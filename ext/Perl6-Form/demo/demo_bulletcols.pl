@@ -7,17 +7,17 @@ s/\\n/\n/g for  @items;
 s/\\r/\r/g for  @items;
 
 print $^STDOUT, < form
- \%(bullet=>'<>'),
- "<> \{:[[[[[[[[[[[[[[[[[[:\}    <> \{:[[[[[[[[[[[[[[[[[[:\}",
- \@items,                     \@items;
+	\%(bullet=>'<>'),
+	 "<> \{:[[[[[[[[[[[[[[[[[[:\}    <> \{:[[[[[[[[[[[[[[[[[[:\}",
+		 \@items,                     \@items;
 
 my $items = join "", @items;
 
 print $^STDOUT, < form
-  "-----------------------",
-  \%(bullet=>'<>'),
-  "<> \{:[[[[[[[[[[[[[[[[[[:\}    <> \{:[[[[[[[[[[[[[[[[[[:\}",
-  $items,                      $items;
+	 "-----------------------",
+     \%(bullet=>'<>'),
+	 "<> \{:[[[[[[[[[[[[[[[[[[:\}    <> \{:[[[[[[[[[[[[[[[[[[:\}",
+		 $items,                      $items;
 
 __DATA__
 A rubber sword, laminated with mylar to look suitably shiny.

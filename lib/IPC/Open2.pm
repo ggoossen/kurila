@@ -14,17 +14,17 @@ IPC::Open2, open2 - open a process for both reading and writing
 
 =head1 SYNOPSIS
 
-use IPC::Open2;
+    use IPC::Open2;
 
-$pid = open2(\*CHLD_OUT, \*CHLD_IN, 'some cmd and args');
-# or without using the shell
-$pid = open2(\*CHLD_OUT, \*CHLD_IN, 'some', 'cmd', 'and', 'args');
+    $pid = open2(\*CHLD_OUT, \*CHLD_IN, 'some cmd and args');
+      # or without using the shell
+    $pid = open2(\*CHLD_OUT, \*CHLD_IN, 'some', 'cmd', 'and', 'args');
 
-# or with handle autovivification
-my($chld_out, $chld_in);
-$pid = open2($chld_out, $chld_in, 'some cmd and args');
-# or without using the shell
-$pid = open2($chld_out, $chld_in, 'some', 'cmd', 'and', 'args');
+    # or with handle autovivification
+    my($chld_out, $chld_in);
+    $pid = open2($chld_out, $chld_in, 'some cmd and args');
+      # or without using the shell
+    $pid = open2($chld_out, $chld_in, 'some', 'cmd', 'and', 'args');
 
 =head1 DESCRIPTION
 
@@ -32,7 +32,7 @@ The open2() function runs the given $cmd and connects $chld_out for
 reading and $chld_in for writing.  It's what you think should work 
 when you try
 
-$pid = open(HANDLE, "|cmd args|");
+    $pid = open(HANDLE, "|cmd args|");
 
 The write filehandle will have autoflush turned on.
 
@@ -109,7 +109,7 @@ require IPC::Open3;
 
 sub open2 {
     return IPC::Open3::_open3('open2', scalar caller,
-                              @_[1], @_[0], (@: '>&', $^STDERR), < @_[[2 .. ((nelems @_)-1)]]);
+				@_[1], @_[0], (@: '>&', $^STDERR), < @_[[2 .. ((nelems @_)-1)]]);
 }
 
 1

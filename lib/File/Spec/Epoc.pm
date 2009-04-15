@@ -13,7 +13,7 @@ File::Spec::Epoc - methods for Epoc file specs
 
 =head1 SYNOPSIS
 
-require File::Spec::Epoc; # Done internally by File::Spec if needed
+ require File::Spec::Epoc; # Done internally by File::Spec if needed
 
 =head1 DESCRIPTION
 

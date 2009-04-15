@@ -21,14 +21,14 @@ do {
     m/(..)/;
     ok( $1 eq 'la', '// on my $_' );
     do {
-        my $_ = 'nested';
-        ok( $_ eq 'nested', 'my $_ nested' );
-        chop;
-        ok( $_ eq 'neste', 'chop on my $_' );
+	my $_ = 'nested';
+	ok( $_ eq 'nested', 'my $_ nested' );
+	chop;
+	ok( $_ eq 'neste', 'chop on my $_' );
     };
     do {
-        our $_;
-        ok( $_ eq 'glabol', 'gains access to our global $_' );
+	our $_;
+	ok( $_ eq 'glabol', 'gains access to our global $_' );
     };
     ok( $_ eq 'lacol', 'my $_ restored' );
 };
@@ -49,10 +49,10 @@ $_ = "global";
 do {
     my $_ = 'local';
     for my $_ (@("foo")) {
-        ok( $_ eq "foo", 'for my $_' );
-        m/(.)/;
-        ok( $1 eq "f", '...m// in for my $_' );
-        ok( our $_ eq 'global', '...our $_ inside for my $_' );
+	ok( $_ eq "foo", 'for my $_' );
+	m/(.)/;
+	ok( $1 eq "f", '...m// in for my $_' );
+	ok( our $_ eq 'global', '...our $_ inside for my $_' );
     }
     ok( $_ eq 'local', '...my $_ restored outside for my $_' );
     ok( our $_ eq 'global', '...our $_ restored outside for my $_' );
@@ -60,10 +60,10 @@ do {
 do {
     my $_ = 'local';
     for (@("implicit foo")) { # implicit "my $_"
-        ok( $_ eq "implicit foo", 'for implicit my $_' );
-        m/(.)/;
-        ok( $1 eq "i", '...m// in for implicity my $_' );
-        ok( our $_ eq 'global', '...our $_ inside for implicit my $_' );
+	ok( $_ eq "implicit foo", 'for implicit my $_' );
+	m/(.)/;
+	ok( $1 eq "i", '...m// in for implicity my $_' );
+	ok( our $_ eq 'global', '...our $_ inside for implicit my $_' );
     }
     ok( $_ eq 'local', '...my $_ restored outside for implicit my $_' );
     ok( our $_ eq 'global', '...our $_ restored outside for implicit my $_' );
@@ -76,9 +76,9 @@ do {
 };
 do {
     for our $_ (@("bar")) {
-        ok( $_ eq "bar", 'for our $_' );
-        m/(.)/;
-        ok( $1 eq "b", '...m// in for our $_' );
+	ok( $_ eq "bar", 'for our $_' );
+	m/(.)/;
+	ok( $1 eq "b", '...m// in for our $_' );
     }
     ok( $_ eq 'global', '...our $_ restored outside for our $_' );
 };
@@ -89,13 +89,13 @@ do {
     my $_ = 'x';
     sub tmap2 { m/(.)/; $buf .= $1 } # uses my $_
     map {
-            tmap1();
-            tmap2();
-            ok( m/^[67]\z/, 'local lexical $_ is seen in map' );
-            do { ok( our $_ eq 'global', 'our $_ still visible' ); };
-            ok( $_ == 6 || $_ == 7, 'local lexical $_ is still seen in map' );
-            do { my $_ ; ok( !defined, 'nested my $_ is undefined' ); };
-        }, @( 6, 7);
+	tmap1();
+	tmap2();
+	ok( m/^[67]\z/, 'local lexical $_ is seen in map' );
+	do { ok( our $_ eq 'global', 'our $_ still visible' ); };
+	ok( $_ == 6 || $_ == 7, 'local lexical $_ is still seen in map' );
+	do { my $_ ; ok( !defined, 'nested my $_ is undefined' ); };
+    }, @( 6, 7);
     ok( $buf eq 'gxgx', q/...map doesn't modify outer lexical $_/ );
     ok( $_ eq 'x', '...my $_ restored outside map' );
     ok( our $_ eq 'global', '...our $_ restored outside map' );
@@ -115,12 +115,12 @@ do {
     my $_ = 'y';
     sub tgrep2 { m/(.)/; $buf .= $1 }
     grep {
-            tgrep1();
-            tgrep2();
-            ok( m/^[89]\z/, 'local lexical $_ is seen in grep' );
-            do { ok( our $_ eq 'global', 'our $_ still visible' ); };
-            ok( $_ == 8 || $_ == 9, 'local lexical $_ is still seen in grep' );
-        }, @( 8, 9);
+	tgrep1();
+	tgrep2();
+	ok( m/^[89]\z/, 'local lexical $_ is seen in grep' );
+	do { ok( our $_ eq 'global', 'our $_ still visible' ); };
+	ok( $_ == 8 || $_ == 9, 'local lexical $_ is still seen in grep' );
+    }, @( 8, 9);
     ok( $buf eq 'gygy', q/...grep doesn't modify outer lexical $_/ );
     ok( $_ eq 'y', '...my $_ restored outside grep' );
     ok( our $_ eq 'global', '...our $_ restored outside grep' );
@@ -137,7 +137,7 @@ do {
     my $s = "toto";
     my $_ = "titi";
     $s =~ m/to(?{ ok( $_ eq 'toto', 'my $_ in code-match # TODO' ) })to/
-        or ok( 0, "\$s=$s should match!" );
+	or ok( 0, "\$s=$s should match!" );
     ok( our $_ eq 'global', '...our $_ restored outside code-match' );
 };
 
@@ -168,7 +168,7 @@ do {
     $fqdb::_ = 'fqdb';
     ok( $fqdb::_ eq 'fqdb', 'fully qualified $_ is not in main' );
     ok( eval q/$fqdb::_/ eq 'fqdb', 'fully qualified, evaled $_ is not in main' );
-        package fqdb;
+    package fqdb;
     main::ok( $_ ne 'fqdb', 'unqualified $_ is in main' );
     main::ok( q/$_/ ne 'fqdb', 'unqualified, evaled $_ is in main' );
 };

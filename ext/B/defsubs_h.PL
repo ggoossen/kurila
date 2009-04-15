@@ -47,31 +47,31 @@ foreach my $const (qw(
 		      PAD_FAKELEX_MULTI
                       PAD_NAME_START_INDEX
 		      ))
-{
-    doconst($const);
-}
+ {
+  doconst($const);
+ }
 
 doconst('CVf_ISXSUB');
 
 foreach my $tuple (@(\@('op.h'),\@('cop.h'),\@('regexp.h','RXf_')))
-{
-    my $file = $tuple->[0];
-    my $pfx = $tuple->[?1] || '';
-    my $path = File::Spec->catfile($headerpath, $file);
-    open(my $oph,"<","$path") || die "Cannot open $path:$^OS_ERROR";
-    while ( ~< $oph)
-    {  
-        doconst($1) if (m/#define\s+($pfx\w+)\s+([\(\)\|\dx]+)\s*(?:$|\/\*)/);
-    }  
-    close($oph);
-}
+ {
+  my $file = $tuple->[0];
+  my $pfx = $tuple->[?1] || '';
+  my $path = File::Spec->catfile($headerpath, $file);
+  open(my $oph,"<","$path") || die "Cannot open $path:$^OS_ERROR";
+  while ( ~< $oph)
+   {  
+    doconst($1) if (m/#define\s+($pfx\w+)\s+([\(\)\|\dx]+)\s*(?:$|\/\*)/);
+   }  
+  close($oph);
+ }
 close($out_fh);
-
+               
 sub doconst
 {
-    my $sym = shift;
-    my $l = length($sym);
-    print $out_fh, <<"END";
+ my $sym = shift;
+ my $l = length($sym);
+ print $out_fh, <<"END";
  ENTER;
  SAVESPTR(PL_curstash);
  HVcpREPLACE(PL_curstash, stash);

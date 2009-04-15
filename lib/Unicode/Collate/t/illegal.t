@@ -1,13 +1,13 @@
 
 BEGIN {
     unless ("A" eq pack('U', 0x41)) {
-        print $^STDOUT, "1..0 # Unicode::Collate " .
-            "cannot stringify a Unicode code point\n";
-        exit 0;
+	print $^STDOUT, "1..0 # Unicode::Collate " .
+	    "cannot stringify a Unicode code point\n";
+	exit 0;
     }
     if (env::var('PERL_CORE')) {
-        chdir('t') if -d 't';
-        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
+	chdir('t') if -d 't';
+	$^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
 }
 
@@ -32,7 +32,7 @@ no warnings 'utf8';
 # (cf. UCA, 7.1.1 Illegal code points).
 
 my $illeg = Unicode::Collate->new(
-    entry => <<'ENTRIES',
+  entry => <<'ENTRIES',
 0000  ; [.0020.0000.0000.0000] # [0000] NULL
 0001  ; [.0021.0000.0000.0001] # [0001] START OF HEADING
 FFFE  ; [.0022.0000.0000.FFFE] # <noncharacter-FFFE> (invalid)
@@ -48,10 +48,10 @@ FDEF  ; [.0027.0000.0000.FDEF] # <noncharacter-FDEF> (invalid)
 0041 0000 ; [.1100.0020.0008.0041] # latin A + NULL
 0041 FFFF ; [.1200.0020.0008.0041] # latin A + FFFF (invalid)
 ENTRIES
-    level => 1,
-    table => undef,
-    normalization => undef,
-    );
+  level => 1,
+  table => undef,
+  normalization => undef,
+);
 
 # 2..12
 is($illeg->cmp("", "\x00"), -1);
@@ -89,10 +89,10 @@ is($illeg->cmp("AA", "A\0"), -1);
 my($match, $str, $sub, $ret);
 
 my $Collator = Unicode::Collate->new(
-    table => 'keys.txt',
-    level => 1,
-    normalization => undef,
-    );
+  table => 'keys.txt',
+  level => 1,
+  normalization => undef,
+);
 
 $sub = "pe";
 

@@ -43,7 +43,7 @@ is( $exit, 0, '  exited 0' );
 my $quote = $Is_VMS || $Is_Win32 ?? '"' !! '';
 $tnum = curr_test();
 $exit = system $Perl, '-le', 
-    "$($quote)print \$^STDOUT, q<ok $tnum - system(PROG, LIST)>$($quote)";
+               "$($quote)print \$^STDOUT, q<ok $tnum - system(PROG, LIST)>$($quote)";
 next_test();
 is( $exit, 0, '  exited 0' );
 
@@ -76,9 +76,9 @@ do {
         "ok\n", 'extra newlines on outgoing pipes');
 
     do {
-                   local($^INPUT_RECORD_SEPARATOR) = \2;       
-        my $out = runperl(prog => 'print $^STDOUT, q{1234}');
-        is($out, "1234", 'ignore $/ when capturing output in scalar context');
+	local($^INPUT_RECORD_SEPARATOR) = \2;       
+	my $out = runperl(prog => 'print $^STDOUT, q{1234}');
+	is($out, "1234", 'ignore $/ when capturing output in scalar context');
     };
 };
 
@@ -103,7 +103,7 @@ TODO: do {
     my $tnum = curr_test();
     if( $^OS_NAME =~ m/Win32/ ) {
         print $^STDOUT, "not ok $tnum - exec failure doesn't terminate process " .
-            "# TODO Win32 exec failure waits for user input\n";
+              "# TODO Win32 exec failure waits for user input\n";
         next_test();
         last TODO;
     }

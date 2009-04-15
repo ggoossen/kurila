@@ -204,9 +204,9 @@ like( $^EVAL_ERROR->message, qr/Bad filehandle:\s+afile/,          '       right
 
 do {
     for (1..2) {
-        ok( open(my $f, "-|", qq{$Perl -le "print \\\$^STDOUT, 'ok'"}), 'open -|');
-        is( scalar ~< $f, "ok\n", '       readline');
-        ok( close $f,            '       close' );
+	ok( open(my $f, "-|", qq{$Perl -le "print \\\$^STDOUT, 'ok'"}), 'open -|');
+	is( scalar ~< $f, "ok\n", '       readline');
+	ok( close $f,            '       close' );
     }
 };
 
@@ -223,10 +223,10 @@ do {
 SKIP: do {
     skip "This perl uses perlio", 1 if config_value("useperlio");
     skip "miniperl cannot be relied on to load \%Errno"
-        if env::var('PERL_CORE_MINITEST');
+	if env::var('PERL_CORE_MINITEST');
     # Force the reference to %! to be run time by writing ! as {"!"}
     skip "This system doesn't understand EINVAL", 1
-        unless exists %{"!"}{EINVAL};
+	unless exists %{"!"}{EINVAL};
 
     no warnings 'io';
     ok(!open(my $f,'>',\my $s) && %{"!"}{?EINVAL}, 'open(reference) raises EINVAL');
@@ -242,12 +242,12 @@ do {
 
     sub gimme {
         my $tmphandle = shift;
-        my $line = scalar ~< $tmphandle;
-        warn "gimme";
-        return $line;
+	my $line = scalar ~< $tmphandle;
+	warn "gimme";
+	return $line;
     }
 };
-
+    
 SKIP: do {
     skip("These tests use perlio", 5) unless config_value("useperlio");
     my $w;
@@ -256,27 +256,27 @@ SKIP: do {
 
     try { open(my $f, ">>>", "afile") };
     like($w, qr/Invalid separator character '>' in PerlIO layer spec/,
-         "bad open (>>>) warning");
+	 "bad open (>>>) warning");
     like($^EVAL_ERROR->message, qr/Unknown open\(\) mode '>>>'/,
-         "bad open (>>>) failure");
+	 "bad open (>>>) failure");
 
     try { open(my $f, ">:u", "afile" ) };
     ok( ! $^EVAL_ERROR );
     like($w, qr/Unknown PerlIO layer "u"/,
-         'bad layer ">:u" warning');
+	 'bad layer ">:u" warning');
     try { open(my $f, "<:u", "afile" ) };
     ok( ! $^EVAL_ERROR );
     like($w, qr/Unknown PerlIO layer "u"/,
-         'bad layer "<:u" warning');
+	 'bad layer "<:u" warning');
     try { open(my $f, ":c", "afile" ) };
     like($^EVAL_ERROR->message, qr/Unknown open\(\) mode ':c'/,
-         'bad layer ":c" failure');
+	 'bad layer ":c" failure');
 };
 
 # [perl #28986] "open m" crashes Perl
 
 fresh_perl_like('open m', qr/^Search pattern not terminated at/,
-                \%( stderr => 1 ), 'open m test');
+	\%( stderr => 1 ), 'open m test');
 
 fresh_perl_is(
     'sub f { open(my $fh, "<", "xxx"); $fh = "f"; } f; f;print $^STDOUT, "ok"',

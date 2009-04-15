@@ -6,11 +6,11 @@ XS::Typemap - module to test the XS typemaps distributed with perl
 
 =head1 SYNOPSIS
 
-use XS::Typemap;
+  use XS::Typemap;
 
-$output = T_IV( $input );
-$output = T_PV( $input );
-@output = T_ARRAY( @input );
+  $output = T_IV( $input );
+  $output = T_PV( $input );
+  @output = T_ARRAY( @input );
 
 =head1 DESCRIPTION
 

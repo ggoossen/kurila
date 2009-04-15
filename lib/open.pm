@@ -14,19 +14,19 @@ sub _drop_oldenc($h, @< @new) {
     return unless (nelems @new) +>= 1 && @new[-1] =~ m/^:encoding\(.+\)$/;
     my @old = PerlIO::get_layers($h);
     return unless (nelems @old) +>= 3 &&
-        @old[-1] eq 'utf8' &&
-        @old[-2] =~ m/^encoding\(.+\)$/;
+	          @old[-1] eq 'utf8' &&
+                  @old[-2] =~ m/^encoding\(.+\)$/;
     require Encode;
     my @($loname, $lcname) =  _get_encname(@old[-2]);
     unless (defined $lcname) { # Should we trust get_layers()?
-        die("open: Unknown encoding '$loname'");
+	die("open: Unknown encoding '$loname'");
     }
     my @($voname, $vcname) =  _get_encname(@new[-1]);
     unless (defined $vcname) {
-        die("open: Unknown encoding '$voname'");
+	die("open: Unknown encoding '$voname'");
     }
     if ($lcname eq $vcname) {
-        binmode($h, ":pop"); # utf8 is part of the encoding layer
+	binmode($h, ":pop"); # utf8 is part of the encoding layer
     }
 }
 
@@ -35,19 +35,19 @@ sub import($class,@< @args) {
     my $std;
     my @($in,$out) =  split(m/\0/,($^OPEN || "\0"), -1);
     while ((nelems @args)) {
-        my $type = shift(@args);
-        my $dscp;
-        if ($type =~ m/^:?(utf8|encoding\(.+\))$/) {
-            $type = 'IO';
-            $dscp = ":$1";
-        } elsif ($type eq ':std') {
-            $std = 1;
-            next;
-        } else {
-            $dscp = shift(@args) || '';
-        }
-        my @val;
-        foreach my $layer (split(m/\s+/,$dscp)) {
+	my $type = shift(@args);
+	my $dscp;
+	if ($type =~ m/^:?(utf8|encoding\(.+\))$/) {
+	    $type = 'IO';
+	    $dscp = ":$1";
+	} elsif ($type eq ':std') {
+	    $std = 1;
+	    next;
+	} else {
+	    $dscp = shift(@args) || '';
+	}
+	my @val;
+	foreach my $layer (split(m/\s+/,$dscp)) {
             $layer =~ s/^://;
             my $target = $layer;		# the layer name itself
             $target =~ s/^(\w+)\(.+\)$/$1/;	# strip parameters
@@ -55,46 +55,46 @@ sub import($class,@< @args) {
             unless(PerlIO::Layer->find($target,1)) {
                 warnings::warnif("layer", "Unknown PerlIO layer '$target'");
             }
-            push(@val,":$layer");
-            if ($layer =~ m/^(crlf|raw)$/) {
-                $^HINTS{+"open_$type"} = $layer;
-            }
-        }
-        if ($type eq 'IN') {
-            _drop_oldenc($^STDIN, < @val);
-            $in  = join(' ', @val);
-        }
-        elsif ($type eq 'OUT') {
-            _drop_oldenc($^STDOUT, < @val);
-            $out = join(' ', @val);
-        }
-        elsif ($type eq 'IO') {
-            _drop_oldenc($^STDIN,  < @val);
-            _drop_oldenc($^STDOUT, < @val);
-            $in = $out = join(' ', @val);
-        }
-        else {
-            die "Unknown PerlIO layer class '$type'";
-        }
+	    push(@val,":$layer");
+	    if ($layer =~ m/^(crlf|raw)$/) {
+		$^HINTS{+"open_$type"} = $layer;
+	    }
+	}
+	if ($type eq 'IN') {
+	    _drop_oldenc($^STDIN, < @val);
+	    $in  = join(' ', @val);
+	}
+	elsif ($type eq 'OUT') {
+	    _drop_oldenc($^STDOUT, < @val);
+	    $out = join(' ', @val);
+	}
+	elsif ($type eq 'IO') {
+	    _drop_oldenc($^STDIN,  < @val);
+	    _drop_oldenc($^STDOUT, < @val);
+	    $in = $out = join(' ', @val);
+	}
+	else {
+	    die "Unknown PerlIO layer class '$type'";
+	}
     }
     $^OPEN = join("\0", @( $in, $out));
     if ($std) {
-        if ($in) {
-            if ($in =~ m/:utf8\b/) {
-                binmode($^STDIN,  ":utf8");
-            } elsif ($in =~ m/(\w+\(.+\))/) {
-                binmode($^STDIN,  ":$1");
-            }
-        }
-        if ($out) {
-            if ($out =~ m/:utf8\b/) {
-                binmode($^STDOUT,  ":utf8");
-                binmode($^STDERR,  ":utf8");
-            } elsif ($out =~ m/(\w+\(.+\))/) {
-                binmode($^STDOUT,  ":$1");
-                binmode($^STDERR,  ":$1");
-            }
-        }
+	if ($in) {
+	    if ($in =~ m/:utf8\b/) {
+		    binmode($^STDIN,  ":utf8");
+		} elsif ($in =~ m/(\w+\(.+\))/) {
+		    binmode($^STDIN,  ":$1");
+		}
+	}
+	if ($out) {
+	    if ($out =~ m/:utf8\b/) {
+		binmode($^STDOUT,  ":utf8");
+		binmode($^STDERR,  ":utf8");
+	    } elsif ($out =~ m/(\w+\(.+\))/) {
+		binmode($^STDOUT,  ":$1");
+		binmode($^STDERR,  ":$1");
+	    }
+	}
     }
 }
 

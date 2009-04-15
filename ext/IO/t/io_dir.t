@@ -4,8 +4,8 @@ use Config;
 
 BEGIN {
     if (not config_value('d_readdir')) {
-        print $^STDOUT, "1..0 # Skip: readdir() not available\n";
-        exit 0;
+	print $^STDOUT, "1..0 # Skip: readdir() not available\n";
+	exit 0;
     }
 }
 
@@ -17,9 +17,9 @@ use IO::Dir < qw(DIR_UNLINK);
 my $tcount = 0;
 
 sub ok {
-    $tcount++;
-    my $not = @_[0] ?? '' !! 'not ';
-    print $^STDOUT, "$($not)ok $tcount\n";
+  $tcount++;
+  my $not = @_[0] ?? '' !! 'not ';
+  print $^STDOUT, "$($not)ok $tcount\n";
 }
 
 print $^STDOUT, "1..5\n";

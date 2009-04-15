@@ -3,7 +3,7 @@
 use warnings;
 
 use Config;
-
+ 
 use DB_File; 
 use Fcntl;
 
@@ -21,16 +21,16 @@ do {
     {
         my $class = shift ;
         my $filename = shift ;
-        my $fh = gensym ;
-        open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" ;
-        my $real_stdout = $^STDOUT;
-        return bless \@($fh, $real_stdout ) ;
+	my $fh = gensym ;
+	open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" ;
+	my $real_stdout = $^STDOUT;
+	return bless \@($fh, $real_stdout ) ;
 
     }
     sub DESTROY
     {
         my $self = shift ;
-        close $self->[0] ;
+	close $self->[0] ;
     }
 };
 
@@ -57,7 +57,7 @@ sub normalise
 my $Dfile = "dbhash.tmp";
 my $Dfile2 = "dbhash2.tmp";
 my $null_keys_allowed = ($DB_File::db_ver +< 2.004010 
-                         || $DB_File::db_ver +>= 3.1 );
+				|| $DB_File::db_ver +>= 3.1 );
 
 unlink $Dfile;
 
@@ -99,12 +99,12 @@ my %h = DB_File->new($Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH );
 ok( %h);
 
 my @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-     $blksize,$blocks) = @: stat($Dfile);
+   $blksize,$blocks) = @: stat($Dfile);
 
 my %noMode = %( < @+: map { @: $_, 1 }, qw( amigaos MSWin32 NetWare cygwin ) ) ;
 
 ok( ($mode ^&^ 0777) == (($^OS_NAME eq 'os2' || $^OS_NAME eq 'MacOS') ?? 0666 !! 0640) ||
-    %noMode{?$^OS_NAME} );
+   %noMode{?$^OS_NAME} );
 
 my ($key, $value, $i);
 # while (@(?$key,?$value) = @: each(%h)) {
@@ -155,7 +155,7 @@ is( nelems(@keys), 30 );
 is( nelems(@values), 30 );
 
 $i = 0 ;
-    %h->iterate(
+%h->iterate(
     sub {
         my @($key,$value) = @_;
         if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
@@ -181,7 +181,7 @@ if ($null_keys_allowed) {
     $result = ( %h->FETCH('') eq 'bar' );
 }
 else
-{ $result = 1 }
+  { $result = 1 }
 ok( $result) ;
 
 # check cache overflow and numeric keys and contents
@@ -191,17 +191,17 @@ for my $i (1..199) { $ok = 0 unless %h->FETCH($i) == $i; }
 ok( $ok );
 
 @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-  $blksize,$blocks) = @: stat($Dfile);
+   $blksize,$blocks) = @: stat($Dfile);
 ok( $size +> 0 );
 
 # Now check all the non-tie specific stuff
 
 # Check NOOVERWRITE will make put fail when attempting to overwrite
 # an existing record.
-
+ 
 my $status = %h->put( 'x', 'newvalue', R_NOOVERWRITE) ;
 ok( $status == 1 );
-
+ 
 # check that the value of the key 'x' has not been changed by the 
 # previous test
 ok( %h->FETCH('x') eq 'X' );
@@ -295,13 +295,13 @@ do {
     # test that $hash{KEY} = undef doesn't produce the warning
     #     Use of uninitialized value in null operation 
     use warnings ;
-
+     
     use DB_File ;
 
     unlink $Dfile;
     my $a = "";
     local $^WARN_HOOK = sub {$a = @_[0]} ;
-
+    
     my %h = DB_File->new( $Dfile ) or die "Can't open file: $^OS_ERROR\n" ;
     %h->put("ABC" => undef);
     ok( $a eq "") ;
@@ -312,7 +312,7 @@ do {
 do {
     # Passing undef for flags and/or mode when calling tie could cause 
     #     Use of uninitialized value in subroutine entry
-
+    
 
     my $warn_count = 0 ;
     #local $SIG{__WARN__} = sub { ++ $warn_count };
@@ -346,7 +346,7 @@ do {
 
 
     use warnings ;
-
+     
     my (%h) ;
     my $Dfile = "xxy.db";
     unlink $Dfile;
@@ -367,7 +367,7 @@ do {
     }
 
     ok $warned eq '' 
-        or print $^STDOUT, "# Caught warning [$warned]\n" ;
+      or print $^STDOUT, "# Caught warning [$warned]\n" ;
 
     # db-put with substr of value
     $warned = '';
@@ -380,7 +380,7 @@ do {
     }
 
     ok $warned eq '' 
-        or print $^STDOUT, "# Caught warning [$warned]\n" ;
+      or print $^STDOUT, "# Caught warning [$warned]\n" ;
 
     # via the tied hash is not a problem, but check anyway
     # substr of key
@@ -394,7 +394,7 @@ do {
     }
 
     ok $warned eq '' 
-        or print $^STDOUT, "# Caught warning [$warned]\n" ;
+      or print $^STDOUT, "# Caught warning [$warned]\n" ;
 
     # via the tied hash is not a problem, but check anyway
     # substr of value
@@ -408,7 +408,7 @@ do {
     }
 
     ok $warned eq '' 
-        or print $^STDOUT, "# Caught warning [$warned]\n" ;
+      or print $^STDOUT, "# Caught warning [$warned]\n" ;
 
     my %bad = %( () ) ;
     $key = '';
@@ -417,7 +417,7 @@ do {
 
         #print "# key [$key] value [$value]\n" ;
         if (defined %remember{?$key} && defined $value && 
-            %remember{?$key} eq $value) {
+             %remember{?$key} eq $value) {
             delete %remember{$key} ;
         }
         else {
@@ -426,7 +426,7 @@ do {
 
         $status = %h->seq($key, $value, R_NEXT );
     }
-
+    
     ok nkeys %bad == 0 ;
     ok nkeys %remember == 0 ;
 
@@ -439,7 +439,7 @@ do {
     $warned = '';
     %h->put(undef, $value) ;
     ok $warned eq '' 
-        or print $^STDOUT, "# Caught warning [$warned]\n" ;
+      or print $^STDOUT, "# Caught warning [$warned]\n" ;
     $warned = '';
 
     my $no_NULL = ($DB_File::db_ver +>= 2.003016 && $DB_File::db_ver +< 3.001) ;
@@ -448,7 +448,7 @@ do {
     %h->get(undef, $value) ;
     ok $no_NULL || $value eq 'fred' or print $^STDOUT, "# got [$value]\n" ;
     ok $warned eq '' 
-        or print $^STDOUT, "# Caught warning [$warned]\n" ;
+      or print $^STDOUT, "# Caught warning [$warned]\n" ;
     $warned = '';
 
     undef %h;

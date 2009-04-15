@@ -10,6 +10,6 @@ foreach (qw(SEEK_SET SEEK_CUR SEEK_END     _IOFBF    _IOLBF    _IONBF)) {
     my $d2 = defined($v2);
 
     print $^STDOUT, "not "
-        if($d1 != $d2 || ($d1 && ($v1 != $v2)));
+	if($d1 != $d2 || ($d1 && ($v1 != $v2)));
     print $^STDOUT, "ok ",$i++,"\n";
 }

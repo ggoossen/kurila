@@ -35,21 +35,21 @@ BEGIN { $tests += 1 }
 # setlogsock()
 try { setlogsock() };
 like( $^EVAL_ERROR->{?description}, qr/^Invalid argument passed to setlogsock/, 
-      "calling setlogsock() with no argument" );
+    "calling setlogsock() with no argument" );
 
 BEGIN { $tests += 3 }
 # syslog()
 try { syslog() };
 like( $^EVAL_ERROR->{?description}, qr/^syslog: expecting argument \$priority/, 
-      "calling syslog() with no argument" );
+    "calling syslog() with no argument" );
 
 try { syslog(undef) };
 like( $^EVAL_ERROR->{?description}, qr/^syslog: expecting argument \$priority/, 
-      "calling syslog() with one undef argument" );
+    "calling syslog() with one undef argument" );
 
 try { syslog('') };
 like( $^EVAL_ERROR->{?description}, qr/^syslog: expecting argument \$format/, 
-      "calling syslog() with one empty argument" );
+    "calling syslog() with one empty argument" );
 
 
 my $test_string = "uid $^UID is testing Perl $^PERL_VERSION syslog(3) capabilities";
@@ -59,7 +59,7 @@ BEGIN { $tests += 8 }
 # try to open a syslog using a Unix or stream socket
 SKIP: do {
     skip "can't connect to Unix socket: _PATH_LOG unavailable", 8
-        unless -e Sys::Syslog::_PATH_LOG();
+      unless -e Sys::Syslog::_PATH_LOG();
 
     # The only known $^O eq 'svr4' that needs this is NCR MP-RAS,
     # but assuming 'stream' in SVR4 is probably not that bad.
@@ -67,13 +67,13 @@ SKIP: do {
 
     try { setlogsock($sock_type) };
     is( $^EVAL_ERROR, '', "setlogsock() called with '$sock_type'" );
-  TODO: do {
+    TODO: do {
         local $TODO = "minor bug";
         ok( $r, "setlogsock() should return true: '$r'" );
     };
 
-  # open syslog with a "local0" facility
-  SKIP: do {
+    # open syslog with a "local0" facility
+    SKIP: do {
         # openlog()
         $r = try { openlog('perl', 'ndelay', 'local0') } || 0;
         skip "can't connect to syslog", 6 if $^EVAL_ERROR and $^EVAL_ERROR->{?description} =~ m/^no connection to syslog available/;
@@ -97,7 +97,7 @@ BEGIN { $tests += 20 * 8 }
 # try to open a syslog using all the available connection methods
 my @passed = @( () );
 for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp)) {
-  SKIP: do {
+    SKIP: do {
         skip "the 'stream' mechanism because a previous mechanism with similar interface succeeded", 20 
             if $sock_type eq 'stream' and grep {m/pipe|unix/}, @passed;
 
@@ -148,14 +148,14 @@ for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp)) {
 
         # syslog() with level "info" (as a macro), should pass
         do { local $^OS_ERROR = 1;
-            $r = try { syslog(LOG_INFO(), "$test_string by connecting to a $sock_type socket, setting a fake errno: \%m") } || 0;
+          $r = try { syslog(LOG_INFO(), "$test_string by connecting to a $sock_type socket, setting a fake errno: \%m") } || 0;
         };
         is( $^EVAL_ERROR, '', "[$sock_type] syslog() called with level 'info' (macro)" );
         ok( $r, "[$sock_type] syslog() should return true: $(dump::view($r))" );
 
         push @passed, $sock_type;
 
-      SKIP: do {
+        SKIP: do {
             skip "skipping closelog() tests for 'console'", 2 if $sock_type eq 'console';
             # closelog()
             $r = try { closelog() } || 0;
@@ -205,8 +205,8 @@ SKIP: do {
     is( $^EVAL_ERROR, '', "setlogsock() called, with 'stream' and 'test.log' (file does not exist)" );
     ok( !$r, "setlogsock() should return false: '$r'" );
 
-  # setlogsock() with "stream" and a local file
-  SKIP: do {
+    # setlogsock() with "stream" and a local file
+    SKIP: do {
         my $logfile = "test.log";
         open(my $logfh, ">", "$logfile") or skip "can't create file '$logfile': $^OS_ERROR", 2;
         close($logfh);
@@ -233,7 +233,7 @@ do {
         LOG_MASK(LOG_ERR()), 
         ^~^LOG_MASK(LOG_INFO()), 
         LOG_MASK(LOG_CRIT()) ^|^ LOG_MASK(LOG_ERR()) ^|^ LOG_MASK(LOG_WARNING()), 
-        );
+    );
 
     for my $newmask ( @masks) {
         $r = try { setlogmask($newmask) } || 0;

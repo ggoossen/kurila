@@ -12,31 +12,31 @@ package Pod::ParseUtils;
 our ($VERSION);
 $VERSION = 1.35;   ## Current version of this package
 
-    =head1 NAME
+=head1 NAME
 
-    Pod::ParseUtils - helpers for POD parsing and conversion
+Pod::ParseUtils - helpers for POD parsing and conversion
 
-    =head1 SYNOPSIS
+=head1 SYNOPSIS
 
-    use Pod::ParseUtils;
+  use Pod::ParseUtils;
 
-    my $list = new Pod::List;
-    my $link = Pod::Hyperlink->new('Pod::Parser');
+  my $list = new Pod::List;
+  my $link = Pod::Hyperlink->new('Pod::Parser');
 
-    =head1 DESCRIPTION
+=head1 DESCRIPTION
 
-    B<Pod::ParseUtils> contains a few object-oriented helper packages for
-    POD parsing and processing (i.e. in POD formatters and translators).
+B<Pod::ParseUtils> contains a few object-oriented helper packages for
+POD parsing and processing (i.e. in POD formatters and translators).
 
-    =cut
+=cut
 
-    #-----------------------------------------------------------------------------
-    # Pod::List
-    #
-    # class to hold POD list info (=over, =item, =back)
-    #-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+# Pod::List
+#
+# class to hold POD list info (=over, =item, =back)
+#-----------------------------------------------------------------------------
 
-    package Pod::List;
+package Pod::List;
 
 =head2 Pod::List
 
@@ -51,7 +51,7 @@ The following methods are available:
 Create a new list object. Properties may be specified through a hash
 reference like this:
 
-my $list = Pod::List->new({ -start => $., -indent => 4 });
+  my $list = Pod::List->new({ -start => $., -indent => 4 });
 
 See the individual methods/properties for details.
 
@@ -86,7 +86,7 @@ method or by calling the B<file()> method with a scalar argument.
 
 # The POD file name the list appears in
 sub file {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{file} = @_[1]) !! @_[0]->{file};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{file} = @_[1]) !! @_[0]->{file};
 }
 
 =item $list-E<gt>start()
@@ -100,7 +100,7 @@ argument.
 
 # The line in the file the node appears
 sub start {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{start} = @_[1]) !! @_[0]->{start};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{start} = @_[1]) !! @_[0]->{start};
 }
 
 =item $list-E<gt>indent()
@@ -114,7 +114,7 @@ with a scalar argument.
 
 # indent level
 sub indent {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{indent} = @_[1]) !! @_[0]->{indent};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{indent} = @_[1]) !! @_[0]->{indent};
 }
 
 =item $list-E<gt>type()
@@ -129,7 +129,7 @@ with a scalar argument.
 
 # The type of the list (UL, OL, ...)
 sub type {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{type} = @_[1]) !! @_[0]->{type};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{type} = @_[1]) !! @_[0]->{type};
 }
 
 =item $list-E<gt>rx()
@@ -146,7 +146,7 @@ with a scalar argument.
 
 # The regular expression to simplify the items
 sub rx {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{rx} = @_[1]) !! @_[0]->{rx};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{rx} = @_[1]) !! @_[0]->{rx};
 }
 
 =item $list-E<gt>item()
@@ -181,7 +181,7 @@ with a scalar argument.
 # possibility for parsers/translators to store information about the
 # lists's parent object
 sub parent {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{parent} = @_[1]) !! @_[0]->{parent};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{parent} = @_[1]) !! @_[0]->{parent};
 }
 
 =item $list-E<gt>tag()
@@ -199,7 +199,7 @@ with a scalar argument.
 # possibility for parsers/translators to store information about the
 # list's object
 sub tag {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{tag} = @_[1]) !! @_[0]->{tag};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{tag} = @_[1]) !! @_[0]->{tag};
 }
 
 #-----------------------------------------------------------------------------
@@ -214,7 +214,7 @@ package Pod::Hyperlink;
 
 B<Pod::Hyperlink> is a class for manipulation of POD hyperlinks. Usage:
 
-my $link = Pod::Hyperlink->new('alternative text|page/"section in page"');
+  my $link = Pod::Hyperlink->new('alternative text|page/"section in page"');
 
 The B<Pod::Hyperlink> class is mainly designed to parse the contents of the
 C<LE<lt>...E<gt>> sequence, providing a simple interface for accessing the
@@ -276,7 +276,7 @@ section can simply be dropped.
 
 sub parse {
     my $self = shift;
-          local($_) = @_[0];
+    local($_) = @_[0];
     # syntax check the link and extract destination
     my @($alttext,$page,$node,$type,$quoted) = @(undef,'','','',0);
 
@@ -353,8 +353,8 @@ sub parse {
 
     # non-standard: Hyperlink with alt-text - doesn't remove protocol prefix, maybe it should?
     elsif(m!^ \s* (.*?) \s* [|] \s* (\w+:[^:\s] [^\s|]*?) \s* $!ix) {
-        @($alttext,$node) = @($1,$2);
-        $type = 'hyperlink';
+      @($alttext,$node) = @($1,$2);
+      $type = 'hyperlink';
     }
 
     # non-standard: Hyperlink
@@ -382,7 +382,7 @@ sub parse {
     # empty alternative text expands to node name
     if(defined $alttext) {
         if(!length($alttext)) {
-            $alttext = $node ^|^ $page;
+          $alttext = $node ^|^ $page;
         }
     }
     else {
@@ -423,7 +423,7 @@ sub _construct_text {
     }
     else {
         $self->{+_text} = ($section || '') .
-        (($page && $section) ?? ' in ' !! '') .
+            (($page && $section) ?? ' in ' !! '') .
             "$page$page_ext";
     }
     # for being marked up later
@@ -438,7 +438,7 @@ sub _construct_text {
     }
     else {
         $self->{+_markup} = (!$section ?? '' !! "Q<$section>") .
-        ($page ?? ($section ?? ' in '!!'') . "P<$page>$page_ext" !! '');
+            ($page ?? ($section ?? ' in '!!'') . "P<$page>$page_ext" !! '');
     }
 }
 
@@ -464,10 +464,10 @@ but without markers (read only). Depending on the link type this is one of
 the following alternatives (the + and * denote the portions of the text
 that are marked up):
 
-+perl+                    L<perl>
-*$|* in +perlvar+         L<perlvar/$|>
-*OPTIONS* in +perldoc+    L<perldoc/"OPTIONS">
-*DESCRIPTION*             L<"DESCRIPTION">
+  +perl+                    L<perl>
+  *$|* in +perlvar+         L<perlvar/$|>
+  *OPTIONS* in +perldoc+    L<perldoc/"OPTIONS">
+  *DESCRIPTION*             L<"DESCRIPTION">
 
 =cut
 
@@ -719,7 +719,7 @@ Set/retrieve the POD document name (e.g. "Pod::Parser").
 
 # The POD page
 sub page {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{+page} = @_[1]) !! @_[0]->{?page};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{+page} = @_[1]) !! @_[0]->{?page};
 }
 
 =item $cacheitem-E<gt>description()
@@ -731,7 +731,7 @@ section.
 
 # The POD description, taken out of NAME if present
 sub description {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{+description} = @_[1]) !! @_[0]->{?description};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{+description} = @_[1]) !! @_[0]->{?description};
 }
 
 =item $cacheitem-E<gt>path()
@@ -742,7 +742,7 @@ Set/retrieve the POD file storage path.
 
 # The file path
 sub path {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{+path} = @_[1]) !! @_[0]->{?path};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{+path} = @_[1]) !! @_[0]->{?path};
 }
 
 =item $cacheitem-E<gt>file()
@@ -753,7 +753,7 @@ Set/retrieve the POD file name.
 
 # The POD file name
 sub file {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{+file} = @_[1]) !! @_[0]->{?file};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{+file} = @_[1]) !! @_[0]->{?file};
 }
 
 =item $cacheitem-E<gt>nodes()

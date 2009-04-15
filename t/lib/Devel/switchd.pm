@@ -1,5 +1,5 @@
 package Devel::switchd;
-BEGIN { }
+ BEGIN { }
 sub import { print $^STDOUT, "import<$(join ' ',@_)>;" }
 1;
 

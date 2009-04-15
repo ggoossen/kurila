@@ -3,7 +3,7 @@ package kurila;
 our $VERSION = v1.19;
 
 $^PERL_VERSION eq "kurila-1.19"
-    or die "Perl lib version (kurila-1.19) doesn't match executable version (" . $^PERL_VERSION . ")";
+  or die "Perl lib version (kurila-1.19) doesn't match executable version (" . $^PERL_VERSION . ")";
 
 1;
 

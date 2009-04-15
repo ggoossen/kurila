@@ -40,7 +40,7 @@ my $kjeNoN = Unicode::Collate->new(
     table => undef,
     normalization => undef,
     entry => $kjeEntry,
-    );
+);
 
 is($kjeNoN->cmp("\x{043A}", "\x{043A}\x{0301}"), -1);
 is($kjeNoN->cmp("\x{045C}", "\x{043A}\x{0334}\x{0301}"), 1);
@@ -56,48 +56,48 @@ our %sortkeys;
 try { require Unicode::Normalize };
 if (!$^EVAL_ERROR) {
     my $kjeNFD = Unicode::Collate->new(
-        level => 1,
-        table => undef,
-        entry => $kjeEntry,
-        );
-    is($kjeNFD->cmp("\x{043A}", "\x{043A}\x{0301}"), -1);
-    ok($kjeNFD->eq("\x{045C}", "\x{043A}\x{0334}\x{0301}"));
-    is($kjeNFD->cmp("\x{043A}", "\x{043A}\x{0334}\x{0301}"), -1);
-    ok($kjeNFD->eq("\x{045C}", "\x{043A}\x{0301}\x{0334}"));
+	level => 1,
+	table => undef,
+	entry => $kjeEntry,
+    );
+is($kjeNFD->cmp("\x{043A}", "\x{043A}\x{0301}"), -1);
+ok($kjeNFD->eq("\x{045C}", "\x{043A}\x{0334}\x{0301}"));
+is($kjeNFD->cmp("\x{043A}", "\x{043A}\x{0334}\x{0301}"), -1);
+ok($kjeNFD->eq("\x{045C}", "\x{043A}\x{0301}\x{0334}"));
 
     my $aaNFD = Unicode::Collate->new(
-        level => 1,
-        table => undef,
-        entry => $aaEntry,
-        );
+	level => 1,
+	table => undef,
+	entry => $aaEntry,
+    );
 
-    is($aaNFD->cmp("Z", "A\x{30A}\x{304}"), -1);
-    ok($aaNFD->eq("A", "A\x{304}\x{30A}"));
-    ok($aaNFD->eq(pack('U', 0xE5), "A\x{30A}\x{304}"));
-    ok($aaNFD->eq("A\x{304}", "A\x{304}\x{30A}"));
-    is($aaNFD->cmp("Z", "A\x{327}\x{30A}"), -1);
-    is($aaNFD->cmp("Z", "A\x{30A}\x{327}"), -1);
-    is($aaNFD->cmp("Z", "A\x{31A}\x{30A}"), -1);
-    is($aaNFD->cmp("Z", "A\x{30A}\x{31A}"), -1);
+is($aaNFD->cmp("Z", "A\x{30A}\x{304}"), -1);
+ok($aaNFD->eq("A", "A\x{304}\x{30A}"));
+ok($aaNFD->eq(pack('U', 0xE5), "A\x{30A}\x{304}"));
+ok($aaNFD->eq("A\x{304}", "A\x{304}\x{30A}"));
+is($aaNFD->cmp("Z", "A\x{327}\x{30A}"), -1);
+is($aaNFD->cmp("Z", "A\x{30A}\x{327}"), -1);
+is($aaNFD->cmp("Z", "A\x{31A}\x{30A}"), -1);
+is($aaNFD->cmp("Z", "A\x{30A}\x{31A}"), -1);
 
     my $aaPre = Unicode::Collate->new(
-        level => 1,
-        normalization => "prenormalized",
-        table => undef,
-        entry => $aaEntry,
-        );
+	level => 1,
+	normalization => "prenormalized",
+	table => undef,
+	entry => $aaEntry,
+    );
 
-    is($aaPre->cmp("Z", "A\x{30A}\x{304}"), -1);
-    ok($aaPre->eq("A", "A\x{304}\x{30A}"));
-    ok($aaPre->eq(pack('U', 0xE5), "A\x{30A}\x{304}"));
-    ok($aaPre->eq("A\x{304}", "A\x{304}\x{30A}"));
-    is($aaPre->cmp("Z", "A\x{327}\x{30A}"), -1);
-    is($aaPre->cmp("Z", "A\x{30A}\x{327}"), -1);
-    is($aaPre->cmp("Z", "A\x{31A}\x{30A}"), -1);
-    is($aaPre->cmp("Z", "A\x{30A}\x{31A}"), -1);
+is($aaPre->cmp("Z", "A\x{30A}\x{304}"), -1);
+ok($aaPre->eq("A", "A\x{304}\x{30A}"));
+ok($aaPre->eq(pack('U', 0xE5), "A\x{30A}\x{304}"));
+ok($aaPre->eq("A\x{304}", "A\x{304}\x{30A}"));
+is($aaPre->cmp("Z", "A\x{327}\x{30A}"), -1);
+is($aaPre->cmp("Z", "A\x{30A}\x{327}"), -1);
+is($aaPre->cmp("Z", "A\x{31A}\x{30A}"), -1);
+is($aaPre->cmp("Z", "A\x{30A}\x{31A}"), -1);
 }
 else {
-    ok(1) for 1..20;
+  ok(1) for 1..20;
 }
 
 # again: loading Unicode::Normalize should not affect $kjeNoN.
@@ -115,7 +115,7 @@ my $aaNoN = Unicode::Collate->new(
     table => undef,
     entry => $aaEntry,
     normalization => undef,
-    );
+);
 
 is($aaNoN->cmp("Z", "A\x{30A}\x{304}"), -1);
 ok($aaNoN->eq("A", "A\x{304}\x{30A}"));

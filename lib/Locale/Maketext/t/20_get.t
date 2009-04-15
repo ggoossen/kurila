@@ -9,20 +9,20 @@ print $^STDOUT, "# --- Making sure that get_handle works ---\n";
 
 # declare some classes...
 do {
-    package Woozle;
-    our @ISA = @('Locale::Maketext');
-    sub dubbil   { return @_[1] * 2 }
-    sub numerate { return @_[2] . 'en' }
+  package Woozle;
+  our @ISA = @('Locale::Maketext');
+  sub dubbil   { return @_[1] * 2 }
+  sub numerate { return @_[2] . 'en' }
 };
 do {
-    package Woozle::eu_mt;
-    our @ISA = @('Woozle');
-    our %Lexicon = %(
-            'd2' => 'hum [dubbil,_1]',
-                'd3' => 'hoo [quant,_1,zaz]',
-                'd4' => 'hoo [*,_1,zaz]',
-        );
-    keys %Lexicon; # dodges the 'used only once' warning
+  package Woozle::eu_mt;
+  our @ISA = @('Woozle');
+  our %Lexicon = %(
+   'd2' => 'hum [dubbil,_1]',
+   'd3' => 'hoo [quant,_1,zaz]',
+   'd4' => 'hoo [*,_1,zaz]',
+  );
+  keys %Lexicon; # dodges the 'used only once' warning
 };
 
 my $lh;
@@ -33,7 +33,7 @@ is $lh && $lh->maketext('d2', 7), "hum 14"      ;
 
 
 print $^STDOUT, "# Make sure we can assign to ENV entries\n",
-    "# (Otherwise we can't run the subsequent tests)...\n";
+      "# (Otherwise we can't run the subsequent tests)...\n";
 env::var('MYORP'   ) = 'Zing';
 is env::var('MYORP'), 'Zing';
 env::var('SWUZ'   ) = 'KLORTHO HOOBOY';

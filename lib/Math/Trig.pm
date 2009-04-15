@@ -5,7 +5,7 @@
 #
 
 require Exporter;
-    package Math::Trig;
+package Math::Trig;
 
 
 our ($VERSION, $PACKAGE, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
@@ -47,8 +47,8 @@ my @pi = qw(pi pi2 pi4 pip2 pip4);
 # http://williams.best.vwh.net/avform.htm
 
 %EXPORT_TAGS = %('radial' => \ @rdlcnv,
-        'great_circle' => \ @greatcircle,
-            'pi'     => \ @pi);
+	        'great_circle' => \ @greatcircle,
+	        'pi'     => \ @pi);
 
 sub tan($z) {
     my $cz = cos($z);
@@ -123,15 +123,15 @@ sub cartesian_to_spherical( $x, $y, $z) {
     my $rho = sqrt( $x * $x + $y * $y + $z * $z );
 
     return  @( $rho,
-               atan2( $y, $x ),
-               $rho ?? acos_real( $z / $rho ) !! 0 );
+             atan2( $y, $x ),
+             $rho ?? acos_real( $z / $rho ) !! 0 );
 }
 
 sub spherical_to_cartesian( $rho, $theta, $phi) {
 
     return  @( $rho * cos( $theta ) * sin( $phi ),
-               $rho * sin( $theta ) * sin( $phi ),
-               $rho * cos( $phi   ) );
+             $rho * sin( $theta ) * sin( $phi ),
+             $rho * cos( $phi   ) );
 }
 
 sub spherical_to_cylindrical {
@@ -162,8 +162,8 @@ sub great_circle_distance( $theta0, $phi0, $theta1, $phi1, ?$rho) {
     my $lat1 = pip2 - $phi1;
 
     return $rho *
-        acos_real( cos( $lat0 ) * cos( $lat1 ) * cos( $theta0 - $theta1 ) +
-                   sin( $lat0 ) * sin( $lat1 ) );
+	acos_real( cos( $lat0 ) * cos( $lat1 ) * cos( $theta0 - $theta1 ) +
+		   sin( $lat0 ) * sin( $lat1 ) );
 }
 
 sub great_circle_direction {
@@ -175,11 +175,11 @@ sub great_circle_direction {
     my $lat1 = pip2 - $phi1;
 
     my $direction =
-        acos_real((sin($lat1) - sin($lat0) * cos($distance)) /
-                  (cos($lat0) * sin($distance)));
-
+ 	acos_real((sin($lat1) - sin($lat0) * cos($distance)) /
+		  (cos($lat0) * sin($distance)));
+  
     $direction = pi2 - $direction
-        if sin($theta1 - $theta0) +< 0;
+	if sin($theta1 - $theta0) +< 0;
 
     return rad2rad($direction);
 }
@@ -210,7 +210,7 @@ sub great_circle_waypoint( $theta0, $phi0, $theta1, $phi1, $point) {
 
     my $theta = atan2($y, $x);
     my $phi   = acos_real($z);
-
+    
     return  @($theta, $phi);
 }
 
@@ -223,9 +223,9 @@ sub great_circle_destination( $theta0, $phi0, $dir0, $dst) {
     my $lat0 = pip2 - $phi0;
 
     my $phi1   = asin_real(sin($lat0)*cos($dst) + 
-                           cos($lat0)*sin($dst)*cos($dir0));
+			   cos($lat0)*sin($dst)*cos($dir0));
     my $theta1 = $theta0 + atan2(sin($dir0)*sin($dst)*cos($lat0),
-        cos($dst)-sin($lat0)*sin($phi1));
+				 cos($dst)-sin($lat0)*sin($phi1));
 
     my $dir1 = great_circle_bearing($theta1, $phi1, $theta0, $phi0) + pi;
 

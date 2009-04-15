@@ -35,6 +35,6 @@ do {
     WriteEmptyMakefile(
         NAME            => "Foo",
         FIRST_MAKEFILE  => "wibble",
-        );
+    );
     ok -e 'wibble';
 };

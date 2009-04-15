@@ -45,7 +45,7 @@ sub new($self, @< @args) {
     # may not work on Solaris.
     my $home = defined env::var('HOME') ?? "$(env::var('HOME'))/.termcap:" !! '';
     env::var('TERMPATH' ) = $home . '/etc/termcap:/usr/share/misc/termcap'
-        . ':/usr/share/lib/termcap';
+                           . ':/usr/share/lib/termcap';
 
     # Fall back on a hard-coded terminal speed if POSIX::Termios isn't
     # available (such as on VMS).

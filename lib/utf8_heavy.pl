@@ -64,58 +64,58 @@ sub SWASHNEW_real {
 
       GETFILE:
         do {
-            ##
-            ## It could be a user-defined property.
-            ##
+	    ##
+	    ## It could be a user-defined property.
+	    ##
 
-            my $caller1 = $type =~ s/(.+)::// ?? $1 !! caller(2);
+	    my $caller1 = $type =~ s/(.+)::// ?? $1 !! caller(2);
 
-            if (defined $caller1 && $type =~ m/^(?:\w+)$/) {
-                my $prop = Symbol::fetch_glob("$($caller1)::$type");
-                if (exists &{*{$prop}}) {
-                    $list = &{*{$prop}}( < @_ );
-                    last GETFILE;
-                }
-            }
+	    if (defined $caller1 && $type =~ m/^(?:\w+)$/) {
+		my $prop = Symbol::fetch_glob("$($caller1)::$type");
+		if (exists &{*{$prop}}) {
+		    $list = &{*{$prop}}( < @_ );
+		    last GETFILE;
+		}
+	    }
 
             my $wasIs;
 
             ($wasIs = $type =~ s/^Is(?:\s+|[-_])?//i)
-                or
-                $type =~ s/^(?:(?:General(?:\s+|_)?)?Category|gc)\s*[:=]\s*//i
-                or
-                $type =~ s/^(?:Script|sc)\s*[:=]\s*//i
-                or
-                $type =~ s/^Block\s*[:=]\s*/In/i;
+              or
+            $type =~ s/^(?:(?:General(?:\s+|_)?)?Category|gc)\s*[:=]\s*//i
+              or
+            $type =~ s/^(?:Script|sc)\s*[:=]\s*//i
+              or
+            $type =~ s/^Block\s*[:=]\s*/In/i;
 
 
-            ##
-            ## See if it's in some enumeration.
-            ##
-            require "unicore/PVA.pl";
-            if ($type =~ m/^([\w\s]+)[:=]\s*(.*)/) {
-                my @($enum, $val) = @(lc $1, lc $2);
-                $enum =~ s/[ _-]//g;
-                $val =~ s/[ _-]//g;
+	    ##
+	    ## See if it's in some enumeration.
+	    ##
+	    require "unicore/PVA.pl";
+	    if ($type =~ m/^([\w\s]+)[:=]\s*(.*)/) {
+		my @($enum, $val) = @(lc $1, lc $2);
+		$enum =~ s/[ _-]//g;
+		$val =~ s/[ _-]//g;
 
-                my $pa = %PropertyAlias{?$enum} ?? $enum !! %PA_reverse{?$enum};
-                my $f = %PropValueAlias{$pa}->{?$val} ?? $val !! %PVA_reverse{$pa}->{?lc $val};
+		my $pa = %PropertyAlias{?$enum} ?? $enum !! %PA_reverse{?$enum};
+		my $f = %PropValueAlias{$pa}->{?$val} ?? $val !! %PVA_reverse{$pa}->{?lc $val};
 
-                if ($pa and $f) {
-                    $pa = "gc_sc" if $pa eq "gc" or $pa eq "sc";
-                    $file = "unicore/lib/$pa/%PVA_abbr_map{$pa}->{?lc $f}.pl";
-                    last GETFILE;
-                }
-            }
-            else {
-                my $t = lc $type;
-                $t =~ s/[ _-]//g;
+		if ($pa and $f) {
+		    $pa = "gc_sc" if $pa eq "gc" or $pa eq "sc";
+		    $file = "unicore/lib/$pa/%PVA_abbr_map{$pa}->{?lc $f}.pl";
+		    last GETFILE;
+		}
+	    }
+	    else {
+		my $t = lc $type;
+		$t =~ s/[ _-]//g;
 
-                if (%PropValueAlias{gc}->{?$t} or %PropValueAlias{sc}->{?$t}) {
-                    $file = "unicore/lib/gc_sc/%PVA_abbr_map{gc_sc}->{?$t}.pl";
-                    last GETFILE;
-                }
-            }
+		if (%PropValueAlias{gc}->{?$t} or %PropValueAlias{sc}->{?$t}) {
+		    $file = "unicore/lib/gc_sc/%PVA_abbr_map{gc_sc}->{?$t}.pl";
+		    last GETFILE;
+		}
+	    }
 
             ##
             ## See if it's in the direct mapping table.
@@ -135,33 +135,33 @@ sub SWASHNEW_real {
             print $^STDERR, "canonical = $canonical\n" if DEBUG;
 
             require "unicore/Canonical.pl";
-            do { no warnings "uninitialized";
-                if (my $base = (%utf8::Canonical{?$canonical} || %utf8::Canonical{?lc %utf8::PropertyAlias{?$canonical} })) {
-                    $file = "unicore/lib/gc_sc/$base.pl";
-                    last GETFILE;
-                }
+	    do { no warnings "uninitialized";
+            if (my $base = (%utf8::Canonical{?$canonical} || %utf8::Canonical{?lc %utf8::PropertyAlias{?$canonical} })) {
+                $file = "unicore/lib/gc_sc/$base.pl";
+                last GETFILE;
+            }
             };
 
-            ##
-            ## See if it's a user-level "To".
-            ##
+	    ##
+	    ## See if it's a user-level "To".
+	    ##
 
-            my $caller0 = caller(1);
+	    my $caller0 = caller(1);
 
-            if (defined $caller0 && $type =~ m/^To(?:\w+)$/) {
-                my $map = $caller0 . "::" . $type;
+	    if (defined $caller0 && $type =~ m/^To(?:\w+)$/) {
+		my $map = $caller0 . "::" . $type;
 
-                if (exists &{*{Symbol::fetch_glob($map)}}) {
-                    $list = &{*{Symbol::fetch_glob($map)}}( < @_ );
-                    last GETFILE;
-                }
-            }
+		if (exists &{*{Symbol::fetch_glob($map)}}) {
+		    $list = &{*{Symbol::fetch_glob($map)}}( < @_ );
+		    last GETFILE;
+		}
+	    }
 
             ##
             ## Last attempt -- see if it's a standard "To" name
-            ## (e.g. "ToLower")  ToTitle is used by ucfirst().
-            ## The user-level way to access ToDigit() and ToFold()
-            ## is to use Unicode::UCD.
+	    ## (e.g. "ToLower")  ToTitle is used by ucfirst().
+	    ## The user-level way to access ToDigit() and ToFold()
+	    ## is to use Unicode::UCD.
             ##
             if ($type =~ m/^To(Digit|Fold|Lower|Title|Upper)$/) {
                 $file = "unicore/To/$1.pl";
@@ -177,24 +177,24 @@ sub SWASHNEW_real {
             return $type;
         };
 
-        if (defined $file) {
-            print $^STDERR, "found it (file='$file')\n" if DEBUG;
+	if (defined $file) {
+	    print $^STDERR, "found it (file='$file')\n" if DEBUG;
 
-            ##
-            ## If we reach here, it was due to a 'last GETFILE' above
-            ## (exception: user-defined properties and mappings), so we
-            ## have a filename, so now we load it if we haven't already.
-            ## If we have, return the cached results. The cache key is the
-            ## class and file to load.
-            ##
-            my $found = %Cache{?$class . "," . $file};
-            if ($found and ref($found) eq $class) {
-                print $^STDERR, "Returning cached '$file' for \\p\{$type\}\n" if DEBUG;
-                return $found;
-            }
+	    ##
+	    ## If we reach here, it was due to a 'last GETFILE' above
+	    ## (exception: user-defined properties and mappings), so we
+	    ## have a filename, so now we load it if we haven't already.
+	    ## If we have, return the cached results. The cache key is the
+	    ## class and file to load.
+	    ##
+	    my $found = %Cache{?$class . "," . $file};
+	    if ($found and ref($found) eq $class) {
+		print $^STDERR, "Returning cached '$file' for \\p\{$type\}\n" if DEBUG;
+		return $found;
+	    }
 
-            $list = do $file; die $^EVAL_ERROR if $^EVAL_ERROR;
-        }
+	    $list = do $file; die $^EVAL_ERROR if $^EVAL_ERROR;
+	}
 
         $ListSorted = 1; ## we know that these lists are sorted
     }
@@ -204,72 +204,72 @@ sub SWASHNEW_real {
 
     my $ORIG = $list;
     if ($list) {
-        my @tmp = split(m/^/m, $list);
-        my %seen;
-        no warnings;
-        $extras = join '', grep { m/^[^0-9a-fA-F]/ }, @tmp;
-        $list = join '', map  { $_->[1] },
-            sort { $a->[0] <+> $b->[0] },
-            map  { m/^([0-9a-fA-F]+)/; \@( CORE::hex($1), $_ ) },
-            grep { m/^([0-9a-fA-F]+)/ and not %seen{+$1}++ }, @tmp; # XXX doesn't do ranges right
+	my @tmp = split(m/^/m, $list);
+	my %seen;
+	no warnings;
+	$extras = join '', grep { m/^[^0-9a-fA-F]/ }, @tmp;
+	$list = join '', map  { $_->[1] },
+	    sort { $a->[0] <+> $b->[0] },
+ map  { m/^([0-9a-fA-F]+)/; \@( CORE::hex($1), $_ ) },
+ grep { m/^([0-9a-fA-F]+)/ and not %seen{+$1}++ }, @tmp; # XXX doesn't do ranges right
     }
 
     if ($none) {
-        my $hextra = sprintf "\%04x", $none + 1;
-        $list =~ s/\tXXXX$/\t$hextra/mg;
+	my $hextra = sprintf "\%04x", $none + 1;
+	$list =~ s/\tXXXX$/\t$hextra/mg;
     }
 
     if ($minbits != 1 && $minbits +< 32) { # not binary property
-        my $top = 0;
-        while ($list =~ m/^([0-9a-fA-F]+)(?:[\t]([0-9a-fA-F]+)?)(?:[ \t]([0-9a-fA-F]+))?/mg) {
-            my $min = CORE::hex $1;
-            my $max = defined $2 ?? CORE::hex $2 !! $min;
-            my $val = defined $3 ?? CORE::hex $3 !! 0;
-            $val += $max - $min if defined $3;
-            $top = $val if $val +> $top;
-        }
-        my $topbits =
-            $top +> 0xffff ?? 32 !!
-            $top +> 0xff ?? 16 !! 8;
-        $bits = $topbits if $bits +< $topbits;
+	my $top = 0;
+	while ($list =~ m/^([0-9a-fA-F]+)(?:[\t]([0-9a-fA-F]+)?)(?:[ \t]([0-9a-fA-F]+))?/mg) {
+	    my $min = CORE::hex $1;
+	    my $max = defined $2 ?? CORE::hex $2 !! $min;
+	    my $val = defined $3 ?? CORE::hex $3 !! 0;
+	    $val += $max - $min if defined $3;
+	    $top = $val if $val +> $top;
+	}
+	my $topbits =
+	    $top +> 0xffff ?? 32 !!
+	    $top +> 0xff ?? 16 !! 8;
+	$bits = $topbits if $bits +< $topbits;
     }
 
     my @extras;
     do {
         my $x = $extras;
-        while ($x =~ m/^([^0-9a-fA-F\n])(.*)/mg) {
-            my $char = $1;
-            my $name = $2;
-            print $^STDERR, "$1 => $2\n" if DEBUG;
-            if ($char =~ m/[-+!&]/) {
-                my @($c,?$t) =  split(m/::/, $name, 2);	# bogus use of ::, really
-                my $subobj;
-                if ($c eq 'utf8') {
-                    $subobj = SWASHNEW_real('utf8', $t, "", $minbits, 0);
-                }
-                elsif (exists &{*{Symbol::fetch_glob($name)}}) {
-                    $subobj = SWASHNEW_real('utf8', $name, "", $minbits, 0);
-                }
-                elsif ($c =~ m/^([0-9a-fA-F]+)/) {
-                    $subobj = SWASHNEW_real('utf8', "", $c, $minbits, 0);
-                }
-                return $subobj unless ref $subobj;
-                push @extras, $name => $subobj;
-                $bits = $subobj->{?BITS} if $bits +< $subobj->{?BITS};
-            }
-        }
+	while ($x =~ m/^([^0-9a-fA-F\n])(.*)/mg) {
+	    my $char = $1;
+	    my $name = $2;
+	    print $^STDERR, "$1 => $2\n" if DEBUG;
+	    if ($char =~ m/[-+!&]/) {
+		my @($c,?$t) =  split(m/::/, $name, 2);	# bogus use of ::, really
+		my $subobj;
+		if ($c eq 'utf8') {
+		    $subobj = SWASHNEW_real('utf8', $t, "", $minbits, 0);
+		}
+		elsif (exists &{*{Symbol::fetch_glob($name)}}) {
+		    $subobj = SWASHNEW_real('utf8', $name, "", $minbits, 0);
+		}
+		elsif ($c =~ m/^([0-9a-fA-F]+)/) {
+		    $subobj = SWASHNEW_real('utf8', "", $c, $minbits, 0);
+		}
+		return $subobj unless ref $subobj;
+		push @extras, $name => $subobj;
+		$bits = $subobj->{?BITS} if $bits +< $subobj->{?BITS};
+	    }
+	}
     };
 
     print $^STDERR, "CLASS = $class, TYPE => $type, BITS => $bits, NONE => $none\nEXTRAS =>\n$extras\nLIST =>\n$list\n" if DEBUG;
 
     my $SWASH = bless \%(
-            TYPE => $type,
-                BITS => $bits,
-                EXTRAS => $extras,
-                LIST => $list,
-                NONE => $none,
-                < @extras,
-        ) => $class;
+	TYPE => $type,
+	BITS => $bits,
+	EXTRAS => $extras,
+	LIST => $list,
+	NONE => $none,
+	< @extras,
+    ) => $class;
 
     if ($file) {
         %Cache{+$class . "," . $file} = $SWASH;

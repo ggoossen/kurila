@@ -11,52 +11,52 @@ our ($VERSION, $tabstop, $debug);
 $VERSION = 2007.1117;
 
 BEGIN	{
-    $tabstop = 8;
-    $debug = 0;
+	$tabstop = 8;
+	$debug = 0;
 }
 
 sub expand {
-    my @l;
-    my $pad;
-    my $s = '';
-    for (split(m/^/m, @_[0], -1)) {
-        my $offs = 0;
-        s{\t}{$( do {
-            $pad = $tabstop - (pos() + $offs) % $tabstop;
-            $offs += $pad - 1;
-            " " x $pad;
-        } )}g;
-        $s .= $_;
-    }
-    return $s;
+	my @l;
+	my $pad;
+        my $s = '';
+        for (split(m/^/m, @_[0], -1)) {
+            my $offs = 0;
+            s{\t}{$( do {
+				$pad = $tabstop - (pos() + $offs) % $tabstop;
+				$offs += $pad - 1;
+				" " x $pad;
+			} )}g;
+            $s .= $_;
+        }
+        return $s;
 }
 
 sub unexpand
 {
-    my @l = @_;
-    my @e;
-    my $lastbit;
-    my $ts_as_space = " "x$tabstop;
-    my @lines = split("\n", @l[0], -1);
-    for ( @lines) {
-        my $line = expand($_);
-        @e = split(m/(.{$tabstop})/,$line,-1);
-        $lastbit = pop(@e);
-        $lastbit = '' 
-            unless defined $lastbit;
-        $lastbit = "\t"
-            if $lastbit eq $ts_as_space;
-        for my $_ ( @e) {
-            if ($debug) {
-                my $x = $_;
-                $x =~ s/\t/^I\t/gs;
-                print $^STDOUT, "sub on '$x'\n";
+	my @l = @_;
+	my @e;
+	my $lastbit;
+	my $ts_as_space = " "x$tabstop;
+        my @lines = split("\n", @l[0], -1);
+        for ( @lines) {
+            my $line = expand($_);
+            @e = split(m/(.{$tabstop})/,$line,-1);
+            $lastbit = pop(@e);
+            $lastbit = '' 
+              unless defined $lastbit;
+            $lastbit = "\t"
+              if $lastbit eq $ts_as_space;
+            for my $_ ( @e) {
+                if ($debug) {
+                    my $x = $_;
+                    $x =~ s/\t/^I\t/gs;
+                    print $^STDOUT, "sub on '$x'\n";
+                }
+                s/  +$/\t/;
             }
-            s/  +$/\t/;
+            $_ = join('', @(< @e, $lastbit));
         }
-        $_ = join('', @(< @e, $lastbit));
-    }
-    return join("\n", @lines);
+        return join("\n", @lines);
 }
 
 1;

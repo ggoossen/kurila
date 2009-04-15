@@ -6,7 +6,7 @@ BEGIN {
 
 BEGIN {
     if ($^OS_NAME eq 'riscos') {
-        skip_all("kill() not implemented on this platform");
+	skip_all("kill() not implemented on this platform");
     }
 }
 
@@ -20,7 +20,7 @@ ok( kill(0, $^PID), 'kill(0, $pid) returns true if $pid exists' );
 my $count = 0;
 my $total = 30_000;
 for my $pid (1 .. $total) {
-    ++$count if kill(0, $pid);
+  ++$count if kill(0, $pid);
 }
 # It is highly unlikely that all of the above PIDs are genuinely in use,
 # so $count should be less than $total.

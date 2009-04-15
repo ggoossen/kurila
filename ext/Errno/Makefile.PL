@@ -26,15 +26,15 @@ WriteMakefile(
     PM		 => \%('Errno.pm' => '$(INST_LIBDIR)/Errno.pm'),
     'clean'	 => \%(FILES => 'Errno.pm arch.txt'),
     'dist'	 => \%(
-        COMPRESS => 'gzip -9f',
-            SUFFIX   => '.gz', 
-            DIST_DEFAULT => 'd/Errno.pm tardist',
+	COMPRESS => 'gzip -9f',
+	SUFFIX   => '.gz', 
+	DIST_DEFAULT => 'd/Errno.pm tardist',
     ),
-    );
+);
 
 sub MY::postamble {
     my $TARG = MM->catfile('d','Errno.pm');
-    qq!$TARG : Makefile
+qq!$TARG : Makefile
 	echo '#This is a dummy file so CPAN will find a VERSION' > $TARG
 	echo 'package Errno;' >> $TARG
 	echo '\$\$VERSION = "\$(VERSION)";' >>$TARG

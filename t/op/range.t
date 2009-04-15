@@ -12,16 +12,16 @@ our (@a, @foo, @bar, @bcd, $e, $x, @x, @b, @y);
 is(join(':',1..5), '1:2:3:4:5');
 
 @foo = @(1,2,3,4,5,6,7,8,9);
-@foo[[2..4]] = @('c','d','e');
+ @foo[[2..4]] = @('c','d','e');
 
 is(join(':', @foo[[@foo[0]..5]]), '2:c:d:e:6');
-
+ 
 @bar[[2..4]] = @('c','d','e');
 is(join(':', @bar[[1..5]]), ':c:d:e:');
 
 TODO: do {
-    todo_skip("slices in the middle of a list assignment", 1);
-    eval <<'TODO'; die if $^EVAL_ERROR;
+   todo_skip("slices in the middle of a list assignment", 1);
+   eval <<'TODO'; die if $^EVAL_ERROR;
    ($a, < @bcd[[0..2]],$e) = ('a','b','c','d','e');
    is(join(':', @($a, < @bcd[[0..2]],$e)), 'a:b:c:d:e');
 TODO
@@ -54,16 +54,16 @@ is(join(",", @y), join(",", @x));
 
 # check bounds
 if (config_value('ivsize') == 8) {
-    @a = eval "0x7ffffffffffffffe..0x7fffffffffffffff";
-    $a = "9223372036854775806 9223372036854775807";
-    @b = eval "-0x7fffffffffffffff..-0x7ffffffffffffffe";
-    $b = "-9223372036854775807 -9223372036854775806";
+  @a = eval "0x7ffffffffffffffe..0x7fffffffffffffff";
+  $a = "9223372036854775806 9223372036854775807";
+  @b = eval "-0x7fffffffffffffff..-0x7ffffffffffffffe";
+  $b = "-9223372036854775807 -9223372036854775806";
 }
 else {
-    @a = eval "0x7ffffffe..0x7fffffff";
-    $a = "2147483646 2147483647";
-    @b = eval "-0x7fffffff..-0x7ffffffe";
-    $b = "-2147483647 -2147483646";
+  @a = eval "0x7ffffffe..0x7fffffff";
+  $a = "2147483646 2147483647";
+  @b = eval "-0x7fffffff..-0x7ffffffe";
+  $b = "-2147483647 -2147483646";
 }
 
 is ("$(join ' ',@a)", $a);
@@ -78,7 +78,7 @@ do {
 do {
     my $fail = 0;
     for my $x ("0"..-1) {
-        $fail++;
+	$fail++;
     }
     is ($fail, 0);
 };

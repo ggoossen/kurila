@@ -54,37 +54,37 @@ SKIP: do {
     skip("No $chflags available", 4) if !-x $chflags;
 
     my $skip_eff_user_tests = (!config_value("d_setreuid") && !config_value("d_setresuid"))
-        ||
-        (!config_value("d_setregid") && !config_value("d_setresgid"));
+	                                            ||
+			      (!config_value("d_setregid") && !config_value("d_setresgid"));
 
     try {
-        if (!-e $tstfile) {
-            open(my $t, ">", "$tstfile") or die "Can't create $tstfile: $^OS_ERROR";
-            close $t;
-        }
-        system($chflags, "uchg", $tstfile);
-        die "Can't exec $chflags uchg" if $^CHILD_ERROR != 0;
+	if (!-e $tstfile) {
+	    open(my $t, ">", "$tstfile") or die "Can't create $tstfile: $^OS_ERROR";
+	    close $t;
+	}
+	system($chflags, "uchg", $tstfile);
+	die "Can't exec $chflags uchg" if $^CHILD_ERROR != 0;
     };
     skip("Errors in test using chflags: $^EVAL_ERROR", 4) if $^EVAL_ERROR;
 
     do {
-        use filetest 'access';
-      SKIP: do {
-            skip("No tests on effective user id", 1)
-                if $skip_eff_user_tests;
-            is(-w $tstfile, undef, "$tstfile should not be recognized as writable");
-        };
-        is(-W $tstfile, undef, "$tstfile should not be recognized as writable");
+	use filetest 'access';
+    SKIP: do {
+	    skip("No tests on effective user id", 1)
+		if $skip_eff_user_tests;
+	    is(-w $tstfile, undef, "$tstfile should not be recognized as writable");
+	};
+	is(-W $tstfile, undef, "$tstfile should not be recognized as writable");
     };
 
     do {
-        no filetest 'access';
-      SKIP: do {
-            skip("No tests on effective user id", 1)
-                if $skip_eff_user_tests;
-            is(-w $tstfile, 1, "$tstfile should be recognized as writable");
-        };
-        is(-W $tstfile, 1, "$tstfile should be recognized as writable");
+	no filetest 'access';
+    SKIP: do {
+	    skip("No tests on effective user id", 1)
+		if $skip_eff_user_tests;
+	    is(-w $tstfile, 1, "$tstfile should be recognized as writable");
+	};
+	is(-W $tstfile, 1, "$tstfile should be recognized as writable");
     };
 
     # cleanup

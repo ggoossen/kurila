@@ -139,11 +139,11 @@ sub init_fonts($self) {
     # Set up a table of font escapes.  First number is fixed-width, second is
     # bold, third is italic.
     %$self{+FONTS} = \%( '000' => '\fR', '001' => '\fI',
-        '010' => '\fB', '011' => '\f(BI',
-            '100' => toescape (%$self{?fixed}),
-            '101' => toescape (%$self{?fixeditalic}),
-            '110' => toescape (%$self{?fixedbold}),
-            '111' => toescape (%$self{?fixedbolditalic}) );
+                        '010' => '\fB', '011' => '\f(BI',
+                        '100' => toescape (%$self{?fixed}),
+                        '101' => toescape (%$self{?fixeditalic}),
+                        '110' => toescape (%$self{?fixedbold}),
+                        '111' => toescape (%$self{?fixedbolditalic}) );
 }
 
 # Initialize the quotes that we'll be using for C<> text.  This requires some
@@ -159,7 +159,7 @@ sub init_quotes {
     } elsif (length (%$self{?quotes}) == 1) {
         %$self{+LQUOTE} = %$self{+RQUOTE} = %$self{?quotes};
     } elsif (%$self{?quotes} =~ m/^(.)(.)$/
-    || %$self{?quotes} =~ m/^(..)(..)$/) {
+             || %$self{?quotes} =~ m/^(..)(..)$/) {
         %$self{+LQUOTE} = $1;
         %$self{+RQUOTE} = $2;
     } else {
@@ -183,11 +183,11 @@ sub init_page($self) {
     # Set the defaults for page titles and indentation if the user didn't
     # override anything.
     %$self{+center} = 'User Contributed Perl Documentation'
-    unless defined %$self{?center};
+        unless defined %$self{?center};
     %$self{+release} = 'perl v' . $version
-    unless defined %$self{?release};
+        unless defined %$self{?release};
     %$self{+indent} = 4
-    unless defined %$self{?indent};
+        unless defined %$self{?indent};
 
     # Double quotes in things that will be quoted.
     for (qw/center release/) {
@@ -459,7 +459,7 @@ sub guesswork {
             (?= [\s>\}\]\(\)\'\".?!,;] | \\*\(-- | \\\  | $ )   # (3)
         } {$(
             $1 . '\s-1' . $2 . '\s0'
-            )}gx;
+        )}gx;
     }
 
     # Note that from this point forward, we have to adjust for \s-1 and \s-0
@@ -476,7 +476,7 @@ sub guesswork {
             ( [A-Za-z_] ([:\w] | \\s-?[01])+ \(\) )
         } {$(
             $1 . '\f(IS' . $2 . '\f(IE'
-            )}gx;
+        )}gx;
     }
 
     # Change references to manual pages to put the page name in italics but
@@ -493,7 +493,7 @@ sub guesswork {
             ( \( \d [a-z]* \) )
         } {$(
             $1 . '\f(IS' . $2 . '\f(IE\|' . $3
-            )}gx;
+        )}gx;
     }
 
     # Convert simple Perl variable references to a fixed-width font.  Be
@@ -506,7 +506,7 @@ sub guesswork {
            (?! \( )
         } {$(
             $1 . '\f(FS' . $2 . '\f(FE'
-            )}gx;
+        )}gx;
     }
 
     # Fix up double quotes.  Unfortunately, we miss this transformation if the
@@ -1217,20 +1217,20 @@ sub parse_from_filehandle {
     my $self = shift;
     $self->parse_from_file (< @_);
 }
+ 
+##############################################################################
+# Translation tables
+##############################################################################
 
-    ##############################################################################
-    # Translation tables
-    ##############################################################################
-
-    # The following table is adapted from Tom Christiansen's pod2man.  It assumes
-    # that the standard preamble has already been printed, since that's what
-    # defines all of the accent marks.  We really want to do something better than
-    # this when *roff actually supports other character sets itself, since these
-    # results are pretty poor.
-    #
-    # This only works in an ASCII world.  What to do in a non-ASCII world is very
-    # unclear.
-    %ESCAPES{[0xA0 .. 0xFF]} = @(
+# The following table is adapted from Tom Christiansen's pod2man.  It assumes
+# that the standard preamble has already been printed, since that's what
+# defines all of the accent marks.  We really want to do something better than
+# this when *roff actually supports other character sets itself, since these
+# results are pretty poor.
+#
+# This only works in an ASCII world.  What to do in a non-ASCII world is very
+# unclear.
+%ESCAPES{[0xA0 .. 0xFF]} = @(
     "\\ ", undef, undef, undef,            undef, undef, undef, undef,
     undef, undef, undef, undef,            undef, "\\\%", undef, undef,
 

@@ -8,18 +8,18 @@ use File::Find;
 
 my %files;
 find(sub {
-         my $name = $File::Find::name;
-         # Assumes that the path separator is exactly one character.
-         $name =~ s/^\.\..//;
-         push @{%files{lc $name}}, $name;
-     }, '.');
+	   my $name = $File::Find::name;
+	   # Assumes that the path separator is exactly one character.
+	   $name =~ s/^\.\..//;
+	   push @{%files{lc $name}}, $name;
+	 }, '.');
 
 my $failed;
 
 foreach (values %files) {
     if ((nelems @$_) +> 1) {
-        print $^STDOUT, join(", ", @$_), "\n";
-        $failed++;
+	print $^STDOUT, join(", ", @$_), "\n";
+	$failed++;
     }
 }
 

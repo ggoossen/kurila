@@ -10,14 +10,14 @@ $huge='overflow';
 $Text::Wrap::columns=9;
 $break="(?<=[,.])";
 try {
-    $a=wrap('','',
-            "mmmm,n,ooo,ppp.qqqq.rrrrr,sssssssssssss,ttttttttt,uu,vvv wwwwwwwww####\n");
+$a=wrap('','',
+"mmmm,n,ooo,ppp.qqqq.rrrrr,sssssssssssss,ttttttttt,uu,vvv wwwwwwwww####\n");
 };
 
 if ($^EVAL_ERROR) {
-    my $e = $^EVAL_ERROR;
-    $e =~ s/^/# /gm;
-    print $^STDOUT, $e;
+	my $e = $^EVAL_ERROR;
+	$e =~ s/^/# /gm;
+	print $^STDOUT, $e;
 }
 print $^STDOUT, $^EVAL_ERROR ?? "not ok 1\n" !! "ok 1\n";
 

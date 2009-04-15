@@ -7,7 +7,7 @@ use Time::Local;
 
 # Set up time values to test
 my @time =
-    @(
+  @(
    #year,mon,day,hour,min,sec
    \@(1970,  1,  2, 00, 00, 00),
    \@(1980,  2, 28, 12, 00, 00),
@@ -18,11 +18,11 @@ my @time =
    # leap day
    \@(2020,  2, 29, 12, 59, 59),
    \@(2030,  7,  4, 17, 07, 06),
-    # The following test fails on a surprising number of systems
-    # so it is commented out. The end of the Epoch for a 32-bit signed
-    # implementation of time_t should be Jan 19, 2038  03:14:07 UTC.
-    #  [2038,  1, 17, 23, 59, 59],     # last full day in any tz
-    );
+# The following test fails on a surprising number of systems
+# so it is commented out. The end of the Epoch for a 32-bit signed
+# implementation of time_t should be Jan 19, 2038  03:14:07 UTC.
+#  [2038,  1, 17, 23, 59, 59],     # last full day in any tz
+  );
 
 my @bad_time =
     @(
@@ -80,7 +80,7 @@ for ( @( < @time, < @neg_time) ) {
     $year -= 1900;
     $mon--;
 
-  SKIP: do {
+ SKIP: do {
         skip '1970 test on VOS fails.', 12
             if $^OS_NAME eq 'vos' && $year == 70;
         skip 'this platform does not support negative epochs.', 12

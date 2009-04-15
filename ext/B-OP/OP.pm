@@ -109,7 +109,7 @@ sub scope {
             $kid = $o->first;
             die "This probably shouldn't happen (\$kid->null)\n"
                 if ( $kid->type == B::opnumber("nextstate")
-                     or $kid->type == B::opnumber("dbstate") );
+                or $kid->type == B::opnumber("dbstate") );
         }
         else {
             $o = B::LISTOP->new( "scope", 0, $o, undef );

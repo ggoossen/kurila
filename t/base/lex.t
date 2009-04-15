@@ -69,7 +69,7 @@ print $^STDOUT, qq
 [ok 16\n]
 ;
 
-    print $^STDOUT, q<ok 17
+print $^STDOUT, q<ok 17
 >;
 
 print $^STDOUT, <<;   # Yow!
@@ -81,15 +81,15 @@ print $^STDOUT, <<E1 eq "foo\n\n" ?? "ok 19\n" !! "not ok 19\n";
 $( <<E2
 foo
 E2
-    )
+)
 E1
 
 print $^STDOUT, <<E1 eq "foo\n\n" ?? "ok 20\n" !! "not ok 20\n";
 $(
-    <<E2
+  <<E2
 foo
 E2
-    )
+)
 E1
 
 do {
@@ -127,27 +127,27 @@ print $^STDOUT, $foo;
 # MJD 19990227
 
 do {
-    print $^STDOUT, "ok 31\n";
-    print $^STDOUT, "ok 32\n";
-    print $^STDOUT, "ok 33\n";
-    print $^STDOUT, "ok 34\n";
-    print $^STDOUT, "ok 35\n";
-    print $^STDOUT, "ok 36\n";
-    print $^STDOUT, "ok 37\n";
-    print $^STDOUT, "ok 38\n";
+  print $^STDOUT, "ok 31\n";
+  print $^STDOUT, "ok 32\n";
+  print $^STDOUT, "ok 33\n";
+  print $^STDOUT, "ok 34\n";
+  print $^STDOUT, "ok 35\n";
+  print $^STDOUT, "ok 36\n";
+  print $^STDOUT, "ok 37\n";
+  print $^STDOUT, "ok 38\n";
 
-        # Now let's make sure that caret variables are all forced into the main package.
-        package Someother;
-    $^RE_TRIE_MAXBUF = 'Someother 2';
-    $^EMERGENCY_MEMORY = 'Someother 3';
-        package main;
-    print $^STDOUT, "ok 39\n";
-    print $^STDOUT, "not " unless $^RE_TRIE_MAXBUF eq 'Someother 2';
-    print $^STDOUT, "ok 40\n";
-    print $^STDOUT, "not " unless $^EMERGENCY_MEMORY eq 'Someother 3';
-    print $^STDOUT, "ok 41\n";
+# Now let's make sure that caret variables are all forced into the main package.
+  package Someother;
+  $^RE_TRIE_MAXBUF = 'Someother 2';
+  $^EMERGENCY_MEMORY = 'Someother 3';
+  package main;
+  print $^STDOUT, "ok 39\n";
+  print $^STDOUT, "not " unless $^RE_TRIE_MAXBUF eq 'Someother 2';
+  print $^STDOUT, "ok 40\n";
+  print $^STDOUT, "not " unless $^EMERGENCY_MEMORY eq 'Someother 3';
+  print $^STDOUT, "ok 41\n";
 
-
+  
 };
 
 # see if eval '', s///e, and heredocs mix
@@ -183,34 +183,34 @@ EOT
 # arrays now *always* interpolate into "..." strings.
 # 20000522 MJD (mjd@plover.com)
 do {
-    my $test = 47;
-    our (@nosuch, @a, @example);
-    eval(q(">$(join ' ', < @nosuch)<" eq "><")) || print $^STDOUT, "# $^EVAL_ERROR", "not ";
-    print $^STDOUT, "ok $test\n";
-    ++$test;
+  my $test = 47;
+  our (@nosuch, @a, @example);
+  eval(q(">$(join ' ', < @nosuch)<" eq "><")) || print $^STDOUT, "# $^EVAL_ERROR", "not ";
+  print $^STDOUT, "ok $test\n";
+  ++$test;
 
-    # Let's make sure that normal array interpolation still works right
-    # For some reason, this appears not to be tested anywhere else.
-    my @a = @(1,2,3);
-    print($^STDOUT,  ((">$(join ' ',@a)<" eq ">1 2 3<") ?? '' !! 'not '), "ok $test\n");
-    ++$test;
+  # Let's make sure that normal array interpolation still works right
+  # For some reason, this appears not to be tested anywhere else.
+  my @a = @(1,2,3);
+  print($^STDOUT,  ((">$(join ' ',@a)<" eq ">1 2 3<") ?? '' !! 'not '), "ok $test\n");
+  ++$test;
 
-    # Ditto.
-    eval(q{@nosuch = @('a', 'b', 'c'); ">$(join ' ', @nosuch)<" eq ">a b c<"}) 
-        || print $^STDOUT, "# $^EVAL_ERROR", "not ";
-    print $^STDOUT, "ok $test\n";
-    ++$test;
+  # Ditto.
+  eval(q{@nosuch = @('a', 'b', 'c'); ">$(join ' ', @nosuch)<" eq ">a b c<"}) 
+      || print $^STDOUT, "# $^EVAL_ERROR", "not ";
+  print $^STDOUT, "ok $test\n";
+  ++$test;
 
-    # This isn't actually a lex test, but it's testing the same feature
-    sub makearray {
-        my @array = @('fish', 'dog', 'carrot');
-        *R::crackers = \@array;
-    }
+  # This isn't actually a lex test, but it's testing the same feature
+  sub makearray {
+    my @array = @('fish', 'dog', 'carrot');
+    *R::crackers = \@array;
+  }
 
-    eval(q{makearray(); ">$(join ' ', @R::crackers)<" eq ">fish dog carrot<"})
-        || print $^STDOUT, "# $^EVAL_ERROR", "not ";
-    print $^STDOUT, "ok $test\n";
-    ++$test;
+  eval(q{makearray(); ">$(join ' ', @R::crackers)<" eq ">fish dog carrot<"})
+    || print $^STDOUT, "# $^EVAL_ERROR", "not ";
+  print $^STDOUT, "ok $test\n";
+  ++$test;
 };
 
 # Tests 52-54
@@ -218,10 +218,10 @@ do {
 
 sub xyz::foo { "bar" }
 my %str = %(
-        foo      => 1,
-            xyz::foo => 1,
-            'xyz::bar' => 1,
-    );
+    foo      => 1,
+    xyz::foo => 1,
+    'xyz::bar' => 1,
+);
 
 my $test = 51;
 print ($^STDOUT, (exists %str{foo}      ?? "" !! "not ")."ok $test\n"); ++$test;

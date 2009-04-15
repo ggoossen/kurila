@@ -16,7 +16,7 @@ BEGIN { plan tests => 5 }
 
 
 print $^STDOUT, "# ", __FILE__,
-    ": Testing limit_glob ...\n";
+ ": Testing limit_glob ...\n";
 
 my $x = Pod::Simple::Search->new;
 die "Couldn't make an object!?" unless ok defined $x;
@@ -43,19 +43,19 @@ sub source_path {
 my($here1, $here2, $here3);
 
 if(        -e ($here1 = source_path(  'testlib1'      ))) {
-    die "But where's $here2?"
-        unless -e ($here2 = source_path (   'testlib2'));
-    die "But where's $here3?"
-        unless -e ($here3 = source_path(   'testlib3'));
+  die "But where's $here2?"
+    unless -e ($here2 = source_path (   'testlib2'));
+  die "But where's $here3?"
+    unless -e ($here3 = source_path(   'testlib3'));
 
 } elsif(   -e ($here1 = File::Spec->catdir($cwd, 't', 'testlib1'      ))) {
-    die "But where's $here2?"
-        unless -e ($here2 = File::Spec->catdir($cwd, 't', 'testlib2'));
-    die "But where's $here3?"
-        unless -e ($here3 = File::Spec->catdir($cwd, 't', 'testlib3'));
+  die "But where's $here2?"
+    unless -e ($here2 = File::Spec->catdir($cwd, 't', 'testlib2'));
+  die "But where's $here3?"
+    unless -e ($here3 = File::Spec->catdir($cwd, 't', 'testlib3'));
 
 } else {
-    die "Can't find the test corpora";
+  die "Can't find the test corpora";
 }
 print $^STDOUT, "# OK, found the test corpora\n#  as $here1\n# and $here2\n# and $here3\n#\n";
 ok 1;
@@ -78,13 +78,13 @@ $p =~ s/^/#  /mg;
 print $^STDOUT, $p;
 
 do {
-    my $names = join "|", sort keys %$name2where;
-    is $names, "Zonk::Pronk|hinkhonk::Glunk|perlzuk|squaa::Glunk|zikzik";
+my $names = join "|", sort keys %$name2where;
+is $names, "Zonk::Pronk|hinkhonk::Glunk|perlzuk|squaa::Glunk|zikzik";
 };
 
 do {
-    my $names = join "|", sort values %$where2name;
-    is $names, "Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Glunk|perlzuk|squaa::Glunk|zikzik";
+my $names = join "|", sort values %$where2name;
+is $names, "Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Glunk|perlzuk|squaa::Glunk|zikzik";
 };
 
 print $^STDOUT, "# OK, bye from ", __FILE__, "\n";

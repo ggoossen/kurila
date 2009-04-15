@@ -3,7 +3,7 @@
 
 BEGIN {
     if (not env::var('PERL_CORE')) {
-        # this won't work outside of the core, so exit
+	# this won't work outside of the core, so exit
         print $^STDOUT, "1..0\n"; exit 0;
     }
 }
@@ -46,10 +46,10 @@ sub testop($op, $opname, $code) {
 
 foreach (@op) {
     if ($_->[2]) {
-        testop < @$_;
+	testop < @$_;
     } else {
-        local $TODO = "No test yet for $_->[1]";
-        fail();
+	local $TODO = "No test yet for $_->[1]";
+	fail();
     }
 }
 

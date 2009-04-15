@@ -41,7 +41,7 @@ END {
 }
 
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
-    diag("chdir failed: $^OS_ERROR");
+  diag("chdir failed: $^OS_ERROR");
 
 my $stdout = '';
 close $^STDOUT;
@@ -52,7 +52,7 @@ my $mm = WriteMakefile(
     VERSION_FROM  => 'lib/Big/Dummy.pm',
     PREREQ_PM     => \%(),
     PERL_CORE     => env::var('PERL_CORE'),
-    );
+);
 
 like( $stdout, qr{
                         Writing\ $Makefile\ for\ Big::Liar\n
@@ -82,7 +82,7 @@ $mm = WriteMakefile(
     PREREQ_PM     => \%(),
     PERL_CORE     => env::var('PERL_CORE'),
     PREFIX        => $PREFIX,
-    );
+);
 like( $stdout, qr{
                         Writing\ $Makefile\ for\ Big::Liar\n
                         Big::Liar's\ vars\n
@@ -115,17 +115,17 @@ is( $mm_perl_src, $perl_src,     'PERL_SRC' );
 
 # Every INSTALL* variable must start with some PREFIX.
 my %Install_Vars = %(
-        PERL   => \qw(archlib    privlib   bin       man1dir       man3dir   script),
-            SITE   => \qw(sitearch   sitelib   sitebin   siteman1dir   siteman3dir),
-            VENDOR => \qw(vendorarch vendorlib vendorbin vendorman1dir vendorman3dir)
-    );
+ PERL   => \qw(archlib    privlib   bin       man1dir       man3dir   script),
+ SITE   => \qw(sitearch   sitelib   sitebin   siteman1dir   siteman3dir),
+ VENDOR => \qw(vendorarch vendorlib vendorbin vendorman1dir vendorman3dir)
+);
 
 while( my@(?$type, ?$vars) =@( each %Install_Vars)) {
-  SKIP: do {
+    SKIP: do {
         skip "VMS must expand macros in INSTALL* vars", scalar nelems @$vars 
-            if $Is_VMS;    
+          if $Is_VMS;    
         skip '$Config{usevendorprefix} not set', scalar nelems @$vars
-            if $type eq 'VENDOR' and !%Config{usevendorprefix};
+          if $type eq 'VENDOR' and !%Config{usevendorprefix};
 
         foreach my $var ( @$vars) {
             my $installvar = "install$var";
@@ -133,12 +133,12 @@ while( my@(?$type, ?$vars) =@( each %Install_Vars)) {
 
           SKIP: do {
                 skip uc($installvar).' set to another INSTALL variable', 1
-                    if $mm->{uc $installvar} =~ m/^\$\(INSTALL.*\)$/;
+                  if $mm->{uc $installvar} =~ m/^\$\(INSTALL.*\)$/;
 
                 # support for man page skipping
                 $prefix = 'none' if $type eq 'PERL' && 
-                    $var =~ m/man/ && 
-                    !%Config{$installvar};
+                                    $var =~ m/man/ && 
+                                    !%Config{$installvar};
                 like( $mm->{uc $installvar}, qr/^\Q$prefix\E/, 
                       "$prefix + $var" );
             };
@@ -154,13 +154,13 @@ do {
 
     my $wibble = File::Spec->catdir( <qw(wibble and such));
     my $mm = WriteMakefile(
-        NAME          => 'Big::Dummy',
-        VERSION_FROM  => 'lib/Big/Dummy.pm',
-        PREREQ_PM     => \%(),
-        PERL_CORE     => env::var('PERL_CORE'),
-        PREFIX        => $PREFIX,
-        INSTALLMAN1DIR=> $wibble,
-        );
+                           NAME          => 'Big::Dummy',
+                           VERSION_FROM  => 'lib/Big/Dummy.pm',
+                           PREREQ_PM     => \%(),
+                           PERL_CORE     => env::var('PERL_CORE'),
+                           PREFIX        => $PREFIX,
+                           INSTALLMAN1DIR=> $wibble,
+                          );
 
     is( $mm->{INSTALLMAN1DIR}, $wibble );
     is( $mm->{INSTALLMAN3DIR}, 'none'  );
@@ -175,20 +175,20 @@ do {
     _set_config(vendorprefixexp => 'something' );
 
     my $mm = WriteMakefile(
-        NAME          => 'Big::Dummy',
-        VERSION_FROM  => 'lib/Big/Dummy.pm',
-        PREREQ_PM     => \%(),
-        PERL_CORE     => env::var('PERL_CORE'),
+                   NAME          => 'Big::Dummy',
+                   VERSION_FROM  => 'lib/Big/Dummy.pm',
+                   PREREQ_PM     => \%(),
+                   PERL_CORE     => env::var('PERL_CORE'),
 
-        # In case the local installation doesn't have man pages.
-        INSTALLMAN1DIR=> 'foo/bar/baz',
-        INSTALLMAN3DIR=> 'foo/bar/baz',
-        );
+                   # In case the local installation doesn't have man pages.
+                   INSTALLMAN1DIR=> 'foo/bar/baz',
+                   INSTALLMAN3DIR=> 'foo/bar/baz',
+                  );
 
     is( $mm->{INSTALLVENDORMAN1DIR}, File::Spec->catdir('foo','bar'), 
-        'installvendorman1dir (in %Config) not modified' );
+                      'installvendorman1dir (in %Config) not modified' );
     isnt( $mm->{INSTALLVENDORMAN3DIR}, '', 
-          'installvendorman3dir (not in %Config) set'  );
+                      'installvendorman3dir (not in %Config) set'  );
 };
 
 # Check that when installsiteman*dir isn't set in Config it falls back
@@ -205,10 +205,10 @@ do {
 
     my $wibble = File::Spec->catdir( <qw(wibble and such));
     my $mm = WriteMakefile(
-        NAME          => 'Big::Dummy',
-        VERSION_FROM  => 'lib/Big/Dummy.pm',
-        PERL_CORE     => env::var('PERL_CORE'),
-        );
+                           NAME          => 'Big::Dummy',
+                           VERSION_FROM  => 'lib/Big/Dummy.pm',
+                           PERL_CORE     => env::var('PERL_CORE'),
+                          );
 
     is( $mm->{INSTALLMAN1DIR}, File::Spec->catdir('foo', 'bar') );
     is( $mm->{INSTALLMAN3DIR}, File::Spec->catdir('foo', 'baz') );
@@ -237,10 +237,10 @@ do {
 
     my $wibble = File::Spec->catdir( <qw(wibble and such));
     my $mm = WriteMakefile(
-        NAME          => 'Big::Dummy',
-        VERSION_FROM  => 'lib/Big/Dummy.pm',
-        PERL_CORE     => env::var('PERL_CORE'),
-        );
+                           NAME          => 'Big::Dummy',
+                           VERSION_FROM  => 'lib/Big/Dummy.pm',
+                           PERL_CORE     => env::var('PERL_CORE'),
+                          );
 
     is( $mm->{INSTALLMAN1DIR}, File::Spec->catdir('foo', 'bar') );
     is( $mm->{INSTALLMAN3DIR}, File::Spec->catdir('foo', 'baz') );

@@ -32,11 +32,11 @@ my $Is_Win32   = $^OS_NAME eq 'MSWin32';
 full_setup();
 
 require ExtUtils::MM;  # Things like CPAN assume loading ExtUtils::MakeMaker
-# will give them MM.
+                       # will give them MM.
 
 require ExtUtils::MY;  # XXX pre-5.8 versions of ExtUtils::Embed expect
-# loading ExtUtils::MakeMaker will give them MY.
-# This will go when Embed is it's own CPAN module.
+                       # loading ExtUtils::MakeMaker will give them MY.
+                       # This will go when Embed is it's own CPAN module.
 
 
 sub WriteMakefile {
@@ -59,45 +59,45 @@ sub WriteMakefile {
 # scalar.
 my %Att_Sigs;
 my %Special_Sigs = %(
-        C                  => 'ARRAY',
-            CONFIG             => 'ARRAY',
-            CONFIGURE          => 'CODE',
-            DIR                => 'ARRAY',
-            DL_FUNCS           => 'HASH',
-            DL_VARS            => 'ARRAY',
-            EXCLUDE_EXT        => 'ARRAY',
-            EXE_FILES          => 'ARRAY',
-            FUNCLIST           => 'ARRAY',
-            H                  => 'ARRAY',
-            IMPORTS            => 'HASH',
-            INCLUDE_EXT        => 'ARRAY',
-            LIBS               => \@('ARRAY',''),
-            MAN1PODS           => 'HASH',
-            MAN3PODS           => 'HASH',
-            PL_FILES           => 'HASH',
-            PM                 => 'HASH',
-            PMLIBDIRS          => 'ARRAY',
-            PMLIBPARENTDIRS    => 'ARRAY',
-            PREREQ_PM          => 'HASH',
-            SKIP               => 'ARRAY',
-            TYPEMAPS           => 'ARRAY',
-            XS                 => 'HASH',
-            VERSION            => \@('version',''),
-            _KEEP_AFTER_FLUSH  => '',
+ C                  => 'ARRAY',
+ CONFIG             => 'ARRAY',
+ CONFIGURE          => 'CODE',
+ DIR                => 'ARRAY',
+ DL_FUNCS           => 'HASH',
+ DL_VARS            => 'ARRAY',
+ EXCLUDE_EXT        => 'ARRAY',
+ EXE_FILES          => 'ARRAY',
+ FUNCLIST           => 'ARRAY',
+ H                  => 'ARRAY',
+ IMPORTS            => 'HASH',
+ INCLUDE_EXT        => 'ARRAY',
+ LIBS               => \@('ARRAY',''),
+ MAN1PODS           => 'HASH',
+ MAN3PODS           => 'HASH',
+ PL_FILES           => 'HASH',
+ PM                 => 'HASH',
+ PMLIBDIRS          => 'ARRAY',
+ PMLIBPARENTDIRS    => 'ARRAY',
+ PREREQ_PM          => 'HASH',
+ SKIP               => 'ARRAY',
+ TYPEMAPS           => 'ARRAY',
+ XS                 => 'HASH',
+ VERSION            => \@('version',''),
+ _KEEP_AFTER_FLUSH  => '',
 
-            clean      => 'HASH',
-            depend     => 'HASH',
-            dist       => 'HASH',
-            dynamic_lib=> 'HASH',
-            linkext    => 'HASH',
-            macro      => 'HASH',
-            postamble  => 'HASH',
-            realclean  => 'HASH',
-            test       => 'HASH',
-    );
+ clean      => 'HASH',
+ depend     => 'HASH',
+ dist       => 'HASH',
+ dynamic_lib=> 'HASH',
+ linkext    => 'HASH',
+ macro      => 'HASH',
+ postamble  => 'HASH',
+ realclean  => 'HASH',
+ test       => 'HASH',
+);
 
-    %Att_Sigs{[keys %Recognized_Att_Keys]} = @('') x (nelems(%Recognized_Att_Keys)/2);
-    %Att_Sigs{[keys %Special_Sigs]} = values %Special_Sigs;
+ %Att_Sigs{[keys %Recognized_Att_Keys]} = @('') x (nelems(%Recognized_Att_Keys)/2);
+ %Att_Sigs{[keys %Special_Sigs]} = values %Special_Sigs;
 
 
 sub _verify_att($att) {
@@ -116,7 +116,7 @@ sub _verify_att($att) {
 
             my $has = _format_att($given);
             warn "WARNING: $key takes a $takes not a $has.\n".
-                "         Please inform the author.\n";
+                 "         Please inform the author.\n";
         }
     }
 }
@@ -124,11 +124,11 @@ sub _verify_att($att) {
 
 sub _format_att {
     my $given = shift;
-
+    
     return $given eq ''        ?? "string/number"
-        !! uc $given eq $given ?? "$given reference"
-        !!                       "$given object"
-;
+         !! uc $given eq $given ?? "$given reference"
+         !!                       "$given object"
+         ;
 }
 
 
@@ -186,11 +186,11 @@ sub eval_in_x($self,$dir) {
         do './Makefile.PL';
     };;
     if ($^EVAL_ERROR) {
-        #         if ($@ =~ /prerequisites/) {
-        #             die "MakeMaker WARNING: $@";
-        #         } else {
-        #             warn "WARNING from evaluation of $dir/Makefile.PL: $@";
-        #         }
+#         if ($@ =~ /prerequisites/) {
+#             die "MakeMaker WARNING: $@";
+#         } else {
+#             warn "WARNING from evaluation of $dir/Makefile.PL: $@";
+#         }
         die "ERROR from evaluation of $dir/Makefile.PL: $($^EVAL_ERROR->message)";
     }
 }
@@ -293,9 +293,9 @@ sub full_setup {
     # Postamble needs to be the last that was always the case
     push @MM_Sections, "postamble";
     push @Overridable, "postamble";
-
-        # All sections are valid keys.
-        %Recognized_Att_Keys{[ @MM_Sections]} = @(1) x nelems @MM_Sections;
+ 
+    # All sections are valid keys.
+    %Recognized_Att_Keys{[ @MM_Sections]} = @(1) x nelems @MM_Sections;
 
     # we will use all these variables in the Makefile
     @Get_from_Config = 
@@ -367,9 +367,9 @@ sub new {
     # PRINT_PREREQ is RedHatism.
     if ("$(join ' ',@ARGV)" =~ m/\bPRINT_PREREQ\b/) {
         print $^STDOUT, join(" ", map { "perl($_)>=$self->{PREREQ_PM}->{?$_} " }, 
-            sort keys %{$self->{?PREREQ_PM}}), "\n";
+                        sort keys %{$self->{?PREREQ_PM}}), "\n";
         exit 0;
-    }
+   }
 
     print $^STDOUT, "MakeMaker (v$VERSION)\n" if $Verbose;
     if (-f "MANIFEST" && ! -f "Makefile"){
@@ -398,22 +398,22 @@ sub new {
 
         if ($^EVAL_ERROR) {
             warn sprintf 'Warning: prerequisite %s %s not found.', 
-                $prereq, $self->{PREREQ_PM}->{?$prereq} 
-                unless $self->{?PREREQ_FATAL};
+              $prereq, $self->{PREREQ_PM}->{?$prereq} 
+                   unless $self->{?PREREQ_FATAL};
             %unsatisfied{+$prereq} = 'not installed';
         } elsif ($pr_version +< $self->{PREREQ_PM}->{?$prereq} ){
             warn sprintf "Warning: prerequisite \%s \%s not found. We have \%s.\n",
-                $prereq, $self->{PREREQ_PM}->{?$prereq}, 
+              $prereq, $self->{PREREQ_PM}->{?$prereq}, 
                 ($pr_version || 'unknown version') 
-                unless $self->{?PREREQ_FATAL};
+                  unless $self->{?PREREQ_FATAL};
             %unsatisfied{+$prereq} = $self->{PREREQ_PM}->{?$prereq} ?? 
-            $self->{PREREQ_PM}->{?$prereq} !! 'unknown version' ;
+              $self->{PREREQ_PM}->{?$prereq} !! 'unknown version' ;
         }
     }
-
-    if (%unsatisfied && $self->{?PREREQ_FATAL}){
+    
+     if (%unsatisfied && $self->{?PREREQ_FATAL}){
         my $failedprereqs = join "\n", map {"    $_ %unsatisfied{?$_}"},
-            sort { $a cmp $b }, keys %unsatisfied;
+                            sort { $a cmp $b }, keys %unsatisfied;
         die <<"END";
 MakeMaker FATAL: prerequisites not found.
 $failedprereqs
@@ -421,7 +421,7 @@ $failedprereqs
 Please install these modules first and rerun 'perl Makefile.PL'.
 END
     }
-
+    
     if (defined $self->{?CONFIGURE}) {
         if (ref $self->{?CONFIGURE} eq 'CODE') {
             %configure_att = %( < %{ $self->{?CONFIGURE}->( < @_ ) } );
@@ -449,13 +449,13 @@ END
 
             # Don't stomp on WriteMakefile() args.
             next if defined $self->{ARGS}->{?$key} and
-                $self->{ARGS}->{?$key} eq $self->{?$key};
+                    $self->{ARGS}->{?$key} eq $self->{?$key};
 
             $self->{+$key} = $self->{PARENT}->{?$key};
 
             unless ($Is_VMS && $key =~ m/PERL$/) {
                 $self->{+$key} = $self->catdir("..",$self->{$key})
-                unless $self->file_name_is_absolute($self->{$key});
+                  unless $self->file_name_is_absolute($self->{$key});
             } else {
                 # PERL or FULLPERL will be a command verb or even a
                 # command with an argument instead of a full file
@@ -464,7 +464,7 @@ END
                 # the argument if not already absolute.
                 my @cmd = split m/\s+/, $self->{?$key};
                 @cmd[1] = $self->catfile('[-]',@cmd[1])
-                    unless ((nelems @cmd) +< 2) || $self->file_name_is_absolute(@cmd[1]);
+                  unless ((nelems @cmd) +< 2) || $self->file_name_is_absolute(@cmd[1]);
                 $self->{+$key} = join(' ', @cmd);
             }
         }
@@ -473,10 +473,10 @@ END
             foreach my $opt (qw(POLLUTE PERL_CORE LINKTYPE)) {
                 if (exists $self->{PARENT}->{$opt}
                     and not exists $self->{$opt})
-                {
-                    # inherit, but only if already unspecified
-                    $self->{+$opt} = $self->{PARENT}->{?$opt};
-                }
+                    {
+                        # inherit, but only if already unspecified
+                        $self->{+$opt} = $self->{PARENT}->{?$opt};
+                    }
             }
         }
         my @fm = grep { m/^FIRST_MAKEFILE=/ }, @ARGV;
@@ -563,22 +563,22 @@ END
     undef %initial_att;        # free memory
 
     if (defined $self->{?CONFIGURE}) {
-        push @{$self->{RESULT}}, <<END;
+       push @{$self->{RESULT}}, <<END;
 
 #   MakeMaker 'CONFIGURE' Parameters:
 END
         if (%configure_att) {
             foreach my $key (sort keys %configure_att){
-                next if $key eq 'ARGS';
-                my $v = neatvalue(%configure_att{?$key});
-                $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
-                $v =~ s/\n+/ /g;
-                push @{$self->{RESULT}}, "#     $key => $v";
+               next if $key eq 'ARGS';
+               my $v = neatvalue(%configure_att{?$key});
+               $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
+               $v =~ s/\n+/ /g;
+               push @{$self->{RESULT}}, "#     $key => $v";
             }
         }
         else
         {
-            push @{$self->{RESULT}}, "# no values returned";
+           push @{$self->{RESULT}}, "# no values returned";
         }
         undef %configure_att;  # free memory
     }
@@ -616,7 +616,7 @@ END
             push @{$self->{RESULT}}, "# " . join ", ", %a if $Verbose && %a;
             push @{$self->{RESULT}}, $self->maketext_filter(
                 $self->?$method( < %a )
-                );
+            );
         }
     }
 
@@ -630,7 +630,7 @@ sub WriteEmptyMakefile {
 
     my %att = %( < @_ );
     my $self = MM->new(\%att);
-
+    
     my $new = $self->{?MAKEFILE};
     my $old = $self->{?MAKEFILE_OLD};
     if (-f $old) {
@@ -679,11 +679,11 @@ sub parse_args($self, @< @args){
         }
         my@($name, $value) = @($1, $2);
         if ($value =~ m/^~(\w+)?/) { # tilde with optional username
-                $value =~ s [^~(\w*)]
+            $value =~ s [^~(\w*)]
                 [$($1 ??
-                ((getpwnam($1))[[7]] || "~$1") !!
-                (getpwuid($^EUID))[[7]]
-            )]x;
+                   ((getpwnam($1))[[7]] || "~$1") !!
+                   (getpwuid($^EUID))[[7]]
+                 )]x;
         }
 
         # Remember the original args passed it.  It will be useful later.
@@ -705,7 +705,7 @@ sub parse_args($self, @< @args){
     if (defined $self->{?ARMAYBE}){
         my@($armaybe) = $self->{?ARMAYBE};
         print $^STDOUT, "ARMAYBE => '$armaybe' should be changed to:\n",
-            "\t'dynamic_lib' => \{ARMAYBE => '$armaybe'\}\n";
+                        "\t'dynamic_lib' => \{ARMAYBE => '$armaybe'\}\n";
         my@(%dl) =@( %( < %{$self->{?dynamic_lib} || \%()} ));
         $self->{+dynamic_lib} = \%( < %dl, ARMAYBE => $armaybe);
         delete $self->{ARMAYBE};
@@ -770,10 +770,10 @@ sub check_hints($self) {
 
 sub _run_hintfile {
     our $self;
-                      local($self) = shift;       # make $self available to the hint file.
+    local($self) = shift;       # make $self available to the hint file.
     my@($hint_file) =@( shift);
 
-                      local($^EVAL_ERROR, $^OS_ERROR);
+    local($^EVAL_ERROR, $^OS_ERROR);
     print $^STDERR, "Processing hints file $hint_file\n";
 
     # Just in case the ./ isn't on the hint file, which File::Spec can
@@ -795,9 +795,9 @@ sub mv_all_methods {
     # because I want to make it easier for the user. A.K.
 
     local $^WARN_HOOK = sub { 
-            # can't use 'no warnings redefined', 5.6 only
-            warn < @_[0]->message unless @_[0]->message =~ m/^Subroutine .* redefined/ 
-        };
+        # can't use 'no warnings redefined', 5.6 only
+        warn < @_[0]->message unless @_[0]->message =~ m/^Subroutine .* redefined/ 
+    };
     foreach my $method ( @Overridable) {
 
         # We cannot say "next" here. Nick might call MY->makeaperl
@@ -822,23 +822,23 @@ sub mv_all_methods {
                 package MY;
                 my $super = "SUPER::".$method;
                 *{Symbol::fetch_glob($method)} = sub {
-                        shift->?$super(< @_);
-                    };
+                    shift->?$super(< @_);
+                };
             };
         };
     }
 
-# We have to clean out $^INCLUDED also, because the current directory is
-# changed frequently and Graham Barr prefers to get his version
-# out of a History.pl file which is "required" so woudn't get
-# loaded again in another extension requiring a History.pl
+    # We have to clean out $^INCLUDED also, because the current directory is
+    # changed frequently and Graham Barr prefers to get his version
+    # out of a History.pl file which is "required" so woudn't get
+    # loaded again in another extension requiring a History.pl
 
-# With perl5.002_01 the deletion of entries in $^INCLUDED caused Tk-b11
-# to core dump in the middle of a require statement. The required
-# file was Tk/MMutil.pm.  The consequence is, we have to be
-# extremely careful when we try to give perl a reason to reload a
-# library with same name.  The workaround prefers to drop nothing
-# from $^INCLUDED and teach the writers not to use such libraries.
+    # With perl5.002_01 the deletion of entries in $^INCLUDED caused Tk-b11
+    # to core dump in the middle of a require statement. The required
+    # file was Tk/MMutil.pm.  The consequence is, we have to be
+    # extremely careful when we try to give perl a reason to reload a
+    # library with same name.  The workaround prefers to drop nothing
+    # from $^INCLUDED and teach the writers not to use such libraries.
 
 #    my $inc;
 #    foreach $inc (keys $^INCLUDED) {
@@ -851,20 +851,20 @@ sub skipcheck($self, $section) {
 
     if ($section eq 'dynamic') {
         print $^STDOUT, "Warning (non-fatal): Target 'dynamic' depends on targets ",
-            "in skipped section 'dynamic_bs'\n"
+        "in skipped section 'dynamic_bs'\n"
             if $self->{SKIPHASH}->{?dynamic_bs} && $Verbose;
         print $^STDOUT, "Warning (non-fatal): Target 'dynamic' depends on targets ",
-            "in skipped section 'dynamic_lib'\n"
+        "in skipped section 'dynamic_lib'\n"
             if $self->{SKIPHASH}->{?dynamic_lib} && $Verbose;
     }
     if ($section eq 'dynamic_lib') {
         print $^STDOUT, "Warning (non-fatal): Target '\$(INST_DYNAMIC)' depends on ",
-            "targets in skipped section 'dynamic_bs'\n"
+        "targets in skipped section 'dynamic_bs'\n"
             if $self->{SKIPHASH}->{?dynamic_bs} && $Verbose;
     }
     if ($section eq 'static') {
         print $^STDOUT, "Warning (non-fatal): Target 'static' depends on targets ",
-            "in skipped section 'static_lib'\n"
+        "in skipped section 'static_lib'\n"
             if $self->{SKIPHASH}->{?static_lib} && $Verbose;
     }
     return 'skipped' if $self->{?SKIPHASH}->{?$section};
@@ -887,7 +887,7 @@ sub flush {
 
     close $fh;
     _rename("MakeMaker.tmp", $finalname) or
-        warn "rename MakeMaker.tmp => $finalname: $^OS_ERROR";
+      warn "rename MakeMaker.tmp => $finalname: $^OS_ERROR";
     chmod 0644, $finalname unless $Is_VMS;
 
     my %keep = %( < @+: map { @($_ => 1) }, qw(NEEDS_LINKING HAS_LINK_CODE) );

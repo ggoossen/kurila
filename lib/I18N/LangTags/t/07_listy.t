@@ -1,5 +1,5 @@
 
-# Time-stamp: "2003-10-10 17:37:34 ADT"
+ # Time-stamp: "2003-10-10 17:37:34 ADT"
 use Test::More;
 BEGIN { plan tests => 17 };
 BEGIN { ok 1 }

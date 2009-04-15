@@ -15,7 +15,7 @@ my $Why = "Just testing the skip interface.";
 
 SKIP: do {
     skip $Why, 2 
-        unless Pigs->can('fly');
+      unless Pigs->can('fly');
 
     my $pig = Pigs->new;
     $pig->takeoff;
@@ -44,7 +44,7 @@ SKIP: do {
 
 
 SKIP: do {
-        skip $Why, 2 if 1;
+    skip $Why, 2 if 1;
 
     die "A horrible death";
     fail("Deliberate failure");
@@ -55,16 +55,16 @@ SKIP: do {
 do {
     my $warning;
     local $^WARN_HOOK = sub { $warning = @_[0]->message };
-  SKIP: do {
+    SKIP: do {
         # perl gets the line number a little wrong on the first
         # statement inside a block.
         1 == 1;
-        #line 56
+#line 56
         skip $Why;
         fail("So very failed");
     };
     like( $warning, qr/skip\(\) needs to know \$how_many tests are in the block/ms,
-          'skip without $how_many warning' );
+        'skip without $how_many warning' );
 };
 
 
@@ -73,8 +73,8 @@ SKIP: do {
 
     pass("This is supposed to run");
 
-  # Testing out nested skips.
-  SKIP: do {
+    # Testing out nested skips.
+    SKIP: do {
         skip $Why, 2;
         fail("AHHH!");
         fail("You're a failure");
@@ -87,8 +87,8 @@ do {
     my $warning = '';
     local $^WARN_HOOK = sub { $warning .= @_[0]->message };
 
-  SKIP: do {
-            skip 1, "This is backwards" if 1;
+    SKIP: do {
+        skip 1, "This is backwards" if 1;
 
         pass "This does not run";
     };

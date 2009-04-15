@@ -1,5 +1,5 @@
 
-# Time-stamp: "2004-03-30 17:52:14 AST"
+ # Time-stamp: "2004-03-30 17:52:14 AST"
 use Test::More;
 BEGIN { plan tests => 64 };
 BEGIN { ok 1 }
@@ -79,14 +79,14 @@ foreach my $lt (qw(
  cr-western
  cr-latin
 )) {
-    my $name = I18N::LangTags::List::name($lt);
-    if($name) {
-        ok(1);
-        print $^STDOUT, "#        $lt -> $name\n";
-    } else {
-        ok(0);
-        print $^STDOUT, "#        Failed lookup on $lt\n";
-    }
+  my $name = I18N::LangTags::List::name($lt);
+  if($name) {
+    ok(1);
+    print $^STDOUT, "#        $lt -> $name\n";
+  } else {
+    ok(0);
+    print $^STDOUT, "#        Failed lookup on $lt\n";
+  }
 }
 
 

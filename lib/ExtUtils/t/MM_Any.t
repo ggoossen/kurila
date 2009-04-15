@@ -25,9 +25,9 @@ my @flavors = MM->os_flavor;
 ok( (nelems @flavors),   'os_flavor() returned something' );
 
 ok( MM->os_flavor_is(@flavors[rand nelems @flavors]), 
-      'os_flavor_is() one flavor' );
+                                          'os_flavor_is() one flavor' );
 ok( MM->os_flavor_is(@flavors[rand nelems @flavors], 'BogusOS'),
-      '    many flavors' );
+                                          '    many flavors' );
 ok( !MM->os_flavor_is('BogusOS'),        '    wrong flavor' );
 ok( !MM->os_flavor_is(),                 '    no flavor' );
 

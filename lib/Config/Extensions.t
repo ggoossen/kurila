@@ -14,7 +14,7 @@ use Config;
 
 my @types = qw(dynamic static nonxs);
 my %types;
-    %types{[ @types]} =  @types;
+ %types{[ @types]} =  @types;
 
 ok (nkeys %Extensions, "There are some extensions");
 # Check only the 3 valid keys have been used.
@@ -25,8 +25,8 @@ while (my @(?$key, ?$val) =@( each %Extensions)) {
     my $re = qr/\b\Q$raw_ext\E\b/;
     like(config_value("extensions"), $re, "$key was built");
     unless (%types{$val}) {
-        fail("$key is $val");
-        next;
+	fail("$key is $val");
+	next;
     }
     my $type = $val . '_ext';
     like(config_value($type), $re, "$key is $type");

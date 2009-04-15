@@ -44,7 +44,7 @@ END {
 }
 
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||
-    diag("chdir failed: $^OS_ERROR");
+  diag("chdir failed: $^OS_ERROR");
 
 unlink $Makefile;
 my $prereq_out = run(qq{$Perl Makefile.PL "PREREQ_PRINT=1"});
@@ -64,7 +64,7 @@ $prereq_out = run(qq{$Perl Makefile.PL "PRINT_PREREQ=1"});
 ok( !-r $Makefile, "PRINT_PREREQ produces no $Makefile" );
 is( $^CHILD_ERROR, 0,         '  exited normally' );
 main::like( $prereq_out, qr/^perl\(strict\) \s* >= \s* 0 \s*$/x, 
-            'prereqs dumped' );
+                                                      'prereqs dumped' );
 
 
 # Currently a bug.

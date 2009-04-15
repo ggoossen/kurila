@@ -188,7 +188,7 @@ eval q{
 };
 
 my @Expected_Warnings = 
-    @(
+  @(
    qr/^Constant name 'BEGIN' is a Perl keyword/,
    qr/^Constant name 'INIT' is a Perl keyword/,
    qr/^Constant name 'CHECK' is a Perl keyword/,
@@ -203,7 +203,7 @@ my @Expected_Warnings =
    qr/^Constant name 'ENV' is forced into package main::/,
    qr/^Constant name 'INC' is forced into package main::/,
    qr/^Constant name 'SIG' is forced into package main::/,
-    );
+);
 
 # when run under "make test"
 if (0+nelems @warnings == 0+nelems @Expected_Warnings) {
@@ -232,12 +232,12 @@ for my $idx (0..((nelems @warnings)-1)) {
 
 
 use constant \%(
-        THREE  => 3,
-            FAMILY => \ qw( John Jane Sally ),
-            AGES   => \%( John => 33, Jane => 28, Sally => 3 ),
-            RFAM   => \@( \ qw( John Jane Sally ) ),
-            SPIT   => sub { shift },
-    );
+	THREE  => 3,
+	FAMILY => \ qw( John Jane Sally ),
+	AGES   => \%( John => 33, Jane => 28, Sally => 3 ),
+	RFAM   => \@( \ qw( John Jane Sally ) ),
+	SPIT   => sub { shift },
+);
 
 is nelems(@{$:FAMILY}), THREE;
 is nelems(@{$:FAMILY}), nelems @{RFAM->[0]};

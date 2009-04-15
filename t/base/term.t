@@ -41,9 +41,9 @@ if (($x ^|^ 1) == 101) {print $^STDOUT, "ok 5\n";} else {print $^STDOUT, "not ok
 
 my $try;
 if ($^OS_NAME eq 'MacOS') {
-    open($try, "<", "Dev:Null") || (die "Can't open /dev/null.");
+	open($try, "<", "Dev:Null") || (die "Can't open /dev/null.");
 } else {
-    open($try, "<", "/dev/null") || open($try,"<", "nla0:") || (die "Can't open /dev/null.");
+	open($try, "<", "/dev/null") || open($try,"<", "nla0:") || (die "Can't open /dev/null.");
 }
 
 if ( ~< $try eq '') {

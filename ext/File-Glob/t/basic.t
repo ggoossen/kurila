@@ -11,8 +11,8 @@ env::var('PATH' ) = "/bin";
 env::var($_) = undef for qw(BASH_ENV CDPATH ENV IFS);
 my @correct = @( () );
 if (opendir(my $d, $^OS_NAME eq "MacOS" ?? ":" !! ".")) {
-    @correct = grep { !m/^\./ }, sort @( readdir($d));
-    closedir $d;
+   @correct = grep { !m/^\./ }, sort @( readdir($d));
+   closedir $d;
 }
 my @a = File::Glob::bsd_glob("*", 0);
 @a = sort @a;
@@ -27,20 +27,20 @@ if (GLOB_ERROR) {
 SKIP: do {
     my ($name, $home);
     skip $^OS_NAME, 1 if $^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'VMS'
-        || $^OS_NAME eq 'os2' || $^OS_NAME eq 'beos';
+	|| $^OS_NAME eq 'os2' || $^OS_NAME eq 'beos';
     skip "Can't find user for $^EUID: $^EVAL_ERROR", 1 unless try {
-            @($name, $home) =  @(getpwuid($^EUID))[[@:0,7]];
-            1;
-        };
+	@($name, $home) =  @(getpwuid($^EUID))[[@:0,7]];
+	1;
+    };
     skip "$^EUID has no home directory", 1
-        unless defined $home && defined $name && -d $home;
+	unless defined $home && defined $name && -d $home;
 
     @a = bsd_glob("~$name", GLOB_TILDE);
 
     if (GLOB_ERROR) {
-        fail(GLOB_ERROR);
+	fail(GLOB_ERROR);
     } else {
-        is_deeply (\@a, \@($home));
+	is_deeply (\@a, \@($home));
     }
 };
 
@@ -66,7 +66,7 @@ SKIP: do {
 # should return an empty list, and set ERROR
 SKIP: do {
     skip $^OS_NAME, 2 if $^OS_NAME eq 'mpeix' or $^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'NetWare'
-        or $^OS_NAME eq 'os2' or $^OS_NAME eq 'VMS' or $^OS_NAME eq 'cygwin';
+	or $^OS_NAME eq 'os2' or $^OS_NAME eq 'VMS' or $^OS_NAME eq 'cygwin';
     skip "AFS", 2 if Cwd::cwd() =~ m#^$(config_value('afsroot'))#s;
     skip "running as root", 2 if not $^EUID;
 
@@ -87,7 +87,7 @@ is_deeply(\@a, \@('a', 'b'));
 @a = bsd_glob(
     '{TES?,doesntexist*,a,b}',
     GLOB_BRACE ^|^ GLOB_NOMAGIC ^|^ ($^OS_NAME eq 'VMS' ?? GLOB_NOCASE !! 0)
-    );
+);
 
 # Working on t/TEST often causes this test to fail because it sees Emacs temp
 # and RCS files.  Filter them out, and .pm files too, and patch temp files.
@@ -147,18 +147,18 @@ do {
     use File::Spec qw();
 
     my $dir = tempdir(CLEANUP => 1)
-        or die "Could not create temporary directory";
+	or die "Could not create temporary directory";
     for my $file (qw(a_dej a_ghj a_qej)) {
-        open my $fh, ">", File::Spec->catfile($dir, $file)
-            or die "Could not create file $dir/$file: $^OS_ERROR";
-        close $fh;
+	open my $fh, ">", File::Spec->catfile($dir, $file)
+	    or die "Could not create file $dir/$file: $^OS_ERROR";
+	close $fh;
     }
     my $cwd = Cwd::cwd();
     chdir $dir
-        or die "Could not chdir to $dir: $^OS_ERROR";
+	or die "Could not chdir to $dir: $^OS_ERROR";
     my @glob_files = glob('a*{d[e]}j');
     local $TODO = "home-made glob doesn't do regexes" if $^OS_NAME eq 'VMS';
     is_deeply(\@glob_files, \@('a_dej'));
     chdir $cwd
-        or die "Could not chdir back to $cwd: $^OS_ERROR";
+	or die "Could not chdir back to $cwd: $^OS_ERROR";
 };

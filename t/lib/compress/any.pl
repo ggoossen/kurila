@@ -1,6 +1,6 @@
 
 use lib 't';
-
+ 
 use warnings;
 use bytes;
 
@@ -54,8 +54,8 @@ sub run
 
             do {
                 my $unc = $AnyConstruct-> new( $input, Transparent => $trans,
-                    RawInflate => 1,
-                    Append => 1)  ;
+                                           RawInflate => 1,
+                                           Append => 1)  ;
 
                 ok $unc, "  Created $AnyClass object" 
                     or print $^STDOUT, "# $$AnyError\n";
@@ -73,8 +73,8 @@ sub run
 
             do {
                 my $unc = $AnyConstruct-> new( $input, Transparent => $trans,
-                    RawInflate => 1,
-                    Append => 1)  ;
+                                           RawInflate => 1,
+                                           Append => 1)  ;
 
                 ok $unc, "  Created $AnyClass object" 
                     or print $^STDOUT, "# $$AnyError\n";

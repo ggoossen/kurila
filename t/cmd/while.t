@@ -37,8 +37,8 @@ $badcont = '';
 open($fh, "<",'Cmd_while.tmp') || die "Can't open Cmd_while.tmp.";
 loop: while ( ~< *$fh) {
     if (s/vt100/VT100/g) {
-        s/VT100/Vt100/g;
-        redo loop;
+	s/VT100/Vt100/g;
+	redo loop;
     }
     $bad = 1 if m/vt100/;
     $bad = 1 if m/VT100/;
@@ -72,16 +72,16 @@ print $^STDOUT, "ok $i\n";
 'abc' =~ m/b/p;
 WHILE:
 while (1) {
-    $i++;
-    print $^STDOUT, "not " unless $^PREMATCH . $^MATCH . $^POSTMATCH eq "abc";
-    print $^STDOUT, "ok $i\n";
-    do {                             # Localize changes to $` and friends
-        'end' =~ m/end/p;
-        redo WHILE if $i == 11;
-        next WHILE if $i == 12;
-        # 13 do a normal loop
-        last WHILE if $i == 14;
-    };
+  $i++;
+  print $^STDOUT, "not " unless $^PREMATCH . $^MATCH . $^POSTMATCH eq "abc";
+  print $^STDOUT, "ok $i\n";
+  do {                             # Localize changes to $` and friends
+    'end' =~ m/end/p;
+    redo WHILE if $i == 11;
+    next WHILE if $i == 12;
+    # 13 do a normal loop
+    last WHILE if $i == 14;
+  };
 }
 $i++;
 print $^STDOUT, "not " unless $^PREMATCH . $^MATCH . $^POSTMATCH eq "abc";
@@ -91,9 +91,9 @@ print $^STDOUT, "ok $i\n";
 do {
     my $var = 16;
     while (my $i = ++$var) {
-        next if $i == 17;
-        last if $i +> 17;
-        my $i = 0;
+	next if $i == 17;
+	last if $i +> 17;
+	my $i = 0;
     }
     continue {
         print $^STDOUT, "ok ", $var-1, "\nok $i\n";
@@ -125,14 +125,14 @@ do {
 $i = 20;
 do {
     while (1) {
-        my $x;
-        print $^STDOUT, $x if defined $x;
-        $x = "not ";
-        print $^STDOUT, "ok $i\n"; ++$i;
-        if ($i == 21) {
-            next;
-        }
-        last;
+	my $x;
+	print $^STDOUT, $x if defined $x;
+	$x = "not ";
+	print $^STDOUT, "ok $i\n"; ++$i;
+	if ($i == 21) {
+	    next;
+	}
+	last;
     }
     continue {
         print $^STDOUT, "ok $i\n"; ++$i;

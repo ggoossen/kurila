@@ -46,7 +46,7 @@ ok( chdir('Recurs'), q{chdir'd to Recurs} ) ||
 my $mpl_out = run(qq{$perl Makefile.PL});
 
 cmp_ok( $^CHILD_ERROR, '==', 0, 'Makefile.PL exited with zero' ) ||
-    diag($mpl_out);
+  diag($mpl_out);
 
 my $makefile = makefile_name();
 
@@ -69,7 +69,7 @@ ok( chdir('Recurs'), q{chdir'd to Recurs} ) ||
 $mpl_out = run(qq{$perl Makefile.PL "NORECURS=1"});
 
 cmp_ok( $^CHILD_ERROR, '==', 0, 'Makefile.PL NORECURS=1 exited with zero' ) ||
-    diag($mpl_out);
+  diag($mpl_out);
 
 $makefile = makefile_name();
 
@@ -94,7 +94,7 @@ ok( chdir('Recurs'), q{chdir'd to Recurs} ) ||
 $mpl_out = run(qq{$perl Makefile.PL "INST_SCRIPT=cgi"});
 
 cmp_ok( $^CHILD_ERROR, '==', 0, 'Makefile.PL exited with zero' ) ||
-    diag($mpl_out);
+  diag($mpl_out);
 
 $makefile = makefile_name();
 my $submakefile = File::Spec->catfile('prj2',$makefile);
@@ -105,8 +105,8 @@ ok( -e $submakefile, 'sub Makefile written' );
 my $inst_script = File::Spec->catdir(File::Spec->updir, 'cgi');
 ok( open(my $makefh, "<", $submakefile) ) || diag("Can't open $submakefile: $^OS_ERROR");
 do { local $^INPUT_RECORD_SEPARATOR = undef;
-    like( ($: ~< $makefh), qr/^\s*INST_SCRIPT\s*=\s*\Q$inst_script\E/m, 
-          'prepend .. not stomping WriteMakefile args' ) 
+  like( ($: ~< $makefh), qr/^\s*INST_SCRIPT\s*=\s*\Q$inst_script\E/m, 
+        'prepend .. not stomping WriteMakefile args' ) 
 };
 close $makefh;
 

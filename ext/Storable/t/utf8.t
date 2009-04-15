@@ -10,10 +10,10 @@ use Config;
 
 BEGIN {
     if (env::var('PERL_CORE')){
-        chdir('t') if -d 't';
-        push $^INCLUDE_PATH, '../ext/Storable/t';
+	chdir('t') if -d 't';
+	push $^INCLUDE_PATH, '../ext/Storable/t';
     } else {
-        unshift $^INCLUDE_PATH, 't';
+	unshift $^INCLUDE_PATH, 't';
     }
     require 'st-dump.pl';
 }

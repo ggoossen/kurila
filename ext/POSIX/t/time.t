@@ -17,12 +17,12 @@ SKIP: do {
     # actually do anything.  Cygwin works in some places, but not others.  The
     # other Win32's below are guesses.
     skip "No tzset()", 2
-        if $^OS_NAME eq "MacOS" || $^OS_NAME eq "VMS" || $^OS_NAME eq "cygwin" || $^OS_NAME eq "djgpp" ||
-        $^OS_NAME eq "MSWin32" || $^OS_NAME eq "dos" || $^OS_NAME eq "interix";
+       if $^OS_NAME eq "MacOS" || $^OS_NAME eq "VMS" || $^OS_NAME eq "cygwin" || $^OS_NAME eq "djgpp" ||
+          $^OS_NAME eq "MSWin32" || $^OS_NAME eq "dos" || $^OS_NAME eq "interix";
     tzset();
     my @tzname = tzname();
     like(@tzname[0], qr/(GMT|UTC)/i, "tzset() to GMT/UTC");
-  SKIP: do {
+    SKIP: do {
         skip "Mac OS X/Darwin doesn't handle this", 1 if $^OS_NAME =~ m/darwin/i;
         like(@tzname[1], qr/(GMT|UTC)/i, "The whole year?");
     };
@@ -38,7 +38,7 @@ is(asctime(localtime(12345678)), ctime(12345678), "asctime() and ctime() at 1234
 my $orig_loc = setlocale(LC_TIME, "C") || die "Cannot setlocale() to C:  $^OS_ERROR";
 my $jan_16 = 15 * 86400;
 is(ctime($jan_16), strftime("\%a \%b \%d \%H:\%M:\%S \%Y\n", localtime($jan_16)),
-   "get ctime() equal to strftime()");
+        "get ctime() equal to strftime()");
 setlocale(LC_TIME, $orig_loc) || die "Cannot setlocale() back to orig: $^OS_ERROR";
 
 # clock() seems to have different definitions of what it does between POSIX

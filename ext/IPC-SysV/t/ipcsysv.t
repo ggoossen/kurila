@@ -24,13 +24,13 @@ my $sem;
 
 # FreeBSD is known to throw this if there's no SysV IPC in the kernel.
 signals::handler("SYS") = sub {
-        diag(<<EOM);
+    diag(<<EOM);
 SIGSYS caught.
 It may be that your kernel does not have SysV IPC configured.
 
 EOM
-        if ($^OS_NAME eq 'freebsd') {
-            diag(<<EOM);
+    if ($^OS_NAME eq 'freebsd') {
+        diag(<<EOM);
 You must have following options in your kernel:
 
 options         SYSVSHM
@@ -40,20 +40,20 @@ options         SYSVMSG
 See config(8).
 
 EOM
-        }
-        diag('Bail out! SIGSYS caught');
-        exit(1);
-    };
+    }
+    diag('Bail out! SIGSYS caught');
+    exit(1);
+};
 
 my $perm = S_IRWXU;
 
 SKIP: do {
 
-    skip( 'lacking d_msgget d_msgctl d_msgsnd d_msgrcv', 6 ) unless
-        config_value('d_msgget') eq 'define' &&
-        config_value('d_msgctl') eq 'define' &&
-        config_value('d_msgsnd') eq 'define' &&
-        config_value('d_msgrcv') eq 'define';
+skip( 'lacking d_msgget d_msgctl d_msgsnd d_msgrcv', 6 ) unless
+    config_value('d_msgget') eq 'define' &&
+    config_value('d_msgctl') eq 'define' &&
+    config_value('d_msgsnd') eq 'define' &&
+    config_value('d_msgrcv') eq 'define';
 
     $msg = msgget(IPC_PRIVATE, $perm);
     # Very first time called after machine is booted value may be 0 
@@ -127,10 +127,10 @@ EOM
         $test6bad = 1;
     }
     if ($test6bad && $test2bad) {
-        print $^STDOUT, <<EOM;
+    print $^STDOUT, <<EOM;
 This failure was to be expected because the subtest #2 failed.
 EOM
-    }
+     }
 }; # SKIP
 
 SKIP: do {
@@ -181,7 +181,7 @@ SKIP: do {
 
     @data[$poke] = 1;
     ok(semctl($sem,0,SETALL,pack("s!*",<@data)),'poke it');
-
+    
     $data = "";
     ok(semctl($sem,0,GETALL,$data),'and get it back');
 

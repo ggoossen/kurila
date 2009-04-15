@@ -14,7 +14,7 @@ BEGIN {
     %EXPORT_TAGS = %( FIELDS => \@( < @EXPORT_OK, < @EXPORT ) );
 }
 our ($h_name, @h_aliases, $h_addrtype, $h_length,
-    @h_addr_list, $h_addr);
+     @h_addr_list, $h_addr);
 
 # Class::Struct forbids use of @ISA
 sub import {
@@ -24,12 +24,12 @@ sub import {
 
 use Class::Struct < qw(struct);
 struct 'Net::hostent' => \@(
-       name		=> '$',
-       aliases	=> '@',
-       addrtype	=> '$',
-       'length'	=> '$',
-       addr_list	=> '@',
-       );
+   name		=> '$',
+   aliases	=> '@',
+   addrtype	=> '$',
+   'length'	=> '$',
+   addr_list	=> '@',
+);
 
 sub addr { shift->addr_list->[0] }
 
@@ -55,10 +55,10 @@ sub gethostbyaddr ($addr, ?$addrtype) {
 
 sub gethost($name_addr) {
     if ($name_addr =~ m/^\d+(?:\.\d+(?:\.\d+(?:\.\d+)?)?)?$/) {
-        require Socket;
-        &gethostbyaddr( <Socket::inet_aton($name_addr));
+	require Socket;
+	&gethostbyaddr( <Socket::inet_aton($name_addr));
     } else {
-        &gethostbyname( $name_addr );
+	&gethostbyname( $name_addr );
     } 
 } 
 

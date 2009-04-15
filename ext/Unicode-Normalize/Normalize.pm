@@ -23,11 +23,11 @@ our @EXPORT_OK = qw(
     splitOnLastStarter
 );
 our %EXPORT_TAGS = %(
-        all       => \@( < @EXPORT, < @EXPORT_OK ),
-            normalize => \@( < @EXPORT, < qw/normalize decompose reorder compose/ ),
-            check     => \ qw/checkNFD checkNFKD checkNFC checkNFKC check/,
-            fast      => \ qw/FCD checkFCD FCC checkFCC composeContiguous/,
-    );
+    all       => \@( < @EXPORT, < @EXPORT_OK ),
+    normalize => \@( < @EXPORT, < qw/normalize decompose reorder compose/ ),
+    check     => \ qw/checkNFD checkNFKD checkNFC checkNFKC check/,
+    fast      => \ qw/FCD checkFCD FCC checkFCC composeContiguous/,
+);
 
 ######
 
@@ -57,17 +57,17 @@ sub FCD ($str) {
 }
 
 our %formNorm = %(
-        NFC  => \&NFC,	C  => \&NFC,
-            NFD  => \&NFD,	D  => \&NFD,
-            NFKC => \&NFKC,	KC => \&NFKC,
-            NFKD => \&NFKD,	KD => \&NFKD,
-            FCD  => \&FCD,	FCC => \&FCC,
-    );
+    NFC  => \&NFC,	C  => \&NFC,
+    NFD  => \&NFD,	D  => \&NFD,
+    NFKC => \&NFKC,	KC => \&NFKC,
+    NFKD => \&NFKD,	KD => \&NFKD,
+    FCD  => \&FCD,	FCC => \&FCC,
+);
 
 sub normalize($form, $str)
 {
     if (exists %formNorm{$form}) {
-        return %formNorm{?$form}->($str);
+	return %formNorm{?$form}->($str);
     }
     croak($PACKAGE."::normalize: invalid form name: $form");
 }
@@ -78,17 +78,17 @@ sub normalize($form, $str)
 ##
 
 our %formCheck = %(
-        NFC  => \&checkNFC, 	C  => \&checkNFC,
-            NFD  => \&checkNFD, 	D  => \&checkNFD,
-            NFKC => \&checkNFKC,	KC => \&checkNFKC,
-            NFKD => \&checkNFKD,	KD => \&checkNFKD,
-            FCD  => \&checkFCD, 	FCC => \&checkFCC,
-    );
+    NFC  => \&checkNFC, 	C  => \&checkNFC,
+    NFD  => \&checkNFD, 	D  => \&checkNFD,
+    NFKC => \&checkNFKC,	KC => \&checkNFKC,
+    NFKD => \&checkNFKD,	KD => \&checkNFKD,
+    FCD  => \&checkFCD, 	FCC => \&checkFCC,
+);
 
 sub check($form, $str)
 {
     if (exists %formCheck{$form}) {
-        return %formCheck{?$form}->($str);
+	return %formCheck{?$form}->($str);
     }
     croak($PACKAGE."::check: invalid form name: $form");
 }

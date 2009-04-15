@@ -19,7 +19,7 @@ my $linkver = $Pod::ParseUtils::VERSION;
 
 # Set up an END block to remove the test output file
 END {
-    unlink "test.tex";
+  unlink "test.tex";
 };
 
 ok(1);
@@ -29,8 +29,8 @@ ok(1);
 # Do this until we read an =pod
 my @reference;
 while (my $line = ~< *DATA) {
-    last if $line =~ m/^=pod/;
-    push(@reference,$line);
+  last if $line =~ m/^=pod/;
+  push(@reference,$line);
 }
 
 my $user_preamble = <<PRE;
@@ -47,9 +47,9 @@ POST
 
 # Create a new parser
 my %params = %(
-        UserPreamble => $user_preamble,
-            UserPostamble => $user_postamble
-    );
+	UserPreamble => $user_preamble,
+	UserPostamble => $user_postamble
+);
 
 my $parser = Pod::LaTeX->new(< %params);
 ok($parser);
@@ -70,8 +70,8 @@ my @output = @( ~< $infh );
 is((nelems @output), nelems @reference);
 
 for my $i (0..((nelems @reference)-1)) {
-    next if @reference[$i] =~ m/^%%/; # skip timestamp comments
-    is(@output[$i], @reference[$i]);
+  next if @reference[$i] =~ m/^%%/; # skip timestamp comments
+  is(@output[$i], @reference[$i]);
 }
 
 close($infh) or die "Error closing INFH test.tex: $^OS_ERROR\n";

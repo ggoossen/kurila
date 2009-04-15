@@ -55,27 +55,27 @@ sub start_testing
 
 sub my_test_test
 {
-    my $text = shift;
-    local $^WARNING = 0;
+  my $text = shift;
+  local $^WARNING = 0;
 
-    # reset the outputs 
-    $t->output($original_output_handle);
-    $t->failure_output($original_failure_handle);
-    $t->todo_output($original_todo_handle);
-    env::var('HARNESS_ACTIVE' ) = $original_harness_env;
+  # reset the outputs 
+  $t->output($original_output_handle);
+  $t->failure_output($original_failure_handle);
+  $t->todo_output($original_todo_handle);
+  env::var('HARNESS_ACTIVE' ) = $original_harness_env;
 
-    # reset the number of tests
-    $t->current_test = $testing_num;
+  # reset the number of tests
+  $t->current_test = $testing_num;
 
-    # check we got the same values
-    my $got;
-    my $wanted;
+  # check we got the same values
+  my $got;
+  my $wanted;
 
-    # stdout
-    $t->ok( $out->check, "STDOUT $text");
+  # stdout
+  $t->ok( $out->check, "STDOUT $text");
 
-    # stderr
-    $t->ok( $err->check, "STDERR $text");
+  # stderr
+  $t->ok( $err->check, "STDERR $text");
 }
 
 ####################################################################

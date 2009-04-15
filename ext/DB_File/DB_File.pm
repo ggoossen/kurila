@@ -21,15 +21,15 @@ sub new
 {
     my $pkg = shift ;
     return bless \%( VALID => \%( 
-                bsize	  => 1,
-                    ffactor	  => 1,
-                    nelem	  => 1,
-                    cachesize => 1,
-                    hash	  => 2,
-                    lorder	  => 1,
-            ), 
-            GOT   => \%()
-        ), $pkg ;
+		       	bsize	  => 1,
+			ffactor	  => 1,
+			nelem	  => 1,
+			cachesize => 1,
+			hash	  => 2,
+			lorder	  => 1,
+		     ), 
+	    GOT   => \%()
+          ), $pkg ;
 }
 
 sub NotHere
@@ -43,7 +43,7 @@ sub NotHere
 package DB_File::RECNOINFO ;
 
 use warnings;
-
+ 
 
 @DB_File::RECNOINFO::ISA = qw(DB_File::HASHINFO) ;
 
@@ -52,16 +52,16 @@ sub TIEHASH
     my $pkg = shift ;
 
     bless \%( VALID => \%( < @+: map { @: $_, 1}, 
-                qw( bval cachesize psize flags lorder reclen bfname )
-            ),
-            GOT   => \%(),
-        ), $pkg ;
+		       qw( bval cachesize psize flags lorder reclen bfname )
+		     ),
+	    GOT   => \%(),
+          ), $pkg ;
 }
 
 package DB_File::BTREEINFO ;
 
 use warnings;
-
+ 
 
 @DB_File::BTREEINFO::ISA = qw(DB_File::HASHINFO) ;
 
@@ -70,17 +70,17 @@ sub TIEHASH
     my $pkg = shift ;
 
     bless \%( VALID => \%( 
-                flags	   => 1,
-                    cachesize  => 1,
-                    maxkeypage => 1,
-                    minkeypage => 1,
-                    psize	   => 1,
-                    compare	   => 2,
-                    prefix	   => 2,
-                    lorder	   => 1,
-            ),
-            GOT   => \%(),
-        ), $pkg ;
+		      	flags	   => 1,
+			cachesize  => 1,
+			maxkeypage => 1,
+			minkeypage => 1,
+			psize	   => 1,
+			compare	   => 2,
+			prefix	   => 2,
+			lorder	   => 1,
+	    	     ),
+	    GOT   => \%(),
+          ), $pkg ;
 }
 
 
@@ -152,9 +152,9 @@ try {
 };
 
 if ($use_XSLoader)
-{ XSLoader::load("DB_File", $VERSION)}
+  { XSLoader::load("DB_File", $VERSION)}
 else
-{ DB_File->bootstrap( $VERSION) }
+  { DB_File->bootstrap( $VERSION) }
 
 # Preloaded methods go here.  Autoload methods go after __END__, and are
 # processed by the autosplit program.
@@ -168,10 +168,10 @@ sub new($class, $filename, ?$flags, ?$mode, ?$hash_info)
     # make recno in Berkeley DB version 2 (or better) work like 
     # recno in version 1.
     if ($db_version +> 1 and defined $hash_info and (ref $hash_info) =~ m/RECNO/ and 
-        $filename and ! -e $filename) {
-        open(my $fh, ">", $filename) or return undef ;
-        close $fh ;
-        chmod $mode || 0666 , $filename;
+	$filename and ! -e $filename) {
+	open(my $fh, ">", $filename) or return undef ;
+	close $fh ;
+	chmod $mode || 0666 , $filename;
     }
 
     DoTie_(0, $class, $filename, $flags, $mode, $hash_info || () );
@@ -184,7 +184,7 @@ sub clear
     my $value = "" ;
     my $status = $self->seq($key, $value, R_FIRST());
     my @keys;
-
+ 
     while ($status == 0) {
         push @keys, $key;
         $status = $self->seq($key, $value, R_NEXT());
@@ -223,7 +223,7 @@ sub find_dup
 {
     die "Usage: \$db->find_dup(key,value)\n"
         unless (nelems @_) == 3 ;
-
+ 
     my $db        = shift ;
     my @($origkey, $value_wanted) =  @_ ;
     my @($key, $value) = @($origkey, 0);
@@ -242,7 +242,7 @@ sub del_dup
 {
     die "Usage: \$db->del_dup(key,value)\n"
         unless (nelems @_) == 3 ;
-
+ 
     my $db        = shift ;
     my @($key, $value) =  @_ ;
     my $status = $db->find_dup($key, $value) ;
@@ -256,7 +256,7 @@ sub get_dup
 {
     die "Usage: \$db->get_dup(key [,flag])\n"
         unless (nelems @_) == 2 or (nelems @_) == 3 ;
-
+ 
     my $db        = shift ;
     my $key       = shift ;
     my $flag	  = shift ;
@@ -265,21 +265,21 @@ sub get_dup
     my %values	  = %( () ) ;
     my @values    = @( () ) ;
     my $counter   = 0 ;
-
+ 
     # iterate through the database until either EOF ($status == 0)
     # or a different key is encountered ($key ne $origkey).
     my $status = $db->seq($key, $value, R_CURSOR());
     while ( $status == 0 and $key eq $origkey ) {
-
+ 
         # save the value or count number of matches
         if ($flag)
-        { ++ %values{+$value} }
+          { ++ %values{+$value} }
         else
-        { push (@values, $value) }
+          { push (@values, $value) }
 
         $status = $db->seq($key, $value, R_NEXT());
     }
-
+ 
     return  $flag ?? %values !! @values;
 }
 

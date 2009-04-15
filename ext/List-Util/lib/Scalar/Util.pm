@@ -16,36 +16,36 @@ $VERSION    = "1.19";
 $VERSION   = eval $VERSION;
 
 sub export_fail {
-    if (grep { m/^(weaken|isweak)$/ }, @_ ) {
-        require Carp;
-        Carp::croak("Weak references are not implemented in the version of perl");
-    }
-    if (grep { m/^(isvstring)$/ }, @_ ) {
-        require Carp;
-        Carp::croak("Vstrings are not implemented in the version of perl");
-    }
-    if (grep { m/^(dualvar)$/ }, @_ ) {
-        require Carp;
-        Carp::croak("$1 is only avaliable with the XS version");
-    }
+  if (grep { m/^(weaken|isweak)$/ }, @_ ) {
+    require Carp;
+    Carp::croak("Weak references are not implemented in the version of perl");
+  }
+  if (grep { m/^(isvstring)$/ }, @_ ) {
+    require Carp;
+    Carp::croak("Vstrings are not implemented in the version of perl");
+  }
+  if (grep { m/^(dualvar)$/ }, @_ ) {
+    require Carp;
+    Carp::croak("$1 is only avaliable with the XS version");
+  }
 
-    < @_;
+  < @_;
 }
 
 sub openhandle($fh) {
-    my $rt = reftype($fh) || '';
+  my $rt = reftype($fh) || '';
 
-    return defined(fileno($fh)) ?? $fh !! undef
-        if $rt eq 'IO';
+  return defined(fileno($fh)) ?? $fh !! undef
+    if $rt eq 'IO';
 
-    if (reftype(\$fh) eq 'GLOB') { # handle  openhandle(*DATA)
-        $fh = \(my $tmp=$fh);
-    }
-    elsif ($rt ne 'GLOB') {
-        return undef;
-    }
+  if (reftype(\$fh) eq 'GLOB') { # handle  openhandle(*DATA)
+    $fh = \(my $tmp=$fh);
+  }
+  elsif ($rt ne 'GLOB') {
+    return undef;
+  }
 
-    defined(fileno($fh)) ?? $fh !! undef;
+  defined(fileno($fh)) ?? $fh !! undef;
 }
 
 eval <<'ESQ' unless defined &dualvar;

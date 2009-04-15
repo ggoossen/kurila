@@ -1,12 +1,12 @@
 BEGIN {
     unless ("A" eq pack('U', 0x41)) {
-        print $^STDOUT, "1..0 # Unicode::Collate " .
-            "cannot stringify a Unicode code point\n";
-        exit 0;
+	print $^STDOUT, "1..0 # Unicode::Collate " .
+	    "cannot stringify a Unicode code point\n";
+	exit 0;
     }
     if (env::var('PERL_CORE')) {
-        chdir('t') if -d 't';
-        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
+	chdir('t') if -d 't';
+	$^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
 }
 

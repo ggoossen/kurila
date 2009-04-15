@@ -12,8 +12,8 @@ ExtUtils::MM_QNX - QNX specific subclass of ExtUtils::MM_Unix
 
 =head1 SYNOPSIS
 
-Don't use this module directly.
-Use ExtUtils::MM and let it choose.
+  Don't use this module directly.
+  Use ExtUtils::MM and let it choose.
 
 =head1 DESCRIPTION
 
@@ -35,7 +35,7 @@ sub extra_clean_files {
 
     my @errfiles = @{$self->{?C}};
     for (  @errfiles ) {
-        s/.c$/.err/;
+	s/.c$/.err/;
     }
 
     return @( @errfiles, 'perlmain.err' );

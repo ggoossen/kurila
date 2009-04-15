@@ -25,7 +25,7 @@ $v = reduce { $a . $b }, < @a;
 is( $v,	join("", @a),	'concat');
 
 sub add($aa, $bb) {
-    return $aa + $bb;
+  return $aa + $bb;
 }
 
 $v = reduce { my $t="$a $b\n"; 0+add($a, $b) }, 3, 2, 1;
@@ -65,8 +65,8 @@ is($v, 12, 'return from loop');
 
 # Does it work from another package?
 do { package Foo;
-    $a = $b;
-    main::is((List::Util::reduce {$a*$b}, ( <1..4)), 24, 'other package');
+  $a = $b;
+  main::is((List::Util::reduce {$a*$b}, ( <1..4)), 24, 'other package');
 };
 
 # Redefining an active sub should not fail, but whether the

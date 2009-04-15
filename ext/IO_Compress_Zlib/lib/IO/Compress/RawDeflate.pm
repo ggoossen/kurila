@@ -29,13 +29,13 @@ $RawDeflateError = '';
                                     Z_FINISH
                                     Z_BLOCK
                               },
-        level     => \qw{  
+                 level     => \qw{  
                                     Z_NO_COMPRESSION
                                     Z_BEST_SPEED
                                     Z_BEST_COMPRESSION
                                     Z_DEFAULT_COMPRESSION
                               },
-            strategy  => \qw{  
+                 strategy  => \qw{  
                                     Z_FILTERED
                                     Z_HUFFMAN_ONLY
                                     Z_RLE
@@ -43,15 +43,15 @@ $RawDeflateError = '';
                                     Z_DEFAULT_STRATEGY
                               },
 
-    );
+              );
 
 do {
     my %seen;
     foreach (keys %EXPORT_TAGS )
     {
         push @{%EXPORT_TAGS{+constants}}, 
-            < grep { !%seen{+$_}++ }, 
-            @{ %EXPORT_TAGS{$_} }
+                 < grep { !%seen{+$_}++ }, 
+ @{ %EXPORT_TAGS{$_} }
     }
     %EXPORT_TAGS{+all} = %EXPORT_TAGS{?constants} ;
 };
@@ -62,7 +62,7 @@ do {
 push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
 
 Exporter::export_ok_tags('all');
-
+              
 
 
 sub new
@@ -101,10 +101,10 @@ sub mkComp
                                                  $got->value('Strategy')
                                                  );
 
-    return $self->saveErrorString(undef, $errstr, $errno)
-        if ! defined $obj;
+   return $self->saveErrorString(undef, $errstr, $errno)
+       if ! defined $obj;
 
-    return $obj;    
+   return $obj;    
 }
 
 
@@ -145,25 +145,25 @@ sub getZlibParams
     use IO::Compress::Base::Common  v2.006 < qw(:Parse);
     use Compress::Raw::Zlib  v2.006 < qw(Z_DEFLATED Z_DEFAULT_COMPRESSION Z_DEFAULT_STRATEGY);
 
-
+    
     return  @(
+        
+            # zlib behaviour
+            #'Method'   => [0, 1, Parse_unsigned,  Z_DEFLATED],
+            'Level'     => \@(0, 1, Parse_signed,    Z_DEFAULT_COMPRESSION),
+            'Strategy'  => \@(0, 1, Parse_signed,    Z_DEFAULT_STRATEGY),
 
-# zlib behaviour
-#'Method'   => [0, 1, Parse_unsigned,  Z_DEFLATED],
-'Level'     => \@(0, 1, Parse_signed,    Z_DEFAULT_COMPRESSION),
-'Strategy'  => \@(0, 1, Parse_signed,    Z_DEFAULT_STRATEGY),
-
-'CRC32'     => \@(0, 1, Parse_boolean,   0),
-'ADLER32'   => \@(0, 1, Parse_boolean,   0),
+            'CRC32'     => \@(0, 1, Parse_boolean,   0),
+            'ADLER32'   => \@(0, 1, Parse_boolean,   0),
         );
-
-
+    
+    
 }
 
 sub getInverseClass
 {
     return  @('IO::Uncompress::RawInflate', 
-              \$IO::Uncompress::RawInflate::RawInflateError);
+                \$IO::Uncompress::RawInflate::RawInflateError);
 }
 
 sub getFileInfo
@@ -171,7 +171,7 @@ sub getFileInfo
     my $self = shift ;
     my $params = shift;
     my $file = shift ;
-
+    
 }
 
 use IO::Seekable < qw(SEEK_SET);

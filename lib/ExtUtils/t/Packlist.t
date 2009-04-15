@@ -12,17 +12,17 @@ isa_ok( $pl, 'ExtUtils::Packlist' );
 
 SKIP: do {
 
-    # and some test data to be read
-    $pl->{+data} = %(
-        single => 1,
-            hash => \%(
-                foo => 'bar',
-                    baz => 'bup',
-            ),
-            '/./abc' => '',
-    );
-    ExtUtils::Packlist::write($pl, 'eplist');
-    is( $pl->{packfile}, 'eplist', 'write() should set packfile name' );
+	# and some test data to be read
+	$pl->{+data} = %(
+		single => 1,
+		hash => \%(
+			foo => 'bar',
+			baz => 'bup',
+		),
+		'/./abc' => '',
+	);
+	ExtUtils::Packlist::write($pl, 'eplist');
+	is( $pl->{packfile}, 'eplist', 'write() should set packfile name' );
 };
 
 
@@ -50,7 +50,7 @@ SKIP: do {
     # give validate a valid and an invalid file to find
     $pl->{+data} = %(
         eplist => 1,
-            fake => undef,
+        fake => undef,
     );
 
     is( nelems @(ExtUtils::Packlist::validate($pl)), 1,
@@ -66,10 +66,10 @@ SKIP: do {
 
 # packlist_file, $pl should be set from write test
 is( ExtUtils::Packlist::packlist_file(\%( packfile => 'pl' ))[0], 'pl',
-    'packlist_file() should fetch packlist from passed hash' );
+	'packlist_file() should fetch packlist from passed hash' );
 is( ExtUtils::Packlist::packlist_file($pl)[0], 'eplist',
-    'packlist_file() should fetch packlist from ExtUtils::Packlist object' );
+	'packlist_file() should fetch packlist from ExtUtils::Packlist object' );
 
 END {
-    1 while unlink < qw( eplist );
+	1 while unlink < qw( eplist );
 }

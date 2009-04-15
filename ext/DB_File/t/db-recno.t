@@ -3,7 +3,7 @@
 use warnings;
 
 use Config;
-
+ 
 use DB_File; 
 use Fcntl;
 our ($dbh, $Dfile, $bad_ones, $FA);
@@ -27,16 +27,16 @@ do {
     {
         my $class = shift ;
         my $filename = shift ;
-        my $fh = gensym ;
-        open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" ;
-        my $real_stdout = $^STDOUT;
-        return bless \@($fh, $real_stdout ) ;
+	my $fh = gensym ;
+	open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" ;
+	my $real_stdout = $^STDOUT;
+	return bless \@($fh, $real_stdout ) ;
 
     }
     sub DESTROY
     {
         my $self = shift ;
-        close $self->[0] ;
+	close $self->[0] ;
     }
 };
 
@@ -62,23 +62,23 @@ sub docat_del
 sub bad_one
 {
     unless ($bad_ones++) {
-        print $^STDERR, <<EOM ;
+	print $^STDERR, <<EOM ;
 #
 # Some older versions of Berkeley DB version 1 will fail db-recno
 # tests 61, 63, 64 and 65.
 EOM
         if ($^OS_NAME eq 'darwin'
-            && config_value("db_version_major") == 1
-            && config_value("db_version_minor") == 0
-            && config_value("db_version_patch") == 0) {
-            print $^STDERR, <<EOM ;
+	    && config_value("db_version_major") == 1
+	    && config_value("db_version_minor") == 0
+	    && config_value("db_version_patch") == 0) {
+	    print $^STDERR, <<EOM ;
 #
 # For example Mac OS X 10.2 (or earlier) has such an old
 # version of Berkeley DB.
 EOM
-        }
+	}
 
-        print $^STDERR, <<EOM ;
+	print $^STDERR, <<EOM ;
 #
 # You can safely ignore the errors if you're never going to use the
 # broken functionality (recno databases with a modified bval). 
@@ -96,7 +96,7 @@ sub normalise
 {
     return unless $^OS_NAME eq 'cygwin' ;
     foreach ( @_)
-    { s#\r\n#\n#g }     
+      { s#\r\n#\n#g }     
 }
 
 BEGIN 
@@ -104,7 +104,7 @@ BEGIN
     do { 
         try { require Data::Dumper ; Data::Dumper->import() } ; 
     };
-
+ 
     if ($^EVAL_ERROR) {
         *Dumper = sub { my $a = shift; return "[ $(join ' ',@{ $a }) ]" } ;
     }          

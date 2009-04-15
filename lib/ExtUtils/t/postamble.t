@@ -30,25 +30,25 @@ END {
 }
 
 ok( chdir 'Big-Dummy', q{chdir'd to Big-Dummy} ) ||
-    diag("chdir failed: $^OS_ERROR");
+        diag("chdir failed: $^OS_ERROR");
 
 do {
     my $warnings = '';
     local $^WARN_HOOK = sub {
-            $warnings = join '', @_;
-        };
+        $warnings = join '', @_;
+    };
 
     my $stdout = '';
     close $^STDOUT;
     open $^STDOUT, '>>', \$stdout or die;
     my $mm = WriteMakefile(
-        NAME            => 'Big::Dummy',
-        VERSION_FROM    => 'lib/Big/Dummy.pm',
-        postamble       => \%(
-            FOO => 1,
-                BAR => "fugawazads"
-        )
-        );
+                           NAME            => 'Big::Dummy',
+                           VERSION_FROM    => 'lib/Big/Dummy.pm',
+                           postamble       => \%(
+                                               FOO => 1,
+                                               BAR => "fugawazads"
+                                              )
+                          );
     is( $warnings, '', 'postamble argument not warned about' );
 };
 

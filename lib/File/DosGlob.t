@@ -39,13 +39,13 @@ print $^STDOUT, "ok 4\n";
 @r = @( () );
 if ($^OS_NAME eq 'MacOS') {
     for (glob(":*:a*.t")) {
-        print $^STDOUT, "# $_\n";
-        push @r, $_;
+    	print $^STDOUT, "# $_\n";
+    	push @r, $_;
     }
 } else {
     for (glob("*/a*.t")) {
-        print $^STDOUT, "# $_\n";
-        push @r, $_;
+    	print $^STDOUT, "# $_\n";
+    	push @r, $_;
     }
 }
 print $^STDOUT, "not " if (nelems @r) != $r;

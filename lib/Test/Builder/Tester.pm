@@ -12,13 +12,13 @@ Test::Builder
 
 =head1 SYNOPSIS
 
-use Test::Builder::Tester tests => 1;
-use Test::More;
+    use Test::Builder::Tester tests => 1;
+    use Test::More;
 
-test_out("not ok 1 - foo");
-test_fail(+1);
-fail("foo");
-test_test("fail works");
+    test_out("not ok 1 - foo");
+    test_fail(+1);
+    fail("foo");
+    test_test("fail works");
 
 =head1 DESCRIPTION
 
@@ -63,11 +63,11 @@ our @EXPORT = qw(test_out test_err test_fail test_diag test_test line_num);
 # 5.004's Exporter doesn't have export_to_level.
 sub _export_to_level
 {
-    my $pkg = shift;
-    my $level = shift;
-    shift;                  # XXX redundant arg
-    my $callpkg = caller($level);
-    $pkg->export($callpkg, < @_);
+      my $pkg = shift;
+      my $level = shift;
+      shift;                  # XXX redundant arg
+      my $callpkg = caller($level);
+      $pkg->export($callpkg, < @_);
 }
 
 sub import {
@@ -162,16 +162,16 @@ Procedures for predeclaring the output that your test suite is
 expected to produce until C<test_test> is called.  These procedures
 automatically assume that each line terminates with "\n".  So
 
-test_out("ok 1","ok 2");
+   test_out("ok 1","ok 2");
 
 is the same as
 
-test_out("ok 1\nok 2");
+   test_out("ok 1\nok 2");
 
 which is even the same as
 
-test_out("ok 1");
-test_out("ok 2");
+   test_out("ok 1");
+   test_out("ok 2");
 
 Once C<test_out> or C<test_err> (or C<test_fail> or C<test_diag>) have
 been called once all further output from B<Test::Builder> will be
@@ -206,21 +206,21 @@ output, and because has changed between Test::Builder versions, rather
 than forcing you to call C<test_err> with the string all the time like
 so
 
-test_err("# Failed test ($0 at line ".line_num(+1).")");
+    test_err("# Failed test ($0 at line ".line_num(+1).")");
 
 C<test_fail> exists as a convenience function that can be called
 instead.  It takes one argument, the offset from the current line that
 the line that causes the fail is on.
 
-test_fail(+1);
+    test_fail(+1);
 
 This means that the example in the synopsis could be rewritten
 more simply as:
 
-test_out("not ok 1 - foo");
-test_fail(+1);
-fail("foo");
-test_test("fail works");
+   test_out("not ok 1 - foo");
+   test_fail(+1);
+   fail("foo");
+   test_test("fail works");
 
 =cut
 
@@ -248,20 +248,20 @@ The C<test_diag> function prepends comment hashes and spacing to the
 start and newlines to the end of the expected output passed to it and
 adds it to the list of expected error output.  So, instead of writing
 
-test_err("# Couldn't open file");
+   test_err("# Couldn't open file");
 
 you can write
 
-test_diag("Couldn't open file");
+   test_diag("Couldn't open file");
 
 Remember that B<Test::Builder>'s diag function will not add newlines to
 the end of output and test_diag will. So to check
 
-Test::Builder->new->diag("foo\n","bar\n");
+   Test::Builder->new->diag("foo\n","bar\n");
 
 You would do
 
-test_diag("foo","bar")
+  test_diag("foo","bar")
 
 without the newlines.
 
@@ -318,22 +318,22 @@ will function normally and cause success/errors for B<Test::Harness>.
 
 sub test_test
 {
-    # decode the arguements as described in the pod
-    my $mess;
-    my %args;
-    if ((nelems @_) == 1)
-    { $mess = shift }
-    else
-    {
-        %args = %( < @_ );
-        $mess = %args{?name} if exists(%args{name});
-        $mess = %args{?title} if exists(%args{title});
-        $mess = %args{?label} if exists(%args{label});
-    }
+   # decode the arguements as described in the pod
+   my $mess;
+   my %args;
+   if ((nelems @_) == 1)
+     { $mess = shift }
+   else
+   {
+     %args = %( < @_ );
+     $mess = %args{?name} if exists(%args{name});
+     $mess = %args{?title} if exists(%args{title});
+     $mess = %args{?label} if exists(%args{label});
+   }
 
     # er, are we testing?
     die "Not testing.  You must declare output with a test function first."
-        unless $testing;
+	unless $testing;
 
     # okay, reconnect the test suite back to the saved handles
     $t->output($original_output_handle);
@@ -349,19 +349,19 @@ sub test_test
 
     # check the output we've stashed
     unless ($t->ok(    (%args{?skip_out} || $out->check)
-        && (%args{?skip_err} || $err->check),
-        $mess))
+                    && (%args{?skip_err} || $err->check),
+                   $mess))
     {
-        # print out the diagnostic information about why this
-        # test failed
+      # print out the diagnostic information about why this
+      # test failed
 
-        local $_ = undef;
+      local $_ = undef;
 
-        $t->diag(< map {"$_\n"}, @( $out->complaint))
-            unless %args{?skip_out} || $out->check;
+      $t->diag(< map {"$_\n"}, @( $out->complaint))
+	unless %args{?skip_out} || $out->check;
 
-        $t->diag(< map {"$_\n"}, @( $err->complaint))
-            unless %args{?skip_err} || $err->check;
+      $t->diag(< map {"$_\n"}, @( $err->complaint))
+	unless %args{?skip_err} || $err->check;
     }
 }
 
@@ -418,7 +418,7 @@ current setting.
 To enable colouring from the command line, you can use the
 B<Text::Builder::Tester::Color> module like so:
 
-perl -Mlib=Text::Builder::Tester::Color test.t
+   perl -Mlib=Text::Builder::Tester::Color test.t
 
 Or by including the B<Test::Builder::Tester::Color> module directly in
 the PERL5LIB.
@@ -428,8 +428,8 @@ the PERL5LIB.
 my $color;
 sub color
 {
-    $color = shift if (nelems @_);
-    $color;
+  $color = shift if (nelems @_);
+  $color;
 }
 
 =back
@@ -476,10 +476,10 @@ L<Test::Builder>, L<Test::Builder::Tester::Color>, L<Test::More>.
 
 1;
 
-    ####################################################################
-    # Helper class that is used to remember expected and received data
+####################################################################
+# Helper class that is used to remember expected and received data
 
-    package Test::Builder::Tester::Tie;
+package Test::Builder::Tester::Tie;
 
 ##
 # add line(s) to be expected
@@ -554,42 +554,42 @@ sub complaint
     # are we running in colour mode?
     if (Test::Builder::Tester::color)
     {
-        # get color
-        try { require Term::ANSIColor };
-        unless ($^EVAL_ERROR)
-        {
-            # colours
+      # get color
+      try { require Term::ANSIColor };
+      unless ($^EVAL_ERROR)
+      {
+        # colours
 
-            my $green = Term::ANSIColor::color("black").
-                Term::ANSIColor::color("on_green");
-            my $red   = Term::ANSIColor::color("black").
-                Term::ANSIColor::color("on_red");
-            my $reset = Term::ANSIColor::color("reset");
+        my $green = Term::ANSIColor::color("black").
+                    Term::ANSIColor::color("on_green");
+        my $red   = Term::ANSIColor::color("black").
+                    Term::ANSIColor::color("on_red");
+        my $reset = Term::ANSIColor::color("reset");
 
-            # work out where the two strings start to differ
-            my $char = 0;
-            $char++ while substr($got, $char, 1) eq substr($wanted, $char, 1);
+        # work out where the two strings start to differ
+        my $char = 0;
+        $char++ while substr($got, $char, 1) eq substr($wanted, $char, 1);
 
-            # get the start string and the two end strings
-            my $start     = $green . substr($wanted, 0,   $char);
-            my $gotend    = $red   . substr($got   , $char) . $reset;
-            my $wantedend = $red   . substr($wanted, $char) . $reset;
+        # get the start string and the two end strings
+        my $start     = $green . substr($wanted, 0,   $char);
+        my $gotend    = $red   . substr($got   , $char) . $reset;
+        my $wantedend = $red   . substr($wanted, $char) . $reset;
 
-            # make the start turn green on and off
-            $start =~ s/\n/$reset\n$green/g;
+        # make the start turn green on and off
+        $start =~ s/\n/$reset\n$green/g;
 
-            # make the ends turn red on and off
-            $gotend    =~ s/\n/$reset\n$red/g;
-            $wantedend =~ s/\n/$reset\n$red/g;
+        # make the ends turn red on and off
+        $gotend    =~ s/\n/$reset\n$red/g;
+        $wantedend =~ s/\n/$reset\n$red/g;
 
-            # rebuild the strings
-            $got    = $start . $gotend;
-            $wanted = $start . $wantedend;
-        }
+        # rebuild the strings
+        $got    = $start . $gotend;
+        $wanted = $start . $wantedend;
+      }
     }
 
     return "$type is:\n" .
-        "$got\nnot:\n$wanted\nas expected"
+           "$got\nnot:\n$wanted\nas expected"
 }
 
 ##

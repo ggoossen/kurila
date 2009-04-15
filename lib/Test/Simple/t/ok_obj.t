@@ -12,7 +12,7 @@ BEGIN {
 
 use Test::More tests => 4;
 
-    package Foo;
+package Foo;
 my $destroyed = 0;
 sub new { bless \%(), shift }
 

@@ -19,18 +19,18 @@ ExtUtils::Command - utilities to replace common UNIX commands in Makefiles etc.
 
 =head1 SYNOPSIS
 
-perl -MExtUtils::Command -e cat files... > destination
-perl -MExtUtils::Command -e mv source... destination
-perl -MExtUtils::Command -e cp source... destination
-perl -MExtUtils::Command -e touch files...
-perl -MExtUtils::Command -e rm_f files...
-perl -MExtUtils::Command -e rm_rf directories...
-perl -MExtUtils::Command -e mkpath directories...
-perl -MExtUtils::Command -e eqtime source destination
-perl -MExtUtils::Command -e test_f file
-perl -MExtUtils::Command -e test_d directory
-perl -MExtUtils::Command -e chmod mode files...
-...
+  perl -MExtUtils::Command -e cat files... > destination
+  perl -MExtUtils::Command -e mv source... destination
+  perl -MExtUtils::Command -e cp source... destination
+  perl -MExtUtils::Command -e touch files...
+  perl -MExtUtils::Command -e rm_f files...
+  perl -MExtUtils::Command -e rm_rf directories...
+  perl -MExtUtils::Command -e mkpath directories...
+  perl -MExtUtils::Command -e eqtime source destination
+  perl -MExtUtils::Command -e test_f file
+  perl -MExtUtils::Command -e test_d directory
+  perl -MExtUtils::Command -e chmod mode files...
+  ...
 
 =head1 DESCRIPTION
 
@@ -38,11 +38,11 @@ The module is used to replace common UNIX commands.  In all cases the
 functions work from @ARGV rather than taking arguments.  This makes
 them easier to deal with in Makefiles.  Call them like this:
 
-perl -MExtUtils::Command -e some_command some files to work on
+  perl -MExtUtils::Command -e some_command some files to work on
 
 and I<NOT> like this:
 
-perl -MExtUtils::Command -e 'some_command qw(some files to work on)'
+  perl -MExtUtils::Command -e 'some_command qw(some files to work on)'
 
 For that use L<Shell::Command>.
 
@@ -59,13 +59,13 @@ Filenames with * and ? will be glob expanded.
 my $wild_regex = $Is_VMS ?? '*%' !! '*?';
 sub expand_wildcards
 {
-    @ARGV = @+: map( { m/[$wild_regex]/o ?? glob($_) !! @: $_ }, @ARGV);
+ @ARGV = @+: map( { m/[$wild_regex]/o ?? glob($_) !! @: $_ }, @ARGV);
 }
 
 
 =item cat
 
-cat file ...
+    cat file ...
 
 Concatenates all files mentioned on command line to STDOUT.
 
@@ -79,7 +79,7 @@ sub cat ()
 
 =item eqtime
 
-eqtime source destination
+    eqtime source destination
 
 Sets modified time of destination to that of source.
 
@@ -87,14 +87,14 @@ Sets modified time of destination to that of source.
 
 sub eqtime
 {
-    my @($src,$dst) =  @ARGV;
-    local @ARGV = @($dst);  touch();  # in case $dst doesn't exist
-    utime(< @(stat($src))[[8..9]],$dst);
+ my @($src,$dst) =  @ARGV;
+ local @ARGV = @($dst);  touch();  # in case $dst doesn't exist
+ utime(< @(stat($src))[[8..9]],$dst);
 }
 
 =item rm_rf
 
-rm_rf files or directories ...
+    rm_rf files or directories ...
 
 Removes files and directories - recursively (even if readonly)
 
@@ -102,13 +102,13 @@ Removes files and directories - recursively (even if readonly)
 
 sub rm_rf
 {
-    expand_wildcards();
-    rmtree(< grep { -e $_ }, @ARGV );
+ expand_wildcards();
+ rmtree(< grep { -e $_ }, @ARGV );
 }
 
 =item rm_f
 
-rm_f file ...
+    rm_f file ...
 
 Removes files (even if readonly)
 
@@ -143,7 +143,7 @@ sub _unlink {
 
 =item touch
 
-touch file ...
+    touch file ...
 
 Makes files exist, with current timestamp 
 
@@ -161,8 +161,8 @@ sub touch {
 
 =item mv
 
-mv source_file destination_file
-mv source_file source_file destination_dir
+    mv source_file destination_file
+    mv source_file source_file destination_dir
 
 Moves source to destination.  Multiple sources are allowed if
 destination is an existing directory.
@@ -187,8 +187,8 @@ sub mv {
 
 =item cp
 
-cp source_file destination_file
-cp source_file source_file destination_dir
+    cp source_file destination_file
+    cp source_file source_file destination_dir
 
 Copies sources to the destination.  Multiple sources are allowed if
 destination is an existing directory.
@@ -213,7 +213,7 @@ sub cp {
 
 =item chmod
 
-chmod mode files ...
+    chmod mode files ...
 
 Sets UNIX like permissions 'mode' on all the files.  e.g. 0666
 
@@ -244,7 +244,7 @@ sub chmod {
 
 =item mkpath
 
-mkpath directory ...
+    mkpath directory ...
 
 Creates directories, including any parent directories.
 
@@ -258,7 +258,7 @@ sub mkpath
 
 =item test_f
 
-test_f file
+    test_f file
 
 Tests if a file exists.  I<Exits> with 0 if it does, 1 if it does not (ie.
 shell's idea of true and false).
@@ -267,12 +267,12 @@ shell's idea of true and false).
 
 sub test_f
 {
-    exit(-f @ARGV[0] ?? 0 !! 1);
+ exit(-f @ARGV[0] ?? 0 !! 1);
 }
 
 =item test_d
 
-test_d directory
+    test_d directory
 
 Tests if a directory exists.  I<Exits> with 0 if it does, 1 if it does
 not (ie. shell's idea of true and false).
@@ -281,12 +281,12 @@ not (ie. shell's idea of true and false).
 
 sub test_d
 {
-    exit(-d @ARGV[0] ?? 0 !! 1);
+ exit(-d @ARGV[0] ?? 0 !! 1);
 }
 
 =item dos2unix
 
-dos2unix files or dirs ...
+    dos2unix files or dirs ...
 
 Converts DOS and OS/2 linefeeds to Unix style recursively.
 
@@ -295,27 +295,27 @@ Converts DOS and OS/2 linefeeds to Unix style recursively.
 sub dos2unix {
     require File::Find;
     File::Find::find(sub {
-                         return if -d;
-                         return unless -w _;
-                         return unless -r _;
-                         return if -B _;
+        return if -d;
+        return unless -w _;
+        return unless -r _;
+        return if -B _;
 
-                         local $^OUTPUT_RECORD_SEPARATOR = undef;
+        local $^OUTPUT_RECORD_SEPARATOR = undef;
 
-                         my $orig = $_;
-                         my $temp = '.dos2unix_tmp';
-                         open my $orig_fh, "<", $_ or do { warn "dos2unix can't open $_: $^OS_ERROR"; return };
-                         open my $temp_fh, ">", "$temp" or 
-                             do { warn "dos2unix can't create .dos2unix_tmp: $^OS_ERROR"; return };
-                         while (my $line = ~< $orig_fh) { 
-                             $line =~ s/\015\012/\012/g;
-                             print $temp_fh ,$line;
-                         }
-                         close $orig_fh;
-                         close $temp_fh;
-                         rename $temp, $orig;
+	my $orig = $_;
+	my $temp = '.dos2unix_tmp';
+	open my $orig_fh, "<", $_ or do { warn "dos2unix can't open $_: $^OS_ERROR"; return };
+	open my $temp_fh, ">", "$temp" or 
+	    do { warn "dos2unix can't create .dos2unix_tmp: $^OS_ERROR"; return };
+        while (my $line = ~< $orig_fh) { 
+            $line =~ s/\015\012/\012/g;
+            print $temp_fh ,$line;
+        }
+	close $orig_fh;
+	close $temp_fh;
+	rename $temp, $orig;
 
-                     }, < @ARGV);
+    }, < @ARGV);
 }
 
 =back

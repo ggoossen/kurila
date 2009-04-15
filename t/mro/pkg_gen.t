@@ -11,7 +11,7 @@ do {
 };
 
 ok(!mro::get_pkg_gen('ReallyDoesNotExist'),
-   "pkg_gen 0 for non-existant pkg");
+    "pkg_gen 0 for non-existant pkg");
 
 my $f_gen = mro::get_pkg_gen('Foo');
 ok($f_gen +> 0, 'Foo pkg_gen > 0');

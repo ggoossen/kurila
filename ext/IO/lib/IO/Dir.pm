@@ -28,8 +28,8 @@ sub new {
     my $class = shift;
     my $dh = gensym;
     if ((nelems @_)) {
-        IO::Dir::open($dh, @_[0])
-            or return undef;
+	IO::Dir::open($dh, @_[0])
+	    or return undef;
     }
     bless $dh, $class;
 }
@@ -43,7 +43,7 @@ sub open {
     (nelems @_) == 2 or croak 'usage: $dh->open(DIRNAME)';
     my @($dh, $dirname) =  @_;
     return undef
-        unless opendir($dh, $dirname);
+	unless opendir($dh, $dirname);
     # a dir name should always have a ":" in it; assume dirname is
     # in current directory
     $dirname = ':' .  $dirname if ( ($^OS_NAME eq 'MacOS') && ($dirname !~ m/:/) );

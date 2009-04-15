@@ -14,8 +14,8 @@ while (~< $fh) {
 if (!nelems @ARGV) {
     open my $fh, '<', 'MANIFEST' or die "Can't open MANIFEST: $^OS_ERROR";
     while (~<$fh) {
-        # *.c or */*.c or *_i.h or */*_i.h
-        push @ARGV, $1 if m!^((?:[^/]+/)?[^/]+(?:\.c|_i\.h))\t!;
+	# *.c or */*.c or *_i.h or */*_i.h
+	push @ARGV, $1 if m!^((?:[^/]+/)?[^/]+(?:\.c|_i\.h))\t!;
     }
 }
 

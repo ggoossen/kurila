@@ -4,9 +4,9 @@ WriteMakefile(
               'NAME'      => 'XS::Typemap',
               'VERSION_FROM'   => 'Typemap.pm',
               OBJECT      => 'stdio.o  Typemap.o',
-              ABSTRACT_FROM => 'Typemap.pm',
-              AUTHOR     => 'Tim Jenness <t.jenness@jach.hawaii.edu>',
-              );
+	      ABSTRACT_FROM => 'Typemap.pm',
+	      AUTHOR     => 'Tim Jenness <t.jenness@jach.hawaii.edu>',
+);
 
 
 # Nothing to install (except maybe the XS::Typemap.xs documentation)

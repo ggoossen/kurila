@@ -10,10 +10,10 @@ use Config;
 
 sub BEGIN {
     if (env::var('PERL_CORE')){
-        chdir('t') if -d 't';
-        $^INCLUDE_PATH = @('.', '../lib');
+       chdir('t') if -d 't';
+       $^INCLUDE_PATH = @('.', '../lib');
     } else {
-        unshift $^INCLUDE_PATH, 't';
+       unshift $^INCLUDE_PATH, 't';
     }
 }
 
@@ -22,8 +22,8 @@ BEGIN {
        use Test::More;
        1;
     }) {
-        print $^STDOUT, "1..0 # skip: tests only work with Test::More\n";
-        exit;
+       print $^STDOUT, "1..0 # skip: tests only work with Test::More\n";
+       exit;
     }
 }
 

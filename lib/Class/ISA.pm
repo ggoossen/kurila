@@ -13,28 +13,28 @@ Class::ISA -- report the search path for a class's ISA tree
 
 =head1 SYNOPSIS
 
-# Suppose you go: use Food::Fishstick, and that uses and
-# inherits from other things, which in turn use and inherit
-# from other things.  And suppose, for sake of brevity of
-# example, that their ISA tree is the same as:
+  # Suppose you go: use Food::Fishstick, and that uses and
+  # inherits from other things, which in turn use and inherit
+  # from other things.  And suppose, for sake of brevity of
+  # example, that their ISA tree is the same as:
 
-@Food::Fishstick::ISA = qw(Food::Fish  Life::Fungus  Chemicals);
-@Food::Fish::ISA = qw(Food);
-@Food::ISA = qw(Matter);
-@Life::Fungus::ISA = qw(Life);
-@Chemicals::ISA = qw(Matter);
-@Life::ISA = qw(Matter);
-@Matter::ISA = qw();
+  @Food::Fishstick::ISA = qw(Food::Fish  Life::Fungus  Chemicals);
+  @Food::Fish::ISA = qw(Food);
+  @Food::ISA = qw(Matter);
+  @Life::Fungus::ISA = qw(Life);
+  @Chemicals::ISA = qw(Matter);
+  @Life::ISA = qw(Matter);
+  @Matter::ISA = qw();
 
-use Class::ISA;
-print "Food::Fishstick path is:\n ",
-join(", ", Class::ISA::super_path('Food::Fishstick')),
-"\n";
+  use Class::ISA;
+  print "Food::Fishstick path is:\n ",
+        join(", ", Class::ISA::super_path('Food::Fishstick')),
+        "\n";
 
 That prints:
 
-Food::Fishstick path is:
-Food::Fish, Food, Matter, Life::Fungus, Life, Chemicals
+  Food::Fishstick path is:
+   Food::Fish, Food, Matter, Life::Fungus, Life, Chemicals
 
 =head1 DESCRIPTION
 
@@ -111,11 +111,11 @@ in the magical class UNIVERSAL.  This is rarely relevant to the tasks
 that I expect Class::ISA functions to be put to, but if it matters to
 you, then instead of this:
 
-@supers = Class::Tree::super_path($class);
+  @supers = Class::Tree::super_path($class);
 
 do this:
 
-@supers = (Class::Tree::super_path($class), 'UNIVERSAL');
+  @supers = (Class::Tree::super_path($class), 'UNIVERSAL');
 
 And don't say no-one ever told ya!
 
@@ -142,7 +142,7 @@ Sean M. Burke C<sburke@cpan.org>
 
 sub self_and_super_versions { @+: map {
         @: $_ => (defined(${*{Symbol::fetch_glob("$_\::VERSION")}}) ?? ${*{Symbol::fetch_glob("$_\::VERSION")}} !! undef)
-    }, self_and_super_path(@_[0])
+      }, self_and_super_path(@_[0])
 }
 
 # Also consider magic like:
@@ -163,44 +163,44 @@ sub self_and_super_versions { @+: map {
 
 ###########################################################################
 sub super_path {
-    my @ret = &self_and_super_path(< @_);
-    shift @ret if (nelems @ret);
-    return @ret;
+  my @ret = &self_and_super_path(< @_);
+  shift @ret if (nelems @ret);
+  return @ret;
 }
 
 #--------------------------------------------------------------------------
 sub self_and_super_path {
-    # Assumption: searching is depth-first.
-    # Assumption: '' (empty string) can't be a class package name.
-    # Note: 'UNIVERSAL' is not given any special treatment.
-    return () unless (nelems @_);
+  # Assumption: searching is depth-first.
+  # Assumption: '' (empty string) can't be a class package name.
+  # Note: 'UNIVERSAL' is not given any special treatment.
+  return () unless (nelems @_);
 
-    my @out = @( () );
+  my @out = @( () );
 
-    my @in_stack = @(@_[0]);
-    my %seen = %(@_[0] => 1);
+  my @in_stack = @(@_[0]);
+  my %seen = %(@_[0] => 1);
 
-    my $current;
-    while((nelems @in_stack)) {
-        next unless defined($current = shift @in_stack) && length($current);
-        print $^STDOUT, "At $current\n" if $Debug;
-        push @out, $current;
-        unshift @in_stack,
-            < map
-            { my $c = $_; # copy, to avoid being destructive
-                substr($c,0,2, "main::") if substr($c,0,2) eq '::';
-                # Canonize the :: -> main::, ::foo -> main::foo thing.
-                # Should I ever canonize the Foo'Bar = Foo::Bar thing? 
-                %seen{+$c}++ ?? () !! $c;
-            },
-            @{*{Symbol::fetch_glob("$current\::ISA")}}
+  my $current;
+  while((nelems @in_stack)) {
+    next unless defined($current = shift @in_stack) && length($current);
+    print $^STDOUT, "At $current\n" if $Debug;
+    push @out, $current;
+    unshift @in_stack,
+      < map
+        { my $c = $_; # copy, to avoid being destructive
+          substr($c,0,2, "main::") if substr($c,0,2) eq '::';
+           # Canonize the :: -> main::, ::foo -> main::foo thing.
+           # Should I ever canonize the Foo'Bar = Foo::Bar thing? 
+          %seen{+$c}++ ?? () !! $c;
+        },
+ @{*{Symbol::fetch_glob("$current\::ISA")}}
     ;
     # I.e., if this class has any parents (at least, ones I've never seen
     # before), push them, in order, onto the stack of classes I need to
     # explore.
-    }
+  }
 
-    return @out;
+  return @out;
 }
 #--------------------------------------------------------------------------
 1;

@@ -19,10 +19,10 @@ sub import {
 
 use Class::Struct < qw(struct);
 struct 'Net::protoent' => \@(
-       name		=> '$',
-       aliases	=> '@',
-       proto	=> '$',
-       );
+   name		=> '$',
+   aliases	=> '@',
+   proto	=> '$',
+);
 
 sub populate {
     return unless (nelems @_);

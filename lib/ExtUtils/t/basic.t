@@ -4,7 +4,7 @@
 # build, test and installation of the Big::Fat::Dummy module.
 
 BEGIN {
-    unshift $^INCLUDE_PATH, 'lib';
+  unshift $^INCLUDE_PATH, 'lib';
 }
 
 use env;
@@ -43,20 +43,20 @@ END {
 }
 
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||
-    diag("chdir failed: $^OS_ERROR");
+  diag("chdir failed: $^OS_ERROR");
 
 my $mpl_out = run(qq{$perl Makefile.PL "PREFIX=../dummy-install"});
 END { rmtree '../dummy-install'; }
 
 cmp_ok( $^CHILD_ERROR, '==', 0, 'Makefile.PL exited with zero' ) ||
-    diag($mpl_out);
+  diag($mpl_out);
 
 my $makefile = makefile_name();
 like( $mpl_out, qr/^Writing $makefile for Big::Dummy/m,
       'Makefile.PL output looks right');
 
 like( $mpl_out, qr/^Current package is: main$/m,
-      'Makefile.PL run in package main');
+    'Makefile.PL run in package main');
 
 ok( -e $makefile,       'Makefile exists' );
 
@@ -86,22 +86,22 @@ my $ppd_html;
 do { local $^INPUT_RECORD_SEPARATOR = undef; $ppd_html = ~< *$ppd };
 close $ppd;
 like( $ppd_html, qr{^<SOFTPKG NAME="Big-Dummy" VERSION="0,01,0,0">}m, 
-      '  <SOFTPKG>' );
+                                                           '  <SOFTPKG>' );
 like( $ppd_html, qr{^\s*<TITLE>Big-Dummy</TITLE>}m,        '  <TITLE>'   );
 like( $ppd_html, qr{^\s*<ABSTRACT>Try "our" hot dog's</ABSTRACT>}m,         
-      '  <ABSTRACT>');
+                                                           '  <ABSTRACT>');
 like( $ppd_html, 
       qr{^\s*<AUTHOR>Michael G Schwern &lt;schwern\@pobox.com&gt;</AUTHOR>}m,
-      '  <AUTHOR>'  );
+                                                           '  <AUTHOR>'  );
 like( $ppd_html, qr{^\s*<IMPLEMENTATION>}m,          '  <IMPLEMENTATION>');
 like( $ppd_html, qr{^\s*<DEPENDENCY NAME="strict" VERSION="0,0,0,0" />}m,
-      '  <DEPENDENCY>' );
+                                                           '  <DEPENDENCY>' );
 like( $ppd_html, qr{^\s*<OS NAME="$(Config::config_value('osname'))" />}m,
-      '  <OS>'      );
+                                                           '  <OS>'      );
 my $archname = config_value('archname');
 $archname .= "-". substr(config_value("version"),0,3);
 like( $ppd_html, qr{^\s*<ARCHITECTURE NAME="$archname" />}m,
-      '  <ARCHITECTURE>');
+                                                           '  <ARCHITECTURE>');
 like( $ppd_html, qr{^\s*<CODEBASE HREF="" />}m,            '  <CODEBASE>');
 like( $ppd_html, qr{^\s*</IMPLEMENTATION>}m,           '  </IMPLEMENTATION>');
 like( $ppd_html, qr{^\s*</SOFTPKG>}m,                      '  </SOFTPKG>');
@@ -114,7 +114,7 @@ SKIP: do {
     my $test_out = run("$make test");
     like( $test_out, qr/All tests successful/, 'make test' );
     is( $^CHILD_ERROR, 0,                                 '  exited normally' ) || 
-        diag $test_out;
+      diag $test_out;
 
     # Test 'make test TEST_VERBOSE=1'
     my $make_test_verbose = make_macro($make, 'test', TEST_VERBOSE => 1);
@@ -122,7 +122,7 @@ SKIP: do {
     like( $test_out, qr/ok \d+ - TEST_VERBOSE/, 'TEST_VERBOSE' );
     like( $test_out, qr/All tests successful/,  '  successful' );
     is( $^CHILD_ERROR, 0,                                  '  exited normally' ) ||
-        diag $test_out;
+      diag $test_out;
 };
 
 
@@ -134,14 +134,14 @@ like( $install_out, qr/^Writing /m );
 ok( -r '../dummy-install',     '  install dir created' );
 my %files = %( () );
 find( sub { 
-          # do it case-insensitive for non-case preserving OSs
-          my $file = lc $_;
+    # do it case-insensitive for non-case preserving OSs
+    my $file = lc $_;
 
-          # VMS likes to put dots on the end of things that don't have them.
-          $file =~ s/\.$// if $Is_VMS;
+    # VMS likes to put dots on the end of things that don't have them.
+    $file =~ s/\.$// if $Is_VMS;
 
-          %files{+$file} = $File::Find::name; 
-      }, '../dummy-install' );
+    %files{+$file} = $File::Find::name; 
+}, '../dummy-install' );
 ok( %files{?'dummy.pm'},     '  Dummy.pm installed' );
 ok( %files{?'liar.pm'},      '  Liar.pm installed'  );
 ok( %files{?'program'},      '  program installed'  );
@@ -182,8 +182,8 @@ SKIP: do {
     %files = %( () );
     my $perllocal;
     find( sub { 
-              %files{+$_} = $File::Find::name;
-          }, 'other' );
+        %files{+$_} = $File::Find::name;
+    }, 'other' );
     ok( %files{?'Dummy.pm'},     '  Dummy.pm installed' );
     ok( %files{?'Liar.pm'},      '  Liar.pm installed'  );
     ok( %files{?'program'},      '  program installed'  );
@@ -193,18 +193,18 @@ SKIP: do {
     ok( open(my $perllocalfh, "<", %files{?'perllocal.pod'} ) ) || 
         diag("Can't open %files{?'perllocal.pod'}: $^OS_ERROR");
     do { local $^INPUT_RECORD_SEPARATOR = undef;
-        unlike( ($: ~< *$perllocalfh), qr/other/, 'DESTDIR should not appear in perllocal');
+      unlike( ($: ~< *$perllocalfh), qr/other/, 'DESTDIR should not appear in perllocal');
     };
     close $perllocalfh;
 
-    # TODO not available in the min version of Test::Harness we require
-    #    ok( open(PACKLIST, $files{'.packlist'} ) ) || 
-    #        diag("Can't open $files{'.packlist'}: $!");
-    #    { local $/;
-    #      local $TODO = 'DESTDIR still in .packlist';
-    #      unlike(<PACKLIST>, qr/other/, 'DESTDIR should not appear in .packlist');
-    #    }
-    #    close PACKLIST;
+# TODO not available in the min version of Test::Harness we require
+#    ok( open(PACKLIST, $files{'.packlist'} ) ) || 
+#        diag("Can't open $files{'.packlist'}: $!");
+#    { local $/;
+#      local $TODO = 'DESTDIR still in .packlist';
+#      unlike(<PACKLIST>, qr/other/, 'DESTDIR should not appear in .packlist');
+#    }
+#    close PACKLIST;
 
     rmtree('other');
 };
@@ -299,8 +299,8 @@ $mpl_out = run(qq{$perl Makefile.PL "PREFIX=../dummy-install"});
 cmp_ok( $^CHILD_ERROR, '==', 0, 'Makefile.PL exited with zero' ) || diag($mpl_out);
 
 like( $mpl_out, qr/^Writing $makefile for Big::Dummy/m,
-      'init_dirscan skipped distdir') ||
-    diag($mpl_out);
+    'init_dirscan skipped distdir') ||
+  diag($mpl_out);
 
 # I know we'll get ignored errors from make here, that's ok.
 # Send STDERR off to oblivion.

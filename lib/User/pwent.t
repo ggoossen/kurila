@@ -34,7 +34,7 @@ my $pwent = getpwuid $uid; # This is the OO getpwuid.
 my $uid_expect = $uid;
 if ( $^OS_NAME eq 'cygwin' ) {
     print $^STDOUT, "not " unless (   $pwent->uid == $uid_expect
-                                      || $pwent->uid == 500         );  # go figure
+                         || $pwent->uid == 500         );  # go figure
 }
 else {
     print $^STDOUT, "not " unless $pwent->uid    == $uid_expect ;
@@ -46,8 +46,8 @@ print $^STDOUT, "ok 3\n";
 
 if ($^OS_NAME eq 'os390') {
     print $^STDOUT, "not "
-        unless not defined $pwent->passwd &&
-        @pwent[1] eq '0'; # go figure
+	unless not defined $pwent->passwd &&
+	       @pwent[1] eq '0'; # go figure
 } else {
     print $^STDOUT, "not " unless $pwent->passwd eq @pwent[1];
 }

@@ -5,7 +5,7 @@ require Exporter;
 use Carp ;
 
 #use Parse::Parameters;
-
+ 
 use warnings ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT);
@@ -112,8 +112,8 @@ sub Compress::Raw::Zlib::Parameters::new
     my $class = shift ;
 
     my $obj = \%( Error => '',
-            Got   => \%(),
-        ) ;
+                Got   => \%(),
+              ) ;
 
     #return bless $obj, ref($class) || $class || __PACKAGE__ ;
     return bless $obj, 'Compress::Raw::Zlib::Parameters' ;
@@ -128,13 +128,13 @@ sub Compress::Raw::Zlib::Parameters::setError
     $self->{+Error} = $error ;
     return $retval;
 }
-
+          
 #sub getError
 #{
 #    my $self = shift ;
 #    return $self->{Error} ;
 #}
-
+          
 sub Compress::Raw::Zlib::Parameters::parse
 {
     my $self = shift ;
@@ -156,7 +156,7 @@ sub Compress::Raw::Zlib::Parameters::parse
         my $href = @_[0] ;    
         return $self->setError("Expected even number of parameters, got 1")
             if ! defined $href or ! ref $href or ref $href ne "HASH" ;
-
+ 
         foreach my $key (keys %$href) {
             push @entered, $key ;
             push @entered, \$href->{+$key} ;
@@ -166,7 +166,7 @@ sub Compress::Raw::Zlib::Parameters::parse
         my $count = (nelems @_);
         return $self->setError("Expected even number of parameters, got $count")
             if $count % 2 != 0 ;
-
+        
         for my $i (0.. $count / 2 - 1) {
             push @entered, @_[2* $i] ;
             push @entered, \@_[2* $i+1] ;
@@ -202,9 +202,9 @@ sub Compress::Raw::Zlib::Parameters::parse
 
         $key =~ s/^-// ;
         my $canonkey = lc $key;
-
+ 
         if ($got->{?$canonkey} && ($firstTime ||
-                                   ! $got->{$canonkey}->[OFF_FIRST_ONLY]  ))
+                                  ! $got->{$canonkey}->[OFF_FIRST_ONLY]  ))
         {
             my $type = $got->{$canonkey}->[OFF_TYPE] ;
             my $s ;
@@ -215,9 +215,9 @@ sub Compress::Raw::Zlib::Parameters::parse
             $got->{+$canonkey} = \@(1, $type, $value, $s) ;
         }
         else
-        { push (@Bad, $key) }
+          { push (@Bad, $key) }
     }
-
+ 
     if ((nelems @Bad)) {
         my @($bad) = join@(", ", @Bad) ;
         return $self->setError("unknown key value(s) $(join ' ',@Bad)") ;
@@ -320,23 +320,23 @@ sub Compress::Raw::Zlib::Deflate::new
 {
     my $pkg = shift ;
     my $got = ParseParameters(0,
-        \%(
-            'AppendOutput'  => \@(1, 1, Parse_boolean,  0),
+            \%(
+                'AppendOutput'  => \@(1, 1, Parse_boolean,  0),
                 'CRC32'         => \@(1, 1, Parse_boolean,  0),
                 'ADLER32'       => \@(1, 1, Parse_boolean,  0),
                 'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
-
+ 
                 'Level'         => \@(1, 1, Parse_signed,   Z_DEFAULT_COMPRESSION()),
                 'Method'        => \@(1, 1, Parse_unsigned, Z_DEFLATED()),
                 'WindowBits'    => \@(1, 1, Parse_signed,   MAX_WBITS()),
                 'MemLevel'      => \@(1, 1, Parse_unsigned, MAX_MEM_LEVEL()),
                 'Strategy'      => \@(1, 1, Parse_unsigned, Z_DEFAULT_STRATEGY()),
                 'Dictionary'    => \@(1, 1, Parse_any,      ""),
-        ), < @_) ;
+            ), < @_) ;
 
 
     croak "Compress::Raw::Zlib::Deflate::new: Bufsize must be >= 1, you specified " . 
-          $got->value('Bufsize')
+            $got->value('Bufsize')
         unless $got->value('Bufsize') +>= 1;
 
     my $flags = 0 ;
@@ -345,13 +345,13 @@ sub Compress::Raw::Zlib::Deflate::new
     $flags ^|^= FLAG_ADLER  if $got->value('ADLER32') ;
 
     _deflateInit($flags,
-                 $got->value('Level'), 
-                 $got->value('Method'), 
-                 $got->value('WindowBits'), 
-                 $got->value('MemLevel'), 
-                 $got->value('Strategy'), 
-                 $got->value('Bufsize'),
-                 $got->value('Dictionary')) ;
+                $got->value('Level'), 
+                $got->value('Method'), 
+                $got->value('WindowBits'), 
+                $got->value('MemLevel'), 
+                $got->value('Strategy'), 
+                $got->value('Bufsize'),
+                $got->value('Dictionary')) ;
 
 }
 
@@ -359,20 +359,20 @@ sub Compress::Raw::Zlib::Inflate::new
 {
     my $pkg = shift ;
     my $got = ParseParameters(0,
-        \%(
-            'AppendOutput'  => \@(1, 1, Parse_boolean,  0),
-                'CRC32'         => \@(1, 1, Parse_boolean,  0),
-                'ADLER32'       => \@(1, 1, Parse_boolean,  0),
-                'ConsumeInput'  => \@(1, 1, Parse_boolean,  1),
-                'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
-
-                'WindowBits'    => \@(1, 1, Parse_signed,   MAX_WBITS()),
-                'Dictionary'    => \@(1, 1, Parse_any,      ""),
-        ), < @_) ;
+                    \%(
+                        'AppendOutput'  => \@(1, 1, Parse_boolean,  0),
+                        'CRC32'         => \@(1, 1, Parse_boolean,  0),
+                        'ADLER32'       => \@(1, 1, Parse_boolean,  0),
+                        'ConsumeInput'  => \@(1, 1, Parse_boolean,  1),
+                        'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
+                 
+                        'WindowBits'    => \@(1, 1, Parse_signed,   MAX_WBITS()),
+                        'Dictionary'    => \@(1, 1, Parse_any,      ""),
+            ), < @_) ;
 
 
     croak "Compress::Raw::Zlib::Inflate::new: Bufsize must be >= 1, you specified " . 
-          $got->value('Bufsize')
+            $got->value('Bufsize')
         unless $got->value('Bufsize') +>= 1;
 
     my $flags = 0 ;
@@ -389,18 +389,18 @@ sub Compress::Raw::Zlib::InflateScan::new
 {
     my $pkg = shift ;
     my @($got) =  ParseParameters(0,
-        \%(
-            'CRC32'         => \@(1, 1, < Parse_boolean,  0),
-                'ADLER32'       => \@(1, 1, < Parse_boolean,  0),
-                'Bufsize'       => \@(1, 1, < Parse_unsigned, 4096),
-
-                'WindowBits'    => \@(1, 1, < Parse_signed,   -MAX_WBITS()),
-                'Dictionary'    => \@(1, 1, < Parse_any,      ""),
-        ), < @_) ;
+                    \%(
+                        'CRC32'         => \@(1, 1, < Parse_boolean,  0),
+                        'ADLER32'       => \@(1, 1, < Parse_boolean,  0),
+                        'Bufsize'       => \@(1, 1, < Parse_unsigned, 4096),
+                 
+                        'WindowBits'    => \@(1, 1, < Parse_signed,   -MAX_WBITS()),
+                        'Dictionary'    => \@(1, 1, < Parse_any,      ""),
+            ), < @_) ;
 
 
     croak "Compress::Raw::Zlib::InflateScan::new: Bufsize must be >= 1, you specified " . 
-          $got->value('Bufsize')
+            $got->value('Bufsize')
         unless $got->value('Bufsize') +>= 1;
 
     my $flags = 0 ;
@@ -410,28 +410,28 @@ sub Compress::Raw::Zlib::InflateScan::new
     #$flags |= FLAG_CONSUME_INPUT if $got->value('ConsumeInput') ;
 
     _inflateScanInit($flags, < $got->value('WindowBits'), < $got->value('Bufsize'), 
-                     '') ;
+                 '') ;
 }
 
 sub Compress::Raw::Zlib::inflateScanStream::createDeflateStream
 {
     my $pkg = shift ;
     my @($got) =  ParseParameters(0,
-        \%(
-            'AppendOutput'  => \@(1, 1, < Parse_boolean,  0),
+            \%(
+                'AppendOutput'  => \@(1, 1, < Parse_boolean,  0),
                 'CRC32'         => \@(1, 1, < Parse_boolean,  0),
                 'ADLER32'       => \@(1, 1, < Parse_boolean,  0),
                 'Bufsize'       => \@(1, 1, < Parse_unsigned, 4096),
-
+ 
                 'Level'         => \@(1, 1, < Parse_signed,   Z_DEFAULT_COMPRESSION()),
                 'Method'        => \@(1, 1, < Parse_unsigned, Z_DEFLATED()),
                 'WindowBits'    => \@(1, 1, < Parse_signed,   - MAX_WBITS()),
                 'MemLevel'      => \@(1, 1, < Parse_unsigned, MAX_MEM_LEVEL()),
                 'Strategy'      => \@(1, 1, < Parse_unsigned, Z_DEFAULT_STRATEGY()),
-        ), < @_) ;
+            ), < @_) ;
 
     croak "Compress::Raw::Zlib::InflateScan::createDeflateStream: Bufsize must be >= 1, you specified " . 
-          $got->value('Bufsize')
+            $got->value('Bufsize')
         unless $got->value('Bufsize') +>= 1;
 
     my $flags = 0 ;
@@ -439,14 +439,14 @@ sub Compress::Raw::Zlib::inflateScanStream::createDeflateStream
     $flags ^|^= FLAG_CRC    if $got->value('CRC32') ;
     $flags ^|^= FLAG_ADLER  if $got->value('ADLER32') ;
 
-        $pkg->_createDeflateStream($flags, <
-        $got->value('Level'), < 
-        $got->value('Method'), < 
-        $got->value('WindowBits'), < 
-        $got->value('MemLevel'), < 
-        $got->value('Strategy'), < 
-        $got->value('Bufsize'),
-    ) ;
+    $pkg->_createDeflateStream($flags, <
+                $got->value('Level'), < 
+                $got->value('Method'), < 
+                $got->value('WindowBits'), < 
+                $got->value('MemLevel'), < 
+                $got->value('Strategy'), < 
+                $got->value('Bufsize'),
+                ) ;
 
 }
 
@@ -460,10 +460,10 @@ sub Compress::Raw::Zlib::inflateScanStream::inflate
 
     if ($status == Z_OK() && @_[2]) {
         my $byte = ' ';
-
+        
         $status = $self->scan(\$byte, @_[1]) ;
     }
-
+    
     return $status ;
 }
 

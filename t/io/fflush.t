@@ -24,9 +24,9 @@ if ($useperlio || $fflushNULL || $d_sfio) {
     print $^STDOUT, "1..7\n";
 } else {
     if ($fflushall) {
-        print $^STDOUT, "1..7\n";
+	print $^STDOUT, "1..7\n";
     } else {
-        print $^STDOUT, "1..0 # Skip: fflush(NULL) or equivalent not available\n";
+	print $^STDOUT, "1..0 # Skip: fflush(NULL) or equivalent not available\n";
         exit;
     }
 }
@@ -38,7 +38,7 @@ my @delete;
 
 END {
     for ( @delete) {
-        unlink $_ or warn "unlink $_: $^OS_ERROR";
+	unlink $_ or warn "unlink $_: $^OS_ERROR";
     }
 }
 
@@ -80,19 +80,19 @@ if (!$d_fork) {
     print $out, "Pe";
     my $pid = fork;
     if ($pid) {
-        # Parent
-        wait;
-        close $out or die "close $f: $^OS_ERROR";
+	# Parent
+	wait;
+	close $out or die "close $f: $^OS_ERROR";
     } elsif (defined $pid) {
-        # Kid
-        print $out, "r";
-        my $command = qq{$runperl "ff-prog" "$f" "l"};
-        print $^STDOUT, "# $command\n";
-        exec $command or die $^OS_ERROR;
-        exit;
+	# Kid
+	print $out, "r";
+	my $command = qq{$runperl "ff-prog" "$f" "l"};
+	print $^STDOUT, "# $command\n";
+	exec $command or die $^OS_ERROR;
+	exit;
     } else {
-        # Bang
-        die "fork: $^OS_ERROR";
+	# Bang
+	die "fork: $^OS_ERROR";
     }
 
     print $^STDOUT, file_eq($f, "Perl") ?? "ok 1\n" !! "not ok 1\n";
@@ -101,7 +101,7 @@ if (!$d_fork) {
 
 # Test flush on system/qx/pipe open
 my %subs = %(
-        "system" => sub {
+            "system" => sub {
                 my $c = shift;
                 system $c;
             },
@@ -114,7 +114,7 @@ my %subs = %(
                 open my $pipe, "-|", "$c" or die "$c: $^OS_ERROR";
                 close $pipe;
             },
-    );
+            );
 my $t = 2;
 for (qw(system qx popen)) {
     my $code    = %subs{?$_};
@@ -131,9 +131,9 @@ for (qw(system qx popen)) {
 }
 
 my $cmd = _create_runperl(
-    switches => \@('-l'),
-    prog =>
-    sprintf('print $^STDOUT, qq[ok $_] for (%d..%d)', $t, $t+2));
+			  switches => \@('-l'),
+			  prog =>
+			  sprintf('print $^STDOUT, qq[ok $_] for (%d..%d)', $t, $t+2));
 print $^STDOUT, "# cmd = '$cmd'\n";
 open my $CMD, '-|', "$cmd" or die "Can't open pipe to '$cmd': $^OS_ERROR";
 while ( ~< $CMD) {

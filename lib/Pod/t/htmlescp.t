@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w                                         # -*- perl -*-
 
 BEGIN {
-    unshift $^INCLUDE_PATH, '../lib/Pod/t';
-    require "pod2html-lib.pl";
+   unshift $^INCLUDE_PATH, '../lib/Pod/t';
+   require "pod2html-lib.pl";
 }
 
 use Test::More tests => 1;

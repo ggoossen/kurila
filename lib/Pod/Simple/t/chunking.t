@@ -19,20 +19,20 @@ print $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 sub e ($x, $y) { Pod::Simple::DumpAsXML->_duo($x, $y) }
 
 is( Pod::Simple::XMLOutStream->_out("=head1 =head1"),
-                             '<Document><head1>=head1</head1></Document>'
-                             );
+    '<Document><head1>=head1</head1></Document>'
+);
 
 is( Pod::Simple::XMLOutStream->_out("\n=head1 =head1"),
-                             '<Document><head1>=head1</head1></Document>'
-                             );
+    '<Document><head1>=head1</head1></Document>'
+);
 
 is( Pod::Simple::XMLOutStream->_out("\n=head1 =head1\n"),
-                             '<Document><head1>=head1</head1></Document>'
-                             );
+    '<Document><head1>=head1</head1></Document>'
+);
 
 is( Pod::Simple::XMLOutStream->_out("\n=head1 =head1\n\n"),
-                             '<Document><head1>=head1</head1></Document>'
-                             );
+    '<Document><head1>=head1</head1></Document>'
+);
 
 is( <e "\n=head1 =head1\n\n" , "\n=head1 =head1\n\n");
 

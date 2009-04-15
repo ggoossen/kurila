@@ -1,9 +1,9 @@
 BEGIN {
-    use File::Basename;
-    my $THISDIR = dirname $^PROGRAM_NAME;
-    unshift $^INCLUDE_PATH, $THISDIR;
-    require "testpchk.pl";
-    TestPodChecker->import();
+   use File::Basename;
+   my $THISDIR = dirname $^PROGRAM_NAME;
+   unshift $^INCLUDE_PATH, $THISDIR;
+   require "testpchk.pl";
+   TestPodChecker->import();
 }
 
 my %options = %( < @+: map { @: $_ => 1 }, @ARGV );  ## convert cmdline to options-hash

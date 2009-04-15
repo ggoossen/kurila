@@ -10,7 +10,7 @@ use IO::Compress::Base::Common v2.006 ;
 use Compress::Raw::Zlib v2.006 ;
 use IO::Compress::Gzip v2.006 ;
 use IO::Uncompress::Gunzip v2.006 ;
-
+ 
 use warnings ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT);
@@ -40,7 +40,7 @@ BEGIN
 
 # typeglob constants.
 for my $name (@( <qw|DEF_WBITS MAX_MEM_LEVEL MAX_WBITS OS_CODE|,
-                 < grep { m/^Z_/ }, @Compress::Raw::Zlib::EXPORT)) {
+              < grep { m/^Z_/ }, @Compress::Raw::Zlib::EXPORT)) {
     Symbol::fetch_glob($name)->* = \&{*{Symbol::fetch_glob("Compress::Raw::Zlib::$name")}};
 }
 
@@ -102,8 +102,8 @@ sub gzopen($file, $mode)
 
     my $gz ;
     my %defOpts = %(Level    => Z_DEFAULT_COMPRESSION(),
-            Strategy => Z_DEFAULT_STRATEGY(),
-        );
+                   Strategy => Z_DEFAULT_STRATEGY(),
+                  );
 
     my $writing ;
     $writing = ! ($mode =~ m/r/i) ;
@@ -119,25 +119,25 @@ sub gzopen($file, $mode)
 
     croak "gzopen: file parameter is not a filehandle or filename"
         unless isaFilehandle($file) || isaFilename($file)  || 
-        (ref $file && ref $file eq 'SCALAR');
+               (ref $file && ref $file eq 'SCALAR');
 
     croak "gzopen: invalid mode"
-        unless $mode =~ m/[rwa]/i ;
+      unless $mode =~ m/[rwa]/i ;
 
     _set_gzerr(0) ;
 
     if ($writing) {
         $gz = IO::Compress::Gzip->new($file, Minimal => 1, AutoClose => 1, 
-            < %defOpts) 
+                                     < %defOpts) 
             or $Compress::Zlib::gzerrno = $IO::Compress::Gzip::GzipError;
     }
     else {
         $gz = IO::Uncompress::Gunzip->new($file, 
-            Transparent => 1,
-            Append => 0, 
-            AutoClose => 1, 
-            MultiStream => 1,
-            Strict => 0) 
+                                         Transparent => 1,
+                                         Append => 0, 
+                                         AutoClose => 1, 
+                                         MultiStream => 1,
+                                         Strict => 0) 
             or $Compress::Zlib::gzerrno = $IO::Uncompress::Gunzip::GunzipError;
     }
 
@@ -245,9 +245,9 @@ sub Compress::Zlib::gzFile::gzsetparams
 
     return _set_gzerr(Z_STREAM_ERROR())
         if $self->[1] ne 'deflate';
-
+ 
     my $status = *$gz->{?Compress}->deflateParams(Level   => $level, 
-        Strategy => $strategy);
+                                                Strategy => $strategy);
     _save_gzerr($gz);
     return $status ;
 }
@@ -256,7 +256,7 @@ sub Compress::Zlib::gzFile::gzerror
 {
     my $self = shift ;
     my $gz = $self->[0] ;
-
+    
     return $Compress::Zlib::gzerrno ;
 }
 
@@ -283,7 +283,7 @@ sub compress
 
     $err = $x->flush($output) ;
     return undef unless $err == Z_OK() ;
-
+    
     return $output ;
 
 }
@@ -302,10 +302,10 @@ sub uncompress
 
     @($x, ...) = Compress::Raw::Zlib::Inflate->new( ConsumeInput => 0);
     $x or return undef ;
-
+ 
     $err = $x->inflate($in, $output) ;
     return undef unless $err == Z_STREAM_END() ;
-
+ 
     return $output ;
 }
 
@@ -313,32 +313,32 @@ sub uncompress
 sub deflateInit
 {
     my $got = ParseParameters(0,
-        \%(
-            'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
+                \%(
+                'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
                 'Level'         => \@(1, 1, Parse_signed,   Z_DEFAULT_COMPRESSION()),
                 'Method'        => \@(1, 1, Parse_unsigned, Z_DEFLATED()),
                 'WindowBits'    => \@(1, 1, Parse_signed,   MAX_WBITS()),
                 'MemLevel'      => \@(1, 1, Parse_unsigned, MAX_MEM_LEVEL()),
                 'Strategy'      => \@(1, 1, Parse_unsigned, Z_DEFAULT_STRATEGY()),
                 'Dictionary'    => \@(1, 1, Parse_any,      ""),
-        ), < @_ ) ;
+                ), < @_ ) ;
 
     croak "Compress::Zlib::deflateInit: Bufsize must be >= 1, you specified " . 
-          $got->value('Bufsize')
+            $got->value('Bufsize')
         unless $got->value('Bufsize') +>= 1;
 
     my $obj ;
 
     my $status = 0 ;
     @($obj, $status) =  
-        Compress::Raw::Zlib::_deflateInit(0,
-        $got->value('Level'), 
-        $got->value('Method'), 
-        $got->value('WindowBits'), 
-        $got->value('MemLevel'), 
-        $got->value('Strategy'), 
-        $got->value('Bufsize'),
-        $got->value('Dictionary')) ;
+      Compress::Raw::Zlib::_deflateInit(0,
+                $got->value('Level'), 
+                $got->value('Method'), 
+                $got->value('WindowBits'), 
+                $got->value('MemLevel'), 
+                $got->value('Strategy'), 
+                $got->value('Bufsize'),
+                $got->value('Dictionary')) ;
 
     my $x = ($status == Z_OK() ?? bless $obj, "Zlib::OldDeflate"  !! undef) ;
     return $x;
@@ -347,23 +347,23 @@ sub deflateInit
 sub inflateInit
 {
     my $got = ParseParameters(0,
-        \%(
-            'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
+                \%(
+                'Bufsize'       => \@(1, 1, Parse_unsigned, 4096),
                 'WindowBits'    => \@(1, 1, Parse_signed,   MAX_WBITS()),
                 'Dictionary'    => \@(1, 1, Parse_any,      ""),
-        ), < @_) ;
+                ), < @_) ;
 
 
     croak "Compress::Zlib::inflateInit: Bufsize must be >= 1, you specified " . 
-          $got->value('Bufsize')
+            $got->value('Bufsize')
         unless $got->value('Bufsize') +>= 1;
 
     my $status = 0 ;
     my $obj ;
     @($obj, $status) =  Compress::Raw::Zlib::_inflateInit(FLAG_CONSUME_INPUT,
-        $got->value('WindowBits'), 
-        $got->value('Bufsize'), 
-        $got->value('Dictionary')) ;
+                                $got->value('WindowBits'), 
+                                $got->value('Bufsize'), 
+                                $got->value('Dictionary')) ;
 
     my $x = ($status == Z_OK() ?? bless $obj, "Zlib::OldInflate"  !! undef) ;
 
@@ -391,7 +391,7 @@ sub flush
     my $output ;
     my $flag = shift || Compress::Zlib::Z_FINISH();
     my $status = $self->SUPER::flush($output, $flag) ;
-
+    
     return @($output, $status);
 }
 
@@ -414,15 +414,15 @@ use IO::Compress::Gzip::Constants v2.006 ;
 
 sub memGzip
 {
-    my $out;
+  my $out;
 
-    # if the deflation buffer isn't a reference, make it one
-    my $string = (ref @_[0] ?? @_[0] !! \@_[0]) ;
+  # if the deflation buffer isn't a reference, make it one
+  my $string = (ref @_[0] ?? @_[0] !! \@_[0]) ;
 
-    IO::Compress::Gzip::gzip($string, \$out, Minimal => 1)
-        or return undef ;
+  IO::Compress::Gzip::gzip($string, \$out, Minimal => 1)
+      or return undef ;
 
-    return $out;
+  return $out;
 }
 
 
@@ -436,7 +436,7 @@ sub _removeGzipHeader($string)
 
     return Z_DATA_ERROR()
         unless $magic1 == GZIP_ID1 and $magic2 == GZIP_ID2 and
-        $method == Z_DEFLATED() and !($flags ^&^ GZIP_FLG_RESERVED) ;
+           $method == Z_DEFLATED() and !($flags ^&^ GZIP_FLG_RESERVED) ;
     substr($$string, 0, GZIP_MIN_HEADER_SIZE, '') ;
 
     # skip extra field
@@ -458,7 +458,7 @@ sub _removeGzipHeader($string)
     {
         my $name_end = index ($$string, GZIP_NULL_BYTE);
         return Z_DATA_ERROR()
-            if $name_end == -1 ;
+           if $name_end == -1 ;
         substr($$string, 0, $name_end + 1,  '');
     }
 
@@ -478,7 +478,7 @@ sub _removeGzipHeader($string)
             if length ($$string) +< GZIP_FHCRC_SIZE ;
         substr($$string, 0, GZIP_FHCRC_SIZE, '');
     }
-
+    
     return Z_OK();
 }
 
@@ -487,13 +487,13 @@ sub memGunzip
 {
     # if the buffer isn't a reference, make it one
     my $string = (ref @_[0] ?? @_[0] !! \@_[0]);
-
+ 
     _removeGzipHeader($string) == Z_OK() 
         or return undef;
-
+     
     my $bufsize = length $$string +> 4096 ?? length $$string !! 4096 ;
     my @($x, ...) =  Compress::Raw::Zlib::Inflate->new(\%(WindowBits => - MAX_WBITS(),
-            Bufsize => $bufsize));
+                         Bufsize => $bufsize));
     $x or return undef;
 
     my $output = "" ;
@@ -507,7 +507,7 @@ sub memGunzip
         substr($$string, 0, 8, '');
         return undef 
             unless $len == length($output) and
-            $crc == crc32($output);
+                   $crc == crc32($output);
     }
     else
     {

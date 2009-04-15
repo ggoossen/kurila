@@ -9,12 +9,12 @@ require q(./test.pl); plan(tests => 1);
 
 From the parrot test t/pmc/object-meths.t
 
-A   B A   E
-\ /   \ /
-C     D
-\   /
-\ /
-F
+ A   B A   E
+  \ /   \ /
+   C     D
+    \   /
+     \ /
+      F
 
 =cut
 
@@ -30,5 +30,5 @@ do {
 ok(eq_array(
     mro::get_linear_isa('t::lib::F'),
     \ qw(t::lib::F t::lib::C t::lib::D t::lib::A t::lib::B t::lib::E)
-    ), '... got the right MRO for t::lib::F');  
+), '... got the right MRO for t::lib::F');  
 

@@ -46,8 +46,8 @@ $b = "$($x101)$($x100)aA";
 do {
     use utf8;
 
-    # \x{100} is LATIN CAPITAL LETTER A WITH MACRON; its bijective lowercase is
-    # \x{101}, LATIN SMALL LETTER A WITH MACRON.
+# \x{100} is LATIN CAPITAL LETTER A WITH MACRON; its bijective lowercase is
+# \x{101}, LATIN SMALL LETTER A WITH MACRON.
 
 
     is("\Q$a\E."      , "\x{100}\x{101}Aa.", '\Q\E \x{100}\x{101}Aa');
@@ -181,10 +181,10 @@ for my $a (@(0,1)) {
 do {
     foreach (@(0, 1)) {
         local our $TODO = "fix lc";
-        $a = "\x{a}"."\x{101}";
-        chop $a;
-        $a =~ s/^(\s*)(\w*)/$("$1".ucfirst($2))/;
-        is($a, "\x{a}", "[perl #18857]");
+	$a = "\x{a}"."\x{101}";
+	chop $a;
+	$a =~ s/^(\s*)(\w*)/$("$1".ucfirst($2))/;
+	is($a, "\x{a}", "[perl #18857]");
     } 
 };
 

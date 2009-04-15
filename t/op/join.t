@@ -26,11 +26,11 @@ print $^STDOUT, "ok 8\n";
 
 # 9,10 and for multiple read of undef
 do { my $s = 5;
-    local @($^WARNING, $^WARN_HOOK) = @( 1, sub { $s+=4 } );
-    my $r = join ':', @( 'a', undef, $s, 'b', undef, $s, 'c');
-    print $^STDOUT, "# expected '13' got '$s'\nnot " if $s != 13;
-    print $^STDOUT, "ok 9\n";
-    my $r = join '', @( 'a', undef, $s, 'b', undef, $s, 'c');
-    print $^STDOUT, "# expected '21' got '$s'\nnot " if $s != 21;
-    print $^STDOUT, "ok 10\n";
+  local @($^WARNING, $^WARN_HOOK) = @( 1, sub { $s+=4 } );
+  my $r = join ':', @( 'a', undef, $s, 'b', undef, $s, 'c');
+  print $^STDOUT, "# expected '13' got '$s'\nnot " if $s != 13;
+  print $^STDOUT, "ok 9\n";
+  my $r = join '', @( 'a', undef, $s, 'b', undef, $s, 'c');
+  print $^STDOUT, "# expected '21' got '$s'\nnot " if $s != 21;
+  print $^STDOUT, "ok 10\n";
 };;

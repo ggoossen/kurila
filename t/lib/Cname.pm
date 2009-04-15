@@ -10,7 +10,7 @@ sub translator {
         return $r;
     }
     if ( $str eq 'EMPTY-STR') {
-        return "";
+       return "";
     }
     return $str;
 }

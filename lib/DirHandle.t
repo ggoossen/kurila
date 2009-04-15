@@ -4,8 +4,8 @@ use Config;
 
 BEGIN {
     if (not config_value('d_readdir')) {
-        print $^STDOUT, "1..0\n";
-        exit 0;
+	print $^STDOUT, "1..0\n";
+	exit 0;
     }
 }
 

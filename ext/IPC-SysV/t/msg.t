@@ -4,13 +4,13 @@ BEGIN {
     my $reason;
 
     if (config_value('d_sem') ne 'define') {
-        $reason = '%Config{d_sem} undefined';
+      $reason = '%Config{d_sem} undefined';
     } elsif (config_value('d_msg') ne 'define') {
-        $reason = '%Config{d_msg} undefined';
+      $reason = '%Config{d_msg} undefined';
     }
     if ($reason) {
-        print $^STDOUT, "1..0 # Skip: $reason\n";
-        exit 0;
+	print $^STDOUT, "1..0 # Skip: $reason\n";
+	exit 0;
     }
 }
 
@@ -24,7 +24,7 @@ print $^STDOUT, "1..9\n";
 my $msq =
     IPC::Msg->new(IPC_PRIVATE, S_IRWXU ^|^ S_IRWXG ^|^ S_IRWXO)
     || die "msgget: ",$^OS_ERROR+0," $^OS_ERROR\n";
-
+	
 print $^STDOUT, "ok 1\n";
 
 #Putting a message on the queue
@@ -54,6 +54,6 @@ print $^STDOUT, "not " unless $ds && $ds->qnum() == 0;
 print $^STDOUT, "ok 8\n";
 
 END {
-    (defined $msq && $msq->remove) || print $^STDOUT, "not ";
-    print $^STDOUT, "ok 9\n";
+	(defined $msq && $msq->remove) || print $^STDOUT, "not ";
+	print $^STDOUT, "ok 9\n";
 }

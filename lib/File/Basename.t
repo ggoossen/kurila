@@ -14,7 +14,7 @@ do {
     is( fileparse_set_fstype(), 'Unix',     'get fstype' );
 
     my@($base,$path,$type) =  fileparse('/virgil/aeneid/draft.book7',
-                                        qr'\.book\d+');
+                                      qr'\.book\d+');
     is($base, 'draft');
     is($path, '/virgil/aeneid/');
     is($type, '.book7');
@@ -30,7 +30,7 @@ do {
     is(fileparse_set_fstype('VMS'), 'Unix', 'set fstype to VMS');
 
     my@($base,$path,$type) = fileparse('virgil:[aeneid]draft.book7',
-                                       qr{\.book\d+});
+                                      qr{\.book\d+});
     is($base, 'draft');
     is($path, 'virgil:[aeneid]');
     is($type, '.book7');
@@ -53,7 +53,7 @@ do {
     is(fileparse_set_fstype('DOS'), 'VMS', 'set fstype to DOS');
 
     my@($base,$path,$type) = fileparse('C:\virgil\aeneid\draft.book7',
-                                       '\.book\d+');
+                                      '\.book\d+');
     is($base, 'draft');
     is($path, 'C:\virgil\aeneid\');
     is($type, '.book7');
@@ -78,7 +78,7 @@ do {
     is(fileparse_set_fstype('MacOS'), 'MSDOS', 'set fstype to MacOS');
 
     my@($base,$path,$type) =  fileparse('virgil:aeneid:draft.book7',
-                                        '\.book\d+');
+                                      '\.book\d+');
     is($base, 'draft');
     is($path, 'virgil:aeneid:');
     is($type, '.book7');

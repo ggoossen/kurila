@@ -8,10 +8,10 @@ use B < qw(peekop class walkoptree walkoptree_exec
 my %done_gv;
 
 sub _printop {
-    my $op = shift;
-    my $addr = ${$op} ?? $op->ppaddr !! '';
-    $addr =~ s/^PL_ppaddr// if $addr;
-    return sprintf "0x\%x \%s \%s", ${$op}, ${$op} ?? class($op) !! '', $addr;
+  my $op = shift;
+  my $addr = ${$op} ?? $op->ppaddr !! '';
+  $addr =~ s/^PL_ppaddr// if $addr;
+  return sprintf "0x\%x \%s \%s", ${$op}, ${$op} ?? class($op) !! '', $addr;
 }
 
 sub B::OP::debug($op) {
@@ -102,16 +102,16 @@ sub B::PADOP::debug($op) {
 
 sub B::NULL::debug($sv) {
     if ($$sv == ${sv_undef()}) {
-        print $^STDOUT, "&sv_undef\n";
+	print $^STDOUT, "&sv_undef\n";
     } else {
-        printf $^STDOUT, "NULL (0x\%x)\n", $$sv;
+	printf $^STDOUT, "NULL (0x\%x)\n", $$sv;
     }
 }
 
 sub B::SV::debug($sv) {
     if (!$$sv) {
-        print $^STDOUT, < class($sv), " = NULL\n";
-        return;
+	print $^STDOUT, < class($sv), " = NULL\n";
+	return;
     }
     printf $^STDOUT, <<'EOT', < class($sv), $$sv, < $sv->REFCNT, < $sv->FLAGS;
 %s (0x%x)
@@ -202,8 +202,8 @@ EOT
 
 sub B::GV::debug($gv) {
     if (%done_gv{+$$gv}++) {
-        printf $^STDOUT, "GV \%s::\%s\n", < $gv->STASH->NAME, < $gv->SAFENAME;
-        return;
+	printf $^STDOUT, "GV \%s::\%s\n", < $gv->STASH->NAME, < $gv->SAFENAME;
+	return;
     }
     my @($sv) =  $gv->SV;
     my @($av) =  $gv->AV;

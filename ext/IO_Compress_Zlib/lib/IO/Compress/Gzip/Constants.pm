@@ -1,5 +1,5 @@
 package IO::Compress::Gzip::Constants;
-
+ 
 use warnings;
 use bytes;
 
@@ -87,13 +87,13 @@ use constant GZIP_FEXTRA_MAX_SIZE             => 0xFF ;
 use constant GZIP_FEXTRA_SUBFIELD_ID_SIZE     => 2 ;
 use constant GZIP_FEXTRA_SUBFIELD_LEN_SIZE    => 2 ;
 use constant GZIP_FEXTRA_SUBFIELD_HEADER_SIZE => GZIP_FEXTRA_SUBFIELD_ID_SIZE +
-    GZIP_FEXTRA_SUBFIELD_LEN_SIZE;
+                                                 GZIP_FEXTRA_SUBFIELD_LEN_SIZE;
 use constant GZIP_FEXTRA_SUBFIELD_MAX_SIZE    => GZIP_FEXTRA_MAX_SIZE - 
-    GZIP_FEXTRA_SUBFIELD_HEADER_SIZE ;
+                                                 GZIP_FEXTRA_SUBFIELD_HEADER_SIZE ;
 
 
-$GZIP_FNAME_INVALID_CHAR_RE       =  '[\x[00]-\x[1F]\x[7F]-\x[9F]]';
-$GZIP_FCOMMENT_INVALID_CHAR_RE    =  '[\x[00]-\x[09]\x[11]-\x[1F]\x[7F]-\x[9F]]';
+    $GZIP_FNAME_INVALID_CHAR_RE       =  '[\x[00]-\x[1F]\x[7F]-\x[9F]]';
+    $GZIP_FCOMMENT_INVALID_CHAR_RE    =  '[\x[00]-\x[09]\x[11]-\x[1F]\x[7F]-\x[9F]]';
 
 use constant GZIP_FHCRC_SIZE        => 2 ; # aka CONTINUATION in gzip
 
@@ -107,31 +107,31 @@ use constant GZIP_ISIZE_MOD_VALUE   => GZIP_ISIZE_MAX + 1 ;
 
 use constant GZIP_OS_DEFAULT=> 0xFF ;
 %GZIP_OS_Names = %(
-        0   => 'MS-DOS',
-            1   => 'Amiga',
-            2   => 'VMS',
-            3   => 'Unix',
-            4   => 'VM/CMS',
-            5   => 'Atari TOS',
-            6   => 'HPFS (OS/2, NT)',
-            7   => 'Macintosh',
-            8   => 'Z-System',
-            9   => 'CP/M',
-            10  => 'TOPS-20',
-            11  => 'NTFS (NT)',
-            12  => 'SMS QDOS',
-            13  => 'Acorn RISCOS',
-            14  => 'VFAT file system (Win95, NT)',
-            15  => 'MVS',
-            16  => 'BeOS',
-            17  => 'Tandem/NSK',
-            18  => 'THEOS',
-            GZIP_OS_DEFAULT()   => 'Unknown',
+    0   => 'MS-DOS',
+    1   => 'Amiga',
+    2   => 'VMS',
+    3   => 'Unix',
+    4   => 'VM/CMS',
+    5   => 'Atari TOS',
+    6   => 'HPFS (OS/2, NT)',
+    7   => 'Macintosh',
+    8   => 'Z-System',
+    9   => 'CP/M',
+    10  => 'TOPS-20',
+    11  => 'NTFS (NT)',
+    12  => 'SMS QDOS',
+    13  => 'Acorn RISCOS',
+    14  => 'VFAT file system (Win95, NT)',
+    15  => 'MVS',
+    16  => 'BeOS',
+    17  => 'Tandem/NSK',
+    18  => 'THEOS',
+    GZIP_OS_DEFAULT()   => 'Unknown',
     ) ;
 
 use constant GZIP_MINIMUM_HEADER =>   pack("C4 V C C",  
-    GZIP_ID1, GZIP_ID2, GZIP_CM_DEFLATED, GZIP_FLG_DEFAULT,
-    GZIP_MTIME_DEFAULT, GZIP_XFL_DEFAULT, GZIP_OS_DEFAULT) ;
+        GZIP_ID1, GZIP_ID2, GZIP_CM_DEFLATED, GZIP_FLG_DEFAULT,
+        GZIP_MTIME_DEFAULT, GZIP_XFL_DEFAULT, GZIP_OS_DEFAULT) ;
 
 
 1;

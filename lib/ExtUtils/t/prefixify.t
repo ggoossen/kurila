@@ -30,12 +30,12 @@ my $default = File::Spec->catdir( <qw(this that));
 
 $mm->prefixify('installbin', 'wibble', 'something', $default);
 is( $mm->{INSTALLBIN}, %Config{installbin},
-    'prefixify w/defaults');
+                                            'prefixify w/defaults');
 
 $mm->{ARGS}->{+PREFIX} = 'foo';
 $mm->prefixify('installbin', 'wibble', 'something', $default);
 is( $mm->{INSTALLBIN}, File::Spec->catdir('something', $default),
-    'prefixify w/defaults and PREFIX');
+                                            'prefixify w/defaults and PREFIX');
 
 SKIP: do {
     skip "Test for DOSish prefixification", 1 unless $Is_Dosish;

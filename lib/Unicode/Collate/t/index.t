@@ -1,8 +1,8 @@
 
 BEGIN {
     if (env::var('PERL_CORE')) {
-        chdir('t') if -d 't';
-        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
+	chdir('t') if -d 't';
+	$^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
 }
 
@@ -19,9 +19,9 @@ our $IsEBCDIC = ord("A") != 0x41;
 ok(1);
 
 my $Collator = Unicode::Collate->new(
-    table => 'keys.txt',
-    normalization => undef,
-    );
+  table => 'keys.txt',
+  normalization => undef,
+);
 
 ##############
 
@@ -45,7 +45,7 @@ $Collator->change(< %old_level);
 
 $str = $orig;
 if (my @(?$pos,?$len) =  $Collator->index($str, $sub) || @()) {
-    substr($str, $pos, $len, $rep);
+  substr($str, $pos, $len, $rep);
 }
 
 is($str, $orig);
@@ -333,7 +333,7 @@ is($str, "lr\cB\x{300}e\cBP and LREP.");
 $str = "Camel donkey zebra came\x{301}l CAMEL horse cAm\0E\0L...";
 $Collator->gsubst($str, "camel", sub { "<b>@_[0]</b>" });
 is($str, "<b>Camel</b> donkey zebra <b>came\x{301}l</b> "
-   . "<b>CAMEL</b> horse <b>cAm\0E\0L</b>...");
+	. "<b>CAMEL</b> horse <b>cAm\0E\0L</b>...");
 
 $Collator->change(level => 3);
 

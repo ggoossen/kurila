@@ -7,82 +7,82 @@ $VERSION = '0.35';
 
 #----------------------------------------------------------------------
 do {
-    # read the table out of our own POD!
-    my $seeking = 1;
-    my $count = 0;
-    my($disrec,$tag,$name);
-    my $last_name = '';
-    while( ~< *I18N::LangTags::List::DATA) {
-        if($seeking) {
-            $seeking = 0 if m/=for woohah/;
-        } elsif( @(?$disrec, ?$tag, ?$name) =
-        @: m/(\[?)\{([-0-9a-zA-Z]+)\}(?:\s*:)?\s*([^\[\]]+)/
-        ) {
-                $name =~ s/\s*[;\.]*\s*$//g;
-                next unless $name;
-                ++$count;
-                print $^STDOUT, "<$tag> <$name>\n" if $Debug;
-                $last_name = %Name{+$tag} = $name;
-                %Is_Disrec{+$tag} = 1 if $disrec;
-            } elsif (m/[Ff]ormerly \"([-a-z0-9]+)\"/) {
-            %Name{+$1} = "$last_name (old tag)" if $last_name;
-            %Is_Disrec{+$1} = 1;
-        }
+# read the table out of our own POD!
+  my $seeking = 1;
+  my $count = 0;
+  my($disrec,$tag,$name);
+  my $last_name = '';
+  while( ~< *I18N::LangTags::List::DATA) {
+    if($seeking) {
+      $seeking = 0 if m/=for woohah/;
+    } elsif( @(?$disrec, ?$tag, ?$name) =
+          @: m/(\[?)\{([-0-9a-zA-Z]+)\}(?:\s*:)?\s*([^\[\]]+)/
+    ) {
+      $name =~ s/\s*[;\.]*\s*$//g;
+      next unless $name;
+      ++$count;
+      print $^STDOUT, "<$tag> <$name>\n" if $Debug;
+      $last_name = %Name{+$tag} = $name;
+      %Is_Disrec{+$tag} = 1 if $disrec;
+    } elsif (m/[Ff]ormerly \"([-a-z0-9]+)\"/) {
+      %Name{+$1} = "$last_name (old tag)" if $last_name;
+      %Is_Disrec{+$1} = 1;
     }
-    die "No tags read??" unless $count;
+  }
+  die "No tags read??" unless $count;
 };
 #----------------------------------------------------------------------
 
 sub name {
-    my $tag = lc(@_[?0] || return);
-    $tag =~ s/^\s+//s;
-    $tag =~ s/\s+$//s;
-
-    my $alt;
-    if($tag =~ m/^x-(.+)/) {
-        $alt = "i-$1";
-    } elsif($tag =~ m/^i-(.+)/) {
-        $alt = "x-$1";
+  my $tag = lc(@_[?0] || return);
+  $tag =~ s/^\s+//s;
+  $tag =~ s/\s+$//s;
+  
+  my $alt;
+  if($tag =~ m/^x-(.+)/) {
+    $alt = "i-$1";
+  } elsif($tag =~ m/^i-(.+)/) {
+    $alt = "x-$1";
+  } else {
+    $alt = '';
+  }
+  
+  my $subform = '';
+  my $name = '';
+  print $^STDOUT, "Input: \{$tag\}\n" if $Debug;
+  while(length $tag) {
+    last if $name = %Name{?$tag};
+    last if $name = %Name{?$alt};
+    if($tag =~ s/(-[a-z0-9]+)$//s) {
+      print $^STDOUT, "Shaving off: $1 leaving $tag\n" if $Debug;
+      $subform = "$1$subform";
+       # and loop around again
+       
+      $alt =~ s/(-[a-z0-9]+)$//s && $Debug && print $^STDOUT, " alt -> $alt\n";
     } else {
-        $alt = '';
+      # we're trying to pull a subform off a primary tag. TILT!
+      print $^STDOUT, "Aborting on: \{$name\}\{$subform\}\n" if $Debug;
+      last;
     }
-
-    my $subform = '';
-    my $name = '';
-    print $^STDOUT, "Input: \{$tag\}\n" if $Debug;
-    while(length $tag) {
-        last if $name = %Name{?$tag};
-        last if $name = %Name{?$alt};
-        if($tag =~ s/(-[a-z0-9]+)$//s) {
-            print $^STDOUT, "Shaving off: $1 leaving $tag\n" if $Debug;
-            $subform = "$1$subform";
-            # and loop around again
-
-            $alt =~ s/(-[a-z0-9]+)$//s && $Debug && print $^STDOUT, " alt -> $alt\n";
-        } else {
-            # we're trying to pull a subform off a primary tag. TILT!
-            print $^STDOUT, "Aborting on: \{$name\}\{$subform\}\n" if $Debug;
-            last;
-        }
-    }
-    print $^STDOUT, "Output: \{$name\}\{$subform\}\n" if $Debug;
-
-    return unless $name;   # Failure
-    return $name unless $subform;   # Exact match
-    $subform =~ s/^-//s;
-    $subform =~ s/-$//s;
-    return "$name (Subform \"$subform\")";
+  }
+  print $^STDOUT, "Output: \{$name\}\{$subform\}\n" if $Debug;
+  
+  return unless $name;   # Failure
+  return $name unless $subform;   # Exact match
+  $subform =~ s/^-//s;
+  $subform =~ s/-$//s;
+  return "$name (Subform \"$subform\")";
 }
 
 #--------------------------------------------------------------------------
 
 sub is_decent {
-    my $tag = lc(@_[?0] || return 0);
-    #require I18N::LangTags;
+  my $tag = lc(@_[?0] || return 0);
+  #require I18N::LangTags;
 
-    return 0 unless
-        $tag =~ 
-        m/^(?:  # First subtag
+  return 0 unless
+    $tag =~ 
+    m/^(?:  # First subtag
          [xi] | [a-z]{2,3}
       )
       (?:  # Subtags thereafter
@@ -91,22 +91,22 @@ sub is_decent {
       )*
     $/xs;
 
-    my @supers = @( () );
-    foreach my $bit (split('-', $tag)) {
-        push @supers, 
-            scalar(nelems @supers) ?? (@supers[-1] . '-' . $bit) !! $bit;
-    }
-    return 0 unless (nelems @supers);
-    shift @supers if @supers[0] =~ m<^(i|x|sgn)$>s;
-    return 0 unless (nelems @supers);
+  my @supers = @( () );
+  foreach my $bit (split('-', $tag)) {
+    push @supers, 
+      scalar(nelems @supers) ?? (@supers[-1] . '-' . $bit) !! $bit;
+  }
+  return 0 unless (nelems @supers);
+  shift @supers if @supers[0] =~ m<^(i|x|sgn)$>s;
+  return 0 unless (nelems @supers);
 
-    foreach my $f (@($tag, < @supers)) {
-        return 0 if %Is_Disrec{?$f};
-        return 2 if %Name{?$f};
-    # so that decent subforms of indecent tags are decent
-    }
-    return 2 if %Name{?$tag}; # not only is it decent, it's known!
-    return 1;
+  foreach my $f (@($tag, < @supers)) {
+    return 0 if %Is_Disrec{?$f};
+    return 2 if %Name{?$f};
+     # so that decent subforms of indecent tags are decent
+  }
+  return 2 if %Name{?$tag}; # not only is it decent, it's known!
+  return 1;
 }
 
 #--------------------------------------------------------------------------

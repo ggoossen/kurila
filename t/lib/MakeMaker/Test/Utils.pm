@@ -27,23 +27,23 @@ MakeMaker::Test::Utils - Utility routines for testing MakeMaker
 
 =head1 SYNOPSIS
 
-use MakeMaker::Test::Utils;
+  use MakeMaker::Test::Utils;
 
-my $perl     = which_perl;
-perl_lib;
+  my $perl     = which_perl;
+  perl_lib;
 
-my $makefile      = makefile_name;
-my $makefile_back = makefile_backup;
+  my $makefile      = makefile_name;
+  my $makefile_back = makefile_backup;
 
-my $make          = make;
-my $make_run      = make_run;
-make_macro($make, $targ, %macros);
+  my $make          = make;
+  my $make_run      = make_run;
+  make_macro($make, $targ, %macros);
 
-my $mtime         = calibrate_mtime;
+  my $mtime         = calibrate_mtime;
 
-my $out           = run($cmd);
+  my $out           = run($cmd);
 
-my $have_compiler = have_compiler();
+  my $have_compiler = have_compiler();
 
 
 =head1 DESCRIPTION
@@ -59,7 +59,7 @@ The following are exported by default.
 
 =item B<which_perl>
 
-my $perl = which_perl;
+  my $perl = which_perl;
 
 Returns a path to perl which is safe to use in a command line, no
 matter where you chdir to.
@@ -82,7 +82,7 @@ sub which_perl {
         # When building in the core, *don't* go off and find
         # another perl
         die "Can't find a perl to use (\$^X=$^EXECUTABLE_NAME), (\$perlpath=$perlpath)" 
-            if env::var('PERL_CORE');
+          if env::var('PERL_CORE');
 
         foreach my $path ( 'File::Spec'->path) {
             $perlpath = 'File::Spec'->catfile($path, $perl);
@@ -95,7 +95,7 @@ sub which_perl {
 
 =item B<perl_lib>
 
-perl_lib;
+  perl_lib;
 
 Sets up environment variables so perl can find its libraries.
 
@@ -104,10 +104,10 @@ Sets up environment variables so perl can find its libraries.
 my $old5lib = env::var('PERL5LIB');
 my $had5lib = defined $old5lib;
 sub perl_lib {
-    # perl-src/t/
+                               # perl-src/t/
     my $lib =  env::var('PERL_CORE') ?? qq{../lib}
-        # ExtUtils-MakeMaker/t/
-        !! qq{../blib/lib};
+                               # ExtUtils-MakeMaker/t/
+                               !! qq{../blib/lib};
     $lib = 'File::Spec'->rel2abs($lib);
     my @libs = @($lib);
     push @libs, env::var('PERL5LIB') if defined env::var('PERL5LIB');
@@ -122,7 +122,7 @@ END {
 
 =item B<makefile_name>
 
-my $makefile = makefile_name;
+  my $makefile = makefile_name;
 
 MakeMaker doesn't always generate 'Makefile'.  It returns what it
 should generate.
@@ -135,7 +135,7 @@ sub makefile_name {
 
 =item B<makefile_backup>
 
-my $makefile_old = makefile_backup;
+  my $makefile_old = makefile_backup;
 
 Returns the name MakeMaker will use for a backup of the current
 Makefile.
@@ -149,7 +149,7 @@ sub makefile_backup {
 
 =item B<make>
 
-my $make = make;
+  my $make = make;
 
 Returns a good guess at the make to run.
 
@@ -163,7 +163,7 @@ sub make {
 
 =item B<make_run>
 
-my $make_run = make_run;
+  my $make_run = make_run;
 
 Returns the make to run as with make() plus any necessary switches.
 
@@ -178,13 +178,13 @@ sub make_run {
 
 =item B<make_macro>
 
-my $make_cmd = make_macro($make, $target, %macros);
+    my $make_cmd = make_macro($make, $target, %macros);
 
 Returns the command necessary to run $make on the given $target using
 the given %macros.
 
-my $make_test_verbose = make_macro(make_run(), 'test', 
-TEST_VERBOSE => 1);
+  my $make_test_verbose = make_macro(make_run(), 'test', 
+                                     TEST_VERBOSE => 1);
 
 This is important because VMS's make utilities have a completely
 different calling convention than Unix or Windows.
@@ -214,7 +214,7 @@ sub make_macro {
 
 =item B<calibrate_mtime>
 
-my $mtime = calibrate_mtime;
+  my $mtime = calibrate_mtime;
 
 When building on NFS, file modification times can often lose touch
 with reality.  This returns the mtime of a file which has just been
@@ -233,8 +233,8 @@ sub calibrate_mtime {
 
 =item B<run>
 
-my $out = run($command);
-my @out = run($command);
+  my $out = run($command);
+  my @out = run($command);
 
 Runs the given $command as an external program returning at least STDOUT
 as $out.  If possible it will return STDOUT and STDERR combined as you
@@ -251,12 +251,12 @@ sub run {
     # This makes our failure diagnostics nicer to read.
     if( MM->os_flavor_is('Unix') or
         (MM->os_flavor_is('OS/2'))
-    ) {
-            return `$cmd 2>&1`;
-        }
-        else {
-            return `$cmd`;
-        }
+      ) {
+        return `$cmd 2>&1`;
+    }
+    else {
+        return `$cmd`;
+    }
 }
 
 =item B<setup_mm_test_root>
@@ -273,7 +273,7 @@ sub setup_mm_test_root {
         # can't create logical names with attributes in Perl, so we do it
         # in a DCL subprocess and put it in the job table so the parent sees it.
         open( my $mmtmp, ">", 'mmtesttmp.com' ) || 
-            die "Error creating command file; $^OS_ERROR";
+          die "Error creating command file; $^OS_ERROR";
         print $mmtmp, <<'COMMAND';
 $ MM_TEST_ROOT = F$PARSE("SYS$DISK:[-]",,,,"NO_CONCEAL")-".][000000"-"]["-"].;"+".]"
 $ DEFINE/JOB/NOLOG/TRANSLATION=CONCEALED MM_TEST_ROOT 'MM_TEST_ROOT'
@@ -287,7 +287,7 @@ COMMAND
 
 =item have_compiler
 
-$have_compiler = have_compiler;
+  $have_compiler = have_compiler;
 
 Returns true if there is a compiler available for XS builds.
 
@@ -307,10 +307,10 @@ sub have_compiler {
     $^STDERR = *{$fh}{IO};
 
     try {
-        require ExtUtils::CBuilder;
-        my $cb = 'ExtUtils::CBuilder'->new;
+	require ExtUtils::CBuilder;
+	my $cb = 'ExtUtils::CBuilder'->new;
 
-        $have_compiler = $cb->have_compiler;
+	$have_compiler = $cb->have_compiler;
     };
 
     return $have_compiler;

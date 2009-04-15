@@ -52,7 +52,7 @@ BOOT_XS: do {
     *dl_load_flags = DynaLoader->can('dl_load_flags');
 
     do {
-        __PACKAGE__->can('bootstrap') || \&DynaLoader::bootstrap
+	__PACKAGE__->can('bootstrap') || \&DynaLoader::bootstrap
     }->(__PACKAGE__, $XS_VERSION);
 };
 

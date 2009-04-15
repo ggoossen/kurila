@@ -14,7 +14,7 @@ $reopen = ($^OS_NAME eq 'VMS' ||
            $^OS_NAME eq 'MSWin32' ||
            $^OS_NAME eq 'NetWare' ||
            $^OS_NAME eq 'dos' ||
-           $^OS_NAME eq 'mpeix');
+	   $^OS_NAME eq 'mpeix');
 
 $x = 'abc';
 
@@ -92,7 +92,7 @@ print $^STDOUT, "ok 15\n";
 
 # $outfile still intact
 if ($reopen) {  # must close file to update EOF marker for stat
-    close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
+  close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print $^STDOUT, 'not ' if (-s $outfile);
 print $^STDOUT, "ok 16\n";
@@ -109,18 +109,18 @@ print $^STDOUT, "ok 18\n";
 
 # $outfile still intact
 if ($reopen) {  # must close file to update EOF marker for stat
-    close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
+  close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print $^STDOUT, 'not ' if (-s $outfile);
 print $^STDOUT, "ok 19\n";
 
 # default offset 0
 if (syswrite($o_fh, $a, 2) == 2){
-    print $^STDOUT, "ok 20\n";
+  print $^STDOUT, "ok 20\n";
 } else {
-    print $^STDOUT, "# $^OS_ERROR\nnot ok 20\n";
-    # most other tests make no sense after e.g. "No space left on device"
-    die $^OS_ERROR;
+  print $^STDOUT, "# $^OS_ERROR\nnot ok 20\n";
+  # most other tests make no sense after e.g. "No space left on device"
+  die $^OS_ERROR;
 }
 
 
@@ -130,7 +130,7 @@ print $^STDOUT, "ok 21\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-    close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
+  close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print $^STDOUT, 'not ' unless (-s $outfile == 2);
 print $^STDOUT, "ok 22\n";
@@ -145,7 +145,7 @@ print $^STDOUT, "ok 24\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-    close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
+  close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print $^STDOUT, 'not ' unless (-s $outfile == 4);
 print $^STDOUT, "ok 25\n";
@@ -160,7 +160,7 @@ print $^STDOUT, "ok 27\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-    close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
+  close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print $^STDOUT, 'not ' unless (-s $outfile == 7);
 print $^STDOUT, "ok 28\n";
@@ -175,7 +175,7 @@ print $^STDOUT, "ok 30\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-    close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
+  close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print $^STDOUT, 'not ' unless (-s $outfile == 10);
 print $^STDOUT, "ok 31\n";

@@ -1,6 +1,6 @@
 package MakeUtil ;
 package main ;
-
+ 
 
 use Config;
 use File::Copy;
@@ -33,8 +33,8 @@ sub MY::libscan
 
     return undef
         if $path =~ m/(~|\.bak|_bak)$/ ||
-        $path =~ m/\..*\.sw(o|p)$/  ||
-        $path =~ m/\B\.svn\b/;
+           $path =~ m/\..*\.sw(o|p)$/  ||
+           $path =~ m/\B\.svn\b/;
 
     return $path;
 }

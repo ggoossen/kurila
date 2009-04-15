@@ -1,12 +1,12 @@
 BEGIN {
     unless ("A" eq pack('U', 0x41)) {
-        print $^STDOUT, "1..0 # Unicode::Collate " .
-            "cannot stringify a Unicode code point\n";
-        exit 0;
+	print $^STDOUT, "1..0 # Unicode::Collate " .
+	    "cannot stringify a Unicode code point\n";
+	exit 0;
     }
     if (env::var('PERL_CORE')) {
-        chdir('t') if -d 't';
-        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
+	chdir('t') if -d 't';
+	$^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
 }
 
@@ -22,20 +22,20 @@ ok(1);
 
 # a standard collator (3.1.1)
 my $Collator = Unicode::Collate->new(
-    table => 'keys.txt',
-    normalization => undef,
-    );
+  table => 'keys.txt',
+  normalization => undef,
+);
 
 
 # a collator for hangul sorting,
 # cf. http://std.dkuug.dk/JTC1/SC22/WG20/docs/documents.html
 #     http://std.dkuug.dk/JTC1/SC22/WG20/docs/n1051-hangulsort.pdf
 my $hangul = Unicode::Collate->new(
-    level => 3,
-    table => undef,
-    normalization => undef,
+  level => 3,
+  table => undef,
+  normalization => undef,
 
-    entry => <<'ENTRIES',
+  entry => <<'ENTRIES',
 0061      ; [.0A15.0020.0002] # LATIN SMALL LETTER A
 0041      ; [.0A15.0020.0008] # LATIN CAPITAL LETTER A
 #1161     ; [.1800.0020.0002] # <comment> initial jungseong A
@@ -55,17 +55,17 @@ my $hangul = Unicode::Collate->new(
 1161      ; [.FE20.0020.0002] # jungseong A <non-initial>
 1163      ; [.FE21.0020.0002] # jungseong YA <non-initial>
 ENTRIES
-    );
+);
 
 is(ref $hangul, "Unicode::Collate");
 
 my $trailwt = Unicode::Collate->new(
-    level => 3,
-    table => undef,
-    normalization => undef,
-    hangul_terminator => 16,
+  level => 3,
+  table => undef,
+  normalization => undef,
+  hangul_terminator => 16,
 
-    entry => <<'ENTRIES', # Term < Jongseong < Jungseong < Choseong
+  entry => <<'ENTRIES', # Term < Jongseong < Jungseong < Choseong
 0061  ; [.0A15.0020.0002] # LATIN SMALL LETTER A
 0041  ; [.0A15.0020.0008] # LATIN CAPITAL LETTER A
 11A8  ; [.1801.0020.0002] # HANGUL JONGSEONG KIYEOK
@@ -77,7 +77,7 @@ my $trailwt = Unicode::Collate->new(
 1102  ; [.1862.0020.0002] # HANGUL CHOSEONG NIEUN
 3042  ; [.1921.0020.000E] # HIRAGANA LETTER A
 ENTRIES
-    );
+);
 
 #########################
 
@@ -187,10 +187,10 @@ ok($trailwt ->eq("\x{1101}\x{1161}\x{11A8}", "\x{1100}\x{AC01}"));
 # weights of these contractions may be non-sense.
 
 my $hangcont = Unicode::Collate->new(
-    level => 3,
-    table => undef,
-    normalization => undef,
-    entry => <<'ENTRIES',
+  level => 3,
+  table => undef,
+  normalization => undef,
+  entry => <<'ENTRIES',
 1100  ; [.1831.0020.0002] # HANGUL CHOSEONG KIYEOK
 1101  ; [.1832.0020.0002] # HANGUL CHOSEONG SSANGKIYEOK
 1161  ; [.188D.0020.0002] # HANGUL JUNGSEONG A
@@ -201,7 +201,7 @@ my $hangcont = Unicode::Collate->new(
 1161 11A9 ; [.0000.0000.0000] # A-GG <contraction>
 1100 1163 11A8 ; [.1000.0020.0002] # G-YA-G <contraction> eq. U+AC39
 ENTRIES
-    );
+);
 
 # contracted into VT
 is($Collator->cmp("\x{1101}", "\x{1101}\x{1161}\x{11A9}"), -1);

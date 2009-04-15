@@ -41,9 +41,9 @@ EOM
 
 
         do {
-            ok my $x = $CompressClass-> new( $name, -AutoClose => 1)  ;
+          ok my $x = $CompressClass-> new( $name, -AutoClose => 1)  ;
 
-            ok $x->write($hello) ;
+          ok $x->write($hello) ;
         };
 
         is anyUncompress($name), $hello ;
@@ -63,9 +63,9 @@ EOM
         my $fh = 'IO::File'->new( "$name", ">") ;
 
         do {
-            ok my $x = $CompressClass-> new( $fh, -AutoClose => 1)  ;
+          ok my $x = $CompressClass-> new( $fh, -AutoClose => 1)  ;
 
-            $x->write($hello) ;
+          $x->write($hello) ;
         };
 
         ok anyUncompress($name) eq $hello ;

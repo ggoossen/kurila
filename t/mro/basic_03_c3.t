@@ -18,27 +18,27 @@ class C(D,F): pass
 class B(E,D): pass
 class A(B,C): pass
 
-6
----
+                           6
+                          ---
 Level 3                  | O |
-/  ---  \
-/    |    \
-/     |     \
-/      |      \
----     ---    ---
+                       /  ---  \
+                      /    |    \
+                     /     |     \
+                    /      |      \
+                  ---     ---    ---
 Level 2        2 | E | 4 | D |  | F | 5
----     ---    ---
-\      / \     /
-\    /   \   /
-\  /     \ /
----     ---
+                  ---     ---    ---
+                   \      / \     /
+                    \    /   \   /
+                     \  /     \ /
+                      ---     ---
 Level 1            1 | B |   | C | 3
----     ---
-\       /
-\     /
----
+                      ---     ---
+                       \       /
+                        \     /
+                          ---
 Level 0                0 | A |
----
+                          ---
 
 >>> A.mro()
 (<class '__main__.A'>, <class '__main__.B'>, <class '__main__.E'>,
@@ -50,38 +50,38 @@ Level 0                0 | A |
 do {
     package Test::O;
     use mro 'c3';
-
+    
     sub O_or_D { 'Test::O' }
     sub O_or_F { 'Test::O' }    
-
+    
     package Test::F;
     use base 'Test::O';
     use mro 'c3';
-
+    
     sub O_or_F { 'Test::F' }    
-
+    
     package Test::E;
     use base 'Test::O';
     use mro 'c3';
-
-        package Test::D;
+        
+    package Test::D;
     use base 'Test::O';    
     use mro 'c3';
-
+    
     sub O_or_D { 'Test::D' }
     sub C_or_D { 'Test::D' }
-
+        
     package Test::C;
     use base ('Test::D', 'Test::F');
     use mro 'c3';    
 
     sub C_or_D { 'Test::C' }
-
+    
     package Test::B;
     use base ('Test::E', 'Test::D');
     use mro 'c3';
-
-        package Test::A;
+        
+    package Test::A;
     use base ('Test::B', 'Test::C');
     use mro 'c3';
 };
@@ -89,8 +89,8 @@ do {
 ok(eq_array(
     mro::get_linear_isa('Test::A'),
     \ qw(Test::A Test::B Test::E Test::C Test::D Test::F Test::O)
-    ), '... got the right MRO for Test::A');      
-
+), '... got the right MRO for Test::A');      
+    
 is('Test::A'->O_or_D, 'Test::D', '... got the right method dispatch');    
 is('Test::A'->O_or_F, 'Test::F', '... got the right method dispatch');   
 

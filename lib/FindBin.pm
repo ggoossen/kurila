@@ -10,13 +10,13 @@ FindBin - Locate directory of original perl script
 
 =head1 SYNOPSIS
 
-use FindBin;
-use lib "$FindBin::Bin/../lib";
+ use FindBin;
+ use lib "$FindBin::Bin/../lib";
 
-or
+ or
 
-use FindBin qw($Bin);
-use lib "$Bin/../lib";
+ use FindBin qw($Bin);
+ use lib "$Bin/../lib";
 
 =head1 DESCRIPTION
 
@@ -34,10 +34,10 @@ directory.
 
 =head1 EXPORTABLE VARIABLES
 
-$Bin         - path to bin directory from where script was invoked
-$Script      - basename of script from which perl was invoked
-$RealBin     - $Bin with all links resolved
-$RealScript  - $Script with all links resolved
+ $Bin         - path to bin directory from where script was invoked
+ $Script      - basename of script from which perl was invoked
+ $RealBin     - $Bin with all links resolved
+ $RealScript  - $Script with all links resolved
 
 =head1 KNOWN ISSUES
 
@@ -50,20 +50,20 @@ that you should avoid using C<FindBin> in modules that you plan to put
 on CPAN. To make sure that C<FindBin> will work is to call the C<again>
 function:
 
-use FindBin;
-FindBin::again(); # or FindBin->again;
+  use FindBin;
+  FindBin::again(); # or FindBin->again;
 
 In former versions of FindBin there was no C<again> function. The
 workaround was to force the C<BEGIN> block to be executed again:
 
-delete $INC{'FindBin.pm'};
-require FindBin;
+  delete $INC{'FindBin.pm'};
+  require FindBin;
 
 =head1 KNOWN BUGS
 
 If perl is invoked as
 
-perl filename
+   perl filename
 
 and I<filename> does not have executable rights and a program called
 I<filename> exists in the users C<$ENV{PATH}> which satisfies both B<-x>
@@ -72,7 +72,7 @@ C<$ENV{PATH}>.
 
 Workaround is to invoke perl as
 
-perl ./filename
+ perl ./filename
 
 =head1 AUTHORS
 
@@ -115,92 +115,92 @@ if( $^OS_NAME eq 'VMS' ) {
 }
 
 sub cwd2 {
-    my $cwd = getcwd();
-    # getcwd might fail if it hasn't access to the current directory.
-    # try harder.
-    defined $cwd or $cwd = cwd();
-    $cwd;
+   my $cwd = getcwd();
+   # getcwd might fail if it hasn't access to the current directory.
+   # try harder.
+   defined $cwd or $cwd = cwd();
+   $cwd;
 }
 
 sub init
 {
-    *Dir = \$Bin;
-    *RealDir = \$RealBin;
+ *Dir = \$Bin;
+ *RealDir = \$RealBin;
 
-    if($^PROGRAM_NAME eq '-e' || $^PROGRAM_NAME eq '-')
+ if($^PROGRAM_NAME eq '-e' || $^PROGRAM_NAME eq '-')
+  {
+   # perl invoked with -e or script is on C<STDIN>
+   $Script = $RealScript = $^PROGRAM_NAME;
+   $Bin    = $RealBin    = cwd2();
+   $Bin = VMS::Filespec::unixify($Bin) if $^OS_NAME eq 'VMS';
+  }
+ else
+  {
+   my $script = $^PROGRAM_NAME;
+
+   if ($^OS_NAME eq 'VMS')
     {
-        # perl invoked with -e or script is on C<STDIN>
-        $Script = $RealScript = $^PROGRAM_NAME;
-        $Bin    = $RealBin    = cwd2();
-        $Bin = VMS::Filespec::unixify($Bin) if $^OS_NAME eq 'VMS';
+     @($Bin,$Script) = VMS::Filespec::rmsexpand($^PROGRAM_NAME) =~ m/(.*[\]>\/]+)(.*)/s;
+     # C<use disk:[dev]/lib> isn't going to work, so unixify first
+     ($Bin = VMS::Filespec::unixify($Bin)) =~ s/\/\z//;
+     @($RealBin,$RealScript) = @($Bin,$Script);
     }
-    else
+   else
     {
-        my $script = $^PROGRAM_NAME;
-
-        if ($^OS_NAME eq 'VMS')
+     my $dosish = ($^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'os2');
+     unless(($script =~ m#/# || ($dosish && $script =~ m#\\#))
+            && -f $script)
+      {
+       foreach my $dir ( File::Spec->path)
         {
-            @($Bin,$Script) = VMS::Filespec::rmsexpand($^PROGRAM_NAME) =~ m/(.*[\]>\/]+)(.*)/s;
-            # C<use disk:[dev]/lib> isn't going to work, so unixify first
-            ($Bin = VMS::Filespec::unixify($Bin)) =~ s/\/\z//;
-            @($RealBin,$RealScript) = @($Bin,$Script);
-        }
-        else
-        {
-            my $dosish = ($^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'os2');
-            unless(($script =~ m#/# || ($dosish && $script =~ m#\\#))
-                && -f $script)
-            {
-                foreach my $dir ( File::Spec->path)
-                {
-                    my $scr = File::Spec->catfile($dir, $script);
+        my $scr = File::Spec->catfile($dir, $script);
 
-                    # $script can been found via PATH but perl could have
-                    # been invoked as 'perl file'. Do a dumb check to see
-                    # if $script is a perl program, if not then keep $script = $0
-                    #
-                    # well we actually only check that it is an ASCII file
-                    # we know its executable so it is probably a script
-                    # of some sort.
-                    if(-f $scr && -r _ && ($dosish || -x _) && -s _ && -T _)
-                    {
-                        $script = $scr;
-                        last;
-                    }
-                }
-            }
+        # $script can been found via PATH but perl could have
+        # been invoked as 'perl file'. Do a dumb check to see
+        # if $script is a perl program, if not then keep $script = $0
+        #
+        # well we actually only check that it is an ASCII file
+        # we know its executable so it is probably a script
+        # of some sort.
+        if(-f $scr && -r _ && ($dosish || -x _) && -s _ && -T _)
+         {
+          $script = $scr;
+          last;
+         }
+       }
+     }
 
-            croak("Cannot find current script '$^PROGRAM_NAME'") unless(-f $script);
+     croak("Cannot find current script '$^PROGRAM_NAME'") unless(-f $script);
 
-            # Ensure $script contains the complete path in case we C<chdir>
+     # Ensure $script contains the complete path in case we C<chdir>
 
-            $script = File::Spec->catfile(cwd2(), $script)
-                unless File::Spec->file_name_is_absolute($script);
+     $script = File::Spec->catfile(cwd2(), $script)
+       unless File::Spec->file_name_is_absolute($script);
 
-            @($Script,$Bin, _) =  fileparse($script);
+     @($Script,$Bin, _) =  fileparse($script);
 
-            # Resolve $script if it is a link
-            while(1)
-            {
-                my $linktext = readlink($script);
+     # Resolve $script if it is a link
+     while(1)
+      {
+       my $linktext = readlink($script);
 
-                @($RealScript,$RealBin, _) =  fileparse($script);
-                last unless defined $linktext;
+       @($RealScript,$RealBin, _) =  fileparse($script);
+       last unless defined $linktext;
 
-                $script = (File::Spec->file_name_is_absolute($linktext))
-                    ?? $linktext
-                    !! File::Spec->catfile($RealBin, $linktext);
-            }
+       $script = (File::Spec->file_name_is_absolute($linktext))
+                  ?? $linktext
+                  !! File::Spec->catfile($RealBin, $linktext);
+      }
 
-            # Get absolute paths to directories
-            if ($Bin) {
-                my $BinOld = $Bin;
-                $Bin = abs_path($Bin);
-                defined $Bin or $Bin = File::Spec->canonpath($BinOld);
-            }
-            $RealBin = abs_path($RealBin) if($RealBin);
-        }
+     # Get absolute paths to directories
+     if ($Bin) {
+      my $BinOld = $Bin;
+      $Bin = abs_path($Bin);
+      defined $Bin or $Bin = File::Spec->canonpath($BinOld);
+     }
+     $RealBin = abs_path($RealBin) if($RealBin);
     }
+  }
 }
 
 BEGIN { init }

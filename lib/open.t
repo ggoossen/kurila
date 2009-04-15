@@ -4,7 +4,7 @@ use Test::More tests => 22;
 
 # open::import expects 'open' as its first argument, but it clashes with open()
 sub import {
-    open::import( 'open', < @_ );
+	open::import( 'open', < @_ );
 }
 
 # can't use require_ok() here, with a name like 'open'
@@ -13,24 +13,24 @@ ok( require 'open.pm', 'requiring open' );
 # this should fail
 try { import() };
 like( $^EVAL_ERROR->{?description}, qr/needs explicit list of PerlIO layers/,
-      'import should fail without args' );
+	'import should fail without args' );
 
 # prevent it from loading I18N::Langinfo, so we can test encoding failures
 my $warn;
 local $^WARN_HOOK = sub {
-        $warn .= shift->{?description};
-    };
+	$warn .= shift->{?description};
+};
 
 # and it shouldn't be able to find this layer
 $warn = '';
 eval q{ no warnings 'layer'; use open IN => ':macguffin' ; };
 is( $warn, '',
-    'should not warn about unknown layer with bad layer provided' );
+	'should not warn about unknown layer with bad layer provided' );
 
 $warn = '';
 eval q{ use warnings 'layer'; use open IN => ':macguffin' ; };
 like( $warn, qr/Unknown PerlIO layer/,
-      'should warn about unknown layer with bad layer provided' );
+	'should warn about unknown layer with bad layer provided' );
 
 # open :locale logic changed since open 1.04, new logic
 # difficult to test portably.
@@ -50,7 +50,7 @@ like( $^EVAL_ERROR->{?description}, qr/Unknown PerlIO layer class/, 'should croa
 # but it handles them all so well together
 import( 'IO', ':raw :crlf' );
 is( $^OPEN, ":raw :crlf\0:raw :crlf",
-    'should set multi types, multi layer' );
+	'should set multi types, multi layer' );
 is( $^HINTS{?'open_IO'}, 'crlf', 'should record last layer set in %^H' );
 
 SKIP: do {
@@ -88,93 +88,93 @@ EOE
     $ok = $a = 0;
     for (@a) {
         unless (
-            ($c = sysread($f, $b, 1)) == 1  &&
-            length($b)               == 1  &&
-            ord($b)                  == ord($_) &&
-            systell($f)               == ($a += bytes::length($b))
-        ) {
-                print $^STDOUT, '# ord($_)           == ', ord($_), "\n";
-                print $^STDOUT, '# ord($b)           == ', ord($b), "\n";
-                print $^STDOUT, '# length($b)        == ', length($b), "\n";
-                print $^STDOUT, '# bytes::length($b) == ', bytes::length($b), "\n";
-                print $^STDOUT, '# systell($f)        == ', systell($f), "\n";
-                print $^STDOUT, '# $a                == ', $a, "\n";
-                print $^STDOUT, '# $c                == ', $c, "\n";
-                last;
-            }
-        $ok++;
+		($c = sysread($f, $b, 1)) == 1  &&
+		length($b)               == 1  &&
+		ord($b)                  == ord($_) &&
+		systell($f)               == ($a += bytes::length($b))
+		) {
+	    print $^STDOUT, '# ord($_)           == ', ord($_), "\n";
+	    print $^STDOUT, '# ord($b)           == ', ord($b), "\n";
+	    print $^STDOUT, '# length($b)        == ', length($b), "\n";
+	    print $^STDOUT, '# bytes::length($b) == ', bytes::length($b), "\n";
+	    print $^STDOUT, '# systell($f)        == ', systell($f), "\n";
+	    print $^STDOUT, '# $a                == ', $a, "\n";
+	    print $^STDOUT, '# $c                == ', $c, "\n";
+	    last;
+	}
+	$ok++;
     }
     close $f;
     ok($ok == (nelems @a),
        "on :utf8 streams sysread() should work on characters, not bytes");
 
     sub diagnostics {
-        print $^STDOUT, '# ord($_)           == ', ord($_), "\n";
-        print $^STDOUT, '# bytes::length($_) == ', bytes::length($_), "\n";
-        print $^STDOUT, '# systell(G)        == ', systell('G'), "\n";
-        print $^STDOUT, '# $a                == ', $a, "\n";
-        print $^STDOUT, '# $c                == ', $c, "\n";
+	print $^STDOUT, '# ord($_)           == ', ord($_), "\n";
+	print $^STDOUT, '# bytes::length($_) == ', bytes::length($_), "\n";
+	print $^STDOUT, '# systell(G)        == ', systell('G'), "\n";
+	print $^STDOUT, '# $a                == ', $a, "\n";
+	print $^STDOUT, '# $c                == ', $c, "\n";
     }
 
 
     my $g;
     my %actions = %(
-            syswrite => sub { syswrite $g, shift; },
-                'syswrite len' => sub { syswrite $g, shift, 1; },
-                'syswrite len pad' => sub {
-                    my $temp = shift() . "\243";
-                    syswrite $g, $temp, 1; },
-                'syswrite off' => sub { 
-                    my $temp = "\351" . shift();
-                    syswrite $g, $temp, 1, 1; },
-                'syswrite off pad' => sub { 
-                    my $temp = "\351" . shift() . "\243";
-                    syswrite $g, $temp, 1, 1; },
-        );
+		   syswrite => sub { syswrite $g, shift; },
+		   'syswrite len' => sub { syswrite $g, shift, 1; },
+		   'syswrite len pad' => sub {
+		       my $temp = shift() . "\243";
+		       syswrite $g, $temp, 1; },
+		   'syswrite off' => sub { 
+		       my $temp = "\351" . shift();
+		       syswrite $g, $temp, 1, 1; },
+		   'syswrite off pad' => sub { 
+		       my $temp = "\351" . shift() . "\243";
+		       syswrite $g, $temp, 1, 1; },
+		  );
 
     foreach my $key (sort keys %actions) {
-        # syswrite() on should work on characters, not bytes
-        open $g, ">:utf8", "b";
+	# syswrite() on should work on characters, not bytes
+	open $g, ">:utf8", "b";
 
-        print $^STDOUT, "# $key\n";
-        $ok = $a = 0;
-        for (@a) {
-            unless (
-                ($c = %actions{?$key}->($_)) == 1 &&
-                systell($g)                == ($a += bytes::length($_))
-            ) {
-                    diagnostics();
-                    last;
-                }
-            $ok++;
-        }
-        close $g;
-        ok($ok == (nelems @a),
-           "on :utf8 streams syswrite() should work on characters, not bytes");
+	print $^STDOUT, "# $key\n";
+	$ok = $a = 0;
+	for (@a) {
+	    unless (
+		    ($c = %actions{?$key}->($_)) == 1 &&
+		    systell($g)                == ($a += bytes::length($_))
+		   ) {
+		diagnostics();
+		last;
+	    }
+	    $ok++;
+	}
+	close $g;
+	ok($ok == (nelems @a),
+	   "on :utf8 streams syswrite() should work on characters, not bytes");
 
-        open $g, "<:utf8", "b";
-        $ok = $a = 0;
-        for (@a) {
-            unless (
-                ($c = sysread($g, $b, 1)) == 1 &&
-                length($b)               == 1 &&
-                ord($b)                  == ord($_) &&
-                systell($g)               == ($a += bytes::length($_))
-            ) {
-                    print $^STDOUT, '# ord($_)           == ', ord($_), "\n";
-                    print $^STDOUT, '# ord($b)           == ', ord($b), "\n";
-                    print $^STDOUT, '# length($b)        == ', length($b), "\n";
-                    print $^STDOUT, '# bytes::length($b) == ', bytes::length($b), "\n";
-                    print $^STDOUT, '# systell($g)        == ', systell($g), "\n";
-                    print $^STDOUT, '# $a                == ', $a, "\n";
-                    print $^STDOUT, '# $c                == ', $c, "\n";
-                    last;
-                }
-            $ok++;
-        }
-        close $g;
-        ok($ok == (nelems @a),
-           "checking syswrite() output on :utf8 streams by reading it back in");
+	open $g, "<:utf8", "b";
+	$ok = $a = 0;
+	for (@a) {
+	    unless (
+		    ($c = sysread($g, $b, 1)) == 1 &&
+		    length($b)               == 1 &&
+		    ord($b)                  == ord($_) &&
+		    systell($g)               == ($a += bytes::length($_))
+		   ) {
+		print $^STDOUT, '# ord($_)           == ', ord($_), "\n";
+		print $^STDOUT, '# ord($b)           == ', ord($b), "\n";
+		print $^STDOUT, '# length($b)        == ', length($b), "\n";
+		print $^STDOUT, '# bytes::length($b) == ', bytes::length($b), "\n";
+		print $^STDOUT, '# systell($g)        == ', systell($g), "\n";
+		print $^STDOUT, '# $a                == ', $a, "\n";
+		print $^STDOUT, '# $c                == ', $c, "\n";
+		last;
+	    }
+	    $ok++;
+	}
+	close $g;
+	ok($ok == (nelems @a),
+	   "checking syswrite() output on :utf8 streams by reading it back in");
     }
 };
 
@@ -182,10 +182,10 @@ SKIP: do {
     skip("no perlio", 1) unless (PerlIO::Layer->find( 'perlio'));
     use open IN => ':non-existent';
     try {
-        require Symbol; # Anything that exists but we havn't loaded
+	require Symbol; # Anything that exists but we havn't loaded
     };
     like($^EVAL_ERROR->{?description}, qr/Can't locate Symbol|Recursive call/i,
-         "test for an endless loop in PerlIO_find_layer");
+	 "test for an endless loop in PerlIO_find_layer");
 };
 
 END {

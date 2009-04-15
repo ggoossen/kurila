@@ -94,29 +94,29 @@ my $rerun = env::var('PERL_DL_NONLAZY') ?? 0 !! 1;
 
 my @st = @tests;
 while ((nelems @st)) {
-    my $in = shift(@st);
-    my $out = shift(@st);
+	my $in = shift(@st);
+	my $out = shift(@st);
 
-    $in =~ s/^TEST(\d+)?\n//;
+	$in =~ s/^TEST(\d+)?\n//;
 
-    my $back = wrap('   ', ' ', $in);
+	my $back = wrap('   ', ' ', $in);
 
-    is($back, $out);
+	is($back, $out);
 }
 
 @st = @tests;
 while((nelems @st)) {
-    my $in = shift(@st);
-    my $out = shift(@st);
+	my $in = shift(@st);
+	my $out = shift(@st);
 
-    $in =~ s/^TEST(\d+)?\n//;
+	$in =~ s/^TEST(\d+)?\n//;
 
-    my @in = split("\n", $in, -1);
-    @in = @((< map { "$_\n" }, @in[[0..((nelems @in)-1)-1]]), @in[-1]);
+	my @in = split("\n", $in, -1);
+	@in = @((< map { "$_\n" }, @in[[0..((nelems @in)-1)-1]]), @in[-1]);
+	
+	my $back = wrap('   ', ' ', < @in);
 
-    my $back = wrap('   ', ' ', < @in);
-
-    is($back, $out);
+	is($back, $out);
 }
 
 $Text::Wrap::huge = 'overflow';

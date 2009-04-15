@@ -18,8 +18,8 @@ to come to.
 ';
 
 my $y = 'now is the time' . "\n" .
-    'for all good men' . "\n" .
-    'to come to.' . "\n\n\n!\n\n";
+'for all good men' . "\n" .
+'to come to.' . "\n\n\n!\n\n";
 
 is($x, $y,  'test data is sane');
 

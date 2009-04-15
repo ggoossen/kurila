@@ -2,8 +2,8 @@
 
 use Scalar::Util ();
 use Test::More  (grep { m/dualvar/ }, @Scalar::Util::EXPORT_FAIL)
-    ?? (skip_all => 'dualvar requires XS version')
-    !! (tests => 9);
+			?? (skip_all => 'dualvar requires XS version')
+			!! (tests => 9);
 
 Scalar::Util->import('dualvar');
 

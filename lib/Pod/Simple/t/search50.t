@@ -25,10 +25,10 @@ use Pod::Simple;
 
 my $found = 0;
 $x->callback(sub {
-        print $^STDOUT, "#  ", join("  ", map { "\{$_\}" }, @_), "\n";
-        ++$found;
-        return;
-    });
+  print $^STDOUT, "#  ", join("  ", map { "\{$_\}" }, @_), "\n";
+  ++$found;
+  return;
+});
 
 print $^STDOUT, "# \$^INCLUDE_PATH == $(join ' ',$^INCLUDE_PATH)\n";
 
@@ -43,13 +43,13 @@ like( ($name2where->{?'warnings'} || 'huh???'), qr/warnings\.(pod|pm)$/);
 
 my  $warningspath = $name2where->{?'warnings'};
 if( $warningspath ) {
-    my @x = @($x->find('warnings')||'(nil)', $warningspath);
-    print $^STDOUT, "# Comparing \"@x[0]\" to \"@x[1]\"\n";
-    for( @x) { s{[/\\]}{/}g; }
-    print $^STDOUT, "#        => \"@x[0]\" to \"@x[1]\"\n";
-    is @x[0], @x[1], " find('warnings') should match survey's name2where\{warnings\}";
+  my @x = @($x->find('warnings')||'(nil)', $warningspath);
+  print $^STDOUT, "# Comparing \"@x[0]\" to \"@x[1]\"\n";
+  for( @x) { s{[/\\]}{/}g; }
+  print $^STDOUT, "#        => \"@x[0]\" to \"@x[1]\"\n";
+  is @x[0], @x[1], " find('warnings') should match survey's name2where\{warnings\}";
 } else {
-    ok 0;  # no 'thatpath/warnings.pm' means can't test find()
+  ok 0;  # no 'thatpath/warnings.pm' means can't test find()
 }
 
 ok 1;

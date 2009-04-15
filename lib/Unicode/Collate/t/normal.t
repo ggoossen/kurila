@@ -1,13 +1,13 @@
 use Test::More;
 BEGIN {
     unless ("A" eq pack('U', 0x41)) {
-        plan skip_all => "Unicode::Collate " .
-            "cannot stringify a Unicode code point";
-        exit 0;
+	plan skip_all => "Unicode::Collate " .
+	    "cannot stringify a Unicode code point";
+	exit 0;
     }
     if (env::var('PERL_CORE')) {
-        chdir('t') if -d 't';
-        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
+	chdir('t') if -d 't';
+	$^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
 }
 
@@ -41,35 +41,35 @@ our $noN = Unicode::Collate->new(
     table => undef,
     normalization => undef,
     entry => $entry,
-    );
+);
 
 our $nfc = Unicode::Collate->new(
-    level => 1,
-    table => undef,
-    normalization => 'NFC',
-    entry => $entry,
-    );
+  level => 1,
+  table => undef,
+  normalization => 'NFC',
+  entry => $entry,
+);
 
 our $nfd = Unicode::Collate->new(
-    level => 1,
-    table => undef,
-    normalization => 'NFD',
-    entry => $entry,
-    );
+  level => 1,
+  table => undef,
+  normalization => 'NFD',
+  entry => $entry,
+);
 
 our $nfkc = Unicode::Collate->new(
-    level => 1,
-    table => undef,
-    normalization => 'NFKC',
-    entry => $entry,
-    );
+  level => 1,
+  table => undef,
+  normalization => 'NFKC',
+  entry => $entry,
+);
 
 our $nfkd = Unicode::Collate->new(
-    level => 1,
-    table => undef,
-    normalization => 'NFKD',
-    entry => $entry,
-    );
+  level => 1,
+  table => undef,
+  normalization => 'NFKD',
+  entry => $entry,
+);
 
 is($noN->cmp("\x{212B}", "A"), -1);
 is($noN->cmp("\x{212B}", $Aring), -1);

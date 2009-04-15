@@ -15,11 +15,11 @@ my (@files, @dirs, @still_there);
 # And a test for files that should still be around
 # These are tidied up
 END {
-    foreach ( @still_there) {
-        ok( -f $_ );
-        ok( unlink( $_ ) );
-        ok( !(-f $_) );
-    }
+  foreach ( @still_there) {
+    ok( -f $_ );
+    ok( unlink( $_ ) );
+    ok( !(-f $_) );
+  }
 }
 
 # Loop over an array hoping that the files dont exist
@@ -41,9 +41,9 @@ ok(1);
 # Tempfile
 # Open tempfile in some directory, unlink at end
 my @($fh, $tempfile) =  tempfile(
-    UNLINK => 1,
-    SUFFIX => '.txt',
-    );
+			       UNLINK => 1,
+			       SUFFIX => '.txt',
+			      );
 
 ok( (-f $tempfile) );
 # Should still be around after closing
@@ -57,9 +57,9 @@ push(@files, $tempfile);
 my $template = 'tmpdirXXXXXX';
 print $^STDOUT, "# Template: $template\n";
 my $tempdir = tempdir( $template ,
-                       DIR => File::Spec->curdir,
-                       CLEANUP => 1,
-                       );
+		       DIR => File::Spec->curdir,
+		       CLEANUP => 1,
+		     );
 
 print $^STDOUT, "# TEMPDIR: $tempdir\n";
 
@@ -68,10 +68,10 @@ push(@dirs, $tempdir);
 
 # Create file in the temp dir
 @($fh, $tempfile) =  tempfile(
-    DIR => $tempdir,
-    UNLINK => 1,
-    SUFFIX => '.dat',
-    );
+			    DIR => $tempdir,
+			    UNLINK => 1,
+			    SUFFIX => '.dat',
+			   );
 
 print $^STDOUT, "# TEMPFILE: Created $tempfile\n";
 
@@ -81,8 +81,8 @@ push(@files, $tempfile);
 # Test tempfile
 # ..and again
 @($fh, $tempfile) =  tempfile(
-    DIR => $tempdir,
-    );
+			    DIR => $tempdir,
+			   );
 
 
 ok( (-f $tempfile ));
@@ -91,8 +91,8 @@ push(@files, $tempfile);
 # Test tempfile
 # ..and another with changed permissions (read-only)
 @($fh, $tempfile) =  tempfile(
-    DIR => $tempdir,
-    );
+                           DIR => $tempdir,
+                          );
 chmod 0444, $tempfile;
 
 ok( (-f $tempfile ));
@@ -103,10 +103,10 @@ print $^STDOUT, "# TEMPFILE: Created $tempfile\n";
 # and another (with template)
 
 @($fh, $tempfile) =  tempfile( 'helloXXXXXXX',
-                               DIR => $tempdir,
-                               UNLINK => 1,
-                               SUFFIX => '.dat',
-                               );
+			    DIR => $tempdir,
+			    UNLINK => 1,
+			    SUFFIX => '.dat',
+			   );
 
 print $^STDOUT, "# TEMPFILE: Created $tempfile\n";
 
@@ -134,13 +134,13 @@ $fh = try { tempfile( 'ftmpXXXXX', DIR => < File::Spec->tmpdir ) };
 
 SKIP:
 do {
-    skip "Skip Failed probably due to NFS", 2 if not $fh;
+  skip "Skip Failed probably due to NFS", 2 if not $fh;
 
-    # print something to it to make sure something is there
-    ok( print $fh, "Test\n" );
+  # print something to it to make sure something is there
+  ok( print $fh, "Test\n" );
 
-    # Close it - can not check it is gone since we dont know the name
-    ok( close($fh) );
+  # Close it - can not check it is gone since we dont know the name
+  ok( close($fh) );
 };
 
 # Now END block will execute to test the removal of directories

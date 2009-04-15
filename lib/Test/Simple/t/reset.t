@@ -71,11 +71,11 @@ ok( $tb->use_numbers    == 1,           'use_numbers' );
 ok( $tb->no_header      == 0,           'no_header' );
 ok( $tb->no_ending      == 0,           'no_ending' );
 ok( fileno $tb->output         == fileno %Original_Output{?output},    
-    'output' );
+                                        'output' );
 ok( fileno $tb->failure_output == fileno %Original_Output{?failure_output},    
-    'failure_output' );
+                                        'failure_output' );
 ok( fileno $tb->todo_output    == fileno %Original_Output{?todo_output},
-    'todo_output' );
+                                        'todo_output' );
 ok( $tb->current_test   == 0,           'current_test' );
 ok( (nelems $tb->summary)        == 0,           'summary' );
 ok( (nelems $tb->details)        == 0,           'details' );

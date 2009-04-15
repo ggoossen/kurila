@@ -14,8 +14,8 @@ BEGIN {
 require Test::Simple::Catch;
 my@($out, $err) =  Test::Simple::Catch::caught();
 
-    # Can't use Test.pm, that's a 5.005 thing.
-    package My::Test;
+# Can't use Test.pm, that's a 5.005 thing.
+package My::Test;
 
 # This has to be a require or else the END block below runs before
 # Test::Builder's own and the ending diagnostics don't come out right.

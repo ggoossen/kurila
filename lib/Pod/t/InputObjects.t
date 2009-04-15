@@ -41,19 +41,19 @@ do { # test package Pod::Paragraph
     my $new_text = 'test - This is the test suite.';
     is( $p_p2->text( $new_text ), $new_text, 
         'Pod::Paragraph->text( ... )' );
-
+    
     is( $p_p1->raw_text, '=head1 NAME', 
         'Pod::Paragraph->raw_text()' );
     is( $p_p2->raw_text, $new_text, 
         'Pod::Paragraph->raw_text() revisited' );
-
+    
     is( $p_p1->cmd_prefix, '=', 
         'Pod::Paragraph->cmd_prefix()' );
     is( $p_p1->cmd_separator, ' ', 
         'Pod::Paragraph->cmd_separator()' );
 
     # Pod::Parser->parse_tree() / ptree()
-
+    
     is( (join ':',$p_p1->file_line()), '<unknown-file>:0', 
         'Pod::Paragraph->file_line()' );
     $p_p2->{+'file' } = 'test'; $p_p2->{+'line' } = 3;
@@ -67,14 +67,14 @@ do { # test package Pod::InteriorSequence
     my $pre_txt = 'test - This is the ';
     my $cmd_txt = 'test suite';
     my $pst_txt ='.';
-    $p_pt->append( $cmd_txt );
+	$p_pt->append( $cmd_txt );
 
     my $p_is = Pod::InteriorSequence->new( 
         name => 'I', ldelim => '<', rdelim => '>',
         ptree => $p_pt
-        );
+    );
     isa_ok( $p_is, 'Pod::InteriorSequence', 'P::InteriorSequence constructor' );
-
+	
     is( $p_is->cmd_name(), 'I', 'Pod::InteriorSequence->cmd_name()' );
     is( $p_is->cmd_name( 'B' ), 'B', 
         'set Pod::InteriorSequence->cmd_name( B )' );
@@ -96,7 +96,7 @@ do { # test package Pod::ParseTree
     my $p_pt2 = Pod::ParseTree->new();
     isa_ok( $p_pt1, 'Pod::ParseTree', 
             'Pod::ParseTree constructor' );
-
+    
     is( $p_pt1->top(), $p_pt1, 'Pod::ParseTree->top()' );
     is( $p_pt1->top( $p_pt1, $p_pt2 ), $p_pt1, 
         'set new Pod::ParseTree->top()' );
@@ -104,9 +104,9 @@ do { # test package Pod::ParseTree
     ok( eq_array( \ $p_pt1->children(), \@( $p_pt1, $p_pt2) ),
         'Pod::ParseTree->children()' );
 
-    my $text = 'This is the test suite.';
-    $p_pt2->append( $text );
-    is( $p_pt2->raw_text(), $text, 'Pod::ParseTree->append()' );
+	my $text = 'This is the test suite.';
+	$p_pt2->append( $text );
+	is( $p_pt2->raw_text(), $text, 'Pod::ParseTree->append()' );
 };
 
 __END__

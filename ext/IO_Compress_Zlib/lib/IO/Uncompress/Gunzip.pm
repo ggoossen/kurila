@@ -3,7 +3,7 @@ package IO::Uncompress::Gunzip ;
 
 
 # for RFC1952
-
+ 
 use warnings;
 use bytes;
 
@@ -70,7 +70,7 @@ sub ckMagic
     $self->{+HeaderPending} = $magic ;
 
     return $self->HeaderError("Minimum header size is " . 
-        GZIP_MIN_HEADER_SIZE . " bytes") 
+                              GZIP_MIN_HEADER_SIZE . " bytes") 
         if length $magic != GZIP_ID_SIZE ;                                    
 
     return $self->HeaderError("Bad Magic")
@@ -105,7 +105,7 @@ sub chkTrailer
 
         my $exp_isize = $self->{UnCompSize}->get32bit();
         return $self->TrailerError("ISIZE mismatch. Got $ISIZE"
-            . ", expected $exp_isize")
+                                  . ", expected $exp_isize")
             if $ISIZE != $exp_isize ;
     }
 
@@ -129,7 +129,7 @@ sub _readFullGzipHeader($self)
     $self->{+HeaderPending} = $magic ;
 
     return $self->HeaderError("Minimum header size is " . 
-        GZIP_MIN_HEADER_SIZE . " bytes") 
+                              GZIP_MIN_HEADER_SIZE . " bytes") 
         if length $magic != GZIP_ID_SIZE ;                                    
 
 
@@ -148,7 +148,7 @@ sub _readGzipHeader($self, $magic)
 
     $self->smartReadExact(\$buffer, GZIP_MIN_HEADER_SIZE - GZIP_ID_SIZE)
         or return $self->HeaderError("Minimum header size is " . 
-        GZIP_MIN_HEADER_SIZE . " bytes") ;
+                                     GZIP_MIN_HEADER_SIZE . " bytes") ;
 
     my $keep = $magic . $buffer ;
     $self->{+HeaderPending} = $keep ;
@@ -177,7 +177,7 @@ sub _readGzipHeader($self, $magic)
 
         if ($XLEN && $self->{?'ParseExtra'}) {
             my $bad = IO::Compress::Zlib::Extra::parseRawExtra($EXTRA,
-                                                               \@EXTRA, 1, 1);
+                                                \@EXTRA, 1, 1);
             return $self->HeaderError($bad)
                 if defined $bad;
         }
@@ -233,37 +233,37 @@ sub _readGzipHeader($self, $magic)
     $self->{+Type} = 'rfc1952';
 
     return \%(
-            'Type'          => 'rfc1952',
-                'FingerprintLength'  => 2,
-                'HeaderLength'  => length $keep,
-                'TrailerLength' => GZIP_TRAILER_SIZE,
-                'Header'        => $keep,
-                'isMinimalHeader' => $keep eq GZIP_MINIMUM_HEADER ?? 1 !! 0,
+        'Type'          => 'rfc1952',
+        'FingerprintLength'  => 2,
+        'HeaderLength'  => length $keep,
+        'TrailerLength' => GZIP_TRAILER_SIZE,
+        'Header'        => $keep,
+        'isMinimalHeader' => $keep eq GZIP_MINIMUM_HEADER ?? 1 !! 0,
 
-                'MethodID'      => $cm,
-                'MethodName'    => $cm == GZIP_CM_DEFLATED ?? "Deflated" !! "Unknown" ,
-                'TextFlag'      => $flag ^&^ GZIP_FLG_FTEXT ?? 1 !! 0,
-                'HeaderCRCFlag' => $flag ^&^ GZIP_FLG_FHCRC ?? 1 !! 0,
-                'NameFlag'      => $flag ^&^ GZIP_FLG_FNAME ?? 1 !! 0,
-                'CommentFlag'   => $flag ^&^ GZIP_FLG_FCOMMENT ?? 1 !! 0,
-                'ExtraFlag'     => $flag ^&^ GZIP_FLG_FEXTRA ?? 1 !! 0,
-                'Name'          => $origname,
-                'Comment'       => $comment,
-                'Time'          => $mtime,
-                'OsID'          => $os,
-                'OsName'        => defined %GZIP_OS_Names{?$os} 
-                ?? %GZIP_OS_Names{?$os} !! "Unknown",
-                'HeaderCRC'     => $HeaderCRC,
-                'Flags'         => $flag,
-                'ExtraFlags'    => $xfl,
-                'ExtraFieldRaw' => $EXTRA,
-                'ExtraField'    => \ @EXTRA,
+        'MethodID'      => $cm,
+        'MethodName'    => $cm == GZIP_CM_DEFLATED ?? "Deflated" !! "Unknown" ,
+        'TextFlag'      => $flag ^&^ GZIP_FLG_FTEXT ?? 1 !! 0,
+        'HeaderCRCFlag' => $flag ^&^ GZIP_FLG_FHCRC ?? 1 !! 0,
+        'NameFlag'      => $flag ^&^ GZIP_FLG_FNAME ?? 1 !! 0,
+        'CommentFlag'   => $flag ^&^ GZIP_FLG_FCOMMENT ?? 1 !! 0,
+        'ExtraFlag'     => $flag ^&^ GZIP_FLG_FEXTRA ?? 1 !! 0,
+        'Name'          => $origname,
+        'Comment'       => $comment,
+        'Time'          => $mtime,
+        'OsID'          => $os,
+        'OsName'        => defined %GZIP_OS_Names{?$os} 
+                                 ?? %GZIP_OS_Names{?$os} !! "Unknown",
+        'HeaderCRC'     => $HeaderCRC,
+        'Flags'         => $flag,
+        'ExtraFlags'    => $xfl,
+        'ExtraFieldRaw' => $EXTRA,
+        'ExtraField'    => \ @EXTRA,
 
 
         #'CompSize'=> $compsize,
         #'CRC32'=> $CRC32,
         #'OrigSize'=> $ISIZE,
-        )
+      )
 }
 
 

@@ -6,8 +6,8 @@ Fcntl - load the C Fcntl.h defines
 
 =head1 SYNOPSIS
 
-use Fcntl;
-use Fcntl qw(:DEFAULT :flock);
+    use Fcntl;
+    use Fcntl qw(:DEFAULT :flock);
 
 =head1 DESCRIPTION
 
@@ -61,13 +61,13 @@ require Exporter;
 use XSLoader ();
 @ISA = qw(Exporter);
 BEGIN {
-    $VERSION = "1.06";
+  $VERSION = "1.06";
 }
 
 # Items to export into callers namespace by default
 # (move infrequently used names to @EXPORT_OK below)
 @EXPORT =
-    qw(
+  qw(
 	FD_CLOEXEC
 	F_ALLOCSP
 	F_ALLOCSP64
@@ -191,11 +191,11 @@ BEGIN {
 );
 # Named groups of exports
 %EXPORT_TAGS = %(
-        'flock'   => \qw(LOCK_SH LOCK_EX LOCK_NB LOCK_UN),
-            'Fcompat' => \qw(FAPPEND FASYNC FCREAT FDEFER FDSYNC FEXCL FLARGEFILE
+    'flock'   => \qw(LOCK_SH LOCK_EX LOCK_NB LOCK_UN),
+    'Fcompat' => \qw(FAPPEND FASYNC FCREAT FDEFER FDSYNC FEXCL FLARGEFILE
 		     FNDELAY FNONBLOCK FRSYNC FSYNC FTRUNC),
-            'seek'    => \qw(SEEK_SET SEEK_CUR SEEK_END),
-            'mode'    => \qw(S_ISUID S_ISGID S_ISVTX S_ISTXT
+    'seek'    => \qw(SEEK_SET SEEK_CUR SEEK_END),
+    'mode'    => \qw(S_ISUID S_ISGID S_ISVTX S_ISTXT
 		     _S_IFMT S_IFREG S_IFDIR S_IFLNK
 		     S_IFSOCK S_IFBLK S_IFCHR S_IFIFO S_IFWHT S_ENFMT
 		     S_IRUSR S_IWUSR S_IXUSR S_IRWXU
@@ -207,11 +207,11 @@ BEGIN {
 		     S_ISWHT S_ISENFMT		
 		     S_IFMT S_IMODE
                   ),
-    );
+);
 
 # Force the constants to become inlined
 BEGIN {
-    XSLoader::load 'Fcntl', $VERSION;
+  XSLoader::load 'Fcntl', $VERSION;
 }
 
 sub S_IFMT  { (nelems @_) ??  @( @_[0] ^&^ _S_IFMT() ) !! _S_IFMT()  }

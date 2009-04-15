@@ -73,9 +73,9 @@ sub run_tests {
     seek *DATA, 0, 0;
     while (~< *DATA) { last if m/^__DATA__/ }
     while (~< *DATA) {
-        chomp;
-        next if m/^#/;
-        print $^STDOUT, m/^$email$/ ?? "ok " !! "not ok ", ++ $count, "\n";
+	chomp;
+	next if m/^#/;
+	print $^STDOUT, m/^$email$/ ?? "ok " !! "not ok ", ++ $count, "\n";
     }
 }
 

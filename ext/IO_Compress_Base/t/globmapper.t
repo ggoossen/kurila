@@ -1,12 +1,12 @@
 BEGIN {
     if (env::var('PERL_CORE')) {
-        chdir 't' if -d 't';
-        $^INCLUDE_PATH = @("../lib", "lib/compress");
+	chdir 't' if -d 't';
+	$^INCLUDE_PATH = @("../lib", "lib/compress");
     }
 }
 
 use lib < qw(t t/compress);
-
+ 
 use warnings ;
 
 use Test::More ;
@@ -35,7 +35,7 @@ do {
         $gm = File::GlobMapper->new("$($delim)abc", '*.X');
         ok ! $gm, "  new failed" ;
         is $File::GlobMapper::Error, "Unmatched $delim in input fileglob", 
-           "  catch unmatched $delim";
+            "  catch unmatched $delim";
     }
 
     for my $delim ( qw/ ( ) [ ] / )
@@ -43,7 +43,7 @@ do {
         $gm = File::GlobMapper->new("\{$($delim)abc\}", '*.X');
         ok ! $gm, "  new failed" ;
         is $File::GlobMapper::Error, "Unmatched $delim in input fileglob", 
-           "  catch unmatched $delim inside \{\}";
+            "  catch unmatched $delim inside \{\}";
     }
 };
 
@@ -77,17 +77,17 @@ do {
 
     my $map = $gm->getFileMap() ;
     is_deeply $map,
-              \@( \@(<map { "$tmpDir/$_" }, qw(abc1.tmp abc1.tmpX)),
-                  \@(<map { "$tmpDir/$_" }, qw(abc2.tmp abc2.tmpX)),
-                  \@(<map { "$tmpDir/$_" }, qw(abc3.tmp abc3.tmpX)),
-              ), "  got mapping";
+        \@( \@(<map { "$tmpDir/$_" }, qw(abc1.tmp abc1.tmpX)),
+          \@(<map { "$tmpDir/$_" }, qw(abc2.tmp abc2.tmpX)),
+          \@(<map { "$tmpDir/$_" }, qw(abc3.tmp abc3.tmpX)),
+        ), "  got mapping";
 
     my $hash = $gm->getHash() ;
     is_deeply $hash,
-              \%( < map { "$tmpDir/$_" }, qw(abc1.tmp abc1.tmpX
+        \%( < map { "$tmpDir/$_" }, qw(abc1.tmp abc1.tmpX
                                   abc2.tmp abc2.tmpX
                                   abc3.tmp abc3.tmpX),
-              ), "  got mapping";
+        ), "  got mapping";
 };
 
 do {
@@ -104,13 +104,13 @@ do {
 
     my $map = $gm->getFileMap() ;
     is_deeply $map,
-              \@( \@(< map { "$tmpDir/$_.tmp" }, qw(abc2 abc2)),
-              ), "  got mapping";
+        \@( \@(< map { "$tmpDir/$_.tmp" }, qw(abc2 abc2)),
+        ), "  got mapping";
 
     my $hash = $gm->getHash() ;
     is_deeply $hash,
-              \%( < map { "$tmpDir/$_.tmp" }, qw(abc2 abc2),
-              ), "  got mapping";
+        \%( < map { "$tmpDir/$_.tmp" }, qw(abc2 abc2),
+        ), "  got mapping";
 };
 
 do {
@@ -128,9 +128,9 @@ do {
 
     my $map = $gm->getFileMap() ;
     is_deeply $map,
-              \@( \@(< map { "$tmpDir/$_" }, qw(abc1.tmp abc1.tmp.X)),
-                  \@(< map { "$tmpDir/$_" }, qw(abc3.tmp abc3.tmp.X)),
-              ), "  got mapping";
+        \@( \@(< map { "$tmpDir/$_" }, qw(abc1.tmp abc1.tmp.X)),
+          \@(< map { "$tmpDir/$_" }, qw(abc3.tmp abc3.tmp.X)),
+        ), "  got mapping";
 
     $gm = File::GlobMapper->new("$tmpDir/abc\{1,3\}.tmp", "$tmpDir/X.#1.X")
         or diag $File::GlobMapper::Error ;
@@ -139,9 +139,9 @@ do {
 
     $map = $gm->getFileMap() ;
     is_deeply $map,
-              \@( \@(<map { "$tmpDir/$_" }, qw(abc1.tmp X.1.X)),
-                  \@(< map { "$tmpDir/$_" }, qw(abc3.tmp X.3.X)),
-              ), "  got mapping";
+        \@( \@(<map { "$tmpDir/$_" }, qw(abc1.tmp X.1.X)),
+          \@(< map { "$tmpDir/$_" }, qw(abc3.tmp X.3.X)),
+        ), "  got mapping";
 
 };
 
@@ -161,10 +161,10 @@ do {
 
     my $map = $gm->getFileMap() ;
     is_deeply $map,
-              \@( \@(<map { "$tmpDir/$_" }, qw(abc1.tmp X-c1-a-X)),
-                  \@(<map { "$tmpDir/$_" }, qw(abc2.tmp X-c2-a-X)),
-                  \@(<map { "$tmpDir/$_" }, qw(abc3.tmp X-c3-a-X)),
-              ), "  got mapping";
+        \@( \@(<map { "$tmpDir/$_" }, qw(abc1.tmp X-c1-a-X)),
+          \@(<map { "$tmpDir/$_" }, qw(abc2.tmp X-c2-a-X)),
+          \@(<map { "$tmpDir/$_" }, qw(abc3.tmp X-c3-a-X)),
+        ), "  got mapping";
 };
 
 do {
@@ -181,10 +181,10 @@ do {
 
     my $map = $gm->getFileMap() ;
     is_deeply $map,
-              \@( \@(<map { "$tmpDir/$_" }, qw(abc1.tmp X-c1-a-X)),
-                  \@(<map { "$tmpDir/$_" }, qw(abc2.tmp X-c2-a-X)),
-                  \@(<map { "$tmpDir/$_" }, qw(abc3.tmp X-c3-a-X)),
-              ), "  got mapping";
+        \@( \@(<map { "$tmpDir/$_" }, qw(abc1.tmp X-c1-a-X)),
+          \@(<map { "$tmpDir/$_" }, qw(abc2.tmp X-c2-a-X)),
+          \@(<map { "$tmpDir/$_" }, qw(abc3.tmp X-c3-a-X)),
+        ), "  got mapping";
 };
 
 do {
@@ -202,10 +202,10 @@ do {
     #diag "Input pattern is $gm->{InputPattern}";
     my $map = $gm->getFileMap() ;
     is_deeply $map,
-              \@( \@(<map { "./$tmpDir/$_" }, qw(abc1.tmp X-1-c-a-X)),
-                  \@(<map { "./$tmpDir/$_" }, qw(abc2.tmp X-2-c-a-X)),
-                  \@(<map { "./$tmpDir/$_" }, qw(abc3.tmp X-3-c-a-X)),
-              ), "  got mapping";
+        \@( \@(<map { "./$tmpDir/$_" }, qw(abc1.tmp X-1-c-a-X)),
+          \@(<map { "./$tmpDir/$_" }, qw(abc2.tmp X-2-c-a-X)),
+          \@(<map { "./$tmpDir/$_" }, qw(abc3.tmp X-3-c-a-X)),
+        ), "  got mapping";
 };
 
 do {
@@ -222,11 +222,11 @@ do {
 
     my $map = $gm->getFileMap() ;
     is_deeply $map,
-              \@( \@(<map { "$tmpDir/$_" }, qw(abc.tmp abc.tmp.X)), ), "  got mapping";
+        \@( \@(<map { "$tmpDir/$_" }, qw(abc.tmp abc.tmp.X)), ), "  got mapping";
 
     my $hash = $gm->getHash() ;
     is_deeply $hash,
-              \%( <map { "$tmpDir/$_" }, qw(abc.tmp abc.tmp.X) ), "  got mapping";
+        \%( <map { "$tmpDir/$_" }, qw(abc.tmp abc.tmp.X) ), "  got mapping";
 
 };
 
@@ -244,10 +244,10 @@ do {
 
     is $File::GlobMapper::Error, 'multiple input files map to one output file', "  Error is expected" ;
 
-#my $map = $gm->getFileMap() ;
-#is @{ $map }, 1, "  returned 1 maps";
-#is_deeply $map,
-#\@( \@(<map { "$tmpDir/$_" } qw(abc1 abc.X)), ), "  got mapping";
+    #my $map = $gm->getFileMap() ;
+    #is @{ $map }, 1, "  returned 1 maps";
+    #is_deeply $map,
+    #\@( \@(<map { "$tmpDir/$_" } qw(abc1 abc.X)), ), "  got mapping";
 };
 
 do {
@@ -264,10 +264,10 @@ do {
         or diag $File::GlobMapper::Error ;
 
     is_deeply $map,
-              \@( \@(<map { "$tmpDir/$_" }, qw(abc1.tmp X-c1-a-X)),
-                  \@(<map { "$tmpDir/$_" }, qw(abc2.tmp X-c2-a-X)),
-                  \@(<map { "$tmpDir/$_" }, qw(abc3.tmp X-c3-a-X)),
-              ), "  got mapping";
+        \@( \@(<map { "$tmpDir/$_" }, qw(abc1.tmp X-c1-a-X)),
+          \@(<map { "$tmpDir/$_" }, qw(abc2.tmp X-c2-a-X)),
+          \@(<map { "$tmpDir/$_" }, qw(abc3.tmp X-c3-a-X)),
+        ), "  got mapping";
 };
 
 # TODO

@@ -38,7 +38,7 @@ my $mpl_out = run(qq{$perl Makefile.PL "INSTALL_BASE=../dummy-install"});
 END { rmtree '../dummy-install'; }
 
 cmp_ok( $^CHILD_ERROR, '==', 0, 'Makefile.PL exited with zero' ) ||
-    diag($mpl_out);
+  diag($mpl_out);
 
 my $makefile = makefile_name();
 like( $mpl_out, qr/^Writing $makefile for Big::Dummy/m, 
@@ -54,12 +54,12 @@ like( $install_out, qr/^Writing /m );
 ok( -r '../dummy-install',      '  install dir created' );
 
 my @installed_files = 
-    @('../dummy-install/lib/perl5/Big/Dummy.pm',
-      '../dummy-install/lib/perl5/Big/Liar.pm',
-      '../dummy-install/bin/program',
-      "../dummy-install/lib/perl5/$(config_value('archname'))/perllocal.pod",
-      "../dummy-install/lib/perl5/$(config_value('archname'))/auto/Big/Dummy/.packlist"
-    );
+  @('../dummy-install/lib/perl5/Big/Dummy.pm',
+   '../dummy-install/lib/perl5/Big/Liar.pm',
+   '../dummy-install/bin/program',
+   "../dummy-install/lib/perl5/$(config_value('archname'))/perllocal.pod",
+   "../dummy-install/lib/perl5/$(config_value('archname'))/auto/Big/Dummy/.packlist"
+  );
 
 foreach my $file ( @installed_files) {
     ok( -e $file, "  $file installed" );

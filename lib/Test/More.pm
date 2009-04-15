@@ -27,55 +27,55 @@ Test::More - yet another framework for writing test scripts
 
 =head1 SYNOPSIS
 
-use Test::More tests => 23;
-# or
-use Test::More qw(no_plan);
-# or
-use Test::More skip_all => $reason;
+  use Test::More tests => 23;
+  # or
+  use Test::More qw(no_plan);
+  # or
+  use Test::More skip_all => $reason;
 
-BEGIN { use_ok( 'Some::Module' ); }
-require_ok( 'Some::Module' );
+  BEGIN { use_ok( 'Some::Module' ); }
+  require_ok( 'Some::Module' );
 
-# Various ways to say "ok"
-ok($got eq $expected, $test_name);
+  # Various ways to say "ok"
+  ok($got eq $expected, $test_name);
 
-is  ($got, $expected, $test_name);
-isnt($got, $expected, $test_name);
+  is  ($got, $expected, $test_name);
+  isnt($got, $expected, $test_name);
 
-# Rather than print STDERR "# here's what went wrong\n"
-diag("here's what went wrong");
+  # Rather than print STDERR "# here's what went wrong\n"
+  diag("here's what went wrong");
 
-like  ($got, qr/expected/, $test_name);
-unlike($got, qr/expected/, $test_name);
+  like  ($got, qr/expected/, $test_name);
+  unlike($got, qr/expected/, $test_name);
 
-cmp_ok($got, '==', $expected, $test_name);
+  cmp_ok($got, '==', $expected, $test_name);
 
-is_deeply($got_complex_structure, $expected_complex_structure, $test_name);
+  is_deeply($got_complex_structure, $expected_complex_structure, $test_name);
 
-SKIP: {
-skip $why, $how_many unless $have_some_feature;
+  SKIP: {
+      skip $why, $how_many unless $have_some_feature;
 
-ok( foo(),       $test_name );
-is( foo(42), 23, $test_name );
-};
+      ok( foo(),       $test_name );
+      is( foo(42), 23, $test_name );
+  };
 
-TODO: {
-local $TODO = $why;
+  TODO: {
+      local $TODO = $why;
 
-ok( foo(),       $test_name );
-is( foo(42), 23, $test_name );
-};
+      ok( foo(),       $test_name );
+      is( foo(42), 23, $test_name );
+  };
 
-can_ok($module, @methods);
-isa_ok($object, $class);
+  can_ok($module, @methods);
+  isa_ok($object, $class);
 
-pass($test_name);
-fail($test_name);
+  pass($test_name);
+  fail($test_name);
 
-BAIL_OUT($why);
+  BAIL_OUT($why);
 
-# UNIMPLEMENTED!!!
-my @status = Test::More::status;
+  # UNIMPLEMENTED!!!
+  my @status = Test::More::status;
 
 
 =head1 DESCRIPTION
@@ -99,20 +99,20 @@ failure.
 
 The preferred way to do this is to declare a plan when you C<use Test::More>.
 
-use Test::More tests => 23;
+  use Test::More tests => 23;
 
 There are rare cases when you will not know beforehand how many tests
 your script is going to run.  In this case, you can declare that you
 have no plan.  (Try to avoid using this as it weakens your test.)
 
-use Test::More qw(no_plan);
+  use Test::More qw(no_plan);
 
 B<NOTE>: using no_plan requires a Test::Harness upgrade else it will
 think everything has failed.  See L<CAVEATS and NOTES>).
 
 In some cases, you'll want to completely skip an entire testing script.
 
-use Test::More skip_all => $skip_reason;
+  use Test::More skip_all => $skip_reason;
 
 Your script will declare a skip with the reason why you skipped and
 exit immediately with a zero (success).  See L<Test::Harness> for
@@ -122,23 +122,23 @@ If you want to control what functions Test::More will export, you
 have to use the 'import' option.  For example, to import everything
 but 'fail', you'd do:
 
-use Test::More tests => 23, import => ['!fail'];
+  use Test::More tests => 23, import => ['!fail'];
 
 Alternatively, you can use the plan() function.  Useful for when you
 have to calculate the number of tests.
 
-use Test::More;
-plan tests => keys %Stuff * 3;
+  use Test::More;
+  plan tests => keys %Stuff * 3;
 
 or for deciding between running the tests at all:
 
-use Test::More;
-if( $^O eq 'MacOS' ) {
-plan skip_all => 'Test irrelevant on MacOS';
-}
-else {
-plan tests => 42;
-}
+  use Test::More;
+  if( $^O eq 'MacOS' ) {
+      plan skip_all => 'Test irrelevant on MacOS';
+  }
+  else {
+      plan tests => 42;
+  }
 
 =cut
 
@@ -155,15 +155,15 @@ By convention, each test is assigned a number in order.  This is
 largely done automatically for you.  However, it's often very useful to
 assign a name to each test.  Which would you rather see:
 
-ok 4
-not ok 5
-ok 6
+  ok 4
+  not ok 5
+  ok 6
 
 or
 
-ok 4 - basic multi-variable
-not ok 5 - simple exponential
-ok 6 - force == mass * acceleration
+  ok 4 - basic multi-variable
+  not ok 5 - simple exponential
+  ok 6 - force == mass * acceleration
 
 The later gives you some idea of what failed.  It also makes it easier
 to find the test in your script, simply search for "simple
@@ -187,7 +187,7 @@ respectively.
 
 =item B<ok>
 
-ok($got eq $expected, $test_name);
+  ok($got eq $expected, $test_name);
 
 This simply evaluates any expression (C<$got eq $expected> is just a
 simple example) and uses that to determine if the test succeeded or
@@ -195,10 +195,10 @@ failed.  A true expression passes, a false one fails.  Very simple.
 
 For example:
 
-ok( $exp{9} == 81,                   'simple exponential' );
-ok( Film->can('db_Main'),            'set_db()' );
-ok( $p->tests == 4,                  'saw tests' );
-ok( !grep !defined $_, @items,       'items populated' );
+    ok( $exp{9} == 81,                   'simple exponential' );
+    ok( Film->can('db_Main'),            'set_db()' );
+    ok( $p->tests == 4,                  'saw tests' );
+    ok( !grep !defined $_, @items,       'items populated' );
 
 (Mnemonic:  "This is ok.")
 
@@ -209,9 +209,9 @@ but we B<very> strongly encourage its use.
 
 Should an ok() fail, it will produce some diagnostics:
 
-not ok 18 - sufficient mucus
-#   Failed test 'sufficient mucus'
-#   in foo.t at line 42.
+    not ok 18 - sufficient mucus
+    #   Failed test 'sufficient mucus'
+    #   in foo.t at line 42.
 
 This is the same as Test::Simple's ok() routine.
 
@@ -227,23 +227,23 @@ sub ok($test, ?$name) {
 
 =item B<isnt>
 
-is  ( $got, $expected, $test_name );
-isnt( $got, $expected, $test_name );
+  is  ( $got, $expected, $test_name );
+  isnt( $got, $expected, $test_name );
 
 Similar to ok(), is() and isnt() compare their two arguments
 with C<eq> and C<ne> respectively and use the result of that to
 determine if the test succeeded or failed.  So these:
 
-# Is the ultimate answer 42?
-is( ultimate_answer(), 42,          "Meaning of Life" );
+    # Is the ultimate answer 42?
+    is( ultimate_answer(), 42,          "Meaning of Life" );
 
-# $foo isn't empty
-isnt( $foo, '',     "Got some foo" );
+    # $foo isn't empty
+    isnt( $foo, '',     "Got some foo" );
 
 are similar to these:
 
-ok( ultimate_answer() eq 42,        "Meaning of Life" );
-ok( $foo ne '',     "Got some foo" );
+    ok( ultimate_answer() eq 42,        "Meaning of Life" );
+    ok( $foo ne '',     "Got some foo" );
 
 (Mnemonic:  "This is that."  "This isn't that.")
 
@@ -252,16 +252,16 @@ cannot know what you are testing for (beyond the name), but is() and
 isnt() know what the test was and why it failed.  For example this
 test:
 
-my $foo = 'waffle';  my $bar = 'yarblokos';
-is( $foo, $bar,   'Is foo the same as bar?' );
+    my $foo = 'waffle';  my $bar = 'yarblokos';
+    is( $foo, $bar,   'Is foo the same as bar?' );
 
 Will produce something like this:
 
-not ok 17 - Is foo the same as bar?
-#   Failed test 'Is foo the same as bar?'
-#   in foo.t at line 139.
-#          got: 'waffle'
-#     expected: 'yarblokos'
+    not ok 17 - Is foo the same as bar?
+    #   Failed test 'Is foo the same as bar?'
+    #   in foo.t at line 139.
+    #          got: 'waffle'
+    #     expected: 'yarblokos'
 
 So you can figure out what went wrong without rerunning the test.
 
@@ -269,14 +269,14 @@ You are encouraged to use is() and isnt() over ok() where possible,
 however do not be tempted to use them to find out if something is
 true or false!
 
-# XXX BAD!
-is( exists $brooklyn{tree}, 1, 'A tree grows in Brooklyn' );
+  # XXX BAD!
+  is( exists $brooklyn{tree}, 1, 'A tree grows in Brooklyn' );
 
 This does not check if C<exists $brooklyn{tree}> is true, it checks if
 it returns 1.  Very different.  Similar caveats exist for false and 0.
 In these cases, use ok().
 
-ok( exists $brooklyn{tree},    'A tree grows in Brooklyn' );
+  ok( exists $brooklyn{tree},    'A tree grows in Brooklyn' );
 
 For those grammatical pedants out there, there's an C<isn't()>
 function which is an alias of isnt().
@@ -298,17 +298,17 @@ sub isnt($lhs, $rhs, ?$msg) {
 
 =item B<like>
 
-like( $got, qr/expected/, $test_name );
+  like( $got, qr/expected/, $test_name );
 
 Similar to ok(), like() matches $got against the regex C<qr/expected/>.
 
 So this:
 
-like($got, qr/expected/, 'this is like that');
+    like($got, qr/expected/, 'this is like that');
 
 is similar to:
 
-ok( $got =~ /expected/, 'this is like that');
+    ok( $got =~ /expected/, 'this is like that');
 
 (Mnemonic "This is like that".)
 
@@ -317,7 +317,7 @@ regex reference (i.e. C<qr//>) or (for better compatibility with older
 perls) as a string that looks like a regex (alternative delimiters are
 currently not supported):
 
-like( $got, '/expected/', 'this is like that' );
+    like( $got, '/expected/', 'this is like that' );
 
 Regex options may be placed on the end (C<'/expected/i'>).
 
@@ -335,7 +335,7 @@ sub like($got, $expected, ?$name) {
 
 =item B<unlike>
 
-unlike( $got, qr/expected/, $test_name );
+  unlike( $got, qr/expected/, $test_name );
 
 Works exactly as like(), only it checks if $got B<does not> match the
 given pattern.
@@ -351,34 +351,34 @@ sub unlike($got, $expected, ?$name) {
 
 =item B<cmp_ok>
 
-cmp_ok( $got, $op, $expected, $test_name );
+  cmp_ok( $got, $op, $expected, $test_name );
 
 Halfway between ok() and is() lies cmp_ok().  This allows you to
 compare two arguments using any binary perl operator.
 
-# ok( $got eq $expected );
-cmp_ok( $got, 'eq', $expected, 'this eq that' );
+    # ok( $got eq $expected );
+    cmp_ok( $got, 'eq', $expected, 'this eq that' );
 
-# ok( $got == $expected );
-cmp_ok( $got, '==', $expected, 'this == that' );
+    # ok( $got == $expected );
+    cmp_ok( $got, '==', $expected, 'this == that' );
 
-# ok( $got && $expected );
-cmp_ok( $got, '&&', $expected, 'this && that' );
-...etc...
+    # ok( $got && $expected );
+    cmp_ok( $got, '&&', $expected, 'this && that' );
+    ...etc...
 
 Its advantage over ok() is when the test fails you'll know what $got
 and $expected were:
 
-not ok 1
-#   Failed test in foo.t at line 12.
-#     '23'
-#         &&
-#     undef
+    not ok 1
+    #   Failed test in foo.t at line 12.
+    #     '23'
+    #         &&
+    #     undef
 
 It's also useful in those cases where you are comparing numbers and
 is()'s use of C<eq> will interfere:
 
-cmp_ok( $big_hairy_number, '==', $another_big_hairy_number );
+    cmp_ok( $big_hairy_number, '==', $another_big_hairy_number );
 
 =cut
 
@@ -391,20 +391,20 @@ sub cmp_ok {
 
 =item B<can_ok>
 
-can_ok($module, @methods);
-can_ok($object, @methods);
+  can_ok($module, @methods);
+  can_ok($object, @methods);
 
 Checks to make sure the $module or $object can do these @methods
 (works with functions, too).
 
-can_ok('Foo', qw(this that whatever));
+    can_ok('Foo', qw(this that whatever));
 
 is almost exactly like saying:
 
-ok( Foo->can('this') && 
-Foo->can('that') && 
-Foo->can('whatever') 
-);
+    ok( Foo->can('this') && 
+        Foo->can('that') && 
+        Foo->can('whatever') 
+      );
 
 only without all the typing and with a better interface.  Handy for
 quickly testing an interface.
@@ -412,9 +412,9 @@ quickly testing an interface.
 No matter how many @methods you check, a single can_ok() call counts
 as one test.  If you desire otherwise, use:
 
-foreach my $meth (@methods) {
-can_ok('Foo', $meth);
-}
+    foreach my $meth (@methods) {
+        can_ok('Foo', $meth);
+    }
 
 =cut
 
@@ -441,7 +441,7 @@ sub can_ok($proto, @< @methods) {
 
     my $name;
     $name = (nelems @methods) == 1 ?? "$class->can('@methods[0]')" 
-        !! "$class->can(...)";
+                          !! "$class->can(...)";
 
     my $ok = $tb->ok( !nelems @nok, $name );
 
@@ -452,26 +452,26 @@ sub can_ok($proto, @< @methods) {
 
 =item B<isa_ok>
 
-isa_ok($object, $class, $object_name);
-isa_ok($ref,    $type,  $ref_name);
+  isa_ok($object, $class, $object_name);
+  isa_ok($ref,    $type,  $ref_name);
 
 Checks to see if the given C<< $object->isa($class) >>.  Also checks to make
 sure the object was defined in the first place.  Handy for this sort
 of thing:
 
-my $obj = Some::Module->new;
-isa_ok( $obj, 'Some::Module' );
+    my $obj = Some::Module->new;
+    isa_ok( $obj, 'Some::Module' );
 
 where you'd otherwise have to write
 
-my $obj = Some::Module->new;
-ok( defined $obj && $obj->isa('Some::Module') );
+    my $obj = Some::Module->new;
+    ok( defined $obj && $obj->isa('Some::Module') );
 
 to safeguard against your test script blowing up.
 
 It works on references, too:
 
-isa_ok( $array_ref, 'ARRAY' );
+    isa_ok( $array_ref, 'ARRAY' );
 
 The diagnostics of this test normally just refer to 'the object'.  If
 you'd like them to be more specific, you can supply an $object_name
@@ -515,8 +515,8 @@ WHOA
             $diag = "$obj_name isn't a '$class' it's a '$ref'";
         }
     }
-
-
+            
+      
 
     my $ok;
     if( $diag ) {
@@ -535,8 +535,8 @@ WHOA
 
 =item B<fail>
 
-pass($test_name);
-fail($test_name);
+  pass($test_name);
+  fail($test_name);
 
 Sometimes you just want to say that the tests have passed.  Usually
 the case is you've got some complicated condition that is difficult to
@@ -571,8 +571,8 @@ C<use_ok> and C<require_ok>.
 
 =item B<use_ok>
 
-BEGIN { use_ok($module); }
-BEGIN { use_ok($module, @imports); }
+   BEGIN { use_ok($module); }
+   BEGIN { use_ok($module, @imports); }
 
 These simply use the given $module and test to make sure the load
 happened ok.  It's recommended that you run use_ok() inside a BEGIN
@@ -581,30 +581,30 @@ properly honored.
 
 If @imports are given, they are passed through to the use.  So this:
 
-BEGIN { use_ok('Some::Module', qw(foo bar)) }
+   BEGIN { use_ok('Some::Module', qw(foo bar)) }
 
 is like doing this:
 
-use Some::Module qw(foo bar);
+   use Some::Module qw(foo bar);
 
 Version numbers can be checked like so:
 
-# Just like "use Some::Module 1.02"
-BEGIN { use_ok('Some::Module', 1.02) }
+   # Just like "use Some::Module 1.02"
+   BEGIN { use_ok('Some::Module', 1.02) }
 
 Don't try to do this:
 
-BEGIN {
-use_ok('Some::Module');
+   BEGIN {
+       use_ok('Some::Module');
 
-...some code that depends on the use...
-...happening at compile time...
-}
+       ...some code that depends on the use...
+       ...happening at compile time...
+   }
 
 because the notion of "compile-time" is relative.  Instead, you want:
 
-BEGIN { use_ok('Some::Module') }
-BEGIN { ...some code that depends on the use... }
+  BEGIN { use_ok('Some::Module') }
+  BEGIN { ...some code that depends on the use... }
 
 
 =cut
@@ -635,7 +635,7 @@ USE
 
     my@($eval_result, $eval_error) =  _eval($code, \@imports);
     my $ok = $tb->ok( $eval_result, "use $module;" );
-
+    
     unless( $ok ) {
         $tb->diag(<<DIAGNOSTIC);
     Tried to use '$module'.
@@ -652,9 +652,9 @@ sub _eval {
     my@($code) =@( shift);
     my @args = @_;
 
-                      # Work around oddities surrounding resetting of $@ by immediately
-                      # storing it.
-                      local($^EVAL_ERROR,$^OS_ERROR);   # isolate eval
+    # Work around oddities surrounding resetting of $@ by immediately
+    # storing it.
+    local($^EVAL_ERROR,$^OS_ERROR);   # isolate eval
     my $eval_result = eval $code;
     my $eval_error  = $^EVAL_ERROR;
 
@@ -679,8 +679,8 @@ sub dies_like($coderef, $like, ?$name) {
 
 =item B<require_ok>
 
-require_ok($module);
-require_ok($file);
+   require_ok($module);
+   require_ok($file);
 
 Like use_ok(), except it requires the $module or $file.
 
@@ -741,7 +741,7 @@ B<NOTE> I'm not quite sure what will happen with filehandles.
 
 =item B<is_deeply>
 
-is_deeply( $got, $expected, $test_name );
+  is_deeply( $got, $expected, $test_name );
 
 Similar to is(), except that if $got and $expected are references, it
 does a deep comparison walking each data structure to see if they are
@@ -782,7 +782,7 @@ WARNING
 
         warn sprintf $msg, scalar nelems @_;
 
-        return $tb->ok(0);
+	return $tb->ok(0);
     }
 
     my @($got, $expected, ?$name) =  @_;
@@ -881,7 +881,7 @@ messages which are safer than just C<print STDERR>.
 
 =item B<diag>
 
-diag(@diagnostic_message);
+  diag(@diagnostic_message);
 
 Prints a diagnostic message which is guaranteed not to interfere with
 test output.  Like C<print> @diagnostic_message is simply concatenated
@@ -889,15 +889,15 @@ together.
 
 Handy for this sort of thing:
 
-ok( grep(/foo/, @users), "There's a foo user" ) or
-diag("Since there's no foo, check that /etc/bar is set up right");
+    ok( grep(/foo/, @users), "There's a foo user" ) or
+        diag("Since there's no foo, check that /etc/bar is set up right");
 
 which would produce:
 
-not ok 42 - There's a foo user
-#   Failed test 'There's a foo user'
-#   in foo.t at line 52.
-# Since there's no foo, check that /etc/bar is set up right.
+    not ok 42 - There's a foo user
+    #   Failed test 'There's a foo user'
+    #   in foo.t at line 52.
+    # Since there's no foo, check that /etc/bar is set up right.
 
 You might remember C<ok() or diag()> with the mnemonic C<open() or
 die()>.
@@ -916,7 +916,7 @@ sub diag {
 
 =item B<diag>
 
-diag(@informational_message);
+  diag(@informational_message);
 
 Prints an informational message which is guaranteed not to interfere with
 test output.  Like C<print> @informational_message is simply concatenated
@@ -953,27 +953,27 @@ just show you...
 
 =item B<SKIP: BLOCK>
 
-SKIP: {
-skip $why, $how_many if $condition;
+  SKIP: {
+      skip $why, $how_many if $condition;
 
-...normal testing code goes here...
-}
+      ...normal testing code goes here...
+  }
 
 This declares a block of tests that might be skipped, $how_many tests
 there are, $why and under what $condition to skip them.  An example is
 the easiest way to illustrate:
 
-SKIP: {
-try { require HTML::Lint };
+    SKIP: {
+        try { require HTML::Lint };
 
-skip "HTML::Lint not installed", 2 if $@;
+        skip "HTML::Lint not installed", 2 if $@;
 
-my $lint = new HTML::Lint;
-isa_ok( $lint, "HTML::Lint" );
+        my $lint = new HTML::Lint;
+        isa_ok( $lint, "HTML::Lint" );
 
-$lint->parse( $html );
-is( $lint->errors, 0, "No errors found in HTML" );
-}
+        $lint->parse( $html );
+        is( $lint->errors, 0, "No errors found in HTML" );
+    }
 
 If the user does not have HTML::Lint installed, the whole block of
 code I<won't be run at all>.  Test::More will output special ok's
@@ -999,7 +999,7 @@ sub skip($why, ?$how_many) {
     unless( defined $how_many ) {
         # $how_many can only be avoided when no_plan is in use.
         warn "skip() needs to know \$how_many tests are in the block"
-            unless $tb->has_plan eq 'no_plan';
+          unless $tb->has_plan eq 'no_plan';
         $how_many = 1;
     }
 
@@ -1019,25 +1019,25 @@ sub skip($why, ?$how_many) {
 
 =item B<TODO: BLOCK>
 
-TODO: {
-local $TODO = $why if $condition;
+    TODO: {
+        local $TODO = $why if $condition;
 
-...normal testing code goes here...
-}
+        ...normal testing code goes here...
+    }
 
 Declares a block of tests you expect to fail and $why.  Perhaps it's
 because you haven't fixed a bug or haven't finished a new feature:
 
-TODO: {
-local $TODO = "URI::Geller not finished";
+    TODO: {
+        local $TODO = "URI::Geller not finished";
 
-my $card = "Eight of clubs";
-is( URI::Geller->your_card, $card, 'Is THIS your card?' );
+        my $card = "Eight of clubs";
+        is( URI::Geller->your_card, $card, 'Is THIS your card?' );
 
-my $spoon;
-URI::Geller->bend_spoon;
-is( $spoon, 'bent',    "Spoon bending, that's original" );
-}
+        my $spoon;
+        URI::Geller->bend_spoon;
+        is( $spoon, 'bent',    "Spoon bending, that's original" );
+    }
 
 With a todo block, the tests inside are expected to fail.  Test::More
 will run the tests normally, but print out special flags indicating
@@ -1060,11 +1060,11 @@ treat it as a normal failure.  See L<CAVEATS and NOTES>).
 
 =item B<todo_skip>
 
-TODO: {
-todo_skip $why, $how_many if $condition;
+    TODO: {
+        todo_skip $why, $how_many if $condition;
 
-...normal testing code...
-}
+        ...normal testing code...
+    }
 
 With todo tests, it's best to have the tests actually run.  That way
 you'll know when they start passing.  Sometimes this isn't possible.
@@ -1084,7 +1084,7 @@ sub todo_skip($why, ?$how_many) {
     unless( defined $how_many ) {
         # $how_many can only be avoided when no_plan is in use.
         warn "todo_skip() needs to know \$how_many tests are in the block"
-            unless $tb->has_plan eq 'no_plan';
+          unless $tb->has_plan eq 'no_plan';
         $how_many = 1;
     }
 
@@ -1117,7 +1117,7 @@ but want to put tests in your testing script (always a good idea).
 
 =item B<BAIL_OUT>
 
-BAIL_OUT($reason);
+    BAIL_OUT($reason);
 
 Indicates to the harness that things are going so badly all testing
 should terminate.  This includes the running any additional test scripts.
@@ -1150,11 +1150,11 @@ arbitrary data structures.
 
 These functions are usually used inside an ok().
 
-ok( eq_array(\@got, \@expected) );
+    ok( eq_array(\@got, \@expected) );
 
 C<is_deeply()> can do that better and with diagnostics.  
 
-is_deeply( \@got, \@expected );
+    is_deeply( \@got, \@expected );
 
 They may be deprecated in future versions.
 
@@ -1162,7 +1162,7 @@ They may be deprecated in future versions.
 
 =item B<eq_array>
 
-my $is_eq = eq_array(\@got, \@expected);
+  my $is_eq = eq_array(\@got, \@expected);
 
 Checks if two arrays are equivalent.  This is a deep check, so
 multi-level structures are handled correctly.
@@ -1279,7 +1279,7 @@ WHOA
 
 =item B<eq_hash>
 
-my $is_eq = eq_hash(\%got, \%expected);
+  my $is_eq = eq_hash(\%got, \%expected);
 
 Determines if the two hashes contain the same keys and values.  This
 is a deep check.
@@ -1318,17 +1318,17 @@ sub _eq_hash($a1, $a2) {
 
 =item B<eq_set>
 
-my $is_eq = eq_set(\@got, \@expected);
+  my $is_eq = eq_set(\@got, \@expected);
 
 Similar to eq_array(), except the order of the elements is B<not>
 important.  This is a deep check, but the irrelevancy of order only
 applies to the top level.
 
-ok( eq_set(\@got, \@expected) );
+    ok( eq_set(\@got, \@expected) );
 
 Is better written:
 
-is_deeply( [sort @got], [sort @expected] );
+    is_deeply( [sort @got], [sort @expected] );
 
 B<NOTE> By historical accident, this is not a true set comparison.
 While the order of elements does not matter, duplicate elements do.
@@ -1336,7 +1336,7 @@ While the order of elements does not matter, duplicate elements do.
 B<NOTE> eq_set() does not know how to deal with references at the top
 level.  The following is an example of a comparison which might not work:
 
-eq_set([\1, \2], [\2, \1]);
+    eq_set([\1, \2], [\2, \1]);
 
 Test::Deep contains much better set comparison functions.
 
@@ -1348,7 +1348,7 @@ sub eq_set($a1, $a2, ?$name)  {
     return eq_array(
            \ (sort { $a cmp $b }, map { dump::view($_) }, @$a1 ),
            \ (sort { $a cmp $b }, map { dump::view($_) }, @$a2 ),
-           );
+    );
 }
 
 =back
@@ -1369,7 +1369,7 @@ you can access the underlying Test::Builder object like so:
 
 =item B<builder>
 
-my $test_builder = Test::More->builder;
+    my $test_builder = Test::More->builder;
 
 Returns the Test::Builder object underlying Test::More for you to play
 with.
@@ -1390,9 +1390,9 @@ considered a failure and will exit with 255.
 
 So the exit codes are...
 
-0                   all tests successful
-255                 test died or all passed but wrong # of tests run
-any other number    how many failed (including missing or extras)
+    0                   all tests successful
+    255                 test died or all passed but wrong # of tests run
+    any other number    how many failed (including missing or extras)
 
 If you fail more than 254 tests, it will be reported as 254.
 
@@ -1428,13 +1428,13 @@ complex data structures.
 Test::More will only be aware of threads if "use threads" has been done
 I<before> Test::More is loaded.  This is ok:
 
-use threads;
-use Test::More;
+    use threads;
+    use Test::More;
 
 This may cause problems:
 
-use Test::More
-use threads;
+    use Test::More
+    use threads;
 
 5.8.1 and above are supported.  Anything below that has too many bugs.
 

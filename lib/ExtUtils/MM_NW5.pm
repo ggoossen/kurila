@@ -6,7 +6,7 @@ ExtUtils::MM_NW5 - methods to override UN*X behaviour in ExtUtils::MakeMaker
 
 =head1 SYNOPSIS
 
-use ExtUtils::MM_NW5; # Done internally by ExtUtils::MakeMaker if needed
+ use ExtUtils::MM_NW5; # Done internally by ExtUtils::MakeMaker if needed
 
 =head1 DESCRIPTION
 
@@ -77,7 +77,7 @@ sub init_platform {
     if($self->{?'base_import'}) {
         $self->{+'BASE_IMPORT'} .= ', ' . $self->{?'base_import'};
     }
-
+ 
     $self->{+'NLM_VERSION'} = %Config{?'nlm_version'};
     $self->{+'MPKTOOL'}	= %Config{?'mpktool'};
     $self->{+'TOOLPATH'}	= %Config{?'toolpath'};

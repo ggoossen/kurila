@@ -18,7 +18,7 @@ sub two {
 our $x;
 if ($x eq $x) {
     sub three {
-        print $^STDOUT, "ok 3\n";
+	print $^STDOUT, "ok 3\n";
     }
     three();
 }

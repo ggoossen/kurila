@@ -16,7 +16,7 @@ plan(tests => nelems @prgs);
 for ( @prgs){
     my $switch = "";
     if (s/^\s*(-\w+)//){
-        $switch = $1;
+       $switch = $1;
     }
     my@($prog,$expected) =  split(m/\nEXPECT\n/, $_);
 

@@ -10,7 +10,7 @@ sub foo($a, $b) {
     $c = "ok 3\n";
     $d = "ok 4\n";
     do { my@($a, _, $c) = @("ok 9\n", "not ok 10\n", "ok 10\n");
-        @($x, $y) = @($a, $c); };
+      @($x, $y) = @($a, $c); };
     print $^STDOUT, $a, $b;
     $c . $d;
 }

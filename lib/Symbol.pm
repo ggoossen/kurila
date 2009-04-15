@@ -6,37 +6,37 @@ Symbol - manipulate Perl symbols and their names
 
 =head1 SYNOPSIS
 
-print ${*{Symbol::fetch_glob("$class\::VERSION")}};
-*{Symbol::fetch_glob("foo") = sub { "this is foo" };
+    print ${*{Symbol::fetch_glob("$class\::VERSION")}};
+    *{Symbol::fetch_glob("foo") = sub { "this is foo" };
 
-keys %{Symbol::stash("main")};
+    keys %{Symbol::stash("main")};
 
-use Symbol;
+    use Symbol;
 
-$sym = gensym;
-open($sym, "filename");
-$_ = <$sym>;
-# etc.
+    $sym = gensym;
+    open($sym, "filename");
+    $_ = <$sym>;
+    # etc.
 
-ungensym $sym;      # no effect
+    ungensym $sym;      # no effect
 
-# replace *FOO{IO} handle but not $FOO, %FOO, etc.
-*FOO = geniosym;
+    # replace *FOO{IO} handle but not $FOO, %FOO, etc.
+    *FOO = geniosym;
 
-print qualify("x"), "\n";              # "Test::x"
-print qualify("x", "FOO"), "\n"        # "FOO::x"
-print qualify("BAR::x"), "\n";         # "BAR::x"
-print qualify("BAR::x", "FOO"), "\n";  # "BAR::x"
-print qualify("STDOUT", "FOO"), "\n";  # "main::STDOUT" (global)
-print qualify(\*x), "\n";              # returns \*x
-print qualify(\*x, "FOO"), "\n";       # returns \*x
+    print qualify("x"), "\n";              # "Test::x"
+    print qualify("x", "FOO"), "\n"        # "FOO::x"
+    print qualify("BAR::x"), "\n";         # "BAR::x"
+    print qualify("BAR::x", "FOO"), "\n";  # "BAR::x"
+    print qualify("STDOUT", "FOO"), "\n";  # "main::STDOUT" (global)
+    print qualify(\*x), "\n";              # returns \*x
+    print qualify(\*x, "FOO"), "\n";       # returns \*x
 
-print { qualify_to_ref $fh } "foo!\n";
-$ref = qualify_to_ref $name, $pkg;
+    print { qualify_to_ref $fh } "foo!\n";
+    $ref = qualify_to_ref $name, $pkg;
 
-use Symbol qw(delete_package);
-delete_package('Foo::Bar');
-print "deleted\n" unless exists $Foo::{'Bar::'};
+    use Symbol qw(delete_package);
+    delete_package('Foo::Bar');
+    print "deleted\n" unless exists $Foo::{'Bar::'};
 
 =head1 DESCRIPTION
 
@@ -121,7 +121,7 @@ sub geniosym () {
     my $sym = gensym();
     # force the IO slot to be filled
     open $sym;
-        *$sym{IO};
+    *$sym{IO};
 }
 
 sub ungensym(_) {}
@@ -129,14 +129,14 @@ sub ungensym(_) {}
 sub qualify($name, ? $pkg) {
     ref \$name eq "GLOB" and Carp::confess("glob..." . ref $name);
     if (!ref($name) && index($name, '::') == -1 && index($name, "'") == -1) {
-        # Global names: special character, "^xyz", or other. 
-        if ($name =~ m/^(([^a-z])|(\^[a-z_]+))\z/i || %global{?$name}) {
-            $pkg = "";
-        }
-        else {
-            $pkg //= caller;
-        }
-        $name = $pkg . "::" . $name;
+	# Global names: special character, "^xyz", or other. 
+	if ($name =~ m/^(([^a-z])|(\^[a-z_]+))\z/i || %global{?$name}) {
+	    $pkg = "";
+	}
+	else {
+	    $pkg //= caller;
+	}
+	$name = $pkg . "::" . $name;
     }
     $name;
 }

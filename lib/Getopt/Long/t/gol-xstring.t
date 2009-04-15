@@ -4,7 +4,7 @@ use Getopt::Long < qw(GetOptionsFromString :config no_ignore_case);
 my $want_version="2.3501";
 die("Getopt::Long version $want_version required--this is only version ".
     $Getopt::Long::VERSION)
-    unless $Getopt::Long::VERSION +>= $want_version;
+  unless $Getopt::Long::VERSION +>= $want_version;
 
 print $^STDOUT, "1..12\n";
 
@@ -28,10 +28,10 @@ $args = "-Foo -baR blech --foo bar";
 undef $opt_baR;
 undef $opt_bar;
 do { my $msg = "";
-    local $^WARN_HOOK = sub { $msg .= @_[0]->{?description} };
-    my $ret = GetOptionsFromString($args, "foo", "Foo=s");
-    print ($^STDOUT, $ret ?? "not " !! "ok 9\n");
-    print ($^STDOUT, $msg =~ m/^GetOptionsFromString: Excess data / ?? "" !! "$msg\nnot ", "ok 10\n");
+  local $^WARN_HOOK = sub { $msg .= @_[0]->{?description} };
+  my $ret = GetOptionsFromString($args, "foo", "Foo=s");
+  print ($^STDOUT, $ret ?? "not " !! "ok 9\n");
+  print ($^STDOUT, $msg =~ m/^GetOptionsFromString: Excess data / ?? "" !! "$msg\nnot ", "ok 10\n");
 };
 print ($^STDOUT, "$(join ' ',@ARGV)" eq "foo bar" ?? "" !! "not ", "ok 11\n");
 

@@ -65,23 +65,23 @@ TODO: do {
 do {
     my $warning;
     local $^WARN_HOOK = sub { $warning = @_[0]->message };
-  TODO: do {
+    TODO: do {
         # perl gets the line number a little wrong on the first
         # statement inside a block.
         1 == 1;
-        #line 73
+#line 73
         todo_skip "Just testing todo_skip";
         fail("So very failed");
     };
     like( $warning, qr/^\Qtodo_skip() needs to know \E\$how_many tests are in the block/ms,
-          'todo_skip without $how_many warning' );
+        'todo_skip without $how_many warning' );
 };
 
 
 TODO: do {
     Test::More->builder->exported_to("Wibble");
-
+    
     local $TODO = "testing \$TODO with an incorrect exported_to()";
-
+    
     fail("Just testing todo");
 };

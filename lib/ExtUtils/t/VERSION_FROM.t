@@ -34,6 +34,6 @@ open $^STDOUT, '>>', \$stdout or die;
 my $mm = WriteMakefile(
     NAME         => 'Version',
     VERSION_FROM => 'Version'
-    );
+);
 
 is( $mm->{VERSION}, 0, 'VERSION_FROM when $VERSION = 0' );

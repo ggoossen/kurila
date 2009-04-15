@@ -10,14 +10,14 @@ my $saveout;
 sub import($class, @< @options) {
     my @($quiet, $veryquiet) = @(0, 0);
     if (@options[0] eq '-q' || @options[0] eq '-qq') {
-        $quiet = 1;
-        open ($saveout, ">&", $^STDOUT);
-        close $^STDOUT;
-        open ($^STDOUT, ">", \$O::BEGIN_output);
-        if (@options[0] eq '-qq') {
-            $veryquiet = 1;
-        }
-        shift @options;
+	$quiet = 1;
+	open ($saveout, ">&", $^STDOUT);
+	close $^STDOUT;
+	open ($^STDOUT, ">", \$O::BEGIN_output);
+	if (@options[0] eq '-qq') {
+	    $veryquiet = 1;
+	}
+	shift @options;
     }
     my $backend = shift (@options);
     eval q[

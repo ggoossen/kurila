@@ -28,27 +28,27 @@ sub harden { @_[0]->fullstop_space_harden(1) }
 print $^STDOUT, "# Test that \".  \" always compacts without the hardening on...\n";
 
 is( Pod::Simple::XMLOutStream->_out("\n=pod\n\nShe set me a message about the M.D.  I\ncalled back!\n"),
-                             qq{<Document><Para>She set me a message about the M.D. I called back!</Para></Document>}
-                             );
+  qq{<Document><Para>She set me a message about the M.D. I called back!</Para></Document>}
+);
 is( Pod::Simple::XMLOutStream->_out("\n=pod\n\nShe set me a message about the M.D. I called back!\n"),
-                             qq{<Document><Para>She set me a message about the M.D. I called back!</Para></Document>}
-                             );
+  qq{<Document><Para>She set me a message about the M.D. I called back!</Para></Document>}
+);
 is( Pod::Simple::XMLOutStream->_out("\n=pod\n\nShe set me a message about the M.D.\nI called back!\n"),
-                             qq{<Document><Para>She set me a message about the M.D. I called back!</Para></Document>}
-                             );
+  qq{<Document><Para>She set me a message about the M.D. I called back!</Para></Document>}
+);
 
 
 print $^STDOUT, "# Now testing with the hardening on...\n";
 
 is( Pod::Simple::XMLOutStream->_out(\&harden, "\n=pod\n\nShe set me a message about the M.D.  I\ncalled back!\n"),
-                             qq{<Document><Para>She set me a message about the M.D.&#160; I called back!</Para></Document>}
-                             );
+  qq{<Document><Para>She set me a message about the M.D.&#160; I called back!</Para></Document>}
+);
 is( Pod::Simple::XMLOutStream->_out(\&harden, "\n=pod\n\nShe set me a message about the M.D. I called back!\n"),
-                             qq{<Document><Para>She set me a message about the M.D. I called back!</Para></Document>}
-                             );
+  qq{<Document><Para>She set me a message about the M.D. I called back!</Para></Document>}
+);
 is( Pod::Simple::XMLOutStream->_out(\&harden, "\n=pod\n\nShe set me a message about the M.D.\nI called back!\n"),
-                             qq{<Document><Para>She set me a message about the M.D. I called back!</Para></Document>}
-                             );
+  qq{<Document><Para>She set me a message about the M.D. I called back!</Para></Document>}
+);
 
 
 print $^STDOUT, "# Byebye\n";

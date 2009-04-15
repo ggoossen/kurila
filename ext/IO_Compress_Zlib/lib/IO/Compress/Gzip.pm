@@ -1,7 +1,7 @@
 
 package IO::Compress::Gzip ;
 
-
+ 
 use warnings;
 use bytes;
 
@@ -96,13 +96,13 @@ sub ckParams
         # Also check that they only contain ISO 8859-1 chars.
         if ($got->parsed('Name') && defined $got->value('Name')) {
             my $name = $got->value('Name');
-
+                
             return $self->saveErrorString(undef, "Null Character found in Name",
-                Z_DATA_ERROR)
+                                                Z_DATA_ERROR)
                 if $strict && $name =~ m/\x00/ ;
 
             return $self->saveErrorString(undef, "Non ISO 8859-1 Character found in Name",
-                Z_DATA_ERROR)
+                                                Z_DATA_ERROR)
                 if $strict && $name =~ m/$GZIP_FNAME_INVALID_CHAR_RE/o ;
         }
 
@@ -110,11 +110,11 @@ sub ckParams
             my $comment = $got->value('Comment');
 
             return $self->saveErrorString(undef, "Null Character found in Comment",
-                Z_DATA_ERROR)
+                                                Z_DATA_ERROR)
                 if $strict && $comment =~ m/\x00/ ;
 
             return $self->saveErrorString(undef, "Non ISO 8859-1 Character found in Comment",
-                Z_DATA_ERROR)
+                                                Z_DATA_ERROR)
                 if $strict && $comment =~ m/$GZIP_FCOMMENT_INVALID_CHAR_RE/o;
         }
 
@@ -123,7 +123,7 @@ sub ckParams
 
             return $self->saveErrorString(undef, "OS_Code must be between 0 and 255, got '$value'")
                 if $value +< 0 || $value +> 255 ;
-
+            
         }
 
         # gzip only supports Deflate at present
@@ -153,13 +153,13 @@ sub mkTrailer
 {
     my $self = shift ;
     return pack("V V", $self->{Compress}->crc32(), 
-        $self->{UnCompSize}->get32bit());
+                       $self->{UnCompSize}->get32bit());
 }
 
 sub getInverseClass
 {
     return  @('IO::Uncompress::Gunzip',
-              \$IO::Uncompress::Gunzip::GunzipError);
+                \$IO::Uncompress::Gunzip::GunzipError);
 }
 
 sub mkHeader
@@ -180,7 +180,7 @@ sub mkHeader
     $flags ^|^= GZIP_FLG_FEXTRA   if $param->wantValue('ExtraField') ;
     $flags ^|^= GZIP_FLG_FNAME    if $param->wantValue('Name') ;
     $flags ^|^= GZIP_FLG_FCOMMENT if $param->wantValue('Comment') ;
-
+    
     # MTIME
     my $time = $param->valueOrDefault('Time', GZIP_MTIME_DEFAULT) ;
 
@@ -192,14 +192,14 @@ sub mkHeader
 
 
     my $out = pack("C4 V C C", 
-        GZIP_ID1,   # ID1
-        GZIP_ID2,   # ID2
-        $method,    # Compression Method
-        $flags,     # Flags
-        $time,      # Modification Time
-        $extra_flags, # Extra Flags
-        $os_code,   # Operating System Code
-        ) ;
+            GZIP_ID1,   # ID1
+            GZIP_ID2,   # ID2
+            $method,    # Compression Method
+            $flags,     # Flags
+            $time,      # Modification Time
+            $extra_flags, # Extra Flags
+            $os_code,   # Operating System Code
+            ) ;
 
     # EXTRA
     if ($flags ^&^ GZIP_FLG_FEXTRA) {
@@ -215,7 +215,7 @@ sub mkHeader
         # Terminate the filename with NULL unless it already is
         $out .= GZIP_NULL_BYTE 
             if !length $name or
-            substr($name, 1, -1) ne GZIP_NULL_BYTE ;
+               substr($name, 1, -1) ne GZIP_NULL_BYTE ;
     }
 
     # COMMENT
@@ -226,7 +226,7 @@ sub mkHeader
         # Terminate the comment with NULL unless it already is
         $out .= GZIP_NULL_BYTE
             if ! length $comment or
-            substr($comment, 1, -1) ne GZIP_NULL_BYTE;
+               substr($comment, 1, -1) ne GZIP_NULL_BYTE;
     }
 
     # HEADER CRC

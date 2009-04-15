@@ -8,17 +8,17 @@ my $test = 1;
 sub is($left, $right, ?$msg) {
 
     if ($left eq $right) {
-        printf $^STDOUT, 'ok %d
+      printf $^STDOUT, 'ok %d
 ', $test++;
-        return 1;
+      return 1;
     }
     foreach (@($left, $right)) {
-    # Comment out these regexps to map non-printables to ord if the perl under
-    # test is so broken that it's not helping
-    #       s/([^-+A-Za-z_0-9])/sprintf q{'.chr(%d).'}, ord $1/ge;
-    #       $_ = sprintf q('%s'), $_;
-    #       s/^''\.//;
-    #       s/\.''$//;
+      # Comment out these regexps to map non-printables to ord if the perl under
+      # test is so broken that it's not helping
+#       s/([^-+A-Za-z_0-9])/sprintf q{'.chr(%d).'}, ord $1/ge;
+#       $_ = sprintf q('%s'), $_;
+#       s/^''\.//;
+#       s/\.''$//;
     }
     printf $^STDOUT, q(not ok %d - got %s expected %s
 ), $test++, $left, $right;
@@ -64,74 +64,74 @@ do {
 };
 
 do {
-    require utf8;
-    is ("\x{0065}", utf8::chr(101));
-    is ("\x{000000000000000000000000000000000000000000000000000000000000000072}",
-        utf8::chr(114));
-    is ("\x{0_06_5}", utf8::chr(101));
-    is ("\x{1234}", utf8::chr(4660));
-    is ("\x{10FFFD}", utf8::chr(1114109));
-
-    use charnames ':full';
-    is ("\N{LATIN SMALL LETTER A}", "a");
-    is ("\N{NEL}", utf8::chr(0x85));
+  require utf8;
+  is ("\x{0065}", utf8::chr(101));
+  is ("\x{000000000000000000000000000000000000000000000000000000000000000072}",
+      utf8::chr(114));
+  is ("\x{0_06_5}", utf8::chr(101));
+  is ("\x{1234}", utf8::chr(4660));
+  is ("\x{10FFFD}", utf8::chr(1114109));
+  
+  use charnames ':full';
+  is ("\N{LATIN SMALL LETTER A}", "a");
+  is ("\N{NEL}", utf8::chr(0x85));
 };
 
 # variable interpolation
 do {
-    our @($a, $b, ?$c, ?$dx) =  qw(foo bar);
+  our @($a, $b, ?$c, ?$dx) =  qw(foo bar);
 
-    is("$a", "foo",    "verifying assign");
-    is("$a$b", "foobar", "basic concatenation");
-    is("$c$a$c", "foo",    "concatenate undef, fore and aft");
+  is("$a", "foo",    "verifying assign");
+  is("$a$b", "foobar", "basic concatenation");
+  is("$c$a$c", "foo",    "concatenate undef, fore and aft");
 
-    # Array and derefence, this doesn't really belong in 'op/concat' but I
-    # couldn't find a better place
+  # Array and derefence, this doesn't really belong in 'op/concat' but I
+  # couldn't find a better place
 
-    my @x = qw|aap noot|;
-    my $dx = \ @x;
+  my @x = qw|aap noot|;
+  my $dx = \ @x;
 
-    is("$(join ' ',@x)", "aap noot");
-    is("$(join ' ',@$dx)", "aap noot");
+  is("$(join ' ',@x)", "aap noot");
+  is("$(join ' ',@$dx)", "aap noot");
 
-    # Okay, so that wasn't very challenging.  Let's go Unicode.
+  # Okay, so that wasn't very challenging.  Let's go Unicode.
 
+  do {
+    use utf8;
+    # bug id 20000819.004 
+
+    $_ = $dx = "\x{10f2}";
+    s/($dx)/$dx$1/;
     do {
-        use utf8;
-        # bug id 20000819.004 
-
-        $_ = $dx = "\x{10f2}";
-        s/($dx)/$dx$1/;
-        do {
-            is($_,  "$dx$dx","bug id 20000819.004, back");
-        };
-
-        $_ = $dx = "\x{10f2}";
-        s/($dx)/$1$dx/;
-        do {
-            is($_,  "$dx$dx","bug id 20000819.004, front");
-        };
-
-        $dx = "\x{10f2}";
-        $_  = "\x{10f2}\x{10f2}";
-        s/($dx)($dx)/$1$2/;
-        do {
-            is($_,  "$dx$dx","bug id 20000819.004, front and back");
-        };
+        is($_,  "$dx$dx","bug id 20000819.004, back");
     };
 
+    $_ = $dx = "\x{10f2}";
+    s/($dx)/$1$dx/;
     do {
-        # bug id 20000901.092
-        # test that undef left and right of utf8 results in a valid string
-
-        use utf8;
-
-        my $a;
-        $a .= "\x{1ff}";
-        is($a,  "\x{1ff}", "bug id 20000901.092, undef left");
-        $a .= undef;
-        is($a,  "\x{1ff}", "bug id 20000901.092, undef right");
+        is($_,  "$dx$dx","bug id 20000819.004, front");
     };
+
+    $dx = "\x{10f2}";
+    $_  = "\x{10f2}\x{10f2}";
+    s/($dx)($dx)/$1$2/;
+    do {
+        is($_,  "$dx$dx","bug id 20000819.004, front and back");
+    };
+  };
+
+  do {
+    # bug id 20000901.092
+    # test that undef left and right of utf8 results in a valid string
+
+    use utf8;
+
+    my $a;
+    $a .= "\x{1ff}";
+    is($a,  "\x{1ff}", "bug id 20000901.092, undef left");
+    $a .= undef;
+    is($a,  "\x{1ff}", "bug id 20000901.092, undef right");
+  };
 
 };
   

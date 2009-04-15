@@ -21,25 +21,25 @@ if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS')) {
     $Config_archname = qq('$(config_value("archname"))');
     $Config_version  = qq('$(config_value("version"))');
     my @Config_inc_version_list =
-        reverse split m/ /, config_value("inc_version_list");
+	reverse split m/ /, config_value("inc_version_list");
     $Config_inc_version_list =
-        (nelems @Config_inc_version_list) ??
-        qq($(join ' ',@Config_inc_version_list)) !! q(());
+	(nelems @Config_inc_version_list) ??
+	    qq($(join ' ',@Config_inc_version_list)) !! q(());
 } else {
     $useConfig = 'use Config;';
     $Config_archname = q($(config_value('archname')));
     $Config_version  = q($(config_value('version')));
     $Config_inc_version_list =
-        q(reverse split m/ /, config_value('inc_version_list'));
+	      q(reverse split m/ /, config_value('inc_version_list'));
 }
-
+ 
 open my $out,">", "$file" or die "Can't create $file: $^OS_ERROR";
-
+ 
 print $^STDOUT, "Extracting $file (with variable substitutions)\n";
-
+ 
 # In this section, perl variables will be expanded during extraction.
 # You can use %Config{...} to use Configure variables.
-
+ 
 print $out, <<"!GROK!THIS!";
 package lib;
 

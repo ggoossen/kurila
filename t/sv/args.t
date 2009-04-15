@@ -58,13 +58,13 @@ do {
     my $flag = 0;
     sub X::DESTROY { $flag = 1 }
     sub f {
-        delete @_[0];
-        ok(!$flag, 'delete $_[0] : in f');
+	delete @_[0];
+	ok(!$flag, 'delete $_[0] : in f');
     }
     do {
-        my $x = bless \@(), 'X';
-        f($x);
-        ok(!$flag, 'delete $_[0] : after f');
+	my $x = bless \@(), 'X';
+	f($x);
+	ok(!$flag, 'delete $_[0] : after f');
     };
     ok($flag, 'delete $_[0] : outside block');
 };

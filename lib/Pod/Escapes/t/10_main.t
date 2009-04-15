@@ -23,17 +23,17 @@ print $^STDOUT, "# I'm ", (chr(65) eq 'A') ?? '' !! 'not ', "in ASCII world.\n";
 print $^STDOUT, "#\n#------------------------\n#\n";
 
 foreach my $quotie (qw( \n \r \cm \cj \t \f \b \a \e )) {
-    my $val = eval "\"$quotie\"";
-    if($^EVAL_ERROR) {
-        ok 0;
-        print $^STDOUT, "# Error in evalling quotie \"$quotie\"\n";
-    } elsif(!defined $val) {
-        ok 0;
-        print $^STDOUT, "# \"$quotie\" is undef!?\n";
-    } else {
-        ok 1;
-        print $^STDOUT, "# \"$quotie\" is ", ord($val), "\n";
-    }
+  my $val = eval "\"$quotie\"";
+  if($^EVAL_ERROR) {
+    ok 0;
+    print $^STDOUT, "# Error in evalling quotie \"$quotie\"\n";
+  } elsif(!defined $val) {
+    ok 0;
+    print $^STDOUT, "# \"$quotie\" is undef!?\n";
+  } else {
+    ok 1;
+    print $^STDOUT, "# \"$quotie\" is ", ord($val), "\n";
+  }
 }
 
 print $^STDOUT, "#\n#------------------------\n#\n";
@@ -76,7 +76,7 @@ print $^STDOUT, "# eacute tests...\n";
 ok defined e2char('eacute');
 
 print $^STDOUT, "#    eacute is <", e2char('eacute'), "> which is code ",
-    ord(e2char('eacute')), "\n";
+      ord(e2char('eacute')), "\n";
 
 is e2char('eacute'), e2char('233');
 is e2char('eacute'), e2char('0351');
@@ -87,7 +87,7 @@ print $^STDOUT, "# pi tests...\n";
 ok defined e2char('pi');
 
 print $^STDOUT, "#    pi is <", e2char('pi'), "> which is code ",
-    ord(e2char('pi')), "\n";
+      ord(e2char('pi')), "\n";
 
 is e2char('pi'), e2char('960');
 is e2char('pi'), e2char('01700');

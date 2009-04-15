@@ -4,79 +4,79 @@ use Config;
 
 use Scalar::Util ();
 use Test::More  (grep { m/weaken/ }, @Scalar::Util::EXPORT_FAIL)
-    ?? (skip_all => 'weaken requires XS version')
-    !! (tests => 22);
+			?? (skip_all => 'weaken requires XS version')
+			!! (tests => 22);
 
 if (0) {
-    require Devel::Peek;
-    Devel::Peek->import('Dump');
+  require Devel::Peek;
+  Devel::Peek->import('Dump');
 }
 else {
-    *Dump = sub {};
+  *Dump = sub {};
 }
 
 Scalar::Util->import( < qw(weaken isweak));
 
 if(1) {
 
-    my ($y,$z);
+my ($y,$z);
 
-    #
-    # Case 1: two references, one is weakened, the other is then undef'ed.
-    #
+#
+# Case 1: two references, one is weakened, the other is then undef'ed.
+#
 
-    do {
-        my $x = "foo";
-        $y = \$x;
-        $z = \$x;
-    };
-    print $^STDOUT, "# START\n";
-    Dump($y); Dump($z);
+do {
+	my $x = "foo";
+	$y = \$x;
+	$z = \$x;
+};
+print $^STDOUT, "# START\n";
+Dump($y); Dump($z);
 
-    ok( ref($y) and ref($z));
+ok( ref($y) and ref($z));
 
-    print $^STDOUT, "# WEAK:\n";
-    weaken($y);
-    Dump($y); Dump($z);
+print $^STDOUT, "# WEAK:\n";
+weaken($y);
+Dump($y); Dump($z);
 
-    ok( ref($y) and ref($z));
+ok( ref($y) and ref($z));
 
-    print $^STDOUT, "# UNDZ:\n";
-    undef($z);
-    Dump($y); Dump($z);
+print $^STDOUT, "# UNDZ:\n";
+undef($z);
+Dump($y); Dump($z);
 
-    ok( not (defined($y) and defined($z)) );
+ok( not (defined($y) and defined($z)) );
 
-    print $^STDOUT, "# UNDY:\n";
-    undef($y);
-    Dump($y); Dump($z);
+print $^STDOUT, "# UNDY:\n";
+undef($y);
+Dump($y); Dump($z);
 
-    ok( not (defined($y) and defined($z)) );
+ok( not (defined($y) and defined($z)) );
 
-    print $^STDOUT, "# FIN:\n";
-    Dump($y); Dump($z);
+print $^STDOUT, "# FIN:\n";
+Dump($y); Dump($z);
 
 
-    # 
-    # Case 2: one reference, which is weakened
-    #
+# 
+# Case 2: one reference, which is weakened
+#
 
-    print $^STDOUT, "# CASE 2:\n";
+print $^STDOUT, "# CASE 2:\n";
 
-    do {
-        my $x = "foo";
-        $y = \$x;
-    };
+do {
+	my $x = "foo";
+	$y = \$x;
+};
 
-    ok( ref($y) );
-    print $^STDOUT, "# BW: \n";
-    Dump($y);
-    weaken($y);
-    print $^STDOUT, "# AW: \n";
-    Dump($y);
-    ok( not defined $y  );
+ok( ref($y) );
+print $^STDOUT, "# BW: \n";
+Dump($y);
+weaken($y);
+print $^STDOUT, "# AW: \n";
+Dump($y);
+ok( not defined $y  );
 
-    print $^STDOUT, "# EXITBLOCK\n";
+print $^STDOUT, "# EXITBLOCK\n";
 }
 
 # 
@@ -85,17 +85,17 @@ if(1) {
 
 my $flag = 0;
 do {
-    my $y = bless \%(), 'Dest';
-    Dump($y);
-    $y->{+Self} = $y;
-    Dump($y);
-    $y->{+Flag} = \$flag;
-    weaken($y->{?Self});
-    print $^STDOUT, "# WKED\n";
-    ok( ref($y) );
-    print $^STDOUT, "# VALS: HASH ", dump::view($y),"   SELF ", dump::view(\$y->{+Self}),"  Y ", dump::view(\$y), 
-        "    FLAG: ", dump::view(\$y->{+Flag}),"\n";
-    print $^STDOUT, "# VPRINT\n";
+	my $y = bless \%(), 'Dest';
+	Dump($y);
+	$y->{+Self} = $y;
+	Dump($y);
+	$y->{+Flag} = \$flag;
+	weaken($y->{?Self});
+	print $^STDOUT, "# WKED\n";
+	ok( ref($y) );
+	print $^STDOUT, "# VALS: HASH ", dump::view($y),"   SELF ", dump::view(\$y->{+Self}),"  Y ", dump::view(\$y), 
+		"    FLAG: ", dump::view(\$y->{+Flag}),"\n";
+	print $^STDOUT, "# VPRINT\n";
 };
 print $^STDOUT, "# OUT $flag\n";
 ok( $flag == 1 );
@@ -112,13 +112,13 @@ print $^STDOUT, "# FLAGU\n";
 
 $flag = 0;
 do {
-    my $y = bless \%(), 'Dest';
-    my $x = bless \%(), 'Dest';
-    $x->{+Ref} = $y;
-    $y->{+Ref} = $x;
-    $x->{+Flag} = \$flag;
-    $y->{+Flag} = \$flag;
-    weaken($x->{?Ref});
+	my $y = bless \%(), 'Dest';
+	my $x = bless \%(), 'Dest';
+	$x->{+Ref} = $y;
+	$y->{+Ref} = $x;
+	$x->{+Flag} = \$flag;
+	$y->{+Flag} = \$flag;
+	weaken($x->{?Ref});
 };
 ok( $flag == 2 );
 
@@ -128,9 +128,9 @@ ok( $flag == 2 );
 
 our ($y, $z);
 do {
-    my $x = "foo";
-    $y = \$x;
-    $z = \$x;
+	my $x = "foo";
+	$y = \$x;
+	$z = \$x;
 };
 
 print $^STDOUT, "# CASE5\n";
@@ -185,6 +185,6 @@ SKIP: do {
 package Dest;
 
 sub DESTROY {
-    print $^STDOUT, "# INCFLAG\n";
-    ${@_[0]->{Flag}} ++;
+	print $^STDOUT, "# INCFLAG\n";
+	${@_[0]->{Flag}} ++;
 }

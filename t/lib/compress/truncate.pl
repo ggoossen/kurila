@@ -13,7 +13,7 @@ sub run
     my $UncompressClass = getInverse($CompressClass);
     my $Error           = getErrorRef($CompressClass);
     my $UnError         = getErrorRef($UncompressClass);
-
+    
     my $hello = <<EOM ;
 hello world
 this is a test
@@ -42,15 +42,15 @@ EOM
         foreach my $i (1 .. $fingerprint_size-1)
         {
             my $lex = LexFile->new( my $name) ;
-
+        
             title "Fingerprint Truncation - length $i, Transparent $trans";
 
             my $part = substr($compressed, 0, $i);
             writeFile($name, $part);
 
             my $gz = $UncompressClass-> new( $name,
-                -BlockSize   => $blocksize,
-                -Transparent => $trans);
+                                          -BlockSize   => $blocksize,
+                                          -Transparent => $trans);
             if ($trans) {
                 ok $gz;
                 ok ! $gz->error() ;
@@ -73,33 +73,33 @@ EOM
         foreach my $i ($fingerprint_size .. $header_size -1)
         {
             my $lex = LexFile->new( my $name) ;
-
+        
             title "Header Truncation - length $i, Transparent $trans";
 
             my $part = substr($compressed, 0, $i);
             writeFile($name, $part);
             ok ! defined $UncompressClass-> new( $name,
-               -BlockSize   => $blocksize,
-               -Transparent => $trans);
-        #ok $gz->eof() ;
+                                              -BlockSize   => $blocksize,
+                                              -Transparent => $trans);
+            #ok $gz->eof() ;
         }
 
-
+        
         foreach my $i ($header_size .. length($compressed) - 1 - $trailer_size)
         {
             next if $i == 0 ;
 
             my $lex = LexFile->new( my $name) ;
-
+        
             title "Compressed Data Truncation - length $i, Transparent $trans";
 
             my $part = substr($compressed, 0, $i);
             writeFile($name, $part);
             ok my $gz = $UncompressClass-> new( $name,
-                -Strict      => 1,
-                -BlockSize   => $blocksize,
-                -Transparent => $trans)
-                or diag $$UnError;
+                                             -Strict      => 1,
+                                             -BlockSize   => $blocksize,
+                                             -Transparent => $trans)
+                 or diag $$UnError;
 
             my $un ;
             my $status = 1 ;
@@ -109,7 +109,7 @@ EOM
             ok $gz->eof() ;
             $gz->close();
         }
-
+        
         # RawDeflate does not have a trailer
         next if $CompressClass eq 'IO::Compress::RawDeflate' ;
 
@@ -119,15 +119,15 @@ EOM
             foreach my $lax (@(0, 1))
             {
                 my $lex = LexFile->new( my $name) ;
-
+            
                 ok 1, "Compressed Trailer Truncation - Length $i, Lax $lax, Transparent $trans" ;
                 my $part = substr($compressed, 0, $i);
                 writeFile($name, $part);
                 ok my $gz = $UncompressClass-> new( $name,
-                    -BlockSize   => $blocksize,
-                    -Strict      => !$lax,
-                    -Append      => 1,   
-                    -Transparent => $trans);
+                                                 -BlockSize   => $blocksize,
+                                                 -Strict      => !$lax,
+                                                 -Append      => 1,   
+                                                 -Transparent => $trans);
                 my $un = '';
                 my $status = 1 ;
                 $status = $gz->read($un) while $status +> 0 ;
@@ -149,7 +149,7 @@ EOM
                         or diag "Status $status Error is " . $gz->error() ;
                     ok $gz->error() ;
                 }
-
+                
                 $gz->close();
             }
         }

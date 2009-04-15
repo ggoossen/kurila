@@ -9,7 +9,7 @@ $^INCLUDED{+'Term/Cap.pm' } = 1;
 local env::var('PERL_RE_TC') = undef;
 re::setcolor();
 is( env::var('PERL_RE_COLORS'), "md\tme\tso\tse\tus\tue", 
-    'setcolor() should provide default colors' );
+	'setcolor() should provide default colors' );
 env::var('PERL_RE_TC' ) = 'su,n,ny';
 re::setcolor();
 is( env::var('PERL_RE_COLORS'), "su\tn\tny", '... or use %ENV{PERL_RE_COLORS}' );
@@ -18,21 +18,21 @@ is( env::var('PERL_RE_COLORS'), "su\tn\tny", '... or use %ENV{PERL_RE_COLORS}' )
 # get on
 my $warn;
 local $^WARN_HOOK = sub {
-        $warn = @_[0]->{?description};
-    };
+	$warn = @_[0]->{?description};
+};
 #try { re::bits(1) };
 #like( $warn, qr/Useless use/, 'bits() should warn with no args' );
 
 env::var('PERL_RE_COLORS') = undef;
 re::bits(0, 'debug');
 is( env::var('PERL_RE_COLORS'), undef,
-    "... should not set regex colors given 'debug'" );
+	"... should not set regex colors given 'debug'" );
 re::bits(0, 'debugcolor');
 isnt( env::var('PERL_RE_COLORS'), '', 
-      "... should set regex colors given 'debugcolor'" );
+	"... should set regex colors given 'debugcolor'" );
 re::bits(0, 'nosuchsubpragma');
 like( $warn, qr/Unknown "re" subpragma/, 
-      '... should warn about unknown subpragma' );
+	'... should warn about unknown subpragma' );
 ok( re::bits(0, 'eval')  ^&^ 0x00200000, '... should set eval bits' );
 
 local $^HINT_BITS = undef;
@@ -52,12 +52,12 @@ my $ok='foo'=~m/$reg/;
 eval"no re Debug=>'ALL'";
 ok( $ok, 'No segv!' );
 
-    package Term::Cap;
+package Term::Cap;
 
 sub Tgetent {
-    bless(\%(), @_[0]);
+	bless(\%(), @_[0]);
 }
 
 sub Tputs {
-    return @_[1];
+	return @_[1];
 }

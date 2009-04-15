@@ -35,71 +35,71 @@ $set_out = "binmode \$^STDOUT, ':crlf'"
     if defined  $main::use_crlf && $main::use_crlf == 1;
 
 sub testread($fh, $str, $read_c, $how_r, $write_c, $how_w, $why) {
-    my $buf = '';
-    if ($how_r eq 'readline_all') {
-        $buf .= $_ while ~< $fh;
-    } elsif ($how_r eq 'readline') {
-        $^INPUT_RECORD_SEPARATOR = \$read_c;
-        $buf .= $_ while ~< $fh;
-    } elsif ($how_r eq 'read') {
-        my($in, $c);
-        $buf .= $in while $c = read($fh, $in, $read_c);
-    } elsif ($how_r eq 'sysread') {
-        my($in, $c);
-        $buf .= $in while $c = sysread($fh, $in, $read_c);
-    } else {
-        die "Unrecognized read: '$how_r'";
-    }
-    close $fh or die "close: $^OS_ERROR";
-    # The only contamination allowed is with sysread/prints
-    $buf =~ s/\r\n/\n/g if $how_r eq 'sysread' and $how_w =~ m/print/;
-    is(length $buf, length $str, "length with wrc=$write_c, rdc=$read_c, $how_w, $how_r, $why");
-    is($buf, $str, "content with wrc=$write_c, rdc=$read_c, $how_w, $how_r, $why");
+  my $buf = '';
+  if ($how_r eq 'readline_all') {
+    $buf .= $_ while ~< $fh;
+  } elsif ($how_r eq 'readline') {
+    $^INPUT_RECORD_SEPARATOR = \$read_c;
+    $buf .= $_ while ~< $fh;
+  } elsif ($how_r eq 'read') {
+    my($in, $c);
+    $buf .= $in while $c = read($fh, $in, $read_c);
+  } elsif ($how_r eq 'sysread') {
+    my($in, $c);
+    $buf .= $in while $c = sysread($fh, $in, $read_c);
+  } else {
+    die "Unrecognized read: '$how_r'";
+  }
+  close $fh or die "close: $^OS_ERROR";
+  # The only contamination allowed is with sysread/prints
+  $buf =~ s/\r\n/\n/g if $how_r eq 'sysread' and $how_w =~ m/print/;
+  is(length $buf, length $str, "length with wrc=$write_c, rdc=$read_c, $how_w, $how_r, $why");
+  is($buf, $str, "content with wrc=$write_c, rdc=$read_c, $how_w, $how_r, $why");
 }
 
 sub testpipe($str, $write_c, $read_c, $how_w, $how_r, $why) {
-    (my $quoted = $str) =~ s/\n/\\n/g;;
-    my $fh;
-    if ($how_w eq 'print') {	# AUTOFLUSH???
-        # Should be shell-neutral:
-        open $fh, '-|', qq[$Perl -we "$set_out;print \\\$^STDOUT, \\\$_ for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted)"] or die "open: $^OS_ERROR";
-    } elsif ($how_w eq 'print/flush') {
-        # shell-neutral and miniperl-enabled autoflush? qq(\x24) eq '$'
-        open $fh, '-|', qq[$Perl -we "$set_out;eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die;print \\\$^STDOUT, \\\$_ for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted) "] or die "open: $^OS_ERROR";
-    } elsif ($how_w eq 'syswrite') {
-        ### How to protect \$_
-        my $cmd = qq[$Perl -we "$set_out;eval qq(sub w \\\{syswrite \\\\\\\$^STDOUT, \\x[24]_\\\} 1) or die; w() for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted)"];
-        open $fh, '-|', $cmd or die "open '$cmd': $^OS_ERROR";
-    } else {
-        die "Unrecognized write: '$how_w'";
-    }
-    binmode $fh, ':crlf'
-        if defined $main::use_crlf && $main::use_crlf == 1;
-    testread($fh, $str, $read_c, $how_r, $write_c, $how_w, "pipe$why");
+  (my $quoted = $str) =~ s/\n/\\n/g;;
+  my $fh;
+  if ($how_w eq 'print') {	# AUTOFLUSH???
+    # Should be shell-neutral:
+    open $fh, '-|', qq[$Perl -we "$set_out;print \\\$^STDOUT, \\\$_ for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted)"] or die "open: $^OS_ERROR";
+  } elsif ($how_w eq 'print/flush') {
+    # shell-neutral and miniperl-enabled autoflush? qq(\x24) eq '$'
+    open $fh, '-|', qq[$Perl -we "$set_out;eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die;print \\\$^STDOUT, \\\$_ for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted) "] or die "open: $^OS_ERROR";
+  } elsif ($how_w eq 'syswrite') {
+    ### How to protect \$_
+    my $cmd = qq[$Perl -we "$set_out;eval qq(sub w \\\{syswrite \\\\\\\$^STDOUT, \\x[24]_\\\} 1) or die; w() for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted)"];
+    open $fh, '-|', $cmd or die "open '$cmd': $^OS_ERROR";
+  } else {
+    die "Unrecognized write: '$how_w'";
+  }
+  binmode $fh, ':crlf'
+      if defined $main::use_crlf && $main::use_crlf == 1;
+  testread($fh, $str, $read_c, $how_r, $write_c, $how_w, "pipe$why");
 }
 
 sub testfile($str, $write_c, $read_c, $how_w, $how_r, $why) {
-    my @data = grep { length }, split m/(.{1,$write_c})/s, $str;
+  my @data = grep { length }, split m/(.{1,$write_c})/s, $str;
 
-    open my $fh, '>', 'io_io.tmp' or die;
-    binmode $fh, ':crlf' 
-        if defined $main::use_crlf && $main::use_crlf == 1;
-    if ($how_w eq 'print') {	# AUTOFLUSH???
-        $^OUTPUT_AUTOFLUSH = 0;
-        print $fh, $_ for  @data;
-    } elsif ($how_w eq 'print/flush') {
-        $^OUTPUT_AUTOFLUSH = 1;
-        print $fh, $_ for  @data;
-    } elsif ($how_w eq 'syswrite') {
-        syswrite $fh, $_ for  @data;
-    } else {
-        die "Unrecognized write: '$how_w'";
-    }
-    close $fh or die "close: $^OS_ERROR";
-    open $fh, '<', 'io_io.tmp' or die;
-    binmode $fh, ':crlf'
-        if defined $main::use_crlf && $main::use_crlf == 1;
-    testread($fh, $str, $read_c, $how_r, $write_c, $how_w, "file$why");
+  open my $fh, '>', 'io_io.tmp' or die;
+  binmode $fh, ':crlf' 
+      if defined $main::use_crlf && $main::use_crlf == 1;
+  if ($how_w eq 'print') {	# AUTOFLUSH???
+    $^OUTPUT_AUTOFLUSH = 0;
+    print $fh, $_ for  @data;
+  } elsif ($how_w eq 'print/flush') {
+    $^OUTPUT_AUTOFLUSH = 1;
+    print $fh, $_ for  @data;
+  } elsif ($how_w eq 'syswrite') {
+    syswrite $fh, $_ for  @data;
+  } else {
+    die "Unrecognized write: '$how_w'";
+  }
+  close $fh or die "close: $^OS_ERROR";
+  open $fh, '<', 'io_io.tmp' or die;
+  binmode $fh, ':crlf'
+      if defined $main::use_crlf && $main::use_crlf == 1;
+  testread($fh, $str, $read_c, $how_r, $write_c, $how_w, "file$why");
 }
 
 # shell-neutral and miniperl-enabled autoflush? qq(\x24) eq '$'
@@ -115,21 +115,21 @@ is("$(join ' ',@c)", '97 10 98 10 10 99 10 10 10', 'got expected chars');
 ok(close($fh), 'close');
 
 for my $s (1..2) {
-    my $t = @($t1, $t2)[$s-1];
-    my $str = $t->{?data};
-    my $r = $t->{?read_c};
-    my $w = $t->{?write_c};
-    for my $read_c ( @$r) {
-        for my $write_c ( @$w) {
-            for my $how_r (qw(readline_all readline read sysread)) {
-                next if $how_r eq 'readline_all' and $read_c != 1;
-                for my $how_w (qw(print print/flush syswrite)) {
-                    testfile($str, $write_c, $read_c, $how_w, $how_r, $s);
-                    testpipe($str, $write_c, $read_c, $how_w, $how_r, $s);
-                }
-            }
+  my $t = @($t1, $t2)[$s-1];
+  my $str = $t->{?data};
+  my $r = $t->{?read_c};
+  my $w = $t->{?write_c};
+  for my $read_c ( @$r) {
+    for my $write_c ( @$w) {
+      for my $how_r (qw(readline_all readline read sysread)) {
+	next if $how_r eq 'readline_all' and $read_c != 1;
+        for my $how_w (qw(print print/flush syswrite)) {
+	  testfile($str, $write_c, $read_c, $how_w, $how_r, $s);
+	  testpipe($str, $write_c, $read_c, $how_w, $how_r, $s);
         }
+      }
     }
+  }
 }
 
 unlink 'io_io.tmp';

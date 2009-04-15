@@ -14,36 +14,36 @@ sub _ok($type, $got, $expected, ?$name) {
 
     my $result;
     if ($type eq 'is') {
-        $result = $got eq $expected;
+	$result = $got eq $expected;
     } elsif ($type eq 'isnt') {
-        $result = $got ne $expected;
+	$result = $got ne $expected;
     } elsif ($type eq 'like') {
-        $result = $got =~ $expected;
+	$result = $got =~ $expected;
     } else {
-        die "Unexpected type '$type'$name";
+	die "Unexpected type '$type'$name";
     }
     if ($result) {
-        if ($name) {
-            print $^STDOUT, "ok $test - $name\n";
-        } else {
-            print $^STDOUT, "ok $test\n";
-        }
+	if ($name) {
+	    print $^STDOUT, "ok $test - $name\n";
+	} else {
+	    print $^STDOUT, "ok $test\n";
+	}
     } else {
-        if ($name) {
-            print $^STDOUT, "not ok $test - $name\n";
-        } else {
-            print $^STDOUT, "not ok $test\n";
-        }
-        my @caller = @( caller(2) );
-        print $^STDOUT, "# Failed test at @caller[1] line @caller[2]\n";
-        print $^STDOUT, "# Got      '$got'\n";
-        if ($type eq 'is') {
-            print $^STDOUT, "# Expected '$expected'\n";
-        } elsif ($type eq 'isnt') {
-            print $^STDOUT, "# Expected not '$expected'\n";
-        } elsif ($type eq 'like') {
-            print $^STDOUT, "# Expected $expected\n";
-        }
+	if ($name) {
+	    print $^STDOUT, "not ok $test - $name\n";
+	} else {
+	    print $^STDOUT, "not ok $test\n";
+	}
+	my @caller = @( caller(2) );
+	print $^STDOUT, "# Failed test at @caller[1] line @caller[2]\n";
+	print $^STDOUT, "# Got      '$got'\n";
+	if ($type eq 'is') {
+	    print $^STDOUT, "# Expected '$expected'\n";
+	} elsif ($type eq 'isnt') {
+	    print $^STDOUT, "# Expected not '$expected'\n";
+	} elsif ($type eq 'like') {
+	    print $^STDOUT, "# Expected $expected\n";
+	}
     }
     $test = $test + 1;
     $result;

@@ -7,67 +7,67 @@ BEGIN {
     push $^INCLUDE_PATH, './lib';
 }
 use kurila;
-
+ 
 
 sub DEFAULT_ON  () { 1 }
 sub DEFAULT_OFF () { 2 }
 
 my $tree = \%(
 
-        'all' => \@( 5.008, \%(
-                'io'		=> \@( 5.008, \%( 	
-                        'pipe' 		=> \@( 5.008, DEFAULT_OFF),
-                            'unopened'	=> \@( 5.008, DEFAULT_OFF),
-                            'closed'	=> \@( 5.008, DEFAULT_OFF),
-                            'newline'	=> \@( 5.008, DEFAULT_OFF),
-                            'exec'		=> \@( 5.008, DEFAULT_OFF),
-                            'layer'		=> \@( 5.008, DEFAULT_OFF),
-                    )),
-                    'syntax'	=> \@( 5.008, \%( 	
-                        'ambiguous'	=> \@( 5.008, DEFAULT_OFF),
-                            'semicolon'	=> \@( 5.008, DEFAULT_OFF),
-                            'precedence'	=> \@( 5.008, DEFAULT_OFF),
-                            'bareword'	=> \@( 5.008, DEFAULT_OFF),
-                            'reserved'	=> \@( 5.008, DEFAULT_OFF),
-                            'digit'		=> \@( 5.008, DEFAULT_OFF),
-                            'parenthesis'	=> \@( 5.008, DEFAULT_OFF),
-                            'printf'	=> \@( 5.008, DEFAULT_OFF),
-                            'prototype'	=> \@( 5.008, DEFAULT_OFF),
-                            'qw'		=> \@( 5.008, DEFAULT_OFF),
-                    )),
-                    'severe'	=> \@( 5.008, \%( 	
-                        'inplace'	=> \@( 5.008, DEFAULT_ON),
-                            'internal'	=> \@( 5.008, DEFAULT_ON),
-                            'debugging'	=> \@( 5.008, DEFAULT_ON),
-                            'malloc'	=> \@( 5.008, DEFAULT_ON),
-                    )),
-                    'deprecated'	=> \@( 5.008, DEFAULT_OFF),
-                    'void'		=> \@( 5.008, DEFAULT_OFF),
-                    'recursion'	=> \@( 5.008, DEFAULT_OFF),
-                    'redefine'	=> \@( 5.008, DEFAULT_OFF),
-                    'numeric'	=> \@( 5.008, DEFAULT_OFF),
-                    'uninitialized'	=> \@( 5.008, DEFAULT_OFF),
-                    'once'		=> \@( 5.008, DEFAULT_OFF),
-                    'misc'		=> \@( 5.008, DEFAULT_OFF),
-                    'regexp'	=> \@( 5.008, DEFAULT_OFF),
-                    'glob'		=> \@( 5.008, DEFAULT_OFF),
-                    'untie'		=> \@( 5.008, DEFAULT_OFF),
-                    'substr'	=> \@( 5.008, DEFAULT_OFF),
-                    'taint'		=> \@( 5.008, DEFAULT_OFF),
-                    'signal'	=> \@( 5.008, DEFAULT_OFF),
-                    'closure'	=> \@( 5.008, DEFAULT_OFF),
-                    'overflow'	=> \@( 5.008, DEFAULT_OFF),
-                    'portable'	=> \@( 5.008, DEFAULT_OFF),
-                    'utf8'		=> \@( 5.008, DEFAULT_OFF),
-                    'exiting'	=> \@( 5.008, DEFAULT_OFF),
-                    'pack'		=> \@( 5.008, DEFAULT_OFF),
-                    'unpack'	=> \@( 5.008, DEFAULT_OFF),
-                    'threads'	=> \@( 5.008, DEFAULT_OFF),
-                    'imprecision'	=> \@( 5.011, DEFAULT_OFF),
+'all' => \@( 5.008, \%(
+	'io'		=> \@( 5.008, \%( 	
+				'pipe' 		=> \@( 5.008, DEFAULT_OFF),
+       				'unopened'	=> \@( 5.008, DEFAULT_OFF),
+       				'closed'	=> \@( 5.008, DEFAULT_OFF),
+       				'newline'	=> \@( 5.008, DEFAULT_OFF),
+       				'exec'		=> \@( 5.008, DEFAULT_OFF),
+       				'layer'		=> \@( 5.008, DEFAULT_OFF),
+			   )),
+     	'syntax'	=> \@( 5.008, \%( 	
+				'ambiguous'	=> \@( 5.008, DEFAULT_OFF),
+			     	'semicolon'	=> \@( 5.008, DEFAULT_OFF),
+			     	'precedence'	=> \@( 5.008, DEFAULT_OFF),
+			     	'bareword'	=> \@( 5.008, DEFAULT_OFF),
+			     	'reserved'	=> \@( 5.008, DEFAULT_OFF),
+				'digit'		=> \@( 5.008, DEFAULT_OFF),
+			     	'parenthesis'	=> \@( 5.008, DEFAULT_OFF),
+       	 			'printf'	=> \@( 5.008, DEFAULT_OFF),
+       	 			'prototype'	=> \@( 5.008, DEFAULT_OFF),
+       	 			'qw'		=> \@( 5.008, DEFAULT_OFF),
+			   )),
+       	'severe'	=> \@( 5.008, \%( 	
+				'inplace'	=> \@( 5.008, DEFAULT_ON),
+	 			'internal'	=> \@( 5.008, DEFAULT_ON),
+         			'debugging'	=> \@( 5.008, DEFAULT_ON),
+         			'malloc'	=> \@( 5.008, DEFAULT_ON),
+	 		   )),
+        'deprecated'	=> \@( 5.008, DEFAULT_OFF),
+       	'void'		=> \@( 5.008, DEFAULT_OFF),
+       	'recursion'	=> \@( 5.008, DEFAULT_OFF),
+       	'redefine'	=> \@( 5.008, DEFAULT_OFF),
+       	'numeric'	=> \@( 5.008, DEFAULT_OFF),
+        'uninitialized'	=> \@( 5.008, DEFAULT_OFF),
+       	'once'		=> \@( 5.008, DEFAULT_OFF),
+       	'misc'		=> \@( 5.008, DEFAULT_OFF),
+       	'regexp'	=> \@( 5.008, DEFAULT_OFF),
+       	'glob'		=> \@( 5.008, DEFAULT_OFF),
+       	'untie'		=> \@( 5.008, DEFAULT_OFF),
+	'substr'	=> \@( 5.008, DEFAULT_OFF),
+	'taint'		=> \@( 5.008, DEFAULT_OFF),
+	'signal'	=> \@( 5.008, DEFAULT_OFF),
+	'closure'	=> \@( 5.008, DEFAULT_OFF),
+	'overflow'	=> \@( 5.008, DEFAULT_OFF),
+	'portable'	=> \@( 5.008, DEFAULT_OFF),
+	'utf8'		=> \@( 5.008, DEFAULT_OFF),
+       	'exiting'	=> \@( 5.008, DEFAULT_OFF),
+       	'pack'		=> \@( 5.008, DEFAULT_OFF),
+       	'unpack'	=> \@( 5.008, DEFAULT_OFF),
+       	'threads'	=> \@( 5.008, DEFAULT_OFF),
+       	'imprecision'	=> \@( 5.011, DEFAULT_OFF),
 
-            #'default'	=> [ 5.008, DEFAULT_ON ],
-            )),
-    ) ;
+       	 #'default'	=> [ 5.008, DEFAULT_ON ],
+  	)),
+) ;
 
 ###########################################################################
 sub tab {
@@ -92,17 +92,17 @@ sub valueWalk
     my @list = @() ;
 
     foreach my $k (sort keys %$tre) {
-        my $v = $tre->{?$k};
-        die "duplicate key $k\n" if defined %list{?$k} ;
-        die "Value associated with key '$k' is not an ARRAY reference"
-            if !ref $v || ref $v ne 'ARRAY' ;
+	my $v = $tre->{?$k};
+	die "duplicate key $k\n" if defined %list{?$k} ;
+	die "Value associated with key '$k' is not an ARRAY reference"
+	    if !ref $v || ref $v ne 'ARRAY' ;
 
-        my @($ver, $rest) =  @{ $v } ;
+	my @($ver, $rest) =  @{ $v } ;
         %v_list{+$ver} //= @: ;
-        push %v_list{+$ver}, $k;
-
-        if (ref $rest)
-        { valueWalk ($rest) }
+	push %v_list{+$ver}, $k;
+	
+	if (ref $rest)
+	  { valueWalk ($rest) }
 
     }
 
@@ -113,8 +113,8 @@ sub orderValues
     my $index = 0;
     foreach my $ver ( sort { $a <+> $b }, keys %v_list ) {
         foreach my $name ( %v_list{$ver} ) {
-            %ValueToName{+$index } = \@( uc $name, $ver ) ;
-            %NameToValue{+uc $name } = $index ++ ;
+	    %ValueToName{+$index } = \@( uc $name, $ver ) ;
+	    %NameToValue{+uc $name } = $index ++ ;
         }
     }
 
@@ -129,24 +129,24 @@ sub walk
     my @list = @() ;
 
     foreach my $k (sort keys %$tre) {
-        my $v = $tre->{?$k};
-        die "duplicate key $k\n" if defined %list{?$k} ;
-        #$Value{$index} = uc $k ;
-        die "Can't find key '$k'"
-            if ! defined %NameToValue{?uc $k} ;
+	my $v = $tre->{?$k};
+	die "duplicate key $k\n" if defined %list{?$k} ;
+	#$Value{$index} = uc $k ;
+	die "Can't find key '$k'"
+	    if ! defined %NameToValue{?uc $k} ;
         push @{ %list{+$k} }, %NameToValue{?uc $k} ;
-        die "Value associated with key '$k' is not an ARRAY reference"
-            if !ref $v || ref $v ne 'ARRAY' ;
-
-        my @($ver, $rest) =  @{ $v } ;
-        if (ref $rest) {
+	die "Value associated with key '$k' is not an ARRAY reference"
+	    if !ref $v || ref $v ne 'ARRAY' ;
+	
+	my @($ver, $rest) =  @{ $v } ;
+	if (ref $rest) {
             push (@{ %list{$k} }, < walk ($rest));
         }
 
-        push @list, < @{ %list{?$k} } ;
+	push @list, < @{ %list{?$k} } ;
     }
 
-    return @list ;
+   return @list ;
 }
 
 ###########################################################################
@@ -157,8 +157,8 @@ sub mkRange
     my @out = @a ;
 
     for my $i (1..nelems(@a)-1) {
-        @out[+$i] = ".."
-            if @a[$i] == @a[$i - 1] + 1 && @a[$i] + 1 == @a[?$i + 1] ;
+      	@out[+$i] = ".."
+          if @a[$i] == @a[$i - 1] + 1 && @a[$i] + 1 == @a[?$i + 1] ;
     }
 
     my $out = join(",",@out);
@@ -178,30 +178,30 @@ sub printTree
     my @keys = sort keys %$tre ;
 
     while ($k = shift @keys) {
-        $v = $tre->{?$k};
-        die "Value associated with key '$k' is not an ARRAY reference"
-            if !ref $v || ref $v ne 'ARRAY' ;
-
+	$v = $tre->{?$k};
+	die "Value associated with key '$k' is not an ARRAY reference"
+	    if !ref $v || ref $v ne 'ARRAY' ;
+	
         my $offset ;
-        if ($tre ne $tree) {
-            print \*STDOUT, $prefix . "|\n" ;
-            print \*STDOUT, $prefix . "+- $k" ;
-            $offset = ' ' x ($max + 4) ;
-        }
-        else {
-            print \*STDOUT, $prefix . "$k" ;
-            $offset = ' ' x ($max + 1) ;
-        }
+	if ($tre ne $tree) {
+	    print \*STDOUT, $prefix . "|\n" ;
+	    print \*STDOUT, $prefix . "+- $k" ;
+	    $offset = ' ' x ($max + 4) ;
+	}
+	else {
+	    print \*STDOUT, $prefix . "$k" ;
+	    $offset = ' ' x ($max + 1) ;
+	}
 
-        my @($ver, $rest) = @{ $v } ;
-        if (ref $rest)
-        {
-            my $bar = @keys ?? "|" !! " ";
-            print \*STDOUT, " -" . "-" x ($max - length $k ) . "+\n" ;
-            printTree ($rest, $prefix . $bar . $offset )
-        }
-        else
-        { print \*STDOUT, "\n" }
+	my @($ver, $rest) = @{ $v } ;
+	if (ref $rest)
+	{
+	    my $bar = @keys ?? "|" !! " ";
+	    print \*STDOUT, " -" . "-" x ($max - length $k ) . "+\n" ;
+	    printTree ($rest, $prefix . $bar . $offset )
+	}
+	else
+	  { print \*STDOUT, "\n" }
     }
 
 }
@@ -215,7 +215,7 @@ sub mkHex
     my $string = "" ;
 
     foreach ( @a) {
-        vec($mask, $_, 1 => 1);
+	vec($mask, $_, 1 => 1);
     }
 
     foreach (@(unpack("C*", $mask))) {
@@ -380,9 +380,9 @@ foreach my $k (sort keys  %list) {
     my @list = sort { $a <+> $b }, @$v;
 
     print $pm, tab(4, "    '$k'"), '=> "',
-        # mkHex($warn_size, @list),
-        mkHex($warn_size, < map { $_ * 2 }, @list),
-        '", # [', mkRange(@list), "]\n" ;
+		# mkHex($warn_size, @list),
+		mkHex($warn_size, < map { $_ * 2 }, @list),
+		'", # [', mkRange(@list), "]\n" ;
 }
 
 print $pm, "  );\n\n" ;
@@ -394,9 +394,9 @@ foreach my $k (sort keys  %list) {
     my @list = sort { $a <+> $b }, @$v;
 
     print $pm, tab(4, "    '$k'"), '=> "',
-        # mkHex($warn_size, @list),
-        mkHex($warn_size, < map { $_ * 2 + 1 }, @list),
-        '", # [', mkRange(@list), "]\n" ;
+		# mkHex($warn_size, @list),
+		mkHex($warn_size, < map { $_ * 2 + 1 }, @list),
+		'", # [', mkRange(@list), "]\n" ;
 }
 
 print $pm, "  );\n\n" ;

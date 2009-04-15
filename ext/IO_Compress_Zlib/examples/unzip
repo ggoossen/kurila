@@ -10,7 +10,7 @@ die "Usage: zipcat file"
 my $file = @ARGV[0] ;
 
 my $fh = IO::File->new( "<$file")
-    or die "Cannot open '$file': $^OS_ERROR\n";
+            or die "Cannot open '$file': $^OS_ERROR\n";
 
 while ()
 {
@@ -28,7 +28,7 @@ while ()
 
     my $compressedMethod   = unpack ("v", substr($buffer, 8, 2));
     my $compressedLength   = unpack ("V", substr($buffer, 18, 4));
-    #my $uncompressedLength = unpack ("V", substr($buffer, 22, 4));
+   #my $uncompressedLength = unpack ("V", substr($buffer, 22, 4));
     my $filename_length    = unpack ("v", substr($buffer, 26, 2)); 
     my $extra_length       = unpack ("v", substr($buffer, 28, 2));
 
@@ -55,9 +55,9 @@ while ()
     basename->mkpath( $filename);
 
     rawinflate $fh  => $filename,
-               Transparent => 1,
-               InputLength => $compressedLength
-        or die "Error uncompressing $file [$filename]: $RawInflateError\n"  ;
+        Transparent => 1,
+        InputLength => $compressedLength
+      or die "Error uncompressing $file [$filename]: $RawInflateError\n"  ;
 }
 
 sub decodeLocalFileHeader

@@ -18,29 +18,29 @@ Pod::Usage, pod2usage() - print a usage message from embedded pod documentation
 
 =head1 SYNOPSIS
 
-use Pod::Usage
+  use Pod::Usage
 
-my $message_text  = "This text precedes the usage message.";
-my $exit_status   = 2;          ## The exit status to use
-my $verbose_level = 0;          ## The verbose level to use
-my $filehandle    = $^STDERR;   ## The filehandle to write to
+  my $message_text  = "This text precedes the usage message.";
+  my $exit_status   = 2;          ## The exit status to use
+  my $verbose_level = 0;          ## The verbose level to use
+  my $filehandle    = $^STDERR;   ## The filehandle to write to
 
-pod2usage($message_text);
+  pod2usage($message_text);
 
-pod2usage($exit_status);
+  pod2usage($exit_status);
 
-pod2usage( { message => $message_text ,
-exitval => $exit_status  ,  
-verbose => $verbose_level,  
-output  => $filehandle } );
+  pod2usage( { message => $message_text ,
+               exitval => $exit_status  ,  
+               verbose => $verbose_level,  
+               output  => $filehandle } );
 
-pod2usage(   msg     => $message_text ,
-exitval => $exit_status  ,  
-verbose => $verbose_level,  
-output  => $filehandle   );
+  pod2usage(   msg     => $message_text ,
+               exitval => $exit_status  ,  
+               verbose => $verbose_level,  
+               output  => $filehandle   );
 
-pod2usage(   verbose => 2,
-noperldoc => 1  )
+  pod2usage(   verbose => 2,
+               noperldoc => 1  )
 
 =head1 ARGUMENTS
 
@@ -222,32 +222,32 @@ use them by default if you don't expressly tell it to do otherwise.  The
 ability of B<pod2usage()> to accept a single number or a string makes it
 convenient to use as an innocent looking error message handling function:
 
-use Pod::Usage;
-use Getopt::Long;
+    use Pod::Usage;
+    use Getopt::Long;
 
-## Parse options
-GetOptions("help", "man", "flag1")  ||  pod2usage(2);
-pod2usage(1)  if ($opt_help);
-pod2usage(verbose => 2)  if ($opt_man);
+    ## Parse options
+    GetOptions("help", "man", "flag1")  ||  pod2usage(2);
+    pod2usage(1)  if ($opt_help);
+    pod2usage(verbose => 2)  if ($opt_man);
 
-## Check for too many filenames
-pod2usage("$0: Too many files given.\n")  if (@ARGV > 1);
+    ## Check for too many filenames
+    pod2usage("$0: Too many files given.\n")  if (@ARGV > 1);
 
 Some user's however may feel that the above "economy of expression" is
 not particularly readable nor consistent and may instead choose to do
 something more like the following:
 
-use Pod::Usage;
-use Getopt::Long;
+    use Pod::Usage;
+    use Getopt::Long;
 
-## Parse options
-GetOptions("help", "man", "flag1")  ||  pod2usage(verbose => 0);
-pod2usage(verbose => 1)  if ($opt_help);
-pod2usage(verbose => 2)  if ($opt_man);
+    ## Parse options
+    GetOptions("help", "man", "flag1")  ||  pod2usage(verbose => 0);
+    pod2usage(verbose => 1)  if ($opt_help);
+    pod2usage(verbose => 2)  if ($opt_man);
 
-## Check for too many filenames
-pod2usage(verbose => 2, message => "$0: Too many files given.\n")
-if (@ARGV > 1);
+    ## Check for too many filenames
+    pod2usage(verbose => 2, message => "$0: Too many files given.\n")
+        if (@ARGV > 1);
 
 As with all things in Perl, I<there's more than one way to do it>, and
 B<pod2usage()> adheres to this philosophy.  If you are interested in
@@ -259,72 +259,72 @@ means exhaustive), please refer to L<"EXAMPLES">.
 Each of the following invocations of C<pod2usage()> will print just the
 "SYNOPSIS" section to C<STDERR> and will exit with a status of 2:
 
-pod2usage();
+    pod2usage();
 
-pod2usage(2);
+    pod2usage(2);
 
-pod2usage(verbose => 0);
+    pod2usage(verbose => 0);
 
-pod2usage(exitval => 2);
+    pod2usage(exitval => 2);
 
-pod2usage({exitval => 2, output => $^STDERR});
+    pod2usage({exitval => 2, output => $^STDERR});
 
-pod2usage({verbose => 0, output  => $^STDERR});
+    pod2usage({verbose => 0, output  => $^STDERR});
 
-pod2usage(exitval => 2, verbose => 0);
+    pod2usage(exitval => 2, verbose => 0);
 
-pod2usage(exitval => 2, verbose => 0, output => $^STDERR);
+    pod2usage(exitval => 2, verbose => 0, output => $^STDERR);
 
 Each of the following invocations of C<pod2usage()> will print a message
 of "Syntax error." (followed by a newline) to C<STDERR>, immediately
 followed by just the "SYNOPSIS" section (also printed to C<STDERR>) and
 will exit with a status of 2:
 
-pod2usage("Syntax error.");
+    pod2usage("Syntax error.");
 
-pod2usage(message => "Syntax error.", verbose => 0);
+    pod2usage(message => "Syntax error.", verbose => 0);
 
-pod2usage(msg  => "Syntax error.", exitval => 2);
+    pod2usage(msg  => "Syntax error.", exitval => 2);
 
-pod2usage({msg => "Syntax error.", exitval => 2, output => $^STDERR});
+    pod2usage({msg => "Syntax error.", exitval => 2, output => $^STDERR});
 
-pod2usage({msg => "Syntax error.", verbose => 0, output => $^STDERR});
+    pod2usage({msg => "Syntax error.", verbose => 0, output => $^STDERR});
 
-pod2usage(msg  => "Syntax error.", exitval => 2, verbose => 0);
+    pod2usage(msg  => "Syntax error.", exitval => 2, verbose => 0);
 
-pod2usage(message => "Syntax error.",
-exitval => 2,
-verbose => 0,
-output  => $^STDERR);
+    pod2usage(message => "Syntax error.",
+              exitval => 2,
+              verbose => 0,
+              output  => $^STDERR);
 
 Each of the following invocations of C<pod2usage()> will print the
 "SYNOPSIS" section and any "OPTIONS" and/or "ARGUMENTS" sections to
 C<STDOUT> and will exit with a status of 1:
 
-pod2usage(1);
+    pod2usage(1);
 
-pod2usage(verbose => 1);
+    pod2usage(verbose => 1);
 
-pod2usage(exitval => 1);
+    pod2usage(exitval => 1);
 
-pod2usage({exitval => 1, output => $^STDOUT});
+    pod2usage({exitval => 1, output => $^STDOUT});
 
-pod2usage({verbose => 1, output => $^STDOUT});
+    pod2usage({verbose => 1, output => $^STDOUT});
 
-pod2usage(exitval => 1, verbose => 1);
+    pod2usage(exitval => 1, verbose => 1);
 
-pod2usage(exitval => 1, verbose => 1, output => $^STDOUT});
+    pod2usage(exitval => 1, verbose => 1, output => $^STDOUT});
 
 Each of the following invocations of C<pod2usage()> will print the
 entire manual page to C<STDOUT> and will exit with a status of 1:
 
-pod2usage(verbose  => 2);
+    pod2usage(verbose  => 2);
 
-pod2usage({verbose => 2, output => $^STDOUT});
+    pod2usage({verbose => 2, output => $^STDOUT});
 
-pod2usage(exitval  => 1, verbose => 2);
+    pod2usage(exitval  => 1, verbose => 2);
 
-pod2usage({exitval => 1, verbose => 2, output => $^STDOUT});
+    pod2usage({exitval => 1, verbose => 2, output => $^STDOUT});
 
 =head2 Recommended Use
 
@@ -337,54 +337,54 @@ provide a means of printing their complete documentation to C<STDOUT>
 uses B<Pod::Usage> in combination with B<Getopt::Long> to do all of these
 things:
 
-use Getopt::Long;
-use Pod::Usage;
+    use Getopt::Long;
+    use Pod::Usage;
 
-my $man = 0;
-my $help = 0;
-## Parse options and print usage if there is a syntax error,
-## or if usage was explicitly requested.
-GetOptions('help|?' => \$help, man => \$man) or pod2usage(2);
-pod2usage(1) if $help;
-pod2usage(verbose => 2) if $man;
+    my $man = 0;
+    my $help = 0;
+    ## Parse options and print usage if there is a syntax error,
+    ## or if usage was explicitly requested.
+    GetOptions('help|?' => \$help, man => \$man) or pod2usage(2);
+    pod2usage(1) if $help;
+    pod2usage(verbose => 2) if $man;
 
-## If no arguments were given, then allow STDIN to be used only
-## if it's not connected to a terminal (otherwise print usage)
-pod2usage("$0: No files given.")  if ((@ARGV == 0) && (-t STDIN));
-__END__
+    ## If no arguments were given, then allow STDIN to be used only
+    ## if it's not connected to a terminal (otherwise print usage)
+    pod2usage("$0: No files given.")  if ((@ARGV == 0) && (-t STDIN));
+    __END__
 
-=head1 NAME
+    =head1 NAME
 
-sample - Using GetOpt::Long and Pod::Usage
+    sample - Using GetOpt::Long and Pod::Usage
 
-=head1 SYNOPSIS
+    =head1 SYNOPSIS
 
-sample [options] [file ...]
+    sample [options] [file ...]
 
-Options:
--help            brief help message
--man             full documentation
+     Options:
+       -help            brief help message
+       -man             full documentation
 
-=head1 OPTIONS
+    =head1 OPTIONS
 
-=over 8
+    =over 8
 
-=item B<-help>
+    =item B<-help>
 
-Print a brief help message and exits.
+    Print a brief help message and exits.
 
-=item B<-man>
+    =item B<-man>
 
-Prints the manual page and exits.
+    Prints the manual page and exits.
 
-=back
+    =back
 
-=head1 DESCRIPTION
+    =head1 DESCRIPTION
 
-B<This program> will read the given input file(s) and do something
-useful with the contents thereof.
+    B<This program> will read the given input file(s) and do something
+    useful with the contents thereof.
 
-=cut
+    =cut
 
 =head1 CAVEATS
 
@@ -396,7 +396,7 @@ If this is the case for your system, you may need to explicitly specify
 the path to the pod docs for the invoking script using something
 similar to the following:
 
-pod2usage(-exitval => 2, -input => "/path/to/your/pod/docs");
+    pod2usage(-exitval => 2, -input => "/path/to/your/pod/docs");
 
 In the pathological case that a script is called via a relative path
 I<and> the script itself changes the current working directory
@@ -429,8 +429,8 @@ use File::Spec;
 our (@ISA, @EXPORT);
 @EXPORT = qw(&pod2usage);
 BEGIN {
-    require Pod::Text;
-    @ISA = qw( Pod::Text );
+       require Pod::Text;
+       @ISA = qw( Pod::Text );
 }
 
 
@@ -441,7 +441,7 @@ BEGIN {
 ##---------------------------------
 
 sub pod2usage {
-                      local($_) = shift;
+    local($_) = shift;
     my %opts;
     ## Collect arguments
     if ((nelems @_) +> 0) {
@@ -450,7 +450,7 @@ sub pod2usage {
         %opts = %($_, < @_);
     }
     elsif (!defined $_) {
-        $_ = "";
+      $_ = "";
     }
     elsif (ref $_) {
         ## User passed a ref to a hash
@@ -470,12 +470,12 @@ sub pod2usage {
     ## looked like Unix command-line options.
     ## to be uppercase keywords)
     %opts = %: < @+: map {
-                my $val = %opts{?$_};
-                s/^-//;
-                m/^msg/i   and  $_ = 'message';
-                m/^exit/i  and  $_ = 'exitval';
-                @: lc($_) => $val;    
-            }, keys %opts;
+        my $val = %opts{?$_};
+        s/^-//;
+        m/^msg/i   and  $_ = 'message';
+        m/^exit/i  and  $_ = 'exitval';
+        @: lc($_) => $val;    
+    }, keys %opts;
 
     ## Now determine default exitval and verbose values to use
     if ((! defined %opts{?"exitval"}) && (! defined %opts{?"verbose"})) {
@@ -493,7 +493,7 @@ sub pod2usage {
     ## Default the output file
     %opts{+"output"} = (lc(%opts{?"exitval"}) eq "noexit" ||
                         %opts{?"exitval"} +< 2) ?? $^STDOUT !! $^STDERR
-    unless (defined %opts{?"output"});
+            unless (defined %opts{?"output"});
     ## Default the input file
     %opts{+"input"} = $^PROGRAM_NAME  unless (defined %opts{?"input"});
 
@@ -501,7 +501,7 @@ sub pod2usage {
     unless ((ref %opts{?"input"}) || (-e %opts{?"input"})) {
         my @($basename) = @(%opts{?"input"});
         my $pathsep = ($^OS_NAME =~ m/^(?:dos|os2|MSWin32)$/) ?? ";"
-            !! (($^OS_NAME eq 'MacOS' || $^OS_NAME eq 'VMS') ?? ',' !!  ":");
+                            !! (($^OS_NAME eq 'MacOS' || $^OS_NAME eq 'VMS') ?? ',' !!  ":");
         my $pathspec = %opts{?"pathlist"} || env::var('PATH') || env::var('PERL5LIB');
 
         my @paths = @( (ref $pathspec) ?? < @$pathspec !! < split($pathsep, $pathspec) );
@@ -518,8 +518,8 @@ sub pod2usage {
     }
     elsif (%opts{"verbose"} == 1) {
         my $opt_re = '(?i)' .
-            '(?:OPTIONS|ARGUMENTS)' .
-            '(?:\s*(?:AND|\/)\s*(?:OPTIONS|ARGUMENTS))?';
+                     '(?:OPTIONS|ARGUMENTS)' .
+                     '(?:\s*(?:AND|\/)\s*(?:OPTIONS|ARGUMENTS))?';
         $parser->select( 'SYNOPSIS', $opt_re, "DESCRIPTION/$opt_re" );
     }
     elsif (%opts{"verbose"} +>= 2 && %opts{"verbose"} != 99) {
@@ -532,20 +532,20 @@ sub pod2usage {
 
     ## Now translate the pod document and then exit with the desired status
     if ( !%opts{?"noperldoc"}
-        and  %opts{?"verbose"} +>= 2 
-        and  !ref(%opts{?"input"})
-        and  %opts{?"output"} \== $^STDOUT )
+             and  %opts{?"verbose"} +>= 2 
+             and  !ref(%opts{?"input"})
+             and  %opts{?"output"} \== $^STDOUT )
     {
-        ## spit out the entire PODs. Might as well invoke perldoc
-        my $progpath = File::Spec->catfile(config_value('scriptdir'), "perldoc");
-        system($progpath, %opts{?"input"});
-        if($^CHILD_ERROR) {
-            # RT16091: fall back to more if perldoc failed
-            system(env::var('PAGER') || 'more', %opts{?"input"});
-        }
+       ## spit out the entire PODs. Might as well invoke perldoc
+       my $progpath = File::Spec->catfile(config_value('scriptdir'), "perldoc");
+       system($progpath, %opts{?"input"});
+       if($^CHILD_ERROR) {
+         # RT16091: fall back to more if perldoc failed
+         system(env::var('PAGER') || 'more', %opts{?"input"});
+       }
     }
     else {
-        $parser->parse_from_file(%opts{?"input"}, %opts{"output"});
+       $parser->parse_from_file(%opts{?"input"}, %opts{"output"});
     }
 
     exit(%opts{?"exitval"})  unless (lc(%opts{?"exitval"}) eq 'noexit');
@@ -601,14 +601,14 @@ sub _handle_element_end($self, $element) {
         my $heading = %$self{?USAGE_HEAD1};
         $heading .= '/' . %$self{?USAGE_HEAD2} if defined %$self{?USAGE_HEAD2};
         if (!%$self{?USAGE_SELECT} || !nelems @{ %$self{?USAGE_SELECT} }) {
-            %$self{+USAGE_SKIPPING} = 0;
+           %$self{+USAGE_SKIPPING} = 0;
         } else {
-            for ( @{ %$self{USAGE_SELECT} }) {
-                if ($heading =~ m/^$_\s*$/) {
-                    %$self{+USAGE_SKIPPING} = 0;
-                    last;
-                }
-            }
+          for ( @{ %$self{USAGE_SELECT} }) {
+              if ($heading =~ m/^$_\s*$/) {
+                  %$self{+USAGE_SKIPPING} = 0;
+                  last;
+              }
+          }
         }
 
         # Try to do some lowercasing instead of all-caps in headings, and use

@@ -18,27 +18,27 @@ my $t_dir;
 my $corpus_dir;
 
 foreach my $t_maybe (@(
-                                File::Spec->catdir( File::Spec->updir(), 'lib','Pod','Simple','t'),
-                                File::Spec->catdir( $cwd ),
-                                File::Spec->catdir( $cwd, 't' ),
-                                'OHSNAP')
+  File::Spec->catdir( File::Spec->updir(), 'lib','Pod','Simple','t'),
+  File::Spec->catdir( $cwd ),
+  File::Spec->catdir( $cwd, 't' ),
+  'OHSNAP')
 ) {
-    die "Can't find the test corpus" if $t_maybe eq 'OHSNAP';
-    next unless -e $t_maybe;
+  die "Can't find the test corpus" if $t_maybe eq 'OHSNAP';
+  next unless -e $t_maybe;
 
-    $t_dir = $t_maybe;
-    $corpus_dir = File::Spec->catdir( $t_maybe, 'testlib1' );
-    next unless -e $corpus_dir;
-    last;
+  $t_dir = $t_maybe;
+  $corpus_dir = File::Spec->catdir( $t_maybe, 'testlib1' );
+  next unless -e $corpus_dir;
+  last;
 }
 print $^STDOUT, "# OK, found the test corpus as $corpus_dir\n";
 ok 1;
 
 my $outdir;
 while(1) {
-    my $rand = sprintf "\%05x", rand( 0x100000 );
-    $outdir = File::Spec->catdir( $t_dir, "delme-$rand-out" );
-    last unless -e $outdir;
+  my $rand = sprintf "\%05x", rand( 0x100000 );
+  $outdir = File::Spec->catdir( $t_dir, "delme-$rand-out" );
+  last unless -e $outdir;
 }
 
 END {
@@ -63,18 +63,18 @@ use File::Find;
 find( sub { push @files, $File::Find::name; return }, $outdir );
 
 do {
-    my $long = ( grep { m/zikzik\./i }, @files )[0];
-    ok($long) or print $^STDOUT, "# How odd, no zikzik file in $outdir!?\n";
-    if($long) {
-        $long =~ s{zikzik\.html?$}{}s;
-        for( @files) { substr($_, 0, length($long), '') }
-        @files = grep { length($_) }, @files;
-    }
+  my $long = ( grep { m/zikzik\./i }, @files )[0];
+  ok($long) or print $^STDOUT, "# How odd, no zikzik file in $outdir!?\n";
+  if($long) {
+    $long =~ s{zikzik\.html?$}{}s;
+    for( @files) { substr($_, 0, length($long), '') }
+    @files = grep { length($_) }, @files;
+  }
 };
 
 print $^STDOUT, "#Produced in $outdir ...\n";
 foreach my $f (sort @files) {
-    print $^STDOUT, "#   $f\n";
+  print $^STDOUT, "#   $f\n";
 }
 print $^STDOUT, "# (", scalar(nelems @files), " items total)\n";
 

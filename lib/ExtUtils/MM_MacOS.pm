@@ -16,7 +16,7 @@ ExtUtils::MM_MacOS - once produced Makefiles for MacOS Classic
 
 =head1 SYNOPSIS
 
-# MM_MacOS no longer contains any code.  This is just a stub.
+  # MM_MacOS no longer contains any code.  This is just a stub.
 
 =head1 DESCRIPTION
 

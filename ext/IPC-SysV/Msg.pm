@@ -20,19 +20,19 @@ do {
     use Class::Struct < qw(struct);
 
     struct 'IPC::Msg::stat' => \@(
-           uid	=> '$',
-           gid	=> '$',
-           cuid	=> '$',
-           cgid	=> '$',
-           mode	=> '$',
-           qnum	=> '$',
-           qbytes	=> '$',
-           lspid	=> '$',
-           lrpid	=> '$',
-           stime	=> '$',
-           rtime	=> '$',
-           ctime	=> '$',
-           );
+	uid	=> '$',
+	gid	=> '$',
+	cuid	=> '$',
+	cgid	=> '$',
+	mode	=> '$',
+	qnum	=> '$',
+	qbytes	=> '$',
+	lspid	=> '$',
+	lrpid	=> '$',
+	stime	=> '$',
+	rtime	=> '$',
+	ctime	=> '$',
+    );
 };
 
 sub new {
@@ -42,8 +42,8 @@ sub new {
     my $id = msgget(@_[0],@_[1]);
 
     defined($id)
-        ?? bless \$id, $class
-        !! undef;
+	?? bless \$id, $class
+	!! undef;
 }
 
 sub id {
@@ -55,7 +55,7 @@ sub stat {
     my $self = shift;
     my $data = "";
     msgctl($$self,IPC_STAT,$data) or
-        return undef;
+	return undef;
     IPC::Msg::stat->new->unpack($data);
 }
 
@@ -64,16 +64,16 @@ sub set {
     my $ds;
 
     if((nelems @_) == 1) {
-        $ds = shift;
+	$ds = shift;
     }
     else {
-        croak 'Bad arg count' if (nelems @_) % 2;
-        my %arg = %( < @_ );
-        $ds = $self->stat
-            or return undef;
-        my($key,$val);
-        $ds->?$key($val)
-            while(@($key,$val) =@( each %arg));
+	croak 'Bad arg count' if (nelems @_) % 2;
+	my %arg = %( < @_ );
+	$ds = $self->stat
+		or return undef;
+	my($key,$val);
+	$ds->?$key($val)
+	    while(@($key,$val) =@( each %arg));
     }
 
     msgctl($$self,IPC_SET,$ds->pack);
@@ -89,7 +89,7 @@ sub rcv {
     my $self = shift;
     my $buf = "";
     msgrcv($$self,$buf,@_[1],@_[2] || 0, @_[3] || 0) or
-        return;
+	return;
     my $type;
     @($type,@_[0]) = @: unpack("l! a*",$buf);
     $type;

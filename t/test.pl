@@ -42,14 +42,14 @@ sub _print_stderr {
 sub plan {
     my $n;
     if ((nelems @_) == 1) {
-        $n = shift;
-        if ($n eq 'no_plan') {
-            undef $n;
-            $noplan = 1;
-        }
+	$n = shift;
+	if ($n eq 'no_plan') {
+	  undef $n;
+	  $noplan = 1;
+	}
     } else {
-        my %plan = %( < @_ );
-        $n = %plan{?tests};
+	my %plan = %( < @_ );
+	$n = %plan{?tests};
     }
     _print "1..$n\n" unless $noplan;
     $planned = $n;
@@ -58,12 +58,12 @@ sub plan {
 END {
     my $ran = $test - 1;
     if (!$NO_ENDING) {
-        if (defined $planned && $planned != $ran) {
-            _print_stderr
-  "# Looks like you planned $planned tests but ran $ran.\n";
-        } elsif ($noplan) {
-            _print "1..$ran\n";
-        }
+	if (defined $planned && $planned != $ran) {
+	    _print_stderr
+		"# Looks like you planned $planned tests but ran $ran.\n";
+	} elsif ($noplan) {
+	    _print "1..$ran\n";
+	}
     }
 }
 
@@ -72,7 +72,7 @@ END {
 sub _diag {
     return unless (nelems @_);
     my @mess = map { m/^#/ ?? "$_\n" !! "# $_\n" },
-        @+: map { split m/\n/ }, @_;
+    @+: map { split m/\n/ }, @_;
     my $func = $TODO ?? \&_print !! \&_print_stderr;
     $func->(< @mess);
 }
@@ -83,15 +83,15 @@ sub diag {
 
 sub info {
     my @mess = map { m/^#/ ?? "$_\n" !! "# $_\n" },
-        @+: map { split m/\n/ }, @_;
+      @+: map { split m/\n/ }, @_;
     _print(< @mess);
 }
 
 sub skip_all {
     if ((nelems @_)) {
-        _print "1..0 # Skipped: $(join ' ',@_)\n";
+	_print "1..0 # Skipped: $(join ' ',@_)\n";
     } else {
-        _print "1..0\n";
+	_print "1..0\n";
     }
     exit(0);
 }
@@ -104,16 +104,16 @@ sub _ok {
     if ($name) {
         # escape out '#' or it will interfere with '# skip' and such
         $name =~ s/#/\\#/g;
-        $out = $pass ?? "ok $test - $name" !! "not ok $test - $name";
+	$out = $pass ?? "ok $test - $name" !! "not ok $test - $name";
     } else {
-        $out = $pass ?? "ok $test" !! "not ok $test";
+	$out = $pass ?? "ok $test" !! "not ok $test";
     }
 
     $out .= " # TODO $TODO" if $TODO;
     _print "$out\n";
 
     unless ($pass) {
-        _diag "# Failed $where\n";
+	_diag "# Failed $where\n";
     }
 
     # Ensure that the message is properly escaped.
@@ -171,8 +171,8 @@ sub is ($got, $expected, ?$name, @< @mess) {
     }
 
     unless ($pass) {
-        unshift(@mess, "#      got "._q($got)."\n",
-            "# expected "._q($expected)."\n");
+	unshift(@mess, "#      got "._q($got)."\n",
+		       "# expected "._q($expected)."\n");
     }
     _ok($pass, _where(), $name, < @mess);
 }
@@ -192,7 +192,7 @@ sub isnt ($got, $isnt, ?$name, @< @mess) {
 
     unless( $pass ) {
         unshift(@mess, "# it should not be "._q($got)."\n",
-            "# but it is.\n");
+                       "# but it is.\n");
     }
     _ok($pass, _where(), $name, < @mess);
 }
@@ -201,8 +201,8 @@ sub cmp_ok ($got, $type, $expected, ?$name, @< @mess) {
     my $pass;
     do {
         local $^WARNING = 0;
-                          local($^EVAL_ERROR,$^OS_ERROR);   # don't interfere with $@
-        # eval() sometimes resets $!
+        local($^EVAL_ERROR,$^OS_ERROR);   # don't interfere with $@
+                        # eval() sometimes resets $!
         $pass = eval "\$got $type \$expected";
     };
     unless ($pass) {
@@ -218,7 +218,7 @@ sub cmp_ok ($got, $type, $expected, ?$name, @< @mess) {
             unshift @mess, "# $got - $expected = " . ($got - $expected) . "\n";
         }
         unshift(@mess, "#      got "._q($got)."\n",
-            "# expected $type "._q($expected)."\n");
+                       "# expected $type "._q($expected)."\n");
     }
     _ok($pass, _where(), $name, < @mess);
 }
@@ -232,7 +232,7 @@ sub cmp_ok ($got, $type, $expected, ?$name, @< @mess) {
 sub within ($got, $expected, $range, $name, @< @mess) {
     my $pass;
     if (!defined $got or !defined $expected or !defined $range) {
-    # This is a fail, but doesn't need extra diagnostics
+        # This is a fail, but doesn't need extra diagnostics
     } elsif ($got !~ m/[0-9]/ or $expected !~ m/[0-9]/ or $range !~ m/[0-9]/) {
         # This is a fail
         unshift @mess, "# got, expected and range must be numeric\n";
@@ -253,8 +253,8 @@ sub within ($got, $expected, $range, $name, @< @mess) {
         if ($got eq $expected) {
             unshift @mess, "# $got - $expected = " . ($got - $expected) . "\n";
         }
-        unshift@mess, "#      got "._q($got)."\n",
-            "# expected "._q($expected)." (within "._q($range).")\n";
+	unshift@mess, "#      got "._q($got)."\n",
+		      "# expected "._q($expected)." (within "._q($range).")\n";
     }
     _ok($pass, _where(), $name, < @mess);
 }
@@ -269,9 +269,9 @@ sub like_yn ($flip, $got, $expected, ?$name, @< @mess) {
     $pass = $got =~ m/$expected/ if !$flip;
     $pass = $got !~ m/$expected/ if $flip;
     unless ($pass) {
-        unshift(@mess, "#      got '$got'\n",
-            $flip
-            ?? "# expected !~ m/$expected/\n" !! "# expected m/$expected/\n");
+	unshift(@mess, "#      got '$got'\n",
+		$flip
+		?? "# expected !~ m/$expected/\n" !! "# expected m/$expected/\n");
     }
     local $Level = $Level + 1;
     _ok($pass, _where(), $name, < @mess);
@@ -291,9 +291,9 @@ sub curr_test {
 }
 
 sub next_test {
-    my $retval = $test;
-    $test = $test + 1; # don't use ++
-    $retval;
+  my $retval = $test;
+  $test = $test + 1; # don't use ++
+  $retval;
 }
 
 # Note: can't pass multipart messages since we try to
@@ -325,40 +325,40 @@ sub eq_array {
     my @($ra, $rb) =  @_;
     return 0 unless (nelems @$ra) == nelems(@$rb);
     for my $i (0..(nelems @$ra)-1) {
-        next     if !defined $ra->[$i] && !defined $rb->[$i];
-        return 0 if !defined $ra->[$i];
-        return 0 if !defined $rb->[$i];
-        return 0 unless $ra->[$i] eq $rb->[$i];
+	next     if !defined $ra->[$i] && !defined $rb->[$i];
+	return 0 if !defined $ra->[$i];
+	return 0 if !defined $rb->[$i];
+	return 0 unless $ra->[$i] eq $rb->[$i];
     }
     return 1;
 }
 
 sub eq_hash {
-    my @($orig, $suspect) =  @_;
-    my $fail;
-    while (my @(?$key, ?$value) =@( each %$suspect)) {
-        # Force a hash recompute if this perl's internals can cache the hash key.
-        $key = "" . $key;
-        if (exists $orig->{$key}) {
-            if ($orig->{?$key} ne $value) {
-                _print "# key ", _qq($key), " was ", _qq($orig->{?$key}),
-                       " now ", _qq($value), "\n";
-                $fail = 1;
-            }
-        } else {
-            _print "# key ", _qq($key), " is ", _qq($value),
-                   ", not in original.\n";
-            $fail = 1;
-        }
-    }
-    foreach (keys %$orig) {
-        # Force a hash recompute if this perl's internals can cache the hash key.
-        $_ = "" . $_;
-        next if (exists $suspect->{$_});
-        _print "# key ", < _qq($_), " was ", < _qq($orig->{?$_}), " now missing.\n";
+  my @($orig, $suspect) =  @_;
+  my $fail;
+  while (my @(?$key, ?$value) =@( each %$suspect)) {
+    # Force a hash recompute if this perl's internals can cache the hash key.
+    $key = "" . $key;
+    if (exists $orig->{$key}) {
+      if ($orig->{?$key} ne $value) {
+        _print "# key ", _qq($key), " was ", _qq($orig->{?$key}),
+                     " now ", _qq($value), "\n";
         $fail = 1;
+      }
+    } else {
+      _print "# key ", _qq($key), " is ", _qq($value),
+                   ", not in original.\n";
+      $fail = 1;
     }
-    !$fail;
+  }
+  foreach (keys %$orig) {
+    # Force a hash recompute if this perl's internals can cache the hash key.
+    $_ = "" . $_;
+    next if (exists $suspect->{$_});
+    _print "# key ", < _qq($_), " was ", < _qq($orig->{?$_}), " now missing.\n";
+    $fail = 1;
+  }
+  !$fail;
 }
 
 sub require_ok ($require) {
@@ -397,10 +397,10 @@ sub _quote_args {
     my @($runperl, $args) =  @_;
 
     foreach ( @$args) {
-        # In VMS protect with doublequotes because otherwise
-        # DCL will lowercase -- unless already doublequoted.
-        $_ = q(").$_.q(") if $is_vms && !m/^\"/ && length($_) +> 0;
-        $$runperl .= ' ' . $_;
+	# In VMS protect with doublequotes because otherwise
+	# DCL will lowercase -- unless already doublequoted.
+       $_ = q(").$_.q(") if $is_vms && !m/^\"/ && length($_) +> 0;
+	$$runperl .= ' ' . $_;
     }
 }
 
@@ -409,32 +409,32 @@ sub _create_runperl { # Create the string to qx in runperl().
     my $runperl = $^EXECUTABLE_NAME =~ m/\s/ ?? qq{"$^EXECUTABLE_NAME"} !! $^EXECUTABLE_NAME;
     #- this allows, for example, to set PERL_RUNPERL_DEBUG=/usr/bin/valgrind
     if (env::var('PERL_RUNPERL_DEBUG')) {
-        $runperl = "$(env::var('PERL_RUNPERL_DEBUG')) $runperl";
+	$runperl = "$(env::var('PERL_RUNPERL_DEBUG')) $runperl";
     }
     unless (%args{?nolib}) {
-        if ($is_macos) {
-            $runperl .= ' -I::lib';
-            # Use UNIX style error messages instead of MPW style.
-            $runperl .= ' -MMac::err=unix' if %args{?stderr};
-        }
-        else {
-            $runperl .= ' "-I../lib"'; # doublequotes because of VMS
-        }
+	if ($is_macos) {
+	    $runperl .= ' -I::lib';
+	    # Use UNIX style error messages instead of MPW style.
+	    $runperl .= ' -MMac::err=unix' if %args{?stderr};
+	}
+	else {
+	    $runperl .= ' "-I../lib"'; # doublequotes because of VMS
+	}
     }
     if (%args{?switches}) {
-        local $Level = 2;
-        die "test.pl:runperl(): 'switches' must be an ARRAYREF " . _where()
-            unless ref %args{?switches} eq "ARRAY";
-        _quote_args(\$runperl, %args{?switches});
+	local $Level = 2;
+	die "test.pl:runperl(): 'switches' must be an ARRAYREF " . _where()
+	    unless ref %args{?switches} eq "ARRAY";
+	_quote_args(\$runperl, %args{?switches});
     }
     if (defined %args{?prog}) {
-        die "test.pl:runperl(): both 'prog' and 'progs' cannot be used " . _where()
-            if defined %args{?progs};
+	die "test.pl:runperl(): both 'prog' and 'progs' cannot be used " . _where()
+	    if defined %args{?progs};
         %args{+progs} = \@(%args{?prog})
     }
     if (defined %args{?progs}) {
-        die "test.pl:runperl(): 'progs' must be an ARRAYREF " . _where()
-            unless ref %args{?progs} eq "ARRAY";
+	die "test.pl:runperl(): 'progs' must be an ARRAYREF " . _where()
+	    unless ref %args{?progs} eq "ARRAY";
         foreach my $prog ( @{%args{progs}}) {
             if ($is_mswin || $is_netware || $is_vms) {
                 $runperl .= qq ( -e "$prog" );
@@ -444,58 +444,58 @@ sub _create_runperl { # Create the string to qx in runperl().
             }
         }
     } elsif (defined %args{?progfile}) {
-        $runperl .= qq( "%args{?progfile}");
+	$runperl .= qq( "%args{?progfile}");
     } else {
-        # You probaby didn't want to be sucking in from the upstream stdin
-        die "test.pl:runperl(): none of prog, progs, progfile, args, "
-            . " switches or stdin specified"
-            unless defined %args{?args} or defined %args{?switches}
-            or defined %args{?stdin};
+	# You probaby didn't want to be sucking in from the upstream stdin
+	die "test.pl:runperl(): none of prog, progs, progfile, args, "
+	    . " switches or stdin specified"
+	    unless defined %args{?args} or defined %args{?switches}
+		or defined %args{?stdin};
     }
     if (defined %args{?stdin}) {
-        # so we don't try to put literal newlines and crs onto the
-        # command line.
-        %args{+stdin} =~ s/\n/\\n/g;
-        %args{+stdin} =~ s/\r/\\r/g;
+	# so we don't try to put literal newlines and crs onto the
+	# command line.
+	%args{+stdin} =~ s/\n/\\n/g;
+	%args{+stdin} =~ s/\r/\\r/g;
 
-        if ($is_mswin || $is_netware || $is_vms) {
-            $runperl = qq{$^EXECUTABLE_NAME -e "print \\\$^STDOUT, qq(} .
-                %args{?stdin} . q{)" | } . $runperl;
-        }
-        elsif ($is_macos) {
-            # MacOS can only do two processes under MPW at once;
-            # the test itself is one; we can't do two more, so
-            # write to temp file
-            my $stdin = qq{$^EXECUTABLE_NAME -e 'print \$^STDOUT, qq(} . %args{?stdin} . qq{)' > teststdin; };
-            if (%args{?verbose}) {
-                my $stdindisplay = $stdin;
-                $stdindisplay =~ s/\n/\n\#/g;
-                _print_stderr "# $stdindisplay\n";
-            }
-            `$stdin`;
-            $runperl .= q{ < teststdin };
-        }
-        else {
-            $runperl = qq{$^EXECUTABLE_NAME -e 'print \$^STDOUT, qq(} .
-                %args{?stdin} . q{)' | } . $runperl;
-        }
+	if ($is_mswin || $is_netware || $is_vms) {
+	    $runperl = qq{$^EXECUTABLE_NAME -e "print \\\$^STDOUT, qq(} .
+		%args{?stdin} . q{)" | } . $runperl;
+	}
+	elsif ($is_macos) {
+	    # MacOS can only do two processes under MPW at once;
+	    # the test itself is one; we can't do two more, so
+	    # write to temp file
+	    my $stdin = qq{$^EXECUTABLE_NAME -e 'print \$^STDOUT, qq(} . %args{?stdin} . qq{)' > teststdin; };
+	    if (%args{?verbose}) {
+		my $stdindisplay = $stdin;
+		$stdindisplay =~ s/\n/\n\#/g;
+		_print_stderr "# $stdindisplay\n";
+	    }
+	    `$stdin`;
+	    $runperl .= q{ < teststdin };
+	}
+	else {
+	    $runperl = qq{$^EXECUTABLE_NAME -e 'print \$^STDOUT, qq(} .
+		%args{?stdin} . q{)' | } . $runperl;
+	}
     }
     if (defined %args{?args}) {
-        _quote_args(\$runperl, %args{?args});
+	_quote_args(\$runperl, %args{?args});
     }
     $runperl .= ' 2>&1'          if  %args{?stderr} && !$is_macos;
     $runperl .= " \x[B3] Dev:Null" if !%args{?stderr} &&  $is_macos;
     if (%args{?verbose}) {
-        my $runperldisplay = $runperl;
-        $runperldisplay =~ s/\n/\n\#/g;
-        _print_stderr "# $runperldisplay\n";
+	my $runperldisplay = $runperl;
+	$runperldisplay =~ s/\n/\n\#/g;
+	_print_stderr "# $runperldisplay\n";
     }
     return $runperl;
 }
 
 sub runperl {
     die "test.pl:runperl() does not take a hashref"
-        if ref @_[0] and ref @_[0] eq 'HASH';
+	if ref @_[0] and ref @_[0] eq 'HASH';
     my $runperl = _create_runperl( < @_ );
     my $result = `$runperl`;
     $result =~ s/\n\n/\n/ if $is_vms; # XXX pipes sometimes double these
@@ -513,48 +513,48 @@ sub DIE {
 my $Perl;
 sub which_perl {
     unless (defined $Perl) {
-        $Perl = $^EXECUTABLE_NAME;
+	$Perl = $^EXECUTABLE_NAME;
 
-        # VMS should have 'perl' aliased properly
-        return $Perl if $^OS_NAME eq 'VMS';
+	# VMS should have 'perl' aliased properly
+	return $Perl if $^OS_NAME eq 'VMS';
 
-        my $exe;
+	my $exe;
         our %Config;
-        eval "require Config; Config->import";
-        if ($^EVAL_ERROR) {
-            warn "test.pl had problems loading Config: $^EVAL_ERROR";
-            $exe = '';
-        } else {
-            $exe = %Config{?_exe};
-        }
-        $exe = '' unless defined $exe;
+	eval "require Config; Config->import";
+	if ($^EVAL_ERROR) {
+	    warn "test.pl had problems loading Config: $^EVAL_ERROR";
+	    $exe = '';
+	} else {
+	    $exe = %Config{?_exe};
+	}
+       $exe = '' unless defined $exe;
 
-        # This doesn't absolutize the path: beware of future chdirs().
-        # We could do File::Spec->abs2rel() but that does getcwd()s,
-        # which is a bit heavyweight to do here.
+	# This doesn't absolutize the path: beware of future chdirs().
+	# We could do File::Spec->abs2rel() but that does getcwd()s,
+	# which is a bit heavyweight to do here.
 
-        if ($Perl =~ m/^perl\Q$exe\E$/i) {
-            my $perl = "perl$exe";
-            eval "require File::Spec";
-            if ($^EVAL_ERROR) {
-                warn "test.pl had problems loading File::Spec: $^EVAL_ERROR";
-                $Perl = "./$perl";
-            } else {
-                $Perl = 'File::Spec'->catfile( <'File::Spec'->curdir(), $perl);
-            }
-        }
+	if ($Perl =~ m/^perl\Q$exe\E$/i) {
+	    my $perl = "perl$exe";
+	    eval "require File::Spec";
+	    if ($^EVAL_ERROR) {
+		warn "test.pl had problems loading File::Spec: $^EVAL_ERROR";
+		$Perl = "./$perl";
+	    } else {
+		$Perl = 'File::Spec'->catfile( <'File::Spec'->curdir(), $perl);
+	    }
+	}
 
-        # Build up the name of the executable file from the name of
-        # the command.
+	# Build up the name of the executable file from the name of
+	# the command.
 
-        if ($Perl !~ m/\Q$exe\E$/i) {
-            $Perl .= $exe;
-        }
+	if ($Perl !~ m/\Q$exe\E$/i) {
+	    $Perl .= $exe;
+	}
 
-        warn "which_perl: cannot find $Perl from $^EXECUTABLE_NAME" unless -f $Perl;
+	warn "which_perl: cannot find $Perl from $^EXECUTABLE_NAME" unless -f $Perl;
 
-        # For subcommands to use.
-        env::var('PERLEXE' ) = $Perl;
+	# For subcommands to use.
+	env::var('PERLEXE' ) = $Perl;
     }
     return $Perl;
 }
@@ -649,8 +649,8 @@ sub fresh_perl_is {
     local $Level = 2;
     $expected =~ s/\n+$//; # is also removed from program output
     _fresh_perl($prog,
-                sub { (nelems @_) ?? @_[0] eq $expected !! $expected },
-                $runperl_args, $name);
+		sub { (nelems @_) ?? @_[0] eq $expected !! $expected },
+		$runperl_args, $name);
 }
 
 #
@@ -663,10 +663,10 @@ sub fresh_perl_like {
     my@($prog, $expected, $runperl_args, $name) =  @_;
     local $Level = 2;
     _fresh_perl($prog,
-                sub { (nelems @_) ??
-                    @_[0] =~ (ref $expected ?? $expected !! m/$expected/) !!
-                        $expected },
-                $runperl_args, $name);
+		sub { (nelems @_) ??
+			  @_[0] =~ (ref $expected ?? $expected !! m/$expected/) !!
+		          $expected },
+		$runperl_args, $name);
 }
 
 sub can_ok ($proto, @< @methods) {
@@ -678,14 +678,14 @@ sub can_ok ($proto, @< @methods) {
 
     my @nok = @( () );
     foreach my $method ( @methods) {
-                          local($^OS_ERROR, $^EVAL_ERROR);  # don't interfere with caller's $@
-        # eval sometimes resets $!
+        local($^OS_ERROR, $^EVAL_ERROR);  # don't interfere with caller's $@
+                        # eval sometimes resets $!
         try { $proto->can($method) } || push @nok, $method;
     }
 
     my $name;
     $name = (nelems @methods) == 1 ?? "$class->can('@methods[0]')"
-        !! "$class->can(...)";
+                          !! "$class->can(...)";
 
     _ok( !nelems @nok, _where(), $name );
 }
@@ -701,8 +701,8 @@ sub isa_ok ($object, $class, ?$obj_name) {
         $diag = "$obj_name isn't a reference";
     }
     else {
-                          # We can't use UNIVERSAL::isa because we want to honor isa() overrides
-                          local($^EVAL_ERROR, $^OS_ERROR);  # eval sometimes resets $!
+        # We can't use UNIVERSAL::isa because we want to honor isa() overrides
+        local($^EVAL_ERROR, $^OS_ERROR);  # eval sometimes resets $!
         my $rslt = try { $object->isa($class) };
         if( $^EVAL_ERROR ) {
             if( $^EVAL_ERROR->{?description} =~ m/^Can't call method "isa" on unblessed reference/ ) {
@@ -751,7 +751,7 @@ sub eval_dies_like ($e, $qr, ?$name) {
   TODO:
     do {
         todo_skip("Compile time abortion are known to leak memory", 1) if env::var('PERL_VALGRIND');
-
+        
         eval "$e";
         my $err = $^EVAL_ERROR;
         if (not $err) {

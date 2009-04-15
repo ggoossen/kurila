@@ -16,20 +16,20 @@ print $^STDOUT, q(1..22
 );
 
 do {
-    our ($a, $b, $c);
+  our ($a, $b, $c);
 
-    $a = 'ab' . 'c';	# compile time
-    $b = 'def';
+  $a = 'ab' . 'c';	# compile time
+  $b = 'def';
 
-    $c = $a . $b;
-    ok($c eq 'abcdef');
+  $c = $a . $b;
+  ok($c eq 'abcdef');
 
-    $c .= 'xyz';
-    ok($c eq 'abcdefxyz');
+  $c .= 'xyz';
+  ok($c eq 'abcdefxyz');
 
-    $_ = $a;
-    $_ .= $b;
-    ok($_ eq 'abcdef');
+  $_ = $a;
+  $_ .= $b;
+  ok($_ eq 'abcdef');
 };
 
 # test that when right argument of concat is UTF8, and is the same
@@ -37,9 +37,9 @@ do {
 # longer frees the wrong string.
 do {
     sub r2 {
-        my $string = '';
-        $string .= pack("U0a*", 'mnopqrstuvwx');
-        $string = "abcdefghijkl$string";
+	my $string = '';
+	$string .= pack("U0a*", 'mnopqrstuvwx');
+	$string = "abcdefghijkl$string";
     }
 
     r2() and ok(1) for qw/ 4 5 /;
@@ -55,33 +55,33 @@ do {
     my $t1 = $a; $t1 .= $ab;
 
     ok(scalar $t1 =~ m/b/);
-
+    
     my $t2 = $a; $t2 .= $uab;
-
+    
     ok(scalar eval '$t2 =~ m/$ub/');
-
+    
     my $t3 = $ua; $t3 .= $ab;
-
+    
     ok(scalar $t3 =~ m/$ub/);
-
+    
     my $t4 = $ua; $t4 .= $uab;
-
+    
     ok(scalar eval '$t4 =~ m/$ub/');
-
+    
     my $t5 = $a; $t5 = $ab . $t5;
-
+    
     ok(scalar $t5 =~ m/$ub/);
-
+    
     my $t6 = $a; $t6 = $uab . $t6;
-
+    
     ok(scalar eval '$t6 =~ m/$ub/');
-
+    
     my $t7 = $ua; $t7 = $ab . $t7;
-
+    
     ok(scalar $t7 =~ m/$ub/);
-
+    
     my $t8 = $ua; $t8 = $uab . $t8;
-
+    
     ok(scalar eval '$t8 =~ m/$ub/');
 };
 

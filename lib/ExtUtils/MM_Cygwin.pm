@@ -17,7 +17,7 @@ ExtUtils::MM_Cygwin - methods to override UN*X behaviour in ExtUtils::MakeMaker
 
 =head1 SYNOPSIS
 
-use ExtUtils::MM_Cygwin; # Done internally by ExtUtils::MakeMaker if needed
+ use ExtUtils::MM_Cygwin; # Done internally by ExtUtils::MakeMaker if needed
 
 =head1 DESCRIPTION
 
@@ -86,7 +86,7 @@ sub init_linker {
         $self->{+PERL_ARCHIVE} = $libperl;
     } else {
         $self->{+PERL_ARCHIVE} = 
-        '$(PERL_INC)' .'/'. ("%Config{?libperl}" or "libperl.a");
+          '$(PERL_INC)' .'/'. ("%Config{?libperl}" or "libperl.a");
     }
 
     $self->{+PERL_ARCHIVE_AFTER} ||= '';

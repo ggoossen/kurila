@@ -8,37 +8,37 @@ IO::File - supply object methods for filehandles
 
 =head1 SYNOPSIS
 
-use IO::File;
+    use IO::File;
 
-$fh = new IO::File;
-if ($fh->open("< file")) {
-print <$fh>;
-$fh->close;
-}
+    $fh = new IO::File;
+    if ($fh->open("< file")) {
+        print <$fh>;
+        $fh->close;
+    }
 
-$fh = new IO::File "> file";
-if (defined $fh) {
-print $fh "bar\n";
-$fh->close;
-}
+    $fh = new IO::File "> file";
+    if (defined $fh) {
+        print $fh "bar\n";
+        $fh->close;
+    }
 
-$fh = new IO::File "file", "r";
-if (defined $fh) {
-print <$fh>;
-undef $fh;       # automatically closes the file
-}
+    $fh = new IO::File "file", "r";
+    if (defined $fh) {
+        print <$fh>;
+        undef $fh;       # automatically closes the file
+    }
 
-$fh = new IO::File "file", O_WRONLY|O_APPEND;
-if (defined $fh) {
-print $fh "corge\n";
+    $fh = new IO::File "file", O_WRONLY|O_APPEND;
+    if (defined $fh) {
+        print $fh "corge\n";
 
-$pos = $fh->getpos;
-$fh->setpos($pos);
+        $pos = $fh->getpos;
+        $fh->setpos($pos);
 
-undef $fh;       # automatically closes the file
-}
+        undef $fh;       # automatically closes the file
+    }
 
-autoflush STDOUT 1;
+    autoflush STDOUT 1;
 
 =head1 DESCRIPTION
 
@@ -153,11 +153,11 @@ sub new {
     my $type = shift;
     my $class = ref($type) || $type || "IO::File";
     (nelems @_) +>= 0 && (nelems @_) +<= 3
-        or die "usage: new $class [FILENAME [,MODE [,PERMS]]]";
+	or die "usage: new $class [FILENAME [,MODE [,PERMS]]]";
     my $fh = $class->SUPER::new();
     if ((nelems @_)) {
-        $fh->open(< @_)
-            or return undef;
+	$fh->open(< @_)
+	    or return undef;
     }
     $fh;
 }
@@ -170,14 +170,14 @@ sub open {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $fh->open(FILENAME [,MODE [,PERMS]])';
     my @($fh, $file, ...) =  @_;
     if ((nelems @_) +> 2) {
-        my @($mode, $perms) =  @_[[@(2, 3)]];
-        if ($mode =~ m/^\d+$/) {
-            defined $perms or $perms = 0666;
-            return sysopen($fh, $file, $mode, $perms);
-        } elsif ($mode =~ m/:/) {
-            return open($fh, $mode, $file) if (nelems @_) == 3;
-            die 'usage: $fh->open(FILENAME, IOLAYERS)';
-        } else {
+	my @($mode, $perms) =  @_[[@(2, 3)]];
+	if ($mode =~ m/^\d+$/) {
+	    defined $perms or $perms = 0666;
+	    return sysopen($fh, $file, $mode, $perms);
+	} elsif ($mode =~ m/:/) {
+	    return open($fh, $mode, $file) if (nelems @_) == 3;
+	    die 'usage: $fh->open(FILENAME, IOLAYERS)';
+	} else {
             return open($fh, IO::Handle::_open_mode_string($mode), $file);
         }
     }

@@ -51,12 +51,12 @@ sub code2country
     #-------------------------------------------------------------------
     if ($codeset == LOCALE_CODE_NUMERIC)
     {
-        return undef if ($code =~ m/\D/);
-        $code = sprintf("\%.3d", $code);
+	return undef if ($code =~ m/\D/);
+	$code = sprintf("\%.3d", $code);
     }
     else
     {
-        $code = lc($code);
+	$code = lc($code);
     }
 
     if (exists $CODES->[$codeset]->{$code})
@@ -211,21 +211,21 @@ sub rename_country
     $country = $CODES->[$codeset]->{?$code};
 
     foreach my $cset (@(LOCALE_CODE_ALPHA_2,
-    LOCALE_CODE_ALPHA_3,
-        LOCALE_CODE_NUMERIC))
-        {
-            if ($cset == $codeset)
-            {
-                $c = $code;
-            }
-            else
-            {
-                $c = country_code2code($code, $codeset, $cset);
-            }
+			LOCALE_CODE_ALPHA_3,
+			LOCALE_CODE_NUMERIC))
+    {
+	if ($cset == $codeset)
+	{
+	    $c = $code;
+	}
+	else
+	{
+	    $c = country_code2code($code, $codeset, $cset);
+	}
 
-            $CODES->[$cset]->{+$c} = $new_name;
-            $COUNTRIES->[$cset]->{+lc "$new_name"} = $c;
-        }
+	$CODES->[$cset]->{+$c} = $new_name;
+	$COUNTRIES->[$cset]->{+lc "$new_name"} = $c;
+    }
 
     return 1;
 }
@@ -245,10 +245,10 @@ sub _code2codeset
 
 
     foreach my $codeset (@(LOCALE_CODE_ALPHA_2, LOCALE_CODE_ALPHA_3,
-    LOCALE_CODE_NUMERIC))
-        {
-            return $codeset if (exists $CODES->[$codeset]->{$code})
-        }
+			LOCALE_CODE_NUMERIC))
+    {
+	return $codeset if (exists $CODES->[$codeset]->{$code})
+    }
 
     return undef;
 }
@@ -272,28 +272,28 @@ do {
         @($alpha2, $alpha3, $numeric, @< @countries) =  split(m/:/, $_);
 
         $CODES->[+LOCALE_CODE_ALPHA_2]->{+$alpha2} = @countries[0];
-        foreach my $country ( @countries)
-        {
-            $COUNTRIES->[+LOCALE_CODE_ALPHA_2]->{+lc "$country"} = $alpha2;
-        }
+	foreach my $country ( @countries)
+	{
+	    $COUNTRIES->[+LOCALE_CODE_ALPHA_2]->{+lc "$country"} = $alpha2;
+	}
 
-        if ($alpha3)
-        {
+	if ($alpha3)
+	{
             $CODES->[+LOCALE_CODE_ALPHA_3]->{+$alpha3} = @countries[0];
-            foreach my $country ( @countries)
-            {
-                $COUNTRIES->[+LOCALE_CODE_ALPHA_3]->{+lc "$country"} = $alpha3;
-            }
-        }
+	    foreach my $country ( @countries)
+	    {
+		$COUNTRIES->[+LOCALE_CODE_ALPHA_3]->{+lc "$country"} = $alpha3;
+	    }
+	}
 
-        if ($numeric)
-        {
+	if ($numeric)
+	{
             $CODES->[+LOCALE_CODE_NUMERIC]->{+$numeric} = @countries[0];
-            foreach my $country ( @countries)
-            {
-                $COUNTRIES->[+LOCALE_CODE_NUMERIC]->{+lc "$country"} = $numeric;
-            }
-        }
+	    foreach my $country ( @countries)
+	    {
+		$COUNTRIES->[+LOCALE_CODE_NUMERIC]->{+lc "$country"} = $numeric;
+	    }
+	}
 
     }
 

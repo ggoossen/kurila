@@ -7,7 +7,7 @@ ExtUtils::MM_BeOS - methods to override UN*X behaviour in ExtUtils::MakeMaker
 
 =head1 SYNOPSIS
 
-use ExtUtils::MM_BeOS;	# Done internally by ExtUtils::MakeMaker if needed
+ use ExtUtils::MM_BeOS;	# Done internally by ExtUtils::MakeMaker if needed
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ sub init_linker {
     my@($self) =@( shift);
 
     $self->{+PERL_ARCHIVE} ||= 
-    File::Spec->catdir('$(PERL_INC)',%Config{libperl});
+      File::Spec->catdir('$(PERL_INC)',%Config{libperl});
     $self->{+PERL_ARCHIVE_AFTER} ||= '';
     $self->{+EXPORT_LIST}  ||= '';
 }

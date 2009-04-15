@@ -16,21 +16,21 @@ class Y(O): pass
 class A(X,Y): pass
 class B(Y,X): pass
 try:
-class Z(A,B): pass #creates Z(A,B) in Python 2.2
+    class Z(A,B): pass #creates Z(A,B) in Python 2.2
 except TypeError:
-pass # Z(A,B) cannot be created in Python 2.3
+    pass # Z(A,B) cannot be created in Python 2.3
 
 =cut
 
 do {
     package X;
-
-        package Y;
-
-        package XY;
+    
+    package Y;
+    
+    package XY;
     our @ISA = @('X', 'Y');
-
-        package YX;
+    
+    package YX;
     our @ISA = @('Y', 'X');
 };
 

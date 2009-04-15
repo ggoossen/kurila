@@ -19,23 +19,23 @@ sub _mkdirs {
         mkdir $dir or die "Can't mkdir $dir: $^OS_ERROR" if ! -d $dir;
     }
 }
-
+    
 
 BEGIN {
     if ($^OS_NAME eq 'MacOS')
     {
-        $MacPerl::Architecture = $MacPerl::Architecture; # shhhhh
-        $blib = ":blib:";
-        $blib_lib = ":blib:lib:";
-        $blib_arch = ":blib:lib:$MacPerl::Architecture:";
-        @blib_dirs = @($blib, $blib_lib, $blib_arch); # order
+	$MacPerl::Architecture = $MacPerl::Architecture; # shhhhh
+	$blib = ":blib:";
+	$blib_lib = ":blib:lib:";
+	$blib_arch = ":blib:lib:$MacPerl::Architecture:";
+	@blib_dirs = @($blib, $blib_lib, $blib_arch); # order
     }
     else
     {
-        $blib = "blib";
-        $blib_arch = "blib/arch";
-        $blib_lib = "blib/lib";
-        @blib_dirs = @($blib, $blib_arch, $blib_lib);
+	$blib = "blib";
+	$blib_arch = "blib/arch";
+	$blib_lib = "blib/lib";
+	@blib_dirs = @($blib, $blib_arch, $blib_lib);
     }
     _cleanup( < @blib_dirs );
 }

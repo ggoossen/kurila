@@ -12,4 +12,4 @@ WriteMakefile(
 
     AUTHOR        => 'Jan Dubois <jand@activestate.com>',
     ABSTRACT_FROM => 'Win32.pm',
-    );
+);

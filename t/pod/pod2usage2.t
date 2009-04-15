@@ -4,45 +4,45 @@ use Test::More;
 use warnings;
 
 BEGIN {
-    if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'VMS') {
-        plan skip_all => "Not portable on Win32 or VMS\n";
-    }
-    else {
-        plan tests => 14;
-    }
+  if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'VMS') {
+      plan skip_all => "Not portable on Win32 or VMS\n";
+  }
+  else {
+      plan tests => 14;
+  }
 }
 use Pod::Usage;
 
 sub getoutput
 {
-    my @($code) =  @_;
-    my $pid = open(my $in, "-|", "-");
-    unless(defined $pid) {
-        die "Cannot fork: $^OS_ERROR";
-    }
-    if($pid) {
-        # parent
-        my @out = @( ~< $in );
-        close($in);
-        my $exit = $^CHILD_ERROR>>8;
-        s/^/#/ for  @out;
-        print $^STDOUT, "#EXIT=$exit OUTPUT=+++#$(join '',@out)#+++\n";
-        return @($exit, join("", @out));
-    }
-    # child
-    open($^STDERR, ">&", $^STDOUT);
-    &$code( < @_ );
-    print $^STDOUT, "--NORMAL-RETURN--\n";
-    exit 0;
+  my @($code) =  @_;
+  my $pid = open(my $in, "-|", "-");
+  unless(defined $pid) {
+    die "Cannot fork: $^OS_ERROR";
+  }
+  if($pid) {
+    # parent
+    my @out = @( ~< $in );
+    close($in);
+    my $exit = $^CHILD_ERROR>>8;
+    s/^/#/ for  @out;
+    print $^STDOUT, "#EXIT=$exit OUTPUT=+++#$(join '',@out)#+++\n";
+    return @($exit, join("", @out));
+  }
+  # child
+  open($^STDERR, ">&", $^STDOUT);
+  &$code( < @_ );
+  print $^STDOUT, "--NORMAL-RETURN--\n";
+  exit 0;
 }
 
 sub compare($left,$right)
 {
-    $left  =~ s/^#\s+/#/gm;
-    $right =~ s/^#\s+/#/gm;
-    $left  =~ s/\s+/ /gm;
-    $right =~ s/\s+/ /gm;
-    return $left eq $right;
+  $left  =~ s/^#\s+/#/gm;
+  $right =~ s/^#\s+/#/gm;
+  $left  =~ s/\s+/ /gm;
+  $right =~ s/\s+/ /gm;
+  return $left eq $right;
 }
 
 my @($exit, $text) =  getoutput( sub { pod2usage() } );
@@ -54,8 +54,8 @@ ok (compare ($text, <<'EOT'), "Output test pod2usage ()");
 EOT
 
 @($exit, $text) =  getoutput( sub { pod2usage(
-                                  message => 'You naughty person, what did you say?',
-                                      verbose => 1 ) });
+  message => 'You naughty person, what did you say?',
+  verbose => 1 ) });
 is ($exit, 1,                 "Exit status pod2usage (message => '...', verbose => 1)");
 ok (compare ($text, <<'EOT'), "Output test pod2usage (message => '...', verbose => 1)");
 #You naughty person, what did you say?

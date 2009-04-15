@@ -36,7 +36,7 @@ print $^STDOUT, `$cmd`;
 # KNOWN BUG system() does not honor STDOUT redirections on VMS.
 if( $^OS_NAME eq 'VMS' ) {
     print $^STDOUT, "not ok $_ # TODO system() not honoring STDOUT redirect on VMS\n"
-        for 6..7;
+      for 6..7;
 }
 else {
     system sprintf $echo, 6;
@@ -90,7 +90,7 @@ curr_test(13);
 
 SKIP: do {
     skip("need perlio", 14) unless config_value("useperlio");
-
+    
     ok(open($f, ">&", $^STDOUT));
     isnt(fileno($f), fileno($^STDOUT));
     close $f;
@@ -125,9 +125,9 @@ SKIP: do {
 
     open($gfh, "<", "dup$^PID") or die;
     do {
-        my $line;
-        $line = ~< *$gfh; chomp $line; is($line, "ggg");
-        $line = ~< *$gfh; chomp $line; is($line, "fff");
+	my $line;
+	$line = ~< *$gfh; chomp $line; is($line, "ggg");
+	$line = ~< *$gfh; chomp $line; is($line, "fff");
     };
     close $gfh;
 
@@ -143,10 +143,10 @@ SKIP: do {
     close $utfdup;
     open(my $utfin, "<:utf8", "dup$^PID") or die $^OS_ERROR;
     do {
-        my $line;
-        $line = ~< *$utfin; is($line, $message);
-        $line = ~< *$utfin; is($line, $message);
-        $line = ~< *$utfin; is($line, $message);
+	my $line;
+	$line = ~< *$utfin; is($line, $message);
+	$line = ~< *$utfin; is($line, $message);
+	$line = ~< *$utfin; is($line, $message);
     };
     close $utfin;
 

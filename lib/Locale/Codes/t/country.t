@@ -13,10 +13,10 @@ use Locale::Country;
 # If it is true (1), the test is treated as passing, otherwise it failed.
 #-----------------------------------------------------------------------
 our @TESTS =
-    @(
- #================================================
- # TESTS FOR code2country
- #================================================
+@(
+	#================================================
+	# TESTS FOR code2country
+	#================================================
 
  #---- selection of examples which should all result in undef -----------
  \@('!defined code2country()', 0),                  # no argument
@@ -56,9 +56,9 @@ our @TESTS =
  \@('code2country("tls", LOCALE_CODE_ALPHA_3) eq "Timor-Leste"', 0),
  \@('code2country("626", LOCALE_CODE_NUMERIC) eq "Timor-Leste"', 0),
 
- #================================================
- # TESTS FOR country2code
- #================================================
+	#================================================
+	# TESTS FOR country2code
+	#================================================
 
  #---- selection of examples which should all result in undef -----------
  \@('!defined code2country("BO", LOCALE_CODE_ALPHA_3)', 0),
@@ -86,9 +86,9 @@ our @TESTS =
  \@('country2code("United States of America") eq "us"', 0),    # alias
  \@('country2code("Great Britain")			eq "gb"', 0),    # alias
 
- #================================================
- # TESTS FOR country_code2code
- #================================================
+	#================================================
+	# TESTS FOR country_code2code
+	#================================================
 
  #---- selection of examples which should all result in undef -----------
  \@('!defined country_code2code("bo", LOCALE_CODE_ALPHA_3, LOCALE_CODE_ALPHA_3)', 0),
@@ -128,7 +128,7 @@ our @TESTS =
  \@('country2code("Congo, The Democratic Republic of the", LOCALE_CODE_ALPHA_3)	eq "cod"', 0),	# new name
  \@('country2code("Congo, The Democratic Republic of the", LOCALE_CODE_NUMERIC)	eq "180"', 0),	# new name
 
-    );
+);
 
 use Test::More;
 plan tests => nelems(@TESTS);

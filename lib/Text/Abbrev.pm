@@ -9,8 +9,8 @@ abbrev - create an abbreviation table from a list
 
 =head1 SYNOPSIS
 
-use Text::Abbrev;
-abbrev $hashref, LIST
+    use Text::Abbrev;
+    abbrev $hashref, LIST
 
 
 =head1 DESCRIPTION
@@ -21,13 +21,13 @@ The values are the original list elements.
 
 =head1 EXAMPLE
 
-$hashref = abbrev qw(list edit send abort gripe);
+    $hashref = abbrev qw(list edit send abort gripe);
 
-%hash = abbrev qw(list edit send abort gripe);
+    %hash = abbrev qw(list edit send abort gripe);
 
-abbrev $hashref, qw(list edit send abort gripe);
+    abbrev $hashref, qw(list edit send abort gripe);
 
-abbrev(*hash, qw(list edit send abort gripe));
+    abbrev(*hash, qw(list edit send abort gripe));
 
 =cut
 
@@ -48,21 +48,21 @@ sub abbrev {
     $returnvoid = 1;
     %{$hashref} = %( () );
 
-  WORD: foreach my $word ( @_) {
+    WORD: foreach my $word ( @_) {
         for my $len ( reverse( 1 .. (length $word) - 1 ) ) {
-            my $abbrev = substr($word,0,$len);
-            my $seen = ++%table{+$abbrev};
-            if ($seen == 1) {	    # We're the first word so far to have
-                # this abbreviation.
-                $hashref->{+$abbrev} = $word;
-            } elsif ($seen == 2) {  # We're the second word to have this
-                # abbreviation, so we can't use it.
-                delete $hashref->{$abbrev};
-            } else {		    # We're the third word to have this
-                # abbreviation, so skip to the next word.
-                next WORD;
-            }
-        }
+	    my $abbrev = substr($word,0,$len);
+	    my $seen = ++%table{+$abbrev};
+	    if ($seen == 1) {	    # We're the first word so far to have
+	    			    # this abbreviation.
+	        $hashref->{+$abbrev} = $word;
+	    } elsif ($seen == 2) {  # We're the second word to have this
+	    			    # abbreviation, so we can't use it.
+	        delete $hashref->{$abbrev};
+	    } else {		    # We're the third word to have this
+	    			    # abbreviation, so skip to the next word.
+	        next WORD;
+	    }
+	}
     }
     # Non-abbreviations always get entered, even if they aren't unique
     foreach my $word ( @_) {

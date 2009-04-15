@@ -30,7 +30,7 @@ END {
 }
 
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
-    diag("chdir failed: $^OS_ERROR");
+  diag("chdir failed: $^OS_ERROR");
 
 my $stdout = '';
 close $^STDOUT;
@@ -41,7 +41,7 @@ do {
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
         PM              => \%( 'wibble' => 'woof' )
-        );
+    );
 
     is_deeply( $mm->{PM},  \%( wibble => 'woof' ) );
 };

@@ -24,9 +24,9 @@ sub length ($s) {
 
 sub substr {
     return
-        (nelems @_) == 2 ?? CORE::substr(@_[0], @_[1]) !!
-        (nelems @_) == 3 ?? CORE::substr(@_[0], @_[1], @_[2]) !!
-        CORE::substr(@_[0], @_[1], @_[2], @_[3]) ;
+	(nelems @_) == 2 ?? CORE::substr(@_[0], @_[1]) !!
+	(nelems @_) == 3 ?? CORE::substr(@_[0], @_[1], @_[2]) !!
+	          CORE::substr(@_[0], @_[1], @_[2], @_[3]) ;
 }
 
 sub ord($s) {
@@ -39,14 +39,14 @@ sub chr($s) {
 
 sub index {
     return
-        (nelems @_) == 2 ?? CORE::index(@_[0], @_[1]) !!
-        CORE::index(@_[0], @_[1], @_[2]) ;
+	(nelems @_) == 2 ?? CORE::index(@_[0], @_[1]) !!
+	          CORE::index(@_[0], @_[1], @_[2]) ;
 }
 
 sub rindex {
     return
-        (nelems @_) == 2 ?? CORE::rindex(@_[0], @_[1]) !!
-        CORE::rindex(@_[0], @_[1], @_[2]) ;
+	(nelems @_) == 2 ?? CORE::rindex(@_[0], @_[1]) !!
+	          CORE::rindex(@_[0], @_[1], @_[2]) ;
 }
 
 BEGIN { bytes::import() }

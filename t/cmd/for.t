@@ -13,9 +13,9 @@ print $^STDOUT, "#1	:$y: eq :10:\n";
 $y = join(' ', @x);
 print $^STDOUT, "#1	:$y: eq :0 1 2 3 4 5 6 7 8 9 10:\n";
 if (join(' ', @x) eq '0 1 2 3 4 5 6 7 8 9 10') {
-    print $^STDOUT, "ok 1\n";
+	print $^STDOUT, "ok 1\n";
 } else {
-    print $^STDOUT, "not ok 1\n";
+	print $^STDOUT, "not ok 1\n";
 }
 
 @ary = @(1, 2);
@@ -33,17 +33,17 @@ print $^STDOUT, "ok 4\n";
 # this also tests that $foo was restored to 3210 after test 3
 my $foo = "3210";
 for (split(' ','a b c d e')) {
-    $foo .= $_;
+	$foo .= $_;
 }
 if ($foo eq '3210abcde') {print $^STDOUT, "ok 5\n";} else {print $^STDOUT, "not ok 5 $foo\n";}
 
 foreach my $foo (@(("ok 6\n","ok 7\n"))) {
-    print $^STDOUT, $foo;
+	print $^STDOUT, $foo;
 }
 
 sub foo {
     for my $i (1..5) {
-        return $i if @_[0] == $i;
+	return $i if @_[0] == $i;
     }
 }
 
@@ -83,9 +83,9 @@ do {
 
     my $x = 0;
     sub X::DESTROY {
-        my $o = shift;
-        $x++;
-        1 for @( (1));
+	my $o = shift;
+	$x++;
+	1 for @( (1));
     }
 
     my %h;
@@ -99,8 +99,8 @@ my $test = 15;
 sub is($got, $expected, $name) {
     ++$test;
     if ($got eq $expected) {
-        print $^STDOUT, "ok $test # $name\n";
-        return 1;
+	print $^STDOUT, "ok $test # $name\n";
+	return 1;
     }
     print $^STDOUT, "not ok $test # $name\n";
     print $^STDOUT, "# got '$got', expected '$expected'\n";

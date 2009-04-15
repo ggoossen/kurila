@@ -16,14 +16,14 @@ WriteMakefile(
 
     (
       env::var('SKIP_FOR_CORE')
-      ?? (MAN3PODS    => \%())
-      !! (PREREQ_PM   => \%( 'Compress::Raw::Zlib'  => $::VERSION,
-                          'IO::Compress::Base'   => $::VERSION,
-                              'IO::Uncompress::Base' => $::VERSION,
-                      )
-                      )
-      ),
-
+        ?? (MAN3PODS    => \%())
+	    !! (PREREQ_PM   => \%( 'Compress::Raw::Zlib'  => $::VERSION,
+                                  'IO::Compress::Base'   => $::VERSION,
+                                  'IO::Uncompress::Base' => $::VERSION,
+                                )
+	      )
+    ),
+       
     ABSTRACT => 'Perl interface to zlib',
     AUTHOR  => 'Paul Marquess <pmqs@cpan.org>',
 
@@ -31,7 +31,7 @@ WriteMakefile(
 
     'LICENSE'  => 'perl',    
 
-    ) ;
+) ;
 
 # end of file Makefile.PL
 

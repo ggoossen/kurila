@@ -16,22 +16,22 @@ WriteMakefile(
 
 
     PREREQ_PM   => \%( 'Compress::Raw::Zlib'           => $::VERSION,
-        'IO::Compress::Base'            => $::VERSION,
-            'IO::Compress::Base::Common'    => $::VERSION,
-            'IO::Uncompress::Base'          => $::VERSION,
-            'IO::Compress::Gzip'            => $::VERSION,
-            'IO::Compress::Gzip::Constants' => $::VERSION,
-            'IO::Uncompress::Gunzip'        => $::VERSION,
-            'Scalar::Util'                  => 0,
-    ),
-
+		                    'IO::Compress::Base'            => $::VERSION,
+		                    'IO::Compress::Base::Common'    => $::VERSION,
+		                    'IO::Uncompress::Base'          => $::VERSION,
+		                    'IO::Compress::Gzip'            => $::VERSION,
+		                    'IO::Compress::Gzip::Constants' => $::VERSION,
+		                    'IO::Uncompress::Gunzip'        => $::VERSION,
+		                    'Scalar::Util'                  => 0,
+                          ),
+       
     ABSTRACT_FROM => 'lib/Compress/Zlib.pm',
     AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
 
     INSTALLDIRS => 'perl',
     LICENSE  => 'perl',
 
-    ) ;
+) ;
 
 # end of file Makefile.PL
 

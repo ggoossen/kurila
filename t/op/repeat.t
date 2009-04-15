@@ -118,7 +118,7 @@ do {
     my $x = 'abcd';
     my $y = '';
     for (@($x =~ m/./g) x 2) {
-        $y .= chop;
+	$y .= chop;
     }
     is($y, 'abcdabcd');
 };

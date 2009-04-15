@@ -9,34 +9,34 @@ do {
     package MRO_ISA_NO_ARRAY;
     our @ISA = 'foobar';
     main::dies_like( sub { mro::get_linear_isa('MRO_ISA_NO_ARRAY') },
-                     qr/[@]ISA is not an array but PLAINVALUE/ );
+               qr/[@]ISA is not an array but PLAINVALUE/ );
 };
 
 do {
     package MRO_A;
     our @ISA = qw//;
-        package MRO_B;
+    package MRO_B;
     our @ISA = qw//;
-        package MRO_C;
+    package MRO_C;
     our @ISA = qw//;
-        package MRO_D;
+    package MRO_D;
     our @ISA = qw/MRO_A MRO_B MRO_C/;
-        package MRO_E;
+    package MRO_E;
     our @ISA = qw/MRO_A MRO_B MRO_C/;
-        package MRO_F;
+    package MRO_F;
     our @ISA = qw/MRO_D MRO_E/;
 };
 
 ok(eq_array(
     mro::get_linear_isa('MRO_F'),
     \qw/MRO_F MRO_D MRO_E MRO_A MRO_B MRO_C/
-    ));
+));
 
 my @isarev = sort { $a cmp $b }, @{mro::get_isarev('MRO_B')};
 ok(eq_array(
     \@isarev,
     \qw/MRO_D MRO_E MRO_F/
-    ));
+));
 
 ok(!mro::is_universal('MRO_B'));
 
@@ -52,7 +52,7 @@ ok(!mro::is_universal('Does_Not_Exist'));
 ok(eq_array(
     mro::get_linear_isa('Does_Not_Exist_Three'),
     \qw/Does_Not_Exist_Three/
-    ));
+));
 
 # Assigning @ISA via globref
 do {
@@ -144,7 +144,7 @@ do {
         package ISACLEAR1;
         our @ISA = qw/WW XX/;
 
-            package ISACLEAR2;
+        package ISACLEAR2;
         our @ISA = qw/YY ZZ/;
     };
     # baseline
@@ -165,7 +165,7 @@ do {
         '@MRO_R3::ISA = @("MRO_R4"); push(@MRO_R4::ISA, "MRO_R3");',
         '@MRO_R5::ISA = @("MRO_R6"); @MRO_R6::ISA = qw/XX MRO_R5 YY/;',
         '@MRO_R7::ISA = @("MRO_R8"); push(@MRO_R8::ISA, < qw/XX MRO_R7 YY/)',
-        );
+    );
     foreach my $code ( @recurse_codes) {
         eval $code;
         ok($^EVAL_ERROR->{?description} =~ m/Recursive inheritance detected/);
@@ -182,7 +182,7 @@ do {
         package SUPERTEST::MID;
         our @ISA = @( 'SUPERTEST' );
 
-            package SUPERTEST::KID;
+        package SUPERTEST::KID;
         our @ISA = @( 'SUPERTEST::MID' );
         sub foo { my $s = shift; $s->SUPER::foo(< @_) }
 
@@ -193,7 +193,7 @@ do {
     my $stk_obj = SUPERTEST::KID->new();
     is($stk_obj->foo(1), 2);
     do { no warnings 'redefine';
-        *SUPERTEST::foo = sub { @_[1]+2 };
+      *SUPERTEST::foo = sub { @_[1]+2 };
     };
     is($stk_obj->foo(2), 4);
     @SUPERTEST::MID::ISA = @( 'SUPERTEST::REBASE' );

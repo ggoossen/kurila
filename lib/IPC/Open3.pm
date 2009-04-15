@@ -16,12 +16,12 @@ IPC::Open3, open3 - open a process for reading, writing, and error handling
 
 =head1 SYNOPSIS
 
-$pid = open3(\*CHLD_IN, \*CHLD_OUT, \*CHLD_ERR,
-'some cmd and args', 'optarg', ...);
+    $pid = open3(\*CHLD_IN, \*CHLD_OUT, \*CHLD_ERR,
+		    'some cmd and args', 'optarg', ...);
 
-my($wtr, $rdr, $err);
-$pid = open3($wtr, $rdr, $err,
-'some cmd and args', 'optarg', ...);
+    my($wtr, $rdr, $err);
+    $pid = open3($wtr, $rdr, $err,
+		    'some cmd and args', 'optarg', ...);
 
 =head1 DESCRIPTION
 
@@ -181,7 +181,7 @@ sub _open3 {
     my($dup_wtr, $dup_rdr, $dup_err, $kidpid);
 
     if ((nelems @cmd) +> 1 and @cmd[0] eq '-') {
-        die "Arguments don't make sense when the command is '-'"
+	die "Arguments don't make sense when the command is '-'"
     }
 
     # simulate autovivification of filehandles because
@@ -189,13 +189,13 @@ sub _open3 {
     # tchrist 5-Mar-00
 
     unless (try  {
-            $dad_wtr = @_[1] = gensym unless defined $dad_wtr;
-            $dad_rdr = @_[2] = gensym unless defined $dad_rdr;
-            1; }) 
+	$dad_wtr = @_[1] = gensym unless defined $dad_wtr;
+	$dad_rdr = @_[2] = gensym unless defined $dad_rdr;
+	1; }) 
     {
-        # must strip crud for die to add back, or looks ugly
-        $^EVAL_ERROR =~ s/(?<=value attempted) at .*//s;
-        die "$Me: $^EVAL_ERROR";
+	# must strip crud for die to add back, or looks ugly
+	$^EVAL_ERROR =~ s/(?<=value attempted) at .*//s;
+	die "$Me: $^EVAL_ERROR";
     } 
 
     $dad_err ||= $dad_rdr;
@@ -232,88 +232,88 @@ sub _open3 {
 
     $kidpid = $do_spawn ?? -1 !! xfork;
     if ($kidpid == 0) {		# Kid
-        # If she wants to dup the kid's stderr onto her stdout I need to
-        # save a copy of her stdout before I put something else there.
-        if (($dad_rdr \!= $dad_err) && $dup_err
-            && xfileno($dad_err) == fileno($^STDOUT)) {
-            my $tmp = gensym;
-            xopen($tmp, ">&", $dad_err);
-            $dad_err = $tmp;
-        }
+	# If she wants to dup the kid's stderr onto her stdout I need to
+	# save a copy of her stdout before I put something else there.
+	if (($dad_rdr \!= $dad_err) && $dup_err
+		&& xfileno($dad_err) == fileno($^STDOUT)) {
+	    my $tmp = gensym;
+	    xopen($tmp, ">&", $dad_err);
+	    $dad_err = $tmp;
+	}
 
-        if ($dup_wtr) {
-            xopen $^STDIN,  "<&", $dad_wtr if fileno($^STDIN) != xfileno($dad_wtr);
-        } else {
-            xclose $dad_wtr;
-            xopen $^STDIN,  "<&=", fileno $kid_rdr;
-        }
-        if ($dup_rdr) {
-            xopen $^STDOUT, ">&", $dad_rdr if fileno($^STDOUT) != xfileno($dad_rdr);
-        } else {
-            xclose $dad_rdr;
-            xopen $^STDOUT, ">&=", $kid_wtr;
-        }
-        if ($dad_rdr \!= $dad_err) {
-            if ($dup_err) {
-                # I have to use a fileno here because in this one case
-                # I'm doing a dup but the filehandle might be a reference
-                # (from the special case above).
-                xopen $^STDERR, ">&", xfileno($dad_err)
-                    if fileno($^STDERR) != xfileno($dad_err);
-            } else {
-                xclose $dad_err;
-                xopen $^STDERR, ">&=", fileno $kid_err;
-            }
-        } else {
-            xopen $^STDERR, ">&", $^STDOUT if fileno($^STDERR) != fileno($^STDOUT);
-        }
-        return 0 if (@cmd[0] eq '-');
-        exec < @cmd or do {
-            warn "$Me: exec of $(join ' ',@cmd) failed";
-            try { require POSIX; POSIX::_exit(255); };
-            exit 255;
-        };
+	if ($dup_wtr) {
+	    xopen $^STDIN,  "<&", $dad_wtr if fileno($^STDIN) != xfileno($dad_wtr);
+	} else {
+	    xclose $dad_wtr;
+	    xopen $^STDIN,  "<&=", fileno $kid_rdr;
+	}
+	if ($dup_rdr) {
+	    xopen $^STDOUT, ">&", $dad_rdr if fileno($^STDOUT) != xfileno($dad_rdr);
+	} else {
+	    xclose $dad_rdr;
+	    xopen $^STDOUT, ">&=", $kid_wtr;
+	}
+	if ($dad_rdr \!= $dad_err) {
+	    if ($dup_err) {
+		# I have to use a fileno here because in this one case
+		# I'm doing a dup but the filehandle might be a reference
+		# (from the special case above).
+		xopen $^STDERR, ">&", xfileno($dad_err)
+		    if fileno($^STDERR) != xfileno($dad_err);
+	    } else {
+		xclose $dad_err;
+		xopen $^STDERR, ">&=", fileno $kid_err;
+	    }
+	} else {
+	    xopen $^STDERR, ">&", $^STDOUT if fileno($^STDERR) != fileno($^STDOUT);
+	}
+	return 0 if (@cmd[0] eq '-');
+	exec < @cmd or do {
+	    warn "$Me: exec of $(join ' ',@cmd) failed";
+	    try { require POSIX; POSIX::_exit(255); };
+	    exit 255;
+	};
     } elsif ($do_spawn) {
-        # All the bookkeeping of coincidence between handles is
-        # handled in spawn_with_handles.
+	# All the bookkeeping of coincidence between handles is
+	# handled in spawn_with_handles.
 
-        my @close;
-        if ($dup_wtr) {
-            $kid_rdr = \*{$dad_wtr};
-            push @close, $kid_rdr;
-        } else {
-            push @close, \*{$dad_wtr}, $kid_rdr;
-        }
-        if ($dup_rdr) {
-            $kid_wtr = \*{$dad_rdr};
-            push @close, $kid_wtr;
-        } else {
-            push @close, \*{$dad_rdr}, $kid_wtr;
-        }
-        if ($dad_rdr ne $dad_err) {
-            if ($dup_err) {
-                $kid_err = \*{$dad_err};
-                push @close, $kid_err;
-            } else {
-                push @close, \*{$dad_err}, $kid_err;
-            }
-        } else {
-            $kid_err = $kid_wtr;
-        }
-        require IO::Pipe;
-        $kidpid = try {
-                spawn_with_handles( \@( \%( mode => 'r',
-                                            open_as => $kid_rdr,
-                                                handle => $^STDIN ),
-                                        \%( mode => 'w',
-                                            open_as => $kid_wtr,
-                                                handle => $^STDOUT ),
-                                        \%( mode => 'w',
-                                            open_as => $kid_err,
-                                                handle => $^STDERR ),
-                                    ), \@close, < @cmd);
-            };
-        die "$Me: $^EVAL_ERROR" if $^EVAL_ERROR;
+	my @close;
+	if ($dup_wtr) {
+	  $kid_rdr = \*{$dad_wtr};
+	  push @close, $kid_rdr;
+	} else {
+	  push @close, \*{$dad_wtr}, $kid_rdr;
+	}
+	if ($dup_rdr) {
+	  $kid_wtr = \*{$dad_rdr};
+	  push @close, $kid_wtr;
+	} else {
+	  push @close, \*{$dad_rdr}, $kid_wtr;
+	}
+	if ($dad_rdr ne $dad_err) {
+	    if ($dup_err) {
+	      $kid_err = \*{$dad_err};
+	      push @close, $kid_err;
+	    } else {
+	      push @close, \*{$dad_err}, $kid_err;
+	    }
+	} else {
+	  $kid_err = $kid_wtr;
+	}
+	require IO::Pipe;
+	$kidpid = try {
+	    spawn_with_handles( \@( \%( mode => 'r',
+				    open_as => $kid_rdr,
+				    handle => $^STDIN ),
+				  \%( mode => 'w',
+				    open_as => $kid_wtr,
+				    handle => $^STDOUT ),
+				  \%( mode => 'w',
+				    open_as => $kid_err,
+				    handle => $^STDERR ),
+				), \@close, < @cmd);
+	};
+	die "$Me: $^EVAL_ERROR" if $^EVAL_ERROR;
     }
 
     xclose $kid_rdr if !$dup_wtr;
@@ -329,7 +329,7 @@ sub _open3 {
 
 sub open3 {
     if ((nelems @_) +< 4) {
-        die "open3($(join ', ',@_)): not enough arguments";
+	die "open3($(join ', ',@_)): not enough arguments";
     }
     return _open3 'open3', scalar caller, < @_
 }
@@ -341,33 +341,33 @@ sub spawn_with_handles {
     require Fcntl;
 
     foreach my $fd ( @$fds) {
-        $fd->{+tmp_copy} = IO::Handle->new_from_fd($fd->{?handle}, $fd->{mode});
-        %saved{+fileno $fd->{?handle}} = $fd->{?tmp_copy};
+	$fd->{+tmp_copy} = IO::Handle->new_from_fd($fd->{?handle}, $fd->{mode});
+	%saved{+fileno $fd->{?handle}} = $fd->{?tmp_copy};
     }
     foreach my $fd ( @$fds) {
-        bless $fd->{?handle}, 'IO::Handle'
-            unless try { $fd->{?handle}->isa('IO::Handle') } ;
-        # If some of handles to redirect-to coincide with handles to
-        # redirect, we need to use saved variants:
-        $fd->{?handle}->fdopen(%saved{?fileno $fd->{?open_as}} || $fd->{?open_as},
-        $fd->{mode});
+	bless $fd->{?handle}, 'IO::Handle'
+	    unless try { $fd->{?handle}->isa('IO::Handle') } ;
+	# If some of handles to redirect-to coincide with handles to
+	# redirect, we need to use saved variants:
+	$fd->{?handle}->fdopen(%saved{?fileno $fd->{?open_as}} || $fd->{?open_as},
+			      $fd->{mode});
     }
     unless ($^OS_NAME eq 'MSWin32') {
-        # Stderr may be redirected below, so we save the err text:
-        foreach my $fd ( @$close_in_child) {
-            fcntl($fd, Fcntl::F_SETFD(), 1) or push @errs, "fcntl $fd: $^OS_ERROR"
-                unless %saved{?fileno $fd}; # Do not close what we redirect!
-        }
+	# Stderr may be redirected below, so we save the err text:
+	foreach my $fd ( @$close_in_child) {
+	    fcntl($fd, Fcntl::F_SETFD(), 1) or push @errs, "fcntl $fd: $^OS_ERROR"
+		unless %saved{?fileno $fd}; # Do not close what we redirect!
+	}
     }
 
     unless (nelems @errs) {
-        $pid = try { system 1, < @_ }; # 1 == P_NOWAIT
-        push @errs, "IO::Pipe: Can't spawn-NOWAIT: $^OS_ERROR" if !$pid || $pid +< 0;
+	$pid = try { system 1, < @_ }; # 1 == P_NOWAIT
+	push @errs, "IO::Pipe: Can't spawn-NOWAIT: $^OS_ERROR" if !$pid || $pid +< 0;
     }
 
     foreach my $fd ( @$fds) {
-        $fd->{?handle}->fdopen($fd->{?tmp_copy}, $fd->{mode});
-        $fd->{tmp_copy}->close or die "Can't close: $^OS_ERROR";
+	$fd->{?handle}->fdopen($fd->{?tmp_copy}, $fd->{mode});
+	$fd->{tmp_copy}->close or die "Can't close: $^OS_ERROR";
     }
     die join "\n", @errs if (nelems @errs);
     return $pid;

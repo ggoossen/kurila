@@ -12,12 +12,12 @@ is(
     sprintf("\%.40g ",0.01),
     sprintf("\%.40g", 0.01)." ",
     q(the sprintf "%.<number>g" optimization)
-    );
+);
 is(
     sprintf("\%.40f ",0.01),
     sprintf("\%.40f", 0.01)." ",
     q(the sprintf "%.<number>f" optimization)
-    );
+);
 
 # cases of $i > 1 are against [perl #39126]
 for my $i (@(1, 5, 10, 20, 50, 100)) {
@@ -43,7 +43,7 @@ fresh_perl_is(
     'Modification of a read-only value attempted at - line 1 character 7.',
     \%( switches => \@( '-w' ) ),
     q(%n should not be able to modify read-only constants),
-    );
+);
 
 # check overflows
 for (@(int(^~^0/2+1), ^~^0, "9999999999999999999")) {
@@ -57,13 +57,13 @@ for (@(int(^~^0/2+1), ^~^0, "9999999999999999999")) {
 do {
     my @($warn, $bad) = @(0,0);
     local $^WARN_HOOK = sub {
-            if (@_[0]->{?description} =~ m/uninitialized/) {
-                $warn++
-            }
-            else {
-                $bad++
-            }
-        };
+	if (@_[0]->{?description} =~ m/uninitialized/) {
+	    $warn++
+	}
+	else {
+	    $bad++
+	}
+    };
 
     my $fmt = join('', map( {"\%$_\$s\%" . ((1 << 31)-$_) . '$s' }, 1..20));
     my $result = sprintf $fmt, < qw(a b c d);
@@ -74,15 +74,15 @@ do {
 
 do {
     foreach my $ord (0 .. 255) {
-        my $bad = 0;
-        local $^WARN_HOOK = sub {
-                if (@_[0]->{?description} !~ m/^Invalid conversion in sprintf/) {
-                    warn @_[0];
-                    $bad++;
-                }
-            };
-        my $r = try {sprintf '%v' . chr $ord};
-        is ($bad, 0, "pattern '\%v' . chr $ord");
+	my $bad = 0;
+	local $^WARN_HOOK = sub {
+	    if (@_[0]->{?description} !~ m/^Invalid conversion in sprintf/) {
+		warn @_[0];
+		$bad++;
+	    }
+	};
+	my $r = try {sprintf '%v' . chr $ord};
+	is ($bad, 0, "pattern '\%v' . chr $ord");
     }
 };
 
@@ -92,17 +92,17 @@ sub mysprintf_int_flags {
     my $flag  = $1;
     my $width = $2;
     my $sign  = $num +< 0 ?? '-' !!
-        $flag =~ m/\+/ ?? '+' !!
-        $flag =~ m/\ / ?? ' ' !!
-        '';
+		$flag =~ m/\+/ ?? '+' !!
+		$flag =~ m/\ / ?? ' ' !!
+		'';
     my $abs   = abs($num);
     my $padlen = $width - length($sign.$abs);
     return
-        $flag =~ m/0/ && $flag !~ m/-/ # do zero padding
-        ?? $sign . '0' x $padlen . $abs
-        !! $flag =~ m/-/ # left or right
-        ?? $sign . $abs . ' ' x $padlen
-        !! ' ' x $padlen . $sign . $abs;
+	$flag =~ m/0/ && $flag !~ m/-/ # do zero padding
+	    ?? $sign . '0' x $padlen . $abs
+	    !! $flag =~ m/-/ # left or right
+		?? $sign . $abs . ' ' x $padlen
+		!! ' ' x $padlen . $sign . $abs;
 }
 
 # Whole tests for "%4d" with 2 to 4 flags;
@@ -111,26 +111,26 @@ sub mysprintf_int_flags {
 my @flags = @("-", "+", " ", "0");
 for my $num (@(0, -1, 1)) {
     for my $f1 ( @flags) {
-        for my $f2 ( @flags) {
-            for my $f3 (@('', < @flags)) { # '' for doubled flags
-                my $flag = $f1.$f2.$f3;
-                my $width = 4;
-                my $fmt   = '%'."$($flag)$($width)d";
-                my $result = sprintf($fmt, $num);
-                my $expect = mysprintf_int_flags($fmt, $num);
-                is($result, $expect, qq/sprintf("$fmt",$num)/);
+	for my $f2 ( @flags) {
+	    for my $f3 (@('', < @flags)) { # '' for doubled flags
+		my $flag = $f1.$f2.$f3;
+		my $width = 4;
+		my $fmt   = '%'."$($flag)$($width)d";
+		my $result = sprintf($fmt, $num);
+		my $expect = mysprintf_int_flags($fmt, $num);
+		is($result, $expect, qq/sprintf("$fmt",$num)/);
 
-                next if $f3 eq '';
+	        next if $f3 eq '';
 
-                for my $f4 ( @flags) { # quadrupled flags
-                    my $flag = $f1.$f2.$f3.$f4;
-                    my $fmt   = '%'."$($flag)$($width)d";
-                    my $result = sprintf($fmt, $num);
-                    my $expect = mysprintf_int_flags($fmt, $num);
-                    is($result, $expect, qq/sprintf("$fmt",$num)/);
-                }
-            }
-        }
+		for my $f4 ( @flags) { # quadrupled flags
+		    my $flag = $f1.$f2.$f3.$f4;
+		    my $fmt   = '%'."$($flag)$($width)d";
+		    my $result = sprintf($fmt, $num);
+		    my $expect = mysprintf_int_flags($fmt, $num);
+		    is($result, $expect, qq/sprintf("$fmt",$num)/);
+		}
+	    }
+	}
     }
 }
 

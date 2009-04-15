@@ -28,7 +28,7 @@ srand(1138);
 @second_run =mk_rand;
 
 ok( !eq_array(\@first_run, \@second_run),
-    'srand(), different arg, different rands' );
+                                 'srand(), different arg, different rands' );
 
 
 # Check that srand() isn't affected by $_
@@ -41,7 +41,7 @@ do {
     @second_run =mk_rand;
 
     ok( !eq_array(\@first_run, \@second_run),
-        'srand(), no arg, not affected by $_');
+                       'srand(), no arg, not affected by $_');
 };
 
 # This test checks whether Perl called srand for you.

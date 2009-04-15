@@ -53,15 +53,15 @@ use Symbol < qw(qualify qualify_to_ref);  # must import into this package too
 main::ok( qualify("x") eq "foo::x",		'qualify() with a simple identifier' );
 main::ok( qualify("x", "FOO") eq "FOO::x",	'qualify() with a package' );
 main::ok( qualify("BAR::x") eq "BAR::x",
-          'qualify() with a qualified identifier' );
+    'qualify() with a qualified identifier' );
 main::ok( qualify("STDOUT") eq "::STDOUT",
-          'qualify() with a reserved identifier' );
+    'qualify() with a reserved identifier' );
 main::ok( qualify("ARGV", "FOO") eq "::ARGV",
-          'qualify() with a reserved identifier and a package' );
+    'qualify() with a reserved identifier and a package' );
 main::ok( qualify("_foo") eq "foo::_foo",
-          'qualify() with an identifier starting with a _' );
+    'qualify() with an identifier starting with a _' );
 main::is( qualify("^FOO"), "::^FOO",
-          'qualify() with an identifier starting with a ^' );
+    'qualify() with an identifier starting with a ^' );
 
 # Test qualify_to_ref()
 do {
@@ -84,8 +84,8 @@ main::ok( (ref Symbol::stash("foo")) eq "HASH", "stash returns a ref to a hash" 
 main::is( Symbol::glob_name(*FOO), "foo::FOO", "glob_name");
 main::is( Symbol::glob_name(*main::FOO), "main::FOO", "glob_name");
 
-    # tests for delete_package
-    package main;
+# tests for delete_package
+package main;
 TODO: do {
     todo_skip("fix delete_package", 2);
     $Transient::variable = 42;

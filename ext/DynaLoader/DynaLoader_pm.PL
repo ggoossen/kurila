@@ -34,7 +34,7 @@ sub _expansion($op, $os, $expr) {
     if ($expr =~ m[^(.*?)<<\|\$\^O-$op-$os>>(.*?)$]s) {
         my @($if,$el) = @($1,$2);
         if (($op eq 'eq' and ($^OS_NAME eq $os || config_value("osname") eq $os))
-            || ($op eq 'ne' and ($^OS_NAME ne $os || config_value("osname") ne $os))) {
+              || ($op eq 'ne' and ($^OS_NAME ne $os || config_value("osname") ne $os))) {
             return $if
         }
         else {
@@ -44,7 +44,7 @@ sub _expansion($op, $os, $expr) {
     else {
         # #if;#endif
         if (($op eq 'eq' and ($^OS_NAME eq $os || config_value("osname") eq $os))
-            || ($op eq 'ne' and ($^OS_NAME ne $os || config_value("osname") ne $os))) {
+              || ($op eq 'ne' and ($^OS_NAME ne $os || config_value("osname") ne $os))) {
             return $expr
         }
         else {
@@ -56,12 +56,12 @@ sub _expansion($op, $os, $expr) {
 sub expand_os_specific {
     my $s = shift;
     $s =~ s/<<=(.*?)>>/$(eval $1)/g;
-        $s =~ s/<<\$\^O-(eq|ne)-(\w+)>>(.*?)<<\/\$\^O-\1-\2>>/$(
-        _expansion($1,$2,$3)
-    )/gs;
+    $s =~ s/<<\$\^O-(eq|ne)-(\w+)>>(.*?)<<\/\$\^O-\1-\2>>/$(
+            _expansion($1,$2,$3)
+        )/gs;
     if ($s =~ m/<<(=|\$\^O-)/) {
         die "bad <<\$^O-eq/ne-osname>> expression.".
-            " Unclosed brackets?";
+          " Unclosed brackets?";
     }
     $s;
 }
@@ -113,9 +113,9 @@ EOT
 
 if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS')) {
     print $out, "our @(\$dl_dlext, \$dl_so, \$dlsrc) = @(",
-        < to_string(config_value('dlext')), ",",
-        < to_string(config_value('so')), ",",
-        < to_string(config_value('dlsrc')), ")\n;" ;
+              < to_string(config_value('dlext')), ",",
+              < to_string(config_value('so')), ",",
+              < to_string(config_value('dlsrc')), ")\n;" ;
 }
 else {
     print $out, <<'EOT';

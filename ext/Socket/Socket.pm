@@ -9,32 +9,32 @@ Socket, sockaddr_in, inet_aton, inet_ntoa - load the C socket.h defines and stru
 
 =head1 SYNOPSIS
 
-use Socket;
+    use Socket;
 
-$proto = getprotobyname('udp');
-socket(Socket_Handle, PF_INET, SOCK_DGRAM, $proto);
-$iaddr = gethostbyname('hishost.com');
-$port = getservbyname('time', 'udp');
-$sin = sockaddr_in($port, $iaddr);
-send(Socket_Handle, 0, 0, $sin);
+    $proto = getprotobyname('udp');
+    socket(Socket_Handle, PF_INET, SOCK_DGRAM, $proto);
+    $iaddr = gethostbyname('hishost.com');
+    $port = getservbyname('time', 'udp');
+    $sin = sockaddr_in($port, $iaddr);
+    send(Socket_Handle, 0, 0, $sin);
 
-$proto = getprotobyname('tcp');
-socket(Socket_Handle, PF_INET, SOCK_STREAM, $proto);
-$port = getservbyname('smtp', 'tcp');
-$sin = sockaddr_in($port,inet_aton("127.1"));
-$sin = sockaddr_in(7,inet_aton("localhost"));
-$sin = sockaddr_in(7,INADDR_LOOPBACK);
-connect(Socket_Handle,$sin);
+    $proto = getprotobyname('tcp');
+    socket(Socket_Handle, PF_INET, SOCK_STREAM, $proto);
+    $port = getservbyname('smtp', 'tcp');
+    $sin = sockaddr_in($port,inet_aton("127.1"));
+    $sin = sockaddr_in(7,inet_aton("localhost"));
+    $sin = sockaddr_in(7,INADDR_LOOPBACK);
+    connect(Socket_Handle,$sin);
 
-($port, $iaddr) = sockaddr_in(getpeername(Socket_Handle));
-$peer_host = gethostbyaddr($iaddr, AF_INET);
-$peer_addr = inet_ntoa($iaddr);
+    ($port, $iaddr) = sockaddr_in(getpeername(Socket_Handle));
+    $peer_host = gethostbyaddr($iaddr, AF_INET);
+    $peer_addr = inet_ntoa($iaddr);
 
-$proto = getprotobyname('tcp');
-socket(Socket_Handle, PF_UNIX, SOCK_STREAM, $proto);
-unlink('/var/run/usock');
-$sun = sockaddr_un('/var/run/usock');
-connect(Socket_Handle,$sun);
+    $proto = getprotobyname('tcp');
+    socket(Socket_Handle, PF_UNIX, SOCK_STREAM, $proto);
+    unlink('/var/run/usock');
+    $sun = sockaddr_un('/var/run/usock');
+    connect(Socket_Handle,$sun);
 
 =head1 DESCRIPTION
 
@@ -52,7 +52,7 @@ not want to use the literal characters in your programs, then use
 the constants provided here.  They are not exported by default, but can
 be imported individually, and with the C<:crlf> export tag:
 
-use Socket qw(:DEFAULT :crlf);
+    use Socket qw(:DEFAULT :crlf);
 
 In addition, some structure manipulation functions are available:
 
@@ -348,9 +348,9 @@ use XSLoader ();
 	       TCP_STDURG);
 
 %EXPORT_TAGS = %(
-        crlf    => \qw(CR LF CRLF $CR $LF $CRLF),
-            all     => \@(< @EXPORT, < @EXPORT_OK),
-    );
+    crlf    => \qw(CR LF CRLF $CR $LF $CRLF),
+    all     => \@(< @EXPORT, < @EXPORT_OK),
+);
 
 BEGIN {
     sub CR   () {"\015"}
@@ -366,7 +366,7 @@ sub sockaddr_in {
     if (nelems @_ == 1) {
         return unpack_sockaddr_in(< @_);
     } else {
-        die "usage:   sin_sv = sockaddr_in(port,iaddr))" unless (nelems @_) == 2;
+	die "usage:   sin_sv = sockaddr_in(port,iaddr))" unless (nelems @_) == 2;
         return pack_sockaddr_in(< @_);
     }
 }

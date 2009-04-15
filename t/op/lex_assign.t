@@ -3,7 +3,7 @@
 BEGIN { require "./test.pl" }
 
 our ($xref, $runme, @a, %h, $aref, $chopit, @chopar, $posstr,
-    $cstr, $nn, $n, @INPUT, @simple_input, $ord, $href, $zzz1,
+     $cstr, $nn, $n, @INPUT, @simple_input, $ord, $href, $zzz1,
     $zzz2, $op, $commentt, $expectop, $skip, $integer,
     $comment, $operator, $variable);
 
@@ -65,19 +65,19 @@ ok( ($zzz1 == 13 and $zzz2 == 13 and $l1 == 13),
     "$zzz1 = $l1 = $l2 = $zzz2 = $l3 = $l4 = 13" );
 
 for ( @INPUT) {
-  SKIP: do {
-        @($op, _, $comment) = @: m/^([^\#]+)(\#\s+(.*))?/;
-        $comment = $op unless defined $comment;
-        chomp;
-        $op = "$op==$op" unless $op =~ m/==/;
-        @($op, $expectop) = @: $op =~ m/(.*)==(.*)/;
-
-        if ($op =~ m/^'\?\?\?'/ or $comment =~ m/skip\(.*\Q$^OS_NAME\E.*\)/i) {
-            skip("$comment", 1);
-        }
-        $integer = ($comment =~ m/^i_/) ?? "use integer" !! '' ;
-
-        eval <<EOE . <<'EOE';
+ SKIP: do {
+    @($op, _, $comment) = @: m/^([^\#]+)(\#\s+(.*))?/;
+    $comment = $op unless defined $comment;
+    chomp;
+    $op = "$op==$op" unless $op =~ m/==/;
+    @($op, $expectop) = @: $op =~ m/(.*)==(.*)/;
+  
+    if ($op =~ m/^'\?\?\?'/ or $comment =~ m/skip\(.*\Q$^OS_NAME\E.*\)/i) {
+      skip("$comment", 1);
+    }
+    $integer = ($comment =~ m/^i_/) ?? "use integer" !! '' ;
+  
+    eval <<EOE . <<'EOE';
     local \$^WARN_HOOK = \\&wrn;
     my \$a = 'fake';
     $integer;
@@ -86,24 +86,24 @@ for ( @INPUT) {
 EOE
     is($a, $b, $comment);
 EOE
-        if ($^EVAL_ERROR) {
-            if ($^EVAL_ERROR->{?description} =~ m/is unimplemented/) {
-                skip("$comment: unimplemented", 1);
-            } else {
-                fail("error: $($^EVAL_ERROR->message)");
-            }
-        }
-    };
+    if ($^EVAL_ERROR) {
+      if ($^EVAL_ERROR->{?description} =~ m/is unimplemented/) {
+        skip("$comment: unimplemented", 1);
+      } else {
+        fail("error: $($^EVAL_ERROR->message)");
+      }
+    }
+  };
 }
 
 for ( @simple_input) {
-  SKIP:
-    do {
-        @($op, _, $comment) = @: m/^([^\#]+)(\#\s+(.*))?/;
-        $comment = $op unless defined $comment;
-        chomp;
-        @($operator, $variable) = @: m/^\s*(\w+)\s*\$(\w+)/ or warn "misprocessed '$_'\n";
-        eval <<EOE;
+ SKIP:
+ do {
+  @($op, _, $comment) = @: m/^([^\#]+)(\#\s+(.*))?/;
+  $comment = $op unless defined $comment;
+  chomp;
+  @($operator, $variable) = @: m/^\s*(\w+)\s*\$(\w+)/ or warn "misprocessed '$_'\n";
+  eval <<EOE;
   local \$^WARN_HOOK = \\&wrn;
   my \$$variable = "Ac# Ca\\nxxx";
   \$$variable = $operator \$$variable;
@@ -112,16 +112,16 @@ for ( @simple_input) {
   ok( \$toself eq \$direct,
      "\\\$$variable = $operator \\\$$variable");
 EOE
-        if ($^EVAL_ERROR) {
-            if ($^EVAL_ERROR->{?description} =~ m/is unimplemented/) {
-                skip("skipping $comment: unimplemented", 1);
-            } elsif ($^EVAL_ERROR->{?description} =~ m/Can't (modify|take log of 0)/) {
-                skip("skipping $comment: syntax not good for selfassign", 1);
-            } else {
-                fail("error: $($^EVAL_ERROR->message)");
-            }
-        }
-    };
+  if ($^EVAL_ERROR) {
+    if ($^EVAL_ERROR->{?description} =~ m/is unimplemented/) {
+      skip("skipping $comment: unimplemented", 1);
+    } elsif ($^EVAL_ERROR->{?description} =~ m/Can't (modify|take log of 0)/) {
+      skip("skipping $comment: syntax not good for selfassign", 1);
+    } else {
+      fail("error: $($^EVAL_ERROR->message)");
+    }
+  }
+ };
 }
 
 try {

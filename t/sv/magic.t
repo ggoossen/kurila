@@ -28,9 +28,9 @@ my $Is_BeOS     = $^OS_NAME eq 'beos';
 
 my $PERL = env::var('PERL')
     || ($Is_NetWare           ?? 'perl'   !!
-        ($Is_MacOS || $Is_VMS) ?? $^EXECUTABLE_NAME      !!
-        $Is_MSWin32            ?? '.\perl' !!
-        './perl');
+       ($Is_MacOS || $Is_VMS) ?? $^EXECUTABLE_NAME      !!
+       $Is_MSWin32            ?? '.\perl' !!
+       './perl');
 
 eval 'env::var("FOO") = "hi there";';	# check that ENV is inited inside eval
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
@@ -72,24 +72,24 @@ our ($wd, $script);
 # $^X and $0
 do {
     if ($^OS_NAME eq 'qnx') {
-        chomp($wd = `/usr/bin/fullpath -t`);
+	chomp($wd = `/usr/bin/fullpath -t`);
     }
     elsif($Is_Cygwin || config_value('d_procselfexe')) {
-        # Cygwin turns the symlink into the real file
-        chomp($wd = `pwd`);
-        $wd =~ s#/t$##;
-        if ($Is_Cygwin) {
-            $wd = Cygwin::win_to_posix_path( <Cygwin::posix_to_win_path($wd, 1));
-        }
+       # Cygwin turns the symlink into the real file
+       chomp($wd = `pwd`);
+       $wd =~ s#/t$##;
+       if ($Is_Cygwin) {
+	   $wd = Cygwin::win_to_posix_path( <Cygwin::posix_to_win_path($wd, 1));
+       }
     }
     elsif($Is_os2) {
-        $wd = Cwd::sys_cwd();
+       $wd = Cwd::sys_cwd();
     }
     elsif($Is_MacOS) {
-        $wd = ':';
+       $wd = ':';
     }
     else {
-        $wd = '.';
+	$wd = '.';
     }
     my $perl = ($Is_MacOS || $Is_VMS) ?? $^EXECUTABLE_NAME !! "$wd/perl";
     my $headmaybe = '';
@@ -97,40 +97,40 @@ do {
     my $tailmaybe = '';
     $script = "$wd/show-shebang";
     if ($Is_MSWin32) {
-        chomp($wd = `cd`);
-        $wd =~ s|\\|/|g;
-        $perl = "$wd/perl.exe";
-        $script = "$wd/show-shebang.bat";
-        $headmaybe = <<EOH ;
+	chomp($wd = `cd`);
+	$wd =~ s|\\|/|g;
+	$perl = "$wd/perl.exe";
+	$script = "$wd/show-shebang.bat";
+	$headmaybe = <<EOH ;
 \@rem ='
 \@echo off
 $perl -x \%0
 goto endofperl
 \@rem ';
 EOH
-        $tailmaybe = <<EOT ;
+	$tailmaybe = <<EOT ;
 
 __END__
 :endofperl
 EOT
     }
     elsif ($Is_os2) {
-        $script = "./show-shebang";
+      $script = "./show-shebang";
     }
     elsif ($Is_MacOS) {
-        $script = ":show-shebang";
+      $script = ":show-shebang";
     }
     elsif ($Is_VMS) {
-        $script = "[]show-shebang";
+      $script = "[]show-shebang";
     }
     elsif ($Is_Cygwin) {
-        $middlemaybe = <<'EOX'
+      $middlemaybe = <<'EOX'
 $^EXECUTABLE_NAME = Cygwin::win_to_posix_path(Cygwin::posix_to_win_path($^EXECUTABLE_NAME, 1));
 $^PROGRAM_NAME = Cygwin::win_to_posix_path(Cygwin::posix_to_win_path($^PROGRAM_NAME, 1));
 EOX
     }
     if ($^OS_NAME eq 'os390' or $^OS_NAME eq 'posix-bc' or $^OS_NAME eq 'vmesa') {  # no shebang
-        $headmaybe = <<EOH ;
+	$headmaybe = <<EOH ;
     eval 'exec ./perl -S \$0 \$\{1+"\$\@"\}'
         if 0;
 EOH
@@ -167,62 +167,62 @@ if ($Is_VMS || $Is_Dos || $Is_MacOS) {
     skip("\%ENV manipulations fail or aren't safe on $^OS_NAME") for 1..4;
 }
 else {
-    if (env::var('PERL_VALGRIND')) {
-        skip("clearing \%ENV is not safe when running under valgrind");
-    } else {
-        my $PATH = env::var('PATH');
-        my $PDL = env::var('PERL_DESTRUCT_LEVEL') || 0;
-        env::var('foo' ) = "bar";
-        for (env::keys()) {
-            env::var($_) = undef;
-        }
-        env::var('PATH' ) = $PATH;
-        env::var('PERL_DESTRUCT_LEVEL' ) = $PDL || 0;
-        ok ($Is_MSWin32 ?? (`set foo 2>NUL` eq "")
-            !! (`echo \$foo` eq "\n") );
-    }
+	if (env::var('PERL_VALGRIND')) {
+	    skip("clearing \%ENV is not safe when running under valgrind");
+	} else {
+	    my $PATH = env::var('PATH');
+	    my $PDL = env::var('PERL_DESTRUCT_LEVEL') || 0;
+	    env::var('foo' ) = "bar";
+            for (env::keys()) {
+                env::var($_) = undef;
+            }
+	    env::var('PATH' ) = $PATH;
+	    env::var('PERL_DESTRUCT_LEVEL' ) = $PDL || 0;
+	    ok ($Is_MSWin32 ?? (`set foo 2>NUL` eq "")
+			    !! (`echo \$foo` eq "\n") );
+	}
 
-    env::var('__NoNeSuCh' ) = "foo";
-    $^PROGRAM_NAME = "bar";
-    # cmd.exe will echo 'variable=value' but 4nt will echo just the value
-    # -- Nikola Knezevic
-    ok ($Is_MSWin32 ?? (`set __NoNeSuCh` =~ m/^(?:__NoNeSuCh=)?foo$/)
-        !! (`echo \$__NoNeSuCh` eq "foo\n") );
-    if ($^OS_NAME =~ m/^(linux|freebsd)$/ &&
-        open my $cmdline, '<', "/proc/$^PID/cmdline") {
-        chomp(my $line = scalar ~< $cmdline);
-        my $me = (split m/\0/, $line)[0];
-        ok($me eq $^PROGRAM_NAME, 'altering $0 is effective (testing with /proc/)');
-        close $cmdline;
-        # perlbug #22811
-        my $mydollarzero = sub {
-                my@($arg) =@( shift);
-                $^PROGRAM_NAME = $arg if defined $arg;
-                # In FreeBSD the ps -o command= will cause
-                # an empty header line, grab only the last line.
-                my $ps = @(`ps -o command= -p $^PID`)[-1];
-                return if $^CHILD_ERROR;
-                chomp $ps;
-                printf $^STDOUT, "# 0[\%s]ps[\%s]\n", $^PROGRAM_NAME, $ps;
-                $ps;
+	env::var('__NoNeSuCh' ) = "foo";
+	$^PROGRAM_NAME = "bar";
+# cmd.exe will echo 'variable=value' but 4nt will echo just the value
+# -- Nikola Knezevic
+       ok ($Is_MSWin32 ?? (`set __NoNeSuCh` =~ m/^(?:__NoNeSuCh=)?foo$/)
+			    !! (`echo \$__NoNeSuCh` eq "foo\n") );
+	if ($^OS_NAME =~ m/^(linux|freebsd)$/ &&
+	    open my $cmdline, '<', "/proc/$^PID/cmdline") {
+	    chomp(my $line = scalar ~< $cmdline);
+	    my $me = (split m/\0/, $line)[0];
+	    ok($me eq $^PROGRAM_NAME, 'altering $0 is effective (testing with /proc/)');
+	    close $cmdline;
+            # perlbug #22811
+            my $mydollarzero = sub {
+              my@($arg) =@( shift);
+              $^PROGRAM_NAME = $arg if defined $arg;
+	      # In FreeBSD the ps -o command= will cause
+	      # an empty header line, grab only the last line.
+              my $ps = @(`ps -o command= -p $^PID`)[-1];
+              return if $^CHILD_ERROR;
+              chomp $ps;
+              printf $^STDOUT, "# 0[\%s]ps[\%s]\n", $^PROGRAM_NAME, $ps;
+              $ps;
             };
-        my $ps = $mydollarzero->("x");
-        ok(!$ps  # we allow that something goes wrong with the ps command
-           # In Linux 2.4 we would get an exact match ($ps eq 'x') but
-           # in Linux 2.2 there seems to be something funny going on:
-           # it seems as if the original length of the argv[] would
-           # be stored in the proc struct and then used by ps(1),
-           # no matter what characters we use to pad the argv[].
-           # (And if we use \0:s, they are shown as spaces.)  Sigh.
-           || $ps =~ m/^x\s*$/
-           # FreeBSD cannot get rid of both the leading "perl :"
-           # and the trailing " (perl)": some FreeBSD versions
-           # can get rid of the first one.
-           || ($^OS_NAME eq 'freebsd' && $ps =~ m/^(?:perl: )?x(?: \(perl\))?$/),
-           'altering $0 is effective (testing with `ps`)');
-    } else {
-        skip("\$0 check only on Linux and FreeBSD") for @( 0, 1);
-    }
+            my $ps = $mydollarzero->("x");
+            ok(!$ps  # we allow that something goes wrong with the ps command
+	       # In Linux 2.4 we would get an exact match ($ps eq 'x') but
+	       # in Linux 2.2 there seems to be something funny going on:
+	       # it seems as if the original length of the argv[] would
+	       # be stored in the proc struct and then used by ps(1),
+	       # no matter what characters we use to pad the argv[].
+	       # (And if we use \0:s, they are shown as spaces.)  Sigh.
+               || $ps =~ m/^x\s*$/
+	       # FreeBSD cannot get rid of both the leading "perl :"
+	       # and the trailing " (perl)": some FreeBSD versions
+	       # can get rid of the first one.
+	       || ($^OS_NAME eq 'freebsd' && $ps =~ m/^(?:perl: )?x(?: \(perl\))?$/),
+		       'altering $0 is effective (testing with `ps`)');
+	} else {
+	    skip("\$0 check only on Linux and FreeBSD") for @( 0, 1);
+	}
 }
 
 do {
@@ -258,15 +258,15 @@ do {
     my $ok = 0;
     # [perl #19330]
     do {
-        local $^OUTPUT_RECORD_SEPARATOR = undef;
-        $^OUTPUT_RECORD_SEPARATOR++; $^OUTPUT_RECORD_SEPARATOR++;
-        $ok = $^OUTPUT_RECORD_SEPARATOR eq 2;
+	local $^OUTPUT_RECORD_SEPARATOR = undef;
+	$^OUTPUT_RECORD_SEPARATOR++; $^OUTPUT_RECORD_SEPARATOR++;
+	$ok = $^OUTPUT_RECORD_SEPARATOR eq 2;
     };
     ok $ok;
     $ok = 0;
     do {
-        local $^OUTPUT_RECORD_SEPARATOR = "a\0b";
-        $ok = "a$($^OUTPUT_RECORD_SEPARATOR)b" eq "aa\0bb";
+	local $^OUTPUT_RECORD_SEPARATOR = "a\0b";
+	$ok = "a$($^OUTPUT_RECORD_SEPARATOR)b" eq "aa\0bb";
     };
     ok $ok;
 };

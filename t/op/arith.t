@@ -3,26 +3,26 @@
 print $^STDOUT, "1..145\n";
 
 sub tryok($nr, $ok) {
-    print($^STDOUT,  ($ok ?? "ok" !! "not ok"), " $nr\n" );
+   print($^STDOUT,  ($ok ?? "ok" !! "not ok"), " $nr\n" );
 }
 sub tryeq ($nr, $got, $expected) {
-    if ($got == $expected) {
-        print $^STDOUT, "ok $nr\n";
-    } else {
-        print $^STDOUT, "not ok $nr # $got != $expected\n";
-    }
+  if ($got == $expected) {
+    print $^STDOUT, "ok $nr\n";
+  } else {
+    print $^STDOUT, "not ok $nr # $got != $expected\n";
+  }
 }
 sub tryeq_sloppy ($nr, $got, $expected) {
-    if ($got == $expected) {
-        print $^STDOUT, "ok $nr\n";
+  if ($got == $expected) {
+    print $^STDOUT, "ok $nr\n";
+  } else {
+    my $error = abs ($got - $expected) / $expected;
+    if ($error +< 1e-9) {
+      print $^STDOUT, "ok $nr # $got is close to $expected, \$^O eq $^OS_NAME\n";
     } else {
-        my $error = abs ($got - $expected) / $expected;
-        if ($error +< 1e-9) {
-            print $^STDOUT, "ok $nr # $got is close to $expected, \$^O eq $^OS_NAME\n";
-        } else {
-            print $^STDOUT, "not ok $nr # $got != $expected\n";
-        }
+      print $^STDOUT, "not ok $nr # $got != $expected\n";
     }
+  }
 }
 
 my $T = 1;
@@ -266,55 +266,55 @@ tryeq_sloppy $T++, 18446744073709551616/4294967296, 4294967296;
 tryeq_sloppy $T++, 18446744073709551616/9223372036854775808, 2;
 
 do {
-    # The peephole optimiser is wrong to think that it can substitute intops
-    # in place of regular ops, because i_multiply can overflow.
-    # Bug reported by "Sisyphus" <kalinabears@hdc.com.au>
-    my $n = 1127;
+  # The peephole optimiser is wrong to think that it can substitute intops
+  # in place of regular ops, because i_multiply can overflow.
+  # Bug reported by "Sisyphus" <kalinabears@hdc.com.au>
+  my $n = 1127;
 
-    my $float = ($n % 1000) * 167772160.0;
-    tryeq_sloppy $T++, $float, 21307064320;
+  my $float = ($n % 1000) * 167772160.0;
+  tryeq_sloppy $T++, $float, 21307064320;
 
-    # On a 32 bit machine, if the i_multiply op is used, you will probably get
-    # -167772160. It's actually undefined behaviour, so anything may happen.
-    my $int = ($n % 1000) * 167772160;
-    tryeq $T++, $int, 21307064320;
+  # On a 32 bit machine, if the i_multiply op is used, you will probably get
+  # -167772160. It's actually undefined behaviour, so anything may happen.
+  my $int = ($n % 1000) * 167772160;
+  tryeq $T++, $int, 21307064320;
 
-    my $t = time;
-    my $t1000 = time() * 1000;
-    tryok $T++, abs($t1000 -1000 * $t) +<= 2000;
+  my $t = time;
+  my $t1000 = time() * 1000;
+  tryok $T++, abs($t1000 -1000 * $t) +<= 2000;
 };
 
 my $vms_no_ieee;
 if ($^OS_NAME eq 'VMS') {
-    try {require Config; Config->import() };
-    $vms_no_ieee = 1 unless defined(config_value('useieee'));
+  try {require Config; Config->import() };
+  $vms_no_ieee = 1 unless defined(config_value('useieee'));
 }
 
 if ($^OS_NAME eq 'vos') {
-    print $^STDOUT, "not ok ", $T++, " # TODO VOS raises SIGFPE instead of producing infinity.\n";
+  print $^STDOUT, "not ok ", $T++, " # TODO VOS raises SIGFPE instead of producing infinity.\n";
 }
 elsif ($vms_no_ieee) {
-    print $^STDOUT, $T++, " # SKIP -- the IEEE infinity model is unavailable in this configuration.\n"
+ print $^STDOUT, $T++, " # SKIP -- the IEEE infinity model is unavailable in this configuration.\n"
 }
 elsif ($^OS_NAME eq 'ultrix') {
-    print $^STDOUT, "not ok ", $T++, " # TODO Ultrix enters deep nirvana instead of producing infinity.\n";
+  print $^STDOUT, "not ok ", $T++, " # TODO Ultrix enters deep nirvana instead of producing infinity.\n";
 }
 else {
-    # The computation of $v should overflow and produce "infinity"
-    # on any system whose max exponent is less than 10**1506.
-    # The exact string used to represent infinity varies by OS,
-    # so we don't test for it; all we care is that we don't die.
-    #
-    # Perl considers it to be an error if SIGFPE is raised.
-    # Chances are the interpreter will die, since it doesn't set
-    # up a handler for SIGFPE.  That's why this test is last; to
-    # minimize the number of test failures.  --PG
+  # The computation of $v should overflow and produce "infinity"
+  # on any system whose max exponent is less than 10**1506.
+  # The exact string used to represent infinity varies by OS,
+  # so we don't test for it; all we care is that we don't die.
+  #
+  # Perl considers it to be an error if SIGFPE is raised.
+  # Chances are the interpreter will die, since it doesn't set
+  # up a handler for SIGFPE.  That's why this test is last; to
+  # minimize the number of test failures.  --PG
 
-    my $n = 5000;
-    my $v = 2;
-    while (--$n)
-    {
-        $v *= 2;
-    }
-    print $^STDOUT, "ok ", $T++, "\n";
+  my $n = 5000;
+  my $v = 2;
+  while (--$n)
+  {
+    $v *= 2;
+  }
+  print $^STDOUT, "ok ", $T++, "\n";
 }

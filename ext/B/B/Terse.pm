@@ -9,9 +9,9 @@ use Carp;
 sub terse($order, ?$subref) {
     set_style_standard("terse");
     if ($order eq "exec") {
-        concise_subref('exec', $subref);
+	concise_subref('exec', $subref);
     } else {
-        concise_subref('basic', $subref);
+	concise_subref('basic', $subref);
     }
 }
 
@@ -40,8 +40,8 @@ sub B::SV::terse {
     my %info;
     B::Concise::concise_sv($sv, \%info);
     my $s = indent($level)
-        . B::Concise::fmt_line(\%info, $sv,
-                               "#svclass~(?((#svaddr))?)~#svval", 0);
+	. B::Concise::fmt_line(\%info, $sv,
+				 "#svclass~(?((#svaddr))?)~#svval", 0);
     chomp $s;
     $s;
 }
@@ -55,7 +55,7 @@ sub B::NULL::terse {
 sub B::SPECIAL::terse {
     my @($sv, $level) = @(< @_, 0);
     my $s = indent($level)
-        . sprintf( '%s #%d %s', class($sv), $$sv, @specialsv_name[$$sv]);
+	. sprintf( '%s #%d %s', class($sv), $$sv, @specialsv_name[$$sv]);
     $s;
 }
 

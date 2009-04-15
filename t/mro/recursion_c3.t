@@ -23,34 +23,34 @@ do {
     package K;
     use mro 'c3';
     our @ISA = qw/J I/;
-        package J;
+    package J;
     use mro 'c3';
     our @ISA = qw/F/;
-        package I;
+    package I;
     use mro 'c3';
     our @ISA = qw/H F/;
-        package H;
+    package H;
     use mro 'c3';
     our @ISA = qw/G/;
-        package G;
+    package G;
     use mro 'c3';
     our @ISA = qw/D/;
-        package F;
+    package F;
     use mro 'c3';
     our @ISA = qw/E/;
-        package E;
+    package E;
     use mro 'c3';
     our @ISA = qw/D/;
-        package D;
+    package D;
     use mro 'c3';
     our @ISA = qw/A B C/;
-        package C;
+    package C;
     use mro 'c3';
     our @ISA = qw//;
-        package B;
+    package B;
     use mro 'c3';
     our @ISA = qw//;
-        package A;
+    package A;
     use mro 'c3';
     our @ISA = qw//;
 };
@@ -66,7 +66,7 @@ my @loopies = @(
     sub { @H::ISA = qw/G/; @B::ISA = qw/B/ },
     sub { @B::ISA = qw//; @K::ISA = qw/K J I/ },
     sub { @K::ISA = qw/J I/; @D::ISA = qw/A H B C/ },
-    );
+);
 
 foreach my $loopy ( @loopies) {
     try {

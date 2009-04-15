@@ -5,7 +5,7 @@ $VERSION = "3.26"
 ;
 
 use Exporter;
-    @ISA = qw(Exporter);
+@ISA = qw(Exporter);
 @EXPORT = qw(shellwords quotewords nested_quotewords parse_line);
 @EXPORT_OK = qw(old_shellwords);
 
@@ -15,11 +15,11 @@ sub shellwords {
     my @allwords;
 
     foreach my $line ( @lines) {
-        $line =~ s/^\s+//;
-        my @words = parse_line('\s+', 0, $line);
-        pop @words if (nelems @words) and !defined @words[-1];
-        return @() unless ((nelems @words) || !length($line));
-        push(@allwords, < @words);
+	$line =~ s/^\s+//;
+	my @words = parse_line('\s+', 0, $line);
+	pop @words if (nelems @words) and !defined @words[-1];
+	return @() unless ((nelems @words) || !length($line));
+	push(@allwords, < @words);
     }
     return @allwords;
 }
@@ -30,9 +30,9 @@ sub quotewords($delim, $keep, @< @lines) {
     my(@words, @allwords);
 
     foreach my $line ( @lines) {
-        @words = parse_line($delim, $keep, $line);
-        return() unless ((nelems @words) || !length($line));
-        push(@allwords, < @words);
+	@words = parse_line($delim, $keep, $line);
+	return() unless ((nelems @words) || !length($line));
+	push(@allwords, < @words);
     }
     return @allwords;
 }
@@ -43,8 +43,8 @@ sub nested_quotewords($delim, $keep, @< @lines) {
     my(@allwords);
 
     for my $i (0 .. nelems(@lines) -1) {
-        @{@allwords[+$i]} = parse_line($delim, $keep, @lines[$i]);
-        return() unless ((nelems @{@allwords[$i]}) || !length(@lines[$i]));
+	@{@allwords[+$i]} = parse_line($delim, $keep, @lines[$i]);
+	return() unless ((nelems @{@allwords[$i]}) || !length(@lines[$i]));
     }
     return @allwords;
 }
@@ -86,17 +86,17 @@ sub parse_line($delimiter, $keep, $line) {
         my @($quote, $quoted, $unquoted, $delim) = @(($1 ?? ($1,$2) !! ($3,$4)), $5, $6);
 
 
-        return @() unless( defined($quote) || length($unquoted) || length($delim));
+	return @() unless( defined($quote) || length($unquoted) || length($delim));
 
         if ($keep) {
-            $quoted = "$quote$quoted$quote";
-        }
+	    $quoted = "$quote$quoted$quote";
+	}
         else {
-            $unquoted =~ s/\\(.)/$1/sg;
-            if (defined $quote) {
-                $quoted =~ s/\\(.)/$1/sg if ($quote eq '"');
+	    $unquoted =~ s/\\(.)/$1/sg;
+	    if (defined $quote) {
+		$quoted =~ s/\\(.)/$1/sg if ($quote eq '"');
             }
-        }
+	}
         $word .= substr($line, 0, 0);	# leave results tainted
         $word .= defined $quote ?? $quoted !! $unquoted;
 
@@ -107,7 +107,7 @@ sub parse_line($delimiter, $keep, $line) {
         }
         if (!length($line)) {
             push(@pieces, $word);
-        }
+	}
     }
     return @pieces;
 }
@@ -130,37 +130,37 @@ sub old_shellwords {
 
     s/\A\s+//;
     while ($_ ne '') {
-        my $field = substr($_, 0, 0);	# leave results tainted
-        while (1) {
-            if (s/\A"(([^"\\]|\\.)*)"//s) {
-                ($snippet = $1) =~ s#\\(.)#$1#sg;
-            }
-            elsif (m/\A"/) {
-                require Carp;
-                Carp::carp("Unmatched double quote: $_");
-                return();
-            }
-            elsif (s/\A'(([^'\\]|\\.)*)'//s) {
-                ($snippet = $1) =~ s#\\(.)#$1#sg;
-            }
-            elsif (m/\A'/) {
-                require Carp;
-                Carp::carp("Unmatched single quote: $_");
-                return();
-            }
-            elsif (s/\A\\(.?)//s) {
-                $snippet = $1;
-            }
-            elsif (s/\A([^\s\\'"]+)//) {
-                $snippet = $1;
-            }
-            else {
-                s/\A\s+//;
-                last;
-            }
-            $field .= $snippet;
-        }
-        push(@words, $field);
+	my $field = substr($_, 0, 0);	# leave results tainted
+	while (1) {
+	    if (s/\A"(([^"\\]|\\.)*)"//s) {
+		($snippet = $1) =~ s#\\(.)#$1#sg;
+	    }
+	    elsif (m/\A"/) {
+		require Carp;
+		Carp::carp("Unmatched double quote: $_");
+		return();
+	    }
+	    elsif (s/\A'(([^'\\]|\\.)*)'//s) {
+		($snippet = $1) =~ s#\\(.)#$1#sg;
+	    }
+	    elsif (m/\A'/) {
+		require Carp;
+		Carp::carp("Unmatched single quote: $_");
+		return();
+	    }
+	    elsif (s/\A\\(.?)//s) {
+		$snippet = $1;
+	    }
+	    elsif (s/\A([^\s\\'"]+)//) {
+		$snippet = $1;
+	    }
+	    else {
+		s/\A\s+//;
+		last;
+	    }
+	    $field .= $snippet;
+	}
+	push(@words, $field);
     }
     return @words;
 }

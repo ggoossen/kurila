@@ -6,11 +6,11 @@ BEGIN {
     my $reason;
 
     if ($^OS_NAME eq 'apollo') {
-        $reason = "unknown *FIXME*";
+      $reason = "unknown *FIXME*";
     }
     if ($reason) {
-        print $^STDOUT, "1..0 # Skip: $reason\n";
-        exit 0;
+	print $^STDOUT, "1..0 # Skip: $reason\n";
+	exit 0;
     }
 }
 
@@ -19,16 +19,16 @@ sub compare_addr {
     my $a = shift;
     my $b = shift;
     if (length($a) != length $b) {
-        my $min = (length($a) +< length $b) ?? length($a) !! length $b;
-        if ($min and substr($a, 0, $min) eq substr($b, 0, $min)) {
-            printf $^STDOUT, "# Apparently: \%d bytes junk at the end of \%s\n# \%s\n",
-                abs(length($a) - length ($b)),
-                @_[length($a) +< length ($b) ?? 1 !! 0],
-                "consider decreasing bufsize of recfrom.";
-            substr($a, $min, undef, "");
-            substr($b, $min, undef, "");
-        }
-        return 0;
+	my $min = (length($a) +< length $b) ?? length($a) !! length $b;
+	if ($min and substr($a, 0, $min) eq substr($b, 0, $min)) {
+	    printf $^STDOUT, "# Apparently: \%d bytes junk at the end of \%s\n# \%s\n",
+		abs(length($a) - length ($b)),
+		@_[length($a) +< length ($b) ?? 1 !! 0],
+		"consider decreasing bufsize of recfrom.";
+	    substr($a, $min, undef, "");
+	    substr($b, $min, undef, "");
+	}
+	return 0;
     }
     my @a = unpack_sockaddr_in($a);
     my @b = unpack_sockaddr_in($b);
@@ -43,13 +43,13 @@ use IO::Socket < qw(AF_INET SOCK_DGRAM INADDR_ANY);
 use IO::Socket::INET;
 
 my $udpa = IO::Socket::INET->new(Proto => 'udp', LocalAddr => 'localhost')
-    || IO::Socket::INET->new(Proto => 'udp', LocalAddr => '127.0.0.1')
+     || IO::Socket::INET->new(Proto => 'udp', LocalAddr => '127.0.0.1')
     or die "$^OS_ERROR (maybe your system does not have a localhost at all, 'localhost' or 127.0.0.1)";
 
 print $^STDOUT, "ok 1\n";
 
 my $udpb = IO::Socket::INET->new(Proto => 'udp', LocalAddr => 'localhost')
-    || IO::Socket::INET->new(Proto => 'udp', LocalAddr => '127.0.0.1')
+     || IO::Socket::INET->new(Proto => 'udp', LocalAddr => '127.0.0.1')
     or die "$^OS_ERROR (maybe your system does not have a localhost at all, 'localhost' or 127.0.0.1)";
 
 print $^STDOUT, "ok 2\n";
@@ -57,7 +57,7 @@ print $^STDOUT, "ok 2\n";
 $udpa->send("ok 4\n",0, $udpb->sockname);
 
 print $^STDOUT, "not "
-    unless compare_addr($udpa->peername,$udpb->sockname, 'peername', 'sockname');
+  unless compare_addr($udpa->peername,$udpb->sockname, 'peername', 'sockname');
 print $^STDOUT, "ok 3\n";
 
 my $where = $udpb->recv((my $buf=""),5);

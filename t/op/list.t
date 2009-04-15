@@ -58,11 +58,11 @@ do {
     my ($a, $b, $c);
     for my $x (0..2) {
         @($a, $b, $c) = 
-            $x == 0 ??  @('a','b','c')
+              $x == 0 ??  @('a','b','c')
             !! $x == 1 ??  @('d','e','f')
             !!            @('g','h','i')
         ;
-            if ($x == 0) {
+        if ($x == 0) {
             cmp_ok($a,'eq','a','ternary for a 1');
             cmp_ok($b,'eq','b','ternary for b 1');
             cmp_ok($c,'eq','c','ternary for c 1');

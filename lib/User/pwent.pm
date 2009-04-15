@@ -22,14 +22,14 @@ BEGIN {
 
                    );
     %EXPORT_TAGS = %(
-            FIELDS => \@( < grep( {m/^\$pw_/ }, @EXPORT_OK), < @EXPORT ),
-                ALL    => \@( < @EXPORT, < @EXPORT_OK ),
-        );
+        FIELDS => \@( < grep( {m/^\$pw_/ }, @EXPORT_OK), < @EXPORT ),
+        ALL    => \@( < @EXPORT, < @EXPORT_OK ),
+    );
 }
 
 our ($pw_name, $pw_passwd, $pw_uid, $pw_gid, $pw_change, $pw_age,
-    $pw_class, $pw_comment, $pw_gecos, $pw_dir, $pw_shell, $pw_expire,
-    $pw_quota);
+     $pw_class, $pw_comment, $pw_gecos, $pw_dir, $pw_shell, $pw_expire,
+     $pw_quota);
 #
 # XXX: these mean somebody hacked this module's source
 #      without understanding the underlying assumptions.
@@ -44,30 +44,30 @@ sub import {
 
 use Class::Struct < qw(struct);
 struct 'User::pwent' => \@(
-       name    => '$',         # pwent[0]
-       passwd  => '$',         # pwent[1]
-       uid     => '$',         # pwent[2]
-       gid     => '$',         # pwent[3]
+    name    => '$',         # pwent[0]
+    passwd  => '$',         # pwent[1]
+    uid     => '$',         # pwent[2]
+    gid     => '$',         # pwent[3]
 
-       # you'll only have one/none of these three
-       change  => '$',         # pwent[4]
-       age     => '$',         # pwent[4]
-       quota   => '$',         # pwent[4]
+    # you'll only have one/none of these three
+    change  => '$',         # pwent[4]
+    age     => '$',         # pwent[4]
+    quota   => '$',         # pwent[4]
 
-       # you'll only have one/none of these two
-       comment => '$',         # pwent[5]
-       class   => '$',         # pwent[5]
+    # you'll only have one/none of these two
+    comment => '$',         # pwent[5]
+    class   => '$',         # pwent[5]
 
-       # you might not have this one
-       gecos   => '$',         # pwent[6]
+    # you might not have this one
+    gecos   => '$',         # pwent[6]
 
-       dir     => '$',         # pwent[7]
-       shell   => '$',         # pwent[8]
+    dir     => '$',         # pwent[7]
+    shell   => '$',         # pwent[8]
 
-       # you might not have this one
-       expire  => '$',         # pwent[9]
+    # you might not have this one
+    expire  => '$',         # pwent[9]
 
-       );
+);
 
 
 # init our groks hash to be true if the built platform knew how
@@ -79,16 +79,16 @@ sub _feature_init {
                          pwage      pwchange   pwclass    pwcomment
                          pwexpire   pwgecos    pwpasswd   pwquota
                      }
-    )
+                 )
     {
         my $short = $feep =~ m/^pw(.*)/
-            ?? $1
-        !! do {
-            # not cluck, as we know we called ourselves,
-            # and a confession is probably imminent anyway
-            warn("$IE $feep is a funny struct pwd field");
-            $feep;
-        };
+                  ?? $1
+                  !! do {
+                        # not cluck, as we know we called ourselves,
+                        # and a confession is probably imminent anyway
+                        warn("$IE $feep is a funny struct pwd field");
+                        $feep;
+                    };
 
         %Groks{+$short} = defined config_value("d_" . $feep);
     }
@@ -114,8 +114,8 @@ sub pw_has {
     our %Groks;         # whether build system knew how to do this feature
     my $cando = 1;
     my $sploder = caller() ne __PACKAGE__
-        ?? \&die
-        !! sub { die("$IE $(join ' ',@_)") };
+                    ?? \&die
+                    !! sub { die("$IE $(join ' ',@_)") };
     if ((nelems @_) == 0) {
         my @valid = sort grep { %Groks{?$_} }, keys %Groks;
         return @valid;

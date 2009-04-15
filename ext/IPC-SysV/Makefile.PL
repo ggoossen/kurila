@@ -7,21 +7,21 @@ use ExtUtils::MakeMaker;
 
 sub MY::libscan($self, $path)
 {
-    package MY;
+  package MY;
 
-    return $path if $self->SUPER::libscan($path) and
-        $path !~ m! [~%]$
+  return $path if $self->SUPER::libscan($path) and
+                  $path !~ m! [~%]$
                             | \.(cache\.cm|swp|orig|rej)$
                             | regen\.pl$
                             !x;
-    return '';
+  return '';
 }
 
 WriteMakefile(
-    VERSION_FROM	=> "SysV.pm",
-    NAME      	=> "IPC::SysV",
-    'clean'   	=> \%(FILES => join(" ", map { "$_ */$_ */*/$_" },
-        qw(*% *.html *.b[ac]k *.old))
-    ),
-    'macro'		=> \%( INSTALLDIRS => 'perl' ),
-    );
+	VERSION_FROM	=> "SysV.pm",
+	NAME      	=> "IPC::SysV",
+	'clean'   	=> \%(FILES => join(" ", map { "$_ */$_ */*/$_" },
+                                            qw(*% *.html *.b[ac]k *.old))
+                             ),
+	'macro'		=> \%( INSTALLDIRS => 'perl' ),
+);

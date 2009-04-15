@@ -15,38 +15,38 @@ EOTEXT
 # Default (no squeezing)...
 
 print $^STDOUT, < form
-  "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
-  $eulogy, "","";
+	 "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
+	    $eulogy, "","";
 
 
 # Squeeze all whitespace...
 
 print $^STDOUT, < form
-  \%(ws=>qr/\s+/),
-  "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
-  $eulogy, "","";
+	 \%(ws=>qr/\s+/),
+     "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
+	    $eulogy, "","";
 
 
 # Squeeze all whitespace except newlines...
 
 print $^STDOUT, < form
-  \%(ws=>qr/[^\S\n]+/),
-  "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
-  $eulogy, "","";
+	 \%(ws=>qr/[^\S\n]+/),
+     "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
+	    $eulogy, "","";
 
 # Squeeze even harder before punctuation
 
 print $^STDOUT, < form
-  \%(ws=>qr/[^\S\n]+ ([,.!])?/x),
-  "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
-  $eulogy, "","";
+	 \%(ws=>qr/[^\S\n]+ ([,.!])?/x),
+     "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
+	    $eulogy, "","";
 
 
 # Form is smart enough not to squeeze zero-width matches...
 
 print $^STDOUT, < form
-  \%(ws=>qr/\s*/),
-  "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
-  $eulogy, "","";
+	 \%(ws=>qr/\s*/),
+     "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
+	    $eulogy, "","";
 
 

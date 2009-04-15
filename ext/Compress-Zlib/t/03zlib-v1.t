@@ -1,6 +1,6 @@
 BEGIN {
     if (env::var('PERL_CORE')) {
-        push $^INCLUDE_PATH, "lib/compress";
+	push $^INCLUDE_PATH, "lib/compress";
     }
 }
 
@@ -41,12 +41,12 @@ my $len   = length $hello ;
 
 # Check zlib_version and ZLIB_VERSION are the same.
 is Compress::Zlib::zlib_version, ZLIB_VERSION, 
-   "ZLIB_VERSION matches Compress::Zlib::zlib_version" ;
+    "ZLIB_VERSION matches Compress::Zlib::zlib_version" ;
 
 # generate a long random string
 my $contents = '' ;
 foreach (1 .. 5000)
-{ $contents .= chr int rand 256 }
+  { $contents .= chr int rand 256 }
 
 my $x ;
 my $fil;
@@ -134,10 +134,10 @@ ok !defined uncompress (\$compr) ;
 $hello = "I am a HAL 9000 computer" ;
 my @hello = split('', $hello);
 my ($err, $X, $status);
-
+ 
 ok($x = deflateInit( \%(Bufsize => 1) ) );
 ok $x ;
-
+ 
 my $Answer = '';
 foreach (@hello)
 {
@@ -146,19 +146,19 @@ foreach (@hello)
 
     $Answer .= $X ;
 }
-
+ 
 ok $status == Z_OK ;
 
 ok    (@(@($X, $status) =  $x->flush())[?1] == Z_OK ) ;
 $Answer .= $X ;
-
-
+ 
+ 
 my @Answer = split('', $Answer);
-
+ 
 my $k;
 ok ($k = inflateInit( \%(Bufsize => 1)) ) ;
 ok $k ;
-
+ 
 my $GOT = '';
 my $Z;
 foreach (@Answer)
@@ -166,9 +166,9 @@ foreach (@Answer)
     @($Z, $status) =  $k->inflate($_) ;
     $GOT .= $Z ;
     last if $status == Z_STREAM_END or $status != Z_OK ;
-
+ 
 }
-
+ 
 ok $status == Z_STREAM_END ;
 ok $GOT eq $hello ;
 
@@ -177,10 +177,10 @@ title 'deflate/inflate - small buffer with a number';
 # ==============================
 
 $hello = 6529 ;
-
+ 
 ok ($x = deflateInit( \%(Bufsize => 1) ) ) ;
 ok $x ;
-
+ 
 ok !defined $x->msg() ;
 ok $x->total_in() == 0 ;
 ok $x->total_out() == 0 ;
@@ -190,35 +190,35 @@ do {
 
     $Answer .= $X ;
 };
-
+ 
 ok $status == Z_OK ;
 
 ok   (@(@($X, $status) =  $x->flush())[?1] == Z_OK ) ;
 $Answer .= $X ;
-
+ 
 ok !defined $x->msg() ;
 ok $x->total_in() == length $hello ;
 ok $x->total_out() == length $Answer ;
 
-
+ 
 @Answer = split('', $Answer);
-
+ 
 ok ($k = inflateInit( \%(Bufsize => 1)) ) ;
 ok $k ;
 
 ok !defined $k->msg() ;
 ok $k->total_in() == 0 ;
 ok $k->total_out() == 0 ;
-
+ 
 $GOT = '';
 foreach (@Answer)
 {
     @($Z, $status) =  $k->inflate($_) ;
     $GOT .= $Z ;
     last if $status == Z_STREAM_END or $status != Z_OK ;
-
+ 
 }
-
+ 
 ok $status == Z_STREAM_END ;
 ok $GOT eq $hello ;
 
@@ -227,27 +227,27 @@ is $k->total_in(), length $Answer ;
 ok $k->total_out() == length $hello ;
 
 
-
+ 
 title 'deflate/inflate - larger buffer';
 # ==============================
 
 
 ok($x = deflateInit());
-
+ 
 ok (@(@($X, $status) =  $x->deflate($contents))[?1] == Z_OK) ;
 
 my $Y = $X ;
-
-
+ 
+ 
 ok (@(@($X, $status) =  $x->flush() )[?1] == Z_OK ) ;
 $Y .= $X ;
-
-
-
+ 
+ 
+ 
 ok($k = inflateInit());
-
+ 
 @($Z, $status) =  $k->inflate($Y) ;
-
+ 
 ok $status == Z_STREAM_END ;
 ok $contents eq $Z ;
 
@@ -256,8 +256,8 @@ title 'deflate/inflate - preset dictionary';
 
 my $dictionary = "hello" ;
 ok($x = deflateInit(\%(Level => Z_BEST_COMPRESSION,
-                        Dictionary => $dictionary)));
-
+			 Dictionary => $dictionary)));
+ 
 my $dictID = $x->dict_adler() ;
 
 @($X, $status) =  $x->deflate($hello) ;
@@ -266,9 +266,9 @@ ok $status == Z_OK ;
 ok $status == Z_OK ;
 $X .= $Y ;
 $x = 0 ;
-
+ 
 ok($k = inflateInit(Dictionary => $dictionary));
-
+ 
 @($Z, $status) =  $k->inflate($X);
 ok $status == Z_STREAM_END ;
 ok $k->dict_adler() == $dictID;
@@ -291,19 +291,19 @@ ok $hello eq $Z ;
 
 title 'inflate - check remaining buffer after Z_STREAM_END';
 # ===================================================
-
+ 
 do {
     ok($x = deflateInit(Level => Z_BEST_COMPRESSION ));
-
+ 
     @($X, $status) =  $x->deflate($hello) ;
     ok $status == Z_OK ;
     @($Y, $status) =  $x->flush() ;
     ok $status == Z_OK ;
     $X .= $Y ;
     $x = 0 ;
-
+ 
     ok($k = inflateInit());
-
+ 
     my $first = substr($X, 0, 2) ;
     my $last  = substr($X, 2) ;
     @($Z, $status) =  $k->inflate($first);
@@ -344,21 +344,21 @@ EOM
 
     # uncompress with gzopen
     ok(my $fil = gzopen($name, "rb"));
-
+ 
     is $fil->gzread($uncomp, 0), 0 ;
     ok (($x = $fil->gzread($uncomp)) == $len) ;
-
+ 
     ok ! $fil->gzclose ;
 
     ok $uncomp eq $buffer ;
-
+ 
     1 while unlink $name ;
 
     # now check that memGunzip can deal with it.
     my $ungzip = Compress::Zlib::memGunzip($dest) ;
     ok defined $ungzip ;
     ok $buffer eq $ungzip ;
-
+ 
     # now do the same but use a reference 
 
     $dest = Compress::Zlib::memGzip(\$buffer) ; 
@@ -372,13 +372,13 @@ EOM
 
     # uncompress with gzopen
     ok($fil = gzopen($name, "rb"));
-
+ 
     ok (($x = $fil->gzread($uncomp)) == $len) ;
-
+ 
     ok ! $fil->gzclose ;
 
     ok $uncomp eq $buffer ;
-
+ 
     # now check that memGunzip can deal with it.
     my $keep = $dest;
     $ungzip = Compress::Zlib::memGunzip(\$dest) ;
@@ -430,7 +430,7 @@ EOM
     $ungzip = Compress::Zlib::memGunzip(\$minimal) ;
     ok ! defined $ungzip ;
 
-
+ 
     1 while unlink $name ;
 
     # check corrupt header -- too short
@@ -534,48 +534,48 @@ do {
 
     # Check - MAX_WBITS
     # =================
-
+    
     $hello = "Test test test test test";
     @hello = split('', $hello);
-
+     
     ok ($x = deflateInit( Bufsize => 1, WindowBits => -MAX_WBITS() ) ) ;
     ok $x ;
-
+     
     $Answer = '';
     foreach (@hello)
     {
         @($X, $status) =  $x->deflate($_) ;
         last unless $status == Z_OK ;
-
+    
         $Answer .= $X ;
     }
-
+     
     ok $status == Z_OK ;
-
+    
     ok   (@(@($X, $status) =  $x->flush())[?1] == Z_OK ) ;
     $Answer .= $X ;
-
-
+     
+     
     @Answer = split('', $Answer);
     # Undocumented corner -- extra byte needed to get inflate to return 
     # Z_STREAM_END when done.  
     push @Answer, " " ; 
-
+     
     ok ($k = inflateInit(Bufsize => 1, WindowBits => -MAX_WBITS()) ) ;
     ok $k ;
-
+     
     $GOT = '';
     foreach ( @Answer)
     {
         @($Z, $status) =  $k->inflate($_) ;
         $GOT .= $Z ;
         last if $status == Z_STREAM_END or $status != Z_OK ;
-
+     
     }
-
+     
     ok $status == Z_STREAM_END ;
     ok $GOT eq $hello ;
-
+    
 };
 
 do {
@@ -614,7 +614,7 @@ do {
 
     try { gzopen(\@(), 0) ; }  ;
     ok $^EVAL_ERROR->{?description} =~ m/^gzopen: file parameter is not a filehandle or filename at/
-        or print $^STDOUT, "# $^EVAL_ERROR\n" ;
+	or print $^STDOUT, "# $^EVAL_ERROR\n" ;
 
 #    my $x = Symbol::gensym() ;
 #    try { gzopen($x, 0) ; }  ;
@@ -641,8 +641,8 @@ do {
     # adler of this data should have the high bit set
     # value in ascii is lpscOVsAJiUfNComkOfWYBcPhHZ[bT
     my $data = "\x6c\x70\x73\x63\x4f\x56\x73\x41\x4a\x69\x55\x66" .
-        "\x4e\x43\x6f\x6d\x6b\x4f\x66\x57\x59\x42\x63\x50" .
-        "\x68\x48\x5a\x5b\x62\x54";
+               "\x4e\x43\x6f\x6d\x6b\x4f\x66\x57\x59\x42\x63\x50" .
+               "\x68\x48\x5a\x5b\x62\x54";
     my $expected_crc = 0xAAD60AC7 ; # 2866154183 
     my $crc = adler32($data) ;
     is $crc, $expected_crc;
@@ -653,17 +653,17 @@ do {
 
     my $contents = '' ;
     foreach (1 .. 20000)
-    { $contents .= chr int rand 256 }
+      { $contents .= chr int rand 256 }
 
     ok(my $compressed = Compress::Zlib::memGzip(\$contents));
 
     ok length $compressed +> 4096 ;
     ok(my $out = Compress::Zlib::memGunzip(\$compressed));
-
+     
     ok $contents eq $out ;
     is length $out, length $contents ;
 
-
+    
 };
 
 
@@ -722,7 +722,7 @@ EOM
 
     my $truncated ;
     ok(my $x = IO::Compress::Gzip->new( \$truncated, Append => 1, HeaderCRC => 1, Strict => 0,
-       ExtraField => "hello" x 10));
+				ExtraField => "hello" x 10));
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -793,12 +793,12 @@ EOM
 
     my $buffer ;
     ok( my $x = IO::Compress::Gzip->new( \$buffer, 
-        Append     => 1,
-        Strict     => 0,
-        HeaderCRC  => 1,
-        Name       => "Fred",
-        ExtraField => "Extra",
-        Comment    => 'Comment'));
+                             Append     => 1,
+                             Strict     => 0,
+                             HeaderCRC  => 1,
+                             Name       => "Fred",
+                             ExtraField => "Extra",
+                             Comment    => 'Comment'));
     ok  $x->write($string) ;
     ok  $x->close ;
 

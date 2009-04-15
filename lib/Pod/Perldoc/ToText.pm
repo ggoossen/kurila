@@ -21,22 +21,22 @@ sub width     { shift->_perldoc_elem('width'   , < @_) }
 sub new { return bless \%(), ref(@_[0]) || @_[0] }
 
 sub parse_from_file {
-    my $self = shift;
-
-    my @options = @+: map { @: $_, $self->{?$_} },
-        grep { !m/^_/s },
+  my $self = shift;
+  
+  my @options = @+: map { @: $_, $self->{?$_} },
+ grep { !m/^_/s },
         keys %$self
-    ;
+  ;
+  
+  defined(&Pod::Perldoc::DEBUG)
+   and Pod::Perldoc::DEBUG()
+   and print $^STDOUT, "About to call new Pod::Text ",
+    $Pod::Text::VERSION ?? "(v$Pod::Text::VERSION) " !! '',
+    "with options: ",
+    (nelems @options) ?? "[$(join ' ',@options)]" !! "(nil)", "\n";
+  ;
 
-        defined(&Pod::Perldoc::DEBUG)
-        and Pod::Perldoc::DEBUG()
-        and print $^STDOUT, "About to call new Pod::Text ",
-        $Pod::Text::VERSION ?? "(v$Pod::Text::VERSION) " !! '',
-        "with options: ",
-        (nelems @options) ?? "[$(join ' ',@options)]" !! "(nil)", "\n";
-        ;
-
-    Pod::Text->new(< @options)->parse_from_file(< @_);
+  Pod::Text->new(< @options)->parse_from_file(< @_);
 }
 
 1;

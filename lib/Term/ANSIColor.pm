@@ -17,7 +17,7 @@
 package Term::ANSIColor;
 
 our ($AUTORESET, $EACHLINE, @ISA, @EXPORT, @EXPORT_OK
-    ,            %EXPORT_TAGS, $VERSION, %attributes, %attributes_r);
+,            %EXPORT_TAGS, $VERSION, %attributes, %attributes_r);
 
 use Exporter ();
 @ISA         = qw(Exporter);
@@ -37,23 +37,23 @@ $VERSION = '1.12';
 ##############################################################################
 
 %attributes = %('clear'      => 0,
-        'reset'      => 0,
-            'bold'       => 1,
-            'dark'       => 2,
-            'underline'  => 4,
-            'underscore' => 4,
-            'blink'      => 5,
-            'reverse'    => 7,
-            'concealed'  => 8,
+               'reset'      => 0,
+               'bold'       => 1,
+               'dark'       => 2,
+               'underline'  => 4,
+               'underscore' => 4,
+               'blink'      => 5,
+               'reverse'    => 7,
+               'concealed'  => 8,
 
-            'black'      => 30,   'on_black'   => 40,
-            'red'        => 31,   'on_red'     => 41,
-            'green'      => 32,   'on_green'   => 42,
-            'yellow'     => 33,   'on_yellow'  => 43,
-            'blue'       => 34,   'on_blue'    => 44,
-            'magenta'    => 35,   'on_magenta' => 45,
-            'cyan'       => 36,   'on_cyan'    => 46,
-            'white'      => 37,   'on_white'   => 47);
+               'black'      => 30,   'on_black'   => 40,
+               'red'        => 31,   'on_red'     => 41,
+               'green'      => 32,   'on_green'   => 42,
+               'yellow'     => 33,   'on_yellow'  => 43,
+               'blue'       => 34,   'on_blue'    => 44,
+               'magenta'    => 35,   'on_magenta' => 45,
+               'cyan'       => 36,   'on_cyan'    => 46,
+               'white'      => 37,   'on_white'   => 47);
 
 # Reverse lookup.  Alphabetically first name for a sequence is preferred.
 for (reverse sort keys %attributes) {
@@ -136,13 +136,13 @@ sub uncolor {
         push (@nums, < split (m/;/, $1));
     }
     for ( @nums) {
-        $_ += 0; # Strip leading zeroes
-        my $name = %attributes_r{?$_};
-        if (!defined $name) {
-            require Carp;
-            Carp::croak ("No name for escape sequence $_" );
-        }
-        push (@result, $name);
+	$_ += 0; # Strip leading zeroes
+	my $name = %attributes_r{?$_};
+	if (!defined $name) {
+	    require Carp;
+	    Carp::croak ("No name for escape sequence $_" );
+	}
+	push (@result, $name);
     }
     @result;
 }
@@ -168,8 +168,8 @@ sub colored {
     if (defined $EACHLINE) {
         my $attr = color (< @codes);
         join '', map { $_ ne $EACHLINE ?? $attr . $_ . "\e[0m" !! $_ },
-            grep { length ($_) +> 0 },
-            split (m/(\Q$EACHLINE\E)/, $string);
+ grep { length ($_) +> 0 },
+                    split (m/(\Q$EACHLINE\E)/, $string);
     } else {
         color (< @codes) . $string . "\e[0m";
     }

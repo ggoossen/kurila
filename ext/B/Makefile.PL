@@ -8,10 +8,10 @@ my $exeout_flag = '-o ';
 my $core = grep { $_ eq 'PERL_CORE=1' }, @ARGV;
 if ($^OS_NAME eq 'MSWin32') {
     if (config_value('cc') =~ m/^cl/i) {
-        $exeout_flag = '-Fe';
+	$exeout_flag = '-Fe';
     }
     elsif (config_value('cc') =~ m/^bcc/i) {
-        $exeout_flag = '-e';
+	$exeout_flag = '-e';
     }
 }
 
@@ -20,11 +20,11 @@ WriteMakefile(
     VERSION_FROM    => "B.pm",
     PL_FILES	    => \%( 'defsubs_h.PL' => 'defsubs.h' ),
     clean	    => \%(
-        FILES	    => "perl$e *$o B.c defsubs.h *~"
+	FILES	    => "perl$e *$o B.c defsubs.h *~"
     )
-    );
+);
 
-    package MY;
+package MY;
 
 use Config;
 
@@ -34,10 +34,10 @@ sub post_constants {
 
 sub headerpath {
     if ($core) {
-        return File::Spec->catdir( File::Spec->updir,
-            File::Spec->updir);
+	return File::Spec->catdir( File::Spec->updir,
+				   File::Spec->updir);
     } else {
-        return File::Spec->catdir(config_value("archlibexp"), "CORE");
+	return File::Spec->catdir(config_value("archlibexp"), "CORE");
     }
 }
 
@@ -46,7 +46,7 @@ sub MY::postamble {
     my @headers = map { File::Spec->catfile($headerpath, $_) }, qw(op.h cop.h);
     my $noecho = shift->{?NOECHO};
 
-    "
+"
 B\$(OBJ_EXT) : defsubs.h
 
 defsubs.h :: $(join ' ',@headers) defsubs_h.PL

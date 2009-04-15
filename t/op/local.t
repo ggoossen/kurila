@@ -15,7 +15,7 @@ $list_assignment_supported = 0 if ($^OS_NAME eq 'VMS');
 
 sub foo {
     local@($a, $b) =  @_;
-                      local($c, $d);
+    local($c, $d);
     $c = "c 3";
     $d = "d 4";
     do { local @($a,$c) = @("a 9", "c 10"); @($x, $y) = @($a, $c); };
@@ -45,7 +45,7 @@ is($y, "c 10");
 
 sub foo2 {
     local@($a, @b) = @(shift, @_);
-                      local(@c, %d);
+    local(@c, %d);
     @c = @( "c 3" );
     %d{+''} = "d 4";
     do { local@($a, @c) = @("a 19", @("c 20")); @($x, $y) = @($a, < @c); };
@@ -72,23 +72,23 @@ is($y, "c 20");
 
 
 do {
-    local our $TODO = "fix localization through reference";
-    eval 'local($$e)';
-    like($^EVAL_ERROR && $^EVAL_ERROR->{?description}, qr/Can't localize through a reference/);
+local our $TODO = "fix localization through reference";
+eval 'local($$e)';
+like($^EVAL_ERROR && $^EVAL_ERROR->{?description}, qr/Can't localize through a reference/);
 
-    eval '$e = \@(); local(@$e)';
-    like($^EVAL_ERROR && $^EVAL_ERROR->{?description}, qr/Can't localize through a reference/);
+eval '$e = \@(); local(@$e)';
+like($^EVAL_ERROR && $^EVAL_ERROR->{?description}, qr/Can't localize through a reference/);
 
-    eval '$e = \%(); local(%$e)';
-    like($^EVAL_ERROR && $^EVAL_ERROR->{?description}, qr/Can't localize through a reference/);
+eval '$e = \%(); local(%$e)';
+like($^EVAL_ERROR && $^EVAL_ERROR->{?description}, qr/Can't localize through a reference/);
 };
 
 # Array and hash elements
 
 @a = @('a', 'b', 'c');
 do {
-                      local(@a[1]) = 'foo';
-                      local(@a[2]) = @a[2];
+    local(@a[1]) = 'foo';
+    local(@a[2]) = @a[2];
     is(@a[1], 'foo');
     is(@a[2], 'c');
     undef @a;
@@ -99,7 +99,7 @@ ok(!defined @a[0]);
 
 @a = @('a', 'b', 'c');
 do {
-                      local(@a[1]) = "X";
+    local(@a[1]) = "X";
     shift @a;
 };
 is(@a[0].@a[1], "Xb");
@@ -111,11 +111,11 @@ do {
 
 %h = %('a' => 1, 'b' => 2, 'c' => 3);
 do {
-                      local(%h{+'a'}) = 'foo';
-                      local(%h{+'b'}) = %h{?'b'};
+    local(%h{+'a'}) = 'foo';
+    local(%h{+'b'}) = %h{?'b'};
     is(%h{?'a'}, 'foo');
     is(%h{?'b'}, 2);
-                      local(%h{'c'});
+    local(%h{'c'});
     delete %h{'c'};
 };
 is(%h{?'a'}, 1);
@@ -146,7 +146,7 @@ do {
 
 @a = @('a', 'b', 'c');
 do {
-                      local(@a[1]) = "X";
+    local(@a[1]) = "X";
     shift @a;
 };
 is(@a[0].@a[1], "Xb");
@@ -178,23 +178,23 @@ like($^EVAL_ERROR->{?description}, qr/Modification of a read-only value attempte
 
 # sub localisation
 do {
-    package Other;
+	package Other;
 
-    sub f1 { "f1" }
-    sub f2 { "f2" }
+	sub f1 { "f1" }
+	sub f2 { "f2" }
 
-    no warnings "redefine";
-    do {
-        local *f1 = sub  { "g1" };
-        main::ok(f1() eq "g1", "localised sub via glob");
-    };
-    main::ok(f1() eq "f1", "localised sub restored");
-    do {
-        main::eval_dies_like( 'local %Other::{+"f1"} = sub { "h1" }',
-                              qr/can't localize a glob/, "localised sub via stash" );
-    };
-    main::ok(f1() eq "f1", "localised sub restored");
-    main::ok(f2() eq "f2", "localised sub restored");
+	no warnings "redefine";
+	do {
+		local *f1 = sub  { "g1" };
+		main::ok(f1() eq "g1", "localised sub via glob");
+	};
+	main::ok(f1() eq "f1", "localised sub restored");
+	do {
+            main::eval_dies_like( 'local %Other::{+"f1"} = sub { "h1" }',
+                                  qr/can't localize a glob/, "localised sub via stash" );
+	};
+	main::ok(f1() eq "f1", "localised sub restored");
+	main::ok(f2() eq "f2", "localised sub restored");
 };
 
 # Localising unicode keys (bug #38815)
@@ -205,17 +205,17 @@ do {
     is(nelems( keys %h), 2);
     do {
         use utf8;
-        my $unicode = chr 256;
-        my $ambigous = "\240" . $unicode;
-        chop $ambigous;
-        local %h{+$unicode} = 256;
-        local %h{+$ambigous} = 160;
+	my $unicode = chr 256;
+	my $ambigous = "\240" . $unicode;
+	chop $ambigous;
+	local %h{+$unicode} = 256;
+	local %h{+$ambigous} = 160;
 
-        is(nelems(keys %h), 4);
-        is(%h{?"\243"}, "pound");
-        is(%h{?$unicode}, 256);
-        is(%h{?$ambigous}, 160);
-        is(%h{?"\302\240"}, "octects");
+	is(nelems(keys %h), 4);
+	is(%h{?"\243"}, "pound");
+	is(%h{?$unicode}, 256);
+	is(%h{?$ambigous}, 160);
+	is(%h{?"\302\240"}, "octects");
     };
     is(nelems(keys %h), 2);
     is(%h{?"\243"}, "pound");
@@ -230,16 +230,16 @@ do {
     is(nelems(keys %h), 2);
     do {
         use utf8;
-        my $unicode = chr 256;
-        my $ambigous = "\240" . $unicode;
-        chop $ambigous;
-        local %h{[@($unicode, $ambigous)]} = @(256, 160);
+	my $unicode = chr 256;
+	my $ambigous = "\240" . $unicode;
+	chop $ambigous;
+	local %h{[@($unicode, $ambigous)]} = @(256, 160);
 
-        is(nkeys %h, 4);
-        is(%h{?"\243"}, "pound");
-        is(%h{?$unicode}, 256);
-        is(%h{?$ambigous}, 160);
-        is(%h{?"\302\240"}, "octects");
+	is(nkeys %h, 4);
+	is(%h{?"\243"}, "pound");
+	is(%h{?$unicode}, 256);
+	is(%h{?$ambigous}, 160);
+	is(%h{?"\302\240"}, "octects");
     };
     is(nkeys %h, 2);
     is(%h{?"\243"}, "pound");
@@ -254,7 +254,7 @@ do {
     sub X39012::DESTROY { $x++ }
     sub { local @_[0]; shift }->($y);
     ok(!$x,  '[perl #39012]');
-
+    
 };
 
 # when localising a hash element, the key should be copied, not referenced
@@ -263,10 +263,10 @@ do {
     my %h=%('k1' => 111);
     my $k='k1';
     do {
-        local %h{+$k}=222;
+	local %h{+$k}=222;
 
-        is(%h{?'k1'},222);
-        $k='k2';
+	is(%h{?'k1'},222);
+	$k='k2';
     };
     ok(! exists(%h{'k2'}));
     is(%h{?'k1'},111);
@@ -275,9 +275,9 @@ do {
     my %h=%('k1' => 111);
     our $k = 'k1';  # try dynamic too
     do {
-        local %h{+$k}=222;
-        is(%h{?'k1'},222);
-        $k='k2';
+	local %h{+$k}=222;
+	is(%h{?'k1'},222);
+	$k='k2';
     };
     ok(! exists(%h{'k2'}));
     is(%h{?'k1'},111);

@@ -6,13 +6,13 @@ mypragma - an example of a user pragma
 
 In your code
 
-use mypragma; # Enable the pragma
+    use mypragma; # Enable the pragma
+    
+    mypragma::in_effect() # returns true; pragma is enabled
 
-mypragma::in_effect() # returns true; pragma is enabled
-
-no mypragma;
-
-mypragma::in_effect() # returns false; pragma is not enabled
+    no mypragma;
+    
+    mypragma::in_effect() # returns false; pragma is not enabled
 
 =head1 DESCRIPTION
 

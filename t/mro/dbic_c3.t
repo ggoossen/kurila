@@ -27,19 +27,19 @@ do {
       xx::DBIx::Class::AccessorGroup
     /;
 
-        package xx::DBIx::Class::InflateColumn; use mro 'c3';
+    package xx::DBIx::Class::InflateColumn; use mro 'c3';
     our @ISA = qw/ xx::DBIx::Class::Row /;
 
-        package xx::DBIx::Class::Row; use mro 'c3';
+    package xx::DBIx::Class::Row; use mro 'c3';
     our @ISA = qw/ xx::DBIx::Class /;
 
-        package xx::DBIx::Class; use mro 'c3';
+    package xx::DBIx::Class; use mro 'c3';
     our @ISA = qw/
       xx::DBIx::Class::Componentised
       xx::Class::Data::Accessor
     /;
 
-        package xx::DBIx::Class::Relationship; use mro 'c3';
+    package xx::DBIx::Class::Relationship; use mro 'c3';
     our @ISA = qw/
       xx::DBIx::Class::Relationship::Helpers
       xx::DBIx::Class::Relationship::Accessor
@@ -49,7 +49,7 @@ do {
       xx::DBIx::Class
     /;
 
-        package xx::DBIx::Class::Relationship::Helpers; use mro 'c3';
+    package xx::DBIx::Class::Relationship::Helpers; use mro 'c3';
     our @ISA = qw/
       xx::DBIx::Class::Relationship::HasMany
       xx::DBIx::Class::Relationship::HasOne
@@ -57,28 +57,28 @@ do {
       xx::DBIx::Class::Relationship::ManyToMany
     /;
 
-        package xx::DBIx::Class::Relationship::ProxyMethods; use mro 'c3';
+    package xx::DBIx::Class::Relationship::ProxyMethods; use mro 'c3';
     our @ISA = qw/ xx::DBIx::Class /;
 
-        package xx::DBIx::Class::Relationship::Base; use mro 'c3';
+    package xx::DBIx::Class::Relationship::Base; use mro 'c3';
     our @ISA = qw/ xx::DBIx::Class /;
 
-        package xx::DBIx::Class::PK::Auto; use mro 'c3';
+    package xx::DBIx::Class::PK::Auto; use mro 'c3';
     our @ISA = qw/ xx::DBIx::Class /;
 
-        package xx::DBIx::Class::PK; use mro 'c3';
+    package xx::DBIx::Class::PK; use mro 'c3';
     our @ISA = qw/ xx::DBIx::Class::Row /;
 
-        package xx::DBIx::Class::ResultSourceProxy::Table; use mro 'c3';
+    package xx::DBIx::Class::ResultSourceProxy::Table; use mro 'c3';
     our @ISA = qw/
       xx::DBIx::Class::AccessorGroup
       xx::DBIx::Class::ResultSourceProxy
     /;
 
-        package xx::DBIx::Class::ResultSourceProxy; use mro 'c3';
+    package xx::DBIx::Class::ResultSourceProxy; use mro 'c3';
     our @ISA = qw/ xx::DBIx::Class /;
 
-        package xx::Class::Data::Accessor; our @ISA = @( () ); use mro 'c3';
+    package xx::Class::Data::Accessor; our @ISA = @( () ); use mro 'c3';
     package xx::DBIx::Class::Relationship::HasMany; our @ISA = @( () ); use mro 'c3';
     package xx::DBIx::Class::Relationship::HasOne; our @ISA = @( () ); use mro 'c3';
     package xx::DBIx::Class::Relationship::BelongsTo; our @ISA = @( () ); use mro 'c3';
@@ -116,4 +116,4 @@ ok(eq_array(
         xx::DBIx::Class::Componentised
         xx::Class::Data::Accessor
     /
-    ), '... got the right C3 merge order for xx::DBIx::Class::Core');
+), '... got the right C3 merge order for xx::DBIx::Class::Core');

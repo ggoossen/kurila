@@ -1,16 +1,16 @@
 #!./perl
 
 env::var('PATH' ) = "/bin:/usr/bin:/usr/xpg4/bin:/usr/ucb" .
-defined env::var('PATH') ?? ":$(env::var('PATH'))" !! "" ;
+    defined env::var('PATH') ?? ":$(env::var('PATH'))" !! "" ;
 env::var('LC_ALL' ) = "C"; # so that external utilities speak English
 env::var('LANGUAGE' ) = 'C'; # GNU locale extension
 
 BEGIN {
     require Config;
     if ($^EVAL_ERROR) {
-        print $^STDOUT, "1..0 # Skip: no Config\n";
+	print $^STDOUT, "1..0 # Skip: no Config\n";
     } else {
-        Config->import;
+	Config->import;
     }
 }
 
@@ -53,21 +53,21 @@ GROUPS: do {
     # prefer 'id' over 'groups' (is this ever wrong anywhere?)
     # and 'id -a' over 'id -Gn' (the former is good about spaces in group names)
     if (($groups = `id -a 2>/dev/null`) ne '') {
-        # $groups is of the form:
-        # uid=39957(gsar) gid=22(users) groups=33536,39181,22(users),0(root),1067(dev)
-        # FreeBSD since 6.2 has a fake id -a:
-        # uid=1001(tobez) gid=20(staff) groups=20(staff), 0(wheel), 68(dialer)
-        last GROUPS if $groups =~ m/groups=/;
+	# $groups is of the form:
+	# uid=39957(gsar) gid=22(users) groups=33536,39181,22(users),0(root),1067(dev)
+	# FreeBSD since 6.2 has a fake id -a:
+	# uid=1001(tobez) gid=20(staff) groups=20(staff), 0(wheel), 68(dialer)
+	last GROUPS if $groups =~ m/groups=/;
     }
     if (($groups = `id -Gn 2>/dev/null`) ne '') {
-        # $groups could be of the form:
-        # users 33536 39181 root dev
-        last GROUPS if $groups !~ m/^(\d|\s)+$/;
+	# $groups could be of the form:
+	# users 33536 39181 root dev
+	last GROUPS if $groups !~ m/^(\d|\s)+$/;
     }
     if (($groups = `groups 2>/dev/null`) ne '') {
-        # may not reflect all groups in some places, so do a sanity check
-        if (-d '/afs') {
-            print $^STDOUT, <<EOM;
+	# may not reflect all groups in some places, so do a sanity check
+	if (-d '/afs') {
+	    print $^STDOUT, <<EOM;
 # These test results *may* be bogus, as you appear to have AFS,
 # and I can't find a working 'id' in your PATH (which I have set
 # to '$(env::var('PATH'))').
@@ -76,8 +76,8 @@ GROUPS: do {
 # on this platform to find *all* the groups that an arbitrary
 # user may belong to, using the 'perlbug' program.
 EOM
-        }
-        last GROUPS;
+	}
+	last GROUPS;
     }
     # Okay, not today.
     quit();
@@ -95,17 +95,17 @@ if ($groups =~ m/groups=(.+)( [ug]id=|$)/) {
     my @g1;
     # prefer names over numbers
     for ( @g0) {
-        # 42(zot me)
-        if (m/^(\d+)(?:\(([^)]+)\))?/) {
-            push @g1, ($2 || $1);
-        }
-        # zot me(42)
-        elsif (m/^([^(]*)\((\d+)\)/) {
-            push @g1, ($1 || $2);
-        }
-        else {
-            print $^STDOUT, "# ignoring group entry [$_]\n";
-        }
+	# 42(zot me)
+	if (m/^(\d+)(?:\(([^)]+)\))?/) {
+	    push @g1, ($2 || $1);
+	}
+	# zot me(42)
+	elsif (m/^([^(]*)\((\d+)\)/) {
+	    push @g1, ($1 || $2);
+	}
+	else {
+	    print $^STDOUT, "# ignoring group entry [$_]\n";
+	}
     }
     print $^STDOUT, "# groups=$gr\n";
     print $^STDOUT, "# g0 = $(join ' ',@g0)\n";
@@ -125,10 +125,10 @@ for (split(' ', $^GID)) {
     ($group) = getgrgid($_);
     next if (! defined $group or ! grep { $_ eq $group }, @gr) and %seen{+$_}++;
     if (defined $group) {
-        push(@gr, $group);
+	push(@gr, $group);
     }
     else {
-        push(@gr, $_);
+	push(@gr, $_);
     }
 }
 
@@ -136,17 +136,17 @@ print $^STDOUT, "# gr = $(join ' ',@gr)\n";
 
 my %did;
 if ($^OS_NAME =~ m/^(?:uwin|cygwin|interix|solaris)$/) {
-    # Or anybody else who can have spaces in group names.
-    $gr1 = join(' ', grep( {!%did{+$_}++ }, sort split(' ', join(' ', @gr))));
+	# Or anybody else who can have spaces in group names.
+	$gr1 = join(' ', grep( {!%did{+$_}++ }, sort split(' ', join(' ', @gr))));
 } else {
-    # Don't assume that there aren't duplicate groups
-    $gr1 = join(' ', sort grep { defined $_ && !%did{+$_}++ }, @gr);
+	# Don't assume that there aren't duplicate groups
+	$gr1 = join(' ', sort grep { defined $_ && !%did{+$_}++ }, @gr);
 }
 
 if (config_value("myuname") =~ m/^cygwin_nt/i) {  # basegroup on CYGWIN_NT has id = 0.
-        %basegroup{[@($pwgid,$pwgnam)]} = @(0,0);
+    %basegroup{[@($pwgid,$pwgnam)]} = @(0,0);
 } else { 
-        %basegroup{[@($pwgid,$pwgnam)]} = @(1,1);
+    %basegroup{[@($pwgid,$pwgnam)]} = @(1,1);
 }
 $gr2 = join(' ', grep( {!%basegroup{+$_}++ }, sort split(' ',$groups)));
 
@@ -160,8 +160,8 @@ elsif (config_value("myuname") =~ m/^cygwin_nt/i) { # basegroup on CYGWIN_NT has
     %basegroup = %( $pwgid => 1, $pwgnam => 1 );
     $gr2 = join(' ', grep( {!%basegroup{+$_}++ }, sort split(' ',$groups)));
     if ($gr1 eq $gr2 || ($gr1 eq '' && $gr2 eq $pwgid)) {
-        print $^STDOUT, "ok 1 # This Cygwin behaves like Unix (Win2k?)\n";
-        $ok1++;
+	print $^STDOUT, "ok 1 # This Cygwin behaves like Unix (Win2k?)\n";
+	$ok1++;
     }
 }
 unless ($ok1) {

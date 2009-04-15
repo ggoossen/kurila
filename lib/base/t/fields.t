@@ -18,13 +18,13 @@ package main;
 
 is_deeply( \(sort keys %Foo::FIELDS), 
            \sort qw(_no Pants who _up_yours what)
-           );
+);
 
 sub show_fields {
     my@($base, $mask) =  @_;
     my $fields = \%{*{Symbol::fetch_glob($base.'::FIELDS')}};
     return grep { (%fields::attr{$base}->[$fields->{?$_}] ^&^ $mask) == $mask},
-        keys %$fields;
+                keys %$fields;
 }
 
 is_deeply( \sort(&show_fields('Foo', fields::PUBLIC)),
@@ -35,12 +35,12 @@ is_deeply( \sort(&show_fields('Foo', fields::PRIVATE)),
 foreach (@(Foo->new)) {
     my $obj = $_;
     my %test = %( Pants => 'Whatever', _no => 'Yeah',
-            what  => 'Ahh',      who => 'Moo',
-                _up_yours => 'Yip' );
+                 what  => 'Ahh',      who => 'Moo',
+                 _up_yours => 'Yip' );
 
     $obj->{+Pants} = 'Whatever';
     $obj->{+_no}   = 'Yeah';
-        %{$obj}{[qw(what who _up_yours)]} = @('Ahh', 'Moo', 'Yip');
+     %{$obj}{[qw(what who _up_yours)]} = @('Ahh', 'Moo', 'Yip');
 
     while(my@(?$k,?$v) =@( each %test)) {
         is($obj->{?$k}, $v);
@@ -49,8 +49,8 @@ foreach (@(Foo->new)) {
 
 do {
     local $^WARN_HOOK = sub {
-            return if @_[0] =~ m/^Pseudo-hashes are deprecated/ 
-        };
+        return if @_[0] =~ m/^Pseudo-hashes are deprecated/ 
+    };
     my $phash;
     try { $phash = fields::phash(name => "Joe", rank => "Captain") };
     like $^EVAL_ERROR->{?description}, qr/^Pseudo-hashes have been removed from Perl/;

@@ -22,8 +22,8 @@ print $^STDOUT, "ok 3\n";
 $sel->remove($^STDIN) == 1 or print $^STDOUT, "not ";
 print $^STDOUT, "ok 4\n",
 ;
-    $sel->remove($^STDIN, 5, 6) == 1  # two of there are not present
-    or print $^STDOUT, "not ";
+$sel->remove($^STDIN, 5, 6) == 1  # two of there are not present
+  or print $^STDOUT, "not ";
 print $^STDOUT, "ok 5\n";
 
 print $^STDOUT, "not " unless $sel->count == 2;
@@ -102,13 +102,13 @@ print $^STDOUT, "ok 21\n";
 
 # check warnings
 $^WARN_HOOK = sub { 
-        ++ $w 
-            if @_[0]->{?description} =~ m/^Call to deprecated method 'has_error', use 'has_exception'/ ;
+    ++ $w 
+      if @_[0]->{?description} =~ m/^Call to deprecated method 'has_error', use 'has_exception'/ ;
     } ;
 $w = 0 ;
 do {
-    no warnings 'IO::Select' ;
-    IO::Select::has_exception();
+no warnings 'IO::Select' ;
+IO::Select::has_exception();
 };
 print $^STDOUT, "not " unless $w == 0 ;
 $w = 0 ;

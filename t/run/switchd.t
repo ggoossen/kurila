@@ -12,9 +12,9 @@ END { unlink < @tmpfiles }
 
 my $filename = 'swdtest.tmp';
 SKIP: do {
-    open my $f, ">", "$filename"
-        or skip( "Can't write temp file $filename: $^OS_ERROR" );
-    print $f, <<'__SWDTEST__';
+	open my $f, ">", "$filename"
+	    or skip( "Can't write temp file $filename: $^OS_ERROR" );
+	print $f, <<'__SWDTEST__';
 package Bar;
 sub bar { @_[0] * @_[0] }
 package Foo;
@@ -29,16 +29,16 @@ __SWDTEST__
     push @tmpfiles, $filename;
     $^OUTPUT_AUTOFLUSH = 1; # Unbufferize.
     $r = runperl(
-        switches => \@( '-Ilib', '-I../lib', '-f', '-d:switchd' ),
-        progfile => $filename,
-        args => \@('3'),
-        );
+		 switches => \@( '-Ilib', '-I../lib', '-f', '-d:switchd' ),
+		 progfile => $filename,
+		 args => \@('3'),
+		);
     like($r, qr/^import<Devel::switchd>;$/);
     $r = runperl(
-        switches => \@( '-Ilib', '-I../lib', '-f', '-d:switchd=a,42' ),
-        progfile => $filename,
-        args => \@('4'),
-        );
+		 switches => \@( '-Ilib', '-I../lib', '-f', '-d:switchd=a,42' ),
+		 progfile => $filename,
+		 args => \@('4'),
+		);
     like($r, qr/^import<Devel::switchd a 42>;$/);
 };
 

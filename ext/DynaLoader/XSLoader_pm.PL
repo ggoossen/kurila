@@ -96,13 +96,13 @@ print $out, <<'EOT';
 
 EOT
 
-if ($^OS_NAME eq 'darwin') {
-    print $out, <<'EOT';
+    if ($^OS_NAME eq 'darwin') {
+print $out, <<'EOT';
         if ($boot_symbol_ref = dl_find_symbol(0, $bootname)) {
             goto boot; #extension library has already been loaded, e.g. darwin
         }
 EOT
-}
+    }
 
 print $out, <<'EOT';
     # Many dynamic extension loading problems will appear to come from

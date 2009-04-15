@@ -26,18 +26,18 @@ Exporter::export_ok_tags('all');
 
 BEGIN
 {
-    eval ' use IO::Uncompress::Adapter::Inflate 2.006 ;';
-    eval ' use IO::Uncompress::Adapter::Bunzip2 2.006 ;';
-    eval ' use IO::Uncompress::Adapter::LZO 2.006 ;';
-    eval ' use IO::Uncompress::Adapter::Lzf 2.006 ;';
+   eval ' use IO::Uncompress::Adapter::Inflate 2.006 ;';
+   eval ' use IO::Uncompress::Adapter::Bunzip2 2.006 ;';
+   eval ' use IO::Uncompress::Adapter::LZO 2.006 ;';
+   eval ' use IO::Uncompress::Adapter::Lzf 2.006 ;';
 
-    eval ' use IO::Uncompress::Bunzip2 2.006 ;';
-    eval ' use IO::Uncompress::UnLzop 2.006 ;';
-    eval ' use IO::Uncompress::Gunzip 2.006 ;';
-    eval ' use IO::Uncompress::Inflate 2.006 ;';
-    eval ' use IO::Uncompress::RawInflate 2.006 ;';
-    eval ' use IO::Uncompress::Unzip 2.006 ;';
-    eval ' use IO::Uncompress::UnLzf 2.006 ;';
+   eval ' use IO::Uncompress::Bunzip2 2.006 ;';
+   eval ' use IO::Uncompress::UnLzop 2.006 ;';
+   eval ' use IO::Uncompress::Gunzip 2.006 ;';
+   eval ' use IO::Uncompress::Inflate 2.006 ;';
+   eval ' use IO::Uncompress::RawInflate 2.006 ;';
+   eval ' use IO::Uncompress::Unzip 2.006 ;';
+   eval ' use IO::Uncompress::UnLzf 2.006 ;';
 }
 
 sub new
@@ -88,25 +88,25 @@ sub mkUncomp
             if ! defined $obj;
 
         *$self->{+Uncomp} = $obj;
-
+        
         my @possible = qw( Inflate Gunzip Unzip );
         unshift @possible, 'RawInflate' 
             if $got->value('RawInflate');
 
         $magic = $self->ckMagic( < @possible );
-
+        
         if ($magic) {
             *$self->{+Info} = $self->readHeader($magic)
-            or return undef ;
+                or return undef ;
 
             return 1;
         }
-    }
+     }
 
-    if (defined $IO::Uncompress::Bunzip2::VERSION and
-        $magic = $self->ckMagic('Bunzip2')) {
+     if (defined $IO::Uncompress::Bunzip2::VERSION and
+         $magic = $self->ckMagic('Bunzip2')) {
         *$self->{+Info} = $self->readHeader($magic)
-        or return undef ;
+            or return undef ;
 
         my @($obj, $errstr, $errno) =  IO::Uncompress::Adapter::Bunzip2::mkUncompObject();
 
@@ -115,14 +115,14 @@ sub mkUncomp
 
         *$self->{+Uncomp} = $obj;
 
-        return 1;
-    }
+         return 1;
+     }
 
-    if (defined $IO::Uncompress::UnLzop::VERSION and
-        $magic = $self->ckMagic('UnLzop')) {
+     if (defined $IO::Uncompress::UnLzop::VERSION and
+            $magic = $self->ckMagic('UnLzop')) {
 
         *$self->{+Info} = $self->readHeader($magic)
-        or return undef ;
+            or return undef ;
 
         my @($obj, $errstr, $errno) =  IO::Uncompress::Adapter::LZO::mkUncompObject();
 
@@ -131,14 +131,14 @@ sub mkUncomp
 
         *$self->{+Uncomp} = $obj;
 
-        return 1;
-    }
+         return 1;
+     }
 
-    if (defined $IO::Uncompress::UnLzf::VERSION and
-        $magic = $self->ckMagic('UnLzf')) {
+     if (defined $IO::Uncompress::UnLzf::VERSION and
+            $magic = $self->ckMagic('UnLzf')) {
 
         *$self->{+Info} = $self->readHeader($magic)
-        or return undef ;
+            or return undef ;
 
         my @($obj, $errstr, $errno) =  IO::Uncompress::Adapter::Lzf::mkUncompObject();
 
@@ -147,10 +147,10 @@ sub mkUncomp
 
         *$self->{+Uncomp} = $obj;
 
-        return 1;
-    }
+         return 1;
+     }
 
-    return 0 ;
+     return 0 ;
 }
 
 

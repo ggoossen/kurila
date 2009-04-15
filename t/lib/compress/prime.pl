@@ -51,10 +51,10 @@ EOM
             {
                 print $^STDOUT, "#\n# BlockSize $blocksize, Length $i, Buffer $useBuf\n#\n" ;
                 my $lex = LexFile->new( my $name) ;
-
+        
                 my $prime = substr($compressed, 0, $i);
                 my $rest = substr($compressed, $i);
-
+        
                 my $start  ;
                 if ($useBuf) {
                     $start = \$rest ;
@@ -66,12 +66,12 @@ EOM
 
                 #my $gz = new $UncompressClass $name,
                 my $gz = $UncompressClass-> new( $start,
-                    -Append      => 1,
-                    -BlockSize   => $blocksize,
-                    -Prime       => $prime,
-                    -Transparent => 0)
-                ;
-                    ok $gz;
+                                              -Append      => 1,
+                                              -BlockSize   => $blocksize,
+                                              -Prime       => $prime,
+                                              -Transparent => 0)
+                                              ;
+                ok $gz;
                 ok ! $gz->error() ;
                 my $un ;
                 my $status = 1 ;
@@ -86,5 +86,5 @@ EOM
         }
     }
 }
-
+ 
 1;
