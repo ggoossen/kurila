@@ -1178,7 +1178,7 @@ S_curmad(pTHX_ char slot, SV *sv, SV* location)
 }
 #else
 #  define start_force(where)    NOOP
-#  define curmad(slot, sv)      NOOP
+#  define curmad(slot, sv, location)      NOOP
 #endif
 
 /*

@@ -161,7 +161,7 @@ sub T($where, $num) {
 my $test = 42;
 
 do {
-    # line 42 "plink"
+# line 42 "plink"
     local $_ = "not ok ";
     eval q{
 	s/^not /{<<EOT}/ and T '^main:\(eval \d+\):2$', $test++;
