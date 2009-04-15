@@ -187,6 +187,14 @@ sub rename_madprop {
     del_madprop($op, $oldkey);
 }
 
+sub madprops {
+    my ($op) = @_;
+    assert($op);
+    my (@madsv) = $op->findnodes(qq|madprops/*|);
+    my (@keys) = map { $_->tag =~ m/^mad_(.*)/; $1 } @madsv;
+    return @keys;
+}
+
 sub make_glob_sub {
     my $twig = shift;
     for my $op_glob ($twig->findnodes(q|//op_null[@was="glob"]|)) {
@@ -1423,6 +1431,222 @@ sub local_undef {
     }
 }
 
+sub env_sub {
+    my $xml = shift;
+    for my $op (find_ops($xml, "entersub")) {
+        my $op_method = $op->child(-1) && $op->child(-1)->child(-1);
+        my $op_gv = $op_method && $op_method->child(-1);
+        next unless $op_gv and get_madprop($op_gv, 'value');
+        next unless get_madprop($op_gv, 'value') =~ m/^env::((?:temp_)?)set_var$/;
+        my $is_temp = $1;
+        set_madprop($op_gv, 'value' => ($is_temp ? 'local ' : '') . 'env::var');
+        set_madprop($op, 'round_close', '');
+        my $arg = $op->child(-1)->child(2);
+        set_madprop($arg, comma => ') =');
+    }
+}
+
+sub first_token {
+    my ($op) = @_;
+    my ($linenr, $charoffset);
+
+    for my $mk (madprops($op)) {
+        my $this_linenr = get_madprop($op, $mk, "linenr");
+        my $this_charoffset = get_madprop($op, $mk, "charoffset");
+        next if not $this_linenr;
+        if ( (not $linenr)
+               or ($this_linenr < $linenr)
+               or ($this_linenr == $linenr and $this_charoffset < $charoffset) ) {
+            $linenr = $this_linenr;
+            $charoffset = $this_charoffset;
+        }
+    }
+
+    for my $child ($op->children) {
+        my ($this_linenr, $this_charoffset) = first_token($child);
+        next if not $this_linenr;
+        if ( (not $linenr)
+               or ($this_linenr < $linenr)
+               or ($this_linenr == $linenr and $this_charoffset < $charoffset) ) {
+            $linenr = $this_linenr;
+            $charoffset = $this_charoffset;
+        }
+    }
+    return $linenr, $charoffset;
+}
+
+sub indent {
+    my $xml = shift;
+
+    my %done;
+    my $indent_level = 0;
+    my $cont = 0;
+
+    my $opsub;
+    $opsub = sub {
+        my $op = shift;
+
+        $done{$op}++;
+
+        my $old_indent_level;
+        my $new_indent_level;
+        my $old_cont;
+
+        my $new_block = defined get_madprop($op, 'curly_open');
+
+        if ($new_block) {
+            $old_indent_level = $indent_level;
+            $new_indent_level = $indent_level + 4 + $cont;
+            $indent_level = $indent_level + $cont;
+            $old_cont = $cont;
+            $cont = 0;
+        }
+
+        my $null_type = get_madprop($op, 'null_type') || '';
+        my $is_binop = $null_type eq "operator";
+        my $is_entersub = ($op->tag eq "op_entersub");
+        my $is_modif = $null_type eq "modif";
+        my $is_subdef = (get_madprop($op, 'null_type_first')||'') eq "sub";
+
+        my %done_mad;
+
+        my $wsreplace = sub {
+                my $madv = shift;
+
+                return if $done_mad{$madv};
+                $done_mad{$madv} = 1;
+                for my $wsname (qw[wsbefore wsafter]) {
+                    my $ws = $madv->att($wsname);
+                    if ($ws and $ws =~ m/&#xA;/) {
+                        my $ws_indent = $indent_level + $cont;
+                        if ($madv->tag eq "mad_label") {
+                            $ws_indent -= 2;
+                        }
+                        $ws =~ s/&#xA;(\s|&#x9;)*/ '&#xA;' . (' ' x $ws_indent) /ge;
+                        $ws =~ s/&#xA;(\s|&#x9;)+&#xA;/&#xA;&#xA;/g for 1..2;
+                        $madv->set_att($wsname, $ws);
+                        if (not ($op->tag =~ m/^op_(scope|leavescope|leave)$/
+                                   or $madv->tag =~ m/^mad_(peg|curly_open|curly_close)$/
+                                     or $is_subdef
+                                       or get_madprop($op, "while")
+                                   ) ) {
+                            $cont ||= 4;
+                        }
+                    }
+                }
+        };
+
+        if ($new_block) {
+            $cont = 0;
+        }
+
+        if ($op->tag =~ m/^op_(nextstate|enterloop)$/
+              or $null_type eq "use"
+                or $is_subdef) {
+            $cont = 0;
+        }
+
+        if ($op->tag eq "op_sassign") {
+            $opsub->($op->child(-1));
+        }
+        elsif ( ($is_binop and $op->tag !~ m/^op_(range|srefgen)$/)
+               or $op->tag =~ m/^op_(helem|aelem)$/) {
+            my $child_off = $op->child(0)->tag eq "madprops";
+            if ($op->children_count == 1+$child_off) {
+                if ($op->child(-1)->child(-2)) {
+                    $opsub->($op->child(-1)->child(-2));
+                }
+            }
+            else {
+                $opsub->($op->child(0+$child_off));
+            }
+        }
+        if ($op->tag eq "op_listfirst") {
+            $opsub->($op->child(2));
+        }
+
+        if ($null_type eq "if") {
+            my ($madif) = $op->findnodes("madprops/mad_if");
+            $wsreplace->($madif);
+            $opsub->($op->child(-1)->child(0));
+            $cont = 0;
+        }
+
+        if ($null_type eq "?") {
+            $opsub->($op->child(1));
+        }
+
+        if ((get_madprop($op, 'round_open') || '') =~ m/[(]$/ and $null_type eq "(" ) {
+            my ($madx) = $op->findnodes("madprops/mad_round_open");
+            $wsreplace->($madx);
+            my ($linenr, $charoffset) = first_token($op->child(1));
+            if ($linenr) {
+                $old_cont = $cont;
+                $cont = $charoffset - $indent_level - 1;
+            }
+        }
+
+        if ($is_entersub) {
+            if ($op->child(-1) and $op->child(-1)->child(-1)) {
+                $opsub->($op->child(-1)->child(-1));
+                if ($op->child(-1)->child(1)) {
+                    my ($linenr, $charoffset) = first_token($op->child(-1)->child(1));
+                    if ($linenr) {
+                        $old_cont = $cont;
+                        $cont = $charoffset - $indent_level - 1;
+                    }
+                }
+            }
+        }
+
+        if ($is_modif) {
+            $opsub->($op->child(-1)->child(-1));
+        }
+        if (get_madprop($op, "whilepost")) {
+            $opsub->($op->child(-1));
+        }
+
+        # replace items of op mad properties.
+        my $madprop = $op->child(0);
+        if ($madprop and $madprop->tag eq 'madprops') {
+            for my $madv (sort { $a->tag cmp $b->tag } $madprop->children) {
+                next if $madv->tag eq "mad_peg";
+                $wsreplace->($madv);
+            }
+        }
+
+        if ( $op->tag eq "op_anonarray") {
+            if ($op->child(2)) {
+                my ($linenr, $charoffset) = first_token($op->child(2));
+                if ($linenr) {
+                    $old_cont = $cont;
+                    $cont = $charoffset - $indent_level - 1;
+                }
+            }
+        }
+
+        if ($new_indent_level) {
+            $old_indent_level //= $indent_level;
+            $indent_level = $new_indent_level;
+        }
+
+        # recurse to children.
+        for my $child ($op->children) {
+            next if $done{$child};
+            $opsub->($child);
+        }
+
+        if (defined $old_indent_level) {
+            $indent_level = $old_indent_level;
+        }
+        if (defined $old_cont) {
+            $cont = $old_cont;
+        }
+    };
+
+    $opsub->($xml->root);
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1530,7 +1754,7 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.17') {
     rename_magic_vars($twig);
 }
 
-if ($from->{branch} ne "kurila" or $from->{v} < qv '1.17') {
+if ($from->{branch} ne "kurila" or $from->{v} < qv '1.18') {
     rename_inc_vars($twig);
     print_filehandle($twig);
     block_arg($twig);
@@ -1538,9 +1762,14 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.17') {
 
 #must_haveargs($twig);
 
-#make_prototype($twig);
-mg_stdin($twig);
-local_undef($twig);
+if ($from->{branch} ne "kurila" or $from->{v} < qv '1.19') {
+    make_prototype($twig);
+    mg_stdin($twig);
+    local_undef($twig);
+    env_sub($twig);
+}
+
+indent($twig);
 
 #add_call_parens($twig);
 

@@ -524,6 +524,8 @@ struct madprop {
 /*    short mad_count; */
     char mad_key;
     char mad_type;
+    IV mad_linenr;
+    IV mad_charoffset;
 };
 
 struct madtoken {

@@ -1850,6 +1850,10 @@ package PLXML::op_listfirst;
 
 our @ISA = ('PLXML::listop');
 
+package PLXML::op_listlast;
+
+our @ISA = ('PLXML::listop');
+
 package PLXML::op_list;
 
 our @ISA = ('PLXML::listop');
@@ -2151,6 +2155,14 @@ sub check { 'ck_method' }
 sub flags { 'd1' }
 sub args { '' }
 
+
+package PLXML::op_entersub_targargs;
+
+our @ISA = ('PLXML::unop');
+
+package PLXML::op_entersub_save;
+
+our @ISA = ('PLXML::unop');
 
 package PLXML::op_entersub;
 

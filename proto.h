@@ -5722,7 +5722,7 @@ PERL_CALLCONV void	Perl_token_free(pTHX_ MADTOKEN* tk)
 #define PERL_ARGS_ASSERT_TOKEN_FREE	\
 	assert(tk)
 
-PERL_CALLCONV void	Perl_token_getmad(pTHX_ MADTOKEN* tk, OP* o, char slot)
+PERL_CALLCONV void	Perl_token_getmad(pTHX_ MADTOKEN* tk, OP* o, char slot, SV* location)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_TOKEN_GETMAD	\
 	assert(tk)
@@ -5737,12 +5737,12 @@ PERL_CALLCONV void	Perl_append_madprops_pv(pTHX_ const char* v, OP* o, char slot
 	assert(v)
 
 PERL_CALLCONV void	Perl_addmad(pTHX_ MADPROP* tm, MADPROP** root, char slot);
-PERL_CALLCONV MADPROP*	Perl_newMADsv(pTHX_ char key, SV* sv)
+PERL_CALLCONV MADPROP*	Perl_newMADsv(pTHX_ char key, SV* sv, IV linenr, IV charoffset)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_NEWMADSV	\
 	assert(sv)
 
-PERL_CALLCONV MADPROP*	Perl_newMADPROP(pTHX_ char key, char type, const void* val, I32 vlen);
+PERL_CALLCONV MADPROP*	Perl_newMADPROP(pTHX_ char key, char type, const void* val, I32 vlen, IV linenr, IV charoffset);
 PERL_CALLCONV void	Perl_mad_free(pTHX_ MADPROP* mp);
 
 #  if defined(PERL_IN_TOKE_C) || defined(PERL_DECL_PROT)
@@ -5762,7 +5762,7 @@ STATIC char*	S_skipspace2(pTHX_ char *s, SV **sv)
 	assert(s)
 
 STATIC void	S_start_force(pTHX_ int where);
-STATIC void	S_curmad(pTHX_ char slot, SV *sv);
+STATIC void	S_curmad(pTHX_ char slot, SV *sv, SV* location);
 #  endif
 PERL_CALLCONV int	Perl_madlex(pTHX);
 PERL_CALLCONV int	Perl_madparse(pTHX);

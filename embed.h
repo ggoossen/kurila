@@ -3953,15 +3953,15 @@
 #ifdef PERL_CORE
 #define newMADTOKEN(a,b)	Perl_newMADTOKEN(aTHX_ a,b)
 #define token_free(a)		Perl_token_free(aTHX_ a)
-#define token_getmad(a,b,c)	Perl_token_getmad(aTHX_ a,b,c)
+#define token_getmad(a,b,c,d)	Perl_token_getmad(aTHX_ a,b,c,d)
 #define op_getmad_weak(a,b,c)	Perl_op_getmad_weak(aTHX_ a,b,c)
 #define op_getmad(a,b,c)	Perl_op_getmad(aTHX_ a,b,c)
 #define prepend_madprops(a,b,c)	Perl_prepend_madprops(aTHX_ a,b,c)
 #define append_madprops(a,b,c)	Perl_append_madprops(aTHX_ a,b,c)
 #define append_madprops_pv(a,b,c)	Perl_append_madprops_pv(aTHX_ a,b,c)
 #define addmad(a,b,c)		Perl_addmad(aTHX_ a,b,c)
-#define newMADsv(a,b)		Perl_newMADsv(aTHX_ a,b)
-#define newMADPROP(a,b,c,d)	Perl_newMADPROP(aTHX_ a,b,c,d)
+#define newMADsv(a,b,c,d)	Perl_newMADsv(aTHX_ a,b,c,d)
+#define newMADPROP(a,b,c,d,e,f)	Perl_newMADPROP(aTHX_ a,b,c,d,e,f)
 #define mad_free(a)		Perl_mad_free(aTHX_ a)
 #endif
 #  if defined(PERL_IN_TOKE_C) || defined(PERL_DECL_PROT)
@@ -3970,7 +3970,7 @@
 #define skipspace1(a)		S_skipspace1(aTHX_ a)
 #define skipspace2(a,b)		S_skipspace2(aTHX_ a,b)
 #define start_force(a)		S_start_force(aTHX_ a)
-#define curmad(a,b)		S_curmad(aTHX_ a,b)
+#define curmad(a,b,c)		S_curmad(aTHX_ a,b,c)
 #endif
 #  endif
 #ifdef PERL_CORE

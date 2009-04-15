@@ -2361,6 +2361,7 @@ static struct { const char slot; const char* name; } const slotnames[] =
     { 'G', "endsection" },
     { 'H', "optional_assign" },
     { 'I', "if" },
+    { 'J', "prototype_type" },
     { 'K', "key" },
     { 'L', "label" },
     { 'O', "replacedoperator" },
@@ -2576,6 +2577,8 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 		sv_catxmlsv(tmpsv, (SV*)mp->mad_val);
 		sv_catpv(tmpsv, "\" ");
 
+		sv_catpvf(tmpsv, "linenr=\"%"IVdf"\" ", mp->mad_linenr);
+		sv_catpvf(tmpsv, "charoffset=\"%"IVdf"\" ", mp->mad_charoffset);
 		{
 		    const MADPROP* next = mp->mad_next;
 		    if (next) {

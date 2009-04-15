@@ -491,7 +491,7 @@ Perl_yyparse (pTHX)
 #define PVAL(p) (p.pval)
 #define LOCATION(v) (v.location)
 #ifdef PERL_IN_MADLY_C
-#  define TOKEN_GETMAD(a,b,c) token_getmad((a.madtoken),(b),(c))
+#  define TOKEN_GETMAD(a,b,c) token_getmad((a.madtoken),(b),(c), (a.location))
 #  define APPEND_MADPROPS_PV(a,b,c) append_madprops_pv((a),(b),(c))
 #  define TOKEN_FREE(a) token_free(a.madtoken)
 #  define OP_GETMAD(a,b,c) op_getmad((a),(b),(c))

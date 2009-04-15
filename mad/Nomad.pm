@@ -1093,7 +1093,7 @@ BEGIN {
 	'sub' => sub {			# subroutine
 	    my $self = shift;
 	    my @newkids;
-            push @newkids, $self->madness('d n s prototype a : { & } fake_semicolon ;');
+            push @newkids, $self->madness('d n s prototyped a : { & } fake_semicolon ;');
 	    $::curstate = 0;
 	    return P5AST::sub->new(Kids => [@newkids])
 	},
@@ -1491,7 +1491,7 @@ package PLXML::op_padsv;
 sub ast {
     my $self = shift;
     my @args;
-    push @args, $self->madness('dx d ( optional_assign X $ @ % )');
+    push @args, $self->madness('dx d ( optional_assign o X $ @ % )');
 
     return $self->newtype->new(Kids => [@args]);
 }
@@ -1614,7 +1614,7 @@ sub ast {
     my $self = shift;
 
     my @newkids;
-    push @newkids, $self->madness('&');
+    push @newkids, $self->madness('dx d &');
     if (@{$$self{Kids}}) {
 	push @newkids, $$self{Kids}[0]->ast();
     }
@@ -2406,6 +2406,21 @@ sub ast {
     return $self->newtype->new(Kids => [@kids]);
 }
 
+package PLXML::op_listlast;
+
+sub ast {
+    my $self = shift;
+    my $mainop = $self->{Kids}->[1];
+    for (keys %{$self->{mp}}) {
+        if (exists($mainop->{mp}{$_})) {
+            die "exists $_";
+        }
+        $mainop->{mp}{$_} = $self->{mp}{$_};
+    }
+    my @kids = ( $mainop->ast(@_) );
+    return $self->newtype->new(Kids => [@kids]);
+}
+
 package PLXML::op_list;
 
 sub astnull {
@@ -2445,7 +2460,16 @@ sub ast {
     push @retval, $self->madness('dx d (');
 
     my @newkids;
-    for my $kid (@{$$self{Kids}}) {
+    my @kids = @{$self->{Kids}};
+    if ($self->{mp}{prototype_type}) {
+        my $first_kid = shift @kids;
+        if ($self->{mp}{prototype_type} eq 'optassignarg') {
+            my $assign_kid = shift @kids;
+            push @kids, $assign_kid;
+        }
+        push @kids, $first_kid;
+    }
+    for my $kid (@kids) {
 	push @newkids, $kid->ast($self, @_);
     }
     my $x = "";
@@ -2627,6 +2651,14 @@ package PLXML::op_cond_expr;
 package PLXML::op_andassign;
 package PLXML::op_orassign;
 package PLXML::op_method;
+package PLXML::op_entersub_save;
+
+sub ast {
+    my $self = shift;
+    my @kids = map { $_->ast() } @{$self->{Kids}};
+    return $self->newtype->new(Kids => [$self->madness('dx d'), @kids]);
+}
+
 package PLXML::op_entersub;
 
 sub ast {
@@ -2777,8 +2809,9 @@ sub lineseq {
 	my $thing = $kid->ast($self, @_);
 	next unless defined $thing;
         if ( $::version_from->{branch} eq 'kurila' and $::version_from->{'v'} > v1.14 ) {
-            if ($kid->{mp}{U} or $kid->{mp}{n} or $kid->{mp}{'&'} or
-                  ( ($kid->{mp}{null_type} || '') =~ m/^(peg|package|.*statement)$/ )
+            if ($kid->{mp}{U} or $kid->{mp}{n} 
+                  or ($kid->{mp}{'&'} and not $kid->{mp}{'local'})
+                  or ( ($kid->{mp}{null_type} || '') =~ m/^(peg|package|.*statement)$/ )
               ) {
                 push @newstuff, $thing;
             }
@@ -3006,7 +3039,7 @@ sub ast {
 	    if (exists $$range{mp}{O}) {	# deeply buried .. operator
 		PLXML::prepreproc($$range{mp}{O});
 		push @retval,
-		  $$range{mp}{'O'}{Kids}[0]{Kids}[0]{Kids}[0]{Kids}[0]->madness('o')
+		  $$range{mp}{'O'}{Kids}[0]->madness('o')
 	    }
 	    else {
 		push @retval, '..';		# XXX missing whitespace

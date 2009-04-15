@@ -1743,7 +1743,7 @@ Mp	|void	|op_xmldump	|NN const OP *o
 
 Mp	|MADTOKEN*	|newMADTOKEN	|I32 optype|NULLOK MADPROP* madprop
 Mp	|void	|token_free	|NN MADTOKEN* tk
-Mp	|void	|token_getmad	|NN MADTOKEN* tk|NULLOK OP* o|char slot
+Mp	|void	|token_getmad	|NN MADTOKEN* tk|NULLOK OP* o|char slot|NULLOK SV* location
 Mp	|void	|op_getmad_weak	|NULLOK OP* from|NULLOK OP* o|char slot
 Mp	|void	|op_getmad	|NULLOK OP* from|NULLOK OP* o|char slot
 Mp	|void	|prepend_madprops|NULLOK MADPROP* mp|NULLOK OP* o|char slot
@@ -1751,9 +1751,9 @@ Mp	|void	|append_madprops|NULLOK MADPROP* tm|NULLOK OP* o|char slot
 Mp	|void	|append_madprops_pv|NN const char* v|NULLOK OP* o|char slot
 Mp	|void	|addmad		|NULLOK MADPROP* tm|NULLOK MADPROP** root \
 				|char slot
-Mp	|MADPROP*|newMADsv	|char key|NN SV* sv
+Mp	|MADPROP*|newMADsv	|char key|NN SV* sv|IV linenr|IV charoffset
 Mp	|MADPROP*|newMADPROP	|char key|char type|NULLOK const void* val \
-				|I32 vlen
+				|I32 vlen|IV linenr|IV charoffset
 Mp	|void	|mad_free	|NULLOK MADPROP* mp
 
 #  if defined(PERL_IN_TOKE_C) || defined(PERL_DECL_PROT)
@@ -1761,7 +1761,7 @@ s	|char*	|skipspace0	|NN char *s
 s	|char*	|skipspace1	|NN char *s
 s	|char*	|skipspace2	|NN char *s|NULLOK SV **sv
 s	|void	|start_force	|int where
-s	|void	|curmad		|char slot|NULLOK SV *sv
+s	|void	|curmad		|char slot|NULLOK SV *sv|NULLOK SV* location
 #  endif
 Mp	|int	|madlex
 Mp	|int	|madparse

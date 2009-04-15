@@ -34,11 +34,15 @@ sub p5convert {
                                   switches => "-I../lib",
                                   dumpcommand => "$ENV{madpath}/perl",
                                  );
+    $output =~ s/\s+$//;
+    $expected =~ s/\s+$//;
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_local();
+t_indent();
 die "END";
+t_env_sub();
+t_local();
 t_stdin();
 t_prototype();
 t_must_haveargs();
@@ -1720,5 +1724,368 @@ local $^INPUT_RECORD_SEPARATOR = 3;
 local $^INPUT_RECORD_SEPARATOR = undef;
 local $^INPUT_RECORD_SEPARATOR = 3;
 2;
+END
+}
+
+sub t_env_sub {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+env::set_var('key', 'value');
+----
+env::var('key') = 'value';
+====
+env::temp_set_var('key', 'value');
+----
+local env::var('key') = 'value';
+END
+}
+
+sub t_indent {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+1;
+"aa"
++
+"bb";
+"cc"
++
+"dd";
+1;
+----
+1;
+"aa"
+    +
+    "bb";
+"cc"
+    +
+    "dd";
+1;
+====
+1;
+$a
+and $b;
+----
+1;
+$a
+    and $b;
+====
+do {
+3;
+};
+----
+do {
+    3;
+};
+====
+foobar("aap",
+ "noot");
+----
+foobar("aap",
+       "noot");
+====
+foobar('aap',
+  qr/help/,
+ "noot");
+----
+foobar('aap',
+       qr/help/,
+       "noot");
+====
+BEGIN {
+ require "./test.pl";
+}
+----
+BEGIN {
+    require "./test.pl";
+}
+====
+sub foox { }
+foox(sub { @_ },
+ 'arg');
+----
+sub foox { }
+foox(sub { @_ },
+     'arg');
+====
+do {
+  foo(1,2);
+
+  "noot";
+};
+----
+do {
+    foo(1,2);
+
+    "noot";
+};
+====
+BEGIN { require "./test.pl"; }
+do {
+  1;
+}
+----
+BEGIN { require "./test.pl"; }
+do {
+    1;
+}
+====
+use constant foo => 33;
+foo
+----
+use constant foo => 33;
+foo
+====
+baz();
+----
+baz();
+====
+warn "help";
+
+sub foo($x) {
+  warn $x;
+}
+----
+warn "help";
+
+sub foo($x) {
+    warn $x;
+}
+====
+warn "x";
+if ($a) {
+ $a;
+} else {
+ $a+1;
+}
+----
+warn "x";
+if ($a) {
+    $a;
+} else {
+    $a+1;
+}
+====
+warn "y";
+ my $vms_no_ieee = 1 unless defined(config_value('useieee'));
+----
+warn "y";
+my $vms_no_ieee = 1 unless defined(config_value('useieee'));
+====
+warn "z";
+while($a) {
+  "aap";
+  "noot";
+}
+----
+warn "z";
+while($a) {
+    "aap";
+    "noot";
+}
+====
+#!./perl
+BEGIN {
+        require './test.pl';
+}
+----
+#!./perl
+BEGIN {
+    require './test.pl';
+}
+====
+my $warn;
+$^WARN_HOOK = sub { print $^STDOUT, $warn; $warn .= @_[0]->{?description} . "\n" };
+  sub tiex { }
+----
+my $warn;
+$^WARN_HOOK = sub { print $^STDOUT, $warn; $warn .= @_[0]->{?description} . "\n" };
+sub tiex { }
+====
+sub tiex { }
+for my $tie (@("")) {
+  do { 1 };
+}
+----
+sub tiex { }
+for my $tie (@("")) {
+    do { 1 };
+}
+====
+my %x;
+%x{+0} = 100;
+----
+my %x;
+%x{+0} = 100;
+====
+if (foo("aap") eq "noot") {
+  $a;
+}
+----
+if (foo("aap") eq "noot") {
+    $a;
+}
+====
+# tab
+	foo($1);
+----
+# tab
+foo($1);
+====
+do {
+ local $^WARN_HOOK = sub { push $a, @_[0]->message };
+ use warnings;
+};
+----
+do {
+    local $^WARN_HOOK = sub { push $a, @_[0]->message };
+    use warnings;
+};
+====
+do {
+ $^HINTS{+doot} = 1;
+};
+----
+do {
+    $^HINTS{+doot} = 1;
+};
+====
+sub show_bits
+ {
+  my $out = '';
+  return $out;
+ }
+----
+sub show_bits
+{
+    my $out = '';
+    return $out;
+}
+====
+warn "xx";
+my $has_dirfd = ($a
+  || $b);
+----
+warn "xx";
+my $has_dirfd = ($a
+                 || $b);
+====
+do {
+ SKIP: do {
+ 2;
+};
+};
+----
+do {
+  SKIP: do {
+        2;
+    };
+};
+====
+do {
+ SKIP:
+ do {
+ 2;
+};
+};
+----
+do {
+  SKIP:
+    do {
+        2;
+    };
+};
+====
+warn "yy";
+if ($a
+|| $b)
+{
+pass();
+}
+----
+warn "yy";
+if ($a
+    || $b)
+{
+    pass();
+}
+====
+@('aa',
+'noot');
+----
+@('aa',
+  'noot');
+====
+( "aap"
+ . "mies" );
+----
+( "aap"
+  . "mies" );
+====
+warn "xx";
+ my @($a) = "aap";
+----
+warn "xx";
+my @($a) = "aap";
+====
+warn "yy";
+@: 'aa',
+ 'noot';
+----
+warn "yy";
+@: 'aa',
+   'noot';
+====
+warn "yy";
+foo( "mies",
+ sub {
+ "aap";
+ "zus";
+ }, 'noot');
+----
+warn "yy";
+foo( "mies",
+     sub {
+         "aap";
+         "zus";
+     }, 'noot');
+====
+warn "yy";
+ "aap"
+ for $a;
+----
+warn "yy";
+"aap"
+    for $a;
+====
+"aap";
+foo( "noot",
+  "mies",
+  {
+ "zus";
+ },
+);
+----
+"aap";
+foo( "noot",
+     "mies",
+     {
+         "zus";
+     },
+     );
+====
+"aap";
+push $a,
+  "noot";
+----
+"aap";
+push $a,
+    "noot";
+====
+do {
+  for (qw[a b c]) {
+   my @args;
+   my @argslist = map {
+   "noot";
+  }, @args;
+  }
+};
 END
 }
