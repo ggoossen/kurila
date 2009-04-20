@@ -1,6 +1,6 @@
 BEGIN {
     if (env::var('PERL_CORE')) {
-	push $^INCLUDE_PATH, "lib/compress";
+        push $^INCLUDE_PATH, "lib/compress";
     }
 }
 
@@ -37,8 +37,8 @@ my $len   = length $hello ;
 
 # Check zlib_version and ZLIB_VERSION are the same.
 is Compress::Zlib::zlib_version, ZLIB_VERSION,
-    "ZLIB_VERSION matches Compress::Zlib::zlib_version" ;
- 
+   "ZLIB_VERSION matches Compress::Zlib::zlib_version" ;
+
 # gzip tests
 #===========
 
@@ -123,7 +123,7 @@ ok(my $f = gzopen($file, "wb"));
 # generate a long random string
 my $contents = '' ;
 foreach (1 .. 5000)
-  { $contents .= chr int rand 256 }
+{ $contents .= chr int rand 256 }
 
 $len = length $contents ;
 
@@ -132,14 +132,14 @@ ok $f->gzwrite($contents) == $len ;
 ok ! $f->gzclose ;
 
 ok($f = gzopen($file, "rb"));
- 
+
 my $uncompressed ;
 is $f->gzread($uncompressed, $len), $len ;
 
 ok $contents eq $uncompressed 
 
     or print $^STDOUT, "# Length orig $len" . 
-             ", Length uncompressed " . length($uncompressed) . "\n" ;
+    ", Length uncompressed " . length($uncompressed) . "\n" ;
 
 ok ! $f->gzclose ;
 
@@ -237,7 +237,7 @@ ok ! $fil->gzclose ;
 do {
 
     title 'mix gzread and gzreadline';
-    
+
     # case 1: read a line, then a block. The block is
     #         smaller than the internal block used by
     #	  gzreadline
@@ -245,14 +245,14 @@ do {
     $line1 = "hello hello, I'm back again\n" ;
     $line2 = "abc" x 200 ; 
     my $line3 = "def" x 200 ;
-    
+
     $text = $line1 . $line2 . $line3 ;
     my $fil;
     ok(($fil = gzopen($name, "wb")), ' gzopen for write ok');
     is $fil->gzwrite($text), length $text, '    gzwrite ok' ;
     is $fil->gztell(), length $text, '    gztell ok' ;
     ok ! $fil->gzclose, '  gzclose ok' ;
-    
+
     # now try to read it back in
     ok(($fil = gzopen($name, "rb")), '  gzopen for read ok');
     cmp_ok $fil->gzreadline($line), '+>', 0, '    gzreadline' ;
@@ -306,7 +306,7 @@ do {
     # missing parameters
     eval ' $fil = gzopen()  ' ;
     like $^EVAL_ERROR->{?description}, mkEvalErr('Not enough arguments for Compress::Zlib::gzopen'),
-        '  gzopen with missing mode fails' ;
+         '  gzopen with missing mode fails' ;
 
     # unknown parameters
     $fil = try { gzopen($name, "xy") };
@@ -352,7 +352,7 @@ do {
 do {
     title 'read/write a non-readable/writable file';
 
-    SKIP:
+  SKIP:
     do {
         my $lex = LexFile->new( my $name) ;
         writeFile($name, "abc");
@@ -371,7 +371,7 @@ do {
         chmod 0777, $name ;
     };
 
-    SKIP:
+  SKIP:
     do {
         my $lex = LexFile->new( my $name) ;
         skip "Cannot create non-readable file", 3 

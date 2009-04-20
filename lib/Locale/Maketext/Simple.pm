@@ -154,19 +154,19 @@ sub load_loc {
 
 	1;
     " or die $^EVAL_ERROR;
-    
+
     my $lh = try { $pkg->get_handle } or return;
     my $style = lc(%args{?Style});
     if ($style eq 'maketext') {
-	%Loc{+$pkg} = sub {
-	    $lh->maketext(< @_)
-	};
+        %Loc{+$pkg} = sub {
+            $lh->maketext(< @_)
+        };
     }
     elsif ($style eq 'gettext') {
-	%Loc{+$pkg} = sub {
-	    my $str = shift;
+        %Loc{+$pkg} = sub {
+            my $str = shift;
             $str =~ s{([\~\[\]])}{~$1}g;
-            $str =~ s{
+                $str =~ s{
                 ([%\\]%)                        # 1 - escaped sequence
             |
                 %   (?:
@@ -177,40 +177,40 @@ sub load_loc {
                     )
             }{$(
                 $1 ?? $1
-                   !! $2 ?? "\[$2,"._unescape($3)."]"
-                        !! "[_$4]"
+                !! $2 ?? "\[$2,"._unescape($3)."]"
+                !! "[_$4]"
             )}gx;
-	    return $lh->maketext($str, < @_);
-	};
+            return $lh->maketext($str, < @_);
+        };
     }
     else {
-	die "Unknown Style: $style";
+        die "Unknown Style: $style";
     }
 
     return @(%Loc{?$pkg}, sub {
-	$lh = $pkg->get_handle(< @_);
-	$lh = $pkg->get_handle(< @_);
-    });
+                 $lh = $pkg->get_handle(< @_);
+                 $lh = $pkg->get_handle(< @_);
+             });
 }
 
 sub default_loc {
     my @($self, %< %args) =  @_;
     my $style = lc(%args{?Style});
     if ($style eq 'maketext') {
-	return sub {
-	    my $str = shift;
-            $str =~ s{((?<!~)(?:~~)*)\[_([1-9]\d*|\*)\]}
+        return sub {
+                my $str = shift;
+                $str =~ s{((?<!~)(?:~~)*)\[_([1-9]\d*|\*)\]}
                      {$1\%$2}g;
-            $str =~ s{((?<!~)(?:~~)*)\[([A-Za-z#*]\w*),([^\]]+)\]} 
+                $str =~ s{((?<!~)(?:~~)*)\[([A-Za-z#*]\w*),([^\]]+)\]} 
                      {$("$1\%$2(" . _escape($3) . ')')}g;
-	    _default_gettext($str, < @_);
-	};
+                _default_gettext($str, < @_);
+            };
     }
     elsif ($style eq 'gettext') {
-	return \&_default_gettext;
+        return \&_default_gettext;
     }
     else {
-	die "Unknown Style: $style";
+        die "Unknown Style: $style";
     }
 }
 
@@ -239,14 +239,14 @@ sub _default_gettext {
 	    \)			#   closing function call
 	)			# closing either one of
     }{$( do {
-	my $digit = $2 || shift;
-	$digit . (
-	    $1 ?? (
-		($1 eq 'tense') ?? (($3 eq 'present') ?? 'ing' !! 'ed') !!
-		($1 eq 'quant') ?? ' ' . (($digit +> 1) ?? ($4 || "$3s") !! $3) !!
-		''
-	    ) !! ''
-	);
+        my $digit = $2 || shift;
+        $digit . (
+                                                   $1 ?? (
+                                                             ($1 eq 'tense') ?? (($3 eq 'present') ?? 'ing' !! 'ed') !!
+                                                             ($1 eq 'quant') ?? ' ' . (($digit +> 1) ?? ($4 || "$3s") !! $3) !!
+                                                             ''
+                                                             ) !! ''
+                                                   );
     })}gx;
     return $str;
 };
@@ -259,8 +259,8 @@ sub _escape {
 
 sub _unescape {
     join(',', map {
-        m/\A(\s*)%([1-9]\d*|\*)(\s*)\z/ ?? "$1_$2$3" !! $_
-    }, split(m/,/, @_[0]));
+            m/\A(\s*)%([1-9]\d*|\*)(\s*)\z/ ?? "$1_$2$3" !! $_
+        }, split(m/,/, @_[0]));
 }
 
 sub auto_path($self, $calldir) {
@@ -269,10 +269,10 @@ sub auto_path($self, $calldir) {
 
     # Try absolute path name.
     if ($^OS_NAME eq 'MacOS') {
-	(my $malldir = $calldir) =~ s!/!:!g;
-	$path =~ s#^(.*)$malldir\.pm\z#$1auto:$malldir:#s;
+        (my $malldir = $calldir) =~ s!/!:!g;
+        $path =~ s#^(.*)$malldir\.pm\z#$1auto:$malldir:#s;
     } else {
-	$path =~ s#^(.*)$calldir\.pm\z#$1auto/$calldir/#;
+        $path =~ s#^(.*)$calldir\.pm\z#$1auto/$calldir/#;
     }
 
     return $path if -d $path;
@@ -280,7 +280,7 @@ sub auto_path($self, $calldir) {
     # If that failed, try relative path with normal $^INCLUDE_PATH searching.
     $path = "auto/$calldir/";
     foreach my $inc ( $^INCLUDE_PATH) {
-	return "$inc/$path" if -d "$inc/$path";
+        return "$inc/$path" if -d "$inc/$path";
     }
 
     return;

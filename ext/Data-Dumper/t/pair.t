@@ -28,12 +28,12 @@ $want_comma =~ s/ => /,/g;
 SKIP: do {
     skip 'XS extension not loaded', 3 unless (defined &Data::Dumper::Dumpxs);
     is (Data::Dumper::DumperX($HASH), $WANT, 
-	'XS: Default hash key/value separator: " => "');
+        'XS: Default hash key/value separator: " => "');
     local $Data::Dumper::Pair = ' : ';
     is (Data::Dumper::DumperX($HASH), $want_colon, 'XS: $Data::Dumper::Pair = " : "');
     my $dd = Data::Dumper->new(\@( $HASH ))->Pair(',');
     is ($dd->Dumpxs(), $want_comma, 
-	'XS: Data::Dumper->new([ $HASH ])->Pair(",")->Dumpxs()');
+        'XS: Data::Dumper->new([ $HASH ])->Pair(",")->Dumpxs()');
 };;
 
 ###################### Perl Tests ####################
@@ -41,11 +41,11 @@ SKIP: do {
 do {
     is ($Data::Dumper::Pair, ' => ', 'Perl: $Data::Dumper::Pair eq " => "');
     is (Data::Dumper::Dumper($HASH), $WANT, 
-	'Perl: Default hash key/value separator: " => "');
+        'Perl: Default hash key/value separator: " => "');
     local $Data::Dumper::Pair = ' : ';
     is (Data::Dumper::Dumper($HASH), $want_colon, 'Perl: $Data::Dumper::Pair = " : "');
     my $dd = Data::Dumper->new(\@( $HASH ))->Pair(',');
     is ($dd->Pair(), ',', 
-	'Perl: Data::Dumper->new([ $HASH ])->Pair(",")->Pair() eq ","');
+        'Perl: Data::Dumper->new([ $HASH ])->Pair(",")->Pair() eq ","');
     is ($dd->Dump(), $want_comma, 'Perl: Data::Dumper->new([ $HASH ])->Pair(",")->Dump()');
 };

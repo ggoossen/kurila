@@ -11,23 +11,23 @@ for my $i (@(undef, < 0 .. 2, "", "0 but true")) {
     my $true = 1;
     my $false = 0;
     for my $j (@(undef, < 0 .. 2, "", "0 but true")) {
-	$true &&= !(
-	    ((!$i || !$j) != !($i && $j))
-	    or (!($i || $j) != (!$i && !$j))
-	    or ( ! ! ($i || $j) != !(!$i && !$j))
-	    or (!(!$i || !$j) != ! ! ($i && $j))
-	);
-	$false ||= (
-	    ((!$i || !$j) == ! ! ($i && $j))
-	    and (! !($i || $j) == (!$i && !$j))
-	    and ((!$i || $j) == ($i && !$j))
-	    and (($i || !$j) != (!$i && $j))
-	);
+        $true &&= !(
+     ((!$i || !$j) != !($i && $j))
+     or (!($i || $j) != (!$i && !$j))
+     or ( ! ! ($i || $j) != !(!$i && !$j))
+     or (!(!$i || !$j) != ! ! ($i && $j))
+     );
+        $false ||= (
+     ((!$i || !$j) == ! ! ($i && $j))
+     and (! !($i || $j) == (!$i && !$j))
+     and ((!$i || $j) == ($i && !$j))
+     and (($i || !$j) != (!$i && $j))
+     );
     }
     if (not $true) {
-	print $^STDOUT, "not ";
+        print $^STDOUT, "not ";
     } elsif ($false) {
-	print $^STDOUT, "not ";
+        print $^STDOUT, "not ";
     }
     print $^STDOUT, "ok ", ++$test, "\n";
 }

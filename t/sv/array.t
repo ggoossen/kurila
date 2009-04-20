@@ -70,7 +70,7 @@ is($Etc, 'the time');
 
 $foo = 'lskjdf';
 ok(!($cnt = (@(?$F1,?$F2,?$Etc) = @($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/))))
-   or diag("$cnt $F1:$F2:$Etc");
+    or diag("$cnt $F1:$F2:$Etc");
 
 %foo = %('blurfl','dyick','foo','bar','etc.','etc.');
 %bar = %( < %foo );
@@ -80,7 +80,7 @@ is(%bar{?'foo'}, undef);
 @(%< %bar ) = @(< %foo,'how','now');
 is(%bar{?'foo'}, 'bar');
 is(%bar{?'how'}, 'now');
- %bar{[keys %foo]} =  values %foo;
+    %bar{[keys %foo]} =  values %foo;
 is(%bar{?'foo'}, 'bar');
 is(%bar{?'how'}, 'now');
 
@@ -140,14 +140,14 @@ do {
         local @bee = @('XXX',< @bee,'YYY');
         is((join ' ', @bee), "XXX foo bar burbl blah YYY");		# 46
         do {
-#             local @bee = local(@bee) = @(qw(foo bar burbl blah));
-#             is((join ' ', < @bee), "foo bar burbl blah");		# 47
-#             {
-#                 local (@bim) = local(@bee) = qw(foo bar);
-#                 is((join ' ', < @bee), "foo bar");			# 48
-#                 is((join ' ', < @bim), "foo bar");			# 49
-#             }
-#             is((join ' ', < @bee), "foo bar burbl blah");		# 50
+        #             local @bee = local(@bee) = @(qw(foo bar burbl blah));
+        #             is((join ' ', < @bee), "foo bar burbl blah");		# 47
+        #             {
+        #                 local (@bim) = local(@bee) = qw(foo bar);
+        #                 is((join ' ', < @bee), "foo bar");			# 48
+        #                 is((join ' ', < @bim), "foo bar");			# 49
+        #             }
+        #             is((join ' ', < @bee), "foo bar burbl blah");		# 50
         };
         is((join ' ', @bee), "XXX foo bar burbl blah YYY");		# 51
     };
@@ -159,24 +159,24 @@ do {
     my @bee = @bee;
     is((join ' ',@bee), "foo bar burbl blah");				# 54
     do {
-	my @(_,@<@bee) =  @bee;
-	is((join ' ',@bee), "bar burbl blah");				# 55
-	do {
-	    my @bee = @('XXX',< @bee,'YYY');
-	    is((join ' ',@bee), "XXX bar burbl blah YYY");		# 56
-	    do {
-		my @bee = @( my @bee = qw(foo bar burbl blah) );
-		is((join ' ',@bee), "foo bar burbl blah");		# 57
-		do {
-		    my @bim = my @bee = qw(foo bar);
-		    is((join ' ',@bee), "foo bar");			# 58
-		    is((join ' ',@bim), "foo bar");			# 59
-		};
-		is((join ' ',@bee), "foo bar burbl blah");		# 60
-	    };
-	    is((join ' ',@bee), "XXX bar burbl blah YYY");		# 61
-	};
-	is((join ' ',@bee), "bar burbl blah");				# 62
+        my @(_,@<@bee) =  @bee;
+        is((join ' ',@bee), "bar burbl blah");				# 55
+        do {
+            my @bee = @('XXX',< @bee,'YYY');
+            is((join ' ',@bee), "XXX bar burbl blah YYY");		# 56
+            do {
+                my @bee = @( my @bee = qw(foo bar burbl blah) );
+                is((join ' ',@bee), "foo bar burbl blah");		# 57
+                do {
+                    my @bim = my @bee = qw(foo bar);
+                    is((join ' ',@bee), "foo bar");			# 58
+                    is((join ' ',@bim), "foo bar");			# 59
+                };
+                is((join ' ',@bee), "foo bar burbl blah");		# 60
+            };
+            is((join ' ',@bee), "XXX bar burbl blah YYY");		# 61
+        };
+        is((join ' ',@bee), "bar burbl blah");				# 62
     };
     is((join ' ',@bee), "foo bar burbl blah");				# 63
 };
@@ -186,21 +186,21 @@ do {
     our @bee = @bee;
     is((join ' ',@bee), "foo bar burbl blah");
     do {
-	our @(_,@<@bee) =  @bee;
-	is((join ' ',@bee), "bar burbl blah");
-	do {
-	    our @bee = @('XXX',< @bee,'YYY');
-	    is((join ' ',@bee), "XXX bar burbl blah YYY");
-	    do {
-		our @bee = our @bee = qw(foo bar burbl blah);
-		is((join ' ',@bee), "foo bar burbl blah");
-		do {
-		    our @bim = our @bee = qw(foo bar);
-		    is((join ' ',@bee), "foo bar");
-		    is((join ' ',@bim), "foo bar");
-		};
-	    };
-	};
+        our @(_,@<@bee) =  @bee;
+        is((join ' ',@bee), "bar burbl blah");
+        do {
+            our @bee = @('XXX',< @bee,'YYY');
+            is((join ' ',@bee), "XXX bar burbl blah YYY");
+            do {
+                our @bee = our @bee = qw(foo bar burbl blah);
+                is((join ' ',@bee), "foo bar burbl blah");
+                do {
+                    our @bim = our @bee = qw(foo bar);
+                    is((join ' ',@bee), "foo bar");
+                    is((join ' ',@bim), "foo bar");
+                };
+            };
+        };
     };
 };
 
@@ -230,13 +230,13 @@ is (@foo[1], "a");
 # to modify the array - caused 'Attempt to free unreferenced scalar'
 
 my $got = runperl (
-	prog => q{
+    prog => q{
                     our @a;
 		    sub X::DESTROY { @a = () }
 		    @a = @(bless \%(), "X");
 		    @a = ();
 		},
-	stderr => 1
+    stderr => 1
     );
 
 do {
@@ -266,17 +266,17 @@ do {
     my @a;
     eval '@a[+-1] = 0';
     like $^EVAL_ERROR->message,
-      qr/Required array element -1 could not be created/, "\$a[+-1] = 0";
+         qr/Required array element -1 could not be created/, "\$a[+-1] = 0";
 };
 
 do {
     # Bug #36211
     for (@(1,2)) {
-	do {
-	    local our @a;
-	    is (nelems @a, 0);
-	    @a=1..4
-	};
+        do {
+            local our @a;
+            is (nelems @a, 0);
+            @a=1..4
+        };
     }
 };
 

@@ -121,7 +121,7 @@ sub geniosym () {
     my $sym = gensym();
     # force the IO slot to be filled
     open $sym;
-    *$sym{IO};
+        *$sym{IO};
 }
 
 sub ungensym(_) {}
@@ -129,14 +129,14 @@ sub ungensym(_) {}
 sub qualify($name, ? $pkg) {
     ref \$name eq "GLOB" and Carp::confess("glob..." . ref $name);
     if (!ref($name) && index($name, '::') == -1 && index($name, "'") == -1) {
-	# Global names: special character, "^xyz", or other. 
-	if ($name =~ m/^(([^a-z])|(\^[a-z_]+))\z/i || %global{?$name}) {
-	    $pkg = "";
-	}
-	else {
-	    $pkg //= caller;
-	}
-	$name = $pkg . "::" . $name;
+        # Global names: special character, "^xyz", or other. 
+        if ($name =~ m/^(([^a-z])|(\^[a-z_]+))\z/i || %global{?$name}) {
+            $pkg = "";
+        }
+        else {
+            $pkg //= caller;
+        }
+        $name = $pkg . "::" . $name;
     }
     $name;
 }

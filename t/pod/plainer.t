@@ -21,12 +21,12 @@ while( ~< *DATA ) {
 
     open $out, '<', $output or die $^OS_ERROR;
     my $returned; do { local $^INPUT_RECORD_SEPARATOR = undef; $returned = ~< $out; };
-    
+
     unless( $returned eq $expected ) {
-       print $^STDOUT, < map { s/^/\#/mg; $_; },
- map { $: $_ },               # to avoid readonly values
- @(                   "EXPECTED:\n", $expected, "GOT:\n", $returned);
-       print $^STDOUT, "not ";
+        print $^STDOUT, < map { s/^/\#/mg; $_; },
+            map { $: $_ },               # to avoid readonly values
+            @(                   "EXPECTED:\n", $expected, "GOT:\n", $returned);
+        print $^STDOUT, "not ";
     }
     printf $^STDOUT, "ok \%d\n", ++$test; 
     close $out;

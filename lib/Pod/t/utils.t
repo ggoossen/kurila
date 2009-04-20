@@ -22,29 +22,29 @@ my @links = qw{
 };
 
 my @results = @(
-	       "P<name>",
-	       "Q<ident> in P<name>",
-	       "Q<sec> in P<name>",
-	       "Q<sec>",
-	       "Q<sec>",
-	       "Q<http://www.perl.org/>",
-	       "Q<text>",
-	       "Q<text>",
-	       "Q<text>",
-	       "Q<text>",
-	      );
+        "P<name>",
+        "Q<ident> in P<name>",
+        "Q<sec> in P<name>",
+        "Q<sec>",
+        "Q<sec>",
+        "Q<http://www.perl.org/>",
+        "Q<text>",
+        "Q<text>",
+        "Q<text>",
+        "Q<text>",
+    );
 
 for my $i( 0..nelems @links ) {
-  my $link = Pod::Hyperlink->new( @links[?$i]);
-  is($link->markup, @results[?$i]);
+    my $link = Pod::Hyperlink->new( @links[?$i]);
+    is($link->markup, @results[?$i]);
 }
 
 # Now test lists
 # This test needs to be better
 my $list = Pod::List->new( indent => 4,
-                           start  => 52,
-                           file   => "itemtest.t",
-                           type   => "OL",);
+    start  => 52,
+    file   => "itemtest.t",
+    type   => "OL",);
 
 ok($list);
 
@@ -59,12 +59,12 @@ is($list->type, "OL");
 
 my $cache = Pod::Cache->new();
 
-# Store it in the cache
-$cache->item(
-	     page => "Pod::ParseUtils",
-	     description => "A description",
-	     file => "file.t",
- );
+    # Store it in the cache
+    $cache->item(
+    page => "Pod::ParseUtils",
+    description => "A description",
+    file => "file.t",
+);
 
 # Now look for an item of this name
 my $item = $cache->find_page("Pod::ParseUtils");

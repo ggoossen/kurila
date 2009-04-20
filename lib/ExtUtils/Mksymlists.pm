@@ -20,7 +20,7 @@ sub Mksymlists {
     (%spec{+FILE} = %spec{?NAME}) =~ s/.*::// unless %spec{?FILE};
     %spec{+FUNCLIST} = \@() unless %spec{?FUNCLIST};
     %spec{+DL_FUNCS} = \%( %spec{?NAME} => \@() )
-        unless ( (%spec{?DL_FUNCS} and keys %{%spec{?DL_FUNCS}}) or
+    unless ( (%spec{?DL_FUNCS} and keys %{%spec{?DL_FUNCS}}) or
                  nelems @{%spec{?FUNCLIST}});
     if (defined %spec{?DL_FUNCS}) {
         foreach my $package (keys %{%spec{?DL_FUNCS}}) {
@@ -39,9 +39,9 @@ sub Mksymlists {
         }
     }
 
-#    We'll need this if we ever add any OS which uses mod2fname
-#    not as pseudo-builtin.
-#    require DynaLoader;
+    #    We'll need this if we ever add any OS which uses mod2fname
+    #    not as pseudo-builtin.
+    #    require DynaLoader;
     if (defined &DynaLoader::mod2fname and not %spec{?DLBASE}) {
         %spec{+DLBASE} = DynaLoader::mod2fname(\ split(m/::/,%spec{?NAME}));
     }
@@ -81,7 +81,7 @@ sub _write_os2($data) {
     $distname = "Distribution $distname";
     my $patchlevel = " pl$(config_value('perl_patchlevel'))" || '';
     my $comment = sprintf "Perl (v\%s\%s\%s) module \%s", 
-      Config::config_value("version"), $threaded, $patchlevel, $data->{?NAME};
+        Config::config_value("version"), $threaded, $patchlevel, $data->{?NAME};
     chomp $comment;
     if ($data->{?INSTALLDIRS} and $data->{?INSTALLDIRS} eq 'perl') {
         $distname = 'perl5-porters@perl.org';
@@ -189,7 +189,7 @@ sub _write_vms($data) {
         if ($isvax) { print $opt, "UNIVERSAL=$safe\n" }
         else        { print $opt, "SYMBOL_VECTOR=($safe=DATA)\n"; }
     }
-    
+
     close $opt;
 }
 

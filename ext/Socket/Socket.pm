@@ -348,9 +348,9 @@ use XSLoader ();
 	       TCP_STDURG);
 
 %EXPORT_TAGS = %(
-    crlf    => \qw(CR LF CRLF $CR $LF $CRLF),
-    all     => \@(< @EXPORT, < @EXPORT_OK),
-);
+        crlf    => \qw(CR LF CRLF $CR $LF $CRLF),
+            all     => \@(< @EXPORT, < @EXPORT_OK),
+    );
 
 BEGIN {
     sub CR   () {"\015"}
@@ -366,7 +366,7 @@ sub sockaddr_in {
     if (nelems @_ == 1) {
         return unpack_sockaddr_in(< @_);
     } else {
-	die "usage:   sin_sv = sockaddr_in(port,iaddr))" unless (nelems @_) == 2;
+        die "usage:   sin_sv = sockaddr_in(port,iaddr))" unless (nelems @_) == 2;
         return pack_sockaddr_in(< @_);
     }
 }

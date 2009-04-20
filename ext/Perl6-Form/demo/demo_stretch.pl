@@ -9,4 +9,4 @@ Proc            Time      PID    Elapsed
 ==============  ========  =====  =======
 {[[[[[[[[[[[[}  {]]]]]+}  {[[[}  {[{8+}[} |
 .
-\@proc,         \@time,   \@pid, \ @time;
+                       \@proc,         \@time,   \@pid, \ @time;

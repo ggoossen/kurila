@@ -1,16 +1,16 @@
 package TestPodIncPlainText;
 
 BEGIN {
-   use File::Basename;
-   use File::Spec;
-   use Cwd < qw(abs_path);
-   push $^INCLUDE_PATH, '..';
-   my $THISDIR = abs_path(dirname $^PROGRAM_NAME);
-   unshift $^INCLUDE_PATH, $THISDIR;
-   require "testcmp.pl";
-   TestCompare->import();
-   my $PARENTDIR = dirname $THISDIR;
-   push $^INCLUDE_PATH, < map { 'File::Spec'->catfile($_, 'lib') }, @( ($PARENTDIR, $THISDIR));
+    use File::Basename;
+    use File::Spec;
+    use Cwd < qw(abs_path);
+    push $^INCLUDE_PATH, '..';
+    my $THISDIR = abs_path(dirname $^PROGRAM_NAME);
+    unshift $^INCLUDE_PATH, $THISDIR;
+    require "testcmp.pl";
+    TestCompare->import();
+    my $PARENTDIR = dirname $THISDIR;
+    push $^INCLUDE_PATH, < map { 'File::Spec'->catfile($_, 'lib') }, @( ($PARENTDIR, $THISDIR));
 }
 
 #use diagnostics;
@@ -26,7 +26,7 @@ BEGIN {
     @ISA = qw( Pod::PlainText );
     require VMS::Filespec if $^OS_NAME eq 'VMS';
 }
- 
+
 ## Hardcode settings for TERMCAP and COLUMNS so we can try to get
 ## reproducible results between environments
 env::var('TERMCAP' ) = 'co=76:do=^J';
@@ -45,7 +45,7 @@ my @PODINCDIRS = @(catfile($INSTDIR, 'lib', 'Pod'),
                    catfile($INSTDIR, 'scripts'),
                    catfile($INSTDIR, 'pod'),
                    catfile($INSTDIR, 't', 'pod')
-                 );
+    );
 
 ## Find the path to the file to =include
 sub findinclude {
@@ -63,8 +63,8 @@ sub findinclude {
     my @podincdirs = @($thispoddir, $parentdir, < @PODINCDIRS);
 
     for ( @podincdirs) {
-       my $incfile = catfile($_, $incname);
-       return $incfile  if (-r $incfile);
+        my $incfile = catfile($_, $incname);
+        return $incfile  if (-r $incfile);
     }
     warn("*** Can't find =include file $incname in $(join ' ',@podincdirs)\n");
     return "";
@@ -95,7 +95,7 @@ sub command {
 }
 
 sub begin_input {
-   @_[0]->{+_INFILE} = VMS::Filespec::unixify(@_[0]->{?_INFILE}) if $^OS_NAME eq 'VMS';
+    @_[0]->{+_INFILE} = VMS::Filespec::unixify(@_[0]->{?_INFILE}) if $^OS_NAME eq 'VMS';
 }
 
 sub podinc2plaintext($infile, $outfile) {
@@ -105,81 +105,81 @@ sub podinc2plaintext($infile, $outfile) {
 }
 
 sub testpodinc2plaintext( %< %args ) {
-   my $infile  = %args{?'In'}  || die "No input file given!";
-   my $outfile = %args{?'Out'} || die "No output file given!";
-   my $cmpfile = %args{?'Cmp'} || die "No compare-result file given!";
+    my $infile  = %args{?'In'}  || die "No input file given!";
+    my $outfile = %args{?'Out'} || die "No output file given!";
+    my $cmpfile = %args{?'Cmp'} || die "No compare-result file given!";
 
-   my $different = '';
-   my $testname = basename $cmpfile, '.t', '.xr';
+    my $different = '';
+    my $testname = basename $cmpfile, '.t', '.xr';
 
-   unless (-e $cmpfile) {
-      my $msg = "*** Can't find comparison file $cmpfile for testing $infile";
-      warn  "$msg\n";
-      return  $msg;
-   }
+    unless (-e $cmpfile) {
+        my $msg = "*** Can't find comparison file $cmpfile for testing $infile";
+        warn  "$msg\n";
+        return  $msg;
+    }
 
-   print $^STDOUT, "# Running testpodinc2plaintext for '$testname'...\n";
-   ## Compare the output against the expected result
-   podinc2plaintext($infile, $outfile);
-   if ( testcmp($outfile, $cmpfile) ) {
-       $different = "$outfile is different from $cmpfile";
-   }
-   else {
-       unlink($outfile);
-   }
-   return  $different;
+    print $^STDOUT, "# Running testpodinc2plaintext for '$testname'...\n";
+    ## Compare the output against the expected result
+    podinc2plaintext($infile, $outfile);
+    if ( testcmp($outfile, $cmpfile) ) {
+        $different = "$outfile is different from $cmpfile";
+    }
+    else {
+        unlink($outfile);
+    }
+    return  $different;
 }
 
 sub testpodplaintext {
-   my %opts = %( (ref @_[0] eq 'HASH') ?? < %{shift()} !! () );
-   my @testpods = @_;
-   my @($testname, $testdir) = @("", "");
-   my $cmpfile = "";
-   my @($outfile, $errfile) = @("", "");
-   my $passes = 0;
-   my $failed = 0;
-   local $_ = undef;
+    my %opts = %( (ref @_[0] eq 'HASH') ?? < %{shift()} !! () );
+    my @testpods = @_;
+    my @($testname, $testdir) = @("", "");
+    my $cmpfile = "";
+    my @($outfile, $errfile) = @("", "");
+    my $passes = 0;
+    my $failed = 0;
+    local $_ = undef;
 
-   print $^STDOUT, "1..", scalar nelems @testpods, "\n"  unless (%opts{?'xrgen'});
+    print $^STDOUT, "1..", scalar nelems @testpods, "\n"  unless (%opts{?'xrgen'});
 
-   for my $podfile ( @testpods) {
-      @($testname, $_, ...) = fileparse($podfile);
-      $testdir ||=  $_;
-      $testname  =~ s/\.t$//;
-      $cmpfile   =  $testdir . $testname . '.xr';
-      $outfile   =  $testdir . $testname . '.OUT';
+    for my $podfile ( @testpods) {
+        @($testname, $_, ...) = fileparse($podfile);
+        $testdir ||=  $_;
+        $testname  =~ s/\.t$//;
+        $cmpfile   =  $testdir . $testname . '.xr';
+        $outfile   =  $testdir . $testname . '.OUT';
 
-      if (%opts{?'xrgen'}) {
-          if (%opts{?'force'} or ! -e $cmpfile) {
-             ## Create the comparison file
-             print $^STDOUT, "# Creating expected result for \"$testname\"" .
-                   " pod2plaintext test ...\n";
-             podinc2plaintext($podfile, $cmpfile);
-          }
-          else {
-             print $^STDOUT, "# File $cmpfile already exists" .
-                   " (use 'force' to regenerate it).\n";
-          }
-          next;
-      }
+        if (%opts{?'xrgen'}) {
+            if (%opts{?'force'} or ! -e $cmpfile) {
+                ## Create the comparison file
+                print $^STDOUT, "# Creating expected result for \"$testname\"" .
+                    " pod2plaintext test ...\n";
+                podinc2plaintext($podfile, $cmpfile);
+            }
+            else {
+                print $^STDOUT, "# File $cmpfile already exists" .
+                    " (use 'force' to regenerate it).\n";
+            }
+            next;
+        }
 
-      my $failmsg = testpodinc2plaintext
-                        In  => $podfile,
-                        Out => $outfile,
-                        Cmp => $cmpfile;
-      if ($failmsg) {
-          ++$failed;
-          print $^STDOUT, "#\tFAILED. ($failmsg)\n";
-	  print $^STDOUT, "not ok ", $failed+$passes, "\n";
-      }
-      else {
-          ++$passes;
-          unlink($outfile);
-          print $^STDOUT, "#\tPASSED.\n";
-	  print $^STDOUT, "ok ", $failed+$passes, "\n";
-      }
-   }
-   return  $passes;
+        my $failmsg = testpodinc2plaintext
+            In  => $podfile,
+            Out => $outfile,
+            Cmp => $cmpfile;
+        if ($failmsg) {
+            ++$failed;
+            print $^STDOUT, "#\tFAILED. ($failmsg)\n";
+            print $^STDOUT, "not ok ", $failed+$passes, "\n";
+        }
+        else {
+            ++$passes;
+            unlink($outfile);
+            print $^STDOUT, "#\tPASSED.\n";
+            print $^STDOUT, "ok ", $failed+$passes, "\n";
+        }
+    }
+    return  $passes;
 }
 
 1;

@@ -9,8 +9,8 @@ BEGIN {
         $reason = 'no fork';
     }
     if ($reason) {
-	print $^STDOUT, "1..0 # Skip: $reason\n";
-	exit 0;
+        print $^STDOUT, "1..0 # Skip: $reason\n";
+        exit 0;
     }
 }
 
@@ -36,7 +36,7 @@ sub _get_addr($sock,$addr_str, $multi)
     print $^STDOUT, "not " unless $multi;
     print $^STDOUT, "ok 2\n";
 
-     @(
+        @(
      # private IP-addresses which I hope does not work anywhere :-)
      inet_aton("10.250.230.10"),
      inet_aton("10.250.230.12"),
@@ -48,17 +48,17 @@ sub connect
 {
     my $self = shift;
     if ((nelems @_) == 1) {
-	my@($port, $addr) =  unpack_sockaddr_in(@_[0]);
-	$addr = inet_ntoa($addr);
-	#print "connect($self, $port, $addr)\n";
-	if($addr eq "10.250.230.10") {
-	    print $^STDOUT, "ok 3\n";
-	    return 0;
-	}
-	if($addr eq "10.250.230.12") {
-	    print $^STDOUT, "ok 4\n";
-	    return 0;
-	}
+        my@($port, $addr) =  unpack_sockaddr_in(@_[0]);
+        $addr = inet_ntoa($addr);
+        #print "connect($self, $port, $addr)\n";
+        if($addr eq "10.250.230.10") {
+            print $^STDOUT, "ok 3\n";
+            return 0;
+        }
+        if($addr eq "10.250.230.12") {
+            print $^STDOUT, "ok 4\n";
+            return 0;
+        }
     }
     $self->SUPER::connect(< @_);
 }
@@ -70,9 +70,9 @@ package main;
 use IO::Socket;
 
 my $listen = IO::Socket::INET->new(Listen => 2,
-				Proto => 'tcp',
-				Timeout => 5,
-			       ) or die "$^OS_ERROR";
+    Proto => 'tcp',
+    Timeout => 5,
+    ) or die "$^OS_ERROR";
 
 print $^STDOUT, "ok 1\n";
 
@@ -95,11 +95,11 @@ if(my $pid = fork()) {
 } elsif(defined $pid) {
 
     my $sock = Multi->new(PeerPort => $port,
-		       Proto => 'tcp',
-		       PeerAddr => 'localhost',
-		       MultiHomed => 1,
-		       Timeout => 1,
-		      ) or die "$^OS_ERROR";
+        Proto => 'tcp',
+        PeerAddr => 'localhost',
+        MultiHomed => 1,
+        Timeout => 1,
+        ) or die "$^OS_ERROR";
 
     print $sock, "ok 6\n";
     sleep(1); # race condition

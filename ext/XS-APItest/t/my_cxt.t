@@ -32,10 +32,10 @@ sub do_thread {
     is(my_cxt_getint(), 4321, "new int value (child)");
 
     is(my_cxt_getsv($_), "initial_clone", "initial sv value (child)$_")
-	    foreach @: '', ' (context arg)';
+        foreach @: '', ' (context arg)';
     my_cxt_setsv("dcba");
     is(my_cxt_getsv($_),  "dcba", "new SV value (child)$_")
-	    foreach @: '', ' (context arg)';
+        foreach @: '', ' (context arg)';
 }
 
 SKIP: do {
@@ -45,4 +45,4 @@ SKIP: do {
 
 is(my_cxt_getint(), 1234,  "int value preserved after join");
 is(my_cxt_getsv($_),  "abcd", "SV value preserved after join$_")
-        foreach @: '', ' (context arg)';
+    foreach @: '', ' (context arg)';

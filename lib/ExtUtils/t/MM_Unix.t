@@ -31,9 +31,9 @@ my $class = 'ExtUtils::MM_Unix';
 # only one of the following can be true
 # test should be removed if MM_Unix ever stops handling other OS than Unix
 my $os =  (%ExtUtils::MM_Unix::Is{?OS2}   || 0)
-        + (%ExtUtils::MM_Unix::Is{?Win32} || 0) 
-        + (%ExtUtils::MM_Unix::Is{?Dos}   || 0)
-        + (%ExtUtils::MM_Unix::Is{?VMS}   || 0); 
+    + (%ExtUtils::MM_Unix::Is{?Win32} || 0) 
+    + (%ExtUtils::MM_Unix::Is{?Dos}   || 0)
+    + (%ExtUtils::MM_Unix::Is{?VMS}   || 0); 
 ok ( $os +<= 1,  'There can be only one (or none)');
 
 cmp_ok ($ExtUtils::MM_Unix::VERSION, '+>=', '1.12606', 'Should be at least version 1.12606');
@@ -42,25 +42,25 @@ cmp_ok ($ExtUtils::MM_Unix::VERSION, '+>=', '1.12606', 'Should be at least versi
 # File::Spec calls, the test's become a bit pointless
 
 foreach ( qw( xx/ ./xx/ xx/././xx xx///xx) )
-  {
-  is ($class->canonpath($_), File::Spec->canonpath($_), "canonpath $_");
-  }
+{
+    is ($class->canonpath($_), File::Spec->canonpath($_), "canonpath $_");
+}
 
 is ($class->catdir('xx','xx'), File::Spec->catdir('xx','xx'),
-     'catdir(xx, xx) => xx/xx');
+    'catdir(xx, xx) => xx/xx');
 is ($class->catfile('xx','xx','yy'), File::Spec->catfile('xx','xx','yy'),
-     'catfile(xx, xx) => xx/xx');
+    'catfile(xx, xx) => xx/xx');
 
 is ($class->file_name_is_absolute('Bombdadil'), 
     File::Spec->file_name_is_absolute('Bombdadil'),
-     'file_name_is_absolute()');
+    'file_name_is_absolute()');
 
 is_deeply($class->path(), File::Spec->path(), 'path() same as File::Spec->path()');
 
 foreach (qw/updir curdir rootdir/)
-  {
-  is ($class->?$_(), File::Spec->?$_(), $_ );
-  }
+{
+    is ($class->?$_(), File::Spec->?$_(), $_ );
+}
 
 foreach ( qw /
   c_o
@@ -122,9 +122,9 @@ foreach ( qw /
   xs_cpp
   xs_o
   / )
-  {
-      can_ok($class, $_);
-  }
+{
+    can_ok($class, $_);
+}
 
 ###############################################################################
 # some more detailed tests for the methods above
@@ -183,7 +183,7 @@ unlink "command";
 # perl_script (on unix any ordinary, readable file)
 
 my $self_name = env::var('PERL_CORE') ?? '../lib/ExtUtils/t/MM_Unix.t' 
-                                 !! 'MM_Unix.t';
+    !! 'MM_Unix.t';
 is ($t->perl_script($self_name),$self_name, 'we pass as a perl_script()');
 
 ###############################################################################
@@ -197,9 +197,9 @@ is ($t->perm_rwx(),'755', 'perm_rwx() is 755');
 # post_constants, postamble, post_initialize
 
 foreach (qw/ post_constants postamble post_initialize/)
-  {
-  is ($t->?$_(),'', "$_() is an empty string");
-  }
+{
+    is ($t->?$_(),'', "$_() is an empty string");
+}
 
 ###############################################################################
 # replace_manpage_separator 

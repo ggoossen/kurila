@@ -10,7 +10,7 @@ use File::Path;
 
 my $path = File::Spec->catdir( 'lib', 'B' );
 unless (-d $path) {
-	mkpath( $path ) or skip_all( 'Cannot create fake module path' );
+    mkpath( $path ) or skip_all( 'Cannot create fake module path' );
 }
 
 my $file = File::Spec->catfile( $path, 'success.pm' );
@@ -37,26 +37,26 @@ is( @lines[3], '-e syntax OK', 'O.pm should not munge perl output without -qq');
 isnt( @lines[1], 'Compiling!', 'Output should not be printed with -q switch' );
 
 SKIP: do {
-	skip( '-q redirection does not work without PerlIO', 2)
-		unless config_value("useperlio");
-	is( @lines[1], "[Compiling!", '... but should be in $O::BEGIN_output' );
+    skip( '-q redirection does not work without PerlIO', 2)
+        unless config_value("useperlio");
+    is( @lines[1], "[Compiling!", '... but should be in $O::BEGIN_output' );
 
-	@args[1] = '-MO=-qq,success,foo,bar';
-	@lines = get_lines( < @args );
-	is( scalar nelems @lines, 3, '-qq should suppress even the syntax OK message' );
+    @args[1] = '-MO=-qq,success,foo,bar';
+    @lines = get_lines( < @args );
+    is( scalar nelems @lines, 3, '-qq should suppress even the syntax OK message' );
 };
 
 @args[1] = '-MO=success,fail';
 @lines = get_lines( < @args );
 like( @lines[1], qr/fail at .eval/,
-	'O.pm should die if backend compile() does not return a subref' );
+      'O.pm should die if backend compile() does not return a subref' );
 
 sub get_lines { split(m/[\r\n]+/, runperl( args => \ @_, stderr => 1 ));
 }
 
 END {
-	1 while unlink($file);
-	rmdir($path); # not "1 while" since there might be more in there
+    1 while unlink($file);
+    rmdir($path); # not "1 while" since there might be more in there
 }
 
 __END__

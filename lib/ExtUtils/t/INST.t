@@ -39,7 +39,7 @@ END {
 }
 
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
-  diag("chdir failed: $^OS_ERROR");
+    diag("chdir failed: $^OS_ERROR");
 
 my $stdout = '';
 close $^STDOUT;
@@ -49,7 +49,7 @@ my $mm = WriteMakefile(
     VERSION_FROM  => 'lib/Big/Dummy.pm',
     PREREQ_PM     => \%(),
     PERL_CORE     => env::var('PERL_CORE'),
-);
+    );
 like( $stdout, qr{
                         Writing\ $Makefile\ for\ Big::Liar\n
                         Big::Liar's\ vars\n
@@ -65,7 +65,7 @@ is( $mm->{NAME}, 'Big::Dummy',  'NAME' );
 is( $mm->{VERSION}, 0.01,            'VERSION' );
 
 my $config_prefix = config_value("installprefixexp") || config_value("installprefix") ||
-                    config_value("prefixexp")        || config_value("prefix");
+    config_value("prefixexp")        || config_value("prefix");
 is( $mm->{PERLPREFIX}, $config_prefix,   'PERLPREFIX' );
 
 is( $mm->{PERL_CORE}, env::var('PERL_CORE'), 'PERL_CORE' );
@@ -91,20 +91,20 @@ is( $mm->{PERM_RWX}, 755,    'PERM_RWX' );
 # INST_*
 is( $mm->{INST_ARCHLIB}, 
     $mm->{PERL_CORE} ?? $mm->{PERL_ARCHLIB}
-                     !! File::Spec->catdir($Curdir, 'blib', 'arch'),
-                                     'INST_ARCHLIB');
+    !! File::Spec->catdir($Curdir, 'blib', 'arch'),
+    'INST_ARCHLIB');
 is( $mm->{INST_BIN},     File::Spec->catdir($Curdir, 'blib', 'bin'),
-                                     'INST_BIN' );
+    'INST_BIN' );
 
 is( nkeys %{$mm->{CHILDREN}}, 1 );
 my@($child_pack) =  keys %{$mm->{CHILDREN}};
 my $c_mm = $mm->{CHILDREN}->{$child_pack};
 is( $c_mm->{INST_ARCHLIB}, 
     $c_mm->{PERL_CORE} ?? $c_mm->{PERL_ARCHLIB}
-                       !! File::Spec->catdir($Updir, 'blib', 'arch'),
-                                     'CHILD INST_ARCHLIB');
+    !! File::Spec->catdir($Updir, 'blib', 'arch'),
+    'CHILD INST_ARCHLIB');
 is( $c_mm->{INST_BIN},     File::Spec->catdir($Updir, 'blib', 'bin'),
-                                     'CHILD INST_BIN' );
+    'CHILD INST_BIN' );
 
 
 my $inst_lib = File::Spec->catdir($Curdir, 'blib', 'lib');
@@ -127,7 +127,7 @@ $mm = WriteMakefile(
     INSTALLSITEMAN3DIR   => 'none',
     INSTALLVENDORMAN1DIR => 'none',
     INST_MAN1DIR         => 'none',
-);
+    );
 like( $stdout, qr{
                         Writing\ $Makefile\ for\ Big::Liar\n
                         Big::Liar's\ vars\n

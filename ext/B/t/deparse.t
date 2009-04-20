@@ -11,12 +11,12 @@ ok($deparse);
 
 # Tell B::Deparse about our ambient pragmas
 do { my ($hint_bits, $warning_bits, $hinthash);
- BEGIN { @($hint_bits, $warning_bits, $hinthash) = @($^HINT_BITS, $^WARNING_BITS, \$^HINTS); }
- $deparse->ambient_pragmas (
-     hint_bits    => $hint_bits,
-     warning_bits => $warning_bits,
-     '%^H'	  => $hinthash,
- );
+    BEGIN { @($hint_bits, $warning_bits, $hinthash) = @($^HINT_BITS, $^WARNING_BITS, \$^HINTS); }
+        $deparse->ambient_pragmas (
+        hint_bits    => $hint_bits,
+        warning_bits => $warning_bits,
+        '%^H'	  => $hinthash,
+    );
 };
 
 $^INPUT_RECORD_SEPARATOR = "\n####\n";
@@ -28,10 +28,10 @@ while ( ~< *DATA) {
     }
     my ($input, $expected);
     if (m/(.*)\n>>>>\n(.*)/s) {
-	@($input, $expected) = @($1, $2);
+        @($input, $expected) = @($1, $2);
     }
     else {
-	@($input, $expected) = @($_, $_);
+        @($input, $expected) = @($_, $_);
     }
 
     local our $TODO = $todo;
@@ -39,16 +39,16 @@ while ( ~< *DATA) {
     my $coderef = eval "sub \{$input\}";
 
     if ($^EVAL_ERROR and $^EVAL_ERROR->{?description}) {
-	diag("$num deparsed: $($^EVAL_ERROR->message)");
+        diag("$num deparsed: $($^EVAL_ERROR->message)");
         diag("input: '$input'");
-	ok(0, $testname);
+        ok(0, $testname);
     }
     else {
-	my $deparsed = $deparse->coderef2text( $coderef );
-	my $regex = $expected;
-	$regex =~ s/(\S+)/\Q$1/g;
-	$regex =~ s/\s+/ \\s+ /g;
-	$regex = '^ \{ \s* ' . $regex . ' \s* \} $';
+        my $deparsed = $deparse->coderef2text( $coderef );
+        my $regex = $expected;
+        $regex =~ s/(\S+)/\Q$1/g;
+        $regex =~ s/\s+/ \\s+ /g;
+        $regex = '^ \{ \s* ' . $regex . ' \s* \} $';
         like($deparsed, qr/$regex/x, $testname);
     }
 }
@@ -102,8 +102,8 @@ $b =~ s/(LINE:)/sub BEGIN \{
 \}
 $1/ if $Is_MacOS;
 do {
-   local our $TODO = 1;
-   is($a, $b);
+    local our $TODO = 1;
+    is($a, $b);
 };
 
 #Re: perlbug #35857, patch #24505
@@ -113,17 +113,17 @@ package B::Deparse::Wrapper;
 use warnings;
 use warnings::register;
 sub getcode {
-   my $deparser = B::Deparse->new();
-   return $deparser->coderef2text(shift);
+    my $deparser = B::Deparse->new();
+    return $deparser->coderef2text(shift);
 }
 
 package main;
 
 use warnings;
 sub test {
-   my $val = shift;
-   my $res = B::Deparse::Wrapper::getcode($val);
-   like( $res, qr/use warnings/);
+    my $val = shift;
+    my $res = B::Deparse::Wrapper::getcode($val);
+    like( $res, qr/use warnings/);
 }
 sub testsub {
     42;

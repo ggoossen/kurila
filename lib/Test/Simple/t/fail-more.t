@@ -17,8 +17,8 @@ my@($out, $err) =  Test::Simple::Catch::caught();
 local env::var('HARNESS_ACTIVE' ) = 0;
 
 
-# Can't use Test.pm, that's a 5.005 thing.
-package My::Test;
+    # Can't use Test.pm, that's a 5.005 thing.
+    package My::Test;
 
 # This has to be a require or else the END block below runs before
 # Test::Builder's own and the ending diagnostics don't come out right.
@@ -223,7 +223,7 @@ do {
 #     expected: 'foo'
 ERR
     My::Test::like $warnings,
-     qq[/^Argument "foo" isn't numeric in .*/];
+                   qq[/^Argument "foo" isn't numeric in .*/];
 
 };
 
@@ -288,7 +288,7 @@ not ok - use Hooble::mooble::yooble;
 not ok - require ALL::YOUR::BASE::ARE::BELONG::TO::US::wibble;
 OUT
 
-err_ok( <<ERR );
+    err_ok( <<ERR );
 # Looks like you failed $Total tests of $Total.
 ERR
 

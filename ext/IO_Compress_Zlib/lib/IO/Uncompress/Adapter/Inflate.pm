@@ -23,17 +23,17 @@ sub mkUncompObject
     if ($scan)
     {
         @($inflate, $status) =  Compress::Raw::Zlib::InflateScan->new(
-                                    CRC32        => $crc32,
-                                    ADLER32      => $adler32,
-                                    WindowBits   => - MAX_WBITS) ;
+            CRC32        => $crc32,
+            ADLER32      => $adler32,
+            WindowBits   => - MAX_WBITS) ;
     }
     else
     {
         @($inflate, $status) =  Compress::Raw::Zlib::Inflate->new(
-                                    AppendOutput => 1,
-                                    CRC32        => $crc32,
-                                    ADLER32      => $adler32,
-                                    WindowBits   => - MAX_WBITS) ;
+            AppendOutput => 1,
+            CRC32        => $crc32,
+            ADLER32      => $adler32,
+            WindowBits   => - MAX_WBITS) ;
     }
 
     return  @(undef, "Could not create Inflation object: $status", $status) 
@@ -41,10 +41,10 @@ sub mkUncompObject
 
     return @( bless \%('Inf'        => $inflate,
                   'CompSize'   => 0,
-                  'UnCompSize' => 0,
-                  'Error'      => '',
-                 ) );     
-    
+                      'UnCompSize' => 0,
+                      'Error'      => '',
+              ) );     
+
 }
 
 sub uncompr
@@ -71,7 +71,7 @@ sub uncompr
         return STATUS_ERROR;
     }
 
-    
+
     return STATUS_OK        if $status == Z_OK ;
     return STATUS_ENDSTREAM if $status == Z_STREAM_END ;
     return STATUS_ERROR ;
@@ -119,8 +119,8 @@ sub sync
 {
     my $self = shift ;
     ( $self->{?Inf}->inflateSync(< @_) == Z_OK) 
-            ?? STATUS_OK 
-            !! STATUS_ERROR ;
+        ?? STATUS_OK 
+        !! STATUS_ERROR ;
 }
 
 
@@ -147,10 +147,10 @@ sub createDeflateStream
     my $self = shift ;
     my $deflate = $self->{?Inf}->createDeflateStream(< @_);
     return bless \%('Def'        => $deflate,
-                  'CompSize'   => 0,
-                  'UnCompSize' => 0,
-                  'Error'      => '',
-                 ), 'IO::Compress::Adapter::Deflate';
+            'CompSize'   => 0,
+                'UnCompSize' => 0,
+                'Error'      => '',
+        ), 'IO::Compress::Adapter::Deflate';
 }
 
 1;

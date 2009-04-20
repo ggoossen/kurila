@@ -13,7 +13,7 @@ package Pod::InputObjects;
 our ($VERSION);
 $VERSION = 1.30;  ## Current version of this package
 
-#############################################################################
+    #############################################################################
 
 =head1 NAME
 
@@ -75,14 +75,14 @@ sections which follow.
 
 =cut
 
-#############################################################################
+    #############################################################################
 
-#use diagnostics;
-#use Carp;
+    #use diagnostics;
+    #use Carp;
 
-#############################################################################
+    #############################################################################
 
-package Pod::InputSource;
+    package Pod::InputSource;
 
 ##---------------------------------------------------------------------------
 
@@ -137,9 +137,9 @@ sub new {
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
     my $self = \%( name        => '(unknown)',
-                 handle      => undef,
-                 was_cutting => 0,
-                 < @_ );
+            handle      => undef,
+                was_cutting => 0,
+                < @_ );
 
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class;
@@ -165,8 +165,8 @@ contents of the given argument.
 =cut
 
 sub name {
-   ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1];
-   return @_[0]->{?'name'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1];
+    return @_[0]->{?'name'};
 }
 
 ## allow 'filename' as an alias for 'name'
@@ -188,7 +188,7 @@ one used to contructed this input source object).
 =cut
 
 sub handle {
-   return @_[0]->{?'handle'};
+    return @_[0]->{?'handle'};
 }
 
 ##---------------------------------------------------------------------------
@@ -209,8 +209,8 @@ state is restored to this value.
 =cut
 
 sub was_cutting {
-   ((nelems @_) +> 1)  and  @_[0]->{+was_cutting} = @_[1];
-   return @_[0]->{?was_cutting};
+    ((nelems @_) +> 1)  and  @_[0]->{+was_cutting} = @_[1];
+    return @_[0]->{?was_cutting};
 }
 
 ##---------------------------------------------------------------------------
@@ -265,15 +265,15 @@ sub new {
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
     my $self = \%(
-          name       => undef,
-          text       => ((nelems @_) == 1) ?? shift !! undef,
-          file       => '<unknown-file>',
-          line       => 0,
-          prefix     => '=',
-          separator  => ' ',
-          ptree => \@(),
-          < @_
-    );
+            name       => undef,
+                text       => ((nelems @_) == 1) ?? shift !! undef,
+                file       => '<unknown-file>',
+                line       => 0,
+                prefix     => '=',
+                separator  => ' ',
+                ptree => \@(),
+                < @_
+        );
 
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class;
@@ -292,8 +292,8 @@ the name of the command (I<without> any leading C<=> prefix).
 =cut
 
 sub cmd_name {
-   ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1];
-   return @_[0]->{?'name'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1];
+    return @_[0]->{?'name'};
 }
 
 ## let name() be an alias for cmd_name()
@@ -310,8 +310,8 @@ This method will return the corresponding text of the paragraph.
 =cut
 
 sub text {
-   ((nelems @_) +> 1)  and  @_[0]->{+'text'} = @_[1];
-   return @_[0]->{?'text'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'text'} = @_[1];
+    return @_[0]->{?'text'};
 }       
 
 ##---------------------------------------------------------------------------
@@ -326,9 +326,9 @@ as it appeared in the input.
 =cut
 
 sub raw_text {
-   return @_[0]->{?'text'}  unless (defined @_[0]->{?'name'});
-   return @_[0]->{?'prefix'} . @_[0]->{?'name'} . 
-          @_[0]->{?'separator'} . @_[0]->{?'text'};
+    return @_[0]->{?'text'}  unless (defined @_[0]->{?'name'});
+    return @_[0]->{?'prefix'} . @_[0]->{?'name'} . 
+        @_[0]->{?'separator'} . @_[0]->{?'text'};
 }
 
 ##---------------------------------------------------------------------------
@@ -344,7 +344,7 @@ or "==").
 =cut
 
 sub cmd_prefix {
-   return @_[0]->{?'prefix'};
+    return @_[0]->{?'prefix'};
 }
 
 ##---------------------------------------------------------------------------
@@ -360,7 +360,7 @@ paragraph (if any).
 =cut
 
 sub cmd_separator {
-   return @_[0]->{?'separator'};
+    return @_[0]->{?'separator'};
 }
 
 ##---------------------------------------------------------------------------
@@ -376,8 +376,8 @@ This method will get/set the corresponding parse-tree of the paragraph's text.
 =cut
 
 sub parse_tree {
-   ((nelems @_) +> 1)  and  @_[0]->{+'ptree'} = @_[1];
-   return @_[0]->{?'ptree'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'ptree'} = @_[1];
+    return @_[0]->{?'ptree'};
 }       
 
 ## let ptree() be an alias for parse_tree()
@@ -399,9 +399,9 @@ by a colon (':'), followed by the line number.
 =cut
 
 sub file_line {
-   my @loc = @(@_[0]->{?'file'} || '<unknown-file>',
-              @_[0]->{?'line'} || 0);
-   return @loc;
+    my @loc = @(@_[0]->{?'file'} || '<unknown-file>',
+               @_[0]->{?'line'} || 0);
+    return @loc;
 }
 
 ##---------------------------------------------------------------------------
@@ -456,14 +456,14 @@ sub new {
 
     ## See if first argument has no keyword
     if ((((nelems @_) +<= 2) or ((nelems @_) % 2)) and @_[0] !~ m/^-\w/) {
-       ## Yup - need an implicit 'name' before first parameter
-       unshift @_, 'name';
+        ## Yup - need an implicit 'name' before first parameter
+        unshift @_, 'name';
     }
 
     ## See if odd number of args
     if (((nelems @_) % 2) != 0) {
-       ## Yup - need an implicit 'ptree' before the last parameter
-       splice @_, ((nelems @_)-1), 0, 'ptree';
+        ## Yup - need an implicit 'ptree' before the last parameter
+        splice @_, ((nelems @_)-1), 0, 'ptree';
     }
 
     ## Any remaining arguments are treated as initial values for the
@@ -471,13 +471,13 @@ sub new {
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
     my $self = \%(
-          name       => ((nelems @_) == 1) ?? @_[0] !! undef,
-          file       => '<unknown-file>',
-          line       => 0,
-          ldelim     => '<',
-          rdelim     => '>',
-          < @_
-    );
+            name       => ((nelems @_) == 1) ?? @_[0] !! undef,
+                file       => '<unknown-file>',
+                line       => 0,
+                ldelim     => '<',
+                rdelim     => '>',
+                < @_
+        );
 
     ## Initialize contents if they havent been already
     my $ptree = $self->{?'ptree'} || Pod::ParseTree->new();
@@ -504,8 +504,8 @@ The name of the interior sequence command.
 =cut
 
 sub cmd_name {
-   ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1];
-   return @_[0]->{?'name'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1];
+    return @_[0]->{?'name'};
 }
 
 ## let name() be an alias for cmd_name()
@@ -517,28 +517,28 @@ sub cmd_name {
 ## children that are interior-sequences to be $self
 
 sub _set_child2parent_links($self, @< @children) {
-   ## Make sure any sequences know who their parent is
-   for ( @children) {
-      next  unless (ref  and  ref ne 'SCALAR');
-      if (UNIVERSAL::isa($_, 'Pod::InteriorSequence') or
-          UNIVERSAL::can($_, 'nested'))
-      {
-          $_->nested($self);
-      }
-   }
+    ## Make sure any sequences know who their parent is
+    for ( @children) {
+        next  unless (ref  and  ref ne 'SCALAR');
+        if (UNIVERSAL::isa($_, 'Pod::InteriorSequence') or
+            UNIVERSAL::can($_, 'nested'))
+        {
+            $_->nested($self);
+        }
+    }
 }
 
 ## Private subroutine to unset child->parent links
 
 sub _unset_child2parent_links {
-   my $self = shift;
-   $self->{+'parent_sequence'} = undef;
-   my $ptree = $self->{?'ptree'};
-   for ( @$ptree) {
-      next  unless (ref  and  ref ne 'SCALAR');
-      $_->_unset_child2parent_links()
-          if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
-   }
+    my $self = shift;
+    $self->{+'parent_sequence'} = undef;
+    my $ptree = $self->{?'ptree'};
+    for ( @$ptree) {
+        next  unless (ref  and  ref ne 'SCALAR');
+        $_->_unset_child2parent_links()
+            if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
+    }
 }
 
 ##---------------------------------------------------------------------------
@@ -554,10 +554,10 @@ of this interior sequence.
 =cut
 
 sub prepend {
-   my $self  = shift;
-   $self->{?'ptree'}->prepend(< @_);
-   _set_child2parent_links($self, < @_);
-   return $self;
+    my $self  = shift;
+    $self->{?'ptree'}->prepend(< @_);
+    _set_child2parent_links($self, < @_);
+    return $self;
 }       
 
 ##---------------------------------------------------------------------------
@@ -573,10 +573,10 @@ of this interior sequence.
 =cut
 
 sub append {
-   my $self = shift;
-   $self->{?'ptree'}->append(< @_);
-   _set_child2parent_links($self, < @_);
-   return $self;
+    my $self = shift;
+    $self->{?'ptree'}->append(< @_);
+    _set_child2parent_links($self, < @_);
+    return $self;
 }       
 
 ##---------------------------------------------------------------------------
@@ -592,9 +592,9 @@ returned. Otherwise C<undef> is returned.
 =cut
 
 sub nested {
-   my $self = shift;
-  ((nelems @_) == 1)  and  $self->{+'parent_sequence'} = shift;
-   return  $self->{?'parent_sequence'} || undef;
+    my $self = shift;
+    ((nelems @_) == 1)  and  $self->{+'parent_sequence'} = shift;
+    return  $self->{?'parent_sequence'} || undef;
 }
 
 ##---------------------------------------------------------------------------
@@ -609,13 +609,13 @@ exactly as it appeared in the input.
 =cut
 
 sub raw_text {
-   my $self = shift;
-   my $text = $self->{?'name'} . $self->{?'ldelim'};
-   for (  $self->{'ptree'}->children ) {
-      $text .= (ref $_) ?? $_->raw_text !! $_;
-   }
-   $text .= $self->{?'rdelim'};
-   return $text;
+    my $self = shift;
+    my $text = $self->{?'name'} . $self->{?'ldelim'};
+    for (  $self->{'ptree'}->children ) {
+        $text .= (ref $_) ?? $_->raw_text !! $_;
+    }
+    $text .= $self->{?'rdelim'};
+    return $text;
 }
 
 ##---------------------------------------------------------------------------
@@ -630,8 +630,8 @@ sequence (should be "<").
 =cut
 
 sub left_delimiter {
-   ((nelems @_) +> 1)  and  @_[0]->{+'ldelim'} = @_[1];
-   return @_[0]->{?'ldelim'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'ldelim'} = @_[1];
+    return @_[0]->{?'ldelim'};
 }
 
 ## let ldelim() be an alias for left_delimiter()
@@ -647,8 +647,8 @@ sequence (should be ">").
 =cut
 
 sub right_delimiter {
-   ((nelems @_) +> 1)  and  @_[0]->{+'rdelim'} = @_[1];
-   return @_[0]->{?'rdelim'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'rdelim'} = @_[1];
+    return @_[0]->{?'rdelim'};
 }
 
 ## let rdelim() be an alias for right_delimiter()
@@ -668,8 +668,8 @@ sequence's text.
 =cut
 
 sub parse_tree {
-   ((nelems @_) +> 1)  and  @_[0]->{+'ptree'} = @_[1];
-   return @_[0]->{?'ptree'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'ptree'} = @_[1];
+    return @_[0]->{?'ptree'};
 }       
 
 ## let ptree() be an alias for parse_tree()
@@ -691,9 +691,9 @@ by a colon (':'), followed by the line number.
 =cut
 
 sub file_line {
-   my @loc = @(@_[0]->{?'file'}  || '<unknown-file>',
-              @_[0]->{?'line'}  || 0);
-   return @loc;
+    my @loc = @(@_[0]->{?'file'}  || '<unknown-file>',
+               @_[0]->{?'line'}  || 0);
+    return @loc;
 }
 
 ##---------------------------------------------------------------------------
@@ -708,10 +708,10 @@ I<interior-sequence storage will not be reclaimed upon destruction!>
 =cut
 
 sub DESTROY {
-   ## We need to get rid of all child->parent pointers throughout the
-   ## tree so their reference counts will go to zero and they can be
-   ## garbage-collected
-   _unset_child2parent_links(< @_);
+    ## We need to get rid of all child->parent pointers throughout the
+    ## tree so their reference counts will go to zero and they can be
+    ## garbage-collected
+    _unset_child2parent_links(< @_);
 }
 
 ##---------------------------------------------------------------------------
@@ -779,11 +779,11 @@ children for the top node.
 =cut
 
 sub top {
-   my $self = shift;
-   if ((nelems @_) +> 0) {
-      @{ $self } = @( ((nelems @_) == 1  and  ref @_[0]) ?? ${ nelems @_ } !! < @_ );
-   }
-   return $self;
+    my $self = shift;
+    if ((nelems @_) +> 0) {
+        @{ $self } = @( ((nelems @_) == 1  and  ref @_[0]) ?? ${ nelems @_ } !! < @_ );
+    }
+    return $self;
 }
 
 ## let parse_tree() & ptree() be aliases for the 'top' method
@@ -803,11 +803,11 @@ children for the top node.
 =cut
 
 sub children {
-   my $self = shift;
-   if ((nelems @_) +> 0) {
-      @{ $self } = @( ((nelems @_) == 1  and  ref @_[0]) ?? ${ nelems @_ } !! < @_ );
-   }
-   return @{ $self };
+    my $self = shift;
+    if ((nelems @_) +> 0) {
+        @{ $self } = @( ((nelems @_) == 1  and  ref @_[0]) ?? ${ nelems @_ } !! < @_ );
+    }
+    return @{ $self };
 }
 
 ##---------------------------------------------------------------------------
@@ -823,16 +823,16 @@ the current one.
 =cut
 
 sub prepend {
-   my $self = shift;
-   for ( @_) {
-      next  unless length;
-      if ((nelems @$self)  and  !(ref @$self[0])  and  !(ref $_)) {
-         @$self[0] = $_ . @$self[0];
-      }
-      else {
-         unshift @$self, $_;
-      }
-   }
+    my $self = shift;
+    for ( @_) {
+        next  unless length;
+        if ((nelems @$self)  and  !(ref @$self[0])  and  !(ref $_)) {
+            @$self[0] = $_ . @$self[0];
+        }
+        else {
+            unshift @$self, $_;
+        }
+    }
 }
 
 ##---------------------------------------------------------------------------
@@ -848,22 +848,22 @@ the current one.
 =cut
 
 sub append {
-   my $self = shift;
-   my $can_append = (nelems @$self) && !(ref @$self[-1]);
-   for ( @_) {
-      if (ref) {
-         push @$self, $_;
-      }
-      elsif(!length) {
-         next;
-      }
-      elsif ($can_append) {
-         @$self[-1] .= $_;
-      }
-      else {
-         push @$self, $_;
-      }
-   }
+    my $self = shift;
+    my $can_append = (nelems @$self) && !(ref @$self[-1]);
+    for ( @_) {
+        if (ref) {
+            push @$self, $_;
+        }
+        elsif(!length) {
+            next;
+        }
+        elsif ($can_append) {
+            @$self[-1] .= $_;
+        }
+        else {
+            push @$self, $_;
+        }
+    }
 }
 
 =head2 $ptree-E<gt>B<raw_text()>
@@ -876,12 +876,12 @@ exactly as it appeared in the input.
 =cut
 
 sub raw_text {
-   my $self = shift;
-   my $text = "";
-   for (  @$self ) {
-      $text .= (ref $_) ?? $_->raw_text !! $_;
-   }
-   return $text;
+    my $self = shift;
+    my $text = "";
+    for (  @$self ) {
+        $text .= (ref $_) ?? $_->raw_text !! $_;
+    }
+    return $text;
 }
 
 ##---------------------------------------------------------------------------
@@ -889,16 +889,16 @@ sub raw_text {
 ## Private routines to set/unset child->parent links
 
 sub _unset_child2parent_links {
-   my $self = shift;
-   for ( @$self) {
-       next  unless (defined and  ref  and  ref ne 'SCALAR');
-       $_->_unset_child2parent_links()
-           if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
-   }
+    my $self = shift;
+    for ( @$self) {
+        next  unless (defined and  ref  and  ref ne 'SCALAR');
+        $_->_unset_child2parent_links()
+            if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
+    }
 }
 
 sub _set_child2parent_links {
-    ## nothing to do, Pod::ParseTrees cant have parent pointers
+## nothing to do, Pod::ParseTrees cant have parent pointers
 }
 
 =head2 Pod::ParseTree::B<DESTROY()>
@@ -911,10 +911,10 @@ otherwise I<parse-tree storage will not be reclaimed upon destruction!>
 =cut
 
 sub DESTROY {
-   ## We need to get rid of all child->parent pointers throughout the
-   ## tree so their reference counts will go to zero and they can be
-   ## garbage-collected
-   _unset_child2parent_links(< @_);
+    ## We need to get rid of all child->parent pointers throughout the
+    ## tree so their reference counts will go to zero and they can be
+    ## garbage-collected
+    _unset_child2parent_links(< @_);
 }
 
 #############################################################################

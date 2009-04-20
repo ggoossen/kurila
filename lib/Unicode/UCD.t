@@ -319,7 +319,7 @@ do {
 };
 
 do {
-	is(charinfo(0xdeadbeef), undef, "[perl #23273] warnings in Unicode::UCD");
+    is(charinfo(0xdeadbeef), undef, "[perl #23273] warnings in Unicode::UCD");
 };
 
 use Unicode::UCD < qw(namedseq);

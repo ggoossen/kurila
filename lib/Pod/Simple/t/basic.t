@@ -60,31 +60,31 @@ is( < e "=head1 Foo\n\n=cut\n",  "\n\n\n\n=head1 Foo\n"  );
 print $^STDOUT, "# Simple XMLification tests...\n";
 
 is( Pod::Simple::XMLOutStream->_out("\n\n\nprint \$^T;\n\n\n"),
-    qq{<Document\ncontentless="1"></Document>}
-     # make sure the contentless flag is set
-);
+                             qq{<Document\ncontentless="1"></Document>}
+                             # make sure the contentless flag is set
+                             );
 is( Pod::Simple::XMLOutStream->_out("\n\n"),
-    qq{<Document\ncontentless="1"></Document>}
-     # make sure the contentless flag is set
-);
+                             qq{<Document\ncontentless="1"></Document>}
+                             # make sure the contentless flag is set
+                             );
 is( Pod::Simple::XMLOutStream->_out("\n"),
-    qq{<Document\ncontentless="1"></Document>}
-     # make sure the contentless flag is set
-);
+                             qq{<Document\ncontentless="1"></Document>}
+                             # make sure the contentless flag is set
+                             );
 is( Pod::Simple::XMLOutStream->_out(""),
-    qq{<Document\ncontentless="1"></Document>}
-     # make sure the contentless flag is set
-);
+                             qq{<Document\ncontentless="1"></Document>}
+                             # make sure the contentless flag is set
+                             );
 
 ok( Pod::Simple::XMLOutStream->_out('', '<Document></Document>' ) );
 
 is( Pod::Simple::XMLOutStream->_out("=pod\n\nFoo\n"),
-    '<Document><Para>Foo</Para></Document>'
-);
+                             '<Document><Para>Foo</Para></Document>'
+                             );
 
 is( Pod::Simple::XMLOutStream->_out("=head1 Chacha\n\nFoo\n"),
-    '<Document><head1>Chacha</head1><Para>Foo</Para></Document>'
-);
+                             '<Document><head1>Chacha</head1><Para>Foo</Para></Document>'
+                             );
 
 
 print $^STDOUT, "# Wrapping up... one for the road...\n";

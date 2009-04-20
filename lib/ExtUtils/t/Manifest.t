@@ -81,7 +81,7 @@ chmod( 0744, 'foo') if config_value('chmod');
 my @($res, $warn) =  catch_warning( \&mkmanifest );
 # Canonize the order.
 $warn = join("", map { "$_|" }, 
-                 sort { lc($a) cmp lc($b) }, split m/\r?\n/, $warn);
+    sort { lc($a) cmp lc($b) }, split m/\r?\n/, $warn);
 is( $warn, "Added to MANIFEST: foo|Added to MANIFEST: MANIFEST|",
     "mkmanifest() displayed its additions" );
 
@@ -104,8 +104,8 @@ is_deeply( $res, @('bar'), 'bar reported as new' );
 
 # now quiet the warning that bar was added and test again
 @($res, $warn) = do { local $ExtUtils::Manifest::Quiet = 1;
-                      catch_warning( \&skipcheck )
-                };
+    catch_warning( \&skipcheck )
+};
 is( $warn, '', 'disabled warnings' );
 
 # add a skip file with a rule to skip itself (and the nonexistent glob '*baz*')
@@ -117,28 +117,28 @@ like( $warn, qr/^Skipping MANIFEST\.SKIP/i, 'got skipping warning' );
 
 my @skipped;
 catch_warning( sub {
-	@skipped = skipcheck()
-});
+                   @skipped = skipcheck()
+               });
 
 is( join( ' ', @skipped ), 'MANIFEST.SKIP', 'listed skipped files' );
 
 do {
-	local $ExtUtils::Manifest::Quiet = 1;
-	is( join(' ', filecheck() ), 'bar', 'listing skipped with filecheck()' );
+    local $ExtUtils::Manifest::Quiet = 1;
+    is( join(' ', filecheck() ), 'bar', 'listing skipped with filecheck()' );
 };
 
 # add a subdirectory and a file there that should be found
 ok( mkdir( 'moretest', 0777 ), 'created moretest directory' );
 add_file( File::Spec->catfile('moretest', 'quux'), 'quux' );
 ok( exists( ExtUtils::Manifest::manifind()->{'moretest/quux'} ), 
-                                        "manifind found moretest/quux" );
+    "manifind found moretest/quux" );
 
 # only MANIFEST and foo are in the manifest
 $_ = 'foo';
 my $files = maniread();
 is( nkeys %$files, 2, 'two files found' );
 is( join(' ', sort { lc($a) cmp lc($b) }, keys %$files), 'foo MANIFEST', 
-                                        'both files found' );
+    'both files found' );
 is( $_, 'foo', q{maniread() doesn't clobber $_} );
 
 ok( mkdir( 'copy', 0777 ), 'made copy directory' );
@@ -148,7 +148,7 @@ manicopy( $files, 'copy', 'cp' );
 my @copies = @( () );
 find( sub { push @copies, $_ if -f }, 'copy' );
 @copies = map { s/\.$//; $_ }, @copies if $Is_VMS;  # VMS likes to put dots on
-                                                   # the end of files.
+# the end of files.
 # Have to compare insensitively for non-case preserving VMS
 is_deeply( \(sort map { lc }, @copies), \(sort map { lc }, keys %$files) );
 
@@ -165,12 +165,12 @@ rmtree('copy');
 # poison the manifest, and add a comment that should be reported
 add_file( 'MANIFEST', 'none #none' );
 is( ExtUtils::Manifest::maniread()->{?none}, '#none', 
-                                        'maniread found comment' );
+    'maniread found comment' );
 
 ok( mkdir( 'copy', 0777 ), 'made copy directory' );
 $files = maniread();
 try { @(_, $warn) =  catch_warning( sub {
- 		manicopy( $files, 'copy', 'cp' ) })
+                                        manicopy( $files, 'copy', 'cp' ) })
 };
 like( $^EVAL_ERROR->{?description}, qr/^Can't read none: /, 'croaked about none' );
 
@@ -182,12 +182,12 @@ like($warn, qr/^Skipping MANIFEST.SKIP/i, 'warned about MANIFEST.SKIP' );
 
 # tell ExtUtils::Manifest to use a different file
 do {
-	local $ExtUtils::Manifest::MANIFEST = 'albatross'; 
-	@($res, $warn) =  catch_warning( \&mkmanifest );
-	like( $warn, qr/Added to albatross: /, 'using a new manifest file' );
+    local $ExtUtils::Manifest::MANIFEST = 'albatross'; 
+    @($res, $warn) =  catch_warning( \&mkmanifest );
+    like( $warn, qr/Added to albatross: /, 'using a new manifest file' );
 
-	# add the new file to the list of files to be deleted
-	%Files{+'albatross'}++;
+    # add the new file to the list of files to be deleted
+    %Files{+'albatross'}++;
 };
 
 
@@ -220,11 +220,11 @@ is( $files->{?foobar}, '',    '          preserved old entries' );
 # test including an external manifest.skip file in MANIFEST.SKIP
 do {
     maniadd(\%( foo => undef , albatross => undef,
-              'mymanifest.skip' => undef, 'mydefault.skip' => undef));
+                'mymanifest.skip' => undef, 'mydefault.skip' => undef));
     add_file('mymanifest.skip' => "^foo\n");
     add_file('mydefault.skip'  => "^my\n");
     $ExtUtils::Manifest::DEFAULT_MSKIP =
-         File::Spec->catfile($cwd, < qw(mantest mydefault.skip));
+        File::Spec->catfile($cwd, < qw(mantest mydefault.skip));
     my $skip = File::Spec->catfile($cwd, < qw(mantest mymanifest.skip));
     add_file('MANIFEST.SKIP' =>
              "albatross\n#!include $skip\n#!include_default");
@@ -258,8 +258,8 @@ $files = maniread;
 # VMS downcases the MANIFEST.  We normalize it here to match.
 %$files = %( < @+: map { @(lc $_ => $files->{?$_}) }, keys %$files );
 my %expect = %( 'makefile.pl' => '',
-               'foo'    => 'bar'
-             );
+        'foo'    => 'bar'
+    );
 is_deeply( $files, \%expect, 'maniadd() vs MANIFEST without trailing newline');
 
 #add_file('MANIFEST'   => 'Makefile.PL');
@@ -278,18 +278,18 @@ SKIP: do {
         maniadd(\%( 'grrrwoof' => 'yippie' ));
     };
     like( $^EVAL_ERROR->{?description}, qr/^\Qmaniadd() could not open MANIFEST:\E/,  
-                 "maniadd() dies if it can't open the MANIFEST" );
+          "maniadd() dies if it can't open the MANIFEST" );
 
     chmod( 0600, 'MANIFEST' );
 };
 
 
 END {
-	is( unlink( < keys %Files ), nkeys %Files, 'remove all added files' );
-	remove_dir( 'moretest', 'copy' );
+    is( unlink( < keys %Files ), nkeys %Files, 'remove all added files' );
+    remove_dir( 'moretest', 'copy' );
 
-	# now get rid of the parent directory
-	ok( chdir( $cwd ), 'return to parent directory' );
-	remove_dir( 'mantest' );
+    # now get rid of the parent directory
+    ok( chdir( $cwd ), 'return to parent directory' );
+    remove_dir( 'mantest' );
 }
 

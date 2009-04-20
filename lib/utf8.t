@@ -7,7 +7,7 @@ BEGIN {
     $^INCLUDE_PATH = @( '../lib' );
     require './test.pl';
     unless ($has_perlio = PerlIO::Layer->find( 'perlio')) {
-	print $^STDOUT, <<EOF;
+        print $^STDOUT, <<EOF;
 # Since you don't have perlio you might get failures with UTF-8 locales.
 EOF
     }
@@ -46,43 +46,43 @@ do {
     my $smiley = "\x{263a}";
 
     for my $s (@("\x{263a}",
-	       $smiley,
-		
-	       "" . $smiley,
-	       "" . "\x{263a}",
+                 $smiley,
 
-	       $smiley    . "",
-	       "\x{263a}" . "",)
-	       ) {
-	my $length_chars = length($s);
-	my $length_bytes;
-	do { use bytes; $length_bytes = length($s) };
-	my @regex_chars = @( $s =~ m/(.)/g );
-	my $regex_chars = (nelems @regex_chars);
-	my @split_chars = split m//, $s;
-	my $split_chars = (nelems @split_chars);
-	ok("$length_chars/$regex_chars/$split_chars/$length_bytes" eq
-	   "1/1/1/3");
+                 "" . $smiley,
+                 "" . "\x{263a}",
+
+                 $smiley    . "",
+                 "\x{263a}" . "",)
+    ) {
+        my $length_chars = length($s);
+        my $length_bytes;
+        do { use bytes; $length_bytes = length($s) };
+        my @regex_chars = @( $s =~ m/(.)/g );
+        my $regex_chars = (nelems @regex_chars);
+        my @split_chars = split m//, $s;
+        my $split_chars = (nelems @split_chars);
+        ok("$length_chars/$regex_chars/$split_chars/$length_bytes" eq
+    "1/1/1/3");
     }
 
     for my $s (@("\x{263a}" . "\x{263a}",
-	       $smiley    . $smiley,
+                 $smiley    . $smiley,
 
-	       "\x{263a}\x{263a}",
-	       "$smiley$smiley",
-	       
-	       "\x{263a}" x 2,
-	       $smiley    x 2,)
-	       ) {
-	my $length_chars = length($s);
-	my $length_bytes;
-	do { use bytes; $length_bytes = length($s) };
-	my @regex_chars = @( $s =~ m/(.)/g );
-	my $regex_chars = (nelems @regex_chars);
-	my @split_chars = split m//, $s;
-	my $split_chars = (nelems @split_chars);
-	ok("$length_chars/$regex_chars/$split_chars/$length_bytes" eq
-	   "2/2/2/6");
+                 "\x{263a}\x{263a}",
+                 "$smiley$smiley",
+
+                 "\x{263a}" x 2,
+                 $smiley    x 2,)
+    ) {
+        my $length_chars = length($s);
+        my $length_bytes;
+        do { use bytes; $length_bytes = length($s) };
+        my @regex_chars = @( $s =~ m/(.)/g );
+        my $regex_chars = (nelems @regex_chars);
+        my @split_chars = split m//, $s;
+        my $split_chars = (nelems @split_chars);
+        ok("$length_chars/$regex_chars/$split_chars/$length_bytes" eq
+    "2/2/2/6");
     }
 };
 
@@ -93,7 +93,7 @@ do {
     my $w = 0;
     local $^WARN_HOOK = sub { print $^STDOUT, "#(@_[0])\n"; $w++ };
     my $x = eval q/"\\/ . "\x{100}" . q/"/;
-   
+
     ok($w == 0 && $x eq "\x{100}");
 };
 
@@ -207,8 +207,8 @@ do {
 
 do {
     fresh_perl_like ('use utf8; utf8::moo()',
-		     qr/Undefined subroutine &utf8::moo/, \%(stderr=>1),
-		    "Check Carp is loaded for AUTOLOADing errors")
+                     qr/Undefined subroutine &utf8::moo/, \%(stderr=>1),
+                     "Check Carp is loaded for AUTOLOADing errors")
 };
 
 do {

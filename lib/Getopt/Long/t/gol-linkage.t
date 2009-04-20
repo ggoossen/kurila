@@ -60,7 +60,7 @@ do {
     $errors="";
     %lnk = %( () );
     undef $bar;
-     @ARGV = qw(/Foo=-baR);
+    @ARGV = qw(/Foo=-baR);
     Getopt::Long::Configure ("default","bundling","ignore_case_always",
                              "prefix_pattern=--|/|-|\\+","long_prefix_pattern=--|/");
     GetOptions (\%lnk, "bar" => \$bar, "Foo=s");

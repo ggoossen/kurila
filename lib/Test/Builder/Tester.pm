@@ -63,11 +63,11 @@ our @EXPORT = qw(test_out test_err test_fail test_diag test_test line_num);
 # 5.004's Exporter doesn't have export_to_level.
 sub _export_to_level
 {
-      my $pkg = shift;
-      my $level = shift;
-      shift;                  # XXX redundant arg
-      my $callpkg = caller($level);
-      $pkg->export($callpkg, < @_);
+    my $pkg = shift;
+    my $level = shift;
+    shift;                  # XXX redundant arg
+    my $callpkg = caller($level);
+    $pkg->export($callpkg, < @_);
 }
 
 sub import {
@@ -318,22 +318,22 @@ will function normally and cause success/errors for B<Test::Harness>.
 
 sub test_test
 {
-   # decode the arguements as described in the pod
-   my $mess;
-   my %args;
-   if ((nelems @_) == 1)
-     { $mess = shift }
-   else
-   {
-     %args = %( < @_ );
-     $mess = %args{?name} if exists(%args{name});
-     $mess = %args{?title} if exists(%args{title});
-     $mess = %args{?label} if exists(%args{label});
-   }
+    # decode the arguements as described in the pod
+    my $mess;
+    my %args;
+    if ((nelems @_) == 1)
+    { $mess = shift }
+    else
+    {
+        %args = %( < @_ );
+        $mess = %args{?name} if exists(%args{name});
+        $mess = %args{?title} if exists(%args{title});
+        $mess = %args{?label} if exists(%args{label});
+    }
 
     # er, are we testing?
     die "Not testing.  You must declare output with a test function first."
-	unless $testing;
+        unless $testing;
 
     # okay, reconnect the test suite back to the saved handles
     $t->output($original_output_handle);
@@ -349,19 +349,19 @@ sub test_test
 
     # check the output we've stashed
     unless ($t->ok(    (%args{?skip_out} || $out->check)
-                    && (%args{?skip_err} || $err->check),
-                   $mess))
+        && (%args{?skip_err} || $err->check),
+        $mess))
     {
-      # print out the diagnostic information about why this
-      # test failed
+        # print out the diagnostic information about why this
+        # test failed
 
-      local $_ = undef;
+        local $_ = undef;
 
-      $t->diag(< map {"$_\n"}, @( $out->complaint))
-	unless %args{?skip_out} || $out->check;
+        $t->diag(< map {"$_\n"}, @( $out->complaint))
+            unless %args{?skip_out} || $out->check;
 
-      $t->diag(< map {"$_\n"}, @( $err->complaint))
-	unless %args{?skip_err} || $err->check;
+        $t->diag(< map {"$_\n"}, @( $err->complaint))
+            unless %args{?skip_err} || $err->check;
     }
 }
 
@@ -428,8 +428,8 @@ the PERL5LIB.
 my $color;
 sub color
 {
-  $color = shift if (nelems @_);
-  $color;
+    $color = shift if (nelems @_);
+    $color;
 }
 
 =back
@@ -476,10 +476,10 @@ L<Test::Builder>, L<Test::Builder::Tester::Color>, L<Test::More>.
 
 1;
 
-####################################################################
-# Helper class that is used to remember expected and received data
+    ####################################################################
+    # Helper class that is used to remember expected and received data
 
-package Test::Builder::Tester::Tie;
+    package Test::Builder::Tester::Tie;
 
 ##
 # add line(s) to be expected
@@ -554,42 +554,42 @@ sub complaint
     # are we running in colour mode?
     if (Test::Builder::Tester::color)
     {
-      # get color
-      try { require Term::ANSIColor };
-      unless ($^EVAL_ERROR)
-      {
-        # colours
+        # get color
+        try { require Term::ANSIColor };
+        unless ($^EVAL_ERROR)
+        {
+            # colours
 
-        my $green = Term::ANSIColor::color("black").
-                    Term::ANSIColor::color("on_green");
-        my $red   = Term::ANSIColor::color("black").
-                    Term::ANSIColor::color("on_red");
-        my $reset = Term::ANSIColor::color("reset");
+            my $green = Term::ANSIColor::color("black").
+                Term::ANSIColor::color("on_green");
+            my $red   = Term::ANSIColor::color("black").
+                Term::ANSIColor::color("on_red");
+            my $reset = Term::ANSIColor::color("reset");
 
-        # work out where the two strings start to differ
-        my $char = 0;
-        $char++ while substr($got, $char, 1) eq substr($wanted, $char, 1);
+            # work out where the two strings start to differ
+            my $char = 0;
+            $char++ while substr($got, $char, 1) eq substr($wanted, $char, 1);
 
-        # get the start string and the two end strings
-        my $start     = $green . substr($wanted, 0,   $char);
-        my $gotend    = $red   . substr($got   , $char) . $reset;
-        my $wantedend = $red   . substr($wanted, $char) . $reset;
+            # get the start string and the two end strings
+            my $start     = $green . substr($wanted, 0,   $char);
+            my $gotend    = $red   . substr($got   , $char) . $reset;
+            my $wantedend = $red   . substr($wanted, $char) . $reset;
 
-        # make the start turn green on and off
-        $start =~ s/\n/$reset\n$green/g;
+            # make the start turn green on and off
+            $start =~ s/\n/$reset\n$green/g;
 
-        # make the ends turn red on and off
-        $gotend    =~ s/\n/$reset\n$red/g;
-        $wantedend =~ s/\n/$reset\n$red/g;
+            # make the ends turn red on and off
+            $gotend    =~ s/\n/$reset\n$red/g;
+            $wantedend =~ s/\n/$reset\n$red/g;
 
-        # rebuild the strings
-        $got    = $start . $gotend;
-        $wanted = $start . $wantedend;
-      }
+            # rebuild the strings
+            $got    = $start . $gotend;
+            $wanted = $start . $wantedend;
+        }
     }
 
     return "$type is:\n" .
-           "$got\nnot:\n$wanted\nas expected"
+        "$got\nnot:\n$wanted\nas expected"
 }
 
 ##

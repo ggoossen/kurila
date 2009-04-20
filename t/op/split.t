@@ -68,8 +68,8 @@ is("$a|$b", "2|4");
 
 # .. even for locals?
 do {
-  local @(_, $a, _, $b) =  qw(1 2 3 4);
-  is("$a|$b", "2|4");
+    local @(_, $a, _, $b) =  qw(1 2 3 4);
+    is("$a|$b", "2|4");
 };
 
 # check splitting of null string
@@ -161,7 +161,7 @@ do {
     my @charlist = split m//, $sushi;
     my $r = '';
     foreach my $ch ( @charlist) {
-	$r = $r . " " . sprintf "U+\%04X", ord($ch);
+        $r = $r . " " . sprintf "U+\%04X", ord($ch);
     }
 
     is($r, " U+B36C U+5A8C U+FF5B U+5079 U+505B");
@@ -171,15 +171,15 @@ do {
     my $s = "\x20\x40\x{80}\x{100}\x{80}\x40\x20";
 
   SKIP: do {
-    if (ord('A') == 193) {
-	skip("EBCDIC", 1);
-    } else {
-	# bug id 20000426.003
+        if (ord('A') == 193) {
+            skip("EBCDIC", 1);
+        } else {
+            # bug id 20000426.003
 
-	my @($a, $b, $c) =  split(m/\x40/, $s);
-	ok($a eq "\x20" && $b eq "\x{80}\x{100}\x{80}" && $c eq $a);
-    }
-  };
+            my @($a, $b, $c) =  split(m/\x40/, $s);
+            ok($a eq "\x20" && $b eq "\x{80}\x{100}\x{80}" && $c eq $a);
+        }
+    };
 
     my @($a, $b) =  split(m/\x{100}/, $s);
     ok($a eq "\x20\x40\x{80}" && $b eq "\x{80}\x40\x20");
@@ -188,13 +188,13 @@ do {
     ok($a eq "\x20\x40" && $b eq "\x40\x20");
 
   SKIP: do {
-    if (ord('A') == 193) {
-	skip("EBCDIC", 1);
-    }  else {
-	my @($a, $b) =  split(m/\x40\x{80}/, $s);
-	ok($a eq "\x20" && $b eq "\x{100}\x{80}\x40\x20");
-    }
-  };
+        if (ord('A') == 193) {
+            skip("EBCDIC", 1);
+        }  else {
+            my @($a, $b) =  split(m/\x40\x{80}/, $s);
+            ok($a eq "\x20" && $b eq "\x{100}\x{80}\x40\x20");
+        }
+    };
 
     my @($a, $b, $c) =  split(m/[\x40\x{80}]+/, $s);
     ok($a eq "\x20" && $b eq "\x{100}" && $c eq "\x20");
@@ -227,7 +227,7 @@ do {
     # reported in <20010627113312.RWGY6087.viemta06@localhost>
     my $r;
     foreach my $pat (@( qr/\s+/, qr/ll/) ) {
-	$r = join ':', split($pat, "hello cruel world");
+        $r = join ':', split($pat, "hello cruel world");
     }
     is($r, "he:o cruel world");
 };
@@ -251,13 +251,13 @@ do {
 do {
     # [perl #18195]
     for my $u (@(0, 1)) {
-	for my $a (@(0, 1)) {
-	    $_ = 'readin,database,readout';
-	    utf8::encode $_ if $u;
-	    m/(.+)/;
-	    my @d = split m/[,]/,$1;
-	    is(join (':', @d), 'readin:database:readout', "[perl #18195]");
-	}
+        for my $a (@(0, 1)) {
+            $_ = 'readin,database,readout';
+            utf8::encode $_ if $u;
+            m/(.+)/;
+            my @d = split m/[,]/,$1;
+            is(join (':', @d), 'readin:database:readout', "[perl #18195]");
+        }
     }
 };
 
@@ -291,27 +291,27 @@ do {
     # For terms of use, see http://www.unicode.org/terms_of_use.html
     # For documentation, see UCD.html
     my @spaces=@(
-	ord("\t"),      # Cc       <control-0009>
-	ord("\n"),      # Cc       <control-000A>
-	# not PerlSpace # Cc       <control-000B>
-	ord("\f"),      # Cc       <control-000C>
-	ord("\r"),      # Cc       <control-000D>
-	ord(" "),       # Zs       SPACE
-        ord("\N{NEL}"), # Cc       <control-0085>
-	ord("\N{NO-BREAK SPACE}"),
-			# Zs       NO-BREAK SPACE
-        0x1680,         # Zs       OGHAM SPACE MARK
-        0x180E, <         # Zs       MONGOLIAN VOWEL SEPARATOR
-        0x2000..0x200A, # Zs  [11] EN QUAD..HAIR SPACE
-        0x2028,         # Zl       LINE SEPARATOR
-        0x2029,         # Zp       PARAGRAPH SEPARATOR
-        0x202F,         # Zs       NARROW NO-BREAK SPACE
-        0x205F,         # Zs       MEDIUM MATHEMATICAL SPACE
-        0x3000          # Zs       IDEOGRAPHIC SPACE
-    );
+ ord("\t"),      # Cc       <control-0009>
+ ord("\n"),      # Cc       <control-000A>
+ # not PerlSpace # Cc       <control-000B>
+ ord("\f"),      # Cc       <control-000C>
+ ord("\r"),      # Cc       <control-000D>
+ ord(" "),       # Zs       SPACE
+ ord("\N{NEL}"), # Cc       <control-0085>
+ ord("\N{NO-BREAK SPACE}"),
+ # Zs       NO-BREAK SPACE
+ 0x1680,         # Zs       OGHAM SPACE MARK
+ 0x180E, <         # Zs       MONGOLIAN VOWEL SEPARATOR
+ 0x2000..0x200A, # Zs  [11] EN QUAD..HAIR SPACE
+ 0x2028,         # Zl       LINE SEPARATOR
+ 0x2029,         # Zp       PARAGRAPH SEPARATOR
+ 0x202F,         # Zs       NARROW NO-BREAK SPACE
+ 0x205F,         # Zs       MEDIUM MATHEMATICAL SPACE
+ 0x3000          # Zs       IDEOGRAPHIC SPACE
+        );
     #diag "Have @{[0+@spaces]} to test\n";
     foreach my $cp ( @spaces) {
-	my $msg = sprintf "Space: U+\%04x", $cp;
+        my $msg = sprintf "Space: U+\%04x", $cp;
         my $space = chr($cp);
         my $str="A:$space:B";
 

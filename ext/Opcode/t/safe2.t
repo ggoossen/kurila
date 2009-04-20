@@ -112,7 +112,7 @@ print $^STDOUT, defined $t_scalar2 ?? "not ok 28\n" !! "ok 28\n";
 print $^STDOUT, $^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/foo bar/ ?? "ok 29\n" !! "not ok 29\n";
 
 # --- rdo
-  
+
 my $t = 30;
 $^OS_ERROR = 0;
 my $nosuch = '/non/existant/file.name';
@@ -130,7 +130,7 @@ close($nosuch_fh);
 
 # test #31 is gone.
 print $^STDOUT, "ok $t\n"; $t++;
-  
+
 #my $rdo_file = "tmp_rdo.tpl";
 #if (open X,">$rdo_file") {
 #    print X "999\n";

@@ -35,7 +35,7 @@ sub extra_clean_files {
 
     my @errfiles = @{$self->{?C}};
     for (  @errfiles ) {
-	s/.c$/.err/;
+        s/.c$/.err/;
     }
 
     return @( @errfiles, 'perlmain.err' );

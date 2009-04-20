@@ -15,12 +15,12 @@ sub expected {
     my $r = qr/^\Q$package\E=(\w+)\(0x([0-9a-f]+)\)$/;
     like(dump::view($object), $r);
     if (dump::view($object) =~ $r) {
-	is($1, $type);
-	# in 64-bit platforms hex warns for 32+ -bit values
-	cmp_ok(do {no warnings 'portable'; hex($2)}, '==', ref::address($object));
+        is($1, $type);
+        # in 64-bit platforms hex warns for 32+ -bit values
+        cmp_ok(do {no warnings 'portable'; hex($2)}, '==', ref::address($object));
     }
     else {
-	fail(); fail();
+        fail(); fail();
     }
 }
 

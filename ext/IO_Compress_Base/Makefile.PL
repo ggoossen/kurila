@@ -14,19 +14,19 @@ WriteMakefile(
 
     (
       env::var('SKIP_FOR_CORE')
-        ?? (MAN3PODS    => \%())
-        !! (PREREQ_PM   => \%( 'Scalar::Util'  => 0, )
-	      )
-    ),
-       
+      ?? (MAN3PODS    => \%())
+      !! (PREREQ_PM   => \%( 'Scalar::Util'  => 0, )
+                        )
+      ),
+
     ABSTRACT_FROM => 'lib/IO/Compress/Base.pm',
     AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
 
     INSTALLDIRS => 'perl',
 
     'LICENSE'  => 'perl',
-    
-) ;
+
+    ) ;
 
 # end of file Makefile.PL
 

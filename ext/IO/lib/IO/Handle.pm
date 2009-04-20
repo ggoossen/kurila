@@ -294,7 +294,7 @@ sub new_from_fd {
     my $io = gensym;
     shift;
     IO::Handle::fdopen($io, < @_)
-	or return undef;
+        or return undef;
     bless $io, $class;
 }
 
@@ -304,10 +304,10 @@ sub new_from_fd {
 
 sub _open_mode_string($mode) {
     $mode =~ m/^\+?(<|>>?)$/
-      or $mode =~ s/^r(\+?)$/$1</
-      or $mode =~ s/^w(\+?)$/$1>/
-      or $mode =~ s/^a(\+?)$/$1>>/
-      or die "IO::Handle: bad open mode: $mode";
+        or $mode =~ s/^r(\+?)$/$1</
+        or $mode =~ s/^w(\+?)$/$1>/
+        or $mode =~ s/^a(\+?)$/$1>>/
+        or die "IO::Handle: bad open mode: $mode";
     $mode;
 }
 
@@ -317,12 +317,12 @@ sub fdopen {
 
     my $fdmode = '&';
     if (!ref($fd) && $fd =~ m#^\d+$#) {
-	# It's an FD number; prefix with "=".
-	$fdmode .= "=";
+        # It's an FD number; prefix with "=".
+        $fdmode .= "=";
     }
 
     open($io, _open_mode_string($mode) . $fdmode, $fd)
-	?? $io !! undef;
+        ?? $io !! undef;
 }
 
 sub close {
@@ -402,7 +402,7 @@ sub sysread {
 
 sub write {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])';
-    local($^OUTPUT_RECORD_SEPARATOR) = "";
+          local($^OUTPUT_RECORD_SEPARATOR) = "";
     @_[+2] = length(@_[1]) unless defined @_[?2];
     print  @_[0]  ,substr(@_[1], @_[?3] || 0, @_[2]);
 }
@@ -410,9 +410,9 @@ sub write {
 sub syswrite {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])';
     if (defined(@_[?2])) {
-	syswrite(@_[0], @_[1], @_[2], @_[?3] || 0);
+        syswrite(@_[0], @_[1], @_[2], @_[?3] || 0);
     } else {
-	syswrite(@_[0], @_[1]);
+        syswrite(@_[0], @_[1]);
     }
 }
 
@@ -434,7 +434,7 @@ sub autoflush {
 
 sub output_field_separator {
     warn "output_field_separator is not supported on a per-handle basis"
-	if ref(@_[0]);
+        if ref(@_[0]);
     my $prev = $^OUTPUT_FIELD_SEPARATOR;
     $^OUTPUT_FIELD_SEPARATOR = @_[1] if (nelems @_) +> 1;
     $prev;
@@ -442,7 +442,7 @@ sub output_field_separator {
 
 sub output_record_separator {
     warn "output_record_separator is not supported on a per-handle basis"
-	if ref(@_[0]);
+        if ref(@_[0]);
     my $prev = $^OUTPUT_RECORD_SEPARATOR;
     $^OUTPUT_RECORD_SEPARATOR = @_[1] if (nelems @_) +> 1;
     $prev;
@@ -450,7 +450,7 @@ sub output_record_separator {
 
 sub input_record_separator {
     warn "input_record_separator is not supported on a per-handle basis"
-	if ref(@_[0]);
+        if ref(@_[0]);
     my $prev = $^INPUT_RECORD_SEPARATOR;
     $^INPUT_RECORD_SEPARATOR = @_[1] if (nelems @_) +> 1;
     $prev;
@@ -487,7 +487,7 @@ sub ioctl {
 sub constant {
     my $name = shift;
     (($name =~ m/^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && defined &{*{Symbol::fetch_glob($name)}})
-	?? &{*{Symbol::fetch_glob($name)}}() !! undef;
+        ?? &{*{Symbol::fetch_glob($name)}}() !! undef;
 }
 
 

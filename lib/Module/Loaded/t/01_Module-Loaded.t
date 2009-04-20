@@ -14,7 +14,7 @@ do {   use_ok( $Class );
 do {   ok( !is_loaded($Mod),       "$Mod not loaded yet" );
     ok( mark_as_loaded($Mod),   "   $Mod now marked as loaded" );
     is( is_loaded($Mod), $^PROGRAM_NAME,    "   $Mod is loaded from $^PROGRAM_NAME" );
-    
+
     my $rv = eval "require $Mod; 1";
     ok( $rv,                    "$Mod required" );
     ok( !$^EVAL_ERROR,                    "   require did not die" );
@@ -35,14 +35,14 @@ use error;
 do {   my $where = is_loaded( $Strict );
     ok( $where,                 "$Strict loaded" );
     ok( mark_as_unloaded( $Strict ),
-                                "   $Strict unloaded" );
+        "   $Strict unloaded" );
 
     ### redefining subs, quell warnings
     do {   local $^WARN_HOOK = sub {};
         my $rv = eval "require $Strict; 1";
         ok( $rv,                "$Strict loaded again" );
     };
-    
+
     is( is_loaded( $Strict ), $where, 
-                                "   $Strict is loaded" );
+        "   $Strict is loaded" );
 };

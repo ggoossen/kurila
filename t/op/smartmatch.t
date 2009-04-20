@@ -38,10 +38,10 @@ sub match_test {
     my @($yn, $left, $right) =  @_;
 
     die "Bad test spec: ($yn, $left, $right)"
-	unless $yn eq "" || $yn eq "!";
-    
+        unless $yn eq "" || $yn eq "!";
+
     my $tstr = "$left ~~ $right";
-    
+
     my $res;
     $res = eval $tstr // "";	#/ <- fix syntax colouring
 

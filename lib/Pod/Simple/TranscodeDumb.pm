@@ -10,53 +10,53 @@ $VERSION = '2.02';
 #  available.
 
 %Supported = %(
-  'ascii'       => 1,
-  'ascii-ctrl'  => 1,
-  'utf8'  => 1,
-  'null'        => 1,
-  'latin1' => 1,
-  < %Supported,
-);
+        'ascii'       => 1,
+            'ascii-ctrl'  => 1,
+            'utf8'  => 1,
+            'null'        => 1,
+            'latin1' => 1,
+            < %Supported,
+    );
 
 sub is_dumb  {1}
 sub is_smart {0}
 
 sub all_encodings {
-  return sort keys %Supported;
+    return sort keys %Supported;
 }
 
 sub encoding_is_available {
-  return exists %Supported{lc @_[1]};
+    return exists %Supported{lc @_[1]};
 }
 
 sub encmodver {
-  return __PACKAGE__ . " v" .($VERSION || '?');
+    return __PACKAGE__ . " v" .($VERSION || '?');
 }
 
 sub make_transcoder {
-  my $e = @_[1];
-  die "WHAT ENCODING!?!?" unless $e;
-  my $x;
-  if ($e eq "latin1") {
-      return sub { return map { join '', map { utf8::chr($_) }, @( unpack "C*", $_) }, @_ };
-  }
+    my $e = @_[1];
+    die "WHAT ENCODING!?!?" unless $e;
+    my $x;
+    if ($e eq "latin1") {
+        return sub { return map { join '', map { utf8::chr($_) }, @( unpack "C*", $_) }, @_ };
+    }
 
-  return sub {;
-    #foreach $x (@_) {
-    #  if(Pod::Simple::ASCII and !Pod::Simple::UNICODE) {
-    #    # We're in horrible gimp territory, so we need to knock out
-    #    # all the highbit things
-    #    $x =
-    #      pack 'C*',
-    #      map {; ($_ < 128) ? $_ : 0x7e }
-    #      unpack "C*",
-    #      $x
-    #    ;
-    #  }
-    #}
-    #
-    #return;
-  };
+    return sub {;
+        #foreach $x (@_) {
+        #  if(Pod::Simple::ASCII and !Pod::Simple::UNICODE) {
+        #    # We're in horrible gimp territory, so we need to knock out
+        #    # all the highbit things
+        #    $x =
+        #      pack 'C*',
+        #      map {; ($_ < 128) ? $_ : 0x7e }
+        #      unpack "C*",
+        #      $x
+        #    ;
+        #  }
+        #}
+        #
+        #return;
+        };
 }
 
 

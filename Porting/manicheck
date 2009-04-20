@@ -13,7 +13,7 @@
 #
 
 sub help {
-  die <<EOF;
+    die <<EOF;
 $^PROGRAM_NAME: Usage: $^PROGRAM_NAME [-x|-m|-l|-h]
 -x show only the extra files
 -m show only the missing files
@@ -37,16 +37,16 @@ my %mand = %: ".", 1;
 use File::Basename < qw(dirname);
 
 while ( ~< $manifest_fh ) {
-  if (m/^(\S+)\s+(.+)$/) {
-    %mani{+$1}++;
-    my $d = dirname($1);
-    while($d ne '.') {
-	%mand{+$d}++;
-	$d = dirname($d);
+    if (m/^(\S+)\s+(.+)$/) {
+        %mani{+$1}++;
+        my $d = dirname($1);
+        while($d ne '.') {
+            %mand{+$d}++;
+            $d = dirname($d);
+        }
+    } else {
+        warn "MANIFEST:$(iohandle::input_line_number($manifest_fh)):$_";
     }
-  } else {
-    warn "MANIFEST:$(iohandle::input_line_number($manifest_fh)):$_";
-  }
 }
 
 close($manifest_fh);
@@ -54,21 +54,21 @@ close($manifest_fh);
 my %find;
 use File::Find;
 find(sub {
-       my $n = $File::Find::name;
-       $n =~ s:^\./::;
-       return if $n =~ m{^\.git/};
-       %find{+$n}++;
+         my $n = $File::Find::name;
+         $n =~ s:^\./::;
+         return if $n =~ m{^\.git/};
+         %find{+$n}++;
      }, '.' );
 
 my @xtra;
 my @miss;
 
 for (sort keys %find) {
-  push @xtra, $_ unless %mani{?$_} || %mand{?$_};
+    push @xtra, $_ unless %mani{?$_} || %mand{?$_};
 }
 
 for (sort keys %mani) {
-  push @miss, $_ unless %find{$_};
+    push @miss, $_ unless %find{$_};
 }
 
 my $separator = $l ?? "\n" !! " ";

@@ -21,15 +21,15 @@ do {
     use Class::Struct < qw(struct);
 
     struct 'IPC::Semaphore::stat' => \@(
-	uid	=> '$',
-	gid	=> '$',
-	cuid	=> '$',
-	cgid	=> '$',
-	mode	=> '$',
-	ctime	=> '$',
-	otime	=> '$',
-	nsems	=> '$',
-    );
+           uid	=> '$',
+           gid	=> '$',
+           cuid	=> '$',
+           cgid	=> '$',
+           mode	=> '$',
+           ctime	=> '$',
+           otime	=> '$',
+           nsems	=> '$',
+           );
 };
 
 sub new {
@@ -39,8 +39,8 @@ sub new {
     my $id = semget(@_[0],@_[1],@_[2]);
 
     defined($id)
-	?? bless \$id, $class
-	!! undef;
+        ?? bless \$id, $class
+        !! undef;
 }
 
 sub id {
@@ -97,7 +97,7 @@ sub stat {
     my $self = shift;
     my $data = "";
     semctl($$self,0,IPC_STAT,$data)
-	or return undef;
+        or return undef;
     IPC::Semaphore::stat->new->unpack($data);
 }
 
@@ -106,16 +106,16 @@ sub set {
     my $ds;
 
     if((nelems @_) == 1) {
-	$ds = shift;
+        $ds = shift;
     }
     else {
-	croak 'Bad arg count' if (nelems @_) % 2;
-	my %arg = %( < @_ );
-	$ds = $self->stat
-		or return undef;
-	my($key,$val);
-	$ds->?$key($val)
-	    while(@($key,$val) =@( each %arg));
+        croak 'Bad arg count' if (nelems @_) % 2;
+        my %arg = %( < @_ );
+        $ds = $self->stat
+            or return undef;
+        my($key,$val);
+        $ds->?$key($val)
+            while(@($key,$val) =@( each %arg));
     }
 
     my $v = semctl($$self,0,IPC_SET,$ds->pack);
@@ -126,7 +126,7 @@ sub getall {
     my $self = shift;
     my $data = "";
     semctl($$self,0,GETALL,$data)
-	or return ();
+        or return ();
     @(unpack("s!*",$data));
 }
 

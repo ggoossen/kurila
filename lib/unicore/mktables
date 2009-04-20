@@ -54,7 +54,7 @@ while ((nelems @ARGV))
     } elsif ($arg eq '-makelist') {
         $MakeList = 1;        
     } elsif ($arg eq '-C' && defined ($UseDir = shift @ARGV)) {
-	-d $UseDir or die "Unknown directory '$UseDir'";
+        -d $UseDir or die "Unknown directory '$UseDir'";
     } elsif ($arg eq '-L' && defined ($FileList = shift @ARGV)) {
         -e $FileList or die "Filelist '$FileList' doesn't appear to exist!";
     } else {
@@ -97,7 +97,7 @@ if ($FileList) {
     }            
     if ( $Verbose ) {
         print $^STDOUT, "Expecting ".scalar( nelems @input )." input files. ",
-              "Checking ".scalar( nelems @output )." output files.\n";
+            "Checking ".scalar( nelems @output )." output files.\n";
     }
     # we set maxtime to be the youngest input file, including $0 itself.
     my $maxtime = -M $^PROGRAM_NAME; # do this before the chdir!
@@ -143,10 +143,10 @@ if ($FileList) {
 }
 
 foreach my $lib (@('To', 'lib',
-		 < map { File::Spec->catdir("lib",$_)},
-		 qw(gc_sc dt bc hst ea jt lb nt ccc))) {
-  next if -d $lib;
-  mkdir $lib, 0755 or die "mkdir '$lib': $^OS_ERROR";
+                   < map { File::Spec->catdir("lib",$_)},
+                   qw(gc_sc dt bc hst ea jt lb nt ccc))) {
+    next if -d $lib;
+    mkdir $lib, 0755 or die "mkdir '$lib': $^OS_ERROR";
 }
 
 my $LastUnicodeCodepoint = 0x10FFFF; # As of Unicode 3.1.1.
@@ -176,7 +176,7 @@ sub WriteIfChanged($file, $lines) {
 
     my $TextToWrite = join '', $lines;
     if (open my $in, "<", $file) {
-        local($^INPUT_RECORD_SEPARATOR) = undef;
+              local($^INPUT_RECORD_SEPARATOR) = undef;
         my $PreviousText = ~< $in;
         close $in;
         if ($PreviousText eq $TextToWrite) {
@@ -257,53 +257,53 @@ sub Build_Aliases()
     %utf8::PVA_abbr_map = %( () );
 
     open my $pa, "<", "PropertyAliases.txt"
-	or die "Can't open PropertyAliases.txt: $^OS_ERROR";
+        or die "Can't open PropertyAliases.txt: $^OS_ERROR";
     while ( ~< $pa) {
-	s/#.*//;
-	s/\s+$//;
-	next if m/^$/;
+        s/#.*//;
+        s/\s+$//;
+        next if m/^$/;
 
-	my @($abbrev, $name, ...) = split m/\s*;\s*/;
+        my @($abbrev, $name, ...) = split m/\s*;\s*/;
         next if $abbrev eq "n/a";
-	%PropertyAlias{+$abbrev} = $name;
+        %PropertyAlias{+$abbrev} = $name;
         %PA_reverse{+$name} = $abbrev;
 
-	# The %utf8::... versions use japhy's code originally from utf8_pva.pl
-	# However, it's moved here so that we build the tables at runtime.
-	$$_ =~ s/[ _-]//g for @( \$abbrev, \$name);
-	%utf8::PropertyAlias{+lc $abbrev} = $name;
-	%utf8::PA_reverse{+lc $name} = $abbrev;
+        # The %utf8::... versions use japhy's code originally from utf8_pva.pl
+        # However, it's moved here so that we build the tables at runtime.
+        $$_ =~ s/[ _-]//g for @( \$abbrev, \$name);
+        %utf8::PropertyAlias{+lc $abbrev} = $name;
+        %utf8::PA_reverse{+lc $name} = $abbrev;
     }
     close $pa;
 
     open my $pva, "<", "PropValueAliases.txt"
-	or die "Can't open PropValueAliases.txt: $^OS_ERROR";
+        or die "Can't open PropValueAliases.txt: $^OS_ERROR";
     while ( ~< $pva) {
-	s/#.*//;
-	s/\s+$//;
-	next if m/^$/;
+        s/#.*//;
+        s/\s+$//;
+        next if m/^$/;
 
-	my @($prop, @< @data) =  split m/\s*;\s*/;
+        my @($prop, @< @data) =  split m/\s*;\s*/;
 
-	if ($prop eq 'ccc') {
-	    %PropValueAlias{+$prop}->{+@data[1]} = \ @data[[@(0,2)]];
-	    %PVA_reverse{+$prop}->{+@data[2]} = \ @data[[@(0,1)]];
-	}
-	else {
+        if ($prop eq 'ccc') {
+            %PropValueAlias{+$prop}->{+@data[1]} = \ @data[[@(0,2)]];
+            %PVA_reverse{+$prop}->{+@data[2]} = \ @data[[@(0,1)]];
+        }
+        else {
             next if @data[0] eq "n/a";
-	    %PropValueAlias{+$prop}->{+@data[0]} = @data[1];
+            %PropValueAlias{+$prop}->{+@data[0]} = @data[1];
             %PVA_reverse{+$prop}->{+@data[1]} = @data[0];
-	}
+        }
 
-	shift @data if $prop eq 'ccc';
-	next if @data[0] eq "n/a";
+        shift @data if $prop eq 'ccc';
+        next if @data[0] eq "n/a";
 
-	@data[1] =~ s/[ _-]//g;
-	%utf8::PropValueAlias{+$prop}->{+lc @data[0]} = @data[1];
-	%utf8::PVA_reverse{+$prop}->{+lc @data[1]} = @data[0];
+        @data[1] =~ s/[ _-]//g;
+        %utf8::PropValueAlias{+$prop}->{+lc @data[0]} = @data[1];
+        %utf8::PVA_reverse{+$prop}->{+lc @data[1]} = @data[0];
 
-	my $abbr_class = ($prop eq 'gc' or $prop eq 'sc') ?? 'gc_sc' !! $prop;
-	%utf8::PVA_abbr_map{+$abbr_class}->{+lc @data[0]} = @data[0];
+        my $abbr_class = ($prop eq 'gc' or $prop eq 'sc') ?? 'gc_sc' !! $prop;
+        %utf8::PVA_abbr_map{+$abbr_class}->{+lc @data[0]} = @data[0];
     }
     close $pva;
 
@@ -559,16 +559,16 @@ sub Table::Merge
 
     ## sort by range start, with longer ranges coming first.
     my @($first, @< @Rest) =  sort {
-        ($a->[RANGE_START] <+> $b->[RANGE_START])
-          or
-        ($b->[RANGE_END]   <+> $b->[RANGE_END])
-    }, @Records;
+            ($a->[RANGE_START] <+> $b->[RANGE_START])
+                or
+                ($b->[RANGE_END]   <+> $b->[RANGE_END])
+        }, @Records;
 
     my $New = Table->New();
 
     ## Ensuring the first range is there makes the subsequent loop easier
     $New->AppendRange($first->[RANGE_START],
-                      $first->[RANGE_END]);
+        $first->[RANGE_END]);
 
     ## Fold in records so long as they add new information.
     for my $set ( @Rest)
@@ -719,8 +719,8 @@ sub New_Alias($Type, $Alias, $SameAs, $Name, %< %Args)
 
 ## All assigned code points
 my $Assigned = Table->New(Is    => 'Assigned',
-                          Desc  => "All assigned code points",
-                          Fuzzy => 0);
+    Desc  => "All assigned code points",
+    Fuzzy => 0);
 
 my $Name     = Table->New(); ## all characters, individually by name
 my $General  = Table->New(); ## all characters, grouped by category
@@ -732,23 +732,23 @@ my %Cat;
 sub simple_dumper {
     my @lines;
     foreach my $item ( @_) {
-	if (ref $item) {
-	    if (ref $item eq 'ARRAY') {
-		push @lines, '\@('."\n", < simple_dumper (< @$item), "),\n";
-	    } elsif (ref $item eq 'HASH') {
-		push @lines, '\%('."\n", < simple_dumper (< %$item), "),\n";
-	    } else {
-		die "Can't cope with $item";
-	    }
-	} else {
-	    if (defined $item) {
-		my $copy = $item;
-		$copy =~ s/([\'\\])/\\$1/gs;
-		push @lines, "'$copy',\n";
-	    } else {
-		push @lines, "undef,\n";
-	    }
-	}
+        if (ref $item) {
+            if (ref $item eq 'ARRAY') {
+                push @lines, '\@('."\n", < simple_dumper (< @$item), "),\n";
+            } elsif (ref $item eq 'HASH') {
+                push @lines, '\%('."\n", < simple_dumper (< %$item), "),\n";
+            } else {
+                die "Can't cope with $item";
+            }
+        } else {
+            if (defined $item) {
+                my $copy = $item;
+                $copy =~ s/([\'\\])/\\$1/gs;
+                push @lines, "'$copy',\n";
+            } else {
+                push @lines, "undef,\n";
+            }
+        }
     }
     @lines;
 }
@@ -763,8 +763,8 @@ sub UnicodeData_Txt()
     my $Comb     = Table->New();
     my $Number   = Table->New();
     my $Mirrored = Table->New();#Is    => 'Mirrored',
-                              #Desc  => "Mirrored in bidirectional text",
-                              #Fuzzy => 0);
+    #Desc  => "Mirrored in bidirectional text",
+    #Fuzzy => 0);
 
     my %DC;
     my %Bidi;
@@ -775,37 +775,37 @@ sub UnicodeData_Txt()
     ## Initialize Perl-generated categories
     ## (Categories from UnicodeData.txt are auto-initialized in gencat)
     %Cat{+Alnum}  =
-	Table->New(Is => 'Alnum',  Desc => "[[:Alnum:]]",  Fuzzy => 0);
+    Table->New(Is => 'Alnum',  Desc => "[[:Alnum:]]",  Fuzzy => 0);
     %Cat{+Alpha}  =
-	Table->New(Is => 'Alpha',  Desc => "[[:Alpha:]]",  Fuzzy => 0);
+    Table->New(Is => 'Alpha',  Desc => "[[:Alpha:]]",  Fuzzy => 0);
     %Cat{+ASCII}  =
-	Table->New(Is => 'ASCII',  Desc => "[[:ASCII:]]",  Fuzzy => 0);
+    Table->New(Is => 'ASCII',  Desc => "[[:ASCII:]]",  Fuzzy => 0);
     %Cat{+Blank}  =
-	Table->New(Is => 'Blank',  Desc => "[[:Blank:]]",  Fuzzy => 0);
+    Table->New(Is => 'Blank',  Desc => "[[:Blank:]]",  Fuzzy => 0);
     %Cat{+Cntrl}  =
-	Table->New(Is => 'Cntrl',  Desc => "[[:Cntrl:]]",  Fuzzy => 0);
+    Table->New(Is => 'Cntrl',  Desc => "[[:Cntrl:]]",  Fuzzy => 0);
     %Cat{+Digit}  =
-	Table->New(Is => 'Digit',  Desc => "[[:Digit:]]",  Fuzzy => 0);
+    Table->New(Is => 'Digit',  Desc => "[[:Digit:]]",  Fuzzy => 0);
     %Cat{+Graph}  =
-	Table->New(Is => 'Graph',  Desc => "[[:Graph:]]",  Fuzzy => 0);
+    Table->New(Is => 'Graph',  Desc => "[[:Graph:]]",  Fuzzy => 0);
     %Cat{+Lower}  =
-	Table->New(Is => 'Lower',  Desc => "[[:Lower:]]",  Fuzzy => 0);
+    Table->New(Is => 'Lower',  Desc => "[[:Lower:]]",  Fuzzy => 0);
     %Cat{+Print}  =
-	Table->New(Is => 'Print',  Desc => "[[:Print:]]",  Fuzzy => 0);
+    Table->New(Is => 'Print',  Desc => "[[:Print:]]",  Fuzzy => 0);
     %Cat{+Punct}  =
-	Table->New(Is => 'Punct',  Desc => "[[:Punct:]]",  Fuzzy => 0);
+    Table->New(Is => 'Punct',  Desc => "[[:Punct:]]",  Fuzzy => 0);
     %Cat{+Space}  =
-	Table->New(Is => 'Space',  Desc => "[[:Space:]]",  Fuzzy => 0);
+    Table->New(Is => 'Space',  Desc => "[[:Space:]]",  Fuzzy => 0);
     %Cat{+Title}  =
-	Table->New(Is => 'Title',  Desc => "[[:Title:]]",  Fuzzy => 0);
+    Table->New(Is => 'Title',  Desc => "[[:Title:]]",  Fuzzy => 0);
     %Cat{+Upper}  =
-	Table->New(Is => 'Upper',  Desc => "[[:Upper:]]",  Fuzzy => 0);
+    Table->New(Is => 'Upper',  Desc => "[[:Upper:]]",  Fuzzy => 0);
     %Cat{+XDigit} =
-	Table->New(Is => 'XDigit', Desc => "[[:XDigit:]]", Fuzzy => 0);
+    Table->New(Is => 'XDigit', Desc => "[[:XDigit:]]", Fuzzy => 0);
     %Cat{+Word}   =
-	Table->New(Is => 'Word',   Desc => "[[:Word:]]",   Fuzzy => 0);
+    Table->New(Is => 'Word',   Desc => "[[:Word:]]",   Fuzzy => 0);
     %Cat{+SpacePerl} =
-	Table->New(Is => 'SpacePerl', Desc => '\s', Fuzzy => 0);
+    Table->New(Is => 'SpacePerl', Desc => '\s', Fuzzy => 0);
 
     my %To;
     %To{+Upper} = Table->New();
@@ -827,14 +827,14 @@ sub UnicodeData_Txt()
 
         ## add to the sub category (e.g. "Lu", "Nd", "Cf", ..)
         %Cat{+$cat}      ||= Table->New(Is   => $cat,
-                                       Desc => "General Category '$cat'",
-                                       Fuzzy => 0);
+        Desc => "General Category '$cat'",
+            Fuzzy => 0);
         %Cat{?$cat}->?$op($code);
 
         ## add to the major category (e.g. "L", "N", "C", ...)
         %Cat{+$MajorCat} ||= Table->New(Is => $MajorCat,
-                                       Desc => "Major Category '$MajorCat'",
-                                       Fuzzy => 0);
+        Desc => "Major Category '$MajorCat'",
+            Fuzzy => 0);
         %Cat{?$MajorCat}->?$op($code);
 
         (%General{+$name} ||= Table->New)->?$op($code, $name);
@@ -844,31 +844,31 @@ sub UnicodeData_Txt()
         %Cat{?Alnum}->?$op($code) if $cat =~ m/^[LM]|Nd/;
         %Cat{?Alpha}->?$op($code) if $cat =~ m/^[LM]/;
 
-	my $isspace = 
-	    ($cat =~ m/Zs|Zl|Zp/ &&
-	     $code != 0x200B) # 200B is ZWSP which is for line break control
-	     # and therefore it is not part of "space" even while it is "Zs".
-                                || $code == 0x0009  # 0009: HORIZONTAL TAB
-                                || $code == 0x000A  # 000A: LINE FEED
-                                || $code == 0x000B  # 000B: VERTICAL TAB
-                                || $code == 0x000C  # 000C: FORM FEED
-                                || $code == 0x000D  # 000D: CARRIAGE RETURN
-                                || $code == 0x0085  # 0085: NEL
+        my $isspace = 
+            ($cat =~ m/Zs|Zl|Zp/ &&
+      $code != 0x200B) # 200B is ZWSP which is for line break control
+            # and therefore it is not part of "space" even while it is "Zs".
+            || $code == 0x0009  # 0009: HORIZONTAL TAB
+            || $code == 0x000A  # 000A: LINE FEED
+            || $code == 0x000B  # 000B: VERTICAL TAB
+            || $code == 0x000C  # 000C: FORM FEED
+            || $code == 0x000D  # 000D: CARRIAGE RETURN
+            || $code == 0x0085  # 0085: NEL
 
-	    ;
+        ;
 
-        %Cat{?Space}->?$op($code) if $isspace;
+            %Cat{?Space}->?$op($code) if $isspace;
 
         %Cat{?SpacePerl}->?$op($code) if $isspace
-	                               && $code != 0x000B; # Backward compat.
+        && $code != 0x000B; # Backward compat.
 
         %Cat{?Blank}->?$op($code) if $isspace
-                                && !($code == 0x000A ||
-				     $code == 0x000B ||
-				     $code == 0x000C ||
-				     $code == 0x000D ||
-				     $code == 0x0085 ||
-				     $cat =~ m/^Z[lp]/);
+        && !($code == 0x000A ||
+                                     $code == 0x000B ||
+                                     $code == 0x000C ||
+                                     $code == 0x000D ||
+                                     $code == 0x0085 ||
+                                     $cat =~ m/^Z[lp]/);
 
         %Cat{?Digit}->?$op($code) if $cat eq "Nd";
         %Cat{?Upper}->?$op($code) if $cat eq "Lu";
@@ -876,14 +876,14 @@ sub UnicodeData_Txt()
         %Cat{?Title}->?$op($code) if $cat eq "Lt";
         %Cat{?ASCII}->?$op($code) if $code +<= 0x007F;
         %Cat{?Cntrl}->?$op($code) if $cat =~ m/^C/;
-	my $isgraph = !$isspace && $cat !~ m/Cc|Cs|Cn/;
+        my $isgraph = !$isspace && $cat !~ m/Cc|Cs|Cn/;
         %Cat{?Graph}->?$op($code) if $isgraph;
         %Cat{?Print}->?$op($code) if $isgraph || $isspace;
         %Cat{?Punct}->?$op($code) if $cat =~ m/^P/;
 
         %Cat{?XDigit}->?$op($code) if ($code +>= 0x30 && $code +<= 0x39)  ## 0..9
-                                 || ($code +>= 0x41 && $code +<= 0x46)  ## A..F
-                                 || ($code +>= 0x61 && $code +<= 0x66); ## a..f
+        || ($code +>= 0x41 && $code +<= 0x46)  ## A..F
+            || ($code +>= 0x61 && $code +<= 0x66); ## a..f
     }
 
     ## open ane read file.....
@@ -898,12 +898,12 @@ sub UnicodeData_Txt()
     my %_Above_HexCodes; ## Hexcodes for chars with $comb == 230 ("ABOVE")
 
     my %CodeToDeco;      ## Maps code to decomp. list for chars with first
-                         ## decomp. char an "i" or "j" (for \p{_CanonDCIJ})
+    ## decomp. char an "i" or "j" (for \p{_CanonDCIJ})
 
     ## This is filled in as we go....
     my $CombAbove = Table->New(Is   => '_CombAbove',
-                               Desc  => '(for internal casefolding use)',
-                               Fuzzy => 0);
+        Desc  => '(for internal casefolding use)',
+        Fuzzy => 0);
 
     while ( ~< $in)
     {
@@ -911,26 +911,26 @@ sub UnicodeData_Txt()
         s/\s+$//;
 
         my @($hexcode,   ## code point in hex (e.g. "0041")
-            $name,      ## character name (e.g. "LATIN CAPITAL LETTER A")
-            $cat,       ## category (e.g. "Lu")
-            $comb,      ## Canonical combining class (e.t. "230")
-            $bidi,      ## directional category (e.g. "L")
-            $deco,      ## decomposition mapping
-            $decimal,   ## decimal digit value
-            $digit,     ## digit value
-            $number,    ## numeric value
-            $mirrored,  ## mirrored
-            ?$unicode10, ## name in Unicode 1.0
-            ?$comment,   ## comment field
-            ?$upper,     ## uppercase mapping
-            ?$lower,     ## lowercase mapping
-            ?$title,     ## titlecase mapping
-              ) =  split(m/\s*;\s*/);
+             $name,      ## character name (e.g. "LATIN CAPITAL LETTER A")
+             $cat,       ## category (e.g. "Lu")
+             $comb,      ## Canonical combining class (e.t. "230")
+             $bidi,      ## directional category (e.g. "L")
+             $deco,      ## decomposition mapping
+             $decimal,   ## decimal digit value
+             $digit,     ## digit value
+             $number,    ## numeric value
+             $mirrored,  ## mirrored
+             ?$unicode10, ## name in Unicode 1.0
+             ?$comment,   ## comment field
+             ?$upper,     ## uppercase mapping
+             ?$lower,     ## lowercase mapping
+             ?$title,     ## titlecase mapping
+            ) =  split(m/\s*;\s*/);
 
-	# Note that in Unicode 3.2 there will be names like
-	# LINE FEED (LF), which probably means that \N{} needs
-	# to cope also with LINE FEED and LF.
-	$name = $unicode10 if $name eq '<control>' && $unicode10 ne '';
+        # Note that in Unicode 3.2 there will be names like
+        # LINE FEED (LF), which probably means that \N{} needs
+        # to cope also with LINE FEED and LF.
+        $name = $unicode10 if $name eq '<control>' && $unicode10 ne '';
 
         my $code = hex($hexcode);
 
@@ -954,7 +954,7 @@ sub UnicodeData_Txt()
         {
             $name = $1;
             gencat($name, $cat, $code, $2 eq 'First' ?? 'Append' !! 'Extend');
-            #New_Prop(In => $name, $General{$name}, Fuzzy => 1);
+        #New_Prop(In => $name, $General{$name}, Fuzzy => 1);
         }
         else
         {
@@ -971,17 +971,17 @@ sub UnicodeData_Txt()
             $Comb->Append($code, $comb) if $comb;
             $Number->Append($code, $number) if length $number;
 
-	    length($decimal) and (%Number{+De} ||= Table->New())->Append($code)
-	      or
-	    length($digit)   and (%Number{+Di} ||= Table->New())->Append($code)
-	      or
-	    length($number)  and (%Number{+Nu} ||= Table->New())->Append($code);
+            length($decimal) and (%Number{+De} ||= Table->New())->Append($code)
+                or
+                length($digit)   and (%Number{+Di} ||= Table->New())->Append($code)
+                or
+                length($number)  and (%Number{+Nu} ||= Table->New())->Append($code);
 
             $Mirrored->Append($code) if $mirrored eq "Y";
 
             %Bidi{+$bidi} ||= Table->New();#Is    => "bt/$bidi",
-                                        #Desc  => "Bi-directional category '$bidi'",
-                                        #Fuzzy => 0);
+            #Desc  => "Bi-directional category '$bidi'",
+            #Fuzzy => 0);
             %Bidi{?$bidi}->Append($code);
 
             if ($deco)
@@ -989,7 +989,7 @@ sub UnicodeData_Txt()
                 $Deco->Append($code, $deco);
                 if ($deco =~m/^<(\w+)>/)
                 {
-		    my $dshort = %PVA_reverse{dt}->{?ucfirst lc $1};
+                    my $dshort = %PVA_reverse{dt}->{?ucfirst lc $1};
                     %DC{?com}->Append($code);
 
                     %DC{+$dshort} ||= Table->New();
@@ -1010,9 +1010,9 @@ sub UnicodeData_Txt()
 
     %Cat{+Cn} = $Assigned->Invert; ## Cn is everything that doesn't exist
     New_Prop(Is => 'Cn',
-             %Cat{?Cn},
-             Desc => "General Category 'Cn' [not functional in Perl]",
-             Fuzzy => 0);
+        %Cat{?Cn},
+        Desc => "General Category 'Cn' [not functional in Perl]",
+        Fuzzy => 0);
 
     ## Unassigned is the same as 'Cn'
     New_Alias(Is => 'Unassigned', SameAs => 'Cn', Fuzzy => 0);
@@ -1023,15 +1023,15 @@ sub UnicodeData_Txt()
     # LC is Ll, Lu, and Lt.
     # (used to be L& or L_, but PropValueAliases.txt defines it as LC)
     New_Prop(Is => 'LC',
-             Table->Merge( <%Cat{[qw[Ll Lu Lt]]}),
-             Desc  => '[\p{Ll}\p{Lu}\p{Lt}]',
-             Fuzzy => 0);
+        Table->Merge( <%Cat{[qw[Ll Lu Lt]]}),
+        Desc  => '[\p{Ll}\p{Lu}\p{Lt}]',
+        Fuzzy => 0);
 
     ## Any and All are all code points.
     my $Any = Table->New(Is    => 'Any',
-                         Desc  => sprintf("[\\x\{0000\}-\\x\{\%X\}]",
-                                          $LastUnicodeCodepoint),
-                         Fuzzy => 0);
+        Desc  => sprintf("[\\x\{0000\}-\\x\{\%X\}]",
+        $LastUnicodeCodepoint),
+        Fuzzy => 0);
     $Any->RawAppendRange(0, $LastUnicodeCodepoint);
 
     New_Alias(Is => 'All', SameAs => 'Any', Fuzzy => 0);
@@ -1046,17 +1046,17 @@ sub UnicodeData_Txt()
 
     ## \p{_CaseIgnorable} is [\p{Mn}\0x00AD\x2010]
     New_Prop(Is => '_CaseIgnorable',
-             Table->Merge(%Cat{?Mn},
-                          0x00AD,    #SOFT HYPHEN
-                          0x2010),   #HYPHEN
-             Desc  => '(for internal casefolding use)',
-             Fuzzy => 0);
+        Table->Merge(%Cat{?Mn},
+        0x00AD,    #SOFT HYPHEN
+        0x2010),   #HYPHEN
+        Desc  => '(for internal casefolding use)',
+        Fuzzy => 0);
 
 
     ## \p{_CanonDCIJ} is fairly complex...
     my $CanonCDIJ = Table->New(Is    => '_CanonDCIJ',
-                               Desc  => '(for internal casefolding use)',
-                               Fuzzy => 0);
+        Desc  => '(for internal casefolding use)',
+        Fuzzy => 0);
     ## It contains the ASCII 'i' and 'j'....
     $CanonCDIJ->Append(0x0069); # ASCII ord("i")
     $CanonCDIJ->Append(0x006A); # ASCII ord("j")
@@ -1090,50 +1090,50 @@ sub UnicodeData_Txt()
     $Name->Write("Name.pl");
 
     do {
-	my @PVA = @( $HEADER );
-	foreach my $name (qw (PropertyAlias PA_reverse PropValueAlias
+        my @PVA = @( $HEADER );
+        foreach my $name (qw (PropertyAlias PA_reverse PropValueAlias
 			      PVA_reverse PVA_abbr_map)) {
-	    # Should I really jump through typeglob hoops just to avoid a
-	    # symbolic reference? (%{"utf8::$name})
-	    push @PVA, "\n", "\%utf8::$name = \%(\n", <
-		simple_dumper (< %{%utf8::{$name}}), ");\n";
-	}
-	push @PVA, "1;\n";
-	WriteIfChanged("PVA.pl", @PVA);
+            # Should I really jump through typeglob hoops just to avoid a
+            # symbolic reference? (%{"utf8::$name})
+            push @PVA, "\n", "\%utf8::$name = \%(\n", <
+                simple_dumper (< %{%utf8::{$name}}), ");\n";
+        }
+        push @PVA, "1;\n";
+        WriteIfChanged("PVA.pl", @PVA);
     };
 
     # $Bidi->Write("Bidirectional.pl");
     for (keys %Bidi) {
-	%Bidi{?$_}->Write(
-	    \@("lib","bc","$_.pl"),
-	    "BidiClass category '%PropValueAlias{bc}->{?$_}'"
-	);
+            %Bidi{?$_}->Write(
+            \@("lib","bc","$_.pl"),
+            "BidiClass category '%PropValueAlias{bc}->{?$_}'"
+        );
     }
 
     $Comb->Write("CombiningClass.pl");
     for (keys %{ %PropValueAlias{?ccc} }) {
-	my @($code, $name) =  @{ %PropValueAlias{ccc}->{?$_} };
-	(my $c = Table->New())->Append($code);
-	$c->Write(
-	    \@("lib","ccc","$_.pl"),
-	    "CombiningClass category '$name'"
-	);
+        my @($code, $name) =  @{ %PropValueAlias{ccc}->{?$_} };
+        (my $c = Table->New())->Append($code);
+            $c->Write(
+            \@("lib","ccc","$_.pl"),
+            "CombiningClass category '$name'"
+        );
     }
 
     $Deco->Write("Decomposition.pl");
     for (keys %DC) {
-	%DC{?$_}->Write(
-	    \@("lib","dt","$_.pl"),
-	    "DecompositionType category '%PropValueAlias{dt}->{?$_}'"
-	);
+            %DC{?$_}->Write(
+            \@("lib","dt","$_.pl"),
+            "DecompositionType category '%PropValueAlias{dt}->{?$_}'"
+        );
     }
 
     # $Number->Write("Number.pl");
     for (keys %Number) {
-	%Number{?$_}->Write(
-	    \@("lib","nt","$_.pl"),
-	    "NumericType category '%PropValueAlias{nt}->{?$_}'"
-	);
+            %Number{?$_}->Write(
+            \@("lib","nt","$_.pl"),
+            "NumericType category '%PropValueAlias{nt}->{?$_}'"
+        );
     }
 
     # $General->Write("Category.pl");
@@ -1143,7 +1143,7 @@ sub UnicodeData_Txt()
     }
 
     for (keys %{ %PropValueAlias{?gc} }) {
-	New_Alias(Is => %PropValueAlias{gc}->{?$_}, SameAs => $_, Fuzzy => 1);
+        New_Alias(Is => %PropValueAlias{gc}->{?$_}, SameAs => $_, Fuzzy => 1);
     }
 }
 
@@ -1164,17 +1164,17 @@ sub LineBreak_Txt()
     {
         next unless m/^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(\w+)/;
 
-	my @($first, $last, $lbrk) = @(hex($1), hex($2||""), $3);
+        my @($first, $last, $lbrk) = @(hex($1), hex($2||""), $3);
 
-	$Lbrk->Append($first, $lbrk);
+        $Lbrk->Append($first, $lbrk);
 
         %Lbrk{+$lbrk} ||= Table->New();
         %Lbrk{?$lbrk}->Append($first);
 
-	if ($last) {
-	    $Lbrk->Extend($last);
-	    %Lbrk{?$lbrk}->Extend($last);
-	}
+        if ($last) {
+            $Lbrk->Extend($last);
+            %Lbrk{?$lbrk}->Extend($last);
+        }
     }
     close $in;
 
@@ -1182,10 +1182,10 @@ sub LineBreak_Txt()
 
 
     for (keys %Lbrk) {
-	%Lbrk{?$_}->Write(
-	    \@("lib","lb","$_.pl"),
-	    "Linebreak category '%PropValueAlias{lb}->{?$_}'"
-	);
+            %Lbrk{?$_}->Write(
+            \@("lib","lb","$_.pl"),
+            "Linebreak category '%PropValueAlias{lb}->{?$_}'"
+        );
     }
 }
 
@@ -1206,13 +1206,13 @@ sub ArabicShaping_txt()
 
     while ( ~< *$in)
     {
-	next unless m/^[0-9A-Fa-f]+;/;
-	s/\s+$//;
+        next unless m/^[0-9A-Fa-f]+;/;
+        s/\s+$//;
 
-	my @($hexcode, $name, $link, $linkgroup) =  split(m/\s*;\s*/);
+        my @($hexcode, $name, $link, $linkgroup) =  split(m/\s*;\s*/);
         my $code = hex($hexcode);
-	$ArabLink->Append($code, $link);
-	$ArabLinkGroup->Append($code, $linkgroup);
+        $ArabLink->Append($code, $link);
+        $ArabLinkGroup->Append($code, $linkgroup);
 
         %JoinType{+$link} ||= Table->New(Is => "JoinType$link");
         %JoinType{?$link}->Append($code);
@@ -1224,10 +1224,10 @@ sub ArabicShaping_txt()
 
 
     for (keys %JoinType) {
-	%JoinType{?$_}->Write(
-	    \@("lib","jt","$_.pl"),
-	    "JoiningType category '%PropValueAlias{jt}->{?$_}'"
-	);
+            %JoinType{?$_}->Write(
+            \@("lib","jt","$_.pl"),
+            "JoiningType category '%PropValueAlias{jt}->{?$_}'"
+        );
     }
 }
 
@@ -1245,27 +1245,27 @@ sub EastAsianWidth_txt()
 
     while ( ~< *$in)
     {
-	next unless m/^[0-9A-Fa-f]+(\.\.[0-9A-Fa-f]+)?;/;
-	s/#.*//;
-	s/\s+$//;
+        next unless m/^[0-9A-Fa-f]+(\.\.[0-9A-Fa-f]+)?;/;
+        s/#.*//;
+        s/\s+$//;
 
-	my @($hexcodes, $pv) =  split(m/\s*;\s*/);
+        my @($hexcodes, $pv) =  split(m/\s*;\s*/);
         %EAW{+$pv} ||= Table->New(Is => "EastAsianWidth$pv");
-      my @($start, ?$end) =  split(m/\.\./, $hexcodes);
-      if (defined $end) {
-        %EAW{?$pv}->AppendRange(hex($start), hex($end));
-      } else {
-        %EAW{?$pv}->Append(hex($start));
-      }
+        my @($start, ?$end) =  split(m/\.\./, $hexcodes);
+        if (defined $end) {
+            %EAW{?$pv}->AppendRange(hex($start), hex($end));
+        } else {
+            %EAW{?$pv}->Append(hex($start));
+        }
     }
     close $in;
 
 
     for (keys %EAW) {
-	%EAW{?$_}->Write(
-	    \@("lib","ea","$_.pl"),
-	    "EastAsianWidth category '%PropValueAlias{ea}->{?$_}'"
-	);
+            %EAW{?$_}->Write(
+            \@("lib","ea","$_.pl"),
+            "EastAsianWidth category '%PropValueAlias{ea}->{?$_}'"
+        );
     }
 }
 
@@ -1284,20 +1284,20 @@ sub HangulSyllableType_txt()
     while ( ~< *$in)
     {
         next unless m/^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(\w+)/;
-	my @($first, $last, $pv) = @(hex($1), hex($2||""), $3);
+        my @($first, $last, $pv) = @(hex($1), hex($2||""), $3);
 
         %HST{+$pv} ||= Table->New(Is => "HangulSyllableType$pv");
         %HST{?$pv}->Append($first);
 
-	if ($last) { %HST{?$pv}->Extend($last) }
+        if ($last) { %HST{?$pv}->Extend($last) }
     }
     close $in;
 
     for (keys %HST) {
-	%HST{?$_}->Write(
-	    \@("lib","hst","$_.pl"),
-	    "HangulSyllableType category '%PropValueAlias{hst}->{?$_}'"
-	);
+            %HST{?$_}->Write(
+            \@("lib","hst","$_.pl"),
+            "HangulSyllableType category '%PropValueAlias{hst}->{?$_}'"
+        );
     }
 }
 
@@ -1314,13 +1314,13 @@ sub Jamo_txt()
 
     while ( ~< *$in)
     {
-	next unless m/^([0-9A-Fa-f]+)\s*;\s*(\w*)/;
-	my @($code, $short) = @(hex($1), $2);
+        next unless m/^([0-9A-Fa-f]+)\s*;\s*(\w*)/;
+        my @($code, $short) = @(hex($1), $2);
 
-	$Short->Append($code, $short);
+        $Short->Append($code, $short);
     }
     close $in;
-    # $Short->Write("JamoShort.pl");
+# $Short->Write("JamoShort.pl");
 }
 
 ##
@@ -1354,8 +1354,8 @@ sub Scripts_txt()
         $Scripts->Append($first, $name);
 
         %Script{+$name} ||= Table->New(Is    => $name,
-                                      Desc  => "Script '$name'",
-                                      Fuzzy => 1);
+        Desc  => "Script '$name'",
+            Fuzzy => 1);
         %Script{?$name}->Append($first, $name);
 
         if ($last) {
@@ -1371,9 +1371,9 @@ sub Scripts_txt()
     ##    ***shouldn't this be intersected with \p{Assigned}? ******
     ##
     New_Prop(Is => 'Common',
-             $Scripts->Invert,
-             Desc  => 'Pseudo-Script of codepoints not in other Unicode scripts',
-             Fuzzy => 1);
+        $Scripts->Invert,
+        Desc  => 'Pseudo-Script of codepoints not in other Unicode scripts',
+        Fuzzy => 1);
 }
 
 ##
@@ -1407,25 +1407,25 @@ sub Blocks_txt()
     while ( ~< $in)
     {
         #next if not /Private Use$/;
-	next if not m/^([0-9A-Fa-f]+)\.\.([0-9A-Fa-f]+)\s*;\s*(.+?)\s*$/;
+        next if not m/^([0-9A-Fa-f]+)\.\.([0-9A-Fa-f]+)\s*;\s*(.+?)\s*$/;
 
-	my @($first, $last, $name) = @(hex($1), hex($2), $3);
+        my @($first, $last, $name) = @(hex($1), hex($2), $3);
 
-	$Blocks->Append($first, $name);
+        $Blocks->Append($first, $name);
 
         %Blocks{+$name} ||= Table->New(In    => $name,
-                                      Desc  => "Block '$name'",
-                                      Fuzzy => 1);
+        Desc  => "Block '$name'",
+            Fuzzy => 1);
         %Blocks{?$name}->Append($first, $name);
 
-	if ($last and $last != $first) {
-	    $Blocks->Extend($last);
-	    %Blocks{?$name}->Extend($last);
-	}
+        if ($last and $last != $first) {
+            $Blocks->Extend($last);
+            %Blocks{?$name}->Extend($last);
+        }
     }
     close $in;
 
-    # $Blocks->Write("Blocks.pl");
+# $Blocks->Write("Blocks.pl");
 }
 
 ##
@@ -1446,11 +1446,11 @@ sub PropList_txt()
 
     while ( ~< $in)
     {
-	next unless m/^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(.+?)\s*\#/;
+        next unless m/^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(.+?)\s*\#/;
 
-	# Wait until all the extended properties have been read since
-	# they are not listed in numeric order.
-	push @PropInfo, \@( hex($1), hex($2||""), $3 );
+        # Wait until all the extended properties have been read since
+        # they are not listed in numeric order.
+        push @PropInfo, \@( hex($1), hex($2||""), $3 );
     }
     close $in;
 
@@ -1464,8 +1464,8 @@ sub PropList_txt()
         $Props->Append($first, $name);
 
         %Prop{+$name} ||= Table->New(Is    => $name,
-                                    Desc  => "Extended property '$name'",
-                                    Fuzzy => 1);
+        Desc  => "Extended property '$name'",
+            Fuzzy => 1);
         %Prop{?$name}->Append($first, $name);
 
         if ($last) {
@@ -1475,51 +1475,51 @@ sub PropList_txt()
     }
 
     for (keys %Prop) {
-	(my $file = %PA_reverse{?$_}) =~ s/_//g;
-	# XXX I'm assuming that the names from %Prop don't suffer 8.3 clashes.
-	%BaseNames{+lc $file}++;
-	%Prop{?$_}->Write(
-	    \@("lib","gc_sc","$file.pl"),
-	    "Binary property '$_'"
-	);
+        (my $file = %PA_reverse{?$_}) =~ s/_//g;
+        # XXX I'm assuming that the names from %Prop don't suffer 8.3 clashes.
+        %BaseNames{+lc $file}++;
+            %Prop{?$_}->Write(
+            \@("lib","gc_sc","$file.pl"),
+            "Binary property '$_'"
+        );
     }
 
     # Alphabetic is L, Nl, and Other_Alphabetic.
     New_Prop(Is    => 'Alphabetic',
-             Table->Merge(%Cat{?L}, %Cat{?Nl}, %Prop{Other_Alphabetic}),
-             Desc  => '[\p{L}\p{Nl}\p{OtherAlphabetic}]', # canonical names
-             Fuzzy => 1);
+        Table->Merge(%Cat{?L}, %Cat{?Nl}, %Prop{Other_Alphabetic}),
+        Desc  => '[\p{L}\p{Nl}\p{OtherAlphabetic}]', # canonical names
+        Fuzzy => 1);
 
     # Lowercase is Ll and Other_Lowercase.
     New_Prop(Is    => 'Lowercase',
-             Table->Merge(%Cat{?Ll}, %Prop{Other_Lowercase}),
-             Desc  => '[\p{Ll}\p{OtherLowercase}]', # canonical names
-             Fuzzy => 1);
+        Table->Merge(%Cat{?Ll}, %Prop{Other_Lowercase}),
+        Desc  => '[\p{Ll}\p{OtherLowercase}]', # canonical names
+        Fuzzy => 1);
 
     # Uppercase is Lu and Other_Uppercase.
     New_Prop(Is => 'Uppercase',
-             Table->Merge(%Cat{?Lu}, %Prop{Other_Uppercase}),
-             Desc  => '[\p{Lu}\p{OtherUppercase}]', # canonical names
-             Fuzzy => 1);
+        Table->Merge(%Cat{?Lu}, %Prop{Other_Uppercase}),
+        Desc  => '[\p{Lu}\p{OtherUppercase}]', # canonical names
+        Fuzzy => 1);
 
     # Math is Sm and Other_Math.
     New_Prop(Is => 'Math',
-             Table->Merge(%Cat{?Sm}, %Prop{Other_Math}),
-             Desc  => '[\p{Sm}\p{OtherMath}]', # canonical names
-             Fuzzy => 1);
+        Table->Merge(%Cat{?Sm}, %Prop{Other_Math}),
+        Desc  => '[\p{Sm}\p{OtherMath}]', # canonical names
+        Fuzzy => 1);
 
     # ID_Start is Ll, Lu, Lt, Lm, Lo, Nl, and Other_ID_Start.
     New_Prop(Is => 'ID_Start',
-             Table->Merge( <%Cat{[qw[Ll Lu Lt Lm Lo Nl]]}, %Prop{Other_ID_Start}),
-             Desc  => '[\p{Ll}\p{Lu}\p{Lt}\p{Lm}\p{Lo}\p{Nl}\p{OtherIDStart}]',
-             Fuzzy => 1);
+        Table->Merge( <%Cat{[qw[Ll Lu Lt Lm Lo Nl]]}, %Prop{Other_ID_Start}),
+        Desc  => '[\p{Ll}\p{Lu}\p{Lt}\p{Lm}\p{Lo}\p{Nl}\p{OtherIDStart}]',
+        Fuzzy => 1);
 
     # ID_Continue is ID_Start, Mn, Mc, Nd, Pc, and Other_ID_Continue.
     New_Prop(Is => 'ID_Continue',
-             Table->Merge( <%Cat{[qw[Ll Lu Lt Lm Lo Nl Mn Mc Nd Pc ]]}, <
-                          %Prop{[qw[Other_ID_Start Other_ID_Continue]]}),
-             Desc  => '[\p{ID_Start}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{OtherIDContinue}]',
-             Fuzzy => 1);
+        Table->Merge( <%Cat{[qw[Ll Lu Lt Lm Lo Nl Mn Mc Nd Pc ]]}, <
+            %Prop{[qw[Other_ID_Start Other_ID_Continue]]}),
+        Desc  => '[\p{ID_Start}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{OtherIDContinue}]',
+        Fuzzy => 1);
 
     # Default_Ignorable_Code_Point = Other_Default_Ignorable_Code_Point
     #                     + Cf + Cc + Cs + Noncharacter + Variation_Selector
@@ -1529,17 +1529,17 @@ sub PropList_txt()
     $Annotation->RawAppendRange(0xFFF9, 0xFFFB);
 
     New_Prop(Is => 'Default_Ignorable_Code_Point',
-             Table->Merge( <%Cat{[qw[Cf Cc Cs]]},
-                          %Prop{?Noncharacter_Code_Point},
-                          %Prop{?Variation_Selector},
-                          %Prop{Other_Default_Ignorable_Code_Point})
-                  ->Invert
-                  ->Merge(%Prop{?White_Space}, $Annotation)
-                  ->Invert,
-             Desc  => '(?![\p{WhiteSpace}\x{FFF9}-\x{FFFB}])[\p{Cf}\p{Cc}'.
-                      '\p{Cs}\p{NoncharacterCodePoint}\p{VariationSelector}'.
-                      '\p{OtherDefaultIgnorableCodePoint}]',
-             Fuzzy => 1);
+        Table->Merge( <%Cat{[qw[Cf Cc Cs]]},
+        %Prop{?Noncharacter_Code_Point},
+        %Prop{?Variation_Selector},
+        %Prop{Other_Default_Ignorable_Code_Point})
+        ->Invert
+        ->Merge(%Prop{?White_Space}, $Annotation)
+        ->Invert,
+        Desc  => '(?![\p{WhiteSpace}\x{FFF9}-\x{FFFB}])[\p{Cf}\p{Cc}'.
+        '\p{Cs}\p{NoncharacterCodePoint}\p{VariationSelector}'.
+        '\p{OtherDefaultIgnorableCodePoint}]',
+        Fuzzy => 1);
 
 }
 
@@ -1586,13 +1586,13 @@ my @GoodSeps = @(
                 "",
                 "",
                 "_",
-               );
+    );
 my @BadSeps = @(
                "--",
                "__",
                " _",
                "/"
-              );
+    );
 
 ## This used only for making the test script
 sub RandomlyFuzzifyName($Name, ?$WantError)
@@ -1654,10 +1654,10 @@ sub MakePropTestScript()
     {
         my $Orig  = %CanonicalToOrig{?$Name};
         my %Names = %(
-                     $Name => 1,
-                     $Orig => 1, <
-                     RandomlyFuzzifyName($Orig) => 1
-                    );
+                $Name => 1,
+                    $Orig => 1, <
+                    RandomlyFuzzifyName($Orig) => 1
+            );
 
         for my $N (keys %Names) {
             GenTests(*OUT, $N, $Table->ValidCode, $Table->InvalidCode);
@@ -1750,8 +1750,8 @@ sub WriteAllMappings()
             do {
                 ## 'Is' items lose 'Is' from the basename.
                 $filename = $Type eq 'Is' ??
-		    (%PVA_reverse{sc}->{?$Name} || $Name) !!
-		    "$Type$Name";
+                    (%PVA_reverse{sc}->{?$Name} || $Name) !!
+                    "$Type$Name";
 
                 $filename =~ s/[^\w_]+/_/g; # "L&" -> "L_"
                 substr($filename, 8, undef, '') if length($filename) +> 8;
@@ -1768,7 +1768,7 @@ sub WriteAllMappings()
                 while (my $num = %BaseNames{+lc $filename}++)
                 {
                     $num++; ## so basenames with numbers start with '2', which
-                            ## just looks more natural.
+                    ## just looks more natural.
                     ## Want to append $num, but if it'll make the basename longer
                     ## than 8 characters, pre-truncate $filename so that the result
                     ## is acceptable.
@@ -1814,7 +1814,7 @@ sub WriteAllMappings()
                     my $MyDesc = ($N eq $Name) ?? $Desc !! "Alias for $OrigProp ($Desc)";
 
                     push @MAP, sprintf("\%s \%-42s \%s\n",
-                                       $IsFuzzy ?? '*' !! ' ', $Prop, $MyDesc);
+                        $IsFuzzy ?? '*' !! ' ', $Prop, $MyDesc);
                 }
                 if ($Desc) {
                     $Comment .= "\nMeaning: $Desc\n";
@@ -1875,7 +1875,7 @@ sub WriteAllMappings()
                    "## '*' means name may be 'fuzzy'\n",
                    "##\n\n", <
                    sort { substr($a,2) cmp substr($b, 2) }, @( < @MAP,)
-                  );
+            );
         WriteIfChanged('Properties', @OUT);
     };
 
@@ -1890,9 +1890,9 @@ sub WriteAllMappings()
                    "##\n\n",
                    "## Mapping from name to filename in ./lib/gc_sc\n",
                    "\%utf8::Exact = \%(\n",
-                  );
+            );
 
-	%Exact{+InGreek} = 'InGreekA';  # this is evil kludge
+        %Exact{+InGreek} = 'InGreekA';  # this is evil kludge
         for my $Name (sort keys %Exact)
         {
             my $File = %Exact{?$Name};
@@ -1914,7 +1914,7 @@ sub WriteAllMappings()
                    "##\n\n",
                    "## Mapping from lc(canonical name) to filename in ./lib\n",
                    "\%utf8::Canonical = \%(\n",
-                  );
+            );
         my $Trail = ""; ## used just to keep the spacing pretty
         for my $Name (sort keys %Canonical)
         {
@@ -1966,11 +1966,11 @@ sub SpecialCasing_txt()
         # they are not listed in numeric order.
         my $ix = hex($code);
         push @{%CaseInfo{+Lower}}, \@( $ix, $code, $lower )
-	    unless $code eq $lower;
+            unless $code eq $lower;
         push @{%CaseInfo{+Title}}, \@( $ix, $code, $title )
-	    unless $code eq $title;
+            unless $code eq $title;
         push @{%CaseInfo{+Upper}}, \@( $ix, $code, $upper )
-	    unless $code eq $upper;
+            unless $code eq $upper;
     }
     close $in;
 
@@ -1982,21 +1982,21 @@ sub SpecialCasing_txt()
         my $NormalCase = do "To/$case.pl" || die "$^PROGRAM_NAME: $^EVAL_ERROR\n";
 
         my @OUT =
-	    @(
-	     $HEADER, "\n",
-	     "# The key UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
-	     "\%utf8::ToSpec$case =\n\%(\n",
-	    );
+            @(
+      $HEADER, "\n",
+      "# The key UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
+      "\%utf8::ToSpec$case =\n\%(\n",
+            );
 
         for my $prop (sort { $a->[0] <+> $b->[0] }, @{%CaseInfo{?$case}}) {
             my @($ix, $code, $to) =  @$prop;
             my $tostr =
-              join "", map { sprintf "\\x\{\%s\}", $_ }, split ' ', $to;
+                join "", map { sprintf "\\x\{\%s\}", $_ }, split ' ', $to;
             push @OUT, sprintf qq["\%s" => "$tostr",\n], join("", map { sprintf "\\x[\%02X]", $_ }, @( unpack("U0C*", pack("U", $ix))));
-	    # Remove any single-character mappings for
-	    # the same character since we are going for
-	    # the special casing rules.
-	    $NormalCase =~ s/^$code\t\t\w+\n//m;
+            # Remove any single-character mappings for
+            # the same character since we are going for
+            # the special casing rules.
+            $NormalCase =~ s/^$code\t\t\w+\n//m;
         }
         push @OUT, (
                     ");\n\n",
@@ -2017,24 +2017,24 @@ sub CaseFolding_txt()
 {
     my $in;
     if (not open $in, "<", "CaseFolding.txt") {
-	die "$^PROGRAM_NAME: CaseFolding.txt: $^OS_ERROR\n";
+        die "$^PROGRAM_NAME: CaseFolding.txt: $^OS_ERROR\n";
     }
 
     my $Fold = Table->New();
     my %Fold;
 
     while ( ~< $in) {
-	# Skip status 'S', simple case folding
-	next unless m/^([0-9A-Fa-f]+)\s*;\s*([CFI])\s*;\s*([0-9A-Fa-f]+(?: [0-9A-Fa-f]+)*)\s*;/;
+        # Skip status 'S', simple case folding
+        next unless m/^([0-9A-Fa-f]+)\s*;\s*([CFI])\s*;\s*([0-9A-Fa-f]+(?: [0-9A-Fa-f]+)*)\s*;/;
 
-	my @($code, $status, $fold) = @(hex($1), $2, $3);
+        my @($code, $status, $fold) = @(hex($1), $2, $3);
 
-	if ($status eq 'C') { # Common: one-to-one folding
-	    # No append() since several codes may fold into one.
-	    $Fold->RawAppendRange($code, $code, $fold);
-	} else { # F: full, or I: dotted uppercase I -> dotless lowercase I
-	    %Fold{+$code} = $fold;
-	}
+        if ($status eq 'C') { # Common: one-to-one folding
+            # No append() since several codes may fold into one.
+            $Fold->RawAppendRange($code, $code, $fold);
+        } else { # F: full, or I: dotted uppercase I -> dotless lowercase I
+            %Fold{+$code} = $fold;
+        }
     }
     close $in;
 
@@ -2046,14 +2046,14 @@ sub CaseFolding_txt()
     my $CommonFold = do "To/Fold.pl" || die "$^PROGRAM_NAME: To/Fold.pl: $^OS_ERROR\n";
 
     my @OUT =
-	@(
-	 $HEADER, "\n",
-	 "#  The ke UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
-	 "\%utf8::ToSpecFold =\n\%(\n",
-	);
+        @(
+  $HEADER, "\n",
+  "#  The ke UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
+  "\%utf8::ToSpecFold =\n\%(\n",
+        );
     for my $code (sort { $a <+> $b }, keys %Fold) {
         my $foldstr =
-          join "", map { sprintf "\\x\{\%s\}", $_ }, split ' ', %Fold{?$code};
+            join "", map { sprintf "\\x\{\%s\}", $_ }, split ' ', %Fold{?$code};
         push @OUT, sprintf qq["\%s" => "$foldstr",\n], join("", map { sprintf "\\x[\%02X]", $_ }, @( unpack("U0C*", pack("U", $code))));
     }
     push @OUT, (
@@ -2061,7 +2061,7 @@ sub CaseFolding_txt()
                 "return <<'END';\n",
                 $CommonFold,
                 "END\n",
-               );
+                );
 
     WriteIfChanged(\@("To","Fold.pl"), @OUT);
 }
@@ -2086,10 +2086,10 @@ SpecialCasing_txt();
 CaseFolding_txt();
 
 if ( $FileList and $MakeList ) {
-    
+
     print $^STDOUT, "Updating '$FileList'\n"
         if ($Verbose);
-        
+
     open my $ofh,">",$FileList 
         or die "Can't write to '$FileList':$^OS_ERROR";
     print $ofh, <<"EOFHEADER";
@@ -2111,34 +2111,34 @@ if ( $FileList and $MakeList ) {
 EOFHEADER
     my @input=@("version",glob( <'*.txt'));
     print $ofh, "$_\n" for 
-      @input
+        @input
         +@+ @:"\n=================================\n",
-        "# Output files:\n",
-        # special files
-        "Properties";
-        
-    
+              "# Output files:\n",
+              # special files
+              "Properties";
+
+
     require File::Find;
     my $count=0;
     File::Find::find(\%(
-        no_chdir=>1,
-        wanted=>sub {
-          if (m/\.pl$/) {
-            s!^\./!!;
-            print $ofh, "$_\n";
-            $count++;
-          }
-        },
-    ),"."); 
-    
+                         no_chdir=>1,
+                             wanted=>sub {
+                                 if (m/\.pl$/) {
+                                     s!^\./!!;
+                                     print $ofh, "$_\n";
+                                     $count++;
+                                 }
+                             },
+                     ),"."); 
+
     print $ofh, "\n# ",scalar(nelems @input)," input files\n",
-               "# ",scalar($count+1)," output files\n\n",
-               "# End list\n";  
+        "# ",scalar($count+1)," output files\n\n",
+        "# End list\n";  
     close $ofh 
         or warn "Failed to close $ofh: $^OS_ERROR";
-    
+
     print $^STDOUT, "Filelist has ",scalar(nelems @input)," input files and ",
-          scalar($count+1)," output files\n"
+        scalar($count+1)," output files\n"
         if $Verbose;
 }
 print $^STDOUT, "All done\n" if $Verbose;

@@ -59,7 +59,7 @@ Filenames with * and ? will be glob expanded.
 my $wild_regex = $Is_VMS ?? '*%' !! '*?';
 sub expand_wildcards
 {
- @ARGV = @+: map( { m/[$wild_regex]/o ?? glob($_) !! @: $_ }, @ARGV);
+    @ARGV = @+: map( { m/[$wild_regex]/o ?? glob($_) !! @: $_ }, @ARGV);
 }
 
 
@@ -87,9 +87,9 @@ Sets modified time of destination to that of source.
 
 sub eqtime
 {
- my @($src,$dst) =  @ARGV;
- local @ARGV = @($dst);  touch();  # in case $dst doesn't exist
- utime(< @(stat($src))[[8..9]],$dst);
+    my @($src,$dst) =  @ARGV;
+    local @ARGV = @($dst);  touch();  # in case $dst doesn't exist
+    utime(< @(stat($src))[[8..9]],$dst);
 }
 
 =item rm_rf
@@ -102,8 +102,8 @@ Removes files and directories - recursively (even if readonly)
 
 sub rm_rf
 {
- expand_wildcards();
- rmtree(< grep { -e $_ }, @ARGV );
+    expand_wildcards();
+    rmtree(< grep { -e $_ }, @ARGV );
 }
 
 =item rm_f
@@ -267,7 +267,7 @@ shell's idea of true and false).
 
 sub test_f
 {
- exit(-f @ARGV[0] ?? 0 !! 1);
+    exit(-f @ARGV[0] ?? 0 !! 1);
 }
 
 =item test_d
@@ -281,7 +281,7 @@ not (ie. shell's idea of true and false).
 
 sub test_d
 {
- exit(-d @ARGV[0] ?? 0 !! 1);
+    exit(-d @ARGV[0] ?? 0 !! 1);
 }
 
 =item dos2unix
@@ -295,27 +295,27 @@ Converts DOS and OS/2 linefeeds to Unix style recursively.
 sub dos2unix {
     require File::Find;
     File::Find::find(sub {
-        return if -d;
-        return unless -w _;
-        return unless -r _;
-        return if -B _;
+                         return if -d;
+                         return unless -w _;
+                         return unless -r _;
+                         return if -B _;
 
-        local $^OUTPUT_RECORD_SEPARATOR = undef;
+                         local $^OUTPUT_RECORD_SEPARATOR = undef;
 
-	my $orig = $_;
-	my $temp = '.dos2unix_tmp';
-	open my $orig_fh, "<", $_ or do { warn "dos2unix can't open $_: $^OS_ERROR"; return };
-	open my $temp_fh, ">", "$temp" or 
-	    do { warn "dos2unix can't create .dos2unix_tmp: $^OS_ERROR"; return };
-        while (my $line = ~< $orig_fh) { 
-            $line =~ s/\015\012/\012/g;
-            print $temp_fh ,$line;
-        }
-	close $orig_fh;
-	close $temp_fh;
-	rename $temp, $orig;
+                         my $orig = $_;
+                         my $temp = '.dos2unix_tmp';
+                         open my $orig_fh, "<", $_ or do { warn "dos2unix can't open $_: $^OS_ERROR"; return };
+                         open my $temp_fh, ">", "$temp" or 
+                             do { warn "dos2unix can't create .dos2unix_tmp: $^OS_ERROR"; return };
+                         while (my $line = ~< $orig_fh) { 
+                             $line =~ s/\015\012/\012/g;
+                             print $temp_fh ,$line;
+                         }
+                         close $orig_fh;
+                         close $temp_fh;
+                         rename $temp, $orig;
 
-    }, < @ARGV);
+                     }, < @ARGV);
 }
 
 =back

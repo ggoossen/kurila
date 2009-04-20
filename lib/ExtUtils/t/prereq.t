@@ -31,7 +31,7 @@ END {
 }
 
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
-  diag("chdir failed: $^OS_ERROR");
+    diag("chdir failed: $^OS_ERROR");
 
 do {
     close $^STDOUT;
@@ -39,15 +39,15 @@ do {
     open $^STDOUT, '>>', \$stdout or die;
     my $warnings = '';
     local $^WARN_HOOK = sub {
-        $warnings .= @_[0]->{description};
-    };
+            $warnings .= @_[0]->{description};
+        };
 
     WriteMakefile(
         NAME            => 'Big::Dummy',
         PREREQ_PM       => \%(
             error  => 0
         )
-    );
+        );
     is $warnings, '';
 
     $warnings = '';
@@ -56,10 +56,10 @@ do {
         PREREQ_PM       => \%(
             error  => 99999
         )
-    );
+        );
     is $warnings, 
-    sprintf("Warning: prerequisite error 99999 not found. We have \%s.\n",
-            error->VERSION);
+       sprintf("Warning: prerequisite error 99999 not found. We have \%s.\n",
+       error->VERSION);
 
     $warnings = '';
     WriteMakefile(
@@ -67,36 +67,36 @@ do {
         PREREQ_PM       => \%(
             "I::Do::Not::Exist" => 0,
         )
-    );
+        );
     is $warnings, 
-    "Warning: prerequisite I::Do::Not::Exist 0 not found.";
+       "Warning: prerequisite I::Do::Not::Exist 0 not found.";
 
     $warnings = '';
     WriteMakefile(
         NAME            => 'Big::Dummy',
         PREREQ_PM       => \%(
             "I::Do::Not::Exist" => 0,
-            "error"            => 99999,
+                "error"            => 99999,
         )
-    );
+        );
     is $warnings, 
-    "Warning: prerequisite I::Do::Not::Exist 0 not found.".
-    sprintf("Warning: prerequisite error 99999 not found. We have \%s.\n",
-            error->VERSION);
-    
+       "Warning: prerequisite I::Do::Not::Exist 0 not found.".
+       sprintf("Warning: prerequisite error 99999 not found. We have \%s.\n",
+       error->VERSION);
+
     $warnings = '';
     try {
         WriteMakefile(
             NAME            => 'Big::Dummy',
             PREREQ_PM       => \%(
                 "I::Do::Not::Exist" => 0,
-                "Nor::Do::I"        => 0,
-                "error"            => 99999,
+                    "Nor::Do::I"        => 0,
+                    "error"            => 99999,
             ),
             PREREQ_FATAL    => 1,
-        );
+            );
     };
-    
+
     is $warnings, '';
     is $^EVAL_ERROR->{description}, <<'END', "PREREQ_FATAL";
 MakeMaker FATAL: prerequisites not found.
@@ -119,9 +119,9 @@ END
                 require I::Do::Not::Exist;
             },
             PREREQ_FATAL    => 1,
-        );
+            );
     };
-    
+
     is $warnings, '';
     is $^EVAL_ERROR->{description}, <<'END', "PREREQ_FATAL happens before CONFIGURE";
 MakeMaker FATAL: prerequisites not found.

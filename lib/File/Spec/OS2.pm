@@ -43,7 +43,7 @@ sub catdir {
     my $self = shift;
     my @args = @_;
     foreach ( @args) {
-	s[\\][/]g;
+        s[\\][/]g;
         # append a backslash to each argument unless it has one there
         $_ .= "/" unless m{/$};
     }
@@ -59,7 +59,7 @@ sub canonpath($self,?$path) {
     $path =~ s|(/\.)+/|/|g;                     # xx/././xx -> xx/xx
     $path =~ s|^(\./)+(?=[^/])||s;		# ./xx      -> xx
     $path =~ s|/\Z(?!\n)||
-             unless $path =~ m#^([a-z]:)?/\Z(?!\n)#si;# xx/       -> xx
+        unless $path =~ m#^([a-z]:)?/\Z(?!\n)#si;# xx/       -> xx
     $path =~ s{^/\.\.$}{/};                     # /..    -> /
     1 while $path =~ s{^/\.\.}{};               # /../xx -> /xx
     return $path;
@@ -69,16 +69,16 @@ sub canonpath($self,?$path) {
 sub splitpath($self,$path, ?$nofile) {
     my @($volume,$directory,$file) = @('','','');
     if ( $nofile ) {
-        $path =~ 
-            m{^( (?:[a-zA-Z]:|(?:\\\\|//)[^\\/]+[\\/][^\\/]+)? ) 
+            $path =~ 
+        m{^( (?:[a-zA-Z]:|(?:\\\\|//)[^\\/]+[\\/][^\\/]+)? ) 
                  (.*)
              }xs;
         $volume    = $1;
         $directory = $2;
     }
     else {
-        $path =~ 
-            m{^ ( (?: [a-zA-Z]: |
+            $path =~ 
+        m{^ ( (?: [a-zA-Z]: |
                       (?:\\\\|//)[^\\/]+[\\/][^\\/]+
                   )?
                 )
@@ -106,20 +106,20 @@ sub catpath($self,$volume,$directory,$file) {
     $volume .= $1
         if ( $volume =~ m@^([\\/])[\\/][^\\/]+[\\/][^\\/]+\Z(?!\n)@s &&
              $directory =~ m@^[^\\/]@s
-           ) ;
+             ) ;
 
     $volume .= $directory ;
 
     # If the volume is not just A:, make sure the glue separator is 
     # there, reusing whatever separator is first in the $volume if possible.
     if ( $volume !~ m@^[a-zA-Z]:\Z(?!\n)@s &&
-         $volume =~ m@[^\\/]\Z(?!\n)@      &&
-         $file   =~ m@[^\\/]@
-       ) {
-        $volume =~ m@([\\/])@ ;
-        my $sep = $1 ?? $1 !! '/' ;
-        $volume .= $sep ;
-    }
+        $volume =~ m@[^\\/]\Z(?!\n)@      &&
+        $file   =~ m@[^\\/]@
+    ) {
+            $volume =~ m@([\\/])@ ;
+            my $sep = $1 ?? $1 !! '/' ;
+            $volume .= $sep ;
+        }
 
     $volume .= $file ;
 
@@ -138,7 +138,7 @@ sub abs2rel($self,$path,$base) {
 
     # Figure out the effective $base and clean it up.
     if ( !defined( $base ) || $base eq '' ) {
-	$base = $self->_cwd();
+        $base = $self->_cwd();
     } elsif ( ! $self->file_name_is_absolute( $base ) ) {
         $base = $self->rel2abs( $base ) ;
     } else {
@@ -155,12 +155,12 @@ sub abs2rel($self,$path,$base) {
     my @basechunks = $self->splitdir( $base_directories );
 
     while ( (nelems @pathchunks) && 
-            nelems @basechunks && 
-            lc( @pathchunks[0] ) eq lc( @basechunks[0] ) 
-          ) {
-        shift @pathchunks ;
-        shift @basechunks ;
-    }
+    nelems @basechunks && 
+        lc( @pathchunks[0] ) eq lc( @basechunks[0] ) 
+    ) {
+            shift @pathchunks ;
+            shift @basechunks ;
+        }
 
     # No need to catdir, we know these are well formed.
     $path_directories = CORE::join( '/', @pathchunks );
@@ -185,7 +185,7 @@ sub abs2rel($self,$path,$base) {
 
     return $self->canonpath( 
         $self->catpath( "", $path_directories, $path_file ) 
-    ) ;
+        ) ;
 }
 
 
@@ -194,7 +194,7 @@ sub rel2abs($self,$path,?$base) {
     if ( ! $self->file_name_is_absolute( $path ) ) {
 
         if ( !defined( $base ) || $base eq '' ) {
-	    $base = $self->_cwd();
+            $base = $self->_cwd();
         }
         elsif ( ! $self->file_name_is_absolute( $base ) ) {
             $base = $self->rel2abs( $base ) ;
@@ -204,7 +204,7 @@ sub rel2abs($self,$path,?$base) {
         }
 
         my @( $path_directories, $path_file ) =
-             ($self->splitpath( $path, 1 ))[[1..2]] ;
+            ($self->splitpath( $path, 1 ))[[1..2]] ;
 
         my @( $base_volume, $base_directories ) = 
             $self->splitpath( $base, 1 ) ;
@@ -213,7 +213,7 @@ sub rel2abs($self,$path,?$base) {
             $base_volume, < 
             $self->catdir( $base_directories, $path_directories ), 
             $path_file
-        ) ;
+            ) ;
     }
 
     return $self->canonpath( $path ) ;

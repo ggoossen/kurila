@@ -43,7 +43,7 @@ do {
 do {
     no warnings 'utf8'; # avoid Unicode warnings
 
-# The following code points are some interesting steps.
+    # The following code points are some interesting steps.
     is(ord(chr(   0x100)),    0x100, '0x0100');
     is(ord(chr(   0x3FF)),    0x3FF, 'last two-byte char in UTF-EBCDIC');
     is(ord(chr(   0x400)),    0x400, 'first three-byte char in UTF-EBCDIC');

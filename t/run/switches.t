@@ -23,7 +23,7 @@ $r = runperl(
     switches	=> \@(),
     stdin	=> 'foo\nbar\nbaz\n',
     prog	=> 'print $^STDOUT, qq(<$_>) while ~< *ARGV',
-);
+    );
 is( $r, "<foo\n><bar\n><baz\n>", "no switches" );
 
 # Tests for -0
@@ -32,48 +32,48 @@ $r = runperl(
     switches	=> \@( '-0', ),
     stdin	=> 'foo\0bar\0baz\0',
     prog	=> 'print $^STDOUT, qq(<$_>) while ~< *ARGV',
-);
+    );
 is( $r, "<foo\0><bar\0><baz\0>", "-0" );
 
 $r = runperl(
     switches	=> \@( '-l', '-0', '-p' ),
     stdin	=> 'foo\0bar\0baz\0',
     prog	=> '1',
-);
+    );
 is( $r, "foo\nbar\nbaz\n", "-0 after a -l" );
 
 $r = runperl(
     switches	=> \@( '-0', '-l', '-p' ),
     stdin	=> 'foo\0bar\0baz\0',
     prog	=> '1',
-);
+    );
 is( $r, "foo\0bar\0baz\0", "-0 before a -l" );
 
 $r = runperl(
     switches	=> \@( sprintf('-0%o', ord 'x') ),
     stdin	=> 'fooxbarxbazx',
     prog	=> 'print $^STDOUT, qq(<$_>) while ~< *ARGV',
-);
+    );
 is( $r, "<foox><barx><bazx>", "-0 with octal number" );
 
 $r = runperl(
     switches	=> \@( '-00', '-p' ),
     stdin	=> 'abc\ndef\n\nghi\njkl\nmno\n\npq\n',
     prog	=> 's/\n/-/g;$_.=q(/)',
-);
+    );
 is( $r, 'abc-def--/ghi-jkl-mno--/pq-/', '-00 (paragraph mode)' );
 
 $r = runperl(
     switches	=> \@( '-0777', '-p' ),
     stdin	=> 'abc\ndef\n\nghi\njkl\nmno\n\npq\n',
     prog	=> 's/\n/-/g;$_.=q(/)',
-);
+    );
 is( $r, 'abc-def--ghi-jkl-mno--pq-/', '-0777 (slurp mode)' );
 
 $r = runperl(
     switches	=> \@( '-066' ),
     prog	=> 'BEGIN { print $^STDOUT, qq{($^INPUT_RECORD_SEPARATOR)} } print $^STDOUT, qq{[$^INPUT_RECORD_SEPARATOR]}',
-);
+    );
 is( $r, "(\066)[\066]", '$/ set at compile-time' );
 
 # Tests for -c
@@ -92,21 +92,21 @@ END   { print $^STDOUT, "block 5\n"; }
 SWTEST
     close $f or die "Could not close: $^OS_ERROR";
     $r = runperl(
-	switches	=> \@( '-c' ),
-	progfile	=> $filename,
-	stderr		=> 1,
-    );
+        switches	=> \@( '-c' ),
+        progfile	=> $filename,
+        stderr		=> 1,
+        );
     # Because of the stderr redirection, we can't tell reliably the order
     # in which the output is given
     ok(
-	$r =~ m/$filename syntax OK/
-	&& $r =~ m/\bblock 1\b/
-	&& $r =~ m/\bblock 2\b/
-	&& $r !~ m/\bblock 3\b/
-	&& $r !~ m/\bblock 4\b/
-	&& $r !~ m/\bblock 5\b/,
-	'-c'
-    );
+ $r =~ m/$filename syntax OK/
+ && $r =~ m/\bblock 1\b/
+ && $r =~ m/\bblock 2\b/
+ && $r !~ m/\bblock 3\b/
+ && $r !~ m/\bblock 4\b/
+ && $r !~ m/\bblock 5\b/,
+ '-c'
+ );
     push @tmpfiles, $filename;
 };
 
@@ -115,7 +115,7 @@ SWTEST
 $r = runperl(
     switches	=> \@( sprintf('-l%o', ord 'x') ),
     prog	=> 'print $^STDOUT, $_ for qw/foo bar/'
-);
+    );
 is( $r, 'fooxbarx', '-l with octal number' );
 
 # Tests for -m and -M
@@ -130,58 +130,58 @@ sub import { print $^STDOUT, < map { "<$_>" }, @_ }
 SWTESTPM
     close $f or die "Could not close: $^OS_ERROR";
     $r = runperl(
-	switches    => \@( '-Mswtest' ),
-	prog	    => '1',
-    );
+        switches    => \@( '-Mswtest' ),
+        prog	    => '1',
+        );
     is( $r, '<swtest>', '-M' );
     $r = runperl(
-	switches    => \@( '-Mswtest=foo' ),
-	prog	    => '1',
-    );
+        switches    => \@( '-Mswtest=foo' ),
+        prog	    => '1',
+        );
     is( $r, '<swtest><foo>', '-M with import parameter' );
     $r = runperl(
-	switches    => \@( '-mswtest' ),
-	prog	    => '1',
-    );
+        switches    => \@( '-mswtest' ),
+        prog	    => '1',
+        );
 
     do {
         local $TODO = '';  # this one works on VMS
         is( $r, '', '-m' );
     };
     $r = runperl(
-	switches    => \@( '-mswtest=foo,bar' ),
-	prog	    => '1',
-    );
+        switches    => \@( '-mswtest=foo,bar' ),
+        prog	    => '1',
+        );
     is( $r, '<swtest><foo><bar>', '-m with import parameters' );
     push @tmpfiles, $filename;
 
     is( runperl( switches => \@( '-MTie::Hash' ), stderr => 1, prog => 1 ),
-	  '', "-MFoo::Bar allowed" );
+        '', "-MFoo::Bar allowed" );
 
     like( runperl( switches => \@( '-M:swtest' ), stderr => 1,
-		   prog => 'die "oops"' ),
-	  qr/Invalid module name [\w:]+ with -M option\b/,
+          prog => 'die "oops"' ),
+          qr/Invalid module name [\w:]+ with -M option\b/,
           "-M:Foo not allowed" );
 
     like( runperl( switches => \@( '-mA:B:C' ), stderr => 1,
-		   prog => 'die "oops"' ),
-	  qr/Invalid module name [\w:]+ with -m option\b/,
+          prog => 'die "oops"' ),
+          qr/Invalid module name [\w:]+ with -m option\b/,
           "-mFoo:Bar not allowed" );
 
     like( runperl( switches => \@( '-m-A:B:C' ), stderr => 1,
-		   prog => 'die "oops"' ),
-	  qr/Invalid module name [\w:]+ with -m option\b/,
+          prog => 'die "oops"' ),
+          qr/Invalid module name [\w:]+ with -m option\b/,
           "-m-Foo:Bar not allowed" );
 
     like( runperl( switches => \@( '-m-' ), stderr => 1,
-		   prog => 'die "oops"' ),
-	  qr/Module name required with -m option\b/,
-  	  "-m- not allowed" );
+          prog => 'die "oops"' ),
+          qr/Module name required with -m option\b/,
+          "-m- not allowed" );
 
     like( runperl( switches => \@( '-M-=' ), stderr => 1,
-		   prog => 'die "oops"' ),
-	  qr/Module name required with -M option\b/,
-  	  "-M- not allowed" );
+          prog => 'die "oops"' ),
+          qr/Module name required with -M option\b/,
+          "-M- not allowed" );
 };
 
 # Tests for -V
@@ -195,7 +195,7 @@ do {
           '-V generates 20+ lines' );
 
     like( runperl( switches => \@('-V') ),
-	  qr/\ASummary of my kurila .*configuration:/,
+          qr/\ASummary of my kurila .*configuration:/,
           '-V looks okay' );
 
     # lookup a known config var
@@ -221,7 +221,7 @@ do {
     my @(_, $v) =  split m/-/, $^PERL_VERSION;
     my $archname = config_value('archname');
     like( runperl( switches => \@('-v') ),
-	  qr/This[ ]is[ ]kurila,[  ]v$v [ ] (?:DEVEL\w+[ ])? built[ ]for[ ]
+          qr/This[ ]is[ ]kurila,[  ]v$v [ ] (?:DEVEL\w+[ ])? built[ ]for[ ]
              \Q$archname\E .+
              Copyright .+
              Gerard[ ]Goossen.+Artistic[ ]License .+
@@ -236,7 +236,7 @@ do {
     local $TODO = '';   # these ones should work on VMS
 
     like( runperl( switches => \@('-h') ),
-	  qr/Usage: .+(?i:perl(?:$(config_value('_exe')))?).+switches.+programfile.+arguments/,
+          qr/Usage: .+(?i:perl(?:$(config_value('_exe')))?).+switches.+programfile.+arguments/,
           '-h looks okay' );
 
 };
@@ -248,8 +248,8 @@ foreach my $switch (split m//, "ABbGgHJjKkLNOoPQqRrYyZz123456789_")
     local $TODO = '';   # these ones should work on VMS
 
     like( runperl( switches => \@("-$switch"), stderr => 1,
-		   prog => 'die "oops"' ),
-	  qr/\QUnrecognized switch: -$switch  (-h will show valid options)/,
+          prog => 'die "oops"' ),
+          qr/\QUnrecognized switch: -$switch  (-h will show valid options)/,
           "-$switch correctly unknown" );
 
 }

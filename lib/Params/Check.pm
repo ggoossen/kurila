@@ -6,9 +6,9 @@ use Locale::Maketext::Simple    Style => 'gettext';
 use Data::Dumper;
 
 our (@ISA, $VERSION, @EXPORT_OK, $VERBOSE, $ALLOW_UNKNOWN,
-     $STRICT_TYPE, $STRIP_LEADING_DASHES, $NO_DUPLICATES,
-     $PRESERVE_CASE, $ONLY_ALLOW_DEFINED, $WARNINGS_FATAL,
-     $SANITY_CHECK_TEMPLATE, $CALLER_DEPTH, $_ERROR_STRING);
+    $STRICT_TYPE, $STRIP_LEADING_DASHES, $NO_DUPLICATES,
+    $PRESERVE_CASE, $ONLY_ALLOW_DEFINED, $WARNINGS_FATAL,
+    $SANITY_CHECK_TEMPLATE, $CALLER_DEPTH, $_ERROR_STRING);
 
 BEGIN {
     use Exporter    ();
@@ -30,7 +30,7 @@ BEGIN {
 }
 
 my %known_keys = %( < @+: map { @: $_ => 1 },
-                    qw| required allow default strict_type no_override
+        qw| required allow default strict_type no_override
                         store defined | );
 
 =pod
@@ -264,7 +264,7 @@ sub check($utmpl, $href, ?$verbose) {
 
     ### sanity check + defaults + required keys set? ###
     my $defs = _sanity_check_and_defaults( $utmpl, $args, $verbose )
-                    or return;
+        or return;
 
     ### deref only once ###
     my %utmpl   = %( < %$utmpl );
@@ -273,7 +273,7 @@ sub check($utmpl, $href, ?$verbose) {
 
     ### flag to see if anything went wrong ###
     my $wrong; 
-    
+
     ### flag to see if we warned for anything, needed for warnings_fatal
     my $warned;
 
@@ -302,7 +302,7 @@ sub check($utmpl, $href, ?$verbose) {
                 loc(q[You are not allowed to override key '%1'].
                     q[for %2 from %3], $key, _who_was_it(), _who_was_it(1)),
                 $verbose
-            );
+                );
             $warned ||= 1;
             next;
         }
@@ -314,38 +314,38 @@ sub check($utmpl, $href, ?$verbose) {
         if( (%tmpl{?'defined'} || $ONLY_ALLOW_DEFINED) and
             not defined %args{?$key}
         ) {
-            _store_error(loc(q|Key '%1' must be defined when passed|, $key),
-                $verbose );
-            $wrong ||= 1;
-            next;
-        }
+                _store_error(loc(q|Key '%1' must be defined when passed|, $key),
+                         $verbose );
+                $wrong ||= 1;
+                next;
+            }
 
         ### check if they should be of a strict type, and if it is ###
         if( (%tmpl{?'strict_type'} || $STRICT_TYPE) and
             (ref %args{?$key} ne ref %tmpl{?'default'})
         ) {
-            _store_error(loc(q|Key '%1' needs to be of type '%2'|,
-                        $key, ref %tmpl{?'default'} || 'SCALAR'), $verbose );
-            $wrong ||= 1;
-            next;
-        }
+                _store_error(loc(q|Key '%1' needs to be of type '%2'|,
+                             $key, ref %tmpl{?'default'} || 'SCALAR'), $verbose );
+                $wrong ||= 1;
+                next;
+            }
 
         ### check if we have an allow handler, to validate against ###
         ### allow() will report its own errors ###
         if( exists %tmpl{'allow'} and not do {
-                local $_ERROR_STRING = undef;
-                allow( %args{?$key}, %tmpl{?'allow'} )
-            }         
+            local $_ERROR_STRING = undef;
+            allow( %args{?$key}, %tmpl{?'allow'} )
+        }         
         ) {
-            ### stringify the value in the error report -- we don't want dumps
-            ### of objects, but we do want to see *roughly* what we passed
-            _store_error(loc(q|Key '%1' (%2) is of invalid type for '%3' |.
+                ### stringify the value in the error report -- we don't want dumps
+                ### of objects, but we do want to see *roughly* what we passed
+                _store_error(loc(q|Key '%1' (%2) is of invalid type for '%3' |.
                              q|provided by %4|,
-                            $key, dump::view(%args{?$key}), _who_was_it(),
-                            _who_was_it(1)), $verbose);
-            $wrong ||= 1;
-            next;
-        }
+                             $key, dump::view(%args{?$key}), _who_was_it(),
+                             _who_was_it(1)), $verbose);
+                $wrong ||= 1;
+                next;
+            }
 
         ### we got here, then all must be OK ###
         %defs{+$key} = %args{?$key};
@@ -436,7 +436,7 @@ sub allow {
         for (  @{@_[1]} ) {
             return 1 if allow( @_[0], $_ );
         }
-        
+
         return;
 
     ### fall back to a simple, but safe 'eq' ###
@@ -494,7 +494,7 @@ sub _sanity_check_and_defaults {
 
         ### next, set the default, make sure the key exists in %defs ###
         %defs{+$key} = %utmpl{$key}->{?'default'}
-                        if exists %utmpl{$key}->{'default'};
+        if exists %utmpl{$key}->{'default'};
 
         if( $SANITY_CHECK_TEMPLATE ) {
             ### last, check if they provided any weird template keys
@@ -502,16 +502,16 @@ sub _sanity_check_and_defaults {
             ### just a small optimization.
             map {   _store_error(
                         loc(q|Template type '%1' not supported [at key '%2']|,
-                        $_, $key), 1, 1 );
-            }, grep {
-                not %known_keys{?$_}
-            }, keys %{%utmpl{?$key}};
-        
+                            $_, $key), 1, 1 );
+                }, grep {
+                    not %known_keys{?$_}
+                }, keys %{%utmpl{?$key}};
+
             ### make sure you passed a ref, otherwise, complain about it!
             if ( exists %utmpl{$key}->{'store'} ) {
                 _store_error( loc(
                     q|Store variable for '%1' is not a reference!|, $key
-                ), 1, 1 ) unless ref %utmpl{$key}->{?'store'};
+                    ), 1, 1 ) unless ref %utmpl{$key}->{?'store'};
             }
         }
     }
@@ -527,8 +527,8 @@ sub _sanity_check_and_defaults {
 sub _safe_eq {
     ### only do a straight 'eq' if they're both defined ###
     return defined(@_[0]) && defined(@_[1])
-                ?? @_[0] eq @_[1]
-                !! defined(@_[0]) eq defined(@_[1]);
+        ?? @_[0] eq @_[1]
+        !! defined(@_[0]) eq defined(@_[1]);
 }
 
 sub _who_was_it {

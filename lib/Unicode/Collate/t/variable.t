@@ -16,9 +16,9 @@ my $A_acute = _pack_U(0xC1);
 my $acute   = _pack_U(0x0301);
 
 my $Collator = Unicode::Collate->new(
-  table => 'keys.txt',
-  normalization => undef,
-);
+    table => 'keys.txt',
+    normalization => undef,
+    );
 
 my %origVar = %( < $Collator->change(variable => 'Blanked') );
 

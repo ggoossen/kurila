@@ -8,22 +8,22 @@ use Data::Dumper;
 
 do {
     sub iterate_hash($h) {
-	my $count = 0;
-	$count++ while each %$h;
-	return $count;
+        my $count = 0;
+        $count++ while each %$h;
+        return $count;
     }
 };
 
 # [perl #38612] Data::Dumper core dump in 5.8.6, fixed by 5.8.7
 sub foo {
-     my $s = shift;
-     local $Data::Dumper::Terse = 1;
-     my $c = eval Dumper($s);
-     sub bar::quote { }
-     bless $c, 'bar';
-     my $d = Data::Dumper->new(\@($c));
-     $d->Freezer('quote');
-     return $d->Dump;
+    my $s = shift;
+    local $Data::Dumper::Terse = 1;
+    my $c = eval Dumper($s);
+    sub bar::quote { }
+    bless $c, 'bar';
+    my $d = Data::Dumper->new(\@($c));
+    $d->Freezer('quote');
+    return $d->Dump;
 }
 foo(\%());
 ok(1, "[perl #38612]"); # Still no core dump? We are fine.

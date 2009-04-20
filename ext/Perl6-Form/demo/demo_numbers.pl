@@ -3,28 +3,28 @@ use Perl6::Form;
 my $nums = do{local$^INPUT_RECORD_SEPARATOR = undef; ~< *DATA};
 
 print $^STDOUT, < form
-	 "Brittannia      Continental     East Indies      Tyrol           Nippon",
-     "_____________   _____________   ______________   _____________   _____________",
-     "\{],]]],]]].[\}   \{].]]].]]],[\}    \{]],]],]]].[\}   \{]']]]']]],[\}   \{]]]],]]]].[\}",
-     "$nums",         "$nums",         "$nums",        "$nums",        "$nums";
+  "Brittannia      Continental     East Indies      Tyrol           Nippon",
+  "_____________   _____________   ______________   _____________   _____________",
+  "\{],]]],]]].[\}   \{].]]].]]],[\}    \{]],]],]]].[\}   \{]']]]']]],[\}   \{]]]],]]]].[\}",
+  "$nums",         "$nums",         "$nums",        "$nums",        "$nums";
 
 print $^STDOUT, < form
-	 "",
-	 "Quintuple ",
-     "_____________",
-     "\{]],]]]]].[\}",
-     "$nums",
-	 "",
-	 "Hyperspatial ",
-     "_____________",
-     "\{] ]]] ]]]|[\}",
-     "$nums",
-	 \%(locale=>1),
-	 "",
-	 "Locale ",
-     "_____________",
-     "\{]].]]]]],[\}",
-     "$nums";
+  "",
+  "Quintuple ",
+  "_____________",
+  "\{]],]]]]].[\}",
+  "$nums",
+  "",
+  "Hyperspatial ",
+  "_____________",
+  "\{] ]]] ]]]|[\}",
+  "$nums",
+  \%(locale=>1),
+  "",
+  "Locale ",
+  "_____________",
+  "\{]].]]]]],[\}",
+  "$nums";
 
 __DATA__
 0

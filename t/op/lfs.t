@@ -5,11 +5,11 @@
 use Config;
 
 BEGIN {
-	# Don't bother if there are no quad offsets.
-	if (config_value('lseeksize') +< 8) {
-		print $^STDOUT, "1..0 # Skip: no 64-bit file offsets\n";
-		exit(0);
-	}
+    # Don't bother if there are no quad offsets.
+    if (config_value('lseeksize') +< 8) {
+        print $^STDOUT, "1..0 # Skip: no 64-bit file offsets\n";
+        exit(0);
+    }
 }
 
 our @s;
@@ -32,7 +32,7 @@ my $explained;
 
 sub explain {
     unless ($explained++) {
-	print $^STDOUT, <<EOM;
+        print $^STDOUT, <<EOM;
 #
 # If the lfs (large file support: large meaning larger than two
 # gigabytes) tests are skipped or fail, it may mean either that your
@@ -113,9 +113,9 @@ print $^STDOUT, "# s2 = $(join ' ',@s2)\n";
 zap();
 
 unless (@s1[7] == 1_000_003 && @s2[7] == 2_000_003 &&
-	@s1[11] == @s2[11] && @s1[12] == @s2[12]) {
-	print $^STDOUT, "1..0 # Skip: no sparse files?\n";
-	bye;
+    @s1[11] == @s2[11] && @s1[12] == @s2[12]) {
+    print $^STDOUT, "1..0 # Skip: no sparse files?\n";
+    bye;
 }
 
 print $^STDOUT, "# we seem to have sparse files...\n";
@@ -149,11 +149,11 @@ my $close = close $big;
 print $^STDOUT, "# close failed: $^OS_ERROR\n" unless $close;
 unless ($print && $close) {
     if ($^OS_ERROR =~m/too large/i) {
-	explain("writing past 2GB failed: process limits?");
+        explain("writing past 2GB failed: process limits?");
     } elsif ($^OS_ERROR =~ m/quota/i) {
-	explain("filesystem quota limits?");
+        explain("filesystem quota limits?");
     } else {
-	explain("error: $^OS_ERROR");
+        explain("error: $^OS_ERROR");
     }
     bye();
 }
@@ -176,17 +176,17 @@ sub offset($offset_will_be, $offset_want) {
     my $offset_is = eval $offset_will_be;
     unless ($offset_is == $offset_want) {
         print $^STDOUT, "# bad offset $offset_is, want $offset_want\n";
-	my @($offset_func) = @($offset_will_be =~ m/^(\w+)/);
-	if (unpack("L", pack("L", $offset_want)) == $offset_is) {
-	    print $^STDOUT, "# 32-bit wraparound suspected in $offset_func() since\n";
-	    print $^STDOUT, "# $offset_want cast into 32 bits equals $offset_is.\n";
-	} elsif ($offset_want - unpack("L", pack("L", $offset_want)) - 1
-	         == $offset_is) {
-	    print $^STDOUT, "# 32-bit wraparound suspected in $offset_func() since\n";
-	    printf $^STDOUT, "# \%s - unpack('L', pack('L', \%s)) - 1 equals \%s.\n",
-	        $offset_want,
-	        $offset_want,
-	        $offset_is;
+        my @($offset_func) = @($offset_will_be =~ m/^(\w+)/);
+        if (unpack("L", pack("L", $offset_want)) == $offset_is) {
+            print $^STDOUT, "# 32-bit wraparound suspected in $offset_func() since\n";
+            print $^STDOUT, "# $offset_want cast into 32 bits equals $offset_is.\n";
+        } elsif ($offset_want - unpack("L", pack("L", $offset_want)) - 1
+        == $offset_is) {
+            print $^STDOUT, "# 32-bit wraparound suspected in $offset_func() since\n";
+            printf $^STDOUT, "# \%s - unpack('L', pack('L', \%s)) - 1 equals \%s.\n",
+                $offset_want,
+                $offset_want,
+                $offset_is;
         }
         fail;
     }

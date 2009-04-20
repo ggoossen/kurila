@@ -9,18 +9,18 @@ $Safe::VERSION = "2.16";
 # see any lexicals in scope (apart from __ExPr__ which is unavoidable)
 
 sub lexless_anon_sub {
-		 # $_[0] is package;
-		 # $_[1] is strict flag;
+    # $_[0] is package;
+    # $_[1] is strict flag;
     my $__ExPr__ = @_[2];   # must be a lexical to create the closure that
-			    # can be used to pass the value into the safe
-			    # world
+    # can be used to pass the value into the safe
+    # world
 
     # Create anon sub ref in root of compartment.
     # Uses a closure (on $__ExPr__) to pass in the code to be executed.
     # (eval on one line to keep line numbers as expected by caller)
     eval sprintf
-    'package %s; sub { @_= @(); eval q[my $__ExPr__;] . $__ExPr__; }',
-		@_[0];
+        'package %s; sub { @_= @(); eval q[my $__ExPr__;] . $__ExPr__; }',
+        @_[0];
 }
 
 use Carp;
@@ -84,14 +84,14 @@ sub new($class, ?$root, ?$mask) {
     bless $obj, $class;
 
     if (defined($root)) {
-	croak "Can't use \"$root\" as root name"
-	    if $root =~ m/^main\b/ or $root !~ m/^\w+::\w[:\w]*$/;
-	$obj->{+Root}  = $root;
-	$obj->{+Erase} = 0;
+        croak "Can't use \"$root\" as root name"
+            if $root =~ m/^main\b/ or $root !~ m/^\w+::\w[:\w]*$/;
+        $obj->{+Root}  = $root;
+        $obj->{+Erase} = 0;
     }
     else {
-	$obj->{+Root}  = "Safe::Root".$default_root++;
-	$obj->{+Erase} = 1;
+        $obj->{+Root}  = "Safe::Root".$default_root++;
+        $obj->{+Erase} = 1;
     }
 
     # use permit/deny methods instead till interface issues resolved
@@ -128,16 +128,16 @@ sub erase($obj, $action) {
 
     #warn "erase($pkg) stem=$stem, leaf=$leaf";
     #warn " stem_symtab hash ".scalar(%$stem_symtab)."\n";
-	# ", join(', ', %$stem_symtab),"\n";
+    # ", join(', ', %$stem_symtab),"\n";
 
-#    delete $stem_symtab->{$leaf};
+    #    delete $stem_symtab->{$leaf};
 
     delete $stem_symtab->{$leaf};
     return;
 
     my $leaf_globref   = \($stem_symtab->{+$leaf});
     my $leaf_symtab = *{$leaf_globref}{HASH};
-#    warn " leaf_symtab ", join(', ', %$leaf_symtab),"\n";
+    #    warn " leaf_symtab ", join(', ', %$leaf_symtab),"\n";
     # FIXME this does not clear properly yet: %$leaf_symtab = %( () );
     for (keys %$leaf_symtab) {
         delete $leaf_symtab->{$_};
@@ -145,7 +145,7 @@ sub erase($obj, $action) {
     #delete $leaf_symtab->{'__ANON__'};
     #delete $leaf_symtab->{'foo'};
     #delete $leaf_symtab->{'main::'};
-#    my $foo = undef ${"$stem\::"}{"$leaf\::"};
+    #    my $foo = undef ${"$stem\::"}{"$leaf\::"};
 
     if ($action and $action eq 'DESTROY') {
         delete $stem_symtab->{$leaf};
@@ -219,20 +219,20 @@ sub share_from {
     my $root = $obj->root();
     croak("vars not an array ref") unless ref $vars eq 'ARRAY';
     # Check that 'from' package actually exists
-#     croak("Package \"$pkg\" does not exist")
-# 	unless %{Symbol::stash("$pkg")};
+    #     croak("Package \"$pkg\" does not exist")
+    # 	unless %{Symbol::stash("$pkg")};
     foreach my $arg ( @$vars) {
-	# catch some $safe->share($var) errors:
-	my ($var, $type);
-	$type = $1 if ($var = $arg) =~ s/^(\W)//;
-	# warn "share_from $pkg $type $var";
-	*{Symbol::fetch_glob($root."::$var")} = (!$type)       ?? \&{*{Symbol::fetch_glob($pkg."::$var")}}
-			  !! ($type eq '&') ?? \&{*{Symbol::fetch_glob($pkg."::$var")}}
-			  !! ($type eq '$') ?? \${*{Symbol::fetch_glob($pkg."::$var")}}
-			  !! ($type eq '@') ?? \@{*{Symbol::fetch_glob($pkg."::$var")}}
-			  !! ($type eq '%') ?? \%{*{Symbol::fetch_glob($pkg."::$var")}}
-			  !! ($type eq '*') ??  *{Symbol::fetch_glob($pkg."::$var")}
-			  !! croak(qq(Can't share "$type$var" of unknown type));
+        # catch some $safe->share($var) errors:
+        my ($var, $type);
+        $type = $1 if ($var = $arg) =~ s/^(\W)//;
+        # warn "share_from $pkg $type $var";
+        *{Symbol::fetch_glob($root."::$var")} = (!$type)       ?? \&{*{Symbol::fetch_glob($pkg."::$var")}}
+            !! ($type eq '&') ?? \&{*{Symbol::fetch_glob($pkg."::$var")}}
+            !! ($type eq '$') ?? \${*{Symbol::fetch_glob($pkg."::$var")}}
+            !! ($type eq '@') ?? \@{*{Symbol::fetch_glob($pkg."::$var")}}
+            !! ($type eq '%') ?? \%{*{Symbol::fetch_glob($pkg."::$var")}}
+            !! ($type eq '*') ??  *{Symbol::fetch_glob($pkg."::$var")}
+            !! croak(qq(Can't share "$type$var" of unknown type));
     }
     $obj->share_record($pkg, $vars) unless $no_record or !$vars;
 }
@@ -242,16 +242,16 @@ sub share_record {
     my $pkg = shift;
     my $vars = shift;
     my $shares = \%{$obj->{+Shares} ||= \%()};
-     # Record shares using keys of $obj->{Shares}. See reinit.
-    %{$shares}{[ @$vars]} = @($pkg) x nelems @$vars if (nelems @$vars);
+        # Record shares using keys of $obj->{Shares}. See reinit.
+        %{$shares}{[ @$vars]} = @($pkg) x nelems @$vars if (nelems @$vars);
 }
 sub share_redo {
     my $obj = shift;
     my $shares = \%{$obj->{+Shares} ||= \%()};
     my($var, $pkg);
     while(@($var, $pkg) =@( each %$shares)) {
-	# warn "share_redo $pkg\:: $var";
-	$obj->share_from($pkg,  \@( $var ), 1);
+        # warn "share_redo $pkg\:: $var";
+        $obj->share_from($pkg,  \@( $var ), 1);
     }
 }
 sub share_forget {
@@ -274,7 +274,7 @@ sub rdo($obj, $file) {
     my $root = $obj->{?Root};
 
     my $evalsub = eval
-	    sprintf('package %s; sub { @_ = (); do $file }', $root);
+        sprintf('package %s; sub { @_ = (); do $file }', $root);
     return Opcode::_safe_call_sv($root, $obj->{?Mask}, $evalsub);
 }
 

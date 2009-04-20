@@ -1,12 +1,12 @@
 
 package Pod::Simple::LinkSection;
-  # Based somewhat dimly on Array::Autojoin
+# Based somewhat dimly on Array::Autojoin
 
 use Pod::Simple::BlackBox;
 
 sub tack_on {
-  @_[0] = \@('', \%(), "@_[0]" );
-  return (@_[0]->[2] .= @_[1]);
+    @_[0] = \@('', \%(), "@_[0]" );
+    return (@_[0]->[2] .= @_[1]);
 }
 
 sub as_string {
@@ -17,32 +17,32 @@ sub stringify {
 }
 
 sub new {
-  my $class = shift;
-  $class = ref($class) || $class;
-  my $new;
-  if((nelems @_) == 1) {
-    if (!ref(@_[0] || '')) { # most common case: one bare string
-      return bless \@('', \%(), @_[0] ), $class;
-    } elsif( ref(@_[0] || '') eq 'ARRAY') {
-      $new = \$: @{ @_[0] };
-    } else {
-      Carp::croak( "$class new() doesn't know to clone $new" );
+    my $class = shift;
+    $class = ref($class) || $class;
+    my $new;
+    if((nelems @_) == 1) {
+        if (!ref(@_[0] || '')) { # most common case: one bare string
+            return bless \@('', \%(), @_[0] ), $class;
+        } elsif( ref(@_[0] || '') eq 'ARRAY') {
+            $new = \$: @{ @_[0] };
+        } else {
+            Carp::croak( "$class new() doesn't know to clone $new" );
+        }
+    } else { # misc stuff
+        $new = \@( '', \%(), < @_ );
     }
-  } else { # misc stuff
-    $new = \@( '', \%(), < @_ );
-  }
 
-  # By now it's a treelet:  [ 'foo', {}, ... ]
-  foreach my $x ( @$new) {
-    if(ref($x || '') eq 'ARRAY') {
-      $x = $class->new($x); # recurse
-    } elsif(ref($x || '') eq 'HASH') {
-      $x = \%( < %$x );
+    # By now it's a treelet:  [ 'foo', {}, ... ]
+    foreach my $x ( @$new) {
+        if(ref($x || '') eq 'ARRAY') {
+            $x = $class->new($x); # recurse
+        } elsif(ref($x || '') eq 'HASH') {
+            $x = \%( < %$x );
+        }
+    # otherwise leave it.
     }
-     # otherwise leave it.
-  }
 
-  return bless $new, $class;
+    return bless $new, $class;
 }
 
 # Not much in this class is likely to be link-section specific --

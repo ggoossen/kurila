@@ -22,11 +22,11 @@ sub import {
 
 use Class::Struct < qw(struct);
 struct 'Net::netent' => \@(
-   name		=> '$',
-   aliases	=> '@',
-   addrtype	=> '$',
-   net		=> '$',
-);
+       name		=> '$',
+       aliases	=> '@',
+       addrtype	=> '$',
+       net		=> '$',
+       );
 
 sub populate {
     return unless (nelems @_);
@@ -48,10 +48,10 @@ sub getnetbyaddr ($net, ?$addrtype) {
 
 sub getnet($name) {
     if ($name =~ m/^\d+(?:\.\d+(?:\.\d+(?:\.\d+)?)?)?$/) {
-	require Socket;
-	&getnetbyaddr( <Socket::inet_aton($name));
+        require Socket;
+        &getnetbyaddr( <Socket::inet_aton($name));
     } else {
-	&getnetbyname( $name );
+        &getnetbyname( $name );
     } 
 } 
 

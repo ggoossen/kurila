@@ -83,8 +83,8 @@ do {
     $x = 0;
     sub X::DESTROY { $ok = !ref($x); }
     do {
-	local $x = \ bless \%(), 'X';
-	1;
+        local $x = \ bless \%(), 'X';
+        1;
     };
-ok($ok,'old value not visible during restore');
+    ok($ok,'old value not visible during restore');
 };

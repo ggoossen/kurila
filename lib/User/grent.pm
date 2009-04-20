@@ -20,11 +20,11 @@ sub import {
 
 use Class::Struct < qw(struct);
 struct 'User::grent' => \@(
-    name    => '$',
-    passwd  => '$',
-    gid	    => '$',
-    members => '@',
-);
+       name    => '$',
+       passwd  => '$',
+       gid	    => '$',
+       members => '@',
+       );
 
 sub populate {
     return unless (nelems @_);

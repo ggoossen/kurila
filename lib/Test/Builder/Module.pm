@@ -26,7 +26,7 @@ Test::Builder::Module - Base class for test modules
       my $tb = $CLASS->builder;
       return $tb->ok(@_);
   }
-  
+
   1;
 
 
@@ -72,7 +72,7 @@ import_extra().
 
 sub import {
     my@($class) =@( shift);
-    
+
     # Don't run all this when loading ourself.
     return 1 if $class eq 'Test::Builder::Module';
 

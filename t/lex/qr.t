@@ -7,9 +7,9 @@ my $test = 1;
 sub is($left, $right, ?$msg) {
 
     if ($left eq $right) {
-      printf $^STDOUT, 'ok %d
+        printf $^STDOUT, 'ok %d
 ', $test++;
-      return 1;
+        return 1;
     }
     printf $^STDOUT, q(not ok %d - got %s expected %s
 ), $test++, $left, $right;

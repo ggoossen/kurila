@@ -21,9 +21,9 @@ BEGIN {
     is($XS::APItest::BEGIN_called, undef, "BEGIN not yet called");
     is($XS::APItest::BEGIN_called_PP, undef, "BEGIN not yet called");
     is($XS::APItest::UNITCHECK_called, undef, "UNITCHECK not yet called")
-       if $uc;
+        if $uc;
     is($XS::APItest::UNITCHECK_called_PP, undef, "UNITCHECK not yet called")
-       if $uc;
+        if $uc;
     is($XS::APItest::CHECK_called, undef, "CHECK not yet called");
     is($XS::APItest::CHECK_called_PP, undef, "CHECK not yet called");
     is($XS::APItest::INIT_called, undef, "INIT not yet called");

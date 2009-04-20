@@ -32,18 +32,18 @@ SKIP: do {
     skip "Doesn't work here yet", 6 if $^OS_NAME eq 'vmesa';
 
     if (open($pipe, "-|", "-")) {
-	while( ~< $pipe) {
-	    s/^not //;
-	    print $^STDOUT, $_;
-	}
-	close $pipe;        # avoid zombies
+        while( ~< $pipe) {
+            s/^not //;
+            print $^STDOUT, $_;
+        }
+        close $pipe;        # avoid zombies
     }
     else {
-	printf $^STDOUT, "not ok \%d - open -|\n", curr_test();
+        printf $^STDOUT, "not ok \%d - open -|\n", curr_test();
         next_test();
         my $tnum = curr_test;
         next_test();
-	exec $Perl, '-le', "print \$^STDOUT, q\{not ok $tnum -     again\}";
+        exec $Perl, '-le', "print \$^STDOUT, q\{not ok $tnum -     again\}";
     }
 
     # This has to be *outside* the fork
@@ -51,20 +51,20 @@ SKIP: do {
 
     my $raw = "abc\nrst\rxyz\r\nfoo\n";
     if (open($pipe, "-|", "-")) {
-	$_ = join '', @( ~< $pipe);
-	(my $raw1 = $_) =~ s/not ok \d+ - //;
-	my @r  = map { ord }, split m//, $raw;
-	my @r1 = map { ord }, split m//, $raw1;
+        $_ = join '', @( ~< $pipe);
+        (my $raw1 = $_) =~ s/not ok \d+ - //;
+        my @r  = map { ord }, split m//, $raw;
+        my @r1 = map { ord }, split m//, $raw1;
         if ($raw1 eq $raw) {
-	    s/^not (ok \d+ -) .*/$1 '$(join ' ',@r1)' passes through '-|'\n/s;
-	} else {
-	    s/^(not ok \d+ -) .*/$1 expect '$(join ' ',@r)', got '$(join ' ',@r1)'\n/s;
-	}
-	print $^STDOUT, $_;
-	close $pipe;        # avoid zombies
+            s/^not (ok \d+ -) .*/$1 '$(join ' ',@r1)' passes through '-|'\n/s;
+        } else {
+            s/^(not ok \d+ -) .*/$1 expect '$(join ' ',@r)', got '$(join ' ',@r1)'\n/s;
+        }
+        print $^STDOUT, $_;
+        close $pipe;        # avoid zombies
     }
     else {
-	printf $^STDOUT, "not ok \%d - $raw", curr_test();
+        printf $^STDOUT, "not ok \%d - $raw", curr_test();
         exec $Perl, '-e0';	# Do not run END()...
     }
 
@@ -72,27 +72,27 @@ SKIP: do {
     next_test();
 
     if (open($pipe, "|-", "-")) {
-	printf $pipe, "not ok \%d - $raw", curr_test();
-	close $pipe;        # avoid zombies
+        printf $pipe, "not ok \%d - $raw", curr_test();
+        close $pipe;        # avoid zombies
     }
     else {
-	$_ = join '', @( ~< $^STDIN);
-	(my $raw1 = $_) =~ s/not ok \d+ - //;
-	my @r  = map { ord }, split m//, $raw;
-	my @r1 = map { ord }, split m//, $raw1;
+        $_ = join '', @( ~< $^STDIN);
+        (my $raw1 = $_) =~ s/not ok \d+ - //;
+        my @r  = map { ord }, split m//, $raw;
+        my @r1 = map { ord }, split m//, $raw1;
         if ($raw1 eq $raw) {
-	    s/^not (ok \d+ -) .*/$1 '$(join ' ',@r1)' passes through '|-'\n/s;
-	} else {
-	    s/^(not ok \d+ -) .*/$1 expect '$(join ' ',@r)', got '$(join ' ',@r1)'\n/s;
-	}
-	print $^STDOUT, $_;
+            s/^not (ok \d+ -) .*/$1 '$(join ' ',@r1)' passes through '|-'\n/s;
+        } else {
+            s/^(not ok \d+ -) .*/$1 expect '$(join ' ',@r)', got '$(join ' ',@r1)'\n/s;
+        }
+        print $^STDOUT, $_;
         exec $Perl, '-e0';	# Do not run END()...
     }
 
     # This has to be *outside* the fork
     next_test();
 
-    SKIP: do {
+  SKIP: do {
         skip "fork required", 2 unless config_value('d_fork');
 
         pipe(my $reader, my $writer) || die "Can't open pipe";
@@ -114,7 +114,7 @@ SKIP: do {
 
             open($^STDOUT, ">&", $writer) || die "Can't dup WRITER to STDOUT";
             close $writer;
-            
+
             my $tnum = curr_test;
             next_test;
             exec $Perl, '-le', "print \$^STDOUT, q\{not ok $tnum -     with fh dup \}";
@@ -147,17 +147,17 @@ pass();
 
 SKIP: do {
     skip "doesn't like spawning subprocesses that are still connected", 10
-      if $^OS_NAME eq 'VMS';
+        if $^OS_NAME eq 'VMS';
 
-    SKIP: do {
+  SKIP: do {
         # Sfio doesn't report failure when closing a broken pipe
         # that has pending output.  Go figure.  MachTen doesn't either,
         # but won't write to broken pipes, so nothing's pending at close.
         # BeOS will not write to broken pipes, either.
         # Nor does POSIX-BC.
         skip "Won't report failure on broken pipe", 1
-          if config_value('d_sfio') || $^OS_NAME eq 'machten' || $^OS_NAME eq 'beos' || 
-             $^OS_NAME eq 'posix-bc';
+            if config_value('d_sfio') || $^OS_NAME eq 'machten' || $^OS_NAME eq 'beos' || 
+            $^OS_NAME eq 'posix-bc';
 
         local signals::handler("PIPE") = 'IGNORE';
         open my $nil, '|-', qq{$Perl -e "exit 0"} or die "open failed: $^OS_ERROR";
@@ -171,7 +171,7 @@ SKIP: do {
         }
     };
 
-    SKIP: do {
+  SKIP: do {
         skip "Don't work yet", 9 if $^OS_NAME eq 'vmesa';
 
         # check that errno gets forced to 0 if the piped program exited 
@@ -182,7 +182,7 @@ SKIP: do {
         is($^OS_ERROR, '',      '       errno');
         isnt($^CHILD_ERROR, 0,     '       status');
 
-        SKIP: do {
+      SKIP: do {
             skip "Don't work yet", 6 if $^OS_NAME eq 'mpeix';
 
             # check that status for the correct process is collected
@@ -208,34 +208,34 @@ SKIP: do {
 # Test new semantics for missing command in piped open
 # 19990114 M-J. Dominus mjd@plover.com
 do {
-  no warnings 'pipe';
-  my $p;
-  ok( !open($p, "|-", ""),        'missing command in piped open input' );
-  ok( !open($p, "-|", ""),       '                              output');
+    no warnings 'pipe';
+    my $p;
+    ok( !open($p, "|-", ""),        'missing command in piped open input' );
+    ok( !open($p, "-|", ""),       '                              output');
 };
 
 # check that status is unaffected by implicit close
 do {
     open my $nil, '|-', qq{$Perl -e "exit 23"} or die "fork failed: $^OS_ERROR";
     $^CHILD_ERROR = 42;
-    # NIL implicitly closed here
+# NIL implicitly closed here
 };
 is($^CHILD_ERROR, 42,      'status unaffected by implicit close');
 $^CHILD_ERROR = 0;
 
 # check that child is reaped if the piped program can't be executed
 SKIP: do {
-  skip "/no_such_process exists", 1 if -e "/no_such_process";
-  open my $nil, "-|", '/no_such_process';
-  close $nil;
+    skip "/no_such_process exists", 1 if -e "/no_such_process";
+    open my $nil, "-|", '/no_such_process';
+    close $nil;
 
-  my $child = 0;
-  try {
-    local signals::handler("ALRM") = sub { die; };
-    alarm 2;
-    $child = wait;
-    alarm 0;
-  };
+    my $child = 0;
+    try {
+        local signals::handler("ALRM") = sub { die; };
+        alarm 2;
+        $child = wait;
+        alarm 0;
+    };
 
-  is($child, -1, 'child reaped if piped program cannot be executed');
+    is($child, -1, 'child reaped if piped program cannot be executed');
 };

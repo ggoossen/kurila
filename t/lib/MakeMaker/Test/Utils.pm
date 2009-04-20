@@ -82,7 +82,7 @@ sub which_perl {
         # When building in the core, *don't* go off and find
         # another perl
         die "Can't find a perl to use (\$^X=$^EXECUTABLE_NAME), (\$perlpath=$perlpath)" 
-          if env::var('PERL_CORE');
+            if env::var('PERL_CORE');
 
         foreach my $path ( 'File::Spec'->path) {
             $perlpath = 'File::Spec'->catfile($path, $perl);
@@ -104,10 +104,10 @@ Sets up environment variables so perl can find its libraries.
 my $old5lib = env::var('PERL5LIB');
 my $had5lib = defined $old5lib;
 sub perl_lib {
-                               # perl-src/t/
+    # perl-src/t/
     my $lib =  env::var('PERL_CORE') ?? qq{../lib}
-                               # ExtUtils-MakeMaker/t/
-                               !! qq{../blib/lib};
+        # ExtUtils-MakeMaker/t/
+        !! qq{../blib/lib};
     $lib = 'File::Spec'->rel2abs($lib);
     my @libs = @($lib);
     push @libs, env::var('PERL5LIB') if defined env::var('PERL5LIB');
@@ -251,12 +251,12 @@ sub run {
     # This makes our failure diagnostics nicer to read.
     if( MM->os_flavor_is('Unix') or
         (MM->os_flavor_is('OS/2'))
-      ) {
-        return `$cmd 2>&1`;
-    }
-    else {
-        return `$cmd`;
-    }
+    ) {
+            return `$cmd 2>&1`;
+        }
+        else {
+            return `$cmd`;
+        }
 }
 
 =item B<setup_mm_test_root>
@@ -273,7 +273,7 @@ sub setup_mm_test_root {
         # can't create logical names with attributes in Perl, so we do it
         # in a DCL subprocess and put it in the job table so the parent sees it.
         open( my $mmtmp, ">", 'mmtesttmp.com' ) || 
-          die "Error creating command file; $^OS_ERROR";
+            die "Error creating command file; $^OS_ERROR";
         print $mmtmp, <<'COMMAND';
 $ MM_TEST_ROOT = F$PARSE("SYS$DISK:[-]",,,,"NO_CONCEAL")-".][000000"-"]["-"].;"+".]"
 $ DEFINE/JOB/NOLOG/TRANSLATION=CONCEALED MM_TEST_ROOT 'MM_TEST_ROOT'
@@ -307,10 +307,10 @@ sub have_compiler {
     $^STDERR = *{$fh}{IO};
 
     try {
-	require ExtUtils::CBuilder;
-	my $cb = 'ExtUtils::CBuilder'->new;
+        require ExtUtils::CBuilder;
+        my $cb = 'ExtUtils::CBuilder'->new;
 
-	$have_compiler = $cb->have_compiler;
+        $have_compiler = $cb->have_compiler;
     };
 
     return $have_compiler;

@@ -525,7 +525,7 @@ my $Is_MacOS = $^OS_NAME eq 'MacOS';
 # These OSes complain if you want to remove a file that you have no
 # write permission to:
 my $Force_Writeable = ($^OS_NAME eq 'os2' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'MSWin32' ||
-		       $^OS_NAME eq 'amigaos' || $^OS_NAME eq 'MacOS' || $^OS_NAME eq 'epoc');
+                       $^OS_NAME eq 'amigaos' || $^OS_NAME eq 'MacOS' || $^OS_NAME eq 'epoc');
 
 sub _error {
     my $arg     = shift;
@@ -548,8 +548,8 @@ sub mkpath {
         or ((nelems @_) == 3
             and ((defined @_[1] && ! ref @_[1]) ?? @_[1] =~ m/\A\d+\z/ !! 1)
             and ((defined @_[2] && ! ref @_[2]) ?? @_[2] =~ m/\A\d+\z/ !! 1)
-        )
-    ) ?? 1 !! 0;
+            )
+        ) ?? 1 !! 0;
 
     my $arg;
     my $paths;
@@ -569,7 +569,7 @@ sub mkpath {
             ${$arg->{error}} = \@() if exists $arg->{error};
         }
         else { 
-            %{$arg}{[qw(verbose mode)]} = @(0, 0777);
+                %{$arg}{[qw(verbose mode)]} = @(0, 0777);
         }
         $paths = \$: @_;
     }
@@ -583,26 +583,26 @@ sub _mkpath {
     my(@created);
     foreach my $path ( @$paths) {
         next unless length($path);
-	$path .= '/' if $^OS_NAME eq 'os2' and $path =~ m/^\w:\z/s; # feature of CRT 
-	# Logic wants Unix paths, so go with the flow.
-	if ($Is_VMS) {
-	    next if $path eq '/';
-	    $path = VMS::Filespec::unixify($path);
-	}
-	next if -d $path;
-	my $parent = File::Basename::dirname($path);
-	unless (-d $parent or $path eq $parent) {
+        $path .= '/' if $^OS_NAME eq 'os2' and $path =~ m/^\w:\z/s; # feature of CRT 
+        # Logic wants Unix paths, so go with the flow.
+        if ($Is_VMS) {
+            next if $path eq '/';
+            $path = VMS::Filespec::unixify($path);
+        }
+        next if -d $path;
+        my $parent = File::Basename::dirname($path);
+        unless (-d $parent or $path eq $parent) {
             push(@created, <_mkpath($arg, \@($parent)));
         }
         print $^STDOUT, "mkdir $path\n" if $arg->{?verbose};
         if (mkdir($path,$arg->{?mode})) {
             push(@created, $path);
-	}
+        }
         else {
             my $save_bang = $^OS_ERROR;
             my @($e, $e1) = @($save_bang, $^EXTENDED_OS_ERROR);
-	    $e .= "; $e1" if $e ne $e1;
-	    # allow for another process to have created it meanwhile
+            $e .= "; $e1" if $e ne $e1;
+            # allow for another process to have created it meanwhile
             if (!-d $path) {
                 $^OS_ERROR = $save_bang;
                 if ($arg->{?error}) {
@@ -611,8 +611,8 @@ sub _mkpath {
                 else {
                     die("mkdir $path: $e");
                 }
-	}
-    }
+            }
+        }
     }
     return @created;
 }
@@ -633,7 +633,7 @@ sub rmtree {
             ${$arg->{result}} = \@() if exists $arg->{result};
         }
         else {
-             %{$arg}{[qw(verbose safe)]} = @(0, 0);
+                %{$arg}{[qw(verbose safe)]} = @(0, 0);
         }
         $paths = \ @_;
     }
@@ -646,7 +646,7 @@ sub rmtree {
         return 0;
     };
     for (@($arg->{?cwd})) { m/\A(.*)\Z/; $_ = $1 } # untaint
-     %{$arg}{[qw(device inode)]} = @(stat $arg->{?cwd})[[0..1]] or do {
+        %{$arg}{[qw(device inode)]} = @(stat $arg->{?cwd})[[0..1]] or do {
         _error($arg, "cannot stat initial working directory", $arg->{?cwd});
         return 0;
     };
@@ -663,15 +663,15 @@ sub _rmtree {
     my $updir  = File::Spec->updir();
 
     my (@files);
-    ROOT_DIR:
+  ROOT_DIR:
     foreach my $root ($(@$paths)) {
-    	if ($Is_MacOS) {
+        if ($Is_MacOS) {
             $root  = ":$root" unless $root =~ m/:/;
             $root .= ":"      unless $root =~ m/:\z/;
         }
         else {
             $root =~ s{/\z}{};
-	}
+        }
 
         # since we chdir into each directory, it may not be obvious
         # to figure out where we are if we generate a message about
@@ -684,10 +684,10 @@ sub _rmtree {
             !! $root
         ;
 
-        my @($ldev, $lino, $perm) =  @(lstat $root)[[0..2]];
+            my @($ldev, $lino, $perm) =  @(lstat $root)[[0..2]];
         $ldev or next ROOT_DIR;
 
-	if ( -d _ ) {
+        if ( -d _ ) {
             $root = VMS::Filespec::pathify($root) if $Is_VMS;
             if (!chdir($root)) {
                 # see if we can escalate privileges to get in
@@ -715,10 +715,10 @@ sub _rmtree {
             $perm ^&^= 07777; # don't forget setuid, setgid, sticky bits
             my $nperm = $perm ^|^ 0700;
 
-	    # notabene: 0700 is for making readable in the first place,
-	    # it's also intended to change it to writable in case we have
-	    # to recurse in which case we are better than rm -rf for 
-	    # subtrees with strange permissions
+            # notabene: 0700 is for making readable in the first place,
+            # it's also intended to change it to writable in case we have
+            # to recurse in which case we are better than rm -rf for 
+            # subtrees with strange permissions
 
             if (!($arg->{?safe} or $nperm == $perm or chmod($nperm, $curdir))) {
                 _error($arg, "cannot make directory read+writeable", $canon);
@@ -732,10 +732,10 @@ sub _rmtree {
             }
             else {
                 @files = @( readdir $d );
-		closedir $d;
-	    }
+                closedir $d;
+            }
 
-	    if ($Is_VMS) {
+            if ($Is_VMS) {
                 # Deleting large numbers of files from VMS Files-11
                 # filesystems is faster if done in reverse ASCIIbetical order.
                 # include '.' to '.;' from blead patch #31775
@@ -747,8 +747,8 @@ sub _rmtree {
             if ((nelems @files)) {
                 # remove the contained files before the directory itself
                 my $narg = \%(< %$arg);
-                 %{$narg}{[qw(device inode cwd prefix depth)]}
-                    = @($device, $inode, $updir, $canon, $arg->{?depth}+1);
+                    %{$narg}{[qw(device inode cwd prefix depth)]}
+                = @($device, $inode, $updir, $canon, $arg->{?depth}+1);
                 $count += _rmtree($narg, \@files);
             }
 
@@ -773,26 +773,26 @@ sub _rmtree {
 
             if ($arg->{?depth} or !$arg->{?keep_root}) {
                 if ($arg->{?safe} &&
-		($Is_VMS ?? !&VMS::Filespec::candelete($root) !! !-w $root)) {
+                    ($Is_VMS ?? !&VMS::Filespec::candelete($root) !! !-w $root)) {
                     print $^STDOUT, "skipped $root\n" if $arg->{?verbose};
                     next ROOT_DIR;
-	    }
+                }
                 if (!chmod $perm ^|^ 0700, $root) {
                     if ($Force_Writeable) {
                         _error($arg, "cannot make directory writeable", $canon);
                     }
                 }
                 print $^STDOUT, "rmdir $root\n" if $arg->{?verbose};
-	    if (rmdir $root) {
+                if (rmdir $root) {
                     push @{${$arg->{result}}}, $root if $arg->{?result};
-		++$count;
-	    }
-	    else {
+                    ++$count;
+                }
+                else {
                     _error($arg, "cannot remove directory", $canon);
                     if (!chmod($perm, ($Is_VMS ?? < VMS::Filespec::fileify($root) !! $root))
                     ) {
-                        _error($arg, sprintf("cannot restore permissions to 0\%o",$perm), $canon);
-                    }
+                            _error($arg, sprintf("cannot restore permissions to 0\%o",$perm), $canon);
+                        }
                 }
             }
         }
@@ -803,22 +803,22 @@ sub _rmtree {
                 if $Is_VMS && !File::Spec->file_name_is_absolute($root);
 
             if ($arg->{?safe} &&
-		($Is_VMS ?? !&VMS::Filespec::candelete($root)
-		         !! !(-l $root || -w $root)))
-	    {
+                ($Is_VMS ?? !&VMS::Filespec::candelete($root)
+   !! !(-l $root || -w $root)))
+            {
                 print $^STDOUT, "skipped $root\n" if $arg->{?verbose};
                 next ROOT_DIR;
-	    }
+            }
 
             my $nperm = $perm ^&^ 07777 ^|^ 0600;
             if ($nperm != $perm and not chmod $nperm, $root) {
                 if ($Force_Writeable) {
                     _error($arg, "cannot make file writeable", $canon);
-                    }
                 }
+            }
             print $^STDOUT, "unlink $canon\n" if $arg->{?verbose};
-	    # delete all versions under VMS
-	    while (1) {
+            # delete all versions under VMS
+            while (1) {
                 if (unlink $root) {
                     push @{${$arg->{result}}}, $root if $arg->{?result};
                 }
@@ -826,12 +826,12 @@ sub _rmtree {
                     _error($arg, "cannot unlink file", $canon);
                     $Force_Writeable and chmod($perm, $root) or
                         _error($arg, sprintf("cannot restore permissions to 0\%o",$perm), $canon);
-		    last;
-		}
-		++$count;
-		last unless $Is_VMS && lstat $root;
-	    }
-	}
+                    last;
+                }
+                ++$count;
+                last unless $Is_VMS && lstat $root;
+            }
+        }
     }
 
     return $count;

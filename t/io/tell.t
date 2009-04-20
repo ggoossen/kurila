@@ -3,8 +3,8 @@
 print $^STDOUT, "1..28\n";
 
 my $Is_Dosish = ($^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'NetWare' or $^OS_NAME eq 'dos' or
-              $^OS_NAME eq 'os2' or $^OS_NAME eq 'mint' or $^OS_NAME eq 'cygwin' or
-              $^OS_NAME =~ m/^uwin/);
+                 $^OS_NAME eq 'os2' or $^OS_NAME eq 'mint' or $^OS_NAME eq 'cygwin' or
+                 $^OS_NAME =~ m/^uwin/);
 
 open(my $TST, "<", 'TEST') || (die "Can't open TEST");
 binmode $TST if $Is_Dosish;
@@ -89,15 +89,15 @@ binmode $tst if $Is_Dosish;
 
 if (0) 
 {
- # :stdio does not pass these so ignore them for now 
+    # :stdio does not pass these so ignore them for now 
 
-if (tell($tst) == 0) { print $^STDOUT, "ok 27\n"; } else { print $^STDOUT, "not ok 27\n"; }
+    if (tell($tst) == 0) { print $^STDOUT, "ok 27\n"; } else { print $^STDOUT, "not ok 27\n"; }
 
-my $line = ~< $tst;
+    my $line = ~< $tst;
 
-if ($line eq "fred\n") { print $^STDOUT, "ok 29\n"; } else { print $^STDOUT, "not ok 29\n"; }
+    if ($line eq "fred\n") { print $^STDOUT, "ok 29\n"; } else { print $^STDOUT, "not ok 29\n"; }
 
-if (tell($tst) == 5) { print $^STDOUT, "ok 30\n"; } else { print $^STDOUT, "not ok 30\n"; }
+    if (tell($tst) == 5) { print $^STDOUT, "ok 30\n"; } else { print $^STDOUT, "not ok 30\n"; }
 
 }
 

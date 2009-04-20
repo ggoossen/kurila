@@ -58,13 +58,13 @@ use Getopt::Long;
 our ($HELP, $FILE, $FOO, $BAR, $NO);
 
 ok( GetOptions(
-	'help'   => \$HELP,
-	'file:s' => \$FILE,
-	'foo!'   => \$FOO,
-	'bar!'   => \$BAR,
-	'num:i'  => \$NO,
-    ),
+ 'help'   => \$HELP,
+ 'file:s' => \$FILE,
+ 'foo!'   => \$FOO,
+ 'bar!'   => \$BAR,
+ 'num:i'  => \$NO,
+ ),
     'Getopt::Long::GetOptions succeeded'
-);
+    );
 is( (join ' ',@ARGV), 'file', 'options removed from @ARGV (5)' );
 ok( $HELP && $FOO && !$BAR && $FILE eq 'foo' && $NO == 5, 'options set' );

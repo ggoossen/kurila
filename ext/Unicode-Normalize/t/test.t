@@ -49,12 +49,12 @@ is($sNFKC, "\x{FA26}");
 
 
 sub hexNFC {
-  join " ", map { sprintf("\%04X", $_) },
-  _unpack_U NFC _pack_U < map { hex }, split ' ', shift;
+    join " ", map { sprintf("\%04X", $_) },
+        _unpack_U NFC _pack_U < map { hex }, split ' ', shift;
 }
 sub hexNFD {
-  join " ", map { sprintf("\%04X", $_) },
-  _unpack_U NFD _pack_U < map { hex }, split ' ', shift;
+    join " ", map { sprintf("\%04X", $_) },
+        _unpack_U NFD _pack_U < map { hex }, split ' ', shift;
 }
 
 is(hexNFD("1E14 AC01"), "0045 0304 0300 1100 1161 11A8");

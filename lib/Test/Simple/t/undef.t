@@ -35,7 +35,7 @@ sub warnings_like {
 
 
 my $Filename = quotemeta $^PROGRAM_NAME;
-   
+
 
 is( undef, undef,           'undef is undef');
 no_warnings;

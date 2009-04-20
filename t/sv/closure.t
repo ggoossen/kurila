@@ -80,24 +80,24 @@ for (qw(0 1 2 3 4)) {
 }
 
 test {
-    &{@foo[0]}() == 0 and
-      &{@foo[1]}() == 1 and
-        &{@foo[2]}() == 2 and
-          &{@foo[3]}() == 3 and
-            &{@foo[4]}() == 4
-        },;
+         &{@foo[0]}() == 0 and
+             &{@foo[1]}() == 1 and
+             &{@foo[2]}() == 2 and
+             &{@foo[3]}() == 3 and
+             &{@foo[4]}() == 4
+     },;
 
 for (0 .. 4) {
     &{@foo[$_]}(4-$_);
 }
 
 test {
-    &{@foo[0]}() == 4 and
-      &{@foo[1]}() == 3 and
-        &{@foo[2]}() == 2 and
-          &{@foo[3]}() == 1 and
-            &{@foo[4]}() == 0
-        },;
+         &{@foo[0]}() == 4 and
+             &{@foo[1]}() == 3 and
+             &{@foo[2]}() == 2 and
+             &{@foo[3]}() == 1 and
+             &{@foo[4]}() == 0
+     },;
 
 sub barf {
     my @foo;
@@ -110,24 +110,24 @@ sub barf {
 
 @foo = barf();
 test {
-    &{@foo[0]}() == 0 and
-      &{@foo[1]}() == 1 and
-        &{@foo[2]}() == 2 and
-          &{@foo[3]}() == 3 and
-            &{@foo[4]}() == 4
-        },;
+         &{@foo[0]}() == 0 and
+             &{@foo[1]}() == 1 and
+             &{@foo[2]}() == 2 and
+             &{@foo[3]}() == 3 and
+             &{@foo[4]}() == 4
+     },;
 
 for (0 .. 4) {
     &{@foo[$_]}(4-$_);
 }
 
 test {
-    &{@foo[0]}() == 4 and
-      &{@foo[1]}() == 3 and
-        &{@foo[2]}() == 2 and
-          &{@foo[3]}() == 1 and
-            &{@foo[4]}() == 0
-        },;
+         &{@foo[0]}() == 4 and
+             &{@foo[1]}() == 3 and
+             &{@foo[2]}() == 2 and
+             &{@foo[3]}() == 1 and
+             &{@foo[4]}() == 0
+     },;
 
 # test if closures get created in optimized for loops
 
@@ -137,47 +137,47 @@ for my $n (qw[A B C D E]) {
 }
 
 test {
-    &{%foo{?A}}('A') and
-      &{%foo{?B}}('B') and
-        &{%foo{?C}}('C') and
-          &{%foo{?D}}('D') and
-            &{%foo{?E}}('E')
-        },;
+         &{%foo{?A}}('A') and
+             &{%foo{?B}}('B') and
+             &{%foo{?C}}('C') and
+             &{%foo{?D}}('D') and
+             &{%foo{?E}}('E')
+     },;
 
 for my $n (0..4) {
     @foo[$n] = sub { $n == @_[0] };
 }
 
 test {
-    &{@foo[0]}(0) and
-      &{@foo[1]}(1) and
-        &{@foo[2]}(2) and
-          &{@foo[3]}(3) and
-            &{@foo[4]}(4)
-        },;
+         &{@foo[0]}(0) and
+             &{@foo[1]}(1) and
+             &{@foo[2]}(2) and
+             &{@foo[3]}(3) and
+             &{@foo[4]}(4)
+     },;
 
 for my $n (0..4) {
     @foo[$n] = sub {
-        # no intervening reference to $n here
-        sub { $n == @_[0] }
-    };
+            # no intervening reference to $n here
+            sub { $n == @_[0] }
+        };
 }
 
 test {
-    @foo[0]->()->(0) and
-      @foo[1]->()->(1) and
-        @foo[2]->()->(2) and
-          @foo[3]->()->(3) and
-            @foo[4]->()->(4)
-        },;
+         @foo[0]->()->(0) and
+             @foo[1]->()->(1) and
+             @foo[2]->()->(2) and
+             @foo[3]->()->(3) and
+             @foo[4]->()->(4)
+     },;
 
 do {
     my $w;
     $w = sub {
-	my @($i) =  @_;
-	test { $i == 10 },;
-	sub { $w };
-    };
+            my @($i) =  @_;
+            test { $i == 10 },;
+            sub { $w };
+        };
     $w->(10);
 };
 
@@ -193,16 +193,16 @@ do {
 
     # The expected values for these tests
     %expected = %(
-	'global_scalar'	=> 1001,
-	'global_array'	=> 2101,
-	'global_hash'	=> 3004,
-	'fs_scalar'	=> 4001,
-	'fs_array'	=> 5101,
-	'fs_hash'	=> 6004,
-	'sub_scalar'	=> 7001,
-	'sub_array'	=> 8101,
-	'sub_hash'	=> 9004,
-    );
+            'global_scalar'	=> 1001,
+                'global_array'	=> 2101,
+                'global_hash'	=> 3004,
+                'fs_scalar'	=> 4001,
+                'fs_array'	=> 5101,
+                'fs_hash'	=> 6004,
+                'sub_scalar'	=> 7001,
+                'sub_array'	=> 8101,
+                'sub_hash'	=> 9004,
+        );
 
     # Our innermost sub is either named or anonymous
     for my $inner_type (qw!anon!) {
@@ -217,17 +217,17 @@ do {
                 # Here are a number of variables which show what's
                 # going on, in a way.
                 $nc_attempt = 0+ # Named closure attempted
-                  ( ($inner_type eq 'named') ||
-                      ($within eq 'other_sub') ) ;
+                    ( ($inner_type eq 'named') ||
+                    ($within eq 'other_sub') ) ;
                 $call_inner = 0+ # Need to call &inner
-                  ( ($inner_type eq 'anon') &&
-                      ($within eq 'other_sub') ) ;
+                    ( ($inner_type eq 'anon') &&
+                    ($within eq 'other_sub') ) ;
                 $call_outer = 0+ # Need to call &outer or &$outer
-                  ( ($inner_type eq 'anon') &&
-                      ($within ne 'other_sub') ) ;
+                    ( ($inner_type eq 'anon') &&
+                    ($within ne 'other_sub') ) ;
                 $undef_outer = 0+ # $outer is created but unused
-                  ( ($where_declared eq 'in_anon') &&
-                      (not $call_outer) ) ;
+                    ( ($where_declared eq 'in_anon') &&
+                    (not $call_outer) ) ;
 
                 $code = "# This is a test script built by t/op/closure.t\n\n";
 
@@ -278,7 +278,7 @@ my \%fs_hash = \%( < 6000..6009);
 END_MARK_THREE
 
                 if ($where_declared eq 'filescope') {
-                    # Nothing here
+                # Nothing here
                 } elsif ($where_declared eq 'in_named') {
                     $code .= <<'END';
 sub outer {
@@ -286,7 +286,7 @@ sub outer {
   my @sub_array = @(8000, 8100, 8200, 8300);
   my %sub_hash = %(<9000..9009);
 END
-                    # }
+                # }
                 } elsif ($where_declared eq 'in_anon') {
                     $code .= <<'END';
 our $outer = sub {
@@ -294,7 +294,7 @@ our $outer = sub {
   my @sub_array = @(8000, 8100, 8200, 8300);
   my %sub_hash = %(<9000..9009);
 END
-                    # }
+                # }
                 } else {
                     die "What was $where_declared?"
                 }
@@ -312,7 +312,7 @@ END
 
                 $sub_test = $test;
                 @inners = @( < qw!global_scalar global_array global_hash! , <
-                               qw!fs_scalar fs_array fs_hash! );
+                             qw!fs_scalar fs_array fs_hash! );
                 if ($where_declared ne 'filescope') {
                     push @inners, < qw!sub_scalar sub_array sub_hash!;
                 }
@@ -348,7 +348,7 @@ END
                     } else {
                         die "What was $inner_sub_test?"
                     }
-	  
+
                     # Close up
                     if ($inner_type eq 'anon') {
                         $code .= ';'
@@ -382,11 +382,11 @@ END
                 # Now, we can actually prep to run the tests.
                 for my $inner_sub_test ( @inners) {
                     $expected = %expected{?$inner_sub_test} or
-                      die "expected $inner_sub_test missing";
+                        die "expected $inner_sub_test missing";
 
                     # Named closures won't access the expected vars
                     if ( $nc_attempt and 
-                           substr($inner_sub_test, 0, 4) eq "sub_" ) {
+                        substr($inner_sub_test, 0, 4) eq "sub_" ) {
                         $expected = 1;
                     }
 
@@ -435,7 +435,7 @@ END
                         open $^STDOUT, ">&", \*$write  or die "Can't redirect STDOUT: $^OS_ERROR";
                         open $^STDERR, ">&", \*$write2 or die "Can't redirect STDERR: $^OS_ERROR";
                         exec which_perl(), '-w', '-MTestInit', '-'
-                          or die "Can't exec perl: $^OS_ERROR";
+                            or die "Can't exec perl: $^OS_ERROR";
                     } else {
                         # Parent process here.
                         close $write;
@@ -443,8 +443,8 @@ END
                         print $perl_fh, $code;
                         close $perl_fh;
                         do { local $^INPUT_RECORD_SEPARATOR = undef;
-                             $output = join '', @( ~< $read);
-                             $errors = join '', @( ~< $read2); };
+                            $output = join '', @( ~< $read);
+                            $errors = join '', @( ~< $read2); };
                         close $read;
                         close $read2;
                     }
@@ -533,12 +533,12 @@ test { $a->() == 123 },;
 # an SvFAKE to be added to the outer anon's pad, which was then grown.
 my $outer;
 sub {
-    my $x;
-    $x = eval 'sub { $outer }';
-    $x->();
-    $a = \@( 99 );
-    $x->();
-}->();
+        my $x;
+        $x = eval 'sub { $outer }';
+        $x->();
+        $a = \@( 99 );
+        $x->();
+    }->();
 test {1},;
 
 # [perl #17605] found that an empty block called in scalar context
@@ -557,7 +557,7 @@ do {
     my $x = 1;
     sub fake {
         test { sub {eval'$x'}->() == 1 },;
-	do { $x;	test { sub {eval'$x'}->() == 1 }, };
+        do { $x;	test { sub {eval'$x'}->() == 1 }, };
         test { sub {eval'$x'}->() == 1 },;
     }
 };
@@ -586,10 +586,10 @@ sub Watch::DESTROY { ${@_[0]->[0]} .= @_[0]->[1] }
 sub linger {
     my $x = Watch->new(@_[0], '2');
     sub {
-	$x;
-	my $y;
-	sub { $y; };
-    };
+            $x;
+            my $y;
+            sub { $y; };
+        };
 }
 do {
     my $watch = '1';
@@ -615,9 +615,9 @@ do {
 do {
     my $x = 1;
     sub f16302 {
-	sub {
-	    test { defined $x and $x == 1 },
-	}->();
+        sub {
+                test { defined $x and $x == 1 },
+            }->();
     }
 };
 f16302();
@@ -628,7 +628,7 @@ f16302();
 do {
     my %a;
     for my $x (@(7,11)) {
-	%a{+$x} = sub { $x=$x; sub { eval '$x' } };
+        %a{+$x} = sub { $x=$x; sub { eval '$x' } };
     }
     test { %a{?7}->()->() + %a{?11}->()->() == 18 },;
 };
@@ -663,8 +663,8 @@ do {
     # savestack, due to the early freeing of the anon closure
 
     my $got = runperl(stderr => 1, prog => 
-                        'sub d {die} my $f; $f = sub {my $x=1; $f = 0; d}; try{$f->()}; print $^STDOUT, qq(ok\n)'
-                    );
+        'sub d {die} my $f; $f = sub {my $x=1; $f = 0; d}; try{$f->()}; print $^STDOUT, qq(ok\n)'
+        );
     test { $got eq "ok\n" },;
 };
 
@@ -675,10 +675,10 @@ do {
     my $flag = 0;
     sub  X::DESTROY { $flag = 1 }
     do {
-	my $x;
-	sub newsub {};
-	BEGIN {$x = \&newsub }
-	$x = bless \%(), 'X';
+        my $x;
+        sub newsub {};
+        BEGIN {$x = \&newsub }
+        $x = bless \%(), 'X';
     };
     # test { $flag == 1 };
     print $^STDOUT, "not ok $test # TODO cleanup sub freeing\n";

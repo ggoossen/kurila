@@ -1,5 +1,5 @@
 package IO::Compress::Zip::Constants;
- 
+
 use warnings;
 
 require Exporter;
@@ -81,11 +81,11 @@ use constant ZIP_EXTRA_ID_INFO_ZIP_UNIX2       => "Ux";
 use constant ZIP64_MIN_VERSION                 => 45;
 
 %ZIP_CM_MIN_VERSIONS = %( <
-            ZIP_CM_STORE()                      => 20, <
+        ZIP_CM_STORE()                      => 20, <
             ZIP_CM_DEFLATE()                    => 20, <
             ZIP_CM_BZIP2()                      => 46, <
             ZIP_CM_LZMA()                       => 63,
-            );
+    );
 
 
 1;

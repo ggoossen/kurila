@@ -60,44 +60,44 @@ my @in = grep { m/\S/ }, split m/\n/, q{
 };
 
 foreach my $in ( @in) {
-  $in =~ s/^\s*\[([^\]]+)\]\s*//s or die "Bad input: $in";
-  my @should = @( do { my $x = $1; $x =~ m/(\S+)/g } );
+    $in =~ s/^\s*\[([^\]]+)\]\s*//s or die "Bad input: $in";
+    my @should = @( do { my $x = $1; $x =~ m/(\S+)/g } );
 
-  if($in eq 'NIX') { $in = ''; @should = @( () ); }
+    if($in eq 'NIX') { $in = ''; @should = @( () ); }
 
-  local env::var('HTTP_ACCEPT_LANGUAGE') = undef;
-  
-  foreach my $modus (@(
+    local env::var('HTTP_ACCEPT_LANGUAGE') = undef;
+
+    foreach my $modus (@(
     sub {
-      print $^STDOUT, "# Testing with arg...\n";
-      env::var('HTTP_ACCEPT_LANGUAGE' ) = 'PLORK';
-      return @(@_[0]);
-    },
-    sub {
-      print $^STDOUT, "# Testing wath HTTP_ACCEPT_LANGUAGE...\n";
-      env::var('HTTP_ACCEPT_LANGUAGE' ) = @_[0];
-     return();
-    },)
-  ) {
-    my @args = &$modus($in);
-
-    # ////////////////////////////////////////////////////
-    my @out = I18N::LangTags::Detect->http_accept_langs(< @args);
-    # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
-    if(
-     (nelems @out) == nelems @should
-       and lc( join "\e", @(<@out) ) eq lc( join "\e", @should )
+            print $^STDOUT, "# Testing with arg...\n";
+            env::var('HTTP_ACCEPT_LANGUAGE' ) = 'PLORK';
+            return @(@_[0]);
+        },
+        sub {
+            print $^STDOUT, "# Testing wath HTTP_ACCEPT_LANGUAGE...\n";
+            env::var('HTTP_ACCEPT_LANGUAGE' ) = @_[0];
+            return();
+        },)
     ) {
-      print $^STDOUT, "# Happily got [$(join ' ',@(<@out))] from [$in]\n";
-      ok 1;
-    } else {
-      ok 0;
-      print $^STDOUT, "#Got:         [$(join ' ',@out)]\n",
-            "# but wanted: [$(join ' ',@should)]\n",
-            "# < \"$in\"\n#\n";
+        my @args = &$modus($in);
+
+        # ////////////////////////////////////////////////////
+        my @out = I18N::LangTags::Detect->http_accept_langs(< @args);
+        # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+        if(
+            (nelems @out) == nelems @should
+            and lc( join "\e", @(<@out) ) eq lc( join "\e", @should )
+        ) {
+                print $^STDOUT, "# Happily got [$(join ' ',@(<@out))] from [$in]\n";
+                ok 1;
+            } else {
+                ok 0;
+                print $^STDOUT, "#Got:         [$(join ' ',@out)]\n",
+                    "# but wanted: [$(join ' ',@should)]\n",
+                    "# < \"$in\"\n#\n";
+            }
     }
-  }
 }
 
 print $^STDOUT, "#\n#\n# Bye-bye!\n";

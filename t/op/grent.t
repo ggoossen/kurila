@@ -13,10 +13,10 @@ our (%Config, $where);
 try { require Config; Config->import; };
 my $reason;
 if (%Config{?'i_grp'} ne 'define') {
-	$reason = '%Config{i_grp} not defined';
+    $reason = '%Config{i_grp} not defined';
 }
 elsif (not -f "/etc/group" ) { # Play safe.
-	$reason = 'no /etc/group file';
+    $reason = 'no /etc/group file';
 }
 
 if (not defined $where) {	# Try NIS.
@@ -35,7 +35,7 @@ if (not defined $where) {	# Try NIS.
                 # If there's no group line, assume it default to compat.
                 if( !$group || $group !~ m/(nis|compat)/ ) {
                     print $^STDOUT, "# Doesn't look like you're using NIS in ".
-                          "/etc/nsswitch.conf\n";
+                        "/etc/nsswitch.conf\n";
                     last;
                 }
             }
@@ -97,41 +97,41 @@ while ( ~< *GR) {
     my @s = split m/:/, $_, -1;
     my @($name_s,$passwd_s,$gid_s,$members_s) =  @s;
     if ((nelems @s)) {
-	push @{ %seen{+$name_s} }, iohandle::input_line_number(\*GR);
+        push @{ %seen{+$name_s} }, iohandle::input_line_number(\*GR);
     } else {
-	warn "# Your $where line $(iohandle::input_line_number(\*GR)) is empty.\n";
-	next;
+        warn "# Your $where line $(iohandle::input_line_number(\*GR)) is empty.\n";
+        next;
     }
     if ($n == $max) {
-	local $^INPUT_RECORD_SEPARATOR = undef;
-	my $junk = ~< *GR;
-	last;
+        local $^INPUT_RECORD_SEPARATOR = undef;
+        my $junk = ~< *GR;
+        last;
     }
     # In principle we could whine if @s != 4 but do we know enough
     # of group file formats everywhere?
     if ((nelems @s) == 4) {
-	$members_s =~ s/\s*,\s*/,/g;
-	$members_s =~ s/\s+$//;
-	$members_s =~ s/^\s+//;
-	my @n = @( getgrgid($gid_s) );
-	# 'nogroup' et al.
-	next unless (nelems @n);
-	my @($name,$passwd,$gid,$members) =  @n;
-	# Protect against one-to-many and many-to-one mappings.
-	if ($name_s ne $name) {
-	    @n = @( getgrnam($name_s) );
-	    @($name,$passwd,$gid,$members) =  @n;
-	    next if $name_s ne $name;
-	}
-	# NOTE: group names *CAN* contain whitespace.
-	$members =~ s/\s+/,/g;
-	# what about different orders of members?
-	%perfect{+$name_s}++
-	    if $name    eq $name_s    and
-# Do not compare passwords: think shadow passwords.
-# Not that group passwords are used much but better not assume anything.
-               $gid     eq $gid_s     and
-               $members eq $members_s;
+        $members_s =~ s/\s*,\s*/,/g;
+        $members_s =~ s/\s+$//;
+        $members_s =~ s/^\s+//;
+        my @n = @( getgrgid($gid_s) );
+        # 'nogroup' et al.
+        next unless (nelems @n);
+        my @($name,$passwd,$gid,$members) =  @n;
+        # Protect against one-to-many and many-to-one mappings.
+        if ($name_s ne $name) {
+            @n = @( getgrnam($name_s) );
+            @($name,$passwd,$gid,$members) =  @n;
+            next if $name_s ne $name;
+        }
+        # NOTE: group names *CAN* contain whitespace.
+        $members =~ s/\s+/,/g;
+        # what about different orders of members?
+        %perfect{+$name_s}++
+        if $name    eq $name_s    and
+            # Do not compare passwords: think shadow passwords.
+            # Not that group passwords are used much but better not assume anything.
+            $gid     eq $gid_s     and
+            $members eq $members_s;
     }
     $n++;
 }

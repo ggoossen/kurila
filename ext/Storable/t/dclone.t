@@ -8,7 +8,7 @@
 
 BEGIN {
     if (env::var('PERL_CORE')){
-	push $^INCLUDE_PATH, '../ext/Storable/t';
+        push $^INCLUDE_PATH, '../ext/Storable/t';
     }
     require 'st-dump.pl';
 }
@@ -24,7 +24,7 @@ our $c = bless \%(), 'CLASS';
 $c->{+attribute} = 'attrval';
 our %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
 our @a = @('first', undef, 3, -4, -3.14159, 456, 4.5,
-	$b, \$a, $a, $c, \$c, \%a);
+           $b, \$a, $a, $c, \$c, \%a);
 
 print $^STDOUT, "not " unless defined (our $aref = dclone(\@a));
 print $^STDOUT, "ok 1\n";
@@ -38,12 +38,12 @@ print $^STDOUT, "ok 3\n";
 print $^STDOUT, "not " unless $got eq $dumped; 
 print $^STDOUT, "ok 4\n";
 
-package FOO; our @ISA = qw(Storable);
+    package FOO; our @ISA = qw(Storable);
 
 sub make {
-	my $self = bless \%();
-	$self->{+key} = \%main::a;
-	return $self;
+    my $self = bless \%();
+    $self->{+key} = \%main::a;
+    return $self;
 };
 
 package main;
@@ -69,8 +69,8 @@ print $^STDOUT, "ok 8\n";
 print $^STDOUT, "not " unless %$cloned{''}->[0] \== \%$cloned{+a};
 print $^STDOUT, "ok 9\n";
 
-# [ID 20020221.007] SEGV in Storable with empty string scalar object
-package TestString;
+    # [ID 20020221.007] SEGV in Storable with empty string scalar object
+    package TestString;
 sub new($type, $string) {
     return bless(\$string, $type);
 }
@@ -79,6 +79,6 @@ my $empty_string_obj = TestString->new('');
 my $clone = dclone($empty_string_obj);
 # If still here after the dclone the fix (#17543) worked.
 print $^STDOUT, ref $clone eq ref $empty_string_obj &&
-      $$clone eq $$empty_string_obj &&
-      $$clone eq '' ?? "ok 10\n" !! "not ok 10\n";
+    $$clone eq $$empty_string_obj &&
+    $$clone eq '' ?? "ok 10\n" !! "not ok 10\n";
 

@@ -4,30 +4,30 @@ use Test::More;
 plan tests => 12;
 
 do {
-   package LenDigest;
-   require Digest::base;
-   our (@ISA);
-   @ISA = qw(Digest::base);
+    package LenDigest;
+    require Digest::base;
+    our (@ISA);
+    @ISA = qw(Digest::base);
 
-   sub new {
-	my $class = shift;
-	my $str = "";
-	bless \$str, $class;
-   }
+    sub new {
+        my $class = shift;
+        my $str = "";
+        bless \$str, $class;
+    }
 
-   sub add {
-	my $self = shift;
-	$$self .= join("", @_);
-	return $self;
-   }
+    sub add {
+        my $self = shift;
+        $$self .= join("", @_);
+        return $self;
+    }
 
-   sub digest {
-	my $self = shift;
-	my $len = length($$self);
-	my $first = ($len +> 0) ?? substr($$self, 0, 1) !! "X";
-	$$self = "";
-	return sprintf "$first\%04d", $len;
-   }
+    sub digest {
+        my $self = shift;
+        my $len = length($$self);
+        my $first = ($len +> 0) ?? substr($$self, 0, 1) !! "X";
+        $$self = "";
+        return sprintf "$first\%04d", $len;
+    }
 };
 
 my $ctx = LenDigest->new;

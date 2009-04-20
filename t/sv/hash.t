@@ -12,13 +12,13 @@ my %h;
 ok (!Internals::HvREHASH(\%h), "hash doesn't start with rehash flag on");
 
 foreach (1..10) {
-  %h{+"\0"x$_}++;
+    %h{+"\0"x$_}++;
 }
 
 ok (!Internals::HvREHASH(\%h), "10 entries doesn't trigger rehash");
 
 foreach (11..20) {
-  %h{+"\0"x$_}++;
+    %h{+"\0"x$_}++;
 }
 
 ok (Internals::HvREHASH(\%h), "20 entries triggers rehash");

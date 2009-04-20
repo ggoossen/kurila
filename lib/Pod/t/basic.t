@@ -46,10 +46,10 @@ env::var('TERMCAP' ) = 'xterm:co=80:do=^J:md=\E[1m:us=\E[4m:me=\E[m';
 # Map of translators to file extensions to find the formatted output to
 # compare against.
 my %translators = %('Pod::Man'              => 'man',
-                   'Pod::Text'             => 'txt',
-                   'Pod::Text::Color'      => 'clr',
-                   'Pod::Text::Overstrike' => 'ovr',
-                   'Pod::Text::Termcap'    => 'cap');
+        'Pod::Text'             => 'txt',
+            'Pod::Text::Color'      => 'clr',
+            'Pod::Text::Overstrike' => 'ovr',
+            'Pod::Text::Termcap'    => 'cap');
 
 # Set default options to match those of pod2man and pod2text.
 our %options = %(sentence => 0);

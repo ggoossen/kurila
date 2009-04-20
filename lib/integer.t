@@ -25,23 +25,23 @@ $z = $x / $y;
 is($z, 0, "modulo");
 
 is($x, 4.5, "scalar still floating point");
- 
+
 isnt(sqrt($x), 2, "functions still floating point");
- 
+
 isnt($x ** .5, 2, "power still floating point");
 
 is(++$x, 5.5, "++ still floating point");
- 
+
 SKIP: do {
     my $ivsize = config_value("ivsize");
     skip "ivsize == $ivsize", 2 unless $ivsize == 4 || $ivsize == 8;
 
     if ($ivsize == 4) {
-	$z = 2**31 - 1;
-	is($z + 1, -2147483648, "left shift");
+        $z = 2**31 - 1;
+        is($z + 1, -2147483648, "left shift");
     } elsif ($ivsize == 8) {
-	$z = 2**63 - 1;
-	is($z + 1, -9223372036854775808, "left shift");
+        $z = 2**63 - 1;
+        is($z + 1, -9223372036854775808, "left shift");
     }
 };
 

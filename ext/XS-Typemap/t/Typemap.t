@@ -12,15 +12,15 @@ ok(1);
 
 # Some inheritance trees to check ISA relationships
 BEGIN {
-  package intObjPtr::SubClass;
-  use base < qw/ intObjPtr /;
-  sub xxx { 1; }
+    package intObjPtr::SubClass;
+    use base < qw/ intObjPtr /;
+    sub xxx { 1; }
 }
 
 BEGIN {
-  package intRefIvPtr::SubClass;
-  use base < qw/ intRefIvPtr /;
-  sub xxx { 1 }
+    package intRefIvPtr::SubClass;
+    use base < qw/ intRefIvPtr /;
+    sub xxx { 1 }
 }
 
 # T_SV - standard perl scalar value
@@ -121,9 +121,9 @@ diag "# T_U_SHORT\n";
 
 is( T_U_SHORT(32000), 32000);
 if (config_value('shortsize') == 2) {
-  ok( T_U_SHORT(65536) != 65536); # probably dont want to test edge cases
+    ok( T_U_SHORT(65536) != 65536); # probably dont want to test edge cases
 } else {
-  ok(1); # e.g. Crays have shortsize 4 (T3X) or 8 (CXX and SVX)
+    ok(1); # e.g. Crays have shortsize 4 (T3X) or 8 (CXX and SVX)
 }
 
 # T_U_LONG aka U32
@@ -245,7 +245,7 @@ $p = T_OPAQUEPTR_IN_struct(< @test);
 my @result = T_OPAQUEPTR_OUT_struct($p);
 is(scalar(nelems @result),scalar(nelems @test));
 for (0..((nelems @test)-1)) {
-  is(@result[$_], @test[$_]);
+    is(@result[$_], @test[$_]);
 }
 
 # T_OPAQUE
@@ -264,7 +264,7 @@ my $packed = T_OPAQUE_array(< @opq);
 my @uopq = @( unpack("i*",$packed) );
 is(scalar(nelems @uopq), scalar(nelems @opq));
 for (0..((nelems @opq)-1)) {
-  is( @uopq[$_], @opq[$_]);
+    is( @uopq[$_], @opq[$_]);
 }
 
 # Skip T_PACKED
@@ -283,7 +283,7 @@ my @outarr = @( < T_ARRAY( 5, < @inarr ) );
 is(scalar(nelems @outarr), scalar(nelems @inarr));
 
 for (0..((nelems @inarr)-1)) {
-  is(@outarr[$_], @inarr[$_]);
+    is(@outarr[$_], @inarr[$_]);
 }
 
 
@@ -299,31 +299,31 @@ ok( $fh );
 # write to it using perl
 if (defined $fh) {
 
-  my @lines = @("NormalSTDIO\n", "PerlIO\n");
+    my @lines = @("NormalSTDIO\n", "PerlIO\n");
 
-  # print to it using FILE* through XS
-  is( T_STDIO_print($fh, @lines[0]), length(@lines[0]));
+    # print to it using FILE* through XS
+    is( T_STDIO_print($fh, @lines[0]), length(@lines[0]));
 
-  # print to it using normal perl
-  ok(print $fh, "@lines[1]");
+    # print to it using normal perl
+    ok(print $fh, "@lines[1]");
 
-  # close it using XS if using perlio, using Perl otherwise
-  ok( config_value('useperlio') ?? T_STDIO_close( $fh ) !! close( $fh ) );
+    # close it using XS if using perlio, using Perl otherwise
+    ok( config_value('useperlio') ?? T_STDIO_close( $fh ) !! close( $fh ) );
 
-  # open from perl, and check contents
-  open($fh, "<", "$testfile");
-  ok($fh);
-  my $line = ~< $fh;
-  is($line,@lines[0]);
-  $line = ~< $fh;
-  is($line,@lines[1]);
+    # open from perl, and check contents
+    open($fh, "<", "$testfile");
+    ok($fh);
+    my $line = ~< $fh;
+    is($line,@lines[0]);
+    $line = ~< $fh;
+    is($line,@lines[1]);
 
-  ok(close($fh));
-  ok(unlink($testfile));
+    ok(close($fh));
+    ok(unlink($testfile));
 
 } else {
-  for (1..8) {
-    skip("Skip Test not relevant since file was not opened correctly",0);
-  }
+    for (1..8) {
+        skip("Skip Test not relevant since file was not opened correctly",0);
+    }
 }
 

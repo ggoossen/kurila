@@ -101,7 +101,7 @@ sub test_not_inherited {
     # cmp_ok( $rc, '!=', 0,
     #     "child return code=$rc (non-zero means cannot inherit fd=$expected_fd)" );
     cmp_ok( nelems(@: $out =~ m/(\n)/g), '==', 1,
-        "child stdout: has 1 newline (rc=$rc, should be non-zero)" );
+            "child stdout: has 1 newline (rc=$rc, should be non-zero)" );
     is( $out, "childfd=$expected_fd\n", 'child stdout: fd' );
 }
 
@@ -112,7 +112,7 @@ sub test_inherited {
     my $out = `$cmd`;
     my $rc  = $^CHILD_ERROR >> 8;
     cmp_ok( $rc, '==', 0,
-        "child return code=$rc (zero means inherited fd=$expected_fd ok)" );
+            "child return code=$rc (zero means inherited fd=$expected_fd ok)" );
     my @lines = split(m/^/, $out);
     cmp_ok( (nelems @($out =~ m/(\n)/g)), '==', 2, 'child stdout: has 2 newlines' );
     cmp_ok( scalar(nelems @lines),  '==', 2, 'child stdout: split into 2 lines' );

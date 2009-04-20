@@ -24,15 +24,15 @@ my @prgs = @( () ) ;
 my @w_files = @( () ) ;
 
 if ((nelems @ARGV))
-  { print $^STDOUT, "ARGV = [$(join ' ',@ARGV)]\n" ;
+{ print $^STDOUT, "ARGV = [$(join ' ',@ARGV)]\n" ;
     if ($Is_MacOS) {
-      @w_files = map { s#^#:lib:$pragma_name:#; $_ }, @ARGV
+        @w_files = map { s#^#:lib:$pragma_name:#; $_ }, @ARGV
     } else {
-      @w_files = map { s#^#./lib/$pragma_name/#; $_ }, @ARGV
+        @w_files = map { s#^#./lib/$pragma_name/#; $_ }, @ARGV
     }
-  }
+}
 else
-  { @w_files = sort glob(catfile(curdir(), "lib", $pragma_name, "*")) }
+{ @w_files = sort glob(catfile(curdir(), "lib", $pragma_name, "*")) }
 
 my $files = 0;
 foreach my $file ( @w_files) {
@@ -47,7 +47,7 @@ foreach my $file ( @w_files) {
     while ( ~< $f) {
         print $got_file, $_ if $got_files;
         $line++;
-	last if m/^__END__/ ;
+        last if m/^__END__/ ;
     }
     close $got_file if $got_files;
 
@@ -67,16 +67,16 @@ my $out_file;
 my $file;
 for ( @prgs){
     unless (m/\n/)
-     {
-      print $^STDOUT, "# From $_\n";
-      $file = $_;
+    {
+        print $^STDOUT, "# From $_\n";
+        $file = $_;
 
-      if ($got_files) {
-          close $out_file if $out_file;
-          open $out_file, ">>", "$file.got" or die;
-      }
-      next;
-     }
+        if ($got_files) {
+            close $out_file if $out_file;
+            open $out_file, ">>", "$file.got" or die;
+        }
+        next;
+    }
     my $src = $_;
     my $switch = "";
     my @temps = @( () ) ;
@@ -91,38 +91,38 @@ for ( @prgs){
     # If the TODO reason starts ? then it's taken as a code snippet to evaluate
     # This provides the flexibility to have conditional TODOs
     if ($todo_reason && $todo_reason =~ s/^\?//) {
-	my $temp = eval $todo_reason;
-	if ($^EVAL_ERROR) {
-	    die "# In TODO code reason:\n# $todo_reason\n$($^EVAL_ERROR->message)";
-	}
-	$todo_reason = $temp;
+        my $temp = eval $todo_reason;
+        if ($^EVAL_ERROR) {
+            die "# In TODO code reason:\n# $todo_reason\n$($^EVAL_ERROR->message)";
+        }
+        $todo_reason = $temp;
     }
     if ( $prog =~ m/--FILE--/) {
         my @files = split(m/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) ;
-	shift @files ;
-	die "Internal error: test $_ didn't split into pairs, got " .
-		scalar(nelems @files) . "[" . join("\%\%\%\%", @files) ."]\n"
-	    if (nelems @files) % 2 ;
-	while ((nelems @files) +> 2) {
-	    my $filename = shift @files ;
-	    my $code = shift @files ;
-    	    push @temps, $filename ;
-    	    if ($filename =~ m#(.*)/#) {
+        shift @files ;
+        die "Internal error: test $_ didn't split into pairs, got " .
+            scalar(nelems @files) . "[" . join("\%\%\%\%", @files) ."]\n"
+            if (nelems @files) % 2 ;
+        while ((nelems @files) +> 2) {
+            my $filename = shift @files ;
+            my $code = shift @files ;
+            push @temps, $filename ;
+            if ($filename =~ m#(.*)/#) {
                 mkpath($1);
                 push(@temp_path, $1);
-    	    }
-	    open my $f, ">", "$filename" or die "Cannot open $filename: $^OS_ERROR\n" ;
-	    print $f ,$code ;
-	    close $f or die "Cannot close $filename: $^OS_ERROR\n";
-	}
-	shift @files ;
-	$prog = shift @files ;
+            }
+            open my $f, ">", "$filename" or die "Cannot open $filename: $^OS_ERROR\n" ;
+            print $f ,$code ;
+            close $f or die "Cannot close $filename: $^OS_ERROR\n";
+        }
+        shift @files ;
+        $prog = shift @files ;
     }
 
     # fix up some paths
     if ($Is_MacOS) {
-	$prog =~ s|require "./abc(d)?";|require ":abc$1";|g;
-	$prog =~ s|"\."|":"|g;
+        $prog =~ s|require "./abc(d)?";|require ":abc$1";|g;
+        $prog =~ s|"\."|":"|g;
     }
 
     open my $test, ">", "$tmpfile" or die "Cannot open >$tmpfile: $^OS_ERROR";
@@ -148,16 +148,16 @@ for ( @prgs){
         # pipes double these sometimes
         $results =~ s/\n\n/\n/g;
     }
-# bison says 'parse error' instead of 'syntax error',
-# various yaccs may or may not capitalize 'syntax'.
+    # bison says 'parse error' instead of 'syntax error',
+    # various yaccs may or may not capitalize 'syntax'.
     $results =~ s/^(syntax|parse) error/syntax error/mig;
     # allow all tests to run when there are leaks
     $results =~ s/Scalars leaked: \d+\n//g;
 
     # fix up some paths
     if ($Is_MacOS) {
-	$results =~ s|:abc\.pm\b|abc.pm|g;
-	$results =~ s|:abc(d)?\b|./abc$1|g;
+        $results =~ s|:abc\.pm\b|abc.pm|g;
+        $results =~ s|:abc(d)?\b|./abc$1|g;
     }
 
     $expected =~ s/\n+$//;
@@ -166,41 +166,41 @@ for ( @prgs){
     my $option_regex = 0;
     my $option_random = 0;
     if ($expected =~ s/^OPTIONS? (.+)\n//) {
-	foreach my $option (split(' ', $1)) {
-	    if ($option eq 'regex') { # allow regular expressions
-		$option_regex = 1;
-	    }
-	    elsif ($option eq 'random') { # all lines match, but in any order
-		$option_random = 1;
-	    }
-	    else {
-		die "$^PROGRAM_NAME: Unknown OPTION '$option'\n";
-	    }
-	}
+        foreach my $option (split(' ', $1)) {
+            if ($option eq 'regex') { # allow regular expressions
+                $option_regex = 1;
+            }
+            elsif ($option eq 'random') { # all lines match, but in any order
+                $option_random = 1;
+            }
+            else {
+                die "$^PROGRAM_NAME: Unknown OPTION '$option'\n";
+            }
+        }
     }
     die "$^PROGRAM_NAME: can't have OPTION regex and random\n"
         if $option_regex + $option_random +> 1;
     my $ok = 0;
     if ($results =~ s/^SKIPPED\n//) {
-	print $^STDOUT, "$results\n" ;
-	$ok = 1;
+        print $^STDOUT, "$results\n" ;
+        $ok = 1;
     }
     elsif ($option_random) {
         $ok = randomMatch($results, $expected);
     }
     elsif ($option_regex) {
-	$ok = $results =~ m/^$expected/;
+        $ok = $results =~ m/^$expected/;
     }
     elsif ($prefix) {
-	$ok = $results =~ m/^\Q$expected/;
+        $ok = $results =~ m/^\Q$expected/;
     }
     else {
-	$ok = $results eq $expected;
+        $ok = $results eq $expected;
 
         $src =~ s/\nEXPECT(?:\n|$)(.|\n)*/\nEXPECT\n$results/;
     }
     print $out_file, $src, "\n########\n" if $got_files;
- 
+
     our $TODO = $todo ?? $todo_reason !! 0;
 
     print_err_line( $switch, $prog, $expected, $results, $todo, $file ) unless $ok or $TODO;
@@ -208,9 +208,9 @@ for ( @prgs){
     ok($ok);
 
     foreach ( @temps)
-	{ unlink $_ if $_ }
+    { unlink $_ if $_ }
     foreach ( @temp_path)
-	{ rmtree $_ if -d $_ }
+    { rmtree $_ if -d $_ }
 }
 
 sub randomMatch
@@ -221,22 +221,22 @@ sub randomMatch
     my @got = sort split "\n", $got ;
     my @expected = sort split "\n", $expected ;
 
-   return "$(join ' ',@got)" eq "$(join ' ',@expected)";
+    return "$(join ' ',@got)" eq "$(join ' ',@expected)";
 
 }
 
 sub print_err_line {
     my @($switch, $prog, $expected, $results, $todo, $file) =  @_;
     my $err_line = "FILE: $file\n" .
-                   "PROG: $switch\n$prog\n" .
-		   "EXPECTED:\n$expected\n" .
-		   "GOT:\n$results\n";
+        "PROG: $switch\n$prog\n" .
+        "EXPECTED:\n$expected\n" .
+        "GOT:\n$results\n";
     if ($todo) {
-	$err_line =~ s/^/# /mg;
-	print $^STDOUT, $err_line;  # Harness can't filter it out from STDERR.
+        $err_line =~ s/^/# /mg;
+        print $^STDOUT, $err_line;  # Harness can't filter it out from STDERR.
     }
     else {
-	print $^STDERR, $err_line;
+        print $^STDERR, $err_line;
     }
 
     return 1;

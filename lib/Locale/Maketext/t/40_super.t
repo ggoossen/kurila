@@ -39,39 +39,39 @@ pt-br-janeiro de pt-br fr => pt-br-janeiro de pt-br fr pt
 $Locale::Maketext::MATCH_SUPERS_TIGHTLY = 0;
 
 foreach my $in ( @in) {
-  $in =~ s/^\s+//s;
-  $in =~ s/\s+$//s;
-  $in =~ s/#.+//s;
-  next unless $in =~ m/\S/;
-  
-  my(@in, @should);
-  do {
-    die "What kind of line is <$in>?!"
-     unless $in =~ m/^(.+)=>(.+)$/s;
-  
-    my@($i,$s) = @($1, $2);
-    @in     = @($i =~ m/(\S+)/g);
-    @should = @($s =~ m/(\S+)/g);
-    #print "{@in}{@should}\n";
-  };
-  my @out = Locale::Maketext->_add_supers(
-    ("$(join ' ',@in)" eq 'NIX') ?? () !! < @in
-  );
-  #print "O: ", join(' ', map "<$_>", @out), "\n";
-  @out = @( 'NIX' ) unless (nelems @out);
+    $in =~ s/^\s+//s;
+    $in =~ s/\s+$//s;
+    $in =~ s/#.+//s;
+    next unless $in =~ m/\S/;
 
-  
-  if( (nelems @out) == nelems @should
-      and lc( join "\e", @out ) eq lc( join "\e", @should )
-  ) {
-    print $^STDOUT, "#     Happily got [$(join ' ',@out)] from [$in]\n";
-    ok 1;
-  } else {
-    ok 0;
-    print $^STDOUT, "#!!Got:         [$(join ' ',@out)]\n",
-          "#!! but wanted: [$(join ' ',@should)]\n",
-          "#!! from \"$in\"\n#\n";
-  }
+    my(@in, @should);
+    do {
+        die "What kind of line is <$in>?!"
+            unless $in =~ m/^(.+)=>(.+)$/s;
+
+        my@($i,$s) = @($1, $2);
+        @in     = @($i =~ m/(\S+)/g);
+        @should = @($s =~ m/(\S+)/g);
+    #print "{@in}{@should}\n";
+    };
+    my @out = Locale::Maketext->_add_supers(
+        ("$(join ' ',@in)" eq 'NIX') ?? () !! < @in
+        );
+    #print "O: ", join(' ', map "<$_>", @out), "\n";
+    @out = @( 'NIX' ) unless (nelems @out);
+
+
+    if( (nelems @out) == nelems @should
+        and lc( join "\e", @out ) eq lc( join "\e", @should )
+    ) {
+            print $^STDOUT, "#     Happily got [$(join ' ',@out)] from [$in]\n";
+            ok 1;
+        } else {
+            ok 0;
+            print $^STDOUT, "#!!Got:         [$(join ' ',@out)]\n",
+                "#!! but wanted: [$(join ' ',@should)]\n",
+                "#!! from \"$in\"\n#\n";
+        }
 }
 
 print $^STDOUT, "#\n#\n# Bye-bye!\n";

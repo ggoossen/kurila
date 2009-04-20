@@ -2,8 +2,8 @@
 
 BEGIN {
     if (env::var('PERL_CORE')) {
-	$^INCLUDE_PATH = @( '../lib' );
-	chdir 't';
+        $^INCLUDE_PATH = @( '../lib' );
+        chdir 't';
     }
 }
 
@@ -11,7 +11,7 @@ use Getopt::Long < qw(GetOptionsFromArray :config no_ignore_case);
 my $want_version="2.3501";
 die("Getopt::Long version $want_version required--this is only version ".
     $Getopt::Long::VERSION)
-  unless $Getopt::Long::VERSION +>= $want_version;
+    unless $Getopt::Long::VERSION +>= $want_version;
 
 print $^STDOUT, "1..10\n";
 

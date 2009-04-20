@@ -29,8 +29,8 @@ sub PUSHED { bless \*PUSHED,@_[0] } #PUSHED
 
 sub FILL {
 
-# Read the line from the handle
-# Decode if there is something decode and return result or signal eof
+    # Read the line from the handle
+    # Decode if there is something decode and return result or signal eof
 
     my $line = readline( @_[1] );
     (defined $line) ?? MIME::QuotedPrint::decode_qp( $line ) !! undef;
@@ -44,7 +44,7 @@ sub FILL {
 
 sub WRITE {
 
-# Encode whatever needs to be encoded and write to handle: indicate result
+    # Encode whatever needs to be encoded and write to handle: indicate result
 
     (print @_[2] ,MIME::QuotedPrint::encode_qp(@_[1])) ?? length(@_[1]) !! -1;
 } #WRITE

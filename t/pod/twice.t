@@ -17,12 +17,12 @@ do {
         my $parser = 'Pod::Parser'->new();
         $parser->parse_from_file( $^PROGRAM_NAME, $handle );
     };
-  # free the reference
-  do {
-    my $parser = 'Pod::Parser'->new();
-    $parser->parse_from_file( $^PROGRAM_NAME, < 'File::Spec'->devnull );
-  };
-  1;
+    # free the reference
+    do {
+        my $parser = 'Pod::Parser'->new();
+        $parser->parse_from_file( $^PROGRAM_NAME, < 'File::Spec'->devnull );
+    };
+    1;
 };
 
 __END__

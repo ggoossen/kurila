@@ -11,18 +11,18 @@ $VERSION = '2.02';
 @ISA = @('Pod::Simple');
 
 sub new {
-  my $self = shift;
-  my $new = $self->SUPER::new(< @_);
-  $new->{+'output_fh'} ||= $^STDOUT;
-  $new->nix_X_codes(1);
-  return $new;
+    my $self = shift;
+    my $new = $self->SUPER::new(< @_);
+    $new->{+'output_fh'} ||= $^STDOUT;
+    $new->nix_X_codes(1);
+    return $new;
 }
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 sub _handle_element_start {
-  print @_[0]->{?'output_fh'} ,"\n"  unless @_[1] =~ m/^[A-Z]$/s;
-  return;
+    print @_[0]->{?'output_fh'} ,"\n"  unless @_[1] =~ m/^[A-Z]$/s;
+    return;
 }
 
 sub _handle_text {
@@ -33,8 +33,8 @@ sub _handle_text {
 }
 
 sub _handle_element_end {
-  print @_[0]->{?'output_fh'} ,"\n"  unless @_[1] =~ m/^[A-Z]$/s;
-  return;
+    print @_[0]->{?'output_fh'} ,"\n"  unless @_[1] =~ m/^[A-Z]$/s;
+    return;
 }
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

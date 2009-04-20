@@ -4,15 +4,15 @@ use MIME::QuotedPrint;
 my $x70 = "x" x 70;
 
 my @tests =
-  @(
+    @(
    # plain ascii should not be encoded
    \@("", ""),
    \@("quoted printable"  =>
-    "quoted printable=\n"),
+      "quoted printable=\n"),
 
    # 8-bit chars should be encoded
    \@("v\xe5re kj\xe6re norske tegn b\xf8r \xe6res" =>
-    "v=E5re kj=E6re norske tegn b=F8r =E6res=\n"),
+      "v=E5re kj=E6re norske tegn b=F8r =E6res=\n"),
 
    # trailing space should be encoded
    \@("  " => "=20=20=\n"),
@@ -25,15 +25,15 @@ my @tests =
 
    # Very long lines should be broken (not more than 76 chars
    \@("The Quoted-Printable encoding is intended to represent data that largly consists of octets that correspond to printable characters in the ASCII character set." =>
-    "The Quoted-Printable encoding is intended to represent data that largly con=
+      "The Quoted-Printable encoding is intended to represent data that largly con=
 sists of octets that correspond to printable characters in the ASCII charac=
 ter set.=\n"
-    ),
+   ),
 
    # Long lines after short lines were broken through 2.01.
    \@("short line
 In America, any boy may become president and I suppose that's just one of the risks he takes. -- Adlai Stevenson" =>
-    "short line
+                                                                                       "short line
 In America, any boy may become president and I suppose that's just one of t=
 he risks he takes. -- Adlai Stevenson=\n"),
 
@@ -41,7 +41,7 @@ he risks he takes. -- Adlai Stevenson=\n"),
    # multiple long lines.
    \@("College football is a game which would be much more interesting if the faculty played instead of the students, and even more interesting if the
 trustees played.  There would be a great increase in broken arms, legs, and necks, and simultaneously an appreciable diminution in the loss to humanity. -- H. L. Mencken" =>
-    "College football is a game which would be much more interesting if the facu=
+                                                                                                                                                    "College football is a game which would be much more interesting if the facu=
 lty played instead of the students, and even more interesting if the
 trustees played.  There would be a great increase in broken arms, legs, and=
  necks, and simultaneously an appreciable diminution in the loss to humanit=
@@ -84,7 +84,7 @@ y. -- H. L. Mencken=\n"),
    # trailing whitespace
    \@("foo \t ", "foo=20=09=20=\n"),
    \@("foo\t \n \t", "foo=09=20\n=20=09=\n"),
-);
+    );
 
 my $notests = (nelems @tests) + 15;
 print $^STDOUT, "1..$notests\n";
@@ -99,31 +99,31 @@ for ( @tests) {
     }
     my $x = encode_qp($plain);
     if ($x ne $encoded) {
-	print $^STDOUT, "Encode test failed\n";
-	print $^STDOUT, "Got:      '$x'\n";
-	print $^STDOUT, "Expected: '$encoded'\n";
-	print $^STDOUT, "not ok $testno\n";
-	next;
+        print $^STDOUT, "Encode test failed\n";
+        print $^STDOUT, "Got:      '$x'\n";
+        print $^STDOUT, "Expected: '$encoded'\n";
+        print $^STDOUT, "not ok $testno\n";
+        next;
     }
     $x = decode_qp($encoded);
     if ($x ne $plain) {
-	print $^STDOUT, "Decode test failed\n";
-	print $^STDOUT, "Got:      '$x'\n";
-	print $^STDOUT, "Expected: '$plain'\n";
-	print $^STDOUT, "not ok $testno\n";
-	next;
+        print $^STDOUT, "Decode test failed\n";
+        print $^STDOUT, "Got:      '$x'\n";
+        print $^STDOUT, "Expected: '$plain'\n";
+        print $^STDOUT, "not ok $testno\n";
+        next;
     }
     print $^STDOUT, "ok $testno\n";
 }
 
 # Some extra testing for a case that was wrong until libwww-perl-5.09
 print $^STDOUT, "not " unless decode_qp("foo  \n\nfoo =\n\nfoo=20\n\n") eq
-                                "foo\n\nfoo \nfoo \n\n";
+    "foo\n\nfoo \nfoo \n\n";
 $testno++; print $^STDOUT, "ok $testno\n";
 
 # Same test but with "\r\n" terminated lines
 print $^STDOUT, "not " unless decode_qp("foo  \r\n\r\nfoo =\r\n\r\nfoo=20\r\n\r\n") eq
-                                "foo\n\nfoo \nfoo \n\n";
+    "foo\n\nfoo \nfoo \n\n";
 $testno++; print $^STDOUT, "ok $testno\n";
 
 # Trailing whitespace

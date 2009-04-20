@@ -12,10 +12,10 @@ use Config;
 
 BEGIN {
     for my $syscall (qw(pipe fork waitpid getppid)) {
-	if (!config_value("d_$syscall")) {
-	    print $^STDOUT, "1..0 # Skip: no $syscall\n";
-	    exit;
-	}
+        if (!config_value("d_$syscall")) {
+            print $^STDOUT, "1..0 # Skip: no $syscall\n";
+            exit;
+        }
     }
     require './test.pl';
     plan (8);
@@ -27,42 +27,42 @@ sub fork_and_retrieve {
     my $pid = fork; defined $pid or die "fork: $^OS_ERROR\n";
 
     if ($pid) {
-	# parent
-	close $w;
-	$_ = ~< $r;
-	chomp;
-	die "Garbled output '$_'"
-	    unless my @($first, $second) = @: m/^(\d+),(\d+)\z/;
-	cmp_ok ($first, '+>=', 1, "Parent of $which grandchild");
-	cmp_ok ($second, '+>=', 1, "New parent of orphaned $which grandchild");
-	SKIP: do {
-	    skip("Orphan processes are not reparented on QNX", 1)
-		if $^OS_NAME eq 'nto';
-	    isnt($first, $second,
-                 "Orphaned $which grandchild got a new parent");
-	};
-	return $second;
+        # parent
+        close $w;
+        $_ = ~< $r;
+        chomp;
+        die "Garbled output '$_'"
+            unless my @($first, $second) = @: m/^(\d+),(\d+)\z/;
+        cmp_ok ($first, '+>=', 1, "Parent of $which grandchild");
+        cmp_ok ($second, '+>=', 1, "New parent of orphaned $which grandchild");
+      SKIP: do {
+            skip("Orphan processes are not reparented on QNX", 1)
+                if $^OS_NAME eq 'nto';
+            isnt($first, $second,
+          "Orphaned $which grandchild got a new parent");
+        };
+        return $second;
     }
     else {
-	# child
-	# Prevent test.pl from thinking that we failed to run any tests.
-	$::NO_ENDING = 1;
-	close $r;
+        # child
+        # Prevent test.pl from thinking that we failed to run any tests.
+        $::NO_ENDING = 1;
+        close $r;
 
-	my $pid2 = fork; defined $pid2 or die "fork: $^OS_ERROR\n";
-	if ($pid2) {
-	    close $w;
-	    sleep 1;
-	}
-	else {
-	    # grandchild
-	    my $ppid1 = getppid();
-	    # Wait for immediate parent to exit
-	    sleep 2;
-	    my $ppid2 = getppid();
-	    print $w, "$ppid1,$ppid2\n";
-	}
-	exit 0;
+        my $pid2 = fork; defined $pid2 or die "fork: $^OS_ERROR\n";
+        if ($pid2) {
+            close $w;
+            sleep 1;
+        }
+        else {
+            # grandchild
+            my $ppid1 = getppid();
+            # Wait for immediate parent to exit
+            sleep 2;
+            my $ppid2 = getppid();
+            print $w, "$ppid1,$ppid2\n";
+        }
+        exit 0;
     }
 }
 

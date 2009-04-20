@@ -441,7 +441,7 @@ sub can_ok($proto, @< @methods) {
 
     my $name;
     $name = (nelems @methods) == 1 ?? "$class->can('@methods[0]')" 
-                          !! "$class->can(...)";
+        !! "$class->can(...)";
 
     my $ok = $tb->ok( !nelems @nok, $name );
 
@@ -515,8 +515,8 @@ WHOA
             $diag = "$obj_name isn't a '$class' it's a '$ref'";
         }
     }
-            
-      
+
+
 
     my $ok;
     if( $diag ) {
@@ -635,7 +635,7 @@ USE
 
     my@($eval_result, $eval_error) =  _eval($code, \@imports);
     my $ok = $tb->ok( $eval_result, "use $module;" );
-    
+
     unless( $ok ) {
         $tb->diag(<<DIAGNOSTIC);
     Tried to use '$module'.
@@ -652,9 +652,9 @@ sub _eval {
     my@($code) =@( shift);
     my @args = @_;
 
-    # Work around oddities surrounding resetting of $@ by immediately
-    # storing it.
-    local($^EVAL_ERROR,$^OS_ERROR);   # isolate eval
+          # Work around oddities surrounding resetting of $@ by immediately
+          # storing it.
+          local($^EVAL_ERROR,$^OS_ERROR);   # isolate eval
     my $eval_result = eval $code;
     my $eval_error  = $^EVAL_ERROR;
 
@@ -782,7 +782,7 @@ WARNING
 
         warn sprintf $msg, scalar nelems @_;
 
-	return $tb->ok(0);
+        return $tb->ok(0);
     }
 
     my @($got, $expected, ?$name) =  @_;
@@ -999,7 +999,7 @@ sub skip($why, ?$how_many) {
     unless( defined $how_many ) {
         # $how_many can only be avoided when no_plan is in use.
         warn "skip() needs to know \$how_many tests are in the block"
-          unless $tb->has_plan eq 'no_plan';
+            unless $tb->has_plan eq 'no_plan';
         $how_many = 1;
     }
 
@@ -1084,7 +1084,7 @@ sub todo_skip($why, ?$how_many) {
     unless( defined $how_many ) {
         # $how_many can only be avoided when no_plan is in use.
         warn "todo_skip() needs to know \$how_many tests are in the block"
-          unless $tb->has_plan eq 'no_plan';
+            unless $tb->has_plan eq 'no_plan';
         $how_many = 1;
     }
 
@@ -1348,7 +1348,7 @@ sub eq_set($a1, $a2, ?$name)  {
     return eq_array(
            \ (sort { $a cmp $b }, map { dump::view($_) }, @$a1 ),
            \ (sort { $a cmp $b }, map { dump::view($_) }, @$a2 ),
-    );
+           );
 }
 
 =back

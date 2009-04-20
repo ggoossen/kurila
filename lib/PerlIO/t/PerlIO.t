@@ -1,9 +1,9 @@
 BEGIN {
-	require Config; Config->import;
-	unless (PerlIO::Layer->find( 'perlio')) {
-	    print $^STDOUT, "1..0 # Skip: PerlIO not used\n";
-	    exit 0;
-	}
+    require Config; Config->import;
+    unless (PerlIO::Layer->find( 'perlio')) {
+        print $^STDOUT, "1..0 # Skip: PerlIO not used\n";
+        exit 0;
+    }
 }
 
 use Test::More tests => 37;
@@ -103,7 +103,7 @@ do {
         #close STDOUT;
         my $status = open($^STDOUT,">",\$var);
         my $error = "$^OS_ERROR" unless $status; # remember the error
-	close $^STDOUT unless $status;
+        close $^STDOUT unless $status;
         open $^STDOUT, ">&",  \*$oldout or die "cannot dup OLDOUT: $^OS_ERROR";
         print $^STDOUT, "# $error\n" unless $status;
         # report after STDOUT is restored

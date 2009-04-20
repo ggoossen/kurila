@@ -7,7 +7,7 @@ BEGIN {
 plan tests => 27;
 
 our (%h, @keys, @values, $i, $key, $value, $size, $newsize, $total, 
-     %hash, @foo, %u, $A, %b);
+    %hash, @foo, %u, $A, %b);
 
 %h{+'abc'} = 'ABC';
 %h{+'def'} = 'DEF';
@@ -49,8 +49,8 @@ $i = 0;		# stop -w complaints
 while (@(?$key,?$value) = @: each(%h)) {
     if ($key eq @keys[$i] && $value eq @values[$i]
         && (($key cmp $value) +> 0)) {
-	$key =~ s/([a-z])/$(uc($1))/g;
-	$i++ if $key eq $value;
+        $key =~ s/([a-z])/$(uc($1))/g;
+        $i++ if $key eq $value;
     }
 }
 
@@ -87,9 +87,9 @@ $i = 0;
 @keys = keys(%h);
 @values = values(%h);
 while (@(?$key, ?$value) = @: each(%h)) {
-	if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
-		$i++;
-	}
+    if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
+        $i++;
+    }
 }
 is ($i, 5);
 
@@ -98,10 +98,10 @@ do {
     package Obj;
     sub DESTROY { print $^STDOUT, "ok @::tests[?1] # DESTROY called\n"; }
     do {
-	my $h = \%( A => bless \@(), __PACKAGE__ );
+        my $h = \%( A => bless \@(), __PACKAGE__ );
         while (my@(?$k,?$v) =@( each %$h)) {
-	    print $^STDOUT, "ok @::tests[?0]\n" if $k eq 'A' and ref($v) eq 'Obj';
-	}
+            print $^STDOUT, "ok @::tests[?0]\n" if $k eq 'A' and ref($v) eq 'Obj';
+        }
     };
     print $^STDOUT, "ok @::tests[?2]\n";
 };
@@ -110,7 +110,7 @@ do {
 use utf8;
 %u = %("\x{12}", "f", "\x{123}", "fo", "\x{1234}",  "foo");
 %u{+"\x{12345}"}  = "bar";
-%u{[@("\x{10FFFD}")]} = @: "zap";
+    %u{[@("\x{10FFFD}")]} = @: "zap";
 
 my %u2;
 foreach (keys %u) {

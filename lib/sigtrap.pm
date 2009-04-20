@@ -22,7 +22,7 @@ sub import {
             if (m/^[A-Z][A-Z0-9]*$/) {
                 $saw_sig++;
                 unless ($untrapped and signals::handler($_)
-                          and signals::handler($_) ne 'DEFAULT') {
+                    and signals::handler($_) ne 'DEFAULT') {
                     print $^STDOUT, "Installing handler $(dump::view($handler)) for $_\n" if $Verbose;
                     signals::handler($_) = $handler;
                 }
@@ -32,7 +32,7 @@ sub import {
                 unshift @_, < grep { signals::supported($_) }, qw(ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP);
             } elsif ($_ eq 'old-interface-signals') {
                 unshift @_,
-                  < grep { signals::supported($_) }, qw(ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP);
+                    < grep { signals::supported($_) }, qw(ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP);
             } elsif ($_ eq 'stack-trace') {
                 $handler = \&handler_traceback;
             } elsif ($_ eq 'die') {
@@ -41,7 +41,7 @@ sub import {
                 (nelems @_) or die "No argument specified after 'handler'";
                 $handler = shift;
                 unless (ref $handler or $handler eq 'IGNORE'
-                          or $handler eq 'DEFAULT') {
+                    or $handler eq 'DEFAULT') {
                     require Symbol;
                     $handler = Symbol::qualify($handler, (caller)[[0]]);
                 }
@@ -51,12 +51,12 @@ sub import {
                 $untrapped = 0;
             } elsif ($_ =~ m/^\d/) {
                 $VERSION +>= $_ or die "sigtrap.pm version $_ required,"
-                  . " but this is only version $VERSION";
+                    . " but this is only version $VERSION";
             } else {
                 die "Unrecognized argument $_";
             }
         }
-	@_ = qw(old-interface-signals);
+        @_ = qw(old-interface-signals);
     } while ( ! $saw_sig );
 }
 
@@ -81,28 +81,28 @@ sub handler_traceback {
     my $i = 1;
     while (my @($p,$f,$l,$s,$h,$w,$e,$r) = caller@($i)) {
         my @a = @( () );
-	for ( @DB::args) {
-	    s/([\'\\])/\\$1/g;
-	    s/([^\0]*)/'$1'/
-	      unless m/^(?: -?[\d.]+ | \*[\w:]* )$/x;
-	    s/([\200-\377])/$(sprintf("M-\%c",ord($1)^&^0177))/g;
-	    s/([\0-\37\177])/$(sprintf("^\%c",ord($1)^^^64))/g;
-	    push(@a, $_);
-	}
-	$w = $w ?? '@ = ' !! '$ = ';
-	$a = $h ?? '(' . join(', ', @a) . ')' !! '';
-	$e =~ s/\n\s*\;\s*\Z// if $e;
-	$e =~ s/[\\\']/\\$1/g if $e;
-	if ($r) {
-	    $s = "require '$e'";
-	} elsif (defined $r) {
-	    $s = "eval '$e'";
-	} elsif ($s eq '(eval)') {
-	    $s = "eval \{...\}";
-	}
-	$f = "file `$f'" unless $f eq '-e';
-	my $mess = "$w$s$a called from $f line $l\n";
-	syswrite($^STDERR, $mess, length($mess));
+        for ( @DB::args) {
+            s/([\'\\])/\\$1/g;
+            s/([^\0]*)/'$1'/
+                unless m/^(?: -?[\d.]+ | \*[\w:]* )$/x;
+            s/([\200-\377])/$(sprintf("M-\%c",ord($1)^&^0177))/g;
+            s/([\0-\37\177])/$(sprintf("^\%c",ord($1)^^^64))/g;
+            push(@a, $_);
+        }
+        $w = $w ?? '@ = ' !! '$ = ';
+        $a = $h ?? '(' . join(', ', @a) . ')' !! '';
+        $e =~ s/\n\s*\;\s*\Z// if $e;
+        $e =~ s/[\\\']/\\$1/g if $e;
+        if ($r) {
+            $s = "require '$e'";
+        } elsif (defined $r) {
+            $s = "eval '$e'";
+        } elsif ($s eq '(eval)') {
+            $s = "eval \{...\}";
+        }
+        $f = "file `$f'" unless $f eq '-e';
+        my $mess = "$w$s$a called from $f line $l\n";
+        syswrite($^STDERR, $mess, length($mess));
 
         $i++;
     }

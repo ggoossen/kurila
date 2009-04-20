@@ -153,11 +153,11 @@ sub new {
     my $type = shift;
     my $class = ref($type) || $type || "IO::File";
     (nelems @_) +>= 0 && (nelems @_) +<= 3
-	or die "usage: new $class [FILENAME [,MODE [,PERMS]]]";
+        or die "usage: new $class [FILENAME [,MODE [,PERMS]]]";
     my $fh = $class->SUPER::new();
     if ((nelems @_)) {
-	$fh->open(< @_)
-	    or return undef;
+        $fh->open(< @_)
+            or return undef;
     }
     $fh;
 }
@@ -170,14 +170,14 @@ sub open {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $fh->open(FILENAME [,MODE [,PERMS]])';
     my @($fh, $file, ...) =  @_;
     if ((nelems @_) +> 2) {
-	my @($mode, $perms) =  @_[[@(2, 3)]];
-	if ($mode =~ m/^\d+$/) {
-	    defined $perms or $perms = 0666;
-	    return sysopen($fh, $file, $mode, $perms);
-	} elsif ($mode =~ m/:/) {
-	    return open($fh, $mode, $file) if (nelems @_) == 3;
-	    die 'usage: $fh->open(FILENAME, IOLAYERS)';
-	} else {
+        my @($mode, $perms) =  @_[[@(2, 3)]];
+        if ($mode =~ m/^\d+$/) {
+            defined $perms or $perms = 0666;
+            return sysopen($fh, $file, $mode, $perms);
+        } elsif ($mode =~ m/:/) {
+            return open($fh, $mode, $file) if (nelems @_) == 3;
+            die 'usage: $fh->open(FILENAME, IOLAYERS)';
+        } else {
             return open($fh, IO::Handle::_open_mode_string($mode), $file);
         }
     }

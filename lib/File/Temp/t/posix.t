@@ -21,9 +21,9 @@ ok( (-e $tmpnam ));
 # Unlink it - a possible NFS issue again if TMPDIR is not a local disk
 my $status = unlink0($fh, $tmpnam);
 if ($status) {
-  ok( $status );
+    ok( $status );
 } else {
-  skip("Skip test failed probably due to \$TMPDIR being on NFS",1);
+    skip("Skip test failed probably due to \$TMPDIR being on NFS",1);
 }
 
 # TMPFILE
@@ -31,33 +31,33 @@ if ($status) {
 $fh = tmpfile();
 
 if (defined $fh) {
-  ok( $fh );
-  print $^STDOUT, "# TMPFILE: tmpfile got FH $(dump::view($fh))\n";
+    ok( $fh );
+    print $^STDOUT, "# TMPFILE: tmpfile got FH $(dump::view($fh))\n";
 
-  $fh->autoflush(1);
+    $fh->autoflush(1);
 
-  # print something to it
-  my $original = "Hello a test\n";
-  print $^STDOUT, "# TMPFILE: Wrote line: $original";
-  print $fh, $original
-    or die "Error printing to tempfile\n";
+    # print something to it
+    my $original = "Hello a test\n";
+    print $^STDOUT, "# TMPFILE: Wrote line: $original";
+    print $fh, $original
+        or die "Error printing to tempfile\n";
 
-  # rewind it
-  ok( seek($fh,0,0) );
+    # rewind it
+    ok( seek($fh,0,0) );
 
-  # Read from it
-  my $line = ~< $fh;
+    # Read from it
+    my $line = ~< $fh;
 
-  print $^STDOUT, "# TMPFILE: Read line: $line";
-  is( $original, $line);
+    print $^STDOUT, "# TMPFILE: Read line: $line";
+    is( $original, $line);
 
-  close($fh);
+    close($fh);
 
 } else {
-  # Skip all the remaining tests
-  foreach (1..3) {
-    skip("Skip test failed probably due to \$TMPDIR being on NFS",1);
-  }
+    # Skip all the remaining tests
+    foreach (1..3) {
+        skip("Skip test failed probably due to \$TMPDIR being on NFS",1);
+    }
 }
 
 

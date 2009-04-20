@@ -1,6 +1,6 @@
 package IO::Uncompress::RawInflate ;
 # for RFC1951
- 
+
 use warnings;
 use bytes;
 
@@ -64,18 +64,18 @@ sub mkUncomp
                                                                 $got->value('CRC32'),
                                                                 $got->value('ADLER32'),
                                                                 $got->value('Scan'),
-                                                            );
+                                                                );
 
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
 
     $self->{+Uncomp} = $obj;
 
-     my $magic = $self->ckMagic()
+    my $magic = $self->ckMagic()
         or return 0;
 
     $self->{+Info} = $self->readHeader($magic)
-        or return undef ;
+    or return undef ;
 
     return 1;
 
@@ -95,11 +95,11 @@ sub readHeader
     my $magic = shift ;
 
     return \%(
-        'Type'          => 'rfc1951',
-        'FingerprintLength'  => 0,
-        'HeaderLength'  => 0,
-        'TrailerLength' => 0,
-        'Header'        => ''
+            'Type'          => 'rfc1951',
+                'FingerprintLength'  => 0,
+                'HeaderLength'  => 0,
+                'TrailerLength' => 0,
+                'Header'        => ''
         );
 }
 
@@ -150,7 +150,7 @@ sub _isRawx
 
     if ($status == STATUS_ENDSTREAM) {
         if (*$self->{?MultiStream} 
-                    && (length $temp_buf || ! $self->smartEof())){
+            && (length $temp_buf || ! $self->smartEof())){
             *$self->{+NewStream} = 1 ;
             *$self->{+EndStream} = 0 ;
             $self->pushBack($temp_buf);
@@ -168,10 +168,10 @@ sub _isRawx
     $self->saveStatus(STATUS_OK);
 
     return \%(
-        'Type'          => 'rfc1951',
-        'HeaderLength'  => 0,
-        'TrailerLength' => 0,
-        'Header'        => ''
+            'Type'          => 'rfc1951',
+                'HeaderLength'  => 0,
+                'TrailerLength' => 0,
+                'Header'        => ''
         );
 }
 
@@ -212,7 +212,7 @@ sub inflateSync
                 return $self->saveErrorString(0, "unexpected end of file", STATUS_ERROR);
             }
         }
-        
+
         $status = *$self->{?Uncomp}->sync($temp_buf) ;
 
         if ($status == STATUS_OK)

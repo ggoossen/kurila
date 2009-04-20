@@ -39,9 +39,9 @@ sub import
         %warnings::Bits{+$package}     = mkMask($warnings::LAST_BIT);
         vec(%warnings::Bits{?'all'}, $warnings::LAST_BIT, 1 => 1);
         %warnings::Offsets{+$package}  = $warnings::LAST_BIT ++;
-	foreach my $k (keys %warnings::Bits) {
-	    vec(%warnings::Bits{?$k}, $warnings::LAST_BIT, 1 => 0);
-	}
+        foreach my $k (keys %warnings::Bits) {
+            vec(%warnings::Bits{?$k}, $warnings::LAST_BIT, 1 => 0);
+        }
         %warnings::DeadBits{+$package} = mkMask($warnings::LAST_BIT);
         vec(%warnings::DeadBits{?'all'}, $warnings::LAST_BIT++, 1 => 1);
     }

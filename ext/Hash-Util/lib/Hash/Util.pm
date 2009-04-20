@@ -127,7 +127,7 @@ sub lock_ref_keys($hash, @< @keys) {
         my %original_keys = %( < @+: map { @($_ => 1) }, keys %$hash );
         foreach my $k (keys %original_keys) {
             die "Hash has key '$k' which is not in the new key set"
-              unless %keys{?$k};
+                unless %keys{?$k};
         }
 
         foreach my $k ( @keys) {
@@ -210,7 +210,7 @@ sub lock_ref_value($hash, $key) {
     # Marking a value in the hash as RO is useful, regardless
     # of the status of the hash itself.
     warn "Cannot usefully lock values in an unlocked hash"
-      if !Internals::HvRESTRICTED(%$hash) && warnings::enabled;
+        if !Internals::HvRESTRICTED(%$hash) && warnings::enabled;
     Internals::SvREADONLY($hash->{?$key}, 1);
     return $hash
 }

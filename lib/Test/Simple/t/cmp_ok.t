@@ -21,7 +21,7 @@ my $TB = Test::Builder->create;
 $TB->level(0);
 
 sub try_cmp_ok($left, $cmp, $right) {
-    
+
     my %expect;
     %expect{+ok}    = eval "\$left $cmp \$right";
     %expect{+error} = $^EVAL_ERROR;
@@ -30,7 +30,7 @@ sub try_cmp_ok($left, $cmp, $right) {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my $ok = cmp_ok($left, $cmp, $right);
     $TB->is_num( ! ! $ok, ! ! %expect{ok});
-    
+
     my $diag = $$err;
     $$err = "";
     if( !$ok and %expect{?error} ) {
@@ -56,22 +56,22 @@ my @Tests = @(
     \@("a", "eq", "a"),
     \@(1, "+", 1),
     \@(1, "-", 1),
-);
+    );
 
 # These don't work yet.
 if( 0 ) {
-#if( try { require overload } ) {
+    #if( try { require overload } ) {
     require MyOverload;
-    
+
     my $cmp = Overloaded::Compare->new("foo", 42);
     my $ify = Overloaded::Ify->new("bar", 23);
-    
+
     push @Tests, (
         \@($cmp, '==', 42),
         \@($cmp, 'eq', "foo"),
         \@($ify, 'eq', "bar"),
         \@($ify, "==", 23),
-    );
+        );
 }
 
 plan tests => scalar nelems @Tests;
