@@ -2080,12 +2080,19 @@ push $a,
     "noot";
 ====
 do {
-  for (qw[a b c]) {
-   my @args;
-   my @argslist = map {
-   "noot";
-  }, @args;
-  }
+ "aap";
+=pod
+Foo
+=cut
+ "noot";
+};
+----
+do {
+    "aap";
+=pod
+Foo
+=cut
+    "noot";
 };
 END
 }

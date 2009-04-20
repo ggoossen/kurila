@@ -1522,7 +1522,20 @@ sub indent {
                         if ($madv->tag eq "mad_label") {
                             $ws_indent -= 2;
                         }
-                        $ws =~ s/&#xA;(\s|&#x9;)*/ '&#xA;' . (' ' x $ws_indent) /ge;
+                        my @lines = split m/&#xA;/, $ws, -1;
+                        my $i = 1;
+                        while ($i < scalar(@lines)) {
+                            if ($lines[$i] =~ m/^=/) {
+                                while ($lines[$i] !~ m/^=cut/) {
+                                    ++$i;
+                                }
+                                $i++;
+                                redo;
+                            }
+                            $lines[$i] =~ s/^(\s|&#x9;)*/ ' ' x $ws_indent /ge;
+                            $i++;
+                        }
+                        $ws = join '&#xA;', @lines;
                         $ws =~ s/&#xA;(\s|&#x9;)+&#xA;/&#xA;&#xA;/g for 1..2;
                         $madv->set_att($wsname, $ws);
                         if (not ($op->tag =~ m/^op_(scope|leavescope|leave)$/
