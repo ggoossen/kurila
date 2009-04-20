@@ -191,28 +191,26 @@ static const char* const lex_state_names[] = {
 #   define REPORT(retval) (retval)
 #endif
 
-#define SETCURLOCATION(x) { x }
-
-#define TOKEN(retval) SETCURLOCATION( return ( PL_bufptr = s, REPORT(retval)); )
-#define OPERATOR(retval) SETCURLOCATION( return (PL_expect = XTERM, PL_bufptr = s, REPORT(retval)); )
-#define AOPERATOR(retval) SETCURLOCATION( return ao((PL_expect = XTERM, PL_bufptr = s, REPORT(retval))); )
-#define PREBLOCK(retval) SETCURLOCATION( return (PL_expect = XBLOCK,PL_bufptr = s, REPORT(retval)); )
-#define PRETERMBLOCK(retval) SETCURLOCATION( return (PL_expect = XTERMBLOCK,PL_bufptr = s, REPORT(retval)); )
-#define PREREF(retval) SETCURLOCATION( return (PL_expect = XREF,PL_bufptr = s, REPORT(retval)); )
-#define TERM(retval) SETCURLOCATION( return (PL_expect = XOPERATOR, PL_bufptr = s, REPORT(retval)); )
-#define LOOPX(f) SETCURLOCATION( return (pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)LOOPEX)); )
-#define FTST(f)  SETCURLOCATION( return (pl_yylval.i_tkval.ival=f, PL_expect=XTERMORDORDOR, PL_bufptr=s, REPORT((int)UNIOP)); )
-#define FUN0(f)  SETCURLOCATION( return (pl_yylval.i_tkval.ival=f, PL_expect=XOPERATOR, PL_bufptr=s, REPORT((int)FUNC0)); )
-#define FUN1(f)  SETCURLOCATION( return (pl_yylval.i_tkval.ival=f, PL_expect=XOPERATOR, PL_bufptr=s, REPORT((int)FUNC1)); )
-#define BOop(f)  SETCURLOCATION( return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)BITOROP))); )
-#define BAop(f)  SETCURLOCATION( return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)BITANDOP))); )
-#define SHop(f)  SETCURLOCATION( return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)SHIFTOP))); )
-#define PWop(f)  SETCURLOCATION( return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)POWOP))); )
-#define PMop(f)  SETCURLOCATION( return(pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)MATCHOP)); )
-#define Aop(f)   SETCURLOCATION( return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)ADDOP))); )
-#define Mop(f)   SETCURLOCATION( return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)MULOP))); )
-#define Eop(f)   SETCURLOCATION( return (pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)EQOP)); )
-#define Rop(f)   SETCURLOCATION( return (pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)RELOP)); )
+#define TOKEN(retval) return ( PL_bufptr = s, REPORT(retval));
+#define OPERATOR(retval) return (PL_expect = XTERM, PL_bufptr = s, REPORT(retval));
+#define AOPERATOR(retval) return ao((PL_expect = XTERM, PL_bufptr = s, REPORT(retval)));
+#define PREBLOCK(retval) return (PL_expect = XBLOCK,PL_bufptr = s, REPORT(retval));
+#define PRETERMBLOCK(retval) return (PL_expect = XTERMBLOCK,PL_bufptr = s, REPORT(retval));
+#define PREREF(retval) return (PL_expect = XREF,PL_bufptr = s, REPORT(retval));
+#define TERM(retval) return (PL_expect = XOPERATOR, PL_bufptr = s, REPORT(retval));
+#define LOOPX(f) return (pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)LOOPEX));
+#define FTST(f)  return (pl_yylval.i_tkval.ival=f, PL_expect=XTERMORDORDOR, PL_bufptr=s, REPORT((int)UNIOP));
+#define FUN0(f)  return (pl_yylval.i_tkval.ival=f, PL_expect=XOPERATOR, PL_bufptr=s, REPORT((int)FUNC0));
+#define FUN1(f)  return (pl_yylval.i_tkval.ival=f, PL_expect=XOPERATOR, PL_bufptr=s, REPORT((int)FUNC1));
+#define BOop(f)  return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)BITOROP)));
+#define BAop(f)  return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)BITANDOP)));
+#define SHop(f)  return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)SHIFTOP)));
+#define PWop(f)  return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)POWOP)));
+#define PMop(f)  return(pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)MATCHOP));
+#define Aop(f)   return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)ADDOP)));
+#define Mop(f)   return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)MULOP)));
+#define Eop(f)   return (pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)EQOP));
+#define Rop(f)   return (pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)RELOP));
 
 /* This bit of chicanery makes a unary function followed by
  * a parenthesis into a function with one argument, highest precedence.
@@ -246,7 +244,7 @@ static const char* const lex_state_names[] = {
 	}
 
 /* grandfather return to old style */
-#define RETURNop(f) SETCURLOCATION( return(pl_yylval.i_tkval.ival=f,PL_expect = XTERM,PL_bufptr = s,(int)RETURNOP); )
+#define RETURNop(f) return(pl_yylval.i_tkval.ival=f,PL_expect = XTERM,PL_bufptr = s,(int)RETURNOP);
 
 #ifdef DEBUGGING
 
@@ -2788,8 +2786,8 @@ Perl_yylex(pTHX)
 	PL_thistoken = 0;
     }
     PL_realtokenstart = s - SvPVX_mutable(PL_linestr);	/* assume but undo on ws */
-    pl_yylval.i_tkval.location = S_curlocation(PL_bufptr);
 #endif
+    pl_yylval.i_tkval.location = S_curlocation(PL_bufptr);
     switch (*s) {
     default:
 	if (isIDFIRST_lazy_if(s,UTF))
