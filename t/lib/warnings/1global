@@ -122,7 +122,7 @@ Use of uninitialized value $b in chop at - line 5 character 13.
 -w
 -e undef
 EXPECT
-Use of uninitialized value in -e at - line 2 character 2.
+Use of uninitialized value in -e at - line 2 character 1.
 ########
 
 $^WARNING = 1 + 2 ;
