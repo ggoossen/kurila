@@ -35,28 +35,28 @@ do {
     package Object;    
     use mro 'c3';
     our @ISA = @();
-    
-    package LifeForm;
+
+        package LifeForm;
     use mro 'c3';
     use base 'Object';
-    
-    package Sentient;
+
+        package Sentient;
     use mro 'c3';
     use base 'LifeForm';
-    
-    package BiPedal;
+
+        package BiPedal;
     use mro 'c3';    
     use base 'LifeForm';
-    
-    package Intelligent;
+
+        package Intelligent;
     use mro 'c3';    
     use base 'Sentient';
-    
-    package Humanoid;
+
+        package Humanoid;
     use mro 'c3';    
     use base 'BiPedal';
-    
-    package Vulcan;
+
+        package Vulcan;
     use mro 'c3';    
     use base ('Intelligent', 'Humanoid');
 };
@@ -64,4 +64,4 @@ do {
 ok(eq_array(
     mro::get_linear_isa('Vulcan'),
     \ qw(Vulcan Intelligent Sentient Humanoid BiPedal LifeForm Object)
-), '... got the right MRO for the Vulcan Dylan Example');  
+    ), '... got the right MRO for the Vulcan Dylan Example');  

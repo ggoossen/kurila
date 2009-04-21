@@ -15,49 +15,49 @@ sub import {
 };
 
 sub fill_protos {
-  my $proto = shift;
-  my $n = -1;
-  my ($isref, @out, @out1, $seen_semi);
-  while ($proto =~ m/\S/) {
-    $n++;
-    push(@out1,\@($n,< @out)) if $seen_semi;
-    push(@out, $1 . "\{\@_[$n]\}"), next if $proto =~ s/^\s*\\([\@%\$\&])//;
-    push(@out, "\@_[$n]"), next if $proto =~ s/^\s*([_*\$&])//;
-    push(@out, " < \@_[[ $n..nelems(\@_)-1]]"), last if $proto =~ s/^\s*(;\s*)?\@//;
-    ($seen_semi = 1), $n--, next if $proto =~ s/^\s*;//; # XXXX ????
-    die "Unknown prototype letters: \"$proto\"";
-  }
-  push(@out1,\@($n+1,< @out));
-  return @out1;
+    my $proto = shift;
+    my $n = -1;
+    my ($isref, @out, @out1, $seen_semi);
+    while ($proto =~ m/\S/) {
+        $n++;
+        push(@out1,\@($n,< @out)) if $seen_semi;
+        push(@out, $1 . "\{\@_[$n]\}"), next if $proto =~ s/^\s*\\([\@%\$\&])//;
+        push(@out, "\@_[$n]"), next if $proto =~ s/^\s*([_*\$&])//;
+        push(@out, " < \@_[[ $n..nelems(\@_)-1]]"), last if $proto =~ s/^\s*(;\s*)?\@//;
+        ($seen_semi = 1), $n--, next if $proto =~ s/^\s*;//; # XXXX ????
+        die "Unknown prototype letters: \"$proto\"";
+    }
+    push(@out1,\@($n+1,< @out));
+    return @out1;
 }
 
 sub write_invocation($core, $call, $name, @< @argvs) {
-  if ((nelems @argvs) == 1) {		# No optional arguments
-    my @argv = @{@argvs[0]};
-    shift @argv;
-    return "\t" . one_invocation($core, $call, $name, < @argv) . ";\n";
-  } else {
-    my $else = "\t";
-    my (@out, @argv, $n);
-    while ((nelems @argvs)) {
-      @argv = @{shift @argvs};
-      $n = shift @argv;
-      push @out, "$($else)if (nelems(\@_) == $n) \{\n";
-      $else = "\t\} els";
-      push @out, 
-          "\t\treturn " . one_invocation($core, $call, $name, < @argv) . ";\n";
-    }
-    push @out, <<EOC;
+    if ((nelems @argvs) == 1) {		# No optional arguments
+        my @argv = @{@argvs[0]};
+        shift @argv;
+        return "\t" . one_invocation($core, $call, $name, < @argv) . ";\n";
+    } else {
+        my $else = "\t";
+        my (@out, @argv, $n);
+        while ((nelems @argvs)) {
+            @argv = @{shift @argvs};
+            $n = shift @argv;
+            push @out, "$($else)if (nelems(\@_) == $n) \{\n";
+            $else = "\t\} els";
+            push @out, 
+                "\t\treturn " . one_invocation($core, $call, $name, < @argv) . ";\n";
+        }
+        push @out, <<EOC;
 	\}
 	die "$name(\$(join ' ', map \{ dump::view(\$_) \}, \@_): Do not expect to get \$(nelems(\@_)) arguments";
 EOC
-    return join '', @out;
-  }
+        return join '', @out;
+    }
 }
 
 sub one_invocation($core, $call, $name, @< @argv) {
-  return qq{$call($(join ', ', @argv)) || die "Can't $name(\$(join ', ', map \{ dump::view(\$_) \}, \@_))} . 
-    ($core ?? ': $^OS_ERROR' !! ', \$^OS_ERROR is \"$^OS_ERROR\"') . '"';
+    return qq{$call($(join ', ', @argv)) || die "Can't $name(\$(join ', ', map \{ dump::view(\$_) \}, \@_))} . 
+        ($core ?? ': $^OS_ERROR' !! ', \$^OS_ERROR is \"$^OS_ERROR\"') . '"';
 }
 
 sub _make_fatal($sub, $pkg) {
@@ -71,23 +71,23 @@ sub _make_fatal($sub, $pkg) {
     print $^STDOUT, "# _make_fatal: sub=$sub pkg=$pkg name=$name\n" if $Debug;
     die "Bad subroutine name for Fatal: $name" unless $name =~ m/^\w+$/;
     if (defined(&$sub)) {	# user subroutine
-	$sref = \&$sub;
-	$proto = prototype $sref;
-	$call = '&$sref';
+        $sref = \&$sub;
+        $proto = prototype $sref;
+        $call = '&$sref';
     } else {			# CORE subroutine
         $proto = try { prototype "CORE::$name" };
-	die "$name is neither a builtin, nor a Perl subroutine" 
-	  if $^EVAL_ERROR;
-	die "Cannot make the non-overridable builtin $name fatal"
-	  if not defined $proto;
-	$core = 1;
-	$call = "CORE::$name";
+        die "$name is neither a builtin, nor a Perl subroutine" 
+            if $^EVAL_ERROR;
+        die "Cannot make the non-overridable builtin $name fatal"
+            if not defined $proto;
+        $core = 1;
+        $call = "CORE::$name";
     }
     if (defined $proto) {
-      $real_proto = " ($proto)";
+        $real_proto = " ($proto)";
     } else {
-      $real_proto = '';
-      $proto = '@';
+        $real_proto = '';
+        $proto = '@';
     }
     $code = <<EOS;
 sub \{
@@ -98,10 +98,10 @@ EOS
     $code .= "\}\n";
     print $^STDOUT, $code if $Debug;
     do {
-      $code = eval("package $pkg; $code");
-      die if $^EVAL_ERROR;
-      no warnings;   # to avoid: Subroutine foo redefined ...
-      *{$sub} = $code;
+        $code = eval("package $pkg; $code");
+        die if $^EVAL_ERROR;
+        no warnings;   # to avoid: Subroutine foo redefined ...
+        *{$sub} = $code;
     };
 }
 

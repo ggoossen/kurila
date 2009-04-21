@@ -25,11 +25,11 @@ GetOptions(\%args, < qw(hiertype!
 		      s=s
 		      csuffix=s
 		     ))
-  or die $usage;
+    or die $usage;
 
 if (%args{?v}) {
-  print $^STDOUT, "xsubpp version $ExtUtils::ParseXS::VERSION\n";
-  exit;
+    print $^STDOUT, "xsubpp version $ExtUtils::ParseXS::VERSION\n";
+    exit;
 }
 
 (nelems @ARGV) == 1 or die $usage;

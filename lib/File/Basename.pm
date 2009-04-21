@@ -91,73 +91,73 @@ denote the same location as the original $path.
 
 sub fileparse($fullname, @< @suffices) {
 
-  unless (defined $fullname) {
-      die("fileparse(): need a valid pathname");
-  }
-
-  my $orig_type = '';
-  my@($type,$igncase) = @($Fileparse_fstype, $Fileparse_igncase);
-
-  my $taint = substr($fullname,0,0);  # Is $fullname tainted?
-
-  if ($type eq "VMS" and $fullname =~ m{/} ) {
-    # We're doing Unix emulation
-    $orig_type = $type;
-    $type = 'Unix';
-  }
-
-  my($dirpath, $basename);
-
-  if (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 Epoc)) {
-    @($dirpath,$basename) = @($fullname =~ m/^((?:.*[:\\\/])?)(.*)/s);
-    $dirpath .= '.\' unless $dirpath =~ m/[\\\/]\z/;
-  }
-  elsif ($type eq "OS2") {
-    @($dirpath,$basename) = @($fullname =~ m#^((?:.*[:\\/])?)(.*)#s);
-    $dirpath = './' unless $dirpath;	# Can't be 0
-    $dirpath .= '/' unless $dirpath =~ m#[\\/]\z#;
-  }
-  elsif ($type eq "MacOS") {
-    @($dirpath,$basename) = @($fullname =~ m/^(.*:)?(.*)/s);
-    $dirpath = ':' unless $dirpath;
-  }
-  elsif ($type eq "AmigaOS") {
-    @($dirpath,$basename) = @($fullname =~ m/(.*[:\/])?(.*)/s);
-    $dirpath = './' unless $dirpath;
-  }
-  elsif ($type eq 'VMS' ) {
-    @($dirpath,$basename) = @($fullname =~ m/^(.*[:>\]])?(.*)/s);
-    $dirpath ||= '';  # should always be defined
-  }
-  else { # Default to Unix semantics.
-    @($dirpath,$basename) = @($fullname =~ m{^(.*/)?(.*)}s);
-    if ($orig_type eq 'VMS' and $fullname =~ m{^(/[^/]+/000000(/|$))(.*)}) {
-      # dev:[000000] is top of VMS tree, similar to Unix '/'
-      # so strip it off and treat the rest as "normal"
-      my $devspec  = $1;
-      my $remainder = $3;
-      @($dirpath,$basename) = @($remainder =~ m{^(.*/)?(.*)}s);
-      $dirpath ||= '';  # should always be defined
-      $dirpath = $devspec.$dirpath;
+    unless (defined $fullname) {
+        die("fileparse(): need a valid pathname");
     }
-    $dirpath = './' unless $dirpath;
-  }
-      
 
-  my $tail   = '';
-  if ((nelems @suffices)) {
-    foreach my $suffix ( @suffices) {
-      my $pat = ($igncase ?? '(?i)' !! '') . "($suffix)\$";
-      if ($basename =~ s/$pat//s) {
-        $taint .= substr($suffix,0,0);
-        $tail = $1 . $tail;
-      }
+    my $orig_type = '';
+    my@($type,$igncase) = @($Fileparse_fstype, $Fileparse_igncase);
+
+    my $taint = substr($fullname,0,0);  # Is $fullname tainted?
+
+    if ($type eq "VMS" and $fullname =~ m{/} ) {
+        # We're doing Unix emulation
+        $orig_type = $type;
+        $type = 'Unix';
     }
-  }
 
-  # Ensure taint is propgated from the path to its pieces.
-  $tail .= $taint;
-  return @(($basename .= $taint), ($dirpath .= $taint), $tail);
+    my($dirpath, $basename);
+
+    if (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 Epoc)) {
+        @($dirpath,$basename) = @($fullname =~ m/^((?:.*[:\\\/])?)(.*)/s);
+        $dirpath .= '.\' unless $dirpath =~ m/[\\\/]\z/;
+    }
+    elsif ($type eq "OS2") {
+        @($dirpath,$basename) = @($fullname =~ m#^((?:.*[:\\/])?)(.*)#s);
+        $dirpath = './' unless $dirpath;	# Can't be 0
+        $dirpath .= '/' unless $dirpath =~ m#[\\/]\z#;
+    }
+    elsif ($type eq "MacOS") {
+        @($dirpath,$basename) = @($fullname =~ m/^(.*:)?(.*)/s);
+        $dirpath = ':' unless $dirpath;
+    }
+    elsif ($type eq "AmigaOS") {
+        @($dirpath,$basename) = @($fullname =~ m/(.*[:\/])?(.*)/s);
+        $dirpath = './' unless $dirpath;
+    }
+    elsif ($type eq 'VMS' ) {
+        @($dirpath,$basename) = @($fullname =~ m/^(.*[:>\]])?(.*)/s);
+        $dirpath ||= '';  # should always be defined
+    }
+    else { # Default to Unix semantics.
+        @($dirpath,$basename) = @($fullname =~ m{^(.*/)?(.*)}s);
+        if ($orig_type eq 'VMS' and $fullname =~ m{^(/[^/]+/000000(/|$))(.*)}) {
+            # dev:[000000] is top of VMS tree, similar to Unix '/'
+            # so strip it off and treat the rest as "normal"
+            my $devspec  = $1;
+            my $remainder = $3;
+            @($dirpath,$basename) = @($remainder =~ m{^(.*/)?(.*)}s);
+            $dirpath ||= '';  # should always be defined
+            $dirpath = $devspec.$dirpath;
+        }
+        $dirpath = './' unless $dirpath;
+    }
+
+
+    my $tail   = '';
+    if ((nelems @suffices)) {
+        foreach my $suffix ( @suffices) {
+            my $pat = ($igncase ?? '(?i)' !! '') . "($suffix)\$";
+            if ($basename =~ s/$pat//s) {
+                $taint .= substr($suffix,0,0);
+                $tail = $1 . $tail;
+            }
+        }
+    }
+
+    # Ensure taint is propgated from the path to its pieces.
+    $tail .= $taint;
+    return @(($basename .= $taint), ($dirpath .= $taint), $tail);
 }
 
 
@@ -196,28 +196,28 @@ remaining characters in the filename.
 
 
 sub basename {
-  my@($path) =@( shift);
+    my@($path) =@( shift);
 
-  # From BSD basename(1)
-  # The basename utility deletes any prefix ending with the last slash `/'
-  # character present in string (after first stripping trailing slashes)
-  _strip_trailing_sep($path);
+    # From BSD basename(1)
+    # The basename utility deletes any prefix ending with the last slash `/'
+    # character present in string (after first stripping trailing slashes)
+    _strip_trailing_sep($path);
 
-  my@($basename, $dirname, $suffix) =  fileparse( $path, < map( {"\Q$_\E" }, @_) );
+    my@($basename, $dirname, $suffix) =  fileparse( $path, < map( {"\Q$_\E" }, @_) );
 
-  # From BSD basename(1)
-  # The suffix is not stripped if it is identical to the remaining 
-  # characters in string.
-  if( length $suffix and !length $basename ) {
-      $basename = $suffix;
-  }
-  
-  # Ensure that basename '/' == '/'
-  if( !length $basename ) {
-      $basename = $dirname;
-  }
+    # From BSD basename(1)
+    # The suffix is not stripped if it is identical to the remaining 
+    # characters in string.
+    if( length $suffix and !length $basename ) {
+        $basename = $suffix;
+    }
 
-  return $basename;
+    # Ensure that basename '/' == '/'
+    if( !length $basename ) {
+        $basename = $dirname;
+    }
+
+    return $basename;
 }
 
 
@@ -270,8 +270,8 @@ sub dirname {
     my $type = $Fileparse_fstype;
 
     if( $type eq 'VMS' and $path =~ m{/} ) {
-        # Parse as Unix
-        local($File::Basename::Fileparse_fstype) = '';
+              # Parse as Unix
+              local($File::Basename::Fileparse_fstype) = '';
         return dirname($path);
     }
 
@@ -281,18 +281,18 @@ sub dirname {
         $dirname ||= env::var('DEFAULT');
     }
     elsif ($type eq 'MacOS') {
-	if( !length($basename) && $dirname !~ m/^[^:]+:\z/) {
+        if( !length($basename) && $dirname !~ m/^[^:]+:\z/) {
             _strip_trailing_sep($dirname);
-	    @($basename,$dirname, _) =  fileparse $dirname;
-	}
-	$dirname .= ":" unless $dirname =~ m/:\z/;
+            @($basename,$dirname, _) =  fileparse $dirname;
+        }
+        $dirname .= ":" unless $dirname =~ m/:\z/;
     }
     elsif (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 OS2)) { 
         _strip_trailing_sep($dirname);
         unless( length($basename) ) {
-	    @($basename,$dirname, _) =  fileparse $dirname;
-	    _strip_trailing_sep($dirname);
-	}
+            @($basename,$dirname, _) =  fileparse $dirname;
+            _strip_trailing_sep($dirname);
+        }
     }
     elsif ($type eq 'AmigaOS') {
         if ( $dirname =~ m/:\z/) { return $dirname }
@@ -302,9 +302,9 @@ sub dirname {
     else {
         _strip_trailing_sep($dirname);
         unless( length($basename) ) {
-	    @($basename,$dirname, _) =  fileparse $dirname;
-	    _strip_trailing_sep($dirname);
-	}
+            @($basename,$dirname, _) =  fileparse $dirname;
+            _strip_trailing_sep($dirname);
+        }
     }
 
     $dirname;
@@ -370,7 +370,7 @@ sub fileparse_set_fstype {
         }
 
         $Fileparse_igncase = 
-          (grep { $Fileparse_fstype eq $_ }, @Ignore_Case) ?? 1 !! 0;
+            (grep { $Fileparse_fstype eq $_ }, @Ignore_Case) ?? 1 !! 0;
     }
 
     return $old;

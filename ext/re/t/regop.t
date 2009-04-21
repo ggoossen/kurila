@@ -27,14 +27,14 @@ foreach my $testout (  @tests ) {
     while ((nelems @strs)) {
         local $_ = shift @strs;
         last if !$_
-             or m/^---/;
+            or m/^---/;
         next if m/^\s*#/;
         s/^\s+//;
         s/\s+$//;
         ok( $testout=~m/\Q$_\E/, "$_: /$pattern/" )
             or do {
-                !$diaged++ and diag("$_: /$pattern/\n'$testout'");
-            };
+            !$diaged++ and diag("$_: /$pattern/\n'$testout'");
+        };
     }
 }
 

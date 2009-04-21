@@ -17,7 +17,7 @@ sub load ($mod, @< @args)  {
     if( _is_file( $mod ) ) {
         require $mod;
     } else {
-        LOAD: do {
+      LOAD: do {
             my $err;
             for my $flag ( qw[1 0] ) {
                 my $file = _to_file( $mod, $flag);
@@ -49,11 +49,11 @@ sub _to_file{
 
     ### because of [perl #19213], see caveats ###
     my $file = $^OS_NAME eq 'MSWin32'
-                    ?? join "/", @parts
-                    !! File::Spec->catfile( < @parts );
+        ?? join "/", @parts
+        !! File::Spec->catfile( < @parts );
 
     $file   .= '.pm' if $pm;
-    
+
     ### on perl's before 5.10 (5.9.5@31746) if you require
     ### a file in VMS format, it's stored in $^INCLUDED in VMS
     ### format. Therefor, better unixify it first
@@ -69,9 +69,9 @@ sub _who { @(caller(1))[0] }
 sub _is_file {
     local $_ = shift;
     return  m/^\./               ?? 1 !!
-            m/[^\w:']/           ?? 1 !!
-            undef
-    #' silly bbedit..
+        m/[^\w:']/           ?? 1 !!
+        undef
+#' silly bbedit..
 }
 
 

@@ -19,11 +19,11 @@ sub import {
 
 use Class::Struct < qw(struct);
 struct 'Net::servent' => \@(
-   name		=> '$',
-   aliases	=> '@',
-   port		=> '$',
-   proto	=> '$',
-);
+       name		=> '$',
+       aliases	=> '@',
+       port		=> '$',
+       proto	=> '$',
+       );
 
 sub populate {
     return unless (nelems @_);

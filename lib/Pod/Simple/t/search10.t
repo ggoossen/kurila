@@ -15,7 +15,7 @@ use Test::More;
 BEGIN { plan tests => 7 }
 
 print $^STDOUT, "# ", __FILE__,
- ": Testing the surveying of a single specified docroot...\n";
+    ": Testing the surveying of a single specified docroot...\n";
 
 my $x = Pod::Simple::Search->new;
 die "Couldn't make an object!?" unless ok defined $x;
@@ -43,11 +43,11 @@ sub source_path {
 
 my $here;
 if(     -e ($here = source_path('testlib1'))) {
-  #
+#
 } elsif(-e ($here = File::Spec->catdir($cwd, 't', 'testlib1'))) {
-  #
+#
 } else {
-  die "Can't find the test corpus";
+    die "Can't find the test corpus";
 }
 print $^STDOUT, "# OK, found the test corpus as $here\n";
 ok 1;
@@ -66,13 +66,13 @@ $p =~ s/^/#  /mg;
 print $^STDOUT, $p;
 
 do {
-my $names = join "|", sort values %$where2name;
-is $names, "Blorm|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|squaa|squaa::Glunk|squaa::Vliff|zikzik";
+    my $names = join "|", sort values %$where2name;
+    is $names, "Blorm|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|squaa|squaa::Glunk|squaa::Vliff|zikzik";
 };
 
 do {
-my $names = join "|", sort keys %$name2where;
-is $names, "Blorm|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|squaa|squaa::Glunk|squaa::Vliff|zikzik";
+    my $names = join "|", sort keys %$name2where;
+    is $names, "Blorm|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|squaa|squaa::Glunk|squaa::Vliff|zikzik";
 };
 
 like( ($name2where->{?'squaa'} || 'huh???'), '/squaa\.pm$/');

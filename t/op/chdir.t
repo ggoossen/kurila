@@ -41,18 +41,18 @@ $Cwd = abs_path;
 SKIP: do {
     skip("no fchdir", 16) unless $has_fchdir;
     my $has_dirfd = (config_value("d_dirfd")
-                       || config_value("d_dir_dd_fd") || "") eq "define";
+                     || config_value("d_dir_dd_fd") || "") eq "define";
     ok(opendir(my $dh, "."), "opendir .");
     ok(open(my $fh, "<", "op"), "open op");
     ok(chdir($fh), "fchdir op");
     ok(-f "chdir.t", "verify that we are in op");
     if ($has_dirfd) {
-       ok(chdir($dh), "fchdir back");
+        ok(chdir($dh), "fchdir back");
     }
     else {
-       try { chdir($dh); };
-       like($^EVAL_ERROR->{?description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
-       chdir ".." or die $^OS_ERROR;
+        try { chdir($dh); };
+        like($^EVAL_ERROR->{?description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
+        chdir ".." or die $^OS_ERROR;
     }
 
     # same with bareword file handles
@@ -62,34 +62,34 @@ SKIP: do {
     ok(chdir *FH, "fchdir op bareword");
     ok(-f "chdir.t", "verify that we are in op");
     if ($has_dirfd) {
-       ok(chdir *DH, "fchdir back bareword");
+        ok(chdir *DH, "fchdir back bareword");
     }
     else {
-       try { chdir(*DH); };
-       like($^EVAL_ERROR->{?description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
-       chdir ".." or die $^OS_ERROR;
+        try { chdir(*DH); };
+        like($^EVAL_ERROR->{?description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
+        chdir ".." or die $^OS_ERROR;
     }
     ok(-d "op", "verify that we are back");
 
     # And now the ambiguous case
     my $h;
     do {
-	no warnings < qw<io deprecated>;
-	ok(opendir($h, "op"), "opendir op") or $^OS_ERROR-> diag();
-	ok(open($h, "<", "base"), "open base") or $^OS_ERROR-> diag();
+        no warnings < qw<io deprecated>;
+        ok(opendir($h, "op"), "opendir op") or $^OS_ERROR-> diag();
+        ok(open($h, "<", "base"), "open base") or $^OS_ERROR-> diag();
     };
     if ($has_dirfd) {
-	ok(chdir($h), "fchdir to op");
-	ok(-f "chdir.t", "verify that we are in 'op'");
-	chdir ".." or die $^OS_ERROR;
+        ok(chdir($h), "fchdir to op");
+        ok(-f "chdir.t", "verify that we are in 'op'");
+        chdir ".." or die $^OS_ERROR;
     }
     else {
-	try { chdir($h); };
-	like($^EVAL_ERROR->{?description}, qr/^The dirfd function is unimplemented at/,
-	     "dirfd is unimplemented");
-	SKIP: do {
-	    skip("dirfd is unimplemented");
-	};
+        try { chdir($h); };
+        like($^EVAL_ERROR->{?description}, qr/^The dirfd function is unimplemented at/,
+      "dirfd is unimplemented");
+      SKIP: do {
+            skip("dirfd is unimplemented");
+        };
     }
     ok(closedir($h), "closedir");
     ok(chdir($h), "fchdir to base");
@@ -171,7 +171,7 @@ sub clean_env {
 
 END {
     no warnings 'uninitialized';
- 
+
     # Restore the environment for VMS (and doesn't hurt for anyone else)
     for my $key (@magic_envs) {
         env::var($key) = %Saved_Env{$key};

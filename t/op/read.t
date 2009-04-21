@@ -25,10 +25,10 @@ is ($buf, "");
 # This is true if Config is not built, or if PerlIO is enabled
 # ie assume that PerlIO is present, unless we know for sure otherwise.
 my $has_perlio = !try {
-    no warnings;
-    require Config;
-    ! Config::config_value("useperlio")
-};
+        no warnings;
+        require Config;
+        ! Config::config_value("useperlio")
+    };
 
 my $tmpfile = 'Op_read.tmp';
 
@@ -42,11 +42,11 @@ do {
 
     use bytes;
     for (@(\@(length($value), 0, '', length($value), "$value"),
-         \@(4, 0, '', 4, "\x[E28DAAE2]"),
-         \@(9+8, 0, '', 9, $value),
-         \@(9, 3, '', 9, "\0" x 3 . $value),
-         \@(9+8, 3, '', 9, "\0" x 3 . $value))
-        )
+           \@(4, 0, '', 4, "\x[E28DAAE2]"),
+           \@(9+8, 0, '', 9, $value),
+           \@(9, 3, '', 9, "\0" x 3 . $value),
+           \@(9+8, 3, '', 9, "\0" x 3 . $value))
+    )
     {
         my @($length, $offset, $buffer, $expect_length, $expect) =  @$_;
         my $buffer = "";
@@ -59,11 +59,11 @@ do {
 
     use utf8;
     for (@(\@(length($value), 0, '', length($value), "$value"),
-         \@(2, 0, '', 2, "\x{236a}" x 2),
-         \@(3+8, 0, '', 3, $value),
-         \@(3, 3, '', 3, "\0" x 3 . $value),
-         \@(3+8, 3, '', 3, "\0" x 3 . $value))
-        )
+           \@(2, 0, '', 2, "\x{236a}" x 2),
+           \@(3+8, 0, '', 3, $value),
+           \@(3, 3, '', 3, "\0" x 3 . $value),
+           \@(3+8, 3, '', 3, "\0" x 3 . $value))
+    )
     {
         my @($length, $offset, $buffer, $expect_length, $expect) =  @$_;
         my $buffer = "";

@@ -21,14 +21,14 @@ BEGIN {
 
 sub hostname {
 
-  # we already know it
-  return $host if defined $host;
+    # we already know it
+    return $host if defined $host;
 
-  # try to ask the system
-  $host = ghname() if defined &ghname;
-  return $host if defined $host;
+    # try to ask the system
+    $host = ghname() if defined &ghname;
+    return $host if defined $host;
 
-  die "Cannot get host name of local machine";
+    die "Cannot get host name of local machine";
 }
 
 1;

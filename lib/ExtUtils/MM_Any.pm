@@ -174,7 +174,7 @@ sub split_command($self, $cmd, @< @args) {
 
 sub _expand_macros($self, $cmd) {
 
-    $cmd =~ s{\$\((\w+)\)}{$(
+        $cmd =~ s{\$\((\w+)\)}{$(
         defined $self->{?$1} ?? $self->{?$1} !! "\$($1)"
     )};
     return $cmd;
@@ -200,7 +200,7 @@ sub echo($self, $text, $file, ?$appending) {
     $appending ||= 0;
 
     my @cmds = map { '$(NOECHO) $(ECHO) '.$self->quote_literal($_) }, 
-               split m/\n/, $text;
+        split m/\n/, $text;
     if( $file ) {
         my $redirect = $appending ?? '>>' !! '>';
         @cmds[0] .= " $redirect $file";
@@ -446,19 +446,19 @@ clean :: clean_subdirs
     # INST_LIB = ../../lib rather than actually installing the files.
     # So a "make clean" in an ext/ directory would blow away lib.
     # Until the core is adjusted let's leave this out.
-#     push @dirs, qw($(INST_ARCHLIB) $(INST_LIB)
-#                    $(INST_BIN) $(INST_SCRIPT)
-#                    $(INST_MAN1DIR) $(INST_MAN3DIR)
-#                    $(INST_LIBDIR) $(INST_ARCHLIBDIR) $(INST_AUTODIR) 
-#                    $(INST_STATIC) $(INST_DYNAMIC) $(INST_BOOT)
-#                 );
-                  
+    #     push @dirs, qw($(INST_ARCHLIB) $(INST_LIB)
+    #                    $(INST_BIN) $(INST_SCRIPT)
+    #                    $(INST_MAN1DIR) $(INST_MAN3DIR)
+    #                    $(INST_LIBDIR) $(INST_ARCHLIBDIR) $(INST_AUTODIR) 
+    #                    $(INST_STATIC) $(INST_DYNAMIC) $(INST_BOOT)
+    #                 );
+
 
     if( %attribs{?FILES} ) {
         # Use @dirs because we don't know what's in here.
         push @dirs, ref %attribs{?FILES}                ??
-                        < @{%attribs{?FILES}}             !! <
-                        split m/\s+/, %attribs{?FILES}   ;
+            < @{%attribs{?FILES}}             !! <
+            split m/\s+/, %attribs{?FILES}   ;
     }
 
     push(@files, < qw[$(MAKE_APERL_FILE) 
@@ -607,10 +607,10 @@ sub dist_test {
     my $mpl_args = join " ", map { qq["$_"] }, @ARGV;
 
     my $test = $self->cd('$(DISTVNAME)',
-                         '$(ABSPERLRUN) Makefile.PL '.$mpl_args,
-                         '$(MAKE) $(PASTHRU)',
-                         '$(MAKE) test $(PASTHRU)'
-                        );
+        '$(ABSPERLRUN) Makefile.PL '.$mpl_args,
+        '$(MAKE) $(PASTHRU)',
+        '$(MAKE) test $(PASTHRU)'
+        );
 
     return sprintf <<'MAKE_FRAG', $test;
 disttest : distdir
@@ -629,7 +629,7 @@ Defines the dynamic target.
 =cut
 
 sub dynamic {
-# --- Dynamic Loading Sections ---
+    # --- Dynamic Loading Sections ---
 
     my@($self) =@( shift);
     '
@@ -736,9 +736,9 @@ MAKE_FRAG
         license      => $self->{?LICENSE},
         author       => $author_value,
         generated_by => 
-                "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
+        "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
         distribution_type => $self->{?PM} ?? 'module' !! 'script',
-    );
+        );
 
     my $meta = "--- #YAML:1.0\n";
 
@@ -813,7 +813,7 @@ sub realclean($self, %< %attribs) {
     # Special exception for the perl core where INST_* is not in blib.
     # This cleans up the files built from the ext/ directory (all XS).
     if( $self->{?PERL_CORE} ) {
-	push @dirs, < qw($(INST_AUTODIR) $(INST_ARCHAUTODIR));
+        push @dirs, < qw($(INST_AUTODIR) $(INST_ARCHAUTODIR));
         push @files, < values %{$self->{PM}};
     }
 
@@ -835,9 +835,9 @@ sub realclean($self, %< %attribs) {
     do { my@(%d) =@( %( < @+: map { @($_ => 1) }, @dirs ));   @dirs  = keys %d; };
 
     my $rm_cmd  = join "\n\t", map { "$_" }, 
-                    $self->split_command('- $(RM_F)',  < @files);
+        $self->split_command('- $(RM_F)',  < @files);
     my $rmf_cmd = join "\n\t", map { "$_" }, 
-                    $self->split_command('- $(RM_RF)', < @dirs);
+        $self->split_command('- $(RM_RF)', < @dirs);
 
     my $m = sprintf <<'MAKE', $rm_cmd, $rmf_cmd;
 # Delete temporary files (via clean) and also delete dist files
@@ -988,14 +988,14 @@ sub init_ABSTRACT {
 
     if( $self->{?ABSTRACT_FROM} and $self->{?ABSTRACT} ) {
         warn "Both ABSTRACT_FROM and ABSTRACT are set.  ".
-             "Ignoring ABSTRACT_FROM.\n";
+            "Ignoring ABSTRACT_FROM.\n";
         return;
     }
 
     if ($self->{?ABSTRACT_FROM}){
         $self->{+ABSTRACT} = $self->parse_abstract($self->{ABSTRACT_FROM}) or
-            warn "WARNING: Setting ABSTRACT via file ".
-                 "'$self->{?ABSTRACT_FROM}' failed\n";
+        warn "WARNING: Setting ABSTRACT via file ".
+            "'$self->{?ABSTRACT_FROM}' failed\n";
     }
 }
 
@@ -1018,27 +1018,27 @@ sub init_INST {
     # perl has been built and installed. Setting INST_LIB allows
     # you to build directly into, say $Config{privlibexp}.
     unless ($self->{?INST_LIB}){
-	if ($self->{?PERL_CORE}) {
+        if ($self->{?PERL_CORE}) {
             if (defined $Cross::platform) {
                 $self->{+INST_LIB} = $self->{+INST_ARCHLIB} = 
-                  $self->catdir($self->{?PERL_LIB},"..","xlib",
-                                     $Cross::platform);
+                $self->catdir($self->{?PERL_LIB},"..","xlib",
+                    $Cross::platform);
             }
             else {
                 $self->{+INST_LIB} = $self->{+INST_ARCHLIB} = $self->{?PERL_LIB};
             }
-	} else {
-	    $self->{+INST_LIB} = $self->catdir($Curdir,"blib","lib");
-	}
+        } else {
+            $self->{+INST_LIB} = $self->catdir($Curdir,"blib","lib");
+        }
     }
 
     my @parentdir = split(m/::/, $self->{?PARENT_NAME});
     $self->{+INST_LIBDIR}      = $self->catdir('$(INST_LIB)',     < @parentdir);
     $self->{+INST_ARCHLIBDIR}  = $self->catdir('$(INST_ARCHLIB)', < @parentdir);
     $self->{+INST_AUTODIR}     = $self->catdir('$(INST_LIB)', 'auto', 
-                                              '$(FULLEXT)');
+    '$(FULLEXT)');
     $self->{+INST_ARCHAUTODIR} = $self->catdir('$(INST_ARCHLIB)', 'auto',
-                                              '$(FULLEXT)');
+    '$(FULLEXT)');
 
     $self->{+INST_SCRIPT}  ||= $self->catdir($Curdir,'blib','script');
 
@@ -1091,7 +1091,7 @@ sub init_INSTALL_from_PREFIX {
         my $k = 'installsiteman'.$num.'dir';
 
         $self->{+uc $k} ||= uc "\$(installman$($num)dir)"
-          unless %Config{?$k};
+        unless %Config{?$k};
     }
 
     foreach my $num (@(1, 3)) {
@@ -1099,30 +1099,30 @@ sub init_INSTALL_from_PREFIX {
 
         unless( %Config{?$k} ) {
             $self->{+uc $k}  ||= %Config{?usevendorprefix}
-                              ?? uc "\$(installman$($num)dir)"
-                              !! '';
+                ?? uc "\$(installman$($num)dir)"
+            !! '';
         }
     }
 
     $self->{+INSTALLSITEBIN} ||= '$(INSTALLBIN)'
-      unless %Config{?installsitebin};
+    unless %Config{?installsitebin};
     $self->{+INSTALLSITESCRIPT} ||= '$(INSTALLSCRIPT)'
-      unless %Config{?installsitescript};
+    unless %Config{?installsitescript};
 
     unless( %Config{?installvendorbin} ) {
         $self->{+INSTALLVENDORBIN} ||= %Config{?usevendorprefix} 
-                                    ?? %Config{?installbin}
-                                    !! '';
+            ?? %Config{?installbin}
+        !! '';
     }
     unless( %Config{?installvendorscript} ) {
         $self->{+INSTALLVENDORSCRIPT} ||= %Config{?usevendorprefix}
-                                       ?? %Config{?installscript}
-                                       !! '';
+            ?? %Config{?installscript}
+        !! '';
     }
 
 
     my $iprefix = %Config{?installprefixexp} || %Config{?installprefix} || 
-                  %Config{?prefixexp}        || %Config{?prefix} || '';
+        %Config{?prefixexp}        || %Config{?prefix} || '';
     my $vprefix = %Config{?usevendorprefix}  ?? %Config{?vendorprefixexp} !! '';
     my $sprefix = %Config{?siteprefixexp}    || '';
 
@@ -1133,8 +1133,8 @@ sub init_INSTALL_from_PREFIX {
     $self->{+PREFIX}       ||= '';
 
     if( $self->{?PREFIX} ) { 
-        %{$self}{[qw(PERLPREFIX SITEPREFIX VENDORPREFIX)]} =
-          @('$(PREFIX)') x 3;
+            %{$self}{[qw(PERLPREFIX SITEPREFIX VENDORPREFIX)]} =
+        @('$(PREFIX)') x 3;
     }
     else {
         $self->{+PERLPREFIX}   ||= $iprefix;
@@ -1162,88 +1162,88 @@ sub init_INSTALL_from_PREFIX {
     # read man pages.
     for my $num (@(1, 3)) {
         $self->{+'INSTALLMAN'.$num.'DIR'} ||= 'none'
-          unless %Config{?'installman'.$num.'dir'};
+        unless %Config{?'installman'.$num.'dir'};
     }
 
     my %bin_layouts = 
-    %(
-        bin         => \%( s => $iprefix,
-                         t => 'perl',
-                         d => 'bin' ),
-        vendorbin   => \%( s => $vprefix,
-                         t => 'vendor',
-                         d => 'bin' ),
-        sitebin     => \%( s => $sprefix,
-                         t => 'site',
-                         d => 'bin' ),
-        script      => \%( s => $iprefix,
-                         t => 'perl',
-                         d => 'bin' ),
-        vendorscript=> \%( s => $vprefix,
-                         t => 'vendor',
-                         d => 'bin' ),
-        sitescript  => \%( s => $sprefix,
-                         t => 'site',
-                         d => 'bin' ),
-    );
-    
-    my %man_layouts =
-    %(
-        man1dir         => \%( s => $iprefix,
-                             t => 'perl',
-                             d => 'man/man1',
-                             style => $manstyle, ),
-        siteman1dir     => \%( s => $sprefix,
-                             t => 'site',
-                             d => 'man/man1',
-                             style => $manstyle, ),
-        vendorman1dir   => \%( s => $vprefix,
-                             t => 'vendor',
-                             d => 'man/man1',
-                             style => $manstyle, ),
+        %(
+            bin         => \%( s => $iprefix,
+                    t => 'perl',
+                        d => 'bin' ),
+                vendorbin   => \%( s => $vprefix,
+                    t => 'vendor',
+                        d => 'bin' ),
+                sitebin     => \%( s => $sprefix,
+                    t => 'site',
+                        d => 'bin' ),
+                script      => \%( s => $iprefix,
+                    t => 'perl',
+                        d => 'bin' ),
+                vendorscript=> \%( s => $vprefix,
+                    t => 'vendor',
+                        d => 'bin' ),
+                sitescript  => \%( s => $sprefix,
+                    t => 'site',
+                        d => 'bin' ),
+        );
 
-        man3dir         => \%( s => $iprefix,
-                             t => 'perl',
-                             d => 'man/man3',
-                             style => $manstyle, ),
-        siteman3dir     => \%( s => $sprefix,
-                             t => 'site',
-                             d => 'man/man3',
-                             style => $manstyle, ),
-        vendorman3dir   => \%( s => $vprefix,
-                             t => 'vendor',
-                             d => 'man/man3',
-                             style => $manstyle, ),
-    );
+    my %man_layouts =
+        %(
+            man1dir         => \%( s => $iprefix,
+                    t => 'perl',
+                        d => 'man/man1',
+                        style => $manstyle, ),
+                siteman1dir     => \%( s => $sprefix,
+                    t => 'site',
+                        d => 'man/man1',
+                        style => $manstyle, ),
+                vendorman1dir   => \%( s => $vprefix,
+                    t => 'vendor',
+                        d => 'man/man1',
+                        style => $manstyle, ),
+
+                man3dir         => \%( s => $iprefix,
+                    t => 'perl',
+                        d => 'man/man3',
+                        style => $manstyle, ),
+                siteman3dir     => \%( s => $sprefix,
+                    t => 'site',
+                        d => 'man/man3',
+                        style => $manstyle, ),
+                vendorman3dir   => \%( s => $vprefix,
+                    t => 'vendor',
+                        d => 'man/man3',
+                        style => $manstyle, ),
+        );
 
     my %lib_layouts =
-    %(
-        privlib     => \%( s => $iprefix,
-                         t => 'perl',
-                         d => '',
-                         style => $libstyle, ),
-        vendorlib   => \%( s => $vprefix,
-                         t => 'vendor',
-                         d => '',
-                         style => $libstyle, ),
-        sitelib     => \%( s => $sprefix,
-                         t => 'site',
-                         d => 'site_perl',
-                         style => $libstyle, ),
-        
-        archlib     => \%( s => $iprefix,
-                         t => 'perl',
-                         d => "$version/$arch",
-                         style => $libstyle ),
-        vendorarch  => \%( s => $vprefix,
-                         t => 'vendor',
-                         d => "$version/$arch",
-                         style => $libstyle ),
-        sitearch    => \%( s => $sprefix,
-                         t => 'site',
-                         d => "site_perl/$version/$arch",
-                         style => $libstyle ),
-    );
+        %(
+            privlib     => \%( s => $iprefix,
+                    t => 'perl',
+                        d => '',
+                        style => $libstyle, ),
+                vendorlib   => \%( s => $vprefix,
+                    t => 'vendor',
+                        d => '',
+                        style => $libstyle, ),
+                sitelib     => \%( s => $sprefix,
+                    t => 'site',
+                        d => 'site_perl',
+                        style => $libstyle, ),
+
+                archlib     => \%( s => $iprefix,
+                    t => 'perl',
+                        d => "$version/$arch",
+                        style => $libstyle ),
+                vendorarch  => \%( s => $vprefix,
+                    t => 'vendor',
+                        d => "$version/$arch",
+                        style => $libstyle ),
+                sitearch    => \%( s => $sprefix,
+                    t => 'site',
+                        d => "site_perl/$version/$arch",
+                        style => $libstyle ),
+        );
 
 
     # Special case for LIB.
@@ -1253,7 +1253,7 @@ sub init_INSTALL_from_PREFIX {
 
             if( $var =~ m/arch/ ) {
                 $self->{+$Installvar} ||= 
-                  $self->catdir($self->{?LIB}, %Config{archname});
+                $self->catdir($self->{?LIB}, %Config{archname});
             }
             else {
                 $self->{+$Installvar} ||= $self->{?LIB};
@@ -1262,9 +1262,9 @@ sub init_INSTALL_from_PREFIX {
     }
 
     my %type2prefix = %( perl    => 'PERLPREFIX',
-                        site    => 'SITEPREFIX',
-                        vendor  => 'VENDORPREFIX'
-                      );
+            site    => 'SITEPREFIX',
+                vendor  => 'VENDORPREFIX'
+        );
 
     my %layouts = %(< %bin_layouts, < %man_layouts, < %lib_layouts);
     while( my @(?$var, ?$layout) = @: each(%layouts) ) {
@@ -1281,7 +1281,7 @@ sub init_INSTALL_from_PREFIX {
         $self->prefixify($installvar, $s, $r, $d);
 
         print $^STDERR, "  $Installvar == $self->{?$Installvar}\n" 
-          if $Verbose +>= 2;
+            if $Verbose +>= 2;
     }
 
     # Generate these if they weren't figured out.
@@ -1299,18 +1299,18 @@ sub init_INSTALL_from_PREFIX {
 =cut
 
 my %map = %(
-           lib      => \qw(lib perl5),
-           arch     => \@('lib', 'perl5', %Config{?archname}),
-           bin      => \qw(bin),
-           man1dir  => \qw(man man1),
-           man3dir  => \qw(man man3),
-          );
+        lib      => \qw(lib perl5),
+            arch     => \@('lib', 'perl5', %Config{?archname}),
+            bin      => \qw(bin),
+            man1dir  => \qw(man man1),
+            man3dir  => \qw(man man3),
+    );
 %map{+script} = %map{?bin};
 
 sub init_INSTALL_from_INSTALL_BASE {
     my $self = shift;
- 
-    %{$self}{[qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)]} = @:
+
+        %{$self}{[qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)]} = @:
                                                          '$(INSTALL_BASE)';
 
     my %install;
@@ -1320,7 +1320,7 @@ sub init_INSTALL_from_INSTALL_BASE {
             my $key = "INSTALL".$dir.$uc_thing;
 
             %install{+$key} ||= 
-              $self->catdir('$(INSTALL_BASE)', < @{%map{$thing}});
+            $self->catdir('$(INSTALL_BASE)', < @{%map{$thing}});
         }
     }
 
@@ -1379,7 +1379,7 @@ sub init_VERSION {
         $self->{+VERSION} = $self->parse_version($self->{VERSION_FROM});
         if( $self->{?VERSION} eq 'undef' ) {
             warn("WARNING: Setting VERSION via file ".
-                 "'$self->{?VERSION_FROM}' failed\n");
+                "'$self->{?VERSION_FROM}' failed\n");
         }
     }
 
@@ -1570,8 +1570,8 @@ Typical usage:
 sub POD2MAN_macro {
     my $self = shift;
 
-# Need the trailing '--' so perl stops gobbling arguments and - happens
-# to be an alternative end of line seperator on VMS so we quote it
+    # Need the trailing '--' so perl stops gobbling arguments and - happens
+    # to be an alternative end of line seperator on VMS so we quote it
     return <<'END_OF_DEF';
 POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2man "--"
 POD2MAN = $(POD2MAN_EXE)
@@ -1593,7 +1593,7 @@ Used on the t/*.t files.
 sub test_via_harness($self, $perl, $tests) {
 
     return qq{\t$perl "-MExtUtils::Command::MM" }.
-           qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)')" $tests\n};
+        qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)')" $tests\n};
 }
 
 =head3 test_via_script
@@ -1706,7 +1706,7 @@ installation.
 sub libscan($self,$path) {
     my@($dirs,$file) =  ($self->splitpath($path))[[1..2]];
     return '' if grep { m/^(?:RCS|CVS|SCCS|\.svn|_darcs)$/ }, @( < 
-                     $self->splitdir($dirs), $file);
+                                                                 $self->splitdir($dirs), $file);
 
     return $path;
 }

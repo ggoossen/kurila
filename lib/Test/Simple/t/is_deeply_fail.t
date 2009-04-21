@@ -20,8 +20,8 @@ Test::Builder->new->no_ending(1);
 local env::var('HARNESS_ACTIVE' ) = 0;
 
 
-# Can't use Test.pm, that's a 5.005 thing.
-package main;
+    # Can't use Test.pm, that's a 5.005 thing.
+    package main;
 
 
 my $TB = Test::Builder->create;
@@ -85,7 +85,7 @@ ERR
 #line 88
 ok !is_deeply(\%( this => 42 ), \%( this => 43 ), 'hashes with different values');
 is( $out, "not ok 3 - hashes with different values\n", 
-                                        'hashes with different values' );
+    'hashes with different values' );
 is( $err, <<ERRHEAD . <<'ERR',                        '   right diagnostic' );
 #   Failed test 'hashes with different values'
 #   at $^PROGRAM_NAME line 88.
@@ -98,7 +98,7 @@ ERR
 #line 99
 ok !is_deeply(\%( that => 42 ), \%( this => 42 ), 'hashes with different keys');
 is( $out, "not ok 4 - hashes with different keys\n",
-                                        'hashes with different keys' );
+    'hashes with different keys' );
 is( $err, <<ERR,                        '    right diagnostic' );
 #   Failed test 'hashes with different keys'
 #   at $^PROGRAM_NAME line 99.
@@ -110,7 +110,7 @@ ERR
 #line 110
 ok !is_deeply(\(1..9), \(1..10),    'arrays of different length');
 is( $out, "not ok 5 - arrays of different length\n",
-                                        'arrays of different length' );
+    'arrays of different length' );
 is( $err, <<ERR,                        '    right diagnostic' );
 #   Failed test 'arrays of different length'
 #   at $^PROGRAM_NAME line 110.
@@ -156,7 +156,7 @@ ERR
 #line 151
 ok !is_deeply(\@(), \23,    'mixed scalar and array refs');
 is( $out, "not ok 9 - mixed scalar and array refs\n",
-                                        'mixed scalar and array refs' );
+    'mixed scalar and array refs' );
 is( $err, <<ERRHEAD . <<'ERR',                      '    right diagnostic' );
 #   Failed test 'mixed scalar and array refs'
 #   at $^PROGRAM_NAME line 151.
@@ -192,14 +192,14 @@ ERR
 # is_deeply([$a1], [$b1], 'deep mixed scalar refs');
 
 my $foo = \%(
-           this => \(1..10),
-           that => \%( up => "down", left => "right" ),
-          );
+        this => \(1..10),
+            that => \%( up => "down", left => "right" ),
+    );
 
 my $bar = \%(
-           this => \(1..10),
-           that => \%( up => "down", left => "right", foo => 42 ),
-          );
+        this => \(1..10),
+            that => \%( up => "down", left => "right", foo => 42 ),
+    );
 
 #line 198
 ok !is_deeply( $foo, $bar, 'deep structures' );
@@ -216,9 +216,9 @@ ERR
 
 #line 221
 my @tests = @(\@(),
-             \qw(42),
-             \@( <qw(42 23), < qw(42 23))
-            );
+              \qw(42),
+              \@( <qw(42 23), < qw(42 23))
+    );
 
 foreach my $test ( @tests) {
     my $num_args = (nelems @$test);
@@ -331,7 +331,7 @@ do {
         $TB->todo_skip("different subs");
         last TODO;
 
-# line 349
+        # line 349
         ok !is_deeply( sub {"foo"}, sub {"bar"} ), 'function refs';
         is( $out, "not ok 27\n" );
         like( $err, <<ERR,	     '  right diagnostic' );
@@ -349,7 +349,7 @@ ERR
   TODO: do {
         $TB->todo_skip("different subs");
         last TODO;
-#line 357
+        #line 357
         ok !is_deeply( $glob1, $glob2 ), 'typeglobs';
         is( $out, "not ok 28\n" );
         like( $err, <<ERR,	     '  right diagnostic' );

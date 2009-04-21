@@ -2,8 +2,8 @@
 
 BEGIN {
     unless (PerlIO::Layer->find( 'perlio')) {
-	print $^STDOUT, "1..0 # Skip: not perlio\n";
-	exit 0;
+        print $^STDOUT, "1..0 # Skip: not perlio\n";
+        exit 0;
     }
 }
 
@@ -29,5 +29,5 @@ is(ord( ~< $io), 256, "readline chr(256)");
 undef $io;
 
 END {
-  1 while unlink "io_utf8";
+    1 while unlink "io_utf8";
 }

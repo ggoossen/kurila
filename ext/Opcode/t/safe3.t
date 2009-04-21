@@ -17,7 +17,7 @@ $safe->reval( qq{\@_[1] = qq/\0/ x } . $masksize );
 # Check that it didn't work
 $safe->reval( q{$x + $y} );
 like( $^EVAL_ERROR->{?description}, qr/^'?addition \(\+\)'? trapped by operation mask/,
-	    'opmask still in place with reval' );
+      'opmask still in place with reval' );
 
 my $safe2 = Safe->new();
 $safe2->deny('add');

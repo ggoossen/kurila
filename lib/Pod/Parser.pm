@@ -459,8 +459,8 @@ method then they I<must> be sure to invoke C<$self-E<gt>SUPER::initialize()>.
 =cut
 
 sub initialize {
-    #my $self = shift;
-    #return;
+#my $self = shift;
+#return;
 }
 
 ##---------------------------------------------------------------------------
@@ -476,8 +476,8 @@ this method to perform any per-document initialization.
 =cut
 
 sub begin_pod {
-    #my $self = shift;
-    #return;
+#my $self = shift;
+#return;
 }
 
 ##---------------------------------------------------------------------------
@@ -499,8 +499,8 @@ initializations once per document, then you should use B<begin_pod()>.
 =cut
 
 sub begin_input {
-    #my $self = shift;
-    #return;
+#my $self = shift;
+#return;
 }
 
 ##---------------------------------------------------------------------------
@@ -522,8 +522,8 @@ cleanup actions once per document, then you should use B<end_pod()>.
 =cut
 
 sub end_input {
-    #my $self = shift;
-    #return;
+#my $self = shift;
+#return;
 }
 
 ##---------------------------------------------------------------------------
@@ -539,8 +539,8 @@ to perform any per-document finalization.
 =cut
 
 sub end_pod {
-    #my $self = shift;
-    #return;
+#my $self = shift;
+#return;
 }
 
 ##---------------------------------------------------------------------------
@@ -743,10 +743,10 @@ sub parse_text {
         ## more than just the sequence object, we also need to pass the
         ## sequence name and text.
         $xseq_sub = sub {
-            my @($self, $iseq) =  @_;
-            my $args = join("", $iseq->parse_tree->children);
-            return  $self->interior_sequence( $iseq->name, $args, $iseq);
-        };
+                my @($self, $iseq) =  @_;
+                my $args = join("", $iseq->parse_tree->children);
+                return  $self->interior_sequence( $iseq->name, $args, $iseq);
+            };
     }
     ref $xseq_sub    or  $xseq_sub   = sub { shift()->?$expand_seq(< @_) };
     ref $xtext_sub   or  $xtext_sub  = sub { shift()->?$expand_text(< @_) };
@@ -779,10 +779,10 @@ sub parse_text {
             ($ldelim = $ldelim_orig) =~ s/\s+$//;
             ($rdelim = $ldelim) =~ s/</>/g;
             $seq = Pod::InteriorSequence->new(
-                       name   => $cmd,
-                       ldelim => $ldelim_orig,  rdelim => $rdelim,
-                       file   => $file,    line   => $line
-                   );
+                name   => $cmd,
+                ldelim => $ldelim_orig,  rdelim => $rdelim,
+                file   => $file,    line   => $line
+                );
             ((nelems @seq_stack) +> 1)  and  $seq->nested(@seq_stack[-1]);
             push @seq_stack, $seq;
         }
@@ -791,7 +791,7 @@ sub parse_text {
             ## Make sure we match the right kind of closing delimiter
             my @($seq_end, $post_seq) = @("", "");
             if ( ($ldelim eq '<'   and  m/\A(.*?)(>)/s)
-                 or  m/\A(.*?)(\s+$rdelim)/s )
+                or  m/\A(.*?)(\s+$rdelim)/s )
             {
                 ## Found end-of-sequence, capture the interior and the
                 ## closing the delimiter, and put the rest back on the
@@ -813,7 +813,7 @@ sub parse_text {
                 pop @seq_stack;
                 ## Append result to its parent in current parse tree
                 @seq_stack[-1]->append($expand_seq ?? &$xseq_sub($self,$seq)
-                                                   !! $seq);
+                    !! $seq);
                 ## Remember the current cmd-name and left-delimiter
                 if((nelems @seq_stack) +> 1) {
                     $cmd = @seq_stack[-1]->name;
@@ -838,18 +838,18 @@ sub parse_text {
     ## Handle unterminated sequences
     my $errorsub = ((nelems @seq_stack) +> 1) ?? $self->errorsub() !! undef;
     while ((nelems @seq_stack) +> 1) {
-       @($cmd, $file, $line) = @( $seq->name, < $seq->file_line);
-       $ldelim  = $seq->ldelim;
-       ($rdelim = $ldelim) =~ s/</>/g;
-       $rdelim  =~ s/^(\S+)(\s*)$/$2$1/;
-       pop @seq_stack;
-       my $errmsg = "*** ERROR: unterminated $($cmd)$($ldelim)...$($rdelim)".
-                    " at line $line in file $file\n";
-       (ref $errorsub) and &{$errorsub}($errmsg)
-           or (defined $errorsub) and $self->?$errorsub($errmsg)
-               or  warn($errmsg);
-       @seq_stack[-1]->append($expand_seq ?? < &$xseq_sub($self,$seq) !! $seq);
-       $seq = @seq_stack[-1];
+        @($cmd, $file, $line) = @( $seq->name, < $seq->file_line);
+        $ldelim  = $seq->ldelim;
+        ($rdelim = $ldelim) =~ s/</>/g;
+        $rdelim  =~ s/^(\S+)(\s*)$/$2$1/;
+        pop @seq_stack;
+        my $errmsg = "*** ERROR: unterminated $($cmd)$($ldelim)...$($rdelim)".
+            " at line $line in file $file\n";
+        (ref $errorsub) and &{$errorsub}($errmsg)
+            or (defined $errorsub) and $self->?$errorsub($errmsg)
+            or  warn($errmsg);
+        @seq_stack[-1]->append($expand_seq ?? < &$xseq_sub($self,$seq) !! $seq);
+        $seq = @seq_stack[-1];
     }
 
     ## Return the resulting parse-tree
@@ -935,9 +935,9 @@ sub parse_paragraph($self, $text, $line_num) {
     ## If we havent already, perform any desired preprocessing and
     ## then re-check the "cutting" state
     unless ($wantNonPods) {
-       $text = $self->preprocess_paragraph($text, $line_num);
-       return 1  unless ((defined $text) and (length $text));
-       return 1  if (%$self{?_CUTTING});
+        $text = $self->preprocess_paragraph($text, $line_num);
+        return 1  unless ((defined $text) and (length $text));
+        return 1  if (%$self{?_CUTTING});
     }
 
     ## Look for one of the three types of paragraphs
@@ -953,18 +953,18 @@ sub parse_paragraph($self, $text, $line_num) {
         ## If this is a "cut" directive then we dont need to do anything
         ## except return to "cutting" mode.
         if ($cmd eq 'cut') {
-           %$self{+_CUTTING} = 1;
-           return  unless %myOpts{?'process_cut_cmd'};
+            %$self{+_CUTTING} = 1;
+            return  unless %myOpts{?'process_cut_cmd'};
         }
     }
     ## Save the attributes indicating how the command was specified.
     $pod_para = Pod::Paragraph->new(
-          name      => $cmd,
-          text      => $text,
-          prefix    => $pfx,
-          separator => $sep,
-          file      => %$self{?_INFILE},
-          line      => $line_num);
+        name      => $cmd,
+        text      => $text,
+        prefix    => $pfx,
+        separator => $sep,
+        file      => %$self{?_INFILE},
+        line      => $line_num);
     # ## Invoke appropriate callbacks
     # if (exists $$self{_CALLBACKS}) {
     #    ## Look through the callback list, invoke callbacks,
@@ -1062,17 +1062,17 @@ sub parse_from_filehandle {
         ## See if this line is blank and ends the current paragraph.
         ## If it isnt, then keep iterating until it is.
         next unless (($textline =~ m/^([^\S\r\n]*)[\r\n]*$/)
-                                     && (length $paragraph));
+                     && (length $paragraph));
 
         ## Issue a warning about any non-empty blank lines
         if (length($1) +> 0 and %myOpts{?'warnings'} and ! %$self{?_CUTTING}) {
             my $errorsub = $self->errorsub();
             my $file = $self->input_file();
             my $errmsg = "*** WARNING: line containing nothing but whitespace".
-                         " in paragraph at line $nlines in file $file\n";
+                " in paragraph at line $nlines in file $file\n";
             (ref $errorsub) and &{$errorsub}($errmsg)
                 or (defined $errorsub) and $self->?$errorsub($errmsg)
-                    or  warn($errmsg);
+                or  warn($errmsg);
         }
 
         ## Now process the paragraph
@@ -1082,7 +1082,7 @@ sub parse_from_filehandle {
     }
     ## Dont forget about the last paragraph in the file
     if (length $paragraph) {
-       parse_paragraph($self, $paragraph, ($nlines - $plines) + 1)
+        parse_paragraph($self, $paragraph, ($nlines - $plines) + 1)
     }
 
     ## Now pop the input stream off the top of the input stack.
@@ -1162,7 +1162,7 @@ sub parse_from_file {
         ## We have a filename, open it for reading
         %$self{+_INFILE} = $infile;
         open($in_fh, "<", "$infile")  or
-             die "Can't open $infile for reading: $^OS_ERROR\n";
+            die "Can't open $infile for reading: $^OS_ERROR\n";
         $close_input = 1;
     }
 
@@ -1179,11 +1179,11 @@ sub parse_from_file {
             die "Output to $1 reference not supported!\n";
         }
         elsif (ref($outfile) eq 'SCALAR') {
-#           # NOTE: IO::String isn't a part of the perl distribution,
-#           #       so probably we shouldn't support this case...
-#           require IO::String;
-#           $$self{_OUTFILE} = "$outfile";
-#           $out_fh = IO::String->new($outfile);
+            #           # NOTE: IO::String isn't a part of the perl distribution,
+            #           #       so probably we shouldn't support this case...
+            #           require IO::String;
+            #           $$self{_OUTFILE} = "$outfile";
+            #           $out_fh = IO::String->new($outfile);
             die "Output to SCALAR reference not supported!\n";
         }
         else {
@@ -1216,7 +1216,7 @@ sub parse_from_file {
         %$self{+_OUTFILE} = $outfile;
         (-d $outfile) and die "$outfile is a directory, not POD input!\n";
         open($out_fh, ">", "$outfile")  or
-             die "Can't open $outfile for writing: $^OS_ERROR\n";
+            die "Can't open $outfile for writing: $^OS_ERROR\n";
         $close_output = 1;
     }
 
@@ -1266,7 +1266,7 @@ is used to issue error messages (this is the default behavior).
 =cut
 
 sub errorsub {
-   return ((nelems @_) +> 1) ??  @(@_[0]->{+_ERRORSUB} = @_[1]) !! @_[0]->{?_ERRORSUB};
+    return ((nelems @_) +> 1) ??  @(@_[0]->{+_ERRORSUB} = @_[1]) !! @_[0]->{?_ERRORSUB};
 }
 
 ##---------------------------------------------------------------------------
@@ -1287,7 +1287,7 @@ result.
 =cut
 
 sub cutting {
-   return ((nelems @_) +> 1) ??  @(@_[0]->{+_CUTTING} = @_[1]) !! @_[0]->{?_CUTTING};
+    return ((nelems @_) +> 1) ??  @(@_[0]->{+_CUTTING} = @_[1]) !! @_[0]->{?_CUTTING};
 }
 
 ##---------------------------------------------------------------------------
@@ -1352,7 +1352,7 @@ Returns the name of the output file being written.
 =cut
 
 sub output_file {
-   return @_[0]->{?_OUTFILE};
+    return @_[0]->{?_OUTFILE};
 }
 
 ##---------------------------------------------------------------------------
@@ -1366,7 +1366,7 @@ Returns the output filehandle object.
 =cut
 
 sub output_handle {
-   return @_[0]->{?_OUTPUT};
+    return @_[0]->{?_OUTPUT};
 }
 
 ##---------------------------------------------------------------------------
@@ -1380,7 +1380,7 @@ Returns the name of the input file being read.
 =cut
 
 sub input_file {
-   return @_[0]->{?_INFILE};
+    return @_[0]->{?_INFILE};
 }
 
 ##---------------------------------------------------------------------------
@@ -1394,7 +1394,7 @@ Returns the current input filehandle object.
 =cut
 
 sub input_handle {
-   return @_[0]->{?_INPUT};
+    return @_[0]->{?_INPUT};
 }
 
 ##---------------------------------------------------------------------------
@@ -1429,7 +1429,7 @@ being processed.
 =cut
 
 sub input_streams {
-   return @_[0]->{?_INPUT_STREAMS};
+    return @_[0]->{?_INPUT_STREAMS};
 }
 
 ##---------------------------------------------------------------------------
@@ -1453,7 +1453,7 @@ to obtain the name and line number of the current input file.
 =cut
 
 sub top_stream {
-   return @_[0]->{?_TOP_STREAM} || undef;
+    return @_[0]->{?_TOP_STREAM} || undef;
 }
 
 #############################################################################
@@ -1520,11 +1520,11 @@ sub _push_input_stream($self, $in_fh, $out_fh) {
     %$self{+_INFILE}  = '(unknown)'  unless (defined  %$self{?_INFILE});
     %$self{+_INPUT}   = $in_fh;
     my $input_top     = %$self{+_TOP_STREAM}
-                      = Pod::InputSource->new(
-                            name        => %$self{?_INFILE},
-                            handle      => $in_fh,
-                            was_cutting => %$self{_CUTTING}
-);
+        = Pod::InputSource->new(
+        name        => %$self{?_INFILE},
+        handle      => $in_fh,
+        was_cutting => %$self{_CUTTING}
+        );
     my $input_stack = %$self{?_INPUT_STREAMS};
     push(@$input_stack, $input_top);
 
@@ -1569,12 +1569,12 @@ sub _pop_input_stream($self) {
     ## Dont forget to reset the input indicators
     my $input_top = undef;
     if ((nelems @$input_stack) +> 0) {
-       $input_top = %$self{+_TOP_STREAM} = @$input_stack[-1];
-       %$self{+_INFILE}  = $input_top->name();
-       %$self{+_INPUT}   = $input_top->handle();
+        $input_top = %$self{+_TOP_STREAM} = @$input_stack[-1];
+        %$self{+_INFILE}  = $input_top->name();
+        %$self{+_INPUT}   = $input_top->handle();
     } else {
-       delete %$self{_TOP_STREAM};
-       delete %$self{_INPUT_STREAMS};
+        delete %$self{_TOP_STREAM};
+        delete %$self{_INPUT_STREAMS};
     }
 
     return  $input_top;

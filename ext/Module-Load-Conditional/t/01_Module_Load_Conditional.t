@@ -14,7 +14,7 @@ use_ok( 'Module::Load::Conditional' );
 
 ### stupid stupid warnings ###
 do {   $Module::Load::Conditional::VERBOSE =   
-       $Module::Load::Conditional::VERBOSE = 0;
+    $Module::Load::Conditional::VERBOSE = 0;
 
     *can_load       = \&Module::Load::Conditional::can_load;
     *check_install  = \&Module::Load::Conditional::check_install;
@@ -23,13 +23,13 @@ do {   $Module::Load::Conditional::VERBOSE =
 
 do {
     my $rv = check_install(
-                        module  => 'Module::Load::Conditional',
-                        version => $Module::Load::Conditional::VERSION,
-                );
+        module  => 'Module::Load::Conditional',
+        version => $Module::Load::Conditional::VERSION,
+        );
 
     ok( $rv->{?uptodate},    q[Verify self] );
     is( $rv->{version}->stringify, $Module::Load::Conditional::VERSION,  
-                            q[  Found proper version] );
+        q[  Found proper version] );
 
     ### break up the specification
     my @rv_path = do {
@@ -37,7 +37,7 @@ do {
         ### Use the UNIX specific method, as the VMS one currently
         ### converts the file spec back to VMS format.
         my $class = ON_VMS ?? 'File::Spec::Unix' !! 'File::Spec';
-        
+
         my@($vol, $path, $file) =  $class->splitpath( $rv->{'file'} );
 
         my @path = @($vol, < $class->splitdir( $path ), $file );
@@ -48,11 +48,11 @@ do {
         ### and return it    
         @path;
     };
-    
+
     is( $^INCLUDED{?'Module/Load/Conditional.pm'},            
-            File::Spec::Unix->catfile(< @rv_path),
-                            q[  Found proper file]
-    );
+        File::Spec::Unix->catfile(< @rv_path),
+        q[  Found proper file]
+        );
 
 };
 
@@ -60,13 +60,13 @@ do {
 ### numeric' -- turn off that warning here.
 do {   local $^WARNING = undef;
     my $rv = check_install(
-                        module  => 'Module::Load::Conditional',
-                        version => $Module::Load::Conditional::VERSION + 1,
-                );
+        module  => 'Module::Load::Conditional',
+        version => $Module::Load::Conditional::VERSION + 1,
+        );
 
     ok( !$rv->{?uptodate} && $rv->{?version} && $rv->{?file},
         q[Verify out of date module]
-    );
+        );
 };
 
 do {
@@ -74,7 +74,7 @@ do {
 
     ok( $rv->{?uptodate} && $rv->{?version} && $rv->{?file},
         q[Verify any module]
-    );
+        );
 };
 
 do {
@@ -82,7 +82,7 @@ do {
 
     ok( !$rv->{?uptodate} && !$rv->{?version} && !$rv->{?file},
         q[Verify non-existant module]
-    );
+        );
 
 };
 
@@ -95,25 +95,25 @@ do {   my $rv = check_install( module => 'InPod' );
 
 ### test beta/developer release versions
 do {   my $test_ver = $Module::Load::Conditional::VERSION;
-    
+
     ### strip beta tags
     $test_ver =~ s/_\d+//g;
     $test_ver .= '_99';
-    
+
     my $rv = check_install( 
-                    module  => 'Module::Load::Conditional', 
-                    version => $test_ver,
-                );
+        module  => 'Module::Load::Conditional', 
+        version => $test_ver,
+        );
 
     ok( $rv,                "Checking beta versions" );
     ok( !$rv->{?'uptodate'}, "   Beta version is higher" );
-    
+
 };    
 
 ### test $FIND_VERSION
 do {   local $Module::Load::Conditional::FIND_VERSION = 0;
     local $Module::Load::Conditional::FIND_VERSION = 0;
-    
+
     my $rv = check_install( module  => 'Module::Load::Conditional' );
 
     ok( $rv,                        'Testing $FIND_VERSION' );
@@ -153,17 +153,17 @@ do {
 
     ok( !$^INCLUDED{?'LoadIt.pm'} && !$^INCLUDED{?'MustBe/Loaded.pm'},
         q[Do not load if one prerequisite fails]
-    );
+        );
 };
 
 
 ### test 'requires' ###
 SKIP:do {
     skip "Depends on \$^X, which doesn't work well when testing the Perl core", 
-        1 if env::var('PERL_CORE');
+         1 if env::var('PERL_CORE');
 
     my %list = %( < @+: map { @: $_ => 1 }, requires('Carp') );
-    
+
     my $flag;
     $flag++ unless delete %list{'Exporter'};
 
@@ -173,15 +173,15 @@ SKIP:do {
 ### test using the %INC lookup for check_install
 do {   local $Module::Load::Conditional::CHECK_INC_HASH = 1;
     local $Module::Load::Conditional::CHECK_INC_HASH = 1;
-    
+
     do {   package A::B::C::D; 
         $A::B::C::D::VERSION = $^PID; 
         $^INCLUDED{+'A/B/C/D.pm'}   = $^PID.$^PID;
-        
-        ### XXX this is no longer needed with M::Load 0.11_01
-        #$INC{'[.A.B.C]D.pm'} = $$.$$ if $^O eq 'VMS';
+
+    ### XXX this is no longer needed with M::Load 0.11_01
+    #$INC{'[.A.B.C]D.pm'} = $$.$$ if $^O eq 'VMS';
     };
-    
+
     my $href = check_install( module => 'A::B::C::D', version => 0 );
 
     ok( $href,                  'Found package in %INC' );
@@ -189,6 +189,6 @@ do {   local $Module::Load::Conditional::CHECK_INC_HASH = 1;
     is( $href->{?'version'}, $^PID, '   Found correct version' );
     ok( $href->{?'uptodate'},    '   Marked as uptodate' );
     ok( can_load( modules => \%( 'A::B::C::D' => 0 ) ),
-                                '   can_load successful' );
+        '   can_load successful' );
 };
 

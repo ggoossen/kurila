@@ -1,13 +1,13 @@
 
 package Pod::Simple::PullParserToken;
- # Base class for tokens gotten from Pod::Simple::PullParser's $parser->get_token
+# Base class for tokens gotten from Pod::Simple::PullParser's $parser->get_token
 our @ISA = @( () );
 our $VERSION = '2.02';
 
 
 sub new {  # Class->new('type', stuff...);  ## Overridden in derived classes anyway
-  my $class = shift;
-  return bless \$(@_), ref($class) || $class;
+    my $class = shift;
+    return bless \$(@_), ref($class) || $class;
 }
 
 sub type { @_[0]->[0] }  # Can't change the type of an object

@@ -52,7 +52,7 @@ BEGIN {
     # Do this open before any chdir
     $file = shift(@ARGV);
     if (defined $file) {
-	open $tests_fh, "<", $file or die "Can't open $file";
+        open $tests_fh, "<", $file or die "Can't open $file";
     }
 }
 
@@ -63,7 +63,7 @@ our ($qr, $skip_amp, $qr_embed, $qr_embed_thr); # set by our callers
 
 if (!defined $file) {
     open($tests_fh, "<",'op/re_tests') || open($tests_fh, "<",'t/op/re_tests')
-	|| open($tests_fh, "<",':op:re_tests') || die "Can't open re_tests";
+        || open($tests_fh, "<",':op:re_tests') || die "Can't open re_tests";
 }
 
 my @tests = @( ~< $tests_fh );
@@ -116,11 +116,11 @@ foreach ( @tests) {
     $result =~ s/B//i unless $skip;
 
     for my $study (@('', 'study $subject')) {
-	# Need to make a copy, else the utf8::upgrade of an alreay studied
-	# scalar confuses things.
-	my $subject = $subject;
-	my $c = $iters;
-	my ($code, $match, $got);
+        # Need to make a copy, else the utf8::upgrade of an alreay studied
+        # scalar confuses things.
+        my $subject = $subject;
+        my $c = $iters;
+        my ($code, $match, $got);
         if ($repl eq 'pos') {
             $code= <<EOFCODE;
                 $utf8;
@@ -160,46 +160,46 @@ EOFCODE
         #$code.=qq[\n\$expect="$expect";\n];
         #use Devel::Peek;
         #die Dump($code) if $pat=~/\\h/ and $subject=~/\x{A0}/;
-	do {
-	    # Probably we should annotate specific tests with which warnings
-	    # categories they're known to trigger, and hence should be
-	    # disabled just for that test
-	    no warnings < qw(uninitialized regexp);
-	    eval $code;
-	};
-	my $err = $^EVAL_ERROR;
-	if ($result eq 'c') {
-	    if ($err->{?description} !~ m!^\Q$expect!) { print $^STDOUT, "not ok $test (compile) $input => `$err'\n"; next TEST }
-	    last;  # no need to study a syntax error
-	}
-	elsif ( $skip ) {
-	    print $^STDOUT, "ok $test # skipped", length($reason) ?? " $reason" !! '', "\n";
-	    next TEST;
-	}
-	elsif ( $todo ) {
-	    print $^STDOUT, "not ok $test # todo", length($reason) ?? " - $reason" !! '', "\n";
-	    next TEST;
-	}
-	elsif ($err) {
-	    print $^STDOUT, "not ok $test $input => error: '$($^EVAL_ERROR->message)'\n$(dump::view($code))\n"; next TEST;
-	}
-	elsif ($result =~ m/^n/) {
-	    if ($match) { print $^STDOUT, "not ok $test ($study) $input => false positive\n"; next TEST }
-	}
-	else {
-	    if (!$match || $got ne $expect) {
-	        try { require Data::Dumper };
-		if ($^EVAL_ERROR) {
-		    print $^STDOUT, "not ok $test ($study) $input => `$got', match=$match\n$code\n";
-		}
-		else { # better diagnostics
-		    my $s = 'Data::Dumper'->new(\@($subject),\@('subject'))->Useqq(1)->Dump;
-		    my $g = 'Data::Dumper'->new(\@($got),\@('got'))->Useqq(1)->Dump;
-		    print $^STDOUT, "not ok $test ($study) $input => `$got', match=$match\n$s\n$g\n$code\n";
-		}
-		next TEST;
-	    }
-	}
+        do {
+            # Probably we should annotate specific tests with which warnings
+            # categories they're known to trigger, and hence should be
+            # disabled just for that test
+            no warnings < qw(uninitialized regexp);
+            eval $code;
+        };
+        my $err = $^EVAL_ERROR;
+        if ($result eq 'c') {
+            if ($err->{?description} !~ m!^\Q$expect!) { print $^STDOUT, "not ok $test (compile) $input => `$err'\n"; next TEST }
+            last;  # no need to study a syntax error
+        }
+        elsif ( $skip ) {
+            print $^STDOUT, "ok $test # skipped", length($reason) ?? " $reason" !! '', "\n";
+            next TEST;
+        }
+        elsif ( $todo ) {
+            print $^STDOUT, "not ok $test # todo", length($reason) ?? " - $reason" !! '', "\n";
+            next TEST;
+        }
+        elsif ($err) {
+            print $^STDOUT, "not ok $test $input => error: '$($^EVAL_ERROR->message)'\n$(dump::view($code))\n"; next TEST;
+        }
+        elsif ($result =~ m/^n/) {
+            if ($match) { print $^STDOUT, "not ok $test ($study) $input => false positive\n"; next TEST }
+        }
+        else {
+            if (!$match || $got ne $expect) {
+                try { require Data::Dumper };
+                if ($^EVAL_ERROR) {
+                    print $^STDOUT, "not ok $test ($study) $input => `$got', match=$match\n$code\n";
+                }
+                else { # better diagnostics
+                    my $s = 'Data::Dumper'->new(\@($subject),\@('subject'))->Useqq(1)->Dump;
+                    my $g = 'Data::Dumper'->new(\@($got),\@('got'))->Useqq(1)->Dump;
+                    print $^STDOUT, "not ok $test ($study) $input => `$got', match=$match\n$s\n$g\n$code\n";
+                }
+                next TEST;
+            }
+        }
     }
     print $^STDOUT, "ok $test\n";
 }

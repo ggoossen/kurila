@@ -101,7 +101,7 @@ sub new {
     } elsif (length (%$self{?opt_quotes}) == 1) {
         %$self{+LQUOTE} = %$self{+RQUOTE} = %$self{?opt_quotes};
     } elsif (%$self{?opt_quotes} =~ m/^(.)(.)$/
-             || %$self{?opt_quotes} =~ m/^(..)(..)$/) {
+    || %$self{?opt_quotes} =~ m/^(..)(..)$/) {
         %$self{+LQUOTE} = $1;
         %$self{+RQUOTE} = $2;
     } else {

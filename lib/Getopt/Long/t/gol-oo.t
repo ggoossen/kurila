@@ -4,7 +4,7 @@ use Getopt::Long;
 my $want_version="2.24";
 die("Getopt::Long version $want_version required--this is only version ".
     $Getopt::Long::VERSION)
-  unless $Getopt::Long::VERSION +>= $want_version;
+    unless $Getopt::Long::VERSION +>= $want_version;
 print $^STDOUT, "1..9\n";
 
 our ($opt_baR, $opt_bar, $opt_foo, $opt_Foo);

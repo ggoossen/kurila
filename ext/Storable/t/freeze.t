@@ -8,10 +8,10 @@
 
 BEGIN {
     if (env::var('PERL_CORE')){
-	chdir('t') if -d 't';
-	$^INCLUDE_PATH = @('.', '../lib', '../ext/Storable/t');
+        chdir('t') if -d 't';
+        $^INCLUDE_PATH = @('.', '../lib', '../ext/Storable/t');
     } else {
-	unshift $^INCLUDE_PATH, 't';
+        unshift $^INCLUDE_PATH, 't';
     }
     require 'st-dump.pl';
 }
@@ -31,7 +31,7 @@ $d->{+'a'} = $e;
 $e->[+0] = $d;
 our %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
 our @a = @('first', undef, 3, -4, -3.14159, 456, 4.5, $d, \$d, \$e, $e,
-	$b, \$a, $a, $c, \$c, \%a);
+           $b, \$a, $a, $c, \$c, \%a);
 
 ok defined (our $f1 = freeze(\@a));
 
@@ -46,12 +46,12 @@ ok 1;
 
 ok $got eq $dumped; 
 
-package FOO; our @ISA = qw(Storable);
+    package FOO; our @ISA = qw(Storable);
 
 sub make {
-	my $self = bless \%();
-	$self->{+key} = \%main::a;
-	return $self;
+    my $self = bless \%();
+    $self->{+key} = \%main::a;
+    return $self;
 };
 
 package main;
@@ -78,12 +78,12 @@ our $root2 = thaw($other);
 ok &dump($root2) eq &dump($root);
 
 our $VAR1 = \@(
-	'method',
-	1,
-	'prepare',
-	q|SELECT table_name, table_owner, num_rows FROM iitables
+ 'method',
+ 1,
+ 'prepare',
+ q|SELECT table_name, table_owner, num_rows FROM iitables
                   where table_owner != '$ingres' and table_owner != 'DBA'|
-);
+    );
 
 our $x = nfreeze($VAR1);
 our $VAR2 = thaw($x);
@@ -100,14 +100,14 @@ ok 1;
 my $thaw_me = 'asdasdasdasd';
 
 try {
-	my $thawed = thaw $thaw_me;
+    my $thawed = thaw $thaw_me;
 };
 ok $^EVAL_ERROR;
 
 my %to_be_frozen = %(foo => 'bar');
 my $frozen;
 try {
-	$frozen = freeze \%to_be_frozen;
+    $frozen = freeze \%to_be_frozen;
 };
 ok !$^EVAL_ERROR;
 
@@ -119,11 +119,11 @@ ok !$^EVAL_ERROR;
 thaw $frozen;			# used to segfault here
 ok 1;
 
-    eval '
+eval '
         $a = \@(undef, undef);
         $b = thaw freeze $a;
         @a = map { exists $a->[$_] }, 0 .. (nelems @$a)-1;
         our @b = map { exists $b->[$_] }, 0 .. (nelems @$b)-1;
         ok (join " ", @a) eq (join " ", @b);
     ';
-    die if $^EVAL_ERROR;
+die if $^EVAL_ERROR;

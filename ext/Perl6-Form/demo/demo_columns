@@ -7,14 +7,14 @@ print $^STDOUT, "Number of cols: ";
 my $colcount = ~< *ARGV;
 
 print $^STDOUT, < form 
-	'{:[{*}[:}  ' x $colcount,
-	($files) x $colcount;
+ '{:[{*}[:}  ' x $colcount,
+ ($files) x $colcount;
 
 print $^STDOUT, "\n\n";
 
 print $^STDOUT, < form 
-	'{:[{*}[:}  ' x $colcount,
-	(\@files) x $colcount;
+ '{:[{*}[:}  ' x $colcount,
+ (\@files) x $colcount;
 
 
 __DATA__

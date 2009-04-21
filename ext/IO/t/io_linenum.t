@@ -17,9 +17,9 @@ use IO::File;
 
 sub lineno($f)
 {
-  my $l;
-  $l .= $f->input_line_number;
-  $l;
+    my $l;
+    $l .= $f->input_line_number;
+    $l;
 }
 
 my $t;
@@ -60,8 +60,8 @@ $t = tell $fh;
 is(lineno($io), "11");
 
 do {
-  $io->getline for @( ( <1 .. 5));
-  is(lineno($io), "16");
+    $io->getline for @( ( <1 .. 5));
+    is(lineno($io), "16");
 };
 
 is(lineno($io), "16");

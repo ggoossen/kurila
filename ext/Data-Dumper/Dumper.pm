@@ -45,109 +45,109 @@ our $Deparse    //= 0;
 #
 sub new($c, $v, ?$n) {
 
-  die "Usage:  PACKAGE->new(ARRAYREF, [ARRAYREF])" 
-    unless (defined($v) && (ref($v) eq 'ARRAY'));
-  $n = \@() unless (defined($n) && (ref($v) eq 'ARRAY'));
+    die "Usage:  PACKAGE->new(ARRAYREF, [ARRAYREF])" 
+        unless (defined($v) && (ref($v) eq 'ARRAY'));
+    $n = \@() unless (defined($n) && (ref($v) eq 'ARRAY'));
 
-  my $s = \%( 
-             level      => 0,           # current recursive depth
-	     indent     => $Indent,     # various styles of indenting
-	     pad	=> $Pad,        # all lines prefixed by this string
-	     xpad       => "",          # padding-per-level
-	     apad       => "",          # added padding for hash keys n such
-	     sep        => "",          # list separator
-	     pair	=> $Pair,	# hash key/value separator: defaults to ' => '
-	     seen       => \%(),        # local (nested) refs (id => [name, val])
-	     todump     => $v,          # values to dump []
-	     names      => $n,          # optional names for values []
-	     varname    => $Varname,    # prefix to use for tagging nameless ones
-             purity     => $Purity,     # degree to which output is evalable
-             useqq 	=> $Useqq,      # use "" for strings (backslashitis ensues)
-             terse 	=> $Terse,      # avoid name output (where feasible)
-             freezer	=> $Freezer,    # name of Freezer method for objects
-             toaster	=> $Toaster,    # name of method to revive objects
-             deepcopy	=> $Deepcopy,   # dont cross-ref, except to stop recursion
-             quotekeys	=> $Quotekeys,  # quote hash keys
-             'bless'	=> $Bless,	# keyword to use for "bless"
-#	     expdepth   => $Expdepth,   # cutoff depth for explicit dumping
-	     maxdepth	=> $Maxdepth,   # depth beyond which we give up
-	     sortkeys   => $Sortkeys,   # flag or filter for sorting hash keys
-	     deparse	=> $Deparse,	# use B::Deparse for coderefs
-	   );
+    my $s = \%( 
+            level      => 0,           # current recursive depth
+                indent     => $Indent,     # various styles of indenting
+                pad	=> $Pad,        # all lines prefixed by this string
+                xpad       => "",          # padding-per-level
+                apad       => "",          # added padding for hash keys n such
+                sep        => "",          # list separator
+                pair	=> $Pair,	# hash key/value separator: defaults to ' => '
+                seen       => \%(),        # local (nested) refs (id => [name, val])
+                todump     => $v,          # values to dump []
+                names      => $n,          # optional names for values []
+                varname    => $Varname,    # prefix to use for tagging nameless ones
+                purity     => $Purity,     # degree to which output is evalable
+                useqq 	=> $Useqq,      # use "" for strings (backslashitis ensues)
+                terse 	=> $Terse,      # avoid name output (where feasible)
+                freezer	=> $Freezer,    # name of Freezer method for objects
+                toaster	=> $Toaster,    # name of method to revive objects
+                deepcopy	=> $Deepcopy,   # dont cross-ref, except to stop recursion
+                quotekeys	=> $Quotekeys,  # quote hash keys
+                'bless'	=> $Bless,	# keyword to use for "bless"
+                #	     expdepth   => $Expdepth,   # cutoff depth for explicit dumping
+                maxdepth	=> $Maxdepth,   # depth beyond which we give up
+                sortkeys   => $Sortkeys,   # flag or filter for sorting hash keys
+                deparse	=> $Deparse,	# use B::Deparse for coderefs
+        );
 
-  if ($Indent +> 0) {
-    $s->{+xpad} = "  ";
-    $s->{+sep} = "\n";
-  }
-  return bless($s, $c);
+    if ($Indent +> 0) {
+        $s->{+xpad} = "  ";
+        $s->{+sep} = "\n";
+    }
+    return bless($s, $c);
 }
 
 do {
-  # Packed numeric addresses take less memory. Plus pack is faster than sprintf
-  *init_refaddr_format = sub {};
+    # Packed numeric addresses take less memory. Plus pack is faster than sprintf
+    *init_refaddr_format = sub {};
 
-  *format_refaddr  = sub {
-    require Scalar::Util;
-    pack "J", Scalar::Util::refaddr(shift);
-  };
+    *format_refaddr  = sub {
+            require Scalar::Util;
+            pack "J", Scalar::Util::refaddr(shift);
+        };
 };
 
 #
 # add-to or query the table of already seen references
 #
 sub Seen($s, $g) {
-  if (defined($g) && (ref($g) eq 'HASH'))  {
-    init_refaddr_format();
-    my($k, $v, $id);
-    while (@($k, $v) =@( each %$g)) {
-      if (defined $v and ref $v) {
-	$id = format_refaddr($v);
-	if ($k =~ m/^[*](.*)$/) {
-	  $k = (ref $v eq 'ARRAY') ?? ( "\\\@" . $1 ) !!
-	       (ref $v eq 'HASH')  ?? ( "\\\%" . $1 ) !!
-	       (ref $v eq 'CODE')  ?? ( "\\\&" . $1 ) !!
-				     (   "\$" . $1 ) ;
-	}
-	elsif ($k !~ m/^\$/) {
-	  $k = "\$" . $k;
-	}
-	$s->{seen}->{+$id} = \@($k, $v);
-      }
-      else {
-	warn "Only refs supported, ignoring non-ref item \$$k";
-      }
+    if (defined($g) && (ref($g) eq 'HASH'))  {
+        init_refaddr_format();
+        my($k, $v, $id);
+        while (@($k, $v) =@( each %$g)) {
+            if (defined $v and ref $v) {
+                $id = format_refaddr($v);
+                if ($k =~ m/^[*](.*)$/) {
+                    $k = (ref $v eq 'ARRAY') ?? ( "\\\@" . $1 ) !!
+                        (ref $v eq 'HASH')  ?? ( "\\\%" . $1 ) !!
+                        (ref $v eq 'CODE')  ?? ( "\\\&" . $1 ) !!
+                        (   "\$" . $1 ) ;
+                }
+                elsif ($k !~ m/^\$/) {
+                    $k = "\$" . $k;
+                }
+                $s->{seen}->{+$id} = \@($k, $v);
+            }
+            else {
+                warn "Only refs supported, ignoring non-ref item \$$k";
+            }
+        }
+        return $s;
     }
-    return $s;
-  }
-  else {
-    return map { < @$_ }, values %{$s->{seen}};
-  }
+    else {
+        return map { < @$_ }, values %{$s->{seen}};
+    }
 }
 
 #
 # set or query the values to be dumped
 #
 sub Values($s, $v) {
-  if (defined($v) && (ref($v) eq 'ARRAY'))  {
-    $s->{+todump} = \ @$v;        # make a copy
-    return $s;
-  }
-  else {
-    return @{$s->{?todump}};
-  }
+    if (defined($v) && (ref($v) eq 'ARRAY'))  {
+        $s->{+todump} = \ @$v;        # make a copy
+        return $s;
+    }
+    else {
+        return @{$s->{?todump}};
+    }
 }
 
 #
 # set or query the names of the values to be dumped
 #
 sub Names($s, $n) {
-  if (defined($n) && (ref($n) eq 'ARRAY'))  {
-    $s->{+names} = \ @$n;         # make a copy
-    return $s;
-  }
-  else {
-    return @{$s->{?names}};
-  }
+    if (defined($n) && (ref($n) eq 'ARRAY'))  {
+        $s->{+names} = \ @$n;         # make a copy
+        return $s;
+    }
+    else {
+        return @{$s->{?names}};
+    }
 }
 
 sub Dump {
@@ -160,58 +160,58 @@ sub Dump {
 #
 our @post;
 sub Dumpperl {
-  my $s = shift;
-  my(@out, $name);
-  my $i = 0;
-  local(@post);
-  init_refaddr_format();
+    my $s = shift;
+    my(@out, $name);
+    my $i = 0;
+        local(@post);
+    init_refaddr_format();
 
-  $s = $s->new(< @_) unless ref $s;
+    $s = $s->new(< @_) unless ref $s;
 
-  for my $val ( @{$s->{todump}}) {
-    my $out = "";
-    @post = @();
-    $name = $s->{names}->[?$i++];
-    if (defined $name) {
-      if ($name =~ m/^[*](.*)$/) {
-	if (defined $val) {
-	  $name = (ref::svtype($val) eq 'ARRAY') ?? ( '@' . $1 ) !!
-		  (ref::svtype($val) eq 'HASH')  ?? ( '%' . $1 ) !!
-		  (ref::svtype($val) eq 'CODE')  ?? ( '*' . $1 ) !!
-                                                   ( '$' . $1 ) ;
-	}
-	else {
-	  $name = "\$" . $1;
-	}
-      }
-      elsif ($name !~ m/^\$/) {
-	$name = "\$" . $name;
-      }
+    for my $val ( @{$s->{todump}}) {
+        my $out = "";
+        @post = @();
+        $name = $s->{names}->[?$i++];
+        if (defined $name) {
+            if ($name =~ m/^[*](.*)$/) {
+                if (defined $val) {
+                    $name = (ref::svtype($val) eq 'ARRAY') ?? ( '@' . $1 ) !!
+                        (ref::svtype($val) eq 'HASH')  ?? ( '%' . $1 ) !!
+                        (ref::svtype($val) eq 'CODE')  ?? ( '*' . $1 ) !!
+                        ( '$' . $1 ) ;
+                }
+                else {
+                    $name = "\$" . $1;
+                }
+            }
+            elsif ($name !~ m/^\$/) {
+                $name = "\$" . $name;
+            }
+        }
+        else {
+            $name = "\$" . $s->{?varname} . $i;
+        }
+
+        # Ensure hash iterator is reset
+        if (ref($val) eq 'HASH') {
+            keys(%$val);
+        }
+
+        my $valstr;
+        do {
+            local($s->{+apad}) = $s->{?apad};
+            $s->{+apad} .= ' ' x (length($name) + 3) if $s->{?indent} +>= 2;
+            $valstr = $s->_dump($val, $name);
+        };
+
+        $valstr = "$name = " . $valstr . ';' if (nelems @post) or !$s->{?terse};
+        $out .= $s->{?pad} . $valstr . $s->{?sep};
+        $out .= $s->{?pad} . join(';' . $s->{?sep} . $s->{?pad}, @post) 
+            . ';' . $s->{?sep} if (nelems @post);
+
+        push @out, $out;
     }
-    else {
-      $name = "\$" . $s->{?varname} . $i;
-    }
-
-    # Ensure hash iterator is reset
-    if (ref($val) eq 'HASH') {
-        keys(%$val);
-    }
-
-    my $valstr;
-    do {
-      local($s->{+apad}) = $s->{?apad};
-      $s->{+apad} .= ' ' x (length($name) + 3) if $s->{?indent} +>= 2;
-      $valstr = $s->_dump($val, $name);
-    };
-
-    $valstr = "$name = " . $valstr . ';' if (nelems @post) or !$s->{?terse};
-    $out .= $s->{?pad} . $valstr . $s->{?sep};
-    $out .= $s->{?pad} . join(';' . $s->{?sep} . $s->{?pad}, @post) 
-      . ';' . $s->{?sep} if (nelems @post);
-
-    push @out, $out;
-  }
-  return join('', @out);
+    return join('', @out);
 }
 
 # wrap string in single quotes (escaping if needed)
@@ -264,7 +264,7 @@ sub _dump {
                 #	if ($s->{expdepth} < $s->{level}) {
                 if ($s->{?purity} and $s->{?level} +> 0) {
                     $out = ($realtype eq 'HASH')  ?? '\%()' !!
-                      ($realtype eq 'ARRAY') ?? '\@()' !!
+                        ($realtype eq 'ARRAY') ?? '\@()' !!
                         'do{my $o}' ;
                     push @post, $name . " = " . $s->{seen}->{$id}->[0];
                 } else {
@@ -279,14 +279,14 @@ sub _dump {
                     }
                 }
                 return $out;
-                #        }
+            #        }
             } else {
                 # store our name
                 $s->{seen}->{+$id} = \@( (($name =~ m/^[@%]/)     ?? ('\' . $name ) !!
-			     ($realtype eq 'CODE' and
-			      $name =~ m/^[*](.*)$/) ?? ('\&' . $1 )   !!
-                                         $name          ),
-                                        $val );
+                                          ($realtype eq 'CODE' and
+         $name =~ m/^[*](.*)$/) ?? ('\&' . $1 )   !!
+                                          $name          ),
+                                         $val );
             }
         }
         my $no_bless = 0; 
@@ -381,32 +381,32 @@ sub _dump {
         }
 
         if ($s->{?purity}) {
-            local ($s->{+level}) = 0;
+                   local ($s->{+level}) = 0;
             for my $k (qw(SCALAR ARRAY HASH)) {
                 my $gval = *$rval{$k};
                 next unless defined $gval;
                 next if $k eq "SCALAR" && ! defined $$gval;  # always there
-                
+
                 # _dump can push into @post, so we hold our place using $postlen
                 my $postlen = scalar nelems @post;
                 @post[$postlen] = "\*$sname = ";
-                local ($s->{+apad}) = " " x length(@post[$postlen]) if $s->{?indent} +>= 2;
+                       local ($s->{+apad}) = " " x length(@post[$postlen]) if $s->{?indent} +>= 2;
                 @post[$postlen] .= $s->_dump($gval, "\*$sname\{$k\}");
             }
         }
         $out .= '*' . $sname;
-	$out .= '\' . $s->_dump($$rval, "*\{$name\}"); # '
+        $out .= '\' . $s->_dump($$rval, "*\{$name\}"); # '
 
-          if ($id) {
-              # if we made it this far, $id was added to seen list at current
-              # level, so remove it to get deep copies
-              if ($s->{?deepcopy}) {
-                  delete($s->{seen}->{$id});
-              }
-              elsif ($name) {
-                  $s->{seen}->{$id}->[2] = 1;
-              }
-          }
+        if ($id) {
+            # if we made it this far, $id was added to seen list at current
+            # level, so remove it to get deep copies
+            if ($s->{?deepcopy}) {
+                delete($s->{seen}->{$id});
+            }
+            elsif ($name) {
+                $s->{seen}->{$id}->[2] = 1;
+            }
+        }
     }
     elsif ($realtype eq 'ARRAY') {
         my($pad, $mname);
@@ -445,18 +445,18 @@ sub _dump {
             }
         }
         while (@(?$k, ?$v) = ! $sortkeys ?? @(each %$rval) !!
-               (nelems @$keys) ?? @(($key = shift(@$keys)), $rval->{?$key}) !!
-               @() ) {
-            my $nk = $s->_dump($k, "");
-            $nk = $1 if !$s->{?quotekeys} and $nk =~ m/^[\"\']([A-Za-z_]\w*)[\"\']$/;
-            $sname = $mname . '{' . $nk . '}';
-            $out .= $pad . $ipad . $nk . $pair;
+        (nelems @$keys) ?? @(($key = shift(@$keys)), $rval->{?$key}) !!
+            @() ) {
+                my $nk = $s->_dump($k, "");
+                $nk = $1 if !$s->{?quotekeys} and $nk =~ m/^[\"\']([A-Za-z_]\w*)[\"\']$/;
+                $sname = $mname . '{' . $nk . '}';
+                $out .= $pad . $ipad . $nk . $pair;
 
-            # temporarily alter apad
-            $s->{+apad} .= (" " x (length($nk) + 4)) if $s->{?indent} +>= 2;
-            $out .= $s->_dump($rval->{?$k}, $sname) . ",";
-            $s->{+apad} = $lpad if $s->{?indent} +>= 2;
-        }
+                # temporarily alter apad
+                $s->{+apad} .= (" " x (length($nk) + 4)) if $s->{?indent} +>= 2;
+                $out .= $s->_dump($rval->{?$k}, $sname) . ",";
+                $s->{+apad} = $lpad if $s->{?indent} +>= 2;
+            }
         if (substr($out, -1) eq ',') {
             chop $out;
             $out .= $pad . ($s->{?xpad} x ($s->{?level} - 1));
@@ -498,17 +498,17 @@ sub _dump {
 
     return $out;
 }
-  
+
 #
 # non-OO style of earlier version
 #
 sub Dumper {
-  return Data::Dumper->Dump(\ @_);
+    return Data::Dumper->Dump(\ @_);
 }
 
 # compat stub
 sub DumperX {
-  return Data::Dumper->Dumpxs(\ @_, \@());
+    return Data::Dumper->Dumpxs(\ @_, \@());
 }
 
 sub Dumpf { return Data::Dumper->Dump(< @_) }
@@ -519,27 +519,27 @@ sub Dumpp { print $^STDOUT, < Data::Dumper->Dump(< @_) }
 # reset the "seen" cache 
 #
 sub Reset {
-  my@($s) =@( shift);
-  $s->{+seen} = \%();
-  return $s;
+    my@($s) =@( shift);
+    $s->{+seen} = \%();
+    return $s;
 }
 
 sub Indent($s, $v) {
-  if (defined($v)) {
-    if ($v == 0) {
-      $s->{+xpad} = "";
-      $s->{+sep} = "";
+    if (defined($v)) {
+        if ($v == 0) {
+            $s->{+xpad} = "";
+            $s->{+sep} = "";
+        }
+        else {
+            $s->{+xpad} = "  ";
+            $s->{+sep} = "\n";
+        }
+        $s->{+indent} = $v;
+        return $s;
     }
     else {
-      $s->{+xpad} = "  ";
-      $s->{+sep} = "\n";
+        return $s->{?indent};
     }
-    $s->{+indent} = $v;
-    return $s;
-  }
-  else {
-    return $s->{?indent};
-  }
 }
 
 sub Pair($s, ?$v) {
@@ -547,97 +547,97 @@ sub Pair($s, ?$v) {
 }
 
 sub Pad($s, $v) {
-  defined($v) ?? do { ($s->{+pad} = $v); return $s} !! $s->{?pad};
+    defined($v) ?? do { ($s->{+pad} = $v); return $s} !! $s->{?pad};
 }
 
 sub Varname($s, $v) {
-  defined($v) ?? do {($s->{+varname} = $v); return $s} !! $s->{?varname};
+    defined($v) ?? do {($s->{+varname} = $v); return $s} !! $s->{?varname};
 }
 
 sub Purity($s, $v) {
-  defined($v) ?? do {($s->{+purity} = $v); return $s} !! $s->{?purity};
+    defined($v) ?? do {($s->{+purity} = $v); return $s} !! $s->{?purity};
 }
 
 sub Useqq($s, $v) {
-  defined($v) ?? do {($s->{+useqq} = $v); return $s} !! $s->{?useqq};
+    defined($v) ?? do {($s->{+useqq} = $v); return $s} !! $s->{?useqq};
 }
 
 sub Terse($s, $v) {
-  defined($v) ?? do {($s->{+terse} = $v); return $s} !! $s->{?terse};
+    defined($v) ?? do {($s->{+terse} = $v); return $s} !! $s->{?terse};
 }
 
 sub Freezer($s, $v) {
-  defined($v) ?? do {($s->{+freezer} = $v); return $s} !! $s->{?freezer};
+    defined($v) ?? do {($s->{+freezer} = $v); return $s} !! $s->{?freezer};
 }
 
 sub Toaster($s, $v) {
-  defined($v) ?? do {($s->{+toaster} = $v); return $s} !! $s->{?toaster};
+    defined($v) ?? do {($s->{+toaster} = $v); return $s} !! $s->{?toaster};
 }
 
 sub Deepcopy($s, $v) {
-  defined($v) ?? do {($s->{+deepcopy} = $v); return $s} !! $s->{?deepcopy};
+    defined($v) ?? do {($s->{+deepcopy} = $v); return $s} !! $s->{?deepcopy};
 }
 
 sub Quotekeys($s, $v) {
-  defined($v) ?? do {($s->{+quotekeys} = $v); return $s} !! $s->{?quotekeys};
+    defined($v) ?? do {($s->{+quotekeys} = $v); return $s} !! $s->{?quotekeys};
 }
 
 sub Bless($s, $v) {
-  defined($v) ?? do {($s->{+'bless'} = $v); return $s} !! $s->{?'bless'};
+    defined($v) ?? do {($s->{+'bless'} = $v); return $s} !! $s->{?'bless'};
 }
 
 sub Maxdepth($s, $v) {
-  defined($v) ?? do {($s->{+'maxdepth'} = $v); return $s} !! $s->{?'maxdepth'};
+    defined($v) ?? do {($s->{+'maxdepth'} = $v); return $s} !! $s->{?'maxdepth'};
 }
 
 sub Sortkeys($s, $v) {
-  defined($v) ?? do {($s->{+'sortkeys'} = $v); return $s} !! $s->{?'sortkeys'};
+    defined($v) ?? do {($s->{+'sortkeys'} = $v); return $s} !! $s->{?'sortkeys'};
 }
 
 sub Deparse($s, $v) {
-  defined($v) ?? do {($s->{+'deparse'} = $v); return $s} !! $s->{?'deparse'};
+    defined($v) ?? do {($s->{+'deparse'} = $v); return $s} !! $s->{?'deparse'};
 }
 
 # used by qquote below
 my %esc = %(  
-    "\a" => "\\a",
-    "\b" => "\\b",
-    "\t" => "\\t",
-    "\n" => "\\n",
-    "\f" => "\\f",
-    "\r" => "\\r",
-    "\e" => "\\e",
-);
+        "\a" => "\\a",
+            "\b" => "\\b",
+            "\t" => "\\t",
+            "\n" => "\\n",
+            "\f" => "\\f",
+            "\r" => "\\r",
+            "\e" => "\\e",
+    );
 
 # put a string value in double quotes
 sub qquote {
-  local($_) = shift;
-  s/([\\\"\@\$\{\}])/\\$1/g;
-  my $bytes; do { use bytes; $bytes = length };
-  s/([^\x[00]-\x[7f]])/$('\x'.sprintf("[\%02x]",ord($1)))/g if $bytes +> length;
-  return qq("$_") unless 
-    m/[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~]/;  # fast exit
+        local($_) = shift;
+    s/([\\\"\@\$\{\}])/\\$1/g;
+    my $bytes; do { use bytes; $bytes = length };
+    s/([^\x[00]-\x[7f]])/$('\x'.sprintf("[\%02x]",ord($1)))/g if $bytes +> length;
+    return qq("$_") unless 
+        m/[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~]/;  # fast exit
 
-  my $high = shift || "";
-  s/([\a\b\t\n\f\r\e])/%esc{?$1}/g;
+    my $high = shift || "";
+    s/([\a\b\t\n\f\r\e])/%esc{?$1}/g;
 
     # no need for 3 digits in escape for these
     s/([\0-\037])(?!\d)/$('\'.sprintf('%o',ord($1)))/g;
     s/([\0-\037\177])/$('\'.sprintf('\%03o',ord($1)))/g;
     # all but last branch below not supported --BEHAVIOR SUBJECT TO CHANGE--
     if ($high eq "iso8859") {
-      s/([\200-\240])/$('\'.sprintf('%o',ord($1)))/g;
+        s/([\200-\240])/$('\'.sprintf('%o',ord($1)))/g;
     } elsif ($high eq "utf8") {
-#     use utf8;
-#     $str =~ s/([^\040-\176])/sprintf "\\x{%04x}", ord($1)/ge;
+    #     use utf8;
+    #     $str =~ s/([^\040-\176])/sprintf "\\x{%04x}", ord($1)/ge;
     } elsif ($high eq "8bit") {
-        # leave it as it is
+    # leave it as it is
     } else {
         use utf8;
         s/([^\040-\176])/$(sprintf "\\x\{\%04x\}", ord($1))/g;
     }
 
-  return qq("$_");
+    return qq("$_");
 }
 
 # helper sub to sort hash keys in Perl < 5.8.0 where we don't have

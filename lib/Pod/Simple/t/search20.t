@@ -10,7 +10,7 @@ use Test::More;
 BEGIN { plan tests => 7 }
 
 print $^STDOUT, "# ", __FILE__,
- ": Testing the scanning of several (well, two) docroots...\n";
+    ": Testing the scanning of several (well, two) docroots...\n";
 
 my $x = Pod::Simple::Search->new;
 die "Couldn't make an object!?" unless ok defined $x;
@@ -18,9 +18,9 @@ die "Couldn't make an object!?" unless ok defined $x;
 $x->inc(0);
 
 $x->callback(sub {
-  print $^STDOUT, "#  ", join("  ", map { "\{$_\}" }, @_), "\n";
-  return;
-});
+        print $^STDOUT, "#  ", join("  ", map { "\{$_\}" }, @_), "\n";
+        return;
+    });
 
 use File::Spec;
 use Cwd;
@@ -40,13 +40,13 @@ sub source_path {
 
 my($here1, $here2);
 if(        -e ($here1 = source_path('testlib1'))) {
-  die "But where's $here2?"
-    unless -e ($here2 = source_path('testlib2'));
+    die "But where's $here2?"
+        unless -e ($here2 = source_path('testlib2'));
 } elsif(   -e ($here1 = File::Spec->catdir($cwd, 't', 'testlib1'      ))) {
-  die "But where's $here2?"
-    unless -e ($here2 = File::Spec->catdir($cwd, 't', 'testlib2'));
+    die "But where's $here2?"
+        unless -e ($here2 = File::Spec->catdir($cwd, 't', 'testlib2'));
 } else {
-  die "Can't find the test corpora";
+    die "Can't find the test corpora";
 }
 print $^STDOUT, "# OK, found the test corpora\n#  as $here1\n# and $here2\n";
 ok 1;

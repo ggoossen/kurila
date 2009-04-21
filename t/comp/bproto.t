@@ -23,13 +23,13 @@ sub test_no_error {
 }
 
 test_too_many($_) for split m/\n/,
-q[	defined(&foo, $bar);
+    q[	defined(&foo, $bar);
 	undef(&foo, $bar);
 	uc($bar,$bar);
 ];
 
 test_no_error($_) for split m/\n/,
-q[ defined &foo, &foo, &foo;
+    q[ defined &foo, &foo, &foo;
    undef &foo, $bar;
 	uc $bar,$bar;
 	grep( { not($bar) }, @($bar));

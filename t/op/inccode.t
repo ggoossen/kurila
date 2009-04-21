@@ -10,7 +10,7 @@ my $has_perlio = config_value("useperlio");
 
 if (!$minitest) {
     if (config_value("d_fork") && try { require POSIX; 1 } ) {
-	$can_fork = 1;
+        $can_fork = 1;
     }
 }
 
@@ -37,7 +37,7 @@ END { 1 while unlink < @tempfiles }
 
 sub fooinc($self, $filename) {
     if (substr($filename,0,3) eq 'Foo') {
-	return get_temp_fh($filename);
+        return get_temp_fh($filename);
     }
     else {
         return undef;
@@ -75,7 +75,7 @@ pop $^INCLUDE_PATH;
 
 sub fooinc2($self, $filename) {
     if (substr($filename, 0, length($self->[1])) eq $self->[1]) {
-	return get_temp_fh($filename);
+        return get_temp_fh($filename);
     }
     else {
         return undef;
@@ -112,7 +112,7 @@ pop $^INCLUDE_PATH;
 
 sub FooLoader::INC($self, $filename) {
     if (substr($filename,0,4) eq 'Quux') {
-	return get_temp_fh($filename);
+        return get_temp_fh($filename);
     }
     else {
         return undef;
@@ -127,7 +127,7 @@ die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'require Quux; magic via hash object' );
 ok( exists $^INCLUDED{'Quux.pm'},        '  $^INCLUDED sees Quux.pm' );
 is( ref $^INCLUDED{?'Quux.pm'}, 'FooLoader',
-				   '  val Quux.pm is an object in $^INCLUDED' );
+    '  val Quux.pm is an object in $^INCLUDED' );
 cmp_ok( $^INCLUDED{?'Quux.pm'}, '\==', $href,        '  val Quux.pm is correct in $^INCLUDED' );
 
 pop $^INCLUDE_PATH;
@@ -140,7 +140,7 @@ die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'require Quux1; magic via array object' );
 ok( exists $^INCLUDED{'Quux1.pm'},       '  $^INCLUDED sees Quux1.pm' );
 is( ref $^INCLUDED{?'Quux1.pm'}, 'FooLoader',
-				   '  val Quux1.pm is an object in $^INCLUDED' );
+    '  val Quux1.pm is an object in $^INCLUDED' );
 cmp_ok( $^INCLUDED{?'Quux1.pm'}, '\==', $aref,       '  val Quux1.pm  is correct in $^INCLUDED' );
 
 pop $^INCLUDE_PATH;
@@ -153,7 +153,7 @@ die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'require Quux2; magic via scalar object' );
 ok( exists $^INCLUDED{'Quux2.pm'},       '  $^INCLUDED sees Quux2.pm' );
 is( ref $^INCLUDED{?'Quux2.pm'}, 'FooLoader',
-				   '  val Quux2.pm is an object in $^INCLUDED' );
+    '  val Quux2.pm is an object in $^INCLUDED' );
 cmp_ok( $^INCLUDED{?'Quux2.pm'}, '\==', $sref,       '  val Quux2.pm is correct in $^INCLUDED' );
 
 pop $^INCLUDE_PATH;
@@ -161,8 +161,8 @@ pop $^INCLUDE_PATH;
 push $^INCLUDE_PATH, sub {
     my @($self, $filename) =  @_;
     if (substr($filename,0,4) eq 'Toto') {
-	$^INCLUDED{+$filename} = 'xyz';
-	return get_temp_fh($filename);
+        $^INCLUDED{+$filename} = 'xyz';
+        return get_temp_fh($filename);
     }
     else {
         return undef;
@@ -181,10 +181,10 @@ pop $^INCLUDE_PATH;
 push $^INCLUDE_PATH, sub {
     my @($self, $filename) =  @_;
     if ($filename eq 'abc.pl') {
-	return get_temp_fh($filename, qq(return "abc";\n));
+        return get_temp_fh($filename, qq(return "abc";\n));
     }
     else {
-	return undef;
+        return undef;
     }
 };
 
@@ -212,8 +212,8 @@ SKIP: do {
         my @($cr, $filename) =  @_;
         my $module = $filename; $module =~ s,/,::,g; $module =~ s/\.pm$//;
         open my $fh, '<',
-             \"package $module; sub complain \{ warn q(barf) \}; \$main::file = __FILE__;"
-	    or die $^OS_ERROR;
+            \"package $module; sub complain \{ warn q(barf) \}; \$main::file = __FILE__;"
+            or die $^OS_ERROR;
         $^INCLUDED{+$filename} = "/custom/path/to/$filename";
         return $fh;
     };
@@ -238,27 +238,27 @@ if ($can_fork) {
     # with each module chaining the next one down to 0. If it works, then we
     # can safely nest subprocesses
     push $^INCLUDE_PATH, sub {
-	return unless @_[1] =~ m/^BBBLPLAST(\d+)\.pm/;
-	my $pid = open my $fh, "-|", "-";
-	if ($pid) {
-	    # Parent
-	    return $fh;
-	}
-	die "Can't fork self: $^OS_ERROR" unless defined $pid;
+        return unless @_[1] =~ m/^BBBLPLAST(\d+)\.pm/;
+        my $pid = open my $fh, "-|", "-";
+        if ($pid) {
+            # Parent
+            return $fh;
+        }
+        die "Can't fork self: $^OS_ERROR" unless defined $pid;
 
-	# Child
-	my $count = $1;
-	# Lets force some fun with odd sized reads.
-	$^OUTPUT_AUTOFLUSH = 1;
-	print $^STDOUT, 'push @main::bbblplast, ';
-	print $^STDOUT, "$count;\n";
-	if ($count--) {
-	    print $^STDOUT, "use BBBLPLAST$count;\n";
-	}
+        # Child
+        my $count = $1;
+        # Lets force some fun with odd sized reads.
+        $^OUTPUT_AUTOFLUSH = 1;
+        print $^STDOUT, 'push @main::bbblplast, ';
+        print $^STDOUT, "$count;\n";
+        if ($count--) {
+            print $^STDOUT, "use BBBLPLAST$count;\n";
+        }
         print $^STDOUT, "pass('In @_[1]');";
-	print $^STDOUT, '"Truth"';
-	POSIX::_exit(0);
-	die "Can't get here: $^OS_ERROR";
+        print $^STDOUT, '"Truth"';
+        POSIX::_exit(0);
+        die "Can't get here: $^OS_ERROR";
     };
 
     @::bbblplast = @( () );
@@ -266,7 +266,7 @@ if ($can_fork) {
     is ("$(join ' ',@main::bbblplast)", "0 1 2 3 4 5", "All ran");
 
     foreach (keys $^INCLUDED) {
-	delete $^INCLUDED{$_} if m/^BBBLPLAST/;
+        delete $^INCLUDED{$_} if m/^BBBLPLAST/;
     }
 
     @::bbblplast = @( () );

@@ -24,13 +24,13 @@ except TypeError:
 
 do {
     package X;
-    
-    package Y;
-    
-    package XY;
+
+        package Y;
+
+        package XY;
     our @ISA = @('X', 'Y');
-    
-    package YX;
+
+        package YX;
     our @ISA = @('Y', 'X');
 };
 

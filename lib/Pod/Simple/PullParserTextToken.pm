@@ -5,8 +5,8 @@ our @ISA = @('Pod::Simple::PullParserToken');
 
 
 sub new {  # Class->new(text);
-  my $class = shift;
-  return bless \@('text', < @_), ref($class) || $class;
+    my $class = shift;
+    return bless \@('text', < @_), ref($class) || $class;
 }
 
 # Purely accessors:

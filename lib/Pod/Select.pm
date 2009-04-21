@@ -337,7 +337,7 @@ sub select {
     my @sections = @_;
     local $_ = undef;
 
-### NEED TO DISCERN A SECTION-SPEC FROM A RANGE-SPEC (look for m{^/.+/$}?)
+    ### NEED TO DISCERN A SECTION-SPEC FROM A RANGE-SPEC (look for m{^/.+/$}?)
 
     ##---------------------------------------------------------------------
     ## The following is a blatant hack for backward compatibility, and for
@@ -358,7 +358,7 @@ sub select {
         return;
     }
     %$self{+_SELECTED_SECTIONS} = \@()
-        unless ($add  &&  exists %$self{_SELECTED_SECTIONS});
+    unless ($add  &&  exists %$self{_SELECTED_SECTIONS});
     my $selected_sections = %$self{?_SELECTED_SECTIONS};
 
     ## Compile each spec
@@ -439,7 +439,7 @@ sub match_section {
 
     ## Return true if no restrictions were explicitly specified
     my $selections = (exists %$self{_SELECTED_SECTIONS})
-                       ??  %$self{?_SELECTED_SECTIONS}  !!  undef;
+        ??  %$self{?_SELECTED_SECTIONS}  !!  undef;
     return  1  unless ((defined $selections) && ((nelems @{$selections}) +> 0));
 
     ## Default any unspecified sections to the current one
@@ -462,7 +462,7 @@ sub match_section {
             $regex   = $section_spec->[$i];
             $negated = ($regex =~ s/^\!//);
             $match  ^&^= ($negated ?? (@headings[$i] !~ m/$regex/)
-                                 !! (@headings[$i] =~ m/$regex/));
+                          !! (@headings[$i] =~ m/$regex/));
             last unless ($match);
         }
         return  1  if ($match);
@@ -580,7 +580,7 @@ sub podselect(@argv) {
     local $_ = undef;
     for ( @argv) {
         if (ref($_)) {
-        next unless (ref($_) eq 'HASH');
+            next unless (ref($_) eq 'HASH');
             %opts = %(< %defaults, < %{$_});
 
             ##-------------------------------------------------------------
@@ -590,12 +590,12 @@ sub podselect(@argv) {
             ## to be uppercase keywords)
             ##-------------------------------------------------------------
             %opts = %: < @+: map {
-                my @($key, $val) = @(lc $_, %opts{?$_});
-                $key =~ s/^(?=\w)/-/;
-                $key =~ m/^-se[cl]/  and  $key  = '-sections';
-                #! $key eq '-range'    and  $key .= 's';
-                @($key => $val);
-            }, keys %opts;
+                        my @($key, $val) = @(lc $_, %opts{?$_});
+                        $key =~ s/^(?=\w)/-/;
+                        $key =~ m/^-se[cl]/  and  $key  = '-sections';
+                        #! $key eq '-range'    and  $key .= 's';
+                        @($key => $val);
+                    }, keys %opts;
 
             ## Process the options
             (exists %opts{'-output'})  and  $output = %opts{?'-output'};
@@ -605,10 +605,10 @@ sub podselect(@argv) {
                 if ( (defined %opts{?'-sections'})
                      && ((ref %opts{?'-sections'}) eq 'ARRAY') );
 
-            #! ## Select the desired paragraph ranges
-            #! $pod_parser->select(@{ $opts{'-ranges'} })
-            #!     if ( (defined $opts{'-ranges'})
-            #!          && ((ref $opts{'-ranges'}) eq 'ARRAY') );
+        #! ## Select the desired paragraph ranges
+        #! $pod_parser->select(@{ $opts{'-ranges'} })
+        #!     if ( (defined $opts{'-ranges'})
+        #!          && ((ref $opts{'-ranges'}) eq 'ARRAY') );
         }
         else {
             $pod_parser->parse_from_file($_, $output);
@@ -669,7 +669,7 @@ sub _compile_section_spec($section_spec) {
     ## Set default regex for ommitted levels
     for my $i (0 .. $MAX_HEADING_LEVEL -1) {
         @regexs[+$i]  = '.*'  unless ((defined @regexs[?$i])
-                                     && (length @regexs[$i]));
+                                      && (length @regexs[$i]));
     }
     ## Modify the regexs as needed and validate their syntax
     my $bad_regexs = 0;

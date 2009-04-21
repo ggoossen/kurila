@@ -95,53 +95,53 @@ sub getopt($argumentative, ?$hash) {
     local @EXPORT;
 
     while ((nelems @ARGV) && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/) {
-	@($first,$rest) = @($1,$2);
-	if (m/^--$/) {	# early exit if --
-	    shift @ARGV;
-	    last;
-	}
-	if (index($argumentative,$first) +>= 0) {
-	    if ($rest ne '') {
-		shift(@ARGV);
-	    }
-	    else {
-		shift(@ARGV);
-		$rest = shift(@ARGV);
-	    }
-	    if (ref $hash) {
-	        %$hash{+$first} = $rest;
-	    }
-	    else {
-	        ${*{Symbol::fetch_glob("opt_$first")}} = $rest;
-	        push( @EXPORT, "\$opt_$first" );
-	    }
-	}
-	else {
-	    if (ref $hash) {
-	        %$hash{+$first} = 1;
-	    }
-	    else {
-	        ${*{Symbol::fetch_glob("opt_$first")}} = 1;
-	        push( @EXPORT, "\$opt_$first" );
-	    }
-	    if ($rest ne '') {
-		@ARGV[0] = "-$rest";
-	    }
-	    else {
-		shift(@ARGV);
-	    }
-	}
+        @($first,$rest) = @($1,$2);
+        if (m/^--$/) {	# early exit if --
+            shift @ARGV;
+            last;
+        }
+        if (index($argumentative,$first) +>= 0) {
+            if ($rest ne '') {
+                shift(@ARGV);
+            }
+            else {
+                shift(@ARGV);
+                $rest = shift(@ARGV);
+            }
+            if (ref $hash) {
+                %$hash{+$first} = $rest;
+            }
+            else {
+                ${*{Symbol::fetch_glob("opt_$first")}} = $rest;
+                push( @EXPORT, "\$opt_$first" );
+            }
+        }
+        else {
+            if (ref $hash) {
+                %$hash{+$first} = 1;
+            }
+            else {
+                ${*{Symbol::fetch_glob("opt_$first")}} = 1;
+                push( @EXPORT, "\$opt_$first" );
+            }
+            if ($rest ne '') {
+                @ARGV[0] = "-$rest";
+            }
+            else {
+                shift(@ARGV);
+            }
+        }
     }
     unless (ref $hash) { 
-	local $Exporter::ExportLevel = 1;
-	Getopt::Std->import;
+        local $Exporter::ExportLevel = 1;
+        Getopt::Std->import;
     }
 }
 
 sub output_h () {
-  return $OUTPUT_HELP_VERSION if defined $OUTPUT_HELP_VERSION;
-  return $^STDOUT if $STANDARD_HELP_VERSION;
-  return $^STDERR;
+    return $OUTPUT_HELP_VERSION if defined $OUTPUT_HELP_VERSION;
+    return $^STDOUT if $STANDARD_HELP_VERSION;
+    return $^STDERR;
 }
 
 sub try_exit () {
@@ -156,14 +156,14 @@ EOM
 sub version_mess ($args, ?$mess) {
     my $h = output_h;
     if ($mess and defined &main::VERSION_MESSAGE) {
-	main::VERSION_MESSAGE($h, __PACKAGE__, $VERSION, $args);
+        main::VERSION_MESSAGE($h, __PACKAGE__, $VERSION, $args);
     } else {
-	my $v = $main::VERSION;
-	$v = '[unknown]' unless defined $v;
-	my $myv = $VERSION;
-	$myv .= ' [paranoid]' unless $STANDARD_HELP_VERSION;
-	my $perlv = $^PERL_VERSION;
-	print $h, <<EOH;
+        my $v = $main::VERSION;
+        $v = '[unknown]' unless defined $v;
+        my $myv = $VERSION;
+        $myv .= ' [paranoid]' unless $STANDARD_HELP_VERSION;
+        my $perlv = $^PERL_VERSION;
+        print $h, <<EOH;
 $^PROGRAM_NAME version $v calling Getopt::Std::getopts (version $myv),
 running under Perl version $perlv.
 EOH
@@ -174,37 +174,37 @@ sub help_mess {
     my $args = shift;
     my $h = output_h;
     if ((nelems @_) and defined &main::HELP_MESSAGE) {
-	main::HELP_MESSAGE($h, __PACKAGE__, $VERSION, $args);
+        main::HELP_MESSAGE($h, __PACKAGE__, $VERSION, $args);
     } else {
-	my @witharg = @($args =~ m/(\S)\s*:/g);
-	my @rest = @($args =~ m/([^\s:])(?!\s*:)/g);
-	my @($help, $arg) = @('', '');
-	if ((nelems @witharg)) {
-	    $help .= "\n\tWith arguments: -" . join " -", @witharg;
-	    $arg = "\nSpace is not required between options and their arguments.";
-	}
-	if ((nelems @rest)) {
-	    $help .= "\n\tBoolean (without arguments): -" . join " -", @rest;
-	}
-	my @($scr) = @($^PROGRAM_NAME =~ m,([^/\\]+)$,);
-	print $h, <<EOH if (nelems @_);			# Let the script override this
+        my @witharg = @($args =~ m/(\S)\s*:/g);
+        my @rest = @($args =~ m/([^\s:])(?!\s*:)/g);
+        my @($help, $arg) = @('', '');
+        if ((nelems @witharg)) {
+            $help .= "\n\tWith arguments: -" . join " -", @witharg;
+            $arg = "\nSpace is not required between options and their arguments.";
+        }
+        if ((nelems @rest)) {
+            $help .= "\n\tBoolean (without arguments): -" . join " -", @rest;
+        }
+        my @($scr) = @($^PROGRAM_NAME =~ m,([^/\\]+)$,);
+        print $h, <<EOH if (nelems @_);			# Let the script override this
 
 Usage: $scr [-OPTIONS [-MORE_OPTIONS]] [--] [PROGRAM_ARG1 ...]
 EOH
-	print $h, <<EOH;
+        print $h, <<EOH;
 
 The following single-character options are accepted:$help
 
 Options may be merged together.  -- stops processing of options.$arg
 EOH
-	my $has_pod;
-	if ( defined $^PROGRAM_NAME and $^PROGRAM_NAME ne '-e' and -f $^PROGRAM_NAME and -r $^PROGRAM_NAME
-	     and open my $script, '<', $^PROGRAM_NAME ) {
-	    while ( ~< $script) {
-		($has_pod = 1), last if m/^=(pod|head1)/;
-	    }
-	}
-	print $h, <<EOH if $has_pod;
+        my $has_pod;
+        if ( defined $^PROGRAM_NAME and $^PROGRAM_NAME ne '-e' and -f $^PROGRAM_NAME and -r $^PROGRAM_NAME
+            and open my $script, '<', $^PROGRAM_NAME ) {
+            while ( ~< $script) {
+                ($has_pod = 1), last if m/^=(pod|head1)/;
+            }
+        }
+        print $h, <<EOH if $has_pod;
 
 For more details run
 	perldoc -F $^PROGRAM_NAME
@@ -224,69 +224,69 @@ sub getopts($argumentative, ?$hash) {
 
     @args = split( m/ */, $argumentative );
     while((nelems @ARGV) && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/s) {
-	@($first,$rest) = @($1,$2);
-	if (m/^--$/) {	# early exit if --
-	    shift @ARGV;
-	    last;
-	}
-	my $pos = index($argumentative,$first);
-	if ($pos +>= 0) {
-	    if (defined(@args[?$pos+1]) and (@args[$pos+1] eq ':')) {
-		shift(@ARGV);
-		if ($rest eq '') {
-		    ++$errs unless (nelems @ARGV);
-		    $rest = shift(@ARGV);
-		}
-		if (ref $hash) {
-		    %$hash{+$first} = $rest;
-		}
-		else {
-		    ${*{Symbol::fetch_glob("opt_$first")}} = $rest;
-		    push( @EXPORT, "\$opt_$first" );
-		}
-	    }
-	    else {
-		if (ref $hash) {
-		    %$hash{+$first} = 1;
-		}
-		else {
-		    ${*{Symbol::fetch_glob("opt_$first")}} = 1;
-		    push( @EXPORT, "\$opt_$first" );
-		}
-		if ($rest eq '') {
-		    shift(@ARGV);
-		}
-		else {
-		    @ARGV[0] = "-$rest";
-		}
-	    }
-	}
-	else {
-	    if ($first eq '-' and $rest eq 'help') {
-		version_mess($argumentative, 'main');
-		help_mess($argumentative, 'main');
-		try_exit();
-		shift(@ARGV);
-		next;
-	    } elsif ($first eq '-' and $rest eq 'version') {
-		version_mess($argumentative, 'main');
-		try_exit();
-		shift(@ARGV);
-		next;
-	    }
-	    warn "Unknown option: $first\n";
-	    ++$errs;
-	    if ($rest ne '') {
-		@ARGV[0] = "-$rest";
-	    }
-	    else {
-		shift(@ARGV);
-	    }
-	}
+        @($first,$rest) = @($1,$2);
+        if (m/^--$/) {	# early exit if --
+            shift @ARGV;
+            last;
+        }
+        my $pos = index($argumentative,$first);
+        if ($pos +>= 0) {
+            if (defined(@args[?$pos+1]) and (@args[$pos+1] eq ':')) {
+                shift(@ARGV);
+                if ($rest eq '') {
+                    ++$errs unless (nelems @ARGV);
+                    $rest = shift(@ARGV);
+                }
+                if (ref $hash) {
+                    %$hash{+$first} = $rest;
+                }
+                else {
+                    ${*{Symbol::fetch_glob("opt_$first")}} = $rest;
+                    push( @EXPORT, "\$opt_$first" );
+                }
+            }
+            else {
+                if (ref $hash) {
+                    %$hash{+$first} = 1;
+                }
+                else {
+                    ${*{Symbol::fetch_glob("opt_$first")}} = 1;
+                    push( @EXPORT, "\$opt_$first" );
+                }
+                if ($rest eq '') {
+                    shift(@ARGV);
+                }
+                else {
+                    @ARGV[0] = "-$rest";
+                }
+            }
+        }
+        else {
+            if ($first eq '-' and $rest eq 'help') {
+                version_mess($argumentative, 'main');
+                help_mess($argumentative, 'main');
+                try_exit();
+                shift(@ARGV);
+                next;
+            } elsif ($first eq '-' and $rest eq 'version') {
+                version_mess($argumentative, 'main');
+                try_exit();
+                shift(@ARGV);
+                next;
+            }
+            warn "Unknown option: $first\n";
+            ++$errs;
+            if ($rest ne '') {
+                @ARGV[0] = "-$rest";
+            }
+            else {
+                shift(@ARGV);
+            }
+        }
     }
     unless (ref $hash) { 
-	local $Exporter::ExportLevel = 1;
-	Getopt::Std->import;
+        local $Exporter::ExportLevel = 1;
+        Getopt::Std->import;
     }
     $errs == 0;
 }

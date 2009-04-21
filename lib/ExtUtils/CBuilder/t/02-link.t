@@ -1,26 +1,26 @@
 #! perl -w
 
 BEGIN {
-  if (env::var('PERL_CORE')) {
-    chdir 't' if -d 't';
-    chdir '../lib/ExtUtils/CBuilder'
-      or die "Can't chdir to lib/ExtUtils/CBuilder: $^OS_ERROR";
-    $^INCLUDE_PATH = qw(../..);
-  }
+    if (env::var('PERL_CORE')) {
+        chdir 't' if -d 't';
+        chdir '../lib/ExtUtils/CBuilder'
+            or die "Can't chdir to lib/ExtUtils/CBuilder: $^OS_ERROR";
+        $^INCLUDE_PATH = qw(../..);
+    }
 }
 
 use Test::More;
 BEGIN { 
-  if ($^OS_NAME eq 'MSWin32') {
-    print $^STDOUT, "1..0 # Skipped: link_executable() is not implemented yet on Win32\n";
-    exit;
-  }
-  if ($^OS_NAME eq 'VMS') {
-    # So we can get the return value of system()
-    require vmsish;
-    vmsish->import();
-  }
-  plan tests => 5;
+    if ($^OS_NAME eq 'MSWin32') {
+        print $^STDOUT, "1..0 # Skipped: link_executable() is not implemented yet on Win32\n";
+        exit;
+    }
+    if ($^OS_NAME eq 'VMS') {
+        # So we can get the return value of system()
+        require vmsish;
+        vmsish->import();
+    }
+    plan tests => 5;
 }
 
 use ExtUtils::CBuilder;
@@ -34,9 +34,9 @@ ok $b;
 
 my $source_file = File::Spec->catfile('t', 'compilet.c');
 do {
-  open my $fh, ">", "$source_file" or die "Can't create $source_file: $^OS_ERROR";
-  print $fh, "int main(void) \{ return 11; \}\n";
-  close $fh;
+    open my $fh, ">", "$source_file" or die "Can't create $source_file: $^OS_ERROR";
+    print $fh, "int main(void) \{ return 11; \}\n";
+    close $fh;
 };
 ok -e $source_file;
 
@@ -50,11 +50,11 @@ my ($exe_file, @temps);
 ok $exe_file;
 
 if ($^OS_NAME eq 'os2') {		# Analogue of LDLOADPATH...
-	# Actually, not needed now, since we do not link with the generated DLL
-  my $old = OS2::extLibpath();	# [builtin function]
-  $old = ";$old" if defined $old and length $old;
-  # To pass the sanity check, components must have backslashes...
-  OS2::extLibpath_set(".\\$old");
+    # Actually, not needed now, since we do not link with the generated DLL
+    my $old = OS2::extLibpath();	# [builtin function]
+    $old = ";$old" if defined $old and length $old;
+    # To pass the sanity check, components must have backslashes...
+    OS2::extLibpath_set(".\\$old");
 }
 
 # Try the executable
@@ -62,14 +62,14 @@ is my_system($exe_file), 11;
 
 # Clean up
 for (@($source_file, $object_file, $exe_file)) {
-  s/"|'//g;
-  1 while unlink;
+    s/"|'//g;
+    1 while unlink;
 }
 
 sub my_system {
-  my $cmd = shift;
-  if ($^OS_NAME eq 'VMS') {
-    return system("mcr $cmd");
-  }
-  return system($cmd) >> 8;
+    my $cmd = shift;
+    if ($^OS_NAME eq 'VMS') {
+        return system("mcr $cmd");
+    }
+    return system($cmd) >> 8;
 }

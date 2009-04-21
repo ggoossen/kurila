@@ -270,9 +270,9 @@ stat($^STDIN);
 -T \*HOCUS;
 stat(\*POCUS);
 EXPECT
--T on closed filehandle STDIN at - line 4 character 2.
+-T on closed filehandle STDIN at - line 4 character 1.
 stat() on closed filehandle STDIN at - line 5 character 1.
--T on unopened filehandle at - line 6 character 2.
+-T on unopened filehandle at - line 6 character 1.
 stat() on unopened filehandle at - line 7 character 1.
 ########
 # pp_sys.c [pp_fttext]
@@ -281,7 +281,7 @@ use warnings 'newline' ;
 no warnings 'newline' ;
 -T "abc\ndef" ;
 EXPECT
-Unsuccessful open on filename containing newline at - line 3 character 2.
+Unsuccessful open on filename containing newline at - line 3 character 1.
 ########
 # pp_sys.c [pp_sysread]
 use warnings 'io' ;

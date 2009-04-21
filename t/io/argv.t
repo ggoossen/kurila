@@ -14,16 +14,16 @@ close $try or die "Could not close: $^OS_ERROR";
 
 do {
     my $x = runperl(
-	prog	=> 'while (~< *ARGV) { print $^STDOUT, $_; }',
-	stdin	=> "foo\n",
-	args	=> \@( 'Io_argv1.tmp', '-' ),
-    );
+        prog	=> 'while (~< *ARGV) { print $^STDOUT, $_; }',
+        stdin	=> "foo\n",
+        args	=> \@( 'Io_argv1.tmp', '-' ),
+        );
     is($x, "a line\nfoo\n", '   from a file and STDIN');
 
     $x = runperl(
-	prog	=> 'while (~< *ARGV) { print $^STDOUT, $_; }',
-	stdin	=> "foo\n",
-    );
+        prog	=> 'while (~< *ARGV) { print $^STDOUT, $_; }',
+        stdin	=> "foo\n",
+        );
     is($x, "foo\n", '   from just STDIN');
 };
 
@@ -98,6 +98,6 @@ do {
 };
 
 END {
-    1 while unlink 'Io_argv1.tmp',
-	'Io_argv2.tmp', 'Io_argv3.tmp';
+        1 while unlink 'Io_argv1.tmp',
+    'Io_argv2.tmp', 'Io_argv3.tmp';
 }

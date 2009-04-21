@@ -22,11 +22,11 @@ sub import {
     my $self = shift;
 
     if ( (nelems @_) == 0 ) {
-      $self->export_to_level( 1, $self, < @EXPORT );
+        $self->export_to_level( 1, $self, < @EXPORT );
     } elsif ( (nelems @_) == 1 ) {
-	# This is admittedly a little bit silly:
-	# do we ever export anything else than 'struct'...?
-      $self->export_to_level( 1, $self, < @_ );
+        # This is admittedly a little bit silly:
+        # do we ever export anything else than 'struct'...?
+        $self->export_to_level( 1, $self, < @_ );
     } else {
         if (not ref @_[1]) {
             return struct( @(caller)[0] => \@_);
@@ -126,9 +126,9 @@ sub struct {
         }
         elsif( $type =~ m/^\w+(?:::\w+)*$/ ){
             $out .= "    if (defined(\%init\{?'$name'\})) \{\n";
-           $out .= "       if (ref \%init\{'$name'\} eq 'HASH')\n";
+            $out .= "       if (ref \%init\{'$name'\} eq 'HASH')\n";
             $out .= "            \{ \$r->$elem = $type->new(\%\{\%init\{'$name'\}\}) \} $cmt\n";
-           $out .= "       elsif (UNIVERSAL::isa(\%init\{'$name'\}, '$type'))\n";
+            $out .= "       elsif (UNIVERSAL::isa(\%init\{'$name'\}, '$type'))\n";
             $out .= "            \{ \$r->$elem = \%init\{'$name'\} \} $cmt\n";
             $out .= "       else \{ die 'Initializer for $name must be hash or $type reference' \}\n";
             $out .= "    \}\n";

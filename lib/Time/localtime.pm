@@ -17,17 +17,17 @@ BEGIN {
     $VERSION     = 1.02;
 }
 our ($tm_sec, $tm_min, $tm_hour, $tm_mday,
-     $tm_mon, $tm_year, $tm_wday, $tm_yday,
-     $tm_isdst);
+    $tm_mon, $tm_year, $tm_wday, $tm_yday,
+    $tm_isdst);
 
 sub populate {
     return unless (nelems @_);
     my $tmob = Time::tm->new();
     @$tmob = @(
-		$tm_sec, $tm_min, $tm_hour, $tm_mday, 
-		$tm_mon, $tm_year, $tm_wday, $tm_yday, 
-		$tm_isdst )
-	    =  @_ ;
+  $tm_sec, $tm_min, $tm_hour, $tm_mday, 
+  $tm_mon, $tm_year, $tm_wday, $tm_yday, 
+  $tm_isdst )
+        =  @_ ;
     return $tmob;
 } 
 

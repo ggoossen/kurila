@@ -1,7 +1,7 @@
 
 package IO::Compress::Base ;
 
- 
+
 use warnings;
 
 use IO::Compress::Base::Common v2.006 ;
@@ -120,7 +120,7 @@ sub output
 
     if ( defined $self->{?FH} ) {
         defined IO::Handle::write($self->{?FH}, $data, length $data )
-          or return $self->saveErrorString(0, $^OS_ERROR, $^OS_ERROR); 
+            or return $self->saveErrorString(0, $^OS_ERROR, $^OS_ERROR); 
     }
     else {
         ${ $self->{Buffer} } .= $data ;
@@ -132,7 +132,7 @@ sub output
 sub getOneShotParams
 {
     return  @( 'MultiStream' => \@(1, 1, Parse_boolean,   1),
-           );
+        );
 }
 
 sub checkParams
@@ -146,15 +146,15 @@ sub checkParams
         \%(
             # Generic Parameters
             'AutoClose' => \@(1, 1, Parse_boolean,   0),
-            #'Encode'    => [1, 1, Parse_any,       undef],
-            'Strict'    => \@(0, 1, Parse_boolean,   1),
-            'Append'    => \@(1, 1, Parse_boolean,   0),
-            'BinModeIn' => \@(1, 1, Parse_boolean,   0),
+                #'Encode'    => [1, 1, Parse_any,       undef],
+                'Strict'    => \@(0, 1, Parse_boolean,   1),
+                'Append'    => \@(1, 1, Parse_boolean,   0),
+                'BinModeIn' => \@(1, 1, Parse_boolean,   0),
 
-            'FilterEnvelope' => \@(1, 1, Parse_any,   undef),
+                'FilterEnvelope' => \@(1, 1, Parse_any,   undef),
 
-            < $self->getExtraParams(),
-            $self->{?OneShot} ?? < $self->getOneShotParams() !! (),
+                < $self->getExtraParams(),
+                $self->{?OneShot} ?? < $self->getOneShotParams() !! (),
         ), 
         < @_) or die("$(dump::view($class)): $(dump::view($got->{?Error}))")  ;
 
@@ -179,7 +179,7 @@ sub _create
     {
         $oneShot = 0 ;
         $got = $obj->checkParams($class, undef, < @_)
-          or $obj->croakError("invalid params");
+            or $obj->croakError("invalid params");
     }
 
     my $lax = ! $got->value('Strict') ;
@@ -187,7 +187,7 @@ sub _create
     my $outType = whatIsOutput($outValue);
 
     $obj->ckOutputParam($class, $outValue)
-      or $obj->croakError("invalid output param");
+        or $obj->croakError("invalid output param");
 
     if ($outType eq 'buffer') {
         $obj->{+Buffer} = $outValue;
@@ -203,7 +203,7 @@ sub _create
 
     # If output is a file, check that it is writable
     if ($outType eq 'filename' && -e $outValue && ! -w _)
-      { return $obj->saveErrorString(undef, "Output file '$outValue' is not writable" ) }
+    { return $obj->saveErrorString(undef, "Output file '$outValue' is not writable" ) }
 
 
 
@@ -221,8 +221,8 @@ sub _create
     my $status ;
     do {
         $obj->{+Compress} = $obj->mkComp($class, $got)
-            or $obj->croakError("Failed making Compress");
-        
+        or $obj->croakError("Failed making Compress");
+
         $obj->{+UnCompSize} = U64->new() ;
         $obj->{+CompSize} = U64->new() ;
 
@@ -247,7 +247,7 @@ sub _create
                 $mode = '>>'
                     if $appendOutput;
                 $obj->{+FH} = IO::File->new( "$outValue", "$mode")
-                    or return $obj->saveErrorString(undef, "cannot open file '$outValue': $^OS_ERROR", $^OS_ERROR) ;
+                or return $obj->saveErrorString(undef, "cannot open file '$outValue': $^OS_ERROR", $^OS_ERROR) ;
                 $obj->{+StdIO} = ($outValue eq '-'); 
             }
         }
@@ -281,7 +281,7 @@ sub ckOutputParam
 
     $self->croakError("$from: output buffer is read-only")
         if $outType eq 'buffer' && readonly(${ @_[0] });
-    
+
     return 1;    
 }
 
@@ -289,7 +289,7 @@ sub ckOutputParam
 sub _def
 {
     my $obj = shift ;
-    
+
     my $class= @(caller)[0] ;
     my $name = @(caller(1))[3] ;
 
@@ -312,19 +312,19 @@ sub _def
 
     $x->{+Got} = $got ;
 
-#    if ($x->{Hash})
-#    {
-#        while (my($k, $v) = each %$input)
-#        {
-#            $v = \$input->{$k} 
-#                unless defined $v ;
-#
-#            $obj->_singleTarget($x, 1, $k, $v, @_)
-#                or return undef ;
-#        }
-#
-#        return keys %$input ;
-#    }
+    #    if ($x->{Hash})
+    #    {
+    #        while (my($k, $v) = each %$input)
+    #        {
+    #            $v = \$input->{$k} 
+    #                unless defined $v ;
+    #
+    #            $obj->_singleTarget($x, 1, $k, $v, @_)
+    #                or return undef ;
+    #        }
+    #
+    #        return keys %$input ;
+    #    }
 
     if ($x->{?GlobMap})
     {
@@ -342,10 +342,10 @@ sub _def
     if (! $x->{?oneOutput} )
     {
         my $inFile = ($x->{?inType} eq 'filenames' 
-                        || $x->{?inType} eq 'filename');
+                      || $x->{?inType} eq 'filename');
 
         $x->{+inType} = $inFile ?? 'filename' !! 'buffer';
-        
+
         foreach my $in (@($x->{?oneInput} ?? $input !! < @$input))
         {
             my $out ;
@@ -355,10 +355,10 @@ sub _def
                 or return undef ;
 
             push @$output, \$out ;
-            #if ($x->{outType} eq 'array')
-            #  { push @$output, \$out }
-            #else
-            #  { $output->{$in} = \$out }
+        #if ($x->{outType} eq 'array')
+        #  { push @$output, \$out }
+        #else
+        #  { $output->{$in} = \$out }
         }
 
         return 1 ;
@@ -376,7 +376,7 @@ sub _singleTarget
     my $x               = shift ;
     my $inputIsFilename = shift;
     my $input           = shift;
-    
+
     if ($x->{?oneInput})
     {
         my $z = $obj->_create($x->{?Got}, < @_)
@@ -497,7 +497,7 @@ sub addInterStream
     }
     elsif ($self->{?Got}->value('AutoFlush'))
     {
-        #return $self->flush(Z_FULL_FLUSH);
+    #return $self->flush(Z_FULL_FLUSH);
     }
 
     return 1 ;
@@ -512,7 +512,7 @@ sub TIEHANDLE
     return @_[0] if ref(@_[0]);
     die "OOPS\n" ;
 }
-  
+
 sub UNTIE
 {
     my $self = shift ;
@@ -587,7 +587,7 @@ sub syswrite
     my $status = $self->{?Compress}->compr($buffer, $outBuffer) ;
 
     return $self->saveErrorString(undef, $self->{Compress}->{?Error}, 
-                                         $self->{Compress}->{ErrorNo})
+        $self->{Compress}->{ErrorNo})
         if $status == STATUS_ERROR;
 
     $self->{?CompSize}->add(length $outBuffer) ;
@@ -637,7 +637,7 @@ sub flush
     my $outBuffer='';
     my $status = $self->{?Compress}->flush($outBuffer, < @_) ;
     return $self->saveErrorString(0, $self->{Compress}->{?Error}, 
-                                    $self->{Compress}->{ErrorNo})
+        $self->{Compress}->{ErrorNo})
         if $status == STATUS_ERROR;
 
     if ( defined $self->{?FH} ) {
@@ -660,7 +660,7 @@ sub flush
 sub newStream
 {
     my $self = shift ;
-  
+
     $self->_writeTrailer()
         or return 0 ;
 
@@ -673,10 +673,10 @@ sub newStream
     $self->{+Header} = $self->mkHeader($got) ;
     $self->output($self->{Header} )
         or return 0;
-    
+
     my $status = $self->reset() ;
     return $self->saveErrorString(0, $self->{Compress}->{?Error}, 
-                                  $self->{Compress}->{ErrorNo})
+        $self->{Compress}->{ErrorNo})
         if $status == STATUS_ERROR;
 
     $self->{UnCompSize}->reset();
@@ -705,7 +705,7 @@ sub _writeTrailer
 
     $trailer .= $self->mkTrailer();
     defined $trailer
-      or return 0;
+        or return 0;
 
     return $self->output($trailer);
 }
@@ -852,8 +852,8 @@ sub fileno
 {
     my $self     = shift ;
     return defined $self->{?FH} 
-            ?? fileno($self->{?FH}) 
-            !! undef ;
+        ?? fileno($self->{?FH}) 
+        !! undef ;
 }
 
 sub opened
@@ -866,8 +866,8 @@ sub autoflush
 {
     my $self     = shift ;
     return defined $self->{?FH} 
-            ?? $self->{?FH}->autoflush(< @_) 
-            !! undef ;
+        ?? $self->{?FH}->autoflush(< @_) 
+        !! undef ;
 }
 
 sub input_line_number

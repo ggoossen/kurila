@@ -13,22 +13,22 @@ my $LIB = "-ldb" ;
 $LIB = "-llibdb" if $^OS_NAME eq 'MSWin32' ;
 
 WriteMakefile(
-	NAME 		=> 'DB_File',
-	LIBS 		=> \@("-L/usr/local/lib $LIB"),
-	#INC		=> '-I/usr/local/include',
-	VERSION_FROM	=> 'DB_File.pm',
-	OBJECT		=> 'version$(OBJ_EXT) DB_File$(OBJ_EXT)',
-	XSPROTOARG	=> '-noprototypes',
-	DEFINE		=> $OS2 || "",
-	INC		=> ($^OS_NAME eq "MacOS" ?? "-i ::::db:include" !! ""),
-        XS_VERSION      => eval MM->parse_version('DB_File.pm'),
-        LICENSE  => 'perl',
-        ABSTRACT_FROM => 'DB_File.pm',
-        AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
+    NAME 		=> 'DB_File',
+    LIBS 		=> \@("-L/usr/local/lib $LIB"),
+    #INC		=> '-I/usr/local/include',
+    VERSION_FROM	=> 'DB_File.pm',
+    OBJECT		=> 'version$(OBJ_EXT) DB_File$(OBJ_EXT)',
+    XSPROTOARG	=> '-noprototypes',
+    DEFINE		=> $OS2 || "",
+    INC		=> ($^OS_NAME eq "MacOS" ?? "-i ::::db:include" !! ""),
+    XS_VERSION      => eval MM->parse_version('DB_File.pm'),
+    LICENSE  => 'perl',
+    ABSTRACT_FROM => 'DB_File.pm',
+    AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
 
-	'depend'	=> \%('version$(OBJ_EXT)' => 'version.c'),
-	'clean'		=> \%(FILES => 'constants.h constants.xs'),
-	);
+    'depend'	=> \%('version$(OBJ_EXT)' => 'version.c'),
+    'clean'		=> \%(FILES => 'constants.h constants.xs'),
+    );
 
 my @names = qw(
 	BTREEMAGIC
@@ -61,33 +61,33 @@ my @names = qw(
 	__R_UNUSED
 	);
 
-    # Check the constants above all appear in @EXPORT in DB_File.pm
-    my %names = %( < @+: map { @: $_, 1}, @names );
-    open my $f, "<", "DB_File.pm" or die "Cannot open DB_File.pm: $^OS_ERROR\n";
-    while ( ~< $f)
-    {
-        last if m/^\s*\@EXPORT\s+=\s+ qw\(/x ;
-    }
+# Check the constants above all appear in @EXPORT in DB_File.pm
+my %names = %( < @+: map { @: $_, 1}, @names );
+open my $f, "<", "DB_File.pm" or die "Cannot open DB_File.pm: $^OS_ERROR\n";
+while ( ~< $f)
+{
+    last if m/^\s*\@EXPORT\s+=\s+ qw\(/x ;
+}
 
-    while ( ~< $f)
-    {
-        last if m/^\s*\)/ ;
-        m/(\S+)/ ;
-        delete %names{$1} if defined $1 ;
-    }
-    close $f ;
+while ( ~< $f)
+{
+    last if m/^\s*\)/ ;
+    m/(\S+)/ ;
+    delete %names{$1} if defined $1 ;
+}
+close $f ;
 
-    if ( %names )
-    {
-        my $missing = join ("\n\t", sort keys %names) ;
-        die "The following names are missing from \@EXPORT in DB_File.pm\n" .
-            "\t$missing\n" ;
-    }
-    
+if ( %names )
+{
+    my $missing = join ("\n\t", sort keys %names) ;
+    die "The following names are missing from \@EXPORT in DB_File.pm\n" .
+        "\t$missing\n" ;
+}
 
-    WriteConstants( NAME => 'DB_File',
-                    NAMES => \@names,
-                    C_FILE  => 'constants.h',
-                    XS_FILE  => 'constants.xs',
-                    PROXYSUBS => 1,
-                  );
+
+WriteConstants( NAME => 'DB_File',
+    NAMES => \@names,
+    C_FILE  => 'constants.h',
+    XS_FILE  => 'constants.xs',
+    PROXYSUBS => 1,
+    );

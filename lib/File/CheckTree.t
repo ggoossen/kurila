@@ -6,12 +6,12 @@ BEGIN { plan tests => 8 }
 
 
 BEGIN {
-# Cwd::cwd does an implicit "require Win32", but
-# the ../lib directory in $^INCLUDE_PATH will no longer work once
-# we chdir() out of the "t" directory.
+    # Cwd::cwd does an implicit "require Win32", but
+    # the ../lib directory in $^INCLUDE_PATH will no longer work once
+    # we chdir() out of the "t" directory.
     if ($^OS_NAME eq 'MSWin32') {
-	require Win32;
-	Win32->import();
+        require Win32;
+        Win32->import();
     }
 }
 
@@ -72,9 +72,9 @@ do {
     };
 
     if ( !$^EVAL_ERROR && (nelems @warnings) == 1
-             && @warnings[0] =~ m/lib is not a plain file/
-             && defined($num_warnings)
-             && $num_warnings == 1 )
+        && @warnings[0] =~ m/lib is not a plain file/
+        && defined($num_warnings)
+        && $num_warnings == 1 )
     {
         ok(1);
     }
@@ -103,11 +103,11 @@ do {
     };
 
     if ( !$^EVAL_ERROR && (nelems @warnings) == 3
-             && @warnings[0] =~ m/lib is not a plain file/
-             && @warnings[1] =~ m/README is not a directory/
-             && @warnings[2] =~ m/my warning: lib/
-             && defined($num_warnings)
-             && $num_warnings == 3 )
+        && @warnings[0] =~ m/lib is not a plain file/
+        && @warnings[1] =~ m/README is not a directory/
+        && @warnings[2] =~ m/my warning: lib/
+        && defined($num_warnings)
+        && $num_warnings == 3 )
     {
         ok(1);
     }
@@ -140,10 +140,10 @@ do {
     };
 
     if ( !$^EVAL_ERROR && (nelems @warnings) == 2
-             && @warnings[0] =~ m/Spec is not a plain file/
-             && @warnings[1] =~ m/INSTALL is not a directory/
-             && defined($num_warnings)
-             && $num_warnings == 2 )
+        && @warnings[0] =~ m/Spec is not a plain file/
+        && @warnings[1] =~ m/INSTALL is not a directory/
+        && defined($num_warnings)
+        && $num_warnings == 2 )
     {
         ok(1);
     }
@@ -166,7 +166,7 @@ do {
     };
 
     if ( $^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/lib is not a plain file/
-            && not defined $num_warnings )
+        && not defined $num_warnings )
     {
         ok(1);
     }
@@ -189,7 +189,7 @@ do {
     };
 
     if ( $^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/yadda lib yadda/
-            && not defined $num_warnings )
+        && not defined $num_warnings )
     {
         ok(1);
     }
@@ -209,11 +209,11 @@ do {
     };
 
     if ( !$^EVAL_ERROR ) {
-	# No errors mean we compile correctly
+        # No errors mean we compile correctly
         ok(1);
     } else {
         ok(0);
-	print $^STDERR, $^EVAL_ERROR;
+        print $^STDERR, $^EVAL_ERROR;
     };
 };
 

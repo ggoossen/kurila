@@ -22,68 +22,68 @@ is( < e "\n", "", );
 
 
 ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n"),
-  qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz</Verbatim></Document>}
-);
+                             qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz</Verbatim></Document>}
+                             );
 ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n quux\n"),
-  qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz\n quux</Verbatim></Document>}
-);
+                             qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz\n quux</Verbatim></Document>}
+                             );
 ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\nquux\n"),
-  qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz\nquux</Verbatim></Document>}
-);
+                             qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz\nquux</Verbatim></Document>}
+                             );
 
 print $^STDOUT, "# Contiguous verbatims...\n";
 ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n quux\n"),
-  qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz\n\n quux</Verbatim></Document>}
-);
+                             qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz\n\n quux</Verbatim></Document>}
+                             );
 ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n\n quux\n"),
-  qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz\n\n\n quux</Verbatim></Document>}
-);
+                             qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz\n\n\n quux</Verbatim></Document>}
+                             );
 
 print $^STDOUT, "# Testing =cut...\n";
 ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n=cut\n quux\n"),
-  qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz</Verbatim></Document>}
-);
+                             qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz</Verbatim></Document>}
+                             );
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 do {
-my $it =
-qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz</Verbatim><head1>Foo</head1><Verbatim\nxml:space="preserve"> quux\nquum</Verbatim></Document>}
-;
+    my $it =
+        qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz</Verbatim><head1>Foo</head1><Verbatim\nxml:space="preserve"> quux\nquum</Verbatim></Document>}
+    ;
 
 
-print $^STDOUT, "# Various \\n-(in)significance sanity checks...\n";
+        print $^STDOUT, "# Various \\n-(in)significance sanity checks...\n";
 
-print $^STDOUT, "#  verbatim/cut/head/verbatim sanity zero...\n";
+    print $^STDOUT, "#  verbatim/cut/head/verbatim sanity zero...\n";
 
-ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n=head1 Foo\n\n quux\nquum\n"), $it);
-ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n=cut\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
-ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n=cut\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
+    ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n=head1 Foo\n\n quux\nquum\n"), $it);
+    ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n=cut\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
+    ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n=cut\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 
-print $^STDOUT, "#  verbatim/cut/head/verbatim sanity one...\n";
+    print $^STDOUT, "#  verbatim/cut/head/verbatim sanity one...\n";
 
-ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n=cut\n\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
-ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n=cut\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
-ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n=cut\n\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
+    ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n=cut\n\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
+    ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n=cut\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
+    ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n=cut\n\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
 
-print $^STDOUT, "#  verbatim/cut/head/verbatim sanity two...\n";
+    print $^STDOUT, "#  verbatim/cut/head/verbatim sanity two...\n";
 
-ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n=cut\n\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
-ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n=cut\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
-ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n=cut\n\n\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
+    ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n=cut\n\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
+    ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n=cut\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
+    ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n=cut\n\n\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 
-print $^STDOUT, "#  verbatim/cut/head/verbatim sanity three...\n";
+    print $^STDOUT, "#  verbatim/cut/head/verbatim sanity three...\n";
 
-ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n=cut\n\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
-ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n=cut\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
-ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n=cut\n\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
+    ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n=cut\n\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
+    ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n=cut\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
+    ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n=cut\n\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 
-print $^STDOUT, "#  verbatim/cut/head/verbatim sanity four...\n";
+    print $^STDOUT, "#  verbatim/cut/head/verbatim sanity four...\n";
 
-ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n\n\n\n=cut\n\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
-ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n\n\n\n\n=cut\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
-ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n\n\n\n\n=cut\n\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
+    ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n\n\n\n=cut\n\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
+    ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n\n\n\n\n=cut\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
+    ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n\n\n\n\n=cut\n\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 
 };
 
@@ -92,7 +92,7 @@ ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n\n\n\n\n\n=cut\n\ns
 print $^STDOUT, "# Testing tab expansion...\n";
 
 &ok( < e
-q{=pod
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              q{=pod
 
  here we go now
 a
@@ -122,7 +122,7 @@ a
                         y
                          z
 },
-q{=pod
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              q{=pod
 
  here we go now
 a
@@ -152,12 +152,12 @@ a
                         y
                          z
 },
-);
+     );
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 &ok( < e
-q{=pod
+                                                                                           q{=pod
 
  here we go now
 a
@@ -187,7 +187,7 @@ a
 .                       y
 .                        z
 },
-q{=pod
+                                                                                           q{=pod
 
  here we go now
 a
@@ -217,12 +217,12 @@ a
 .                       y
 .                        z
 },
-);
+     );
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 &ok( < e
-q{=pod
+                                                                                           q{=pod
 
  here we go now
 a
@@ -252,7 +252,7 @@ a
 ..                      y
 ..                       z
 },
-q{=pod
+                                                                                           q{=pod
 
  here we go now
 a
@@ -282,13 +282,13 @@ a
 ..                      y
 ..                       z
 },
-);
+     );
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 &ok( < e
-q{=pod
+                                                                                            q{=pod
 
  here we go now
 a
@@ -318,7 +318,7 @@ a
 ..      .               y
 ..      .                z
 },
-q{=pod
+                                                                                            q{=pod
 
  here we go now
 a
@@ -348,7 +348,7 @@ a
 ..      .               y
 ..      .                z
 },
-);
+     );
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

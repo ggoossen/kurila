@@ -28,7 +28,7 @@ END {
 }
 
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
-  diag("chdir failed: $^OS_ERROR");
+    diag("chdir failed: $^OS_ERROR");
 
 do {
     my $stdout = \$( '' );
@@ -36,8 +36,8 @@ do {
     $^STDOUT = *{$stdout_fh}{IO};
     my $warnings = '';
     local $^WARN_HOOK = sub {
-        $warnings .= @_[0]->description;
-    };
+            $warnings .= @_[0]->description;
+        };
 
     my $mm;
 
@@ -47,7 +47,7 @@ do {
             NAME            => 'Big::Dummy',
             VERSION_FROM    => 'lib/Big/Dummy.pm',
             AUTHOR          => sub {},
-        );
+            );
     };
 
     is( $warnings, <<VERIFY );
@@ -62,7 +62,7 @@ VERIFY
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
         LIBS            => '-lwibble -lwobble',
-    );
+        );
 
     # We'll get warnings about the bogus libs, that's ok.
     unlike( $warnings, qr/WARNING: .* takes/ );
@@ -73,7 +73,7 @@ VERIFY
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
         LIBS            => \@('-lwibble', '-lwobble'),
-    );
+        );
 
     # We'll get warnings about the bogus libs, that's ok.
     unlike( $warnings, qr/WARNING: .* takes/ );
@@ -85,7 +85,7 @@ VERIFY
             NAME            => 'Big::Dummy',
             VERSION_FROM    => 'lib/Big/Dummy.pm',
             LIBS            => \%( wibble => "wobble" ),
-        );
+            );
     };
 
     # We'll get warnings about the bogus libs, that's ok.
@@ -97,7 +97,7 @@ VERIFY
         NAME            => 'Big::Dummy',
         WIBBLE          => 'something',
         wump            => \%( foo => 42 ),
-    );
+        );
 
     like( $warnings, qr{^WARNING: WIBBLE is not a known parameter.\n}m );
     like( $warnings, qr{^WARNING: wump is not a known parameter.\n}m );
@@ -110,18 +110,18 @@ VERIFY
     $warnings = '';
     try {
         $mm = WriteMakefile(
-        NAME       => 'Big::Dummy',
-        VERSION    => \@(1,2,3),
-        );
+            NAME       => 'Big::Dummy',
+            VERSION    => \@(1,2,3),
+            );
     };
     like( $warnings, qr{^WARNING: VERSION takes a version object or string/number} );
 
     $warnings = '';
     try {
         $mm = WriteMakefile(
-        NAME       => 'Big::Dummy',
-        VERSION    => 1.002_003,
-        );
+            NAME       => 'Big::Dummy',
+            VERSION    => 1.002_003,
+            );
     };
     is( $warnings, '' );
     is( $mm->{?VERSION}, '1.002003' );
@@ -129,9 +129,9 @@ VERIFY
     $warnings = '';
     try {
         $mm = WriteMakefile(
-        NAME       => 'Big::Dummy',
-        VERSION    => '1.002_003',
-        );
+            NAME       => 'Big::Dummy',
+            VERSION    => '1.002_003',
+            );
     };
     is( $warnings, '' );
     is( $mm->{?VERSION}, '1.002_003' );
@@ -140,14 +140,14 @@ VERIFY
     $warnings = '';
     try {
         $mm = WriteMakefile(
-        NAME       => 'Big::Dummy',
-        VERSION    => bless \%(), "Some::Class",
-        );
+            NAME       => 'Big::Dummy',
+            VERSION    => bless \%(), "Some::Class",
+            );
     };
     like( $warnings, '/^WARNING: VERSION takes a version object or string/number not a Some::Class object/' );
 
 
-    SKIP: do {
+  SKIP: do {
         skip("Can't test version objects",6) unless try { require version };
         version->import;
 
@@ -156,7 +156,7 @@ VERIFY
         $mm = WriteMakefile(
             NAME       => 'Big::Dummy',
             VERSION    => $version,
-        );
+            );
         is( $warnings, '' );
         is( $mm->{?VERSION}, $version->stringify );
 
@@ -165,7 +165,7 @@ VERIFY
         $mm = WriteMakefile(
             NAME       => 'Big::Dummy',
             VERSION    => $version,
-        );
+            );
         is( $warnings, '' );
         is( $mm->{?VERSION}, $version->stringify, 'correct version' );
     };

@@ -13,11 +13,11 @@ BEGIN {
 
 my (@enums, @names);
 while ( ~< *DATA) {
-  next if m/^#/;
-  next if m/^$/;
-  my @($enum, $name) = @: m/^(\S+)\s+(\S+)/ or die "Can't parse $_";
-  push @enums, $enum;
-  push @names, $name;
+    next if m/^#/;
+    next if m/^$/;
+    my @($enum, $name) = @: m/^(\S+)\s+(\S+)/ or die "Can't parse $_";
+    push @enums, $enum;
+    push @names, $name;
 }
 
 safer_unlink ('overload.h', 'overload.c');
@@ -25,7 +25,7 @@ my $c = safer_open("overload.c");
 my $h = safer_open("overload.h");
 
 sub print_header($fh, $file) {
-  print $fh, <<"EOF";
+    print $fh, <<"EOF";
 /* -*- buffer-read-only: t -*-
  *
  *    $file

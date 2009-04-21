@@ -86,7 +86,7 @@ do {
     sub foo { "foo" }
     package A2;
     our @ISA = @( 'A1' );
-    package main;
+        package main;
     is(A2->foo(), "foo");
     is(do { eval 'A2::foo()'; $^EVAL_ERROR ?? 1 !! 0}, 1);
     is(A2->foo(), "foo");
@@ -106,22 +106,22 @@ do {
 
 # test error messages if method loading fails
 is(do { eval 'my $e = bless \%(), "E::A"; E::A->foo()';
-	  $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::A"/ ?? 1 !! $^EVAL_ERROR->message}, 1);
+    $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::A"/ ?? 1 !! $^EVAL_ERROR->message}, 1);
 is(do { eval 'my $e = bless \%(), "E::B"; $e->foo()';  
-	  $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::B"/ ?? 1 !! $^EVAL_ERROR}, 1);
+    $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::B"/ ?? 1 !! $^EVAL_ERROR}, 1);
 is(do { eval 'E::C->foo()';
-	  $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::C" (perhaps / ?? 1 !! $^EVAL_ERROR}, 1);
+    $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::C" (perhaps / ?? 1 !! $^EVAL_ERROR}, 1);
 
 is(do { eval 'UNIVERSAL->E::D::foo()';
-	  $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::D" (perhaps / ?? 1 !! $^EVAL_ERROR}, 1);
+    $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::D" (perhaps / ?? 1 !! $^EVAL_ERROR}, 1);
 is(do { eval 'my $e = bless \%(), "UNIVERSAL"; $e->E::E::foo()';
-	  $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::E" (perhaps / ?? 1 !! $^EVAL_ERROR}, 1);
+    $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::E" (perhaps / ?? 1 !! $^EVAL_ERROR}, 1);
 
 my $e = bless \%(), "E::F";  # force package to exist
 is(do { eval 'UNIVERSAL->E::F::foo()';
-	  $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::F"/ ?? 1 !! $^EVAL_ERROR}, 1);
+    $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::F"/ ?? 1 !! $^EVAL_ERROR}, 1);
 is(do { eval '$e = bless \%(), "UNIVERSAL"; $e->E::F::foo()';
-	  $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::F"/ ?? 1 !! $^EVAL_ERROR}, 1);
+    $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::F"/ ?? 1 !! $^EVAL_ERROR}, 1);
 
 # TODO: we need some tests for the SUPER:: pseudoclass
 
@@ -142,25 +142,25 @@ is( eval 'main::Foo->boogie(); 1'         ?? "yes"!!"no", "no" );
 is( %main::{?"Foo::"} || "none", "none");  # still missing?
 
 is(do { eval 'main::Foo->boogie()';
-	  $^EVAL_ERROR->message =~ m/^\QCan't locate object method "boogie" via package "main::Foo" (perhaps / ?? 1 !! $^EVAL_ERROR}, 1);
+    $^EVAL_ERROR->message =~ m/^\QCan't locate object method "boogie" via package "main::Foo" (perhaps / ?? 1 !! $^EVAL_ERROR}, 1);
 
 eval 'sub main::Foo::boogie { "yes, sir!" }';
 is( %main::{?"Foo::"} ?? "ok" !! "none", "ok");  # should exist now
 is( main::Foo->boogie(), "yes, sir!");
 
-# TODO: universal.t should test NoSuchPackage->isa()/can()
+    # TODO: universal.t should test NoSuchPackage->isa()/can()
 
-# [ID 20020305.025] PACKAGE::SUPER doesn't work anymore
+    # [ID 20020305.025] PACKAGE::SUPER doesn't work anymore
 
-package main;
+    package main;
 our @X;
-package Amajor;
+    package Amajor;
 sub test {
     push @main::X, 'Amajor', < @_;
 }
 package Bminor;
 use base < qw(Amajor);
-package main;
+    package main;
 sub Bminor::test {
     @_[0]->Bminor::SUPER::test('x', 'y');
     push @main::X, 'Bminor', < @_;

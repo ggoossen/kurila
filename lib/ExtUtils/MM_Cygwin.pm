@@ -86,7 +86,7 @@ sub init_linker {
         $self->{+PERL_ARCHIVE} = $libperl;
     } else {
         $self->{+PERL_ARCHIVE} = 
-          '$(PERL_INC)' .'/'. ("%Config{?libperl}" or "libperl.a");
+        '$(PERL_INC)' .'/'. ("%Config{?libperl}" or "libperl.a");
     }
 
     $self->{+PERL_ARCHIVE_AFTER} ||= '';

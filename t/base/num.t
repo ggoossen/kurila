@@ -174,14 +174,14 @@ $b = 0.0005000000000000000104;
 print $^STDOUT, $a +<= $b ?? "ok 46\n" !! "not ok 46\n";
 
 if ($^OS_NAME eq 'ultrix' || $^OS_NAME eq 'VMS') {
-  # Ultrix enters looong nirvana over this. VMS blows up when configured with
-  # D_FLOAT (but with G_FLOAT or IEEE works fine).  The test should probably
-  # make the number of 0's a function of NV_DIG, but that's not in Config and 
-  # we probably don't want to suck Config into a base test anyway.
-  print $^STDOUT, "ok 47\n";
+    # Ultrix enters looong nirvana over this. VMS blows up when configured with
+    # D_FLOAT (but with G_FLOAT or IEEE works fine).  The test should probably
+    # make the number of 0's a function of NV_DIG, but that's not in Config and 
+    # we probably don't want to suck Config into a base test anyway.
+    print $^STDOUT, "ok 47\n";
 } else {
-  $a = 0.00000000000000000000000000000000000000000000000000000000000000000001;
-  print $^STDOUT, $a +> 0 ?? "ok 47\n" !! "not ok 47\n";
+    $a = 0.00000000000000000000000000000000000000000000000000000000000000000001;
+    print $^STDOUT, $a +> 0 ?? "ok 47\n" !! "not ok 47\n";
 }
 
 $a = 80000.0000000000000000000000000;
@@ -194,4 +194,4 @@ print $^STDOUT, $a == 10.0 ?? "ok 49\n" !! "not ok 49\n";
 
 $a = 57.295779513082320876798154814169;
 print $^STDOUT, ok($a*10,572.95779513082320876798154814169,1e-10) ?? "ok 50\n" !!
-  "not ok 50 # $a\n";
+    "not ok 50 # $a\n";

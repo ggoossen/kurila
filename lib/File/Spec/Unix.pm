@@ -40,7 +40,7 @@ actually traverse the filesystem cleaning up paths like this.
 
 sub canonpath($self,?$path) {
     return unless defined $path;
-    
+
     # Handle POSIX-style node names beginning with double slash (qnx, nto)
     # (POSIX says: "a pathname that begins with two successive slashes
     # may be interpreted in an implementation-defined manner, although
@@ -48,7 +48,7 @@ sub canonpath($self,?$path) {
     my $node = '';
     my $double_slashes_special = $^OS_NAME eq 'qnx' || $^OS_NAME eq 'nto';
     if ( $double_slashes_special && $path =~ s{^(//[^/]+)(?:/|\z)}{/}s ) {
-      $node = $1;
+        $node = $1;
     }
     # This used to be
     # $path =~ s|/+|/|g unless ($^O eq 'cygwin');
@@ -140,9 +140,9 @@ sub _tmpdir {
     my $self = shift;
     my @dirlist = @_;
     foreach ( @dirlist) {
-	next unless defined && -d && -w _;
-	$tmpdir = $_;
-	last;
+        next unless defined && -d && -w _;
+        $tmpdir = $_;
+        last;
     }
     $tmpdir = $self->curdir unless defined $tmpdir;
     $tmpdir = defined $tmpdir && $self->canonpath($tmpdir);
@@ -299,15 +299,15 @@ inserted if needed (though if the directory portion doesn't start with
 sub catpath($self,$volume,$directory,$file) {
 
     if ( $directory ne ''                && 
-         $file ne ''                     && 
-         substr( $directory, -1 ) ne '/' && 
-         substr( $file, 0, 1 ) ne '/' 
+        $file ne ''                     && 
+        substr( $directory, -1 ) ne '/' && 
+        substr( $file, 0, 1 ) ne '/' 
     ) {
-        $directory .= "/$file" ;
-    }
-    else {
-        $directory .= $file ;
-    }
+            $directory .= "/$file" ;
+        }
+        else {
+            $directory .= $file ;
+        }
 
     return $directory ;
 }
@@ -346,11 +346,11 @@ sub abs2rel($self,$path,?$base) {
     @($path, $base) =  map { $self->canonpath($_) }, @( $path, $base);
 
     if (grep { $self->file_name_is_absolute($_) }, @( $path, $base)) {
-	@($path, $base) =  map { $self->rel2abs($_) }, @( $path, $base);
+        @($path, $base) =  map { $self->rel2abs($_) }, @( $path, $base);
     }
     else {
-	# save a couple of cwd()s if both paths are relative
-	@($path, $base) =  map { $self->catdir('/', $_) }, @( $path, $base);
+        # save a couple of cwd()s if both paths are relative
+        @($path, $base) =  map { $self->catdir('/', $_) }, @( $path, $base);
     }
 
     my @($path_volume, ...) =  $self->splitpath($path, 1);
@@ -366,7 +366,7 @@ sub abs2rel($self,$path,?$base) {
     # strictly speaking has no directory portion.  Treat it as if it
     # had the root directory for that volume.
     if (!length($base_directories) and $self->file_name_is_absolute($base)) {
-      $base_directories = $self->rootdir;
+        $base_directories = $self->rootdir;
     }
 
     # Now, remove all leading components that are the same
@@ -374,15 +374,15 @@ sub abs2rel($self,$path,?$base) {
     my @basechunks = $self->splitdir( $base_directories );
 
     if ($base_directories eq $self->rootdir) {
-      shift @pathchunks;
-      return $self->canonpath( $self->catpath('', $self->catdir( < @pathchunks ), '') );
+        shift @pathchunks;
+        return $self->canonpath( $self->catpath('', $self->catdir( < @pathchunks ), '') );
     }
 
     while (@pathchunks && @basechunks
-             && $self->_same(@pathchunks[0], @basechunks[0])) {
-        shift @pathchunks ;
-        shift @basechunks ;
-    }
+    && $self->_same(@pathchunks[0], @basechunks[0])) {
+            shift @pathchunks ;
+            shift @basechunks ;
+        }
     return $self->curdir unless @pathchunks || @basechunks;
 
     # $base now contains the directories the resulting relative path 
@@ -392,7 +392,7 @@ sub abs2rel($self,$path,?$base) {
 }
 
 sub _same {
-  @_[1] eq @_[2];
+    @_[1] eq @_[2];
 }
 
 =item rel2abs()
@@ -427,7 +427,7 @@ sub rel2abs($self,$path,?$base) {
     if ( ! $self->file_name_is_absolute( $path ) ) {
         # Figure out the effective $base and clean it up.
         if ( !defined( $base ) || $base eq '' ) {
-	    $base = $self->_cwd();
+            $base = $self->_cwd();
         }
         elsif ( ! $self->file_name_is_absolute( $base ) ) {
             $base = $self->rel2abs( $base ) ;
@@ -484,19 +484,19 @@ sub _collapse($fs, $path) {
             length @collapsed[-1]       and   # and its not the rootdir
             @collapsed[-1] ne $updir    and   # nor another updir
             @collapsed[-1] ne $curdir         # nor the curdir
-          ) 
-        {                                     # then
-            pop @collapsed;                   # collapse
-        }
-        else {                                # else
-            push @collapsed, $dir;            # just hang onto it
-        }
+        ) 
+            {                                     # then
+                pop @collapsed;                   # collapse
+            }
+            else {                                # else
+                push @collapsed, $dir;            # just hang onto it
+            }
     }
 
     return $fs->catpath($vol, <
-                        $fs->catdir(< @collapsed),
-                        $file
-                       );
+        $fs->catdir(< @collapsed),
+        $file
+        );
 }
 
 

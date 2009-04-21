@@ -17,7 +17,7 @@ my $TB = Test::Builder->create;
 $TB->plan(tests => 2);
 
 
-package main;
+    package main;
 
 require Test::Simple;
 

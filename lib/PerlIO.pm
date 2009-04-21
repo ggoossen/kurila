@@ -7,21 +7,21 @@ our %alias;
 
 sub import
 {
- my $class = shift;
- while ((nelems @_))
-  {
-   my $layer = shift;
-   if (exists %alias{$layer})
+    my $class = shift;
+    while ((nelems @_))
     {
-     $layer = %alias{?$layer}
+        my $layer = shift;
+        if (exists %alias{$layer})
+        {
+            $layer = %alias{?$layer}
+        }
+        else
+        {
+            $layer = "$($class)::$layer";
+        }
+        eval "require $layer";
+        warn "failed loading $layer\: $($^EVAL_ERROR->message)" if $^EVAL_ERROR;
     }
-   else
-    {
-     $layer = "$($class)::$layer";
-    }
-   eval "require $layer";
-   warn "failed loading $layer\: $($^EVAL_ERROR->message)" if $^EVAL_ERROR;
-  }
 }
 
 sub F_UTF8 () { 0x8000 }

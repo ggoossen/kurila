@@ -1,7 +1,7 @@
 BEGIN {
     if (env::var('PERL_CORE')) {
-	chdir 't' if -d 't';
-	$^INCLUDE_PATH = @("../lib", "lib/compress");
+        chdir 't' if -d 't';
+        $^INCLUDE_PATH = @("../lib", "lib/compress");
     }
 }
 
@@ -38,31 +38,31 @@ sub My::testParseParameters()
 {
     try { ParseParameters(1, \%(), 1) ; };
     like $^EVAL_ERROR->{?description}, mkErr(': Expected even number of parameters, got 1'), 
-            "Trap odd number of params";
+         "Trap odd number of params";
 
     try { ParseParameters(1, \%(), undef) ; };
     like $^EVAL_ERROR->{?description}, mkErr(': Expected even number of parameters, got 1'), 
-            "Trap odd number of params";
+         "Trap odd number of params";
 
     try { ParseParameters(1, \%(), \@()) ; };
     like $^EVAL_ERROR->{?description}, mkErr(': Expected even number of parameters, got 1'), 
-            "Trap odd number of params";
+         "Trap odd number of params";
 
     try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_boolean, 0)), Fred => 'joe') ; };
     like $^EVAL_ERROR->{?description}, mkErr("Parameter 'Fred' must be an int, got 'joe'"), 
-            "wanted unsigned, got undef";
+         "wanted unsigned, got undef";
 
     try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_unsigned, 0)), Fred => undef) ; };
     like $^EVAL_ERROR->{?description}, mkErr("Parameter 'Fred' must be an unsigned int, got 'undef'"), 
-            "wanted unsigned, got undef";
+         "wanted unsigned, got undef";
 
     try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_signed, 0)), Fred => undef) ; };
     like $^EVAL_ERROR->{?description}, mkErr("Parameter 'Fred' must be a signed int, got 'undef'"), 
-            "wanted signed, got undef";
+         "wanted signed, got undef";
 
     try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_signed, 0)), Fred => 'abc') ; };
     like $^EVAL_ERROR->{?description}, mkErr("Parameter 'Fred' must be a signed int, got 'abc'"), 
-            "wanted signed, got 'abc'";
+         "wanted signed, got 'abc'";
 
 
   SKIP:
@@ -71,22 +71,22 @@ sub My::testParseParameters()
 
         try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => 'abc') ; };
         like $^EVAL_ERROR->{?description}, mkErr("Parameter 'Fred' not writable"), 
-                "wanted writable, got readonly";
+             "wanted writable, got readonly";
     };
 
     my @xx;
     try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => \@xx) ; };
     like $^EVAL_ERROR->{?description}, mkErr("Parameter 'Fred' not a scalar reference"), 
-            "wanted scalar reference";
+         "wanted scalar reference";
 
     local *ABC;
     try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => \*ABC) ; };
     like $^EVAL_ERROR->{?description}, mkErr("Parameter 'Fred' not a scalar"), 
-            "wanted scalar";
+         "wanted scalar";
 
     #try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_any|Parse_multiple, 0)), Fred => 1, Fred => 2) ; };
     #like $@, mkErr("Muliple instances of 'Fred' found"),
-        #"wanted scalar";
+    #"wanted scalar";
 
     ok 1;
 
@@ -94,12 +94,12 @@ sub My::testParseParameters()
     is $got->value('Fred'), "abc", "other" ;
 
     $got = ParseParameters(1, \%('Fred' => \@(0, 1, Parse_any, undef)), Fred =>
-undef) ;
+        undef) ;
     ok $got->parsed('Fred'), "undef" ;
     ok ! defined $got->value('Fred'), "undef" ;
 
     $got = ParseParameters(1, \%('Fred' => \@(0, 1, Parse_string, undef)), Fred =>
-undef) ;
+        undef) ;
     ok $got->parsed('Fred'), "undef" ;
     is $got->value('Fred'), "", "empty string" ;
 

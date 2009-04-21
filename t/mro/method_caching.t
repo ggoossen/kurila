@@ -14,7 +14,7 @@ do {
     package MCTest::Derived;
     our @ISA = qw/MCTest::Base/;
 
-    package Foo; our @FOO = @( qw// );
+        package Foo; our @FOO = @( qw// );
 };
 
 # These are various ways of re-defining MCTest::Base::foo and checking whether the method is cached when it shouldn't be
@@ -44,7 +44,7 @@ my @testsubs = @(
     sub { eval 'package MCTest::Base; sub foo { @_[1]+17 }'; is('MCTest::Derived'->foo(0), 17); },
     # 5.8.8 fails this one too
     sub { eval 'package MCTest::Base; sub foo { @_[1]+18 }'; is('MCTest::Derived'->foo(0), 18); },
-);
+    );
 
 plan(tests => scalar(nelems @testsubs));
 

@@ -44,12 +44,12 @@ END {
 }
 
 ok( chdir('XS-Test'), "chdir'd to XS-Test" ) ||
-  diag("chdir failed: $^OS_ERROR");
+    diag("chdir failed: $^OS_ERROR");
 
 my $mpl_out = run(qq{$perl Makefile.PL});
 
 cmp_ok( $^CHILD_ERROR, '==', 0, 'Makefile.PL exited with zero' ) ||
-  diag($mpl_out);
+    diag($mpl_out);
 
 my $make = make_run();
 my $make_out = run("$make");

@@ -1,13 +1,13 @@
 
 BEGIN {
     unless ("A" eq pack('U', 0x41)) {
-	print $^STDOUT, "1..0 # Unicode::Collate " .
-	    "cannot stringify a Unicode code point\n";
-	exit 0;
+        print $^STDOUT, "1..0 # Unicode::Collate " .
+            "cannot stringify a Unicode code point\n";
+        exit 0;
     }
     if (env::var('PERL_CORE')) {
-	chdir('t') if -d 't';
-	$^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
+        chdir('t') if -d 't';
+        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
 }
 
@@ -32,9 +32,9 @@ is(Unicode::Collate::Base_Unicode_Version, $Base_Unicode_Version);
 is(Unicode::Collate->Base_Unicode_Version, $Base_Unicode_Version);
 
 my $Collator = Unicode::Collate->new(
-  table => 'keys.txt',
-  normalization => undef,
-);
+    table => 'keys.txt',
+    normalization => undef,
+    );
 
 is($Collator->UCA_Version,   $UCA_Version);
 is($Collator->UCA_Version(), $UCA_Version);
@@ -44,9 +44,9 @@ is($Collator->version,   $Key_Version);
 is($Collator->version(), $Key_Version);
 
 my $UndefTable = Unicode::Collate->new(
-  table => undef,
-  normalization => undef,
-);
+    table => undef,
+    normalization => undef,
+    );
 
 is($UndefTable->UCA_Version,   $UCA_Version);
 is($UndefTable->UCA_Version(), $UCA_Version);

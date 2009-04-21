@@ -5,7 +5,7 @@ use Test::More;
 
 # NB. For PERL_CORE to be set, taint mode must not be enabled
 my $macrosall = env::var('PERL_CORE') ?? File::Spec->catfile( <qw(.. ext Sys Syslog macros.all))
-                                !! 'macros.all';
+    !! 'macros.all';
 open(my $macros_fh, "<", $macrosall) or plan skip_all => "can't read '$macrosall': $^OS_ERROR";
 my @names = map {chomp;$_}, @( ~< *$macros_fh);
 close($macros_fh);
@@ -23,7 +23,7 @@ like( $^EVAL_ERROR->{?description}, "/^Undefined subroutine/", "trying a non-exi
 # Testing all macros
 if((nelems @names)) {
     for my $name ( @names) {
-        SKIP: do {
+      SKIP: do {
             $name =~ m/^(\w+)$/ or skip "invalid name '$name'", 2;
             $name = $1;
             my $v = eval "$($callpack)::$name()";
@@ -34,7 +34,7 @@ if((nelems @names)) {
 
             } else {
                 like( $^EVAL_ERROR->{?description}, "/^Your vendor has not defined $testpack macro $name/", 
-                    "calling the constant via its name" );
+                      "calling the constant via its name" );
                 skip "irrelevant test in this case", 1
             }
         };

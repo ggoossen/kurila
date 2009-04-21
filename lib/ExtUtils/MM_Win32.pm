@@ -51,20 +51,20 @@ sub dlsyms($self,%< %attribs) {
     my(@m);
 
     if (not $self->{SKIPHASH}->{?'dynamic'}) {
-	push(@m,"
+        push(@m,"
 $self->{?BASEEXT}.def: Makefile.PL
 ",
-     q!	$(PERLRUN) -MExtUtils::Mksymlists \\
+            q!	$(PERLRUN) -MExtUtils::Mksymlists \\
      -e "Mksymlists('NAME'=>\"!, $self->{?NAME},
-     q!\", 'DLBASE' => '!,$self->{?DLBASE},
-     # The above two lines quoted differently to work around
-     # a bug in the 4DOS/4NT command line interpreter.  The visible
-     # result of the bug was files named q('extension_name',) *with the
-     # single quotes and the comma* in the extension build directories.
-     q!', 'DL_FUNCS' => !, <neatvalue($funcs),
-     q!, 'FUNCLIST' => !, <neatvalue($funclist),
-     q!, 'IMPORTS' => !, <neatvalue($imports),
-     q!, 'DL_VARS' => !, < neatvalue($vars), q!);"
+            q!\", 'DLBASE' => '!,$self->{?DLBASE},
+            # The above two lines quoted differently to work around
+            # a bug in the 4DOS/4NT command line interpreter.  The visible
+            # result of the bug was files named q('extension_name',) *with the
+            # single quotes and the comma* in the extension build directories.
+            q!', 'DL_FUNCS' => !, <neatvalue($funcs),
+            q!, 'FUNCLIST' => !, <neatvalue($funclist),
+            q!, 'IMPORTS' => !, <neatvalue($imports),
+            q!, 'DL_VARS' => !, < neatvalue($vars), q!);"
 !);
     }
     join('', @m);
@@ -95,19 +95,19 @@ used by default.
 
 sub maybe_command($self,$file) {
     my @e = defined(env::var('PATHEXT'))
-          ?? split(m/;/, env::var('PATHEXT'))
-	  !! qw(.com .exe .bat .cmd);
+        ?? split(m/;/, env::var('PATHEXT'))
+        !! qw(.com .exe .bat .cmd);
     my $e = '';
     for ( @e) { $e .= "\Q$_\E|" }
     chop $e;
     # see if file ends in one of the known extensions
     if ($file =~ m/($e)$/i) {
-	return $file if -e $file;
+        return $file if -e $file;
     }
     else {
-	for ( @e) {
-	    return "$file$_" if -e "$file$_";
-	}
+        for ( @e) {
+            return "$file$_" if -e "$file$_";
+        }
     }
     return;
 }
@@ -126,8 +126,8 @@ sub init_DIRFILESEP {
 
     # The ^ makes sure its not interpreted as an escape in nmake
     $self->{+DIRFILESEP} = $make eq 'nmake' ?? '^\' !!
-                          $make eq 'dmake' ?? '\\'
-                                           !! '\';
+    $make eq 'dmake' ?? '\\'
+        !! '\';
 }
 
 =item B<init_others>
@@ -161,8 +161,8 @@ sub init_others($self) {
     $self->{+DEV_NULL} ||= '> NUL';
 
     $self->{+FIXIN}    ||= $self->{?PERL_CORE} ?? 
-      "\$(PERLRUN) $self->{?PERL_SRC}/win32/bin/pl2bat.pl" !! 
-      'pl2bat.bat';
+    "\$(PERLRUN) $self->{?PERL_SRC}/win32/bin/pl2bat.pl" !! 
+        'pl2bat.bat';
 
     $self->{+LD}     ||= %Config{?ld} || 'link';
     $self->{+AR}     ||= %Config{?ar} || 'lib';
@@ -261,9 +261,9 @@ END
 MAKE_FRAG
 
     push @m,
-q{	$(AR) }.($BORLAND ?? '$@ $(OBJECT:^"+")'
-			  !! ($GCC ?? '-ru $@ $(OBJECT)'
-			          !! '-out:$@ $(OBJECT)')).q{
+        q{	$(AR) }.($BORLAND ?? '$@ $(OBJECT:^"+")'
+            !! ($GCC ?? '-ru $@ $(OBJECT)'
+         !! '-out:$@ $(OBJECT)')).q{
 	$(CHMOD) $(PERM_RWX) $@
 	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)\extralibs.ld
 };
@@ -293,15 +293,15 @@ sub dynamic_lib($self, %< %attribs) {
     my@($ldfrom) = '$(LDFROM)';
     my(@m);
 
-# one thing for GCC/Mingw32:
-# we try to overcome non-relocateable-DLL problems by generating
-#    a (hopefully unique) image-base from the dll's name
-# -- BKS, 10-19-1999
+    # one thing for GCC/Mingw32:
+    # we try to overcome non-relocateable-DLL problems by generating
+    #    a (hopefully unique) image-base from the dll's name
+    # -- BKS, 10-19-1999
     if ($GCC) { 
-	my $dllname = $self->{?BASEEXT} . "." . $self->{?DLEXT};
-	$dllname =~ m/(....)(.{0,4})/;
-	my $baseaddr = unpack("n", $1 ^^^ $2);
-	$otherldflags .= sprintf("-Wl,--image-base,0x\%x0000 ", $baseaddr);
+        my $dllname = $self->{?BASEEXT} . "." . $self->{?DLEXT};
+        $dllname =~ m/(....)(.{0,4})/;
+        my $baseaddr = unpack("n", $1 ^^^ $2);
+        $otherldflags .= sprintf("-Wl,--image-base,0x\%x0000 ", $baseaddr);
     }
 
     push(@m,'
@@ -313,32 +313,32 @@ INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
 $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
 ');
     if ($GCC) {
-      push(@m,  
-       q{	dlltool --def $(EXPORT_LIST) --output-exp dll.exp
+        push(@m,  
+            q{	dlltool --def $(EXPORT_LIST) --output-exp dll.exp
 	$(LD) -o $@ -Wl,--base-file -Wl,dll.base $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) $(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) dll.exp
 	dlltool --def $(EXPORT_LIST) --base-file dll.base --output-exp dll.exp
 	$(LD) -o $@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) $(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) dll.exp });
     } elsif ($BORLAND) {
-      push(@m,
-       q{	$(LD) $(LDDLFLAGS) $(OTHERLDFLAGS) }.$ldfrom.q{,$@,,}
-       .($self->make eq 'dmake' 
-                ?? q{$(PERL_ARCHIVE:s,/,\,) $(LDLOADLIBS:s,/,\,) }
-		 .q{$(MYEXTLIB:s,/,\,),$(EXPORT_LIST:s,/,\,)}
-		!! q{$(subst /,\,$(PERL_ARCHIVE)) $(subst /,\,$(LDLOADLIBS)) }
-		 .q{$(subst /,\,$(MYEXTLIB)),$(subst /,\,$(EXPORT_LIST))})
-       .q{,$(RESFILES)});
-    } else {	# VC
-      push(@m,
-       q{	$(LD) -out:$@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) }
-      .q{$(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) -def:$(EXPORT_LIST)});
-
-      # VS2005 (aka VC 8) or higher, but not for 64-bit compiler from Platform SDK
-      if (%Config{?ivsize} == 4 && %Config{?cc} eq 'cl' and %Config{?ccversion} =~ m/^(\d+)/ and $1 +>= 14) 
-    {
         push(@m,
-          q{
+            q{	$(LD) $(LDDLFLAGS) $(OTHERLDFLAGS) }.$ldfrom.q{,$@,,}
+            .($self->make eq 'dmake' 
+         ?? q{$(PERL_ARCHIVE:s,/,\,) $(LDLOADLIBS:s,/,\,) }
+         .q{$(MYEXTLIB:s,/,\,),$(EXPORT_LIST:s,/,\,)}
+         !! q{$(subst /,\,$(PERL_ARCHIVE)) $(subst /,\,$(LDLOADLIBS)) }
+         .q{$(subst /,\,$(MYEXTLIB)),$(subst /,\,$(EXPORT_LIST))})
+            .q{,$(RESFILES)});
+    } else {	# VC
+        push(@m,
+            q{	$(LD) -out:$@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) }
+            .q{$(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) -def:$(EXPORT_LIST)});
+
+        # VS2005 (aka VC 8) or higher, but not for 64-bit compiler from Platform SDK
+        if (%Config{?ivsize} == 4 && %Config{?cc} eq 'cl' and %Config{?ccversion} =~ m/^(\d+)/ and $1 +>= 14) 
+        {
+            push(@m,
+                q{
 	mt -nologo -manifest $@.manifest -outputresource:$@;2 && del $@.manifest});
-      }
+        }
     }
     push @m, '
 	$(CHMOD) $(PERM_RWX) $@

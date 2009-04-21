@@ -15,10 +15,10 @@ my $test = 4;
 # return from try {} should clear $@ correctly
 do {
     my $status = try {
-	try { die };
-	print $^STDOUT, "# eval \{ return \} test\n";
-	return; # removing this changes behavior
-    };
+            try { die };
+            print $^STDOUT, "# eval \{ return \} test\n";
+            return; # removing this changes behavior
+        };
     print $^STDOUT, "not " if $^EVAL_ERROR;
     print $^STDOUT, "ok $test\n";
     $test++;

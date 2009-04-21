@@ -6,8 +6,8 @@ use Config;
 
 BEGIN {
     unless (config_value('d_fork') or config_value('d_pseudofork')) {
-	print $^STDOUT, "1..0 # Skip: no fork\n";
-	exit 0;
+        print $^STDOUT, "1..0 # Skip: no fork\n";
+        exit 0;
     }
     env::var('PERL5LIB' ) = "../lib";
 }
@@ -31,15 +31,15 @@ my $test_fh;
 END { close $test_fh; unlink $tmpfile if $tmpfile; }
 
 $CAT = (($^OS_NAME eq 'MSWin32') 
-          ?? '.\perl -e "print \$^STDOUT, ~< *ARGV"'
-          !! (($^OS_NAME eq 'NetWare')
-          ?? 'perl -e "print \$^STDOUT, ~< *ARGV"'
-          !! 'cat'));
+        ?? '.\perl -e "print \$^STDOUT, ~< *ARGV"'
+        !! (($^OS_NAME eq 'NetWare')
+              ?? 'perl -e "print \$^STDOUT, ~< *ARGV"'
+              !! 'cat'));
 
 for ( @prgs){
     my $switch;
     if (s/^\s*(-\w.*)//){
-	$switch = $1;
+        $switch = $1;
     }
     my@($prog,$expected) =  split(m/\nEXPECT\n/, $_);
     $expected =~ s/\n+$//;
@@ -50,29 +50,29 @@ for ( @prgs){
     close $test_fh or die "Cannot close $tmpfile: $^OS_ERROR";
     my $results;
     if ($^OS_NAME eq 'MSWin32') {
-      $results = `.\\perl -I../lib $switch $tmpfile 2>&1`;
+        $results = `.\\perl -I../lib $switch $tmpfile 2>&1`;
     }
     elsif ($^OS_NAME eq 'NetWare') {
-      $results = `perl -I../lib $switch $tmpfile 2>&1`;
+        $results = `perl -I../lib $switch $tmpfile 2>&1`;
     }
     else {
-      $results = `./perl $switch $tmpfile 2>&1`;
+        $results = `./perl $switch $tmpfile 2>&1`;
     }
     $status = $^CHILD_ERROR;
     $results =~ s/\n+$//;
     $results =~ s/at\s+forktmp\d+\s+line/at - line/g;
     $results =~ s/of\s+forktmp\d+\s+aborted/of - aborted/g;
-# bison says 'parse error' instead of 'syntax error',
-# various yaccs may or may not capitalize 'syntax'.
+    # bison says 'parse error' instead of 'syntax error',
+    # various yaccs may or may not capitalize 'syntax'.
     $results =~ s/^(syntax|parse) error/syntax error/mig;
     $results =~ s/^\n*Process terminated by SIG\w+\n?//mg
-	if $^OS_NAME eq 'os2';
+        if $^OS_NAME eq 'os2';
     my @results = sort split m/\n/, $results;
     if ( "$(join ' ',@results)" ne "$(join ' ',@expected)" ) {
-	print $^STDERR, "PROG: $switch\n$prog\n";
-	print $^STDERR, "EXPECTED:\n$expected\n";
-	print $^STDERR, "GOT:\n$results\n";
-	print $^STDOUT, "not ";
+        print $^STDERR, "PROG: $switch\n$prog\n";
+        print $^STDERR, "EXPECTED:\n$expected\n";
+        print $^STDERR, "GOT:\n$results\n";
+        print $^STDOUT, "not ";
     }
     print $^STDOUT, "ok ", ++$i, "\n";
 }

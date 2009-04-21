@@ -1,7 +1,7 @@
 # Test problems in Makefile.PL's and hint files.
 
 BEGIN {
-  unshift $^INCLUDE_PATH, 'lib', '../../lib';
+    unshift $^INCLUDE_PATH, 'lib', '../../lib';
 }
 
 use Test::More tests => 6;
@@ -17,7 +17,7 @@ END {
 }
 
 ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
-  diag("chdir failed: $^OS_ERROR");
+    diag("chdir failed: $^OS_ERROR");
 
 
 # Make sure when Makefile.PL's break, they issue a warning.

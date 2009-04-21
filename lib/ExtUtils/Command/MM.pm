@@ -97,11 +97,11 @@ sub pod2man {
     my %options = %( () );
     Getopt::Long::config ('bundling_override');
     Getopt::Long::GetOptions (\%options, 
-                'section|s=s', 'release|r=s', 'center|c=s',
-                'date|d=s', 'fixed=s', 'fixedbold=s', 'fixeditalic=s',
-                'fixedbolditalic=s', 'official|o', 'quotes|q=s', 'lax|l',
-                'name|n=s', 'perm_rw:i'
-    );
+                              'section|s=s', 'release|r=s', 'center|c=s',
+                              'date|d=s', 'fixed=s', 'fixedbold=s', 'fixeditalic=s',
+                              'fixedbolditalic=s', 'official|o', 'quotes|q=s', 'lax|l',
+                              'name|n=s', 'perm_rw:i'
+                              );
 
     # If there's no files, don't bother going further.
     return 0 unless (nelems @ARGV);
@@ -126,11 +126,11 @@ sub pod2man {
 
         my $parser = Pod::Man->new(< %options);
         $parser->parse_from_file($pod, $man)
-          or do { warn("Could not install $man\n");  next };
+            or do { warn("Could not install $man\n");  next };
 
         if (length %options{?perm_rw}) {
             chmod(oct(%options{?perm_rw}), $man)
-              or do { warn("chmod %options{?perm_rw} $man: $^OS_ERROR\n"); next };
+                or do { warn("chmod %options{?perm_rw} $man: $^OS_ERROR\n"); next };
         }
     } while (nelems @ARGV);
 
@@ -192,7 +192,7 @@ sub perllocal_install {
     # VMS feeds args as a piped file on STDIN since it usually can't
     # fit all the args on a single command line.
     my @mod_info = @( $Is_VMS ?? < split m/\|/, ~< $^STDIN
-                           !! < @ARGV );
+                      !! < @ARGV );
 
     my $pod;
     $pod = sprintf <<POD, scalar localtime;

@@ -1,8 +1,8 @@
 #!./perl
 
 BEGIN {
-require "utf8.pm";
-require "utf8_heavy.pl";
+    require "utf8.pm";
+    require "utf8_heavy.pl";
 }
 
 # my $c = 1;
@@ -20,9 +20,9 @@ require "utf8_heavy.pl";
 # __END__
 our $skip_amp = 1;
 for my $file (@('./op/regexp.t', './t/op/regexp.t', ':op:regexp.t')) {
-  if (-r $file) {
-    do $file or die $^EVAL_ERROR;
-    exit;
-  }
+    if (-r $file) {
+        do $file or die $^EVAL_ERROR;
+        exit;
+    }
 }
 die "Cannot find ./op/regexp.t or ./t/op/regexp.t\n";

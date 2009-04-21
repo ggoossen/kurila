@@ -208,7 +208,7 @@ sub expected_tests {
 
     if( (nelems @_) ) {
         die("Number of tests must be a positive integer.  You gave it '$max'")
-          unless $max =~ m/^\+?\d+$/ and $max +> 0;
+            unless $max =~ m/^\+?\d+$/ and $max +> 0;
 
         $self->{+Expected_Tests} = $max;
         $self->{+Have_Plan}      = 1;
@@ -332,7 +332,7 @@ sub ok($self, $test, ?$name) {
 ERR
 
     my $todo = $self->todo();
-    
+
     # Capture the value of $TODO for the rest of this ok() call
     # so it can more easily be found by other routines.
     local $self->{+TODO} = $todo;
@@ -342,10 +342,10 @@ ERR
 
     unless( $test ) {
         $out .= "not ";
-         %$result{[@('ok', 'actual_ok') ]} = @( ( $todo ?? 1 !! 0 ), 0 );
+            %$result{[@('ok', 'actual_ok') ]} = @( ( $todo ?? 1 !! 0 ), 0 );
     }
     else { 
-        %$result{[@('ok', 'actual_ok') ]} = @( 1, $test );
+            %$result{[@('ok', 'actual_ok') ]} = @( 1, $test );
     }
 
     $out .= "ok";
@@ -379,7 +379,7 @@ ERR
         my $msg = $todo ?? "Failed (TODO)" !! "Failed";
         $self->_print_diag("\n") if env::var('HARNESS_ACTIVE');
 
-    my@(_, $file, $line, ...) =  $self->caller;
+        my@(_, $file, $line, ...) =  $self->caller;
         if( defined $name ) {
             $self->diag(qq[  $msg test '$name'\n]);
             $self->diag(qq[  at $file line $line.\n]);
@@ -571,13 +571,13 @@ Works just like Test::More's cmp_ok().
 
 
 my %numeric_cmps = %( < @+: map { @($_, 1) }, 
- @(                       ("<",  "<=", ">",  ">=", "==", "!=", "<=>")) );
+        @(                       ("<",  "<=", ">",  ">=", "==", "!=", "<=>")) );
 
 sub cmp_ok($self, $got, $type, $expect, ?$name) {
 
     my $test;
     do {
-        local($^EVAL_ERROR,$^OS_ERROR);  # isolate eval
+              local($^EVAL_ERROR,$^OS_ERROR);  # isolate eval
 
         my $code = $self->_caller_context;
 
@@ -603,10 +603,10 @@ $code" . "\$got $type \$expect;";
 }
 
 sub _cmp_diag($self, $got, $type, $expect) {
-    
+
     $got    = dump::view($got);
     $expect = dump::view($expect);
-    
+
     local $Level = $Level + 1;
     return $self->diag(sprintf <<DIAGNOSTIC, $got, $type, $expect);
     \%s
@@ -681,12 +681,12 @@ sub skip($self, $why) {
     $self->{+Curr_Test}++;
 
     $self->{Test_Results}->[+$self->{?Curr_Test}-1] = &share(\%(
-        'ok'      => 1,
-        actual_ok => 1,
-        name      => '',
-        type      => 'skip',
-        reason    => $why,
-    ));
+                                                                 'ok'      => 1,
+                                                                     actual_ok => 1,
+                                                                     name      => '',
+                                                                     type      => 'skip',
+                                                                     reason    => $why,
+                                                             ));
 
     my $out = "ok";
     $out   .= " $self->{?Curr_Test}" if $self->use_numbers;
@@ -721,12 +721,12 @@ sub todo_skip($self, $why) {
     $self->{+Curr_Test}++;
 
     $self->{Test_Results}->[+$self->{?Curr_Test}-1] = &share(\%(
-        'ok'      => 1,
-        actual_ok => 0,
-        name      => '',
-        type      => 'todo_skip',
-        reason    => $why,
-    ));
+                                                                 'ok'      => 1,
+                                                                     actual_ok => 0,
+                                                                     name      => '',
+                                                                     type      => 'todo_skip',
+                                                                     reason    => $why,
+                                                             ));
 
     my $out = "not ok";
     $out   .= " $self->{?Curr_Test}" if $self->use_numbers;
@@ -804,11 +804,11 @@ sub maybe_regex($self, $regex) {
     }
     # Check for '/foo/' or 'm,foo,'
     elsif( @(?$re, ?$opts)        = @($regex =~ m{^ /(.*)/ (\w*) $ }sx)           or
-           @(?_, ?$re, ?$opts) = @: $regex =~ m,^ m([^\w\s]) (.+) \1 (\w*) $,sx
-         )
-    {
-        $usable_regex = length $opts ?? "(?$opts)$re" !! $re;
-    }
+        @(?_, ?$re, ?$opts) = @: $regex =~ m,^ m([^\w\s]) (.+) \1 (\w*) $,sx
+    )
+        {
+            $usable_regex = length $opts ?? "(?$opts)$re" !! $re;
+        }
 
     return $usable_regex;
 }
@@ -816,7 +816,7 @@ sub maybe_regex($self, $regex) {
 
 sub _is_qr {
     my $regex = shift;
-    
+
     # is_regexp() checks for regexes in a robust manner, say if they're
     # blessed.
     return re::is_regexp($regex) if defined &re::is_regexp;
@@ -875,11 +875,11 @@ It is suggested you use this in place of eval BLOCK.
 =cut
 
 sub _try($self, $code) {
-    
+
     local $^OS_ERROR = undef;               # eval can mess up $!
     local $^EVAL_ERROR = undef;               # don't set $@ in the test
     my $return = try { $code->() };
-    
+
     return $return;
 }
 
@@ -903,8 +903,8 @@ sub is_fh {
     return 1 if ref \$maybe_fh eq 'GLOB'; # its a glob
 
     return try { $maybe_fh->isa("IO::Handle") } ||
-           # 5.5.4's tied() and can() doesn't like getting undef
-           try { (tied($maybe_fh) || '')->can('TIEHANDLE') };
+        # 5.5.4's tied() and can() doesn't like getting undef
+        try { (tied($maybe_fh) || '')->can('TIEHANDLE') };
 }
 
 
@@ -1008,13 +1008,13 @@ foreach my $attribute (qw(No_Header No_Ending No_Diag)) {
     my $method = lc $attribute;
 
     my $code = sub {
-        my@($self, ?$no) =  @_;
+            my@($self, ?$no) =  @_;
 
-        if( defined $no ) {
-            $self->{+$attribute} = $no;
-        }
-        return $self->{?$attribute};
-    };
+            if( defined $no ) {
+                $self->{+$attribute} = $no;
+            }
+            return $self->{?$attribute};
+        };
 
     *{Symbol::fetch_glob(__PACKAGE__.'::'.$method)} = $code;
 }
@@ -1266,9 +1266,9 @@ sub _dup_stdhandles {
 my $Opened_Testhandles = 0;
 sub _open_testhandles {
     my $self = shift;
-    
+
     return if $Opened_Testhandles;
-    
+
     # We dup STDOUT and STDERR so people can change them in their
     # test suites while still getting normal test output.
     open($Testout, ">&", $^STDOUT) or die "Can't dup STDOUT:  $^OS_ERROR";
@@ -1279,13 +1279,13 @@ sub _open_testhandles {
 
 
 sub _copy_io_layers($self, $src, $dest) {
-    
+
     $self->_try(sub {
-        require PerlIO;
-        my @layers = PerlIO::get_layers($src);
-        
-        binmode $dest, join " ", map { ":$_" }, @layers if (nelems @layers);
-    });
+            require PerlIO;
+            my @layers = PerlIO::get_layers($src);
+
+            binmode $dest, join " ", map { ":$_" }, @layers if (nelems @layers);
+        });
 }
 
 sub _plan_check {
@@ -1334,12 +1334,12 @@ sub current_test($self ?= $num) {
             my $start = (nelems @$test_results) ?? (nelems @$test_results) !! 0;
             for ($start..$num-1) {
                 $test_results->[+$_] = &share(\%(
-                    'ok'      => 1, 
-                    actual_ok => undef, 
-                    reason    => 'incrementing test number', 
-                    type      => 'unknown', 
-                    name      => undef 
-                ));
+                                                  'ok'      => 1, 
+                                                      actual_ok => undef, 
+                                                      reason    => 'incrementing test number', 
+                                                      type      => 'unknown', 
+                                                      name      => undef 
+                                              ));
             }
         }
         # If backward, wipe history.  Its their funeral.
@@ -1451,7 +1451,7 @@ sub todo($self, ?$package) {
     return 0 unless $package;
 
     return defined ${*{Symbol::fetch_glob($package.'::TODO')}} ?? ${*{Symbol::fetch_glob($package.'::TODO')}}
-                                     !! 0;
+        !! 0;
 }
 
 =item B<caller>
@@ -1497,9 +1497,9 @@ sub _sanity_check {
 
     $self->_whoa($self->{?Curr_Test} +< 0,  'Says here you ran a negative number of tests!');
     $self->_whoa((!$self->{?Have_Plan} and $self->{?Curr_Test}),
-          'Somehow your tests ran without a plan!');
+        'Somehow your tests ran without a plan!');
     $self->_whoa($self->{?Curr_Test} != nelems @{ $self->{?Test_Results} },
-          'Somehow you got a different number of results than tests ran!');
+        'Somehow you got a different number of results than tests ran!');
 }
 
 =item B<_whoa>
@@ -1557,7 +1557,7 @@ sub _ending {
     if( $self->{?Original_Pid} != $^PID ) {
         return;
     }
-    
+
     # Exit if plan() was never called.  This is so "require Test::Simple" 
     # doesn't puke.
     if( !$self->{?Have_Plan} ) {
@@ -1584,7 +1584,7 @@ sub _ending {
         my $empty_result = &share(\%());
         for my $idx ( 0..$self->{?Expected_Tests}-1 ) {
             $test_results->[+$idx] = $empty_result
-              unless defined $test_results->[?$idx];
+                unless defined $test_results->[?$idx];
         }
 
         my $num_failed = nelems( grep { !$_->{?'ok'} },

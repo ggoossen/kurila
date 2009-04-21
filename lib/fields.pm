@@ -2,9 +2,9 @@ package fields;
 
 unless( eval q{require warnings::register; warnings::register->import; 1} ) {
     *warnings::warnif = sub { 
-        require Carp;
-        Carp::carp(< @_);
-    }
+            require Carp;
+            Carp::carp(< @_);
+        }
 }
 our (%attr, $VERSION);
 
@@ -115,9 +115,9 @@ sub new {
 
 sub _accessible_keys($class) {
     return  @( <
-        keys %{*{Symbol::fetch_glob($class.'::FIELDS')}},
-        < @+: map( { _accessible_keys($_) }, @{*{Symbol::fetch_glob($class.'::ISA')}}),
-    );
+               keys %{*{Symbol::fetch_glob($class.'::FIELDS')}},
+               < @+: map( { _accessible_keys($_) }, @{*{Symbol::fetch_glob($class.'::ISA')}}),
+        );
 }
 
 sub phash {

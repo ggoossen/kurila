@@ -1,6 +1,6 @@
 BEGIN {
     if (env::var('PERL_CORE')) {
-	push $^INCLUDE_PATH, "lib/compress";
+        push $^INCLUDE_PATH, "lib/compress";
     }
 }
 
@@ -43,18 +43,18 @@ for my $i (1 .. 13)
 
     my $hello = "I am a HAL 9000 computer" x 2001;
     my $tmp = $hello ;
-    
+
     my @hello = @();
     push @hello, $1 
-	while $tmp =~ s/^(.\{$i\})//;
+        while $tmp =~ s/^(.\{$i\})//;
     push @hello, $tmp if length $tmp ;
 
     my ($err, $x, $X, $status); 
- 
+
     ok( @($x, $err) =  Compress::Raw::Zlib::Deflate->new(AppendOutput => 1));
     ok $x ;
     cmp_ok $err, '==', Z_OK, "  status is Z_OK" ;
- 
+
     ok ! defined $x->msg(), "  no msg" ;
     is $x->total_in(), 0, "  total_in == 0" ;
     is $x->total_out(), 0, "  total_out == 0" ;
@@ -64,26 +64,26 @@ for my $i (1 .. 13)
     {
         $status = $x->deflate($_, $out) ;
         last unless $status == Z_OK ;
-     
+
     }
     cmp_ok $status, '==', Z_OK, "  status is Z_OK" ;
-    
+
     cmp_ok $x->flush($out), '==', Z_OK, "  flush returned Z_OK" ;
-     
+
     ok ! defined $x->msg(), "  no msg"  ;
     is $x->total_in(), length $hello, "  length total_in" ;
     is $x->total_out(), length $out, "  length total_out" ;
-     
+
     my @Answer = @();
     $tmp = $out;
     push @Answer, $1 while $tmp =~ s/^(.\{$i\})//;
     push @Answer, $tmp if length $tmp ;
-     
+
     my $k;
     ok(@($k, $err) =  Compress::Raw::Zlib::Inflate->new( AppendOutput => 1));
     ok $k ;
     cmp_ok $err, '==', Z_OK, "  status is Z_OK" ;
- 
+
     ok ! defined $k->msg(), "  no msg" ;
     is $k->total_in(), 0, "  total_in == 0" ;
     is $k->total_out(), 0, "  total_out == 0" ;
@@ -94,9 +94,9 @@ for my $i (1 .. 13)
     {
         $status = $k->inflate($_, $GOT) ;
         last if $status == Z_STREAM_END or $status != Z_OK ;
-     
+
     }
-     
+
     cmp_ok $status, '==', Z_STREAM_END, "  status is Z_STREAM_END" ;
     is $GOT, $hello, "  got expected output" ;
     ok ! defined $k->msg(), "  no msg" ;

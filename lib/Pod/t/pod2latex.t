@@ -21,7 +21,7 @@ my $linkver = $Pod::ParseUtils::VERSION;
 
 # Set up an END block to remove the test output file
 END {
-  unlink "test.tex";
+    unlink "test.tex";
 };
 
 ok(1);
@@ -31,8 +31,8 @@ ok(1);
 # Do this until we read an =pod
 my @reference;
 while (my $line = ~< *DATA) {
-  last if $line =~ m/^=pod/;
-  push(@reference,$line);
+    last if $line =~ m/^=pod/;
+    push(@reference,$line);
 }
 
 # Create a new parser
@@ -61,17 +61,17 @@ my @output = @( ~< $infh );
 
 is((nelems @output), nelems @reference);
 for my $i (0..((nelems @reference)-1)) {
-  next if @reference[$i] =~ m/^%%/; # skip timestamp comments
+    next if @reference[$i] =~ m/^%%/; # skip timestamp comments
 
-  # if we are running a new version of Pod::ParseUtils we need
-  # to change the link text. This is a kluge until we drop support
-  # for older versions of Pod::ParseUtils
-  if ($linkver +< 0.29 && @output[$i] =~ m/manpage/) {
-    # convert our expectations from new to old new format 
-    @reference[$i] =~ s/Standard link: \\emph\{Pod::LaTeX\}/Standard link: the \\emph\{Pod::LaTeX\} manpage/;
-    @reference[$i] =~ s/\\textsf\{sec\} in \\emph\{Pod::LaTeX\}/the section on \\textsf\{sec\} in the \\emph\{Pod::LaTeX\} manpage/;
-  }
-  is(@output[$i], @reference[$i]);
+    # if we are running a new version of Pod::ParseUtils we need
+    # to change the link text. This is a kluge until we drop support
+    # for older versions of Pod::ParseUtils
+    if ($linkver +< 0.29 && @output[$i] =~ m/manpage/) {
+        # convert our expectations from new to old new format 
+        @reference[$i] =~ s/Standard link: \\emph\{Pod::LaTeX\}/Standard link: the \\emph\{Pod::LaTeX\} manpage/;
+        @reference[$i] =~ s/\\textsf\{sec\} in \\emph\{Pod::LaTeX\}/the section on \\textsf\{sec\} in the \\emph\{Pod::LaTeX\} manpage/;
+    }
+    is(@output[$i], @reference[$i]);
 }
 
 close($infh) or die "Error closing INFH test.tex: $^OS_ERROR\n";

@@ -51,11 +51,11 @@ BEGIN { use_ok('Yup') }
 
 BEGIN {
     if ($^OS_NAME eq 'MacOS') {
-	for (@($Lib_Dir, $Arch_Dir)) {
-	    s|/|:|g;
-	    $_ .= ":" unless m/:$/;
-	    $_ = ":$_" unless m/^:/; # we know this path is relative
-	}
+        for (@($Lib_Dir, $Arch_Dir)) {
+            s|/|:|g;
+            $_ .= ":" unless m/:$/;
+            $_ = ":$_" unless m/^:/; # we know this path is relative
+        }
     }
     is( $^INCLUDE_PATH[1], $Lib_Dir,          'lib adding at end of $^INCLUDE_PATH' );
     is( $^INCLUDE_PATH[0], $Arch_Dir,        '    auto/ dir in front of that' );
@@ -65,7 +65,7 @@ BEGIN {
     # Not on Mac OS, it doesn't ... it never has, at least.
     my $path = join("/", @($Lib_Dir, 'Yup.pm'));
     if ($^OS_NAME eq 'MacOS') {
-	$path = $Lib_Dir . 'Yup.pm';
+        $path = $Lib_Dir . 'Yup.pm';
     }
     is( $^INCLUDED{?'Yup.pm'}, $path,    '$^INCLUDED set properly' );
 
@@ -80,7 +80,7 @@ BEGIN {
 no lib $Lib_Dir;
 
 unlike( do { eval 'use lib config_value("installsitelib");'; $^EVAL_ERROR || '' },
-	qr/::Config is read-only/, 'lib handles readonly stuff' );
+qr/::Config is read-only/, 'lib handles readonly stuff' );
 
 BEGIN {
     is( nelems(grep( {m/stuff/ },$^INCLUDE_PATH)), 0, 'no lib' );

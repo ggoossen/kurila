@@ -44,7 +44,7 @@ close $^STDOUT;
 open $^STDOUT, '>>', \$stdout or die;
 pm_to_blib( \%( 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
             'blib/lib/auto'
-          );
+            );
 END { rmtree 'blib' }
 
 ok( -d 'blib/lib',              'pm_to_blib created blib dir' );
@@ -55,7 +55,7 @@ $stdout = '';
 
 pm_to_blib( \%( 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
             'blib/lib/auto'
-          );
+            );
 ok( -d 'blib/lib',              'second run, blib dir still there' );
 ok( -r 'blib/lib/Big/Dummy.pm', '  .pm file still there' );
 ok( -r 'blib/lib/auto',         '  autosplit still there' );
@@ -63,18 +63,18 @@ is( $stdout, "Skip blib/lib/Big/Dummy.pm (unchanged)\n" );
 $stdout = '';
 
 install( \%( 'blib/lib' => 'install-test/lib/perl',
-           read   => 'install-test/packlist',
-           write  => 'install-test/packlist'
+             read   => 'install-test/packlist',
+                 write  => 'install-test/packlist'
          ),
-       0, 1);
+         0, 1);
 ok( ! -d 'install-test/lib/perl',        'install made dir (dry run)');
 ok( ! -r 'install-test/lib/perl/Big/Dummy.pm',
-                                         '  .pm file installed (dry run)');
+    '  .pm file installed (dry run)');
 ok( ! -r 'install-test/packlist',        '  packlist exists (dry run)');
 
 install( \%( 'blib/lib' => 'install-test/lib/perl',
-           read   => 'install-test/packlist',
-           write  => 'install-test/packlist'
+             read   => 'install-test/packlist',
+                 write  => 'install-test/packlist'
          ) );
 ok( -d 'install-test/lib/perl',                 'install made dir' );
 ok( -r 'install-test/lib/perl/Big/Dummy.pm',    '  .pm file installed' );
@@ -94,10 +94,10 @@ is( lc((keys %packlist)[0]), lc $native_dummy, 'packlist written' );
 
 # Test UNINST=1 preserving same versions in other dirs.
 install( \%( 'blib/lib' => 'install-test/other_lib/perl',
-           read   => 'install-test/packlist',
-           write  => 'install-test/packlist'
+             read   => 'install-test/packlist',
+                 write  => 'install-test/packlist'
          ),
-       0, 0, 1);
+         0, 0, 1);
 ok( -d 'install-test/other_lib/perl',        'install made other dir' );
 ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
 ok( -r 'install-test/packlist',              '  packlist exists' );
@@ -112,82 +112,82 @@ close $dummy;
 
 # Test UNINST=0 does not remove other versions in other dirs.
 do {
-  ok( -r 'install-test/lib/perl/Big/Dummy.pm', 'different install exists' );
+    ok( -r 'install-test/lib/perl/Big/Dummy.pm', 'different install exists' );
 
-  local $^INCLUDE_PATH = @('install-test/lib/perl');
-  local env::var('PERL5LIB' ) = '';
-  install( \%( 'blib/lib' => 'install-test/other_lib/perl',
-           read   => 'install-test/packlist',
-           write  => 'install-test/packlist'
-         ),
-       0, 0, 0);
-  ok( -d 'install-test/other_lib/perl',        'install made other dir' );
-  ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
-  ok( -r 'install-test/packlist',              '  packlist exists' );
-  ok( -r 'install-test/lib/perl/Big/Dummy.pm',
-                                             '  UNINST=0 left different' );
+    local $^INCLUDE_PATH = @('install-test/lib/perl');
+    local env::var('PERL5LIB' ) = '';
+    install( \%( 'blib/lib' => 'install-test/other_lib/perl',
+               read   => 'install-test/packlist',
+                   write  => 'install-test/packlist'
+           ),
+           0, 0, 0);
+    ok( -d 'install-test/other_lib/perl',        'install made other dir' );
+    ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
+    ok( -r 'install-test/packlist',              '  packlist exists' );
+    ok( -r 'install-test/lib/perl/Big/Dummy.pm',
+      '  UNINST=0 left different' );
 };
 
 # Test UNINST=1 only warning when failing to remove an irrelevent shadow file
 do {
-  my $tfile='install-test/lib/perl/Big/Dummy.pm';
-  local $ExtUtils::Install::Testing = $tfile; 
-  local $^INCLUDE_PATH = @('install-test/other_lib/perl','install-test/lib/perl');
-  local env::var('PERL5LIB' ) = '';
-  ok( -r $tfile, 'different install exists' );
-  my @warn;
-  local $^WARN_HOOK =sub { push @warn, @_[0]->message; return };
-  install( \%( 'blib/lib' => 'install-test/other_lib/perl',
+    my $tfile='install-test/lib/perl/Big/Dummy.pm';
+    local $ExtUtils::Install::Testing = $tfile; 
+    local $^INCLUDE_PATH = @('install-test/other_lib/perl','install-test/lib/perl');
+    local env::var('PERL5LIB' ) = '';
+    ok( -r $tfile, 'different install exists' );
+    my @warn;
+    local $^WARN_HOOK =sub { push @warn, @_[0]->message; return };
+    install( \%( 'blib/lib' => 'install-test/other_lib/perl',
                read   => 'install-test/packlist',
-               write  => 'install-test/packlist'
-             ),
+                   write  => 'install-test/packlist'
+           ),
            0, 0, 1);
-  ok(0+nelems @warn,"  we did warn");
-  ok( -d 'install-test/other_lib/perl',        'install made other dir' );
-  ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
-  ok( -r 'install-test/packlist',              '  packlist exists' );
-  ok( -r $tfile, '  UNINST=1 failed to remove different' );
-  
+    ok(0+nelems @warn,"  we did warn");
+    ok( -d 'install-test/other_lib/perl',        'install made other dir' );
+    ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
+    ok( -r 'install-test/packlist',              '  packlist exists' );
+    ok( -r $tfile, '  UNINST=1 failed to remove different' );
+
 };
 
 # Test UNINST=1 dieing when failing to remove an relevent shadow file
 do {
-  my $tfile='install-test/lib/perl/Big/Dummy.pm';
-  local $ExtUtils::Install::Testing = $tfile;
-  local $^INCLUDE_PATH = @('install-test/lib/perl','install-test/other_lib/perl');
-  local env::var('PERL5LIB' ) = '';
-  ok( -r $tfile, 'different install exists' );
-  my @warn;
-  local $^WARN_HOOK =sub { push @warn, <@_[0]->message; return };
-  my $ok=try {
-    install( \%( 'blib/lib' => 'install-test/other_lib/perl',
-           read   => 'install-test/packlist',
-           write  => 'install-test/packlist'
-         ),
-       0, 0, 1);
-    1
-  };
-  ok(!$ok,'  we did die');
-  ok(!nelems @warn,"  we didnt warn");
-  ok( -d 'install-test/other_lib/perl',        'install made other dir' );
-  ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
-  ok( -r 'install-test/packlist',              '  packlist exists' );
-  ok( -r $tfile,'  UNINST=1 failed to remove different' );
+    my $tfile='install-test/lib/perl/Big/Dummy.pm';
+    local $ExtUtils::Install::Testing = $tfile;
+    local $^INCLUDE_PATH = @('install-test/lib/perl','install-test/other_lib/perl');
+    local env::var('PERL5LIB' ) = '';
+    ok( -r $tfile, 'different install exists' );
+    my @warn;
+    local $^WARN_HOOK =sub { push @warn, <@_[0]->message; return };
+    my $ok=try {
+            install( \%( 'blib/lib' => 'install-test/other_lib/perl',
+                 read   => 'install-test/packlist',
+                     write  => 'install-test/packlist'
+             ),
+             0, 0, 1);
+            1
+        };
+    ok(!$ok,'  we did die');
+    ok(!nelems @warn,"  we didnt warn");
+    ok( -d 'install-test/other_lib/perl',        'install made other dir' );
+    ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
+    ok( -r 'install-test/packlist',              '  packlist exists' );
+    ok( -r $tfile,'  UNINST=1 failed to remove different' );
 };
 
 # Test UNINST=1 removing other versions in other dirs.
 do {
-  local $^INCLUDE_PATH = @('install-test/lib/perl');
-  local env::var('PERL5LIB' ) = '';
-  install( \%( 'blib/lib' => 'install-test/other_lib/perl',
-           read   => 'install-test/packlist',
-           write  => 'install-test/packlist'
-         ),
-       0, 0, 1);
-  ok( -d 'install-test/other_lib/perl',        'install made other dir' );
-  ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
-  ok( -r 'install-test/packlist',              '  packlist exists' );
-  ok( !-r 'install-test/lib/perl/Big/Dummy.pm',
-                                             '  UNINST=1 removed different' );
+    local $^INCLUDE_PATH = @('install-test/lib/perl');
+    local env::var('PERL5LIB' ) = '';
+    install( \%( 'blib/lib' => 'install-test/other_lib/perl',
+               read   => 'install-test/packlist',
+                   write  => 'install-test/packlist'
+           ),
+           0, 0, 1);
+    ok( -d 'install-test/other_lib/perl',        'install made other dir' );
+    ok( -r 'install-test/other_lib/perl/Big/Dummy.pm', '  .pm file installed' );
+    ok( -r 'install-test/packlist',              '  packlist exists' );
+    ok( !-r 'install-test/lib/perl/Big/Dummy.pm',
+      '  UNINST=1 removed different' );
 };
 

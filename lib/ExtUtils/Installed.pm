@@ -43,9 +43,9 @@ sub _is_doc($self, $path) {
     my $man1dir = $self->{':private:'}->{Config}->{?man1direxp};
     my $man3dir = $self->{':private:'}->{Config}->{?man3direxp};
     return ($man1dir && $self->_is_prefix($path, $man1dir))
-           ||
-           ($man3dir && $self->_is_prefix($path, $man3dir))
-           ?? 1 !! 0;
+        ||
+        ($man3dir && $self->_is_prefix($path, $man3dir))
+        ?? 1 !! 0;
 }
 
 sub _is_type($self, $path, $type) {
@@ -55,9 +55,9 @@ sub _is_type($self, $path, $type) {
 
     if ($type eq "prog") {
         return ($self->_is_prefix($path, $self->{':private:'}->{Config}->{?prefix} || $self->{':private:'}->{Config}->{prefixexp})
-               &&
-               !($self->_is_doc($path))
-               ?? 1 !! 0);
+                &&
+                !($self->_is_doc($path))
+                ?? 1 !! 0);
     }
     return 0;
 }
@@ -78,8 +78,8 @@ sub new {
     my %args = %( < @_ );
 
     my $self = \%( ':private:' => \%(),
-                   'Perl' => \%(),
-               );
+            'Perl' => \%(),
+        );
 
     if (%args{?config_override}) {
         try {
@@ -90,11 +90,11 @@ sub new {
     }
     else {
         $self->{':private:'}->{+Config} = \%:<
-          @+: map { @($_ => config_value($_)) }, config_keys();
+            @+: map { @($_ => config_value($_)) }, config_keys();
     }
-    
+
     for my $tuple (@(\@(inc_override => INC => \$($^INCLUDE_PATH) ),
-                   \@( extra_libs => EXTRA => \@() ))) 
+                     \@( extra_libs => EXTRA => \@() ))) 
     {
         my @($arg,$key,$val)= @$tuple;
         if ( %args{?$arg} ) {
@@ -111,16 +111,16 @@ sub new {
     do {
         my %dupe;
         @{$self->{':private:'}->{INC}} = grep { -e $_ && !%dupe{+$_}++ },
-          @: < @{$self->{':private:'}->{?INC}}, < @{$self->{':private:'}->{?EXTRA}};
+            @: < @{$self->{':private:'}->{?INC}}, < @{$self->{':private:'}->{?EXTRA}};
     };
     my $perl5lib = defined env::var('PERL5LIB') ?? env::var('PERL5LIB') !! "";
 
     my @dirs = @( $self->{':private:'}->{Config}->{?archlibexp},
-                 $self->{':private:'}->{Config}->{?sitearchexp},
-                 < split(m/\Q$(config_value("path_sep"))\E/, $perl5lib),
-                 < @{$self->{':private:'}->{?EXTRA}},
-               );
-    
+                  $self->{':private:'}->{Config}->{?sitearchexp},
+                  < split(m/\Q$(config_value("path_sep"))\E/, $perl5lib),
+                  < @{$self->{':private:'}->{?EXTRA}},
+        );
+
     # File::Find does not know how to deal with VMS filepaths.
     if( $Is_VMS ) {
         $_ = VMS::Filespec::unixify($_) 
@@ -131,48 +131,48 @@ sub new {
         s|\\|/|g for  @dirs;
     }
     my $archlib = @dirs[0];
-    
+
     # Read the core packlist
     $self->{Perl}->{+packlist} =
-      ExtUtils::Packlist->new( File::Spec->catfile($archlib, '.packlist') );
+    ExtUtils::Packlist->new( File::Spec->catfile($archlib, '.packlist') );
     $self->{Perl}->{+version} = $self->{':private:'}->{Config}->{?version};
 
     # Read the module packlists
     my $sub = sub {
-        # Only process module .packlists
-        return if $_ ne ".packlist" || $File::Find::dir eq $archlib;
+            # Only process module .packlists
+            return if $_ ne ".packlist" || $File::Find::dir eq $archlib;
 
-        # Hack of the leading bits of the paths & convert to a module name
-        my $module = $File::Find::name;
-        my $found;
-        for ( @dirs) {
-            $found = $module =~ s!\Q$_\E/?auto/(.*)/.packlist!$1!s
-                and last;
-        }            
-        unless ($found) {
-            # warn "Woah! \$_=$_\n\$module=$module\n\$File::Find::dir=$File::Find::dir\n",
-            #    join ("\n",@dirs);
-            return;
-        }            
-        my $modfile = "$module.pm";
-        $module =~ s!/!::!g;
+            # Hack of the leading bits of the paths & convert to a module name
+            my $module = $File::Find::name;
+            my $found;
+            for ( @dirs) {
+                $found = $module =~ s!\Q$_\E/?auto/(.*)/.packlist!$1!s
+                    and last;
+            }            
+            unless ($found) {
+                # warn "Woah! \$_=$_\n\$module=$module\n\$File::Find::dir=$File::Find::dir\n",
+                #    join ("\n",@dirs);
+                return;
+            }            
+            my $modfile = "$module.pm";
+            $module =~ s!/!::!g;
 
-        # Find the top-level module file in $^INCLUDE_PATH
-        $self->{+$module}->{+version} = '';
-        foreach my $dir ( @{$self->{':private:'}->{INC}} ) {
-            my $p = File::Spec->catfile($dir, $modfile);
-            if (-r $p) {
-                $module = _module_name($p, $module) if $Is_VMS;
+            # Find the top-level module file in $^INCLUDE_PATH
+            $self->{+$module}->{+version} = '';
+            foreach my $dir ( @{$self->{':private:'}->{INC}} ) {
+                my $p = File::Spec->catfile($dir, $modfile);
+                if (-r $p) {
+                    $module = _module_name($p, $module) if $Is_VMS;
 
-                $self->{$module}->{+version} = MM->parse_version($p);
-                last;
+                    $self->{$module}->{+version} = MM->parse_version($p);
+                    last;
+                }
             }
-        }
 
-        # Read the .packlist
-        $self->{$module}->{+packlist} =
-          ExtUtils::Packlist->new($File::Find::name);
-    };
+            # Read the .packlist
+            $self->{$module}->{+packlist} =
+            ExtUtils::Packlist->new($File::Find::name);
+        };
     my %dupe;
     @dirs= grep { -e $_ && !%dupe{+$_}++ }, @dirs;
     $self->{':private:'}->{+LIBDIRS} = \@dirs;    
@@ -203,7 +203,7 @@ sub _module_name($file, $orig_module) {
     }
 
     print $^STDERR, "Couldn't figure out the package name for $file\n"
-      unless $module;
+        unless $module;
 
     return $module;
 }
@@ -227,7 +227,7 @@ sub files($self, $module, ?$type, @< @under) {
     my (@files);
     foreach my $file (keys(%{$self->{$module}->{?packlist}})) {
         push(@files, $file)
-          if ($self->_is_type($file, $type) &&
+            if ($self->_is_type($file, $type) &&
               $self->_is_under($file, < @under));
     }
     return @files;

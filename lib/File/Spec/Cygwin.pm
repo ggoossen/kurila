@@ -109,31 +109,31 @@ Default: 1
 =cut
 
 sub case_tolerant(?$drive) {
-  return 1 unless $^OS_NAME eq 'cygwin'
-    and defined &Cygwin::mount_flags;
+    return 1 unless $^OS_NAME eq 'cygwin'
+        and defined &Cygwin::mount_flags;
 
-  if (! $drive) {
-      my @flags = split(m/,/, Cygwin::mount_flags('/cygwin'));
-      my $prefix = pop(@flags);
-      if (! $prefix || $prefix eq 'cygdrive') {
-          $drive = '/cygdrive/c';
-      } elsif ($prefix eq '/') {
-          $drive = '/c';
-      } else {
-          $drive = "$prefix/c";
-      }
-  }
-  my $mntopts = Cygwin::mount_flags($drive);
-  if ($mntopts and ($mntopts =~ m/,managed/)) {
-    return 0;
-  }
-  try { require Win32API::File; } or return 1;
-  my $osFsType = "\0"x256;
-  my $osVolName = "\0"x256;
-  my $ouFsFlags = 0;
-  Win32API::File::GetVolumeInformation($drive, $osVolName, 256, \@(), \@(), $ouFsFlags, $osFsType, 256 );
-  if ($ouFsFlags ^&^ Win32API::File::FS_CASE_SENSITIVE()) { return 0; }
-  else { return 1; }
+    if (! $drive) {
+        my @flags = split(m/,/, Cygwin::mount_flags('/cygwin'));
+        my $prefix = pop(@flags);
+        if (! $prefix || $prefix eq 'cygdrive') {
+            $drive = '/cygdrive/c';
+        } elsif ($prefix eq '/') {
+            $drive = '/c';
+        } else {
+            $drive = "$prefix/c";
+        }
+    }
+    my $mntopts = Cygwin::mount_flags($drive);
+    if ($mntopts and ($mntopts =~ m/,managed/)) {
+        return 0;
+    }
+    try { require Win32API::File; } or return 1;
+    my $osFsType = "\0"x256;
+    my $osVolName = "\0"x256;
+    my $ouFsFlags = 0;
+    Win32API::File::GetVolumeInformation($drive, $osVolName, 256, \@(), \@(), $ouFsFlags, $osFsType, 256 );
+    if ($ouFsFlags ^&^ Win32API::File::FS_CASE_SENSITIVE()) { return 0; }
+    else { return 1; }
 }
 
 =back

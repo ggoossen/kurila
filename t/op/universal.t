@@ -14,13 +14,13 @@ $a = \%();
 bless $a, "Bob";
 ok $a->isa("Bob");
 
-package Human;
+    package Human;
 sub eat {}
 
 package Female;
 our @ISA=qw(Human);
 
-package Alice;
+    package Alice;
 our @ISA=qw(Bob Female);
 sub drink { return "drinking " . @_[1]  }
 sub new { bless \%() }
@@ -169,7 +169,7 @@ is $^EVAL_ERROR, '';
 # This segfaulted in a blead.
 fresh_perl_is('package Foo; Foo->VERSION;  print $^STDOUT, "ok"', 'ok');
 
-package Foo;
+    package Foo;
 
 sub DOES { 1 }
 
@@ -177,23 +177,23 @@ package Bar;
 
 @Bar::ISA = @( 'Foo' );
 
-package Baz;
+    package Baz;
 
-package main;
+    package main;
 ok( Foo->DOES( 'bar' ), 'DOES() should call DOES() on class' );
 ok( Bar->DOES( 'Bar' ), '... and should fall back to isa()' );
 ok( Bar->DOES( 'Foo' ), '... even when inherited' );
 ok( Baz->DOES( 'Baz' ), '... even without inheriting any other DOES()' );
 ok( ! Baz->DOES( 'Foo' ), '... returning true or false appropriately' );
 
-package Pig;
-package Bodine;
+    package Pig;
+    package Bodine;
 Bodine->isa('Pig');
 *isa = \&UNIVERSAL::isa;
 try { isa(\%(), 'HASH') };
 main::is($^EVAL_ERROR, '', "*isa correctly found");
 
-package main;
+    package main;
 main::dies_like( sub { UNIVERSAL::DOES(\@(), "foo") },
-             qr/Can't call method "DOES" on unblessed reference/,
-             'DOES call error message says DOES, not isa' );
+                 qr/Can't call method "DOES" on unblessed reference/,
+                 'DOES call error message says DOES, not isa' );

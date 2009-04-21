@@ -2,11 +2,11 @@ use Perl6::Form;
 
 my $linenum = 1;
 sub numerate($lines, $fill, $opts) {
-	my $body = form '{]]]]} {"""{*}"""}',
-					\$linenum..$linenum+nelems @$lines-1, $lines,
-					< @$fill;
-	$linenum += nelems @$lines;
-	return $body;
+    my $body = form '{]]]]} {"""{*}"""}',
+                 \$linenum..$linenum+nelems @$lines-1, $lines,
+                 < @$fill;
+    $linenum += nelems @$lines;
+    return $body;
 }
 
 my $richardIII_soliloquy = <<EOR3;
@@ -18,12 +18,12 @@ To be, or not to be -- that is the question: / Whether 'tis nobler in the mind t
 EOH
 
 print $^STDOUT, < form \%(page=>\%( header => "\n==========\n\n",
-			  length => 12,
-			  body   => \&numerate
-			)
-	 ),
-	 "\{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",
-	 $richardIII_soliloquy,
-	 \%(page=>\%()),
-	 "                 \{]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]\}",
-	 $hamlet_soliloquy;
+                               length => 12,
+                                   body   => \&numerate
+                           )
+                       ),
+                       "\{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",
+                       $richardIII_soliloquy,
+                       \%(page=>\%()),
+                       "                 \{]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]\}",
+                       $hamlet_soliloquy;

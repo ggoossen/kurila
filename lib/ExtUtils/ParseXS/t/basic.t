@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
 BEGIN {
-  if (env::var('PERL_CORE')) {
-    chdir 't' if -d 't';
-    chdir '../lib/ExtUtils/ParseXS'
-      or die "Can't chdir to lib/ExtUtils/ParseXS: $^OS_ERROR";
-    $^INCLUDE_PATH = qw(../.. ../../.. .);
-  }
+    if (env::var('PERL_CORE')) {
+        chdir 't' if -d 't';
+        chdir '../lib/ExtUtils/ParseXS'
+            or die "Can't chdir to lib/ExtUtils/ParseXS: $^OS_ERROR";
+        $^INCLUDE_PATH = qw(../.. ../../.. .);
+    }
 }
 
 use Test::More;
@@ -38,34 +38,34 @@ my $quiet = env::var('PERL_CORE') && !env::var('HARNESS_ACTIVE');
 # Try to compile the file!  Don't get too fancy, though.
 my $b = ExtUtils::CBuilder->new(quiet => $quiet);
 if ($b->have_compiler) {
-  my $module = 'XSTest';
+    my $module = 'XSTest';
 
-  my $obj_file = $b->compile( source => $source_file );
-  ok $obj_file;
-  is -e $obj_file, 1, "Make sure $obj_file exists";
+    my $obj_file = $b->compile( source => $source_file );
+    ok $obj_file;
+    is -e $obj_file, 1, "Make sure $obj_file exists";
 
-  my @($lib_file) = $b->link( objects => $obj_file, module_name => $module );
-  ok $lib_file;
-  is -e $lib_file, 1, "Make sure $lib_file exists";
+    my @($lib_file) = $b->link( objects => $obj_file, module_name => $module );
+    ok $lib_file;
+    is -e $lib_file, 1, "Make sure $lib_file exists";
 
-  require XSTest;
-  ok  XSTest::is_even(8);
-  ok !XSTest::is_even(9);
+    require XSTest;
+    ok  XSTest::is_even(8);
+    ok !XSTest::is_even(9);
 
-  # Win32 needs to close the DLL before it can unlink it, but unfortunately
-  # dl_unload_file was missing on Win32 prior to perl change #24679!
-  if ($^OS_NAME eq 'MSWin32' and defined &DynaLoader::dl_unload_file) {
-    for my $i (0 .. nelems(@DynaLoader::dl_modules) -1) {
-      if (@DynaLoader::dl_modules[$i] eq $module) {
-        DynaLoader::dl_unload_file(@DynaLoader::dl_librefs[$i]);
-        last;
-      }
+    # Win32 needs to close the DLL before it can unlink it, but unfortunately
+    # dl_unload_file was missing on Win32 prior to perl change #24679!
+    if ($^OS_NAME eq 'MSWin32' and defined &DynaLoader::dl_unload_file) {
+        for my $i (0 .. nelems(@DynaLoader::dl_modules) -1) {
+            if (@DynaLoader::dl_modules[$i] eq $module) {
+                DynaLoader::dl_unload_file(@DynaLoader::dl_librefs[$i]);
+                last;
+            }
+        }
     }
-  }
-  1 while unlink $obj_file;
-  1 while unlink $lib_file;
+    1 while unlink $obj_file;
+    1 while unlink $lib_file;
 } else {
-  skip "Skipped can't find a C compiler & linker", 1 for 1..7;
+    skip "Skipped can't find a C compiler & linker", 1 for 1..7;
 }
 
 1 while unlink $source_file;

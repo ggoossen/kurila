@@ -32,17 +32,17 @@ foreach my $line ( @tests) {
     @x = @(0,1,2,3,4,5,6,7);
     my @got;
     if (defined $len) {
-	@got = @( splice(@x, $pos, $len, < @list) );
+        @got = @( splice(@x, $pos, $len, < @list) );
     }
     else {
-	@got = @( splice(@x, $pos) );
+        @got = @( splice(@x, $pos) );
     }
     if (join(':', @got) eq join(':', @get) &&
-	join(':', @x) eq join(':', @leave)) {
-	print $^STDOUT, "ok ",$test++,"\n";
+        join(':', @x) eq join(':', @leave)) {
+        print $^STDOUT, "ok ",$test++,"\n";
     }
     else {
-	print $^STDOUT, "not ok ",$test++," got: $(join ' ',@got) == $(join ' ',@get) left: $(join ' ',@x) == $(join ' ',@leave)\n";
+        print $^STDOUT, "not ok ",$test++," got: $(join ' ',@got) == $(join ' ',@get) left: $(join ' ',@x) == $(join ' ',@leave)\n";
     }
 }
 

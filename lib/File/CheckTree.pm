@@ -119,7 +119,7 @@ sub validate {
 
             # expand relative $file to full pathname if preceded by cd directive
             $file = File::Spec->catfile($cwd, $file) 
-                    if $cwd && !File::Spec->file_name_is_absolute($file);
+                if $cwd && !File::Spec->file_name_is_absolute($file);
 
             # put filename in after the test operator
             $this =~ s/(-\w\b)/$1 "\$file"/g;
@@ -150,14 +150,14 @@ sub validate {
                 # also, call any pre-existing signal handler for __WARN__
                 my $orig_sigwarn = $^WARN_HOOK;
                 local $^WARN_HOOK = sub {
-                    ++$Warnings;
-                    if ( $orig_sigwarn ) {
-                        $orig_sigwarn->(< @_);
-                    }
-                    else {
-                        print $^STDERR, @_[0]->message;
-                    }
-                };
+                        ++$Warnings;
+                        if ( $orig_sigwarn ) {
+                            $orig_sigwarn->(< @_);
+                        }
+                        else {
+                            print $^STDERR, @_[0]->message;
+                        }
+                    };
 
                 # do the test
                 eval $this;
@@ -186,30 +186,30 @@ sub validate {
 }
 
 my %Val_Message = %(
-    'r' => "is not readable by uid $^UID.",
-    'w' => "is not writable by uid $^UID.",
-    'x' => "is not executable by uid $^UID.",
-    'o' => "is not owned by uid $^UID.",
-    'R' => "is not readable by you.",
-    'W' => "is not writable by you.",
-    'X' => "is not executable by you.",
-    'O' => "is not owned by you.",
-    'e' => "does not exist.",
-    'z' => "does not have zero size.",
-    's' => "does not have non-zero size.",
-    'f' => "is not a plain file.",
-    'd' => "is not a directory.",
-    'l' => "is not a symbolic link.",
-    'p' => "is not a named pipe (FIFO).",
-    'S' => "is not a socket.",
-    'b' => "is not a block special file.",
-    'c' => "is not a character special file.",
-    'u' => "does not have the setuid bit set.",
-    'g' => "does not have the setgid bit set.",
-    'k' => "does not have the sticky bit set.",
-    'T' => "is not a text file.",
-    'B' => "is not a binary file."
-);
+        'r' => "is not readable by uid $^UID.",
+            'w' => "is not writable by uid $^UID.",
+            'x' => "is not executable by uid $^UID.",
+            'o' => "is not owned by uid $^UID.",
+            'R' => "is not readable by you.",
+            'W' => "is not writable by you.",
+            'X' => "is not executable by you.",
+            'O' => "is not owned by you.",
+            'e' => "does not exist.",
+            'z' => "does not have zero size.",
+            's' => "does not have non-zero size.",
+            'f' => "is not a plain file.",
+            'd' => "is not a directory.",
+            'l' => "is not a symbolic link.",
+            'p' => "is not a named pipe (FIFO).",
+            'S' => "is not a socket.",
+            'b' => "is not a block special file.",
+            'c' => "is not a character special file.",
+            'u' => "does not have the setuid bit set.",
+            'g' => "does not have the setgid bit set.",
+            'k' => "does not have the sticky bit set.",
+            'T' => "is not a text file.",
+            'B' => "is not a binary file."
+    );
 
 sub valmess($disposition, $test, $file) {
     my $ferror;
@@ -221,8 +221,8 @@ sub valmess($disposition, $test, $file) {
 
         if ($neg eq '!') {
             $ferror =~ s/ is not / should not be / ||
-            $ferror =~ s/ does not / should not / ||
-            $ferror =~ s/ not / /;
+                $ferror =~ s/ does not / should not / ||
+                $ferror =~ s/ not / /;
         }
     }
     else {

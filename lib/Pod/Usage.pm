@@ -429,8 +429,8 @@ use File::Spec;
 our (@ISA, @EXPORT);
 @EXPORT = qw(&pod2usage);
 BEGIN {
-       require Pod::Text;
-       @ISA = qw( Pod::Text );
+    require Pod::Text;
+    @ISA = qw( Pod::Text );
 }
 
 
@@ -441,7 +441,7 @@ BEGIN {
 ##---------------------------------
 
 sub pod2usage {
-    local($_) = shift;
+          local($_) = shift;
     my %opts;
     ## Collect arguments
     if ((nelems @_) +> 0) {
@@ -450,7 +450,7 @@ sub pod2usage {
         %opts = %($_, < @_);
     }
     elsif (!defined $_) {
-      $_ = "";
+        $_ = "";
     }
     elsif (ref $_) {
         ## User passed a ref to a hash
@@ -470,12 +470,12 @@ sub pod2usage {
     ## looked like Unix command-line options.
     ## to be uppercase keywords)
     %opts = %: < @+: map {
-        my $val = %opts{?$_};
-        s/^-//;
-        m/^msg/i   and  $_ = 'message';
-        m/^exit/i  and  $_ = 'exitval';
-        @: lc($_) => $val;    
-    }, keys %opts;
+                my $val = %opts{?$_};
+                s/^-//;
+                m/^msg/i   and  $_ = 'message';
+                m/^exit/i  and  $_ = 'exitval';
+                @: lc($_) => $val;    
+            }, keys %opts;
 
     ## Now determine default exitval and verbose values to use
     if ((! defined %opts{?"exitval"}) && (! defined %opts{?"verbose"})) {
@@ -493,7 +493,7 @@ sub pod2usage {
     ## Default the output file
     %opts{+"output"} = (lc(%opts{?"exitval"}) eq "noexit" ||
                         %opts{?"exitval"} +< 2) ?? $^STDOUT !! $^STDERR
-            unless (defined %opts{?"output"});
+    unless (defined %opts{?"output"});
     ## Default the input file
     %opts{+"input"} = $^PROGRAM_NAME  unless (defined %opts{?"input"});
 
@@ -501,7 +501,7 @@ sub pod2usage {
     unless ((ref %opts{?"input"}) || (-e %opts{?"input"})) {
         my @($basename) = @(%opts{?"input"});
         my $pathsep = ($^OS_NAME =~ m/^(?:dos|os2|MSWin32)$/) ?? ";"
-                            !! (($^OS_NAME eq 'MacOS' || $^OS_NAME eq 'VMS') ?? ',' !!  ":");
+            !! (($^OS_NAME eq 'MacOS' || $^OS_NAME eq 'VMS') ?? ',' !!  ":");
         my $pathspec = %opts{?"pathlist"} || env::var('PATH') || env::var('PERL5LIB');
 
         my @paths = @( (ref $pathspec) ?? < @$pathspec !! < split($pathsep, $pathspec) );
@@ -518,8 +518,8 @@ sub pod2usage {
     }
     elsif (%opts{"verbose"} == 1) {
         my $opt_re = '(?i)' .
-                     '(?:OPTIONS|ARGUMENTS)' .
-                     '(?:\s*(?:AND|\/)\s*(?:OPTIONS|ARGUMENTS))?';
+            '(?:OPTIONS|ARGUMENTS)' .
+            '(?:\s*(?:AND|\/)\s*(?:OPTIONS|ARGUMENTS))?';
         $parser->select( 'SYNOPSIS', $opt_re, "DESCRIPTION/$opt_re" );
     }
     elsif (%opts{"verbose"} +>= 2 && %opts{"verbose"} != 99) {
@@ -532,20 +532,20 @@ sub pod2usage {
 
     ## Now translate the pod document and then exit with the desired status
     if ( !%opts{?"noperldoc"}
-             and  %opts{?"verbose"} +>= 2 
-             and  !ref(%opts{?"input"})
-             and  %opts{?"output"} \== $^STDOUT )
+        and  %opts{?"verbose"} +>= 2 
+        and  !ref(%opts{?"input"})
+        and  %opts{?"output"} \== $^STDOUT )
     {
-       ## spit out the entire PODs. Might as well invoke perldoc
-       my $progpath = File::Spec->catfile(config_value('scriptdir'), "perldoc");
-       system($progpath, %opts{?"input"});
-       if($^CHILD_ERROR) {
-         # RT16091: fall back to more if perldoc failed
-         system(env::var('PAGER') || 'more', %opts{?"input"});
-       }
+        ## spit out the entire PODs. Might as well invoke perldoc
+        my $progpath = File::Spec->catfile(config_value('scriptdir'), "perldoc");
+        system($progpath, %opts{?"input"});
+        if($^CHILD_ERROR) {
+            # RT16091: fall back to more if perldoc failed
+            system(env::var('PAGER') || 'more', %opts{?"input"});
+        }
     }
     else {
-       $parser->parse_from_file(%opts{?"input"}, %opts{"output"});
+        $parser->parse_from_file(%opts{?"input"}, %opts{"output"});
     }
 
     exit(%opts{?"exitval"})  unless (lc(%opts{?"exitval"}) eq 'noexit');
@@ -601,14 +601,14 @@ sub _handle_element_end($self, $element) {
         my $heading = %$self{?USAGE_HEAD1};
         $heading .= '/' . %$self{?USAGE_HEAD2} if defined %$self{?USAGE_HEAD2};
         if (!%$self{?USAGE_SELECT} || !nelems @{ %$self{?USAGE_SELECT} }) {
-           %$self{+USAGE_SKIPPING} = 0;
+            %$self{+USAGE_SKIPPING} = 0;
         } else {
-          for ( @{ %$self{USAGE_SELECT} }) {
-              if ($heading =~ m/^$_\s*$/) {
-                  %$self{+USAGE_SKIPPING} = 0;
-                  last;
-              }
-          }
+            for ( @{ %$self{USAGE_SELECT} }) {
+                if ($heading =~ m/^$_\s*$/) {
+                    %$self{+USAGE_SKIPPING} = 0;
+                    last;
+                }
+            }
         }
 
         # Try to do some lowercasing instead of all-caps in headings, and use

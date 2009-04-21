@@ -27,7 +27,7 @@ our $VERSION = '0.14';
 
 our $WARNINGS_ON_BOOTSTRAP;
 our ($BEGIN_called_PP, $UNITCHECK_called_PP, $CHECK_called_PP,
-     $INIT_called_PP, $END_called_PP);
+    $INIT_called_PP, $END_called_PP);
 
 # Do these here to verify that XS code and Perl code get called at the same
 # times
@@ -42,10 +42,10 @@ do {
     # can get warnings about "Too late to run CHECK" block (and INIT block)
     no warnings 'void';
     CHECK {
-	$CHECK_called_PP++;
+        $CHECK_called_PP++;
     }
     INIT {
-	$INIT_called_PP++;
+        $INIT_called_PP++;
     }
 };
 END {

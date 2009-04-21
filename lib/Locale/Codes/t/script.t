@@ -13,10 +13,10 @@ use Locale::Script;
 # If it is true (1), the test is treated as passing, otherwise it failed.
 #-----------------------------------------------------------------------
 our @TESTS =
-@(
-	#================================================
-	# TESTS FOR code2script
-	#================================================
+    @(
+ #================================================
+ # TESTS FOR code2script
+ #================================================
 
  #---- selection of examples which should all result in undef -----------
  \@('!defined code2script()', 0),                  # no argument
@@ -41,9 +41,9 @@ our @TESTS =
  \@('code2script("am") eq "Aramaic"', 0),          # first in DATA segment
 
 
-	#================================================
-	# TESTS FOR script2code
-	#================================================
+ #================================================
+ # TESTS FOR script2code
+ #================================================
 
  #---- selection of examples which should all result in undef -----------
  \@('!defined code2script("BO", LOCALE_CODE_ALPHA_3)', 0),
@@ -61,9 +61,9 @@ our @TESTS =
  \@('script2code("Latin")                      eq "la"', 0),
  \@('script2code("Latin", LOCALE_CODE_ALPHA_3) eq "lat"', 0),
 
-	#================================================
-	# TESTS FOR script_code2code
-	#================================================
+ #================================================
+ # TESTS FOR script_code2code
+ #================================================
 
  #---- selection of examples which should all result in undef -----------
  \@('!defined script_code2code("bo", LOCALE_CODE_ALPHA_3, LOCALE_CODE_ALPHA_3)', 0),
@@ -78,7 +78,7 @@ our @TESTS =
  \@('script_code2code(170, LOCALE_CODE_NUMERIC, LOCALE_CODE_ALPHA_3) eq "tna"', 0),
  \@('script_code2code("rr", LOCALE_CODE_ALPHA_2, LOCALE_CODE_NUMERIC) eq "620"', 0),
 
-);
+    );
 
 use Test::More;
 

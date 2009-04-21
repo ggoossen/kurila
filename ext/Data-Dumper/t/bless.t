@@ -15,41 +15,41 @@ BEGIN { use_ok('Data::Dumper') };
 foreach my $use (@(0, 1)) {
     $Data::Dumper::Useperl = $use;
 
-#diag("\$Data::Dumper::Useperl = $Data::Dumper::Useperl");
+    #diag("\$Data::Dumper::Useperl = $Data::Dumper::Useperl");
 
-our $VAR1;
-do {
-my $t = bless( \%(), q{a'b} );
-my $dt = Dumper($t);
-my $o = <<'PERL';
+    our $VAR1;
+    do {
+        my $t = bless( \%(), q{a'b} );
+        my $dt = Dumper($t);
+        my $o = <<'PERL';
 $VAR1 = bless( \%(), "a'b" );
 PERL
 
-is($dt, $o, "package name in bless is escaped if needed (useperl=$Data::Dumper::Useperl)");
-is_deeply(scalar eval($dt), $t, "eval reverts dump");
-};
+        is($dt, $o, "package name in bless is escaped if needed (useperl=$Data::Dumper::Useperl)");
+        is_deeply(scalar eval($dt), $t, "eval reverts dump");
+    };
 
-do {
-my $t = bless( \%(), q{a\} );
-my $dt = Dumper($t);
-my $o = <<'PERL';
+    do {
+        my $t = bless( \%(), q{a\} );
+        my $dt = Dumper($t);
+        my $o = <<'PERL';
 $VAR1 = bless( \%(), "a\\" );
 PERL
 
-is($dt, $o, "package name in bless is escaped if needed");
-is_deeply(scalar eval($dt), $t, "eval reverts dump");
-};
-SKIP: do {
-    skip(q/no 're::regexp_pattern'/, 1)
-        if ! defined(*re::regexp_pattern{CODE});
+        is($dt, $o, "package name in bless is escaped if needed");
+        is_deeply(scalar eval($dt), $t, "eval reverts dump");
+    };
+  SKIP: do {
+        skip(q/no 're::regexp_pattern'/, 1)
+            if ! defined(*re::regexp_pattern{CODE});
 
-my $t = bless( qr//, 'foo');
-my $dt = Dumper($t);
-my $o = <<'PERL';
+        my $t = bless( qr//, 'foo');
+        my $dt = Dumper($t);
+        my $o = <<'PERL';
 $VAR1 = bless( qr/(?-uxism:)/, "foo" );
 PERL
 
-is($dt, $o, "We can dump blessed qr//'s properly");
+        is($dt, $o, "We can dump blessed qr//'s properly");
 
-};
+    };
 }

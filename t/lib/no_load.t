@@ -13,7 +13,7 @@ require "./test.pl";
 #
 my @TESTS = @(
     \@(Carp  => < qw [warnings Exporter]),
-);
+    );
 
 my $count = 0;
 $count += (nelems @$_) - 1 for  @TESTS;

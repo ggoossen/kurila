@@ -17,8 +17,8 @@ my@($out, $err) =  Test::Simple::Catch::caught();
 local env::var('HARNESS_ACTIVE' ) = 0;
 
 
-# Can't use Test.pm, that's a 5.005 thing.
-package My::Test;
+    # Can't use Test.pm, that's a 5.005 thing.
+    package My::Test;
 
 print $^STDOUT, "1..2\n";
 

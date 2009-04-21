@@ -7,7 +7,7 @@
 
 require DynaLoader;
 require Exporter;
-package Storable;
+    package Storable;
 
 use IO::File;
 
@@ -40,14 +40,14 @@ do {
 #
 
 BEGIN {
-	if (try { require Fcntl; 1 } && exists %Fcntl::EXPORT_TAGS{'flock'}) {
-		Fcntl->import(':flock');
-	} else {
-		eval q{
+    if (try { require Fcntl; 1 } && exists %Fcntl::EXPORT_TAGS{'flock'}) {
+        Fcntl->import(':flock');
+    } else {
+        eval q{
 			sub LOCK_SH ()	{1}
 			sub LOCK_EX ()	{2}
 		};
-	}
+    }
 }
 
 sub CLONE {
@@ -73,7 +73,7 @@ sub logcroak {
 }
 
 sub logcarp {
-  warn(< @_);
+    warn(< @_);
 }
 
 #
@@ -82,12 +82,12 @@ sub logcarp {
 
 my $CAN_FLOCK;
 sub CAN_FLOCK {
-	return $CAN_FLOCK if defined $CAN_FLOCK;
-	require Config;
-	return ($CAN_FLOCK =
-		Config::config_value('d_flock') ||
-		Config::config_value('d_fcntl_can_lock') ||
-		Config::config_value('d_lockf'));
+    return $CAN_FLOCK if defined $CAN_FLOCK;
+    require Config;
+    return ($CAN_FLOCK =
+         Config::config_value('d_flock') ||
+         Config::config_value('d_fcntl_can_lock') ||
+         Config::config_value('d_lockf'));
 }
 
 sub show_file_magic {
@@ -131,54 +131,54 @@ sub read_magic($buf, ?$file) {
     my $buflen = length($buf);
     my $magic;
     if ($buf =~ s/^(pst0|perl-store)//) {
-	$magic = $1;
-	%info{+file} = $file || 1;
+        $magic = $1;
+        %info{+file} = $file || 1;
     }
     else {
-	return undef if $file;
-	$magic = "";
+        return undef if $file;
+        $magic = "";
     }
 
     return undef unless length($buf);
 
     my $net_order;
     if ($magic eq "perl-store" && ord(substr($buf, 0, 1)) +> 1) {
-	%info{+version} = -1;
-	$net_order = 0;
+        %info{+version} = -1;
+        $net_order = 0;
     }
     else {
-	$net_order = ord(substr($buf, 0, 1, ""));
-	my $major = $net_order >> 1;
-	return undef if $major +> 4; # sanity (assuming we never go that high)
-	%info{+major} = $major;
-	$net_order ^&^= 0x01;
-	if ($major +> 1) {
-	    return undef unless length($buf);
-	    my $minor = ord(substr($buf, 0, 1, ""));
-	    %info{+minor} = $minor;
-	    %info{+version} = "$major.$minor";
-	    %info{+version_nv} = sprintf "\%d.\%03d", $major, $minor;
-	}
-	else {
-	    %info{+version} = $major;
-	}
+        $net_order = ord(substr($buf, 0, 1, ""));
+        my $major = $net_order >> 1;
+        return undef if $major +> 4; # sanity (assuming we never go that high)
+        %info{+major} = $major;
+        $net_order ^&^= 0x01;
+        if ($major +> 1) {
+            return undef unless length($buf);
+            my $minor = ord(substr($buf, 0, 1, ""));
+            %info{+minor} = $minor;
+            %info{+version} = "$major.$minor";
+            %info{+version_nv} = sprintf "\%d.\%03d", $major, $minor;
+        }
+        else {
+            %info{+version} = $major;
+        }
     }
     %info{+version_nv} ||= %info{?version};
     %info{+netorder} = $net_order;
 
     unless ($net_order) {
-	return undef unless length($buf);
-	my $len = ord(substr($buf, 0, 1, ""));
-	return undef unless length($buf) +>= $len;
-	return undef unless $len == 4 || $len == 8;  # sanity
-	%info{+byteorder} = substr($buf, 0, $len, "");
-	%info{+intsize} = ord(substr($buf, 0, 1, ""));
-	%info{+longsize} = ord(substr($buf, 0, 1, ""));
-	%info{+ptrsize} = ord(substr($buf, 0, 1, ""));
-	if (%info{?version_nv} +>= 2.002) {
-	    return undef unless length($buf);
-	    %info{+nvsize} = ord(substr($buf, 0, 1, ""));
-	}
+        return undef unless length($buf);
+        my $len = ord(substr($buf, 0, 1, ""));
+        return undef unless length($buf) +>= $len;
+        return undef unless $len == 4 || $len == 8;  # sanity
+        %info{+byteorder} = substr($buf, 0, $len, "");
+        %info{+intsize} = ord(substr($buf, 0, 1, ""));
+        %info{+longsize} = ord(substr($buf, 0, 1, ""));
+        %info{+ptrsize} = ord(substr($buf, 0, 1, ""));
+        if (%info{?version_nv} +>= 2.002) {
+            return undef unless length($buf);
+            %info{+nvsize} = ord(substr($buf, 0, 1, ""));
+        }
     }
     %info{+hdrsize} = $buflen - length($buf);
 
@@ -202,7 +202,7 @@ sub BIN_WRITE_VERSION_NV {
 # removed.
 #
 sub store {
-	return _store(\&pstore, < @_, 0);
+    return _store(\&pstore, < @_, 0);
 }
 
 #
@@ -211,7 +211,7 @@ sub store {
 # Same as store, but in network order.
 #
 sub nstore {
-	return _store(\&net_pstore, < @_, 0);
+    return _store(\&net_pstore, < @_, 0);
 }
 
 #
@@ -220,7 +220,7 @@ sub nstore {
 # Same as store, but flock the file first (advisory locking).
 #
 sub lock_store {
-	return _store(\&pstore, < @_, 1);
+    return _store(\&pstore, < @_, 1);
 }
 
 #
@@ -229,40 +229,40 @@ sub lock_store {
 # Same as nstore, but flock the file first (advisory locking).
 #
 sub lock_nstore {
-	return _store(\&net_pstore, < @_, 1);
+    return _store(\&net_pstore, < @_, 1);
 }
 
 # Internal store to file routine
 sub _store {
-	my $xsptr = shift;
-	my $self = shift;
-	my @($file, $use_locking) =  @_;
-	logcroak "not a reference" unless ref($self);
-	logcroak "wrong argument number" unless (nelems @_) == 2;	# No @foo in arglist
-        my $fh;
-	if ($use_locking) {
-		open($fh, ">>", "$file") || logcroak "can't write into $file: $^OS_ERROR";
-		unless (&CAN_FLOCK( < @_ )) {
-			logcarp "Storable::lock_store: fcntl/flock emulation broken on $^OS_NAME";
-			return undef;
-		}
-		flock($fh, LOCK_EX) ||
-			logcroak "can't get exclusive lock on $file: $^OS_ERROR";
-		truncate $fh, 0;
-		# Unlocking will happen when FILE is closed
-	} else {
-		open($fh, ">", "$file") || logcroak "can't create $file: $^OS_ERROR";
-	}
-	binmode $fh;				# Archaic systems...
-	my $da = $^EVAL_ERROR;				# Don't mess if called from exception handler
-	my $ret;
-	# Call C routine nstore or pstore, depending on network order
-	try { $ret = &$xsptr($fh, $self) };
-	close($fh) or $ret = undef;
-	unlink($file) or warn "Can't unlink $file: $^OS_ERROR\n" if $^EVAL_ERROR || !defined $ret;
-	logcroak $^EVAL_ERROR if $^EVAL_ERROR;
-	$^EVAL_ERROR = $da;
-	return $ret ?? $ret !! undef;
+    my $xsptr = shift;
+    my $self = shift;
+    my @($file, $use_locking) =  @_;
+    logcroak "not a reference" unless ref($self);
+    logcroak "wrong argument number" unless (nelems @_) == 2;	# No @foo in arglist
+    my $fh;
+    if ($use_locking) {
+        open($fh, ">>", "$file") || logcroak "can't write into $file: $^OS_ERROR";
+        unless (&CAN_FLOCK( < @_ )) {
+            logcarp "Storable::lock_store: fcntl/flock emulation broken on $^OS_NAME";
+            return undef;
+        }
+        flock($fh, LOCK_EX) ||
+            logcroak "can't get exclusive lock on $file: $^OS_ERROR";
+        truncate $fh, 0;
+    # Unlocking will happen when FILE is closed
+    } else {
+        open($fh, ">", "$file") || logcroak "can't create $file: $^OS_ERROR";
+    }
+    binmode $fh;				# Archaic systems...
+    my $da = $^EVAL_ERROR;				# Don't mess if called from exception handler
+    my $ret;
+    # Call C routine nstore or pstore, depending on network order
+    try { $ret = &$xsptr($fh, $self) };
+    close($fh) or $ret = undef;
+    unlink($file) or warn "Can't unlink $file: $^OS_ERROR\n" if $^EVAL_ERROR || !defined $ret;
+    logcroak $^EVAL_ERROR if $^EVAL_ERROR;
+    $^EVAL_ERROR = $da;
+    return $ret ?? $ret !! undef;
 }
 
 #
@@ -281,27 +281,27 @@ sub store_fd {
 # Same as store_fd, but in network order.
 #
 sub nstore_fd {
-	my @($self, $file) =  @_;
-	return _store_fd(\&net_pstore, < @_);
+    my @($self, $file) =  @_;
+    return _store_fd(\&net_pstore, < @_);
 }
 
 # Internal store routine on opened file descriptor
 sub _store_fd {
-	my $xsptr = shift;
-	my $self = shift;
-	my @($file) =  @_;
-	logcroak "not a reference" unless ref($self);
-	logcroak "too many arguments" unless (nelems @_) == 1;	# No @foo in arglist
-	my $fd = fileno($file);
-	logcroak "not a valid file descriptor" unless defined $fd;
-	my $da = $^EVAL_ERROR;				# Don't mess if called from exception handler
-	my $ret;
-	# Call C routine nstore or pstore, depending on network order
-	try { $ret = &$xsptr($file, $self) };
-	logcroak $^EVAL_ERROR if $^EVAL_ERROR;
-	local $^OUTPUT_RECORD_SEPARATOR = undef; $file->print('');	# Autoflush the file if wanted
-	$^EVAL_ERROR = $da;
-	return $ret ?? $ret !! undef;
+    my $xsptr = shift;
+    my $self = shift;
+    my @($file) =  @_;
+    logcroak "not a reference" unless ref($self);
+    logcroak "too many arguments" unless (nelems @_) == 1;	# No @foo in arglist
+    my $fd = fileno($file);
+    logcroak "not a valid file descriptor" unless defined $fd;
+    my $da = $^EVAL_ERROR;				# Don't mess if called from exception handler
+    my $ret;
+    # Call C routine nstore or pstore, depending on network order
+    try { $ret = &$xsptr($file, $self) };
+    logcroak $^EVAL_ERROR if $^EVAL_ERROR;
+    local $^OUTPUT_RECORD_SEPARATOR = undef; $file->print('');	# Autoflush the file if wanted
+    $^EVAL_ERROR = $da;
+    return $ret ?? $ret !! undef;
 }
 
 #
@@ -311,7 +311,7 @@ sub _store_fd {
 # containing the result.
 #
 sub freeze {
-	_freeze(\&mstore, < @_);
+    _freeze(\&mstore, < @_);
 }
 
 #
@@ -320,22 +320,22 @@ sub freeze {
 # Same as freeze but in network order.
 #
 sub nfreeze {
-	_freeze(\&net_mstore, < @_);
+    _freeze(\&net_mstore, < @_);
 }
 
 # Internal freeze routine
 sub _freeze {
-	my $xsptr = shift;
-	my $self = shift;
-	logcroak "not a reference" unless ref($self);
-	logcroak "too many arguments" unless (nelems @_) == 0;	# No @foo in arglist
-	my $da = $^EVAL_ERROR;				# Don't mess if called from exception handler
-	my $ret;
-	# Call C routine mstore or net_mstore, depending on network order
-	try { $ret = &$xsptr($self) };
-	logcroak $^EVAL_ERROR if $^EVAL_ERROR;
-	$^EVAL_ERROR = $da;
-	return $ret ?? $ret !! undef;
+    my $xsptr = shift;
+    my $self = shift;
+    logcroak "not a reference" unless ref($self);
+    logcroak "too many arguments" unless (nelems @_) == 0;	# No @foo in arglist
+    my $da = $^EVAL_ERROR;				# Don't mess if called from exception handler
+    my $ret;
+    # Call C routine mstore or net_mstore, depending on network order
+    try { $ret = &$xsptr($self) };
+    logcroak $^EVAL_ERROR if $^EVAL_ERROR;
+    $^EVAL_ERROR = $da;
+    return $ret ?? $ret !! undef;
 }
 
 #
@@ -345,7 +345,7 @@ sub _freeze {
 # object of that tree.
 #
 sub retrieve {
-	_retrieve(@_[0], 0);
+    _retrieve(@_[0], 0);
 }
 
 #
@@ -354,30 +354,30 @@ sub retrieve {
 # Same as retrieve, but with advisory locking.
 #
 sub lock_retrieve {
-	_retrieve(@_[0], 1);
+    _retrieve(@_[0], 1);
 }
 
 # Internal retrieve routine
 sub _retrieve {
-	my @($file, $use_locking) =  @_;
-        my $fh;
-	open($fh, "<", $file) || logcroak "can't open $file: $^OS_ERROR";
-	binmode $fh;							# Archaic systems...
-	my $self;
-	my $da = $^EVAL_ERROR;							# Could be from exception handler
-	if ($use_locking) {
-		unless (&CAN_FLOCK( < @_ )) {
-			logcarp "Storable::lock_store: fcntl/flock emulation broken on $^OS_NAME";
-			return undef;
-		}
-		flock($fh, LOCK_SH) || logcroak "can't get shared lock on $file: $^OS_ERROR";
-		# Unlocking will happen when $fh is closed
-	}
-	try { $self = pretrieve($fh) };		# Call C routine
-	close($fh);
-	logcroak $^EVAL_ERROR if $^EVAL_ERROR;
-	$^EVAL_ERROR = $da;
-	return $self;
+    my @($file, $use_locking) =  @_;
+    my $fh;
+    open($fh, "<", $file) || logcroak "can't open $file: $^OS_ERROR";
+    binmode $fh;							# Archaic systems...
+    my $self;
+    my $da = $^EVAL_ERROR;							# Could be from exception handler
+    if ($use_locking) {
+        unless (&CAN_FLOCK( < @_ )) {
+            logcarp "Storable::lock_store: fcntl/flock emulation broken on $^OS_NAME";
+            return undef;
+        }
+        flock($fh, LOCK_SH) || logcroak "can't get shared lock on $file: $^OS_ERROR";
+    # Unlocking will happen when $fh is closed
+    }
+    try { $self = pretrieve($fh) };		# Call C routine
+    close($fh);
+    logcroak $^EVAL_ERROR if $^EVAL_ERROR;
+    $^EVAL_ERROR = $da;
+    return $self;
 }
 
 #
@@ -386,14 +386,14 @@ sub _retrieve {
 # Same as retrieve, but perform from an already opened file descriptor instead.
 #
 sub fd_retrieve($file) {
-	my $fd = fileno($file);
-	logcroak "not a valid file descriptor" unless defined $fd;
-	my $self;
-	my $da = $^EVAL_ERROR;							# Could be from exception handler
-	try { $self = pretrieve($file) };		# Call C routine
-	logcroak $^EVAL_ERROR if $^EVAL_ERROR;
-	$^EVAL_ERROR = $da;
-	return $self;
+    my $fd = fileno($file);
+    logcroak "not a valid file descriptor" unless defined $fd;
+    my $self;
+    my $da = $^EVAL_ERROR;							# Could be from exception handler
+    try { $self = pretrieve($file) };		# Call C routine
+    logcroak $^EVAL_ERROR if $^EVAL_ERROR;
+    $^EVAL_ERROR = $da;
+    return $self;
 }
 
 #
@@ -403,13 +403,13 @@ sub fd_retrieve($file) {
 # by freeze.  If the frozen image passed is undef, return undef.
 #
 sub thaw($frozen) {
-	return undef unless defined $frozen;
-	my $self;
-	my $da = $^EVAL_ERROR;							# Could be from exception handler
-	try { $self = mretrieve($frozen) };	# Call C routine
-	logcroak $^EVAL_ERROR if $^EVAL_ERROR;
-	$^EVAL_ERROR = $da;
-	return $self;
+    return undef unless defined $frozen;
+    my $self;
+    my $da = $^EVAL_ERROR;							# Could be from exception handler
+    try { $self = mretrieve($frozen) };	# Call C routine
+    logcroak $^EVAL_ERROR if $^EVAL_ERROR;
+    $^EVAL_ERROR = $da;
+    return $self;
 }
 
 1;

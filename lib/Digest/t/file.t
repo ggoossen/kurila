@@ -4,27 +4,27 @@ use Test::More;
 plan tests => 5;
 
 do {
-   package Digest::Foo;
-   require Digest::base;
-   our (@ISA, $VERSION);
-   @ISA = qw(Digest::base);
+    package Digest::Foo;
+    require Digest::base;
+    our (@ISA, $VERSION);
+    @ISA = qw(Digest::base);
 
-   sub new {
-	my $class = shift;
-	my $str = "";
-	bless \$str, $class;
-   }
+    sub new {
+        my $class = shift;
+        my $str = "";
+        bless \$str, $class;
+    }
 
-   sub add {
-	my $self = shift;
-	$$self .= join("", @_);
-	return $self;
-   }
+    sub add {
+        my $self = shift;
+        $$self .= join("", @_);
+        return $self;
+    }
 
-   sub digest {
-	my $self = shift;
-	return sprintf "\%04d", length($$self);
-   }
+    sub digest {
+        my $self = shift;
+        return sprintf "\%04d", length($$self);
+    }
 };
 
 use Digest::file < qw(digest_file digest_file_hex digest_file_base64);

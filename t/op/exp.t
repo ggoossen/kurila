@@ -36,8 +36,8 @@ my $pi = 3.1415926535897931160;
 my $pi_2 = 1.5707963267948965580;
 
 sub round {
-   my $result = shift;
-   return sprintf("\%.9f", $result);
+    my $result = shift;
+    return sprintf("\%.9f", $result);
 }
 
 # sin() tests

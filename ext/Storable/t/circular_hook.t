@@ -43,34 +43,34 @@ is_deeply( \@Foo::order, \@( 'Bar', 'Foo' ), 'thaw order is correct (depth first
 
 
 
-package Foo;
+    package Foo;
 
 our @order = @( () );
 
 sub STORABLE_freeze($self, $clone) {
-	my $class = ref $self;
-	
-	# print "# Freezing $class\n";
+    my $class = ref $self;
 
-	return  @($class, $self->{?$class});
+    # print "# Freezing $class\n";
+
+    return  @($class, $self->{?$class});
 }
 
 sub STORABLE_thaw($self, $clone, $string, @< @refs) {
-	my $class = ref $self;
+    my $class = ref $self;
 
-	# print "# Thawing $class\n";
+    # print "# Thawing $class\n";
 
-	$self->{+$class} = shift @refs;
+    $self->{+$class} = shift @refs;
 
-	push @order, $class;
+    push @order, $class;
 
- 	return;
+    return;
 }
 
 package Bar;
 
 BEGIN {
-our @ISA = @( 'Foo' );
+    our @ISA = @( 'Foo' );
 }
 
 1;

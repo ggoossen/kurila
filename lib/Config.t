@@ -57,7 +57,7 @@ do {
     my @exports = qw(myconfig config_sh config_vars config_re);
     Config->import(< @exports);
     foreach my $func ( @exports) {
-	main::ok( __PACKAGE__->can($func), "$func exported" );
+        main::ok( __PACKAGE__->can($func), "$func exported" );
     }
 };
 
@@ -66,7 +66,7 @@ like(Config::config_sh(), qr/osname='\Q$(config_value("osname"))\E'/, "config_sh
 like(Config::config_sh(), qr/byteorder='[1-8]+'/,
      "config_sh has a valid byteorder");
 foreach my $line ( Config::config_re('c.*')) {
-  like($line,                  qr/^c.*?=.*$/,                   'config_re' );
+    like($line,                  qr/^c.*?=.*$/,                   'config_re' );
 }
 
 my ($out1, $out2);
@@ -91,16 +91,16 @@ do {
     package FakeOut;
 
     sub TIEHANDLE {
-	bless(\(my $text), @_[0]);
+        bless(\(my $text), @_[0]);
     }
 
     sub clear {
-	${ @_[0] } = '';
+        ${ @_[0] } = '';
     }
 
     sub PRINT {
-	my $self = shift;
-	$$self .= join('', @_);
+        my $self = shift;
+        $$self .= join('', @_);
     }
 };
 
@@ -118,13 +118,13 @@ my @virtual = qw(byteorder ccflags_nolargefiles ldflags_nolargefiles
 # special casing code for this
 
 foreach my $pain (@($first, < @virtual)) {
-  # No config var is named with anything that is a regexp metachar
-  ok(defined config_value($pain), "\$config('$pain') exists");
+    # No config var is named with anything that is a regexp metachar
+    ok(defined config_value($pain), "\$config('$pain') exists");
 
-  my @result = Config::config_re($pain);
-  is (nelems @result, 1, "single result for config_re('$pain')");
-  like (@result[0], qr/^$pain=(['"])\Q$(config_value($pain))\E\1$/, # grr '
-	"which is the expected result for $pain");
+    my @result = Config::config_re($pain);
+    is (nelems @result, 1, "single result for config_re('$pain')");
+    like (@result[0], qr/^$pain=(['"])\Q$(config_value($pain))\E\1$/, # grr '
+        "which is the expected result for $pain");
 }
 
 # Check that config entries appear correctly in $^INCLUDE_PATH
@@ -132,29 +132,29 @@ foreach my $pain (@($first, < @virtual)) {
 # This little bit of evil is to avoid a @ in the program, in case it confuses
 # shell 1 liners. Perl 1 rules.
 my @($path, $ver, @< @orig_inc)
-  =  split m/\n/,
+    =  split m/\n/,
     runperl (nolib=>1,
-	     prog=>'print $^STDOUT, qq{$^EXECUTABLE_NAME\n$^PERL_VERSION\n}; print $^STDOUT, qq{$_\n} while $_ = shift $^INCLUDE_PATH');
+    prog=>'print $^STDOUT, qq{$^EXECUTABLE_NAME\n$^PERL_VERSION\n}; print $^STDOUT, qq{$_\n} while $_ = shift $^INCLUDE_PATH');
 
 die "This perl is $^PERL_VERSION at $^EXECUTABLE_NAME; other perl is $ver (at $path) "
-  . '- failed to find this perl' unless $^PERL_VERSION eq $ver;
+    . '- failed to find this perl' unless $^PERL_VERSION eq $ver;
 
 my %orig_inc;
- %orig_inc{[ @orig_inc]} =@( @());
+    %orig_inc{[ @orig_inc]} =@( @());
 
 my $failed;
 # This is the order that directories are pushed onto $^INCLUDE_PATH in perl.c:
 foreach my $lib (qw(applibexp archlibexp privlibexp sitearchexp sitelibexp
 		     vendorarchexp vendorlibexp vendorlib_stem)) {
-  my $dir = config_value($lib);
+    my $dir = config_value($lib);
   SKIP: do {
-    skip "lib $lib not in \$^INCLUDE_PATH on Win32" if $^OS_NAME eq 'MSWin32';
-    skip "lib $lib not defined" unless defined $dir;
-    skip "lib $lib not set" unless length $dir;
-    # So we expect to find it in $^INCLUDE_PATH
+        skip "lib $lib not in \$^INCLUDE_PATH on Win32" if $^OS_NAME eq 'MSWin32';
+        skip "lib $lib not defined" unless defined $dir;
+        skip "lib $lib not set" unless length $dir;
+        # So we expect to find it in $^INCLUDE_PATH
 
-    ok (exists %orig_inc{$dir}, "Expect $lib '$dir' to be in \$^INCLUDE_PATH")
-      or $failed++;
-  };
+        ok (exists %orig_inc{$dir}, "Expect $lib '$dir' to be in \$^INCLUDE_PATH")
+            or $failed++;
+    };
 }
 _diag ('$^INCLUDE_PATH is:', @orig_inc) if $failed;

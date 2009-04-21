@@ -69,11 +69,11 @@ my $tmpdir;
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
     $tmpdir = @_[0]->_tmpdir( < map( { env::var($_) }, qw(TMPDIR TEMP TMP) ),
-			      'SYS:/temp',
-			      'C:\system\temp',
-			      'C:/temp',
-			      '/tmp',
-			      '/'  );
+        'SYS:/temp',
+        'C:\system\temp',
+        'C:/temp',
+        '/tmp',
+        '/'  );
 }
 
 =item case_tolerant
@@ -87,14 +87,14 @@ Default: 1
 =cut
 
 sub case_tolerant(?$drive) {
-  try { require Win32API::File; } or return 1;
-  $drive ||= "C:";
-  my $osFsType = "\0"x256;
-  my $osVolName = "\0"x256;
-  my $ouFsFlags = 0;
-  Win32API::File::GetVolumeInformation($drive, $osVolName, 256, \@(), \@(), $ouFsFlags, $osFsType, 256 );
-  if ($ouFsFlags ^&^ Win32API::File::FS_CASE_SENSITIVE()) { return 0; }
-  else { return 1; }
+    try { require Win32API::File; } or return 1;
+    $drive ||= "C:";
+    my $osFsType = "\0"x256;
+    my $osVolName = "\0"x256;
+    my $ouFsFlags = 0;
+    Win32API::File::GetVolumeInformation($drive, $osVolName, 256, \@(), \@(), $ouFsFlags, $osFsType, 256 );
+    if ($ouFsFlags ^&^ Win32API::File::FS_CASE_SENSITIVE()) { return 0; }
+    else { return 1; }
 }
 
 =item file_name_is_absolute
@@ -107,10 +107,10 @@ volume, 1 if it's absolute with no volume, 0 otherwise.
 sub file_name_is_absolute($self,$file) {
 
     if ($file =~ m{^($VOL_RX)}o) {
-      my $vol = $1;
-      return  $vol =~ m{^$UNC_RX}o ?? 2
-	      !! $file =~ m{^$DRIVE_RX(?:[\\/])}o ?? 2
-	      !! 0;
+        my $vol = $1;
+        return  $vol =~ m{^$UNC_RX}o ?? 2
+            !! $file =~ m{^$DRIVE_RX(?:[\\/])}o ?? 2
+            !! 0;
     }
     return $file =~  m{^[\\/]} ?? 1 !! 0;
 }
@@ -128,7 +128,7 @@ sub catfile {
     # Legacy / compatibility support
     #
     shift, return _canon_cat( "/", < @_ )
-	if @_[0] eq "";
+        if @_[0] eq "";
 
     # Compatibility with File::Spec <= 3.26:
     #     catfile('A:', 'foo') should return 'A:\foo'.
@@ -144,9 +144,9 @@ sub catdir {
     # Legacy / compatibility support
     #
     return ""
-    	unless (nelems @_);
+        unless (nelems @_);
     shift, return _canon_cat( "/", < @_ )
-	if @_[0] eq "";
+        if @_[0] eq "";
 
     # Compatibility with File::Spec <= 3.26:
     #     catdir('A:', 'foo') should return 'A:\foo'.
@@ -204,14 +204,14 @@ The results can be passed to L</catpath> to get back a path equivalent to
 sub splitpath($self,$path, ?$nofile) {
     my @($volume,$directory,$file) = @('','','');
     if ( $nofile ) {
-        $path =~ 
-            m{^ ( $VOL_RX ? ) (.*) }sox;
+            $path =~ 
+        m{^ ( $VOL_RX ? ) (.*) }sox;
         $volume    = $1;
         $directory = $2;
     }
     else {
-        $path =~ 
-            m{^ ( $VOL_RX ? )
+            $path =~ 
+        m{^ ( $VOL_RX ? )
                 ( (?:.*[\\/](?:\.\.?\Z(?!\n))?)? )
                 (.*)
              }sox;
@@ -283,20 +283,20 @@ sub catpath($self,$volume,$directory,$file) {
     $volume .= $v
         if ( (($v) = $volume =~ m@^([\\/])[\\/][^\\/]+[\\/][^\\/]+\Z(?!\n)@s) &&
              $directory =~ m@^[^\\/]@s
-           ) ;
+             ) ;
 
     $volume .= $directory ;
 
     # If the volume is not just A:, make sure the glue separator is 
     # there, reusing whatever separator is first in the $volume if possible.
     if ( $volume !~ m@^[a-zA-Z]:\Z(?!\n)@s &&
-         $volume =~ m@[^\\/]\Z(?!\n)@      &&
-         $file   =~ m@[^\\/]@
-       ) {
-        $volume =~ m@([\\/])@ ;
-        my $sep = $1 ?? $1 !! '\' ;
-        $volume .= $sep ;
-    }
+        $volume =~ m@[^\\/]\Z(?!\n)@      &&
+        $file   =~ m@[^\\/]@
+    ) {
+            $volume =~ m@([\\/])@ ;
+            my $sep = $1 ?? $1 !! '\' ;
+            $volume .= $sep ;
+        }
 
     $volume .= $file ;
 
@@ -304,7 +304,7 @@ sub catpath($self,$volume,$directory,$file) {
 }
 
 sub _same {
-  lc(@_[1]) eq lc(@_[2]);
+    lc(@_[1]) eq lc(@_[2]);
 }
 
 sub rel2abs($self,$path,?$base) {
@@ -315,34 +315,34 @@ sub rel2abs($self,$path,?$base) {
     return $self->canonpath( $path ) if $is_abs == 2;
 
     if ($is_abs) {
-      # It's missing a volume, add one
-      my $vol = $self->splitpath( $self->_cwd() )[0];
-      return $self->canonpath( $vol . $path );
+        # It's missing a volume, add one
+        my $vol = $self->splitpath( $self->_cwd() )[0];
+        return $self->canonpath( $vol . $path );
     }
 
     if ( !defined( $base ) || $base eq '' ) {
-      require Cwd ;
-      $base = Cwd::getdcwd( $self->splitpath( $path )[0] ) if defined &Cwd::getdcwd ;
-      $base = $self->_cwd() unless defined $base ;
+        require Cwd ;
+        $base = Cwd::getdcwd( $self->splitpath( $path )[0] ) if defined &Cwd::getdcwd ;
+        $base = $self->_cwd() unless defined $base ;
     }
     elsif ( ! $self->file_name_is_absolute( $base ) ) {
-      $base = $self->rel2abs( $base ) ;
+        $base = $self->rel2abs( $base ) ;
     }
     else {
-      $base = $self->canonpath( $base ) ;
+        $base = $self->canonpath( $base ) ;
     }
 
     my @( $path_directories, $path_file ) =
-       ($self->splitpath( $path, 1 ))[[1..2]] ;
+        ($self->splitpath( $path, 1 ))[[1..2]] ;
 
     my @( $base_volume, $base_directories, _ ) = 
-      $self->splitpath( $base, 1 ) ;
+        $self->splitpath( $base, 1 ) ;
 
     $path = $self->catpath( 
-			   $base_volume, 
-			   $self->catdir( $base_directories, $path_directories ), 
-			   $path_file
-			  ) ;
+        $base_volume, 
+        $self->catdir( $base_directories, $path_directories ), 
+        $path_file
+        ) ;
 
     return $self->canonpath( $path ) ;
 }
@@ -372,19 +372,19 @@ sub _canon_cat				# @path -> path
 {
     my $first  = shift;
     my $volume = $first =~ s{ \A ([A-Za-z]:) ([\\/]?) }{}x	# drive letter
-    	       ?? ucfirst( $1 ).( $2 ?? "\\" !! "" )
-	       !! $first =~ s{ \A (?:\\\\|//) ([^\\/]+)
+        ?? ucfirst( $1 ).( $2 ?? "\\" !! "" )
+        !! $first =~ s{ \A (?:\\\\|//) ([^\\/]+)
 				 (?: [\\/] ([^\\/]+) )?
 	       			 [\\/]? }{}xs			# UNC volume
-	       ?? "\\\\$1".( defined $2 ?? "\\$2" !! "" )."\\"
-	       !! $first =~ s{ \A [\\/] }{}x			# root dir
-	       ?? "\\"
-	       !! "";
+        ?? "\\\\$1".( defined $2 ?? "\\$2" !! "" )."\\"
+        !! $first =~ s{ \A [\\/] }{}x			# root dir
+        ?? "\\"
+        !! "";
     my $path   = join "\\", @( $first, < @_);
 
     $path =~ s#[\\/]+#\\#g;		# xx/yy --> xx\yy & xx\\yy --> xx\yy
 
-    					# xx/././yy --> xx/yy
+    # xx/././yy --> xx/yy
     $path =~ s{(?:
 		(?:\A|\\)		# at begin or after a slash
 		\.
@@ -398,12 +398,12 @@ sub _canon_cat				# @path -> path
     #     Then .... could easily become ../../.. etc:
     # Replace \.\.\. by (\.\.\.+)  and substitute with
     # { $1 . ".." . "\\.." x (length($2)-2) }gex
-	     				# ... --> ../..
+    # ... --> ../..
     $path =~ s{ (\A|\\)			# at begin or after a slash
     		\.\.\.
 		(?=\\|\z) 		# at end or followed by slash
 	     }{$1..\\..}gx;
-    					# xx\yy\..\zz --> xx\zz
+    # xx\yy\..\zz --> xx\zz
     while ( $path =~ s{(?:
 		(?:\A|\\)		# at begin or after a slash
 		[^\\]+			# rip this 'yy' off
@@ -419,15 +419,15 @@ sub _canon_cat				# @path -> path
 
     if ( $volume =~ m#\\\z# )
     {					# <vol>\.. --> <vol>\
-	$path =~ s{ \A			# at begin
+        $path =~ s{ \A			# at begin
 		    \.\.
 		    (?:\\\.\.)*		# and more
 		    (?:\\|\z) 		# at end or followed by slash
 		 }{}x;
 
-	return $1			# \\HOST\SHARE\ --> \\HOST\SHARE
-	    if    $path eq ""
-	      and $volume =~ m#\A(\\\\.*)\\\z#s;
+        return $1			# \\HOST\SHARE\ --> \\HOST\SHARE
+            if    $path eq ""
+            and $volume =~ m#\A(\\\\.*)\\\z#s;
     }
     return $path ne "" || $volume ?? $volume.$path !! ".";
 }

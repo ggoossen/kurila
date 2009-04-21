@@ -7,9 +7,9 @@ our ($VERSION);
 use base < qw( Pod::Simple::XMLOutStream );
 
 $VERSION   # so that ->VERSION is happy
-# stop CPAN from seeing this
- =
-$Pod::Simple::XMLOutStream::VERSION;
+    # stop CPAN from seeing this
+    =
+    $Pod::Simple::XMLOutStream::VERSION;
 
 
 sub is_pageable        { 0 }

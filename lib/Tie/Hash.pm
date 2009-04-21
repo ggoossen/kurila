@@ -197,11 +197,11 @@ sub new {
 sub TIEHASH {
     my $pkg = shift;
     if (defined &{Symbol::fetch_glob("$($pkg)::new")}) {
-	warnings::warnif("WARNING: calling $($pkg)->new since $($pkg)->TIEHASH is missing");
-	$pkg->new(< @_);
+        warnings::warnif("WARNING: calling $($pkg)->new since $($pkg)->TIEHASH is missing");
+        $pkg->new(< @_);
     }
     else {
-	die "$pkg doesn't define a TIEHASH method";
+        die "$pkg doesn't define a TIEHASH method";
     }
 }
 
@@ -216,11 +216,11 @@ sub CLEAR {
     my @keys;
 
     while (defined $key) {
-	push @keys, $key;
-	$key = $self->NEXTKEY(< @_, $key);
+        push @keys, $key;
+        $key = $self->NEXTKEY(< @_, $key);
     }
     foreach my $key ( @keys) {
-	$self->DELETE(< @_, $key);
+        $self->DELETE(< @_, $key);
     }
 }
 

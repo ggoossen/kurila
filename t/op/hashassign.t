@@ -108,52 +108,52 @@ ok (!eq_hash (\%direct, \%slow), "different hashes should not be equal!");
 
 my (%names, %names_copy);
 %names = %('$' => 'Scalar', '@' => 'Array', # Grr '
-          '%', 'Hash', '&', 'Code');
+        '%', 'Hash', '&', 'Code');
 %names_copy = %( < %names );
 ok (eq_hash (\%names, \%names_copy), "check we can copy our hash");
 
 sub in {
-  my %args = %( < @_ );
-  return eq_hash (\%names, \%args);
+    my %args = %( < @_ );
+    return eq_hash (\%names, \%args);
 }
 
 ok (in (< %names), "pass hash into a method");
 
 sub in_method {
-  my $self = shift;
-  my %args = %( < @_ );
-  return eq_hash (\%names, \%args);
+    my $self = shift;
+    my %args = %( < @_ );
+    return eq_hash (\%names, \%args);
 }
 
 ok (main->in_method (< %names), "pass hash into a method");
 
 sub out {
-  return %names;
+    return %names;
 }
 %names_copy = %( < out () );
 
 ok (eq_hash (\%names, \%names_copy), "pass hash from a subroutine");
 
 sub out_method {
-  my $self = shift;
-  return %names;
+    my $self = shift;
+    return %names;
 }
 %names_copy = %( < main->out_method () );
 
 ok (eq_hash (\%names, \%names_copy), "pass hash from a method");
 
 sub in_out {
-  my %args = %( < @_ );
-  return %args;
+    my %args = %( < @_ );
+    return %args;
 }
 %names_copy = %( < in_out (< %names) );
 
 ok (eq_hash (\%names, \%names_copy), "pass hash to and from a subroutine");
 
 sub in_out_method {
-  my $self = shift;
-  my %args = %( < @_ );
-  return %args;
+    my $self = shift;
+    my %args = %( < @_ );
+    return %args;
 }
 %names_copy = %( < main->in_out_method (< %names) );
 
@@ -174,7 +174,7 @@ ok (eq_hash (\%names, \%names_copy), "duplicates at the start of a list");
 ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at the end of a list");
 
 %names_copy = %('%', 'Associative Array', '*', 'Endangered species', < %names,
-              '*', 'Typeglob',);
+        '*', 'Typeglob',);
 
 ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at both ends");
 

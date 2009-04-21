@@ -13,8 +13,8 @@ chdir File::Spec->updir;
 my $manifest = File::Spec->catfile('MANIFEST');
 open(my $manifestfh, "<", $manifest) or die "Can't open $manifest: $^OS_ERROR";
 my @modules = map { m{^lib/(\S+)}; $1 }, 
- grep { m{^lib/ExtUtils/\S*\.pm} }, 
- grep { !m{/t/} }, @( ~< *$manifestfh);
+    grep { m{^lib/ExtUtils/\S*\.pm} }, 
+    grep { !m{/t/} }, @( ~< *$manifestfh);
 chomp @modules;
 close $manifestfh;
 
@@ -27,7 +27,7 @@ foreach my $file ( @modules) {
     unshift $^INCLUDE_PATH, ".";
     ok($: try { require($file); 1 }) or diag "require $file failed.\n$($^EVAL_ERROR->message)";
 
-    SKIP: do {
+  SKIP: do {
         skip "Test::Pod not installed", 1 unless $Has_Test_Pod;
         pod_file_ok($file);
     };

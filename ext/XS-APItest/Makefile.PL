@@ -13,11 +13,11 @@ WriteMakefile(
     'LIBS'		=> \@(''), # e.g., '-lm'
     'DEFINE'		=> '', # e.g., '-DHAVE_SOMETHING'
     'INC'		=> '-I.', # e.g., '-I. -I/usr/include/other'
-	# Un-comment this if you add C files to link with later:
+    # Un-comment this if you add C files to link with later:
     # 'OBJECT'		=> '$(O_FILES)', # link all the C files too
     MAN3PODS		=> \%(),  # Pods will be built by installman.
     realclean => \%(FILES	=> 'const-c.inc const-xs.inc'),
-);
+    );
 
 WriteConstants(
     PROXYSUBS => 1,
@@ -26,7 +26,7 @@ WriteConstants(
 		 HV_FETCH_ISEXISTS HV_FETCH_LVALUE HV_FETCH_JUST_SV
 		 G_SCALAR G_ARRAY G_VOID G_DISCARD G_EVAL
 		 G_KEEPERR G_NODEBUG G_METHOD G_FAKINGEVAL),
-	      \%(name=>"G_WANT", default=>\@("IV", "G_ARRAY|G_VOID"))),
-	       );
+                 \%(name=>"G_WANT", default=>\@("IV", "G_ARRAY|G_VOID"))),
+    );
 
 sub MY::install { "install ::\n"  };

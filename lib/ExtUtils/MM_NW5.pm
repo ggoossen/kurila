@@ -77,7 +77,7 @@ sub init_platform {
     if($self->{?'base_import'}) {
         $self->{+'BASE_IMPORT'} .= ', ' . $self->{?'base_import'};
     }
- 
+
     $self->{+'NLM_VERSION'} = %Config{?'nlm_version'};
     $self->{+'MPKTOOL'}	= %Config{?'mpktool'};
     $self->{+'TOOLPATH'}	= %Config{?'toolpath'};

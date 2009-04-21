@@ -52,7 +52,7 @@ print $^STDOUT, "# eacute tests...\n";
 ok defined e2charnum('eacute');
 
 print $^STDOUT, "#    eacute is <", e2charnum('eacute'), "> which is code ",
-      ord(e2charnum('eacute')), "\n";
+    ord(e2charnum('eacute')), "\n";
 
 is e2charnum('eacute'), e2charnum('233');
 is e2charnum('eacute'), e2charnum('0351');
@@ -63,7 +63,7 @@ print $^STDOUT, "# pi tests...\n";
 ok defined e2charnum('pi');
 
 print $^STDOUT, "#    pi is <", e2charnum('pi'), "> which is code ",
-      e2charnum('pi'), "\n";
+    e2charnum('pi'), "\n";
 
 is e2charnum('pi'), e2charnum('960');
 is e2charnum('pi'), e2charnum('01700');

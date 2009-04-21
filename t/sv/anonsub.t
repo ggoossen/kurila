@@ -28,21 +28,21 @@ END { if ($tmpfile) { 1 while unlink $tmpfile; } }
 for ( @prgs){
     my $switch = "";
     if (s/^\s*(-\w+)//){
-       $switch = $1;
+        $switch = $1;
     }
     my@($prog,$expected) =  split(m/\nEXPECT\n/, $_);
     open my $test, ">", "$tmpfile";
     print $test, "$prog\n";
     close $test or die "Could not close: $^OS_ERROR";
     my $results = $Is_VMS ??
-		`$^EXECUTABLE_NAME "-I[-.lib]" $switch $tmpfile 2>&1` !!
-		  $Is_MSWin32 ??
-		    `.\\perl -I../lib $switch $tmpfile 2>&1` !!
-		      $Is_MacOS ??  
-			`$^EXECUTABLE_NAME -I::lib $switch $tmpfile` !!
-			    $Is_NetWare ??
-				`perl -I../lib $switch $tmpfile 2>&1` !!
-				    `./perl $switch $tmpfile 2>&1`;
+        `$^EXECUTABLE_NAME "-I[-.lib]" $switch $tmpfile 2>&1` !!
+        $Is_MSWin32 ??
+        `.\\perl -I../lib $switch $tmpfile 2>&1` !!
+        $Is_MacOS ??  
+        `$^EXECUTABLE_NAME -I::lib $switch $tmpfile` !!
+        $Is_NetWare ??
+        `perl -I../lib $switch $tmpfile 2>&1` !!
+        `./perl $switch $tmpfile 2>&1`;
     my $status = $^CHILD_ERROR;
     $results =~ s/\n+$//;
     # allow expected output to be written as if $prog is on STDIN
@@ -50,7 +50,7 @@ for ( @prgs){
     $results =~ s/\n%[A-Z]+-[SIWEF]-.*$// if $Is_VMS;  # clip off DCL status msg
     $expected =~ s/\n+$//;
     if ($results ne $expected) {
-       print $^STDERR, "PROG: $switch\n$prog\n";
+        print $^STDERR, "PROG: $switch\n$prog\n";
     }
     is($results, $expected);
 }

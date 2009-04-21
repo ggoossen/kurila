@@ -189,18 +189,18 @@ foreach my $country ( all_country_names())
     my $code = country2code($country, LOCALE_CODE_ALPHA_3);
     if (!defined $code)
     {
-	next if ($country eq 'Antarctica'
-		 || $country eq 'Bouvet Island'
-		 || $country eq 'Cocos (Keeling) Islands'
-		 || $country eq 'Christmas Island'
-		 || $country eq 'France, Metropolitan'
-		 || $country eq 'South Georgia and the South Sandwich Islands'
-		 || $country eq 'Heard Island and McDonald Islands'
-		 || $country eq 'British Indian Ocean Territory'
-		 || $country eq 'French Southern Territories'
-		 || $country eq 'United States Minor Outlying Islands'
-		 || $country eq 'Mayotte'
-		 || $country eq 'Zaire');
+        next if ($country eq 'Antarctica'
+          || $country eq 'Bouvet Island'
+          || $country eq 'Cocos (Keeling) Islands'
+          || $country eq 'Christmas Island'
+          || $country eq 'France, Metropolitan'
+          || $country eq 'South Georgia and the South Sandwich Islands'
+          || $country eq 'Heard Island and McDonald Islands'
+          || $country eq 'British Indian Ocean Territory'
+          || $country eq 'French Southern Territories'
+          || $country eq 'United States Minor Outlying Islands'
+          || $country eq 'Mayotte'
+          || $country eq 'Zaire');
         $ok = 0;
         last;
     }
@@ -227,18 +227,18 @@ foreach my $country ( all_country_names())
     my $code = country2code($country, LOCALE_CODE_NUMERIC);
     if (!defined $code)
     {
-	next if ($country eq 'Antarctica'
-		 || $country eq 'Bouvet Island'
-		 || $country eq 'Cocos (Keeling) Islands'
-		 || $country eq 'Christmas Island'
-		 || $country eq 'France, Metropolitan'
-		 || $country eq 'South Georgia and the South Sandwich Islands'
-		 || $country eq 'Heard Island and McDonald Islands'
-		 || $country eq 'British Indian Ocean Territory'
-		 || $country eq 'French Southern Territories'
-		 || $country eq 'United States Minor Outlying Islands'
-		 || $country eq 'Mayotte'
-		 || $country eq 'Zaire');
+        next if ($country eq 'Antarctica'
+          || $country eq 'Bouvet Island'
+          || $country eq 'Cocos (Keeling) Islands'
+          || $country eq 'Christmas Island'
+          || $country eq 'France, Metropolitan'
+          || $country eq 'South Georgia and the South Sandwich Islands'
+          || $country eq 'Heard Island and McDonald Islands'
+          || $country eq 'British Indian Ocean Territory'
+          || $country eq 'French Southern Territories'
+          || $country eq 'United States Minor Outlying Islands'
+          || $country eq 'Mayotte'
+          || $country eq 'Zaire');
         $ok = 0;
         last;
     }
@@ -325,9 +325,9 @@ foreach my $code ( all_currency_codes())
     #	The Russian Ruble has two codes - rub and rur
     #	The Belarussian Ruble has two codes - byb and byr
     if ($reverse ne $code
-	&& $code ne 'mwk' && $code ne 'zmk'
-	&& $code ne 'byr' && $code ne 'byb'
-	&& $code ne 'rub' && $code ne 'rur')
+        && $code ne 'mwk' && $code ne 'zmk'
+        && $code ne 'byr' && $code ne 'byb'
+        && $code ne 'rub' && $code ne 'rur')
     {
         $ok = 0;
         last;

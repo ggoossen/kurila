@@ -51,12 +51,12 @@ sub code2script
     #-------------------------------------------------------------------
     if ($codeset == LOCALE_CODE_NUMERIC)
     {
-	return undef if ($code =~ m/\D/);
-	$code = sprintf("\%.3d", $code);
+        return undef if ($code =~ m/\D/);
+        $code = sprintf("\%.3d", $code);
     }
     else
     {
-	$code = lc($code);
+        $code = lc($code);
     }
 
     if (exists $CODES->[$codeset]->{$code})
@@ -170,17 +170,17 @@ do {
         $CODES->[+LOCALE_CODE_ALPHA_2]->{+$alpha2} = $script;
         $COUNTRIES->[+LOCALE_CODE_ALPHA_2]->{+lc "$script"} = $alpha2;
 
-	if ($alpha3)
-	{
+        if ($alpha3)
+        {
             $CODES->[+LOCALE_CODE_ALPHA_3]->{+$alpha3} = $script;
             $COUNTRIES->[+LOCALE_CODE_ALPHA_3]->{+lc "$script"} = $alpha3;
-	}
+        }
 
-	if ($numeric)
-	{
+        if ($numeric)
+        {
             $CODES->[+LOCALE_CODE_NUMERIC]->{+$numeric} = $script;
             $COUNTRIES->[+LOCALE_CODE_NUMERIC]->{+lc "$script"} = $numeric;
-	}
+        }
 
     }
 
