@@ -487,7 +487,6 @@ C<InputLength> option.
 To read the contents of the file C<file1.txt.Compressed> and write the
 compressed data to the file C<file1.txt>.
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::AnyUncompress qw(anyuncompress $AnyUncompressError) ;
 
@@ -500,7 +499,6 @@ compressed data to the file C<file1.txt>.
 To read from an existing Perl filehandle, C<$input>, and write the
 uncompressed data to a buffer, C<$buffer>.
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::AnyUncompress qw(anyuncompress $AnyUncompressError) ;
     use IO::File ;
@@ -513,7 +511,6 @@ uncompressed data to a buffer, C<$buffer>.
 
 To uncompress all files in the directory "/my/home" that match "*.txt.Compressed" and store the compressed data in the same directory
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::AnyUncompress qw(anyuncompress $AnyUncompressError) ;
 
@@ -522,7 +519,6 @@ To uncompress all files in the directory "/my/home" that match "*.txt.Compressed
 
 and if you want to compress each file one at a time, this will do the trick
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::AnyUncompress qw(anyuncompress $AnyUncompressError) ;
 

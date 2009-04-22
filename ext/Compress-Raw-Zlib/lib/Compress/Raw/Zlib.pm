@@ -773,7 +773,6 @@ Returns the buffer size used to carry out the compression.
 Here is a trivial example of using C<deflate>. It simply reads standard
 input, deflates it and writes it to standard output.
 
-    use strict ;
     use warnings ;
 
     use Compress::Raw::Zlib ;
@@ -1030,7 +1029,6 @@ Returns the buffer size used to carry out the decompression.
 
 Here is an example of using C<inflate>.
 
-    use strict ;
     use warnings ;
     
     use Compress::Raw::Zlib;

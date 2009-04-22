@@ -439,7 +439,6 @@ TODO
 To read the contents of the file C<file1.txt> and write the compressed
 data to the file C<file1.txt.1951>.
 
-    use strict ;
     use warnings ;
     use IO::Compress::RawDeflate qw(rawdeflate $RawDeflateError) ;
 
@@ -451,7 +450,6 @@ data to the file C<file1.txt.1951>.
 To read from an existing Perl filehandle, C<$input>, and write the
 compressed data to a buffer, C<$buffer>.
 
-    use strict ;
     use warnings ;
     use IO::Compress::RawDeflate qw(rawdeflate $RawDeflateError) ;
     use IO::File ;
@@ -465,7 +463,6 @@ compressed data to a buffer, C<$buffer>.
 To compress all files in the directory "/my/home" that match "*.txt"
 and store the compressed data in the same directory
 
-    use strict ;
     use warnings ;
     use IO::Compress::RawDeflate qw(rawdeflate $RawDeflateError) ;
 
@@ -474,7 +471,6 @@ and store the compressed data in the same directory
 
 and if you want to compress each file one at a time, this will do the trick
 
-    use strict ;
     use warnings ;
     use IO::Compress::RawDeflate qw(rawdeflate $RawDeflateError) ;
 
