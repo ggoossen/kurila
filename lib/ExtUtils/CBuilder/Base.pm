@@ -34,13 +34,13 @@ sub find_perl_interpreter {
 sub add_to_cleanup {
     my $self = shift;
     foreach ( @_) {
-        $self->{files_to_clean}->{+$_} = 1;
+        $self->{files_to_clean}{+$_} = 1;
     }
 }
 
 sub cleanup {
     my $self = shift;
-    foreach my $file (keys ($self->{?files_to_clean} || \%() )->%) {
+    foreach my $file (keys($self->{?files_to_clean} || %() )) {
         unlink $file;
     }
 }
