@@ -101,7 +101,7 @@ while ( ~< *PW) {
     }
     next if m/^\+/; # ignore NIS includes
     if ((nelems @s)) {
-        push @{ %seen{+$name_s} }, iohandle::input_line_number(\*PW);
+        push  %seen{+$name_s}->@, iohandle::input_line_number(\*PW);
     } else {
         warn "# Your $where line $(iohandle::input_line_number(\*PW)) is empty.\n";
         next;

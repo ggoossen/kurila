@@ -26,7 +26,7 @@ sub run
     my $UnError         = getErrorRef($UncompressClass);
 
     my $AnyConstruct = "IO::Uncompress::$($AnyClass)" ;
-    my $AnyError = \${Symbol::fetch_glob( "IO::Uncompress::$($AnyClass)::$($AnyClass)Error") };
+    my $AnyError = \Symbol::fetch_glob( "IO::Uncompress::$($AnyClass)::$($AnyClass)Error")->$;
 
     for my $trans (@( 0, 1) )
     {

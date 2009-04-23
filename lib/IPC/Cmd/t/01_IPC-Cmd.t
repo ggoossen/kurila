@@ -90,12 +90,12 @@ do {   ### list of commands and regexes matching output ###
                     ### the last 3 entries from the RV, are they array refs?
                     isa_ok( @list[$_], 'ARRAY' ) for 2..4;
 
-                    like( "$(join ' ',@{@list[2]})", $regex,
+                    like( "$(join ' ',@list[2]->@)", $regex,
                           "   Combined buffer holds output" );
 
-                    like( "$(join ' ',@{@list[3]})", qr/$regex/,
+                    like( "$(join ' ',@list[3]->@)", qr/$regex/,
                           "   Stdout buffer filled" );
-                    is( scalar( nelems @{@list[4]} ), 0,
+                    is( scalar( nelems @list[4]->@ ), 0,
                         "   Stderr buffer empty" );
                 };
             };
@@ -166,12 +166,12 @@ do {   ### list of commands and regexes matching output ###
                     ### the last 3 entries from the RV, are they array refs?
                     isa_ok( @list[$_], 'ARRAY' ) for 2..4;
 
-                    like( join(' ',@{@list[2]}), $regex,
+                    like( join(' ',@list[2]->@), $regex,
                           "   Combined buffer holds output" );
 
-                    is( scalar( nelems @{@list[3]} ), 0,
+                    is( scalar( nelems @list[3]->@ ), 0,
                         "   Stdout buffer empty" );
-                    like( join(' ',@{@list[4]}), qr/$regex/,
+                    like( join(' ',@list[4]->@), qr/$regex/,
                           "   Stderr buffer filled" );
                 };
             };

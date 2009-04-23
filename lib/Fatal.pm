@@ -33,14 +33,14 @@ sub fill_protos {
 
 sub write_invocation($core, $call, $name, @< @argvs) {
     if ((nelems @argvs) == 1) {		# No optional arguments
-        my @argv = @{@argvs[0]};
+        my @argv = @argvs[0]->@;
         shift @argv;
         return "\t" . one_invocation($core, $call, $name, < @argv) . ";\n";
     } else {
         my $else = "\t";
         my (@out, @argv, $n);
         while ((nelems @argvs)) {
-            @argv = @{shift @argvs};
+            @argv = (shift @argvs)->@;
             $n = shift @argv;
             push @out, "$($else)if (nelems(\@_) == $n) \{\n";
             $else = "\t\} els";
@@ -101,7 +101,7 @@ EOS
         $code = eval("package $pkg; $code");
         die if $^EVAL_ERROR;
         no warnings;   # to avoid: Subroutine foo redefined ...
-        *{$sub} = $code;
+        $sub->* = $code;
     };
 }
 

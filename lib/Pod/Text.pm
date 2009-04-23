@@ -158,7 +158,7 @@ sub _handle_element_start($self, $element, $attrs) {
     # If we have a command handler, we need to accumulate the contents of the
     # tag before calling it.
     if ($self->can ("cmd_$method")) {
-        push (@{ %$self{PENDING} }, \@( $attrs, '' ));
+        push ( %$self{PENDING}->@, \@( $attrs, '' ));
     } elsif ($self->can ("start_$method")) {
         my $method = 'start_' . $method;
         $self->?$method ($attrs, '');
@@ -174,11 +174,11 @@ sub _handle_element_end($self, $element) {
     # If we have a command handler, pull off the pending text and pass it to
     # the handler along with the saved attribute hash.
     if ($self->can ("cmd_$method")) {
-        my $tag = pop @{ %$self{PENDING} };
+        my $tag = pop  %$self{PENDING}->@;
         my $method = 'cmd_' . $method;
         my $text = $self->?$method (< @$tag);
         if (defined $text) {
-            if ((nelems @{ %$self{?PENDING} }) +> 1) {
+            if ((nelems  %$self{?PENDING}->@) +> 1) {
                 %$self{PENDING}->[-1]->[1] .= $text;
             } else {
                 $self->output ($text);
@@ -409,7 +409,7 @@ sub over_common_start($self, $attrs) {
     }
 
     # Add this to our stack of indents and increase our current margin.
-    push (@{ %$self{INDENTS} }, %$self{?MARGIN});
+    push ( %$self{INDENTS}->@, %$self{?MARGIN});
     %$self{+MARGIN} += ($indent + 0);
     return '';
 }
@@ -418,7 +418,7 @@ sub over_common_start($self, $attrs) {
 # any pending items and then pop one level of indentation.
 sub over_common_end($self) {
     $self->item ("\n\n") if defined %$self{?ITEM};
-    %$self{+MARGIN} = pop @{ %$self{INDENTS} };
+    %$self{+MARGIN} = pop  %$self{INDENTS}->@;
     return '';
 }
 

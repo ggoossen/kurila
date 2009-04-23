@@ -203,7 +203,7 @@ SKIP: do {
 
     mkpath( $entry, \%(error => \$error) );
     is( scalar(nelems @$error), 1, "caught error condition" );
-    @($file, $message) =@( each %{$error->[0]});
+    @($file, $message) =@( each $error->[0]->%);
     is( $entry, $file, "and the message is: $message");
 
     try {@created = mkpath($entry, 0, 0700)};
@@ -233,21 +233,21 @@ SKIP: do {
     $dir = catdir('EXTRA', '3', 'S');
     rmtree($dir, \%(error => \$error));
     is( scalar(nelems @$error), 1, 'one error for an unreadable dir' );
-    try { @($file, $message) =@( each %{$error->[0]})};
+    try { @($file, $message) =@( each $error->[0]->%)};
     is( $file, $dir, 'unreadable dir reported in error' )
         or diag($message);
 
     $dir = catdir('EXTRA', '3', 'T');
     rmtree($dir, \%(error => \$error));
     is( scalar(nelems @$error), 1, 'one error for an unreadable dir T' );
-    try { @($file, $message) =@( each %{$error->[0]})};
+    try { @($file, $message) =@( each $error->[0]->%)};
     is( $file, $dir, 'unreadable dir reported in error T' );
 
     $dir = catdir( 'EXTRA', '4' );
     rmtree($dir,  \%(result => \$list, error => \$err) );
     is( scalar(nelems @$list), 0, q{don't follow a symlinked dir} );
     is( scalar(nelems @$err),  2, q{two errors when removing a symlink in r/o dir} );
-    try { @($file, $message) =@( each %{$err->[0]}) };
+    try { @($file, $message) =@( each $err->[0]->%) };
     is( $file, $dir, 'symlink reported in error' );
 
     $dir  = catdir('EXTRA', '3', 'U');
@@ -255,7 +255,7 @@ SKIP: do {
     rmtree($dir, $dir2, \%(verbose => 0, error => \$err, result => \$list));
     is( scalar(nelems @$list),  1, q{deleted 1 out of 2 directories} );
     is( scalar(nelems @$error), 1, q{left behind 1 out of 2 directories} );
-    try { @($file, $message) =@( each %{$err->[0]}) };
+    try { @($file, $message) =@( each $err->[0]->%) };
     is( $file, $dir, 'first dir reported in error' );
 };
 

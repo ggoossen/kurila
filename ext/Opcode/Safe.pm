@@ -136,7 +136,7 @@ sub erase($obj, $action) {
     return;
 
     my $leaf_globref   = \($stem_symtab->{+$leaf});
-    my $leaf_symtab = *{$leaf_globref}{HASH};
+    my $leaf_symtab = $leaf_globref->*{HASH};
     #    warn " leaf_symtab ", join(', ', %$leaf_symtab),"\n";
     # FIXME this does not clear properly yet: %$leaf_symtab = %( () );
     for (keys %$leaf_symtab) {
@@ -226,12 +226,12 @@ sub share_from {
         my ($var, $type);
         $type = $1 if ($var = $arg) =~ s/^(\W)//;
         # warn "share_from $pkg $type $var";
-        *{Symbol::fetch_glob($root."::$var")} = (!$type)       ?? \&{*{Symbol::fetch_glob($pkg."::$var")}}
-            !! ($type eq '&') ?? \&{*{Symbol::fetch_glob($pkg."::$var")}}
-            !! ($type eq '$') ?? \${*{Symbol::fetch_glob($pkg."::$var")}}
-            !! ($type eq '@') ?? \@{*{Symbol::fetch_glob($pkg."::$var")}}
-            !! ($type eq '%') ?? \%{*{Symbol::fetch_glob($pkg."::$var")}}
-            !! ($type eq '*') ??  *{Symbol::fetch_glob($pkg."::$var")}
+        Symbol::fetch_glob($root."::$var")->* = (!$type)       ?? \&{Symbol::fetch_glob($pkg."::$var")->*}
+            !! ($type eq '&') ?? \&{Symbol::fetch_glob($pkg."::$var")->*}
+            !! ($type eq '$') ?? \Symbol::fetch_glob($pkg."::$var")->*->$
+            !! ($type eq '@') ?? \Symbol::fetch_glob($pkg."::$var")->*->@
+            !! ($type eq '%') ?? \Symbol::fetch_glob($pkg."::$var")->*->%
+            !! ($type eq '*') ??  Symbol::fetch_glob($pkg."::$var")->*
             !! croak(qq(Can't share "$type$var" of unknown type));
     }
     $obj->share_record($pkg, $vars) unless $no_record or !$vars;
@@ -241,13 +241,13 @@ sub share_record {
     my $obj = shift;
     my $pkg = shift;
     my $vars = shift;
-    my $shares = \%{$obj->{+Shares} ||= \%()};
+    my $shares = \($obj->{+Shares} ||= \%())->%;
         # Record shares using keys of $obj->{Shares}. See reinit.
-        %{$shares}{[ @$vars]} = @($pkg) x nelems @$vars if (nelems @$vars);
+        $shares->{[ @$vars]} = @($pkg) x nelems @$vars if (nelems @$vars);
 }
 sub share_redo {
     my $obj = shift;
-    my $shares = \%{$obj->{+Shares} ||= \%()};
+    my $shares = \($obj->{+Shares} ||= \%())->%;
     my($var, $pkg);
     while(@($var, $pkg) =@( each %$shares)) {
         # warn "share_redo $pkg\:: $var";

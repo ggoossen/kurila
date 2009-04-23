@@ -103,7 +103,7 @@ sub compile {
                     $objname = "main::$objname" unless $objname =~ m/::/;
                     print $walkHandle, "$objname:\n";
                     die "err: unknown function ($objname)\n"
-                        unless *{$objname}{CODE};
+                        unless $objname->*{CODE};
                     $objref = \&$objname;
                 }
                 showlex_obj($objname, $objref);

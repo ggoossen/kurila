@@ -30,13 +30,13 @@ sub import {
     return unless (nelems @_);
     my $package = caller(0);
     # avoid possible typo warnings
-    %{*{Symbol::fetch_glob("$package\::FIELDS")}} = %( () ) unless %{*{Symbol::fetch_glob("$package\::FIELDS")}};
-    my $fields = \%{*{Symbol::fetch_glob("$package\::FIELDS")}};
+    Symbol::fetch_glob("$package\::FIELDS")->*->% = %( () ) unless Symbol::fetch_glob("$package\::FIELDS")->*->%;
+    my $fields = \Symbol::fetch_glob("$package\::FIELDS")->*->%;
     my $fattr = (%attr{+$package} ||= \@(1));
     my $next = (nelems @$fattr);
 
     # Quiet pseudo-hash deprecation warning for uses of fields::new.
-    bless \%{*{Symbol::fetch_glob("$package\::FIELDS")}}, 'pseudohash';
+    bless \Symbol::fetch_glob("$package\::FIELDS")->*->%, 'pseudohash';
 
     if ($next +> $fattr->[0]
         and ($fields->{?@_[0]} || 0) +>= $fattr->[0])
@@ -81,11 +81,11 @@ sub _dump  # sometimes useful for debugging
 {
     for my $pkg (sort keys %attr) {
         print $^STDOUT, "\n$pkg";
-        if ((nelems @{*{Symbol::fetch_glob("$pkg\::ISA")}})) {
-            print $^STDOUT, " (", join(", ", @{*{Symbol::fetch_glob("$pkg\::ISA")}}), ")";
+        if ((nelems Symbol::fetch_glob("$pkg\::ISA")->*->@)) {
+            print $^STDOUT, " (", join(", ", Symbol::fetch_glob("$pkg\::ISA")->*->@), ")";
         }
         print $^STDOUT, "\n";
-        my $fields = \%{*{Symbol::fetch_glob("$pkg\::FIELDS")}};
+        my $fields = \Symbol::fetch_glob("$pkg\::FIELDS")->*->%;
         for my $f (sort {$fields->{?$a} <+> $fields->{?$b}}, keys %$fields) {
             my $no = $fields->{?$f};
             print $^STDOUT, "   $no: $f";
@@ -115,8 +115,8 @@ sub new {
 
 sub _accessible_keys($class) {
     return  @( <
-               keys %{*{Symbol::fetch_glob($class.'::FIELDS')}},
-               < @+: map( { _accessible_keys($_) }, @{*{Symbol::fetch_glob($class.'::ISA')}}),
+               keys Symbol::fetch_glob($class.'::FIELDS')->*->%,
+               < @+: map( { _accessible_keys($_) }, Symbol::fetch_glob($class.'::ISA')->*->@),
         );
 }
 

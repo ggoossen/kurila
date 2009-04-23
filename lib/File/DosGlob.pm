@@ -385,7 +385,7 @@ sub glob($pat,$cxix) {
 
     # chuck it all out, quick or slow
     delete %iter{$cxix};
-    return @{delete %entries{$cxix}};
+    return (delete %entries{$cxix})->@;
 }
 
 do {
@@ -394,7 +394,7 @@ do {
         return unless (nelems @_);
         my $sym = shift;
         my $callpkg = ($sym =~ s/^GLOBAL_//s ?? 'CORE::GLOBAL' !! caller(0));
-        *{Symbol::fetch_glob($callpkg.'::'.$sym)} = \&{*{Symbol::fetch_glob($pkg.'::'.$sym)}} if $sym eq 'glob';
+        Symbol::fetch_glob($callpkg.'::'.$sym)->* = \&{Symbol::fetch_glob($pkg.'::'.$sym)->*} if $sym eq 'glob';
     }
 };
 1;

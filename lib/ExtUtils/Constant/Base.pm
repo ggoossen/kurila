@@ -108,7 +108,7 @@ the front of I<name>).
 =cut
 
 sub memEQ_clause($self, $args) {
-    my @($name, $checked_at, $indent) =  %{$args}{[qw(name checked_at indent)]};
+    my @($name, $checked_at, $indent) =  $args->{[qw(name checked_at indent)]};
     $indent = ' ' x ($indent || 4);
     my $front_chop;
     if (ref $checked_at) {
@@ -198,7 +198,7 @@ I<default_types> and the I<ITEM>s.
 
 sub dump_names($self, $args, @< @items) {
     my @($default_type, $what, $indent, $declare_types)
-        =  %{$args}{[qw(default_type what indent declare_types)]};
+        =  $args->{[qw(default_type what indent declare_types)]};
     $indent = ' ' x ($indent || 0);
 
     my $result;
@@ -288,7 +288,7 @@ sub assign {
     my $self = shift;
     my $args = shift;
     my @($indent, $type, $pre, $post, $item)
-        =  %{$args}{[qw(indent type pre post item)]};
+        =  $args->{[qw(indent type pre post item)]};
     $post ||= '';
     my $clause;
     my $close;
@@ -371,7 +371,7 @@ sub return_clause($self, $args, $item) {
 }
 
 sub match_clause($self, $args, $item) {
-    my @($offset, $indent) =  %{$args}{[qw(checked_at indent)]};
+    my @($offset, $indent) =  $args->{[qw(checked_at indent)]};
     $indent = ' ' x ($indent || 4);
     my $body = '';
     my ($no, $yes, $either, $name, $inner_indent);
@@ -415,7 +415,7 @@ each call).
 =cut
 
 sub switch_clause($self, $args, $namelen, $items, @< @items) {
-    my @($indent, $comment) =  %{$args}{[qw(indent comment)]};
+    my @($indent, $comment) =  $args->{[qw(indent comment)]};
     $indent = ' ' x ($indent || 2);
 
     local $Text::Wrap::huge = 'overflow';
@@ -456,7 +456,7 @@ sub switch_clause($self, $args, $namelen, $items, @< @items) {
             die "char $ord is out of range" if $ord +> 255;
             $max = $ord if $ord +> $max;
             $min = $ord if $ord +< $min;
-            push @{%spread{$char}}, $_;
+            push %spread{$char}->@, $_;
         # warn "$_ $char";
         }
         # I'm going to pick the character to split on that minimises the root
@@ -508,7 +508,7 @@ sub switch_clause($self, $args, $namelen, $items, @< @items) {
                 or $l->{?name} cmp $r->{?name}},
             # If this looks evil, maybe it is.  $items is a
             # hashref, and we're doing a hash slice on it
-            %{$items}{[ @{$best->{?$char}}]}) {
+            $items->{[ $best->{?$char}->@]}) {
             # warn "You are here";
             if ($do_front_chop) {
                 $body .= $self->match_clause (\%(indent => 2 + length $indent,
@@ -750,7 +750,7 @@ example C<constant_5> for names 5 characters long.  The default I<breakout> is
 
 sub C_constant($self, $args, @< @items) {
     my @($package, $subname, $default_type, $what, $indent, $breakout) = 
-            %{$args}{[qw(package subname default_type types indent breakout)]};
+            $args->{[qw(package subname default_type types indent breakout)]};
     $package ||= 'Foo';
     $subname ||= 'constant';
     # I'm not using this. But a hashref could be used for full formatting without
@@ -808,12 +808,12 @@ sub C_constant($self, $args, @< @items) {
         # Need to group names of the same length
         my @by_length;
         foreach ( @items) {
-            push @{@by_length[+ length $_->{?name}]}, $_;
+            push @by_length[+ length $_->{?name}]->@, $_;
         }
         foreach my $i (0 .. ((nelems @by_length)-1)) {
             next unless @by_length[$i];	# None of this length
             $body .= "  case $i:\n";
-            if ((nelems @{@by_length[$i]}) == 1) {
+            if ((nelems @by_length[$i]->@) == 1) {
                 my $only_thing = @by_length[$i]->[0];
                 if ($only_thing->{?utf8}) {
                     if ($only_thing->{?utf8} eq 'yes') {
@@ -826,14 +826,14 @@ sub C_constant($self, $args, @< @items) {
                 } else {
                     $body .= $self->match_clause (undef, $only_thing);
                 }
-            } elsif ((nelems @{@by_length[$i]}) +< $breakout) {
+            } elsif ((nelems @by_length[$i]->@) +< $breakout) {
                 $body .= $self->switch_clause (\%(indent=>4),
-                    $i, $items, < @{@by_length[$i]});
+                    $i, $items, < @by_length[$i]->@);
             } else {
                 # Only use the minimal set of parameters actually needed by the types
                 # of the names of this length.
                 my $what = \%();
-                foreach ( @{@by_length[$i]}) {
+                foreach ( @by_length[$i]->@) {
                     $what->{+$_->{?type}} = 1;
                     $what->{+''} = 1 if $_->{?utf8};
                 }
@@ -843,7 +843,7 @@ sub C_constant($self, $args, @< @items) {
                             default_type => $default_type,
                             types => $what, indent => $indent,
                             breakout => \@($i, $items)),
-                    < @{@by_length[$i]});
+                    < @by_length[$i]->@);
                 $body .= "    return $($subname)_$i ("
                     # Eg "aTHX_ "
                     . $self->C_constant_prefix_param($params)

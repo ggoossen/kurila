@@ -155,7 +155,7 @@ do {
         );
 
     for my $method ( keys %$Tmpl ) {
-        *{Symbol::fetch_glob($method)} = sub {
+        Symbol::fetch_glob($method)->* = sub {
                 my $self = shift;
                 $self->{+$method} = @_[0] if (nelems @_);
                 return $self->{?$method};
@@ -373,7 +373,7 @@ sub _parse_uri {
     } else { 
             ### using anything but qw() in hash slices may produce warnings 
             ### in older perls :-(
-            %{$href}{[qw(host path) ]} = @: $uri =~ m|([^/]*)(/.*)$|s;
+            $href->{[qw(host path) ]} = @: $uri =~ m|([^/]*)(/.*)$|s;
     }
 
     ### split the path into file + dir ###
@@ -426,7 +426,7 @@ sub fetch {
     my $out_to = ON_WIN ?? $to.'/'.$self->output_file 
         !! File::Spec->catfile( $to, < $self->output_file );
 
-    for my $method (  @{ $METHODS->{$self->scheme} } ) {
+    for my $method (   $METHODS->{$self->scheme}->@ ) {
         my $sub =  '_'.$method.'_fetch';
 
         unless( __PACKAGE__->can($sub) ) {

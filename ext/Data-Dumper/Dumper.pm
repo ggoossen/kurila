@@ -120,7 +120,7 @@ sub Seen($s, $g) {
         return $s;
     }
     else {
-        return map { < @$_ }, values %{$s->{seen}};
+        return map { < @$_ }, values $s->{seen}->%;
     }
 }
 
@@ -133,7 +133,7 @@ sub Values($s, $v) {
         return $s;
     }
     else {
-        return @{$s->{?todump}};
+        return $s->{?todump}->@;
     }
 }
 
@@ -146,7 +146,7 @@ sub Names($s, $n) {
         return $s;
     }
     else {
-        return @{$s->{?names}};
+        return $s->{?names}->@;
     }
 }
 
@@ -168,7 +168,7 @@ sub Dumpperl {
 
     $s = $s->new(< @_) unless ref $s;
 
-    for my $val ( @{$s->{todump}}) {
+    for my $val ( $s->{todump}->@) {
         my $out = "";
         @post = @();
         $name = $s->{names}->[?$i++];
@@ -642,7 +642,7 @@ sub qquote {
 
 # helper sub to sort hash keys in Perl < 5.8.0 where we don't have
 # access to sortsv() from XS
-sub _sortkeys { \ sort keys %{@_[0]} }
+sub _sortkeys { \ sort keys @_[0]->% }
 
 1;
 __END__

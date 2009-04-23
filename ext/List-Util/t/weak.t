@@ -186,5 +186,5 @@ package Dest;
 
 sub DESTROY {
     print $^STDOUT, "# INCFLAG\n";
-    ${@_[0]->{Flag}} ++;
+    @_[0]->{Flag}->$ ++;
 }

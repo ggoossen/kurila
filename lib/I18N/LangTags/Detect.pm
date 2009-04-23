@@ -109,12 +109,12 @@ sub http_accept_langs {
         ;
             $q = (defined $2 and length $2) ?? $2 !! 1;
         #print "$1 with q=$q\n";
-        push @{ %pref{+$q} }, lc $1;
+        push  %pref{+$q}->@, lc $1;
     }
 
     return _normalize(
         # Read off %pref, in descending key order...
-        < @+: map { @{%pref{?$_}} },
+        < @+: map { %pref{?$_}->@ },
         sort {$b <+> $a},
         keys %pref
     );
@@ -132,7 +132,7 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
     my $module = @_[0];   # ASSUME sane module name!
     do {
         return @(%tried{+$module} = 1)
-            if defined(%{*{Symbol::fetch_glob($module . "::Lexicon")}}) or defined(@{*{Symbol::fetch_glob($module . "::ISA")}});
+            if defined(Symbol::fetch_glob($module . "::Lexicon")->*->%) or defined(Symbol::fetch_glob($module . "::ISA")->*->@);
     # weird case: we never use'd it, but there it is!
     };
 

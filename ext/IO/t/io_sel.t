@@ -53,7 +53,7 @@ $sel->add(\@($^STDOUT, "ok 12\n"));
 print $^STDOUT, "not " unless (nelems @a) == 1;
 print $^STDOUT, "ok 11\n";
 
-my@($fd, $msg) =  @{shift @a};
+my@($fd, $msg) =  (shift @a)->@;
 print $fd, $msg;
 
 $sel->add($^STDOUT);  # update

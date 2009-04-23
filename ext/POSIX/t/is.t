@@ -59,7 +59,7 @@ foreach my $s (keys %classes) {
     %classes{+$s} = \%( < @+: map {
             %functions{+"is$_"}++;	# Keep track of all the 'is<xxx>' functions
             @: "is$_" => 1;		# Our return value: is<xxx>($s) should pass.
-        }, @{%classes{$s}} );
+        }, %classes{$s}->@ );
 }
 
 # Expected number of tests is one each for every combination of a

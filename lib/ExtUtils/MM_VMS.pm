@@ -599,7 +599,7 @@ sub constants($self) {
         # Where is the space coming from? --jhi
         next unless $self ne " " && defined $self->{?$macro};
         my %tmp = %( () );
-        for my $key (keys %{$self->{?$macro}}) {
+        for my $key (keys $self->{?$macro}->%) {
             %tmp{+$self->fixpath($key,0)} = 
             $self->fixpath($self->{$macro}->{?$key},0);
         }
@@ -609,7 +609,7 @@ sub constants($self) {
     for my $macro (qw/ C O_FILES H /) {
         next unless defined $self->{?$macro};
         my @tmp = @( () );
-        for my $val ( @{$self->{$macro}}) {
+        for my $val ( $self->{$macro}->@) {
             push(@tmp, <$self->fixpath($val,0));
         }
         $self->{+$macro} = \@tmp;
@@ -690,7 +690,7 @@ sub cflags($self,$libperl) {
     if ($self->{?DEFINE}) { $quals .= $self->{?DEFINE}; }
     for my $type (qw(Def Undef)) {
         my(@terms);
-        while ($quals =~ m:/${\$type}i?n?e?=([^/]+):ig) {
+        while ($quals =~ m:/(\$type)->$i?n?e?=([^/]+):ig) {
             my $term = $1;
             $term =~ s:^\((.+)\)$:$1:;
             push @terms, $term;
@@ -699,7 +699,7 @@ sub cflags($self,$libperl) {
             push @terms, < qw[ $(DEFINE_VERSION) $(XS_DEFINE_VERSION) ];
         }
         if ((nelems @terms)) {
-            $quals =~ s:/${\$type}i?n?e?=[^/]+::ig;
+            $quals =~ s:/(\$type)->$i?n?e?=[^/]+::ig;
             $quals .= "/$^PID(\$type)ine=(" . join(',', @terms) . ')';
         }
     }
@@ -1014,7 +1014,7 @@ sub static_lib($self) {
     return '
 $(INST_STATIC) :
 	$(NOECHO) $(NOOP)
-' unless ($self->{?OBJECT} or nelems @{$self->{?C} || \@()} or $self->{?MYEXTLIB});
+' unless ($self->{?OBJECT} or nelems ($self->{?C} || \@())->@ or $self->{?MYEXTLIB});
 
     my(@m);
     push @m,'
@@ -1293,8 +1293,8 @@ $(PERL_ARCHLIB)Config.pm : $(PERL_SRC)config.sh
 ]);
     }
 
-    push(@m, join(" ", map( { <$self->fixpath($_,0) },values %{$self->{XS}}))." : \$(XSUBPPDEPS)\n")
-        if %{$self->{?XS}};
+    push(@m, join(" ", map( { <$self->fixpath($_,0) },values $self->{XS}->%))." : \$(XSUBPPDEPS)\n")
+        if $self->{?XS}->%;
 
     join('', @m);
 }
@@ -1321,7 +1321,7 @@ MAP_TARGET    = $target
 ";
     return join '', @m if $self->{?PARENT};
 
-    my@($dir) =@( join ":", @{$self->{?DIR}});
+    my@($dir) =@( join ":", $self->{?DIR}->@);
 
     unless ($self->{?MAKEAPERL}) {
         push @m, q{
@@ -1368,7 +1368,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 
                              # Throw away anything not explicitly marked for inclusion.
                              # DynaLoader is implied.
-                             foreach my $incl (@((< @{$self->{?INCLUDE_EXT}},'DynaLoader'))){
+                             foreach my $incl (@((< $self->{?INCLUDE_EXT}->@,'DynaLoader'))){
                                  if( $xx eq $incl ){
                                      $found++;
                                      last;
@@ -1382,17 +1382,17 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
                              $xx =~ s,/,::,g;
 
                              # Throw away anything explicitly marked for exclusion
-                             foreach my $excl ( @{$self->{EXCLUDE_EXT}}){
+                             foreach my $excl ( $self->{EXCLUDE_EXT}->@){
                                  return if( $xx eq $excl );
                              }
                          }
 
                          %olbs{+env::var('DEFAULT')} = $_;
-                     }, < grep( { -d $_ }, @{$searchdirs || \@()}));
+                     }, < grep( { -d $_ }, ($searchdirs || \@())->@));
 
     # We trust that what has been handed in as argument will be buildable
     $static = \@() unless $static;
-        %olbs{[ @{$static}]} = (1) x nelems @{$static};
+        %olbs{[ $static->@]} = (1) x nelems $static->@;
 
     $extra = \@() unless $extra && ref $extra eq 'ARRAY';
     # Sort the object libraries in inverse order of
@@ -1478,7 +1478,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 MAP_TARGET    = |, <$self->fixpath($target,0),'
 MAP_SHRTARGET = ', <$self->fixpath($shrtarget,0),"
 MAP_LINKCMD   = $linkcmd
-MAP_PERLINC   = ", $perlinc ?? < map( {'"$_" ' }, @{$perlinc}) !! '',"
+MAP_PERLINC   = ", $perlinc ?? < map( {'"$_" ' }, $perlinc->@) !! '',"
 MAP_EXTRA     = $extralist
 MAP_LIBPERL = ", <$self->fixpath($libperl,0),'
 ';
@@ -1808,7 +1808,7 @@ sub eliminate_macros($self,$path) {
             @($head,$macro,$tail) = @($1,$2,$3);
             if (ref $self->{?$macro}) {
                 if (ref $self->{?$macro} eq 'ARRAY') {
-                    $macro = join ' ', @{$self->{?$macro}};
+                    $macro = join ' ', $self->{?$macro}->@;
                 }
                 else {
                     print $^STDOUT, "Note: can't expand macro \$($macro) containing ",ref($self->{?$macro}),

@@ -603,7 +603,7 @@ The error level, should be 'WARNING' or 'ERROR'.
 # Invoked as $self->poderror( @args ), or $self->poderror( {%opts}, @args )
 sub poderror {
     my $self = shift;
-    my %opts = %( (ref @_[0]) ?? < %{shift()} !! () );
+    my %opts = %( (ref @_[0]) ?? < shift()->% !! () );
 
     ## Retrieve options
     chomp( my $msg  = (%opts{?msg} || "")."$(join ' ',@_)" );
@@ -681,12 +681,12 @@ sub node($self, ?$text) {
         $text =~ s/\s+$//s; # strip trailing whitespace
         $text =~ s/\s+/ /gs; # collapse whitespace
         # add node, order important!
-        push(@{$self->{_nodes}}, $text);
+        push($self->{_nodes}->@, $text);
         # keep also a uniqueness counter
         $self->{+_unique_nodes}->{+$text}++ if($text !~ m/^\s*$/s);
         return $text;
     }
-    return @{$self->{?_nodes}};
+    return $self->{?_nodes}->@;
 }
 
 ##################################
@@ -705,12 +705,12 @@ sub idx($self,?$text) {
         $text =~ s/\s+$//s; # strip trailing whitespace
         $text =~ s/\s+/ /gs; # collapse whitespace
         # add node, order important!
-        push(@{$self->{_index}}, $text);
+        push($self->{_index}->@, $text);
         # keep also a uniqueness counter
         $self->{_unique_nodes}->{+$text}++ if($text !~ m/^\s*$/s);
         return $text;
     }
-    return @{$self->{?_index}};
+    return $self->{?_index}->@;
 }
 
 ##################################
@@ -729,10 +729,10 @@ number and C<Pod::Hyperlink> object.
 sub hyperlink {
     my $self = shift;
     if(@_[?0]) {
-        push(@{$self->{_links}}, @_[0]);
+        push($self->{_links}->@, @_[0]);
         return @_[0];
     }
-    return @{$self->{?_links}};
+    return $self->{?_links}->@;
 }
 
 ## overrides for Pod::Parser
@@ -743,7 +743,7 @@ sub end_pod {
     my $self   = shift;
     my $infile = $self->input_file();
 
-    if((nelems @{$self->{?_list_stack}})) {
+    if((nelems $self->{?_list_stack}->@)) {
         my $list;
         while(($list = $self->_close_list('EOF',$infile)) &&
         $list->indent() ne 'auto') {
@@ -786,7 +786,7 @@ sub end_pod {
     # =headX, =item and X<...>
     if($self->{?warnings} && $self->{?warnings}+>1) {
         foreach( grep( {$self->{_unique_nodes}->{?$_} +> 1 },
-        keys %{$self->{?_unique_nodes}})) {
+        keys $self->{?_unique_nodes}->%)) {
                 $self->poderror(\%( line => '-', file => $infile,
                         severity => 'WARNING',
                             msg => "multiple occurrence of link target '$_'"));
@@ -829,7 +829,7 @@ sub command($self, $cmd, $paragraph, $line_num, $pod_para) {
         }
         elsif($cmd eq 'item') {
             # are we in a list?
-            unless(nelems @{$self->{?_list_stack}}) {
+            unless(nelems $self->{?_list_stack}->@) {
                 $self->poderror(\%( line => $line, file => $file,
                         severity => 'ERROR', 
                             msg => "=item without previous =over" ));
@@ -893,7 +893,7 @@ sub command($self, $cmd, $paragraph, $line_num, $pod_para) {
         }
         elsif($cmd eq 'back') {
             # check if we have an open list
-            unless(nelems @{$self->{?_list_stack}}) {
+            unless(nelems $self->{?_list_stack}->@) {
                 $self->poderror(\%( line => $line, file => $file,
                         severity => 'ERROR', 
                             msg => "=back without previous =over" ));
@@ -937,7 +937,7 @@ sub command($self, $cmd, $paragraph, $line_num, $pod_para) {
             $self->{+_commands_in_head} = -1;
             $self->{+_last_head} = $hnum;
             # check if there is an open list
-            if((nelems @{$self->{?_list_stack}})) {
+            if((nelems $self->{?_list_stack}->@)) {
                 my $list;
                 while(($list = $self->_close_list($line,$file)) &&
                 $list->indent() ne 'auto') {
@@ -1032,14 +1032,14 @@ sub _open_list($self,$indent,$line,$file)
         indent => $indent,
         start => $line,
         file => $file);
-    unshift(@{$self->{_list_stack}}, $list);
+    unshift($self->{_list_stack}->@, $list);
     undef $self->{+_list_item_contents};
     $list;
 }
 
 sub _close_list($self,$line,$file)
 {
-    my $list = shift(@{$self->{_list_stack}});
+    my $list = shift($self->{_list_stack}->@);
     if(defined $self->{?_list_item_contents} &&
         $self->{?_list_item_contents} == 0) {
         $self->poderror(\%( line => $line, file => $file,
@@ -1233,7 +1233,7 @@ sub _preproc_par
     if(@_[0]) {
         $self->{+_commands_in_head}++;
         $self->{+_list_item_contents}++ if(defined $self->{?_list_item_contents});
-        if((nelems @{$self->{?_list_stack}}) && !$self->{_list_stack}->[0]->item()) {
+        if((nelems $self->{?_list_stack}->@) && !$self->{_list_stack}->[0]->item()) {
             $self->{_list_stack}->[0]->{+_has_par} = 1;
         }
     }

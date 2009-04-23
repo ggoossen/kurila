@@ -104,7 +104,7 @@ sub _strip_imports {
         my $item = $list->[$idx];
 
         if( defined $item and $item eq 'import' ) {
-            push @imports, < @{$list->[$idx+1]};
+            push @imports, < $list->[$idx+1]->@;
             $idx++;
         }
         else {

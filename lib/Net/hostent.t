@@ -50,11 +50,11 @@ SKIP: do {
     skip "Windows will return the machine name instead of 'localhost'", 2
         if $^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'NetWare' or $^OS_NAME eq 'cygwin';
 
-    print $^STDOUT, "# name = " . $h->name . ", aliases = " . join (",", @{$h->aliases}) . "\n";
+    print $^STDOUT, "# name = " . $h->name . ", aliases = " . join (",", $h->aliases->@) . "\n";
 
     my $in_alias;
     unless ($h->name =~ m/^localhost(?:\..+)?$/i) {
-        foreach ( @{$h->aliases}) {
+        foreach ( $h->aliases->@) {
             if (m/^localhost(?:\..+)?$/i) {
                 $in_alias = 1;
                 last;
@@ -67,7 +67,7 @@ SKIP: do {
 
     if ($in_alias) {
         # If we found it in the aliases before, expect to find it there again.
-        foreach ( @{$h->aliases}) {
+        foreach ( $h->aliases->@) {
             if (m/^localhost(?:\..+)?$/i) {
                 # This time, clear the flag if we see "localhost"
                 undef $in_alias;
@@ -81,6 +81,6 @@ SKIP: do {
     }
     else {
         ok( !$in_alias );
-        print $^STDOUT, "# " . $h->name . " " . join (",", @{$h->aliases}) . "\n";
+        print $^STDOUT, "# " . $h->name . " " . join (",", $h->aliases->@) . "\n";
     }
 };

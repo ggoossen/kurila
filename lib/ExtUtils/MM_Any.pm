@@ -437,7 +437,7 @@ sub clean($self, %< %attribs) {
 clean :: clean_subdirs
 |);
 
-    my @files = values %{$self->{XS}}; # .c files from *.xs files
+    my @files = values $self->{XS}->%; # .c files from *.xs files
     my @dirs  = qw(blib);
 
     # Normally these are all under blib but they might have been
@@ -457,7 +457,7 @@ clean :: clean_subdirs
     if( %attribs{?FILES} ) {
         # Use @dirs because we don't know what's in here.
         push @dirs, ref %attribs{?FILES}                ??
-            < @{%attribs{?FILES}}             !! <
+            < %attribs{?FILES}->@             !! <
             split m/\s+/, %attribs{?FILES}   ;
     }
 
@@ -512,7 +512,7 @@ sub clean_subdirs_target {
     my@($self) =@( shift);
 
     # No subdirectories, no cleaning.
-    return <<'NOOP_FRAG' unless (nelems @{$self->{?DIR}});
+    return <<'NOOP_FRAG' unless (nelems $self->{?DIR}->@);
 clean_subdirs :
 	$(NOECHO) $(NOOP)
 NOOP_FRAG
@@ -520,7 +520,7 @@ NOOP_FRAG
 
     my $clean = "clean_subdirs :\n";
 
-    for my $dir ( @{$self->{DIR}}) {
+    for my $dir ( $self->{DIR}->@) {
         my $subclean = $self->oneliner(sprintf <<'CODE', $dir);
 chdir '%s';  system '$(MAKE) clean' if -f '$(FIRST_MAKEFILE)';
 CODE
@@ -676,7 +676,7 @@ sub manifypods_target {
     my $dependencies  = '';
 
     # populate manXpods & dependencies:
-    foreach my $name (@( <keys %{$self->{?MAN1PODS} || \%()}, < keys %{$self->{?MAN3PODS} || \%()})) {
+    foreach my $name (@( <keys ($self->{?MAN1PODS} || \%())->%, < keys ($self->{?MAN3PODS} || \%())->%)) {
         $dependencies .= " \\\n\t$name";
     }
 
@@ -719,7 +719,7 @@ metafile :
 MAKE_FRAG
 
     my $prereq_pm = '';
-    foreach my $mod ( sort { lc $a cmp lc $b }, keys %{$self->{?PREREQ_PM} || \%()} ) {
+    foreach my $mod ( sort { lc $a cmp lc $b }, keys ($self->{?PREREQ_PM} || \%())->% ) {
         my $ver = $self->{PREREQ_PM}->{?$mod};
         $prereq_pm .= sprintf "\n    \%-30s \%s", "$mod:", $ver;
     }
@@ -814,7 +814,7 @@ sub realclean($self, %< %attribs) {
     # This cleans up the files built from the ext/ directory (all XS).
     if( $self->{?PERL_CORE} ) {
         push @dirs, < qw($(INST_AUTODIR) $(INST_ARCHAUTODIR));
-        push @files, < values %{$self->{PM}};
+        push @files, < values $self->{PM}->%;
     }
 
     if( $self->has_link_code ){
@@ -823,7 +823,7 @@ sub realclean($self, %< %attribs) {
 
     if( %attribs{?FILES} ) {
         if( ref %attribs{?FILES} ) {
-            push @dirs, < @{ %attribs{?FILES} };
+            push @dirs, <  %attribs{?FILES}->@;
         }
         else {
             push @dirs, < split m/\s+/, %attribs{?FILES};
@@ -864,14 +864,14 @@ target to call realclean on any subdirectories which contain Makefiles.
 sub realclean_subdirs_target {
     my $self = shift;
 
-    return <<'NOOP_FRAG' unless (nelems @{$self->{?DIR}});
+    return <<'NOOP_FRAG' unless (nelems $self->{?DIR}->@);
 realclean_subdirs :
 	$(NOECHO) $(NOOP)
 NOOP_FRAG
 
     my $rclean = "realclean_subdirs :\n";
 
-    foreach my $dir ( @{$self->{DIR}}) {
+    foreach my $dir ( $self->{DIR}->@) {
         foreach my $makefile (@('$(MAKEFILE_OLD)', '$(FIRST_MAKEFILE)') ) {
             my $subrclean .= $self->oneliner(sprintf <<'CODE', $dir, < (@($makefile) x 2));
 chdir '%s';  system '$(MAKE) $(USEMAKEFILE) %s realclean' if -f '%s';
@@ -1133,7 +1133,7 @@ sub init_INSTALL_from_PREFIX {
     $self->{+PREFIX}       ||= '';
 
     if( $self->{?PREFIX} ) { 
-            %{$self}{[qw(PERLPREFIX SITEPREFIX VENDORPREFIX)]} =
+            $self->{[qw(PERLPREFIX SITEPREFIX VENDORPREFIX)]} =
         @('$(PREFIX)') x 3;
     }
     else {
@@ -1268,7 +1268,7 @@ sub init_INSTALL_from_PREFIX {
 
     my %layouts = %(< %bin_layouts, < %man_layouts, < %lib_layouts);
     while( my @(?$var, ?$layout) = @: each(%layouts) ) {
-        my@($s, $t, $d, $style) =  %{$layout}{[qw(s t d style)]};
+        my@($s, $t, $d, $style) =  $layout->{[qw(s t d style)]};
         my $r = '$('.%type2prefix{?$t}.')';
 
         print $^STDERR, "Prefixing $var\n" if $Verbose +>= 2;
@@ -1310,7 +1310,7 @@ my %map = %(
 sub init_INSTALL_from_INSTALL_BASE {
     my $self = shift;
 
-        %{$self}{[qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)]} = @:
+        $self->{[qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)]} = @:
                                                          '$(INSTALL_BASE)';
 
     my %install;
@@ -1320,7 +1320,7 @@ sub init_INSTALL_from_INSTALL_BASE {
             my $key = "INSTALL".$dir.$uc_thing;
 
             %install{+$key} ||= 
-            $self->catdir('$(INSTALL_BASE)', < @{%map{$thing}});
+            $self->catdir('$(INSTALL_BASE)', < %map{$thing}->@);
         }
     }
 

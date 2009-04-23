@@ -148,7 +148,7 @@ sub _liblist_ext($self, $potential_libs,$verbose,$give_libs) {
 
     my(@dirs,@libs,%found,@fndlibs,$ldlib);
     my $cwd = cwd();
-    my@($so,$lib_ext,$obj_ext) =  %{$self->{'config'}}{[@('so','lib_ext','obj_ext')]};
+    my@($so,$lib_ext,$obj_ext) =  $self->{'config'}->{[@('so','lib_ext','obj_ext')]};
     # List of common Unix library names and their VMS equivalents
     # (VMS equivalent of '' indicates that the library is automatically
     # searched by the linker, and should be skipped here.)
@@ -260,8 +260,8 @@ sub _liblist_ext($self, $potential_libs,$verbose,$give_libs) {
             }
             if ($ctype) { 
                 # This has to precede any other CRTLs, so just make it first
-                if ($cand eq 'VAXCCURSE') { unshift @{%found{$ctype}}, $cand; }  
-                else                      { push    @{%found{$ctype}}, $cand; }
+                if ($cand eq 'VAXCCURSE') { unshift %found{$ctype}->@, $cand; }  
+                else                      { push    %found{$ctype}->@, $cand; }
                 warn "\tFound as $cand (really $fullname), type $ctype\n" 
                     if $verbose +> 1;
                 push @flibs, $name unless %libs_seen{+$fullname}++;
@@ -272,9 +272,9 @@ sub _liblist_ext($self, $potential_libs,$verbose,$give_libs) {
             ."No library found for $lib\n";
     }
 
-    push @fndlibs, < @{%found{?OBJ}}                      if exists %found{OBJ};
-    push @fndlibs, < map { "$_/Library" }, @{%found{OLB}} if exists %found{OLB};
-    push @fndlibs, < map { "$_/Share"   }, @{%found{SHR}} if exists %found{SHR};
+    push @fndlibs, < %found{?OBJ}->@                      if exists %found{OBJ};
+    push @fndlibs, < map { "$_/Library" }, %found{OLB}->@ if exists %found{OLB};
+    push @fndlibs, < map { "$_/Share"   }, %found{SHR}->@ if exists %found{SHR};
     my $lib = join(' ', @fndlibs);
 
     $ldlib = $crtlstr ?? "$lib $crtlstr" !! $lib;

@@ -329,12 +329,12 @@ sub init_globals {
 # clean_data: global clean-up of pod data
 #
 sub clean_data($dataref) {
-    for my $i ( 0..(nelems @{$dataref})-1 ) {
-        @{$dataref}[$i] =~ s/\s+\Z//;
+    for my $i ( 0..(nelems $dataref->@)-1 ) {
+        $dataref->[$i] =~ s/\s+\Z//;
 
         # have a look for all-space lines
-        if( @{$dataref}[$i] =~ m/^\s+$/m and $dataref->[$i] !~ m/^\s/ ){
-            my @chunks = split( m/^\s+$/m, @{$dataref}[$i] );
+        if( $dataref->[$i] =~ m/^\s+$/m and $dataref->[$i] !~ m/^\s/ ){
+            my @chunks = split( m/^\s+$/m, $dataref->[$i] );
             splice( @$dataref, $i, 1, < @chunks );
         }
     }
@@ -2056,8 +2056,8 @@ my %E2c;
 sub depod($v){
     my $string;
     if( ref( $v ) ){
-        $string =  ${$v};
-        ${$v} = depod1( \$string );
+        $string =  $v->$;
+        $v->$ = depod1( \$string );
     } else {
         $string =  $v;
         depod1( \$string );

@@ -317,7 +317,7 @@ sub _getFiles
     my %outInMapping = %( () );
     my %inFiles = %( () ) ;
 
-    foreach my $inFile ( @{ $self->{InputFiles} })
+    foreach my $inFile (  $self->{InputFiles}->@)
     {
         next if %inFiles{+$inFile} ++ ;
 
@@ -334,7 +334,7 @@ sub _getFiles
                 return undef ;
             }
             %outInMapping{+$outFile} = $inFile;
-            push @{ $self->{Pairs} }, \@($inFile, $outFile);
+            push  $self->{Pairs}->@, \@($inFile, $outFile);
         }
     }
 
@@ -352,7 +352,7 @@ sub getHash
 {
     my $self = shift ;
 
-    return \%( < @+: map { @: $_->[0] => $_->[1] }, @{ $self->{Pairs} } ) ;
+    return \%( < @+: map { @: $_->[0] => $_->[1] },  $self->{Pairs}->@ ) ;
 }
 
 1;

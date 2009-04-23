@@ -205,7 +205,7 @@ sub do_middle {      # the main work
 
         } elsif( $type eq 'start' ) {
             DEBUG +> 1 and print $^STDOUT, "  +$type ", <$token->tagname,
-                " (", < map( {"<$_> " }, %{$token->attr_hash}), ")\n";
+                " (", < map( {"<$_> " }, $token->attr_hash->%), ")\n";
 
             if( ($tagname = $token->tagname) eq 'Verbatim'
                 or $tagname eq 'VerbatimFormatted'
@@ -240,7 +240,7 @@ sub do_middle {      # the main work
                     # of removes, and operates on the beginning instead of the end!
 
                     if(@to_unget[-1]->type eq 'text') {
-                        if( ($text_count_here += length ${@to_unget[-1]->text_r}) +> 150 ){
+                        if( ($text_count_here += length @to_unget[-1]->text_r->$) +> 150 ){
                             DEBUG +> 1 and print $^STDOUT, "    item-* is too long to be keepn'd.\n";
                             last;
                         }
@@ -293,7 +293,7 @@ sub do_middle {      # the main work
             }
 
             defined($scratch = $self->{'Tagmap'}->{?$tagname}) or next;
-            $scratch =~ s/\#([^\#]+)\#/%{$self}{?$1}/g; # interpolate
+            $scratch =~ s/\#([^\#]+)\#/$self->{?$1}/g; # interpolate
             print $fh, $scratch;
 
             if ($tagname eq 'item-number') {
@@ -313,7 +313,7 @@ sub do_middle {      # the main work
                 --$self->{+'rtfverbatim'};
             }
             defined($scratch = $self->{'Tagmap'}->{?"/$tagname"}) or next;
-            $scratch =~ s/\#([^\#]+)\#/%{$self}{?$1}/g; # interpolate
+            $scratch =~ s/\#([^\#]+)\#/$self->{?$1}/g; # interpolate
             print $fh, $scratch;
         }
     }

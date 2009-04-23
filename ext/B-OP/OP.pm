@@ -29,11 +29,11 @@ use constant OP_LIST    => 141;    # MUST FIX CONSTANTS.
 # This is where we implement op.c in Perl. Sssh.
 sub linklist {
     my $o = shift;
-    if ( $o->can("first") and $o->first and ${ $o->first } ) {
+    if ( $o->can("first") and $o->first and  $o->first->$ ) {
         $o->next( < $o->first->linklist );
         my $kid = $o->first;
         while ($$kid) {
-            if ( ${ $kid->sibling } ) {
+            if (  $kid->sibling->$ ) {
                 $kid->next( < $kid->sibling->linklist );
             }
             else {

@@ -1108,7 +1108,7 @@ do {
         );
 
     for my $tle (sort keys %templates) {
-        my @d = @{%templates{?$tle}};
+        my @d = %templates{?$tle}->@;
         my $tbe = $tle;
         $tbe =~ s/</>/g;
         for my $t (@($tbe, $tle)) {
@@ -1482,7 +1482,7 @@ foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w)) {
         foreach my $test ( @tests) {
             ok (list_eq ($test->[1], $test->[2]), $test->[0]) ||
                 diag sprintf "unpack gave \%s expected \%s", <
-             encode_list (< @{$test->[1]}), < encode_list (< @{$test->[2]});
+             encode_list (< $test->[1]->@), < encode_list (< $test->[2]->@);
         }
     };
 }

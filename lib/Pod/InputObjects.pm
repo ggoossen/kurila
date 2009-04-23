@@ -781,7 +781,7 @@ children for the top node.
 sub top {
     my $self = shift;
     if ((nelems @_) +> 0) {
-        @{ $self } = @( ((nelems @_) == 1  and  ref @_[0]) ?? ${ nelems @_ } !! < @_ );
+         $self->@ = @( ((nelems @_) == 1  and  ref @_[0]) ?? ( nelems @_ )->$ !! < @_ );
     }
     return $self;
 }
@@ -805,9 +805,9 @@ children for the top node.
 sub children {
     my $self = shift;
     if ((nelems @_) +> 0) {
-        @{ $self } = @( ((nelems @_) == 1  and  ref @_[0]) ?? ${ nelems @_ } !! < @_ );
+         $self->@ = @( ((nelems @_) == 1  and  ref @_[0]) ?? ( nelems @_ )->$ !! < @_ );
     }
-    return @{ $self };
+    return  $self->@;
 }
 
 ##---------------------------------------------------------------------------

@@ -181,7 +181,7 @@ sub lock_ref_keys_plus($hash,@< @keys) {
         }
     }
     Internals::HvRESTRICTED(%$hash,1);
-    delete %{$hash}{[@delete]};
+    delete $hash->{[@delete]};
     return $hash
 }
 

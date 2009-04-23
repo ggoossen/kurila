@@ -20,8 +20,8 @@ if ('1234' =~ m/(?:(?<A>\d)|(?<C>!))(?<B>\d)(?<A>\d)(?<B>\d)/){
     is("$(join ' ',@names)","A B","regnames");
     @names = sort $( regnames(1) );
     is("$(join ' ',@names)","A B C","regnames");
-    is(join("", @{regname("A",1)}),"13");
-    is(join("", @{regname("B",1)}),"24");
+    is(join("", regname("A",1)->@),"13");
+    is(join("", regname("B",1)->@),"24");
     do {
         if ('foobar' =~ m/(?<foo>foo)(?<bar>bar)/) {
             is(regnames_count(),2);

@@ -50,7 +50,7 @@ do {
         VERSION_FROM    => 'lib/Big/Dummy.pm',
         );
 
-    ok( %{ $mm->{MAN3PODS} } );
+    ok(  $mm->{MAN3PODS}->% );
 };
 
 do {
@@ -60,7 +60,7 @@ do {
         INSTALLMAN3DIR  => 'none'
         );
 
-    ok( !%{ $mm->{MAN3PODS} } );
+    ok( ! $mm->{MAN3PODS}->% );
 };
 
 

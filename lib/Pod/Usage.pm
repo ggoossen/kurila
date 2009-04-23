@@ -454,7 +454,7 @@ sub pod2usage {
     }
     elsif (ref $_) {
         ## User passed a ref to a hash
-        %opts = %( < %{$_} )  if (ref($_) eq 'HASH');
+        %opts = %( < $_->% )  if (ref($_) eq 'HASH');
     }
     elsif (m/^[-+]?\d+$/) {
         ## User passed in the exit value to use
@@ -600,10 +600,10 @@ sub _handle_element_end($self, $element) {
         %$self{+USAGE_SKIPPING} = 1;
         my $heading = %$self{?USAGE_HEAD1};
         $heading .= '/' . %$self{?USAGE_HEAD2} if defined %$self{?USAGE_HEAD2};
-        if (!%$self{?USAGE_SELECT} || !nelems @{ %$self{?USAGE_SELECT} }) {
+        if (!%$self{?USAGE_SELECT} || !nelems  %$self{?USAGE_SELECT}->@) {
             %$self{+USAGE_SKIPPING} = 0;
         } else {
-            for ( @{ %$self{USAGE_SELECT} }) {
+            for (  %$self{USAGE_SELECT}->@) {
                 if ($heading =~ m/^$_\s*$/) {
                     %$self{+USAGE_SKIPPING} = 0;
                     last;
@@ -622,7 +622,7 @@ sub _handle_element_end($self, $element) {
         }
     }
     if (%$self{?USAGE_SKIPPING}) {
-        pop @{ %$self{PENDING} };
+        pop  %$self{PENDING}->@;
     } else {
         $self->SUPER::_handle_element_end($element);
     }

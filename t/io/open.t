@@ -226,10 +226,10 @@ SKIP: do {
         if env::var('PERL_CORE_MINITEST');
     # Force the reference to %! to be run time by writing ! as {"!"}
     skip "This system doesn't understand EINVAL", 1
-        unless exists %{"!"}{EINVAL};
+        unless exists "!"->{EINVAL};
 
     no warnings 'io';
-    ok(!open(my $f,'>',\my $s) && %{"!"}{?EINVAL}, 'open(reference) raises EINVAL');
+    ok(!open(my $f,'>',\my $s) && "!"->{?EINVAL}, 'open(reference) raises EINVAL');
 };
 
 do {

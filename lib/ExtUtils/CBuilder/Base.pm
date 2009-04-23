@@ -40,7 +40,7 @@ sub add_to_cleanup {
 
 sub cleanup {
     my $self = shift;
-    foreach my $file (keys %{$self->{?files_to_clean} || \%() }) {
+    foreach my $file (keys ($self->{?files_to_clean} || \%() )->%) {
         unlink $file;
     }
 }
@@ -83,10 +83,10 @@ sub compile($self, %< %args) {
     %args{+object_file} ||= $self->object_file(%args{source});
 
     my @include_dirs = $self->arg_include_dirs
-        (< @{%args{?include_dirs} || \@()},
+        (< (%args{?include_dirs} || \@())->@,
         $self->perl_inc());
 
-    my @defines = $self->arg_defines( < %{%args{?defines} || \%()} );
+    my @defines = $self->arg_defines( < (%args{?defines} || \%())->% );
 
     my @extra_compiler_flags = $self->split_like_shell(%args{?extra_compiler_flags});
     my @cccdlflags = $self->split_like_shell($cf->{cccdlflags});

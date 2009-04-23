@@ -34,9 +34,9 @@ foreach(1..3) {
 
     $cpt->share( <qw($foo));
 
-    print $^STDOUT, ${*{$cpt->varglob('foo')}}       == 42 ?? "ok $t\n" !! "not ok $t\n"; $t++;
+    print $^STDOUT, $cpt->varglob('foo')->*->$       == 42 ?? "ok $t\n" !! "not ok $t\n"; $t++;
 
-    ${*{$cpt->varglob('foo')}} = 9;
+    $cpt->varglob('foo')->*->$ = 9;
 
     print $^STDOUT, $foo == 9	?? "ok $t\n" !! "not ok $t\n"; $t++;
 
@@ -56,7 +56,7 @@ foreach(1..3) {
     # $Root::foo etc we would still see the original values!
     # This seems to be because the compiler has created an extra ref.
 
-    print $^STDOUT, ${*{$cpt->varglob('foo')}} ?? "not ok $t\n" !! "ok $t\n"; $t++;
+    print $^STDOUT, $cpt->varglob('foo')->*->$ ?? "not ok $t\n" !! "ok $t\n"; $t++;
 }
 
 print $^STDOUT, "ok $last_test\n";

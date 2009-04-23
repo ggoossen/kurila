@@ -126,7 +126,7 @@ sub walkoptree_slow($op, $method, $level) {
     }
     if (class($op) eq 'PMOP'
         && ref($op->pmreplroot)
-        && ${$op->pmreplroot}
+        && $op->pmreplroot->$
         && $op->pmreplroot->isa( 'B::OP' ))
     {
         unshift(@parents, $op);
@@ -225,10 +225,10 @@ sub walksymtable($symref, $method, $recurse, $prefix) {
         if ($sym =~ m/::$/) {
             $sym = $prefix . $sym;
             if ($sym ne "<none>::" && &$recurse($sym)) {
-                walksymtable(\%{*{Symbol::fetch_glob($fullname)}}, $method, $recurse, $sym);
+                walksymtable(\Symbol::fetch_glob($fullname)->*->%, $method, $recurse, $sym);
             }
         } else {
-            svref_2object(\*{Symbol::fetch_glob($fullname)})->?$method();
+            svref_2object(\Symbol::fetch_glob($fullname)->*)->?$method();
         }
     }
 }

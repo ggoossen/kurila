@@ -218,9 +218,9 @@ sub _open3 {
     ref::svtype($dad_err) eq "PLAINVALUE" and die "PLAINVALUE can not be used as a filehandle";
 
     # force unqualified filehandles into caller's package
-    $dad_wtr = \*{Symbol::fetch_glob(qualify $dad_wtr, $package)} unless ref \$dad_wtr ne "SCALAR" or fh_is_fd($dad_wtr);
-    $dad_rdr = \*{Symbol::fetch_glob(qualify $dad_rdr, $package)} unless ref \$dad_rdr ne "SCALAR" or fh_is_fd($dad_rdr);
-    $dad_err = \*{Symbol::fetch_glob(qualify $dad_err, $package)} unless ref \$dad_err ne "SCALAR" or fh_is_fd($dad_err);
+    $dad_wtr = \Symbol::fetch_glob(qualify $dad_wtr, $package)->* unless ref \$dad_wtr ne "SCALAR" or fh_is_fd($dad_wtr);
+    $dad_rdr = \Symbol::fetch_glob(qualify $dad_rdr, $package)->* unless ref \$dad_rdr ne "SCALAR" or fh_is_fd($dad_rdr);
+    $dad_err = \Symbol::fetch_glob(qualify $dad_err, $package)->* unless ref \$dad_err ne "SCALAR" or fh_is_fd($dad_err);
 
     my $kid_rdr = gensym;
     my $kid_wtr = gensym;
@@ -279,23 +279,23 @@ sub _open3 {
 
         my @close;
         if ($dup_wtr) {
-            $kid_rdr = \*{$dad_wtr};
+            $kid_rdr = \$dad_wtr->*;
             push @close, $kid_rdr;
         } else {
-            push @close, \*{$dad_wtr}, $kid_rdr;
+            push @close, \$dad_wtr->*, $kid_rdr;
         }
         if ($dup_rdr) {
-            $kid_wtr = \*{$dad_rdr};
+            $kid_wtr = \$dad_rdr->*;
             push @close, $kid_wtr;
         } else {
-            push @close, \*{$dad_rdr}, $kid_wtr;
+            push @close, \$dad_rdr->*, $kid_wtr;
         }
         if ($dad_rdr ne $dad_err) {
             if ($dup_err) {
-                $kid_err = \*{$dad_err};
+                $kid_err = \$dad_err->*;
                 push @close, $kid_err;
             } else {
-                push @close, \*{$dad_err}, $kid_err;
+                push @close, \$dad_err->*, $kid_err;
             }
         } else {
             $kid_err = $kid_wtr;

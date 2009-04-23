@@ -30,13 +30,13 @@ my $test = curr_test();
 @ref[+2] = \@c;
 @ref[+3] = \@d;
 for my $i (@(3,1,2,0)) {
-    push(@{@ref[$i]}, "ok @ary[$i]\n");
+    push(@ref[$i]->@, "ok @ary[$i]\n");
 }
 print $^STDOUT, < @a;
-print $^STDOUT, @{@ref[1]}[0];
-print $^STDOUT, < @{@ref[2]}[[@(0)]];
+print $^STDOUT, @ref[1]->[0];
+print $^STDOUT, < @ref[2]->[[@(0)]];
 do {
-    print $^STDOUT, < @{*{Symbol::fetch_glob('d')}};
+    print $^STDOUT, < Symbol::fetch_glob('d')->*->@;
 };
 curr_test($test+4);
 
@@ -51,8 +51,8 @@ is ($$$refref, 'Good');
 $ref = \@(\@(),2,\@(3,4,5,));
 is (scalar nelems @$ref, 3);
 is (@$ref[1], 2);
-is (@{@$ref[2]}[2], 5);
-is (scalar nelems @{@$ref[0]}, 0);
+is (@$ref[2]->[2], 5);
+is (scalar nelems @$ref[0]->@, 0);
 
 is ($ref->[1], 2);
 is ($ref->[2]->[0], 3);
@@ -67,14 +67,14 @@ is ($refref->{"key"}->[2]->[0], 3);
 
 @spring[+5]->[+0] = 123;
 @spring[5]->[+1] = 456;
-push(@{@spring[5]}, 789);
-is (join(':', @{@spring[5]}), "123:456:789");
+push(@spring[5]->@, 789);
+is (join(':', @spring[5]->@), "123:456:789");
 
 # Test to see if anonymous subhashes spring into existence.
 
-@{%spring2{+"foo"}} = @(1,2,3);
+%spring2{+"foo"}->@ = @(1,2,3);
 %spring2{"foo"}->[+3] = 4;
-is (join(':', @{%spring2{?"foo"}}), "1:2:3:4");
+is (join(':', %spring2{?"foo"}->@), "1:2:3:4");
 
 # Test references to subroutines.
 
@@ -230,7 +230,7 @@ do {
     @a[+1] = "good";
     my $got;
     for (@a) {
-        $got .= ${\$_};
+        $got .= (\$_)->$;
         $got .= ';';
     }
     is ($got, ";good;");
@@ -290,34 +290,34 @@ TODO: do {
 
     isnt ($name1, $name2, "They differ");
 
-    is (${*{Symbol::fetch_glob($name1)}}, undef, 'Nothing before we start (scalars)');
-    is (${*{Symbol::fetch_glob($name2)}}, undef, 'Nothing before we start');
-    ${*{Symbol::fetch_glob($name1)}} = "Yummy";
-    is (${*{Symbol::fetch_glob($name1)}}, "Yummy", 'Accessing via the correct name works');
-    is (${*{Symbol::fetch_glob($name2)}}, undef,
+    is (Symbol::fetch_glob($name1)->*->$, undef, 'Nothing before we start (scalars)');
+    is (Symbol::fetch_glob($name2)->*->$, undef, 'Nothing before we start');
+    Symbol::fetch_glob($name1)->*->$ = "Yummy";
+    is (Symbol::fetch_glob($name1)->*->$, "Yummy", 'Accessing via the correct name works');
+    is (Symbol::fetch_glob($name2)->*->$, undef,
         'Accessing via a different NUL-containing name gives nothing');
     # defined uses a different code path
-    ok (defined ${*{Symbol::fetch_glob($name1)}}, 'defined via the correct name works');
-    ok (!defined ${*{Symbol::fetch_glob($name2)}},
+    ok (defined Symbol::fetch_glob($name1)->*->$, 'defined via the correct name works');
+    ok (!defined Symbol::fetch_glob($name2)->*->$,
         'defined via a different NUL-containing name gives nothing');
 
-    is (*{Symbol::fetch_glob($name1)}->[+0], undef, 'Nothing before we start (arrays)');
-    is (*{Symbol::fetch_glob($name2)}->[+0], undef, 'Nothing before we start');
-    *{Symbol::fetch_glob($name1)}->[0] = "Yummy";
-    is (*{Symbol::fetch_glob($name1)}->[0], "Yummy", 'Accessing via the correct name works');
-    is (*{Symbol::fetch_glob($name2)}->[0], undef,
+    is (Symbol::fetch_glob($name1)->*->[+0], undef, 'Nothing before we start (arrays)');
+    is (Symbol::fetch_glob($name2)->*->[+0], undef, 'Nothing before we start');
+    Symbol::fetch_glob($name1)->*->[0] = "Yummy";
+    is (Symbol::fetch_glob($name1)->*->[0], "Yummy", 'Accessing via the correct name works');
+    is (Symbol::fetch_glob($name2)->*->[0], undef,
         'Accessing via a different NUL-containing name gives nothing');
-    ok (defined *{Symbol::fetch_glob($name1)}->[0], 'defined via the correct name works');
-    ok (!defined*{Symbol::fetch_glob($name2)}->[0],
+    ok (defined Symbol::fetch_glob($name1)->*->[0], 'defined via the correct name works');
+    ok (!definedSymbol::fetch_glob($name2)->*->[0],
         'defined via a different NUL-containing name gives nothing');
 
-    my @(_, $one) =  @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]];
-    my @(_, $two) =  @{*{Symbol::fetch_glob($name2)}}[[@(2,3)]];
+    my @(_, $one) =  Symbol::fetch_glob($name1)->*->[[@(2,3)]];
+    my @(_, $two) =  Symbol::fetch_glob($name2)->*->[[@(2,3)]];
     is ($one, undef, 'Nothing before we start (array slices)');
     is ($two, undef, 'Nothing before we start');
-    @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]] = @("Very", "Yummy");
-    @(_, $one) =  @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]];
-    @(_, $two) =  @{*{Symbol::fetch_glob($name2)}}[[@(2,3)]];
+    Symbol::fetch_glob($name1)->*->[[@(2,3)]] = @("Very", "Yummy");
+    @(_, $one) =  Symbol::fetch_glob($name1)->*->[[@(2,3)]];
+    @(_, $two) =  Symbol::fetch_glob($name2)->*->[[@(2,3)]];
     is ($one, "Yummy", 'Accessing via the correct name works');
     is ($two, undef,
         'Accessing via a different NUL-containing name gives nothing');
@@ -325,23 +325,23 @@ TODO: do {
     ok (!defined $two,
         'defined via a different NUL-containing name gives nothing');
 
-    is (*{Symbol::fetch_glob($name1)}->{?PWOF}, undef, 'Nothing before we start (hashes)');
-    is (*{Symbol::fetch_glob($name2)}->{?PWOF}, undef, 'Nothing before we start');
-    *{Symbol::fetch_glob($name1)}->{+PWOF} = "Yummy";
-    is (*{Symbol::fetch_glob($name1)}->{?PWOF}, "Yummy", 'Accessing via the correct name works');
-    is (*{Symbol::fetch_glob($name2)}->{?PWOF}, undef,
+    is (Symbol::fetch_glob($name1)->*->{?PWOF}, undef, 'Nothing before we start (hashes)');
+    is (Symbol::fetch_glob($name2)->*->{?PWOF}, undef, 'Nothing before we start');
+    Symbol::fetch_glob($name1)->*->{+PWOF} = "Yummy";
+    is (Symbol::fetch_glob($name1)->*->{?PWOF}, "Yummy", 'Accessing via the correct name works');
+    is (Symbol::fetch_glob($name2)->*->{?PWOF}, undef,
         'Accessing via a different NUL-containing name gives nothing');
-    ok (defined *{Symbol::fetch_glob($name1)}->{?PWOF}, 'defined via the correct name works');
-    ok (!defined *{Symbol::fetch_glob($name2)}->{?PWOF},
+    ok (defined Symbol::fetch_glob($name1)->*->{?PWOF}, 'defined via the correct name works');
+    ok (!defined Symbol::fetch_glob($name2)->*->{?PWOF},
         'defined via a different NUL-containing name gives nothing');
 
-    my @(_, $one) =  %{*{Symbol::fetch_glob($name1)}}{[@('SNIF', 'BEEYOOP')]};
-    my @(_, $two) =  %{*{Symbol::fetch_glob($name2)}}{[@('SNIF', 'BEEYOOP')]};
+    my @(_, $one) =  Symbol::fetch_glob($name1)->*->{[@('SNIF', 'BEEYOOP')]};
+    my @(_, $two) =  Symbol::fetch_glob($name2)->*->{[@('SNIF', 'BEEYOOP')]};
     is ($one, undef, 'Nothing before we start (hash slices)');
     is ($two, undef, 'Nothing before we start');
-        %{*{Symbol::fetch_glob($name1)}}{[@('SNIF', 'BEEYOOP')]} = @("Very", "Yummy");
-    @(_, $one) =  %{*{Symbol::fetch_glob($name1)}}{[@('SNIF', 'BEEYOOP')]};
-    @(_, $two) =  %{*{Symbol::fetch_glob($name2)}}{[@('SNIF', 'BEEYOOP')]};
+        Symbol::fetch_glob($name1)->*->{[@('SNIF', 'BEEYOOP')]} = @("Very", "Yummy");
+    @(_, $one) =  Symbol::fetch_glob($name1)->*->{[@('SNIF', 'BEEYOOP')]};
+    @(_, $two) =  Symbol::fetch_glob($name2)->*->{[@('SNIF', 'BEEYOOP')]};
     is ($one, "Yummy", 'Accessing via the correct name works');
     is ($two, undef,
         'Accessing via a different NUL-containing name gives nothing');
@@ -354,11 +354,11 @@ TODO: do {
 
     is ($glob1, undef, "We get different typeglobs. In fact, undef");
 
-    *{Symbol::fetch_glob($name1)} = sub {"One"};
-    *{Symbol::fetch_glob($name2)} = sub {"Two"};
+    Symbol::fetch_glob($name1)->* = sub {"One"};
+    Symbol::fetch_glob($name2)->* = sub {"Two"};
 
-    is (&{*{Symbol::fetch_glob($name1)}}( < @_ ), "One");
-    is (&{*{Symbol::fetch_glob($name2)}}( < @_ ), "Two");
+    is (&{Symbol::fetch_glob($name1)->*}( < @_ ), "One");
+    is (&{Symbol::fetch_glob($name2)->*}( < @_ ), "Two");
 };
 
 # test dereferencing errors
@@ -373,7 +373,7 @@ do {
     try { *$ref };
     is($^EVAL_ERROR, '', "Glob dereference of PVIO is acceptable");
 
-    cmp_ok($ref, '\==', *{$ref}{IO}, "IO slot of the temporary glob is set correctly");
+    cmp_ok($ref, '\==', $ref->*{IO}, "IO slot of the temporary glob is set correctly");
 };
 
 # Bit of a hack to make test.pl happy. There are 3 more tests after it leaves.

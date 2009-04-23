@@ -205,7 +205,7 @@ sub checkCollator {
     else {
         my %level;
         $self->{+backwardsFlag} = 0;
-        for my $b ( @{ $self->{backwards} }) {
+        for my $b (  $self->{backwards}->@) {
             _checkLevel($b, "backwards");
             %level{+$b} = 1;
         }
@@ -221,8 +221,8 @@ sub checkCollator {
     # keys of $self->{rearrangeHash} are $self->{rearrange}.
     $self->{+rearrangeHash} = \%();
 
-    if ((nelems @{ $self->{?rearrange} })) { 
-            %{ $self->{rearrangeHash} }{[ @{ $self->{?rearrange} } ]} = @();
+    if ((nelems  $self->{?rearrange}->@)) { 
+             $self->{rearrangeHash}->{[  $self->{?rearrange}->@ ]} = @();
     }
 
     $self->{+normCode} = undef;
@@ -315,13 +315,13 @@ sub read_table {
             $self->{+alternateTable} ||= $1;
         }
         elsif ($line =~ m/^backwards\s+(\S*)/) {
-            push @{ $self->{backwardsTable} }, $1;
+            push  $self->{backwardsTable}->@, $1;
         }
         elsif ($line =~ m/^forwards\s+(\S*)/) { # parhaps no use
-            push @{ $self->{forwardsTable} }, $1;
+            push  $self->{forwardsTable}->@, $1;
         }
         elsif ($line =~ m/^rearrange\s+(.*)/) { # (\S*) is NG
-            push @{ $self->{rearrangeTable} }, < _getHexArray($1);
+            push  $self->{rearrangeTable}->@, < _getHexArray($1);
         }
     }
     close $fh;
@@ -490,7 +490,7 @@ sub splitEnt
     for my $i (0 .. nelems(@src) -1) {
         @src[$i] = undef
             if _isIllegal(@src[$i]) || ($ver9 &&
-                                 $map->{?@src[$i] } && (nelems @{ $map->{?@src[$i] } }) == 0);
+                                 $map->{?@src[$i] } && (nelems  $map->{?@src[$i] }->@) == 0);
     }
 
     my $i = 0;
@@ -553,7 +553,7 @@ sub splitEnt
         }
 
         # skip completely ignorable
-        if ($map->{?$jcps} && (nelems @{ $map->{?$jcps} }) == 0) {
+        if ($map->{?$jcps} && (nelems  $map->{?$jcps}->@) == 0) {
             if ($wLen && nelems @buf) {
                 @buf[-1]->[2] = $i + 1;
             }
@@ -582,7 +582,7 @@ sub getWt
     my $der  = $self->{?derivCode};
 
     return if !defined $u;
-    return map( {_varCE($vbl, $_) }, @{ $map->{$u} })
+    return map( {_varCE($vbl, $_) },  $map->{$u}->@)
         if $map->{?$u};
 
     # JCPS must not be a contraction, then it's a code point.
@@ -621,7 +621,7 @@ sub getWt
             }
 
             @hangulCE = @+: map({
-                    $map->{?$_} ?? @{ $map->{?$_} } !! $der->($_);
+                    $map->{?$_} ??  $map->{?$_}->@ !! $der->($_);
                 }, @decH);
         }
         return map { _varCE($vbl, $_) }, @hangulCE;
@@ -701,13 +701,13 @@ sub getSortKey
             }
         }
         foreach my $v (0..$lev-1) {
-            0 +< @wt[$v] and push @{ @ret[$v] }, @wt[$v];
+            0 +< @wt[$v] and push  @ret[$v]->@, @wt[$v];
         }
     }
 
     # modification of tertiary weights
     if ($self->{?upper_before_lower}) {
-        foreach my $w ( @{ @ret[2] }) {
+        foreach my $w (  @ret[2]->@) {
             if    (0x8 +<= $w && $w +<= 0xC) { $w -= 6 } # lower
             elsif (0x2 +<= $w && $w +<= 0x6) { $w += 6 } # upper
             elsif ($w == 0x1C)             { $w += 1 } # square upper
@@ -715,7 +715,7 @@ sub getSortKey
         }
     }
     if ($self->{?katakana_before_hiragana}) {
-        foreach my $w ( @{ @ret[2] }) {
+        foreach my $w (  @ret[2]->@) {
             if    (0x0F +<= $w && $w +<= 0x13) { $w -= 2 } # katakana
             elsif (0x0D +<= $w && $w +<= 0x0E) { $w += 5 } # hiragana
         }
@@ -724,7 +724,7 @@ sub getSortKey
     if ($self->{?backwardsFlag}) {
         for my $v (MinLevel .. MaxLevel) {
             if ($self->{?backwardsFlag} ^&^ (1 << $v)) {
-                @{ @ret[$v-1] } = reverse @{ @ret[$v-1] };
+                 @ret[$v-1]->@ = reverse  @ret[$v-1]->@;
             }
         }
     }
@@ -883,9 +883,9 @@ sub _eqArray($source, $substr, $lev)
 {
     for my $g (0..(nelems @$substr)-1){
         # Do the $g'th graphemes have the same number of AV weigths?
-        return if (nelems @{ $source->[$g] }) != nelems @{ $substr->[$g] };
+        return if (nelems  $source->[$g]->@) != nelems  $substr->[$g]->@;
 
-        for my $w (0..(nelems @{ $substr->[$g] })-1) {
+        for my $w (0..(nelems  $substr->[$g]->@)-1) {
             for my $v (0..$lev-1) {
                 return if $source->[$g]->[$w]->[$v] != $substr->[$g]->[$w]->[$v];
             }
@@ -948,7 +948,7 @@ sub index
         }
 
         if ((nelems @subWt) && !$var && !@wt[0]) {
-            push @{ @subWt[-1] }, \@wt if $to_be_pushed;
+            push  @subWt[-1]->@, \@wt if $to_be_pushed;
         } else {
             push @subWt, \@( \@wt );
         }
@@ -982,7 +982,7 @@ sub index
                 }
 
                 if ((nelems @strWt) && !$var && !@wt[0]) {
-                    push @{ @strWt[-1] }, \@wt if $to_be_pushed;
+                    push  @strWt[-1]->@, \@wt if $to_be_pushed;
                     @finPos[-1] = $strE->[$i]->[2];
                 } elsif ($to_be_pushed) {
                     push @strWt, \@( \@wt );

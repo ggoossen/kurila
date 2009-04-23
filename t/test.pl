@@ -435,7 +435,7 @@ sub _create_runperl { # Create the string to qx in runperl().
     if (defined %args{?progs}) {
         die "test.pl:runperl(): 'progs' must be an ARRAYREF " . _where()
             unless ref %args{?progs} eq "ARRAY";
-        foreach my $prog ( @{%args{progs}}) {
+        foreach my $prog ( %args{progs}->@) {
             if ($is_mswin || $is_netware || $is_vms) {
                 $runperl .= qq ( -e "$prog" );
             }

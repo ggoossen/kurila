@@ -108,7 +108,7 @@ sub get_status {
     my $cache = shift;
     my $pkg = shift;
     $cache->{+$pkg} ||= \@(\%($pkg => $pkg), \trusts_directly($pkg));
-    return @{$cache->{?$pkg}};
+    return $cache->{?$pkg}->@;
 }
 
 # Takes the info from caller() and figures out the name of
@@ -273,9 +273,9 @@ sub trusts {
 sub trusts_directly {
     my $class = shift;
     no warnings 'once'; 
-    return (nelems @{*{Symbol::fetch_glob("$class\::CARP_NOT")}})
-        ?? @{*{Symbol::fetch_glob("$class\::CARP_NOT")}}
-        !! @{*{Symbol::fetch_glob("$class\::ISA")}};
+    return (nelems Symbol::fetch_glob("$class\::CARP_NOT")->*->@)
+        ?? Symbol::fetch_glob("$class\::CARP_NOT")->*->@
+        !! Symbol::fetch_glob("$class\::ISA")->*->@;
 }
 
 1;

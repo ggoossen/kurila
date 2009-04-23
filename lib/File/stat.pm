@@ -53,7 +53,7 @@ sub stat ($arg) {
         local $^OS_ERROR = undef;
         require Symbol;
         my @($pkg) = caller@();
-        $fh = \*{ Symbol::fetch_glob( $pkg . "::" . $arg) };
+        $fh = \ Symbol::fetch_glob( $pkg . "::" . $arg)->*;
         return unless defined fileno $fh;
     };
     return populate(CORE::stat $fh);

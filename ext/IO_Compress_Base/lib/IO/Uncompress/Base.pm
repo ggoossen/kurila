@@ -24,7 +24,7 @@ use List::Util < qw(min);
 use Carp ;
 
 %EXPORT_TAGS = %( );
-push @{ %EXPORT_TAGS{+all} }, < @EXPORT_OK ;
+push  %EXPORT_TAGS{+all}->@, < @EXPORT_OK ;
 #Exporter::export_ok_tags('all') ;
 
 
@@ -137,7 +137,7 @@ sub smartSeek
     { $self->{?FH}->seek($offset, SEEK_SET) }
     else {
         $self->{+BufferOffset} = $offset ;
-        substr(${ $self->{?Buffer} }, $self->{?BufferOffset}, undef, '')
+        substr( $self->{?Buffer}->$, $self->{?BufferOffset}, undef, '')
             if $truncate;
         return 1;
     }
@@ -177,7 +177,7 @@ sub smartEof
     elsif (defined $self->{?InputEvent})
     { $self->{?EventEof} }
     else 
-    { $self->{?BufferOffset} +>= length(${ $self->{?Buffer} }) }
+    { $self->{?BufferOffset} +>= length( $self->{?Buffer}->$) }
 }
 
 sub clearError
@@ -185,7 +185,7 @@ sub clearError
     my $self   = shift ;
 
     $self->{+ErrorNo}  =  0 ;
-    ${ $self->{Error} } = '' ;
+     $self->{Error}->$ = '' ;
 }
 
 sub saveStatus
@@ -196,7 +196,7 @@ sub saveStatus
     #return $errno unless $errno ;
 
     $self->{+ErrorNo}  = $errno;
-    ${ $self->{Error} } = '' ;
+     $self->{Error}->$ = '' ;
 
     return $self->{?ErrorNo} ;
 }
@@ -209,7 +209,7 @@ sub saveErrorString
 
     #return $retval if ${ $self->{Error} };
 
-    ${ $self->{Error} } = shift ;
+     $self->{Error}->$ = shift ;
     $self->{+ErrorNo} = shift() + 0 if (nelems @_) ;
 
     #warn "saveErrorString: " . ${ $self->{Error} } . " " . $self->{Error} . "\n" ;
@@ -230,12 +230,12 @@ sub closeError
     my $retval = shift ;
 
     my $errno = $self->{?ErrorNo};
-    my $error = ${ $self->{?Error} };
+    my $error =  $self->{?Error}->$;
 
     $self->close();
 
     $self->{+ErrorNo} = $errno ;
-    ${ $self->{Error} } = $error ;
+     $self->{Error}->$ = $error ;
 
     return $retval;
 }
@@ -243,7 +243,7 @@ sub closeError
 sub error
 {
     my $self   = shift ;
-    return ${ $self->{?Error} } ;
+    return  $self->{?Error}->$ ;
 }
 
 sub errorNo
@@ -440,7 +440,7 @@ sub _create
         $obj->pushBack($obj->{HeaderPending})  ;
     }
 
-    push @{ $obj->{+InfoList} }, $obj->{?Info} ;
+    push  $obj->{+InfoList}->@, $obj->{?Info} ;
 
     $obj->saveStatus(STATUS_OK) ;
     $obj->{+InNew} = 0;
@@ -526,14 +526,14 @@ sub _inf
     if ($x->{?GlobMap})
     {
         $x->{+oneInput} = 1 ;
-        foreach my $pair ( @{ $x->{Pairs} })
+        foreach my $pair (  $x->{Pairs}->@)
         {
             my @($from, $to) =  @$pair ;
             $obj->_singleTarget($x, $from, $to, < @_)
                 or return undef ;
         }
 
-        return scalar nelems @{ $x->{?Pairs} } ;
+        return scalar nelems  $x->{?Pairs}->@ ;
     }
 
     if (! $x->{?oneOutput} )
@@ -566,7 +566,7 @@ sub retErr
     my $x = shift ;
     my $string = shift ;
 
-    ${ $x->{Error} } = $string ;
+     $x->{Error}->$ = $string ;
 
     return undef ;
 }
@@ -653,9 +653,9 @@ sub _rd2
 
         while (($status = $z->read($x->{buff})) +> 0) {
             if ($fh) {
-                print $fh, ${ $x->{?buff} }
+                print $fh,  $x->{?buff}->$
                     or return $z->saveErrorString(undef, "Error writing to output file: $^OS_ERROR", $^OS_ERROR);
-                ${ $x->{buff} } = '' ;
+                 $x->{buff}->$ = '' ;
             }
         }
 
@@ -683,7 +683,7 @@ sub _rd2
     return $z->closeError(undef)
         if $status +< 0 ;
 
-    ${ $self->{TrailingData} } = $z->trailingData()
+     $self->{TrailingData}->$ = $z->trailingData()
         if defined $self->{?TrailingData} ;
 
     $z->close() 
@@ -944,7 +944,7 @@ sub gotoNextStream
         }
     }
 
-    push @{ $self->{InfoList} }, $self->{?Info} ;
+    push  $self->{InfoList}->@, $self->{?Info} ;
 
     return 1; 
 }
@@ -953,7 +953,7 @@ sub streamCount
 {
     my $self = shift ;
     return 1 if ! defined $self->{?InfoList};
-    return scalar nelems @{ $self->{?InfoList} }  ;
+    return scalar nelems  $self->{?InfoList}->@  ;
 }
 
 sub read
@@ -976,7 +976,7 @@ sub read
 
     if (ref @_[0] ) {
         $self->croakError($self->{?ClassName} . "::read: buffer parameter is read-only")
-            if readonly(${ @_[0] });
+            if readonly( @_[0]->$);
 
         $self->croakError($self->{?ClassName} . "::read: not a scalar reference @_[0]" )
             unless ref @_[0] eq 'SCALAR' ;
@@ -1067,8 +1067,8 @@ sub _getline
     }
 
     # Record Mode
-    if ( ref $^INPUT_RECORD_SEPARATOR eq 'SCALAR' && ${$^INPUT_RECORD_SEPARATOR} =~ m/^\d+$/ && ${$^INPUT_RECORD_SEPARATOR} +> 0) {
-        my $reclen = ${$^INPUT_RECORD_SEPARATOR} ;
+    if ( ref $^INPUT_RECORD_SEPARATOR eq 'SCALAR' && $^INPUT_RECORD_SEPARATOR->$ =~ m/^\d+$/ && $^INPUT_RECORD_SEPARATOR->$ +> 0) {
+        my $reclen = $^INPUT_RECORD_SEPARATOR->$ ;
         my $data ;
         $self->read($data, $reclen) ;
         return \$data ;

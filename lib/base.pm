@@ -39,8 +39,8 @@ sub get_attr {
 
 sub get_fields {
     # Shut up a possible typo warning.
-    my $x = \%{*{Symbol::fetch_glob(@_[0].'::FIELDS')}};
-    return \%{*{Symbol::fetch_glob(@_[0].'::FIELDS')}};
+    my $x = \Symbol::fetch_glob(@_[0].'::FIELDS')->*->%;
+    return \Symbol::fetch_glob(@_[0].'::FIELDS')->*->%;
 }
 
 sub import {
@@ -70,7 +70,7 @@ sub import_into {
             # Only ignore "Can't locate" errors from our eval require.
             # Other fatal errors (syntax etc) must be reported.
             die if $^EVAL_ERROR && $^EVAL_ERROR->{?description} !~ m/^Can't locate .*?/;
-            unless (%{*{Symbol::fetch_glob("$base\::")}}) {
+            unless (Symbol::fetch_glob("$base\::")->*->%) {
                 die(<<ERROR);
 Base class package "$base" is empty.
     (Perhaps you need to 'use' the module which defines that package first,
@@ -90,7 +90,7 @@ ERROR
         }
     }
     # Save this until the end so it's all or nothing if the above loop croaks.
-    push @{*{Symbol::fetch_glob("$inheritor\::ISA")}}, < @bases;
+    push Symbol::fetch_glob("$inheritor\::ISA")->*->@, < @bases;
 
     if( defined $fields_base ) {
         inherit_fields($inheritor, $fields_base);

@@ -84,7 +84,7 @@ sub import {
     my @imports = @( () );
     foreach my $idx (0..((nelems @plan)-1)) {
         if( @plan[$idx] eq 'import' ) {
-            @imports = @{@plan[$idx+1]};
+            @imports = @plan[$idx+1]->@;
             last;
         }
     }
@@ -504,7 +504,7 @@ sub expect
     my @checks = @_;
     foreach my $check ( @checks) {
         $check = $self->_translate_Failed_check($check);
-        push @{$self->{wanted}}, ref $check ?? $check !! "$check\n";
+        push $self->{wanted}->@, ref $check ?? $check !! "$check\n";
     }
 }
 
@@ -530,7 +530,7 @@ sub check
     # turn off warnings as these might be undef
     local $^WARNING = 0;
 
-    my @checks = @{$self->{?wanted}};
+    my @checks = $self->{?wanted}->@;
     my $got = $self->{?got};
     foreach my $check ( @checks) {
         $check = "\Q$check\E" unless ($check =~ s,^/(.*)/$,$1, or ref $check);
@@ -549,7 +549,7 @@ sub complaint
     my $self = shift;
     my $type   = $self->type;
     my $got    = $self->got;
-    my $wanted = join "\n", @{$self->wanted};
+    my $wanted = join "\n", $self->wanted->@;
 
     # are we running in colour mode?
     if (Test::Builder::Tester::color)

@@ -83,7 +83,7 @@ sub new {
 
     if (%args{?config_override}) {
         try {
-            $self->{':private:'}->{+Config} = \%( < %{%args{?config_override}} );
+            $self->{':private:'}->{+Config} = \%( < %args{?config_override}->% );
         } or die(
             "The 'config_override' parameter must be a hash reference."
         );
@@ -99,7 +99,7 @@ sub new {
         my @($arg,$key,$val)= @$tuple;
         if ( %args{?$arg} ) {
             try {
-                $self->{':private:'}->{+$key} = \ @{%args{$arg}};
+                $self->{':private:'}->{+$key} = \ %args{$arg}->@;
             } or die(
                 "The '$arg' parameter must be an array reference."
             );
@@ -110,15 +110,15 @@ sub new {
     }
     do {
         my %dupe;
-        @{$self->{':private:'}->{INC}} = grep { -e $_ && !%dupe{+$_}++ },
-            @: < @{$self->{':private:'}->{?INC}}, < @{$self->{':private:'}->{?EXTRA}};
+        $self->{':private:'}->{INC}->@ = grep { -e $_ && !%dupe{+$_}++ },
+            @: < $self->{':private:'}->{?INC}->@, < $self->{':private:'}->{?EXTRA}->@;
     };
     my $perl5lib = defined env::var('PERL5LIB') ?? env::var('PERL5LIB') !! "";
 
     my @dirs = @( $self->{':private:'}->{Config}->{?archlibexp},
                   $self->{':private:'}->{Config}->{?sitearchexp},
                   < split(m/\Q$(config_value("path_sep"))\E/, $perl5lib),
-                  < @{$self->{':private:'}->{?EXTRA}},
+                  < $self->{':private:'}->{?EXTRA}->@,
         );
 
     # File::Find does not know how to deal with VMS filepaths.
@@ -159,7 +159,7 @@ sub new {
 
             # Find the top-level module file in $^INCLUDE_PATH
             $self->{+$module}->{+version} = '';
-            foreach my $dir ( @{$self->{':private:'}->{INC}} ) {
+            foreach my $dir ( $self->{':private:'}->{INC}->@ ) {
                 my $p = File::Spec->catfile($dir, $modfile);
                 if (-r $p) {
                     $module = _module_name($p, $module) if $Is_VMS;
@@ -225,7 +225,7 @@ sub files($self, $module, ?$type, @< @under) {
         if ($type ne "all" && $type ne "prog" && $type ne "doc");
 
     my (@files);
-    foreach my $file (keys(%{$self->{$module}->{?packlist}})) {
+    foreach my $file (keys($self->{$module}->{?packlist}->%)) {
         push(@files, $file)
             if ($self->_is_type($file, $type) &&
               $self->_is_under($file, < @under));

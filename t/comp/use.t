@@ -79,7 +79,7 @@ $^INCLUDED{+'testuse.pm'} = 1;
 eval "use testuse v0.9";
 is ($^EVAL_ERROR, '');
 is $version_check->{?'original'}, "v0.9";
-is( (nelems @{$testimport}), 1, "import called with only packagename");
+is( (nelems $testimport->@), 1, "import called with only packagename");
 
 # test the default VERSION check.
 undef *testuse::VERSION;

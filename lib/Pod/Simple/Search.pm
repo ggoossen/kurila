@@ -610,7 +610,7 @@ sub contains_pod($self, $file) {
 sub _accessorize {  # A simple-minded method-maker
     shift;
     foreach my $attrname ( @_) {
-        *{Symbol::fetch_glob(caller() . '::' . $attrname)} = sub {
+        Symbol::fetch_glob(caller() . '::' . $attrname)->* = sub {
 
                 ($Carp::CarpLevel = 1),  Carp::croak(
        "Accessor usage: \$obj->$attrname() or \$obj->$attrname(\$new_value)"

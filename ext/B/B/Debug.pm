@@ -9,9 +9,9 @@ my %done_gv;
 
 sub _printop {
     my $op = shift;
-    my $addr = ${$op} ?? $op->ppaddr !! '';
+    my $addr = $op->$ ?? $op->ppaddr !! '';
     $addr =~ s/^PL_ppaddr// if $addr;
-    return sprintf "0x\%x \%s \%s", ${$op}, ${$op} ?? class($op) !! '', $addr;
+    return sprintf "0x\%x \%s \%s", $op->$, $op->$ ?? class($op) !! '', $addr;
 }
 
 sub B::OP::debug($op) {
@@ -63,8 +63,8 @@ sub B::LISTOP::debug($op) {
 
 sub B::PMOP::debug($op) {
     $op->B::LISTOP::debug();
-    printf $^STDOUT, "\top_pmreplroot\t0x\%x\n", ${$op->pmreplroot};
-    printf $^STDOUT, "\top_pmreplstart\t0x\%x\n", ${$op->pmreplstart};
+    printf $^STDOUT, "\top_pmreplroot\t0x\%x\n", $op->pmreplroot->$;
+    printf $^STDOUT, "\top_pmreplstart\t0x\%x\n", $op->pmreplstart->$;
     printf $^STDOUT, "\top_pmstash\t\%s\n", < cstring( <$op->pmstash);
     printf $^STDOUT, "\top_precomp->precomp\t\%s\n", < cstring( <$op->precomp);
     printf $^STDOUT, "\top_pmflags\t0x\%x\n", < $op->pmflags;
@@ -75,7 +75,7 @@ sub B::PMOP::debug($op) {
 sub B::COP::debug($op) {
     $op->B::OP::debug();
     my $cop_io = class($op->io) eq 'SPECIAL' ?? '' !! $op->io->as_string;
-    printf $^STDOUT, <<'EOT', $op->label, $op->stashpv, $op->cop_seq, ${$op->warnings}, cstring($cop_io);
+    printf $^STDOUT, <<'EOT', $op->label, $op->stashpv, $op->cop_seq, $op->warnings->$, cstring($cop_io);
 	cop_label	"%s"
 	cop_stashpv	"%s"
 	cop_seq		%d
@@ -86,7 +86,7 @@ EOT
 
 sub B::SVOP::debug($op) {
     $op->B::OP::debug();
-    printf $^STDOUT, "\top_sv\t\t0x\%x\n", ${$op->sv};
+    printf $^STDOUT, "\top_sv\t\t0x\%x\n", $op->sv->$;
     $op->sv->debug;
 }
 
@@ -101,7 +101,7 @@ sub B::PADOP::debug($op) {
 }
 
 sub B::NULL::debug($sv) {
-    if ($$sv == ${sv_undef()}) {
+    if ($$sv == sv_undef()->$) {
         print $^STDOUT, "&sv_undef\n";
     } else {
         printf $^STDOUT, "NULL (0x\%x)\n", $$sv;
@@ -122,7 +122,7 @@ EOT
 
 sub B::RV::debug($rv) {
     B::SV::debug($rv);
-    printf $^STDOUT, <<'EOT', ${$rv->RV};
+    printf $^STDOUT, <<'EOT', $rv->RV->$;
 	RV		0x%x
 EOT
     $rv->RV->debug;
@@ -172,7 +172,7 @@ sub B::CV::debug($sv) {
     my @($padlist) =  $sv->PADLIST;
     my @($file) =  $sv->FILE;
     my @($gv) =  $sv->GV;
-    printf $^STDOUT, <<'EOT', $$stash, $$start, $$root, $$gv, $file, < $sv->DEPTH, $padlist, ${$sv->OUTSIDE}, < $sv->OUTSIDE_SEQ;
+    printf $^STDOUT, <<'EOT', $$stash, $$start, $$root, $$gv, $file, < $sv->DEPTH, $padlist, $sv->OUTSIDE->$, < $sv->OUTSIDE_SEQ;
 	STASH		0x%x
 	START		0x%x
 	ROOT		0x%x
@@ -209,7 +209,7 @@ sub B::GV::debug($gv) {
     my @($av) =  $gv->AV;
     my @($cv) =  $gv->CV;
     $gv->B::SV::debug;
-    printf $^STDOUT, <<'EOT', < $gv->SAFENAME, < $gv->STASH->NAME, < $gv->STASH, $$sv, < $gv->GvREFCNT, < $gv->FORM, $$av, ${$gv->HV}, ${$gv->EGV}, $$cv, < $gv->CVGEN, < $gv->LINE, < $gv->FILE, < $gv->GvFLAGS;
+    printf $^STDOUT, <<'EOT', < $gv->SAFENAME, < $gv->STASH->NAME, < $gv->STASH, $$sv, < $gv->GvREFCNT, < $gv->FORM, $$av, $gv->HV->$, $gv->EGV->$, $$cv, < $gv->CVGEN, < $gv->LINE, < $gv->FILE, < $gv->GvFLAGS;
 	NAME		%s
 	STASH		%s (0x%x)
 	SV		0x%x

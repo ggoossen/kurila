@@ -142,7 +142,7 @@ sub Compress::Raw::Zlib::Parameters::parse
     my $default = shift ;
 
     my $got = $self->{?Got} ;
-    my $firstTime = nkeys %{ $got } == 0 ;
+    my $firstTime = nkeys  $got->% == 0 ;
 
     my (@Bad) ;
     my @entered = @( () ) ;

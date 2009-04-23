@@ -51,11 +51,11 @@ sub _do_link($self, $how, %< %args) {
 
 sub extra_link_args_after_prelink($self, %< %args) {
 
-    my @DEF = grep { m/\.def$/i }, @{%args{prelink_res}};
+    my @DEF = grep { m/\.def$/i }, %args{prelink_res}->@;
     die "More than one .def files created by `prelink' stage" if (nelems @DEF) +> 1;
     # XXXX No "$how" argument here, so how to test for dynamic link?
     die "No .def file created by `prelink' stage"
-        unless (nelems @DEF) or not nelems @{%args{?prelink_res}};
+        unless (nelems @DEF) or not nelems %args{?prelink_res}->@;
 
     my @after_libs = @($OS2::is_aout ?? ()
                      !! $self->perl_inc() . "/libperl_override$self->{config}->{?lib_ext}");

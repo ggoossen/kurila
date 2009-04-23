@@ -10,7 +10,7 @@ our %Config = %+: map { %: $_ => config_value($_) }, config_keys();
 sub import {
     my $caller = caller;
 
-    *{Symbol::fetch_glob($caller.'::Config')} = \%Config;
+    Symbol::fetch_glob($caller.'::Config')->* = \%Config;
 }
 
 1;

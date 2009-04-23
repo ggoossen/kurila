@@ -317,14 +317,14 @@ sub cmd_over {
     my $self = shift;
     local $_ = shift;
     unless (m/^[-+]?\d+\s+$/) { $_ = %$self{?indent} }
-    push (@{ %$self{INDENTS} }, %$self{?MARGIN});
+    push ( %$self{INDENTS}->@, %$self{?MARGIN});
     %$self{+MARGIN} += ($_ + 0);
 }
 
 # End a list.
 sub cmd_back {
     my $self = shift;
-    %$self{+MARGIN} = pop @{ %$self{INDENTS} };
+    %$self{+MARGIN} = pop  %$self{INDENTS}->@;
     unless (defined %$self{?MARGIN}) {
         warn "Unmatched =back";
         %$self{+MARGIN} = %$self{?indent};

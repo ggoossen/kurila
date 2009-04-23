@@ -97,7 +97,7 @@ sub valueWalk
         die "Value associated with key '$k' is not an ARRAY reference"
             if !ref $v || ref $v ne 'ARRAY' ;
 
-        my @($ver, $rest) =  @{ $v } ;
+        my @($ver, $rest) =   $v->@ ;
         %v_list{+$ver} //= @: ;
         push %v_list{+$ver}, $k;
 
@@ -134,16 +134,16 @@ sub walk
         #$Value{$index} = uc $k ;
         die "Can't find key '$k'"
             if ! defined %NameToValue{?uc $k} ;
-        push @{ %list{+$k} }, %NameToValue{?uc $k} ;
+        push  %list{+$k}->@, %NameToValue{?uc $k} ;
         die "Value associated with key '$k' is not an ARRAY reference"
             if !ref $v || ref $v ne 'ARRAY' ;
 
-        my @($ver, $rest) =  @{ $v } ;
+        my @($ver, $rest) =   $v->@ ;
         if (ref $rest) {
-            push (@{ %list{$k} }, < walk ($rest));
+            push ( %list{$k}->@, < walk ($rest));
         }
 
-        push @list, < @{ %list{?$k} } ;
+        push @list, <  %list{?$k}->@ ;
     }
 
     return @list ;
@@ -193,7 +193,7 @@ sub printTree
             $offset = ' ' x ($max + 1) ;
         }
 
-        my @($ver, $rest) = @{ $v } ;
+        my @($ver, $rest) =  $v->@ ;
         if (ref $rest)
         {
             my $bar = @keys ?? "|" !! " ";
@@ -288,7 +288,7 @@ my $warn_size = int($index / 8) + ($index % 8 != 0) ;
 
 my $last_ver = 0;
 foreach my $k (sort { $a <+> $b }, keys %ValueToName) {
-    my @($name, $version) =  @{ %ValueToName{?$k} };
+    my @($name, $version) =   %ValueToName{?$k}->@;
     print $warn, "\n/* Warnings Categories added in Perl $version */\n\n"
         if $last_ver != $version ;
     print $warn, tab(5, "#define WARN_$name"), "$k\n" ;
@@ -359,7 +359,7 @@ while ( ~< *DATA) {
 $last_ver = 0;
 print $pm, "our \%Offsets = \%(\n" ;
 foreach my $k (sort { $a <+> $b }, keys %ValueToName) {
-    my @($name, $version) =  @{ %ValueToName{?$k} };
+    my @($name, $version) =   %ValueToName{?$k}->@;
     $name = lc $name;
     $k *= 2 ;
     if ( $last_ver != $version ) {

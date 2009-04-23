@@ -729,7 +729,7 @@ sub install { #XXX OS-SPECIFIC
                  my $sourcedir  = File::Spec->catdir($source, $File::Find::dir);
                  my $sourcefile = File::Spec->catfile($sourcedir, $origfile);
 
-                 for my $pat ( @{$skip || \@()}) {
+                 for my $pat ( ($skip || \@())->@) {
                      if ( $sourcefile=~m/$pat/ ) {
                          print $^STDOUT, "Skipping $targetfile (filtered)\n"
                              if $verbose+>1;
@@ -1182,7 +1182,7 @@ package ExtUtils::Install::Warn;
 sub new { bless \%(), shift }
 
 sub add($self,$file,$targetfile) {
-    push @{$self->{$file}}, $targetfile;
+    push $self->{$file}->@, $targetfile;
 }
 
 sub DESTROY {
@@ -1190,9 +1190,9 @@ sub DESTROY {
         my $self = shift;
         my($i,$plural);
         foreach my $file (sort keys %$self) {
-            $plural = (nelems @{$self->{?$file}}) +> 1 ?? "s" !! "";
+            $plural = (nelems $self->{?$file}->@) +> 1 ?? "s" !! "";
             print $^STDOUT, "## Differing version$plural of $file found. You might like to\n";
-            for (0..(nelems @{$self->{?$file}})-1) {
+            for (0..(nelems $self->{?$file}->@)-1) {
                 print $^STDOUT, "rm ", $self->{$file}->[$_], "\n";
                 $i++;
             }

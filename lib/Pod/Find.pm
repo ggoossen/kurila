@@ -118,7 +118,7 @@ sub pod_find
 {
     my %opts;
     if(ref @_[0]) {
-        %opts = %( < %{shift()} );
+        %opts = %( < shift()->% );
     }
 
     %opts{+verbose} ||= 0;
@@ -381,7 +381,7 @@ sub pod_where {
     my @parts = split (m/::/, $pod);
 
     # Get full directory list
-    my @search_dirs = @{ %options{?'dirs'} };
+    my @search_dirs =  %options{?'dirs'}->@;
 
     if (%options{?'inc'}) {
 

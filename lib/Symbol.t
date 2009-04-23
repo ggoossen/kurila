@@ -65,7 +65,7 @@ main::is( qualify("^FOO"), "::^FOO",
 
 # Test qualify_to_ref()
 do {
-    main::ok( \*{qualify_to_ref("x")} \== \*foo::x, 'qualify_to_ref() with a simple identifier' );
+    main::ok( \qualify_to_ref("x")->* \== \*foo::x, 'qualify_to_ref() with a simple identifier' );
     main::is( qualify_to_ref("FOO"), \*FOO,
               'qualify_to_ref() with reserved indentier is the special variable' );
 };

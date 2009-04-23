@@ -90,7 +90,7 @@ sub recursive_dump($object, $link) {
 
     croak "Unknown simple type '$ref'" unless defined %dump{?$ref};
 
-    &{*{Symbol::fetch_glob(%dump{?$ref})}}($object);	# Dump object
+    &{Symbol::fetch_glob(%dump{?$ref})->*}($object);	# Dump object
     &bless($bless) if $bless;	# Mark it as blessed, if necessary
 
     $dumped .= "OBJECT $objcount\n";
@@ -114,9 +114,9 @@ sub dump_scalar($sref) {
 
 # Dump array
 sub dump_array($aref) {
-    my $items = nelems @{$aref};
+    my $items = nelems $aref->@;
     $dumped .= "ARRAY items=$items\n";
-    foreach my $item ( @{$aref}) {
+    foreach my $item ( $aref->@) {
         unless (defined $item) {
             $dumped .= 'ITEM_UNDEF' . "\n";
             next;
@@ -128,9 +128,9 @@ sub dump_array($aref) {
 
 # Dump hash table
 sub dump_hash($href) {
-    my $items = nelems(keys %{$href});
+    my $items = nelems(keys $href->%);
     $dumped .= "HASH items=$items\n";
-    foreach my $key (sort keys %{$href}) {
+    foreach my $key (sort keys $href->%) {
         $dumped .= 'KEY ';
         &recursive_dump(\$key, undef);
         unless (defined $href->{?$key}) {

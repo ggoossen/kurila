@@ -309,7 +309,7 @@ sub const_config {
 END
 
     my(%once_only);
-    foreach my $key ( @{$self->{CONFIG}}){
+    foreach my $key ( $self->{CONFIG}->@){
         # SITE*EXP macros are defined in &constants; avoid duplicates here
         next if %once_only{?$key};
         $self->{+uc $key} = quote_paren($self->{?uc $key});
@@ -426,12 +426,12 @@ MM_REVISION = $self->{?MM_REVISION}
 
     push @m, "
 # Handy lists of source code files:
-XS_FILES = ".$self->wraplist( <sort keys %{$self->{?XS} || \%()})."
-C_FILES  = ".$self->wraplist(< @{$self->{C}})."
-O_FILES  = ".$self->wraplist(< @{$self->{O_FILES}})."
-H_FILES  = ".$self->wraplist(< @{$self->{H}})."
-MAN1PODS = ".$self->wraplist( <sort keys %{$self->{?MAN1PODS} || \%()})."
-MAN3PODS = ".$self->wraplist( <sort keys %{$self->{?MAN3PODS} || \%()})."
+XS_FILES = ".$self->wraplist( <sort keys ($self->{?XS} || \%())->%)."
+C_FILES  = ".$self->wraplist(< $self->{C}->@)."
+O_FILES  = ".$self->wraplist(< $self->{O_FILES}->@)."
+H_FILES  = ".$self->wraplist(< $self->{H}->@)."
+MAN1PODS = ".$self->wraplist( <sort keys ($self->{?MAN1PODS} || \%())->%)."
+MAN3PODS = ".$self->wraplist( <sort keys ($self->{?MAN3PODS} || \%())->%)."
 ";
 
 
@@ -464,9 +464,9 @@ PERL_ARCHIVE_AFTER = $self->{?PERL_ARCHIVE_AFTER}
 
     push @m, "
 
-TO_INST_PM = ".$self->wraplist( <sort keys %{$self->{PM}})."
+TO_INST_PM = ".$self->wraplist( <sort keys $self->{PM}->%)."
 
-PM_TO_BLIB = ".$self->wraplist(< %{$self->{PM}})."
+PM_TO_BLIB = ".$self->wraplist(< $self->{PM}->%)."
 ";
 
     join('', @m);
@@ -1217,7 +1217,7 @@ needs_linking() does.
 sub has_link_code {
     my@($self) =@( shift);
     return $self->{?HAS_LINK_CODE} if defined $self->{?HAS_LINK_CODE};
-    if ($self->{?OBJECT} or nelems @{$self->{?C} || \@()} or $self->{?MYEXTLIB}){
+    if ($self->{?OBJECT} or nelems ($self->{?C} || \@())->@ or $self->{?MYEXTLIB}){
         $self->{+HAS_LINK_CODE} = 1;
         return 1;
     }
@@ -1286,7 +1286,7 @@ sub init_dirscan($self) {
     $self->{+H}          ||= \sort keys %h;
     $self->{+PM}         ||= \%pm;
 
-    my @o_files = @{$self->{?C}};
+    my @o_files = $self->{?C}->@;
     $self->{+O_FILES} = \ grep { s/\.c(pp|xx|c)?\z/$self->{?OBJ_EXT}/i }, @o_files;
 }
 
@@ -1345,7 +1345,7 @@ Initializes MAN1PODS from the list of EXE_FILES.
 sub init_MAN1PODS($self) {
 
     if ( exists $self->{EXE_FILES} ) {
-        foreach my $name ( @{$self->{EXE_FILES}}) {
+        foreach my $name ( $self->{EXE_FILES}->@) {
             next unless $self->_has_pod($name);
 
             $self->{+MAN1PODS}->{+$name} =
@@ -1368,7 +1368,7 @@ sub init_MAN3PODS {
     my %manifypods = %( () ); # we collect the keys first, i.e. the files
     # we have to convert to pod
 
-    foreach my $name (keys %{$self->{?PM}}) {
+    foreach my $name (keys $self->{?PM}->%) {
         if ($name =~ m/\.pod\z/ ) {
             %manifypods{+$name} = $self->{PM}->{?$name};
         } elsif ($name =~ m/\.p[ml]\z/ ) {
@@ -1378,7 +1378,7 @@ sub init_MAN3PODS {
         }
     }
 
-    my $parentlibs_re = join '|', @{$self->{?PMLIBPARENTDIRS}};
+    my $parentlibs_re = join '|', $self->{?PMLIBPARENTDIRS}->@;
 
     # Remove "Configure.pm" and similar, if it's not the only pod listed
     # To force inclusion, just name it "Configure.pod", or override 
@@ -1452,21 +1452,21 @@ sub init_PM {
 
     # Avoid $_ wherever possible:
     # @{$self->{PMLIBDIRS}} = grep -d && !$dir{$_}, @{$self->{PMLIBDIRS}};
-    my @pmlibdirs = @{$self->{?PMLIBDIRS}};
-    @{$self->{PMLIBDIRS}} = @( () );
-    my %dir = %( < @+: map { @($_ => $_) }, @{$self->{DIR}} );
+    my @pmlibdirs = $self->{?PMLIBDIRS}->@;
+    $self->{PMLIBDIRS}->@ = @( () );
+    my %dir = %( < @+: map { @($_ => $_) }, $self->{DIR}->@ );
     foreach my $pmlibdir ( @pmlibdirs) {
-        -d $pmlibdir && !%dir{?$pmlibdir} && push @{$self->{PMLIBDIRS}}, $pmlibdir;
+        -d $pmlibdir && !%dir{?$pmlibdir} && push $self->{PMLIBDIRS}->@, $pmlibdir;
     }
 
     unless( $self->{?PMLIBPARENTDIRS} ) {
-        @{$self->{+PMLIBPARENTDIRS}} = @('lib');
+        $self->{+PMLIBPARENTDIRS}->@ = @('lib');
     }
 
     return if $self->{?PM} and $self->{ARGS}->{?PM};
 
-    if ((nelems @{$self->{?PMLIBDIRS}})){
-        print $^STDOUT, "Searching PMLIBDIRS: $(join ' ',@{$self->{?PMLIBDIRS}})\n"
+    if ((nelems $self->{?PMLIBDIRS}->@)){
+        print $^STDOUT, "Searching PMLIBDIRS: $(join ' ',$self->{?PMLIBDIRS}->@)\n"
             if ($Verbose +>= 2);
         require File::Find;
         File::Find::find(sub {
@@ -1484,7 +1484,7 @@ sub init_PM {
                              my $prefix = $self->{?INST_LIBDIR};
                              my $striplibpath;
 
-                             my $parentlibs_re = join '|', @{$self->{?PMLIBPARENTDIRS}};
+                             my $parentlibs_re = join '|', $self->{?PMLIBPARENTDIRS}->@;
                              $prefix =  $self->{?INST_LIB} 
                                  if ($striplibpath = $path) =~ s{^(\W*)($parentlibs_re)\W}
 	                                       {$1}i;
@@ -1495,7 +1495,7 @@ sub init_PM {
                              print $^STDOUT, "libscan($path) => '$inst'\n" if ($Verbose +>= 2);
                              return unless $inst;
                              $self->{PM}->{+$path} = $inst;
-                         }, < @{$self->{PMLIBDIRS}});
+                         }, < $self->{PMLIBDIRS}->@);
     }
 }
 
@@ -1673,10 +1673,10 @@ EOP
     print $^STDOUT, "CONFIG must be an array ref\n"
         if ($self->{?CONFIG} and ref $self->{?CONFIG} ne 'ARRAY');
     $self->{+CONFIG} = \@() unless (ref $self->{?CONFIG});
-    push(@{$self->{CONFIG}}, < @ExtUtils::MakeMaker::Get_from_Config);
-    push(@{$self->{CONFIG}}, 'shellflags') if %Config{?shellflags};
+    push($self->{CONFIG}->@, < @ExtUtils::MakeMaker::Get_from_Config);
+    push($self->{CONFIG}->@, 'shellflags') if %Config{?shellflags};
     my(%once_only);
-    foreach my $m ( @{$self->{CONFIG}}){
+    foreach my $m ( $self->{CONFIG}->@){
         next if %once_only{?$m};
         print $^STDOUT, "CONFIG key '$m' does not exist in Config.pm\n"
             unless exists %Config{$m};
@@ -1729,10 +1729,10 @@ sub init_others {	# --- Initialize Other Attributes
     # May check $Config{libs} too, thus not empty.
     $self->{+LIBS} = \@($self->{?LIBS}) unless ref $self->{?LIBS};
 
-    $self->{+LIBS} = \@('') unless (nelems @{$self->{?LIBS}}) && defined $self->{LIBS}->[0];
+    $self->{+LIBS} = \@('') unless (nelems $self->{?LIBS}->@) && defined $self->{LIBS}->[0];
     $self->{+LD_RUN_PATH} = "";
 
-    foreach my $libs (  @{$self->{LIBS}} ){
+    foreach my $libs (  $self->{LIBS}->@ ){
         $libs =~ s/^\s*(.*\S)\s*$/$1/; # remove leading and trailing whitespace
         my @libs = $self->extliblist($libs);
         if (@libs[0] or @libs[1] or @libs[2]){
@@ -1748,7 +1748,7 @@ sub init_others {	# --- Initialize Other Attributes
     } else {
         # init_dirscan should have found out, if we have C files
         $self->{+OBJECT} = "";
-        $self->{+OBJECT} = '$(BASEEXT)$(OBJ_EXT)' if @{$self->{?C}};
+        $self->{+OBJECT} = '$(BASEEXT)$(OBJ_EXT)' if $self->{?C}->@;
     }
     $self->{+OBJECT} =~ s/\n+/ \\\n\t/g;
     $self->{+BOOTDEP}  = (-f "$self->{?BASEEXT}_BS") ?? "$self->{?BASEEXT}_BS" !! "";
@@ -2192,7 +2192,7 @@ sub installbin {
     my@($self) =@( shift);
 
     return "" unless $self->{?EXE_FILES} && ref $self->{?EXE_FILES} eq "ARRAY";
-    my @exefiles = @{$self->{?EXE_FILES}};
+    my @exefiles = $self->{?EXE_FILES}->@;
     return "" unless (nelems @exefiles);
 
     @exefiles = map { < vmsify($_) }, @exefiles if %Is{?VMS};
@@ -2316,7 +2316,7 @@ FULLPERL      = $self->{?FULLPERL}
 ";
     return join '', @m if $self->{?PARENT};
 
-    my@($dir) =@( join ":", @{$self->{?DIR}});
+    my@($dir) =@( join ":", $self->{?DIR}->@);
 
     unless ($self->{?MAKEAPERL}) {
         push @m, q{
@@ -2382,7 +2382,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 
                              # Throw away anything not explicitly marked for inclusion.
                              # DynaLoader is implied.
-                             foreach my $incl (@((< @{$self->{?INCLUDE_EXT}},'DynaLoader'))){
+                             foreach my $incl (@((< $self->{?INCLUDE_EXT}->@,'DynaLoader'))){
                                  if( $xx eq $incl ){
                                      $found++;
                                      last;
@@ -2396,7 +2396,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
                              $xx =~ s,/,::,g;
 
                              # Throw away anything explicitly marked for exclusion
-                             foreach my $excl ( @{$self->{EXCLUDE_EXT}}){
+                             foreach my $excl ( $self->{EXCLUDE_EXT}->@){
                                  return if( $xx eq $excl );
                              }
                          }
@@ -2410,11 +2410,11 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
                          # drop it
                          return if $File::Find::name =~ m:auto/$self->{?FULLEXT}/$self->{?BASEEXT}$self->{?LIB_EXT}\z:;
                          %static{+cwd() . "/" . $_}++;
-                     }, < grep( { -d $_ }, @{$searchdirs || \@()}) );
+                     }, < grep( { -d $_ }, ($searchdirs || \@())->@) );
 
     # We trust that what has been handed in as argument, will be buildable
     $static = \@() unless $static;
-        %static{[ @{$static}]} = @(1) x nelems @{$static};
+        %static{[ $static->@]} = @(1) x nelems $static->@;
 
     $extra = \@() unless $extra && ref $extra eq 'ARRAY';
     for (sort keys %static) {
@@ -2423,7 +2423,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
         push @$extra, $_;
     }
 
-    s/^(.*)/"-I$1"/ for  @{$perlinc || \@()}; 
+    s/^(.*)/"-I$1"/ for  ($perlinc || \@())->@; 
 
     $target ||= "perl";
     $tmp    ||= ".";
@@ -2433,7 +2433,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
     # extralibs.all are computed correctly
     push @m, "
 MAP_LINKCMD   = $linkcmd
-MAP_PERLINC   = $(join ' ',@{$perlinc || \@()}
+MAP_PERLINC   = $(join ' ',($perlinc || \@())->@
         )MAP_STATIC    = ",
         join(" \\\n\t", reverse sort keys %static), "
 
@@ -2605,7 +2605,7 @@ sub needs_linking {
         $self->{+NEEDS_LINKING} = 1;
         return 1;
     }
-    foreach my $child (keys %{$self->{?CHILDREN} || \%()}) {
+    foreach my $child (keys ($self->{?CHILDREN} || \%())->%) {
         if ($self->{CHILDREN}->{$child}->needs_linking) {
             $self->{+NEEDS_LINKING} = 1;
             return 1;
@@ -2822,7 +2822,7 @@ PERL_HDRS = \
 $(OBJECT) : $(PERL_HDRS)
 } if $self->{?OBJECT};
 
-    push @m, join(" ", values %{$self->{XS}})." : \$(XSUBPPDEPS)\n"  if %{$self->{?XS}};
+    push @m, join(" ", values $self->{XS}->%)." : \$(XSUBPPDEPS)\n"  if $self->{?XS}->%;
 
     join "\n", @m;
 }
@@ -2875,7 +2875,7 @@ pm_to_blib : $(TO_INST_PM)
 pm_to_blib(\\\%( < \@ARGV ), '$autodir', '\$(PM_FILTER)')
 CODE
 
-    my @cmds = $self->split_command($pm_to_blib, < %{$self->{PM}});
+    my @cmds = $self->split_command($pm_to_blib, < $self->{PM}->%);
 
     $r .= join '', map { "\t\$(NOECHO) $_\n" }, @cmds;
     $r .= qq{\t\$(NOECHO) \$(TOUCH) pm_to_blib\n};
@@ -2944,7 +2944,7 @@ sub ppd($self) {
 PPD_HTML
 
     $ppd_xml .= "    <IMPLEMENTATION>\n";
-    foreach my $prereq (sort keys %{$self->{?PREREQ_PM} || \%()}) {
+    foreach my $prereq (sort keys ($self->{?PREREQ_PM} || \%())->%) {
         my $pre_req = $prereq;
         $pre_req =~ s/::/-/g;
         my $dep_ver = join ",", @( <split (m/\./, $self->{PREREQ_PM}->{?$prereq}), 
@@ -3290,7 +3290,7 @@ sub staticmake($self, %< %attribs) {
 
     # And as it's not yet built, we add the current extension
     # but only if it has some C code (or XS code, which implies C code)
-    if ((nelems @{$self->{?C}})) {
+    if ((nelems $self->{?C}->@)) {
         @static = @( $self->catfile($self->{?INST_ARCHLIB},
               "auto",
               $self->{?FULLEXT},
@@ -3350,7 +3350,7 @@ sub subdirs {
     # This method provides a mechanism to automatically deal with
     # subdirectories containing further Makefile.PL scripts.
     # It calls the subdir_x() method for each subdirectory.
-    foreach my $dir ( @{$self->{DIR}}){
+    foreach my $dir ( $self->{DIR}->@){
         push(@m, $self->subdir_x($dir));
     ####	print "Including $dir subdirectory\n";
     }
@@ -3395,7 +3395,7 @@ subdirs-test ::
 
 ");
 
-    foreach my $dir ( @{ $self->{DIR} }) {
+    foreach my $dir (  $self->{DIR}->@) {
         my $test = $self->cd($dir, '$(MAKE) test $(PASTHRU)');
 
         push @m, <<END
@@ -3406,7 +3406,7 @@ END
     }
 
     push(@m, "\t\$(NOECHO) \$(ECHO) 'No tests defined for \$(NAME) extension.'\n")
-        unless $tests or -f "test.pl" or nelems @{$self->{?DIR}};
+        unless $tests or -f "test.pl" or nelems $self->{?DIR}->@;
     push(@m, "\n");
 
     push(@m, "test_dynamic :: pure_all\n");
@@ -3521,7 +3521,7 @@ sub tool_xsubpp {
     my $tmdir   = File::Spec->catdir($self->{?PERL_LIB},"ExtUtils");
     my@(@tmdeps) =@( @( $self->catfile($tmdir,'typemap') ));
     if( $self->{?TYPEMAPS} ){
-        foreach my $typemap ( @{$self->{TYPEMAPS}}){
+        foreach my $typemap ( $self->{TYPEMAPS}->@){
             if( ! -f  $typemap ) {
                 warn "Typemap $typemap not found.\n";
             }
@@ -3602,7 +3602,7 @@ config :: $(FIRST_MAKEFILE) blibdirs
 
     push @m, '
 $(O_FILES): $(H_FILES)
-' if (nelems @{$self->{?O_FILES} || \@()}) && nelems @{$self->{?H} || \@()};
+' if (nelems ($self->{?O_FILES} || \@())->@) && nelems ($self->{?H} || \@())->@;
 
     push @m, q{
 help :

@@ -46,7 +46,7 @@ do {
     sub DESTROY
     {
         my $self = shift ;
-        chmod 0777, < @{ $self } ;
+        chmod 0777, <  $self->@ ;
         for ( @$self) { 1 while unlink $_ } ;
     }
 
@@ -588,12 +588,12 @@ sub dumpObj
     }
 
     my $max = 0 ;;
-    foreach my $k (keys %{ *$obj })
+    foreach my $k (keys  *$obj->%)
     {
         $max = length $k if length $k +> $max ;
     }
 
-    foreach my $k (sort keys %{ *$obj })
+    foreach my $k (sort keys  *$obj->%)
     {
         my $v = $obj->{?$k} ;
         $v = '-undef-' unless defined $v;

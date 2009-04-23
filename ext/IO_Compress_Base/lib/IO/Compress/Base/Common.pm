@@ -284,7 +284,7 @@ sub Validator::new
     }
 
     return $obj->saveErrorString("$reportClass: output buffer is read-only")
-        if $outType eq 'buffer' && readonly(${ @_[1] });
+        if $outType eq 'buffer' && readonly( @_[1]->$);
 
     if ($outType eq 'filename' )
     {
@@ -306,7 +306,7 @@ sub Validator::new
 sub Validator::saveErrorString
 {
     my $self   = shift ;
-    ${ $self->{Error} } = shift ;
+     $self->{Error}->$ = shift ;
     return undef;
 
 }
@@ -354,12 +354,12 @@ sub Validator::validateInputArray
 {
     my $self = shift ;
 
-    if ( (nelems @{ @_[0] }) == 0 )
+    if ( (nelems  @_[0]->@) == 0 )
     {
         return $self->saveErrorString("empty array reference") ;
     }    
 
-    foreach my $element (  @{ @_[0] } )
+    foreach my $element (   @_[0]->@ )
     {
         my $inType  = whatIsInput($element);
 
@@ -437,7 +437,7 @@ sub createSelfTiedObject
                            Parse_multiple Parse_writable_scalar
                          );              
 
-push @EXPORT, < @{ %EXPORT_TAGS{?Parse} } ;
+push @EXPORT, <  %EXPORT_TAGS{?Parse}->@ ;
 
 use constant Parse_any      => 0x01;
 use constant Parse_unsigned => 0x02;
@@ -513,7 +513,7 @@ sub IO::Compress::Base::Parameters::parse
     my $default = shift ;
 
     my $got = $self->{?Got} ;
-    my $firstTime = nkeys %{ $got } == 0 ;
+    my $firstTime = nkeys  $got->% == 0 ;
 
     my (@Bad) ;
     my @entered = @( () ) ;
@@ -595,7 +595,7 @@ sub IO::Compress::Base::Parameters::parse
             $value = $$value ;
             if ($type ^&^ Parse_multiple) {
                 $got->{$canonkey}->[OFF_PARSED] = 1;
-                push @{ $got->{$canonkey}->[OFF_FIXED] }, $s ;
+                push  $got->{$canonkey}->[OFF_FIXED]->@, $s ;
             }
             else {
                 $got->{+$canonkey} = \@(1, $type, $value, $s) ;
@@ -754,7 +754,7 @@ sub IO::Compress::Base::Parameters::clone
     my $obj = \%( );
     my %got ;
 
-    while (my @($k, $v) =@( each %{ $self->{Got} })) {
+    while (my @($k, $v) =@( each  $self->{Got}->%)) {
         %got{+$k} = \ @$v;
     }
 

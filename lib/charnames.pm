@@ -129,7 +129,7 @@ sub charnames
         ## scripts.
         if (not defined $hexstr) {
             my $case = $name =~ m/[[:upper:]]/ ?? "CAPITAL" !! "SMALL";
-            for my $script ( @{$^HINTS{charnames_scripts}}) {
+            for my $script ( $^HINTS{charnames_scripts}->@) {
                 my $ucname = uc($name);
                 if ($txt =~ m/($hexre)\t\t$script (?:$case )?LETTER \Q$ucname\E$/m) {
                     $hexstr = $1;
@@ -203,10 +203,10 @@ sub import
     ## If utf8? warnings are enabled, and some scripts were given,
     ## see if at least we can find one letter of each script.
     ##
-    if (warnings::enabled('utf8') && nelems @{$^HINTS{?charnames_scripts}}) {
+    if (warnings::enabled('utf8') && nelems $^HINTS{?charnames_scripts}->@) {
         $txt = do "unicore/Name.pl" unless $txt;
 
-        for my $script ( @{$^HINTS{charnames_scripts}}) {
+        for my $script ( $^HINTS{charnames_scripts}->@) {
             if (not $txt =~ m/\t\t$script (?:CAPITAL |SMALL )?LETTER /) {
                 warnings::warn('utf8',  "No such script: '$script'");
             }

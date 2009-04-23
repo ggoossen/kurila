@@ -749,7 +749,7 @@ if (exists %METHOD_MAP{$^OS_NAME}) {
     my %map = %METHOD_MAP{?$^OS_NAME};
     foreach my $name (keys %map) {
         local $^WARNING = 0;  # assignments trigger 'subroutine redefined' warning
-        *{Symbol::fetch_glob($name)} = \&{%map{?$name}};
+        Symbol::fetch_glob($name)->* = \&{%map{?$name}};
     }
 }
 

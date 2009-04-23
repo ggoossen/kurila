@@ -2360,7 +2360,7 @@ END
    &&  $1 eq "ba$s",
    "TRIEF + LATIN SMALL LETTER SHARP S =~ SS # TODO");
 
-        ok(("foba  ba$($s)pxySS$s$s" =~ qr/(b(?:a${\$s}t|a${\$s}f|a${\$s}p)[xy]+$s*)/i)
+        ok(("foba  ba$($s)pxySS$s$s" =~ qr/(b(?:a(\$s)->$t|a(\$s)->$f|a(\$s)->$p)[xy]+$s*)/i)
    &&  $1 eq "ba$($s)pxySS$s$s",
    "COMMON PREFIX TRIEF + LATIN SMALL LETTER SHARP S # TODO");
 
@@ -2953,8 +2953,8 @@ EOFTEST
         local $Message = "http://nntp.perl.org/group/perl.perl5.porters/118663";
         my $qr_barR1 = qr/(bar)\g-1/;
         ok("foobarbarxyz" =~ $qr_barR1);
-        ok("foobarbarxyz" =~ qr/foo${\$qr_barR1}xyz/);
-        ok("foobarbarxyz" =~ qr/(foo)${\$qr_barR1}xyz/);
+        ok("foobarbarxyz" =~ qr/foo(\$qr_barR1)->$xyz/);
+        ok("foobarbarxyz" =~ qr/(foo)(\$qr_barR1)->$xyz/);
         ok("foobarbarxyz" =~ qr/(foo)(bar)\g{-1}xyz/);
         ok("foobarbarxyz" =~ qr/(foo$qr_barR1)xyz/);
         ok("foobarbarxyz" =~ qr/(foo(bar)\g{-1})xyz/);

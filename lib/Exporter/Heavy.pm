@@ -22,7 +22,7 @@ No user-serviceable parts inside.
 sub _rebuild_cache($pkg, $exports, $cache) {
     s/^&// foreach  @$exports;
         $cache->{[ @$exports]} = @(1) x nelems @$exports;
-    my $ok = \@{*{Symbol::fetch_glob("$($pkg)::EXPORT_OK")}};
+    my $ok = \Symbol::fetch_glob("$($pkg)::EXPORT_OK")->*->@;
     if ((nelems @$ok)) {
         s/^&// foreach  @$ok;
             $cache->{[@$ok]} = @(1) x nelems @$ok;
@@ -31,7 +31,7 @@ sub _rebuild_cache($pkg, $exports, $cache) {
 
 sub export($pkg, $callpkg, @< @imports) {
     my ($type, $cache_is_current, $oops);
-    my @($exports, $export_cache) = @(\@{*{Symbol::fetch_glob("$($pkg)::EXPORT")}},
+    my @($exports, $export_cache) = @(\Symbol::fetch_glob("$($pkg)::EXPORT")->*->@,
                                       (%Exporter::Cache{+$pkg} ||= \%()));
 
     if ((nelems @imports)) {
@@ -41,7 +41,7 @@ sub export($pkg, $callpkg, @< @imports) {
         }
 
         if (grep { m{^[/!:]} }, @imports) {
-            my $tagsref = \%{*{Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")}};
+            my $tagsref = \Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")->*->%;
             my $tagdata;
             my %imports;
             my($remove, @names, @allexports);
@@ -129,7 +129,7 @@ sub export($pkg, $callpkg, @< @imports) {
         @imports = @$exports;
     }
 
-    my @($fail, $fail_cache) = @(\@{*{Symbol::fetch_glob("$($pkg)::EXPORT_FAIL")}},
+    my @($fail, $fail_cache) = @(\Symbol::fetch_glob("$($pkg)::EXPORT_FAIL")->*->@,
                                  (%Exporter::FailCache{+$pkg} ||= \%()));
 
     if ((nelems @$fail)) {
@@ -139,7 +139,7 @@ sub export($pkg, $callpkg, @< @imports) {
             # (Technique could be applied to $export_cache at cost of memory)
             my @expanded = @+: map { m/^\w/ ?? @($_, '&'.$_) !! @($_) }, @$fail;
             warn "$($pkg)::EXPORT_FAIL cached: $(join ' ',@expanded)" if $Exporter::Verbose;
-                %{$fail_cache}{[ @expanded]} = (1) x nelems @expanded;
+                $fail_cache->{[ @expanded]} = (1) x nelems @expanded;
         }
         my @failed;
         foreach my $sym ( @imports) { push(@failed, $sym) if $fail_cache->{?$sym} }
@@ -160,15 +160,15 @@ sub export($pkg, $callpkg, @< @imports) {
 
     foreach my $sym ( @imports) {
         # shortcut for the common case of no type character
-        (*{Symbol::fetch_glob("$($callpkg)::$sym")} = \&{*{Symbol::fetch_glob("$($pkg)::$sym")}} and next)
+        (Symbol::fetch_glob("$($callpkg)::$sym")->* = \&{Symbol::fetch_glob("$($pkg)::$sym")->*} and next)
             unless $sym =~ s/^(\W)//;
         $type = $1;
         no warnings 'once';
-        *{Symbol::fetch_glob("$($callpkg)::$sym")} =
-            $type eq '&' ?? \&{*{Symbol::fetch_glob("$($pkg)::$sym")}} !!
-            $type eq '$' ?? \${*{Symbol::fetch_glob("$($pkg)::$sym")}} !!
-            $type eq '@' ?? \@{*{Symbol::fetch_glob("$($pkg)::$sym")}} !!
-            $type eq '%' ?? \%{*{Symbol::fetch_glob("$($pkg)::$sym")}} !!
+        Symbol::fetch_glob("$($callpkg)::$sym")->* =
+            $type eq '&' ?? \&{Symbol::fetch_glob("$($pkg)::$sym")->*} !!
+            $type eq '$' ?? \Symbol::fetch_glob("$($pkg)::$sym")->*->$ !!
+            $type eq '@' ?? \Symbol::fetch_glob("$($pkg)::$sym")->*->@ !!
+            $type eq '%' ?? \Symbol::fetch_glob("$($pkg)::$sym")->*->% !!
             warn("Can't export symbol: $type$sym");
     }
 }
@@ -186,9 +186,9 @@ sub export_to_level
 
 sub _push_tags($pkg, $var, $syms) {
     my @nontag = @( () );
-    my $export_tags = \%{*{Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")}};
-    push(@{*{Symbol::fetch_glob("$($pkg)::$var")}},
-        < @+: map { $export_tags->{?$_} ?? @{$export_tags->{?$_}}
+    my $export_tags = \Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")->*->%;
+    push(Symbol::fetch_glob("$($pkg)::$var")->*->@,
+        < @+: map { $export_tags->{?$_} ?? $export_tags->{?$_}->@
             !! do { push(@nontag,$_); @($_) } },
         (nelems @$syms) ?? @$syms !! keys %$export_tags);
     if ((nelems @nontag) and $^WARNING) {

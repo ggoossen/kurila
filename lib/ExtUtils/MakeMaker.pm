@@ -169,7 +169,7 @@ sub eval_in_subdirs($self) {;
     local $^INCLUDE_PATH = map { try {abs_path($_) if -e} || $_ }, $^INCLUDE_PATH;
     push $^INCLUDE_PATH, '.';     # '.' has to always be at the end of $^INCLUDE_PATH
 
-    foreach my $dir ( @{$self->{DIR}}){
+    foreach my $dir ( $self->{DIR}->@){
         my $abs = $self->catdir($pwd,$dir);
         try { $self->eval_in_x($abs); };
         last if $^EVAL_ERROR;
@@ -367,7 +367,7 @@ sub new {
     # PRINT_PREREQ is RedHatism.
     if ("$(join ' ',@ARGV)" =~ m/\bPRINT_PREREQ\b/) {
         print $^STDOUT, join(" ", map { "perl($_)>=$self->{PREREQ_PM}->{?$_} " }, 
-            sort keys %{$self->{?PREREQ_PM}}), "\n";
+            sort keys $self->{?PREREQ_PM}->%), "\n";
         exit 0;
     }
 
@@ -384,7 +384,7 @@ sub new {
     my %initial_att  = %$self; # record initial attributes
 
     my %unsatisfied = %();
-    foreach my $prereq (sort keys %{$self->{?PREREQ_PM} || \%()}) {
+    foreach my $prereq (sort keys ($self->{?PREREQ_PM} || \%())->%) {
         # 5.8.0 has a bug with require Foo::Bar alone in an eval, so an
         # extra statement is a workaround.
         my $file = "$prereq.pm";
@@ -424,7 +424,7 @@ END
 
     if (defined $self->{?CONFIGURE}) {
         if (ref $self->{?CONFIGURE} eq 'CODE') {
-            %configure_att = %( < %{ $self->{?CONFIGURE}->( < @_ ) } );
+            %configure_att = %( <  $self->{?CONFIGURE}->( < @_ )->% );
             $self = \%( < %$self, < %configure_att );
         } else {
             die "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n";
@@ -439,7 +439,7 @@ END
         bless $self, $newclass;
         push @Parent, $self;
         require ExtUtils::MY;
-        @{*{Symbol::fetch_glob("$newclass\:\:ISA")}} = @( 'MM' );
+        Symbol::fetch_glob("$newclass\:\:ISA")->*->@ = @( 'MM' );
     };
 
     if (defined @Parent[?-2]){
@@ -538,7 +538,7 @@ END
     $argv =~ s/^\[/(/;
     $argv =~ s/\]$/)/;
 
-    push @{$self->{+RESULT}}, <<END;
+    push $self->{+RESULT}->@, <<END;
 # This Makefile is for the $self->{?NAME} extension to perl.
 #
 # It was generated automatically by MakeMaker version
@@ -558,12 +558,12 @@ END
         my $v = neatvalue(%initial_att{?$key});
         $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
         $v =~ s/\n+/ /g;
-        push @{$self->{RESULT}}, "#     $key => $v";
+        push $self->{RESULT}->@, "#     $key => $v";
     }
     undef %initial_att;        # free memory
 
     if (defined $self->{?CONFIGURE}) {
-        push @{$self->{RESULT}}, <<END;
+        push $self->{RESULT}->@, <<END;
 
 #   MakeMaker 'CONFIGURE' Parameters:
 END
@@ -573,18 +573,18 @@ END
                 my $v = neatvalue(%configure_att{?$key});
                 $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
                 $v =~ s/\n+/ /g;
-                push @{$self->{RESULT}}, "#     $key => $v";
+                push $self->{RESULT}->@, "#     $key => $v";
             }
         }
         else
         {
-            push @{$self->{RESULT}}, "# no values returned";
+            push $self->{RESULT}->@, "# no values returned";
         }
         undef %configure_att;  # free memory
     }
 
     # turn the SKIP array into a SKIPHASH hash
-    for my $skip ( @{$self->{?SKIP} || \@()}) {
+    for my $skip ( ($self->{?SKIP} || \@())->@) {
         $self->{+SKIPHASH}->{+$skip} = 1;
     }
     delete $self->{SKIP}; # free memory
@@ -598,7 +598,7 @@ END
     # We run all the subdirectories now. They don't have much to query
     # from the parent, but the parent has to query them: if they need linking!
     unless ($self->{?NORECURS}) {
-        $self->eval_in_subdirs if (nelems @{$self->{?DIR}});
+        $self->eval_in_subdirs if (nelems $self->{?DIR}->@);
     }
 
     foreach my $section (  @MM_Sections ) {
@@ -609,18 +609,18 @@ END
         print $^STDOUT, "Processing Makefile '$section' section\n" if ($Verbose +>= 2);
         my $skipit = $self->skipcheck($section);
         if ($skipit){
-            push @{$self->{RESULT}}, "\n# --- MakeMaker $section section $skipit.";
+            push $self->{RESULT}->@, "\n# --- MakeMaker $section section $skipit.";
         } else {
-            my %a = %( < %{$self->{?$section} || \%()} );
-            push @{$self->{RESULT}}, "\n# --- MakeMaker $section section:";
-            push @{$self->{RESULT}}, "# " . join ", ", %a if $Verbose && %a;
-            push @{$self->{RESULT}}, $self->maketext_filter(
+            my %a = %( < ($self->{?$section} || \%())->% );
+            push $self->{RESULT}->@, "\n# --- MakeMaker $section section:";
+            push $self->{RESULT}->@, "# " . join ", ", %a if $Verbose && %a;
+            push $self->{RESULT}->@, $self->maketext_filter(
                 $self->?$method( < %a )
                 );
         }
     }
 
-    push @{$self->{RESULT}}, "\n# End.";
+    push $self->{RESULT}->@, "\n# End.";
 
     $self;
 }
@@ -706,7 +706,7 @@ sub parse_args($self, @< @args){
         my@($armaybe) = $self->{?ARMAYBE};
         print $^STDOUT, "ARMAYBE => '$armaybe' should be changed to:\n",
             "\t'dynamic_lib' => \{ARMAYBE => '$armaybe'\}\n";
-        my@(%dl) =@( %( < %{$self->{?dynamic_lib} || \%()} ));
+        my@(%dl) =@( %( < ($self->{?dynamic_lib} || \%())->% ));
         $self->{+dynamic_lib} = \%( < %dl, ARMAYBE => $armaybe);
         delete $self->{ARMAYBE};
     }
@@ -811,7 +811,7 @@ sub mv_all_methods {
         next unless defined &{Symbol::fetch_glob("$($from)::$method")};
 
         do {
-            *{Symbol::fetch_glob("$($to)::$method")} = \&{Symbol::fetch_glob("$($from)::$method")};
+            Symbol::fetch_glob("$($to)::$method")->* = \&{Symbol::fetch_glob("$($from)::$method")};
 
             # If we delete a method, then it will be undefined and cannot
             # be called.  But as long as we have Makefile.PLs that rely on
@@ -821,7 +821,7 @@ sub mv_all_methods {
             do {
                 package MY;
                 my $super = "SUPER::".$method;
-                *{Symbol::fetch_glob($method)} = sub {
+                Symbol::fetch_glob($method)->* = sub {
                         shift->?$super(< @_);
                     };
             };
@@ -881,7 +881,7 @@ sub flush {
     open(my $fh,">", "MakeMaker.tmp")
         or die "Unable to open MakeMaker.tmp: $^OS_ERROR";
 
-    for my $chunk ( @{$self->{RESULT}}) {
+    for my $chunk ( $self->{RESULT}->@) {
         print $fh, "$chunk\n";
     }
 

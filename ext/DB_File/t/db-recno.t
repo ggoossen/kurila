@@ -106,7 +106,7 @@ BEGIN
     };
 
     if ($^EVAL_ERROR) {
-        *Dumper = sub { my $a = shift; return "[ $(join ' ',@{ $a }) ]" } ;
+        *Dumper = sub { my $a = shift; return "[ $(join ' ', $a->@) ]" } ;
     }          
 }
 

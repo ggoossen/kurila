@@ -535,10 +535,10 @@ sub new { my @t = @( mytime, times, (nelems @_) == 2 ?? @_[1] !! 0);
     print $^STDERR, "new=$(join ' ',@t)\n" if $Debug;
     bless \@t; }
 
-sub cpu_p { my@($r,$pu,$ps,$cu,$cs, ...) =  @{@_[0]}; $pu+$ps         ; }
-sub cpu_c { my@($r,$pu,$ps,$cu,$cs, ...) =  @{@_[0]};         $cu+$cs ; }
-sub cpu_a { my@($r,$pu,$ps,$cu,$cs, ...) =  @{@_[0]}; $pu+$ps+$cu+$cs ; }
-sub real  { my@($r,$pu,$ps,$cu,$cs, ...) =  @{@_[0]}; $r              ; }
+sub cpu_p { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $pu+$ps         ; }
+sub cpu_c { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@;         $cu+$cs ; }
+sub cpu_a { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $pu+$ps+$cu+$cs ; }
+sub real  { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $r              ; }
 sub iters { @_[0]->[5] ; }
 
 
@@ -899,7 +899,7 @@ sub cmpthese{
     $style = "" unless defined $style;
 
     # Flatten in to an array of arrays with the name as the first field
-    my @vals = map{ \@( $_, < @{$results->{?$_}} ) }, keys %$results;
+    my @vals = map{ \@( $_, < $results->{?$_}->@ ) }, keys %$results;
 
     for ( @vals) {
         # The epsilon fudge here is to prevent div by 0.  Since clock
@@ -1003,14 +1003,14 @@ sub cmpthese{
     # exceeding 80 characters.  This does not use or affect cols 0 or 1.
     my @sorted_width_refs = 
         sort { $$a <+> $$b }, map { \$_ }, @col_widths[[2..((nelems @col_widths)-1)]];
-    my $max_width = ${@sorted_width_refs[-1]};
+    my $max_width = @sorted_width_refs[-1]->$;
 
     my $total = (nelems @col_widths) - 1 ;
     for (  @col_widths ) { $total += $_ }
 
   STRETCHER:
     while ( $total +< 80 ) {
-        my $min_width = ${@sorted_width_refs[0]};
+        my $min_width = @sorted_width_refs[0]->$;
         last
             if $min_width == $max_width;
         for (  @sorted_width_refs ) {

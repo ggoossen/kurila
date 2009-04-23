@@ -49,7 +49,7 @@ ok($foo eq 'xy' || $foo eq 'yx','fresh keys');
 %refhash{"top"}->{+"bar"} = "BAR";
 
 delete %refhash{"top"}->{"bar"};
-@list = keys %{%refhash{?"top"}};
+@list = keys %refhash{?"top"}->%;
 
 cmp_ok("$(join ' ',@list)",'eq',"foo", 'autoviv and delete hashref');
 
@@ -110,7 +110,7 @@ cmp_ok($foo,'eq','x y','two fresh');
 
 delete @refary[0]->[3];
 
-cmp_ok( scalar(nelems @{@refary[0]}),'==',1,'one down');
+cmp_ok( scalar(nelems @refary[0]->@),'==',1,'one down');
 
 do {
     my @a = @( 33 );

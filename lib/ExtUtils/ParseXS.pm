@@ -120,7 +120,7 @@ sub process_file {
     $WantOptimize = %args{?optimize};
     $process_inout = %args{?inout};
     $process_argtypes = %args{?argtypes};
-    @tm = @( ref %args{?typemap} ?? < @{%args{?typemap}} !! (%args{?typemap}) );
+    @tm = @( ref %args{?typemap} ?? < %args{?typemap}->@ !! (%args{?typemap}) );
 
     for (@(%args{?filename})) {
         die "Missing required parameter 'filename'" unless $_;
@@ -470,18 +470,18 @@ sub process_para {
                 push(@BootCode,     "#endif");
             }
 
-            my @fns = keys %{@XSStack[-1]->{?functions} || \%()};
+            my @fns = keys (@XSStack[-1]->{?functions} || \%())->%;
             if ($statement ne 'endif') { 
                     # Hide the functions defined in other #if branches, and reset.
-                    %{@XSStack[-1]->{+other_functions}}{[ @fns]} = @(1) x nelems @fns;
-                    %{@XSStack[-1]}{[qw(varname functions)]} = @('', \%());
+                    @XSStack[-1]->{+other_functions}->{[ @fns]} = @(1) x nelems @fns;
+                    @XSStack[-1]->{[qw(varname functions)]} = @('', \%());
             } else {
                 my $tmp = pop(@XSStack);
                 0 while (--$XSS_work_idx
             && @XSStack[$XSS_work_idx]->{?type} ne 'if');
                 # Keep all new defined functions
-                push(@fns, < keys %{$tmp->{?other_functions} || \%()});
-                    %{@XSStack[$XSS_work_idx]->{+functions}}{[ @fns]} = @(1) x nelems @fns;
+                push(@fns, < keys ($tmp->{?other_functions} || \%())->%);
+                    @XSStack[$XSS_work_idx]->{+functions}->{[ @fns]} = @(1) x nelems @fns;
             }
         }
     }
@@ -528,7 +528,7 @@ sub process_para {
 
     $_ = shift(@line);
     while (my $kwd = check_keyword("REQUIRE|PROTOTYPES|FALLBACK|VERSIONCHECK|INCLUDE")) {
-        &{*{Symbol::fetch_glob("$($kwd)_handler")}}() ;
+        &{Symbol::fetch_glob("$($kwd)_handler")->*}() ;
         next PARAGRAPH unless (nelems @line) ;
         $_ = shift(@line);
     }
@@ -1126,7 +1126,7 @@ sub process_keyword($pattern)
 { 
     my $kwd ;
 
-    &{*{Symbol::fetch_glob("$($kwd)_handler")}}()
+    &{Symbol::fetch_glob("$($kwd)_handler")->*}()
         while $kwd = check_keyword($pattern) ;
 }
 
@@ -1552,8 +1552,8 @@ sub PopFile()
     $filepathname = $data->{?Filepathname} ;
     $lastline   = $data->{?LastLine} ;
     $lastline_no = $data->{?LastLineNo} ;
-    @line       = @{ $data->{?Line} } ;
-    @line_no    = @{ $data->{?LineNo} } ;
+    @line       =  $data->{?Line}->@ ;
+    @line_no    =  $data->{?LineNo}->@ ;
 
     if ($isPipe and $^CHILD_ERROR ) {
         -- $lastline_no ;

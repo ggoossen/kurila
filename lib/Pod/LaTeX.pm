@@ -1339,7 +1339,7 @@ sub begin_list {
 
     # Indicate that a list should be started for the next item
     # need to do this to work out the type of list
-    push ( @{$self->lists}, Pod::List->new(-indent => $indent, 
+    push ( $self->lists->@, Pod::List->new(-indent => $indent, 
         -start => $line_num,
         -file => $self->input_file,)	 
         );
@@ -1376,7 +1376,7 @@ sub end_list {
         if (defined $type && length($type) +> 0);
 
     # Clear list
-    pop(@{ $self->lists});
+    pop( $self->lists->@);
 
 }
 

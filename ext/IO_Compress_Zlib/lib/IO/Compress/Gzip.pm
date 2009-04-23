@@ -23,7 +23,7 @@ $GzipError = '' ;
 @ISA    = qw(IO::Compress::RawDeflate Exporter);
 @EXPORT_OK = qw( $GzipError gzip ) ;
 %EXPORT_TAGS = %( < %IO::Compress::RawDeflate::DEFLATE_CONSTANTS ) ;
-push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
+push  %EXPORT_TAGS{all}->@, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');
 
 sub new

@@ -577,7 +577,7 @@ do {
 # handy class: $x = Watch->new(\$foo,'bar')
 # causes 'bar' to be appended to $foo when $x is destroyed
 sub Watch::new { bless \@( @_[1], @_[2] ), @_[0] }
-sub Watch::DESTROY { ${@_[0]->[0]} .= @_[0]->[1] }
+sub Watch::DESTROY { @_[0]->[0]->$ .= @_[0]->[1] }
 
 
 # bugid 1028:

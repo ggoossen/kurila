@@ -48,12 +48,12 @@ sub struct {
     my $base_type = ref @_[1];
     if ( $base_type eq 'HASH' ) {
         $class = shift;
-        @decls = @: < %{shift()};
+        @decls = @: < shift()->%;
         _usage_error() if (nelems @_);
     }
     elsif ( $base_type eq 'ARRAY' ) {
         $class = shift;
-        @decls = @{shift()};
+        @decls = shift()->@;
         _usage_error() if (nelems @_);
     }
     else {

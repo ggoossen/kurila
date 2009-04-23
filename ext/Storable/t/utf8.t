@@ -26,25 +26,25 @@ use Storable < qw(thaw freeze);
 use Test::More tests => 5;
 
 my $x = chr(1234);
-is $x, ${thaw freeze \$x};
+is $x, (thaw freeze \$x)->$;
 
 # Long scalar
 $x = join '', map {chr $_}, @( ( <0..1023));
-is $x, ${thaw freeze \$x};
+is $x, (thaw freeze \$x)->$;
 
 # Char in the range 127-255 (probably) in utf8
 $x = chr (175) . chr (256);
 chop $x;
-is $x, ${thaw freeze \$x};
+is $x, (thaw freeze \$x)->$;
 
 # Storable needs to cope if a frozen string happens to be internall utf8
 # encoded
 
 $x = chr 256;
 my $data = freeze \$x;
-is $x, ${thaw $data};
+is $x, (thaw $data)->$;
 
 $data .= chr 256;
 chop $data;
-is $x, ${thaw $data};
+is $x, (thaw $data)->$;
 

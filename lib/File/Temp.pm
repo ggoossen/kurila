@@ -357,11 +357,11 @@ sub _gettemp {
     %options = %(< %options, < @_)  if (nelems @_);
 
     # Make sure the error string is set to undef
-    ${%options{ErrStr}} = undef;
+    %options{ErrStr}->$ = undef;
 
     # Can not open the file and make a directory in a single call
     if (%options{?"open"} && %options{?"mkdir"}) {
-        ${%options{ErrStr}} = "doopen and domkdir can not both be true\n";
+        %options{ErrStr}->$ = "doopen and domkdir can not both be true\n";
         return ();
     }
 
@@ -376,7 +376,7 @@ sub _gettemp {
     # we know where we are looking and what we are looking for
 
     if (substr($template, $start - MINX + 1, MINX) ne 'X' x MINX) {
-        ${%options{ErrStr}} = "The template must end with at least ".
+        %options{ErrStr}->$ = "The template must end with at least ".
             MINX . " 'X' characters\n";
         return ();
     }
@@ -445,11 +445,11 @@ sub _gettemp {
     # that does not exist or is not writable
 
     unless (-e $parent) {
-        ${%options{ErrStr}} = "Parent directory ($parent) does not exist";
+        %options{ErrStr}->$ = "Parent directory ($parent) does not exist";
         return ();
     }
     unless (-d $parent) {
-        ${%options{ErrStr}} = "Parent directory ($parent) is not a directory";
+        %options{ErrStr}->$ = "Parent directory ($parent) is not a directory";
         return ();
     }
 
@@ -459,7 +459,7 @@ sub _gettemp {
     # writable.
     }
     elsif (not -w $parent) {
-        ${%options{ErrStr}} = "Parent directory ($parent) is not writable\n";
+        %options{ErrStr}->$ = "Parent directory ($parent) is not writable\n";
         return ();
     }
 
@@ -471,13 +471,13 @@ sub _gettemp {
     if (File::Temp->safe_level == MEDIUM) {
         my $safeerr;
         unless (_is_safe($parent,\$safeerr)) {
-            ${%options{ErrStr}} = "Parent directory ($parent) is not safe ($safeerr)";
+            %options{ErrStr}->$ = "Parent directory ($parent) is not safe ($safeerr)";
             return ();
         }
     } elsif (File::Temp->safe_level == HIGH) {
         my $safeerr;
         unless (_is_verysafe($parent, \$safeerr)) {
-            ${%options{ErrStr}} = "Parent directory ($parent) is not safe ($safeerr)";
+            %options{ErrStr}->$ = "Parent directory ($parent) is not safe ($safeerr)";
             return ();
         }
     }
@@ -521,7 +521,7 @@ sub _gettemp {
                 # Error opening file - abort with error
                 # if the reason was anything but EEXIST
                 unless ($^OS_ERROR == EEXIST) {
-                    ${%options{ErrStr}} = "Could not create temp file $path: $^OS_ERROR";
+                    %options{ErrStr}->$ = "Could not create temp file $path: $^OS_ERROR";
                     return ();
                 }
 
@@ -541,7 +541,7 @@ sub _gettemp {
                 # Abort with error if the reason for failure was anything
                 # except EEXIST
                 unless ($^OS_ERROR == EEXIST) {
-                    ${%options{ErrStr}} = "Could not create directory $path: $^OS_ERROR";
+                    %options{ErrStr}->$ = "Could not create directory $path: $^OS_ERROR";
                     return ();
                 }
 
@@ -586,14 +586,14 @@ sub _gettemp {
 
         # Check for out of control looping
         if ($counter +> $MAX_GUESS) {
-            ${%options{ErrStr}} = "Tried to get a new temp name different to the previous value $MAX_GUESS times.\nSomething wrong with template?? ($template)";
+            %options{ErrStr}->$ = "Tried to get a new temp name different to the previous value $MAX_GUESS times.\nSomething wrong with template?? ($template)";
             return ();
         }
 
     }
 
     # If we get here, we have run out of tries
-    ${ %options{ErrStr} } = "Have exceeded the maximum number of attempts ("
+     %options{ErrStr}->$ = "Have exceeded the maximum number of attempts ("
         . MAX_TRIES . ") to open temp file/dir";
 
     return ();
@@ -870,7 +870,7 @@ do {
         if (!$KEEP_ALL) {
             # Files
             my @files = @(exists %files_to_unlink{$^PID} ??
-                    < @{ %files_to_unlink{?$^PID} } !! () );
+                    <  %files_to_unlink{?$^PID}->@ !! () );
             foreach my $file ( @files) {
                 # close the filehandle without checking its state
                 # in order to make real sure that this is closed
@@ -885,7 +885,7 @@ do {
             }
             # Dirs
             my @dirs = @(exists %dirs_to_unlink{$^PID} ??
-                   < @{ %dirs_to_unlink{?$^PID} } !! () );
+                   <  %dirs_to_unlink{?$^PID}->@ !! () );
             foreach my $dir ( @dirs) {
                 if (-d $dir) {
                     rmtree($dir, $DEBUG, 0);
@@ -893,9 +893,9 @@ do {
             }
 
             # clear the arrays
-            @{ %files_to_unlink{$^PID} } = @( () )
+             %files_to_unlink{$^PID}->@ = @( () )
                 if exists %files_to_unlink{$^PID};
-            @{ %dirs_to_unlink{$^PID} } = @( () )
+             %dirs_to_unlink{$^PID}->@ = @( () )
                 if exists %dirs_to_unlink{$^PID};
         }
     }
@@ -926,7 +926,7 @@ do {
                 $fname = VMS::Filespec::vmspath($fname) if $^OS_NAME eq 'VMS';
                 %dirs_to_unlink{+$^PID} = \@() 
                 unless exists %dirs_to_unlink{$^PID};
-                push (@{ %dirs_to_unlink{$^PID} }, $fname);
+                push ( %dirs_to_unlink{$^PID}->@, $fname);
 
             } else {
                 carp "Request to remove directory $fname could not be completed since it does not exist!\n" if $^WARNING;
@@ -939,7 +939,7 @@ do {
                 # file exists so store handle and name for later removal
                 %files_to_unlink{+$^PID} = \@()
                 unless exists %files_to_unlink{$^PID};
-                push(@{ %files_to_unlink{$^PID} }, \@($fh, $fname));
+                push( %files_to_unlink{$^PID}->@, \@($fh, $fname));
 
             } else {
                 carp "Request to remove file $fname could not be completed since it is not there!\n" if $^WARNING;
@@ -1020,13 +1020,13 @@ sub new {
     print $^STDOUT, "Tmp: $fh - $path\n" if $DEBUG;
 
     # Store the filename in the scalar slot
-    ${*$fh} = $path;
+    *$fh->$ = $path;
 
     # Cache the filename by pid so that the destructor can decide whether to remove it
     %FILES_CREATED_BY_OBJECT{+$^PID}->{+$path} = 1;
 
     # Store unlink information in hash slot (plus other constructor info)
-    %{*$fh} = %( < %args );
+    *$fh->% = %( < %args );
 
     # create the object
     bless $fh, $class;
@@ -1089,7 +1089,7 @@ a string.
 
 sub filename {
     my $self = shift;
-    return ${*$self};
+    return *$self->$;
 }
 
 sub STRINGIFY {
@@ -1120,9 +1120,9 @@ Default is for the file to be removed.
 sub unlink_on_destroy {
     my $self = shift;
     if ((nelems @_)) {
-        %{*$self}{+UNLINK} = shift;
+        *$self->{+UNLINK} = shift;
     }
-    return %{*$self}{?UNLINK};
+    return *$self->{?UNLINK};
 }
 
 =item B<DESTROY>
@@ -1148,7 +1148,7 @@ will not be removed.
 
 sub DESTROY {
     my $self = shift;
-    if (%{*$self}{?UNLINK} && !$KEEP_ALL) {
+    if (*$self->{?UNLINK} && !$KEEP_ALL) {
         print $^STDOUT, "# --------->   Unlinking $self\n" if $DEBUG;
 
         # only delete if this process created it

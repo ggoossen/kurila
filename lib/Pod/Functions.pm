@@ -132,7 +132,7 @@ while ( ~< *DATA) {
     %Type{+$name} = $type;
     %Flavor{+$name} = $text;
     for my $t ( split m/[,\s]+/, $type ) {
-        push @{%Kinds{+$t}}, $name;
+        push %Kinds{+$t}->@, $name;
     }
 }
 
@@ -141,7 +141,7 @@ close \*DATA;
 my( $typedesc, $list );
 unless (caller) {
     foreach my $type (  @Type_Order ) {
-        $list = join(", ", sort @{%Kinds{?$type}});
+        $list = join(", ", sort %Kinds{?$type}->@);
         $typedesc = %Type_Description{?$type} . ":";
 
         print $^STDOUT, < form("",

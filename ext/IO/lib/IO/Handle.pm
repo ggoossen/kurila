@@ -486,8 +486,8 @@ sub ioctl {
 
 sub constant {
     my $name = shift;
-    (($name =~ m/^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && defined &{*{Symbol::fetch_glob($name)}})
-        ?? &{*{Symbol::fetch_glob($name)}}() !! undef;
+    (($name =~ m/^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && defined &{Symbol::fetch_glob($name)->*})
+        ?? &{Symbol::fetch_glob($name)->*}() !! undef;
 }
 
 

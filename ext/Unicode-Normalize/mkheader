@@ -181,7 +181,7 @@ sub getCanonList {
     my @src = @_;
     my @dec = @+: map {
             (SBase +<= $_ && $_ +<= SFinal) ?? decomposeHangul($_)
-                !! %Canon{?$_} ?? @{ %Canon{?$_} } !! @($_)
+                !! %Canon{?$_} ??  %Canon{?$_}->@ !! @($_)
         }, @src;
     return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCanonList(< @dec);
 # condition @src == @dec is not ok.
@@ -191,7 +191,7 @@ sub getCompatList {
     my @src = @_;
     my @dec = @+: map {
             (SBase +<= $_ && $_ +<= SFinal) ?? decomposeHangul($_)
-                !! %Compat{?$_} ?? @{ %Compat{?$_} } !! @($_)
+                !! %Compat{?$_} ??  %Compat{?$_}->@ !! @($_)
         }, @src;
     return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCompatList(< @dec);
 # condition @src == @dec is not ok.
@@ -228,7 +228,7 @@ sub _U_stringify {
 
 foreach my $hash (@(\%Canon, \%Compat)) {
     foreach my $key (keys %$hash) {
-        $hash->{+$key} = _U_stringify( < @{ $hash->{$key} } );
+        $hash->{+$key} = _U_stringify( <  $hash->{$key}->@ );
     }
 }
 
@@ -269,7 +269,7 @@ print $fh, << 'EOF';
 EOF
 
 foreach my $tbl ( @boolfunc) {
-    my @temp = sort {$a <+> $b}, keys %{$tbl->{?hash}};
+    my @temp = sort {$a <+> $b}, keys $tbl->{?hash}->%;
     my $type = $tbl->{?type};
     my $name = $tbl->{?name};
     print $fh, "$type is$name (UV uv)\n\{\nreturn\n\t";
@@ -301,7 +301,7 @@ my $compinit =
 foreach my $i (sort keys %CompList) {
     $compinit .= "$structname $i [] = \{\n";
     $compinit .= join ",\n", map { sprintf("\t\{ \%d, \%d \}", $_, %CompList{$i}->{?$_}) },
-        sort { $a <+> $b }, keys %{ %CompList{?$i} };
+        sort { $a <+> $b }, keys  %CompList{?$i}->%;
     $compinit .= ",\n\{0,0\}\n\};\n\n"; # with sentinel
 }
 

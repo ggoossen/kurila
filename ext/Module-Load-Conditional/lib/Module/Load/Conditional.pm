@@ -179,7 +179,7 @@ sub check_install {
 
         ### find the version by inspecting the package
         if( defined $filename && $FIND_VERSION ) {
-            $href->{+version} = ${*{Symbol::fetch_glob( "$args->{?module}"."::VERSION")} }; 
+            $href->{+version} = Symbol::fetch_glob( "$args->{?module}"."::VERSION")->*->$; 
         }
     }     
 
@@ -199,7 +199,7 @@ sub check_install {
                     ($fh) = $dir->($dir, $file);
 
                 } elsif (UNIVERSAL::isa($dir, 'ARRAY')) {
-                    ($fh) = $dir->[0]->($dir, $file, < %{$dir}{[1..((nelems @{$dir})-1)]})
+                    ($fh) = $dir->[0]->($dir, $file, < $dir->{[1..((nelems $dir->@)-1)]})
 
                 } elsif (UNIVERSAL::can($dir, 'INC')) {
                     ($fh) = $dir->INC->($dir, $file);

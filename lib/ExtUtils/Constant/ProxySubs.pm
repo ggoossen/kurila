@@ -112,7 +112,7 @@ sub partition_names($self, $default_type, @< @items) {
             or %type_is_a_problem{?$item->{?type}}) {
             push @trouble, $item;
         } else {
-            push @{%found{+$item->{?type}}}, $item;
+            push %found{+$item->{?type}}->@, $item;
         }
     }
     # use Data::Dumper; print Dumper \%found;
@@ -155,7 +155,7 @@ sub WriteConstants {
     my $ARGS = \%(< @_);
 
     my @($c_fh, $xs_fh, $c_subname, $xs_subname, $default_type, $package)
-        =  %{$ARGS}{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]};
+        =  $ARGS->{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]};
 
     my $options = $ARGS->{?PROXYSUBS};
     $options = \%() unless ref $options;
@@ -174,7 +174,7 @@ sub WriteConstants {
 
     my @items = $self->normalise_items (\%(disable_utf8_duplication => 1),
         $default_type, $what, $items,
-        < @{$ARGS->{NAMES}});
+        < $ARGS->{NAMES}->@);
 
     # Partition the values by type. Also include any defaults in here
     # Everything that doesn't have a default needs alternative code for
@@ -304,7 +304,7 @@ EOBOOT
 EOBOOT
 
 
-        foreach my $item ( @{$found->{$type}}) {
+        foreach my $item ( $found->{$type}->@) {
             my @($name, $namelen, $value, $macro)
                 =  $self->name_len_value_macro($item);
 
@@ -419,7 +419,7 @@ EOBOOT
         # these don't fit nicely in the macro-ised generator functions
         my $counter = 0;
         printf $xs_fh, "            \%s temp\%d;\n", $_, $counter++
-            foreach  @{%type_temporary{$type}};
+            foreach  %type_temporary{$type}->@;
 
         print $xs_fh, "            $item->{?pre}\n" if $item->{?pre};
 

@@ -49,9 +49,9 @@ do {
     my %seen;
     foreach (keys %EXPORT_TAGS )
     {
-        push @{%EXPORT_TAGS{+constants}}, 
+        push %EXPORT_TAGS{+constants}->@, 
             < grep { !%seen{+$_}++ }, 
-            @{ %EXPORT_TAGS{$_} }
+             %EXPORT_TAGS{$_}->@
     }
     %EXPORT_TAGS{+all} = %EXPORT_TAGS{?constants} ;
 };
@@ -59,7 +59,7 @@ do {
 
 %DEFLATE_CONSTANTS = %( < %EXPORT_TAGS );
 
-push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
+push  %EXPORT_TAGS{all}->@, < @EXPORT_OK ;
 
 Exporter::export_ok_tags('all');
 

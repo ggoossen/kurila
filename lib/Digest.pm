@@ -31,7 +31,7 @@ sub new
         my $class = $_;
         my @args;
         @($class, @< @args) =  @$class if ref($class);
-        unless (exists %{*{Symbol::fetch_glob("$class\::")}}{"VERSION"}) {
+        unless (exists Symbol::fetch_glob("$class\::")->*->{"VERSION"}) {
             eval "require $class";
             if ($^EVAL_ERROR) {
                 $err ||= $^EVAL_ERROR;

@@ -276,13 +276,13 @@ sub test_pkg($pkg, ?$fntypes) {
     # build %stash: keys are func-names, vals filled in below
     my %stash = %+: map
         { %: $_ => 0 },
-        grep { exists &{*{Symbol::fetch_glob("$pkg\::$_")}}	# grab CODE symbols
+        grep { exists &{Symbol::fetch_glob("$pkg\::$_")->*}	# grab CODE symbols
         },
-        grep { !m/__ANON__/ }, keys %{*{Symbol::fetch_glob($pkg.'::')}}		# from symbol table
+        grep { !m/__ANON__/ }, keys Symbol::fetch_glob($pkg.'::')->*->%		# from symbol table
     ;
 
         for my $type (keys %matchers) {
-            foreach my $fn ( @{$fntypes->{?$type}}) {
+            foreach my $fn ( $fntypes->{?$type}->@) {
                 carp "$fn can only be one of $type, %stash{?$fn}\n"
                     if %stash{?$fn};
                 %stash{+$fn} = $type;
@@ -293,7 +293,7 @@ sub test_pkg($pkg, ?$fntypes) {
     for my $k (keys %stash) {
         %stash{+$k} = $dflt unless %stash{?$k};
     }
-    %stash{+$_} = 'skip' foreach  @{$fntypes->{?skip}};
+    %stash{+$_} = 'skip' foreach  $fntypes->{?skip}->@;
 
     if (%opts{?v}) {
         diag("fntypes: " => < Dumper($fntypes));
@@ -303,7 +303,7 @@ sub test_pkg($pkg, ?$fntypes) {
         next if %stash{?$fn} eq 'skip';
         my $res = checkXS("$($pkg)::$fn", %stash{?$fn});
         if ($res ne '1') {
-            push @{%report{$pkg}->{$res}}, $fn;
+            push %report{$pkg}->{$res}->@, $fn;
         }
     }
 }
@@ -360,8 +360,8 @@ END {
 
         foreach my $pkg (sort keys %report) {
             for my $type (keys %matchers) {
-                print $^STDOUT, "$pkg: $type: $(join ' ',@{%report{$pkg}->{?$type}})\n"
-                    if (nelems @{%report{$pkg}->{?$type}});
+                print $^STDOUT, "$pkg: $type: $(join ' ',%report{$pkg}->{?$type}->@)\n"
+                    if (nelems %report{$pkg}->{?$type}->@);
             }
         }
     }

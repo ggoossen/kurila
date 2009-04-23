@@ -97,19 +97,19 @@ sub get_token {
     my $self = shift;
     DEBUG +> 1 and print $^STDOUT, "\nget_token starting up on $self.\n";
     DEBUG +> 2 and print $^STDOUT, " Items in token-buffer (",
-        scalar( nelems @{ $self->{?'token_buffer'} } ) ,
+        scalar( nelems  $self->{?'token_buffer'}->@ ) ,
         ") :\n", < map( {
-            "    " . $_->dump . "\n" }, @{ $self->{'token_buffer'} }
+            "    " . $_->dump . "\n" },  $self->{'token_buffer'}->@
         ),
-        (nelems @{ $self->{?'token_buffer'} }) ?? '' !! '       (no tokens)',
+        (nelems  $self->{?'token_buffer'}->@) ?? '' !! '       (no tokens)',
         "\n"
     ;
 
-        until( nelems @{ $self->{?'token_buffer'} } ) {
+        until( nelems  $self->{?'token_buffer'}->@ ) {
         DEBUG +> 3 and print $^STDOUT, "I need to get something into my empty token buffer...\n";
         if($self->{?'source_dead'}) {
             DEBUG and print $^STDOUT, "$self 's source is dead.\n";
-            push @{ $self->{'token_buffer'} }, undef;
+            push  $self->{'token_buffer'}->@, undef;
         } elsif(exists $self->{'source_fh'}) {
             my @lines;
             my $fh = $self->{?'source_fh'}
@@ -153,15 +153,15 @@ sub get_token {
 
         } elsif(exists $self->{'source_arrayref'}) {
                 DEBUG and print $^STDOUT, "$self 's source is arrayref $self->{?'source_arrayref'}, with ",
-            scalar(nelems @{$self->{?'source_arrayref'}}), " items left in it.\n";
+            scalar(nelems $self->{?'source_arrayref'}->@), " items left in it.\n";
 
             DEBUG +> 3 and print $^STDOUT, "  Fetching ", Pod::Simple::MANY_LINES, " lines.\n";
                 $self->SUPER::parse_lines(
-                splice @{ $self->{'source_arrayref'} },
+                splice  $self->{'source_arrayref'}->@,
                 0,
                 Pod::Simple::MANY_LINES
             );
-            unless( nelems @{ $self->{?'source_arrayref'} } ) {
+            unless( nelems  $self->{?'source_arrayref'}->@ ) {
                 DEBUG and print $^STDOUT, "That's it for that source arrayref!  Killing.\n";
                 $self->SUPER::parse_lines(undef);
                 delete $self->{'source_arrayref'}; # so it can be GC'd
@@ -171,19 +171,19 @@ sub get_token {
         } elsif(exists $self->{'source_scalar_ref'}) {
 
                 DEBUG and print $^STDOUT, "$self 's source is scalarref $self->{?'source_scalar_ref'}, with ",
-            length(${ $self->{?'source_scalar_ref'} }) -
-                (pos(${ $self->{?'source_scalar_ref'} }) || 0),
+            length( $self->{?'source_scalar_ref'}->$) -
+                (pos( $self->{?'source_scalar_ref'}->$) || 0),
                 " characters left to parse.\n";
 
             DEBUG +> 3 and print $^STDOUT, " Fetching a line from source-string...\n";
-            if( ${ $self->{?'source_scalar_ref'} } =~
+            if(  $self->{?'source_scalar_ref'}->$ =~
                 m/([^\n\r]*)((?:\r?\n)?)/g
             ) {
                     #print(">> $1\n"),
                     $self->SUPER::parse_lines($1)
                         if length($1) or length($2)
-                        or pos(     ${ $self->{?'source_scalar_ref'} })
-                        != length( ${ $self->{?'source_scalar_ref'} });
+                        or pos(      $self->{?'source_scalar_ref'}->$)
+                        != length(  $self->{?'source_scalar_ref'}->$);
                 # I.e., unless it's a zero-length "empty line" at the very
                 #  end of "foo\nbar\n" (i.e., between the \n and the EOS).
                 } else { # that's the end.  Byebye
@@ -198,10 +198,10 @@ sub get_token {
         }
     }
         DEBUG and print $^STDOUT, "get_token about to return ", <
-    Pod::Simple::pretty( (nelems @{$self->{?'token_buffer'}}
+    Pod::Simple::pretty( (nelems $self->{?'token_buffer'}->@
                          )     ?? $self->{'token_buffer'}->[-1] !! undef
                         ), "\n";
-    return shift @{$self->{'token_buffer'}}; # that's an undef if empty
+    return shift $self->{'token_buffer'}->@; # that's an undef if empty
 }
 
 use UNIVERSAL ();
@@ -218,9 +218,9 @@ sub unget_token {
             unless UNIVERSAL::can($t, 'type');
     }
 
-    unshift @{$self->{'token_buffer'}}, < @_;
+    unshift $self->{'token_buffer'}->@, < @_;
     DEBUG +> 1 and print $^STDOUT, "Token buffer now has ",
-        scalar(nelems @{$self->{?'token_buffer'}}), " items in it.\n";
+        scalar(nelems $self->{?'token_buffer'}->@), " items in it.\n";
     return;
 }
 
@@ -466,9 +466,9 @@ sub _get_titled_section {
 
 sub _handle_element_start {
     my $self = shift;   # leaving ($element_name, $attr_hash_r)
-    DEBUG +> 2 and print $^STDOUT, "++ @_[0] (", < map( {"<$_> " }, %{@_[1]}), ")\n";
+    DEBUG +> 2 and print $^STDOUT, "++ @_[0] (", < map( {"<$_> " }, @_[1]->%), ")\n";
 
-    push @{ $self->{'token_buffer'} }, 
+    push  $self->{'token_buffer'}->@, 
         $self->{?'start_token_class'}->new(< @_);
     return;
 }
@@ -476,7 +476,7 @@ sub _handle_element_start {
 sub _handle_text {
     my $self = shift;   # leaving ($text)
     DEBUG +> 2 and print $^STDOUT, "== @_[0]\n";
-    push @{ $self->{'token_buffer'} },
+    push  $self->{'token_buffer'}->@,
         $self->{?'text_token_class'}->new(< @_);
     return;
 }
@@ -484,7 +484,7 @@ sub _handle_text {
 sub _handle_element_end {
     my $self = shift;   # leaving ($element_name);
     DEBUG +> 2 and print $^STDOUT, "-- @_[0]\n";
-    push @{ $self->{'token_buffer'} },
+    push  $self->{'token_buffer'}->@,
         $self->{?'end_token_class'}->new(< @_);
     return;
 }

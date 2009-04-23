@@ -724,7 +724,7 @@ sub parse_text {
     local $_ = '';
 
     ## Get options and set any defaults
-    my %opts = %( (ref @_[0]) ?? < %{ shift() } !! () );
+    my %opts = %( (ref @_[0]) ?? <  shift()->% !! () );
     my $expand_seq   = %opts{?'expand_seq'}   || undef;
     my $expand_text  = %opts{?'expand_text'}  || undef;
     my $expand_ptree = %opts{?'expand_ptree'} || undef;
@@ -1024,7 +1024,7 @@ This method does I<not> usually need to be overridden by subclasses.
 
 sub parse_from_filehandle {
     my $self = shift;
-    my %opts = %( (ref @_[0] eq 'HASH') ?? < %{ shift() } !! () );
+    my %opts = %( (ref @_[0] eq 'HASH') ?? <  shift()->% !! () );
     my @($in_fh, ?$out_fh) =  @_;
     $in_fh = $^STDIN  unless ($in_fh);
     my %myOpts = %$self{+_PARSEOPTS} || %();  ## get parse-options
@@ -1135,7 +1135,7 @@ This method does I<not> usually need to be overridden by subclasses.
 
 sub parse_from_file {
     my $self = shift;
-    my %opts = %( (ref @_[0] eq 'HASH') ?? < %{ shift() } !! () );
+    my %opts = %( (ref @_[0] eq 'HASH') ?? <  shift()->% !! () );
     my @($infile, ?$outfile) =  @_;
     my ($in_fh,  $out_fh);
     my @($close_input, $close_output) = @(0, 0);
@@ -1147,7 +1147,7 @@ sub parse_from_file {
         }
         ## Must be a filehandle-ref (or else assume its a ref to an object
         ## that supports the common IO read operations).
-        %$self{+_INFILE} = ${$infile};
+        %$self{+_INFILE} = $infile->$;
         $in_fh = $infile;
     }
     elsif (!defined($infile) || !length($infile) || ($infile eq '-')

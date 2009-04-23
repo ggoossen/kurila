@@ -301,7 +301,7 @@ level, then C<undef> is returned.
 sub curr_headings {
     my $self = shift;
     $self->_init_headings()  unless (defined $self->{?_SECTION_HEADINGS});
-    my @headings = @{ $self->{?_SECTION_HEADINGS} };
+    my @headings =  $self->{?_SECTION_HEADINGS}->@;
     return ((nelems @_) +> 0  and  @_[0] =~ m/^\d+$/) ?? @headings[@_[0] - 1] !! @headings;
 }
 
@@ -440,7 +440,7 @@ sub match_section {
     ## Return true if no restrictions were explicitly specified
     my $selections = (exists %$self{_SELECTED_SECTIONS})
         ??  %$self{?_SELECTED_SECTIONS}  !!  undef;
-    return  1  unless ((defined $selections) && ((nelems @{$selections}) +> 0));
+    return  1  unless ((defined $selections) && ((nelems $selections->@) +> 0));
 
     ## Default any unspecified sections to the current one
     my @current_headings = $self->curr_headings();
@@ -450,7 +450,7 @@ sub match_section {
 
     ## Look for a match against the specified section expressions
     my ($regex, $negated, $match);
-    for my $section_spec (  @{$selections} ) {
+    for my $section_spec (  $selections->@ ) {
         ##------------------------------------------------------
         ## Each portion of this spec must match in order for
         ## the spec to be matched. So we will start with a 
@@ -581,7 +581,7 @@ sub podselect(@argv) {
     for ( @argv) {
         if (ref($_)) {
             next unless (ref($_) eq 'HASH');
-            %opts = %(< %defaults, < %{$_});
+            %opts = %(< %defaults, < $_->%);
 
             ##-------------------------------------------------------------
             ## Need this for backward compatibility since we formerly used
@@ -601,7 +601,7 @@ sub podselect(@argv) {
             (exists %opts{'-output'})  and  $output = %opts{?'-output'};
 
             ## Select the desired sections
-            $pod_parser->select(< @{ %opts{'-sections'} })
+            $pod_parser->select(<  %opts{'-sections'}->@)
                 if ( (defined %opts{?'-sections'})
                      && ((ref %opts{?'-sections'}) eq 'ARRAY') );
 

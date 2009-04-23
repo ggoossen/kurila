@@ -112,7 +112,7 @@ sub getopt($argumentative, ?$hash) {
                 %$hash{+$first} = $rest;
             }
             else {
-                ${*{Symbol::fetch_glob("opt_$first")}} = $rest;
+                Symbol::fetch_glob("opt_$first")->*->$ = $rest;
                 push( @EXPORT, "\$opt_$first" );
             }
         }
@@ -121,7 +121,7 @@ sub getopt($argumentative, ?$hash) {
                 %$hash{+$first} = 1;
             }
             else {
-                ${*{Symbol::fetch_glob("opt_$first")}} = 1;
+                Symbol::fetch_glob("opt_$first")->*->$ = 1;
                 push( @EXPORT, "\$opt_$first" );
             }
             if ($rest ne '') {
@@ -241,7 +241,7 @@ sub getopts($argumentative, ?$hash) {
                     %$hash{+$first} = $rest;
                 }
                 else {
-                    ${*{Symbol::fetch_glob("opt_$first")}} = $rest;
+                    Symbol::fetch_glob("opt_$first")->*->$ = $rest;
                     push( @EXPORT, "\$opt_$first" );
                 }
             }
@@ -250,7 +250,7 @@ sub getopts($argumentative, ?$hash) {
                     %$hash{+$first} = 1;
                 }
                 else {
-                    ${*{Symbol::fetch_glob("opt_$first")}} = 1;
+                    Symbol::fetch_glob("opt_$first")->*->$ = 1;
                     push( @EXPORT, "\$opt_$first" );
                 }
                 if ($rest eq '') {

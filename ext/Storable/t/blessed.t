@@ -80,7 +80,7 @@ ok 1;
 
 my $y = thaw $x;
 ok ref $y eq 'ARRAY';
-ok nelems(@{$y}) == nelems(@pool);
+ok nelems($y->@) == nelems(@pool);
 
 ok ref $y->[0] eq 'SHORT_NAME';
 ok ref $y->[1] eq 'SHORT_NAME_WITH_HOOK';

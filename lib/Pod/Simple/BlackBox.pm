@@ -176,7 +176,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
 
         if($line =~ m/^=cut/s) {
             # here ends the pod block, and therefore the previous pod para
-            DEBUG +> 1 and print $^STDOUT, "Noting =cut at line %{$self}{?'line_count'}\n";
+            DEBUG +> 1 and print $^STDOUT, "Noting =cut at line $self->{?'line_count'}\n";
             $self->{+'in_pod'} = 0;
             # ++$self->{'pod_para_count'};
             $self->_ponder_paragraph_buffer();
@@ -189,12 +189,12 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
 
         } elsif($line =~ m/^\s*$/s) {  # it's a blank line
             if(!$self->{?'start_of_pod_block'} and nelems @$paras and $paras->[-1]->[0] eq '~Verbatim') {
-                DEBUG +> 1 and print $^STDOUT, "Saving blank line at line %{$self}{?'line_count'}\n";
-                push @{$paras->[-1]}, $line;
+                DEBUG +> 1 and print $^STDOUT, "Saving blank line at line $self->{?'line_count'}\n";
+                push $paras->[-1]->@, $line;
             }  # otherwise it's not interesting
 
             if(!$self->{?'start_of_pod_block'} and !$self->{?'last_was_blank'}) {
-                DEBUG +> 1 and print $^STDOUT, "Noting para ends with blank line at %{$self}{?'line_count'}\n"; 
+                DEBUG +> 1 and print $^STDOUT, "Noting para ends with blank line at $self->{?'line_count'}\n"; 
             }
 
             $self->{+'last_was_blank'} = 1;
@@ -213,18 +213,18 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
                 # by now it's safe to consider the previous paragraph as done.
 
                 push @$paras, $new; # the new incipient paragraph
-                DEBUG +> 1 and print $^STDOUT, "Starting new $paras->[-1]->[0] para at line %{$self}{?'line_count'}\n";
+                DEBUG +> 1 and print $^STDOUT, "Starting new $paras->[-1]->[0] para at line $self->{?'line_count'}\n";
 
             } elsif($line =~ m/^\s/s) {
 
                 if(!$self->{?'start_of_pod_block'} and nelems @$paras and $paras->[-1]->[0] eq '~Verbatim') {
-                    DEBUG +> 1 and print $^STDOUT, "Resuming verbatim para at line %{$self}{?'line_count'}\n";
-                    push @{$paras->[-1]}, $line;
+                    DEBUG +> 1 and print $^STDOUT, "Resuming verbatim para at line $self->{?'line_count'}\n";
+                    push $paras->[-1]->@, $line;
                 } else {
                     ++$self->{+'pod_para_count'};
                     $self->_ponder_paragraph_buffer();
                     # by now it's safe to consider the previous paragraph as done.
-                    DEBUG +> 1 and print $^STDOUT, "Starting verbatim para at line %{$self}{?'line_count'}\n";
+                    DEBUG +> 1 and print $^STDOUT, "Starting verbatim para at line $self->{?'line_count'}\n";
                     push @$paras, \@('~Verbatim', \%('start_line' => $self->{?'line_count'}), $line);
                 }
             } else {
@@ -232,15 +232,15 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
                 $self->_ponder_paragraph_buffer();
                 # by now it's safe to consider the previous paragraph as done.
                 push @$paras, \@('~Para',  \%('start_line' => $self->{?'line_count'}), $line);
-                DEBUG +> 1 and print $^STDOUT, "Starting plain para at line %{$self}{?'line_count'}\n";
+                DEBUG +> 1 and print $^STDOUT, "Starting plain para at line $self->{?'line_count'}\n";
             }
             $self->{+'last_was_blank'} = $self->{+'start_of_pod_block'} = 0;
 
         } else {
             # It's a non-blank line /continuing/ the current para
             if((nelems @$paras)) {
-                DEBUG +> 2 and print $^STDOUT, "Line %{$self}{?'line_count'} continues current paragraph\n";
-                push @{$paras->[-1]}, $line;
+                DEBUG +> 2 and print $^STDOUT, "Line $self->{?'line_count'} continues current paragraph\n";
+                push $paras->[-1]->@, $line;
             } else {
                 # Unexpected case!
                 die "Continuing a paragraph but \@\$paras is empty?";
@@ -265,7 +265,7 @@ sub _handle_encoding_line($self, $line) {
 
     my $e    = $1;
     my $orig = $e;
-    push @{ $self->{+'encoding_command_reqs'} }, "=encoding $orig";
+    push  $self->{+'encoding_command_reqs'}->@, "=encoding $orig";
 
     my $enc_error;
 
@@ -325,7 +325,7 @@ sub _handle_encoding_line($self, $line) {
 
             $self->scream( $self->{?'line_count'}, $enc_error );
     }
-    push @{ $self->{+'encoding_command_statuses'} }, $enc_error;
+    push  $self->{+'encoding_command_statuses'}->@, $enc_error;
 
     return '=encoding ALREADYDONE';
 }
@@ -374,18 +374,18 @@ do {
         # Return 0 or more fake-o paragraphs explaining the accumulated
         #  errors on this document.
 
-        return @() unless $self->{?'errata'} and %{$self->{?'errata'}};
+        return @() unless $self->{?'errata'} and $self->{?'errata'}->%;
 
         my @out;
 
-        foreach my $line (sort {$a <+> $b}, keys %{$self->{?'errata'}}) {
+        foreach my $line (sort {$a <+> $b}, keys $self->{?'errata'}->%) {
             push @out,
                 \@('=item', \%('start_line' => $m), "Around line $line:"),
                 < map( { \@('~Para', \%('start_line' => $m, '~cooked' => 1),
                   #['~Top', {'start_line' => $m},
                   $_
                     #]
-                    ) }, @{$self->{'errata'}->{$line}}
+                    ) }, $self->{'errata'}->{$line}->@
                 )
         ;
         }
@@ -448,7 +448,7 @@ sub _ponder_paragraph_buffer {
 
     my $self = @_[0];
     my $paras;
-    return unless (nelems @{$paras = $self->{?'paras'}});
+    return unless (nelems ($paras = $self->{?'paras'})->@);
     my $curr_open = ($self->{+'curr_open'} ||= \@());
 
     my $scratch;
@@ -669,7 +669,7 @@ sub _ponder_paragraph_buffer {
                         # For the cases where we /didn't/ push to @$para
                         if($paras->[0]->[0] eq '~Para') {
                             DEBUG and print $^STDOUT, "Assimilating following ~Para content into $over_type item\n";
-                            push @$para, splice @{shift @$paras},2;
+                            push @$para, splice (shift @$paras)->@,2;
                         } else {
                             DEBUG and print $^STDOUT, "Can't assimilate following ", $paras->[0]->[0], "\n";
                             push @$para, '';  # Just so it's not contentless
@@ -715,7 +715,7 @@ sub _ponder_paragraph_buffer {
                         # For the cases where we /didn't/ push to @$para
                         if($paras->[0]->[0] eq '~Para') {
                             DEBUG and print $^STDOUT, "Assimilating following ~Para content into $over_type item\n";
-                            push @$para, splice @{shift @$paras},2;
+                            push @$para, splice (shift @$paras)->@,2;
                         } else {
                             DEBUG and print $^STDOUT, "Can't assimilate following ", $paras->[0]->[0], "\n";
                             push @$para, '';  # Just so it's not contentless
@@ -757,7 +757,7 @@ sub _ponder_paragraph_buffer {
                 } else {
                     # An unknown directive!
                     DEBUG +> 1 and printf $^STDOUT, "Unhandled directive \%s (Handled: \%s)\n",
-                        $para->[0], join(' ', sort keys %{$self->{?'accept_directives'}} )
+                        $para->[0], join(' ', sort keys $self->{?'accept_directives'}->% )
                     ;
                         $self->whine(
                         $para->[1]->{?'start_line'},
@@ -1261,7 +1261,7 @@ sub _ponder_item($self,$para,$curr_open,$paras) {
             # For the cases where we /didn't/ push to @$para
             if($paras->[0]->[0] eq '~Para') {
                 DEBUG and print $^STDOUT, "Assimilating following ~Para content into $over_type item\n";
-                push @$para, splice @{shift @$paras},2;
+                push @$para, splice (shift @$paras)->@,2;
             } else {
                 DEBUG and print $^STDOUT, "Can't assimilate following ", $paras->[0]->[0], "\n";
                 push @$para, '';  # Just so it's not contentless
@@ -1307,7 +1307,7 @@ sub _ponder_item($self,$para,$curr_open,$paras) {
             # For the cases where we /didn't/ push to @$para
             if($paras->[0]->[0] eq '~Para') {
                 DEBUG and print $^STDOUT, "Assimilating following ~Para content into $over_type item\n";
-                push @$para, splice @{shift @$paras},2;
+                push @$para, splice (shift @$paras)->@,2;
             } else {
                 DEBUG and print $^STDOUT, "Can't assimilate following ", $paras->[0]->[0], "\n";
                 push @$para, '';  # Just so it's not contentless
@@ -1329,10 +1329,10 @@ sub _ponder_Plain($self,$para) {
         or $para->[1]->{?'~cooked'}
     ) {
             push @$para,
-                < @{$self->_make_treelet(
+                < $self->_make_treelet(
                         join("\n", @( splice(@$para, 2))),
                         $para->[1]->{'start_line'}
-                    )};
+                    )->@;
         }
     # Empty paragraphs don't need a treelet for any reason I can see.
     # And precooked paragraphs already have a treelet.
@@ -1362,10 +1362,10 @@ sub _ponder_Verbatim($self,$para) {
             $self->_verbatim_format($para);
         } elsif ($self->{?'codes_in_verbatim'}) {
         push @$para,
-            < @{$self->_make_treelet(
+            < $self->_make_treelet(
                     join("\n", @( splice(@$para, 2))),
                     $para->[1]->{?'start_line'}, $para->[1]->{'xml:space'}
-                )};
+                )->@;
         $para->[-1] =~ s/\n+$//s; # Kill any number of terminal newlines
     } else {
         push @$para, join "\n", @( splice(@$para, 2)) if (nelems @$para) +> 3;
@@ -1409,9 +1409,9 @@ sub _traverse_treelet_bit {  # for use only by the routine above
 sub _closers_for_all_curr_open {
     my $self = @_[0];
     my @closers;
-    foreach my $still_open ( @{  $self->{?'curr_open'} || return  }) {
+    foreach my $still_open ( (  $self->{?'curr_open'} || return  )->@) {
         my @copy = @$still_open;
-        @copy[1] = \%(< %{ @copy[1] });
+        @copy[1] = \%(<  @copy[1]->%);
         #$copy[1]{'start_line'} = -1;
         if(@copy[0] eq '=for') {
             @copy[0] = '=end';
@@ -1660,7 +1660,7 @@ sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space) 
                     push @stack, 0;  # signal that we're looking for simple
                 }
                 push @lineage, \@( substr($1,0,1), \%(), );  # new node object
-                push @{ @lineage[-2] }, @lineage[-1];
+                push  @lineage[-2]->@, @lineage[-1];
 
             } elsif(defined $4) {
                 DEBUG +> 3 and print $^STDOUT, "Found apparent complex end-text code \"$3$4\"\n";
@@ -1668,12 +1668,12 @@ sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space) 
                 if(! nelems @stack) {
                     # We saw " >>>>" but needed nothing.  This is ALL just stuff then.
                     DEBUG +> 4 and print $^STDOUT, " But it's really just stuff.\n";
-                    push @{ @lineage[-1] }, $3, $4;
+                    push  @lineage[-1]->@, $3, $4;
                     next;
                 } elsif(!@stack[-1]) {
                     # We saw " >>>>" but needed only ">".  Back pos up.
                     DEBUG +> 4 and print $^STDOUT, " And that's more than we needed to close simple.\n";
-                    push @{ @lineage[-1] }, $3; # That was a for-real space, too.
+                    push  @lineage[-1]->@, $3; # That was a for-real space, too.
                     pos($para, pos($para) - length($4) + 1);
                 } elsif(@stack[-1] == length($4)) {
                     # We found " >>>>", and it was exactly what we needed.  Commonest case.
@@ -1685,12 +1685,12 @@ sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space) 
                 } else {
                     # We saw " >>>>" but needed " >>>>>>".  So this is all just stuff!
                     DEBUG +> 4 and print $^STDOUT, " But it's really just stuff, because we needed more.\n";
-                    push @{ @lineage[-1] }, $3, $4;
+                    push  @lineage[-1]->@, $3, $4;
                     next;
                 }
                 #print "\nHOOBOY ", scalar(@{$lineage[-1]}), "!!!\n";
 
-                push @{ @lineage[-1] }, '' if 2 == nelems @{ @lineage[-1] };
+                push  @lineage[-1]->@, '' if 2 == nelems  @lineage[-1]->@;
                 # Keep the element from being childless
 
                 pop @stack;
@@ -1704,21 +1704,21 @@ sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space) 
                     DEBUG +> 4 and print $^STDOUT, " It's indeed an end-code.\n";
 
                     if(length($5) == 2) { # There was a space there: " >"
-                        push @{ @lineage[-1] }, ' ';
-                    } elsif( 2 == nelems @{ @lineage[-1] } ) { # Closing a childless element
-                        push @{ @lineage[-1] }, ''; # keep it from being really childless
+                        push  @lineage[-1]->@, ' ';
+                    } elsif( 2 == nelems  @lineage[-1]->@ ) { # Closing a childless element
+                        push  @lineage[-1]->@, ''; # keep it from being really childless
                     }
 
                     pop @stack;
                     pop @lineage;
                 } else {
                     DEBUG +> 4 and print $^STDOUT, " It's just stuff.\n";
-                    push @{ @lineage[-1] }, $5;
+                    push  @lineage[-1]->@, $5;
                 }
 
             } elsif(defined $6) {
                 DEBUG +> 3 and print $^STDOUT, "Found stuff \"$6\"\n";
-                push @{ @lineage[-1] }, $6;
+                push  @lineage[-1]->@, $6;
 
             } else {
                 # should never ever ever ever happen
@@ -1730,7 +1730,7 @@ sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space) 
     if((nelems @stack)) { # Uhoh, some sequences weren't closed.
         my $x= "...";
         while((nelems @stack)) {
-            push @{ @lineage[-1] }, '' if 2 == nelems @{ @lineage[-1] };
+            push  @lineage[-1]->@, '' if 2 == nelems  @lineage[-1]->@;
             # Hmmmmm!
 
             my $code         = (pop @lineage)->[0];

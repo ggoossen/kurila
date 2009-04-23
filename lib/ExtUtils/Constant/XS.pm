@@ -181,7 +181,7 @@ sub C_constant_other_params($self, $params) {
 
 sub dogfood($self, $args, @< @items) {
     my @($package, $subname, $default_type, $what, $indent, $breakout) = 
-            %{$args}{[qw(package subname default_type what indent breakout)]};
+            $args->{[qw(package subname default_type what indent breakout)]};
     my $result = <<"EOT";
   /* When generated this function returned values for the list of names given
      in this section of perl code.  Rather than manually editing these functions

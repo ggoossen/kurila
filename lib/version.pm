@@ -12,7 +12,7 @@ $CLASS = 'version';
 sub import($class, ...) {
     my $callpkg = caller();
 
-    *{Symbol::fetch_glob($callpkg."::qv")} = 
+    Symbol::fetch_glob($callpkg."::qv")->* = 
         sub {return bless version::qv(shift), $class }
         unless defined (&{Symbol::fetch_glob("$callpkg\::qv")});
 
