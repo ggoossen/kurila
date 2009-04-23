@@ -12,7 +12,7 @@ use ExtUtils::MakeMaker;
 
 my $VERBOSE = env::var('VERBOSE');
 my $DEFINE;
-my $LIBS = \@();
+my $LIBS = @();
 my $XSOPT = '';
 my $SYSCALL_H;
 
@@ -93,7 +93,7 @@ __EOD__
             $errornull = '';
         }
 
-        $cccmd = "$(config_value('cc')) -o $tmp $ccflags $tmp.c $(join ' ',@$LIBS) $errornull"
+        $cccmd = "$(config_value('cc')) -o $tmp $ccflags $tmp.c $(join ' ',$LIBS) $errornull"
             unless defined $cccmd;
 
         if ($^OS_NAME eq 'VMS') {
@@ -330,8 +330,8 @@ sub init {
         local $self = undef;
         do $hints;
         if (exists $self->{LIBS}) {
-            $LIBS = $self->{?LIBS};
-            print $^STDOUT, "Extra libraries: $(join ' ',@$LIBS)...\n";
+            $LIBS = $self->{LIBS};
+            print $^STDOUT, "Extra libraries: $(join ' ', $LIBS)...\n";
         }
     }
 
@@ -719,8 +719,8 @@ sub doMakefile {
         # Solaris will avenge.
         'INC'	=> '',     # e.g., '-I/usr/include/other'
         'INSTALLDIRS' => 'perl',
-        clean => \%( FILES => "xdefine" ),
-        realclean => \%( FILES=> 'const-c.inc const-xs.inc' ),
+        clean => %( FILES => "xdefine" ),
+        realclean => %( FILES=> 'const-c.inc const-xs.inc' ),
         );
 
     WriteMakefile(< @makefileopts);
@@ -779,7 +779,7 @@ sub main {
 
     if ($^OS_NAME =~ m/Win32/i) {
         DEFINE('SELECT_IS_BROKEN');
-        $LIBS = \@();
+        $LIBS = @();
         print $^STDOUT, "System is $^OS_NAME, skipping full configure...\n";
     } else {
         init();

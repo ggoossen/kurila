@@ -641,7 +641,7 @@ our %hints; # used to display each COP's op_hints values
 
 sub _flags($hash, $x) {
     my @s;
-    for my $flag (sort {$b <+> $a}, keys ($hash || \%())->%) {
+    for my $flag (sort {$b <+> $a}, keys(($hash || \%())->%)) {
         if ($hash->{?$flag} and $x ^&^ $flag and $x +>= $flag) {
             $x -= $flag;
             push @s, $hash->{?$flag};

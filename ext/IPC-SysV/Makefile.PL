@@ -20,8 +20,8 @@ sub MY::libscan($self, $path)
 WriteMakefile(
     VERSION_FROM	=> "SysV.pm",
     NAME      	=> "IPC::SysV",
-    'clean'   	=> \%(FILES => join(" ", map { "$_ */$_ */*/$_" },
+    'clean'   	=> %(FILES => join(" ", map { "$_ */$_ */*/$_" },
         qw(*% *.html *.b[ac]k *.old))
     ),
-    'macro'		=> \%( INSTALLDIRS => 'perl' ),
+    'macro'		=> %( INSTALLDIRS => 'perl' ),
     );

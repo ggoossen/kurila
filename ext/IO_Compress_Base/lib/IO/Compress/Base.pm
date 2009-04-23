@@ -36,7 +36,7 @@ sub saveErrorString
 {
     my $self   = shift ;
     my $retval = shift ;
-     $self->{Error}->$ = shift() . ($self->{?Error}->$ ?? "\nprevious: $self->{?Error}->$" !! "") ;
+     $self->{Error}->$ = shift() . ($self->{?Error}->$ ?? "\nprevious: $($self->{?Error}->$)" !! "") ;
      $self->{ErrorNo}->$ = shift() + 0 if (nelems @_) ;
 
     return $retval;

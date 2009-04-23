@@ -224,12 +224,13 @@ SKIP: do {
     skip "This perl uses perlio", 1 if config_value("useperlio");
     skip "miniperl cannot be relied on to load \%Errno"
         if env::var('PERL_CORE_MINITEST');
+    require Errno;
     # Force the reference to %! to be run time by writing ! as {"!"}
     skip "This system doesn't understand EINVAL", 1
-        unless exists "!"->{EINVAL};
+        unless exists &Errno::EINVAL;
 
     no warnings 'io';
-    ok(!open(my $f,'>',\my $s) && "!"->{?EINVAL}, 'open(reference) raises EINVAL');
+    ok(!open(my $f,'>',\my $s) && $^OS_ERROR == Errno::EINVAL(), 'open(reference) raises EINVAL');
 };
 
 do {

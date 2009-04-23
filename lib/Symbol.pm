@@ -164,7 +164,7 @@ sub delete_package($pkg) {
 
     # free all the symbols in the package
 
-    my $leaf_symtab = $stem_symtab->{?$leaf}->*{HASH};
+    my $leaf_symtab = $stem_symtab->{?$leaf}->{HASH};
     foreach my $name (keys %$leaf_symtab) {
         undef Symbol::qualify_to_ref($pkg . $name)->*;
     }

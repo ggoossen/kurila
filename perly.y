@@ -806,11 +806,6 @@ subscripted:    star '{' expr ';' '}'       /* *main::{something} like *STDOUT{I
                             $$ = newHVREF($1, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'a');
                         }
-        |       term DEREFSTAR                /* somearef->* */
-                        {
-                            $$ = newGVREF(0, $1, LOCATION($2));
-                            TOKEN_GETMAD($2,$$,'a');
-                        }
         |       term DEREFAMP                /* somearef->& */
                         {
                             $$ = newCVREF(0, $1, LOCATION($2));
@@ -1408,6 +1403,11 @@ star	:	'*' indirob
                             $$ = newGVREF(0,$2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'*');
 			}
+        |       term DEREFSTAR                /* somearef->* */
+                        {
+                            $$ = newGVREF(0, $1, LOCATION($2));
+                            TOKEN_GETMAD($2,$$,'a');
+                        }
 	;
 
 /* Indirect objects */

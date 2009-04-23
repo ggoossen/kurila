@@ -620,7 +620,7 @@ sub segment($format, $args, $opts, $fldcnt, $argcache) {
             }
 
             if ($setwidth && $setwidth eq '*')	{
-                push %form{?verbatim} ?? \@vstarred !! \@starred->@, \%form;
+                push %form{?verbatim} ?? @vstarred !! @starred, \%form;
             }
             else {
                 $width -= %form{?width}

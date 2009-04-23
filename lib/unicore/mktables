@@ -344,7 +344,7 @@ sub New_Prop($Type, $Name, $Table, %< %Args)
         %TableInfo{+$Type}->{+$Name} = $Table;
         %TableDesc{+$Type}->{+$Name} = $Desc;
         if ($Fuzzy) {
-            %FuzzyNames{+$Type}->{+$Name} = $Name;
+            %FuzzyNames{+$Type}{+$Name} = $Name;
         }
     }
 }
@@ -709,9 +709,9 @@ sub New_Alias($Type, $Alias, $SameAs, $Name, %< %Args)
     if (%TableInfo{?$Alias}) {
         die "$^PROGRAM_NAME: already have original $Type => $Alias; can't make alias";
     }
-    %AliasInfo{+$Type}->{+$Name} = $Alias;
+    %AliasInfo{+$Type}{+$Name} = $Alias;
     if ($Fuzzy) {
-        %FuzzyNames{+$Type}->{+$Alias} = $Name;
+        %FuzzyNames{+$Type}{+$Alias} = $Name;
     }
 
 }
@@ -1743,7 +1743,7 @@ sub WriteAllMappings()
         {
             ## Note: $Name is already canonical
             my $Table   = %TableInfo{$Type}->{?$Name};
-            my $IsFuzzy = %FuzzyNames{$Type}->{?$Name};
+            my $IsFuzzy = %FuzzyNames{$Type}{?$Name};
 
             ## Need an 8.3 safe filename (which means "an 8 safe" $filename)
             my $filename;
@@ -1790,10 +1790,12 @@ sub WriteAllMappings()
                 my $Desc = %TableDesc{$Type}->{?$Name} || "";
                 ## get list of names this table is reference by
                 my @Supported = @( $Name );
-                while (my @(?$Orig, ?$Alias) = @( each ( %AliasInfo{?$Type} || \%() )->%))
-                {
-                    if ($Orig eq $Name) {
-                        push @Supported, $Alias;
+                if (%AliasInfo{?$Type}) {
+                    while (my @(?$Orig, ?$Alias) = @( each( %AliasInfo{$Type} )))
+                      {
+                        if ($Orig eq $Name) {
+                            push @Supported, $Alias;
+                        }
                     }
                 }
 
@@ -1803,7 +1805,7 @@ sub WriteAllMappings()
                 $Comment = "This file supports:\n";
                 for my $N ( @Supported)
                 {
-                    my $IsFuzzy = %FuzzyNames{$Type}->{?$N};
+                    my $IsFuzzy = %FuzzyNames{$Type}{?$N};
                     my $Prop    = "\\p\{$TypeToShow$Name\}";
                     $OrigProp = $Prop if not $OrigProp; #cache for aliases
                     if ($IsFuzzy) {
@@ -1842,10 +1844,10 @@ sub WriteAllMappings()
         }
 
         ## Register aliase info
-        for my $Name (sort {length $a <+> length $b}, keys (%AliasInfo{?$Type} || \%())->%)
+        for my $Name (sort {length $a <+> length $b}, keys(%AliasInfo{?$Type} || %()))
         {
-            my $Alias    = %AliasInfo{$Type}->{?$Name};
-            my $IsFuzzy  = %FuzzyNames{$Type}->{?$Alias};
+            my $Alias    = %AliasInfo{$Type}{?$Name};
+            my $IsFuzzy  = %FuzzyNames{$Type}{?$Alias};
             my $filename = %RawNameToFile{?$Name};
             die "oops [$Alias]->[$Name]" if not $filename;
             RegisterFileForName($Type => $Alias, $IsFuzzy, $filename);

@@ -581,7 +581,7 @@ sub checkErrs {
     $tc->{+goterrs} ||= \@();
         %goterrs{[ $tc->{?goterrs}->@]} = @(1) x nelems $tc->{?goterrs}->@;
 
-    foreach my $k (keys ($tc->{+errs} ||= \%())->%) {
+    foreach my $k (keys(($tc->{+errs} ||= \%())->%)) {
         if (@got = grep { m/^$k$/ }, keys %goterrs) {
             delete $tc->{errs}->{$k};
             delete %goterrs{$_} foreach  @got;

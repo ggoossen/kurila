@@ -47,7 +47,7 @@ open $^STDOUT, '>>', \$stdout or die;
 my $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
-    PREREQ_PM     => \%(),
+    PREREQ_PM     => %(),
     PERL_CORE     => env::var('PERL_CORE'),
     );
 like( $stdout, qr{
@@ -96,9 +96,9 @@ is( $mm->{INST_ARCHLIB},
 is( $mm->{INST_BIN},     File::Spec->catdir($Curdir, 'blib', 'bin'),
     'INST_BIN' );
 
-is( nkeys $mm->{CHILDREN}->%, 1 );
-my@($child_pack) =  keys $mm->{CHILDREN}->%;
-my $c_mm = $mm->{CHILDREN}->{$child_pack};
+is( nkeys $mm->{CHILDREN}, 1 );
+my@($child_pack) =  keys $mm->{CHILDREN};
+my $c_mm = $mm->{CHILDREN}{$child_pack};
 is( $c_mm->{INST_ARCHLIB}, 
     $c_mm->{PERL_CORE} ?? $c_mm->{PERL_ARCHLIB}
     !! File::Spec->catdir($Updir, 'blib', 'arch'),

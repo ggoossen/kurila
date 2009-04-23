@@ -437,7 +437,7 @@ sub clean($self, %< %attribs) {
 clean :: clean_subdirs
 |);
 
-    my @files = values $self->{XS}->%; # .c files from *.xs files
+    my @files = values $self->{XS}; # .c files from *.xs files
     my @dirs  = qw(blib);
 
     # Normally these are all under blib but they might have been
@@ -512,7 +512,7 @@ sub clean_subdirs_target {
     my@($self) =@( shift);
 
     # No subdirectories, no cleaning.
-    return <<'NOOP_FRAG' unless (nelems $self->{?DIR}->@);
+    return <<'NOOP_FRAG' unless (nelems $self->{?DIR});
 clean_subdirs :
 	$(NOECHO) $(NOOP)
 NOOP_FRAG
@@ -520,7 +520,7 @@ NOOP_FRAG
 
     my $clean = "clean_subdirs :\n";
 
-    for my $dir ( $self->{DIR}->@) {
+    for my $dir ( $self->{DIR}) {
         my $subclean = $self->oneliner(sprintf <<'CODE', $dir);
 chdir '%s';  system '$(MAKE) clean' if -f '$(FIRST_MAKEFILE)';
 CODE
@@ -676,7 +676,7 @@ sub manifypods_target {
     my $dependencies  = '';
 
     # populate manXpods & dependencies:
-    foreach my $name (@( <keys ($self->{?MAN1PODS} || \%())->%, < keys ($self->{?MAN3PODS} || \%())->%)) {
+    foreach my $name (keys($self->{?MAN1PODS} || %()) +@+ keys($self->{?MAN3PODS} || %())) {
         $dependencies .= " \\\n\t$name";
     }
 
@@ -687,7 +687,7 @@ END
     my @man_cmds;
     foreach my $section (qw(1 3)) {
         my $pods = $self->{?"MAN$($section)PODS"};
-        push @man_cmds, < $self->split_command(<<CMD, < %$pods);
+        push @man_cmds, < $self->split_command(<<CMD, < $pods);
 	\$(NOECHO) \$(POD2MAN) --section=$section --perm_rw=\$(PERM_RW)
 CMD
     }
@@ -719,8 +719,8 @@ metafile :
 MAKE_FRAG
 
     my $prereq_pm = '';
-    foreach my $mod ( sort { lc $a cmp lc $b }, keys ($self->{?PREREQ_PM} || \%())->% ) {
-        my $ver = $self->{PREREQ_PM}->{?$mod};
+    foreach my $mod ( sort { lc $a cmp lc $b }, keys($self->{?PREREQ_PM} || %()) ) {
+        my $ver = $self->{PREREQ_PM}{?$mod};
         $prereq_pm .= sprintf "\n    \%-30s \%s", "$mod:", $ver;
     }
 
@@ -814,7 +814,7 @@ sub realclean($self, %< %attribs) {
     # This cleans up the files built from the ext/ directory (all XS).
     if( $self->{?PERL_CORE} ) {
         push @dirs, < qw($(INST_AUTODIR) $(INST_ARCHAUTODIR));
-        push @files, < values $self->{PM}->%;
+        push @files, < values $self->{PM};
     }
 
     if( $self->has_link_code ){
@@ -864,14 +864,14 @@ target to call realclean on any subdirectories which contain Makefiles.
 sub realclean_subdirs_target {
     my $self = shift;
 
-    return <<'NOOP_FRAG' unless (nelems $self->{?DIR}->@);
+    return <<'NOOP_FRAG' unless (nelems $self->{?DIR});
 realclean_subdirs :
 	$(NOECHO) $(NOOP)
 NOOP_FRAG
 
     my $rclean = "realclean_subdirs :\n";
 
-    foreach my $dir ( $self->{DIR}->@) {
+    foreach my $dir ( $self->{DIR}) {
         foreach my $makefile (@('$(MAKEFILE_OLD)', '$(FIRST_MAKEFILE)') ) {
             my $subrclean .= $self->oneliner(sprintf <<'CODE', $dir, < (@($makefile) x 2));
 chdir '%s';  system '$(MAKE) $(USEMAKEFILE) %s realclean' if -f '%s';
@@ -1061,11 +1061,11 @@ INSTALLDIRS) and *PREFIX.
 sub init_INSTALL {
     my@($self) =@( shift);
 
-    if( $self->{ARGS}->{?INSTALL_BASE} and $self->{ARGS}->{?PREFIX} ) {
+    if( $self->{ARGS}{?INSTALL_BASE} and $self->{ARGS}{?PREFIX} ) {
         die "Only one of PREFIX or INSTALL_BASE can be given.  Not both.\n";
     }
 
-    if( $self->{ARGS}->{?INSTALL_BASE} ) {
+    if( $self->{ARGS}{?INSTALL_BASE} ) {
         $self->init_INSTALL_from_INSTALL_BASE;
     }
     else {

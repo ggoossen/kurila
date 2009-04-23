@@ -308,7 +308,7 @@ TODO: do {
     is (Symbol::fetch_glob($name2)->*->[0], undef,
         'Accessing via a different NUL-containing name gives nothing');
     ok (defined Symbol::fetch_glob($name1)->*->[0], 'defined via the correct name works');
-    ok (!definedSymbol::fetch_glob($name2)->*->[0],
+    ok (!defined Symbol::fetch_glob($name2)->*->[0],
         'defined via a different NUL-containing name gives nothing');
 
     my @(_, $one) =  Symbol::fetch_glob($name1)->*->[[@(2,3)]];

@@ -150,7 +150,7 @@ is ($t->has_link_code(),1); is ($t->{HAS_LINK_CODE},1);
 delete $t->{HAS_LINK_CODE}; delete $t->{OBJECT}; $t->{+MYEXTLIB} = 1;
 is ($t->has_link_code(),1); is ($t->{HAS_LINK_CODE},1);
 
-delete $t->{HAS_LINK_CODE}; delete $t->{MYEXTLIB}; $t->{+C} = \@( 'Gloin' );
+delete $t->{HAS_LINK_CODE}; delete $t->{MYEXTLIB}; $t->{+C} = @( 'Gloin' );
 is ($t->has_link_code(),1); is ($t->{HAS_LINK_CODE},1);
 
 ###############################################################################

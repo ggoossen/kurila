@@ -16,8 +16,8 @@ WriteMakefile(
 
     (
       env::var('SKIP_FOR_CORE')
-      ?? (MAN3PODS    => \%())
-      !! (PREREQ_PM   => \%( 'Compress::Raw::Zlib'  => $::VERSION,
+      ?? (MAN3PODS    => %())
+      !! (PREREQ_PM   => %( 'Compress::Raw::Zlib'  => $::VERSION,
                          'IO::Compress::Base'   => $::VERSION,
                              'IO::Uncompress::Base' => $::VERSION,
                      )

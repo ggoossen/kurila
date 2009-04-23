@@ -4,14 +4,14 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'		=> 'I18N::Langinfo',
     'VERSION_FROM'	=> 'Langinfo.pm', # finds $VERSION
-    'PREREQ_PM'		=> \%(), # e.g., Module::Name => 1.1
+    'PREREQ_PM'		=> %(), # e.g., Module::Name => 1.1
     ABSTRACT_FROM => 'Langinfo.pm', # retrieve abstract from module
     AUTHOR     => 'Jarkko Hietaniemi <jhi@hut.fi>',
-    'LIBS'		=> \@(''), # e.g., '-lm'
+    'LIBS'		=> @(''), # e.g., '-lm'
     'DEFINE'		=> '', # e.g., '-DHAVE_SOMETHING'
     # Insert -I. if you add *.h files later:
     'INC'		=> '', # e.g., '-I/usr/include/other'
-    realclean => \%( FILES=> 'const-c.inc const-xs.inc' ),
+    realclean => %( FILES=> 'const-c.inc const-xs.inc' ),
     # Un-comment this if you add C files to link with later:
     # 'OBJECT'		=> '$(O_FILES)', # link all the C files too
     );

@@ -44,7 +44,7 @@ do {
     my $mm = WriteMakefile(
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
-        postamble       => \%(
+        postamble       => %(
             FOO => 1,
                 BAR => "fugawazads"
         )

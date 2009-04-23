@@ -4,11 +4,11 @@ BEGIN {
     unshift $^INCLUDE_PATH, 'lib', '../../lib';
 }
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 use ExtUtils::MM;
 use MakeMaker::Test::Setup::Problem;
 
-my $MM = bless \%( DIR => \@('subdir') ), 'MM';
+my $MM = bless \%( DIR => @('subdir') ), 'MM';
 
 ok( setup_recurs(), 'setup' );
 END {
@@ -29,7 +29,7 @@ do {
 
     my $warning = '';
     local $^WARN_HOOK = sub { $warning = @_[0]->{?description} };
-    try { $MM->eval_in_subdirs; };
+    dies_like( { $MM->eval_in_subdirs }, qr/YYYAaaaakkk/ );
 
     is( $stdout, qq{\$^INCLUDE_PATH has .\n}, 'cwd in $^INCLUDE_PATH' );
     $stdout = '';

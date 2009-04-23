@@ -42,5 +42,5 @@ WriteMakefile(
     NAME 	=> 'Fcntl',
     XSPROTOARG => '-noprototypes', 		# XXX remove later?
     VERSION_FROM => 'Fcntl.pm',
-    realclean => \%( FILES=> 'const-c.inc const-xs.inc'),
+    realclean => %( FILES=> 'const-c.inc const-xs.inc'),
     );

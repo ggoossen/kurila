@@ -5,18 +5,18 @@ use ExtUtils::Constant v0.11 'WriteConstants';
 WriteMakefile(
     'NAME'		=> 'XS::APItest',
     'VERSION_FROM'	=> 'APItest.pm', # finds $VERSION
-    'PREREQ_PM'		=> \%(), # e.g., Module::Name => 1.1
+    'PREREQ_PM'		=> %(), # e.g., Module::Name => 1.1
     ABSTRACT_FROM => 'APItest.pm', # retrieve abstract from module
     AUTHOR     => 'Tim Jenness <t.jenness@jach.hawaii.edu>, Christian Soeller <csoelle@mph.auckland.ac.nz>, Hugo van der Sanden <hv@crypt.compulink.co.uk>',
-    'C'                 => \@('exception.c', 'core.c', 'notcore.c'),
+    'C'                 => @('exception.c', 'core.c', 'notcore.c'),
     'OBJECT'            => '$(BASEEXT)$(OBJ_EXT) $(O_FILES)',
-    'LIBS'		=> \@(''), # e.g., '-lm'
+    'LIBS'		=> @(''), # e.g., '-lm'
     'DEFINE'		=> '', # e.g., '-DHAVE_SOMETHING'
     'INC'		=> '-I.', # e.g., '-I. -I/usr/include/other'
     # Un-comment this if you add C files to link with later:
     # 'OBJECT'		=> '$(O_FILES)', # link all the C files too
-    MAN3PODS		=> \%(),  # Pods will be built by installman.
-    realclean => \%(FILES	=> 'const-c.inc const-xs.inc'),
+    MAN3PODS		=> %(),  # Pods will be built by installman.
+    realclean => %(FILES	=> 'const-c.inc const-xs.inc'),
     );
 
 WriteConstants(

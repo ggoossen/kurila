@@ -448,7 +448,7 @@ sub _ponder_paragraph_buffer {
 
     my $self = @_[0];
     my $paras;
-    return unless (nelems ($paras = $self->{?'paras'})->@);
+    return unless nelems(($paras = $self->{?'paras'})->@);
     my $curr_open = ($self->{+'curr_open'} ||= \@());
 
     my $scratch;
@@ -669,7 +669,7 @@ sub _ponder_paragraph_buffer {
                         # For the cases where we /didn't/ push to @$para
                         if($paras->[0]->[0] eq '~Para') {
                             DEBUG and print $^STDOUT, "Assimilating following ~Para content into $over_type item\n";
-                            push @$para, splice (shift @$paras)->@,2;
+                            push @$para, splice((shift @$paras)->@,2);
                         } else {
                             DEBUG and print $^STDOUT, "Can't assimilate following ", $paras->[0]->[0], "\n";
                             push @$para, '';  # Just so it's not contentless
@@ -715,7 +715,7 @@ sub _ponder_paragraph_buffer {
                         # For the cases where we /didn't/ push to @$para
                         if($paras->[0]->[0] eq '~Para') {
                             DEBUG and print $^STDOUT, "Assimilating following ~Para content into $over_type item\n";
-                            push @$para, splice (shift @$paras)->@,2;
+                            push @$para, splice((shift @$paras)->@,2);
                         } else {
                             DEBUG and print $^STDOUT, "Can't assimilate following ", $paras->[0]->[0], "\n";
                             push @$para, '';  # Just so it's not contentless
@@ -1261,7 +1261,7 @@ sub _ponder_item($self,$para,$curr_open,$paras) {
             # For the cases where we /didn't/ push to @$para
             if($paras->[0]->[0] eq '~Para') {
                 DEBUG and print $^STDOUT, "Assimilating following ~Para content into $over_type item\n";
-                push @$para, splice (shift @$paras)->@,2;
+                push @$para, splice((shift @$paras)->@,2);
             } else {
                 DEBUG and print $^STDOUT, "Can't assimilate following ", $paras->[0]->[0], "\n";
                 push @$para, '';  # Just so it's not contentless
@@ -1307,7 +1307,7 @@ sub _ponder_item($self,$para,$curr_open,$paras) {
             # For the cases where we /didn't/ push to @$para
             if($paras->[0]->[0] eq '~Para') {
                 DEBUG and print $^STDOUT, "Assimilating following ~Para content into $over_type item\n";
-                push @$para, splice (shift @$paras)->@,2;
+                push @$para, splice((shift @$paras)->@,2);
             } else {
                 DEBUG and print $^STDOUT, "Can't assimilate following ", $paras->[0]->[0], "\n";
                 push @$para, '';  # Just so it's not contentless

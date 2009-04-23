@@ -690,7 +690,7 @@ sub cflags($self,$libperl) {
     if ($self->{?DEFINE}) { $quals .= $self->{?DEFINE}; }
     for my $type (qw(Def Undef)) {
         my(@terms);
-        while ($quals =~ m:/(\$type)->$i?n?e?=([^/]+):ig) {
+        while ($quals =~ m:/$($type)i?n?e?=([^/]+):ig) {
             my $term = $1;
             $term =~ s:^\((.+)\)$:$1:;
             push @terms, $term;
@@ -699,7 +699,7 @@ sub cflags($self,$libperl) {
             push @terms, < qw[ $(DEFINE_VERSION) $(XS_DEFINE_VERSION) ];
         }
         if ((nelems @terms)) {
-            $quals =~ s:/(\$type)->$i?n?e?=[^/]+::ig;
+            $quals =~ s:/$($type)i?n?e?=[^/]+::ig;
             $quals .= "/$^PID(\$type)ine=(" . join(',', @terms) . ')';
         }
     }

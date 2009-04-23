@@ -4626,9 +4626,6 @@ Perl_ck_fun(pTHX_ OP *o)
 #endif
 		break;
 	    case OA_HVREF:
-		if (kid->op_type != OP_RV2HV && kid->op_type != OP_PADSV && kid->op_type != OP_ANONHASH
-		    && kid->op_type != OP_RV2SV)
-		    bad_type(numargs, "hash", PL_op_desc[type], kid);
 		*tokid = kid = mod(kid, type);
 #ifdef PERL_MAD
 		addmad(newMADsv('c', newSVpvn("%", 1), 0, 0), &kid->op_madprop, 0);

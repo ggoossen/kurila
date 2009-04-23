@@ -16,7 +16,7 @@ use ExtUtils::MakeMaker;
 # A module for testing PL_FILES
 WriteMakefile(
     NAME     => 'PL_FILES::Module',
-    PL_FILES => \%( 'single.PL' => 'single.out',
+    PL_FILES => %( 'single.PL' => 'single.out',
                     'multi.PL'  => \qw(1.out 2.out),
                     'Bar_pm.PL' => '$(INST_LIB)/PL/Bar.pm',
     )

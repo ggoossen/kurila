@@ -13,14 +13,14 @@ if (config_value("sig_name") =~ m/\bRTMIN\b/
 
 my @libs;
 if ($^OS_NAME ne 'MSWin32') {
-    @libs = @('LIBS' => \@("-lm -lposix -lcposix"));
+    @libs = @('LIBS' => @("-lm -lposix -lcposix"));
 }
 WriteMakefile(
     NAME	=> 'POSIX',
     < @libs,
     XSPROTOARG	=> '-noprototypes',	# XXX remove later?
     VERSION_FROM => 'POSIX.pm',
-    realclean	=> \%(FILES=> 'const-c.inc const-xs.inc'),
+    realclean	=> %(FILES=> 'const-c.inc const-xs.inc'),
     );
 
 my @names =
