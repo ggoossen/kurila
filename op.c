@@ -3448,39 +3448,6 @@ Perl_cv_tmprefcnt(pTHX_ CV *cv)
     }
 }
 
-void
-Perl_cv_ckproto_len(pTHX_ const CV *cv, const GV *gv, const char *p,
-		    const STRLEN len)
-{
-    PERL_ARGS_ASSERT_CV_CKPROTO_LEN;
-
-    /* Can't just use a strcmp on the prototype, as CONSTSUBs "cheat" by
-       relying on SvCUR, and doubling up the buffer to hold CvFILE().  */
-    if (((!p != !SvPOK(cv)) /* One has prototype, one has not.  */
-	 || (p && (len != SvCUR(cv) /* Not the same length.  */
-		 || memNE(p, SvPVX_const((SV*)cv), len))))
-	 && ckWARN_d(WARN_PROTOTYPE)) {
-	SV* const msg = sv_newmortal();
-	SV* name = NULL;
-
-	if (gv)
-	    gv_efullname3(name = sv_newmortal(), gv, NULL);
-	sv_setpvs(msg, "Prototype mismatch:");
-	if (name)
-	    Perl_sv_catpvf(aTHX_ msg, " sub %"SVf, SVfARG(name));
-	if (SvPOK(cv))
-	    Perl_sv_catpvf(aTHX_ msg, " (%"SVf")", SVfARG(cv));
-	else
-	    sv_catpvs(msg, ": none");
-	sv_catpvs(msg, " vs ");
-	if (p)
-	    Perl_sv_catpvf(aTHX_ msg, "(%.*s)", (int) len, p);
-	else
-	    sv_catpvs(msg, "none");
-	Perl_warner(aTHX_ packWARN(WARN_PROTOTYPE), "%"SVf, SVfARG(msg));
-    }
-}
-
 static void const_sv_xsub(pTHX_ CV* cv);
 
 /*

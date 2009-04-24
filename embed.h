@@ -181,8 +181,6 @@
 #define printf_nocontext	Perl_printf_nocontext
 #endif
 #ifdef PERL_CORE
-#define cv_ckproto		Perl_cv_ckproto
-#define cv_ckproto_len		Perl_cv_ckproto_len
 #define cv_setcv		Perl_cv_setcv
 #endif
 #define cv_const_sv		Perl_cv_const_sv
@@ -2371,8 +2369,6 @@
 #if defined(PERL_IMPLICIT_CONTEXT)
 #endif
 #ifdef PERL_CORE
-#define cv_ckproto(a,b,c)	Perl_cv_ckproto(aTHX_ a,b,c)
-#define cv_ckproto_len(a,b,c,d)	Perl_cv_ckproto_len(aTHX_ a,b,c,d)
 #define cv_setcv(a,b)		Perl_cv_setcv(aTHX_ a,b)
 #endif
 #define cv_const_sv(a)		Perl_cv_const_sv(aTHX_ a)

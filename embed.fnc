@@ -192,10 +192,6 @@ Afnp	|void	|sv_setpvf_mg_nocontext|NN SV *const sv|NN const char *const pat|...
 Afnp	|int	|fprintf_nocontext|NN PerlIO *stream|NN const char *format|...
 Afnp	|int	|printf_nocontext|NN const char *format|...
 #endif
-bp	|void	|cv_ckproto	|NN const CV* cv|NULLOK const GV* gv\
-				|NULLOK const char* p
-p	|void	|cv_ckproto_len	|NN const CV* cv|NULLOK const GV* gv\
-				|NULLOK const char* p|const STRLEN len
 pd	|void	|cv_setcv	|NN CV* dst|NN CV* src
 ApdR	|SV*	|cv_const_sv	|NULLOK CV* cv
 pR	|SV*	|op_const_sv	|NULLOK const OP* o|NULLOK CV* cv

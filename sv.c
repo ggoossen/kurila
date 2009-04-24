@@ -2508,10 +2508,6 @@ S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
 					GvENAME((GV*)dstr));
 			}
 		    }
-		if (!intro)
-		    cv_ckproto_len(cv, (GV*)dstr,
-				   SvPOK(sref) ? SvPVX_const(sref) : NULL,
-				   SvPOK(sref) ? SvCUR(sref) : 0);
 	    }
 	    GvCVGEN(dstr) = 0; /* Switch off cacheness. */
 	    GvASSUMECV_on(dstr);
