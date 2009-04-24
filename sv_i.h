@@ -74,6 +74,7 @@ Perl_SvCUR_set(pTHX_ SV* sv, STRLEN len) {
     assert(SvTYPE(sv) != SVt_PVAV);
     assert(SvTYPE(sv) != SVt_PVHV);
     assert(!isGV_with_GP(sv));
+    assert( SvLEN(sv) == 0 || SvLEN(sv) >= len );
     ((XPV*) SvANY(sv))->xpv_cur = len;
 }
 
@@ -227,9 +228,6 @@ Perl_LocationFilename(pTHX_ SV *location)
 SV* 
 Perl_loc_desc(pTHX_ SV *loc) {
     SV * str = sv_2mortal(newSVpv("", 0));
-
-    PERL_ARGS_ASSERT_LOC_DESC;
-
     if (loc && SvAVOK(loc)) {
         SV ** loc0 = av_fetch((AV*)loc, 0, FALSE);
         SV ** loc1 = av_fetch((AV*)loc, 1, FALSE);
@@ -249,7 +247,6 @@ Perl_loc_desc(pTHX_ SV *loc) {
 SV* 
 Perl_loc_name(pTHX_ SV *loc) {
     SV * str = sv_2mortal(newSVpv("", 0));
-    PERL_ARGS_ASSERT_LOC_NAME;
     if (loc && SvAVOK(loc)) {
         Perl_sv_catpvf(aTHX_ str, "%s",
                        SvPVX_const(*av_fetch((AV*)loc, LOC_NAME_INDEX, FALSE))

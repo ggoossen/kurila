@@ -207,16 +207,8 @@ PERL_INLINE_CALLCONV void	Perl_SvIOKp_on(pTHX_ SV *sv)
 #define PERL_ARGS_ASSERT_SVIOKP_ON	\
 	assert(sv)
 
-PERL_INLINE_CALLCONV SV*	Perl_loc_desc(pTHX_ SV *loc)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_LOC_DESC	\
-	assert(loc)
-
-PERL_INLINE_CALLCONV SV*	Perl_loc_name(pTHX_ SV *loc)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_LOC_NAME	\
-	assert(loc)
-
+PERL_INLINE_CALLCONV SV*	Perl_loc_desc(pTHX_ SV *loc);
+PERL_INLINE_CALLCONV SV*	Perl_loc_name(pTHX_ SV *loc);
 PERL_INLINE_CALLCONV SV*	Perl_SvNAME(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SVNAME	\

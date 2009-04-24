@@ -6027,8 +6027,8 @@ Perl_newSVpvn_share(pTHX_ const char *src, I32 len, U32 hash)
     new_SV(sv);
     sv_upgrade(sv, SVt_PV);
     SvPV_set(sv, sharepvn(src, len, hash));
-    SvCUR_set(sv, len);
     SvLEN_set(sv, 0);
+    SvCUR_set(sv, len);
     SvREADONLY_on(sv);
     SvFAKE_on(sv);
     SvPOK_on(sv);

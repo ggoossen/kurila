@@ -116,8 +116,8 @@ Aip	|char *	|SvPVx_nolen	|NN SV *sv
 Aip	|const char *	|SvPVx_nolen_const	|NN SV *sv
 Aip	|bool	|SvTRUE	|NN SV *sv
 Aip	|void	|SvIOKp_on	|NN SV *sv
-Aip	|SV*	|loc_desc	|NN SV *loc
-Aip	|SV*	|loc_name	|NN SV *loc
+Aip	|SV*	|loc_desc	|NULLOK SV *loc
+Aip	|SV*	|loc_name	|NULLOK SV *loc
 Aip	|SV*	|SvNAME	|NN SV *sv
 Aip	|SV*	|LocationFilename	|NULLOK SV *location
 
