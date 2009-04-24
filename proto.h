@@ -177,6 +177,41 @@ PERL_INLINE_CALLCONV NV	Perl_SvNV(pTHX_ SV *sv)
 #define PERL_ARGS_ASSERT_SVNV	\
 	assert(sv)
 
+PERL_INLINE_CALLCONV char *	Perl_SvPVx_nolen(pTHX_ SV *sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SVPVX_NOLEN	\
+	assert(sv)
+
+PERL_INLINE_CALLCONV const char *	Perl_SvPVx_nolen_const(pTHX_ SV *sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SVPVX_NOLEN_CONST	\
+	assert(sv)
+
+PERL_INLINE_CALLCONV bool	Perl_SvTRUE(pTHX_ SV *sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SVTRUE	\
+	assert(sv)
+
+PERL_INLINE_CALLCONV void	Perl_SvIOKp_on(pTHX_ SV *sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SVIOKP_ON	\
+	assert(sv)
+
+PERL_INLINE_CALLCONV SV*	Perl_loc_desc(pTHX_ SV *loc)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_LOC_DESC	\
+	assert(loc)
+
+PERL_INLINE_CALLCONV SV*	Perl_loc_name(pTHX_ SV *loc)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_LOC_NAME	\
+	assert(loc)
+
+PERL_INLINE_CALLCONV SV*	Perl_SvNAME(pTHX_ SV *sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SVNAME	\
+	assert(sv)
+
 PERL_INLINE_CALLCONV SV*	Perl_LocationFilename(pTHX_ SV *location);
 
 PERL_INLINE_CALLCONV PERL_CONTEXT*	Perl_PushBlock(pTHX_ U8 t, SV** sp, U8 gimme)

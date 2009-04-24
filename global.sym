@@ -56,6 +56,13 @@ Perl_sv_cp_replace
 Perl_SvIV
 Perl_SvUV
 Perl_SvNV
+Perl_SvPVx_nolen
+Perl_SvPVx_nolen_const
+Perl_SvTRUE
+Perl_SvIOKp_on
+Perl_loc_desc
+Perl_loc_name
+Perl_SvNAME
 Perl_LocationFilename
 Perl_PushBlock
 Perl_PopBlock

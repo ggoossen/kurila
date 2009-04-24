@@ -59,14 +59,22 @@ Perl_SvNV(pTHX_ SV *sv) {
 #define SvIV_nomg(sv) (SvIOK(sv) ? SvIVX(sv) : sv_2iv(sv))
 #define SvUV_nomg(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv))
 
-#define SvPVx_nolen(sv) iiSvPVx_nolen(aTHX_ sv)
-static __inline__ char* iiSvPVx_nolen(pTHX_ SV* sv) {return SvPV_nolen(sv); }
+char* 
+Perl_SvPVx_nolen(pTHX_ SV* sv) {
+    PERL_ARGS_ASSERT_SVPVX_NOLEN;
+    return SvPV_nolen(sv);
+}
 
-#define SvPVx_nolen_const(sv) iiSvPVx_nolen_const(aTHX_ sv)
-static __inline__ const char* iiSvPVx_nolen_const(pTHX_ SV *sv) {return SvPV_nolen_const(sv); }
+const char* 
+Perl_SvPVx_nolen_const(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVPVX_NOLEN_CONST;
+    return SvPV_nolen_const(sv);
+}
 
-#define SvTRUE(sv) iiSvTRUE(aTHX_ sv)
-static __inline__ bool iiSvTRUE(pTHX_ SV *sv) {
+bool
+Perl_SvTRUE(pTHX_ SV *sv)
+{
+    PERL_ARGS_ASSERT_SVTRUE;
     if (!sv)
         return 0;
     if (SvPOK(sv)) {
@@ -85,22 +93,16 @@ static __inline__ bool iiSvTRUE(pTHX_ SV *sv) {
     return sv_2bool(sv);
 }
 
-/* static __inline__ bool SvTRUEx(pTHX_ SV *sv) {return SvTRUE(sv); } */
-#define SvTRUEx SvTRUE
-
-static __inline__ void iiSvIOKp_on(pTHX_ SV *sv) {
+void
+Perl_SvIOKp_on(pTHX_ SV *sv)
+{
+    PERL_ARGS_ASSERT_SVIOKP_ON;
     assert_not_glob(sv)
     SvRELEASE_IVX_(sv)
     SvFLAGS(sv) |= SVp_IOK;
     assert((SvTYPE(sv) == SVt_IV) || (SvTYPE(sv) >= SVt_PVIV));
 }
-#define SvIOKp_on(sv) iiSvIOKp_on(aTHX_ sv)
 
-
-#define av_mortalcopy(av) inline_av_mortalcopy(aTHX_ av)
-static __inline__ AV* inline_av_mortalcopy(pTHX_ AV *av) {
-    return (AV*)sv_mortalcopy((SV*)av);
-}
 
 /* XV to SV conversion "macros" */
 SV* Perl_avTsv(pTHX_ AV *av) { return (SV*)av; }
@@ -204,9 +206,12 @@ Perl_LocationFilename(pTHX_ SV *location)
 }
 
 /* Location retrieval */
-#define loc_desc(loc) inline_loc_desc(aTHX_ loc)
-static __inline__ SV* inline_loc_desc(pTHX_ SV *loc) {
+SV* 
+Perl_loc_desc(pTHX_ SV *loc) {
     SV * str = sv_2mortal(newSVpv("", 0));
+
+    PERL_ARGS_ASSERT_LOC_DESC;
+
     if (loc && SvAVOK(loc)) {
         SV ** loc0 = av_fetch((AV*)loc, 0, FALSE);
         SV ** loc1 = av_fetch((AV*)loc, 1, FALSE);
@@ -223,9 +228,10 @@ static __inline__ SV* inline_loc_desc(pTHX_ SV *loc) {
 #define LOC_NAME_INDEX 3
 
 /* Location retrieval */
-#define loc_name(loc) inline_loc_name(aTHX_ loc)
-static __inline__ SV* inline_loc_name(pTHX_ SV *loc) {
+SV* 
+Perl_loc_name(pTHX_ SV *loc) {
     SV * str = sv_2mortal(newSVpv("", 0));
+    PERL_ARGS_ASSERT_LOC_NAME;
     if (loc && SvAVOK(loc)) {
         Perl_sv_catpvf(aTHX_ str, "%s",
                        SvPVX_const(*av_fetch((AV*)loc, LOC_NAME_INDEX, FALSE))
@@ -234,8 +240,9 @@ static __inline__ SV* inline_loc_name(pTHX_ SV *loc) {
     return str;
 }
 
-#define SvNAME(sv) inline_SvNAME(aTHX_ sv)
-static __inline__ SV* inline_SvNAME(pTHX_ SV *sv) {
+SV* 
+Perl_SvNAME(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVNAME;
     return loc_name(SvLOCATION(sv));
 }
 
