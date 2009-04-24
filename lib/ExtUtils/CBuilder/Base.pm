@@ -196,8 +196,8 @@ sub _do_link($self, $type, %< %args) {
     my @shrp = $self->split_like_shell($cf->{shrpenv});
     my @ld = $self->split_like_shell($cf->{ld});
 
-    $self->do_system(< @shrp, < @ld, < @output, < @$objects, < @linker_flags)
-        or die "error building $out from $(join ' ',@$objects)";
+    $self->do_system(< @shrp, < @ld, < @output, < $objects->@, < @linker_flags)
+        or die "error building $out from $(join ' ',$objects->@)";
 
     return @($out, < @temp_files);
 }
@@ -211,7 +211,7 @@ sub do_system($self, @< @cmd) {
 sub split_like_shell($self, $string) {
 
     return () unless defined($string);
-    return @$string if UNIVERSAL::isa($string, 'ARRAY');
+    return $string->@ if UNIVERSAL::isa($string, 'ARRAY');
     $string =~ s/^\s+|\s+$//g;
     return () unless length($string);
 

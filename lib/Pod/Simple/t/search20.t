@@ -68,7 +68,7 @@ print $^STDOUT, $p;
 
 SKIP:
 do {
-    my $names = join "|", sort values %$where2name;
+    my $names = join "|", sort values $where2name->%;
     skip '-- case may or may not be preserved', 1 if $^OS_NAME eq 'VMS';
     is($names,
        "Blorm|Suzzle|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|perlzuk|squaa|squaa::Glunk|squaa::Vliff|squaa::Wowo|zikzik");
@@ -76,7 +76,7 @@ do {
 
 SKIP:
 do {
-    my $names = join "|", sort keys %$name2where;
+    my $names = join "|", sort keys $name2where->%;
     skip '-- case may or may not be preserved', 1 if $^OS_NAME eq 'VMS';
     is($names,
        "Blorm|Suzzle|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|perlzuk|squaa|squaa::Glunk|squaa::Vliff|squaa::Wowo|zikzik");
@@ -84,7 +84,7 @@ do {
 
 like( ($name2where->{?'squaa'} || 'huh???'), '/squaa\.pm$/');
 
-is nelems(grep( { m/squaa\.pm/ }, keys %$where2name) ), 1;
+is nelems(grep( { m/squaa\.pm/ }, keys $where2name->%) ), 1;
 
 ok 1;
 

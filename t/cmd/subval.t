@@ -113,6 +113,6 @@ sub somesub($num,$P,$F,$L) {
 sub autov { @_[0] = 23 };
 
 my $href = \%();
-print $^STDOUT, nkeys %$href ?? 'not ' !! '', "ok 29\n";
+print $^STDOUT, nkeys $href->% ?? 'not ' !! '', "ok 29\n";
 autov($href->{+b});
-print $^STDOUT, join(':', @:< %$href) eq 'b:23' ?? '' !! 'not ', "ok 30\n";
+print $^STDOUT, join(':', @:< $href->%) eq 'b:23' ?? '' !! 'not ', "ok 30\n";

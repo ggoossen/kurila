@@ -92,7 +92,7 @@ do {
     my $dx = \ @x;
 
     is("$(join ' ',@x)", "aap noot");
-    is("$(join ' ',@$dx)", "aap noot");
+    is("$(join ' ',$dx->@)", "aap noot");
 
     # Okay, so that wasn't very challenging.  Let's go Unicode.
 

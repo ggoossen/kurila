@@ -64,7 +64,7 @@ print $^STDOUT, "ok 13\n";
 
 my @($r, $w, $e) =  @a;
 
-print $^STDOUT, "not " unless (nelems @$r) == 0 && (nelems @$w) == 1 && (nelems @$e) == 0;
+print $^STDOUT, "not " unless (nelems $r->@) == 0 && (nelems $w->@) == 1 && (nelems $e->@) == 0;
 print $^STDOUT, "ok 14\n";
 
 $fd = $w->[0];

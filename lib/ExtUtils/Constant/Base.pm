@@ -114,8 +114,8 @@ sub memEQ_clause($self, $args) {
     if (ref $checked_at) {
         # regexp won't work on 5.6.1 without use utf8; in turn that won't work
         # on 5.005_03.
-        substr ($name, 0, length $$checked_at, '');
-        $front_chop = C_stringify ($$checked_at);
+        substr ($name, 0, length $checked_at->$, '');
+        $front_chop = C_stringify ($checked_at->$);
         undef $checked_at;
     }
     my $len = length $name;
@@ -229,7 +229,7 @@ sub dump_names($self, $args, @< @items) {
 
     if (!defined $declare_types) {
         # Do they pass in any types we weren't already using?
-        foreach (keys %$what) {
+        foreach (keys $what->%) {
             next if %used_types{?$_};
             $declare_types++; # Found one in $what that wasn't used.
             last; # And one is enough to terminate this loop
@@ -237,7 +237,7 @@ sub dump_names($self, $args, @< @items) {
     }
     if ($declare_types) {
         $result = $indent . 'my $types = \%(map {($_, 1)} qw('
-            . join (" ", sort keys %$what) . "));\n";
+            . join (" ", sort keys $what->%) . "));\n";
     }
     local $Text::Wrap::huge = 'overflow';
     local $Text::Wrap::columns = 80;
@@ -253,7 +253,7 @@ sub dump_names($self, $args, @< @items) {
                 if (defined $value) {
                     if (ref $value) {
                         $line .= ", $thing=>[\""
-                            . join ('", "', map { <perl_stringify $_}, @$value) . '"]';
+                            . join ('", "', map { <perl_stringify $_}, $value->@) . '"]';
                     } else {
                         $line .= ", $thing=>\"" . perl_stringify($value) . "\"";
                     }
@@ -331,7 +331,7 @@ sub return_clause($self, $args, $item) {
     my $indent = $args->{?indent};
 
     my @($name, $value, $default, $pre, $post, $def_pre, $def_post, $type)
-        =  %$item{[qw (name value default pre post def_pre def_post type)]};
+        =  $item->%{[qw (name value default pre post def_pre def_post type)]};
     $value = $name unless defined $value;
     my $macro = $self->macro_from_item($item);
     $indent = ' ' x ($indent || 6);
@@ -347,7 +347,7 @@ sub return_clause($self, $args, $item) {
     #      return PERL_constant_ISIV;
     $clause
         .= $self->assign (\%(indent=>$indent, type=>$type, pre=>$pre, post=>$post,
-            item=>$item), ref $value ?? < @$value !! $value);
+            item=>$item), ref $value ?? < $value->@ !! $value);
 
     if (defined $macro && $macro ne "" && $macro ne "1") {
         ##else
@@ -358,7 +358,7 @@ sub return_clause($self, $args, $item) {
             my $notdef = $self->return_statement_for_notdef();
             $clause .= "$indent$notdef\n" if defined $notdef;
         } else {
-            my @default = @( ref $default ?? < @$default !! $default );
+            my @default = @( ref $default ?? < $default->@ !! $default );
             $type = shift @default;
             $clause .= $self->assign (\%(indent=>$indent, type=>$type, pre=>$pre,
                     post=>$post, item=>$item), < @default);
@@ -474,7 +474,7 @@ sub switch_clause($self, $args, $namelen, $items, @< @items) {
         # OK. Trump that. Now favour the last character of the string, before the
         # rest.
         my $ss;
-        $ss += (nelems @$_) * nelems @$_ foreach values %spread;
+        $ss += (nelems $_->@) * nelems $_->@ foreach values %spread;
         my $rms = sqrt ($ss / keys %spread);
         if ($rms +< @best[0] || ($rms == @best[0] && ($max - $min) +< @best[1])) {
             @best = @($rms, $max - $min, $i, \%spread);
@@ -492,7 +492,7 @@ sub switch_clause($self, $args, $namelen, $items, @< @items) {
     } else {
         $body .= $indent . "switch (" . $self->name_param() . "[$offset]) \{\n";
     }
-    foreach my $char (sort keys %$best) {
+    foreach my $char (sort keys $best->%) {
         die sprintf "'$char' is \%d bytes long, not 1", length $char
             if length ($char) != 1;
         die sprintf "char \%#X is out of range", ord $char if ord ($char) +> 255;
@@ -607,7 +607,7 @@ sub normalise_items
         if (ref $orig) {
             # Make a copy which is a normalised version of the ref passed in.
             $name = $orig->{?name};
-            my @($type, $macro, $value) =  %$orig{[qw (type macro value)]};
+            my @($type, $macro, $value) =  $orig->%{[qw (type macro value)]};
             $type ||= $default_type;
             $what->{+$type} = 1;
             $item = \%(name=>$name, type=>$type);
@@ -761,7 +761,7 @@ sub C_constant($self, $args, @< @items) {
     if (ref $breakout) {
         # We are called recursively. We trust @items to be normalised, $what to
         # be a hashref, and pinch %$items from our parent to save recalculation.
-        @($namelen, $items) =  @$breakout;
+        @($namelen, $items) =  $breakout->@;
     } else {
         $items = \%();
         $breakout ||= 3;

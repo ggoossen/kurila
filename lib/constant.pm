@@ -39,7 +39,7 @@ sub import {
         $constants->{+shift(@_)} = undef;
     }
 
-    foreach my $name ( keys %$constants ) {
+    foreach my $name ( keys $constants->% ) {
         unless (defined $name) {
             die("Can't use undef as constant name");
         }

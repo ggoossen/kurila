@@ -277,8 +277,8 @@ sub do_beginning {
 }
 
 sub _add_top_anchor($self, $text_r) {
-    unless($$text_r and $$text_r =~ m/name=['"]___top['"]/) { # a hack
-        $$text_r .= "<a name='___top' class='dummyTopAnchor' ></a>\n";
+    unless($text_r->$ and $text_r->$ =~ m/name=['"]___top['"]/) { # a hack
+        $text_r->$ .= "<a name='___top' class='dummyTopAnchor' ></a>\n";
     }
     return;
 }
@@ -328,11 +328,11 @@ sub do_middle {
         # An efficiency hack
         my $out = $self->output_string; #it's a reference to it
         my $sneakytag = "\f\f\e\e\b\bIndex Here\e\e\b\b\f\f\n";
-        $$out .= $sneakytag;
+        $out->$ .= $sneakytag;
         $self->_do_middle_main_loop;
         $sneakytag = quotemeta($sneakytag);
         my $index = $self->index_as_html();
-        if( $$out =~ s/$sneakytag/$index/s ) {
+        if( $out->$ =~ s/$sneakytag/$index/s ) {
             # Expected case
             DEBUG and print $^STDOUT, "Inserted ", length($index), " bytes of index HTML into $out.\n";
         } else {
@@ -372,15 +372,15 @@ sub index_as_html {
 
     my $points = $self->{?'PSHTML_index_points'} || \@();
 
-    (nelems @$points) +> 1 or return qq[<div class='indexgroupEmpty'></div>\n];
+    (nelems $points->@) +> 1 or return qq[<div class='indexgroupEmpty'></div>\n];
     # There's no point in having a 0-item or 1-item index, I dare say.
 
     my@(@out) =@( @( qq{\n<div class='indexgroup'>} ));
     my $level = 0;
 
     my( $target_level, $previous_tagname, $tagname, $text, $anchorname, $indent);
-    foreach my $p ( @( < @$points, \@('head0', '(end)') ) ) {
-        @($tagname, $text) =  @$p;
+    foreach my $p ( @( < $points->@, \@('head0', '(end)') ) ) {
+        @($tagname, $text) =  $p->@;
         $anchorname = $self->section_escape($text);
         if( $tagname =~ m{^head(\d+)$} ) {
             $target_level = 0 + $1;
@@ -702,9 +702,9 @@ sub batch_mode_rectify_path($self, $pathbits) {
     my $level = $self->batch_mode_current_level;
     $level--; # how many levels up to go to get to the root
     if($level +< 1) {
-        unshift @$pathbits, '.'; # just to be pretty
+        unshift $pathbits->@, '.'; # just to be pretty
     } else {
-        unshift @$pathbits, ('..') x $level;
+        unshift $pathbits->@, ('..') x $level;
     }
     return;
 }

@@ -123,7 +123,7 @@ for my $num_chain (1..$max_chain) {
         for my $first (2..5) {
             for my $last (2..5) {
                 my $nok = 0;
-                my @otherops = grep { $_ +<= 3 }, @$op;
+                my @otherops = grep { $_ +<= 3 }, $op->@;
                 my @curops = @($op,\@otherops);
 
                 for my $num ( @list) {

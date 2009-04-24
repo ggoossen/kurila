@@ -147,7 +147,7 @@ sub as_string  # for debugging
     my $count = $vec->count;
     $str .= defined($bits) ?? unpack("b*", $bits) !! "undef";
     $str .= " $count";
-    my @handles = @$vec;
+    my @handles = $vec->@;
     splice(@handles, 0, FIRST_FD);
     for ( @handles) {
         $str .= " " . (defined($_) ?? "$_" !! "-");
@@ -183,9 +183,9 @@ sub select
         my @r = @( () );
         my @w = @( () );
         my @e = @( () );
-        my $i = _max(defined $r ?? scalar(nelems @$r)-1 !! 0,
-                defined $w ?? scalar(nelems @$w)-1 !! 0,
-                defined $e ?? scalar(nelems @$e)-1 !! 0);
+        my $i = _max(defined $r ?? scalar(nelems $r->@)-1 !! 0,
+                defined $w ?? scalar(nelems $w->@)-1 !! 0,
+                defined $e ?? scalar(nelems $e->@)-1 !! 0);
 
         while($i +>= FIRST_FD)
         {
@@ -210,7 +210,7 @@ sub handles
     my $vec = shift;
     my $bits = shift;
     my @h = @( () );
-    my $max = scalar(nelems @$vec) - 1;
+    my $max = scalar(nelems $vec->@) - 1;
 
     for my $i (FIRST_FD .. $max)
     {

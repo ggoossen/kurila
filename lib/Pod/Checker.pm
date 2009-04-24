@@ -768,7 +768,7 @@ sub end_pod {
         %nodes{+$_} = 3; # index node
     }
     foreach( $self->hyperlink()) {
-        my @($line,$link) =  @$_;
+        my @($line,$link) =  $_->@;
         # _TODO_ what if there is a link to the page itself by the name,
         # e.g. in Tk::Pod : L<Tk::Pod/"DESCRIPTION">
         if($link->node() && !$link->page() && $link->type() ne 'hyperlink') {
@@ -1062,7 +1062,7 @@ sub _check_ptree($self,$ptree,$line,$file,$nestlist) {
           local($_);
     my $text = '';
     # process each node in the parse tree
-    foreach( @$ptree) {
+    foreach( $ptree->@) {
         # regular text chunk
         unless(ref) {
             # count the unescaped angle brackets
@@ -1100,13 +1100,13 @@ sub _check_ptree($self,$ptree,$line,$file,$nestlist) {
         }
         if($cmd eq 'E') {
             # preserve entities
-            if((nelems @$contents) +> 1 || ref @$contents[0] || @$contents[0] !~ m/^\w+$/) {
+            if((nelems $contents->@) +> 1 || ref $contents->@[0] || $contents->@[0] !~ m/^\w+$/) {
                 $self->poderror(\%( line => $line, file => $file,
                         severity => 'ERROR', 
                             msg => "garbled entity " . $_->raw_text()));
                 next;
             }
-            my $ent = @$contents[0];
+            my $ent = $contents->@[0];
             my $val;
             if($ent =~ m/^0x[0-9a-f]+$/i) {
                 # hexadec entity

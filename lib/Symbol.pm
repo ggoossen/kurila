@@ -121,7 +121,7 @@ sub geniosym () {
     my $sym = gensym();
     # force the IO slot to be filled
     open $sym;
-        *$sym{IO};
+        $sym->*{IO};
 }
 
 sub ungensym(_) {}
@@ -165,13 +165,13 @@ sub delete_package($pkg) {
     # free all the symbols in the package
 
     my $leaf_symtab = $stem_symtab->{?$leaf}->{HASH};
-    foreach my $name (keys %$leaf_symtab) {
+    foreach my $name (keys $leaf_symtab->%) {
         undef Symbol::qualify_to_ref($pkg . $name)->*;
     }
 
     # delete the symbol table
 
-    %$leaf_symtab = %( () );
+    $leaf_symtab->% = %( () );
     delete $stem_symtab->{$leaf};
 }
 

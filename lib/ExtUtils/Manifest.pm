@@ -98,7 +98,7 @@ sub mkmanifest {
     my $skip = _maniskip();
     my $found = manifind();
     my($key,$val,%all);
-    %all = %$found +%+ %$read;
+    %all = $found->% +%+ $read->%;
     %all{+$MANIFEST} = ($Is_VMS ?? "$MANIFEST\t\t" !! '') . 'This list of files'
     if $manimiss; # add new MANIFEST to known file list
     foreach my $file ( _sort < keys %all) {
@@ -231,7 +231,7 @@ sub skipcheck(?$p) {
     my $matches = _maniskip();
 
     my @skipped = @( () );
-    foreach my $file ( _sort < keys %$found){
+    foreach my $file ( _sort < keys $found->%){
         if (&$matches($file)){
             warn "Skipping $file\n";
             push @skipped, $file;
@@ -250,7 +250,7 @@ sub _check_files {
     my $found = manifind($p);
 
     my@(@missfile) =@( @( () ));
-    foreach my $file ( _sort < keys %$read){
+    foreach my $file ( _sort < keys $read->%){
         warn "Debug: manicheck checking from $MANIFEST $file\n" if $Debug;
         if ($dosnames){
             $file = lc $file;
@@ -273,7 +273,7 @@ sub _check_manifest(?$p) {
     my $skip  = _maniskip();
 
     my @missentry = @( () );
-    foreach my $file ( _sort < keys %$found){
+    foreach my $file ( _sort < keys $found->%){
         next if $skip->($file);
         warn "Debug: manicheck checking from disk $file\n" if $Debug;
         unless ( exists $read->{$file} ) {
@@ -467,7 +467,7 @@ sub manicopy($read,$target,$how) {
 
     $target = VMS::Filespec::unixify($target) if $Is_VMS;
     File::Path::mkpath(\@( $target ),! $Quiet,$Is_VMS ?? undef !! 0755);
-    foreach my $file (keys %$read){
+    foreach my $file (keys $read->%){
         if ($Is_MacOS) {
             if ($file =~ m!:!) { 
                 my $dir = _maccat($target, $file);
@@ -608,7 +608,7 @@ sub maniadd {
     _fix_manifest($MANIFEST);
 
     my $manifest = maniread();
-    my @needed = grep { !exists $manifest->{$_} }, keys %$additions;
+    my @needed = grep { !exists $manifest->{$_} }, keys $additions->%;
     return 1 unless (nelems @needed);
 
     open(my $manifest_fh, ">>", "$MANIFEST") or 

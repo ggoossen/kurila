@@ -128,7 +128,7 @@ sub write($self, ?$packfile)
         }
         print $fh, ("$key");
         if (ref($data)) {
-            foreach my $k (sort(keys(%$data))) {
+            foreach my $k (sort(keys($data->%))) {
                 print $fh, (" $k=$data->{$k}");
             }
         }

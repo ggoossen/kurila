@@ -109,7 +109,7 @@ is("\x[dd]" x 24, "\x[dddddddddddddddddddddddddddddddddddddddddddddddd]", 'Dec C
 # perlbug 20011113.110 works in 5.6.1, broken in 5.7.2
 do {
     my $x= \@(("foo") x 2);
-    is( join('', @$x), 'foofoo', 'list repeat in anon array ref broken [ID 20011113.110]' );
+    is( join('', $x->@), 'foofoo', 'list repeat in anon array ref broken [ID 20011113.110]' );
 };
 
 # [ID 20010809.028] x operator not copying elements in 'for' list?

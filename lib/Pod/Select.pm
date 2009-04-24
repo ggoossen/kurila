@@ -272,10 +272,10 @@ sub _init_headings {
     my $self = shift;
 
     ## Initialize current section heading titles if necessary
-    unless (defined %$self{?_SECTION_HEADINGS}) {
-        my $section_headings = %$self{+_SECTION_HEADINGS} = \@();
+    unless (defined $self->%{?_SECTION_HEADINGS}) {
+        my $section_headings = $self->%{+_SECTION_HEADINGS} = \@();
         for my $i (0..$MAX_HEADING_LEVEL-1) {
-            @$section_headings[+$i] = '';
+            $section_headings->@[+$i] = '';
         }
     }
 }
@@ -354,18 +354,18 @@ sub select {
 
     ## Reset the set of sections to use
     unless ((nelems @sections) +> 0) {
-        delete %$self{_SELECTED_SECTIONS}  unless ($add);
+        delete $self->%{_SELECTED_SECTIONS}  unless ($add);
         return;
     }
-    %$self{+_SELECTED_SECTIONS} = \@()
-    unless ($add  &&  exists %$self{_SELECTED_SECTIONS});
-    my $selected_sections = %$self{?_SELECTED_SECTIONS};
+    $self->%{+_SELECTED_SECTIONS} = \@()
+    unless ($add  &&  exists $self->%{_SELECTED_SECTIONS});
+    my $selected_sections = $self->%{?_SELECTED_SECTIONS};
 
     ## Compile each spec
     for my $spec ( @sections) {
         if ( defined($_ = &_compile_section_spec($spec)) ) {
             ## Store them in our sections array
-            push(@$selected_sections, $_);
+            push($selected_sections->@, $_);
         }
         else {
             warn "Ignoring section spec \"$spec\"!\n";
@@ -438,8 +438,8 @@ sub match_section {
     my @headings = @_;
 
     ## Return true if no restrictions were explicitly specified
-    my $selections = (exists %$self{_SELECTED_SECTIONS})
-        ??  %$self{?_SELECTED_SECTIONS}  !!  undef;
+    my $selections = (exists $self->%{_SELECTED_SECTIONS})
+        ??  $self->%{?_SELECTED_SECTIONS}  !!  undef;
     return  1  unless ((defined $selections) && ((nelems $selections->@) +> 0));
 
     ## Default any unspecified sections to the current one
@@ -492,7 +492,7 @@ for processing; otherwise a false value is returned.
 sub is_selected($self, $paragraph) {
     local $_ = undef;
 
-    $self->_init_headings()  unless (defined %$self{?_SECTION_HEADINGS});
+    $self->_init_headings()  unless (defined $self->%{?_SECTION_HEADINGS});
 
     ## Keep track of current sections levels and headings
     $_ = $paragraph;
@@ -502,10 +502,10 @@ sub is_selected($self, $paragraph) {
         my @($level, $heading) = @($2, $3);
         $level = 1 + (length($1) / 3)  if ((! length $level) || (length $1));
         ## Reset the current section heading at this level
-        %$self{_SECTION_HEADINGS}->[$level - 1] = $heading;
+        $self->%{_SECTION_HEADINGS}->[$level - 1] = $heading;
         ## Reset subsection headings of this one to empty
         for my $i ($level .. $MAX_HEADING_LEVEL -1) {
-            %$self{_SECTION_HEADINGS}->[$i] = '';
+            $self->%{_SECTION_HEADINGS}->[$i] = '';
         }
     }
 

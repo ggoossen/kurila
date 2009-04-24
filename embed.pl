@@ -85,11 +85,11 @@ sub walk_table ($function, ?$filename, ?$leader, ?$trailer) {
     }
     print $F, $leader if $leader;
     seek $in, 0, 0;		# so we may restart
-    while ( ~< *$in) {
+    while ( ~< $in->*) {
         chomp;
         next if m/^:/;
         while (s|\\$||) {
-            $_ .= ~< *$in;
+            $_ .= ~< $in->*;
             chomp;
         }
         s/\s+$//;
@@ -323,7 +323,7 @@ sub readsyms($syms, $file) {
     my $fh;
     open($fh, "<", "$file")
         or die "embed.pl: Can't open $file: $^OS_ERROR\n";
-    while ( ~< *$fh) {
+    while ( ~< $fh->*) {
         s/[ \t]*#.*//;		# Delete comments.
         if (m/^\s*(\S+)\s*$/) {
             my $sym = $1;
@@ -342,14 +342,14 @@ sub readvars($syms, $file,$pre,?$keep_pre) {
            local ($_);
     open(my $fh, "<", "$file")
         or die "embed.pl: Can't open $file: $^OS_ERROR\n";
-    while ( ~< *$fh) {
+    while ( ~< $fh->*) {
         s/[ \t]*#.*//;		# Delete comments.
         if (m/PERLVARA?I?S?C?\($pre(\w+)/) {
             my $sym = $1;
             $sym = $pre . $sym if $keep_pre;
             warn "duplicate symbol $sym while processing $file line $(iohandle::input_line_number(\*FILE))\n"
-                if exists %$syms{$sym};
-            %$syms{+$sym} = $pre || 1;
+                if exists $syms->%{$sym};
+            $syms->%{+$sym} = $pre || 1;
         }
     }
     close($fh);

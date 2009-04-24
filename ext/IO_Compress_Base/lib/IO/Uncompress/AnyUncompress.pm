@@ -87,7 +87,7 @@ sub mkUncomp
         return $self->saveErrorString(undef, $errstr, $errno)
             if ! defined $obj;
 
-        *$self->{+Uncomp} = $obj;
+        $self->*->{+Uncomp} = $obj;
 
         my @possible = qw( Inflate Gunzip Unzip );
         unshift @possible, 'RawInflate' 
@@ -96,7 +96,7 @@ sub mkUncomp
         $magic = $self->ckMagic( < @possible );
 
         if ($magic) {
-            *$self->{+Info} = $self->readHeader($magic)
+            $self->*->{+Info} = $self->readHeader($magic)
             or return undef ;
 
             return 1;
@@ -105,7 +105,7 @@ sub mkUncomp
 
     if (defined $IO::Uncompress::Bunzip2::VERSION and
         $magic = $self->ckMagic('Bunzip2')) {
-        *$self->{+Info} = $self->readHeader($magic)
+        $self->*->{+Info} = $self->readHeader($magic)
         or return undef ;
 
         my @($obj, $errstr, $errno) =  IO::Uncompress::Adapter::Bunzip2::mkUncompObject();
@@ -113,7 +113,7 @@ sub mkUncomp
         return $self->saveErrorString(undef, $errstr, $errno)
             if ! defined $obj;
 
-        *$self->{+Uncomp} = $obj;
+        $self->*->{+Uncomp} = $obj;
 
         return 1;
     }
@@ -121,7 +121,7 @@ sub mkUncomp
     if (defined $IO::Uncompress::UnLzop::VERSION and
         $magic = $self->ckMagic('UnLzop')) {
 
-        *$self->{+Info} = $self->readHeader($magic)
+        $self->*->{+Info} = $self->readHeader($magic)
         or return undef ;
 
         my @($obj, $errstr, $errno) =  IO::Uncompress::Adapter::LZO::mkUncompObject();
@@ -129,7 +129,7 @@ sub mkUncomp
         return $self->saveErrorString(undef, $errstr, $errno)
             if ! defined $obj;
 
-        *$self->{+Uncomp} = $obj;
+        $self->*->{+Uncomp} = $obj;
 
         return 1;
     }
@@ -137,7 +137,7 @@ sub mkUncomp
     if (defined $IO::Uncompress::UnLzf::VERSION and
         $magic = $self->ckMagic('UnLzf')) {
 
-        *$self->{+Info} = $self->readHeader($magic)
+        $self->*->{+Info} = $self->readHeader($magic)
         or return undef ;
 
         my @($obj, $errstr, $errno) =  IO::Uncompress::Adapter::Lzf::mkUncompObject();
@@ -145,7 +145,7 @@ sub mkUncomp
         return $self->saveErrorString(undef, $errstr, $errno)
             if ! defined $obj;
 
-        *$self->{+Uncomp} = $obj;
+        $self->*->{+Uncomp} = $obj;
 
         return 1;
     }
@@ -172,8 +172,8 @@ sub ckMagic
             return $magic ;
         }
 
-        $self->pushBack(*$self->{HeaderPending})  ;
-        *$self->{+HeaderPending} = ''  ;
+        $self->pushBack($self->*->{HeaderPending})  ;
+        $self->*->{+HeaderPending} = ''  ;
     }    
 
     bless $self => $keep;

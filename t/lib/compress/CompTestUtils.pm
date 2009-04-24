@@ -47,7 +47,7 @@ do {
     {
         my $self = shift ;
         chmod 0777, <  $self->@ ;
-        for ( @$self) { 1 while unlink $_ } ;
+        for ( $self->@) { 1 while unlink $_ } ;
     }
 
 };
@@ -66,7 +66,7 @@ do {
     sub DESTROY
     {
         my $self = shift ;
-        foreach ( @$self) { rmtree $_ }
+        foreach ( $self->@) { rmtree $_ }
     }
 };
 sub readFile
@@ -87,7 +87,7 @@ sub readFile
         open (my $fh, "<", "$f") 
             or die "Cannot open $f: $^OS_ERROR\n" ;
         binmode $fh;
-        @strings = @( ~< *$fh ) ;	
+        @strings = @( ~< $fh->* ) ;	
         close $fh ;
     }
 
@@ -142,7 +142,7 @@ sub hexDump
     }
     else
     {
-        $d = $$d ;
+        $d = $d->$ ;
     }
 
     my $offset = 0 ;
@@ -399,14 +399,14 @@ sub anyUncompress
     my @opts = @( () );
     if (ref $buffer && ref $buffer eq 'ARRAY')
     {
-        @opts = @$buffer;
+        @opts = $buffer->@;
         $buffer = shift @opts;
     }
 
     if (ref $buffer)
     {
-        croak "buffer is undef" unless defined $$buffer;
-        croak "buffer is empty" unless length $$buffer;
+        croak "buffer is undef" unless defined $buffer->$;
+        croak "buffer is empty" unless length $buffer->$;
 
     }
 
@@ -422,7 +422,7 @@ sub anyUncompress
     }
     else
     {
-        $data = $$buffer ;
+        $data = $buffer->$ ;
     }
 
     if (defined $already && length $already)
@@ -459,14 +459,14 @@ sub getHeaders
     my @opts = @( () );
     if (ref $buffer && ref $buffer eq 'ARRAY')
     {
-        @opts = @$buffer;
+        @opts = $buffer->@;
         $buffer = shift @opts;
     }
 
     if (ref $buffer)
     {
-        croak "buffer is undef" unless defined $$buffer;
-        croak "buffer is empty" unless length $$buffer;
+        croak "buffer is undef" unless defined $buffer->$;
+        croak "buffer is empty" unless length $buffer->$;
 
     }
 
@@ -482,7 +482,7 @@ sub getHeaders
     }
     else
     {
-        $data = $$buffer ;
+        $data = $buffer->$ ;
     }
 
     if (defined $already && length $already)
@@ -540,7 +540,7 @@ sub mkComplete
     }
 
     my $z = $class-> new(( \$buffer, < %params))
-        or croak "Cannot create $class object: $$Error";
+        or croak "Cannot create $class object: $Error->$";
     $z->write($data);
     $z->close();
 
@@ -588,12 +588,12 @@ sub dumpObj
     }
 
     my $max = 0 ;;
-    foreach my $k (keys  *$obj->%)
+    foreach my $k (keys  $obj->*->%)
     {
         $max = length $k if length $k +> $max ;
     }
 
-    foreach my $k (sort keys  *$obj->%)
+    foreach my $k (sort keys  $obj->*->%)
     {
         my $v = $obj->{?$k} ;
         $v = '-undef-' unless defined $v;

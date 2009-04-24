@@ -50,7 +50,7 @@ sub xsinit {
     my $xsinit_proto = "pTHX";
 
     if ((nelems @_)) {
-        @mods = @$mods if $mods;
+        @mods = $mods->@ if $mods;
     }
     else {
         getopts('o:s:');
@@ -140,7 +140,7 @@ sub static_ext {
 
 sub _escape {
     my $arg = shift;
-    $$arg =~ s/([\(\)])/\\$1/g;
+    $arg->$ =~ s/([\(\)])/\\$1/g;
 }
 
 sub _ldflags {
@@ -168,8 +168,8 @@ sub ldopts {
     my(@mods,@link_args,@argv);
     my($dllib,$config_libs,@potential_libs,@path);
     if (scalar nelems @_) {
-        @link_args = @$link_args if $link_args;
-        @mods = @$mods if $mods;
+        @link_args = $link_args->@ if $link_args;
+        @mods = $mods->@ if $mods;
     }
     else {
         @argv = @ARGV;
@@ -206,7 +206,7 @@ sub ldopts {
             push @archives, $archive;
             if(-e ($extra = File::Spec->catdir($_,"auto",$root,"extralibs.ld"))) {
                 if(open(my $fh, "<", $extra)) {
-                    my@($libs) = ~< *$fh; chomp $libs;
+                    my@($libs) = ~< $fh->*; chomp $libs;
                     push @potential_libs, < split m/\s+/, $libs;
                 }
                 else {  

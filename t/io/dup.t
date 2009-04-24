@@ -126,13 +126,13 @@ SKIP: do {
     open($gfh, "<", "dup$^PID") or die;
     do {
         my $line;
-        $line = ~< *$gfh; chomp $line; is($line, "ggg");
-        $line = ~< *$gfh; chomp $line; is($line, "fff");
+        $line = ~< $gfh->*; chomp $line; is($line, "ggg");
+        $line = ~< $gfh->*; chomp $line; is($line, "fff");
     };
     close $gfh;
 
     open my $utfout, '>:utf8', "dup$^PID" or die $^OS_ERROR;
-    open my $utfdup, ">&", \*$utfout or die $^OS_ERROR;
+    open my $utfdup, ">&", \$utfout->* or die $^OS_ERROR;
     # some old greek saying.
     my $message = "\x{03A0}\x{0391}\x{039D}\x{03A4}\x{0391} \x{03A1}\x{0395}\x{0399}\n";
     print $utfout, $message;
@@ -144,9 +144,9 @@ SKIP: do {
     open(my $utfin, "<:utf8", "dup$^PID") or die $^OS_ERROR;
     do {
         my $line;
-        $line = ~< *$utfin; is($line, $message);
-        $line = ~< *$utfin; is($line, $message);
-        $line = ~< *$utfin; is($line, $message);
+        $line = ~< $utfin->*; is($line, $message);
+        $line = ~< $utfin->*; is($line, $message);
+        $line = ~< $utfin->*; is($line, $message);
     };
     close $utfin;
 

@@ -108,7 +108,7 @@ sub nstore_and_retrieve {
 }
 
 foreach ( @processes) {
-    my @($process, $sub) =  @$_;
+    my @($process, $sub) =  $_->@;
     foreach my $number ( @numbers) {
         # as $number is an alias into @numbers, we don't want any side effects of
         # conversion macros affecting later runs, so pass a copy to Storable:
@@ -124,7 +124,7 @@ foreach ( @processes) {
             # -2147483649
             # 2147483648
 
-            my $copy_s1 = my $copy_s2 = $$copy_s;
+            my $copy_s1 = my $copy_s2 = $copy_s->$;
             # On 5.8 can do this with a straight ==, due to the integer/float maths
             # on 5.6 can't do this with
             # my $eq = do {use integer; $copy_s1 == $copy1} && $copy_s1 == $copy1;

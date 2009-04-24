@@ -231,15 +231,15 @@ sub pod_find
 }
 
 sub _check_for_duplicates($file, $name, $names_ref, $pods_ref) {
-    if(%$names_ref{?$name}) {
+    if($names_ref->%{?$name}) {
         warn "Duplicate POD found (shadowing?): $name ($file)\n";
         warn "    Already seen in ",
-            join(' ', grep( {%$pods_ref{?$_} eq $name }, keys %$pods_ref)),"\n";
+            join(' ', grep( {$pods_ref->%{?$_} eq $name }, keys $pods_ref->%)),"\n";
     }
     else {
-        %$names_ref{+$name} = 1;
+        $names_ref->%{+$name} = 1;
     }
-    %$pods_ref{+$file} = $name;
+    $pods_ref->%{+$file} = $name;
 }
 
 sub _check_and_extract_name($file, $verbose, $root_rx) {
@@ -368,7 +368,7 @@ sub pod_where {
         my $opt = shift;
 
         # Merge default options with supplied options
-        %options = %(< %options, < %$opt);
+        %options = %(< %options, < $opt->%);
     }
 
     # Check usage

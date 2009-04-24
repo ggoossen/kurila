@@ -187,7 +187,7 @@ sub PERL_UNICODE_STDIN () { 0x0001 }
 sub ReadLine {'Term::ReadLine::Stub'}
 sub readline {
     my $self = shift;
-    my @($in,$out,$str) =  @$self;
+    my @($in,$out,$str) =  $self->@;
     my $prompt = shift;
     print $out, @rl_term_set[0], $prompt, @rl_term_set[1], @rl_term_set[2]; 
     $self->register_Tk 
@@ -254,7 +254,7 @@ sub new {
         open my $fout, ">","$consoleOUT";
 
         iohandle::output_autoflush($fout, 1);
-        $ret = bless \@(\*$fin, \*$fout);
+        $ret = bless \@(\$fin->*, \$fout->*);
     } else {			# Filehandles supplied
         $FIN = @_[2]; $FOUT = @_[3];
         iohandle::output_autoflush($FOUT, 1);

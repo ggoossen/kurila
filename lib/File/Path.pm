@@ -581,7 +581,7 @@ sub _mkpath {
     my $paths = shift;
 
     my(@created);
-    foreach my $path ( @$paths) {
+    foreach my $path ( $paths->@) {
         next unless length($path);
         $path .= '/' if $^OS_NAME eq 'os2' and $path =~ m/^\w:\z/s; # feature of CRT 
         # Logic wants Unix paths, so go with the flow.
@@ -664,7 +664,7 @@ sub _rmtree {
 
     my (@files);
   ROOT_DIR:
-    foreach my $root ($(@$paths)) {
+    foreach my $root ($($paths->@)) {
         if ($Is_MacOS) {
             $root  = ":$root" unless $root =~ m/:/;
             $root .= ":"      unless $root =~ m/:\z/;
@@ -746,7 +746,7 @@ sub _rmtree {
 
             if ((nelems @files)) {
                 # remove the contained files before the directory itself
-                my $narg = \%(< %$arg);
+                my $narg = \%(< $arg->%);
                     $narg->{[qw(device inode cwd prefix depth)]}
                 = @($device, $inode, $updir, $canon, $arg->{?depth}+1);
                 $count += _rmtree($narg, \@files);

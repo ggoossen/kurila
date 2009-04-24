@@ -48,7 +48,7 @@ do {
            \@(9+8, 3, '', 9, "\0" x 3 . $value))
     )
     {
-        my @($length, $offset, $buffer, $expect_length, $expect) =  @$_;
+        my @($length, $offset, $buffer, $expect_length, $expect) =  $_->@;
         my $buffer = "";
         open $fh, "<", $tmpfile or die "Can't open $tmpfile: $^OS_ERROR";
         $got = read ($fh, $buffer, $length, $offset);
@@ -65,7 +65,7 @@ do {
            \@(3+8, 3, '', 3, "\0" x 3 . $value))
     )
     {
-        my @($length, $offset, $buffer, $expect_length, $expect) =  @$_;
+        my @($length, $offset, $buffer, $expect_length, $expect) =  $_->@;
         my $buffer = "";
         open $fh, "<", $tmpfile or die "Can't open $tmpfile: $^OS_ERROR";
         $got = read ($fh, $buffer, $length, $offset);

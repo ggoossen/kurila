@@ -81,7 +81,7 @@ open my $master, "<", $masterpodfile or die "$^PROGRAM_NAME: Can't open $masterp
 
 my ($delta_source, $delta_target);
 
-foreach (@( ~< *$master)) {
+foreach (@( ~< $master->*)) {
     next if m/^\#/;
 
     # At least one upper case letter somewhere in the first group
@@ -169,7 +169,7 @@ do {
         %sources{[values %Copies]} = @();
 
     open(my $mani, "<", "../MANIFEST") || die "$^PROGRAM_NAME: opening ../MANIFEST failed: $^OS_ERROR";
-    while ( ~< *$mani) {
+    while ( ~< $mani->*) {
         if (m!^pod/([^.]+\.pod)\s+!i) {
             push @manipods, $1;
         } elsif (m!^README\.(\S+)\s+!i) {
@@ -183,7 +183,7 @@ do {
 
     my $in_perlpod;
     open(my $perlpod, "<", "perl.pod") || die "$^PROGRAM_NAME: opening perl.pod failed: $^OS_ERROR\n";
-    while ( ~< *$perlpod) {
+    while ( ~< $perlpod->*) {
         $in_perlpod ||= m/^For ease of access/;
         $in_perlpod &&= ! m/^\(If you're intending /;
         if ($in_perlpod) {
@@ -242,7 +242,7 @@ do {
             }
             else {
                 my $line;
-                while ($line = ~< *$f) {
+                while ($line = ~< $f->*) {
                     if ($line =~ m/^=head1\s+NAME\b/) {
                         push @modpods, $file;
                         #warn "GOOD $file\n";
@@ -313,7 +313,7 @@ EOPOD2B
     #' make emacs happy
 
     # All the things in the master list that happen to be pod filenames
-    podset(< map {"$_->[1].pod"}, grep {defined $_ && (nelems @$_) == 3 && !$_->[0]->{?toc_omit}}, @Master);
+    podset(< map {"$_->[1].pod"}, grep {defined $_ && (nelems $_->@) == 3 && !$_->[0]->{?toc_omit}}, @Master);
 
 
     ($_= <<"EOPOD2B") =~ s/^\t//gm && output($_);
@@ -487,26 +487,26 @@ sub generate_perlpod {
         next if $flags->{aux};
         next if $flags->{perlpod_omit};
 
-        if ((nelems @$_) == 2) {
+        if ((nelems $_->@) == 2) {
             # Heading
             push @output, "=head2 $_->[1]\n";
-        } elsif ((nelems @$_) == 3) {
+        } elsif ((nelems $_->@) == 3) {
             # Section
             my $start = " " x (4 + $flags->{indent}) . $_->[1];
             $maxlength = length $start if length ($start) +> $maxlength;
             push @output, \@($start, $_->[2]);
-        } elsif ((nelems @$_) == 0) {
+        } elsif ((nelems $_->@) == 0) {
             # blank line
             push @output, "\n";
         } else {
-            die "$^PROGRAM_NAME: Illegal length " . scalar nelems @$_;
+            die "$^PROGRAM_NAME: Illegal length " . scalar nelems $_->@;
         }
     }
     # want at least 2 spaces padding
     $maxlength += 2;
     $maxlength = ($maxlength + 3) ^&^ ^~^3;
     # sprintf gives $1.....$2 where ... are spaces:
-    return unexpand (< map {ref $_ ?? sprintf "\%-$($maxlength)s\%s\n", < @$_ !! $_},
+    return unexpand (< map {ref $_ ?? sprintf "\%-$($maxlength)s\%s\n", < $_->@ !! $_},
                    @output);
 }
 
@@ -515,7 +515,7 @@ sub generate_manifest {
     # Annyoingly unexpand doesn't consider it good form to replace a single
     # space before a tab with a tab
     # Annoyingly (2) it returns read only values.
-    my @temp = unexpand (< map {sprintf "\%-32s\%s\n", < @$_}, @_);
+    my @temp = unexpand (< map {sprintf "\%-32s\%s\n", < $_->@}, @_);
     map {s/ \t/\t\t/g; $_}, @temp;
 }
 sub generate_manifest_pod {
@@ -705,7 +705,7 @@ while (my @(?$target, ?$name) = @: each %Targets) {
     }
     print\*STDOUT,  "Now processing $name\n" if $Verbose;
     open my $thing, "<", $name or die "Can't open $name: $^OS_ERROR";
-    my @orig = @( ~< *$thing );
+    my @orig = @( ~< $thing->* );
     my $orig = join '', @orig;
     close $thing;
     my @new = &{"do_$target"}($target, < @orig);

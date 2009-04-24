@@ -99,7 +99,7 @@ EOM
                 -Strict      => 1,
                 -BlockSize   => $blocksize,
                 -Transparent => $trans)
-                or diag $$UnError;
+                or diag $UnError->$;
 
             my $un ;
             my $status = 1 ;

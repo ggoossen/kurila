@@ -109,7 +109,7 @@ sub getopt($argumentative, ?$hash) {
                 $rest = shift(@ARGV);
             }
             if (ref $hash) {
-                %$hash{+$first} = $rest;
+                $hash->%{+$first} = $rest;
             }
             else {
                 Symbol::fetch_glob("opt_$first")->*->$ = $rest;
@@ -118,7 +118,7 @@ sub getopt($argumentative, ?$hash) {
         }
         else {
             if (ref $hash) {
-                %$hash{+$first} = 1;
+                $hash->%{+$first} = 1;
             }
             else {
                 Symbol::fetch_glob("opt_$first")->*->$ = 1;
@@ -238,7 +238,7 @@ sub getopts($argumentative, ?$hash) {
                     $rest = shift(@ARGV);
                 }
                 if (ref $hash) {
-                    %$hash{+$first} = $rest;
+                    $hash->%{+$first} = $rest;
                 }
                 else {
                     Symbol::fetch_glob("opt_$first")->*->$ = $rest;
@@ -247,7 +247,7 @@ sub getopts($argumentative, ?$hash) {
             }
             else {
                 if (ref $hash) {
-                    %$hash{+$first} = 1;
+                    $hash->%{+$first} = 1;
                 }
                 else {
                     Symbol::fetch_glob("opt_$first")->*->$ = 1;

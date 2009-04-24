@@ -24,7 +24,7 @@ sub new($class,$delay) {
 
 sub copy { 
     my $orig = shift;
-    bless \%(< %$orig, 'quiet_until' => 1), ref($orig);
+    bless \%(< $orig->%, 'quiet_until' => 1), ref($orig);
 }
 #--------------------------------------------------------------------------
 

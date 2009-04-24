@@ -267,9 +267,9 @@ sub check($utmpl, $href, ?$verbose) {
         or return;
 
     ### deref only once ###
-    my %utmpl   = %( < %$utmpl );
-    my %args    = %( < %$args );
-    my %defs    = %( < %$defs );
+    my %utmpl   = %( < $utmpl->% );
+    my %args    = %( < $args->% );
+    my %defs    = %( < $defs->% );
 
     ### flag to see if anything went wrong ###
     my $wrong; 
@@ -365,7 +365,7 @@ sub check($utmpl, $href, ?$verbose) {
     ### leaving the user with a few set variables
     for my $key (keys %defs) {
         if( my $ref = %utmpl{?$key}->{?'store'} ) {
-            $$ref = $NO_DUPLICATES ?? delete %defs{$key} !! %defs{?$key};
+            $ref->$ = $NO_DUPLICATES ?? delete %defs{$key} !! %defs{?$key};
         }
     }
 

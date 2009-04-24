@@ -17,13 +17,13 @@ my $Fattr = \%fields::attr;
 sub has_fields {
     my@($base) =@( shift);
     my $fglob = Symbol::fetch_glob("$base\::FIELDS");
-    return ($fglob && 'GLOB' eq ref($fglob) && *$fglob{HASH}) ?? 1 !! 0;
+    return ($fglob && 'GLOB' eq ref($fglob) && $fglob->*{HASH}) ?? 1 !! 0;
 }
 
 sub has_version {
     my@($base) =@( shift);
     my $vglob = Symbol::fetch_glob($base.'::VERSION');
-    return ($vglob && *$vglob{SCALAR}) ?? 1 !! 0;
+    return ($vglob && $vglob->*{SCALAR}) ?? 1 !! 0;
 }
 
 sub has_attr {
@@ -107,9 +107,9 @@ sub inherit_fields($derived, $base) {
     my $dfields = get_fields($derived);
     my $bfields = get_fields($base);
 
-    $dattr->[0] = (nelems @$battr);
+    $dattr->[0] = (nelems $battr->@);
 
-    if( %$dfields ) {
+    if( $dfields->% ) {
         warn <<"END";
 $derived is inheriting from $base but already has its own fields!
 This will cause problems.  Be sure you use base BEFORE declaring fields.
@@ -121,7 +121,7 @@ END
     # ones to the derived class.  Hang on to the original attribute
     # (Public, Private, etc...) and add Inherited.
     # This is all too complicated to do efficiently with add_fields().
-    while (my@(?$k,?$v) =@( each %$bfields)) {
+    while (my@(?$k,?$v) =@( each $bfields->%)) {
         my $fno;
         if ($fno = $dfields->{?$k} and $fno != $v) {
             die("Inherited fields can't override existing fields");
@@ -136,7 +136,7 @@ END
         }
     }
 
-    foreach my $idx (1..(nelems @$battr)-1) {
+    foreach my $idx (1..(nelems $battr->@)-1) {
         next if defined $dattr->[?$idx];
         $dattr->[+$idx] = $battr->[$idx] ^&^ INHERITED;
     }

@@ -332,7 +332,7 @@ sub _get_install_skip( $skip, $verbose) {
             if $verbose+>1;
         $skip= \@();
     }
-    warn "Got $(nelems @$skip) skip patterns.\n"
+    warn "Got $(nelems $skip->@) skip patterns.\n"
         if $verbose+>3;
     return $skip
 }
@@ -652,8 +652,8 @@ provided then the returned hashref will be the passed in hashref.
 
 sub install { #XXX OS-SPECIFIC
     my@($from_to,?$verbose,?$dry_run,?$uninstall_shadows,?$skip,?$always_copy,?$result) =  @_;
-    if ((nelems @_)==1 and try { 1+nelems @$from_to }) {
-        my %opts        = %( < @$from_to );
+    if ((nelems @_)==1 and try { 1+nelems $from_to->@ }) {
+        my %opts        = %( < $from_to->@ );
         $from_to        = %opts{?from_to} 
             or Carp::confess("from_to is a mandatory parameter");
         $verbose        = %opts{?verbose};
@@ -674,7 +674,7 @@ sub install { #XXX OS-SPECIFIC
         || 0
         unless defined $always_copy;
 
-    my@(%from_to) =@( %( < %$from_to ));
+    my@(%from_to) =@( %( < $from_to->% ));
     my(%pack, $dir, %warned);
     my $packlist = ExtUtils::Packlist->new();
 
@@ -768,7 +768,7 @@ sub install { #XXX OS-SPECIFIC
     }
     foreach my $found ( @found_files) {
         my @($diff, $ffd, $origfile, $mode, $size, $atime, $mtime,
-             $targetdir, $targetfile, $sourcedir, $sourcefile)=  @$found;
+             $targetdir, $targetfile, $sourcedir, $sourcefile)=  $found->@;
 
         my $realtarget= $targetfile;
         if ($diff) {
@@ -1140,7 +1140,7 @@ be prepended as a directory to each installed file (and directory).
 sub pm_to_blib($fromto,$autodir, ?$pm_filter) {
 
     _mkpath($autodir,0,0755);
-    while(my@(?$from, ?$to) =@( each %$fromto)) {
+    while(my@(?$from, ?$to) =@( each $fromto->%)) {
         if( -f $to && -s $from == -s $to && -M $to +< -M $from ) {
             print $^STDOUT, "Skip $to (unchanged)\n";
             next;
@@ -1189,7 +1189,7 @@ sub DESTROY {
     unless(defined $INSTALL_ROOT) {
         my $self = shift;
         my($i,$plural);
-        foreach my $file (sort keys %$self) {
+        foreach my $file (sort keys $self->%) {
             $plural = (nelems $self->{?$file}->@) +> 1 ?? "s" !! "";
             print $^STDOUT, "## Differing version$plural of $file found. You might like to\n";
             for (0..(nelems $self->{?$file}->@)-1) {

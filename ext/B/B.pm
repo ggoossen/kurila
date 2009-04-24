@@ -106,7 +106,7 @@ sub parents { \@parents }
 # For debugging
 sub peekop {
     my $op = shift;
-    return sprintf("\%s (0x\%x) \%s", < class($op), $$op, < $op->name);
+    return sprintf("\%s (0x\%x) \%s", < class($op), $op->$, < $op->name);
 }
 
 sub walkoptree_slow($op, $method, $level) {
@@ -114,11 +114,11 @@ sub walkoptree_slow($op, $method, $level) {
     $level ||= 0;
     warn(sprintf("walkoptree: \%d. \%s\n", $level, < peekop($op))) if $debug;
     $op->?$method($level) if $op->can($method);
-    if ($$op && ($op->flags ^&^ OPf_KIDS)) {
+    if ($op->$ && ($op->flags ^&^ OPf_KIDS)) {
         my $kid;
         unshift(@parents, $op);
         $kid = $op->first;
-        while ($$kid) {
+        while ($kid->$) {
             walkoptree_slow($kid, $method, $level + 1);
             $kid = $kid->sibling;
         }
@@ -154,25 +154,25 @@ sub clearsym {
 
 sub savesym($obj, $value) {
     #    warn(sprintf("savesym: sym_%x => %s\n", $$obj, $value)); # debug
-    %symtable{+sprintf("sym_\%x", $$obj)} = $value;
+    %symtable{+sprintf("sym_\%x", $obj->$)} = $value;
 }
 
 sub objsym {
     my $obj = shift;
-    return %symtable{?sprintf("sym_\%x", $$obj)};
+    return %symtable{?sprintf("sym_\%x", $obj->$)};
 }
 
 sub walkoptree_exec($op, $method, $level) {
     $level ||= 0;
     my ($sym, $ppname);
     my $prefix = "    " x $level;
-    while ($$op) {
+    while ($op->$) {
         $sym = objsym($op);
         if (defined($sym)) {
             print $^STDOUT, $prefix, "goto $sym\n";
             return;
         }
-        savesym($op, sprintf("\%s (0x\%lx)", < class($op), $$op));
+        savesym($op, sprintf("\%s (0x\%lx)", < class($op), $op->$));
         $op->?$method($level);
         $ppname = $op->name;
         if ($ppname =~
@@ -183,7 +183,7 @@ sub walkoptree_exec($op, $method, $level) {
             print $^STDOUT, $prefix, "\}\n";
         } elsif ($ppname eq "match" || $ppname eq "subst") {
             my $pmreplstart = $op->pmreplstart;
-            if ($$pmreplstart) {
+            if ($pmreplstart->$) {
                 print $^STDOUT, $prefix, "PMREPLSTART => \{\n";
                 walkoptree_exec($pmreplstart, $method, $level + 1);
                 print $^STDOUT, $prefix, "\}\n";
@@ -203,7 +203,7 @@ sub walkoptree_exec($op, $method, $level) {
             print $^STDOUT, $prefix, "\}\n";
         } elsif ($ppname eq "subst") {
             my $replstart = $op->pmreplstart;
-            if ($$replstart) {
+            if ($replstart->$) {
                 print $^STDOUT, $prefix, "SUBST => \{\n";
                 walkoptree_exec($replstart, $method, $level + 1);
                 print $^STDOUT, $prefix, "\}\n";
@@ -219,7 +219,7 @@ sub walksymtable($symref, $method, $recurse, $prefix) {
     my $ref;
     my $fullname;
     $prefix = '' unless defined $prefix;
-    for my $sym (keys %$symref) {
+    for my $sym (keys $symref->%) {
         my $ref = $symref->{?$_};
         $fullname = "*".$prefix.$sym;
         if ($sym =~ m/::$/) {

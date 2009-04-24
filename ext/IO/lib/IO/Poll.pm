@@ -77,7 +77,7 @@ sub poll($self,$timeout) {
 
     while(@(?$fd,?$iom) =@( each $self->[0]->%)) {
         $mask   = 0;
-        $mask  ^|^= $_ for values(%$iom);
+        $mask  ^|^= $_ for values($iom->%);
         push(@poll,$fd => $mask);
     }
 

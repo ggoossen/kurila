@@ -40,22 +40,22 @@ END { 1 while unlink($tmpfile) }
 ok( defined $out );
 
 print $out, "hi!\n";
-close *$out;
+close $out->*;
 
 undef $out;
 open(my $in, "<", $tmpfile) or die $^OS_ERROR;
-chomp(my $line = ~< *$in);
+chomp(my $line = ~< $in->*);
 close $in;
 
 ok($line eq 'hi!');
 
 open(my $foo, ">>", "$tmpfile") or die $^OS_ERROR;
-$out = $Test->output(\*$foo);
+$out = $Test->output(\$foo->*);
 print $out, "Hello!\n";
 close $out;
 undef $out;
 open($in, "<", $tmpfile) or die $^OS_ERROR;
-my @lines = @( ~< *$in );
+my @lines = @( ~< $in->* );
 close $in;
 
 ok(@lines[0] =~ m/hi!/);

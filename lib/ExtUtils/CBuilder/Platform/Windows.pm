@@ -33,7 +33,7 @@ sub _compiler_type {
 
 sub split_like_shell(my $self, local $_) {
 
-    return @$_ if defined() && UNIVERSAL::isa($_, 'ARRAY');
+    return $_->@ if defined() && UNIVERSAL::isa($_, 'ARRAY');
     return unless defined() && length();
     return  @($_);
 }
@@ -86,7 +86,7 @@ sub compile($self, %< %args) {
 
     my @cmds = $self->format_compiler_cmd(< %spec);
     while ( my $cmd = shift @cmds ) {
-        $self->do_system( < @$cmd )
+        $self->do_system( < $cmd->@ )
             or die "error building $cf->{?dlext} file from '%args{?source}'";
     }
 
@@ -176,7 +176,7 @@ sub link($self, %< %args) {
 
     my @cmds = $self->format_linker_cmd(< %spec);
     while ( my $cmd = shift @cmds ) {
-        $self->do_system( < @$cmd );
+        $self->do_system( < $cmd->@ );
     }
 
     %spec{+output} =~ s/'|"//g;
@@ -187,11 +187,11 @@ sub link($self, %< %args) {
 sub normalize_filespecs($self, @< @specs) {
     foreach my $spec ( grep { defined }, @specs ) {
         if ( ref $spec eq 'ARRAY') {
-            $self->normalize_filespecs( < map {\$_}, grep { defined }, @$spec )
+            $self->normalize_filespecs( < map {\$_}, grep { defined }, $spec->@ )
         } elsif ( ref $spec eq 'SCALAR' ) {
-            $$spec =~ s/"//g if $$spec;
-            next unless $$spec;
-            $$spec = '"' . File::Spec->canonpath($$spec) . '"';
+            $spec->$ =~ s/"//g if $spec->$;
+            next unless $spec->$;
+            $spec->$ = '"' . File::Spec->canonpath($spec->$) . '"';
         } elsif ( ref $spec eq '' ) {
             $spec = '"' . File::Spec->canonpath($spec) . '"';
         } else {

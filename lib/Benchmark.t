@@ -132,11 +132,11 @@ open my $out_fh, '>>', \$out or die;
 sub do_with_out($sub) {
     open my $real_stdout, ">&", $^STDOUT;
     close $^STDOUT;
-    $^STDOUT = *$out_fh{IO};
+    $^STDOUT = $out_fh->*{IO};
 
     my $res = $sub->();
 
-    $^STDOUT = *$real_stdout{IO};
+    $^STDOUT = $real_stdout->*{IO};
     return $res;
 }
 
@@ -208,7 +208,7 @@ is(ref ($got), 'HASH', "timethese should return a hashref");
 isa_ok($got->{?Foo}, 'Benchmark', "Foo value");
 isa_ok($got->{?Bar}, 'Benchmark', "Bar value");
 isa_ok($got->{?Baz}, 'Benchmark', "Baz value");
-eq_set(\keys %$got, \qw(Foo Bar Baz), 'should be exactly three objects');
+eq_set(\keys $got->%, \qw(Foo Bar Baz), 'should be exactly three objects');
 is ($foo, $iterations, "Foo code was run $iterations times");
 is ($bar, $iterations, "Bar code was run $iterations times");
 is ($baz, $iterations, "Baz code was run $iterations times");
@@ -239,7 +239,7 @@ do {
     is(ref ($results), 'HASH', "timethese should return a hashref");
     isa_ok($results->{?Foo}, 'Benchmark', "Foo value");
     isa_ok($results->{?Bar}, 'Benchmark', "Bar value");
-    eq_set(\keys %$results, \qw(Foo Bar), 'should be exactly two objects');
+    eq_set(\keys $results->%, \qw(Foo Bar), 'should be exactly two objects');
     ok ($foo +> 0, "Foo code was run");
     ok ($bar +> 0, "Bar code was run");
 
@@ -338,11 +338,11 @@ sub check_graph_vs_output($chart, $got) {
 }
 
 sub check_graph($title, $row1, $row2) {
-    is (nelems @$title, 4, "Four entries in title row");
-    is (nelems @$row1, 4, "Four entries in first row");
-    is (nelems @$row2, 4, "Four entries in second row");
-    is (shift @$title, '', "First entry of output graph should be ''");
-    check_graph_consistency (<@$title, <@$row1, <@$row2);
+    is (nelems $title->@, 4, "Four entries in title row");
+    is (nelems $row1->@, 4, "Four entries in first row");
+    is (nelems $row2->@, 4, "Four entries in second row");
+    is (shift $title->@, '', "First entry of output graph should be ''");
+    check_graph_consistency (<$title->@, <$row1->@, <$row2->@);
 }
 
 do {
@@ -421,7 +421,7 @@ do {
     # Some of these will go bang if the preceding test fails. There will be
     # a big clue as to why, from the previous test's diagnostic
     is (ref $chart->[0], 'ARRAY', "output should be an array of arrays");
-    check_graph (<@$chart);
+    check_graph (<$chart->@);
 };
 
 do {
@@ -450,7 +450,7 @@ do {
     # Some of these will go bang if the preceding test fails. There will be
     # a big clue as to why, from the previous test's diagnostic
     is (ref $chart->[0], 'ARRAY', "output should be an array of arrays");
-    check_graph (<@$chart);
+    check_graph (<$chart->@);
 };
 
 ###}my $out = tie *OUT, 'TieOut'; my ($got); ###
@@ -458,7 +458,7 @@ do {
 do {
     my $debug = "";
     open my $debug_fh, '>>', \$debug or die;
-    local $^STDERR = *$debug_fh{IO};
+    local $^STDERR = $debug_fh->*{IO};
 
     $bar = 0;
     isa_ok(timeit(5, '++$main::bar'), 'Benchmark', "timeit eval");

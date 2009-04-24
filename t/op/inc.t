@@ -84,7 +84,7 @@ ok (!defined($a--), "postdec undef returns undef");
 
 sub check_same($orig, $suspect) {
     my $fail;
-    while (my @(?$key, ?$value) =@( each %$suspect)) {
+    while (my @(?$key, ?$value) =@( each $suspect->%)) {
         if (exists $orig->{$key}) {
             if ($orig->{?$key} ne $value) {
                 print $^STDOUT, "# key '$key' was '$orig->{?$key}' now '$value'\n";
@@ -95,7 +95,7 @@ sub check_same($orig, $suspect) {
             $fail = 1;
         }
     }
-    foreach (keys %$orig) {
+    foreach (keys $orig->%) {
         next if (exists $suspect->{$_});
         print $^STDOUT, "# key '$_' was '$orig->{?$_}' now missing\n";
         $fail = 1;
@@ -217,7 +217,7 @@ EOC
         }
     } else {
         unless (ok (scalar nelems @warnings == 0)) {
-            print $^STDERR, "# $(join ' ',@$_)" foreach  @warnings;
+            print $^STDERR, "# $(join ' ',$_->@)" foreach  @warnings;
         }
     }
 }
@@ -248,10 +248,10 @@ for my $n (47..113) {
 
     foreach my $warn (@(0, 1)) {
         foreach (@(\@('++$i', 'pre-inc'), \@('$i++', 'post-inc'))) {
-            check_some_code($start_p, $warn, < @$_);
+            check_some_code($start_p, $warn, < $_->@);
         }
         foreach (@(\@('--$i', 'pre-dec'), \@('$i--', 'post-dec'))) {
-            check_some_code($start_n, $warn, < @$_);
+            check_some_code($start_n, $warn, < $_->@);
         }
     }
 

@@ -343,7 +343,7 @@ BEGIN
         \@( ''        => 255,  'Unknown OS'                   ),
         );
 
-    %OSnames = %( < @+: map { @: @$_[1] => @$_[2] },
+    %OSnames = %( < @+: map { @: $_->@[1] => $_->@[2] },
             @GZIP_OS_Names ) ;
 }
 
@@ -355,7 +355,7 @@ sub getOSCode
 
     for my $h ( @GZIP_OS_Names)
     {
-        my @($pattern, $code, $name) =  @$h;
+        my @($pattern, $code, $name) =  $h->@;
 
         return $code
             if $pattern && $uname eq $pattern ;

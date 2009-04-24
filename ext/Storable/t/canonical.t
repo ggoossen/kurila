@@ -70,7 +70,7 @@ for my $i (0 .. $hashsize -1) {
         my $arr_ref = \@();
         my $arraysize = int(rand($maxarraysize));
         while ($arraysize--) {
-            push(@$arr_ref, @fixed_strings[rand(int(nelems @fixed_strings))]);
+            push($arr_ref->@, @fixed_strings[rand(int(nelems @fixed_strings))]);
         }
         %a1{$k}->{+value} = $arr_ref;
     }	
@@ -127,11 +127,11 @@ ok 5, ($x1 ne $x2) || ($x1 ne $x3);
 # Same test as in t/dclone.t to ensure the "canonical" code is also correct
 
 my $hash;
-push %$hash{+''}->@, \%$hash{+a};
-ok 6, %$hash{''}->[0] \== \%$hash{+a};
+push $hash->%{+''}->@, \$hash->%{+a};
+ok 6, $hash->%{''}->[0] \== \$hash->%{+a};
 
 my $cloned = dclone(dclone($hash));
-ok 7, %$cloned{''}->[0] \== \%$cloned{+a};
+ok 7, $cloned->%{''}->[0] \== \$cloned->%{+a};
 
-%$cloned{+a} = "blah";
-ok 8, %$cloned{''}->[0] \== \%$cloned{+a};
+$cloned->%{+a} = "blah";
+ok 8, $cloned->%{''}->[0] \== \$cloned->%{+a};

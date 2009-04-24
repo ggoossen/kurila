@@ -96,7 +96,7 @@ sub new {
     for my $tuple (@(\@(inc_override => INC => \$($^INCLUDE_PATH) ),
                      \@( extra_libs => EXTRA => \@() ))) 
     {
-        my @($arg,$key,$val)= @$tuple;
+        my @($arg,$key,$val)= $tuple->@;
         if ( %args{?$arg} ) {
             try {
                 $self->{':private:'}->{+$key} = \ %args{$arg}->@;
@@ -187,7 +187,7 @@ sub _module_name($file, $orig_module) {
 
     my $module = '';
     if (open my $packfh, "<", $file) {
-        while ( ~< *$packfh) {
+        while ( ~< $packfh->*) {
             if (m/package\s+(\S+)\s*;/) {
                 my $pack = $1;
                 # Make a sanity check, that lower case $module
@@ -213,7 +213,7 @@ sub _module_name($file, $orig_module) {
 sub modules($self) {
 
     # Bug/feature of sort in scalar context requires this.
-    return sort grep { not m/^:private:$/ }, keys %$self;
+    return sort grep { not m/^:private:$/ }, keys $self->%;
 }
 
 sub files($self, $module, ?$type, @< @under) {

@@ -76,7 +76,7 @@ sub survey($self, @< @search_dirs) {
                 );
             $modname_prefix = \ grep { length($_) }, split m{[:/\\]}, $self->{?'dir_prefix'};
             $verbose and print $^STDOUT, "Appending \"$self->{?'dir_prefix'}\" to $try, ",
-                "giving $start_in (= $(join ' ',@$modname_prefix))\n";
+                "giving $start_in (= $(join ' ',$modname_prefix->@))\n";
         } else {
             $start_in = $try;
         }
@@ -112,7 +112,7 @@ sub survey($self, @< @search_dirs) {
         }
     }
     $self->progress and $self->progress->done(
-        "Noted %$self{?'_scan_count'} Pod files total");
+        "Noted $self->%{?'_scan_count'} Pod files total");
 
     return $self->name2path;
 }
@@ -182,7 +182,7 @@ sub _make_search_callback {
             if( !$shadows and $name2path->{?$name} ) {
                 $verbose and print $^STDOUT, "Not worth considering $file ",
                     "-- already saw $name as ",
-                    join(' ', grep( {$path2name->{?$_} eq $name }, keys %$path2name)), "\n";
+                    join(' ', grep( {$path2name->{?$_} eq $name }, keys $path2name->%)), "\n";
                 return;
             }
 
@@ -201,7 +201,7 @@ sub _make_search_callback {
                 $verbose and print $^STDOUT,
                     "Duplicate POD found (shadowing?): $name ($file)\n",
                     "    Already seen in ",
-                    join(' ', grep( {$path2name->{?$_} eq $name }, keys %$path2name)), "\n";
+                    join(' ', grep( {$path2name->{?$_} eq $name }, keys $path2name->%)), "\n";
             } else {
                 $name2path->{+$name} = $file; # Noting just the first occurrence
             }
@@ -226,7 +226,7 @@ sub _path2modname($self, $file, $shortname, $modname_bits) {
     # * remove pod/ if followed by perl*.pod (e.g. in pod/perlfunc.pod)
     # * dig into the file for case-preserved name if not already mixed case
 
-    my @m = @$modname_bits;
+    my @m = $modname_bits->@;
     my $x;
     my $verbose = $self->verbose;
 
@@ -293,8 +293,8 @@ sub _recurse_dir {
     my $recursor;
     $recursor = sub {
             my@($dir_long, $dir_bare) =  @_;
-            if( (nelems @$modname_bits) +>= 10 ) {
-                $verbose and print $^STDOUT, "Too deep! [$(join ' ',@$modname_bits)]\n";
+            if( (nelems $modname_bits->@) +>= 10 ) {
+                $verbose and print $^STDOUT, "Too deep! [$(join ' ',$modname_bits->@)]\n";
                 return;
             }
 
@@ -311,7 +311,7 @@ sub _recurse_dir {
             my @items = sort @( readdir($indir));
             closedir($indir);
 
-            push @$modname_bits, $dir_bare unless $dir_bare eq '';
+            push $modname_bits->@, $dir_bare unless $dir_bare eq '';
 
             my $i_full;
             foreach my $i ( @items) {
@@ -340,7 +340,7 @@ sub _recurse_dir {
                     $verbose +> 1 and print $^STDOUT, "Skipping oddity $i_full\n";
                 }
             }
-            pop @$modname_bits;
+            pop $modname_bits->@;
             return;
         };;
 
@@ -451,11 +451,11 @@ sub _expand_inc($self, $search_dirs) {
     return unless $self->{?'inc'};
 
     if ($^OS_NAME eq 'MacOS') {
-        push @$search_dirs,
+        push $search_dirs->@,
             < grep { $_ ne File::Spec->curdir }, $self->_mac_whammy(< $^INCLUDE_PATH);
     # Any other OSs need custom handling here?
     } else {
-        push @$search_dirs, < grep { $_ ne File::Spec->curdir }, $^INCLUDE_PATH;
+        push $search_dirs->@, < grep { $_ ne File::Spec->curdir }, $^INCLUDE_PATH;
     }
 
     $self->{+'laborious'} = 0;   # Since inc said to use INC
@@ -633,7 +633,7 @@ sub _state_as_string {
     my $self = @_[0];
     return '' unless ref $self;
     my @out = @( "\{\n  # State of $(dump::view($self)) ...\n" );
-    foreach my $k (sort keys %$self) {
+    foreach my $k (sort keys $self->%) {
         push @out, "  $(dump::view($k)) => $(dump::view($self->{?$k}))\n";
     }
     push @out, "\}\n";

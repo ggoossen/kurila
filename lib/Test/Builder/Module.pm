@@ -100,7 +100,7 @@ sub _strip_imports {
     my @imports = @( () );
     my @other   = @( () );
     my $idx = 0;
-    while( $idx +<= (nelems @$list) -1 ) {
+    while( $idx +<= (nelems $list->@) -1 ) {
         my $item = $list->[$idx];
 
         if( defined $item and $item eq 'import' ) {
@@ -114,7 +114,7 @@ sub _strip_imports {
         $idx++;
     }
 
-    @$list = @other;
+    $list->@ = @other;
 
     return @imports;
 }

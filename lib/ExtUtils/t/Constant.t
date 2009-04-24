@@ -159,7 +159,7 @@ sub build_and_run($tests, $expect, $files) {
 
     if (open my $outputfh, "<", "$output") {
         local $^INPUT_RECORD_SEPARATOR = undef; # Slurp it - faster.
-        print $^STDOUT, ~< *$outputfh;
+        print $^STDOUT, ~< $outputfh->*;
         close $outputfh or print $^STDOUT, "# Close $output failed: $^OS_ERROR\n";
     } else {
         # Harness will report missing test results at this point.
@@ -201,7 +201,7 @@ sub build_and_run($tests, $expect, $files) {
         pass;
     }
 
-    check_for_bonus_files ('.', < @$files, $output, $makefile_rename, '.', '..');
+    check_for_bonus_files ('.', < $files->@, $output, $makefile_rename, '.', '..');
 
     rename $makefile_rename, $makefile . $makefile_ext
         or die "Can't rename '$makefile_rename' to '$makefile$makefile_ext': $^OS_ERROR";
@@ -219,10 +219,10 @@ sub build_and_run($tests, $expect, $files) {
         pass;
     }
 
-    check_for_bonus_files ('.', < @$files, '.', '..');
+    check_for_bonus_files ('.', < $files->@, '.', '..');
 
     unless ($keep_files) {
-        foreach ( @$files) {
+        foreach ( $files->@) {
             unlink $_ or warn "unlink $_: $^OS_ERROR";
         }
     }
@@ -277,7 +277,7 @@ $wc_args) {
             NAME => $package,
             NAMES => $items,
             PROXYSUBS => 1,
-            < @$wc_args,
+            < $wc_args->@,
             );
 
         my $C_code = $c;
@@ -345,7 +345,7 @@ EOT
         print $fh, "\@EXPORT_OK = qw(\n";
 
         # Print the names of all our autoloaded constants
-        print $fh, "\t$_\n" foreach @( (< @$export_names));
+        print $fh, "\t$_\n" foreach @( (< $export_names->@));
         print $fh, ");\n";
         print $fh, "$package->bootstrap(\$VERSION);\n1;\n__END__\n";
         close $fh or die "close $pm: $^OS_ERROR\n";
@@ -356,7 +356,7 @@ EOT
         open $fh, ">", "$testpl" or die "open >$testpl: $^OS_ERROR\n";
         # Standard test header (need an option to suppress this?)
         print $fh, <<"EOT" or die $^OS_ERROR;
-use $package < qw($(join ' ',@$export_names));
+use $package < qw($(join ' ',$export_names->@));
 
 print \$^STDOUT, "1..1\n";
 print \$^STDOUT, "ok 1\n";
@@ -755,7 +755,7 @@ simple ("Twos and three middle", < qw(aa ae ai ea eu ie io oe era eta));
 # Given the choice go for the end, else the earliest point
 simple ("Three end and four symetry", < qw(ean ear eat barb marm tart));
 
-write_and_run_extension < @$_ foreach  @tests;
+write_and_run_extension < $_->@ foreach  @tests;
 
 # This was causing an assertion failure (a C<confess>ion)
 # Any single byte > 128 should do it.

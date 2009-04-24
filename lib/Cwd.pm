@@ -730,7 +730,7 @@ sub _qnx_abs_path {
     my $rpfh;
     defined( open($rpfh, "-|", '-') || exec '/usr/bin/fullpath', '-t', $path ) or
         die "Can't open /usr/bin/fullpath: $^OS_ERROR";
-    my $realpath = ~< *$rpfh;
+    my $realpath = ~< $rpfh->*;
     close $rpfh;
     chomp $realpath;
     return $realpath;

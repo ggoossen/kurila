@@ -161,14 +161,14 @@ sub _batch_convert_main($self, $dirs, $outdir) {
     }
 
     if($dirs) {
-        $self->muse(scalar(nelems @$dirs), " dirs to scan: $(join ' ',@$dirs)");
+        $self->muse(scalar(nelems $dirs->@), " dirs to scan: $(join ' ',$dirs->@)");
     } else {
         $self->muse("Scanning \$^INCLUDE_PATH.  This could take a minute or two.");
     }
     my $mod2path = $self->find_all_pods($dirs ?? $dirs !! ());
     $self->muse("Done scanning.");
 
-    my $total = nkeys %$mod2path;
+    my $total = nkeys $mod2path->%;
     unless($total) {
         $self->muse("No pod found.  Aborting batch conversion.\n");
         return $self;
@@ -195,7 +195,7 @@ sub _batch_convert_main($self, $dirs, $outdir) {
 sub _do_all_batch_conversions($self, $mod2path, $outdir) {
     $self->{+"__batch_conv_page_count"} = 0;
 
-    foreach my $module (sort {lc($a) cmp lc($b)}, keys %$mod2path) {
+    foreach my $module (sort {lc($a) cmp lc($b)}, keys $mod2path->%) {
         $self->_do_one_batch_conversion($module, $mod2path, $outdir);
         sleep($SLEEPY - 1) if $SLEEPY;
     }
@@ -205,7 +205,7 @@ sub _do_all_batch_conversions($self, $mod2path, $outdir) {
 
 sub _batch_convert_finish($self, $outdir) {
     $self->write_contents_file($outdir);
-    $self->muse("Done with batch conversion.  %$self{?'__batch_conv_page_count'} files done.");
+    $self->muse("Done with batch conversion.  $self->%{?'__batch_conv_page_count'} files done.");
     $self->muse( "= ", scalar(localtime) );
     $self->progress and $self->progress->done("All done!");
     return;
@@ -216,7 +216,7 @@ sub _batch_convert_finish($self, $outdir) {
 sub _do_one_batch_conversion($self, $module, $mod2path, $outdir, ?$outfile) {
 
     my $retval;
-    my $total    = nkeys %$mod2path;
+    my $total    = nkeys $mod2path->%;
     my $infile   = $mod2path->{?$module};
     my @namelets = grep { m/\S/ }, split "::", $module;
     # this can stick around in the contents LoL
@@ -284,11 +284,11 @@ sub note_for_contents_file($self, $namelets, $infile, $outfile) {
 
     if( $self->contents_file ) {
         my $c = $self->_contents();
-        push @$c,
-            \@( join("::", @$namelets), $infile, $outfile, $namelets )
+        push $c->@,
+            \@( join("::", $namelets->@), $infile, $outfile, $namelets )
         #            0               1         2         3
         ;
-            DEBUG +> 3 and print $^STDOUT, "Noting  <@$c[[@(-1)]]\n";
+            DEBUG +> 3 and print $^STDOUT, "Noting  <$c->@[[@(-1)]]\n";
     }
     return;
 }
@@ -347,7 +347,7 @@ sub _write_contents_start($self, $Contents, $outfile) {
 
 sub _write_contents_middle($self, $Contents, $outfile, $toplevel2submodules, $toplevel_form_freq) {
 
-    foreach my $t (sort keys %$toplevel2submodules) {
+    foreach my $t (sort keys $toplevel2submodules->%) {
         my @downlines = sort {$a->[-1] cmp $b->[-1]},
              $toplevel2submodules->{?$t}->@;
 
@@ -388,7 +388,7 @@ sub _prep_contents_breakdown($self) {
     my %toplevel_form_freq; # ends up being  'foo' => 'Foo'
     # (mapping anycase forms to most freq form)
 
-    foreach my $entry ( @$contents) {
+    foreach my $entry ( $contents->@) {
         my $toplevel = 
             $entry->[0] =~ m/^perl\w*$/ ?? 'perl_core_docs'
             # group all the perlwhatever docs together
@@ -396,7 +396,7 @@ sub _prep_contents_breakdown($self) {
         ;
             ++%toplevel_form_freq{ + lc $toplevel }->{+$toplevel };
         push  %toplevel{ + lc $toplevel }->@, $entry;
-        push @$entry, lc($entry->[0]); # add a sort-order key to the end
+        push $entry->@, lc($entry->[0]); # add a sort-order key to the end
     }
 
     foreach my $toplevel (sort keys %toplevel) {
@@ -404,7 +404,7 @@ sub _prep_contents_breakdown($self) {
         %toplevel_form_freq{+$toplevel} =
         (
       sort { $fgroup->{?$b} <+> $fgroup->{?$a}  or  $a cmp $b },
-      keys %$fgroup
+      keys $fgroup->%
       # This hash is extremely unlikely to have more than 4 members, so this
       # sort isn't so very wasteful
       )[0];
@@ -424,9 +424,9 @@ sub _contents_filespec($self, $outdir) {
 #_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
 sub makepath($self, $outdir, $namelets) {
-    return unless (nelems @$namelets) +> 1;
-    for my $i (0 .. ((nelems @$namelets) - 2)) {
-        my $dir = $self->filespecsys->catdir( $outdir, < @$namelets[[0 .. $i]] );
+    return unless (nelems $namelets->@) +> 1;
+    for my $i (0 .. ((nelems $namelets->@) - 2)) {
+        my $dir = $self->filespecsys->catdir( $outdir, < $namelets->@[[0 .. $i]] );
         if(-e $dir) {
             die "$dir exists but not as a directory!?" unless -d $dir;
             next;
@@ -515,22 +515,22 @@ sub modnames2paths($self, $dirs) {
         $search->progress( < $self->progress->copy->goal(0) ) if $self->progress;
         $search->shadows(0);  # don't bother noting shadowed files
         $search->inc(     $dirs ?? 0      !!  1 );
-        $search->survey(  $dirs ?? < @$dirs !! () );
+        $search->survey(  $dirs ?? < $dirs->@ !! () );
         $m2p = $search->name2path;
         die "What, no name2path?!" unless $m2p;
     };
 
-    $self->muse("That's odd... no modules found!") unless %$m2p;
+    $self->muse("That's odd... no modules found!") unless $m2p->%;
     if( DEBUG +> 4 ) {
         print $^STDOUT, "Modules found (name => path):\n";
-        foreach my $m (sort {lc($a) cmp lc($b)}, keys %$m2p) {
-            print $^STDOUT, "  $m  %$m2p{?$m}\n";
+        foreach my $m (sort {lc($a) cmp lc($b)}, keys $m2p->%) {
+            print $^STDOUT, "  $m  $m2p->%{?$m}\n";
         }
-        print $^STDOUT, "(total ",     nkeys %$m2p, ")\n\n";
+        print $^STDOUT, "(total ",     nkeys $m2p->%, ")\n\n";
     } elsif( DEBUG ) {
-        print $^STDOUT,      "Found ", nkeys %$m2p, " modules.\n";
+        print $^STDOUT,      "Found ", nkeys $m2p->%, " modules.\n";
     }
-    $self->muse( "Found ", nkeys %$m2p, " modules." );
+    $self->muse( "Found ", nkeys $m2p->%, " modules." );
 
     # return the Foo::Bar => /whatever/Foo/Bar.pod|pm hashref
     return $m2p;
@@ -576,14 +576,14 @@ sub _spray_css($self, $outdir) {
     $self->_gen_css_wad();
 
     my $lol = $self->_css_wad;
-    foreach my $chunk ( @$lol) {
+    foreach my $chunk ( $lol->@) {
         my $url = $chunk->[0];
         my $outfile;
         if( ref($chunk->[-1]) and $url =~ m{^(_[-a-z0-9_]+\.css$)} ) {
             $outfile = $self->filespecsys->catfile( $outdir, $1 );
-            DEBUG +> 5 and print $^STDOUT, "Noting @$chunk[0] as a file I'll create.\n";
+            DEBUG +> 5 and print $^STDOUT, "Noting $chunk->@[0] as a file I'll create.\n";
         } else {
-            DEBUG +> 5 and print $^STDOUT, "OK, noting @$chunk[0] as an external CSS.\n";
+            DEBUG +> 5 and print $^STDOUT, "OK, noting $chunk->@[0] as an external CSS.\n";
             # Requires no further attention.
             next;
         }
@@ -613,11 +613,11 @@ sub _css_wad_to_markup($self, $depth) {
     my $uplink = $depth ?? ('../' x $depth) !! '';
 
     foreach my $chunk ( @css) {
-        next unless $chunk and nelems @$chunk;
+        next unless $chunk and nelems $chunk->@;
 
         my@( $url1, $url2, $title, $type, $media) = @(
       $self->_maybe_uplink( $chunk->[0], $uplink ),
-      < map { esc($_) }, @( (< grep { !ref($_) }, @$chunk))
+      < map { esc($_) }, @( (< grep { !ref($_) }, $chunk->@))
             );
 
         $out .= qq{<link rel="$rel" title="$title" type="$type" href="$url1$url2" media="$media" >\n};
@@ -734,15 +734,15 @@ sub _spray_javascript($self, $outdir) {
     $self->_gen_javascript_wad();
 
     my $lol = $self->_javascript_wad;
-    foreach my $script ( @$lol) {
+    foreach my $script ( $lol->@) {
         my $url = $script->[0];
         my $outfile;
 
         if( ref($script->[-1]) and $url =~ m{^(_[-a-z0-9_]+\.js$)} ) {
             $outfile = $self->filespecsys->catfile( $outdir, $1 );
-            DEBUG +> 5 and print $^STDOUT, "Noting @$script[0] as a file I'll create.\n";
+            DEBUG +> 5 and print $^STDOUT, "Noting $script->@[0] as a file I'll create.\n";
         } else {
-            DEBUG +> 5 and print $^STDOUT, "OK, noting @$script[0] as an external JavaScript.\n";
+            DEBUG +> 5 and print $^STDOUT, "OK, noting $script->@[0] as an external JavaScript.\n";
             next;
         }
 
@@ -776,11 +776,11 @@ sub _javascript_wad_to_markup($self, $depth) {
     my $uplink = $depth ?? ('../' x $depth) !! '';
 
     foreach my $s ( @scripts) {
-        next unless $s and nelems @$s;
+        next unless $s and nelems $s->@;
 
         my@( $url1, $url2, $type, ?$media) = @(
       $self->_maybe_uplink( $s->[0], $uplink ),
-      < map { esc($_) }, @( (< grep { !ref($_) }, @$s))
+      < map { esc($_) }, @( (< grep { !ref($_) }, $s->@))
             );
 
         $out .= qq{<script type="$type" src="$url1$url2"></script>\n};

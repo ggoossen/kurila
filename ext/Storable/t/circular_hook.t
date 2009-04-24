@@ -28,7 +28,7 @@ my $thawed = Storable::thaw( $string );
 # is_deeply infinite loops in ciculars, so do it manually
 # is_deeply( $array, $thawed, 'Circular hooked objects work' );
 is( ref($thawed), 'ARRAY', 'Top level ARRAY' );
-is( scalar(nelems @$thawed), 1, 'ARRAY contains one element' );
+is( scalar(nelems $thawed->@), 1, 'ARRAY contains one element' );
 isa_ok( $thawed->[0], 'Foo' );
 is( nkeys($thawed->[0]->%), 1, 'Foo contains one element' );
 isa_ok( $thawed->[0]->{?Foo}, 'Bar' );

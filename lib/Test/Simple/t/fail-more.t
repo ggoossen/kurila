@@ -35,8 +35,8 @@ sub is {
 }
 
 sub main::err_ok($expect) {
-    my $got = $$err;
-    $$err = "";
+    my $got = $err->$;
+    $err->$ = "";
 
     return $TB->is_eq( $got, $expect );
 }
@@ -238,8 +238,8 @@ my $more_err_re = <<ERR;
 #     Error:  Can't locate Hooble.* in \\\$\\\^INCLUDE_PATH .*
 ERR
 
-My::Test::like($$err, "/^$more_err_re/");
-$$err = "";
+My::Test::like($err->$, "/^$more_err_re/");
+$err->$ = "";
 
 
 #line 85
@@ -251,13 +251,13 @@ $more_err_re = <<ERR;
 #     Error:  Can't locate ALL.* in \\\$\\\^INCLUDE_PATH .*
 ERR
 
-My::Test::like($$err, "/^$more_err_re/");
-$$err = "";
+My::Test::like($err->$, "/^$more_err_re/");
+$err->$ = "";
 
 
 #line 88
 END {
-    $TB->is_eq($$out, <<OUT, 'failing output');
+    $TB->is_eq($out->$, <<OUT, 'failing output');
 1..$Total
 not ok - failing
 not ok - foo is bar?

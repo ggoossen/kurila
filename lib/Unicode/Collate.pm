@@ -590,7 +590,7 @@ sub getWt
         my $hang = $self->{?overrideHangul};
         my @hangulCE;
         if ($hang) {
-            @hangulCE = map( {pack(VCE_TEMPLATE, < NON_VAR, < @$_) }, &$hang($u));
+            @hangulCE = map( {pack(VCE_TEMPLATE, < NON_VAR, < $_->@) }, &$hang($u));
         }
         elsif (!defined $hang) {
             @hangulCE = $der->($u);
@@ -630,7 +630,7 @@ sub getWt
         my $cjk  = $self->{?overrideCJK};
         return map { _varCE($vbl, $_) },
             @(	    $cjk
-            ?? < map( {pack(VCE_TEMPLATE, NON_VAR, < @$_) }, &$cjk($u))
+            ?? < map( {pack(VCE_TEMPLATE, NON_VAR, < $_->@) }, &$cjk($u))
             !! defined $cjk && $self->{?UCA_Version} +<= 8 && $u +< 0x10000
             ?? _uideoCE_8($u)
         !! < $der->($u));
@@ -655,7 +655,7 @@ sub getSortKey
     my @buf; # weight arrays
     if ($self->{?hangul_terminator}) {
         my $preHST = '';
-        foreach my $jcps ( @$rEnt) {
+        foreach my $jcps ( $rEnt->@) {
             # weird things like VL, TL-contraction are not considered!
             my $curHST = '';
             foreach my $u (split m/;/, $jcps) {
@@ -676,7 +676,7 @@ sub getSortKey
             and push @buf, $self->getWtHangulTerm();
     }
     else {
-        foreach my $jcps ( @$rEnt) {
+        foreach my $jcps ( $rEnt->@) {
             push @buf, < $self->getWt($jcps);
         }
     }
@@ -729,7 +729,7 @@ sub getSortKey
         }
     }
 
-    return join LEVEL_SEP, map { pack(KEY_TEMPLATE, < @$_) }, @ret;
+    return join LEVEL_SEP, map { pack(KEY_TEMPLATE, < $_->@) }, @ret;
 }
 
 
@@ -881,7 +881,7 @@ sub _nonIgnorAtLevel($wt, $lv)
 ##
 sub _eqArray($source, $substr, $lev)
 {
-    for my $g (0..(nelems @$substr)-1){
+    for my $g (0..(nelems $substr->@)-1){
         # Do the $g'th graphemes have the same number of AV weigths?
         return if (nelems  $source->[$g]->@) != nelems  $substr->[$g]->@;
 
@@ -915,7 +915,7 @@ sub index
     my $v2i  = $self->{?UCA_Version} +>= 9 &&
         $self->{?variable} ne 'non-ignorable';
 
-    if (! nelems @$subE) {
+    if (! nelems $subE->@) {
         my $temp = $pos +<= 0 ?? 0 !! $len +<= $pos ?? $len !! $pos;
         return $grob
             ?? map( {\@($_, 0) }, $temp..$len)
@@ -924,13 +924,13 @@ sub index
     $len +< $pos
         and return @();
     my $strE = $self->splitEnt($pos ?? substr($str, $pos) !! $str, TRUE);
-    (nelems @$strE)
+    (nelems $strE->@)
         or return @();
 
     my(@strWt, @iniPos, @finPos, @subWt, @g_ret);
 
     my $last_is_variable;
-    for my $vwt ( @+: map { $self->getWt($_) }, @$subE) {
+    for my $vwt ( @+: map { $self->getWt($_) }, $subE->@) {
         my @($var, @< @wt) = @: unpack(VCE_TEMPLATE, $vwt);
         my $to_be_pushed = _nonIgnorAtLevel(\@wt,$lev);
 
@@ -955,7 +955,7 @@ sub index
     }
 
     my $count = 0;
-    my $end = (nelems @$strE) - 1;
+    my $end = (nelems $strE->@) - 1;
 
     $last_is_variable = FALSE; # reuse
     my $i = 0;

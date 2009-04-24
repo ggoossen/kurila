@@ -103,7 +103,7 @@ sub bless($class) {
 
 # Dump single scalar
 sub dump_scalar($sref) {
-    my $scalar = $$sref;
+    my $scalar = $sref->$;
     unless (defined $scalar) {
         $dumped .= "UNDEF\n";
         return;
@@ -144,7 +144,7 @@ sub dump_hash($href) {
 
 # Dump reference to reference
 sub dump_ref($rref) {
-    my $deref = $$rref;				# Follow reference to reference
+    my $deref = $rref->$;				# Follow reference to reference
     $dumped .= 'REF ';
     &recursive_dump($deref, 1);		# $dref is a reference
 }

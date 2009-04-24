@@ -57,7 +57,7 @@ is($iv_ref->REFCNT, 1, "Test B::IV->REFCNT");
 #diag $iv_ref->FLAGS();
 my $iv_ret = $iv_ref->object_2svref();
 is(ref $iv_ret, "SCALAR", "Test object_2svref() return is SCALAR");
-is($$iv_ret, $iv, "Test object_2svref()");
+is($iv_ret->$, $iv, "Test object_2svref()");
 is($iv_ref->int_value, $iv, "Test int_value()");
 is($iv_ref->IV, $iv, "Test IV()");
 is($iv_ref->IVX(), $iv, "Test IVX()");
@@ -71,7 +71,7 @@ is($pv_ref->REFCNT, 1, "Test B::PV->REFCNT");
 #diag $pv_ref->FLAGS();
 my $pv_ret = $pv_ref->object_2svref();
 is(ref $pv_ret, "SCALAR", "Test object_2svref() return is SCALAR");
-is($$pv_ret, $pv, "Test object_2svref()");
+is($pv_ret->$, $pv, "Test object_2svref()");
 is($pv_ref->PV(), $pv, "Test PV()");
 try { is($pv_ref->RV(), $pv, "Test RV()"); };
 ok($^EVAL_ERROR, "Test RV()");
@@ -85,7 +85,7 @@ is($nv_ref->REFCNT, 1, "Test B::NV->REFCNT");
 #diag $nv_ref->FLAGS();
 my $nv_ret = $nv_ref->object_2svref();
 is(ref $nv_ret, "SCALAR", "Test object_2svref() return is SCALAR");
-is($$nv_ret, $nv, "Test object_2svref()");
+is($nv_ret->$, $nv, "Test object_2svref()");
 is($nv_ref->NV, $nv, "Test NV()");
 is($nv_ref->NVX(), $nv, "Test NVX()");
 
@@ -97,7 +97,7 @@ is($null_ref->REFCNT, 1, "Test B::NULL->REFCNT");
 #diag $null_ref->FLAGS();
 my $null_ret = $nv_ref->object_2svref();
 is(ref $null_ret, "SCALAR", "Test object_2svref() return is SCALAR");
-is($$null_ret, $nv, "Test object_2svref()");
+is($null_ret->$, $nv, "Test object_2svref()");
 
 my $RV_class = 'B::IV';
 my $cv = sub{ 1; };
@@ -107,7 +107,7 @@ is(ref $cv_ref, "$RV_class",
    "Test $RV_class return from svref_2object - code");
 my $cv_ret = $cv_ref->object_2svref();
 is(ref $cv_ret, "REF", "Test object_2svref() return is REF");
-is($$cv_ret, $cv, "Test object_2svref()");
+is($cv_ret->$, $cv, "Test object_2svref()");
 
 my $av = \@();
 my $av_ref = B::svref_2object(\$av);

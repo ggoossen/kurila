@@ -124,7 +124,7 @@ while ($Decomp =~ m/(.+)/g) {
     my $ini = hex(@tab[0]); # initial decomposable character
 
     my $listname =
-        (nelems @$dec) == 2 ?? sprintf("$($structname)_\%06x", $dec->[0]) !! 'USELESS';
+        (nelems $dec->@) == 2 ?? sprintf("$($structname)_\%06x", $dec->[0]) !! 'USELESS';
     # %04x is bad since it'd place _3046 after _1d157.
 
     if (@tab[1] eq '') {
@@ -133,7 +133,7 @@ while ($Decomp =~ m/(.+)/g) {
         if (! $compat) {
             %Canon{+$ini } = $dec;
 
-            if ((nelems @$dec) == 2) {
+            if ((nelems $dec->@) == 2) {
                 if (%Combin{?$dec->[0] }) {
                     %NonStD{+$ini } = 1;
                 } else {
@@ -141,7 +141,7 @@ while ($Decomp =~ m/(.+)/g) {
                     %Comp1st{+$dec->[0] } = $listname;
                     %Comp2nd{+$dec->[1] } = 1 if ! %Exclus{?$ini};
                 }
-            } elsif ((nelems @$dec) == 1) {
+            } elsif ((nelems $dec->@) == 1) {
                 %Single{+$ini } = 1;
             } else {
                 die("Weird Canonical Decomposition of U+@tab[0]");
@@ -154,7 +154,7 @@ while ($Decomp =~ m/(.+)/g) {
             if (! $compat) {
                 %Canon{+$u } = $dec;
 
-                if ((nelems @$dec) == 2) {
+                if ((nelems $dec->@) == 2) {
                     if (%Combin{?$dec->[0] }) {
                         %NonStD{+$u } = 1;
                     } else {
@@ -162,7 +162,7 @@ while ($Decomp =~ m/(.+)/g) {
                         %Comp1st{+$dec->[0] } = $listname;
                         %Comp2nd{+$dec->[1] } = 1 if ! %Exclus{?$u};
                     }
-                } elsif ((nelems @$dec) == 1) {
+                } elsif ((nelems $dec->@) == 1) {
                     %Single{+$u } = 1;
                 } else {
                     die("Weird Canonical Decomposition of U+@tab[0]");
@@ -227,7 +227,7 @@ sub _U_stringify {
 }
 
 foreach my $hash (@(\%Canon, \%Compat)) {
-    foreach my $key (keys %$hash) {
+    foreach my $key (keys $hash->%) {
         $hash->{+$key} = _U_stringify( <  $hash->{$key}->@ );
     }
 }
@@ -358,7 +358,7 @@ EOF
 
     print $fh, $init if defined $init;
 
-    foreach my $uv (keys %$hash) {
+    foreach my $uv (keys $hash->%) {
         die sprintf("a Unicode code point 0x\%04X over 0x10FFFF.", $uv)
             unless $uv +<= 0x10FFFF;
         my @c = @( unpack 'CCCC', pack 'N', $uv );

@@ -102,7 +102,7 @@ my %Special_Sigs = %(
 
 sub _verify_att($att) {
 
-    while( my @(?$key, ?$val) = @( each %$att) ) {
+    while( my @(?$key, ?$val) = @( each $att->%) ) {
         my $sig = %Att_Sigs{?$key};
         unless( defined $sig ) {
             warn "WARNING: $key is not a known parameter.\n";
@@ -352,7 +352,7 @@ sub new {
     my($key);
 
     # Store the original args passed to WriteMakefile()
-    foreach my $k (keys %$self) {
+    foreach my $k (keys $self->%) {
         $self->{+ARGS}{+$k} = $self->{?$k};
     }
 
@@ -379,7 +379,7 @@ sub new {
     check_hints($self);
 
     my %configure_att;         # record &{$self->{CONFIGURE}} attributes
-    my %initial_att  = %$self; # record initial attributes
+    my %initial_att  = $self->%; # record initial attributes
 
     my %unsatisfied = %();
     foreach my $prereq (sort keys($self->{?PREREQ_PM} || %())) {
@@ -423,7 +423,7 @@ END
     if (defined $self->{?CONFIGURE}) {
         if (ref $self->{?CONFIGURE} eq 'CODE') {
             %configure_att = %( <  $self->{?CONFIGURE}->( < @_ )->% );
-            $self = \%( < %$self, < %configure_att );
+            $self = \%( < $self->%, < %configure_att );
         } else {
             die "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n";
         }
@@ -730,7 +730,7 @@ sub parse_args($self, @< @args){
         $self->{+EXCLUDE_EXT} = \ grep { $_ }, split '\s+', $self->{?EXCLUDE_EXT};
     }
 
-    foreach my $mmkey (sort keys %$self){
+    foreach my $mmkey (sort keys $self->%){
         next if $mmkey eq 'ARGS';
         print $^STDOUT, "  $mmkey => ", < neatvalue($self->{?$mmkey}), "\n" if $Verbose;
         print $^STDOUT, "'$mmkey' is not a known MakeMaker parameter name.\n"
@@ -892,7 +892,7 @@ sub flush {
     my %keep = %( < @+: map { @($_ => 1) }, qw(NEEDS_LINKING HAS_LINK_CODE) );
 
     if ($self->{?PARENT} && !$self->{?_KEEP_AFTER_FLUSH}) {
-        foreach (keys %$self) { # safe memory
+        foreach (keys $self->%) { # safe memory
             delete $self->{$_} unless %keep{?$_};
         }
     }
@@ -946,7 +946,7 @@ sub selfdocument($self) {
     my(@m);
     if ($Verbose){
         push @m, "\n# Full list of MakeMaker attribute values:";
-        foreach my $key (sort keys %$self){
+        foreach my $key (sort keys $self->%){
             next if $key eq 'RESULT' || $key =~ m/^[A-Z][a-z]/;
             my@($v) =  neatvalue($self->{?$key});
             $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;

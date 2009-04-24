@@ -40,7 +40,7 @@ eval q{ like( "foo", qr/that/, 'is foo like that' ); };
 
 
 END {
-    $TB->is_eq($$out, <<OUT, 'failing output');
+    $TB->is_eq($out->$, <<OUT, 'failing output');
 1..1
 not ok 1 - is foo like that
 OUT
@@ -54,7 +54,7 @@ OUT
 ERR
 
 
-    $TB->like($$err, qr/^$err_re$/, 'failing errors');
+    $TB->like($err->$, qr/^$err_re$/, 'failing errors');
 
     exit(0);
 }

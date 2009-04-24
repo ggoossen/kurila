@@ -17,13 +17,13 @@ do {
 
     sub add {
         my $self = shift;
-        $$self .= join("", @_);
+        $self->$ .= join("", @_);
         return $self;
     }
 
     sub digest {
         my $self = shift;
-        return sprintf "\%04d", length($$self);
+        return sprintf "\%04d", length($self->$);
     }
 };
 

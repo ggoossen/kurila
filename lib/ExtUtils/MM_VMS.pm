@@ -155,7 +155,7 @@ sub find_perl($self, $ver, $names, $dirs, $trace) {
                 my@($absb) =  $self->file_name_is_absolute($b);
                 if ($absa && $absb) { return $a cmp $b }
                 else { return $absa ?? 1 !!  @($absb ?? -1 !!  @($a cmp $b)); }
-            }, @$dirs;
+            }, $dirs->@;
         # Check miniperl before perl, and check names likely to contain
         # version numbers before "generic" names, so we pick up an
         # executable that's less likely to be from an old installation.
@@ -167,11 +167,11 @@ sub find_perl($self, $ver, $names, $dirs, $trace) {
                 elsif ($bhasdir and not $ahasdir) { return -1; }
                 else { $bb =~ m/\d/ <+> $ba =~ m/\d/
                     or substr($ba,0,1) cmp substr($bb,0,1)
-                        or length($bb) <+> length($ba) } }, @$names;
+                        or length($bb) <+> length($ba) } }, $names->@;
     }
     else {
-        @sdirs  = @$dirs;
-        @snames = @$names;
+        @sdirs  = $dirs->@;
+        @snames = $names->@;
     }
 
     # Image names containing Perl version use '_' instead of '.' under VMS
@@ -231,7 +231,7 @@ sub find_perl($self, $ver, $names, $dirs, $trace) {
             return "MCR $vmsfile";
         }
     }
-    print $^STDOUT, "Unable to find a perl $ver (by these names: $(join ' ',@$names), in these dirs: $(join ' ',@$dirs))\n";
+    print $^STDOUT, "Unable to find a perl $ver (by these names: $(join ' ',$names->@), in these dirs: $(join ' ',$dirs->@))\n";
     0; # false and not empty
 }
 
@@ -403,7 +403,7 @@ sub init_main {
                 $def =~ s/"/""/g;  # Protect existing " from DCL
                 $def = qq["$def"]; # and quote to prevent parsing of =
             }
-            push @$targ, $def;
+            push $targ->@, $def;
         }
 
         $self->{+DEFINE} = '';
@@ -1422,7 +1422,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
                 my $skip = exists(%libseen{$_}) && !exists(%seenthis{$_});
                 %libseen{+$_}++;  %seenthis{+$_}++;
                 next if $skip;
-                push @$extra,$_;
+                push $extra->@,$_;
             }
         }
         # Get full name of extension for ExtUtils::Miniperl
@@ -1440,7 +1440,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
     # libraries in the final link, in order to maximize the opportunity
     # for XS code from multiple extensions to resolve symbols against the
     # same external library while only including that library once.
-    push @optlibs, < @$extra;
+    push @optlibs, < $extra->@;
 
     $target = "Perl%Config{?'exe_ext'}" unless $target;
     my $shrtarget;
@@ -1694,7 +1694,7 @@ sub oneliner($self, $cmd, $switches) {
     $cmd = $self->escape_newlines($cmd);
 
     # Switches must be quoted else they will be lowercased.
-    $switches = join ' ', map { qq{"$_"} }, @$switches;
+    $switches = join ' ', map { qq{"$_"} }, $switches->@;
 
     return qq{\$(ABSPERLRUN) $switches -e $cmd "--"};
 }

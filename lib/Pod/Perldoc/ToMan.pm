@@ -41,7 +41,7 @@ sub parse_from_file {
 
     # turn the switches into CLIs
     my $switches = join ' ', map { qq{"--$_=$self->{?$_}"} }, grep { !m/^_/s },
-        keys %$self
+        keys $self->%
     ;
 
         my $pod2man =
@@ -112,7 +112,7 @@ sub parse_from_file {
 
     } else {
         print $outfh, $rslt
-            or die "Can't print to %$self{?__output_file}: $^OS_ERROR";
+            or die "Can't print to $self->%{?__output_file}: $^OS_ERROR";
     }
 
     return;

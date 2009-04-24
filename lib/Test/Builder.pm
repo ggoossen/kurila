@@ -342,10 +342,10 @@ ERR
 
     unless( $test ) {
         $out .= "not ";
-            %$result{[@('ok', 'actual_ok') ]} = @( ( $todo ?? 1 !! 0 ), 0 );
+            $result->%{[@('ok', 'actual_ok') ]} = @( ( $todo ?? 1 !! 0 ), 0 );
     }
     else { 
-            %$result{[@('ok', 'actual_ok') ]} = @( 1, $test );
+            $result->%{[@('ok', 'actual_ok') ]} = @( 1, $test );
     }
 
     $out .= "ok";
@@ -1330,8 +1330,8 @@ sub current_test($self ?= $num) {
 
         # If the test counter is being pushed forward fill in the details.
         my $test_results = $self->{?Test_Results};
-        if( $num +> nelems @$test_results ) {
-            my $start = (nelems @$test_results) ?? (nelems @$test_results) !! 0;
+        if( $num +> nelems $test_results->@ ) {
+            my $start = (nelems $test_results->@) ?? (nelems $test_results->@) !! 0;
             for ($start..$num-1) {
                 $test_results->[+$_] = &share(\%(
                                                   'ok'      => 1, 
@@ -1343,7 +1343,7 @@ sub current_test($self ?= $num) {
             }
         }
         # If backward, wipe history.  Its their funeral.
-        elsif( $num +< nelems @$test_results ) {
+        elsif( $num +< nelems $test_results->@ ) {
             splice $test_results->@, $num;
         }
     }
@@ -1571,7 +1571,7 @@ sub _ending {
 
     # Figure out if we passed or failed and print helpful messages.
     my $test_results = $self->{?Test_Results};
-    if( (nelems @$test_results) ) {
+    if( (nelems $test_results->@) ) {
         # The plan?  We have no plan.
         if( $self->{?No_Plan} ) {
             $self->_print("1..$self->{?Curr_Test}\n") unless $self->no_header;

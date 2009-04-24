@@ -108,7 +108,7 @@ open my $tmph_fh, "<", $tmph_file or die "Can't open $tmph_file: $^OS_ERROR\n";
 chmod 0644, $h_file;
 open my $h_fh, ">", "$h_file" or die "Can't open $h_file: $^OS_ERROR\n";
 my $endcore_done = 0;
-while ( ~< *$tmph_fh) {
+while ( ~< $tmph_fh->*) {
     print $h_fh, "#ifdef PERL_CORE\n" if iohandle::input_line_number($tmph_fh) == 1;
     if (!$endcore_done and m/YYSTYPE_IS_DECLARED/) {
         print $h_fh, "#endif /* PERL_CORE */\n";

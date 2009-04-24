@@ -318,7 +318,7 @@ do {
         );
 
     ### the rv we expect ###
-    my $get = \%( < %$try, bureau => 'NSA' );
+    my $get = \%( < $try->%, bureau => 'NSA' );
 
     my $rv = check( $tmpl, $try );
 

@@ -534,7 +534,7 @@ sub _unset_child2parent_links {
     my $self = shift;
     $self->{+'parent_sequence'} = undef;
     my $ptree = $self->{?'ptree'};
-    for ( @$ptree) {
+    for ( $ptree->@) {
         next  unless (ref  and  ref ne 'SCALAR');
         $_->_unset_child2parent_links()
             if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
@@ -826,11 +826,11 @@ sub prepend {
     my $self = shift;
     for ( @_) {
         next  unless length;
-        if ((nelems @$self)  and  !(ref @$self[0])  and  !(ref $_)) {
-            @$self[0] = $_ . @$self[0];
+        if ((nelems $self->@)  and  !(ref $self->@[0])  and  !(ref $_)) {
+            $self->@[0] = $_ . $self->@[0];
         }
         else {
-            unshift @$self, $_;
+            unshift $self->@, $_;
         }
     }
 }
@@ -849,19 +849,19 @@ the current one.
 
 sub append {
     my $self = shift;
-    my $can_append = (nelems @$self) && !(ref @$self[-1]);
+    my $can_append = (nelems $self->@) && !(ref $self->@[-1]);
     for ( @_) {
         if (ref) {
-            push @$self, $_;
+            push $self->@, $_;
         }
         elsif(!length) {
             next;
         }
         elsif ($can_append) {
-            @$self[-1] .= $_;
+            $self->@[-1] .= $_;
         }
         else {
-            push @$self, $_;
+            push $self->@, $_;
         }
     }
 }
@@ -878,7 +878,7 @@ exactly as it appeared in the input.
 sub raw_text {
     my $self = shift;
     my $text = "";
-    for (  @$self ) {
+    for (  $self->@ ) {
         $text .= (ref $_) ?? $_->raw_text !! $_;
     }
     return $text;
@@ -890,7 +890,7 @@ sub raw_text {
 
 sub _unset_child2parent_links {
     my $self = shift;
-    for ( @$self) {
+    for ( $self->@) {
         next  unless (defined and  ref  and  ref ne 'SCALAR');
         $_->_unset_child2parent_links()
             if UNIVERSAL::isa($_, 'Pod::InteriorSequence');

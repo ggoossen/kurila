@@ -62,7 +62,7 @@ print $^STDOUT, $p;
 
 do {
     print $^STDOUT, "# won't show any shadows, since we're just looking at the name2where keys\n";
-    my $names = join "|", sort keys %$name2where;
+    my $names = join "|", sort keys $name2where->%;
     skip '-- case may or may not be preserved', 1 if $^OS_NAME eq 'VMS';
     is( $names,
         "Blorm|Suzzle|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|perlzuk|squaa|squaa::Glunk|squaa::Vliff|squaa::Wowo|zikzik" );
@@ -70,19 +70,19 @@ do {
 
 do {
     print $^STDOUT, "# but here we'll see shadowing:\n";
-    my $names = join "|", sort values %$where2name;
+    my $names = join "|", sort values $where2name->%;
     skip '-- case may or may not be preserved', 1 if $^OS_NAME eq 'VMS';
     is( $names,
         "Blorm|Suzzle|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Glunk|hinkhonk::Vliff|hinkhonk::Vliff|perlflif|perlthng|perlthng|perlzuk|squaa|squaa::Glunk|squaa::Vliff|squaa::Vliff|squaa::Vliff|squaa::Wowo|zikzik" );
 
     my %count;
-    for(values %$where2name) { ++%count{+$_} };
+    for(values $where2name->%) { ++%count{+$_} };
     #print pretty(\%count), "\n\n";
     delete %count{[ grep { %count{?$_} +< 2 }, keys %count ]};
     my $shadowed = join "|", sort keys %count;
     is $shadowed, "hinkhonk::Glunk|hinkhonk::Vliff|perlthng|squaa::Vliff";
 
-    sub thar { print $^STDOUT, "# Seen @_[0] :\n", < map { "#  \{$_\}\n" }, sort grep { $where2name->{?$_} eq @_[0] },keys %$where2name; return; }
+    sub thar { print $^STDOUT, "# Seen @_[0] :\n", < map { "#  \{$_\}\n" }, sort grep { $where2name->{?$_} eq @_[0] },keys $where2name->%; return; }
 
     is %count{?'perlthng'}, 2;
     thar 'perlthng';
@@ -93,7 +93,7 @@ do {
 
 like( ($name2where->{?'squaa'} || 'huh???'), qr/squaa\.pm$/);
 
-is nelems(grep( { m/squaa\.pm/ }, keys %$where2name) ), 1;
+is nelems(grep( { m/squaa\.pm/ }, keys $where2name->%) ), 1;
 
 like( ($name2where->{?'perlthng'}    || 'huh???'), qr/[^\^]testlib1/ );
 like( ($name2where->{?'squaa::Vliff'} || 'huh???'), qr/[^\^]testlib1/ );

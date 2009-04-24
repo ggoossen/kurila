@@ -6,7 +6,7 @@ BEGIN {
 
 plan tests => 15;
 
-dies_like(sub { my $x = \2; $$x = ~< *FH; },
+dies_like(sub { my $x = \2; $x->$ = ~< *FH; },
           qr/^Modification of a read-only value attempted$/, '[perl #19566]');
 
 do {

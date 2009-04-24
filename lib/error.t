@@ -88,7 +88,7 @@ MSG
 # Internal Perl_croak routines also make error objects
 do {
     my $line1;
-    try { my $foo = "xx"; $$foo; }; $line1 = __LINE__;
+    try { my $foo = "xx"; $foo->$; }; $line1 = __LINE__;
     is defined $^EVAL_ERROR, 1, '$@ is set';
     is ref $^EVAL_ERROR, 'error', '$@ is an error object';
     is $^EVAL_ERROR->description, "Can't use PLAINVALUE as a SCALAR REF";

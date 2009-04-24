@@ -413,7 +413,7 @@ sub can_load {
         my $href = $args->{?modules};
 
         my @load;
-        for my $mod ( keys %$href ) {
+        for my $mod ( keys $href->% ) {
 
             next if $CACHE->{?$mod}->{?usable} && !$args->{?nocache};
 

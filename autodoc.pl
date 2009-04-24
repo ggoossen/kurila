@@ -111,7 +111,7 @@ sub autodoc($fh, $file) { # parse a file and extract documentation info
 }
 
 sub docout($fh, $name, $docref) { # output the docs for one function
-    my @($flags, $docs, $ret, $file, @< @args) = @$docref;
+    my @($flags, $docs, $ret, $file, @< @args) = $docref->@;
     $name =~ s/\s*$//;
 
     $docs .= "NOTE: this function is experimental and may change or be
@@ -180,7 +180,7 @@ walk_table sub {	# load documented functions into appropriate hash
                    $retval =~ s/\t//;
                    my $docref = delete %docfuncs{$func};
                    %seenfuncs{+$func} = 1;
-                   if ($docref and nelems @$docref) {
+                   if ($docref and nelems $docref->@) {
                        if ($flags =~ m/A/) {
                            $docref->[0].="x" if $flags =~ m/M/;
                            %apidocs{+$docref->[4]}{+$func} =

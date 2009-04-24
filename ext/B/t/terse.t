@@ -97,15 +97,15 @@ sub TIEHANDLE {
 
 sub PRINT {
     my $self = shift;
-    $$self .= join('', @_);
+    $self->$ .= join('', @_);
 }
 
 sub PRINTF {
     my $self = shift;
-    $$self .= sprintf(nelems @_);
+    $self->$ .= sprintf(nelems @_);
 }
 
 sub read {
     my $self = shift;
-    return substr($$self, 0, length($$self), '');
+    return substr($self->$, 0, length($self->$), '');
 }

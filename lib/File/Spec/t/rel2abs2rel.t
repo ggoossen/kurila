@@ -43,12 +43,12 @@ sub sayok{
     open($^STDOUT, ">", "rel2abs2rel$^PID.tmp")
         or die "Can't open scratch file rel2abs2rel$^PID.tmp -- $^OS_ERROR\n";
     system($perl, "rel2abs2rel$^PID.pl");
-    open($^STDOUT, ">&", \*$stdoutdup);
+    open($^STDOUT, ">&", \$stdoutdup->*);
     close($stdoutdup);
 
     open(my $f, "<", "rel2abs2rel$^PID.tmp");
     local $^INPUT_RECORD_SEPARATOR = undef;
-    my $output = ~< *$f;
+    my $output = ~< $f->*;
     close($f);
     return $output;
 }

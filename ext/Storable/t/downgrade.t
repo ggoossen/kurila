@@ -76,7 +76,7 @@ sub thaw_scalar($name, $expected, ?$bug) {
     my $scalar = try {thaw %tests{?$name}};
     is ($^EVAL_ERROR, '', "Thawed $name without error?");
     isa_ok ($scalar, 'SCALAR', "Thawed $name?");
-    is ($$scalar, $expected, "And it is the data we expected?");
+    is ($scalar->$, $expected, "And it is the data we expected?");
     $scalar;
 }
 
@@ -88,8 +88,8 @@ sub thaw_fail($name, $expected) {
 
 sub test_locked_hash {
     my $hash = shift;
-    my @keys = keys %$hash;
-    my @($key, $value) =@( each %$hash);
+    my @keys = keys $hash->%;
+    my @($key, $value) =@( each $hash->%);
     try {$hash->{+$key} = 'x' . $value};
     like( $^EVAL_ERROR->{?description}, "/^Modification of a read-only value attempted/",
         'trying to change a locked key' );
@@ -97,13 +97,13 @@ sub test_locked_hash {
     try {$hash->{+use} = 'perl'};
     like( $^EVAL_ERROR->{?description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
         'trying to add another key' );
-    ok (eq_array(\keys %$hash, \@keys), "Still the same keys?");
+    ok (eq_array(\keys $hash->%, \@keys), "Still the same keys?");
 }
 
 sub test_restricted_hash {
     my $hash = shift;
-    my @keys = keys %$hash;
-    my @($key, $value) =@( each %$hash);
+    my @keys = keys $hash->%;
+    my @($key, $value) =@( each $hash->%);
     try {$hash->{+$key} = 'x' . $value};
     is( $^EVAL_ERROR, '',
       'trying to change a restricted key' );
@@ -111,7 +111,7 @@ sub test_restricted_hash {
     try {$hash->{+use} = 'perl'};
     like( $^EVAL_ERROR->{?description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
         'trying to add another key' );
-    ok (eq_array(\keys %$hash, \@keys), "Still the same keys?");
+    ok (eq_array(\keys $hash->%, \@keys), "Still the same keys?");
 }
 
 sub test_placeholder {

@@ -241,7 +241,7 @@ sub new {
     if(defined @_[0]) {
         if(ref(@_[0])) {
             # called with a list of parameters
-            %$self = %( < @_[0]->% );
+            $self->% = %( < @_[0]->% );
             $self->_construct_text();
         }
         else {
@@ -651,7 +651,7 @@ list of all cache elements.
 sub item($self,%< %param) {
     if(%param) {
         my $item = Pod::Cache::Item->new(< %param);
-        push(@$self, $item);
+        push($self->@, $item);
         return $item;
     }
     else {
@@ -670,7 +670,7 @@ not found.
 =cut
 
 sub find_page($self,$page) {
-    foreach( @$self) {
+    foreach( $self->@) {
         if($_->page() eq $page) {
             return $_;
         }

@@ -21,13 +21,13 @@ print $^STDOUT, "ok 5\n";
 my $bad = '';
 my $badcont = 1;
 open(my $fh, "<",'Cmd_while.tmp') || die "Can't open Cmd_while.tmp.";
-entry: while ( ~< *$fh) {
+entry: while ( ~< $fh->*) {
     next entry if m/vt100/;
     $bad = 1 if m/vt100/;
 } continue {
     $badcont = '' if m/vt100/;
 }
-if (!eof(\*$fh) || m/vt100/ || $bad) {print $^STDOUT, "not ok 6\n";} else {print $^STDOUT, "ok 6\n";}
+if (!eof(\$fh->*) || m/vt100/ || $bad) {print $^STDOUT, "not ok 6\n";} else {print $^STDOUT, "ok 6\n";}
 if (!$badcont) {print $^STDOUT, "ok 7\n";} else {print $^STDOUT, "not ok 7\n";}
 
 # test "redo" command
@@ -35,7 +35,7 @@ if (!$badcont) {print $^STDOUT, "ok 7\n";} else {print $^STDOUT, "not ok 7\n";}
 $bad = '';
 $badcont = '';
 open($fh, "<",'Cmd_while.tmp') || die "Can't open Cmd_while.tmp.";
-loop: while ( ~< *$fh) {
+loop: while ( ~< $fh->*) {
     if (s/vt100/VT100/g) {
         s/VT100/Vt100/g;
         redo loop;
@@ -45,7 +45,7 @@ loop: while ( ~< *$fh) {
 } continue {
     $badcont = 1 if m/vt100/;
 }
-if (!eof(\*$fh) || $bad) {print $^STDOUT, "not ok 8\n";} else {print $^STDOUT, "ok 8\n";}
+if (!eof(\$fh->*) || $bad) {print $^STDOUT, "not ok 8\n";} else {print $^STDOUT, "ok 8\n";}
 if (!$badcont) {print $^STDOUT, "ok 9\n";} else {print $^STDOUT, "not ok 9\n";}
 
 close($fh) || die "Can't close Cmd_while.tmp.";

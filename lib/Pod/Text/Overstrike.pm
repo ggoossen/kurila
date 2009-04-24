@@ -76,9 +76,9 @@ sub cmd_head4($self, $attrs, $text) {
 # The common code for handling all headers.  We have to override to avoid
 # interpolating twice and because we don't want to honor alt.
 sub heading($self, $text, $indent, $marker) {
-    $self->item ("\n\n") if defined %$self{?ITEM};
-    $text .= "\n" if %$self{?opt_loose};
-    my $margin = ' ' x (%$self{?opt_margin} + $indent);
+    $self->item ("\n\n") if defined $self->%{?ITEM};
+    $text .= "\n" if $self->%{?opt_loose};
+    my $margin = ' ' x ($self->%{?opt_margin} + $indent);
     $self->output ($margin . $text . "\n");
     return '';
 }
@@ -100,8 +100,8 @@ sub wrap {
     my $self = shift;
     local $_ = shift;
     my $output = '';
-    my $spaces = ' ' x %$self{?MARGIN};
-    my $width = %$self{?opt_width} - %$self{?MARGIN};
+    my $spaces = ' ' x $self->%{?MARGIN};
+    my $width = $self->%{?opt_width} - $self->%{?MARGIN};
     while (length +> $width) {
         # This regex represents a single character, that's possibly underlined
         # or in bold (in which case, it's three characters; the character, a

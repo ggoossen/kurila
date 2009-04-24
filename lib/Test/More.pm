@@ -1185,10 +1185,10 @@ sub _eq_array($a1, $a2)  {
     return 1 if $a1 \== $a2;
 
     my $ok = 1;
-    my $max = (nelems @$a1) +> nelems @$a2 ?? (nelems @$a1) !! nelems @$a2;
+    my $max = (nelems $a1->@) +> nelems $a2->@ ?? (nelems $a1->@) !! nelems $a2->@;
     for (0..$max-1) {
-        my $e1 = $_ +> (nelems @$a1)-1 ?? $DNE !! $a1->[$_];
-        my $e2 = $_ +> (nelems @$a2)-1 ?? $DNE !! $a2->[$_];
+        my $e1 = $_ +> (nelems $a1->@)-1 ?? $DNE !! $a1->[$_];
+        my $e2 = $_ +> (nelems $a2->@)-1 ?? $DNE !! $a2->[$_];
 
         push @Data_Stack, \%( type => 'ARRAY', idx => $_, vals => \@($e1, $e2) );
         $ok = _deep_check($e1,$e2);
@@ -1248,7 +1248,7 @@ sub _deep_check($e1, $e2) {
                 return 1;
             }
             push @Data_Stack, \%( type => $type, vals => \@($e1, $e2) );
-            $ok = _deep_check($$e1, $$e2);
+            $ok = _deep_check($e1->$, $e2->$);
             pop @Data_Stack if $ok;
         }
         elsif( $type eq 'UNDEF' ) {
@@ -1301,8 +1301,8 @@ sub _eq_hash($a1, $a2) {
     return 1 if $a1 \== $a2;
 
     my $ok = 1;
-    my $bigger = (nelems keys %$a1) +> (nelems keys %$a2) ?? $a1 !! $a2;
-    foreach my $k (keys %$bigger) {
+    my $bigger = (nelems keys $a1->%) +> (nelems keys $a2->%) ?? $a1 !! $a2;
+    foreach my $k (keys $bigger->%) {
         my $e1 = exists $a1->{$k} ?? $a1->{?$k} !! $DNE;
         my $e2 = exists $a2->{$k} ?? $a2->{?$k} !! $DNE;
 
@@ -1343,11 +1343,11 @@ Test::Deep contains much better set comparison functions.
 =cut
 
 sub eq_set($a1, $a2, ?$name)  {
-    return 0 unless (nelems @$a1) == nelems @$a2;
+    return 0 unless (nelems $a1->@) == nelems $a2->@;
 
     return eq_array(
-           \ (sort { $a cmp $b }, map { dump::view($_) }, @$a1 ),
-           \ (sort { $a cmp $b }, map { dump::view($_) }, @$a2 ),
+           \ (sort { $a cmp $b }, map { dump::view($_) }, $a1->@ ),
+           \ (sort { $a cmp $b }, map { dump::view($_) }, $a2->@ ),
            );
 }
 

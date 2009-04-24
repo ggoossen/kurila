@@ -429,7 +429,7 @@ sub oneliner($self, $cmd, $switches) {
     $cmd = $self->quote_literal($cmd);
     $cmd = $self->escape_newlines($cmd);
 
-    $switches = join ' ', @$switches;
+    $switches = join ' ', $switches->@;
 
     return qq{\$(ABSPERLRUN) $switches -e $cmd --};
 }

@@ -31,7 +31,7 @@ sub _do_link($self, $how, %< %args) {
 
         # Now know the basename, find directory parts via lib_file, or objects
         my $objs = ( (ref %args{?objects}) ?? %args{?objects} !! \@(%args{?objects}) );
-        my $near_obj = $self->lib_file(< @$objs);
+        my $near_obj = $self->lib_file(< $objs->@);
         my $ref_file = ( defined %args{?lib_file} ?? %args{?lib_file} !! $near_obj );
         my $lib_dir = ($ref_file =~ m,(.*)[/\\],s ?? "$1/" !! '' );
         my $exp_dir = ($near_obj =~ m,(.*)[/\\],s ?? "$1/" !! '' );
@@ -40,7 +40,7 @@ sub _do_link($self, $how, %< %args) {
         %args{+lib_file} = "$lib_dir$lib.$self->{config}->{?dlext}";	# DLL file
 
         # XXX _do_link does not have place to put libraries?
-        push @$objs, $self->perl_inc() . "/libperl$self->{config}->{?lib_ext}";
+        push $objs->@, $self->perl_inc() . "/libperl$self->{config}->{?lib_ext}";
         %args{+objects} = $objs;
     }
     # Some 'env' do exec(), thus return too early when run from ksh;

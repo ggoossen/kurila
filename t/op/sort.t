@@ -298,7 +298,7 @@ main::cmp_ok($answer,'eq','good','sort subr called from other package');
 # sort in package1 is active should set $package2::a/b.
 
 $answer = "good";
-my @list = sort { A::min(< @$a) <+> A::min(< @$b) },
+my @list = sort { A::min(< $a->@) <+> A::min(< $b->@) },
     @(  \@(3, 1, 5), \@(2, 4), \@(0));
 
 main::cmp_ok($answer,'eq','good','bug 36430');

@@ -16,12 +16,12 @@ my @TESTS = @(
     );
 
 my $count = 0;
-$count += (nelems @$_) - 1 for  @TESTS;
+$count += (nelems $_->@) - 1 for  @TESTS;
 
 print $^STDOUT, "1..$count\n";
 
 foreach my $test ( @TESTS) {
-    my @($exclude, @< @modules) =  @$test;
+    my @($exclude, @< @modules) =  $test->@;
 
     foreach my $module ( @modules) {
         my $prog = <<"        --";

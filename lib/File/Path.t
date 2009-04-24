@@ -75,7 +75,7 @@ SKIP: do {
 
 my $count = rmtree(\%(error => \$error));
 is( $count, 0, 'rmtree of nothing, count of zero' );
-is( scalar(nelems @$error), 0, 'no diagnostic captured' );
+is( scalar(nelems $error->@), 0, 'no diagnostic captured' );
 
 @created = mkpath($tmp_base, 0);
 is(scalar(nelems @created), 0, "skipped making existing directories (old style 1)")
@@ -123,9 +123,9 @@ rmtree( $dir, $dir2,
         )
         );
 
-is(scalar(nelems @$error), 0, "no errors unlinking a and z");
-is(scalar(nelems @$list),  4, "list contains 4 elements")
-    or diag("$(join ' ',@$list)");
+is(scalar(nelems $error->@), 0, "no errors unlinking a and z");
+is(scalar(nelems $list->@),  4, "list contains 4 elements")
+    or diag("$(join ' ',$list->@)");
 
 ok(-d $dir,  "dir a still exists");
 ok(-d $dir2, "dir z still exists");
@@ -202,7 +202,7 @@ SKIP: do {
     ok(-e $entry, "file exists in place of directory");
 
     mkpath( $entry, \%(error => \$error) );
-    is( scalar(nelems @$error), 1, "caught error condition" );
+    is( scalar(nelems $error->@), 1, "caught error condition" );
     @($file, $message) =@( each $error->[0]->%);
     is( $entry, $file, "and the message is: $message");
 
@@ -222,39 +222,39 @@ SKIP: do {
     my ($list, $err);
     $dir = catdir( 'EXTRA', '1' );
     rmtree( $dir, \%(result => \$list, error => \$err) );
-    is(scalar(nelems @$list), 2, "extra dir $dir removed");
-    is(scalar(nelems @$err), 1, "one error encountered");
+    is(scalar(nelems $list->@), 2, "extra dir $dir removed");
+    is(scalar(nelems $err->@), 1, "one error encountered");
 
     $dir = catdir( 'EXTRA', '3', 'N' );
     rmtree( $dir, \%(result => \$list, error => \$err) );
-    is( (nelems @$list), 1, q{remove a symlinked dir} );
-    is( (nelems @$err),  0, q{with no errors} );
+    is( (nelems $list->@), 1, q{remove a symlinked dir} );
+    is( (nelems $err->@),  0, q{with no errors} );
 
     $dir = catdir('EXTRA', '3', 'S');
     rmtree($dir, \%(error => \$error));
-    is( scalar(nelems @$error), 1, 'one error for an unreadable dir' );
+    is( scalar(nelems $error->@), 1, 'one error for an unreadable dir' );
     try { @($file, $message) =@( each $error->[0]->%)};
     is( $file, $dir, 'unreadable dir reported in error' )
         or diag($message);
 
     $dir = catdir('EXTRA', '3', 'T');
     rmtree($dir, \%(error => \$error));
-    is( scalar(nelems @$error), 1, 'one error for an unreadable dir T' );
+    is( scalar(nelems $error->@), 1, 'one error for an unreadable dir T' );
     try { @($file, $message) =@( each $error->[0]->%)};
     is( $file, $dir, 'unreadable dir reported in error T' );
 
     $dir = catdir( 'EXTRA', '4' );
     rmtree($dir,  \%(result => \$list, error => \$err) );
-    is( scalar(nelems @$list), 0, q{don't follow a symlinked dir} );
-    is( scalar(nelems @$err),  2, q{two errors when removing a symlink in r/o dir} );
+    is( scalar(nelems $list->@), 0, q{don't follow a symlinked dir} );
+    is( scalar(nelems $err->@),  2, q{two errors when removing a symlink in r/o dir} );
     try { @($file, $message) =@( each $err->[0]->%) };
     is( $file, $dir, 'symlink reported in error' );
 
     $dir  = catdir('EXTRA', '3', 'U');
     $dir2 = catdir('EXTRA', '3', 'V');
     rmtree($dir, $dir2, \%(verbose => 0, error => \$err, result => \$list));
-    is( scalar(nelems @$list),  1, q{deleted 1 out of 2 directories} );
-    is( scalar(nelems @$error), 1, q{left behind 1 out of 2 directories} );
+    is( scalar(nelems $list->@),  1, q{deleted 1 out of 2 directories} );
+    is( scalar(nelems $error->@), 1, q{left behind 1 out of 2 directories} );
     try { @($file, $message) =@( each $err->[0]->%) };
     is( $file, $dir, 'first dir reported in error' );
 };
@@ -372,12 +372,12 @@ SKIP: do {
         unless -d catdir( <qw(EXTRA 1));
 
     rmtree 'EXTRA', \%(safe => 0, error => \$error);
-    is( scalar(nelems @$error), 11, 'seven deadly sins' ); # well there used to be 7
+    is( scalar(nelems $error->@), 11, 'seven deadly sins' ); # well there used to be 7
 
     rmtree 'EXTRA', \%(safe => 1, error => \$error);
-    is( scalar(nelems @$error), 9, 'safe is better' );
-    for ( @$error) {
-        @($file, $message) =@( each %$_);
+    is( scalar(nelems $error->@), 9, 'safe is better' );
+    for ( $error->@) {
+        @($file, $message) =@( each $_->%);
         if ($file =~  m/[123]\z/) {
             is(index($message, 'cannot remove directory: '), 0, "failed to remove $file with rmdir")
                 or diag($message);

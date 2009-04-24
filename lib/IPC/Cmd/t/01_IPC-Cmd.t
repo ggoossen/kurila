@@ -49,11 +49,11 @@ do {   ### list of commands and regexes matching output ###
         $IPC::Cmd::USE_IPC_OPEN3  = $IPC::Cmd::USE_IPC_OPEN3    = $pref->[1];
 
         ### for each command
-        for my $aref (  @$map ) {
+        for my $aref (  $map->@ ) {
             my $cmd                 = $aref->[0];
             my $regex               = $aref->[1];
 
-            my $pp_cmd = ref $cmd ?? "$(join ' ',@$cmd)" !! "$cmd";
+            my $pp_cmd = ref $cmd ?? "$(join ' ',$cmd->@)" !! "$cmd";
             diag( "Running '$pp_cmd' as " . (ref $cmd ?? "ARRAY" !! "SCALAR") ) 
                 if $Verbose;
 
@@ -123,11 +123,11 @@ do {   ### list of commands and regexes matching output ###
         $IPC::Cmd::USE_IPC_OPEN3  = $IPC::Cmd::USE_IPC_OPEN3    = $pref->[1];
 
         ### for each command
-        for my $aref (  @$map ) {
+        for my $aref (  $map->@ ) {
             my $cmd                 = $aref->[0];
             my $regex               = $aref->[1];
 
-            my $pp_cmd = ref $cmd ?? "$(join ' ',@$cmd)" !! "$cmd";
+            my $pp_cmd = ref $cmd ?? "$(join ' ',$cmd->@)" !! "$cmd";
             diag( "Running '$pp_cmd' as " . (ref $cmd ?? "ARRAY" !! "SCALAR") )
                 if $Verbose;
 

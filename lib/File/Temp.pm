@@ -665,7 +665,7 @@ sub _is_safe {
     # Stat path
     my @info = @( stat($path) );
     unless (scalar(nelems @info)) {
-        $$err_ref = "stat(path) returned no values";
+        $err_ref->$ = "stat(path) returned no values";
         return 0;
     };
     return 1 if $^OS_NAME eq 'VMS';  # owner delete control at file level
@@ -678,7 +678,7 @@ sub _is_safe {
         Carp::cluck(sprintf "uid=@info[4] topuid=\%s euid=$^EUID path='$path'", <
                 File::Temp->top_system_uid());
 
-        $$err_ref = "Directory owned neither by root nor the current user"
+        $err_ref->$ = "Directory owned neither by root nor the current user"
             if ref($err_ref);
         return 0;
     }
@@ -692,13 +692,13 @@ sub _is_safe {
         (@info[2] ^&^ &Fcntl::S_IWOTH( < @_ )) ) {  # Is world writable?
         # Must be a directory
         unless (-d $path) {
-            $$err_ref = "Path ($path) is not a directory"
+            $err_ref->$ = "Path ($path) is not a directory"
                 if ref($err_ref);
             return 0;
         }
         # Must have sticky bit set
         unless (-k $path) {
-            $$err_ref = "Sticky bit not set on $path when dir is group|world writable"
+            $err_ref->$ = "Sticky bit not set on $path when dir is group|world writable"
                 if ref($err_ref);
             return 0;
         }
@@ -1020,13 +1020,13 @@ sub new {
     print $^STDOUT, "Tmp: $fh - $path\n" if $DEBUG;
 
     # Store the filename in the scalar slot
-    *$fh->$ = $path;
+    $fh->*->$ = $path;
 
     # Cache the filename by pid so that the destructor can decide whether to remove it
     %FILES_CREATED_BY_OBJECT{+$^PID}->{+$path} = 1;
 
     # Store unlink information in hash slot (plus other constructor info)
-    *$fh->% = %( < %args );
+    $fh->*->% = %( < %args );
 
     # create the object
     bless $fh, $class;
@@ -1089,7 +1089,7 @@ a string.
 
 sub filename {
     my $self = shift;
-    return *$self->$;
+    return $self->*->$;
 }
 
 sub STRINGIFY {
@@ -1120,9 +1120,9 @@ Default is for the file to be removed.
 sub unlink_on_destroy {
     my $self = shift;
     if ((nelems @_)) {
-        *$self->{+UNLINK} = shift;
+        $self->*->{+UNLINK} = shift;
     }
-    return *$self->{?UNLINK};
+    return $self->*->{?UNLINK};
 }
 
 =item B<DESTROY>
@@ -1148,7 +1148,7 @@ will not be removed.
 
 sub DESTROY {
     my $self = shift;
-    if (*$self->{?UNLINK} && !$KEEP_ALL) {
+    if ($self->*->{?UNLINK} && !$KEEP_ALL) {
         print $^STDOUT, "# --------->   Unlinking $self\n" if $DEBUG;
 
         # only delete if this process created it

@@ -17,15 +17,15 @@ do {
 
     sub add {
         my $self = shift;
-        $$self .= join("", @_);
+        $self->$ .= join("", @_);
         return $self;
     }
 
     sub digest {
         my $self = shift;
-        my $len = length($$self);
-        my $first = ($len +> 0) ?? substr($$self, 0, 1) !! "X";
-        $$self = "";
+        my $len = length($self->$);
+        my $first = ($len +> 0) ?? substr($self->$, 0, 1) !! "X";
+        $self->$ = "";
         return sprintf "$first\%04d", $len;
     }
 };
@@ -58,7 +58,7 @@ print $fh, "abc" x 100, "\n";
 close($fh) || die;
 
 open($fh, "<", "xxtest$^PID") || die;
-$ctx->addfile(\*$fh);
+$ctx->addfile(\$fh->*);
 close($fh);
 unlink("xxtest$^PID") || warn;
 

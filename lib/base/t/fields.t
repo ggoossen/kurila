@@ -24,7 +24,7 @@ sub show_fields {
     my@($base, $mask) =  @_;
     my $fields = \Symbol::fetch_glob($base.'::FIELDS')->*->%;
     return grep { (%fields::attr{$base}->[$fields->{?$_}] ^&^ $mask) == $mask},
-        keys %$fields;
+        keys $fields->%;
 }
 
 is_deeply( \sort(&show_fields('Foo', fields::PUBLIC)),

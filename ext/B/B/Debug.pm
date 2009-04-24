@@ -15,7 +15,7 @@ sub _printop {
 }
 
 sub B::OP::debug($op) {
-    printf $^STDOUT, <<'EOT', class($op), $$op, $op->ppaddr, _printop($op->next), _printop($op->sibling), $op->targ, $op->type;
+    printf $^STDOUT, <<'EOT', class($op), $op->$, $op->ppaddr, _printop($op->next), _printop($op->sibling), $op->targ, $op->type;
 %s (0x%lx)
 	op_ppaddr	%s
 	op_next		%s
@@ -101,19 +101,19 @@ sub B::PADOP::debug($op) {
 }
 
 sub B::NULL::debug($sv) {
-    if ($$sv == sv_undef()->$) {
+    if ($sv->$ == sv_undef()->$) {
         print $^STDOUT, "&sv_undef\n";
     } else {
-        printf $^STDOUT, "NULL (0x\%x)\n", $$sv;
+        printf $^STDOUT, "NULL (0x\%x)\n", $sv->$;
     }
 }
 
 sub B::SV::debug($sv) {
-    if (!$$sv) {
+    if (!$sv->$) {
         print $^STDOUT, < class($sv), " = NULL\n";
         return;
     }
-    printf $^STDOUT, <<'EOT', < class($sv), $$sv, < $sv->REFCNT, < $sv->FLAGS;
+    printf $^STDOUT, <<'EOT', < class($sv), $sv->$, < $sv->REFCNT, < $sv->FLAGS;
 %s (0x%x)
 	REFCNT		%d
 	FLAGS		0x%x
@@ -172,7 +172,7 @@ sub B::CV::debug($sv) {
     my @($padlist) =  $sv->PADLIST;
     my @($file) =  $sv->FILE;
     my @($gv) =  $sv->GV;
-    printf $^STDOUT, <<'EOT', $$stash, $$start, $$root, $$gv, $file, < $sv->DEPTH, $padlist, $sv->OUTSIDE->$, < $sv->OUTSIDE_SEQ;
+    printf $^STDOUT, <<'EOT', $stash->$, $start->$, $root->$, $gv->$, $file, < $sv->DEPTH, $padlist, $sv->OUTSIDE->$, < $sv->OUTSIDE_SEQ;
 	STASH		0x%x
 	START		0x%x
 	ROOT		0x%x
@@ -192,7 +192,7 @@ EOT
 sub B::AV::debug($av) {
     $av->B::SV::debug;
     my @array = $av->ARRAY;
-    print $^STDOUT, "\tARRAY\t\t(", join(", ", map( {"0x" . $$_ }, @array)), ")\n";
+    print $^STDOUT, "\tARRAY\t\t(", join(", ", map( {"0x" . $_->$ }, @array)), ")\n";
     printf $^STDOUT, <<'EOT', scalar(nelems @array), < $av->MAX, < $av->OFF;
 	FILL		%d
 	MAX		%d
@@ -201,7 +201,7 @@ EOT
 }
 
 sub B::GV::debug($gv) {
-    if (%done_gv{+$$gv}++) {
+    if (%done_gv{+$gv->$}++) {
         printf $^STDOUT, "GV \%s::\%s\n", < $gv->STASH->NAME, < $gv->SAFENAME;
         return;
     }
@@ -209,7 +209,7 @@ sub B::GV::debug($gv) {
     my @($av) =  $gv->AV;
     my @($cv) =  $gv->CV;
     $gv->B::SV::debug;
-    printf $^STDOUT, <<'EOT', < $gv->SAFENAME, < $gv->STASH->NAME, < $gv->STASH, $$sv, < $gv->GvREFCNT, < $gv->FORM, $$av, $gv->HV->$, $gv->EGV->$, $$cv, < $gv->CVGEN, < $gv->LINE, < $gv->FILE, < $gv->GvFLAGS;
+    printf $^STDOUT, <<'EOT', < $gv->SAFENAME, < $gv->STASH->NAME, < $gv->STASH, $sv->$, < $gv->GvREFCNT, < $gv->FORM, $av->$, $gv->HV->$, $gv->EGV->$, $cv->$, < $gv->CVGEN, < $gv->LINE, < $gv->FILE, < $gv->GvFLAGS;
 	NAME		%s
 	STASH		%s (0x%x)
 	SV		0x%x
@@ -231,7 +231,7 @@ EOT
 
 sub B::SPECIAL::debug {
     my $sv = shift;
-    print $^STDOUT, @specialsv_name[$$sv], "\n";
+    print $^STDOUT, @specialsv_name[$sv->$], "\n";
 }
 
 sub compile {

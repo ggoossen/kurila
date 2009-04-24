@@ -323,8 +323,8 @@ sub todo_skip {
 
 sub eq_array {
     my @($ra, $rb) =  @_;
-    return 0 unless (nelems @$ra) == nelems(@$rb);
-    for my $i (0..(nelems @$ra)-1) {
+    return 0 unless (nelems $ra->@) == nelems($rb->@);
+    for my $i (0..(nelems $ra->@)-1) {
         next     if !defined $ra->[$i] && !defined $rb->[$i];
         return 0 if !defined $ra->[$i];
         return 0 if !defined $rb->[$i];
@@ -336,7 +336,7 @@ sub eq_array {
 sub eq_hash {
     my @($orig, $suspect) =  @_;
     my $fail;
-    while (my @(?$key, ?$value) =@( each %$suspect)) {
+    while (my @(?$key, ?$value) =@( each $suspect->%)) {
         # Force a hash recompute if this perl's internals can cache the hash key.
         $key = "" . $key;
         if (exists $orig->{$key}) {
@@ -351,7 +351,7 @@ sub eq_hash {
             $fail = 1;
         }
     }
-    foreach (keys %$orig) {
+    foreach (keys $orig->%) {
         # Force a hash recompute if this perl's internals can cache the hash key.
         $_ = "" . $_;
         next if (exists $suspect->{$_});
@@ -396,11 +396,11 @@ my $is_cygwin   = $^OS_NAME eq 'cygwin';
 sub _quote_args {
     my @($runperl, $args) =  @_;
 
-    foreach ( @$args) {
+    foreach ( $args->@) {
         # In VMS protect with doublequotes because otherwise
         # DCL will lowercase -- unless already doublequoted.
         $_ = q(").$_.q(") if $is_vms && !m/^\"/ && length($_) +> 0;
-        $$runperl .= ' ' . $_;
+        $runperl->$ .= ' ' . $_;
     }
 }
 
@@ -600,7 +600,7 @@ sub _fresh_perl {
     print $test_fh, $prog;
     close $test_fh or die "Cannot close $tmpfile: $^OS_ERROR";
 
-    my $results = runperl(< %$runperl_args);
+    my $results = runperl(< $runperl_args->%);
     my $status = $^CHILD_ERROR;
 
     # Clean up the results into something a bit more predictable.

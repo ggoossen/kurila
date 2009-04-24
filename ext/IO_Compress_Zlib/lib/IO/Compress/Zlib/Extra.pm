@@ -26,7 +26,7 @@ sub validateExtraFieldPair
         unless ref $pair &&  ref $pair eq 'ARRAY';
 
     return ExtraFieldError("SubField must have two parts")
-        unless (nelems @$pair) == 2 ;
+        unless (nelems $pair->@) == 2 ;
 
     return ExtraFieldError("SubField ID is a reference")
         if ref $pair->[0] ;
@@ -86,7 +86,7 @@ sub parseRawExtra
                                              substr($data, $offset, $subLen)), 
                                           $strict, $gzipMode );
         return $bad if $bad ;
-        push @$extraRef, \@($id => substr($data, $offset, $subLen))
+        push $extraRef->@, \@($id => substr($data, $offset, $subLen))
             if defined $extraRef;;
 
         $offset += $subLen ;
@@ -147,22 +147,22 @@ sub parseExtraField
     if (ref $data eq 'ARRAY') {    
         if (ref $data->[0]) {
 
-            foreach my $pair ( @$data) {
+            foreach my $pair ( $data->@) {
                 return ExtraFieldError("Not list of lists")
                     unless ref $pair eq 'ARRAY' ;
 
                 my $bad = validateExtraFieldPair($pair, $strict, $gzipMode) ;
                 return $bad if $bad ;
 
-                $out .= mkSubField(< @$pair);
+                $out .= mkSubField(< $pair->@);
             }   
         }   
         else {
             return ExtraFieldError("Not even number of elements")
-                unless (nelems @$data) % 2  == 0;
+                unless (nelems $data->@) % 2  == 0;
 
             my $ix = 0;
-            while ($ix +<= length(nelems @$data) -1) {
+            while ($ix +<= length(nelems $data->@) -1) {
                 my $bad = validateExtraFieldPair(\@($data->[$ix],
                                                     $data->[$ix+1]), 
                                                  $strict, $gzipMode) ;
@@ -174,7 +174,7 @@ sub parseExtraField
         }
     }   
     elsif (ref $data eq 'HASH') {    
-        while (my @($id, $info) =@( each %$data)) {
+        while (my @($id, $info) =@( each $data->%)) {
             my $bad = validateExtraFieldPair(\@($id, $info), $strict, $gzipMode);
             return $bad if $bad ;
 

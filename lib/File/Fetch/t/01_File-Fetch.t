@@ -118,7 +118,7 @@ for my $entry (@map ) {
     my $href = File::Fetch->_parse_uri( $uri );
     ok( $href,  "Able to parse uri '$uri'" );
 
-    for my $key ( sort keys %$entry ) {
+    for my $key ( sort keys $entry->% ) {
         is( $href->{?$key}, $entry->{?$key},
             "   '$key' ok ($entry->{?$key}) for $uri");
     }
@@ -131,7 +131,7 @@ for my $entry (@map) {
     ok( $ff,                    "Object for uri '$entry->{?uri}'" );
     isa_ok( $ff, "File::Fetch", "   Object" );
 
-    for my $acc ( keys %$entry ) {
+    for my $acc ( keys $entry->% ) {
         is( $ff->?$acc(), $entry->{?$acc},
             "   Accessor '$acc' ok ($entry->{?$acc})" );
     }

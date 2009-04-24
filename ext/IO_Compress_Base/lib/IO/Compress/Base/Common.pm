@@ -413,7 +413,7 @@ sub createSelfTiedObject
 
     my $obj = bless \%(), ref($class) || $class;
     $obj->{+Closed} = 1 ;
-    $$error_ref = '';
+    $error_ref->$ = '';
     $obj->{+Error} = $error_ref ;
     my $errno = 0 ;
     $obj->{+ErrorNo} = \$errno ;
@@ -528,7 +528,7 @@ sub IO::Compress::Base::Parameters::parse
         return $self->setError("Expected even number of parameters, got 1")
             if ! defined $href or ! ref $href or ref $href ne "HASH" ;
 
-        foreach my $key (keys %$href) {
+        foreach my $key (keys $href->%) {
             push @entered, $key ;
             push @entered, \$href->{+$key} ;
         }
@@ -545,12 +545,12 @@ sub IO::Compress::Base::Parameters::parse
     }
 
 
-    while (my @(?$key, ?$v) =@( each %$default))
+    while (my @(?$key, ?$v) =@( each $default->%))
     {
-        croak "need 4 params [$(join ' ',@$v)]"
-            if (nelems @$v) != 4 ;
+        croak "need 4 params [$(join ' ',$v->@)]"
+            if (nelems $v->@) != 4 ;
 
-        my @($first_only, $sticky, $type, $value) =  @$v ;
+        my @($first_only, $sticky, $type, $value) =  $v->@ ;
         my $x ;
         $self->_checkType($key, \$value, $type, 0, \$x) 
             or return undef ;
@@ -592,7 +592,7 @@ sub IO::Compress::Base::Parameters::parse
             $self->_checkType($key, $value, $type, 1, \$s)
                 or return undef ;
 
-            $value = $$value ;
+            $value = $value->$ ;
             if ($type ^&^ Parse_multiple) {
                 $got->{$canonkey}->[OFF_PARSED] = 1;
                 push  $got->{$canonkey}->[OFF_FIXED]->@, $s ;
@@ -629,21 +629,21 @@ sub IO::Compress::Base::Parameters::_checkType
     if ($type ^&^ Parse_writable_scalar)
     {
         return $self->setError("Parameter '$key' not writable")
-            if $validate &&  readonly $$value ;
+            if $validate &&  readonly $value->$ ;
 
-        if (ref $$value) 
+        if (ref $value->$) 
         {
             return $self->setError("Parameter '$key' not a scalar reference")
-                if $validate &&  ref $$value ne 'SCALAR' ;
+                if $validate &&  ref $value->$ ne 'SCALAR' ;
 
-            $$output = $$value ;
+            $output->$ = $value->$ ;
         }
         else  
         {
             return $self->setError("Parameter '$key' not a scalar")
                 if $validate &&  ref $value ne 'SCALAR' ;
 
-            $$output = $value ;
+            $output->$ = $value ;
         }
 
         return 1;
@@ -658,11 +658,11 @@ sub IO::Compress::Base::Parameters::_checkType
     #        return 1;
     #    }
 
-    $value = $$value ;
+    $value = $value->$ ;
 
     if ($type ^&^ Parse_any)
     {
-        $$output = $value ;
+        $output->$ = $value ;
         return 1;
     }
     elsif ($type ^&^ Parse_unsigned)
@@ -672,7 +672,7 @@ sub IO::Compress::Base::Parameters::_checkType
         return $self->setError("Parameter '$key' must be an unsigned int, got '$value'")
             if $validate && $value !~ m/^\d+$/;
 
-        $$output = defined $value ?? $value !! 0 ;    
+        $output->$ = defined $value ?? $value !! 0 ;    
         return 1;
     }
     elsif ($type ^&^ Parse_signed)
@@ -682,23 +682,23 @@ sub IO::Compress::Base::Parameters::_checkType
         return $self->setError("Parameter '$key' must be a signed int, got '$value'")
             if $validate && $value !~ m/^-?\d+$/;
 
-        $$output = defined $value ?? $value !! 0 ;    
+        $output->$ = defined $value ?? $value !! 0 ;    
         return 1 ;
     }
     elsif ($type ^&^ Parse_boolean)
     {
         return $self->setError("Parameter '$key' must be an int, got '$value'")
             if $validate && defined $value && $value !~ m/^\d*$/;
-        $$output =  defined $value ?? $value != 0 !! 0 ;    
+        $output->$ =  defined $value ?? $value != 0 !! 0 ;    
         return 1;
     }
     elsif ($type ^&^ Parse_string)
     {
-        $$output = defined $value ?? $value !! "" ;    
+        $output->$ = defined $value ?? $value !! "" ;    
         return 1;
     }
 
-    $$output = $value ;
+    $output->$ = $value ;
     return 1;
 }
 
@@ -755,7 +755,7 @@ sub IO::Compress::Base::Parameters::clone
     my %got ;
 
     while (my @($k, $v) =@( each  $self->{Got}->%)) {
-        %got{+$k} = \ @$v;
+        %got{+$k} = \ $v->@;
     }
 
     $obj->{+Error} = $self->{?Error};
@@ -813,7 +813,7 @@ sub reset
 sub clone
 {
     my $self = shift;
-    bless \ @$self, ref $self ;
+    bless \ $self->@, ref $self ;
 }
 
 sub getHigh
@@ -868,7 +868,7 @@ sub getPacked_V64
 {
     my $self = shift;
 
-    return pack "V V", < @$self ;
+    return pack "V V", < $self->@ ;
 }
 
 sub getPacked_V32

@@ -77,11 +77,11 @@ my $NAMEDSEQFH;
 
 sub openunicode($rfh, @< @path) {
     my $f;
-    unless (defined $$rfh) {
+    unless (defined $rfh->$) {
         for my $d ( $^INCLUDE_PATH) {
             use File::Spec;
             $f = File::Spec->catfile($d, "unicore", < @path);
-            last if open($$rfh, "<", $f);
+            last if open($rfh->$, "<", $f);
             undef $f;
         }
         croak __PACKAGE__, ": failed to find ", <
@@ -271,7 +271,7 @@ sub charinrange($range, $arg) {
     my $code = _getcode($arg);
     croak __PACKAGE__, "::charinrange: unknown code '$arg'"
         unless defined $code;
-    _search($range, 0, ((nelems @$range)-1), $code);
+    _search($range, 0, ((nelems $range->@)-1), $code);
 }
 
 =head2 charblock

@@ -35,14 +35,14 @@ ok(1);
 ok(1);
 
 END {
-    My::Test::is($$out, <<OUT);
+    My::Test::is($out->$, <<OUT);
 1..1
 ok 1
 ok 2
 ok 3
 OUT
 
-    My::Test::is($$err, <<ERR);
+    My::Test::is($err->$, <<ERR);
 # Looks like you planned 1 test but ran 2 extra.
 ERR
 

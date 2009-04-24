@@ -48,9 +48,9 @@ while ( ~< *ARGV) {
     next_test();
 }
 open($try, "<", 'Io_argv1.tmp') or die "Can't open temp file: $^OS_ERROR";
-print $^STDOUT, $_ while ~< *$try;
+print $^STDOUT, $_ while ~< $try->*;
 open($try, "<", 'Io_argv2.tmp') or die "Can't open temp file: $^OS_ERROR";
-print $^STDOUT, $_ while ~< *$try;
+print $^STDOUT, $_ while ~< $try->*;
 close $try or die "Could not close: $^OS_ERROR";
 
 ok( eof $try );
@@ -82,18 +82,18 @@ ok( eof(),      'eof() true after closing ARGV' );
 do {
     local $^INPUT_RECORD_SEPARATOR = undef;
     open my $f, "<", 'Io_argv1.tmp' or die "Could not open Io_argv1.tmp: $^OS_ERROR";
-    ~< *$f;	# set $. = 1
-    is( ($: ~< *$f), undef );
+    ~< $f->*;	# set $. = 1
+    is( ($: ~< $f->*), undef );
 
     open $f, "<", $devnull or die;
-    ok( defined( ~< *$f) );
+    ok( defined( ~< $f->*) );
 
-    is(($: ~< *$f), undef );
-    is(($: ~< *$f), undef );
+    is(($: ~< $f->*), undef );
+    is(($: ~< $f->*), undef );
 
     open $f, "<", $devnull or die;	# restart cycle again
-    ok( defined( ~< *$f) );
-    is(($: ~< *$f), undef );
+    ok( defined( ~< $f->*) );
+    is(($: ~< $f->*), undef );
     close $f or die "Could not close: $^OS_ERROR";
 };
 

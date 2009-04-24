@@ -207,7 +207,7 @@ sub process_file {
                     unless ValidProtoString($proto) ;
                 %proto_letter{+$type} = C_string($proto) ;
             } elsif (m/^\s/) {
-                $$current .= $_;
+                $current->$ .= $_;
             } elsif ($mode eq 'Input') {
                 s/\s+$//;
                 %input_expr{+$_} = '';

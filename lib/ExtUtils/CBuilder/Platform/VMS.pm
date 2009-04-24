@@ -73,10 +73,10 @@ sub _do_link($self, $type, %< %args) {
         close $opt_fh;
 
         $objects->[-1] .= ',';
-        push @$objects, $optfile . '/OPTIONS,';
+        push $objects->@, $optfile . '/OPTIONS,';
 
         # This one not needed for DEC C, but leave for completeness.
-        push @$objects, $self->perl_inc() . 'perlshr_attr.opt/OPTIONS';
+        push $objects->@, $self->perl_inc() . 'perlshr_attr.opt/OPTIONS';
     }
 
     return $self->SUPER::_do_link($type, < %args, objects => $objects);

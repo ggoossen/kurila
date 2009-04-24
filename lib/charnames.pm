@@ -48,7 +48,7 @@ sub alias
 {
     (nelems @_) or return %alias3;
     my $alias = ref @_[0] ?? @_[0] !! \%( < @_ );
-        %alias3{[keys %$alias]} =  values %$alias;
+        %alias3{[keys $alias->%]} =  values $alias->%;
 } # alias
 
 sub alias_file($arg)

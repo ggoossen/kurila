@@ -306,7 +306,7 @@ sub run {
         return;
     };        
 
-    print $^STDOUT, < loc("Running [\%1]...\n", (ref $cmd ?? "$(join ' ',@$cmd)" !! $cmd)) if $verbose;
+    print $^STDOUT, < loc("Running [\%1]...\n", (ref $cmd ?? "$(join ' ',$cmd->@)" !! $cmd)) if $verbose;
 
     ### did the user pass us a buffer to fill or not? if so, set this
     ### flag so we know what is expected of us
@@ -363,7 +363,7 @@ sub run {
         ### in case there are pipes in there;
         ### IPC::Open3 will call exec and exec will do the right thing 
         $ok = __PACKAGE__->_open3_run( 
-            ( ref $cmd ?? "$(join ' ',@$cmd)" !! $cmd ),
+            ( ref $cmd ?? "$(join ' ',$cmd->@)" !! $cmd ),
             $_out_handler, $_err_handler, $verbose 
             );
 
@@ -371,11 +371,11 @@ sub run {
     } else {
         __PACKAGE__->_debug( "# Using system(). Have buffer: $have_buffer" )
             if $DEBUG;
-        $ok = __PACKAGE__->_system_run( (ref $cmd ?? "$(join ' ',@$cmd)" !! $cmd), $verbose );
+        $ok = __PACKAGE__->_system_run( (ref $cmd ?? "$(join ' ',$cmd->@)" !! $cmd), $verbose );
     }
 
     ### fill the buffer;
-    $$buffer = join '', @buffer if (nelems @buffer);
+    $buffer->$ = join '', @buffer if (nelems @buffer);
 
     ### return a list of flags and buffers (if available) in list
     ### context, or just a simple 'ok' in scalar
@@ -508,13 +508,13 @@ sub _ipc_run {
     my @command; my $special_chars;
     if( ref $cmd ) {
         my $aref = \@();
-        for my $item ( @$cmd) {
+        for my $item ( $cmd->@) {
             if( $item =~ m/([<>|&])/ ) {
                 push @command, $aref, $item;
                 $aref = \@();
                 $special_chars .= $1;
             } else {
-                push @$aref, $item;
+                push $aref->@, $item;
             }
         }
         push @command, $aref;

@@ -119,8 +119,8 @@ for my $s (1..2) {
     my $str = $t->{?data};
     my $r = $t->{?read_c};
     my $w = $t->{?write_c};
-    for my $read_c ( @$r) {
-        for my $write_c ( @$w) {
+    for my $read_c ( $r->@) {
+        for my $write_c ( $w->@) {
             for my $how_r (qw(readline_all readline read sysread)) {
                 next if $how_r eq 'readline_all' and $read_c != 1;
                 for my $how_w (qw(print print/flush syswrite)) {

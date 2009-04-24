@@ -450,7 +450,7 @@ sub run_tests {
         my $s = "ab";
         my @r; 
         @r[+$_] = \ substr $s, $_, 1 for @( (0, 1));
-        is(join("", map { $$_ }, @r), "ab");
+        is(join("", map { $_->$ }, @r), "ab");
     };
 
     # [perl #24605]

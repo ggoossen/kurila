@@ -253,7 +253,7 @@ sub _default_gettext {
 
 sub _escape {
     my $text = shift;
-    $text =~ s/\b_([1-9]\d*)/%$1/g;
+    $text =~ s/\b_([1-9]\d*)/$1->%/g;
     return $text;
 }
 

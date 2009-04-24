@@ -216,7 +216,7 @@ sub do_middle {      # the main work
                     my $line_count = 1;
                     if($next->type eq 'text') {
                         my $t = $next->text_r;
-                        while( $$t =~ m/$/mg ) {
+                        while( $t->$ =~ m/$/mg ) {
                             last if  ++$line_count  +> 15; # no point in counting further
                         }
                         DEBUG +> 3 and print $^STDOUT, "    verbatim line count: $line_count\n";

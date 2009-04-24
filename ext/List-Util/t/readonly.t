@@ -22,12 +22,12 @@ is( $var,	'fred',	'no change to string variable');
 $var = \2;
 
 ok( !readonly($var),	'reference to constant');
-ok( readonly($$var),	'de-reference to constant');
+ok( readonly($var->$),	'de-reference to constant');
 
 sub tryreadonly
 {
     my $v = \@_[0];
-    return readonly $$v;
+    return readonly $v->$;
 }
 
 $var = 123;

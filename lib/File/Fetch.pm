@@ -154,7 +154,7 @@ do {
                 _error_msg_long => \%( no_override => 1 ),
         );
 
-    for my $method ( keys %$Tmpl ) {
+    for my $method ( keys $Tmpl->% ) {
         Symbol::fetch_glob($method)->* = sub {
                 my $self = shift;
                 $self->{+$method} = @_[0] if (nelems @_);
@@ -271,7 +271,7 @@ sub new {
     my $href    = __PACKAGE__->_parse_uri( $uri ) or return;
 
     ### make it into a FFI object ###
-    my $ff      = File::Fetch->_create( < %$href ) or return;
+    my $ff      = File::Fetch->_create( < $href->% ) or return;
 
 
     ### return the object ###
@@ -436,7 +436,7 @@ sub fetch {
         }
 
         ### method is blacklisted ###
-        next if grep { lc $_ eq $method }, @$BLACKLIST;
+        next if grep { lc $_ eq $method }, $BLACKLIST->@;
 
         ### method is known to fail ###
         next if $METHOD_FAIL->{?$method};
@@ -610,13 +610,13 @@ sub _wget_fetch {
         my $cmd = \@( $wget, '--quiet' );
 
         ### if a timeout is set, add it ###
-        push(@$cmd, '--timeout=' . $TIMEOUT) if $TIMEOUT;
+        push($cmd->@, '--timeout=' . $TIMEOUT) if $TIMEOUT;
 
         ### run passive if specified ###
-        push @$cmd, '--passive-ftp' if $FTP_PASSIVE;
+        push $cmd->@, '--passive-ftp' if $FTP_PASSIVE;
 
         ### set the output document, add the uri ###
-        push @$cmd, '--output-document', 
+        push $cmd->@, '--output-document', 
             ### DO NOT quote things for IPC::Run, it breaks stuff.
             $IPC::Cmd::USE_IPC_RUN
             ?? ($to, < $self->uri)
@@ -719,10 +719,10 @@ sub _lynx_fetch {
             "-auth=anonymous:$FROM_EMAIL",
             );
 
-        push @$cmd, "-connect_timeout=$TIMEOUT" if $TIMEOUT;
+        push $cmd->@, "-connect_timeout=$TIMEOUT" if $TIMEOUT;
 
         ### DO NOT quote things for IPC::Run, it breaks stuff.
-        push @$cmd, $IPC::Cmd::USE_IPC_RUN
+        push $cmd->@, $IPC::Cmd::USE_IPC_RUN
             ?? < $self->uri
             !! QUOTE. $self->uri .QUOTE;
 
@@ -821,18 +821,18 @@ sub _curl_fetch {
         ### these long opts are self explanatory - I like that -jmb
         my $cmd = \@( $curl );
 
-        push(@$cmd, '--connect-timeout', $TIMEOUT) if $TIMEOUT;
+        push($cmd->@, '--connect-timeout', $TIMEOUT) if $TIMEOUT;
 
-        push(@$cmd, '--silent') unless $DEBUG;
+        push($cmd->@, '--silent') unless $DEBUG;
 
         ### curl does the right thing with passive, regardless ###
         if ($self->scheme eq 'ftp') {
-            push(@$cmd, '--user', "anonymous:$FROM_EMAIL");
+            push($cmd->@, '--user', "anonymous:$FROM_EMAIL");
         }
 
         ### curl doesn't follow 302 (temporarily moved) etc automatically
         ### so we add --location to enable that.
-        push @$cmd, '--fail', '--location', '--output', 
+        push $cmd->@, '--fail', '--location', '--output', 
             ### DO NOT quote things for IPC::Run, it breaks stuff.
             $IPC::Cmd::USE_IPC_RUN
             ?? ($to, < $self->uri)
@@ -940,12 +940,12 @@ sub _rsync_fetch {
         my $cmd = \@( $rsync );
 
         ### XXX: rsync has no I/O timeouts at all, by default
-        push(@$cmd, '--timeout=' . $TIMEOUT) if $TIMEOUT;
+        push($cmd->@, '--timeout=' . $TIMEOUT) if $TIMEOUT;
 
-        push(@$cmd, '--quiet') unless $DEBUG;
+        push($cmd->@, '--quiet') unless $DEBUG;
 
         ### DO NOT quote things for IPC::Run, it breaks stuff.
-        push @$cmd, $IPC::Cmd::USE_IPC_RUN
+        push $cmd->@, $IPC::Cmd::USE_IPC_RUN
             ?? ( <$self->uri, $to)
             !! (QUOTE. $self->uri .QUOTE, QUOTE. $to .QUOTE);
 
@@ -956,7 +956,7 @@ sub _rsync_fetch {
         ) {
 
                 return $self->_error( <loc("Command \%1 failed: \%2", 
-                                       "$(join ' ',@$cmd)" || '', $captured || ''));
+                                       "$(join ' ',$cmd->@)" || '', $captured || ''));
             }
 
         return $to;

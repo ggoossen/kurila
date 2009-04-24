@@ -246,7 +246,7 @@ sub Compress::Zlib::gzFile::gzsetparams
     return _set_gzerr(Z_STREAM_ERROR())
         if $self->[1] ne 'deflate';
 
-    my $status = *$gz->{?Compress}->deflateParams(Level   => $level, 
+    my $status = $gz->*->{?Compress}->deflateParams(Level   => $level, 
         Strategy => $strategy);
     _save_gzerr($gz);
     return $status ;
@@ -429,54 +429,54 @@ sub memGzip
 sub _removeGzipHeader($string)
 {
     return Z_DATA_ERROR() 
-        if length($$string) +< GZIP_MIN_HEADER_SIZE ;
+        if length($string->$) +< GZIP_MIN_HEADER_SIZE ;
 
     my @($magic1, $magic2, $method, $flags, $time, $xflags, $oscode) = 
-        @: unpack ('CCCCVCC', $$string);
+        @: unpack ('CCCCVCC', $string->$);
 
     return Z_DATA_ERROR()
         unless $magic1 == GZIP_ID1 and $magic2 == GZIP_ID2 and
         $method == Z_DEFLATED() and !($flags ^&^ GZIP_FLG_RESERVED) ;
-    substr($$string, 0, GZIP_MIN_HEADER_SIZE, '') ;
+    substr($string->$, 0, GZIP_MIN_HEADER_SIZE, '') ;
 
     # skip extra field
     if ($flags ^&^ GZIP_FLG_FEXTRA)
     {
         return Z_DATA_ERROR()
-            if length($$string) +< GZIP_FEXTRA_HEADER_SIZE ;
+            if length($string->$) +< GZIP_FEXTRA_HEADER_SIZE ;
 
-        my @($extra_len) = @: unpack('v', $$string);
+        my @($extra_len) = @: unpack('v', $string->$);
         $extra_len += GZIP_FEXTRA_HEADER_SIZE;
         return Z_DATA_ERROR()
-            if length($$string) +< $extra_len ;
+            if length($string->$) +< $extra_len ;
 
-        substr($$string, 0, $extra_len, '');
+        substr($string->$, 0, $extra_len, '');
     }
 
     # skip orig name
     if ($flags ^&^ GZIP_FLG_FNAME)
     {
-        my $name_end = index ($$string, GZIP_NULL_BYTE);
+        my $name_end = index ($string->$, GZIP_NULL_BYTE);
         return Z_DATA_ERROR()
             if $name_end == -1 ;
-        substr($$string, 0, $name_end + 1,  '');
+        substr($string->$, 0, $name_end + 1,  '');
     }
 
     # skip comment
     if ($flags ^&^ GZIP_FLG_FCOMMENT)
     {
-        my $comment_end = index ($$string, GZIP_NULL_BYTE);
+        my $comment_end = index ($string->$, GZIP_NULL_BYTE);
         return Z_DATA_ERROR()
             if $comment_end == -1 ;
-        substr($$string, 0, $comment_end + 1, '');
+        substr($string->$, 0, $comment_end + 1, '');
     }
 
     # skip header crc
     if ($flags ^&^ GZIP_FLG_FHCRC)
     {
         return Z_DATA_ERROR()
-            if length ($$string) +< GZIP_FHCRC_SIZE ;
-        substr($$string, 0, GZIP_FHCRC_SIZE, '');
+            if length ($string->$) +< GZIP_FHCRC_SIZE ;
+        substr($string->$, 0, GZIP_FHCRC_SIZE, '');
     }
 
     return Z_OK();
@@ -491,7 +491,7 @@ sub memGunzip
     _removeGzipHeader($string) == Z_OK() 
         or return undef;
 
-    my $bufsize = length $$string +> 4096 ?? length $$string !! 4096 ;
+    my $bufsize = length $string->$ +> 4096 ?? length $string->$ !! 4096 ;
     my @($x, ...) =  Compress::Raw::Zlib::Inflate->new(\%(WindowBits => - MAX_WBITS(),
             Bufsize => $bufsize));
     $x or return undef;
@@ -501,17 +501,17 @@ sub memGunzip
     return undef 
         unless $status == Z_STREAM_END();
 
-    if (length $$string +>= 8)
+    if (length $string->$ +>= 8)
     {
-        my @($crc, $len) = @: unpack("VV", substr($$string, 0, 8));
-        substr($$string, 0, 8, '');
+        my @($crc, $len) = @: unpack("VV", substr($string->$, 0, 8));
+        substr($string->$, 0, 8, '');
         return undef 
             unless $len == length($output) and
             $crc == crc32($output);
     }
     else
     {
-        $$string = '';
+        $string->$ = '';
     }
     return $output;   
 }

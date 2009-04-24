@@ -251,7 +251,7 @@ do {
     my $p = Pod::Simple::PullParser->new;
     ok 1;
     open(my $in, "<", "temp.pod") || die "Can't read-open temp.pod: $^OS_ERROR";
-    $p->set_source(\*$in);
+    $p->set_source(\$in->*);
 
     my( @t, $t );
     while($t = $p->get_token) {
@@ -282,7 +282,7 @@ do {
     my $p = Pod::Simple::PullParser->new;
     ok 1;
     open(my $in, "<", "temp.pod") || die "Can't read-open temp.pod: $^OS_ERROR";
-    $p->set_source(\*$in);
+    $p->set_source(\$in->*);
 
     my( @t, $t );
     while($t = $p->get_token) {

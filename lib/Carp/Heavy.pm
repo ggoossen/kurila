@@ -257,14 +257,14 @@ sub trusts {
     my $cache = shift;
     my @($known, $partial) =  get_status($cache, $child);
     # Figure out consequences until we have an answer
-    while ((nelems @$partial) and not exists $known->{$parent}) {
-        my $anc = shift @$partial;
+    while ((nelems $partial->@) and not exists $known->{$parent}) {
+        my $anc = shift $partial->@;
         next if exists $known->{$anc};
         $known->{+$anc}++;
         my @($anc_knows, $anc_partial) =  get_status($cache, $anc);
-        my @found = keys %$anc_knows;
-            %$known{[ @found]} = @();
-        push @$partial, < @$anc_partial;
+        my @found = keys $anc_knows->%;
+            $known->%{[ @found]} = @();
+        push $partial->@, < $anc_partial->@;
     }
     return exists $known->{$parent};
 }

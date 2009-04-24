@@ -745,16 +745,16 @@ sub mylike {
                  or 0); # no undefs !
 
     # same as A ^ B, but B has side effects
-    my $ok = ( $bad  &&  unlike ($got, $want, $cmnt, < @$msgs)
-               or !$bad && like ($got, $want, $cmnt, < @$msgs));
+    my $ok = ( $bad  &&  unlike ($got, $want, $cmnt, < $msgs->@)
+               or !$bad && like ($got, $want, $cmnt, < $msgs->@));
 
     reduceDiffs ($tc) if not $ok;
 
     if (not $ok and $retry) {
         # redo, perhaps with use re debug - NOT ROBUST
         eval "use re 'debug'" if $debug;
-        $ok = ( $bad  &&  unlike ($got, $want, "(RETRY) $cmnt", < @$msgs)
-         or !$bad && like ($got, $want, "(RETRY) $cmnt", < @$msgs));
+        $ok = ( $bad  &&  unlike ($got, $want, "(RETRY) $cmnt", < $msgs->@)
+         or !$bad && like ($got, $want, "(RETRY) $cmnt", < $msgs->@));
         eval "no re 'debug'";
     }
     return $ok;
@@ -905,7 +905,7 @@ sub mydumper {
         print $^STDOUT, "half hearted attempt:\n";
         foreach my $it ( @_) {
             if (ref $it eq 'HASH') {
-                print $^STDOUT, " $_ => $it->{?$_}\n" foreach sort keys %$it;
+                print $^STDOUT, " $_ => $it->{?$_}\n" foreach sort keys $it->%;
             }
         }
         return;

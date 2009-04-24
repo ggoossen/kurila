@@ -107,7 +107,7 @@ while (my @(?$abbrev, ?$files) =@( each %utf8::PVA_abbr_map)) {
     next unless $prop_name;
     next if $abbrev eq "gc_sc";
 
-    for (sort keys %$files) {
+    for (sort keys $files->%) {
         my $filename = 'File::Spec'->catfile(
             $updir => lib => unicore => lib => $abbrev => "$files->{?$_}.pl"
             );

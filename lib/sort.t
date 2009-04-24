@@ -59,7 +59,7 @@ sub checkorder {
     my $status = '';			# so far, so good
     my ($disorder);
 
-    for my $i (0 .. nelems(@$aref)-2) {
+    for my $i (0 .. nelems($aref->@)-2) {
         # Equality shouldn't happen, but catch it in the contents check
         next if ($aref->[$i] cmp $aref->[$i+1]) +<= 0;
         $disorder = (substr($aref->[$i],   0, $RootWidth) eq
@@ -79,10 +79,10 @@ sub checkorder {
 sub checkequal($aref, $bref) {
     my $status = '';
 
-    if (nelems(@$aref) != nelems(@$bref)) {
-        $status = "Sizes differ: " . nelems(@$aref) . " vs " . nelems(@$bref);
+    if (nelems($aref->@) != nelems($bref->@)) {
+        $status = "Sizes differ: " . nelems($aref->@) . " vs " . nelems($bref->@);
     } else {
-        for my $i (0 .. nelems(@$aref) -1) {
+        for my $i (0 .. nelems($aref->@) -1) {
             next if ($aref->[$i] eq $bref->[$i]);
             $status = "Element $i differs: $aref->[$i] vs $bref->[$i]";
             last;

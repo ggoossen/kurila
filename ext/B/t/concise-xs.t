@@ -252,12 +252,12 @@ my %report;
 
 if (%opts{?r}) {
     my $refpkgs = require "%opts{?r}";
-    $testpkgs->{+$_} = $refpkgs->{?$_} foreach keys %$refpkgs;
+    $testpkgs->{+$_} = $refpkgs->{?$_} foreach keys $refpkgs->%;
 }
 
 unless (%opts{?a}) {
     unless (nelems @argpkgs) {
-        foreach my $pkg (sort keys %$testpkgs) {
+        foreach my $pkg (sort keys $testpkgs->%) {
             test_pkg($pkg, $testpkgs->{?$pkg});
         }
     } else {
@@ -345,10 +345,10 @@ sub corecheck {
         return;
     }
     my $mods = %Module::CoreList::version{?'5.009002'};
-    $mods = \ sort keys %$mods;
+    $mods = \ sort keys $mods->%;
     print $^STDOUT, < Dumper($mods);
 
-    foreach my $pkgnm ( @$mods) {
+    foreach my $pkgnm ( $mods->@) {
         test_pkg($pkgnm);
     }
 }

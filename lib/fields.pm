@@ -33,7 +33,7 @@ sub import {
     Symbol::fetch_glob("$package\::FIELDS")->*->% = %( () ) unless Symbol::fetch_glob("$package\::FIELDS")->*->%;
     my $fields = \Symbol::fetch_glob("$package\::FIELDS")->*->%;
     my $fattr = (%attr{+$package} ||= \@(1));
-    my $next = (nelems @$fattr);
+    my $next = (nelems $fattr->@);
 
     # Quiet pseudo-hash deprecation warning for uses of fields::new.
     bless \Symbol::fetch_glob("$package\::FIELDS")->*->%, 'pseudohash';
@@ -61,7 +61,7 @@ sub import {
         $fattr->[+$next] = ($f =~ m/^_/) ?? PRIVATE !! PUBLIC;
         $next += 1;
     }
-    if ((nelems @$fattr) +> $next) {
+    if ((nelems $fattr->@) +> $next) {
         # Well, we gave them the benefit of the doubt by guessing the
         # module was reloaded, but they appear to be declaring fields
         # in more than one place.  We can't be sure (without some extra
@@ -86,7 +86,7 @@ sub _dump  # sometimes useful for debugging
         }
         print $^STDOUT, "\n";
         my $fields = \Symbol::fetch_glob("$pkg\::FIELDS")->*->%;
-        for my $f (sort {$fields->{?$a} <+> $fields->{?$b}}, keys %$fields) {
+        for my $f (sort {$fields->{?$a} <+> $fields->{?$b}}, keys $fields->%) {
             my $no = $fields->{?$f};
             print $^STDOUT, "   $no: $f";
             my $fattr = %attr{$pkg}->[$no];
@@ -109,7 +109,7 @@ sub new {
     my $self = bless \%(), $class;
 
     # The lock_keys() prototype won't work since we require Hash::Util :(
-    &Hash::Util::lock_keys(\%$self, < _accessible_keys($class));
+    &Hash::Util::lock_keys(\$self->%, < _accessible_keys($class));
     return $self;
 }
 

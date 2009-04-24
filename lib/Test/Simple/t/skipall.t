@@ -37,6 +37,6 @@ Test::More->import('skip_all');
 
 
 END {
-    My::Test::ok($$out eq "1..0\n");
-    My::Test::ok($$err eq "");
+    My::Test::ok($out->$ eq "1..0\n");
+    My::Test::ok($err->$ eq "");
 }

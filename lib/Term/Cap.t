@@ -222,12 +222,12 @@ sub TIEHANDLE {
 
 sub PRINT {
     my $self = shift;
-    $$self .= join('', @_);
+    $self->$ .= join('', @_);
 }
 
 sub read {
     my $self = shift;
-    substr( $$self, 0, length($$self), '' );
+    substr( $self->$, 0, length($self->$), '' );
 }
 
 __END__

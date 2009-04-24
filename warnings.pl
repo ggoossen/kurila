@@ -91,7 +91,7 @@ sub valueWalk
     my $tre = shift ;
     my @list = @() ;
 
-    foreach my $k (sort keys %$tre) {
+    foreach my $k (sort keys $tre->%) {
         my $v = $tre->{?$k};
         die "duplicate key $k\n" if defined %list{?$k} ;
         die "Value associated with key '$k' is not an ARRAY reference"
@@ -128,7 +128,7 @@ sub walk
     my $tre = shift ;
     my @list = @() ;
 
-    foreach my $k (sort keys %$tre) {
+    foreach my $k (sort keys $tre->%) {
         my $v = $tre->{?$k};
         die "duplicate key $k\n" if defined %list{?$k} ;
         #$Value{$index} = uc $k ;
@@ -174,8 +174,8 @@ sub printTree
     my $prefix = shift ;
     my ($k, $v) ;
 
-    my $max = (sort {$a <+> $b}, map { length $_ }, keys %$tre)[-1] ;
-    my @keys = sort keys %$tre ;
+    my $max = (sort {$a <+> $b}, map { length $_ }, keys $tre->%)[-1] ;
+    my @keys = sort keys $tre->% ;
 
     while ($k = shift @keys) {
         $v = $tre->{?$k};
@@ -377,7 +377,7 @@ print $pm, "our \%Bits = %(\n" ;
 foreach my $k (sort keys  %list) {
 
     my $v = %list{?$k} ;
-    my @list = sort { $a <+> $b }, @$v;
+    my @list = sort { $a <+> $b }, $v->@;
 
     print $pm, tab(4, "    '$k'"), '=> "',
         # mkHex($warn_size, @list),
@@ -391,7 +391,7 @@ print $pm, "our \%DeadBits = %(\n" ;
 foreach my $k (sort keys  %list) {
 
     my $v = %list{?$k} ;
-    my @list = sort { $a <+> $b }, @$v;
+    my @list = sort { $a <+> $b }, $v->@;
 
     print $pm, tab(4, "    '$k'"), '=> "',
         # mkHex($warn_size, @list),

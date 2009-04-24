@@ -139,12 +139,12 @@ sub concise_subref {
 }
 
 sub concise_stashref($order, $h) {
-    foreach my $k (sort keys %$h) {
+    foreach my $k (sort keys $h->%) {
         next unless defined $h->{?$k};
         my $s = \($h->{+$k});
-        my $coderef = *$s{CODE} or next;
+        my $coderef = $s->*{CODE} or next;
         reset_sequence();
-        print $^STDOUT, "FUNC: *", Symbol::glob_name(*$s), "\n";
+        print $^STDOUT, "FUNC: *", Symbol::glob_name($s->*), "\n";
         my $codeobj = svref_2object($coderef);
         next unless ref $codeobj eq 'B::CV';
         try { concise_cv_obj($order, $codeobj, $k) };
@@ -423,15 +423,15 @@ sub reset_sequence {
 }
 
 sub seq($op) {
-    return "-" if not exists %sequence_num{$$op};
-    return base_n(%sequence_num{?$$op});
+    return "-" if not exists %sequence_num{$op->$};
+    return base_n(%sequence_num{?$op->$});
 }
 
 sub walk_topdown($op, $sub, $level) {
     $sub->($op, $level);
     if ($op->flags ^&^ OPf_KIDS) {
         my $kid = $op->first;
-        while ($$kid) {
+        while ($kid->$) {
             walk_topdown($kid, $sub, $level + 1);
             $kid = $kid->sibling;
         }
@@ -447,7 +447,7 @@ sub walk_topdown($op, $sub, $level) {
 }
 
 sub walklines($ar, $level) {
-    for my $l ( @$ar) {
+    for my $l ( $ar->@) {
         if (ref($l) eq "ARRAY") {
             walklines($l, $level + 1);
         } else {
@@ -461,17 +461,17 @@ sub walk_exec($top, ?$level) {
     my @lines;
     my @todo = @(\@($top, \@lines));
     while ((nelems @todo) and my@($op, $targ) =  (shift @todo)->@) {
-        while ($$op) {
-            last if %opsseen{+$$op}++;
-            push @$targ, $op;
+        while ($op->$) {
+            last if %opsseen{+$op->$}++;
+            push $targ->@, $op;
             my $name = $op->name;
             if (class($op) eq "LOGOP") {
                 my $ar = \@();
-                push @$targ, $ar;
+                push $targ->@, $ar;
                 push @todo, \@($op->other, $ar);
             } elsif ($name eq "subst" and $op->pmreplstart->$) {
                 my $ar = \@();
-                push @$targ, $ar;
+                push $targ->@, $ar;
                 push @todo, \@($op->pmreplstart, $ar);
             } elsif ($name =~ m/^enter(loop|iter)$/) {
                 %labels{+$op->nextop->$} = "NEXT";
@@ -488,14 +488,14 @@ sub walk_exec($top, ?$level) {
 # The structure of this routine is purposely modeled after op.c's peep()
 sub sequence($op) {
     my $oldop = 0;
-    return if class($op) eq "NULL" or exists %sequence_num{$$op};
-    while ($$op) {
-        last if exists %sequence_num{$$op};
+    return if class($op) eq "NULL" or exists %sequence_num{$op->$};
+    while ($op->$) {
+        last if exists %sequence_num{$op->$};
         my $name = $op->name;
         if ($name =~ m/^(null|scalar|lineseq|scope)$/) {
             next if $oldop and $op->next->$;
         } else {
-            %sequence_num{+$$op} = $seq_max++;
+            %sequence_num{+$op->$} = $seq_max++;
             if (class($op) eq "LOGOP") {
                 my $other = $op->other;
                 $other = $other->next while $other->name eq "null";
@@ -662,8 +662,8 @@ sub concise_sv($sv, $hr, ?$preferpv) {
     $hr->{+svclass} = class($sv);
     $hr->{+svclass} = "UV"
     if $hr->{?svclass} eq "IV" and $sv->FLAGS ^&^ SVf_IVisUV;
-    warn("bad concise_sv: $sv") unless $sv and $$sv;
-    $hr->{+svaddr} = sprintf("\%#x", $$sv);
+    warn("bad concise_sv: $sv") unless $sv and $sv->$;
+    $hr->{+svaddr} = sprintf("\%#x", $sv->$);
     if ($hr->{?svclass} eq "GV") {
         my $gv = $sv;
         my $stash = $gv->STASH->NAME;
@@ -680,7 +680,7 @@ sub concise_sv($sv, $hr, ?$preferpv) {
             $sv = $sv->RV;
         }
         if (class($sv) eq "SPECIAL") {
-            $hr->{+svval} .= @("Null", "sv_undef", "sv_yes", "sv_no")[$$sv];
+            $hr->{+svval} .= @("Null", "sv_undef", "sv_yes", "sv_no")[$sv->$];
         } elsif ($preferpv && $sv->FLAGS ^&^ SVf_POK) {
             $hr->{+svval} .= cstring($sv->PV);
         } elsif ($sv->FLAGS ^&^ SVf_NOK) {
@@ -833,7 +833,7 @@ sub concise_op($op, $level, $format) {
     %h{+seq} = %h{+hyphseq} = seq($op);
     %h{+seq} = "" if %h{?seq} eq "-";
     %h{+opt} = $op->opt;
-    %h{+label} = %labels{?$$op};
+    %h{+label} = %labels{?$op->$};
     %h{+next} = $op->next;
     %h{+next} = (class(%h{?next}) eq "NULL") ?? "(end)" !! seq(%h{?next});
     %h{+nextaddr} = sprintf("\%#x", $op->next->$);
@@ -852,7 +852,7 @@ sub concise_op($op, $level, $format) {
     } else {
         %h{+hintsval} = %h{+hints} = '';
     }
-    %h{+addr} = sprintf("\%#x", $$op);
+    %h{+addr} = sprintf("\%#x", $op->$);
     %h{+typenum} = $op->type;
     %h{+noise} = @linenoise[$op->type];
 
@@ -860,10 +860,10 @@ sub concise_op($op, $level, $format) {
 }
 
 sub B::OP::concise($op, $level) {
-    if ($order eq "exec" and $lastnext and $$lastnext != $$op) {
+    if ($order eq "exec" and $lastnext and $lastnext->$ != $op->$) {
         # insert a 'goto' line
         my $synth = \%("seq" => seq($lastnext), "class" => class($lastnext),
-                "addr" => sprintf("\%#x", $$lastnext),
+                "addr" => sprintf("\%#x", $lastnext->$),
                     "goto" => seq($lastnext), # simplify goto '-' removal
             );
         print $walkHandle, fmt_line($synth, $op, $gotofmt, $level+1);
@@ -886,10 +886,10 @@ sub b_terse($op, $level) {
     # that's worth the effort, though.
     $curcv = main_cv unless $curcv;
 
-    if ($order eq "exec" and $lastnext and $$lastnext != $$op) {
+    if ($order eq "exec" and $lastnext and $lastnext->$ != $op->$) {
         # insert a 'goto'
         my $h = \%("seq" => seq($lastnext), "class" => class($lastnext),
-                "addr" => sprintf("\%#x", $$lastnext));
+                "addr" => sprintf("\%#x", $lastnext->$));
         print $^STDOUT, # $walkHandle
             fmt_line($h, $op, %style{"terse"}->[1], $level+1);
     }
@@ -902,14 +902,14 @@ sub tree {
     my $op = shift;
     my $level = shift;
     my $style = @tree_decorations[$tree_style];
-    my@($space, $single, $kids, $nokid, $last, $lead, $size) =  @$style;
+    my@($space, $single, $kids, $nokid, $last, $lead, $size) =  $style->@;
     my $name = concise_op($op, $level, $treefmt);
     if (not $op->flags ^&^ OPf_KIDS) {
         return $name . "\n";
     }
     my @lines;
     my $kid = $op->first;
-    while ($$kid) {
+    while ($kid->$) {
         push @lines, < tree($kid, $level+1);
         $kid = $kid->sibling;
     }
