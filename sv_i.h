@@ -59,9 +59,6 @@ Perl_SvNV(pTHX_ SV *sv) {
 #define SvIV_nomg(sv) (SvIOK(sv) ? SvIVX(sv) : sv_2iv(sv))
 #define SvUV_nomg(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv))
 
-#define SvPVx_const(sv, lp) iiSvPVx_const(aTHX_ sv, lp)
-static __inline__ const char* iiSvPVx_const(pTHX_ SV *sv, STRLEN *lp) { return SvPV_const(sv, *lp); }
-
 #define SvPVx_nolen(sv) iiSvPVx_nolen(aTHX_ sv)
 static __inline__ char* iiSvPVx_nolen(pTHX_ SV* sv) {return SvPV_nolen(sv); }
 
