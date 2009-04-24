@@ -74,7 +74,6 @@ Perl_SvCUR_set(pTHX_ SV* sv, STRLEN len) {
     assert(SvTYPE(sv) != SVt_PVAV);
     assert(SvTYPE(sv) != SVt_PVHV);
     assert(!isGV_with_GP(sv));
-    assert( SvLEN(sv) == 0 || SvLEN(sv) >= len );
     ((XPV*) SvANY(sv))->xpv_cur = len;
 }
 

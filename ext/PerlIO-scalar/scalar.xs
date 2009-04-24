@@ -156,8 +156,10 @@ PerlIOScalar_write(pTHX_ PerlIO * f, const void *vbuf, Size_t count)
 	    s->posn += count;
 	}
 	Move(vbuf, dst + offset, count, char);
-	if ((STRLEN) s->posn > SvCUR(sv))
+	if ((STRLEN) s->posn > SvCUR(sv)) {
 	    SvCUR_set(sv, (STRLEN)s->posn);
+            dst[s->posn] = '\0';
+        }
 	SvPOK_on(s->var);
 	return count;
     }

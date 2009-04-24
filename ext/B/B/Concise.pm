@@ -111,8 +111,7 @@ sub add_callback {
 our $walkHandle;	# public for your convenience
 BEGIN { $walkHandle = $^STDOUT }
 
-sub walk_output { # updates $walkHandle
-    my $handle = shift;
+sub walk_output(?$handle) { # updates $walkHandle
     return $walkHandle unless $handle; # allow use as accessor
 
     if (ref $handle eq 'SCALAR') {
