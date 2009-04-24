@@ -110,6 +110,7 @@ AipS	|void	|sv_cp_replace	|NN XV **sv_d|NULLOK XV *sv_s
 Aip	|IV	|SvIV	|NN SV *sv
 Aip	|UV	|SvUV	|NN SV *sv
 Aip	|NV	|SvNV	|NN SV *sv
+Aip	|STRLEN	|SvCUR	|NN SV *sv
 Aip	|char *	|SvPVx_nolen	|NN SV *sv
 Aip	|const char *	|SvPVx_nolen_const	|NN SV *sv
 Aip	|bool	|SvTRUE	|NN SV *sv

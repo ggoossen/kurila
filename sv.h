@@ -861,7 +861,6 @@ in gv.h: */
 #  define SvNVX(sv) (-0.0 + ((XPVNV*) SvANY(sv))->xnv_u.xnv_nv)
 #  define SvRV(sv) (0 + (sv)->sv_u.svu_rv)
 /* Don't test the core XS code yet.  */
-#  define SvCUR(sv) (0 + ((XPV*) SvANY(sv))->xpv_cur)
 #  define SvLEN(sv) (0 + ((XPV*) SvANY(sv))->xpv_len)
 #  define SvEND(sv) ((sv)->sv_u.svu_pv + ((XPV*)SvANY(sv))->xpv_cur)
 
@@ -878,14 +877,6 @@ in gv.h: */
 
 #  if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 /* These get expanded inside other macros that already use a variable _sv  */
-#    define SvCUR(sv)							\
-	(*({ SV *const _svi = (SV *) (sv);				\
-	    assert(SvTYPE(_svi) >= SVt_PV);				\
-	    assert(SvTYPE(_svi) != SVt_PVAV);				\
-	    assert(SvTYPE(_svi) != SVt_PVHV);				\
-	    assert(!isGV_with_GP(_svi));				\
-	    &(((XPV*) SvANY(_svi))->xpv_cur);				\
-	 }))
 #    define SvIVX(sv)							\
 	(*({ SV *const _svi = (SV *) (sv);				\
 	    assert(SvTYPE(_svi) == SVt_IV || SvTYPE(_svi) >= SVt_PVIV);	\
@@ -936,7 +927,6 @@ in gv.h: */
 	    &(((XPVMG*) SvANY(_svi))->xmg_stash);			\
 	  }))
 #  else
-#    define SvCUR(sv) ((XPV*) SvANY(sv))->xpv_cur
 #    define SvIVX(sv) ((XPVIV*) SvANY(sv))->xiv_iv
 #    define SvUVX(sv) ((XPVUV*) SvANY(sv))->xuv_uv
 #    define SvNVX(sv) ((XPVNV*) SvANY(sv))->xnv_u.xnv_nv
@@ -1007,7 +997,7 @@ in gv.h: */
 		(((XPV*)  SvANY(sv))->xpv_len = (val)); } STMT_END
 #define SvEND_set(sv, val) \
 	STMT_START { assert(SvTYPE(sv) >= SVt_PV); \
-		(SvCUR(sv) = (val) - SvPVX_const(sv)); } STMT_END
+	    (SvCUR_set(sv, (val) - SvPVX_const(sv))); } STMT_END
 
 #define SvPV_renew(sv,n) \
 	STMT_START { SvLEN_set(sv, n); \

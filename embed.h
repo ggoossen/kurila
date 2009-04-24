@@ -90,6 +90,7 @@
 #define SvIV			Perl_SvIV
 #define SvUV			Perl_SvUV
 #define SvNV			Perl_SvNV
+#define SvCUR			Perl_SvCUR
 #define SvPVx_nolen		Perl_SvPVx_nolen
 #define SvPVx_nolen_const	Perl_SvPVx_nolen_const
 #define SvTRUE			Perl_SvTRUE
@@ -2295,6 +2296,7 @@
 #define SvIV(a)			Perl_SvIV(aTHX_ a)
 #define SvUV(a)			Perl_SvUV(aTHX_ a)
 #define SvNV(a)			Perl_SvNV(aTHX_ a)
+#define SvCUR(a)		Perl_SvCUR(aTHX_ a)
 #define SvPVx_nolen(a)		Perl_SvPVx_nolen(aTHX_ a)
 #define SvPVx_nolen_const(a)	Perl_SvPVx_nolen_const(aTHX_ a)
 #define SvTRUE(a)		Perl_SvTRUE(aTHX_ a)

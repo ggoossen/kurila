@@ -59,6 +59,15 @@ Perl_SvNV(pTHX_ SV *sv) {
 #define SvIV_nomg(sv) (SvIOK(sv) ? SvIVX(sv) : sv_2iv(sv))
 #define SvUV_nomg(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv))
 
+STRLEN
+Perl_SvCUR(pTHX_ SV* sv) {
+    assert(SvTYPE(sv) >= SVt_PV);
+    assert(SvTYPE(sv) != SVt_PVAV);
+    assert(SvTYPE(sv) != SVt_PVHV);
+    assert(!isGV_with_GP(sv));
+    return ((XPV*) SvANY(sv))->xpv_cur;
+}
+
 char* 
 Perl_SvPVx_nolen(pTHX_ SV* sv) {
     PERL_ARGS_ASSERT_SVPVX_NOLEN;
