@@ -264,7 +264,7 @@ sub check_install {
     ### only complain if we're expected to find a version higher than 0.0 anyway
     if( $FIND_VERSION and not defined $href->{?version} ) {
         do {   ### don't warn about the 'not numeric' stuff ###
-            local $^WARNING = undef;
+            local $^WARNING = 0;
 
             ### if we got here, we didn't find the version
             warn < loc(q[Could not check version on '%1'], $args->{?module} )
@@ -274,7 +274,7 @@ sub check_install {
 
     } else {
         ### don't warn about the 'not numeric' stuff ###
-        local $^WARNING = undef;
+        local $^WARNING = 0;
 
         ### use qv(), as it will deal with developer release number
         ### ie ones containing _ as well. This addresses bug report
