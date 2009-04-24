@@ -105,7 +105,7 @@ sub new {
         $self->%{+LQUOTE} = $1;
         $self->%{+RQUOTE} = $2;
     } else {
-        die qq(Invalid quote specification "$self->%{?opt_quotes}");
+        die qq(Invalid quote specification "$self->{?opt_quotes}");
     }
 
     # If requested, do something with the non-POD text.
@@ -507,7 +507,7 @@ sub cmd_c($self, $attrs, $text) {
     # If we didn't return, go ahead and quote the text.
     return $self->%{?opt_alt}
         ?? "``$text''"
-        !! "$self->%{?LQUOTE}$text$self->%{?RQUOTE}";
+        !! "$self->{?LQUOTE}$text$self->{?RQUOTE}";
 }
 
 # Links reduce to the text that we're given, wrapped in angle brackets if it's

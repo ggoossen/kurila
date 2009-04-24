@@ -205,7 +205,7 @@ sub _do_all_batch_conversions($self, $mod2path, $outdir) {
 
 sub _batch_convert_finish($self, $outdir) {
     $self->write_contents_file($outdir);
-    $self->muse("Done with batch conversion.  $self->%{?'__batch_conv_page_count'} files done.");
+    $self->muse("Done with batch conversion.  $self->{?'__batch_conv_page_count'} files done.");
     $self->muse( "= ", scalar(localtime) );
     $self->progress and $self->progress->done("All done!");
     return;

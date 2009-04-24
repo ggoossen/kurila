@@ -23,7 +23,7 @@ my @pairs = @(
 
 
 foreach(  @pairs ) {
-    print $^STDOUT, "# Testing pod source $_->@[0] ...\n" unless $_->[0] =~ m/\n/;
+    print $^STDOUT, "# Testing pod source $_->[0] ...\n" unless $_->[0] =~ m/\n/;
     is( x($_->[0]), $_->[1] )
 }
 print $^STDOUT, "# And one for the road...\n";

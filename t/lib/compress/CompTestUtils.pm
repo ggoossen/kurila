@@ -540,7 +540,7 @@ sub mkComplete
     }
 
     my $z = $class-> new(( \$buffer, < %params))
-        or croak "Cannot create $class object: $Error->$";
+        or croak "Cannot create $class object: $($Error->$)";
     $z->write($data);
     $z->close();
 
