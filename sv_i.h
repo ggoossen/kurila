@@ -68,6 +68,15 @@ Perl_SvCUR(pTHX_ SV* sv) {
     return ((XPV*) SvANY(sv))->xpv_cur;
 }
 
+void
+Perl_SvCUR_set(pTHX_ SV* sv, STRLEN len) {
+    assert(SvTYPE(sv) >= SVt_PV);
+    assert(SvTYPE(sv) != SVt_PVAV);
+    assert(SvTYPE(sv) != SVt_PVHV);
+    assert(!isGV_with_GP(sv));
+    ((XPV*) SvANY(sv))->xpv_cur = len;
+}
+
 char* 
 Perl_SvPVx_nolen(pTHX_ SV* sv) {
     PERL_ARGS_ASSERT_SVPVX_NOLEN;

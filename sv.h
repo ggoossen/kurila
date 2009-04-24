@@ -983,12 +983,6 @@ in gv.h: */
 #define SvSTASH_set(sv, val) \
         STMT_START { assert(SvTYPE(sv) >= SVt_PVMG); \
                 (((XPVMG*)  SvANY(sv))->xmg_stash = (val)); } STMT_END
-#define SvCUR_set(sv, val) \
-	STMT_START { assert(SvTYPE(sv) >= SVt_PV); \
-		assert(SvTYPE(sv) != SVt_PVAV);		\
-		assert(SvTYPE(sv) != SVt_PVHV);		\
-		assert(!isGV_with_GP(sv));		\
-		(((XPV*)  SvANY(sv))->xpv_cur = (val)); } STMT_END
 #define SvLEN_set(sv, val) \
 	STMT_START { assert(SvTYPE(sv) >= SVt_PV); \
 		assert(SvTYPE(sv) != SVt_PVAV);	\

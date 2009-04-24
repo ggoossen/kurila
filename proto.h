@@ -182,6 +182,11 @@ PERL_INLINE_CALLCONV STRLEN	Perl_SvCUR(pTHX_ SV *sv)
 #define PERL_ARGS_ASSERT_SVCUR	\
 	assert(sv)
 
+PERL_INLINE_CALLCONV void	Perl_SvCUR_set(pTHX_ SV *sv, STRLEN len)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SVCUR_SET	\
+	assert(sv)
+
 PERL_INLINE_CALLCONV char *	Perl_SvPVx_nolen(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SVPVX_NOLEN	\
