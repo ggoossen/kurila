@@ -1546,16 +1546,16 @@ sub ast {
     my $self = shift;
 
     if ($$self{mp}{X}) {
-        return $self->newtype->new(Kids => [$self->madness('X')]);
+        return $self->newtype->new(Kids => [$self->madness('wrap_open X wrap_close')]);
     }
 
     my @newkids;
-    push @newkids, $self->madness('dx d optional_assign ( * $');
+    push @newkids, $self->madness('wrap_open dx d optional_assign ( * $');
     for (@{$self->{Kids}}) {
         push @newkids, $_->ast($self,@_);
     }
     # push @newkids, $$self{Kids}[0]->ast();
-    push @newkids, $self->madness(') a');
+    push @newkids, $self->madness(') a wrap_close');
     return $self->newtype->new(Kids => [@newkids]);
 }
 
@@ -1570,11 +1570,11 @@ sub ast {
     my $self = shift;
 
     my @newkids;
-    push @newkids, $self->madness('dx d optional_assign ( X $');
+    push @newkids, $self->madness('wrapopen dx d optional_assign ( X $');
     if (ref $$self{Kids}[0] ne "PLXML::op_gv") {
 	push @newkids, $$self{Kids}[0]->ast();
     }
-    push @newkids, $self->madness(') : a');
+    push @newkids, $self->madness(') : a wrap_close');
     return $self->newtype->new(Kids => [@newkids]);
 }
 
@@ -2188,7 +2188,7 @@ package PLXML::op_rv2av;
 
 sub astnull {
     my $self = shift;
-    return P5AST::op_rv2av->new(Kids => [$self->madness('X $ @')]);
+    return P5AST::op_rv2av->new(Kids => [$self->madness('wrap_open X $ @ wrap_close')]);
 }
 
 sub ast {
@@ -2199,7 +2199,7 @@ sub ast {
     }
 
     my @before;
-    push @before, $self->madness('dx d optional_assign (');
+    push @before, $self->madness('wrap_open dx d optional_assign (');
 
     my @newkids;
     push @newkids, $self->madness('X $ @ K');
@@ -2207,7 +2207,7 @@ sub ast {
 	push @newkids, $$self{Kids}[0]->ast();
     }
     my @after;
-    push @after, $self->madness(') a');
+    push @after, $self->madness(') a wrap_close');
     return $self->newtype->new(Kids => [@before, @newkids, @after]);
 }
 
@@ -2304,14 +2304,14 @@ package PLXML::op_rv2hv;
 
 sub astnull {
     my $self = shift;
-    return P5AST::op_rv2hv->new(Kids => [$self->madness('X $')]);
+    return P5AST::op_rv2hv->new(Kids => [$self->madness('wrap_open X $ wrap_close')]);
 }
 
 sub ast {
     my $self = shift;
 
     my @before;
-    push @before, $self->madness('dx d optional_assign (');
+    push @before, $self->madness('wrap_open dx d optional_assign (');
 
     my @newkids;
     push @newkids, $self->madness('X $ @ % K');
@@ -2319,7 +2319,7 @@ sub ast {
 	push @newkids, $$self{Kids}[0]->ast();
     }
     my @after;
-    push @after, $self->madness(') a');
+    push @after, $self->madness(') a wrap_close');
     return $self->newtype->new(Kids => [@before, @newkids, @after]);
 }
 

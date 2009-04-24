@@ -39,8 +39,9 @@ sub p5convert {
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_indent();
+t_scope_deref();
 die "END";
+t_indent();
 t_env_sub();
 t_local();
 t_stdin();
@@ -2094,5 +2095,73 @@ Foo
 =cut
     "noot";
 };
+====
+"aap";
+ $a->docall(
+  "noot",
+ );
+----
+"aap";
+$a->docall(
+    "noot",
+    );
+END
+}
+
+sub t_scope_deref {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+${$a};
+----
+$a->$;
+====
+@{$a};
+----
+$a->@;
+====
+$a->$;
+----
+$a->$;
+====
+${$a||$b};
+----
+($a||$b)->$;
+====
+%{$a}{[$b]};
+----
+$a->{[$b]};
+====
+@{ shift $a };
+----
+( shift $a )->@;
+====
+${ $a };
+----
+ $a->$;
+====
+%{$a}{aap};
+----
+$a->{aap};
+====
+delete %{$a}{aap};
+----
+delete $a->{aap};
+====
+*{$a};
+----
+$a->*;
+====
+$a->{[@{$a}]};
+----
+$a->{[$a->@]};
+====
+$$a;
+*$a;
+@$a;
+%$a;
+----
+$a->$;
+$a->*;
+$a->@;
+$a->%;
 END
 }
