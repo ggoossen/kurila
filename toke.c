@@ -2071,7 +2071,7 @@ S_intuit_more(pTHX_ register char *s)
 
     if (PL_lex_brackets)
 	return TRUE;
-    if (*s == '-' && s[1] == '>' && (s[2] == '[' || s[2] == '{' || s[2] == '@'))
+    if (*s == '-' && s[1] == '>' && (s[2] == '[' || s[2] == '{' || s[2] == '@' || s[2] == '$'))
 	return TRUE;
     if (*s != '{' && *s != '[')
 	return FALSE;
