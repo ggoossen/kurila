@@ -943,7 +943,7 @@ S_skipspace(pTHX_ register char *s)
 	    }
 
 	    /* mustn't throw out old stuff yet if madpropping */
-	    SvCUR(PL_linestr) = curoff;
+	    SvCUR_set(PL_linestr, curoff);
 	    s = SvPVX_mutable(PL_linestr) + curoff;
 	    *s = 0;
 	    if (curoff && s[-1] == '\n')

@@ -1475,6 +1475,55 @@ sub first_token {
     return $linenr, $charoffset;
 }
 
+sub scope_deref {
+    my $xml = shift;
+
+    for ([qw|rv2sv variable|], [qw|rv2av ary|], [qw|rv2hv hsh|], [qw|rv2gv star|]) {
+        my ($opname, $varname) = @{$_};
+        for my $rv2sv_op (find_ops($xml, $opname)) {
+            my $scope_op = $rv2sv_op->child(-1);
+            if ( $scope_op->tag =~ m/^op_(scope|leave)$/ ) {
+
+                my $need_parens;
+                if ( (get_madprop($scope_op->child(-1), "null_type")||'')
+                       =~ m/^(operator|uniop)$/ ) {
+                    $need_parens = 1;
+                }
+
+                my $var = get_madprop($rv2sv_op, $varname);
+                my $parent_tag = $rv2sv_op->parent->tag eq "op_null"
+                  ? $rv2sv_op->parent->att('was') : $rv2sv_op->parent->tag;
+                if ( ($parent_tag||'') =~ m/^(op_)?(hslice|helem|aslice|aelem)$/
+                       and $rv2sv_op->pos == ($parent_tag =~ m/slice/ ? 3 : 2) ) {
+                    $var = '';
+                }
+                set_madprop($rv2sv_op, $varname, '');
+                set_madprop($scope_op, "curly_open",
+                            $need_parens ? '(' : '',
+                        );
+                set_madprop($scope_op, "curly_close",
+                            ($need_parens ? ')' : '') . '-&gt;' . $var,
+                            ( $need_parens ? () : ( wsbefore => '' ) ),
+                        );
+            }
+            else {
+                if (get_madprop($rv2sv_op, $varname)) {
+                    my $var = get_madprop($rv2sv_op, $varname);
+                    next if length($var) != 1;
+                    my $parent_tag = $rv2sv_op->parent->tag eq "op_null"
+                      ? $rv2sv_op->parent->att('was') : $rv2sv_op->parent->tag;
+                    if ( ($parent_tag||'') =~ m/^(op_)?(hslice|helem|aslice|aelem)$/
+                           and $rv2sv_op->pos == ($parent_tag =~ m/slice/ ? 3 : 2) ) {
+                        $var = '';
+                    }
+                    set_madprop($rv2sv_op, $varname, '');
+                    set_madprop($rv2sv_op, 'wrap_close', '-&gt;' . $var);
+                }
+            }
+        }
+    }
+}
+
 sub indent {
     my $xml = shift;
 
@@ -1600,10 +1649,17 @@ sub indent {
         }
 
         if ($is_entersub) {
-            if ($op->child(-1) and $op->child(-1)->child(-1)) {
-                $opsub->($op->child(-1)->child(-1));
-                if ($op->child(-1)->child(1)) {
-                    my ($linenr, $charoffset) = first_token($op->child(-1)->child(1));
+            my $subop;
+            if ($op->child(-1)->tag eq "op_method_named") {
+                $subop = $op->child(2);
+            }
+            else {
+                $subop = $op->child(-1)->child(-1);
+            }
+            if ($subop) {
+                $opsub->($subop);
+                if ($subop->parent->child(1)) {
+                    my ($linenr, $charoffset) = first_token($subop->parent->child(1));
                     if ($linenr) {
                         $old_cont = $cont;
                         $cont = $charoffset - $indent_level - 1;
@@ -1782,9 +1838,11 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.19') {
     env_sub($twig);
 }
 
-indent($twig);
+scope_deref($twig);
 
-#add_call_parens($twig);
+#indent($twig);
+
+#future: add_call_parens($twig);
 
 # print
 $twig->print( pretty_print => 'indented' );
