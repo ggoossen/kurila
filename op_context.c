@@ -102,7 +102,9 @@ Perl_scalar(pTHX_ OP *o)
 	PL_curcop = &PL_compiling;
 	break;
     case OP_LIST:
+#ifndef PERL_MAD
 	Perl_croak_at(aTHX_ o->op_location, "%s may not be used in scalar context", PL_op_desc[o->op_type]);
+#endif /* PERL_MAD */
 	break;
     case OP_ANONARRAY:
 	break;
