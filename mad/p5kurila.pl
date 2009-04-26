@@ -1509,6 +1509,13 @@ sub scope_deref {
             else {
                 if (get_madprop($rv2sv_op, $varname)) {
                     my $var = get_madprop($rv2sv_op, $varname);
+                    next if length($var) != 1;
+                    my $parent_tag = $rv2sv_op->parent->tag eq "op_null"
+                      ? $rv2sv_op->parent->att('was') : $rv2sv_op->parent->tag;
+                    if ( ($parent_tag||'') =~ m/^(op_)?(hslice|helem|aslice|aelem)$/
+                           and $rv2sv_op->pos == ($parent_tag =~ m/slice/ ? 3 : 2) ) {
+                        $var = '';
+                    }
                     set_madprop($rv2sv_op, $varname, '');
                     set_madprop($rv2sv_op, 'wrap_close', '-&gt;' . $var);
                 }
