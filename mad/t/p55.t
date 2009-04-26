@@ -358,3 +358,6 @@ sub foo($x, $y = $z) { }
 foo(33, 55) == 44;
 ########
 local &{"foo"};
+########
+BEGIN { unless(defined &DEBUG) { *DEBUG = sub () {0} } }
+BEGIN { my $x = DEBUG(); }

@@ -3588,8 +3588,10 @@ PP(pp_list)
 {
     dVAR; dSP; dMARK;
     if (GIMME != G_ARRAY) {
+#ifndef PERL_MAD
 	if (GIMME_V == G_SCALAR)
 	    Perl_croak(aTHX_ "list may not be used in scalar context");
+#endif /* PERL_MAD */
 	if (++MARK <= SP)
 	    *MARK = *SP;		/* unwanted list, return last item */
 	else
