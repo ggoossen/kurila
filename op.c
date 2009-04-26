@@ -864,6 +864,9 @@ Perl_op_mod_assign(pTHX_ OP *operator, OP **operandp, I32 optype)
 	return operator;
     }
 
+    if (!*operandp)
+	return operator;
+
     finish_assign = op_assign(operandp, optype);
 
     if (!finish_assign) {
