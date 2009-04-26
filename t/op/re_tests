@@ -161,8 +161,8 @@ a[bcd]+dcdcde	adcdcde	n	-	-
 (bc+d$|ef*g.|h?i(j|k))	reffgz	y	$^MATCH-$1-$2	effgz-effgz-
 ((((((((((a))))))))))	a	y	$10	a
 ((((((((((a))))))))))\10	aa	y	$^MATCH	aa
-((((((((((a))))))))))${bang}	aa	n	-	-
-((((((((((a))))))))))${bang}	a!	y	$^MATCH	a!
+((((((((((a))))))))))$($bang)	aa	n	-	-
+((((((((((a))))))))))$($bang)	a!	y	$^MATCH	a!
 (((((((((a)))))))))	a	y	$^MATCH	a
 multiple words of text	uh-uh	n	-	-
 multiple words	multiple words, yeah	y	$^MATCH	multiple words
@@ -312,8 +312,8 @@ a[-]?c	ac	y	$^MATCH	ac
 '(bc+d$|ef*g.|h?i(j|k))'i	REFFGZ	y	$^MATCH-$1-$2	EFFGZ-EFFGZ-
 '((((((((((a))))))))))'i	A	y	$10	A
 '((((((((((a))))))))))\10'i	AA	y	$^MATCH	AA
-'((((((((((a))))))))))${\$bang}'i	AA	n	-	-
-'((((((((((a))))))))))${\$bang}'i	A!	y	$^MATCH	A!
+'((((((((((a))))))))))$($bang)'i	AA	n	-	-
+'((((((((((a))))))))))$($bang)'i	A!	y	$^MATCH	A!
 '(((((((((a)))))))))'i	A	y	$^MATCH	A
 '(?:(?:(?:(?:(?:(?:(?:(?:(?:(a))))))))))'i	A	y	$1	A
 '(?:(?:(?:(?:(?:(?:(?:(?:(?:(a|b|c))))))))))'i	C	y	$1	C

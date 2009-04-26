@@ -334,13 +334,13 @@ sub init {
     $self->{+'bindir' } = $Bindir   unless exists $self->{'bindir'};
     $self->{+'pod2man'} = $Pod2man  unless exists $self->{'pod2man'};
 
-    push ( $self->{+'formatter_switches'} = \@() )->@, (
+    push(( $self->{+'formatter_switches'} = \@() )->@, (
      # Yeah, we could use a hashref, but maybe there's some class where options
      # have to be ordered; so we'll use an arrayref.
 
      \@( '__bindir'  => $self->{?'bindir' } ),
      \@( '__pod2man' => $self->{?'pod2man'} ),
-     );
+     ));
 
     DEBUG +> 3 and printf $^STDOUT, "Formatter switches now: [\%s]\n",
         join ' ', map { "[$(join ' ',$_->@)]" },  $self->{'formatter_switches'}->@;
@@ -576,7 +576,7 @@ sub render_and_page($self, $found_list) {
             } else {
                 # Odd case:
                 $self->aside("Skipping $out (from $found_list->@[0] "
-                    . "via $self->%{?'formatter_class'}) as it is 0-length.\n");
+                    . "via $self->{?'formatter_class'}) as it is 0-length.\n");
 
                 push  $self->{'temp_file_list'}->@, $out;
                 $self->unlink_if_temp_file($out);
@@ -688,7 +688,7 @@ sub grand_search_init($self, $pages, @< @found) {
                 chomp;
                 push(@found, $_) if m,/$searchfor(?:\.(?:pod|pm))?\z,i;
             }
-            close($podidx)            or die "Can't close $self->%{?'podidx'}: $^OS_ERROR";
+            close($podidx)            or die "Can't close $self->{?'podidx'}: $^OS_ERROR";
             next;
         }
 

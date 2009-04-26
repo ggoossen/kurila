@@ -97,7 +97,7 @@ do {
         while (ref $kid ne "B::NULL") {
             if ($kid->name eq "const") {
                 # allocate a 'my' variable
-                my $targ = B::PAD::allocmy( '$' . ${ $kid->sv->object_2svref } );
+                my $targ = B::PAD::allocmy( '$' . $kid->sv->object_2svref()->$ );
                 # introduce the 'my' variable, and insert it into the list of argument.
                 my $padsv = B::OP->new('padsv', B::OPf_MOD, undef);
                 $padsv->set_private(B::OPpLVAL_INTRO);

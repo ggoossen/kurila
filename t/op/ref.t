@@ -250,7 +250,7 @@ is ($a, 2);
 foreach my $lexical (@('', 'my $a; ')) {
     my $expect = "pass\n";
     my $result = runperl (switches => \@('-wl'), stderr => 1,
-        prog => $lexical . 'BEGIN {$a = \q{pass}}; $a = $$a; print $^STDOUT, $a');
+        prog => $lexical . 'BEGIN {$a = \q{pass}}; $a = $a->$; print $^STDOUT, $a');
 
     is ($^CHILD_ERROR, 0);
     is ($result, $expect);
@@ -280,7 +280,7 @@ is ($^CHILD_ERROR, 0, 'coredump on typeglob = (SvRV && !SvROK)');
 # "Attempt to free unreferenced scalar" warnings
 
 is (runperl(
-    prog => 'use Symbol;my $x=bless \gensym,"t"; print $^STDOUT, $_;*$$x=$x',
+    prog => 'use Symbol;my $x=bless \gensym,"t"; print $^STDOUT, $_;$x->$->*=$x',
     stderr => 1
     ), '', 'freeing self-referential typeglob');
 

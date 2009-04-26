@@ -322,7 +322,7 @@ sub abs2rel {
     my @($path,$base) = @_;
     $base = $self->_cwd() unless defined $base and length $base;
 
-    for (@(\$path, \$base)) { $$_ = $self->canonpath($$_) }
+    for (@(\$path, \$base)) { $_->$ = $self->canonpath($_->$) }
 
     # Are we even starting $path on the same (node::)device as $base?  Note that
     # logical paths or nodename differences may be on the "same device" 
@@ -450,7 +450,7 @@ sub eliminate_macros {
             @($head,$macro,$tail) = @($1,$2,$3);
             if (ref $self->{$macro}) {
                 if (ref $self->{$macro} eq 'ARRAY') {
-                    $macro = join ' ', <@{$self->{$macro}};
+                    $macro = join ' ', < $self->{$macro}->@;
                 }
                 else {
                     print "Note: can't expand macro \$($macro) containing ",ref($self->{$macro}),

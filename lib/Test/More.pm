@@ -628,7 +628,7 @@ USE
     else {
         $code = <<USE;
 package $pack;
-use $module < \@\{\@args[0]\};
+use $module < \@args[0]->\@;
 1;
 USE
     }

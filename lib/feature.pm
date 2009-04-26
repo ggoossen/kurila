@@ -141,7 +141,7 @@ sub import {
 		    unknown_feature_bundle(substr($name, 1));
 		}
 	    }
-	    unshift @_, < @{%feature_bundle{?$v}};
+	    unshift @_, < %feature_bundle{?$v}->@;
 	    next;
 	}
 	if (!exists %feature{$name}) {
@@ -170,7 +170,7 @@ sub unimport {
 		    unknown_feature_bundle(substr($name, 1));
 		}
 	    }
-	    unshift @_, < @{%feature_bundle{?$v}};
+	    unshift @_, < %feature_bundle{?$v}->@;
 	    next;
 	}
 	if (!exists(%feature{$name})) {

@@ -48,11 +48,11 @@ do {
         ),
     );
 
-    our @EXPORT = @{%EXPORT_TAGS{?standard}};
+    our @EXPORT = %EXPORT_TAGS{?standard}->@;
 
     our @EXPORT_OK = @(
-        < @{%EXPORT_TAGS{?extended}}, 
-        < @{%EXPORT_TAGS{?macros}}, 
+        < %EXPORT_TAGS{?extended}->@, 
+        < %EXPORT_TAGS{?macros}->@, 
     );
 
     try {
@@ -122,7 +122,7 @@ $sock_timeout = 0.25 if $^OS_NAME =~ m/darwin/;
 my $err_sub = %options{?nofatal} ?? \&warnings::warnif !! sub { die shift; };
 
 
-sub openlog(?$ident, ?my $logopt, ?$facility) {
+sub openlog(?$ident, ?$logopt, ?$facility) {
 
     # default values
     $ident    ||= basename($^PROGRAM_NAME) || getlogin() || getpwuid($^UID) || 'syslog';
@@ -158,7 +158,7 @@ sub setlogsock {
     @connectMethods = @defaultMethods;
 
     if (ref $setsock eq 'ARRAY') {
-	@connectMethods = @$setsock;
+	@connectMethods = $setsock->@;
 
     } elsif (lc $setsock eq 'stream') {
 	if (not defined $syslog_path) {
@@ -433,7 +433,7 @@ sub xlate {
     $name = "LOG_$name" unless $name =~ m/^LOG_/;
     $name = "Sys::Syslog::$name";
     # Can't have just try { &$name } || -1 because some LOG_XXX may be zero.
-    my $value = try { &{*{Symbol::fetch_glob($name)}} ( < @_ )};
+    my $value = try { &{Symbol::fetch_glob($name)->*} ( < @_ )};
     defined $value ?? $value !! -1;
 }
 
@@ -458,7 +458,7 @@ sub connect_log {
 
     while ($proto = shift @fallbackMethods) {
 	my $fn = "connect_$proto";
-	$connected = &{*{Symbol::fetch_glob($fn)}}(\@errs) if defined &{*{Symbol::fetch_glob($fn)}};
+	$connected = &{Symbol::fetch_glob($fn)->*}(\@errs) if defined &{Symbol::fetch_glob($fn)->*};
 	last if $connected;
     }
 
@@ -477,14 +477,14 @@ sub connect_tcp($errs) {
 
     my $tcp = getprotobyname('tcp');
     if (!defined $tcp) {
-	push @$errs, "getprotobyname failed for tcp";
+	push $errs->@, "getprotobyname failed for tcp";
 	return 0;
     }
 
     my $syslog = getservbyname('syslog', 'tcp');
     $syslog = getservbyname('syslogng', 'tcp') unless defined $syslog;
     if (!defined $syslog) {
-	push @$errs, "getservbyname failed for syslog/tcp and syslogng/tcp";
+	push $errs->@, "getservbyname failed for syslog/tcp and syslogng/tcp";
 	return 0;
     }
 
@@ -492,7 +492,7 @@ sub connect_tcp($errs) {
     if (defined $host) {
         $addr = inet_aton($host);
         if (!$addr) {
-	    push @$errs, "can't lookup $host";
+	    push $errs->@, "can't lookup $host";
 	    return 0;
 	}
     } else {
@@ -501,7 +501,7 @@ sub connect_tcp($errs) {
     $addr = sockaddr_in($syslog, $addr);
 
     if (!socket($syslogfh, AF_INET, SOCK_STREAM, $tcp)) {
-	push @$errs, "tcp socket: $^OS_ERROR";
+	push $errs->@, "tcp socket: $^OS_ERROR";
 	return 0;
     }
 
@@ -511,7 +511,7 @@ sub connect_tcp($errs) {
         setsockopt($syslogfh, IPPROTO_TCP(), TCP_NODELAY(), 1);
     }
     if (!connect($syslogfh, $addr)) {
-	push @$errs, "tcp connect: $^OS_ERROR";
+	push $errs->@, "tcp connect: $^OS_ERROR";
 	return 0;
     }
 
@@ -524,13 +524,13 @@ sub connect_udp($errs) {
 
     my $udp = getprotobyname('udp');
     if (!defined $udp) {
-	push @$errs, "getprotobyname failed for udp";
+	push $errs->@, "getprotobyname failed for udp";
 	return 0;
     }
 
     my $syslog = getservbyname('syslog', 'udp');
     if (!defined $syslog) {
-	push @$errs, "getservbyname failed for syslog/udp";
+	push $errs->@, "getservbyname failed for syslog/udp";
 	return 0;
     }
 
@@ -538,7 +538,7 @@ sub connect_udp($errs) {
     if (defined $host) {
         $addr = inet_aton($host);
         if (!$addr) {
-	    push @$errs, "can't lookup $host";
+	    push $errs->@, "can't lookup $host";
 	    return 0;
 	}
     } else {
@@ -547,11 +547,11 @@ sub connect_udp($errs) {
     $addr = sockaddr_in($syslog, $addr);
 
     if (!socket($syslogfh, AF_INET, SOCK_DGRAM, $udp)) {
-	push @$errs, "udp socket: $^OS_ERROR";
+	push $errs->@, "udp socket: $^OS_ERROR";
 	return 0;
     }
     if (!connect($syslogfh, $addr)) {
-	push @$errs, "udp connect: $^OS_ERROR";
+	push $errs->@, "udp connect: $^OS_ERROR";
 	return 0;
     }
 
@@ -559,7 +559,7 @@ sub connect_udp($errs) {
     # way to do that is to send a message and see if an ICMP is returned
     _syslog_send_socket("");
     if (!connection_ok()) {
-	push @$errs, "udp connect: nobody listening";
+	push $errs->@, "udp connect: nobody listening";
 	return 0;
     }
 
@@ -573,11 +573,11 @@ sub connect_stream($errs) {
     # it were in there!)
     $syslog_path = '/dev/conslog' unless defined $syslog_path; 
     if (!-w $syslog_path) {
-	push @$errs, "stream $syslog_path is not writable";
+	push $errs->@, "stream $syslog_path is not writable";
 	return 0;
     }
     if (!sysopen($syslogfh, $syslog_path, 0400, O_WRONLY)) {
-	push @$errs, "stream can't open $syslog_path: $^OS_ERROR";
+	push $errs->@, "stream can't open $syslog_path: $^OS_ERROR";
 	return 0;
     }
     $syslog_send = \&_syslog_send_stream;
@@ -589,12 +589,12 @@ sub connect_pipe($errs) {
     $syslog_path ||= _PATH_LOG() || "/dev/log";
 
     if (not -w $syslog_path) {
-        push @$errs, "$syslog_path is not writable";
+        push $errs->@, "$syslog_path is not writable";
         return 0;
     }
 
     if (not open($syslogfh, ">", "$syslog_path")) {
-        push @$errs, "can't write to $syslog_path: $^OS_ERROR";
+        push $errs->@, "can't write to $syslog_path: $^OS_ERROR";
         return 0;
     }
 
@@ -608,32 +608,32 @@ sub connect_unix($errs) {
     $syslog_path ||= _PATH_LOG() if length _PATH_LOG();
 
     if (not defined $syslog_path) {
-        push @$errs, "_PATH_LOG not available in syslog.h and no user-supplied socket path";
+        push $errs->@, "_PATH_LOG not available in syslog.h and no user-supplied socket path";
 	return 0;
     }
 
     if (! -S $syslog_path) {
-        push @$errs, "$syslog_path is not a socket";
+        push $errs->@, "$syslog_path is not a socket";
 	return 0;
     }
 
     my $addr = pack_sockaddr_un($syslog_path);
     if (!$addr) {
-	push @$errs, "can't locate $syslog_path";
+	push $errs->@, "can't locate $syslog_path";
 	return 0;
     }
     if (!socket($syslogfh, AF_UNIX, SOCK_STREAM, 0)) {
-        push @$errs, "unix stream socket: $^OS_ERROR";
+        push $errs->@, "unix stream socket: $^OS_ERROR";
 	return 0;
     }
 
     if (!connect($syslogfh, $addr)) {
         if (!socket($syslogfh, AF_UNIX, SOCK_DGRAM, 0)) {
-	    push @$errs, "unix dgram socket: $^OS_ERROR";
+	    push $errs->@, "unix dgram socket: $^OS_ERROR";
 	    return 0;
 	}
         if (!connect($syslogfh, $addr)) {
-	    push @$errs, "unix dgram connect: $^OS_ERROR";
+	    push $errs->@, "unix dgram connect: $^OS_ERROR";
 	    return 0;
 	}
     }
@@ -653,7 +653,7 @@ sub connect_native($errs) {
 
     try { openlog_xs($ident, $logopt, xlate($facility)) };
     if ($^EVAL_ERROR) {
-        push @$errs, $^EVAL_ERROR->message;
+        push $errs->@, $^EVAL_ERROR->message;
         return 0;
     }
 
@@ -672,7 +672,7 @@ sub connect_eventlog($errs) {
 
 sub connect_console($errs) {
     if (!-w '/dev/console') {
-	push @$errs, "console is not writable";
+	push $errs->@, "console is not writable";
 	return 0;
     }
     $syslog_send = \&_syslog_send_console;

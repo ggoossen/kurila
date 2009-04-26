@@ -235,8 +235,8 @@ BEGIN {
 EXPECT
 foo
 bar at - line 5 character 5.
-    main::__ANON__ called at - line 7.
-BEGIN failed--compilation aborted
+    main::__ANON__ called at - line 5 character 11.
+    BEGIN called at - line 2 character 1.
 ########
 re();
 sub re {
@@ -355,7 +355,7 @@ ok
 ######## scalar ref to file test operator segfaults on 5.6.1 [ID 20011127.155]
 # This only happens if the filename is 11 characters or less.
 my $foo = \-f "blah";
-print $^STDOUT, "ok" if ref $foo && !$$foo;
+print $^STDOUT, "ok" if ref $foo && !$foo->$;
 EXPECT
 ok
 ######## [ID 20011128.159] 'X' =~ m/\X/ segfault in 5.6.1

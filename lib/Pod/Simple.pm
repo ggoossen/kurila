@@ -136,8 +136,8 @@ sub output_string {
   return $this->{?'output_string'} unless (nelems @_);  # GET.
   
   my $x = (defined(@_[0]) and ref(@_[0])) ?? @_[0] !! \( @_[0] );
-  $$x = '' unless defined $$x;
-  DEBUG +> 4 and print $^STDOUT, "# Output string set to $x ($$x)\n";
+  $x->$ = '' unless defined $x->$;
+  DEBUG +> 4 and print $^STDOUT, "# Output string set to $x ($x->$)\n";
   $this->{+'output_fh'} = undef;
   open $this->{+'output_fh'}, '>>', $x or die "Failed opening filehandle $^OS_ERROR";
   return ($this->{+'output_string'} = @_[0]);
@@ -203,7 +203,7 @@ sub _accept_directives {
   DEBUG +> 6 and print $^STDOUT, "$this\'s accept_directives : ", <
    pretty($this->{?'accept_directives'}), "\n";
   
-  return sort keys %{ $this->{?'accept_directives'} };
+  return sort keys $this->{?'accept_directives'}->%;
 }
 
 #--------------------------------------------------------------------------
@@ -222,7 +222,7 @@ sub unaccept_directives {
     delete $this->{'accept_directives'}->{$d};
     DEBUG +> 2 and print $^STDOUT, "OK, won't accept \"=$d\" as directive.\n";
   }
-  return sort keys %{ $this->{?'accept_directives'} };
+  return sort keys $this->{?'accept_directives'}->%;
 }
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -246,7 +246,7 @@ sub _accept_targets {
     $this->{'accept_targets'}->{+$t} = $type;
     DEBUG +> 2 and print $^STDOUT, "Learning to accept \"$t\" as target of type $type\n";
   }    
-  return sort keys %{ $this->{?'accept_targets'} };
+  return sort keys $this->{?'accept_targets'}->%;
 }
 
 #--------------------------------------------------------------------------
@@ -260,7 +260,7 @@ sub unaccept_targets {
     delete $this->{'accept_targets'}->{$t};
     DEBUG +> 2 and print $^STDOUT, "OK, won't accept \"$t\" as target.\n";
   }    
-  return sort keys %{ $this->{?'accept_targets'} };
+  return sort keys $this->{?'accept_targets'}->%;
 }
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -472,7 +472,7 @@ sub _complain_errata($self,$line,$complaint) {
     DEBUG +> 9 and print $^STDOUT, "Discarding erratum (at line $line) $complaint\n because no_errata_section is on.\n";
   } else {
     DEBUG +> 9 and print $^STDOUT, "Queuing erratum (at line $line) $complaint\n";
-    push @{$self->{+'errata'}->{+$line}}, $complaint
+    push $self->{+'errata'}->{+$line}->@, $complaint
       # for a report to be generated later!
   }
   return 1;
@@ -484,7 +484,7 @@ sub _get_initial_item_type($self, $para) {
   return $para->[1]->{?'~type'}  if $para->[1]->{?'~type'};
 
   return ($para->[1]->{+'~type'} = 'text')
-   if join("\n", @{$para}[[2 .. (nelems @$para)-1]]) =~ m/^\s*(\d+)\.?\s*$/s and $1 ne '1';
+   if join("\n", $para->[[2 .. (nelems $para->@)-1]]) =~ m/^\s*(\d+)\.?\s*$/s and $1 ne '1';
   # Else fall thru to the general case:
   return $self->_get_item_type($para);
 }
@@ -497,11 +497,11 @@ sub _get_item_type($self, $para) {
 
   # Otherwise we haven't yet been to this node.  Maybe alter it...
   
-  my $content = join "\n", @{$para}[[2 .. (nelems @$para)-1]];
+  my $content = join "\n", $para->[[2 .. (nelems $para->@)-1]];
 
   if($content =~ m/^\s*\*\s*$/s or $content =~ m/^\s*$/s) {
     # Like: "=item *", "=item   *   ", "=item"
-    splice @$para, 2; # so it ends up just being ['=item', { attrhash } ]
+    splice $para->@, 2; # so it ends up just being ['=item', { attrhash } ]
     $para->[1]->{+'~orig_content'} = $content;
     return ($para->[1]->{+'~type'} = 'bullet');
 
@@ -510,8 +510,8 @@ sub _get_item_type($self, $para) {
     # Like: "=item * Foo bar baz";
     $para->[1]->{+'~orig_content'}      = $content;
     $para->[1]->{+'~_freaky_para_hack'} = $1;
-    DEBUG +> 2 and print $^STDOUT, " Tolerating @$para[2] as =item *\\n\\n$1\n";
-    splice @$para, 2; # so it ends up just being ['=item', { attrhash } ]
+    DEBUG +> 2 and print $^STDOUT, " Tolerating $para->[2] as =item *\\n\\n$1\n";
+    splice $para->@, 2; # so it ends up just being ['=item', { attrhash } ]
     return ($para->[1]->{+'~type'} = 'bullet');
 
   } elsif($content =~ m/^\s*(\d+)\.?\s*$/s) {
@@ -520,7 +520,7 @@ sub _get_item_type($self, $para) {
     $para->[1]->{+'~orig_content'} = $content;
     $para->[1]->{+'number'} = $1;  # Yes, stores the number there!
 
-    splice @$para, 2; # so it ends up just being ['=item', { attrhash } ]
+    splice $para->@, 2; # so it ends up just being ['=item', { attrhash } ]
     return ($para->[1]->{+'~type'} = 'number');
     
   } else {
@@ -544,7 +544,7 @@ sub _make_treelet {
 
     DEBUG and print $^STDOUT, "Applying precooked treelet hack to @_[0]->[0]\n";
     $treelet = @_[0]->[0];
-    splice @$treelet, 0, 2;  # lop the top off
+    splice $treelet->@, 0, 2;  # lop the top off
     return $treelet;
   } else {
     $treelet = $self->_treelet_from_formatting_codes(< @_);
@@ -563,7 +563,7 @@ sub _make_treelet {
      # Very common case!
   }
   
-  splice @$treelet, 0, 2;  # lop the top off
+  splice $treelet->@, 0, 2;  # lop the top off
 
   return $treelet;
 }
@@ -585,11 +585,11 @@ sub _wrap_up($self, @< @stack) {
   while($treelet = shift @stack) {
     DEBUG +> 3 and print $^STDOUT, " Considering children of this $treelet->[0] node...\n";
     my $i = 2;
-    while ( $i +< nelems(@$treelet) ) { # iterate over children
+    while ( $i +< nelems($treelet->@) ) { # iterate over children
       DEBUG +> 3 and print $^STDOUT, " Considering child at $i ", < pretty($treelet->[$i]), "\n";
       if($nixx and ref $treelet->[$i] and $treelet->[$i]->[0] eq 'X') {
         DEBUG +> 3 and print $^STDOUT, "   Nixing X node at $i\n";
-        splice(@$treelet, $i, 1); # just nix this node (and its descendants)
+        splice($treelet->@, $i, 1); # just nix this node (and its descendants)
         # no need to back-update the counter just yet
         redo;
 
@@ -598,7 +598,7 @@ sub _wrap_up($self, @< @stack) {
       ) {
         DEBUG +> 3 and print $^STDOUT, "   Merging ", $i-1,
          ":[$treelet->[$i-1]] and $i\:[$treelet->[$i]]\n";
-        $treelet->[$i-1] .= @(splice(@$treelet, $i, 1))[0];
+        $treelet->[$i-1] .= @(splice($treelet->@, $i, 1))[0];
         DEBUG +> 4 and print $^STDOUT, "    Now: ", $i-1, ":[$treelet->[$i-1]]\n";
         next;
         # since we just pulled the possibly last node out from under
@@ -633,7 +633,7 @@ sub _wrap_up($self, @< @stack) {
 sub _remap_sequences {
   my@($self,@< @stack) =  @_;
   
-  if((nelems @stack) == 1 and (nelems @{ @stack[0] }) == 3 and !ref @stack[0]->[2]) {
+  if((nelems @stack) == 1 and (nelems @stack[0]->@) == 3 and !ref @stack[0]->[2]) {
     # VERY common case: abort it.
     DEBUG and print $^STDOUT, "Skipping _remap_sequences: formatless treelet.\n";
     return 0;
@@ -648,10 +648,10 @@ sub _remap_sequences {
   ;
   DEBUG +> 3 and print $^STDOUT, " Map: ",
     join('; ', map { "$_=" . (
-        ref($map->{?$_}) ?? join(",", @{$map->{?$_}}) !! $map->{?$_}
+        ref($map->{?$_}) ?? join(",", $map->{?$_}->@) !! $map->{?$_}
       ) },
-      sort keys %$map ),
-    ("B~C~E~F~I~L~S~X~Z" eq join '~', sort keys %$map)
+      sort keys $map->% ),
+    ("B~C~E~F~I~L~S~X~Z" eq join '~', sort keys $map->% )
      ?? "  (all normal)\n" !! "\n"
   ;
 
@@ -661,7 +661,7 @@ sub _remap_sequences {
   while($treelet = shift @stack) {
     DEBUG +> 3 and print $^STDOUT, " Considering children of this $treelet->[0] node...\n";
     my $i = 2;
-    while ( $i +< nelems(@$treelet) ) { # iterate over children
+    while ( $i +< nelems($treelet->@) ) { # iterate over children
       next unless ref $treelet->[$i];  # text nodes are uninteresting
       
       DEBUG +> 4 and print $^STDOUT, "  Noting child $i : $treelet->[$i]->[0]<...>\n";
@@ -675,7 +675,7 @@ sub _remap_sequences {
         } else  {
           print $^STDOUT, "   Code $was<> maps to ",
            ref($is)
-            ?? ( "tags ", < map( {"$_<" }, @$is), '...', < map( {'>' }, @$is), "\n" )
+            ?? ( "tags ", < map( {"$_<" }, $is->@), '...', < map( {'>' }, $is->@), "\n" )
             !! "tag $is<...>.\n";
         }
       }
@@ -687,7 +687,7 @@ sub _remap_sequences {
         # children of this node, but something about that seems icky.
       }
       if(ref $is) {
-        my @dynasty = @$is;
+        my @dynasty = $is->@;
         DEBUG +> 4 and print $^STDOUT, "    Renaming $was node to @dynasty[-1]\n"; 
         $treelet->[$i]->[0] = pop @dynasty;
         my $nugget;
@@ -698,15 +698,15 @@ sub _remap_sequences {
           ;
           
           #$nugget = ;
-          splice @$treelet, $i, 1, \@(pop(@dynasty), \%(), $treelet->[$i]);
+          splice $treelet->@, $i, 1, \@(pop(@dynasty), \%(), $treelet->[$i]);
             # relace node with a new parent
         }
       } elsif($is eq '0') {
-        splice(@$treelet, $i, 1); # just nix this node (and its descendants)
+        splice($treelet->@, $i, 1); # just nix this node (and its descendants)
         --$i;  # back-update the counter
       } elsif($is eq '1') {
-        splice(@$treelet, $i, 1 # replace this node with its children!
-          => splice @{ $treelet->[$i] },2
+        splice($treelet->@, $i, 1 # replace this node with its children!
+          => splice $treelet->[$i]->@, 2
               # (not catching its first two (non-child) items)
         );
         --$i;  # back up for new stuff
@@ -722,7 +722,7 @@ sub _remap_sequences {
   
   DEBUG +> 2 and print $^STDOUT, "End of _remap_sequences traversal.\n\n";
 
-  if((nelems @_) == 2 and (nelems @{ @_[1] }) == 3 and !ref @_[1]->[2]) {
+  if((nelems @_) == 2 and (nelems @_[1]->@) == 3 and !ref @_[1]->[2]) {
     DEBUG and print $^STDOUT, "Noting that the treelet is now formatless.\n";
     return 0;
   }
@@ -732,7 +732,7 @@ sub _remap_sequences {
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sub _ponder_extend($self, $para) {
-  my $content = join ' ', @( splice @$para, 2);
+  my $content = join ' ', @( splice $para->@, 2);
   $content =~ s/^\s+//s;
   $content =~ s/\s+$//s;
 
@@ -860,23 +860,23 @@ sub _treat_Zs($self,@< @stack) {
 
   while ($treelet = shift @stack) {
       my $i = 2;
-      while ($i +< nelems(@$treelet)) { # iterate over children
+      while ($i +< nelems($treelet->@)) { # iterate over children
           next unless ref $treelet->[$i]; # text nodes are uninteresting
           unless($treelet->[$i]->[0] eq 'Z') {
               unshift @stack, $treelet->[$i]; # recurse
               next;
           }
         
-          DEBUG +> 1 and print $^STDOUT, "Nixing Z node $(join ' ',@{$treelet->[$i]})\n";
+          DEBUG +> 1 and print $^STDOUT, "Nixing Z node $(join ' ', $treelet->[$i]->@)\n";
         
           # bitch UNLESS it's empty
-          unless (  (nelems @{$treelet->[$i]}) == 2
-                      or ((nelems @{$treelet->[$i]}) == 3 and $treelet->[$i]->[2] eq '')
+          unless (  (nelems $treelet->[$i]->@) == 2
+                      or ((nelems $treelet->[$i]->@) == 3 and $treelet->[$i]->[2] eq '')
                   ) {
               $self->whine( $start_line, "A non-empty Z<>" );
           }                     # but kill it anyway
         
-          splice(@$treelet, $i, 1); # thereby just nix this node.
+          splice($treelet->@, $i, 1); # thereby just nix this node.
           --$i;
       } continue {
           $i++;
@@ -956,7 +956,7 @@ sub _treat_Ls($self,@< @stack) {
   # A recursive algorithm implemented iteratively!  Whee!
 
   while($treelet = shift @stack) {
-    for my $i (2 .. nelems(@$treelet) -1) {
+    for my $i (2 .. nelems($treelet->@) -1) {
       # iterate over children of current tree node
       next unless ref $treelet->[$i];  # text nodes are uninteresting
       unless($treelet->[$i]->[0] eq 'L') {
@@ -969,8 +969,8 @@ sub _treat_Ls($self,@< @stack) {
       DEBUG +> 1 and print $^STDOUT, "Ogling L node $treelet->[$i]\n";
         
       # bitch if it's empty
-      if(  (nelems @{$treelet->[$i]}) == 2
-       or ((nelems @{$treelet->[$i]}) == 3 and not ref $treelet->[$i]->[2] and $treelet->[$i]->[2] eq '')
+      if(  (nelems $treelet->[$i]->@) == 2
+       or ((nelems $treelet->[$i]->@) == 3 and not ref $treelet->[$i]->[2] and $treelet->[$i]->[2] eq '')
       ) {
         $self->whine( $start_line, "An empty L<>" );
         $treelet->[$i] = 'L<>';  # just make it a text node
@@ -989,7 +989,7 @@ sub _treat_Ls($self,@< @stack) {
 
         # TODO: deal with rel: URLs here?
 
-        if( 3 == nelems @{ $treelet->[$i] } ) {
+        if( 3 == nelems $treelet->[$i]->@ ) {
           # But if it IS just one text node (most common case)
           DEBUG +> 1 and printf $^STDOUT, qq{Catching "\%s as " as ho-hum L<URL> link.\n},
             $treelet->[$i]->[2]
@@ -999,7 +999,7 @@ sub _treat_Ls($self,@< @stack) {
           );                   # its own treelet
         } else {
           # It's a URL but complex (like "L<foo:bazE<123>bar>").  Feh.
-          #$treelet->[$i][1]{'to'} = [ @{$treelet->[$i]} ];
+          #$treelet->[$i][1]{'to'} = [ $treelet->[$i]->@ ];
           #splice @{ $treelet->[$i][1]{'to'} }, 0,2;
           #DEBUG > 1 and printf qq{Catching "%s as " as complex L<URL> link.\n},
           #  join '~', @{$treelet->[$i][1]{'to'  }};
@@ -1018,7 +1018,7 @@ sub _treat_Ls($self,@< @stack) {
       
       
       # Catch some very simple and/or common cases
-      if((nelems @{$treelet->[$i]}) == 3 and ! ref $treelet->[$i]->[2]) {
+      if((nelems $treelet->[$i]->@) == 3 and ! ref $treelet->[$i]->[2]) {
         my $it = $treelet->[$i]->[2];
         if($it =~ m/^[-a-zA-Z0-9]+\([-a-zA-Z0-9]+\)$/s) { # man sections
           # Hopefully neither too broad nor too restrictive a RE
@@ -1054,7 +1054,7 @@ sub _treat_Ls($self,@< @stack) {
       
       my $link_text; # set to an arrayref if found
       my $ell = $treelet->[$i];
-      my @ell_content = @$ell;
+      my @ell_content = $ell->@;
       splice @ell_content,0,2; # Knock off the 'L' and {} bits
 
       DEBUG +> 3 and print $^STDOUT, " Ell content to start: ", <
@@ -1168,11 +1168,11 @@ sub _treat_Ls($self,@< @stack) {
       unless($link_text) {
         $ell->[1]->{+'content-implicit'} = 'yes';
         $link_text = \@();
-        push @$link_text, '"', < @$section_name, '"' if $section_name;
+        push $link_text->@, '"', < $section_name->@, '"' if $section_name;
 
         if((nelems @ell_content)) {
           $link_text->[-1] .= ' in ' if $section_name;
-          push @$link_text, < @ell_content;
+          push $link_text->@, < @ell_content;
         }
       }
 
@@ -1191,7 +1191,7 @@ sub _treat_Ls($self,@< @stack) {
 
       if( defined $section_name ) {
         $ell->[1]->{+'section'} = Pod::Simple::LinkSection->new(
-          \@('', \%(), < @$section_name)
+          \@('', \%(), < $section_name->@)
         );
         DEBUG +> 3 and print $^STDOUT, "L-section content: ", < pretty($ell->[1]->{?'section'}), "\n";
       }
@@ -1204,7 +1204,7 @@ sub _treat_Ls($self,@< @stack) {
       }
       
       # And update children to be the link-text:
-      @$ell = @( <@$ell[[@(0,1)]], defined($link_text) ?? splice(@$link_text) !! '');
+      $ell->@ = @( <$ell->[[@(0,1)]], defined($link_text) ?? splice($link_text->@) !! '');
       
       DEBUG +> 2 and print $^STDOUT, "End of L-parsing for this node $treelet->[$i]\n";
 
@@ -1231,7 +1231,7 @@ sub _treat_Es($self,@< @stack) {
 
   while($treelet = shift @stack) {
     my $i = 2;
-    while ($i +< nelems(@$treelet)) { # iterate over children
+    while ($i +< nelems($treelet->@)) { # iterate over children
       next unless ref $treelet->[$i];  # text nodes are uninteresting
       if($treelet->[$i]->[0] eq 'L') {
         # SPECIAL STUFF for semi-processed L<>'s
@@ -1256,8 +1256,8 @@ sub _treat_Es($self,@< @stack) {
       DEBUG +> 1 and print $^STDOUT, "Ogling E node ", < pretty($treelet->[$i]), "\n";
 
       # bitch if it's empty
-      if(  (nelems @{$treelet->[$i]}) == 2
-       or ((nelems @{$treelet->[$i]}) == 3 and $treelet->[$i]->[2] eq '')
+      if(  (nelems $treelet->[$i]->@) == 2
+       or ((nelems $treelet->[$i]->@) == 3 and $treelet->[$i]->[2] eq '')
       ) {
         $self->whine( $start_line, "An empty E<>" );
         $treelet->[$i] = 'E<>'; # splice in a literal
@@ -1265,12 +1265,12 @@ sub _treat_Es($self,@< @stack) {
       }
         
       # bitch if content is weird
-      unless((nelems @{$treelet->[$i]}) == 3 and !ref($content = $treelet->[$i]->[2])) {
+      unless((nelems $treelet->[$i]->@) == 3 and !ref($content = $treelet->[$i]->[2])) {
         $self->whine( $start_line, "An E<...> surrounding strange content" );
         $replacer = $treelet->[$i]; # scratch
-        splice(@$treelet, $i, 1,   # fake out a literal
+        splice($treelet->@, $i, 1,   # fake out a literal
           'E<',
-          splice(@$replacer,2), # promote its content
+          splice($replacer->@,2), # promote its content
           '>'
         );
         # Don't need to do --$i, as the 'E<' we just added isn't interesting.
@@ -1292,7 +1292,7 @@ sub _treat_Es($self,@< @stack) {
         DEBUG +> 1 and print $^STDOUT, " Replacing E<$content> with $replacer\n";
       }
 
-      splice(@$treelet, $i, 1, $replacer); # no need to back up $i, tho
+      splice($treelet->@, $i, 1, $replacer); # no need to back up $i, tho
     }
     continue {
         $i++;
@@ -1325,13 +1325,13 @@ sub _change_S_to_nbsp($treelet, $in_s) {
                    #  or by an ancestor being an S element.
 
   my $i = 2;
-  while ( $i +< nelems(@$treelet) ) {
+  while ( $i +< nelems($treelet->@) ) {
     if(ref $treelet->[$i]) {
       if( _change_S_to_nbsp( $treelet->[$i], $in_s ) ) {
         my $to_pull_up = $treelet->[$i];
-        splice @$to_pull_up,0,2;   # ...leaving just its content
-        splice @$treelet, $i, 1, < @$to_pull_up;  # Pull up content
-        $i +=  (nelems @$to_pull_up) - 1;   # Make $i skip the pulled-up stuff
+        splice $to_pull_up->@,0,2;   # ...leaving just its content
+        splice $treelet->@, $i, 1, < $to_pull_up->@;  # Pull up content
+        $i +=  (nelems $to_pull_up->@) - 1;   # Make $i skip the pulled-up stuff
       }
     } else {
       $treelet->[$i] =~ s/\s/\x{A0}/g if ASCII and $in_s;
@@ -1377,7 +1377,7 @@ sub filter($class, $source) {
   $new->output_fh($^STDOUT);
   
   if(ref($source || '') eq 'SCALAR') {
-    $new->parse_string_document( $$source );
+    $new->parse_string_document( $source->$ );
   } elsif(ref($source)) {  # it's a file handle
     $new->parse_file($source);
   } else {  # it's a filename

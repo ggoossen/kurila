@@ -184,8 +184,8 @@ sub my_preprocess {
         delete %Expect_Dir{ $File::Find::dir }->{$file};
     }
     print $^STDOUT, "# --end preprocess--\n";
-    Check((nkeys %{%Expect_Dir{?$File::Find::dir }}) == 0);
-    if ((nkeys %{%Expect_Dir{?$File::Find::dir }}) == 0) {
+    Check((nkeys %Expect_Dir{?$File::Find::dir}->%) == 0);
+    if ((nkeys %Expect_Dir{?$File::Find::dir}->%) == 0) {
         delete %Expect_Dir{ $File::Find::dir }
     }
     return @files;

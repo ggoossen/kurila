@@ -265,7 +265,7 @@ our (@isa, @args, $module, @dirs, $file, $dl_debug, $dlsrc, @dl_library_path,
 sub bootstrap_inherit {
     my $module = @_[0];
     my $isa_glob = Symbol::fetch_glob("$module\::ISA");
-    local @{*{$isa_glob}} = @(<@{*{$isa_glob}}, 'DynaLoader');
+    local $isa_glob->*->@ = $isa_glob->*->@ +@+ @: 'DynaLoader';
     # Cannot goto due to delocalization.  Will report errors on a wrong line?
     bootstrap(<@_);
 }
