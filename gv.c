@@ -909,8 +909,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		if (strEQ(name2, "ERSION"))
 		    GvMULTI_on(gv);
 		break;
-	    case '^':
-		Perl_croak(aTHX_ "Invalid glob name %s", name);
 	    }
 	}
     } else {

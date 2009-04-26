@@ -129,6 +129,7 @@ Illegal division by zero at - line 1 character 10.
 BEGIN { undef = 0 }
 EXPECT
 Can't assign to undef operator at - line 1 character 9.
+BEGIN not safe after errors--compilation aborted at - line 1 character 20.
 ########
 my @a; @a[+2] = 1; for (@a) { $_ = 2 } print $^STDOUT, join(' ', @a) . "\n"
 EXPECT

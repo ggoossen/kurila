@@ -4589,7 +4589,7 @@ Perl_yylex(pTHX)
 		const char *pname = "main";
 		if (PL_tokenbuf[2] == 'D')
 		    pname = HvNAME_get(PL_curstash);
-		gv = gv_fetchpv(Perl_form(aTHX_ "%s::DATA", pname), GV_ADD,
+		gv = gv_fetchpv(Perl_form(aTHX_ "%s::^DATA", pname), GV_ADD,
 				SVt_PVIO);
 		GvMULTI_on(gv);
 		if (!GvIO(gv))

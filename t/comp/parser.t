@@ -19,7 +19,7 @@ like( $^EVAL_ERROR->{?description}, qr/^Missing braces on \\N/,
     'syntax error in string with incomplete \N' );
 
 # Bug 20010831.001
-eval '@($a, b) = @(1, 2);';
+eval '@($a, "b") = @(1, 2);';
 like( $^EVAL_ERROR->{?description}, qr/^Can't assign to constant item/,
     'bareword in list assignment' );
 

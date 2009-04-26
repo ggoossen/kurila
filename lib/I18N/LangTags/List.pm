@@ -12,7 +12,7 @@ do {
     my $count = 0;
     my($disrec,$tag,$name);
     my $last_name = '';
-    while( ~< *I18N::LangTags::List::DATA) {
+    while( ~< $^DATA) {
         if($seeking) {
             $seeking = 0 if m/=for woohah/;
         } elsif( @(?$disrec, ?$tag, ?$name) =

@@ -543,6 +543,13 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 	    }
 	    break;
 	case 'D':
+	    if (strEQ(remaining, "DATA")) { /* $^DATA */
+		char* pname = HvNAME_get(CopSTASH(PL_curcop));
+		GV* gv = gv_fetchpv(Perl_form(aTHX_ "%s::^DATA", pname), GV_ADD,
+		    SVt_PVIO);
+		sv_setrv(sv, SvREFCNT_inc(ioTsv(GvIOp(gv))));
+		break;
+	    }
 	    if (strEQ(remaining, "DIE_HOOK")) { /* $^DIE_HOOK */
 		sv_setsv(sv, PL_diehook);
 		break;
@@ -1196,7 +1203,9 @@ Perl_is_magicsv(pTHX_ const char* name)
 	    if (strEQ(name2, "COMPILING"))
 		return 1;
 	    break;
-	case 'D':        /* $^DIE_HOOK */
+	case 'D':
+	    if (strEQ(name2, "DATA"))
+		return 1;
 	    if (strEQ(name2, "DEBUGGING"))
 		return 1;
 	    if (strEQ(name2, "DIE_HOOK"))
