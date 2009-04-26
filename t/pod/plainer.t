@@ -8,8 +8,8 @@ my $output = 'plnr_out.pod';
 
 my $test = 0;
 print $^STDOUT, "1..7\n";
-while( ~< *DATA ) {
-    my $expected = $header. ~< *DATA; 
+while( ~< $^DATA ) {
+    my $expected = $header. ~< $^DATA; 
 
     open(my $in, '>', $input) or die $^OS_ERROR;
     print $in, $header, $_;

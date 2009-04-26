@@ -48,7 +48,7 @@ $RESTRICTED_CROAK = "/^Cannot retrieve restricted hash/";
 my %tests;
 do {
     local $^INPUT_RECORD_SEPARATOR = "\n\nend\n";
-    while ( ~< *DATA) {
+    while ( ~< $^DATA) {
         next unless m/\S/s;
         unless (m/begin ([0-7]{3}) ([^\n]*)\n(.*)$/s) {
             s/\n.*//s;

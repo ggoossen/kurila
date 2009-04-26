@@ -469,7 +469,7 @@ EOF
         local $^WARN_HOOK = sub { $warning = @_[0] };
         my $ver = 1.23;  # has to be floating point number
         my $loc;
-        while ( ~< *DATA) {
+        while ( ~< $^DATA) {
             chomp;
             $loc = POSIX::setlocale(&POSIX::LC_ALL( < @_ ), $_);
             last if POSIX::localeconv()->{?decimal_point} eq ',';

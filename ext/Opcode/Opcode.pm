@@ -49,9 +49,9 @@ sub _init_optags {
 
           local($_);
           local($^INPUT_RECORD_SEPARATOR) = "\n=cut"; # skip to optags definition section
-    ~< *DATA;
+    ~< $^DATA;
     $^INPUT_RECORD_SEPARATOR = "\n=";		# now read in 'pod section' chunks
-    while(defined(my $line = ~< *DATA)) {
+    while(defined(my $line = ~< $^DATA)) {
         next unless $line =~ m/^item\s+(:\w+)/;
         my $tag = $1;
 
@@ -68,7 +68,7 @@ sub _init_optags {
         # opset will croak on invalid names
         define_optag($tag, opset(< @ops));
     }
-    close(\*DATA);
+    close($^DATA);
     warn "Untagged opnames: ".join(' ',keys %all)."\n" if %all;
 }
 

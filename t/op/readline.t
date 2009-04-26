@@ -41,7 +41,7 @@ foreach my $l (@(1, 82)) {
     my $k = $l;
     $k = 'k' x $k;
     my $copy = $k;
-    $k = ~< *DATA;
+    $k = ~< $^DATA;
     is ($k, "moo\n", 'catline to COW sv for length ' . length $copy);
 }
 
@@ -50,7 +50,7 @@ foreach my $l (@(1, 21)) {
     my $k = $l;
     $k = 'perl' x $k;
     my $perl = $k;
-    $k .= ~< *DATA;
+    $k .= ~< $^DATA;
     is ($k, "$perl rules\n", 'rcatline to COW sv for length ' . length $perl);
 }
 
@@ -82,7 +82,7 @@ fresh_perl_is('BEGIN{~< *ARGV}', '',
               'No ARGVOUT used only once warning');
 
 my $obj = bless \@();
-dies_like( sub { $obj .= ~< *DATA; }, qr/reference as string/, 'rcatline and refs');
+dies_like( sub { $obj .= ~< $^DATA; }, qr/reference as string/, 'rcatline and refs');
 
 __DATA__
 moo

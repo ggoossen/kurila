@@ -16,7 +16,7 @@ unless (-d $path) {
 my $file = File::Spec->catfile( $path, 'success.pm' );
 my $out_fh;
 open($out_fh, '>', $file) or skip_all( 'Cannot write fake backend module');
-print $out_fh, $_ while ~< *DATA;
+print $out_fh, $_ while ~< $^DATA;
 close $out_fh;
 
 plan( 9 ); # And someone's responsible.

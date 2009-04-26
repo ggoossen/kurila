@@ -1640,7 +1640,7 @@ sub MakePropTestScript()
     if (not open $out, ">", "TestProp.pl") {
         die "$^PROGRAM_NAME: TestProp.pl: $^OS_ERROR\n";
     }
-    print $out, ~< *DATA;
+    print $out, ~< $^DATA;
 
     while (my @($Name, $Table) =@( each %ExactNameToTest))
     {

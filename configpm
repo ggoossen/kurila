@@ -45,7 +45,7 @@ my $how_many_common = 22;
 my %Common;
 
 while ($how_many_common--) {
-    my $_ = ~< *DATA;
+    my $_ = ~< $^DATA;
     chomp;
     m/^(\S+):\s*(\d+)$/ or die "Malformed line '$_'";
     %Common{+$1} = $1;

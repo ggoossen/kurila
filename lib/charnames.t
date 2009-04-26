@@ -180,7 +180,7 @@ END { if ($tmpfile) { 1 while unlink $tmpfile; } }
 
 my @prgs;
 do {   local $^INPUT_RECORD_SEPARATOR = undef;
-    @prgs = split "\n########\n", ~< *DATA;
+    @prgs = split "\n########\n", ~< $^DATA;
 };
 
 for ( @prgs) {

@@ -124,7 +124,7 @@ our @Type_Order = qw{
     Time
 };
 
-while ( ~< *DATA) {
+while ( ~< $^DATA) {
     chomp;
     s/#.*//;
     next unless $_;
@@ -136,7 +136,7 @@ while ( ~< *DATA) {
     }
 }
 
-close \*DATA;
+close $^DATA;
 
 my( $typedesc, $list );
 unless (caller) {

@@ -184,12 +184,12 @@ sub printTree
 
         my $offset ;
         if ($tre ne $tree) {
-            print \*STDOUT, $prefix . "|\n" ;
-            print \*STDOUT, $prefix . "+- $k" ;
+            print $^STDOUT, $prefix . "|\n" ;
+            print $^STDOUT, $prefix . "+- $k" ;
             $offset = ' ' x ($max + 4) ;
         }
         else {
-            print \*STDOUT, $prefix . "$k" ;
+            print $^STDOUT, $prefix . "$k" ;
             $offset = ' ' x ($max + 1) ;
         }
 
@@ -197,11 +197,11 @@ sub printTree
         if (ref $rest)
         {
             my $bar = @keys ?? "|" !! " ";
-            print \*STDOUT, " -" . "-" x ($max - length $k ) . "+\n" ;
+            print $^STDOUT, " -" . "-" x ($max - length $k ) . "+\n" ;
             printTree ($rest, $prefix . $bar . $offset )
         }
         else
-        { print \*STDOUT, "\n" }
+        { print $^STDOUT, "\n" }
     }
 
 }
@@ -349,7 +349,7 @@ EOM
 safer_close $warn;
 rename_if_different("warnings.h-new", "warnings.h");
 
-while ( ~< *DATA) {
+while ( ~< $^DATA) {
     last if m/^KEYWORDS$/ ;
     print $pm, $_ ;
 }
@@ -403,7 +403,7 @@ print $pm, "  );\n\n" ;
 print $pm, 'our $NONE     = "', ('\0' x $warn_size) , "\";\n" ;
 print $pm, 'our $LAST_BIT = ' . "$index ;\n" ;
 print $pm, 'our $BYTES    = ' . "$warn_size ;\n" ;
-while ( ~< *DATA) {
+while ( ~< $^DATA) {
     print $pm, $_ ;
 }
 

@@ -20,7 +20,7 @@ do { my ($hint_bits, $warning_bits, $hinthash);
 };
 
 $^INPUT_RECORD_SEPARATOR = "\n####\n";
-while ( ~< *DATA) {
+while ( ~< $^DATA) {
     chomp;
     my ($num, $testname, $todo);
     if (s/#\s*(.*)$//mg) {

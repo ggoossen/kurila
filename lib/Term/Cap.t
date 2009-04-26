@@ -36,7 +36,7 @@ open my $out_fh, ">>", \(my $out);
 my $writable = 1;
 
 if (open(my $tcout, ">", "tcout")) {
-    print $tcout, ~< *DATA;
+    print $tcout, ~< $^DATA;
     close $tcout;
 } else {
     $writable = 0;

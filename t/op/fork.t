@@ -22,7 +22,7 @@ $^OUTPUT_AUTOFLUSH=1;
 our (@prgs, $tmpfile, $CAT, $status, $i);
 
 $^INPUT_RECORD_SEPARATOR = undef;
-@prgs = split "\n########\n", ~< *DATA;
+@prgs = split "\n########\n", ~< $^DATA;
 print $^STDOUT, "1..", scalar nelems @prgs, "\n";
 
 $tmpfile = "forktmp000";

@@ -93,7 +93,7 @@ output the string to $FH if specified.
 
 if ( $^OS_NAME eq 'VMS' )
 {
-    chomp( my @entry = @( ~< *DATA ) );
+    chomp( my @entry = @( ~< $^DATA ) );
     $VMS_TERMCAP = join '', @entry;
 }
 

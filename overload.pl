@@ -12,7 +12,7 @@ BEGIN {
 
 
 my (@enums, @names);
-while ( ~< *DATA) {
+while ( ~< $^DATA) {
     next if m/^#/;
     next if m/^$/;
     my @($enum, $name) = @: m/^(\S+)\s+(\S+)/ or die "Can't parse $_";

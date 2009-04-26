@@ -23,10 +23,10 @@ print $^STDOUT, "ok 1\n";
 my $man = Pod::Man->new or die "Cannot create parser\n";
 my $text = Pod::Text->new or die "Cannot create parser\n";
 my $n = 2;
-while ( ~< *DATA) {
+while ( ~< $^DATA) {
     next until $_ eq "###\n";
     open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
-    while ( ~< *DATA) {
+    while ( ~< $^DATA) {
         last if $_ eq "###\n";
         print $tmp, $_;
     }
@@ -45,7 +45,7 @@ while ( ~< *DATA) {
     };
     close $out;
     my $expected = '';
-    while ( ~< *DATA) {
+    while ( ~< $^DATA) {
         last if $_ eq "###\n";
         $expected .= $_;
     }
@@ -69,7 +69,7 @@ while ( ~< *DATA) {
     close $out;
     unlink ('tmp.pod', 'out.tmp');
     $expected = '';
-    while ( ~< *DATA) {
+    while ( ~< $^DATA) {
         last if $_ eq "###\n";
         $expected .= $_;
     }

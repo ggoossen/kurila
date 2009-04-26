@@ -25,7 +25,7 @@ if ($^OS_NAME eq 'VMS') {
 # No %Config.
 my $Is_Ultrix_VAX = $^OS_NAME eq 'ultrix' && `uname -m` =~ m/^VAX$/;
 
-while ( ~< *DATA) {
+while ( ~< $^DATA) {
     s/^\s*>//; s/<\s*$//;
     @($template, $data, $result, ?$comment) =  split(m/<\s*>/, $_, 4);
     if ($^OS_NAME eq 'os390' || $^OS_NAME eq 's390') { # non-IEEE (s390 is UTS)

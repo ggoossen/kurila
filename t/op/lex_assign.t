@@ -26,7 +26,7 @@ pos($posstr = 3);
 $nn = $n = 2;
 sub subb {"in s"}
 
-@INPUT = @( ~< *DATA );
+@INPUT = @( ~< $^DATA );
 @simple_input = grep { m/^\s*\w+\s*\$\w+\s*[#\n]/ }, @INPUT;
 
 plan 6 + (nelems @INPUT) + nelems @simple_input;

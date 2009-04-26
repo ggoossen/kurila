@@ -70,9 +70,9 @@ sub run_tests {
     $^OUTPUT_AUTOFLUSH = 1;
     # rewinding DATA is necessary with PERLIO=stdio when this
     # test is run from another thread
-    seek *DATA, 0, 0;
-    while (~< *DATA) { last if m/^__DATA__/ }
-    while (~< *DATA) {
+    seek $^DATA, 0, 0;
+    while (~< $^DATA) { last if m/^__DATA__/ }
+    while (~< $^DATA) {
         chomp;
         next if m/^#/;
         print $^STDOUT, m/^$email$/ ?? "ok " !! "not ok ", ++ $count, "\n";

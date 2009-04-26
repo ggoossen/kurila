@@ -18,7 +18,7 @@ our $i = 0;
 $^OUTPUT_AUTOFLUSH=1;
 
 undef $^INPUT_RECORD_SEPARATOR;
-my @prgs = split "\n########\n", ~< *DATA;
+my @prgs = split "\n########\n", ~< $^DATA;
 plan(6 + scalar nelems @prgs);
 
 my $tmpfile = "asubtmp000";

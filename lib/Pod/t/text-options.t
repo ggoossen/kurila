@@ -20,16 +20,16 @@ use Pod::Text;
 print $^STDOUT, "ok 1\n";
 
 my $n = 2;
-while ( ~< *DATA) {
+while ( ~< $^DATA) {
     my %options;
     next until $_ eq "###\n";
-    while ( ~< *DATA) {
+    while ( ~< $^DATA) {
         last if $_ eq "###\n";
         my @($option, $value) =  split;
         %options{+$option} = $value;
     }
     open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
-    while ( ~< *DATA) {
+    while ( ~< $^DATA) {
         last if $_ eq "###\n";
         print $tmp, $_;
     }
@@ -47,7 +47,7 @@ while ( ~< *DATA) {
     close $tmp;
     unlink ('tmp.pod', 'out.tmp');
     my $expected = '';
-    while ( ~< *DATA) {
+    while ( ~< $^DATA) {
         last if $_ eq "###\n";
         $expected .= $_;
     }

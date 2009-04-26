@@ -108,7 +108,7 @@ do {
     local $_ = undef;
 
 
-    while ( ~< *DATA)
+    while ( ~< $^DATA)
     {
         next unless m/\S/;
         chop;
@@ -117,7 +117,7 @@ do {
         %LANGUAGES{+lc "$language"} = $code;
     }
 
-    close(\*DATA);
+    close($^DATA);
 };
 
 1;

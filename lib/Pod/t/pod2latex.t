@@ -30,7 +30,7 @@ ok(1);
 # the DATA filehandle and store it in a scalar.
 # Do this until we read an =pod
 my @reference;
-while (my $line = ~< *DATA) {
+while (my $line = ~< $^DATA) {
     last if $line =~ m/^=pod/;
     push(@reference,$line);
 }
@@ -51,7 +51,7 @@ open(my $outfh, ">", "test.tex" ) or die "Unable to open test tex file: $^OS_ERR
 
 # Read from the DATA filehandle and write to a new output file
 # Really want to write this to a scalar
-$parser->parse_from_filehandle(\*DATA,$outfh);
+$parser->parse_from_filehandle($^DATA,$outfh);
 
 close($outfh) or die "Error closing OUTFH test.tex: $^OS_ERROR\n";
 

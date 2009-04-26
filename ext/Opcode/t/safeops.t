@@ -16,7 +16,7 @@ use Safe;
 my @op;
 my %code;
 
-while ( ~< *DATA) {
+while ( ~< $^DATA) {
     chomp;
     die "Can't match $_" unless m/^([a-z_0-9]+)\t+(.*)/;
     %code{+$1} = $2;

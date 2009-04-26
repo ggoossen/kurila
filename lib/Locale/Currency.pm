@@ -109,7 +109,7 @@ do {
     local $_ = undef;
 
 
-    while ( ~< *DATA)
+    while ( ~< $^DATA)
     {
         next unless m/\S/;
         chop;
@@ -118,7 +118,7 @@ do {
         %CURRENCIES{+lc "$currency"} = $code;
     }
 
-    close(\*DATA);
+    close($^DATA);
 };
 
 1;

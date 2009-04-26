@@ -23,17 +23,17 @@ print $^STDOUT, "ok 1\n";
 
 my $parser = Pod::Man->new or die "Cannot create parser\n";
 my $n = 2;
-while ( ~< *DATA) {
+while ( ~< $^DATA) {
     next until $_ eq "###\n";
 
     my $input = "";
-    while ( ~< *DATA) {
+    while ( ~< $^DATA) {
         no warnings 'utf8'; # No invalid unicode warnings.
         last if $_ eq "###\n";
         $input .= $_;
     }
     my $expected = '';
-    while ( ~< *DATA) {
+    while ( ~< $^DATA) {
         last if $_ eq "###\n";
         $expected .= $_;
     }

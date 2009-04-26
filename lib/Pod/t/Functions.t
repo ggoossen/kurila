@@ -45,7 +45,7 @@ my $pod_functions = File::Spec->catfile(
     $path, File::Spec->updir, 'Functions.pm' );
 
 SKIP: do {
-    my $test_out = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< *DATA }; 
+    my $test_out = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $^DATA }; 
 
     skip( "Can't fork '$^EXECUTABLE_NAME': $^OS_ERROR", 1) 
         unless open my $fh, "-|", qq[$^EXECUTABLE_NAME "-I../lib" $pod_functions];

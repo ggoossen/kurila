@@ -1356,7 +1356,7 @@ sub _change_S_to_nbsp($treelet, $in_s) {
 sub _accessorize {  # A simple-minded method-maker
   foreach my $attrname ( @_) {
     next if $attrname =~ m/::/; # a hack
-    *{Symbol::fetch_glob(caller() . '::' . $attrname)} = sub {
+    Symbol::fetch_glob(caller() . '::' . $attrname)->* = sub {
       
       die "Accessor usage: \$obj->$attrname() or \$obj->$attrname(\$new_value)"
         unless ((nelems @_) == 1 or (nelems @_) == 2) and ref @_[0];

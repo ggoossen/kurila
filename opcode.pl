@@ -17,7 +17,7 @@ my $on = safer_open($opname_new);
 my %seen;
 my (@ops, %desc, %check, %ckname, %flags, %args, %opnum);
 
-while ( ~< *DATA) {
+while ( ~< $^DATA) {
     chop;
     next unless $_;
     next if m/^#/;

@@ -698,12 +698,12 @@ while (my @(?$target, ?$name) = @: each %Targets) {
     next unless %Build{$target};
     $built++;
     if ($target eq "toc") {
-        print\*STDOUT,  "Now processing $name\n" if $Verbose;
+        print$^STDOUT,  "Now processing $name\n" if $Verbose;
         &output_kurilatoc( < @_ );
-        print \*STDOUT, "Finished\n" if $Verbose;
+        print $^STDOUT, "Finished\n" if $Verbose;
         next;
     }
-    print\*STDOUT,  "Now processing $name\n" if $Verbose;
+    print$^STDOUT,  "Now processing $name\n" if $Verbose;
     open my $thing, "<", $name or die "Can't open $name: $^OS_ERROR";
     my @orig = @( ~< $thing->* );
     my $orig = join '', @orig;
@@ -711,7 +711,7 @@ while (my @(?$target, ?$name) = @: each %Targets) {
     my @new = &{"do_$target"}($target, < @orig);
     my $new = join '', @new;
     if ($new eq $orig) {
-        print \*STDOUT, "Was not modified\n" if $Verbose;
+        print $^STDOUT, "Was not modified\n" if $Verbose;
         next;
     }
     rename $name, "$name.old" or die "$^PROGRAM_NAME: Can't rename $name to $name.old: $^OS_ERROR";
