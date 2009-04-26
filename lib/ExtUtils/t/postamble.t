@@ -68,7 +68,7 @@ OUT
 ok( open(my $makefh, "<", $Makefile) ) or diag "Can't open $Makefile: $^OS_ERROR";
 do {
     local $^INPUT_RECORD_SEPARATOR = undef;
-    like( ($: ~< *$makefh), qr/^\# This makes sure the postamble gets written\n/m,
+    like( ($: ~< $makefh->*), qr/^\# This makes sure the postamble gets written\n/m,
           'postamble added to the Makefile' );
 };
 close $makefh;

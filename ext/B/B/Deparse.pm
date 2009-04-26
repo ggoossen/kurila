@@ -347,8 +347,8 @@ sub next_todo {
 # Return a "use" declaration for this BEGIN block, if appropriate
 sub begin_is_use($self, $cv) {
     my $root = $cv->ROOT;
-    local %$self{[qw'curcv curcvlex']};
-        %$self{[qw'curcv curcvlex']} = @($cv);
+    local $self->{[qw'curcv curcvlex']};
+        $self->{[qw'curcv curcvlex']} = @($cv);
     #require B::Debug;
     #B::walkoptree($cv->ROOT, "debug");
     my $lineseq = $root->first;
@@ -456,13 +456,13 @@ sub stash_subs($self, ?$pack) {
         $pack =~ s/(::)?$//;
         $stash = \Symbol::stash($pack)->%;
     }
-    for my $key (keys %$stash) {
+    for my $key (keys $stash->%) {
         my $val = svref_2object( \( $stash->{+$key} ) );
         my $class = class($val);
         if ($class eq "GV") {
             if (class(my $cv = $val->CV) ne "SPECIAL") {
-                next if $self->{'subs_done'}->{+$$val}++;
-                next if $$val != $cv->GV->$;   # Ignore imposters
+                next if $self->{'subs_done'}->{+$val->$}++;
+                next if $val->$ != $cv->GV->$;   # Ignore imposters
                 $self->todo($cv, 0);
             }
             if (class($val->HV) ne "SPECIAL" && $key =~ m/::$/) {
@@ -658,7 +658,7 @@ sub ambient_pragmas {
                 @names = qw/refs subs vars/;
             }
             elsif (ref $val) {
-                @names = @$val;
+                @names = $val->@;
             }
             else {
                 @names = split' ', $val;
@@ -690,7 +690,7 @@ sub ambient_pragmas {
                 @names = qw/taint eval/;
             }
             elsif (ref $val) {
-                @names = @$val;
+                @names = $val->@;
             }
             else {
                 @names = split' ',$val;
@@ -706,7 +706,7 @@ sub ambient_pragmas {
 
             my @names;
             if (ref $val) {
-                @names = @$val;
+                @names = $val->@;
             }
             else {
                 @names = split m/\s+/, $val;
@@ -789,9 +789,9 @@ sub deparse_sub {
 
           local($self->{+'curcv'}) = $cv;
           local($self->{?'curcvlex'});
-    my @oldv = %$self{[qw'curstash warnings hints hinthash']};
-          local(%$self{[qw'curstash warnings hints hinthash']});
-        %$self{[qw'curstash warnings hints hinthash']}
+    my @oldv = $self->{[qw'curstash warnings hints hinthash']};
+          local($self->{[qw'curstash warnings hints hinthash']});
+        $self->{[qw'curstash warnings hints hinthash']}
     =  @oldv;
     my $body;
     if (not null $cv->ROOT) {
@@ -799,7 +799,7 @@ sub deparse_sub {
         if ($lineseq->name eq "lineseq") {
             my @ops;
             my$o=$lineseq->first;
-            while ($$o) {
+            while ($o->$) {
                 push @ops, $o;
                 $o=$o->sibling;
             }
@@ -816,7 +816,7 @@ sub deparse_sub {
     }
     else {
         my $sv = $cv->const_sv;
-        if ($$sv) {
+        if ($sv->$) {
             # uh-oh. inlinable sub... format it differently
             return $proto . "\{ " . $self->const($sv, 0) . " \}\n";
         } else { # XSUB? (or just a declaration)
@@ -932,7 +932,7 @@ sub maybe_parens_func($self, $func, $text, $cx, $prec) {
 sub maybe_local($self, $op, $cx, $text) {
     my $our_intro = ($op->name =~ m/^(gv|rv2)[ash]v$/) ?? OPpOUR_INTRO !! 0;
     if ($op->private ^&^ (OPpLVAL_INTRO^|^$our_intro)
-        and not $self->{?'avoid_local'}->{?$$op}) {
+        and not $self->{?'avoid_local'}->{?$op->$}) {
         my $our_local = ($op->private ^&^ OPpLVAL_INTRO) ?? "local" !! "our";
         if( $our_local eq 'our' ) {
             # XXX This assertion fails code with non-ASCII identifiers,
@@ -967,7 +967,7 @@ sub padname_sv {
 }
 
 sub maybe_my($self, $op, $cx, $text) {
-    if ($op->private ^&^ OPpLVAL_INTRO and not $self->{?'avoid_local'}->{?$$op}) {
+    if ($op->private ^&^ OPpLVAL_INTRO and not $self->{?'avoid_local'}->{?$op->$}) {
         my $my = "my";
         if (want_scalar($op)) {
             return "$my $text";
@@ -1021,9 +1021,9 @@ sub scopeop($real_block, $self, $op, $cx) {
     my $kid;
     my @kids;
 
-    my @oldv = %$self{[qw'curstash warnings hints hinthash']};
-          local(%$self{[qw'curstash warnings hints hinthash']}) if $real_block;
-        %$self{[qw'curstash warnings hints hinthash']} =  @oldv;
+    my @oldv = $self->{[qw'curstash warnings hints hinthash']};
+          local($self->{[qw'curstash warnings hints hinthash']}) if $real_block;
+        $self->{[qw'curstash warnings hints hinthash']} =  @oldv;
     if ($real_block) {
         $kid = $op->first->sibling; # skip enter
         if (is_miniwhile($kid)) {
@@ -1076,9 +1076,9 @@ sub pp_leave { scopeop(1, < @_); }
 sub deparse_root {
     my $self = shift;
     my@($op) =  @_;
-    my @oldv = %$self{[qw'curstash warnings hints hinthash']};
-          local(%$self{[qw'curstash warnings hints hinthash']});
-        %$self{[qw'curstash warnings hints hinthash']} =  @oldv;
+    my @oldv = $self->{[qw'curstash warnings hints hinthash']};
+          local($self->{[qw'curstash warnings hints hinthash']});
+        $self->{[qw'curstash warnings hints hinthash']} =  @oldv;
     my @kids;
     return if null $op->first; # Can happen, e.g., for Bytecode without -k
     my $kid = $op->first->sibling;
@@ -1093,7 +1093,7 @@ sub deparse_root {
 }
 
 sub walk_lineseq($self, $op, $kids, $callback) {
-    my @kids = @$kids;
+    my @kids = $kids->@;
     my $i = 0;
     while ( $i +< nelems(@kids) ) {
         my $expr = "";
@@ -1171,7 +1171,7 @@ sub lex_in_scope($self, $name) {
     my $seq = $self->{'curcop'}->cop_seq;
     return 0 if !exists $self->{'curcvlex'}->{$name};
     for my $a ( $self->{'curcvlex'}->{$name}->@) {
-        my @($st, $en) =  @$a;
+        my @($st, $en) =  $a->@;
         return 1 if $seq +> $st && $seq +<= $en;
     }
     return 0;
@@ -1221,7 +1221,7 @@ sub find_scope($self, $op, ?$scope_st, ?$scope_en) {
     my @queue = @($op);
     while(my $op = shift @queue ) {
         my $o=$op->first;
-        while ($$o) {
+        while ($o->$) {
             if ($o->name =~ m/^pad.v$/ && $o->private ^&^ OPpLVAL_INTRO) {
                 my $s = int($self->padname_sv($o->targ)->COP_SEQ_RANGE_LOW);
                 my $e = $self->padname_sv($o->targ)->COP_SEQ_RANGE_HIGH;
@@ -1286,10 +1286,10 @@ sub pp_nextstate($self, $op, $cx) {
 
     my $warnings = $op->warnings;
     my $warning_bits;
-    if ($warnings->isa("B::SPECIAL") && $$warnings == 4) {
+    if ($warnings->isa("B::SPECIAL") && $warnings->$ == 4) {
         $warning_bits = %warnings::Bits{?"all"} ^&^ WARN_MASK;
     }
-    elsif ($warnings->isa("B::SPECIAL") && $$warnings == 5) {
+    elsif ($warnings->isa("B::SPECIAL") && $warnings->$ == 5) {
         $warning_bits = $warnings::NONE;
     }
     elsif ($warnings->isa("B::SPECIAL")) {
@@ -1360,13 +1360,13 @@ my %ignored_hints = %(
 
 sub declare_hinthash($from, $to, $indent) {
     my @decls;
-    for my $key (keys %$to) {
+    for my $key (keys $to->%) {
         next if %ignored_hints{?$key};
         if (!defined $from->{?$key} or $from->{?$key} ne $to->{?$key}) {
             push @decls, qq(\%^H\{'$key'\} = q($to->{?$key}););
         }
     }
-    for my $key (keys %$from) {
+    for my $key (keys $from->%) {
         next if %ignored_hints{?$key};
         if (!exists $to->{$key}) {
             push @decls, qq(delete \%^H\{'$key'\};);
@@ -2369,9 +2369,9 @@ sub pp_list($self, $op, $cx) {
             } else {
                 $lop = $kid;
             }
-            $self->{+'avoid_local'}->{+$$lop}++;
+            $self->{+'avoid_local'}->{+$lop->$}++;
             $expr = $self->deparse($kid, 6);
-            delete $self->{'avoid_local'}->{$$lop};
+            delete $self->{'avoid_local'}->{$lop->$};
         } else {
             $expr = $self->deparse($kid, 6);
         }
@@ -2432,9 +2432,9 @@ sub pp_cond_expr($self, $op, $cx) {
 sub loop_common($self, $op, $cx, $init) {
     my $enter = $op->first;
     my $kid = $enter->sibling;
-    my @oldv = %$self{[qw'curstash warnings hints hinthash']};
-          local(%$self{[qw'curstash warnings hints hinthash']});
-        %$self{[qw'curstash warnings hints hinthash']} =  @oldv;
+    my @oldv = $self->{[qw'curstash warnings hints hinthash']};
+          local($self->{[qw'curstash warnings hints hinthash']});
+        $self->{[qw'curstash warnings hints hinthash']} =  @oldv;
     my $head = "";
     my $bare = 0;
     my $body;
@@ -2499,7 +2499,7 @@ sub loop_common($self, $op, $cx, $init) {
     # block (or the last in a bare loop).
     my $cont_start = $enter->nextop;
     my $cont;
-    if ($$cont_start != $$op && $cont_start->$ != $body->last->$) {
+    if ($cont_start->$ != $op->$ && $cont_start->$ != $body->last->$) {
         if ($bare) {
             $cont = $body->last;
         } else {
@@ -2511,7 +2511,7 @@ sub loop_common($self, $op, $cx, $init) {
         my $state = $body->first;
         my $cuddle = $self->{?'cuddle'};
         my @states;
-        while ($$state != $$cont) {
+        while ($state->$ != $cont->$) {
             push @states, $state;
             $state = $state->sibling;
         }
@@ -3289,7 +3289,7 @@ sub balanced_delim($str) {
     my @str = split m//, $str;
     my($open, $close, $fail, $cnt, $last_bs);
     for my $ar (@(\@('[',']'), \@('(',')'), \@('<','>'), \@('{','}'))) {
-        @($open, $close) =  @$ar;
+        @($open, $close) =  $ar->@;
         $fail = 0; $cnt = 0; $last_bs = 0;
         for my $c ( @str) {
             if ($c eq $open) {
@@ -3359,7 +3359,7 @@ sub const($self, $sv, $cx) {
     }
     if (class($sv) eq "SPECIAL") {
         # sv_undef, sv_yes, sv_no
-        return @('undef', '1', < $self->maybe_parens("!1", $cx, 21))[$$sv-1];
+        return @('undef', '1', < $self->maybe_parens("!1", $cx, 21))[$sv->$-1];
     } elsif (class($sv) eq "NULL") {
         return 'undef';
     }
@@ -3463,7 +3463,7 @@ sub const($self, $sv, $cx) {
 
 sub const_dumper($self, $sv, $cx) {
     my $ref = $sv->object_2svref();
-    my $dumper = Data::Dumper->new(\@($$ref), \@('$v'));
+    my $dumper = Data::Dumper->new(\@($ref->$), \@('$v'));
     $dumper->Purity(1)->Terse(1)->Deparse(1)->Indent(0)->Useqq(1)->Sortkeys(1);
     my $str = $dumper->Dump();
     if ($str =~ m/^\$v/) {
@@ -3478,7 +3478,7 @@ sub const_sv {
     my $op = shift;
     my $sv = $op->sv;
     # the constant could be in the pad (under useithreads)
-    $sv = $self->padval( <$op->targ) unless $$sv;
+    $sv = $self->padval( <$op->targ) unless $sv->$;
     return $sv;
 }
 

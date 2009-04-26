@@ -33,7 +33,7 @@ sub shownamearray($name, $av) {
     for my $i (B::PAD_NAME_START_INDEX .. $count -1) {
         my $sv = @els[$i];
         if (class($sv) ne "SPECIAL") {
-            printf $walkHandle, "$i: \%s (0x\%lx) \%s\n", class($sv), $$sv, $sv->PVX_const;
+            printf $walkHandle, "$i: \%s (0x\%lx) \%s\n", class($sv), $sv->$, $sv->PVX_const;
         } else {
             printf $walkHandle, "$i: \%s\n", $sv->terse;
         #printf $walkHandle "$i: \%s\n", B::Concise::concise_sv($sv);

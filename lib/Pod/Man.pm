@@ -92,7 +92,7 @@ sub new {
     # to put them in our object as hash keys and values.  This could cause
     # problems if we ever clash with Pod::Simple's own internal class
     # variables.
-    %$self = %(< %$self, < @_);
+    $self->% = %(< $self->%, < @_);
 
     # Initialize various other internal constants based on our arguments.
     $self->init_fonts;
@@ -100,12 +100,12 @@ sub new {
     $self->init_page;
 
     # For right now, default to turning on all of the magic.
-    %$self{+MAGIC_CPP}       = 1;
-    %$self{+MAGIC_EMDASH}    = 1;
-    %$self{+MAGIC_FUNC}      = 1;
-    %$self{+MAGIC_MANREF}    = 1;
-    %$self{+MAGIC_SMALLCAPS} = 1;
-    %$self{+MAGIC_VARS}      = 1;
+    $self->{+MAGIC_CPP}       = 1;
+    $self->{+MAGIC_EMDASH}    = 1;
+    $self->{+MAGIC_FUNC}      = 1;
+    $self->{+MAGIC_MANREF}    = 1;
+    $self->{+MAGIC_SMALLCAPS} = 1;
+    $self->{+MAGIC_VARS}      = 1;
 
     return $self;
 }
@@ -122,7 +122,7 @@ sub init_fonts($self) {
     # Figure out the fixed-width font.  If user-supplied, make sure that they
     # are the right length.
     for (qw/fixed fixedbold fixeditalic fixedbolditalic/) {
-        my $font = %$self{?$_};
+        my $font = $self->{?$_};
         if (defined ($font) && (length ($font) +< 1 || length ($font) +> 2)) {
             croak qq(roff font should be 1 or 2 chars, not "$font");
         }
@@ -131,19 +131,19 @@ sub init_fonts($self) {
     # Set the default fonts.  We can't be sure portably across different
     # implementations what fixed bold-italic may be called (if it's even
     # available), so default to just bold.
-    %$self{+fixed}           ||= 'CW';
-    %$self{+fixedbold}       ||= 'CB';
-    %$self{+fixeditalic}     ||= 'CI';
-    %$self{+fixedbolditalic} ||= 'CB';
+    $self->{+fixed}           ||= 'CW';
+    $self->{+fixedbold}       ||= 'CB';
+    $self->{+fixeditalic}     ||= 'CI';
+    $self->{+fixedbolditalic} ||= 'CB';
 
     # Set up a table of font escapes.  First number is fixed-width, second is
     # bold, third is italic.
-    %$self{+FONTS} = \%( '000' => '\fR', '001' => '\fI',
+    $self->{+FONTS} = \%( '000' => '\fR', '001' => '\fI',
         '010' => '\fB', '011' => '\f(BI',
-            '100' => toescape (%$self{?fixed}),
-            '101' => toescape (%$self{?fixeditalic}),
-            '110' => toescape (%$self{?fixedbold}),
-            '111' => toescape (%$self{?fixedbolditalic}) );
+            '100' => toescape ($self->{?fixed}),
+            '101' => toescape ($self->{?fixeditalic}),
+            '110' => toescape ($self->{?fixedbold}),
+            '111' => toescape ($self->{?fixedbolditalic}) );
 }
 
 # Initialize the quotes that we'll be using for C<> text.  This requires some
@@ -153,24 +153,24 @@ sub init_fonts($self) {
 sub init_quotes {
     my @($self) = @(< @_);
 
-    %$self{+quotes} ||= '"';
-    if (%$self{?quotes} eq 'none') {
-        %$self{+LQUOTE} = %$self{+RQUOTE} = '';
-    } elsif (length (%$self{?quotes}) == 1) {
-        %$self{+LQUOTE} = %$self{+RQUOTE} = %$self{?quotes};
-    } elsif (%$self{?quotes} =~ m/^(.)(.)$/
-    || %$self{?quotes} =~ m/^(..)(..)$/) {
-        %$self{+LQUOTE} = $1;
-        %$self{+RQUOTE} = $2;
+    $self->{+quotes} ||= '"';
+    if ($self->{?quotes} eq 'none') {
+        $self->{+LQUOTE} = $self->{+RQUOTE} = '';
+    } elsif (length ($self->{?quotes}) == 1) {
+        $self->{+LQUOTE} = $self->{+RQUOTE} = $self->{?quotes};
+    } elsif ($self->{?quotes} =~ m/^(.)(.)$/
+    || $self->{?quotes} =~ m/^(..)(..)$/) {
+        $self->{+LQUOTE} = $1;
+        $self->{+RQUOTE} = $2;
     } else {
-        croak(qq(Invalid quote specification "%$self{?quotes}"))
+        croak(qq(Invalid quote specification "$self->{?quotes}"))
     }
 
     # Double the first quote; note that this should not be s///g as two double
     # quotes is represented in *roff as three double quotes, not four.  Weird,
     # I know.
-    %$self{+LQUOTE} =~ s/\"/\"\"/;
-    %$self{+RQUOTE} =~ s/\"/\"\"/;
+    $self->{+LQUOTE} =~ s/\"/\"\"/;
+    $self->{+RQUOTE} =~ s/\"/\"\"/;
 }
 
 # Initialize the page title information and indentation from our arguments.
@@ -182,16 +182,16 @@ sub init_page($self) {
 
     # Set the defaults for page titles and indentation if the user didn't
     # override anything.
-    %$self{+center} = 'User Contributed Perl Documentation'
-    unless defined %$self{?center};
-    %$self{+release} = 'perl v' . $version
-    unless defined %$self{?release};
-    %$self{+indent} = 4
-    unless defined %$self{?indent};
+    $self->{+center} = 'User Contributed Perl Documentation'
+    unless defined $self->{?center};
+    $self->{+release} = 'perl v' . $version
+    unless defined $self->{?release};
+    $self->{+indent} = 4
+    unless defined $self->{?indent};
 
     # Double quotes in things that will be quoted.
     for (qw/center release/) {
-        %$self{+$_} =~ s/\"/\"\"/g if %$self{?$_};
+        $self->{+$_} =~ s/\"/\"\"/g if $self->{?$_};
     }
 }
 
@@ -217,8 +217,8 @@ sub init_page($self) {
 # according to the current formatting instructions as we do.
 sub _handle_text($self, $text) {
     DEBUG +> 3 and print $^STDOUT, "== $text\n";
-    my $tag = %$self{PENDING}->[-1];
-    @$tag[2] .= $self->format_text (@$tag[1], $text);
+    my $tag = $self->{PENDING}->[-1];
+    $tag->[2] .= $self->format_text ($tag->[1], $text);
 }
 
 # Given an element name, get the corresponding method name.
@@ -234,7 +234,7 @@ sub method_for_element($self, $element) {
 # element method, and create a new tree into which we'll collect blocks of
 # text and nested elements.  Otherwise, if start_element is defined, call it.
 sub _handle_element_start($self, $element, $attrs) {
-    DEBUG +> 3 and print $^STDOUT, "++ $element (<", join ('> <', %$attrs), ">)\n";
+    DEBUG +> 3 and print $^STDOUT, "++ $element (<", join ('> <', $attrs->%), ">)\n";
     my $method = $self->method_for_element ($element);
 
     # If we have a command handler, we need to accumulate the contents of the
@@ -243,16 +243,16 @@ sub _handle_element_start($self, $element, $attrs) {
     # NAME heading.
     if ($self->can ("cmd_$method")) {
         DEBUG +> 2 and print $^STDOUT, "<$element> starts saving a tag\n";
-        %$self{+IN_NAME} = 0 if ($element ne 'Para');
+        $self->{+IN_NAME} = 0 if ($element ne 'Para');
 
         # How we're going to format embedded text blocks depends on the tag
         # and also depends on our parent tags.  Thankfully, inside tags that
         # turn off guesswork and reformatting, nothing else can turn it back
         # on, so this can be strictly inherited.
-        my $formatting = %$self{PENDING}->[-1]->[?1];
+        my $formatting = $self->{PENDING}->[-1]->[?1];
         $formatting = $self->formatting ($formatting, $element);
-        push ( %$self{PENDING}->@, \@( $attrs, $formatting, '' ));
-        DEBUG +> 4 and print $^STDOUT, "Pending: [", < pretty (%$self{?PENDING}), "]\n";
+        push ( $self->{PENDING}->@, \@( $attrs, $formatting, '' ));
+        DEBUG +> 4 and print $^STDOUT, "Pending: [", < pretty ($self->{?PENDING}), "]\n";
     } elsif ($self->can ("start_$method")) {
         my $method = 'start_' . $method;
         $self->?$method ($attrs, '');
@@ -272,14 +272,14 @@ sub _handle_element_end($self, $element) {
     # the handler along with the saved attribute hash.
     if ($self->can ("cmd_$method")) {
         DEBUG +> 2 and print $^STDOUT, "</$element> stops saving a tag\n";
-        my $tag = pop  %$self{PENDING}->@;
+        my $tag = pop  $self->{PENDING}->@;
         DEBUG +> 4 and print $^STDOUT, "Popped: [", < pretty ($tag), "]\n";
-        DEBUG +> 4 and print $^STDOUT, "Pending: [", < pretty (%$self{?PENDING}), "]\n";
+        DEBUG +> 4 and print $^STDOUT, "Pending: [", < pretty ($self->{?PENDING}), "]\n";
         my $method = 'cmd_' . $method;
-        my $text = $self->?$method (@$tag[0], @$tag[2]);
+        my $text = $self->?$method ($tag->[0], $tag->[2]);
         if (defined $text) {
-            if ((nelems  %$self{?PENDING}->@) +> 1) {
-                %$self{PENDING}->[-1]->[2] .= $text;
+            if ((nelems  $self->{?PENDING}->@) +> 1) {
+                $self->{PENDING}->[-1]->[2] .= $text;
             } else {
                 $self->output ($text);
             }
@@ -305,7 +305,7 @@ sub _handle_element_end($self, $element) {
 sub formatting($self, $current, $element) {
     my %options;
     if ($current) {
-        %options = %( < %$current );
+        %options = %( < $current->% );
     } else {
         %options = %(guesswork => 1, cleanup => 1, convert => 1);
     }
@@ -327,10 +327,10 @@ sub formatting($self, $current, $element) {
 # format.  Currently, the only formatting options are guesswork, cleanup, and
 # convert, all of which are boolean.
 sub format_text($self, $options, $text) {
-    my $guesswork = %$options{?guesswork} && !%$self{?IN_NAME};
-    my $cleanup = %$options{?cleanup};
-    my $convert = %$options{?convert};
-    my $literal = %$options{?literal};
+    my $guesswork = $options->{?guesswork} && !$self->{?IN_NAME};
+    my $cleanup = $options->{?cleanup};
+    my $convert = $options->{?convert};
+    my $literal = $options->{?literal};
 
     # Normally we do character translation, but we won't even do that in
     # <Data> blocks.
@@ -438,7 +438,7 @@ sub guesswork {
     # Translate "--" into a real em-dash if it's used like one.  This means
     # that it's either surrounded by whitespace, it follows a regular word, or
     # it occurs between two regular words.
-    if (%$self{?MAGIC_EMDASH}) {
+    if ($self->{?MAGIC_EMDASH}) {
         s{          (\s) \\-\\- (\s)                } {$( $1 . '\*(--' . $2 )}gx;
         s{ (\b[a-zA-Z]+) \\-\\- (\s|\Z|[a-zA-Z]+\b) } {$( $1 . '\*(--' . $2 )}gx;
     }
@@ -452,7 +452,7 @@ sub guesswork {
     # line or following regular punctuation (like quotes) or whitespace (1),
     # and followed by either similar punctuation, an em-dash, or the end of
     # the line (3).
-    if (%$self{?MAGIC_SMALLCAPS}) {
+    if ($self->{?MAGIC_SMALLCAPS}) {
         s{
             ( ^ | [\s\(\"\'\`\[\{<>] | \\\  )                   # (1)
             ( [A-Z] [A-Z] (?: [/A-Z+:\d_\$&] | \\- )* )         # (2)
@@ -470,7 +470,7 @@ sub guesswork {
     # all capitals, but don't italize if there's anything between the parens.
     # The function must start with an alphabetic character or underscore and
     # then consist of word characters or colons.
-    if (%$self{?MAGIC_FUNC}) {
+    if ($self->{?MAGIC_FUNC}) {
         s{
             ( \b | \\s-1 )
             ( [A-Za-z_] ([:\w] | \\s-?[01])+ \(\) )
@@ -486,7 +486,7 @@ sub guesswork {
     # configuration file man pages), or colons, and n is a single digit,
     # optionally followed by some number of lowercase letters.  Note that this
     # does not recognize man page references like perl(l) or socket(3SOCKET).
-    if (%$self{?MAGIC_MANREF}) {
+    if ($self->{?MAGIC_MANREF}) {
         s{
             ( \b | \\s-1 )
             ( [A-Za-z_] (?:[.:\w] | \\- | \\s-?[01])+ )
@@ -499,7 +499,7 @@ sub guesswork {
     # Convert simple Perl variable references to a fixed-width font.  Be
     # careful not to convert functions, though; there are too many subtleties
     # with them to want to perform this transformation.
-    if (%$self{?MAGIC_VARS}) {
+    if ($self->{?MAGIC_VARS}) {
         s{
            ( ^ | \s+ )
            ( [\$\@%] [\w:]+ )
@@ -516,7 +516,7 @@ sub guesswork {
     s{ \" ([^\"]+) \" } {$( '\*(L"' . $1 . '\*(R"' )}gx;
 
     # Make C++ into \*(C+, which is a squinched version.
-    if (%$self{?MAGIC_CPP}) {
+    if ($self->{?MAGIC_CPP}) {
         s{ \b C\+\+ } {\\*\(C+}gx;
     }
 
@@ -557,7 +557,7 @@ sub mapfonts($self, $text) {
         my $f;
         if ($last ne '\fR') { $sequence = '\fP' }
          %magic{$1}->$ += ($2 eq 'S') ?? 1 !! -1;
-        $f = %$self{FONTS}->{?($fixed && 1) . ($bold && 1) . ($italic && 1) };
+        $f = $self->{FONTS}->{?($fixed && 1) . ($bold && 1) . ($italic && 1) };
         if ($f eq $last) {
             '';
         } else {
@@ -581,7 +581,7 @@ sub textmapfonts($self, $text) {
         \\f\((.)(.)
     #$( do {
          %magic{$1}->$ += ($2 eq 'S') ?? 1 !! -1;
-        %$self{FONTS}->{?($fixed && 1) . ($bold && 1) . ($italic && 1) };
+        $self->{FONTS}->{?($fixed && 1) . ($bold && 1) . ($italic && 1) };
     })#gx;
     return $text;
 }
@@ -601,8 +601,8 @@ sub switchquotes($self, $command, $text, ?$extra) {
     # confuses the .SH macros and the like no end.  Expand them ourselves.
     # Also separate troff from nroff if there are any fixed-width fonts in use
     # to work around problems with Solaris nroff.
-    my $c_is_quote = (%$self{?LQUOTE} =~ m/\"/) || (%$self{?RQUOTE} =~ m/\"/);
-    my $fixedpat = join '|',  %$self{FONTS}->{[@('100', '101', '110', '111')]};
+    my $c_is_quote = ($self->{?LQUOTE} =~ m/\"/) || ($self->{?RQUOTE} =~ m/\"/);
+    my $fixedpat = join '|',  $self->{FONTS}->{[@('100', '101', '110', '111')]};
     $fixedpat =~ s/\\/\\\\/g;
     $fixedpat =~ s/\(/\\\(/g;
     if ($text =~ m/\"/ || $text =~ m/$fixedpat/) {
@@ -611,8 +611,8 @@ sub switchquotes($self, $command, $text, ?$extra) {
         my $troff = $text;
         $troff =~ s/\"\"([^\"]*)\"\"/\`\`$1\'\'/g;
         if ($c_is_quote and $text =~ m/\\\*\(C[\'\`]/) {
-            $nroff =~ s/\\\*\(C\`/%$self{?LQUOTE}/g;
-            $nroff =~ s/\\\*\(C\'/%$self{?RQUOTE}/g;
+            $nroff =~ s/\\\*\(C\`/$self->{?LQUOTE}/g;
+            $nroff =~ s/\\\*\(C\'/$self->{?RQUOTE}/g;
             $troff =~ s/\\\*\(C[\'\`]//g;
         }
         $nroff = qq("$nroff") . ($extra ?? " $extra" !! '');
@@ -622,10 +622,10 @@ sub switchquotes($self, $command, $text, ?$extra) {
         # to Roman rather than the actual previous font when used in headings.
         # troff output may still be broken, but at least we can fix nroff by
         # just switching the font changes to the non-fixed versions.
-        $nroff =~ s/\Q%$self{FONTS}->{?100}\E(.*)\\f[PR]/$1/g;
-        $nroff =~ s/\Q%$self{FONTS}->{?101}\E(.*)\\f([PR])/\\fI$1\\f$2/g;
-        $nroff =~ s/\Q%$self{FONTS}->{?110}\E(.*)\\f([PR])/\\fB$1\\f$2/g;
-        $nroff =~ s/\Q%$self{FONTS}->{?111}\E(.*)\\f([PR])/\\f\(BI$1\\f$2/g;
+        $nroff =~ s/\Q$self->{FONTS}->{?100}\E(.*)\\f[PR]/$1/g;
+        $nroff =~ s/\Q$self->{FONTS}->{?101}\E(.*)\\f([PR])/\\fI$1\\f$2/g;
+        $nroff =~ s/\Q$self->{FONTS}->{?110}\E(.*)\\f([PR])/\\fB$1\\f$2/g;
+        $nroff =~ s/\Q$self->{FONTS}->{?111}\E(.*)\\f([PR])/\\f\(BI$1\\f$2/g;
 
         # Now finally output the command.  Bother with .ie only if the nroff
         # and troff output aren't the same.
@@ -656,21 +656,21 @@ sub protect($self, $text) {
 # repeated =items, since calling makespace means we're about to begin the item
 # body.
 sub makespace($self) {
-    $self->output (".PD\n") if %$self{?ITEMS} +> 1;
-    %$self{+ITEMS} = 0;
-    $self->output (%$self{?INDENT} +> 0 ?? ".Sp\n" !! ".PP\n")
-        if %$self{?NEEDSPACE};
+    $self->output (".PD\n") if $self->{?ITEMS} +> 1;
+    $self->{+ITEMS} = 0;
+    $self->output ($self->{?INDENT} +> 0 ?? ".Sp\n" !! ".PP\n")
+        if $self->{?NEEDSPACE};
 }
 
 # Output any pending index entries, and optionally an index entry given as an
 # argument.  Support multiple index entries in X<> separated by slashes, and
 # strip special escapes from index entries.
 sub outindex($self, ?$section, ?$index) {
-    my @entries = @+: map { split m%\s*/\s*% },  %$self{INDEX}->@;
+    my @entries = @+: map { split m%\s*/\s*% },  $self->{INDEX}->@;
     return unless ($section || nelems @entries);
 
     # We're about to output all pending entries, so clear our pending queue.
-    %$self{+INDEX} = \@();
+    $self->{+INDEX} = \@();
 
     # Build the output.  Regular index entries are marked Xref, and headings
     # pass in their own section.  Undo some *roff formatting on headings.
@@ -686,7 +686,7 @@ sub outindex($self, ?$section, ?$index) {
 
     # Print out the .IX commands.
     for ( @output) {
-        my @($type, $entry) =  @$_;
+        my @($type, $entry) =  $_->@;
         $entry =~ s/\"/\"\"/g;
         $self->output (".IX $type " . '"' . $entry . '"' . "\n");
     }
@@ -694,7 +694,7 @@ sub outindex($self, ?$section, ?$index) {
 
 # Output some text, without any additional changes.
 sub output($self, @< @text) {
-    print  %$self{?output_fh}  ,< @text;
+    print  $self->{?output_fh}  ,< @text;
 }
 
 ##############################################################################
@@ -704,41 +704,41 @@ sub output($self, @< @text) {
 # Handle the start of the document.  Here we handle empty documents, as well
 # as setting up our basic macros in a preamble and building the page title.
 sub start_document($self, $attrs, _) {
-    if (%$attrs{?contentless} && !%$self{?ALWAYS_EMIT_SOMETHING}) {
+    if ($attrs->{?contentless} && !$self->{?ALWAYS_EMIT_SOMETHING}) {
         DEBUG and print $^STDOUT, "Document is contentless\n";
-        %$self{+CONTENTLESS} = 1;
+        $self->{+CONTENTLESS} = 1;
         return;
     }
 
     # Determine information for the preamble and then output it.
     my ($name, $section);
-    if (defined %$self{?name}) {
-        $name = %$self{?name};
-        $section = %$self{?section} || 1;
+    if (defined $self->{?name}) {
+        $name = $self->{?name};
+        $section = $self->{?section} || 1;
     } else {
         @($name, $section) =  $self->devise_title;
     }
-    my $date = %$self{?date} || $self->devise_date;
+    my $date = $self->{?date} || $self->devise_date;
     $self->preamble ($name, $section, $date)
         unless $self->bare_output or DEBUG +> 9;
 
     # Initialize a few per-document variables.
-    %$self{+INDENT}    = 0;      # Current indentation level.
-    %$self{+INDENTS}   = \@();     # Stack of indentations.
-    %$self{+INDEX}     = \@();     # Index keys waiting to be printed.
-    %$self{+IN_NAME}   = 0;      # Whether processing the NAME section.
-    %$self{+ITEMS}     = 0;      # The number of consecutive =items.
-    %$self{+ITEMTYPES} = \@();     # Stack of =item types, one per list.
-    %$self{+SHIFTWAIT} = 0;      # Whether there is a shift waiting.
-    %$self{+SHIFTS}    = \@();     # Stack of .RS shifts.
-    %$self{+PENDING}   = \@(\@());   # Pending output.
+    $self->{+INDENT}    = 0;      # Current indentation level.
+    $self->{+INDENTS}   = \@();     # Stack of indentations.
+    $self->{+INDEX}     = \@();     # Index keys waiting to be printed.
+    $self->{+IN_NAME}   = 0;      # Whether processing the NAME section.
+    $self->{+ITEMS}     = 0;      # The number of consecutive =items.
+    $self->{+ITEMTYPES} = \@();     # Stack of =item types, one per list.
+    $self->{+SHIFTWAIT} = 0;      # Whether there is a shift waiting.
+    $self->{+SHIFTS}    = \@();     # Stack of .RS shifts.
+    $self->{+PENDING}   = \@(\@());   # Pending output.
 }
 
 # Handle the end of the document.  This does nothing but print out a final
 # comment at the end of the document under debugging.
 sub end_document($self) {
     return if $self->bare_output;
-    return if (%$self{?CONTENTLESS} && !%$self{?ALWAYS_EMIT_SOMETHING});
+    return if ($self->{?CONTENTLESS} && !$self->{?ALWAYS_EMIT_SOMETHING});
     $self->output (q(.\" [End document]) . "\n") if DEBUG;
 }
 
@@ -747,8 +747,8 @@ sub end_document($self) {
 # information.  Uses File::Basename and File::Spec as necessary.
 sub devise_title($self) {
     my $name = $self->source_filename || '';
-    my $section = %$self{?section} || 1;
-    $section = 3 if (!%$self{?section} && $name =~ m/\.pm\z/i);
+    my $section = $self->{?section} || 1;
+    $section = 3 if (!$self->{?section} && $name =~ m/\.pm\z/i);
     $name =~ s/\.p(od|[lm])\z//i;
 
     # If the section isn't 3, then the name defaults to just the basename of
@@ -841,9 +841,9 @@ sub preamble($self, $name, $section, $date) {
     $date =~ s/\"/\"\"/g;
 
     # Substitute into the preamble the configuration options.
-    $preamble =~ s/\@CFONT\@/%$self{?fixed}/;
-    $preamble =~ s/\@LQUOTE\@/%$self{?LQUOTE}/;
-    $preamble =~ s/\@RQUOTE\@/%$self{?RQUOTE}/;
+    $preamble =~ s/\@CFONT\@/$self->{?fixed}/;
+    $preamble =~ s/\@LQUOTE\@/$self->{?LQUOTE}/;
+    $preamble =~ s/\@RQUOTE\@/$self->{?RQUOTE}/;
     chomp $preamble;
 
     # Get the version information.
@@ -859,7 +859,7 @@ $preamble
 .\\" ========================================================================
 .\\"
 .IX Title "$index"
-.TH $name $section "$date" "%$self{?release}" "%$self{?center}"
+.TH $name $section "$date" "$self->{?release}" "$self->{?center}"
 .\\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\\" way too many mistakes in technical documents.
 .if n .ad l
@@ -876,23 +876,23 @@ $preamble
 # the first paragraph of text after an =over, in which case we have to change
 # indentations for *roff.
 sub cmd_para($self, $attrs, $text) {
-    my $line = %$attrs{?start_line};
+    my $line = $attrs->{?start_line};
 
     # Output the paragraph.  We also have to handle =over without =item.  If
     # there's an =over without =item, SHIFTWAIT will be set, and we need to
     # handle creation of the indent here.  Add the shift to SHIFTS so that it
     # will be cleaned up on =back.
     $self->makespace;
-    if (%$self{?SHIFTWAIT}) {
-        $self->output (".RS %$self{?INDENT}\n");
-        push ( %$self{SHIFTS}->@, %$self{?INDENT});
-        %$self{+SHIFTWAIT} = 0;
+    if ($self->{?SHIFTWAIT}) {
+        $self->output (".RS $self->{?INDENT}\n");
+        push ( $self->{SHIFTS}->@, $self->{?INDENT});
+        $self->{+SHIFTWAIT} = 0;
     }
 
     # Add the line number for debugging, but not in the NAME section just in
     # case the comment would confuse apropos.
     $self->output (".\\\" [At source line $line]\n")
-        if defined ($line) && DEBUG && !%$self{?IN_NAME};
+        if defined ($line) && DEBUG && !$self->{?IN_NAME};
 
     # Force exactly one newline at the end and strip unwanted trailing
     # whitespace at the end.
@@ -901,7 +901,7 @@ sub cmd_para($self, $attrs, $text) {
     # Output the paragraph.
     $self->output ( $self->protect ( $self->textmapfonts ($text)));
     $self->outindex;
-    %$self{+NEEDSPACE} = 1;
+    $self->{+NEEDSPACE} = 1;
     return '';
 }
 
@@ -927,7 +927,7 @@ sub cmd_verbatim($self, $attrs, $text) {
         last if m/^\s*$/;
         $unbroken++;
     }
-    $unbroken = 10 if ($unbroken +> 12 && !%$self{?MAGIC_VNOPAGEBREAK_LIMIT});
+    $unbroken = 10 if ($unbroken +> 12 && !$self->{?MAGIC_VNOPAGEBREAK_LIMIT});
 
     # Prepend a null token to each line.
     $text =~ s/^/\\&/gm;
@@ -935,7 +935,7 @@ sub cmd_verbatim($self, $attrs, $text) {
     # Output the results.
     $self->makespace;
     $self->output (".Vb $unbroken\n$text.Ve\n");
-    %$self{+NEEDSPACE} = 1;
+    $self->{+NEEDSPACE} = 1;
     return '';
 }
 
@@ -961,8 +961,8 @@ sub heading_common($self, $text, $line) {
 
     # This should never happen; it means that we have a heading after =item
     # without an intervening =back.  But just in case, handle it anyway.
-    if (%$self{?ITEMS} +> 1) {
-        %$self{+ITEMS} = 0;
+    if ($self->{?ITEMS} +> 1) {
+        $self->{+ITEMS} = 0;
         $self->output (".PD\n");
     }
 
@@ -978,43 +978,43 @@ sub heading_common($self, $text, $line) {
 # appropriate.
 sub cmd_head1($self, $attrs, $text) {
     $text =~ s/\\s-?\d//g;
-    $text = $self->heading_common ($text, %$attrs{start_line});
+    $text = $self->heading_common ($text, $attrs->{start_line});
     my $isname = ($text eq 'NAME' || $text =~ m/\(NAME\)/);
     $self->output ( $self->switchquotes ('.SH', $self->mapfonts ($text)));
     $self->outindex ('Header', $text) unless $isname;
-    %$self{+NEEDSPACE} = 0;
-    %$self{+IN_NAME} = $isname;
+    $self->{+NEEDSPACE} = 0;
+    $self->{+IN_NAME} = $isname;
     return '';
 }
 
 # Second level heading.
 sub cmd_head2($self, $attrs, $text) {
-    $text = $self->heading_common ($text, %$attrs{start_line});
+    $text = $self->heading_common ($text, $attrs->{start_line});
     $self->output ( $self->switchquotes ('.Sh', $self->mapfonts ($text)));
     $self->outindex ('Subsection', $text);
-    %$self{+NEEDSPACE} = 0;
+    $self->{+NEEDSPACE} = 0;
     return '';
 }
 
 # Third level heading.  *roff doesn't have this concept, so just put the
 # heading in italics as a normal paragraph.
 sub cmd_head3($self, $attrs, $text) {
-    $text = $self->heading_common ($text, %$attrs{start_line});
+    $text = $self->heading_common ($text, $attrs->{start_line});
     $self->makespace;
     $self->output ($self->textmapfonts ('\f(IS' . $text . '\f(IE') . "\n");
     $self->outindex ('Subsection', $text);
-    %$self{+NEEDSPACE} = 1;
+    $self->{+NEEDSPACE} = 1;
     return '';
 }
 
 # Fourth level heading.  *roff doesn't have this concept, so just put the
 # heading as a normal paragraph.
 sub cmd_head4($self, $attrs, $text) {
-    $text = $self->heading_common ($text, %$attrs{start_line});
+    $text = $self->heading_common ($text, $attrs->{start_line});
     $self->makespace;
     $self->output ($self->textmapfonts ($text) . "\n");
     $self->outindex ('Subsection', $text);
-    %$self{+NEEDSPACE} = 1;
+    $self->{+NEEDSPACE} = 1;
     return '';
 }
 
@@ -1031,14 +1031,14 @@ sub cmd_c { return @_[0]->quote_literal (@_[2]) }
 
 # Index entries are just added to the pending entries.
 sub cmd_x($self, $attrs, $text) {
-    push ( %$self{INDEX}->@, $text);
+    push ( $self->{INDEX}->@, $text);
     return '';
 }
 
 # Links reduce to the text that we're given, wrapped in angle brackets if it's
 # a URL.
 sub cmd_l($self, $attrs, $text) {
-    return %$attrs{?type} eq 'url' ?? "<$text>" !! $text;
+    return $attrs->{?type} eq 'url' ?? "<$text>" !! $text;
 }
 
 ##############################################################################
@@ -1049,32 +1049,32 @@ sub cmd_l($self, $attrs, $text) {
 # first argument, and then the attr hash.  This is called by the handlers for
 # the four different types of lists (bullet, number, text, and block).
 sub over_common_start($self, $type, $attrs, _) {
-    my $line = %$attrs{?start_line};
-    my $indent = %$attrs{?indent};
+    my $line = $attrs->{?start_line};
+    my $indent = $attrs->{?indent};
     DEBUG +> 3 and print $^STDOUT, " Starting =over $type (line $line, indent ",
         ($indent || '?'), "\n";
 
     # Find the indentation level.
     unless (defined ($indent) && $indent =~ m/^[-+]?\d{1,4}\s*$/) {
-        $indent = %$self{?indent};
+        $indent = $self->{?indent};
     }
 
     # If we've gotten multiple indentations in a row, we need to emit the
     # pending indentation for the last level that we saw and haven't acted on
     # yet.  SHIFTS is the stack of indentations that we've actually emitted
     # code for.
-    if ((nelems  %$self{?SHIFTS}->@) +< nelems  %$self{?INDENTS}->@) {
-        $self->output (".RS %$self{?INDENT}\n");
-        push ( %$self{SHIFTS}->@, %$self{?INDENT});
+    if ((nelems  $self->{?SHIFTS}->@) +< nelems  $self->{?INDENTS}->@) {
+        $self->output (".RS $self->{?INDENT}\n");
+        push ( $self->{SHIFTS}->@, $self->{?INDENT});
     }
 
     # Now, do record-keeping.  INDENTS is a stack of indentations that we've
     # seen so far, and INDENT is the current level of indentation.  ITEMTYPES
     # is a stack of list types that we've seen.
-    push ( %$self{INDENTS}->@, %$self{?INDENT});
-    push ( %$self{ITEMTYPES}->@, $type);
-    %$self{+INDENT} = $indent + 0;
-    %$self{+SHIFTWAIT} = 1;
+    push ( $self->{INDENTS}->@, $self->{?INDENT});
+    push ( $self->{ITEMTYPES}->@, $type);
+    $self->{+INDENT} = $indent + 0;
+    $self->{+SHIFTWAIT} = 1;
 }
 
 # End an =over block.  Takes no options other than the class pointer.
@@ -1085,23 +1085,23 @@ sub over_common_start($self, $type, $attrs, _) {
 # .RE and then a new .RS to unconfuse *roff.
 sub over_common_end($self) {
     DEBUG +> 3 and print $^STDOUT, " Ending =over\n";
-    %$self{+INDENT} = pop  %$self{INDENTS}->@;
-    pop  %$self{ITEMTYPES}->@;
+    $self->{+INDENT} = pop  $self->{INDENTS}->@;
+    pop  $self->{ITEMTYPES}->@;
 
     # If we emitted code for that indentation, end it.
-    if ((nelems  %$self{?SHIFTS}->@) +> nelems  %$self{?INDENTS}->@) {
+    if ((nelems  $self->{?SHIFTS}->@) +> nelems  $self->{?INDENTS}->@) {
         $self->output (".RE\n");
-        pop  %$self{SHIFTS}->@;
+        pop  $self->{SHIFTS}->@;
     }
 
     # If we're still in an indentation, *roff will have now lost track of the
     # right depth of that indentation, so fix that.
-    if ((nelems  %$self{?INDENTS}->@) +> 0) {
+    if ((nelems  $self->{?INDENTS}->@) +> 0) {
         $self->output (".RE\n");
-        $self->output (".RS %$self{?INDENT}\n");
+        $self->output (".RS $self->{?INDENT}\n");
     }
-    %$self{+NEEDSPACE} = 1;
-    %$self{+SHIFTWAIT} = 0;
+    $self->{+NEEDSPACE} = 1;
+    $self->{+SHIFTWAIT} = 0;
 }
 
 # Dispatch the start and end calls as appropriate.
@@ -1121,7 +1121,7 @@ sub end_over_block  { @_[0]->over_common_end }
 # entries for things like bullets and numbers.  Newlines in an item title are
 # turned into spaces since *roff can't handle them embedded.
 sub item_common($self, $type, $attrs, $text) {
-    my $line = %$attrs{?start_line};
+    my $line = $attrs->{?start_line};
     DEBUG +> 3 and print $^STDOUT, "  $type item (line $line): $text\n";
 
     # Clean up the text.  We want to end up with two variables, one ($text)
@@ -1133,7 +1133,7 @@ sub item_common($self, $type, $attrs, $text) {
         $item = "\\\(bu";
         $text =~ s/\n*$/\n/;
     } elsif ($type eq 'number') {
-        $item = %$attrs{?number} . '.';
+        $item = $attrs->{?number} . '.';
     } else {
         $item = $text;
         $item =~ s/\s*\n\s*/ /g;
@@ -1147,25 +1147,25 @@ sub item_common($self, $type, $attrs, $text) {
     # directly following another one.  We only have to do that once for a
     # whole chain of items so do it for the second item in the change.  Note
     # that makespace is what undoes this.
-    if ((nelems  %$self{?SHIFTS}->@) == nelems  %$self{?INDENTS}->@) {
+    if ((nelems  $self->{?SHIFTS}->@) == nelems  $self->{?INDENTS}->@) {
         $self->output (".RE\n");
-        pop  %$self{SHIFTS}->@;
+        pop  $self->{SHIFTS}->@;
     }
-    $self->output (".PD 0\n") if (%$self{?ITEMS} == 1);
+    $self->output (".PD 0\n") if ($self->{?ITEMS} == 1);
 
     # Now, output the item tag itself.
     $item = $self->textmapfonts ($item);
-    $self->output ( $self->switchquotes ('.IP', $item, %$self{INDENT}));
-    %$self{+NEEDSPACE} = 0;
-    %$self{+ITEMS}++;
-    %$self{+SHIFTWAIT} = 0;
+    $self->output ( $self->switchquotes ('.IP', $item, $self->{INDENT}));
+    $self->{+NEEDSPACE} = 0;
+    $self->{+ITEMS}++;
+    $self->{+SHIFTWAIT} = 0;
 
     # If body text for this item was included, go ahead and output that now.
     if ($text) {
         $text =~ s/\s*$/\n/;
         $self->makespace;
         $self->output ( $self->protect ( $self->textmapfonts ($text)));
-        %$self{+NEEDSPACE} = 1;
+        $self->{+NEEDSPACE} = 1;
     }
     $self->outindex ($index ?? ('Item', $index) !! ());
 }
@@ -1190,9 +1190,9 @@ sub parse_from_file {
     # Pod::Simple state and is quite ugly; we need a better approach.
     if (ref (@_[0]) eq 'HASH') {
         my $opts = shift @_;
-        if (defined (%$opts{?cutting}) && !%$opts{?cutting}) {
-            %$self{+in_pod} = 1;
-            %$self{+last_was_blank} = 1;
+        if (defined ($opts->{?cutting}) && !$opts->{?cutting}) {
+            $self->{+in_pod} = 1;
+            $self->{+last_was_blank} = 1;
         }
     }
 

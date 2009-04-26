@@ -15,7 +15,7 @@ our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
 $FOO = \$BAR;
 $BAR = \$BAZ;
 $BAZ = "hit";
-is ($$$FOO, 'hit');
+is ($FOO->$->$, 'hit');
 
 # test that vstring are blessed 'version' objects
 my $vstref = v1;
@@ -44,15 +44,15 @@ curr_test($test+4);
 
 $refref = \\$x;
 $x = "Good";
-is ($$$refref, 'Good');
+is ($refref->$->$, 'Good');
 
 # Test nested anonymous lists.
 
 $ref = \@(\@(),2,\@(3,4,5,));
-is (scalar nelems @$ref, 3);
-is (@$ref[1], 2);
-is (@$ref[2]->[2], 5);
-is (scalar nelems @$ref[0]->@, 0);
+is (scalar nelems $ref->@, 3);
+is ($ref->[1], 2);
+is ($ref->[2]->[2], 5);
+is (scalar nelems $ref->[0]->@, 0);
 
 is ($ref->[1], 2);
 is ($ref->[2]->[0], 3);
@@ -87,7 +87,7 @@ do {
 };
 
 $subrefref = \\&mysub2;
-is ( $$subrefref->("GOOD"), "good");
+is ( $subrefref->$->("GOOD"), "good");
 sub mysub2 { lc shift }
 
 # Test the ref operator.
@@ -101,7 +101,7 @@ is (ref $refref, 'HASH');
 $anonhash = \%();
 is (ref $anonhash, 'HASH');
 $anonhash2 = \%(FOO => 'BAR', ABC => 'XYZ',);
-is (join('', sort values %$anonhash2), 'BARXYZ');
+is (join('', sort values $anonhash2->%), 'BARXYZ');
 
 # Test ->[$@%&*] derefence syntax
 do {
@@ -110,7 +110,7 @@ do {
     my $y = \@(1,2,3,4);
     is(join(':', $y->@), "1:2:3:4");
     my $x = \%( aap => 'noot', mies => "teun" );
-    is((join "*", keys $x->%), join "*", keys %$x);
+    is((join "*", keys $x->%), join "*", keys $x->%);
     my $w = \*foo428;
     is(Symbol::glob_name($w->*), "main::foo428");
     my $v = sub { return @_[0]; };
@@ -199,7 +199,7 @@ curr_test($test + 3);
 
 our $var = "glob 4";
 $_   = \$var;
-is ($$_, 'glob 4');
+is ($_->$, 'glob 4');
 
 # test if @_[0] is properly protected in DESTROY()
 
@@ -364,13 +364,13 @@ TODO: do {
 # test dereferencing errors
 do {
     foreach my $ref (@($^STDOUT)) {
-        dies_like(sub { @$ref }, qr/Not an ARRAY reference/, "Array dereference");
-        dies_like(sub { %$ref }, qr/Expected a HASH ref but got a IO ref/, "Hash dereference");
+        dies_like(sub { $ref->@ }, qr/Not an ARRAY reference/, "Array dereference");
+        dies_like(sub { $ref->% }, qr/Expected a HASH ref but got a IO ref/, "Hash dereference");
         dies_like(sub { &$ref( < @_ ) }, qr/Not a CODE reference/, "Code dereference");
     }
 
     $ref = $^STDOUT;
-    try { *$ref };
+    try { $ref->* };
     is($^EVAL_ERROR, '', "Glob dereference of PVIO is acceptable");
 
     cmp_ok($ref, '\==', $ref->*{IO}, "IO slot of the temporary glob is set correctly");

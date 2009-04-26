@@ -122,12 +122,12 @@ my %Install_Vars = %(
 
 while( my@(?$type, ?$vars) =@( each %Install_Vars)) {
   SKIP: do {
-        skip "VMS must expand macros in INSTALL* vars", scalar nelems @$vars 
+        skip "VMS must expand macros in INSTALL* vars", scalar nelems $vars->@ 
             if $Is_VMS;    
-        skip '$Config{usevendorprefix} not set', scalar nelems @$vars
+        skip '$Config{usevendorprefix} not set', scalar nelems $vars->@
             if $type eq 'VENDOR' and !%Config{usevendorprefix};
 
-        foreach my $var ( @$vars) {
+        foreach my $var ( $vars->@) {
             my $installvar = "install$var";
             my $prefix = '$('.$type.'PREFIX)';
 
