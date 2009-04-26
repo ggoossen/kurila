@@ -29,11 +29,11 @@ use constant OP_LIST    => 141;    # MUST FIX CONSTANTS.
 # This is where we implement op.c in Perl. Sssh.
 sub linklist {
     my $o = shift;
-    if ( $o->can("first") and $o->first and ${ $o->first } ) {
+    if ( $o->can("first") and $o->first and  $o->first->$ ) {
         $o->next( < $o->first->linklist );
         my $kid = $o->first;
-        while ($$kid) {
-            if ( ${ $kid->sibling } ) {
+        while ($kid->$) {
+            if (  $kid->sibling->$ ) {
                 $kid->next( < $kid->sibling->linklist );
             }
             else {
@@ -50,8 +50,8 @@ sub linklist {
 }
 
 sub append_elem( $class, $type, $first, $last) {
-    return $last  unless $first and $$first;
-    return $first unless $last  and $$last;
+    return $last  unless $first and $first->$;
+    return $first unless $last  and $last->$;
 
     if ( $first->type() != $type
         or ( $type == OP_LIST and ( $first->flags ^&^ B::OPf_PARENS ) ) )
@@ -96,7 +96,7 @@ sub prepend_elem( $class, $type, $first, $last) {
 
 sub scope {
     my $o = shift;
-    return unless $o and $$o;
+    return unless $o and $o->$;
     if ( $o->flags ^&^ B::OPf_PARENS ) {
         $o = B::OP->prepend_elem( < B::opnumber("lineseq"), <
             B::OP->new( "enter", 0 ), $o );

@@ -7,7 +7,7 @@ use File::Spec ();
 sub import {
     my $who = _who();
 
-    *{Symbol::fetch_glob("$($who)::load")} = \&load;
+    Symbol::fetch_glob("$($who)::load")->* = \&load;
 }
 
 sub load ($mod, @< @args)  {

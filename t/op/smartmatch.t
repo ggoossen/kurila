@@ -14,8 +14,8 @@ use Tie::Hash;
 # about feature issues such as scoping etc.
 
 # Predeclare vars used in the tests:
-my $deep1 = \@(); push @$deep1, \$deep1;
-my $deep2 = \@(); push @$deep2, \$deep2;
+my $deep1 = \@(); push $deep1->@, \$deep1;
+my $deep2 = \@(); push $deep2->@, \$deep2;
 
 do {my $const = "a constant"; sub a_const () {$const}};
 
@@ -28,7 +28,7 @@ my @tests = map { \@(chomp and < split m/\t+/, $_, 3) }, grep { !m/^#/ && m/\S/ 
 plan tests => 2 * nelems @tests;
 
 for my $test ( @tests) {
-    my @($yn, $left, $right) =  @$test;
+    my @($yn, $left, $right) =  $test->@;
 
     match_test($yn, $left, $right);
     match_test($yn, $right, $left);

@@ -142,7 +142,7 @@ sub new {
 
     # Process config attributes.
     if ( defined %atts{?config} ) {
-        my $save = Getopt::Long::Configure ($default_config, < @{%atts{config}});
+        my $save = Getopt::Long::Configure ($default_config, < %atts{config}->@);
         $self->{+settings} = Getopt::Long::Configure ($save);
         delete (%atts{config});
     }
@@ -514,11 +514,11 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
                         if ( $ctl->[CTL_TYPE] eq '+' ) {
                             print $^STDERR, ("=> \$\$L\{$opt\} += \"$arg\"\n")
                                 if $debug;
-                            if ( defined ${%linkage{$opt}} ) {
-                                ${%linkage{$opt}} += $arg;
+                            if ( defined %linkage{$opt}->$ ) {
+                                %linkage{$opt}->$ += $arg;
                             }
                             else {
-                                ${%linkage{$opt}} = $arg;
+                                %linkage{$opt}->$ = $arg;
                             }
                         }
                         elsif ( $ctl->[CTL_DEST] == CTL_DEST_ARRAY ) {
@@ -529,7 +529,7 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
                             $$t = %linkage{+$opt} = \@();
                             print $^STDERR, ("=> push(\@\{\$L\{$opt\}, \"$arg\")\n")
                                 if $debug;
-                            push (@{%linkage{$opt}}, $arg);
+                            push (%linkage{$opt}->@, $arg);
                         }
                         elsif ( $ctl->[CTL_DEST] == CTL_DEST_HASH ) {
                             print $^STDERR, ("=> ref(\$L\{$opt\}) auto-vivified",
@@ -544,13 +544,13 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
                         else {
                             print $^STDERR, ("=> \$\$L\{$opt\} = \"$arg\"\n")
                                 if $debug;
-                            ${%linkage{$opt}} = $arg;
+                            %linkage{$opt}->$ = $arg;
                         }
                     }
                     elsif ( ref(%linkage{?$opt}) eq 'ARRAY' ) {
                         print $^STDERR, ("=> push(\@\{\$L\{$opt\}, \"$arg\")\n")
                             if $debug;
-                        push (@{%linkage{$opt}}, $arg);
+                        push (%linkage{$opt}->@, $arg);
                     }
                     elsif ( ref(%linkage{?$opt}) eq 'HASH' ) {
                         print $^STDERR, ("=> \$\$L\{$opt\}->\{$key\} = \"$arg\"\n")
@@ -603,7 +603,7 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
                     if ( defined $userlinkage->{?$opt} ) {
                         print $^STDERR, ("=> push(\@\{\$L\{$opt\}\}, \"$arg\")\n")
                             if $debug;
-                        push (@{$userlinkage->{$opt}}, $arg);
+                        push ($userlinkage->{$opt}->@, $arg);
                     }
                     else {
                         print $^STDERR, ("=>\$L\{$opt\} = [\"$arg\"]\n")
@@ -1238,7 +1238,7 @@ sub Configure (@< @options) {
         @( $error, $debug, $major_version, $minor_version,
     $autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
     $gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help,
-    $longprefix ) =  @{shift(@options)};
+    $longprefix ) =  shift(@options)->@;
     }
 
     foreach my $opt (  @options ) {

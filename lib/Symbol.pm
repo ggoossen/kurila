@@ -111,9 +111,9 @@ my %global = %+: map { %: $_ => 1 }, qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN ST
 #
 sub gensym () {
     my $name = "GEN" . $genseq++;
-    my $ref = \*{Symbol::qualify_to_ref($genpkg . "::" . $name)};
-    $ref = \*{Symbol::qualify_to_ref($genpkg . "::" . $name)};  # second time to supress only-used once warning.
-    delete %{Symbol::stash($genpkg)}{$name};
+    my $ref = \Symbol::qualify_to_ref($genpkg . "::" . $name)->*;
+    $ref = \Symbol::qualify_to_ref($genpkg . "::" . $name)->*;  # second time to supress only-used once warning.
+    delete Symbol::stash($genpkg)->{$name};
     $ref;
 }
 
@@ -121,7 +121,7 @@ sub geniosym () {
     my $sym = gensym();
     # force the IO slot to be filled
     open $sym;
-        *$sym{IO};
+        $sym->*{IO};
 }
 
 sub ungensym(_) {}
@@ -142,7 +142,7 @@ sub qualify($name, ? $pkg) {
 }
 
 sub qualify_to_ref($name, ?$package) {
-    return \*{ Symbol::fetch_glob( qualify $name, (defined $package) ?? $package !! scalar(caller) ) };
+    return \ Symbol::fetch_glob( qualify $name, (defined $package) ?? $package !! scalar(caller) )->*;
 }
 
 #
@@ -164,14 +164,14 @@ sub delete_package($pkg) {
 
     # free all the symbols in the package
 
-    my $leaf_symtab = *{$stem_symtab->{?$leaf}}{HASH};
-    foreach my $name (keys %$leaf_symtab) {
-        undef *{Symbol::qualify_to_ref($pkg . $name)};
+    my $leaf_symtab = $stem_symtab->{?$leaf}->{HASH};
+    foreach my $name (keys $leaf_symtab->%) {
+        undef Symbol::qualify_to_ref($pkg . $name)->*;
     }
 
     # delete the symbol table
 
-    %$leaf_symtab = %( () );
+    $leaf_symtab->% = %( () );
     delete $stem_symtab->{$leaf};
 }
 

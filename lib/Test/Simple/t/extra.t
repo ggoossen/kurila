@@ -38,7 +38,7 @@ ok(1, 'Car');
 ok(0, 'Sar');
 
 END {
-    $TB->is_eq($$out, <<OUT);
+    $TB->is_eq($out->$, <<OUT);
 1..3
 ok 1 - Foo
 not ok 2 - Bar
@@ -47,7 +47,7 @@ ok 4 - Car
 not ok 5 - Sar
 OUT
 
-    $TB->is_eq($$err, <<ERR);
+    $TB->is_eq($err->$, <<ERR);
 #   Failed test 'Bar'
 #   at $^PROGRAM_NAME line 31.
 #   Failed test 'Sar'

@@ -73,15 +73,15 @@ my ($out1, $out2);
 do {
     my $out = \$("");
     open my $fakeout, '>>', $out or die;
-    local $^STDOUT = *$fakeout{IO};
+    local $^STDOUT = $fakeout->*{IO};
 
     Config::config_vars('cc');	# non-regex test of essential cfg-var
-    $out1 = $$out;
-    $$out = "";
+    $out1 = $out->$;
+    $out->$ = "";
 
     Config::config_vars('d_bork');	# non-regex, non-existent cfg-var
-    $out2 = $$out;
-    $$out = "";
+    $out2 = $out->$;
+    $out->$ = "";
 };
 
 like($out1, qr/^cc='\Q$(config_value("cc"))\E';/, "found config_var cc");
@@ -95,12 +95,12 @@ do {
     }
 
     sub clear {
-        ${ @_[0] } = '';
+         @_[0]->$ = '';
     }
 
     sub PRINT {
         my $self = shift;
-        $$self .= join('', @_);
+        $self->$ .= join('', @_);
     }
 };
 

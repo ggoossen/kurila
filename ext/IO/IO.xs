@@ -215,7 +215,7 @@ new_tmpfile(packname = "IO::File")
 #else
 	fp = tmpfile();
 #endif
-	gv = (GV*)SvREFCNT_inc(newGVgen(packname));
+	gv = GvREFCNT_inc(newGVgen(packname));
 	if (gv)
 	    hv_delete(GvSTASH(gv), GvNAME(gv), GvNAMELEN(gv), G_DISCARD);
 	if (gv && do_open(GvIOn(gv), "+>&", 3, FALSE, 0, 0, fp)) {

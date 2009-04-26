@@ -33,7 +33,7 @@ Add .err files corresponding to each .c file.
 sub extra_clean_files {
     my $self = shift;
 
-    my @errfiles = @{$self->{?C}};
+    my @errfiles = $self->{?C}->@;
     for (  @errfiles ) {
         s/.c$/.err/;
     }

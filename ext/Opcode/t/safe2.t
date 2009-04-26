@@ -79,13 +79,13 @@ print $^STDOUT, $^EVAL_ERROR ?? "not ok 13\n#$($^EVAL_ERROR->message)" !! "ok 13
 print $^STDOUT, $foo, %bar{?new}, "$(join ' ',@glob)\n";
 
 $Root::foo = "not ok 17";
-@{$cpt->varglob('bar')} = qw(not ok 18);
-${$cpt->varglob('foo')} = "ok 17";
+$cpt->varglob('bar')->@ = qw(not ok 18);
+$cpt->varglob('foo')->$ = "ok 17";
 @Root::bar = @( "ok" );
 push(@Root::bar, "18"); # Two steps to prevent "Identifier used only once..."
 
 print $^STDOUT, "$Root::foo\n";
-print $^STDOUT, join(' ',@{$cpt->varglob('bar')}) . "\n";
+print $^STDOUT, join(' ',$cpt->varglob('bar')->@) . "\n";
 
 
 print $^STDOUT, 1 ?? "ok 19\n" !! "not ok 19\n";

@@ -26,7 +26,7 @@ sub run
     my $UnError         = getErrorRef($UncompressClass);
 
     my $AnyConstruct = "IO::Uncompress::$($AnyClass)" ;
-    my $AnyError = \${Symbol::fetch_glob( "IO::Uncompress::$($AnyClass)::$($AnyClass)Error") };
+    my $AnyError = \Symbol::fetch_glob( "IO::Uncompress::$($AnyClass)::$($AnyClass)Error")->$;
 
     for my $trans (@( 0, 1) )
     {
@@ -58,7 +58,7 @@ sub run
                     Append => 1)  ;
 
                 ok $unc, "  Created $AnyClass object" 
-                    or print $^STDOUT, "# $$AnyError\n";
+                    or print $^STDOUT, "# $AnyError->$\n";
                 my $uncomp ;
                 1 while  $unc->read($uncomp) +> 0 ;
                 #ok $unc->read($uncomp) > 0 
@@ -77,7 +77,7 @@ sub run
                     Append => 1)  ;
 
                 ok $unc, "  Created $AnyClass object" 
-                    or print $^STDOUT, "# $$AnyError\n";
+                    or print $^STDOUT, "# $AnyError->$\n";
                 my $uncomp ;
                 1 while  $unc->read($uncomp, 100) +> 0 ;
                 #ok $unc->read($uncomp) > 0 

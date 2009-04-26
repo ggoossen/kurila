@@ -303,8 +303,8 @@ sub have_compiler {
 
     my $buffer;
     open my $fh, '>', \$buffer;
-    $^STDOUT = *{$fh}{IO};
-    $^STDERR = *{$fh}{IO};
+    $^STDOUT = $fh->*{IO};
+    $^STDERR = $fh->*{IO};
 
     try {
         require ExtUtils::CBuilder;

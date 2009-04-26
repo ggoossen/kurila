@@ -194,8 +194,8 @@ sub binmode {
 
     my @($fh, ?$layer) =  @_;
 
-    return binmode $$fh unless $layer;
-    return binmode $$fh, $layer;
+    return binmode $fh->$ unless $layer;
+    return binmode $fh->$, $layer;
 }
 
 1;

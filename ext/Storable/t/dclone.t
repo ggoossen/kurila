@@ -57,16 +57,16 @@ print $^STDOUT, "ok 6\n";
 
 # Ensure refs to "undef" values are properly shared during cloning
 my $hash;
-push @{%$hash{+''}}, \%$hash{+a};
-print $^STDOUT, "not " unless %$hash{''}->[0] \== \%$hash{+a};
+push $hash->%{+''}->@, \$hash->%{+a};
+print $^STDOUT, "not " unless $hash->%{''}->[0] \== \$hash->%{+a};
 print $^STDOUT, "ok 7\n";
 
 my $cloned = dclone(dclone($hash));
-print $^STDOUT, "not " unless %$cloned{''}->[0] \== \%$cloned{+a};
+print $^STDOUT, "not " unless $cloned->%{''}->[0] \== \$cloned->%{+a};
 print $^STDOUT, "ok 8\n";
 
-%$cloned{+a} = "blah";
-print $^STDOUT, "not " unless %$cloned{''}->[0] \== \%$cloned{+a};
+$cloned->%{+a} = "blah";
+print $^STDOUT, "not " unless $cloned->%{''}->[0] \== \$cloned->%{+a};
 print $^STDOUT, "ok 9\n";
 
     # [ID 20020221.007] SEGV in Storable with empty string scalar object
@@ -79,6 +79,6 @@ my $empty_string_obj = TestString->new('');
 my $clone = dclone($empty_string_obj);
 # If still here after the dclone the fix (#17543) worked.
 print $^STDOUT, ref $clone eq ref $empty_string_obj &&
-    $$clone eq $$empty_string_obj &&
-    $$clone eq '' ?? "ok 10\n" !! "not ok 10\n";
+    $clone->$ eq $empty_string_obj->$ &&
+    $clone->$ eq '' ?? "ok 10\n" !! "not ok 10\n";
 

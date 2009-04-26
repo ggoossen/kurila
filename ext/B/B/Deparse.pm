@@ -303,7 +303,7 @@ sub todo($self, $cv, $is_form) {
     } else {
         $seq = 0;
     }
-    push @{$self->{'subs_todo'}}, \@($seq, $cv, $is_form);
+    push $self->{'subs_todo'}->@, \@($seq, $cv, $is_form);
     unless ($is_form || class( <$cv->STASH) eq 'SPECIAL') {
         $self->{'subs_deparsed'}->{+$cv->STASH->NAME."::".$cv->GV->NAME} = 1;
     }
@@ -311,7 +311,7 @@ sub todo($self, $cv, $is_form) {
 
 sub next_todo {
     my $self = shift;
-    my $ent = shift @{$self->{'subs_todo'}};
+    my $ent = shift $self->{'subs_todo'}->@;
     my $cv = $ent->[1];
     my $gv = $cv->GV;
     my $name = $self->gv_name($gv);
@@ -450,11 +450,11 @@ sub stash_subs($self, ?$pack) {
     my (@ret, $stash);
     if (!defined $pack) {
         $pack = '';
-        $stash = \%{Symbol::stash('main')};
+        $stash = \Symbol::stash('main')->%;
     }
     else {
         $pack =~ s/(::)?$//;
-        $stash = \%{Symbol::stash($pack)};
+        $stash = \Symbol::stash($pack)->%;
     }
     for my $key (keys %$stash) {
         my $val = svref_2object( \( $stash->{+$key} ) );
@@ -462,7 +462,7 @@ sub stash_subs($self, ?$pack) {
         if ($class eq "GV") {
             if (class(my $cv = $val->CV) ne "SPECIAL") {
                 next if $self->{'subs_done'}->{+$$val}++;
-                next if $$val != ${$cv->GV};   # Ignore imposters
+                next if $$val != $cv->GV->$;   # Ignore imposters
                 $self->todo($cv, 0);
             }
             if (class($val->HV) ne "SPECIAL" && $key =~ m/::$/) {
@@ -477,7 +477,7 @@ sub stash_subs($self, ?$pack) {
 sub print_protos {
     my $self = shift;
     my @ret;
-    foreach my $ar ( @{$self->{+'protos_todo'}}) {
+    foreach my $ar ( $self->{+'protos_todo'}->@) {
         my $proto = (defined $ar->[1] ?? " (". $ar->[1] . ")" !! "");
         push @ret, "sub " . $ar->[0] .  "$proto;\n";
     }
@@ -606,12 +606,12 @@ sub compile {
             $self->{+'curcv'} = main_cv;
             $self->{+'curcvlex'} = undef;
             print $^STDOUT, < $self->print_protos;
-            @{$self->{'subs_todo'}} =
-                sort {$a->[0] <+> $b->[0]}, @{$self->{?'subs_todo'}};
+            $self->{'subs_todo'}->@ =
+                sort {$a->[0] <+> $b->[0]}, $self->{?'subs_todo'}->@;
             print $^STDOUT, $self->indent($self->deparse_root(main_root)), "\n"
                 unless null main_root;
             my @text;
-            while (scalar(nelems @{$self->{?'subs_todo'}})) {
+            while (scalar(nelems $self->{?'subs_todo'}->@)) {
                 push @text, < $self->next_todo;
             }
             print $^STDOUT, < $self->indent(join("", @text)), "\n" if (nelems @text);
@@ -619,11 +619,11 @@ sub compile {
             # Print __DATA__ section, if necessary
             my $laststash = defined $self->{?'curcop'}
                 ?? $self->{'curcop'}->stash->NAME !! $self->{?'curstash'};
-            if (defined *{Symbol::fetch_glob($laststash."::DATA")}{IO}) {
+            if (defined Symbol::fetch_glob($laststash."::DATA")->*{IO}) {
                 print $^STDOUT, "package $laststash;\n"
                     unless $laststash eq $self->{?'curstash'};
                 print $^STDOUT, "__DATA__\n";
-                print $^STDOUT, readline(*{Symbol::fetch_glob($laststash."::DATA")});
+                print $^STDOUT, readline(Symbol::fetch_glob($laststash."::DATA")->*);
             }
         }
 }
@@ -671,10 +671,10 @@ sub ambient_pragmas {
             || $name eq 'utf8') {
             require "$name.pm";
             if ($val) {
-                $hint_bits ^|^= ${Symbol::stash($name)->{?"hint_bits"}};
+                $hint_bits ^|^= Symbol::stash($name)->{?"hint_bits"}->$;
             }
             else {
-                $hint_bits ^&^= ^~^ ${Symbol::stash($name)->{?"hint_bits"}};
+                $hint_bits ^&^= ^~^ Symbol::stash($name)->{?"hint_bits"}->$;
             }
         }
 
@@ -823,8 +823,8 @@ sub deparse_sub {
             return "$proto;\n";
         }
     }
-    if (%{$self->{?'global_variables'}}) {
-        $body = "our (" . (join ", ", keys %{$self->{?'global_variables'}}) . ");\n" . $body;
+    if ($self->{?'global_variables'}->%) {
+        $body = "our (" . (join ", ", keys $self->{?'global_variables'}->%) . ");\n" . $body;
     }
     return $proto ."\{\n\t$body\n\b\}" ."\n";
 }
@@ -997,7 +997,7 @@ sub lineseq {
     if (defined $root) {
         $limit_seq = $out_seq;
         my $nseq;
-        $nseq = $self->find_scope_st($root->sibling) if ${$root->sibling};
+        $nseq = $self->find_scope_st($root->sibling) if $root->sibling->$;
         $limit_seq = $nseq if !defined($limit_seq)
             or defined($nseq) && $nseq +< $limit_seq;
     }
@@ -1170,7 +1170,7 @@ sub lex_in_scope($self, $name) {
     return 0 if !defined($self->{?'curcop'});
     my $seq = $self->{'curcop'}->cop_seq;
     return 0 if !exists $self->{'curcvlex'}->{$name};
-    for my $a ( @{$self->{'curcvlex'}->{$name}}) {
+    for my $a ( $self->{'curcvlex'}->{$name}->@) {
         my @($st, $en) =  @$a;
         return 1 if $seq +> $st && $seq +<= $en;
     }
@@ -1203,7 +1203,7 @@ sub populate_curcvlex {
                 ?? @(0, 999999)
                 !! @(@ns[$i]->COP_SEQ_RANGE_LOW, @ns[$i]->COP_SEQ_RANGE_HIGH);
 
-            push @{$self->{+'curcvlex'}->{+$name}}, \@($seq_st, $seq_en);
+            push $self->{+'curcvlex'}->{+$name}->@, \@($seq_st, $seq_en);
         }
     } continue {
         $padlist = $parentpadlist;
@@ -1264,7 +1264,7 @@ sub seq_subs($self, $seq) {
     #push @text, "# ($seq)\n";
 
     return "" if !defined $seq;
-    while (scalar(nelems @{$self->{?'subs_todo'}})
+    while (scalar(nelems $self->{?'subs_todo'}->@)
     and $seq +> $self->{'subs_todo'}->[0]->[0]) {
             push @text, < $self->next_todo;
         }
@@ -1311,8 +1311,8 @@ sub pp_nextstate($self, $op, $cx) {
     }
 
     # hack to check that the hint hash hasn't changed
-    if (join(' ', sort @: < %{$self->{?'hinthash'} || \%()}) 
-        ne join(' ', sort @: < %{$op->hints_hash || \%()})) {
+    if (join(' ', sort @: < ($self->{?'hinthash'} || \%())->%) 
+        ne join(' ', sort @: < ($op->hints_hash || \%())->%)) {
         push @text, declare_hinthash($self->{?'hinthash'}, $op->hints_hash, $self->{?indent_size});
         $self->{+'hinthash'} = $op->hints_hash;
     }
@@ -1679,8 +1679,8 @@ sub padval {
 }
 
 sub anon_hash_or_list($self, $op, $cx) {
-    my@($pre, $post) =  @{%("anonarray" => \@('@(',')'),
-                "anonhash" => \@('%(',')')){?$op->name}};
+    my@($pre, $post) =  %("anonarray" => \@('@(',')'),
+                "anonhash" => \@('%(',')')){?$op->name}->@;
     my($expr, @exprs);
     $op = $op->first->sibling; # skip pushmark
     while (!null($op)) {
@@ -2499,7 +2499,7 @@ sub loop_common($self, $op, $cx, $init) {
     # block (or the last in a bare loop).
     my $cont_start = $enter->nextop;
     my $cont;
-    if ($$cont_start != $$op && ${$cont_start} != ${$body->last}) {
+    if ($$cont_start != $$op && $cont_start->$ != $body->last->$) {
         if ($bare) {
             $cont = $body->last;
         } else {
@@ -2945,7 +2945,7 @@ sub e_method($self, $info) {
 
     my $meth = $info->{?method};
     $meth = '?' . $self->deparse($meth, 1) if $info->{?variable_method};
-    my $args = join(", ", map { $self->deparse($_, 6) }, @{$info->{args}} );
+    my $args = join(", ", map { $self->deparse($_, 6) }, $info->{args}->@ );
     my $kid = $obj . "->" . $meth;
     if (length $args) {
         return $kid . "(" . $args . ")"; # parens mandatory
@@ -3084,11 +3084,11 @@ sub pp_entersub($self, $op, $cx) {
         no warnings 'uninitialized';
         $declared = exists(($self->{?'subs_declared'} || \%())->{$kid})
             || (
-   defined %{Symbol::stash($self->{?'curstash'})}{?$kid}
+   defined Symbol::stash($self->{?'curstash'})->{?$kid}
    && !exists(
        ($self->{?'subs_deparsed'}||\%())->{$self->{?'curstash'}."::".$kid})
    && defined prototype(
-   \&{*{Symbol::fetch_glob($self->{?'curstash'}."::".$kid)}})
+   \&{Symbol::fetch_glob($self->{?'curstash'}."::".$kid)->*})
    );
         if (!$declared && defined($proto)) {
             # Avoid "too early to check prototype" warning
@@ -3674,7 +3674,7 @@ sub pure_string($self, $op) {
         return 0 unless $gvop->name eq 'gvsv';
         return 0 unless '"' eq $self->gv_name( <$self->gv_or_padgv($gvop));
 
-        return 0 unless ${$join_op->sibling} eq ${$op->last};
+        return 0 unless $join_op->sibling->$ eq $op->last->$;
         return 0 unless $op->last->name =~ m/^(?:[ah]slice|(?:rv2|pad)av)$/;
     }
     elsif ($type eq 'concat') {

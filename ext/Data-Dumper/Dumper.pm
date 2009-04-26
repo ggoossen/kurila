@@ -99,7 +99,7 @@ sub Seen($s, $g) {
     if (defined($g) && (ref($g) eq 'HASH'))  {
         init_refaddr_format();
         my($k, $v, $id);
-        while (@($k, $v) =@( each %$g)) {
+        while (@($k, $v) =@( each $g->%)) {
             if (defined $v and ref $v) {
                 $id = format_refaddr($v);
                 if ($k =~ m/^[*](.*)$/) {
@@ -120,7 +120,7 @@ sub Seen($s, $g) {
         return $s;
     }
     else {
-        return map { < @$_ }, values %{$s->{seen}};
+        return map { < $_->@ }, values $s->{seen}->%;
     }
 }
 
@@ -129,11 +129,11 @@ sub Seen($s, $g) {
 #
 sub Values($s, $v) {
     if (defined($v) && (ref($v) eq 'ARRAY'))  {
-        $s->{+todump} = \ @$v;        # make a copy
+        $s->{+todump} = \ $v->@;        # make a copy
         return $s;
     }
     else {
-        return @{$s->{?todump}};
+        return $s->{?todump}->@;
     }
 }
 
@@ -142,11 +142,11 @@ sub Values($s, $v) {
 #
 sub Names($s, $n) {
     if (defined($n) && (ref($n) eq 'ARRAY'))  {
-        $s->{+names} = \ @$n;         # make a copy
+        $s->{+names} = \ $n->@;         # make a copy
         return $s;
     }
     else {
-        return @{$s->{?names}};
+        return $s->{?names}->@;
     }
 }
 
@@ -168,7 +168,7 @@ sub Dumpperl {
 
     $s = $s->new(< @_) unless ref $s;
 
-    for my $val ( @{$s->{todump}}) {
+    for my $val ( $s->{todump}->@) {
         my $out = "";
         @post = @();
         $name = $s->{names}->[?$i++];
@@ -194,7 +194,7 @@ sub Dumpperl {
 
         # Ensure hash iterator is reset
         if (ref($val) eq 'HASH') {
-            keys(%$val);
+            keys($val->%);
         }
 
         my $valstr;
@@ -234,14 +234,14 @@ sub _dump {
     my($out, $realpack, $type, $ipad, $blesspad);
 
     my $rval = \@_[1];
-    my $reftype = ref $$rval;
+    my $reftype = ref $rval->$;
     $out = "";
     $ipad = $s->{?xpad} x $s->{?level};
 
-    my $realtype = ref::svtype($$rval);
+    my $realtype = ref::svtype($rval->$);
     if ($reftype) {
 
-        my $val = $$rval;
+        my $val = $rval->$;
         # Call the freezer method if it's specified and the object has the
         # method.  Trap errors and warn() instead of die()ing, like the XS
         # implementation.
@@ -336,7 +336,7 @@ sub _dump {
             $pat =~ s,/,\\/,g;
             $out .= "qr/$pat/";
         } else {
-            $out .= '\' . $s->_dump($$val, $name); # '
+            $out .= '\' . $s->_dump($val->$, $name); # '
         }
 
         if ($realpack and !$no_bless) { # we have a blessed ref
@@ -348,7 +348,7 @@ sub _dump {
     }
     elsif ($realtype eq 'REF') {
         if ($realpack) {
-            $out .= 'do{\(my $o = ' . $s->_dump($$rval, "\$\{$name\}") . ')}';
+            $out .= 'do{\(my $o = ' . $s->_dump($rval->$, "\$\{$name\}") . ')}';
         } else {
             $out .= '\' . $s->_dump($rval, "\$\{$name\}"); # '
         }
@@ -383,9 +383,9 @@ sub _dump {
         if ($s->{?purity}) {
                    local ($s->{+level}) = 0;
             for my $k (qw(SCALAR ARRAY HASH)) {
-                my $gval = *$rval{$k};
+                my $gval = $rval->*{$k};
                 next unless defined $gval;
-                next if $k eq "SCALAR" && ! defined $$gval;  # always there
+                next if $k eq "SCALAR" && ! defined $gval->$;  # always there
 
                 # _dump can push into @post, so we hold our place using $postlen
                 my $postlen = scalar nelems @post;
@@ -395,7 +395,7 @@ sub _dump {
             }
         }
         $out .= '*' . $sname;
-        $out .= '\' . $s->_dump($$rval, "*\{$name\}"); # '
+        $out .= '\' . $s->_dump($rval->$, "*\{$name\}"); # '
 
         if ($id) {
             # if we made it this far, $id was added to seen list at current
@@ -415,11 +415,11 @@ sub _dump {
         $pad = $s->{?sep} . $s->{?pad} . $s->{?apad};
         $mname = $name . '->';
         $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/;
-        for my $v ( @$rval) {
+        for my $v ( $rval->@) {
             $sname = $mname . '[' . $i . ']';
             $out .= $pad . $ipad . '#' . $i if $s->{?indent} +>= 3;
             $out .= $pad . $ipad . $s->_dump($v, $sname);
-            $out .= "," if $i++ +< (nelems @$rval) -1;
+            $out .= "," if $i++ +< (nelems $rval->@) -1;
         }
         $out .= $pad . ($s->{?xpad} x ($s->{?level} - 1)) if $i;
         $out .= ')';
@@ -441,11 +441,11 @@ sub _dump {
                     $keys = \@();
                 }
             } else {
-                $keys = \ sort keys %$rval;
+                $keys = \ sort keys $rval->%;
             }
         }
-        while (@(?$k, ?$v) = ! $sortkeys ?? @(each %$rval) !!
-        (nelems @$keys) ?? @(($key = shift(@$keys)), $rval->{?$key}) !!
+        while (@(?$k, ?$v) = ! $sortkeys ?? @(each $rval->%) !!
+        (nelems $keys->@) ?? @(($key = shift($keys->@)), $rval->{?$key}) !!
             @() ) {
                 my $nk = $s->_dump($k, "");
                 $nk = $1 if !$s->{?quotekeys} and $nk =~ m/^[\"\']([A-Za-z_]\w*)[\"\']$/;
@@ -476,16 +476,16 @@ sub _dump {
         }
     }
     elsif ($realtype eq 'PLAINVALUE') {
-        if ($$rval =~ m/^(?:0|-?[1-9]\d{0,8})\z/) { # safe decimal number
-            $out .= $$rval;
+        if ($rval->$ =~ m/^(?:0|-?[1-9]\d{0,8})\z/) { # safe decimal number
+            $out .= $rval->$;
         }
         else {				 # string
-            if ($s->{?useqq} or $$rval =~ m/[\x[80]-\x[FF]]/) {
+            if ($s->{?useqq} or $rval->$ =~ m/[\x[80]-\x[FF]]/) {
                 # Fall back to qq if there's Unicode
-                $out .= qquote($$rval, $s->{?useqq});
+                $out .= qquote($rval->$, $s->{?useqq});
             }
             else {
-                $out .= _quote($$rval);
+                $out .= _quote($rval->$);
             }
         }
     }
@@ -642,7 +642,7 @@ sub qquote {
 
 # helper sub to sort hash keys in Perl < 5.8.0 where we don't have
 # access to sortsv() from XS
-sub _sortkeys { \ sort keys %{@_[0]} }
+sub _sortkeys { \ sort keys @_[0]->% }
 
 1;
 __END__

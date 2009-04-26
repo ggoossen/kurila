@@ -39,8 +39,8 @@ sub STORABLE_thaw($self, $cloning, $x, $obj) {
     my $len = length $x;
     my $a = thaw $x;
     die "STORABLE_thaw #2" unless ref $a eq 'ARRAY';
-    die "STORABLE_thaw #3" unless nelems @$a == 2 && $a->[0] eq 'a' && $a->[1] == 1;
-    @$self = @$a;
+    die "STORABLE_thaw #3" unless nelems $a->@ == 2 && $a->[0] eq 'a' && $a->[1] == 1;
+    $self->@ = $a->@;
     die "STORABLE_thaw #4" unless Storable::is_retrieving;
 }
 
@@ -57,7 +57,7 @@ sub STORABLE_freeze($self, $cloning) {
 
 sub STORABLE_thaw($self, $cloning, $undef, $a, $obj) {
     die "STORABLE_thaw #1" unless $obj \== $self;
-    die "STORABLE_thaw #2" unless ref $a eq 'ARRAY' || @$a != 2;
+    die "STORABLE_thaw #2" unless ref $a eq 'ARRAY' || $a->@ != 2;
     $self->{+ok} = $self;
 }
 
@@ -75,7 +75,7 @@ sub make($class, $ext) {
 
 sub STORABLE_freeze {
     my $self = shift;
-    my %copy = %$self;
+    my %copy = $self->%;
     my $r = \%copy;
     my $t = dclone($r->{?sync});
     return @("", \@($t, $self->{?ext}), $r, $self, $r->{?ext});
@@ -87,7 +87,7 @@ sub STORABLE_thaw($self, $cloning, $undef, $a, $r, $obj, $ext) {
     die "STORABLE_thaw #3" unless ref $r eq 'HASH';
     die "STORABLE_thaw #4" unless $a->[1] \== $r->{?ext};
     $self->{+ok} = $self;
-    @($self->{+sync}, $self->{+ext}) = @$a;
+    @($self->{+sync}, $self->{+ext}) = $a->@;
 }
 
 package OBJ_REAL2;

@@ -142,7 +142,7 @@ sub Compress::Raw::Zlib::Parameters::parse
     my $default = shift ;
 
     my $got = $self->{?Got} ;
-    my $firstTime = nkeys %{ $got } == 0 ;
+    my $firstTime = nkeys  $got->% == 0 ;
 
     my (@Bad) ;
     my @entered = @( () ) ;
@@ -157,7 +157,7 @@ sub Compress::Raw::Zlib::Parameters::parse
         return $self->setError("Expected even number of parameters, got 1")
             if ! defined $href or ! ref $href or ref $href ne "HASH" ;
 
-        foreach my $key (keys %$href) {
+        foreach my $key (keys $href->%) {
             push @entered, $key ;
             push @entered, \$href->{+$key} ;
         }
@@ -174,12 +174,12 @@ sub Compress::Raw::Zlib::Parameters::parse
     }
 
 
-    while (my @(?$key, ?$v) =@( each %$default))
+    while (my @(?$key, ?$v) =@( each $default->%))
     {
-        croak "need 4 params [$(join ' ',@$v)]"
-            if (nelems @$v) != 4 ;
+        croak "need 4 params [$(join ' ',$v->@)]"
+            if (nelems $v->@) != 4 ;
 
-        my @($first_only, $sticky, $type, $value) =  @$v ;
+        my @($first_only, $sticky, $type, $value) =  $v->@ ;
         my $x ;
         $self->_checkType($key, \$value, $type, 0, \$x) 
             or return undef ;
@@ -211,7 +211,7 @@ sub Compress::Raw::Zlib::Parameters::parse
             $self->_checkType($key, $value, $type, 1, \$s)
                 or return undef ;
             #$value = $$value unless $type & Parse_store_ref ;
-            $value = $$value ;
+            $value = $value->$ ;
             $got->{+$canonkey} = \@(1, $type, $value, $s) ;
         }
         else
@@ -243,15 +243,15 @@ sub Compress::Raw::Zlib::Parameters::_checkType
         #$value = $$value
         #    if ref ${ $value } ;
 
-        $$output = $value ;
+        $output->$ = $value ;
         return 1;
     }
 
-    $value = $$value ;
+    $value = $value->$ ;
 
     if ($type ^&^ Parse_any)
     {
-        $$output = $value ;
+        $output->$ = $value ;
         return 1;
     }
     elsif ($type ^&^ Parse_unsigned)
@@ -261,7 +261,7 @@ sub Compress::Raw::Zlib::Parameters::_checkType
         return $self->setError("Parameter '$key' must be an unsigned int, got '$value'")
             if $validate && $value !~ m/^\d+$/;
 
-        $$output = defined $value ?? $value !! 0 ;    
+        $output->$ = defined $value ?? $value !! 0 ;    
         return 1;
     }
     elsif ($type ^&^ Parse_signed)
@@ -271,23 +271,23 @@ sub Compress::Raw::Zlib::Parameters::_checkType
         return $self->setError("Parameter '$key' must be a signed int, got '$value'")
             if $validate && $value !~ m/^-?\d+$/;
 
-        $$output = defined $value ?? $value !! 0 ;    
+        $output->$ = defined $value ?? $value !! 0 ;    
         return 1 ;
     }
     elsif ($type ^&^ Parse_boolean)
     {
         return $self->setError("Parameter '$key' must be an int, got '$value'")
             if $validate && defined $value && $value !~ m/^\d*$/;
-        $$output =  defined $value ?? $value != 0 !! 0 ;    
+        $output->$ =  defined $value ?? $value != 0 !! 0 ;    
         return 1;
     }
     elsif ($type ^&^ Parse_string)
     {
-        $$output = defined $value ?? $value !! "" ;    
+        $output->$ = defined $value ?? $value !! "" ;    
         return 1;
     }
 
-    $$output = $value ;
+    $output->$ = $value ;
     return 1;
 }
 
@@ -773,7 +773,6 @@ Returns the buffer size used to carry out the compression.
 Here is a trivial example of using C<deflate>. It simply reads standard
 input, deflates it and writes it to standard output.
 
-    use strict ;
     use warnings ;
 
     use Compress::Raw::Zlib ;
@@ -1030,7 +1029,6 @@ Returns the buffer size used to carry out the decompression.
 
 Here is an example of using C<inflate>.
 
-    use strict ;
     use warnings ;
     
     use Compress::Raw::Zlib;

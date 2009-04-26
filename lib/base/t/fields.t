@@ -22,9 +22,9 @@ is_deeply( \(sort keys %Foo::FIELDS),
 
 sub show_fields {
     my@($base, $mask) =  @_;
-    my $fields = \%{*{Symbol::fetch_glob($base.'::FIELDS')}};
+    my $fields = \Symbol::fetch_glob($base.'::FIELDS')->*->%;
     return grep { (%fields::attr{$base}->[$fields->{?$_}] ^&^ $mask) == $mask},
-        keys %$fields;
+        keys $fields->%;
 }
 
 is_deeply( \sort(&show_fields('Foo', fields::PUBLIC)),
@@ -40,7 +40,7 @@ foreach (@(Foo->new)) {
 
     $obj->{+Pants} = 'Whatever';
     $obj->{+_no}   = 'Yeah';
-        %{$obj}{[qw(what who _up_yours)]} = @('Ahh', 'Moo', 'Yip');
+        $obj->{[qw(what who _up_yours)]} = @('Ahh', 'Moo', 'Yip');
 
     while(my@(?$k,?$v) =@( each %test)) {
         is($obj->{?$k}, $v);

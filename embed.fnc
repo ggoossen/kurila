@@ -110,6 +110,15 @@ AipS	|void	|sv_cp_replace	|NN XV **sv_d|NULLOK XV *sv_s
 Aip	|IV	|SvIV	|NN SV *sv
 Aip	|UV	|SvUV	|NN SV *sv
 Aip	|NV	|SvNV	|NN SV *sv
+Aip	|STRLEN	|SvCUR	|NN SV *sv
+Aip	|void	|SvCUR_set	|NN SV *sv|STRLEN len
+Aip	|char *	|SvPVx_nolen	|NN SV *sv
+Aip	|const char *	|SvPVx_nolen_const	|NN SV *sv
+Aip	|bool	|SvTRUE	|NN SV *sv
+Aip	|void	|SvIOKp_on	|NN SV *sv
+Aip	|SV*	|loc_desc	|NULLOK SV *loc
+Aip	|SV*	|loc_name	|NULLOK SV *loc
+Aip	|SV*	|SvNAME	|NN SV *sv
 Aip	|SV*	|LocationFilename	|NULLOK SV *location
 
 Aip     |PERL_CONTEXT* |PushBlock  |U8 t|NN SV** sp|U8 gimme
@@ -183,10 +192,6 @@ Afnp	|void	|sv_setpvf_mg_nocontext|NN SV *const sv|NN const char *const pat|...
 Afnp	|int	|fprintf_nocontext|NN PerlIO *stream|NN const char *format|...
 Afnp	|int	|printf_nocontext|NN const char *format|...
 #endif
-bp	|void	|cv_ckproto	|NN const CV* cv|NULLOK const GV* gv\
-				|NULLOK const char* p
-p	|void	|cv_ckproto_len	|NN const CV* cv|NULLOK const GV* gv\
-				|NULLOK const char* p|const STRLEN len
 pd	|void	|cv_setcv	|NN CV* dst|NN CV* src
 ApdR	|SV*	|cv_const_sv	|NULLOK CV* cv
 pR	|SV*	|op_const_sv	|NULLOK const OP* o|NULLOK CV* cv
@@ -842,7 +847,7 @@ Apd	|void	|sv_magic	|NN SV *const sv|NULLOK SV *const obj|const int how \
 Apd	|MAGIC *|sv_magicext	|NN SV *const sv|NULLOK SV *const obj|const int how \
 				|NULLOK const MGVTBL *const vtbl|NULLOK const char *const name \
 				|const I32 namlen
-ApdaR	|SV*	|sv_mortalcopy	|NULLOK SV *const oldsv
+ApdaRS	|SV*	|sv_mortalcopy	|NULLOK XV *const oldsv
 ApdR	|SV*	|sv_newmortal
 Apd	|SV*	|sv_newref	|NULLOK SV *const sv
 Ap	|const char*	|sv_peek	|NULLOK SV* sv

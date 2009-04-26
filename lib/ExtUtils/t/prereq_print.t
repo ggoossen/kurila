@@ -55,7 +55,7 @@ do {
     my $PREREQ_PM = undef;  # shut up "used only once" warning.
     eval $prereq_out;
     die if $^EVAL_ERROR;
-    main::is_deeply( $PREREQ_PM, \%( strict => 0 ), 'prereqs dumped' );
+    main::is_deeply( $PREREQ_PM, %( strict => 0 ), 'prereqs dumped' );
     main::is( $^EVAL_ERROR, '',                             '  without error' );
 };
 

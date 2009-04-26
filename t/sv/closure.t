@@ -432,8 +432,8 @@ END
                         # through the extra pipe.
                         close $read;
                         close $read2;
-                        open $^STDOUT, ">&", \*$write  or die "Can't redirect STDOUT: $^OS_ERROR";
-                        open $^STDERR, ">&", \*$write2 or die "Can't redirect STDERR: $^OS_ERROR";
+                        open $^STDOUT, ">&", \$write->*  or die "Can't redirect STDOUT: $^OS_ERROR";
+                        open $^STDERR, ">&", \$write2->* or die "Can't redirect STDERR: $^OS_ERROR";
                         exec which_perl(), '-w', '-MTestInit', '-'
                             or die "Can't exec perl: $^OS_ERROR";
                     } else {
@@ -577,7 +577,7 @@ do {
 # handy class: $x = Watch->new(\$foo,'bar')
 # causes 'bar' to be appended to $foo when $x is destroyed
 sub Watch::new { bless \@( @_[1], @_[2] ), @_[0] }
-sub Watch::DESTROY { ${@_[0]->[0]} .= @_[0]->[1] }
+sub Watch::DESTROY { @_[0]->[0]->$ .= @_[0]->[1] }
 
 
 # bugid 1028:

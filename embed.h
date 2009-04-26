@@ -90,6 +90,15 @@
 #define SvIV			Perl_SvIV
 #define SvUV			Perl_SvUV
 #define SvNV			Perl_SvNV
+#define SvCUR			Perl_SvCUR
+#define SvCUR_set		Perl_SvCUR_set
+#define SvPVx_nolen		Perl_SvPVx_nolen
+#define SvPVx_nolen_const	Perl_SvPVx_nolen_const
+#define SvTRUE			Perl_SvTRUE
+#define SvIOKp_on		Perl_SvIOKp_on
+#define loc_desc		Perl_loc_desc
+#define loc_name		Perl_loc_name
+#define SvNAME			Perl_SvNAME
 #define LocationFilename	Perl_LocationFilename
 #define PushBlock		Perl_PushBlock
 #define PopBlock		Perl_PopBlock
@@ -172,8 +181,6 @@
 #define printf_nocontext	Perl_printf_nocontext
 #endif
 #ifdef PERL_CORE
-#define cv_ckproto		Perl_cv_ckproto
-#define cv_ckproto_len		Perl_cv_ckproto_len
 #define cv_setcv		Perl_cv_setcv
 #endif
 #define cv_const_sv		Perl_cv_const_sv
@@ -902,6 +909,12 @@
 #define sv_len_utf8		Perl_sv_len_utf8
 #define sv_magic		Perl_sv_magic
 #define sv_magicext		Perl_sv_magicext
+#define av_mortalcopy(a)		svTav(Perl_sv_mortalcopy(aTHX_ avTsv(a)))
+#define hv_mortalcopy(a)		svThv(Perl_sv_mortalcopy(aTHX_ hvTsv(a)))
+#define cv_mortalcopy(a)		svTcv(Perl_sv_mortalcopy(aTHX_ cvTsv(a)))
+#define gv_mortalcopy(a)		svTgv(Perl_sv_mortalcopy(aTHX_ gvTsv(a)))
+#define io_mortalcopy(a)		svTio(Perl_sv_mortalcopy(aTHX_ ioTsv(a)))
+#define re_mortalcopy(a)		svTre(Perl_sv_mortalcopy(aTHX_ reTsv(a)))
 #define sv_mortalcopy		Perl_sv_mortalcopy
 #define sv_newmortal		Perl_sv_newmortal
 #define sv_newref		Perl_sv_newref
@@ -2282,6 +2295,15 @@
 #define SvIV(a)			Perl_SvIV(aTHX_ a)
 #define SvUV(a)			Perl_SvUV(aTHX_ a)
 #define SvNV(a)			Perl_SvNV(aTHX_ a)
+#define SvCUR(a)		Perl_SvCUR(aTHX_ a)
+#define SvCUR_set(a,b)		Perl_SvCUR_set(aTHX_ a,b)
+#define SvPVx_nolen(a)		Perl_SvPVx_nolen(aTHX_ a)
+#define SvPVx_nolen_const(a)	Perl_SvPVx_nolen_const(aTHX_ a)
+#define SvTRUE(a)		Perl_SvTRUE(aTHX_ a)
+#define SvIOKp_on(a)		Perl_SvIOKp_on(aTHX_ a)
+#define loc_desc(a)		Perl_loc_desc(aTHX_ a)
+#define loc_name(a)		Perl_loc_name(aTHX_ a)
+#define SvNAME(a)		Perl_SvNAME(aTHX_ a)
 #define LocationFilename(a)	Perl_LocationFilename(aTHX_ a)
 #define PushBlock(a,b,c)	Perl_PushBlock(aTHX_ a,b,c)
 #define PopBlock()		Perl_PopBlock(aTHX)
@@ -2347,8 +2369,6 @@
 #if defined(PERL_IMPLICIT_CONTEXT)
 #endif
 #ifdef PERL_CORE
-#define cv_ckproto(a,b,c)	Perl_cv_ckproto(aTHX_ a,b,c)
-#define cv_ckproto_len(a,b,c,d)	Perl_cv_ckproto_len(aTHX_ a,b,c,d)
 #define cv_setcv(a,b)		Perl_cv_setcv(aTHX_ a,b)
 #endif
 #define cv_const_sv(a)		Perl_cv_const_sv(aTHX_ a)
@@ -3075,6 +3095,12 @@
 #define sv_len_utf8(a)		Perl_sv_len_utf8(aTHX_ a)
 #define sv_magic(a,b,c,d,e)	Perl_sv_magic(aTHX_ a,b,c,d,e)
 #define sv_magicext(a,b,c,d,e,f)	Perl_sv_magicext(aTHX_ a,b,c,d,e,f)
+#define av_mortalcopy(a)		svTav(Perl_sv_mortalcopy(aTHX_ avTsv(a)))
+#define hv_mortalcopy(a)		svThv(Perl_sv_mortalcopy(aTHX_ hvTsv(a)))
+#define cv_mortalcopy(a)		svTcv(Perl_sv_mortalcopy(aTHX_ cvTsv(a)))
+#define gv_mortalcopy(a)		svTgv(Perl_sv_mortalcopy(aTHX_ gvTsv(a)))
+#define io_mortalcopy(a)		svTio(Perl_sv_mortalcopy(aTHX_ ioTsv(a)))
+#define re_mortalcopy(a)		svTre(Perl_sv_mortalcopy(aTHX_ reTsv(a)))
 #define sv_mortalcopy(a)	Perl_sv_mortalcopy(aTHX_ a)
 #define sv_newmortal()		Perl_sv_newmortal(aTHX)
 #define sv_newref(a)		Perl_sv_newref(aTHX_ a)

@@ -50,7 +50,7 @@ do {
         VERSION_FROM    => 'lib/Big/Dummy.pm',
         );
 
-    ok( %{ $mm->{MAN3PODS} } );
+    ok(  $mm->{MAN3PODS} );
 };
 
 do {
@@ -60,7 +60,7 @@ do {
         INSTALLMAN3DIR  => 'none'
         );
 
-    ok( !%{ $mm->{MAN3PODS} } );
+    ok( ! $mm->{MAN3PODS} );
 };
 
 
@@ -68,10 +68,10 @@ do {
     my $mm = WriteMakefile(
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
-        MAN3PODS        => \%()
+        MAN3PODS        => %()
         );
 
-    is_deeply( $mm->{MAN3PODS}, \%( ) );
+    is_deeply( $mm->{MAN3PODS}, %( ) );
 };
 
 
@@ -79,8 +79,8 @@ do {
     my $mm = WriteMakefile(
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
-        MAN3PODS        => \%( "Foo.pm" => "Foo.1" )
+        MAN3PODS        => %( "Foo.pm" => "Foo.1" )
         );
 
-    is_deeply( $mm->{MAN3PODS}, \%( "Foo.pm" => "Foo.1" ) );
+    is_deeply( $mm->{MAN3PODS}, %( "Foo.pm" => "Foo.1" ) );
 };

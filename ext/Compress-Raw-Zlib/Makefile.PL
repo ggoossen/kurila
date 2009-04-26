@@ -66,14 +66,14 @@ WriteMakefile(
     VERSION_FROM => 'lib/Compress/Raw/Zlib.pm',
     INC          => "-I$ZLIB_INCLUDE" ,
     DEFINE       => "$OLD_ZLIB $WALL -DGZIP_OS_CODE=$GZIP_OS_CODE $USE_PPPORT_H" ,
-    XS           => \%( 'Zlib.xs' => 'Zlib.c'),
-    'depend'     => \%( 'Makefile'   => 'config.in' ),
-    'clean'      => \%( FILES        => '*.c constants.h constants.xs' ),
+    XS           => %( 'Zlib.xs' => 'Zlib.c'),
+    'depend'     => %( 'Makefile'   => 'config.in' ),
+    'clean'      => %( FILES        => '*.c constants.h constants.xs' ),
 
     (
       $BUILD_ZLIB
       ?? < zlib_files($ZLIB_LIB)
-      !! (LIBS => \@( "-L$ZLIB_LIB -lz " ))
+      !! (LIBS => @( "-L$ZLIB_LIB -lz " ))
       ),
 
     ABSTRACT_FROM => 'lib/Compress/Raw/Zlib.pm',
@@ -270,8 +270,8 @@ sub zlib_files
 {
     my $dir = shift ;
 
-    my @h_files = @( () );
-    my @c_files = @( () );
+    my @h_files = @();
+    my @c_files = @();
 
     if (-f catfile($dir, "infback.c")) {
         # zlib 1.2.0 or greater
@@ -306,7 +306,7 @@ sub zlib_files
 
     return  @(
 #'H'         =>  [ @h_files ],
-'C'         =>  \ @c_files ,
+'C'         =>  @c_files ,
 #'OBJECT'    => qq[ @o_files ],
 'OBJECT'    => q[ $(O_FILES) ],
 
@@ -343,7 +343,7 @@ BEGIN
         \@( ''        => 255,  'Unknown OS'                   ),
         );
 
-    %OSnames = %( < @+: map { @: @$_[1] => @$_[2] },
+    %OSnames = %( < @+: map { @: $_->@[1] => $_->@[2] },
             @GZIP_OS_Names ) ;
 }
 
@@ -355,7 +355,7 @@ sub getOSCode
 
     for my $h ( @GZIP_OS_Names)
     {
-        my @($pattern, $code, $name) =  @$h;
+        my @($pattern, $code, $name) =  $h->@;
 
         return $code
             if $pattern && $uname eq $pattern ;

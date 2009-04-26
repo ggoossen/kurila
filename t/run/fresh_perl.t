@@ -29,7 +29,7 @@ while( ~< *DATA) {
 plan tests => scalar nelems @prgs;
 
 foreach my $prog ( @prgs) {
-    my@($raw_prog, $name) =  @$prog;
+    my@($raw_prog, $name) =  $prog->@;
 
     my $switch;
     if ($raw_prog =~ s/^\s*(-\w.*)\n//){

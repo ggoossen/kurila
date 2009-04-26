@@ -68,11 +68,11 @@ $self->{?BASEEXT}.def: Makefile.PL
             ', "DL_VARS" => ', < neatvalue($vars), q|);'
 |);
     }
-    if ($self->{?IMPORTS} && %{$self->{?IMPORTS}}) {
+    if ($self->{?IMPORTS} && $self->{?IMPORTS}->%) {
         # Make import files (needed for static build)
         -d 'tmp_imp' or mkdir 'tmp_imp', 0777 or die "Can't mkdir tmp_imp";
         open my $imp, '>', 'tmpimp.imp' or die "Can't open tmpimp.imp";
-        while (my@($name, $exp) =@( each %{$self->{IMPORTS}})) {
+        while (my@($name, $exp) =@( each $self->{IMPORTS}->%)) {
             my @($lib, $id) = @($exp =~ m/(.*)\.(.*)/) or die "Malformed IMPORT `$exp'";
             print $imp, "$name $lib $id ?\n";
         }
@@ -89,7 +89,7 @@ $self->{?BASEEXT}.def: Makefile.PL
 
 sub static_lib($self) {
     my $old = $self->ExtUtils::MM_Unix::static_lib();
-    return $old unless $self->{?IMPORTS} && %{$self->{?IMPORTS}};
+    return $old unless $self->{?IMPORTS} && $self->{?IMPORTS}->%;
 
     my @chunks = split m/\n{2,}/, $old;
     shift @chunks unless length @chunks[0]; # Empty lines at the start

@@ -108,14 +108,14 @@ sub My::testParseParameters()
 
     ok $got->parsed('Fred'), "parsed" ;
     my $xx_ref = $got->value('Fred');
-    $$xx_ref = 77 ;
+    $xx_ref->$ = 77 ;
     is $xx, 77;
 
     $got = ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, undef)), Fred => \$xx) ;
 
     ok $got->parsed('Fred'), "parsed" ;
     $xx_ref = $got->value('Fred');
-    $$xx_ref = 666 ;
+    $xx_ref->$ = 666 ;
     is $xx, 666;
 
 }
@@ -138,7 +138,7 @@ do {
 
     my $lex = LexFile->new( my $out_file) ;
     open my $fh, ">", "$out_file" ;
-    is whatIsInput(*$fh), 'handle', "Match filehandle" ;
+    is whatIsInput($fh->*), 'handle', "Match filehandle" ;
     close $fh ;
 
     my $stdin = '-';
@@ -157,7 +157,7 @@ do {
 
     my $lex = LexFile->new( my $out_file) ;
     open my $fh, ">", "$out_file" ;
-    is whatIsOutput(*$fh), 'handle', "Match filehandle" ;
+    is whatIsOutput($fh->*), 'handle', "Match filehandle" ;
     close $fh ;
 
     my $stdout = '-';

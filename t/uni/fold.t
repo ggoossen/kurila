@@ -27,7 +27,7 @@ if (open(my $cf_fh, "<", $CF)) {
 
     my $i = 0;
     for my $cf (@CF) {
-        my @($code, $status, $mapping, $name) =  @$cf;
+        my @($code, $status, $mapping, $name) =  $cf->@;
         $i++;
         my $a = pack("U0U*", hex $code);
         my $b = pack("U0U*", < map { hex }, split " ", $mapping);

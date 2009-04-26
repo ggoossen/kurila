@@ -104,7 +104,7 @@ use ExtUtils::Constant::XS < qw(%XS_Constant %XS_TypeSet);
 	C_constant WriteConstants WriteMakefileSnippet
 ) );
 
-@EXPORT_OK = @{ %EXPORT_TAGS{?'all'} };
+@EXPORT_OK =  %EXPORT_TAGS{?'all'}->@;
 
 =item constant_types
 
@@ -302,7 +302,7 @@ EOT
     $result =~ s/^/$(' 'x$indent)/gm;
     return ExtUtils::Constant::XS->dump_names(\%(default_type=>%args{?DEFAULT_TYPE},
             indent=>$indent,),
-        < @{%args{NAMES}})
+        < %args{NAMES}->@)
         . $result;
 }
 

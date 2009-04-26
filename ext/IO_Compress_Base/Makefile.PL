@@ -11,14 +11,6 @@ UpDowngrade( <getPerlFiles('MANIFEST'))
 WriteMakefile( 
     NAME         => 'IO::Compress::Base',
     VERSION_FROM => 'lib/IO/Compress/Base.pm',
-
-    (
-      env::var('SKIP_FOR_CORE')
-      ?? (MAN3PODS    => \%())
-      !! (PREREQ_PM   => \%( 'Scalar::Util'  => 0, )
-                        )
-      ),
-
     ABSTRACT_FROM => 'lib/IO/Compress/Base.pm',
     AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
 

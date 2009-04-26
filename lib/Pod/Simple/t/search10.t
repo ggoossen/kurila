@@ -66,18 +66,18 @@ $p =~ s/^/#  /mg;
 print $^STDOUT, $p;
 
 do {
-    my $names = join "|", sort values %$where2name;
+    my $names = join "|", sort values $where2name->%;
     is $names, "Blorm|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|squaa|squaa::Glunk|squaa::Vliff|zikzik";
 };
 
 do {
-    my $names = join "|", sort keys %$name2where;
+    my $names = join "|", sort keys $name2where->%;
     is $names, "Blorm|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|squaa|squaa::Glunk|squaa::Vliff|zikzik";
 };
 
 like( ($name2where->{?'squaa'} || 'huh???'), '/squaa\.pm$/');
 
-is nelems(grep( { m/squaa\.pm/ }, keys %$where2name)), 1;
+is nelems(grep( { m/squaa\.pm/ }, keys $where2name->%)), 1;
 
 ok 1;
 

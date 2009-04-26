@@ -158,7 +158,7 @@ sub uncolor {
 sub colored {
     my ($string, @codes);
     if (ref @_[0]) {
-        @codes = @{$:shift};
+        @codes = $:shift->@;
         $string = join ('', @_);
     } else {
         $string = shift;

@@ -98,7 +98,7 @@ SKIP: do {
         or skip("$TTY not a character file", $n);
     open(my $ttyfh, "<", $TTY)
         or skip("failed to open $TTY: $^OS_ERROR", $n);
-    -t *$ttyfh
+    -t $ttyfh->*
         or skip("TTY ($TTY) not a terminal file", $n);
 
     my $fd = fileno($ttyfh);

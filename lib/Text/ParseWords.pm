@@ -43,8 +43,8 @@ sub nested_quotewords($delim, $keep, @< @lines) {
     my(@allwords);
 
     for my $i (0 .. nelems(@lines) -1) {
-        @{@allwords[+$i]} = parse_line($delim, $keep, @lines[$i]);
-        return() unless ((nelems @{@allwords[$i]}) || !length(@lines[$i]));
+        @allwords[+$i]->@ = parse_line($delim, $keep, @lines[$i]);
+        return() unless ((nelems @allwords[$i]->@) || !length(@lines[$i]));
     }
     return @allwords;
 }

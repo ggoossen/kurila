@@ -123,7 +123,7 @@ for my $num_chain (1..$max_chain) {
         for my $first (2..5) {
             for my $last (2..5) {
                 my $nok = 0;
-                my @otherops = grep { $_ +<= 3 }, @$op;
+                my @otherops = grep { $_ +<= 3 }, $op->@;
                 my @curops = @($op,\@otherops);
 
                 for my $num ( @list) {
@@ -151,7 +151,7 @@ for my $num_chain (1..$max_chain) {
                         #next if $num_chain > 1
                         #  and "$tmp" ne "$tmp1"; # Already the coercion gives problems...
 
-                        for my $curop ( @{@curops[$short]}) {
+                        for my $curop ( @curops[$short]->@) {
                             if ($curop +< 5) {
                                 if ($curop +< 3) {
                                     if ($curop == 0) {
@@ -193,7 +193,7 @@ for my $num_chain (1..$max_chain) {
                         push @ans, $inpt;
                     }
                     if (@ans[0] ne @ans[1]) {
-                        print $^STDOUT, "# '@ans[0]' ne '@ans[1]',\t$num\t=> $(join ' ', @opnames[[@($first,< @{@curops[0]},$last)]]) vs $(join ' ', @opnames[[@($first,< @{@curops[1]},$last)]])\n";
+                        print $^STDOUT, "# '@ans[0]' ne '@ans[1]',\t$num\t=> $(join ' ', @opnames[[@($first,< @curops[0]->@,$last)]]) vs $(join ' ', @opnames[[@($first,< @curops[1]->@,$last)]])\n";
                         # XXX ought to check that "+" was in the list of opnames
                         if (((@ans[0] eq $max_uv_pp) and (@ans[1] eq $max_uv_p1))
                             or ((@ans[1] eq $max_uv_pp) and (@ans[0] eq $max_uv_p1))) {
@@ -218,7 +218,7 @@ for my $num_chain (1..$max_chain) {
                         and @ans[0] eq $max_uv_p1_as_uv) {
                             # as aboce
                             print $^STDOUT, "# ok, \"$max_uv_p1\" correctly converts to UV \"$max_uv_p1_as_uv\"\n";
-                        } elsif (grep {m/^N$/}, @opnames[[@{@curops[0]}]]
+                        } elsif (grep {m/^N$/}, @opnames[[@curops[0]->@]]
                         and @ans[0] == @ans[1] and @ans[0] +<= ^~^0
                             # First must be in E notation (ie not just digits) and
                             # second must still be an integer.

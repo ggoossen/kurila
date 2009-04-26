@@ -1939,7 +1939,7 @@ EOF
     if (!env::var('PERL_SKIP_PSYCHO_TEST')){
         print $^STDOUT, "# [ID 20020630.002] utf8 regex only matches 32k\n";
         for (@(\@( 'byte', "\x{ff}" ), \@( 'utf8', "\x{1ff}" ))) {
-            my@($type, $char) =  @$_;
+            my@($type, $char) =  $_->@;
             for my $len (@(32000, 32768, 33000)) {
                 my $s = $char . "f" x $len;
                 my $r = $s =~ m/$char([f]*)/gc;
@@ -2360,7 +2360,7 @@ END
    &&  $1 eq "ba$s",
    "TRIEF + LATIN SMALL LETTER SHARP S =~ SS # TODO");
 
-        ok(("foba  ba$($s)pxySS$s$s" =~ qr/(b(?:a${\$s}t|a${\$s}f|a${\$s}p)[xy]+$s*)/i)
+        ok(("foba  ba$($s)pxySS$s$s" =~ qr/(b(?:a$($s)t|a$($s)f|a$($s)p)[xy]+$s*)/i)
    &&  $1 eq "ba$($s)pxySS$s$s",
    "COMMON PREFIX TRIEF + LATIN SMALL LETTER SHARP S # TODO");
 
@@ -2953,8 +2953,8 @@ EOFTEST
         local $Message = "http://nntp.perl.org/group/perl.perl5.porters/118663";
         my $qr_barR1 = qr/(bar)\g-1/;
         ok("foobarbarxyz" =~ $qr_barR1);
-        ok("foobarbarxyz" =~ qr/foo${\$qr_barR1}xyz/);
-        ok("foobarbarxyz" =~ qr/(foo)${\$qr_barR1}xyz/);
+        ok("foobarbarxyz" =~ qr/foo$($qr_barR1)xyz/);
+        ok("foobarbarxyz" =~ qr/(foo)$($qr_barR1)xyz/);
         ok("foobarbarxyz" =~ qr/(foo)(bar)\g{-1}xyz/);
         ok("foobarbarxyz" =~ qr/(foo$qr_barR1)xyz/);
         ok("foobarbarxyz" =~ qr/(foo(bar)\g{-1})xyz/);
@@ -2966,7 +2966,7 @@ EOFTEST
         my $doit=sub {
                 my $pats= shift;
                 for ( @_) {
-                    for my $pat ( @$pats) {
+                    for my $pat ( $pats->@) {
                         for my $quant ( @quants) {
                             for my $tail ( @tails) {
                                 my $re = "($pat$quant\$)$tail";
@@ -3036,12 +3036,12 @@ EOFTEST
         ) {
             my $m = shift $p;
             my @($s, $f) =  map { \split m/ */ }, $p;
-            ok(m/$m/, " $m basic match") for  @$s;
-            ok(not m/$m/) for  @$f;
-            ok(m/^$m$/) for  @$s;
-            ok(not m/^$m$/) for  @$f;
-            ok("xxxx$_" =~ m/^.*$m$/) for  @$s;
-            ok("xxxx$_" !~ m/^.*$m$/) for  @$f;
+            ok(m/$m/, " $m basic match") for  $s->@;
+            ok(not m/$m/) for  $f->@;
+            ok(m/^$m$/) for  $s->@;
+            ok(not m/^$m$/) for  $f->@;
+            ok("xxxx$_" =~ m/^.*$m$/) for  $s->@;
+            ok("xxxx$_" !~ m/^.*$m$/) for  $f->@;
         }
     };
 
@@ -3116,9 +3116,9 @@ EOFTEST
         my @lb=@( "\x{0D}\x{0A}",
               < map { chr( $_ ) }, @( ( < 0x0A..0x0D,0x85,0x2028,0x2029 )));
         foreach my $t (@(\@(\@lb,qr/\R/,qr/\R+/),)){
-            my $ary=shift @$t;
-            foreach my $pat ( @$t) {
-                foreach my $str ( @$ary) {
+            my $ary=shift $t->@;
+            foreach my $pat ( $t->@) {
+                foreach my $str ( $ary->@) {
                     ok($str=~m/($pat)/,"$pat");
                     is($1,$str,"$pat");
                 }

@@ -157,7 +157,7 @@ do {
         $^EVAL_ERROR = "";
         try { $thawed  = thaw $freezed };
         ok($^EVAL_ERROR, "");
-        ok($$thawed, qr/^sub/);
+        ok($thawed->$, qr/^sub/);
     }
 };
 
@@ -173,7 +173,7 @@ do {
 
     try { $freezed = freeze @obj[0]->[0] };
 
-    open($^STDERR, ">&", \*$saverr);
+    open($^STDERR, ">&", \$saverr->*);
 
     ok($^EVAL_ERROR, "");
     ok($freezed ne '');

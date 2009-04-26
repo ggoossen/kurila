@@ -329,13 +329,13 @@ sub init_globals {
 # clean_data: global clean-up of pod data
 #
 sub clean_data($dataref) {
-    for my $i ( 0..(nelems @{$dataref})-1 ) {
-        @{$dataref}[$i] =~ s/\s+\Z//;
+    for my $i ( 0..(nelems $dataref->@)-1 ) {
+        $dataref->[$i] =~ s/\s+\Z//;
 
         # have a look for all-space lines
-        if( @{$dataref}[$i] =~ m/^\s+$/m and $dataref->[$i] !~ m/^\s/ ){
-            my @chunks = split( m/^\s+$/m, @{$dataref}[$i] );
-            splice( @$dataref, $i, 1, < @chunks );
+        if( $dataref->[$i] =~ m/^\s+$/m and $dataref->[$i] !~ m/^\s/ ){
+            my @chunks = split( m/^\s+$/m, $dataref->[$i] );
+            splice( $dataref->@, $i, 1, < @chunks );
         }
     }
 }
@@ -768,7 +768,7 @@ sub get_cache {
 
 sub cache_key($dircache, $itemcache, $podpath, $podroot, $recurse) {
     return join('!', @( $dircache, $itemcache, $recurse,
-                        < @$podpath, $podroot, stat($dircache), stat($itemcache)));
+                        < $podpath->@, $podroot, stat($dircache), stat($itemcache)));
 }
 
 #
@@ -789,7 +789,7 @@ sub load_cache($dircache, $itemcache, $podpath, $podroot) {
     # is it the same podpath?
     $_ = ~< $cache;
     chomp($_);
-    $tests++ if (join(":", @$podpath) eq $_);
+    $tests++ if (join(":", $podpath->@) eq $_);
 
     # is it the same podroot?
     $_ = ~< $cache;
@@ -818,7 +818,7 @@ sub load_cache($dircache, $itemcache, $podpath, $podroot) {
     # is it the same podpath?
     $_ = ~< $cache;
     chomp($_);
-    $tests++ if (join(":", @$podpath) eq $_);
+    $tests++ if (join(":", $podpath->@) eq $_);
 
     # is it the same podroot?
     $_ = ~< $cache;
@@ -885,7 +885,7 @@ sub scan_podpath($podroot, $recurse, $append) {
             foreach my $pod ( @files) {
                 open(my $pod_fh, "<", "$dirname/$pod") ||
                     die "$^PROGRAM_NAME: error opening $dirname/$pod for input: $^OS_ERROR\n";
-                @poddata = @( ~< *$pod_fh );
+                @poddata = @( ~< $pod_fh->* );
                 close($pod_fh);
                 clean_data( \@poddata );
 
@@ -904,7 +904,7 @@ sub scan_podpath($podroot, $recurse, $append) {
             my $pod = $1;
             open(my $pod_fh, "<", "$pod") ||
                 die "$^PROGRAM_NAME: error opening $pod for input: $^OS_ERROR\n";
-            @poddata = @( ~< *$pod_fh );
+            @poddata = @( ~< $pod_fh->* );
             close($pod_fh);
             clean_data( \@poddata );
 
@@ -1023,7 +1023,7 @@ sub scan_headings($sections, @< @data) {
 
             my $title = depod( $otitle );
             my $name = anchorify( $title );
-            %$sections{+$name} = 1;
+            $sections->%{+$name} = 1;
             $title = process_text( \$otitle );
 
             while ($which_head != $listdepth) {
@@ -1080,7 +1080,7 @@ sub scan_items( $itemref, $pod, @< @poddata) {
             next;
         }
         my $fid = fragment_id( $item );
-        %$itemref{+$fid} = "$pod" if $fid;
+        $itemref->%{+$fid} = "$pod" if $fid;
     }
 }
 
@@ -1308,7 +1308,7 @@ sub process_pre( $text) {
     my( $rest );
     return if $Ignore;
 
-    $rest = $$text;
+    $rest = $text->$;
 
     # insert spaces in place of tabs
     $rest =~ s#(.+)#$( do {
@@ -1399,7 +1399,7 @@ sub process_pre( $text) {
       }{<a href="$1">$1</a>}igox;
 
     # text should be as it is (verbatim)
-    $$text = $rest;
+    $text->$ = $rest;
 }
 
 
@@ -1510,7 +1510,7 @@ sub process_text( $tref) {
 
     my $res = process_text1( 0, $tref );
     $res =~ s/\s+$//s;
-    $$tref = $res;
+    $tref->$ = $res;
 }
 
 sub process_text_rfc_links {
@@ -1556,7 +1556,7 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing){
 
     } elsif( $func eq 'E' ){
         # E<x> - convert to character
-        $$rstr =~ s/^([^>]*)>//;
+        $rstr->$ =~ s/^([^>]*)>//;
         my $escape = $1;
         $escape =~ s/^(\d+|X[\dA-F]+)$/#$1/i;
         $res = "&$escape;";
@@ -1681,7 +1681,7 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing){
         };
 
         # now we have a URL or just plain code
-        $$rstr = $linktext . '>' . $$rstr;
+        $rstr->$ = $linktext . '>' . $rstr->$;
         if( defined( $url ) ){
             $res = "<a href=\"$url\">" . &process_text1( $lev, $rstr ) . '</a>';
         } else {
@@ -1696,15 +1696,15 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing){
     } elsif( $func eq 'X' ){
         # X<> - ignore
         warn "$^PROGRAM_NAME: $Podfile: invalid X<> in paragraph $Paragraph.\n"
-            unless $$rstr =~ s/^[^>]*>// or $Quiet;
+            unless $rstr->$ =~ s/^[^>]*>// or $Quiet;
     } elsif( $func eq 'Z' ){
         # Z<> - empty
         warn "$^PROGRAM_NAME: $Podfile: invalid Z<> in paragraph $Paragraph.\n"
-            unless $$rstr =~ s/^>// or $Quiet;
+            unless $rstr->$ =~ s/^>// or $Quiet;
 
     } else {
         my $term = pattern $closing;
-        while( $$rstr =~ s/\A(.*?)(([BCEFILSXZ])<(<+[^\S\n]+)?|$term)//s ){
+        while( $rstr->$ =~ s/\A(.*?)(([BCEFILSXZ])<(<+[^\S\n]+)?|$term)//s ){
             # all others: either recurse into new function or
             # terminate at closing angle bracket(s)
             my $pt = $1;
@@ -1716,9 +1716,9 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing){
             }
         }
         if( $lev == 1 ){
-            $res .= pure_text( $$rstr );
+            $res .= pure_text( $rstr->$ );
         } elsif( ! $Quiet ) {
-            my $snippet = substr($$rstr,0,60);
+            my $snippet = substr($rstr->$,0,60);
             warn "$^PROGRAM_NAME: $Podfile: undelimited $func<> in paragraph $Paragraph: '$snippet'.\n" 
 
         }
@@ -1733,7 +1733,7 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing){
 sub go_ahead( $rstr, $func, $closing){
     my $res = '';
     my @closing = @($closing);
-    while( $$rstr =~
+    while( $rstr->$ =~
     s/\A (.*?) (([BCEFILSXZ])<(<+\s+)?| $(pattern @closing[0]) )//xs ){
             $res .= $1;
             unless( $3 ){
@@ -1745,7 +1745,7 @@ sub go_ahead( $rstr, $func, $closing){
             $res .= $2;
         }
     unless ($Quiet) {
-        my $snippet = substr($$rstr,0,60);
+        my $snippet = substr($rstr->$,0,60);
         warn "$^PROGRAM_NAME: $Podfile: undelimited $func<> in paragraph $Paragraph (go_ahead): '$snippet'.\n" 
     }	        
     return $res;
@@ -2056,8 +2056,8 @@ my %E2c;
 sub depod($v){
     my $string;
     if( ref( $v ) ){
-        $string =  ${$v};
-        ${$v} = depod1( \$string );
+        $string =  $v->$;
+        $v->$ = depod1( \$string );
     } else {
         $string =  $v;
         depod1( \$string );
@@ -2066,29 +2066,29 @@ sub depod($v){
 
 sub depod1( $rstr, ?$func, ?$closing){
     my $res = '';
-    return $res unless defined $$rstr;
+    return $res unless defined $rstr->$;
     if( ! defined( $func ) ){
         # skip to next begin of an interior sequence
-        while( $$rstr =~ s/\A(.*?)([BCEFILSXZ])<(<+[^\S\n]+)?//s ){
+        while( $rstr->$ =~ s/\A(.*?)([BCEFILSXZ])<(<+[^\S\n]+)?//s ){
             # recurse into its text
             $res .= $1 . &depod1( $rstr, $2, closing $3);
         }
-        $res .= $$rstr;
+        $res .= $rstr->$;
     } elsif( $func eq 'E' ){
         # E<x> - convert to character
-        $$rstr =~ s/^([^>]*)>//;
+        $rstr->$ =~ s/^([^>]*)>//;
         $res .= %E2c{?$1} || "";
     } elsif( $func eq 'X' ){
         # X<> - ignore
-        $$rstr =~ s/^[^>]*>//;
+        $rstr->$ =~ s/^[^>]*>//;
     } elsif( $func eq 'Z' ){
         # Z<> - empty
-        $$rstr =~ s/^>//;
+        $rstr->$ =~ s/^>//;
     } else {
         # all others: either recurse into new function or
         # terminate at closing angle bracket
         my $term = pattern $closing;
-        while( $$rstr =~ s/\A(.*?)(([BCEFILSXZ])<(<+[^\S\n]+)?|$term)//s ){
+        while( $rstr->$ =~ s/\A(.*?)(([BCEFILSXZ])<(<+[^\S\n]+)?|$term)//s ){
             $res .= $1;
             last unless $3;
             $res .= &depod1( $rstr, $3, closing $4 );

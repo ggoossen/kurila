@@ -29,7 +29,7 @@ close $try or die "Could not close: $^OS_ERROR";
 open($try, "<",'Comp.try') || (die "Can't reopen temp file.");
 my $count = 0;
 my $z = '';
-while ( ~< *$try) {
+while ( ~< $try->*) {
     $z .= $_;
     $count = $count + 1;
 }

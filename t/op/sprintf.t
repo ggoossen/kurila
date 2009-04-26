@@ -63,9 +63,9 @@ $^WARN_HOOK = sub {
     };
 
 for my  $i (1 .. nelems(@tests)) {
-    @($template, $evalData, $result, $comment, $data) =  @{shift @tests};
+    @($template, $evalData, $result, $comment, $data) =  (shift @tests)->@;
     $w = undef;
-    $x = sprintf(">$template<", < @$evalData);
+    $x = sprintf(">$template<", < $evalData->@);
     substr($x, -1, 0, $w) if $w;
     # $x may have 3 exponent digits, not 2
     my $y = $x;

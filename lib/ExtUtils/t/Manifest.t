@@ -40,7 +40,7 @@ sub add_file {
 
 sub read_manifest {
     open( my $m, "<", 'MANIFEST' ) or return;
-    chomp( my @files = @( ~< *$m ) );
+    chomp( my @files = @( ~< $m->* ) );
     close $m;
     return @files;
 }
@@ -136,8 +136,8 @@ ok( exists( ExtUtils::Manifest::manifind()->{'moretest/quux'} ),
 # only MANIFEST and foo are in the manifest
 $_ = 'foo';
 my $files = maniread();
-is( nkeys %$files, 2, 'two files found' );
-is( join(' ', sort { lc($a) cmp lc($b) }, keys %$files), 'foo MANIFEST', 
+is( nkeys $files->%, 2, 'two files found' );
+is( join(' ', sort { lc($a) cmp lc($b) }, keys $files->%), 'foo MANIFEST', 
     'both files found' );
 is( $_, 'foo', q{maniread() doesn't clobber $_} );
 
@@ -150,7 +150,7 @@ find( sub { push @copies, $_ if -f }, 'copy' );
 @copies = map { s/\.$//; $_ }, @copies if $Is_VMS;  # VMS likes to put dots on
 # the end of files.
 # Have to compare insensitively for non-case preserving VMS
-is_deeply( \(sort map { lc }, @copies), \(sort map { lc }, keys %$files) );
+is_deeply( \(sort map { lc }, @copies), \(sort map { lc }, keys $files->%) );
 
 # cp would leave files readonly, so check permissions.
 foreach my $orig ( @copies) {
@@ -256,7 +256,7 @@ add_file('MANIFEST'   => 'Makefile.PL');
 maniadd(\%( foo  => 'bar' ));
 $files = maniread;
 # VMS downcases the MANIFEST.  We normalize it here to match.
-%$files = %( < @+: map { @(lc $_ => $files->{?$_}) }, keys %$files );
+$files->% = %( < @+: map { @(lc $_ => $files->{?$_}) }, keys $files->% );
 my %expect = %( 'makefile.pl' => '',
         'foo'    => 'bar'
     );

@@ -25,10 +25,10 @@ $VERSION = '2.006';
 sub saveStatus
 {
     my $self   = shift ;
-    ${ $self->{ErrorNo} } = shift() + 0 ;
-    ${ $self->{Error} } = '' ;
+     $self->{ErrorNo}->$ = shift() + 0 ;
+     $self->{Error}->$ = '' ;
 
-    return ${ $self->{?ErrorNo} } ;
+    return  $self->{?ErrorNo}->$ ;
 }
 
 
@@ -36,8 +36,8 @@ sub saveErrorString
 {
     my $self   = shift ;
     my $retval = shift ;
-    ${ $self->{Error} } = shift() . (${$self->{?Error}} ?? "\nprevious: ${$self->{?Error}}" !! "") ;
-    ${ $self->{ErrorNo} } = shift() + 0 if (nelems @_) ;
+     $self->{Error}->$ = shift() . ($self->{?Error}->$ ?? "\nprevious: $($self->{?Error}->$)" !! "") ;
+     $self->{ErrorNo}->$ = shift() + 0 if (nelems @_) ;
 
     return $retval;
 }
@@ -55,12 +55,12 @@ sub closeError
     my $retval = shift ;
 
     my $errno = $self->{?ErrorNo};
-    my $error = ${ $self->{?Error} };
+    my $error =  $self->{?Error}->$;
 
     $self->close();
 
     $self->{+ErrorNo} = $errno ;
-    ${ $self->{Error} } = $error ;
+     $self->{Error}->$ = $error ;
 
     return $retval;
 }
@@ -70,13 +70,13 @@ sub closeError
 sub error
 {
     my $self   = shift ;
-    return ${ $self->{?Error} } ;
+    return  $self->{?Error}->$ ;
 }
 
 sub errorNo
 {
     my $self   = shift ;
-    return ${ $self->{?ErrorNo} } ;
+    return  $self->{?ErrorNo}->$ ;
 }
 
 
@@ -98,7 +98,7 @@ sub writeAt
             or return $self->saveErrorString(undef, "Cannot seek to end of output filehandle: $^OS_ERROR", $^OS_ERROR) ;
     }
     else {
-        substr(${ $self->{?Buffer} }, $offset, length($data), $data) ;
+        substr( $self->{?Buffer}->$, $offset, length($data), $data) ;
     }
 
     return 1;
@@ -123,7 +123,7 @@ sub output
             or return $self->saveErrorString(0, $^OS_ERROR, $^OS_ERROR); 
     }
     else {
-        ${ $self->{Buffer} } .= $data ;
+         $self->{Buffer}->$ .= $data ;
     }
 
     return 1;
@@ -209,7 +209,7 @@ sub _create
 
     if ($got->parsed('Encode')) { 
         my $want_encoding = $got->value('Encode');
-        *$obj->{+Encoding} = getEncoding($obj, $class, $want_encoding);
+        $obj->*->{+Encoding} = getEncoding($obj, $class, $want_encoding);
     }
 
     $obj->ckParams($got)
@@ -227,7 +227,7 @@ sub _create
         $obj->{+CompSize} = U64->new() ;
 
         if ( $outType eq 'buffer') {
-            ${ $obj->{Buffer} }  = ''
+             $obj->{Buffer}->$  = ''
                 unless $appendOutput ;
         }
         else {
@@ -280,7 +280,7 @@ sub ckOutputParam
         if $outType eq 'filename' && (! defined @_[0] || @_[0] eq '')  ;
 
     $self->croakError("$from: output buffer is read-only")
-        if $outType eq 'buffer' && readonly(${ @_[0] });
+        if $outType eq 'buffer' && readonly( @_[0]->$);
 
     return 1;    
 }
@@ -329,14 +329,14 @@ sub _def
     if ($x->{?GlobMap})
     {
         $x->{+oneInput} = 1 ;
-        foreach my $pair ( @{ $x->{Pairs} })
+        foreach my $pair (  $x->{Pairs}->@)
         {
-            my @($from, $to) =  @$pair ;
+            my @($from, $to) =  $pair->@ ;
             $obj->_singleTarget($x, 1, $from, $to, < @_)
                 or return undef ;
         }
 
-        return scalar nelems @{ $x->{?Pairs} } ;
+        return scalar nelems  $x->{?Pairs}->@ ;
     }
 
     if (! $x->{?oneOutput} )
@@ -346,7 +346,7 @@ sub _def
 
         $x->{+inType} = $inFile ?? 'filename' !! 'buffer';
 
-        foreach my $in (@($x->{?oneInput} ?? $input !! < @$input))
+        foreach my $in (@($x->{?oneInput} ?? $input !! < $input->@))
         {
             my $out ;
             $x->{+oneInput} = 1 ;
@@ -354,7 +354,7 @@ sub _def
             $obj->_singleTarget($x, $inFile, $in, \$out, < @_)
                 or return undef ;
 
-            push @$output, \$out ;
+            push $output->@, \$out ;
         #if ($x->{outType} eq 'array')
         #  { push @$output, \$out }
         #else
@@ -395,7 +395,7 @@ sub _singleTarget
         my $keep = $x->{Got}->clone();
 
         #for my $element ( ($x->{inType} eq 'hash') ? keys %$input : @$input)
-        for my $element (  @$input)
+        for my $element (  $input->@)
         {
             my $isFilename = isaFilename($element);
 
@@ -416,7 +416,7 @@ sub _singleTarget
             defined $obj->_wr2($element, $isFilename) 
                 or return $obj->closeError(undef) ;
 
-            *$obj->{+Got} = $keep->clone();
+            $obj->*->{+Got} = $keep->clone();
         }
         return $obj->close() ;
     }
@@ -526,7 +526,7 @@ sub DESTROY
     # TODO - memory leak with 5.8.0 - this isn't called until 
     #        global destruction
     #
-    %{ $self } = %( () ) ;
+     $self->% = %( () ) ;
     undef $self ;
 }
 
@@ -552,7 +552,7 @@ sub syswrite
 
 
     if ((nelems @_) +> 1) {
-        my $slen = defined $$buffer ?? length($$buffer) !! 0;
+        my $slen = defined $buffer->$ ?? length($buffer->$) !! 0;
         my $len = $slen;
         my $offset = 0;
         $len = @_[1] if @_[1] +< $len;
@@ -569,18 +569,18 @@ sub syswrite
             $len = $rem if $rem +< $len;
         }
 
-        $buffer = \substr($$buffer, $offset, $len) ;
+        $buffer = \substr($buffer->$, $offset, $len) ;
     }
 
-    return 0 if ! defined $$buffer || length $$buffer == 0 ;
+    return 0 if ! defined $buffer->$ || length $buffer->$ == 0 ;
 
     if ($self->{?Encoding}) {
-        $$buffer = $self->{?Encoding}->encode($$buffer);
+        $buffer->$ = $self->{?Encoding}->encode($buffer->$);
     }
 
     $self->filterUncompressed($buffer);
 
-    my $buffer_length = defined $$buffer ?? length($$buffer) !! 0 ;
+    my $buffer_length = defined $buffer->$ ?? length($buffer->$) !! 0 ;
     $self->{?UnCompSize}->add($buffer_length) ;
 
     my $outBuffer='';

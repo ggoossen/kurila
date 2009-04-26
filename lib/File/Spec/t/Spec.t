@@ -734,7 +734,7 @@ is("Win32->can('_cwd')", "Win32->can('_cwd')");
 
 # Test out the class methods
 for (  @tests ) {
-    tryfunc( < @$_ ) ;
+    tryfunc( < $_->@ ) ;
 }
 
 

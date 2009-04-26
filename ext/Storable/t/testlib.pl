@@ -14,7 +14,7 @@ sub slurp {
     local $^INPUT_RECORD_SEPARATOR = undef;
     open my $fh, "<", "$file" or die "Can't open '$file': $^OS_ERROR";
     binmode $fh;
-    my $contents = ~< *$fh;
+    my $contents = ~< $fh->*;
     die "Can't read $file: $^OS_ERROR" unless defined $contents;
     return $contents;
 }

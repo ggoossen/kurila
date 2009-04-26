@@ -77,11 +77,11 @@ my $NAMEDSEQFH;
 
 sub openunicode($rfh, @< @path) {
     my $f;
-    unless (defined $$rfh) {
+    unless (defined $rfh->$) {
         for my $d ( $^INCLUDE_PATH) {
             use File::Spec;
             $f = File::Spec->catfile($d, "unicore", < @path);
-            last if open($$rfh, "<", $f);
+            last if open($rfh->$, "<", $f);
             undef $f;
         }
         croak __PACKAGE__, ": failed to find ", <
@@ -271,7 +271,7 @@ sub charinrange($range, $arg) {
     my $code = _getcode($arg);
     croak __PACKAGE__, "::charinrange: unknown code '$arg'"
         unless defined $code;
-    _search($range, 0, ((nelems @$range)-1), $code);
+    _search($range, 0, ((nelems $range->@)-1), $code);
 }
 
 =head2 charblock
@@ -312,7 +312,7 @@ sub _charblocks {
                     my @($lo, $hi) = @(hex($1), hex($2));
                     my $subrange = \@( $lo, $hi, $3 );
                     push @BLOCKS, $subrange;
-                    push @{%BLOCKS{+$3}}, $subrange;
+                    push %BLOCKS{+$3}->@, $subrange;
                 }
             }
             close($BLOCKSFH);
@@ -376,7 +376,7 @@ sub _charscripts {
                     $script =~ s/\b(\w)/$(uc($1))/g;
                     my $subrange = \@( $lo, $hi, $script );
                     push @SCRIPTS, $subrange;
-                    push @{%SCRIPTS{+$script}}, $subrange;
+                    push %SCRIPTS{+$script}->@, $subrange;
                 }
             }
             close($SCRIPTSFH);
@@ -780,7 +780,7 @@ sub _casespec {
             $oldtitle,
             $oldupper,
             $oldcondition) = 
-                                    %{%CASESPEC{$code}}{[qw(lower
+                                    %CASESPEC{$code}->{[qw(lower
 							   title
 							   upper
 							   condition)]};

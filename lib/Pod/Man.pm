@@ -251,7 +251,7 @@ sub _handle_element_start($self, $element, $attrs) {
         # on, so this can be strictly inherited.
         my $formatting = %$self{PENDING}->[-1]->[?1];
         $formatting = $self->formatting ($formatting, $element);
-        push (@{ %$self{PENDING} }, \@( $attrs, $formatting, '' ));
+        push ( %$self{PENDING}->@, \@( $attrs, $formatting, '' ));
         DEBUG +> 4 and print $^STDOUT, "Pending: [", < pretty (%$self{?PENDING}), "]\n";
     } elsif ($self->can ("start_$method")) {
         my $method = 'start_' . $method;
@@ -272,13 +272,13 @@ sub _handle_element_end($self, $element) {
     # the handler along with the saved attribute hash.
     if ($self->can ("cmd_$method")) {
         DEBUG +> 2 and print $^STDOUT, "</$element> stops saving a tag\n";
-        my $tag = pop @{ %$self{PENDING} };
+        my $tag = pop  %$self{PENDING}->@;
         DEBUG +> 4 and print $^STDOUT, "Popped: [", < pretty ($tag), "]\n";
         DEBUG +> 4 and print $^STDOUT, "Pending: [", < pretty (%$self{?PENDING}), "]\n";
         my $method = 'cmd_' . $method;
         my $text = $self->?$method (@$tag[0], @$tag[2]);
         if (defined $text) {
-            if ((nelems @{ %$self{?PENDING} }) +> 1) {
+            if ((nelems  %$self{?PENDING}->@) +> 1) {
                 %$self{PENDING}->[-1]->[2] .= $text;
             } else {
                 $self->output ($text);
@@ -556,7 +556,7 @@ sub mapfonts($self, $text) {
         my $sequence = '';
         my $f;
         if ($last ne '\fR') { $sequence = '\fP' }
-        ${ %magic{$1} } += ($2 eq 'S') ?? 1 !! -1;
+         %magic{$1}->$ += ($2 eq 'S') ?? 1 !! -1;
         $f = %$self{FONTS}->{?($fixed && 1) . ($bold && 1) . ($italic && 1) };
         if ($f eq $last) {
             '';
@@ -580,7 +580,7 @@ sub textmapfonts($self, $text) {
     $text =~ s#
         \\f\((.)(.)
     #$( do {
-        ${ %magic{$1} } += ($2 eq 'S') ?? 1 !! -1;
+         %magic{$1}->$ += ($2 eq 'S') ?? 1 !! -1;
         %$self{FONTS}->{?($fixed && 1) . ($bold && 1) . ($italic && 1) };
     })#gx;
     return $text;
@@ -602,7 +602,7 @@ sub switchquotes($self, $command, $text, ?$extra) {
     # Also separate troff from nroff if there are any fixed-width fonts in use
     # to work around problems with Solaris nroff.
     my $c_is_quote = (%$self{?LQUOTE} =~ m/\"/) || (%$self{?RQUOTE} =~ m/\"/);
-    my $fixedpat = join '|', %{ %$self{FONTS} }{[@('100', '101', '110', '111')]};
+    my $fixedpat = join '|',  %$self{FONTS}->{[@('100', '101', '110', '111')]};
     $fixedpat =~ s/\\/\\\\/g;
     $fixedpat =~ s/\(/\\\(/g;
     if ($text =~ m/\"/ || $text =~ m/$fixedpat/) {
@@ -666,7 +666,7 @@ sub makespace($self) {
 # argument.  Support multiple index entries in X<> separated by slashes, and
 # strip special escapes from index entries.
 sub outindex($self, ?$section, ?$index) {
-    my @entries = @+: map { split m%\s*/\s*% }, @{ %$self{INDEX} };
+    my @entries = @+: map { split m%\s*/\s*% },  %$self{INDEX}->@;
     return unless ($section || nelems @entries);
 
     # We're about to output all pending entries, so clear our pending queue.
@@ -885,7 +885,7 @@ sub cmd_para($self, $attrs, $text) {
     $self->makespace;
     if (%$self{?SHIFTWAIT}) {
         $self->output (".RS %$self{?INDENT}\n");
-        push (@{ %$self{SHIFTS} }, %$self{?INDENT});
+        push ( %$self{SHIFTS}->@, %$self{?INDENT});
         %$self{+SHIFTWAIT} = 0;
     }
 
@@ -1031,7 +1031,7 @@ sub cmd_c { return @_[0]->quote_literal (@_[2]) }
 
 # Index entries are just added to the pending entries.
 sub cmd_x($self, $attrs, $text) {
-    push (@{ %$self{INDEX} }, $text);
+    push ( %$self{INDEX}->@, $text);
     return '';
 }
 
@@ -1063,16 +1063,16 @@ sub over_common_start($self, $type, $attrs, _) {
     # pending indentation for the last level that we saw and haven't acted on
     # yet.  SHIFTS is the stack of indentations that we've actually emitted
     # code for.
-    if ((nelems @{ %$self{?SHIFTS} }) +< nelems @{ %$self{?INDENTS} }) {
+    if ((nelems  %$self{?SHIFTS}->@) +< nelems  %$self{?INDENTS}->@) {
         $self->output (".RS %$self{?INDENT}\n");
-        push (@{ %$self{SHIFTS} }, %$self{?INDENT});
+        push ( %$self{SHIFTS}->@, %$self{?INDENT});
     }
 
     # Now, do record-keeping.  INDENTS is a stack of indentations that we've
     # seen so far, and INDENT is the current level of indentation.  ITEMTYPES
     # is a stack of list types that we've seen.
-    push (@{ %$self{INDENTS} }, %$self{?INDENT});
-    push (@{ %$self{ITEMTYPES} }, $type);
+    push ( %$self{INDENTS}->@, %$self{?INDENT});
+    push ( %$self{ITEMTYPES}->@, $type);
     %$self{+INDENT} = $indent + 0;
     %$self{+SHIFTWAIT} = 1;
 }
@@ -1085,18 +1085,18 @@ sub over_common_start($self, $type, $attrs, _) {
 # .RE and then a new .RS to unconfuse *roff.
 sub over_common_end($self) {
     DEBUG +> 3 and print $^STDOUT, " Ending =over\n";
-    %$self{+INDENT} = pop @{ %$self{INDENTS} };
-    pop @{ %$self{ITEMTYPES} };
+    %$self{+INDENT} = pop  %$self{INDENTS}->@;
+    pop  %$self{ITEMTYPES}->@;
 
     # If we emitted code for that indentation, end it.
-    if ((nelems @{ %$self{?SHIFTS} }) +> nelems @{ %$self{?INDENTS} }) {
+    if ((nelems  %$self{?SHIFTS}->@) +> nelems  %$self{?INDENTS}->@) {
         $self->output (".RE\n");
-        pop @{ %$self{SHIFTS} };
+        pop  %$self{SHIFTS}->@;
     }
 
     # If we're still in an indentation, *roff will have now lost track of the
     # right depth of that indentation, so fix that.
-    if ((nelems @{ %$self{?INDENTS} }) +> 0) {
+    if ((nelems  %$self{?INDENTS}->@) +> 0) {
         $self->output (".RE\n");
         $self->output (".RS %$self{?INDENT}\n");
     }
@@ -1147,9 +1147,9 @@ sub item_common($self, $type, $attrs, $text) {
     # directly following another one.  We only have to do that once for a
     # whole chain of items so do it for the second item in the change.  Note
     # that makespace is what undoes this.
-    if ((nelems @{ %$self{?SHIFTS} }) == nelems @{ %$self{?INDENTS} }) {
+    if ((nelems  %$self{?SHIFTS}->@) == nelems  %$self{?INDENTS}->@) {
         $self->output (".RE\n");
-        pop @{ %$self{SHIFTS} };
+        pop  %$self{SHIFTS}->@;
     }
     $self->output (".PD 0\n") if (%$self{?ITEMS} == 1);
 

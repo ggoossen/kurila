@@ -1,6 +1,6 @@
 #!./perl
 
-print $^STDOUT, q(1..41
+print $^STDOUT, q(1..42
 );
 
 # This is() function is written to avoid ""
@@ -80,10 +80,12 @@ do {
 # variable interpolation
 do {
     our @($a, $b, ?$c, ?$dx) =  qw(foo bar);
+    my $da = \$a;
 
     is("$a", "foo",    "verifying assign");
     is("$a$b", "foobar", "basic concatenation");
     is("$c$a$c", "foo",    "concatenate undef, fore and aft");
+    is("$da->$x", "foox", "interpolation till ->\$");
 
     # Array and derefence, this doesn't really belong in 'op/concat' but I
     # couldn't find a better place
@@ -92,7 +94,7 @@ do {
     my $dx = \ @x;
 
     is("$(join ' ',@x)", "aap noot");
-    is("$(join ' ',@$dx)", "aap noot");
+    is("$(join ' ',$dx->@)", "aap noot");
 
     # Okay, so that wasn't very challenging.  Let's go Unicode.
 

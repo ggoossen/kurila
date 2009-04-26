@@ -78,12 +78,12 @@ $p =~ s/^/#  /mg;
 print $^STDOUT, $p;
 
 do {
-    my $names = join "|", sort keys %$name2where;
+    my $names = join "|", sort keys $name2where->%;
     is $names, "Zonk::Pronk|hinkhonk::Glunk|perlzuk|squaa::Glunk|zikzik";
 };
 
 do {
-    my $names = join "|", sort values %$where2name;
+    my $names = join "|", sort values $where2name->%;
     is $names, "Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Glunk|perlzuk|squaa::Glunk|zikzik";
 };
 

@@ -33,7 +33,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
 do {
     my $stdout = \$( '' );
     open my $stdout_fh, '>>', $stdout or die;
-    $^STDOUT = *{$stdout_fh}{IO};
+    $^STDOUT = $stdout_fh->*{IO};
     my $warnings = '';
     local $^WARN_HOOK = sub {
             $warnings .= @_[0]->description;
@@ -42,18 +42,13 @@ do {
     my $mm;
 
     $warnings = '';
-    try {
+    dies_like {
         $mm = WriteMakefile(
             NAME            => 'Big::Dummy',
             VERSION_FROM    => 'lib/Big/Dummy.pm',
             AUTHOR          => sub {},
             );
-    };
-
-    is( $warnings, <<VERIFY );
-WARNING: AUTHOR takes a string/number not a CODE reference.
-         Please inform the author.
-VERIFY
+    }, qr|AUTHOR takes a PLAINVALUE not a REF.|;
 
     # LIBS accepts *both* a string or an array ref.  The first cut of
     # our verification did not take this into account.
@@ -66,30 +61,27 @@ VERIFY
 
     # We'll get warnings about the bogus libs, that's ok.
     unlike( $warnings, qr/WARNING: .* takes/ );
-    is_deeply( $mm->{?LIBS}, \@('-lwibble -lwobble') );
+    is_deeply( $mm->{?LIBS}, @('-lwibble -lwobble') );
 
     $warnings = '';
     $mm = WriteMakefile(
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
-        LIBS            => \@('-lwibble', '-lwobble'),
+        LIBS            => @('-lwibble', '-lwobble'),
         );
 
     # We'll get warnings about the bogus libs, that's ok.
     unlike( $warnings, qr/WARNING: .* takes/ );
-    is_deeply( $mm->{?LIBS}, \@('-lwibble', '-lwobble') );
+    is_deeply( $mm->{?LIBS}, @('-lwibble', '-lwobble') );
 
     $warnings = '';
-    try {
+    dies_like {
         $mm = WriteMakefile(
             NAME            => 'Big::Dummy',
             VERSION_FROM    => 'lib/Big/Dummy.pm',
-            LIBS            => \%( wibble => "wobble" ),
+            LIBS            => %( wibble => "wobble" ),
             );
-    };
-
-    # We'll get warnings about the bogus libs, that's ok.
-    like( $warnings, qr{^WARNING: LIBS takes a ARRAY reference or string/number not a HASH reference}m );
+    }, qr{^LIBS takes a ARRAY or PLAINVALUE not a HASH}m ;
 
 
     $warnings = '';
@@ -108,13 +100,12 @@ VERIFY
 
     # Test VERSION
     $warnings = '';
-    try {
+    dies_like {
         $mm = WriteMakefile(
             NAME       => 'Big::Dummy',
             VERSION    => \@(1,2,3),
             );
-    };
-    like( $warnings, qr{^WARNING: VERSION takes a version object or string/number} );
+    }, qr{^VERSION takes a version object or PLAINVALUE} ;
 
     $warnings = '';
     try {
@@ -138,13 +129,12 @@ VERIFY
 
 
     $warnings = '';
-    try {
+    dies_like {
         $mm = WriteMakefile(
             NAME       => 'Big::Dummy',
             VERSION    => bless \%(), "Some::Class",
             );
-    };
-    like( $warnings, '/^WARNING: VERSION takes a version object or string/number not a Some::Class object/' );
+    }, qr/^VERSION takes a version object or PLAINVALUE not a REF/ ;
 
 
   SKIP: do {

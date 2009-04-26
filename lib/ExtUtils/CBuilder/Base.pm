@@ -34,13 +34,13 @@ sub find_perl_interpreter {
 sub add_to_cleanup {
     my $self = shift;
     foreach ( @_) {
-        $self->{files_to_clean}->{+$_} = 1;
+        $self->{files_to_clean}{+$_} = 1;
     }
 }
 
 sub cleanup {
     my $self = shift;
-    foreach my $file (keys %{$self->{?files_to_clean} || \%() }) {
+    foreach my $file (keys($self->{?files_to_clean} || %() )) {
         unlink $file;
     }
 }
@@ -83,10 +83,10 @@ sub compile($self, %< %args) {
     %args{+object_file} ||= $self->object_file(%args{source});
 
     my @include_dirs = $self->arg_include_dirs
-        (< @{%args{?include_dirs} || \@()},
+        (< (%args{?include_dirs} || \@())->@,
         $self->perl_inc());
 
-    my @defines = $self->arg_defines( < %{%args{?defines} || \%()} );
+    my @defines = $self->arg_defines( < (%args{?defines} || \%())->% );
 
     my @extra_compiler_flags = $self->split_like_shell(%args{?extra_compiler_flags});
     my @cccdlflags = $self->split_like_shell($cf->{cccdlflags});
@@ -196,8 +196,8 @@ sub _do_link($self, $type, %< %args) {
     my @shrp = $self->split_like_shell($cf->{shrpenv});
     my @ld = $self->split_like_shell($cf->{ld});
 
-    $self->do_system(< @shrp, < @ld, < @output, < @$objects, < @linker_flags)
-        or die "error building $out from $(join ' ',@$objects)";
+    $self->do_system(< @shrp, < @ld, < @output, < $objects->@, < @linker_flags)
+        or die "error building $out from $(join ' ',$objects->@)";
 
     return @($out, < @temp_files);
 }
@@ -211,7 +211,7 @@ sub do_system($self, @< @cmd) {
 sub split_like_shell($self, $string) {
 
     return () unless defined($string);
-    return @$string if UNIVERSAL::isa($string, 'ARRAY');
+    return $string->@ if UNIVERSAL::isa($string, 'ARRAY');
     $string =~ s/^\s+|\s+$//g;
     return () unless length($string);
 

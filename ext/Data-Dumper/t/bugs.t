@@ -9,7 +9,7 @@ use Data::Dumper;
 do {
     sub iterate_hash($h) {
         my $count = 0;
-        $count++ while each %$h;
+        $count++ while each $h->%;
         return $count;
     }
 };

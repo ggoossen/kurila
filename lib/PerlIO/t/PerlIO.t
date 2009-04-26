@@ -79,7 +79,7 @@ do {
     # test magic temp file over STDOUT
     open my $oldout, ">&", $^STDOUT or die "cannot dup STDOUT: $^OS_ERROR";
     my $status = open($^STDOUT,"+<",undef);
-    open $^STDOUT, ">&",  \*$oldout or die "cannot dup OLDOUT: $^OS_ERROR";
+    open $^STDOUT, ">&",  \$oldout->* or die "cannot dup OLDOUT: $^OS_ERROR";
     # report after STDOUT is restored
     ok($status, '       re-open STDOUT');
     close $oldout;
@@ -104,7 +104,7 @@ do {
         my $status = open($^STDOUT,">",\$var);
         my $error = "$^OS_ERROR" unless $status; # remember the error
         close $^STDOUT unless $status;
-        open $^STDOUT, ">&",  \*$oldout or die "cannot dup OLDOUT: $^OS_ERROR";
+        open $^STDOUT, ">&",  \$oldout->* or die "cannot dup OLDOUT: $^OS_ERROR";
         print $^STDOUT, "# $error\n" unless $status;
         # report after STDOUT is restored
         ok($status, '       open STDOUT into in-memory var');
@@ -113,7 +113,7 @@ do {
         open my $olderr, ">&", $^STDERR or die "cannot dup STDERR: $^OS_ERROR";
         #close STDERR;
         ok( open($^STDERR,">",\$var), '       open STDERR into in-memory var');
-        open $^STDERR, ">&",  \*$olderr or die "cannot dup OLDERR: $^OS_ERROR";
+        open $^STDERR, ">&",  \$olderr->* or die "cannot dup OLDERR: $^OS_ERROR";
     };
 };
 

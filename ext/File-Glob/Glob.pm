@@ -137,7 +137,7 @@ sub csh_glob {
     }
 
     # chuck it all out, quick or slow
-    return @{delete %entries{$cxix}};
+    return (delete %entries{$cxix})->@;
 }
 
 1;

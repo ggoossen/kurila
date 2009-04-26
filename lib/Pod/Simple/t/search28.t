@@ -72,7 +72,7 @@ $p =~ s/^/#  /mg;
 print $^STDOUT, $p;
 
 do {
-    my $names = join "|", sort values %$where2name;
+    my $names = join "|", sort values $where2name->%;
     is $names, "Zonk::Pronk|perlzuk|zikzik";
 };
 

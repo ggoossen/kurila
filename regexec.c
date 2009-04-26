@@ -1465,6 +1465,7 @@ Perl_regexec_flags(pTHX_ REGEXP * const rx, char *stringarg, register char *stre
 	Perl_croak(aTHX_ "NULL regexp parameter");
 	return 0;
     }
+    assert(*strend == '\0');
 
     multiline = prog->extflags & RXf_PMf_MULTILINE;
     reginfo.prog = rx;	 /* Yes, sorry that this is confusing.  */

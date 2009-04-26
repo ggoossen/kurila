@@ -21,7 +21,7 @@ our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $GunzipError);
 @ISA = qw( IO::Uncompress::RawInflate Exporter );
 @EXPORT_OK = qw( $GunzipError gunzip );
 %EXPORT_TAGS = %( < %IO::Uncompress::RawInflate::DEFLATE_CONSTANTS ) ;
-push @{ %EXPORT_TAGS{+all} }, < @EXPORT_OK ;
+push  %EXPORT_TAGS{+all}->@, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');
 
 $GunzipError = '';
@@ -559,7 +559,6 @@ C<InputLength> option.
 To read the contents of the file C<file1.txt.gz> and write the
 compressed data to the file C<file1.txt>.
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::Gunzip qw(gunzip $GunzipError) ;
 
@@ -572,7 +571,6 @@ compressed data to the file C<file1.txt>.
 To read from an existing Perl filehandle, C<$input>, and write the
 uncompressed data to a buffer, C<$buffer>.
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::Gunzip qw(gunzip $GunzipError) ;
     use IO::File ;
@@ -585,7 +583,6 @@ uncompressed data to a buffer, C<$buffer>.
 
 To uncompress all files in the directory "/my/home" that match "*.txt.gz" and store the compressed data in the same directory
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::Gunzip qw(gunzip $GunzipError) ;
 
@@ -594,7 +591,6 @@ To uncompress all files in the directory "/my/home" that match "*.txt.gz" and st
 
 and if you want to compress each file one at a time, this will do the trick
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::Gunzip qw(gunzip $GunzipError) ;
 

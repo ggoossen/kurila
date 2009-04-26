@@ -54,7 +54,7 @@ sub mask {
             $self->[2]->{+$io}      = $io;   # remember handle
         } else {
             delete $self->[0]->{$fd}->{$io};
-            unless(%{$self->[0]->{?$fd}}) {
+            unless($self->[0]->{?$fd}->%) {
                 # We no longer have any handles for this FD
                 delete $self->[1]->{$fd};
                 delete $self->[0]->{$fd};
@@ -75,9 +75,9 @@ sub poll($self,$timeout) {
     my($fd,$mask,$iom);
     my @poll = @( () );
 
-    while(@(?$fd,?$iom) =@( each %{$self->[0]})) {
+    while(@(?$fd,?$iom) =@( each $self->[0]->%)) {
         $mask   = 0;
-        $mask  ^|^= $_ for values(%$iom);
+        $mask  ^|^= $_ for values($iom->%);
         push(@poll,$fd => $mask);
     }
 
@@ -112,14 +112,14 @@ sub remove {
 
 sub handles {
     my $self = shift;
-    return values %{$self->[2]} unless (nelems @_);
+    return values $self->[2]->% unless (nelems @_);
 
     my $events = shift || 0;
     my($fd,$ev,$io,$mask);
     my @handles = @( () );
 
-    while(@($fd,$ev) =@( each %{$self->[1]})) {
-        while (@($io,$mask) =@( each %{$self->[0]->{$fd}})) {
+    while(@($fd,$ev) =@( each $self->[1]->%)) {
+        while (@($io,$mask) =@( each $self->[0]->{$fd}->%)) {
             $mask ^|^= POLLHUP^|^POLLERR^|^POLLNVAL;  # must allow these
             push @handles,$self->[2]->{?$io} if ($ev ^&^ $mask) ^&^ $events;
         }

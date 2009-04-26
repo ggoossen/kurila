@@ -49,7 +49,7 @@ ok( 0, 'damnit' );
 
 
 END {
-    My::Test::ok($$out eq <<OUT);
+    My::Test::ok($out->$ eq <<OUT);
 1..5
 ok 1 - passing
 ok 2 - passing still
@@ -58,7 +58,7 @@ not ok 4 - oh no!
 not ok 5 - damnit
 OUT
 
-    My::Test::ok($$err eq <<ERR);
+    My::Test::ok($err->$ eq <<ERR);
 #   Failed test 'oh no!'
 #   at $^PROGRAM_NAME line 38.
 #   Failed test 'damnit'

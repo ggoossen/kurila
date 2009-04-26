@@ -31,7 +31,7 @@ my %gen = %(
 sub do_cksum {
     my $pl = shift;
     my %cksum;
-    for my $f ( @{ %gen{$pl} }) {
+    for my $f (  %gen{$pl}->@) {
         my $fh;
         if (open($fh, "<", $f)) {
             local $^INPUT_RECORD_SEPARATOR;
@@ -53,7 +53,7 @@ foreach my $pl (qw (keywords.pl opcode.pl embed.pl
     next if $pl eq 'warnings.pl'; # the files were removed
     my %cksum1 = %( < do_cksum($pl) );
     my @chg;
-    for my $f ( @{ %gen{$pl} }) {
+    for my $f (  %gen{$pl}->@) {
         push(@chg, $f)
             if !defined(%cksum0{?$f}) ||
             !defined(%cksum1{?$f}) ||

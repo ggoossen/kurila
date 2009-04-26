@@ -160,11 +160,11 @@ If an argument has been given, it is pushed on the list of items.
 # The individual =items of this list
 sub item($self, ?$item) {
     if(defined $item) {
-        push(@{$self->{_items}}, $item);
+        push($self->{_items}->@, $item);
         return $item;
     }
     else {
-        return @{$self->{_items}};
+        return $self->{_items}->@;
     }
 }
 
@@ -241,7 +241,7 @@ sub new {
     if(defined @_[0]) {
         if(ref(@_[0])) {
             # called with a list of parameters
-            %$self = %( < %{@_[0]} );
+            $self->% = %( < @_[0]->% );
             $self->_construct_text();
         }
         else {
@@ -487,10 +487,10 @@ parsing process.
 sub warning {
     my $self = shift;
     if((nelems @_)) {
-        push(@{$self->{_warnings}}, < @_);
+        push($self->{_warnings}->@, < @_);
         return @_;
     }
-    return @{$self->{?_warnings}};
+    return $self->{?_warnings}->@;
 }
 
 =item $link-E<gt>file()
@@ -651,11 +651,11 @@ list of all cache elements.
 sub item($self,%< %param) {
     if(%param) {
         my $item = Pod::Cache::Item->new(< %param);
-        push(@$self, $item);
+        push($self->@, $item);
         return $item;
     }
     else {
-        return @{$self};
+        return $self->@;
     }
 }
 
@@ -670,7 +670,7 @@ not found.
 =cut
 
 sub find_page($self,$page) {
-    foreach( @$self) {
+    foreach( $self->@) {
         if($_->page() eq $page) {
             return $_;
         }
@@ -770,11 +770,11 @@ unique id for the C<find_node> method to work correctly.
 # The POD nodes
 sub nodes($self,@< @nodes) {
     if((nelems @nodes)) {
-        push(@{$self->{nodes}}, < @nodes);
+        push($self->{nodes}->@, < @nodes);
         return @nodes;
     }
     else {
-        return @{$self->{?nodes}};
+        return $self->{?nodes}->@;
     }
 }
 
@@ -788,8 +788,8 @@ stored in the node array) or undef if not found.
 
 sub find_node($self,$node) {
     my @search;
-    push(@search, < @{$self->{?nodes}}) if($self->{?nodes});
-    push(@search, < @{$self->{?idx}}) if($self->{?idx});
+    push(@search, < $self->{?nodes}->@) if($self->{?nodes});
+    push(@search, < $self->{?idx}->@) if($self->{?idx});
     foreach( @search) {
         if($_->[0] eq $node) {
             return $_->[1]; # id
@@ -814,11 +814,11 @@ unique id.
 # The POD index entries
 sub idx($self,@< @idx) {
     if((nelems @idx)) {
-        push(@{$self->{idx}}, < @idx);
+        push($self->{idx}->@, < @idx);
         return @idx;
     }
     else {
-        return @{$self->{?idx}};
+        return $self->{?idx}->@;
     }
 }
 

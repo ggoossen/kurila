@@ -45,32 +45,32 @@ ok($foo->store('store'));
 ok(open(my $outfh, ">>", 'store'));
 binmode $outfh;
 
-ok(defined store_fd(\@a, \*$outfh));
-ok(defined nstore_fd($foo, \*$outfh));
-ok(defined nstore_fd(\%a, \*$outfh));
+ok(defined store_fd(\@a, \$outfh->*));
+ok(defined nstore_fd($foo, \$outfh->*));
+ok(defined nstore_fd(\%a, \$outfh->*));
 
 ok(close($outfh));
 
 ok(open($outfh, "<", 'store'));
 binmode $outfh;
 
-my $r = fd_retrieve(\*$outfh);
+my $r = fd_retrieve(\$outfh->*);
 ok(defined $r);
 is_deeply($foo, $r);
 
-$r = fd_retrieve(\*$outfh);
+$r = fd_retrieve(\$outfh->*);
 ok(defined $r);
 is_deeply(\@a, $r);
 
-$r = fd_retrieve(\*$outfh);
+$r = fd_retrieve(\$outfh->*);
 ok(defined $r);
 is_deeply($foo, $r);
 
-$r = fd_retrieve(\*$outfh);
+$r = fd_retrieve(\$outfh->*);
 ok(defined $r);
 is_deeply(\%a, $r);
 
-try { $r = fd_retrieve(\*$outfh); };
+try { $r = fd_retrieve(\$outfh->*); };
 ok($^EVAL_ERROR);
 
 close $outfh or die "Could not close: $^OS_ERROR";

@@ -48,13 +48,13 @@ sub new {
 
 sub id {
     my $self = shift;
-    $$self;
+    $self->$;
 }
 
 sub stat {
     my $self = shift;
     my $data = "";
-    msgctl($$self,IPC_STAT,$data) or
+    msgctl($self->$,IPC_STAT,$data) or
         return undef;
     IPC::Msg::stat->new->unpack($data);
 }
@@ -76,19 +76,19 @@ sub set {
             while(@($key,$val) =@( each %arg));
     }
 
-    msgctl($$self,IPC_SET,$ds->pack);
+    msgctl($self->$,IPC_SET,$ds->pack);
 }
 
 sub remove {
     my $self = shift;
-    @(msgctl($$self,IPC_RMID,0), undef $$self)[0];
+    @(msgctl($self->$,IPC_RMID,0), undef $self->$)[0];
 }
 
 sub rcv {
     (nelems @_) +<= 5 && (nelems @_) +>= 3 or croak '$msg->rcv( BUF, LEN, TYPE, FLAGS )';
     my $self = shift;
     my $buf = "";
-    msgrcv($$self,$buf,@_[1],@_[2] || 0, @_[3] || 0) or
+    msgrcv($self->$,$buf,@_[1],@_[2] || 0, @_[3] || 0) or
         return;
     my $type;
     @($type,@_[0]) = @: unpack("l! a*",$buf);
@@ -98,7 +98,7 @@ sub rcv {
 sub snd {
     (nelems @_) +<= 4 && (nelems @_) +>= 3 or  croak '$msg->snd( TYPE, BUF, FLAGS )';
     my $self = shift;
-    msgsnd($$self,pack("l! a*",@_[0],@_[1]), @_[2] || 0);
+    msgsnd($self->$,pack("l! a*",@_[0],@_[1]), @_[2] || 0);
 }
 
 

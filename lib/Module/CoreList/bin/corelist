@@ -107,7 +107,7 @@ if(exists %Opts{v} ){
     if ( !nelems @ARGV ) {
         print $^STDOUT, "\nThe following modules were in perl v%Opts{?v} CORE\n";
         print $^STDOUT, "$_ ", $version_hash->{?$_} || " ","\n"
-            for sort keys %$version_hash;
+            for sort keys $version_hash->%;
         print $^STDOUT, "\n";
         exit 0;
     }

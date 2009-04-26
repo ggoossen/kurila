@@ -31,7 +31,7 @@ sub _handle_element_start {
     my $fh = @_[0]->{?'output_fh'};
     DEBUG and print $^STDOUT, "++ @_[1]\n";
     print $fh, "<", @_[1];
-    foreach my $key (sort keys %{@_[2]}) {
+    foreach my $key (sort keys @_[2]->%) {
         unless($key =~ m/^~/s) {
             next if $key eq 'start_line' and @_[0]->{?'hide_line_numbers'};
             my $value = @_[2]->{?$key};

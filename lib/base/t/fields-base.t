@@ -127,9 +127,9 @@ my %EXPECT = %(
     );
 
 while(my@(?$class, ?$efields) =@( each %EXPECT)) {
-    my %fields = %( < %{*{Symbol::fetch_glob($class.'::FIELDS')}} );
+    my %fields = %( < Symbol::fetch_glob($class.'::FIELDS')->*->% );
     my %expected_fields;
-    foreach my $idx (1..nelems @$efields) {
+    foreach my $idx (1..nelems $efields->@) {
         my $key = $efields->[$idx-1];
         next unless $key;
         %expected_fields{+$key} = $idx;
@@ -150,11 +150,11 @@ $obj2->{+b1} = "D3";
 
     # Slices
 
-    %$obj1{[@("_b1", "b1")]} = @(17, 29);
+    $obj1->%{[@("_b1", "b1")]} = @(17, 29);
 is( $obj1->{?_b1}, 17 );
 is( $obj1->{?b1},  29 );
 
-    %$obj1{[@('_b1', 'b1')]} = @(44,28);
+    $obj1->%{[@('_b1', 'b1')]} = @(44,28);
 is( $obj1->{?_b1}, 44 );
 is( $obj1->{?b1},  28 );
 

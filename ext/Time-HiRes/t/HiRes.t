@@ -86,7 +86,7 @@ if ($have_fork) {
 my $xdefine = ''; 
 
 if (open(my $fh, "<", "xdefine")) {
-    chomp($xdefine = ~< *$fh);
+    chomp($xdefine = ~< $fh->*);
     close($fh);
 }
 
@@ -588,7 +588,7 @@ if ($have_ualarm) {
                  \@(35, 1_100_000),
                  \@(36, 2_200_000),
                  \@(37, 4_300_000))) {
-        my @($i, $n) = @$t;
+        my @($i, $n) = $t->@;
         my $alarmed = 0;
         local signals::handler("ALRM") = sub { $alarmed++ };
         my $t0 = Time::HiRes::time();
@@ -625,7 +625,7 @@ if ($^OS_NAME =~ m/^(cygwin|MSWin)/) {
         push @mtime, @stat[?9];
         Time::HiRes::sleep(rand(0.1) + 0.1);
         open($x, "<", "$^PID");
-        ~< *$x;
+        ~< $x->*;
         close($x);
         @stat = @( Time::HiRes::stat($^PID) );
         push @atime, @stat[?8];

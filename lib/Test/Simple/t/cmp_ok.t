@@ -31,8 +31,8 @@ sub try_cmp_ok($left, $cmp, $right) {
     my $ok = cmp_ok($left, $cmp, $right);
     $TB->is_num( ! ! $ok, ! ! %expect{ok});
 
-    my $diag = $$err;
-    $$err = "";
+    my $diag = $err->$;
+    $err->$ = "";
     if( !$ok and %expect{?error} ) {
         $diag =~ s/^# //mg;
         $TB->like( $diag, "/\Q%expect{?error}\E/" );
@@ -78,5 +78,5 @@ plan tests => scalar nelems @Tests;
 $TB->plan(tests => (nelems @Tests) * 2);
 
 for my $test ( @Tests) {
-    try_cmp_ok(< @$test);
+    try_cmp_ok(< $test->@);
 }

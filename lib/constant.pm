@@ -39,7 +39,7 @@ sub import {
         $constants->{+shift(@_)} = undef;
     }
 
-    foreach my $name ( keys %$constants ) {
+    foreach my $name ( keys $constants->% ) {
         unless (defined $name) {
             die("Can't use undef as constant name");
         }
@@ -87,12 +87,12 @@ sub import {
             %declared{+$full_name}++;
             if ($multiple || (nelems @_) == 1) {
                 my $scalar = $multiple ?? $constants->{?$name} !! @_[0];
-                *{Symbol::fetch_glob($full_name)} = sub () { $scalar };
+                Symbol::fetch_glob($full_name)->* = sub () { $scalar };
             } elsif ((nelems @_)) {
                 my @list = @_;
-                *{Symbol::fetch_glob($full_name)} = sub () { @list };
+                Symbol::fetch_glob($full_name)->* = sub () { @list };
             } else {
-                *{Symbol::fetch_glob($full_name)} = sub () { };
+                Symbol::fetch_glob($full_name)->* = sub () { };
             }
         };
     }

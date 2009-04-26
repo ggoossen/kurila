@@ -21,7 +21,7 @@ my @test = @(
     );
 
 foreach my $test (@test) {
-    my@($type,$what, $n) =  @$test;
+    my@($type,$what, $n) =  $test->@;
 
     is( reftype($what), $type, $n);
     next unless ref($what);

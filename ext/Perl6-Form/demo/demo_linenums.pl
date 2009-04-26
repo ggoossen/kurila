@@ -3,9 +3,9 @@ use Perl6::Form;
 my $linenum = 1;
 sub numerate($lines, $fill, $opts) {
     my $body = form '{]]]]} {"""{*}"""}',
-                 \$linenum..$linenum+nelems @$lines-1, $lines,
-                 < @$fill;
-    $linenum += nelems @$lines;
+                 \$linenum..$linenum+nelems $lines->@-1, $lines,
+                 < $fill->@;
+    $linenum += nelems $lines->@;
     return $body;
 }
 

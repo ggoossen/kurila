@@ -239,7 +239,7 @@ is( $ei->validate('yesmod'), 'validated',
     'validate() should return results of packlist validate() call' );
 
 # packlist
-is( ${ $ei->packlist('yesmod') }, 102,
+is(  $ei->packlist('yesmod')->$, 102,
     'packlist() should report installed mod packlist' );
 
 # version

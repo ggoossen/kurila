@@ -47,7 +47,7 @@ sub open {
     # a dir name should always have a ":" in it; assume dirname is
     # in current directory
     $dirname = ':' .  $dirname if ( ($^OS_NAME eq 'MacOS') && ($dirname !~ m/:/) );
-    %{*$dh}{+io_dir_path} = $dirname;
+    $dh->*->{+io_dir_path} = $dirname;
     1;
 }
 

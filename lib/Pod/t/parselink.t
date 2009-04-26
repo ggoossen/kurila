@@ -105,7 +105,7 @@ my @names = qw(text inferred name section type);
 
 my $n = 2;
 for ( @TESTS) {
-    my @expected = @$_;
+    my @expected = $_->@;
     my $link = shift @expected;
     my @results = parselink ($link);
     my $okay = 1;

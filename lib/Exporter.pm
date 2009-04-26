@@ -15,21 +15,21 @@ sub import {
     my $callpkg = caller($ExportLevel);
 
     if ($pkg eq "Exporter" and nelems @_ and @_[0] eq "import") {
-        *{Symbol::fetch_glob($callpkg."::import")} = \&import;
+        Symbol::fetch_glob($callpkg."::import")->* = \&import;
         return;
     }
 
     # We *need* to treat @{"$pkg\::EXPORT_FAIL"} since Carp uses it :-(
-    my @($exports, $fail) = @(\@{*{Symbol::fetch_glob("$pkg\::EXPORT")}},
-                            \@{*{Symbol::fetch_glob("$pkg\::EXPORT_FAIL")}});
+    my @($exports, $fail) = @(\Symbol::fetch_glob("$pkg\::EXPORT")->*->@,
+                            \Symbol::fetch_glob("$pkg\::EXPORT_FAIL")->*->@);
     return export $pkg, $callpkg, < @_
-        if $Verbose or $Debug or (nelems @$fail) +> 1;
+        if $Verbose or $Debug or (nelems $fail->@) +> 1;
     my $export_cache = (%Cache{+$pkg} ||= \%());
-    my $args = (nelems @_) or @_ = @$exports;
+    my $args = (nelems @_) or @_ = $exports->@;
 
     local $_ = undef;
-    if ($args and not %$export_cache) {
-        foreach (@$exports +@+  @{*{Symbol::fetch_glob("$pkg\::EXPORT_OK")}}) {
+    if ($args and not $export_cache->%) {
+        foreach ($exports->@ +@+  Symbol::fetch_glob("$pkg\::EXPORT_OK")->*->@) {
             s/^&//;
             $export_cache->{+$_} = 1;
         }
@@ -40,7 +40,7 @@ sub import {
     if ($args or $fail) {
         for (@_) {
             ($heavy = (m/\W/ or $args and not exists $export_cache->{$_}
-                     or (nelems @$fail) and $_ eq $fail->[0])) and last;
+                     or (nelems $fail->@) and $_ eq $fail->[0])) and last;
         }
     } else {
         ($heavy = m/\W/) and last
@@ -48,7 +48,7 @@ sub import {
     }
     return export $pkg, $callpkg, ($args ?? < @_ !! ()) if $heavy;
     # shortcut for the common case of no type character
-    *{Symbol::fetch_glob("$callpkg\::$_")} = \&{*{Symbol::fetch_glob("$pkg\::$_")}} foreach  @_;
+    Symbol::fetch_glob("$callpkg\::$_")->* = \&{Symbol::fetch_glob("$pkg\::$_")->*} foreach  @_;
 }
 
 # Default methods

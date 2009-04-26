@@ -342,10 +342,10 @@ ERR
 
     unless( $test ) {
         $out .= "not ";
-            %$result{[@('ok', 'actual_ok') ]} = @( ( $todo ?? 1 !! 0 ), 0 );
+            $result->%{[@('ok', 'actual_ok') ]} = @( ( $todo ?? 1 !! 0 ), 0 );
     }
     else { 
-            %$result{[@('ok', 'actual_ok') ]} = @( 1, $test );
+            $result->%{[@('ok', 'actual_ok') ]} = @( 1, $test );
     }
 
     $out .= "ok";
@@ -1016,7 +1016,7 @@ foreach my $attribute (qw(No_Header No_Ending No_Diag)) {
             return $self->{?$attribute};
         };
 
-    *{Symbol::fetch_glob(__PACKAGE__.'::'.$method)} = $code;
+    Symbol::fetch_glob(__PACKAGE__.'::'.$method)->* = $code;
 }
 
 
@@ -1330,8 +1330,8 @@ sub current_test($self ?= $num) {
 
         # If the test counter is being pushed forward fill in the details.
         my $test_results = $self->{?Test_Results};
-        if( $num +> nelems @$test_results ) {
-            my $start = (nelems @$test_results) ?? (nelems @$test_results) !! 0;
+        if( $num +> nelems $test_results->@ ) {
+            my $start = (nelems $test_results->@) ?? (nelems $test_results->@) !! 0;
             for ($start..$num-1) {
                 $test_results->[+$_] = &share(\%(
                                                   'ok'      => 1, 
@@ -1343,8 +1343,8 @@ sub current_test($self ?= $num) {
             }
         }
         # If backward, wipe history.  Its their funeral.
-        elsif( $num +< nelems @$test_results ) {
-            splice @{$test_results}, $num;
+        elsif( $num +< nelems $test_results->@ ) {
+            splice $test_results->@, $num;
         }
     }
     return $self->{?Curr_Test};
@@ -1365,7 +1365,7 @@ Of course, test #1 is $tests[0], etc...
 sub summary {
     my@($self) =@( shift);
 
-    return map { $_->{?'ok'} }, @{ $self->{Test_Results} };
+    return map { $_->{?'ok'} },  $self->{Test_Results}->@;
 }
 
 =item B<details>
@@ -1419,7 +1419,7 @@ result in this structure:
 
 sub details {
     my $self = shift;
-    return @{ $self->{?Test_Results} };
+    return  $self->{?Test_Results}->@;
 }
 
 =item B<todo>
@@ -1450,7 +1450,7 @@ sub todo($self, ?$package) {
     $package = $package || $self->caller(1)[?0] || $self->exported_to;
     return 0 unless $package;
 
-    return defined ${*{Symbol::fetch_glob($package.'::TODO')}} ?? ${*{Symbol::fetch_glob($package.'::TODO')}}
+    return defined Symbol::fetch_glob($package.'::TODO')->*->$ ?? Symbol::fetch_glob($package.'::TODO')->*->$
         !! 0;
 }
 
@@ -1498,7 +1498,7 @@ sub _sanity_check {
     $self->_whoa($self->{?Curr_Test} +< 0,  'Says here you ran a negative number of tests!');
     $self->_whoa((!$self->{?Have_Plan} and $self->{?Curr_Test}),
         'Somehow your tests ran without a plan!');
-    $self->_whoa($self->{?Curr_Test} != nelems @{ $self->{?Test_Results} },
+    $self->_whoa($self->{?Curr_Test} != nelems  $self->{?Test_Results}->@,
         'Somehow you got a different number of results than tests ran!');
 }
 
@@ -1571,7 +1571,7 @@ sub _ending {
 
     # Figure out if we passed or failed and print helpful messages.
     my $test_results = $self->{?Test_Results};
-    if( (nelems @$test_results) ) {
+    if( (nelems $test_results->@) ) {
         # The plan?  We have no plan.
         if( $self->{?No_Plan} ) {
             $self->_print("1..$self->{?Curr_Test}\n") unless $self->no_header;
@@ -1588,7 +1588,7 @@ sub _ending {
         }
 
         my $num_failed = nelems( grep { !$_->{?'ok'} },
-            @{$test_results}[[0..$self->{?Curr_Test}-1]] );
+            $test_results->[[0..$self->{?Curr_Test}-1]] );
 
         my $num_extra = $self->{?Curr_Test} - $self->{?Expected_Tests};
 

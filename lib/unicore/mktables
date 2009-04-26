@@ -344,7 +344,7 @@ sub New_Prop($Type, $Name, $Table, %< %Args)
         %TableInfo{+$Type}->{+$Name} = $Table;
         %TableDesc{+$Type}->{+$Name} = $Desc;
         if ($Fuzzy) {
-            %FuzzyNames{+$Type}->{+$Name} = $Name;
+            %FuzzyNames{+$Type}{+$Name} = $Name;
         }
     }
 }
@@ -709,9 +709,9 @@ sub New_Alias($Type, $Alias, $SameAs, $Name, %< %Args)
     if (%TableInfo{?$Alias}) {
         die "$^PROGRAM_NAME: already have original $Type => $Alias; can't make alias";
     }
-    %AliasInfo{+$Type}->{+$Name} = $Alias;
+    %AliasInfo{+$Type}{+$Name} = $Alias;
     if ($Fuzzy) {
-        %FuzzyNames{+$Type}->{+$Alias} = $Name;
+        %FuzzyNames{+$Type}{+$Alias} = $Name;
     }
 
 }
@@ -1096,7 +1096,7 @@ sub UnicodeData_Txt()
             # Should I really jump through typeglob hoops just to avoid a
             # symbolic reference? (%{"utf8::$name})
             push @PVA, "\n", "\%utf8::$name = \%(\n", <
-                simple_dumper (< %{%utf8::{$name}}), ");\n";
+                simple_dumper (< %utf8::{$name}->%), ");\n";
         }
         push @PVA, "1;\n";
         WriteIfChanged("PVA.pl", @PVA);
@@ -1111,8 +1111,8 @@ sub UnicodeData_Txt()
     }
 
     $Comb->Write("CombiningClass.pl");
-    for (keys %{ %PropValueAlias{?ccc} }) {
-        my @($code, $name) =  @{ %PropValueAlias{ccc}->{?$_} };
+    for (keys  %PropValueAlias{?ccc}->%) {
+        my @($code, $name) =   %PropValueAlias{ccc}->{?$_}->@;
         (my $c = Table->New())->Append($code);
             $c->Write(
             \@("lib","ccc","$_.pl"),
@@ -1142,7 +1142,7 @@ sub UnicodeData_Txt()
         %To{?$to}->Write(\@("To","$to.pl"));
     }
 
-    for (keys %{ %PropValueAlias{?gc} }) {
+    for (keys  %PropValueAlias{?gc}->%) {
         New_Alias(Is => %PropValueAlias{gc}->{?$_}, SameAs => $_, Fuzzy => 1);
     }
 }
@@ -1739,11 +1739,11 @@ sub WriteAllMappings()
     {
         my %RawNameToFile; ## a per-$Type cache
 
-        for my $Name (sort {length $a <+> length $b}, keys %{%TableInfo{?$Type}})
+        for my $Name (sort {length $a <+> length $b}, keys %TableInfo{?$Type}->%)
         {
             ## Note: $Name is already canonical
             my $Table   = %TableInfo{$Type}->{?$Name};
-            my $IsFuzzy = %FuzzyNames{$Type}->{?$Name};
+            my $IsFuzzy = %FuzzyNames{$Type}{?$Name};
 
             ## Need an 8.3 safe filename (which means "an 8 safe" $filename)
             my $filename;
@@ -1790,10 +1790,12 @@ sub WriteAllMappings()
                 my $Desc = %TableDesc{$Type}->{?$Name} || "";
                 ## get list of names this table is reference by
                 my @Supported = @( $Name );
-                while (my @(?$Orig, ?$Alias) = @( each %{ %AliasInfo{?$Type} || \%() }))
-                {
-                    if ($Orig eq $Name) {
-                        push @Supported, $Alias;
+                if (%AliasInfo{?$Type}) {
+                    while (my @(?$Orig, ?$Alias) = @( each( %AliasInfo{$Type} )))
+                      {
+                        if ($Orig eq $Name) {
+                            push @Supported, $Alias;
+                        }
                     }
                 }
 
@@ -1803,7 +1805,7 @@ sub WriteAllMappings()
                 $Comment = "This file supports:\n";
                 for my $N ( @Supported)
                 {
-                    my $IsFuzzy = %FuzzyNames{$Type}->{?$N};
+                    my $IsFuzzy = %FuzzyNames{$Type}{?$N};
                     my $Prop    = "\\p\{$TypeToShow$Name\}";
                     $OrigProp = $Prop if not $OrigProp; #cache for aliases
                     if ($IsFuzzy) {
@@ -1842,10 +1844,10 @@ sub WriteAllMappings()
         }
 
         ## Register aliase info
-        for my $Name (sort {length $a <+> length $b}, keys %{%AliasInfo{?$Type} || \%()})
+        for my $Name (sort {length $a <+> length $b}, keys(%AliasInfo{?$Type} || %()))
         {
-            my $Alias    = %AliasInfo{$Type}->{?$Name};
-            my $IsFuzzy  = %FuzzyNames{$Type}->{?$Alias};
+            my $Alias    = %AliasInfo{$Type}{?$Name};
+            my $IsFuzzy  = %FuzzyNames{$Type}{?$Alias};
             my $filename = %RawNameToFile{?$Name};
             die "oops [$Alias]->[$Name]" if not $filename;
             RegisterFileForName($Type => $Alias, $IsFuzzy, $filename);
@@ -1965,11 +1967,11 @@ sub SpecialCasing_txt()
         # Wait until all the special cases have been read since
         # they are not listed in numeric order.
         my $ix = hex($code);
-        push @{%CaseInfo{+Lower}}, \@( $ix, $code, $lower )
+        push %CaseInfo{+Lower}->@, \@( $ix, $code, $lower )
             unless $code eq $lower;
-        push @{%CaseInfo{+Title}}, \@( $ix, $code, $title )
+        push %CaseInfo{+Title}->@, \@( $ix, $code, $title )
             unless $code eq $title;
-        push @{%CaseInfo{+Upper}}, \@( $ix, $code, $upper )
+        push %CaseInfo{+Upper}->@, \@( $ix, $code, $upper )
             unless $code eq $upper;
     }
     close $in;
@@ -1988,7 +1990,7 @@ sub SpecialCasing_txt()
       "\%utf8::ToSpec$case =\n\%(\n",
             );
 
-        for my $prop (sort { $a->[0] <+> $b->[0] }, @{%CaseInfo{?$case}}) {
+        for my $prop (sort { $a->[0] <+> $b->[0] }, %CaseInfo{?$case}->@) {
             my @($ix, $code, $to) =  @$prop;
             my $tostr =
                 join "", map { sprintf "\\x\{\%s\}", $_ }, split ' ', $to;

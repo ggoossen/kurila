@@ -394,7 +394,7 @@ sub getCmdLine {	# import assistant
             my $tval;  # temp
             if (grep { s/$opt=(\w+)/$($tval=$1)/ }, @ARGV) {
                 # check val before accepting
-                my @allowed = @{%gOpts{?$opt}};
+                my @allowed = %gOpts{?$opt}->@;
                 if (grep { $_ eq $tval }, @allowed) {
                     %gOpts{+$opt} = $tval;
                 }
@@ -402,7 +402,7 @@ sub getCmdLine {	# import assistant
             }
 
             # take 1st val as default
-            %gOpts{+$opt} = @{%gOpts{?$opt}}[0]
+            %gOpts{+$opt} = %gOpts{?$opt}->[0]
             if ref %gOpts{?$opt} eq 'ARRAY';
         }
         else { # handle scalars
@@ -439,7 +439,7 @@ sub checkOptree {
 
         local $Level = $Level + 2;
       TODO:
-        foreach my $want ( @{%modes{%gOpts{?testmode}}}) {
+        foreach my $want ( %modes{%gOpts{?testmode}}->@) {
             local $TODO = $tc->{?todo} if $tc->{?todo};
 
             $tc->{+cross} = %msgs{?"$want-$thrstat"};
@@ -471,7 +471,7 @@ sub newTestCases {
         }
         elsif (ref $tc->{?errs} eq 'ARRAY') {
             my %errs;
-                %errs{[ @{$tc->{?errs}}]} = @(1) x nelems @{$tc->{?errs}};
+                %errs{[ $tc->{?errs}->@]} = @(1) x nelems $tc->{?errs}->@;
             $tc->{+errs} = \%errs;
         }
         elsif (ref $tc->{?errs} eq 'Regexp') {
@@ -485,7 +485,7 @@ sub label($tc) {
     return $tc->{?name} if $tc->{?name};
 
     my $buf = (ref $tc->{?bcopts}) 
-        ?? join(',', @{$tc->{?bcopts}}) !! $tc->{?bcopts};
+        ?? join(',', $tc->{?bcopts}->@) !! $tc->{?bcopts};
 
     foreach (qw( note prog code )) {
         $buf .= " $_: $tc->{?$_}" if $tc->{?$_} and not ref $tc->{?$_};
@@ -567,7 +567,7 @@ sub get_bcopts {
     my @opts = @( () );
     if ($tc->{?bcopts}) {
         @opts = @( (ref $tc->{?bcopts} eq 'ARRAY')
-            ?? < @{$tc->{?bcopts}} !! ($tc->{?bcopts}) );
+            ?? < $tc->{?bcopts}->@ !! ($tc->{?bcopts}) );
     }
     return @opts;
 }
@@ -579,9 +579,9 @@ sub checkErrs {
     # check for agreement, by hash (order less important)
     my (%goterrs, @got);
     $tc->{+goterrs} ||= \@();
-        %goterrs{[ @{$tc->{?goterrs}}]} = @(1) x nelems @{$tc->{?goterrs}};
+        %goterrs{[ $tc->{?goterrs}->@]} = @(1) x nelems $tc->{?goterrs}->@;
 
-    foreach my $k (keys %{$tc->{+errs} ||= \%()}) {
+    foreach my $k (keys(($tc->{+errs} ||= \%())->%)) {
         if (@got = grep { m/^$k$/ }, keys %goterrs) {
             delete $tc->{errs}->{$k};
             delete %goterrs{$_} foreach  @got;
@@ -590,7 +590,7 @@ sub checkErrs {
     $tc->{+goterrs} = \%goterrs;
 
     # relook at altered
-    if (%{$tc->{?errs}} or %{$tc->{+goterrs} ||= \%()}) {
+    if ($tc->{?errs}->% or ($tc->{+goterrs} ||= \%())->%) {
         $tc->diag_or_fail();
     }
     fail("FORCED: $tc->{?name}:\n") if %gOpts{?fail}; # silly ?
@@ -601,8 +601,8 @@ sub diag_or_fail {
     my $tc = shift;
 
     my @lines;
-    push @lines, "got unexpected:", < sort keys %{$tc->{?goterrs}} if %{$tc->{?goterrs}};
-    push @lines, "missed expected:", < sort keys %{$tc->{?errs}}   if %{$tc->{?errs}};
+    push @lines, "got unexpected:", < sort keys $tc->{?goterrs}->% if $tc->{?goterrs}->%;
+    push @lines, "missed expected:", < sort keys $tc->{?errs}->%   if $tc->{?errs}->%;
 
     if ((nelems @lines)) {
         unshift @lines, $tc->{?name};
@@ -745,16 +745,16 @@ sub mylike {
                  or 0); # no undefs !
 
     # same as A ^ B, but B has side effects
-    my $ok = ( $bad  &&  unlike ($got, $want, $cmnt, < @$msgs)
-               or !$bad && like ($got, $want, $cmnt, < @$msgs));
+    my $ok = ( $bad  &&  unlike ($got, $want, $cmnt, < $msgs->@)
+               or !$bad && like ($got, $want, $cmnt, < $msgs->@));
 
     reduceDiffs ($tc) if not $ok;
 
     if (not $ok and $retry) {
         # redo, perhaps with use re debug - NOT ROBUST
         eval "use re 'debug'" if $debug;
-        $ok = ( $bad  &&  unlike ($got, $want, "(RETRY) $cmnt", < @$msgs)
-         or !$bad && like ($got, $want, "(RETRY) $cmnt", < @$msgs));
+        $ok = ( $bad  &&  unlike ($got, $want, "(RETRY) $cmnt", < $msgs->@)
+         or !$bad && like ($got, $want, "(RETRY) $cmnt", < $msgs->@));
         eval "no re 'debug'";
     }
     return $ok;
@@ -905,7 +905,7 @@ sub mydumper {
         print $^STDOUT, "half hearted attempt:\n";
         foreach my $it ( @_) {
             if (ref $it eq 'HASH') {
-                print $^STDOUT, " $_ => $it->{?$_}\n" foreach sort keys %$it;
+                print $^STDOUT, " $_ => $it->{?$_}\n" foreach sort keys $it->%;
             }
         }
         return;

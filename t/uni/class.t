@@ -107,7 +107,7 @@ while (my @(?$abbrev, ?$files) =@( each %utf8::PVA_abbr_map)) {
     next unless $prop_name;
     next if $abbrev eq "gc_sc";
 
-    for (sort keys %$files) {
+    for (sort keys $files->%) {
         my $filename = 'File::Spec'->catfile(
             $updir => lib => unicore => lib => $abbrev => "$files->{?$_}.pl"
             );
@@ -128,7 +128,7 @@ while (my @(?$abbrev, ?$files) =@( each %utf8::PVA_abbr_map)) {
 
 # General Category and Script
 for my $p (@('gc', 'sc')) {
-    while (my @(?$abbr, ?_) =@( each %{ %utf8::PropValueAlias{$p} })) {
+    while (my @(?$abbr, ?_) =@( each  %utf8::PropValueAlias{$p}->%)) {
         my $filename = 'File::Spec'->catfile(
             $updir => lib => unicore => lib => gc_sc => "%utf8::PVA_abbr_map{gc_sc}->{?$abbr}.pl"
             );

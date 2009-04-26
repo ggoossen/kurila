@@ -15,9 +15,9 @@ BEGIN {
 use Test::More tests => 10;
 
 my $a1 = \@( 1, 2, 3 );
-push @$a1, $a1;
+push $a1->@, $a1;
 my $a2 = \@( 1, 2, 3 );
-push @$a2, $a2;
+push $a2->@, $a2;
 
 is_deeply $a1, $a2;
 ok( eq_array ($a1, $a2) );

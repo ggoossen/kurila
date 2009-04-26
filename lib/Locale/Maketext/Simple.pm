@@ -112,8 +112,8 @@ sub import($class, %< %args) {
     my @(?$loc, ?$loc_lang) =  $class->load_loc(< %args) || @();
     $loc ||= $class->default_loc(< %args);
 
-    *{Symbol::fetch_glob(caller(0) . "::%args{?Export}")} = $loc if %args{?Export};
-    *{Symbol::fetch_glob(caller(0) . "::%args{?Export}_lang")} = $loc_lang || sub { 1 };
+    Symbol::fetch_glob(caller(0) . "::%args{?Export}")->* = $loc if %args{?Export};
+    Symbol::fetch_glob(caller(0) . "::%args{?Export}_lang")->* = $loc_lang || sub { 1 };
 }
 
 my %Loc;
@@ -253,7 +253,7 @@ sub _default_gettext {
 
 sub _escape {
     my $text = shift;
-    $text =~ s/\b_([1-9]\d*)/%$1/g;
+    $text =~ s/\b_([1-9]\d*)/$1->%/g;
     return $text;
 }
 

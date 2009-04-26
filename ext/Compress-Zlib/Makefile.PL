@@ -15,7 +15,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/Compress/Zlib.pm',
 
 
-    PREREQ_PM   => \%( 'Compress::Raw::Zlib'           => $::VERSION,
+    PREREQ_PM   => %( 'Compress::Raw::Zlib'           => $::VERSION,
         'IO::Compress::Base'            => $::VERSION,
             'IO::Compress::Base::Common'    => $::VERSION,
             'IO::Uncompress::Base'          => $::VERSION,

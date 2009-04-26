@@ -37,7 +37,7 @@ do {
 pass("Changing output() of new TB doesn't interfere with singleton");
 
 ok open my $file, "<", "some_file";
-is join("", @( ~< *$file)), <<OUT;
+is join("", @( ~< $file->*)), <<OUT;
 1..1
 ok 1
 OUT

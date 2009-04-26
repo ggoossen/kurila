@@ -45,19 +45,19 @@ sub new {
 
 sub id {
     my $self = shift;
-    $$self;
+    $self->$;
 }
 
 sub remove {
     my $self = shift;
-    @(semctl($$self,0,IPC_RMID,0), undef $$self)[0];
+    @(semctl($self->$,0,IPC_RMID,0), undef $self->$)[0];
 }
 
 sub getncnt {
     (nelems @_) == 2 || croak '$sem->getncnt( SEM )';
     my $self = shift;
     my $sem = shift;
-    my $v = semctl($$self,$sem,GETNCNT,0);
+    my $v = semctl($self->$,$sem,GETNCNT,0);
     $v ?? 0 + $v !! undef;
 }
 
@@ -65,7 +65,7 @@ sub getzcnt {
     (nelems @_) == 2 || croak '$sem->getzcnt( SEM )';
     my $self = shift;
     my $sem = shift;
-    my $v = semctl($$self,$sem,GETZCNT,0);
+    my $v = semctl($self->$,$sem,GETZCNT,0);
     $v ?? 0 + $v !! undef;
 }
 
@@ -73,7 +73,7 @@ sub getval {
     (nelems @_) == 2 || croak '$sem->getval( SEM )';
     my $self = shift;
     my $sem = shift;
-    my $v = semctl($$self,$sem,GETVAL,0);
+    my $v = semctl($self->$,$sem,GETVAL,0);
     $v ?? 0 + $v !! undef;
 }
 
@@ -81,7 +81,7 @@ sub getpid {
     (nelems @_) == 2 || croak '$sem->getpid( SEM )';
     my $self = shift;
     my $sem = shift;
-    my $v = semctl($$self,$sem,GETPID,0);
+    my $v = semctl($self->$,$sem,GETPID,0);
     $v ?? 0 + $v !! undef;
 }
 
@@ -90,13 +90,13 @@ sub op {
     my $self = shift;
     croak 'Bad arg count' if (nelems @_) % 3;
     my $data = pack("s!*",< @_);
-    semop($$self,$data);
+    semop($self->$,$data);
 }
 
 sub stat {
     my $self = shift;
     my $data = "";
-    semctl($$self,0,IPC_STAT,$data)
+    semctl($self->$,0,IPC_STAT,$data)
         or return undef;
     IPC::Semaphore::stat->new->unpack($data);
 }
@@ -118,14 +118,14 @@ sub set {
             while(@($key,$val) =@( each %arg));
     }
 
-    my $v = semctl($$self,0,IPC_SET,$ds->pack);
+    my $v = semctl($self->$,0,IPC_SET,$ds->pack);
     $v ?? 0 + $v !! undef;
 }
 
 sub getall {
     my $self = shift;
     my $data = "";
-    semctl($$self,0,GETALL,$data)
+    semctl($self->$,0,GETALL,$data)
         or return ();
     @(unpack("s!*",$data));
 }
@@ -133,7 +133,7 @@ sub getall {
 sub setall {
     my $self = shift;
     my $data = pack("s!*",< @_);
-    semctl($$self,0,SETALL,$data);
+    semctl($self->$,0,SETALL,$data);
 }
 
 sub setval {
@@ -141,7 +141,7 @@ sub setval {
     my $self = shift;
     my $sem = shift;
     my $val = shift;
-    semctl($$self,$sem,SETVAL,$val);
+    semctl($self->$,$sem,SETVAL,$val);
 }
 
 1;

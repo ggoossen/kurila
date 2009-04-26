@@ -267,9 +267,9 @@ sub check($utmpl, $href, ?$verbose) {
         or return;
 
     ### deref only once ###
-    my %utmpl   = %( < %$utmpl );
-    my %args    = %( < %$args );
-    my %defs    = %( < %$defs );
+    my %utmpl   = %( < $utmpl->% );
+    my %args    = %( < $args->% );
+    my %defs    = %( < $defs->% );
 
     ### flag to see if anything went wrong ###
     my $wrong; 
@@ -308,7 +308,7 @@ sub check($utmpl, $href, ?$verbose) {
         }
 
         ### copy of this keys template instructions, to save derefs ###
-        my %tmpl = %( < %{%utmpl{?$key}} );
+        my %tmpl = %( < %utmpl{?$key}->% );
 
         ### check if you were supposed to provide defined() values ###
         if( (%tmpl{?'defined'} || $ONLY_ALLOW_DEFINED) and
@@ -365,7 +365,7 @@ sub check($utmpl, $href, ?$verbose) {
     ### leaving the user with a few set variables
     for my $key (keys %defs) {
         if( my $ref = %utmpl{?$key}->{?'store'} ) {
-            $$ref = $NO_DUPLICATES ?? delete %defs{$key} !! %defs{?$key};
+            $ref->$ = $NO_DUPLICATES ?? delete %defs{$key} !! %defs{?$key};
         }
     }
 
@@ -433,7 +433,7 @@ sub allow {
         ### loop over the elements, see if one of them says the
         ### value is OK
         ### also, short-cicruit when possible
-        for (  @{@_[1]} ) {
+        for (  @_[1]->@ ) {
             return 1 if allow( @_[0], $_ );
         }
 
@@ -455,7 +455,7 @@ sub _clean_up_args {
     ### don't even bother to loop, if there's nothing to clean up ###
     return @_[0] if $PRESERVE_CASE and !$STRIP_LEADING_DASHES;
 
-    my %args = %( < %{@_[0]} );
+    my %args = %( < @_[0]->% );
 
     ### keys are note aliased ###
     for my $key (keys %args) {
@@ -471,8 +471,8 @@ sub _clean_up_args {
 }
 
 sub _sanity_check_and_defaults {
-    my %utmpl   = %( < %{@_[0]} );
-    my %args    = %( < %{@_[1]} );
+    my %utmpl   = %( < @_[0]->% );
+    my %args    = %( < @_[1]->% );
     my $verbose = @_[2];
 
     my %defs; my $fail;
@@ -505,7 +505,7 @@ sub _sanity_check_and_defaults {
                             $_, $key), 1, 1 );
                 }, grep {
                     not %known_keys{?$_}
-                }, keys %{%utmpl{?$key}};
+                }, keys %utmpl{?$key}->%;
 
             ### make sure you passed a ref, otherwise, complain about it!
             if ( exists %utmpl{$key}->{'store'} ) {

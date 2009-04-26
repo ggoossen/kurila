@@ -944,7 +944,7 @@ sub _find_dir($wanted, $p_dir, $nlink) {
     }
     continue {
         while ( defined ($SE = pop @Stack) ) {
-            @($Level, $p_dir, $dir_rel, $nlink) = @$SE;
+            @($Level, $p_dir, $dir_rel, $nlink) = $SE->@;
             if ($CdLvl +> $Level && !$no_chdir) {
                 my $tmp;
                 if ($Is_MacOS) {
@@ -1192,7 +1192,7 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) { # $dir_loc is the absolute dir
     }
     continue {
         while (defined($SE = pop @Stack)) {
-            @($dir_loc, $updir_loc, $p_dir, $dir_rel, $byd_flag) = @$SE;
+            @($dir_loc, $updir_loc, $p_dir, $dir_rel, $byd_flag) = $SE->@;
             if ($Is_MacOS) {
                 # $p_dir always has a trailing ':', except for the starting dir,
                 # where $dir_rel eq ':'

@@ -91,7 +91,7 @@ my @raw_alias = @(
 
 while (@raw_alias) {
     my @($func, $names) = @: splice @raw_alias, 0, 2;
-    %alias{+$_} = $func for  @$names;
+    %alias{+$_} = $func for  $names->@;
 }
 
 # Emit defines.
@@ -405,12 +405,12 @@ gen_op_is_macro( \%OP_IS_FILETEST, 'OP_IS_FILETEST');
 gen_op_is_macro( \%OP_IS_FT_ACCESS, 'OP_IS_FILETEST_ACCESS');
 
 sub gen_op_is_macro($op_is, $macname) {
-    if (%$op_is) {
+    if ($op_is->%) {
 
         # get opnames whose numbers are lowest and highest
         my @($first, @< @rest) =  sort {
                 $op_is->{?$a} <+> $op_is->{?$b}
-            }, keys %$op_is;
+            }, keys $op_is->%;
 
         my $last = pop @rest;	# @rest slurped, get its last
         die "Invalid range of ops: $first .. $last\n" unless $last;
@@ -426,7 +426,7 @@ sub gen_op_is_macro($op_is, $macname) {
             print $on, ")\n\n";
         }
         else {
-            print $on, join(" || \\\n\t ", map { "(op) == OP_" . uc() }, sort keys %$op_is);
+            print $on, join(" || \\\n\t ", map { "(op) == OP_" . uc() }, sort keys $op_is->%);
             print $on, ")\n\n";
         }
     }

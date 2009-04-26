@@ -40,12 +40,12 @@ ok(1, 'foo');
 
 
 END {
-    My::Test::ok($$out eq <<OUT);
+    My::Test::ok($out->$ eq <<OUT);
 ok 1 - foo
 1..1
 OUT
 
-    My::Test::ok($$err eq <<ERR);
+    My::Test::ok($err->$ eq <<ERR);
 ERR
 
     # Prevent Test::Simple from exiting with non zero

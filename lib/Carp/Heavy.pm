@@ -108,7 +108,7 @@ sub get_status {
     my $cache = shift;
     my $pkg = shift;
     $cache->{+$pkg} ||= \@(\%($pkg => $pkg), \trusts_directly($pkg));
-    return @{$cache->{?$pkg}};
+    return $cache->{?$pkg}->@;
 }
 
 # Takes the info from caller() and figures out the name of
@@ -257,14 +257,14 @@ sub trusts {
     my $cache = shift;
     my @($known, $partial) =  get_status($cache, $child);
     # Figure out consequences until we have an answer
-    while ((nelems @$partial) and not exists $known->{$parent}) {
-        my $anc = shift @$partial;
+    while ((nelems $partial->@) and not exists $known->{$parent}) {
+        my $anc = shift $partial->@;
         next if exists $known->{$anc};
         $known->{+$anc}++;
         my @($anc_knows, $anc_partial) =  get_status($cache, $anc);
-        my @found = keys %$anc_knows;
-            %$known{[ @found]} = @();
-        push @$partial, < @$anc_partial;
+        my @found = keys $anc_knows->%;
+            $known->%{[ @found]} = @();
+        push $partial->@, < $anc_partial->@;
     }
     return exists $known->{$parent};
 }
@@ -273,9 +273,9 @@ sub trusts {
 sub trusts_directly {
     my $class = shift;
     no warnings 'once'; 
-    return (nelems @{*{Symbol::fetch_glob("$class\::CARP_NOT")}})
-        ?? @{*{Symbol::fetch_glob("$class\::CARP_NOT")}}
-        !! @{*{Symbol::fetch_glob("$class\::ISA")}};
+    return (nelems Symbol::fetch_glob("$class\::CARP_NOT")->*->@)
+        ?? Symbol::fetch_glob("$class\::CARP_NOT")->*->@
+        !! Symbol::fetch_glob("$class\::ISA")->*->@;
 }
 
 1;

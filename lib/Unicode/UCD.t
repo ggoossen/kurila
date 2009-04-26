@@ -311,11 +311,11 @@ is(Unicode::UCD::_getcode('U+123x'),  undef, "_getcode(x123)");
 
 do {
     my $r1 = charscript('Latin');
-    my $n1 = nelems @$r1;
+    my $n1 = nelems $r1->@;
     is($n1, 35, "number of ranges in Latin script (Unicode 5.0.0)");
-    shift @$r1 while @$r1;
+    shift $r1->@ while $r1->@;
     my $r2 = charscript('Latin');
-    is((nelems @$r2), $n1, "modifying results should not mess up internal caches");
+    is((nelems $r2->@), $n1, "modifying results should not mess up internal caches");
 };
 
 do {

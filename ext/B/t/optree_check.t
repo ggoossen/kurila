@@ -31,7 +31,6 @@ SKIP: do {
     skip "no perlio in this build", $tests
         unless Config::config_value("useperlio");
 
-
     pass("REGEX TEST HARNESS SELFTEST");
 
     checkOptree ( name	=> "bare minimum opcode search",

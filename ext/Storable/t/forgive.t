@@ -41,7 +41,7 @@ open($^STDERR, ">", "$devnull") or
 
 try {$result = store ($bad , 'store')};
 
-open($^STDERR, ">&", \*$saverr);
+open($^STDERR, ">&", \$saverr->*);
 
 print ($^STDOUT, (defined $result)??"ok $test\n"!!"not ok $test\n"); $test++;
 print ($^STDOUT, ($^EVAL_ERROR eq '')??"ok $test\n"!!"not ok $test\n"); $test++;

@@ -60,7 +60,7 @@ $VERSION = '0.06';
 
 sub type_to_C_value {
     my @($self, $type) =  @_;
-    return %type_to_C_value{?$type} || sub {return @+: map {ref $_ ?? @$_ !! @($_) }, @_ };
+    return %type_to_C_value{?$type} || sub {return @+: map {ref $_ ?? $_->@ !! @($_) }, @_ };
 }
 
 # TODO - figure out if there is a clean way for the type_to_sv code to
@@ -82,7 +82,7 @@ sub type_to_C_value {
 
 while (my @(?$type, ?$value) =@( each %XS_TypeSet)) {
     %type_num_args{+$type}
-    = defined $value ?? ref $value ?? scalar nelems @$value !! 1 !! 0;
+    = defined $value ?? ref $value ?? scalar nelems $value->@ !! 1 !! 0;
 }
 %type_num_args{+''} = 0;
 
@@ -94,11 +94,11 @@ sub partition_names($self, $default_type, @< @items) {
         if ($default) {
             # If we find a default value, convert it into a regular item and
             # append it to the queue of items to process
-            my $default_item = \%(< %$item);
+            my $default_item = \%(< $item->%);
             $default_item->{+invert_macro} = 1;
             $default_item->{+pre} = delete $item->{def_pre};
             $default_item->{+post} = delete $item->{def_post};
-            $default_item->{+type} = shift @$default;
+            $default_item->{+type} = shift $default->@;
             $default_item->{+value} = $default;
             push @items, $default_item;
         } else {
@@ -112,7 +112,7 @@ sub partition_names($self, $default_type, @< @items) {
             or %type_is_a_problem{?$item->{?type}}) {
             push @trouble, $item;
         } else {
-            push @{%found{+$item->{?type}}}, $item;
+            push %found{+$item->{?type}}->@, $item;
         }
     }
     # use Data::Dumper; print Dumper \%found;
@@ -155,7 +155,7 @@ sub WriteConstants {
     my $ARGS = \%(< @_);
 
     my @($c_fh, $xs_fh, $c_subname, $xs_subname, $default_type, $package)
-        =  %{$ARGS}{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]};
+        =  $ARGS->{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]};
 
     my $options = $ARGS->{?PROXYSUBS};
     $options = \%() unless ref $options;
@@ -174,7 +174,7 @@ sub WriteConstants {
 
     my @items = $self->normalise_items (\%(disable_utf8_duplication => 1),
         $default_type, $what, $items,
-        < @{$ARGS->{NAMES}});
+        < $ARGS->{NAMES}->@);
 
     # Partition the values by type. Also include any defaults in here
     # Everything that doesn't have a default needs alternative code for
@@ -284,9 +284,9 @@ EOBOOT
     my %iterator;
 
     $found->{+''}
-    = \ map {\%(< %$_, type=>'', invert_macro => 1)}, @$notfound;
+    = \ map {\%(< $_->%, type=>'', invert_macro => 1)}, $notfound->@;
 
-    foreach my $type (sort keys %$found) {
+    foreach my $type (sort keys $found->%) {
         my $struct = %type_to_struct{?$type};
         my $type_to_value = $self->type_to_C_value($type);
         my $number_of_args = %type_num_args{?$type};
@@ -304,7 +304,7 @@ EOBOOT
 EOBOOT
 
 
-        foreach my $item ( @{$found->{$type}}) {
+        foreach my $item ( $found->{$type}->@) {
             my @($name, $namelen, $value, $macro)
                 =  $self->name_len_value_macro($item);
 
@@ -344,7 +344,7 @@ EOBOOT
 EOBOOT
 
     my $add_symbol_subname = $c_subname . '_add_symbol';
-    foreach my $type (sort keys %$found) {
+    foreach my $type (sort keys $found->%) {
         print $xs_fh, $self->boottime_iterator($type, %iterator{?$type}, 
             'symbol_table',
             $add_symbol_subname);
@@ -396,7 +396,7 @@ DONT
 	\}
 EOBOOT
 
-    foreach my $item ( @$trouble) {
+    foreach my $item ( $trouble->@) {
         my @($name, $namelen, $value, $macro)
             =  $self->name_len_value_macro($item);
         my $ifdef = $self->macro_to_ifdef($macro);
@@ -419,7 +419,7 @@ EOBOOT
         # these don't fit nicely in the macro-ised generator functions
         my $counter = 0;
         printf $xs_fh, "            \%s temp\%d;\n", $_, $counter++
-            foreach  @{%type_temporary{$type}};
+            foreach  %type_temporary{$type}->@;
 
         print $xs_fh, "            $item->{?pre}\n" if $item->{?pre};
 

@@ -59,8 +59,8 @@ my %hash = %(perl => 'rules');
 sub test_hash {
     my $clone = shift;
     is (ref $clone, "HASH", "Get hash back");
-    is (nkeys %$clone, 1, "with 1 key");
-    is ((keys %$clone)[0], "perl", "which is correct");
+    is (nkeys $clone->%, 1, "with 1 key");
+    is ((keys $clone->%)[0], "perl", "which is correct");
     is ($clone->{perl}, "rules");
 }
 
@@ -191,7 +191,7 @@ sub test_things {
                \@('longsize', "Long integer"),
                \@('ptrsize', "Pointer"),
                \@('nvsize', "Double"))) {
-            my @($key, $name) = @$_;
+            my @($key, $name) = $_->@;
             $copy = $contents;
             substr ($copy, $where++, 1, chr 0);
             test_corrupt ($copy, $sub, "/^$name size is not compatible/",

@@ -535,10 +535,10 @@ sub new { my @t = @( mytime, times, (nelems @_) == 2 ?? @_[1] !! 0);
     print $^STDERR, "new=$(join ' ',@t)\n" if $Debug;
     bless \@t; }
 
-sub cpu_p { my@($r,$pu,$ps,$cu,$cs, ...) =  @{@_[0]}; $pu+$ps         ; }
-sub cpu_c { my@($r,$pu,$ps,$cu,$cs, ...) =  @{@_[0]};         $cu+$cs ; }
-sub cpu_a { my@($r,$pu,$ps,$cu,$cs, ...) =  @{@_[0]}; $pu+$ps+$cu+$cs ; }
-sub real  { my@($r,$pu,$ps,$cu,$cs, ...) =  @{@_[0]}; $r              ; }
+sub cpu_p { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $pu+$ps         ; }
+sub cpu_c { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@;         $cu+$cs ; }
+sub cpu_a { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $pu+$ps+$cu+$cs ; }
+sub real  { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $r              ; }
 sub iters { @_[0]->[5] ; }
 
 
@@ -551,7 +551,7 @@ sub timediff($a, $b) {
     die usage unless ref $a and ref $b;
 
     my @r;
-    for my $i (0 .. nelems(@$a) -1) {
+    for my $i (0 .. nelems($a->@) -1) {
         push(@r, $a->[$i] - $b->[$i]);
     }
     #die "Bad timediff(): ($r[1] + $r[2]) <= 0 (@$a[1,2]|@$b[1,2])\n"
@@ -568,7 +568,7 @@ sub timesum($a, $b) {
     die usage unless ref $a and ref $b;
 
     my @r;
-    for my $i (0 .. nelems(@$a) -1) {
+    for my $i (0 .. nelems($a->@) -1) {
         push(@r, $a->[$i] + $b->[$i]);
     }
     bless \@r;
@@ -583,7 +583,7 @@ sub timestr($tr, ?$style, ?$f) {
 
     die usage unless ref $tr;
 
-    my @t = @$tr;
+    my @t = $tr->@;
     warn "bad time value ($(join ' ',@t))" unless (nelems @t)==6;
     my@($r, $pu, $ps, $cu, $cs, $n) =  @t;
     my@($pt, $ct, $tt) = @( $tr->cpu_p, $tr->cpu_c, $tr->cpu_a);
@@ -846,7 +846,7 @@ USAGE
 sub timethese($n, $alt, ?$style){
     die usage unless ref $alt eq 'HASH';
 
-    my @names = sort keys %$alt;
+    my @names = sort keys $alt->%;
     $style = "" unless defined $style;
     print $^STDOUT, "Benchmark: " unless $style eq 'none';
     if ( $n +> 0 ) {
@@ -899,7 +899,7 @@ sub cmpthese{
     $style = "" unless defined $style;
 
     # Flatten in to an array of arrays with the name as the first field
-    my @vals = map{ \@( $_, < @{$results->{?$_}} ) }, keys %$results;
+    my @vals = map{ \@( $_, < $results->{?$_}->@ ) }, keys $results->%;
 
     for ( @vals) {
         # The epsilon fudge here is to prevent div by 0.  Since clock
@@ -1002,21 +1002,21 @@ sub cmpthese{
     # Equalize column widths in the chart as much as possible without
     # exceeding 80 characters.  This does not use or affect cols 0 or 1.
     my @sorted_width_refs = 
-        sort { $$a <+> $$b }, map { \$_ }, @col_widths[[2..((nelems @col_widths)-1)]];
-    my $max_width = ${@sorted_width_refs[-1]};
+        sort { $a->$ <+> $b->$ }, map { \$_ }, @col_widths[[2..((nelems @col_widths)-1)]];
+    my $max_width = @sorted_width_refs[-1]->$;
 
     my $total = (nelems @col_widths) - 1 ;
     for (  @col_widths ) { $total += $_ }
 
   STRETCHER:
     while ( $total +< 80 ) {
-        my $min_width = ${@sorted_width_refs[0]};
+        my $min_width = @sorted_width_refs[0]->$;
         last
             if $min_width == $max_width;
         for (  @sorted_width_refs ) {
             last 
-                if $$_ +> $min_width;
-            ++$$_;
+                if $_->$ +> $min_width;
+            ++$_->$;
             ++$total;
             last STRETCHER
                 if $total +>= 80;
@@ -1027,7 +1027,7 @@ sub cmpthese{
     my $format = join( ' ', map { "\%$($_)s" }, @col_widths ) . "\n";
     substr( $format, 1, 0, '-' );
     for (  @rows ) {
-        printf $^STDOUT, $format, < @$_;
+        printf $^STDOUT, $format, < $_->@;
     }
 
     return \@rows ;

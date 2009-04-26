@@ -179,7 +179,7 @@ sub check_install {
 
         ### find the version by inspecting the package
         if( defined $filename && $FIND_VERSION ) {
-            $href->{+version} = ${*{Symbol::fetch_glob( "$args->{?module}"."::VERSION")} }; 
+            $href->{+version} = Symbol::fetch_glob( "$args->{?module}"."::VERSION")->*->$; 
         }
     }     
 
@@ -199,7 +199,7 @@ sub check_install {
                     ($fh) = $dir->($dir, $file);
 
                 } elsif (UNIVERSAL::isa($dir, 'ARRAY')) {
-                    ($fh) = $dir->[0]->($dir, $file, < %{$dir}{[1..((nelems @{$dir})-1)]})
+                    ($fh) = $dir->[0]->($dir, $file, < $dir->{[1..((nelems $dir->@)-1)]})
 
                 } elsif (UNIVERSAL::can($dir, 'INC')) {
                     ($fh) = $dir->INC->($dir, $file);
@@ -264,7 +264,7 @@ sub check_install {
     ### only complain if we're expected to find a version higher than 0.0 anyway
     if( $FIND_VERSION and not defined $href->{?version} ) {
         do {   ### don't warn about the 'not numeric' stuff ###
-            local $^WARNING = undef;
+            local $^WARNING = 0;
 
             ### if we got here, we didn't find the version
             warn < loc(q[Could not check version on '%1'], $args->{?module} )
@@ -274,7 +274,7 @@ sub check_install {
 
     } else {
         ### don't warn about the 'not numeric' stuff ###
-        local $^WARNING = undef;
+        local $^WARNING = 0;
 
         ### use qv(), as it will deal with developer release number
         ### ie ones containing _ as well. This addresses bug report
@@ -413,7 +413,7 @@ sub can_load {
         my $href = $args->{?modules};
 
         my @load;
-        for my $mod ( keys %$href ) {
+        for my $mod ( keys $href->% ) {
 
             next if $CACHE->{?$mod}->{?usable} && !$args->{?nocache};
 

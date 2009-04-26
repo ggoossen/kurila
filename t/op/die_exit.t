@@ -44,7 +44,7 @@ plan(tests => $max);
 open($^STDERR, ">", "die_exit.err") or die "Can't open temp error file:  $^OS_ERROR";
 
 foreach my $test (1 .. $max) {
-    my @($bang, $query, ?$code) =  @{%tests{?$test}};
+    my @($bang, $query, ?$code) =  %tests{?$test}->@;
     $code ||= 'die;';
     if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'VMS') {
         system(qq{$^EXECUTABLE_NAME -e "\$^OS_ERROR = $bang; \$^CHILD_ERROR = $query; $code"});

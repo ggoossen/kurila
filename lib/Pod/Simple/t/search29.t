@@ -68,7 +68,7 @@ my $name2where = $x->survey($here1, $here2, $here3);
 my $where2name = $x->path2name;
 
 do {
-    my $names = join "|", sort values %$where2name;
+    my $names = join "|", sort values $where2name->%;
     is $names, "perlzuk|zikzik";
 };
 

@@ -46,12 +46,12 @@ Test::Simple->import(tests => 1);
 ok(0);
 
 END {
-    My::Test::ok($$out eq <<OUT);
+    My::Test::ok($out->$ eq <<OUT);
 1..1
 not ok 1
 OUT
 
-    My::Test::ok($$err eq <<ERR) || print $^STDOUT, $$err;
+    My::Test::ok($err->$ eq <<ERR) || print $^STDOUT, $err->$;
 #   Failed test at $^PROGRAM_NAME line 45.
 # Looks like you failed 1 test of 1.
 ERR

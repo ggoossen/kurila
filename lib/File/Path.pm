@@ -534,7 +534,7 @@ sub _error {
 
     if ($arg->{?error}) {
         $object = '' unless defined $object;
-        push @{${$arg->{error}}}, \%($object => "$message: $^OS_ERROR");
+        push $arg->{error}->$->@, \%($object => "$message: $^OS_ERROR");
     }
     else {
         warn(defined($object) ?? "$message for $object: $^OS_ERROR" !! "$message: $^OS_ERROR");
@@ -566,10 +566,10 @@ sub mkpath {
             $arg = pop @_;
             exists $arg->{mask} and $arg->{+mode} = delete $arg->{mask};
             $arg->{+mode} = 0777 unless exists $arg->{mode};
-            ${$arg->{error}} = \@() if exists $arg->{error};
+            $arg->{error}->$ = \@() if exists $arg->{error};
         }
         else { 
-                %{$arg}{[qw(verbose mode)]} = @(0, 0777);
+                $arg->{[qw(verbose mode)]} = @(0, 0777);
         }
         $paths = \$: @_;
     }
@@ -581,7 +581,7 @@ sub _mkpath {
     my $paths = shift;
 
     my(@created);
-    foreach my $path ( @$paths) {
+    foreach my $path ( $paths->@) {
         next unless length($path);
         $path .= '/' if $^OS_NAME eq 'os2' and $path =~ m/^\w:\z/s; # feature of CRT 
         # Logic wants Unix paths, so go with the flow.
@@ -606,7 +606,7 @@ sub _mkpath {
             if (!-d $path) {
                 $^OS_ERROR = $save_bang;
                 if ($arg->{?error}) {
-                    push @{${$arg->{error}}}, \%($path => $e);
+                    push $arg->{error}->$->@, \%($path => $e);
                 }
                 else {
                     die("mkdir $path: $e");
@@ -629,11 +629,11 @@ sub rmtree {
     else {
         if ((nelems @_) +> 0 and UNIVERSAL::isa(@_[-1],'HASH')) {
             $arg = pop @_;
-            ${$arg->{error}}  = \@() if exists $arg->{error};
-            ${$arg->{result}} = \@() if exists $arg->{result};
+            $arg->{error}->$  = \@() if exists $arg->{error};
+            $arg->{result}->$ = \@() if exists $arg->{result};
         }
         else {
-                %{$arg}{[qw(verbose safe)]} = @(0, 0);
+                $arg->{[qw(verbose safe)]} = @(0, 0);
         }
         $paths = \ @_;
     }
@@ -646,7 +646,7 @@ sub rmtree {
         return 0;
     };
     for (@($arg->{?cwd})) { m/\A(.*)\Z/; $_ = $1 } # untaint
-        %{$arg}{[qw(device inode)]} = @(stat $arg->{?cwd})[[0..1]] or do {
+        $arg->{[qw(device inode)]} = @(stat $arg->{?cwd})[[0..1]] or do {
         _error($arg, "cannot stat initial working directory", $arg->{?cwd});
         return 0;
     };
@@ -664,7 +664,7 @@ sub _rmtree {
 
     my (@files);
   ROOT_DIR:
-    foreach my $root ($(@$paths)) {
+    foreach my $root ($($paths->@)) {
         if ($Is_MacOS) {
             $root  = ":$root" unless $root =~ m/:/;
             $root .= ":"      unless $root =~ m/:\z/;
@@ -746,8 +746,8 @@ sub _rmtree {
 
             if ((nelems @files)) {
                 # remove the contained files before the directory itself
-                my $narg = \%(< %$arg);
-                    %{$narg}{[qw(device inode cwd prefix depth)]}
+                my $narg = \%(< $arg->%);
+                    $narg->{[qw(device inode cwd prefix depth)]}
                 = @($device, $inode, $updir, $canon, $arg->{?depth}+1);
                 $count += _rmtree($narg, \@files);
             }
@@ -784,7 +784,7 @@ sub _rmtree {
                 }
                 print $^STDOUT, "rmdir $root\n" if $arg->{?verbose};
                 if (rmdir $root) {
-                    push @{${$arg->{result}}}, $root if $arg->{?result};
+                    push $arg->{result}->$->@, $root if $arg->{?result};
                     ++$count;
                 }
                 else {
@@ -820,7 +820,7 @@ sub _rmtree {
             # delete all versions under VMS
             while (1) {
                 if (unlink $root) {
-                    push @{${$arg->{result}}}, $root if $arg->{?result};
+                    push $arg->{result}->$->@, $root if $arg->{?result};
                 }
                 else {
                     _error($arg, "cannot unlink file", $canon);

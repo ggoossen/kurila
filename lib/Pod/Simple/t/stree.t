@@ -125,8 +125,8 @@ sub deq { # deep-equals
     # So it's a ref:
     use UNIVERSAL;
     if(UNIVERSAL::isa(@_[0], 'ARRAY')) {
-        return '' unless (nelems @{@_[0]}) == nelems @{@_[1]};
-        for my $i (0 .. nelems(@{@_[0]}) -1) {
+        return '' unless (nelems @_[0]->@) == nelems @_[1]->@;
+        for my $i (0 .. nelems(@_[0]->@) -1) {
             print($^STDOUT, "# NEQ ", Pod::Simple::pretty(@_[0]),
                 "\n#  != ", Pod::Simple::pretty(@_[1]), "\n"),
                 return '' unless deq(@_[0]->[$i], @_[1]->[$i]); # recurse!
@@ -134,8 +134,8 @@ sub deq { # deep-equals
         return 1;
     } elsif(UNIVERSAL::isa(@_[0], 'HASH')) {
         return 1 if $hashes_dont_matter;
-        return '' unless nelems(keys %{@_[0]}) == (nelems( keys %{@_[1]}));
-        foreach my $k (keys %{@_[0]}) {
+        return '' unless nelems(keys @_[0]->%) == (nelems( keys @_[1]->%));
+        foreach my $k (keys @_[0]->%) {
             return '' unless exists @_[1]->{$k};
             return '' unless deq(@_[0]->{?$k}, @_[1]->{?$k});
         }

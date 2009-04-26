@@ -80,7 +80,7 @@ ok 1;
 
 my $y = thaw $x;
 ok ref $y eq 'ARRAY';
-ok nelems(@{$y}) == nelems(@pool);
+ok nelems($y->@) == nelems(@pool);
 
 ok ref $y->[0] eq 'SHORT_NAME';
 ok ref $y->[1] eq 'SHORT_NAME_WITH_HOOK';
@@ -101,7 +101,7 @@ do {
     my $x = freeze $blessed_ref;
     my $y = thaw $x;
     ok ref $y eq 'Foobar';
-    ok $$$y->[0] == 1;
+    ok $y->$->$->[0] == 1;
 };
 
 package RETURNS_IMMORTALS;
@@ -111,7 +111,7 @@ sub make { my $self = shift; bless \ @_, $self }
 sub STORABLE_freeze {
     # Some reference some number of times.
     my $self = shift;
-    my @($what, $times) =  @$self;
+    my @($what, $times) =  $self->@;
     return @("$what$times", < (@(%::immortals{?$what}) x $times));
 }
 

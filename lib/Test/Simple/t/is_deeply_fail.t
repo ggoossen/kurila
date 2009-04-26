@@ -34,9 +34,9 @@ sub ok($ok, ?$name) {
 
 sub is($this, $that, ?$name) {
 
-    my $ok = $TB->is_eq($$this, $that, $name);
+    my $ok = $TB->is_eq($this->$, $that, $name);
 
-    $$this = '';
+    $this->$ = '';
 
     return $ok;
 }
@@ -44,9 +44,9 @@ sub is($this, $that, ?$name) {
 sub like($this, $regex, ?$name) {
     $regex = "/$regex/" if !ref $regex and $regex !~ m{^/.*/$}s;
 
-    my $ok = $TB->like($$this, $regex, $name);
+    my $ok = $TB->like($this->$, $regex, $name);
 
-    $$this = '';
+    $this->$ = '';
 
     return $ok;
 }
@@ -221,11 +221,11 @@ my @tests = @(\@(),
     );
 
 foreach my $test ( @tests) {
-    my $num_args = (nelems @$test);
+    my $num_args = (nelems $test->@);
 
     my $warning;
     local $^WARN_HOOK = sub { $warning .= @_[0]->message; };
-    ok !is_deeply(< @$test);
+    ok !is_deeply(< $test->@);
 
     like \$warning, 
          "/^is_deeply\\(\\) takes two or three args, you gave $num_args\.\n/";
@@ -252,7 +252,7 @@ ok !is_deeply( \@(), \@(\@()) );
 
 
 #line 273
-$$err = $$out = '';
+$err->$ = $out->$ = '';
 ok !is_deeply( \@(\'a', 'b'), \@(\'a', 'c') );
 is( $out, "not ok 20\n",  'scalar refs in an array' );
 is( $err, <<ERR,        '    right diagnostic' );

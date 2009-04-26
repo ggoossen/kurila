@@ -23,7 +23,7 @@ $RawInflateError = '';
 @EXPORT_OK = qw( $RawInflateError rawinflate ) ;
 %DEFLATE_CONSTANTS = %( () );
 %EXPORT_TAGS = %( < %IO::Uncompress::Base::EXPORT_TAGS ) ;
-push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
+push  %EXPORT_TAGS{all}->@, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');
 
 
@@ -115,13 +115,13 @@ sub _isRaw
     my $got = $self->_isRawx(< @_);
 
     if ($got) {
-        *$self->{+Pending} = *$self->{?HeaderPending} ;
+        $self->*->{+Pending} = $self->*->{?HeaderPending} ;
     }
     else {
-        $self->pushBack(*$self->{HeaderPending});
-        *$self->{Uncomp}->reset();
+        $self->pushBack($self->*->{HeaderPending});
+        $self->*->{Uncomp}->reset();
     }
-    *$self->{+HeaderPending} = '';
+    $self->*->{+HeaderPending} = '';
 
     return $got ;
 }
@@ -135,35 +135,35 @@ sub _isRawx
 
     my $buffer = '';
 
-    $self->smartRead(\$buffer, *$self->{BlockSize}) +>= 0  
+    $self->smartRead(\$buffer, $self->*->{BlockSize}) +>= 0  
         or return $self->saveErrorString(undef, "No data to read");
 
     my $temp_buf = $magic . $buffer ;
-    *$self->{+HeaderPending} = $temp_buf ;    
+    $self->*->{+HeaderPending} = $temp_buf ;    
     $buffer = '';
-    my $status = *$self->{?Uncomp}->uncompr(\$temp_buf, \$buffer, < $self->smartEof()) ;
-    return $self->saveErrorString(undef, *$self->{Uncomp}->{?Error}, STATUS_ERROR)
+    my $status = $self->*->{?Uncomp}->uncompr(\$temp_buf, \$buffer, < $self->smartEof()) ;
+    return $self->saveErrorString(undef, $self->*->{Uncomp}->{?Error}, STATUS_ERROR)
         if $status == STATUS_ERROR;
 
     #my $buf_len = *$self->{Uncomp}->uncompressedBytes();
     my $buf_len = length $buffer;
 
     if ($status == STATUS_ENDSTREAM) {
-        if (*$self->{?MultiStream} 
+        if ($self->*->{?MultiStream} 
             && (length $temp_buf || ! $self->smartEof())){
-            *$self->{+NewStream} = 1 ;
-            *$self->{+EndStream} = 0 ;
+            $self->*->{+NewStream} = 1 ;
+            $self->*->{+EndStream} = 0 ;
             $self->pushBack($temp_buf);
         }
         else {
-            *$self->{+EndStream} = 1 ;
+            $self->*->{+EndStream} = 1 ;
             $self->pushBack($temp_buf);
         }
     }
-    *$self->{+HeaderPending} = $buffer ;    
-    *$self->{+InflatedBytesRead} = $buf_len ;    
-    *$self->{+TotalInflatedBytesRead} += $buf_len ;    
-    *$self->{+Type} = 'rfc1951';
+    $self->*->{+HeaderPending} = $buffer ;    
+    $self->*->{+InflatedBytesRead} = $buf_len ;    
+    $self->*->{+TotalInflatedBytesRead} += $buf_len ;    
+    $self->*->{+Type} = 'rfc1951';
 
     $self->saveStatus(STATUS_OK);
 
@@ -182,42 +182,42 @@ sub inflateSync
 
     # inflateSync is a no-op in Plain mode
     return 1
-        if *$self->{?Plain} ;
+        if $self->*->{?Plain} ;
 
-    return 0 if *$self->{?Closed} ;
+    return 0 if $self->*->{?Closed} ;
     #return G_EOF if !length *$self->{Pending} && *$self->{EndStream} ;
-    return 0 if ! length *$self->{?Pending} && *$self->{?EndStream} ;
+    return 0 if ! length $self->*->{?Pending} && $self->*->{?EndStream} ;
 
     # Disable CRC check
-    *$self->{+Strict} = 0 ;
+    $self->*->{+Strict} = 0 ;
 
     my $status ;
     while (1)
     {
         my $temp_buf ;
 
-        if (length *$self->{?Pending} )
+        if (length $self->*->{?Pending} )
         {
-            $temp_buf = *$self->{?Pending} ;
-            *$self->{+Pending} = '';
+            $temp_buf = $self->*->{?Pending} ;
+            $self->*->{+Pending} = '';
         }
         else
         {
-            $status = $self->smartRead(\$temp_buf, *$self->{BlockSize}) ;
+            $status = $self->smartRead(\$temp_buf, $self->*->{BlockSize}) ;
             return $self->saveErrorString(0, "Error Reading Data")
                 if $status +< 0  ;
 
             if ($status == 0 ) {
-                *$self->{+EndStream} = 1 ;
+                $self->*->{+EndStream} = 1 ;
                 return $self->saveErrorString(0, "unexpected end of file", STATUS_ERROR);
             }
         }
 
-        $status = *$self->{?Uncomp}->sync($temp_buf) ;
+        $status = $self->*->{?Uncomp}->sync($temp_buf) ;
 
         if ($status == STATUS_OK)
         {
-            *$self->{+Pending} .= $temp_buf ;
+            $self->*->{+Pending} .= $temp_buf ;
             return 1 ;
         }
 
@@ -269,14 +269,14 @@ sub scan
 {
     my $self = shift ;
 
-    return 1 if *$self->{?Closed} ;
-    return 1 if !length *$self->{?Pending} && *$self->{?EndStream} ;
+    return 1 if $self->*->{?Closed} ;
+    return 1 if !length $self->*->{?Pending} && $self->*->{?EndStream} ;
 
     my $buffer = '' ;
     my $len = 0;
 
     $len = $self->_raw_read(\$buffer, 1) 
-        while ! *$self->{?EndStream} && $len +>= 0 ;
+        while ! $self->*->{?EndStream} && $len +>= 0 ;
 
     #return $len if $len < 0 ? $len : 0 ;
     return $len +< 0 ?? 0 !! 1 ;
@@ -286,9 +286,9 @@ sub zap
 {
     my $self  = shift ;
 
-    my $headerLength = *$self->{Info}->{?HeaderLength};
-    my $block_offset =  $headerLength + *$self->{Uncomp}->getLastBlockOffset();
-    @_[0] = $headerLength + *$self->{Uncomp}->getEndOffset();
+    my $headerLength = $self->*->{Info}->{?HeaderLength};
+    my $block_offset =  $headerLength + $self->*->{Uncomp}->getLastBlockOffset();
+    @_[0] = $headerLength + $self->*->{Uncomp}->getEndOffset();
     #printf "# End $_[0], headerlen $headerLength \n";;
     #printf "# block_offset $block_offset %x\n", $block_offset;
     my $byte ;
@@ -297,7 +297,7 @@ sub zap
         or return $self->saveErrorString(0, $^OS_ERROR, $^OS_ERROR); 
 
     #printf "#byte is %x\n", unpack('C*',$byte);
-    *$self->{?Uncomp}->resetLastBlockByte($byte);
+    $self->*->{?Uncomp}->resetLastBlockByte($byte);
     #printf "#to byte is %x\n", unpack('C*',$byte);
 
     ( $self->smartSeek($block_offset) && 
@@ -599,7 +599,6 @@ C<InputLength> option.
 To read the contents of the file C<file1.txt.1951> and write the
 compressed data to the file C<file1.txt>.
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::RawInflate qw(rawinflate $RawInflateError) ;
 
@@ -612,7 +611,6 @@ compressed data to the file C<file1.txt>.
 To read from an existing Perl filehandle, C<$input>, and write the
 uncompressed data to a buffer, C<$buffer>.
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::RawInflate qw(rawinflate $RawInflateError) ;
     use IO::File ;
@@ -625,7 +623,6 @@ uncompressed data to a buffer, C<$buffer>.
 
 To uncompress all files in the directory "/my/home" that match "*.txt.1951" and store the compressed data in the same directory
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::RawInflate qw(rawinflate $RawInflateError) ;
 
@@ -634,7 +631,6 @@ To uncompress all files in the directory "/my/home" that match "*.txt.1951" and 
 
 and if you want to compress each file one at a time, this will do the trick
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::RawInflate qw(rawinflate $RawInflateError) ;
 

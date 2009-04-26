@@ -18,7 +18,7 @@ Make a filehandle. Same kind of idea as Symbol::gensym().
 
 sub mkfh()
 {
-    my $fh = \*{Symbol::fetch_glob($fhname++)};
+    my $fh = \Symbol::fetch_glob($fhname++)->*;
     return $fh;
 }
 
@@ -128,7 +128,7 @@ sub write($self, ?$packfile)
         }
         print $fh, ("$key");
         if (ref($data)) {
-            foreach my $k (sort(keys(%$data))) {
+            foreach my $k (sort(keys($data->%))) {
                 print $fh, (" $k=$data->{$k}");
             }
         }

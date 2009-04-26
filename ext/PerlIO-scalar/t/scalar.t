@@ -128,7 +128,7 @@ do {
 my $data = "a non-empty PV";
 $data = undef;
 open(my $mem, '<', \$data) or die "Fail: $^OS_ERROR\n";
-my $x = join '', @: ~< *$mem;
+my $x = join '', @: ~< $mem->*;
 is($x, '');
 
 do {
@@ -140,7 +140,7 @@ a third line
 EOF
     open(my $f, '<', \$s) or die "Could not open string as a file";
     local $^INPUT_RECORD_SEPARATOR = "";
-    my $ln = ~< *$f;
+    my $ln = ~< $f->*;
     close $f;
     is($ln, $s, "[perl #35929]");
 };
@@ -155,7 +155,7 @@ do {
     close $f;
     # but we can read from it
     ok(open($f, '<', $ro), $^OS_ERROR);
-    is( ~< *$f, 43);
+    is( ~< $f->*, 43);
     close $f;
 };
 

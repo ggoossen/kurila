@@ -67,8 +67,8 @@ sub encode_list {
 
 
 sub list_eq($l, $r) {
-    return 0 unless (nelems @$l) == nelems @$r;
-    for my $i (0..(nelems @$l) -1) {
+    return 0 unless (nelems $l->@) == nelems $r->@;
+    for my $i (0..(nelems $l->@) -1) {
         if (defined $l->[$i]) {
             return 0 unless defined ($r->[$i]) && $l->[$i] eq $r->[$i];
         } else {
@@ -505,7 +505,7 @@ foreach (@(
     \@('u', 'Z8',  "foo\0bar \0", "foo"),)
 )
 {
-    my @($what, $template, $in, $out) =  @$_;
+    my @($what, $template, $in, $out) =  $_->@;
     my $got = $what eq 'u' ?? (unpack $template, $in) !! (pack $template, $in);
     unless (is($got, $out)) {
         my $un = $what eq 'u' ?? 'un' !! '';
@@ -861,7 +861,7 @@ do {
            \@('a/a*/b*', '212ab', '100001100100'),)
     )
     {
-        my @($pat, $in, $expect) =  @$_;
+        my @($pat, $in, $expect) =  $_->@;
         undef $x;
         try { ($x) = unpack $pat, $in };
         is($^EVAL_ERROR, '');
@@ -1004,7 +1004,7 @@ foreach (@(
          \@('a*@4a', 'Perl rules', '!', 'Perl!'),)
 )
 {
-    my @($template, @< @in) =  @$_;
+    my @($template, @< @in) =  $_->@;
     my $out = pop @in;
     my $got = try {pack $template, < @in};
     is($^EVAL_ERROR, '');
@@ -1024,7 +1024,7 @@ foreach (@(
          \@('a*@1a3', "steam", "steam", "tea"),)
 )
 {
-    my @($template, $in, @< @out) =  @$_;
+    my @($template, $in, @< @out) =  $_->@;
     my @got = @( try {unpack $template, $in} );
     is($^EVAL_ERROR, '');
     ok (list_eq (\@got, \@out)) ||
@@ -1108,7 +1108,7 @@ do {
         );
 
     for my $tle (sort keys %templates) {
-        my @d = @{%templates{?$tle}};
+        my @d = %templates{?$tle}->@;
         my $tbe = $tle;
         $tbe =~ s/</>/g;
         for my $t (@($tbe, $tle)) {
@@ -1482,7 +1482,7 @@ foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w)) {
         foreach my $test ( @tests) {
             ok (list_eq ($test->[1], $test->[2]), $test->[0]) ||
                 diag sprintf "unpack gave \%s expected \%s", <
-             encode_list (< @{$test->[1]}), < encode_list (< @{$test->[2]});
+             encode_list (< $test->[1]->@), < encode_list (< $test->[2]->@);
         }
     };
 }
@@ -1627,7 +1627,7 @@ do {
             \@('A3', "abc"), \@('Z3', "ghi"))
     ) {
       SKIP: do {
-            my @($format, $val) =  @$_;
+            my @($format, $val) =  $_->@;
             no utf8;
             my $down = try { pack($format, $val) };
             skip "cannot pack/unpack $format on this perl", 9 if

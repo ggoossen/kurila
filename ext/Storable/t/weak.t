@@ -88,7 +88,7 @@ my @tests = @(
     );
 
 foreach (@tests) {
-    my @($input, $testsub) = @$_;
+    my @($input, $testsub) = $_->@;
 
     tester($input, sub {return shift}, $testsub, 'nothing');
 

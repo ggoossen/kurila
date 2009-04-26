@@ -124,7 +124,7 @@ while ($Decomp =~ m/(.+)/g) {
     my $ini = hex(@tab[0]); # initial decomposable character
 
     my $listname =
-        (nelems @$dec) == 2 ?? sprintf("$($structname)_\%06x", $dec->[0]) !! 'USELESS';
+        (nelems $dec->@) == 2 ?? sprintf("$($structname)_\%06x", $dec->[0]) !! 'USELESS';
     # %04x is bad since it'd place _3046 after _1d157.
 
     if (@tab[1] eq '') {
@@ -133,7 +133,7 @@ while ($Decomp =~ m/(.+)/g) {
         if (! $compat) {
             %Canon{+$ini } = $dec;
 
-            if ((nelems @$dec) == 2) {
+            if ((nelems $dec->@) == 2) {
                 if (%Combin{?$dec->[0] }) {
                     %NonStD{+$ini } = 1;
                 } else {
@@ -141,7 +141,7 @@ while ($Decomp =~ m/(.+)/g) {
                     %Comp1st{+$dec->[0] } = $listname;
                     %Comp2nd{+$dec->[1] } = 1 if ! %Exclus{?$ini};
                 }
-            } elsif ((nelems @$dec) == 1) {
+            } elsif ((nelems $dec->@) == 1) {
                 %Single{+$ini } = 1;
             } else {
                 die("Weird Canonical Decomposition of U+@tab[0]");
@@ -154,7 +154,7 @@ while ($Decomp =~ m/(.+)/g) {
             if (! $compat) {
                 %Canon{+$u } = $dec;
 
-                if ((nelems @$dec) == 2) {
+                if ((nelems $dec->@) == 2) {
                     if (%Combin{?$dec->[0] }) {
                         %NonStD{+$u } = 1;
                     } else {
@@ -162,7 +162,7 @@ while ($Decomp =~ m/(.+)/g) {
                         %Comp1st{+$dec->[0] } = $listname;
                         %Comp2nd{+$dec->[1] } = 1 if ! %Exclus{?$u};
                     }
-                } elsif ((nelems @$dec) == 1) {
+                } elsif ((nelems $dec->@) == 1) {
                     %Single{+$u } = 1;
                 } else {
                     die("Weird Canonical Decomposition of U+@tab[0]");
@@ -181,7 +181,7 @@ sub getCanonList {
     my @src = @_;
     my @dec = @+: map {
             (SBase +<= $_ && $_ +<= SFinal) ?? decomposeHangul($_)
-                !! %Canon{?$_} ?? @{ %Canon{?$_} } !! @($_)
+                !! %Canon{?$_} ??  %Canon{?$_}->@ !! @($_)
         }, @src;
     return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCanonList(< @dec);
 # condition @src == @dec is not ok.
@@ -191,7 +191,7 @@ sub getCompatList {
     my @src = @_;
     my @dec = @+: map {
             (SBase +<= $_ && $_ +<= SFinal) ?? decomposeHangul($_)
-                !! %Compat{?$_} ?? @{ %Compat{?$_} } !! @($_)
+                !! %Compat{?$_} ??  %Compat{?$_}->@ !! @($_)
         }, @src;
     return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCompatList(< @dec);
 # condition @src == @dec is not ok.
@@ -227,8 +227,8 @@ sub _U_stringify {
 }
 
 foreach my $hash (@(\%Canon, \%Compat)) {
-    foreach my $key (keys %$hash) {
-        $hash->{+$key} = _U_stringify( < @{ $hash->{$key} } );
+    foreach my $key (keys $hash->%) {
+        $hash->{+$key} = _U_stringify( <  $hash->{$key}->@ );
     }
 }
 
@@ -269,7 +269,7 @@ print $fh, << 'EOF';
 EOF
 
 foreach my $tbl ( @boolfunc) {
-    my @temp = sort {$a <+> $b}, keys %{$tbl->{?hash}};
+    my @temp = sort {$a <+> $b}, keys $tbl->{?hash}->%;
     my $type = $tbl->{?type};
     my $name = $tbl->{?name};
     print $fh, "$type is$name (UV uv)\n\{\nreturn\n\t";
@@ -301,7 +301,7 @@ my $compinit =
 foreach my $i (sort keys %CompList) {
     $compinit .= "$structname $i [] = \{\n";
     $compinit .= join ",\n", map { sprintf("\t\{ \%d, \%d \}", $_, %CompList{$i}->{?$_}) },
-        sort { $a <+> $b }, keys %{ %CompList{?$i} };
+        sort { $a <+> $b }, keys  %CompList{?$i}->%;
     $compinit .= ",\n\{0,0\}\n\};\n\n"; # with sentinel
 }
 
@@ -358,7 +358,7 @@ EOF
 
     print $fh, $init if defined $init;
 
-    foreach my $uv (keys %$hash) {
+    foreach my $uv (keys $hash->%) {
         die sprintf("a Unicode code point 0x\%04X over 0x10FFFF.", $uv)
             unless $uv +<= 0x10FFFF;
         my @c = @( unpack 'CCCC', pack 'N', $uv );

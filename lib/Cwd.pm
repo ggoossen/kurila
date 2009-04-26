@@ -730,7 +730,7 @@ sub _qnx_abs_path {
     my $rpfh;
     defined( open($rpfh, "-|", '-') || exec '/usr/bin/fullpath', '-t', $path ) or
         die "Can't open /usr/bin/fullpath: $^OS_ERROR";
-    my $realpath = ~< *$rpfh;
+    my $realpath = ~< $rpfh->*;
     close $rpfh;
     chomp $realpath;
     return $realpath;
@@ -749,7 +749,7 @@ if (exists %METHOD_MAP{$^OS_NAME}) {
     my %map = %METHOD_MAP{?$^OS_NAME};
     foreach my $name (keys %map) {
         local $^WARNING = 0;  # assignments trigger 'subroutine redefined' warning
-        *{Symbol::fetch_glob($name)} = \&{%map{?$name}};
+        Symbol::fetch_glob($name)->* = \&{%map{?$name}};
     }
 }
 

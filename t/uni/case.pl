@@ -41,7 +41,7 @@ sub casetest {
 
     my $both;
 
-    for my $i (sort keys %$spec) {
+    for my $i (sort keys $spec->%) {
         if (++%seen{+$i} == 2) {
             warn sprintf "$base: $i seen twice\n";
             $both++;
@@ -58,7 +58,7 @@ sub casetest {
 
     my $tests = 
         ( (nelems(%simple)/2) +
-   (nelems(%$spec)/2) +
+   (nelems($spec->%)/2) +
    (nelems(%none)/2) ) * nelems @funcs;
     print $^STDOUT, "1..$tests\n";
 
@@ -76,7 +76,7 @@ sub casetest {
         }
     }
 
-    for my $i (sort keys %$spec) {
+    for my $i (sort keys $spec->%) {
         my $w = unidump($spec->{?$i});
         #my $c = substr $i, 0, 1;
         my $h = unidump($i);

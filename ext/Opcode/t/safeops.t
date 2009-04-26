@@ -46,7 +46,7 @@ sub testop($op, $opname, $code) {
 
 foreach (@op) {
     if ($_->[2]) {
-        testop < @$_;
+        testop < $_->@;
     } else {
         local $TODO = "No test yet for $_->[1]";
         fail();

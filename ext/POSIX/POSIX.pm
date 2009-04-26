@@ -31,7 +31,7 @@ my %NON_CONSTS = %(< @+: map {@($_,1)},
                      WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG));
 
 for my $name (keys %NON_CONSTS) {
-    *{Symbol::fetch_glob($name)} = sub { int_macro_int($name, @_[?0]) };
+    Symbol::fetch_glob($name)->* = sub { int_macro_int($name, @_[?0]) };
 }
 
 sub usage($mess) {
@@ -863,7 +863,7 @@ sub load_imports {
     do {
         # De-duplicate the export list: 
         my %export;
-            %export{[ @+: map {@$_}, values %EXPORT_TAGS]} = @();
+            %export{[ @+: map {$_->@}, values %EXPORT_TAGS]} = @();
         # Doing the de-dup with a temporary hash has the advantage that the SVs in
         # @EXPORT are actually shared hash key sacalars, which will save some memory.
         push @EXPORT, < keys %export;

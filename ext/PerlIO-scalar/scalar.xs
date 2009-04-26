@@ -143,21 +143,23 @@ PerlIOScalar_write(pTHX_ PerlIO * f, const void *vbuf, Size_t count)
 	SV *sv = s->var;
 	char *dst;
 	if ((PerlIOBase(f)->flags) & PERLIO_F_APPEND) {
-	    dst = SvGROW(sv, SvCUR(sv) + count);
+	    dst = SvGROW(sv, SvCUR(sv) + count + 1);
 	    offset = SvCUR(sv);
 	    s->posn = offset + count;
 	}
 	else {
 	    if ((s->posn + count) > SvCUR(sv))
-		dst = SvGROW(sv, (STRLEN)s->posn + count);
+		dst = SvGROW(sv, (STRLEN)s->posn + count + 1);
 	    else
 		dst = SvPV_nolen(sv);
 	    offset = s->posn;
 	    s->posn += count;
 	}
 	Move(vbuf, dst + offset, count, char);
-	if ((STRLEN) s->posn > SvCUR(sv))
+	if ((STRLEN) s->posn > SvCUR(sv)) {
 	    SvCUR_set(sv, (STRLEN)s->posn);
+            dst[s->posn] = '\0';
+        }
 	SvPOK_on(s->var);
 	return count;
     }

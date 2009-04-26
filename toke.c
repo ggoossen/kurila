@@ -2071,7 +2071,7 @@ S_intuit_more(pTHX_ register char *s)
 
     if (PL_lex_brackets)
 	return TRUE;
-    if (*s == '-' && s[1] == '>' && (s[2] == '[' || s[2] == '{' || s[2] == '@'))
+    if (*s == '-' && s[1] == '>' && (s[2] == '[' || s[2] == '{' || s[2] == '@' || s[2] == '$'))
 	return TRUE;
     if (*s != '{' && *s != '[')
 	return FALSE;
@@ -3317,7 +3317,7 @@ Perl_yylex(pTHX)
 			/* ->$ closes the interpoltion and creates a join */
 			PL_lex_state = LEX_INTERPEND;
 		    }
-		    OPERATOR(DEREFSCL);
+		    TERM(DEREFSCL);
 		}
 		else if (*s == '%') {
 		    s++;
@@ -3325,7 +3325,7 @@ Perl_yylex(pTHX)
 			/* ->$ closes the interpoltion and creates a join */
 			PL_lex_state = LEX_INTERPEND;
 		    }
-		    OPERATOR(DEREFHSH);
+		    TERM(DEREFHSH);
 		} 
 		else if (*s == '*') {
 		    s++;
@@ -3333,7 +3333,7 @@ Perl_yylex(pTHX)
 			/* ->$ closes the interpoltion and creates a join */
 			PL_lex_state = LEX_INTERPEND;
 		    }
-		    OPERATOR(DEREFSTAR);
+		    TERM(DEREFSTAR);
 		} 
 		else if (*s == '&') {
 		    s++;
@@ -3341,7 +3341,7 @@ Perl_yylex(pTHX)
 			/* ->$ closes the interpoltion and creates a join */
 			PL_lex_state = LEX_INTERPEND;
 		    }
-		    OPERATOR(DEREFAMP);
+		    TERM(DEREFAMP);
 		} 
 		s = SKIPSPACE1(s);
 		if (isIDFIRST_lazy_if(s,UTF)) {

@@ -492,12 +492,6 @@ struct rootop {
 #define ref(o, type) doref(o, type, TRUE)
 #endif
 
-/* no longer used anywhere in core */
-#ifndef PERL_CORE
-#define cv_ckproto(cv, gv, p) \
-   cv_ckproto_len((cv), (gv), (p), (p) ? strlen(p) : 0)
-#endif
-
 #ifdef USE_REENTRANT_API
 #include "reentr.h"
 #endif

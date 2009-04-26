@@ -248,7 +248,7 @@ foreach my $dir ( @splithead) {
         die "$^PROGRAM_NAME: error opening $file.html for input: $^OS_ERROR\n";
     $^INPUT_RECORD_SEPARATOR = "";
     my @data = @( () );
-    while ( ~< *$h_fh) {
+    while ( ~< $h_fh->*) {
         last if m/name="name"/i;
         $_ =~ s{href="#(.*)">}{$( do {
             my $url = "$pod/$1.html" ;
@@ -323,7 +323,7 @@ sub create_index($html, $dir) {
 
         open(my $in_fh, "<", "$dir/$file") ||
             die "$^PROGRAM_NAME: error opening $dir/$file for input: $^OS_ERROR\n";
-        @filedata = @( ~< *$in_fh );
+        @filedata = @( ~< $in_fh->* );
         close($in_fh);
 
         # pull out the NAME section
@@ -371,7 +371,7 @@ sub split_on_head($podroot, $htmldir, $splitdirs, $ignore, @< @splithead) {
         $filename = "$2.pod";
 
         # since we are splitting this file it shouldn't be converted.
-        push(@$ignore, "$podroot/$dirname/$filename");
+        push($ignore->@, "$podroot/$dirname/$filename");
 
         # split the pod
         splitpod("$podroot/$dirname/$filename", "$podroot/$dirname", $htmldir,
@@ -395,10 +395,10 @@ sub split_on_item($podroot, $splitdirs, $ignore, @< @splititem) {
         $filename = "$2.pod";
 
         # since we are splitting this file it shouldn't be converted.
-        push(@$ignore, "$podroot/$dirname.pod");
+        push($ignore->@, "$podroot/$dirname.pod");
 
         # split the pod
-        push(@$splitdirs, "$podroot/$dirname");
+        push($splitdirs->@, "$podroot/$dirname");
         if (! -d "$podroot/$dirname") {
             mkdir("$podroot/$dirname", 0755) ||
                 die "$^PROGRAM_NAME: error creating directory $podroot/$dirname: $^OS_ERROR\n";
@@ -430,7 +430,7 @@ sub splitpod($pod, $poddir, $htmldir, $splitdirs) {
     $^INPUT_RECORD_SEPARATOR = "";
     open(my $splitin_fh, "<", "$pod") ||
         die "$^PROGRAM_NAME: error opening $pod for input: $^OS_ERROR\n";
-    @filedata = @( ~< *$splitin_fh );
+    @filedata = @( ~< $splitin_fh->* );
     close($splitin_fh) ||
         die "$^PROGRAM_NAME: error closing $pod: $^OS_ERROR\n";
 
@@ -458,7 +458,7 @@ sub splitpod($pod, $poddir, $htmldir, $splitdirs) {
     $pod =~ s,.*/(.*),$1,;	# get the last part of the name
     my $dir = $pod;
     $dir =~ s/\.pod//g;
-    push(@$splitdirs, "$poddir/$dir");
+    push($splitdirs->@, "$poddir/$dir");
     mkdir("$poddir/$dir", 0755) ||
         die "$^PROGRAM_NAME: could not create directory $poddir/$dir: $^OS_ERROR\n"
         unless -d "$poddir/$dir";
@@ -515,7 +515,7 @@ sub installdir($dir, $recurse, $podroot, $splitdirs, $ignore) {
     @pmlist  = @( () );	# .pm files to install
 
     # should files in this directory get an index?
-    $doindex = (grep( { $_ eq "$podroot/$dir" }, @$splitdirs) ?? 0 !! 1);
+    $doindex = (grep( { $_ eq "$podroot/$dir" }, $splitdirs->@) ?? 0 !! 1);
 
     opendir(my $dirhandle, "$podroot/$dir")
         || die "$^PROGRAM_NAME: error opening directory $podroot/$dir: $^OS_ERROR\n";
@@ -545,7 +545,7 @@ sub installdir($dir, $recurse, $podroot, $splitdirs, $ignore) {
     foreach my $pod ( @podlist) {
         # check if we should ignore it.
         next if $pod =~ m(/t/); # comes from a test file
-        next if grep( { $_ eq "$pod.pod" }, @$ignore);
+        next if grep( { $_ eq "$pod.pod" }, $ignore->@);
 
         # check if a .pm files exists too
         if (grep( { $_ eq $pod }, @pmlist)) {

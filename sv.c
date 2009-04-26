@@ -2508,10 +2508,6 @@ S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
 					GvENAME((GV*)dstr));
 			}
 		    }
-		if (!intro)
-		    cv_ckproto_len(cv, (GV*)dstr,
-				   SvPOK(sref) ? SvPVX_const(sref) : NULL,
-				   SvPOK(sref) ? SvCUR(sref) : 0);
 	    }
 	    GvCVGEN(dstr) = 0; /* Switch off cacheness. */
 	    GvASSUMECV_on(dstr);
@@ -6027,8 +6023,8 @@ Perl_newSVpvn_share(pTHX_ const char *src, I32 len, U32 hash)
     new_SV(sv);
     sv_upgrade(sv, SVt_PV);
     SvPV_set(sv, sharepvn(src, len, hash));
-    SvCUR_set(sv, len);
     SvLEN_set(sv, 0);
+    SvCUR_set(sv, len);
     SvREADONLY_on(sv);
     SvFAKE_on(sv);
     SvPOK_on(sv);

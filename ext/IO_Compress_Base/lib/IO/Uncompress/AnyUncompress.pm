@@ -18,7 +18,7 @@ $AnyUncompressError = '';
 @ISA = qw( IO::Uncompress::Base Exporter );
 @EXPORT_OK = qw( $AnyUncompressError anyuncompress ) ;
 %EXPORT_TAGS = %( < %IO::Uncompress::Base::DEFLATE_CONSTANTS ) ;
-push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
+push  %EXPORT_TAGS{all}->@, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');
 
 # TODO - allow the user to pick a set of the three formats to allow
@@ -87,7 +87,7 @@ sub mkUncomp
         return $self->saveErrorString(undef, $errstr, $errno)
             if ! defined $obj;
 
-        *$self->{+Uncomp} = $obj;
+        $self->*->{+Uncomp} = $obj;
 
         my @possible = qw( Inflate Gunzip Unzip );
         unshift @possible, 'RawInflate' 
@@ -96,7 +96,7 @@ sub mkUncomp
         $magic = $self->ckMagic( < @possible );
 
         if ($magic) {
-            *$self->{+Info} = $self->readHeader($magic)
+            $self->*->{+Info} = $self->readHeader($magic)
             or return undef ;
 
             return 1;
@@ -105,7 +105,7 @@ sub mkUncomp
 
     if (defined $IO::Uncompress::Bunzip2::VERSION and
         $magic = $self->ckMagic('Bunzip2')) {
-        *$self->{+Info} = $self->readHeader($magic)
+        $self->*->{+Info} = $self->readHeader($magic)
         or return undef ;
 
         my @($obj, $errstr, $errno) =  IO::Uncompress::Adapter::Bunzip2::mkUncompObject();
@@ -113,7 +113,7 @@ sub mkUncomp
         return $self->saveErrorString(undef, $errstr, $errno)
             if ! defined $obj;
 
-        *$self->{+Uncomp} = $obj;
+        $self->*->{+Uncomp} = $obj;
 
         return 1;
     }
@@ -121,7 +121,7 @@ sub mkUncomp
     if (defined $IO::Uncompress::UnLzop::VERSION and
         $magic = $self->ckMagic('UnLzop')) {
 
-        *$self->{+Info} = $self->readHeader($magic)
+        $self->*->{+Info} = $self->readHeader($magic)
         or return undef ;
 
         my @($obj, $errstr, $errno) =  IO::Uncompress::Adapter::LZO::mkUncompObject();
@@ -129,7 +129,7 @@ sub mkUncomp
         return $self->saveErrorString(undef, $errstr, $errno)
             if ! defined $obj;
 
-        *$self->{+Uncomp} = $obj;
+        $self->*->{+Uncomp} = $obj;
 
         return 1;
     }
@@ -137,7 +137,7 @@ sub mkUncomp
     if (defined $IO::Uncompress::UnLzf::VERSION and
         $magic = $self->ckMagic('UnLzf')) {
 
-        *$self->{+Info} = $self->readHeader($magic)
+        $self->*->{+Info} = $self->readHeader($magic)
         or return undef ;
 
         my @($obj, $errstr, $errno) =  IO::Uncompress::Adapter::Lzf::mkUncompObject();
@@ -145,7 +145,7 @@ sub mkUncomp
         return $self->saveErrorString(undef, $errstr, $errno)
             if ! defined $obj;
 
-        *$self->{+Uncomp} = $obj;
+        $self->*->{+Uncomp} = $obj;
 
         return 1;
     }
@@ -172,8 +172,8 @@ sub ckMagic
             return $magic ;
         }
 
-        $self->pushBack(*$self->{HeaderPending})  ;
-        *$self->{+HeaderPending} = ''  ;
+        $self->pushBack($self->*->{HeaderPending})  ;
+        $self->*->{+HeaderPending} = ''  ;
     }    
 
     bless $self => $keep;
@@ -487,7 +487,6 @@ C<InputLength> option.
 To read the contents of the file C<file1.txt.Compressed> and write the
 compressed data to the file C<file1.txt>.
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::AnyUncompress qw(anyuncompress $AnyUncompressError) ;
 
@@ -500,7 +499,6 @@ compressed data to the file C<file1.txt>.
 To read from an existing Perl filehandle, C<$input>, and write the
 uncompressed data to a buffer, C<$buffer>.
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::AnyUncompress qw(anyuncompress $AnyUncompressError) ;
     use IO::File ;
@@ -513,7 +511,6 @@ uncompressed data to a buffer, C<$buffer>.
 
 To uncompress all files in the directory "/my/home" that match "*.txt.Compressed" and store the compressed data in the same directory
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::AnyUncompress qw(anyuncompress $AnyUncompressError) ;
 
@@ -522,7 +519,6 @@ To uncompress all files in the directory "/my/home" that match "*.txt.Compressed
 
 and if you want to compress each file one at a time, this will do the trick
 
-    use strict ;
     use warnings ;
     use IO::Uncompress::AnyUncompress qw(anyuncompress $AnyUncompressError) ;
 

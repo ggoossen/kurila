@@ -21,7 +21,7 @@ EO_NAME
 
 $p_s->select( 'NAME' );
 $p_s->parse_from_file( $^PROGRAM_NAME, $fake_out_fh );
-is( $$fake_out, $pod, 'select( NAME )' );
+is( $fake_out->$, $pod, 'select( NAME )' );
 
 $pod .= << 'EO_SYNOPSIS';
 =head1 SYNOPSIS
@@ -30,10 +30,10 @@ This program just tests the basics of the Pod::Select module.
 
 EO_SYNOPSIS
 
-$$fake_out = '';
+$fake_out->$ = '';
 $p_s->select( 'NAME', 'SYNOPSIS' );
 $p_s->parse_from_file( $^PROGRAM_NAME, $fake_out_fh );
-is( $$fake_out, $pod, 'select( NAME, SYNOPSIS )' );
+is( $fake_out->$, $pod, 'select( NAME, SYNOPSIS )' );
 
 $pod .= << 'EO_AUTHOR';
 =head1 AUTHOR
@@ -42,10 +42,10 @@ Abe Timmerman <abe@ztreet.demon.nl>
 
 EO_AUTHOR
 
-$$fake_out = '';
+$fake_out->$ = '';
 $p_s->add_selection( 'AUTHOR' );
 $p_s->parse_from_file( $^PROGRAM_NAME, $fake_out_fh );
-is( $$fake_out, $pod, 'add_selection( AUTHOR )' );
+is( $fake_out->$, $pod, 'add_selection( AUTHOR )' );
 
 my $head1 = $p_s->curr_headings(1);
 is( $head1, 'AUTHOR', 'curr_headings()' );
@@ -57,10 +57,10 @@ a sub-section can be specified
 
 EO_DESCRIPTION
 
-$$fake_out = '';
+$fake_out->$ = '';
 $p_s->select( 'DESCRIPTION/subsection' );
 $p_s->parse_from_file( $^PROGRAM_NAME, $fake_out_fh );
-is( $$fake_out, $pod, 'select( DESCRIPTION/subsection )' );
+is( $fake_out->$, $pod, 'select( DESCRIPTION/subsection )' );
 
 
 ok( $p_s->match_section( 'DESCRIPTION', 'subsection' ), 
@@ -73,10 +73,10 @@ I'll go by the POD in Pod::Select.
 
 EO_DESCRIPTION
 
-$$fake_out = '';
+$fake_out->$ = '';
 $p_s->select( 'DESCRIPTION/!.+' );
 $p_s->parse_from_file( $^PROGRAM_NAME, $fake_out_fh );
-is( $$fake_out, $pod, 'select( DESCRIPTION/!.+ )' );
+is( $fake_out->$, $pod, 'select( DESCRIPTION/!.+ )' );
 
 
 __END__

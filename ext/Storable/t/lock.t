@@ -40,7 +40,7 @@ ok(my $dumped = &dump(\@a));
 
 my $root = lock_retrieve('store');
 ok ref $root eq 'ARRAY';
-ok nelems(@a) == nelems(@$root);
+ok nelems(@a) == nelems($root->@);
 ok &dump($root) eq $dumped; 
 
 unlink 't/store';

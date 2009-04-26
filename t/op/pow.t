@@ -60,7 +60,7 @@ foreach my $n (0..$bits_in_uv - 1) {
 }
 
 foreach my $pow ( @pow) {
-    my @($base, $max, $range) =  @$pow;
+    my @($base, $max, $range) =  $pow->@;
     my $expect = 1;
     foreach my $n (0..$max-1) {
         my $got = $base ** $n;

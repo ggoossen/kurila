@@ -34,7 +34,7 @@ env::var('PERL5OPT') = undef;
 sub runperl {
     my @($env, $args, $stdout, $stderr) =  @_;
 
-    unshift @$args, '-I../lib';
+    unshift $args->@, '-I../lib';
 
     $stdout = '' unless defined $stdout;
     $stderr = '' unless defined $stderr;
@@ -61,16 +61,16 @@ sub runperl {
             return @(1, '');                 # success
         }
     } else {                      # child
-        my $old = %+: map { %: $_ => env::var($_) }, keys %$env;
+        my $old = %+: map { %: $_ => env::var($_) }, keys $env->%;
         push dynascope->{onleave}, sub {
                 for (keys $old) {
                     env::var($_) = $old{$_};
                 }
             };
-        env::var($_ ) = $env->{$_} for keys %$env;
+        env::var($_ ) = $env->{$_} for keys $env->%;
         open $^STDOUT, ">", $STDOUT or exit $FAILURE_CODE;
         open $^STDERR, ">", $STDERR or it_didnt_work();
-        do { exec $PERL, < @$args };
+        do { exec $PERL, < $args->@ };
         it_didnt_work();
     }
 }
