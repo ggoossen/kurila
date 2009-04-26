@@ -207,7 +207,7 @@ sub pod2man {
     }
 
     foreach my $page (@to_process) {
-	my @($pod, $tmp, $manpage) = @$page;
+	my @($pod, $tmp, $manpage) = $page->@;
 
         my $parser = Pod::Man->new( section => $manext,
                                     official=> 1,
