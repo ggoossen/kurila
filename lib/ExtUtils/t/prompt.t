@@ -27,21 +27,21 @@ like( $^EVAL_ERROR->{description}, qr/^prompt function called without an argumen
 
 my $stdout = \$( '' );
 open my $stdout_fh, '>>', $stdout or die;
-$^STDOUT = *$stdout_fh{IO};
+$^STDOUT = $stdout_fh->*{IO};
 
 
 env::var('PERL_MM_USE_DEFAULT' ) = 1;
 is( prompt("Foo?"), '',     'no default' );
-like( $$stdout,  qr/^Foo\?\s*\n$/,      '  question' );
-$$stdout = '';
+like( $stdout->$,  qr/^Foo\?\s*\n$/,      '  question' );
+$stdout->$ = '';
 
 is( prompt("Foo?", undef), '',     'undef default' );
-like( $$stdout,  qr/^Foo\?\s*\n$/,      '  question' );
-$$stdout = '';
+like( $stdout->$,  qr/^Foo\?\s*\n$/,      '  question' );
+$stdout->$ = '';
 
 is( prompt("Foo?", 'Bar!'), 'Bar!',     'default' );
-like( $$stdout,  qr/^Foo\? \[Bar!\]\s+Bar!\n$/,      '  question' );
-$$stdout = '';
+like( $stdout->$,  qr/^Foo\? \[Bar!\]\s+Bar!\n$/,      '  question' );
+$stdout->$ = '';
 
 
 do {
@@ -49,11 +49,11 @@ do {
     close $^STDIN;
     my $stdin = '';
     open my $stdin_fh, '<', \$stdin or die;
-    $^STDIN = *$stdin_fh{IO};
+    $^STDIN = $stdin_fh->*{IO};
     $stdin .= "From STDIN";
     ok( !-t $^STDIN,      'STDIN not a tty' );
 
     is( prompt("Foo?", 'Bar!'), 'From STDIN',     'from STDIN' );
-    like( $$stdout,  qr/^Foo\? \[Bar!\]\s*$/,      '  question' );
-    $$stdout = '';
+    like( $stdout->$,  qr/^Foo\? \[Bar!\]\s*$/,      '  question' );
+    $stdout->$ = '';
 };

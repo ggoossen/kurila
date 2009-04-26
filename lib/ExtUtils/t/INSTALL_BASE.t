@@ -75,5 +75,5 @@ open($^STDERR, ">", "".File::Spec->devnull) or die $^OS_ERROR;
 my $realclean_out = run("$make realclean");
 is( $^CHILD_ERROR, 0, 'realclean' ) || diag($realclean_out);
 
-open($^STDERR, ">&", \*$saverr) or die $^OS_ERROR;
+open($^STDERR, ">&", \$saverr->*) or die $^OS_ERROR;
 close $saverr;

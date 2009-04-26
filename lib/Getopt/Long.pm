@@ -103,7 +103,7 @@ sub import {
             $dest = \@config;	# config next
             next;
         }
-        push(@$dest, $_);	# push
+        push($dest->@, $_);	# push
     }
     # Hide one level and call super.
     local $Exporter::ExportLevel = 1;
@@ -252,9 +252,9 @@ sub GetOptionsFromString($string, @< @args) {
     my $args = \ Text::ParseWords::shellwords($string);
     $caller ||= @(caller)[0];	# current context
     my $ret = GetOptionsFromArray($args, < @args);
-    if ( (nelems @$args) ) {
+    if ( (nelems $args->@) ) {
         $ret = 0;
-        warn("GetOptionsFromString: Excess data \"$(join ' ',@$args)\" in string \"$string\"\n");
+        warn("GetOptionsFromString: Excess data \"$(join ' ',$args->@)\" in string \"$string\"\n");
     }
     return $ret;
 }
@@ -280,7 +280,7 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
     '$Revision: 2.74 $', ") ",
     "called from package \"$pkg\".",
     "\n  ",
-    "argv: ($(join ' ',@$argv))",
+    "argv: ($(join ' ',$argv->@))",
     "\n  ",
     "autoabbrev=$autoabbrev,".
     "bundling=$bundling,",
@@ -470,10 +470,10 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
 
     # Process argument list
     my $goon = 1;
-    while ( $goon && (nelems @$argv) +> 0 ) {
+    while ( $goon && (nelems $argv->@) +> 0 ) {
 
         # Get next argument.
-        $opt = shift (@$argv);
+        $opt = shift ($argv->@);
         print $^STDERR, ("=> arg \"", $opt, "\"\n") if $debug;
 
         # Double dash is option list terminator.
@@ -526,7 +526,7 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
                         " to ARRAY\n")
                                 if $debug;
                             my $t = %linkage{?$opt};
-                            $$t = %linkage{+$opt} = \@();
+                            $t->$ = %linkage{+$opt} = \@();
                             print $^STDERR, ("=> push(\@\{\$L\{$opt\}, \"$arg\")\n")
                                 if $debug;
                             push (%linkage{$opt}->@, $arg);
@@ -536,7 +536,7 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
                         " to HASH\n")
                                 if $debug;
                             my $t = %linkage{?$opt};
-                            $$t = %linkage{+$opt} = \%();
+                            $t->$ = %linkage{+$opt} = \%();
                             print $^STDERR, ("=> \$\$L\{$opt\}->\{$key\} = \"$arg\"\n")
                                 if $debug;
                             %linkage{$opt}->{+$key} = $arg;
@@ -646,15 +646,15 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
 
                 # Need more args?
                 if ( $argcnt +< $ctl->[CTL_AMIN] ) {
-                    if ( (nelems @$argv) ) {
+                    if ( (nelems $argv->@) ) {
                         if ( ValidValue($ctl, $argv->[0], 1, $argend, $prefix) ) {
-                            $arg = shift(@$argv);
+                            $arg = shift($argv->@);
                             $arg =~ s/_//g if $ctl->[CTL_TYPE] =~ m/^[iIo]$/;
                             @($key,$arg) = $arg =~ m/^([^=]+)=(.*)/
                                 if $ctl->[CTL_DEST] == CTL_DEST_HASH;
                             next;
                         }
-                        warn("Value \"@$argv[0]\" invalid for option $opt\n");
+                        warn("Value \"$argv->[0]\" invalid for option $opt\n");
                         $error++;
                     }
                     else {
@@ -664,8 +664,8 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
                 }
 
                 # Any more args?
-                if ( (nelems @$argv) && ValidValue($ctl, $argv->[0], 0, $argend, $prefix) ) {
-                    $arg = shift(@$argv);
+                if ( (nelems $argv->@) && ValidValue($ctl, $argv->[0], 0, $argend, $prefix) ) {
+                    $arg = shift($argv->@);
                     $arg =~ s/_//g if $ctl->[CTL_TYPE] =~ m/^[iIo]$/;
                     @($key,$arg) = $arg =~ m/^([^=]+)=(.*)/
                         if $ctl->[CTL_DEST] == CTL_DEST_HASH;
@@ -709,7 +709,7 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
         # ...otherwise, terminate.
         else {
             # Push this one back and exit.
-            unshift (@$argv, $tryopt);
+            unshift ($argv->@, $tryopt);
             return  @($error == 0);
         }
 
@@ -720,7 +720,7 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
         #  Push back accumulated arguments
         print $^STDERR, ("=> restoring \"", join('" "', @ret), "\"\n")
             if $debug;
-        unshift (@$argv, < @ret);
+        unshift ($argv->@, < @ret);
     }
 
     return  @($error == 0);
@@ -728,7 +728,7 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
 
 # A readable representation of what's in an optbl.
 sub OptCtl($v) {
-    my @v = map { defined($_) ?? ($_) !! ("<undef>") }, @$v;
+    my @v = map { defined($_) ?? ($_) !! ("<undef>") }, $v->@;
     "[".
         join(",", @(
     "\"@v[CTL_TYPE]\"",
@@ -847,7 +847,7 @@ sub ParseOptionSpec($opt, $opctl) {
         if ( $spec eq '!' ) {
             $opctl->{+"no$_"} = $entry;
             $opctl->{+"no-$_"} = $entry;
-            $opctl->{+$_} = \$: @$entry;
+            $opctl->{+$_} = \$: $entry->@;
             $opctl->{$_}->[CTL_TYPE] = '';
         }
         else {
@@ -920,7 +920,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl) {
     # Try auto-abbreviation.
     elsif ( $autoabbrev ) {
         # Sort the possible long option names.
-        my @names = sort(keys (%$opctl));
+        my @names = sort(keys ($opctl->%));
         # Downcase if allowed.
         $opt = lc ($opt) if $ignorecase;
         $tryopt = $opt;
@@ -982,7 +982,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl) {
         # Pretend one char when bundling.
         if ( $bundling == 1 && length($starter) == 1 ) {
             $opt = substr($opt,0,1);
-            unshift (@$argv, $starter.$rest) if defined $rest;
+            unshift ($argv->@, $starter.$rest) if defined $rest;
         }
         warn ("Unknown option: " . $opt . "\n");
         $error++;
@@ -1014,7 +1014,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl) {
             $opt =~ s/^no-?//i;	# strip NO prefix
             $arg = 0;		# supply explicit value
         }
-        unshift (@$argv, $starter.$rest) if defined $rest;
+        unshift ($argv->@, $starter.$rest) if defined $rest;
         return  @(1, $opt, $ctl, $arg);
     }
 
@@ -1030,7 +1030,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl) {
     # Check if there is an option argument available.
     if ( defined $optarg
         ?? ($optarg eq '')
-        !! !(defined $rest || (nelems @$argv) +> 0) ) {
+        !! !(defined $rest || (nelems $argv->@) +> 0) ) {
         # Complain if this option needs an argument.
         #	if ( $mand && !($type eq 's' ? defined($optarg) : 0) ) {
         if ( $mand ) {
@@ -1041,7 +1041,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl) {
         }
         if ( $type eq 'I' ) {
             # Fake incremental type.
-            my @c = @$ctl;
+            my @c = $ctl->@;
             @c[CTL_TYPE] = '+';
             return  @(1, $opt, \@c, 1);
         }
@@ -1052,7 +1052,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl) {
 
     # Get (possibly optional) argument.
     $arg = (defined $rest ?? $rest
-            !! (defined $optarg ?? $optarg !! shift (@$argv)));
+            !! (defined $optarg ?? $optarg !! shift ($argv->@)));
 
     # Get key if this is a "name=value" pair for a hash option.
     my $key;
@@ -1065,7 +1065,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl) {
             warn ("Option $opt, key \"$key\", requires a value\n");
             $error++;
             # Push back.
-            unshift (@$argv, $starter.$rest) if defined $rest;
+            unshift ($argv->@, $starter.$rest) if defined $rest;
             return  @(1, undef);
         }
     }
@@ -1091,7 +1091,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl) {
         if ($arg eq $argend ||
             $arg =~ m/^$prefix.+/) {
             # Push back.
-            unshift (@$argv, $arg);
+            unshift ($argv->@, $arg);
             # Supply empty value.
             $arg = '';
         }
@@ -1108,7 +1108,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl) {
             @($key, $arg, $rest) = @($1, $2, $3);
             chop($key) if $key;
             $arg = ($type eq 'o' && $arg =~ m/^0/) ?? oct($arg) !! 0+$arg;
-            unshift (@$argv, $starter.$rest) if defined $rest && $rest ne '';
+            unshift ($argv->@, $starter.$rest) if defined $rest && $rest ne '';
         }
         elsif ( $arg =~ m/^$o_valid$/si ) {
             $arg =~ s/_//g;
@@ -1117,7 +1117,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl) {
         else {
             if ( defined $optarg || $mand ) {
                 if ( $passthrough ) {
-                    unshift (@$argv, defined $rest ?? $starter.$rest !! $arg)
+                    unshift ($argv->@, defined $rest ?? $starter.$rest !! $arg)
                         unless defined $optarg;
                     return  @(0);
                 }
@@ -1127,15 +1127,15 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl) {
                     "number expected)\n");
                 $error++;
                 # Push back.
-                unshift (@$argv, $starter.$rest) if defined $rest;
+                unshift ($argv->@, $starter.$rest) if defined $rest;
                 return  @(1, undef);
             }
             else {
                 # Push back.
-                unshift (@$argv, defined $rest ?? $starter.$rest !! $arg);
+                unshift ($argv->@, defined $rest ?? $starter.$rest !! $arg);
                 if ( $type eq 'I' ) {
                     # Fake incremental type.
-                    my @c = @$ctl;
+                    my @c = $ctl->@;
                     @c[CTL_TYPE] = '+';
                     return  @(1, $opt, \@c, 1);
                 }
@@ -1155,7 +1155,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl) {
             $arg =~ s/_//g;
             @($key, $arg, $rest) = @($1, $2, $3);
             chop($key) if $key;
-            unshift (@$argv, $starter.$rest) if defined $rest && $rest ne '';
+            unshift ($argv->@, $starter.$rest) if defined $rest && $rest ne '';
         }
         elsif ( $arg =~ m/^$o_valid$/ ) {
             $arg =~ s/_//g;
@@ -1163,7 +1163,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl) {
         else {
             if ( defined $optarg || $mand ) {
                 if ( $passthrough ) {
-                    unshift (@$argv, defined $rest ?? $starter.$rest !! $arg)
+                    unshift ($argv->@, defined $rest ?? $starter.$rest !! $arg)
                         unless defined $optarg;
                     return  @(0);
                 }
@@ -1171,12 +1171,12 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl) {
                     $opt, " (real number expected)\n");
                 $error++;
                 # Push back.
-                unshift (@$argv, $starter.$rest) if defined $rest;
+                unshift ($argv->@, $starter.$rest) if defined $rest;
                 return  @(1, undef);
             }
             else {
                 # Push back.
-                unshift (@$argv, defined $rest ?? $starter.$rest !! $arg);
+                unshift ($argv->@, defined $rest ?? $starter.$rest !! $arg);
                 # Supply default value.
                 $arg = 0.0;
             }

@@ -112,7 +112,7 @@ sub survey($self, @< @search_dirs) {
         }
     }
     $self->progress and $self->progress->done(
-        "Noted $self->%{?'_scan_count'} Pod files total");
+        "Noted $self->{?'_scan_count'} Pod files total");
 
     return $self->name2path;
 }

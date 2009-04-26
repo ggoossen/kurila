@@ -864,6 +864,9 @@ Perl_op_mod_assign(pTHX_ OP *operator, OP **operandp, I32 optype)
 	return operator;
     }
 
+    if (!*operandp)
+	return operator;
+
     finish_assign = op_assign(operandp, optype);
 
     if (!finish_assign) {
@@ -1641,7 +1644,7 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 
     default:
     no_assign:
-	Perl_croak_at(aTHX_ o->op_location, "Can't assign to %s", OP_DESC(o));
+	yyerror_at(aTHX_ o->op_location, Perl_form("Can't assign to %s", OP_DESC(o)));
     }
     return o;
 }

@@ -176,7 +176,7 @@ sub maketext {
 
   my $value;
   foreach my $h_r (
-     @{  %isa_scan{?ref($handle) || $handle} || $handle->_lex_refs  }
+     (%isa_scan{?ref($handle) || $handle} || $handle->_lex_refs)->@
   ) {
     print $^STDOUT, "* Looking up \"$phrase\" in $h_r\n" if DEBUG;
     if(exists $h_r->{$phrase}) {
@@ -216,7 +216,7 @@ sub maketext {
     }
   }
 
-  return $$value if ref($value) eq 'SCALAR';
+  return $value->$ if ref($value) eq 'SCALAR';
   return $value unless ref($value) eq 'CODE';
   
   do {
@@ -370,7 +370,7 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
   my $module = @_[0];   # ASSUME sane module name!
   do {
     return (%tried{+$module} = 1)
-     if %{*{Symbol::fetch_glob($module . "::Lexicon")}} or @{*{Symbol::fetch_glob($module . "::ISA")}};
+     if Symbol::fetch_glob($module . "::Lexicon")->*->% or Symbol::fetch_glob($module . "::ISA")->*->@;
     # weird case: we never use'd it, but there it is!
   };
 
@@ -398,18 +398,18 @@ sub _lex_refs {  # report the lexicon references for this handle's class
   my @lex_refs;
   my $seen_r = ref(@_[?1]) ?? @_[1] !! \%();
 
-  if( defined( *{Symbol::fetch_glob($class . '::Lexicon')}{'HASH'} )) {
-    push @lex_refs, *{Symbol::fetch_glob($class . '::Lexicon')}{'HASH'};
+  if( defined( Symbol::fetch_glob($class . '::Lexicon')->*{'HASH'} )) {
+    push @lex_refs, Symbol::fetch_glob($class . '::Lexicon')->*{'HASH'};
     print $^STDOUT, "\%" . $class . "::Lexicon contains ",
-         scalar(keys %{*{Symbol::fetch_glob($class . '::Lexicon')}}), " entries\n" if DEBUG;
+         scalar(keys Symbol::fetch_glob($class . '::Lexicon')->*->%), " entries\n" if DEBUG;
   }
 
   # Implements depth(height?)-first recursive searching of superclasses.
   # In hindsight, I suppose I could have just used Class::ISA!
-  foreach my $superclass ( @{*{Symbol::fetch_glob($class . "::ISA")}}) {
+  foreach my $superclass ( Symbol::fetch_glob($class . "::ISA")->*->@) {
     print $^STDOUT, " Super-class search into $superclass\n" if DEBUG;
     next if $seen_r->{+$superclass}++;
-    push @lex_refs, < @{&_lex_refs($superclass, $seen_r)};  # call myself
+    push @lex_refs, < &_lex_refs($superclass, $seen_r)->@;  # call myself
   }
 
   %isa_scan{+$class} = \@lex_refs; # save for next time

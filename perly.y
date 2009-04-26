@@ -1341,11 +1341,6 @@ scalar  :	PRIVATEVAR
                             $$ = newPRIVATEVAROP(PL_parser->tokenbuf, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'X');
                         }
-	|	'$' indirob
-			{ 
-                            $$ = newSVREF($2, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'$');
-			}
         |       ANONSCALAR expr ')'  /* $( ... ) */
                         { 
                             $$ = newUNOP(OP_ANONSCALAR, 0, scalar($2), LOCATION($1));
@@ -1362,11 +1357,6 @@ scalar  :	PRIVATEVAR
                                     PL_parser->lex_state = LEX_INTERPEND;
                             }
 			}
-	|       '@' indirob
-			{ 
-                            $$ = newAVREF($2, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'@');
-			}
         |       ANONARY expr ')'  /* @( ... ) */
                         {
                             $$ = newANONARRAY($2, LOCATION($1));
@@ -1378,11 +1368,6 @@ scalar  :	PRIVATEVAR
                             $$ = newANONARRAY((OP*)NULL, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
                             TOKEN_GETMAD($2,$$,']');
-			}
-	|	'%' indirob
-                        {
-                            $$ = newHVREF($2, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'%');
 			}
 	|       ANONHSH expr ')'	%prec '(' /* %( foo => "Bar" ) */
 			{ 

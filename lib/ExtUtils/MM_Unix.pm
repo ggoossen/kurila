@@ -985,9 +985,9 @@ sub find_perl($self, $ver, $names, $dirs, $trace) {
 
     if ($trace +>= 2){
         print $^STDOUT, "Looking for perl $ver by these names:
-$(join ' ',@$names)
+$(join ' ',$names->@)
 in these dirs:
-$(join ' ',@$dirs)
+$(join ' ',$dirs->@)
 ";
     }
 
@@ -1005,8 +1005,8 @@ WARNING
         }
     }
 
-    foreach my $name ( @$names){
-        foreach my $dir ( @$dirs){
+    foreach my $name ( $names->@){
+        foreach my $dir ( $dirs->@){
             next unless defined $dir; # $self->{PERL_SRC} may be undefined
             my ($abs, $val);
             if ($self->file_name_is_absolute($name)) {     # /foo/bar
@@ -1047,7 +1047,7 @@ WARNING
             }
         }
     }
-    print $^STDOUT, "Unable to find a perl $ver (by these names: $(join ' ',@$names), in these dirs: $(join ' ',@$dirs))\n";
+    print $^STDOUT, "Unable to find a perl $ver (by these names: $(join ' ',$names->@), in these dirs: $(join ' ',$dirs->@))\n";
     0; # false and not empty
 }
 
@@ -2418,7 +2418,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
     for (sort keys %static) {
         next unless m/\Q$self->{?LIB_EXT}\E\z/;
         $_ = dirname($_) . "/extralibs.ld";
-        push @$extra, $_;
+        push $extra->@, $_;
     }
 
     s/^(.*)/"-I$1"/ for  ($perlinc || \@())->@; 
@@ -2473,12 +2473,12 @@ LLIBPERL    = $llibperl
 ";
 
     push @m, '
-$(INST_ARCHAUTODIR)/extralibs.all : $(INST_ARCHAUTODIR)$(DFSEP).exists '.join(" \\\n\t", @$extra).'
+$(INST_ARCHAUTODIR)/extralibs.all : $(INST_ARCHAUTODIR)$(DFSEP).exists '.join(" \\\n\t", $extra->@).'
 	$(NOECHO) $(RM_F)  $@
 	$(NOECHO) $(TOUCH) $@
 ';
 
-    foreach my $catfile ( @$extra){
+    foreach my $catfile ( $extra->@){
         push @m, "\tcat $catfile >> \$\@\n";
     }
 
@@ -3062,7 +3062,7 @@ sub processPL {
             ??  $pl_files{?$plfile}
             !! \@($pl_files{?$plfile});
 
-        foreach my $target ( @$list) {
+        foreach my $target ( $list->@) {
             if( %Is{?VMS} ) {
                 $plfile = vmsify( <$self->eliminate_macros($plfile));
                 $target = vmsify( <$self->eliminate_macros($target));
@@ -3159,7 +3159,7 @@ sub oneliner($self, $cmd, ?$switches) {
     $cmd = join " \n\t  -e ", map { $self->quote_literal($_) }, @cmds;
     $cmd = $self->escape_newlines($cmd);
 
-    $switches = join ' ', @$switches;
+    $switches = join ' ', $switches->@;
 
     return qq{\$(ABSPERLRUN) $switches -e $cmd --};   
 }

@@ -82,10 +82,10 @@ if ($FileList) {
             next if m/^ \s* (?: \# .* )? $/x;
             last if m/^ =+ $/x;
             my @( $file ) =  split m/\t/, $_;
-            push @$list, $file;
+            push $list->@, $file;
         }
         my %dupe;
-        @$list = grep { !%dupe{+$_ }++ }, @$list;
+        $list->@ = grep { !%dupe{+$_ }++ }, $list->@;
     }
     close $fh;
     die "No input or output files in '$FileList'!"
@@ -172,7 +172,7 @@ sub force_unlink {
 ## Filename can be given as an arrayref of directory names
 ##
 sub WriteIfChanged($file, $lines) {
-    $file = File::Spec->catfile(< @$file) if ref $file;
+    $file = File::Spec->catfile(< $file->@) if ref $file;
 
     my $TextToWrite = join '', $lines;
     if (open my $in, "<", $file) {
@@ -270,7 +270,7 @@ sub Build_Aliases()
 
         # The %utf8::... versions use japhy's code originally from utf8_pva.pl
         # However, it's moved here so that we build the tables at runtime.
-        $$_ =~ s/[ _-]//g for @( \$abbrev, \$name);
+        $_->$ =~ s/[ _-]//g for @( \$abbrev, \$name);
         %utf8::PropertyAlias{+lc $abbrev} = $name;
         %utf8::PA_reverse{+lc $name} = $abbrev;
     }
@@ -403,7 +403,7 @@ sub Table::Max
 ##
 sub Table::Replace($Table, $New)
 {
-    @$Table = @$New;
+    $Table->@ = $New->@;
 }
 
 ##
@@ -452,7 +452,7 @@ sub Table::RawAppendRange
     my $name  = shift;
     $name = "" if not defined $name; ## warning: $name can be "0"
 
-    push @$Table, \@( $start,    # RANGE_START
+    push $Table->@, \@( $start,    # RANGE_START
                       $end,      # RANGE_END
                       $name   ); # RANGE_NAME
 }
@@ -515,7 +515,7 @@ sub Table::Invert
 
     my $New = Table->New();
     my $max = -1;
-    for my $range ( @$Table)
+    for my $range ( $Table->@)
     {
         my $start = $range->[RANGE_START];
         my $end   = $range->[RANGE_END];
@@ -550,7 +550,7 @@ sub Table::Merge
     {
         if (ref $Arg) {
             ## arg is a table -- get its ranges
-            push @Records, < @$Arg;
+            push @Records, < $Arg->@;
         } else {
             ## arg is a codepoint, make a range
             push @Records, \@( $Arg, $Arg )
@@ -604,7 +604,7 @@ sub Table::Write
     }
     push @OUT, "return <<'END';\n";
 
-    for my $set ( @$Table)
+    for my $set ( $Table->@)
     {
         my $start = $set->[RANGE_START];
         my $end   = $set->[RANGE_END];
@@ -641,7 +641,7 @@ sub IsUsable($code)
 sub Table::ValidCode
 {
     my $Table = shift; #self
-    for my $set ( @$Table) {
+    for my $set ( $Table->@) {
         return $set->[RANGE_END] if IsUsable($set->[RANGE_END]);
     }
     return ();
@@ -654,9 +654,9 @@ sub Table::InvalidCode
 {
     my $Table = shift; #self
 
-    return 0x1234 if not nelems @$Table;
+    return 0x1234 if not nelems $Table->@;
 
-    for my $set ( @$Table)
+    for my $set ( $Table->@)
     {
         if (IsUsable($set->[RANGE_END] + 1))
         {
@@ -734,9 +734,9 @@ sub simple_dumper {
     foreach my $item ( @_) {
         if (ref $item) {
             if (ref $item eq 'ARRAY') {
-                push @lines, '\@('."\n", < simple_dumper (< @$item), "),\n";
+                push @lines, '\@('."\n", < simple_dumper (< $item->@), "),\n";
             } elsif (ref $item eq 'HASH') {
-                push @lines, '\%('."\n", < simple_dumper (< %$item), "),\n";
+                push @lines, '\%('."\n", < simple_dumper (< $item->%), "),\n";
             } else {
                 die "Can't cope with $item";
             }
@@ -1204,7 +1204,7 @@ sub ArabicShaping_txt()
 
     my %JoinType;
 
-    while ( ~< *$in)
+    while ( ~< $in->*)
     {
         next unless m/^[0-9A-Fa-f]+;/;
         s/\s+$//;
@@ -1243,7 +1243,7 @@ sub EastAsianWidth_txt()
 
     my %EAW;
 
-    while ( ~< *$in)
+    while ( ~< $in->*)
     {
         next unless m/^[0-9A-Fa-f]+(\.\.[0-9A-Fa-f]+)?;/;
         s/#.*//;
@@ -1281,7 +1281,7 @@ sub HangulSyllableType_txt()
 
     my %HST;
 
-    while ( ~< *$in)
+    while ( ~< $in->*)
     {
         next unless m/^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(\w+)/;
         my @($first, $last, $pv) = @(hex($1), hex($2||""), $3);
@@ -1312,7 +1312,7 @@ sub Jamo_txt()
     }
     my $Short = Table->New();
 
-    while ( ~< *$in)
+    while ( ~< $in->*)
     {
         next unless m/^([0-9A-Fa-f]+)\s*;\s*(\w*)/;
         my @($code, $short) = @(hex($1), $2);
@@ -1350,7 +1350,7 @@ sub Scripts_txt()
 
     for my $script (sort { $a->[0] <+> $b->[0] }, @ScriptInfo)
     {
-        my @($first, $last, $name) =  @$script;
+        my @($first, $last, $name) =  $script->@;
         $Scripts->Append($first, $name);
 
         %Script{+$name} ||= Table->New(Is    => $name,
@@ -1460,7 +1460,7 @@ sub PropList_txt()
 
     for my $prop (sort { $a->[0] <+> $b->[0] }, @PropInfo)
     {
-        my @($first, $last, $name) =  @$prop;
+        my @($first, $last, $name) =  $prop->@;
         $Props->Append($first, $name);
 
         %Prop{+$name} ||= Table->New(Is    => $name,
@@ -1991,7 +1991,7 @@ sub SpecialCasing_txt()
             );
 
         for my $prop (sort { $a->[0] <+> $b->[0] }, %CaseInfo{?$case}->@) {
-            my @($ix, $code, $to) =  @$prop;
+            my @($ix, $code, $to) =  $prop->@;
             my $tostr =
                 join "", map { sprintf "\\x\{\%s\}", $_ }, split ' ', $to;
             push @OUT, sprintf qq["\%s" => "$tostr",\n], join("", map { sprintf "\\x[\%02X]", $_ }, @( unpack("U0C*", pack("U", $ix))));

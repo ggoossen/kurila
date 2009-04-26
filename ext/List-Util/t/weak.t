@@ -177,7 +177,7 @@ SKIP: do {
     # we didn't die
     ok($^EVAL_ERROR eq "") or print $^STDOUT, "# died with $^EVAL_ERROR\n";
     ok(isweak($b));
-    ok($$b eq "hello") or print $^STDOUT, "# b is '$$b'\n";
+    ok($b->$ eq "hello") or print $^STDOUT, "# b is '$b->$'\n";
     $a="";
     ok(not $b) or print $^STDOUT, "# b didn't go away\n";
 };

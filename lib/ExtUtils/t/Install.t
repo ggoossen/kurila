@@ -82,7 +82,7 @@ ok(!-r 'install-test/lib/perl/Big/Dummy.SKIP',  '  ignored .SKIP file' );
 ok( -r 'install-test/packlist',                 '  packlist exists' );
 
 open(my $packlist, "<", 'install-test/packlist' );
-my %packlist = %( < @+: map { chomp;  @($_ => 1) }, @( ~< *$packlist) );
+my %packlist = %( < @+: map { chomp;  @($_ => 1) }, @( ~< $packlist->*) );
 close $packlist;
 
 # On case-insensitive filesystems (ie. VMS), the keys of the packlist might

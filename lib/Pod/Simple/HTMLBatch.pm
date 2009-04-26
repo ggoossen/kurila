@@ -524,7 +524,7 @@ sub modnames2paths($self, $dirs) {
     if( DEBUG +> 4 ) {
         print $^STDOUT, "Modules found (name => path):\n";
         foreach my $m (sort {lc($a) cmp lc($b)}, keys $m2p->%) {
-            print $^STDOUT, "  $m  $m2p->%{?$m}\n";
+            print $^STDOUT, "  $m  $m2p->?$m->%\n";
         }
         print $^STDOUT, "(total ",     nkeys $m2p->%, ")\n\n";
     } elsif( DEBUG ) {

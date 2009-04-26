@@ -130,7 +130,7 @@ sub find_modules {
 
     my %mods;
     foreach ( @perls) {
-        while (my @(?$k, ?$v) =@( each %{%version{$_}})) {
+        while (my @(?$k, ?$v) =@( each %version{$_}->%)) {
             %mods{+$k}++ if $k =~ $regex;
         }
     }
@@ -205,7 +205,7 @@ sub find_version($class, $v) {
 
 for my $version ( sort { $a <+> $b }, keys %released ) {
     my $family = int ($version * 1000) / 1000;
-    push @{ %families{ + $family }} , $version;
+    push %families{ + $family }->@ , $version;
 }
 
 

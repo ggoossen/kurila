@@ -139,7 +139,7 @@ sub erase($obj, $action) {
     my $leaf_symtab = $leaf_globref->*{HASH};
     #    warn " leaf_symtab ", join(', ', %$leaf_symtab),"\n";
     # FIXME this does not clear properly yet: %$leaf_symtab = %( () );
-    for (keys %$leaf_symtab) {
+    for (keys $leaf_symtab->%) {
         delete $leaf_symtab->{$_};
     }
     #delete $leaf_symtab->{'__ANON__'};
@@ -221,7 +221,7 @@ sub share_from {
     # Check that 'from' package actually exists
     #     croak("Package \"$pkg\" does not exist")
     # 	unless %{Symbol::stash("$pkg")};
-    foreach my $arg ( @$vars) {
+    foreach my $arg ( $vars->@) {
         # catch some $safe->share($var) errors:
         my ($var, $type);
         $type = $1 if ($var = $arg) =~ s/^(\W)//;
@@ -243,13 +243,13 @@ sub share_record {
     my $vars = shift;
     my $shares = \($obj->{+Shares} ||= \%())->%;
         # Record shares using keys of $obj->{Shares}. See reinit.
-        $shares->{[ @$vars]} = @($pkg) x nelems @$vars if (nelems @$vars);
+        $shares->{[ $vars->@]} = @($pkg) x nelems $vars->@ if (nelems $vars->@);
 }
 sub share_redo {
     my $obj = shift;
     my $shares = \($obj->{+Shares} ||= \%())->%;
     my($var, $pkg);
-    while(@($var, $pkg) =@( each %$shares)) {
+    while(@($var, $pkg) =@( each $shares->%)) {
         # warn "share_redo $pkg\:: $var";
         $obj->share_from($pkg,  \@( $var ), 1);
     }

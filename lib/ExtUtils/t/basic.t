@@ -83,7 +83,7 @@ my $ppd_out = run("$make ppd");
 is( $^CHILD_ERROR, 0,                      '  exited normally' ) || diag $ppd_out;
 ok( open(my $ppd, "<", 'Big-Dummy.ppd'), '  .ppd file generated' );
 my $ppd_html;
-do { local $^INPUT_RECORD_SEPARATOR = undef; $ppd_html = ~< *$ppd };
+do { local $^INPUT_RECORD_SEPARATOR = undef; $ppd_html = ~< $ppd->* };
 close $ppd;
 like( $ppd_html, qr{^<SOFTPKG NAME="Big-Dummy" VERSION="0,01,0,0">}m, 
       '  <SOFTPKG>' );
@@ -193,7 +193,7 @@ SKIP: do {
     ok( open(my $perllocalfh, "<", %files{?'perllocal.pod'} ) ) || 
         diag("Can't open %files{?'perllocal.pod'}: $^OS_ERROR");
     do { local $^INPUT_RECORD_SEPARATOR = undef;
-        unlike( ($: ~< *$perllocalfh), qr/other/, 'DESTDIR should not appear in perllocal');
+        unlike( ($: ~< $perllocalfh->*), qr/other/, 'DESTDIR should not appear in perllocal');
     };
     close $perllocalfh;
 
@@ -256,7 +256,7 @@ ok( -f $meta_yml,    'META.yml written to dist dir' );
 ok( !-e "META_new.yml", 'temp META.yml file not left around' );
 
 ok open my $metafh, "<", $meta_yml or diag $^OS_ERROR;
-my $meta = join '', @( ~< \*$metafh);
+my $meta = join '', @( ~< \$metafh->*);
 ok close $metafh;
 
 is $meta, <<"END";
@@ -310,14 +310,14 @@ open($^STDERR, ">", "".File::Spec->devnull) or die $^OS_ERROR;
 my $realclean_out = run("$make realclean");
 is( $^CHILD_ERROR, 0, 'realclean' ) || diag($realclean_out);
 
-open($^STDERR, ">&", \*$saverr) or die $^OS_ERROR;
+open($^STDERR, ">&", \$saverr->*) or die $^OS_ERROR;
 close $saverr;
 
 
 sub _normalize {
     my $hash = shift;
 
-    while(my@(?$k,?$v) =@( each %$hash)) {
+    while(my@(?$k,?$v) =@( each $hash->%)) {
         delete $hash->{$k};
         $hash->{+lc $k} = $v;
     }
