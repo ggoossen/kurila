@@ -360,7 +360,7 @@ sub bootstrap {
     $bs =~ s/(\.\w+)?(;\d*)?$/\.bs/; # look for .bs 'beside' the library
     if (-s $bs) { # only read file if it's not empty
         print $^STDERR, "BS: $bs ($^OS_NAME, $dlsrc)\n" if $dl_debug;
-        try { do $bs; };
+        try { evalfile $bs; };
         warn "$bs: $^EVAL_ERROR\n" if $^EVAL_ERROR;
     }
 
