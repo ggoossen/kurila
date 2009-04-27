@@ -277,7 +277,6 @@ pR	|Off_t	|do_tell	|NN GV* gv
 p	|UV	|do_vecget	|NN SV* sv|I32 offset|I32 size
 p	|void	|do_vecset
 p	|void	|do_vop		|I32 optype|NN SV* sv|NN SV* left|NN SV* right
-p	|OP*	|dofile		|NN OP* term|I32 force_builtin|NULLOK SV* location
 ApR	|I32	|dowantarray
 Ap	|void	|dump_all
 Ap	|void	|dump_eval

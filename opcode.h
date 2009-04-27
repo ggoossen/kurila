@@ -343,7 +343,7 @@ EXTCONST char* const PL_op_name[] = {
 	"semget",
 	"semctl",
 	"require",
-	"dofile",
+	"evalfile",
 	"hintseval",
 	"entereval",
 	"leaveeval",
@@ -703,7 +703,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"semget",
 	"semctl",
 	"require",
-	"do \"file\"",
+	"evalfile \"file\"",
 	"eval hints",
 	"eval \"string\"",
 	"eval \"string\" exit",
@@ -1075,7 +1075,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_semget),
 	MEMBER_TO_FPTR(Perl_pp_semctl),
 	MEMBER_TO_FPTR(Perl_pp_require),
-	MEMBER_TO_FPTR(Perl_pp_require),	/* Perl_pp_dofile */
+	MEMBER_TO_FPTR(Perl_pp_require),	/* Perl_pp_evalfile */
 	MEMBER_TO_FPTR(Perl_pp_hintseval),
 	MEMBER_TO_FPTR(Perl_pp_entereval),
 	MEMBER_TO_FPTR(Perl_pp_leaveeval),
@@ -1444,7 +1444,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* semget */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* semctl */
 	MEMBER_TO_FPTR(Perl_ck_require),	/* require */
-	MEMBER_TO_FPTR(Perl_ck_fun),	/* dofile */
+	MEMBER_TO_FPTR(Perl_ck_fun),	/* evalfile */
 	MEMBER_TO_FPTR(Perl_ck_svconst),	/* hintseval */
 	MEMBER_TO_FPTR(Perl_ck_eval),	/* entereval */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* leaveeval */
@@ -1807,7 +1807,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x0022281d,	/* semget */
 	0x0222281d,	/* semctl */
 	0x000136c0,	/* require */
-	0x00002240,	/* dofile */
+	0x00002240,	/* evalfile */
 	0x00000c04,	/* hintseval */
 	0x00003640,	/* entereval */
 	0x00002200,	/* leaveeval */

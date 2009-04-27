@@ -1049,12 +1049,7 @@ anonymous:
 	;
 
 /* Things called with "do" */
-termdo	:       DO term	%prec UNIOP                     /* do $filename */
-			{ 
-                            $$ = dofile($2, IVAL($1), LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'o');
-			}
-	|	DO dblock cont %prec '('               /* do { code */
+termdo	:	DO dblock cont %prec '('               /* do { code */
                         {
                             OP* op_scope =
                                 scope(newWHILEOP(0, 1, (LOOP*)(OP*)NULL,

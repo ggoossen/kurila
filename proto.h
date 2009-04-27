@@ -832,11 +832,6 @@ PERL_CALLCONV void	Perl_do_vop(pTHX_ I32 optype, SV* sv, SV* left, SV* right)
 #define PERL_ARGS_ASSERT_DO_VOP	\
 	assert(sv); assert(left); assert(right)
 
-PERL_CALLCONV OP*	Perl_dofile(pTHX_ OP* term, I32 force_builtin, SV* location)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DOFILE	\
-	assert(term)
-
 PERL_CALLCONV I32	Perl_dowantarray(pTHX)
 			__attribute__warn_unused_result__;
 

@@ -4842,6 +4842,9 @@ Perl_yylex(pTHX)
 	case KEY_endgrent:
 	    FUN0(OP_EGRENT);
 
+	case KEY_evalfile:
+	    UNI(OP_EVALFILE);
+
 	case KEY_for:
 	case KEY_foreach:
 	    s = SKIPSPACE1(s);
@@ -7968,6 +7971,16 @@ Perl_keyword (pTHX_ const char *name, I32 len)
             }
           }
 
+          if (name[1] == 'v' &&
+              name[2] == 'a' &&
+              name[3] == 'l' &&
+              name[4] == 'f' &&
+              name[5] == 'i' &&
+              name[6] == 'l' &&
+              name[7] == 'e')
+          {
+	      return KEY_evalfile;
+	  }
           goto unknown;
 
         case 'g':
