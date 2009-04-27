@@ -30,12 +30,12 @@ BEGIN {
 
 our $PACKAGE = 'Unicode::Normalize, mkheader';
 
-our $Combin = do "unicore/CombiningClass.pl"
-    || do "unicode/CombiningClass.pl"
+our $Combin = evalfile "unicore/CombiningClass.pl"
+    || evalfile "unicode/CombiningClass.pl"
     || die "$PACKAGE: CombiningClass.pl not found";
 
-our $Decomp = do "unicore/Decomposition.pl"
-    || do "unicode/Decomposition.pl"
+our $Decomp = evalfile "unicore/Decomposition.pl"
+    || evalfile "unicode/Decomposition.pl"
     || die "$PACKAGE: Decomposition.pl not found";
 
 our %Combin;	# $codepoint => $number    : combination class

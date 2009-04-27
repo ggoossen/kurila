@@ -39,7 +39,7 @@ open(my $try, ">",'Op.eval');
 print $try, 'print $^STDOUT, "ok 10\n"; unlink "Op.eval";',"\n";
 close $try;
 
-do './Op.eval'; print $^STDOUT, $^EVAL_ERROR;
+evalfile './Op.eval'; print $^STDOUT, $^EVAL_ERROR;
 
 # Test the singlequoted eval optimizer
 

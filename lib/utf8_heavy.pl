@@ -193,7 +193,7 @@ sub SWASHNEW_real {
                 return $found;
             }
 
-            $list = do $file; die $^EVAL_ERROR if $^EVAL_ERROR;
+            $list = evalfile $file; die $^EVAL_ERROR if $^EVAL_ERROR;
         }
 
         $ListSorted = 1; ## we know that these lists are sorted

@@ -1981,7 +1981,7 @@ sub SpecialCasing_txt()
 
     for my $case (qw(Lower Title Upper))
     {
-        my $NormalCase = do "To/$case.pl" || die "$^PROGRAM_NAME: $^EVAL_ERROR\n";
+        my $NormalCase = evalfile "To/$case.pl" || die "$^PROGRAM_NAME: $^EVAL_ERROR\n";
 
         my @OUT =
             @(
@@ -2045,7 +2045,7 @@ sub CaseFolding_txt()
     #
     # Prepend the special foldings to the common foldings.
     #
-    my $CommonFold = do "To/Fold.pl" || die "$^PROGRAM_NAME: To/Fold.pl: $^OS_ERROR\n";
+    my $CommonFold = evalfile "To/Fold.pl" || die "$^PROGRAM_NAME: To/Fold.pl: $^OS_ERROR\n";
 
     my @OUT =
         @(

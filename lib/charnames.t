@@ -239,7 +239,7 @@ ok $_ eq 'foobar';
 # To do this can take advantage of the fact that unicore/Name.pl is 7 bit
 # (or at least should be). So assert that that it's true here.
 
-my $names = do "unicore/Name.pl";
+my $names = evalfile "unicore/Name.pl";
 ok defined $names;
 do { # as on ASCII or UTF-8 machines
     my $non_ascii = $names =~ s/[^\0-\177]//g;

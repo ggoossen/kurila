@@ -69,7 +69,7 @@ BEGIN {
     }
     is( $^INCLUDED{?'Yup.pm'}, $path,    '$^INCLUDED set properly' );
 
-    is( try { do 'Yup.pm'  }, 42,  'do() works' );
+    is( try { evalfile 'Yup.pm'  }, 42,  'do() works' );
     ok( try { require Yup; },      '   require()' );
     ok( eval "use Yup; 1;",         '   use()' );
     is( $^EVAL_ERROR, '' );
@@ -84,5 +84,5 @@ qr/::Config is read-only/, 'lib handles readonly stuff' );
 
 BEGIN {
     is( nelems(grep( {m/stuff/ },$^INCLUDE_PATH)), 0, 'no lib' );
-    ok( !do 'Yup.pm',           '   do() effected' );
+    ok( !evalfile 'Yup.pm',           '   do() effected' );
 }
