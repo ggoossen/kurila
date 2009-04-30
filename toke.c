@@ -148,10 +148,10 @@ static const char* const lex_state_names[] = {
 #  define SKIPSPACE2(s,tsv) skipspace2(s,&tsv)
 #  define PEEKSPACE(s) skipspace2(s,0)
 #else
-#  define SKIPSPACE0(s) skipspace(s)
-#  define SKIPSPACE1(s) skipspace(s)
-#  define SKIPSPACE2(s,tsv) skipspace(s)
-#  define PEEKSPACE(s) skipspace(s)
+#  define SKIPSPACE0(s) skipspace(s, TRUE)
+#  define SKIPSPACE1(s) skipspace(s, TRUE)
+#  define SKIPSPACE2(s,tsv) skipspace(s, TRUE)
+#  define PEEKSPACE(s) skipspace(s, TRUE)
 #endif
 
 /*
@@ -307,7 +307,7 @@ static struct debug_tokens {
     { POWOP,		TOKENTYPE_OPNUM,	"POWOP" },
     { PREDEC,		TOKENTYPE_NONE,		"PREDEC" },
     { PREINC,		TOKENTYPE_NONE,		"PREINC" },
-    { PRIVATEVAR,	TOKENTYPE_OPVAL,	"PRIVATEVAR" },
+    { PRIVATEVAR,	TOKENTYPE_NONE,	"PRIVATEVAR" },
     { SREFGEN,		TOKENTYPE_NONE,		"SREFGEN" },
     { RELOP,		TOKENTYPE_OPNUM,	"RELOP" },
     { REQUIRE,		TOKENTYPE_IVAL,	        "REQUIRE" },
@@ -678,8 +678,8 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
     parser->lex_charoffset = 0;
     parser->lex_line_number = 0;
     parser->lex_filename = NULL;
+    parser->statement_indent = 0;
 }
-
 
 /* delete a parser object */
 
@@ -741,6 +741,7 @@ S_incline(pTHX_ const char *s)
 
     PL_parser->lex_charoffset = 0;
     PL_parser->lex_line_number += 1;
+    PL_parser->linestart = s;
     if (*s++ != '#')
 	return;
     while (SPACE_OR_TAB(*s))
@@ -871,10 +872,12 @@ S_skipspace2(pTHX_ register char *s, SV **svp)
  * S_skipspace
  * Called to gobble the appropriate amount and type of whitespace.
  * Skips comments as well.
+ * If continuous line is true and the next line isn't a continuation the last
+ * newline is returned
  */
 
 STATIC char *
-S_skipspace(pTHX_ register char *s)
+S_skipspace(pTHX_ register char *s, bool continuous_line)
 {
     dVAR;
 #ifdef PERL_MAD
@@ -889,6 +892,14 @@ S_skipspace(pTHX_ register char *s)
     }
 #endif
     PERL_ARGS_ASSERT_SKIPSPACE;
+
+    /* skip space on the current line */
+    while (s < PL_bufend && isSPACE(*s) && *s != '\n') {
+	s++;
+    }
+
+    if ( s < PL_bufend && *s != '#' && *s != '\n' )
+	return s;
 
     for (;;) {
 	STRLEN prevlen;
@@ -917,11 +928,7 @@ S_skipspace(pTHX_ register char *s)
 	 * we're in normal lexing mode
 	 */
 	if (s < PL_bufend || !PL_rsfp || PL_sublex_info.sub_inwhat)
-#ifdef PERL_MAD
-	    goto done;
-#else
-	    return s;
-#endif
+	    break;
 
 	/* try to recharge the buffer */
 #ifdef PERL_MAD
@@ -996,7 +1003,7 @@ S_skipspace(pTHX_ register char *s)
 	    else
 		(void)PerlIO_close(PL_rsfp);
 	    PL_rsfp = NULL;
-	    return s;
+	    break;
 	}
 
 	/* not at end of file, so we only read another line */
@@ -1007,7 +1014,7 @@ S_skipspace(pTHX_ register char *s)
 	    oldunilen = PL_last_uni - PL_bufend;
 	if (PL_last_lop)
 	    oldloplen = PL_last_lop - PL_bufend;
-	PL_linestart = PL_bufptr = s + prevlen;
+	PL_bufptr = s + prevlen;
 	PL_bufend = s + SvCUR(PL_linestr);
 	s = PL_bufptr;
 	PL_oldbufptr = s + oldprevlen;
@@ -1017,6 +1024,14 @@ S_skipspace(pTHX_ register char *s)
 	if (PL_last_lop)
 	    PL_last_lop = s + oldloplen;
 	incline(s);
+    }
+
+    /* reset if this isn't a continuation of the original line */
+    if (continuous_line
+	&& PL_parser->statement_indent
+	&& PL_parser->statement_indent <= (s - PL_linestart) 
+	) {
+	return PL_linestart - 1;
     }
 
 #ifdef PERL_MAD
@@ -1029,8 +1044,8 @@ S_skipspace(pTHX_ register char *s)
 	    sv_catpvn(PL_skipwhite, SvPVX_mutable(PL_linestr) + startoff,
 				curoff - startoff);
     }
-    return s;
 #endif
+    return s;
 }
 
 /*
@@ -1484,6 +1499,7 @@ S_sublex_push(pTHX)
     SAVEI32(PL_lex_starts);
     SAVEI32(PL_parser->lex_charoffset);
     SAVEI32(PL_parser->lex_line_number);
+    SAVEI32(PL_parser->statement_indent);
     SAVEI8(PL_lex_state);
     SAVEI16(PL_lex_flags);
     SAVEI16(PL_lex_inwhat);
@@ -1509,6 +1525,7 @@ S_sublex_push(pTHX)
     PL_bufend += SvCUR(PL_linestr);
     PL_last_lop = PL_last_uni = NULL;
 
+    PL_parser->statement_indent = 0;
     PL_lex_brackets = 0;
     Newx(PL_lex_brackstack, 120, char);
     Newx(PL_lex_casestack, 12, char);
@@ -1590,6 +1607,38 @@ S_sublex_done(pTHX)
     }
 }
 
+/* 
+  start_statement_indent
+
+  starts a new statement indentation level at the given character.
+  Must be stopped using "stop_statement_indent"
+
+*/
+STATIC void
+S_start_statement_indent(pTHX_ char* s)
+{
+    ENTER;
+    SAVEI32(PL_parser->statement_indent);
+    PL_parser->statement_indent = s - PL_linestart;
+    DEBUG_T({ PerlIO_printf(Perl_debug_log,
+		"### New statement indent level, %d.\n",
+		(int)PL_parser->statement_indent); });
+    start_force(PL_curforce);
+    force_next('{');
+}
+
+/* 
+  stop_statement_indent
+
+  stops the current statement indentation level
+*/
+STATIC void
+S_stop_statement_indent(pTHX)
+{
+    LEAVE;
+    start_force(PL_curforce);
+    force_next('}');
+}
 /*
   parse_escape
 
@@ -3139,7 +3188,24 @@ Perl_yylex(pTHX)
 	s++;
 	goto retry;
     case '#':
-    case '\n':
+    case '\n': {
+	/* might be non continuous line */
+	char* next_s = skipspace(s, FALSE);
+	if (next_s != s) {
+	    if (PL_parser->statement_indent) {
+		if ((next_s - PL_linestart) <= PL_parser->statement_indent) {
+		    if ((next_s - PL_linestart) < PL_parser->statement_indent) {
+			S_stop_statement_indent();
+		    }
+		    else 
+			s = next_s;
+		    OPERATOR(';');
+		}
+	    }
+	    s = next_s;
+	    goto retry;
+	}
+
 #ifdef PERL_MAD
 	PL_realtokenstart = -1;
 	if (PL_madskills)
@@ -3211,6 +3277,7 @@ Perl_yylex(pTHX)
 #endif
 	}
 	goto retry;
+    }
     case '-':
 	if (s[1] && isALPHA(s[1]) && !isALNUM(s[2])) {
 	    I32 ftst = 0;
@@ -4344,7 +4411,7 @@ Perl_yylex(pTHX)
 			pl_yylval.opval = (OP*)newSVOP(OP_CONST, 0, SvREFCNT_inc_NN(SvRV(*compsub)), S_curlocation(PL_bufptr));
 			pl_yylval.opval->op_private = OPpCONST_BARE;
 			PL_expect = XTERM;
-			s = skipspace(s);
+			s = SKIPSPACE0(s);
 			PL_bufptr = s;
 			PL_last_uni = PL_oldbufptr;
 			PL_last_lop_op = OP_COMPSUB;
@@ -4437,7 +4504,7 @@ Perl_yylex(pTHX)
 		    s = SKIPSPACE2(s,nextPL_nextwhite);
 		PL_nextwhite = nextPL_nextwhite;
 #else
-		s = skipspace(s);
+		s = SKIPSPACE0(s);
 #endif
 
 		/* Is this a word before a => operator? */
@@ -4659,7 +4726,7 @@ Perl_yylex(pTHX)
 	case KEY_INIT:
 	case KEY_END:
 	    if (PL_expect == XSTATE) {
-		s = skipspace(s);
+		s = skipspace(s, TRUE);
 		if (*s != '{') {
 		    yyerror("Illegal declaration of special block");
 		}
@@ -4761,17 +4828,10 @@ Perl_yylex(pTHX)
 
 	case KEY_do:
 	    s = SKIPSPACE1(s);
-	    if (*s == '{')
-		PRETERMBLOCK(DO);
-	    if (*s != '\'')
-		s = force_word(s,WORD,TRUE,TRUE,FALSE);
-	    if (orig_keyword == KEY_do) {
-		orig_keyword = 0;
-		pl_yylval.i_tkval.ival = 1;
+	    if (*s != '{') {
+		S_start_statement_indent(s);
 	    }
-	    else
-		pl_yylval.i_tkval.ival = 0;
-	    OPERATOR(DO);
+	    PRETERMBLOCK(DO);
 
 	case KEY_die:
 	    PL_hints |= HINT_BLOCK_SCOPE;
@@ -5251,7 +5311,7 @@ Perl_yylex(pTHX)
 	    PL_bufptr = s;
 	    PL_last_uni = PL_oldbufptr;
 	    PL_last_lop_op = OP_REQUIRE;
-	    s = skipspace(s);
+	    s = skipspace(s, TRUE);
 	    return REPORT( (int)REQUIRE );
 
 	case KEY_redo:
@@ -5435,7 +5495,7 @@ Perl_yylex(pTHX)
 		d = s;
 		s = SKIPSPACE2(s,tmpwhite);
 #else
-		s = skipspace(s);
+		s = SKIPSPACE0(s);
 #endif
 
 		if (isIDFIRST_lazy_if(s,UTF) ||
@@ -5473,7 +5533,7 @@ Perl_yylex(pTHX)
 
 		    s = SKIPSPACE2(d,tmpwhite);
 #else
-		    s = skipspace(d);
+		    s = SKIPSPACE0(d);
 #endif
 		}
 		else {

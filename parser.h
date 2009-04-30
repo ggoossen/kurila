@@ -96,6 +96,7 @@ typedef struct yy_parser {
     U8		error_count;	/* how many compile errors so far, max 10 */
     PerlIO	*rsfp;		/* current source file pointer */
     AV		*rsfp_filters;	/* holds chain of active source filters */
+    I32         statement_indent; /* the indentation level of the current statement scope */
 
 #ifdef PERL_MAD
     SV		*endwhite;
