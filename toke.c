@@ -1029,7 +1029,7 @@ S_skipspace(pTHX_ register char *s, bool continuous_line)
     /* reset if this isn't a continuation of the original line */
     if (continuous_line
 	&& PL_parser->statement_indent
-	&& PL_parser->statement_indent <= (s - PL_linestart) 
+	&& (s - PL_linestart) <= PL_parser->statement_indent
 	) {
 	return PL_linestart - 1;
     }
