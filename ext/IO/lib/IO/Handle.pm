@@ -390,14 +390,12 @@ sub truncate(@< @_) {
     truncate(@_[0], @_[1]);
 }
 
-sub read(@< @_) {
-    (nelems @_) == 3 || (nelems @_) == 4 or die 'usage: $io->read(BUF, LEN [, OFFSET])';
-    read(@_[0], @_[1], @_[2], @_[?3] || 0);
+sub read($io, $bufref, $len, ?$offset) {
+    read($io, $bufref->$, $len, $offset || 0);
 }
 
-sub sysread(@< @_) {
-    (nelems @_) == 3 || (nelems @_) == 4 or die 'usage: $io->sysread(BUF, LEN [, OFFSET])';
-    sysread(@_[0], @_[1], @_[2], @_[?3] || 0);
+sub sysread($io, $bufref, $len, ?$offset) {
+    sysread($io, $bufref->$, $len, $offset || 0);
 }
 
 sub write(@< @_) {
@@ -424,8 +422,7 @@ sub stat(@< @_) {
 ## State modification functions.
 ##
 
-sub autoflush(@< @_) {
-    my $fh = shift @_;
+sub autoflush($fh, @< @_) {
     my $prev = iohandle::output_autoflush($fh);
     iohandle::output_autoflush($fh, @_ ?? @_[0] !! 1);
     return $prev;
