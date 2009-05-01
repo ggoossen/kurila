@@ -28,7 +28,7 @@ use Cwd < qw( cwd );
 );
 #==========================================================================
 
-sub new(?$class) {
+sub new($class) {
     my $self = bless \%(), ref($class) || $class;
     $self->init;
     return $self;
@@ -117,17 +117,14 @@ sub survey($self, @< @search_dirs) {
 
 
 #==========================================================================
-sub _make_search_callback(@< @_) {
-    my $self = @_[0];
-
+sub _make_search_callback($self) {
     # Put the options in variables, for easy access
     my@(  $laborious, $verbose, $shadows, $limit_re, $callback, $progress,$path2name,$name2path) =
         map { scalar($self->?$_()) },
         qw(laborious   verbose   shadows   limit_re   callback   progress  path2name  name2path);
 
     my($file, $shortname, $isdir, $modname_bits);
-    return sub {
-            @($file, $shortname, $isdir, $modname_bits) =  @_;
+    return sub ($file, $shortname, $isdir, $modname_bits) {
 
             if($isdir) { # this never gets called on the startdir itself, just subdirs
 
@@ -238,7 +235,7 @@ sub _path2modname($self, $file, $shortname, $modname_bits) {
           )) { shift @m }
 
     my $name = join '::', @( < @m, $shortname);
-    $self->_simplify_base($name);
+    $name = $self->_simplify_base($name);
 
     # On VMS, case-preserved document names can't be constructed from
     # filenames, so try to extract them from the "=head1 NAME" tag in the
@@ -278,8 +275,7 @@ sub _path2modname($self, $file, $shortname, $modname_bits) {
 
 #==========================================================================
 
-sub _recurse_dir(@< @_) {
-    my@($self, $startdir, $callback, $modname_bits) =  @_;
+sub _recurse_dir($self, $startdir, $callback, $modname_bits) {
 
     my $maxdepth = $self->{?'fs_recursion_maxdepth'} || 10;
     my $verbose = $self->verbose;
@@ -289,8 +285,7 @@ sub _recurse_dir(@< @_) {
     $modname_bits ||= \@();
 
     my $recursor;
-    $recursor = sub {
-            my@($dir_long, $dir_bare) =  @_;
+    $recursor = sub ($dir_long, $dir_bare) {
             if( (nelems $modname_bits->@) +>= 10 ) {
                 $verbose and print $^STDOUT, "Too deep! [$(join ' ',$modname_bits->@)]\n";
                 return;
@@ -358,7 +353,7 @@ sub run(?$file, ?$name) {
 
     my $self = __PACKAGE__->new;
     $self->limit_glob(@ARGV[0]) if (nelems @ARGV);
-    $self->callback( sub {
+    $self->callback( sub () {
             my $version = '';
 
             # Yes, I know we won't catch the version in like a File/Thing.pm
@@ -422,24 +417,24 @@ sub simplify_name($self, $str) {
     if ($^OS_NAME eq 'MacOS') { $str =~ s{^.*:+}{}s }
     else                { $str =~ s{^.*/+}{}s }
 
-    $self->_simplify_base($str);
+    $str = $self->_simplify_base($str);
     return $str;
 }
 
 #==========================================================================
 
-sub _simplify_base(@< @_) {   # Internal method only
+sub _simplify_base($self, $base) {   # Internal method only
 
     # strip Perl's own extensions
-    @_[1] =~ s/\.(pod|pm|plx?)\z//i;
+    $base =~ s/\.(pod|pm|plx?)\z//i;
 
     # strip meaningless extensions on Win32 and OS/2
-    @_[1] =~ s/\.(bat|exe|cmd)\z//i if $^OS_NAME =~ m/mswin|os2/i;
+    $base =~ s/\.(bat|exe|cmd)\z//i if $^OS_NAME =~ m/mswin|os2/i;
 
     # strip meaningless extensions on VMS
-    @_[1] =~ s/\.(com)\z//i if $^OS_NAME eq 'VMS';
+    $base =~ s/\.(com)\z//i if $^OS_NAME eq 'VMS';
 
-    return;
+    return $base;
 }
 
 #==========================================================================

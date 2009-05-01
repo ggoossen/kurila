@@ -252,7 +252,7 @@ sub output_code(@< @_) { @_[0]->output (@_[1]) }
 ##############################################################################
 
 # Set up various things that have to be initialized on a per-document basis.
-sub start_document($self) {
+sub start_document($self, ...) {
     my $margin = $self->%{?opt_indent} + $self->%{?opt_margin};
 
     # Initialize a few per-document variables.

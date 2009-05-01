@@ -182,8 +182,8 @@ SKIP: do {
         sub defd_empty(...) {};
         @($res,$err) =  render('-basic', \&defd_empty);
         my @lines = split(m/\n/, $res);
-        is(scalar nelems @lines, 4,
-    "'sub defd_empty \{\}' seen as 4 liner");
+        is(scalar nelems @lines, 7,
+           "'sub defd_empty \{\}' seen as 7 liner");
 
         is(1, ($: $res =~ m/leavesub/ && $res =~ m/(next|db)state/),
             "'sub defd_empty \{\}' seen as 2 ops: leavesub,nextstate");

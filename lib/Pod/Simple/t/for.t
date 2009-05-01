@@ -16,9 +16,9 @@ $Pod::Simple::XMLOutStream::ATTR_PAD   = ' ';
 $Pod::Simple::XMLOutStream::SORT_ATTRS = 1; # for predictably testable output
 
 
-sub moj(@< @_) {shift @_->accept_target('mojojojo')}
-sub mojtext(@< @_) {shift @_->accept_target_as_text('mojojojo')}
-sub any(@< @_) {shift @_->accept_target('*')}
+sub moj($self) {$self->accept_target('mojojojo')}
+sub mojtext($self) {$self->accept_target_as_text('mojojojo')}
+sub any($self) {$self->accept_target('*')}
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

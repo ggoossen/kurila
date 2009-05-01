@@ -168,8 +168,8 @@ sub go(...) { exit Pod::Simple::HTML->parse_from_file(< @ARGV) }
 #  For that, use perldoc!
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sub new(@< @_) {
-    my $new = shift @_->SUPER::new(< @_);
+sub new($self, @< @_) {
+    my $new = $self->SUPER::new(< @_);
     #$new->nix_X_codes(1);
     $new->nbsp_for_S(1);
     $new->accept_targets( 'html', 'HTML' );
@@ -635,8 +635,8 @@ sub section_name_tidy($self, $section) {
     return $section;
 }
 
-sub section_url_escape(@< @_)  { shift @_->general_url_escape(< @_) }
-sub pagepath_url_escape(@< @_) { shift @_->general_url_escape(< @_) }
+sub section_url_escape($self, @< @_)  { $self->general_url_escape(< @_) }
+sub pagepath_url_escape($self, @< @_) { $self->general_url_escape(< @_) }
 
 sub general_url_escape($self, $string) {
 

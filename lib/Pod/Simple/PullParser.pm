@@ -270,19 +270,19 @@ sub set_source(@< @_) {
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-sub get_title_short(@< @_) {  shift @_->get_short_title(< @_)  } # alias
+sub get_title_short($self, @< @_) {  $self->get_short_title(< @_)  } # alias
 
-sub get_short_title(@< @_) {
-    my $title = shift @_->get_title(< @_);
+sub get_short_title($self, @< @_) {
+    my $title = $self->get_title(< @_);
     $title = $1 if $title =~ m/^(\S{1,60})\s+--?\s+./s;
     # turn "Foo::Bar -- bars for your foo" into "Foo::Bar"
     return $title;
 }
 
-sub get_title(@< @_)       { shift @_->_get_titled_section(
+sub get_title($self, @< @_)       { $self->_get_titled_section(
     'NAME', max_token => 50, desperate => 1, < @_)
 }
-sub get_version(@< @_)     { shift @_->_get_titled_section(
+sub get_version($self, @< @_)     { $self->_get_titled_section(
         'VERSION',
         max_token => 400,
         accept_verbatim => 1,
@@ -290,17 +290,16 @@ sub get_version(@< @_)     { shift @_->_get_titled_section(
         < @_,
     );
 }
-sub get_description(@< @_) { shift @_->_get_titled_section(
+sub get_description($self, @< @_) { $self->_get_titled_section(
         'DESCRIPTION',
         max_token => 400,
         max_content_length => 3_000,
         < @_,
     ) }
 
-sub get_authors(@< @_)     { shift @_->get_author(< @_) }  # a harmless alias
+sub get_authors($self, @< @_)     { $self->get_author(< @_) }  # a harmless alias
 
-sub get_author(@< @_)      {
-    my $this = shift @_;
+sub get_author($this, @< @_)      {
     # Max_token is so high because these are
     #  typically at the end of the document:
     $this->_get_titled_section('AUTHOR' , max_token => 10_000, < @_) ||
@@ -309,9 +308,8 @@ sub get_author(@< @_)      {
 
 #--------------------------------------------------------------------------
 
-sub _get_titled_section(@< @_) {
+sub _get_titled_section($self, $titlename, %< %options) {
     # Based on a get_title originally contributed by Graham Barr
-    my@($self, $titlename, %< %options) = @(< @_);
 
     my $max_token            = delete %options{'max_token'};
     my $desperate_for_title  = delete %options{'desperate'};

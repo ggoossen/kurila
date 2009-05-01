@@ -69,9 +69,9 @@ sub My::testParseParameters()
     do {
         use Config;
 
-        try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => 'abc') ; };
-        like $^EVAL_ERROR->{?description}, mkErr("Parameter 'Fred' not writable"), 
-             "wanted writable, got readonly";
+        dies_like { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => 'abc') ; },
+          mkErr("Parameter 'Fred' not writable"),
+            "wanted writable, got readonly";
     };
 
     my @xx;

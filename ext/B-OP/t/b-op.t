@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use Test::More tests => 3;
+use Test::More tests => 1;
 
 use B < qw|svref_2object|;
 
@@ -11,10 +11,8 @@ do {
         return (nelems @_) + 1;
     }
 
-    my $cop = svref_2object(\&foo)->START;
-    is ref($cop), "B::COP", "start opcode";
-    isa_ok($cop->io, "B::PV");
-    is $cop->io->sv, ":crlf\0:bytes";
+    my $op = svref_2object(\&foo)->START;
+    is ref($op), "B::OP", "start opcode";
 };
 
 do {

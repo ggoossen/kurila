@@ -16,8 +16,7 @@ sub stringify(@< @_) {
     return Pod::Simple::BlackBox::stringify_lol(<@_);
 }
 
-sub new(@< @_) {
-    my $class = shift @_;
+sub new($class, @< @_) {
     $class = ref($class) || $class;
     my $new;
     if((nelems @_) == 1) {

@@ -369,8 +369,7 @@ sub _handle_encoding_second_level($self, $para) {
 do {
     my $m = -321;   # magic line number
 
-    sub _gen_errata(@< @_) {
-        my $self = @_[0];
+    sub _gen_errata($self) {
         # Return 0 or more fake-o paragraphs explaining the accumulated
         #  errors on this document.
 
@@ -426,7 +425,7 @@ do {
 ##
 ##############################################################################
 
-sub _ponder_paragraph_buffer(@< @_) {
+sub _ponder_paragraph_buffer($self) {
 
     # Para-token types as found in the buffer.
     #   ~Verbatim, ~Para, ~end, =head1..4, =for, =begin, =end,
@@ -446,7 +445,6 @@ sub _ponder_paragraph_buffer(@< @_) {
     #                   B, C, longdirname (TODO -- wha?), etc. for all directives
     # 
 
-    my $self = @_[0];
     my $paras;
     return unless nelems(($paras = $self->{?'paras'})->@);
     my $curr_open = ($self->{+'curr_open'} ||= \@());
@@ -1386,8 +1384,7 @@ sub _ponder_Data($self,$para) {
 
 ###########################################################################
 
-sub _traverse_treelet_bit(@< @_) {  # for use only by the routine above
-    my@($self, $name) =@( splice @_,0,2);
+sub _traverse_treelet_bit($self, $name, @< @_) {  # for use only by the routine above
 
     my $scratch;
     $self->_handle_element_start(($scratch=$name), shift @_);
@@ -1406,8 +1403,7 @@ sub _traverse_treelet_bit(@< @_) {  # for use only by the routine above
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub _closers_for_all_curr_open(@< @_) {
-    my $self = @_[0];
+sub _closers_for_all_curr_open($self) {
     my @closers;
     foreach my $still_open ( (  $self->{?'curr_open'} || return  )->@) {
         my @copy = $still_open->@;
@@ -1757,9 +1753,9 @@ sub text_content_of_treelet(@< @_) {  # method: $parser->text_content_of_treelet
     return stringify_lol(@_[1]);
 }
 
-sub stringify_lol(@< @_) {  # function: stringify_lol($lol)
+sub stringify_lol($lol) {  # function: stringify_lol($lol)
     my $string_form = '';
-    _stringify_lol( @_[0] => \$string_form );
+    _stringify_lol( $lol => \$string_form );
     return $string_form;
 }
 
@@ -1777,8 +1773,8 @@ sub _stringify_lol($lol, $to) {;
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub _dump_curr_open(@< @_) { # return a string representation of the stack
-    my $curr_open = @_[0]->{?'curr_open'};
+sub _dump_curr_open($self) { # return a string representation of the stack
+    my $curr_open = $self->{?'curr_open'};
 
     return '[empty]' unless (nelems $curr_open->@);
     return join '; ', map {;
@@ -1809,10 +1805,9 @@ my %pretty_form = %(
             '#' => '\#',
     );
 
-sub pretty(@< @_) { # adopted from Class::Classless
+sub pretty(@< @stuff) { # adopted from Class::Classless
     # Not the most brilliant routine, but passable.
     # Don't give it a cyclic data structure!
-    my @stuff = @_; # copy
     my $x;
     my $out =
         # join ",\n" .

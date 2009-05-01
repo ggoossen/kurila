@@ -331,7 +331,7 @@ sub _freeze(@< @_) {
     my $da = $^EVAL_ERROR;				# Don't mess if called from exception handler
     my $ret;
     # Call C routine mstore or net_mstore, depending on network order
-    try { $ret = &$xsptr($self) };
+    try { $ret = $xsptr->($self) };
     logcroak $^EVAL_ERROR if $^EVAL_ERROR;
     $^EVAL_ERROR = $da;
     return $ret ?? $ret !! undef;

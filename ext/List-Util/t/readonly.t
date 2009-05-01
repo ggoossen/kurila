@@ -24,12 +24,11 @@ $var = \2;
 ok( !readonly($var),	'reference to constant');
 ok( readonly($var->$),	'de-reference to constant');
 
-sub tryreadonly(@< @_)
+sub tryreadonly($v)
 {
-    my $v = \@_[0];
     return readonly $v->$;
 }
 
 $var = 123;
-ok( tryreadonly("abc"), 'reference a constant in a sub');
-ok( !tryreadonly($var), 'reference a non-constant in a sub');
+ok( tryreadonly(\"abc"), 'reference a constant in a sub');
+ok( !tryreadonly(\$var), 'reference a non-constant in a sub');

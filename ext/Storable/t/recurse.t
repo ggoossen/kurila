@@ -73,7 +73,7 @@ sub make($class, $ext) {
     return $self;
 }
 
-sub STORABLE_freeze($self) {
+sub STORABLE_freeze($self, ...) {
     my %copy = $self->%;
     my $r = \%copy;
     my $t = dclone($r->{?sync});
@@ -99,7 +99,7 @@ my $hook_called = 0;
 
 sub make(@< @_) { bless \@(), shift @_ }
 
-sub STORABLE_freeze($self) {
+sub STORABLE_freeze($self, ...) {
     $hook_called++;
     return @(freeze($self), $self) if ++$recursed +< $MAX;
     return @("no", $self);
@@ -274,7 +274,7 @@ sub new(@< @_) {
     bless \%(), @_[0];
 }
 
-sub STORABLE_freeze(?$obj) {
+sub STORABLE_freeze(?$obj, ...) {
     return @("", $obj, Foo2->new);
 }
 
@@ -289,4 +289,4 @@ my $so = thaw freeze $o;
 
 $refcount_ok = 0;
 thaw freeze(Foo3->new);
-ok $refcount_ok == 1;
+is $refcount_ok, 1;

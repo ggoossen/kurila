@@ -268,19 +268,14 @@ sub send(@< @_) {
     $r;
 }
 
-sub recv(@< @_) {
-    (nelems @_) == 3 || (nelems @_) == 4 or croak 'usage: $sock->recv(BUF, LEN [, FLAGS])';
-    my $sock  = @_[0];
-    my $len   = @_[2];
-    my $flags = @_[?3] || 0;
+sub recv($sock, $buf, $len, ?$flags) {
+    $flags //= 0;
 
     # remember who we recv'd from
-    $sock->*->{+'io_socket_peername'} = recv($sock, (@_[1]=''), $len, $flags);
+    $sock->*->{+'io_socket_peername'} = recv($sock, ($buf->$=''), $len, $flags);
 }
 
-sub shutdown(@< @_) {
-    (nelems @_) == 2 or croak 'usage: $sock->shutdown(HOW)';
-    my@($sock, $how) =  @_;
+sub shutdown($sock, $how) {
     $sock->*->{+'io_socket_peername'} = undef;
     shutdown($sock, $how);
 }

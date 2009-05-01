@@ -31,7 +31,7 @@ struct 'Net::hostent' => \@(
        addr_list	=> '@',
        );
 
-sub addr(@< @_) { shift @_->addr_list->[0] }
+sub addr($self, @< @_) { $self->addr_list->[0] }
 
 sub populate(@< @_) {
     return unless (nelems @_);

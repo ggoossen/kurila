@@ -576,10 +576,7 @@ sub mkpath(@< @_) {
     return _mkpath($arg, $paths);
 }
 
-sub _mkpath(@< @_) {
-    my $arg   = shift @_;
-    my $paths = shift @_;
-
+sub _mkpath($arg, $paths) {
     my(@created);
     foreach my $path ( $paths->@) {
         next unless length($path);
@@ -654,10 +651,7 @@ sub rmtree(@< @_) {
     return _rmtree($arg, $paths);
 }
 
-sub _rmtree(@< @_) {
-    my $arg   = shift @_;
-    my $paths = shift @_;
-
+sub _rmtree($arg, $paths) {
     my $count  = 0;
     my $curdir = File::Spec->curdir();
     my $updir  = File::Spec->updir();

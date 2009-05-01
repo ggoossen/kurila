@@ -35,7 +35,7 @@ package SHORT_NAME_WITH_HOOK;
 
 sub make(@< @_) { bless \@(), shift @_ }
 
-sub STORABLE_freeze($self) {
+sub STORABLE_freeze($self, ...) {
     return @("", $self);
 }
 
@@ -107,7 +107,7 @@ package RETURNS_IMMORTALS;
 
 sub make(@< @_) { my $self = shift @_; bless \ @_, $self }
 
-sub STORABLE_freeze($self) {
+sub STORABLE_freeze($self, ...) {
     my @($what, $times) =  $self->@;
     return @("$what$times", < (@(%::immortals{?$what}) x $times));
 }
@@ -151,7 +151,7 @@ sub make(...) {
     bless \@();
 }
 
-sub STORABLE_freeze($self) {
+sub STORABLE_freeze($self, ...) {
     return @('');
 }
 

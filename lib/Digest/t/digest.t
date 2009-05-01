@@ -16,7 +16,7 @@ do {
         bless \%( d => $d ), $class;
     }
     sub add(...) {}
-    sub digest(@< @_) { shift @_->{?d} }
+    sub digest($self) { $self->{?d} }
 };
 
 my $d;

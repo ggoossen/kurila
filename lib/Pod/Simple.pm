@@ -185,9 +185,9 @@ sub _handle_text($self, $text)          {
 #
 # And now directives (not targets)
 
-sub accept_directive_as_verbatim(@< @_)  { shift @_->_accept_directives('Verbatim', < @_) }
-sub accept_directive_as_data(@< @_)      { shift @_->_accept_directives('Data',     < @_) }
-sub accept_directive_as_processed(@< @_) { shift @_->_accept_directives('Plain',    < @_) }
+sub accept_directive_as_verbatim($self, @< @_)  { $self->_accept_directives('Verbatim', < @_) }
+sub accept_directive_as_data($self, @< @_)      { $self->_accept_directives('Data',     < @_) }
+sub accept_directive_as_processed($self, @< @_) { $self->_accept_directives('Plain',    < @_) }
 
 sub _accept_directives(@< @_) {
   my@($this, $type) =@( splice @_,0,2);
@@ -229,13 +229,13 @@ sub unaccept_directives(@< @_) {
 #
 # And now targets (not directives)
 
-sub accept_target(@< @_)         { shift @_->accept_targets(< @_)         } # alias
-sub accept_target_as_text(@< @_) { shift @_->accept_targets_as_text(< @_) } # alias
+sub accept_target($self, @< @_)         { $self->accept_targets(< @_)         } # alias
+sub accept_target_as_text($self, @< @_) { $self->accept_targets_as_text(< @_) } # alias
 
 
-sub accept_targets(@< @_)         { shift @_->_accept_targets('1', < @_) }
+sub accept_targets($self, @< @_)         { $self->_accept_targets('1', < @_) }
 
-sub accept_targets_as_text(@< @_) { shift @_->_accept_targets('force_resolve', < @_) }
+sub accept_targets_as_text($self, @< @_) { $self->_accept_targets('force_resolve', < @_) }
  # forces them to be processed, even when there's no ":".
 
 sub _accept_targets(@< @_) {

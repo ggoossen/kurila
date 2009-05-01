@@ -2528,15 +2528,14 @@ sub loop_common($self, $op, $cx, $init) {
     return $head . "\{\n\t" . $body . "\b\}" . $cont;
 }
 
-sub pp_leaveloop(@< @_) { shift @_->loop_common(< @_, "") }
+sub pp_leaveloop($self, @< @_) { $self->loop_common(< @_, "") }
 
 sub for_loop($self, $op, $cx) {
     my $init = $self->deparse($op, 1);
     return $self->loop_common($op->sibling->first->sibling, $cx, $init);
 }
 
-sub pp_leavetry(@< @_) {
-    my $self = shift @_;
+sub pp_leavetry($self, @< @_) {
     return "eval \{\n\t" . $self->pp_leave(< @_) . "\n\b\}";
 }
 

@@ -2831,8 +2831,8 @@ interpreted as an octal value.
 
 =cut
 
-sub perm_rw(@< @_) {
-    return shift @_->{?PERM_RW};
+sub perm_rw($self) {
+    return $self->{?PERM_RW};
 }
 
 =item perm_rwx (o)
@@ -2844,8 +2844,8 @@ See also perl_rw.
 
 =cut
 
-sub perm_rwx(@< @_) {
-    return shift @_->{?PERM_RWX};
+sub perm_rwx($self) {
+    return $self->{?PERM_RWX};
 }
 
 =item pm_to_blib
