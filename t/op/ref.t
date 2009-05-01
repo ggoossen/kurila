@@ -249,8 +249,8 @@ is ($a, 2);
 
 foreach my $lexical (@('', 'my $a; ')) {
     my $expect = "pass\n";
-    my $result = runperl (switches => \@('-wl'), stderr => 1,
-        prog => $lexical . 'BEGIN {$a = \q{pass}}; $a = $a->$; print $^STDOUT, $a');
+    my $result = runperl (switches => \@('-w'), stderr => 1,
+        prog => $lexical . 'BEGIN {$a = \q{pass}}; $a = $a->$; print $^STDOUT, $a, qq[\n]');
 
     is ($^CHILD_ERROR, 0);
     is ($result, $expect);
@@ -267,8 +267,8 @@ do { my $a1 = bless \@(3),"x";
 };
 curr_test($test+4);
 
-is (runperl (switches=> \@('-l'),
-    prog=> 'print $^STDOUT, 1; print $^STDOUT, qq-*$^INPUT_RECORD_SEPARATOR*-;print $^STDOUT, 1;'),
+is (runperl (
+    prog=> 'print $^STDOUT, 1, qq[\n]; print $^STDOUT, qq-*$^INPUT_RECORD_SEPARATOR*-, qq[\n];print $^STDOUT, 1, qq[\n];'),
     "1\n*\n*\n1\n");
 
 # bug #22719

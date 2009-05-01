@@ -13,7 +13,7 @@ chdir 't';
 
 use File::Spec;
 
-use Test::More tests => 6;
+use Test::More tests => 5;
 
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
@@ -36,9 +36,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
 # [rt.cpan.org 26234]
 do {
     local $^INPUT_RECORD_SEPARATOR = "foo";
-    local $^OUTPUT_RECORD_SEPARATOR = "bar";
     MY->fixin("bin/program");
     is $^INPUT_RECORD_SEPARATOR, "foo", '$/ not clobbered';
-    is $^OUTPUT_RECORD_SEPARATOR, "bar", '$\ not clobbered';
 };
 

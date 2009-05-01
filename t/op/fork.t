@@ -234,19 +234,17 @@ waited
 ########
 use Config;
 $^OUTPUT_AUTOFLUSH = 1;
-$^OUTPUT_RECORD_SEPARATOR = "\n";
 fork()
- ?? print($^STDOUT, config_value('osname') eq $^OS_NAME)
- !! print($^STDOUT, config_value('osname') eq $^OS_NAME) ;
+ ?? print($^STDOUT, config_value('osname') eq $^OS_NAME, qq[\n])
+ !! print($^STDOUT, config_value('osname') eq $^OS_NAME, qq[\n]) ;
 EXPECT
 1
 1
 ########
 $^OUTPUT_AUTOFLUSH = 1;
-$^OUTPUT_RECORD_SEPARATOR = "\n";
 fork()
- ?? do { require Config; print($^STDOUT, Config::config_value("osname") eq $^OS_NAME); }
- !! do { require Config; print($^STDOUT, Config::config_value("osname") eq $^OS_NAME); }
+ ?? do { require Config; print($^STDOUT, Config::config_value("osname") eq $^OS_NAME, qq[\n]); }
+ !! do { require Config; print($^STDOUT, Config::config_value("osname") eq $^OS_NAME, qq[\n]); }
 EXPECT
 1
 1
@@ -254,13 +252,12 @@ EXPECT
 $^OUTPUT_AUTOFLUSH = 1;
 use Cwd;
 my $cwd = cwd(); # Make sure we load Win32.pm while "../lib" still works.
-$^OUTPUT_RECORD_SEPARATOR = "\n";
 my $dir;
 if (fork) {
     $dir = "f$^PID.tst";
     mkdir $dir, 0755;
     chdir $dir;
-    print $^STDOUT, cwd() =~ m/\Q$dir/i ?? "ok 1 parent" !! "not ok 1 parent";
+    print $^STDOUT, cwd() =~ m/\Q$dir/i ?? "ok 1 parent\n" !! "not ok 1 parent\n";
     chdir "..";
     rmdir $dir;
 }
@@ -269,7 +266,7 @@ else {
     $dir = "f$^PID.tst";
     mkdir $dir, 0755;
     chdir $dir;
-    print $^STDOUT, cwd() =~ m/\Q$dir/i ?? "ok 1 child" !! "not ok 1 child";
+    print $^STDOUT, cwd() =~ m/\Q$dir/i ?? "ok 1 child\n" !! "not ok 1 child\n";
     chdir "..";
     rmdir $dir;
 }
@@ -278,7 +275,6 @@ ok 1 parent
 ok 1 child
 ########
 $^OUTPUT_AUTOFLUSH = 1;
-$^OUTPUT_RECORD_SEPARATOR = "\n";
 my $getenv;
 if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare') {
     $getenv = qq[$^EXECUTABLE_NAME -e "print \\\$^STDOUT, \$(env::var(q[TST]))"];
@@ -289,14 +285,14 @@ else {
 env::var("TST") = 'foo';
 if (fork) {
     sleep 1;
-    print $^STDOUT, "parent before: " . `$getenv`;
+    print $^STDOUT, "parent before: " . `$getenv` . "\n";
     env::var("TST") = 'bar';
-    print $^STDOUT, "parent after: " . `$getenv`;
+    print $^STDOUT, "parent after: " . `$getenv` . "\n";
 }
 else {
-    print $^STDOUT, "child before: " . `$getenv`;
+    print $^STDOUT, "child before: " . `$getenv` . "\n";
     env::var("TST") = 'baz';
-    print $^STDOUT, "child after: " . `$getenv`;
+    print $^STDOUT, "child after: " . `$getenv` . "\n";
 }
 EXPECT
 child before: foo
@@ -305,10 +301,9 @@ parent before: foo
 parent after: bar
 ########
 $^OUTPUT_AUTOFLUSH = 1;
-$^OUTPUT_RECORD_SEPARATOR = "\n";
 if (my $pid = fork) {
     waitpid($pid,0);
-    print $^STDOUT, "parent got $^CHILD_ERROR"
+    print $^STDOUT, "parent got $^CHILD_ERROR\n"
 }
 else {
     exit(42);
@@ -317,11 +312,10 @@ EXPECT
 parent got 10752
 ########
 $^OUTPUT_AUTOFLUSH = 1;
-$^OUTPUT_RECORD_SEPARATOR = "\n";
 my $echo = 'echo';
 if (my $pid = fork) {
     waitpid($pid,0);
-    print $^STDOUT, "parent got $^CHILD_ERROR"
+    print $^STDOUT, "parent got $^CHILD_ERROR\n"
 }
 else {
     exec("$echo foo");

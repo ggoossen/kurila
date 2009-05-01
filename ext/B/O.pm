@@ -47,9 +47,7 @@ sub import($class, @< @options) {
 		die $compilesub;
 	    }
 
-            our $savebackslash;
-	    local $savebackslash = $^OUTPUT_RECORD_SEPARATOR;
-	    local @($^OUTPUT_RECORD_SEPARATOR,$^OUTPUT_FIELD_SEPARATOR) = @(undef,'');
+	    local $^OUTPUT_FIELD_SEPARATOR = '';
 	    &$compilesub();
 
 	    close $^STDERR if $veryquiet;

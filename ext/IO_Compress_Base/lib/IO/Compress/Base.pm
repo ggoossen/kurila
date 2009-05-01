@@ -606,18 +606,10 @@ sub print
     #    $self = $self{GLOB} ;
     #}
 
-    if (defined $^OUTPUT_RECORD_SEPARATOR) {
-        if (defined $^OUTPUT_FIELD_SEPARATOR) {
-            defined $self->syswrite(join($^OUTPUT_FIELD_SEPARATOR, @_) . $^OUTPUT_RECORD_SEPARATOR);
-        } else {
-            defined $self->syswrite(join("", @_) . $^OUTPUT_RECORD_SEPARATOR);
-        }
+    if (defined $^OUTPUT_FIELD_SEPARATOR) {
+        defined $self->syswrite(join($^OUTPUT_FIELD_SEPARATOR, @_));
     } else {
-        if (defined $^OUTPUT_FIELD_SEPARATOR) {
-            defined $self->syswrite(join($^OUTPUT_FIELD_SEPARATOR, @_));
-        } else {
-            defined $self->syswrite(join("", @_));
-        }
+        defined $self->syswrite(join("", @_));
     }
 }
 

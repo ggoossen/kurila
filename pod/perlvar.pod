@@ -341,16 +341,6 @@ X<$^OUTPUT_FIELD_SEPARATOR>
 The output field separator for the print operator.  If defined, this
 value is printed between each of print's arguments.  Default is C<undef>.
 
-=item IO::Handle->output_record_separator EXPR
-
-=item $^OUTPUT_RECORD_SEPARATOR
-X<$^OUTPUT_RECORD_SEPARATOR>
-
-The output record separator for the print operator.  If defined, this
-value is printed after the last of print's arguments.  Default is C<undef>.
-(Mnemonic: you set C<$^OUTPUT_RECORD_SEPARATOR> instead of adding "\n" at the end of the print.
-Also, it's just like C<$^INPUT_RECORD_SEPARATOR>, but it's what you get "back" from Perl.)
-
 =item $CHILD_ERROR
 X<$CHILD_ERROR>
 

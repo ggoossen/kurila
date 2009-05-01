@@ -2079,9 +2079,8 @@ END
     };
 
     do {
-        local $^OUTPUT_RECORD_SEPARATOR = undef;
         $_ = 'aaaaaaaaaa';
-        chop $_; $^OUTPUT_RECORD_SEPARATOR="\n";
+        chop $_;
         ok(m/[^\s]+/, "m/[^\s]/ utf8");
         ok(m/[^\d]+/, "m/[^\d]/ utf8");
         ok(do {$a = $_; $_ =~ s/[^\s]+/./g}, "s/[^\s]/ utf8");
