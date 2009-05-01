@@ -15,16 +15,16 @@ our @EXPORT_OK=qw|drill break_at|;
 
 my %caller_opts;
 
-sub defined_or_space {
+sub defined_or_space(@< @_) {
     return " " if !defined @_[0] || length @_[0] == 0; 
     return @_[0];
 }
 
-sub boolean {
+sub boolean(@< @_) {
     return @_[0] ?? 1 !! 0;
 }
 
-sub pattern {
+sub pattern(@< @_) {
     return @_[0] if ref @_[0] eq 'Regexp';
     return @_[0] ?? qr/(?=)/ !! qr/(?!)/;
 }
@@ -52,14 +52,14 @@ sub one_char($newval, _, $opts) {
     return;
 }
 
-sub layout_word {
+sub layout_word(@< @_) {
     die "Value for layout option must be 'across', 'down', 'balanced', ",
         "or 'tabular\n(not '@_[0]')"
         unless @_[0] =~ m/^(across|down|balanced|tabular)$/;
     return @_[0];
 }
 
-sub pos_integer {
+sub pos_integer(@< @_) {
     die "Value for '@_[1]' option must be positive integer (not @_[0])"
         unless int(@_[0]) eq @_[0] && @_[0] +> 0;
     return @_[0];
@@ -76,7 +76,7 @@ sub strings_or_undef($val, $name) {
 
 my $unlimited = ^~^0>>1;			# Ersatz infinity
 
-sub height_vals {
+sub height_vals(@< @_) {
     my @($vals) =  @_;
     my $type = ref $vals;
     if (!defined $vals)      { $vals = \%(min=>0,     max=>$unlimited) }
@@ -109,7 +109,7 @@ my %def_page = %(
             number => undef,
     );
 
-sub form_body {
+sub form_body(@< @_) {
     my @($format) =  @_;
     $format = '{[{*}[}' unless defined $format;
     return sub {
@@ -151,7 +151,7 @@ sub hashify($what, $val, $default_undef, $default_val) {
     die "Value for $what must be string, subroutine, or hash";
 }
 
-sub page_hash {
+sub page_hash(@< @_) {
     my @($h, _, $opts) =  @_;
     die "Value for 'page' option must be hash reference (not $_)"
         for grep { $_ ne 'HASH' }, @( ref $h);
@@ -168,7 +168,7 @@ sub page_hash {
     return $h;
 }
 
-sub filehandle {
+sub filehandle(@< @_) {
     die "Value for 'out' option must be filehandle (not '$_')"
         for grep {$_ ne 'GLOB' }, @( ref @_[0]);
     return @_[0];
@@ -225,7 +225,7 @@ my %std_opt = %(
 
 my %def_opts = %( < @+: map {@:$_=>%std_opt{$_}->{?def}},  keys %std_opt );
 
-sub get_locale_vals {   # args: $dec_mark, $thou_sep, $thou_group
+sub get_locale_vals(@< @_) {   # args: $dec_mark, $thou_sep, $thou_group
     use POSIX;
     my $lconv = POSIX::localeconv();
     @_[0] = exists $lconv->{decimal_point} ?? $lconv->{?decimal_point} !! "?";
@@ -259,13 +259,13 @@ sub fillpat($pos, $fill, $len) {
     return substr($fill x (($pos+$len)/length($fill)+1), $pos, $len);
 }
 
-sub jhorlit {}	# literals don't need any justification
+sub jhorlit(...) {}	# literals don't need any justification
 
-sub jverbatim {
+sub jverbatim(@< @_) {
     jleft(< @_, precropped=>1);
 }
 
-sub jleft {
+sub jleft(@< @_) {
     my @(_, %< %val) =  @_;
     @_[0] =~ s/^\s+// unless %val{?precropped};
     my $len = length @_[0];
@@ -273,14 +273,14 @@ sub jleft {
     substr(@_[0],%val{?width}, undef, "") unless %val{?stretch};
 }
 
-sub jright {
+sub jright(@< @_) {
     my @(_, %< %val) =  @_;
     @_[0] =~ s/\s+$// unless %val{?precropped};
     @_[0] = fillpat(%val{?pos}, %val{?pre}, %val{?width}-length(@_[0])) . @_[0];
     substr(@_[0],0,-%val{?width}, "") unless %val{?stretch};
 }
 
-sub jcentre {
+sub jcentre(@< @_) {
     my @(_, %< %val) =  @_;
     @_[0] =~ s/^\s+|\s+$//g;
     %val{+precropped} = 1;
@@ -289,7 +289,7 @@ sub jcentre {
     jright(@_[0], < %val);
 }
 
-sub jfull {
+sub jfull(@< @_) {
     my @($str, %< %val) =  @_;
     my $rem = %val{?width};
     $str =~ s/^\s+|\s+$//g;
@@ -302,12 +302,12 @@ sub jfull {
     &jleft( < @_ );
 }
 
-sub jsingle {
+sub jsingle(@< @_) {
     my @(_, %< %val) =  @_;
     @_[0] = length @_[0] ?? substr(@_[0],0,1) !! fillpat(%val{?pos}, %val{?pre},1);
 }
 
-sub jfatal {
+sub jfatal(...) {
     die "Internal error in &form."
 }
 
@@ -317,11 +317,11 @@ sub joverflow($x, $y) {
     return \&jfatal;
 }
 
-sub jbullet {
+sub jbullet(@< @_) {
     return  @(@_[0],1);
 }
 
-sub jnum {
+sub jnum(@< @_) {
     my @($fld,$precurr,$incurr,$postcurr,$width,$opts,$setplaces,$checkplaces)
         =  @_;
     my $orig = $fld;
@@ -457,13 +457,13 @@ sub perl6_match($str, $pat) {;
 }
 
 my $litval;
-sub litval {
+sub litval(@< @_) {
     ($litval) = (nelems @_) if (nelems @_);
     return $litval;
 }
 
 my ($fld, $udnum);
-sub fldvals {
+sub fldvals(@< @_) {
     @($fld, $udnum) =  @_ if (nelems @_);
     return  @($fld, $udnum);
 }
@@ -734,7 +734,7 @@ sub segment($format, $args, $opts, $fldcnt, $argcache) {
     return \@formatters;
 }
 
-sub layout_groups {
+sub layout_groups(@< @_) {
     my @groups;
     my $i = 0;
   FORMATTER: for my $f ( @_) {
@@ -750,7 +750,7 @@ sub layout_groups {
     return < @groups;
 }
 
-sub make_col {
+sub make_col(@< @_) {
     my @($f, $opts, $maxheight, $tabular) =  @_;
     $maxheight = min @($unlimited,
                     < grep { defined() }, @( $maxheight, $f->{?opts}{?height}{?max}));
@@ -826,7 +826,7 @@ sub balance_cols($group, $opts, $maxheight) {
     }
 }
 
-sub delineate_overflows {
+sub delineate_overflows(@< @_) {
     for my $formats ( @_) {
         # Is there a block field on the line?
         next if grep { !(  $_->{?line}
@@ -1049,7 +1049,7 @@ sub linecount($v) {
 
 use warnings::register;
 
-sub form {
+sub form(@< @_) {
     # Handle formatting calls...
     my @($package, $file, $line) =@( caller);
     my $caller_opts = %caller_opts{+$package.','.$file} ||= \%();
@@ -1237,7 +1237,7 @@ sub slice($structure, @< @indices) {
     return ref eq 'HASH' ?? < $_->{[ @indices]} !! < $_->[[@(@indices)]] for @( $structure);
 }
 
-sub vals { return ref eq 'HASH' ?? values $_->% !! < $_->@ for @( @_[0]) }
+sub vals(@< @_) { return ref eq 'HASH' ?? values $_->% !! < $_->@ for @( @_[0]) }
 
 sub drill($structure, @< @indices) {
     return $structure unless (nelems @indices);
@@ -1250,7 +1250,7 @@ sub drill($structure, @< @indices) {
     return @section;
 }
 
-sub break_lit {
+sub break_lit(@< @_) {
     return  @(@_[0]->$,0,0);
 }
 
@@ -1275,7 +1275,7 @@ sub break_nl($str) {
 
 my $wsnzw = q{ (??{length($^LAST_SUBMATCH_RESULT)?'(?=)':'(?!)'}) };
 
-sub break_at {
+sub break_at(@< @_) {
     my @($hyphen) =  @_;
     my $lit_hy = qr/\Q$hyphen\E/;
     my $hylen = length($hyphen);         

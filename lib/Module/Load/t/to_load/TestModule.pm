@@ -7,8 +7,8 @@ our (@EXPORT, @EXPORT_OK, @ISA);
 @EXPORT = qw(func2);
 @EXPORT_OK = qw(func1);
 
-sub func1 { return "func1"; }
+sub func1(...) { return "func1"; }
 
-sub func2 { return "func2"; }
+sub func2(...) { return "func2"; }
 
 1;

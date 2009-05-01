@@ -93,9 +93,9 @@ use constant OFF_STICKY     => 5 ;
 
 
 
-sub ParseParameters
+sub ParseParameters(@< @_)
 {
-    my $level = shift || 0 ; 
+    my $level = shift @_ || 0 ; 
 
     my $sub = @(caller($level + 1))[3] ;
     #local $Carp::CarpLevel = 1 ;
@@ -107,9 +107,8 @@ sub ParseParameters
 }
 
 
-sub Compress::Raw::Zlib::Parameters::new
+sub Compress::Raw::Zlib::Parameters::new(?$class)
 {
-    my $class = shift ;
 
     my $obj = \%( Error => '',
             Got   => \%(),
@@ -119,11 +118,11 @@ sub Compress::Raw::Zlib::Parameters::new
     return bless $obj, 'Compress::Raw::Zlib::Parameters' ;
 }
 
-sub Compress::Raw::Zlib::Parameters::setError
+sub Compress::Raw::Zlib::Parameters::setError(@< @_)
 {
-    my $self = shift ;
-    my $error = shift ;
-    my $retval = (nelems @_) ?? shift !! undef ;
+    my $self = shift @_ ;
+    my $error = shift @_ ;
+    my $retval = (nelems @_) ?? shift @_ !! undef ;
 
     $self->{+Error} = $error ;
     return $retval;
@@ -135,11 +134,11 @@ sub Compress::Raw::Zlib::Parameters::setError
 #    return $self->{Error} ;
 #}
 
-sub Compress::Raw::Zlib::Parameters::parse
+sub Compress::Raw::Zlib::Parameters::parse(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
 
-    my $default = shift ;
+    my $default = shift @_ ;
 
     my $got = $self->{?Got} ;
     my $firstTime = nkeys  $got->% == 0 ;
@@ -226,15 +225,15 @@ sub Compress::Raw::Zlib::Parameters::parse
     return 1;
 }
 
-sub Compress::Raw::Zlib::Parameters::_checkType
+sub Compress::Raw::Zlib::Parameters::_checkType(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
 
-    my $key   = shift ;
-    my $value = shift ;
-    my $type  = shift ;
-    my $validate  = shift ;
-    my $output  = shift;
+    my $key   = shift @_ ;
+    my $value = shift @_ ;
+    my $type  = shift @_ ;
+    my $validate  = shift @_ ;
+    my $output  = shift @_;
 
     #local $Carp::CarpLevel = $level ;
     #print "PARSE $type $key $value $validate $sub\n" ;
@@ -293,18 +292,18 @@ sub Compress::Raw::Zlib::Parameters::_checkType
 
 
 
-sub Compress::Raw::Zlib::Parameters::parsed
+sub Compress::Raw::Zlib::Parameters::parsed(@< @_)
 {
-    my $self = shift ;
-    my $name = shift ;
+    my $self = shift @_ ;
+    my $name = shift @_ ;
 
     return $self->{Got}->{lc $name}->[OFF_PARSED] ;
 }
 
-sub Compress::Raw::Zlib::Parameters::value
+sub Compress::Raw::Zlib::Parameters::value(@< @_)
 {
-    my $self = shift ;
-    my $name = shift ;
+    my $self = shift @_ ;
+    my $name = shift @_ ;
 
     if ((nelems @_))
     {
@@ -316,9 +315,9 @@ sub Compress::Raw::Zlib::Parameters::value
     return $self->{Got}->{lc $name}->[OFF_FIXED] ;
 }
 
-sub Compress::Raw::Zlib::Deflate::new
+sub Compress::Raw::Zlib::Deflate::new(@< @_)
 {
-    my $pkg = shift ;
+    my $pkg = shift @_ ;
     my $got = ParseParameters(0,
         \%(
             'AppendOutput'  => \@(1, 1, Parse_boolean,  0),
@@ -355,9 +354,9 @@ sub Compress::Raw::Zlib::Deflate::new
 
 }
 
-sub Compress::Raw::Zlib::Inflate::new
+sub Compress::Raw::Zlib::Inflate::new(@< @_)
 {
-    my $pkg = shift ;
+    my $pkg = shift @_ ;
     my $got = ParseParameters(0,
         \%(
             'AppendOutput'  => \@(1, 1, Parse_boolean,  0),
@@ -385,9 +384,9 @@ sub Compress::Raw::Zlib::Inflate::new
                  $got->value('Dictionary')) ;
 }
 
-sub Compress::Raw::Zlib::InflateScan::new
+sub Compress::Raw::Zlib::InflateScan::new(@< @_)
 {
-    my $pkg = shift ;
+    my $pkg = shift @_ ;
     my @($got) =  ParseParameters(0,
         \%(
             'CRC32'         => \@(1, 1, < Parse_boolean,  0),
@@ -413,9 +412,9 @@ sub Compress::Raw::Zlib::InflateScan::new
                      '') ;
 }
 
-sub Compress::Raw::Zlib::inflateScanStream::createDeflateStream
+sub Compress::Raw::Zlib::inflateScanStream::createDeflateStream(@< @_)
 {
-    my $pkg = shift ;
+    my $pkg = shift @_ ;
     my @($got) =  ParseParameters(0,
         \%(
             'AppendOutput'  => \@(1, 1, < Parse_boolean,  0),
@@ -450,9 +449,9 @@ sub Compress::Raw::Zlib::inflateScanStream::createDeflateStream
 
 }
 
-sub Compress::Raw::Zlib::inflateScanStream::inflate
+sub Compress::Raw::Zlib::inflateScanStream::inflate(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
     my $buffer = @_[1];
     my $eof = @_[2];
 

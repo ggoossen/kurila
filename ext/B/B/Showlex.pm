@@ -19,7 +19,7 @@ use B::Concise ();
 # borrowed from B::Concise
 our $walkHandle = $^STDOUT;
 
-sub walk_output { # updates $walkHandle
+sub walk_output(@< @_) { # updates $walkHandle
     $walkHandle = B::Concise::walk_output(< @_);
     #print "got $walkHandle";
     #print $walkHandle "using it";
@@ -76,12 +76,12 @@ sub showlex_obj($objname, $obj) {
     newlex ($objname, < svref_2object($obj)->PADLIST->ARRAY) if  $newlex;
 }
 
-sub showlex_main {
+sub showlex_main(...) {
     showlex("comppadlist", < comppadlist->ARRAY)	if !$newlex;
     newlex ("main", < comppadlist->ARRAY)		if  $newlex;
 }
 
-sub compile {
+sub compile(@< @_) {
     my @options = grep { ! ref && m/^-/ }, @_;
     my @args = grep { ref || !m/^-/ }, @_;
     for my $o ( @options) {

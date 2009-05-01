@@ -15,15 +15,15 @@ bless $a, "Bob";
 ok $a->isa("Bob");
 
     package Human;
-sub eat {}
+sub eat(...) {}
 
 package Female;
 our @ISA=qw(Human);
 
     package Alice;
 our @ISA=qw(Bob Female);
-sub drink { return "drinking " . @_[1]  }
-sub new { bless \%() }
+sub drink(@< @_) { return "drinking " . @_[1]  }
+sub new(...) { bless \%() }
 
 $Alice::VERSION = 2.718;
 
@@ -37,7 +37,7 @@ do {
     package Programmer;
     our $VERSION = 1.667;
 
-    sub write_perl { 1 }
+    sub write_perl(...) { 1 }
 };
 
 package main;
@@ -171,7 +171,7 @@ fresh_perl_is('package Foo; Foo->VERSION;  print $^STDOUT, "ok"', 'ok');
 
     package Foo;
 
-sub DOES { 1 }
+sub DOES(...) { 1 }
 
 package Bar;
 

@@ -288,8 +288,7 @@ use warnings ();
 # \f - flush left (no indent)
 # \cK - kill following semicolon, if any
 
-sub null {
-    my $op = shift;
+sub null(?$op) {
     return class($op) eq "NULL";
 }
 
@@ -309,8 +308,7 @@ sub todo($self, $cv, $is_form) {
     }
 }
 
-sub next_todo {
-    my $self = shift;
+sub next_todo($self) {
     my $ent = shift $self->{'subs_todo'}->@;
     my $cv = $ent->[1];
     my $gv = $cv->GV;
@@ -474,8 +472,7 @@ sub stash_subs($self, ?$pack) {
     }
 }
 
-sub print_protos {
-    my $self = shift;
+sub print_protos($self) {
     my @ret;
     foreach my $ar ( $self->{+'protos_todo'}->@) {
         my $proto = (defined $ar->[1] ?? " (". $ar->[1] . ")" !! "");
@@ -485,9 +482,9 @@ sub print_protos {
     return @ret;
 }
 
-sub style_opts {
-    my $self = shift;
-    my $opts = shift;
+sub style_opts(@< @_) {
+    my $self = shift @_;
+    my $opts = shift @_;
     my $opt;
     while (length($opt = substr($opts, 0, 1))) {
         if ($opt eq "C") {
@@ -506,8 +503,8 @@ sub style_opts {
     }
 }
 
-sub new {
-    my $class = shift;
+sub new(@< @_) {
+    my $class = shift @_;
     my $self = bless \%(), $class;
     $self->{+'cuddle'} = "\n";
     $self->{+'curcop'} = undef;
@@ -566,8 +563,7 @@ do {
 # Initialise the contextual information, either from
 # defaults provided with the ambient_pragmas method,
 # or from perl's own defaults otherwise.
-sub init {
-    my $self = shift;
+sub init($self) {
 
     $self->{+'warnings'} = defined ($self->{?'ambient_warnings'})
         ?? $self->{?'ambient_warnings'} ^&^ WARN_MASK
@@ -579,7 +575,7 @@ sub init {
     delete $self->{'subs_declared'};
 }
 
-sub compile {
+sub compile(@< @_) {
     my @args = @_;
     return sub {
             my $self = B::Deparse->new(< @args);
@@ -628,22 +624,22 @@ sub compile {
         }
 }
 
-sub coderef2text {
-    my $self = shift;
-    my $sub = shift;
+sub coderef2text(@< @_) {
+    my $self = shift @_;
+    my $sub = shift @_;
     die "Usage: ->coderef2text(CODEREF)" unless UNIVERSAL::isa($sub, "CODE");
 
     $self->init();
     return $self->indent($self->deparse_sub(svref_2object($sub)));
 }
 
-sub ambient_pragmas {
-    my $self = shift;
+sub ambient_pragmas(@< @_) {
+    my $self = shift @_;
     my @($hint_bits, $warning_bits, $hinthash) = @(0, 0, undef);
 
     while ((nelems @_) +> 1) {
-        my $name = shift();
-        my $val  = shift();
+        my $name = shift( @_);
+        my $val  = shift( @_);
 
         if ($name eq 'strict') {
             require strict;
@@ -749,9 +745,9 @@ sub deparse($self, $op, $cx) {
     return $self->?$meth($op, $cx);
 }
 
-sub indent {
-    my $self = shift;
-    my $txt = shift;
+sub indent(@< @_) {
+    my $self = shift @_;
+    my $txt = shift @_;
     my @lines = split(m/\n/, $txt);
     my $leader = "";
     my $level = 0;
@@ -776,9 +772,9 @@ sub indent {
     return join("\n", @lines);
 }
 
-sub deparse_sub {
-    my $self = shift;
-    my $cv = shift;
+sub deparse_sub(@< @_) {
+    my $self = shift @_;
+    my $cv = shift @_;
     my $proto = "";
     die("NULL in deparse_sub") if !defined($cv) || $cv->isa("B::NULL");
     die("SPECIAL in deparse_sub") if $cv->isa("B::SPECIAL");
@@ -829,21 +825,19 @@ sub deparse_sub {
     return $proto ."\{\n\t$body\n\b\}" ."\n";
 }
 
-sub is_scope {
-    my $op = shift;
+sub is_scope(?$op) {
     return $op->name eq "leave" || $op->name eq "scope"
         || $op->name eq "lineseq"
         ||  ($op->name eq "null" && class($op) eq "UNOP"
       &&  (is_scope($op->first) || $op->first->name eq "enter"));
 }
 
-sub is_state {
+sub is_state(@< @_) {
     my $name = @_[0]->name;
     return $name eq "nextstate" || $name eq "dbstate" || $name eq "setstate";
 }
 
-sub is_miniwhile { # check for one-line loop (`foo() while $y--')
-    my $op = shift;
+sub is_miniwhile(?$op) {
     return (!null($op) and null($op->sibling)
             and $op->name eq "null" and class($op) eq "UNOP"
             and  ($op->first->name =~ m/^(and|or)$/
@@ -856,8 +850,7 @@ sub is_miniwhile { # check for one-line loop (`foo() while $y--')
 
 # Check if the op and its sibling are the initialization and the rest of a
 # for (..;..;..) { ... } loop
-sub is_for_loop {
-    my $op = shift;
+sub is_for_loop(?$op) {
     # This OP might be almost anything, though it won't be a
     # nextstate. (It's the initialization, so in the canonical case it
     # will be an sassign.) The sibling is a lineseq whose first child
@@ -872,8 +865,7 @@ sub is_for_loop {
     return 0;
 }
 
-sub is_scalar {
-    my $op = shift;
+sub is_scalar(?$op) {
     return  @($op->name eq "rv2sv" or
               $op->name eq "padsv" or
               $op->name eq "gv" or # only in array/hash constructs
@@ -960,9 +952,9 @@ sub maybe_targmy($self, $op, $cx, $func, @< @args) {
     }
 }
 
-sub padname_sv {
-    my $self = shift;
-    my $targ = shift;
+sub padname_sv(@< @_) {
+    my $self = shift @_;
+    my $targ = shift @_;
     return $self->{'curcv'}->PADLIST->ARRAYelt(0)->ARRAYelt($targ);
 }
 
@@ -987,7 +979,7 @@ sub maybe_my($self, $op, $cx, $text) {
 # we're sequencing here. If it's undefined, then we don't append
 # any subroutine declarations to the deparsed ops, otherwise we
 # append appropriate declarations.
-sub lineseq {
+sub lineseq(@< @_) {
     my@($self, $root, @< @ops) =  @_;
     my($expr, @exprs);
 
@@ -1066,15 +1058,15 @@ sub scopeop($real_block, $self, $op, $cx) {
     }
 }
 
-sub pp_scope { scopeop(0, < @_); }
-sub pp_lineseq { scopeop(0, < @_); }
-sub pp_leave { scopeop(1, < @_); }
+sub pp_scope(@< @_) { scopeop(0, < @_); }
+sub pp_lineseq(@< @_) { scopeop(0, < @_); }
+sub pp_leave(@< @_) { scopeop(1, < @_); }
 
 # This is a special case of scopeop and lineseq, for the case of the
 # main_root. The difference is that we print the output statements as
 # soon as we get them, for the sake of impatient users.
-sub deparse_root {
-    my $self = shift;
+sub deparse_root(@< @_) {
+    my $self = shift @_;
     my@($op) =  @_;
     my @oldv = $self->{[qw'curstash warnings hints hinthash']};
           local($self->{[qw'curstash warnings hints hinthash']});
@@ -1122,9 +1114,9 @@ my %globalnames;
 BEGIN { map( {%globalnames{+$_}++ }, @( "SIG", "STDIN", "STDOUT", "STDERR", "INC",
                                         "ENV", "ARGV", "ARGVOUT", "_")); }
 
-sub gv_name {
-    my $self = shift;
-    my $gv = shift;
+sub gv_name(@< @_) {
+    my $self = shift @_;
+    my $gv = shift @_;
     die "no B::GV" unless ref($gv) eq "B::GV";
     my $stash = $gv->STASH->NAME;
     my $name = $gv->SAFENAME;
@@ -1177,8 +1169,7 @@ sub lex_in_scope($self, $name) {
     return 0;
 }
 
-sub populate_curcvlex {
-    my $self = shift;
+sub populate_curcvlex($self) {
     my $cv = $self->{?'curcv'};
     my $padlist = $cv->PADLIST;
     my $parentpadlist;
@@ -1210,8 +1201,8 @@ sub populate_curcvlex {
     }
 }
 
-sub find_scope_st { find_scope(< @_)[0]; }
-sub find_scope_en { find_scope(< @_)[1]; }
+sub find_scope_st(@< @_) { find_scope(< @_)[0]; }
+sub find_scope_en(@< @_) { find_scope(< @_)[1]; }
 
 # Recurses down the tree, looking for pad variable introductions and COPs
 sub find_scope($self, $op, ?$scope_st, ?$scope_en) {
@@ -1384,10 +1375,10 @@ sub hint_pragmas($bits) {
     return @pragmas;
 }
 
-sub pp_dbstate { pp_nextstate(< @_) }
-sub pp_setstate { pp_nextstate(< @_) }
+sub pp_dbstate(@< @_) { pp_nextstate(< @_) }
+sub pp_setstate(@< @_) { pp_nextstate(< @_) }
 
-sub pp_unstack { return "" } # see also leaveloop
+sub pp_unstack(...) { return "" } # see also leaveloop
 
 sub baseop($self, $op, $cx, $name) {
     return $name;
@@ -1401,35 +1392,35 @@ sub pp_stub($self, $op, $cx, ?$name) {
         return "();";
     }
 }
-sub pp_wantarray { baseop(< @_, "wantarray") }
-sub pp_fork { baseop(< @_, "fork") }
-sub pp_wait { maybe_targmy(< @_, \&baseop, "wait") }
-sub pp_getppid { maybe_targmy(< @_, \&baseop, "getppid") }
-sub pp_time { maybe_targmy(< @_, \&baseop, "time") }
-sub pp_tms { baseop(< @_, "times") }
-sub pp_ghostent { baseop(< @_, "gethostent") }
-sub pp_gnetent { baseop(< @_, "getnetent") }
-sub pp_gprotoent { baseop(< @_, "getprotoent") }
-sub pp_gservent { baseop(< @_, "getservent") }
-sub pp_ehostent { baseop(< @_, "endhostent") }
-sub pp_enetent { baseop(< @_, "endnetent") }
-sub pp_eprotoent { baseop(< @_, "endprotoent") }
-sub pp_eservent { baseop(< @_, "endservent") }
-sub pp_gpwent { baseop(< @_, "getpwent") }
-sub pp_spwent { baseop(< @_, "setpwent") }
-sub pp_epwent { baseop(< @_, "endpwent") }
-sub pp_ggrent { baseop(< @_, "getgrent") }
-sub pp_sgrent { baseop(< @_, "setgrent") }
-sub pp_egrent { baseop(< @_, "endgrent") }
-sub pp_getlogin { baseop(< @_, "getlogin") }
+sub pp_wantarray(@< @_) { baseop(< @_, "wantarray") }
+sub pp_fork(@< @_) { baseop(< @_, "fork") }
+sub pp_wait(@< @_) { maybe_targmy(< @_, \&baseop, "wait") }
+sub pp_getppid(@< @_) { maybe_targmy(< @_, \&baseop, "getppid") }
+sub pp_time(@< @_) { maybe_targmy(< @_, \&baseop, "time") }
+sub pp_tms(@< @_) { baseop(< @_, "times") }
+sub pp_ghostent(@< @_) { baseop(< @_, "gethostent") }
+sub pp_gnetent(@< @_) { baseop(< @_, "getnetent") }
+sub pp_gprotoent(@< @_) { baseop(< @_, "getprotoent") }
+sub pp_gservent(@< @_) { baseop(< @_, "getservent") }
+sub pp_ehostent(@< @_) { baseop(< @_, "endhostent") }
+sub pp_enetent(@< @_) { baseop(< @_, "endnetent") }
+sub pp_eprotoent(@< @_) { baseop(< @_, "endprotoent") }
+sub pp_eservent(@< @_) { baseop(< @_, "endservent") }
+sub pp_gpwent(@< @_) { baseop(< @_, "getpwent") }
+sub pp_spwent(@< @_) { baseop(< @_, "setpwent") }
+sub pp_epwent(@< @_) { baseop(< @_, "endpwent") }
+sub pp_ggrent(@< @_) { baseop(< @_, "getgrent") }
+sub pp_sgrent(@< @_) { baseop(< @_, "setgrent") }
+sub pp_egrent(@< @_) { baseop(< @_, "endgrent") }
+sub pp_getlogin(@< @_) { baseop(< @_, "getlogin") }
 
 sub POSTFIX () { 1 }
 
 # I couldn't think of a good short name, but this is the category of
 # symbolic unary operators with interesting precedence
 
-sub pfixop {
-    my $self = shift;
+sub pfixop(@< @_) {
+    my $self = shift @_;
     my@($op, $cx, $name, $prec, $flags) = @(< @_, 0);
     my $kid = $op->first;
     $kid = $self->deparse($kid, $prec);
@@ -1437,17 +1428,17 @@ sub pfixop {
         $cx, $prec);
 }
 
-sub pp_preinc { pfixop(< @_, "++", 23) }
-sub pp_predec { pfixop(< @_, "--", 23) }
-sub pp_postinc { maybe_targmy(< @_, \&pfixop, "++", 23, POSTFIX) }
-sub pp_postdec { maybe_targmy(< @_, \&pfixop, "--", 23, POSTFIX) }
-sub pp_i_preinc { pfixop(< @_, "++", 23) }
-sub pp_i_predec { pfixop(< @_, "--", 23) }
-sub pp_i_postinc { maybe_targmy(< @_, \&pfixop, "++", 23, POSTFIX) }
-sub pp_i_postdec { maybe_targmy(< @_, \&pfixop, "--", 23, POSTFIX) }
-sub pp_complement { maybe_targmy(< @_, \&pfixop, "~", 21) }
+sub pp_preinc(@< @_) { pfixop(< @_, "++", 23) }
+sub pp_predec(@< @_) { pfixop(< @_, "--", 23) }
+sub pp_postinc(@< @_) { maybe_targmy(< @_, \&pfixop, "++", 23, POSTFIX) }
+sub pp_postdec(@< @_) { maybe_targmy(< @_, \&pfixop, "--", 23, POSTFIX) }
+sub pp_i_preinc(@< @_) { pfixop(< @_, "++", 23) }
+sub pp_i_predec(@< @_) { pfixop(< @_, "--", 23) }
+sub pp_i_postinc(@< @_) { maybe_targmy(< @_, \&pfixop, "++", 23, POSTFIX) }
+sub pp_i_postdec(@< @_) { maybe_targmy(< @_, \&pfixop, "--", 23, POSTFIX) }
+sub pp_complement(@< @_) { maybe_targmy(< @_, \&pfixop, "~", 21) }
 
-sub pp_negate { maybe_targmy(< @_, \&real_negate) }
+sub pp_negate(@< @_) { maybe_targmy(< @_, \&real_negate) }
 sub real_negate($self, $op, $cx) {
     if ($op->first->name =~ m/^(i_)?negate$/) {
         # avoid --$x
@@ -1456,7 +1447,7 @@ sub real_negate($self, $op, $cx) {
         $self->pfixop($op, $cx, "-", 21);	
     }
 }
-sub pp_i_negate { pp_negate(< @_) }
+sub pp_i_negate(@< @_) { pp_negate(< @_) }
 
 sub pp_not($self, $op, $cx) {
     if ($cx +<= 4) {
@@ -1482,71 +1473,71 @@ sub unop($self, $op, $cx, $name) {
     }
 }
 
-sub pp_chop { maybe_targmy(< @_, \&unop, "chop") }
-sub pp_chomp { maybe_targmy(< @_, \&unop, "chomp") }
-sub pp_schop { maybe_targmy(< @_, \&unop, "chop") }
-sub pp_schomp { maybe_targmy(< @_, \&unop, "chomp") }
-sub pp_defined { unop(< @_, "defined") }
-sub pp_undef { unop(< @_, "undef") }
-sub pp_study { unop(< @_, "study") }
-sub pp_ref { unop(< @_, "ref") }
-sub pp_pos { maybe_local(< @_, < unop(< @_, "pos")) }
+sub pp_chop(@< @_) { maybe_targmy(< @_, \&unop, "chop") }
+sub pp_chomp(@< @_) { maybe_targmy(< @_, \&unop, "chomp") }
+sub pp_schop(@< @_) { maybe_targmy(< @_, \&unop, "chop") }
+sub pp_schomp(@< @_) { maybe_targmy(< @_, \&unop, "chomp") }
+sub pp_defined(@< @_) { unop(< @_, "defined") }
+sub pp_undef(@< @_) { unop(< @_, "undef") }
+sub pp_study(@< @_) { unop(< @_, "study") }
+sub pp_ref(@< @_) { unop(< @_, "ref") }
+sub pp_pos(@< @_) { maybe_local(< @_, < unop(< @_, "pos")) }
 
-sub pp_sin { maybe_targmy(< @_, \&unop, "sin") }
-sub pp_cos { maybe_targmy(< @_, \&unop, "cos") }
-sub pp_rand { maybe_targmy(< @_, \&unop, "rand") }
-sub pp_srand { unop(< @_, "srand") }
-sub pp_exp { maybe_targmy(< @_, \&unop, "exp") }
-sub pp_log { maybe_targmy(< @_, \&unop, "log") }
-sub pp_sqrt { maybe_targmy(< @_, \&unop, "sqrt") }
-sub pp_int { maybe_targmy(< @_, \&unop, "int") }
-sub pp_hex { maybe_targmy(< @_, \&unop, "hex") }
-sub pp_oct { maybe_targmy(< @_, \&unop, "oct") }
-sub pp_abs { maybe_targmy(< @_, \&unop, "abs") }
+sub pp_sin(@< @_) { maybe_targmy(< @_, \&unop, "sin") }
+sub pp_cos(@< @_) { maybe_targmy(< @_, \&unop, "cos") }
+sub pp_rand(@< @_) { maybe_targmy(< @_, \&unop, "rand") }
+sub pp_srand(@< @_) { unop(< @_, "srand") }
+sub pp_exp(@< @_) { maybe_targmy(< @_, \&unop, "exp") }
+sub pp_log(@< @_) { maybe_targmy(< @_, \&unop, "log") }
+sub pp_sqrt(@< @_) { maybe_targmy(< @_, \&unop, "sqrt") }
+sub pp_int(@< @_) { maybe_targmy(< @_, \&unop, "int") }
+sub pp_hex(@< @_) { maybe_targmy(< @_, \&unop, "hex") }
+sub pp_oct(@< @_) { maybe_targmy(< @_, \&unop, "oct") }
+sub pp_abs(@< @_) { maybe_targmy(< @_, \&unop, "abs") }
 
-sub pp_length { maybe_targmy(< @_, \&unop, "length") }
-sub pp_ord { maybe_targmy(< @_, \&unop, "ord") }
-sub pp_chr { maybe_targmy(< @_, \&unop, "chr") }
+sub pp_length(@< @_) { maybe_targmy(< @_, \&unop, "length") }
+sub pp_ord(@< @_) { maybe_targmy(< @_, \&unop, "ord") }
+sub pp_chr(@< @_) { maybe_targmy(< @_, \&unop, "chr") }
 
 sub pp_expand($self, $op, $cx) {
     return pfixop($self, $op, $cx, "< ", 21);
 }
 
-sub pp_each { unop(< @_, "each") }
-sub pp_values { unop(< @_, "values") }
-sub pp_keys { unop(< @_, "keys") }
-sub pp_pop { unop(< @_, "pop") }
-sub pp_shift { unop(< @_, "shift") }
+sub pp_each(@< @_) { unop(< @_, "each") }
+sub pp_values(@< @_) { unop(< @_, "values") }
+sub pp_keys(@< @_) { unop(< @_, "keys") }
+sub pp_pop(@< @_) { unop(< @_, "pop") }
+sub pp_shift(@< @_) { unop(< @_, "shift") }
 
-sub pp_caller { unop(< @_, "caller") }
-sub pp_reset { unop(< @_, "reset") }
-sub pp_exit { unop(< @_, "exit") }
-sub pp_prototype { unop(< @_, "prototype") }
+sub pp_caller(@< @_) { unop(< @_, "caller") }
+sub pp_reset(@< @_) { unop(< @_, "reset") }
+sub pp_exit(@< @_) { unop(< @_, "exit") }
+sub pp_prototype(@< @_) { unop(< @_, "prototype") }
 
-sub pp_close { unop(< @_, "close") }
-sub pp_fileno { unop(< @_, "fileno") }
-sub pp_umask { unop(< @_, "umask") }
-sub pp_untie { unop(< @_, "untie") }
-sub pp_tied { unop(< @_, "tied") }
-sub pp_getc { unop(< @_, "getc") }
-sub pp_eof { unop(< @_, "eof") }
-sub pp_tell { unop(< @_, "tell") }
-sub pp_getsockname { unop(< @_, "getsockname") }
-sub pp_getpeername { unop(< @_, "getpeername") }
+sub pp_close(@< @_) { unop(< @_, "close") }
+sub pp_fileno(@< @_) { unop(< @_, "fileno") }
+sub pp_umask(@< @_) { unop(< @_, "umask") }
+sub pp_untie(@< @_) { unop(< @_, "untie") }
+sub pp_tied(@< @_) { unop(< @_, "tied") }
+sub pp_getc(@< @_) { unop(< @_, "getc") }
+sub pp_eof(@< @_) { unop(< @_, "eof") }
+sub pp_tell(@< @_) { unop(< @_, "tell") }
+sub pp_getsockname(@< @_) { unop(< @_, "getsockname") }
+sub pp_getpeername(@< @_) { unop(< @_, "getpeername") }
 
-sub pp_chdir { maybe_targmy(< @_, \&unop, "chdir") }
-sub pp_chroot { maybe_targmy(< @_, \&unop, "chroot") }
-sub pp_readlink { unop(< @_, "readlink") }
-sub pp_rmdir { maybe_targmy(< @_, \&unop, "rmdir") }
-sub pp_readdir { unop(< @_, "readdir") }
-sub pp_telldir { unop(< @_, "telldir") }
-sub pp_rewinddir { unop(< @_, "rewinddir") }
-sub pp_closedir { unop(< @_, "closedir") }
-sub pp_getpgrp { maybe_targmy(< @_, \&unop, "getpgrp") }
-sub pp_localtime { unop(< @_, "localtime") }
-sub pp_gmtime { unop(< @_, "gmtime") }
-sub pp_alarm { unop(< @_, "alarm") }
-sub pp_sleep { maybe_targmy(< @_, \&unop, "sleep") }
+sub pp_chdir(@< @_) { maybe_targmy(< @_, \&unop, "chdir") }
+sub pp_chroot(@< @_) { maybe_targmy(< @_, \&unop, "chroot") }
+sub pp_readlink(@< @_) { unop(< @_, "readlink") }
+sub pp_rmdir(@< @_) { maybe_targmy(< @_, \&unop, "rmdir") }
+sub pp_readdir(@< @_) { unop(< @_, "readdir") }
+sub pp_telldir(@< @_) { unop(< @_, "telldir") }
+sub pp_rewinddir(@< @_) { unop(< @_, "rewinddir") }
+sub pp_closedir(@< @_) { unop(< @_, "closedir") }
+sub pp_getpgrp(@< @_) { maybe_targmy(< @_, \&unop, "getpgrp") }
+sub pp_localtime(@< @_) { unop(< @_, "localtime") }
+sub pp_gmtime(@< @_) { unop(< @_, "gmtime") }
+sub pp_alarm(@< @_) { unop(< @_, "alarm") }
+sub pp_sleep(@< @_) { maybe_targmy(< @_, \&unop, "sleep") }
 
 sub pp_readline($self, $op, $cx) { 
     my $name = "~<";
@@ -1559,25 +1550,25 @@ sub pp_readline($self, $op, $cx) {
     }
 }
 
-sub pp_dofile { unop(< @_, "do") }
-sub pp_entereval { unop(< @_, "eval") }
+sub pp_dofile(@< @_) { unop(< @_, "do") }
+sub pp_entereval(@< @_) { unop(< @_, "eval") }
 
-sub pp_ghbyname { unop(< @_, "gethostbyname") }
-sub pp_gnbyname { unop(< @_, "getnetbyname") }
-sub pp_gpbyname { unop(< @_, "getprotobyname") }
-sub pp_shostent { unop(< @_, "sethostent") }
-sub pp_snetent { unop(< @_, "setnetent") }
-sub pp_sprotoent { unop(< @_, "setprotoent") }
-sub pp_sservent { unop(< @_, "setservent") }
-sub pp_gpwnam { unop(< @_, "getpwnam") }
-sub pp_gpwuid { unop(< @_, "getpwuid") }
-sub pp_ggrnam { unop(< @_, "getgrnam") }
-sub pp_ggrgid { unop(< @_, "getgrgid") }
+sub pp_ghbyname(@< @_) { unop(< @_, "gethostbyname") }
+sub pp_gnbyname(@< @_) { unop(< @_, "getnetbyname") }
+sub pp_gpbyname(@< @_) { unop(< @_, "getprotobyname") }
+sub pp_shostent(@< @_) { unop(< @_, "sethostent") }
+sub pp_snetent(@< @_) { unop(< @_, "setnetent") }
+sub pp_sprotoent(@< @_) { unop(< @_, "setprotoent") }
+sub pp_sservent(@< @_) { unop(< @_, "setservent") }
+sub pp_gpwnam(@< @_) { unop(< @_, "getpwnam") }
+sub pp_gpwuid(@< @_) { unop(< @_, "getpwuid") }
+sub pp_ggrnam(@< @_) { unop(< @_, "getgrnam") }
+sub pp_ggrgid(@< @_) { unop(< @_, "getgrgid") }
 
-sub pp_lock { unop(< @_, "lock") }
+sub pp_lock(@< @_) { unop(< @_, "lock") }
 
-sub pp_continue { unop(< @_, "continue"); }
-sub pp_break {
+sub pp_continue(@< @_) { unop(< @_, "continue"); }
+sub pp_break(@< @_) {
     my @($self, $op) =  @_;
     return "" if $op->flags ^&^ OPf_SPECIAL;
     unop(< @_, "break");
@@ -1602,8 +1593,8 @@ sub givwhen($self, $op, $cx, $givwhen) {
         "\b\}\cK";
 }
 
-sub pp_leavegiven { givwhen(< @_, "given"); }
-sub pp_leavewhen  { givwhen(< @_, "when"); }
+sub pp_leavegiven(@< @_) { givwhen(< @_, "given"); }
+sub pp_leavewhen(@< @_)  { givwhen(< @_, "when"); }
 
 sub pp_exists($self, $op, $cx) {
     my $arg;
@@ -1660,8 +1651,8 @@ sub pp_require($self, $op, $cx) {
     }
 }
 
-sub pp_scalar {
-    my $self = shift;
+sub pp_scalar(@< @_) {
+    my $self = shift @_;
     my@($op, $cx) =  @_;
     my $kid = $op->first;
     if (not null < $kid->sibling) {
@@ -1672,9 +1663,9 @@ sub pp_scalar {
 }
 
 
-sub padval {
-    my $self = shift;
-    my $targ = shift;
+sub padval(@< @_) {
+    my $self = shift @_;
+    my $targ = shift @_;
     return $self->{'curcv'}->PADLIST->ARRAYelt(1)->ARRAYelt($targ);
 }
 
@@ -1738,8 +1729,8 @@ sub pp_rcatline($self, $op) {
 }
 
 # Unary operators that can occur as pseudo-listops inside double quotes
-sub dq_unop {
-    my $self = shift;
+sub dq_unop(@< @_) {
+    my $self = shift @_;
     my@($op, $cx, $name, $prec, $flags) = @(< @_, 0, 0);
     my $kid;
     if ($op->flags ^&^ OPf_KIDS) {
@@ -1752,11 +1743,11 @@ sub dq_unop {
     }
 }
 
-sub pp_ucfirst { dq_unop(< @_, "ucfirst") }
-sub pp_lcfirst { dq_unop(< @_, "lcfirst") }
-sub pp_uc { dq_unop(< @_, "uc") }
-sub pp_lc { dq_unop(< @_, "lc") }
-sub pp_quotemeta { maybe_targmy(< @_, \&dq_unop, "quotemeta") }
+sub pp_ucfirst(@< @_) { dq_unop(< @_, "ucfirst") }
+sub pp_lcfirst(@< @_) { dq_unop(< @_, "lcfirst") }
+sub pp_uc(@< @_) { dq_unop(< @_, "uc") }
+sub pp_lc(@< @_) { dq_unop(< @_, "lc") }
+sub pp_quotemeta(@< @_) { maybe_targmy(< @_, \&dq_unop, "quotemeta") }
 
 sub loopex($self, $op, $cx, $name) {
     if (class($op) eq "PVOP") {
@@ -1770,11 +1761,11 @@ sub loopex($self, $op, $cx, $name) {
     }
 }
 
-sub pp_last { loopex(< @_, "last") }
-sub pp_next { loopex(< @_, "next") }
-sub pp_redo { loopex(< @_, "redo") }
-sub pp_goto { loopex(< @_, "goto") }
-sub pp_dump { loopex(< @_, "dump") }
+sub pp_last(@< @_) { loopex(< @_, "last") }
+sub pp_next(@< @_) { loopex(< @_, "next") }
+sub pp_redo(@< @_) { loopex(< @_, "redo") }
+sub pp_goto(@< @_) { loopex(< @_, "goto") }
+sub pp_dump(@< @_) { loopex(< @_, "dump") }
 
 sub ftst($self, $op, $cx, $name) {
     if (class($op) eq "UNOP") {
@@ -1788,35 +1779,35 @@ sub ftst($self, $op, $cx, $name) {
     }
 }
 
-sub pp_lstat    { ftst(< @_, "lstat") }
-sub pp_stat     { ftst(< @_, "stat") }
-sub pp_ftrread  { ftst(< @_, "-R") }
-sub pp_ftrwrite { ftst(< @_, "-W") }
-sub pp_ftrexec  { ftst(< @_, "-X") }
-sub pp_fteread  { ftst(< @_, "-r") }
-sub pp_ftewrite { ftst(< @_, "-w") }
-sub pp_fteexec  { ftst(< @_, "-x") }
-sub pp_ftis     { ftst(< @_, "-e") }
-sub pp_fteowned { ftst(< @_, "-O") }
-sub pp_ftrowned { ftst(< @_, "-o") }
-sub pp_ftzero   { ftst(< @_, "-z") }
-sub pp_ftsize   { ftst(< @_, "-s") }
-sub pp_ftmtime  { ftst(< @_, "-M") }
-sub pp_ftatime  { ftst(< @_, "-A") }
-sub pp_ftctime  { ftst(< @_, "-C") }
-sub pp_ftsock   { ftst(< @_, "-S") }
-sub pp_ftchr    { ftst(< @_, "-c") }
-sub pp_ftblk    { ftst(< @_, "-b") }
-sub pp_ftfile   { ftst(< @_, "-f") }
-sub pp_ftdir    { ftst(< @_, "-d") }
-sub pp_ftpipe   { ftst(< @_, "-p") }
-sub pp_ftlink   { ftst(< @_, "-l") }
-sub pp_ftsuid   { ftst(< @_, "-u") }
-sub pp_ftsgid   { ftst(< @_, "-g") }
-sub pp_ftsvtx   { ftst(< @_, "-k") }
-sub pp_fttty    { ftst(< @_, "-t") }
-sub pp_fttext   { ftst(< @_, "-T") }
-sub pp_ftbinary { ftst(< @_, "-B") }
+sub pp_lstat(@< @_)    { ftst(< @_, "lstat") }
+sub pp_stat(@< @_)     { ftst(< @_, "stat") }
+sub pp_ftrread(@< @_)  { ftst(< @_, "-R") }
+sub pp_ftrwrite(@< @_) { ftst(< @_, "-W") }
+sub pp_ftrexec(@< @_)  { ftst(< @_, "-X") }
+sub pp_fteread(@< @_)  { ftst(< @_, "-r") }
+sub pp_ftewrite(@< @_) { ftst(< @_, "-w") }
+sub pp_fteexec(@< @_)  { ftst(< @_, "-x") }
+sub pp_ftis(@< @_)     { ftst(< @_, "-e") }
+sub pp_fteowned(@< @_) { ftst(< @_, "-O") }
+sub pp_ftrowned(@< @_) { ftst(< @_, "-o") }
+sub pp_ftzero(@< @_)   { ftst(< @_, "-z") }
+sub pp_ftsize(@< @_)   { ftst(< @_, "-s") }
+sub pp_ftmtime(@< @_)  { ftst(< @_, "-M") }
+sub pp_ftatime(@< @_)  { ftst(< @_, "-A") }
+sub pp_ftctime(@< @_)  { ftst(< @_, "-C") }
+sub pp_ftsock(@< @_)   { ftst(< @_, "-S") }
+sub pp_ftchr(@< @_)    { ftst(< @_, "-c") }
+sub pp_ftblk(@< @_)    { ftst(< @_, "-b") }
+sub pp_ftfile(@< @_)   { ftst(< @_, "-f") }
+sub pp_ftdir(@< @_)    { ftst(< @_, "-d") }
+sub pp_ftpipe(@< @_)   { ftst(< @_, "-p") }
+sub pp_ftlink(@< @_)   { ftst(< @_, "-l") }
+sub pp_ftsuid(@< @_)   { ftst(< @_, "-u") }
+sub pp_ftsgid(@< @_)   { ftst(< @_, "-g") }
+sub pp_ftsvtx(@< @_)   { ftst(< @_, "-k") }
+sub pp_fttty(@< @_)    { ftst(< @_, "-t") }
+sub pp_fttext(@< @_)   { ftst(< @_, "-T") }
+sub pp_ftbinary(@< @_) { ftst(< @_, "-B") }
 
 sub SWAP_CHILDREN () { 1 }
 sub ASSIGN () { 2 } # has OP= variant
@@ -1824,8 +1815,7 @@ sub LIST_CONTEXT () { 4 } # Assignment is in list context
 
 my(%left, %right);
 
-sub assoc_class {
-    my $op = shift;
+sub assoc_class(?$op) {
     my $name = $op->name;
     if ($name eq "concat" and $op->first->name eq "concat") {
         # avoid spurious `=' -- see comment in pp_concat
@@ -1905,8 +1895,8 @@ sub deparse_binop_right($self, $op, $right, $prec) {
     }
 }
 
-sub binop {
-    my $self = shift;
+sub binop(@< @_) {
+    my $self = shift @_;
     my @($op, $cx, $opname, $prec, $flags, ...) = @(< @_, 0);
     my $left = $op->first;
     my $right = $op->last;
@@ -1925,51 +1915,51 @@ sub binop {
     return $self->maybe_parens("$left $opname$eq $right", $cx, $prec);
 }
 
-sub pp_add { maybe_targmy(< @_, \&binop, "+", 18, ASSIGN) }
-sub pp_multiply { maybe_targmy(< @_, \&binop, "*", 19, ASSIGN) }
-sub pp_subtract { maybe_targmy(< @_, \&binop, "-",18,  ASSIGN) }
-sub pp_divide { maybe_targmy(< @_, \&binop, "/", 19, ASSIGN) }
-sub pp_modulo { maybe_targmy(< @_, \&binop, "\%", 19, ASSIGN) }
-sub pp_i_add { maybe_targmy(< @_, \&binop, "+", 18, ASSIGN) }
-sub pp_i_multiply { maybe_targmy(< @_, \&binop, "*", 19, ASSIGN) }
-sub pp_i_subtract { maybe_targmy(< @_, \&binop, "-", 18, ASSIGN) }
-sub pp_i_divide { maybe_targmy(< @_, \&binop, "/", 19, ASSIGN) }
-sub pp_i_modulo { maybe_targmy(< @_, \&binop, "\%", 19, ASSIGN) }
-sub pp_pow { maybe_targmy(< @_, \&binop, "**", 22, ASSIGN) }
+sub pp_add(@< @_) { maybe_targmy(< @_, \&binop, "+", 18, ASSIGN) }
+sub pp_multiply(@< @_) { maybe_targmy(< @_, \&binop, "*", 19, ASSIGN) }
+sub pp_subtract(@< @_) { maybe_targmy(< @_, \&binop, "-",18,  ASSIGN) }
+sub pp_divide(@< @_) { maybe_targmy(< @_, \&binop, "/", 19, ASSIGN) }
+sub pp_modulo(@< @_) { maybe_targmy(< @_, \&binop, "\%", 19, ASSIGN) }
+sub pp_i_add(@< @_) { maybe_targmy(< @_, \&binop, "+", 18, ASSIGN) }
+sub pp_i_multiply(@< @_) { maybe_targmy(< @_, \&binop, "*", 19, ASSIGN) }
+sub pp_i_subtract(@< @_) { maybe_targmy(< @_, \&binop, "-", 18, ASSIGN) }
+sub pp_i_divide(@< @_) { maybe_targmy(< @_, \&binop, "/", 19, ASSIGN) }
+sub pp_i_modulo(@< @_) { maybe_targmy(< @_, \&binop, "\%", 19, ASSIGN) }
+sub pp_pow(@< @_) { maybe_targmy(< @_, \&binop, "**", 22, ASSIGN) }
 
-sub pp_left_shift { maybe_targmy(< @_, \&binop, "<<", 17, ASSIGN) }
-sub pp_right_shift { maybe_targmy(< @_, \&binop, ">>", 17, ASSIGN) }
-sub pp_bit_and { maybe_targmy(< @_, \&binop, "^&^", 13, ASSIGN) }
-sub pp_bit_or { maybe_targmy(< @_, \&binop, "^|^", 12, ASSIGN) }
-sub pp_bit_xor { maybe_targmy(< @_, \&binop, "^^^", 12, ASSIGN) }
+sub pp_left_shift(@< @_) { maybe_targmy(< @_, \&binop, "<<", 17, ASSIGN) }
+sub pp_right_shift(@< @_) { maybe_targmy(< @_, \&binop, ">>", 17, ASSIGN) }
+sub pp_bit_and(@< @_) { maybe_targmy(< @_, \&binop, "^&^", 13, ASSIGN) }
+sub pp_bit_or(@< @_) { maybe_targmy(< @_, \&binop, "^|^", 12, ASSIGN) }
+sub pp_bit_xor(@< @_) { maybe_targmy(< @_, \&binop, "^^^", 12, ASSIGN) }
 
-sub pp_eq { binop(< @_, "==", 14) }
-sub pp_ne { binop(< @_, "!=", 14) }
-sub pp_lt { binop(< @_, "+<", 15) }
-sub pp_gt { binop(< @_, "+>", 15) }
-sub pp_ge { binop(< @_, "+>=", 15) }
-sub pp_le { binop(< @_, "+<=", 15) }
-sub pp_ncmp { binop(< @_, "<+>", 14) }
-sub pp_i_eq { binop(< @_, "==", 14) }
-sub pp_i_ne { binop(< @_, "!=", 14) }
-sub pp_i_lt { binop(< @_, "+<", 15) }
-sub pp_i_gt { binop(< @_, "+>", 15) }
-sub pp_i_ge { binop(< @_, "+>=", 15) }
-sub pp_i_le { binop(< @_, "+<=", 15) }
-sub pp_i_ncmp { binop(< @_, "<+>", 14) }
+sub pp_eq(@< @_) { binop(< @_, "==", 14) }
+sub pp_ne(@< @_) { binop(< @_, "!=", 14) }
+sub pp_lt(@< @_) { binop(< @_, "+<", 15) }
+sub pp_gt(@< @_) { binop(< @_, "+>", 15) }
+sub pp_ge(@< @_) { binop(< @_, "+>=", 15) }
+sub pp_le(@< @_) { binop(< @_, "+<=", 15) }
+sub pp_ncmp(@< @_) { binop(< @_, "<+>", 14) }
+sub pp_i_eq(@< @_) { binop(< @_, "==", 14) }
+sub pp_i_ne(@< @_) { binop(< @_, "!=", 14) }
+sub pp_i_lt(@< @_) { binop(< @_, "+<", 15) }
+sub pp_i_gt(@< @_) { binop(< @_, "+>", 15) }
+sub pp_i_ge(@< @_) { binop(< @_, "+>=", 15) }
+sub pp_i_le(@< @_) { binop(< @_, "+<=", 15) }
+sub pp_i_ncmp(@< @_) { binop(< @_, "<+>", 14) }
 
-sub pp_seq { binop(< @_, "eq", 14) }
-sub pp_sne { binop(< @_, "ne", 14) }
-sub pp_slt { binop(< @_, "lt", 15) }
-sub pp_sgt { binop(< @_, "gt", 15) }
-sub pp_sge { binop(< @_, "ge", 15) }
-sub pp_sle { binop(< @_, "le", 15) }
-sub pp_scmp { binop(< @_, "cmp", 14) }
+sub pp_seq(@< @_) { binop(< @_, "eq", 14) }
+sub pp_sne(@< @_) { binop(< @_, "ne", 14) }
+sub pp_slt(@< @_) { binop(< @_, "lt", 15) }
+sub pp_sgt(@< @_) { binop(< @_, "gt", 15) }
+sub pp_sge(@< @_) { binop(< @_, "ge", 15) }
+sub pp_sle(@< @_) { binop(< @_, "le", 15) }
+sub pp_scmp(@< @_) { binop(< @_, "cmp", 14) }
 
-sub pp_sassign { binop(< @_, "=", 7, SWAP_CHILDREN) }
-sub pp_aassign { binop(< @_, "=", 7, SWAP_CHILDREN ^|^ LIST_CONTEXT) }
+sub pp_sassign(@< @_) { binop(< @_, "=", 7, SWAP_CHILDREN) }
+sub pp_aassign(@< @_) { binop(< @_, "=", 7, SWAP_CHILDREN ^|^ LIST_CONTEXT) }
 
-sub pp_smartmatch {
+sub pp_smartmatch(@< @_) {
     my @($self, $op, $cx) =  @_;
     if ($op->flags ^&^ OPf_SPECIAL) {
         return $self->deparse( <$op->last, $cx);
@@ -1982,7 +1972,7 @@ sub pp_smartmatch {
 # `.' is special because concats-of-concats are optimized to save copying
 # by making all but the first concat stacked. The effect is as if the
 # programmer had written `($a . $b) .= $c', except legal.
-sub pp_concat { maybe_targmy(< @_, \&real_concat) }
+sub pp_concat(@< @_) { maybe_targmy(< @_, \&real_concat) }
 sub real_concat($self, $op, $cx) {
     my $left = $op->first;
     my $right = $op->last;
@@ -2062,13 +2052,13 @@ sub logop($self, $op, $cx, $lowop, $lowprec, $highop, $highprec, $blockname) {
     }
 }
 
-sub pp_and { logop(< @_, "and", 3, "&&", 11, "if") }
-sub pp_or  { logop(< @_, "or",  2, "||", 10, "unless") }
-sub pp_dor { logop(< @_, "err", 2, "//", 10, "") }
+sub pp_and(@< @_) { logop(< @_, "and", 3, "&&", 11, "if") }
+sub pp_or(@< @_)  { logop(< @_, "or",  2, "||", 10, "unless") }
+sub pp_dor(@< @_) { logop(< @_, "err", 2, "//", 10, "") }
 
 # xor is syntactically a logop, but it's really a binop (contrary to
 # old versions of opcode.pl). Syntax is what matters here.
-sub pp_xor { logop(< @_, "xor", 2, "",   0,  "") }
+sub pp_xor(@< @_) { logop(< @_, "xor", 2, "",   0,  "") }
 
 sub logassignop($self, $op, $cx, $opname) {
     my $left = $op->first;
@@ -2078,9 +2068,9 @@ sub logassignop($self, $op, $cx, $opname) {
     return $self->maybe_parens("$left $opname $right", $cx, 7);
 }
 
-sub pp_andassign { logassignop(< @_, "&&=") }
-sub pp_orassign  { logassignop(< @_, "||=") }
-sub pp_dorassign { logassignop(< @_, "//=") }
+sub pp_andassign(@< @_) { logassignop(< @_, "&&=") }
+sub pp_orassign(@< @_)  { logassignop(< @_, "||=") }
+sub pp_dorassign(@< @_) { logassignop(< @_, "//=") }
 
 sub listop($self, $op, $cx, $name) {
     my(@exprs);
@@ -2119,86 +2109,86 @@ sub listop($self, $op, $cx, $name) {
     }
 }
 
-sub pp_bless { listop(< @_, "bless") }
-sub pp_atan2 { maybe_targmy(< @_, \&listop, "atan2") }
-sub pp_substr { maybe_local(< @_, < listop(< @_, "substr")) }
-sub pp_vec { maybe_local(< @_, < listop(< @_, "vec")) }
-sub pp_index { maybe_targmy(< @_, \&listop, "index") }
-sub pp_rindex { maybe_targmy(< @_, \&listop, "rindex") }
-sub pp_sprintf { maybe_targmy(< @_, \&listop, "sprintf") }
-sub pp_crypt { maybe_targmy(< @_, \&listop, "crypt") }
-sub pp_unpack { listop(< @_, "unpack") }
-sub pp_pack { listop(< @_, "pack") }
-sub pp_join { maybe_targmy(< @_, \&listop, "join") }
-sub pp_splice { listop(< @_, "splice") }
-sub pp_push { maybe_targmy(< @_, \&listop, "push") }
-sub pp_unshift { maybe_targmy(< @_, \&listop, "unshift") }
-sub pp_reverse { listop(< @_, "reverse") }
-sub pp_warn { listop(< @_, "warn") }
-sub pp_die { listop(< @_, "die") }
+sub pp_bless(@< @_) { listop(< @_, "bless") }
+sub pp_atan2(@< @_) { maybe_targmy(< @_, \&listop, "atan2") }
+sub pp_substr(@< @_) { maybe_local(< @_, < listop(< @_, "substr")) }
+sub pp_vec(@< @_) { maybe_local(< @_, < listop(< @_, "vec")) }
+sub pp_index(@< @_) { maybe_targmy(< @_, \&listop, "index") }
+sub pp_rindex(@< @_) { maybe_targmy(< @_, \&listop, "rindex") }
+sub pp_sprintf(@< @_) { maybe_targmy(< @_, \&listop, "sprintf") }
+sub pp_crypt(@< @_) { maybe_targmy(< @_, \&listop, "crypt") }
+sub pp_unpack(@< @_) { listop(< @_, "unpack") }
+sub pp_pack(@< @_) { listop(< @_, "pack") }
+sub pp_join(@< @_) { maybe_targmy(< @_, \&listop, "join") }
+sub pp_splice(@< @_) { listop(< @_, "splice") }
+sub pp_push(@< @_) { maybe_targmy(< @_, \&listop, "push") }
+sub pp_unshift(@< @_) { maybe_targmy(< @_, \&listop, "unshift") }
+sub pp_reverse(@< @_) { listop(< @_, "reverse") }
+sub pp_warn(@< @_) { listop(< @_, "warn") }
+sub pp_die(@< @_) { listop(< @_, "die") }
 # Actually, return is exempt from the LLAFR (see examples in this very
 # module!), but for consistency's sake, ignore that fact
-sub pp_return { listop(< @_, "return") }
-sub pp_open { listop(< @_, "open") }
-sub pp_pipe_op { listop(< @_, "pipe") }
-sub pp_tie { listop(< @_, "tie") }
-sub pp_binmode { listop(< @_, "binmode") }
-sub pp_sselect { listop(< @_, "select") }
-sub pp_select { listop(< @_, "select") }
-sub pp_read { listop(< @_, "read") }
-sub pp_sysopen { listop(< @_, "sysopen") }
-sub pp_sysseek { listop(< @_, "sysseek") }
-sub pp_sysread { listop(< @_, "sysread") }
-sub pp_syswrite { listop(< @_, "syswrite") }
-sub pp_send { listop(< @_, "send") }
-sub pp_recv { listop(< @_, "recv") }
-sub pp_seek { listop(< @_, "seek") }
-sub pp_fcntl { listop(< @_, "fcntl") }
-sub pp_ioctl { listop(< @_, "ioctl") }
-sub pp_flock { maybe_targmy(< @_, \&listop, "flock") }
-sub pp_socket { listop(< @_, "socket") }
-sub pp_sockpair { listop(< @_, "sockpair") }
-sub pp_bind { listop(< @_, "bind") }
-sub pp_connect { listop(< @_, "connect") }
-sub pp_listen { listop(< @_, "listen") }
-sub pp_accept { listop(< @_, "accept") }
-sub pp_shutdown { listop(< @_, "shutdown") }
-sub pp_gsockopt { listop(< @_, "getsockopt") }
-sub pp_ssockopt { listop(< @_, "setsockopt") }
-sub pp_chown { maybe_targmy(< @_, \&listop, "chown") }
-sub pp_unlink { maybe_targmy(< @_, \&listop, "unlink") }
-sub pp_chmod { maybe_targmy(< @_, \&listop, "chmod") }
-sub pp_utime { maybe_targmy(< @_, \&listop, "utime") }
-sub pp_rename { maybe_targmy(< @_, \&listop, "rename") }
-sub pp_link { maybe_targmy(< @_, \&listop, "link") }
-sub pp_symlink { maybe_targmy(< @_, \&listop, "symlink") }
-sub pp_mkdir { maybe_targmy(< @_, \&listop, "mkdir") }
-sub pp_open_dir { listop(< @_, "opendir") }
-sub pp_seekdir { listop(< @_, "seekdir") }
-sub pp_waitpid { maybe_targmy(< @_, \&listop, "waitpid") }
-sub pp_system { maybe_targmy(< @_, \&listop, "system") }
-sub pp_exec { maybe_targmy(< @_, \&listop, "exec") }
-sub pp_kill { maybe_targmy(< @_, \&listop, "kill") }
-sub pp_setpgrp { maybe_targmy(< @_, \&listop, "setpgrp") }
-sub pp_getpriority { maybe_targmy(< @_, \&listop, "getpriority") }
-sub pp_setpriority { maybe_targmy(< @_, \&listop, "setpriority") }
-sub pp_shmget { listop(< @_, "shmget") }
-sub pp_shmctl { listop(< @_, "shmctl") }
-sub pp_shmread { listop(< @_, "shmread") }
-sub pp_shmwrite { listop(< @_, "shmwrite") }
-sub pp_msgget { listop(< @_, "msgget") }
-sub pp_msgctl { listop(< @_, "msgctl") }
-sub pp_msgsnd { listop(< @_, "msgsnd") }
-sub pp_msgrcv { listop(< @_, "msgrcv") }
-sub pp_semget { listop(< @_, "semget") }
-sub pp_semctl { listop(< @_, "semctl") }
-sub pp_semop { listop(< @_, "semop") }
-sub pp_ghbyaddr { listop(< @_, "gethostbyaddr") }
-sub pp_gnbyaddr { listop(< @_, "getnetbyaddr") }
-sub pp_gpbynumber { listop(< @_, "getprotobynumber") }
-sub pp_gsbyname { listop(< @_, "getservbyname") }
-sub pp_gsbyport { listop(< @_, "getservbyport") }
-sub pp_syscall { listop(< @_, "syscall") }
+sub pp_return(@< @_) { listop(< @_, "return") }
+sub pp_open(@< @_) { listop(< @_, "open") }
+sub pp_pipe_op(@< @_) { listop(< @_, "pipe") }
+sub pp_tie(@< @_) { listop(< @_, "tie") }
+sub pp_binmode(@< @_) { listop(< @_, "binmode") }
+sub pp_sselect(@< @_) { listop(< @_, "select") }
+sub pp_select(@< @_) { listop(< @_, "select") }
+sub pp_read(@< @_) { listop(< @_, "read") }
+sub pp_sysopen(@< @_) { listop(< @_, "sysopen") }
+sub pp_sysseek(@< @_) { listop(< @_, "sysseek") }
+sub pp_sysread(@< @_) { listop(< @_, "sysread") }
+sub pp_syswrite(@< @_) { listop(< @_, "syswrite") }
+sub pp_send(@< @_) { listop(< @_, "send") }
+sub pp_recv(@< @_) { listop(< @_, "recv") }
+sub pp_seek(@< @_) { listop(< @_, "seek") }
+sub pp_fcntl(@< @_) { listop(< @_, "fcntl") }
+sub pp_ioctl(@< @_) { listop(< @_, "ioctl") }
+sub pp_flock(@< @_) { maybe_targmy(< @_, \&listop, "flock") }
+sub pp_socket(@< @_) { listop(< @_, "socket") }
+sub pp_sockpair(@< @_) { listop(< @_, "sockpair") }
+sub pp_bind(@< @_) { listop(< @_, "bind") }
+sub pp_connect(@< @_) { listop(< @_, "connect") }
+sub pp_listen(@< @_) { listop(< @_, "listen") }
+sub pp_accept(@< @_) { listop(< @_, "accept") }
+sub pp_shutdown(@< @_) { listop(< @_, "shutdown") }
+sub pp_gsockopt(@< @_) { listop(< @_, "getsockopt") }
+sub pp_ssockopt(@< @_) { listop(< @_, "setsockopt") }
+sub pp_chown(@< @_) { maybe_targmy(< @_, \&listop, "chown") }
+sub pp_unlink(@< @_) { maybe_targmy(< @_, \&listop, "unlink") }
+sub pp_chmod(@< @_) { maybe_targmy(< @_, \&listop, "chmod") }
+sub pp_utime(@< @_) { maybe_targmy(< @_, \&listop, "utime") }
+sub pp_rename(@< @_) { maybe_targmy(< @_, \&listop, "rename") }
+sub pp_link(@< @_) { maybe_targmy(< @_, \&listop, "link") }
+sub pp_symlink(@< @_) { maybe_targmy(< @_, \&listop, "symlink") }
+sub pp_mkdir(@< @_) { maybe_targmy(< @_, \&listop, "mkdir") }
+sub pp_open_dir(@< @_) { listop(< @_, "opendir") }
+sub pp_seekdir(@< @_) { listop(< @_, "seekdir") }
+sub pp_waitpid(@< @_) { maybe_targmy(< @_, \&listop, "waitpid") }
+sub pp_system(@< @_) { maybe_targmy(< @_, \&listop, "system") }
+sub pp_exec(@< @_) { maybe_targmy(< @_, \&listop, "exec") }
+sub pp_kill(@< @_) { maybe_targmy(< @_, \&listop, "kill") }
+sub pp_setpgrp(@< @_) { maybe_targmy(< @_, \&listop, "setpgrp") }
+sub pp_getpriority(@< @_) { maybe_targmy(< @_, \&listop, "getpriority") }
+sub pp_setpriority(@< @_) { maybe_targmy(< @_, \&listop, "setpriority") }
+sub pp_shmget(@< @_) { listop(< @_, "shmget") }
+sub pp_shmctl(@< @_) { listop(< @_, "shmctl") }
+sub pp_shmread(@< @_) { listop(< @_, "shmread") }
+sub pp_shmwrite(@< @_) { listop(< @_, "shmwrite") }
+sub pp_msgget(@< @_) { listop(< @_, "msgget") }
+sub pp_msgctl(@< @_) { listop(< @_, "msgctl") }
+sub pp_msgsnd(@< @_) { listop(< @_, "msgsnd") }
+sub pp_msgrcv(@< @_) { listop(< @_, "msgrcv") }
+sub pp_semget(@< @_) { listop(< @_, "semget") }
+sub pp_semctl(@< @_) { listop(< @_, "semctl") }
+sub pp_semop(@< @_) { listop(< @_, "semop") }
+sub pp_ghbyaddr(@< @_) { listop(< @_, "gethostbyaddr") }
+sub pp_gnbyaddr(@< @_) { listop(< @_, "getnetbyaddr") }
+sub pp_gpbynumber(@< @_) { listop(< @_, "getprotobynumber") }
+sub pp_gsbyname(@< @_) { listop(< @_, "getservbyname") }
+sub pp_gsbyport(@< @_) { listop(< @_, "getservbyport") }
+sub pp_syscall(@< @_) { listop(< @_, "syscall") }
 
 sub pp_glob($self, $op, $cx) {
     my $text = $self->dq( <$op->first->sibling);  # skip pushmark
@@ -2288,9 +2278,9 @@ sub indirop($self, $op, $cx, $name) {
 
 }
 
-sub pp_prtf { indirop(< @_, "printf") }
-sub pp_print { indirop(< @_, "print") }
-sub pp_sort { indirop(< @_, "sort") }
+sub pp_prtf(@< @_) { indirop(< @_, "printf") }
+sub pp_print(@< @_) { indirop(< @_, "print") }
+sub pp_sort(@< @_) { indirop(< @_, "sort") }
 
 sub mapop($self, $op, $cx, $name) {
     my($expr, @exprs);
@@ -2311,10 +2301,10 @@ sub mapop($self, $op, $cx, $name) {
     return $self->maybe_parens_func($name, $code . join(", ", @exprs), $cx, 5);
 }
 
-sub pp_mapwhile { mapop(< @_, "map") }
-sub pp_grepwhile { mapop(< @_, "grep") }
-sub pp_mapstart { baseop(< @_, "map") }
-sub pp_grepstart { baseop(< @_, "grep") }
+sub pp_mapwhile(@< @_) { mapop(< @_, "map") }
+sub pp_grepwhile(@< @_) { mapop(< @_, "grep") }
+sub pp_mapstart(@< @_) { baseop(< @_, "map") }
+sub pp_grepstart(@< @_) { baseop(< @_, "grep") }
 
 sub pp_list($self, $op, $cx) {
     my($expr, @exprs);
@@ -2386,8 +2376,7 @@ sub pp_list($self, $op, $cx) {
     }
 }
 
-sub is_ifelse_cont {
-    my $op = shift;
+sub is_ifelse_cont(?$op) {
     return  ($op->name eq "null" and class($op) eq "UNOP"
              and $op->first->name =~ m/^(and|cond_expr)$/
              and is_scope($op->first->first->sibling) );
@@ -2540,15 +2529,15 @@ sub loop_common($self, $op, $cx, $init) {
     return $head . "\{\n\t" . $body . "\b\}" . $cont;
 }
 
-sub pp_leaveloop { shift->loop_common(< @_, "") }
+sub pp_leaveloop(@< @_) { shift @_->loop_common(< @_, "") }
 
 sub for_loop($self, $op, $cx) {
     my $init = $self->deparse($op, 1);
     return $self->loop_common($op->sibling->first->sibling, $cx, $init);
 }
 
-sub pp_leavetry {
-    my $self = shift;
+sub pp_leavetry(@< @_) {
+    my $self = shift @_;
     return "eval \{\n\t" . $self->pp_leave(< @_) . "\n\b\}";
 }
 
@@ -2592,15 +2581,15 @@ sub pp_null($self, $op, $cx) {
     }
 }
 
-sub padname {
-    my $self = shift;
-    my $targ = shift;
+sub padname(@< @_) {
+    my $self = shift @_;
+    my $targ = shift @_;
     return $self->padname_sv($targ)->PVX_const;
 }
 
-sub padany {
-    my $self = shift;
-    my $op = shift;
+sub padany(@< @_) {
+    my $self = shift @_;
+    my $op = shift @_;
     return substr($self->padname( <$op->targ), 1); # skip $/@/%
 }
 
@@ -2608,8 +2597,8 @@ sub pp_padsv($self, $op, $cx) {
     return $self->maybe_my($op, $cx, $self->padname($op->targ));
 }
 
-sub pp_padav { pp_padsv(< @_) }
-sub pp_padhv { pp_padsv(< @_) }
+sub pp_padav(@< @_) { pp_padsv(< @_) }
+sub pp_padhv(@< @_) { pp_padsv(< @_) }
 
 my @threadsv_names;
 
@@ -2624,9 +2613,9 @@ sub pp_threadsv($self, $op, $cx) {
     return $self->maybe_local($op, $cx, "\$" .  @threadsv_names[$op->targ]);
 }
 
-sub gv_or_padgv {
-    my $self = shift;
-    my $op = shift;
+sub gv_or_padgv(@< @_) {
+    my $self = shift @_;
+    my $op = shift @_;
     if (class($op) eq "PADOP") {
         return $self->padval( <$op->padix);
     } else { # class($op) eq "SVOP"
@@ -2689,9 +2678,9 @@ sub rv2x($self, $op, $cx, $type) {
     }
 }
 
-sub pp_rv2sv { maybe_local(< @_, rv2x(< @_, "\$")) }
-sub pp_rv2hv { maybe_local(< @_, rv2x(< @_, "\%")) }
-sub pp_rv2gv { maybe_local(< @_, rv2x(< @_, "*")) }
+sub pp_rv2sv(@< @_) { maybe_local(< @_, rv2x(< @_, "\$")) }
+sub pp_rv2hv(@< @_) { maybe_local(< @_, rv2x(< @_, "\%")) }
+sub pp_rv2gv(@< @_) { maybe_local(< @_, rv2x(< @_, "*")) }
 
 # skip down to the old, ex-rv2cv
 sub pp_rv2cv($self, $op, $cx) {
@@ -2729,8 +2718,7 @@ sub pp_rv2av($self, $op, $cx) {
     }
 }
 
-sub is_subscriptable {
-    my $op = shift;
+sub is_subscriptable(?$op) {
     if ($op->name =~ m/^[ahg]elem/) {
         return 1;
     } elsif ($op->name eq "entersub") {
@@ -2820,8 +2808,8 @@ sub elem($self, $op, $cx, $left, $right, $padname) {
 
 }
 
-sub pp_aelem { maybe_local(< @_, elem(< @_, "[", "]", "padav")) }
-sub pp_helem { maybe_local(< @_, elem(< @_, "\{", "\}", "padhv")) }
+sub pp_aelem(@< @_) { maybe_local(< @_, elem(< @_, "[", "]", "padav")) }
+sub pp_helem(@< @_) { maybe_local(< @_, elem(< @_, "\{", "\}", "padhv")) }
 
 sub pp_gelem($self, $op, $cx) {
     my@($glob, $part) = @($op->first, $op->last);
@@ -2863,8 +2851,8 @@ sub slice($self, $op, $cx, $left, $right, $regname, $padname) {
     return $array . $left . $list . $right;
 }
 
-sub pp_aslice { maybe_local(< @_, slice(< @_, "[[", "]]", "rv2av", "padav")) }
-sub pp_hslice { maybe_local(< @_, slice(< @_, "\{[", "]\}", "rv2hv", "padhv")) }
+sub pp_aslice(@< @_) { maybe_local(< @_, slice(< @_, "[[", "]]", "rv2av", "padav")) }
+sub pp_hslice(@< @_) { maybe_local(< @_, slice(< @_, "\{[", "]\}", "rv2hv", "padhv")) }
 
 sub pp_lslice($self, $op, $cx) {
     my $idx = $op->first;
@@ -2875,13 +2863,11 @@ sub pp_lslice($self, $op, $cx) {
     return "($list)" . "[[$idx]]";
 }
 
-sub want_scalar {
-    my $op = shift;
+sub want_scalar(?$op) {
     return ($op->flags ^&^ OPf_WANT) == OPf_WANT_SCALAR;
 }
 
-sub want_list {
-    my $op = shift;
+sub want_list(?$op) {
     return ($op->flags ^&^ OPf_WANT) == OPf_WANT_LIST;
 }
 
@@ -2934,8 +2920,8 @@ sub _method($self, $op, $cx) {
 }
 
 # compat function only
-sub method {
-    my $self = shift;
+sub method(@< @_) {
+    my $self = shift @_;
     my $info = $self->_method(< @_);
     return $self->e_method( < $self->_method(< @_) );
 }
@@ -3473,9 +3459,9 @@ sub const_dumper($self, $sv, $cx) {
     }
 }
 
-sub const_sv {
-    my $self = shift;
-    my $op = shift;
+sub const_sv(@< @_) {
+    my $self = shift @_;
+    my $op = shift @_;
     my $sv = $op->sv;
     # the constant could be in the pad (under useithreads)
     $sv = $self->padval( <$op->targ) unless $sv->$;
@@ -3490,9 +3476,9 @@ sub pp_const($self, $op, $cx) {
     return $self->const($sv, $cx);
 }
 
-sub dq {
-    my $self = shift;
-    my $op = shift;
+sub dq(@< @_) {
+    my $self = shift @_;
+    my $op = shift @_;
     my $type = $op->name;
     if ($type eq "const") {
         return uninterp( <escape_str( <unback( <$self->const_sv($op)->as_string)));
@@ -3531,8 +3517,8 @@ sub pp_backtick($self, $op, $cx) {
     return single_delim("qx", '`', < $self->dq($child));
 }
 
-sub dquote {
-    my $self = shift;
+sub dquote(@< @_) {
+    my $self = shift @_;
     my@($op, $cx) =  @_;
     my $kid = $op->first->sibling; # skip ex-stringify, pushmark
     return $self->deparse($kid, $cx) if $self->{?'unquote'};
@@ -3541,7 +3527,7 @@ sub dquote {
 }
 
 # OP_STRINGIFY is a listop, but it only ever has one arg
-sub pp_stringify { maybe_targmy(< @_, \&dquote) }
+sub pp_stringify(@< @_) { maybe_targmy(< @_, \&dquote) }
 
 # tr/// and s/// (and tr[][], tr[]//, tr###, etc)
 # note that tr(from)/to/ is OK, but not tr/from/(to)
@@ -3770,9 +3756,9 @@ sub matchop($self, $op, $cx, $name, $delim) {
     }
 }
 
-sub pp_match { matchop(< @_, "m", "") }
-sub pp_pushre { matchop(< @_, "m", "/") }
-sub pp_qr { matchop(< @_, "qr", "") }
+sub pp_match(@< @_) { matchop(< @_, "m", "") }
+sub pp_pushre(@< @_) { matchop(< @_, "m", "/") }
+sub pp_qr(@< @_) { matchop(< @_, "qr", "") }
 
 sub pp_split($self, $op, $cx) {
     my($kid, @exprs, $ary, $expr);

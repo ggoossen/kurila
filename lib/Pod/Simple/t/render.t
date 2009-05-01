@@ -17,8 +17,7 @@ $Pod::Simple::Text::FREAKYMODE = 1;
 
 chdir 't' unless env::var('PERL_CORE');
 
-sub source_path {
-    my $file = shift;
+sub source_path(?$file) {
     if (env::var('PERL_CORE')) {
         require File::Spec;
         my $updir = File::Spec->updir;
@@ -119,7 +118,7 @@ print $^STDOUT, "# --- Done with ", __FILE__, " --- \n";
 exit;
 
 
-sub compare2 {
+sub compare2(@< @_) {
     my @out = @_;
     if(@out[0] eq @out[1]) {
         ok 1;

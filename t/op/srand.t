@@ -7,7 +7,7 @@ plan(tests => 4);
 
 # Generate a load of random numbers.
 # int() avoids possible floating point error.
-sub mk_rand { map { int rand 10000 }, 1..100; }
+sub mk_rand(...) { map { int rand 10000 }, 1..100; }
 
 
 # Check that rand() is deterministic.

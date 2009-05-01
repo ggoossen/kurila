@@ -151,7 +151,7 @@ while ((nelems @ARGV)) {
 
 exit();
 
-sub module_version {
+sub module_version(@< @_) {
     my@($mod,$ver) =  @_;
 
     if ( %Opts{?v} ) {
@@ -193,8 +193,7 @@ sub module_version {
     }
 }
 
-sub numify_version {
-    my $ver = shift;
+sub numify_version(?$ver) {
     if ($ver =~ m/\..+\./) {
         try { require version ; 1 }
         or die "You need to install version.pm to use dotted version numbers\n";

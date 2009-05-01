@@ -7,16 +7,16 @@ print $^STDOUT, "1..7\n";
 
 my $i = 1;
 
-sub foo {}
+sub foo(...) {}
 my $bar = "bar";
 
-sub test_too_many {
+sub test_too_many(@< @_) {
     eval @_[0];
     print $^STDOUT, "not " unless $^EVAL_ERROR->{?description} =~ m/^Too many arguments/;
     printf $^STDOUT, "ok \%d\n",$i++;
 }
 
-sub test_no_error {
+sub test_no_error(@< @_) {
     eval @_[0];
     print $^STDOUT, "not " if $^EVAL_ERROR;
     printf $^STDOUT, "ok \%d\n",$i++;

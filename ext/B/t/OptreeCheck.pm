@@ -298,8 +298,7 @@ BEGIN {
         };
 }
 
-sub import {
-    my $pkg = shift;
+sub import(?$pkg) {
     $pkg->export_to_level(1,'checkOptree', < @EXPORT);
     getCmdLine();	# process @ARGV
 }
@@ -372,7 +371,7 @@ our %msgs # announce cross-testing.
     );
 
 #######
-sub getCmdLine {	# import assistant
+sub getCmdLine(...) {	# import assistant
     # offer help
     print($^STDOUT, qq{\n$^PROGRAM_NAME accepts args to update these state-vars:
 	     turn on a flag by typing its name,
@@ -424,7 +423,7 @@ sub getCmdLine {	# import assistant
 ##############################
 # the API (1 function)
 
-sub checkOptree {
+sub checkOptree(@< @_) {
     my $tc = newTestCases(< @_);	# ctor
     my ($rendering);
 
@@ -451,7 +450,7 @@ sub checkOptree {
     return;
 }
 
-sub newTestCases {
+sub newTestCases(@< @_) {
     # make test objects (currently 1) from args (passed to checkOptree)
     my $tc = bless \%(< @_), __PACKAGE__
         or die "test cases are hashes";
@@ -496,8 +495,7 @@ sub label($tc) {
 #################
 # render and its helpers
 
-sub getRendering {
-    my $tc = shift;
+sub getRendering(?$tc) {
     fail("getRendering: code or prog is required")
         unless $tc->{?code} or $tc->{?prog} or $tc->{?Dx};
 
@@ -561,9 +559,9 @@ sub getRendering {
     return @($rendering, @errs);
 }
 
-sub get_bcopts {
+sub get_bcopts(@< @_) {
     # collect concise passthru-options if any
-    my @($tc) =@( shift);
+    my @($tc) =@( shift @_);
     my @opts = @( () );
     if ($tc->{?bcopts}) {
         @opts = @( (ref $tc->{?bcopts} eq 'ARRAY')
@@ -572,9 +570,7 @@ sub get_bcopts {
     return @opts;
 }
 
-sub checkErrs {
-    # check rendering errs against expected errors, reduce and report
-    my $tc = shift;
+sub checkErrs(?$tc) {
 
     # check for agreement, by hash (order less important)
     my (%goterrs, @got);
@@ -596,9 +592,7 @@ sub checkErrs {
     fail("FORCED: $tc->{?name}:\n") if %gOpts{?fail}; # silly ?
 }
 
-sub diag_or_fail {
-    # help checkErrs
-    my $tc = shift;
+sub diag_or_fail(?$tc) {
 
     my @lines;
     push @lines, "got unexpected:", < sort keys $tc->{?goterrs}->% if $tc->{?goterrs}->%;
@@ -727,9 +721,7 @@ sub mkCheckRex($tc, $want) {
 ##############
 # compare and report
 
-sub mylike {
-    # reworked mylike to use hash-obj
-    my $tc	= shift;
+sub mylike(?$tc) {
     my $got	= $tc->{?got};
     my $want	= $tc->{?rex};
     my $cmnt	= $tc->{?name};
@@ -760,14 +752,7 @@ sub mylike {
     return $ok;
 }
 
-sub reduceDiffs {
-    # isolate the real diffs and report them.
-    # i.e. these kinds of errs:
-    # 1. missing or extra ops.  this skews all following op-sequences
-    # 2. single op diff, the rest of the chain is unaltered
-    # in either case, std err report is inadequate;
-
-    my $tc	= shift;
+sub reduceDiffs(?$tc) {
     my $got	= $tc->{?got};
     my @got	= split(m/\n/, $got);
     my $want	= $tc->{?wantstr};
@@ -877,12 +862,7 @@ tested.
 
 =cut
 
-sub runSelftest {
-    # tests the regex produced by mkCheckRex()
-    # by using on the expect* text it was created with
-    # failures indicate a code bug, 
-    # OR regexs plugged into the expect* text (which defeat conversions)
-    my $tc = shift;
+sub runSelftest(?$tc) {
 
     for my $provenance (qw/ expect expect_nt /) {
         #next unless $tc->{$provenance};
@@ -895,7 +875,7 @@ sub runSelftest {
 
 my $dumploaded = 0;
 
-sub mydumper {
+sub mydumper(@< @_) {
 
     do { Dumper(< @_); return } if $dumploaded;
 
@@ -920,8 +900,8 @@ sub mydumper {
 ############################
 # support for test writing
 
-sub preamble {
-    my $testct = shift || 1;
+sub preamble(@< @_) {
+    my $testct = shift @_ || 1;
     return <<EO_HEADER;
 #!perl
 
@@ -937,8 +917,7 @@ EO_HEADER
 
 }
 
-sub OptreeCheck::wrap {
-    my $code = shift;
+sub OptreeCheck::wrap(?$code) {
     $code =~ s/(?:(\#.*?)\n)//gsm;
     $code =~ s/\s+/ /mgs;	       
     chomp $code;
@@ -988,7 +967,7 @@ sub OptreeCheck::gentest($code, ?$opts) {
 }
 
 
-sub OptreeCheck::processExamples {
+sub OptreeCheck::processExamples(@< @_) {
     my @files = @_;
 
     # gets array of paragraphs, which should be code-samples.  Theyre

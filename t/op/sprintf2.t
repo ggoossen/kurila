@@ -86,7 +86,7 @@ do {
     }
 };
 
-sub mysprintf_int_flags {
+sub mysprintf_int_flags(@< @_) {
     my @($fmt, $num) =  @_;
     die "wrong format $fmt" if $fmt !~ m/^%([-+ 0]+)([1-9][0-9]*)d\z/;
     my $flag  = $1;

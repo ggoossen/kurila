@@ -57,8 +57,8 @@ sub handle_code($line, $number, $parser) {
 # set up defaults if none were given.  Note that all internal object keys are
 # in all-caps, reserving all lower-case object keys for Pod::Simple and user
 # arguments.
-sub new {
-    my $class = shift;
+sub new(@< @_) {
+    my $class = shift @_;
     my $self = $class->SUPER::new;
 
     # Tell Pod::Simple to handle S<> by automatically inserting &nbsp;.
@@ -198,9 +198,9 @@ sub _handle_element_end($self, $element) {
 # because it plays games with tabs.  We can't use formline, even though we'd
 # really like to, because it screws up non-printing characters.  So we have to
 # do the wrapping ourselves.
-sub wrap {
-    my $self = shift;
-    local $_ = shift;
+sub wrap(@< @_) {
+    my $self = shift @_;
+    local $_ = shift @_;
     my $output = '';
     my $spaces = ' ' x $self->%{?MARGIN};
     my $width = $self->%{?opt_width} - $self->%{?MARGIN};
@@ -218,9 +218,9 @@ sub wrap {
 
 # Reformat a paragraph of text for the current margin.  Takes the text to
 # reformat and returns the formatted text.
-sub reformat {
-    my $self = shift;
-    local $_ = shift;
+sub reformat(@< @_) {
+    my $self = shift @_;
+    local $_ = shift @_;
 
     # If we're trying to preserve two spaces after sentences, do some munging
     # to support that.  Otherwise, smash all repeated whitespace.
@@ -245,15 +245,14 @@ sub output($self, $text) {
 # Output a block of code (something that isn't part of the POD text).  Called
 # by preprocess_paragraph only if we were given the code option.  Exists here
 # only so that it can be overridden by subclasses.
-sub output_code { @_[0]->output (@_[1]) }
+sub output_code(@< @_) { @_[0]->output (@_[1]) }
 
 ##############################################################################
 # Document initialization
 ##############################################################################
 
 # Set up various things that have to be initialized on a per-document basis.
-sub start_document {
-    my $self = shift;
+sub start_document($self) {
     my $margin = $self->%{?opt_indent} + $self->%{?opt_margin};
 
     # Initialize a few per-document variables.
@@ -423,14 +422,14 @@ sub over_common_end($self) {
 }
 
 # Dispatch the start and end calls as appropriate.
-sub start_over_bullet { @_[0]->over_common_start (@_[1]) }
-sub start_over_number { @_[0]->over_common_start (@_[1]) }
-sub start_over_text   { @_[0]->over_common_start (@_[1]) }
-sub start_over_block  { @_[0]->over_common_start (@_[1]) }
-sub end_over_bullet { @_[0]->over_common_end }
-sub end_over_number { @_[0]->over_common_end }
-sub end_over_text   { @_[0]->over_common_end }
-sub end_over_block  { @_[0]->over_common_end }
+sub start_over_bullet(@< @_) { @_[0]->over_common_start (@_[1]) }
+sub start_over_number(@< @_) { @_[0]->over_common_start (@_[1]) }
+sub start_over_text(@< @_)   { @_[0]->over_common_start (@_[1]) }
+sub start_over_block(@< @_)  { @_[0]->over_common_start (@_[1]) }
+sub end_over_bullet(@< @_) { @_[0]->over_common_end }
+sub end_over_number(@< @_) { @_[0]->over_common_end }
+sub end_over_text(@< @_)   { @_[0]->over_common_end }
+sub end_over_block(@< @_)  { @_[0]->over_common_end }
 
 # The common handler for all item commands.  Takes the type of the item, the
 # attributes, and then the text of the item.
@@ -463,20 +462,20 @@ sub item_common($self, $type, $attrs, $text) {
 }
 
 # Dispatch the item commands to the appropriate place.
-sub cmd_item_bullet { my $self = shift; $self->item_common ('bullet', < @_) }
-sub cmd_item_number { my $self = shift; $self->item_common ('number', < @_) }
-sub cmd_item_text   { my $self = shift; $self->item_common ('text',   < @_) }
-sub cmd_item_block  { my $self = shift; $self->item_common ('block',  < @_) }
+sub cmd_item_bullet(@< @_) { my $self = shift @_; $self->item_common ('bullet', < @_) }
+sub cmd_item_number(@< @_) { my $self = shift @_; $self->item_common ('number', < @_) }
+sub cmd_item_text(@< @_)   { my $self = shift @_; $self->item_common ('text',   < @_) }
+sub cmd_item_block(@< @_)  { my $self = shift @_; $self->item_common ('block',  < @_) }
 
 ##############################################################################
 # Formatting codes
 ##############################################################################
 
 # The simple ones.
-sub cmd_b { return @_[0]->{?alt} ?? "``@_[2]''" !! @_[2] }
-sub cmd_f { return @_[0]->{?alt} ?? "\"@_[2]\"" !! @_[2] }
-sub cmd_i { return '*' . @_[2] . '*' }
-sub cmd_x { return '' }
+sub cmd_b(@< @_) { return @_[0]->{?alt} ?? "``@_[2]''" !! @_[2] }
+sub cmd_f(@< @_) { return @_[0]->{?alt} ?? "\"@_[2]\"" !! @_[2] }
+sub cmd_i(@< @_) { return '*' . @_[2] . '*' }
+sub cmd_x(...) { return '' }
 
 # Apply a whole bunch of messy heuristics to not quote things that don't
 # benefit from being quoted.  These originally come from Barrie Slaymaker and
@@ -522,14 +521,14 @@ sub cmd_l($self, $attrs, $text) {
 
 # The old Pod::Text module did everything in a pod2text() function.  This
 # tries to provide the same interface for legacy applications.
-sub pod2text {
+sub pod2text(@< @_) {
     my @args;
 
     # This is really ugly; I hate doing option parsing in the middle of a
     # module.  But the old Pod::Text module supported passing flags to its
     # entry function, so handle -a and -<number>.
     while (@_[0] =~ m/^-/) {
-        my $flag = shift;
+        my $flag = shift @_;
         if    ($flag eq '-a')       { push (@args, alt => 1)    }
         elsif ($flag =~ m/^-(\d+)$/) { push (@args, width => $1) }
         else {
@@ -565,8 +564,8 @@ sub pod2text {
 
 # Reset the underlying Pod::Simple object between calls to parse_from_file so
 # that the same object can be reused to convert multiple pages.
-sub parse_from_file {
-    my $self = shift;
+sub parse_from_file(@< @_) {
+    my $self = shift @_;
     $self->reinit;
 
     # Fake the old cutting option to Pod::Parser.  This fiddings with internal
@@ -596,8 +595,8 @@ sub parse_from_file {
 # Pod::Simple failed to provide this backward compatibility function, so
 # implement it ourselves.  File handles are one of the inputs that
 # parse_from_file supports.
-sub parse_from_filehandle {
-    my $self = shift;
+sub parse_from_filehandle(@< @_) {
+    my $self = shift @_;
     $self->parse_from_file (< @_);
 }
 

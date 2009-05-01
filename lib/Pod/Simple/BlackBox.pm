@@ -27,13 +27,13 @@ BEGIN {
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub parse_line { shift->parse_lines(< @_) } # alias
+sub parse_line(@< @_) { shift @_->parse_lines(< @_) } # alias
 
 # - - -  Turn back now!  Run away!  - - -
 
-sub parse_lines {             # Usage: $parser->parse_lines(@lines)
+sub parse_lines(@< @_) {             # Usage: $parser->parse_lines(@lines)
     # an undef means end-of-stream
-    my $self = shift;
+    my $self = shift @_;
 
     my $code_handler = $self->{?'code_handler'};
     my $cut_handler  = $self->{?'cut_handler'};
@@ -369,7 +369,7 @@ sub _handle_encoding_second_level($self, $para) {
 do {
     my $m = -321;   # magic line number
 
-    sub _gen_errata {
+    sub _gen_errata(@< @_) {
         my $self = @_[0];
         # Return 0 or more fake-o paragraphs explaining the accumulated
         #  errors on this document.
@@ -426,7 +426,7 @@ do {
 ##
 ##############################################################################
 
-sub _ponder_paragraph_buffer {
+sub _ponder_paragraph_buffer(@< @_) {
 
     # Para-token types as found in the buffer.
     #   ~Verbatim, ~Para, ~end, =head1..4, =for, =begin, =end,
@@ -1386,7 +1386,7 @@ sub _ponder_Data($self,$para) {
 
 ###########################################################################
 
-sub _traverse_treelet_bit {  # for use only by the routine above
+sub _traverse_treelet_bit(@< @_) {  # for use only by the routine above
     my@($self, $name) =@( splice @_,0,2);
 
     my $scratch;
@@ -1406,7 +1406,7 @@ sub _traverse_treelet_bit {  # for use only by the routine above
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub _closers_for_all_curr_open {
+sub _closers_for_all_curr_open(@< @_) {
     my $self = @_[0];
     my @closers;
     foreach my $still_open ( (  $self->{?'curr_open'} || return  )->@) {
@@ -1753,11 +1753,11 @@ sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space) 
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub text_content_of_treelet {  # method: $parser->text_content_of_treelet($lol)
+sub text_content_of_treelet(@< @_) {  # method: $parser->text_content_of_treelet($lol)
     return stringify_lol(@_[1]);
 }
 
-sub stringify_lol {  # function: stringify_lol($lol)
+sub stringify_lol(@< @_) {  # function: stringify_lol($lol)
     my $string_form = '';
     _stringify_lol( @_[0] => \$string_form );
     return $string_form;
@@ -1777,7 +1777,7 @@ sub _stringify_lol($lol, $to) {;
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub _dump_curr_open { # return a string representation of the stack
+sub _dump_curr_open(@< @_) { # return a string representation of the stack
     my $curr_open = @_[0]->{?'curr_open'};
 
     return '[empty]' unless (nelems $curr_open->@);
@@ -1809,7 +1809,7 @@ my %pretty_form = %(
             '#' => '\#',
     );
 
-sub pretty { # adopted from Class::Classless
+sub pretty(@< @_) { # adopted from Class::Classless
     # Not the most brilliant routine, but passable.
     # Don't give it a cyclic data structure!
     my @stuff = @_; # copy
@@ -1856,8 +1856,7 @@ sub pretty { # adopted from Class::Classless
 # backward compatibilty in Pod::Man, etc. but not recommended for
 # general use.
 
-sub reinit {
-    my $self = shift;
+sub reinit($self) {
     foreach (qw(source_dead source_filename doc_has_started
 start_of_pod_block content_seen last_was_blank paras curr_open
 line_count pod_para_count in_pod ~tried_gen_errata errata errors_seen

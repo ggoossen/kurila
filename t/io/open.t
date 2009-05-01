@@ -241,8 +241,7 @@ do {
 do {
     local $^WARN_HOOK = sub { $^EVAL_ERROR = shift };
 
-    sub gimme {
-        my $tmphandle = shift;
+    sub gimme(?$tmphandle) {
         my $line = scalar ~< $tmphandle;
         warn "gimme";
         return $line;

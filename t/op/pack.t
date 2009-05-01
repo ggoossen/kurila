@@ -46,9 +46,8 @@ for my $size (@( 16, 32, 64) ) {
 my $IsTwosComplement = pack('i', -1) eq "\x[FF]" x config_value("intsize");
 info "\$IsTwosComplement = $IsTwosComplement";
 
-sub is_valid_error
+sub is_valid_error(?$err)
 {
-    my $err = shift;
     $err = $err && $err->message;
     for my $e ( @valid_errors) {
         $err =~ $e and return 1;
@@ -57,7 +56,7 @@ sub is_valid_error
     return 0;
 }
 
-sub encode_list {
+sub encode_list(@< @_) {
     my @result = @+: map { _qq($_) }, @_;
     if ((nelems @result) == 1) {
         return @result;
@@ -360,7 +359,7 @@ SKIP: do {
 };
 
 # temps
-sub foo { my $a = "a"; return $a . $a++ . $a++ }
+sub foo(...) { my $a = "a"; return $a . $a++ . $a++ }
 do {
     use warnings < qw(NONFATAL all);;
     my $warning;
@@ -523,8 +522,8 @@ ok(length(pack("s!", 0)) +<= length(pack("i!", 0)));
 ok(length(pack("i!", 0)) +<= length(pack("l!", 0)));
 is(length(pack("i!", 0)), length(pack("i", 0)));
 
-sub numbers {
-    my $base = shift;
+sub numbers(@< @_) {
+    my $base = shift @_;
     my @formats = @($base);
     $base =~ m/^[silqjfdp]/i and push @formats, "$base>", "$base<";
     for my $format ( @formats) {
@@ -532,9 +531,9 @@ sub numbers {
     }
 }
 
-sub numbers_with_total {
-    my $format = shift;
-    my $total = shift;
+sub numbers_with_total(@< @_) {
+    my $format = shift @_;
+    my $total = shift @_;
     if (!defined $total) {
         foreach ( @_) {
             $total += $_;
@@ -696,9 +695,9 @@ SKIP: do {
 
 info "test big-/little-endian conversion";
 
-sub byteorder
+sub byteorder(@< @_)
 {
-    my $format = shift;
+    my $format = shift @_;
     info "byteorder test for $format";
     for my $value ( @_) {
       SKIP: do {
@@ -1085,8 +1084,7 @@ SKIP: do {
 do {
     no utf8;
 
-    sub compress_template {
-        my $t = shift;
+    sub compress_template(?$t) {
         for my $mod (qw( < > )) {
             $t =~ s/((?:(?:[SILQJFDP]!?$mod|[^SILQJFDP\W]!?)(?:\d+|\*|\[(?:[^]]+)\])?\/?)\{2,\})/$( do {
                 my $x = $1; $x =~ s!$mod!!g ?? "($x)$mod" !! $x })/ig;

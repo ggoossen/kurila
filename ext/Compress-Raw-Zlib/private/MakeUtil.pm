@@ -26,10 +26,10 @@ env::var('SKIP_FOR_CORE' ) = 1 if env::var('PERL_CORE') || env::var('MY_PERL_COR
 
 
 
-sub MY::libscan
+sub MY::libscan(@< @_)
 {
-    my $self = shift;
-    my $path = shift;
+    my $self = shift @_;
+    my $path = shift @_;
 
     return undef
         if $path =~ m/(~|\.bak|_bak)$/ ||
@@ -39,7 +39,7 @@ sub MY::libscan
     return $path;
 }
 
-sub MY::postamble 
+sub MY::postamble(...) 
 {
     return ''
         if env::var('PERL_CORE') ;
@@ -61,7 +61,7 @@ MyTrebleCheck:
     return $postamble;
 }
 
-sub getPerlFiles
+sub getPerlFiles(@< @_)
 {
     my @manifests = @_ ;
 

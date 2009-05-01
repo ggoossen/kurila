@@ -29,14 +29,13 @@ plan tests => $tests;
 
     package SHORT_NAME;
 
-sub make { bless \@(), shift }
+sub make(@< @_) { bless \@(), shift @_ }
 
 package SHORT_NAME_WITH_HOOK;
 
-sub make { bless \@(), shift }
+sub make(@< @_) { bless \@(), shift @_ }
 
-sub STORABLE_freeze {
-    my $self = shift;
+sub STORABLE_freeze($self) {
     return @("", $self);
 }
 
@@ -106,11 +105,9 @@ do {
 
 package RETURNS_IMMORTALS;
 
-sub make { my $self = shift; bless \ @_, $self }
+sub make(@< @_) { my $self = shift @_; bless \ @_, $self }
 
-sub STORABLE_freeze {
-    # Some reference some number of times.
-    my $self = shift;
+sub STORABLE_freeze($self) {
     my @($what, $times) =  $self->@;
     return @("$what$times", < (@(%::immortals{?$what}) x $times));
 }
@@ -150,12 +147,11 @@ package HAS_HOOK;
 our $loaded_count = 0;
 our $thawed_count = 0;
 
-sub make {
+sub make(...) {
     bless \@();
 }
 
-sub STORABLE_freeze {
-    my $self = shift;
+sub STORABLE_freeze($self) {
     return @('');
 }
 

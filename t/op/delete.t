@@ -128,7 +128,7 @@ do {
 
 do {
     my $x = 0;
-    sub X::DESTROY { $x++ }
+    sub X::DESTROY(...) { $x++ }
     do {
         my @a;
         @a[+0] = bless \@(), 'X';

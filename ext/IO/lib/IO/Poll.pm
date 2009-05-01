@@ -32,22 +32,21 @@ $VERSION = "0.07";
 # [0] maps fd's to requested masks
 # [1] maps fd's to returned  masks
 # [2] maps fd's to handles
-sub new {
-    my $class = shift;
+sub new(?$class) {
 
     my $self = bless \@(\%(),\%(),\%()), $class;
 
     $self;
 }
 
-sub mask {
-    my $self = shift;
-    my $io = shift;
+sub mask(@< @_) {
+    my $self = shift @_;
+    my $io = shift @_;
     my $fd = fileno($io);
     return unless defined $fd;
     $io = dump::view($io);
     if ((nelems @_)) {
-        my $mask = shift;
+        my $mask = shift @_;
         if($mask) {
             $self->[0]->{+$fd}->{+$io} = $mask; # the error events are always returned
             $self->[1]->{+$fd}      = 0;     # output mask
@@ -94,9 +93,9 @@ sub poll($self,$timeout) {
     return $ret;  
 }
 
-sub events {
-    my $self = shift;
-    my $io = shift;
+sub events(@< @_) {
+    my $self = shift @_;
+    my $io = shift @_;
     my $fd = fileno($io);
     $io = dump::view($io);
     exists $self->[1]->{$fd} and exists $self->[0]->{$fd}->{$io} 
@@ -104,17 +103,17 @@ sub events {
         !! 0;
 }
 
-sub remove {
-    my $self = shift;
-    my $io = shift;
+sub remove(@< @_) {
+    my $self = shift @_;
+    my $io = shift @_;
     $self->mask($io,0);
 }
 
-sub handles {
-    my $self = shift;
+sub handles(@< @_) {
+    my $self = shift @_;
     return values $self->[2]->% unless (nelems @_);
 
-    my $events = shift || 0;
+    my $events = shift @_ || 0;
     my($fd,$ev,$io,$mask);
     my @handles = @( () );
 

@@ -54,10 +54,10 @@ ok( $ok, 'No segv!' );
 
     package Term::Cap;
 
-sub Tgetent {
+sub Tgetent(@< @_) {
     bless(\%(), @_[0]);
 }
 
-sub Tputs {
+sub Tputs(@< @_) {
     return @_[1];
 }

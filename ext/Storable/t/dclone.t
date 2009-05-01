@@ -40,7 +40,7 @@ print $^STDOUT, "ok 4\n";
 
     package FOO; our @ISA = qw(Storable);
 
-sub make {
+sub make(...) {
     my $self = bless \%();
     $self->{+key} = \%main::a;
     return $self;

@@ -64,9 +64,8 @@ our (@my_z_errmsg);
     );
 
 
-sub _set_gzerr
+sub _set_gzerr(?$value)
 {
-    my $value = shift ;
 
     if ($value == 0) {
         $Compress::Zlib::gzerrno = 0 ;
@@ -81,10 +80,10 @@ sub _set_gzerr
     return $value ;
 }
 
-sub _save_gzerr
+sub _save_gzerr(@< @_)
 {
-    my $gz = shift ;
-    my $test_eof = shift ;
+    my $gz = shift @_ ;
+    my $test_eof = shift @_ ;
 
     my $value = $gz->errorNo() || 0 ;
 
@@ -147,9 +146,9 @@ sub gzopen($file, $mode)
     bless \@($gz, $infDef), 'Compress::Zlib::gzFile';
 }
 
-sub Compress::Zlib::gzFile::gzread
+sub Compress::Zlib::gzFile::gzread(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
 
     return _set_gzerr(Z_STREAM_ERROR())
         if $self->[1] ne 'inflate';
@@ -162,9 +161,9 @@ sub Compress::Zlib::gzFile::gzread
     return $status ;
 }
 
-sub Compress::Zlib::gzFile::gzreadline
+sub Compress::Zlib::gzFile::gzreadline(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
 
     my $gz = $self->[0] ;
     do {
@@ -177,9 +176,9 @@ sub Compress::Zlib::gzFile::gzreadline
     return defined @_[0] ?? length @_[0] !! 0 ;
 }
 
-sub Compress::Zlib::gzFile::gzwrite
+sub Compress::Zlib::gzFile::gzwrite(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
     my $gz = $self->[0] ;
 
     return _set_gzerr(Z_STREAM_ERROR())
@@ -190,20 +189,19 @@ sub Compress::Zlib::gzFile::gzwrite
     return $status ;
 }
 
-sub Compress::Zlib::gzFile::gztell
+sub Compress::Zlib::gzFile::gztell($self)
 {
-    my $self = shift ;
     my $gz = $self->[0] ;
     my $status = $gz->tell() ;
     _save_gzerr($gz);
     return $status ;
 }
 
-sub Compress::Zlib::gzFile::gzseek
+sub Compress::Zlib::gzFile::gzseek(@< @_)
 {
-    my $self   = shift ;
-    my $offset = shift ;
-    my $whence = shift ;
+    my $self   = shift @_ ;
+    my $offset = shift @_ ;
+    my $whence = shift @_ ;
 
     my $gz = $self->[0] ;
     my $status ;
@@ -212,10 +210,10 @@ sub Compress::Zlib::gzFile::gzseek
     return $status ;
 }
 
-sub Compress::Zlib::gzFile::gzflush
+sub Compress::Zlib::gzFile::gzflush(@< @_)
 {
-    my $self = shift ;
-    my $f    = shift ;
+    my $self = shift @_ ;
+    my $f    = shift @_ ;
 
     my $gz = $self->[0] ;
     my $status = $gz->flush($f) ;
@@ -223,9 +221,8 @@ sub Compress::Zlib::gzFile::gzflush
     return $status ?? 0 !! $err;
 }
 
-sub Compress::Zlib::gzFile::gzclose
+sub Compress::Zlib::gzFile::gzclose($self)
 {
-    my $self = shift ;
     my $gz = $self->[0] ;
 
     my $status = $gz->close() ;
@@ -233,15 +230,15 @@ sub Compress::Zlib::gzFile::gzclose
     return $status ?? 0 !! $err;
 }
 
-sub Compress::Zlib::gzFile::gzsetparams
+sub Compress::Zlib::gzFile::gzsetparams(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
     croak "Usage: Compress::Zlib::gzFile::gzsetparams(file, level, strategy)"
         unless (nelems @_) eq 2 ;
 
     my $gz = $self->[0] ;
-    my $level = shift ;
-    my $strategy = shift;
+    my $level = shift @_ ;
+    my $strategy = shift @_;
 
     return _set_gzerr(Z_STREAM_ERROR())
         if $self->[1] ne 'deflate';
@@ -252,16 +249,15 @@ sub Compress::Zlib::gzFile::gzsetparams
     return $status ;
 }
 
-sub Compress::Zlib::gzFile::gzerror
+sub Compress::Zlib::gzFile::gzerror($self)
 {
-    my $self = shift ;
     my $gz = $self->[0] ;
 
     return $Compress::Zlib::gzerrno ;
 }
 
 
-sub compress
+sub compress(@< @_)
 {
     my @($x, $output, $err, $in) =@('', '', '', '') ;
 
@@ -288,7 +284,7 @@ sub compress
 
 }
 
-sub uncompress
+sub uncompress(@< @_)
 {
     my @($x, $output, $err, $in) =@('', '', '', '') ;
 
@@ -310,7 +306,7 @@ sub uncompress
 }
 
 
-sub deflateInit
+sub deflateInit(@< @_)
 {
     my $got = ParseParameters(0,
         \%(
@@ -344,7 +340,7 @@ sub deflateInit
     return $x;
 }
 
-sub inflateInit
+sub inflateInit(@< @_)
 {
     my $got = ParseParameters(0,
         \%(
@@ -376,20 +372,20 @@ our (@ISA);
 @ISA = qw(Compress::Raw::Zlib::deflateStream);
 
 
-sub deflate
+sub deflate(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
     my $output ;
 
     my $status = $self->SUPER::deflate(@_[0], $output) ;
     return @($output, $status);
 }
 
-sub flush
+sub flush(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
     my $output ;
-    my $flag = shift || Compress::Zlib::Z_FINISH();
+    my $flag = shift @_ || Compress::Zlib::Z_FINISH();
     my $status = $self->SUPER::flush($output, $flag) ;
 
     return @($output, $status);
@@ -400,9 +396,9 @@ package Zlib::OldInflate ;
 our (@ISA);
 @ISA = qw(Compress::Raw::Zlib::inflateStream);
 
-sub inflate
+sub inflate(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
     my $output ;
     my $status = $self->SUPER::inflate(@_[0], $output) ;
     return @($output, $status);
@@ -412,7 +408,7 @@ package Compress::Zlib ;
 
 use IO::Compress::Gzip::Constants v2.006 ;
 
-sub memGzip
+sub memGzip(@< @_)
 {
     my $out;
 
@@ -483,7 +479,7 @@ sub _removeGzipHeader($string)
 }
 
 
-sub memGunzip
+sub memGunzip(@< @_)
 {
     # if the buffer isn't a reference, make it one
     my $string = (ref @_[0] ?? @_[0] !! \@_[0]);

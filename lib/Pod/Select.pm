@@ -268,8 +268,7 @@ reference to the object itself as an implicit first parameter.
 
 our (@section_headings);
 
-sub _init_headings {
-    my $self = shift;
+sub _init_headings($self) {
 
     ## Initialize current section heading titles if necessary
     unless (defined $self->%{?_SECTION_HEADINGS}) {
@@ -298,8 +297,8 @@ level, then C<undef> is returned.
 
 =cut
 
-sub curr_headings {
-    my $self = shift;
+sub curr_headings(@< @_) {
+    my $self = shift @_;
     $self->_init_headings()  unless (defined $self->{?_SECTION_HEADINGS});
     my @headings =  $self->{?_SECTION_HEADINGS}->@;
     return ((nelems @_) +> 0  and  @_[0] =~ m/^\d+$/) ?? @headings[@_[0] - 1] !! @headings;
@@ -332,8 +331,8 @@ This method should I<not> normally be overridden by subclasses.
 
 our (@selected_sections);
 
-sub select {
-    my $self = shift;
+sub select(@< @_) {
+    my $self = shift @_;
     my @sections = @_;
     local $_ = undef;
 
@@ -392,8 +391,8 @@ This method should I<not> normally be overridden by subclasses.
 
 =cut
 
-sub add_selection {
-    my $self = shift;
+sub add_selection(@< @_) {
+    my $self = shift @_;
     $self->select("+", < @_);
 }
 
@@ -408,8 +407,7 @@ This method takes no arguments, it has the exact same effect as invoking
 
 =cut
 
-sub clear_selections {
-    my $self = shift;
+sub clear_selections($self) {
     $self->select();
 }
 
@@ -433,8 +431,8 @@ This method should I<not> normally be overridden by subclasses.
 
 =cut
 
-sub match_section {
-    my $self = shift;
+sub match_section(@< @_) {
+    my $self = shift @_;
     my @headings = @_;
 
     ## Return true if no restrictions were explicitly specified

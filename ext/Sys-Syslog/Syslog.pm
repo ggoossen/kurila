@@ -138,20 +138,20 @@ sub openlog(?$ident, ?$logopt, ?$facility) {
     connect_log();
 }
 
-sub closelog {
+sub closelog(...) {
     $facility = $ident = '';
     disconnect_log();
 } 
 
-sub setlogmask {
+sub setlogmask(@< @_) {
     my $oldmask = $maskpri;
-    $maskpri = shift unless @_[0] == 0;
+    $maskpri = shift @_ unless @_[0] == 0;
     $oldmask;
 }
  
-sub setlogsock {
-    my $setsock = shift;
-    $syslog_path = shift;
+sub setlogsock(@< @_) {
+    my $setsock = shift @_;
+    $syslog_path = shift @_;
     disconnect_log() if $connected;
     $transmit_ok = 0;
     @fallbackMethods = @( () );
@@ -252,9 +252,9 @@ sub setlogsock {
     return 1;
 }
 
-sub syslog {
-    my $priority = shift;
-    my $mask = shift;
+sub syslog(@< @_) {
+    my $priority = shift @_;
+    my $mask = shift @_;
     my ($message, $buf);
     my (@words, $num, $numpri, $numfac, $sum);
     my $failed = undef;
@@ -426,7 +426,7 @@ sub _syslog_send_native($buf, $numpri, ...) {
 # -----
 # private function to translate names to numeric values
 # 
-sub xlate {
+sub xlate(@< @_) {
     my@($name) =  @_;
     return $name+0 if $name =~ m/^\s*\d+\s*$/;
     $name = uc $name;
@@ -444,7 +444,7 @@ sub xlate {
 # a syslog service using the selected methods, trying each one in the 
 # selected order. 
 # 
-sub connect_log {
+sub connect_log(...) {
     @fallbackMethods = @connectMethods unless @fallbackMethods;
 
     if ($transmit_ok && $current_proto) {
@@ -685,7 +685,7 @@ sub connect_console($errs) {
 # would cause the error to be returned. Unfortunately the syslog 
 # 'protocol' never provides anything for us to read. But with 
 # judicious use of select(), we can see if it would be readable...
-sub connection_ok {
+sub connection_ok(...) {
     return 1 if defined $current_proto and (
         $current_proto eq 'native' or $current_proto eq 'console'
         or $current_proto eq 'eventlog'
@@ -697,7 +697,7 @@ sub connection_ok {
     return $ret ?? 0 !! 1;
 }
 
-sub disconnect_log {
+sub disconnect_log(...) {
     $connected = 0;
     $syslog_send = undef;
 

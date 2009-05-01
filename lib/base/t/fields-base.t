@@ -25,7 +25,7 @@ use fields < qw(b1 b2 b3);
 use fields '_b1';
 use fields < qw(b1 _b2 b2);
 
-sub new { fields::new(shift) }
+sub new(@< @_) { fields::new(shift @_) }
 
 package B3;
 use fields < qw(b4 _b5 b6 _b7);
@@ -49,7 +49,7 @@ use base 'D3';
 use fields < qw(_d3 d3);
 
     package M;
-sub m {}
+sub m(...) {}
 
 package D5;
 use base < qw(M B2);
@@ -183,7 +183,7 @@ main::like( $^EVAL_ERROR->{?description}, qr/Can't multiply inherit fields/i, 'A
     package B9;
 use fields < qw(b1);
 
-sub _mk_obj { fields::new(@_[0])->{?'b1'} };
+sub _mk_obj(@< @_) { fields::new(@_[0])->{?'b1'} };
 
 package D9;
 use base < qw(B9);
@@ -208,20 +208,18 @@ do {
 do {
     package X;
     use fields < qw(X1 _X2);
-    sub new {
-        my $self = shift;
+    sub new($self) {
         $self = fields::new($self) unless ref $self;
         $self->{+X1} = "x1";
         $self->{+_X2} = "_x2";
         return $self;
     }
-    sub get_X2 { my $self = shift; $self->{?_X2} }
+    sub get_X2($self) { $self->{?_X2} }
 
     package Y;
     use base < qw(X);
 
-    sub new {
-        my $self = shift;
+    sub new($self) {
         $self = fields::new($self) unless ref $self;
         $self->SUPER::new();
         return $self;
@@ -232,8 +230,7 @@ do {
     use base < qw(Y);
     use fields < qw(Z1);
 
-    sub new {
-        my $self = shift;
+    sub new($self) {
         $self = fields::new($self) unless ref $self;
         $self->SUPER::new();
         $self->{+Z1} = 'z1';

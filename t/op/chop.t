@@ -16,7 +16,7 @@ $_ = 'abc';
 $c = chop($_);
 is ($c . $_ , 'cab', 'unoptimized');
 
-sub foo {
+sub foo(...) {
     chop;
 }
 

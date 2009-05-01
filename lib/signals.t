@@ -3,7 +3,7 @@ use Test::More tests => 10;
 
 use signals;
 
-sub foo { }
+sub foo(...) { }
 
 ok( ! defined(signals::handler("INT")) );
 signals::handler("INT") = \&foo;

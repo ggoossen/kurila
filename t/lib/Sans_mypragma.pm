@@ -1,6 +1,6 @@
 package Sans_mypragma;
 
-sub affected {
+sub affected(...) {
     mypragma::in_effect();
 }
 

@@ -17,11 +17,11 @@ WriteMakefile(
 
     package MY;
 
-sub upupfile {
+sub upupfile(@< @_) {
     File::Spec->catfile( File::Spec->updir, File::Spec->updir, @_[0]);
 }
 
-sub postamble {
+sub postamble(...) {
     my $regcomp_c = upupfile('regcomp.c');
     my $regexec_c = upupfile('regexec.c');
 
@@ -41,7 +41,7 @@ re_exec\$(OBJ_EXT) : re_exec.c
 EOF
 }
 
-sub MY::c_o {
+sub MY::c_o(@< @_) {
     my@($self) =  @_;
         package MY; # so that "SUPER" works right
     my $inh = $self->SUPER::c_o(< @_);

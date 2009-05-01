@@ -17,19 +17,19 @@ our ($bad, $bad7, $ok10, $bad18, $ok);
 
 $^WARNING=1;
 
-sub IGNORE {
+sub IGNORE(...) {
     $bad7=1;
 }
 
-sub DEFAULT {
+sub DEFAULT(...) {
     $bad18=1;
 }
 
-sub foo {
+sub foo(...) {
     $ok=1;
 }
 
-sub bar { }
+sub bar(...) { }
 
 my $newaction=POSIX::SigAction->new(\&foo, POSIX::SigSet->new(SIGUSR1), 0);
 my $oldaction=POSIX::SigAction->new(\&bar, POSIX::SigSet->new(), 0);
@@ -131,8 +131,8 @@ do {
     my $hup20;
     my $hup21;
 
-    sub hup20 { $hup20++ }
-    sub hup21 { $hup21++ }
+    sub hup20(...) { $hup20++ }
+    sub hup21(...) { $hup21++ }
 
     sigaction("FOOBAR", $newaction);
     ok(1, "no coredump, still alive");
@@ -177,7 +177,7 @@ ok($ok, "safe signal delivery must work");
 SKIP: do {
     eval 'use POSIX qw(SA_SIGINFO); SA_SIGINFO';
     skip("no SA_SIGINFO", 1) if $^EVAL_ERROR;
-    sub hiphup {
+    sub hiphup(@< @_) {
         is(@_[1]->{?signo}, SIGHUP, "SA_SIGINFO got right signal");
     }
     my $act = POSIX::SigAction->new(\&hiphup, 0, SA_SIGINFO);

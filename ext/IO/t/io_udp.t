@@ -14,10 +14,10 @@ BEGIN {
     }
 }
 
-sub compare_addr {
+sub compare_addr(@< @_) {
     no utf8;
-    my $a = shift;
-    my $b = shift;
+    my $a = shift @_;
+    my $b = shift @_;
     if (length($a) != length $b) {
         my $min = (length($a) +< length $b) ?? length($a) !! length $b;
         if ($min and substr($a, 0, $min) eq substr($b, 0, $min)) {

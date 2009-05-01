@@ -9,8 +9,8 @@ sigtrap - Perl pragma to enable simple signal handling
 our $VERSION = 1.04;
 our $Verbose ||= 0;
 
-sub import {
-    my $pkg = shift;
+sub import(@< @_) {
+    my $pkg = shift @_;
     my $handler = \&handler_traceback;
     my $saw_sig = 0;
     my $untrapped = 0;
@@ -18,7 +18,7 @@ sub import {
 
     {
         while ((nelems @_)) {
-            $_ = shift;
+            $_ = shift @_;
             if (m/^[A-Z][A-Z0-9]*$/) {
                 $saw_sig++;
                 unless ($untrapped and signals::handler($_)
@@ -39,7 +39,7 @@ sub import {
                 $handler = \&handler_die;
             } elsif ($_ eq 'handler') {
                 (nelems @_) or die "No argument specified after 'handler'";
-                $handler = shift;
+                $handler = shift @_;
                 unless (ref $handler or $handler eq 'IGNORE'
                     or $handler eq 'DEFAULT') {
                     require Symbol;
@@ -60,11 +60,11 @@ sub import {
     } while ( ! $saw_sig );
 }
 
-sub handler_die {
+sub handler_die(@< @_) {
     die "Caught a SIG@_[0]";
 }
 
-sub handler_traceback {
+sub handler_traceback(@< @_) {
     our $panic;
     signals::handler('ABRT') = 'DEFAULT';
     kill 'ABRT', $^PID if $panic++;

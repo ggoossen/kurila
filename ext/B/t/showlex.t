@@ -30,7 +30,7 @@ my $start_index = B::PAD_NAME_START_INDEX();
 my ($na,$nb,$nc);	# holds regex-strs
 my ($out);	# output, option-flag
 
-sub padrep {
+sub padrep(@< @_) {
     my @($varname,$newlex) =  @_;
     return ($newlex)
         ?? 'PVNV \(0x[0-9a-fA-F]+\) "\'.$varname.'" = '

@@ -41,7 +41,7 @@ foreach my $foo (@(("ok 6\n","ok 7\n"))) {
     print $^STDOUT, $foo;
 }
 
-sub foo {
+sub foo(@< @_) {
     for my $i (1..5) {
         return $i if @_[0] == $i;
     }
@@ -51,7 +51,7 @@ print $^STDOUT, foo(1) == 1 ?? "ok" !! "not ok", " 8\n";
 print $^STDOUT, foo(2) == 2 ?? "ok" !! "not ok", " 9\n";
 print $^STDOUT, foo(5) == 5 ?? "ok" !! "not ok", " 10\n";
 
-sub bar {
+sub bar(...) {
     return  @(1, 2, 4);
 }
 
@@ -62,7 +62,7 @@ foreach my $b ( bar()) {
 print $^STDOUT, $a == 7 ?? "ok" !! "not ok", " 11\n";
 
 # loop over expand on empty list
-sub baz { return () }
+sub baz(...) { return () }
 for ( baz() ) {
     print $^STDOUT, "not ";
 }
@@ -82,8 +82,7 @@ print $^STDOUT, "ok 14\n";
 do {
 
     my $x = 0;
-    sub X::DESTROY {
-        my $o = shift;
+    sub X::DESTROY(?$o) {
         $x++;
         1 for @( (1));
     }

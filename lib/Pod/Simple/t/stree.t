@@ -14,10 +14,10 @@ my $hashes_dont_matter = 0;
 
 
 my $x = 'Pod::Simple::SimpleTree';
-sub x {
+sub x(@< @_) {
     my $p = $x->new;
     $p->merge_text(1);
-    $p->parse_string_document( shift )->root;
+    $p->parse_string_document( shift @_ )->root;
 }
 
 ok 1;
@@ -116,7 +116,7 @@ print $^STDOUT, "# Wrapping up... one for the road...\n";
 ok 1;
 print $^STDOUT, "# --- Done with ", __FILE__, " --- \n";
 
-sub deq { # deep-equals
+sub deq(@< @_) { # deep-equals
     #print "# deq ", Pod::Simple::pretty($_[0], $_[1]), "\n";
     return 1 unless defined @_[0] or defined @_[1]; # two undefs = same
     return '' if defined @_[0] xor defined @_[1];

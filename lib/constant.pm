@@ -23,8 +23,8 @@ my %forbidden = %(< %keywords, < %forced_into_main);
 # be inlined as a constant, thereby avoiding further sub calling 
 # overhead.
 #=======================================================================
-sub import {
-    my $class = shift;
+sub import(@< @_) {
+    my $class = shift @_;
     return unless (nelems @_);			# Ignore 'use constant;'
     my $constants;
     my $multiple  = ref @_[0];
@@ -32,9 +32,9 @@ sub import {
 
     if ( $multiple ) {
         if (ref @_[0] ne 'HASH') {
-            die("Invalid reference type '".ref(shift)."' not 'HASH'");
+            die("Invalid reference type '".ref(shift @_)."' not 'HASH'");
         }
-        $constants = shift;
+        $constants = shift @_;
     } else {
         $constants->{+shift(@_)} = undef;
     }

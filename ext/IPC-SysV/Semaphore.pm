@@ -32,9 +32,9 @@ do {
            );
 };
 
-sub new {
+sub new(@< @_) {
     (nelems @_) == 4 || croak 'new ' . __PACKAGE__ . '( KEY, NSEMS, FLAGS )';
-    my $class = shift;
+    my $class = shift @_;
 
     my $id = semget(@_[0],@_[1],@_[2]);
 
@@ -43,70 +43,67 @@ sub new {
         !! undef;
 }
 
-sub id {
-    my $self = shift;
+sub id($self) {
     $self->$;
 }
 
-sub remove {
-    my $self = shift;
+sub remove($self) {
     @(semctl($self->$,0,IPC_RMID,0), undef $self->$)[0];
 }
 
-sub getncnt {
+sub getncnt(@< @_) {
     (nelems @_) == 2 || croak '$sem->getncnt( SEM )';
-    my $self = shift;
-    my $sem = shift;
+    my $self = shift @_;
+    my $sem = shift @_;
     my $v = semctl($self->$,$sem,GETNCNT,0);
     $v ?? 0 + $v !! undef;
 }
 
-sub getzcnt {
+sub getzcnt(@< @_) {
     (nelems @_) == 2 || croak '$sem->getzcnt( SEM )';
-    my $self = shift;
-    my $sem = shift;
+    my $self = shift @_;
+    my $sem = shift @_;
     my $v = semctl($self->$,$sem,GETZCNT,0);
     $v ?? 0 + $v !! undef;
 }
 
-sub getval {
+sub getval(@< @_) {
     (nelems @_) == 2 || croak '$sem->getval( SEM )';
-    my $self = shift;
-    my $sem = shift;
+    my $self = shift @_;
+    my $sem = shift @_;
     my $v = semctl($self->$,$sem,GETVAL,0);
     $v ?? 0 + $v !! undef;
 }
 
-sub getpid {
+sub getpid(@< @_) {
     (nelems @_) == 2 || croak '$sem->getpid( SEM )';
-    my $self = shift;
-    my $sem = shift;
+    my $self = shift @_;
+    my $sem = shift @_;
     my $v = semctl($self->$,$sem,GETPID,0);
     $v ?? 0 + $v !! undef;
 }
 
-sub op {
+sub op(@< @_) {
     (nelems @_) +>= 4 || croak '$sem->op( OPLIST )';
-    my $self = shift;
+    my $self = shift @_;
     croak 'Bad arg count' if (nelems @_) % 3;
     my $data = pack("s!*",< @_);
     semop($self->$,$data);
 }
 
-sub stat {
-    my $self = shift;
+sub stat($self) {
     my $data = "";
     semctl($self->$,0,IPC_STAT,$data)
         or return undef;
     IPC::Semaphore::stat->new->unpack($data);
 }
 
-sub set {
-    my $self = shift;
+sub set(@< @_) {
+    my $self = shift @_;
     my $ds;
 
     if((nelems @_) == 1) {
-        $ds = shift;
+        $ds = shift @_;
     }
     else {
         croak 'Bad arg count' if (nelems @_) % 2;
@@ -122,25 +119,24 @@ sub set {
     $v ?? 0 + $v !! undef;
 }
 
-sub getall {
-    my $self = shift;
+sub getall($self) {
     my $data = "";
     semctl($self->$,0,GETALL,$data)
         or return ();
     @(unpack("s!*",$data));
 }
 
-sub setall {
-    my $self = shift;
+sub setall(@< @_) {
+    my $self = shift @_;
     my $data = pack("s!*",< @_);
     semctl($self->$,0,SETALL,$data);
 }
 
-sub setval {
+sub setval(@< @_) {
     (nelems @_) == 3 || croak '$sem->setval( SEM, VAL )';
-    my $self = shift;
-    my $sem = shift;
-    my $val = shift;
+    my $self = shift @_;
+    my $sem = shift @_;
+    my $val = shift @_;
     semctl($self->$,$sem,SETVAL,$val);
 }
 

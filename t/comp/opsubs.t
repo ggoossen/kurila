@@ -17,13 +17,13 @@ BEGIN { require "./test.pl" }
 
 plan tests => 23;
 
-sub m  { return "m-".shift }
-sub q  { return "q-".shift }
-sub qq { return "qq-".shift }
-sub qr { return "qr-".shift }
-sub qw { return "qw-".shift }
-sub qx { return "qx-".shift }
-sub s  { return "s-".shift }
+sub m(@< @_)  { return "m-".shift @_ }
+sub q(@< @_)  { return "q-".shift @_ }
+sub qq(@< @_) { return "qq-".shift @_ }
+sub qr(@< @_) { return "qr-".shift @_ }
+sub qw(@< @_) { return "qw-".shift @_ }
+sub qx(@< @_) { return "qx-".shift @_ }
+sub s(@< @_)  { return "s-".shift @_ }
 
 # m operator
 can_ok( 'main', "m" );

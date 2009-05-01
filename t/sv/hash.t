@@ -46,8 +46,7 @@ my @keys = get_keys(\%h2);
 ok (Internals::HvREHASH(\%h2), 
     scalar(nelems @keys) . " colliding into the same bucket keys are triggering rehash");
 
-sub get_keys {
-    my $hr = shift;
+sub get_keys(?$hr) {
 
     # the minimum of bits required to mount the attack on a hash
     my $min_bits = log(THRESHOLD)/log(2);
@@ -87,8 +86,7 @@ sub get_keys {
 # trying to provide the fastest equivalent of C macro's PERL_HASH in
 # Perl - the main complication is that it uses U32 integer, which we
 # can't do it perl, without doing some tricks
-sub hash {
-    my $s = shift;
+sub hash(?$s) {
     my @c = split m//, $s;
     my $u = HASH_SEED;
     for ( @c) {

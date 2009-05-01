@@ -19,7 +19,7 @@ This tests the classic diamond inheritence pattern.
 
 do {
     package Diamond_A;
-    sub hello { 'Diamond_A::hello' }
+    sub hello(...) { 'Diamond_A::hello' }
 };
 do {
     package Diamond_B;
@@ -29,7 +29,7 @@ do {
     package Diamond_C;
     use base 'Diamond_A';     
 
-    sub hello { 'Diamond_C::hello' }
+    sub hello(...) { 'Diamond_C::hello' }
 };
 do {
     package Diamond_D;

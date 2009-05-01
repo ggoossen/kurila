@@ -84,8 +84,8 @@ sub cmd_head2($self, $attrs, $text) {
 }
 
 # Fix up B<> and I<>.  Note that we intentionally don't do F<>.
-sub cmd_b { my $self = shift; return "$self->{?BOLD}@_[1]$self->{?NORM}" }
-sub cmd_i { my $self = shift; return "$self->{?UNDL}@_[1]$self->{?NORM}" }
+sub cmd_b(@< @_) { my $self = shift @_; return "$self->{?BOLD}@_[1]$self->{?NORM}" }
+sub cmd_i(@< @_) { my $self = shift @_; return "$self->{?UNDL}@_[1]$self->{?NORM}" }
 
 # Output any included code in bold.
 sub output_code($self, $code) {
@@ -93,9 +93,9 @@ sub output_code($self, $code) {
 }
 
 # Override the wrapping code to igore the special sequences.
-sub wrap {
-    my $self = shift;
-    local $_ = shift;
+sub wrap(@< @_) {
+    my $self = shift @_;
+    local $_ = shift @_;
     my $output = '';
     my $spaces = ' ' x $self->{?MARGIN};
     my $width = $self->{?opt_width} - $self->{?MARGIN};

@@ -4,23 +4,23 @@ use Pod::Simple::PullParserToken ();
 our @ISA = @('Pod::Simple::PullParserToken');
 
 
-sub new {  # Class->new(tagname, optional_attrhash);
-    my $class = shift;
+sub new(@< @_) {  # Class->new(tagname, optional_attrhash);
+    my $class = shift @_;
     return bless \@('start', < @_), ref($class) || $class;
 }
 
 # Purely accessors:
 
-sub tagname   { ((nelems @_) == 2) ??  @(@_[0]->[1] = @_[1]) !! @_[0]->[1] }
-sub tag { shift->tagname(< @_) }
+sub tagname(@< @_)   { ((nelems @_) == 2) ??  @(@_[0]->[1] = @_[1]) !! @_[0]->[1] }
+sub tag(@< @_) { shift @_->tagname(< @_) }
 
-sub is_tagname { @_[0]->[1] eq @_[1] }
-sub is_tag { shift->is_tagname(< @_) }
+sub is_tagname(@< @_) { @_[0]->[1] eq @_[1] }
+sub is_tag(@< @_) { shift @_->is_tagname(< @_) }
 
 
-sub attr_hash { @_[0]->[2] ||= \%() }
+sub attr_hash(@< @_) { @_[0]->[2] ||= \%() }
 
-sub attr      {
+sub attr(@< @_)      {
     if((nelems @_) == 2) {      # Reading: $token->attr('attrname')
         (@_[0]->[2] || return undef)->{?@_[1] };
     } elsif((nelems @_) +> 2) {  # Writing: $token->attr('attrname', 'newval')

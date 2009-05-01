@@ -24,7 +24,7 @@ $var = \2;
 ok( !readonly($var),	'reference to constant');
 ok( readonly($var->$),	'de-reference to constant');
 
-sub tryreadonly
+sub tryreadonly(@< @_)
 {
     my $v = \@_[0];
     return readonly $v->$;

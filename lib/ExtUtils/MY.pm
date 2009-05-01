@@ -10,7 +10,7 @@ do {
     our @ISA = qw(ExtUtils::MY);
 };
 
-sub DESTROY {}
+sub DESTROY(...) {}
 
 
 =head1 NAME

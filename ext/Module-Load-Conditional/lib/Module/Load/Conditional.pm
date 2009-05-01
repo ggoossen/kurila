@@ -143,7 +143,7 @@ true, since C<check_install> had no way to verify clearly.
 ### we are looking for, or if we couldn't find the desired module to begin with
 ### if the installed version is higher or equal to the one we want, it will return
 ### a hashref with he module name and version in it.. so 'true' as well.
-sub check_install {
+sub check_install(@< @_) {
     my %hash = %( < @_ );
 
     my $tmpl = \%(
@@ -286,10 +286,10 @@ sub check_install {
     return $href;
 }
 
-sub _parse_version {
-    my $self    = shift;
-    my $str     = shift or return;
-    my $verbose = shift or 0;
+sub _parse_version(@< @_) {
+    my $self    = shift @_;
+    my $str     = shift @_ or return;
+    my $verbose = shift @_ or 0;
 
     ### skip commented out lines, they won't eval to anything.
     return if $str =~ m/^\s*#/;
@@ -380,7 +380,7 @@ cache, but you can override that by setting C<nocache> to true.
 
 =cut
 
-sub can_load {
+sub can_load(@< @_) {
     my %hash = %( < @_ );
 
     my $tmpl = \%(
@@ -506,8 +506,7 @@ perl and your current install.
 
 =cut
 
-sub requires {
-    my $who = shift;
+sub requires(?$who) {
 
     unless( check_install( module => $who ) ) {
         warn < loc(q[You do not have module '%1' installed], $who) if $VERBOSE;

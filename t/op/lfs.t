@@ -16,21 +16,21 @@ our @s;
 our $fail;
 my $big;
 
-sub zap {
+sub zap(...) {
     close($big);
     unlink("big");
     unlink("big1");
     unlink("big2");
 }
 
-sub bye {
+sub bye(...) {
     zap();	
     exit(0);
 }
 
 my $explained;
 
-sub explain {
+sub explain(@< @_) {
     unless ($explained++) {
         print $^STDOUT, <<EOM;
 #

@@ -16,7 +16,7 @@ my %header = %(
             },
     );
 
-sub footer {
+sub footer(@< @_) {
     form \%( page => \%(width=>@_[0]->{page}->{?width}) ),
       "\n\{|\{*\}|\}",
       "(page @_[0]->{page}->{?number})"

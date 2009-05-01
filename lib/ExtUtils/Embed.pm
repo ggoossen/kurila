@@ -31,10 +31,9 @@ $VERSION = '1.26_01';
 $Verbose = 0;
 $lib_ext = config_value("lib_ext") || '.a';
 
-sub is_cmd { $^PROGRAM_NAME eq '-e' }
+sub is_cmd(...) { $^PROGRAM_NAME eq '-e' }
 
-sub my_return {
-    my $val = shift;
+sub my_return(?$val) {
     if(is_cmd) {
         print $^STDOUT, $val;
     }
@@ -43,7 +42,7 @@ sub my_return {
     }
 }
 
-sub xsinit { 
+sub xsinit(@< @_) { 
     my@($file, $std, $mods) =  @_;
     my($fh,@mods,%seen);
     $file ||= "perlxsi.c";
@@ -80,7 +79,7 @@ sub xsinit {
 
 }
 
-sub xsi_header {
+sub xsi_header(...) {
     return <<EOF;
 #include <EXTERN.h>
 #include <perl.h>
@@ -128,7 +127,7 @@ sub xsi_body(@exts) {
     return join '', @retval;
 }
 
-sub static_ext {
+sub static_ext(...) {
     unless (scalar nelems @Extensions) {
         my $static_ext = config_value("static_ext");
         $static_ext =~ s/^\s+//;
@@ -138,30 +137,29 @@ sub static_ext {
     @Extensions;
 }
 
-sub _escape {
-    my $arg = shift;
+sub _escape(?$arg) {
     $arg->$ =~ s/([\(\)])/\\$1/g;
 }
 
-sub _ldflags {
+sub _ldflags(...) {
     my $ldflags = config_value("ldflags");
     _escape(\$ldflags);
     return $ldflags;
 }
 
-sub _ccflags {
+sub _ccflags(...) {
     my $ccflags = config_value("ccflags");
     _escape(\$ccflags);
     return $ccflags;
 }
 
-sub _ccdlflags {
+sub _ccdlflags(...) {
     my $ccdlflags = config_value("ccdlflags");
     _escape(\$ccdlflags);
     return $ccdlflags;
 }
 
-sub ldopts {
+sub ldopts(@< @_) {
     require ExtUtils::MakeMaker;
     require ExtUtils::Liblist;
     my @(?$std,?$mods,?$link_args,?$path) =  @_;
@@ -247,23 +245,23 @@ sub ldopts {
     my_return("$linkage\n");
 }
 
-sub ccflags {
+sub ccflags(...) {
     my $ccflags = _ccflags();
     my_return(" $ccflags ");
 }
 
-sub ccdlflags {
+sub ccdlflags(...) {
     my $ccdlflags = _ccdlflags();
     my_return(" $ccdlflags ");
 }
 
-sub perl_inc {
+sub perl_inc(...) {
     my $dir = File::Spec->catdir(config_value("archlibexp"), 'CORE');
     $dir = qq["$dir"] if $^OS_NAME eq 'MSWin32';
     my_return(" -I$dir ");
 }
 
-sub ccopts {
+sub ccopts(...) {
     ccflags . perl_inc;
 }
 

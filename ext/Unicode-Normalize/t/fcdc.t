@@ -16,9 +16,9 @@ BEGIN { plan tests => 70 };
 use Unicode::Normalize < qw(:all);
 ok(1); # If we made it this far, we're ok.
 
-sub _pack_U { Unicode::Normalize::pack_U(< @_) }
-sub hexU { _pack_U < map { hex }, split ' ', shift }
-sub answer { defined @_[0] ?? @_[0] ?? "YES" !! "NO" !! "MAYBE" }
+sub _pack_U(@< @_) { Unicode::Normalize::pack_U(< @_) }
+sub hexU(@< @_) { _pack_U < map { hex }, split ' ', shift @_ }
+sub answer(@< @_) { defined @_[0] ?? @_[0] ?? "YES" !! "NO" !! "MAYBE" }
 
 #########################
 

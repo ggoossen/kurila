@@ -28,15 +28,13 @@ use Cwd < qw( cwd );
 );
 #==========================================================================
 
-sub new {
-    my $class = shift;
+sub new(?$class) {
     my $self = bless \%(), ref($class) || $class;
     $self->init;
     return $self;
 }
 
-sub init {
-    my $self = shift;
+sub init($self) {
     $self->inc(1);
     $self->verbose( DEBUG);
     return $self;
@@ -119,7 +117,7 @@ sub survey($self, @< @search_dirs) {
 
 
 #==========================================================================
-sub _make_search_callback {
+sub _make_search_callback(@< @_) {
     my $self = @_[0];
 
     # Put the options in variables, for easy access
@@ -280,7 +278,7 @@ sub _path2modname($self, $file, $shortname, $modname_bits) {
 
 #==========================================================================
 
-sub _recurse_dir {
+sub _recurse_dir(@< @_) {
     my@($self, $startdir, $callback, $modname_bits) =  @_;
 
     my $maxdepth = $self->{?'fs_recursion_maxdepth'} || 10;
@@ -430,7 +428,7 @@ sub simplify_name($self, $str) {
 
 #==========================================================================
 
-sub _simplify_base {   # Internal method only
+sub _simplify_base(@< @_) {   # Internal method only
 
     # strip Perl's own extensions
     @_[1] =~ s/\.(pod|pm|plx?)\z//i;
@@ -481,7 +479,7 @@ sub _mac_whammy(_,@< @them) { # Tolerate '.', './some_dir' and '(../)+some_dir' 
 
 #==========================================================================
 
-sub _limit_glob_to_limit_re {
+sub _limit_glob_to_limit_re(@< @_) {
     my $self = @_[0];
     my $limit_glob = $self->{?'limit_glob'} || return;
 
@@ -607,8 +605,8 @@ sub contains_pod($self, $file) {
 
 #==========================================================================
 
-sub _accessorize {  # A simple-minded method-maker
-    shift;
+sub _accessorize(@< @_) {  # A simple-minded method-maker
+    shift @_;
     foreach my $attrname ( @_) {
         Symbol::fetch_glob(caller() . '::' . $attrname)->* = sub {
 
@@ -629,7 +627,7 @@ sub _accessorize {  # A simple-minded method-maker
 }
 
 #==========================================================================
-sub _state_as_string {
+sub _state_as_string(@< @_) {
     my $self = @_[0];
     return '' unless ref $self;
     my @out = @( "\{\n  # State of $(dump::view($self)) ...\n" );

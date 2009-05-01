@@ -67,7 +67,7 @@ do {
 
         package Test::F; use mro 'c3';
     use base < qw/Test::E/;
-    sub testmeth { "wrong" }
+    sub testmeth(...) { "wrong" }
 
     package Test::G; use mro 'c3';
     use base < qw/Test::D/;
@@ -77,14 +77,14 @@ do {
 
         package Test::I; use mro 'c3';
     use base < qw/Test::H Test::F/;
-    sub testmeth { "right" }
+    sub testmeth(...) { "right" }
 
     package Test::J; use mro 'c3';
     use base < qw/Test::F/;
 
         package Test::K; use mro 'c3';
     use base < qw/Test::J Test::I/;
-    sub testmeth { shift->SUPER::testmeth() }
+    sub testmeth(@< @_) { shift @_->SUPER::testmeth() }
 };
 
 ok(eq_array(

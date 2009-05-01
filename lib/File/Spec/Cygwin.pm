@@ -49,13 +49,13 @@ sub canonpath($self,?$path) {
     return $node . $self->SUPER::canonpath($path);
 }
 
-sub catdir {
-    my $self = shift;
+sub catdir(@< @_) {
+    my $self = shift @_;
     return '' unless (nelems @_);
 
     # Don't create something that looks like a //network/path
     if (@_[0] and (@_[0] eq '/' or @_[0] eq '\')) {
-        shift;
+        shift @_;
         return $self->SUPER::catdir('', < @_);
     }
 
@@ -94,7 +94,7 @@ variables are tainted, they are not used.
 =cut
 
 my $tmpdir;
-sub tmpdir {
+sub tmpdir(@< @_) {
     return $tmpdir if defined $tmpdir;
     $tmpdir = @_[0]->_tmpdir( env::var('TMPDIR'), "/tmp", env::var('TMP'), env::var('TEMP'), 'C:/temp' );
 }

@@ -28,11 +28,11 @@ WriteMakefile(
 
 use Config;
 
-sub post_constants {
+sub post_constants(...) {
     "\nLIBS = $(config_value('libs'))\n"
 }
 
-sub headerpath {
+sub headerpath(...) {
     if ($core) {
         return File::Spec->catdir( File::Spec->updir,
             File::Spec->updir);
@@ -41,10 +41,10 @@ sub headerpath {
     }
 }
 
-sub MY::postamble {
+sub MY::postamble(@< @_) {
     my $headerpath = headerpath();
     my @headers = map { File::Spec->catfile($headerpath, $_) }, qw(op.h cop.h);
-    my $noecho = shift->{?NOECHO};
+    my $noecho = shift @_->{?NOECHO};
 
     "
 B\$(OBJ_EXT) : defsubs.h
@@ -54,8 +54,8 @@ defsubs.h :: $(join ' ',@headers) defsubs_h.PL
 "
 }
 
-sub MY::processPL {
-    my $text = shift->SUPER::processPL(< @_);
+sub MY::processPL(@< @_) {
+    my $text = shift @_->SUPER::processPL(< @_);
     # Append our extra parameter
     $text =~ s/^(\t.*defsubs_h\.PL.*)/$1 $(headerpath())/m;
     $text;

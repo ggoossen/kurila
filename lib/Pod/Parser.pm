@@ -431,9 +431,9 @@ subclasses returns a blessed reference to the initialized object (hash-table).
 
 =cut
 
-sub new {
+sub new(@< @_) {
     ## Determine if we were called via an object-ref or a classname
-    my $this = shift;
+    my $this = shift @_;
     my $class = ref($this) || $this;
     ## Any remaining arguments are treated as initial values for the
     ## hash that is used to represent this object.
@@ -458,7 +458,7 @@ method then they I<must> be sure to invoke C<$self-E<gt>SUPER::initialize()>.
 
 =cut
 
-sub initialize {
+sub initialize(...) {
 #my $self = shift;
 #return;
 }
@@ -475,7 +475,7 @@ this method to perform any per-document initialization.
 
 =cut
 
-sub begin_pod {
+sub begin_pod(...) {
 #my $self = shift;
 #return;
 }
@@ -498,7 +498,7 @@ initializations once per document, then you should use B<begin_pod()>.
 
 =cut
 
-sub begin_input {
+sub begin_input(...) {
 #my $self = shift;
 #return;
 }
@@ -521,7 +521,7 @@ cleanup actions once per document, then you should use B<end_pod()>.
 
 =cut
 
-sub end_input {
+sub end_input(...) {
 #my $self = shift;
 #return;
 }
@@ -538,7 +538,7 @@ to perform any per-document finalization.
 
 =cut
 
-sub end_pod {
+sub end_pod(...) {
 #my $self = shift;
 #return;
 }
@@ -719,18 +719,18 @@ is a reference to the parse-tree object.
 
 =cut
 
-sub parse_text {
-    my $self = shift;
+sub parse_text(@< @_) {
+    my $self = shift @_;
     local $_ = '';
 
     ## Get options and set any defaults
-    my %opts = %( (ref @_[0]) ?? <  shift()->% !! () );
+    my %opts = %( (ref @_[0]) ?? <  shift( @_)->% !! () );
     my $expand_seq   = %opts{?'expand_seq'}   || undef;
     my $expand_text  = %opts{?'expand_text'}  || undef;
     my $expand_ptree = %opts{?'expand_ptree'} || undef;
 
-    my $text = shift;
-    my $line = shift;
+    my $text = shift @_;
+    my $line = shift @_;
     my $file = $self->input_file();
     my $cmd  = "";
 
@@ -748,9 +748,9 @@ sub parse_text {
                 return  $self->interior_sequence( $iseq->name, $args, $iseq);
             };
     }
-    ref $xseq_sub    or  $xseq_sub   = sub { shift()->?$expand_seq(< @_) };
-    ref $xtext_sub   or  $xtext_sub  = sub { shift()->?$expand_text(< @_) };
-    ref $xptree_sub  or  $xptree_sub = sub { shift()->?$expand_ptree(< @_) };
+    ref $xseq_sub    or  $xseq_sub   = sub { shift( @_)->?$expand_seq(< @_) };
+    ref $xtext_sub   or  $xtext_sub  = sub { shift( @_)->?$expand_text(< @_) };
+    ref $xptree_sub  or  $xptree_sub = sub { shift( @_)->?$expand_ptree(< @_) };
 
     ## Keep track of the "current" interior sequence, and maintain a stack
     ## of "in progress" sequences.
@@ -1022,9 +1022,9 @@ This method does I<not> usually need to be overridden by subclasses.
 
 =cut
 
-sub parse_from_filehandle {
-    my $self = shift;
-    my %opts = %( (ref @_[0] eq 'HASH') ?? <  shift()->% !! () );
+sub parse_from_filehandle(@< @_) {
+    my $self = shift @_;
+    my %opts = %( (ref @_[0] eq 'HASH') ?? <  shift( @_)->% !! () );
     my @($in_fh, ?$out_fh) =  @_;
     $in_fh = $^STDIN  unless ($in_fh);
     my %myOpts = $self->%{+_PARSEOPTS} || %();  ## get parse-options
@@ -1133,9 +1133,9 @@ This method does I<not> usually need to be overridden by subclasses.
 
 =cut
 
-sub parse_from_file {
-    my $self = shift;
-    my %opts = %( (ref @_[0] eq 'HASH') ?? <  shift()->% !! () );
+sub parse_from_file(@< @_) {
+    my $self = shift @_;
+    my %opts = %( (ref @_[0] eq 'HASH') ?? <  shift( @_)->% !! () );
     my @($infile, ?$outfile) =  @_;
     my ($in_fh,  $out_fh);
     my @($close_input, $close_output) = @(0, 0);
@@ -1265,7 +1265,7 @@ is used to issue error messages (this is the default behavior).
 
 =cut
 
-sub errorsub {
+sub errorsub(@< @_) {
     return ((nelems @_) +> 1) ??  @(@_[0]->{+_ERRORSUB} = @_[1]) !! @_[0]->{?_ERRORSUB};
 }
 
@@ -1286,7 +1286,7 @@ result.
 
 =cut
 
-sub cutting {
+sub cutting(@< @_) {
     return ((nelems @_) +> 1) ??  @(@_[0]->{+_CUTTING} = @_[1]) !! @_[0]->{?_CUTTING};
 }
 
@@ -1330,12 +1330,12 @@ parse-option currently recognized.
 
 =cut
 
-sub parseopts {
-    my $self = shift;
+sub parseopts(@< @_) {
+    my $self = shift @_;
     my %myOpts = $self->%{+_PARSEOPTS} || %();
     return %myOpts  if ((nelems @_) == 0);
     if ((nelems @_) == 1) {
-        my $_ = shift;
+        my $_ = shift @_;
         return  ref($_)  ??  ($self->%{+_PARSEOPTS} = $_)  !!  %myOpts{?$_};
     }
     $self->%{+_PARSEOPTS} = %myOpts +%+ %:< @_;
@@ -1351,7 +1351,7 @@ Returns the name of the output file being written.
 
 =cut
 
-sub output_file {
+sub output_file(@< @_) {
     return @_[0]->{?_OUTFILE};
 }
 
@@ -1365,7 +1365,7 @@ Returns the output filehandle object.
 
 =cut
 
-sub output_handle {
+sub output_handle(@< @_) {
     return @_[0]->{?_OUTPUT};
 }
 
@@ -1379,7 +1379,7 @@ Returns the name of the input file being read.
 
 =cut
 
-sub input_file {
+sub input_file(@< @_) {
     return @_[0]->{?_INFILE};
 }
 
@@ -1393,7 +1393,7 @@ Returns the current input filehandle object.
 
 =cut
 
-sub input_handle {
+sub input_handle(@< @_) {
     return @_[0]->{?_INPUT};
 }
 
@@ -1428,7 +1428,7 @@ being processed.
 
 =cut
 
-sub input_streams {
+sub input_streams(@< @_) {
     return @_[0]->{?_INPUT_STREAMS};
 }
 
@@ -1452,7 +1452,7 @@ to obtain the name and line number of the current input file.
 
 =cut
 
-sub top_stream {
+sub top_stream(@< @_) {
     return @_[0]->{?_TOP_STREAM} || undef;
 }
 

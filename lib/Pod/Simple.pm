@@ -100,18 +100,18 @@ __PACKAGE__->_accessorize(
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub any_errata_seen {  # good for using as an exit() value...
-  return shift->{?'errors_seen'} || 0;
+sub any_errata_seen(@< @_) {  # good for using as an exit() value...
+  return shift @_->{?'errors_seen'} || 0;
 }
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # Pull in some functions that, for some reason, I expect to see here too:
-sub pretty { Pod::Simple::BlackBox::pretty(< @_) }
-sub stringify_lol { Pod::Simple::BlackBox::stringify_lol(< @_); }
+sub pretty(@< @_) { Pod::Simple::BlackBox::pretty(< @_) }
+sub stringify_lol(@< @_) { Pod::Simple::BlackBox::stringify_lol(< @_); }
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub version_report {
+sub version_report(@< @_) {
   my $class = ref(@_[0]) || @_[0];
   if($class eq __PACKAGE__) {
     return "$class $VERSION";
@@ -129,10 +129,10 @@ sub version_report {
 #sub _curr_open_listref { $_[0]{'curr_open'} ||= [] }
 
 
-sub output_string {
+sub output_string(@< @_) {
   # Works by faking out output_fh.  Simplifies our code.
   #
-  my $this = shift;
+  my $this = shift @_;
   return $this->{?'output_string'} unless (nelems @_);  # GET.
   
   my $x = (defined(@_[0]) and ref(@_[0])) ?? @_[0] !! \( @_[0] );
@@ -143,15 +143,15 @@ sub output_string {
   return ($this->{+'output_string'} = @_[0]);
 }
 
-sub abandon_output_string { @_[0]->abandon_output_fh; delete @_[0]->{'output_string'} }
-sub abandon_output_fh     { @_[0]->output_fh(undef) }
+sub abandon_output_string(@< @_) { @_[0]->abandon_output_fh; delete @_[0]->{'output_string'} }
+sub abandon_output_fh(@< @_)     { @_[0]->output_fh(undef) }
 # These don't delete the string or close the FH -- they just delete our
 #  references to it/them.
 # TODO: document these
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub new {
+sub new(@< @_) {
   # takes no parameters
   my $class = ref(@_[0]) || @_[0];
   #Carp::croak(__PACKAGE__ . " is a virtual base class -- see perldoc "
@@ -185,11 +185,11 @@ sub _handle_text($self, $text)          {
 #
 # And now directives (not targets)
 
-sub accept_directive_as_verbatim  { shift->_accept_directives('Verbatim', < @_) }
-sub accept_directive_as_data      { shift->_accept_directives('Data',     < @_) }
-sub accept_directive_as_processed { shift->_accept_directives('Plain',    < @_) }
+sub accept_directive_as_verbatim(@< @_)  { shift @_->_accept_directives('Verbatim', < @_) }
+sub accept_directive_as_data(@< @_)      { shift @_->_accept_directives('Data',     < @_) }
+sub accept_directive_as_processed(@< @_) { shift @_->_accept_directives('Plain',    < @_) }
 
-sub _accept_directives {
+sub _accept_directives(@< @_) {
   my@($this, $type) =@( splice @_,0,2);
   foreach my $d ( @_) {
     next unless defined $d and length $d;
@@ -209,10 +209,10 @@ sub _accept_directives {
 #--------------------------------------------------------------------------
 # TODO: document these:
 
-sub unaccept_directive { shift->unaccept_directives(< @_) };
+sub unaccept_directive(@< @_) { shift @_->unaccept_directives(< @_) };
 
-sub unaccept_directives {
-  my $this = shift;
+sub unaccept_directives(@< @_) {
+  my $this = shift @_;
   foreach my $d ( @_) {
     next unless defined $d and length $d;
     die "\"$d\" isn't a valid directive name"
@@ -229,16 +229,16 @@ sub unaccept_directives {
 #
 # And now targets (not directives)
 
-sub accept_target         { shift->accept_targets(< @_)         } # alias
-sub accept_target_as_text { shift->accept_targets_as_text(< @_) } # alias
+sub accept_target(@< @_)         { shift @_->accept_targets(< @_)         } # alias
+sub accept_target_as_text(@< @_) { shift @_->accept_targets_as_text(< @_) } # alias
 
 
-sub accept_targets         { shift->_accept_targets('1', < @_) }
+sub accept_targets(@< @_)         { shift @_->_accept_targets('1', < @_) }
 
-sub accept_targets_as_text { shift->_accept_targets('force_resolve', < @_) }
+sub accept_targets_as_text(@< @_) { shift @_->_accept_targets('force_resolve', < @_) }
  # forces them to be processed, even when there's no ":".
 
-sub _accept_targets {
+sub _accept_targets(@< @_) {
   my@($this, $type) =@( splice @_,0,2);
   foreach my $t ( @_) {
     next unless defined $t and length $t;
@@ -250,10 +250,10 @@ sub _accept_targets {
 }
 
 #--------------------------------------------------------------------------
-sub unaccept_target         { shift->unaccept_targets(< @_) }
+sub unaccept_target(@< @_)         { shift @_->unaccept_targets(< @_) }
 
-sub unaccept_targets {
-  my $this = shift;
+sub unaccept_targets(@< @_) {
+  my $this = shift @_;
   foreach my $t ( @_) {
     next unless defined $t and length $t;
     # TODO: enforce some limitations on what a target name can be?
@@ -267,10 +267,10 @@ sub unaccept_targets {
 #
 # And now codes (not targets or directives)
 
-sub accept_code { shift->accept_codes(< @_) } # alias
+sub accept_code(@< @_) { shift @_->accept_codes(< @_) } # alias
 
-sub accept_codes {  # Add some codes
-  my $this = shift;
+sub accept_codes(@< @_) {  # Add some codes
+  my $this = shift @_;
   
   foreach my $new_code ( @_) {
     next unless defined $new_code and length $new_code;
@@ -302,10 +302,10 @@ sub accept_codes {  # Add some codes
 }
 
 #--------------------------------------------------------------------------
-sub unaccept_code { shift->unaccept_codes(< @_) }
+sub unaccept_code(@< @_) { shift @_->unaccept_codes(< @_) }
 
-sub unaccept_codes { # remove some codes
-  my $this = shift;
+sub unaccept_codes(@< @_) { # remove some codes
+  my $this = shift @_;
   
   foreach my $new_code ( @_) {
     next unless defined $new_code and length $new_code;
@@ -336,8 +336,8 @@ sub unaccept_codes { # remove some codes
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub parse_string_document {
-  my $self = shift;
+sub parse_string_document(@< @_) {
+  my $self = shift @_;
   my @lines;
   foreach my $line_group ( @_) {
     next unless defined $line_group and length $line_group;
@@ -366,7 +366,7 @@ sub _init_fh_source($self, $source) {
 #:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
 #
 
-sub parse_file {
+sub parse_file(@< @_) {
   my@($self, $source) = @(< @_);
 
   if(!defined $source) {
@@ -442,7 +442,7 @@ sub parse_from_file($self, ?$source, ?$to) {
 
 #-----------------------------------------------------------------------------
 
-sub whine {
+sub whine(@< @_) {
   #my($self,$line,$complaint) = @_;
   my $self = shift(@_);
   ++$self->{+'errors_seen'};
@@ -454,7 +454,7 @@ sub whine {
   return $self->_complain_errata(< @_);
 }
 
-sub scream {    # like whine, but not suppressable
+sub scream(@< @_) {    # like whine, but not suppressable
   #my($self,$line,$complaint) = @_;
   my $self = shift(@_);
   ++$self->{+'errors_seen'};
@@ -532,8 +532,8 @@ sub _get_item_type($self, $para) {
 
 #-----------------------------------------------------------------------------
 
-sub _make_treelet {
-  my $self = shift;  # and ($para, $start_line)
+sub _make_treelet(@< @_) {
+  my $self = shift @_;  # and ($para, $start_line)
   my $treelet;
   if(!nelems @_) {
     return \@('');
@@ -630,7 +630,7 @@ sub _wrap_up($self, @< @stack) {
 
 #:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
 
-sub _remap_sequences {
+sub _remap_sequences(@< @_) {
   my@($self,@< @stack) =  @_;
   
   if((nelems @stack) == 1 and (nelems @stack[0]->@) == 3 and !ref @stack[0]->[2]) {
@@ -1353,7 +1353,7 @@ sub _change_S_to_nbsp($treelet, $in_s) {
 
 #-----------------------------------------------------------------------------
 
-sub _accessorize {  # A simple-minded method-maker
+sub _accessorize(@< @_) {  # A simple-minded method-maker
   foreach my $attrname ( @_) {
     next if $attrname =~ m/::/; # a hack
     Symbol::fetch_glob(caller() . '::' . $attrname)->* = sub {
@@ -1390,7 +1390,7 @@ sub filter($class, $source) {
 
 #-----------------------------------------------------------------------------
 
-sub _out {
+sub _out(@< @_) {
   # For use in testing: Class->_out($source)
   #  returns the transformation of $source
   
@@ -1417,7 +1417,7 @@ sub _out {
 }
 
 
-sub _duo {
+sub _duo(@< @_) {
   # For use in testing: Class->_duo($source1, $source2)
   #  returns the parse trees of $source1 and $source2.
   # Good in things like: &ok( Class->duo(... , ...) );

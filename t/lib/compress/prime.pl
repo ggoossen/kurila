@@ -17,7 +17,7 @@ BEGIN {
 
 }
 
-sub run
+sub run(...)
 {
 
     my $CompressClass   = identify();

@@ -24,14 +24,14 @@ $posstr = '123456';
 $cstr = 'aBcD.eF';
 pos($posstr = 3);
 $nn = $n = 2;
-sub subb {"in s"}
+sub subb(...) {"in s"}
 
 @INPUT = @( ~< $^DATA );
 @simple_input = grep { m/^\s*\w+\s*\$\w+\s*[#\n]/ }, @INPUT;
 
 plan 6 + (nelems @INPUT) + nelems @simple_input;
 
-sub wrn {"$(join ' ',@_)"}
+sub wrn(@< @_) {"$(join ' ',@_)"}
 
 # Check correct optimization of ucfirst etc
 my $a = "AB";
@@ -40,7 +40,7 @@ ok $b eq 'Ab';
 
 # Check correct destruction of objects:
 my $dc = 0;
-sub A::DESTROY {$dc += 1}
+sub A::DESTROY(...) {$dc += 1}
 $a=8;
 my $b;
 do { my $c = 6; $b = bless \$c, "A"};

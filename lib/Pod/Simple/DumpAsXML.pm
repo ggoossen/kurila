@@ -10,8 +10,8 @@ use Carp ();
 
 BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
 
-sub new {
-    my $self = shift;
+sub new(@< @_) {
+    my $self = shift @_;
     my $new = $self->SUPER::new(< @_);
     $new->{+'output_fh'} ||= $^STDOUT;
     $new->accept_codes('VerbatimFormatted');
@@ -20,7 +20,7 @@ sub new {
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub _handle_element_start {
+sub _handle_element_start(@< @_) {
     # ($self, $element_name, $attr_hash_r)
     my $fh = @_[0]->{?'output_fh'};
     DEBUG and print $^STDOUT, "++ @_[1]\n";
@@ -45,7 +45,7 @@ sub _handle_element_start {
     return;
 }
 
-sub _handle_text {
+sub _handle_text(@< @_) {
     DEBUG and print $^STDOUT, "== \"@_[1]\"\n";
     if(length @_[1]) {
         my $indent = '  ' x @_[0]->{?'indent'};
@@ -65,7 +65,7 @@ sub _handle_text {
     return;
 }
 
-sub _handle_element_end {
+sub _handle_element_end(@< @_) {
     DEBUG and print $^STDOUT, "-- @_[1]\n";
     print @_[0]->{?'output_fh'}
         ,'  ' x --@_[0]->{+'indent'}, "</", @_[1], ">\n";
@@ -74,7 +74,7 @@ sub _handle_element_end {
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-sub _xml_escape {
+sub _xml_escape(@< @_) {
     foreach my $x ( @_) {
         # Escape things very cautiously:
         $x =~ s/([^-\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/$('&#'.(ord($1)).';')/g;

@@ -12,19 +12,19 @@ BEGIN {
 our $VERSION = '1.07';
 
 # toggle utf8/codepoints hints
-sub import {
+sub import(...) {
     $^HINT_BITS ^|^= $utf8::hint_bits;
     $^HINT_BITS ^|^= $utf8::codepoints_hint_bits;
     $^HINT_BITS ^&^= ^~^$bytes::hint_bits;
 }
 
-sub unimport {
+sub unimport(...) {
     $^HINT_BITS ^&^= ^~^$utf8::hint_bits;
     $^HINT_BITS ^&^= ^~^$utf8::codepoints_hint_bits;
 }
 
 # SWASHNEW
-sub SWASHNEW {
+sub SWASHNEW(@< @_) {
     require "utf8_heavy.pl";
     return utf8::SWASHNEW_real(< @_);
 }
@@ -36,7 +36,7 @@ sub length($s) {
     return CORE::length($s);
 }
 
-sub substr {
+sub substr(@< @_) {
     BEGIN { utf8::import() }
     return
         (nelems @_) == 2 ?? CORE::substr(@_[0], @_[1]) !!
@@ -54,14 +54,14 @@ sub chr ($s) {
     return CORE::chr($s);
 }
 
-sub index {
+sub index(@< @_) {
     BEGIN { utf8::import() }
     return
         (nelems @_) == 2 ?? CORE::index(@_[0], @_[1]) !!
         CORE::index(@_[0], @_[1], @_[2]) ;
 }
 
-sub rindex {
+sub rindex(@< @_) {
     BEGIN { utf8::import() }
     return
         (nelems @_) == 2 ?? CORE::rindex(@_[0], @_[1]) !!

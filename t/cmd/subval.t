@@ -1,32 +1,32 @@
 #!./perl
 
-sub foo1 {
+sub foo1(@< @_) {
     'true1';
     if (@_[0]) { 'true2'; }
 }
 
-sub foo2 {
+sub foo2(@< @_) {
     'true1';
     if (@_[0]) { return 'true2'; } else { return 'true3'; }
     'true0';
 }
 
-sub foo3 {
+sub foo3(@< @_) {
     'true1';
     unless (@_[0]) { 'true2'; }
 }
 
-sub foo4 {
+sub foo4(@< @_) {
     'true1';
     unless (@_[0]) { 'true2'; } else { 'true3'; }
 }
 
-sub foo5 {
+sub foo5(@< @_) {
     'true1';
     'true2' if @_[0];
 }
 
-sub foo6 {
+sub foo6(@< @_) {
     'true1';
     'true2' unless @_[0];
 }
@@ -79,14 +79,14 @@ for my $i (1..10) {
     }
 }
 
-sub ary1 {
+sub ary1(...) {
     return @(1,2,3);
 }
 
 print $^STDOUT, "ok 23\n";
 print $^STDOUT, join(':',&ary1( < @_ )) eq '1:2:3' ?? "ok 24\n" !! "not ok 24\n";
 
-sub ary2 {
+sub ary2(...) {
     do {
         return  @(1,2,3);
         (3,2,1);
@@ -110,7 +110,7 @@ sub somesub($num,$P,$F,$L) {
 &main::somesub(28, 'foo', __FILE__, __LINE__);
 
 
-sub autov { @_[0] = 23 };
+sub autov(@< @_) { @_[0] = 23 };
 
 my $href = \%();
 print $^STDOUT, nkeys $href->% ?? 'not ' !! '', "ok 29\n";

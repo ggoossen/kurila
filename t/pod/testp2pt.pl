@@ -48,9 +48,9 @@ my @PODINCDIRS = @(catfile($INSTDIR, 'lib', 'Pod'),
     );
 
 ## Find the path to the file to =include
-sub findinclude {
-    my $self    = shift;
-    my $incname = shift;
+sub findinclude(@< @_) {
+    my $self    = shift @_;
+    my $incname = shift @_;
 
     ## See if its already found w/out any "searching;
     return  $incname if (-r $incname);
@@ -70,8 +70,8 @@ sub findinclude {
     return "";
 }
 
-sub command {
-    my $self = shift;
+sub command(@< @_) {
+    my $self = shift @_;
     my @($cmd, $text, $line_num, $pod_para)  =  @_;
     $cmd     = ''  unless (defined $cmd);
     local $_ = $text || '';
@@ -94,7 +94,7 @@ sub command {
     print $out_fh, "###### end =include $incbase #####\n"    if ($incdebug);
 }
 
-sub begin_input {
+sub begin_input(@< @_) {
     @_[0]->{+_INFILE} = VMS::Filespec::unixify(@_[0]->{?_INFILE}) if $^OS_NAME eq 'VMS';
 }
 
@@ -130,8 +130,8 @@ sub testpodinc2plaintext( %< %args ) {
     return  $different;
 }
 
-sub testpodplaintext {
-    my %opts = %( (ref @_[0] eq 'HASH') ?? < shift()->% !! () );
+sub testpodplaintext(@< @_) {
+    my %opts = %( (ref @_[0] eq 'HASH') ?? < shift( @_)->% !! () );
     my @testpods = @_;
     my @($testname, $testdir) = @("", "");
     my $cmpfile = "";

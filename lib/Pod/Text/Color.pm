@@ -47,9 +47,9 @@ sub cmd_head2($self, $attrs, $text) {
 }
 
 # Fix the various formatting codes.
-sub cmd_b { return colored (@_[2], 'bold')   }
-sub cmd_f { return colored (@_[2], 'cyan')   }
-sub cmd_i { return colored (@_[2], 'yellow') }
+sub cmd_b(@< @_) { return colored (@_[2], 'bold')   }
+sub cmd_f(@< @_) { return colored (@_[2], 'cyan')   }
+sub cmd_i(@< @_) { return colored (@_[2], 'yellow') }
 
 # Output any included code in green.
 sub output_code($self, $code) {
@@ -59,9 +59,9 @@ sub output_code($self, $code) {
 
 # We unfortunately have to override the wrapping code here, since the normal
 # wrapping code gets really confused by all the escape sequences.
-sub wrap {
-    my $self = shift;
-    local $_ = shift;
+sub wrap(@< @_) {
+    my $self = shift @_;
+    local $_ = shift @_;
     my $output = '';
     my $spaces = ' ' x $self->%{?MARGIN};
     my $width = $self->%{?opt_width} - $self->%{?MARGIN};

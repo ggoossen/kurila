@@ -27,7 +27,7 @@ foreach my $class (@(
     }
 }
 
-sub _blorp { return; } # just to avoid any "empty class" warning
+sub _blorp(...) { return; } # just to avoid any "empty class" warning
 
 1;
 __END__

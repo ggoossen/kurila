@@ -93,8 +93,8 @@ sub ConfigDefaults() {
 }
 
 # Override import.
-sub import {
-    my $pkg = shift;		# package
+sub import(@< @_) {
+    my $pkg = shift @_;		# package
     my @syms = @( () );		# symbols to import
     my @config = @( () );		# configuration
     my $dest = \@syms;		# symbols first
@@ -130,8 +130,8 @@ ConfigDefaults();
 # just been called, what we get from Configure is the default.
 my $default_config = &Getopt::Long::Configure ();
 
-sub new {
-    my $that = shift;
+sub new(@< @_) {
+    my $that = shift @_;
     my $class = ref($that) || $that;
     my %atts = %( < @_ );
 
@@ -159,8 +159,8 @@ sub new {
     $self;
 }
 
-sub configure {
-    my @($self) =@( shift);
+sub configure(@< @_) {
+    my @($self) =@( shift @_);
 
     # Restore settings, merge new settings in.
     my $save = Getopt::Long::Configure ($self->{?settings}, < @_);
@@ -169,8 +169,8 @@ sub configure {
     $self->{+settings} = Getopt::Long::Configure ($save);
 }
 
-sub getoptions {
-    my @($self) =@( shift);
+sub getoptions(@< @_) {
+    my @($self) =@( shift @_);
 
     # Restore config settings.
     my $save = Getopt::Long::Configure ($self->{?settings});
@@ -1425,9 +1425,9 @@ sub setup_pa_args($tag, @args) {
 }
 
 # Sneak way to know what version the user requested.
-sub VERSION {
+sub VERSION(@< @_) {
     $requested_version = @_[?1];
-    shift->SUPER::VERSION(< @_);
+    shift @_->SUPER::VERSION(< @_);
 }
 
 package Getopt::Long::CallBack;
@@ -1436,8 +1436,7 @@ sub new($pkg, %< %atts) {
     bless \%( < %atts ), $pkg;
 }
 
-sub name {
-    my $self = shift;
+sub name($self) {
     ''.$self->{?name};
 }
 

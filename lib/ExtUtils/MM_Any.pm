@@ -99,8 +99,8 @@ This is useful for code like:
 
 =cut
 
-sub os_flavor_is {
-    my $self = shift;
+sub os_flavor_is(@< @_) {
+    my $self = shift @_;
     my %flavors = %( < @+: map { @($_ => 1) }, $self->os_flavor );
     return (grep { %flavors{?$_} }, @_) ?? 1 !! 0;
 }
@@ -224,8 +224,8 @@ arguments.  In most cases this is simply something like:
 
 =cut
 
-sub wraplist {
-    my $self = shift;
+sub wraplist(@< @_) {
+    my $self = shift @_;
     return join " \\\n\t", @_;
 }
 
@@ -245,7 +245,7 @@ MakeMaker.
 
 =cut
 
-sub maketext_filter { return @_[1] }
+sub maketext_filter(@< @_) { return @_[1] }
 
 
 =head3 cd  I<Abstract>
@@ -346,8 +346,7 @@ to do some normalization on the information from %Config or the user.
 
 =cut
 
-sub make {
-    my $self = shift;
+sub make($self) {
 
     my $make = lc $self->{?MAKE};
 
@@ -372,8 +371,7 @@ Generate the default target 'all'.
 
 =cut
 
-sub all_target {
-    my $self = shift;
+sub all_target($self) {
 
     return <<'MAKE_EXT';
 all :: pure_all
@@ -395,8 +393,7 @@ The blibdirs.ts target is deprecated.  Depend on blibdirs instead.
 
 =cut
 
-sub blibdirs_target {
-    my $self = shift;
+sub blibdirs_target($self) {
 
     my @dirs = map { uc "\$(INST_$_)" }, qw(libdir archlib
                                            autodir archautodir
@@ -508,8 +505,8 @@ call clean on any subdirectories which contain Makefiles.
 
 =cut
 
-sub clean_subdirs_target {
-    my@($self) =@( shift);
+sub clean_subdirs_target(@< @_) {
+    my@($self) =@( shift @_);
 
     # No subdirectories, no cleaning.
     return <<'NOOP_FRAG' unless (nelems $self->{?DIR});
@@ -601,8 +598,8 @@ subdirectory.
 
 =cut
 
-sub dist_test {
-    my@($self) =@( shift);
+sub dist_test(@< @_) {
+    my@($self) =@( shift @_);
 
     my $mpl_args = join " ", map { qq["$_"] }, @ARGV;
 
@@ -628,10 +625,10 @@ Defines the dynamic target.
 
 =cut
 
-sub dynamic {
+sub dynamic(@< @_) {
     # --- Dynamic Loading Sections ---
 
-    my@($self) =@( shift);
+    my@($self) =@( shift @_);
     '
 dynamic :: $(FIRST_MAKEFILE) $(INST_DYNAMIC) $(INST_BOOT)
 	$(NOECHO) $(NOOP)
@@ -650,7 +647,7 @@ confused or something gets snuck in before the real 'all' target.
 
 =cut
 
-sub makemakerdflt_target {
+sub makemakerdflt_target(...) {
     return <<'MAKE_FRAG';
 makemakerdflt : all
 	$(NOECHO) $(NOOP)
@@ -668,8 +665,8 @@ all POD files in MAN1PODS and MAN3PODS.
 
 =cut
 
-sub manifypods_target {
-    my@($self) =@( shift);
+sub manifypods_target(@< @_) {
+    my@($self) =@( shift @_);
 
     my $man1pods      = '';
     my $man3pods      = '';
@@ -780,8 +777,7 @@ distdir.
 
 =cut
 
-sub distmeta_target {
-    my $self = shift;
+sub distmeta_target($self) {
 
     my $add_meta = $self->oneliner(<<'CODE', \@('-MExtUtils::Manifest=maniadd'));
 try { maniadd(\%(q{META.yml} => q{Module meta-data (added by MakeMaker)})) } 
@@ -861,8 +857,7 @@ target to call realclean on any subdirectories which contain Makefiles.
 
 =cut
 
-sub realclean_subdirs_target {
-    my $self = shift;
+sub realclean_subdirs_target($self) {
 
     return <<'NOOP_FRAG' unless (nelems $self->{?DIR});
 realclean_subdirs :
@@ -898,8 +893,7 @@ Writes the file SIGNATURE with "cpansign -s".
 
 =cut
 
-sub signature_target {
-    my $self = shift;
+sub signature_target($self) {
 
     return <<'MAKE_FRAG';
 signature :
@@ -918,8 +912,7 @@ distdir.
 
 =cut
 
-sub distsignature_target {
-    my $self = shift;
+sub distsignature_target($self) {
 
     my $add_sign = $self->oneliner(<<'CODE', \@('-MExtUtils::Manifest=maniadd'));
 try { maniadd(\%(q{SIGNATURE} => q{Public-key signature (added by MakeMaker)})) } 
@@ -953,7 +946,7 @@ meaning to make.  For example, .SUFFIXES and .PHONY.
 
 =cut
 
-sub special_targets {
+sub special_targets(...) {
     my $make_frag = <<'MAKE_FRAG';
 .SUFFIXES : .xs .c .C .cpp .i .s .cxx .cc $(OBJ_EXT)
 
@@ -983,8 +976,7 @@ Methods which help initialize the MakeMaker object and macros.
 
 =cut
 
-sub init_ABSTRACT {
-    my $self = shift;
+sub init_ABSTRACT($self) {
 
     if( $self->{?ABSTRACT_FROM} and $self->{?ABSTRACT} ) {
         warn "Both ABSTRACT_FROM and ABSTRACT are set.  ".
@@ -1008,8 +1000,8 @@ to XS code.  Those are handled in init_xs.
 
 =cut
 
-sub init_INST {
-    my@($self) =@( shift);
+sub init_INST(@< @_) {
+    my@($self) =@( shift @_);
 
     $self->{+INST_ARCHLIB} ||= $self->catdir($Curdir,"blib","arch");
     $self->{+INST_BIN}     ||= $self->catdir($Curdir,'blib','bin');
@@ -1058,8 +1050,8 @@ INSTALLDIRS) and *PREFIX.
 
 =cut
 
-sub init_INSTALL {
-    my@($self) =@( shift);
+sub init_INSTALL(@< @_) {
+    my@($self) =@( shift @_);
 
     if( $self->{ARGS}{?INSTALL_BASE} and $self->{ARGS}{?PREFIX} ) {
         die "Only one of PREFIX or INSTALL_BASE can be given.  Not both.\n";
@@ -1080,8 +1072,7 @@ sub init_INSTALL {
 
 =cut
 
-sub init_INSTALL_from_PREFIX {
-    my $self = shift;
+sub init_INSTALL_from_PREFIX($self) {
 
     $self->init_lib2arch;
 
@@ -1307,8 +1298,7 @@ my %map = %(
     );
 %map{+script} = %map{?bin};
 
-sub init_INSTALL_from_INSTALL_BASE {
-    my $self = shift;
+sub init_INSTALL_from_INSTALL_BASE($self) {
 
         $self->{[qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)]} = @:
                                                          '$(INSTALL_BASE)';
@@ -1367,8 +1357,8 @@ Called by init_main.
 
 =cut
 
-sub init_VERSION {
-    my@($self) =@( shift);
+sub init_VERSION(@< @_) {
+    my@($self) =@( shift @_);
 
     $self->{+MAKEMAKER}  = $ExtUtils::MakeMaker::Filename;
     $self->{+MM_VERSION} = $ExtUtils::MakeMaker::VERSION;
@@ -1503,7 +1493,7 @@ A typical one is the version number of your OS specific mocule.
 
 =cut
 
-sub init_platform {
+sub init_platform(...) {
     return '';
 }
 
@@ -1516,8 +1506,7 @@ Initialize MAKE from either a MAKE environment variable or $Config{make}.
 
 =cut
 
-sub init_MAKE {
-    my $self = shift;
+sub init_MAKE($self) {
 
     $self->{+MAKE} ||= env::var('MAKE') || %Config{?make};
 }
@@ -1536,8 +1525,7 @@ put them into the INST_* directories.
 
 =cut
 
-sub manifypods {
-    my $self          = shift;
+sub manifypods($self) {
 
     my $POD2MAN_macro = $self->POD2MAN_macro();
     my $manifypods_target = $self->manifypods_target();
@@ -1567,8 +1555,7 @@ Typical usage:
 
 =cut
 
-sub POD2MAN_macro {
-    my $self = shift;
+sub POD2MAN_macro($self) {
 
     # Need the trailing '--' so perl stops gobbling arguments and - happens
     # to be an alternative end of line seperator on VMS so we quote it
@@ -1628,8 +1615,8 @@ canonicalized.  This override fixes that bug.
 
 =cut
 
-sub catfile {
-    my $self = shift;
+sub catfile(@< @_) {
+    my $self = shift @_;
     return $self->canonpath( $self->SUPER::catfile(< @_));
 }
 
@@ -1649,8 +1636,8 @@ tests in t/*.t.
 
 =cut
 
-sub find_tests {
-    my@($self) =@( shift);
+sub find_tests(@< @_) {
+    my@($self) =@( shift @_);
     return -d 't' ?? 't/*.t' !! '';
 }
 
@@ -1665,7 +1652,7 @@ addition to the usual set.
 =cut
 
 # An empty method here tickled a perl 5.8.1 bug and would return its object.
-sub extra_clean_files { 
+sub extra_clean_files(...) { 
     return;
 }
 
@@ -1679,7 +1666,7 @@ for iteration or building related variable sets.
 
 =cut
 
-sub installvars {
+sub installvars(...) {
     return qw(PRIVLIB SITELIB  VENDORLIB
               ARCHLIB SITEARCH VENDORARCH
               BIN     SITEBIN  VENDORBIN
@@ -1721,7 +1708,7 @@ init_platform() rather than put them in constants().
 
 =cut
 
-sub platform_constants {
+sub platform_constants(...) {
     return '';
 }
 

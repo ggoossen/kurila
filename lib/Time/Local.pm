@@ -57,7 +57,7 @@ else {
 
 %Cheat = %( () );    # clear the cache as epoc has changed
 
-sub _daygm {
+sub _daygm(@< @_) {
 
     # This is written in such a byzantine way in order to avoid
     # lexical variables and sub calls, for speed
@@ -77,7 +77,7 @@ sub _daygm {
         );
 }
 
-sub _timegm {
+sub _timegm(@< @_) {
     my $sec =
         $SecOff + @_[0] + ( SECS_PER_MINUTE * @_[1] ) + ( SECS_PER_HOUR * @_[2] );
 
@@ -133,7 +133,7 @@ sub timegm( $sec, $min, $hour, $mday, $month, $year, ...) {
         + ( SECS_PER_DAY * $days );
 }
 
-sub _is_leap_year {
+sub _is_leap_year(@< @_) {
     return 0 if @_[0] % 4;
     return 1 if @_[0] % 100;
     return 0 if @_[0] % 400;
@@ -141,12 +141,12 @@ sub _is_leap_year {
     return 1;
 }
 
-sub timegm_nocheck {
+sub timegm_nocheck(@< @_) {
     local %Options{+no_range_check} = 1;
     return &timegm( < @_ );
 }
 
-sub timelocal {
+sub timelocal(@< @_) {
     my $ref_t = &timegm( < @_ );
     my $loc_for_ref_t = _timegm( localtime($ref_t) );
 
@@ -181,7 +181,7 @@ sub timelocal {
     return $loc_t;
 }
 
-sub timelocal_nocheck {
+sub timelocal_nocheck(@< @_) {
     local %Options{+no_range_check} = 1;
     return &timelocal( < @_ );
 }

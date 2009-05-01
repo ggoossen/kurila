@@ -1,8 +1,7 @@
 package Cname;
 our $Evil='A';
 
-sub translator {
-    my $str = shift;
+sub translator(?$str) {
     if ( $str eq 'EVIL' ) {
         (my $c=substr("A".$Evil,-1))++;
         my $r=$Evil;
@@ -15,8 +14,8 @@ sub translator {
     return $str;
 }
 
-sub import {
-    shift;
+sub import(@< @_) {
+    shift @_;
     $^HINTS{+charnames} = \&translator;
 }
 1;  

@@ -42,9 +42,9 @@ with a volume name, a relative pathname should always begin with a
 
 use Symbol;
 
-sub new {
+sub new(@< @_) {
     (nelems @_) +>= 1 && (nelems @_) +<= 2 or die 'usage: new DirHandle [DIRNAME]';
-    my $class = shift;
+    my $class = shift @_;
     my $dh = gensym;
     if ((nelems @_)) {
         DirHandle::open($dh, @_[0])
@@ -53,38 +53,38 @@ sub new {
     bless $dh, $class;
 }
 
-sub DESTROY {
+sub DESTROY(@< @_) {
     # Don't warn about already being closed as it may have been closed 
     # correctly, or maybe never opened at all.
     no warnings 'io';
     closedir(@_[0]);
 }
 
-sub open {
+sub open(@< @_) {
     (nelems @_) == 2 or die 'usage: $dh->open(DIRNAME)';
     my @($dh, $dirname) =  @_;
     opendir($dh, $dirname);
 }
 
-sub close {
+sub close(@< @_) {
     (nelems @_) == 1 or die 'usage: $dh->close()';
     my @($dh) =  @_;
     closedir($dh);
 }
 
-sub readdir {
+sub readdir(@< @_) {
     (nelems @_) == 1 or die 'usage: $dh->read()';
     my @($dh) =  @_;
     return $( CORE::readdir($dh) );
 }
 
-sub readdirs {
+sub readdirs(@< @_) {
     (nelems @_) == 1 or die 'usage: $dh->read()';
     my @($dh) =  @_;
     return @( CORE::readdir($dh) ); # Force list context.
 }
 
-sub rewind {
+sub rewind(@< @_) {
     (nelems @_) == 1 or die 'usage: $dh->rewind()';
     my @($dh) =  @_;
     rewinddir($dh);

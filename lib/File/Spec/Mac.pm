@@ -12,7 +12,7 @@ if ($^OS_NAME eq 'MacOS') {
     $macfiles = try { require Mac::Files };
 }
 
-sub case_tolerant { 1 }
+sub case_tolerant(...) { 1 }
 
 
 =head1 NAME
@@ -189,8 +189,8 @@ yields
 
 =cut
 
-sub catdir {
-    my $self = shift;
+sub catdir(@< @_) {
+    my $self = shift @_;
     return '' unless (nelems @_);
     my @args = @_;
     my $first_arg;
@@ -305,8 +305,8 @@ you are encouraged to use C<catpath()> (see below).
 
 =cut
 
-sub catfile {
-    my $self = shift;
+sub catfile(@< @_) {
+    my $self = shift @_;
     return '' unless (nelems @_);
     my $file = pop @_;
     return $file unless (nelems @_);
@@ -321,7 +321,7 @@ Returns a string representing the current directory. On Mac OS, this is ":".
 
 =cut
 
-sub curdir {
+sub curdir(...) {
     return ":";
 }
 
@@ -331,7 +331,7 @@ Returns a string representing the null device. On Mac OS, this is "Dev:Null".
 
 =cut
 
-sub devnull {
+sub devnull(...) {
     return "Dev:Null";
 }
 
@@ -347,7 +347,7 @@ If Mac::Files could not be loaded, the empty string is returned.
 
 =cut
 
-sub rootdir {
+sub rootdir(@< @_) {
     #
     #  There's no real root directory on Mac OS. The name of the startup
     #  volume is returned, since that's the closest in concept.
@@ -369,7 +369,7 @@ directory on your startup volume.
 =cut
 
 my $tmpdir;
-sub tmpdir {
+sub tmpdir(@< @_) {
     return $tmpdir if defined $tmpdir;
     $tmpdir = @_[0]->_tmpdir( env::var('TMPDIR') );
 }
@@ -380,7 +380,7 @@ Returns a string representing the parent directory. On Mac OS, this is "::".
 
 =cut
 
-sub updir {
+sub updir(...) {
     return "::";
 }
 
@@ -424,7 +424,7 @@ MPW, it gives back $ENV{Commands} suitably split, as is done in
 
 =cut
 
-sub path {
+sub path(...) {
     #
     #  The concept is meaningless under the MacPerl application.
     #  Under MPW, it has a meaning.
@@ -635,7 +635,7 @@ Based on code written by Shigio Yamaguchi.
 =cut
 
 # maybe this should be done in canonpath() ?
-sub _resolve_updirs {
+sub _resolve_updirs(@< @_) {
     my $path = shift @_;
     my $proceed;
 

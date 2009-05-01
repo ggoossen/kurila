@@ -30,7 +30,7 @@ do {   for my $str (  __PACKAGE__->_fail ) {
 ###
 ################################
 
-sub _succeed {
+sub _succeed(...) {
     return grep { m/\S/ }, map { s/^\s*//; $_ }, split "\n", q[
         our $VERSION = 1;
         *VERSION = \'1.01';
@@ -55,7 +55,7 @@ sub _succeed {
     ];
 }
 
-sub _fail {
+sub _fail(...) {
     return grep { m/\S/ }, map { s/^\s*//; $_ }, split "\n", q[
         our ($VERSION, %ERROR, $ERROR, $Warn, $Die);
         sub version { $GD::Graph::colour::VERSION }

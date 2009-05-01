@@ -21,21 +21,21 @@ our $fail;
 
 my $big_fh;
 
-sub zap {
+sub zap(...) {
     close($big_fh);
     unlink("big");
     unlink("big1");
     unlink("big2");
 }
 
-sub bye {
+sub bye(...) {
     zap(); 
     exit(0);
 }
 
 my $explained;
 
-sub explain {
+sub explain(@< @_) {
     unless ($explained++) {
         print $^STDOUT, <<EOM;
 #

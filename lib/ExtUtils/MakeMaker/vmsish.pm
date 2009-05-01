@@ -8,10 +8,10 @@ my $IsVMS = $^OS_NAME eq 'VMS';
 require vmsish if $IsVMS;
 
 
-sub import {
+sub import(@< @_) {
     return unless $IsVMS;
 
-    shift;
+    shift @_;
     unshift @_, 'vmsish';
 
     return vmsish::import(< @_);

@@ -16,7 +16,7 @@ use IO::Dir < qw(DIR_UNLINK);
 
 my $tcount = 0;
 
-sub ok {
+sub ok(@< @_) {
     $tcount++;
     my $not = @_[0] ?? '' !! 'not ';
     print $^STDOUT, "$($not)ok $tcount\n";

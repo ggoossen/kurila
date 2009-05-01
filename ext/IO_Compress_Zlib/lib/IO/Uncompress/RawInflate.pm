@@ -28,37 +28,37 @@ Exporter::export_ok_tags('all');
 
 
 
-sub new
+sub new(@< @_)
 {
-    my $class = shift ;
+    my $class = shift @_ ;
     my $obj = createSelfTiedObject($class, \$RawInflateError);
     $obj->_create(undef, 0, < @_);
 }
 
-sub rawinflate
+sub rawinflate(@< @_)
 {
     my $obj = createSelfTiedObject(undef, \$RawInflateError);
     return $obj->_inf(< @_);
 }
 
-sub getExtraParams
+sub getExtraParams(...)
 {
     return ();
 }
 
-sub ckParams
+sub ckParams(@< @_)
 {
-    my $self = shift ;
-    my $got = shift ;
+    my $self = shift @_ ;
+    my $got = shift @_ ;
 
     return 1;
 }
 
-sub mkUncomp
+sub mkUncomp(@< @_)
 {
-    my $self = shift ;
-    my $class = shift ;
-    my $got = shift ;
+    my $self = shift @_ ;
+    my $class = shift @_ ;
+    my $got = shift @_ ;
 
     my @($obj, ?$errstr, ?$errno) =  IO::Uncompress::Adapter::Inflate::mkUncompObject(
                                                                 $got->value('CRC32'),
@@ -82,17 +82,16 @@ sub mkUncomp
 }
 
 
-sub ckMagic
+sub ckMagic($self)
 {
-    my $self = shift;
 
     return $self->_isRaw() ;
 }
 
-sub readHeader
+sub readHeader(@< @_)
 {
-    my $self = shift;
-    my $magic = shift ;
+    my $self = shift @_;
+    my $magic = shift @_ ;
 
     return \%(
             'Type'          => 'rfc1951',
@@ -103,14 +102,14 @@ sub readHeader
         );
 }
 
-sub chkTrailer
+sub chkTrailer(...)
 {
     return STATUS_OK ;
 }
 
-sub _isRaw
+sub _isRaw(@< @_)
 {
-    my $self   = shift ;
+    my $self   = shift @_ ;
 
     my $got = $self->_isRawx(< @_);
 
@@ -126,10 +125,10 @@ sub _isRaw
     return $got ;
 }
 
-sub _isRawx
+sub _isRawx(@< @_)
 {
-    my $self   = shift ;
-    my $magic = shift ;
+    my $self   = shift @_ ;
+    my $magic = shift @_ ;
 
     $magic = '' unless defined $magic ;
 
@@ -176,9 +175,8 @@ sub _isRawx
 }
 
 
-sub inflateSync
+sub inflateSync($self)
 {
-    my $self = shift ;
 
     # inflateSync is a no-op in Plain mode
     return 1
@@ -265,9 +263,8 @@ sub inflateSync
 #    
 #}
 
-sub scan
+sub scan($self)
 {
-    my $self = shift ;
 
     return 1 if $self->*->{?Closed} ;
     return 1 if !length $self->*->{?Pending} && $self->*->{?EndStream} ;
@@ -282,9 +279,9 @@ sub scan
     return $len +< 0 ?? 0 !! 1 ;
 }
 
-sub zap
+sub zap(@< @_)
 {
-    my $self  = shift ;
+    my $self  = shift @_ ;
 
     my $headerLength = $self->*->{Info}->{?HeaderLength};
     my $block_offset =  $headerLength + $self->*->{Uncomp}->getLastBlockOffset();

@@ -66,7 +66,7 @@ matter where you chdir to.
 
 =cut
 
-sub which_perl {
+sub which_perl(...) {
     my $perl = $^EXECUTABLE_NAME;
     $perl ||= 'perl';
 
@@ -103,7 +103,7 @@ Sets up environment variables so perl can find its libraries.
 
 my $old5lib = env::var('PERL5LIB');
 my $had5lib = defined $old5lib;
-sub perl_lib {
+sub perl_lib(...) {
     # perl-src/t/
     my $lib =  env::var('PERL_CORE') ?? qq{../lib}
         # ExtUtils-MakeMaker/t/
@@ -129,7 +129,7 @@ should generate.
 
 =cut
 
-sub makefile_name {
+sub makefile_name(...) {
     return $Is_VMS ?? 'Descrip.MMS' !! 'Makefile';
 }   
 
@@ -142,7 +142,7 @@ Makefile.
 
 =cut
 
-sub makefile_backup {
+sub makefile_backup(...) {
     my $makefile = makefile_name;
     return $Is_VMS ?? "$makefile".'_old' !! "$makefile.old";
 }
@@ -155,7 +155,7 @@ Returns a good guess at the make to run.
 
 =cut
 
-sub make {
+sub make(...) {
     my $make = env::var('MAKE') // config_value("make");
 
     return $make;
@@ -169,7 +169,7 @@ Returns the make to run as with make() plus any necessary switches.
 
 =cut
 
-sub make_run {
+sub make_run(...) {
     my $make = make;
     $make .= ' -nologo' if $make eq 'nmake';
 
@@ -193,8 +193,8 @@ different calling convention than Unix or Windows.
 
 =cut
 
-sub make_macro {
-    my@($make, $target) = @(shift, shift);
+sub make_macro(@< @_) {
+    my@($make, $target) = @(shift @_, shift @_);
 
     my $is_mms = $make =~ m/^MM(K|S)/i;
 
@@ -222,7 +222,7 @@ touched.
 
 =cut
 
-sub calibrate_mtime {
+sub calibrate_mtime(...) {
     open(my $file, ">", "calibrate_mtime.tmp") || die $^OS_ERROR;
     print $file, "foo";
     close $file;
@@ -242,8 +242,7 @@ would expect to see on a screen.
 
 =cut
 
-sub run {
-    my $cmd = shift;
+sub run(?$cmd) {;
 
     use ExtUtils::MM;
 
@@ -266,7 +265,7 @@ No action taken on non-VMS systems.
 
 =cut
 
-sub setup_mm_test_root {
+sub setup_mm_test_root(...) {
     if( $Is_VMS ) {
         # On older systems we might exceed the 8-level directory depth limit
         # imposed by RMS.  We get around this with a rooted logical, but we
@@ -293,7 +292,7 @@ Returns true if there is a compiler available for XS builds.
 
 =cut
 
-sub have_compiler {
+sub have_compiler(...) {
     my $have_compiler = 0;
 
     # ExtUtils::CBuilder prints its compilation lines to the screen.

@@ -20,7 +20,7 @@ our ($tm_sec, $tm_min, $tm_hour, $tm_mday,
     $tm_mon, $tm_year, $tm_wday, $tm_yday,
     $tm_isdst);
 
-sub populate {
+sub populate(@< @_) {
     return unless (nelems @_);
     my $tmob = Time::tm->new();
     $tmob->@ = @(
@@ -31,8 +31,8 @@ sub populate {
     return $tmob;
 } 
 
-sub gmtime    { populate CORE::gmtime((nelems @_) ?? shift !! time)}
-sub gmctime   { scalar   CORE::gmtime((nelems @_) ?? shift !! time)} 
+sub gmtime(@< @_)    { populate CORE::gmtime((nelems @_) ?? shift @_ !! time)}
+sub gmctime(@< @_)   { scalar   CORE::gmtime((nelems @_) ?? shift @_ !! time)} 
 
 1;
 __END__

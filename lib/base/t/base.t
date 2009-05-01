@@ -9,7 +9,7 @@ use_ok('base');
     package No::Version;
 
 our ($Foo);
-sub VERSION { 42 }
+sub VERSION(...) { 42 }
 
 package Test::Version;
 

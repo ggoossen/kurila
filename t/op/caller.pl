@@ -2,7 +2,7 @@
 
 use warnings;
 
-sub dooot {
+sub dooot(...) {
     is(hint_fetch('dooot'), undef);
     is(hint_fetch('thikoosh'), undef);
     ok(!hint_exists('dooot'));

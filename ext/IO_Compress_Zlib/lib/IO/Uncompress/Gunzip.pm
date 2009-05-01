@@ -28,31 +28,31 @@ $GunzipError = '';
 
 $VERSION = '2.006';
 
-sub new
+sub new(@< @_)
 {
-    my $class = shift ;
+    my $class = shift @_ ;
     $GunzipError = '';
     my $obj = createSelfTiedObject($class, \$GunzipError);
 
     $obj->_create(undef, 0, < @_);
 }
 
-sub gunzip
+sub gunzip(@< @_)
 {
     my $obj = createSelfTiedObject(undef, \$GunzipError);
     return $obj->_inf(< @_) ;
 }
 
-sub getExtraParams
+sub getExtraParams(...)
 {
     use IO::Compress::Base::Common  v2.006 < qw(:Parse);
     return  @( 'ParseExtra' => \@(1, 1, Parse_boolean,  0) ) ;
 }
 
-sub ckParams
+sub ckParams(@< @_)
 {
-    my $self = shift ;
-    my $got = shift ;
+    my $self = shift @_ ;
+    my $got = shift @_ ;
 
     # gunzip always needs crc32
     $got->value('CRC32' => 1);
@@ -60,9 +60,8 @@ sub ckParams
     return 1;
 }
 
-sub ckMagic
+sub ckMagic($self)
 {
-    my $self = shift;
 
     my $magic ;
     $self->smartReadExact(\$magic, GZIP_ID_SIZE);
@@ -81,18 +80,18 @@ sub ckMagic
     return $magic ;
 }
 
-sub readHeader
+sub readHeader(@< @_)
 {
-    my $self = shift;
-    my $magic = shift;
+    my $self = shift @_;
+    my $magic = shift @_;
 
     return $self->_readGzipHeader($magic);
 }
 
-sub chkTrailer
+sub chkTrailer(@< @_)
 {
-    my $self = shift;
-    my $trailer = shift;
+    my $self = shift @_;
+    my $trailer = shift @_;
 
     # Check CRC & ISIZE 
     my @($CRC32, $ISIZE) = @: unpack("V V", $trailer) ;
@@ -112,9 +111,8 @@ sub chkTrailer
     return STATUS_OK;
 }
 
-sub isGzipMagic
+sub isGzipMagic(?$buffer)
 {
-    my $buffer = shift ;
     return 0 if length $buffer +< GZIP_ID_SIZE ;
     my @($id1, $id2) = @: unpack("C C", $buffer) ;
     return $id1 == GZIP_ID1 && $id2 == GZIP_ID2 ;

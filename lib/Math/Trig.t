@@ -130,7 +130,7 @@ do {
 do {
     my $R2D = 57.295779513082320876798154814169;
 
-    sub frac { @_[0] - int(@_[0]) }
+    sub frac(@< @_) { @_[0] - int(@_[0]) }
 
     my $lotta_radians = deg2rad(1E+20, 1);
     ok(near($lotta_radians,  1E+20/$R2D));

@@ -551,8 +551,7 @@ POD formatters.
 ##     return $self;
 ## }
 
-sub initialize {
-    my $self = shift;
+sub initialize($self) {
     ## Initialize number of errors, and setup an error function to
     ## increment this number and then print to the designated output.
     $self->{+_NUM_ERRORS} = 0;
@@ -601,9 +600,9 @@ The error level, should be 'WARNING' or 'ERROR'.
 =cut
 
 # Invoked as $self->poderror( @args ), or $self->poderror( {%opts}, @args )
-sub poderror {
-    my $self = shift;
-    my %opts = %( (ref @_[0]) ?? < shift()->% !! () );
+sub poderror(@< @_) {
+    my $self = shift @_;
+    my %opts = %( (ref @_[0]) ?? < shift( @_)->% !! () );
 
     ## Retrieve options
     chomp( my $msg  = (%opts{?msg} || "")."$(join ' ',@_)" );
@@ -635,7 +634,7 @@ Set (if argument specified) and retrieve the number of errors found.
 
 =cut
 
-sub num_errors {
+sub num_errors(@< @_) {
     return ((nelems @_) +> 1) ??  @(@_[0]->{+_NUM_ERRORS} = @_[1]) !! @_[0]->{?_NUM_ERRORS};
 }
 
@@ -647,7 +646,7 @@ Set (if argument specified) and retrieve the number of warnings found.
 
 =cut
 
-sub num_warnings {
+sub num_warnings(@< @_) {
     return ((nelems @_) +> 1) ??  @(@_[0]->{+_NUM_WARNINGS} = @_[1]) !! @_[0]->{?_NUM_WARNINGS};
 }
 
@@ -660,7 +659,7 @@ found in the C<=head1 NAME> section.
 
 =cut
 
-sub name {
+sub name(@< @_) {
     return ((nelems @_) +> 1 && @_[1]) ??
         @(@_[0]->{+name} = @_[1]) !! @_[0]->{?name};  
 }
@@ -726,8 +725,8 @@ number and C<Pod::Hyperlink> object.
 =cut
 
 # set/return hyperlinks of the current POD
-sub hyperlink {
-    my $self = shift;
+sub hyperlink(@< @_) {
+    my $self = shift @_;
     if(@_[?0]) {
         push($self->{_links}->@, @_[0]);
         return @_[0];
@@ -737,10 +736,7 @@ sub hyperlink {
 
 ## overrides for Pod::Parser
 
-sub end_pod {
-    ## Do some final checks and
-    ## print the number of errors found
-    my $self   = shift;
+sub end_pod($self) {
     my $infile = $self->input_file();
 
     if((nelems $self->{?_list_stack}->@)) {
@@ -1226,9 +1222,9 @@ sub textblock($self, $paragraph, $line_num, $pod_para) {
     }
 }
 
-sub _preproc_par
+sub _preproc_par(@< @_)
 {
-    my $self = shift;
+    my $self = shift @_;
     @_[0] =~ s/[\s\n]+$//;
     if(@_[0]) {
         $self->{+_commands_in_head}++;

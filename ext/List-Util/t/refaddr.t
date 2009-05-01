@@ -26,23 +26,23 @@ package Hash3;
 
 use Scalar::Util < qw(refaddr);
 
-sub TIEHASH
+sub TIEHASH(@< @_)
 {
-    my $pkg = shift;
+    my $pkg = shift @_;
     return bless \@( < @_ ), $pkg;
 }
-sub FETCH
+sub FETCH(@< @_)
 {
-    my $self = shift;
-    my $key = shift;
+    my $self = shift @_;
+    my $key = shift @_;
     my @($underlying) =  $self->@;
     return $underlying->{?refaddr($key)};
 }
-sub STORE
+sub STORE(@< @_)
 {
-    my $self = shift;
-    my $key = shift;
-    my $value = shift;
+    my $self = shift @_;
+    my $key = shift @_;
+    my $value = shift @_;
     my @($underlying) =  $self->@;
     return  @($underlying->{+refaddr($key)} = $key);
 }

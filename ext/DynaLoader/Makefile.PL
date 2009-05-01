@@ -16,7 +16,7 @@ WriteMakefile(
         'XSLoader.pm'),
     );
 
-sub MY::postamble {
+sub MY::postamble(...) {
     q|
 DynaLoader.xs: $(DLSRC)
 	$(RM_F) $@
@@ -31,7 +31,7 @@ test-xs:
 |;
 }
 
-sub MY::static {
+sub MY::static(...) {
     '
 $(PERL_SRC)/$(OBJECT) : $(FIRST_MAKEFILE) $(OBJECT)
 	$(RM_RF) $(PERL_SRC)/$(OBJECT)

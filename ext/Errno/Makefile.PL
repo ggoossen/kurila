@@ -32,7 +32,7 @@ WriteMakefile(
     ),
     );
 
-sub MY::postamble {
+sub MY::postamble(...) {
     my $TARG = MM->catfile('d','Errno.pm');
     qq!$TARG : Makefile
 	echo '#This is a dummy file so CPAN will find a VERSION' > $TARG

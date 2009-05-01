@@ -60,9 +60,9 @@ while ()
         or die "Error uncompressing $file [$filename]: $RawInflateError\n"  ;
 }
 
-sub decodeLocalFileHeader
+sub decodeLocalFileHeader(@< @_)
 {
-    my $buffer = shift ;
+    my $buffer = shift @_ ;
 }
 
 

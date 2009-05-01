@@ -9,7 +9,7 @@ require './test.pl';
 
 do {
     package MCTest::Base;
-    sub foo { return @_[1]+1 };
+    sub foo(@< @_) { return @_[1]+1 };
 
     package MCTest::Derived;
     our @ISA = qw/MCTest::Base/;

@@ -195,8 +195,8 @@ remaining characters in the filename.
 =cut
 
 
-sub basename {
-    my@($path) =@( shift);
+sub basename(@< @_) {
+    my@($path) =@( shift @_);
 
     # From BSD basename(1)
     # The basename utility deletes any prefix ending with the last slash `/'
@@ -264,8 +264,7 @@ current default device and directory is used.
 =cut
 
 
-sub dirname {
-    my $path = shift;
+sub dirname(?$path) {
 
     my $type = $Fileparse_fstype;
 
@@ -312,7 +311,7 @@ sub dirname {
 
 
 # Strip the trailing path separator.
-sub _strip_trailing_sep  {
+sub _strip_trailing_sep(@< @_)  {
     my $type = $Fileparse_fstype;
 
     if ($type eq 'MacOS') {
@@ -358,11 +357,11 @@ BEGIN {
     @Types = @(< @Ignore_Case, < qw(Unix));
 }
 
-sub fileparse_set_fstype {
+sub fileparse_set_fstype(@< @_) {
     my $old = $Fileparse_fstype;
 
     if ((nelems @_)) {
-        my $new_type = shift;
+        my $new_type = shift @_;
 
         $Fileparse_fstype = 'Unix';  # default
         foreach my $type ( @Types) {

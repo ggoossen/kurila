@@ -18,7 +18,7 @@ use constant PI		=> 4 * atan2 1, 1;
 ok defined PI,                          'basic scalar constant';
 is substr(PI, 0, 7), '3.14159',         '    in substr()';
 
-sub deg2rad { PI * @_[0] / 180 }
+sub deg2rad(@< @_) { PI * @_[0] / 180 }
 
 my $ninety = deg2rad 90;
 

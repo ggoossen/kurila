@@ -12,7 +12,7 @@ my %ext;
 my $ext;
 my %static;
 
-sub getcwd {
+sub getcwd(...) {
     $_ = `cd`;
     chomp;
     s:\\:/:g ;
@@ -20,7 +20,7 @@ sub getcwd {
     return $_;
 }
 
-sub set_static_extensions {
+sub set_static_extensions(@< @_) {
     # adjust results of scan_ext, and also save
     # statics in case scan_ext hasn't been called yet.
     # if '*' is passed then all XS extensions are static
@@ -37,10 +37,9 @@ sub set_static_extensions {
     }
 }
 
-sub scan_ext
+sub scan_ext(?$dir)
 {
  my $here = getcwd();
- my $dir  = shift;
  chdir($dir) || die "Cannot cd to $dir\n";
  ($ext = getcwd()) =~ s,/,\\,g;
  find_ext('');
@@ -48,40 +47,40 @@ sub scan_ext
  my @ext = extensions();
 }
 
-sub dynamic_ext
+sub dynamic_ext(...)
 {
  return sort grep { %ext{?$_} eq 'dynamic' },keys %ext;
 }
 
-sub static_ext
+sub static_ext(...)
 {
  return sort grep { %ext{?$_} eq 'static' },keys %ext;
 }
 
-sub nonxs_ext
+sub nonxs_ext(...)
 {
  return sort grep { %ext{?$_} eq 'nonxs' },keys %ext;
 }
 
-sub extensions
+sub extensions(...)
 {
  return sort grep { %ext{?$_} ne 'known' },keys %ext;
 }
 
-sub known_extensions
+sub known_extensions(...)
 {
  # faithfully copy Configure in not including nonxs extensions for the nonce
  return sort grep { %ext{?$_} ne 'nonxs' },keys %ext;
 }
 
-sub is_static
+sub is_static(@< @_)
 {
  return %ext{?@_[0]} eq 'static'
 }
 
 # Function to recursively find available extensions, ignoring DynaLoader
 # NOTE: recursion limit of 10 to prevent runaway in case of symlink madness
-sub find_ext
+sub find_ext(@< @_)
 {
     opendir my $dh, '.';
     my @items = grep { !m/^\.\.?$/ }, @( readdir $dh);
