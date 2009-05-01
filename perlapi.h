@@ -428,8 +428,6 @@ END_EXTERN_C
 #define PL_origenviron		(*Perl_Iorigenviron_ptr(aTHX))
 #undef  PL_origfilename
 #define PL_origfilename		(*Perl_Iorigfilename_ptr(aTHX))
-#undef  PL_ors_sv
-#define PL_ors_sv		(*Perl_Iors_sv_ptr(aTHX))
 #undef  PL_osname
 #define PL_osname		(*Perl_Iosname_ptr(aTHX))
 #undef  PL_pad_reset_pending

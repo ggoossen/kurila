@@ -620,9 +620,6 @@ perl_destruct(pTHXx)
     SvREFCNT_dec(PL_ofs_sv);	/* $, */
     PL_ofs_sv = NULL;
 
-    SvREFCNT_dec(PL_ors_sv);	/* $\ */
-    PL_ors_sv = NULL;
-
     SVcpNULL(PL_rs);	/* $/ */
 
     Safefree(PL_osname);	/* $^O */
@@ -1346,7 +1343,6 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	    case 'd':
 	    case 'D':
 	    case 'h':
-	    case 'l':
 	    case 'M':
 	    case 'm':
 	    case 'u':
@@ -2439,7 +2435,6 @@ S_usage(pTHX_ const char *name)		/* XXX move this out into a module ? */
 "-e program        one line of program (several -e's allowed, omit programfile)",
 "-f                don't do $sitelib/sitecustomize.pl at startup",
 "-Idirectory       specify $^INCLUDE_PATH/#include directory (several -I's allowed)",
-"-l[octal]         enable line ending processing, specifies line terminator",
 "-[mM][-]module    execute \"use/no module...\" before executing program",
 "-s                enable rudimentary parsing for switches after programfile",
 "-S                look for programfile using PATH environment variable",
@@ -2672,30 +2667,6 @@ Perl_moreswitches(pTHX_ const char *s)
 	}
 	else
 	    Perl_croak(aTHX_ "No directory specified for -I");
-	return s;
-    case 'l':
-	PL_minus_l = TRUE;
-	s++;
-	if (PL_ors_sv) {
-	    SvREFCNT_dec(PL_ors_sv);
-	    PL_ors_sv = NULL;
-	}
-	if (isDIGIT(*s)) {
-            I32 flags = 0;
-	    STRLEN numlen;
-	    PL_ors_sv = newSVpvs("\n");
-	    numlen = 3 + (*s == '0');
-	    *SvPVX_mutable(PL_ors_sv) = (char)grok_oct(s, &numlen, &flags, NULL);
-	    s += numlen;
-	}
-	else {
-	    if (RsPARA(PL_rs)) {
-		PL_ors_sv = newSVpvs("\n\n");
-	    }
-	    else {
-		PL_ors_sv = newSVsv(PL_rs);
-	    }
-	}
 	return s;
     case 'M':
 	forbid_setid('M', FALSE);	/* XXX ? */

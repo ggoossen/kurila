@@ -7,7 +7,7 @@ perlrun - how to execute the Perl interpreter
 B<perl>	S<[ B<TtuUWX> ]>
 	S<[ B<-hv> ] [ B<-V>[:I<configvar>] ]>
 	S<[ B<-cw> ] [ B<-d>[B<t>][:I<debugger>] ] [ B<-D>[I<number/list>] ]>
-	[ B<-l>[I<octal>] ] [ B<-0>[I<octal/hexadecimal>] ]>
+	[ B<-0>[I<octal/hexadecimal>] ]>
 	S<[ B<-I>I<dir> ] [ B<-m>[B<->]I<module> ] [ B<-M>[B<->]I<'module...'> ] [ B<-f> ]>
 	S<[ B<-C [I<number/list>] >]>
 	S<[ B<-S> ]>
@@ -449,27 +449,6 @@ X<-I> X<$^INCLUDE_PATH>
 
 Directories specified by B<-I> are prepended to the search path for
 modules (C<$^INCLUDE_PATH>).
-
-=item B<-l>[I<octnum>]
-X<-l> X<$/> X<$\>
-
-enables automatic line-ending processing.  It has two separate
-effects.  First, it automatically chomps C<$/> (the input record
-separator) when used with B<-n> or B<-p>.  Second, it assigns C<$\>
-(the output record separator) to have the value of I<octnum> so
-that any print statements will have that separator added back on.
-If I<octnum> is omitted, sets C<$\> to the current value of
-C<$/>.  For instance, to trim lines to 80 columns:
-
-    perl -lpe 'substr($_, 80) = ""'
-
-Note that the assignment C<$\ = $/> is done when the switch is processed,
-so the input record separator can be different than the output record
-separator if the B<-l> switch is followed by a B<-0> switch:
-
-    gnufind / -print0 | perl -ln0e 'print "found $_" if -p'
-
-This sets C<$\> to newline and then sets C<$/> to the null character.
 
 =item B<-m>[B<->]I<module>
 X<-m> X<-M>

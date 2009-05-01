@@ -697,10 +697,6 @@ PP(pp_print)
 	if (MARK <= SP)
 	    goto just_say_no;
 	else {
-	    if (PL_ors_sv && SvOK(PL_ors_sv))
-		if (!do_print(PL_ors_sv, fp)) /* $\ */
-		    goto just_say_no;
-
 	    if (IoFLAGS(io) & IOf_FLUSH)
 		if (PerlIO_flush(fp) == EOF)
 		    goto just_say_no;

@@ -765,13 +765,6 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 		/* $^OUTPUT_FIELD_SEPARATOR */
 		break;
 	    }
-
-	    if (strEQ(remaining, "OUTPUT_RECORD_SEPARATOR")) {
-		/* $^OUTPUT_RECORD_SEPARATOR */
-		if (PL_ors_sv)
-		    sv_copypv(sv, PL_ors_sv);
-		break;
-	    }
 	    break;
 
 	case 'P':
@@ -1273,9 +1266,6 @@ Perl_is_magicsv(pTHX_ const char* name)
 	    if (strEQ(name2, "OUTPUT_AUTOFLUSH")) {
 		return 1;
 	    }
-	    /* $^OUTPUT_RECORD_SEPARATOR */
-	    if (strEQ(name2, "OUTPUT_RECORD_SEPARATOR"))
-		return 1;
 	    /* $^OUTPUT_FIELD_SEPARATOR */
 	    if (strEQ(name2, "OUTPUT_FIELD_SEPARATOR"))
 		return 1;
@@ -1703,20 +1693,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		}
 		break;
 	    }
-
-	    if (strEQ(remaining, "OUTPUT_RECORD_SEPARATOR")) {
-		/* $^OUTPUT_RECORD_SEPARATOR */
-		if (PL_ors_sv)
-		    SvREFCNT_dec(PL_ors_sv);
-		if (SvOK(sv)) {
-		    PL_ors_sv = newSVsv(sv);
-		}
-		else {
-		    PL_ors_sv = NULL;
-		}
-		break;
-	    }
-	    break;
 
 	case 'P':
 	    if (strEQ(remaining, "PERLDB")) {

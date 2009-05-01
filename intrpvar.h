@@ -329,7 +329,6 @@ PERLVAR(ICmd,		char *)		/* stuff to free from do_aexec, vfork safe */
    a single physical line. */
 PERLVAR(Ipreambleav,	AV *)
 PERLVAR(Imess_sv,	SV *)
-PERLVAR(Iors_sv,	SV *)		/* output record separator $\ */
 /* statics moved here for shared library purposes */
 PERLVARI(Igensym,	I32,	0)	/* next symbol for getsym() to define */
 PERLVARI(Icv_has_eval, bool, FALSE) /* PL_compcv includes an entereval or similar */

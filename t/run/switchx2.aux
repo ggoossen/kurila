@@ -16,15 +16,18 @@ Still not perl
 # Ignore shell commands
 if [[ -z $FOO ]]; then echo 'not ok 1'; fi
 
-#!/some/path/that/leads/to/perl -l
+#!/some/path/that/leads/to/perl -0
 
 # These lines get executed
 my $test = @ARGV[0];
+if ($^INPUT_RECORD_SEPARATOR != '\0') {
+    print $^STDOUT, "not ";
+}
 if (-f 'switchx.t') {
-    print($^STDOUT, "ok $test");
+    print($^STDOUT, "ok $test\n");
 }
 $test++;
-print $^STDOUT, "ok $test";
+print $^STDOUT, "ok $test\n";
 
 __END__
 

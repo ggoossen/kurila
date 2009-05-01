@@ -196,7 +196,6 @@
 #define PL_origargv		(vTHX->Iorigargv)
 #define PL_origenviron		(vTHX->Iorigenviron)
 #define PL_origfilename		(vTHX->Iorigfilename)
-#define PL_ors_sv		(vTHX->Iors_sv)
 #define PL_osname		(vTHX->Iosname)
 #define PL_pad_reset_pending	(vTHX->Ipad_reset_pending)
 #define PL_padix		(vTHX->Ipadix)
@@ -473,7 +472,6 @@
 #define PL_Iorigargv		PL_origargv
 #define PL_Iorigenviron		PL_origenviron
 #define PL_Iorigfilename	PL_origfilename
-#define PL_Iors_sv		PL_ors_sv
 #define PL_Iosname		PL_osname
 #define PL_Ipad_reset_pending	PL_pad_reset_pending
 #define PL_Ipadix		PL_padix
