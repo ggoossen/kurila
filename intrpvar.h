@@ -205,10 +205,7 @@ PERLVAR(Ipatchlevel,	SV *)
 PERLVAR(Ilocalpatches,	const char * const *)
 
 PERLVAR(Iminus_c,	bool)
-PERLVAR(Iminus_n,	bool)
-PERLVAR(Iminus_p,	bool)
 PERLVAR(Iminus_l,	bool)
-PERLVAR(Iminus_a,	bool)
 
 /*
 

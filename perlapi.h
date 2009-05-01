@@ -380,16 +380,10 @@ END_EXTERN_C
 #define PL_mess_sv		(*Perl_Imess_sv_ptr(aTHX))
 #undef  PL_min_intro_pending
 #define PL_min_intro_pending	(*Perl_Imin_intro_pending_ptr(aTHX))
-#undef  PL_minus_a
-#define PL_minus_a		(*Perl_Iminus_a_ptr(aTHX))
 #undef  PL_minus_c
 #define PL_minus_c		(*Perl_Iminus_c_ptr(aTHX))
 #undef  PL_minus_l
 #define PL_minus_l		(*Perl_Iminus_l_ptr(aTHX))
-#undef  PL_minus_n
-#define PL_minus_n		(*Perl_Iminus_n_ptr(aTHX))
-#undef  PL_minus_p
-#define PL_minus_p		(*Perl_Iminus_p_ptr(aTHX))
 #undef  PL_modglobal
 #define PL_modglobal		(*Perl_Imodglobal_ptr(aTHX))
 #undef  PL_my_cxt_keys

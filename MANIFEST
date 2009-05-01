@@ -2404,14 +2404,10 @@ t/run/fresh_perl.t		Tests that require a fresh perl.
 t/run/noswitch.t		Test aliasing ARGV for other switch tests
 t/run/runenv.t			Test if perl honors its environment variables.
 t/run/switch0.t			Test the -0 switch
-t/run/switcha.t			Test the -a switch
 t/run/switchC.t			Test the -C switch
 t/run/switchd.t			Test the -d switch
 t/run/switches.t		Tests for the other switches (-0, -l, -c, -s, -M, -m, -V, -v, -h, -z, -i)
 t/run/switchI.t			Test the -I switch
-t/run/switchn.t			Test the -n switch
-t/run/switchp.t			Test the -p switch
-t/run/switchp.aux			Test the -p switch
 t/run/switchx2.aux		Data for switchx.t
 t/run/switchx.aux		Data for switchx.t
 t/run/switchx.t			Test the -x switch
