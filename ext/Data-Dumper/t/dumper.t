@@ -53,8 +53,7 @@ sub TEST($string, ?$name) {
     }
 }
 
-sub SKIP_TEST {
-    my $reason = shift;
+sub SKIP_TEST(?$reason) {
   SKIP: do {
         skip $reason, 3;
     };

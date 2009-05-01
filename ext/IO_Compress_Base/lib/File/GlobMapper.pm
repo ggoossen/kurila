@@ -43,13 +43,13 @@ sub globmap($inputGlob, $outputGlob)
     return $obj->getFileMap();
 }
 
-sub new
+sub new(@< @_)
 {
-    my $class = shift ;
-    my $inputGlob = shift ;
-    my $outputGlob = shift ;
+    my $class = shift @_ ;
+    my $inputGlob = shift @_ ;
+    my $outputGlob = shift @_ ;
     # TODO -- flags needs to default to whatever File::Glob does
-    my $flags = shift || $CSH_GLOB ;
+    my $flags = shift @_ || $CSH_GLOB ;
     #my $flags = shift ;
 
     $inputGlob =~ s/^\s*\<\s*//;
@@ -103,26 +103,24 @@ sub new
     return $self;
 }
 
-sub _retError
+sub _retError(?$string)
 {
-    my $string = shift ;
     $Error = "$string in input fileglob" ;
     return undef ;
 }
 
-sub _unmatched
+sub _unmatched(?$delimeter)
 {
-    my $delimeter = shift ;
 
     _retError("Unmatched $delimeter");
     return undef ;
 }
 
-sub _parseBit
+sub _parseBit(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
 
-    my $string = shift ;
+    my $string = shift @_ ;
 
     my $out = '';
     my $depth = 0 ;
@@ -178,9 +176,8 @@ sub _parseBit
     return $out ;
 }
 
-sub _parseInputGlob
+sub _parseInputGlob($self)
 {
-    my $self = shift ;
 
     my $string = $self->{?InputGlob} ;
     my $inGlob = '';
@@ -265,9 +262,8 @@ sub _parseInputGlob
 
 }
 
-sub _parseOutputGlob
+sub _parseOutputGlob($self)
 {
-    my $self = shift ;
 
     my $string = $self->{?OutputGlob} ;
     my $maxwild = $self->{?WildCount};
@@ -310,9 +306,8 @@ sub _parseOutputGlob
     return 1 ;
 }
 
-sub _getFiles
+sub _getFiles($self)
 {
-    my $self = shift ;
 
     my %outInMapping = %( () );
     my %inFiles = %( () ) ;
@@ -341,16 +336,14 @@ sub _getFiles
     return 1 ;
 }
 
-sub getFileMap
+sub getFileMap($self)
 {
-    my $self = shift ;
 
     return $self->{?Pairs} ;
 }
 
-sub getHash
+sub getHash($self)
 {
-    my $self = shift ;
 
     return \%( < @+: map { @: $_->[0] => $_->[1] },  $self->{Pairs}->@ ) ;
 }

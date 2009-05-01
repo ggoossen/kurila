@@ -67,9 +67,8 @@ foreach my $tuple (@(\@('op.h'),\@('cop.h'),\@('regexp.h','RXf_')))
 }
 close($out_fh);
 
-sub doconst
+sub doconst(?$sym)
 {
-    my $sym = shift;
     my $l = length($sym);
     print $out_fh, <<"END";
  ENTER;

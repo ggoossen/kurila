@@ -53,8 +53,7 @@ sub _expansion($op, $os, $expr) {
     }
 }
 
-sub expand_os_specific {
-    my $s = shift;
+sub expand_os_specific(?$s) {
     $s =~ s/<<=(.*?)>>/$(eval $1)/g;
         $s =~ s/<<\$\^O-(eq|ne)-(\w+)>>(.*?)<<\/\$\^O-\1-\2>>/$(
         _expansion($1,$2,$3)
@@ -157,7 +156,7 @@ my $cfg_dl_library_path = <<'EOT';
 push(@dl_library_path, < split(' ', config_value('libpth')));
 EOT
 
-sub dquoted_comma_list {
+sub dquoted_comma_list(@< @_) {
     join(", ", map {'"'.quotemeta($_).'"'}, @_);
 }
 

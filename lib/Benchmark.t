@@ -10,8 +10,7 @@ use Benchmark < qw(:all);
 my $delta = 0.4;
 
 # Some timing ballast
-sub fib {
-    my $n = shift;
+sub fib(?$n) {
     return $n if $n +< 2;
     fib($n-1) + fib($n-2);
 }

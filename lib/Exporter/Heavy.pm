@@ -173,11 +173,11 @@ sub export($pkg, $callpkg, @< @imports) {
     }
 }
 
-sub export_to_level
+sub export_to_level(@< @_)
 {
-    my $pkg = shift;
-    my $level = shift;
-    shift;			# XXX redundant arg
+    my $pkg = shift @_;
+    my $level = shift @_;
+    shift @_;			# XXX redundant arg
     my $callpkg = caller($level);
     $pkg->export($callpkg, < @_);
 }
@@ -202,11 +202,11 @@ sub require_version($self, $wanted) {
     return $pkg->VERSION($wanted);
 }
 
-sub export_tags {
+sub export_tags(@< @_) {
     _push_tags(@(caller)[0], "EXPORT",    \@_);
 }
 
-sub export_ok_tags {
+sub export_ok_tags(@< @_) {
     _push_tags(@(caller)[0], "EXPORT_OK", \@_);
 }
 

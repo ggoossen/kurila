@@ -9,8 +9,8 @@ ok 1;
 do {
     package Woozle;
     our @ISA = @('Locale::Maketext');
-    sub dubbil   { return @_[1] * 2 }
-    sub numerate { return @_[2] . 'en' }
+    sub dubbil(@< @_)   { return @_[1] * 2 }
+    sub numerate(@< @_) { return @_[2] . 'en' }
 };
 do {
     package Woozle::elx;

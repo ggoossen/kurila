@@ -7,7 +7,7 @@ our ($VERSION, @ISA);
 $VERSION = '0.22';
 @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
 
-sub need_prelink { 1 }
+sub need_prelink(...) { 1 }
 
 sub link($self, %< %args) {
     my $cf = $self->{?config};

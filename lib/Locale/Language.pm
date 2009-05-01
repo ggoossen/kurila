@@ -30,9 +30,8 @@ my %LANGUAGES = %( () );
 # code2language ( CODE )
 #
 #=======================================================================
-sub code2language
+sub code2language(?$code)
 {
-    my $code = shift;
 
 
     return undef unless defined $code;
@@ -56,9 +55,8 @@ sub code2language
 # language2code ( LANGUAGE )
 #
 #=======================================================================
-sub language2code
+sub language2code(?$lang)
 {
-    my $lang = shift;
 
 
     return undef unless defined $lang;
@@ -82,7 +80,7 @@ sub language2code
 # all_language_codes()
 #
 #=======================================================================
-sub all_language_codes
+sub all_language_codes(...)
 {
     return keys %CODES;
 }
@@ -93,7 +91,7 @@ sub all_language_codes
 # all_language_names()
 #
 #=======================================================================
-sub all_language_names
+sub all_language_names(...)
 {
     return values %CODES;
 }

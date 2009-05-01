@@ -63,7 +63,7 @@ others
             UNDEF => undef,
     );
 
-sub header {
+sub header(...) {
     my $start = 1;
     my @lines;
     push @lines, "#define PERL_constant_NOTFOUND\t$start\n"; $start++;
@@ -81,9 +81,9 @@ sub valid_type($self, $type) {
 }
 
 # This might actually be a return statement
-sub assignment_clause_for_type {
-    my $self = shift;
-    my $args = shift;
+sub assignment_clause_for_type(@< @_) {
+    my $self = shift @_;
+    my $args = shift @_;
     my $type = $args->{?type};
     my $typeset = %XS_TypeSet{?$type};
     if (ref $typeset) {
@@ -104,17 +104,17 @@ sub return_statement_for_type($self, $type) {
     "return PERL_constant_IS$type;";
 }
 
-sub return_statement_for_notdef {
+sub return_statement_for_notdef(...) {
     # my ($self) = @_;
     "return PERL_constant_NOTDEF;";
 }
 
-sub return_statement_for_notfound {
+sub return_statement_for_notfound(...) {
     # my ($self) = @_;
     "return PERL_constant_NOTFOUND;";
 }
 
-sub default_type {
+sub default_type(...) {
     'IV';
 }
 
@@ -131,7 +131,7 @@ sub macro_from_item($self, $item) {
 }
 
 # Keep to the traditional perl source macro
-sub memEQ {
+sub memEQ(...) {
     "memEQ";
 }
 
@@ -149,15 +149,15 @@ sub params($self, $what) {
 }
 
 
-sub C_constant_prefix_param {
+sub C_constant_prefix_param(...) {
     "aTHX_ ";
 }
 
-sub C_constant_prefix_param_defintion {
+sub C_constant_prefix_param_defintion(...) {
     "pTHX_ ";
 }
 
-sub namelen_param_definition {
+sub namelen_param_definition(@< @_) {
     'STRLEN ' . @_[0] -> namelen_param;
 }
 

@@ -20,14 +20,14 @@ use MIME::QuotedPrint (); # no need to pollute this namespace
 #      3 file handle of PerlIO layer below (ignored)
 # OUT: 1 blessed object
 
-sub PUSHED { bless \*PUSHED,@_[0] } #PUSHED
+sub PUSHED(@< @_) { bless \*PUSHED,@_[0] } #PUSHED
 
 #-----------------------------------------------------------------------
 #  IN: 1 instantiated object (ignored)
 #      2 handle to read from
 # OUT: 1 decoded string
 
-sub FILL {
+sub FILL(@< @_) {
 
     # Read the line from the handle
     # Decode if there is something decode and return result or signal eof
@@ -42,7 +42,7 @@ sub FILL {
 #      3 handle to write to
 # OUT: 1 number of bytes written
 
-sub WRITE {
+sub WRITE(@< @_) {
 
     # Encode whatever needs to be encoded and write to handle: indicate result
 

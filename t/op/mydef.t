@@ -85,9 +85,9 @@ do {
 
 do {
     my $buf = '';
-    sub tmap1 { m/(.)/; $buf .= $1 } # uses our $_
+    sub tmap1(...) { m/(.)/; $buf .= $1 } # uses our $_
     my $_ = 'x';
-    sub tmap2 { m/(.)/; $buf .= $1 } # uses my $_
+    sub tmap2(...) { m/(.)/; $buf .= $1 } # uses my $_
     map {
             tmap1();
             tmap2();
@@ -111,9 +111,9 @@ do {
 };
 do {
     my $buf = '';
-    sub tgrep1 { m/(.)/; $buf .= $1 }
+    sub tgrep1(...) { m/(.)/; $buf .= $1 }
     my $_ = 'y';
-    sub tgrep2 { m/(.)/; $buf .= $1 }
+    sub tgrep2(...) { m/(.)/; $buf .= $1 }
     grep {
             tgrep1();
             tgrep2();

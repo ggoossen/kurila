@@ -414,7 +414,7 @@ It returns true if the key matched the criteria, or false otherwise.
 
 =cut
 
-sub allow {
+sub allow(@< @_) {
     ### use $_[0] and $_[1] since this is hot code... ###
     #my ($val, $ref) = @_;
 
@@ -451,7 +451,7 @@ sub allow {
 ### helper functions ###
 
 ### clean up the template ###
-sub _clean_up_args {
+sub _clean_up_args(@< @_) {
     ### don't even bother to loop, if there's nothing to clean up ###
     return @_[0] if $PRESERVE_CASE and !$STRIP_LEADING_DASHES;
 
@@ -470,7 +470,7 @@ sub _clean_up_args {
     return \%args;
 }
 
-sub _sanity_check_and_defaults {
+sub _sanity_check_and_defaults(@< @_) {
     my %utmpl   = %( < @_[0]->% );
     my %args    = %( < @_[1]->% );
     my $verbose = @_[2];
@@ -524,14 +524,14 @@ sub _sanity_check_and_defaults {
     return \%defs;
 }
 
-sub _safe_eq {
+sub _safe_eq(@< @_) {
     ### only do a straight 'eq' if they're both defined ###
     return defined(@_[0]) && defined(@_[1])
         ?? @_[0] eq @_[1]
         !! defined(@_[0]) eq defined(@_[1]);
 }
 
-sub _who_was_it {
+sub _who_was_it(@< @_) {
     my $level = @_[?0] || 0;
 
     return @(caller(2 + $CALLER_DEPTH + $level))[?3] || 'ANON'
@@ -551,7 +551,7 @@ It is exported upon request.
 
 do {   $_ERROR_STRING = '';
 
-    sub _store_error {
+    sub _store_error(@< @_) {
         my@($err, $verbose, $offset) =  @_[[0..2]];
         $verbose ||= 0;
         $offset  ||= 0;
@@ -562,11 +562,11 @@ do {   $_ERROR_STRING = '';
         $_ERROR_STRING .= $err . "\n";
     }
 
-    sub _clear_error {
+    sub _clear_error(...) {
         $_ERROR_STRING = '';
     }
 
-    sub last_error { $_ERROR_STRING }
+    sub last_error(...) { $_ERROR_STRING }
 };
 
 1;

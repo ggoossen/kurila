@@ -11,4 +11,4 @@ WriteMakefile(
 
 # Nothing to install (except maybe the XS::Typemap.xs documentation)
 
-sub MY::install { "install ::\n"  };
+sub MY::install(...) { "install ::\n"  };

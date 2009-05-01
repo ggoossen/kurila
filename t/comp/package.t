@@ -9,7 +9,7 @@ do {
 
 package xyz;
 
-sub new {bless \@();}
+sub new(...) {bless \@();}
 
 our $bar = 4;
 
@@ -43,10 +43,9 @@ do {
 
 package main;
 
-sub c { @(caller(0)) }
+sub c(...) { @(caller(0)) }
 
-sub foo {
-    my $s = shift;
+sub foo(?$s) {
     if ($s) {
         package PQR;
         main::c();

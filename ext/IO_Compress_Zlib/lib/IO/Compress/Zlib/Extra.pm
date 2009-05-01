@@ -10,17 +10,17 @@ $VERSION = '2.006';
 
 use IO::Compress::Gzip::Constants v2.006 ;
 
-sub ExtraFieldError
+sub ExtraFieldError(@< @_)
 {
     return @_[0];
     return "Error with ExtraField Parameter: @_[0]" ;
 }
 
-sub validateExtraFieldPair
+sub validateExtraFieldPair(@< @_)
 {
-    my $pair = shift ;
-    my $strict = shift;
-    my $gzipMode = shift ;
+    my $pair = shift @_ ;
+    my $strict = shift @_;
+    my $gzipMode = shift @_ ;
 
     return ExtraFieldError("Not an array ref")
         unless ref $pair &&  ref $pair eq 'ARRAY';
@@ -49,12 +49,12 @@ sub validateExtraFieldPair
     return undef ;
 }
 
-sub parseRawExtra
+sub parseRawExtra(@< @_)
 {
-    my $data     = shift ;
-    my $extraRef = shift;
-    my $strict   = shift;
-    my $gzipMode = shift ;
+    my $data     = shift @_ ;
+    my $extraRef = shift @_;
+    my $strict   = shift @_;
+    my $gzipMode = shift @_ ;
 
     #my $lax = shift ;
 
@@ -97,15 +97,15 @@ sub parseRawExtra
 }
 
 
-sub mkSubField
+sub mkSubField(@< @_)
 {
-    my $id = shift ;
-    my $data = shift ;
+    my $id = shift @_ ;
+    my $data = shift @_ ;
 
     return $id . pack("v", length $data) . $data ;
 }
 
-sub parseExtraField
+sub parseExtraField(@< @_)
 {
     my $dataRef  = @_[0];
     my $strict   = @_[1];

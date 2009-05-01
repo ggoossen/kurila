@@ -112,20 +112,19 @@ package B::Deparse::Wrapper;
 
 use warnings;
 use warnings::register;
-sub getcode {
+sub getcode(@< @_) {
     my $deparser = B::Deparse->new();
-    return $deparser->coderef2text(shift);
+    return $deparser->coderef2text(shift @_);
 }
 
 package main;
 
 use warnings;
-sub test {
-    my $val = shift;
+sub test(?$val) {
     my $res = B::Deparse::Wrapper::getcode($val);
     like( $res, qr/use warnings/);
 }
-sub testsub {
+sub testsub(...) {
     42;
 }
 my ($q,$p);

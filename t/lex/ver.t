@@ -19,7 +19,7 @@ plan( tests => 7 );
 is(ref v111.107.32, 'version','ASCII printing characters');
 
 # poetry optimization should also
-sub v77 { "ok" }
+sub v77(...) { "ok" }
 my $x = v77;
 is('ok',$x,'poetry optimization');
 

@@ -17,7 +17,7 @@ $WRAP = 1 unless defined $WRAP;
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sub _openclose {
+sub _openclose(@< @_) {
     return @+: map {
             m/^([-A-Za-z]+)=(\w[^\=]*)$/s or die "what's <$_>?";
             @( $1,  "\{\\$2\n",   "/$1",  "\}" );
@@ -89,8 +89,8 @@ my @_to_accept;
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-sub new {
-    my $new = shift->SUPER::new(< @_);
+sub new(@< @_) {
+    my $new = shift @_->SUPER::new(< @_);
     $new->nix_X_codes(1);
     $new->nbsp_for_S(1);
     $new->accept_targets( 'rtf', 'RTF' );
@@ -136,7 +136,7 @@ sub new {
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-sub run {
+sub run(@< @_) {
     my $self = @_[0];
     return $self->do_middle if $self->bare_output;
     return
@@ -146,7 +146,7 @@ sub run {
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sub do_middle {      # the main work
+sub do_middle(@< @_) {      # the main work
     my $self = @_[0];
     my $fh = $self->{?'output_fh'};
 
@@ -321,7 +321,7 @@ sub do_middle {      # the main work
 }
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-sub do_beginning {
+sub do_beginning(@< @_) {
     my $self = @_[0];
     my $fh = $self->{?'output_fh'};
     return print $fh, join '', @( <
@@ -335,7 +335,7 @@ sub do_beginning {
 ;
 }
 
-sub do_end {
+sub do_end(@< @_) {
     my $self = @_[0];
     my $fh = $self->{?'output_fh'};
     return print $fh, '}'; # that should do it
@@ -343,7 +343,7 @@ sub do_end {
 
 ###########################################################################
 
-sub stylesheet {
+sub stylesheet(@< @_) {
     return sprintf <<'END', <
 {\stylesheet
 {\snext0 Normal;}
@@ -382,7 +382,7 @@ END
 ###########################################################################
 # Override these as necessary for further customization
 
-sub font_table {
+sub font_table(...) {
     return <<'END';  # text font, code font, heading font
 {\fonttbl
 {\f0\froman Times New Roman;}
@@ -393,21 +393,21 @@ sub font_table {
 END
 }
 
-sub doc_init {
+sub doc_init(...) {
     return <<'END';
 {\rtf1\ansi\deff0
 
 END
 }
 
-sub color_table {
+sub color_table(...) {
     return <<'END';
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 END
 }
 
 
-sub doc_info {
+sub doc_info(@< @_) {
     my $self = @_[0];
 
     my $class = ref($self) || $self;
@@ -437,7 +437,7 @@ END
 ;
 }
 
-sub doc_start {
+sub doc_start(@< @_) {
     my $self = @_[0];
     my $title = $self->get_short_title();
     DEBUG and print $^STDOUT, "Short Title: <$title>\n";
@@ -478,7 +478,7 @@ END
 #-------------------------------------------------------------------------
 
 use integer;
-sub rtf_esc {
+sub rtf_esc(@< @_) {
     my $x; # scratch
     ($x = (((nelems @_) == 1) ?? @_[0] !! join '', @_)
    ) =~ s/([F\x00-\x1F\-\\\{\}\x7F-\xFF])/%Escape{?$1}/g;  # ESCAPER
@@ -487,7 +487,7 @@ sub rtf_esc {
     return $x;
 }
 
-sub rtf_esc_codely {
+sub rtf_esc_codely(@< @_) {
     # Doesn't change "-" to hard-hyphen, nor apply computerese style-smarts.
     # We don't want to change the "-" to hard-hyphen, because we want to
     #  be able to paste this into a file and run it without there being

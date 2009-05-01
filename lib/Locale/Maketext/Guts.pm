@@ -14,7 +14,7 @@ BEGIN {
 
 use utf8;
 
-sub _compile {
+sub _compile(@< @_) {
     # This big scary routine compiles an entry.
     # It returns either a coderef if there's brackety bits in this, or
     #  otherwise a ref to a scalar.
@@ -251,9 +251,9 @@ sub _compile {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub _die_pointing {
+sub _die_pointing(@< @_) {
     # This is used by _compile to throw a fatal error
-    my $target = shift; # class name
+    my $target = shift @_; # class name
     # ...leaving @_[0] the error-causing text, and @_[1] the error message
 
     my $i = index(@_[0], "\n");

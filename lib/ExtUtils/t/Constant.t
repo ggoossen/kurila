@@ -77,8 +77,8 @@ push $^INCLUDE_PATH, '../../lib', '../../../lib';
 
     package main;
 
-sub check_for_bonus_files {
-    my $dir = shift;
+sub check_for_bonus_files(@< @_) {
+    my $dir = shift @_;
     my %expect = %( < @+: map { @: ($^OS_NAME eq 'VMS' ?? lc($_) !! $_), 1}, @_ );
 
     my $fail;
@@ -230,8 +230,7 @@ sub build_and_run($tests, $expect, $files) {
     check_for_bonus_files ('.', '.', '..');
 }
 
-sub Makefile_PL {
-    my $package = shift;
+sub Makefile_PL(?$package) {
     ################ Makefile.PL
     # We really need a Makefile.PL because make test for a no dynamic linking perl
     # will run Makefile.PL again as part of the "make perl" target.
@@ -252,7 +251,7 @@ EOT
     return $makefilePL;
 }
 
-sub MANIFEST {
+sub MANIFEST(@< @_) {
     my @files = @_;
     ################ MANIFEST
     # We really need a MANIFEST because make distclean checks it.
@@ -382,7 +381,7 @@ my $after_tests = 8; # Number of "ok"s emitted after make test run
 my $dummytest = 1;
 
 my $here;
-sub start_tests {
+sub start_tests(...) {
     $dummytest += $before_tests;
     $here = $dummytest;
 }
@@ -711,7 +710,7 @@ EOT
 }
 
 # Simple tests to verify bits of the switch generation system work.
-sub simple {
+sub simple(@< @_) {
     start_tests();
     # Deliberately leave $name in @_, so that it is indexed from 1.
     my @($name, @< @items) =  @_;

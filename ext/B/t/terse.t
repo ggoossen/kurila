@@ -13,7 +13,7 @@ try { B::Terse::terse('scalar') };
 like( $^EVAL_ERROR->{?description}, qr/not a reference/, 'terse() fed bad parameters' );
 
 # now point it at a sub and see what happens
-sub foo {}
+sub foo(...) {}
 
 my $sub;
 try{ $sub = B::Terse::compile('', 'foo') };
@@ -57,7 +57,7 @@ warn "# didn't find " . join(' ', keys %ops) if %ops;
 # under ithreads, though).
 #
 our ($a, $b);
-sub bar {
+sub bar(...) {
     # OP SVOP COP IV here or in sub definition
     my @bar = @(1, 2, 3);
 
@@ -91,21 +91,20 @@ like( $items, qr/IV $hex \\42/, 'RV (but now stored in an IV)' );
 
     package TieOut;
 
-sub TIEHANDLE {
+sub TIEHANDLE(@< @_) {
     bless( \(my $out), @_[0] );
 }
 
-sub PRINT {
-    my $self = shift;
+sub PRINT(@< @_) {
+    my $self = shift @_;
     $self->$ .= join('', @_);
 }
 
-sub PRINTF {
-    my $self = shift;
+sub PRINTF(@< @_) {
+    my $self = shift @_;
     $self->$ .= sprintf(nelems @_);
 }
 
-sub read {
-    my $self = shift;
+sub read($self) {
     return substr($self->$, 0, length($self->$), '');
 }

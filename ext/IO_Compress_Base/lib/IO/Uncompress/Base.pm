@@ -28,7 +28,7 @@ push  %EXPORT_TAGS{+all}->@, < @EXPORT_OK ;
 #Exporter::export_ok_tags('all') ;
 
 
-sub smartRead
+sub smartRead(@< @_)
 {
     my $self = @_[0];
     my $out = @_[1];
@@ -100,9 +100,9 @@ sub smartRead
     return length $out->$;
 }
 
-sub pushBack
+sub pushBack(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
 
     return if ! defined @_[0] || length @_[0] == 0 ;
 
@@ -125,11 +125,11 @@ sub pushBack
     }
 }
 
-sub smartSeek
+sub smartSeek(@< @_)
 {
-    my $self   = shift ;
-    my $offset = shift ;
-    my $truncate = shift;
+    my $self   = shift @_ ;
+    my $offset = shift @_ ;
+    my $truncate = shift @_;
     #print "smartSeek to $offset\n";
 
     # TODO -- need to take prime into account
@@ -143,10 +143,10 @@ sub smartSeek
     }
 }
 
-sub smartWrite
+sub smartWrite(@< @_)
 {
-    my $self   = shift ;
-    my $out_data = shift ;
+    my $self   = shift @_ ;
+    my $out_data = shift @_ ;
 
     if (defined $self->{?FH}) {
         # flush needed for 5.8.0 
@@ -161,12 +161,12 @@ sub smartWrite
     }
 }
 
-sub smartReadExact
+sub smartReadExact(@< @_)
 {
     return @_[0]->smartRead(@_[1], @_[2]) == @_[2];
 }
 
-sub smartEof
+sub smartEof(@< @_)
 {
     my $self = @_[0];
 
@@ -180,18 +180,17 @@ sub smartEof
     { $self->{?BufferOffset} +>= length( $self->{?Buffer}->$) }
 }
 
-sub clearError
+sub clearError($self)
 {
-    my $self   = shift ;
 
     $self->{+ErrorNo}  =  0 ;
      $self->{Error}->$ = '' ;
 }
 
-sub saveStatus
+sub saveStatus(@< @_)
 {
-    my $self   = shift ;
-    my $errno = shift() + 0 ;
+    my $self   = shift @_ ;
+    my $errno = shift( @_) + 0 ;
     #return $errno unless $errno || ! defined $self->{ErrorNo};
     #return $errno unless $errno ;
 
@@ -202,32 +201,32 @@ sub saveStatus
 }
 
 
-sub saveErrorString
+sub saveErrorString(@< @_)
 {
-    my $self   = shift ;
-    my $retval = shift ;
+    my $self   = shift @_ ;
+    my $retval = shift @_ ;
 
     #return $retval if ${ $self->{Error} };
 
-     $self->{Error}->$ = shift ;
-    $self->{+ErrorNo} = shift() + 0 if (nelems @_) ;
+     $self->{Error}->$ = shift @_ ;
+    $self->{+ErrorNo} = shift( @_) + 0 if (nelems @_) ;
 
     #warn "saveErrorString: " . ${ $self->{Error} } . " " . $self->{Error} . "\n" ;
     return $retval;
 }
 
-sub croakError
+sub croakError(@< @_)
 {
-    my $self   = shift ;
+    my $self   = shift @_ ;
     $self->saveErrorString(0, @_[0]);
     croak @_[0];
 }
 
 
-sub closeError
+sub closeError(@< @_)
 {
-    my $self = shift ;
-    my $retval = shift ;
+    my $self = shift @_ ;
+    my $retval = shift @_ ;
 
     my $errno = $self->{?ErrorNo};
     my $error =  $self->{?Error}->$;
@@ -240,53 +239,51 @@ sub closeError
     return $retval;
 }
 
-sub error
+sub error($self)
 {
-    my $self   = shift ;
     return  $self->{?Error}->$ ;
 }
 
-sub errorNo
+sub errorNo($self)
 {
-    my $self   = shift ;
     return $self->{?ErrorNo};
 }
 
-sub HeaderError
+sub HeaderError(@< @_)
 {
-    my @($self) =@( shift);
+    my @($self) =@( shift @_);
     return $self->saveErrorString(undef, "Header Error: @_[0]", STATUS_ERROR);
 }
 
-sub TrailerError
+sub TrailerError(@< @_)
 {
-    my @($self) =@( shift);
+    my @($self) =@( shift @_);
     return $self->saveErrorString( <G_ERR, "Trailer Error: @_[0]", STATUS_ERROR);
 }
 
-sub TruncatedHeader
+sub TruncatedHeader(@< @_)
 {
-    my @($self) =@( shift);
+    my @($self) =@( shift @_);
     return $self->HeaderError("Truncated in @_[0] Section");
 }
 
-sub TruncatedTrailer
+sub TruncatedTrailer(@< @_)
 {
-    my @($self) =@( shift);
+    my @($self) =@( shift @_);
     return $self->TrailerError("Truncated in @_[0] Section");
 }
 
-sub postCheckParams
+sub postCheckParams(...)
 {
     return 1;
 }
 
-sub checkParams
+sub checkParams(@< @_)
 {
-    my $self = shift ;
-    my $class = shift ;
+    my $self = shift @_ ;
+    my $class = shift @_ ;
 
-    my $got = shift || IO::Compress::Base::Parameters::new();
+    my $got = shift @_ || IO::Compress::Base::Parameters::new();
 
     my $Valid = \%(
             'BlockSize'     => \@(1, 1, Parse_unsigned, 16 * 1024),
@@ -321,17 +318,17 @@ sub checkParams
     return $got;
 }
 
-sub _create
+sub _create(@< @_)
 {
-    my $obj = shift;
-    my $got = shift;
-    my $append_mode = shift ;
+    my $obj = shift @_;
+    my $got = shift @_;
+    my $append_mode = shift @_ ;
 
     my $class = ref $obj;
     $obj->croakError("$class: Missing Input parameter")
         if ! nelems @_ && ! $got ;
 
-    my $inValue = shift ;
+    my $inValue = shift @_ ;
 
     $obj->{+OneShot}           = 0 ;
 
@@ -449,10 +446,10 @@ sub _create
     return $obj;
 }
 
-sub ckInputParam
+sub ckInputParam(@< @_)
 {
-    my $self = shift ;
-    my $from = shift ;
+    my $self = shift @_ ;
+    my $from = shift @_ ;
     my $inType = whatIsInput(@_[0], @_[1]);
 
     $self->croakError("$from: input parameter not a filename, filehandle, array ref or scalar ref")
@@ -474,9 +471,9 @@ sub ckInputParam
 }
 
 
-sub _inf
+sub _inf(@< @_)
 {
-    my $obj = shift ;
+    my $obj = shift @_ ;
 
     my $class = (caller)[[0]] ;
     my $name = (caller(1))[[3]] ;
@@ -484,9 +481,9 @@ sub _inf
     $obj->croakError("$name: expected at least 1 parameters\n")
         unless (nelems @_) +>= 1 ;
 
-    my $input = shift ;
+    my $input = shift @_ ;
     my $haveOut = (nelems @_) ;
-    my $output = shift ;
+    my $output = shift @_ ;
 
 
     my $x = Validator->new($class, $obj->{?Error}, $name, $input, $output)
@@ -561,22 +558,22 @@ sub _inf
     croak "should not be here" ;
 }
 
-sub retErr
+sub retErr(@< @_)
 {
-    my $x = shift ;
-    my $string = shift ;
+    my $x = shift @_ ;
+    my $string = shift @_ ;
 
      $x->{Error}->$ = $string ;
 
     return undef ;
 }
 
-sub _singleTarget
+sub _singleTarget(@< @_)
 {
-    my $self      = shift ;
-    my $x         = shift ;
-    my $input     = shift;
-    my $output    = shift;
+    my $self      = shift @_ ;
+    my $x         = shift @_ ;
+    my $input     = shift @_;
+    my $output    = shift @_;
 
     my $buff = '';
     $x->{+buff} = \$buff ;
@@ -634,12 +631,12 @@ sub _singleTarget
     return 1 ;
 }
 
-sub _rd2
+sub _rd2(@< @_)
 {
-    my $self      = shift ;
-    my $x         = shift ;
-    my $input     = shift;
-    my $output    = shift;
+    my $self      = shift @_ ;
+    my $x         = shift @_ ;
+    my $input     = shift @_;
+    my $output    = shift @_;
 
     my $z = createSelfTiedObject($x->{?Class}, $self->{?Error});
 
@@ -692,24 +689,24 @@ sub _rd2
     return 1 ;
 }
 
-sub TIEHANDLE
+sub TIEHANDLE(@< @_)
 {
     return @_[0] if ref(@_[0]);
     die "OOPS\n" ;
 
 }
 
-sub UNTIE
+sub UNTIE(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
 }
 
 
-sub readBlock
+sub readBlock(@< @_)
 {
-    my $self = shift ;
-    my $buff = shift ;
-    my $size = shift ;
+    my $self = shift @_ ;
+    my $buff = shift @_ ;
+    my $size = shift @_ ;
 
     if (defined $self->{?CompressedInputLength}) {
         if ($self->{?CompressedInputLengthRemaining} == 0) {
@@ -734,26 +731,26 @@ sub readBlock
     return STATUS_OK;
 }
 
-sub postBlockChk
+sub postBlockChk(...)
 {
     return STATUS_OK;
 }
 
-sub _raw_read
+sub _raw_read(@< @_)
 {
     # return codes
     # >0 - ok, number of bytes read
     # =0 - ok, eof
     # <0 - not ok
 
-    my $self = shift ;
+    my $self = shift @_ ;
 
     return G_EOF if $self->{?Closed} ;
     #return G_EOF if !length $self->{Pending} && $self->{EndStream} ;
     return G_EOF if $self->{?EndStream} ;
 
-    my $buffer = shift ;
-    my $scan_mode = shift ;
+    my $buffer = shift @_ ;
+    my $scan_mode = shift @_ ;
 
     if ($self->{?Plain}) {
         my $tmp_buff ;
@@ -864,14 +861,13 @@ sub _raw_read
     return $buf_len ;
 }
 
-sub reset
+sub reset($self)
 {
-    my $self = shift ;
 
     return $self->{Uncomp}->reset();
 }
 
-sub filterUncompressed
+sub filterUncompressed(...)
 {
 }
 
@@ -882,9 +878,8 @@ sub filterUncompressed
 #           $self->{EndStream} ;
 #}
 
-sub nextStream
+sub nextStream($self)
 {
-    my $self = shift ;
 
     my $status = $self->gotoNextStream();
     $status == 1
@@ -896,9 +891,8 @@ sub nextStream
     return 1;
 }
 
-sub gotoNextStream
+sub gotoNextStream($self)
 {
-    my $self = shift ;
 
     if (! $self->{?NewStream}) {
         my $status = 1;
@@ -949,21 +943,20 @@ sub gotoNextStream
     return 1; 
 }
 
-sub streamCount
+sub streamCount($self)
 {
-    my $self = shift ;
     return 1 if ! defined $self->{?InfoList};
     return scalar nelems  $self->{?InfoList}->@  ;
 }
 
-sub read
+sub read(@< @_)
 {
     # return codes
     # >0 - ok, number of bytes read
     # =0 - ok, eof
     # <0 - not ok
 
-    my $self = shift ;
+    my $self = shift @_ ;
 
     return G_EOF if $self->{?Closed} ;
     return G_EOF if !length $self->{?Pending} && $self->{?EndStream} ;
@@ -1055,9 +1048,8 @@ sub read
     return $length ;
 }
 
-sub _getline
+sub _getline($self)
 {
-    my $self = shift ;
 
     # Slurp Mode
     if ( ! defined $^INPUT_RECORD_SEPARATOR ) {
@@ -1114,9 +1106,8 @@ sub _getline
     };
 }
 
-sub getline
+sub getline($self)
 {
-    my $self = shift;
     my $current_append = $self->{?AppendOutput} ;
     $self->{+AppendOutput} = 1;
     my $lineref = $self->_getline();
@@ -1125,34 +1116,31 @@ sub getline
     return $lineref->$ ;
 }
 
-sub getlines
+sub getlines($self)
 {
-    my $self = shift;
     my($line, @lines);
     push(@lines, $line) 
         while defined($line = $self->getline);
     return @lines;
 }
 
-sub getc
+sub getc($self)
 {
-    my $self = shift;
     my $buf;
     return $buf if $self->read($buf, 1);
     return undef;
 }
 
-sub ungetc
+sub ungetc(@< @_)
 {
-    my $self = shift;
+    my $self = shift @_;
     $self->{+Pending} = ""  unless defined $self->{?Pending} ;    
     $self->{+Pending} = @_[0] . $self->{?Pending} ;    
 }
 
 
-sub trailingData
+sub trailingData($self)
 {
-    my $self = shift ;
 
     if (defined $self->{?FH} || defined $self->{?InputEvent} ) {
         return $self->{?Prime} ;
@@ -1165,18 +1153,16 @@ sub trailingData
 }
 
 
-sub eof
+sub eof($self)
 {
-    my $self = shift ;
 
     return  @($self->{?Closed} ||
               @(!length $self->{?Pending} 
                  &&  @( $self->smartEof() || $self->{?EndStream}))) ;
 }
 
-sub tell
+sub tell($self)
 {
-    my $self = shift ;
 
     my $in ;
     if ($self->{?Plain}) {
@@ -1192,11 +1178,8 @@ sub tell
     return $in - $pending ;
 }
 
-sub close
+sub close($self)
 {
-    # todo - what to do if close is called before the end of the gzip file
-    #        do we remember any trailing data?
-    my $self = shift ;
 
     return 1 if $self->{?Closed} ;
 
@@ -1219,17 +1202,16 @@ sub close
     return 1;
 }
 
-sub DESTROY
+sub DESTROY($self)
 {
-    my $self = shift ;
     $self->close() ;
 }
 
-sub seek
+sub seek(@< @_)
 {
-    my $self     = shift ;
-    my $position = shift;
-    my $whence   = shift ;
+    my $self     = shift @_ ;
+    my $position = shift @_;
+    my $whence   = shift @_ ;
 
     my $here = $self->tell() ;
     my $target = 0 ;
@@ -1269,15 +1251,14 @@ sub seek
     return $offset == 0 ?? 1 !! 0 ;
 }
 
-sub fileno
+sub fileno($self)
 {
-    my $self = shift ;
     return defined $self->{?FH} 
         ?? fileno $self->{?FH} 
         !! undef ;
 }
 
-sub binmode
+sub binmode(...)
 {
     1;
 #    my $self     = shift ;
@@ -1286,23 +1267,21 @@ sub binmode
 #            : 1 ;
 }
 
-sub opened
+sub opened($self)
 {
-    my $self     = shift ;
     return ! $self->{?Closed} ;
 }
 
-sub autoflush
+sub autoflush(@< @_)
 {
-    my $self     = shift ;
+    my $self     = shift @_ ;
     return defined $self->{?FH} 
         ?? $self->{?FH}->autoflush(< @_) 
         !! undef ;
 }
 
-sub input_line_number
+sub input_line_number($self)
 {
-    my $self = shift ;
     my $last = $self->{?LineNo};
     #$. = $self->{LineNo} = @_[1] if (nelems @_) ;
     return $last;
@@ -1319,9 +1298,8 @@ sub input_line_number
 *FILENO   = \&fileno;
 *CLOSE    = \&close;
 
-sub _notAvailable
+sub _notAvailable(?$name)
 {
-    my $name = shift ;
     #return sub { croak "$name Not Available" ; } ;
     return sub { croak "$name Not Available: File opened only for intput" ; } ;
 }

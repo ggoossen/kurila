@@ -28,15 +28,15 @@ package mypragma;
 
 use warnings;
 
-sub import {
+sub import(...) {
     $^HINTS{+mypragma} = 42;
 }
 
-sub unimport {
+sub unimport(...) {
     $^HINTS{+mypragma} = 0;
 }
 
-sub in_effect {
+sub in_effect(...) {
     my $hinthash = @(caller(0))[10];
     return $hinthash->{?mypragma};
 }

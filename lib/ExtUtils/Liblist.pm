@@ -8,8 +8,8 @@ require ExtUtils::Liblist::Kid;
 
 our @ISA = qw(ExtUtils::Liblist::Kid File::Spec);
 
-sub lsdir {
-    shift;
+sub lsdir(@< @_) {
+    shift @_;
     my $rex = qr/@_[1]/;
     opendir my $dir, @_[0];
     my @out = grep { m/$rex/ }, @: readdir $dir;

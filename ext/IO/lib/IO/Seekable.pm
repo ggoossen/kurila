@@ -107,17 +107,17 @@ require Exporter;
 $VERSION = "1.10";
 $VERSION = eval $VERSION;
 
-sub seek {
+sub seek(@< @_) {
     (nelems @_) == 3 or die 'usage: $io->seek(POS, WHENCE)';
     seek(@_[0], @_[1], @_[2]);
 }
 
-sub sysseek {
+sub sysseek(@< @_) {
     (nelems @_) == 3 or die 'usage: $io->sysseek(POS, WHENCE)';
     sysseek(@_[0], @_[1], @_[2]);
 }
 
-sub tell {
+sub tell(@< @_) {
     (nelems @_) == 1 or die 'usage: $io->tell()';
     tell(@_[0]);
 }

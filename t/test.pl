@@ -29,20 +29,20 @@ $TODO = 0;
 $NO_ENDING = 0;
 
 # Use this instead of print to avoid interference while testing globals.
-sub _print {
-    local @($^OUTPUT_FIELD_SEPARATOR) = @('');
+sub _print(@< @_) {
+    local $^OUTPUT_FIELD_SEPARATOR = '';
     print $^STDOUT, < @_;
 }
 
-sub _print_stderr {
-    local@($^OUTPUT_FIELD_SEPARATOR) = @('');
+sub _print_stderr(@< @_) {
+    local $^OUTPUT_FIELD_SEPARATOR = '';
     print $^STDERR, < @_;
 }
 
-sub plan {
+sub plan(@< @_) {
     my $n;
     if ((nelems @_) == 1) {
-        $n = shift;
+        $n = shift @_;
         if ($n eq 'no_plan') {
             undef $n;
             $noplan = 1;
@@ -69,7 +69,7 @@ END {
 
 # Use this instead of "print STDERR" when outputing failure diagnostic
 # messages
-sub _diag {
+sub _diag(@< @_) {
     return unless (nelems @_);
     my @mess = map { m/^#/ ?? "$_\n" !! "# $_\n" },
         @+: map { split m/\n/ }, @_;
@@ -77,17 +77,17 @@ sub _diag {
     $func->(< @mess);
 }
 
-sub diag {
+sub diag(@< @_) {
     _diag(< @_);
 }
 
-sub info {
+sub info(@< @_) {
     my @mess = map { m/^#/ ?? "$_\n" !! "# $_\n" },
         @+: map { split m/\n/ }, @_;
     _print(< @mess);
 }
 
-sub skip_all {
+sub skip_all(@< @_) {
     if ((nelems @_)) {
         _print "1..0 # Skipped: $(join ' ',@_)\n";
     } else {
@@ -96,7 +96,7 @@ sub skip_all {
     exit(0);
 }
 
-sub _ok {
+sub _ok(@< @_) {
     my @($pass, $where, ?$name, @< @mess) =  @_;
     # Do not try to microoptimize by factoring out the "not ".
     # VMS will avenge.
@@ -124,7 +124,7 @@ sub _ok {
     return $pass;
 }
 
-sub _where {
+sub _where(...) {
     my @caller = @( caller($Level) );
     return "at @caller[1] line @caller[2]";
 }
@@ -134,13 +134,11 @@ sub ok ($pass, ?$name, @< @mess) {
     _ok($pass, _where(), $name, < @mess);
 }
 
-sub _q {
-    my $x = shift;
+sub _q(?$x) {
     return dump::view($x);
 }
 
-sub _qq {
-    my $x = shift;
+sub _qq(?$x) {
     return dump::view($x);
 };
 
@@ -151,7 +149,7 @@ foreach my $x (split m//, q|nrtfa\'"|) {
 }
 # A way to display scalars containing control characters and Unicode.
 # Trying to avoid setting $_, or relying on local $_ to work.
-sub display {
+sub display(@< @_) {
     return dump::view(@_[0]);
 }
 
@@ -277,20 +275,20 @@ sub like_yn ($flip, $got, $expected, ?$name, @< @mess) {
     _ok($pass, _where(), $name, < @mess);
 }
 
-sub pass {
+sub pass(@< @_) {
     _ok(1, '', < @_);
 }
 
-sub fail {
+sub fail(@< @_) {
     _ok(0, _where(), < @_);
 }
 
-sub curr_test {
-    $test = shift if (nelems @_);
+sub curr_test(@< @_) {
+    $test = shift @_ if (nelems @_);
     return $test;
 }
 
-sub next_test {
+sub next_test(...) {
     my $retval = $test;
     $test = $test + 1; # don't use ++
     $retval;
@@ -298,9 +296,9 @@ sub next_test {
 
 # Note: can't pass multipart messages since we try to
 # be compatible with Test::More::skip().
-sub skip {
-    my $why = shift;
-    my $n    = (nelems @_) ?? shift !! 1;
+sub skip(@< @_) {
+    my $why = shift @_;
+    my $n    = (nelems @_) ?? shift @_ !! 1;
     for (1..$n) {
         _print "ok $test # skip: $why\n";
         $test = $test + 1;
@@ -309,9 +307,9 @@ sub skip {
     last SKIP;
 }
 
-sub todo_skip {
-    my $why = shift;
-    my $n   = (nelems @_) ?? shift !! 1;
+sub todo_skip(@< @_) {
+    my $why = shift @_;
+    my $n   = (nelems @_) ?? shift @_ !! 1;
 
     for (1..$n) {
         _print "not ok $test # TODO & SKIP: $why\n";
@@ -321,7 +319,7 @@ sub todo_skip {
     last TODO;
 }
 
-sub eq_array {
+sub eq_array(@< @_) {
     my @($ra, $rb) =  @_;
     return 0 unless (nelems $ra->@) == nelems($rb->@);
     for my $i (0..(nelems $ra->@)-1) {
@@ -333,7 +331,7 @@ sub eq_array {
     return 1;
 }
 
-sub eq_hash {
+sub eq_hash(@< @_) {
     my @($orig, $suspect) =  @_;
     my $fail;
     while (my @(?$key, ?$value) =@( each $suspect->%)) {
@@ -393,7 +391,7 @@ my $is_macos    = $^OS_NAME eq 'MacOS';
 my $is_vms      = $^OS_NAME eq 'VMS';
 my $is_cygwin   = $^OS_NAME eq 'cygwin';
 
-sub _quote_args {
+sub _quote_args(@< @_) {
     my @($runperl, $args) =  @_;
 
     foreach ( $args->@) {
@@ -404,7 +402,7 @@ sub _quote_args {
     }
 }
 
-sub _create_runperl { # Create the string to qx in runperl().
+sub _create_runperl(@< @_) { # Create the string to qx in runperl().
     my %args = %( < @_ );
     my $runperl = $^EXECUTABLE_NAME =~ m/\s/ ?? qq{"$^EXECUTABLE_NAME"} !! $^EXECUTABLE_NAME;
     #- this allows, for example, to set PERL_RUNPERL_DEBUG=/usr/bin/valgrind
@@ -493,7 +491,7 @@ sub _create_runperl { # Create the string to qx in runperl().
     return $runperl;
 }
 
-sub runperl {
+sub runperl(@< @_) {
     die "test.pl:runperl() does not take a hashref"
         if ref @_[0] and ref @_[0] eq 'HASH';
     my $runperl = _create_runperl( < @_ );
@@ -504,14 +502,14 @@ sub runperl {
 
 *run_perl = \&runperl; # Nice alias.
 
-sub DIE {
+sub DIE(@< @_) {
     _print_stderr "# $(join ' ',@_)\n";
     exit 1;
 }
 
 # A somewhat safer version of the sometimes wrong $^X.
 my $Perl;
-sub which_perl {
+sub which_perl(...) {
     unless (defined $Perl) {
         $Perl = $^EXECUTABLE_NAME;
 
@@ -559,7 +557,7 @@ sub which_perl {
     return $Perl;
 }
 
-sub unlink_all {
+sub unlink_all(@< @_) {
     foreach my $file ( @_) {
         1 while unlink $file;
         _print_stderr "# Couldn't unlink '$file': $^OS_ERROR\n" if -f $file;
@@ -579,7 +577,7 @@ END { unlink_all $tmpfile }
 # expected scalar) if given no arguments.
 #
 
-sub _fresh_perl {
+sub _fresh_perl(@< @_) {
     my@($prog, $resolve, $runperl_args, $name) =  @_;
 
     $runperl_args ||= \%();
@@ -644,7 +642,7 @@ sub _fresh_perl {
 # Combination of run_perl() and is().
 #
 
-sub fresh_perl_is {
+sub fresh_perl_is(@< @_) {
     my@($prog, $expected, ?$runperl_args, ?$name) =  @_;
     local $Level = 2;
     $expected =~ s/\n+$//; # is also removed from program output
@@ -659,7 +657,7 @@ sub fresh_perl_is {
 # Combination of run_perl() and like().
 #
 
-sub fresh_perl_like {
+sub fresh_perl_like(@< @_) {
     my@($prog, $expected, $runperl_args, $name) =  @_;
     local $Level = 2;
     _fresh_perl($prog,

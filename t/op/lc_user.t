@@ -6,7 +6,7 @@ plan tests => 4;
 
 use utf8;
 
-sub ToUpper {
+sub ToUpper(...) {
     return <<END;
 0061	0063	0041
 END
@@ -15,7 +15,7 @@ END
 is(uc("foo\x{101}"), "foo\x{101}", "no changes on 'foo'");
 is(uc("bar\x{101}"), "BAr\x{101}", "changing 'ab' on 'bar' ");
 
-sub ToLower {
+sub ToLower(...) {
     return <<END;
 0041		0061
 END

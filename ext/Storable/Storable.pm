@@ -50,13 +50,13 @@ BEGIN {
     }
 }
 
-sub CLONE {
+sub CLONE(...) {
     # clone context under threads
     Storable::init_perinterp();
 }
 
 # Can't Autoload cleanly as this clashes 8.3 with &retrieve
-sub retrieve_fd { &fd_retrieve( < @_ ) }		# Backward compatibility
+sub retrieve_fd(@< @_) { &fd_retrieve( < @_ ) }		# Backward compatibility
 
 # By default restricted hashes are downgraded on earlier perls.
 
@@ -68,11 +68,11 @@ Storable->bootstrap;
 # Autoloader will kindly supply our fallback implementation.
 #
 
-sub logcroak {
+sub logcroak(@< @_) {
     die(< @_);
 }
 
-sub logcarp {
+sub logcarp(@< @_) {
     warn(< @_);
 }
 
@@ -81,7 +81,7 @@ sub logcarp {
 #
 
 my $CAN_FLOCK;
-sub CAN_FLOCK {
+sub CAN_FLOCK(...) {
     return $CAN_FLOCK if defined $CAN_FLOCK;
     require Config;
     return ($CAN_FLOCK =
@@ -90,7 +90,7 @@ sub CAN_FLOCK {
          Config::config_value('d_lockf'));
 }
 
-sub show_file_magic {
+sub show_file_magic(...) {
     print $^STDOUT, <<EOM;
 #
 # To recognize the data files of the Perl module Storable,
@@ -112,8 +112,7 @@ sub show_file_magic {
 EOM
 }
 
-sub file_magic {
-    my $file = shift;
+sub file_magic(?$file) {
     my $fh = IO::File->new();
     open($fh, "<", "". $file) || die "Can't open '$file': $^OS_ERROR";
     binmode($fh);
@@ -185,11 +184,11 @@ sub read_magic($buf, ?$file) {
     return \%info;
 }
 
-sub BIN_VERSION_NV {
+sub BIN_VERSION_NV(...) {
     sprintf "\%d.\%03d", BIN_MAJOR(), BIN_MINOR();
 }
 
-sub BIN_WRITE_VERSION_NV {
+sub BIN_WRITE_VERSION_NV(...) {
     sprintf "\%d.\%03d", BIN_MAJOR(), BIN_WRITE_MINOR();
 }
 
@@ -201,7 +200,7 @@ sub BIN_WRITE_VERSION_NV {
 # Returns undef if an I/O error occurred, in which case the file is
 # removed.
 #
-sub store {
+sub store(@< @_) {
     return _store(\&pstore, < @_, 0);
 }
 
@@ -210,7 +209,7 @@ sub store {
 #
 # Same as store, but in network order.
 #
-sub nstore {
+sub nstore(@< @_) {
     return _store(\&net_pstore, < @_, 0);
 }
 
@@ -219,7 +218,7 @@ sub nstore {
 #
 # Same as store, but flock the file first (advisory locking).
 #
-sub lock_store {
+sub lock_store(@< @_) {
     return _store(\&pstore, < @_, 1);
 }
 
@@ -228,14 +227,14 @@ sub lock_store {
 #
 # Same as nstore, but flock the file first (advisory locking).
 #
-sub lock_nstore {
+sub lock_nstore(@< @_) {
     return _store(\&net_pstore, < @_, 1);
 }
 
 # Internal store to file routine
-sub _store {
-    my $xsptr = shift;
-    my $self = shift;
+sub _store(@< @_) {
+    my $xsptr = shift @_;
+    my $self = shift @_;
     my @($file, $use_locking) =  @_;
     logcroak "not a reference" unless ref($self);
     logcroak "wrong argument number" unless (nelems @_) == 2;	# No @foo in arglist
@@ -271,7 +270,7 @@ sub _store {
 # Same as store, but perform on an already opened file descriptor instead.
 # Returns undef if an I/O error occurred.
 #
-sub store_fd {
+sub store_fd(@< @_) {
     return _store_fd(\&pstore, < @_);
 }
 
@@ -280,15 +279,15 @@ sub store_fd {
 #
 # Same as store_fd, but in network order.
 #
-sub nstore_fd {
+sub nstore_fd(@< @_) {
     my @($self, $file) =  @_;
     return _store_fd(\&net_pstore, < @_);
 }
 
 # Internal store routine on opened file descriptor
-sub _store_fd {
-    my $xsptr = shift;
-    my $self = shift;
+sub _store_fd(@< @_) {
+    my $xsptr = shift @_;
+    my $self = shift @_;
     my @($file) =  @_;
     logcroak "not a reference" unless ref($self);
     logcroak "too many arguments" unless (nelems @_) == 1;	# No @foo in arglist
@@ -310,7 +309,7 @@ sub _store_fd {
 # Store oject and its hierarchy in memory and return a scalar
 # containing the result.
 #
-sub freeze {
+sub freeze(@< @_) {
     _freeze(\&mstore, < @_);
 }
 
@@ -319,14 +318,14 @@ sub freeze {
 #
 # Same as freeze but in network order.
 #
-sub nfreeze {
+sub nfreeze(@< @_) {
     _freeze(\&net_mstore, < @_);
 }
 
 # Internal freeze routine
-sub _freeze {
-    my $xsptr = shift;
-    my $self = shift;
+sub _freeze(@< @_) {
+    my $xsptr = shift @_;
+    my $self = shift @_;
     logcroak "not a reference" unless ref($self);
     logcroak "too many arguments" unless (nelems @_) == 0;	# No @foo in arglist
     my $da = $^EVAL_ERROR;				# Don't mess if called from exception handler
@@ -344,7 +343,7 @@ sub _freeze {
 # Retrieve object hierarchy from disk, returning a reference to the root
 # object of that tree.
 #
-sub retrieve {
+sub retrieve(@< @_) {
     _retrieve(@_[0], 0);
 }
 
@@ -353,12 +352,12 @@ sub retrieve {
 #
 # Same as retrieve, but with advisory locking.
 #
-sub lock_retrieve {
+sub lock_retrieve(@< @_) {
     _retrieve(@_[0], 1);
 }
 
 # Internal retrieve routine
-sub _retrieve {
+sub _retrieve(@< @_) {
     my @($file, $use_locking) =  @_;
     my $fh;
     open($fh, "<", $file) || logcroak "can't open $file: $^OS_ERROR";

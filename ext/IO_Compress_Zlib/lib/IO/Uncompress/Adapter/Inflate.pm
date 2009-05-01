@@ -11,11 +11,11 @@ $VERSION = '2.006';
 
 
 
-sub mkUncompObject
+sub mkUncompObject(@< @_)
 {
-    my $crc32   = shift || 1;
-    my $adler32 = shift || 1;
-    my $scan    = shift || 0;
+    my $crc32   = shift @_ || 1;
+    my $adler32 = shift @_ || 1;
+    my $scan    = shift @_ || 0;
 
     my $inflate ;
     my $status ;
@@ -47,12 +47,12 @@ sub mkUncompObject
 
 }
 
-sub uncompr
+sub uncompr(@< @_)
 {
-    my $self = shift ;
-    my $from = shift ;
-    my $to   = shift ;
-    my $eof  = shift ;
+    my $self = shift @_ ;
+    my $from = shift @_ ;
+    my $to   = shift @_ ;
+    my $eof  = shift @_ ;
 
     my $inf   = $self->{?Inf};
 
@@ -77,9 +77,8 @@ sub uncompr
     return STATUS_ERROR ;
 }
 
-sub reset
+sub reset($self)
 {
-    my $self = shift ;
     $self->{Inf}->inflateReset();
 
     return STATUS_OK ;
@@ -91,60 +90,54 @@ sub reset
 #    $self->{Inf}->inflateCount();
 #}
 
-sub crc32
+sub crc32($self)
 {
-    my $self = shift ;
     $self->{Inf}->crc32();
 }
 
-sub compressedBytes
+sub compressedBytes($self)
 {
-    my $self = shift ;
     $self->{Inf}->compressedBytes();
 }
 
-sub uncompressedBytes
+sub uncompressedBytes($self)
 {
-    my $self = shift ;
     $self->{Inf}->uncompressedBytes();
 }
 
-sub adler32
+sub adler32($self)
 {
-    my $self = shift ;
     $self->{Inf}->adler32();
 }
 
-sub sync
+sub sync(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
     ( $self->{?Inf}->inflateSync(< @_) == Z_OK) 
         ?? STATUS_OK 
         !! STATUS_ERROR ;
 }
 
 
-sub getLastBlockOffset
+sub getLastBlockOffset($self)
 {
-    my $self = shift ;
     $self->{Inf}->getLastBlockOffset();
 }
 
-sub getEndOffset
+sub getEndOffset($self)
 {
-    my $self = shift ;
     $self->{Inf}->getEndOffset();
 }
 
-sub resetLastBlockByte
+sub resetLastBlockByte(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
     $self->{?Inf}->resetLastBlockByte(< @_);
 }
 
-sub createDeflateStream
+sub createDeflateStream(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
     my $deflate = $self->{?Inf}->createDeflateStream(< @_);
     return bless \%('Def'        => $deflate,
             'CompSize'   => 0,

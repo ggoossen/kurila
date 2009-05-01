@@ -12,7 +12,7 @@ $VERSION = '1.1005';
 
 $Too_Big = 1024 * 1024 * 2;
 
-sub compare {
+sub compare(@< @_) {
     die("Usage: compare( file1, file2 [, buffersize]) ")
         unless((nelems @_) == 2 || (nelems @_) == 3);
 
@@ -116,7 +116,7 @@ sub compare {
 
 *cmp = \&compare;
 
-sub compare_text {
+sub compare_text(@< @_) {
     my @($from,$to,?$cmp) =  @_;
     die("Usage: compare_text( file1, file2 [, cmp-function])")
         unless (nelems @_) == 2 || (nelems @_) == 3;

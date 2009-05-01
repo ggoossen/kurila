@@ -162,8 +162,8 @@ do {
             }
     }
 
-    sub _create {
-        my $class = shift;
+    sub _create(@< @_) {
+        my $class = shift @_;
         my %hash  = %( < @_ );
 
         my $args = check( $Tmpl, \%hash ) or return;
@@ -199,8 +199,7 @@ C<index.html?x=y>.
 
 =cut
 
-sub output_file {
-    my $self = shift;
+sub output_file($self) {
     my $file = $self->file;
 
     $file =~ s/\?.*$//g;
@@ -256,8 +255,8 @@ Returns false on failure.
 
 =cut
 
-sub new {
-    my $class = shift;
+sub new(@< @_) {
+    my $class = shift @_;
     my %hash  = %( < @_ );
 
     my ($uri);
@@ -317,9 +316,9 @@ sub new {
 ### Thus are the problems with a protocol-less specification. :-(
 ###
 
-sub _parse_uri {
-    my $self = shift;
-    my $uri  = shift or return;
+sub _parse_uri(@< @_) {
+    my $self = shift @_;
+    my $uri  = shift @_ or return;
 
     my $href = \%( uri => $uri );
 
@@ -400,8 +399,8 @@ on failure.
 
 =cut
 
-sub fetch {
-    my $self = shift or return;
+sub fetch(@< @_) {
+    my $self = shift @_ or return;
     my %hash = %( < @_ );
 
     my $to;
@@ -481,8 +480,8 @@ sub fetch {
 ########################
 
 ### LWP fetching ###
-sub _lwp_fetch {
-    my $self = shift;
+sub _lwp_fetch(@< @_) {
+    my $self = shift @_;
     my %hash = %( < @_ );
 
     my ($to);
@@ -539,8 +538,8 @@ sub _lwp_fetch {
 }
 
 ### Net::FTP fetching
-sub _netftp_fetch {
-    my $self = shift;
+sub _netftp_fetch(@< @_) {
+    my $self = shift @_;
     my %hash = %( < @_ );
 
     my ($to);
@@ -593,8 +592,8 @@ sub _netftp_fetch {
 }
 
 ### /bin/wget fetch ###
-sub _wget_fetch {
-    my $self = shift;
+sub _wget_fetch(@< @_) {
+    my $self = shift @_;
     my %hash = %( < @_ );
 
     my ($to);
@@ -645,8 +644,8 @@ sub _wget_fetch {
 
 
 ### /bin/ftp fetch ###
-sub _ftp_fetch {
-    my $self = shift;
+sub _ftp_fetch(@< @_) {
+    my $self = shift @_;
     my %hash = %( < @_ );
 
     my ($to);
@@ -686,8 +685,8 @@ sub _ftp_fetch {
 
 ### lynx is stupid - it decompresses any .gz file it finds to be text
 ### use /bin/lynx to fetch files
-sub _lynx_fetch {
-    my $self = shift;
+sub _lynx_fetch(@< @_) {
+    my $self = shift @_;
     my %hash = %( < @_ );
 
     my ($to);
@@ -756,8 +755,8 @@ sub _lynx_fetch {
 }
 
 ### use /bin/ncftp to fetch files
-sub _ncftp_fetch {
-    my $self = shift;
+sub _ncftp_fetch(@< @_) {
+    my $self = shift @_;
     my %hash = %( < @_ );
 
     my ($to);
@@ -806,8 +805,8 @@ sub _ncftp_fetch {
 }
 
 ### use /bin/curl to fetch files
-sub _curl_fetch {
-    my $self = shift;
+sub _curl_fetch(@< @_) {
+    my $self = shift @_;
     my %hash = %( < @_ );
 
     my ($to);
@@ -862,8 +861,8 @@ sub _curl_fetch {
 ### Also see wikipedia on file:// (http://en.wikipedia.org/wiki/File://)
 ###
 
-sub _file_fetch {
-    my $self = shift;
+sub _file_fetch(@< @_) {
+    my $self = shift @_;
     my %hash = %( < @_ );
 
     my ($to);
@@ -925,8 +924,8 @@ sub _file_fetch {
 }
 
 ### use /usr/bin/rsync to fetch files
-sub _rsync_fetch {
-    my $self = shift;
+sub _rsync_fetch(@< @_) {
+    my $self = shift @_;
     my %hash = %( < @_ );
 
     my ($to);
@@ -983,9 +982,9 @@ Pass it a true value to get the C<Carp::longmess()> output instead.
 =cut
 
 ### error handling the way Archive::Extract does it
-sub _error {
-    my $self    = shift;
-    my $error   = shift;
+sub _error(@< @_) {
+    my $self    = shift @_;
+    my $error   = shift @_;
 
     $self->_error_msg( $error );
     $self->_error_msg_long( < Carp::longmess($error) );
@@ -997,9 +996,9 @@ sub _error {
     return;
 }
 
-sub error {
-    my $self = shift;
-    return shift() ?? $self->_error_msg_long !! $self->_error_msg;
+sub error(@< @_) {
+    my $self = shift @_;
+    return shift( @_) ?? $self->_error_msg_long !! $self->_error_msg;
 }
 
 

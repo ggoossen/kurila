@@ -12,7 +12,7 @@ BEGIN {
 our ($p_name, @p_aliases, $p_proto);
 
 # Class::Struct forbids use of @ISA
-sub import {
+sub import(@< @_) {
     local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
     return Exporter::import(< @_);
 }
@@ -24,7 +24,7 @@ struct 'Net::protoent' => \@(
        proto	=> '$',
        );
 
-sub populate {
+sub populate(@< @_) {
     return unless (nelems @_);
     my $pob = new();
     $p_name 	 =    $pob->[0]     	     = @_[0];
@@ -37,7 +37,7 @@ sub getprotoent      ( )  { populate(CORE::getprotoent()) }
 sub getprotobyname   ($name)  { populate(CORE::getprotobyname($name)) } 
 sub getprotobynumber ($number)  { populate(CORE::getprotobynumber($number)) } 
 
-sub getproto {
+sub getproto(@< @_) {
     return &{'getprotoby' . (@_[0]=~m/^\d+$/ ?? 'number' !! 'name')}(< @_);
 }
 

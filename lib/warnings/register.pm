@@ -31,9 +31,9 @@ sub mkMask($bit)
     return $mask;
 }
 
-sub import
+sub import(@< @_)
 {
-    shift;
+    shift @_;
     my $package = @(caller(0))[0];
     if (! defined %warnings::Bits{?$package}) {
         %warnings::Bits{+$package}     = mkMask($warnings::LAST_BIT);

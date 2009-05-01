@@ -31,7 +31,7 @@ is_deeply($root, \@a);
 
     package FOO; our @ISA = qw(Storable);
 
-sub make {
+sub make(...) {
     my $self = bless \%();
     $self->{+key} = \%main::a;
     return $self;

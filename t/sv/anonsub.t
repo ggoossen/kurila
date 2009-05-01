@@ -55,7 +55,7 @@ for ( @prgs){
     is($results, $expected);
 }
 
-sub test_invalid_decl {
+sub test_invalid_decl(@< @_) {
     my @($code,?$todo) =  @_;
     local our $TODO = $todo;
     eval_dies_like( $code,

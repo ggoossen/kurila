@@ -270,13 +270,13 @@ foreach my $dir ( @splithead) {
 ##############################################################################
 
 
-sub usage {
+sub usage(@< @_) {
     warn "$^PROGRAM_NAME: $(join ' ',@_)\n" if (nelems @_);
     die $usage;
 }
 
 
-sub parse_command_line {
+sub parse_command_line(...) {
     usage() if defined %Options{?help};
     %Options{+help} = ""; 	    	    # make -w shut up
 

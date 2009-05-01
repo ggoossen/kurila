@@ -14,8 +14,8 @@ $VERSION = "1.03";
 @ISA = @();
 use I18N::LangTags < qw(alternate_language_tags locale2language_tag);
 
-sub _uniq { my %seen; return grep( {!(%seen{+$_}++) }, @_); }
-sub _normalize {
+sub _uniq(@< @_) { my %seen; return grep( {!(%seen{+$_}++) }, @_); }
+sub _normalize(@< @_) {
     my @languages = map { lc($_) }, grep { $_ }, @+: map { @: $_, < alternate_language_tags($_) }, @_;
     return _uniq(< @languages);
 }
@@ -27,7 +27,7 @@ sub detect () { return __PACKAGE__->ambient_langprefs; }
 
 #===========================================================================
 
-sub ambient_langprefs { # always returns things untainted
+sub ambient_langprefs(@< @_) { # always returns things untainted
     my $base_class = @_[0];
 
     return $base_class->http_accept_langs
@@ -64,7 +64,7 @@ sub ambient_langprefs { # always returns things untainted
 
 #---------------------------------------------------------------------------
 
-sub http_accept_langs {
+sub http_accept_langs(@< @_) {
     # Deal with HTTP "Accept-Language:" stuff.  Hassle.
     # This code is more lenient than RFC 3282, which you must read.
     # Hm.  Should I just move this into I18N::LangTags at some point?
@@ -125,7 +125,7 @@ sub http_accept_langs {
 my %tried = %( () );
 # memoization of whether we've used this module, or found it unusable.
 
-sub _try_use {   # Basically a wrapper around "require Modulename"
+sub _try_use(@< @_) {   # Basically a wrapper around "require Modulename"
     # "Many men have tried..."  "They tried and failed?"  "They tried and died."
     return %tried{?@_[0]} if exists %tried{@_[0]};  # memoization
 

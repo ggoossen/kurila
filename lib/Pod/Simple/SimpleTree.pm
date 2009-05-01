@@ -17,7 +17,7 @@ BEGIN {
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sub _handle_element_start { # self, tagname, attrhash
+sub _handle_element_start(@< @_) { # self, tagname, attrhash
     DEBUG +> 2 and print $^STDOUT, "Handling @_[1] start-event\n";
     my $x = \@(@_[1], @_[2]);
     if(@_[0]->{?'_currpos'}) {
@@ -33,7 +33,7 @@ sub _handle_element_start { # self, tagname, attrhash
     return;
 }
 
-sub _handle_element_end { # self, tagname
+sub _handle_element_end(@< @_) { # self, tagname
     DEBUG +> 2 and print $^STDOUT, "Handling @_[1] end-event\n";
     shift @_[0]->{'_currpos'}->@;
     DEBUG +> 3 and print $^STDOUT, "Stack is now: ",
@@ -41,7 +41,7 @@ sub _handle_element_end { # self, tagname
     return;
 }
 
-sub _handle_text { # self, text
+sub _handle_text(@< @_) { # self, text
     DEBUG +> 2 and print $^STDOUT, "Handling @_[1] text-event\n";
     push  @_[0]->{'_currpos'}->[0]->@, @_[1];
     return;
@@ -49,9 +49,9 @@ sub _handle_text { # self, text
 
 
 # A bit of evil from the black box...  please avert your eyes, kind souls.
-sub _traverse_treelet_bit {
+sub _traverse_treelet_bit(@< @_) {
     DEBUG +> 2 and print $^STDOUT, "Handling @_[1] paragraph event\n";
-    my $self = shift;
+    my $self = shift @_;
     push  $self->{'_currpos'}->[0]->@, \ @_;
     return;
 }

@@ -189,7 +189,7 @@ do {
 # 80 bit long doubles have a 64 bit mantissa
 # sparcs have a 112 bit mantissa for their long doubles. Just to be awkward :-)
 
-sub check_some_code {
+sub check_some_code(@< @_) {
     my @($start, $warn, $action, $description) =  @_;
     my $warn_line = ($warn ?? 'use' !! 'no') . " warnings 'imprecision';";
     my @warnings;

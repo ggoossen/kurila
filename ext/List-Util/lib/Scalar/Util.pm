@@ -15,7 +15,7 @@ require List::Util; # List::Util loads the XS
 $VERSION    = "1.19";
 $VERSION   = eval $VERSION;
 
-sub export_fail {
+sub export_fail(@< @_) {
     if (grep { m/^(weaken|isweak)$/ }, @_ ) {
         require Carp;
         Carp::croak("Weak references are not implemented in the version of perl");

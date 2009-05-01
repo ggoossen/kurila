@@ -527,10 +527,10 @@ my $Is_MacOS = $^OS_NAME eq 'MacOS';
 my $Force_Writeable = ($^OS_NAME eq 'os2' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'MSWin32' ||
                        $^OS_NAME eq 'amigaos' || $^OS_NAME eq 'MacOS' || $^OS_NAME eq 'epoc');
 
-sub _error {
-    my $arg     = shift;
-    my $message = shift;
-    my $object  = shift;
+sub _error(@< @_) {
+    my $arg     = shift @_;
+    my $message = shift @_;
+    my $object  = shift @_;
 
     if ($arg->{?error}) {
         $object = '' unless defined $object;
@@ -541,7 +541,7 @@ sub _error {
     }
 }
 
-sub mkpath {
+sub mkpath(@< @_) {
     my $old_style = (
         UNIVERSAL::isa(@_[0],'ARRAY')
         or ((nelems @_) == 2 and ((defined @_[1] && ! ref @_[1]) ?? @_[1] =~ m/\A\d+\z/ !! 1))
@@ -576,9 +576,9 @@ sub mkpath {
     return _mkpath($arg, $paths);
 }
 
-sub _mkpath {
-    my $arg   = shift;
-    my $paths = shift;
+sub _mkpath(@< @_) {
+    my $arg   = shift @_;
+    my $paths = shift @_;
 
     my(@created);
     foreach my $path ( $paths->@) {
@@ -617,7 +617,7 @@ sub _mkpath {
     return @created;
 }
 
-sub rmtree {
+sub rmtree(@< @_) {
     my $old_style = (UNIVERSAL::isa(@_[0],'ARRAY')) ?? 1 !! 0;
 
     my $arg;
@@ -654,9 +654,9 @@ sub rmtree {
     return _rmtree($arg, $paths);
 }
 
-sub _rmtree {
-    my $arg   = shift;
-    my $paths = shift;
+sub _rmtree(@< @_) {
+    my $arg   = shift @_;
+    my $paths = shift @_;
 
     my $count  = 0;
     my $curdir = File::Spec->curdir();

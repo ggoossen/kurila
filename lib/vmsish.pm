@@ -113,7 +113,7 @@ See L<perlmod/Pragmatic Modules>.
 
 my $IsVMS = $^OS_NAME eq 'VMS';
 
-sub bits {
+sub bits(@< @_) {
     my $bits = 0;
     foreach my $sememe ( @_) {
         # Those hints are defined in vms/vmsish.h :
@@ -124,10 +124,10 @@ sub bits {
     $bits;
 }
 
-sub import {
+sub import(@< @_) {
     return unless $IsVMS;
 
-    shift;
+    shift @_;
     $^HINT_BITS ^|^= bits((nelems @_) ?? < @_ !! < qw(status time));
     my $sememe;
 
@@ -137,10 +137,10 @@ sub import {
     }
 }
 
-sub unimport {
+sub unimport(@< @_) {
     return unless $IsVMS;
 
-    shift;
+    shift @_;
     $^HINT_BITS ^&^= ^~^ bits((nelems @_) ?? < @_ !! < qw(status time));
 
     foreach my $sememe (@((nelems @_) ?? < @_ !! < qw(exit hushed))) {

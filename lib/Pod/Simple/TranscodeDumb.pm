@@ -18,22 +18,22 @@ $VERSION = '2.02';
             < %Supported,
     );
 
-sub is_dumb  {1}
-sub is_smart {0}
+sub is_dumb(...)  {1}
+sub is_smart(...) {0}
 
-sub all_encodings {
+sub all_encodings(...) {
     return sort keys %Supported;
 }
 
-sub encoding_is_available {
+sub encoding_is_available(@< @_) {
     return exists %Supported{lc @_[1]};
 }
 
-sub encmodver {
+sub encmodver(...) {
     return __PACKAGE__ . " v" .($VERSION || '?');
 }
 
-sub make_transcoder {
+sub make_transcoder(@< @_) {
     my $e = @_[1];
     die "WHAT ENCODING!?!?" unless $e;
     my $x;

@@ -13,13 +13,13 @@ require Exporter;
 $VERSION = '0.63';
 
 my $print = 0;
-sub printem {
-    if ((nelems @_)) { $print = shift }
+sub printem(@< @_) {
+    if ((nelems @_)) { $print = shift @_ }
     else    { $print++ }
 }
 
-sub import {
-    my $self = shift;
+sub import(@< @_) {
+    my $self = shift @_;
 
     if ( (nelems @_) == 0 ) {
         $self->export_to_level( 1, $self, < @EXPORT );
@@ -36,7 +36,7 @@ sub import {
     }
 }
 
-sub struct {
+sub struct(@< @_) {
 
     # Determine parameter list structure, one of:
     #   struct( class => [ element-list ])
@@ -47,13 +47,13 @@ sub struct {
     my ($class, @decls);
     my $base_type = ref @_[1];
     if ( $base_type eq 'HASH' ) {
-        $class = shift;
-        @decls = @: < shift()->%;
+        $class = shift @_;
+        @decls = @: < shift( @_)->%;
         _usage_error() if (nelems @_);
     }
     elsif ( $base_type eq 'ARRAY' ) {
-        $class = shift;
-        @decls = shift()->@;
+        $class = shift @_;
+        @decls = shift( @_)->@;
         _usage_error() if (nelems @_);
     }
     else {
@@ -192,11 +192,11 @@ sub struct {
     warn $^EVAL_ERROR if $^EVAL_ERROR;
 }
 
-sub _usage_error {
+sub _usage_error(...) {
     die "struct usage error";
 }
 
-sub _subclass_error {
+sub _subclass_error(...) {
     die 'struct class cannot be a subclass (@ISA not allowed)';
 }
 

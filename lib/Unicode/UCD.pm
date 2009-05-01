@@ -135,8 +135,7 @@ you will need also the compexcl(), casefold(), and casespec() functions.
 =cut
 
 # NB: This function is duplicated in charnames.pm
-sub _getcode {
-    my $arg = shift;
+sub _getcode(?$arg) {
 
     if ($arg =~ m/^[1-9]\d*$/) {
         return $arg;
@@ -156,21 +155,21 @@ if ($hasHangulUtil) {
     Lingua::KO::Hangul::Util->import();
 }
 
-sub hangul_decomp { # internal: called from charinfo
+sub hangul_decomp(@< @_) { # internal: called from charinfo
     if ($hasHangulUtil) {
-        my @tmp = decomposeHangul(shift);
+        my @tmp = decomposeHangul(shift @_);
         return sprintf("\%04X \%04X",      < @tmp) if (nelems @tmp) == 2;
         return sprintf("\%04X \%04X \%04X", < @tmp) if (nelems @tmp) == 3;
     }
     return;
 }
 
-sub hangul_charname { # internal: called from charinfo
-    return sprintf("HANGUL SYLLABLE-\%04X", shift);
+sub hangul_charname(@< @_) { # internal: called from charinfo
+    return sprintf("HANGUL SYLLABLE-\%04X", shift @_);
 }
 
-sub han_charname { # internal: called from charinfo
-    return sprintf("CJK UNIFIED IDEOGRAPH-\%04X", shift);
+sub han_charname(@< @_) { # internal: called from charinfo
+    return sprintf("CJK UNIFIED IDEOGRAPH-\%04X", shift @_);
 }
 
 my @CharinfoRanges = @(
@@ -198,8 +197,8 @@ my @CharinfoRanges = @(
   \@( 0x100000, 0x10FFFD, undef,   undef  ),
     );
 
-sub charinfo {
-    my $arg  = shift;
+sub charinfo(@< @_) {
+    my $arg  = shift @_;
     my $code = _getcode($arg);
     croak __PACKAGE__, "::charinfo: unknown code '$arg'"
         unless defined $code;
@@ -303,7 +302,7 @@ argument is not a known character block, C<undef> is returned.
 my @BLOCKS;
 my %BLOCKS;
 
-sub _charblocks {
+sub _charblocks(...) {
     unless (nelems @BLOCKS) {
         if (openunicode(\$BLOCKSFH, "Blocks.txt")) {
             local $_ = undef;
@@ -320,8 +319,7 @@ sub _charblocks {
     }
 }
 
-sub charblock {
-    my $arg = shift;
+sub charblock(?$arg) {
 
     _charblocks() unless (nelems @BLOCKS);
 
@@ -365,7 +363,7 @@ argument is not a known character script, C<undef> is returned.
 my @SCRIPTS;
 my %SCRIPTS;
 
-sub _charscripts {
+sub _charscripts(...) {
     unless (nelems @SCRIPTS) {
         if (openunicode(\$SCRIPTSFH, "Scripts.txt")) {
             local $_ = undef;
@@ -385,8 +383,7 @@ sub _charscripts {
     }
 }
 
-sub charscript {
-    my $arg = shift;
+sub charscript(?$arg) {
 
     _charscripts() unless (nelems @SCRIPTS);
 
@@ -416,7 +413,7 @@ See also L</Blocks versus Scripts>.
 
 =cut
 
-sub charblocks {
+sub charblocks(...) {
     _charblocks() unless %BLOCKS;
     return dclone \%BLOCKS;
 }
@@ -435,7 +432,7 @@ See also L</Blocks versus Scripts>.
 
 =cut
 
-sub charscripts {
+sub charscripts(...) {
     _charscripts() unless %SCRIPTS;
     return dclone \%SCRIPTS;
 }
@@ -532,7 +529,7 @@ my %GENERAL_CATEGORIES =
             'Cn' =>         'Unassigned',
     );
 
-sub general_categories {
+sub general_categories(...) {
     return dclone \%GENERAL_CATEGORIES;
 }
 
@@ -574,7 +571,7 @@ my %BIDI_TYPES =
             'ON'  => 'Other Neutrals',
     ); 
 
-sub bidi_types {
+sub bidi_types(...) {
     return dclone \%BIDI_TYPES;
 }
 
@@ -613,7 +610,7 @@ returned.  Otherwise, false is returned.
 
 my %COMPEXCL;
 
-sub _compexcl {
+sub _compexcl(...) {
     unless (%COMPEXCL) {
         if (openunicode(\$COMPEXCLFH, "CompositionExclusions.txt")) {
             local $_ = undef;
@@ -628,8 +625,7 @@ sub _compexcl {
     }
 }
 
-sub compexcl {
-    my $arg  = shift;
+sub compexcl(?$arg) {
     my $code = _getcode($arg);
     croak __PACKAGE__, "::compexcl: unknown code '$arg'"
         unless defined $code;
@@ -684,7 +680,7 @@ http://www.unicode.org/unicode/reports/tr21/
 
 my %CASEFOLD;
 
-sub _casefold {
+sub _casefold(...) {
     unless (%CASEFOLD) {
         if (openunicode(\$CASEFOLDFH, "CaseFolding.txt")) {
             local $_ = undef;
@@ -701,8 +697,7 @@ sub _casefold {
     }
 }
 
-sub casefold {
-    my $arg  = shift;
+sub casefold(?$arg) {
     my $code = _getcode($arg);
     croak __PACKAGE__, "::casefold: unknown code '$arg'"
         unless defined $code;
@@ -765,7 +760,7 @@ http://www.unicode.org/unicode/reports/tr21/
 
 my %CASESPEC;
 
-sub _casespec {
+sub _casespec(...) {
     unless (%CASESPEC) {
         if (openunicode(\$CASESPECFH, "SpecialCasing.txt")) {
             local $_ = undef;
@@ -819,8 +814,7 @@ sub _casespec {
     }
 }
 
-sub casespec {
-    my $arg  = shift;
+sub casespec(?$arg) {
     my $code = _getcode($arg);
     croak __PACKAGE__, "::casespec: unknown code '$arg'"
         unless defined $code;
@@ -853,7 +847,7 @@ on the context.
 
 my %NAMEDSEQ;
 
-sub _namedseq {
+sub _namedseq(...) {
     unless (%NAMEDSEQ) {
         if (openunicode(\$NAMEDSEQFH, "NamedSequences.txt")) {
             while ( defined(my $line = ~< $NAMEDSEQFH) ) {
@@ -868,7 +862,7 @@ sub _namedseq {
     }
 }
 
-sub namedseq {
+sub namedseq(@< @_) {
     _namedseq() unless %NAMEDSEQ;
     if ((nelems @_) == 0) {
         return %NAMEDSEQ;
@@ -890,7 +884,7 @@ of numbers delimited by dots (C<'.'>).
 
 my $UNICODEVERSION;
 
-sub UnicodeVersion {
+sub UnicodeVersion(...) {
     unless (defined $UNICODEVERSION) {
         openunicode(\$VERSIONFH, "version");
         chomp($UNICODEVERSION = ~< $VERSIONFH);

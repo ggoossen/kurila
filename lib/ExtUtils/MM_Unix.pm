@@ -110,7 +110,7 @@ Simply says that we're Unix.
 
 =cut
 
-sub os_flavor {
+sub os_flavor(...) {
     return @('Unix');
 }
 
@@ -122,10 +122,10 @@ object files.
 
 =cut
 
-sub c_o {
+sub c_o(@< @_) {
     # --- Translation Sections ---
 
-    my@($self) =@( shift);
+    my@($self) =@( shift @_);
     return '' unless $self->needs_linking();
     my(@m);
 
@@ -298,10 +298,10 @@ Defines a couple of constants in the Makefile that are imported from
 
 =cut
 
-sub const_config {
+sub const_config(@< @_) {
     # --- Constants Sections ---
 
-    my@($self) =@( shift);
+    my@($self) =@( shift @_);
     my @m = @( <<"END" );
 
 # These definitions are from config.sh (via $^INCLUDED{?'Config.pm'}).
@@ -326,8 +326,8 @@ L<ExtUtils::Liblist> for details.
 
 =cut
 
-sub const_loadlibs {
-    my@($self) =@( shift);
+sub const_loadlibs(@< @_) {
+    my@($self) =@( shift @_);
     return "" unless $self->needs_linking;
     my @m;
     push @m, qq{
@@ -497,8 +497,7 @@ Defines the DESTDIR and DEST* variables paralleling the INSTALL*.
 
 =cut
 
-sub init_DEST {
-    my $self = shift;
+sub init_DEST($self) {
 
     # Initialize DESTDIR
     $self->{+DESTDIR} ||= '';
@@ -556,8 +555,7 @@ Defines a lot of macros for distribution support.
 
 =cut
 
-sub init_dist {
-    my $self = shift;
+sub init_dist($self) {
 
     $self->{+TAR}      ||= 'tar';
     $self->{+TARFLAGS} ||= 'cvf';
@@ -614,8 +612,8 @@ Defines the targets distclean, distcheck, skipcheck, manifest, veryclean.
 
 =cut
 
-sub dist_basics {
-    my@($self) =@( shift);
+sub dist_basics(@< @_) {
+    my@($self) =@( shift @_);
 
     return <<'MAKE_FRAG';
 distclean :: realclean distcheck
@@ -643,8 +641,8 @@ Defines a check in target for RCS.
 
 =cut
 
-sub dist_ci {
-    my@($self) =@( shift);
+sub dist_ci(@< @_) {
+    my@($self) =@( shift @_);
     return q{
 ci :
 	$(PERLRUN) "-MExtUtils::Manifest=maniread" \\
@@ -663,8 +661,8 @@ fragment.
 
 =cut
 
-sub dist_core {
-    my@($self) =@( shift);
+sub dist_core(@< @_) {
+    my@($self) =@( shift @_);
 
     my $make_frag = '';
     foreach my $target (qw(dist tardist uutardist tarfile zipdist zipfile 
@@ -689,8 +687,8 @@ depends on $(DIST_DEFAULT).
 
 =cut
 
-sub dist_target {
-    my@($self) =@( shift);
+sub dist_target(@< @_) {
+    my@($self) =@( shift @_);
 
     my $date_check = $self->oneliner(<<'CODE');
 print $$^STDOUT, 'Warning: Makefile possibly out of date with $(VERSION_FROM)', qq[\n]
@@ -713,8 +711,8 @@ method, tardist should have that as a dependency.
 
 =cut
 
-sub tardist_target {
-    my@($self) =@( shift);
+sub tardist_target(@< @_) {
+    my@($self) =@( shift @_);
 
     return <<'MAKE_FRAG';
 tardist : $(DISTVNAME).tar$(SUFFIX)
@@ -732,8 +730,8 @@ method, zipdist should have that as a dependency.
 
 =cut
 
-sub zipdist_target {
-    my@($self) =@( shift);
+sub zipdist_target(@< @_) {
+    my@($self) =@( shift @_);
 
     return <<'MAKE_FRAG';
 zipdist : $(DISTVNAME).zip
@@ -751,8 +749,8 @@ a tarball.
 
 =cut
 
-sub tarfile_target {
-    my@($self) =@( shift);
+sub tarfile_target(@< @_) {
+    my@($self) =@( shift @_);
 
     return <<'MAKE_FRAG';
 $(DISTVNAME).tar$(SUFFIX) : distdir
@@ -775,8 +773,8 @@ a zip file.
 
 =cut
 
-sub zipfile_target {
-    my@($self) =@( shift);
+sub zipfile_target(@< @_) {
+    my@($self) =@( shift @_);
 
     return <<'MAKE_FRAG';
 $(DISTVNAME).zip : distdir
@@ -795,8 +793,8 @@ Converts the tarfile into a uuencoded file
 
 =cut
 
-sub uutardist_target {
-    my@($self) =@( shift);
+sub uutardist_target(@< @_) {
+    my@($self) =@( shift @_);
 
     return <<'MAKE_FRAG';
 uutardist : $(DISTVNAME).tar$(SUFFIX)
@@ -813,8 +811,8 @@ Converts the distdir into a shell archive.
 
 =cut
 
-sub shdist_target {
-    my@($self) =@( shift);
+sub shdist_target(@< @_) {
+    my@($self) =@( shift @_);
 
     return <<'MAKE_FRAG';
 shdist : distdir
@@ -834,7 +832,7 @@ Normally just returns an empty string.
 
 =cut
 
-sub dlsyms {
+sub dlsyms(...) {
     return '';
 }
 
@@ -1177,8 +1175,8 @@ Writes an empty FORCE: target.
 
 =cut
 
-sub force {
-    my@($self) =@( shift);
+sub force(@< @_) {
+    my@($self) =@( shift @_);
     '# Phony target to force checking subdirectories.
 FORCE :
 	$(NOECHO) $(NOOP)
@@ -1213,8 +1211,8 @@ needs_linking() does.
 
 =cut
 
-sub has_link_code {
-    my@($self) =@( shift);
+sub has_link_code(@< @_) {
+    my@($self) =@( shift @_);
     return $self->{?HAS_LINK_CODE} if defined $self->{?HAS_LINK_CODE};
     if ($self->{?OBJECT} or nelems($self->{?C} || @()) or $self->{?MYEXTLIB}){
         $self->{+HAS_LINK_CODE} = 1;
@@ -1297,8 +1295,7 @@ and MAN3PODS as appropriate.
 
 =cut
 
-sub init_MANPODS {
-    my $self = shift;
+sub init_MANPODS($self) {
 
     # Set up names of manual pages to generate from pods
     foreach my $man (qw(MAN1 MAN3)) {
@@ -1361,8 +1358,7 @@ Initializes MAN3PODS from the list of PM files.
 
 =cut
 
-sub init_MAN3PODS {
-    my $self = shift;
+sub init_MAN3PODS($self) {
 
     my %manifypods = %( () ); # we collect the keys first, i.e. the files
     # we have to convert to pod
@@ -1408,8 +1404,7 @@ Initializes PMLIBDIRS and PM from PMLIBDIRS.
 
 =cut
 
-sub init_PM {
-    my $self = shift;
+sub init_PM($self) {
 
     # Some larger extensions often wish to install a number of *.pm/pl
     # files into the library in various locations.
@@ -1503,8 +1498,8 @@ Using / for Unix.  Called by init_main.
 
 =cut
 
-sub init_DIRFILESEP {
-    my@($self) =@( shift);
+sub init_DIRFILESEP(@< @_) {
+    my@($self) =@( shift @_);
 
     $self->{+DIRFILESEP} = '/';
 }
@@ -1714,8 +1709,8 @@ TOUCH, CP, MV, CHMOD, UMASK_NULL, ECHO, ECHO_N
 
 =cut
 
-sub init_others {	# --- Initialize Other Attributes
-    my@($self) =@( shift);
+sub init_others(@< @_) {	# --- Initialize Other Attributes
+    my@($self) =@( shift @_);
 
     $self->{+LD} ||= 'ld';
 
@@ -1821,8 +1816,8 @@ Unix has no need of special linker flags.
 
 =cut
 
-sub init_linker {
-    my@($self) =@( shift);
+sub init_linker(@< @_) {
+    my@($self) =@( shift @_);
     $self->{+PERL_ARCHIVE} ||= '';
     $self->{+PERL_ARCHIVE_AFTER} ||= '';
     $self->{+EXPORT_LIST}  ||= '';
@@ -1839,8 +1834,8 @@ sub init_linker {
 
 =cut
 
-sub init_lib2arch {
-    my@($self) =@( shift);
+sub init_lib2arch(@< @_) {
+    my@($self) =@( shift @_);
 
     # The user who requests an installation directory explicitly
     # should not have to tell us an architecture installation directory
@@ -1892,8 +1887,8 @@ Called by init_main.  Sets up ABSPERL, PERL, FULLPERL and all the
 
 =cut
 
-sub init_PERL {
-    my@($self) =@( shift);
+sub init_PERL(@< @_) {
+    my@($self) =@( shift @_);
 
     my @defpath = @( () );
     foreach my $component (@($self->{?PERL_SRC}, < $self->path(), 
@@ -1987,8 +1982,8 @@ Add MM_Unix_VERSION.
 
 =cut
 
-sub init_platform {
-    my@($self) =@( shift);
+sub init_platform(@< @_) {
+    my@($self) =@( shift @_);
 
     $self->{+MM_Unix_VERSION} = $VERSION;
     $self->{+PERL_MALLOC_DEF} = '-DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc '.
@@ -1997,8 +1992,8 @@ sub init_platform {
 
 }
 
-sub platform_constants {
-    my@($self) =@( shift);
+sub platform_constants(@< @_) {
+    my@($self) =@( shift @_);
     my $make_frag = '';
 
     foreach my $macro (qw(MM_Unix_VERSION PERL_MALLOC_DEF))
@@ -2019,8 +2014,8 @@ Called by init_main.  Initializes PERL_*
 
 =cut
 
-sub init_PERM {
-    my@($self) =@( shift);
+sub init_PERM(@< @_) {
+    my@($self) =@( shift @_);
 
     $self->{+PERM_RW}  = 644  unless defined $self->{?PERM_RW};
     $self->{+PERM_RWX} = 755  unless defined $self->{?PERM_RWX};
@@ -2038,8 +2033,7 @@ INST_DYNAMIC and INST_BOOT.
 
 =cut
 
-sub init_xs {
-    my $self = shift;
+sub init_xs($self) {
 
     if ($self->has_link_code()) {
         $self->{+INST_STATIC}  = 
@@ -2185,8 +2179,8 @@ Defines targets to make and to install EXE_FILES.
 
 =cut
 
-sub installbin {
-    my@($self) =@( shift);
+sub installbin(@< @_) {
+    my@($self) =@( shift @_);
 
     return "" unless $self->{?EXE_FILES};
     my @exefiles = $self->{?EXE_FILES};
@@ -2538,8 +2532,8 @@ Defines how to rewrite the Makefile.
 
 =cut
 
-sub makefile {
-    my@($self) =@( shift);
+sub makefile(@< @_) {
+    my@($self) =@( shift @_);
     my $m;
     # We do not know what target was originally specified so we
     # must force a manual rerun to be sure. But as it should only
@@ -2591,8 +2585,8 @@ also has_link_code())
 
 =cut
 
-sub needs_linking {
-    my@($self) =@( shift);
+sub needs_linking(@< @_) {
+    my@($self) =@( shift @_);
 
     my $caller = @(caller(0))[3];
     confess("needs_linking called too early") if 
@@ -2707,8 +2701,8 @@ subdirectories.
 
 =cut
 
-sub pasthru {
-    my@($self) =@( shift);
+sub pasthru(@< @_) {
+    my@($self) =@( shift @_);
     my(@m);
 
     my @pasthru;
@@ -2752,8 +2746,8 @@ distribution.
 
 =cut
 
-sub perldepend {
-    my@($self) =@( shift);
+sub perldepend(@< @_) {
+    my@($self) =@( shift @_);
     my(@m);
 
     my $make_config = $self->cd('$(PERL_SRC)', '$(MAKE) lib/Config.pm');
@@ -2837,8 +2831,8 @@ interpreted as an octal value.
 
 =cut
 
-sub perm_rw {
-    return shift->{?PERM_RW};
+sub perm_rw(@< @_) {
+    return shift @_->{?PERM_RW};
 }
 
 =item perm_rwx (o)
@@ -2850,8 +2844,8 @@ See also perl_rw.
 
 =cut
 
-sub perm_rwx {
-    return shift->{?PERM_RWX};
+sub perm_rwx(@< @_) {
+    return shift @_->{?PERM_RWX};
 }
 
 =item pm_to_blib
@@ -2861,8 +2855,7 @@ destination and autosplits them. See L<ExtUtils::Install/DESCRIPTION>
 
 =cut
 
-sub pm_to_blib {
-    my $self = shift;
+sub pm_to_blib($self) {
     my $autodir = $self->catdir('$(INST_LIB)','auto');
     my $r = q{
 pm_to_blib : $(TO_INST_PM)
@@ -2887,7 +2880,7 @@ within Makefile.PL after all constants have been defined.
 
 =cut
 
-sub post_constants{
+sub post_constants(...){
     "";
 }
 
@@ -2898,7 +2891,7 @@ chunk of text to the Makefile after the object is initialized.
 
 =cut
 
-sub post_initialize {
+sub post_initialize(...) {
     "";
 }
 
@@ -2909,7 +2902,7 @@ text to the Makefile at the end.
 
 =cut
 
-sub postamble {
+sub postamble(...) {
     "";
 }
 
@@ -3049,8 +3042,7 @@ Defines targets to run *.PL files.
 
 =cut
 
-sub processPL {
-    my $self = shift;
+sub processPL($self) {
     my $pl_files = $self->{?PL_FILES};
 
     return "" unless $pl_files;
@@ -3106,8 +3098,7 @@ but handles simple ones.
 
 =cut
 
-sub quote_paren {
-    my $arg = shift;
+sub quote_paren(?$arg) {
     $arg =~ s{\$\((.+?)\)}{\$\\\\($1\\\\)}g;	# protect $(...)
     $arg =~ s{(?<!\\)([()])}{\\$1}g;		# quote unprotected
     $arg =~ s{\$\\\\\((.+?)\\\\\)}{\$($1)}g;	# unprotect $(...)
@@ -3196,8 +3187,8 @@ Using POSIX::ARG_MAX.  Otherwise falling back to 4096.
 
 =cut
 
-sub max_exec_len {
-    my $self = shift;
+sub max_exec_len(@< @_) {
+    my $self = shift @_;
 
     if (!defined $self->{?_MAX_EXEC_LEN}) {
         if (my $arg_max = try { require POSIX;  &POSIX::ARG_MAX( < @_ ) }) {
@@ -3218,10 +3209,10 @@ Defines the static target.
 
 =cut
 
-sub static {
+sub static(@< @_) {
     # --- Static Loading Sections ---
 
-    my@($self) =@( shift);
+    my@($self) =@( shift @_);
     '
 ## $(INST_PM) has been moved to the all: target.
 ## It remains here for awhile to allow for old usage: "make static"
@@ -3340,9 +3331,9 @@ Defines targets to process subdirectories.
 
 =cut
 
-sub subdirs {
+sub subdirs(@< @_) {
     # --- Sub-directory Sections ---
-    my@($self) =@( shift);
+    my@($self) =@( shift @_);
     my(@m);
     # This method provides a mechanism to automatically deal with
     # subdirectories containing further Makefile.PL scripts.
@@ -3467,8 +3458,8 @@ initializes.
 
 =cut
 
-sub tools_other {
-    my@($self) =@( shift);
+sub tools_other(@< @_) {
+    my@($self) =@( shift @_);
     my @m;
 
     # We set PM_FILTER as late as possible so it can see all the earlier
@@ -3498,8 +3489,8 @@ Determines typemaps, xsubpp version, prototype behaviour.
 
 =cut
 
-sub tool_xsubpp {
-    my@($self) =@( shift);
+sub tool_xsubpp(@< @_) {
+    my@($self) =@( shift @_);
     return "" unless $self->needs_linking;
 
     my $xsdir;
@@ -3563,8 +3554,7 @@ Build man pages, too
 
 =cut
 
-sub all_target {
-    my $self = shift;
+sub all_target($self) {
 
     return <<'MAKE_EXT';
 all :: pure_all manifypods
@@ -3578,10 +3568,10 @@ Defines the targets all, subdirs, config, and O_FILES
 
 =cut
 
-sub top_targets {
+sub top_targets(@< @_) {
     # --- Target Sections ---
 
-    my@($self) =@( shift);
+    my@($self) =@( shift @_);
     my(@m);
 
     push @m, $self->all_target, "\n" unless $self->{+SKIPHASH}{?'all'};
@@ -3628,8 +3618,8 @@ Defines the suffix rules to compile XS files to C.
 
 =cut
 
-sub xs_c {
-    my@($self) =@( shift);
+sub xs_c(@< @_) {
+    my@($self) =@( shift @_);
     return '' unless $self->needs_linking();
     return '
 .xs.c:
@@ -3643,8 +3633,8 @@ Defines the suffix rules to compile XS files to C++.
 
 =cut
 
-sub xs_cpp {
-    my@($self) =@( shift);
+sub xs_cpp(@< @_) {
+    my@($self) =@( shift @_);
     return '' unless $self->needs_linking();
     '
 .xs.cpp:
@@ -3659,8 +3649,8 @@ only intended for broken make implementations.
 
 =cut
 
-sub xs_o {	# many makes are too dumb to use xs_c then c_o
-    my@($self) =@( shift);
+sub xs_o(@< @_) {	# many makes are too dumb to use xs_c then c_o
+    my@($self) =@( shift @_);
     return '' unless $self->needs_linking();
     '
 .xs$(OBJ_EXT):

@@ -17,9 +17,8 @@ use warnings;
 require Tie::Hash;
 @DB_File::HASHINFO::ISA = qw(Tie::Hash);
 
-sub new
+sub new(?$pkg)
 {
-    my $pkg = shift ;
     return bless \%( VALID => \%( 
                 bsize	  => 1,
                     ffactor	  => 1,
@@ -32,10 +31,10 @@ sub new
         ), $pkg ;
 }
 
-sub NotHere
+sub NotHere(@< @_)
 {
-    my $self = shift ;
-    my $method = shift ;
+    my $self = shift @_ ;
+    my $method = shift @_ ;
 
     die ref($self) . " does not define the method $($method)" ;
 }
@@ -47,9 +46,8 @@ use warnings;
 
 @DB_File::RECNOINFO::ISA = qw(DB_File::HASHINFO) ;
 
-sub TIEHASH
+sub TIEHASH(?$pkg)
 {
-    my $pkg = shift ;
 
     bless \%( VALID => \%( < @+: map { @: $_, 1}, 
                 qw( bval cachesize psize flags lorder reclen bfname )
@@ -65,9 +63,8 @@ use warnings;
 
 @DB_File::BTREEINFO::ISA = qw(DB_File::HASHINFO) ;
 
-sub TIEHASH
+sub TIEHASH(?$pkg)
 {
-    my $pkg = shift ;
 
     bless \%( VALID => \%( 
                 flags	   => 1,
@@ -177,9 +174,8 @@ sub new($class, $filename, ?$flags, ?$mode, ?$hash_info)
     DoTie_(0, $class, $filename, $flags, $mode, $hash_info || () );
 }
 
-sub clear
+sub clear($self)
 {
-    my $self = shift;
     my $key = 0 ;
     my $value = "" ;
     my $status = $self->seq($key, $value, R_FIRST());
@@ -205,26 +201,26 @@ sub iterate($self, $callback) {
     return;
 }
 
-sub keys {
+sub keys(@< @_) {
     my @($self) = @_;
     my @keys = @();
     $self->iterate( sub { my @($key, $value) = @_; push @keys, $key; } );
     return @keys;
 }
 
-sub values {
+sub values(@< @_) {
     my @($self) = @_;
     my @values = @();
     $self->iterate( sub { my @($key, $value) = @_; push @values, $value; } );
     return @values;
 }
 
-sub find_dup
+sub find_dup(@< @_)
 {
     die "Usage: \$db->find_dup(key,value)\n"
         unless (nelems @_) == 3 ;
 
-    my $db        = shift ;
+    my $db        = shift @_ ;
     my @($origkey, $value_wanted) =  @_ ;
     my @($key, $value) = @($origkey, 0);
 
@@ -238,12 +234,12 @@ sub find_dup
     return $status ;
 }
 
-sub del_dup
+sub del_dup(@< @_)
 {
     die "Usage: \$db->del_dup(key,value)\n"
         unless (nelems @_) == 3 ;
 
-    my $db        = shift ;
+    my $db        = shift @_ ;
     my @($key, $value) =  @_ ;
     my $status = $db->find_dup($key, $value) ;
     return $status if $status != 0 ;
@@ -252,14 +248,14 @@ sub del_dup
     return $status ;
 }
 
-sub get_dup
+sub get_dup(@< @_)
 {
     die "Usage: \$db->get_dup(key [,flag])\n"
         unless (nelems @_) == 2 or (nelems @_) == 3 ;
 
-    my $db        = shift ;
-    my $key       = shift ;
-    my $flag	  = shift ;
+    my $db        = shift @_ ;
+    my $key       = shift @_ ;
+    my $flag	  = shift @_ ;
     my $value 	  = 0 ;
     my $origkey   = $key ;
     my %values	  = %( () ) ;

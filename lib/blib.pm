@@ -43,9 +43,9 @@ our ($VERSION, $Verbose);
 $VERSION = '1.03';
 $Verbose = 0;
 
-sub import
+sub import(@< @_)
 {
-    my $package = shift;
+    my $package = shift @_;
     my $dir;
     if ($^OS_NAME eq "MSWin32" && -f "Win32.xs") {
         # We don't use getcwd() on Windows because it will internally
@@ -61,7 +61,7 @@ sub import
     if ($^OS_NAME eq 'VMS') { ($dir = VMS::Filespec::unixify($dir)) =~ s-/\z--; }
     if ((nelems @_))
     {
-        $dir = shift;
+        $dir = shift @_;
         $dir =~ s/blib\z//;
         $dir =~ s,/+\z,,;
         $dir = File::Spec->curdir unless ($dir);

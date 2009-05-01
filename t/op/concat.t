@@ -36,7 +36,7 @@ do {
 # variable as the target, and the left argument is not UTF8, it no
 # longer frees the wrong string.
 do {
-    sub r2 {
+    sub r2(...) {
         my $string = '';
         $string .= pack("U0a*", 'mnopqrstuvwx');
         $string = "abcdefghijkl$string";
@@ -132,7 +132,7 @@ do {
 
 do {
     # [perl #24508] optree construction bug
-    sub strfoo { "x" }
+    sub strfoo(...) { "x" }
     my ($x, $y);
     $y = ($x = '' . strfoo()) . "y";
     ok( "$x,$y" eq "x,xy", 'figures out correct target' );

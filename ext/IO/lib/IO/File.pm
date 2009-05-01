@@ -149,8 +149,8 @@ try {
 ## Constructor
 ##
 
-sub new {
-    my $type = shift;
+sub new(@< @_) {
+    my $type = shift @_;
     my $class = ref($type) || $type || "IO::File";
     (nelems @_) +>= 0 && (nelems @_) +<= 3
         or die "usage: new $class [FILENAME [,MODE [,PERMS]]]";
@@ -166,7 +166,7 @@ sub new {
 ## Open
 ##
 
-sub open {
+sub open(@< @_) {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $fh->open(FILENAME [,MODE [,PERMS]])';
     my @($fh, $file, ...) =  @_;
     if ((nelems @_) +> 2) {
@@ -189,7 +189,7 @@ sub open {
 ## Binmode
 ##
 
-sub binmode {
+sub binmode(@< @_) {
     ( (nelems @_) == 1 or (nelems @_) == 2 ) or die 'usage $fh->binmode([LAYER])';
 
     my @($fh, ?$layer) =  @_;

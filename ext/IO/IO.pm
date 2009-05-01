@@ -9,8 +9,8 @@ use warnings;
 our $VERSION = "1.23_01";
 XSLoader::load 'IO', $VERSION;
 
-sub import {
-    shift;
+sub import(@< @_) {
+    shift @_;
 
     warnings::warnif('deprecated', qq{Parameterless "use IO" deprecated})
         if (nelems @_) == 0 ;

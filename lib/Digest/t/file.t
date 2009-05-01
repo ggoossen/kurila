@@ -9,20 +9,18 @@ do {
     our (@ISA, $VERSION);
     @ISA = qw(Digest::base);
 
-    sub new {
-        my $class = shift;
+    sub new(?$class) {
         my $str = "";
         bless \$str, $class;
     }
 
-    sub add {
-        my $self = shift;
+    sub add(@< @_) {
+        my $self = shift @_;
         $self->$ .= join("", @_);
         return $self;
     }
 
-    sub digest {
-        my $self = shift;
+    sub digest($self) {
         return sprintf "\%04d", length($self->$);
     }
 };

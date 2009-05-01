@@ -92,14 +92,14 @@ SKIP: do {
 
         print $^STDOUT, "ok 12 - signal masks successful\n";
 
-        sub SigHUP {
+        sub SigHUP(...) {
             print $^STDOUT, "ok 9 - sigaction SIGHUP\n";
             kill 'INT', $^PID;
             sleep 2;
             print $^STDOUT, "ok 10 - sig mask delayed SIGINT\n";
         }
 
-        sub SigINT {
+        sub SigINT(...) {
             $sigint_called++;
         }
 
@@ -171,8 +171,8 @@ next_test();
 
 # If that worked, validate the mini_mktime() routine's normalisation of
 # input fields to strftime().
-sub try_strftime {
-    my $expect = shift;
+sub try_strftime(@< @_) {
+    my $expect = shift @_;
     my $got = POSIX::strftime('%a %b %d %H:%M:%S %Y %j', < @_);
     is($got, $expect, "validating mini_mktime() and strftime(): $expect");
 }

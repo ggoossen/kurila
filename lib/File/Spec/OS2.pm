@@ -7,11 +7,11 @@ $VERSION = '3.2701';
 
 @ISA = qw(File::Spec::Unix);
 
-sub devnull {
+sub devnull(...) {
     return "/dev/nul";
 }
 
-sub case_tolerant {
+sub case_tolerant(...) {
     return 1;
 }
 
@@ -19,7 +19,7 @@ sub file_name_is_absolute($self,$file) {
     return scalar($file =~ m{^([a-z]:)?[\\/]}is);
 }
 
-sub path {
+sub path(...) {
     my $path = env::var('PATH');
     $path =~ s:\\:/:g;
     my @path = split(';',$path);
@@ -27,20 +27,20 @@ sub path {
     return @path;
 }
 
-sub _cwd {
+sub _cwd(...) {
     # In OS/2 the "require Cwd" is unnecessary bloat.
     return Cwd::sys_cwd();
 }
 
 my $tmpdir;
-sub tmpdir {
+sub tmpdir(@< @_) {
     return $tmpdir if defined $tmpdir;
     my @d = map { env::var($_) }, qw(TMPDIR TEMP TMP);
     $tmpdir = @_[0]->_tmpdir( < @d, '/tmp', '/'  );
 }
 
-sub catdir {
-    my $self = shift;
+sub catdir(@< @_) {
+    my $self = shift @_;
     my @args = @_;
     foreach ( @args) {
         s[\\][/]g;

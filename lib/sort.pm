@@ -11,8 +11,8 @@ $sort::sort_bits       = 0x000000FF; # allow 256 different ones
 $sort::stable_bit      = 0x00000100;
 
 
-sub import {
-    shift;
+sub import(@< @_) {
+    shift @_;
     if ((nelems @_) == 0) {
         require Carp;
         Carp::croak("sort pragma requires arguments");
@@ -36,8 +36,8 @@ sub import {
     }
 }
 
-sub unimport {
-    shift;
+sub unimport(@< @_) {
+    shift @_;
     if ((nelems @_) == 0) {
         die("sort pragma requires arguments");
     }
@@ -56,7 +56,7 @@ sub unimport {
     }
 }
 
-sub current {
+sub current(...) {
     my @sort;
     if ($^HINTS{?sort}) {
         push @sort, 'quicksort' if $^HINTS{?sort} ^&^ $sort::quicksort_bit;

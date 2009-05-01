@@ -708,7 +708,7 @@ do {
     our (@ISA);
     @ISA = qw(File::Spec::Win32);
 
-    sub _cwd { 'C:\one\two' }
+    sub _cwd(...) { 'C:\one\two' }
 
     # Some funky stuff to override Cwd::getdcwd() for testing purposes,
     # in the limited scope of the rel2abs() method.
@@ -742,11 +742,11 @@ for (  @tests ) {
 # Tries a named function with the given args and compares the result against
 # an expected result. Works with functions that return scalars or arrays.
 #
-sub tryfunc {
+sub tryfunc(@< @_) {
   SKIP: do {
-        my $function = shift ;
-        my $expected = shift ;
-        my $platform = shift ;
+        my $function = shift @_ ;
+        my $expected = shift @_ ;
+        my $platform = shift @_ ;
 
         if ($platform && $^OS_NAME ne $platform) {
             skip("skip $function", 1);

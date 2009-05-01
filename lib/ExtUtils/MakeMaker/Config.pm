@@ -7,7 +7,7 @@ use Config < qw(config_value config_keys);
 # Give us an overridable config.
 our %Config = %+: map { %: $_ => config_value($_) }, config_keys();
 
-sub import {
+sub import(...) {
     my $caller = caller;
 
     Symbol::fetch_glob($caller.'::Config')->* = \%Config;

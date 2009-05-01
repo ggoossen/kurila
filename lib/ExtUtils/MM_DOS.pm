@@ -32,7 +32,7 @@ Unless otherwise stated, it works just like ExtUtils::MM_Unix
 
 =cut
 
-sub os_flavor {
+sub os_flavor(...) {
     return @('DOS');
 }
 

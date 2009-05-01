@@ -13,7 +13,7 @@ BEGIN {
 our ($gr_name, $gr_gid, $gr_passwd, $gr_mem, @gr_members);
 
 # Class::Struct forbids use of @ISA
-sub import {
+sub import(@< @_) {
     local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
     return Exporter::import(< @_);
 }
@@ -26,7 +26,7 @@ struct 'User::grent' => \@(
        members => '@',
        );
 
-sub populate {
+sub populate(@< @_) {
     return unless (nelems @_);
     my $gob = new();
     @($gr_name, $gr_passwd, $gr_gid) = $gob->@[[@(0,1,2)]] =  @_[[@(0,1,2)]];

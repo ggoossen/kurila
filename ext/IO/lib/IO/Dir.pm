@@ -23,9 +23,9 @@ $VERSION = eval $VERSION;
 
 sub DIR_UNLINK () { 1 }
 
-sub new {
+sub new(@< @_) {
     (nelems @_) +>= 1 && (nelems @_) +<= 2 or croak 'usage: new IO::Dir [DIRNAME]';
-    my $class = shift;
+    my $class = shift @_;
     my $dh = gensym;
     if ((nelems @_)) {
         IO::Dir::open($dh, @_[0])
@@ -39,7 +39,7 @@ sub DESTROY($dh) {;
     closedir($dh);
 }
 
-sub open {
+sub open(@< @_) {
     (nelems @_) == 2 or croak 'usage: $dh->open(DIRNAME)';
     my @($dh, $dirname) =  @_;
     return undef
@@ -51,37 +51,37 @@ sub open {
     1;
 }
 
-sub close {
+sub close(@< @_) {
     (nelems @_) == 1 or croak 'usage: $dh->close()';
     my @($dh) =  @_;
     closedir($dh);
 }
 
-sub read {
+sub read(@< @_) {
     (nelems @_) == 1 or croak 'usage: $dh->read()';
     my @($dh) =  @_;
     readdir($dh);
 }
 
-sub read_all {
+sub read_all(@< @_) {
     (nelems @_) == 1 or croak 'usage: $dh->read_all()';
     my @($dh) =  @_;
     return @( readdir($dh) );
 }
 
-sub seek {
+sub seek(@< @_) {
     (nelems @_) == 2 or croak 'usage: $dh->seek(POS)';
     my @($dh,$pos) =  @_;
     seekdir($dh,$pos);
 }
 
-sub tell {
+sub tell(@< @_) {
     (nelems @_) == 1 or croak 'usage: $dh->tell()';
     my @($dh) =  @_;
     telldir($dh);
 }
 
-sub rewind {
+sub rewind(@< @_) {
     (nelems @_) == 1 or croak 'usage: $dh->rewind()';
     my @($dh) =  @_;
     rewinddir($dh);

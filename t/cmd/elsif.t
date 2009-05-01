@@ -1,6 +1,6 @@
 #!./perl
 
-sub foo {
+sub foo(@< @_) {
     if (@_[0] == 1) {
         1;
     }

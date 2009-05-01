@@ -5,10 +5,10 @@ our $VERSION = 6.44;
 
 my $Have_Bytes = try { require bytes; 1; };
 
-sub import {
+sub import(@< @_) {
     return unless $Have_Bytes;
 
-    shift;
+    shift @_;
     unshift @_, 'bytes';
 
     return bytes::import(< @_);

@@ -114,11 +114,11 @@ as this is prepended to I<$^INCLUDE_PATH> by the Perl interpreter itself.
 # return a hash of the POD files found
 # first argument may be a hashref (options),
 # rest is a list of directories to search recursively
-sub pod_find
+sub pod_find(@< @_)
 {
     my %opts;
     if(ref @_[0]) {
-        %opts = %( < shift()->% );
+        %opts = %( < shift( @_)->% );
     }
 
     %opts{+verbose} ||= 0;
@@ -298,7 +298,7 @@ sub simplify_name($str) {
 }
 
 # internal sub only
-sub _simplify {
+sub _simplify(@< @_) {
     # strip Perl's own extensions
     @_[0] =~ s/\.(pod|pm|plx?)\z//i;
     # strip meaningless extensions on Win32 and OS/2
@@ -354,7 +354,7 @@ contain some pod documentation.
 
 =cut
 
-sub pod_where {
+sub pod_where(@< @_) {
 
     # default options
     my %options = %(
@@ -365,7 +365,7 @@ sub pod_where {
 
     # Check for an options hash as first argument
     if (defined @_[0] && ref(@_[0]) eq 'HASH') {
-        my $opt = shift;
+        my $opt = shift @_;
 
         # Merge default options with supplied options
         %options = %(< %options, < $opt->%);
@@ -375,7 +375,7 @@ sub pod_where {
     warn 'Usage: pod_where({options}, $pod)' unless (scalar(nelems @_));
 
     # Read argument
-    my $pod = shift;
+    my $pod = shift @_;
 
     # Split on :: and then join the name together using File::Spec
     my @parts = split (m/::/, $pod);
@@ -474,10 +474,10 @@ information.
 
 =cut
 
-sub contains_pod {
-    my $file = shift;
+sub contains_pod(@< @_) {
+    my $file = shift @_;
     my $verbose = 0;
-    $verbose = shift if (nelems @_);
+    $verbose = shift @_ if (nelems @_);
 
     # check for one line of POD
     my $pod_fh;

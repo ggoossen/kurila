@@ -93,9 +93,9 @@ if C<IPC::Run> can not be found or loaded.
 =cut
 
 
-sub can_use_ipc_run     { 
-    my $self    = shift;
-    my $verbose = shift || 0;
+sub can_use_ipc_run(@< @_)     { 
+    my $self    = shift @_;
+    my $verbose = shift @_ || 0;
 
     ### ipc::run doesn't run on win98    
     return if IS_WIN98;
@@ -119,9 +119,9 @@ if C<IPC::Open3> can not be found or loaded.
 =cut
 
 
-sub can_use_ipc_open3   { 
-    my $self    = shift;
-    my $verbose = shift || 0;
+sub can_use_ipc_open3(@< @_)   { 
+    my $self    = shift @_;
+    my $verbose = shift @_ || 0;
 
     ### ipc::open3 is not working on VMS becasue of a lack of fork.
     ### todo, win32 also does not have fork, so need to do more research.
@@ -144,8 +144,7 @@ capturing buffers in it's current configuration.
 
 =cut
 
-sub can_capture_buffer {
-    my $self    = shift;
+sub can_capture_buffer($self) {
 
     return 1 if $USE_IPC_RUN    && $self->can_use_ipc_run; 
     return 1 if $USE_IPC_OPEN3  && $self->can_use_ipc_open3 && !IS_WIN32; 
@@ -170,8 +169,7 @@ found, or C<undef> if it was not.
 
 =cut
 
-sub can_run {
-    my $command = shift;
+sub can_run(?$command) {
 
     # a lot of VMS executables have a symbol defined
     # check those first
@@ -286,7 +284,7 @@ what modules or function calls to use when issuing a command.
 
 =cut
 
-sub run {
+sub run(@< @_) {
     my %hash = %( < @_ );
 
     ### if the user didn't provide a buffer, we'll store it here.
@@ -319,7 +317,7 @@ sub run {
 
     ### capture STDOUT
     my $_out_handler = sub {
-            my $buf = shift;
+            my $buf = shift @_;
             return unless defined $buf;
 
             print $^STDOUT, $buf if $verbose;
@@ -329,7 +327,7 @@ sub run {
 
     ### capture STDERR
     my $_err_handler = sub {
-            my $buf = shift;
+            my $buf = shift @_;
             return unless defined $buf;
 
             print $^STDERR, $buf if $verbose;
@@ -384,12 +382,12 @@ sub run {
         !!  @($ok, $^CHILD_ERROR );
 }
 
-sub _open3_run { 
-    my $self            = shift;
-    my $cmd             = shift;
-    my $_out_handler    = shift;
-    my $_err_handler    = shift;
-    my $verbose         = shift || 0;
+sub _open3_run(@< @_) { 
+    my $self            = shift @_;
+    my $cmd             = shift @_;
+    my $_out_handler    = shift @_;
+    my $_err_handler    = shift @_;
+    my $verbose         = shift @_ || 0;
 
     ### Following code are adapted from Friar 'abstracts' in the
     ### Perl Monastery (http://www.perlmonks.org/index.pl?node_id=151886).
@@ -479,11 +477,11 @@ sub _open3_run {
 }
 
 
-sub _ipc_run {  
-    my $self            = shift;
-    my $cmd             = shift;
-    my $_out_handler    = shift;
-    my $_err_handler    = shift;
+sub _ipc_run(@< @_) {  
+    my $self            = shift @_;
+    my $cmd             = shift @_;
+    my $_out_handler    = shift @_;
+    my $_err_handler    = shift @_;
 
     STDOUT->autoflush(1); STDERR->autoflush(1);
 
@@ -556,10 +554,10 @@ sub _ipc_run {
                             );
 }
 
-sub _system_run { 
-    my $self    = shift;
-    my $cmd     = shift;
-    my $verbose = shift || 0;
+sub _system_run(@< @_) { 
+    my $self    = shift @_;
+    my $cmd     = shift @_;
+    my $verbose = shift @_ || 0;
 
     my @fds_to_dup = @( $verbose ?? () !! < qw[STDOUT STDERR] );
     __PACKAGE__->__dup_fds( < @fds_to_dup );
@@ -583,8 +581,8 @@ do {   use File::Spec;
         );
 
     ### dups FDs and stores them in a cache
-    sub __dup_fds {
-        my $self    = shift;
+    sub __dup_fds(@< @_) {
+        my $self    = shift @_;
         my @fds     = @_;
 
         __PACKAGE__->_debug( "# Closing the following fds: $(join ' ',@fds)" ) if $DEBUG;
@@ -615,8 +613,8 @@ do {   use File::Spec;
     }
 
     ### reopens FDs from the cache    
-    sub __reopen_fds {
-        my $self    = shift;
+    sub __reopen_fds(@< @_) {
+        my $self    = shift @_;
         my @fds     = @_;
 
         __PACKAGE__->_debug( "# Reopening the following fds: $(join ' ',@fds)" ) if $DEBUG;
@@ -638,10 +636,10 @@ do {   use File::Spec;
     }
 };    
 
-sub _debug {
-    my $self    = shift;
-    my $msg     = shift or return;
-    my $level   = shift || 0;
+sub _debug(@< @_) {
+    my $self    = shift @_;
+    my $msg     = shift @_ or return;
+    my $level   = shift @_ || 0;
 
     local $Carp::CarpLevel += $level;
     Carp::carp($msg);

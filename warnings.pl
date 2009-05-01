@@ -70,7 +70,7 @@ my $tree = \%(
     ) ;
 
 ###########################################################################
-sub tab {
+sub tab(@< @_) {
     my@($l, $t) =  @_;
     $t .= "\t" x ($l - (length($t) + 1) / 8);
     $t;
@@ -86,9 +86,8 @@ my $index ;
 
 my %v_list = %() ;
 
-sub valueWalk
+sub valueWalk(?$tre)
 {
-    my $tre = shift ;
     my @list = @() ;
 
     foreach my $k (sort keys $tre->%) {
@@ -108,7 +107,7 @@ sub valueWalk
 
 }
 
-sub orderValues
+sub orderValues(...)
 {
     my $index = 0;
     foreach my $ver ( sort { $a <+> $b }, keys %v_list ) {
@@ -123,9 +122,8 @@ sub orderValues
 
 ###########################################################################
 
-sub walk
+sub walk(?$tre)
 {
-    my $tre = shift ;
     my @list = @() ;
 
     foreach my $k (sort keys $tre->%) {
@@ -151,9 +149,8 @@ sub walk
 
 ###########################################################################
 
-sub mkRange
+sub mkRange(?@a)
 {
-    my @a = shift ;
     my @out = @a ;
 
     for my $i (1..nelems(@a)-1) {
@@ -168,10 +165,10 @@ sub mkRange
 }
 
 ###########################################################################
-sub printTree
+sub printTree(@< @_)
 {
-    my $tre = shift ;
-    my $prefix = shift ;
+    my $tre = shift @_ ;
+    my $prefix = shift @_ ;
     my ($k, $v) ;
 
     my $max = (sort {$a <+> $b}, map { length $_ }, keys $tre->%)[-1] ;
@@ -208,7 +205,7 @@ sub printTree
 
 ###########################################################################
 
-sub mkHex
+sub mkHex(@< @_)
 {
     my @($max, @< @a) =  @_ ;
     my $mask = "\x[00]" x $max;

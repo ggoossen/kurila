@@ -58,7 +58,7 @@ $VERSION = '0.06';
             '' => sub {},
     );
 
-sub type_to_C_value {
+sub type_to_C_value(@< @_) {
     my @($self, $type) =  @_;
     return %type_to_C_value{?$type} || sub {return @+: map {ref $_ ?? $_->@ !! @($_) }, @_ };
 }
@@ -150,8 +150,8 @@ sub name_len_value_macro($self, $item) {
     return @($name, $namelen, $value, $macro);
 }
 
-sub WriteConstants {
-    my $self = shift;
+sub WriteConstants(@< @_) {
+    my $self = shift @_;
     my $ARGS = \%(< @_);
 
     my @($c_fh, $xs_fh, $c_subname, $xs_subname, $default_type, $package)

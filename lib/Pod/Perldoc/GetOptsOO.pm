@@ -25,7 +25,7 @@ BEGIN { # Make a DEBUG constant ASAP
 }
 
 
-sub getopts {
+sub getopts(@< @_) {
     my@($target, $args, $truth) =  @_;
 
     $args ||= \@ARGV;

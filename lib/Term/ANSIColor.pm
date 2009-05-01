@@ -104,7 +104,7 @@ for my $attr (keys %attributes) {
 ##############################################################################
 
 # Return the escape code for a given set of color attributes.
-sub color {
+sub color(@< @_) {
     return '' if defined env::var('ANSI_COLORS_DISABLED');
     my @codes = @+: map { split }, @_;
     my $attribute = '';
@@ -123,7 +123,7 @@ sub color {
 # Return a list of named color attributes for a given set of escape codes.
 # Escape sequences can be given with or without enclosing "\e[" and "m".  The
 # empty escape sequence '' or "\e[m" gives an empty list of attrs.
-sub uncolor {
+sub uncolor(@< @_) {
     my (@nums, @result);
     for ( @_) {
         my $escape = $_;
@@ -155,13 +155,13 @@ sub uncolor {
 # the starting attribute code after the string $EACHLINE, so that no attribute
 # crosses line delimiters (this is often desirable if the output is to be
 # piped to a pager or some other program).
-sub colored {
+sub colored(@< @_) {
     my ($string, @codes);
     if (ref @_[0]) {
-        @codes = $:shift->@;
+        @codes = $:shift @_->@;
         $string = join ('', @_);
     } else {
-        $string = shift;
+        $string = shift @_;
         @codes = @_;
     }
     return $string if defined env::var('ANSI_COLORS_DISABLED');

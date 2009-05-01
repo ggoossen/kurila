@@ -34,7 +34,7 @@ BeOS is BeOS.
 
 =cut
 
-sub os_flavor {
+sub os_flavor(...) {
     return @('BeOS');
 }
 
@@ -44,8 +44,8 @@ libperl.a equivalent to be linked to dynamic extensions.
 
 =cut
 
-sub init_linker {
-    my@($self) =@( shift);
+sub init_linker(@< @_) {
+    my@($self) =@( shift @_);
 
     $self->{+PERL_ARCHIVE} ||= 
     File::Spec->catdir('$(PERL_INC)',%Config{libperl});

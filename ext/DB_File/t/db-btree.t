@@ -29,7 +29,7 @@ plan tests => 82;
 
 unlink < glob "__db.*";
 
-sub lexical
+sub lexical(...)
 {
     my @a = @( unpack ("C*", $a) ) ;
     my @b = @( unpack ("C*", $b) ) ;
@@ -47,26 +47,24 @@ do {
     package Redirect ;
     use Symbol ;
 
-    sub new
+    sub new(@< @_)
     {
-        my $class = shift ;
-        my $filename = shift ;
+        my $class = shift @_ ;
+        my $filename = shift @_ ;
         my $fh = gensym ;
         open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" ;
         my $real_stdout = $^STDOUT;
         return bless \@($fh, $real_stdout ) ;
 
     }
-    sub DESTROY
+    sub DESTROY($self)
     {
-        my $self = shift ;
         close $self->[0] ;
     }
 };
 
-sub docat
-{ 
-    my $file = shift;
+sub docat(?$file)
+{
     local $^INPUT_RECORD_SEPARATOR = undef ;
     open(my $catfh, "<",$file) || die "Cannot open $file: $^OS_ERROR";
     my $result = ~< $catfh->*;
@@ -75,17 +73,15 @@ sub docat
     return $result ;
 }   
 
-sub docat_del
-{ 
-    my $file = shift;
+sub docat_del(?$file)
+{
     my $result = docat($file);
     unlink $file ;
     return $result ;
 }   
 
-sub normalise
+sub normalise(?$data)
 {
-    my $data = shift ;
     $data =~ s#\r\n#\n#g 
         if $^OS_NAME eq 'cygwin' ;
 

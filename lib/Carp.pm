@@ -22,29 +22,29 @@ our @EXPORT_FAIL = qw(verbose);	# hook to enable verbose mode
 # to do this thanks to @EXPORT_FAIL, above.  $_[1] will contain the word
 # 'verbose'.
 
-sub export_fail { shift; $Verbose = shift if @_[0] eq 'verbose'; < @_ }
+sub export_fail(@< @_) { shift @_; $Verbose = shift @_ if @_[0] eq 'verbose'; < @_ }
 
 # fixed hooks for stashes to point to
-sub longmess  { return longmess_jmp(< @_) }
-sub shortmess { return shortmess_jmp(< @_) }
+sub longmess(@< @_)  { return longmess_jmp(< @_) }
+sub shortmess(@< @_) { return shortmess_jmp(< @_) }
 # these two are replaced when Carp::Heavy is loaded
-sub longmess_jmp  {
+sub longmess_jmp(@< @_)  {
           local($^EVAL_ERROR, $^OS_ERROR);
     try { require Carp::Heavy };
     die if $^EVAL_ERROR;
     return longmess_real(< @_);
 }
-sub shortmess_jmp  {
+sub shortmess_jmp(@< @_)  {
           local($^EVAL_ERROR, $^OS_ERROR);
     try { require Carp::Heavy };
     die if $^EVAL_ERROR;
     return longmess_real(< @_);
 }
 
-sub croak   { die shortmess < @_ }
-sub confess { die longmess  < @_ }
-sub carp    { warn shortmess < @_ }
-sub cluck   { warn longmess  < @_ }
+sub croak(@< @_)   { die shortmess < @_ }
+sub confess(@< @_) { die longmess  < @_ }
+sub carp(@< @_)    { warn shortmess < @_ }
+sub cluck(@< @_)   { warn longmess  < @_ }
 
 1;
 __END__

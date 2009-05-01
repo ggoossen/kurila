@@ -19,9 +19,9 @@ do {
     map { scalar(sort( @())) }, @( ('')x68);
 };
 
-sub Backwards { ($a cmp $b) +< 0 ?? 1 !! ($a cmp $b) +> 0 ?? -1 !! 0 }
+sub Backwards(...) { ($a cmp $b) +< 0 ?? 1 !! ($a cmp $b) +> 0 ?? -1 !! 0 }
 sub Backwards_stacked($x, $y) { ($x cmp $y) +< 0 ?? 1 !! ($x cmp $y) +> 0 ?? -1 !! 0 }
-sub Backwards_other { ($a cmp $b) +< 0 ?? 1 !! ($a cmp $b) +> 0 ?? -1 !! 0 }
+sub Backwards_other(...) { ($a cmp $b) +< 0 ?? 1 !! ($a cmp $b) +> 0 ?? -1 !! 0 }
 
 my $upperfirst = ('A' cmp 'a') +< 0;
 
@@ -106,7 +106,7 @@ cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','reverse then sort');
 
 
 
-sub twoface { no warnings 'redefine'; *twoface = sub { $a <+> $b }; &twoface( < @_ ) }
+sub twoface(@< @_) { no warnings 'redefine'; *twoface = sub { $a <+> $b }; &twoface( < @_ ) }
 try { @b = sort \&twoface, @(4,1,3,2) }; die if $^EVAL_ERROR;
 cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','redefine sort sub inside the sort sub');
 
@@ -180,8 +180,8 @@ main::cmp_ok("$(join ' ',@b)",'eq','1996 255 90 19 5','not in main:: 1');
 # test against a reentrancy bug
 do {
     package Bar;
-    sub compare { $a cmp $b }
-    sub reenter { my @force = sort \&compare, qw/a b/ }
+    sub compare(...) { $a cmp $b }
+    sub reenter(...) { my @force = sort \&compare, qw/a b/ }
 };
 do {
     my@($def, $init) = @(0, 0);
@@ -197,7 +197,7 @@ do {
 
 
 do {
-    sub routine { @("one", "two") };
+    sub routine(...) { @("one", "two") };
     @a = sort(routine(1));
     main::cmp_ok("$(join ' ',@a)",'eq',"one two",'bug id 19991001.003');
 };
@@ -259,8 +259,7 @@ my @output;
 do {
     my $failed = 0;
 
-    sub rec {
-        my $n = shift;
+    sub rec(?$n) {
         if (!defined($n)) {  # No arg means we're being called by sort()
             return 1;
         }
@@ -284,7 +283,7 @@ my $answer = "good";
 do {
     package OtherPack;
     no warnings 'once';
-    sub foo {
+    sub foo(...) {
         $answer = "something was unexpectedly defined or undefined" if
             defined($a) || defined($b) || !defined($main::a) || !defined($main::b);
         $main::a <+> $main::b;
@@ -304,7 +303,7 @@ my @list = sort { A::min(< $a->@) <+> A::min(< $b->@) },
 main::cmp_ok($answer,'eq','good','bug 36430');
 
     package A;
-sub min {
+sub min(@< @_) {
     my @list = sort {
             $answer = '$a and/or $b are not defined ' if !defined($a) || !defined($b);
             $a <+> $b;
@@ -313,7 +312,7 @@ sub min {
 }
 
 # Sorting shouldn't increase the refcount of a sub
-sub foo {(1+$a) <+> (1+$b)}
+sub foo(...) {(1+$a) <+> (1+$b)}
 my $refcnt = &Internals::SvREFCNT(\&foo);
 @output = sort @( foo 3,7,9);
 main::is($refcnt, &Internals::SvREFCNT(\&foo), "sort sub refcnt");

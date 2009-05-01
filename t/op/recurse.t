@@ -9,17 +9,17 @@ BEGIN {
     plan(tests => 28);
 }
 
-sub gcd {
+sub gcd(@< @_) {
     return gcd(@_[0] - @_[1], @_[1]) if (@_[0] +> @_[1]);
     return gcd(@_[0], @_[1] - @_[0]) if (@_[0] +< @_[1]);
     @_[0];
 }
 
-sub factorial {
+sub factorial(@< @_) {
     @_[0] +< 2 ?? 1 !! @_[0] * factorial(@_[0] - 1);
 }
 
-sub fibonacci {
+sub fibonacci(@< @_) {
     @_[0] +< 2 ?? 1 !! fibonacci(@_[0] - 2) + fibonacci(@_[0] - 1);
 }
 
@@ -29,7 +29,7 @@ sub fibonacci {
 # For example ackermann(4,1) will take quite a long time.
 # It will simply eat away your memory. Trust me.
 
-sub ackermann {
+sub ackermann(@< @_) {
     return @_[1] + 1               if (@_[0] == 0);
     return ackermann(@_[0] - 1, 1) if (@_[1] == 0);
     ackermann(@_[0] - 1, ackermann(@_[0], @_[1] - 1));
@@ -37,7 +37,7 @@ sub ackermann {
 
 # Highly recursive, highly boring.
 
-sub takeuchi {
+sub takeuchi(@< @_) {
     @_[1] +< @_[0] ??
         takeuchi(takeuchi(@_[0] - 1, @_[1], @_[2]),
           takeuchi(@_[1] - 1, @_[2], @_[0]),
@@ -71,11 +71,11 @@ my @($x, $y, $z) = @(18, 12, 6);
 is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
 
 do {
-    sub get_first1 {
+    sub get_first1(@< @_) {
         get_list1(< @_)->[0];
     }
 
-    sub get_list1 {
+    sub get_list1(@< @_) {
         return \@(curr_test) unless @_[0];
         my $u = get_first1(0);
         \@($u);
@@ -85,11 +85,11 @@ do {
 };
 
 do {
-    sub get_first2 {
+    sub get_first2(@< @_) {
         return get_list2(< @_)->[0];
     }
 
-    sub get_list2 {
+    sub get_list2(@< @_) {
         return \@(curr_test) unless @_[0];
         my $u = get_first2(0);
         return \@($u);
@@ -101,7 +101,7 @@ do {
 do {
     local $^WARNING = 0; # We do not need recursion depth warning.
 
-    sub sillysum {
+    sub sillysum(@< @_) {
         return @_[0] + (@_[0] +> 0 ?? sillysum(@_[0] - 1) !! 0);
     }
 

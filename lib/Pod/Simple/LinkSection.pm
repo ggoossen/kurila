@@ -4,20 +4,20 @@ package Pod::Simple::LinkSection;
 
 use Pod::Simple::BlackBox;
 
-sub tack_on {
+sub tack_on(@< @_) {
     @_[0] = \@('', \%(), "@_[0]" );
     return (@_[0]->[2] .= @_[1]);
 }
 
-sub as_string {
+sub as_string(@< @_) {
     return Pod::Simple::BlackBox::stringify_lol(<@_);
 }
-sub stringify {
+sub stringify(@< @_) {
     return Pod::Simple::BlackBox::stringify_lol(<@_);
 }
 
-sub new {
-    my $class = shift;
+sub new(@< @_) {
+    my $class = shift @_;
     $class = ref($class) || $class;
     my $new;
     if((nelems @_) == 1) {

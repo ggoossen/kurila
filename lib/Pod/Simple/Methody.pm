@@ -9,7 +9,7 @@ $VERSION = '2.02';
 # Yes, we could use named variables, but I want this to be impose
 # as little an additional performance hit as possible.
 
-sub _handle_element_start {
+sub _handle_element_start(@< @_) {
     @_[1] =~ s/-|:/_/g;
     @_[1] =~ s/\.//g;
     ( @_[0]->can( 'start_' . @_[1] )
@@ -19,7 +19,7 @@ sub _handle_element_start {
     );
 }
 
-sub _handle_text {
+sub _handle_text(@< @_) {
     ( @_[0]->can( 'handle_text' )
         || return
     )->(
@@ -27,7 +27,7 @@ sub _handle_text {
     );
 }
 
-sub _handle_element_end {
+sub _handle_element_end(@< @_) {
     @_[1] =~ s/-|:/_/g;
     @_[1] =~ s/\.//g;
     ( @_[0]->can( 'end_' . @_[1] )

@@ -112,37 +112,36 @@ my (%names, %names_copy);
 %names_copy = %( < %names );
 ok (eq_hash (\%names, \%names_copy), "check we can copy our hash");
 
-sub in {
+sub in(@< @_) {
     my %args = %( < @_ );
     return eq_hash (\%names, \%args);
 }
 
 ok (in (< %names), "pass hash into a method");
 
-sub in_method {
-    my $self = shift;
+sub in_method(@< @_) {
+    my $self = shift @_;
     my %args = %( < @_ );
     return eq_hash (\%names, \%args);
 }
 
 ok (main->in_method (< %names), "pass hash into a method");
 
-sub out {
+sub out(...) {
     return %names;
 }
 %names_copy = %( < out () );
 
 ok (eq_hash (\%names, \%names_copy), "pass hash from a subroutine");
 
-sub out_method {
-    my $self = shift;
+sub out_method($self) {
     return %names;
 }
 %names_copy = %( < main->out_method () );
 
 ok (eq_hash (\%names, \%names_copy), "pass hash from a method");
 
-sub in_out {
+sub in_out(@< @_) {
     my %args = %( < @_ );
     return %args;
 }
@@ -150,8 +149,8 @@ sub in_out {
 
 ok (eq_hash (\%names, \%names_copy), "pass hash to and from a subroutine");
 
-sub in_out_method {
-    my $self = shift;
+sub in_out_method(@< @_) {
+    my $self = shift @_;
     my %args = %( < @_ );
     return %args;
 }

@@ -6,16 +6,16 @@ our ($VERSION, @ISA);
 $VERSION = '0.22';
 @ISA = qw(ExtUtils::CBuilder::Base);
 
-sub link_executable {
-    my $self = shift;
+sub link_executable(@< @_) {
+    my $self = shift @_;
     # $Config{cc} is usually a better bet for linking executables than $Config{ld}
     local $self->{config}->{+ld} =
     $self->{config}->{?cc} . " " . $self->{config}->{?ldflags};
     return $self->SUPER::link_executable(< @_);
 }
 
-sub link {
-    my $self = shift;
+sub link(@< @_) {
+    my $self = shift @_;
     my $cf = $self->{?config};
 
     # Some platforms (notably Mac OS X 10.3, but some others too) expect

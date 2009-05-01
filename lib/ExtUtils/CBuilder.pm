@@ -77,7 +77,7 @@ do {
     }
 };
 
-sub os_type { %OSTYPES{?$^OS_NAME} }
+sub os_type(...) { %OSTYPES{?$^OS_NAME} }
 
 1;
 __END__

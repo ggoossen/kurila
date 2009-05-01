@@ -62,8 +62,8 @@ do {
     package B::OBJECT;
 };
 
-sub B::GV::SAFENAME {
-    my $name = (shift())->NAME;
+sub B::GV::SAFENAME(@< @_) {
+    my $name = (shift( @_))->NAME;
 
         # The regex below corresponds to the isCONTROLVAR macro
         # from toke.c
@@ -94,18 +94,16 @@ sub debug($class, $value) {
     walkoptree_debug($value);
 }
 
-sub class {
-    my $obj = shift;
+sub class(?$obj) {
     my $name = ref $obj;
     $name =~ s/^.*:://;
     return $name;
 }
 
-sub parents { \@parents }
+sub parents(...) { \@parents }
 
 # For debugging
-sub peekop {
-    my $op = shift;
+sub peekop(?$op) {
     return sprintf("\%s (0x\%x) \%s", < class($op), $op->$, < $op->name);
 }
 
@@ -135,11 +133,11 @@ sub walkoptree_slow($op, $method, $level) {
     }
 }
 
-sub compile_stats {
+sub compile_stats(...) {
     return "Total number of OPs processed: $op_count\n";
 }
 
-sub timing_info {
+sub timing_info(...) {
     my @($sec, $min, $hr) =@( localtime);
     my @($user, $sys) = times;
     sprintf("\%02d:\%02d:\%02d user=$user sys=$sys",
@@ -148,7 +146,7 @@ sub timing_info {
 
 my %symtable;
 
-sub clearsym {
+sub clearsym(...) {
     %symtable = %( () );
 }
 
@@ -157,8 +155,7 @@ sub savesym($obj, $value) {
     %symtable{+sprintf("sym_\%x", $obj->$)} = $value;
 }
 
-sub objsym {
-    my $obj = shift;
+sub objsym(?$obj) {
     return %symtable{?sprintf("sym_\%x", $obj->$)};
 }
 
@@ -249,31 +246,27 @@ do {
         return %sections{?$section};
     }
 
-    sub add {
-        my $section = shift;
-        while (defined($_ = shift)) {
+    sub add(@< @_) {
+        my $section = shift @_;
+        while (defined($_ = shift @_)) {
             print $output_fh, "$section->[1]\t$_\n";
             $section->[0]++;
         }
     }
 
-    sub index {
-        my $section = shift;
+    sub index(?$section) {
         return $section->[0];
     }
 
-    sub name {
-        my $section = shift;
+    sub name(?$section) {
         return $section->[1];
     }
 
-    sub symtable {
-        my $section = shift;
+    sub symtable(?$section) {
         return $section->[2];
     }
 
-    sub default {
-        my $section = shift;
+    sub default(?$section) {
         return $section->[3];
     }
 

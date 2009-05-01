@@ -99,7 +99,7 @@ if ( $^OS_NAME eq 'VMS' )
 
 # Returns a list of termcap files to check.
 
-sub termcap_path
+sub termcap_path(...)
 {    ## private
     my @termcap_path;
 
@@ -658,9 +658,9 @@ found.
 
 =cut
 
-sub Trequire
+sub Trequire(@< @_)
 {    ## public
-    my $self = shift;
+    my $self = shift @_;
     my ( @undefined );
     foreach my $cap ( @_)
     {

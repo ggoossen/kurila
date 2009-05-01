@@ -184,7 +184,7 @@ SKIP: do {
 
 package Dest;
 
-sub DESTROY {
+sub DESTROY(@< @_) {
     print $^STDOUT, "# INCFLAG\n";
     @_[0]->{Flag}->$ ++;
 }

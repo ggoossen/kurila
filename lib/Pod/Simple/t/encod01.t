@@ -17,8 +17,7 @@ BEGIN {
 
     # Find the path to the test source files.  This requires some fiddling when
     # these tests are run as part of Perl core.
-    sub source_path {
-        my $file = shift;
+    sub source_path(?$file) {
         if (env::var('PERL_CORE')) {
             require File::Spec;
             my $updir = File::Spec->updir;

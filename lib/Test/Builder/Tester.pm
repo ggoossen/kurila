@@ -61,17 +61,17 @@ our @EXPORT = qw(test_out test_err test_fail test_diag test_test line_num);
 # the king of cargo cult programming ;-)
 
 # 5.004's Exporter doesn't have export_to_level.
-sub _export_to_level
+sub _export_to_level(@< @_)
 {
-    my $pkg = shift;
-    my $level = shift;
-    shift;                  # XXX redundant arg
+    my $pkg = shift @_;
+    my $level = shift @_;
+    shift @_;                  # XXX redundant arg
     my $callpkg = caller($level);
     $pkg->export($callpkg, < @_);
 }
 
-sub import {
-    my $class = shift;
+sub import(@< @_) {
+    my $class = shift @_;
     my(@plan) = @_;
 
     my $caller = caller;
@@ -118,7 +118,7 @@ my $original_harness_state;
 my $original_harness_env;
 
 # function that starts testing and redirects the filehandles for now
-sub _start_testing
+sub _start_testing(...)
 {
     # even if we're running under Test::Harness pretend we're not
     # for now.  This needed so Test::Builder doesn't add extra spaces
@@ -182,7 +182,7 @@ output filehandles)
 
 =cut
 
-sub test_out
+sub test_out(@< @_)
 {
     # do we need to do any setup?
     _start_testing() unless $testing;
@@ -190,7 +190,7 @@ sub test_out
     $out->expect(< @_)
 }
 
-sub test_err
+sub test_err(@< @_)
 {
     # do we need to do any setup?
     _start_testing() unless $testing;
@@ -224,14 +224,14 @@ more simply as:
 
 =cut
 
-sub test_fail
+sub test_fail(@< @_)
 {
     # do we need to do any setup?
     _start_testing() unless $testing;
 
     # work out what line we should be on
     my @($package, $filename, $line, ...) = @: caller;
-    $line = $line + (shift() || 0); # prevent warnings
+    $line = $line + (shift( @_) || 0); # prevent warnings
 
     # expect that on stderr
     $err->expect("#     Failed test ($^PROGRAM_NAME at line $line)");
@@ -267,7 +267,7 @@ without the newlines.
 
 =cut
 
-sub test_diag
+sub test_diag(@< @_)
 {
     # do we need to do any setup?
     _start_testing() unless $testing;
@@ -316,13 +316,13 @@ will function normally and cause success/errors for B<Test::Harness>.
 
 =cut
 
-sub test_test
+sub test_test(@< @_)
 {
     # decode the arguements as described in the pod
     my $mess;
     my %args;
     if ((nelems @_) == 1)
-    { $mess = shift }
+    { $mess = shift @_ }
     else
     {
         %args = %( < @_ );
@@ -377,10 +377,10 @@ C<line_num(+3)> idiom is arguably nicer.
 
 =cut
 
-sub line_num
+sub line_num(@< @_)
 {
     my @($package, $filename, $line, ...) = @: caller;
-    return $line + (shift() || 0); # prevent warnings
+    return $line + (shift( @_) || 0); # prevent warnings
 }
 
 =back
@@ -426,9 +426,9 @@ the PERL5LIB.
 =cut
 
 my $color;
-sub color
+sub color(@< @_)
 {
-    $color = shift if (nelems @_);
+    $color = shift @_ if (nelems @_);
     $color;
 }
 
@@ -492,14 +492,13 @@ sub new($class, $type) {
     return $self;
 }
 
-sub handle {
-    my $self = shift;
+sub handle($self) {
     return $self->{?'filehandle'};
 }
 
-sub expect
+sub expect(@< @_)
 {
-    my $self = shift;
+    my $self = shift @_;
 
     my @checks = @_;
     foreach my $check ( @checks) {
@@ -523,9 +522,8 @@ sub _translate_Failed_check($self, $check)
 ##
 # return true iff the expected data matches the got data
 
-sub check
+sub check($self)
 {
-    my $self = shift;
 
     # turn off warnings as these might be undef
     local $^WARNING = 0;
@@ -544,9 +542,8 @@ sub check
 # a complaint message about the inputs not matching (to be
 # used for debugging messages)
 
-sub complaint
+sub complaint($self)
 {
-    my $self = shift;
     my $type   = $self->type;
     my $got    = $self->got;
     my $wanted = join "\n", $self->wanted->@;
@@ -595,30 +592,26 @@ sub complaint
 ##
 # forget all expected and got data
 
-sub reset
+sub reset($self)
 {
-    my $self = shift;
     seek $self->{?'filehandle'}, 0, 0;
     $self->{+'got'} = '';
     $self->{+'wanted'} = \@();
 }
 
 
-sub got
+sub got($self)
 {
-    my $self = shift;
     return $self->{?got};
 }
 
-sub wanted
+sub wanted($self)
 {
-    my $self = shift;
     return $self->{?wanted};
 }
 
-sub type
+sub type($self)
 {
-    my $self = shift;
     return $self->{?type};
 }
 

@@ -10,8 +10,8 @@ our (@ISA, $VERSION);
 $VERSION = '2.02';
 @ISA = @('Pod::Simple');
 
-sub new {
-    my $self = shift;
+sub new(@< @_) {
+    my $self = shift @_;
     my $new = $self->SUPER::new(< @_);
     $new->{+'output_fh'} ||= $^STDOUT;
     $new->nix_X_codes(1);
@@ -20,19 +20,19 @@ sub new {
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sub _handle_element_start {
+sub _handle_element_start(@< @_) {
     print @_[0]->{?'output_fh'} ,"\n"  unless @_[1] =~ m/^[A-Z]$/s;
     return;
 }
 
-sub _handle_text {
+sub _handle_text(@< @_) {
     @_[1] =~ s/\x{AD}//g;
     @_[1] =~ s/\x{A0}/ /g;
     print @_[0]->{?'output_fh'} ,@_[1];
     return;
 }
 
-sub _handle_element_end {
+sub _handle_element_end(@< @_) {
     print @_[0]->{?'output_fh'} ,"\n"  unless @_[1] =~ m/^[A-Z]$/s;
     return;
 }

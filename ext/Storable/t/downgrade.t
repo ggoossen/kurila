@@ -86,8 +86,7 @@ sub thaw_fail($name, $expected) {
     like ($^EVAL_ERROR->{?description}, $expected, "Error as predicted?");
 }
 
-sub test_locked_hash {
-    my $hash = shift;
+sub test_locked_hash(?$hash) {
     my @keys = keys $hash->%;
     my @($key, $value) =@( each $hash->%);
     try {$hash->{+$key} = 'x' . $value};
@@ -100,8 +99,7 @@ sub test_locked_hash {
     ok (eq_array(\keys $hash->%, \@keys), "Still the same keys?");
 }
 
-sub test_restricted_hash {
-    my $hash = shift;
+sub test_restricted_hash(?$hash) {
     my @keys = keys $hash->%;
     my @($key, $value) =@( each $hash->%);
     try {$hash->{+$key} = 'x' . $value};
@@ -114,15 +112,13 @@ sub test_restricted_hash {
     ok (eq_array(\keys $hash->%, \@keys), "Still the same keys?");
 }
 
-sub test_placeholder {
-    my $hash = shift;
+sub test_placeholder(?$hash) {
     try {$hash->{+rules} = 42};
     is ($^EVAL_ERROR, '', 'No errors');
     is ($hash->{?rules}, 42, "New value added");
 }
 
-sub test_newkey {
-    my $hash = shift;
+sub test_newkey(?$hash) {
     try {$hash->{+nms} = "http://nms-cgi.sourceforge.net/"};
     is ($^EVAL_ERROR, '', 'No errors');
     is ($hash->{?nms}, "http://nms-cgi.sourceforge.net/", "New value added");

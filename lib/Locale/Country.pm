@@ -35,10 +35,10 @@ my $COUNTRIES = \@();
 # code2country ( CODE [, CODESET ] )
 #
 #=======================================================================
-sub code2country
+sub code2country(@< @_)
 {
-    my $code = shift;
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT;
+    my $code = shift @_;
+    my $codeset = (nelems @_) +> 0 ?? shift @_ !! LOCALE_CODE_DEFAULT;
 
 
     return undef unless defined $code;
@@ -78,10 +78,10 @@ sub code2country
 # country2code ( NAME [, CODESET ] )
 #
 #=======================================================================
-sub country2code
+sub country2code(@< @_)
 {
-    my $country = shift;
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT;
+    my $country = shift @_;
+    my $codeset = (nelems @_) +> 0 ?? shift @_ !! LOCALE_CODE_DEFAULT;
 
 
     return undef unless defined $country;
@@ -105,13 +105,13 @@ sub country2code
 # country_code2code ( NAME [, CODESET ] )
 #
 #=======================================================================
-sub country_code2code
+sub country_code2code(@< @_)
 {
     ((nelems @_) == 3) or croak "country_code2code() takes 3 arguments!";
 
-    my $code = shift;
-    my $inset = shift;
-    my $outset = shift;
+    my $code = shift @_;
+    my $inset = shift @_;
+    my $outset = shift @_;
     my $outcode;
     my $country;
 
@@ -129,9 +129,9 @@ sub country_code2code
 # all_country_codes ( [ CODESET ] )
 #
 #=======================================================================
-sub all_country_codes
+sub all_country_codes(@< @_)
 {
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT;
+    my $codeset = (nelems @_) +> 0 ?? shift @_ !! LOCALE_CODE_DEFAULT;
 
     return keys  $CODES[$codeset]->%;
 }
@@ -142,9 +142,9 @@ sub all_country_codes
 # all_country_names ( [ CODESET ] )
 #
 #=======================================================================
-sub all_country_names
+sub all_country_names(@< @_)
 {
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT;
+    my $codeset = (nelems @_) +> 0 ?? shift @_ !! LOCALE_CODE_DEFAULT;
 
     return values  $CODES[$codeset]->%;
 }
@@ -160,11 +160,11 @@ sub all_country_names
 #   Locale::Country::alias_code('uk' => 'gb');
 #
 #=======================================================================
-sub alias_code
+sub alias_code(@< @_)
 {
-    my $alias = shift;
-    my $real  = shift;
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT;
+    my $alias = shift @_;
+    my $real  = shift @_;
+    my $codeset = (nelems @_) +> 0 ?? shift @_ !! LOCALE_CODE_DEFAULT;
 
     my $country;
 
@@ -193,11 +193,11 @@ sub alias_code
 # name from code.
 #
 #=======================================================================
-sub rename_country
+sub rename_country(@< @_)
 {
-    my $code     = shift;
-    my $new_name = shift;
-    my $codeset = (nelems @_) +> 0 ?? shift !! _code2codeset($code);
+    my $code     = shift @_;
+    my $new_name = shift @_;
+    my $codeset = (nelems @_) +> 0 ?? shift @_ !! _code2codeset($code);
     my $country;
     my $c;
 
@@ -239,9 +239,8 @@ sub rename_country
 # it is from, or undef.
 #
 #=======================================================================
-sub _code2codeset
+sub _code2codeset(?$code)
 {
-    my $code = shift;
 
 
     foreach my $codeset (@(LOCALE_CODE_ALPHA_2, LOCALE_CODE_ALPHA_3,

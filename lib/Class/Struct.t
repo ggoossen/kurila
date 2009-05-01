@@ -4,11 +4,11 @@
 # A couple of simple classes to use as struct elements.
 #
 package aClass;
-sub new { bless \%(), shift }
-sub meth { 42 }
+sub new(@< @_) { bless \%(), shift @_ }
+sub meth(...) { 42 }
 
 package RecClass;
-sub new { bless \%(), shift }
+sub new(@< @_) { bless \%(), shift @_ }
 
 #
 # The first of our Class::Struct based objects.

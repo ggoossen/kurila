@@ -4,7 +4,7 @@ print $^STDOUT, "1..18\n";
 
 our @a =1..10;
 
-sub j { join(":", @_) }
+sub j(@< @_) { join(":", @_) }
 
 print $^STDOUT, "not " unless j(splice(@a,nelems @a,0,11,12)) eq "" && j(< @a) eq j( <1..12);
 print $^STDOUT, "ok 1\n";

@@ -16,8 +16,8 @@ $VERSION = eval $VERSION;
 
 IO::Socket::UNIX->register_domain( AF_UNIX );
 
-sub new {
-    my $class = shift;
+sub new(@< @_) {
+    my $class = shift @_;
     unshift(@_, "Peer") if (nelems @_) == 1;
     return $class->SUPER::new(< @_);
 }
@@ -48,13 +48,13 @@ sub configure($sock,$arg) {
     $sock;
 }
 
-sub hostpath {
+sub hostpath(@< @_) {
     (nelems @_) == 1 or croak 'usage: $sock->hostpath()';
     my $n = @_[0]->sockname || return undef;
     ( <sockaddr_un($n))[0];
 }
 
-sub peerpath {
+sub peerpath(@< @_) {
     (nelems @_) == 1 or croak 'usage: $sock->peerpath()';
     my $n = @_[0]->peername || return undef;
     ( <sockaddr_un($n))[0];

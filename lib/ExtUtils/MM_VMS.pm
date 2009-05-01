@@ -50,8 +50,8 @@ Converts a list into a string wrapped at approximately 80 columns.
 
 =cut
 
-sub wraplist {
-    my@($self) =@( shift);
+sub wraplist(@< @_) {
+    my@($self) =@( shift @_);
     my@($line,$hlen) = @('',0);
 
     foreach my $word ( @_) {
@@ -280,7 +280,7 @@ the 256 character limit.
 
 =cut
 
-sub pasthru {
+sub pasthru(...) {
     return "PASTHRU=\n";
 }
 
@@ -295,8 +295,7 @@ So in VMS its pm_to_blib.ts.
 
 =cut
 
-sub pm_to_blib {
-    my $self = shift;
+sub pm_to_blib($self) {
 
     my $make = $self->SUPER::pm_to_blib;
 
@@ -350,8 +349,7 @@ must pre-expand the DEST* variables.
 
 =cut
 
-sub init_DEST {
-    my $self = shift;
+sub init_DEST($self) {
 
     $self->SUPER::init_DEST;
 
@@ -369,8 +367,8 @@ No seperator between a directory path and a filename on VMS.
 
 =cut
 
-sub init_DIRFILESEP {
-    my@($self) =@( shift);
+sub init_DIRFILESEP(@< @_) {
+    my@($self) =@( shift @_);
 
     $self->{+DIRFILESEP} = '';
     return 1;
@@ -382,8 +380,8 @@ sub init_DIRFILESEP {
 
 =cut
 
-sub init_main {
-    my@($self) =@( shift);
+sub init_main(@< @_) {
+    my@($self) =@( shift @_);
 
     $self->SUPER::init_main;
 
@@ -505,8 +503,8 @@ $VERSION.
 
 =cut
 
-sub init_platform {
-    my@($self) =@( shift);
+sub init_platform(@< @_) {
+    my@($self) =@( shift @_);
 
     $self->{+MM_VMS_REVISION} = $Revision;
     $self->{+MM_VMS_VERSION}  = $VERSION;
@@ -519,8 +517,8 @@ sub init_platform {
 
 =cut
 
-sub platform_constants {
-    my@($self) =@( shift);
+sub platform_constants(@< @_) {
+    my@($self) =@( shift @_);
     my $make_frag = '';
 
     foreach my $macro (qw(PERL_VMS MM_VMS_REVISION MM_VMS_VERSION))
@@ -540,8 +538,7 @@ MAKEMAKER filepath to VMS style.
 
 =cut
 
-sub init_VERSION {
-    my $self = shift;
+sub init_VERSION($self) {
 
     $self->SUPER::init_VERSION;
 
@@ -628,8 +625,7 @@ Clear the default .SUFFIXES and put in our own list.
 
 =cut
 
-sub special_targets {
-    my $self = shift;
+sub special_targets($self) {
 
     my $make_frag .= <<'MAKE_FRAG';
 .SUFFIXES :
@@ -1053,7 +1049,7 @@ a lot of commands.
 
 =cut
 
-sub extra_clean_files {
+sub extra_clean_files(...) {
     return qw(
               *.Map *.Dmp *.Lis *.cpp *.$(DLEXT) *.Opt $(BASEEXT).bso
               .MM_Tmp
@@ -1071,8 +1067,8 @@ Syntax for invoking shar, tar and zip differs from that for Unix.
 
 =cut
 
-sub zipfile_target {
-    my@($self) =@( shift);
+sub zipfile_target(@< @_) {
+    my@($self) =@( shift @_);
 
     return <<'MAKE_FRAG';
 $(DISTVNAME).zip : distdir
@@ -1083,8 +1079,8 @@ $(DISTVNAME).zip : distdir
 MAKE_FRAG
 }
 
-sub tarfile_target {
-    my@($self) =@( shift);
+sub tarfile_target(@< @_) {
+    my@($self) =@( shift @_);
 
     return <<'MAKE_FRAG';
 $(DISTVNAME).tar$(SUFFIX) : distdir
@@ -1097,8 +1093,8 @@ $(DISTVNAME).tar$(SUFFIX) : distdir
 MAKE_FRAG
 }
 
-sub shdist_target {
-    my@($self) =@( shift);
+sub shdist_target(@< @_) {
+    my@($self) =@( shift @_);
 
     return <<'MAKE_FRAG';
 shdist : distdir
@@ -1749,8 +1745,7 @@ sub escape_newlines($self, $text) {
 
 =cut
 
-sub max_exec_len {
-    my $self = shift;
+sub max_exec_len($self) {
 
     return ($self->{+_MAX_EXEC_LEN} ||= 256);
 }
@@ -1759,8 +1754,7 @@ sub max_exec_len {
 
 =cut
 
-sub init_linker {
-    my $self = shift;
+sub init_linker($self) {
     $self->{+EXPORT_LIST} ||= '$(BASEEXT).opt';
 
     my $shr = %Config{?dbgprefix} . 'PERLSHR';
@@ -1899,7 +1893,7 @@ VMS is VMS.
 
 =cut
 
-sub os_flavor {
+sub os_flavor(...) {
     return @('VMS');
 }
 

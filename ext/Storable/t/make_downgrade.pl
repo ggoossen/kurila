@@ -5,7 +5,7 @@ use Hash::Util < qw(lock_hash unlock_hash lock_keys);
 use Storable < qw(nfreeze);
 
 # If this looks like a hack, it's probably because it is :-)
-sub uuencode_it {
+sub uuencode_it(@< @_) {
   my @($data, $name) =  @_;
   my $frozen = nfreeze $data;
 

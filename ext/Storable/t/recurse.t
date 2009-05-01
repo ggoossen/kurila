@@ -25,11 +25,11 @@ use Storable < qw(freeze thaw);
 
 my @x = @('a', 1);
 
-sub make { bless \@(), shift }
+sub make(@< @_) { bless \@(), shift @_ }
 
-sub STORABLE_freeze {
-    my $self = shift;
-    my $cloning = shift;
+sub STORABLE_freeze(@< @_) {
+    my $self = shift @_;
+    my $cloning = shift @_;
     die "STORABLE_freeze" unless Storable::is_storing;
     return @(freeze(\@x), $self);
 }
@@ -48,7 +48,7 @@ package OBJ_SYNC;
 
 @x = @('a', 1);
 
-sub make { bless \%(), shift }
+sub make(@< @_) { bless \%(), shift @_ }
 
 sub STORABLE_freeze($self, $cloning) {
     return if $cloning;
@@ -73,8 +73,7 @@ sub make($class, $ext) {
     return $self;
 }
 
-sub STORABLE_freeze {
-    my $self = shift;
+sub STORABLE_freeze($self) {
     my %copy = $self->%;
     my $r = \%copy;
     my $t = dclone($r->{?sync});
@@ -98,10 +97,9 @@ my $MAX = 20;
 my $recursed = 0;
 my $hook_called = 0;
 
-sub make { bless \@(), shift }
+sub make(@< @_) { bless \@(), shift @_ }
 
-sub STORABLE_freeze {
-    my $self = shift;
+sub STORABLE_freeze($self) {
     $hook_called++;
     return @(freeze($self), $self) if ++$recursed +< $MAX;
     return @("no", $self);
@@ -171,15 +169,14 @@ ok !Storable::is_retrieving;
 
     package Foo;
 
-sub new {
-    my $class = shift;
-    my $dat = shift;
+sub new(@< @_) {
+    my $class = shift @_;
+    my $dat = shift @_;
     return bless \%(dat => $dat), $class;
 }
 
 package Bar;
-sub new {
-    my $class = shift;
+sub new(?$class) {
     return bless \%(
             a => 'dummy',
                 b => \@( 
@@ -216,8 +213,8 @@ ok ref($bar2->{b}->[1]) eq 'Foo';
 
     package CLASS_1;
 
-sub make {
-    my $self = bless \%(), shift;
+sub make(@< @_) {
+    my $self = bless \%(), shift @_;
     return $self;
 }
 
@@ -248,12 +245,12 @@ sub STORABLE_thaw($self, $clonning, $frozen, $c1, $c3, $o) {
 
 package CLASS_OTHER;
 
-sub make {
-    my $self = bless \%(), shift;
+sub make(@< @_) {
+    my $self = bless \%(), shift @_;
     return $self;
 }
 
-sub set_c2 { @_[0]->{+c2} = @_[1] }
+sub set_c2(@< @_) { @_[0]->{+c2} = @_[1] }
 
 #
 # Is the reference count of the extra references returned from a
@@ -261,29 +258,27 @@ sub set_c2 { @_[0]->{+c2} = @_[1] }
 #
 package Foo2;
 
-sub new {
+sub new(@< @_) {
     my $self = bless \%(), @_[0];
     $self->{+freezed} = dump::view($self);
     return $self;
 }
 
-sub DESTROY {
-    my $self = shift;
+sub DESTROY($self) {
     $main::refcount_ok = 1 unless dump::view($self) eq $self->{?freezed};
 }
 
 package Foo3;
 
-sub new {
+sub new(@< @_) {
     bless \%(), @_[0];
 }
 
-sub STORABLE_freeze {
-    my $obj = shift;
+sub STORABLE_freeze(?$obj) {
     return @("", $obj, Foo2->new);
 }
 
-sub STORABLE_thaw { } # Not really used
+sub STORABLE_thaw(...) { } # Not really used
 
 package main;
 our ($refcount_ok);

@@ -36,7 +36,7 @@ Returns a string representation of the null device.
 
 =cut
 
-sub devnull {
+sub devnull(...) {
     return "nul";
 }
 
@@ -66,7 +66,7 @@ variables are tainted, they are not used.
 =cut
 
 my $tmpdir;
-sub tmpdir {
+sub tmpdir(@< @_) {
     return $tmpdir if defined $tmpdir;
     $tmpdir = @_[0]->_tmpdir( < map( { env::var($_) }, qw(TMPDIR TEMP TMP) ),
         'SYS:/temp',
@@ -122,12 +122,12 @@ complete path ending with a filename
 
 =cut
 
-sub catfile {
-    shift;
+sub catfile(@< @_) {
+    shift @_;
 
     # Legacy / compatibility support
     #
-    shift, return _canon_cat( "/", < @_ )
+    shift @_, return _canon_cat( "/", < @_ )
         if @_[0] eq "";
 
     # Compatibility with File::Spec <= 3.26:
@@ -138,14 +138,14 @@ sub catfile {
     return _canon_cat( < @_ );
 }
 
-sub catdir {
-    shift;
+sub catdir(@< @_) {
+    shift @_;
 
     # Legacy / compatibility support
     #
     return ""
         unless (nelems @_);
-    shift, return _canon_cat( "/", < @_ )
+    shift @_, return _canon_cat( "/", < @_ )
         if @_[0] eq "";
 
     # Compatibility with File::Spec <= 3.26:
@@ -156,7 +156,7 @@ sub catdir {
     return _canon_cat( < @_ );
 }
 
-sub path {
+sub path(...) {
     my @path = split(';', env::var('PATH'));
     s/"//g for  @path;
     @path = grep { length }, @path;
@@ -175,7 +175,7 @@ On Win32 makes
 
 =cut
 
-sub canonpath {
+sub canonpath(@< @_) {
     # Legacy / compatibility support
     #
     return @_[?1] if !defined(@_[?1]) or @_[1] eq '';
@@ -303,7 +303,7 @@ sub catpath($self,$volume,$directory,$file) {
     return $volume ;
 }
 
-sub _same {
+sub _same(@< @_) {
     lc(@_[1]) eq lc(@_[2]);
 }
 
@@ -368,9 +368,9 @@ implementation of these methods, not the semantics.
 =cut
 
 
-sub _canon_cat				# @path -> path
+sub _canon_cat(@< @_)				# @path -> path
 {
-    my $first  = shift;
+    my $first  = shift @_;
     my $volume = $first =~ s{ \A ([A-Za-z]:) ([\\/]?) }{}x	# drive letter
         ?? ucfirst( $1 ).( $2 ?? "\\" !! "" )
         !! $first =~ s{ \A (?:\\\\|//) ([^\\/]+)

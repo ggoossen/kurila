@@ -36,8 +36,8 @@ sub filter($self, $source) {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub parse_string_document {
-    my $this = shift;
+sub parse_string_document(@< @_) {
+    my $this = shift @_;
     $this->set_source(\ @_[0]);
     $this->run;
 }
@@ -50,7 +50,7 @@ sub parse_file($this, $filename) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  In case anyone tries to use them:
 
-sub run {
+sub run(@< @_) {
     use Carp ();
     if( __PACKAGE__ eq ref(@_[0]) || @_[0]) { # I'm not being subclassed!
         Carp::croak "You can call run() only on subclasses of "
@@ -62,13 +62,13 @@ sub run {
     }
 }
 
-sub parse_lines {
+sub parse_lines(...) {
     use Carp ();
     Carp::croak "Use set_source with ", __PACKAGE__,
               " and subclasses, not parse_lines";
 }
 
-sub parse_line {
+sub parse_line(...) {
     use Carp ();
     Carp::croak "Use set_source with ", __PACKAGE__,
               " and subclasses, not parse_line";
@@ -76,8 +76,8 @@ sub parse_line {
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sub new {
-    my $class = shift;
+sub new(@< @_) {
+    my $class = shift @_;
     my $self = $class->SUPER::new(< @_);
     die "Couldn't construct for $class" unless $self;
 
@@ -93,8 +93,7 @@ sub new {
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-sub get_token {
-    my $self = shift;
+sub get_token($self) {
     DEBUG +> 1 and print $^STDOUT, "\nget_token starting up on $self.\n";
     DEBUG +> 2 and print $^STDOUT, " Items in token-buffer (",
         scalar( nelems  $self->{?'token_buffer'}->@ ) ,
@@ -205,8 +204,8 @@ sub get_token {
 }
 
 use UNIVERSAL ();
-sub unget_token {
-    my $self = shift;
+sub unget_token(@< @_) {
+    my $self = shift @_;
         DEBUG and print $^STDOUT, "Ungetting ", scalar(nelems @_), " tokens: ",
     (nelems @_) ?? "$(join ' ',@_)\n" !! "().\n";
     foreach my $t ( @_) {
@@ -228,7 +227,7 @@ sub unget_token {
 
 # $self->{'source_filename'} = $source;
 
-sub set_source {
+sub set_source(@< @_) {
     my $self = shift @_;
     return $self->{?'source_fh'} unless (nelems @_);
     my $handle;
@@ -271,19 +270,19 @@ sub set_source {
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-sub get_title_short {  shift->get_short_title(< @_)  } # alias
+sub get_title_short(@< @_) {  shift @_->get_short_title(< @_)  } # alias
 
-sub get_short_title {
-    my $title = shift->get_title(< @_);
+sub get_short_title(@< @_) {
+    my $title = shift @_->get_title(< @_);
     $title = $1 if $title =~ m/^(\S{1,60})\s+--?\s+./s;
     # turn "Foo::Bar -- bars for your foo" into "Foo::Bar"
     return $title;
 }
 
-sub get_title       { shift->_get_titled_section(
+sub get_title(@< @_)       { shift @_->_get_titled_section(
     'NAME', max_token => 50, desperate => 1, < @_)
 }
-sub get_version     { shift->_get_titled_section(
+sub get_version(@< @_)     { shift @_->_get_titled_section(
         'VERSION',
         max_token => 400,
         accept_verbatim => 1,
@@ -291,17 +290,17 @@ sub get_version     { shift->_get_titled_section(
         < @_,
     );
 }
-sub get_description { shift->_get_titled_section(
+sub get_description(@< @_) { shift @_->_get_titled_section(
         'DESCRIPTION',
         max_token => 400,
         max_content_length => 3_000,
         < @_,
     ) }
 
-sub get_authors     { shift->get_author(< @_) }  # a harmless alias
+sub get_authors(@< @_)     { shift @_->get_author(< @_) }  # a harmless alias
 
-sub get_author      {
-    my $this = shift;
+sub get_author(@< @_)      {
+    my $this = shift @_;
     # Max_token is so high because these are
     #  typically at the end of the document:
     $this->_get_titled_section('AUTHOR' , max_token => 10_000, < @_) ||
@@ -310,7 +309,7 @@ sub get_author      {
 
 #--------------------------------------------------------------------------
 
-sub _get_titled_section {
+sub _get_titled_section(@< @_) {
     # Based on a get_title originally contributed by Graham Barr
     my@($self, $titlename, %< %options) = @(< @_);
 
@@ -464,8 +463,8 @@ sub _get_titled_section {
 #
 #  Methods that actually do work at parse-time:
 
-sub _handle_element_start {
-    my $self = shift;   # leaving ($element_name, $attr_hash_r)
+sub _handle_element_start(@< @_) {
+    my $self = shift @_;   # leaving ($element_name, $attr_hash_r)
     DEBUG +> 2 and print $^STDOUT, "++ @_[0] (", < map( {"<$_> " }, @_[1]->%), ")\n";
 
     push  $self->{'token_buffer'}->@, 
@@ -473,16 +472,16 @@ sub _handle_element_start {
     return;
 }
 
-sub _handle_text {
-    my $self = shift;   # leaving ($text)
+sub _handle_text(@< @_) {
+    my $self = shift @_;   # leaving ($text)
     DEBUG +> 2 and print $^STDOUT, "== @_[0]\n";
     push  $self->{'token_buffer'}->@,
         $self->{?'text_token_class'}->new(< @_);
     return;
 }
 
-sub _handle_element_end {
-    my $self = shift;   # leaving ($element_name);
+sub _handle_element_end(@< @_) {
+    my $self = shift @_;   # leaving ($element_name);
     DEBUG +> 2 and print $^STDOUT, "-- @_[0]\n";
     push  $self->{'token_buffer'}->@,
         $self->{?'end_token_class'}->new(< @_);

@@ -56,20 +56,20 @@ do {
     use base 'Test::O';    
     use mro 'c3';     
 
-    sub C_or_E { 'Test::E' }
+    sub C_or_E(...) { 'Test::E' }
 
     package Test::D;
     use mro 'c3'; 
     use base 'Test::O';     
 
-    sub C_or_D { 'Test::D' }       
+    sub C_or_D(...) { 'Test::D' }       
 
     package Test::C;
     use base ('Test::D', 'Test::F');
     use mro 'c3'; 
 
-    sub C_or_D { 'Test::C' }
-    sub C_or_E { 'Test::C' }    
+    sub C_or_D(...) { 'Test::C' }
+    sub C_or_E(...) { 'Test::C' }    
 
     package Test::B;    
     use mro 'c3'; 

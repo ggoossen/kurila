@@ -117,8 +117,7 @@ sub maybe_command($self,$file) {
 
 =cut
 
-sub init_linker {
-    my $self = shift;
+sub init_linker($self) {
 
     $self->{+PERL_ARCHIVE} = "\$(PERL_INC)/libperl\$(LIB_EXT)";
 
@@ -134,7 +133,7 @@ OS/2 is OS/2
 
 =cut
 
-sub os_flavor {
+sub os_flavor(...) {
     return @('OS/2');
 }
 

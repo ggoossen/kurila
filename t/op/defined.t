@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-sub noot { die "should not be called"; }
+sub noot(...) { die "should not be called"; }
 
 plan tests => 6;
 

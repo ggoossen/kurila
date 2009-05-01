@@ -50,13 +50,12 @@ is_deeply( $struct, $thawed, 'Empiric testing corfirms correct behaviour' );
 
 my $SINGLETON = undef;
 
-sub new {
+sub new(@< @_) {
     $SINGLETON or
         $SINGLETON = bless \%( value => 'Hello World!' ), @_[0];
 }
 
-sub STORABLE_freeze {
-    my $self = shift;
+sub STORABLE_freeze($self) {
 
     # We don't actually need to return anything, but provide a null string
     # to avoid the null-list-return behaviour.

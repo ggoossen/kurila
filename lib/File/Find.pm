@@ -569,8 +569,8 @@ sub Follow_SymLink($AbsName) {
 
 our($dir, $name, $fullname, $prune);
 
-sub _find_opt {
-    my $wanted = shift;
+sub _find_opt(@< @_) {
+    my $wanted = shift @_;
     die "invalid top directory" unless defined @_[0];
 
     # This function must local()ize everything because callbacks may
@@ -1245,8 +1245,7 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) { # $dir_loc is the absolute dir
 }
 
 
-sub wrap_wanted {
-    my $wanted = shift;
+sub wrap_wanted(?$wanted) {
     if ( ref($wanted) eq 'HASH' ) {
         if ( $wanted->{?follow} || $wanted->{?follow_fast}) {
             $wanted->{+follow_skip} = 1 unless defined $wanted->{?follow_skip};
@@ -1263,13 +1262,13 @@ sub wrap_wanted {
     }
 }
 
-sub find {
-    my $wanted = shift;
+sub find(@< @_) {
+    my $wanted = shift @_;
     _find_opt( wrap_wanted($wanted), < @_);
 }
 
-sub finddepth {
-    my $wanted = wrap_wanted(shift);
+sub finddepth(@< @_) {
+    my $wanted = wrap_wanted(shift @_);
     $wanted->{+bydepth} = 1;
     _find_opt($wanted, < @_);
 }

@@ -26,9 +26,9 @@ $GzipError = '' ;
 push  %EXPORT_TAGS{all}->@, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');
 
-sub new
+sub new(@< @_)
 {
-    my $class = shift ;
+    my $class = shift @_ ;
 
     my $obj = createSelfTiedObject($class, \$GzipError);
 
@@ -36,7 +36,7 @@ sub new
 }
 
 
-sub gzip
+sub gzip(@< @_)
 {
     my $obj = createSelfTiedObject(__PACKAGE__, \$GzipError);
     return $obj->_def(< @_);
@@ -49,9 +49,8 @@ sub gzip
 #    return $self->mkHeader(*$self->{Got});
 #}
 
-sub getExtraParams
+sub getExtraParams($self)
 {
-    my $self = shift ;
 
     return  @(
             # zlib behaviour
@@ -72,10 +71,10 @@ sub getExtraParams
 }
 
 
-sub ckParams
+sub ckParams(@< @_)
 {
-    my $self = shift ;
-    my $got = shift ;
+    my $self = shift @_ ;
+    my $got = shift @_ ;
 
     # gzip always needs crc32
     $got->value('CRC32' => 1);
@@ -149,23 +148,22 @@ sub ckParams
     return 1;
 }
 
-sub mkTrailer
+sub mkTrailer($self)
 {
-    my $self = shift ;
     return pack("V V", $self->{Compress}->crc32(), 
         $self->{UnCompSize}->get32bit());
 }
 
-sub getInverseClass
+sub getInverseClass(...)
 {
     return  @('IO::Uncompress::Gunzip',
               \$IO::Uncompress::Gunzip::GunzipError);
 }
 
-sub mkHeader
+sub mkHeader(@< @_)
 {
-    my $self = shift ;
-    my $param = shift ;
+    my $self = shift @_ ;
+    my $param = shift @_ ;
 
     # stort-circuit if a minimal header is requested.
     return GZIP_MINIMUM_HEADER if $param->value('Minimal') ;
@@ -235,7 +233,7 @@ sub mkHeader
     return $out ;
 }
 
-sub mkFinalTrailer
+sub mkFinalTrailer(...)
 {
     return '';
 }

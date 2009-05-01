@@ -2,7 +2,7 @@
 
 print $^STDOUT, "1..18\n";
 
-sub foo1 {
+sub foo1(@< @_) {
     $_ = shift(@_);
     $a = 0;
     until ($a++) {
@@ -24,7 +24,7 @@ print $^STDOUT, foo1(3) == 3 ?? "ok 4\n" !! "not ok 4\n";
 print $^STDOUT, foo1(4) == 4 ?? "ok 5\n" !! "not ok 5\n";
 print $^STDOUT, foo1(5) == 20 ?? "ok 6\n" !! "not ok 6\n";
 
-sub foo2 {
+sub foo2(@< @_) {
     $_ = shift(@_);
     do {
         last if $_ == 1;
@@ -45,7 +45,7 @@ print $^STDOUT, foo2(3) == 3 ?? "ok 10\n" !! "not ok 10\n";
 print $^STDOUT, foo2(4) == 4 ?? "ok 11\n" !! "not ok 11\n";
 print $^STDOUT, foo2(5) == 20 ?? "ok 12\n" !! "not ok 12\n";
 
-sub foo3 {
+sub foo3(@< @_) {
     $_ = shift(@_);
     if (m/^1/) {
         return 1;

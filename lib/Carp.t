@@ -28,7 +28,7 @@ do { local $^WARN_HOOK = sub {
 
 };
 
-sub sub_4 {
+sub sub_4(@< @_) {
 
     local $^WARN_HOOK = sub {
             like @_[0]->message, qr/^(\d+) at.+\b(?i:carp\.t) line \d+\n\tmain::sub_4\(\) called at.+\b(?i:carp\.t) line \d+$/, 'cluck 4' };
@@ -45,7 +45,7 @@ do { local $^DIE_HOOK = sub {
     try { croak 5 };
 };
 
-sub sub_6 {
+sub sub_6(@< @_) {
     local $^DIE_HOOK = sub {
             like @_[0]->message, qr/^(\d+) at.+\b(?i:carp\.t) line \d+\n\teval \Q{...}\E called at.+\b(?i:carp\.t) line \d+\n\tmain::sub_6\(\) called at.+\b(?i:carp\.t) line \d+$/, 'confess 6' };
 

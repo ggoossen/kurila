@@ -8,7 +8,7 @@ print $^STDOUT, < form
   farsi(< @amounts);
 
 
-sub farsi {
+sub farsi(@< @_) {
     \ map { m/(-?)(\d+)(?:\.(\d\d))?/; $1.($3||0).".".$2 }, @_;
 }
 

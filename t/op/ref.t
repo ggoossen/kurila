@@ -80,7 +80,7 @@ is (join(':', %spring2{?"foo"}->@), "1:2:3:4");
 
 do {
     my $called;
-    sub mysub { $called++; }
+    sub mysub(...) { $called++; }
     $subref = \&mysub;
     &$subref( < @_ );
     is ($called, 1);
@@ -88,7 +88,7 @@ do {
 
 $subrefref = \\&mysub2;
 is ( $subrefref->$->("GOOD"), "good");
-sub mysub2 { lc shift }
+sub mysub2(@< @_) { lc shift @_ }
 
 # Test the ref operator.
 
@@ -132,8 +132,8 @@ main::is (ref $object2,	'MYHASH');
 
 &mymethod($object,"argument");
 
-sub mymethod {
-          local($THIS) = shift;
+sub mymethod(@< @_) {
+          local($THIS) = shift @_;
     local @ARGS = @_;
     die 'Got a "' . ref($THIS). '" instead of a MYHASH'
         unless ref $THIS eq 'MYHASH';
@@ -149,12 +149,12 @@ $string = "good";
 $main::anonhash2 = "foo";
 $string = "";
 
-sub DESTROY {
+sub DESTROY(@< @_) {
     return unless $string;
     main::is ($string, 'good');
 
     # Test that the object has not already been "cursed".
-    main::isnt (ref shift, 'HASH');
+    main::isnt (ref shift @_, 'HASH');
 }
 
 # Now test inheritance of methods.
@@ -171,19 +171,19 @@ $main::object = bless \%(FOO => 'foo', BAR => 'bar');
 
 is ($object->doit("BAR"), 'bar');
 
-sub BASEOBJ::doit {
-    local $ref = shift;
+sub BASEOBJ::doit(@< @_) {
+    local $ref = shift @_;
     die "Not an OBJ" unless ref $ref eq 'OBJ';
-    $ref->{?shift()};
+    $ref->{?shift( @_)};
 }
 
 package main;
 
 # test for proper destruction of lexical objects
 $test = curr_test();
-sub larry::DESTROY { print $^STDOUT, "# larry\nok $test\n"; }
-sub curly::DESTROY { print $^STDOUT, "# curly\nok ", $test + 1, "\n"; }
-sub moe::DESTROY   { print $^STDOUT, "# moe\nok ", $test + 2, "\n"; }
+sub larry::DESTROY(...) { print $^STDOUT, "# larry\nok $test\n"; }
+sub curly::DESTROY(...) { print $^STDOUT, "# curly\nok ", $test + 1, "\n"; }
+sub moe::DESTROY(...)   { print $^STDOUT, "# moe\nok ", $test + 2, "\n"; }
 
 do {
     my ($joe, @curly, %larry);
@@ -215,8 +215,8 @@ do {
             like ($m->{?description}, qr/^Modification of a read-only/);
         };
         package C;
-    sub new { bless \%(), shift }
-    sub DESTROY { @_[0] = 'foo' }
+    sub new(@< @_) { bless \%(), shift @_ }
+    sub DESTROY(@< @_) { @_[0] = 'foo' }
     do {
         print $^STDOUT, "# should generate an error...\n";
         my $c = C->new;
@@ -257,7 +257,7 @@ foreach my $lexical (@('', 'my $a; ')) {
 }
 
 $test = curr_test();
-sub x::DESTROY {print $^STDOUT, "ok ", $test + shift->[0], "\n"}
+sub x::DESTROY(@< @_) {print $^STDOUT, "ok ", $test + shift @_->[0], "\n"}
 do { my $a1 = bless \@(3),"x";
     my $a2 = bless \@(2),"x";
     do { my $a3 = bless \@(1),"x";
@@ -397,7 +397,7 @@ do {
 
 print $^STDOUT, "not ok $test2 # TODO Package destruction\n";
 
-sub DESTROY {
+sub DESTROY(@< @_) {
     print $^STDOUT, @_[0]->[0];
 }
 

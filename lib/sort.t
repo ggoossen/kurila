@@ -37,8 +37,8 @@ use Test::More tests => (nelems @TestSizes) * 2	# sort() tests
 # tagged with the item index, so we can detect original input order,
 # and reconstruct the original array order.
 
-sub genarray {
-    my $size = int(shift);		# fractions not welcome
+sub genarray(@< @_) {
+    my $size = int(shift @_);		# fractions not welcome
     my ($items);
     my @a;
 
@@ -54,8 +54,7 @@ sub genarray {
 
 # Check for correct order (including stability)
 
-sub checkorder {
-    my $aref = shift;
+sub checkorder(?$aref) {
     my $status = '';			# so far, so good
     my ($disorder);
 

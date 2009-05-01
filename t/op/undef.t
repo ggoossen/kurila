@@ -47,7 +47,7 @@ print $^STDOUT, defined @ary ?? "ok 17\n" !! "not ok 17\n";
 %ary = %(1,1);
 print $^STDOUT, defined %ary ?? "ok 18\n" !! "not ok 18\n";
 
-sub foo { print $^STDOUT, "ok 19\n"; }
+sub foo(...) { print $^STDOUT, "ok 19\n"; }
 
 &foo( < @_ ) || print $^STDOUT, "not ok 19\n";
 
@@ -75,7 +75,7 @@ $test = 27;
             key2 => bless(\%(), 'X'),
     );
 undef %hash;
-sub X::DESTROY {
+sub X::DESTROY(...) {
     print $^STDOUT, "not " if %hash; print $^STDOUT, "ok $test\n"; $test++;
     print $^STDOUT, "not " if %hash; print $^STDOUT, "ok $test\n"; $test++;
     print $^STDOUT, "not " if each   %hash; print $^STDOUT, "ok $test\n"; $test++;

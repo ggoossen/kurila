@@ -49,7 +49,7 @@ Pod::Simple::_accessorize( __PACKAGE__,
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Just so we can run from the command line more easily
-sub go {
+sub go(...) {
     (nelems @ARGV) == 2 or die sprintf(
         "Usage: perl -M\%s -e \%s:go indirs outdir\n  (or use \"\$^INCLUDE_PATH\" for indirs)\n",
         __PACKAGE__, __PACKAGE__, 
@@ -67,7 +67,7 @@ sub go {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-sub new {
+sub new(@< @_) {
     my $new = bless \%(), ref(@_[0]) || @_[0];
     $new->html_render_class($HTML_RENDER_CLASS);
     $new->verbose(1 + DEBUG);
@@ -105,8 +105,8 @@ sub new {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub muse {
-    my $self = shift;
+sub muse(@< @_) {
+    my $self = shift @_;
     if($self->verbose) {
         print $^STDOUT, 'T+', int(time() - $self->{?'_batch_start_time'}), "s: ", < @_, "\n";
     }
@@ -273,7 +273,7 @@ sub _do_one_batch_conversion($self, $module, $mod2path, $outdir, ?$outfile) {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-sub filespecsys { @_[0]->{?'_filespecsys'} || 'File::Spec' }
+sub filespecsys(@< @_) { @_[0]->{?'_filespecsys'} || 'File::Spec' }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -636,7 +636,7 @@ sub _maybe_uplink($self, $url, $uplink) {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-sub _gen_css_wad {
+sub _gen_css_wad(@< @_) {
     my $self = @_[0];
     my $css_template = $self->_css_template;
     foreach my $variation (
@@ -712,7 +712,7 @@ sub _gen_css_wad {
     return;
 }
 
-sub _color_negate {
+sub _color_negate(@< @_) {
     my $x = lc @_[0];
     $x =~ s/([0123456789abcdef])/$( 
     %( < qw| 0 f 1 e 2 d 3 c 4 b 5 a 6 9 7 8 8 7 9 6 a 5 b 4 c 3 d 2 e 1 f 0 | ){?$1} )/g;
@@ -758,7 +758,7 @@ sub _spray_javascript($self, $outdir) {
     return;
 }
 
-sub _gen_javascript_wad {
+sub _gen_javascript_wad(@< @_) {
     my $self = @_[0];
     my $js_code = $self->_javascript || return;
     $self->add_javascript( "_podly.js", 0, \$js_code);
@@ -790,8 +790,8 @@ sub _javascript_wad_to_markup($self, $depth) {
 
 #===========================================================================
 
-sub _css_template { return $CSS }
-sub _javascript   { return $JAVASCRIPT }
+sub _css_template(...) { return $CSS }
+sub _javascript(...)   { return $JAVASCRIPT }
 
 $CSS = <<'EOCSS';
 /* For accessibility reasons, never specify text sizes in px/pt/pc/in/cm/mm */

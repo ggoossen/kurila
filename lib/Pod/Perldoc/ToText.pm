@@ -5,23 +5,23 @@ use warnings;
 
 use base < qw(Pod::Perldoc::BaseTo);
 
-sub is_pageable        { 1 }
-sub write_with_binmode { 0 }
-sub output_extension   { 'txt' }
+sub is_pageable(...)        { 1 }
+sub write_with_binmode(...) { 0 }
+sub output_extension(...)   { 'txt' }
 
 use Pod::Text ();
 
-sub alt       { shift->_perldoc_elem('alt'     , < @_) }
-sub indent    { shift->_perldoc_elem('indent'  , < @_) }
-sub loose     { shift->_perldoc_elem('loose'   , < @_) }
-sub quotes    { shift->_perldoc_elem('quotes'  , < @_) }
-sub sentence  { shift->_perldoc_elem('sentence', < @_) }
-sub width     { shift->_perldoc_elem('width'   , < @_) }
+sub alt(@< @_)       { shift @_->_perldoc_elem('alt'     , < @_) }
+sub indent(@< @_)    { shift @_->_perldoc_elem('indent'  , < @_) }
+sub loose(@< @_)     { shift @_->_perldoc_elem('loose'   , < @_) }
+sub quotes(@< @_)    { shift @_->_perldoc_elem('quotes'  , < @_) }
+sub sentence(@< @_)  { shift @_->_perldoc_elem('sentence', < @_) }
+sub width(@< @_)     { shift @_->_perldoc_elem('width'   , < @_) }
 
-sub new { return bless \%(), ref(@_[0]) || @_[0] }
+sub new(@< @_) { return bless \%(), ref(@_[0]) || @_[0] }
 
-sub parse_from_file {
-    my $self = shift;
+sub parse_from_file(@< @_) {
+    my $self = shift @_;
 
     my @options = @+: map { @: $_, $self->{?$_} },
         grep { !m/^_/s },

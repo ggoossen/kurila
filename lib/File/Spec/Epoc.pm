@@ -25,7 +25,7 @@ This package is still work in progress ;-)
 
 =cut
 
-sub case_tolerant {
+sub case_tolerant(...) {
     return 1;
 }
 

@@ -16,7 +16,7 @@ use File::Spec::Functions < qw(:DEFAULT splitdir rel2abs splitpath);
 
 # Can't use Cwd::abs_path() because it has different ideas about
 # path separators than File::Spec.
-sub abs_path {
+sub abs_path(...) {
     my $d = rel2abs(curdir);
 
     $d = uc($d) if $IsVMS;
@@ -107,7 +107,7 @@ SKIP: do {
 # The environment variables chdir() pays attention to.
 my @magic_envs = qw(HOME LOGDIR SYS$LOGIN);
 
-sub check_env {
+sub check_env(@< @_) {
     my@($key) =  @_;
 
     # Make sure $ENV{'SYS$LOGIN'} is only honored on VMS.
@@ -149,7 +149,7 @@ WARNING
 }
 
 my %Saved_Env = %( () );
-sub clean_env {
+sub clean_env(...) {
     foreach my $env ( @magic_envs) {
         %Saved_Env{+$env} = env::var($env);
 

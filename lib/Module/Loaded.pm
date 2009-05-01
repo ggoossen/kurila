@@ -103,9 +103,9 @@ sub is_loaded ($pm) {
 }
 
 
-sub _pm_to_file {
-    my $pkg = shift;
-    my $pm  = shift or return;
+sub _pm_to_file(@< @_) {
+    my $pkg = shift @_;
+    my $pm  = shift @_ or return;
 
     my $file = join '/', split '::', $pm;
     $file .= '.pm';

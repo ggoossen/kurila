@@ -10,7 +10,7 @@ BEGIN { plan tests => 136 };
 
 use Pod::Simple::PullParser;
 
-sub pump_it_up {
+sub pump_it_up(@< @_) {
     my $p = Pod::Simple::PullParser->new;
     $p->set_source( \( @_[0] ) );
     my(@t, $t);

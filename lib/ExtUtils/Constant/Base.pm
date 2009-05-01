@@ -30,11 +30,11 @@ available
 
 =cut
 
-sub valid_type {
+sub valid_type(...) {
     # Default to assuming that you don't need different types of return data.
     1;
 }
-sub default_type {
+sub default_type(...) {
     '';
 }
 
@@ -45,7 +45,7 @@ C header file.
 
 =cut
 
-sub header {
+sub header(...) {
     ''
 }
 
@@ -53,14 +53,14 @@ sub header {
 # for any space you might need before your value, as it lets to perform
 # "tricks" such as "return KEY_" and have strings appended.
 # In which case this might be an empty string
-sub return_statement_for_type {undef};
+sub return_statement_for_type(...) {undef};
 
 # "#if 1" is true to a C pre-processor
-sub macro_from_name {
+sub macro_from_name(...) {
     1;
 }
 
-sub macro_from_item {
+sub macro_from_item(...) {
     1;
 }
 
@@ -85,11 +85,11 @@ sub macro_to_endif($self, $macro) {
     return "";
 }
 
-sub name_param {
+sub name_param(...) {
     'name';
 }
 
-sub memEQ {
+sub memEQ(...) {
     "!memcmp";
 }
 
@@ -284,9 +284,9 @@ of a block, so variables may be defined in it.
 =cut
 # Hmm. value undef to to NOTDEF? value () to do NOTFOUND?
 
-sub assign {
-    my $self = shift;
-    my $args = shift;
+sub assign(@< @_) {
+    my $self = shift @_;
+    my $args = shift @_;
     my @($indent, $type, $pre, $post, $item)
         =  $args->{[qw(indent type pre post item)]};
     $post ||= '';
@@ -524,35 +524,35 @@ sub switch_clause($self, $args, $namelen, $items, @< @items) {
     return $body;
 }
 
-sub C_constant_return_type {
+sub C_constant_return_type(...) {
     "static int";
 }
 
-sub C_constant_prefix_param {
+sub C_constant_prefix_param(...) {
     '';
 }
 
-sub C_constant_prefix_param_defintion {
+sub C_constant_prefix_param_defintion(...) {
     '';
 }
 
-sub name_param_definition {
+sub name_param_definition(@< @_) {
     "const char *" . @_[0]->name_param;
 }
 
-sub namelen_param {
+sub namelen_param(...) {
     'len';
 }
 
-sub namelen_param_definition {
+sub namelen_param_definition(@< @_) {
     'size_t ' . @_[0]->namelen_param;
 }
 
-sub C_constant_other_params {
+sub C_constant_other_params(...) {
     '';
 }
 
-sub C_constant_other_params_defintion {
+sub C_constant_other_params_defintion(...) {
     '';
 }
 
@@ -569,7 +569,7 @@ C_constant_other_params_definition and C_constant_other_params
 
 =cut
 
-sub params {
+sub params(...) {
     '';
 }
 
@@ -583,7 +583,7 @@ Currently the base class does nothing and returns an empty string.
 
 =cut
 
-sub dogfood {
+sub dogfood(...) {
     ''
 }
 
@@ -594,13 +594,13 @@ the item to an array of 1 or 2 items, both 8 bit and UTF-8 encoded.
 
 =cut
 
-sub normalise_items
+sub normalise_items(@< @_)
 {
-    my $self = shift;
-    my $args = shift;
-    my $default_type = shift;
-    my $what = shift;
-    my $items = shift;
+    my $self = shift @_;
+    my $args = shift @_;
+    my $default_type = shift @_;
+    my $what = shift @_;
+    my $items = shift @_;
     my @new_items;
     foreach my $orig ( @_) {
         my ($name, $item);

@@ -65,34 +65,34 @@ Exporter::export_ok_tags('all');
 
 
 
-sub new
+sub new(@< @_)
 {
-    my $class = shift ;
+    my $class = shift @_ ;
 
     my $obj = createSelfTiedObject($class, \$RawDeflateError);
 
     return $obj->_create(undef, < @_);
 }
 
-sub rawdeflate
+sub rawdeflate(@< @_)
 {
     my $obj = createSelfTiedObject(undef, \$RawDeflateError);
     return $obj->_def(< @_);
 }
 
-sub ckParams
+sub ckParams(@< @_)
 {
-    my $self = shift ;
-    my $got = shift;
+    my $self = shift @_ ;
+    my $got = shift @_;
 
     return 1 ;
 }
 
-sub mkComp
+sub mkComp(@< @_)
 {
-    my $self = shift ;
-    my $class = shift ;
-    my $got = shift ;
+    my $self = shift @_ ;
+    my $class = shift @_ ;
+    my $got = shift @_ ;
 
     my @($obj, ?$errstr, ?$errno) =  IO::Compress::Adapter::Deflate::mkCompObject(
                                                  $got->value('CRC32'),
@@ -108,19 +108,17 @@ sub mkComp
 }
 
 
-sub mkHeader
+sub mkHeader($self)
 {
-    my $self = shift ;
     return '';
 }
 
-sub mkTrailer
+sub mkTrailer($self)
 {
-    my $self = shift ;
     return '';
 }
 
-sub mkFinalTrailer
+sub mkFinalTrailer(...)
 {
     return '';
 }
@@ -132,15 +130,13 @@ sub mkFinalTrailer
 #    return '';
 #}
 
-sub getExtraParams
+sub getExtraParams($self)
 {
-    my $self = shift ;
     return $self->getZlibParams();
 }
 
-sub getZlibParams
-{
-    my $self = shift ;
+sub getZlibParams($self)
+{ ;
 
     use IO::Compress::Base::Common  v2.006 < qw(:Parse);
     use Compress::Raw::Zlib  v2.006 < qw(Z_DEFLATED Z_DEFAULT_COMPRESSION Z_DEFAULT_STRATEGY);
@@ -160,17 +156,17 @@ sub getZlibParams
 
 }
 
-sub getInverseClass
+sub getInverseClass(...)
 {
     return  @('IO::Uncompress::RawInflate', 
               \$IO::Uncompress::RawInflate::RawInflateError);
 }
 
-sub getFileInfo
+sub getFileInfo(@< @_)
 {
-    my $self = shift ;
-    my $params = shift;
-    my $file = shift ;
+    my $self = shift @_ ;
+    my $params = shift @_;
+    my $file = shift @_ ;
 
 }
 

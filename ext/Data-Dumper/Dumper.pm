@@ -150,7 +150,7 @@ sub Names($s, $n) {
     }
 }
 
-sub Dump {
+sub Dump(@< @_) {
     return &Dumpperl( < @_ );
 }
 
@@ -159,8 +159,8 @@ sub Dump {
 # expects same args as new() if called via package name.
 #
 our @post;
-sub Dumpperl {
-    my $s = shift;
+sub Dumpperl(@< @_) {
+    my $s = shift @_;
     my(@out, $name);
     my $i = 0;
         local(@post);
@@ -215,8 +215,7 @@ sub Dumpperl {
 }
 
 # wrap string in single quotes (escaping if needed)
-sub _quote {
-    my $val = shift;
+sub _quote(?$val) {
     $val =~ s/([\\\"\$\{\}\@\%])/\\$1/g;
     return  '"' . $val .  '"';
 }
@@ -227,7 +226,7 @@ sub _quote {
 # sometimes sordidly;
 # and curse if no recourse.
 #
-sub _dump {
+sub _dump(@< @_) {
     my $s = @_[0];
     my $name = @_[2];
     my($sname);
@@ -502,24 +501,24 @@ sub _dump {
 #
 # non-OO style of earlier version
 #
-sub Dumper {
+sub Dumper(@< @_) {
     return Data::Dumper->Dump(\ @_);
 }
 
 # compat stub
-sub DumperX {
+sub DumperX(@< @_) {
     return Data::Dumper->Dumpxs(\ @_, \@());
 }
 
-sub Dumpf { return Data::Dumper->Dump(< @_) }
+sub Dumpf(@< @_) { return Data::Dumper->Dump(< @_) }
 
-sub Dumpp { print $^STDOUT, < Data::Dumper->Dump(< @_) }
+sub Dumpp(@< @_) { print $^STDOUT, < Data::Dumper->Dump(< @_) }
 
 #
 # reset the "seen" cache 
 #
-sub Reset {
-    my@($s) =@( shift);
+sub Reset(@< @_) {
+    my@($s) =@( shift @_);
     $s->{+seen} = \%();
     return $s;
 }
@@ -610,15 +609,15 @@ my %esc = %(
     );
 
 # put a string value in double quotes
-sub qquote {
-        local($_) = shift;
+sub qquote(@< @_) {
+        local($_) = shift @_;
     s/([\\\"\@\$\{\}])/\\$1/g;
     my $bytes; do { use bytes; $bytes = length };
     s/([^\x[00]-\x[7f]])/$('\x'.sprintf("[\%02x]",ord($1)))/g if $bytes +> length;
     return qq("$_") unless 
         m/[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~]/;  # fast exit
 
-    my $high = shift || "";
+    my $high = shift @_ || "";
     s/([\a\b\t\n\f\r\e])/%esc{?$1}/g;
 
     # no need for 3 digits in escape for these
@@ -642,7 +641,7 @@ sub qquote {
 
 # helper sub to sort hash keys in Perl < 5.8.0 where we don't have
 # access to sortsv() from XS
-sub _sortkeys { \ sort keys @_[0]->% }
+sub _sortkeys(@< @_) { \ sort keys @_[0]->% }
 
 1;
 __END__

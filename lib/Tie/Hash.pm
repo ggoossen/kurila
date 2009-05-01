@@ -187,15 +187,15 @@ good working examples.
 
 use warnings::register;
 
-sub new {
-    my $pkg = shift;
+sub new(@< @_) {
+    my $pkg = shift @_;
     $pkg->TIEHASH(< @_);
 }
 
 # Grandfather "new"
 
-sub TIEHASH {
-    my $pkg = shift;
+sub TIEHASH(@< @_) {
+    my $pkg = shift @_;
     if (defined &{Symbol::fetch_glob("$($pkg)::new")}) {
         warnings::warnif("WARNING: calling $($pkg)->new since $($pkg)->TIEHASH is missing");
         $pkg->new(< @_);
@@ -205,13 +205,13 @@ sub TIEHASH {
     }
 }
 
-sub EXISTS {
+sub EXISTS(@< @_) {
     my $pkg = ref @_[0];
     die "$pkg doesn't define an EXISTS method";
 }
 
-sub CLEAR {
-    my $self = shift;
+sub CLEAR(@< @_) {
+    my $self = shift @_;
     my $key = $self->FIRSTKEY(< @_);
     my @keys;
 
@@ -231,26 +231,26 @@ sub CLEAR {
 package Tie::StdHash;
 # @ISA = qw(Tie::Hash);		# would inherit new() only
 
-sub TIEHASH  { bless \%(), @_[0] }
-sub STORE    { @_[0]->{+@_[1]} = @_[2] }
-sub FETCH    { @_[0]->{?@_[1]} }
-sub FIRSTKEY { my $a = nelems( keys @_[0]->%); each @_[0]->% }
-sub NEXTKEY  { each @_[0]->% }
-sub EXISTS   { exists @_[0]->{@_[1]} }
-sub DELETE   { delete @_[0]->{@_[1]} }
-sub CLEAR    { @_[0]->% = %( () ) }
-sub SCALAR   { scalar @_[0]->% }
+sub TIEHASH(@< @_)  { bless \%(), @_[0] }
+sub STORE(@< @_)    { @_[0]->{+@_[1]} = @_[2] }
+sub FETCH(@< @_)    { @_[0]->{?@_[1]} }
+sub FIRSTKEY(@< @_) { my $a = nelems( keys @_[0]->%); each @_[0]->% }
+sub NEXTKEY(@< @_)  { each @_[0]->% }
+sub EXISTS(@< @_)   { exists @_[0]->{@_[1]} }
+sub DELETE(@< @_)   { delete @_[0]->{@_[1]} }
+sub CLEAR(@< @_)    { @_[0]->% = %( () ) }
+sub SCALAR(@< @_)   { scalar @_[0]->% }
 
 package Tie::ExtraHash;
 
-sub TIEHASH  { my $p = shift; bless \@(\%(), < @_), $p }
-sub STORE    { @_[0]->[0]->{+@_[1]} = @_[2] }
-sub FETCH    { @_[0]->[0]->{?@_[1]} }
-sub FIRSTKEY { my $a = scalar keys @_[0]->[0]->%; each @_[0]->[0]->% }
-sub NEXTKEY  { each @_[0]->[0]->% }
-sub EXISTS   { exists @_[0]->[0]->{@_[1]} }
-sub DELETE   { delete @_[0]->[0]->{@_[1]} }
-sub CLEAR    { @_[0]->[0]->% = %( () ) }
-sub SCALAR   { scalar @_[0]->[0]->% }
+sub TIEHASH(@< @_)  { my $p = shift @_; bless \@(\%(), < @_), $p }
+sub STORE(@< @_)    { @_[0]->[0]->{+@_[1]} = @_[2] }
+sub FETCH(@< @_)    { @_[0]->[0]->{?@_[1]} }
+sub FIRSTKEY(@< @_) { my $a = scalar keys @_[0]->[0]->%; each @_[0]->[0]->% }
+sub NEXTKEY(@< @_)  { each @_[0]->[0]->% }
+sub EXISTS(@< @_)   { exists @_[0]->[0]->{@_[1]} }
+sub DELETE(@< @_)   { delete @_[0]->[0]->{@_[1]} }
+sub CLEAR(@< @_)    { @_[0]->[0]->% = %( () ) }
+sub SCALAR(@< @_)   { scalar @_[0]->[0]->% }
 
 1;

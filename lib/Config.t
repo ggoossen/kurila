@@ -90,16 +90,16 @@ like($out2, qr/^d_bork='undef';/, "config_var d_bork is UNKNOWN");
 do {
     package FakeOut;
 
-    sub TIEHANDLE {
+    sub TIEHANDLE(@< @_) {
         bless(\(my $text), @_[0]);
     }
 
-    sub clear {
+    sub clear(@< @_) {
          @_[0]->$ = '';
     }
 
-    sub PRINT {
-        my $self = shift;
+    sub PRINT(@< @_) {
+        my $self = shift @_;
         $self->$ .= join('', @_);
     }
 };

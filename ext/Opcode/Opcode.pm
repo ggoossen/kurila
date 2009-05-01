@@ -25,7 +25,7 @@ XSLoader::load 'Opcode', $VERSION;
 
 _init_optags();
 
-sub ops_to_opset { opset(< @_) }	# alias for old name
+sub ops_to_opset(@< @_) { opset(< @_) }	# alias for old name
 
 sub opset_to_hex ($v) {
     return "(invalid opset)" unless verify_opset($v);
@@ -43,7 +43,7 @@ sub opdump (?$pat) {
 
 
 
-sub _init_optags {
+sub _init_optags(...) {
     my(%all, %seen);
         %all{[opset_to_ops(full_opset())]} = @(); # keys only
 

@@ -362,7 +362,7 @@ BEGIN {
 *LF   = \LF();
 *CRLF = \CRLF();
 
-sub sockaddr_in {
+sub sockaddr_in(@< @_) {
     if (nelems @_ == 1) {
         return unpack_sockaddr_in(< @_);
     } else {

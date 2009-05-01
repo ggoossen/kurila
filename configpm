@@ -30,7 +30,7 @@
 # this case, since for example an extension makefile that has a dependency
 # on Config.pm should trigger even if only Config_heavy.pl has changed.
 
-sub usage { die <<EOF }
+sub usage(...) { die <<EOF }
 usage: $^PROGRAM_NAME  [ options ]
     --cross=PLATFORM    cross-compile for a different platform
     --no-glossary       don't include Porting/Glossary in lib/Config.pod
@@ -62,7 +62,7 @@ my %Allowed_Opts = %(
     #                  for compactness
     );
 
-sub opts {
+sub opts(...) {
     # user specified options
     my %given_opts = %(
             # --opt=smth
@@ -831,8 +831,7 @@ my %seen = %( () );
 my $text = 0;
 $^INPUT_RECORD_SEPARATOR = '';
 
-sub process {
-    my $_ = shift;
+sub process(?$_) {
     if (s/\A(\w*)\s+\(([\w.]+)\):\s*\n(\t?)/=item C<$1>\n\nFrom F<$2>:\n\n/m) {
         my $c = substr $1, 0, 1;
         unless (%seen{+$c}++) {

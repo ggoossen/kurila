@@ -12,15 +12,15 @@ package Testing::Symtable;
 our ($This, @That, %wibble, $moo, %moo);
 my $not_a_sym = 'moo';
 
-sub moo { 42 }
-sub car { 23 }
+sub moo(...) { 42 }
+sub car(...) { 23 }
 
 
 package Testing::Symtable::Foo;
-sub yarrow { "Hock" }
+sub yarrow(...) { "Hock" }
 
 package Testing::Symtable::Bar;
-sub hock { "yarrow" }
+sub hock(...) { "yarrow" }
 
 package main;
 our (%Subs);

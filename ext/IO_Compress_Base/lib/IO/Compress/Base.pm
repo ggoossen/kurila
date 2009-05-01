@@ -22,37 +22,37 @@ $VERSION = '2.006';
 
 #Can't locate object method "SWASHNEW" via package "utf8" (perhaps you forgot to load "utf8"?) at .../ext/Compress-Zlib/Gzip/blib/lib/Compress/Zlib/Common.pm line 16.
 
-sub saveStatus
+sub saveStatus(@< @_)
 {
-    my $self   = shift ;
-     $self->{ErrorNo}->$ = shift() + 0 ;
+    my $self   = shift @_ ;
+     $self->{ErrorNo}->$ = shift( @_) + 0 ;
      $self->{Error}->$ = '' ;
 
     return  $self->{?ErrorNo}->$ ;
 }
 
 
-sub saveErrorString
+sub saveErrorString(@< @_)
 {
-    my $self   = shift ;
-    my $retval = shift ;
-     $self->{Error}->$ = shift() . ($self->{?Error}->$ ?? "\nprevious: $($self->{?Error}->$)" !! "") ;
-     $self->{ErrorNo}->$ = shift() + 0 if (nelems @_) ;
+    my $self   = shift @_ ;
+    my $retval = shift @_ ;
+     $self->{Error}->$ = shift( @_) . ($self->{?Error}->$ ?? "\nprevious: $($self->{?Error}->$)" !! "") ;
+     $self->{ErrorNo}->$ = shift( @_) + 0 if (nelems @_) ;
 
     return $retval;
 }
 
-sub croakError
+sub croakError(@< @_)
 {
-    my $self   = shift ;
+    my $self   = shift @_ ;
     $self->saveErrorString(0, @_[0]);
     croak @_[0];
 }
 
-sub closeError
+sub closeError(@< @_)
 {
-    my $self = shift ;
-    my $retval = shift ;
+    my $self = shift @_ ;
+    my $retval = shift @_ ;
 
     my $errno = $self->{?ErrorNo};
     my $error =  $self->{?Error}->$;
@@ -67,24 +67,22 @@ sub closeError
 
 
 
-sub error
+sub error($self)
 {
-    my $self   = shift ;
     return  $self->{?Error}->$ ;
 }
 
-sub errorNo
+sub errorNo($self)
 {
-    my $self   = shift ;
     return  $self->{?ErrorNo}->$ ;
 }
 
 
-sub writeAt
+sub writeAt(@< @_)
 {
-    my $self = shift ;
-    my $offset = shift;
-    my $data = shift;
+    my $self = shift @_ ;
+    my $offset = shift @_;
+    my $data = shift @_;
 
     if (defined $self->{?FH}) {
         my $here = tell($self->{?FH});
@@ -104,11 +102,11 @@ sub writeAt
     return 1;
 }
 
-sub output
+sub output(@< @_)
 {
-    my $self = shift ;
-    my $data = shift ;
-    my $last = shift ;
+    my $self = shift @_ ;
+    my $data = shift @_ ;
+    my $last = shift @_ ;
 
     return 1 
         if length $data == 0 && ! $last ;
@@ -129,18 +127,18 @@ sub output
     return 1;
 }
 
-sub getOneShotParams
+sub getOneShotParams(...)
 {
     return  @( 'MultiStream' => \@(1, 1, Parse_boolean,   1),
         );
 }
 
-sub checkParams
+sub checkParams(@< @_)
 {
-    my $self = shift ;
-    my $class = shift ;
+    my $self = shift @_ ;
+    my $class = shift @_ ;
 
-    my $got = shift || IO::Compress::Base::Parameters::new();
+    my $got = shift @_ || IO::Compress::Base::Parameters::new();
 
     $got->parse(
         \%(
@@ -161,10 +159,10 @@ sub checkParams
     return $got ;
 }
 
-sub _create
+sub _create(@< @_)
 {
-    my $obj = shift;
-    my $got = shift;
+    my $obj = shift @_;
+    my $got = shift @_;
 
     $obj->{+Closed} = 1 ;
 
@@ -172,7 +170,7 @@ sub _create
     $obj->croakError("$class: Missing Output parameter")
         if ! nelems @_ && ! $got ;
 
-    my $outValue = shift ;
+    my $outValue = shift @_ ;
     my $oneShot = 1 ;
 
     if (! $got)
@@ -267,10 +265,10 @@ sub _create
     return $obj ;
 }
 
-sub ckOutputParam 
+sub ckOutputParam(@< @_) 
 {
-    my $self = shift ;
-    my $from = shift ;
+    my $self = shift @_ ;
+    my $from = shift @_ ;
     my $outType = whatIsOutput(@_[0]);
 
     $self->croakError("$from: output parameter not a filename, filehandle or scalar ref")
@@ -286,9 +284,9 @@ sub ckOutputParam
 }
 
 
-sub _def
+sub _def(@< @_)
 {
-    my $obj = shift ;
+    my $obj = shift @_ ;
 
     my $class= @(caller)[0] ;
     my $name = @(caller(1))[3] ;
@@ -296,9 +294,9 @@ sub _def
     $obj->croakError("$name: expected at least 1 parameters\n")
         unless (nelems @_) +>= 1 ;
 
-    my $input = shift ;
+    my $input = shift @_ ;
     my $haveOut = (nelems @_) ;
-    my $output = shift ;
+    my $output = shift @_ ;
 
     my $x = Validator->new($class, $obj->{?Error}, $name, $input, $output)
         or return undef ;
@@ -370,12 +368,12 @@ sub _def
     croak "should not be here" ;
 }
 
-sub _singleTarget
+sub _singleTarget(@< @_)
 {
-    my $obj             = shift ;
-    my $x               = shift ;
-    my $inputIsFilename = shift;
-    my $input           = shift;
+    my $obj             = shift @_ ;
+    my $x               = shift @_ ;
+    my $inputIsFilename = shift @_;
+    my $input           = shift @_;
 
     if ($x->{?oneInput})
     {
@@ -423,12 +421,12 @@ sub _singleTarget
 
 }
 
-sub _wr2
+sub _wr2(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
 
-    my $source = shift ;
-    my $inputIsFilename = shift;
+    my $source = shift @_ ;
+    my $inputIsFilename = shift @_;
 
     my $input = $source ;
     if (! $inputIsFilename)
@@ -480,11 +478,11 @@ sub _wr2
     return undef;
 }
 
-sub addInterStream
+sub addInterStream(@< @_)
 {
-    my $self = shift ;
-    my $input = shift ;
-    my $inputIsFilename = shift ;
+    my $self = shift @_ ;
+    my $input = shift @_ ;
+    my $inputIsFilename = shift @_ ;
 
     if ($self->{?Got}->value('MultiStream'))
     {
@@ -503,24 +501,23 @@ sub addInterStream
     return 1 ;
 }
 
-sub getFileInfo
+sub getFileInfo(...)
 {
 }
 
-sub TIEHANDLE
+sub TIEHANDLE(@< @_)
 {
     return @_[0] if ref(@_[0]);
     die "OOPS\n" ;
 }
 
-sub UNTIE
+sub UNTIE(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
 }
 
-sub DESTROY
+sub DESTROY($self)
 {
-    my $self = shift ;
     $self->close() ;
 
     # TODO - memory leak with 5.8.0 - this isn't called until 
@@ -532,13 +529,13 @@ sub DESTROY
 
 
 
-sub filterUncompressed
+sub filterUncompressed(...)
 {
 }
 
-sub syswrite
+sub syswrite(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
 
     my $buffer ;
     if (ref @_[0] ) {
@@ -598,9 +595,9 @@ sub syswrite
     return $buffer_length;
 }
 
-sub print
+sub print(@< @_)
 {
-    my $self = shift;
+    my $self = shift @_;
 
     #if (ref $self) {
     #    $self = $self{GLOB} ;
@@ -613,18 +610,18 @@ sub print
     }
 }
 
-sub printf
+sub printf(@< @_)
 {
-    my $self = shift;
-    my $fmt = shift;
+    my $self = shift @_;
+    my $fmt = shift @_;
     defined $self->syswrite(sprintf($fmt, < @_));
 }
 
 
 
-sub flush
+sub flush(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
 
     my $outBuffer='';
     my $status = $self->{?Compress}->flush($outBuffer, < @_) ;
@@ -649,9 +646,9 @@ sub flush
     return 1;
 }
 
-sub newStream
+sub newStream(@< @_)
 {
-    my $self = shift ;
+    my $self = shift @_ ;
 
     $self->_writeTrailer()
         or return 0 ;
@@ -677,15 +674,13 @@ sub newStream
     return 1 ;
 }
 
-sub reset
+sub reset($self)
 {
-    my $self = shift ;
     return $self->{Compress}->reset() ;
 }
 
-sub _writeTrailer
+sub _writeTrailer($self)
 {
-    my $self = shift ;
 
     my $trailer = '';
 
@@ -702,16 +697,14 @@ sub _writeTrailer
     return $self->output($trailer);
 }
 
-sub _writeFinalTrailer
+sub _writeFinalTrailer($self)
 {
-    my $self = shift ;
 
     return $self->output($self->mkFinalTrailer());
 }
 
-sub close
+sub close($self)
 {
-    my $self = shift ;
 
     return 1 if $self->{?Closed} || ! $self->{?Compress} ;
     $self->{+Closed} = 1 ;
@@ -777,26 +770,24 @@ sub close
 #}
 
 
-sub tell
+sub tell($self)
 {
-    my $self = shift ;
 
     return $self->{UnCompSize}->get32bit() ;
 }
 
-sub eof
+sub eof($self)
 {
-    my $self = shift ;
 
     return $self->{?Closed} ;
 }
 
 
-sub seek
+sub seek(@< @_)
 {
-    my $self     = shift ;
-    my $position = shift;
-    my $whence   = shift ;
+    my $self     = shift @_ ;
+    my $position = shift @_;
+    my $whence   = shift @_ ;
 
     my $here = $self->tell() ;
     my $target = 0 ;
@@ -831,7 +822,7 @@ sub seek
     return 1 ;
 }
 
-sub binmode
+sub binmode(...)
 {
     1;
 #    my $self     = shift ;
@@ -840,37 +831,34 @@ sub binmode
 #            : 1 ;
 }
 
-sub fileno
+sub fileno($self)
 {
-    my $self     = shift ;
     return defined $self->{?FH} 
         ?? fileno($self->{?FH}) 
         !! undef ;
 }
 
-sub opened
+sub opened($self)
 {
-    my $self     = shift ;
     return ! $self->{?Closed} ;
 }
 
-sub autoflush
+sub autoflush(@< @_)
 {
-    my $self     = shift ;
+    my $self     = shift @_ ;
     return defined $self->{?FH} 
         ?? $self->{?FH}->autoflush(< @_) 
         !! undef ;
 }
 
-sub input_line_number
+sub input_line_number(...)
 {
     return undef ;
 }
 
 
-sub _notAvailable
+sub _notAvailable(?$name)
 {
-    my $name = shift ;
     return sub { croak "$name Not Available: File opened only for output" ; } ;
 }
 

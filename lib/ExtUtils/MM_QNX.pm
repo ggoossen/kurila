@@ -30,8 +30,7 @@ Add .err files corresponding to each .c file.
 
 =cut
 
-sub extra_clean_files {
-    my $self = shift;
+sub extra_clean_files($self) {
 
     my @errfiles = $self->{?C}->@;
     for (  @errfiles ) {

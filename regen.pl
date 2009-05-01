@@ -28,8 +28,7 @@ my %gen = %(
             'overload.pl' => \qw[overload.h],
     );
 
-sub do_cksum {
-    my $pl = shift;
+sub do_cksum(?$pl) {
     my %cksum;
     for my $f (  %gen{$pl}->@) {
         my $fh;

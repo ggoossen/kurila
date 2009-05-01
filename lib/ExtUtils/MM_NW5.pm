@@ -40,8 +40,7 @@ We're Netware in addition to being Windows.
 
 =cut
 
-sub os_flavor {
-    my $self = shift;
+sub os_flavor($self) {
     return  @($self->SUPER::os_flavor, 'Netware');
 }
 
@@ -59,8 +58,8 @@ Add Netware macros initialized above to the Makefile.
 
 =cut
 
-sub init_platform {
-    my@($self) =@( shift);
+sub init_platform(@< @_) {
+    my@($self) =@( shift @_);
 
     # To get Win32's setup.
     $self->SUPER::init_platform;
@@ -102,8 +101,8 @@ sub init_platform {
     $self->{+MM_NW5_VERSION} = $VERSION;
 }
 
-sub platform_constants {
-    my@($self) =@( shift);
+sub platform_constants(@< @_) {
+    my@($self) =@( shift @_);
     my $make_frag = '';
 
     # Setup Win32's constants.

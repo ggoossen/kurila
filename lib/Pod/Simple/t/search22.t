@@ -16,8 +16,7 @@ use Cwd;
 my $cwd = cwd();
 print $^STDOUT, "# CWD: $cwd\n";
 
-sub source_path {
-    my $file = shift;
+sub source_path(?$file) {
     if (env::var('PERL_CORE')) {
         my $updir = File::Spec->updir;
         my $dir = File::Spec->catdir($updir, 'lib', 'Pod', 'Simple', 't');
@@ -82,7 +81,7 @@ do {
     my $shadowed = join "|", sort keys %count;
     is $shadowed, "hinkhonk::Glunk|hinkhonk::Vliff|perlthng|squaa::Vliff";
 
-    sub thar { print $^STDOUT, "# Seen @_[0] :\n", < map { "#  \{$_\}\n" }, sort grep { $where2name->{?$_} eq @_[0] },keys $where2name->%; return; }
+    sub thar(@< @_) { print $^STDOUT, "# Seen @_[0] :\n", < map { "#  \{$_\}\n" }, sort grep { $where2name->{?$_} eq @_[0] },keys $where2name->%; return; }
 
     is %count{?'perlthng'}, 2;
     thar 'perlthng';
