@@ -128,7 +128,8 @@ MSG
 do {
     fresh_perl_is("\$x = 1;\n\$y = 1;\n", <<'MSG' );
 Global symbol "$x" requires explicit package name at - line 1, near "$x "
-Global symbol "$y" requires explicit package name at - line 2, near "$y "
+Global symbol "$y" requires explicit package name at - line 2, near ";
+$y "
 Execution of - aborted due to compilation errors.
 MSG
 };

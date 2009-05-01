@@ -1872,20 +1872,20 @@ PP(pp_entereval)
 
     ENTER;
     lex_start(sv, NULL, FALSE);
-    PL_parser->lex_line_number++;
     SAVETMPS;
 
     /* switch to eval mode */
-
-    len = my_snprintf(tmpbuf, sizeof(tbuf), "_<(eval %lu)", (unsigned long)++PL_evalseq);
-    SVcpSTEAL(PL_parser->lex_filename, newSVpvn(tmpbuf+2, len-2));
-    /* XXX For C<eval "...">s within BEGIN {} blocks, this ends up
-       deleting the eval's FILEGV from the stash before gv_check() runs
-       (i.e. before run-time proper). To work around the coredump that
-       ensues, we always turn GvMULTI_on for any globals that were
-       introduced within evals. See force_ident(). GSAR 96-10-12 */
-    safestr = savepvn(tmpbuf, len);
-    SAVEDELETE(PL_defstash, safestr, len);
+    if (!PL_parser->lex_filename) {
+	len = my_snprintf(tmpbuf, sizeof(tbuf), "_<(eval %lu)", (unsigned long)++PL_evalseq);
+	SVcpSTEAL(PL_parser->lex_filename, newSVpvn(tmpbuf+2, len-2));
+	/* XXX For C<eval "...">s within BEGIN {} blocks, this ends up
+	   deleting the eval's FILEGV from the stash before gv_check() runs
+	   (i.e. before run-time proper). To work around the coredump that
+	   ensues, we always turn GvMULTI_on for any globals that were
+	   introduced within evals. See force_ident(). GSAR 96-10-12 */
+	safestr = savepvn(tmpbuf, len);
+	SAVEDELETE(PL_defstash, safestr, len);
+    }
     SAVEHINTS();
     PL_hints = PL_op->op_targ;
     if (saved_hh)

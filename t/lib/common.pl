@@ -125,15 +125,16 @@ for ( @prgs){
         $prog =~ s|"\."|":"|g;
     }
 
-    open my $test, ">", "$tmpfile" or die "Cannot open >$tmpfile: $^OS_ERROR";
-    print $test, q{
+    my $prog_header = q[
         BEGIN {
             open($^STDERR, ">&", $^STDOUT)
               or die "Can't dup STDOUT->STDERR: $^OS_ERROR;";
         }
-    };
-    print $test, "\n#line 1\n";  # So the line numbers don't get messed up.
-    print $test, $prog,"\n";
+    ] . "\n#line 1\n";
+    my $real_prog = $prog;
+    $real_prog =~ s/^((?:#!.*)?)/$1$($prog_header)/;
+    open my $test, ">", "$tmpfile" or die "Cannot open >$tmpfile: $^OS_ERROR";
+    print $test, $real_prog, "\n";
     close $test or die "Cannot close $tmpfile: $^OS_ERROR";
     my $results = runperl( switches => \@($switch), stderr => 1, progfile => $tmpfile );
     my $status = $^CHILD_ERROR;

@@ -18,7 +18,7 @@ my $Perl = which_perl();
 
 $^OUTPUT_AUTOFLUSH = 1;
 
-open(my $pipe, "|-", "-") || exec $Perl, '-pe', 's/Y/k/g; s/X/o/g';
+open(my $pipe, "|-", "-") || exec $Perl, '-e', 'while (my $_ = ~< $^STDIN) { s/Y/k/g; s/X/o/g; print $^STDOUT, $_ }';
 
 printf $pipe, "Xk \%d - open |- || exec\n", curr_test();
 next_test();
@@ -43,7 +43,7 @@ SKIP: do {
         next_test();
         my $tnum = curr_test;
         next_test();
-        exec $Perl, '-le', "print \$^STDOUT, q\{not ok $tnum -     again\}";
+        exec $Perl, '-e', "print \$^STDOUT, q\{not ok $tnum -     again\n\}";
     }
 
     # This has to be *outside* the fork
@@ -117,7 +117,7 @@ SKIP: do {
 
             my $tnum = curr_test;
             next_test;
-            exec $Perl, '-le', "print \$^STDOUT, q\{not ok $tnum -     with fh dup \}";
+            exec $Perl, '-e', "print \$^STDOUT, q\{not ok $tnum -     with fh dup \n\}";
         }
 
         # This has to be done *outside* the fork.

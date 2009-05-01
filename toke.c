@@ -679,6 +679,8 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
     parser->lex_line_number = 0;
     parser->lex_filename = NULL;
     parser->statement_indent = 0;
+    if (len)
+	incline(parser->linestart);
 }
 
 /* delete a parser object */

@@ -78,11 +78,11 @@ do {
     my $a = oct "0xfffffffffffffffffg" ;
 };
 EXPECT
-Integer overflow in hexadecimal number at (eval 1) line 3 character 35.
+Integer overflow in hexadecimal number at (eval 1) line 3 character 10.
     (eval) called at - line 6 character 5.
-Illegal hexadecimal digit 'g' ignored at (eval 1) line 3 character 35.
+Illegal hexadecimal digit 'g' ignored at (eval 1) line 3 character 10.
     (eval) called at - line 6 character 5.
-Hexadecimal number > 0xffffffff non-portable at (eval 1) line 3 character 35.
+Hexadecimal number > 0xffffffff non-portable at (eval 1) line 3 character 10.
     (eval) called at - line 6 character 5.
 ########
 
@@ -95,11 +95,11 @@ do {
     '; print $^STDERR, $^EVAL_ERROR ;
 };
 EXPECT
-Integer overflow in hexadecimal number at (eval 1) line 2 character 11.
+Integer overflow in hexadecimal number at (eval 1) line 2 character 10.
     (eval) called at - line 6 character 5.
-Illegal hexadecimal digit 'g' ignored at (eval 1) line 2 character 11.
+Illegal hexadecimal digit 'g' ignored at (eval 1) line 2 character 10.
     (eval) called at - line 6 character 5.
-Hexadecimal number > 0xffffffff non-portable at (eval 1) line 2 character 11.
+Hexadecimal number > 0xffffffff non-portable at (eval 1) line 2 character 10.
     (eval) called at - line 6 character 5.
 ########
 
