@@ -9,11 +9,11 @@ sub tack_on(@< @_) {
     return (@_[0]->[2] .= @_[1]);
 }
 
-sub as_string(@< @_) {
-    return Pod::Simple::BlackBox::stringify_lol(<@_);
+sub as_string($lol) {
+    return Pod::Simple::BlackBox::stringify_lol($lol);
 }
-sub stringify(@< @_) {
-    return Pod::Simple::BlackBox::stringify_lol(<@_);
+sub stringify($lol) {
+    return Pod::Simple::BlackBox::stringify_lol($lol);
 }
 
 sub new($class, @< @_) {

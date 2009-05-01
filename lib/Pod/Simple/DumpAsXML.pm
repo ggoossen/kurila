@@ -10,8 +10,7 @@ use Carp ();
 
 BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
 
-sub new(@< @_) {
-    my $self = shift @_;
+sub new($self, @< @_) {
     my $new = $self->SUPER::new(< @_);
     $new->{+'output_fh'} ||= $^STDOUT;
     $new->accept_codes('VerbatimFormatted');
@@ -50,7 +49,7 @@ sub _handle_text(@< @_) {
     if(length @_[1]) {
         my $indent = '  ' x @_[0]->{?'indent'};
         my $text = @_[1];
-        $text =~ _xml_escape($text);
+        $text = _xml_escape($text);
         $text =~  # A not-totally-brilliant wrapping algorithm:
         s/(
          [^\n]{55}         # Snare some characters from a line
@@ -65,10 +64,10 @@ sub _handle_text(@< @_) {
     return;
 }
 
-sub _handle_element_end(@< @_) {
-    DEBUG and print $^STDOUT, "-- @_[1]\n";
-    print @_[0]->{?'output_fh'}
-        ,'  ' x --@_[0]->{+'indent'}, "</", @_[1], ">\n";
+sub _handle_element_end($self, $name) {
+    DEBUG and print $^STDOUT, "-- $name\n";
+    print $self->{?'output_fh'}
+        ,'  ' x --$self->{+'indent'}, "</", $name, ">\n";
     return;
 }
 

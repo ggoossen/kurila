@@ -1111,7 +1111,7 @@ EOT
         # from japhy
         my $w;
         use warnings;    
-        local $^WARN_HOOK = sub { $w .= shift @_->{?description} . "\n" };
+        local $^WARN_HOOK = sub ($e) { $w .= $e->{?description} . "\n" };
 
         $w = "";
         eval 'qr/(?c)/'; die if $^EVAL_ERROR;
@@ -2509,7 +2509,7 @@ END
                     my $warning;
                     local $^WARN_HOOK = undef;
                     undef $^EVAL_ERROR;
-                    eval 'BEGIN { use warnings; $^WARN_HOOK = sub { $warning = @_[0]->message }; }' . "\n"
+                    eval 'BEGIN { use warnings; $^WARN_HOOK = sub ($e) { $warning = $e->message }; }' . "\n"
                         . $code; die if $^EVAL_ERROR;
                     ok( $warning =~ m/$warn_pat/, "expected warning: $(dump::view($warn_pat)), got: $(dump::view($warning))" );
                 };
@@ -2521,7 +2521,7 @@ END
         do {
             my $code;
             my $w="";
-            local $^WARN_HOOK = sub { $w.=shift @_->description };
+            local $^WARN_HOOK = sub ($e) { $w.=$e->description };
             eval($code=<<'EOFTEST') or die "$^EVAL_ERROR\n$code\n";
         do {
             use warnings;
@@ -2962,8 +2962,7 @@ EOFTEST
         local $Message = "RT#41010";
         my @tails=@('','(?(1))','(|)','()?');    
         my @quants=@('*','+');
-        my $doit=sub {
-                my $pats= shift @_;
+        my $doit=sub ($pats, @< @_) {
                 for ( @_) {
                     for my $pat ( $pats->@) {
                         for my $quant ( @quants) {

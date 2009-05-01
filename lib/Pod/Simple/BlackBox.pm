@@ -1749,8 +1749,8 @@ sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space) 
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub text_content_of_treelet(@< @_) {  # method: $parser->text_content_of_treelet($lol)
-    return stringify_lol(@_[1]);
+sub text_content_of_treelet(_, $lol) {  # method: $parser->text_content_of_treelet($lol)
+    return stringify_lol($lol);
 }
 
 sub stringify_lol($lol) {  # function: stringify_lol($lol)

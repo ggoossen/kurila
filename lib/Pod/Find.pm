@@ -266,7 +266,7 @@ sub _check_and_extract_name($file, $verbose, $root_rx) {
             $name =~ s:^.*/::s;
         }
     }
-    _simplify($name);
+    $name = _simplify($name);
     $name =~ s!/+!::!g; #/
     if ($^OS_NAME eq 'MacOS') {
         $name =~ s!:+!::!g; # : -> ::
@@ -293,18 +293,18 @@ sub simplify_name($str) {
     } else {
         $str =~ s:^.*/::s;
     }
-    _simplify($str);
-    $str;
+    return _simplify($str);
 }
 
 # internal sub only
-sub _simplify(@< @_) {
+sub _simplify($_) {
     # strip Perl's own extensions
-    @_[0] =~ s/\.(pod|pm|plx?)\z//i;
+    s/\.(pod|pm|plx?)\z//i;
     # strip meaningless extensions on Win32 and OS/2
-    @_[0] =~ s/\.(bat|exe|cmd)\z//i if($^OS_NAME =~ m/mswin|os2/i);
+    s/\.(bat|exe|cmd)\z//i if($^OS_NAME =~ m/mswin|os2/i);
     # strip meaningless extensions on VMS
-    @_[0] =~ s/\.(com)\z//i if($^OS_NAME eq 'VMS');
+    s/\.(com)\z//i if($^OS_NAME eq 'VMS');
+    return $_;
 }
 
 # contribution from Tim Jenness <t.jenness@jach.hawaii.edu>

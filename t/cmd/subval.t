@@ -31,7 +31,7 @@ sub foo6(@< @_) {
     'true2' unless @_[0];
 }
 
-print $^STDOUT, "1..30\n";
+print $^STDOUT, "1..28\n";
 
 if (&foo1(0) eq '0') {print $^STDOUT, "ok 1\n";} else {print $^STDOUT, "not ok 1\n";}
 if (&foo1(1) eq 'true2') {print $^STDOUT, "ok 2\n";} else {print $^STDOUT, "not ok 2\n";}
@@ -108,11 +108,3 @@ sub somesub($num,$P,$F,$L) {
 
     package foo;
 &main::somesub(28, 'foo', __FILE__, __LINE__);
-
-
-sub autov(@< @_) { @_[0] = 23 };
-
-my $href = \%();
-print $^STDOUT, nkeys $href->% ?? 'not ' !! '', "ok 29\n";
-autov($href->{+b});
-print $^STDOUT, join(':', @:< $href->%) eq 'b:23' ?? '' !! 'not ', "ok 30\n";

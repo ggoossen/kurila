@@ -1045,16 +1045,16 @@ sub gmatch(@< @_)
 ##
 ## bool subst'ed = subst(string, substring, replace)
 ##
-sub subst($self, @< @_)
+sub subst($self, $strref, $substr, $replace)
 {
-    my $code = ref @_[2] eq 'CODE' ?? @_[2] !! FALSE;
+    my $code = ref $replace eq 'CODE' ?? $replace !! FALSE;
 
-    if (my @(?$pos,?$len) =  $self->index(@_[0], @_[1]) || @()) {
+    if (my @(?$pos,?$len) =  $self->index($strref->$, $substr) || @()) {
         if ($code) {
-            my $mat = substr(@_[0], $pos, $len);
-            substr(@_[0], $pos, $len, $code->($mat));
+            my $mat = substr($strref->$, $pos, $len);
+            substr($strref->$, $pos, $len, $code->($mat));
         } else {
-            substr(@_[0], $pos, $len, @_[2]);
+            substr($strref->$, $pos, $len, $replace);
         }
         return TRUE;
     }
@@ -1066,19 +1066,18 @@ sub subst($self, @< @_)
 ##
 ## int count = gsubst(string, substring, replace)
 ##
-sub gsubst(@< @_)
+sub gsubst($self, $strref, $substr, $replace)
 {
-    my $self = shift @_;
-    my $code = ref @_[2] eq 'CODE' ?? @_[2] !! FALSE;
+    my $code = ref $replace eq 'CODE' ?? $replace !! FALSE;
     my $cnt = 0;
 
     # Replacement is carried out from the end, then use reverse.
-    for my $pos_len (reverse $self->index(@_[0], @_[1], 0, 'g')) {
+    for my $pos_len (reverse $self->index($strref->$, $substr, 0, 'g')) {
         if ($code) {
-            my $mat = substr(@_[0], $pos_len->[0], $pos_len->[1]);
-            substr(@_[0], $pos_len->[0], $pos_len->[1], $code->($mat));
+            my $mat = substr($strref->$, $pos_len->[0], $pos_len->[1]);
+            substr($strref->$, $pos_len->[0], $pos_len->[1], $code->($mat));
         } else {
-            substr(@_[0], $pos_len->[0], $pos_len->[1], @_[2]);
+            substr($strref->$, $pos_len->[0], $pos_len->[1], $replace);
         }
         $cnt++;
     }

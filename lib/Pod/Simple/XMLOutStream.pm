@@ -16,8 +16,7 @@ $ATTR_PAD = "\n" unless defined $ATTR_PAD;
 
 $SORT_ATTRS = 0 unless defined $SORT_ATTRS;
 
-sub new(@< @_) {
-    my $self = shift @_;
+sub new($self, @< @_) {
     my $new = $self->SUPER::new(< @_);
     $new->{+'output_fh'} ||= $^STDOUT;
     #$new->accept_codes('VerbatimFormatted');
@@ -56,9 +55,9 @@ sub _handle_text(@< @_) {
     return;
 }
 
-sub _handle_element_end(@< @_) {
-    DEBUG and print $^STDOUT, "-- @_[1]\n";
-    print @_[0]->{?'output_fh'} ,"</", @_[1], ">";
+sub _handle_element_end($self, $name) {
+    DEBUG and print $^STDOUT, "-- $name\n";
+    print $self->{?'output_fh'} ,"</", $name, ">";
     return;
 }
 

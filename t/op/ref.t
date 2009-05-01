@@ -257,7 +257,7 @@ foreach my $lexical (@('', 'my $a; ')) {
 }
 
 $test = curr_test();
-sub x::DESTROY(@< @_) {print $^STDOUT, "ok ", $test + shift @_->[0], "\n"}
+sub x::DESTROY($self) {print $^STDOUT, "ok ", $test + $self->[0], "\n"}
 do { my $a1 = bless \@(3),"x";
     my $a2 = bless \@(2),"x";
     do { my $a3 = bless \@(1),"x";
