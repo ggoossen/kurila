@@ -237,8 +237,8 @@ sub checkCollator(@< @_) {
         }
         elsif ($self->{?normalization} ne 'prenormalized') {
             my $norm = $self->{?normalization};
-            $self->{+normCode} = sub {
-                Unicode::Normalize::normalize($norm, shift @_);
+            $self->{+normCode} = sub ($v) {
+                Unicode::Normalize::normalize($norm, $v);
             };
             try { $self->{?normCode}->("") }; # try
             $^EVAL_ERROR and die "$PACKAGE unknown normalization form name: $norm";
@@ -463,8 +463,8 @@ sub splitEnt(@< @_)
     }
     else {
         $str = @_[0];
-        $str = &$code($str) if ref $code;
-        $str = &$norm($str) if ref $norm;
+        $str = $code->($str) if ref $code;
+        $str = $norm->($str) if ref $norm;
     }
 
     # get array of Unicode code point of string.
@@ -891,15 +891,12 @@ sub _eqArray($source, $substr, $lev)
 ## With "grobal" (only for the list context),
 ##  returns list of arrayref[position, length].
 ##
-sub index(@< @_)
+sub index($self, $str, $substr, ?$pos, ?$grob)
 {
-    my $self = shift @_;
-    my $str  = shift @_;
     my $len  = length($str);
-    my $subE = $self->splitEnt(shift @_);
-    my $pos  = (nelems @_) ?? shift @_ !! 0;
+    my $subE = $self->splitEnt($substr);
+    $pos  //= 0;
     $pos  = 0 if $pos +< 0;
-    my $grob = shift @_;
 
     my $lev  = $self->{?level};
     my $v2i  = $self->{?UCA_Version} +>= 9 &&
@@ -1048,9 +1045,8 @@ sub gmatch(@< @_)
 ##
 ## bool subst'ed = subst(string, substring, replace)
 ##
-sub subst(@< @_)
+sub subst($self, @< @_)
 {
-    my $self = shift @_;
     my $code = ref @_[2] eq 'CODE' ?? @_[2] !! FALSE;
 
     if (my @(?$pos,?$len) =  $self->index(@_[0], @_[1]) || @()) {

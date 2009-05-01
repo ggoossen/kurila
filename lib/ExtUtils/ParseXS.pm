@@ -194,7 +194,7 @@ sub process_file(@< @_) {
             if ($mode eq 'Typemap') {
                 chomp;
                 my $line = $_ ;
-                TrimWhitespace($_) ;
+                $_ = TrimWhitespace($_) ;
                 # skip blank lines and comment lines
                 next if m/^$/ or m/^#/ ;
                 my @($type,$kind, $proto) = @: m/^\s*(.*?\S)\s+(\S+)\s*($proto_re*)\s*$/ or
@@ -1064,13 +1064,13 @@ sub standard_typemap_locations(...) {
     return @tm;
 }
 
-sub TrimWhitespace(@< @_)
+sub TrimWhitespace($_)
 {
-    @_[0] =~ s/^\s+|\s+$//go ;
+    s/^\s+|\s+$//go ;
+    return $_;
 }
 
-sub TidyType(@< @_) {
-           local ($_) = @_[0] ;
+sub TidyType($_) {
 
     # rationalise any '*' by joining them into bunches and removing whitespace
     s#\s*(\*+)\s*#$1#g;
@@ -1080,9 +1080,9 @@ sub TidyType(@< @_) {
     s/\s+/ /g ;
 
     # trim leading & trailing whitespace
-    TrimWhitespace($_) ;
+    $_ = TrimWhitespace($_) ;
 
-    $_ ;
+    return $_ ;
 }
 
 # Input:  ($_, @line) == unparsed input.
@@ -1135,7 +1135,7 @@ sub CASE_handler(@< @_) {
     blurt ("Error: `CASE:' after unconditional `CASE:'")
         if $condnum && $cond eq '';
     $cond = $_;
-    TrimWhitespace($cond);
+    $cond = TrimWhitespace($cond);
     print $output_fh, "   " . ($condnum++ ?? " else" !! "") . ($cond ?? " if ($cond)\n" !! "\n");
     $_ = '' ;
 }
@@ -1145,7 +1145,7 @@ sub INPUT_handler(...) {
         last if m/^\s*NOT_IMPLEMENTED_YET/;
         next unless m/\S/;		# skip blank lines
 
-        TrimWhitespace($_) ;
+        $_ = TrimWhitespace($_) ;
         my $line = $_ ;
 
         # remove trailing semicolon if no initialisation
@@ -1252,14 +1252,13 @@ sub OUTPUT_handler(...) {
 sub C_ARGS_handler() {
     my $in = merge_section();
 
-    TrimWhitespace($in);
-    $func_args = $in;
+    $func_args = TrimWhitespace($in);
 }
 
 sub INTERFACE_MACRO_handler() {
     my $in = merge_section();
 
-    TrimWhitespace($in);
+    $in = TrimWhitespace($in);
     if ($in =~ m/\s/) {		# two
         @($interface_macro, $interface_macro_set) =  split ' ', $in;
     } else {
@@ -1273,7 +1272,7 @@ sub INTERFACE_MACRO_handler() {
 sub INTERFACE_handler() {
     my $in = merge_section();
 
-    TrimWhitespace($in);
+    $in = TrimWhitespace($in);
 
     foreach (split m/[\s,]+/, $in) {
         my $name = $_;
@@ -1330,7 +1329,7 @@ sub ATTRS_handler ()
 {
     while (!m/^$BLOCK_re/) {
         next unless m/\S/;
-        TrimWhitespace($_) ;
+        $_ = TrimWhitespace($_) ;
         push @Attributes, $_;
     }
     continue {
@@ -1342,7 +1341,7 @@ sub ALIAS_handler ()
 {
     while (!m/^$BLOCK_re/) {
         next unless m/\S/;
-        TrimWhitespace($_) ;
+        $_ = TrimWhitespace($_) ;
         GetAliases($_) if $_ ;
     }
     continue {
@@ -1355,7 +1354,7 @@ sub FALLBACK_handler()
     # the rest of the current line should contain either TRUE, 
     # FALSE or UNDEF
 
-    TrimWhitespace($_) ;
+    $_ = TrimWhitespace($_) ;
     my %map = %(
             TRUE => "&PL_sv_yes", 1 => "&PL_sv_yes",
                 FALSE => "&PL_sv_no", 0 => "&PL_sv_no",
@@ -1374,7 +1373,7 @@ sub REQUIRE_handler ()
     # the rest of the current line should contain a version number
     my $Ver = $_ ;
 
-    TrimWhitespace($Ver) ;
+    $Ver = TrimWhitespace($Ver) ;
 
     death ("Error: REQUIRE expects a version number")
         unless $Ver ;
@@ -1392,7 +1391,7 @@ sub VERSIONCHECK_handler ()
     # the rest of the current line should contain either ENABLE or
     # DISABLE
 
-    TrimWhitespace($_) ;
+    $_ = TrimWhitespace($_) ;
 
     # check for ENABLE/DISABLE
     death ("Error: VERSIONCHECK: ENABLE/DISABLE")
@@ -1413,7 +1412,7 @@ sub PROTOTYPE_handler ()
     while (!m/^$BLOCK_re/) {
         next unless m/\S/;
         $specified = 1 ;
-        TrimWhitespace($_) ;
+        $_ = TrimWhitespace($_) ;
         if ($_ eq 'DISABLE') {
             $ProtoThisXSUB = 0
         } elsif ($_ eq 'ENABLE') {
@@ -1444,7 +1443,7 @@ sub SCOPE_handler ()
 
     while (!m/^$BLOCK_re/) {
         next unless m/\S/;
-        TrimWhitespace($_) ;
+        $_ = TrimWhitespace($_) ;
         if ($_ =~ m/^DISABLE/i) {
             $ScopeThisXSUB = 0
         } elsif ($_ =~ m/^ENABLE/i) {
@@ -1462,7 +1461,7 @@ sub PROTOTYPES_handler ()
     # the rest of the current line should contain either ENABLE or
     # DISABLE
 
-    TrimWhitespace($_) ;
+    $_ = TrimWhitespace($_) ;
 
     # check for ENABLE/DISABLE
     death ("Error: PROTOTYPES: ENABLE/DISABLE")
@@ -1478,7 +1477,7 @@ sub INCLUDE_handler ()
 {
     # the rest of the current line should contain a valid filename
 
-    TrimWhitespace($_) ;
+    $_ = TrimWhitespace($_) ;
 
     death("INCLUDE: filename missing")
         unless $_ ;

@@ -3,7 +3,7 @@ package File::GlobPP;
 use Config < qw(config_value);
 my $has_csh = defined config_value("d_csh");
 
-sub glob(?$pat) {
+sub glob(?$pat, ?_) {
 
     open my $outfh,"-|",
         ( $has_csh

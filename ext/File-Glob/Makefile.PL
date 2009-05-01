@@ -11,9 +11,9 @@ WriteMakefile(
     #   OPTIMIZE		=> '-g',
     );
 use Config;
-sub MY::cflags(@< @_) {
+sub MY::cflags($self, @< @_) {
     package MY;
-    my $inherited = shift @_->SUPER::cflags(< @_);
+    my $inherited = $self->SUPER::cflags(< @_);
     if (Config::config_value("archname") =~ m/^aix/
         and Config::config_value("use64bitall") eq 'define') {
         $inherited =~ s/\s-O\d?//m;

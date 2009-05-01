@@ -41,10 +41,10 @@ sub headerpath(...) {
     }
 }
 
-sub MY::postamble(@< @_) {
+sub MY::postamble($self) {
     my $headerpath = headerpath();
     my @headers = map { File::Spec->catfile($headerpath, $_) }, qw(op.h cop.h);
-    my $noecho = shift @_->{?NOECHO};
+    my $noecho = $self->{?NOECHO};
 
     "
 B\$(OBJ_EXT) : defsubs.h
@@ -54,8 +54,8 @@ defsubs.h :: $(join ' ',@headers) defsubs_h.PL
 "
 }
 
-sub MY::processPL(@< @_) {
-    my $text = shift @_->SUPER::processPL(< @_);
+sub MY::processPL($self, @< @_) {
+    my $text = $self->SUPER::processPL(< @_);
     # Append our extra parameter
     $text =~ s/^(\t.*defsubs_h\.PL.*)/$1 $(headerpath())/m;
     $text;
