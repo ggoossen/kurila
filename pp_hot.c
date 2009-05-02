@@ -594,8 +594,11 @@ PP(pp_aelemfast)
     const U32 lval = op_flags & OPf_MOD;
     const I32 elem = PL_op->op_private;
     if (!SvAVOK(av)) {
-	if (lval && ! SvOK(av))
+	if (lval && ! SvOK(av)) {
+	    if (SvREADONLY(av))
+		Perl_croak(aTHX_ PL_no_modify);
 	    sv_upgrade((SV*)av, SVt_PVAV);
+	}
 	else
 	    bad_arg(1, "array", PL_op_desc[PL_op->op_type], (SV*)av);
     }
@@ -1620,6 +1623,8 @@ PP(pp_aelem)
 	}
 	if (!add)
 	    Perl_croak(aTHX_ "Can't take an element from a %s", Ddesc((SV*)av));
+	if (SvREADONLY(av))
+	    Perl_croak(aTHX_ PL_no_modify);
 	sv_upgrade(avTsv(av), SVt_PVAV);
     }
     else if ( ! SvAVOK(av) )

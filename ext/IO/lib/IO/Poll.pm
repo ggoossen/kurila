@@ -35,7 +35,7 @@ $VERSION = "0.07";
 sub new {
     my $class = shift;
 
-    my $self = bless \@(\%(),\%(),\%()), $class;
+    my $self = bless \@(%(),%(),%()), $class;
 
     $self;
 }
@@ -49,9 +49,9 @@ sub mask {
     if ((nelems @_)) {
         my $mask = shift;
         if($mask) {
-            $self->[0]->{+$fd}{+$io} = $mask; # the error events are always returned
-            $self->[1]->{+$fd}      = 0;     # output mask
-            $self->[2]->{+$io}      = $io;   # remember handle
+            $self->[0]{+$fd}{+$io} = $mask; # the error events are always returned
+            $self->[1]{+$fd}      = 0;     # output mask
+            $self->[2]{+$io}      = $io;   # remember handle
         } else {
             delete $self->[0]{$fd}{$io};
             unless($self->[0]{?$fd}) {
@@ -63,8 +63,8 @@ sub mask {
         }
     }
 
-    return unless exists $self->[0]->{$fd} and exists $self->[0]->{$fd}{$io};
-    return $self->[0]->{$fd}{?$io};
+    return unless exists $self->[0]{$fd} and exists $self->[0]{$fd}{$io};
+    return $self->[0]{$fd}{?$io};
 }
 
 
@@ -75,7 +75,7 @@ sub poll($self,$timeout) {
     my($fd,$mask,$iom);
     my @poll = @( () );
 
-    while(@(?$fd,?$iom) =@( each $self->[0]->%)) {
+    while(@(?$fd,?$iom) =@( each $self->[0])) {
         $mask   = 0;
         $mask  ^|^= $_ for values($iom);
         push(@poll,$fd => $mask);
@@ -88,7 +88,7 @@ sub poll($self,$timeout) {
 
     while((nelems @poll)) {
         my @($fd,$got) = @: splice(@poll,0,2);
-        $self->[1]->{+$fd} = $got if $got;
+        $self->[1]{+$fd} = $got if $got;
     }
 
     return $ret;  
@@ -99,8 +99,8 @@ sub events {
     my $io = shift;
     my $fd = fileno($io);
     $io = dump::view($io);
-    exists $self->[1]->{$fd} and exists $self->[0]->{$fd}->{$io} 
-        ?? $self->[1]->{?$fd} ^&^ ($self->[0]->{$fd}->{?$io}^|^POLLHUP^|^POLLERR^|^POLLNVAL)
+    exists $self->[1]{$fd} and exists $self->[0]{$fd}{$io} 
+        ?? $self->[1]{?$fd} ^&^ ($self->[0]{$fd}{?$io}^|^POLLHUP^|^POLLERR^|^POLLNVAL)
         !! 0;
 }
 
@@ -112,16 +112,16 @@ sub remove {
 
 sub handles {
     my $self = shift;
-    return values $self->[2]->% unless (nelems @_);
+    return values $self->[2] unless (nelems @_);
 
     my $events = shift || 0;
     my($fd,$ev,$io,$mask);
     my @handles = @( () );
 
-    while(@($fd,$ev) =@( each $self->[1]->%)) {
-        while (@($io,$mask) =@( each $self->[0]->{$fd}->%)) {
+    while(@($fd,$ev) =@( each $self->[1])) {
+        while (@($io,$mask) =@( each $self->[0]{$fd})) {
             $mask ^|^= POLLHUP^|^POLLERR^|^POLLNVAL;  # must allow these
-            push @handles,$self->[2]->{?$io} if ($ev ^&^ $mask) ^&^ $events;
+            push @handles,$self->[2]{?$io} if ($ev ^&^ $mask) ^&^ $events;
         }
     }
     return @handles;

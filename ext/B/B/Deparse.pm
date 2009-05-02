@@ -477,7 +477,7 @@ sub stash_subs($self, ?$pack) {
 sub print_protos {
     my $self = shift;
     my @ret;
-    foreach my $ar ( $self->{+'protos_todo'}->@) {
+    foreach my $ar ( $self->{+'protos_todo'}) {
         my $proto = (defined $ar->[1] ?? " (". $ar->[1] . ")" !! "");
         push @ret, "sub " . $ar->[0] .  "$proto;\n";
     }
@@ -966,7 +966,7 @@ sub padname_sv {
 }
 
 sub maybe_my($self, $op, $cx, $text) {
-    if ($op->private ^&^ OPpLVAL_INTRO and not $self->{?'avoid_local'}->{?$op->$}) {
+    if ($op->private ^&^ OPpLVAL_INTRO and not $self->{?'avoid_local'}{?$op->$}) {
         my $my = "my";
         if (want_scalar($op)) {
             return "$my $text";
@@ -1168,8 +1168,8 @@ sub lex_in_scope($self, $name) {
 
     return 0 if !defined($self->{?'curcop'});
     my $seq = $self->{'curcop'}->cop_seq;
-    return 0 if !exists $self->{'curcvlex'}->{$name};
-    for my $a ( $self->{'curcvlex'}->{$name}->@) {
+    return 0 if !exists $self->{'curcvlex'}{$name};
+    for my $a ( $self->{'curcvlex'}{$name}) {
         my @($st, $en) =  $a->@;
         return 1 if $seq +> $st && $seq +<= $en;
     }
@@ -1202,7 +1202,7 @@ sub populate_curcvlex {
                 ?? @(0, 999999)
                 !! @(@ns[$i]->COP_SEQ_RANGE_LOW, @ns[$i]->COP_SEQ_RANGE_HIGH);
 
-            push $self->{+'curcvlex'}->{+$name}->@, \@($seq_st, $seq_en);
+            push $self->{+'curcvlex'}{+$name}, \@($seq_st, $seq_en);
         }
     } continue {
         $padlist = $parentpadlist;
@@ -1310,7 +1310,7 @@ sub pp_nextstate($self, $op, $cx) {
     }
 
     # hack to check that the hint hash hasn't changed
-    if (join(' ', sort @: < ($self->{?'hinthash'} || \%())->%) 
+    if (join(' ', sort @: < ($self->{?'hinthash'} || \%())->%)
         ne join(' ', sort @: < ($op->hints_hash || \%())->%)) {
         push @text, declare_hinthash($self->{?'hinthash'}, $op->hints_hash, $self->{?indent_size});
         $self->{+'hinthash'} = $op->hints_hash;
@@ -1359,6 +1359,8 @@ my %ignored_hints = %(
 
 sub declare_hinthash($from, $to, $indent) {
     my @decls;
+    $from //= \%();
+    $to //= \%();
     for my $key (keys $to->%) {
         next if %ignored_hints{?$key};
         if (!defined $from->{?$key} or $from->{?$key} ne $to->{?$key}) {
@@ -2368,9 +2370,9 @@ sub pp_list($self, $op, $cx) {
             } else {
                 $lop = $kid;
             }
-            $self->{+'avoid_local'}->{+$lop->$}++;
+            $self->{+'avoid_local'}{+$lop->$}++;
             $expr = $self->deparse($kid, 6);
-            delete $self->{'avoid_local'}->{$lop->$};
+            delete $self->{'avoid_local'}{$lop->$};
         } else {
             $expr = $self->deparse($kid, 6);
         }

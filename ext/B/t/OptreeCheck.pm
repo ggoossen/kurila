@@ -745,8 +745,8 @@ sub mylike {
                  or 0); # no undefs !
 
     # same as A ^ B, but B has side effects
-    my $ok = ( $bad  &&  unlike ($got, $want, $cmnt, < $msgs->@)
-               or !$bad && like ($got, $want, $cmnt, < $msgs->@));
+    my $ok = ( $bad  &&  unlike ($got, $want, $cmnt, < $msgs)
+               or !$bad && like ($got, $want, $cmnt, < $msgs));
 
     reduceDiffs ($tc) if not $ok;
 

@@ -3480,7 +3480,7 @@ PP(pp_hslice)
 	    RETURN;
 	}
 	if (!add)
-	    Perl_croak(aTHX_ "Expected a HASH but got UNDEF");
+	    Perl_croak(aTHX_ "%s expects a HASH but got UNDEF", OP_DESC(PL_op));
 	if (SvREADONLY(hv))
 	    Perl_croak(aTHX_ PL_no_modify);
 	sv_upgrade(hv, SVt_PVHV);
@@ -4255,12 +4255,15 @@ PP(pp_push)
 
     do_arg_check(MARK);
 
-    if ( ! SvOK(ary) )
-	sv_upgrade(ary, SVt_PVAV);
-
     if ( ! SvAVOK(ary) ) {
-	Perl_croak(aTHX_ "First argument to %s must be an ARRAY not %s", 
-	    OP_DESC(PL_op), Ddesc(avTsv(ary)));
+	if ( SvOK(ary) )
+	    Perl_croak(aTHX_ "First argument to %s must be an ARRAY not %s", 
+		OP_DESC(PL_op), Ddesc(avTsv(ary)));
+
+	if (SvREADONLY(ary))
+	    Perl_croak(aTHX_ PL_no_modify);
+
+	sv_upgrade(ary, SVt_PVAV);
     }
 
     {
