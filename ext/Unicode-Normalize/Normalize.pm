@@ -39,11 +39,11 @@ Unicode::Normalize->bootstrap( $VERSION);
 ## utilites for tests
 ##
 
-sub pack_U(@< @_) {
+sub pack_U {
     return pack('U*', < @_);
 }
 
-sub unpack_U(@< @_) {
+sub unpack_U {
     return @( unpack('U*', shift(@_).pack('U*')) );
 }
 

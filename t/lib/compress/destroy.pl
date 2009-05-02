@@ -19,7 +19,7 @@ BEGIN
     use_ok('IO::File') ;
 }
 
-sub run(...)
+sub run
 {
 
     my $CompressClass   = identify();

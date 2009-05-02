@@ -95,7 +95,7 @@ sub process_file($file) {
 
 my $cppstdin;
 
-sub default_cpp(...) {
+sub default_cpp {
     unless (defined $cppstdin) {
         use File::Spec;
         $cppstdin = config_value("cppstdin");
@@ -111,7 +111,7 @@ sub default_cpp(...) {
     return "$cppstdin $(config_value('cppflags')) $(config_value('cppminus'))";
 }
 
-sub get_files(...) {
+sub get_files {
     my %file = %( () );
     # VMS keeps its include files in system libraries (well, except for Gcc)
     if ($^OS_NAME eq 'VMS') {
@@ -214,7 +214,7 @@ sub get_files(...) {
     return keys %file;
 }
 
-sub write_errno_pm(...) {
+sub write_errno_pm {
 
     # quick sanity check
 

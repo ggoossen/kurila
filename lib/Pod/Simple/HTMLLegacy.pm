@@ -13,7 +13,7 @@ $VERSION = "5.01";
 #
 # TODO: some basic docs
 
-sub pod2html(@< @_) {
+sub pod2html {
     my @args = @_;
 
     my( $verbose, $infile, $outfile, $title );
@@ -65,12 +65,12 @@ sub pod2html(@< @_) {
 
 #--------------------------------------------------------------------------
 
-sub bad_opts(...)     { die < _help_message();         }
-sub help_message(...) { print $^STDOUT, < _help_message() }
+sub bad_opts     { die < _help_message();         }
+sub help_message { print $^STDOUT, < _help_message() }
 
 #--------------------------------------------------------------------------
 
-sub _help_message(...) {
+sub _help_message {
 
     join '', @(
 

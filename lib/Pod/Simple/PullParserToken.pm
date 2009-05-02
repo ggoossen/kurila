@@ -5,17 +5,17 @@ our @ISA = @( () );
 our $VERSION = '2.02';
 
 
-sub new(@< @_) {  # Class->new('type', stuff...);  ## Overridden in derived classes anyway
-    my $class = shift @_;
+sub new {  # Class->new('type', stuff...);  ## Overridden in derived classes anyway
+    my $class = shift;
     return bless \$(@_), ref($class) || $class;
 }
 
-sub type(@< @_) { @_[0]->[0] }  # Can't change the type of an object
-sub dump(@< @_) { Pod::Simple::pretty( \@( <  @_[0]->@ ) ) }
+sub type { @_[0]->[0] }  # Can't change the type of an object
+sub dump { Pod::Simple::pretty( \@( <  @_[0]->@ ) ) }
 
-sub is_start(@< @_) { @_[0]->[0] eq 'start' }
-sub is_end(@< @_)   { @_[0]->[0] eq 'end'   }
-sub is_text(@< @_)  { @_[0]->[0] eq 'text'  }
+sub is_start { @_[0]->[0] eq 'start' }
+sub is_end   { @_[0]->[0] eq 'end'   }
+sub is_text  { @_[0]->[0] eq 'text'  }
 
 1;
 __END__

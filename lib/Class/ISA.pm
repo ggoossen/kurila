@@ -140,7 +140,7 @@ Sean M. Burke C<sburke@cpan.org>
 
 ###########################################################################
 
-sub self_and_super_versions(@< @_) { @+: map {
+sub self_and_super_versions { @+: map {
         @: $_ => (defined(Symbol::fetch_glob("$_\::VERSION")->*->$) ?? Symbol::fetch_glob("$_\::VERSION")->*->$ !! undef)
     }, self_and_super_path(@_[0])
 }
@@ -162,14 +162,14 @@ sub self_and_super_versions(@< @_) { @+: map {
 # $foo{'a'} is 'foist', not 'wun'.
 
 ###########################################################################
-sub super_path(@< @_) {
+sub super_path {
     my @ret = &self_and_super_path(< @_);
     shift @ret if (nelems @ret);
     return @ret;
 }
 
 #--------------------------------------------------------------------------
-sub self_and_super_path(@< @_) {
+sub self_and_super_path {
     # Assumption: searching is depth-first.
     # Assumption: '' (empty string) can't be a class package name.
     # Note: 'UNIVERSAL' is not given any special treatment.

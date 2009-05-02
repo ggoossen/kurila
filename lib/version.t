@@ -62,7 +62,7 @@ eval 'use version;';
 unlike ($^EVAL_ERROR, qr/^Subroutine main::qv redefined/,
         "Only export qv once per package (to prevent redefined warnings)."); 
 
-sub BaseTests(@< @_) {
+sub BaseTests {
 
     my @($CLASS, ?$no_qv) =  @_;
 

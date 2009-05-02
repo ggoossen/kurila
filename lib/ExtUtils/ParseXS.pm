@@ -65,7 +65,7 @@ $C_arg = qr/ (?: (?> [^()\[\]{},"']+ )
 
 our $SymSet;
 
-sub process_file(@< @_) {
+sub process_file {
 
     # Allow for $package->process_file(%hash) in the future
     my @($pkg, %< %args) = (nelems @_) % 2 ?? @_ !! @(__PACKAGE__, < @_);
@@ -450,7 +450,7 @@ EOF
     return 1;
 }
 
-sub process_para(@< @_) {
+sub process_para {
     my %args = %( < @_ );
 
     # Print initial preprocessor statements and blank lines
@@ -1042,9 +1042,9 @@ EOF
     }
 }
 
-sub errors(...) { $errors }
+sub errors { $errors }
 
-sub standard_typemap_locations(...) {
+sub standard_typemap_locations {
     # Add all the default typemap locations to the search path
     my @tm = qw(typemap);
 
@@ -1088,12 +1088,12 @@ sub TidyType($_) {
 # Input:  ($_, @line) == unparsed input.
 # Output: ($_, @line) == (rest of line, following lines).
 # Return: the matched keyword if found, otherwise 0
-sub check_keyword(@< @_) {
+sub check_keyword {
     $_ = shift(@line) while !m/\S/ && nelems @line;
     s/^(\s*)(@_[0])\s*:\s*(?:#.*)?/$1/s && $2;
 }
 
-sub print_section(@< @_) {
+sub print_section {
     my %args = %:< @_;
     # the "do" is required for right semantics
     { $_ = shift(@line) } while !m/\S/ && nelems @line;
@@ -1107,7 +1107,7 @@ sub print_section(@< @_) {
     print $output_fh, 'ExtUtils::ParseXS::CountLines'->end_marker . "\n" if $WantLineNumbers;
 }
 
-sub merge_section(...) {
+sub merge_section {
     my $in = '';
 
     while (!m/\S/ && nelems @line) {
@@ -1130,7 +1130,7 @@ sub process_keyword($pattern)
         while $kwd = check_keyword($pattern) ;
 }
 
-sub CASE_handler(@< @_) {
+sub CASE_handler {
     my %args = %:< @_;
     blurt ("Error: `CASE:' after unconditional `CASE:'")
         if $condnum && $cond eq '';
@@ -1140,7 +1140,7 @@ sub CASE_handler(@< @_) {
     $_ = '' ;
 }
 
-sub INPUT_handler(...) {
+sub INPUT_handler {
     while (!m/^$BLOCK_re/) {
         last if m/^\s*NOT_IMPLEMENTED_YET/;
         next unless m/\S/;		# skip blank lines
@@ -1214,7 +1214,7 @@ sub INPUT_handler(...) {
     }
 }
 
-sub OUTPUT_handler(...) {
+sub OUTPUT_handler {
     while (!m/^$BLOCK_re/) {
         next unless m/\S/;
         if (m/^\s*SETMAGIC\s*:\s*(ENABLE|DISABLE)\s*/) {
@@ -1592,7 +1592,7 @@ sub ProtoString($type)
     %proto_letter{?$type} or "\$" ;
 }
 
-sub check_cpp(...) {
+sub check_cpp {
     my @cpp = grep( {m/^\#\s*(?:if|e\w+)/ }, @line);
     if ((nelems @cpp)) {
         my ($cpplevel);
@@ -1621,7 +1621,7 @@ sub Q($text) {
 }
 
 # Read next xsub into @line from ($lastline, <$FH>).
-sub fetch_para(...) {
+sub fetch_para {
     # parse paragraph
     death ("Error: Unterminated `#if/#ifdef/#ifndef'")
         if !defined $lastline && @XSStack[-1]->{?type} eq 'if';
@@ -1680,7 +1680,7 @@ sub fetch_para(...) {
     1;
 }
 
-sub output_init(@< @_) {
+sub output_init {
          local ($type, $num, $var, $init, $name_printed);
     @($type, $num, $var, $init, $name_printed) = @_;
 
@@ -1710,7 +1710,7 @@ sub output_init(@< @_) {
     }
 }
 
-sub Warn(@< @_)
+sub Warn
 {
     # work out the line number
     my $line_no = @line_no[(nelems @line_no) - (nelems @line) -1] ;
@@ -1718,25 +1718,26 @@ sub Warn(@< @_)
     print $^STDERR, "$(join ' ',@_) in $filename, line $line_no\n" ;
 }
 
-sub blurt(@< @_)
+sub blurt
 {
     Warn < @_ ;
     $errors ++
 }
 
-sub death(@< @_)
+sub death
 {
     Warn < @_ ;
     die < @_;
 }
 
-sub evalqq(?$x) {
+sub evalqq {
+    my $x = shift;
     my $ex = eval qq/"$x"/;
     die "error in '$x': $($^EVAL_ERROR->message)" if $^EVAL_ERROR;
     return $ex;
 }
 
-sub generate_init(@< @_) {
+sub generate_init {
     local@($type, $num, $var, ...) = @_;
         local($arg) = "ST(" . ($num - 1) . ")";
         local($argoff) = $num - 1;
@@ -1812,7 +1813,7 @@ sub generate_init(@< @_) {
     }
 }
 
-sub generate_output(@< @_) {
+sub generate_output {
     local@($type, $num, $var, $do_setmagic, ?$do_push) = @_;
         local($arg) = "ST(" . ($num - ($num != 0)) . ")";
         local($argoff) = $num - 1;
@@ -1939,7 +1940,7 @@ sub FLUSH($self,$fh) {
     return 0;
 }
 
-sub end_marker(...) {
+sub end_marker {
     return $SECTION_END_MARKER;
 }
 

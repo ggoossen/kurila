@@ -82,11 +82,11 @@ See L<perlmodlib/"Pragmatic Modules">, L<perlop/"Integer Arithmetic">
 
 $integer::hint_bits = 0x1;
 
-sub import(...) {
+sub import {
     $^HINT_BITS ^|^= $integer::hint_bits;
 }
 
-sub unimport(...) {
+sub unimport {
     $^HINT_BITS ^&^= ^~^$integer::hint_bits;
 }
 

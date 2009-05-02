@@ -39,7 +39,7 @@ our ($CarpLevel, $MaxArgNums, $MaxEvalLen, $MaxArgLen, $Verbose);
 # XXX longmess_real and shortmess_real should really be merged into
 # XXX {long|sort}mess_heavy at some point
 
-sub  longmess_real(@< @_) {
+sub  longmess_real {
     # Icky backwards compatibility wrapper. :-(
     #
     # The story is that the original implementation hard-coded the
@@ -58,13 +58,13 @@ sub  longmess_real(@< @_) {
 
 our @CARP_NOT;
 
-sub shortmess_real(@< @_) {
+sub shortmess_real {
     # Icky backwards compatibility wrapper. :-(
     local @CARP_NOT = @( caller() );
     shortmess_heavy(< @_);
 };
 
-sub caller_info(@< @_) {
+sub caller_info {
     my $i = shift(@_) + 1;
         package DB;
     my %call_info;
@@ -91,7 +91,8 @@ sub caller_info(@< @_) {
 }
 
 # Transform an argument to a function into a string.
-sub format_arg(?$arg) {
+sub format_arg {
+    my $arg = shift;
 
     $arg = dump::view($arg);
     $arg = str_len_trim($arg, $MaxArgLen);
@@ -103,16 +104,17 @@ sub format_arg(?$arg) {
 # an anon hash of known inheritances and anon array of
 # inheritances which consequences have not been figured
 # for.
-sub get_status(@< @_) {
-    my $cache = shift @_;
-    my $pkg = shift @_;
+sub get_status {
+    my $cache = shift;
+    my $pkg = shift;
     $cache->{+$pkg} ||= \@(\%($pkg => $pkg), \trusts_directly($pkg));
     return $cache->{?$pkg}->@;
 }
 
 # Takes the info from caller() and figures out the name of
 # the sub/require/eval
-sub get_subname(?$info) {
+sub get_subname {
+    my $info = shift;
     if (defined($info->{?evaltext})) {
         my $eval = $info->{?evaltext};
         if ($info->{?is_require}) {
@@ -129,7 +131,7 @@ sub get_subname(?$info) {
 
 # Figures out what call (from the point of view of the caller)
 # the long error backtrace should start at.
-sub long_error_loc(...) {
+sub long_error_loc {
     my $i;
     my $lvl = $CarpLevel;
     do {
@@ -154,7 +156,7 @@ sub long_error_loc(...) {
 }
 
 
-sub longmess_heavy(@< @_) {
+sub longmess_heavy {
     return @_ if ref(@_[0]); # don't break references as exceptions
     my $i = long_error_loc();
     return ret_backtrace($i, < @_);
@@ -198,7 +200,7 @@ sub ret_summary($i, @< @error) {
 }
 
 
-sub short_error_loc(...) {
+sub short_error_loc {
     # You have to create your (hash)ref out here, rather than defaulting it
     # inside trusts *on a lexical*, as you want it to persist across calls.
     # (You can default it on $_[2], but that gets messy)
@@ -221,7 +223,7 @@ sub short_error_loc(...) {
 }
 
 
-sub shortmess_heavy(@< @_) {
+sub shortmess_heavy {
     return longmess_heavy(< @_) if $Verbose;
     return @_ if ref(@_[0]); # don't break references as exceptions
     my $i = short_error_loc();
@@ -234,9 +236,9 @@ sub shortmess_heavy(@< @_) {
 }
 
 # If a string is too long, trims it with ...
-sub str_len_trim(@< @_) {
-    my $str = shift @_;
-    my $max = shift @_ || 0;
+sub str_len_trim {
+    my $str = shift;
+    my $max = shift || 0;
     if (2 +< $max and $max +< length($str)) {
         substr($str, $max - 3, undef, '...');
     }
@@ -249,10 +251,10 @@ sub str_len_trim(@< @_) {
 # Recursive versions of this have to work to avoid certain
 # possible endless loops, and when following long chains of
 # inheritance are less efficient.
-sub trusts(@< @_) {
-    my $child = shift @_;
-    my $parent = shift @_;
-    my $cache = shift @_;
+sub trusts {
+    my $child = shift;
+    my $parent = shift;
+    my $cache = shift;
     my @($known, $partial) =  get_status($cache, $child);
     # Figure out consequences until we have an answer
     while ((nelems $partial->@) and not exists $known->{$parent}) {
@@ -268,7 +270,8 @@ sub trusts(@< @_) {
 }
 
 # Takes a package and gives a list of those trusted directly
-sub trusts_directly(?$class) {;
+sub trusts_directly {
+    my $class = shift;
     no warnings 'once'; 
     return (nelems Symbol::fetch_glob("$class\::CARP_NOT")->*->@)
         ?? Symbol::fetch_glob("$class\::CARP_NOT")->*->@

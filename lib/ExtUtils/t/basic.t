@@ -314,7 +314,8 @@ open($^STDERR, ">&", \$saverr->*) or die $^OS_ERROR;
 close $saverr;
 
 
-sub _normalize(?$hash) {
+sub _normalize {
+    my $hash = shift;
 
     while(my@(?$k,?$v) =@( each $hash->%)) {
         delete $hash->{$k};

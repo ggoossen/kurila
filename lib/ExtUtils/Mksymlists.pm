@@ -8,7 +8,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(&Mksymlists);
 our $VERSION = '6.44';
 
-sub Mksymlists(@< @_) {
+sub Mksymlists {
     my@(%spec) =@( %( < @_ ));
     my@($osname) = $^OS_NAME;
 

@@ -14,7 +14,7 @@ use Cwd 'cwd';
 use File::Basename;
 use File::Spec;
 
-sub ext(@< @_) {
+sub ext {
     if   ($^OS_NAME eq 'VMS')     { return &_vms_ext( < @_ );      }
     elsif($^OS_NAME eq 'MSWin32') { return &_win32_ext( < @_ );    }
     else                    { return &_unix_os2_ext( < @_ ); }

@@ -114,7 +114,7 @@ if( $^OS_NAME eq 'VMS' ) {
     VMS::Filespec->import;
 }
 
-sub cwd2(...) {
+sub cwd2 {
     my $cwd = getcwd();
     # getcwd might fail if it hasn't access to the current directory.
     # try harder.
@@ -122,7 +122,7 @@ sub cwd2(...) {
     $cwd;
 }
 
-sub init(...)
+sub init
 {
     *Dir = \$Bin;
     *RealDir = \$RealBin;

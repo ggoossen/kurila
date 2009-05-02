@@ -36,7 +36,7 @@ END
     );
 
 
-sub _gen_pl_files(...) {
+sub _gen_pl_files {
     my $test = <<'END';
 #!/usr/bin/perl -w
 
@@ -61,7 +61,7 @@ END
 }
 
 
-sub _gen_pm_files(...) {
+sub _gen_pm_files {
     my $test = <<'END';
 #!/usr/bin/perl -w
 
@@ -86,7 +86,7 @@ END
 }
 
 
-sub setup(...) {
+sub setup {
     setup_mm_test_root();
     chdir 'MM_TEST_ROOT:[t]' if $^OS_NAME eq 'VMS';
 
@@ -104,7 +104,7 @@ sub setup(...) {
     return 1;
 }
 
-sub teardown(...) { 
+sub teardown { 
     foreach my $file (keys %Files) {
         my $dir = dirname($file);
         if( -e $dir ) {

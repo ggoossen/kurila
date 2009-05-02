@@ -143,10 +143,10 @@ sub munge_c_files () {
 # generate proto.h
 my $wrote_protected = 0;
 
-sub write_protos(@< @_) {
+sub write_protos {
     my $ret = "";
     if ((nelems @_) == 1) {
-        my $arg = shift @_;
+        my $arg = shift;
         $ret .= "$arg\n";
     }
     else {
@@ -275,7 +275,7 @@ sub write_protos(@< @_) {
 # generates global.sym (API export list)
 do {
     my %seen;
-    sub write_global_sym(@< @_) {
+    sub write_global_sym {
         my $ret = "";
         if ((nelems @_) +> 1) {
             my @($flags,$retval,$func,@< @args) =  @_;

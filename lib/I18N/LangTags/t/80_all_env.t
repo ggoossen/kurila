@@ -16,14 +16,14 @@ env::var('SWUZ'    ) = 'KLORTHO HOOBOY'; is env::var('SWUZ'), 'KLORTHO HOOBOY';
 env::var('MYORP') = undef;
 env::var('SWUZ') = undef;
 
-sub j(@< @_) { "[" . join(' ', map { "\"$_\"" }, @_) . "]" ;}
+sub j { "[" . join(' ', map { "\"$_\"" }, @_) . "]" ;}
 
-sub show(@< @_) {
+sub show {
     print $^STDOUT, "#  (Seeing \{", join(' ', map( {dump::view($_) }, @_)), "\} at line ", @(caller)[2], ")\n";
     printenv();
     return @_[0] || '';
 }
-sub printenv(...) {
+sub printenv {
     print $^STDOUT, "# ENV:\n";
     foreach my $k (sort { $a cmp $b }, env::keys()) {
         my $p = env::var($k);  $p =~ s/\n/\n#/g;

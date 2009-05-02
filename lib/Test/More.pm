@@ -142,7 +142,7 @@ or for deciding between running the tests at all:
 
 =cut
 
-sub plan(@< @_) {
+sub plan {
     my $tb = Test::More->builder;
 
     $tb->plan(< @_);
@@ -382,7 +382,7 @@ is()'s use of C<eq> will interfere:
 
 =cut
 
-sub cmp_ok(@< @_) {
+sub cmp_ok {
     my $tb = Test::More->builder;
 
     $tb->cmp_ok(< @_);
@@ -548,12 +548,12 @@ Use these very, very, very sparingly.
 
 =cut
 
-sub pass(@< @_) {
+sub pass {
     my $tb = Test::More->builder;
     $tb->ok(1, < @_);
 }
 
-sub fail(@< @_) {
+sub fail {
     my $tb = Test::More->builder;
     $tb->ok(0, < @_);
 }
@@ -648,8 +648,8 @@ DIAGNOSTIC
 }
 
 
-sub _eval(@< @_) {
-    my@($code) =@( shift @_);
+sub _eval {
+    my@($code) =@( shift);
     my @args = @_;
 
           # Work around oddities surrounding resetting of $@ by immediately
@@ -716,7 +716,8 @@ DIAGNOSTIC
 }
 
 
-sub _is_module_name(?$module) {
+sub _is_module_name {
+    my $module = shift;
 
     # Module names start with a letter.
     # End with an alphanumeric.
@@ -763,12 +764,12 @@ along these lines.
 our (@Data_Stack, %Refs_Seen);
 my $DNE = bless \@(), 'Does::Not::Exist';
 
-sub _dne(@< @_) {
+sub _dne {
     ref @_[0] eq ref $DNE;
 }
 
 
-sub is_deeply(@< @_) {
+sub is_deeply {
     my $tb = Test::More->builder;
 
     unless( (nelems @_) == 2 or (nelems @_) == 3 ) {
@@ -800,7 +801,7 @@ WARNING
     return $ok;
 }
 
-sub _format_stack(@< @_) {
+sub _format_stack {
     my @Stack = @_;
 
     my $var = '$FOO';
@@ -854,7 +855,8 @@ sub _format_stack(@< @_) {
 }
 
 
-sub _type(?$thing) {
+sub _type {
+    my $thing = shift;
 
     return '' if !ref $thing;
 
@@ -906,7 +908,7 @@ interfere with the test.
 
 =cut
 
-sub diag(@< @_) {
+sub diag {
     my $tb = Test::More->builder;
 
     $tb->diag(< @_);
@@ -922,7 +924,7 @@ together.
 
 =cut
 
-sub info(@< @_) {
+sub info {
     my $tb = Test::More->builder;
 
     $tb->info(< @_);
@@ -1128,7 +1130,8 @@ The test will exit with 255.
 
 =cut
 
-sub BAIL_OUT(?$reason) {
+sub BAIL_OUT {
+    my $reason = shift;
     my $tb = Test::More->builder;
 
     $tb->BAIL_OUT($reason);
@@ -1167,7 +1170,7 @@ multi-level structures are handled correctly.
 =cut
 
 #'#
-sub eq_array(@< @_) {
+sub eq_array {
     local @Data_Stack;
     _deep_check(< @_);
 }
@@ -1283,7 +1286,7 @@ is a deep check.
 
 =cut
 
-sub eq_hash(@< @_) {
+sub eq_hash {
     local @Data_Stack;
     return _deep_check(< @_);
 }

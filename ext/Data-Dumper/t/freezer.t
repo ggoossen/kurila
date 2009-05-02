@@ -68,16 +68,17 @@ do {
 
 # a package with a freeze() which returns a non-ref
 package Test1;
-sub new(@< @_) { bless(\%(name => @_[1]), @_[0]) }
-sub freeze($self) {
+sub new { bless(\%(name => @_[1]), @_[0]) }
+sub freeze {
+    my $self = shift;
     $self->{+frozed} = 1;
 }
 
 # a package without a freeze()
 package Test2;
-sub new(@< @_) { bless(\%(name => @_[1]), @_[0]) }
+sub new { bless(\%(name => @_[1]), @_[0]) }
 
 # a package with a freeze() which dies
 package Test3;
-sub new(@< @_) { bless(\%(name => @_[1]), @_[0]) }
-sub freeze(...) { die "freeze() is broked" }
+sub new { bless(\%(name => @_[1]), @_[0]) }
+sub freeze { die "freeze() is broked" }

@@ -98,7 +98,7 @@ This limitation might be removed in a future version of perl.
 
 $filetest::hint_bits = 0x00400000; # HINT_FILETEST_ACCESS
 
-sub import(@< @_) {
+sub import {
     if ( @_[?1] eq 'access' ) {
         $^HINT_BITS ^|^= $filetest::hint_bits;
     } else {
@@ -106,7 +106,7 @@ sub import(@< @_) {
     }
 }
 
-sub unimport(@< @_) {
+sub unimport {
     if ( @_[?1] eq 'access' ) {
         $^HINT_BITS ^&^= ^~^$filetest::hint_bits;
     } else {

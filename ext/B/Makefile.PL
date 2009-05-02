@@ -28,11 +28,11 @@ WriteMakefile(
 
 use Config;
 
-sub post_constants(...) {
+sub post_constants {
     "\nLIBS = $(config_value('libs'))\n"
 }
 
-sub headerpath(...) {
+sub headerpath {
     if ($core) {
         return File::Spec->catdir( File::Spec->updir,
             File::Spec->updir);

@@ -1,32 +1,32 @@
 #!./perl
 
-sub foo1(@< @_) {
+sub foo1 {
     'true1';
     if (@_[0]) { 'true2'; }
 }
 
-sub foo2(@< @_) {
+sub foo2 {
     'true1';
     if (@_[0]) { return 'true2'; } else { return 'true3'; }
     'true0';
 }
 
-sub foo3(@< @_) {
+sub foo3 {
     'true1';
     unless (@_[0]) { 'true2'; }
 }
 
-sub foo4(@< @_) {
+sub foo4 {
     'true1';
     unless (@_[0]) { 'true2'; } else { 'true3'; }
 }
 
-sub foo5(@< @_) {
+sub foo5 {
     'true1';
     'true2' if @_[0];
 }
 
-sub foo6(@< @_) {
+sub foo6 {
     'true1';
     'true2' unless @_[0];
 }
@@ -79,14 +79,14 @@ for my $i (1..10) {
     }
 }
 
-sub ary1(...) {
+sub ary1 {
     return @(1,2,3);
 }
 
 print $^STDOUT, "ok 23\n";
 print $^STDOUT, join(':',&ary1( < @_ )) eq '1:2:3' ?? "ok 24\n" !! "not ok 24\n";
 
-sub ary2(...) {
+sub ary2 {
     do {
         return  @(1,2,3);
         (3,2,1);

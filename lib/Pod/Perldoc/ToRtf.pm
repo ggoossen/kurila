@@ -12,9 +12,9 @@ $VERSION   # so that ->VERSION is happy
     $Pod::Simple::RTF::VERSION;
 
 
-sub is_pageable(...)        { 0 }
-sub write_with_binmode(...) { 0 }
-sub output_extension(...)   { 'rtf' }
+sub is_pageable        { 0 }
+sub write_with_binmode { 0 }
+sub output_extension   { 'rtf' }
 
 sub page_for_perldoc($self, $tempfile, $perldoc) {
     return unless $perldoc->IS_MSWin32;

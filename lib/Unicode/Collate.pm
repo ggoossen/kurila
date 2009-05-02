@@ -90,17 +90,17 @@ use constant BMP_Max       => 0xFFFF;
 # Logical_Order_Exception in PropList.txt
 my $DefaultRearrange = \@( < 0x0E40..0x0E44, < 0x0EC0..0x0EC4 );
 
-sub UCA_Version(...) { "14" }
+sub UCA_Version { "14" }
 
-sub Base_Unicode_Version(...) { "4.1.0" }
+sub Base_Unicode_Version { "4.1.0" }
 
 ######
 
-sub pack_U(@< @_) {
+sub pack_U {
     return pack('U*', < @_);
 }
 
-sub unpack_U(@< @_) {
+sub unpack_U {
     return @( unpack('U*', shift(@_).pack('U*') ) );
 }
 
@@ -131,7 +131,8 @@ our @ChangeNG = qw/
 # The hash key 'entries' is deleted at v 0.30.
 # The hash key 'L3_ignorable' is deleted at v 0.40.
 
-sub version($self) {
+sub version {
+    my $self = shift;
     return $self->{?versionTable} || 'unknown';
 }
 
@@ -139,8 +140,8 @@ my (%ChangeOK, %ChangeNG);
     %ChangeOK{[ @ChangeOK ]} = @();
     %ChangeNG{[ @ChangeNG ]} = @();
 
-sub change(@< @_) {
-    my $self = shift @_;
+sub change {
+    my $self = shift;
     my %hash = %( < @_ );
     my %old;
     if (exists %hash{variable} && exists %hash{alternate}) {
@@ -163,9 +164,9 @@ sub change(@< @_) {
     return %old;
 }
 
-sub _checkLevel(@< @_) {
-    my $level = shift @_;
-    my $key   = shift @_; # 'level' or 'backwards'
+sub _checkLevel {
+    my $level = shift;
+    my $key   = shift; # 'level' or 'backwards'
     MinLevel +<= $level or die sprintf
         "Illegal level \%d (in value for key '\%s') lower than \%d.",
         $level, $key, < MinLevel;
@@ -181,8 +182,8 @@ my %DerivCode = %(
             14 => \&_derivCE_14,
     );
 
-sub checkCollator(@< @_) {
-    my $self = shift @_;
+sub checkCollator {
+    my $self = shift;
     _checkLevel($self->{?level}, "level");
 
     $self->{+derivCode} = %DerivCode{?$self->{?UCA_Version} }
@@ -247,9 +248,9 @@ sub checkCollator(@< @_) {
     return;
 }
 
-sub new(@< @_)
+sub new
 {
-    my $class = shift @_;
+    my $class = shift;
     my $self = bless \%( < @_ ), $class;
 
     # If undef is passed explicitly, no file is read.
@@ -282,7 +283,8 @@ sub new(@< @_)
     return $self;
 }
 
-sub read_table($self) {
+sub read_table {
+    my $self = shift;
 
     my($f, $fh);
     foreach my $d ( $^INCLUDE_PATH) {
@@ -329,10 +331,10 @@ sub read_table($self) {
 ##
 ## get $line, parse it, and write an entry in $self
 ##
-sub parseEntry(@< @_)
+sub parseEntry
 {
-    my $self = shift @_;
-    my $line = shift @_;
+    my $self = shift;
+    my $line = shift;
     my($name, $entry, @uv, @key);
 
     return if $line !~ m/^\s*[0-9A-Fa-f]/;
@@ -394,10 +396,10 @@ sub parseEntry(@< @_)
 ##
 ## VCE = _varCE(variable term, VCE)
 ##
-sub _varCE(@< @_)
+sub _varCE
 {
-    my $vbl = shift @_;
-    my $vce = shift @_;
+    my $vbl = shift;
+    my $vce = shift;
     if ($vbl eq 'non-ignorable') {
         return $vce;
     }
@@ -416,16 +418,16 @@ sub _varCE(@< @_)
     }
 }
 
-sub viewSortKey(@< @_)
+sub viewSortKey
 {
-    my $self = shift @_;
+    my $self = shift;
     $self->visualizeSortKey($self->getSortKey(< @_));
 }
 
-sub visualizeSortKey(@< @_)
+sub visualizeSortKey
 {
-    my $self = shift @_;
-    my $view = join " ", map { sprintf("\%04X", $_) }, @( unpack(KEY_TEMPLATE, shift @_));
+    my $self = shift;
+    my $view = join " ", map { sprintf("\%04X", $_) }, @( unpack(KEY_TEMPLATE, shift));
 
     if ($self->{?UCA_Version} +<= 8) {
         $view =~ s/ ?0000 ?/|/g;
@@ -440,9 +442,9 @@ sub visualizeSortKey(@< @_)
 ## arrayref of JCPS   = splitEnt(string to be collated)
 ## arrayref of arrayref[JCPS, ini_pos, fin_pos] = splitEnt(string, true)
 ##
-sub splitEnt(@< @_)
+sub splitEnt
 {
-    my $self = shift @_;
+    my $self = shift;
     my $wLen = @_[?1];
 
     my $code = $self->{?preprocess};
@@ -571,10 +573,10 @@ sub splitEnt(@< @_)
 ##
 ## list of VCE = getWt(JCPS)
 ##
-sub getWt(@< @_)
+sub getWt
 {
-    my $self = shift @_;
-    my $u    = shift @_;
+    my $self = shift;
+    my $u    = shift;
     my $vbl  = $self->{?variable};
     my $map  = $self->{?mapping};
     my $der  = $self->{?derivCode};
@@ -642,11 +644,11 @@ sub getWt(@< @_)
 ##
 ## string sortkey = getSortKey(string arg)
 ##
-sub getSortKey(@< @_)
+sub getSortKey
 {
-    my $self = shift @_;
+    my $self = shift;
     my $lev  = $self->{?level};
-    my $rEnt = $self->splitEnt(shift @_); # get an arrayref of JCPS
+    my $rEnt = $self->splitEnt(shift); # get an arrayref of JCPS
     my $v2i  = $self->{?UCA_Version} +>= 9 &&
         $self->{?variable} ne 'non-ignorable';
 
@@ -734,22 +736,23 @@ sub getSortKey(@< @_)
 ##
 ## int compare = cmp(string a, string b)
 ##
-sub cmp(@< @_) { @_[0]->getSortKey(@_[1]) cmp @_[0]->getSortKey(@_[2]) }
-sub eq(@< @_)  { @_[0]->getSortKey(@_[1]) eq  @_[0]->getSortKey(@_[2]) }
-sub ne(@< @_)  { @_[0]->getSortKey(@_[1]) ne  @_[0]->getSortKey(@_[2]) }
+sub cmp { @_[0]->getSortKey(@_[1]) cmp @_[0]->getSortKey(@_[2]) }
+sub eq  { @_[0]->getSortKey(@_[1]) eq  @_[0]->getSortKey(@_[2]) }
+sub ne  { @_[0]->getSortKey(@_[1]) ne  @_[0]->getSortKey(@_[2]) }
 
 ##
 ## list[strings] sorted = sort(list[strings] arg)
 ##
-sub sort(@< @_) {
-    my $obj = shift @_;
+sub sort {
+    my $obj = shift;
     return map { $_[1] },
         sort { $a[0] cmp $b[0] },
         map { @( $obj->getSortKey($_), $_) }, @_;
 }
 
 
-sub _derivCE_14(?$u) {
+sub _derivCE_14 {
+    my $u = shift;
     my $base =
         (CJK_UidIni  +<= $u && $u +<= CJK_UidF41)
         ?? 0xFB40 !! # CJK
@@ -765,7 +768,8 @@ sub _derivCE_14(?$u) {
     pack(VCE_TEMPLATE, NON_VAR, $bbbb,      0,      0, $u) );
 }
 
-sub _derivCE_9(?$u) {
+sub _derivCE_9 {
+    my $u = shift;
     my $base =
         (CJK_UidIni  +<= $u && $u +<= CJK_UidFin)
         ?? 0xFB40 !! # CJK
@@ -781,7 +785,8 @@ sub _derivCE_9(?$u) {
     pack(VCE_TEMPLATE, NON_VAR, $bbbb,      0,      0, $u) );
 }
 
-sub _derivCE_8(?$code) {
+sub _derivCE_8 {
+    my $code = shift;
     my $aaaa =  0xFF80 + ($code >> 15);
     my $bbbb = ($code ^&^ 0x7FFF) ^|^ 0x8000;
     return
@@ -789,7 +794,8 @@ sub _derivCE_8(?$code) {
     pack(VCE_TEMPLATE, NON_VAR, $bbbb, 0, 0, $code) );
 }
 
-sub _uideoCE_8(?$u) {
+sub _uideoCE_8 {
+    my $u = shift;
     return pack(VCE_TEMPLATE, NON_VAR, $u, Min2Wt, Min3Wt, $u);
 }
 
@@ -805,7 +811,8 @@ sub _isUIdeo($u, $uca_vers) {
 }
 
 
-sub getWtHangulTerm($self) {
+sub getWtHangulTerm {
+    my $self = shift;
     return _varCE($self->{?variable},
                   pack(VCE_TEMPLATE, NON_VAR, $self->{?hangul_terminator}, 0,0,0));
 }
@@ -814,13 +821,14 @@ sub getWtHangulTerm($self) {
 ##
 ## "hhhh hhhh hhhh" to (dddd, dddd, dddd)
 ##
-sub _getHexArray(@< @_) { map { hex }, @( @_[0] =~ m/([0-9a-fA-F]+)/g) }
+sub _getHexArray { map { hex }, @( @_[0] =~ m/([0-9a-fA-F]+)/g) }
 
 #
 # $code *must* be in Hangul syllable.
 # Check it before you enter here.
 #
-sub _decompHangul(?$code) {
+sub _decompHangul {
+    my $code = shift;
     my $si = $code - Hangul_SBase;
     my $li = int( $si / Hangul_NCount);
     my $vi = int(($si % Hangul_NCount) / Hangul_TCount);
@@ -832,7 +840,8 @@ sub _decompHangul(?$code) {
         );
 }
 
-sub _isIllegal(?$code) {
+sub _isIllegal {
+    my $code = shift;
     return ! defined $code                      # removed
         || ($code +< 0 || 0x10FFFF +< $code)      # out of range
         || (($code ^&^ 0xFFFE) == 0xFFFE)         # ??FFF[EF] (cf. utf8.c)
@@ -842,7 +851,8 @@ sub _isIllegal(?$code) {
 }
 
 # Hangul Syllable Type
-sub getHST(?$u) {
+sub getHST {
+    my $u = shift;
     return
         Hangul_LIni +<= $u && $u +<= Hangul_LFin || $u == Hangul_LFill ?? "L" !!
         Hangul_VIni +<= $u && $u +<= Hangul_VFin	     ?? "V" !!
@@ -1016,9 +1026,9 @@ sub index($self, $str, $substr, ?$pos, ?$grob)
 ##
 ## scalarref to matching part = match(string, substring)
 ##
-sub match(@< @_)
+sub match
 {
-    my $self = shift @_;
+    my $self = shift;
     if (my@(?$pos,?$len) =  $self->index(@_[0], @_[1])) {
         my $temp = substr(@_[0], $pos, $len);
         return $temp;
@@ -1033,11 +1043,11 @@ sub match(@< @_)
 ##
 ## arrayref matching parts = gmatch(string, substring)
 ##
-sub gmatch(@< @_)
+sub gmatch
 {
-    my $self = shift @_;
-    my $str  = shift @_;
-    my $sub  = shift @_;
+    my $self = shift;
+    my $str  = shift;
+    my $sub  = shift;
     return map { substr($str, $_->[0], $_->[1]) },
         $self->index($str, $sub, 0, 'g');
 }

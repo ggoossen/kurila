@@ -66,20 +66,20 @@ do {
     main::ok( $^EVAL_ERROR,                               'require_version() fail' );
     main::ok( Testing->require_version(0),      'require_version(0)' );
 
-    sub lifejacket(...)  { 'lifejacket'  }
-    sub stuff(...)       { 'stuff'       }
-    sub Above(...)       { 'Above'       }
-    sub the(...)         { 'the'         }
-    sub Fasten(...)      { 'Fasten'      }
-    sub your(...)        { 'your'        }
-    sub under(...)       { 'under'       }
+    sub lifejacket  { 'lifejacket'  }
+    sub stuff       { 'stuff'       }
+    sub Above       { 'Above'       }
+    sub the         { 'the'         }
+    sub Fasten      { 'Fasten'      }
+    sub your        { 'your'        }
+    sub under       { 'under'       }
     our ($seatbelt, $seat, @wailing, %left);
     $seatbelt = 'seatbelt';
     $seat     = 'seat';
     @wailing = qw(AHHHHHH);
     %left = %( left => "right" );
 
-    sub Is(...) { 'Is' };
+    sub Is { 'Is' };
     BEGIN {*is = \&Is};
 
     Exporter::export_ok_tags();
@@ -170,8 +170,8 @@ package Moving::Target;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw (foo);
 
-sub foo(...) {"This is foo"};
-sub bar(...) {"This is bar"};
+sub foo {"This is foo"};
+sub bar {"This is bar"};
 
 package Moving::Target::Test;
 
@@ -192,7 +192,7 @@ use Exporter 'import';
 main::ok(\&import \== \&Exporter::import, "imported the import routine");
 
 our @EXPORT = qw( wibble );
-sub wibble(...) {return "wobble"};
+sub wibble {return "wobble"};
 
 package Use::The::Import;
 

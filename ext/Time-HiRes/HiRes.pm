@@ -25,8 +25,8 @@ require DynaLoader;
 $VERSION = v1.9712;
 $XS_VERSION = $VERSION;
 
-sub import(@< @_) {
-    my $this = shift @_;
+sub import {
+    my $this = shift;
     for my $i (@_) {
         if (($i eq 'clock_getres'    && !&d_clock_getres( < @_ ))    ||
             ($i eq 'clock_gettime'   && !&d_clock_gettime( < @_ ))   ||

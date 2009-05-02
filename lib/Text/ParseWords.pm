@@ -10,7 +10,7 @@ use Exporter;
 @EXPORT_OK = qw(old_shellwords);
 
 
-sub shellwords(@< @_) {
+sub shellwords {
     my @lines = @_;
     my @allwords;
 
@@ -114,7 +114,7 @@ sub parse_line($delimiter, $keep, $line) {
 
 
 
-sub old_shellwords(@< @_) {
+sub old_shellwords {
 
     # Usage:
     #	use ParseWords;

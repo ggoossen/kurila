@@ -263,7 +263,8 @@ current default device and directory is used.
 =cut
 
 
-sub dirname(?$path) {
+sub dirname {
+    my $path = shift;
 
     my $type = $Fileparse_fstype;
 
@@ -357,11 +358,11 @@ BEGIN {
     @Types = @(< @Ignore_Case, < qw(Unix));
 }
 
-sub fileparse_set_fstype(@< @_) {
+sub fileparse_set_fstype {
     my $old = $Fileparse_fstype;
 
     if ((nelems @_)) {
-        my $new_type = shift @_;
+        my $new_type = shift;
 
         $Fileparse_fstype = 'Unix';  # default
         foreach my $type ( @Types) {

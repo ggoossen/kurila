@@ -347,7 +347,8 @@ Abstract a -w check that tries to use POSIX::access() if possible.
 
 do {
     my  $has_posix;
-    sub _have_write_access(?$dir) {
+    sub _have_write_access {
+        my $dir=shift;
         unless (defined $has_posix) {
             $has_posix= (!$Is_cygwin && eval 'local $^W; require POSIX; 1') || 0; 
         }
@@ -381,7 +382,8 @@ relative paths with C<..> in them. But for our purposes it should work ok
 =cut
 
 
-sub _can_write_dir(?$dir) {
+sub _can_write_dir {
+    my $dir=shift;
     return
         unless defined $dir and length $dir;
 
@@ -648,7 +650,7 @@ provided then the returned hashref will be the passed in hashref.
 
 =cut
 
-sub install(@< @_) { #XXX OS-SPECIFIC
+sub install { #XXX OS-SPECIFIC
     my@($from_to,?$verbose,?$dry_run,?$uninstall_shadows,?$skip,?$always_copy,?$result) =  @_;
     if ((nelems @_)==1 and try { 1+nelems $from_to->@ }) {
         my %opts        = %( < $from_to->@ );
@@ -861,7 +863,7 @@ is defined.
 =cut
 
 
-sub install_rooted_file(@< @_) {
+sub install_rooted_file {
     if (defined $INSTALL_ROOT) {
         File::Spec->catfile($INSTALL_ROOT, @_[0]);
     } else {
@@ -870,7 +872,7 @@ sub install_rooted_file(@< @_) {
 }
 
 
-sub install_rooted_dir(@< @_) {
+sub install_rooted_dir {
     if (defined $INSTALL_ROOT) {
         File::Spec->catdir($INSTALL_ROOT, @_[0]);
     } else {
@@ -942,9 +944,9 @@ Consider its use discouraged.
 
 =cut
 
-sub install_default(@< @_) {
+sub install_default {
     (nelems @_) +< 2 or Carp::croak("install_default should be called with 0 or 1 argument");
-    my $FULLEXT = (nelems @_) ?? shift @_ !! @ARGV[0];
+    my $FULLEXT = (nelems @_) ?? shift !! @ARGV[0];
     defined $FULLEXT or die "Do not know to where to write install log";
     my $INST_LIB = File::Spec->catdir($Curdir,"blib","lib");
     my $INST_ARCHLIB = File::Spec->catdir($Curdir,"blib","arch");
@@ -1177,14 +1179,15 @@ sub pm_to_blib($fromto,$autodir, ?$pm_filter) {
 
 package ExtUtils::Install::Warn;
 
-sub new(@< @_) { bless \%(), shift @_ }
+sub new { bless \%(), shift }
 
 sub add($self,$file,$targetfile) {
     push $self->{$file}->@, $targetfile;
 }
 
-sub DESTROY($self) {
+sub DESTROY {
     unless(defined $INSTALL_ROOT) {
+        my $self = shift;
         my($i,$plural);
         foreach my $file (sort keys $self->%) {
             $plural = (nelems $self->{?$file}->@) +> 1 ?? "s" !! "";
@@ -1214,7 +1217,7 @@ or by ExtUtils::MakeMaker.
 
 =cut
 
-sub _invokant(...) {
+sub _invokant {
     my @stack;
     my $frame = 0;
     while (my $file = (caller($frame++))[[1]]) {

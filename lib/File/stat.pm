@@ -22,7 +22,7 @@ our ($st_dev, $st_ino, $st_mode, $st_nlink, $st_uid, $st_gid,
     $st_blksize, $st_blocks);
 
 # Class::Struct forbids use of @ISA
-sub import(@< @_) {
+sub import {
     local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
     return Exporter::import(< @_);
 }
@@ -33,7 +33,7 @@ struct 'File::stat' => \ @+: map { @: $_ => '$' }, qw{
 	 atime mtime ctime blksize blocks
      };
 
-sub populate(@< @_) {
+sub populate {
     return unless (nelems @_);
     my $stob = new();
     $stob->@ = @(

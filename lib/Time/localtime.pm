@@ -20,7 +20,7 @@ our ($tm_sec, $tm_min, $tm_hour, $tm_mday,
     $tm_mon, $tm_year, $tm_wday, $tm_yday,
     $tm_isdst);
 
-sub populate(@< @_) {
+sub populate {
     return unless (nelems @_);
     my $tmob = Time::tm->new();
     $tmob->@ = @(
@@ -31,8 +31,8 @@ sub populate(@< @_) {
     return $tmob;
 } 
 
-sub localtime(@< @_) { populate CORE::localtime((nelems @_) ?? shift @_ !! time)}
-sub ctime(@< @_)     { scalar   CORE::localtime((nelems @_) ?? shift @_ !! time) } 
+sub localtime { populate CORE::localtime((nelems @_) ?? shift !! time)}
+sub ctime     { scalar   CORE::localtime((nelems @_) ?? shift !! time) } 
 
 1;
 

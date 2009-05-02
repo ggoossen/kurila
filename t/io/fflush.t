@@ -42,9 +42,9 @@ END {
     }
 }
 
-sub file_eq(@< @_) {
-    my $f   = shift @_;
-    my $val = shift @_;
+sub file_eq {
+    my $f   = shift;
+    my $val = shift;
 
     open my $in, "<", $f or die "open $f: $^OS_ERROR";
     chomp(my $line = ~< $in);

@@ -35,7 +35,8 @@ cmp_ok(exp(log($x1)), '==', 1);
 my $pi = 3.1415926535897931160;
 my $pi_2 = 1.5707963267948965580;
 
-sub round(?$result) {
+sub round {
+    my $result = shift;
     return sprintf("\%.9f", $result);
 }
 

@@ -8,7 +8,7 @@ plan (90);
 
 our ($a1, $b1, $c1, $d1, $e1, $f1, $g1, @w);
 
-sub expected(@< @_) {
+sub expected {
     my@($object, $package, $type) =  @_;
     print $^STDOUT, "# $(dump::view($object)) $package $type\n";
     is(ref($object), $package);

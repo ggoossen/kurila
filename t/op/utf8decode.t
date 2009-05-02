@@ -139,11 +139,11 @@ do {
             $x_warn = @_[0]->{?description};
         };
 
-    sub moan(@< @_) {
+    sub moan {
         print $^STDOUT, "$id: $(join ' ',@_)";
     }
 
-    sub warn_unpack_U(@< @_) {
+    sub warn_unpack_U {
         $x_warn = '';
         my @null = @( unpack('U0U*', @_[0]) );
         return $x_warn;

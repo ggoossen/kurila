@@ -20,7 +20,7 @@ sub test($sub, @< @args) {
 }
 
 my $i = 1;
-sub foo(@< @_) { $i = shift @_ if (nelems @_); $i }
+sub foo { $i = shift if (nelems @_); $i }
 
 # no closure
 test { foo == 1 },;
@@ -39,9 +39,9 @@ test { foo == 3 and $i == 3},;
 test {&$bar() == 3 },;
 
 # closure: lexical inside sub
-sub bar(@< @_) {
-    my $i = shift @_;
-    sub { $i = shift @_ if (nelems @_); $i }
+sub bar {
+    my $i = shift;
+    sub { $i = shift if (nelems @_); $i }
 }
 
 $foo = bar(4);
@@ -52,14 +52,14 @@ test {&$foo() == 6 },;
 test {&$bar() == 5 },;
 
 # nested closures
-sub bizz(@< @_) {
+sub bizz {
     my $i = 7;
     if ((nelems @_)) {
-        my $i = shift @_;
-        sub {$i = shift @_ if (nelems @_); $i };
+        my $i = shift;
+        sub {$i = shift if (nelems @_); $i };
     } else {
         my $i = $i;
-        sub {$i = shift @_ if (nelems @_); $i };
+        sub {$i = shift if (nelems @_); $i };
     }
 }
 $foo = bizz();
@@ -99,11 +99,11 @@ test {
              &{@foo[4]}() == 0
      },;
 
-sub barf(@< @_) {
+sub barf {
     my @foo;
     for (qw(0 1 2 3 4)) {
         my $i = $_;
-        @foo[+$_] = sub {$i = shift @_ if (nelems @_); $i };
+        @foo[+$_] = sub {$i = shift if (nelems @_); $i };
     }
     @foo;
 }
@@ -510,7 +510,7 @@ our ($newvar, @a, $x);
 # ... and here's another coredump variant - this time we explicitly
 # delete the sub rather than using a BEGIN ...
 
-sub deleteme(...) { $a = sub { eval '$newvar' } }
+sub deleteme { $a = sub { eval '$newvar' } }
 deleteme();
 *deleteme = sub {};             # delete the sub
 $newvar = 123;                  # realloc the SV of the freed CV
@@ -555,7 +555,7 @@ do {
 
 do {
     my $x = 1;
-    sub fake(...) {
+    sub fake {
         test { sub {eval'$x'}->() == 1 },;
         do { $x;	test { sub {eval'$x'}->() == 1 }, };
         test { sub {eval'$x'}->() == 1 },;
@@ -568,7 +568,7 @@ fake();
 do {
     $x = 1;
     my $x = 2;
-    sub tmp(...) { sub { eval '$x' } }
+    sub tmp { sub { eval '$x' } }
     my $a = tmp();
     undef &tmp;
     test { $a->() == 2 },;
@@ -576,14 +576,14 @@ do {
 
 # handy class: $x = Watch->new(\$foo,'bar')
 # causes 'bar' to be appended to $foo when $x is destroyed
-sub Watch::new(@< @_) { bless \@( @_[1], @_[2] ), @_[0] }
-sub Watch::DESTROY(@< @_) { @_[0]->[0]->$ .= @_[0]->[1] }
+sub Watch::new { bless \@( @_[1], @_[2] ), @_[0] }
+sub Watch::DESTROY { @_[0]->[0]->$ .= @_[0]->[1] }
 
 
 # bugid 1028:
 # nested anon subs (and associated lexicals) not freed early enough
 
-sub linger(@< @_) {
+sub linger {
     my $x = Watch->new(@_[0], '2');
     sub {
             $x;
@@ -600,7 +600,7 @@ do {
 # bugid 10085
 # obj not freed early enough
 
-sub linger2(@< @_) { 
+sub linger2 { 
     my $obj = Watch->new(@_[0], '2');
     sub { sub { $obj } };
 }   
@@ -614,7 +614,7 @@ do {
 
 do {
     my $x = 1;
-    sub f16302(...) {
+    sub f16302 {
         sub {
                 test { defined $x and $x == 1 },
             }->();
@@ -673,10 +673,10 @@ do {
 
 do {
     my $flag = 0;
-    sub  X::DESTROY(...) { $flag = 1 }
+    sub  X::DESTROY { $flag = 1 }
     do {
         my $x;
-        sub newsub(...) {};
+        sub newsub {};
         BEGIN {$x = \&newsub }
         $x = bless \%(), 'X';
     };

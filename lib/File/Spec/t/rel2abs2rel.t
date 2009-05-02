@@ -26,8 +26,8 @@ use Config;
 
 
 # Change 'perl' to './perl' so the shell doesn't go looking through PATH.
-sub safe_rel(@< @_) {
-    my@($perl) =@( shift @_);
+sub safe_rel {
+    my@($perl) =@( shift);
     $perl = File::Spec->catfile(File::Spec->curdir, $perl) unless
         File::Spec->file_name_is_absolute($perl);
 
@@ -37,7 +37,8 @@ sub safe_rel(@< @_) {
 # because the filespec of the binary may contain characters that a
 # command interpreter considers special, so we can't use the obvious
 # `$perl -le "print 'ok'"`. And, for portability, we can't use fork().
-sub sayok(?$perl){
+sub sayok{
+    my $perl = shift;
     open(my $stdoutdup, ">&", $^STDOUT);
     open($^STDOUT, ">", "rel2abs2rel$^PID.tmp")
         or die "Can't open scratch file rel2abs2rel$^PID.tmp -- $^OS_ERROR\n";

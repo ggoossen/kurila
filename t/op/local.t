@@ -13,7 +13,7 @@ my $list_assignment_supported = 1;
 $list_assignment_supported = 0 if ($^OS_NAME eq 'VMS');
 
 
-sub foo(@< @_) {
+sub foo {
     local@($a, $b) =  @_;
           local($c, $d);
     $c = "c 3";
@@ -43,8 +43,8 @@ is($y, "c 10");
 
 # same thing, only with arrays and associative arrays
 
-sub foo2(@< @_) {
-    local@($a, @b) = @(shift @_, @_);
+sub foo2 {
+    local@($a, @b) = @(shift, @_);
           local(@c, %d);
     @c = @( "c 3" );
     %d{+''} = "d 4";
@@ -134,14 +134,14 @@ is($a, 'outer');
 
 do {
     package TH;
-    sub TIEHASH(@< @_) { bless \%(), @_[0] }
-    sub STORE(@< @_) { print $^STDOUT, "# STORE [$(dump::view(\@_))]\n"; @_[0]->{+@_[1]} = @_[2] }
-    sub FETCH(@< @_) { my $v = @_[0]->{?@_[1]}; print $^STDOUT, "# FETCH [$(dump::view(\@_))=$v]\n"; $v }
-    sub EXISTS(@< @_) { print $^STDOUT, "# EXISTS [$(dump::view(\@_))]\n"; exists @_[0]->{@_[1]}; }
-    sub DELETE(@< @_) { print $^STDOUT, "# DELETE [$(dump::view(\@_))]\n"; delete @_[0]->{@_[1]}; }
-    sub CLEAR(@< @_) { print $^STDOUT, "# CLEAR [$(dump::view(< @_))]\n"; @_[0]->% = %( () ); }
-    sub FIRSTKEY(@< @_) { print $^STDOUT, "# FIRSTKEY [$(join ' ',@_)]\n"; keys @_[0]->%; each @_[0]->% }
-    sub NEXTKEY(@< @_) { print $^STDOUT, "# NEXTKEY [$(join ' ',@_)]\n"; each @_[0]->% }
+    sub TIEHASH { bless \%(), @_[0] }
+    sub STORE { print $^STDOUT, "# STORE [$(dump::view(\@_))]\n"; @_[0]->{+@_[1]} = @_[2] }
+    sub FETCH { my $v = @_[0]->{?@_[1]}; print $^STDOUT, "# FETCH [$(dump::view(\@_))=$v]\n"; $v }
+    sub EXISTS { print $^STDOUT, "# EXISTS [$(dump::view(\@_))]\n"; exists @_[0]->{@_[1]}; }
+    sub DELETE { print $^STDOUT, "# DELETE [$(dump::view(\@_))]\n"; delete @_[0]->{@_[1]}; }
+    sub CLEAR { print $^STDOUT, "# CLEAR [$(dump::view(< @_))]\n"; @_[0]->% = %( () ); }
+    sub FIRSTKEY { print $^STDOUT, "# FIRSTKEY [$(join ' ',@_)]\n"; keys @_[0]->%; each @_[0]->% }
+    sub NEXTKEY { print $^STDOUT, "# NEXTKEY [$(join ' ',@_)]\n"; each @_[0]->% }
 };
 
 @a = @('a', 'b', 'c');
@@ -180,8 +180,8 @@ like($^EVAL_ERROR->{?description}, qr/Modification of a read-only value attempte
 do {
     package Other;
 
-    sub f1(...) { "f1" }
-    sub f2(...) { "f2" }
+    sub f1 { "f1" }
+    sub f2 { "f2" }
 
     no warnings "redefine";
     do {
@@ -251,7 +251,7 @@ do {
 do {
     my $x;
     my $y = bless \@(), 'X39012';
-    sub X39012::DESTROY(...) { $x++ }
+    sub X39012::DESTROY { $x++ }
     sub { local @_[0]; shift }->($y);
     ok(!$x,  '[perl #39012]');
 

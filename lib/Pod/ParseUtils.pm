@@ -57,8 +57,8 @@ See the individual methods/properties for details.
 
 =cut
 
-sub new(@< @_) {
-    my $this = shift @_;
+sub new {
+    my $this = shift;
     my $class = ref($this) || $this;
     my %params = %( < @_ );
     my $self = \%(< %params);
@@ -67,7 +67,8 @@ sub new(@< @_) {
     return $self;
 }
 
-sub initialize($self) {
+sub initialize {
+    my $self = shift;
     $self->{+file} ||= 'unknown';
     $self->{+start} ||= 'unknown';
     $self->{+indent} ||= 4; # perlpod: "should be the default"
@@ -84,7 +85,7 @@ method or by calling the B<file()> method with a scalar argument.
 =cut
 
 # The POD file name the list appears in
-sub file(@< @_) {
+sub file {
     return ((nelems @_) +> 1) ??  @(@_[0]->{file} = @_[1]) !! @_[0]->{file};
 }
 
@@ -98,7 +99,7 @@ argument.
 =cut
 
 # The line in the file the node appears
-sub start(@< @_) {
+sub start {
     return ((nelems @_) +> 1) ??  @(@_[0]->{start} = @_[1]) !! @_[0]->{start};
 }
 
@@ -112,7 +113,7 @@ with a scalar argument.
 =cut
 
 # indent level
-sub indent(@< @_) {
+sub indent {
     return ((nelems @_) +> 1) ??  @(@_[0]->{indent} = @_[1]) !! @_[0]->{indent};
 }
 
@@ -127,7 +128,7 @@ with a scalar argument.
 =cut
 
 # The type of the list (UL, OL, ...)
-sub type(@< @_) {
+sub type {
     return ((nelems @_) +> 1) ??  @(@_[0]->{type} = @_[1]) !! @_[0]->{type};
 }
 
@@ -144,7 +145,7 @@ with a scalar argument.
 =cut
 
 # The regular expression to simplify the items
-sub rx(@< @_) {
+sub rx {
     return ((nelems @_) +> 1) ??  @(@_[0]->{rx} = @_[1]) !! @_[0]->{rx};
 }
 
@@ -179,7 +180,7 @@ with a scalar argument.
 
 # possibility for parsers/translators to store information about the
 # lists's parent object
-sub parent(@< @_) {
+sub parent {
     return ((nelems @_) +> 1) ??  @(@_[0]->{parent} = @_[1]) !! @_[0]->{parent};
 }
 
@@ -197,7 +198,7 @@ with a scalar argument.
 
 # possibility for parsers/translators to store information about the
 # list's object
-sub tag(@< @_) {
+sub tag {
     return ((nelems @_) +> 1) ??  @(@_[0]->{tag} = @_[1]) !! @_[0]->{tag};
 }
 
@@ -231,8 +232,8 @@ failure, the error message is stored in C<$@>.
 
 =cut
 
-sub new(@< @_) {
-    my $this = shift @_;
+sub new {
+    my $this = shift;
     my $class = ref($this) || $this;
     my $self = \%();
     bless $self, $class;
@@ -251,7 +252,8 @@ sub new(@< @_) {
     return $self;
 }
 
-sub initialize($self) {
+sub initialize {
+    my $self = shift;
     $self->{+line} ||= 'undef';
     $self->{+file} ||= 'undef';
     $self->{+page} ||= '';
@@ -272,8 +274,8 @@ section can simply be dropped.
 
 =cut
 
-sub parse(@< @_) {
-    my $self = shift @_;
+sub parse {
+    my $self = shift;
           local($_) = @_[0];
     # syntax check the link and extract destination
     my @($alttext,$page,$node,$type,$quoted) = @(undef,'','','',0);
@@ -405,7 +407,8 @@ sub parse(@< @_) {
     1;
 }
 
-sub _construct_text($self) {
+sub _construct_text {
+    my $self = shift;
     my $alttext = $self->alttext();
     my $type = $self->type();
     my $section = $self->node();
@@ -450,7 +453,7 @@ have to be implemented in the translator.
 =cut
 
 #' retrieve/set markuped text
-sub markup(@< @_) {
+sub markup {
     return ((nelems @_) +> 1) ??  @(@_[0]->{+_markup} = @_[1]) !! @_[0]->{?_markup};
 }
 
@@ -469,7 +472,7 @@ that are marked up):
 =cut
 
 # The complete link's text
-sub text(@< @_) {
+sub text {
     @_[0]->{?_text};
 }
 
@@ -481,8 +484,8 @@ parsing process.
 =cut
 
 # Set/retrieve warnings
-sub warning(@< @_) {
-    my $self = shift @_;
+sub warning {
+    my $self = shift;
     if((nelems @_)) {
         push($self->{_warnings}->@, < @_);
         return @_;
@@ -500,12 +503,12 @@ the link was encountered in. Has to be filled in manually.
 =cut
 
 # The line in the file the link appears
-sub line(@< @_) {
+sub line {
     return ((nelems @_) +> 1) ??  @(@_[0]->{+line} = @_[1]) !! @_[0]->{?line};
 }
 
 # The POD file name the link appears in
-sub file(@< @_) {
+sub file {
     return ((nelems @_) +> 1) ??  @(@_[0]->{+file} = @_[1]) !! @_[0]->{?file};
 }
 
@@ -516,7 +519,7 @@ This method sets or returns the POD page this link points to.
 =cut
 
 # The POD page the link appears on
-sub page(@< @_) {
+sub page {
     if ((nelems @_) +> 1) {
         @_[0]->{+page} = @_[1];
         @_[0]->_construct_text();
@@ -531,7 +534,7 @@ As above, but the destination node text of the link.
 =cut
 
 # The link destination
-sub node(@< @_) {
+sub node {
     if ((nelems @_) +> 1) {
         @_[0]->{+node} = @_[1];
         @_[0]->_construct_text();
@@ -546,7 +549,7 @@ Sets or returns an alternative text specified in the link.
 =cut
 
 # Potential alternative text
-sub alttext(@< @_) {
+sub alttext {
     if ((nelems @_) +> 1) {
         @_[0]->{+alttext} = @_[1];
         @_[0]->_construct_text();
@@ -562,7 +565,7 @@ there is also C<hyperlink>, derived from e.g. C<LE<lt>http://perl.comE<gt>>
 =cut
 
 # The type: item or headn
-sub type(@< @_) {
+sub type {
     return ((nelems @_) +> 1) ??  @(@_[0]->{+type} = @_[1]) !! @_[0]->{?type};
 }
 
@@ -575,7 +578,8 @@ Returns the link as contents of C<LE<lt>E<gt>>. Reciprocal to B<parse()>.
 =cut
 
 # The link itself
-sub link($self) {
+sub link {
+    my $self = shift;
     my $link = $self->page() || '';
     if($self->node()) {
         my $node = $self->node();
@@ -629,7 +633,8 @@ POD documents of class Pod::Cache::Item.
 
 =cut
 
-sub new(?$this) {
+sub new {
+    my $this = shift;
     my $class = ref($this) || $this;
     my $self = \@();
     bless $self, $class;
@@ -691,8 +696,8 @@ Create a new object.
 
 =cut
 
-sub new(@< @_) {
-    my $this = shift @_;
+sub new {
+    my $this = shift;
     my $class = ref($this) || $this;
     my %params = %( < @_ );
     my $self = \%(< %params);
@@ -701,7 +706,8 @@ sub new(@< @_) {
     return $self;
 }
 
-sub initialize($self) {
+sub initialize {
+    my $self = shift;
     $self->{+nodes} = \@() unless(defined $self->{?nodes});
 }
 
@@ -712,7 +718,7 @@ Set/retrieve the POD document name (e.g. "Pod::Parser").
 =cut
 
 # The POD page
-sub page(@< @_) {
+sub page {
     return ((nelems @_) +> 1) ??  @(@_[0]->{+page} = @_[1]) !! @_[0]->{?page};
 }
 
@@ -724,7 +730,7 @@ section.
 =cut
 
 # The POD description, taken out of NAME if present
-sub description(@< @_) {
+sub description {
     return ((nelems @_) +> 1) ??  @(@_[0]->{+description} = @_[1]) !! @_[0]->{?description};
 }
 
@@ -735,7 +741,7 @@ Set/retrieve the POD file storage path.
 =cut
 
 # The file path
-sub path(@< @_) {
+sub path {
     return ((nelems @_) +> 1) ??  @(@_[0]->{+path} = @_[1]) !! @_[0]->{?path};
 }
 
@@ -746,7 +752,7 @@ Set/retrieve the POD file name.
 =cut
 
 # The POD file name
-sub file(@< @_) {
+sub file {
     return ((nelems @_) +> 1) ??  @(@_[0]->{+file} = @_[1]) !! @_[0]->{?file};
 }
 

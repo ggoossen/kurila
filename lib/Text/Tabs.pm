@@ -15,7 +15,7 @@ BEGIN	{
     $debug = 0;
 }
 
-sub expand(@< @_) {
+sub expand {
     my @l;
     my $pad;
     my $s = '';
@@ -31,7 +31,7 @@ sub expand(@< @_) {
     return $s;
 }
 
-sub unexpand(@< @_)
+sub unexpand
 {
     my @l = @_;
     my @e;

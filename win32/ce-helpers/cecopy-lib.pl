@@ -5,7 +5,8 @@
 my @files;
 
 my %dirs;
-sub mk(?$r) {
+sub mk {
+    my $r = shift;
     return if exists %dirs{$r};
     if ($r=~m/\//) {
         $r=~m/^(.*)\/[^\/]*?$/;
@@ -24,7 +25,7 @@ for ( @files) {
     system("..\\miniperl.exe -I..\\lib -MCross comp.pl --copy pc:..\\lib\\$_ ce:[p]\\lib\\$_");
 }
 
-sub BEGIN(...) {
+sub BEGIN {
     @files = qw(
     attributes.pm
     AutoLoader.pm

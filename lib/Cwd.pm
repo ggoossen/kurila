@@ -306,7 +306,7 @@ unless ($pwd_cmd) {
 }
 
 # The 'natural and safe form' for UNIX (pwd may be setuid root)
-sub _backtick_pwd(...) {
+sub _backtick_pwd {
     # Localize %ENV entries in a way that won't create new hash keys
     my @localize = qw(PATH IFS CDPATH ENV BASH_ENV);
     my $oldvalue = map { env::var($_) }, @localize;
@@ -372,7 +372,7 @@ if ($^OS_NAME eq 'cygwin') {
 
 # A non-XS version of getcwd() - also used to bootstrap the perl build
 # process, when miniperl is running and no XS loading happens.
-sub _perl_getcwd(...)
+sub _perl_getcwd
 {
     abs_path('.');
 }
@@ -384,7 +384,7 @@ sub _perl_getcwd(...)
 # This is a faster version of getcwd.  It's also more dangerous because
 # you might chdir out of a directory that you can't chdir back into.
 
-sub fastcwd_(...) {
+sub fastcwd_ {
     my($odev, $oino, $cdev, $cino, $tdev, $tino);
     my(@path, $path);
 
@@ -431,7 +431,7 @@ if (not defined &fastcwd) { *fastcwd = \&fastcwd_ }
 
 my $chdir_init = 0;
 
-sub chdir_init(...) {
+sub chdir_init {
     if (env::var('PWD') and $^OS_NAME ne 'os2' and $^OS_NAME ne 'dos' and $^OS_NAME ne 'MSWin32') {
         my@($dd,$di, ...) = @: stat('.');
         my@($pd,$pi, ...) = @: stat(env::var('PWD'));
@@ -455,8 +455,8 @@ sub chdir_init(...) {
     $chdir_init = 1;
 }
 
-sub chdir(@< @_) {
-    my $newdir = (nelems @_) ?? shift @_ !! '';	# allow for no arg (chdir to HOME dir)
+sub chdir {
+    my $newdir = (nelems @_) ?? shift !! '';	# allow for no arg (chdir to HOME dir)
     $newdir =~ s|///*|/|g unless $^OS_NAME eq 'MSWin32';
     chdir_init() unless $chdir_init;
     my $newpwd;
@@ -496,9 +496,9 @@ sub chdir(@< @_) {
 }
 
 
-sub _perl_abs_path(@< @_)
+sub _perl_abs_path
 {
-    my $start = (nelems @_) ?? shift @_ !! '.';
+    my $start = (nelems @_) ?? shift !! '.';
     my($dotdots, $cwd, @pst, @cst, $dir, @tst);
 
     unless (@cst = @( stat( $start ) ))
@@ -572,11 +572,11 @@ sub _perl_abs_path(@< @_)
 
 
 my $Curdir;
-sub fast_abs_path(@< @_) {
+sub fast_abs_path {
     local env::var('PWD' ) = env::var('PWD') || ''; # Guard against clobberage
     my $cwd = getcwd();
     require File::Spec;
-    my $path = (nelems @_) ?? shift @_ !! ($Curdir ||= File::Spec->curdir);
+    my $path = (nelems @_) ?? shift !! ($Curdir ||= File::Spec->curdir);
 
     # Detaint else we'll explode in taint mode.  This is safe because
     # we're not doing anything dangerous with it.
@@ -633,13 +633,13 @@ sub fast_abs_path(@< @_) {
 #   and directory seen by DCL after Perl exits, since the effects
 #   the CRTL chdir() function persist only until Perl exits.
 
-sub _vms_cwd(...) {
+sub _vms_cwd {
     return env::var('DEFAULT');
 }
 
-sub _vms_abs_path(@< @_) {
+sub _vms_abs_path {
     return env::var('DEFAULT') unless (nelems @_);
-    my $path = shift @_;
+    my $path = shift;
 
     if (-l $path) {
         my $link_target = readlink($path);
@@ -674,7 +674,7 @@ sub _vms_abs_path(@< @_) {
     return VMS::Filespec::rmsexpand($path);
 }
 
-sub _os2_cwd(...) {
+sub _os2_cwd {
     my $pwd = `cmd /c cd`;
     chomp($pwd);
     $pwd =~ s:\\:/:g ;
@@ -682,7 +682,7 @@ sub _os2_cwd(...) {
     return env::var('PWD');
 }
 
-sub _win32_cwd(...) {
+sub _win32_cwd {
     if (defined &DynaLoader::boot_DynaLoader) {
         env::var('PWD' ) = Win32::GetCwd();
     }
@@ -699,7 +699,7 @@ sub _win32_cwd(...) {
 
 *_NT_cwd = defined &Win32::GetCwd ?? \&_win32_cwd !! \&_os2_cwd;
 
-sub _dos_cwd(...) {
+sub _dos_cwd {
     if (!defined &Dos::GetCwd) {
         my $pwd = `command /c cd`;
         chomp $pwd;
@@ -711,7 +711,7 @@ sub _dos_cwd(...) {
     return env::var('PWD');
 }
 
-sub _qnx_cwd(...) {
+sub _qnx_cwd {
     local env::var('PATH' ) = '';
     local env::var('CDPATH' ) = '';
     local env::var('ENV' ) = '';
@@ -721,11 +721,11 @@ sub _qnx_cwd(...) {
     return env::var('PWD');
 }
 
-sub _qnx_abs_path(@< @_) {
+sub _qnx_abs_path {
     local env::var('PATH' ) = '';
     local env::var('CDPATH' ) = '';
     local env::var('ENV' ) = '';
-    my $path = (nelems @_) ?? shift @_ !! '.';
+    my $path = (nelems @_) ?? shift !! '.';
 
     my $rpfh;
     defined( open($rpfh, "-|", '-') || exec '/usr/bin/fullpath', '-t', $path ) or
@@ -736,7 +736,7 @@ sub _qnx_abs_path(@< @_) {
     return $realpath;
 }
 
-sub _epoc_cwd(...) {
+sub _epoc_cwd {
     env::var('PWD' ) = EPOC::getcwd();
     return env::var('PWD');
 }

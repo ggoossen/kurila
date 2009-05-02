@@ -27,7 +27,7 @@ decodeTest();
 print $^STDOUT, "not " unless decode_base64(encode_base64("foo")) eq "foo";
 print $^STDOUT, "ok ", $testno++, "\n";
 
-sub encodeTest(...)
+sub encodeTest
 {
     print $^STDOUT, "# encode test\n";
 
@@ -333,7 +333,7 @@ sub encodeTest(...)
     }
 }
 
-sub decodeTest(@< @_)
+sub decodeTest
 {
     print $^STDOUT, "# decode test\n";
 

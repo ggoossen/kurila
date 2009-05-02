@@ -28,9 +28,9 @@ sub ok($n, $result, ?$info) {
     }
 }
 
-sub cmd_line(@< @_) {
+sub cmd_line {
     if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare') {
-        my $cmd = shift @_;
+        my $cmd = shift;
         $cmd =~ s/[\r\n]//g;
         $cmd =~ s/"/\\"/g;
         return qq/"$cmd"/;

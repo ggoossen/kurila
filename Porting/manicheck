@@ -12,7 +12,7 @@
 # With option -m prints out only the extra files (and without the "missing: ")
 #
 
-sub help(...) {
+sub help {
     die <<EOF;
 $^PROGRAM_NAME: Usage: $^PROGRAM_NAME [-x|-m|-l|-h]
 -x show only the extra files

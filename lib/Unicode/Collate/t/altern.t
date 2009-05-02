@@ -9,8 +9,8 @@ ok(1);
 
 #########################
 
-sub _pack_U(@< @_)   { Unicode::Collate::pack_U(< @_) }
-sub _unpack_U(@< @_) { Unicode::Collate::unpack_U(< @_) }
+sub _pack_U   { Unicode::Collate::pack_U(< @_) }
+sub _unpack_U { Unicode::Collate::unpack_U(< @_) }
 
 my $A_acute = _pack_U(0xC1);
 my $acute   = _pack_U(0x0301);

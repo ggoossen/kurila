@@ -22,14 +22,14 @@ do {
     package Diamond_A;
     use mro 'c3'; 
 
-    sub foo(...) { 'Diamond_A::foo' }
+    sub foo { 'Diamond_A::foo' }
 };
 do {
     package Diamond_B;
     use base 'Diamond_A';
     use mro 'c3';     
 
-    sub foo(@< @_) { 'Diamond_B::foo => ' . (shift @_)->SUPER::foo }
+    sub foo { 'Diamond_B::foo => ' . (shift)->SUPER::foo }
 };
 do {
     package Diamond_C;
@@ -42,7 +42,7 @@ do {
     use base ('Diamond_C', 'Diamond_B');
     use mro 'c3';    
 
-    sub foo(@< @_) { 'Diamond_D::foo => ' . (shift @_)->SUPER::foo }    
+    sub foo { 'Diamond_D::foo => ' . (shift)->SUPER::foo }    
 };
 
 ok(eq_array(

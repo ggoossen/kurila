@@ -318,7 +318,7 @@ my %FILES_CREATED_BY_OBJECT;
 # for the current version, failures are associated with
 # stored in an error string and returned to give the reason whilst debugging
 # This routine is not called by any external function
-sub _gettemp(@< @_) {
+sub _gettemp {
 
     croak 'Usage: ($fh, $name) = _gettemp($template, OPTIONS);'
         unless scalar(nelems @_) +>= 1;
@@ -339,7 +339,7 @@ sub _gettemp(@< @_) {
         );
 
     # Read the template
-    my $template = shift @_;
+    my $template = shift;
     if (ref($template)) {
         # Use a warning here since we have not yet merged ErrStr
         carp "File::Temp::_gettemp: template must not be a reference";
@@ -609,7 +609,7 @@ sub _gettemp(@< @_) {
 
 # Returns:    modified template
 
-sub _replace_XX(@< @_) {
+sub _replace_XX {
 
     croak 'Usage: _replace_XX($template, $ignore)'
         unless scalar(nelems @_) == 2;
@@ -632,7 +632,8 @@ sub _replace_XX(@< @_) {
 # Internal routine to force a temp file to be writable after
 # it is created so that we can unlink it. Windows seems to occassionally
 # force a file to be readonly when written to certain temp locations
-sub _force_writable(?$file) {
+sub _force_writable {
+    my $file = shift;
     chmod 0600, $file;
 }
 
@@ -656,10 +657,10 @@ sub _force_writable(?$file) {
 # file or directory in this directory, it may not be safe
 # anymore... Have to run _is_safe directly after the open.
 
-sub _is_safe(@< @_) {
+sub _is_safe {
 
-    my $path = shift @_;
-    my $err_ref = shift @_;
+    my $path = shift;
+    my $err_ref = shift;
 
     # Stat path
     my @info = @( stat($path) );
@@ -716,16 +717,16 @@ sub _is_safe(@< @_) {
 
 # Takes optional second arg as scalar ref to error reason
 
-sub _is_verysafe(@< @_) {
+sub _is_verysafe {
 
     # Need POSIX - but only want to bother if really necessary due to overhead
     require POSIX;
 
-    my $path = shift @_;
+    my $path = shift;
     print $^STDOUT, "_is_verysafe testing $path\n" if $DEBUG;
     return 1 if $^OS_NAME eq 'VMS';  # owner delete control at file level
 
-    my $err_ref = shift @_;
+    my $err_ref = shift;
 
         # Should Get the value of _PC_CHOWN_RESTRICTED if it is defined
         # and If it is not there do the extensive test
@@ -791,7 +792,7 @@ sub _is_verysafe(@< @_) {
 # temporary file. Currently I do not know enough about the issues
 # on VMS to decide whether O_EXCL is a requirement.
 
-sub _can_unlink_opened_file(...) {
+sub _can_unlink_opened_file {
 
     if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'os2' || $^OS_NAME eq 'VMS' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'MacOS') {
         return 0;
@@ -808,7 +809,10 @@ sub _can_unlink_opened_file(...) {
 
 #   $cando = _can_do_level( $level )
 
-sub _can_do_level(?$level) {
+sub _can_do_level {
+
+    # Get security level
+    my $level = shift;
 
     # Always have to be able to do STANDARD
     return 1 if $level == STANDARD;
@@ -862,7 +866,7 @@ do {
 
     # Cleanup function. Always triggered on END but can be invoked
     # manually.
-    sub cleanup(...) {
+    sub cleanup {
         if (!$KEEP_ALL) {
             # Files
             my @files = @(exists %files_to_unlink{$^PID} ??
@@ -902,7 +906,7 @@ do {
     # until the END block. For now we do a bit of checking at this
     # point in order to make sure that (1) we have a file/dir to delete
     # and (2) we have been called with the correct arguments.
-    sub _deferred_unlink(@< @_) {
+    sub _deferred_unlink {
 
         croak 'Usage:  _deferred_unlink($fh, $fname, $isdir)'
             unless scalar(nelems @_) == 3;
@@ -990,8 +994,8 @@ Can call croak() if an error occurs.
 
 =cut
 
-sub new(@< @_) {
-    my $proto = shift @_;
+sub new {
+    my $proto = shift;
     my $class = ref($proto) || $proto;
 
     # read arguments and convert keys to upper case
@@ -1048,8 +1052,8 @@ created with this method default to CLEANUP => 1.
 
 =cut
 
-sub newdir(@< @_) {
-    my $self = shift @_;
+sub newdir {
+    my $self = shift;
 
     # need to handle args as in tempdir because we have to force CLEANUP
     # default without passing CLEANUP to tempdir
@@ -1083,11 +1087,13 @@ a string.
 
 =cut
 
-sub filename($self) {
+sub filename {
+    my $self = shift;
     return $self->*->$;
 }
 
-sub STRINGIFY($self) {
+sub STRINGIFY {
+    my $self = shift;
     return $self->filename;
 }
 
@@ -1111,10 +1117,10 @@ Default is for the file to be removed.
 
 =cut
 
-sub unlink_on_destroy(@< @_) {
-    my $self = shift @_;
+sub unlink_on_destroy {
+    my $self = shift;
     if ((nelems @_)) {
-        $self->*->{+UNLINK} = shift @_;
+        $self->*->{+UNLINK} = shift;
     }
     return $self->*->{?UNLINK};
 }
@@ -1140,7 +1146,8 @@ will not be removed.
 
 =cut
 
-sub DESTROY($self) {
+sub DESTROY {
+    my $self = shift;
     if ($self->*->{?UNLINK} && !$KEEP_ALL) {
         print $^STDOUT, "# --------->   Unlinking $self\n" if $DEBUG;
 
@@ -1261,7 +1268,7 @@ Will croak() if there is an error.
 
 =cut
 
-sub tempfile(@< @_) {
+sub tempfile {
 
     # Can not check for argument count since we can have any
     # number of args
@@ -1438,7 +1445,7 @@ Will croak() if there is an error.
 
 # '
 
-sub tempdir(@< @_)  {
+sub tempdir  {
 
     # Can not check for argument count since we can have any
     # number of args
@@ -1560,12 +1567,12 @@ Will croak() if there is an error.
 
 
 
-sub mkstemp(@< @_) {
+sub mkstemp {
 
     croak "Usage: mkstemp(template)"
         if scalar(nelems @_) != 1;
 
-    my $template = shift @_;
+    my $template = shift;
 
     my ($fh, $path, $errstr);
     croak "Error in mkstemp using $template: $errstr"
@@ -1596,14 +1603,14 @@ Will croak() if there is an error.
 
 =cut
 
-sub mkstemps(@< @_) {
+sub mkstemps {
 
     croak "Usage: mkstemps(template, suffix)"
         if scalar(nelems @_) != 2;
 
 
-    my $template = shift @_;
-    my $suffix   = shift @_;
+    my $template = shift;
+    my $suffix   = shift;
 
     $template .= $suffix;
 
@@ -1636,12 +1643,12 @@ Will croak() if there is an error.
 
 #' # for emacs
 
-sub mkdtemp(@< @_) {
+sub mkdtemp {
 
     croak "Usage: mkdtemp(template)"
         if scalar(nelems @_) != 1;
 
-    my $template = shift @_;
+    my $template = shift;
     my $suffixlen = 0;
     if ($^OS_NAME eq 'VMS') {  # dir names can end in delimiters
         $template =~ m/([\.\]:>]+)$/;
@@ -1677,12 +1684,12 @@ Will croak() if there is an error.
 
 =cut
 
-sub mktemp(@< @_) {
+sub mktemp {
 
     croak "Usage: mktemp(template)"
         if scalar(nelems @_) != 1;
 
-    my $template = shift @_;
+    my $template = shift;
 
     my ($tmpname, $junk, $errstr);
     croak "Error getting name to temp file from template $template: $errstr"
@@ -1739,7 +1746,7 @@ Will croak() if there is an error.
 
 =cut
 
-sub tmpnam(...) {
+sub tmpnam {
 
     # Retrieve the temporary directory name
     my $tmpdir = File::Spec->tmpdir;
@@ -1770,7 +1777,7 @@ Will croak() if there is an error.
 
 =cut
 
-sub tmpfile(...) {
+sub tmpfile {
 
     # Simply call tmpnam() in a list context
     my @($fh, $file) =  tmpnam();
@@ -1815,7 +1822,7 @@ Will croak() if there is an error.
 
 =cut
 
-sub tempnam(@< @_) {
+sub tempnam {
 
     croak 'Usage tempnam($dir, $prefix)' unless scalar(nelems @_) == 2;
 
@@ -1887,7 +1894,7 @@ the file.
 
 =cut
 
-sub unlink0(@< @_) {
+sub unlink0 {
 
     croak 'Usage: unlink0(filehandle, filename)'
         unless scalar(nelems @_) == 2;
@@ -1952,7 +1959,7 @@ Not exported by default.
 
 =cut
 
-sub cmpstat(@< @_) {
+sub cmpstat {
 
     croak 'Usage: cmpstat(filehandle, filename)'
         unless scalar(nelems @_) == 2;
@@ -2045,7 +2052,7 @@ comparison.
 
 =cut
 
-sub unlink1(@< @_) {
+sub unlink1 {
     croak 'Usage: unlink1(filehandle, filename)'
         unless scalar(nelems @_) == 2;
 
@@ -2163,10 +2170,10 @@ simply examine the return value of C<safe_level>.
 do {
     # protect from using the variable itself
     my $LEVEL = STANDARD;
-    sub safe_level(@< @_) {
-        my $self = shift @_;
+    sub safe_level {
+        my $self = shift;
         if ((nelems @_)) {
-            my $level = shift @_;
+            my $level = shift;
             if (($level != STANDARD) && ($level != MEDIUM) && ($level != HIGH)) {
                 carp "safe_level: Specified level ($level) not STANDARD, MEDIUM or HIGH - ignoring\n" if $^WARNING;
             } else {
@@ -2203,10 +2210,10 @@ The value is only relevant when C<safe_level> is set to MEDIUM or higher.
 do {
     my $TopSystemUID = 10;
     $TopSystemUID = 197108 if $^OS_NAME eq 'interix'; # "Administrator"
-    sub top_system_uid(@< @_) {
-        my $self = shift @_;
+    sub top_system_uid {
+        my $self = shift;
         if ((nelems @_)) {
-            my $newuid = shift @_;
+            my $newuid = shift;
             croak "top_system_uid: UIDs should be numeric"
                 unless $newuid =~ m/^\d+$/s;
             $TopSystemUID = $newuid;
@@ -2342,23 +2349,26 @@ use File::Path < qw/ rmtree /;
 
 # Read-only - returns the name of the temp directory
 
-sub dirname($self) {
+sub dirname {
+    my $self = shift;
     return $self->{?DIRNAME};
 }
 
-sub STRINGIFY($self) {
+sub STRINGIFY {
+    my $self = shift;
     return $self->dirname;
 }
 
-sub unlink_on_destroy(@< @_) {
-    my $self = shift @_;
+sub unlink_on_destroy {
+    my $self = shift;
     if ((nelems @_)) {
-        $self->{+CLEANUP} = shift @_;
+        $self->{+CLEANUP} = shift;
     }
     return $self->{?CLEANUP};
 }
 
-sub DESTROY($self) {
+sub DESTROY {
+    my $self = shift;
     if ($self->unlink_on_destroy && 
         $^PID == $self->{?LAUNCHPID} && !$File::Temp::KEEP_ALL) {
         rmtree($self->{?DIRNAME}, $File::Temp::DEBUG, 0)

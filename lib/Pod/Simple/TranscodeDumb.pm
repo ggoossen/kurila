@@ -18,18 +18,18 @@ $VERSION = '2.02';
             < %Supported,
     );
 
-sub is_dumb(...)  {1}
-sub is_smart(...) {0}
+sub is_dumb  {1}
+sub is_smart {0}
 
-sub all_encodings(...) {
+sub all_encodings {
     return sort keys %Supported;
 }
 
-sub encoding_is_available(@< @_) {
+sub encoding_is_available {
     return exists %Supported{lc @_[1]};
 }
 
-sub encmodver(...) {
+sub encmodver {
     return __PACKAGE__ . " v" .($VERSION || '?');
 }
 

@@ -80,7 +80,7 @@ sub setBinModeInput($handle)
         if  $needBinmode;
 }
 
-sub isaFilehandle(@< @_)
+sub isaFilehandle
 {
     return  (defined @_[0] and 
              (UNIVERSAL::isa(@_[0],'GLOB')
@@ -89,20 +89,21 @@ sub isaFilehandle(@< @_)
              )
 }
 
-sub isaFilename(@< @_)
+sub isaFilename
 {
     return  (defined @_[0] and 
              ! ref @_[0]    and 
              UNIVERSAL::isa(\@_[0], 'SCALAR'));
 }
 
-sub isaFileGlobString(@< @_)
+sub isaFileGlobString
 {
     return defined @_[0] && @_[0] =~ m/^<.*>$/;
 }
 
-sub cleanFileGlobString(?$string)
+sub cleanFileGlobString
 {
+    my $string = shift ;
 
     $string =~ s/^\s*<\s*(.*)\s*>\s*$/$1/;
 
@@ -115,7 +116,7 @@ use constant WANT_UNDEF => 4 ;
 #use constant WANT_HASH  => 8 ;
 use constant WANT_HASH  => 0 ;
 
-sub whatIsInput(@< @_)
+sub whatIsInput
 {
     my $got = whatIs(< @_);
 
@@ -130,7 +131,7 @@ sub whatIsInput(@< @_)
     return $got;
 }
 
-sub whatIsOutput(@< @_)
+sub whatIsOutput
 {
     my $got = whatIs(< @_);
 
@@ -144,7 +145,7 @@ sub whatIsOutput(@< @_)
     return $got;
 }
 
-sub whatIs(@< @_)
+sub whatIs
 {
     return 'handle' if isaFilehandle(@_[0]);
 
@@ -169,18 +170,18 @@ sub whatIs(@< @_)
     return 'filename';
 }
 
-sub oneTarget(@< @_)
+sub oneTarget
 {
     return @_[0] =~ m/^(code|handle|buffer|filename)$/;
 }
 
-sub Validator::new(@< @_)
+sub Validator::new
 {
-    my $class = shift @_ ;
+    my $class = shift ;
 
-    my $Class = shift @_ ;
-    my $error_ref = shift @_ ;
-    my $reportClass = shift @_ ;
+    my $Class = shift ;
+    my $error_ref = shift ;
+    my $reportClass = shift ;
 
     my %data = %(Class       => $Class, 
             Error       => $error_ref,
@@ -302,26 +303,26 @@ sub Validator::new(@< @_)
     return $obj ;
 }
 
-sub Validator::saveErrorString(@< @_)
+sub Validator::saveErrorString
 {
-    my $self   = shift @_ ;
-     $self->{Error}->$ = shift @_ ;
+    my $self   = shift ;
+     $self->{Error}->$ = shift ;
     return undef;
 
 }
 
-sub Validator::croakError(@< @_)
+sub Validator::croakError
 {
-    my $self   = shift @_ ;
+    my $self   = shift ;
     $self->saveErrorString(@_[0]);
     croak @_[0];
 }
 
 
 
-sub Validator::validateInputFilenames(@< @_)
+sub Validator::validateInputFilenames
 {
-    my $self = shift @_ ;
+    my $self = shift ;
 
     foreach my $filename ( @_)
     {
@@ -349,9 +350,9 @@ sub Validator::validateInputFilenames(@< @_)
     return 1 ;
 }
 
-sub Validator::validateInputArray(@< @_)
+sub Validator::validateInputArray
 {
-    my $self = shift @_ ;
+    my $self = shift ;
 
     if ( (nelems  @_[0]->@) == 0 )
     {
@@ -405,10 +406,10 @@ sub Validator::validateInputArray(@< @_)
 #    return $self ;
 #}
 
-sub createSelfTiedObject(@< @_)
+sub createSelfTiedObject
 {
-    my $class = shift @_ || die "called without a class";
-    my $error_ref = shift @_ ;
+    my $class = shift || die "called without a class";
+    my $error_ref = shift ;
 
     my $obj = bless \%(), ref($class) || $class;
     $obj->{+Closed} = 1 ;
@@ -476,8 +477,9 @@ sub ParseParameters($level, @< @_)
 use warnings;
 use Carp;
 
-sub IO::Compress::Base::Parameters::new(?$class)
+sub IO::Compress::Base::Parameters::new
 {
+    my $class = shift ;
 
     my $obj = \%( Error => '',
             Got   => \%(),
@@ -487,11 +489,11 @@ sub IO::Compress::Base::Parameters::new(?$class)
     return bless $obj, 'IO::Compress::Base::Parameters' ;
 }
 
-sub IO::Compress::Base::Parameters::setError(@< @_)
+sub IO::Compress::Base::Parameters::setError
 {
-    my $self = shift @_ ;
-    my $error = shift @_ ;
-    my $retval = (nelems @_) ?? shift @_ !! undef ;
+    my $self = shift ;
+    my $error = shift ;
+    my $retval = (nelems @_) ?? shift !! undef ;
 
     $self->{+Error} = $error ;
     return $retval;
@@ -606,15 +608,15 @@ sub IO::Compress::Base::Parameters::parse($self, $default, @< @_)
     return 1;
 }
 
-sub IO::Compress::Base::Parameters::_checkType(@< @_)
+sub IO::Compress::Base::Parameters::_checkType
 {
-    my $self = shift @_ ;
+    my $self = shift ;
 
-    my $key   = shift @_ ;
-    my $value = shift @_ ;
-    my $type  = shift @_ ;
-    my $validate  = shift @_ ;
-    my $output  = shift @_;
+    my $key   = shift ;
+    my $value = shift ;
+    my $type  = shift ;
+    my $validate  = shift ;
+    my $output  = shift;
 
     #local $Carp::CarpLevel = $level ;
     #print "PARSE $type $key $value $validate $sub\n" ;
@@ -691,18 +693,18 @@ sub IO::Compress::Base::Parameters::_checkType(@< @_)
 
 
 
-sub IO::Compress::Base::Parameters::parsed(@< @_)
+sub IO::Compress::Base::Parameters::parsed
 {
-    my $self = shift @_ ;
-    my $name = shift @_ ;
+    my $self = shift ;
+    my $name = shift ;
 
     return $self->{Got}->{+ lc $name}->[?OFF_PARSED] ;
 }
 
-sub IO::Compress::Base::Parameters::value(@< @_)
+sub IO::Compress::Base::Parameters::value
 {
-    my $self = shift @_ ;
-    my $name = shift @_ ;
+    my $self = shift ;
+    my $name = shift ;
 
     if ((nelems @_))
     {
@@ -714,11 +716,11 @@ sub IO::Compress::Base::Parameters::value(@< @_)
     return $self->{Got}->{+ lc $name}->[?OFF_FIXED] ;
 }
 
-sub IO::Compress::Base::Parameters::valueOrDefault(@< @_)
+sub IO::Compress::Base::Parameters::valueOrDefault
 {
-    my $self = shift @_ ;
-    my $name = shift @_ ;
-    my $default = shift @_ ;
+    my $self = shift ;
+    my $name = shift ;
+    my $default = shift ;
 
     my $value = $self->{Got}->{lc $name}->[OFF_DEFAULT] ;
 
@@ -726,17 +728,18 @@ sub IO::Compress::Base::Parameters::valueOrDefault(@< @_)
     return $default ;
 }
 
-sub IO::Compress::Base::Parameters::wantValue(@< @_)
+sub IO::Compress::Base::Parameters::wantValue
 {
-    my $self = shift @_ ;
-    my $name = shift @_ ;
+    my $self = shift ;
+    my $name = shift ;
 
     return defined $self->{Got}->{lc $name}->[OFF_DEFAULT] ;
 
 }
 
-sub IO::Compress::Base::Parameters::clone($self)
+sub IO::Compress::Base::Parameters::clone
 {
+    my $self = shift ;
     my $obj = \%( );
     my %got ;
 
@@ -756,67 +759,74 @@ use constant MAX32 => 0xFFFFFFFF ;
 use constant LOW   => 0 ;
 use constant HIGH  => 1;
 
-sub new(@< @_)
+sub new
 {
-    my $class = shift @_ ;
+    my $class = shift ;
 
     my $high = 0 ;
     my $low  = 0 ;
 
     if ((nelems @_) == 2) {
-        $high = shift @_ ;
-        $low  = shift @_ ;
+        $high = shift ;
+        $low  = shift ;
     }
     elsif ((nelems @_) == 1) {
-        $low  = shift @_ ;
+        $low  = shift ;
     }
 
     bless \@($low, $high), $class;
 }
 
-sub newUnpack_V64(?$string)
+sub newUnpack_V64
 {
+    my $string = shift;
 
     my @($low, $hi) =@( unpack "V V", $string) ;
     bless \@( $low, $hi ), "U64";
 }
 
-sub newUnpack_V32(?$string)
+sub newUnpack_V32
 {
+    my $string = shift;
 
     my $low = unpack "V", $string ;
     bless \@( $low, 0 ), "U64";
 }
 
-sub reset($self)
+sub reset
 {
+    my $self = shift;
     $self->[HIGH] = $self->[LOW] = 0;
 }
 
-sub clone($self)
+sub clone
 {
+    my $self = shift;
     bless \ $self->@, ref $self ;
 }
 
-sub getHigh($self)
+sub getHigh
 {
+    my $self = shift;
     return $self->[HIGH];
 }
 
-sub getLow($self)
+sub getLow
 {
+    my $self = shift;
     return $self->[LOW];
 }
 
-sub get32bit($self)
+sub get32bit
 {
+    my $self = shift;
     return $self->[LOW];
 }
 
-sub add(@< @_)
+sub add
 {
-    my $self = shift @_;
-    my $value = shift @_;
+    my $self = shift;
+    my $value = shift;
 
     if (ref $value eq 'U64') {
         $self->[HIGH] += $value->[HIGH] ;
@@ -834,29 +844,32 @@ sub add(@< @_)
     }
 }
 
-sub equal(@< @_)
+sub equal
 {
-    my $self = shift @_;
-    my $other = shift @_;
+    my $self = shift;
+    my $other = shift;
 
     return $self->[LOW]  == $other->[LOW] &&
         $self->[HIGH] == $other->[HIGH] ;
 }
 
-sub getPacked_V64($self)
+sub getPacked_V64
 {
+    my $self = shift;
 
     return pack "V V", < $self->@ ;
 }
 
-sub getPacked_V32($self)
+sub getPacked_V32
 {
+    my $self = shift;
 
     return pack "V", $self->[LOW] ;
 }
 
-sub pack_V64(?$low)
+sub pack_V64
 {
+    my $low  = shift;
 
     return pack "V V", $low, 0;
 }

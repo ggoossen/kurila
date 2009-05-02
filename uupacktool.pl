@@ -17,10 +17,10 @@ Getopt::Long::Configure('no_ignore_case');
 
 our $LastUpdate = -M $^PROGRAM_NAME;
 
-sub handle_file(@< @_) {
-    my $opts    = shift @_;
-    my $file    = shift @_ or die "Need file\n". usage();
-    my $outfile = shift @_ || '';
+sub handle_file {
+    my $opts    = shift;
+    my $file    = shift or die "Need file\n". usage();
+    my $outfile = shift || '';
     $file = vms_check_name($file) if $^OS_NAME eq 'VMS';
     my $mode    = @(stat($file))[2] ^&^ 07777;
 
@@ -86,7 +86,8 @@ EOFBLURB
     }
 }
 
-sub bulk_process(?$opts) {
+sub bulk_process {
+    my $opts = shift;
     my $Manifest = $opts->{?'m'};
 
     open my $fh, "<", $Manifest or die "Could not open '$Manifest':$^OS_ERROR";
@@ -143,7 +144,7 @@ sub bulk_process(?$opts) {
         if $opts->{?'v'};
 }
 
-sub usage(...) {
+sub usage {
     return qq[
 Usage: $^EXECUTABLE_NAME $^PROGRAM_NAME [-d dir] [-v] [-c] [-D] -p|-u [orig [packed|-s] | -m [manifest]]
 
@@ -167,7 +168,15 @@ Options:
 ];
 }
 
-sub vms_check_name(?$file) {
+sub vms_check_name {
+
+    # Packed files tend to have multiple dots, which the CRTL may or may not handle
+    # properly, so convert to native format.  And depending on how the archive was
+    # unpacked, foo.bar.baz may be foo_bar.baz or foo.bar_baz.  N.B. This checks for
+    # existence, so is not suitable as-is to generate ODS-2-safe names in preparation
+    # for file creation.
+
+    my $file = shift;
 
     $file = VMS::Filespec::vmsify($file);
     return $file if -e $file;

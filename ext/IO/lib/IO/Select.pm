@@ -18,9 +18,9 @@ sub VEC_BITS () {0}
 sub FD_COUNT () {1}
 sub FIRST_FD () {2}
 
-sub new(@< @_)
+sub new
 {
-    my $self = shift @_;
+    my $self = shift;
     my $type = ref($self) || $self;
 
     my $vec = bless \@(undef,0), $type;
@@ -59,10 +59,10 @@ sub _fileno($self, $f)
     ($f =~ m/^\d+$/) ?? $f !! fileno($f);
 }
 
-sub _update(@< @_)
+sub _update
 {
-    my $vec = shift @_;
-    my $add = shift @_ eq 'add';
+    my $vec = shift;
+    my $add = shift eq 'add';
 
     my $bits = $vec->[VEC_BITS];
     $bits = '' unless defined $bits;
@@ -93,10 +93,10 @@ sub _update(@< @_)
     $count;
 }
 
-sub can_read(@< @_)
+sub can_read
 {
-    my $vec = shift @_;
-    my $timeout = shift @_;
+    my $vec = shift;
+    my $timeout = shift;
     my $r = $vec->[VEC_BITS];
 
     defined($r) && ((nelems @(select($r,undef,undef,$timeout))) +> 0)
@@ -104,10 +104,10 @@ sub can_read(@< @_)
         !! ();
 }
 
-sub can_write(@< @_)
+sub can_write
 {
-    my $vec = shift @_;
-    my $timeout = shift @_;
+    my $vec = shift;
+    my $timeout = shift;
     my $w = $vec->[VEC_BITS];
 
     defined($w) && (select(undef,$w,undef,$timeout) +> 0)
@@ -115,10 +115,10 @@ sub can_write(@< @_)
         !! ();
 }
 
-sub has_exception(@< @_)
+sub has_exception
 {
-    my $vec = shift @_;
-    my $timeout = shift @_;
+    my $vec = shift;
+    my $timeout = shift;
     my $e = $vec->[?VEC_BITS];
 
     defined($e) && (select(undef,undef,$e,$timeout) +> 0)
@@ -126,18 +126,21 @@ sub has_exception(@< @_)
         !! ();
 }
 
-sub count(?$vec)
+sub count
 {
+    my $vec = shift;
     $vec->[FD_COUNT];
 }
 
-sub bits(?$vec)
+sub bits
 {
+    my $vec = shift;
     $vec->[VEC_BITS];
 }
 
-sub as_string(?$vec)  # for debugging
+sub as_string  # for debugging
 {
+    my $vec = shift;
     my $str = ref($vec) . ": ";
     my $bits = $vec->bits;
     my $count = $vec->count;
@@ -162,9 +165,9 @@ sub _max($a,$b,$c)
         !! $c;
 }
 
-sub select(@< @_)
+sub select
 {
-    shift @_
+    shift
         if defined @_[0] && !ref(@_[0]);
 
     my@($r,$w,$e,$t) =  @_;
@@ -201,10 +204,10 @@ sub select(@< @_)
 }
 
 
-sub handles(@< @_)
+sub handles
 {
-    my $vec = shift @_;
-    my $bits = shift @_;
+    my $vec = shift;
+    my $bits = shift;
     my @h = @( () );
     my $max = scalar(nelems $vec->@) - 1;
 

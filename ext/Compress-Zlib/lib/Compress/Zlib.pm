@@ -64,8 +64,9 @@ our (@my_z_errmsg);
     );
 
 
-sub _set_gzerr(?$value)
+sub _set_gzerr
 {
+    my $value = shift ;
 
     if ($value == 0) {
         $Compress::Zlib::gzerrno = 0 ;
@@ -80,10 +81,10 @@ sub _set_gzerr(?$value)
     return $value ;
 }
 
-sub _save_gzerr(@< @_)
+sub _save_gzerr
 {
-    my $gz = shift @_ ;
-    my $test_eof = shift @_ ;
+    my $gz = shift ;
+    my $test_eof = shift ;
 
     my $value = $gz->errorNo() || 0 ;
 
@@ -184,19 +185,20 @@ sub Compress::Zlib::gzFile::gzwrite($self, $msg)
     return $status ;
 }
 
-sub Compress::Zlib::gzFile::gztell($self)
+sub Compress::Zlib::gzFile::gztell
 {
+    my $self = shift ;
     my $gz = $self->[0] ;
     my $status = $gz->tell() ;
     _save_gzerr($gz);
     return $status ;
 }
 
-sub Compress::Zlib::gzFile::gzseek(@< @_)
+sub Compress::Zlib::gzFile::gzseek
 {
-    my $self   = shift @_ ;
-    my $offset = shift @_ ;
-    my $whence = shift @_ ;
+    my $self   = shift ;
+    my $offset = shift ;
+    my $whence = shift ;
 
     my $gz = $self->[0] ;
     my $status ;
@@ -205,10 +207,10 @@ sub Compress::Zlib::gzFile::gzseek(@< @_)
     return $status ;
 }
 
-sub Compress::Zlib::gzFile::gzflush(@< @_)
+sub Compress::Zlib::gzFile::gzflush
 {
-    my $self = shift @_ ;
-    my $f    = shift @_ ;
+    my $self = shift ;
+    my $f    = shift ;
 
     my $gz = $self->[0] ;
     my $status = $gz->flush($f) ;
@@ -216,8 +218,9 @@ sub Compress::Zlib::gzFile::gzflush(@< @_)
     return $status ?? 0 !! $err;
 }
 
-sub Compress::Zlib::gzFile::gzclose($self)
+sub Compress::Zlib::gzFile::gzclose
 {
+    my $self = shift ;
     my $gz = $self->[0] ;
 
     my $status = $gz->close() ;
@@ -225,15 +228,15 @@ sub Compress::Zlib::gzFile::gzclose($self)
     return $status ?? 0 !! $err;
 }
 
-sub Compress::Zlib::gzFile::gzsetparams(@< @_)
+sub Compress::Zlib::gzFile::gzsetparams
 {
-    my $self = shift @_ ;
+    my $self = shift ;
     croak "Usage: Compress::Zlib::gzFile::gzsetparams(file, level, strategy)"
         unless (nelems @_) eq 2 ;
 
     my $gz = $self->[0] ;
-    my $level = shift @_ ;
-    my $strategy = shift @_;
+    my $level = shift ;
+    my $strategy = shift;
 
     return _set_gzerr(Z_STREAM_ERROR())
         if $self->[1] ne 'deflate';
@@ -244,15 +247,16 @@ sub Compress::Zlib::gzFile::gzsetparams(@< @_)
     return $status ;
 }
 
-sub Compress::Zlib::gzFile::gzerror($self)
+sub Compress::Zlib::gzFile::gzerror
 {
+    my $self = shift ;
     my $gz = $self->[0] ;
 
     return $Compress::Zlib::gzerrno ;
 }
 
 
-sub compress(@< @_)
+sub compress
 {
     my @($x, $output, $err, $in) =@('', '', '', '') ;
 
@@ -279,7 +283,7 @@ sub compress(@< @_)
 
 }
 
-sub uncompress(@< @_)
+sub uncompress
 {
     my @($x, $output, $err, $in) =@('', '', '', '') ;
 
@@ -301,7 +305,7 @@ sub uncompress(@< @_)
 }
 
 
-sub deflateInit(@< @_)
+sub deflateInit
 {
     my $got = ParseParameters(0,
         \%(
@@ -335,7 +339,7 @@ sub deflateInit(@< @_)
     return $x;
 }
 
-sub inflateInit(@< @_)
+sub inflateInit
 {
     my $got = ParseParameters(0,
         \%(
@@ -375,11 +379,11 @@ sub deflate($self, $buffer)
     return @($output, $status);
 }
 
-sub flush(@< @_)
+sub flush
 {
-    my $self = shift @_ ;
+    my $self = shift ;
     my $output ;
-    my $flag = shift @_ || Compress::Zlib::Z_FINISH();
+    my $flag = shift || Compress::Zlib::Z_FINISH();
     my $status = $self->SUPER::flush($output, $flag) ;
 
     return @($output, $status);
@@ -390,9 +394,9 @@ package Zlib::OldInflate ;
 our (@ISA);
 @ISA = qw(Compress::Raw::Zlib::inflateStream);
 
-sub inflate(@< @_)
+sub inflate
 {
-    my $self = shift @_ ;
+    my $self = shift ;
     my $output ;
     my $status = $self->SUPER::inflate(@_[0], $output) ;
     return @($output, $status);
@@ -402,7 +406,7 @@ package Compress::Zlib ;
 
 use IO::Compress::Gzip::Constants v2.006 ;
 
-sub memGzip(@< @_)
+sub memGzip
 {
     my $out;
 
@@ -473,7 +477,7 @@ sub _removeGzipHeader($string)
 }
 
 
-sub memGunzip(@< @_)
+sub memGunzip
 {
     # if the buffer isn't a reference, make it one
     my $string = (ref @_[0] ?? @_[0] !! \@_[0]);

@@ -35,10 +35,10 @@ my $COUNTRIES = \@();
 # code2script ( CODE [, CODESET ] )
 #
 #=======================================================================
-sub code2script(@< @_)
+sub code2script
 {
-    my $code = shift @_;
-    my $codeset = (nelems @_) +> 0 ?? shift @_ !! LOCALE_CODE_DEFAULT;
+    my $code = shift;
+    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT;
 
 
     return undef unless defined $code;
@@ -78,10 +78,10 @@ sub code2script(@< @_)
 # script2code ( SCRIPT [, CODESET ] )
 #
 #=======================================================================
-sub script2code(@< @_)
+sub script2code
 {
-    my $script = shift @_;
-    my $codeset = (nelems @_) +> 0 ?? shift @_ !! LOCALE_CODE_DEFAULT;
+    my $script = shift;
+    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT;
 
 
     return undef unless defined $script;
@@ -105,13 +105,13 @@ sub script2code(@< @_)
 # script_code2code ( CODE, IN-CODESET, OUT-CODESET )
 #
 #=======================================================================
-sub script_code2code(@< @_)
+sub script_code2code
 {
     ((nelems @_) == 3) or croak "script_code2code() takes 3 arguments!";
 
-    my $code = shift @_;
-    my $inset = shift @_;
-    my $outset = shift @_;
+    my $code = shift;
+    my $inset = shift;
+    my $outset = shift;
     my $outcode;
     my $script;
 
@@ -129,9 +129,9 @@ sub script_code2code(@< @_)
 # all_script_codes()
 #
 #=======================================================================
-sub all_script_codes(@< @_)
+sub all_script_codes
 {
-    my $codeset = (nelems @_) +> 0 ?? shift @_ !! LOCALE_CODE_DEFAULT;
+    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT;
 
     return keys  $CODES->[$codeset]->%;
 }
@@ -142,9 +142,9 @@ sub all_script_codes(@< @_)
 # all_script_names()
 #
 #=======================================================================
-sub all_script_names(@< @_)
+sub all_script_names
 {
-    my $codeset = (nelems @_) +> 0 ?? shift @_ !! LOCALE_CODE_DEFAULT;
+    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT;
 
     return values  $CODES->[$codeset]->%;
 }

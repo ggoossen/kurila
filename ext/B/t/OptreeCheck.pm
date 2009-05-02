@@ -298,7 +298,8 @@ BEGIN {
         };
 }
 
-sub import(?$pkg) {
+sub import {
+    my $pkg = shift;
     $pkg->export_to_level(1,'checkOptree', < @EXPORT);
     getCmdLine();	# process @ARGV
 }
@@ -371,7 +372,7 @@ our %msgs # announce cross-testing.
     );
 
 #######
-sub getCmdLine(...) {	# import assistant
+sub getCmdLine {	# import assistant
     # offer help
     print($^STDOUT, qq{\n$^PROGRAM_NAME accepts args to update these state-vars:
 	     turn on a flag by typing its name,
@@ -423,7 +424,7 @@ sub getCmdLine(...) {	# import assistant
 ##############################
 # the API (1 function)
 
-sub checkOptree(@< @_) {
+sub checkOptree {
     my $tc = newTestCases(< @_);	# ctor
     my ($rendering);
 
@@ -450,7 +451,7 @@ sub checkOptree(@< @_) {
     return;
 }
 
-sub newTestCases(@< @_) {
+sub newTestCases {
     # make test objects (currently 1) from args (passed to checkOptree)
     my $tc = bless \%(< @_), __PACKAGE__
         or die "test cases are hashes";
@@ -495,7 +496,8 @@ sub label($tc) {
 #################
 # render and its helpers
 
-sub getRendering(?$tc) {
+sub getRendering {
+    my $tc = shift;
     fail("getRendering: code or prog is required")
         unless $tc->{?code} or $tc->{?prog} or $tc->{?Dx};
 
@@ -559,9 +561,9 @@ sub getRendering(?$tc) {
     return @($rendering, @errs);
 }
 
-sub get_bcopts(@< @_) {
+sub get_bcopts {
     # collect concise passthru-options if any
-    my @($tc) =@( shift @_);
+    my @($tc) =@( shift);
     my @opts = @( () );
     if ($tc->{?bcopts}) {
         @opts = @( (ref $tc->{?bcopts} eq 'ARRAY')
@@ -570,7 +572,9 @@ sub get_bcopts(@< @_) {
     return @opts;
 }
 
-sub checkErrs(?$tc) {
+sub checkErrs {
+    # check rendering errs against expected errors, reduce and report
+    my $tc = shift;
 
     # check for agreement, by hash (order less important)
     my (%goterrs, @got);
@@ -592,7 +596,9 @@ sub checkErrs(?$tc) {
     fail("FORCED: $tc->{?name}:\n") if %gOpts{?fail}; # silly ?
 }
 
-sub diag_or_fail(?$tc) {
+sub diag_or_fail {
+    # help checkErrs
+    my $tc = shift;
 
     my @lines;
     push @lines, "got unexpected:", < sort keys $tc->{?goterrs}->% if $tc->{?goterrs}->%;
@@ -721,7 +727,9 @@ sub mkCheckRex($tc, $want) {
 ##############
 # compare and report
 
-sub mylike(?$tc) {
+sub mylike {
+    # reworked mylike to use hash-obj
+    my $tc	= shift;
     my $got	= $tc->{?got};
     my $want	= $tc->{?rex};
     my $cmnt	= $tc->{?name};
@@ -752,7 +760,14 @@ sub mylike(?$tc) {
     return $ok;
 }
 
-sub reduceDiffs(?$tc) {
+sub reduceDiffs {
+    # isolate the real diffs and report them.
+    # i.e. these kinds of errs:
+    # 1. missing or extra ops.  this skews all following op-sequences
+    # 2. single op diff, the rest of the chain is unaltered
+    # in either case, std err report is inadequate;
+
+    my $tc	= shift;
     my $got	= $tc->{?got};
     my @got	= split(m/\n/, $got);
     my $want	= $tc->{?wantstr};
@@ -862,7 +877,12 @@ tested.
 
 =cut
 
-sub runSelftest(?$tc) {
+sub runSelftest {
+    # tests the regex produced by mkCheckRex()
+    # by using on the expect* text it was created with
+    # failures indicate a code bug, 
+    # OR regexs plugged into the expect* text (which defeat conversions)
+    my $tc = shift;
 
     for my $provenance (qw/ expect expect_nt /) {
         #next unless $tc->{$provenance};
@@ -875,7 +895,7 @@ sub runSelftest(?$tc) {
 
 my $dumploaded = 0;
 
-sub mydumper(@< @_) {
+sub mydumper {
 
     do { Dumper(< @_); return } if $dumploaded;
 
@@ -900,8 +920,8 @@ sub mydumper(@< @_) {
 ############################
 # support for test writing
 
-sub preamble(@< @_) {
-    my $testct = shift @_ || 1;
+sub preamble {
+    my $testct = shift || 1;
     return <<EO_HEADER;
 #!perl
 
@@ -917,7 +937,8 @@ EO_HEADER
 
 }
 
-sub OptreeCheck::wrap(?$code) {
+sub OptreeCheck::wrap {
+    my $code = shift;
     $code =~ s/(?:(\#.*?)\n)//gsm;
     $code =~ s/\s+/ /mgs;	       
     chomp $code;
@@ -967,7 +988,7 @@ sub OptreeCheck::gentest($code, ?$opts) {
 }
 
 
-sub OptreeCheck::processExamples(@< @_) {
+sub OptreeCheck::processExamples {
     my @files = @_;
 
     # gets array of paragraphs, which should be code-samples.  Theyre

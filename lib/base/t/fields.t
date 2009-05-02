@@ -11,8 +11,8 @@ package Foo;
 use fields < qw(_no Pants who _up_yours);
 use fields < qw(what);
 
-sub new(@< @_) { fields::new(shift @_) }
-sub magic_new(...) { bless \@() }  # Doesn't 100% work, perl's problem.
+sub new { fields::new(shift) }
+sub magic_new { bless \@() }  # Doesn't 100% work, perl's problem.
 
 package main;
 
@@ -20,7 +20,7 @@ is_deeply( \(sort keys %Foo::FIELDS),
            \sort qw(_no Pants who _up_yours what)
            );
 
-sub show_fields(@< @_) {
+sub show_fields {
     my@($base, $mask) =  @_;
     my $fields = \Symbol::fetch_glob($base.'::FIELDS')->*->%;
     return grep { (%fields::attr{$base}->[$fields->{?$_}] ^&^ $mask) == $mask},
@@ -61,7 +61,7 @@ do {
 do {
     package Foo::Autoviv;
     use fields < qw(foo bar);
-    sub new(@< @_) { fields::new(@_[0]) }
+    sub new { fields::new(@_[0]) }
 
     package main;
     my $a = Foo::Autoviv->new();
@@ -75,8 +75,8 @@ package Test::FooBar;
 
 use fields < qw(a b c);
 
-sub new(@< @_) {
-    my $self = fields::new(shift @_);
+sub new {
+    my $self = fields::new(shift);
     my @(%<%h) =  @_ if (nelems @_);
     $self->{+$_} = %h{$_} for keys %h;
     $self;

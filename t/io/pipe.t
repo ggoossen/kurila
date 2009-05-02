@@ -131,7 +131,7 @@ close $reader;
 
 signals::handler('PIPE') = \&broken_pipe;
 
-sub broken_pipe(...) {
+sub broken_pipe {
     signals::handler('PIPE') = 'IGNORE';       # loop preventer
     printf $^STDOUT, "ok \%d - SIGPIPE\n", curr_test;
 }

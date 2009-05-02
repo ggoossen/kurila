@@ -17,7 +17,7 @@ our ($h_name, @h_aliases, $h_addrtype, $h_length,
     @h_addr_list, $h_addr);
 
 # Class::Struct forbids use of @ISA
-sub import(@< @_) {
+sub import {
     local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
     return Exporter::import(< @_);
 }
@@ -33,7 +33,7 @@ struct 'Net::hostent' => \@(
 
 sub addr($self, @< @_) { $self->addr_list->[0] }
 
-sub populate(@< @_) {
+sub populate {
     return unless (nelems @_);
     my $hob = new();
     $h_name 	 =    $hob->[0]     	     = @_[0];

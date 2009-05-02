@@ -30,13 +30,13 @@ my %proto_number;
 %proto_number{+icmp} = Socket::IPPROTO_ICMP() if defined &Socket::IPPROTO_ICMP;
 my %proto_name = %( < reverse @: < %proto_number );
 
-sub new(@< @_) {
-    my $class = shift @_;
+sub new {
+    my $class = shift;
     unshift(@_, "PeerAddr") if (nelems @_) == 1;
     return $class->SUPER::new(< @_);
 }
 
-sub _cache_proto(@< @_) {
+sub _cache_proto {
     my @proto = @_;
     for ( map { lc($_) }, @( @proto[0], < split(' ', @proto[1]))) {
         %proto_number{+$_} = @proto[2];
@@ -44,8 +44,8 @@ sub _cache_proto(@< @_) {
     %proto_name{+@proto[2]} = @proto[0];
 }
 
-sub _get_proto_number(@< @_) {
-    my $name = lc(shift @_);
+sub _get_proto_number {
+    my $name = lc(shift);
     return undef unless defined $name;
     return %proto_number{?$name} if exists %proto_number{$name};
 
@@ -56,7 +56,8 @@ sub _get_proto_number(@< @_) {
     return @proto[2];
 }
 
-sub _get_proto_name(?$num) {
+sub _get_proto_name {
+    my $num = shift;
     return undef unless defined $num;
     return %proto_name{?$num} if exists %proto_name{$num};
 
@@ -105,9 +106,9 @@ sub _sock_info($addr,$port,$proto) {
         );
 }
 
-sub _error(@< @_) {
-    my $sock = shift @_;
-    my $err = shift @_;
+sub _error {
+    my $sock = shift;
+    my $err = shift;
     do {
             local($^OS_ERROR);
         my $title = ref($sock).": ";
@@ -245,56 +246,56 @@ sub configure($sock,$arg) {
     $sock;
 }
 
-sub connect(@< @_) {
+sub connect {
     (nelems @_) == 2 || (nelems @_) == 3 or
         croak 'usage: $sock->connect(NAME) or $sock->connect(PORT, ADDR)';
-    my $sock = shift @_;
-    return $sock->SUPER::connect((nelems @_) == 1 ?? shift @_ !! pack_sockaddr_in(< @_));
+    my $sock = shift;
+    return $sock->SUPER::connect((nelems @_) == 1 ?? shift !! pack_sockaddr_in(< @_));
 }
 
-sub bind(@< @_) {
+sub bind {
     (nelems @_) == 2 || (nelems @_) == 3 or
         croak 'usage: $sock->bind(NAME) or $sock->bind(PORT, ADDR)';
-    my $sock = shift @_;
-    return $sock->SUPER::bind((nelems @_) == 1 ?? shift @_ !! pack_sockaddr_in(< @_))
+    my $sock = shift;
+    return $sock->SUPER::bind((nelems @_) == 1 ?? shift !! pack_sockaddr_in(< @_))
 }
 
-sub sockaddr(@< @_) {
+sub sockaddr {
     (nelems @_) == 1 or croak 'usage: $sock->sockaddr()';
     my@($sock) =  @_;
     my $name = $sock->sockname;
     $name ?? sockaddr_in($name)[1] !! undef;
 }
 
-sub sockport(@< @_) {
+sub sockport {
     (nelems @_) == 1 or croak 'usage: $sock->sockport()';
     my@($sock) =  @_;
     my $name = $sock->sockname;
     $name ?? sockaddr_in($name)[0] !! undef;
 }
 
-sub sockhost(@< @_) {
+sub sockhost {
     (nelems @_) == 1 or croak 'usage: $sock->sockhost()';
     my@($sock) =  @_;
     my $addr = $sock->sockaddr;
     $addr ?? inet_ntoa($addr) !! undef;
 }
 
-sub peeraddr(@< @_) {
+sub peeraddr {
     (nelems @_) == 1 or croak 'usage: $sock->peeraddr()';
     my@($sock) =  @_;
     my $name = $sock->peername;
     $name ?? sockaddr_in($name)[1] !! undef;
 }
 
-sub peerport(@< @_) {
+sub peerport {
     (nelems @_) == 1 or croak 'usage: $sock->peerport()';
     my@($sock) =  @_;
     my $name = $sock->peername;
     $name ?? sockaddr_in($name)[0] !! undef;
 }
 
-sub peerhost(@< @_) {
+sub peerhost {
     (nelems @_) == 1 or croak 'usage: $sock->peerhost()';
     my@($sock) =  @_;
     my $addr = $sock->peeraddr;

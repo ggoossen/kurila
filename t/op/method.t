@@ -13,12 +13,12 @@ plan tests => 50;
 @A::ISA = @( 'B' );
 @B::ISA = @( 'C' );
 
-sub C::d(...) {"C::d"}
-sub D::d(...) {"D::d"}
+sub C::d {"C::d"}
+sub D::d {"D::d"}
 
 # First, some basic checks of method-calling syntax:
 my $obj = bless \@(), "Pack";
-sub Pack::method(@< @_) { shift @_; join(",", @( "method", < @_)) }
+sub Pack::method { shift; join(",", @( "method", < @_)) }
 my $mname = "method";
 
 is(Pack->method("a","b","c"), "method,a,b,c");
@@ -83,7 +83,7 @@ is(A->d, "C::d");
 # test that failed subroutine calls don't affect method calls
 do {
     package A1;
-    sub foo(...) { "foo" }
+    sub foo { "foo" }
     package A2;
     our @ISA = @( 'A1' );
         package main;
@@ -155,13 +155,13 @@ is( main::Foo->boogie(), "yes, sir!");
     package main;
 our @X;
     package Amajor;
-sub test(@< @_) {
+sub test {
     push @main::X, 'Amajor', < @_;
 }
 package Bminor;
 use base < qw(Amajor);
     package main;
-sub Bminor::test(@< @_) {
+sub Bminor::test {
     @_[0]->Bminor::SUPER::test('x', 'y');
     push @main::X, 'Bminor', < @_;
 }

@@ -386,7 +386,8 @@ This method should not be invoked by the user directly.
 
 # Arguments have already been read by this point
 
-sub initialize($self) {
+sub initialize {
+    my $self = shift;
 
     # print Dumper($self);
 
@@ -496,10 +497,10 @@ package. This is not yet added to the preamble automatically.
 
 =cut
 
-sub AddPreamble(@< @_) {
-    my $self = shift @_;
+sub AddPreamble {
+    my $self = shift;
     if ((nelems @_)) {
-        $self->{+AddPreamble} = shift @_;
+        $self->{+AddPreamble} = shift;
     }
     return $self->{?AddPreamble};
 }
@@ -523,10 +524,10 @@ be written that could be immediately processed by C<latex>.
 
 =cut
 
-sub AddPostamble(@< @_) {
-    my $self = shift @_;
+sub AddPostamble {
+    my $self = shift;
     if ((nelems @_)) {
-        $self->{+AddPostamble} = shift @_;
+        $self->{+AddPostamble} = shift;
     }
     return $self->{?AddPostamble};
 }
@@ -563,10 +564,10 @@ Default is for a value of 1 (i.e. a C<section>).
 
 =cut
 
-sub Head1Level(@< @_) {
-    my $self = shift @_;
+sub Head1Level {
+    my $self = shift;
     if ((nelems @_)) {
-        my $arg = shift @_;
+        my $arg = shift;
         if ($arg =~ m/^\d$/ && $arg +< nelems @LatexSections) {
             $self->{+Head1Level} = $arg;
         } else {
@@ -601,10 +602,10 @@ Default value is C<undef>.
 
 =cut
 
-sub Label(@< @_) {
-    my $self = shift @_;
+sub Label {
+    my $self = shift;
     if ((nelems @_)) {
-        $self->{+Label} = shift @_;
+        $self->{+Label} = shift;
     }
     return $self->{?Label};
 }
@@ -629,10 +630,10 @@ but sections are numbered).
 
 =cut
 
-sub LevelNoNum(@< @_) {
-    my $self = shift @_;
+sub LevelNoNum {
+    my $self = shift;
     if ((nelems @_)) {
-        $self->{+LevelNoNum} = shift @_;
+        $self->{+LevelNoNum} = shift;
     }
     return $self->{?LevelNoNum};
 }
@@ -652,10 +653,10 @@ Default is for an index to be created.
 
 =cut
 
-sub MakeIndex(@< @_) {
-    my $self = shift @_;
+sub MakeIndex {
+    my $self = shift;
     if ((nelems @_)) {
-        $self->{+MakeIndex} = shift @_;
+        $self->{+MakeIndex} = shift;
     }
     return $self->{?MakeIndex};
 }
@@ -698,10 +699,10 @@ Default is to translate the pod literally.
 
 =cut
 
-sub ReplaceNAMEwithSection(@< @_) {
-    my $self = shift @_;
+sub ReplaceNAMEwithSection {
+    my $self = shift;
     if ((nelems @_)) {
-        $self->{+ReplaceNAMEwithSection} = shift @_;
+        $self->{+ReplaceNAMEwithSection} = shift;
     }
     return $self->{?ReplaceNAMEwithSection};
 }
@@ -718,10 +719,10 @@ Default is false.
 
 =cut
 
-sub StartWithNewPage(@< @_) {
-    my $self = shift @_;
+sub StartWithNewPage {
+    my $self = shift;
     if ((nelems @_)) {
-        $self->{+StartWithNewPage} = shift @_;
+        $self->{+StartWithNewPage} = shift;
     }
     return $self->{?StartWithNewPage};
 }
@@ -739,10 +740,10 @@ Default is false.
 
 =cut
 
-sub TableOfContents(@< @_) {
-    my $self = shift @_;
+sub TableOfContents {
+    my $self = shift;
     if ((nelems @_)) {
-        $self->{+TableOfContents} = shift @_;
+        $self->{+TableOfContents} = shift;
     }
     return $self->{?TableOfContents};
 }
@@ -762,10 +763,10 @@ Default is true.
 
 =cut
 
-sub UniqueLabels(@< @_) {
-    my $self = shift @_;
+sub UniqueLabels {
+    my $self = shift;
     if ((nelems @_)) {
-        $self->{+UniqueLabels} = shift @_;
+        $self->{+UniqueLabels} = shift;
     }
     return $self->{?UniqueLabels};
 }
@@ -781,10 +782,10 @@ C<MakeIndex> and C<TableOfContents> will also be ignored.
 
 =cut
 
-sub UserPreamble(@< @_) {
-    my $self = shift @_;
+sub UserPreamble {
+    my $self = shift;
     if ((nelems @_)) {
-        $self->{+UserPreamble} = shift @_;
+        $self->{+UserPreamble} = shift;
     }
     return $self->{?UserPreamble};
 }
@@ -800,10 +801,10 @@ C<MakeIndex> will also be ignored.
 
 =cut
 
-sub UserPostamble(@< @_) {
-    my $self = shift @_;
+sub UserPostamble {
+    my $self = shift;
     if ((nelems @_)) {
-        $self->{+UserPostamble} = shift @_;
+        $self->{+UserPostamble} = shift;
     }
     return $self->{?UserPostamble};
 }
@@ -826,7 +827,8 @@ Returns array ref in scalar context
 
 
 
-sub lists($self) {
+sub lists {
+    my $self = shift;
     return $self->{?_Lists};
 }
 
@@ -858,7 +860,8 @@ is defined.
 
 =cut
 
-sub begin_pod($self) {
+sub begin_pod {
+    my $self = shift;
 
     # Get the pod identification
     # This should really come from the '=head1 NAME' paragraph
@@ -947,7 +950,8 @@ is true. Writes a standard header unless a UserPostamble is defined.
 
 =cut
 
-sub end_pod($self) {
+sub end_pod {
+    my $self = shift;
 
     # End string
     my $end = '';
@@ -1328,10 +1332,10 @@ list stack.
 
 =cut
 
-sub begin_list(@< @_) {
-    my $self = shift @_;
-    my $indent = shift @_;
-    my $line_num = shift @_;
+sub begin_list {
+    my $self = shift;
+    my $indent = shift;
+    my $line_num = shift;
 
     # Indicate that a list should be started for the next item
     # need to do this to work out the type of list
@@ -1352,9 +1356,9 @@ the C<latex> code required to close a list.
 
 =cut
 
-sub end_list(@< @_) {
-    my $self = shift @_;
-    my $line_num = shift @_;
+sub end_list {
+    my $self = shift;
+    my $line_num = shift;
 
     unless (defined $self->lists->[-1]) {
         my $file = $self->input_file;
@@ -1387,10 +1391,10 @@ and the relevant latex code issued.
 
 =cut
 
-sub add_item(@< @_) {
-    my $self = shift @_;
-    my $paragraph = shift @_;
-    my $line_num = shift @_;
+sub add_item {
+    my $self = shift;
+    my $paragraph = shift;
+    my $line_num = shift;
 
     unless (defined $self->lists->[-1]) {
         my $file = $self->input_file;
@@ -1479,11 +1483,11 @@ object so that the line number can be extracted.
 
 =cut
 
-sub head(@< @_) {
-    my $self = shift @_;
-    my $num = shift @_;
-    my $paragraph = shift @_;
-    my $parobj = shift @_;
+sub head {
+    my $self = shift;
+    my $num = shift;
+    my $paragraph = shift;
+    my $parobj = shift;
 
     # If we are replace 'head1 NAME' with a section
     # we return immediately if we get it
@@ -1543,9 +1547,9 @@ ignored.
 
 =cut
 
-sub _output(@< @_) { 
-    my $self = shift @_;
-    my $text = shift @_;
+sub _output { 
+    my $self = shift;
+    my $text = shift;
 
     print  $self->output_handle  ,$text
         unless $self->{?_suppress_all_para};
@@ -1582,9 +1586,9 @@ Special characters and the C<latex> equivalents are:
 
 =cut
 
-sub _replace_special_chars(@< @_) {
-    my $self = shift @_;
-    my $paragraph = shift @_;
+sub _replace_special_chars {
+    my $self = shift;
+    my $paragraph = shift;
 
     # Replace a \ with $\backslash$
     # This is made more complicated because the dollars will be escaped
@@ -1623,9 +1627,9 @@ Does the following transformation:
 
 =cut
 
-sub _replace_special_chars_late(@< @_) {
-    my $self = shift @_;
-    my $paragraph = shift @_;
+sub _replace_special_chars_late {
+    my $self = shift;
+    my $paragraph = shift;
 
     # < and >
     $paragraph =~ s/(<|>)/\$$1\$/g;
@@ -1656,9 +1660,9 @@ be called to create a Label() without prefixing a previous setting.
 
 =cut
 
-sub _create_label(@< @_) {
-    my $self = shift @_;
-    my $paragraph = shift @_;
+sub _create_label {
+    my $self = shift;
+    my $paragraph = shift;
     my $suppress = ((nelems @_) ?? 1 !! 0 );
 
     # Remove latex commands
@@ -1697,9 +1701,9 @@ sub-entries in an index.
 
 =cut
 
-sub _create_index(@< @_) {
-    my $self = shift @_;
-    my $paragraph = shift @_;
+sub _create_index {
+    my $self = shift;
+    my $paragraph = shift;
     my $suppress = ((nelems @_) ?? 1 !! 0 );
 
     # Remove latex commands
@@ -1728,9 +1732,9 @@ form C<\command{ text }>. "C<text>" is retained
 
 =cut
 
-sub _clean_latex_commands(@< @_) {
-    my $self = shift @_;
-    my $paragraph = shift @_;
+sub _clean_latex_commands {
+    my $self = shift;
+    my $paragraph = shift;
 
     # Remove latex commands of the form \text{ }
     # and replace with the contents of the { }
@@ -1764,10 +1768,10 @@ The length indicates the maximum length of hunk1.
 # initially Supplied by hsmyers@sdragons.com
 # 10/25/01, utility to split \hbox
 # busting lines. Reformatted by TimJ to match module style.
-sub _split_delimited(@< @_) {
-    my $self = shift @_;
-    my $input = shift @_;
-    my $limit = shift @_;
+sub _split_delimited {
+    my $self = shift;
+    my $input = shift;
+    my $limit = shift;
 
     # Return immediately if already small
     return  @($input, '') if length($input) +< $limit;

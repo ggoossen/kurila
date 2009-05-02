@@ -170,8 +170,8 @@ EOH
     }
 }
 
-sub help_mess(@< @_) {
-    my $args = shift @_;
+sub help_mess {
+    my $args = shift;
     my $h = output_h;
     if ((nelems @_) and defined &main::HELP_MESSAGE) {
         main::HELP_MESSAGE($h, __PACKAGE__, $VERSION, $args);

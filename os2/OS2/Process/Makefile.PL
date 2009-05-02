@@ -16,7 +16,7 @@ WriteMakefile(
 		   ),
 );
 
-sub create_constants(...) {
+sub create_constants {
   return if -d 'Process_constants';
   my $src_dir;
   my @try = qw(.. ../.. ../../.. ../../../..);

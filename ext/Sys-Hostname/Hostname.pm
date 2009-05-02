@@ -19,7 +19,7 @@ BEGIN {
 }
 
 
-sub hostname(...) {
+sub hostname {
 
     # we already know it
     return $host if defined $host;

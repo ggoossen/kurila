@@ -35,6 +35,6 @@ foreach my $test (@test) {
 
 package MyTie;
 
-sub TIEHANDLE(...) { bless \%() }
-sub DESTROY(...) {}
+sub TIEHANDLE { bless \%() }
+sub DESTROY {}
 

@@ -31,8 +31,9 @@ my %CURRENCIES = %( () );
 # code2currency( CODE )
 #
 #=======================================================================
-sub code2currency(?$code)
+sub code2currency
 {
+    my $code = shift;
 
 
     return undef unless defined $code;
@@ -56,8 +57,9 @@ sub code2currency(?$code)
 # currency2code ( CURRENCY )
 #
 #=======================================================================
-sub currency2code(?$curr)
+sub currency2code
 {
+    my $curr = shift;
 
 
     return undef unless defined $curr;
@@ -81,7 +83,7 @@ sub currency2code(?$curr)
 # all_currency_codes()
 #
 #=======================================================================
-sub all_currency_codes(...)
+sub all_currency_codes
 {
     return keys %CODES;
 }
@@ -92,7 +94,7 @@ sub all_currency_codes(...)
 # all_currency_names()
 #
 #=======================================================================
-sub all_currency_names(...)
+sub all_currency_names
 {
     return values %CODES;
 }

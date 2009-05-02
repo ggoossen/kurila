@@ -35,9 +35,9 @@ do {
            );
 };
 
-sub new(@< @_) {
+sub new {
     (nelems @_) == 3 || croak 'new IPC::Msg ( KEY , FLAGS )';
-    my $class = shift @_;
+    my $class = shift;
 
     my $id = msgget(@_[0],@_[1]);
 
@@ -46,23 +46,25 @@ sub new(@< @_) {
         !! undef;
 }
 
-sub id($self) {
+sub id {
+    my $self = shift;
     $self->$;
 }
 
-sub stat($self) {
+sub stat {
+    my $self = shift;
     my $data = "";
     msgctl($self->$,IPC_STAT,$data) or
         return undef;
     IPC::Msg::stat->new->unpack($data);
 }
 
-sub set(@< @_) {
-    my $self = shift @_;
+sub set {
+    my $self = shift;
     my $ds;
 
     if((nelems @_) == 1) {
-        $ds = shift @_;
+        $ds = shift;
     }
     else {
         croak 'Bad arg count' if (nelems @_) % 2;
@@ -77,7 +79,8 @@ sub set(@< @_) {
     msgctl($self->$,IPC_SET,$ds->pack);
 }
 
-sub remove($self) {
+sub remove {
+    my $self = shift;
     @(msgctl($self->$,IPC_RMID,0), undef $self->$)[0];
 }
 
@@ -90,9 +93,9 @@ sub rcv($self, $buf, $len, ?$type, ?$flags) {
     return $type;
 }
 
-sub snd(@< @_) {
+sub snd {
     (nelems @_) +<= 4 && (nelems @_) +>= 3 or  croak '$msg->snd( TYPE, BUF, FLAGS )';
-    my $self = shift @_;
+    my $self = shift;
     msgsnd($self->$,pack("l! a*",@_[0],@_[1]), @_[2] || 0);
 }
 

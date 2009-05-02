@@ -143,40 +143,40 @@ our $Me = 'open3 (bug)';	# you should never see this, it's always localized
 
 # Fatal.pm needs to be fixed WRT prototypes.
 
-sub xfork(...) {
+sub xfork {
     my $pid = fork;
     defined $pid or die "$Me: fork failed: $^OS_ERROR";
     return $pid;
 }
 
-sub xpipe(@< @_) {
+sub xpipe {
     pipe @_[0], @_[1] or die "$Me: pipe(" . Symbol::glob_name(@_[0]) . ", " . Symbol::glob_name(@_[1]) . ") failed: $^OS_ERROR";
 }
 
 # I tried using a * prototype character for the filehandle but it still
 # disallows a bearword while compiling under strict subs.
 
-sub xopen(@< @_) {
+sub xopen {
     open @_[0], @_[1], @_[2] or die "$Me: open(...)"; # . Symbol::glob_name($_[0]) . ", $_[1], " . Symbol::glob_name($_[2]) . ") failed: $!";
 }
 
-sub xclose(@< @_) {
+sub xclose {
     close @_[0] or die "$Me: close(*" . Symbol::glob_name(@_[0]->*) . ") failed: $^OS_ERROR";
 }
 
-sub fh_is_fd(@< @_) {
+sub fh_is_fd {
     return ref \@_[0] eq "SCALAR" && @_[0] =~ m/\A=?(\d+)\z/;
 }
 
-sub xfileno(@< @_) {
+sub xfileno {
     return $1 if ref \@_[0] eq "SCALAR" and @_[0] =~ m/\A=?(\d+)\z/;  # deal with fh just being an fd
     return fileno @_[0];
 }
 
 my $do_spawn = $^OS_NAME eq 'os2' || $^OS_NAME eq 'MSWin32';
 
-sub _open3(@< @_) {
-    local $Me = shift @_;
+sub _open3 {
+    local $Me = shift;
     my@($package, $dad_wtr, $dad_rdr, $dad_err, @< @cmd) =  @_;
     my($dup_wtr, $dup_rdr, $dup_err, $kidpid);
 
@@ -327,16 +327,16 @@ sub _open3(@< @_) {
     $kidpid;
 }
 
-sub open3(@< @_) {
+sub open3 {
     if ((nelems @_) +< 4) {
         die "open3($(join ', ',@_)): not enough arguments";
     }
     return _open3 'open3', scalar caller, < @_
 }
 
-sub spawn_with_handles(@< @_) {
-    my $fds = shift @_;		# Fields: handle, mode, open_as
-    my $close_in_child = shift @_;
+sub spawn_with_handles {
+    my $fds = shift;		# Fields: handle, mode, open_as
+    my $close_in_child = shift;
     my ($pid, @saved_fh, $saved, %saved, @errs);
     require Fcntl;
 

@@ -3,7 +3,7 @@
 use Test::More tests => 22;
 
 # open::import expects 'open' as its first argument, but it clashes with open()
-sub import(@< @_) {
+sub import {
     open::import( 'open', < @_ );
 }
 
@@ -74,7 +74,7 @@ EOE
     print $f, <@a;
     close $f;
 
-    sub systell(@< @_) {
+    sub systell {
         use Fcntl 'SEEK_CUR';
         sysseek(@_[0], 0, SEEK_CUR);
     }
@@ -108,7 +108,7 @@ EOE
     ok($ok == (nelems @a),
        "on :utf8 streams sysread() should work on characters, not bytes");
 
-    sub diagnostics(...) {
+    sub diagnostics {
         print $^STDOUT, '# ord($_)           == ', ord($_), "\n";
         print $^STDOUT, '# bytes::length($_) == ', bytes::length($_), "\n";
         print $^STDOUT, '# systell(G)        == ', systell('G'), "\n";

@@ -57,7 +57,7 @@ SKIP: do {
     # FIXME - more of these could be tested without Encode or full perl
     skip("miniperl does not have Encode", $NTEST) if env::var('PERL_CORE_MINITEST');
 
-    sub check(@< @_) {
+    sub check {
         my @($result, $expected, $id) =  @_;
         # An interesting dance follows where we try to make the following
         # IO layer stack setups to compare equal:

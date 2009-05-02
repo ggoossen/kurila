@@ -2,7 +2,8 @@
 use Test::More;
 plan tests => 5;
 
-sub source_path(?$file) {
+sub source_path {
+    my $file = shift;
     if (env::var('PERL_CORE')) {
         require File::Spec;
         my $updir = File::Spec->updir;

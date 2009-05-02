@@ -37,7 +37,7 @@ our ($pw_name, $pw_passwd, $pw_uid, $pw_gid, $pw_change, $pw_age,
 my $IE = "[INTERNAL ERROR]";
 
 # Class::Struct forbids use of @ISA
-sub import(@< @_) {
+sub import {
     local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
     return Exporter::import(< @_);
 }
@@ -73,7 +73,7 @@ struct 'User::pwent' => \@(
 # init our groks hash to be true if the built platform knew how
 # to do each struct pwd field that perl can ever under any circumstances
 # know about.  we do not use /^pw_?/, but just the tails.
-sub _feature_init(...) {
+sub _feature_init {
     our %Groks;         # whether build system knew how to do this feature
     for my $feep ( qw{
                          pwage      pwchange   pwclass    pwcomment
@@ -110,7 +110,7 @@ sub _feature_init(...) {
 # a field that Perl never knows how to provide under any circumstances.
 # If the module does this idiocy to itself, the explosion is noisier.
 #
-sub pw_has(@< @_) {
+sub pw_has {
     our %Groks;         # whether build system knew how to do this feature
     my $cando = 1;
     my $sploder = caller() ne __PACKAGE__
@@ -128,7 +128,7 @@ sub pw_has(@< @_) {
     return $cando;
 }
 
-sub _populate(@< @_) {
+sub _populate {
     return unless (nelems @_);
     my $pwob = new();
 

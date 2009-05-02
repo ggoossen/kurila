@@ -96,7 +96,7 @@ is ($i, 5);
 our @tests = @(&next_test( < @_ ), &next_test( < @_ ), &next_test( < @_ ));
 do {
     package Obj;
-    sub DESTROY(...) { print $^STDOUT, "ok @::tests[?1] # DESTROY called\n"; }
+    sub DESTROY { print $^STDOUT, "ok @::tests[?1] # DESTROY called\n"; }
     do {
         my $h = \%( A => bless \@(), __PACKAGE__ );
         while (my@(?$k,?$v) =@( each $h->%)) {

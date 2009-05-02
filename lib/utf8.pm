@@ -12,19 +12,19 @@ BEGIN {
 our $VERSION = '1.07';
 
 # toggle utf8/codepoints hints
-sub import(...) {
+sub import {
     $^HINT_BITS ^|^= $utf8::hint_bits;
     $^HINT_BITS ^|^= $utf8::codepoints_hint_bits;
     $^HINT_BITS ^&^= ^~^$bytes::hint_bits;
 }
 
-sub unimport(...) {
+sub unimport {
     $^HINT_BITS ^&^= ^~^$utf8::hint_bits;
     $^HINT_BITS ^&^= ^~^$utf8::codepoints_hint_bits;
 }
 
 # SWASHNEW
-sub SWASHNEW(@< @_) {
+sub SWASHNEW {
     require "utf8_heavy.pl";
     return utf8::SWASHNEW_real(< @_);
 }

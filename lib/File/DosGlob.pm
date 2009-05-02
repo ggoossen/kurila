@@ -13,8 +13,8 @@ our $VERSION = '1.01';
 
 use warnings;
 
-sub doglob(@< @_) {
-    my $cond = shift @_;
+sub doglob {
+    my $cond = shift;
     my @retval = @( () );
   #print "doglob: ", join('|', @_), "\n";
   OUTER:
@@ -98,8 +98,8 @@ sub doglob(@< @_) {
 #
 # Do DOS-like globbing on Mac OS 
 #
-sub doglob_Mac(@< @_) {
-    my $cond = shift @_;
+sub doglob_Mac {
+    my $cond = shift;
     my @retval = @( () );
 
   #print "doglob_Mac: ", join('|', @_), "\n";
@@ -216,7 +216,7 @@ sub doglob_Mac(@< @_) {
 #   unchanged. 
 # Note that the returned array of patterns may be empty.
 #  
-sub _expand_volume(@< @_) {
+sub _expand_volume {
 
     require MacPerl; # to be verbose
 
@@ -267,7 +267,7 @@ sub _expand_volume(@< @_) {
 # Resolves any updirs in the pattern. Removes a single trailing colon 
 # from the pattern, unless it's a volume name pattern like "*HD:"
 #
-sub _preprocess_pattern(@< @_) {
+sub _preprocess_pattern {
     my @pat = @_;
 
     foreach my $p ( @pat) {
@@ -288,7 +288,7 @@ sub _preprocess_pattern(@< @_) {
 # Unescapes a list of arguments which may contain escaped 
 # metachars '*', '?' and '\'.
 #
-sub _un_escape(@< @_) {
+sub _un_escape {
     foreach ( @_) {
         s/\\([*?\\])/$1/g;
     }
@@ -389,10 +389,10 @@ sub glob($pat,$cxix) {
 }
 
 do {
-    sub import(@< @_) {
-        my $pkg = shift @_;
+    sub import {
+        my $pkg = shift;
         return unless (nelems @_);
-        my $sym = shift @_;
+        my $sym = shift;
         my $callpkg = ($sym =~ s/^GLOBAL_//s ?? 'CORE::GLOBAL' !! caller(0));
         Symbol::fetch_glob($callpkg.'::'.$sym)->* = \&{Symbol::fetch_glob($pkg.'::'.$sym)->*} if $sym eq 'glob';
     }

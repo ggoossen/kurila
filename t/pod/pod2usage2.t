@@ -13,7 +13,7 @@ BEGIN {
 }
 use Pod::Usage;
 
-sub getoutput(@< @_)
+sub getoutput
 {
     my @($code) =  @_;
     my $pid = open(my $in, "-|", "-");

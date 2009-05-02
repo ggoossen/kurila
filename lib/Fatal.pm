@@ -6,7 +6,7 @@ $VERSION = 1.06;
 
 $Debug = 0 unless defined $Debug;
 
-sub import(@< @_) {
+sub import {
     my $self = shift(@_);
     my $pkg = @(caller)[0];
     foreach my $sym (@_) {
@@ -14,7 +14,8 @@ sub import(@< @_) {
     }
 };
 
-sub fill_protos(?$proto) {
+sub fill_protos {
+    my $proto = shift;
     my $n = -1;
     my ($isref, @out, @out1, $seen_semi);
     while ($proto =~ m/\S/) {

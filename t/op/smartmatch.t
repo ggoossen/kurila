@@ -34,7 +34,7 @@ for my $test ( @tests) {
     match_test($yn, $right, $left);
 }
 
-sub match_test(@< @_) {
+sub match_test {
     my @($yn, $left, $right) =  @_;
 
     die "Bad test spec: ($yn, $left, $right)"
@@ -51,9 +51,9 @@ sub match_test(@< @_) {
 
 
 
-sub foo(...) {}
-sub bar(...) {2}
-sub fatal(...) {die}
+sub foo {}
+sub bar {2}
+sub fatal {die}
 
 sub a_const() {die if (nelems @_); "a constant"}
 sub b_const() {die if (nelems @_); "a constant"}

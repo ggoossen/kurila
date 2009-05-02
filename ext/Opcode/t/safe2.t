@@ -57,7 +57,7 @@ our %bar = %(key => "ok 9\n");
 our @baz = @( () ); push(@baz, "o", "10");
 our @glob = qw(not ok 16);
 
-sub sayok(@< @_) { print $^STDOUT, "ok $(join ' ',@_)\n" }
+sub sayok { print $^STDOUT, "ok $(join ' ',@_)\n" }
 
 $cpt->share( <qw($foo %bar @baz sayok));
 

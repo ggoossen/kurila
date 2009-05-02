@@ -11,14 +11,14 @@ use Carp ;
 use Test::More ; 
 
 
-sub title(@< @_)
+sub title
 {
     #diag "" ; 
     ok 1, @_[0] ;
 #diag "" ;
 }
 
-sub like_eval(@< @_)
+sub like_eval
 {
     like $^EVAL_ERROR->{?description}, nelems @_ ;
 }
@@ -29,9 +29,9 @@ do {
     our ($index);
     $index = '00000';
 
-    sub new(@< @_)
+    sub new
     {
-        my $self = shift @_ ;
+        my $self = shift ;
         foreach ( @_)
         {
             # autogenerate the name unless if none supplied
@@ -43,8 +43,9 @@ do {
         bless \ @_, $self ;
     }
 
-    sub DESTROY($self)
+    sub DESTROY
     {
+        my $self = shift ;
         chmod 0777, <  $self->@ ;
         for ( $self->@) { 1 while unlink $_ } ;
     }
@@ -55,20 +56,22 @@ do {
     package LexDir ;
 
     use File::Path;
-    sub new(@< @_)
+    sub new
     {
-        my $self = shift @_ ;
+        my $self = shift ;
         foreach ( @_) { rmtree $_ }
         bless \ @_, $self ;
     }
 
-    sub DESTROY($self)
+    sub DESTROY
     {
+        my $self = shift ;
         foreach ( $self->@) { rmtree $_ }
     }
 };
-sub readFile(?$f)
+sub readFile
 {
+    my $f = shift ;
 
     my @strings ;
 
@@ -91,7 +94,7 @@ sub readFile(?$f)
     return join "", @strings ;
 }
 
-sub touch(@< @_)
+sub touch
 {
     foreach ( @_) { writeFile($_, '') }
 }
@@ -109,9 +112,9 @@ sub writeFile($filename, @< @strings)
     close $fh ;
 }
 
-sub GZreadFile(@< @_)
+sub GZreadFile
 {
-    my @($filename) =@( shift @_) ;
+    my @($filename) =@( shift) ;
 
     my $uncomp = "" ;
     my $line = "" ;
@@ -125,8 +128,9 @@ sub GZreadFile(@< @_)
     return $uncomp ;
 }
 
-sub hexDump(?$d)
+sub hexDump
 {
+    my $d = shift ;
 
     if (IO::Compress::Base::Common::isaFilehandle($d))
     {
@@ -162,9 +166,9 @@ sub hexDump(?$d)
 
 }
 
-sub readHeaderInfo(@< @_)
+sub readHeaderInfo
 {
-    my $name = shift @_ ;
+    my $name = shift ;
     my %opts = %( < @_ ) ;
 
     my $string = <<EOM;
@@ -197,10 +201,10 @@ sub cmpFile($filename, $uue)
     return readFile($filename) eq unpack("u", $uue) ;
 }
 
-sub uncompressBuffer(@< @_)
+sub uncompressBuffer
 {
-    my $compWith = shift @_ ;
-    my $buffer = shift @_ ;
+    my $compWith = shift ;
+    my $buffer = shift ;
 
     my %mapping = %( 'IO::Compress::Gzip'                     => 'IO::Uncompress::Gunzip',
             'IO::Compress::Gzip::gzip'               => 'IO::Uncompress::Gunzip',
@@ -319,34 +323,38 @@ my %inverse  = %( 'IO::Compress::Gzip'                    => 'IO::Uncompress::Gu
 
 %inverse  = %( < @+: map { @($_ => %inverse{?$_}, %inverse{?$_} => $_) }, keys %inverse );
 
-sub getInverse(?$class)
+sub getInverse
 {
+    my $class = shift ;
 
     return %inverse{?$class} ;
 }
 
-sub getErrorRef(?$class)
+sub getErrorRef
 {
+    my $class = shift ;
 
     return %ErrorMap{?$class} ;
 }
 
-sub getTopFuncRef(?$class)
+sub getTopFuncRef
 {
+    my $class = shift ;
 
     return \&{ %TopFuncMap{?$class} } ;
 }
 
-sub getTopFuncName(?$class)
+sub getTopFuncName
 {
+    my $class = shift ;
 
     return %TopFuncMap{?$class}  ;
 }
 
-sub compressBuffer(@< @_)
+sub compressBuffer
 {
-    my $compWith = shift @_ ;
-    my $buffer = shift @_ ;
+    my $compWith = shift ;
+    my $buffer = shift ;
 
     my %mapping = %( 'IO::Uncompress::Gunzip'                  => 'IO::Compress::Gzip',
             'IO::Uncompress::Gunzip::gunzip'          => 'IO::Compress::Gzip',
@@ -383,10 +391,10 @@ BEGIN
     eval ' use IO::Uncompress::AnyUncompress qw($AnyUncompressError); ';
 }
 
-sub anyUncompress(@< @_)
+sub anyUncompress
 {
-    my $buffer = shift @_ ;
-    my $already = shift @_;
+    my $buffer = shift ;
+    my $already = shift;
 
     my @opts = @( () );
     if (ref $buffer && ref $buffer eq 'ARRAY')
@@ -443,10 +451,10 @@ sub anyUncompress(@< @_)
 
 }
 
-sub getHeaders(@< @_)
+sub getHeaders
 {
-    my $buffer = shift @_ ;
-    my $already = shift @_;
+    my $buffer = shift ;
+    my $already = shift;
 
     my @opts = @( () );
     if (ref $buffer && ref $buffer eq 'ARRAY')
@@ -504,10 +512,10 @@ sub getHeaders(@< @_)
 
 }
 
-sub mkComplete(@< @_)
+sub mkComplete
 {
-    my $class = shift @_ ;
-    my $data = shift @_;
+    my $class = shift ;
+    my $data = shift;
     my $Error = getErrorRef($class);
 
     my $buffer ;
@@ -546,8 +554,9 @@ sub mkComplete(@< @_)
     return @($info, $buffer);
 }
 
-sub mkErr(?$string)
+sub mkErr
 {
+    my $string = shift ;
     my @($dummy, $file, $line) =@( caller) ;
     -- $line ;
 
@@ -556,15 +565,16 @@ sub mkErr(?$string)
     return "/$string/";
 }
 
-sub mkEvalErr(?$string)
+sub mkEvalErr
 {
+    my $string = shift ;
 
     return "/$string/" ;
 }
 
-sub dumpObj(@< @_)
+sub dumpObj
 {
-    my $obj = shift @_ ;
+    my $obj = shift ;
 
     my @($dummy, $file, $line) =@( caller) ;
 
@@ -594,15 +604,16 @@ sub dumpObj(@< @_)
 }
 
 
-sub getMultiValues(?$class)
+sub getMultiValues
 {
+    my $class = shift ;
 
     return  @(0,0) if $class =~ m/lzf/i;
     return  @(1,0);
 }
 
 
-sub gotScalarUtilXS(...)
+sub gotScalarUtilXS
 {
     eval ' use Scalar::Util "dualvar" ';
     return $^EVAL_ERROR ?? 0 !! 1 ;

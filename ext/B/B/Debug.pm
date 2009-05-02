@@ -7,7 +7,8 @@ use B < qw(peekop class walkoptree walkoptree_exec
 
 my %done_gv;
 
-sub _printop(?$op) {
+sub _printop {
+    my $op = shift;
     my $addr = $op->$ ?? $op->ppaddr !! '';
     $addr =~ s/^PL_ppaddr// if $addr;
     return sprintf "0x\%x \%s \%s", $op->$, $op->$ ?? class($op) !! '', $addr;
@@ -228,11 +229,13 @@ EOT
     $cv->debug if $cv;
 }
 
-sub B::SPECIAL::debug(?$sv) {
+sub B::SPECIAL::debug {
+    my $sv = shift;
     print $^STDOUT, @specialsv_name[$sv->$], "\n";
 }
 
-sub compile(?$order) {
+sub compile {
+    my $order = shift;
     B::clearsym();
     if ($order && $order eq "exec") {
         return sub { walkoptree_exec(main_start, "debug") }

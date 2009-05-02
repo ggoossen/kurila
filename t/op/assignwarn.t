@@ -15,8 +15,8 @@ use warnings;
 my $warn = "";
 $^WARN_HOOK = sub { print $^STDOUT, $warn; $warn .= @_[0]->{?description} . "\n" };
 
-sub uninitialized(...) { $warn =~ s/Use of uninitialized value[^\n]+\n//s; }
-sub tiex(...) { }
+sub uninitialized { $warn =~ s/Use of uninitialized value[^\n]+\n//s; }
+sub tiex { }
 our $TODO;
 
 print $^STDOUT, "1..32\n";

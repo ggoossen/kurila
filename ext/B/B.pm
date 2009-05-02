@@ -62,8 +62,8 @@ do {
     package B::OBJECT;
 };
 
-sub B::GV::SAFENAME(@< @_) {
-    my $name = (shift( @_))->NAME;
+sub B::GV::SAFENAME {
+    my $name = (shift())->NAME;
 
         # The regex below corresponds to the isCONTROLVAR macro
         # from toke.c
@@ -94,16 +94,18 @@ sub debug($class, $value) {
     walkoptree_debug($value);
 }
 
-sub class(?$obj) {
+sub class {
+    my $obj = shift;
     my $name = ref $obj;
     $name =~ s/^.*:://;
     return $name;
 }
 
-sub parents(...) { \@parents }
+sub parents { \@parents }
 
 # For debugging
-sub peekop(?$op) {
+sub peekop {
+    my $op = shift;
     return sprintf("\%s (0x\%x) \%s", < class($op), $op->$, < $op->name);
 }
 
@@ -133,11 +135,11 @@ sub walkoptree_slow($op, $method, $level) {
     }
 }
 
-sub compile_stats(...) {
+sub compile_stats {
     return "Total number of OPs processed: $op_count\n";
 }
 
-sub timing_info(...) {
+sub timing_info {
     my @($sec, $min, $hr) =@( localtime);
     my @($user, $sys) = times;
     sprintf("\%02d:\%02d:\%02d user=$user sys=$sys",
@@ -146,7 +148,7 @@ sub timing_info(...) {
 
 my %symtable;
 
-sub clearsym(...) {
+sub clearsym {
     %symtable = %( () );
 }
 
@@ -155,7 +157,8 @@ sub savesym($obj, $value) {
     %symtable{+sprintf("sym_\%x", $obj->$)} = $value;
 }
 
-sub objsym(?$obj) {
+sub objsym {
+    my $obj = shift;
     return %symtable{?sprintf("sym_\%x", $obj->$)};
 }
 
@@ -246,27 +249,31 @@ do {
         return %sections{?$section};
     }
 
-    sub add(@< @_) {
-        my $section = shift @_;
-        while (defined($_ = shift @_)) {
+    sub add {
+        my $section = shift;
+        while (defined($_ = shift)) {
             print $output_fh, "$section->[1]\t$_\n";
             $section->[0]++;
         }
     }
 
-    sub index(?$section) {
+    sub index {
+        my $section = shift;
         return $section->[0];
     }
 
-    sub name(?$section) {
+    sub name {
+        my $section = shift;
         return $section->[1];
     }
 
-    sub symtable(?$section) {
+    sub symtable {
+        my $section = shift;
         return $section->[2];
     }
 
-    sub default(?$section) {
+    sub default {
+        my $section = shift;
         return $section->[3];
     }
 

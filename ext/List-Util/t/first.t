@@ -45,14 +45,14 @@ do { package Foo;
 # redefinition takes effect immediately depends on whether we're
 # running the Perl or XS implementation.
 
-sub self_updating(...) { local $^WARNING = undef; *self_updating = sub{1} ;1}
+sub self_updating { local $^WARNING = undef; *self_updating = sub{1} ;1}
 try { $v = first \&self_updating, 1,2; };
 is($^EVAL_ERROR, '', 'redefine self');
 
 # Calling a sub from first should leave its refcount unchanged.
 SKIP: do {
     skip("No Internals::SvREFCNT", 1) if !defined &Internals::SvREFCNT;
-    sub huge(...) {$_+>1E6}
+    sub huge {$_+>1E6}
     my $refcnt = &Internals::SvREFCNT(\&huge);
     $v = first \&huge, < 1..6;
     is(&Internals::SvREFCNT(\&huge), $refcnt, "Refcount unchanged");

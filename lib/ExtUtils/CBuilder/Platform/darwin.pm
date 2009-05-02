@@ -6,8 +6,8 @@ our ($VERSION, @ISA);
 $VERSION = '0.22';
 @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
 
-sub compile(@< @_) {
-    my $self = shift @_;
+sub compile {
+    my $self = shift;
     my $cf = $self->{?config};
 
     # -flat_namespace isn't a compile flag, it's a linker flag.  But

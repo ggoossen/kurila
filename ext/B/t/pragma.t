@@ -15,7 +15,7 @@ use B 'svref_2object';
 
 # use Data::Dumper 'Dumper';
 
-sub foo(...) {
+sub foo {
     my ( $x, $y, $z );
 
     # hh => {},

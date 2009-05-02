@@ -4,19 +4,19 @@ use Pod::Simple::PullParserToken ();
 our @ISA = @('Pod::Simple::PullParserToken');
 
 
-sub new(@< @_) {  # Class->new(tagname);
-    my $class = shift @_;
+sub new {  # Class->new(tagname);
+    my $class = shift;
     return bless \@('end', < @_), ref($class) || $class;
 }
 
 # Purely accessors:
 
-sub tagname(@< @_) { ((nelems @_) == 2) ??  @(@_[0]->[1] = @_[1]) !! @_[0]->[1] }
-sub tag(@< @_) { shift @_->tagname(< @_) }
+sub tagname { ((nelems @_) == 2) ??  @(@_[0]->[1] = @_[1]) !! @_[0]->[1] }
+sub tag { shift->tagname(< @_) }
 
 # shortcut:
-sub is_tagname(@< @_) { @_[0]->[1] eq @_[1] }
-sub is_tag(@< @_) { shift @_->is_tagname(< @_) }
+sub is_tagname { @_[0]->[1] eq @_[1] }
+sub is_tag { shift->is_tagname(< @_) }
 
 1;
 

@@ -81,7 +81,7 @@ do {
     # freed shouldn't be visible
     my $ok;
     $x = 0;
-    sub X::DESTROY(...) { $ok = !ref($x); }
+    sub X::DESTROY { $ok = !ref($x); }
     do {
         local $x = \ bless \%(), 'X';
         1;

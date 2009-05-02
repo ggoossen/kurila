@@ -224,7 +224,7 @@ do {
     my @modpods;
     find \&getpods => < qw(../lib ../ext);
 
-    sub getpods(...) {
+    sub getpods {
         if (m/\.p(od|m)$/) {
             my $file = $File::Find::name;
             return if $file eq '../lib/Pod/Functions.pm'; # Used only by pod itself
@@ -275,8 +275,8 @@ do {
 # OK. Now a lot of ancillary function definitions follow
 # Main program returns at "Do stuff"
 
-sub path2modname(@< @_) {
-    local $_ = shift @_;
+sub path2modname {
+    local $_ = shift;
     s/\.p(m|od)$//;
     s-.*?/(lib|ext)/--;
     s![/-]!::!g;
@@ -286,7 +286,7 @@ sub path2modname(@< @_) {
 
 my $out;
 
-sub output_kurilatoc(...) {
+sub output_kurilatoc {
     open($out, ">", "kurilatoc.pod") || die "$^PROGRAM_NAME: creating kurilatoc.pod failed: $^OS_ERROR";
 
     local $^INPUT_RECORD_SEPARATOR = '';
@@ -370,7 +370,7 @@ EOPOD2B
 
 my ($inhead1, $inhead2, $initem);
 
-sub podset(@< @_) {
+sub podset {
     local @ARGV = @_;
     my $pod;
 
@@ -426,7 +426,7 @@ sub podset(@< @_) {
     }
 }
 
-sub unhead1(...) {
+sub unhead1 {
     unhead2();
     if ($inhead1) {
         output("\n\n=back\n\n");
@@ -434,7 +434,7 @@ sub unhead1(...) {
     $inhead1 = 0;
 }
 
-sub unhead2(...) {
+sub unhead2 {
     unitem();
     if ($inhead2) {
         output("\n\n=back\n\n");
@@ -442,7 +442,7 @@ sub unhead2(...) {
     $inhead2 = 0;
 }
 
-sub unitem(...) {
+sub unitem {
     if ($initem) {
         output("\n\n");
     ##print "\n\n=back\n\n";
@@ -450,7 +450,7 @@ sub unitem(...) {
     $initem = 0;
 }
 
-sub nl(...) {
+sub nl {
     output("\n");
 }
 
@@ -479,7 +479,7 @@ sub output($str) {
 # End of original buildtoc. From here on are routines to generate new sections
 # for and inplace edit other files
 
-sub generate_perlpod(...) {
+sub generate_perlpod {
     my @output;
     my $maxlength = 0;
     foreach ( @Master) {
@@ -511,22 +511,22 @@ sub generate_perlpod(...) {
 }
 
 
-sub generate_manifest(@< @_) {
+sub generate_manifest {
     # Annyoingly unexpand doesn't consider it good form to replace a single
     # space before a tab with a tab
     # Annoyingly (2) it returns read only values.
     my @temp = unexpand (< map {sprintf "\%-32s\%s\n", < $_->@}, @_);
     map {s/ \t/\t\t/g; $_}, @temp;
 }
-sub generate_manifest_pod(...) {
+sub generate_manifest_pod {
     generate_manifest < map {\@("pod/$_.pod", %Pods{$_})},
                     grep {!%Copies{"$_.pod"}}, sort keys %Pods;
 }
-sub generate_manifest_readme(...) {
+sub generate_manifest_readme {
     generate_manifest < map {\@("README.$_", %Readmes{$_})}, sort keys %Readmes;
 }
 
-sub generate_roffitall(...) {
+sub generate_roffitall {
         @(< map ({"\t\$maindir/$_.1\t\\"}, sort keys %Pods),
      "\t\t\\",
      < map ({"\t\$maindir/$_.1\t\\"}, sort keys %Aux),
@@ -537,7 +537,7 @@ sub generate_roffitall(...) {
     )
 }
 
-sub generate_descrip_mms_1(...) {
+sub generate_descrip_mms_1 {
     local $Text::Wrap::columns = 150;
     my $count = 0;
     my @lines = map {"pod" . $count++ . " = $_"},
@@ -546,7 +546,7 @@ sub generate_descrip_mms_1(...) {
     @lines, "pod = " . join ' ', map {"\$(pod$_)"}, 0 .. $count - 1;
 }
 
-sub generate_descrip_mms_2(...) {
+sub generate_descrip_mms_2 {
     map {sprintf <<'SNIP', $_, $_ eq 'perlvms' ?? 'vms' !! 'pod', $_},
 [.lib.pods]%s.pod : [.%s]%s.pod
 	@ If F$Search("[.lib]pods.dir").eqs."" Then Create/Directory [.lib.pods]
@@ -555,12 +555,12 @@ SNIP
         sort @( < keys %Pods, < keys %Readmepods);
 }
 
-sub generate_nmake_1(...) { map {sprintf "\tcopy ..\\README.\%-8s ..\\pod\\perl$_.pod\n", $_},
+sub generate_nmake_1 { map {sprintf "\tcopy ..\\README.\%-8s ..\\pod\\perl$_.pod\n", $_},
     sort keys %Readmes, map {"\tcopy ..\\pod\\%Copies{$_} ..\\pod\\$_\n"}, sort keys %Copies;
 }
 
 # This doesn't have a trailing newline
-sub generate_nmake_2(...) {
+sub generate_nmake_2 {
     # Spot the special case
     local $Text::Wrap::columns = 76;
     my $line = wrap ("\t    ", "\t    ",
@@ -570,7 +570,8 @@ sub generate_nmake_2(...) {
     $line;
 }
 
-sub generate_pod_mak(?$variable) {
+sub generate_pod_mak {
+    my $variable = shift;
     my @lines;
     my $line = join "\\\n", @( "\U$variable = ",
                              < map {"\t$_.$variable\t"}, sort keys %Pods);
@@ -579,8 +580,8 @@ sub generate_pod_mak(?$variable) {
     $line;
 }
 
-sub do_manifest(@< @_) {
-    my $name = shift @_;
+sub do_manifest {
+    my $name = shift;
     my @manifest = grep {! m!^pod/[^.]+\.pod.*\n!},
         grep {! m!^README\.(\S+)! || %Ignore{$1}}, @_;
     # Dictionary order - fold and handle non-word chars as nothing
@@ -592,8 +593,8 @@ sub do_manifest(@< @_) {
        &generate_manifest_readme());
 }
 
-sub do_nmake(@< @_) {
-    my $name = shift @_;
+sub do_nmake {
+    my $name = shift;
     my $makefile = join '', @_;
     die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile =~ m/\0/;
     $makefile =~ s/^\tcopy \.\.\\README.*\n/\0/gm;
@@ -612,8 +613,8 @@ sub do_nmake(@< @_) {
 # shut up used only once warning
 *do_dmake = *do_dmake = \&do_nmake;
 
-sub do_perlpod(@< @_) {
-    my $name = shift @_;
+sub do_perlpod {
+    my $name = shift;
     my $pod = join '', @_;
 
     unless ($pod =~ s{(For\ ease\ of\ access,\ .*\n)
@@ -628,8 +629,8 @@ sub do_perlpod(@< @_) {
     $pod;
 }
 
-sub do_podmak(@< @_) {
-    my $name = shift @_;
+sub do_podmak {
+    my $name = shift;
     my $body = join '', @_;
     foreach my $variable (qw(pod man html tex)) {
         die "$^PROGRAM_NAME: could not find $variable in $name"
@@ -639,8 +640,8 @@ sub do_podmak(@< @_) {
     $body;
 }
 
-sub do_vms(@< @_) {
-    my $name = shift @_;
+sub do_vms {
+    my $name = shift;
     my $makefile = join '', @_;
     die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile =~ m/\0/;
     $makefile =~ s/\npod\d* =[^\n]*/\0/gs;
@@ -669,8 +670,8 @@ sub do_vms(@< @_) {
     $makefile;
 }
 
-sub do_unix(@< @_) {
-    my $name = shift @_;
+sub do_unix {
+    my $name = shift;
     my $makefile_SH = join '', @_;
     die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile_SH =~ m/\0/;
 

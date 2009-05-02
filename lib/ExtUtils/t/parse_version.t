@@ -32,7 +32,8 @@ for my $v (@: @(q[use version; $VERSION = v1.2.3;], v1.2.3),
     is( parse_version_string($v[0]), $v[1]->stringify, $v[0]);
 }
 
-sub parse_version_string(?$code) {
+sub parse_version_string {
+    my $code = shift;
 
     open(my $fh, ">", "VERSION.tmp") || die $^OS_ERROR;
     print $fh, "$code\n";

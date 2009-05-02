@@ -31,7 +31,7 @@ We're Unix and Cygwin.
 
 =cut
 
-sub os_flavor(...) {
+sub os_flavor {
     return @('Unix', 'Cygwin');
 }
 
@@ -77,7 +77,8 @@ points to libperl.a
 
 =cut
 
-sub init_linker($self) {
+sub init_linker {
+    my $self = shift;
 
     if (%Config{?useshrplib} eq 'true') {
         my $libperl = '$(PERL_INC)' .'/'. "%Config{?libperl}";

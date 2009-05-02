@@ -12,7 +12,7 @@ BEGIN {
 our ($s_name, @s_aliases, $s_port, $s_proto);
 
 # Class::Struct forbids use of @ISA
-sub import(@< @_) {
+sub import {
     local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
     return Exporter::import(< @_);
 }
@@ -25,7 +25,7 @@ struct 'Net::servent' => \@(
        proto	=> '$',
        );
 
-sub populate(@< @_) {
+sub populate {
     return unless (nelems @_);
     my $sob = new();
     $s_name 	 =    $sob->[0]     	     = @_[0];

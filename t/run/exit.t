@@ -4,8 +4,8 @@
 
 
 # Run some code, return its wait status.
-sub run(@< @_) {
-    my@($code) =@( shift @_);
+sub run {
+    my@($code) =@( shift);
     $code = "\"" . $code . "\"" if $^OS_NAME eq 'VMS'; #VMS needs quotes for this.
     return system($^EXECUTABLE_NAME, "-e", $code);
 }

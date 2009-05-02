@@ -26,11 +26,11 @@ require Test::Builder;
 my $TB = Test::Builder->create;
 $TB->plan(tests => 16);
 
-sub like(@< @_) {
+sub like {
     $TB->like(< @_);
 }
 
-sub is(@< @_) {
+sub is {
     $TB->is_eq(< @_);
 }
 

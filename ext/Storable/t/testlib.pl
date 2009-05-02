@@ -9,7 +9,8 @@ END { while (-f $file) {unlink $file or die "Can't unlink '$file': $^OS_ERROR" }
 
 use Storable < qw (store retrieve freeze thaw nstore nfreeze);
 
-sub slurp(?$file) {
+sub slurp {
+    my $file = shift;
     local $^INPUT_RECORD_SEPARATOR = undef;
     open my $fh, "<", "$file" or die "Can't open '$file': $^OS_ERROR";
     binmode $fh;
@@ -18,7 +19,8 @@ sub slurp(?$file) {
     return $contents;
 }
 
-sub store_and_retrieve(?$data) {
+sub store_and_retrieve {
+    my $data = shift;
     unlink $file or die "Can't unlink '$file': $^OS_ERROR";
     open my $fh, ">", "$file" or die "Can't open '$file': $^OS_ERROR";
     binmode $fh;
@@ -28,7 +30,8 @@ sub store_and_retrieve(?$data) {
     return  try {retrieve $file};
 }
 
-sub freeze_and_thaw(?$data) {
+sub freeze_and_thaw {
+    my $data = shift;
     return try {thaw $data};
 }
 

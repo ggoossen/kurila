@@ -27,7 +27,7 @@ my %bitmask = %(
 #
 # *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING ***
 
-sub setcolor(...) {
+sub setcolor {
     try {				# Ignore errors
         require Term::Cap;
 
@@ -77,7 +77,7 @@ our %flags = %(
 my $installed;
 my $installed_error;
 
-sub _do_install(...) {
+sub _do_install {
     if ( ! defined($installed) ) {
         require XSLoader;
         $installed = try { XSLoader::load('re', $VERSION) } || 0;
@@ -106,8 +106,8 @@ sub _load_unload($on) {
     }
 }
 
-sub bits(@< @_) {
-    my $on = shift @_;
+sub bits {
+    my $on = shift;
     my $bits = 0;
     unless (nelems @_) {
         warn("Useless use of \"re\" pragma"); 
@@ -156,14 +156,14 @@ sub bits(@< @_) {
     $bits;
 }
 
-sub import(@< @_) {
-    shift @_;
+sub import {
+    shift;
     my $selected_bits = bits(1, < @_);
     $^HINT_BITS ^|^= $selected_bits;
 }
 
-sub unimport(@< @_) {
-    shift @_;
+sub unimport {
+    shift;
     my $selected_bits = bits(0, < @_);
     $^HINT_BITS ^&^= ^~^ $selected_bits;
 }

@@ -83,5 +83,5 @@ ok( -f -s 'TEST' == 1 );
 
 -f 'TEST';
 ok( -f _ );
-sub _(...) { "this is not a file name" }
+sub _ { "this is not a file name" }
 ok( -f _ );

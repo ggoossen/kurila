@@ -17,7 +17,7 @@ if ($Is_NetWare) {
 
 $Needs_Write = $Is_OS2 || $Is_W32 || $Is_Cygwin || $Is_NetWare;
 
-sub safer_unlink(@< @_) {
+sub safer_unlink {
     my @names = @_;
     my $cnt = 0;
 
@@ -50,7 +50,8 @@ sub rename_if_different($from, $to) {
 }
 
 # Saf*er*, but not totally safe. And assumes always open for output.
-sub safer_open(?$name) {
+sub safer_open {
+    my $name = shift;
     my $fh = gensym;
     open $fh, ">", $name or die "Can't create $name: $^OS_ERROR";
     $fh->*->{+SCALAR} = $name;
@@ -58,7 +59,8 @@ sub safer_open(?$name) {
     $fh;
 }
 
-sub safer_close(?$fh) {
+sub safer_close {
+    my $fh = shift;
     close $fh or die 'Error closing ' . $fh->*->{?SCALAR} . ": $^OS_ERROR";
 }
 

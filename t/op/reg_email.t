@@ -64,7 +64,7 @@ my $email = qr {
 
 run_tests() unless caller;
 
-sub run_tests(...) {
+sub run_tests {
     my $count = 0;
 
     $^OUTPUT_AUTOFLUSH = 1;

@@ -15,7 +15,7 @@ BEGIN {
 our ($n_name, @n_aliases, $n_addrtype, $n_net);
 
 # Class::Struct forbids use of @ISA
-sub import(@< @_) {
+sub import {
     local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
     return Exporter::import(< @_);
 }
@@ -28,7 +28,7 @@ struct 'Net::netent' => \@(
        net		=> '$',
        );
 
-sub populate(@< @_) {
+sub populate {
     return unless (nelems @_);
     my $nob = new();
     $n_name 	 =    $nob->[0]     	     = @_[0];

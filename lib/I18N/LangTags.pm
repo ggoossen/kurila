@@ -20,7 +20,7 @@ require Exporter;
 
 $VERSION = "0.35";
 
-sub uniq(@< @_) { my %seen; return grep( {!(%seen{+$_}++) }, @_); } # a util function
+sub uniq { my %seen; return grep( {!(%seen{+$_}++) }, @_); } # a util function
 
 
 =head1 NAME
@@ -93,7 +93,7 @@ Returns true iff $lang1 is a formally valid language tag.
 
 =cut
 
-sub is_language_tag(@< @_) {
+sub is_language_tag {
 
     ## Changes in the language tagging standards may have to be reflected here.
 
@@ -134,7 +134,7 @@ don't worry about it.
 
 =cut
 
-sub extract_language_tags(@< @_) {
+sub extract_language_tags {
 
     ## Changes in the language tagging standards may have to be reflected here.
 
@@ -186,7 +186,7 @@ reasons.)
 
 =cut
 
-sub same_language_tag(@< @_) {
+sub same_language_tag {
     my $el1 = &encode_language_tag(@_[0]);
     return 0 unless defined $el1;
     # this avoids the problem of
@@ -228,7 +228,7 @@ without regard to case and to x/i- alternation.
 
 =cut
 
-sub similarity_language_tag(@< @_) {
+sub similarity_language_tag {
     my $lang1 = &encode_language_tag(@_[0]);
     my $lang2 = &encode_language_tag(@_[1]);
     # And encode_language_tag takes care of the whole
@@ -288,7 +288,7 @@ B<Get the order right!  It doesn't work the other way around!>
 
 =cut
 
-sub is_dialect_of(@< @_) {
+sub is_dialect_of {
 
     my $lang1 = &encode_language_tag(@_[0]);
     my $lang2 = &encode_language_tag(@_[1]);
@@ -338,7 +338,7 @@ carefully.
 
 =cut 
 
-sub super_languages(@< @_) {
+sub super_languages {
     my $lang1 = @_[0];
     return() unless defined($lang1) && &is_language_tag($lang1);
 
@@ -393,7 +393,7 @@ don't worry about it.
 
 =cut 
 
-sub locale2language_tag(@< @_) {
+sub locale2language_tag {
     my $lang =
         @_[0] =~ m/(.+)/  # to make for an untainted result
         ?? $1 !! ''
@@ -521,7 +521,7 @@ And that does the Right Thing.
 
 =cut
 
-sub encode_language_tag(@< @_) {
+sub encode_language_tag {
     # Only similarity_language_tag() is allowed to analyse encodings!
 
     ## Changes in the language tagging standards may have to be reflected here.
@@ -595,7 +595,7 @@ valid language tag.
 =cut
 
 my %alt = %( < qw( i x   x i   I X   X I ) );
-sub alternate_language_tags(@< @_) {
+sub alternate_language_tags {
     my $tag = @_[0];
     return() unless &is_language_tag($tag);
 
@@ -729,7 +729,7 @@ A useful construct you might consider using is:
 
 =cut
 
-sub panic_languages(@< @_) {
+sub panic_languages {
     # When in panic or in doubt, run in circles, scream, and shout!
     my(@out, %seen);
     foreach my $t ( @_) {
@@ -792,7 +792,7 @@ as far as I'm concerned) you'd use implicate_supers.
 
 =cut
 
-sub implicate_supers(@< @_) {
+sub implicate_supers {
     my @languages = grep { is_language_tag($_) }, @_;
     my %seen_encoded;
     foreach my $lang ( @languages) {
@@ -812,7 +812,7 @@ sub implicate_supers(@< @_) {
 
 }
 
-sub implicate_supers_strictly(@< @_) {
+sub implicate_supers_strictly {
     my @tags = grep { is_language_tag($_) }, @_;
     return uniq( < @_,   < @+: map { super_languages($_) }, @_ );
 }

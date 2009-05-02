@@ -38,7 +38,7 @@ is( $v,	10,	'use eval{}');
 $v = !defined try { reduce { die if $b +> 2; $a + $b }, 0,1,2,3,4 };
 ok($v, 'die');
 
-sub add2(...) { $a + $b }
+sub add2 { $a + $b }
 
 $v = reduce \&add2, 1,2,3;
 is( $v,	6,	'sub reference');
@@ -73,13 +73,13 @@ do { package Foo;
 # redefinition takes effect immediately depends on whether we're
 # running the Perl or XS implementation.
 
-sub self_updating(...) { local $^WARNING = undef; *self_updating = sub{1} ;1 }
+sub self_updating { local $^WARNING = undef; *self_updating = sub{1} ;1 }
 try { $v = reduce \&self_updating, 1,2; };
 is($^EVAL_ERROR, '', 'redefine self');
 
 do { my $failed = 0;
 
-    sub rec(?$n) {
+    sub rec { my $n = shift;
         if (!defined($n)) {  # No arg means we're being called by reduce()
             return 1; }
         if ($n+<5) { rec($n+1); }
@@ -94,7 +94,7 @@ do { my $failed = 0;
 # Calling a sub from reduce should leave its refcount unchanged.
 SKIP: do {
     skip("No Internals::SvREFCNT", 1) if !defined &Internals::SvREFCNT;
-    sub mult(...) {$a*$b}
+    sub mult {$a*$b}
     my $refcnt = &Internals::SvREFCNT(\&mult);
     $v = reduce \&mult, < 1..6;
     is(&Internals::SvREFCNT(\&mult), $refcnt, "Refcount unchanged");

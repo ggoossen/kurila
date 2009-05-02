@@ -37,10 +37,10 @@ do {
     # Convenient alias.
     package MM;
     our @ISA = qw(ExtUtils::MM);
-    sub DESTROY(...) {}
+    sub DESTROY {}
 };
 
-sub _is_win95(...) {
+sub _is_win95 {
     # miniperl might not have the Win32 functions available and we need
     # to run in miniperl.
     return defined &Win32::IsWin95 ?? Win32::IsWin95() 
@@ -81,7 +81,8 @@ die $^EVAL_ERROR if $^EVAL_ERROR;
 unshift @ISA, $class;
 
 
-sub _assert(?$sanity) {
+sub _assert {
+    my $sanity = shift;
     die sprintf "Assert failed at \%s line \%d\n", < @(caller)[[1..2]] unless $sanity;
     return;
 }

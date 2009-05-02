@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(isa can VERSION);
 
 # Make sure that even though the import method is called, it doesn't do
 # anything unless called on UNIVERSAL.
-sub import(@< @_) {
+sub import {
     return unless @_[0] eq __PACKAGE__;
     local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
     return Exporter::import(< @_);

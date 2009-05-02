@@ -67,8 +67,8 @@ BEGIN { *pretty = \&Pod::Simple::pretty }
 # set up defaults if none were given.  Note that all internal object keys are
 # in all-caps, reserving all lower-case object keys for Pod::Simple and user
 # arguments.
-sub new(@< @_) {
-    my $class = shift @_;
+sub new {
+    my $class = shift;
     my $self = $class->SUPER::new;
 
     # Tell Pod::Simple to handle S<> by automatically inserting &nbsp;.
@@ -111,7 +111,7 @@ sub new(@< @_) {
 }
 
 # Translate a font string into an escape.
-sub toescape(@< @_) { (length (@_[0]) +> 1 ?? '\f(' !! '\f') . @_[0] }
+sub toescape { (length (@_[0]) +> 1 ?? '\f(' !! '\f') . @_[0] }
 
 # Determine which fonts the user wishes to use and store them in the object.
 # Regular, italic, bold, and bold-italic are constants, but the fixed width
@@ -150,7 +150,7 @@ sub init_fonts($self) {
 # special handling, both to parse the user parameter if given and to make sure
 # that the quotes will be safe against *roff.  Sets the internal hash keys
 # LQUOTE and RQUOTE.
-sub init_quotes(@< @_) {
+sub init_quotes {
     my @($self) = @(< @_);
 
     $self->{+quotes} ||= '"';
@@ -369,9 +369,9 @@ sub format_text($self, $options, $text) {
 # Handles C<> text, deciding whether to put \*C` around it or not.  This is a
 # whole bunch of messy heuristics to try to avoid overquoting, originally from
 # Barrie Slaymaker.  This largely duplicates similar code in Pod::Text.
-sub quote_literal(@< @_) {
-    my $self = shift @_;
-    local $_ = shift @_;
+sub quote_literal {
+    my $self = shift;
+    local $_ = shift;
 
     # A regex that matches the portion of a variable reference that's the
     # array or hash index, separated out just because we want to use it in
@@ -410,9 +410,9 @@ sub quote_literal(@< @_) {
 # This method is very fragile, both in the regular expressions it uses and in
 # the ordering of those modifications.  Care and testing is required when
 # modifying it.
-sub guesswork(@< @_) {
-    my $self = shift @_;
-    local $_ = shift @_;
+sub guesswork {
+    my $self = shift;
+    local $_ = shift;
     DEBUG +> 5 and print $^STDOUT, "   Guesswork called on [$_]\n";
 
     # By the time we reach this point, all hypens will be escaped by adding a
@@ -1024,10 +1024,10 @@ sub cmd_head4($self, $attrs, $text) {
 
 # All of the formatting codes that aren't handled internally by the parser,
 # other than L<> and X<>.
-sub cmd_b(@< @_) { return '\f(BS' . @_[2] . '\f(BE' }
-sub cmd_i(@< @_) { return '\f(IS' . @_[2] . '\f(IE' }
-sub cmd_f(@< @_) { return '\f(IS' . @_[2] . '\f(IE' }
-sub cmd_c(@< @_) { return @_[0]->quote_literal (@_[2]) }
+sub cmd_b { return '\f(BS' . @_[2] . '\f(BE' }
+sub cmd_i { return '\f(IS' . @_[2] . '\f(IE' }
+sub cmd_f { return '\f(IS' . @_[2] . '\f(IE' }
+sub cmd_c { return @_[0]->quote_literal (@_[2]) }
 
 # Index entries are just added to the pending entries.
 sub cmd_x($self, $attrs, $text) {
@@ -1105,14 +1105,14 @@ sub over_common_end($self) {
 }
 
 # Dispatch the start and end calls as appropriate.
-sub start_over_bullet(@< @_) { my $s = shift @_; $s->over_common_start ('bullet', < @_) }
-sub start_over_number(@< @_) { my $s = shift @_; $s->over_common_start ('number', < @_) }
-sub start_over_text(@< @_)   { my $s = shift @_; $s->over_common_start ('text',   < @_) }
-sub start_over_block(@< @_)  { my $s = shift @_; $s->over_common_start ('block',  < @_) }
-sub end_over_bullet(@< @_) { @_[0]->over_common_end }
-sub end_over_number(@< @_) { @_[0]->over_common_end }
-sub end_over_text(@< @_)   { @_[0]->over_common_end }
-sub end_over_block(@< @_)  { @_[0]->over_common_end }
+sub start_over_bullet { my $s = shift; $s->over_common_start ('bullet', < @_) }
+sub start_over_number { my $s = shift; $s->over_common_start ('number', < @_) }
+sub start_over_text   { my $s = shift; $s->over_common_start ('text',   < @_) }
+sub start_over_block  { my $s = shift; $s->over_common_start ('block',  < @_) }
+sub end_over_bullet { @_[0]->over_common_end }
+sub end_over_number { @_[0]->over_common_end }
+sub end_over_text   { @_[0]->over_common_end }
+sub end_over_block  { @_[0]->over_common_end }
 
 # The common handler for all item commands.  Takes the type of the item, the
 # attributes, and then the text of the item.
@@ -1171,10 +1171,10 @@ sub item_common($self, $type, $attrs, $text) {
 }
 
 # Dispatch the item commands to the appropriate place.
-sub cmd_item_bullet(@< @_) { my $self = shift @_; $self->item_common ('bullet', < @_) }
-sub cmd_item_number(@< @_) { my $self = shift @_; $self->item_common ('number', < @_) }
-sub cmd_item_text(@< @_)   { my $self = shift @_; $self->item_common ('text',   < @_) }
-sub cmd_item_block(@< @_)  { my $self = shift @_; $self->item_common ('block',  < @_) }
+sub cmd_item_bullet { my $self = shift; $self->item_common ('bullet', < @_) }
+sub cmd_item_number { my $self = shift; $self->item_common ('number', < @_) }
+sub cmd_item_text   { my $self = shift; $self->item_common ('text',   < @_) }
+sub cmd_item_block  { my $self = shift; $self->item_common ('block',  < @_) }
 
 ##############################################################################
 # Backward compatibility
@@ -1182,8 +1182,8 @@ sub cmd_item_block(@< @_)  { my $self = shift @_; $self->item_common ('block',  
 
 # Reset the underlying Pod::Simple object between calls to parse_from_file so
 # that the same object can be reused to convert multiple pages.
-sub parse_from_file(@< @_) {
-    my $self = shift @_;
+sub parse_from_file {
+    my $self = shift;
     $self->reinit;
 
     # Fake the old cutting option to Pod::Parser.  This fiddings with internal
@@ -1213,8 +1213,8 @@ sub parse_from_file(@< @_) {
 # Pod::Simple failed to provide this backward compatibility function, so
 # implement it ourselves.  File handles are one of the inputs that
 # parse_from_file supports.
-sub parse_from_filehandle(@< @_) {
-    my $self = shift @_;
+sub parse_from_filehandle {
+    my $self = shift;
     $self->parse_from_file (< @_);
 }
 
@@ -1261,7 +1261,7 @@ sub parse_from_filehandle(@< @_) {
 # generate.  It's completely static except for the font to use as a
 # fixed-width font, which is designed by @CFONT@, and the left and right
 # quotes to use for C<> text, designated by @LQOUTE@ and @RQUOTE@.
-sub preamble_template(...) {
+sub preamble_template {
     return <<'----END OF PREAMBLE----';
 .de Sh \" Subsection heading
 .br

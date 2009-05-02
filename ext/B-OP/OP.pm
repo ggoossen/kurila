@@ -27,7 +27,8 @@ B::OP->bootstrap($VERSION);
 use constant OP_LIST    => 141;    # MUST FIX CONSTANTS.
 
 # This is where we implement op.c in Perl. Sssh.
-sub linklist(?$o) {
+sub linklist {
+    my $o = shift;
     if ( $o->can("first") and $o->first and  $o->first->$ ) {
         $o->next( < $o->first->linklist );
         my $kid = $o->first;
@@ -93,7 +94,8 @@ sub prepend_elem( $class, $type, $first, $last) {
     return $last;    # I cannot believe this works.
 }
 
-sub scope(?$o) {
+sub scope {
+    my $o = shift;
     return unless $o and $o->$;
     if ( $o->flags ^&^ B::OPf_PARENS ) {
         $o = B::OP->prepend_elem( < B::opnumber("lineseq"), <

@@ -59,8 +59,8 @@ foreach my $foo (@(undef, 0)) {
 
 do {   # any object that can print should be ok for walk_output
     package Hugo;
-    sub new(...) { my $foo = bless \%() };
-    sub print(@< @_) { CORE::print $^STDOUT, < @_ }
+    sub new { my $foo = bless \%() };
+    sub print { CORE::print $^STDOUT, < @_ }
 };
 my $foo = Hugo->new();	# suggested this API fix
 try {  walk_output($foo) };
@@ -114,7 +114,7 @@ is ($^EVAL_ERROR, '', "set_style accepts 3 style-format args");
 our($a, $b);
 my $func = sub{ $a = $b+42 };	# canonical example asub
 
-sub render(@< @_) {
+sub render {
     walk_output(\my $out);
     try { B::Concise::compile(< @_)->() };
     # diag "rendering $@\n";
@@ -179,7 +179,7 @@ SKIP: do {
   TODO: do {
         #local $TODO = "\tdoes this handling make sense ?";
 
-        sub defd_empty(...) {};
+        sub defd_empty {};
         @($res,$err) =  render('-basic', \&defd_empty);
         my @lines = split(m/\n/, $res);
         is(scalar nelems @lines, 7,
@@ -191,7 +191,7 @@ SKIP: do {
         do {
             package Bar;
             our $AUTOLOAD = 'garbage';
-            sub AUTOLOAD(...) { print $^STDOUT, "# in AUTOLOAD body: $AUTOLOAD\n" }
+            sub AUTOLOAD { print $^STDOUT, "# in AUTOLOAD body: $AUTOLOAD\n" }
         };
         @($res,$err) =  render('-basic', 'Bar::auto_func');
         like ($res, qr/unknown function \(Bar::auto_func\)/,

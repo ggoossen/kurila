@@ -5,7 +5,7 @@ plan( tests => 10 );
 
 # test various operations on @_
 
-sub new1(@< @_) { bless \@_ }
+sub new1 { bless \@_ }
 do {
     my $x = new1("x");
     my $y = new1("y");
@@ -13,7 +13,7 @@ do {
     is(join(' ', $x->@),"x");
 };
 
-sub new2(@< @_) { splice @_, 0, 0, "a", "b", "c"; return \@_ }
+sub new2 { splice @_, 0, 0, "a", "b", "c"; return \@_ }
 do {
     my $x = new2("x");
     my $y = new2("y");
@@ -24,16 +24,16 @@ do {
 # see if POPSUB gets to see the right pad across a dounwind() with
 # a reified @_
 
-sub methimpl(@< @_) {
+sub methimpl {
     my $refarg = \@_;
     die( "got: $(join ' ',@_)\n" );
 }
 
-sub method(@< @_) {
+sub method {
     &methimpl( < @_ );
 }
 
-sub trymethod(...) {
+sub trymethod {
     try { method('foo', 'bar'); };
     print $^STDOUT, "# $^EVAL_ERROR->{?description}" if $^EVAL_ERROR;
 }
@@ -43,12 +43,12 @@ pass();
 
 # bug #21542 local @_[0] causes reify problems and coredumps
 
-sub local1(@< @_) { local @_[0] }
+sub local1 { local @_[0] }
 my $foo = 'foo'; local1($foo); local1($foo);
 print $^STDOUT, "got [$foo], expected [foo]\nnot " if $foo ne 'foo';
 pass();
 
-sub local2(@< @_) { local @_[?0]; last L }
+sub local2 { local @_[?0]; last L }
 L: do { local2 };
 pass();
 
@@ -56,8 +56,8 @@ pass();
 
 do {
     my $flag = 0;
-    sub X::DESTROY(...) { $flag = 1 }
-    sub f(@< @_) {
+    sub X::DESTROY { $flag = 1 }
+    sub f {
         delete @_[0];
         ok(!$flag, 'delete $_[0] : in f');
     }

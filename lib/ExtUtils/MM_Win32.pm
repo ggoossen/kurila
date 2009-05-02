@@ -119,8 +119,8 @@ Using \ for Windows.
 
 =cut
 
-sub init_DIRFILESEP(@< @_) {
-    my@($self) =@( shift @_);
+sub init_DIRFILESEP {
+    my@($self) =@( shift);
 
     my $make = $self->make;
 
@@ -198,14 +198,14 @@ Add MM_Win32_VERSION.
 
 =cut
 
-sub init_platform(@< @_) {
-    my@($self) =@( shift @_);
+sub init_platform {
+    my@($self) =@( shift);
 
     $self->{+MM_Win32_VERSION} = $VERSION;
 }
 
-sub platform_constants(@< @_) {
-    my@($self) =@( shift @_);
+sub platform_constants {
+    my@($self) =@( shift);
     my $make_frag = '';
 
     foreach my $macro (qw(MM_Win32_VERSION))
@@ -354,7 +354,8 @@ gcc.  Otherwise, take out all *.pdb files.
 
 =cut
 
-sub extra_clean_files($self) {
+sub extra_clean_files {
+    my $self = shift;
 
     return $GCC ??  @(qw(dll.base dll.exp)) !!  @('*.pdb');
 }
@@ -363,7 +364,8 @@ sub extra_clean_files($self) {
 
 =cut
 
-sub init_linker($self) {
+sub init_linker {
+    my $self = shift;
 
     $self->{+PERL_ARCHIVE}       = "\$(PERL_INC)\\%Config{?libperl}";
     $self->{+PERL_ARCHIVE_AFTER} = '';
@@ -392,7 +394,7 @@ This target is stubbed out.  Not sure why.
 
 =cut
 
-sub xs_o(...) {
+sub xs_o {
     return ''
 }
 
@@ -404,8 +406,8 @@ banner.
 
 =cut
 
-sub pasthru(@< @_) {
-    my@($self) =@( shift @_);
+sub pasthru {
+    my@($self) =@( shift);
     return "PASTHRU = " . ($self->make eq 'nmake' ?? "-nologo" !! "");
 }
 
@@ -502,7 +504,8 @@ nmake 1.50 limits command length to 2048 characters.
 
 =cut
 
-sub max_exec_len($self) {
+sub max_exec_len {
+    my $self = shift;
 
     return ($self->{+_MAX_EXEC_LEN} ||= 2 * 1024);
 }
@@ -514,7 +517,7 @@ Windows is Win32.
 
 =cut
 
-sub os_flavor(...) {
+sub os_flavor {
     return @('Win32');
 }
 

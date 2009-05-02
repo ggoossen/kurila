@@ -38,7 +38,7 @@ $FAR_CHAR_NUMBER = ord($FAR_CHAR) unless defined $FAR_CHAR_NUMBER;
 $NOT_ASCII = 'A' ne chr(65) unless defined $NOT_ASCII;
 
 #--------------------------------------------------------------------------
-sub e2char(@< @_) {
+sub e2char {
     my $in = @_[0];
     return undef unless defined $in and length $in;
 
@@ -76,7 +76,7 @@ sub e2char(@< @_) {
 }
 
 #--------------------------------------------------------------------------
-sub e2charnum(@< @_) {
+sub e2charnum {
     my $in = @_[0];
     return undef unless defined $in and length $in;
 

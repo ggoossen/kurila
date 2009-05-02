@@ -179,10 +179,10 @@ do {   my $uri = 'rsync://cpan.pair.com/CPAN/MIRRORING.FROM';
     }
 };
 
-sub _fetch_uri(@< @_) {
-    my $type    = shift @_;
-    my $uri     = shift @_;
-    my $method  = shift @_ or return;
+sub _fetch_uri {
+    my $type    = shift;
+    my $uri     = shift;
+    my $method  = shift or return;
 
   SKIP: do {
         skip "'$method' fetching tests disabled under perl core", 4

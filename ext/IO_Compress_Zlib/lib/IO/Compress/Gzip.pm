@@ -26,9 +26,9 @@ $GzipError = '' ;
 push  %EXPORT_TAGS{all}->@, < @EXPORT_OK ;
 Exporter::export_ok_tags('all');
 
-sub new(@< @_)
+sub new
 {
-    my $class = shift @_ ;
+    my $class = shift ;
 
     my $obj = createSelfTiedObject($class, \$GzipError);
 
@@ -36,7 +36,7 @@ sub new(@< @_)
 }
 
 
-sub gzip(@< @_)
+sub gzip
 {
     my $obj = createSelfTiedObject(__PACKAGE__, \$GzipError);
     return $obj->_def(< @_);
@@ -49,8 +49,9 @@ sub gzip(@< @_)
 #    return $self->mkHeader(*$self->{Got});
 #}
 
-sub getExtraParams($self)
+sub getExtraParams
 {
+    my $self = shift ;
 
     return  @(
             # zlib behaviour
@@ -71,10 +72,10 @@ sub getExtraParams($self)
 }
 
 
-sub ckParams(@< @_)
+sub ckParams
 {
-    my $self = shift @_ ;
-    my $got = shift @_ ;
+    my $self = shift ;
+    my $got = shift ;
 
     # gzip always needs crc32
     $got->value('CRC32' => 1);
@@ -148,13 +149,14 @@ sub ckParams(@< @_)
     return 1;
 }
 
-sub mkTrailer($self)
+sub mkTrailer
 {
+    my $self = shift ;
     return pack("V V", $self->{Compress}->crc32(), 
         $self->{UnCompSize}->get32bit());
 }
 
-sub getInverseClass(...)
+sub getInverseClass
 {
     return  @('IO::Uncompress::Gunzip',
               \$IO::Uncompress::Gunzip::GunzipError);
@@ -230,7 +232,7 @@ sub mkHeader($self, $param)
     return $out ;
 }
 
-sub mkFinalTrailer(...)
+sub mkFinalTrailer
 {
     return '';
 }

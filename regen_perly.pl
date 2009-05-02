@@ -29,7 +29,7 @@
 # it may work elsewhere but no specific attempt has been made to make it
 # portable.
 
-sub usage(...) { die "usage: $^PROGRAM_NAME [ -b bison_executable ] [ file.y ]\n" }
+sub usage { die "usage: $^PROGRAM_NAME [ -b bison_executable ] [ file.y ]\n" }
 
 use warnings;
 
@@ -127,7 +127,8 @@ print $^STDOUT, "rebuilt:  $h_file $tab_file $act_file\n";
 exit 0;
 
 
-sub extract(?$clines) {
+sub extract {
+    my $clines = shift;
     my $tablines;
     my $actlines;
 
@@ -267,7 +268,7 @@ sub make_type_tab($y_file, $tablines) {
 }
 
 
-sub my_system(@< @_) {
+sub my_system {
     system(< @_);
     if ($^CHILD_ERROR == -1) {
         die "failed to execute command '$(join ' ',@_)': $^OS_ERROR\n";

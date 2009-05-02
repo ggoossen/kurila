@@ -66,10 +66,10 @@ foreach my $subname ( map { "opt_$_" }, split '', q{mhlvriFfXqnTdUL}) {
 }
 
 # And these are so that GetOptsOO knows they take options:
-sub opt_f_with(@< @_) { shift @_->_elem('opt_f', < @_) }
-sub opt_q_with(@< @_) { shift @_->_elem('opt_q', < @_) }
-sub opt_d_with(@< @_) { shift @_->_elem('opt_d', < @_) }
-sub opt_L_with(@< @_) { shift @_->_elem('opt_L', < @_) }
+sub opt_f_with { shift->_elem('opt_f', < @_) }
+sub opt_q_with { shift->_elem('opt_q', < @_) }
+sub opt_d_with { shift->_elem('opt_d', < @_) }
+sub opt_L_with { shift->_elem('opt_L', < @_) }
 
 sub opt_w_with($self, $value) {
     if($value =~ m/^([-_a-zA-Z][-_a-zA-Z0-9]*)(?:[=\:](.*?))?$/s) {
@@ -107,7 +107,7 @@ sub opt_M_with($self, $classes) {
     return;
 }
 
-sub opt_V(...) { # report version and exit
+sub opt_V { # report version and exit
     print $^STDOUT, join '', @(
     "Perldoc v$VERSION, under perl $^PERL_VERSION for $^OS_NAME",
 
@@ -121,21 +121,21 @@ sub opt_V(...) { # report version and exit
         exit;
 }
 
-sub opt_t(@< @_) { # choose plaintext as output format
-    my $self = shift @_;
+sub opt_t { # choose plaintext as output format
+    my $self = shift;
     $self->opt_o_with('text')  if (nelems @_) and @_[0];
     return $self->_elem('opt_t', < @_);
 }
 
-sub opt_u(@< @_) { # choose raw pod as output format
-    my $self = shift @_;
+sub opt_u { # choose raw pod as output format
+    my $self = shift;
     $self->opt_o_with('pod')  if (nelems @_) and @_[0];
     return $self->_elem('opt_u', < @_);
 }
 
-sub opt_n_with(@< @_) {
+sub opt_n_with {
     # choose man as the output format, and specify the proggy to run
-    my $self = shift @_;
+    my $self = shift;
     $self->opt_o_with('man')  if (nelems @_) and @_[0];
     $self->_elem('opt_n', < @_);
 }
@@ -175,8 +175,8 @@ sub opt_o_with($self, $rest) {
 ###########################################################################
 # % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 
-sub run(@< @_) {  # to be called by the "perldoc" executable
-    my $class = shift @_;
+sub run {  # to be called by the "perldoc" executable
+    my $class = shift;
     if(DEBUG +> 3) {
         print $^STDOUT, "Parameters to $class\->run:\n";
         my @x = @_;
@@ -194,8 +194,8 @@ sub run(@< @_) {  # to be called by the "perldoc" executable
 # % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 ###########################################################################
 
-sub new(@< @_) {  # yeah, nothing fancy
-    my $class = shift @_;
+sub new {  # yeah, nothing fancy
+    my $class = shift;
     my $new = bless \%(< @_), (ref($class) || $class);
     DEBUG +> 1 and print $^STDOUT, "New $class object $new\n";
     $new->init();
@@ -204,8 +204,8 @@ sub new(@< @_) {  # yeah, nothing fancy
 
 #..........................................................................
 
-sub aside(@< @_) {  # If we're in -v or DEBUG mode, say this.
-    my $self = shift @_;
+sub aside {  # If we're in -v or DEBUG mode, say this.
+    my $self = shift;
     if( DEBUG or $self->opt_v ) {
         my $out = join( '', @(
             DEBUG ?? do {
@@ -224,8 +224,8 @@ sub aside(@< @_) {  # If we're in -v or DEBUG mode, say this.
 
 #..........................................................................
 
-sub usage(@< @_) {
-    my $self = shift @_;
+sub usage {
+    my $self = shift;
     warn "$(join ' ',@_)\n" if (nelems @_);
 
     # Erase evidence of previous errors (if any), so exit status is simple.
@@ -282,7 +282,7 @@ EOF
 
 #..........................................................................
 
-sub usage_brief(...) {
+sub usage_brief {
     my $me = $^PROGRAM_NAME;		# Editing $0 is unportable
 
     $me =~ s,.*[/\\],,; # get basename
@@ -300,11 +300,11 @@ EOUSAGE
 
 #..........................................................................
 
-sub pagers(@< @_) { shift @_->{'pagers'} }
+sub pagers { shift->{'pagers'} }
 
 #..........................................................................
 
-sub _elem(@< @_) {  # handy scalar meta-accessor: shift->_elem("foo", @_)
+sub _elem {  # handy scalar meta-accessor: shift->_elem("foo", @_)
     if((nelems @_) +> 2) { return (@_[0]->{+@_[1] } = @_[2]) }
     else       { return  @_[0]->{?@_[1] }          }
 }
@@ -315,7 +315,8 @@ sub _elem(@< @_) {  # handy scalar meta-accessor: shift->_elem("foo", @_)
 # other stuff that ToMan.pm needs.
 #
 
-sub init($self) {
+sub init {
+    my $self = shift;
 
     # Make sure creat()s are neither too much nor too little
     try { umask(0077) };   # doubtless someone has no mask
@@ -352,7 +353,8 @@ sub init($self) {
 
 #..........................................................................
 
-sub init_formatter_class_list($self) {
+sub init_formatter_class_list {
+    my $self = shift;
     $self->{+'formatter_classes'} ||= \@();
 
     # Remember, no switches have been read yet, when
@@ -370,7 +372,10 @@ sub init_formatter_class_list($self) {
 
 #..........................................................................
 
-sub process($self) {
+sub process {
+    # if this ever returns, its retval will be used for exit(RETVAL)
+
+    my $self = shift;
     DEBUG +> 1 and print $^STDOUT, "  Beginning process.\n";
     DEBUG +> 1 and print $^STDOUT, "  Args: $(join ' ',$self->{?'args'}->@)\n\n";
     if(DEBUG +> 3) {
@@ -439,7 +444,7 @@ sub process($self) {
 do {
 
     my( %class_seen, %class_loaded );
-    sub find_good_formatter_class(@< @_) {
+    sub find_good_formatter_class {
         my $self = @_[0];
         my @class_list = ( $self->{?'formatter_classes'} || \@() )->@;
         die "WHAT?  Nothing in the formatter class list!?" unless (nelems @class_list);
@@ -508,7 +513,8 @@ do {
 };
 #..........................................................................
 
-sub formatter_sanity_check($self) {
+sub formatter_sanity_check {
+    my $self = shift;
     my $formatter_class = $self->{?'formatter_class'}
         || die "NO FORMATTER CLASS YET!?";
 
@@ -584,7 +590,8 @@ sub render_and_page($self, $found_list) {
 
 #..........................................................................
 
-sub options_reading($self) {
+sub options_reading {
+    my $self = shift;
 
     if( defined env::var("PERLDOC") and length env::var("PERLDOC") ) {
         require Text::ParseWords;
@@ -614,7 +621,8 @@ sub options_reading($self) {
 
 #..........................................................................
 
-sub options_processing($self) {
+sub options_processing {
+    my $self = shift;
 
     if ($self->opt_X) {
         my $podidx = config_value('archlib') . "/pod.idx";
@@ -637,7 +645,8 @@ sub options_processing($self) {
 
 #..........................................................................
 
-sub options_sanity($self) {
+sub options_sanity {
+    my $self = shift;
 
     # The opts-counting stuff interacts quite badly with
     # the $ENV{"PERLDOC"} stuff.  I.e., if I have $ENV{"PERLDOC"}
@@ -789,8 +798,8 @@ sub maybe_generate_dynamic_pod($self, $found_things) {
 
 #..........................................................................
 
-sub add_formatter_option(@< @_) { # $self->add_formatter_option('key' => 'value');
-    my $self = shift @_;
+sub add_formatter_option { # $self->add_formatter_option('key' => 'value');
+    my $self = shift;
     push  $self->{'formatter_switches'}->@, \ @_ if (nelems @_);
 
     DEBUG +> 3 and printf $^STDOUT, "Formatter switches now: [\%s]\n",
@@ -801,7 +810,8 @@ sub add_formatter_option(@< @_) { # $self->add_formatter_option('key' => 'value'
 
 #.........................................................................
 
-sub pod_dirs(?$tr) {
+sub pod_dirs { # @dirs = pod_dirs($translator);
+    my $tr = shift;
     return $tr->pod_dirs if $tr->can('pod_dirs');
 
     my $mod = ref $tr || $tr;
@@ -815,8 +825,8 @@ sub pod_dirs(?$tr) {
 
 #.........................................................................
 
-sub add_translator(@< @_) { # $self->add_translator($lang);
-    my $self = shift @_;
+sub add_translator { # $self->add_translator($lang);
+    my $self = shift;
     for my $lang ( @_) {
         my $pack = 'POD2::' . uc($lang);
         eval "require $pack";
@@ -1043,7 +1053,12 @@ sub unlink_if_temp_file($self, $file) {
 
 #..........................................................................
 
-sub MSWin_temp_cleanup($self) {
+sub MSWin_temp_cleanup {
+
+    # Nothing particularly MSWin-specific in here, but I don't know if any
+    # other OS needs its temp dir policed like MSWin does!
+
+    my $self = shift;
 
     my $tempdir = env::var('TEMP');
     return unless defined $tempdir and length $tempdir
@@ -1134,7 +1149,7 @@ sub MSWin_perldoc_tempfile($self, $suffix, $infix) {
 #..........................................................................
 
 
-sub after_rendering(@< @_) {
+sub after_rendering {
     my $self = @_[0];
     $self->after_rendering_VMS     if IS_VMS;
     $self->after_rendering_MSWin32 if IS_MSWin32;
@@ -1143,12 +1158,12 @@ sub after_rendering(@< @_) {
     return;
 }
 
-sub after_rendering_VMS(...)      { return }
-sub after_rendering_Dos(...)      { return }
-sub after_rendering_OS2(...)      { return }
+sub after_rendering_VMS      { return }
+sub after_rendering_Dos      { return }
+sub after_rendering_OS2      { return }
 
-sub after_rendering_MSWin32(@< @_)  {
-    shift @_->MSWin_temp_cleanup() if $Temp_Files_Created;
+sub after_rendering_MSWin32  {
+    shift->MSWin_temp_cleanup() if $Temp_Files_Created;
 }
 
 #..........................................................................
@@ -1219,7 +1234,8 @@ sub minus_f_nocase($self, $dir, $file) {
 
 #..........................................................................
 
-sub pagers_guessing($self) {
+sub pagers_guessing {
+    my $self = shift;
 
     my @pagers;
     push @pagers, < $self->pagers;
@@ -1399,7 +1415,8 @@ sub containspod($self, $file, $readit) {
 
 #..........................................................................
 
-sub maybe_diddle_INC($self) {
+sub maybe_diddle_INC {
+    my $self = shift;
 
     # Does this look like a module or extension directory?
 
@@ -1420,8 +1437,8 @@ sub maybe_diddle_INC($self) {
 
 #..........................................................................
 
-sub new_output_file(@< @_) {
-    my $self = shift @_;
+sub new_output_file {
+    my $self = shift;
     my $outspec = $self->opt_d;  # Yes, -d overrides all else!
     # So don't call this twice per format-job!
 
@@ -1442,7 +1459,17 @@ sub new_output_file(@< @_) {
 
 #..........................................................................
 
-sub useful_filename_bit($self) {
+sub useful_filename_bit {
+    # This tries to provide a meaningful bit of text to do with the query,
+    # such as can be used in naming the file -- since if we're going to be
+    # opening windows on temp files (as a "pager" may well do!) then it's
+    # better if the temp file's name (which may well be used as the window
+    # title) isn't ALL just random garbage!
+    # In other words "perldoc_LWPSimple_2371981429" is a better temp file
+    # name than "perldoc_2371981429".  So this routine is what tries to
+    # provide the "LWPSimple" bit.
+    #
+    my $self = shift;
     my $pages = $self->{?'pages'} || return undef;
     return undef unless (nelems $pages->@);
 
@@ -1462,8 +1489,8 @@ sub useful_filename_bit($self) {
 
 #..........................................................................
 
-sub new_tempfile(@< @_) {    # $self->new_tempfile( [$suffix, [$infix] ] )
-    my $self = shift @_;
+sub new_tempfile {    # $self->new_tempfile( [$suffix, [$infix] ] )
+    my $self = shift;
 
     ++$Temp_Files_Created;
 
@@ -1565,7 +1592,8 @@ sub searchfor($self, $recurse,$s,@< @dirs) {
 #..........................................................................
 do {
     my $already_asserted;
-    sub assert_closing_stdout($self) {
+    sub assert_closing_stdout {
+        my $self = shift;
 
         return if $already_asserted;
 
@@ -1591,7 +1619,8 @@ sub tweak_found_pathnames($self, $found) {
 #	:	:	:	:	:	:	:	:	:
 #..........................................................................
 
-sub am_taint_checking($self) {
+sub am_taint_checking {
+    my $self = shift;
     die "NO ENVIRONMENT?!?!" unless env::keys(); # reset iterator along the way
     my $v = env::var( env::keys()[0] );
     return is_tainted($v);
@@ -1599,7 +1628,8 @@ sub am_taint_checking($self) {
 
 #..........................................................................
 
-sub is_tainted(?$arg) {
+sub is_tainted { # just a function
+    my $arg  = shift;
     my $nada = substr($arg, 0, 0);  # zero-length!
     local $^EVAL_ERROR = undef;  # preserve the caller's version of $@
     try { eval "# $nada" };
@@ -1608,7 +1638,8 @@ sub is_tainted(?$arg) {
 
 #..........................................................................
 
-sub drop_privs_maybe($self) {
+sub drop_privs_maybe {
+    my $self = shift;
 
     # Attempt to drop privs if we should be tainting and aren't
     if (!(IS_VMS || IS_MSWin32 || IS_Dos

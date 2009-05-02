@@ -7,8 +7,8 @@ our ($VERSION, @ISA);
 $VERSION = '0.22';
 @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
 
-sub link_executable(@< @_) {
-    my $self = shift @_;
+sub link_executable {
+    my $self = shift;
     # $Config{ld} is set up as a special script for building
     # perl-linkable libraries.  We don't want that here.
     local $self->{config}->{+ld} = 'gcc';

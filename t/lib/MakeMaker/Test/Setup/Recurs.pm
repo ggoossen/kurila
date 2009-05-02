@@ -36,7 +36,7 @@ print "not ok 1\n";
 END
     );
 
-sub setup_recurs(...) {
+sub setup_recurs {
     setup_mm_test_root();
     chdir 'MM_TEST_ROOT:[t]' if $^OS_NAME eq 'VMS';
 
@@ -54,7 +54,7 @@ sub setup_recurs(...) {
     return 1;
 }
 
-sub teardown_recurs(...) { 
+sub teardown_recurs { 
     foreach my $file (keys %Files) {
         my $dir = dirname($file);
         if( -e $dir ) {

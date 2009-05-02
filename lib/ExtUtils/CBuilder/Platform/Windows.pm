@@ -11,8 +11,8 @@ our ($VERSION, @ISA);
 $VERSION = '0.22';
 @ISA = qw(ExtUtils::CBuilder::Base);
 
-sub new(@< @_) {
-    my $class = shift @_;
+sub new {
+    my $class = shift;
     my $self = $class->SUPER::new(< @_);
     my $cf = $self->{?config};
 
@@ -22,7 +22,8 @@ sub new(@< @_) {
     return $self;
 }
 
-sub _compiler_type($self) {
+sub _compiler_type {
+    my $self = shift;
     my $cc = $self->{config}->{?cc};
 
     return  @(  $cc =~ m/cl(\.exe)?$/ ?? 'MSVC'
@@ -93,7 +94,7 @@ sub compile($self, %< %args) {
     return $out;
 }
 
-sub need_prelink(...) { 1 }
+sub need_prelink { 1 }
 
 sub link($self, %< %args) {
     my $cf = $self->{?config};
@@ -200,7 +201,8 @@ sub normalize_filespecs($self, @< @specs) {
 }
 
 # directory of perl's include files
-sub perl_inc($self) {
+sub perl_inc {
+    my $self = shift;
 
     my $perl_src = $self->perl_src();
 

@@ -36,8 +36,8 @@ sub filter($self, $source) {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub parse_string_document(@< @_) {
-    my $this = shift @_;
+sub parse_string_document {
+    my $this = shift;
     $this->set_source(\ @_[0]);
     $this->run;
 }
@@ -50,7 +50,7 @@ sub parse_file($this, $filename) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  In case anyone tries to use them:
 
-sub run(@< @_) {
+sub run {
     use Carp ();
     if( __PACKAGE__ eq ref(@_[0]) || @_[0]) { # I'm not being subclassed!
         Carp::croak "You can call run() only on subclasses of "
@@ -62,13 +62,13 @@ sub run(@< @_) {
     }
 }
 
-sub parse_lines(...) {
+sub parse_lines {
     use Carp ();
     Carp::croak "Use set_source with ", __PACKAGE__,
               " and subclasses, not parse_lines";
 }
 
-sub parse_line(...) {
+sub parse_line {
     use Carp ();
     Carp::croak "Use set_source with ", __PACKAGE__,
               " and subclasses, not parse_line";
@@ -76,8 +76,8 @@ sub parse_line(...) {
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sub new(@< @_) {
-    my $class = shift @_;
+sub new {
+    my $class = shift;
     my $self = $class->SUPER::new(< @_);
     die "Couldn't construct for $class" unless $self;
 
@@ -93,7 +93,8 @@ sub new(@< @_) {
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-sub get_token($self) {
+sub get_token {
+    my $self = shift;
     DEBUG +> 1 and print $^STDOUT, "\nget_token starting up on $self.\n";
     DEBUG +> 2 and print $^STDOUT, " Items in token-buffer (",
         scalar( nelems  $self->{?'token_buffer'}->@ ) ,
@@ -204,8 +205,8 @@ sub get_token($self) {
 }
 
 use UNIVERSAL ();
-sub unget_token(@< @_) {
-    my $self = shift @_;
+sub unget_token {
+    my $self = shift;
         DEBUG and print $^STDOUT, "Ungetting ", scalar(nelems @_), " tokens: ",
     (nelems @_) ?? "$(join ' ',@_)\n" !! "().\n";
     foreach my $t ( @_) {
@@ -227,7 +228,7 @@ sub unget_token(@< @_) {
 
 # $self->{'source_filename'} = $source;
 
-sub set_source(@< @_) {
+sub set_source {
     my $self = shift @_;
     return $self->{?'source_fh'} unless (nelems @_);
     my $handle;
@@ -461,8 +462,8 @@ sub _get_titled_section($self, $titlename, %< %options) {
 #
 #  Methods that actually do work at parse-time:
 
-sub _handle_element_start(@< @_) {
-    my $self = shift @_;   # leaving ($element_name, $attr_hash_r)
+sub _handle_element_start {
+    my $self = shift;   # leaving ($element_name, $attr_hash_r)
     DEBUG +> 2 and print $^STDOUT, "++ @_[0] (", < map( {"<$_> " }, @_[1]->%), ")\n";
 
     push  $self->{'token_buffer'}->@, 
@@ -470,16 +471,16 @@ sub _handle_element_start(@< @_) {
     return;
 }
 
-sub _handle_text(@< @_) {
-    my $self = shift @_;   # leaving ($text)
+sub _handle_text {
+    my $self = shift;   # leaving ($text)
     DEBUG +> 2 and print $^STDOUT, "== @_[0]\n";
     push  $self->{'token_buffer'}->@,
         $self->{?'text_token_class'}->new(< @_);
     return;
 }
 
-sub _handle_element_end(@< @_) {
-    my $self = shift @_;   # leaving ($element_name);
+sub _handle_element_end {
+    my $self = shift;   # leaving ($element_name);
     DEBUG +> 2 and print $^STDOUT, "-- @_[0]\n";
     push  $self->{'token_buffer'}->@,
         $self->{?'end_token_class'}->new(< @_);

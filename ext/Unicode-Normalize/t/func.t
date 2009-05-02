@@ -8,8 +8,8 @@ BEGIN { plan tests => 211 };
 use Unicode::Normalize < qw(:all);
 ok(1); # If we made it this far, we're ok.
 
-sub _pack_U(@< @_) { Unicode::Normalize::pack_U(< @_) }
-sub hexU(@< @_) { _pack_U < map { hex }, split ' ', shift @_ }
+sub _pack_U { Unicode::Normalize::pack_U(< @_) }
+sub hexU { _pack_U < map { hex }, split ' ', shift }
 
 #########################
 
@@ -69,7 +69,8 @@ is(getComposite(0xAC00, 0x11A7), undef);
 is(getComposite(0xAC00, 0x11A8), 0xAC01);
 is(getComposite(0xADF8, 0x11AF), 0xAE00);
 
-sub uprops(?$uv) {
+sub uprops {
+    my $uv = shift;
     my $r = "";
     $r .= isExclusion($uv)   ?? 'X' !! 'x';
     $r .= isSingleton($uv)   ?? 'S' !! 's';
@@ -164,7 +165,7 @@ my $sCtg = "\x{30DB}\x{309A}";
 is(composeContiguous($sCtg), "\x{30DD}");
 is($sCtg, "\x{30DB}\x{309A}");
 
-sub answer(@< @_) { defined @_[0] ?? @_[0] ?? "YES" !! "NO" !! "MAYBE" }
+sub answer { defined @_[0] ?? @_[0] ?? "YES" !! "NO" !! "MAYBE" }
 
 is(answer(checkNFD("")),  "YES");
 is(answer(checkNFC("")),  "YES");

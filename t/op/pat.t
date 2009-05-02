@@ -50,7 +50,7 @@ our ($TODO);
 
 run_tests() unless caller;
 
-sub run_tests(@< @_) {
+sub run_tests {
 
     $x = "abc\ndef\n";
 
@@ -311,7 +311,7 @@ sub run_tests(@< @_) {
 
     our $c;
 
-    sub matchit(...) {
+    sub matchit {
         m/
      (
        \(
@@ -401,7 +401,7 @@ sub run_tests(@< @_) {
     $x =~ m/.z/gc;
     ok(pos($x) == 2);
 
-    sub f(@< @_) {
+    sub f {
         my $p = @_[0];
         return $p;
     }
@@ -429,7 +429,7 @@ sub run_tests(@< @_) {
         ok( $^MATCH eq $ans );
     }
 
-    sub prefixify(@< @_) {
+    sub prefixify {
         my@($v,$a,$b,$res) =  @_;
         $v =~ s/\Q$a\E/$b/;
         ok($res eq $v);
@@ -1187,7 +1187,7 @@ EOT
 EOT
 
     #test /o feature
-    sub test_o(@< @_) { @_[0] =~m/@_[1]/o; return $1}
+    sub test_o { @_[0] =~m/@_[1]/o; return $1}
     ok(test_o('abc','(.)..') eq 'a');
     ok(test_o('abc','..(.)') eq 'a');
 
@@ -1324,7 +1324,7 @@ EOT
 
         package ID_20010407_006;
 
-        sub x(...) {
+        sub x {
             "a\x{1234}";
         }
 
@@ -1880,21 +1880,21 @@ EOT
 
     print $^STDOUT, "# user-defined character properties\n";
 
-    sub InKana1(...) {
+    sub InKana1 {
         return <<'END';
 3040	309F
 30A0	30FF
 END
     }
 
-    sub InKana2(...) {
+    sub InKana2 {
         return <<'END';
 +utf8::InHiragana
 +utf8::InKatakana
 END
     }
 
-    sub InKana3(...) {
+    sub InKana3 {
         return <<'END';
 +utf8::InHiragana
 +utf8::InKatakana
@@ -1902,7 +1902,7 @@ END
 END
     }
 
-    sub InNotKana(...) {
+    sub InNotKana {
         return <<'END';
 !utf8::InHiragana
 -utf8::InKatakana
@@ -1922,7 +1922,7 @@ END
     ok( "\x{3040}" =~ m/\p{InNotKana}/ );
     ok( "\x{3041}" =~ m/\P{InNotKana}/ );
 
-    sub InConsonant(...) { # Not EBCDIC-aware.
+    sub InConsonant { # Not EBCDIC-aware.
         return <<EOF;
 0061	007f
 -0061
@@ -1980,7 +1980,7 @@ EOF
 
     print $^STDOUT, "# more user-defined character properties\n";
 
-    sub IsSyriac1(...) {
+    sub IsSyriac1 {
         return <<'END';
 0712	072C
 0730	074A
@@ -1990,7 +1990,7 @@ END
     ok("\x{0712}" =~ m/\p{IsSyriac1}/, '\x{0712}, \p{IsSyriac1}');
     ok("\x{072F}" =~ m/\P{IsSyriac1}/, '\x{072F}, \P{IsSyriac1}');
 
-    sub Syriac1(...) {
+    sub Syriac1 {
         return <<'END';
 0712	072C
 0730	074A
@@ -2001,15 +2001,15 @@ END
     ok("\x{072F}" =~ m/\P{Syriac1}/, '\x{072F}, \p{Syriac1}');
 
     print $^STDOUT, "# user-defined character properties may lack \\n at the end\n";
-    sub InGreekSmall(...)   { return "03B1\t03C9" }
-    sub InGreekCapital(...) { return "0391\t03A9\n-03A2" }
+    sub InGreekSmall   { return "03B1\t03C9" }
+    sub InGreekCapital { return "0391\t03A9\n-03A2" }
 
     ok("\x{03C0}" =~ m/\p{InGreekSmall}/,   "Small pi");
     ok("\x{03C2}" =~ m/\p{InGreekSmall}/,   "Final sigma");
     ok("\x{03A0}" =~ m/\p{InGreekCapital}/, "Capital PI");
     ok("\x{03A2}" =~ m/\P{InGreekCapital}/, "Reserved");
 
-    sub AsciiHexAndDash(...) {
+    sub AsciiHexAndDash {
         return <<'END';
 +utf8::ASCII_Hex_Digit
 +utf8::Dash
@@ -2390,7 +2390,7 @@ END
 
     do {
         package wooosh;
-        sub gloople(...) {
+        sub gloople {
             "!";
         }
         package main;
@@ -2401,7 +2401,7 @@ END
     };
 
     do {
-        sub gloople(...) {
+        sub gloople {
             "!";
         }
         try {gloople() =~ m/(.)/g;}; die if $^EVAL_ERROR;
@@ -2502,8 +2502,8 @@ END
         use lib 'lib';
         use Cname;
 
-        sub make_must_warn(@< @_) {
-            my $warn_pat = shift @_;
+        sub make_must_warn {
+            my $warn_pat = shift;
             return sub {
                     my @($code) =  @_;
                     my $warning;
@@ -3016,7 +3016,7 @@ EOFTEST
         $x =~ s/(.)\K/$1/g;
         ok($x eq "aabbccddee");
     };
-    sub kt(@< @_)
+    sub kt
     {
         return '4' if @_[0] eq '09028623';
     }

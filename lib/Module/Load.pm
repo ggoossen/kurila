@@ -4,7 +4,7 @@ our $VERSION = '0.12';
 
 use File::Spec ();
 
-sub import(...) {
+sub import {
     my $who = _who();
 
     Symbol::fetch_glob("$($who)::load")->* = \&load;
@@ -32,18 +32,18 @@ sub load ($mod, @< @args)  {
 
 ### 5.004's Exporter doesn't have export_to_level.
 ### Taken from Michael Schwerns Test::More and slightly modified
-sub _export_to_level(@< @_) {
-    my $pkg     = shift @_;
-    my $level   = shift @_;
-    my $mod     = shift @_;
+sub _export_to_level {
+    my $pkg     = shift;
+    my $level   = shift;
+    my $mod     = shift;
     my $callpkg = caller($level);
 
     $mod->export($callpkg, < @_);
 }
 
-sub _to_file(@< @_){
-    local $_ = shift @_;
-    my $pm      = shift @_ || '';
+sub _to_file{
+    local $_ = shift;
+    my $pm      = shift || '';
 
     my @parts = split m/::/;
 
@@ -64,10 +64,10 @@ sub _to_file(@< @_){
     return $file;
 }
 
-sub _who(...) { @(caller(1))[0] }
+sub _who { @(caller(1))[0] }
 
-sub _is_file(@< @_) {
-    local $_ = shift @_;
+sub _is_file {
+    local $_ = shift;
     return  m/^\./               ?? 1 !!
         m/[^\w:']/           ?? 1 !!
         undef

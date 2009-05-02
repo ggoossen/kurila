@@ -4,7 +4,7 @@ BEGIN { require './test.pl'; }
 
 plan (4);
 
-sub foo(@< @_) {
+sub foo {
     my $x = nelems(@_);
     return $x;
 }

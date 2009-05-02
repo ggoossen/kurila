@@ -115,7 +115,8 @@ $VERSION = '2.02';
 ############################################################################
 
 # Initialize the object.  Must be sure to call our parent initializer.
-sub initialize($self) {
+sub initialize {
+    my $self = shift;
 
     $self->%{+alt}      = 0  unless defined $self->%{?alt};
     $self->%{+indent}   = 4  unless defined $self->%{?indent};
@@ -138,9 +139,9 @@ sub initialize($self) {
 # paragraph, the line number, and a Pod::Paragraph object.  Just dispatches
 # the command to a method named the same as the command.  =cut is handled
 # internally by Pod::Parser.
-sub command(@< @_) {
-    my $self = shift @_;
-    my $command = shift @_;
+sub command {
+    my $self = shift;
+    my $command = shift;
     return if $command eq 'pod';
     return if ($self->%{?EXCLUDE} && $command ne 'end');
     $self->item ("\n") if defined $self->%{?ITEM};
@@ -218,10 +219,10 @@ sub textblock($self, $_, $line, _) {
 # Pod::InteriorSequence object and is expected to return the resulting text.
 # Calls code, bold, italic, file, and link to handle those types of
 # sequences, and handles S<>, E<>, X<>, and Z<> directly.
-sub interior_sequence(@< @_) {
-    my $self = shift @_;
-    my $command = shift @_;
-    local $_ = shift @_;
+sub interior_sequence {
+    my $self = shift;
+    my $command = shift;
+    local $_ = shift;
     return '' if ($command eq 'X' || $command eq 'Z');
 
     # Expand escapes into the actual character now, warning if invalid.
@@ -253,9 +254,9 @@ sub interior_sequence(@< @_) {
 
 # Called for each paragraph that's actually part of the POD.  We take
 # advantage of this opportunity to untabify the input.
-sub preprocess_paragraph(@< @_) {
-    my $self = shift @_;
-    local $_ = shift @_;
+sub preprocess_paragraph {
+    my $self = shift;
+    local $_ = shift;
     1 while s/^(.*?)(\t+)/$($1 . ' ' x (length ($2) * 8 - length ($1) % 8))/m;
     $_;
 }
@@ -268,11 +269,11 @@ sub preprocess_paragraph(@< @_) {
 # All command paragraphs take the paragraph and the line number.
 
 # First level heading.
-sub cmd_head1(@< @_) {
-    my $self = shift @_;
-    local $_ = shift @_;
+sub cmd_head1 {
+    my $self = shift;
+    local $_ = shift;
     s/\s+$//;
-    $_ = $self->interpolate ($_, shift @_);
+    $_ = $self->interpolate ($_, shift);
     if ($self->%{?alt}) {
         $self->output ("\n==== $_ ====\n\n");
     } else {
@@ -282,11 +283,11 @@ sub cmd_head1(@< @_) {
 }
 
 # Second level heading.
-sub cmd_head2(@< @_) {
-    my $self = shift @_;
-    local $_ = shift @_;
+sub cmd_head2 {
+    my $self = shift;
+    local $_ = shift;
     s/\s+$//;
-    $_ = $self->interpolate ($_, shift @_);
+    $_ = $self->interpolate ($_, shift);
     if ($self->%{?alt}) {
         $self->output ("\n==   $_   ==\n\n");
     } else {
@@ -295,11 +296,11 @@ sub cmd_head2(@< @_) {
 }
 
 # third level heading - not strictly perlpodspec compliant
-sub cmd_head3(@< @_) {
-    my $self = shift @_;
-    local $_ = shift @_;
+sub cmd_head3 {
+    my $self = shift;
+    local $_ = shift;
     s/\s+$//;
-    $_ = $self->interpolate ($_, shift @_);
+    $_ = $self->interpolate ($_, shift);
     if ($self->%{?alt}) {
         $self->output ("\n= $_ =\n");
     } else {
@@ -312,9 +313,9 @@ sub cmd_head3(@< @_) {
 *cmd_head4 = \&cmd_head3;
 
 # Start a list.
-sub cmd_over(@< @_) {
-    my $self = shift @_;
-    local $_ = shift @_;
+sub cmd_over {
+    my $self = shift;
+    local $_ = shift;
     unless (m/^[-+]?\d+\s+$/) { $_ = $self->%{?indent} }
     push ( $self->%{INDENTS}->@, $self->%{?MARGIN});
     $self->%{+MARGIN} += ($_ + 0);
@@ -330,19 +331,19 @@ sub cmd_back($self, ...) {
 }
 
 # An individual list item.
-sub cmd_item(@< @_) {
-    my $self = shift @_;
+sub cmd_item {
+    my $self = shift;
     if (defined $self->%{?ITEM}) { $self->item }
-    local $_ = shift @_;
+    local $_ = shift;
     s/\s+$//;
     $self->%{+ITEM} = $self->interpolate ($_);
 }
 
 # Begin a block for a particular translator.  Setting VERBATIM triggers
 # special handling in textblock().
-sub cmd_begin(@< @_) {
-    my $self = shift @_;
-    local $_ = shift @_;
+sub cmd_begin {
+    my $self = shift;
+    local $_ = shift;
     my @($kind) = @: m/^(\S+)/ or return;
     if ($kind eq 'text') {
         $self->%{+VERBATIM} = 1;
@@ -360,10 +361,10 @@ sub cmd_end($self, ...) {
 
 # One paragraph for a particular translator.  Ignore it unless it's intended
 # for text, in which case we treat it as a verbatim text block.
-sub cmd_for(@< @_) {
-    my $self = shift @_;
-    local $_ = shift @_;
-    my $line = shift @_;
+sub cmd_for {
+    my $self = shift;
+    local $_ = shift;
+    my $line = shift;
     return unless s/^text\b[ \t]*\n?//;
     $self->verbatim ($_, $line);
 }
@@ -375,17 +376,17 @@ sub cmd_for(@< @_) {
 
 # The simple formatting ones.  These are here mostly so that subclasses can
 # override them and do more complicated things.
-sub seq_b(@< @_) { return @_[0]->{?alt} ?? "``@_[1]''" !! @_[1] }
-sub seq_c(@< @_) { return @_[0]->{?alt} ?? "``@_[1]''" !! "`@_[1]'" }
-sub seq_f(@< @_) { return @_[0]->{?alt} ?? "\"@_[1]\"" !! @_[1] }
-sub seq_i(@< @_) { return '*' . @_[1] . '*' }
+sub seq_b { return @_[0]->{?alt} ?? "``@_[1]''" !! @_[1] }
+sub seq_c { return @_[0]->{?alt} ?? "``@_[1]''" !! "`@_[1]'" }
+sub seq_f { return @_[0]->{?alt} ?? "\"@_[1]\"" !! @_[1] }
+sub seq_i { return '*' . @_[1] . '*' }
 
 # The complicated one.  Handle links.  Since this is plain text, we can't
 # actually make any real links, so this is all to figure out what text we
 # print out.
-sub seq_l(@< @_) {
-    my $self = shift @_;
-    local $_ = shift @_;
+sub seq_l {
+    my $self = shift;
+    local $_ = shift;
 
     # Smash whitespace in case we were split across multiple lines.
     s/\s+/ /g;
@@ -442,9 +443,9 @@ sub seq_l(@< @_) {
 # contains a newline, output the item tag followed by the newline.
 # Otherwise, see if there's enough room for us to output the item tag in the
 # margin of the text or if we have to put it on a separate line.
-sub item(@< @_) {
-    my $self = shift @_;
-    local $_ = shift @_;
+sub item {
+    my $self = shift;
+    local $_ = shift;
     my $tag = $self->%{?ITEM};
     unless (defined $tag) {
         warn "item called without tag";
@@ -481,9 +482,9 @@ sub item(@< @_) {
 # Text::Wrap because it plays games with tabs.  We can't use formline, even
 # though we'd really like to, because it screws up non-printing characters.
 # So we have to do the wrapping ourselves.
-sub wrap(@< @_) {
-    my $self = shift @_;
-    local $_ = shift @_;
+sub wrap {
+    my $self = shift;
+    local $_ = shift;
     my $output = '';
     my $spaces = ' ' x $self->%{?MARGIN};
     my $width = $self->%{?width} - $self->%{?MARGIN};
@@ -501,9 +502,9 @@ sub wrap(@< @_) {
 
 # Reformat a paragraph of text for the current margin.  Takes the text to
 # reformat and returns the formatted text.
-sub reformat(@< @_) {
-    my $self = shift @_;
-    local $_ = shift @_;
+sub reformat {
+    my $self = shift;
+    local $_ = shift;
 
     # If we're trying to preserve two spaces after sentences, do some
     # munging to support that.  Otherwise, smash all repeated whitespace.
@@ -519,7 +520,7 @@ sub reformat(@< @_) {
 }
 
 # Output text to the output device.
-sub output(@< @_) { @_[1] =~ s/\01/ /g; print  @_[0]->output_handle  ,@_[1] }
+sub output { @_[1] =~ s/\01/ /g; print  @_[0]->output_handle  ,@_[1] }
 
 
 ############################################################################
@@ -528,14 +529,14 @@ sub output(@< @_) { @_[1] =~ s/\01/ /g; print  @_[0]->output_handle  ,@_[1] }
 
 # The old Pod::Text module did everything in a pod2text() function.  This
 # tries to provide the same interface for legacy applications.
-sub pod2text(@< @_) {
+sub pod2text {
     my @args;
 
     # This is really ugly; I hate doing option parsing in the middle of a
     # module.  But the old Pod::Text module supported passing flags to its
     # entry function, so handle -a and -<number>.
     while (@_[0] =~ m/^-/) {
-        my $flag = shift @_;
+        my $flag = shift;
         if    ($flag eq '-a')       { push (@args, alt => 1)    }
         elsif ($flag =~ m/^-(\d+)$/) { push (@args, width => $1) }
         else {

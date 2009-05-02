@@ -146,14 +146,15 @@ sub lock_ref_keys($hash, @< @keys) {
     return $hash;
 }
 
-sub unlock_ref_keys(?$hash) {
+sub unlock_ref_keys {
+    my $hash = shift;
 
     Internals::HvRESTRICTED $hash->%, 0;
     return $hash;
 }
 
-sub   lock_keys(@< @_) {   lock_ref_keys(< @_) }
-sub unlock_keys(@< @_) { unlock_ref_keys(< @_) }
+sub   lock_keys {   lock_ref_keys(< @_) }
+sub unlock_keys { unlock_ref_keys(< @_) }
 
 =item B<lock_keys_plus>
 
@@ -184,7 +185,7 @@ sub lock_ref_keys_plus($hash,@< @keys) {
     return $hash
 }
 
-sub lock_keys_plus(@< @_) { lock_ref_keys_plus(< @_) }
+sub lock_keys_plus { lock_ref_keys_plus(< @_) }
 
 
 =item B<lock_value>
@@ -219,8 +220,8 @@ sub unlock_ref_value($hash, $key) {
     return $hash
 }
 
-sub   lock_value(@< @_) {   lock_ref_value(< @_) }
-sub unlock_value(@< @_) { unlock_ref_value(< @_) }
+sub   lock_value {   lock_ref_value(< @_) }
+sub unlock_value { unlock_ref_value(< @_) }
 
 
 =item B<lock_hash>
@@ -242,7 +243,8 @@ Returns a reference to the %hash.
 
 =cut
 
-sub lock_hashref(?$hash) {
+sub lock_hashref {
+    my $hash = shift;
 
     lock_ref_keys($hash);
 
@@ -253,7 +255,8 @@ sub lock_hashref(?$hash) {
     return $hash;
 }
 
-sub unlock_hashref(?$hash) {
+sub unlock_hashref {
+    my $hash = shift;
 
     foreach my $value (values $hash->%) {
         Internals::SvREADONLY($value, 0);
@@ -264,8 +267,8 @@ sub unlock_hashref(?$hash) {
     return $hash;
 }
 
-sub   lock_hash(@< @_) {   lock_hashref(< @_) }
-sub unlock_hash(@< @_) { unlock_hashref(< @_) }
+sub   lock_hash {   lock_hashref(< @_) }
+sub unlock_hash { unlock_hashref(< @_) }
 
 =item B<lock_hash_recurse>
 
@@ -291,7 +294,8 @@ Returns a reference to the %hash.
 
 =cut
 
-sub lock_hashref_recurse(?$hash) {
+sub lock_hashref_recurse {
+    my $hash = shift;
 
     lock_ref_keys($hash);
     foreach my $value (values $hash->%) {
@@ -303,7 +307,8 @@ sub lock_hashref_recurse(?$hash) {
     return $hash
 }
 
-sub unlock_hashref_recurse(?$hash) {
+sub unlock_hashref_recurse {
+    my $hash = shift;
 
     foreach my $value (values $hash->%) {
         if (reftype($value) eq 'HASH') {
@@ -327,7 +332,8 @@ Returns true if the hash and its keys are unlocked.
 
 =cut
 
-sub hashref_unlocked(?$hash) {
+sub hashref_unlocked {
+    my $hash=shift;
     return Internals::HvRESTRICTED($hash)
 }
 

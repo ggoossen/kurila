@@ -70,7 +70,7 @@ if ($::count_commonsense == 1) {
 my $case = 2;
 my $FastFileTests_OK = 0;
 
-sub cleanup(...) {
+sub cleanup {
     if (-d dir_path('for_find')) {
         chdir(dir_path('for_find'));
     }
@@ -111,7 +111,7 @@ sub CheckDie($ok) {
     else { print $^STDOUT, "not ok $case\n $^OS_ERROR\n"; exit 0; }
 }
 
-sub touch(@< @_) {
+sub touch {
     CheckDie( open(my $T,'>',@_[0]) );
 }
 
@@ -119,7 +119,7 @@ sub MkDir($dir, $mode) {
     CheckDie( mkdir($dir, $mode) );
 }
 
-sub wanted_File_Dir(...) {
+sub wanted_File_Dir {
     printf $^STDOUT, "# \$File::Find::dir => '$File::Find::dir'\t\$_ => '$_'\n";
     s#\.$## if ($^OS_NAME eq 'VMS' && $_ ne '.');
     s/(.dir)?$//i if ($^OS_NAME eq 'VMS' && -d _);
@@ -133,12 +133,12 @@ sub wanted_File_Dir(...) {
     }
 }
 
-sub wanted_File_Dir_prune(@< @_) {
+sub wanted_File_Dir_prune {
     &wanted_File_Dir( < @_ );
     $File::Find::prune=1 if  $_ eq 'faba';
 }
 
-sub wanted_Name(...) {
+sub wanted_Name {
     my $n = $File::Find::name;
     $n =~ s#\.$## if ($^OS_NAME eq 'VMS' && $n ne '.');
     print $^STDOUT, "# \$File::Find::name => '$n'\n";
@@ -153,7 +153,7 @@ sub wanted_Name(...) {
     delete %Expect_Name{$n};
 }
 
-sub wanted_File(...) {
+sub wanted_File {
     print $^STDOUT, "# \$_ => '$_'\n";
     s#\.$## if ($^OS_NAME eq 'VMS' && $_ ne '.');
     my $i = rindex($_,'/');
@@ -167,14 +167,14 @@ sub wanted_File(...) {
     delete %Expect_File{ $_};
 }
 
-sub simple_wanted(...) {
+sub simple_wanted {
     print $^STDOUT, "# \$File::Find::dir => '$File::Find::dir'\n";
     print $^STDOUT, "# \$_ => '$_'\n";
 }
 
-sub noop_wanted(...) {}
+sub noop_wanted {}
 
-sub my_preprocess(@< @_) {
+sub my_preprocess {
     my @files = @_;
     print $^STDOUT, "# --preprocess--\n";
     print $^STDOUT, "#   \$File::Find::dir => '$File::Find::dir' \n";
@@ -191,7 +191,7 @@ sub my_preprocess(@< @_) {
     return @files;
 }
 
-sub my_postprocess(...) {
+sub my_postprocess {
     print $^STDOUT, "# postprocess: \$File::Find::dir => '$File::Find::dir' \n";
     delete %Expect_Dir{ $File::Find::dir};
 }
@@ -212,7 +212,7 @@ sub my_postprocess(...) {
 # this function will return the empty string on Mac OS and the string
 # "./" otherwise.
 
-sub dir_path(@< @_) {
+sub dir_path {
     my $first_arg = shift @_;
 
     if ($first_arg eq '.') {
@@ -240,7 +240,7 @@ sub dir_path(@< @_) {
 # find/finddepth. Basically, topdir() does the same as dir_path() (see
 # above), except that there's no trailing ":" on Mac OS.
 
-sub topdir(@< @_) {
+sub topdir {
     my $path = dir_path(< @_);
     $path =~ s/:$// if ($^OS_NAME eq 'MacOS');
     return $path;
@@ -260,7 +260,7 @@ sub topdir(@< @_) {
 # function will return the empty string on Mac OS and the string "./" 
 # otherwise.
 
-sub file_path(@< @_) {
+sub file_path {
     my $first_arg = shift @_;
 
     if ($first_arg eq '.') {
@@ -294,7 +294,7 @@ sub file_path(@< @_) {
 # above), except that there's always a leading ":" on Mac OS, even for
 # plain file/directory names.
 
-sub file_path_name(@< @_) {
+sub file_path_name {
     my $path = file_path(< @_);
     $path = ":$path" if (($^OS_NAME eq 'MacOS') && ($path !~ m/:/));
     return $path;

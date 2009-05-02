@@ -71,7 +71,7 @@ sub _is_under($self, $path, @< @under) {
     return 0;
 }
 
-sub new(@< @_) {
+sub new {
     my $class = shift(@_);
     $class = ref($class) || $class;
 

@@ -4,13 +4,13 @@ our ($VERSION);
 $VERSION = "1.00";
 
 # subclass is supposed to implement at least these
-sub new(...) { die "not implemented by subclass" }
-sub clone(...) { die "not implemented by subclass" }
-sub add(...) { die "not implemented by subclass" }
-sub digest(...) { die "not implemented by subclass" }
+sub new { die "not implemented by subclass" }
+sub clone { die "not implemented by subclass" }
+sub add { die "not implemented by subclass" }
+sub digest { die "not implemented by subclass" }
 
-sub reset(@< @_) {
-    my $self = shift @_;
+sub reset {
+    my $self = shift;
     $self->new(< @_);  # ugly
 }
 
@@ -30,12 +30,12 @@ sub addfile($self, $handle) {
     $self;
 }
 
-sub add_bits(@< @_) {
-    my $self = shift @_;
+sub add_bits {
+    my $self = shift;
     my $bits;
     my $nbits;
     if ((nelems @_) == 1) {
-        my $arg = shift @_;
+        my $arg = shift;
         $bits = pack("B*", $arg);
         $nbits = length($arg);
     }
@@ -49,13 +49,13 @@ sub add_bits(@< @_) {
     return $self->add(substr($bits, 0, $nbits/8));
 }
 
-sub hexdigest(@< @_) {
-    my $self = shift @_;
+sub hexdigest {
+    my $self = shift;
     return unpack("H*", $self->digest(< @_));
 }
 
-sub b64digest(@< @_) {
-    my $self = shift @_;
+sub b64digest {
+    my $self = shift;
     require MIME::Base64;
     my $b64 = MIME::Base64::encode($self->digest(< @_), "");
     $b64 =~ s/=+$//;

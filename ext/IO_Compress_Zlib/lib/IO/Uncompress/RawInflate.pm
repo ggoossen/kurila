@@ -34,13 +34,13 @@ sub new($class, @< @_)
     $obj->_create(undef, 0, < @_);
 }
 
-sub rawinflate(@< @_)
+sub rawinflate
 {
     my $obj = createSelfTiedObject(undef, \$RawInflateError);
     return $obj->_inf(< @_);
 }
 
-sub getExtraParams(...)
+sub getExtraParams
 {
     return ();
 }
@@ -74,16 +74,17 @@ sub mkUncomp($self, $class, $got)
 }
 
 
-sub ckMagic($self)
+sub ckMagic
 {
+    my $self = shift;
 
     return $self->_isRaw() ;
 }
 
-sub readHeader(@< @_)
+sub readHeader
 {
-    my $self = shift @_;
-    my $magic = shift @_ ;
+    my $self = shift;
+    my $magic = shift ;
 
     return \%(
             'Type'          => 'rfc1951',
@@ -94,7 +95,7 @@ sub readHeader(@< @_)
         );
 }
 
-sub chkTrailer(...)
+sub chkTrailer
 {
     return STATUS_OK ;
 }
@@ -162,8 +163,9 @@ sub _isRawx($self, $magic)
 }
 
 
-sub inflateSync($self)
+sub inflateSync
 {
+    my $self = shift ;
 
     # inflateSync is a no-op in Plain mode
     return 1
@@ -250,8 +252,9 @@ sub inflateSync($self)
 #    
 #}
 
-sub scan($self)
+sub scan
 {
+    my $self = shift ;
 
     return 1 if $self->*->{?Closed} ;
     return 1 if !length $self->*->{?Pending} && $self->*->{?EndStream} ;

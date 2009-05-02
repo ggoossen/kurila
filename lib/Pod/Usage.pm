@@ -440,8 +440,8 @@ BEGIN {
 ## Function definitions begin here
 ##---------------------------------
 
-sub pod2usage(@< @_) {
-          local($_) = shift @_;
+sub pod2usage {
+          local($_) = shift;
     my %opts;
     ## Collect arguments
     if ((nelems @_) +> 0) {
@@ -557,8 +557,8 @@ sub pod2usage(@< @_) {
 ## Method definitions begin here
 ##-------------------------------
 
-sub new(@< @_) {
-    my $this = shift @_;
+sub new {
+    my $this = shift;
     my $class = ref($this) || $this;
     my %params = %( < @_ );
     my $self = \%(< %params);
@@ -572,7 +572,7 @@ sub new(@< @_) {
     return $self;
 }
 
-sub select(@< @_) {
+sub select {
     my @($self, @< @res) =  @_;
     if (@ISA[0]->can('select')) {
         $self->SUPER::select(< @_);
@@ -582,7 +582,7 @@ sub select(@< @_) {
 }
 
 # Override Pod::Text->seq_i to return just "arg", not "*arg*".
-sub seq_i(@< @_) { return @_[1] }
+sub seq_i { return @_[1] }
 
 # This overrides the Pod::Text method to do something very akin to what
 # Pod::Select did as well as the work done below by preprocess_paragraph.
@@ -635,17 +635,18 @@ sub start_document($self, ...) {
     print $out_fh, "$msg\n";
 }
 
-sub begin_pod($self) {
+sub begin_pod {
+    my $self = shift;
     $self->SUPER::begin_pod();  ## Have to call superclass
     my $msg = $self->{USAGE_OPTIONS}->{?message}  or  return 1;
     my $out_fh = $self->output_handle();
     print $out_fh, "$msg\n";
 }
 
-sub preprocess_paragraph(@< @_) {
-    my $self = shift @_;
-    local $_ = shift @_;
-    my $line = shift @_;
+sub preprocess_paragraph {
+    my $self = shift;
+    local $_ = shift;
+    my $line = shift;
     ## See if this is a heading and we arent printing the entire manpage.
     if (($self->{USAGE_OPTIONS}->{?verbose} +< 2) && m/^=head/) {
         ## Change the title of the SYNOPSIS section to USAGE

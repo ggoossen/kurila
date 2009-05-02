@@ -7,12 +7,12 @@ BEGIN {
     $bytes::codepoints_hint_bits = 0x01000000;
 }
 
-sub import(...) {
+sub import {
     $^HINT_BITS ^|^= $bytes::hint_bits;
     $^HINT_BITS ^&^= ^~^$bytes::codepoints_hint_bits;
 }
 
-sub unimport(...) {
+sub unimport {
     $^HINT_BITS ^&^= ^~^$bytes::hint_bits;
 }
 
@@ -22,7 +22,7 @@ sub length ($s) {
     return CORE::length($s);
 }
 
-sub substr(@< @_) {
+sub substr {
     return
         (nelems @_) == 2 ?? CORE::substr(@_[0], @_[1]) !!
         (nelems @_) == 3 ?? CORE::substr(@_[0], @_[1], @_[2]) !!
@@ -37,13 +37,13 @@ sub chr($s) {
     return CORE::chr($s);
 }
 
-sub index(@< @_) {
+sub index {
     return
         (nelems @_) == 2 ?? CORE::index(@_[0], @_[1]) !!
         CORE::index(@_[0], @_[1], @_[2]) ;
 }
 
-sub rindex(@< @_) {
+sub rindex {
     return
         (nelems @_) == 2 ?? CORE::rindex(@_[0], @_[1]) !!
         CORE::rindex(@_[0], @_[1], @_[2]) ;

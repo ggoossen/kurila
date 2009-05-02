@@ -21,7 +21,8 @@ BEGIN {
     plan (8);
 }
 
-sub fork_and_retrieve(?$which) {
+sub fork_and_retrieve {
+    my $which = shift;
     pipe my ($r, $w) or die "pipe: $^OS_ERROR\n";
     my $pid = fork; defined $pid or die "fork: $^OS_ERROR\n";
 

@@ -7,7 +7,7 @@ use bytes;
 use Test::More ;
 use CompTestUtils;
 
-sub run(...)
+sub run
 {
     my $CompressClass   = identify();
     my $UncompressClass = getInverse($CompressClass);

@@ -7,7 +7,7 @@ use B < qw|svref_2object|;
 do {
     # cop_io
     use open IN  => ":crlf", OUT => ":bytes";
-    sub foo(@< @_) {
+    sub foo {
         return (nelems @_) + 1;
     }
 

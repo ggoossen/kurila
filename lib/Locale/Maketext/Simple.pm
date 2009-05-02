@@ -118,9 +118,9 @@ sub import($class, %< %args) {
 
 my %Loc;
 
-sub reload_loc(...) { %Loc = %( () ) }
+sub reload_loc { %Loc = %( () ) }
 
-sub load_loc(@< @_) {
+sub load_loc {
     my @($class, %< %args) =  @_;
 
     my $pkg = join('::', grep { defined and length }, @( %args{?Class}, %args{?Subclass}));
@@ -164,7 +164,7 @@ sub load_loc(@< @_) {
     }
     elsif ($style eq 'gettext') {
         %Loc{+$pkg} = sub {
-            my $str = shift @_;
+            my $str = shift;
             $str =~ s{([\~\[\]])}{~$1}g;
                 $str =~ s{
                 ([%\\]%)                        # 1 - escaped sequence
@@ -193,12 +193,12 @@ sub load_loc(@< @_) {
              });
 }
 
-sub default_loc(@< @_) {
+sub default_loc {
     my @($self, %< %args) =  @_;
     my $style = lc(%args{?Style});
     if ($style eq 'maketext') {
         return sub {
-                my $str = shift @_;
+                my $str = shift;
                 $str =~ s{((?<!~)(?:~~)*)\[_([1-9]\d*|\*)\]}
                      {$1\%$2}g;
                 $str =~ s{((?<!~)(?:~~)*)\[([A-Za-z#*]\w*),([^\]]+)\]} 
@@ -214,8 +214,8 @@ sub default_loc(@< @_) {
     }
 }
 
-sub _default_gettext(@< @_) {
-    my $str = shift @_;
+sub _default_gettext {
+    my $str = shift;
     $str =~ s{
 	%			# leading symbol
 	(?:			# either one of
@@ -239,7 +239,7 @@ sub _default_gettext(@< @_) {
 	    \)			#   closing function call
 	)			# closing either one of
     }{$( do {
-        my $digit = $2 || shift @_;
+        my $digit = $2 || shift;
         $digit . (
                                                    $1 ?? (
                                                              ($1 eq 'tense') ?? (($3 eq 'present') ?? 'ing' !! 'ed') !!
@@ -251,12 +251,13 @@ sub _default_gettext(@< @_) {
     return $str;
 };
 
-sub _escape(?$text) {
+sub _escape {
+    my $text = shift;
     $text =~ s/\b_([1-9]\d*)/$1->%/g;
     return $text;
 }
 
-sub _unescape(@< @_) {
+sub _unescape {
     join(',', map {
             m/\A(\s*)%([1-9]\d*|\*)(\s*)\z/ ?? "$1_$2$3" !! $_
         }, split(m/,/, @_[0]));

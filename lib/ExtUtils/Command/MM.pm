@@ -43,11 +43,11 @@ flag.  Any @test_libs will be unshifted onto the test's $^INCLUDE_PATH.
 
 =cut
 
-sub test_harness(@< @_) {
+sub test_harness {
     require Test::Harness;
     require File::Spec;
 
-    $Test::Harness::verbose = shift @_;
+    $Test::Harness::verbose = shift;
 
     # Because Windows doesn't do this for us and listing all the *.t files
     # out on the command line can blow over its exec limit.
@@ -86,7 +86,7 @@ If no arguments are given to pod2man it will read from @ARGV.
 
 =cut
 
-sub pod2man(@< @_) {
+sub pod2man {
     local @ARGV = @( (nelems @_) ?? < @_ !! < @ARGV );
 
     require Pod::Man;
@@ -147,7 +147,7 @@ filename from @ARGV.
 
 =cut
 
-sub warn_if_old_packlist(...) {
+sub warn_if_old_packlist {
     my $packlist = @ARGV[0];
 
     return unless -f $packlist;
@@ -186,7 +186,7 @@ Key/value pairs are extra information about the module.  Fields include:
 
 =cut
 
-sub perllocal_install(...) {
+sub perllocal_install {
     my@($type, $name) = @: splice(@ARGV, 0, 2);
 
     # VMS feeds args as a piped file on STDIN since it usually can't
@@ -231,7 +231,7 @@ uninstallation.
 
 =cut
 
-sub uninstall(...) {
+sub uninstall {
     my@($packlist) =@( shift @ARGV);
 
     require ExtUtils::Install;

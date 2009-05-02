@@ -10,11 +10,11 @@ use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
 
 print $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
-sub e(@< @_)  { Pod::Simple::DumpAsXML->_duo(\&without_vf, < @_) }
-sub ev(@< @_) { Pod::Simple::DumpAsXML->_duo(\&with_vf,    < @_) }
+sub e  { Pod::Simple::DumpAsXML->_duo(\&without_vf, < @_) }
+sub ev { Pod::Simple::DumpAsXML->_duo(\&with_vf,    < @_) }
 
-sub with_vf(@< @_)    { @_[0]->  accept_codes('VerbatimFormatted') }
-sub without_vf(@< @_) { @_[0]->unaccept_codes('VerbatimFormatted') }
+sub with_vf    { @_[0]->  accept_codes('VerbatimFormatted') }
+sub without_vf { @_[0]->unaccept_codes('VerbatimFormatted') }
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

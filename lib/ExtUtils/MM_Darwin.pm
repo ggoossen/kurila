@@ -28,8 +28,8 @@ Turn off Apple tar's tendency to copy resource forks as "._foo" files.
 
 =cut
 
-sub init_dist(@< @_) {
-    my $self = shift @_;
+sub init_dist {
+    my $self = shift;
 
     # Thank you, Apple, for breaking tar and then breaking the work around.
     # 10.4 wants COPY_EXTENDED_ATTRIBUTES_DISABLE while 10.5 wants

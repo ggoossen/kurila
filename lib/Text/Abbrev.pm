@@ -40,11 +40,11 @@ our @EXPORT = qw(abbrev);
 #	...
 #	$long = $foo{$short};
 
-sub abbrev(@< @_) {
+sub abbrev {
     my ($hashref, $glob, %table, $returnvoid);
 
     (nelems @_) or return;   # So we don't autovivify onto @_ and trigger warning
-    $hashref = shift @_;
+    $hashref = shift;
     $returnvoid = 1;
     $hashref->% = %( () );
 

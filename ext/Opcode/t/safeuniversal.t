@@ -17,7 +17,7 @@ my $r = $c->reval(q!
 is( $r, "pwned", "isa overriden in compartment" );
 is( (bless\@(),"Foo")->isa("Foo"), 1, "... but not outside" );
 
-sub Foo::foo(...) {}
+sub Foo::foo {}
 
 $r = $c->reval(q!
     sub UNIVERSAL::can { "pwned" }

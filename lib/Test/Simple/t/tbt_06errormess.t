@@ -30,7 +30,7 @@ my $original_todo_handle;
 my $original_harness_env;
 my $testing_num;
 
-sub start_testing(...)
+sub start_testing
 {
     # remember what the handles were set to
     $original_output_handle  = $t->output();
@@ -58,8 +58,9 @@ sub start_testing(...)
 # but makes blood come out of my ears if I don't at least simplify
 # it a little this way
 
-sub my_test_test(?$text)
+sub my_test_test
 {
+    my $text = shift;
     local $^WARNING = 0;
 
     # reset the outputs 

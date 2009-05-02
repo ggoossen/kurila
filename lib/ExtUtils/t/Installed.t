@@ -249,11 +249,11 @@ is( $ei->version('yesmod'), 101,
 
     package Fakepak;
 
-sub new(@< @_) {
-    my $class = shift @_;
-    bless(\(my $scalar = shift @_), $class);
+sub new {
+    my $class = shift;
+    bless(\(my $scalar = shift), $class);
 }
 
-sub validate(...) {
+sub validate {
     return 'validated'
 }

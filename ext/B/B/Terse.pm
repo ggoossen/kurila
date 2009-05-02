@@ -15,7 +15,7 @@ sub terse($order, ?$subref) {
     }
 }
 
-sub compile(@< @_) {
+sub compile {
     my @args = @_;
     my $order = (nelems @args) ?? shift(@args) !! "";
     $order = "-exec" if $order eq "exec";
@@ -23,19 +23,19 @@ sub compile(@< @_) {
     B::Concise::compile("-terse", < @args);
 }
 
-sub indent(@< @_) {
-    my $level = (nelems @_) ?? shift @_ !! 0;
+sub indent {
+    my $level = (nelems @_) ?? shift !! 0;
     return "    " x $level;
 }
 
 # Don't use this, at least on OPs in subroutines: it has no way of
 # getting to the pad, and will give wrong answers or crash.
-sub B::OP::terse(@< @_) {
+sub B::OP::terse {
     carp "B::OP::terse is deprecated; use B::Concise instead";
     B::Concise::b_terse(< @_);
 }
 
-sub B::SV::terse(@< @_) {
+sub B::SV::terse {
     my@($sv, $level) = @(< @_, 0);
     my %info;
     B::Concise::concise_sv($sv, \%info);
@@ -46,13 +46,13 @@ sub B::SV::terse(@< @_) {
     $s;
 }
 
-sub B::NULL::terse(@< @_) {
+sub B::NULL::terse {
     my @($sv, $level) = @(< @_, 0);
     my $s = indent($level) . sprintf '%s (0x%lx)', class($sv), $sv->$;
     $s;
 }
 
-sub B::SPECIAL::terse(@< @_) {
+sub B::SPECIAL::terse {
     my @($sv, $level) = @(< @_, 0);
     my $s = indent($level)
         . sprintf( '%s #%d %s', class($sv), $sv->$, @specialsv_name[$sv->$]);

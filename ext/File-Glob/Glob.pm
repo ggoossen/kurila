@@ -55,7 +55,7 @@ use XSLoader ();
 
 $VERSION = '1.06';
 
-sub import(@< @_) {
+sub import {
     require Exporter;
     my $i = 1;
     while ($i +< nelems @_) {
@@ -92,7 +92,7 @@ if ($^OS_NAME =~ m/^(?:MSWin32|VMS|os2|dos|riscos|MacOS)$/) {
     $DEFAULT_FLAGS ^|^= GLOB_NOCASE();
 }
 
-sub bsd_glob(@< @_) {
+sub bsd_glob {
     my @($pat,?$flags) =  @_;
     $flags = $DEFAULT_FLAGS if (nelems @_) +< 2;
     return doglob($pat,$flags);
@@ -102,9 +102,9 @@ sub bsd_glob(@< @_) {
 my %iter;
 my %entries;
 
-sub csh_glob(@< @_) {
-    my $pat = shift @_;
-    my $cxix = shift @_;
+sub csh_glob {
+    my $pat = shift;
+    my $cxix = shift;
     my @pat;
 
     # glob without args defaults to $_

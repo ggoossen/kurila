@@ -17,10 +17,10 @@ $VERSION = "1.15";
             "CRC-CCITT"  => \@(\@("Digest::CRC", type => "crcccitt")),
     );
 
-sub new(@< @_)
+sub new
 {
-    shift @_;  # class ignored
-    my $algorithm = shift @_;
+    shift;  # class ignored
+    my $algorithm = shift;
     my $impl = %MMAP{?$algorithm} || do {
         $algorithm =~ s/\W+//;
         "Digest::$algorithm";

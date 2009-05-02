@@ -527,10 +527,10 @@ my $Is_MacOS = $^OS_NAME eq 'MacOS';
 my $Force_Writeable = ($^OS_NAME eq 'os2' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'MSWin32' ||
                        $^OS_NAME eq 'amigaos' || $^OS_NAME eq 'MacOS' || $^OS_NAME eq 'epoc');
 
-sub _error(@< @_) {
-    my $arg     = shift @_;
-    my $message = shift @_;
-    my $object  = shift @_;
+sub _error {
+    my $arg     = shift;
+    my $message = shift;
+    my $object  = shift;
 
     if ($arg->{?error}) {
         $object = '' unless defined $object;
@@ -541,7 +541,7 @@ sub _error(@< @_) {
     }
 }
 
-sub mkpath(@< @_) {
+sub mkpath {
     my $old_style = (
         UNIVERSAL::isa(@_[0],'ARRAY')
         or ((nelems @_) == 2 and ((defined @_[1] && ! ref @_[1]) ?? @_[1] =~ m/\A\d+\z/ !! 1))
@@ -614,7 +614,7 @@ sub _mkpath($arg, $paths) {
     return @created;
 }
 
-sub rmtree(@< @_) {
+sub rmtree {
     my $old_style = (UNIVERSAL::isa(@_[0],'ARRAY')) ?? 1 !! 0;
 
     my $arg;

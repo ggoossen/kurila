@@ -8,8 +8,8 @@ use Text::ParseWords;
 our ($VERSION);
 $VERSION = '0.22';
 
-sub new(@< @_) {
-    my $class = shift @_;
+sub new {
+    my $class = shift;
     my $self = bless \%(< @_), $class;
 
     $self->{+properties}->{+perl} = $class->find_perl_interpreter
@@ -23,7 +23,7 @@ sub new(@< @_) {
     return $self;
 }
 
-sub find_perl_interpreter(...) {
+sub find_perl_interpreter {
     my $perl;
     File::Spec->file_name_is_absolute($perl = $^EXECUTABLE_NAME)
         or -f ($perl = Config::config_value("perlpath"))
@@ -31,14 +31,15 @@ sub find_perl_interpreter(...) {
     return $perl;
 }
 
-sub add_to_cleanup(@< @_) {
-    my $self = shift @_;
+sub add_to_cleanup {
+    my $self = shift;
     foreach ( @_) {
         $self->{files_to_clean}{+$_} = 1;
     }
 }
 
-sub cleanup($self) {
+sub cleanup {
+    my $self = shift;
     foreach my $file (keys($self->{?files_to_clean} || %() )) {
         unlink $file;
     }
@@ -51,12 +52,12 @@ sub object_file($self, $filename) {
     return "$file_base$self->{config}->{?obj_ext}";
 }
 
-sub arg_include_dirs(@< @_) {
-    my $self = shift @_;
+sub arg_include_dirs {
+    my $self = shift;
     return map {"-I$_"}, @_;
 }
 
-sub arg_nolink(...) { '-c' }
+sub arg_nolink { '-c' }
 
 sub arg_object_file($self, $file) {
     return  @('-o', $file);
@@ -142,9 +143,9 @@ sub exe_file($self, $dl_file) {
     return "$dl_file$self->{config}->{?_exe}";
 }
 
-sub need_prelink(...) { 0 }
+sub need_prelink { 0 }
 
-sub extra_link_args_after_prelink(...) { return }
+sub extra_link_args_after_prelink { return }
 
 sub prelink($self, %< %args) {
 
@@ -218,7 +219,7 @@ sub split_like_shell($self, $string) {
 }
 
 # if building perl, perl's main source directory
-sub perl_src(...) {
+sub perl_src {
     # N.B. makemaker actually searches regardless of PERL_CORE, but
     # only squawks at not finding it if PERL_CORE is set
 
@@ -247,12 +248,14 @@ sub perl_src(...) {
 }
 
 # directory of perl's include files
-sub perl_inc($self) {
+sub perl_inc {
+    my $self = shift;
 
     $self->perl_src() || File::Spec->catdir($self->{config}->{?archlibexp},"CORE");
 }
 
-sub DESTROY($self) {
+sub DESTROY {
+    my $self = shift;
     $self->cleanup();
 }
 

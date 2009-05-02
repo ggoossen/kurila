@@ -50,7 +50,7 @@ is_deeply( $struct, $thawed, 'Empiric testing corfirms correct behaviour' );
 
 my $SINGLETON = undef;
 
-sub new(@< @_) {
+sub new {
     $SINGLETON or
         $SINGLETON = bless \%( value => 'Hello World!' ), @_[0];
 }

@@ -422,7 +422,7 @@ time consistently with style argument, default is 'all' not 'noc' any more.
 =cut
 
 # evaluate something in a clean lexical environment
-sub _doeval(@< @_) { eval shift @_ }
+sub _doeval { eval shift }
 
 #
 # put any lexicals at file scope AFTER here
@@ -448,15 +448,15 @@ sub mytime () { time }
 
 init();
 
-sub BEGIN(...) {
+sub BEGIN {
     if (eval 'require Time::HiRes') {
         Time::HiRes->import( <qw(time));
         $hirestime = \&Time::HiRes::time;
     }
 }
 
-sub import(@< @_) {
-    my $class = shift @_;
+sub import {
+    my $class = shift;
     if (grep { $_ eq ":hireswallclock" }, @_) {
         @_ = grep { $_ ne ":hireswallclock" }, @_;
         local $^WARNING =0;
@@ -468,7 +468,7 @@ sub import(@< @_) {
 our($Debug, $Min_Count, $Min_CPU, $Default_Format, $Default_Style,
     %_Usage, %Cache, $Do_Cache);
 
-sub init(...) {
+sub init {
     $Debug = 0;
     $Min_Count = 4;
     $Min_CPU   = 0.4;
@@ -481,9 +481,9 @@ sub init(...) {
     clearallcache();
 }
 
-sub debug(@< @_) { $Debug = (@_[1] != 0); }
+sub debug { $Debug = (@_[1] != 0); }
 
-sub usage(...) { 
+sub usage { 
     my $calling_sub = @(caller(1))[3];
     $calling_sub =~ s/^Benchmark:://;
     return %_Usage{?$calling_sub} || '';
@@ -496,7 +496,7 @@ sub usage(...) {
 usage: clearcache($count);
 USAGE
 
-sub clearcache(@< @_)    { 
+sub clearcache    { 
     die usage unless (nelems @_) == 1;
     delete %Cache{"@_[0]c"}; delete %Cache{"@_[0]s"}; 
 }
@@ -505,7 +505,7 @@ sub clearcache(@< @_)    {
 usage: clearallcache();
 USAGE
 
-sub clearallcache(@< @_) { 
+sub clearallcache { 
     die usage if (nelems @_);
     %Cache = %( () ); 
 }
@@ -514,7 +514,7 @@ sub clearallcache(@< @_) {
 usage: enablecache();
 USAGE
 
-sub enablecache(@< @_)   {
+sub enablecache   {
     die usage if (nelems @_);
     $Do_Cache = 1; 
 }
@@ -523,7 +523,7 @@ sub enablecache(@< @_)   {
 usage: disablecache();
 USAGE
 
-sub disablecache(@< @_)  {
+sub disablecache  {
     die usage if (nelems @_);
     $Do_Cache = 0; 
 }
@@ -531,15 +531,15 @@ sub disablecache(@< @_)  {
 
 # --- Functions to process the 'time' data type
 
-sub new(@< @_) { my @t = @( mytime, times, (nelems @_) == 2 ?? @_[1] !! 0);
+sub new { my @t = @( mytime, times, (nelems @_) == 2 ?? @_[1] !! 0);
     print $^STDERR, "new=$(join ' ',@t)\n" if $Debug;
     bless \@t; }
 
-sub cpu_p(@< @_) { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $pu+$ps         ; }
-sub cpu_c(@< @_) { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@;         $cu+$cs ; }
-sub cpu_a(@< @_) { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $pu+$ps+$cu+$cs ; }
-sub real(@< @_)  { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $r              ; }
-sub iters(@< @_) { @_[0]->[5] ; }
+sub cpu_p { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $pu+$ps         ; }
+sub cpu_c { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@;         $cu+$cs ; }
+sub cpu_a { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $pu+$ps+$cu+$cs ; }
+sub real  { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $r              ; }
+sub iters { @_[0]->[5] ; }
 
 
 %_Usage{+timediff} = <<'USAGE';
@@ -704,7 +704,7 @@ usage: $result = countit($time, 'code' );        or
        $result = countit($time, sub { code } );
 USAGE
 
-sub countit(@< @_) {
+sub countit {
     my @( $tmax, $code ) =  @_;
 
     die usage unless (nelems @_);
@@ -794,7 +794,8 @@ sub countit(@< @_) {
 
 # --- Functions implementing high-level time-then-print utilities
 
-sub n_to_for(?$n) {
+sub n_to_for {
+    my $n = shift;
     return $n == 0 ?? $default_for !! $n +< 0 ?? -$n !! undef;
 }
 
@@ -879,7 +880,7 @@ usage: cmpthese($count, { Name1 => 'code1', ... });        or
        cmpthese($result, $style);
 USAGE
 
-sub cmpthese(@< @_){
+sub cmpthese{
     my ($results, $style);
 
     # $count can be a blessed object.

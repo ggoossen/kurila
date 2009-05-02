@@ -74,8 +74,8 @@ trailing slash :-)
 
 =cut
 
-sub catdir(@< @_) {
-    my $self = shift @_;
+sub catdir {
+    my $self = shift;
 
     $self->canonpath(join('/', @( < @_, ''))); # '' because need a trailing '/'
 }
@@ -87,8 +87,8 @@ complete path ending with a filename
 
 =cut
 
-sub catfile(@< @_) {
-    my $self = shift @_;
+sub catfile {
+    my $self = shift;
     my $file = $self->canonpath(pop @_);
     return $file unless (nelems @_);
     my $dir = $self->catdir(< @_);
@@ -135,9 +135,9 @@ is tainted, it is not used.
 =cut
 
 my $tmpdir;
-sub _tmpdir(@< @_) {
+sub _tmpdir {
     return $tmpdir if defined $tmpdir;
-    my $self = shift @_;
+    my $self = shift;
     my @dirlist = @_;
     foreach ( @dirlist) {
         next unless defined && -d && -w _;
@@ -149,7 +149,7 @@ sub _tmpdir(@< @_) {
     return $tmpdir;
 }
 
-sub tmpdir(@< @_) {
+sub tmpdir {
     return $tmpdir if defined $tmpdir;
     $tmpdir = @_[0]->_tmpdir( env::var('TMPDIR'), "/tmp" );
 }
@@ -169,8 +169,8 @@ directory. (Does not strip symlinks, only '.', '..', and equivalents.)
 
 =cut
 
-sub no_upwards(@< @_) {
-    my $self = shift @_;
+sub no_upwards {
+    my $self = shift;
     return grep( {!m/^\.{1,2}\z/s }, @_);
 }
 
@@ -203,7 +203,7 @@ Takes no argument, returns the environment variable PATH as an array.
 
 =cut
 
-sub path(...) {
+sub path {
     return () unless defined env::var('PATH');
     my @path = split(':', env::var('PATH'));
     foreach ( @path) { $_ = '.' if $_ eq '' }
@@ -216,8 +216,8 @@ join is the same as catfile.
 
 =cut
 
-sub join(@< @_) {
-    my $self = shift @_;
+sub join {
+    my $self = shift;
     return $self->catfile(< @_);
 }
 
@@ -282,7 +282,7 @@ Yields:
 
 =cut
 
-sub splitdir(@< @_) {
+sub splitdir {
     return split m|/|, @_[1], -1;  # Preserve trailing fields
 }
 
@@ -391,7 +391,7 @@ sub abs2rel($self,$path,?$base) {
     return $self->canonpath( $self->catpath('', $result_dirs, '') );
 }
 
-sub _same(@< @_) {
+sub _same {
     @_[1] eq @_[2];
 }
 
@@ -461,7 +461,7 @@ L<File::Spec>
 # Internal routine to File::Spec, no point in making this public since
 # it is the standard Cwd interface.  Most of the platform-specific
 # File::Spec subclasses use this.
-sub _cwd(...) {
+sub _cwd {
     require Cwd;
     Cwd::getcwd();
 }

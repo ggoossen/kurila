@@ -672,7 +672,7 @@ TEST39: do {
 };
 cmp_ok($ok,'==',1,'nested constructs');
 
-sub test_last_label(...) { last TEST40 }
+sub test_last_label { last TEST40 }
 
 TEST40: do {
     $ok = 1;
@@ -681,7 +681,7 @@ TEST40: do {
 };
 cmp_ok($ok,'==',1,'dynamically scoped label');
 
-sub test_last(...) { last }
+sub test_last { last }
 
 TEST41: do {
     $ok = 1;
@@ -697,7 +697,7 @@ cmp_ok($ok,'==',1,'dynamically scoped');
 
 do {
     my $n=10; my $late_free = 0;
-    sub X::DESTROY(...) { $late_free++ if $n +< 0 };
+    sub X::DESTROY { $late_free++ if $n +< 0 };
   LOOP:
     do {
         ($n-- && bless \%(), 'X') && redo;

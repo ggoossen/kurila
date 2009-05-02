@@ -10,9 +10,9 @@ do {
     require Digest::base;
     @ISA = qw(Digest::base);
 
-    sub new(@< @_) {
-        my $class = shift @_;
-        my $d = shift @_ || "ooo";
+    sub new {
+        my $class = shift;
+        my $d = shift || "ooo";
         bless \%( d => $d ), $class;
     }
     sub add(...) {}

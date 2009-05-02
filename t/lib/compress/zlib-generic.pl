@@ -25,10 +25,10 @@ my $UnError         = getErrorRef($UncompressClass);
 use Compress::Raw::Zlib;
 use IO::Handle < qw(SEEK_SET SEEK_CUR SEEK_END);
 
-sub myGZreadFile(@< @_)
+sub myGZreadFile
 {
-    my $filename = shift @_ ;
-    my $init = shift @_ ;
+    my $filename = shift ;
+    my $init = shift ;
 
 
     my $fil = $UncompressClass-> new( $filename,

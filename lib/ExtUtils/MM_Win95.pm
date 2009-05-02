@@ -36,8 +36,8 @@ The && problem.
 
 =cut
 
-sub xs_c(@< @_) {
-    my@($self) =@( shift @_);
+sub xs_c {
+    my@($self) =@( shift);
     return '' unless $self->needs_linking();
     '
 .xs.c:
@@ -52,8 +52,8 @@ The && problem
 
 =cut
 
-sub xs_cpp(@< @_) {
-    my@($self) =@( shift @_);
+sub xs_cpp {
+    my@($self) =@( shift);
     return '' unless $self->needs_linking();
     '
 .xs.cpp:
@@ -67,8 +67,8 @@ The && problem.
 
 =cut
 
-sub xs_o(@< @_) {
-    my@($self) =@( shift @_);
+sub xs_o {
+    my@($self) =@( shift);
     return '' unless $self->needs_linking();
     '
 .xs$(OBJ_EXT):
@@ -85,7 +85,8 @@ of 2K.  So we go for a more conservative value of 1K.
 
 =cut
 
-sub max_exec_len($self) {
+sub max_exec_len {
+    my $self = shift;
 
     return ($self->{+_MAX_EXEC_LEN} ||= 1024);
 }
@@ -97,7 +98,8 @@ Win95 and Win98 and WinME are collectively Win9x and Win32
 
 =cut
 
-sub os_flavor($self) {
+sub os_flavor {
+    my $self = shift;
     return  @($self->SUPER::os_flavor, 'Win9x');
 }
 

@@ -56,7 +56,7 @@ sub numerate($handle, $num, @< @forms) {
 
 #--------------------------------------------------------------------------
 
-sub numf(@< @_) {
+sub numf {
   my@($handle, $num) =  @_[[@(0,1)]];
   if($num +< 10_000_000_000 and $num +> -10_000_000_000 and $num == int($num)) {
     $num += 0;  # Just use normal integer stringification.
@@ -86,7 +86,7 @@ sub sprintf($handle, $format, @< @params) {
 
 use integer; # vroom vroom... applies to the whole rest of the module
 
-sub language_tag(@< @_) {
+sub language_tag {
   my $it = ref(@_[0]) || @_[0];
   return undef unless $it =~ m/([^':]+)(?:::)?$/s;
   $it = lc($1);
@@ -94,7 +94,7 @@ sub language_tag(@< @_) {
   return $it;
 }
 
-sub encoding(@< @_) {
+sub encoding {
   my $it = @_[0];
   return @(
    (ref($it) && $it->{?'encoding'})
@@ -104,9 +104,9 @@ sub encoding(@< @_) {
 
 #--------------------------------------------------------------------------
 
-sub fallback_languages(...) { return @('i-default', 'en', 'en-US') }
+sub fallback_languages { return @('i-default', 'en', 'en-US') }
 
-sub fallback_language_classes(...) { return () }
+sub fallback_language_classes { return () }
 
 #--------------------------------------------------------------------------
 
@@ -118,7 +118,7 @@ sub fail_with($handle, @< @params) {
 
 #--------------------------------------------------------------------------
 
-sub failure_handler_auto(@< @_) {
+sub failure_handler_auto {
   # Meant to be used like:
   #  $handle->fail_with('failure_handler_auto')
 
@@ -151,7 +151,7 @@ sub failure_handler_auto(@< @_) {
 
 #==========================================================================
 
-sub new(@< @_) {
+sub new {
   # Nothing fancy!
   my $class = ref(@_[0]) || @_[0];
   my $handle = bless \%(), $class;
@@ -159,11 +159,11 @@ sub new(@< @_) {
   return $handle;
 }
 
-sub init(...) { return } # no-op
+sub init { return } # no-op
 
 ###########################################################################
 
-sub maketext(@< @_) {
+sub maketext {
   # Remember, this can fail.  Failure is controllable many ways.
   Carp::croak "maketext requires at least one parameter" unless (nelems @_) +> 1;
 
@@ -318,7 +318,7 @@ sub _langtag_munging($base_class, @< @languages) {
 
 ###########################################################################
 
-sub _ambient_langprefs(...) {
+sub _ambient_langprefs {
   require I18N::LangTags::Detect;
   return  I18N::LangTags::Detect::detect();
 }
@@ -363,7 +363,7 @@ use Locale::Maketext::GutsLoader;
 my %tried = %( () );
   # memoization of whether we've used this module, or found it unusable.
 
-sub _try_use(@< @_) {   # Basically a wrapper around "require Modulename"
+sub _try_use {   # Basically a wrapper around "require Modulename"
   # "Many men have tried..."  "They tried and failed?"  "They tried and died."
   return %tried{?@_[0]} if exists %tried{@_[0]};  # memoization
 
@@ -389,7 +389,7 @@ sub _try_use(@< @_) {   # Basically a wrapper around "require Modulename"
 
 #--------------------------------------------------------------------------
 
-sub _lex_refs(@< @_) {  # report the lexicon references for this handle's class
+sub _lex_refs {  # report the lexicon references for this handle's class
   # returns an arrayREF!
   my $class = ref(@_[0]) || @_[0];
   print $^STDOUT, "Lex refs lookup on $class\n" if DEBUG +> 1;
@@ -416,7 +416,7 @@ sub _lex_refs(@< @_) {  # report the lexicon references for this handle's class
   return \@lex_refs;
 }
 
-sub clear_isa_scan(...) { %isa_scan = %( () ); return; } # end on a note of simplicity!
+sub clear_isa_scan { %isa_scan = %( () ); return; } # end on a note of simplicity!
 
 ###########################################################################
 1;

@@ -27,13 +27,13 @@ BEGIN {
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub parse_line(@< @_) { shift @_->parse_lines(< @_) } # alias
+sub parse_line { shift->parse_lines(< @_) } # alias
 
 # - - -  Turn back now!  Run away!  - - -
 
-sub parse_lines(@< @_) {             # Usage: $parser->parse_lines(@lines)
+sub parse_lines {             # Usage: $parser->parse_lines(@lines)
     # an undef means end-of-stream
-    my $self = shift @_;
+    my $self = shift;
 
     my $code_handler = $self->{?'code_handler'};
     my $cut_handler  = $self->{?'cut_handler'};
@@ -1851,7 +1851,8 @@ sub pretty(@< @stuff) { # adopted from Class::Classless
 # backward compatibilty in Pod::Man, etc. but not recommended for
 # general use.
 
-sub reinit($self) {
+sub reinit {
+    my $self = shift;
     foreach (qw(source_dead source_filename doc_has_started
 start_of_pod_block content_seen last_was_blank paras curr_open
 line_count pod_para_count in_pod ~tried_gen_errata errata errors_seen

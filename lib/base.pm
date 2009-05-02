@@ -14,44 +14,45 @@ sub PROTECTED  () { 2**3  }
 
 my $Fattr = \%fields::attr;
 
-sub has_fields(@< @_) {
-    my@($base) =@( shift @_);
+sub has_fields {
+    my@($base) =@( shift);
     my $fglob = Symbol::fetch_glob("$base\::FIELDS");
     return ($fglob && 'GLOB' eq ref($fglob) && $fglob->*{HASH}) ?? 1 !! 0;
 }
 
-sub has_version(@< @_) {
-    my@($base) =@( shift @_);
+sub has_version {
+    my@($base) =@( shift);
     my $vglob = Symbol::fetch_glob($base.'::VERSION');
     return ($vglob && $vglob->*{SCALAR}) ?? 1 !! 0;
 }
 
-sub has_attr(?$proto) {
+sub has_attr {
+    my $proto = shift;
     my $class = ref $proto || $proto;
     return exists $Fattr->{$class};
 }
 
-sub get_attr(@< @_) {
+sub get_attr {
     $Fattr->{+@_[0]} = \@(1) unless $Fattr->{?@_[0]};
     return $Fattr->{?@_[0]};
 }
 
-sub get_fields(@< @_) {
+sub get_fields {
     # Shut up a possible typo warning.
     my $x = \Symbol::fetch_glob(@_[0].'::FIELDS')->*->%;
     return \Symbol::fetch_glob(@_[0].'::FIELDS')->*->%;
 }
 
-sub import(@< @_) {
-    my $class = shift @_;
+sub import {
+    my $class = shift;
 
     return SUCCESS unless (nelems @_);
 
     return import_into($(caller(0)), < @_);
 }
 
-sub import_into(@< @_) {
-    my $inheritor = shift @_;
+sub import_into {
+    my $inheritor = shift;
 
     # List of base classes from which we will inherit %FIELDS.
     my $fields_base;

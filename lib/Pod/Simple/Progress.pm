@@ -22,7 +22,8 @@ sub new($class,$delay) {
     return $self;
 }
 
-sub copy(?$orig) {
+sub copy { 
+    my $orig = shift;
     bless \%(< $orig->%, 'quiet_until' => 1), ref($orig);
 }
 #--------------------------------------------------------------------------
@@ -59,11 +60,11 @@ sub done($self, $note) {
 #--------------------------------------------------------------------------
 # Simple accessors:
 
-sub delay(@< @_) {
+sub delay {
     return @_[0]->{?'delay'} if (nelems @_) == 1; @_[0]->{+'delay'} = @_[1]; return @_[0] }
-sub goal(@< @_) {
+sub goal {
     return @_[0]->{?'goal' } if (nelems @_) == 1; @_[0]->{+'goal' } = @_[1]; return @_[0] }
-sub to(@< @_)   {
+sub to   {
     return @_[0]->{?'to'   } if (nelems @_) == 1; @_[0]->{+'to'   } = @_[1]; return @_[0] }
 
 #--------------------------------------------------------------------------

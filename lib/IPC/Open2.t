@@ -29,7 +29,7 @@ sub ok($n, $result, ?$info) {
     }
 }
 
-sub cmd_line(@< @_) {
+sub cmd_line {
     if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare') {
         return qq/"@_[0]"/;
     }

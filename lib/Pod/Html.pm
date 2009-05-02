@@ -273,7 +273,7 @@ my $html_fh;
 
 init_globals();
 
-sub init_globals(...) {
+sub init_globals {
     $Cachedir = ".";		# The directory to which item and directory
     # caches will be written.
 
@@ -341,7 +341,7 @@ sub clean_data($dataref) {
 }
 
 
-sub pod2html(@< @_) {
+sub pod2html {
           local(@ARGV) = @_;
           local($^INPUT_RECORD_SEPARATOR);
     local $_ = undef;
@@ -628,8 +628,8 @@ END_OF_TAIL
 
 ##############################################################################
 
-sub usage(@< @_) {
-    my $podfile = shift @_;
+sub usage {
+    my $podfile = shift;
     warn "$^PROGRAM_NAME: $podfile: $(join ' ',@_)\n" if (nelems @_);
     die <<END_OF_USAGE;
 Usage:  $^PROGRAM_NAME --help --htmlroot=<name> --infile=<name> --outfile=<name>
@@ -672,7 +672,7 @@ END_OF_USAGE
 
 }
 
-sub parse_command_line(...) {
+sub parse_command_line {
     my ($opt_backlink,$opt_cachedir,$opt_css,$opt_flush,$opt_header,$opt_help,
         $opt_htmldir,$opt_htmlroot,$opt_index,$opt_infile,$opt_libpods,
         $opt_netscape,$opt_outfile,$opt_podpath,$opt_podroot,$opt_quiet,
@@ -737,7 +737,7 @@ sub parse_command_line(...) {
 
 my $Saved_Cache_Key;
 
-sub get_cache(@< @_) {
+sub get_cache {
     my@($dircache, $itemcache, $podpath, $podroot, $recurse) =  @_;
     my @cache_key_args = @_;
 
@@ -1211,7 +1211,7 @@ sub process_item( $otext) {
 #
 # process_over - process a pod over tag and start a corresponding HTML list.
 #
-sub process_over(...) {
+sub process_over {
     # start a new list
     $Listlevel++;
     push( @Items_Seen, 0 );
@@ -1220,7 +1220,7 @@ sub process_over(...) {
 #
 # process_back - process a pod back tag and convert it to HTML format.
 #
-sub process_back(...) {
+sub process_back {
     if( $Listlevel == 0 ){
         warn "$^PROGRAM_NAME: $Podfile: unexpected =back directive in paragraph $Paragraph.  ignoring.\n" unless $Quiet;
         return;
@@ -1248,7 +1248,7 @@ sub process_back(...) {
 #
 # process_cut - process a pod cut tag, thus start ignoring pod directives.
 #
-sub process_cut(...) {
+sub process_cut {
     $Ignore = 1;
 }
 
@@ -1256,7 +1256,7 @@ sub process_cut(...) {
 # process_pod - process a pod tag, thus stop ignoring pod directives
 # until we see a corresponding cut.
 #
-sub process_pod(...) {
+sub process_pod {
 # no need to set $Ignore to 0 cause the main loop did it
 }
 
@@ -1513,7 +1513,8 @@ sub process_text( $tref) {
     $tref->$ = $res;
 }
 
-sub process_text_rfc_links(?$text) {
+sub process_text_rfc_links {
+    my $text = shift;
 
     # For every "RFCnnnn" or "RFC nnn", link it to the authoritative
     # ource. Do not use the /i modifier here. Require "RFC" to be written in
@@ -1776,7 +1777,7 @@ sub emit_C( $text, ?$nocode, ?$args){
 #
 # html_escape: make text safe for HTML
 #
-sub html_escape(@< @_) {
+sub html_escape {
     my $rest = @_[0];
     $rest   =~ s/&/&amp;/g;
     $rest   =~ s/</&lt;/g;
@@ -1993,9 +1994,9 @@ sub coderef( $page, $item){
 
 #
 # Adapted from Nick Ing-Simmons' PodToHtml package.
-sub relative_url(@< @_) {
-    my $source_file = shift @_ ;
-    my $destination_file = shift @_;
+sub relative_url {
+    my $source_file = shift ;
+    my $destination_file = shift;
 
     my $source = URI::file->new_abs($source_file);
     my $uo = URI::file->new($destination_file,$source)->abs;
@@ -2007,7 +2008,7 @@ sub relative_url(@< @_) {
 # finish_list - finish off any pending HTML lists.  this should be called
 # after the entire pod file has been read and converted.
 #
-sub finish_list(...) {
+sub finish_list {
     if( $Listlevel ){
         warn "$^PROGRAM_NAME: $Podfile: unterminated list(s) at =head in paragraph $Paragraph.  ignoring.\n" unless $Quiet;
         while( $Listlevel ){
@@ -2102,9 +2103,9 @@ sub depod1( $rstr, ?$func, ?$closing){
 do {
     my %seen;   # static fragment record hash
 
-    sub fragment_id_readable(@< @_) {
-        my $text     = shift @_;
-        my $generate = shift @_;   # optional flag
+    sub fragment_id_readable {
+        my $text     = shift;
+        my $generate = shift;   # optional flag
 
         my $orig = $text;
 
@@ -2137,9 +2138,9 @@ do {
     }};
 
 my @HC;
-sub fragment_id_obfuscated(@< @_) {  # This was the old "_2d_2d__"
-    my $text     = shift @_;
-    my $generate = shift @_;   # optional flag
+sub fragment_id_obfuscated {  # This was the old "_2d_2d__"
+    my $text     = shift;
+    my $generate = shift;   # optional flag
 
     # text? Normalize by obfuscating the fragment id to make it unique
     $text =~ s/\s+/_/sg;
@@ -2158,9 +2159,9 @@ sub fragment_id_obfuscated(@< @_) {  # This was the old "_2d_2d__"
 #   b) contents of C<...>
 #
 
-sub fragment_id(@< @_) {
-    my $text     = shift @_;
-    my $generate = shift @_;   # optional flag
+sub fragment_id {
+    my $text     = shift;
+    my $generate = shift;   # optional flag
 
     $text =~ s/\s+\Z//s;
     if( $text ){

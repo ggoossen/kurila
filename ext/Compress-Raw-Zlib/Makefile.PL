@@ -161,7 +161,7 @@ do {
         );
 }; 
 
-sub ParseCONFIG(...)
+sub ParseCONFIG
 {
     my ($k, $v) ;
     my @badkey = @( () ) ;
@@ -266,8 +266,9 @@ EOM
 
 
 
-sub zlib_files(?$dir)
+sub zlib_files
 {
+    my $dir = shift ;
 
     my @h_files = @();
     my @c_files = @();
@@ -346,7 +347,7 @@ BEGIN
             @GZIP_OS_Names ) ;
 }
 
-sub getOSCode(...)
+sub getOSCode
 {
     my $default = 3 ; # Unix is the default
 
@@ -363,8 +364,9 @@ sub getOSCode(...)
     return $default ;
 }
 
-sub getOSname(?$code)
+sub getOSname
 {
+    my $code = shift ;
 
     return %OSnames{?$code} || 'Unknown OS' ;
 }

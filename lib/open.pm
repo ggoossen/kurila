@@ -5,7 +5,7 @@ our $VERSION = '1.06';
 
 my $locale_encoding;
 
-sub _get_encname(@< @_) {
+sub _get_encname {
     return  @($1, Encode::resolve_alias($1)) if @_[0] =~ m/^:?encoding\((.+)\)$/;
     return;
 }

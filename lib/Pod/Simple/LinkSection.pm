@@ -4,7 +4,7 @@ package Pod::Simple::LinkSection;
 
 use Pod::Simple::BlackBox;
 
-sub tack_on(@< @_) {
+sub tack_on {
     @_[0] = \@('', \%(), "@_[0]" );
     return (@_[0]->[2] .= @_[1]);
 }

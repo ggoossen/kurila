@@ -330,9 +330,9 @@ do {
 
 ### $Params::Check::CALLER_DEPTH test
 do {
-    sub wrapper(@< @_) { check  ( < @_ ) };
-    sub inner(@< @_)   { wrapper( < @_ ) };
-    sub outer(@< @_)   { inner  ( < @_ ) };
+    sub wrapper { check  ( < @_ ) };
+    sub inner   { wrapper( < @_ ) };
+    sub outer   { inner  ( < @_ ) };
     outer( \%( dummy => \%( required => 1 )), \%() );
 
     like( last_error, qr/for .*::wrapper by .*::inner$/,

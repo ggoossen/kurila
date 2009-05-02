@@ -7,8 +7,8 @@ our ($VERSION, @ISA);
 @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
 $VERSION = '0.22';
 
-sub link_executable(@< @_) {
-    my $self = shift @_;
+sub link_executable {
+    my $self = shift;
     # $Config{ld} is 'ld' but that won't work: use the cc instead.
     local $self->{config}->{+ld} = $self->{config}->{?cc};
     return $self->SUPER::link_executable(< @_);

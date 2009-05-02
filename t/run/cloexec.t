@@ -52,7 +52,7 @@ skip_all("MacOS")    if $Is_MacOS;
 skip_all("VMS")      if $Is_VMS;
 skip_all("Win32")    if $Is_Win32;
 
-sub make_tmp_file(@< @_) {
+sub make_tmp_file {
     my @($fname, $fcontents) =  @_;
     my $fhtmp;
     open   $fhtmp, ">", "$fname"  or die "open  '$fname': $^OS_ERROR";
@@ -85,7 +85,8 @@ $Child_prog =~ s/\n//g;
 
 plan(tests => 22);
 
-sub test_not_inherited(?$expected_fd) {
+sub test_not_inherited {
+    my $expected_fd = shift;
     ok( -f $tmpfile2, "tmpfile '$tmpfile2' exists" );
     my $cmd = qq{$Perl -e $quote$Child_prog$quote $expected_fd};
     # Expect 'Bad file descriptor' or similar to be written to STDERR.
@@ -104,7 +105,8 @@ sub test_not_inherited(?$expected_fd) {
     is( $out, "childfd=$expected_fd\n", 'child stdout: fd' );
 }
 
-sub test_inherited(?$expected_fd) {
+sub test_inherited {
+    my $expected_fd = shift;
     ok( -f $tmpfile1, "tmpfile '$tmpfile1' exists" );
     my $cmd = qq{$Perl -e $quote$Child_prog$quote $expected_fd};
     my $out = `$cmd`;

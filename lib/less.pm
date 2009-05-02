@@ -4,17 +4,17 @@ use warnings;
 
 our $VERSION = '0.02';
 
-sub _pack_tags(@< @_) {
+sub _pack_tags {
     return join ' ', @_;
 }
 
-sub _unpack_tags(@< @_) {
+sub _unpack_tags {
     return grep { defined and length },
         @+: map  { split ' ' },
         grep {defined}, @_;
 }
 
-sub of(@< @_) {
+sub of {
     my $class = shift @_;
 
     # If no one wants the result, don't bother computing it.
@@ -31,7 +31,7 @@ sub of(@< @_) {
     }
 }
 
-sub import(@< @_) {
+sub import {
     my $class = shift @_;
 
     @_ = @( 'please' ) if not nelems @_;
@@ -42,7 +42,7 @@ sub import(@< @_) {
     return;
 }
 
-sub unimport(@< @_) {
+sub unimport {
     my $class = shift @_;
 
     if ((nelems @_)) {

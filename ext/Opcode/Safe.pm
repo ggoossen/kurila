@@ -8,7 +8,7 @@ $Safe::VERSION = "2.16";
 # This function should return a closure which contains an eval that can't
 # see any lexicals in scope (apart from __ExPr__ which is unavoidable)
 
-sub lexless_anon_sub(@< @_) {
+sub lexless_anon_sub {
     # $_[0] is package;
     # $_[1] is strict flag;
     my $__ExPr__ = @_[2];   # must be a lexical to create the closure that
@@ -110,7 +110,8 @@ sub new($class, ?$root, ?$mask) {
     return $obj;
 }
 
-sub DESTROY(?$obj) {
+sub DESTROY {
+    my $obj = shift;
     $obj->erase('DESTROY') if $obj->{?Erase};
 }
 
@@ -156,49 +157,51 @@ sub erase($obj, $action) {
 }
 
 
-sub reinit(?$obj) {
+sub reinit {
+    my $obj= shift;
     $obj->erase;
     $obj->share_redo;
 }
 
-sub root(@< @_) {
-    my $obj = shift @_;
+sub root {
+    my $obj = shift;
     croak("Safe root method now read-only") if (nelems @_);
     return $obj->{?Root};
 }
 
 
-sub mask(@< @_) {
-    my $obj = shift @_;
+sub mask {
+    my $obj = shift;
     return $obj->{?Mask} unless (nelems @_);
     $obj->deny_only(< @_);
 }
 
 # v1 compatibility methods
-sub trap(@< @_)   { shift @_->deny(< @_)   }
-sub untrap(@< @_) { shift @_->permit(< @_) }
+sub trap   { shift->deny(< @_)   }
+sub untrap { shift->permit(< @_) }
 
-sub deny(@< @_) {
-    my $obj = shift @_;
+sub deny {
+    my $obj = shift;
     $obj->{+Mask} ^|^= opset(< @_);
 }
-sub deny_only(@< @_) {
-    my $obj = shift @_;
+sub deny_only {
+    my $obj = shift;
     $obj->{+Mask} = opset(< @_);
 }
 
-sub permit(@< @_) {
-    my $obj = shift @_;
+sub permit {
+    my $obj = shift;
     # XXX needs testing
     $obj->{+Mask} ^&^= invert_opset opset(< @_);
 }
-sub permit_only(@< @_) {
-    my $obj = shift @_;
+sub permit_only {
+    my $obj = shift;
     $obj->{+Mask} = invert_opset opset(< @_);
 }
 
 
-sub dump_mask(?$obj) {
+sub dump_mask {
+    my $obj = shift;
     print $^STDOUT, < opset_to_hex($obj->{?Mask}),"\n";
 }
 
@@ -208,11 +211,11 @@ sub share($obj, @< @vars) {
     $obj->share_from(scalar(caller), \@vars);
 }
 
-sub share_from(@< @_) {
-    my $obj = shift @_;
-    my $pkg = shift @_;
-    my $vars = shift @_;
-    my $no_record = shift @_ || 0;
+sub share_from {
+    my $obj = shift;
+    my $pkg = shift;
+    my $vars = shift;
+    my $no_record = shift || 0;
     my $root = $obj->root();
     croak("vars not an array ref") unless ref $vars eq 'ARRAY';
     # Check that 'from' package actually exists
@@ -234,15 +237,16 @@ sub share_from(@< @_) {
     $obj->share_record($pkg, $vars) unless $no_record or !$vars;
 }
 
-sub share_record(@< @_) {
-    my $obj = shift @_;
-    my $pkg = shift @_;
-    my $vars = shift @_;
+sub share_record {
+    my $obj = shift;
+    my $pkg = shift;
+    my $vars = shift;
     my $shares = \($obj->{+Shares} ||= \%())->%;
         # Record shares using keys of $obj->{Shares}. See reinit.
         $shares->{[ $vars->@]} = @($pkg) x nelems $vars->@ if (nelems $vars->@);
 }
-sub share_redo(?$obj) {
+sub share_redo {
+    my $obj = shift;
     my $shares = \($obj->{+Shares} ||= \%())->%;
     my($var, $pkg);
     while(@($var, $pkg) =@( each $shares->%)) {

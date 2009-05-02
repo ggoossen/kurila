@@ -63,14 +63,16 @@ die "Temporary file '$file' already exists" if -e $file;
 
 END { while (-f $file) {unlink $file or die "Can't unlink '$file': $^OS_ERROR" }}
 
-sub do_clone(?$data) {
+sub do_clone {
+    my $data = shift;
     my $copy = try {dclone $data};
     is ($^EVAL_ERROR, '', 'Should be no error dcloning');
     ok (1, "dlcone is only 1 process, not 2");
     return $copy;
 }
 
-sub freeze_and_thaw(?$data) {
+sub freeze_and_thaw {
+    my $data = shift;
     my $frozen = try {freeze $data};
     is ($^EVAL_ERROR, '', 'Should be no error freezing');
     my $copy = try {thaw $frozen};
@@ -78,7 +80,8 @@ sub freeze_and_thaw(?$data) {
     return $copy;
 }
 
-sub nfreeze_and_thaw(?$data) {
+sub nfreeze_and_thaw {
+    my $data = shift;
     my $frozen = try {nfreeze $data};
     is ($^EVAL_ERROR, '', 'Should be no error nfreezing');
     my $copy = try {thaw $frozen};
@@ -86,7 +89,8 @@ sub nfreeze_and_thaw(?$data) {
     return $copy;
 }
 
-sub store_and_retrieve(?$data) {
+sub store_and_retrieve {
+    my $data = shift;
     my $frozen = try {store $data, $file};
     is ($^EVAL_ERROR, '', 'Should be no error storing');
     my $copy = try {retrieve $file};
@@ -94,7 +98,8 @@ sub store_and_retrieve(?$data) {
     return $copy;
 }
 
-sub nstore_and_retrieve(?$data) {
+sub nstore_and_retrieve {
+    my $data = shift;
     my $frozen = try {nstore $data, $file};
     is ($^EVAL_ERROR, '', 'Should be no error storing');
     my $copy = try {retrieve $file};

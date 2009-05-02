@@ -57,7 +57,7 @@ Filenames with * and ? will be glob expanded.
 
 # VMS uses % instead of ? to mean "one character"
 my $wild_regex = $Is_VMS ?? '*%' !! '*?';
-sub expand_wildcards(...)
+sub expand_wildcards
 {
     @ARGV = @+: map( { m/[$wild_regex]/o ?? glob($_) !! @: $_ }, @ARGV);
 }
@@ -85,7 +85,7 @@ Sets modified time of destination to that of source.
 
 =cut 
 
-sub eqtime(...)
+sub eqtime
 {
     my @($src,$dst) =  @ARGV;
     local @ARGV = @($dst);  touch();  # in case $dst doesn't exist
@@ -100,7 +100,7 @@ Removes files and directories - recursively (even if readonly)
 
 =cut 
 
-sub rm_rf(...)
+sub rm_rf
 {
     expand_wildcards();
     rmtree(< grep { -e $_ }, @ARGV );
@@ -114,7 +114,7 @@ Removes files (even if readonly)
 
 =cut 
 
-sub rm_f(...) {
+sub rm_f {
     expand_wildcards();
 
     foreach my $file ( @ARGV) {
@@ -130,7 +130,7 @@ sub rm_f(...) {
     }
 }
 
-sub _unlink(@< @_) {
+sub _unlink {
     my $files_unlinked = 0;
     foreach my $file ( @_) {
         my $delete_count = 0;
@@ -149,7 +149,7 @@ Makes files exist, with current timestamp
 
 =cut 
 
-sub touch(...) {
+sub touch {
     my $t    = time;
     expand_wildcards();
     foreach my $file ( @ARGV) {
@@ -171,7 +171,7 @@ Returns true if all moves succeeded, false otherwise.
 
 =cut 
 
-sub mv(...) {
+sub mv {
     expand_wildcards();
     my @src = @ARGV;
     my $dst = pop @src;
@@ -197,7 +197,7 @@ Returns true if all copies succeeded, false otherwise.
 
 =cut
 
-sub cp(...) {
+sub cp {
     expand_wildcards();
     my @src = @ARGV;
     my $dst = pop @src;
@@ -219,7 +219,7 @@ Sets UNIX like permissions 'mode' on all the files.  e.g. 0666
 
 =cut 
 
-sub chmod(...) {
+sub chmod {
     local @ARGV = @ARGV;
     my $mode = shift(@ARGV);
     expand_wildcards();
@@ -250,7 +250,7 @@ Creates directories, including any parent directories.
 
 =cut 
 
-sub mkpath(...)
+sub mkpath
 {
     expand_wildcards();
     File::Path::mkpath(\ @ARGV,0,0777);
@@ -265,7 +265,7 @@ shell's idea of true and false).
 
 =cut 
 
-sub test_f(...)
+sub test_f
 {
     exit(-f @ARGV[0] ?? 0 !! 1);
 }
@@ -279,7 +279,7 @@ not (ie. shell's idea of true and false).
 
 =cut
 
-sub test_d(...)
+sub test_d
 {
     exit(-d @ARGV[0] ?? 0 !! 1);
 }
@@ -292,7 +292,7 @@ Converts DOS and OS/2 linefeeds to Unix style recursively.
 
 =cut
 
-sub dos2unix(...) {
+sub dos2unix {
     require File::Find;
     File::Find::find(sub {
                          return if -d;

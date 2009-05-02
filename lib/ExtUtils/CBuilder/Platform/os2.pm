@@ -6,11 +6,11 @@ our ($VERSION, @ISA);
 $VERSION = '0.22';
 @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
 
-sub need_prelink(...) { 1 }
+sub need_prelink { 1 }
 
-sub prelink(@< @_) {
+sub prelink {
     # Generate import libraries (XXXX currently near .DEF; should be near DLL!)
-    my $self = shift @_;
+    my $self = shift;
     my %args = %( < @_ );
 
     my @res = $self->SUPER::prelink(< %args);
@@ -63,9 +63,9 @@ sub extra_link_args_after_prelink($self, %< %args) {
     return @(@after_libs, @DEF);
 }
 
-sub link_executable(@< @_) {
+sub link_executable {
     # ldflags is not expecting .exe extension given on command line; remove -Zexe
-    my $self = shift @_;
+    my $self = shift;
     local $self->{config}->{+ldflags} = $self->{config}->{?ldflags};
     $self->{config}->{+ldflags} =~ s/(?<!\S)-Zexe(?!\S)//;
     return $self->SUPER::link_executable(< @_);

@@ -10,7 +10,7 @@ use File::Spec::Functions < qw(catfile catdir);
 
 # We do prelink, but don't want the parent to redo it.
 
-sub need_prelink(...) { 0 }
+sub need_prelink { 0 }
 
 sub arg_defines($self, %< %args) {
 
@@ -82,7 +82,7 @@ sub _do_link($self, $type, %< %args) {
     return $self->SUPER::_do_link($type, < %args, objects => $objects);
 }
 
-sub arg_nolink(...) { return; }
+sub arg_nolink { return; }
 
 sub arg_object_file($self, $file) {
     return "/obj=$file";

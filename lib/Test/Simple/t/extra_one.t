@@ -23,7 +23,7 @@ require Test::Builder;
 my $TB = Test::Builder->create;
 $TB->plan(tests => 2);
 
-sub is(@< @_) { $TB->is_eq(< @_) }
+sub is { $TB->is_eq(< @_) }
 
 
 package main;

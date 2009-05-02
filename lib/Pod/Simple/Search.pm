@@ -34,7 +34,8 @@ sub new($class) {
     return $self;
 }
 
-sub init($self) {
+sub init {
+    my $self = shift;
     $self->inc(1);
     $self->verbose( DEBUG);
     return $self;
@@ -474,7 +475,7 @@ sub _mac_whammy(_,@< @them) { # Tolerate '.', './some_dir' and '(../)+some_dir' 
 
 #==========================================================================
 
-sub _limit_glob_to_limit_re(@< @_) {
+sub _limit_glob_to_limit_re {
     my $self = @_[0];
     my $limit_glob = $self->{?'limit_glob'} || return;
 
@@ -600,8 +601,8 @@ sub contains_pod($self, $file) {
 
 #==========================================================================
 
-sub _accessorize(@< @_) {  # A simple-minded method-maker
-    shift @_;
+sub _accessorize {  # A simple-minded method-maker
+    shift;
     foreach my $attrname ( @_) {
         Symbol::fetch_glob(caller() . '::' . $attrname)->* = sub {
 
@@ -622,7 +623,7 @@ sub _accessorize(@< @_) {  # A simple-minded method-maker
 }
 
 #==========================================================================
-sub _state_as_string(@< @_) {
+sub _state_as_string {
     my $self = @_[0];
     return '' unless ref $self;
     my @out = @( "\{\n  # State of $(dump::view($self)) ...\n" );

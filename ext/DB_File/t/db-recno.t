@@ -8,10 +8,10 @@ use DB_File;
 use Fcntl;
 our ($dbh, $Dfile, $bad_ones, $FA);
 
-sub ok(@< @_)
+sub ok
 {
-    my $no = shift @_ ;
-    my $result = shift @_ ;
+    my $no = shift ;
+    my $result = shift ;
 
     print $^STDOUT, "not " unless $result ;
     print $^STDOUT, "ok $no\n" ;
@@ -23,24 +23,26 @@ do {
     package Redirect ;
     use Symbol ;
 
-    sub new(@< @_)
+    sub new
     {
-        my $class = shift @_ ;
-        my $filename = shift @_ ;
+        my $class = shift ;
+        my $filename = shift ;
         my $fh = gensym ;
         open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" ;
         my $real_stdout = $^STDOUT;
         return bless \@($fh, $real_stdout ) ;
 
     }
-    sub DESTROY($self)
+    sub DESTROY
     {
+        my $self = shift ;
         close $self->[0] ;
     }
 };
 
-sub docat(?$file)
+sub docat
 {
+    my $file = shift;
     local $^INPUT_RECORD_SEPARATOR = undef;
     open(my $catfh, "<",$file) || die "Cannot open $file:$^OS_ERROR";
     my $result = ~< $catfh->*;
@@ -49,14 +51,15 @@ sub docat(?$file)
     return $result;
 }
 
-sub docat_del(?$file)
-{
+sub docat_del
+{ 
+    my $file = shift;
     my $result = docat($file);
     unlink $file ;
     return $result;
 }   
 
-sub bad_one(...)
+sub bad_one
 {
     unless ($bad_ones++) {
         print $^STDERR, <<EOM ;
@@ -89,7 +92,7 @@ EOM
     }
 }
 
-sub normalise(@< @_)
+sub normalise
 {
     return unless $^OS_NAME eq 'cygwin' ;
     foreach ( @_)

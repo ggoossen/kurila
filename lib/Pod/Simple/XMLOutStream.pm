@@ -25,7 +25,7 @@ sub new($self, @< @_) {
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sub _handle_element_start(@< @_) {
+sub _handle_element_start {
     # ($self, $element_name, $attr_hash_r)
     my $fh = @_[0]->{?'output_fh'};
     DEBUG and print $^STDOUT, "++ @_[1]\n";
@@ -45,7 +45,7 @@ sub _handle_element_start(@< @_) {
     return;
 }
 
-sub _handle_text(@< @_) {
+sub _handle_text {
     DEBUG and print $^STDOUT, "== \"@_[1]\"\n";
     if(length @_[1]) {
         my $text = @_[1];

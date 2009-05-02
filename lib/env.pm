@@ -1,6 +1,6 @@
 package env;
 
-sub make_restore(...) {
+sub make_restore {
     my %old = %+: map { %: $_ => env::var($_) }, env::keys();
     my $restore= sub {
             my $old_copy = %old;

@@ -113,7 +113,7 @@ constants used internally between the generated C and XS functions.
 
 =cut
 
-sub constant_types(...) {
+sub constant_types {
     ExtUtils::Constant::XS->header();
 }
 
@@ -144,11 +144,11 @@ I<C_SUBNAME>.
 
 =cut
 
-sub XS_constant(@< @_) {
-    my $package = shift @_;
-    my $what = shift @_;
-    my $subname = shift @_;
-    my $C_subname = shift @_;
+sub XS_constant {
+    my $package = shift;
+    my $what = shift;
+    my $subname = shift;
+    my $C_subname = shift;
     $subname ||= 'constant';
     $C_subname ||= $subname;
 
@@ -279,7 +279,7 @@ C<XS_FILE> are recognised.
 
 =cut
 
-sub WriteMakefileSnippet(@< @_) {
+sub WriteMakefileSnippet {
     my %args = %( < @_ );
     my $indent = %args{?INDENT} || 2;
 
@@ -373,7 +373,7 @@ C<constant_10> with the default I<XS_SUBNAME>.
 
 =cut
 
-sub WriteConstants(@< @_) {
+sub WriteConstants {
     my %ARGS =
         %( # defaults
             C_FILE =>       'const-c.inc',

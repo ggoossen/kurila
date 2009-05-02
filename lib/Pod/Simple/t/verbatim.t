@@ -9,7 +9,7 @@ ok 1;
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
 print $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
-sub e(@< @_) { Pod::Simple::DumpAsXML->_duo(< @_) }
+sub e { Pod::Simple::DumpAsXML->_duo(< @_) }
 
 is( < e "", "" );
 is( < e "\n", "", );

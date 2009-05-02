@@ -97,13 +97,13 @@ sub add_style($newstyle,@< @args) {
     $stylename = $newstyle; # update rendering state
 }
 
-sub set_style_standard(@< @_) {
-    $stylename = shift @_; # update rendering state
+sub set_style_standard {
+    $stylename = shift; # update rendering state
     die "err: style '$stylename' unknown\n" unless exists %style{$stylename};
     set_style(< %style{$stylename}->@);
 }
 
-sub add_callback(@< @_) {
+sub add_callback {
     push @callbacks, < @_;
 }
 
@@ -129,7 +129,7 @@ sub walk_output(?$handle) { # updates $walkHandle
     $walkHandle = $handle;
 }
 
-sub concise_subref(@< @_) {
+sub concise_subref {
     my@($order, $coderef, ?$name) =  @_;
     my $codeobj = svref_2object($coderef);
 
@@ -156,7 +156,7 @@ sub concise_stashref($order, $h) {
 # under this name in versions before 0.56
 *concise_cv = \&concise_subref;
 
-sub concise_cv_obj(@< @_) {
+sub concise_cv_obj {
     my @($order, $cv, $name) =  @_;
     # name is either a string, or a CODE ref (copy of $cv arg??)
 
@@ -191,7 +191,7 @@ sub concise_cv_obj(@< @_) {
     }
 }
 
-sub concise_main(@< @_) {
+sub concise_main {
     my@($order) =  @_;
     sequence(main_start);
     $curcv = main_cv;
@@ -234,7 +234,7 @@ my @tree_decorations =
 
 my @render_packs; # collect -stash=<packages>
 
-sub compileOpts(@< @_) {
+sub compileOpts {
     # set rendering state from options and args
     my (@options,@args);
     if ((nelems @_)) {
@@ -297,7 +297,7 @@ sub compileOpts(@< @_) {
     return  @args;
 }
 
-sub compile(@< @_) {
+sub compile {
     my @args = compileOpts(< @_);
     return sub {
             my @newargs = compileOpts(< @_); # accept new rendering options
@@ -403,7 +403,8 @@ sub op_flags($x) {
     return join("", @v);
 }
 
-sub base_n(?$x) {
+sub base_n {
+    my $x = shift;
     return "-" . base_n(-$x) if $x +< 0;
     my $str = "";
     { $str .= substr($chars, $x % $base, 1) } while $x = int($x / $base);
@@ -414,7 +415,7 @@ sub base_n(?$x) {
 my %sequence_num;
 my $seq_max = 1;
 
-sub reset_sequence(...) {
+sub reset_sequence {
     # reset the sequence
     %sequence_num = %( () );
     $seq_max = 1;
@@ -700,7 +701,8 @@ sub concise_sv($sv, $hr, ?$preferpv) {
 
 my %srclines;
 
-sub fill_srclines(?$fullnm) {
+sub fill_srclines {
+    my $fullnm = shift;
     if ($fullnm eq '-e') {
         %srclines{+$fullnm} = \@( $fullnm, "-src not supported for -e" );
         return;
@@ -896,9 +898,9 @@ sub b_terse($op, $level) {
         concise_op($op, $level, %style{"terse"}->[0]);
 }
 
-sub tree(@< @_) {
-    my $op = shift @_;
-    my $level = shift @_;
+sub tree {
+    my $op = shift;
+    my $level = shift;
     my $style = @tree_decorations[$tree_style];
     my@($space, $single, $kids, $nokid, $last, $lead, $size) =  $style->@;
     my $name = concise_op($op, $level, $treefmt);

@@ -25,8 +25,8 @@ sub PROTECTED  () { 2**3  }
 # in the case of base class private fields (which occupy a slot but are
 # otherwise irrelevant to the class).
 
-sub import(@< @_) {
-    my $class = shift @_;
+sub import {
+    my $class = shift;
     return unless (nelems @_);
     my $package = caller(0);
     # avoid possible typo warnings
@@ -72,12 +72,12 @@ sub import(@< @_) {
     }
 }
 
-sub inherit(@< @_) {
+sub inherit {
     require base;
     base::inherit_fields(< @_);
 }
 
-sub _dump(...)  # sometimes useful for debugging
+sub _dump  # sometimes useful for debugging
 {
     for my $pkg (sort keys %attr) {
         print $^STDOUT, "\n$pkg";
@@ -102,7 +102,8 @@ sub _dump(...)  # sometimes useful for debugging
     }
 }
 
-sub new(?$class) {
+sub new {
+    my $class = shift;
     $class = ref $class if ref $class;
     require Hash::Util;
     my $self = bless \%(), $class;
@@ -119,7 +120,7 @@ sub _accessible_keys($class) {
         );
 }
 
-sub phash(...) {
+sub phash {
     die "Pseudo-hashes have been removed from Perl";
 }
 

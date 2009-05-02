@@ -67,7 +67,7 @@ The first fixed version of File::CheckTree was 4.2.
 
 my $Warnings;
 
-sub validate(@< @_) {
+sub validate {
     my ($starting_dir, $file, $test, $cwd, $oldwarnings);
 
     $starting_dir = cwd;

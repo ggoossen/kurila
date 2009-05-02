@@ -855,8 +855,9 @@ EOM
 };
 
 
-sub slurp(?$name)
+sub slurp
 {
+    my $name = shift ;
 
     my $input;
     my $fil = gzopen($name, "rb") ;
@@ -867,8 +868,9 @@ sub slurp(?$name)
     return $input;
 }
 
-sub trickle(?$name)
+sub trickle
 {
+    my $name = shift ;
 
     my $got;
     my $input;

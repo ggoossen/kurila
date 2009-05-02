@@ -11,8 +11,8 @@ print $^STDOUT, "# --- Making sure that get_handle works ---\n";
 do {
     package Woozle;
     our @ISA = @('Locale::Maketext');
-    sub dubbil(@< @_)   { return @_[1] * 2 }
-    sub numerate(@< @_) { return @_[2] . 'en' }
+    sub dubbil   { return @_[1] * 2 }
+    sub numerate { return @_[2] . 'en' }
 };
 do {
     package Woozle::eu_mt;

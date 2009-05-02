@@ -63,8 +63,8 @@ singleton, use C<create>.
 =cut
 
 my $Test = Test::Builder->new;
-sub new(@< @_) {
-    my@($class) =@( shift @_);
+sub new {
+    my@($class) =@( shift);
     $Test ||= $class->create;
     return $Test;
 }
@@ -84,7 +84,8 @@ this method.  Also, the method name may change in the future.
 
 =cut
 
-sub create(?$class) {
+sub create {
+    my $class = shift;
 
     my $self = bless \%(), $class;
     $self->reset;
@@ -201,8 +202,8 @@ the appropriate headers.
 
 =cut
 
-sub expected_tests(@< @_) {
-    my $self = shift @_;
+sub expected_tests {
+    my $self = shift;
     my @(?$max) =  @_;
 
     if( (nelems @_) ) {
@@ -226,7 +227,8 @@ Declares that this test will run an indeterminate # of tests.
 
 =cut
 
-sub no_plan($self) {
+sub no_plan {
+    my $self = shift;
 
     $self->{+No_Plan}   = 1;
     $self->{+Have_Plan} = 1;
@@ -240,7 +242,8 @@ Find out whether a plan has been defined. $plan is either C<undef> (no plan has 
 
 =cut
 
-sub has_plan($self) {
+sub has_plan {
+    my $self = shift;
 
     return $self->{?Expected_Tests} if $self->{?Expected_Tests};
     return 'no_plan' if $self->{?No_Plan};
@@ -613,7 +616,8 @@ DIAGNOSTIC
 }
 
 
-sub _caller_context($self) {
+sub _caller_context {
+    my $self = shift;
 
     my @(?$pack, ?$file, ?$line, ...) =  $self->caller(1);
 
@@ -810,7 +814,8 @@ sub maybe_regex($self, $regex) {
 }
 
 
-sub _is_qr(?$regex) {
+sub _is_qr {
+    my $regex = shift;
 
     # is_regexp() checks for regexes in a robust manner, say if they're
     # blessed.
@@ -889,9 +894,9 @@ Determines if the given $thing can be used as a filehandle.
 
 =cut
 
-sub is_fh(@< @_) {
-    my $self = shift @_;
-    my $maybe_fh = shift @_;
+sub is_fh {
+    my $self = shift;
+    my $maybe_fh = shift;
     return 0 unless defined $maybe_fh;
 
     return 1 if ref $maybe_fh  eq 'GLOB'; # its a glob ref
@@ -1153,8 +1158,8 @@ Like _print, but prints to the current diagnostic filehandle.
 
 =cut
 
-sub _print_diag(@< @_) {
-    my $self = shift @_;
+sub _print_diag {
+    my $self = shift;
 
     local $^OUTPUT_FIELD_SEPARATOR = '';
     my $fh = $self->todo ?? $self->todo_output !! $self->failure_output;
@@ -1215,9 +1220,9 @@ sub todo_output($self, ?$fh) {
 }
 
 
-sub _new_fh(@< @_) {
-    my $self = shift @_;
-    my@($file_or_fh) =@( shift @_);
+sub _new_fh {
+    my $self = shift;
+    my@($file_or_fh) =@( shift);
 
     my $fh;
     if( $self->is_fh($file_or_fh) ) {
@@ -1240,7 +1245,8 @@ sub _autoflush($fh) {
 
 
 my($Testout, $Testerr);
-sub _dup_stdhandles($self) {
+sub _dup_stdhandles {
+    my $self = shift;
 
     $self->_open_testhandles;
 
@@ -1258,7 +1264,8 @@ sub _dup_stdhandles($self) {
 
 
 my $Opened_Testhandles = 0;
-sub _open_testhandles($self) {
+sub _open_testhandles {
+    my $self = shift;
 
     return if $Opened_Testhandles;
 
@@ -1281,7 +1288,8 @@ sub _copy_io_layers($self, $src, $dest) {
         });
 }
 
-sub _plan_check($self) {
+sub _plan_check {
+    my $self = shift;
 
     unless( $self->{?Have_Plan} ) {
         local $Level = $Level + 2;
@@ -1354,8 +1362,8 @@ Of course, test #1 is $tests[0], etc...
 
 =cut
 
-sub summary(@< @_) {
-    my@($self) =@( shift @_);
+sub summary {
+    my@($self) =@( shift);
 
     return map { $_->{?'ok'} },  $self->{Test_Results}->@;
 }
@@ -1409,7 +1417,8 @@ result in this structure:
 
 =cut
 
-sub details($self) {
+sub details {
+    my $self = shift;
     return  $self->{?Test_Results}->@;
 }
 
@@ -1483,7 +1492,8 @@ error message.
 =cut
 
 #'#
-sub _sanity_check($self) {
+sub _sanity_check {
+    my $self = shift;
 
     $self->_whoa($self->{?Curr_Test} +< 0,  'Says here you ran a negative number of tests!');
     $self->_whoa((!$self->{?Have_Plan} and $self->{?Curr_Test}),
@@ -1523,7 +1533,7 @@ doesn't actually exit, that's your job.
 
 =cut
 
-sub _my_exit(@< @_) {
+sub _my_exit {
     $^CHILD_ERROR ||= @_[0];
 
     return 1;
@@ -1536,7 +1546,8 @@ sub _my_exit(@< @_) {
 
 =cut
 
-sub _ending($self) {
+sub _ending {
+    my $self = shift;
 
     my $real_exit_code = $^CHILD_ERROR;
     $self->_sanity_check();

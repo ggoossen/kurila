@@ -8,7 +8,7 @@
 
 use Config;
 
-sub BEGIN(...) {
+sub BEGIN {
     if (env::var('PERL_CORE')){
         chdir('t') if -d 't';
         $^INCLUDE_PATH = @('.', '../lib');

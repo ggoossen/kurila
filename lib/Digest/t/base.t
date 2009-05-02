@@ -9,18 +9,20 @@ do {
     our (@ISA);
     @ISA = qw(Digest::base);
 
-    sub new(?$class) {
+    sub new {
+        my $class = shift;
         my $str = "";
         bless \$str, $class;
     }
 
-    sub add(@< @_) {
-        my $self = shift @_;
+    sub add {
+        my $self = shift;
         $self->$ .= join("", @_);
         return $self;
     }
 
-    sub digest($self) {
+    sub digest {
+        my $self = shift;
         my $len = length($self->$);
         my $first = ($len +> 0) ?? substr($self->$, 0, 1) !! "X";
         $self->$ = "";

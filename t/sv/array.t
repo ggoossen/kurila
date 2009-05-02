@@ -206,7 +206,7 @@ do {
 
 # make sure reification behaves
 my $t = curr_test();
-sub reify(@< @_) { @_[+1] = $t++; print($^STDOUT,  (join ' ',@_), "\n"); }
+sub reify { @_[+1] = $t++; print($^STDOUT,  (join ' ',@_), "\n"); }
 reify('ok');
 reify('ok');
 
@@ -222,7 +222,7 @@ is(pop(@ary), 56);
 is(push(@ary,56), 4);
 is(unshift(@ary,12), 5);
 
-sub foo(...) { "a" }
+sub foo { "a" }
 my @foo= @(foo())[[@(0,0)]];
 is (@foo[1], "a");
 

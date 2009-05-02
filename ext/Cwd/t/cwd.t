@@ -220,22 +220,22 @@ SKIP: do {
 # These routines give us sort of a poor-man's cross-platform
 # directory or path comparison capability.
 
-sub bracketed_form_dir(@< @_) {
-    return join '', map { "[$_]" }, grep { length }, File::Spec->splitdir(File::Spec->canonpath( shift( @_) ));
+sub bracketed_form_dir {
+    return join '', map { "[$_]" }, grep { length }, File::Spec->splitdir(File::Spec->canonpath( shift() ));
 }
 
-sub dir_ends_with(@< @_) {
-    my @($dir, $expect) = @(shift @_, shift @_);
+sub dir_ends_with {
+    my @($dir, $expect) = @(shift, shift);
     my $bracketed_expect = quotemeta bracketed_form_dir($expect);
-    like( bracketed_form_dir($dir), qr|$bracketed_expect$|i, ((nelems @_) ?? shift @_ !! ()) );
+    like( bracketed_form_dir($dir), qr|$bracketed_expect$|i, ((nelems @_) ?? shift !! ()) );
 }
 
-sub bracketed_form_path(@< @_) {
-    return join '', map { "[$_]" }, grep { length }, File::Spec->splitpath(File::Spec->canonpath( shift( @_) ));
+sub bracketed_form_path {
+    return join '', map { "[$_]" }, grep { length }, File::Spec->splitpath(File::Spec->canonpath( shift() ));
 }
 
-sub path_ends_with(@< @_) {
-    my @($dir, $expect) = @(shift @_, shift @_);
+sub path_ends_with {
+    my @($dir, $expect) = @(shift, shift);
     my $bracketed_expect = quotemeta bracketed_form_path($expect);
-    like( bracketed_form_path($dir), qr|$bracketed_expect$|i, ((nelems @_) ?? shift @_ !! ()) );
+    like( bracketed_form_path($dir), qr|$bracketed_expect$|i, ((nelems @_) ?? shift !! ()) );
 }

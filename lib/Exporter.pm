@@ -10,8 +10,8 @@ our (%Cache);
 # Carp does this now for us, so we can finally live w/o Carp
 #$Carp::Internal{Exporter} = 1;
 
-sub import(@< @_) {
-    my $pkg = shift @_;
+sub import {
+    my $pkg = shift;
     my $callpkg = caller($ExportLevel);
 
     if ($pkg eq "Exporter" and nelems @_ and @_[0] eq "import") {
@@ -53,8 +53,8 @@ sub import(@< @_) {
 
 # Default methods
 
-sub export_fail(@< @_) {
-    my $self = shift @_;
+sub export_fail {
+    my $self = shift;
     < @_;
 }
 

@@ -57,9 +57,9 @@ ok(eq_array(
 # Assigning @ISA via globref
 do {
     package MRO_TestBase;
-    sub testfunc(...) { return 123 }
+    sub testfunc { return 123 }
     package MRO_TestOtherBase;
-    sub testfunctwo(...) { return 321 }
+    sub testfunctwo { return 321 }
     package MRO_M; our @ISA = qw/MRO_TestBase/;
 };
 
@@ -74,8 +74,8 @@ do {
 
     do {
         package DESTROY_MRO_Baseline;
-        sub new(@< @_) { bless \%() => shift @_ }
-        sub DESTROY(...) { $x++ }
+        sub new { bless \%() => shift }
+        sub DESTROY { $x++ }
 
         package DESTROY_MRO_Baseline_Child;
         our @ISA = qw/DESTROY_MRO_Baseline/;
@@ -97,7 +97,7 @@ do {
 
     do {
         package DESTROY_MRO_Dynamic;
-        sub new(@< @_) { bless \%() => shift @_ }
+        sub new { bless \%() => shift }
 
         package DESTROY_MRO_Dynamic_Child;
         our @ISA = qw/DESTROY_MRO_Dynamic/;
@@ -176,18 +176,18 @@ do {
 do {
     do {
         package SUPERTEST;
-        sub new(@< @_) { bless \%() => shift @_ }
-        sub foo(@< @_) { @_[1]+1 }
+        sub new { bless \%() => shift }
+        sub foo { @_[1]+1 }
 
         package SUPERTEST::MID;
         our @ISA = @( 'SUPERTEST' );
 
             package SUPERTEST::KID;
         our @ISA = @( 'SUPERTEST::MID' );
-        sub foo(@< @_) { my $s = shift @_; $s->SUPER::foo(< @_) }
+        sub foo { my $s = shift; $s->SUPER::foo(< @_) }
 
         package SUPERTEST::REBASE;
-        sub foo(@< @_) { @_[1]+3 }
+        sub foo { @_[1]+3 }
     };
 
     my $stk_obj = SUPERTEST::KID->new();

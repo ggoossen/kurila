@@ -6,7 +6,7 @@ BEGIN {
 
 plan( tests => 4 );
 
-sub empty_sub(...) {}
+sub empty_sub {}
 
 is(empty_sub,undef,"Is empty");
 is(empty_sub(1,2,3),undef,"Is still empty");

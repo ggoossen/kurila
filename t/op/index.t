@@ -10,7 +10,7 @@ require bytes;
 
 run_tests() unless caller;
 
-sub run_tests(...) {
+sub run_tests {
 
     my $foo = 'Now is the time for all good men to come to the aid of their country.';
 

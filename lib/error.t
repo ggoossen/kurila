@@ -20,8 +20,8 @@ do {
 # a bit more complex one, with stack trace.
 do {
     my ($line1, $line2, $line3);
-    sub new_error(...) { return error::create("my message"); } $line1 = __LINE__;
-    sub new_error2(...) { return new_error(); } $line2 = __LINE__;
+    sub new_error { return error::create("my message"); } $line1 = __LINE__;
+    sub new_error2 { return new_error(); } $line2 = __LINE__;
     my $err = new_error2(); $line3 = __LINE__;
     is( (nelems $err->{?stack}), 2);
     is((join '**', $err->{?stack}[0]), "../lib/error.t**$line2**34**main::new_error**");

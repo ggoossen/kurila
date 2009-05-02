@@ -83,11 +83,11 @@ that are found in the existing F<MANIFEST> file in the new one.
 
 =cut
 
-sub _sort(@< @_) {
+sub _sort {
     return sort { lc $a cmp lc $b }, @_;
 }
 
-sub mkmanifest(...) {
+sub mkmanifest {
     my $manimiss = 0;
     my $read = (-r 'MANIFEST' && maniread()) or $manimiss++;
     $read = \%() if $manimiss;
@@ -123,7 +123,8 @@ sub mkmanifest(...) {
 
 # Geez, shouldn't this use File::Spec or File::Basename or something?  
 # Why so careful about dependencies?
-sub clean_up_filename(?$filename) {
+sub clean_up_filename {
+    my $filename = shift;
     $filename =~ s|^\./||;
     $filename =~ s/^:([^:]+)$/$1/ if $Is_MacOS;
     return $filename;
@@ -139,8 +140,8 @@ below the current directory.
 
 =cut
 
-sub manifind(@< @_) {
-    my $p = shift @_ || \%();
+sub manifind {
+    my $p = shift || \%();
     my $found = \%();
 
     my $wanted = sub {
@@ -179,7 +180,7 @@ outputs these names to STDERR.
 
 =cut
 
-sub manicheck(...) {
+sub manicheck {
     return _check_files();
 }
 
@@ -197,7 +198,7 @@ STDERR.
 
 =cut
 
-sub filecheck(...) {
+sub filecheck {
     return _check_manifest();
 }
 
@@ -211,7 +212,7 @@ refs.
 
 =cut
 
-sub fullcheck(...) {
+sub fullcheck {
     return @(\_check_files(), \_check_manifest());
 }
 
@@ -242,7 +243,8 @@ sub skipcheck(?$p) {
 }
 
 
-sub _check_files(?$p) {
+sub _check_files {
+    my $p = shift;
     my $dosnames=(defined(&Dos::UseLFN) && Dos::UseLFN()==0);
     my $read = maniread() || \%();
     my $found = manifind($p);
@@ -337,7 +339,7 @@ sub maniread(?$mfile) {
 }
 
 # returns an anonymous sub that decides if an argument matches
-sub _maniskip(@< @_) {
+sub _maniskip {
     my @skip ;
     my $mfile = "$MANIFEST.SKIP";
     _check_mskip_directives($mfile) if -f $mfile;
@@ -369,7 +371,8 @@ sub _maniskip(@< @_) {
 # in a custom MANIFEST.SKIP for, for including
 # the content of, respectively, the default MANIFEST.SKIP
 # and an external manifest.skip file
-sub _check_mskip_directives(?$mfile) {
+sub _check_mskip_directives {
+    my $mfile = shift;
            local ($_);
     my @lines = @( () );
     my $flag = 0;
@@ -415,8 +418,8 @@ sub _check_mskip_directives(?$mfile) {
 
 # returns an array containing the lines of an external
 # manifest.skip file, if given, or $DEFAULT_MSKIP
-sub _include_mskip_file(@< @_) {
-    my $mskip = shift @_ || $DEFAULT_MSKIP;
+sub _include_mskip_file {
+    my $mskip = shift || $DEFAULT_MSKIP;
     unless (-f $mskip) {
         warn qq{Included file "$mskip" not found - skipping};
         return;
@@ -521,7 +524,7 @@ sub cp($srcFile, $dstFile) {
 }
 
 
-sub ln(@< @_) {
+sub ln {
     my @($srcFile, $dstFile) =  @_;
     return &cp( < @_ ) if $Is_VMS or ($^OS_NAME eq 'MSWin32' and Win32::IsWin95());
     link($srcFile, $dstFile);
@@ -598,8 +601,8 @@ $file will be normalized (ie. Unixified).  B<UNIMPLEMENTED>
 
 =cut
 
-sub maniadd(@< @_) {
-    my@($additions) =@( shift @_);
+sub maniadd {
+    my@($additions) =@( shift);
 
     _normalize($additions);
     _fix_manifest($MANIFEST);
@@ -622,7 +625,8 @@ sub maniadd(@< @_) {
 
 
 # Sometimes MANIFESTs are missing a trailing newline.  Fix this.
-sub _fix_manifest(?$manifest_file) {
+sub _fix_manifest {
+    my $manifest_file = shift;
 
     open my $manifest_fh, "<", $MANIFEST or die "Could not open $MANIFEST: $^OS_ERROR";
 
@@ -640,7 +644,7 @@ sub _fix_manifest(?$manifest_file) {
 
 
 # UNIMPLEMENTED
-sub _normalize(...) {
+sub _normalize {
     return;
 }
 

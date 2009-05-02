@@ -27,7 +27,7 @@ sub stripname($_) {
     return m/(\w[.\w]*)\s*$/ ?? $1 !! $_;
 }
 
-sub msgcmp(@< @_) {
+sub msgcmp {
     ## filter out platform-dependent aspects of error messages
     my $lines = @_;
     for ($lines) {
@@ -70,8 +70,8 @@ sub testpodcheck( %< %args) {
     return  $different;
 }
 
-sub testpodchecker(@< @_) {
-    my %opts = %( (ref @_[0] eq 'HASH') ?? < shift( @_)->% !! () );
+sub testpodchecker {
+    my %opts = %( (ref @_[0] eq 'HASH') ?? < shift()->% !! () );
     my @testpods = @_;
     my @($testname, $testdir) = @("", "");
     my $cmpfile = "";

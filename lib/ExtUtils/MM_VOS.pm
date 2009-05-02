@@ -30,7 +30,7 @@ Cleanup VOS core files
 
 =cut
 
-sub extra_clean_files(...) {
+sub extra_clean_files {
     return qw(*.kp);
 }
 

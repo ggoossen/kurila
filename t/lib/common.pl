@@ -214,10 +214,10 @@ for ( @prgs){
     { rmtree $_ if -d $_ }
 }
 
-sub randomMatch(@< @_)
+sub randomMatch
 {
-    my $got = shift @_ ;
-    my $expected = shift @_;
+    my $got = shift ;
+    my $expected = shift;
 
     my @got = sort split "\n", $got ;
     my @expected = sort split "\n", $expected ;
@@ -226,7 +226,7 @@ sub randomMatch(@< @_)
 
 }
 
-sub print_err_line(@< @_) {
+sub print_err_line {
     my @($switch, $prog, $expected, $results, $todo, $file) =  @_;
     my $err_line = "FILE: $file\n" .
         "PROG: $switch\n$prog\n" .

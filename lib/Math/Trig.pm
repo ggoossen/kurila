@@ -104,14 +104,14 @@ sub grad2rad ($v, ?$wrap) { my $d = _GR * $v; $wrap ?? $d !! rad2rad($d) }
 # acos and asin functions which always return a real number
 #
 
-sub acos_real(@< @_) {
+sub acos_real {
     my $z = @_[0];
     return 0  if @_[0] +>=  1;
     return pi if @_[0] +<= -1;
     return CORE::atan2(CORE::sqrt(1-$z*$z), $z);
 }
 
-sub asin_real(@< @_) {
+sub asin_real {
     my $z = @_[0];
     return  &pip2( < @_ ) if @_[0] +>=  1;
     return -&pip2( < @_ ) if @_[0] +<= -1;
@@ -134,7 +134,7 @@ sub spherical_to_cartesian( $rho, $theta, $phi) {
                $rho * cos( $phi   ) );
 }
 
-sub spherical_to_cylindrical(@< @_) {
+sub spherical_to_cylindrical {
     my @( $x, $y, $z ) =  spherical_to_cartesian( < @_ );
 
     return  @( sqrt( $x * $x + $y * $y ), @_[1], $z );
@@ -150,7 +150,7 @@ sub cylindrical_to_cartesian( $rho, $theta, $z) {
     return  @( $rho * cos( $theta ), $rho * sin( $theta ), $z );
 }
 
-sub cylindrical_to_spherical(@< @_) {
+sub cylindrical_to_spherical {
     return cartesian_to_spherical( < cylindrical_to_cartesian( < @_ ) );
 }
 
@@ -166,7 +166,7 @@ sub great_circle_distance( $theta0, $phi0, $theta1, $phi1, ?$rho) {
             sin( $lat0 ) * sin( $lat1 ) );
 }
 
-sub great_circle_direction(@< @_) {
+sub great_circle_direction {
     my @( $theta0, $phi0, $theta1, $phi1 ) =  @_;
 
     my $distance = &great_circle_distance( < @_ );
@@ -214,7 +214,7 @@ sub great_circle_waypoint( $theta0, $phi0, $theta1, $phi1, $point) {
     return  @($theta, $phi);
 }
 
-sub great_circle_midpoint(@< @_) {
+sub great_circle_midpoint {
     great_circle_waypoint( <@_[[0..3]], 0.5);
 }
 

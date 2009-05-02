@@ -5,12 +5,12 @@ our $VERSION = '1.04';
 # Map layer name to package that defines it
 our %alias;
 
-sub import(@< @_)
+sub import
 {
-    my $class = shift @_;
+    my $class = shift;
     while ((nelems @_))
     {
-        my $layer = shift @_;
+        my $layer = shift;
         if (exists %alias{$layer})
         {
             $layer = %alias{?$layer}

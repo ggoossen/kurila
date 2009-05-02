@@ -31,7 +31,7 @@ time relative to $^X, and generates a regexp that matches them
 
 =cut
 
-sub __find_relocations(...)
+sub __find_relocations
 {
     my %paths;
     for my $raw_key (keys config_keys) {

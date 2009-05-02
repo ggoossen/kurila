@@ -28,7 +28,7 @@ run_tests() unless caller;
 
 my $krunch = "a";
 
-sub run_tests(@< @_) {
+sub run_tests {
 
     $FATAL_MSG = qr/^substr outside of string/;
 
@@ -269,7 +269,7 @@ sub run_tests(@< @_) {
     is ($a, "foo");
 
     $a = "abcdefgh";
-    is(sub { shift @_ }->(substr($a, 0, 4, "xxxx")), 'abcd');
+    is(sub { shift }->(substr($a, 0, 4, "xxxx")), 'abcd');
     is($a, 'xxxxefgh');
 
     do {

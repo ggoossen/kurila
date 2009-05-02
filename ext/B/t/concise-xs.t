@@ -338,7 +338,7 @@ sub render($func_name) {
     return  @($buf, $^EVAL_ERROR);
 }
 
-sub corecheck(...) {
+sub corecheck {
     try { require Module::CoreList };
     if ($^EVAL_ERROR) {
         warn "Module::CoreList not available on $^PERL_VERSION\n";

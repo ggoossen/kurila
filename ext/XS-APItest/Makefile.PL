@@ -29,4 +29,4 @@ WriteConstants(
                  \%(name=>"G_WANT", default=>\@("IV", "G_ARRAY|G_VOID"))),
     );
 
-sub MY::install(...) { "install ::\n"  };
+sub MY::install { "install ::\n"  };

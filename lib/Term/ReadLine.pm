@@ -184,11 +184,11 @@ our @rl_term_set;
 
 sub PERL_UNICODE_STDIN () { 0x0001 }
 
-sub ReadLine(...) {'Term::ReadLine::Stub'}
-sub readline(@< @_) {
-    my $self = shift @_;
+sub ReadLine {'Term::ReadLine::Stub'}
+sub readline {
+    my $self = shift;
     my @($in,$out,$str) =  $self->@;
-    my $prompt = shift @_;
+    my $prompt = shift;
     print $out, @rl_term_set[0], $prompt, @rl_term_set[1], @rl_term_set[2]; 
     $self->register_Tk 
         if not $Term::ReadLine::registered and $Term::ReadLine::toloop
@@ -204,9 +204,9 @@ sub readline(@< @_) {
     chomp $str if defined $str;
     $str;
 }
-sub addhistory(...) {}
+sub addhistory {}
 
-sub findConsole(...) {
+sub findConsole {
     my $console;
     my $consoleOUT;
 
@@ -240,7 +240,7 @@ sub findConsole(...) {
     return @($console,$consoleOUT);
 }
 
-sub new(@< @_) {
+sub new {
     die "method new called with wrong number of arguments" 
         unless (nelems @_)==2 or (nelems @_)==4;
     my ($FIN, $FOUT, $ret);
@@ -274,15 +274,16 @@ sub newTTY($self, $in, $out) {
     iohandle::output_autoflush($out, 1);
 }
 
-sub IN(@< @_) { shift @_->[0] }
-sub OUT(@< @_) { shift @_->[1] }
-sub MinLine(...) { undef }
-sub Attribs(...) { \%() }
+sub IN { shift->[0] }
+sub OUT { shift->[1] }
+sub MinLine { undef }
+sub Attribs { \%() }
 
 my %features = %(tkRunning => 1, ornaments => 1, 'newTTY' => 1);
-sub Features(...) { \%features }
+sub Features { \%features }
 
-sub get_line($self) {
+sub get_line {
+    my $self = shift;
     my $in = $self->IN;
          local ($^INPUT_RECORD_SEPARATOR) = "\n";
     return scalar ~< $in;
@@ -331,17 +332,17 @@ our @rl_term_set = @("","","","");
 our $rl_term_set = ',,,';
 
 our $terminal;
-sub LoadTermCap(...) {
+sub LoadTermCap {
     return if defined $terminal;
 
     require Term::Cap;
     $terminal = Term::Cap->Tgetent(\%(OSPEED => 9600)); # Avoid warning.
 }
 
-sub ornaments(@< @_) {
-    shift @_;
+sub ornaments {
+    shift;
     return $rl_term_set unless (nelems @_);
-    $rl_term_set = shift @_;
+    $rl_term_set = shift;
     $rl_term_set ||= ',,,';
     $rl_term_set = 'us,ue,md,me' if $rl_term_set eq '1';
     my @ts = split m/,/, $rl_term_set, 4;
@@ -362,31 +363,34 @@ our($count_handle, $count_DoOne, $count_loop);
 $count_handle = $count_DoOne = $count_loop = 0;
 
 our($giveup);
-sub handle(...) {$giveup = 1; $count_handle++}
+sub handle {$giveup = 1; $count_handle++}
 
-sub Tk_loop(...) {
+sub Tk_loop {
     # Tk->tkwait('variable',\$giveup);	# needs Widget
     $count_DoOne++, Tk::DoOneEvent(0) until $giveup;
     $count_loop++;
     $giveup = 0;
 }
 
-sub register_Tk($self) {
+sub register_Tk {
+    my $self = shift;
     $Term::ReadLine::registered++ 
         or Tk->fileevent( <$self->IN,'readable',\&handle);
 }
 
-sub tkRunning(@< @_) {
+sub tkRunning {
     $Term::ReadLine::toloop = @_[1] if (nelems @_) +> 1;
     $Term::ReadLine::toloop;
 }
 
-sub get_c($self) {
+sub get_c {
+    my $self = shift;
     $self->Tk_loop if $Term::ReadLine::toloop && defined &Tk::DoOneEvent;
     return getc $self->IN;
 }
 
-sub get_line($self) {
+sub get_line {
+    my $self = shift;
     $self->Tk_loop if $Term::ReadLine::toloop && defined &Tk::DoOneEvent;
     my $in = $self->IN;
          local ($^INPUT_RECORD_SEPARATOR) = "\n";

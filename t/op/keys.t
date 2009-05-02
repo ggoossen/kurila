@@ -11,7 +11,7 @@ is join('*', sort keys($x)), 'aap*mies';
 $x = %();
 is join('*', keys($x)), '';
 is keys(undef), undef;
-sub foo(...) { return %('aap', 'noot'); }
+sub foo { return %('aap', 'noot'); }
 is join('*', keys(foo)), 'aap';
 
 dies_like 

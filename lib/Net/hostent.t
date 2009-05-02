@@ -19,7 +19,7 @@ use Test::More tests => 7;
 BEGIN { use_ok 'Net::hostent' }
 
 # Remind me to add this to Test::More.
-sub DIE(@< @_) {
+sub DIE {
     print $^STDOUT, "# $(join ' ',@_)\n";
     exit 1;
 }

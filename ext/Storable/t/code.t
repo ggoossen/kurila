@@ -22,10 +22,10 @@ use Safe;
 our ($freezed, $thawed, @obj, @res, $blessed_code);
 
 $blessed_code = bless sub { "blessed" }, "Some::Package";
-do { package Another::Package; sub foo(...) { __PACKAGE__ } };
+do { package Another::Package; sub foo { __PACKAGE__ } };
 
 do {
-    sub code(...) { "JAPH" }
+    sub code { "JAPH" }
 };
 
 local *FOO;
@@ -228,8 +228,8 @@ do {
 do {
     do {
         package MySafe;
-        sub new(@< @_) { bless \%(), shift @_ }
-        sub reval(@< @_) {
+        sub new { bless \%(), shift }
+        sub reval {
             my $source = @_[1];
             # Here you can apply some nifty regexpes to ensure the
             # safeness of the source code.

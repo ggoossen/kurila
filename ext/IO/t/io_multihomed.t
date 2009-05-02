@@ -44,9 +44,9 @@ sub _get_addr($sock,$addr_str, $multi)
     )
 }
 
-sub connect(@< @_)
+sub connect
 {
-    my $self = shift @_;
+    my $self = shift;
     if ((nelems @_) == 1) {
         my@($port, $addr) =  unpack_sockaddr_in(@_[0]);
         $addr = inet_ntoa($addr);

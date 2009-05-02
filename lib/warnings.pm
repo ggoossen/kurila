@@ -301,7 +301,7 @@ our $BYTES    = 12 ;
 
 our $All = "" ; vec($All, %Offsets{'all'}, 2 => 3);
 
-sub bits(@< @_)
+sub bits
 {
     # called from B::Deparse.pm
 
@@ -333,9 +333,9 @@ sub bits(@< @_)
     return $mask ;
 }
 
-sub import(@< @_) 
+sub import 
 {
-    shift @_;
+    shift;
 
     my $catmask ;
     my $fatal = 0 ;
@@ -371,9 +371,9 @@ sub import(@< @_)
     $^WARNING_BITS = $mask ;
 }
 
-sub unimport(@< @_) 
+sub unimport 
 {
-    shift @_;
+    shift;
 
     my $catmask ;
     my $mask = $^WARNING_BITS ;
@@ -401,7 +401,7 @@ sub unimport(@< @_)
 
 my %builtin_type; %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = @();
 
-sub __chk(@< @_)
+sub __chk
 {
     my $category ;
     my $offset ;
@@ -409,7 +409,7 @@ sub __chk(@< @_)
 
     if (@_) {
         # check the category supplied.
-        $category = shift @_ ;
+        $category = shift ;
         if (my $type = ref $category) {
             die("not an object")
                 if exists %builtin_type{$type};
@@ -445,7 +445,7 @@ sub __chk(@< @_)
     return @($callers_bitmask, $offset, $i) ;
 }
 
-sub enabled(@< @_)
+sub enabled
 {
     die("Usage: warnings::enabled([category])")
         unless nelems(@_) == 1 || nelems(@_) == 0 ;
@@ -458,7 +458,7 @@ sub enabled(@< @_)
 }
 
 
-sub warn(@< @_)
+sub warn
 {
     die("Usage: warnings::warn([category,] 'message')")
         unless nelems(@_) == 2 || nelems(@_) == 1 ;
@@ -471,7 +471,7 @@ sub warn(@< @_)
     CORE::warn($message) ;
 }
 
-sub warnif(@< @_)
+sub warnif
 {
     die("Usage: warnings::warnif([category,] 'message')")
         unless nelems(@_) == 2 || nelems(@_) == 1 ;

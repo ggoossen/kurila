@@ -70,8 +70,8 @@ import_extra().
 
 =cut
 
-sub import(@< @_) {
-    my@($class) =@( shift @_);
+sub import {
+    my@($class) =@( shift);
 
     # Don't run all this when loading ourself.
     return 1 if $class eq 'Test::Builder::Module';
@@ -93,9 +93,9 @@ sub import(@< @_) {
 }
 
 
-sub _strip_imports(@< @_) {
-    my $class = shift @_;
-    my $list  = shift @_;
+sub _strip_imports {
+    my $class = shift;
+    my $list  = shift;
 
     my @imports = @( () );
     my @other   = @( () );
@@ -137,7 +137,7 @@ feels like a bit of an ugly hack in its current form.
 
 =cut
 
-sub import_extra(...) {}
+sub import_extra {}
 
 
 =head2 Builder
@@ -168,7 +168,7 @@ call builder() inside each function rather than store it in a global.
 
 =cut
 
-sub builder(...) {
+sub builder {
     return Test::Builder->new;
 }
 

@@ -40,29 +40,29 @@ BEGIN
     eval ' use IO::Uncompress::UnLzf 2.006 ;';
 }
 
-sub new(@< @_)
+sub new
 {
-    my $class = shift @_ ;
+    my $class = shift ;
     my $obj = createSelfTiedObject($class, \$AnyUncompressError);
     $obj->_create(undef, 0, < @_);
 }
 
-sub anyuncompress(@< @_)
+sub anyuncompress
 {
     my $obj = createSelfTiedObject(undef, \$AnyUncompressError);
     return $obj->_inf(< @_) ;
 }
 
-sub getExtraParams(...)
+sub getExtraParams
 {
     use IO::Compress::Base::Common v2.006 < qw(:Parse);
     return  @( 'RawInflate' => \@(1, 1, Parse_boolean,  0) ) ;
 }
 
-sub ckParams(@< @_)
+sub ckParams
 {
-    my $self = shift @_ ;
-    my $got = shift @_ ;
+    my $self = shift ;
+    my $got = shift ;
 
     # any always needs both crc32 and adler32
     $got->value('CRC32' => 1);
@@ -71,11 +71,11 @@ sub ckParams(@< @_)
     return 1;
 }
 
-sub mkUncomp(@< @_)
+sub mkUncomp
 {
-    my $self = shift @_ ;
-    my $class = shift @_ ;
-    my $got = shift @_ ;
+    my $self = shift ;
+    my $class = shift ;
+    my $got = shift ;
 
     my $magic ;
 
@@ -155,9 +155,9 @@ sub mkUncomp(@< @_)
 
 
 
-sub ckMagic(@< @_)
+sub ckMagic
 {
-    my $self = shift @_;
+    my $self = shift;
     my @names = @_ ;
 
     my $keep = ref $self ;

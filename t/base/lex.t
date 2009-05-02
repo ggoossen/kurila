@@ -202,7 +202,7 @@ do {
     ++$test;
 
     # This isn't actually a lex test, but it's testing the same feature
-    sub makearray(...) {
+    sub makearray {
         my @array = @('fish', 'dog', 'carrot');
         *R::crackers = \@array;
     }
@@ -216,7 +216,7 @@ do {
 # Tests 52-54
 # => should only quote foo::bar if it isn't a real sub. AMS, 20010621
 
-sub xyz::foo(...) { "bar" }
+sub xyz::foo { "bar" }
 my %str = %(
         foo      => 1,
             xyz::foo => 1,
@@ -228,7 +228,7 @@ print ($^STDOUT, (exists %str{foo}      ?? "" !! "not ")."ok $test\n"); ++$test;
 print ($^STDOUT, (exists %str{bar}      ?? "" !! "not ")."ok $test\n"); ++$test;
 print ($^STDOUT, (exists %str{'xyz::bar'} ?? "" !! "not ")."ok $test\n"); ++$test;
 
-sub foo::::::bar(...) { print $^STDOUT, "ok $test\n"; $test++ }
+sub foo::::::bar { print $^STDOUT, "ok $test\n"; $test++ }
 foo::::::bar;
 
 eval "\$x =\x[E2]foo";

@@ -10,12 +10,12 @@ our ($VERSION);
 
 $VERSION = '2.006';
 
-sub mkCompObject(@< @_)
+sub mkCompObject
 {
-    my $crc32    = shift @_ ;
-    my $adler32  = shift @_ ;
-    my $level    = shift @_ ;
-    my $strategy = shift @_ ;
+    my $crc32    = shift ;
+    my $adler32  = shift ;
+    my $level    = shift ;
+    my $strategy = shift ;
 
     my @($def, $status) =  Compress::Raw::Zlib::Deflate->new(
         AppendOutput   => 1,
@@ -46,12 +46,12 @@ sub compr($self, $inbuffer, $outbuffer)
         return STATUS_ERROR;
     }
 
-    return STATUS_OK;    
+    return STATUS_OK;
 }
 
-sub flush(@< @_)
+sub flush
 {
-    my $self = shift @_ ;
+    my $self = shift ;
 
     my $def   = $self->{?Def};
 
@@ -69,9 +69,9 @@ sub flush(@< @_)
 
 }
 
-sub close(@< @_)
+sub close
 {
-    my $self = shift @_ ;
+    my $self = shift ;
 
     my $def   = $self->{?Def};
 
@@ -79,8 +79,9 @@ sub close(@< @_)
         if defined $def ;
 }
 
-sub reset($self)
+sub reset
 {
+    my $self = shift ;
 
     my $def   = $self->{?Def};
 
@@ -107,27 +108,31 @@ sub reset($self)
 #    $self->{Def}->total_in();
 #}
 
-sub compressedBytes($self)
+sub compressedBytes
 {
+    my $self = shift ;
 
     $self->{Def}->compressedBytes();
 }
 
-sub uncompressedBytes($self)
+sub uncompressedBytes
 {
+    my $self = shift ;
     $self->{Def}->uncompressedBytes();
 }
 
 
 
 
-sub crc32($self)
+sub crc32
 {
+    my $self = shift ;
     $self->{Def}->crc32();
 }
 
-sub adler32($self)
+sub adler32
 {
+    my $self = shift ;
     $self->{Def}->adler32();
 }
 

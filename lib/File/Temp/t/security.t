@@ -65,7 +65,10 @@ exit;
 # Subroutine to open two temporary files.
 # one is opened in the current dir and the other in the temp dir
 
-sub test_security(?$skip) {
+sub test_security {
+
+    # Read in the skip flag
+    my $skip = shift;
 
     # If we are skipping we need to simply fake the correct number
     # of tests -- we dont use skip since the tempfile() commands will

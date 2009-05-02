@@ -2,7 +2,7 @@
 package Pod::Simple::Debug;
 
 
-sub import(@< @_) {
+sub import {
     my($value,$variable);
 
     if((nelems @_) == 2) {

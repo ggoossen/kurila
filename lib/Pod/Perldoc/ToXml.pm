@@ -12,9 +12,9 @@ $VERSION   # so that ->VERSION is happy
     $Pod::Simple::XMLOutStream::VERSION;
 
 
-sub is_pageable(...)        { 0 }
-sub write_with_binmode(...) { 0 }
-sub output_extension(...)   { 'xml' }
+sub is_pageable        { 0 }
+sub write_with_binmode { 0 }
+sub output_extension   { 'xml' }
 
 1;
 __END__

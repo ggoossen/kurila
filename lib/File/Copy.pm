@@ -49,18 +49,18 @@ sub _catname($from, $to) {
 
 # _eq($from, $to) tells whether $from and $to are identical
 # works for strings and references
-sub _eq(@< @_) {
+sub _eq {
     return @_[0] == @_[1] if ref @_[0] && ref @_[1];
     return @_[0] eq @_[1] if !ref @_[0] && !ref @_[1];
     return "";
 }
 
-sub copy(@< @_) {
+sub copy {
     die("Usage: copy(FROM, TO [, BUFFERSIZE]) ")
         unless((nelems @_) == 2 || (nelems @_) == 3);
 
-    my $from = shift @_;
-    my $to = shift @_;
+    my $from = shift;
+    my $to = shift;
 
     my $from_a_handle = (ref($from)
                          ?? (ref($from) eq 'GLOB'
@@ -208,7 +208,7 @@ sub copy(@< @_) {
     return 1;
 }
 
-sub move(@< @_) {
+sub move {
     die("Usage: move(FROM, TO) ") unless (nelems @_) == 2;
 
     my@($from,$to) =  @_;

@@ -187,15 +187,15 @@ good working examples.
 
 use warnings::register;
 
-sub new(@< @_) {
-    my $pkg = shift @_;
+sub new {
+    my $pkg = shift;
     $pkg->TIEHASH(< @_);
 }
 
 # Grandfather "new"
 
-sub TIEHASH(@< @_) {
-    my $pkg = shift @_;
+sub TIEHASH {
+    my $pkg = shift;
     if (defined &{Symbol::fetch_glob("$($pkg)::new")}) {
         warnings::warnif("WARNING: calling $($pkg)->new since $($pkg)->TIEHASH is missing");
         $pkg->new(< @_);
@@ -205,13 +205,13 @@ sub TIEHASH(@< @_) {
     }
 }
 
-sub EXISTS(@< @_) {
+sub EXISTS {
     my $pkg = ref @_[0];
     die "$pkg doesn't define an EXISTS method";
 }
 
-sub CLEAR(@< @_) {
-    my $self = shift @_;
+sub CLEAR {
+    my $self = shift;
     my $key = $self->FIRSTKEY(< @_);
     my @keys;
 
@@ -231,26 +231,26 @@ sub CLEAR(@< @_) {
 package Tie::StdHash;
 # @ISA = qw(Tie::Hash);		# would inherit new() only
 
-sub TIEHASH(@< @_)  { bless \%(), @_[0] }
-sub STORE(@< @_)    { @_[0]->{+@_[1]} = @_[2] }
-sub FETCH(@< @_)    { @_[0]->{?@_[1]} }
-sub FIRSTKEY(@< @_) { my $a = nelems( keys @_[0]->%); each @_[0]->% }
-sub NEXTKEY(@< @_)  { each @_[0]->% }
-sub EXISTS(@< @_)   { exists @_[0]->{@_[1]} }
-sub DELETE(@< @_)   { delete @_[0]->{@_[1]} }
-sub CLEAR(@< @_)    { @_[0]->% = %( () ) }
-sub SCALAR(@< @_)   { scalar @_[0]->% }
+sub TIEHASH  { bless \%(), @_[0] }
+sub STORE    { @_[0]->{+@_[1]} = @_[2] }
+sub FETCH    { @_[0]->{?@_[1]} }
+sub FIRSTKEY { my $a = nelems( keys @_[0]->%); each @_[0]->% }
+sub NEXTKEY  { each @_[0]->% }
+sub EXISTS   { exists @_[0]->{@_[1]} }
+sub DELETE   { delete @_[0]->{@_[1]} }
+sub CLEAR    { @_[0]->% = %( () ) }
+sub SCALAR   { scalar @_[0]->% }
 
 package Tie::ExtraHash;
 
-sub TIEHASH(@< @_)  { my $p = shift @_; bless \@(\%(), < @_), $p }
-sub STORE(@< @_)    { @_[0]->[0]->{+@_[1]} = @_[2] }
-sub FETCH(@< @_)    { @_[0]->[0]->{?@_[1]} }
-sub FIRSTKEY(@< @_) { my $a = scalar keys @_[0]->[0]->%; each @_[0]->[0]->% }
-sub NEXTKEY(@< @_)  { each @_[0]->[0]->% }
-sub EXISTS(@< @_)   { exists @_[0]->[0]->{@_[1]} }
-sub DELETE(@< @_)   { delete @_[0]->[0]->{@_[1]} }
-sub CLEAR(@< @_)    { @_[0]->[0]->% = %( () ) }
-sub SCALAR(@< @_)   { scalar @_[0]->[0]->% }
+sub TIEHASH  { my $p = shift; bless \@(\%(), < @_), $p }
+sub STORE    { @_[0]->[0]->{+@_[1]} = @_[2] }
+sub FETCH    { @_[0]->[0]->{?@_[1]} }
+sub FIRSTKEY { my $a = scalar keys @_[0]->[0]->%; each @_[0]->[0]->% }
+sub NEXTKEY  { each @_[0]->[0]->% }
+sub EXISTS   { exists @_[0]->[0]->{@_[1]} }
+sub DELETE   { delete @_[0]->[0]->{@_[1]} }
+sub CLEAR    { @_[0]->[0]->% = %( () ) }
+sub SCALAR   { scalar @_[0]->[0]->% }
 
 1;

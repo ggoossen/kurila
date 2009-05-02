@@ -10,10 +10,10 @@ XSLoader::load 'OS2::ExtAttr', $VERSION;
 # Format of the array: 
 # 0 ead, 1 file name, 2 file handle. 3 length, 4 position, 5 need to write.
 
-sub TIEHASH(@< @_) {
-    my $class = shift @_;
+sub TIEHASH {
+    my $class = shift;
     my $ea = _create() || die "Cannot create EA: $^OS_ERROR";
-    my $file = shift @_;
+    my $file = shift;
     my ($name, $handle);
     if (ref $file eq 'GLOB' or ref \$file eq 'GLOB') {
         die "File handle is not opened" unless $handle = fileno $file;
@@ -25,47 +25,50 @@ sub TIEHASH(@< @_) {
     bless \@($ea, $name, $handle, 0, 0, 0), $class;
 }
 
-sub DESTROY(?$eas) {
+sub DESTROY {
+    my $eas = shift;
     # 0 means: discard eas which are not in $eas->[0].
     _write( $eas->[0], $eas->[1], $eas->[2], 0) and die "Cannot write EA: $^OS_ERROR"
         if $eas->[5];
     _destroy( $eas->[0] );
 }
 
-sub FIRSTKEY(?$eas) {
+sub FIRSTKEY {
+    my $eas = shift;
     $eas->[3] = _count($eas->[0]);
     $eas->[4] = 1;
     return undef if $eas->[4] +> $eas->[3];
     return _get_name($eas->[0], $eas->[4]);
 }
 
-sub NEXTKEY(?$eas) {
+sub NEXTKEY {
+    my $eas = shift;
     $eas->[4]++;
     return undef if $eas->[4] +> $eas->[3];
     return _get_name($eas->[0], $eas->[4]);
 }
 
-sub FETCH(@< @_) {
-    my $eas = shift @_;
-    my $index = _find($eas->[0], shift @_);
+sub FETCH {
+    my $eas = shift;
+    my $index = _find($eas->[0], shift);
     return undef if $index +<= 0;
     return value($eas->[0], $index);
 }
 
-sub EXISTS(@< @_) {
-    my $eas = shift @_;
-    return _find($eas->[0], shift @_) +> 0;
+sub EXISTS {
+    my $eas = shift;
+    return _find($eas->[0], shift) +> 0;
 }
 
-sub STORE(@< @_) {
-    my $eas = shift @_;
+sub STORE {
+    my $eas = shift;
     $eas->[5] = 1;
-    add($eas->[0], shift @_, shift @_) +> 0 or die "Error setting EA: $^OS_ERROR";
+    add($eas->[0], shift, shift) +> 0 or die "Error setting EA: $^OS_ERROR";
 }
 
-sub DELETE(@< @_) {
-    my $eas = shift @_;
-    my $index = _find($eas->[0], shift @_);
+sub DELETE {
+    my $eas = shift;
+    my $index = _find($eas->[0], shift);
     return undef if $index +<= 0;
     my $value = value($eas->[0], $index);
     _delete($eas->[0], $index) and die "Error deleting EA: $^OS_ERROR";
@@ -73,7 +76,8 @@ sub DELETE(@< @_) {
     return $value;
 }
 
-sub CLEAR(?$eas) {
+sub CLEAR {
+    my $eas = shift;
     _clear($eas->[0]);
     $eas->[5] = 1;
 }
@@ -82,9 +86,9 @@ sub CLEAR(?$eas) {
 
 *new = \&TIEHASH;
 
-sub copy(@< @_) {
-    my $eas = shift @_;
-    my $file = shift @_;
+sub copy {
+    my $eas = shift;
+    my $file = shift;
     my ($name, $handle);
     if (ref $file eq 'GLOB' or ref \$file eq 'GLOB') {
         die "File handle is not opened" unless $handle = fileno $file;
@@ -95,7 +99,8 @@ sub copy(@< @_) {
     }
 }
 
-sub update(?$eas) {
+sub update {
+    my $eas = shift;
     # 0 means: discard eas which are not in $eas->[0].
     _write( $eas->[0], $eas->[1], $eas->[2], 0) and die "Cannot write EA: $^OS_ERROR";
 }

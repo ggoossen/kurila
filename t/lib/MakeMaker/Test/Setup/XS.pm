@@ -65,7 +65,7 @@ END
     );
 
 
-sub setup_xs(...) {
+sub setup_xs {
     setup_mm_test_root();
     chdir 'MM_TEST_ROOT:[t]' if $Is_VMS;
 
@@ -83,7 +83,7 @@ sub setup_xs(...) {
     return 1;
 }
 
-sub teardown_xs(...) { 
+sub teardown_xs { 
     foreach my $file (keys %Files) {
         my $dir = dirname($file);
         if( -e $dir ) {
