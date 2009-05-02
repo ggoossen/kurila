@@ -10,7 +10,7 @@ my $warn_msg;
 use Carp::Heavy (); # make sure Carp::Heavy is already loaded, because $^INCLUDE_PATH is relative
 
 BEGIN {
-    $^WARN_HOOK = sub { $warn_msg = @_[0]; warn "# @_[0]"; }
+    $^WARN_HOOK = sub { $warn_msg = @_[0]; print $^STDERR, "# " . @_[0]->message; }
 }
 
 if ( $symlink_exists ) { print $^STDOUT, "1..193\n"; }

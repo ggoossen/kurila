@@ -470,18 +470,18 @@ sub process_para {
                 push(@BootCode,     "#endif");
             }
 
-            my @fns = keys((@XSStack[-1]->{?functions} || \%())->%);
+            my @fns = keys(@XSStack[-1]->{?functions} || %());
             if ($statement ne 'endif') { 
                     # Hide the functions defined in other #if branches, and reset.
-                    @XSStack[-1]->{+other_functions}->{[ @fns]} = @(1) x nelems @fns;
-                    @XSStack[-1]->{[qw(varname functions)]} = @('', \%());
+                    @XSStack[-1]->{+other_functions}{[+@fns]} = @(1) x nelems @fns;
+                    @XSStack[-1]->{[qw(varname functions)]} = @('', %());
             } else {
                 my $tmp = pop(@XSStack);
                 0 while (--$XSS_work_idx
             && @XSStack[$XSS_work_idx]->{?type} ne 'if');
                 # Keep all new defined functions
-                push(@fns, < keys(($tmp->{?other_functions} || \%())->%));
-                    @XSStack[$XSS_work_idx]->{+functions}->{[ @fns]} = @(1) x nelems @fns;
+                push(@fns, < keys($tmp->{?other_functions} || %()));
+                @XSStack[$XSS_work_idx]->{+functions}{[+@fns]} = @(1) x nelems @fns;
             }
         }
     }
