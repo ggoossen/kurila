@@ -137,7 +137,7 @@ while ($Decomp =~ m/(.+)/g) {
                 if (%Combin{?$dec->[0] }) {
                     %NonStD{+$ini } = 1;
                 } else {
-                    %CompList{ + $listname }->{+$dec->[1] } = $ini;
+                    %CompList{ + $listname }{+$dec->[1] } = $ini;
                     %Comp1st{+$dec->[0] } = $listname;
                     %Comp2nd{+$dec->[1] } = 1 if ! %Exclus{?$ini};
                 }
@@ -300,8 +300,8 @@ my $compinit =
 
 foreach my $i (sort keys %CompList) {
     $compinit .= "$structname $i [] = \{\n";
-    $compinit .= join ",\n", map { sprintf("\t\{ \%d, \%d \}", $_, %CompList{$i}->{?$_}) },
-        sort { $a <+> $b }, keys  %CompList{?$i}->%;
+    $compinit .= join ",\n", map { sprintf("\t\{ \%d, \%d \}", $_, %CompList{$i}{?$_}) },
+        sort { $a <+> $b }, keys  %CompList{?$i};
     $compinit .= ",\n\{0,0\}\n\};\n\n"; # with sentinel
 }
 
@@ -362,17 +362,17 @@ EOF
         die sprintf("a Unicode code point 0x\%04X over 0x10FFFF.", $uv)
             unless $uv +<= 0x10FFFF;
         my @c = @( unpack 'CCCC', pack 'N', $uv );
-        %val{ + @c[1] }->{ + @c[2] }->{+@c[3] } = $hash->{?$uv};
+        %val{ + @c[1] }{ + @c[2] }{+@c[3] } = $hash->{?$uv};
     }
 
     foreach my $p (sort { $a <+> $b }, keys %val) {
         next if ! %val{?$p };
         for my $r (0..255) {
-            next if ! %val{ $p }->{?$r };
+            next if ! %val{ $p }{?$r };
             printf $fh, "static $type $($head)_\%02x_\%02x [256] = \{\n", $p, $r;
             for my $c (0..255) {
-                print $fh, "\t", defined %val{$p}->{$r}->{?$c}
-                    ?? "($type)".%val{$p}->{$r}->{?$c}
+                print $fh, "\t", defined %val{$p}{$r}{?$c}
+                    ?? "($type)".%val{$p}{$r}{?$c}
                     !! $null;
                 print $fh, ','  if $c != 255;
                 print $fh, "\n" if $c % 8 == 7;
@@ -384,11 +384,11 @@ EOF
         next if ! %val{?$p };
         printf $fh, "static $type* $($head)_\%02x [256] = \{\n", $p;
         for my $r (0..255) {
-            print $fh, %val{ $p }->{?$r }
+            print $fh, %val{ $p }{?$r }
                 ?? sprintf("$($head)_\%02x_\%02x", $p, $r)
                 !! "NULL";
             print $fh, ','  if $r != 255;
-            print $fh, "\n" if %val{ $p }->{?$r } || ($r+1) % 8 == 0;
+            print $fh, "\n" if %val{ $p }{?$r } || ($r+1) % 8 == 0;
         }
         print $fh, "\};\n\n";
     }
