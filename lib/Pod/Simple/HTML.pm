@@ -370,17 +370,17 @@ sub index_as_html {
     my $self = @_[0];
     # This is meant to be called AFTER the input document has been parsed!
 
-    my $points = $self->{?'PSHTML_index_points'} || \@();
+    my $points = $self->{?'PSHTML_index_points'} || @();
 
-    (nelems $points->@) +> 1 or return qq[<div class='indexgroupEmpty'></div>\n];
+    (nelems $points) +> 1 or return qq[<div class='indexgroupEmpty'></div>\n];
     # There's no point in having a 0-item or 1-item index, I dare say.
 
     my@(@out) =@( @( qq{\n<div class='indexgroup'>} ));
     my $level = 0;
 
     my( $target_level, $previous_tagname, $tagname, $text, $anchorname, $indent);
-    foreach my $p ( @( < $points->@, \@('head0', '(end)') ) ) {
-        @($tagname, $text) =  $p->@;
+    foreach my $p ( $points +@+ @: @: 'head0', '(end)' ) {
+        @($tagname, $text) =  $p;
         $anchorname = $self->section_escape($text);
         if( $tagname =~ m{^head(\d+)$} ) {
             $target_level = 0 + $1;
@@ -464,7 +464,7 @@ sub _do_middle_main_loop {
                     print $fh, qq[name="$esc"];
                         DEBUG and print $^STDOUT, "Linearized ", scalar(nelems @to_unget),
                     " tokens as \"$name\".\n";
-                    push  $self->{+'PSHTML_index_points'}->@, \@($tagname, $name)
+                    push  $self->{+'PSHTML_index_points'}, @($tagname, $name)
                         if %ToIndex{?$tagname };
                 # Obviously, this discards all formatting codes (saving
                 #  just their content), but ahwell.

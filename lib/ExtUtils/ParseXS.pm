@@ -574,11 +574,11 @@ sub process_para {
 
     # Check for duplicate function definition
     for my $tmp ( @XSStack) {
-        next unless defined $tmp->{?functions}->{?$Full_func_name};
+        next unless defined $tmp->{?functions}{?$Full_func_name};
         Warn("Warning: duplicate function definition '$clean_func_name' detected");
         last;
     }
-    @XSStack[$XSS_work_idx]->{?functions}->{+$Full_func_name} ++ ;
+    @XSStack[$XSS_work_idx]->{+functions}{+$Full_func_name} ++ ;
     @Attributes = @();
     %XsubAliases = %XsubAliasValues =  %Interfaces = %();
     $DoSetMagic = 1;

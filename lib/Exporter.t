@@ -53,9 +53,9 @@ do {
     }
 
     our %EXPORT_TAGS = %(
-            This => \qw(stuff %left),
-                That => \qw(Above the @wailing),
-                tray => \qw(Fasten $seatbelt),
+            This => qw(stuff %left),
+            That => qw(Above the @wailing),
+            tray => qw(Fasten $seatbelt),
         );
     our @EXPORT    = qw(lifejacket is);
     our @EXPORT_OK = qw(under &your $seat);
@@ -84,8 +84,8 @@ do {
 
     Exporter::export_ok_tags();
 
-    my %tags     = %( < @+: map { @: $_ => 1 }, @+: map { $_->@ }, values %EXPORT_TAGS );
-    my %exportok = %( < @+: map { @: $_ => 1 }, @EXPORT_OK );
+    my %tags     = %+: map { %: $_ => 1 }, @+: values %EXPORT_TAGS;
+    my %exportok = %+: map { %: $_ => 1 }, @EXPORT_OK;
     my $ok = 1;
     foreach my $tag (keys %tags) {
         $ok = exists %exportok{$tag};
@@ -131,7 +131,7 @@ my @tags = qw(:This :tray);
 Testing->import(< @tags);
 
 main::ok( (!grep { eval "!defined $_" }, map { m/^\w/ ?? "&$_" !! $_ },
-           @+: map { $_->@ }, %Testing::EXPORT_TAGS{[ map { s/^://; $_ },@tags ]}),
+           @+: %Testing::EXPORT_TAGS{[ map { s/^://; $_ },@tags ]}),
           'import by tags' );
 
 

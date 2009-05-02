@@ -126,12 +126,12 @@ ok 5, ($x1 ne $x2) || ($x1 ne $x3);
 # Ensure refs to "undef" values are properly shared
 # Same test as in t/dclone.t to ensure the "canonical" code is also correct
 
-my $hash;
-push $hash->%{+''}->@, \$hash->%{+a};
-ok 6, $hash->%{''}->[0] \== \$hash->%{+a};
+my $hash = \%:;
+push $hash->%{+''}, \$hash->%{+a};
+ok 6, $hash->%{''}[0] \== \$hash->%{+a};
 
 my $cloned = dclone(dclone($hash));
-ok 7, $cloned->%{''}->[0] \== \$cloned->%{+a};
+ok 7, $cloned->%{''}[0] \== \$cloned->%{+a};
 
 $cloned->%{+a} = "blah";
-ok 8, $cloned->%{''}->[0] \== \$cloned->%{+a};
+ok 8, $cloned->{''}[0] \== \$cloned->%{+a};

@@ -49,35 +49,35 @@ sub mask {
     if ((nelems @_)) {
         my $mask = shift;
         if($mask) {
-            $self->[0]->{+$fd}->{+$io} = $mask; # the error events are always returned
+            $self->[0]->{+$fd}{+$io} = $mask; # the error events are always returned
             $self->[1]->{+$fd}      = 0;     # output mask
             $self->[2]->{+$io}      = $io;   # remember handle
         } else {
-            delete $self->[0]->{$fd}->{$io};
-            unless($self->[0]->{?$fd}->%) {
+            delete $self->[0]{$fd}{$io};
+            unless($self->[0]{?$fd}) {
                 # We no longer have any handles for this FD
-                delete $self->[1]->{$fd};
-                delete $self->[0]->{$fd};
+                delete $self->[1]{$fd};
+                delete $self->[0]{$fd};
             }
-            delete $self->[2]->{$io};
+            delete $self->[2]{$io};
         }
     }
 
-    return unless exists $self->[0]->{$fd} and exists $self->[0]->{$fd}->{$io};
-    return $self->[0]->{$fd}->{?$io};
+    return unless exists $self->[0]->{$fd} and exists $self->[0]->{$fd}{$io};
+    return $self->[0]->{$fd}{?$io};
 }
 
 
 sub poll($self,$timeout) {
 
-    $self->[1] = \%();
+    $self->[1] = %();
 
     my($fd,$mask,$iom);
     my @poll = @( () );
 
     while(@(?$fd,?$iom) =@( each $self->[0]->%)) {
         $mask   = 0;
-        $mask  ^|^= $_ for values($iom->%);
+        $mask  ^|^= $_ for values($iom);
         push(@poll,$fd => $mask);
     }
 

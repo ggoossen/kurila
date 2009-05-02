@@ -12,9 +12,9 @@ do {
     our @ISA = qw(Exporter);
 
     our %EXPORT_TAGS = %(
-        standard => \qw(openlog syslog closelog setlogmask),
-        extended => \qw(setlogsock),
-        macros => \@(
+        standard => qw(openlog syslog closelog setlogmask),
+        extended => qw(setlogsock),
+        macros => @(
             # levels
             < qw(
                 LOG_ALERT LOG_CRIT LOG_DEBUG LOG_EMERG LOG_ERR 
@@ -48,12 +48,9 @@ do {
         ),
     );
 
-    our @EXPORT = %EXPORT_TAGS{?standard}->@;
+    our @EXPORT = %EXPORT_TAGS{?standard};
 
-    our @EXPORT_OK = @(
-        < %EXPORT_TAGS{?extended}->@, 
-        < %EXPORT_TAGS{?macros}->@, 
-    );
+    our @EXPORT_OK = %EXPORT_TAGS{?extended} +@+ %EXPORT_TAGS{?macros};
 
     try {
         require XSLoader;

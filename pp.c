@@ -3460,15 +3460,33 @@ PP(pp_hslice)
     const OPFLAGS op_flags = PL_op->op_flags;
     register const I32 lval = (op_flags & OPf_MOD);
     const bool localizing = PL_op->op_private & OPpLVAL_INTRO;
+    const bool add = (PL_op->op_private & OPpELEM_ADD) != 0;
+    const bool optional = (PL_op->op_private & OPpELEM_OPTIONAL) != 0;
     bool other_magic = FALSE;
     SV ** sliceitem;
     SV ** slicemax;
 
-    if ( ! SvHVOK(hv) )
-	Perl_croak(aTHX_ "Not a HASH");
-
     if ( ! SvAVOK(slice) )
-	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(avTsv(slice)));
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s",
+	    OP_DESC(PL_op), Ddesc(avTsv(slice)));
+
+    if ( ! SvOK(hv) ) {
+	if (optional) {
+	    AV* res = newAV();
+	    int i;
+	    for (i=SvLEN(res); i>=0; --i)
+		av_push(res, newSV(0));
+	    mXPUSHs(avTsv(res));
+	    RETURN;
+	}
+	if (!add)
+	    Perl_croak(aTHX_ "Expected a HASH but got UNDEF");
+	if (SvREADONLY(hv))
+	    Perl_croak(aTHX_ PL_no_modify);
+	sv_upgrade(hv, SVt_PVHV);
+    }
+    else if ( ! SvHVOK(hv) )
+	Perl_croak(aTHX_ "Not a HASH");
 
     if (op_flags & OPf_ASSIGN) {
 	SV* newv;
@@ -4236,6 +4254,9 @@ PP(pp_push)
     register AV * const ary = (AV*)*++MARK;
 
     do_arg_check(MARK);
+
+    if ( ! SvOK(ary) )
+	sv_upgrade(ary, SVt_PVAV);
 
     if ( ! SvAVOK(ary) ) {
 	Perl_croak(aTHX_ "First argument to %s must be an ARRAY not %s", 

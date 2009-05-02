@@ -109,12 +109,12 @@ sub http_accept_langs {
         ;
             $q = (defined $2 and length $2) ?? $2 !! 1;
         #print "$1 with q=$q\n";
-        push  %pref{+$q}->@, lc $1;
+        push  %pref{+$q}, lc $1;
     }
 
     return _normalize(
         # Read off %pref, in descending key order...
-        < @+: map { %pref{?$_}->@ },
+        < @+: map { %pref{?$_} },
         sort {$b <+> $a},
         keys %pref
     );

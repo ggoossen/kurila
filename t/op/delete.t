@@ -45,11 +45,11 @@ foreach my $key (keys %foo) {
 $foo = join('',values(%foo));
 ok($foo eq 'xy' || $foo eq 'yx','fresh keys');
 
-%refhash{+"top"}->{+"foo"} = "FOO";
-%refhash{"top"}->{+"bar"} = "BAR";
+%refhash{+"top"}{+"foo"} = "FOO";
+%refhash{"top"}{+"bar"} = "BAR";
 
-delete %refhash{"top"}->{"bar"};
-@list = keys %refhash{?"top"}->%;
+delete %refhash{"top"}{"bar"};
+@list = keys %refhash{?"top"};
 
 cmp_ok("$(join ' ',@list)",'eq',"foo", 'autoviv and delete hashref');
 
@@ -105,12 +105,12 @@ cmp_ok(scalar(nelems @foo),'==',0,'and then there were none');
 $foo = "$(join ' ',@foo)";
 cmp_ok($foo,'eq','x y','two fresh');
 
-@refary[+0]->[+0] = "FOO";
-@refary[0]->[+3] = "BAR";
+@refary[+0][+0] = "FOO";
+@refary[0][+3] = "BAR";
 
-delete @refary[0]->[3];
+delete @refary[0][3];
 
-cmp_ok( scalar(nelems @refary[0]->@),'==',1,'one down');
+cmp_ok( scalar(nelems @refary[0]),'==',1,'one down');
 
 do {
     my @a = @( 33 );

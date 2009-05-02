@@ -19,10 +19,10 @@ our @EXPORT_OK = qw( set_style set_style_standard add_callback
 		     concise_subref concise_cv concise_main
 		     add_style walk_output compile reset_sequence );
 our %EXPORT_TAGS =
-    %( io	=> \qw( walk_output compile reset_sequence ),
-        style	=> \qw( add_style set_style_standard ),
-            cb	=> \qw( add_callback ),
-            mech	=> \qw( concise_subref concise_cv concise_main ),  );
+    %( io	=> qw( walk_output compile reset_sequence ),
+        style	=> qw( add_style set_style_standard ),
+            cb	=> qw( add_callback ),
+            mech	=> qw( concise_subref concise_cv concise_main ),  );
 
 # use #6
 use B < qw(class ppname main_start main_root main_cv cstring svref_2object

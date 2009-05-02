@@ -99,12 +99,12 @@ use ExtUtils::Constant::XS < qw(%XS_Constant %XS_TypeSet);
 
 @ISA = @( 'Exporter' );
 
-%EXPORT_TAGS = %( 'all' => \ qw(
+%EXPORT_TAGS = %( 'all' => qw(
 	XS_constant constant_types C_stringify
 	C_constant WriteConstants WriteMakefileSnippet
 ) );
 
-@EXPORT_OK =  %EXPORT_TAGS{?'all'}->@;
+@EXPORT_OK =  %EXPORT_TAGS{?'all'};
 
 =item constant_types
 

@@ -277,7 +277,7 @@ $wc_args) {
             NAME => $package,
             NAMES => $items,
             PROXYSUBS => 1,
-            < $wc_args->@,
+            < $wc_args,
             );
 
         my $C_code = $c;

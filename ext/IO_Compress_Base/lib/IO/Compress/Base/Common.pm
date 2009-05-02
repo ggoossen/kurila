@@ -29,7 +29,7 @@ $VERSION = '2.006';
               STATUS_ERROR
           );  
 
-%EXPORT_TAGS = %( Status => \qw( STATUS_OK
+%EXPORT_TAGS = %( Status => qw( STATUS_OK
                                  STATUS_ENDSTREAM
                                  STATUS_EOF
                                  STATUS_ERROR
@@ -431,13 +431,13 @@ sub createSelfTiedObject
 #$VERSION = '2.000_08';
 #@ISA = qw(Exporter);
 
-%EXPORT_TAGS{+Parse} = \qw( ParseParameters 
+%EXPORT_TAGS{+Parse} = qw( ParseParameters 
                            Parse_any Parse_unsigned Parse_signed 
                            Parse_boolean Parse_custom Parse_string
                            Parse_multiple Parse_writable_scalar_ref
                          );              
 
-push @EXPORT, <  %EXPORT_TAGS{?Parse}->@ ;
+push @EXPORT, <  %EXPORT_TAGS{?Parse} ;
 
 use constant Parse_any      => 0x01;
 use constant Parse_unsigned => 0x02;
@@ -482,7 +482,7 @@ sub IO::Compress::Base::Parameters::new
     my $class = shift ;
 
     my $obj = \%( Error => '',
-            Got   => \%(),
+            Got   => %(),
         ) ;
 
     #return bless $obj, ref($class) || $class || __PACKAGE__ ;
@@ -508,7 +508,7 @@ sub IO::Compress::Base::Parameters::setError
 sub IO::Compress::Base::Parameters::parse($self, $default, @< @_)
 {
     my $got = $self->{?Got} ;
-    my $firstTime = nkeys  $got->% == 0 ;
+    my $firstTime = nkeys  $got == 0 ;
 
     my (@Bad) ;
     my @entered = @( () ) ;
@@ -556,10 +556,10 @@ sub IO::Compress::Base::Parameters::parse($self, $default, @< @_)
             $x = \@( $x )
                 if $type ^&^ Parse_multiple;
 
-            $got->{+$key} = \@(0, $type, $value, $x, $first_only, $sticky) ;
+            $got{+$key} = \@(0, $type, $value, $x, $first_only, $sticky) ;
         }
 
-        $got->{$key}->[OFF_PARSED] = 0 ;
+        $got{$key}->[OFF_PARSED] = 0 ;
     }
 
     my %parsed = %( () );
@@ -573,10 +573,10 @@ sub IO::Compress::Base::Parameters::parse($self, $default, @< @_)
         $key =~ s/^-// ;
         my $canonkey = lc $key;
 
-        if ($got->{?$canonkey} && ($firstTime ||
-                                   ! $got->{$canonkey}->[OFF_FIRST_ONLY]  ))
+        if ($got{?$canonkey} && ($firstTime ||
+                                   ! $got{$canonkey}->[OFF_FIRST_ONLY]  ))
         {
-            my $type = $got->{$canonkey}->[OFF_TYPE] ;
+            my $type = $got{$canonkey}->[OFF_TYPE] ;
             my $parsed = %parsed{?$canonkey};
             ++ %parsed{+$canonkey};
 
@@ -589,11 +589,11 @@ sub IO::Compress::Base::Parameters::parse($self, $default, @< @_)
 
             $value = $value->$ ;
             if ($type ^&^ Parse_multiple) {
-                $got->{$canonkey}->[OFF_PARSED] = 1;
-                push  $got->{$canonkey}->[OFF_FIXED]->@, $s ;
+                $got{$canonkey}->[OFF_PARSED] = 1;
+                push  $got{$canonkey}->[OFF_FIXED]->@, $s ;
             }
             else {
-                $got->{+$canonkey} = \@(1, $type, $value, $s) ;
+                $got{+$canonkey} = \@(1, $type, $value, $s) ;
             }
         }
         else
@@ -698,7 +698,7 @@ sub IO::Compress::Base::Parameters::parsed
     my $self = shift ;
     my $name = shift ;
 
-    return $self->{Got}->{+ lc $name}->[?OFF_PARSED] ;
+    return $self->{Got}{+ lc $name}[?OFF_PARSED] ;
 }
 
 sub IO::Compress::Base::Parameters::value
@@ -706,14 +706,15 @@ sub IO::Compress::Base::Parameters::value
     my $self = shift ;
     my $name = shift ;
 
-    if ((nelems @_))
+    $self->{Got}{+ lc $name} //= @();
+    if (@_)
     {
-        $self->{Got}->{+ lc $name}->[+OFF_PARSED]  = 1;
-        $self->{Got}->{+ lc $name}->[+OFF_DEFAULT] = @_[0] ;
-        $self->{Got}->{+ lc $name}->[+OFF_FIXED]   = @_[0] ;
+        $self->{Got}{lc $name}[+OFF_PARSED]  = 1;
+        $self->{Got}{lc $name}[+OFF_DEFAULT] = @_[0] ;
+        $self->{Got}{lc $name}[+OFF_FIXED]   = @_[0] ;
     }
 
-    return $self->{Got}->{+ lc $name}->[?OFF_FIXED] ;
+    return $self->{Got}{lc $name}[?OFF_FIXED] ;
 }
 
 sub IO::Compress::Base::Parameters::valueOrDefault
@@ -722,7 +723,7 @@ sub IO::Compress::Base::Parameters::valueOrDefault
     my $name = shift ;
     my $default = shift ;
 
-    my $value = $self->{Got}->{lc $name}->[OFF_DEFAULT] ;
+    my $value = $self->{Got}{lc $name}->[OFF_DEFAULT] ;
 
     return $value if defined $value ;
     return $default ;
@@ -733,7 +734,7 @@ sub IO::Compress::Base::Parameters::wantValue
     my $self = shift ;
     my $name = shift ;
 
-    return defined $self->{Got}->{lc $name}->[OFF_DEFAULT] ;
+    return defined $self->{Got}{lc $name}->[OFF_DEFAULT] ;
 
 }
 
@@ -743,12 +744,12 @@ sub IO::Compress::Base::Parameters::clone
     my $obj = \%( );
     my %got ;
 
-    while (my @($k, $v) =@( each  $self->{Got}->%)) {
+    while (my @($k, $v) =@( each  $self->{Got})) {
         %got{+$k} = \ $v->@;
     }
 
     $obj->{+Error} = $self->{?Error};
-    $obj->{+Got} = \%got ;
+    $obj->{+Got} = %got ;
 
     return bless $obj, 'IO::Compress::Base::Parameters' ;
 }

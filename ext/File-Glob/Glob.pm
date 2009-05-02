@@ -32,8 +32,8 @@ use XSLoader ();
 );
 
 %EXPORT_TAGS = %(
-        'glob' => \ qw(
-        GLOB_ABEND
+        'glob' => qw(
+                        GLOB_ABEND
 	GLOB_ALPHASORT
         GLOB_ALTDIRFUNC
         GLOB_BRACE

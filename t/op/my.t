@@ -102,10 +102,10 @@ print $^STDOUT, "ok 33\n";
 
 
 sub foo3 {
-    ++my $x->{+foo};
-    print $^STDOUT, "not " if defined $x->{?bar};
-    ++$x->{+bar};
+    ++my $x{+foo};
+    print $^STDOUT, "not " if defined $x{?bar};
+    ++$x{+bar};
 }
 try { foo3(); foo3(); };
-print $^STDOUT, "not " if $^EVAL_ERROR;
+die if $^EVAL_ERROR;
 print $^STDOUT, "ok 34\n";

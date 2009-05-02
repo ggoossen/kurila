@@ -384,11 +384,11 @@ sub parseEntry
     # if and only if "all" CEs are [.0000.0000.0000].
     }
 
-    $self->{+mapping}->{+$entry} = $is_L3_ignorable ?? \@() !! \@key;
+    $self->{+mapping}{+$entry} = $is_L3_ignorable ?? \@() !! \@key;
 
     if ((nelems @uv) +> 1) {
-        (!$self->{?maxlength}->{?@uv[0]} || $self->{maxlength}->{?@uv[0]} +< nelems @uv)
-            and $self->{+maxlength}->{+@uv[0]} = (nelems @uv);
+        (!$self->{?maxlength}{?@uv[0]} || $self->{maxlength}{?@uv[0]} +< nelems @uv)
+            and $self->{+maxlength}{+@uv[0]} = (nelems @uv);
     }
 }
 
@@ -490,7 +490,7 @@ sub splitEnt
     for my $i (0 .. nelems(@src) -1) {
         @src[$i] = undef
             if _isIllegal(@src[$i]) || ($ver9 &&
-                                 $map->{?@src[$i] } && (nelems  $map->{?@src[$i] }->@) == 0);
+                                 $map{?@src[$i] } && (nelems  $map{?@src[$i] }->@) == 0);
     }
 
     my $i = 0;
@@ -508,17 +508,17 @@ sub splitEnt
         my $i_orig = $i;
 
         # find contraction
-        if ($max->{?$jcps}) {
+        if ($max{?$jcps}) {
             my $temp_jcps = $jcps;
             my $jcpsLen = 1;
-            my $maxLen = $max->{?$jcps};
+            my $maxLen = $max{?$jcps};
 
             for my $p ($i + 1 .. nelems(@src) -1) {
                 last unless $jcpsLen +< $maxLen;
                 next if ! defined @src[$p];
                 $temp_jcps .= CODE_SEP . @src[$p];
                 $jcpsLen++;
-                if ($map->{?$temp_jcps}) {
+                if ($map{?$temp_jcps}) {
                     $jcps = $temp_jcps;
                     $i = $p;
                 }
@@ -542,7 +542,7 @@ sub splitEnt
                     $curCC = $CVgetCombinClass->(@src[$p]);
                     last unless $curCC;
                     my $tail = CODE_SEP . @src[$p];
-                    if ($preCC != $curCC && $map->{?$jcps.$tail}) {
+                    if ($preCC != $curCC && $map{?$jcps.$tail}) {
                         $jcps .= $tail;
                         @src[$p] = undef;
                     } else {
@@ -553,7 +553,7 @@ sub splitEnt
         }
 
         # skip completely ignorable
-        if ($map->{?$jcps} && (nelems  $map->{?$jcps}->@) == 0) {
+        if ($map{?$jcps} && (nelems  $map{?$jcps}->@) == 0) {
             if ($wLen && nelems @buf) {
                 @buf[-1]->[2] = $i + 1;
             }
@@ -582,8 +582,8 @@ sub getWt
     my $der  = $self->{?derivCode};
 
     return if !defined $u;
-    return map( {_varCE($vbl, $_) },  $map->{$u}->@)
-        if $map->{?$u};
+    return map( {_varCE($vbl, $_) },  $map{$u}->@)
+        if $map{?$u};
 
     # JCPS must not be a contraction, then it's a code point.
     if (Hangul_SIni +<= $u && $u +<= Hangul_SFin) {
@@ -601,27 +601,27 @@ sub getWt
 
             if ((nelems @decH) == 2) {
                 my $contract = join(CODE_SEP, @decH);
-                @decH = @($contract) if $map->{?$contract};
+                @decH = @($contract) if $map{?$contract};
             } else { # must be <@decH == 3>
-                if ($max->{?@decH[0]}) {
+                if ($max{?@decH[0]}) {
                     my $contract = join(CODE_SEP, @decH);
-                    if ($map->{?$contract}) {
+                    if ($map{?$contract}) {
                         @decH = @($contract);
                     } else {
                         $contract = join(CODE_SEP, @decH[[@(0,1)]]);
-                        $map->{?$contract} and @decH = @($contract, @decH[2]);
+                        $map{?$contract} and @decH = @($contract, @decH[2]);
                     }
                 # even if V's ignorable, LT contraction is not supported.
                 # If such a situatution were required, NFD should be used.
                 }
-                if ((nelems @decH) == 3 && $max->{?@decH[1]}) {
+                if ((nelems @decH) == 3 && $max{?@decH[1]}) {
                     my $contract = join(CODE_SEP, @decH[[@(1,2)]]);
-                    $map->{?$contract} and @decH = @(@decH[0], $contract);
+                    $map{?$contract} and @decH = @(@decH[0], $contract);
                 }
             }
 
             @hangulCE = @+: map({
-                    $map->{?$_} ??  $map->{?$_}->@ !! $der->($_);
+                    $map{?$_} ??  $map{?$_}->@ !! $der->($_);
                 }, @decH);
         }
         return map { _varCE($vbl, $_) }, @hangulCE;

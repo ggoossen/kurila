@@ -265,7 +265,7 @@ sub _handle_encoding_line($self, $line) {
 
     my $e    = $1;
     my $orig = $e;
-    push  $self->{+'encoding_command_reqs'}->@, "=encoding $orig";
+    push  $self->{+'encoding_command_reqs'}, "=encoding $orig";
 
     my $enc_error;
 
@@ -325,7 +325,7 @@ sub _handle_encoding_line($self, $line) {
 
             $self->scream( $self->{?'line_count'}, $enc_error );
     }
-    push  $self->{+'encoding_command_statuses'}->@, $enc_error;
+    push  $self->{+'encoding_command_statuses'}, $enc_error;
 
     return '=encoding ALREADYDONE';
 }
@@ -344,11 +344,11 @@ sub _handle_encoding_second_level($self, $para) {
         # It's already been handled.  Check for errors.
         if(! $self->{?'encoding_command_statuses'} ) {
             DEBUG +> 2 and print $^STDOUT, " CRAZY ERROR: It wasn't really handled?!\n";
-        } elsif( $self->{'encoding_command_statuses'}->[-1] ) {
+        } elsif( $self->{'encoding_command_statuses'}[-1] ) {
                 $self->whine( $para->[1]->{?'start_line'},
                 sprintf "Couldn't do \%s: \%s",
-                $self->{'encoding_command_reqs'  }->[-1],
-                $self->{'encoding_command_statuses'}->[-1],
+                $self->{'encoding_command_reqs'  }[-1],
+                $self->{'encoding_command_statuses'}[-1],
             );
         } else {
             DEBUG +> 2 and print $^STDOUT, " (Yup, it was successfully handled already.)\n";
@@ -373,18 +373,18 @@ do {
         # Return 0 or more fake-o paragraphs explaining the accumulated
         #  errors on this document.
 
-        return @() unless $self->{?'errata'} and $self->{?'errata'}->%;
+        return @() unless $self->{?'errata'};
 
         my @out;
 
-        foreach my $line (sort {$a <+> $b}, keys $self->{?'errata'}->%) {
+        foreach my $line (sort {$a <+> $b}, keys $self->{?'errata'}) {
             push @out,
                 \@('=item', \%('start_line' => $m), "Around line $line:"),
                 < map( { \@('~Para', \%('start_line' => $m, '~cooked' => 1),
                   #['~Top', {'start_line' => $m},
                   $_
                     #]
-                    ) }, $self->{'errata'}->{$line}->@
+                    ) }, $self->{'errata'}{$line}
                 )
         ;
         }

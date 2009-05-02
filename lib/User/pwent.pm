@@ -22,8 +22,8 @@ BEGIN {
 
                    );
     %EXPORT_TAGS = %(
-            FIELDS => \@( < grep( {m/^\$pw_/ }, @EXPORT_OK), < @EXPORT ),
-                ALL    => \@( < @EXPORT, < @EXPORT_OK ),
+            FIELDS => (grep( {m/^\$pw_/ }, @EXPORT_OK)) +@+ @EXPORT,
+            ALL    => @EXPORT +@+ @EXPORT_OK,
         );
 }
 

@@ -41,9 +41,9 @@ is_deeply( \(grep {
 
 my $consistent = 1;
 for my $family (values %Module::CoreList::families) {
-    my $first = shift $family->@;
+    my $first = shift $family;
     my $has = join " ", sort keys(( %Module::CoreList::versions{?$first } || \%() )->%);
-    for my $member ( $family->@) {
+    for my $member ( $family) {
         $has eq join " ", sort keys(( %Module::CoreList::versions{?$member } || \%() )->%)
             or do { diag "$first -> $member family"; $consistent = 0 };
     }

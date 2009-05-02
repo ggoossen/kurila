@@ -55,7 +55,7 @@ sub export($pkg, $callpkg, @< @imports) {
                         @names = $exports->@;
                     }
                     elsif ($tagdata = $tagsref->{?$spec}) {
-                        @names = $tagdata->@;
+                        @names = $tagdata;
                     }
                     else {
                         warn qq["$spec" is not defined in \%$($pkg)::EXPORT_TAGS];
@@ -188,7 +188,7 @@ sub _push_tags($pkg, $var, $syms) {
     my @nontag = @( () );
     my $export_tags = \Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")->*->%;
     push(Symbol::fetch_glob("$($pkg)::$var")->*->@,
-        < @+: map { $export_tags->{?$_} ?? $export_tags->{?$_}->@
+        < @+: map { exists $export_tags->{$_} ?? $export_tags->{?$_}
             !! do { push(@nontag,$_); @($_) } },
         (nelems $syms->@) ?? $syms->@ !! keys $export_tags->%);
     if ((nelems @nontag) and $^WARNING) {

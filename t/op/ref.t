@@ -65,16 +65,16 @@ is ($refref->{"key"}->[2]->[0], 3);
 
 # Test to see if anonymous subarrays spring into existence.
 
-@spring[+5]->[+0] = 123;
-@spring[5]->[+1] = 456;
-push(@spring[5]->@, 789);
-is (join(':', @spring[5]->@), "123:456:789");
+@spring[+5][+0] = 123;
+@spring[5][+1] = 456;
+push(@spring[5], 789);
+is (join(':', @spring[5]), "123:456:789");
 
 # Test to see if anonymous subhashes spring into existence.
 
-%spring2{+"foo"}->@ = @(1,2,3);
-%spring2{"foo"}->[+3] = 4;
-is (join(':', %spring2{?"foo"}->@), "1:2:3:4");
+%spring2{+"foo"} = @(1,2,3);
+%spring2{"foo"}[+3] = 4;
+is (join(':', %spring2{?"foo"}), "1:2:3:4");
 
 # Test references to subroutines.
 

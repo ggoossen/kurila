@@ -938,7 +938,7 @@ PP(pp_helem)
 
     if ( ! SvHVOK(hv) ) {
 	if ( SvOK(hv) ) {
-	    Perl_croak(aTHX_ "Not a HASH");
+	    Perl_croak(aTHX_ "Expected a HASH not %s", Ddesc(hv));
 	}
 
 	/* hv must be "undef" */
@@ -956,6 +956,8 @@ PP(pp_helem)
 
 	if ( ! add )
 	    Perl_croak(aTHX_ "Can not use UNDEF as a HASH");
+	if (SvREADONLY(hv))
+	    Perl_croak(aTHX_ PL_no_modify);
 
 	sv_upgrade((SV*)hv, SVt_PVHV);
     }
@@ -1611,7 +1613,16 @@ PP(pp_aelem)
     const OPFLAGS optional = PL_op->op_private & OPpELEM_OPTIONAL;
     SV *sv;
 
-    if ( ! SvAVOK(av) )
+    if ( ! SvOK(av) ) {
+	if (optional) {
+	    XPUSHs(&PL_sv_undef);
+	    RETURN;
+	}
+	if (!add)
+	    Perl_croak(aTHX_ "Can't take an element from a %s", Ddesc((SV*)av));
+	sv_upgrade(avTsv(av), SVt_PVAV);
+    }
+    else if ( ! SvAVOK(av) )
 	Perl_croak(aTHX_ "Can't take an element from a %s", Ddesc((SV*)av));
 
     svp = av_fetch(av, elem, add);
@@ -1665,24 +1676,8 @@ Perl_vivify_ref(pTHX_ SV *sv, U32 to_what)
 {
     PERL_ARGS_ASSERT_VIVIFY_REF;
 
-    if (!SvOK(sv)) {
-	if (SvREADONLY(sv))
-	    Perl_croak(aTHX_ PL_no_modify);
-	prepare_SV_for_RV(sv);
-	switch (to_what) {
-	case OPpDEREF_SV:
-	    SvRV_set(sv, newSV(0));
-	    break;
-	case OPpDEREF_AV:
-	    SvRV_set(sv, (SV*)newAV());
-	    break;
-	case OPpDEREF_HV:
-	    SvRV_set(sv, (SV*)newHV());
-	    break;
-	}
-	SvROK_on(sv);
-	SvSETMAGIC(sv);
-    }
+    if (!SvRVOK(sv))
+	Perl_croak(aTHX_ "Can't use %s as a REF", Ddesc(sv));
 }
 
 PP(pp_method)

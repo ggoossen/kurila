@@ -16,7 +16,7 @@ require Exporter;
                 implicate_supers
                 implicate_supers_strictly
                );
-%EXPORT_TAGS = %('ALL' => \@EXPORT_OK);
+%EXPORT_TAGS = %('ALL' => @EXPORT_OK);
 
 $VERSION = "0.35";
 

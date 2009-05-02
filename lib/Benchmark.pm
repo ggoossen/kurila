@@ -436,7 +436,7 @@ our(@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION);
 @EXPORT=qw(timeit timethis timethese timediff timestr);
 @EXPORT_OK=qw(timesum cmpthese countit
 	      clearcache clearallcache disablecache enablecache);
-%EXPORT_TAGS=%( all => \@( < @EXPORT, < @EXPORT_OK ) ) ;
+%EXPORT_TAGS=%( all => @EXPORT +@+ @EXPORT_OK ) ;
 
 $VERSION = 1.10;
 

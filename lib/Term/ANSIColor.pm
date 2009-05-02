@@ -23,7 +23,7 @@ use Exporter ();
 @ISA         = qw(Exporter);
 @EXPORT      = qw(color colored);
 @EXPORT_OK   = qw(uncolor);
-%EXPORT_TAGS = %(constants => \qw(CLEAR RESET BOLD DARK UNDERLINE UNDERSCORE
+%EXPORT_TAGS = %(constants => qw(CLEAR RESET BOLD DARK UNDERLINE UNDERSCORE
                                  BLINK REVERSE CONCEALED BLACK RED GREEN
                                  YELLOW BLUE MAGENTA CYAN WHITE ON_BLACK
                                  ON_RED ON_GREEN ON_YELLOW ON_BLUE ON_MAGENTA

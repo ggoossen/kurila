@@ -267,9 +267,9 @@ sub check($utmpl, $href, ?$verbose) {
         or return;
 
     ### deref only once ###
-    my %utmpl   = %( < $utmpl->% );
-    my %args    = %( < $args->% );
-    my %defs    = %( < $defs->% );
+    my %utmpl   = $utmpl->%;
+    my %args    = $args->%;
+    my %defs    = $defs->%;
 
     ### flag to see if anything went wrong ###
     my $wrong; 
@@ -297,7 +297,7 @@ sub check($utmpl, $href, ?$verbose) {
         }
 
         ### check if you're even allowed to override this key ###
-        if( %utmpl{$key}->{?'no_override'} ) {
+        if( %utmpl{$key}{?'no_override'} ) {
             _store_error(
                 loc(q[You are not allowed to override key '%1'].
                     q[for %2 from %3], $key, _who_was_it(), _who_was_it(1)),
@@ -308,7 +308,7 @@ sub check($utmpl, $href, ?$verbose) {
         }
 
         ### copy of this keys template instructions, to save derefs ###
-        my %tmpl = %( < %utmpl{?$key}->% );
+        my %tmpl = %utmpl{?$key};
 
         ### check if you were supposed to provide defined() values ###
         if( (%tmpl{?'defined'} || $ONLY_ALLOW_DEFINED) and
@@ -364,7 +364,7 @@ sub check($utmpl, $href, ?$verbose) {
     ### can't do it before, because something may go wrong later,
     ### leaving the user with a few set variables
     for my $key (keys %defs) {
-        if( my $ref = %utmpl{?$key}->{?'store'} ) {
+        if( my $ref = %utmpl{?$key}{?'store'} ) {
             $ref->$ = $NO_DUPLICATES ?? delete %defs{$key} !! %defs{?$key};
         }
     }
@@ -471,8 +471,8 @@ sub _clean_up_args {
 }
 
 sub _sanity_check_and_defaults {
-    my %utmpl   = %( < @_[0]->% );
-    my %args    = %( < @_[1]->% );
+    my %utmpl   = @_[0]->%;
+    my %args    = @_[1]->%;
     my $verbose = @_[2];
 
     my %defs; my $fail;
@@ -482,7 +482,7 @@ sub _sanity_check_and_defaults {
         ### keys are now lower cased, unless preserve case was enabled
         ### at which point, the utmpl keys must match, but that's the users
         ### problem.
-        if( %utmpl{$key}->{?'required'} and not exists %args{$key} ) {
+        if( %utmpl{$key}{?'required'} and not exists %args{$key} ) {
             _store_error(
                 loc(q|Required option '%1' is not provided for %2 by %3|,
                     $key, _who_was_it(1), _who_was_it(2)), $verbose );
@@ -493,8 +493,8 @@ sub _sanity_check_and_defaults {
         }
 
         ### next, set the default, make sure the key exists in %defs ###
-        %defs{+$key} = %utmpl{$key}->{?'default'}
-        if exists %utmpl{$key}->{'default'};
+        %defs{+$key} = %utmpl{$key}{?'default'}
+        if exists %utmpl{$key}{'default'};
 
         if( $SANITY_CHECK_TEMPLATE ) {
             ### last, check if they provided any weird template keys
@@ -505,13 +505,13 @@ sub _sanity_check_and_defaults {
                             $_, $key), 1, 1 );
                 }, grep {
                     not %known_keys{?$_}
-                }, keys %utmpl{?$key}->%;
+                }, keys %utmpl{?$key};
 
             ### make sure you passed a ref, otherwise, complain about it!
-            if ( exists %utmpl{$key}->{'store'} ) {
+            if ( exists %utmpl{$key}{'store'} ) {
                 _store_error( loc(
                     q|Store variable for '%1' is not a reference!|, $key
-                    ), 1, 1 ) unless ref %utmpl{$key}->{?'store'};
+                    ), 1, 1 ) unless ref %utmpl{$key}{?'store'};
             }
         }
     }

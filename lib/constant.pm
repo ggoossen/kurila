@@ -34,12 +34,12 @@ sub import {
         if (ref @_[0] ne 'HASH') {
             die("Invalid reference type '".ref(shift)."' not 'HASH'");
         }
-        $constants = shift;
+        $constants = (shift @_)->%;
     } else {
-        $constants->{+shift(@_)} = undef;
+        $constants{+shift(@_)} = undef;
     }
 
-    foreach my $name ( keys $constants->% ) {
+    foreach my $name ( keys $constants ) {
         unless (defined $name) {
             die("Can't use undef as constant name");
         }
@@ -86,7 +86,7 @@ sub import {
             my $full_name = "$($pkg)::$name";
             %declared{+$full_name}++;
             if ($multiple || (nelems @_) == 1) {
-                my $scalar = $multiple ?? $constants->{?$name} !! @_[0];
+                my $scalar = $multiple ?? $constants{?$name} !! @_[0];
                 Symbol::fetch_glob($full_name)->* = sub () { $scalar };
             } elsif ((nelems @_)) {
                 my @list = @_;

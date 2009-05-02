@@ -24,7 +24,7 @@ use List::Util < qw(min);
 use Carp ;
 
 %EXPORT_TAGS = %( );
-push  %EXPORT_TAGS{+all}->@, < @EXPORT_OK ;
+push  %EXPORT_TAGS{+all}, < @EXPORT_OK ;
 #Exporter::export_ok_tags('all') ;
 
 

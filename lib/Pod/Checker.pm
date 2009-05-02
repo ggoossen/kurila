@@ -683,7 +683,7 @@ sub node($self, ?$text) {
         # add node, order important!
         push($self->{_nodes}->@, $text);
         # keep also a uniqueness counter
-        $self->{+_unique_nodes}->{+$text}++ if($text !~ m/^\s*$/s);
+        $self->{+_unique_nodes}{+$text}++ if($text !~ m/^\s*$/s);
         return $text;
     }
     return $self->{?_nodes}->@;
@@ -707,7 +707,7 @@ sub idx($self,?$text) {
         # add node, order important!
         push($self->{_index}->@, $text);
         # keep also a uniqueness counter
-        $self->{_unique_nodes}->{+$text}++ if($text !~ m/^\s*$/s);
+        $self->{_unique_nodes}{+$text}++ if($text !~ m/^\s*$/s);
         return $text;
     }
     return $self->{?_index}->@;

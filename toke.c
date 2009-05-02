@@ -3707,6 +3707,12 @@ Perl_yylex(pTHX)
 		PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
 		PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
 		PL_expect = XSTATE;
+		if ( *s == '+' || *s == '?' ) {
+		    pl_yylval.i_tkval.ival = *s == '+' ? OPpELEM_ADD : OPpELEM_OPTIONAL;
+		    s++;
+		}
+		else
+		    pl_yylval.i_tkval.ival = 0;
 		TOKEN(HSLICE);
 		/* NOT REACHED */
 	    }

@@ -349,7 +349,7 @@ sub _write_contents_middle($self, $Contents, $outfile, $toplevel2submodules, $to
 
     foreach my $t (sort keys $toplevel2submodules->%) {
         my @downlines = sort {$a->[-1] cmp $b->[-1]},
-             $toplevel2submodules->{?$t}->@;
+             $toplevel2submodules->{?$t};
 
         printf $Contents, qq[<dt><a name="\%s">\%s</a></dt>\n<dd>\n],
             esc( $t ), esc( $toplevel_form_freq->{?$t} )
@@ -394,8 +394,8 @@ sub _prep_contents_breakdown($self) {
             # group all the perlwhatever docs together
             !! $entry->[3]->[0] # normal case
         ;
-            ++%toplevel_form_freq{ + lc $toplevel }->{+$toplevel };
-        push  %toplevel{ + lc $toplevel }->@, $entry;
+            ++%toplevel_form_freq{ + lc $toplevel }{+$toplevel };
+        push  %toplevel{ + lc $toplevel }, $entry;
         push $entry->@, lc($entry->[0]); # add a sort-order key to the end
     }
 
@@ -403,8 +403,8 @@ sub _prep_contents_breakdown($self) {
         my $fgroup = %toplevel_form_freq{?$toplevel};
         %toplevel_form_freq{+$toplevel} =
         (
-      sort { $fgroup->{?$b} <+> $fgroup->{?$a}  or  $a cmp $b },
-      keys $fgroup->%
+      sort { $fgroup{?$b} <+> $fgroup{?$a}  or  $a cmp $b },
+      keys $fgroup
       # This hash is extremely unlikely to have more than 4 members, so this
       # sort isn't so very wasteful
       )[0];
