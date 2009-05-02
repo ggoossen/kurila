@@ -36,12 +36,12 @@ sub length($s) {
     return CORE::length($s);
 }
 
-sub substr(@< @_) {
+sub substr($strref, @< @_) {
     BEGIN { utf8::import() }
     return
-        (nelems @_) == 2 ?? CORE::substr(@_[0], @_[1]) !!
-        (nelems @_) == 3 ?? CORE::substr(@_[0], @_[1], @_[2]) !!
-        CORE::substr(@_[0], @_[1], @_[2], @_[3]) ;
+        (nelems @_) == 1 ?? CORE::substr($strref->$, @_[0]) !!
+        (nelems @_) == 2 ?? CORE::substr($strref->$, @_[0], @_[1]) !!
+        CORE::substr($strref->$, @_[0], @_[1], @_[2]) ;
 }
 
 sub ord($s) {
@@ -54,18 +54,18 @@ sub chr ($s) {
     return CORE::chr($s);
 }
 
-sub index(@< @_) {
+sub index($s, @< @_) {
     BEGIN { utf8::import() }
     return
-        (nelems @_) == 2 ?? CORE::index(@_[0], @_[1]) !!
-        CORE::index(@_[0], @_[1], @_[2]) ;
+        (nelems @_) == 1 ?? CORE::index($s, @_[0]) !!
+        CORE::index($s, @_[0], @_[1]) ;
 }
 
-sub rindex(@< @_) {
+sub rindex($s, @< @_) {
     BEGIN { utf8::import() }
     return
-        (nelems @_) == 2 ?? CORE::rindex(@_[0], @_[1]) !!
-        CORE::rindex(@_[0], @_[1], @_[2]) ;
+        (nelems @_) == 1 ?? CORE::rindex($s, @_[0]) !!
+        CORE::rindex($s, @_[0], @_[1]) ;
 }
 
 1;
