@@ -327,7 +327,7 @@ sub init {
     my $hints = File::Spec->catfile("hints", "$^OS_NAME.pl");
     if (-f $hints) {
         print $^STDOUT, "Using hints $hints...\n";
-        local $self = undef;
+        local $self = \%();
         evalfile $hints;
         if (exists $self->{LIBS}) {
             $LIBS = $self->{LIBS};
