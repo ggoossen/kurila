@@ -12,7 +12,7 @@ do {
     }
 
     my $op = svref_2object(\&foo)->START;
-    is ref($op), "B::OP", "start opcode";
+    is ref($op), "B::COP", "start opcode";
 };
 
 do {
