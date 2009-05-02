@@ -3411,7 +3411,7 @@ PP(pp_delete)
 		DIE(aTHX_ "panic: avhv_delete no longer supported");
 	}
 	else
-	    DIE(aTHX_ "Not a HASH reference");
+	    DIE(aTHX_ "%s expects a HASH not %s", OP_DESC(PL_op), Ddesc(hv));
 	if (!sv)
 	    sv = &PL_sv_undef;
 	if (!discard)
