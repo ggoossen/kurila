@@ -80,19 +80,13 @@ sub ckMagic($self)
     return $magic ;
 }
 
-sub readHeader(@< @_)
+sub readHeader($self, $magic)
 {
-    my $self = shift @_;
-    my $magic = shift @_;
-
     return $self->_readGzipHeader($magic);
 }
 
-sub chkTrailer(@< @_)
+sub chkTrailer($self, $trailer)
 {
-    my $self = shift @_;
-    my $trailer = shift @_;
-
     # Check CRC & ISIZE 
     my @($CRC32, $ISIZE) = @: unpack("V V", $trailer) ;
     $self->{Info}->{+CRC32} = $CRC32;    

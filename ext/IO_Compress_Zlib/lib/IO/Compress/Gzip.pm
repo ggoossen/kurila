@@ -160,11 +160,8 @@ sub getInverseClass(...)
               \$IO::Uncompress::Gunzip::GunzipError);
 }
 
-sub mkHeader(@< @_)
+sub mkHeader($self, $param)
 {
-    my $self = shift @_ ;
-    my $param = shift @_ ;
-
     # stort-circuit if a minimal header is requested.
     return GZIP_MINIMUM_HEADER if $param->value('Minimal') ;
 

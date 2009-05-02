@@ -66,7 +66,7 @@ ok($fil = gzopen($name, "rb"));
 is $gzerrno, 0, 'gzerrno is 0';
 is $fil->gztell(), 0;
 
-is $fil->gzread($uncomp), $len; 
+is $fil->gzread(\$uncomp), $len; 
 
 is $fil->gztell(), $len;
 

@@ -28,9 +28,8 @@ Exporter::export_ok_tags('all');
 
 
 
-sub new(@< @_)
+sub new($class, @< @_)
 {
-    my $class = shift @_ ;
     my $obj = createSelfTiedObject($class, \$RawInflateError);
     $obj->_create(undef, 0, < @_);
 }
@@ -46,20 +45,13 @@ sub getExtraParams(...)
     return ();
 }
 
-sub ckParams(@< @_)
+sub ckParams($self, $got)
 {
-    my $self = shift @_ ;
-    my $got = shift @_ ;
-
     return 1;
 }
 
-sub mkUncomp(@< @_)
+sub mkUncomp($self, $class, $got)
 {
-    my $self = shift @_ ;
-    my $class = shift @_ ;
-    my $got = shift @_ ;
-
     my @($obj, ?$errstr, ?$errno) =  IO::Uncompress::Adapter::Inflate::mkUncompObject(
                                                                 $got->value('CRC32'),
                                                                 $got->value('ADLER32'),
@@ -107,10 +99,8 @@ sub chkTrailer(...)
     return STATUS_OK ;
 }
 
-sub _isRaw(@< @_)
+sub _isRaw($self, @< @_)
 {
-    my $self   = shift @_ ;
-
     my $got = $self->_isRawx(< @_);
 
     if ($got) {
@@ -125,11 +115,8 @@ sub _isRaw(@< @_)
     return $got ;
 }
 
-sub _isRawx(@< @_)
+sub _isRawx($self, $magic)
 {
-    my $self   = shift @_ ;
-    my $magic = shift @_ ;
-
     $magic = '' unless defined $magic ;
 
     my $buffer = '';
@@ -279,13 +266,11 @@ sub scan($self)
     return $len +< 0 ?? 0 !! 1 ;
 }
 
-sub zap(@< @_)
+sub zap($self, $lengthref)
 {
-    my $self  = shift @_ ;
-
     my $headerLength = $self->*->{Info}->{?HeaderLength};
     my $block_offset =  $headerLength + $self->*->{Uncomp}->getLastBlockOffset();
-    @_[0] = $headerLength + $self->*->{Uncomp}->getEndOffset();
+    $lengthref->$ = $headerLength + $self->*->{Uncomp}->getEndOffset();
     #printf "# End $_[0], headerlen $headerLength \n";;
     #printf "# block_offset $block_offset %x\n", $block_offset;
     my $byte ;

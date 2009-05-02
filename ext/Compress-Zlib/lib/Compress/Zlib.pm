@@ -116,11 +116,11 @@ sub gzopen($file, $mode)
     my $infDef = $writing ?? 'deflate' !! 'inflate';
     my @params = @( () ) ;
 
-    croak "gzopen: file parameter is not a filehandle or filename"
+    die "gzopen: file parameter is not a filehandle or filename"
         unless isaFilehandle($file) || isaFilename($file)  || 
         (ref $file && ref $file eq 'SCALAR');
 
-    croak "gzopen: invalid mode"
+    die "gzopen: invalid mode"
         unless $mode =~ m/[rwa]/i ;
 
     _set_gzerr(0) ;
@@ -146,45 +146,40 @@ sub gzopen($file, $mode)
     bless \@($gz, $infDef), 'Compress::Zlib::gzFile';
 }
 
-sub Compress::Zlib::gzFile::gzread(@< @_)
+sub Compress::Zlib::gzFile::gzread($self, $bufref, ?$len)
 {
-    my $self = shift @_ ;
-
     return _set_gzerr(Z_STREAM_ERROR())
         if $self->[1] ne 'inflate';
 
-    my $len = defined @_[?1] ?? @_[1] !! 4096 ; 
+    $len //= 4096 ;
 
     my $gz = $self->[0] ;
-    my $status = $gz->read(@_[0], $len) ; 
+    my $status = $gz->read($bufref, $len) ;
     _save_gzerr($gz, 1);
     return $status ;
 }
 
-sub Compress::Zlib::gzFile::gzreadline(@< @_)
+sub Compress::Zlib::gzFile::gzreadline($self, $bufref)
 {
-    my $self = shift @_ ;
-
     my $gz = $self->[0] ;
     do {
         # Maintain backward compatibility with 1.x behaviour
         # It didn't support $/, so this can't either.
         local $^INPUT_RECORD_SEPARATOR = "\n" ;
-        @_[0] = $gz->getline() ; 
+        $bufref->$ = $gz->getline() ; 
     };
     _save_gzerr($gz, 1);
-    return defined @_[0] ?? length @_[0] !! 0 ;
+    return defined $bufref->$ ?? length $bufref->$ !! 0 ;
 }
 
-sub Compress::Zlib::gzFile::gzwrite(@< @_)
+sub Compress::Zlib::gzFile::gzwrite($self, $msg)
 {
-    my $self = shift @_ ;
     my $gz = $self->[0] ;
 
     return _set_gzerr(Z_STREAM_ERROR())
         if $self->[1] ne 'deflate';
 
-    my $status = $gz->write(@_[0]) ;
+    my $status = $gz->write($msg) ;
     _save_gzerr($gz);
     return $status ;
 }
@@ -372,12 +367,11 @@ our (@ISA);
 @ISA = qw(Compress::Raw::Zlib::deflateStream);
 
 
-sub deflate(@< @_)
+sub deflate($self, $buffer)
 {
-    my $self = shift @_ ;
     my $output ;
 
-    my $status = $self->SUPER::deflate(@_[0], $output) ;
+    my $status = $self->SUPER::deflate($buffer, $output) ;
     return @($output, $status);
 }
 

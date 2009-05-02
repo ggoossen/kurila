@@ -581,7 +581,7 @@ sub syswrite(@< @_)
     $self->{?UnCompSize}->add($buffer_length) ;
 
     my $outBuffer='';
-    my $status = $self->{?Compress}->compr($buffer, $outBuffer) ;
+    my $status = $self->{?Compress}->compr($buffer, \$outBuffer) ;
 
     return $self->saveErrorString(undef, $self->{Compress}->{?Error}, 
         $self->{Compress}->{ErrorNo})

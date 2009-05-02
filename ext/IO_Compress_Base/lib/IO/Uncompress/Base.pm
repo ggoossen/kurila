@@ -219,7 +219,7 @@ sub croakError(@< @_)
 {
     my $self   = shift @_ ;
     $self->saveErrorString(0, @_[0]);
-    croak @_[0];
+    die @_[0];
 }
 
 
@@ -306,7 +306,7 @@ sub checkParams(@< @_)
         # ContinueAfterEof
         ) ;
 
-    $Valid->{+TrailingData} = \@(1, 1, Parse_writable_scalar, undef)
+    $Valid->{+TrailingData} = \@(1, 1, Parse_writable_scalar_ref, undef)
     if  $self->{?OneShot} ;
 
     $got->parse($Valid, < @_ ) 
@@ -949,14 +949,12 @@ sub streamCount($self)
     return scalar nelems  $self->{?InfoList}->@  ;
 }
 
-sub read(@< @_)
+sub read($self, $bufref, ?$length, ?$offset)
 {
     # return codes
     # >0 - ok, number of bytes read
     # =0 - ok, eof
     # <0 - not ok
-
-    my $self = shift @_ ;
 
     return G_EOF if $self->{?Closed} ;
     return G_EOF if !length $self->{?Pending} && $self->{?EndStream} ;
@@ -967,23 +965,16 @@ sub read(@< @_)
     #            "::read: buffer parameter is read-only")
     #    if Compress::Raw::Zlib::_readonly_ref($_[0]);
 
-    if (ref @_[0] ) {
-        $self->croakError($self->{?ClassName} . "::read: buffer parameter is read-only")
-            if readonly( @_[0]->$);
-
-        $self->croakError($self->{?ClassName} . "::read: not a scalar reference @_[0]" )
-            unless ref @_[0] eq 'SCALAR' ;
-        $buffer = @_[0] ;
+    if ( not ref $bufref ) {
+        $self->croakError($self->{?ClassName} . "::read: buffer parameter is not a scalar reference");
     }
-    else {
-        $self->croakError($self->{?ClassName} . "::read: buffer parameter is read-only")
-            if readonly(@_[0]);
+    $self->croakError($self->{?ClassName} . "::read: buffer parameter is read-only")
+      if readonly( $bufref->$);
 
-        $buffer = \@_[0] ;
-    }
+    $self->croakError($self->{?ClassName} . "::read: not a scalar reference $bufref" )
+      unless ref $bufref eq 'SCALAR' ;
 
-    my $length = @_[?1] ;
-    my $offset = @_[?2] || 0;
+    $offset //= 0;
 
     # the core read will return 0 if asked for 0 bytes
     return 0 if defined $length && $length == 0 ;

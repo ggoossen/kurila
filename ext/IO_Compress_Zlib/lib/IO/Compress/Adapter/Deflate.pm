@@ -33,13 +33,11 @@ sub mkCompObject(@< @_)
              ) );
 }
 
-sub compr(@< @_)
+sub compr($self, $inbuffer, $outbuffer)
 {
-    my $self = shift @_ ;
-
     my $def   = $self->{?Def};
 
-    my $status = $def->deflate(@_[0], @_[1]) ;
+    my $status = $def->deflate($inbuffer, $outbuffer) ;
     $self->{+ErrorNo} = $status;
 
     if ($status != Z_OK)

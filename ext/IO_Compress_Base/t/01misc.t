@@ -69,18 +69,18 @@ sub My::testParseParameters()
     do {
         use Config;
 
-        dies_like { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => 'abc') ; },
+        dies_like { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar_ref, \0)), Fred => \'abc') ; },
           mkErr("Parameter 'Fred' not writable"),
             "wanted writable, got readonly";
     };
 
     my @xx;
-    try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => \@xx) ; };
+    try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar_ref, \0)), Fred => \@xx) ; };
     like $^EVAL_ERROR->{?description}, mkErr("Parameter 'Fred' not a scalar reference"), 
          "wanted scalar reference";
 
     local *ABC;
-    try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => \*ABC) ; };
+    try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar_ref, \0)), Fred => \*ABC) ; };
     like $^EVAL_ERROR->{?description}, mkErr("Parameter 'Fred' not a scalar"), 
          "wanted scalar";
 
@@ -104,14 +104,14 @@ sub My::testParseParameters()
     is $got->value('Fred'), "", "empty string" ;
 
     my $xx;
-    $got = ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, undef)), Fred => $xx) ;
+    $got = ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar_ref, \undef)), Fred => \$xx) ;
 
     ok $got->parsed('Fred'), "parsed" ;
     my $xx_ref = $got->value('Fred');
     $xx_ref->$ = 77 ;
     is $xx, 77;
 
-    $got = ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, undef)), Fred => \$xx) ;
+    $got = ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar_ref, \undef)), Fred => \$xx) ;
 
     ok $got->parsed('Fred'), "parsed" ;
     $xx_ref = $got->value('Fred');
@@ -130,7 +130,7 @@ do {
     ok ! isaFilename(undef), "undef ! isaFilename";
     ok ! isaFilename(\@()),    "[] ! isaFilename";
     $main::X = 1; $main::X = $main::X ;
-    ok ! isaFilename(*X),    "glob ! isaFilename";
+    ok ! isaFilename(\*X),    "glob ! isaFilename";
 };
 
 do {
@@ -138,7 +138,7 @@ do {
 
     my $lex = LexFile->new( my $out_file) ;
     open my $fh, ">", "$out_file" ;
-    is whatIsInput($fh->*), 'handle', "Match filehandle" ;
+    is whatIsInput($fh), 'handle', "Match filehandle" ;
     close $fh ;
 
     my $stdin = '-';
@@ -157,7 +157,7 @@ do {
 
     my $lex = LexFile->new( my $out_file) ;
     open my $fh, ">", "$out_file" ;
-    is whatIsOutput($fh->*), 'handle', "Match filehandle" ;
+    is whatIsOutput($fh), 'handle', "Match filehandle" ;
     close $fh ;
 
     my $stdout = '-';

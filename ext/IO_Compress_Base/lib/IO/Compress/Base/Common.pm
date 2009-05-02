@@ -433,7 +433,7 @@ sub createSelfTiedObject(@< @_)
 %EXPORT_TAGS{+Parse} = \qw( ParseParameters 
                            Parse_any Parse_unsigned Parse_signed 
                            Parse_boolean Parse_custom Parse_string
-                           Parse_multiple Parse_writable_scalar
+                           Parse_multiple Parse_writable_scalar_ref
                          );              
 
 push @EXPORT, <  %EXPORT_TAGS{?Parse}->@ ;
@@ -448,7 +448,7 @@ use constant Parse_custom   => 0x12;
 #use constant Parse_store_ref        => 0x100 ;
 use constant Parse_multiple         => 0x100 ;
 use constant Parse_writable         => 0x200 ;
-use constant Parse_writable_scalar  => 0x400 ^|^ Parse_writable ;
+use constant Parse_writable_scalar_ref  => 0x400 ^|^ Parse_writable ;
 
 use constant OFF_PARSED     => 0 ;
 use constant OFF_TYPE       => 1 ;
@@ -459,15 +459,14 @@ use constant OFF_STICKY     => 5 ;
 
 
 
-sub ParseParameters(@< @_)
+sub ParseParameters($level, @< @_)
 {
-    my $level = shift @_ || 0 ; 
+    $level //= 0 ;
 
     my $sub = @(caller($level + 1))[?3] ;
-    local $Carp::CarpLevel = 1 ;
     my $p = IO::Compress::Base::Parameters->new() ;
     $p->parse(< @_)
-        or croak "$sub: $p->{?Error}" ;
+        or die "$sub: $p->{?Error}" ;
 
     return $p;
 }
@@ -504,12 +503,8 @@ sub IO::Compress::Base::Parameters::setError(@< @_)
 #    return $self->{Error} ;
 #}
 
-sub IO::Compress::Base::Parameters::parse(@< @_)
+sub IO::Compress::Base::Parameters::parse($self, $default, @< @_)
 {
-    my $self = shift @_ ;
-
-    my $default = shift @_ ;
-
     my $got = $self->{?Got} ;
     my $firstTime = nkeys  $got->% == 0 ;
 
@@ -545,7 +540,7 @@ sub IO::Compress::Base::Parameters::parse(@< @_)
 
     while (my @(?$key, ?$v) =@( each $default->%))
     {
-        croak "need 4 params [$(join ' ',$v->@)]"
+        die "need 4 params [$(join ' ',$v->@)]"
             if (nelems $v->@) != 4 ;
 
         my @($first_only, $sticky, $type, $value) =  $v->@ ;
@@ -624,27 +619,21 @@ sub IO::Compress::Base::Parameters::_checkType(@< @_)
     #local $Carp::CarpLevel = $level ;
     #print "PARSE $type $key $value $validate $sub\n" ;
 
-    if ($type ^&^ Parse_writable_scalar)
+    if ($type ^&^ Parse_writable_scalar_ref)
     {
-        return $self->setError("Parameter '$key' not writable")
-            if $validate &&  readonly $value->$ ;
+        if (not ref $value->$) {
+            return $self->setError("Parameter '$key' not a scalar reference");
+        }
 
-        if (ref $value->$) 
-        {
             return $self->setError("Parameter '$key' not a scalar reference")
-                if $validate &&  ref $value->$ ne 'SCALAR' ;
+              if $validate &&  ref $value->$ ne 'SCALAR' ;
+
+            return $self->setError("Parameter '$key' not writable")
+              if $validate &&  readonly $value->$->$ ;
 
             $output->$ = $value->$ ;
-        }
-        else  
-        {
-            return $self->setError("Parameter '$key' not a scalar")
-                if $validate &&  ref $value ne 'SCALAR' ;
 
-            $output->$ = $value ;
-        }
-
-        return 1;
+            return 1;
     }
 
     #    if ($type & Parse_store_ref)
