@@ -1,7 +1,7 @@
 #!./perl
 
 require "./test.pl";
-plan( tests => 38 );
+plan( tests => 40 );
 
 my (@foo, %foo, $foo, @bar, @refary, %refhash, @list);
 
@@ -125,6 +125,13 @@ do {
     my @($x,$y) = @(1, scalar delete %h{[@()]});
     ok(!nelems($y),q([perl #29127] scalar delete of empty slice returned garbage));
 };
+
+do
+    # delete on undef.
+    my $h
+    is( delete $h{?foo}, undef )
+    dies_like( { delete $h{foo} }, qr/delete expects a HASH not UNDEF/ )
+;
 
 do {
     my $x = 0;

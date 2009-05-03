@@ -4140,6 +4140,7 @@ Perl_ck_delete(pTHX_ OP *o)
 	    yyerror(Perl_form(aTHX_ "%s argument is not a HASH or ARRAY element or slice",
 			      OP_DESC(o)));
 	}
+	o->op_private |= kid->op_private & OPpELEM_OPTIONAL;
 	op_null(kid);
     }
     o = op_mod_assign(o,

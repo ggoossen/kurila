@@ -3406,6 +3406,11 @@ PP(pp_delete)
 	    else
 		DIE(aTHX_ "panic: avhv_delete no longer supported");
 	}
+	else if (!SvOK(hv)) {
+	    if (!(PL_op->op_private & OPpELEM_OPTIONAL))
+		DIE(aTHX_ "%s expects a HASH not %s", OP_DESC(PL_op), Ddesc(hv));
+	    sv = NULL;
+	}
 	else
 	    DIE(aTHX_ "%s expects a HASH not %s", OP_DESC(PL_op), Ddesc(hv));
 	if (!sv)
