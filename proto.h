@@ -3399,11 +3399,6 @@ PERL_CALLCONV char*	Perl_sv_uni_display(pTHX_ SV *dsv, SV *ssv, STRLEN pvlim, UV
 #define PERL_ARGS_ASSERT_SV_UNI_DISPLAY	\
 	assert(dsv); assert(ssv)
 
-PERL_CALLCONV void	Perl_vivify_ref(pTHX_ SV* sv, U32 to_what)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_VIVIFY_REF	\
-	assert(sv)
-
 PERL_CALLCONV I32	Perl_wait4pid(pTHX_ Pid_t pid, int* statusp, int flags)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_WAIT4PID	\

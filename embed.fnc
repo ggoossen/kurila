@@ -943,7 +943,6 @@ Ap	|char*	|uvchr_to_utf8_flags	|NN char *d|UV uv|UV flags
 Apd	|char*	|uvuni_to_utf8_flags	|NN char *d|UV uv|UV flags
 Apd	|char*	|pv_uni_display	|NN SV *dsv|NN const char *spv|STRLEN len|STRLEN pvlim|UV flags
 ApdR	|char*	|sv_uni_display	|NN SV *dsv|NN SV *ssv|STRLEN pvlim|UV flags
-p	|void	|vivify_ref	|NN SV* sv|U32 to_what
 p	|I32	|wait4pid	|Pid_t pid|NN int* statusp|int flags
 p	|U32	|parse_unicode_opts|NN const char **popt
 Ap	|U32	|seed

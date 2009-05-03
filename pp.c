@@ -181,10 +181,6 @@ PP(pp_rv2sv)
 /* 	    Perl_croak(aTHX_ PL_no_localize_ref); */
 	}
     }
-    else if (op_flags & OPf_MOD) {
-	if (PL_op->op_private & OPpDEREF)
-	    vivify_ref(sv, PL_op->op_private & OPpDEREF);
-    }
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {
 	    SV* src;

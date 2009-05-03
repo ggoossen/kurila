@@ -215,11 +215,6 @@ PP(pp_padsv)
     if (PL_op->op_flags & OPf_MOD) {
 	if (PL_op->op_private & OPpLVAL_INTRO)
 	    SAVECLEARSV(PAD_SVl(PL_op->op_targ));
-	if (PL_op->op_private & OPpDEREF) {
-	    PUTBACK;
-	    vivify_ref(PAD_SVl(PL_op->op_targ), PL_op->op_private & OPpDEREF);
-	    SPAGAIN;
-	}
     }
     RETURN;
 }
@@ -947,14 +942,7 @@ PP(pp_helem)
 	/* hv must be "undef" */
 
 	if ( optional ) {
-	    if (PL_op->op_private & OPpDEREF) {
-		SV* sv = newSV(0);
-		vivify_ref(sv, PL_op->op_private & OPpDEREF);
-		XPUSHs(sv);
-		RETURN;
-	    }
-	    else
-		RETPUSHUNDEF;
+	    RETPUSHUNDEF;
 	}
 
 	if ( ! add )
@@ -975,14 +963,7 @@ PP(pp_helem)
     svp = he ? &HeVAL(he) : NULL;
     if ( ! svp || *svp == &PL_sv_undef ) {
 	if ( optional ) {
-	    if (PL_op->op_private & OPpDEREF) {
-		SV* sv = newSV(0);
-		vivify_ref(sv, PL_op->op_private & OPpDEREF);
-		XPUSHs(sv);
-		RETURN;
-	    }
-	    else
-		RETPUSHUNDEF;
+	    RETPUSHUNDEF;
 	}
 	if ( ! add )
 	    Perl_croak(aTHX_ "Missing hash key '%s'", SvPVX_const(keysv));
@@ -1003,8 +984,6 @@ PP(pp_helem)
 		save_helem(hv, keysv, svp);
 	}
     }
-    else if (PL_op->op_private & OPpDEREF)
-	vivify_ref(*svp, PL_op->op_private & OPpDEREF);
 
     sv = (svp ? *svp : &PL_sv_undef);
     /* This makes C<local $tied{foo} = $tied{foo}> possible.
@@ -1633,14 +1612,7 @@ PP(pp_aelem)
     svp = av_fetch(av, elem, add);
     if (!svp) {
 	if ( optional ) {
-	    if (PL_op->op_private & OPpDEREF) {
-		SV* sv = newSV(0);
-		vivify_ref(sv, PL_op->op_private & OPpDEREF);
-		XPUSHs(sv);
-		RETURN;
-	    }
-	    else
-		RETPUSHUNDEF;
+	    RETPUSHUNDEF;
 	}
 	if ( add )
 	    DIE(aTHX_ "Required array element %"IVdf" could not be created", elem);
@@ -1652,11 +1624,6 @@ PP(pp_aelem)
     if (lval && *svp == &PL_sv_undef)
 	svp = av_store(av, elem, newSV(0));
     sv = *svp;
-    if (PL_op->op_private & OPpDEREF && ! SvOK(sv)) {
-	vivify_ref(sv, PL_op->op_private & OPpDEREF);
-	XPUSHs(sv);
-	RETURN;
-    }
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {
 	    SV* src;
@@ -1674,15 +1641,6 @@ PP(pp_aelem)
     }
     PUSHs(sv);
     RETURN;
-}
-
-void
-Perl_vivify_ref(pTHX_ SV *sv, U32 to_what)
-{
-    PERL_ARGS_ASSERT_VIVIFY_REF;
-
-    if (!SvRVOK(sv))
-	Perl_croak(aTHX_ "Can't use %s as a REF", Ddesc(sv));
 }
 
 PP(pp_method)

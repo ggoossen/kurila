@@ -995,7 +995,6 @@
 #define pv_uni_display		Perl_pv_uni_display
 #define sv_uni_display		Perl_sv_uni_display
 #ifdef PERL_CORE
-#define vivify_ref		Perl_vivify_ref
 #define wait4pid		Perl_wait4pid
 #define parse_unicode_opts	Perl_parse_unicode_opts
 #endif
@@ -3179,7 +3178,6 @@
 #define pv_uni_display(a,b,c,d,e)	Perl_pv_uni_display(aTHX_ a,b,c,d,e)
 #define sv_uni_display(a,b,c,d)	Perl_sv_uni_display(aTHX_ a,b,c,d)
 #ifdef PERL_CORE
-#define vivify_ref(a,b)		Perl_vivify_ref(aTHX_ a,b)
 #define wait4pid(a,b,c)		Perl_wait4pid(aTHX_ a,b,c)
 #define parse_unicode_opts(a)	Perl_parse_unicode_opts(aTHX_ a)
 #endif
