@@ -3446,6 +3446,9 @@ PP(pp_exists)
 		RETPUSHYES;
 	}
     }
+    else if ( ! SvOK(sv) ) {
+	RETPUSHNO;
+    }
     else {
 	DIE(aTHX_ "exists expected an ARRAY or a HASH but got a %s", Ddesc(sv));
     }
