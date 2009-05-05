@@ -4312,7 +4312,8 @@ PP(pp_unshift)
     dVAR; dSP; dMARK; dORIGMARK;
     register AV *ary = (AV*)*++MARK;
 
-    do_arg_check(MARK);
+    if ( ! SvAVOK(ary) )
+	Perl_croak(aTHX_ "Can't %s a %s", OP_DESC(PL_op), Ddesc(ary));
 
     {
 	register I32 i = 0;
