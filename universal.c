@@ -766,29 +766,29 @@ XS(XS_Symbol_stash)
     XSRETURN(1);
 }
 
-XS(XS_dump_view)
+static void
+S_cat_view_pv(SV* retsv, SV* sv, int indent)
 {
-    dVAR;
-    dXSARGS;
-    SV * const sv = TOPs;
-    SV * const retsv = ST(0) = sv_newmortal();
-
-    if (items != 1)
-       Perl_croak(aTHX_ "Usage: %s(%s)", "dump::view", "sv");
-
     if ( ! SvOK(sv) ) {
-	sv_setpv(retsv, "undef");
-	XSRETURN(1);
+	sv_catpv(retsv, "undef");
+	return;
     }
 
     if ( SvAVOK(sv) ) {
-	sv_setpv(retsv, "@(ARRAY (TODO))");
-	XSRETURN(1);
+	int i;
+	sv_catpv(retsv, "@: ");
+	indent += 3;
+	for (i=0; i<=av_len(svTav(sv)); i++) {
+	    if (i != 0)
+		sv_catpvf(retsv, "\n%*s", indent, "");
+	    S_cat_view_pv(retsv, *av_fetch(svTav(sv), i, 0), indent);
+	}
+	return;
     }
 
     if ( SvHVOK(sv) ) {
-	sv_setpv(retsv, "%(HASH (TODO))");
-	XSRETURN(1);
+	sv_catpv(retsv, "%(HASH (TODO))");
+	return;
     }
 
     if (SvPOKp(sv)) {
@@ -845,9 +845,9 @@ XS(XS_dump_view)
 	if (single_quotes || grow) {
 	    /* We have something needing hex. 3 is ""\0 */
 	    STRLEN charlen;
-	    sv_grow(retsv, 3 + grow + 2*backslashes + single_quotes
+	    sv_grow(retsv, SvCUR(retsv) + 3 + grow + 2*backslashes + single_quotes
 		    + 2*qq_escapables + normal);
-	    rstart = r = SvPVX_mutable(retsv);
+	    rstart = r = SvPVX_mutable(retsv) + SvCUR(retsv);
 
 	    *r++ = '"';
 
@@ -882,8 +882,8 @@ XS(XS_dump_view)
 	    *r++ = '"';
 	} else {
 	    /* Single quotes.  */
-	    sv_grow(retsv, 3 + backslashes + single_quotes + qq_escapables + normal);
-	    rstart = r = SvPVX_mutable(retsv);
+	    sv_grow(retsv, SvCUR(retsv) + 3 + backslashes + single_quotes + qq_escapables + normal);
+	    rstart = r = SvPVX_mutable(retsv) + SvCUR(retsv);
 	    *r++ = '\'';
 	    for (s = src; s < send; s ++) {
 		*r++ = *s;
@@ -892,15 +892,13 @@ XS(XS_dump_view)
 	}
 	*r = '\0';
 	j = r - rstart;
-	SvCUR_set(retsv, j);
-	SvPOK_on(retsv);
-
-	XSRETURN(1);
+	SvCUR_set(retsv, j + SvCUR(retsv));
+	return;
     }
 
     if (SvIOKp(sv) || SvNOKp(sv)) {
-	sv_setsv(retsv, sv); /* let perl handle the stringification */
-	XSRETURN(1);
+	sv_catsv(retsv, sv); /* let perl handle the stringification */
+	return;
     }
 
     if (SvROK(sv)) {
@@ -911,7 +909,7 @@ XS(XS_dump_view)
 		const SV *const referent = (SV*)SvRV(sv);
 
 		if (!referent) {
-		    sv_setpv(retsv, "NULLREF");
+		    sv_catpv(retsv, "NULLREF");
 /* 		} else if (SvTYPE(referent) == SVt_PVMG */
 /* 			   && ((SvFLAGS(referent) & */
 /* 				(SVs_OBJECT|SVf_OK|SVs_GMG|SVs_SMG|SVs_RMG)) */
@@ -950,8 +948,8 @@ XS(XS_dump_view)
 			    + 2 * sizeof(UV) + 2 /* )\0 */;
 		    }
 
-		    sv_grow(retsv, len);
-		    buffer = SvPVX_mutable(retsv);
+		    sv_grow(retsv, SvCUR(retsv) + len);
+		    buffer = SvPVX_mutable(retsv) + SvCUR(retsv);
 		    buffer_end = retval = buffer + len;
 
 		    /* Working backwards  */
@@ -979,24 +977,30 @@ XS(XS_dump_view)
 
 		    len = buffer_end - retval - 1; /* -1 for that \0  */
 
-		    SvCUR_set(retsv, len);
-		    SvPOK_on(retsv);
+		    SvCUR_set(retsv, len + SvCUR(retsv));
 		}
-/* 		if (lp) */
-/* 		    *lp = len; */
-/* 		SAVEFREEPV(buffer); */
-/* 		return retval; */
-/* 	    } */
-	XSRETURN(1);
+		return;
     }
     
     if (isGV(sv)) {
 	gv_efullname3(retsv, (GV*)sv, "*");
-
-	XSRETURN(1);
+	return;
     }
 
     Perl_croak(aTHX_ "Unknown scalar type");
+}
+
+XS(XS_dump_view)
+{
+    dVAR;
+    dXSARGS;
+    SV * const sv = TOPs;
+    SV * const retsv = ST(0) = newSVpv("", 0);
+
+    if (items != 1)
+       Perl_croak(aTHX_ "Usage: %s(%s)", "dump::view", "sv");
+
+    S_cat_view_pv(retsv, sv, 0);
 
     XSRETURN(1);
 }
