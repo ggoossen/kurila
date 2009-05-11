@@ -79,7 +79,7 @@ is( $err, <<ERRHEAD . <<'ERR',                          '   right diagnostic' );
 ERRHEAD
 #     Structures begin differing at:
 #     ${     $got} = %(HASH (TODO))
-#     ${$expected} = @(ARRAY (TODO))
+#     ${$expected} = @: 
 ERR
 
 #line 88
@@ -162,7 +162,7 @@ is( $err, <<ERRHEAD . <<'ERR',                      '    right diagnostic' );
 #   at $^PROGRAM_NAME line 151.
 ERRHEAD
 #     Structures begin differing at:
-#     ${     $got} = @(ARRAY (TODO))
+#     ${     $got} = @: 
 #     ${$expected} = 23
 ERR
 
@@ -307,7 +307,7 @@ do {
 #   Failed test at $^PROGRAM_NAME line 321.
 #     Structures begin differing at:
 ERRHEAD
-#     ${     $got} = @(ARRAY (TODO))
+#     ${     $got} = @: 
 #     ${$expected} = %(HASH (TODO))
 ERR
 
@@ -318,7 +318,7 @@ ERR
 #   Failed test at $^PROGRAM_NAME line 332.
 #     Structures begin differing at:
 ERRHEAD
-#     ${     $got->[0]} = @(ARRAY (TODO))
+#     ${     $got->[0]} = @: 
 #     ${$expected->[0]} = %(HASH (TODO))
 ERR
 
