@@ -2,7 +2,6 @@
 package Compress::Zlib;
 
 require Exporter;
-use Carp ;
 use IO::Handle ;
 use Scalar::Util < qw(dualvar);
 
@@ -231,7 +230,7 @@ sub Compress::Zlib::gzFile::gzclose
 sub Compress::Zlib::gzFile::gzsetparams
 {
     my $self = shift ;
-    croak "Usage: Compress::Zlib::gzFile::gzsetparams(file, level, strategy)"
+    die "Usage: Compress::Zlib::gzFile::gzsetparams(file, level, strategy)"
         unless (nelems @_) eq 2 ;
 
     my $gz = $self->[0] ;
@@ -262,7 +261,7 @@ sub compress
 
     if (ref @_[0] ) {
         $in = @_[0] ;
-        croak "not a scalar reference" unless ref $in eq 'SCALAR' ;
+        die "not a scalar reference" unless ref $in eq 'SCALAR' ;
     }
     else {
         $in = \@_[0] ;
@@ -318,7 +317,7 @@ sub deflateInit
                 'Dictionary'    => \@(1, 1, Parse_any,      ""),
         ), < @_ ) ;
 
-    croak "Compress::Zlib::deflateInit: Bufsize must be >= 1, you specified " . 
+    die "Compress::Zlib::deflateInit: Bufsize must be >= 1, you specified " . 
           $got->value('Bufsize')
         unless $got->value('Bufsize') +>= 1;
 
@@ -349,7 +348,7 @@ sub inflateInit
         ), < @_) ;
 
 
-    croak "Compress::Zlib::inflateInit: Bufsize must be >= 1, you specified " . 
+    die "Compress::Zlib::inflateInit: Bufsize must be >= 1, you specified " . 
           $got->value('Bufsize')
         unless $got->value('Bufsize') +>= 1;
 
