@@ -816,7 +816,7 @@ sub ast {
 	push @newkids, $self->madness('X m');
     }
     else {
-	push @newkids, $self->madness('e m');
+	push @newkids, $self->madness('trans_something_e m');
     }
 
     return $self->newtype->new(Kids => [@newkids]);

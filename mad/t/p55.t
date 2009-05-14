@@ -106,8 +106,6 @@ use File::Find;
 our %failing = map { $_, 1 } qw|
 ../t/comp/require.t
 
-../t/comp/parser.t
-
 ../t/op/switch.t
 
 ../t/op/attrhand.t
@@ -117,9 +115,19 @@ our %failing = map { $_, 1 } qw|
 ../t/op/exec.t
 
 ../t/op/state.t
-../t/op/tiehandle.t
 ../t/op/each_array.t
 ../t/lib/cygwin.t
+../t/lib/autodie/autodie.t
+../t/lib/autodie/exceptions.t
+../t/lib/autodie/flock.t
+../t/op/pat.t
+../t/op/exists_sub.t
+../t/op/substr.t
+../t/op/yadayada.t
+../t/op/sub_lval.t
+../t/op/regexp_unicode_prop.t
+../t/op/smartmatch.t
+../t/comp/redef.t
 |;
 
 my @files;
@@ -262,3 +270,5 @@ $a =~ s/$foo/$bar/;
 my $msg = "ce ºtii tu, bã ?\n";
 use utf8;
 my $msg = "ce ºtii tu, bã ?\n";
+########
+"\xC1" =~ '\xD1';
