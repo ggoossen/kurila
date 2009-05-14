@@ -1466,6 +1466,7 @@ Perl_do_kv(pTHX)
 
     if (gimme == G_SCALAR) {
 	IV i;
+	dTARGET;
 
 	if (PL_op->op_flags & OPf_MOD || LVRET) {	/* lvalue */
 	    if (SvTYPE(TARG) < SVt_PVLV) {
@@ -1490,7 +1491,6 @@ Perl_do_kv(pTHX)
 	    i = 0;
 	    while (hv_iternext(keys)) i++;
 	}
-	dTARGET;
 	PUSHi( i );
 	RETURN;
     }
