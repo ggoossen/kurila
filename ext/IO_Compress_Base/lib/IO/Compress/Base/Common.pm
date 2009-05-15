@@ -431,8 +431,7 @@ sub createSelfTiedObject
 #$VERSION = '2.000_08';
 #@ISA = qw(Exporter);
 
-%EXPORT_TAGS{+Parse} = qw( ParseParameters 
-                           Parse_any Parse_unsigned Parse_signed 
+%EXPORT_TAGS{+Parse} = qw( Parse_any Parse_unsigned Parse_signed 
                            Parse_boolean Parse_custom Parse_string
                            Parse_multiple Parse_writable_scalar_ref
                          );              
@@ -458,19 +457,6 @@ use constant OFF_FIXED      => 3 ;
 use constant OFF_FIRST_ONLY => 4 ;
 use constant OFF_STICKY     => 5 ;
 
-
-
-sub ParseParameters($level, @< @_)
-{
-    $level //= 0 ;
-
-    my $sub = @(caller($level + 1))[?3] ;
-    my $p = IO::Compress::Base::Parameters->new() ;
-    $p->parse(< @_)
-        or die "$sub: $p->{?Error}" ;
-
-    return $p;
-}
 
 #package IO::Compress::Base::Parameters;
 

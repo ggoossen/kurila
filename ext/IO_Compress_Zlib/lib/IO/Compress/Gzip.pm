@@ -72,10 +72,8 @@ sub getExtraParams
 }
 
 
-sub ckParams
+sub ckParams($self, $got)
 {
-    my $self = shift ;
-    my $got = shift ;
 
     # gzip always needs crc32
     $got->value('CRC32' => 1);

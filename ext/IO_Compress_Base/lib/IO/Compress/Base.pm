@@ -32,12 +32,11 @@ sub saveStatus
 }
 
 
-sub saveErrorString
+sub saveErrorString($self, $retval, $error, ?$error_no)
 {
-    my $self   = shift ;
-    my $retval = shift ;
-     $self->{Error}->$ = shift() . ($self->{?Error}->$ ?? "\nprevious: $($self->{?Error}->$)" !! "") ;
-     $self->{ErrorNo}->$ = shift() + 0 if (nelems @_) ;
+        die $error;
+     $self->{Error}->$ = $error . ($self->{?Error}->$ ?? "\nprevious: $($self->{?Error}->$)" !! "") ;
+     $self->{ErrorNo}->$ = $error_no + 0 if defined $error_no;
 
     return $retval;
 }
@@ -487,20 +486,8 @@ sub getFileInfo
 {
 }
 
-sub TIEHANDLE
+sub DESTROY($self)
 {
-    return @_[0] if ref(@_[0]);
-    die "OOPS\n" ;
-}
-
-sub UNTIE
-{
-    my $self = shift ;
-}
-
-sub DESTROY
-{
-    my $self = shift ;
     $self->close() ;
 
     # TODO - memory leak with 5.8.0 - this isn't called until 
@@ -855,25 +842,10 @@ sub _notAvailable
 }
 
 *read     = _notAvailable('read');
-*READ     = _notAvailable('read');
 *readline = _notAvailable('readline');
-*READLINE = _notAvailable('readline');
 *getc     = _notAvailable('getc');
-*GETC     = _notAvailable('getc');
 
-*FILENO   = \&fileno;
-*PRINT    = \&print;
-*PRINTF   = \&printf;
-*WRITE    = \&syswrite;
 *write    = \&syswrite;
-*SEEK     = \&seek; 
-*TELL     = \&tell;
-*EOF      = \&eof;
-*CLOSE    = \&close;
-*BINMODE  = \&binmode;
-
-#*sysread  = \&_notAvailable;
-#*syswrite = \&_write;
 
 1; 
 
