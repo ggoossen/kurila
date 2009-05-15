@@ -39,8 +39,10 @@ sub p5convert {
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_scope_deref();
+t_defargs();
 die "END";
+t_dofile_to_evalfile();
+t_scope_deref();
 t_indent();
 t_env_sub();
 t_local();
@@ -2171,5 +2173,43 @@ $a->%;
 %$a{aap};
 ----
 $a->{aap};
+END
+}
+
+sub t_dofile_to_evalfile {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+do "aap.pm";
+----
+evalfile "aap.pm";
+====
+require "aap.pm";
+----
+require "aap.pm";
+END
+}
+
+sub t_defargs {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+sub foo { }
+sub aap { 5+$a }
+sub noot { 5+@_[0] }
+sub mies { my $x = shift; $x; }
+sub vuur { my $self = shift; $self; }
+sub zus { my $x = shift; my $y = shift; }
+sub bar($a) { }
+BEGIN { $a }
+----
+sub foo(...) { }
+sub aap(...) { 5+$a }
+sub noot(@< @_) { 5+@_[0] }
+sub mies(?$x) { $x; }
+sub vuur($self) { $self; }
+sub zus(@< @_) { my $x = shift @_; my $y = shift @_; }
+sub bar($a) { }
+BEGIN { $a }
+====
+sub teun { @_; shift; shift $a; }
+----
+sub teun(@< @_) { @_; shift @_; shift $a; }
 END
 }

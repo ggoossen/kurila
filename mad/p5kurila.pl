@@ -1411,7 +1411,7 @@ sub make_prototype {
 sub mg_stdin {
     my $xml = shift;
     for my $op (find_ops($xml, "rv2gv")) {
-        for my $name (qw[STDIN STDOUT STDERR]) {
+        for my $name (qw[STDIN STDOUT STDERR DATA]) {
             if ((get_madprop($op, "star") || '') eq "*" . $name) {
                 set_madprop($op, "star", '$^' . $name);
                 if ($op->parent->tag eq "op_srefgen") {
@@ -1520,6 +1520,56 @@ sub scope_deref {
                     set_madprop($rv2sv_op, 'wrap_close', '-&gt;' . $var);
                 }
             }
+        }
+    }
+}
+
+sub dofile_to_evalfile {
+    my $xml = shift;
+    for my $op (find_ops($xml, "dofile")) {
+        set_madprop($op, "operator", "evalfile");
+    }
+}
+
+sub sub_defargs {
+    my $xml = shift;
+    for my $op (find_ops($xml, "null")) {
+        next unless (get_madprop($op, "defintion")||'') eq "sub";
+        my ($op_leave) = $op->findnodes('madprops/mad_op[@key="ampersand"]/op_root/op_leavesub');
+        if (get_madprop($op_leave->child(0), "curly_open")) {
+            my $has_defargs = grep { (get_madprop($_->parent->parent, "value")||'') eq '@_' }
+              $op_leave->parent->findnodes(q|.//*[@val]|);
+
+            my @shifts = grep { $_->child(1) and $_->child(1)->tag eq "op_padsv" and not get_madprop($_->child(1), "value") }
+              $op->findnodes(".//op_shift");
+            if (! $has_defargs) {
+                if (@shifts > 1) {
+                    $has_defargs = 1;
+                } elsif (@shifts == 1) {
+                    if ($shifts[0]->parent->tag eq "op_sassign"
+                          and $shifts[0]->parent->att('flags') =~ m/\bVOID\b/
+                          and $shifts[0]->parent->child(-1)->tag eq "op_padsv"
+                            and $shifts[0]->parent->child(-1)->att('private') eq "LVAL_INTRO") {
+                        # only one shift as part of the to a lexical variable
+                        my $varname = get_madprop($shifts[0]->parent->child(-1), "value");
+                        set_madprop($op_leave->child(0), "wrap_open",
+                                    '(' . ( $varname eq '$self' ? '' : '?' ) . $varname . ')' );
+                        if ($shifts[0]->parent->next_sibling->tag eq "op_nextstate") {
+                            $shifts[0]->parent->next_sibling->delete;
+                        }
+                        $shifts[0]->parent->delete;
+                        next;
+                    }
+                    else {
+                        $has_defargs = 1;
+                    }
+                }
+            }
+            for (@shifts) {
+                set_madprop($_->child(1), "value", ' @_');
+            }
+            set_madprop($op_leave->child(0), "wrap_open",
+                        $has_defargs ? '(@&lt; @_)' : '(...)' );
         }
     }
 }
@@ -1839,6 +1889,9 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.19') {
 }
 
 scope_deref($twig);
+mg_stdin($twig);
+dofile_to_evalfile($twig);
+sub_defargs($twig);
 
 #indent($twig);
 

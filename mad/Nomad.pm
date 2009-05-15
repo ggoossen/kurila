@@ -1016,7 +1016,7 @@ BEGIN {
 	'nullstatement' => sub {		# null statements/blocks
 	    my $self = shift;
 	    my @newkids;
-	    push @newkids, $self->madness('{ ; } fake_semicolon');
+	    push @newkids, $self->madness('wrap_open { ; } fake_semicolon wrap_close');
 	    $::curstate = 0;
 	    return P5AST::nothing->new(Kids => [@newkids])
 	},
@@ -2861,7 +2861,7 @@ sub blockast {
     local $::curstate;
 
     my @retval;
-    push @retval, $self->madness('{');
+    push @retval, $self->madness('wrap_open {');
  
     my @newkids = $self->PLXML::op_lineseq::lineseq(@_);
     push @retval, @newkids;
@@ -2870,7 +2870,7 @@ sub blockast {
                  and $::version_from->{'v'} > v1.14 ) ) {
         push @retval, $self->madness(';');
     }
-    push @retval, $self->madness('} fake_semicolon');
+    push @retval, $self->madness('} fake_semicolon wrap_close');
     return $self->newtype->new(Kids => [@retval]);
 }
 
