@@ -924,6 +924,7 @@ sub sv_array_hash {
         if ($null_type eq "(") {
             next unless $op->children > 3;
         }
+
         my $type = ($null_type eq "(" or $op->tag eq "op_list") ? "round" : "wrap";
         set_madprop($op, $type."_open", ' @(');
         set_madprop($op, $type."_close", ' )');
@@ -1155,44 +1156,6 @@ sub hashkey_regulator {
         else {
             next if $op->following_elt()->tag eq "op_method_named";
             set_madprop($op, "curly_open", "{?");
-        }
-    }
-}
-
-sub pattern_assignment {
-    my $xml = shift;
-
-    for my $op ($xml->findnodes("//op_aassign")) {
-        my (undef, $dst, $subj) = $op->children;
-
-        next if ($subj->child(1)->tag eq "op_padsv")
-          && ($dst->child(1)->tag =~ m/op_entersub|op_const|op_padsv/);
-
-        for my $side ($subj, $dst) {
-            if ( $side->tag eq "op_null"
-                   and get_madprop($side, "round_open")) {
-                set_madprop($side, "round_open", "\@(");
-            }
-            elsif ($side->child(1)->att("flags") =~ m/\bPARENS\b/
-                     and get_madprop($side->child(1), "round_open")) {
-                set_madprop($side->child(1), "round_open", "\@(");
-            }
-            elsif ( $side->child(1)->tag eq "op_expand") {
-                set_madprop($side->child(1), "operator", '');
-            }
-            else {
-                set_madprop($side->child(1), "wrap_open", "\@(");
-                set_madprop($side->child(1), "wrap_close", ")");
-            }
-        }
-
-        my ($exp) = $op->child(2)->findnodes(".//op_expand");
-        if ( $exp and get_madprop($exp, "operator") ) {
-            my $var = "\@";
-            if ((get_madprop($exp->child(1), "hsh") || '') =~ m/%/) {
-                $var = "%";
-            }
-            set_madprop($exp, "operator", $var . "&lt;");
         }
     }
 }
@@ -1535,7 +1498,7 @@ sub sub_defargs {
     my $xml = shift;
     for my $op (find_ops($xml, "null")) {
         next unless (get_madprop($op, "defintion")||'') eq "sub";
-        my ($op_leave) = $op->findnodes('madprops/mad_op[@key="ampersand"]/op_root/op_leavesub');
+        my ($op_leave) = $op->findnodes('madprops/mad_op[@key="ampersand"]/*/op_leavesub');
         if (get_madprop($op_leave->child(0), "curly_open")) {
             my $has_defargs = grep { (get_madprop($_->parent->parent, "value")||'') eq '@_' }
               $op_leave->parent->findnodes(q|.//*[@val]|);
@@ -1864,7 +1827,6 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.15') {
 if ($from->{branch} ne "kurila" or $from->{v} < qv '1.16') {
     rename_ternary_op($twig);
     hashkey_regulator($twig);
-    pattern_assignment($twig);
 }
 
 if ($from->{branch} ne "kurila" or $from->{v} < qv '1.17') {

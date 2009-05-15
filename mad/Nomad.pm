@@ -3038,8 +3038,14 @@ sub ast {
 	if (defined $max) {
 	    if (exists $$range{mp}{O}) {	# deeply buried .. operator
 		PLXML::prepreproc($$range{mp}{O});
-		push @retval,
-		  $$range{mp}{'O'}{Kids}[0]->madness('o')
+                if ($::version->{branch} eq "perl") {
+                    push @retval,
+                      $$range{mp}{'O'}{Kids}[0]{Kids}[0]{Kids}[0]{Kids}[0]->madness('o');
+                }
+                else {
+                    push @retval,
+                      $$range{mp}{'O'}{Kids}[0]->madness('o');
+                }
 	    }
 	    else {
 		push @retval, '..';		# XXX missing whitespace
