@@ -396,7 +396,7 @@ sub process {
     return $self->usage_brief  unless  (nelems  $self->{?'args'}->@);
     $self->pagers_guessing;
     $self->options_reading;
-    $self->aside(sprintf "$^PROGRAM_NAME => \%s v\%s\n", ref($self), < $self->VERSION);
+    $self->aside(sprintf "$^PROGRAM_NAME => \%s v\%s\n", ref($self), $self->VERSION);
     $self->drop_privs_maybe;
     $self->options_processing;
 
@@ -635,7 +635,7 @@ sub options_processing {
     $self->options_sanity;
 
     $self->opt_n("nroff") unless $self->opt_n;
-    $self->add_formatter_option( '__nroffer' => < $self->opt_n );
+    $self->add_formatter_option( '__nroffer' => $self->opt_n );
 
     # Adjust for using translation packages
     $self->add_translator( <$self->opt_L) if $self->opt_L;
@@ -723,8 +723,8 @@ sub grand_search_init($self, $pages, @< @found) {
                     env::var('PATH'))));
             }
         }
-        my @files = $self->searchfor(0,$page,< @searchdirs);
-        if ((nelems @files)) {
+        my @files = grep { $_ }, @: $self->searchfor(0,$page,< @searchdirs);
+        if (@files) {
             $self->aside( "Found as $(join ' ',@files)\n" );
         }
         else {
@@ -972,7 +972,7 @@ sub render_findings($self, $found_things) {
     # Set formatter options:
     if( ref $formatter ) {
         foreach my $f ( ( $self->{?'formatter_switches'} || \@() )->@) {
-            my@($switch, $value, $silent_fail) =  $f->@;
+            my @($switch, $value, ?$silent_fail) =  $f->@;
             if( $formatter->can($switch) ) {
                 try { $formatter->?$switch( defined($value) ?? $value !! () ) };
                 warn "Got an error when setting $formatter_class\->$switch:\n$^EVAL_ERROR\n"
@@ -992,7 +992,7 @@ sub render_findings($self, $found_things) {
 
     my @($out_fh, $out) =  $self->new_output_file(
         ( $formatter->can('output_extension') && $formatter->output_extension )
-        || undef, <
+        || undef,
         $self->useful_filename_bit,
         );
 
@@ -1378,7 +1378,7 @@ sub check_file($self, $dir, $file) {
 
 #..........................................................................
 
-sub containspod($self, $file, $readit) {
+sub containspod($self, $file, ?$readit) {
     return 1 if !$readit && $file =~ m/\.pod\z/i;
 
 
@@ -1548,7 +1548,7 @@ sub searchfor($self, $recurse,$s,@< @dirs) {
     $self->aside( "Looking for $s in $(join ' ',@dirs)\n" );
     my $ret;
     my $dir;
-    $self->{+'target'} = ( <splitdir $s)[[-1]];  # XXX: why not use File::Basename?
+    $self->{+'target'} = (splitdir $s)[-1];  # XXX: why not use File::Basename?
     for my $i (0 .. nelems(@dirs) -1) {
         $dir = @dirs[$i];
         next unless -d $dir;
@@ -1597,7 +1597,7 @@ do {
 
         return if $already_asserted;
 
-        eval  q~ END { close(STDOUT) || die "Can't close STDOUT: $!" } ~;
+        eval  q~ END { close($^STDOUT) || die "Can't close STDOUT: $^OS_ERROR" } ~;
         # What for? to let the pager know that nothing more will come?
 
         die $^EVAL_ERROR if $^EVAL_ERROR;
