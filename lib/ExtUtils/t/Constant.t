@@ -75,7 +75,7 @@ END {
 chdir $dir or die $^OS_ERROR;
 push $^INCLUDE_PATH, '../../lib', '../../../lib';
 
-    package main;
+package main;
 
 sub check_for_bonus_files {
     my $dir = shift;
@@ -356,7 +356,7 @@ EOT
 # $name, [items], [export_names], $package, $header, $testfile, $num_tests
 my @tests;
 my $before_tests = 4; # Number of "ok"s emitted to build extension
-my $after_tests = 8; # Number of "ok"s emitted after make test run
+my $after_tests = 6; # Number of "ok"s emitted after make test run
 my $dummytest = 1;
 
 my $here;
@@ -456,7 +456,7 @@ my $five = FIVE;
 if ($five == 5) {
   print $^STDOUT, "ok $test\n";
 } else {
-  print $^STDOUT, "not ok $test # \$five\n";
+  print $^STDOUT, "not ok $test # five: \$five\n";
 }
 $test++;
 
