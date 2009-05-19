@@ -1368,8 +1368,7 @@ void Perl_cv_setcv(pTHX_ CV *dst, CV* src)
 	 */
 	SV* const const_sv = op_const_sv(RootopOp(CvROOT(dst)), dst);
 	if (const_sv) {
-	    CvREFCNT_dec(dst);
-	    dst = newCONSTSUB(NULL, const_sv);
+	    CvXSUBANY(dst).any_ptr = const_sv;
 	}
 	else {
 	    CvCONST_off(dst);

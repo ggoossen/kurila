@@ -3735,7 +3735,7 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 
     if (CvANON(cv)) {
 	assert(!CvCONST(cv));
-	if (proto && proto->op_type == OP_STUB && op_const_sv(block, cv))
+	if (CvN_MINARGS(cv) == 0 && CvN_MAXARGS(cv) == 0 && op_const_sv(block, cv))
 	    CvCONST_on(cv);
     }
 
