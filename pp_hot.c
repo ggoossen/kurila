@@ -1398,6 +1398,16 @@ PP(pp_entersub)
 	/* This path taken at least 75% of the time   */
 	dMARK;
 	register I32 items = SP - MARK;
+	if (CvCONST(cv)) {
+	    if (items)
+		Perl_croak(aTHX_ "constant subroutine does not expect any arguments");
+
+	    XPUSHs(cv_const_sv(cv));
+	    PUTBACK;
+
+	    LEAVE;
+	    return NORMAL;
+	}
 	AV* const padlist = CvPADLIST(cv);
 	PUSHBLOCK(cx, CXt_SUB, is_assignment ? MARK - 1 : MARK );
 	PUSHSUB(cx);
