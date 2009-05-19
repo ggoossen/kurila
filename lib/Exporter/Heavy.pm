@@ -23,7 +23,7 @@ sub _rebuild_cache($pkg, $exports, $cache) {
     s/^&// foreach  $exports->@;
         $cache->{[ $exports->@]} = @(1) x nelems $exports->@;
     my $ok = \Symbol::fetch_glob("$($pkg)::EXPORT_OK")->*->@;
-    if ((nelems $ok->@)) {
+    if (nelems $ok->@) {
         s/^&// foreach  $ok->@;
             $cache->{[$ok->@]} = @(1) x nelems $ok->@;
     }
@@ -54,7 +54,7 @@ sub export($pkg, $callpkg, @< @imports) {
                     if ($spec eq 'DEFAULT'){
                         @names = $exports->@;
                     }
-                    elsif ($tagdata = $tagsref->{?$spec}) {
+                    elsif (defined $tagdata = $tagsref->{?$spec}) {
                         @names = $tagdata;
                     }
                     else {
