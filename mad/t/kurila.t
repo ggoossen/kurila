@@ -39,11 +39,11 @@ sub p5convert {
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_defargs();
+t_indent();
 die "END";
+t_defargs();
 t_dofile_to_evalfile();
 t_scope_deref();
-t_indent();
 t_env_sub();
 t_local();
 t_stdin();
@@ -2107,6 +2107,12 @@ Foo
 $a->docall(
     "noot",
     );
+====
+$a
+ unless $b;
+----
+$a
+    unless $b;
 END
 }
 

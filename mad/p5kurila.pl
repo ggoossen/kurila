@@ -10,6 +10,7 @@ use XML::Twig;
 use XML::Twig::XPath;
 use Getopt::Long;
 use Carp::Assert;
+use List::Util qw(min);
 
 sub fst(@) {
     return $_[0];
@@ -835,24 +836,6 @@ sub eval_to_try {
 
 sub sv_array_hash {
     my $xml = shift;
-    for my $op ($xml->findnodes("//op_aassign")) {
-        my (undef, $right, $left) = $op->children;
-
-        next if $left->att('flags') =~ m/PARENS/;
-
-        my $svt;
-        $svt = $1 eq 'av' ? '@' : '%' if $left->child(1)->tag =~ m/op_(?:pad|rv2)(av|hv)/;
-        next unless $svt;
-
-        if ($right->child(1)->tag eq "op_null" 
-            and (get_madprop($right->child(1), 'round_open') || '') eq '(') {
-            set_madprop($right->child(1), 'round_open', "$svt(");
-        } else {
-            set_madprop($right, 'round_open', " $svt(");
-            set_madprop($right, 'round_close', ' )');
-        }
-    }
-
     for my $op (map { $xml->findnodes("//op_$_") } qw|padav rv2av anonlist|) {
         my $flags = $op->att('flags') || '';
         my $main_prop = $op->tag eq "op_anonlist" ? 'square_open' : 'ary';
@@ -876,7 +859,7 @@ sub sv_array_hash {
 
         if ($op->parent->tag eq "op_null" and $op->parent->parent->tag eq "op_join" and get_madprop($op->parent, "comma") eq '') {
             # this is a auto generated join inside some double quoted construct.
-            set_madprop($op, $main_prop, q|{join ' ', &lt;| . get_madprop($op, $main_prop));
+            set_madprop($op, $main_prop, q[$(join ' ', ] . get_madprop($op, $main_prop) . q[)] );
             set_madprop($op, 'round_open', q||);
             set_madprop($op, 'round_close', q|}|);
             next;
@@ -973,19 +956,6 @@ sub map_array {
         }
     }
 
-    for my $map (map { $xml->findnodes("//$_") } qw|op_sort op_split op_reverse op_keys op_values op_range|) {
-        if (($map->att('flags')||'') =~ m/\bLIST\b/) {
-            set_madprop($map, 'wrap_open', ' &lt;' . (get_madprop($map, 'wrap_open') || ''));
-        }
-    }
-
-    for my $map ($xml->findnodes("//op_null")) {
-        next unless get_madprop($map, "quote_open");
-        if ($map->att('flags') =~ m/\bLIST\b/) {
-            set_madprop($map, 'wrap_open', ' &lt;' . (get_madprop($map, 'wrap_open') || ''));
-        }
-    }
-
     for my $map (map { $xml->findnodes("//$_") } qw|op_sort op_reverse|) {
         next if $map->tag eq "op_sort" and $map->att('flags') =~ m/\bSPECIAL\b/;
         my $args = $map->child(2);
@@ -1015,32 +985,6 @@ sub map_array {
         if (get_madprop($args, 'comma')) {
             set_madprop($xargs, 'wrap_open', ', @(', wsbefore => '');
             set_madprop($args, 'comma', '');
-        }
-    }
-
-    for my $leaveloop ($xml->findnodes("//op_leaveloop")) {
-        next unless (get_madprop($leaveloop, 'while') || get_madprop($leaveloop, 'whilepost') || '') =~ m/^for/;
-        my $op_enteriter = $leaveloop->child(1);
-        next if $op_enteriter->att('flags') =~ m/\bSPECIAL\b/; # skip ranges
-        my $x = ($op_enteriter->child(0)->tag eq "madprops") ? $op_enteriter->child(2) : $op_enteriter->child(1);
-        next unless $x->tag eq "op_null";
-        my $what = $x->child(1);
-        if ($what->tag eq "op_expand") {
-            set_madprop($what, "operator", '');
-        }
-        else {
-            my $nwhat = XML::Twig::Elt->new("op_null");
-            if (get_madprop($leaveloop, 'whilepost')) {
-                set_madprop($nwhat, 'wrap_open', ' @(');
-            } else {
-                set_madprop($nwhat, 'wrap_open', '@(');
-            }
-            set_madprop($nwhat, 'wrap_close', ')');
-            $what->replace_with($nwhat);
-            while ($x->children > 2) {
-                $x->child(-1)->move($nwhat);
-            }
-            $what->move($nwhat);
         }
     }
 
@@ -1544,6 +1488,8 @@ sub indent {
     my $indent_level = 0;
     my $cont = 0;
 
+    my ($first_indent_line, undef) = first_token($xml->root);
+
     my $opsub;
     $opsub = sub {
         my $op = shift;
@@ -1559,6 +1505,12 @@ sub indent {
         if ($new_block) {
             $old_indent_level = $indent_level;
             $new_indent_level = $indent_level + 4 + $cont;
+            $first_indent_line = undef;
+            for ($op->children) {
+                my ($child_line, undef) = first_token($_);
+                next if not $child_line;
+                $first_indent_line = $first_indent_line ? min($first_indent_line, $child_line ) : $child_line;
+            }
             $indent_level = $indent_level + $cont;
             $old_cont = $cont;
             $cont = 0;
@@ -1577,12 +1529,20 @@ sub indent {
 
                 return if $done_mad{$madv};
                 $done_mad{$madv} = 1;
+                my $linenr = $madv->att('linenr');
                 for my $wsname (qw[wsbefore wsafter]) {
                     my $ws = $madv->att($wsname);
                     if ($ws and $ws =~ m/&#xA;/) {
                         my $ws_indent = $indent_level + $cont;
                         if ($madv->tag eq "mad_label") {
                             $ws_indent -= 2;
+                            $first_indent_line = get_madprop($op, 'operator', 'linenr');
+                        }
+                        if ($first_indent_line and $first_indent_line < $linenr
+                              and $madv->tag ne "mad_curly_close"
+                                and not $cont
+                          ) {
+                            $ws_indent += 4;
                         }
                         my @lines = split m/&#xA;/, $ws, -1;
                         my $i = 1;
@@ -1600,13 +1560,6 @@ sub indent {
                         $ws = join '&#xA;', @lines;
                         $ws =~ s/&#xA;(\s|&#x9;)+&#xA;/&#xA;&#xA;/g for 1..2;
                         $madv->set_att($wsname, $ws);
-                        if (not ($op->tag =~ m/^op_(scope|leavescope|leave)$/
-                                   or $madv->tag =~ m/^mad_(peg|curly_open|curly_close)$/
-                                     or $is_subdef
-                                       or get_madprop($op, "while")
-                                   ) ) {
-                            $cont ||= 4;
-                        }
                     }
                 }
         };
@@ -1618,6 +1571,7 @@ sub indent {
         if ($op->tag =~ m/^op_(nextstate|enterloop)$/
               or $null_type eq "use"
                 or $is_subdef) {
+            ($first_indent_line, undef) = first_token($op->next_sibling());
             $cont = 0;
         }
 
@@ -1850,12 +1804,12 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.19') {
     env_sub($twig);
 }
 
-scope_deref($twig);
-mg_stdin($twig);
-dofile_to_evalfile($twig);
-sub_defargs($twig);
+# scope_deref($twig);
+# mg_stdin($twig);
+# dofile_to_evalfile($twig);
+# sub_defargs($twig);
 
-#indent($twig);
+indent($twig);
 
 #future: add_call_parens($twig);
 

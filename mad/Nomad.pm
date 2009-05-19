@@ -2538,6 +2538,10 @@ package PLXML::op_mapwhile;
 sub ast {
     my $self = shift;
 
+    if ($self->{Kids}->[-1]->{flags} =~ m/\bSPECIAL\b/) {
+        return $self->SUPER::ast(@_);
+    }
+
     my @newkids;
     push @newkids, $self->madness('wrap_open o (');
     my @kids = @{$$self{Kids}};
