@@ -54,7 +54,7 @@ sub export($pkg, $callpkg, @< @imports) {
                     if ($spec eq 'DEFAULT'){
                         @names = $exports->@;
                     }
-                    elsif (defined $tagdata = $tagsref->{?$spec}) {
+                    elsif (defined($tagdata = $tagsref->{?$spec})) {
                         @names = $tagdata;
                     }
                     else {
