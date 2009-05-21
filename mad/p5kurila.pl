@@ -1354,31 +1354,33 @@ sub env_sub {
 }
 
 sub first_token {
-    my ($op) = @_;
     my ($linenr, $charoffset);
 
-    for my $mk (madprops($op)) {
-        my $this_linenr = get_madprop($op, $mk, "linenr");
-        my $this_charoffset = get_madprop($op, $mk, "charoffset");
-        next if not $this_linenr;
-        if ( (not $linenr)
-               or ($this_linenr < $linenr)
-               or ($this_linenr == $linenr and $this_charoffset < $charoffset) ) {
-            $linenr = $this_linenr;
-            $charoffset = $this_charoffset;
+    for my $op (@_) {
+        for my $mk (madprops($op)) {
+            my $this_linenr = get_madprop($op, $mk, "linenr");
+            my $this_charoffset = get_madprop($op, $mk, "charoffset");
+            next if not $this_linenr;
+            if ( (not $linenr)
+                   or ($this_linenr < $linenr)
+                     or ($this_linenr == $linenr and $this_charoffset < $charoffset) ) {
+                $linenr = $this_linenr;
+                $charoffset = $this_charoffset;
+            }
+        }
+
+        for my $child ($op->children) {
+            my ($this_linenr, $this_charoffset) = first_token($child);
+            next if not $this_linenr;
+            if ( (not $linenr)
+                   or ($this_linenr < $linenr)
+                     or ($this_linenr == $linenr and $this_charoffset < $charoffset) ) {
+                $linenr = $this_linenr;
+                $charoffset = $this_charoffset;
+            }
         }
     }
 
-    for my $child ($op->children) {
-        my ($this_linenr, $this_charoffset) = first_token($child);
-        next if not $this_linenr;
-        if ( (not $linenr)
-               or ($this_linenr < $linenr)
-               or ($this_linenr == $linenr and $this_charoffset < $charoffset) ) {
-            $linenr = $this_linenr;
-            $charoffset = $this_charoffset;
-        }
-    }
     return $linenr, $charoffset;
 }
 
@@ -1486,9 +1488,12 @@ sub indent {
 
     my %done;
     my $indent_level = 0;
+    my $auto_indent = 1;
     my $cont = 0;
 
     my ($first_indent_line, undef) = first_token($xml->root);
+
+    set_madprop($xml->root->child(-1), 'semicolon', '');
 
     my $opsub;
     $opsub = sub {
@@ -1499,8 +1504,9 @@ sub indent {
         my $old_indent_level;
         my $new_indent_level;
         my $old_cont;
+        my $old_auto_indent = $auto_indent;
 
-        my $new_block = defined get_madprop($op, 'curly_open');
+        my $new_block = (defined(get_madprop($op, 'curly_open')) and get_madprop($op, 'curly_open') !~ m/^ ( \%\( | \{\[ ) $/x);
 
         if ($new_block) {
             $old_indent_level = $indent_level;
@@ -1514,6 +1520,26 @@ sub indent {
             $indent_level = $indent_level + $cont;
             $old_cont = $cont;
             $cont = 0;
+
+            $auto_indent = ! get_madprop($op, 'curly_open');
+
+            if (not $auto_indent) {
+                my $open_indent_line = get_madprop($op, 'curly_open', 'linenr');
+                if ($first_indent_line
+                      and $open_indent_line < $first_indent_line) {
+                    set_madprop($op, 'curly_open', '', wsbefore => '');
+                    set_madprop($op, 'curly_close', '');
+                    set_madprop($op, 'operator', get_madprop($op, 'operator'),
+                                wsbefore => '');
+                    my $mad_parent_if = get_madprop($op->parent->parent, 'if');
+                    if ($mad_parent_if and $mad_parent_if eq "elsif") {
+                        set_madprop($op->parent->parent, 'if', $mad_parent_if,
+                                    wsbefore => '');
+                    }
+                    set_madprop($op, 'semicolon', '');
+                    $auto_indent = 1;
+                }
+            }
         }
 
         my $null_type = get_madprop($op, 'null_type') || '';
@@ -1534,12 +1560,8 @@ sub indent {
                     my $ws = $madv->att($wsname);
                     if ($ws and $ws =~ m/&#xA;/) {
                         my $ws_indent = $indent_level + $cont;
-                        if ($madv->tag eq "mad_label") {
-                            $ws_indent -= 2;
-                            $first_indent_line = get_madprop($op, 'operator', 'linenr');
-                        }
                         if ($first_indent_line and $first_indent_line < $linenr
-                              and $madv->tag ne "mad_curly_close"
+                              and not ($new_block and $madv->tag eq "mad_curly_close")
                                 and not $cont
                           ) {
                             $ws_indent += 4;
@@ -1571,7 +1593,10 @@ sub indent {
         if ($op->tag =~ m/^op_(nextstate|enterloop)$/
               or $null_type eq "use"
                 or $is_subdef) {
-            ($first_indent_line, undef) = first_token($op->next_sibling());
+            if ($auto_indent) {
+                set_madprop($op, 'semicolon', '');
+            }
+            ($first_indent_line, undef) = first_token( $op->tag eq 'op_nextstate' ? $op->next_sibling() : $op );
             $cont = 0;
         }
 
@@ -1617,11 +1642,13 @@ sub indent {
 
         if ($is_entersub) {
             my $subop;
-            if ($op->child(-1)->tag eq "op_method_named") {
-                $subop = $op->child(2);
-            }
-            else {
-                $subop = $op->child(-1)->child(-1);
+            if ($op->child(-1)) {
+                if ($op->child(-1)->tag eq "op_method_named") {
+                    $subop = $op->child(2);
+                }
+                else {
+                    $subop = $op->child(-1)->child(-1);
+                }
             }
             if ($subop) {
                 $opsub->($subop);
@@ -1678,6 +1705,9 @@ sub indent {
         if (defined $old_cont) {
             $cont = $old_cont;
         }
+        $auto_indent = $old_auto_indent;
+
+        return;
     };
 
     $opsub->($xml->root);

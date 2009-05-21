@@ -2288,6 +2288,7 @@ Perl_madlex(pTHX)
     int optype;
     char *s = PL_bufptr;
     char *start = PL_bufptr;
+    char *realstart = NULL;
 
     /* make sure PL_thiswhite is initialized */
     PL_thiswhite = 0;
@@ -2313,6 +2314,7 @@ Perl_madlex(pTHX)
 	    else {
 		char * const tstart = SvPVX_mutable(PL_linestr) + PL_realtokenstart;
 		PL_thistoken = newSVpvn(tstart, s - tstart);
+		realstart = tstart;
 	    }
 	}
 	if (PL_thismad)	/* install head */
@@ -2350,7 +2352,7 @@ Perl_madlex(pTHX)
 	}
 	else {
 	    /* Store actual token text as madprop X */
-	    CURMAD('X', PL_thistoken, NULL);
+	    CURMAD('X', PL_thistoken, realstart ? S_curlocation(realstart) : NULL );
 	}
 
 	if (PL_thiswhite) {
