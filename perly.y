@@ -153,7 +153,8 @@ prog	:	progstart
 	;
 
 /* An ordinary block */
-block	:	'{' remember lineseq '}'
+block	:
+	'{' remember lineseq '}'
 			{
                             $$ = block_end($2, $3);
                             TOKEN_GETMAD($1,$$,'{');
@@ -161,11 +162,20 @@ block	:	'{' remember lineseq '}'
 			}
 	;
 
-dblock	:	'{' remember lineseq '}'
+/* A block which must be a block */
+dblock	:
+                        {
+                            PL_parser->expect = XBLOCK;
+                        }
+	'{' 
+                        {
+                            PL_parser->expect = XTERM;
+                        }
+            remember lineseq '}'
 			{
-                            $$ = block_end($2, $3);
-                            TOKEN_GETMAD($1,$$,'{');
-                            TOKEN_GETMAD($4,$$,'}');
+                            $$ = block_end($4, $5);
+                            TOKEN_GETMAD($2,$$,'{');
+                            TOKEN_GETMAD($6,$$,'}');
 			}
 	;
 
@@ -283,6 +293,14 @@ sideff	:	error
 			}
 	;
 
+optional_semicolon
+        :       /* NULL */
+        |       ';'
+                        {
+                            PL_parser->expect = XSTATE;
+                        }
+        ;
+
 /* else and elsif blocks */
 else	:	/* NULL */
 			{ $$ = (OP*)NULL; }
@@ -290,9 +308,9 @@ else	:	/* NULL */
 			{ ($2)->op_flags |= OPf_PARENS; $$ = scope($2);
 			  TOKEN_GETMAD($1,$$,'o');
 			}
-	|	ELSIF '(' mexpr ')' mblock else
+	|	ELSIF '(' mexpr ')' mblock optional_semicolon else
 			{ 
-			    $$ = newCONDOP(0, $3, scope($5), $6, LOCATION($1));
+			    $$ = newCONDOP(0, $3, scope($5), $7, LOCATION($1));
 			    PL_hints |= HINT_BLOCK_SCOPE;
                             TOKEN_GETMAD($1,$$,'I');
                             TOKEN_GETMAD($2,$$,'(');
@@ -302,19 +320,19 @@ else	:	/* NULL */
 	;
 
 /* Real conditional expressions */
-cond	:	IF '(' remember mexpr ')' mblock else
+cond	:	IF '(' remember mexpr ')' mblock optional_semicolon else
 			{
 			    $$ = block_end($3,
-                                newCONDOP(0, $4, scope($6), $7, LOCATION($1)));
+                                newCONDOP(0, $4, scope($6), $8, LOCATION($1)));
                             TOKEN_GETMAD($1,$$,'I');
                             TOKEN_GETMAD($2,$$,'(');
                             TOKEN_GETMAD($5,$$,')');
                             APPEND_MADPROPS_PV("if", $$, '>');
 			}
-	|	UNLESS '(' remember miexpr ')' mblock else
+	|	UNLESS '(' remember miexpr ')' mblock optional_semicolon else
 			{
 			    $$ = block_end($3,
-                                newCONDOP(0, $4, scope($6), $7, LOCATION($1)));
+                                newCONDOP(0, $4, scope($6), $8, LOCATION($1)));
                             TOKEN_GETMAD($1,$$,'I');
                             TOKEN_GETMAD($2,$$,'(');
                             TOKEN_GETMAD($5,$$,')');
@@ -334,7 +352,7 @@ cont	:	/* NULL */
                             }
 #endif /* PERL_MAD */
                         }
-        |       CONTINUE block
+        |       CONTINUE dblock
                         { $$ = scope($2);
                             TOKEN_GETMAD($1,$$,'o');
                         }
@@ -625,12 +643,8 @@ proto	:	/* NULL */
                         }
 	;
 
-/* Subroutine body - either null or a block */
-subbody	:	block	{ $$ = $1; }
-        |	';'	{
-                           $$ = newOP(OP_NULL, 0, LOCATION($1) );
-                           yyerror("forward subroutine declartion not allowed");
-                        }
+/* Subroutine body - a block */
+subbody	:	dblock	{ $$ = $1; }
 	;
 
 package :	PACKAGE WORD ';'
@@ -1044,7 +1058,7 @@ anonymous:
                             $$ = newANONSUB($2, NULL, scalar($3));
                             TOKEN_GETMAD($1,$$,'o');
 			}
-        |       ANONSUB startanonsub proto block	%prec '('
+        |       ANONSUB startanonsub proto dblock	%prec '('
 			{
                             $$ = newANONSUB($2, $3, scalar($4));
                             TOKEN_GETMAD($1,$$,'o');

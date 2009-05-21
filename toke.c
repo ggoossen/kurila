@@ -918,10 +918,9 @@ S_skipspace(pTHX_ register char *s, bool continuous_line)
 		s++;
 	    if (s < PL_bufend) {
 		s++;
-		if (PL_in_eval && !PL_rsfp) {
+		if (PL_in_eval && !PL_rsfp)
 		    incline(s);
-		    continue;
-		}
+		continue;
 	    }
 	}
 
@@ -1010,7 +1009,7 @@ S_skipspace(pTHX_ register char *s, bool continuous_line)
 
     /* reset if this isn't a continuation of the original line */
     if (continuous_line
-	&& PL_parser->statement_indent
+	&& PL_parser->statement_indent != -1
 	&& (s - PL_linestart) <= PL_parser->statement_indent
 	) {
 	return PL_linestart - 1;
@@ -1507,7 +1506,7 @@ S_sublex_push(pTHX)
     PL_bufend += SvCUR(PL_linestr);
     PL_last_lop = PL_last_uni = NULL;
 
-    PL_parser->statement_indent = 0;
+    PL_parser->statement_indent = -1;
     PL_lex_brackets = 0;
     Newx(PL_lex_brackstack, 120, char);
     Newx(PL_lex_casestack, 12, char);
@@ -2718,10 +2717,11 @@ Perl_yylex(pTHX)
 
     DEBUG_T( {
 	SV* tmp = newSVpvs("");
-	PerlIO_printf(Perl_debug_log, "### %"IVdf":LEX_%s/X%s %s\n",
+	PerlIO_printf(Perl_debug_log, "### %"IVdf":LEX_%s/X%s/%"IVdf" %s\n",
 	    (IV)PL_parser->lex_line_number,
 	    lex_state_names[PL_lex_state],
 	    exp_name[PL_expect],
+	    (IV)PL_parser->statement_indent,
 	    pv_display(tmp, s, strlen(s), 0, 60));
 	SvREFCNT_dec(tmp);
     } );
@@ -2983,6 +2983,20 @@ Perl_yylex(pTHX)
     PL_oldoldbufptr = PL_oldbufptr;
     PL_oldbufptr = s;
 
+    if (PL_expect == XBLOCK) {
+	s = SKIPSPACE1(s);
+	if (*s != '{') {
+	    ENTER;
+	    SAVEI32(PL_parser->statement_indent);
+	    PL_parser->statement_indent = s - PL_linestart;
+	    DEBUG_T({ PerlIO_printf(Perl_debug_log,
+			"### New statement indent level, %d.\n",
+		    (int)PL_parser->statement_indent); });
+	    PL_expect = XSTATE;
+	    TOKEN('{');
+	}
+    }
+
   retry:
     PL_bufptr = s;
 #ifdef PERL_MAD
@@ -3010,6 +3024,12 @@ Perl_yylex(pTHX)
 	if (!PL_rsfp) {
 	    PL_last_uni = 0;
 	    PL_last_lop = 0;
+
+	    if (PL_parser->statement_indent > 0) {
+		S_stop_statement_indent();
+		TOKEN(';');
+	    }
+
 	    if (PL_lex_brackets) {
 		yyerror((const char *)
 			("Missing right curly or square bracket"));
@@ -3017,7 +3037,8 @@ Perl_yylex(pTHX)
             DEBUG_T( { PerlIO_printf(Perl_debug_log,
                         "### Tokener got EOF\n");
             } );
-	    TOKEN(0);
+	    force_next(0);
+	    TOKEN(';');
 	}
 	if (s++ < PL_bufend)
 	    goto retry;			/* ignore stray nulls */
@@ -3153,9 +3174,12 @@ Perl_yylex(pTHX)
 	/* might be non continuous line */
 	char* next_s = skipspace(s, FALSE);
 	if (next_s != s) {
-	    if (PL_parser->statement_indent) {
+	    if (PL_parser->statement_indent != -1) {
 		if ((next_s - PL_linestart) <= PL_parser->statement_indent) {
 		    if ((next_s - PL_linestart) < PL_parser->statement_indent) {
+			DEBUG_T({ PerlIO_printf(Perl_debug_log,
+				    "### End statement indent level, %d (line indentation: %d).\n",
+				    (int)PL_parser->statement_indent, (next_s - PL_linestart)); });
 			S_stop_statement_indent();
 		    }
 		    else 
@@ -4258,8 +4282,8 @@ Perl_yylex(pTHX)
 	    goto just_a_word;
 
 	d = s;
-	while (d < PL_bufend && isSPACE(*d))
-		d++;	/* no comments skipped here, or s### is misparsed */
+	if (!tmp)
+	    d = SKIPSPACE0(d);
 
 	/* Is this a label? */
 	if (!tmp && PL_expect == XSTATE
@@ -5449,7 +5473,7 @@ Perl_yylex(pTHX)
 		char tmpbuf[sizeof PL_tokenbuf];
 		SSize_t tboffset = 0;
 		expectation attrful;
-		bool have_name, have_proto;
+		bool have_name;
 		const int key = tmp;
 
 #ifdef PERL_MAD
@@ -5472,7 +5496,7 @@ Perl_yylex(pTHX)
 		    SV *nametoke = NULL;
 #endif
 
-		    PL_expect = XBLOCK;
+		    PL_expect = XTERM;
 		    attrful = XATTRBLOCK;
 		    /* remember buffer pos'n for later force_word */
 		    tboffset = s - PL_oldbufptr;
@@ -5512,15 +5536,10 @@ Perl_yylex(pTHX)
 		    have_name = FALSE;
 		}
 
-		have_proto = FALSE;
-
 		if (*s == ':' && s[1] != ':')
 		    PL_expect = attrful;
-		else if (*s != '{' && *s != '(' && key == KEY_sub) {
-		    if (!have_name)
-			yyerror("Illegal declaration of anonymous subroutine");
-		    else if (*s != ';')
-			yyerror(Perl_form(aTHX_ "Illegal declaration of subroutine %"SVf, SVfARG(PL_subname)));
+		else if (*s != '(' && key == KEY_sub) {
+		    PL_expect = XBLOCK;
 		}
 
 #ifdef PERL_MAD
@@ -5533,13 +5552,6 @@ Perl_yylex(pTHX)
 		force_next(0);
 
 		PL_thistoken = subtoken;
-#else
-		if (have_proto) {
-		    NEXTVAL_NEXTTOKE.opval =
-			(OP*)newSVOP(OP_CONST, 0, PL_lex_stuff.str_sv, S_curlocation(PL_bufptr));
-		    PL_lex_stuff.str_sv = NULL;
-		    force_next(THING);
-		}
 #endif
 		if (!have_name) {
 		    if (PL_curstash)
