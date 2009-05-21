@@ -55,8 +55,7 @@ sub new {
         $SINGLETON = bless \%( value => 'Hello World!' ), @_[0];
 }
 
-sub STORABLE_freeze {
-    my $self = shift;
+sub STORABLE_freeze($self, ...) {
 
     # We don't actually need to return anything, but provide a null string
     # to avoid the null-list-return behaviour.

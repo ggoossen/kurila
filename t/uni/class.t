@@ -107,18 +107,18 @@ while (my @(?$abbrev, ?$files) =@( each %utf8::PVA_abbr_map)) {
     next unless $prop_name;
     next if $abbrev eq "gc_sc";
 
-    for (sort keys $files->%) {
+    for (sort keys $files) {
         my $filename = 'File::Spec'->catfile(
-            $updir => lib => unicore => lib => $abbrev => "$files->{?$_}.pl"
+            $updir => lib => unicore => lib => $abbrev => "$files{?$_}.pl"
             );
 
         next unless -e $filename;
-        my @($h1, $h2) =  map { hex }, (split(m/\t/, (do $filename), 3))[[0..1]];
+        my @($h1, $h2) =  map { hex }, (split(m/\t/, (evalfile $filename), 3))[[0..1]];
 
         my $str = char_range($h1, $h2);
 
         for my $p (@($prop_name, $abbrev)) {
-            for my $c (@($files->{?$_}, $_)) {
+            for my $c (@($files{?$_}, $_)) {
                 is($str =~ m/(\p{$p: $c}+)/ && $1, substr($str, 0, -1), "$filename - $p - $c");
                 is($str =~ m/(\P{$p= $c}+)/ && $1, substr($str, -1));
             }
@@ -128,18 +128,18 @@ while (my @(?$abbrev, ?$files) =@( each %utf8::PVA_abbr_map)) {
 
 # General Category and Script
 for my $p (@('gc', 'sc')) {
-    while (my @(?$abbr, ?_) =@( each  %utf8::PropValueAlias{$p}->%)) {
+    while (my @(?$abbr, ?_) =@( each  %utf8::PropValueAlias{$p})) {
         my $filename = 'File::Spec'->catfile(
-            $updir => lib => unicore => lib => gc_sc => "%utf8::PVA_abbr_map{gc_sc}->{?$abbr}.pl"
+            $updir => lib => unicore => lib => gc_sc => "%utf8::PVA_abbr_map{gc_sc}{?$abbr}.pl"
             );
 
         next unless -e $filename;
-        my @($h1, $h2) =  map { hex }, (split(m/\t/, (do $filename), 3))[[0..1]];
+        my @($h1, $h2) =  map { hex }, (split(m/\t/, (evalfile $filename), 3))[[0..1]];
 
         my $str = char_range($h1, $h2);
 
         for my $x (@($p, %( gc => 'General Category', sc => 'Script' ){?$p})) {
-            for my $y (@($abbr, %utf8::PropValueAlias{$p}->{?$abbr}, %utf8::PVA_abbr_map{gc_sc}->{?$abbr})) {
+            for my $y (@($abbr, %utf8::PropValueAlias{$p}{?$abbr}, %utf8::PVA_abbr_map{gc_sc}{?$abbr})) {
                 is($str =~ m/(\p{$x: $y}+)/ && $1, substr($str, 0, -1));
                 is($str =~ m/(\P{$x= $y}+)/ && $1, substr($str, -1));
               SKIP: do {
@@ -176,7 +176,7 @@ do {
 
         my $filename = 'File::Spec'->catfile($dirname, $leafname);
 
-        my @($h1, $h2) =  map { hex }, split(m/\t/, (do $filename), 3)[[0..1]];
+        my @($h1, $h2) =  map { hex }, split(m/\t/, (evalfile $filename), 3)[[0..1]];
 
         my $str = char_range($h1, $h2);
 
@@ -201,7 +201,7 @@ for ( grep { %utf8::Canonical{?$_} =~ m/^In/ }, keys %utf8::Canonical) {
 
     print $^STDOUT, "# In$_ $filename\n";
 
-    my @($h1, $h2) =  map { hex }, split(m/\t/, (do $filename), 3)[[0..1]];
+    my @($h1, $h2) =  map { hex }, split(m/\t/, (evalfile $filename), 3)[[0..1]];
 
     my $str = char_range($h1, $h2);
 

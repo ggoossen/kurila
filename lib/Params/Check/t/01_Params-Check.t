@@ -40,7 +40,7 @@ do {   ok( allow( 42, qr/^\d+$/ ), "Allow based on regex" );
 ### default tests ###
 do {   
     my $tmpl =  \%(
-            foo => \%( default => 1 )
+            foo => %( default => 1 )
         );
 
     ### empty args first ###
@@ -77,7 +77,7 @@ do {
 };
 
 ### preserve case tests ###
-do {   my $tmpl = \%( Foo => \%( default => 1 ) );
+do {   my $tmpl = \%( Foo => %( default => 1 ) );
 
     for (@(1,0)) {
         local $Params::Check::PRESERVE_CASE = $_;
@@ -115,7 +115,7 @@ do {
 ### store tests ###
 do {   my $foo;
     my $tmpl = \%(
-            foo => \%( store => \$foo )
+            foo => %( store => \$foo )
         );
 
     ### with/without store duplicates ###
@@ -133,7 +133,7 @@ do {   my $foo;
 
 ### no_override tests ###
 do {   my $tmpl = \%(
-        foo => \%( no_override => 1, default => 42 ),
+        foo => %( no_override => 1, default => 42 ),
     );
 
     my $rv = check( $tmpl, \%( foo => 13 ) );        
@@ -146,8 +146,8 @@ do {   my $tmpl = \%(
 
 ### strict_type tests ###
 do {   my @list = @(
-        \@( \%( strict_type => 1, default => \@() ),  0 ),
-        \@( \%( default => \@() ),                    1 ),
+        \@( %( strict_type => 1, default => \@() ),  0 ),
+        \@( %( default => \@() ),                    1 ),
     );
 
     ### check for strict_type global, and in the template key ###
@@ -174,7 +174,7 @@ do {   my @list = @(
 
 ### required tests ###
 do {   my $tmpl = \%(
-        foo => \%( required => 1 )
+        foo => %( required => 1 )
     );
 
     ### required value provided ###
@@ -193,8 +193,8 @@ do {   my $tmpl = \%(
 
 ### defined tests ###
 do {   my @list = @(
-        \@( \%( defined => 1, default => 1 ),  0 ),
-        \@( \%( default => 1 ),                1 ),
+        \@( %( defined => 1, default => 1 ),  0 ),
+        \@( %( default => 1 ),                1 ),
     );
 
     ### check for strict_type global, and in the template key ###
@@ -222,7 +222,7 @@ do {   my @list = @(
 do {   ### check if the subs for allow get what you expect ###
     for my $thing (@(1,'foo',\@(1))) {
         my $tmpl = \%(
-                foo => \%( allow =>
+                foo => %( allow =>
                         sub { is_deeply(shift,$thing,  
                                     "   Allow coderef gets proper args") } 
                     )
@@ -234,7 +234,7 @@ do {   ### check if the subs for allow get what you expect ###
 };
 
 ### invalid key tests 
-do {   my $tmpl = \%( foo => \%( allow => sub { 0 } ) );
+do {   my $tmpl = \%( foo => %( allow => sub { 0 } ) );
 
     for my $val (@( 1, 'foo', \@(), bless(\%(),__PACKAGE__)) ) {
         my $rv      = check( $tmpl, \%( foo => $val ) );
@@ -247,7 +247,7 @@ do {   my $tmpl = \%( foo => \%( allow => sub { 0 } ) );
 };
 
 ### warnings fatal test
-do {   my $tmpl = \%( foo => \%( allow => sub { 0 } ) );
+do {   my $tmpl = \%( foo => %( allow => sub { 0 } ) );
 
     local $Params::Check::WARNINGS_FATAL = 1;
 
@@ -262,7 +262,7 @@ do {   my $tmpl = \%( foo => \%( allow => sub { 0 } ) );
 do {   ### quell warnings
     local $^WARN_HOOK = sub {};
 
-    my $tmpl = \%( foo => \%( store => '' ) );
+    my $tmpl = \%( foo => %( store => '' ) );
     check( $tmpl, \%() );
 
     my $re = quotemeta q|Store variable for 'foo' is not a reference!|;
@@ -272,7 +272,7 @@ do {   ### quell warnings
 ### edge case tests ###
 do {   ### if key is not provided, and value is '', will P::C treat
     ### that correctly? 
-    my $tmpl = \%( foo => \%( default => '' ) );
+    my $tmpl = \%( foo => %( default => '' ) );
     my $rv   = check( $tmpl, \%() );
 
     ok( $rv,                    "check() call with default = ''" );
@@ -288,20 +288,20 @@ do {
 
     ### the template to check against ###
     my $tmpl = \%(
-            firstname   => \%( required   => 1, defined => 1 ),
-                lastname    => \%( required   => 1, store => \$lastname ),
-                gender      => \%( required   => 1,
+            firstname   => %( required   => 1, defined => 1 ),
+                lastname    => %( required   => 1, store => \$lastname ),
+                gender      => %( required   => 1,
                     allow      => \@(qr/M/i, qr/F/i),
                 ),
-                married     => \%( allow      => \@(0,1) ),
-                age         => \%( default    => 21,
+                married     => %( allow      => \@(0,1) ),
+                age         => %( default    => 21,
                     allow      => qr/^\d+$/,
                 ),
-                id_list     => \%( default        => \@(),
+                id_list     => %( default        => \@(),
                     strict_type    => 1
                 ),
-                phone       => \%( allow          => sub { 1 if shift } ),
-                bureau      => \%( default        => 'NSA',
+                phone       => %( allow          => sub { 1 if shift } ),
+                bureau      => %( default        => 'NSA',
                     no_override    => 1
                 ),
         );
@@ -333,13 +333,13 @@ do {
     sub wrapper { check  ( < @_ ) };
     sub inner   { wrapper( < @_ ) };
     sub outer   { inner  ( < @_ ) };
-    outer( \%( dummy => \%( required => 1 )), \%() );
+    outer( \%( dummy => %( required => 1 )), \%() );
 
     like( last_error, qr/for .*::wrapper by .*::inner$/,
           "wrong caller without CALLER_DEPTH" );
 
     local $Params::Check::CALLER_DEPTH = 1;
-    outer( \%( dummy => \%( required => 1 )), \%() );
+    outer( \%( dummy => %( required => 1 )), \%() );
 
     like( last_error, qr/for .*::inner by .*::outer$/,
           "right caller with CALLER_DEPTH" );
@@ -356,8 +356,8 @@ do {   ok( 1,                      "Test last_error() on recursive check() call"
     for my $recurse (@( 0, 1) ) {         
 
         check(  
-            \%( a => \%( defined => 1 ),
-                b => \%( allow   => sub { $clear->( $recurse ) } ),
+            \%( a => %( defined => 1 ),
+                b => %( allow   => sub { $clear->( $recurse ) } ),
             ),
             \%( a => undef, b => undef )
             );       

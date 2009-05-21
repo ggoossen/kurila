@@ -195,13 +195,12 @@ remaining characters in the filename.
 =cut
 
 
-sub basename {
-    my@($path) =@( shift);
+sub basename($path, @< @_) {
 
     # From BSD basename(1)
     # The basename utility deletes any prefix ending with the last slash `/'
     # character present in string (after first stripping trailing slashes)
-    _strip_trailing_sep($path);
+    $path = _strip_trailing_sep($path);
 
     my@($basename, $dirname, $suffix) =  fileparse( $path, < map( {"\Q$_\E" }, @_) );
 
@@ -282,16 +281,16 @@ sub dirname {
     }
     elsif ($type eq 'MacOS') {
         if( !length($basename) && $dirname !~ m/^[^:]+:\z/) {
-            _strip_trailing_sep($dirname);
+            $dirname = _strip_trailing_sep($dirname);
             @($basename,$dirname, _) =  fileparse $dirname;
         }
         $dirname .= ":" unless $dirname =~ m/:\z/;
     }
     elsif (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 OS2)) { 
-        _strip_trailing_sep($dirname);
+        $dirname = _strip_trailing_sep($dirname);
         unless( length($basename) ) {
             @($basename,$dirname, _) =  fileparse $dirname;
-            _strip_trailing_sep($dirname);
+            $dirname = _strip_trailing_sep($dirname);
         }
     }
     elsif ($type eq 'AmigaOS') {
@@ -300,10 +299,10 @@ sub dirname {
         $dirname =~ s{[^:/]+\z}{} unless length($basename);
     }
     else {
-        _strip_trailing_sep($dirname);
+        $dirname = _strip_trailing_sep($dirname);
         unless( length($basename) ) {
             @($basename,$dirname, _) =  fileparse $dirname;
-            _strip_trailing_sep($dirname);
+            $dirname = _strip_trailing_sep($dirname);
         }
     }
 
@@ -312,18 +311,19 @@ sub dirname {
 
 
 # Strip the trailing path separator.
-sub _strip_trailing_sep  {
+sub _strip_trailing_sep($v)  {
     my $type = $Fileparse_fstype;
 
     if ($type eq 'MacOS') {
-        @_[0] =~ s/([^:]):\z/$1/s;
+        $v =~ s/([^:]):\z/$1/s;
     }
     elsif (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 OS2)) { 
-        @_[0] =~ s/([^:])[\\\/]*\z/$1/;
+        $v =~ s/([^:])[\\\/]*\z/$1/;
     }
     else {
-        @_[0] =~ s{(.)/*\z}{$1}s;
+        $v =~ s{(.)/*\z}{$1}s;
     }
+    return $v;
 }
 
 

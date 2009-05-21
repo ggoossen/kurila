@@ -42,9 +42,9 @@ is($result, 'aaaabbbbb|cc cc|\\\"dddd eee\\\\\\"ffff|gg');
 # Make sure @nested_quotewords does the right thing
 our @lists = nested_quotewords('\s+', 0, 'a b c', '1 2 3', 'x y z');
 is ((nelems @lists), 3);
-is ((nelems @lists[0]->@), 3);
-is ((nelems @lists[1]->@), 3);
-is ((nelems @lists[2]->@), 3);
+is ((nelems @lists[0]), 3);
+is ((nelems @lists[1]), 3);
+is ((nelems @lists[2]), 3);
 
 # Now test error return
 $string = 'foo bar baz"bach blech boop';

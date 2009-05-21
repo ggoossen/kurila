@@ -108,55 +108,6 @@ ext/B/t/pragma.t	See if user pragmas work.
 ext/B/t/showlex.t	See if B::ShowLex works
 ext/B/t/terse.t		See if B::Terse works
 ext/B/typemap			Compiler backend interface types
-ext/Compress-Raw-Zlib/Changes		Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/config.in		Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/examples/filtdef	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/examples/filtinf	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/fallback/constants.h	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/fallback/constants.xs	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/lib/Compress/Raw/Zlib.pm	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/Makefile.PL	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/private/MakeUtil.pm	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/README		Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/t/01version.t	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/t/07bufsize.t	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/typemap		Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/adler32.c	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/compress.c	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/crc32.c	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/crc32.h	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/deflate.c	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/deflate.h	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/infback.c	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/inffast.c	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/inffast.h	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/inffixed.h	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/inflate.c	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/inflate.h	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/inftrees.c	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/inftrees.h	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/trees.c	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/trees.h	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/uncompr.c	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/zconf.h	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/zlib.h	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/zutil.c	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/zlib-src/zutil.h	Compress::Raw::Zlib
-ext/Compress-Raw-Zlib/Zlib.xs		Compress::Raw::Zlib
-ext/Compress-Zlib/Changes		Compress::Zlib
-ext/Compress-Zlib/examples/filtdef	Compress::Zlib
-ext/Compress-Zlib/examples/filtinf	Compress::Zlib
-ext/Compress-Zlib/examples/gzcat	Compress::Zlib
-ext/Compress-Zlib/examples/gzgrep	Compress::Zlib
-ext/Compress-Zlib/examples/gzstream	Compress::Zlib
-ext/Compress-Zlib/lib/Compress/Zlib.pm	Compress::Zlib
-ext/Compress-Zlib/Makefile.PL		Compress::Zlib
-ext/Compress-Zlib/private/MakeUtil.pm	Compress::Zlib
-ext/Compress-Zlib/README		Compress::Zlib
-ext/Compress-Zlib/t/01version.t		Compress::Zlib
-ext/Compress-Zlib/t/03zlib-v1.t		Compress::Zlib
-ext/Compress-Zlib/t/08encoding.t	Compress::Zlib
-ext/Compress-Zlib/t/14gzopen.t		Compress::Zlib
 ext/Cwd/Changes			Cwd extension Changelog
 ext/Cwd/Cwd.xs			Cwd extension external subroutines
 ext/Cwd/Makefile.PL		Cwd extension makefile maker
@@ -243,36 +194,6 @@ ext/I18N-Langinfo/Langinfo.xs	I18N::Langinfo
 ext/I18N-Langinfo/Makefile.PL	I18N::Langinfo
 ext/I18N-Langinfo/t/Langinfo.t	See whether I18N::Langinfo works
 ext/IO/ChangeLog		IO perl module change log
-ext/IO_Compress_Base/Changes	IO::Compress::Base
-ext/IO_Compress_Base/lib/File/GlobMapper.pm	IO::Compress::Base
-ext/IO_Compress_Base/lib/IO/Compress/Base/Common.pm	IO::Compress::Base
-ext/IO_Compress_Base/lib/IO/Compress/Base.pm	IO::Compress::Base
-ext/IO_Compress_Base/lib/IO/Uncompress/AnyUncompress.pm	IO::Compress::Base
-ext/IO_Compress_Base/lib/IO/Uncompress/Base.pm	IO::Compress::Base
-ext/IO_Compress_Base/Makefile.PL	IO::Compress::Base
-ext/IO_Compress_Base/private/MakeUtil.pm	IO::Compress::Base
-ext/IO_Compress_Base/README	IO::Compress::Base
-ext/IO_Compress_Base/t/01misc.t	IO::Compress::Base
-ext/IO_Compress_Base/t/globmapper.t	IO::Compress::Base
-ext/IO_Compress_Zlib/Changes	IO::Compress::Zlib
-ext/IO_Compress_Zlib/examples/gzappend	IO::Compress::Zlib
-ext/IO_Compress_Zlib/examples/gzstream	IO::Compress::Zlib
-ext/IO_Compress_Zlib/examples/unzip	IO::Compress::Zlib
-ext/IO_Compress_Zlib/lib/IO/Compress/Adapter/Deflate.pm	IO::Compress::Zlib
-ext/IO_Compress_Zlib/lib/IO/Compress/Deflate.pm	IO::Compress::Zlib
-ext/IO_Compress_Zlib/lib/IO/Compress/Gzip/Constants.pm	IO::Compress::Zlib
-ext/IO_Compress_Zlib/lib/IO/Compress/Gzip.pm	IO::Compress::Zlib
-ext/IO_Compress_Zlib/lib/IO/Compress/RawDeflate.pm	IO::Compress::Zlib
-ext/IO_Compress_Zlib/lib/IO/Compress/Zip/Constants.pm	IO::Compress::Zlib
-ext/IO_Compress_Zlib/lib/IO/Compress/Zlib/Constants.pm	IO::Compress::Zlib
-ext/IO_Compress_Zlib/lib/IO/Compress/Zlib/Extra.pm	IO::Compress::Zlib
-ext/IO_Compress_Zlib/lib/IO/Uncompress/Adapter/Inflate.pm	IO::Compress::Zlib
-ext/IO_Compress_Zlib/lib/IO/Uncompress/Gunzip.pm	IO::Compress::Zlib
-ext/IO_Compress_Zlib/lib/IO/Uncompress/Inflate.pm	IO::Compress::Zlib
-ext/IO_Compress_Zlib/lib/IO/Uncompress/RawInflate.pm	IO::Compress::Zlib
-ext/IO_Compress_Zlib/Makefile.PL	IO::Compress::Zlib
-ext/IO_Compress_Zlib/private/MakeUtil.pm	IO::Compress::Zlib
-ext/IO_Compress_Zlib/README	IO::Compress::Zlib
 ext/IO/hints/sco.pl		Hint for IO for named architecture
 ext/IO/IO.pm			Top-level interface to IO::* classes
 ext/IO/IO.xs			IO extension external subroutines
@@ -2121,6 +2042,7 @@ t/lex/qr.t			See if qr work
 t/lex/use.t			See if use works
 t/lex/ver.t			See if v-strings and the %v format flag work
 t/lex/location.t		See if locations are correctly saved
+t/lex/indentation.t		See if indentation works
 t/op/anon_array.t		See if @( ... ) work
 t/op/hashconcat.t		See if +%+ works
 t/op/anon_hash.t		See if %( ... ) work
@@ -2400,17 +2322,12 @@ t/run/cloexec.t			Test close-on-exec.
 t/run/debugging.t		See if debugging runs work
 t/run/exit.t			Test perl's exit status.
 t/run/fresh_perl.t		Tests that require a fresh perl.
-t/run/noswitch.t		Test aliasing ARGV for other switch tests
 t/run/runenv.t			Test if perl honors its environment variables.
 t/run/switch0.t			Test the -0 switch
-t/run/switcha.t			Test the -a switch
 t/run/switchC.t			Test the -C switch
 t/run/switchd.t			Test the -d switch
 t/run/switches.t		Tests for the other switches (-0, -l, -c, -s, -M, -m, -V, -v, -h, -z, -i)
 t/run/switchI.t			Test the -I switch
-t/run/switchn.t			Test the -n switch
-t/run/switchp.t			Test the -p switch
-t/run/switchp.aux			Test the -p switch
 t/run/switchx2.aux		Data for switchx.t
 t/run/switchx.aux		Data for switchx.t
 t/run/switchx.t			Test the -x switch

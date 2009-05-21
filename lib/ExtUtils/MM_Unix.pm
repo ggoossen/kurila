@@ -692,8 +692,8 @@ depends on $(DIST_DEFAULT).
 sub dist_target {
     my@($self) =@( shift);
 
-    my $date_check = $self->oneliner(<<'CODE', \@('-l'));
-print $$^STDOUT, 'Warning: Makefile possibly out of date with $(VERSION_FROM)'
+    my $date_check = $self->oneliner(<<'CODE');
+print $$^STDOUT, 'Warning: Makefile possibly out of date with $(VERSION_FROM)', qq[\n]
     if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' +< -M '$(FIRST_MAKEFILE)';
 CODE
 
@@ -1021,7 +1021,7 @@ WARNING
             next unless $self->maybe_command($abs);
             print $^STDOUT, "Executing $abs\n" if ($trace +>= 2);
 
-            my $version_check = qq{$abs -le "\$^PERL_VERSION =~ m/^\Q$ver\E/; print \$^STDOUT, qq\{VER_OK\}"};
+            my $version_check = qq{$abs -e "\$^PERL_VERSION =~ m/^\Q$ver\E/; print \$^STDOUT, qq\{VER_OK\n\}"};
             $version_check = "%Config{?run} $version_check"
                 if defined %Config{?run} and length %Config{?run};
 
@@ -1130,7 +1130,6 @@ eval 'exec $interpreter $arg -S \$0 \$\{1+"\$\@"\}'
         };
 
         # Print out the new #! line (or equivalent).
-        local $^OUTPUT_RECORD_SEPARATOR = undef;
         local $^INPUT_RECORD_SEPARATOR = undef;
         print $fixout, $shb, ~< $fixin;
         close $fixin;
@@ -2838,8 +2837,8 @@ interpreted as an octal value.
 
 =cut
 
-sub perm_rw {
-    return shift->{?PERM_RW};
+sub perm_rw($self) {
+    return $self->{?PERM_RW};
 }
 
 =item perm_rwx (o)
@@ -2851,8 +2850,8 @@ See also perl_rw.
 
 =cut
 
-sub perm_rwx {
-    return shift->{?PERM_RWX};
+sub perm_rwx($self) {
+    return $self->{?PERM_RWX};
 }
 
 =item pm_to_blib

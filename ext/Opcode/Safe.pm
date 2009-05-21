@@ -254,8 +254,8 @@ sub share_redo {
         $obj->share_from($pkg,  \@( $var ), 1);
     }
 }
-sub share_forget {
-    delete shift->{Shares};
+sub share_forget($self) {
+    delete $self->{Shares};
 }
 
 sub varglob($obj, $var) {

@@ -41,7 +41,8 @@ print $^STDOUT, "ok 4\n";
 
 #Retreiving a message from the queue
 my $rmsgtype = 0; # Give me any type
-$rmsgtype = $msq->rcv(my $rmsg,256,$rmsgtype,IPC_NOWAIT) || print $^STDOUT, "not ";
+my $rmsg;
+$rmsgtype = $msq->rcv(\$rmsg, 256,$rmsgtype,IPC_NOWAIT) || print $^STDOUT, "not ";
 print $^STDOUT, "ok 5\n";
 
 print $^STDOUT, "not " unless $rmsgtype == $msgtype && $rmsg eq $msg;

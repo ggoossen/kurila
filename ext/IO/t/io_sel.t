@@ -3,7 +3,7 @@
 iohandle::output_autoflush($^STDERR, 1);
 iohandle::output_autoflush($^STDOUT, 1);
 
-print $^STDOUT, "1..22\n";
+print $^STDOUT, "1..21\n";
 
 use IO::Select v1.09;
 
@@ -99,17 +99,3 @@ print $^STDOUT, "ok 20\n";
 $sel->remove( <$sel->handles);
 print $^STDOUT, "not " unless $sel->count == 0 && !defined($sel->bits);
 print $^STDOUT, "ok 21\n";
-
-# check warnings
-$^WARN_HOOK = sub { 
-        ++ $w 
-            if @_[0]->{?description} =~ m/^Call to deprecated method 'has_error', use 'has_exception'/ ;
-    } ;
-$w = 0 ;
-do {
-    no warnings 'IO::Select' ;
-    IO::Select::has_exception();
-};
-print $^STDOUT, "not " unless $w == 0 ;
-$w = 0 ;
-print $^STDOUT, "ok 22\n" ;

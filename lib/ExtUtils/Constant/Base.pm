@@ -371,7 +371,7 @@ sub return_clause($self, $args, $item) {
 }
 
 sub match_clause($self, $args, $item) {
-    my @($offset, $indent) =  $args->{[qw(checked_at indent)]};
+    my @(?$offset, ?$indent) =  $args{[?qw(checked_at indent)]};
     $indent = ' ' x ($indent || 4);
     my $body = '';
     my ($no, $yes, $either, $name, $inner_indent);
@@ -808,13 +808,13 @@ sub C_constant($self, $args, @< @items) {
         # Need to group names of the same length
         my @by_length;
         foreach ( @items) {
-            push @by_length[+ length $_->{?name}]->@, $_;
+            push @by_length[+ length $_->{?name}], $_;
         }
         foreach my $i (0 .. ((nelems @by_length)-1)) {
             next unless @by_length[$i];	# None of this length
             $body .= "  case $i:\n";
-            if ((nelems @by_length[$i]->@) == 1) {
-                my $only_thing = @by_length[$i]->[0];
+            if ((nelems @by_length[$i]) == 1) {
+                my $only_thing = @by_length[$i][0];
                 if ($only_thing->{?utf8}) {
                     if ($only_thing->{?utf8} eq 'yes') {
                         # With utf8 on flag item is passed in element 0
@@ -826,14 +826,14 @@ sub C_constant($self, $args, @< @items) {
                 } else {
                     $body .= $self->match_clause (undef, $only_thing);
                 }
-            } elsif ((nelems @by_length[$i]->@) +< $breakout) {
+            } elsif ((nelems @by_length[$i]) +< $breakout) {
                 $body .= $self->switch_clause (\%(indent=>4),
-                    $i, $items, < @by_length[$i]->@);
+                    $i, $items, < @by_length[$i]);
             } else {
                 # Only use the minimal set of parameters actually needed by the types
                 # of the names of this length.
                 my $what = \%();
-                foreach ( @by_length[$i]->@) {
+                foreach ( @by_length[$i]) {
                     $what->{+$_->{?type}} = 1;
                     $what->{+''} = 1 if $_->{?utf8};
                 }
@@ -843,7 +843,7 @@ sub C_constant($self, $args, @< @items) {
                             default_type => $default_type,
                             types => $what, indent => $indent,
                             breakout => \@($i, $items)),
-                    < @by_length[$i]->@);
+                    < @by_length[$i]);
                 $body .= "    return $($subname)_$i ("
                     # Eg "aTHX_ "
                     . $self->C_constant_prefix_param($params)

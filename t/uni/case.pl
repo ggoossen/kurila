@@ -27,7 +27,7 @@ sub casetest {
     my $file = 'File::Spec'->catfile('File::Spec'->catdir('File::Spec'->updir,
         "lib", "unicore", "To"),
         "$base.pl");
-    my $simple = do $file or die $^EVAL_ERROR;
+    my $simple = evalfile $file or die $^EVAL_ERROR;
     my %simple;
     for my $i (split(m/\n/, $simple)) {
         my @($k, $v) =  split(' ', $i);

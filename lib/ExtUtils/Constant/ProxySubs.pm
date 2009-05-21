@@ -112,7 +112,7 @@ sub partition_names($self, $default_type, @< @items) {
             or %type_is_a_problem{?$item->{?type}}) {
             push @trouble, $item;
         } else {
-            push %found{+$item->{?type}}->@, $item;
+            push %found{+$item->{?type}}, $item;
         }
     }
     # use Data::Dumper; print Dumper \%found;
@@ -284,7 +284,7 @@ EOBOOT
     my %iterator;
 
     $found->{+''}
-    = \ map {\%(< $_->%, type=>'', invert_macro => 1)}, $notfound->@;
+    = map {\%(< $_->%, type=>'', invert_macro => 1)}, $notfound->@;
 
     foreach my $type (sort keys $found->%) {
         my $struct = %type_to_struct{?$type};
@@ -304,7 +304,7 @@ EOBOOT
 EOBOOT
 
 
-        foreach my $item ( $found->{$type}->@) {
+        foreach my $item ( $found->{$type}) {
             my @($name, $namelen, $value, $macro)
                 =  $self->name_len_value_macro($item);
 

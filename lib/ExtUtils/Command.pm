@@ -300,8 +300,6 @@ sub dos2unix {
                          return unless -r _;
                          return if -B _;
 
-                         local $^OUTPUT_RECORD_SEPARATOR = undef;
-
                          my $orig = $_;
                          my $temp = '.dos2unix_tmp';
                          open my $orig_fh, "<", $_ or do { warn "dos2unix can't open $_: $^OS_ERROR"; return };

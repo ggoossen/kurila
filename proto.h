@@ -832,11 +832,6 @@ PERL_CALLCONV void	Perl_do_vop(pTHX_ I32 optype, SV* sv, SV* left, SV* right)
 #define PERL_ARGS_ASSERT_DO_VOP	\
 	assert(sv); assert(left); assert(right)
 
-PERL_CALLCONV OP*	Perl_dofile(pTHX_ OP* term, I32 force_builtin, SV* location)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DOFILE	\
-	assert(term)
-
 PERL_CALLCONV I32	Perl_dowantarray(pTHX)
 			__attribute__warn_unused_result__;
 
@@ -3404,11 +3399,6 @@ PERL_CALLCONV char*	Perl_sv_uni_display(pTHX_ SV *dsv, SV *ssv, STRLEN pvlim, UV
 #define PERL_ARGS_ASSERT_SV_UNI_DISPLAY	\
 	assert(dsv); assert(ssv)
 
-PERL_CALLCONV void	Perl_vivify_ref(pTHX_ SV* sv, U32 to_what)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_VIVIFY_REF	\
-	assert(sv)
-
 PERL_CALLCONV I32	Perl_wait4pid(pTHX_ Pid_t pid, int* statusp, int flags)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_WAIT4PID	\
@@ -5052,7 +5042,7 @@ STATIC char*	S_scan_word(pTHX_ char *s, char *dest, STRLEN destlen, int allow_pa
 #define PERL_ARGS_ASSERT_SCAN_WORD	\
 	assert(s); assert(dest); assert(slp)
 
-STATIC char*	S_skipspace(pTHX_ char *s)
+STATIC char*	S_skipspace(pTHX_ char *s, bool continuous_line)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SKIPSPACE	\

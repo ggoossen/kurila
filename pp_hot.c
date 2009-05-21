@@ -215,11 +215,6 @@ PP(pp_padsv)
     if (PL_op->op_flags & OPf_MOD) {
 	if (PL_op->op_private & OPpLVAL_INTRO)
 	    SAVECLEARSV(PAD_SVl(PL_op->op_targ));
-	if (PL_op->op_private & OPpDEREF) {
-	    PUTBACK;
-	    vivify_ref(PAD_SVl(PL_op->op_targ), PL_op->op_private & OPpDEREF);
-	    SPAGAIN;
-	}
     }
     RETURN;
 }
@@ -594,8 +589,11 @@ PP(pp_aelemfast)
     const U32 lval = op_flags & OPf_MOD;
     const I32 elem = PL_op->op_private;
     if (!SvAVOK(av)) {
-	if (lval && ! SvOK(av))
+	if (lval && ! SvOK(av)) {
+	    if (SvREADONLY(av))
+		Perl_croak(aTHX_ PL_no_modify);
 	    sv_upgrade((SV*)av, SVt_PVAV);
+	}
 	else
 	    bad_arg(1, "array", PL_op_desc[PL_op->op_type], (SV*)av);
     }
@@ -697,10 +695,6 @@ PP(pp_print)
 	if (MARK <= SP)
 	    goto just_say_no;
 	else {
-	    if (PL_ors_sv && SvOK(PL_ors_sv))
-		if (!do_print(PL_ors_sv, fp)) /* $\ */
-		    goto just_say_no;
-
 	    if (IoFLAGS(io) & IOf_FLUSH)
 		if (PerlIO_flush(fp) == EOF)
 		    goto just_say_no;
@@ -942,24 +936,19 @@ PP(pp_helem)
 
     if ( ! SvHVOK(hv) ) {
 	if ( SvOK(hv) ) {
-	    Perl_croak(aTHX_ "Not a HASH");
+	    Perl_croak(aTHX_ "Expected a HASH not %s", Ddesc(hv));
 	}
 
 	/* hv must be "undef" */
 
 	if ( optional ) {
-	    if (PL_op->op_private & OPpDEREF) {
-		SV* sv = newSV(0);
-		vivify_ref(sv, PL_op->op_private & OPpDEREF);
-		XPUSHs(sv);
-		RETURN;
-	    }
-	    else
-		RETPUSHUNDEF;
+	    RETPUSHUNDEF;
 	}
 
 	if ( ! add )
 	    Perl_croak(aTHX_ "Can not use UNDEF as a HASH");
+	if (SvREADONLY(hv))
+	    Perl_croak(aTHX_ PL_no_modify);
 
 	sv_upgrade((SV*)hv, SVt_PVHV);
     }
@@ -974,14 +963,7 @@ PP(pp_helem)
     svp = he ? &HeVAL(he) : NULL;
     if ( ! svp || *svp == &PL_sv_undef ) {
 	if ( optional ) {
-	    if (PL_op->op_private & OPpDEREF) {
-		SV* sv = newSV(0);
-		vivify_ref(sv, PL_op->op_private & OPpDEREF);
-		XPUSHs(sv);
-		RETURN;
-	    }
-	    else
-		RETPUSHUNDEF;
+	    RETPUSHUNDEF;
 	}
 	if ( ! add )
 	    Perl_croak(aTHX_ "Missing hash key '%s'", SvPVX_const(keysv));
@@ -1002,8 +984,6 @@ PP(pp_helem)
 		save_helem(hv, keysv, svp);
 	}
     }
-    else if (PL_op->op_private & OPpDEREF)
-	vivify_ref(*svp, PL_op->op_private & OPpDEREF);
 
     sv = (svp ? *svp : &PL_sv_undef);
     /* This makes C<local $tied{foo} = $tied{foo}> possible.
@@ -1418,6 +1398,16 @@ PP(pp_entersub)
 	/* This path taken at least 75% of the time   */
 	dMARK;
 	register I32 items = SP - MARK;
+	if (CvCONST(cv)) {
+	    if (items)
+		Perl_croak(aTHX_ "constant subroutine does not expect any arguments");
+
+	    XPUSHs(cv_const_sv(cv));
+	    PUTBACK;
+
+	    LEAVE;
+	    return NORMAL;
+	}
 	AV* const padlist = CvPADLIST(cv);
 	PUSHBLOCK(cx, CXt_SUB, is_assignment ? MARK - 1 : MARK );
 	PUSHSUB(cx);
@@ -1615,20 +1605,24 @@ PP(pp_aelem)
     const OPFLAGS optional = PL_op->op_private & OPpELEM_OPTIONAL;
     SV *sv;
 
-    if ( ! SvAVOK(av) )
+    if ( ! SvOK(av) ) {
+	if (optional) {
+	    XPUSHs(&PL_sv_undef);
+	    RETURN;
+	}
+	if (!add)
+	    Perl_croak(aTHX_ "Can't take an element from a %s", Ddesc((SV*)av));
+	if (SvREADONLY(av))
+	    Perl_croak(aTHX_ PL_no_modify);
+	sv_upgrade(avTsv(av), SVt_PVAV);
+    }
+    else if ( ! SvAVOK(av) )
 	Perl_croak(aTHX_ "Can't take an element from a %s", Ddesc((SV*)av));
 
     svp = av_fetch(av, elem, add);
     if (!svp) {
 	if ( optional ) {
-	    if (PL_op->op_private & OPpDEREF) {
-		SV* sv = newSV(0);
-		vivify_ref(sv, PL_op->op_private & OPpDEREF);
-		XPUSHs(sv);
-		RETURN;
-	    }
-	    else
-		RETPUSHUNDEF;
+	    RETPUSHUNDEF;
 	}
 	if ( add )
 	    DIE(aTHX_ "Required array element %"IVdf" could not be created", elem);
@@ -1640,11 +1634,6 @@ PP(pp_aelem)
     if (lval && *svp == &PL_sv_undef)
 	svp = av_store(av, elem, newSV(0));
     sv = *svp;
-    if (PL_op->op_private & OPpDEREF && ! SvOK(sv)) {
-	vivify_ref(sv, PL_op->op_private & OPpDEREF);
-	XPUSHs(sv);
-	RETURN;
-    }
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {
 	    SV* src;
@@ -1662,31 +1651,6 @@ PP(pp_aelem)
     }
     PUSHs(sv);
     RETURN;
-}
-
-void
-Perl_vivify_ref(pTHX_ SV *sv, U32 to_what)
-{
-    PERL_ARGS_ASSERT_VIVIFY_REF;
-
-    if (!SvOK(sv)) {
-	if (SvREADONLY(sv))
-	    Perl_croak(aTHX_ PL_no_modify);
-	prepare_SV_for_RV(sv);
-	switch (to_what) {
-	case OPpDEREF_SV:
-	    SvRV_set(sv, newSV(0));
-	    break;
-	case OPpDEREF_AV:
-	    SvRV_set(sv, (SV*)newAV());
-	    break;
-	case OPpDEREF_HV:
-	    SvRV_set(sv, (SV*)newHV());
-	    break;
-	}
-	SvROK_on(sv);
-	SvSETMAGIC(sv);
-    }
 }
 
 PP(pp_method)

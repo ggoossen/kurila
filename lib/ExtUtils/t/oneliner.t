@@ -44,7 +44,7 @@ try_oneliner(q{print $^STDOUT, "foo'o", ' bar"ar'}, \@(),  q{foo'o bar"ar},  'qu
 try_oneliner(q{our $PATH = 'foo'; print $^STDOUT, $PATH},\@(), q{foo},   'dollar signs' );
 
 # switches?
-try_oneliner(q{print $^STDOUT, 'foo'}, \@('-l'),           "foo\n",       'switches' );
+try_oneliner(q{print $^STDOUT, $^INPUT_RECORD_SEPARATOR}, \@('-0'),           "\0",       'switches' );
 
 # XXX gotta rethink the newline test.  The Makefile does newline
 # escaping, then the shell.

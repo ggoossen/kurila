@@ -185,9 +185,9 @@ sub _handle_text($self, $text)          {
 #
 # And now directives (not targets)
 
-sub accept_directive_as_verbatim  { shift->_accept_directives('Verbatim', < @_) }
-sub accept_directive_as_data      { shift->_accept_directives('Data',     < @_) }
-sub accept_directive_as_processed { shift->_accept_directives('Plain',    < @_) }
+sub accept_directive_as_verbatim($self, @< @_)  { $self->_accept_directives('Verbatim', < @_) }
+sub accept_directive_as_data($self, @< @_)      { $self->_accept_directives('Data',     < @_) }
+sub accept_directive_as_processed($self, @< @_) { $self->_accept_directives('Plain',    < @_) }
 
 sub _accept_directives {
   my@($this, $type) =@( splice @_,0,2);
@@ -229,13 +229,13 @@ sub unaccept_directives {
 #
 # And now targets (not directives)
 
-sub accept_target         { shift->accept_targets(< @_)         } # alias
-sub accept_target_as_text { shift->accept_targets_as_text(< @_) } # alias
+sub accept_target($self, @< @_)         { $self->accept_targets(< @_)         } # alias
+sub accept_target_as_text($self, @< @_) { $self->accept_targets_as_text(< @_) } # alias
 
 
-sub accept_targets         { shift->_accept_targets('1', < @_) }
+sub accept_targets($self, @< @_)         { $self->_accept_targets('1', < @_) }
 
-sub accept_targets_as_text { shift->_accept_targets('force_resolve', < @_) }
+sub accept_targets_as_text($self, @< @_) { $self->_accept_targets('force_resolve', < @_) }
  # forces them to be processed, even when there's no ":".
 
 sub _accept_targets {
@@ -472,7 +472,7 @@ sub _complain_errata($self,$line,$complaint) {
     DEBUG +> 9 and print $^STDOUT, "Discarding erratum (at line $line) $complaint\n because no_errata_section is on.\n";
   } else {
     DEBUG +> 9 and print $^STDOUT, "Queuing erratum (at line $line) $complaint\n";
-    push $self->{+'errata'}->{+$line}->@, $complaint
+    push $self->{+'errata'}{+$line}, $complaint
       # for a report to be generated later!
   }
   return 1;

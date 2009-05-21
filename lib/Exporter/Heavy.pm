@@ -23,7 +23,7 @@ sub _rebuild_cache($pkg, $exports, $cache) {
     s/^&// foreach  $exports->@;
         $cache->{[ $exports->@]} = @(1) x nelems $exports->@;
     my $ok = \Symbol::fetch_glob("$($pkg)::EXPORT_OK")->*->@;
-    if ((nelems $ok->@)) {
+    if (nelems $ok->@) {
         s/^&// foreach  $ok->@;
             $cache->{[$ok->@]} = @(1) x nelems $ok->@;
     }
@@ -54,8 +54,8 @@ sub export($pkg, $callpkg, @< @imports) {
                     if ($spec eq 'DEFAULT'){
                         @names = $exports->@;
                     }
-                    elsif ($tagdata = $tagsref->{?$spec}) {
-                        @names = $tagdata->@;
+                    elsif (defined($tagdata = $tagsref->{?$spec})) {
+                        @names = $tagdata;
                     }
                     else {
                         warn qq["$spec" is not defined in \%$($pkg)::EXPORT_TAGS];
@@ -188,7 +188,7 @@ sub _push_tags($pkg, $var, $syms) {
     my @nontag = @( () );
     my $export_tags = \Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")->*->%;
     push(Symbol::fetch_glob("$($pkg)::$var")->*->@,
-        < @+: map { $export_tags->{?$_} ?? $export_tags->{?$_}->@
+        < @+: map { exists $export_tags->{$_} ?? $export_tags->{?$_}
             !! do { push(@nontag,$_); @($_) } },
         (nelems $syms->@) ?? $syms->@ !! keys $export_tags->%);
     if ((nelems @nontag) and $^WARNING) {

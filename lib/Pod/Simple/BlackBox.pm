@@ -265,7 +265,7 @@ sub _handle_encoding_line($self, $line) {
 
     my $e    = $1;
     my $orig = $e;
-    push  $self->{+'encoding_command_reqs'}->@, "=encoding $orig";
+    push  $self->{+'encoding_command_reqs'}, "=encoding $orig";
 
     my $enc_error;
 
@@ -325,7 +325,7 @@ sub _handle_encoding_line($self, $line) {
 
             $self->scream( $self->{?'line_count'}, $enc_error );
     }
-    push  $self->{+'encoding_command_statuses'}->@, $enc_error;
+    push  $self->{+'encoding_command_statuses'}, $enc_error;
 
     return '=encoding ALREADYDONE';
 }
@@ -344,11 +344,11 @@ sub _handle_encoding_second_level($self, $para) {
         # It's already been handled.  Check for errors.
         if(! $self->{?'encoding_command_statuses'} ) {
             DEBUG +> 2 and print $^STDOUT, " CRAZY ERROR: It wasn't really handled?!\n";
-        } elsif( $self->{'encoding_command_statuses'}->[-1] ) {
+        } elsif( $self->{'encoding_command_statuses'}[-1] ) {
                 $self->whine( $para->[1]->{?'start_line'},
                 sprintf "Couldn't do \%s: \%s",
-                $self->{'encoding_command_reqs'  }->[-1],
-                $self->{'encoding_command_statuses'}->[-1],
+                $self->{'encoding_command_reqs'  }[-1],
+                $self->{'encoding_command_statuses'}[-1],
             );
         } else {
             DEBUG +> 2 and print $^STDOUT, " (Yup, it was successfully handled already.)\n";
@@ -369,23 +369,22 @@ sub _handle_encoding_second_level($self, $para) {
 do {
     my $m = -321;   # magic line number
 
-    sub _gen_errata {
-        my $self = @_[0];
+    sub _gen_errata($self) {
         # Return 0 or more fake-o paragraphs explaining the accumulated
         #  errors on this document.
 
-        return @() unless $self->{?'errata'} and $self->{?'errata'}->%;
+        return @() unless $self->{?'errata'};
 
         my @out;
 
-        foreach my $line (sort {$a <+> $b}, keys $self->{?'errata'}->%) {
+        foreach my $line (sort {$a <+> $b}, keys $self->{?'errata'}) {
             push @out,
                 \@('=item', \%('start_line' => $m), "Around line $line:"),
                 < map( { \@('~Para', \%('start_line' => $m, '~cooked' => 1),
                   #['~Top', {'start_line' => $m},
                   $_
                     #]
-                    ) }, $self->{'errata'}->{$line}->@
+                    ) }, $self->{'errata'}{$line}
                 )
         ;
         }
@@ -426,7 +425,7 @@ do {
 ##
 ##############################################################################
 
-sub _ponder_paragraph_buffer {
+sub _ponder_paragraph_buffer($self) {
 
     # Para-token types as found in the buffer.
     #   ~Verbatim, ~Para, ~end, =head1..4, =for, =begin, =end,
@@ -446,7 +445,6 @@ sub _ponder_paragraph_buffer {
     #                   B, C, longdirname (TODO -- wha?), etc. for all directives
     # 
 
-    my $self = @_[0];
     my $paras;
     return unless nelems(($paras = $self->{?'paras'})->@);
     my $curr_open = ($self->{+'curr_open'} ||= \@());
@@ -1386,8 +1384,7 @@ sub _ponder_Data($self,$para) {
 
 ###########################################################################
 
-sub _traverse_treelet_bit {  # for use only by the routine above
-    my@($self, $name) =@( splice @_,0,2);
+sub _traverse_treelet_bit($self, $name, @< @_) {  # for use only by the routine above
 
     my $scratch;
     $self->_handle_element_start(($scratch=$name), shift @_);
@@ -1406,8 +1403,7 @@ sub _traverse_treelet_bit {  # for use only by the routine above
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub _closers_for_all_curr_open {
-    my $self = @_[0];
+sub _closers_for_all_curr_open($self) {
     my @closers;
     foreach my $still_open ( (  $self->{?'curr_open'} || return  )->@) {
         my @copy = $still_open->@;
@@ -1753,13 +1749,13 @@ sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space) 
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub text_content_of_treelet {  # method: $parser->text_content_of_treelet($lol)
-    return stringify_lol(@_[1]);
+sub text_content_of_treelet(_, $lol) {  # method: $parser->text_content_of_treelet($lol)
+    return stringify_lol($lol);
 }
 
-sub stringify_lol {  # function: stringify_lol($lol)
+sub stringify_lol($lol) {  # function: stringify_lol($lol)
     my $string_form = '';
-    _stringify_lol( @_[0] => \$string_form );
+    _stringify_lol( $lol => \$string_form );
     return $string_form;
 }
 
@@ -1777,8 +1773,8 @@ sub _stringify_lol($lol, $to) {;
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub _dump_curr_open { # return a string representation of the stack
-    my $curr_open = @_[0]->{?'curr_open'};
+sub _dump_curr_open($self) { # return a string representation of the stack
+    my $curr_open = $self->{?'curr_open'};
 
     return '[empty]' unless (nelems $curr_open->@);
     return join '; ', map {;
@@ -1809,10 +1805,9 @@ my %pretty_form = %(
             '#' => '\#',
     );
 
-sub pretty { # adopted from Class::Classless
+sub pretty(@< @stuff) { # adopted from Class::Classless
     # Not the most brilliant routine, but passable.
     # Don't give it a cyclic data structure!
-    my @stuff = @_; # copy
     my $x;
     my $out =
         # join ",\n" .

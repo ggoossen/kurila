@@ -15,13 +15,16 @@ still not perl
 
 still not perl
 
-#!/some/path/that/leads/to/perl -l
+#!/some/path/that/leads/to/perl -0
 
-print $^STDOUT, "1..4";
-if (-f 'run/switchx.aux') {
-    print $^STDOUT, "ok 1";
+print $^STDOUT, "1..4\n";
+if ($^INPUT_RECORD_SEPARATOR != '\0') {
+    print $^STDOUT, "not ";
 }
-print $^STDOUT, "ok 2";
+if (-f 'run/switchx.aux') {
+    print $^STDOUT, "ok 1\n";
+}
+print $^STDOUT, "ok 2\n";
 # other tests are in switchx2.aux
 
 __END__

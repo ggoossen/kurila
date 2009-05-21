@@ -87,8 +87,6 @@ EXPECT
 ########
 eval 'sub bar {print $^STDOUT, "In bar"}';
 ########
-system q[./perl -ne 'print \$^STDOUT, $_ if eof' /dev/null] unless $^OS_NAME eq 'MacOS'
-########
 our $file;
 chop($file = ~< *DATA);
 ########
@@ -177,16 +175,6 @@ check <b>
 init <c>
 end <d>
 argv <e>
-########
--l
-# fdopen from a system descriptor to a system descriptor used to close
-# the former.
-open $^STDERR, '>&=', $^STDOUT or die $^OS_ERROR;
-print $^STDOUT, fileno $^STDOUT or die $^OS_ERROR;
-print $^STDOUT, fileno $^STDERR or die $^OS_ERROR;
-EXPECT
-1
-2
 ########
 # TODO
 package X;

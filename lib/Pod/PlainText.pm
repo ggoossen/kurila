@@ -322,8 +322,7 @@ sub cmd_over {
 }
 
 # End a list.
-sub cmd_back {
-    my $self = shift;
+sub cmd_back($self, ...) {
     $self->%{+MARGIN} = pop  $self->%{INDENTS}->@;
     unless (defined $self->%{?MARGIN}) {
         warn "Unmatched =back";
@@ -355,8 +354,7 @@ sub cmd_begin {
 
 # End a block for a particular translator.  We assume that all =begin/=end
 # pairs are properly closed.
-sub cmd_end {
-    my $self = shift;
+sub cmd_end($self, ...) {
     $self->%{+EXCLUDE} = 0;
     $self->%{+VERBATIM} = 0;
 }    

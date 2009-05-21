@@ -84,15 +84,13 @@ sub remove {
     @(msgctl($self->$,IPC_RMID,0), undef $self->$)[0];
 }
 
-sub rcv {
-    (nelems @_) +<= 5 && (nelems @_) +>= 3 or croak '$msg->rcv( BUF, LEN, TYPE, FLAGS )';
-    my $self = shift;
-    my $buf = "";
-    msgrcv($self->$,$buf,@_[1],@_[2] || 0, @_[3] || 0) or
+sub rcv($self, $buf, $len, ?$type, ?$flags) {
+    my $rcvbuf = "";
+    msgrcv($self->$,$rcvbuf, $len, $type || 0, $flags || 0) or
         return;
     my $type;
-    @($type,@_[0]) = @: unpack("l! a*",$buf);
-    $type;
+    @($type, $buf->$) = @: unpack("l! a*",$rcvbuf);
+    return $type;
 }
 
 sub snd {

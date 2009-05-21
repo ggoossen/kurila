@@ -19,9 +19,9 @@ my $mandirs = ! ! config_value("man1direxp") + ! ! config_value("man3direxp");
 my $ei = bless( \%(), 'ExtUtils::Installed' );
 
 # Make sure meta info is available
-$ei->{+':private:'}->{+Config} = \%:<
-    @+: map { @($_ => config_value($_)) }, config_keys();
-$ei->{':private:'}->{+INC} = \$^INCLUDE_PATH;
+$ei->{+':private:'}{+Config} = %+:
+    map { %($_ => config_value($_)) }, config_keys();
+$ei->{':private:'}{+INC} = $^INCLUDE_PATH;
 
 # _is_prefix
 ok( $ei->_is_prefix('foo/bar', 'foo'),
@@ -98,12 +98,12 @@ my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
 # Do the same thing as the last block, but with overrides for
 # %Config and $^INCLUDE_PATH.
 do {
-    my $config_override = \%:<
-            @+: map { @: $_ => Config::config_value($_) },
+    my $config_override = %+:
+            map { %: $_ => Config::config_value($_) },
                 Config::config_keys();
-    $config_override->{+archlibexp} = cwd();
-    $config_override->{+sitearchexp} = $fake_mod_dir;
-    $config_override->{+version} = 'fake_test_version';
+    $config_override{+archlibexp} = cwd();
+    $config_override{+sitearchexp} = $fake_mod_dir;
+    $config_override{+version} = 'fake_test_version';
 
     my @inc_override = @(< $^INCLUDE_PATH, $fake_mod_dir);
 
@@ -112,13 +112,13 @@ do {
         'inc_override' => \@inc_override,
         );
     isa_ok( $realei, 'ExtUtils::Installed' );
-    isa_ok( $realei->{Perl}->{?packlist}, 'ExtUtils::Packlist' );
-    is( $realei->{Perl}->{?version}, 'fake_test_version',
+    isa_ok( $realei->{Perl}{?packlist}, 'ExtUtils::Packlist' );
+    is( $realei->{Perl}{?version}, 'fake_test_version',
         'new(config_override => HASH) overrides %Config' );
 
     ok( exists $realei->{FakeMod}, 'new() with overrides should find modules with .packlists');
-    isa_ok( $realei->{FakeMod}->{?packlist}, 'ExtUtils::Packlist' );
-    is( $realei->{FakeMod}->{?version}, '1.1.1',
+    isa_ok( $realei->{FakeMod}{?packlist}, 'ExtUtils::Packlist' );
+    is( $realei->{FakeMod}{?version}, '1.1.1',
         '... should find version in modules' );
 };
 
@@ -130,15 +130,15 @@ do {
         'extra_libs' => \@( cwd() ),
         );
     isa_ok( $realei, 'ExtUtils::Installed' );
-    isa_ok( $realei->{Perl}->{?packlist}, 'ExtUtils::Packlist' );
+    isa_ok( $realei->{Perl}{?packlist}, 'ExtUtils::Packlist' );
     ok( exists $realei->{FakeMod}, 
         'new() with extra_libs should find modules with .packlists');
 
     #{ use Data::Dumper; local $realei->{':private:'}{Config};
     #  warn Dumper($realei); }
 
-    isa_ok( $realei->{FakeMod}->{?packlist}, 'ExtUtils::Packlist' );
-    is( $realei->{FakeMod}->{?version}, '1.1.1',
+    isa_ok( $realei->{FakeMod}{?packlist}, 'ExtUtils::Packlist' );
+    is( $realei->{FakeMod}{?version}, '1.1.1',
         '... should find version in modules' );
 };
 

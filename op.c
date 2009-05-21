@@ -2626,35 +2626,6 @@ Perl_vload_module(pTHX_ U32 flags, SV *name, SV *ver, va_list *args)
 }
 
 OP *
-Perl_dofile(pTHX_ OP *term, I32 force_builtin, SV* location)
-{
-    dVAR;
-    OP *doop;
-    GV *gv = NULL;
-
-    PERL_ARGS_ASSERT_DOFILE;
-
-    if (!force_builtin) {
-	gv = gv_fetchpvs("do", GV_NOTQUAL, SVt_PVCV);
-	if (!(gv && GvCVu(gv) && GvIMPORTED_CV(gv))) {
-	    GV * const * const gvp = (GV**)hv_fetchs(PL_globalstash, "do", FALSE);
-	    gv = gvp ? *gvp : NULL;
-	}
-    }
-
-    if (gv && GvCVu(gv) && GvIMPORTED_CV(gv)) {
-	doop = ck_subr(newUNOP(OP_ENTERSUB, OPf_STACKED,
-			       append_elem(OP_LIST, term,
-					   scalar(newUNOP(OP_RV2CV, 0,
-							  newGVOP(OP_GV, 0, gv, location), location))), location));
-    }
-    else {
-	doop = newUNOP(OP_DOFILE, 0, scalar(term), location);
-    }
-    return doop;
-}
-
-OP *
 Perl_newSLICEOP(pTHX_ OPFLAGS flags, OP *subscript, OP *listval)
 {
     return newBINOP(OP_LSLICE, flags, subscript,
@@ -3764,7 +3735,7 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 
     if (CvANON(cv)) {
 	assert(!CvCONST(cv));
-	if (proto && proto->op_type == OP_STUB && op_const_sv(block, cv))
+	if (CvN_MINARGS(cv) == 0 && CvN_MAXARGS(cv) == 0 && op_const_sv(block, cv))
 	    CvCONST_on(cv);
     }
 
@@ -4169,6 +4140,7 @@ Perl_ck_delete(pTHX_ OP *o)
 	    yyerror(Perl_form(aTHX_ "%s argument is not a HASH or ARRAY element or slice",
 			      OP_DESC(o)));
 	}
+	o->op_private |= kid->op_private & OPpELEM_OPTIONAL;
 	op_null(kid);
     }
     o = op_mod_assign(o,

@@ -299,7 +299,7 @@ sub _store_fd {
     # Call C routine nstore or pstore, depending on network order
     try { $ret = &$xsptr($file, $self) };
     logcroak $^EVAL_ERROR if $^EVAL_ERROR;
-    local $^OUTPUT_RECORD_SEPARATOR = undef; $file->print('');	# Autoflush the file if wanted
+    $file->print('');	# Autoflush the file if wanted
     $^EVAL_ERROR = $da;
     return $ret ?? $ret !! undef;
 }
@@ -332,7 +332,7 @@ sub _freeze {
     my $da = $^EVAL_ERROR;				# Don't mess if called from exception handler
     my $ret;
     # Call C routine mstore or net_mstore, depending on network order
-    try { $ret = &$xsptr($self) };
+    try { $ret = $xsptr->($self) };
     logcroak $^EVAL_ERROR if $^EVAL_ERROR;
     $^EVAL_ERROR = $da;
     return $ret ?? $ret !! undef;

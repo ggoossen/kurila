@@ -277,7 +277,6 @@ pR	|Off_t	|do_tell	|NN GV* gv
 p	|UV	|do_vecget	|NN SV* sv|I32 offset|I32 size
 p	|void	|do_vecset
 p	|void	|do_vop		|I32 optype|NN SV* sv|NN SV* left|NN SV* right
-p	|OP*	|dofile		|NN OP* term|I32 force_builtin|NULLOK SV* location
 ApR	|I32	|dowantarray
 Ap	|void	|dump_all
 Ap	|void	|dump_eval
@@ -944,7 +943,6 @@ Ap	|char*	|uvchr_to_utf8_flags	|NN char *d|UV uv|UV flags
 Apd	|char*	|uvuni_to_utf8_flags	|NN char *d|UV uv|UV flags
 Apd	|char*	|pv_uni_display	|NN SV *dsv|NN const char *spv|STRLEN len|STRLEN pvlim|UV flags
 ApdR	|char*	|sv_uni_display	|NN SV *dsv|NN SV *ssv|STRLEN pvlim|UV flags
-p	|void	|vivify_ref	|NN SV* sv|U32 to_what
 p	|I32	|wait4pid	|Pid_t pid|NN int* statusp|int flags
 p	|U32	|parse_unicode_opts|NN const char **popt
 Ap	|U32	|seed
@@ -1442,7 +1440,7 @@ sR	|char*	|scan_str	|NN char *start|int keep_quoted|int keep_delims|NN yy_str_in
 sR	|char*	|scan_subst	|NN char *start
 s	|char*	|scan_word	|NN char *s|NN char *dest|STRLEN destlen \
 				|int allow_package|NN STRLEN *slp
-sR	|char*	|skipspace	|NN char *s
+sR	|char*	|skipspace	|NN char *s|bool continuous_line
 sR	|char*	|swallow_bom	|NN char *s
 s	|void	|checkcomma	|NN const char *s|NN const char *name \
 				|NN const char *what

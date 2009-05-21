@@ -390,19 +390,16 @@ sub truncate {
     truncate(@_[0], @_[1]);
 }
 
-sub read {
-    (nelems @_) == 3 || (nelems @_) == 4 or die 'usage: $io->read(BUF, LEN [, OFFSET])';
-    read(@_[0], @_[1], @_[2], @_[?3] || 0);
+sub read($io, $bufref, $len, ?$offset) {
+    read($io, $bufref->$, $len, $offset || 0);
 }
 
-sub sysread {
-    (nelems @_) == 3 || (nelems @_) == 4 or die 'usage: $io->sysread(BUF, LEN [, OFFSET])';
-    sysread(@_[0], @_[1], @_[2], @_[?3] || 0);
+sub sysread($io, $bufref, $len, ?$offset) {
+    sysread($io, $bufref->$, $len, $offset || 0);
 }
 
 sub write {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])';
-          local($^OUTPUT_RECORD_SEPARATOR) = "";
     @_[+2] = length(@_[1]) unless defined @_[?2];
     print  @_[0]  ,substr(@_[1], @_[?3] || 0, @_[2]);
 }
@@ -425,8 +422,7 @@ sub stat {
 ## State modification functions.
 ##
 
-sub autoflush {
-    my $fh = shift;
+sub autoflush($fh, @< @_) {
     my $prev = iohandle::output_autoflush($fh);
     iohandle::output_autoflush($fh, @_ ?? @_[0] !! 1);
     return $prev;
@@ -440,15 +436,7 @@ sub output_field_separator {
     $prev;
 }
 
-sub output_record_separator {
-    warn "output_record_separator is not supported on a per-handle basis"
-        if ref(@_[0]);
-    my $prev = $^OUTPUT_RECORD_SEPARATOR;
-    $^OUTPUT_RECORD_SEPARATOR = @_[1] if (nelems @_) +> 1;
-    $prev;
-}
-
-sub input_record_separator {
+sub input_record_separator(@< @_) {
     warn "input_record_separator is not supported on a per-handle basis"
         if ref(@_[0]);
     my $prev = $^INPUT_RECORD_SEPARATOR;

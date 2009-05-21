@@ -289,7 +289,6 @@
 #define do_vecget		Perl_do_vecget
 #define do_vecset		Perl_do_vecset
 #define do_vop			Perl_do_vop
-#define dofile			Perl_dofile
 #endif
 #define dowantarray		Perl_dowantarray
 #define dump_all		Perl_dump_all
@@ -996,7 +995,6 @@
 #define pv_uni_display		Perl_pv_uni_display
 #define sv_uni_display		Perl_sv_uni_display
 #ifdef PERL_CORE
-#define vivify_ref		Perl_vivify_ref
 #define wait4pid		Perl_wait4pid
 #define parse_unicode_opts	Perl_parse_unicode_opts
 #endif
@@ -1931,7 +1929,6 @@
 #define pp_delete		Perl_pp_delete
 #define pp_die			Perl_pp_die
 #define pp_divide		Perl_pp_divide
-#define pp_dofile		Perl_pp_dofile
 #define pp_dor			Perl_pp_dor
 #define pp_dorassign		Perl_pp_dorassign
 #define pp_dotdotdot		Perl_pp_dotdotdot
@@ -1957,6 +1954,7 @@
 #define pp_epwent		Perl_pp_epwent
 #define pp_eq			Perl_pp_eq
 #define pp_eservent		Perl_pp_eservent
+#define pp_evalfile		Perl_pp_evalfile
 #define pp_exec			Perl_pp_exec
 #define pp_exists		Perl_pp_exists
 #define pp_exit			Perl_pp_exit
@@ -2477,7 +2475,6 @@
 #define do_vecget(a,b,c)	Perl_do_vecget(aTHX_ a,b,c)
 #define do_vecset()		Perl_do_vecset(aTHX)
 #define do_vop(a,b,c,d)		Perl_do_vop(aTHX_ a,b,c,d)
-#define dofile(a,b,c)		Perl_dofile(aTHX_ a,b,c)
 #endif
 #define dowantarray()		Perl_dowantarray(aTHX)
 #define dump_all()		Perl_dump_all(aTHX)
@@ -3181,7 +3178,6 @@
 #define pv_uni_display(a,b,c,d,e)	Perl_pv_uni_display(aTHX_ a,b,c,d,e)
 #define sv_uni_display(a,b,c,d)	Perl_sv_uni_display(aTHX_ a,b,c,d)
 #ifdef PERL_CORE
-#define vivify_ref(a,b)		Perl_vivify_ref(aTHX_ a,b)
 #define wait4pid(a,b,c)		Perl_wait4pid(aTHX_ a,b,c)
 #define parse_unicode_opts(a)	Perl_parse_unicode_opts(aTHX_ a)
 #endif
@@ -3639,7 +3635,7 @@
 #define scan_str(a,b,c,d)	S_scan_str(aTHX_ a,b,c,d)
 #define scan_subst(a)		S_scan_subst(aTHX_ a)
 #define scan_word(a,b,c,d,e)	S_scan_word(aTHX_ a,b,c,d,e)
-#define skipspace(a)		S_skipspace(aTHX_ a)
+#define skipspace(a,b)		S_skipspace(aTHX_ a,b)
 #define swallow_bom(a)		S_swallow_bom(aTHX_ a)
 #define checkcomma(a,b,c)	S_checkcomma(aTHX_ a,b,c)
 #define force_ident(a,b)	S_force_ident(aTHX_ a,b)
@@ -4127,7 +4123,6 @@
 #define pp_delete()		Perl_pp_delete(aTHX)
 #define pp_die()		Perl_pp_die(aTHX)
 #define pp_divide()		Perl_pp_divide(aTHX)
-#define pp_dofile()		Perl_pp_dofile(aTHX)
 #define pp_dor()		Perl_pp_dor(aTHX)
 #define pp_dorassign()		Perl_pp_dorassign(aTHX)
 #define pp_dotdotdot()		Perl_pp_dotdotdot(aTHX)
@@ -4153,6 +4148,7 @@
 #define pp_epwent()		Perl_pp_epwent(aTHX)
 #define pp_eq()			Perl_pp_eq(aTHX)
 #define pp_eservent()		Perl_pp_eservent(aTHX)
+#define pp_evalfile()		Perl_pp_evalfile(aTHX)
 #define pp_exec()		Perl_pp_exec(aTHX)
 #define pp_exists()		Perl_pp_exists(aTHX)
 #define pp_exit()		Perl_pp_exit(aTHX)

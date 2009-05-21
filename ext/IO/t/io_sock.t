@@ -172,7 +172,7 @@ $port = $server->sockport;
 
 if (my $pid = fork()) {
     my $buf;
-    $server->recv($buf, 100);
+    $server->recv(\$buf, 100);
     print $^STDOUT, $buf;
 } elsif (defined($pid)) {
     #child

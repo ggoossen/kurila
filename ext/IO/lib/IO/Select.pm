@@ -31,22 +31,21 @@ sub new
     $vec;
 }
 
-sub add
+sub add($self, @< @_)
 {
-    shift->_update('add', < @_);
+    $self->_update('add', < @_);
 }
 
 
-sub remove
+sub remove($self, @< @_)
 {
-    shift->_update('remove', < @_);
+    $self->_update('remove', < @_);
 }
 
 
-sub exists
+sub exists($vec, $file)
 {
-    my $vec = shift;
-    my $fno = $vec->_fileno(shift);
+    my $fno = $vec->_fileno($file);
     return undef unless defined $fno;
     $vec->[?$fno + FIRST_FD];
 }

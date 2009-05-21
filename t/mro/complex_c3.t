@@ -84,7 +84,7 @@ do {
 
         package Test::K; use mro 'c3';
     use base < qw/Test::J Test::I/;
-    sub testmeth { shift->SUPER::testmeth() }
+    sub testmeth($self) { $self->SUPER::testmeth() }
 };
 
 ok(eq_array(

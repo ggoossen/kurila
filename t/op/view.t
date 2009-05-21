@@ -2,7 +2,7 @@
 
 BEGIN { require "./test.pl" }
 
-plan tests => 11;
+plan tests => 14;
 
 is dump::view('foo'), q|'foo'|;
 is dump::view("'foo"), q|"'foo"|;
@@ -20,3 +20,10 @@ do {
 };
 like dump::view(\"foobar"), qr/SCALAR[(]0x\w*[)]/;
 
+is dump::view(@: 'aap'), qq|\@: 'aap'| ;
+is dump::view(@: 'aap', 'noot'), qq|\@: 'aap'\n   'noot'| ;
+is dump::view(@: 'aap', @: 'noot', 'mies') . "\n", <<'DUMP' ;
+@: 'aap'
+   @: 'noot'
+      'mies'
+DUMP

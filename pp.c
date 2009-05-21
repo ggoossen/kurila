@@ -181,10 +181,6 @@ PP(pp_rv2sv)
 /* 	    Perl_croak(aTHX_ PL_no_localize_ref); */
 	}
     }
-    else if (op_flags & OPf_MOD) {
-	if (PL_op->op_private & OPpDEREF)
-	    vivify_ref(sv, PL_op->op_private & OPpDEREF);
-    }
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {
 	    SV* src;
@@ -3410,8 +3406,13 @@ PP(pp_delete)
 	    else
 		DIE(aTHX_ "panic: avhv_delete no longer supported");
 	}
+	else if (!SvOK(hv)) {
+	    if (!(PL_op->op_private & OPpELEM_OPTIONAL))
+		DIE(aTHX_ "%s expects a HASH not %s", OP_DESC(PL_op), Ddesc(hv));
+	    sv = NULL;
+	}
 	else
-	    DIE(aTHX_ "Not a HASH reference");
+	    DIE(aTHX_ "%s expects a HASH not %s", OP_DESC(PL_op), Ddesc(hv));
 	if (!sv)
 	    sv = &PL_sv_undef;
 	if (!discard)
@@ -3446,6 +3447,9 @@ PP(pp_exists)
 		RETPUSHYES;
 	}
     }
+    else if ( ! SvOK(sv) ) {
+	RETPUSHNO;
+    }
     else {
 	DIE(aTHX_ "exists expected an ARRAY or a HASH but got a %s", Ddesc(sv));
     }
@@ -3460,15 +3464,33 @@ PP(pp_hslice)
     const OPFLAGS op_flags = PL_op->op_flags;
     register const I32 lval = (op_flags & OPf_MOD);
     const bool localizing = PL_op->op_private & OPpLVAL_INTRO;
+    const bool add = (PL_op->op_private & OPpELEM_ADD) != 0;
+    const bool optional = (PL_op->op_private & OPpELEM_OPTIONAL) != 0;
     bool other_magic = FALSE;
     SV ** sliceitem;
     SV ** slicemax;
 
-    if ( ! SvHVOK(hv) )
-	Perl_croak(aTHX_ "Not a HASH");
-
     if ( ! SvAVOK(slice) )
-	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(avTsv(slice)));
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s",
+	    OP_DESC(PL_op), Ddesc(avTsv(slice)));
+
+    if ( ! SvOK(hv) ) {
+	if (optional) {
+	    AV* res = newAV();
+	    int i;
+	    for (i=SvLEN(res); i>=0; --i)
+		av_push(res, newSV(0));
+	    mXPUSHs(avTsv(res));
+	    RETURN;
+	}
+	if (!add)
+	    Perl_croak(aTHX_ "%s expects a HASH but got UNDEF", OP_DESC(PL_op));
+	if (SvREADONLY(hv))
+	    Perl_croak(aTHX_ PL_no_modify);
+	sv_upgrade(hv, SVt_PVHV);
+    }
+    else if ( ! SvHVOK(hv) )
+	Perl_croak(aTHX_ "Not a HASH");
 
     if (op_flags & OPf_ASSIGN) {
 	SV* newv;
@@ -4238,8 +4260,14 @@ PP(pp_push)
     do_arg_check(MARK);
 
     if ( ! SvAVOK(ary) ) {
-	Perl_croak(aTHX_ "First argument to %s must be an ARRAY not %s", 
-	    OP_DESC(PL_op), Ddesc(avTsv(ary)));
+	if ( SvOK(ary) )
+	    Perl_croak(aTHX_ "First argument to %s must be an ARRAY not %s", 
+		OP_DESC(PL_op), Ddesc(avTsv(ary)));
+
+	if (SvREADONLY(ary))
+	    Perl_croak(aTHX_ PL_no_modify);
+
+	sv_upgrade(ary, SVt_PVAV);
     }
 
     {
@@ -4284,7 +4312,13 @@ PP(pp_unshift)
     dVAR; dSP; dMARK; dORIGMARK;
     register AV *ary = (AV*)*++MARK;
 
-    do_arg_check(MARK);
+    if ( ! SvAVOK(ary) ) {
+	if ( SvOK(ary) )
+	    Perl_croak(aTHX_ "Can't %s a %s", OP_DESC(PL_op), Ddesc(ary));
+	if (SvREADONLY(ary))
+	    Perl_croak(aTHX_ PL_no_modify);
+	sv_upgrade(ary, SVt_PVAV);
+    }
 
     {
 	register I32 i = 0;

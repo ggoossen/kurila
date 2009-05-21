@@ -65,16 +65,16 @@ is ($refref->{"key"}->[2]->[0], 3);
 
 # Test to see if anonymous subarrays spring into existence.
 
-@spring[+5]->[+0] = 123;
-@spring[5]->[+1] = 456;
-push(@spring[5]->@, 789);
-is (join(':', @spring[5]->@), "123:456:789");
+@spring[+5][+0] = 123;
+@spring[5][+1] = 456;
+push(@spring[5], 789);
+is (join(':', @spring[5]), "123:456:789");
 
 # Test to see if anonymous subhashes spring into existence.
 
-%spring2{+"foo"}->@ = @(1,2,3);
-%spring2{"foo"}->[+3] = 4;
-is (join(':', %spring2{?"foo"}->@), "1:2:3:4");
+%spring2{+"foo"} = @(1,2,3);
+%spring2{"foo"}[+3] = 4;
+is (join(':', %spring2{?"foo"}), "1:2:3:4");
 
 # Test references to subroutines.
 
@@ -249,15 +249,15 @@ is ($a, 2);
 
 foreach my $lexical (@('', 'my $a; ')) {
     my $expect = "pass\n";
-    my $result = runperl (switches => \@('-wl'), stderr => 1,
-        prog => $lexical . 'BEGIN {$a = \q{pass}}; $a = $a->$; print $^STDOUT, $a');
+    my $result = runperl (switches => \@('-w'), stderr => 1,
+        prog => $lexical . 'BEGIN {$a = \q{pass}}; $a = $a->$; print $^STDOUT, $a, qq[\n]');
 
     is ($^CHILD_ERROR, 0);
     is ($result, $expect);
 }
 
 $test = curr_test();
-sub x::DESTROY {print $^STDOUT, "ok ", $test + shift->[0], "\n"}
+sub x::DESTROY($self) {print $^STDOUT, "ok ", $test + $self->[0], "\n"}
 do { my $a1 = bless \@(3),"x";
     my $a2 = bless \@(2),"x";
     do { my $a3 = bless \@(1),"x";
@@ -267,8 +267,8 @@ do { my $a1 = bless \@(3),"x";
 };
 curr_test($test+4);
 
-is (runperl (switches=> \@('-l'),
-    prog=> 'print $^STDOUT, 1; print $^STDOUT, qq-*$^INPUT_RECORD_SEPARATOR*-;print $^STDOUT, 1;'),
+is (runperl (
+    prog=> 'print $^STDOUT, 1, qq[\n]; print $^STDOUT, qq-*$^INPUT_RECORD_SEPARATOR*-, qq[\n];print $^STDOUT, 1, qq[\n];'),
     "1\n*\n*\n1\n");
 
 # bug #22719

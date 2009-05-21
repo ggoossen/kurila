@@ -91,9 +91,9 @@ my $x = "ok $i\n";
 write_file("bleah.do", <<EOT);
 our \$x = "not ok $i\\n";
 EOT
-do "bleah.do" or die $^EVAL_ERROR;
+evalfile "bleah.do" or die $^EVAL_ERROR;
 dofile();
-sub dofile { do "bleah.do" or die $^EVAL_ERROR; };
+sub dofile { evalfile "bleah.do" or die $^EVAL_ERROR; };
 print $^STDOUT, $x;
 
 # Test for fix of RT #24404 : "require $scalar" may load a directory

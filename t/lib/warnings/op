@@ -420,7 +420,7 @@ print $^STDOUT, "in mainline\n";
 use abc;
 delete $^INCLUDED{"abc.pm"};
 require abc;
-do "abc.pm";
+evalfile "abc.pm";
 EXPECT
 in begin
 in mainline
@@ -453,7 +453,7 @@ print $^STDOUT, "in mainline\n";
 1;
 --FILE--
 require abc;
-do "abc.pm";
+evalfile "abc.pm";
 EXPECT
 in begin
 in mainline

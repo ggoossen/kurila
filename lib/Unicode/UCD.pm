@@ -198,8 +198,7 @@ my @CharinfoRanges = @(
   \@( 0x100000, 0x10FFFD, undef,   undef  ),
     );
 
-sub charinfo {
-    my $arg  = shift;
+sub charinfo($arg) {
     my $code = _getcode($arg);
     croak __PACKAGE__, "::charinfo: unknown code '$arg'"
         unless defined $code;
@@ -219,7 +218,7 @@ sub charinfo {
     openunicode(\$UNICODEFH, "UnicodeData.txt");
     if (defined $UNICODEFH) {
         use Search::Dict v1.02;
-        if (look($UNICODEFH, "$hexk;", \%( xfrm => sub { @_[0] =~ m/^([^;]+);(.+)/; sprintf "\%06X;$2", hex($1) } ) ) +>= 0) {
+        if (look($UNICODEFH, "$hexk;", \%( xfrm => sub ($v) { $v =~ m/^([^;]+);(.+)/; sprintf "\%06X;$2", hex($1) } ) ) +>= 0) {
             my $line = ~< $UNICODEFH;
             return unless defined $line;
             chomp $line;
@@ -241,7 +240,7 @@ sub charinfo {
                     %prop{+name} = $rname;
                     %prop{+decomposition} = $rdec;
                 }
-                return \%prop;
+                return %prop;
             }
         }
     }
@@ -254,16 +253,16 @@ sub _search($table, $lo, $hi, $code) {
 
     my $mid = int(($lo+$hi) / 2);
 
-    if ($table->[$mid]->[0] +< $code) {
-        if ($table->[$mid]->[1] +>= $code) {
-            return $table->[$mid]->[2];
+    if ($table[$mid][0] +< $code) {
+        if ($table[$mid][1] +>= $code) {
+            return $table[$mid][2];
         } else {
             _search($table, $mid + 1, $hi, $code);
         }
-    } elsif ($table->[$mid]->[0] +> $code) {
+    } elsif ($table[$mid][0] +> $code) {
         _search($table, $lo, $mid - 1, $code);
     } else {
-        return $table->[$mid]->[2];
+        return $table[$mid][2];
     }
 }
 
@@ -271,7 +270,7 @@ sub charinrange($range, $arg) {
     my $code = _getcode($arg);
     croak __PACKAGE__, "::charinrange: unknown code '$arg'"
         unless defined $code;
-    _search($range, 0, ((nelems $range->@)-1), $code);
+    _search($range, 0, ((nelems $range)-1), $code);
 }
 
 =head2 charblock
@@ -310,9 +309,9 @@ sub _charblocks {
             while ( ~< $BLOCKSFH) {
                 if (m/^([0-9A-F]+)\.\.([0-9A-F]+);\s+(.+)/) {
                     my @($lo, $hi) = @(hex($1), hex($2));
-                    my $subrange = \@( $lo, $hi, $3 );
+                    my $subrange = @( $lo, $hi, $3 );
                     push @BLOCKS, $subrange;
-                    push %BLOCKS{+$3}->@, $subrange;
+                    push %BLOCKS{+$3}, $subrange;
                 }
             }
             close($BLOCKSFH);
@@ -328,10 +327,10 @@ sub charblock {
     my $code = _getcode($arg);
 
     if (defined $code) {
-        _search(\@BLOCKS, 0, ((nelems @BLOCKS)-1), $code);
+        _search(@BLOCKS, 0, ((nelems @BLOCKS)-1), $code);
     } else {
         if (exists %BLOCKS{$arg}) {
-            return dclone %BLOCKS{?$arg};
+            return %BLOCKS{?$arg};
         } else {
             return;
         }
@@ -374,13 +373,13 @@ sub _charscripts {
                     my @($lo, $hi) = @(hex($1), $2 ?? hex($2) !! hex($1));
                     my $script = lc($3);
                     $script =~ s/\b(\w)/$(uc($1))/g;
-                    my $subrange = \@( $lo, $hi, $script );
+                    my $subrange = @( $lo, $hi, $script );
                     push @SCRIPTS, $subrange;
-                    push %SCRIPTS{+$script}->@, $subrange;
+                    push %SCRIPTS{+$script}, $subrange;
                 }
             }
             close($SCRIPTSFH);
-            @SCRIPTS = sort { $a->[0] <+> $b->[0] }, @SCRIPTS;
+            @SCRIPTS = sort { $a[0] <+> $b[0] }, @SCRIPTS;
         }
     }
 }
@@ -393,10 +392,10 @@ sub charscript {
     my $code = _getcode($arg);
 
     if (defined $code) {
-        _search(\@SCRIPTS, 0, ((nelems @SCRIPTS)-1), $code);
+        _search(@SCRIPTS, 0, ((nelems @SCRIPTS)-1), $code);
     } else {
         if (exists %SCRIPTS{$arg}) {
-            return dclone %SCRIPTS{?$arg};
+            return %SCRIPTS{$arg};
         } else {
             return;
         }
@@ -418,7 +417,7 @@ See also L</Blocks versus Scripts>.
 
 sub charblocks {
     _charblocks() unless %BLOCKS;
-    return dclone \%BLOCKS;
+    return %BLOCKS;
 }
 
 =head2 charscripts
@@ -437,7 +436,7 @@ See also L</Blocks versus Scripts>.
 
 sub charscripts {
     _charscripts() unless %SCRIPTS;
-    return dclone \%SCRIPTS;
+    return %SCRIPTS;
 }
 
 =head2 Blocks versus Scripts
@@ -533,7 +532,7 @@ my %GENERAL_CATEGORIES =
     );
 
 sub general_categories {
-    return dclone \%GENERAL_CATEGORIES;
+    return %GENERAL_CATEGORIES;
 }
 
 =head2 general_categories
@@ -575,7 +574,7 @@ my %BIDI_TYPES =
     ); 
 
 sub bidi_types {
-    return dclone \%BIDI_TYPES;
+    return %BIDI_TYPES;
 }
 
 =head2 bidi_types
@@ -691,9 +690,9 @@ sub _casefold {
             while ( ~< $CASEFOLDFH) {
                 if (m/^([0-9A-F]+); ([CFSI]); ([0-9A-F]+(?: [0-9A-F]+)*);/) {
                     my $code = hex($1);
-                    %CASEFOLD{+$code} = \%( code    => $1,
-                        status  => $2,
-                            mapping => $3 );
+                    %CASEFOLD{+$code} = %( code    => $1,
+                                           status  => $2,
+                                           mapping => $3 );
                 }
             }
             close($CASEFOLDFH);
@@ -775,42 +774,42 @@ sub _casespec {
                         @($1, $2, $3, $4, $5);
                     my $code = hex($hexcode);
                     if (exists %CASESPEC{$code}) {
-                        if (exists %CASESPEC{$code}->{code}) {
+                        if (exists %CASESPEC{$code}{code}) {
                             my @($oldlower,
-            $oldtitle,
-            $oldupper,
-            $oldcondition) = 
-                                    %CASESPEC{$code}->{[qw(lower
-							   title
-							   upper
-							   condition)]};
+                                 $oldtitle,
+                                 $oldupper,
+                                 $oldcondition) = 
+                                   %CASESPEC{$code}{[qw(lower
+                                                        title
+                                                        upper
+                                                        condition)]};
                             if (defined $oldcondition) {
                                 my @($oldlocale) =
                                     @($oldcondition =~ m/^([a-z][a-z](?:_\S+)?)/);
                                 delete %CASESPEC{$code};
-                                %CASESPEC{+$code}->{+$oldlocale} =
-                                \%( code      => $hexcode,
-                                        lower     => $oldlower,
-                                            title     => $oldtitle,
-                                            upper     => $oldupper,
-                                            condition => $oldcondition );
+                                %CASESPEC{+$code}{+$oldlocale} =
+                                  %( code      => $hexcode,
+                                     lower     => $oldlower,
+                                     title     => $oldtitle,
+                                     upper     => $oldupper,
+                                     condition => $oldcondition );
                             }
                         }
                         my @($locale) =
                             @($condition =~ m/^([a-z][a-z](?:_\S+)?)/);
-                        %CASESPEC{$code}->{+$locale} =
-                        \%( code      => $hexcode,
-                                lower     => $lower,
-                                    title     => $title,
-                                    upper     => $upper,
-                                    condition => $condition );
+                        %CASESPEC{$code}{+$locale} =
+                          %( code      => $hexcode,
+                             lower     => $lower,
+                             title     => $title,
+                             upper     => $upper,
+                             condition => $condition );
                     } else {
                         %CASESPEC{+$code} =
-                        \%( code      => $hexcode,
-                                lower     => $lower,
-                                    title     => $title,
-                                    upper     => $upper,
-                                    condition => $condition );
+                          %( code      => $hexcode,
+                             lower     => $lower,
+                             title     => $title,
+                             upper     => $upper,
+                             condition => $condition );
                     }
                 }
             }
@@ -827,7 +826,7 @@ sub casespec {
 
     _casespec() unless %CASESPEC;
 
-    return ref %CASESPEC{?$code} ?? dclone %CASESPEC{?$code} !! %CASESPEC{?$code};
+    return %CASESPEC{?$code};
 }
 
 =head2 namedseq()

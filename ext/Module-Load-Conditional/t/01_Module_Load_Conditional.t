@@ -27,8 +27,8 @@ do {
         version => $Module::Load::Conditional::VERSION,
         );
 
-    ok( $rv->{?uptodate},    q[Verify self] );
-    is( $rv->{version}->stringify, $Module::Load::Conditional::VERSION,  
+    ok( $rv{?uptodate},    q[Verify self] );
+    is( $rv{version}->stringify, $Module::Load::Conditional::VERSION,  
         q[  Found proper version] );
 
     ### break up the specification
@@ -38,7 +38,7 @@ do {
         ### converts the file spec back to VMS format.
         my $class = ON_VMS ?? 'File::Spec::Unix' !! 'File::Spec';
 
-        my@($vol, $path, $file) =  $class->splitpath( $rv->{'file'} );
+        my@($vol, $path, $file) =  $class->splitpath( $rv{'file'} );
 
         my @path = @($vol, < $class->splitdir( $path ), $file );
 
@@ -64,7 +64,7 @@ do {   local $^WARNING = undef;
         version => $Module::Load::Conditional::VERSION + 1,
         );
 
-    ok( !$rv->{?uptodate} && $rv->{?version} && $rv->{?file},
+    ok( !$rv{?uptodate} && $rv{?version} && $rv{?file},
         q[Verify out of date module]
         );
 };
@@ -72,7 +72,7 @@ do {   local $^WARNING = undef;
 do {
     my $rv = check_install( module  => 'Module::Load::Conditional' );
 
-    ok( $rv->{?uptodate} && $rv->{?version} && $rv->{?file},
+    ok( $rv{?uptodate} && $rv{?version} && $rv{?file},
         q[Verify any module]
         );
 };
@@ -80,7 +80,7 @@ do {
 do {
     my $rv = check_install( module  => 'Module::Does::Not::Exist' );
 
-    ok( !$rv->{?uptodate} && !$rv->{?version} && !$rv->{?file},
+    ok( !$rv{?uptodate} && !$rv{?version} && !$rv{?file},
         q[Verify non-existant module]
         );
 
@@ -89,8 +89,8 @@ do {
 ### test finding a version of a module that mentions $VERSION in pod
 do {   my $rv = check_install( module => 'InPod' );
     ok( $rv,                        'Testing $VERSION in POD' );
-    ok( $rv->{?version},             "   Version found" );
-    is( $rv->{version}->stringify, 2,          "   Version is correct" );
+    ok( $rv{?version},             "   Version found" );
+    is( $rv{version}->stringify, 2,          "   Version is correct" );
 };
 
 ### test beta/developer release versions
@@ -106,7 +106,7 @@ do {   my $test_ver = $Module::Load::Conditional::VERSION;
         );
 
     ok( $rv,                "Checking beta versions" );
-    ok( !$rv->{?'uptodate'}, "   Beta version is higher" );
+    ok( !$rv{?'uptodate'}, "   Beta version is higher" );
 
 };    
 
@@ -117,8 +117,8 @@ do {   local $Module::Load::Conditional::FIND_VERSION = 0;
     my $rv = check_install( module  => 'Module::Load::Conditional' );
 
     ok( $rv,                        'Testing $FIND_VERSION' );
-    is( $rv->{?version}, undef,      "   No version info returned" );
-    ok( $rv->{?uptodate},            "   Module marked as uptodate" );
+    is( $rv{?version}, undef,      "   No version info returned" );
+    ok( $rv{?uptodate},            "   Module marked as uptodate" );
 };    
 
 ### test 'can_load' ###
@@ -185,9 +185,9 @@ do {   local $Module::Load::Conditional::CHECK_INC_HASH = 1;
     my $href = check_install( module => 'A::B::C::D', version => 0 );
 
     ok( $href,                  'Found package in %INC' );
-    is( $href->{?'file'}, $^PID.$^PID, '   Found correct file' );
-    is( $href->{?'version'}, $^PID, '   Found correct version' );
-    ok( $href->{?'uptodate'},    '   Marked as uptodate' );
+    is( $href{?'file'}, $^PID.$^PID, '   Found correct file' );
+    is( $href{?'version'}, $^PID, '   Found correct version' );
+    ok( $href{?'uptodate'},    '   Marked as uptodate' );
     ok( can_load( modules => \%( 'A::B::C::D' => 0 ) ),
         '   can_load successful' );
 };

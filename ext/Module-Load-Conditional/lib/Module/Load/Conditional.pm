@@ -143,13 +143,11 @@ true, since C<check_install> had no way to verify clearly.
 ### we are looking for, or if we couldn't find the desired module to begin with
 ### if the installed version is higher or equal to the one we want, it will return
 ### a hashref with he module name and version in it.. so 'true' as well.
-sub check_install {
-    my %hash = %( < @_ );
-
+sub check_install(%< %hash) {
     my $tmpl = \%(
-            version => \%( default    => '0.0'    ),
-                module  => \%( required   => 1        ),
-                verbose => \%( default    => $VERBOSE ),
+            version => %( default    => '0.0'    ),
+            module  => %( required   => 1        ),
+            verbose => %( default    => $VERBOSE ),
         );
 
     my $args;
@@ -164,7 +162,7 @@ sub check_install {
         ) . '.pm';
 
     ### where we store the return value ###
-    my $href = \%(
+    my $href = %(
             file        => undef,
                 version     => undef,
                 uptodate    => undef,
@@ -174,12 +172,12 @@ sub check_install {
 
     ### check the inc hash if we're allowed to
     if( $CHECK_INC_HASH ) {
-        $filename = $href->{+'file'} = 
+        $filename = $href{+'file'} = 
             $^INCLUDED{?$file_inc } if defined $^INCLUDED{?$file_inc };
 
         ### find the version by inspecting the package
         if( defined $filename && $FIND_VERSION ) {
-            $href->{+version} = Symbol::fetch_glob( "$args->{?module}"."::VERSION")->*->$; 
+            $href{+version} = Symbol::fetch_glob( "$args->{?module}"."::VERSION")->*->$; 
         }
     }     
 
@@ -227,7 +225,7 @@ sub check_install {
 
             ### files need to be in unix format under vms,
             ### or they might be loaded twice
-            $href->{+file} = ON_VMS
+            $href{+file} = ON_VMS
                 ?? VMS::Filespec::unixify( $filename )
             !! $filename;
 
@@ -249,7 +247,7 @@ sub check_install {
                     my $ver = __PACKAGE__->_parse_version( $_ );
 
                     if( defined $ver ) {
-                        $href->{+version} = $ver;
+                        $href{+version} = $ver;
 
                         last DIR;
                     }
@@ -259,10 +257,10 @@ sub check_install {
     }
 
     ### if we couldn't find the file, return undef ###
-    return unless defined $href->{?file};
+    return unless defined $href{?file};
 
     ### only complain if we're expected to find a version higher than 0.0 anyway
-    if( $FIND_VERSION and not defined $href->{?version} ) {
+    if( $FIND_VERSION and not defined $href{?version} ) {
         do {   ### don't warn about the 'not numeric' stuff ###
             local $^WARNING = 0;
 
@@ -270,7 +268,7 @@ sub check_install {
             warn < loc(q[Could not check version on '%1'], $args->{?module} )
                 if $args->{?verbose} and $args->{?version} +> 0;
         };
-        $href->{+uptodate} = 1;
+        $href{+uptodate} = 1;
 
     } else {
         ### don't warn about the 'not numeric' stuff ###
@@ -279,8 +277,8 @@ sub check_install {
         ### use qv(), as it will deal with developer release number
         ### ie ones containing _ as well. This addresses bug report
         ### #29348: Version compare logic doesn't handle alphas?
-        $href->{+uptodate} = 
-        version->new( $args->{version} )->vcmp( $href->{version} ) +<= 0;
+        $href{+uptodate} = 
+        version->new( $args->{version} )->vcmp( $href{version} ) +<= 0;
     }
 
     return $href;
@@ -384,9 +382,9 @@ sub can_load {
     my %hash = %( < @_ );
 
     my $tmpl = \%(
-            modules     => \%( default => \%(), strict_type => 1 ),
-                verbose     => \%( default => $VERBOSE ),
-                nocache     => \%( default => 0 ),
+            modules     => %( default => \%(), strict_type => 1 ),
+                verbose     => %( default => $VERBOSE ),
+                nocache     => %( default => 0 ),
         );
 
     my $args;
@@ -415,7 +413,7 @@ sub can_load {
         my @load;
         for my $mod ( keys $href->% ) {
 
-            next if $CACHE->{?$mod}->{?usable} && !$args->{?nocache};
+            next if $CACHE->{?$mod}{?usable} && !$args->{?nocache};
 
             ### else, check if the hash key is defined already,
             ### meaning $mod => 0,
@@ -425,8 +423,8 @@ sub can_load {
             ### ie ones containing _ as well. This addresses bug report
             ### #29348: Version compare logic doesn't handle alphas?
             if (    !$args->{?nocache}
-                && defined $CACHE->{?$mod}->{?usable}
-                && (qv($CACHE->{$mod}->{?version}||0)->vcmp(qv($href->{?$mod})) +>= 0)
+                && defined $CACHE->{?$mod}{?usable}
+                && (qv($CACHE->{$mod}{?version}||0)->vcmp(qv($href->{?$mod})) +>= 0)
             ) {
                     $error = loc( q[Already tried to use '%1', which was unsuccessful], $mod);
                     last BLOCK;
@@ -437,14 +435,14 @@ sub can_load {
                 version => $href->{?$mod}
                 );
 
-            if( !$mod_data or !defined $mod_data->{?file} ) {
+            if( !$mod_data or !defined $mod_data{?file} ) {
                 $error = loc(q[Could not find or check module '%1'], $mod);
-                $CACHE->{+$mod}->{+usable} = 0;
+                $CACHE->{+$mod}{+usable} = 0;
                 last BLOCK;
             }
 
             map {
-                    $CACHE->{+$mod}->{+$_} = $mod_data->{?$_}
+                    $CACHE->{+$mod}{+$_} = $mod_data{?$_}
                 }, qw[version file uptodate];
 
             push @load, $mod;
@@ -452,7 +450,7 @@ sub can_load {
 
         for my $mod (  @load ) {
 
-            if ( $CACHE->{$mod}->{?uptodate} ) {
+            if ( $CACHE->{$mod}{?uptodate} ) {
 
                 try { load $mod };
 
@@ -460,10 +458,10 @@ sub can_load {
                 ### we tried to use this module and return 0;
                 if( $^EVAL_ERROR ) {
                     $error = $^EVAL_ERROR;
-                    $CACHE->{$mod}->{+usable} = 0;
+                    $CACHE->{$mod}{+usable} = 0;
                     last BLOCK;
                 } else {
-                    $CACHE->{$mod}->{+usable} = 1;
+                    $CACHE->{$mod}{+usable} = 1;
                 }
 
             ### module not found in $^INCLUDE_PATH, store the result in
@@ -471,7 +469,7 @@ sub can_load {
             } else {
 
                 $error = loc(q[Module '%1' is not uptodate!], $mod);
-                $CACHE->{$mod}->{+usable} = 0;
+                $CACHE->{$mod}{+usable} = 0;
                 last BLOCK;
             }
         }

@@ -49,7 +49,7 @@ my @raw_alias = @(
     # All the ops with a body of { return NORMAL; }
     Perl_pp_null => \qw(scalar regcmaybe lineseq scope),
 
-    Perl_pp_require => \@('dofile'),
+    Perl_pp_require => \@('evalfile'),
     Perl_pp_sysread => \qw(read recv),
     Perl_pp_sysseek => \@('seek'),
     Perl_pp_ioctl => \@('fcntl'),
@@ -1026,7 +1026,7 @@ semctl		semctl			ck_fun		imst@	S S S S
 # Eval.
 
 require		require			ck_require	du%	S?
-dofile		do "file"		ck_fun		d1	S
+evalfile	evalfile "file"		ck_fun		d1	S
 hintseval	eval hints		ck_svconst	s$
 entereval	eval "string"		ck_eval		d%	S
 leaveeval	eval "string" exit	ck_null		1	S

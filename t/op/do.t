@@ -10,7 +10,7 @@ sub ok($ok, ?$name) {
         $test,
         defined $name ?? " - $name" !! '';
 
-    printf $^STDOUT, "# Failed test at line \%d\n", (caller)[[2]] unless $ok;
+    printf $^STDOUT, "# Failed test at line \%d\n", @(caller)[2] unless $ok;
 
     $test++;
     return $ok;
@@ -24,14 +24,14 @@ ok( $result eq 'value',  ":$result: eq :value:" );
 unshift $^INCLUDE_PATH, '.';
 
 # bug ID 20010920.007
-eval qq{ do qq(a file that does not exist); };
+eval qq{ evalfile qq(a file that does not exist); };
 ok( !$^EVAL_ERROR, "do on a non-existing file, first try" );
 
-eval qq{ do uc qq(a file that does not exist); };
+eval qq{ evalfile uc qq(a file that does not exist); };
 ok( !$^EVAL_ERROR, "do on a non-existing file, second try"  );
 
 # 6 must be interpreted as a file name here
-ok( (!defined do 6) && $^OS_ERROR, "'do 6' : $^OS_ERROR" );
+ok( (!defined evalfile 6) && $^OS_ERROR, "'do 6' : $^OS_ERROR" );
 
 # [perl #19545]
 push @t, ($u = (do {} . "This should be pushed."));

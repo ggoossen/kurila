@@ -374,7 +374,7 @@ do {
 };
 EOE
 EXPECT
-yelp at foo line 30 character 18.
+yelp at foo line 30 character 1.
     (eval) called at - line 3 character 1.
 ########
 # toke.c

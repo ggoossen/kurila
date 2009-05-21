@@ -63,7 +63,7 @@ sub alias_file($arg)
     else {
         die "Charnames alias files can only have identifier characters";
     }
-    if (my @alias = @( do $file )) {
+    if (my @alias = @( evalfile $file )) {
         (nelems @alias) == 1 && !defined @alias[0] and
             die "$file cannot be used as alias file for charnames";
         (nelems @alias) % 2 and
@@ -103,7 +103,7 @@ sub charnames
         ## Suck in the code/name list as a big string.
         ## Lines look like:
         ##     "0052\t\tLATIN CAPITAL LETTER R\n"
-        $txt = do "unicore/Name.pl" unless $txt;
+        $txt = evalfile "unicore/Name.pl" unless $txt;
 
         my $hexre = "[0-9A-Fa-f]+";
         ## If :full, look for the name exactly
@@ -204,7 +204,7 @@ sub import
     ## see if at least we can find one letter of each script.
     ##
     if (warnings::enabled('utf8') && nelems $^HINTS{?charnames_scripts}->@) {
-        $txt = do "unicore/Name.pl" unless $txt;
+        $txt = evalfile "unicore/Name.pl" unless $txt;
 
         for my $script ( $^HINTS{charnames_scripts}->@) {
             if (not $txt =~ m/\t\t$script (?:CAPITAL |SMALL )?LETTER /) {
@@ -245,7 +245,7 @@ sub viacode
 
     return %viacode{?$hex} if exists %viacode{$hex};
 
-    $txt = do "unicore/Name.pl" unless $txt;
+    $txt = evalfile "unicore/Name.pl" unless $txt;
 
     return unless $txt =~ m/^$hex\t\t(.+)/m;
 
@@ -267,7 +267,7 @@ sub vianame
 
     return %vianame{?$arg} if exists %vianame{$arg};
 
-    $txt = do "unicore/Name.pl" unless $txt;
+    $txt = evalfile "unicore/Name.pl" unless $txt;
 
     my $pos = index $txt, "\t\t$arg\n";
     if ($pos +>= 0) {

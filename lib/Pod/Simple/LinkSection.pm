@@ -9,15 +9,14 @@ sub tack_on {
     return (@_[0]->[2] .= @_[1]);
 }
 
-sub as_string {
-    return Pod::Simple::BlackBox::stringify_lol(<@_);
+sub as_string($lol) {
+    return Pod::Simple::BlackBox::stringify_lol($lol);
 }
-sub stringify {
-    return Pod::Simple::BlackBox::stringify_lol(<@_);
+sub stringify($lol) {
+    return Pod::Simple::BlackBox::stringify_lol($lol);
 }
 
-sub new {
-    my $class = shift;
+sub new($class, @< @_) {
     $class = ref($class) || $class;
     my $new;
     if((nelems @_) == 1) {

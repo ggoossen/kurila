@@ -311,49 +311,49 @@ $Collator->change(level => 1);
 sub strreverse { join '', reverse split m//, shift }
 
 $str = "P\cBe\x{300}\cBrl and PERL.";
-$ret = $Collator->subst($str, "perl", 'Camel');
+$ret = $Collator->subst(\$str, "perl", 'Camel');
 is($ret, 1);
 is($str, "Camel and PERL.");
 
 $str = "P\cBe\x{300}\cBrl and PERL.";
-$ret = $Collator->subst($str, "perl", \&strreverse);
+$ret = $Collator->subst(\$str, "perl", \&strreverse);
 is($ret, 1);
 is($str, "lr\cB\x{300}e\cBP and PERL.");
 
 $str = "P\cBe\x{300}\cBrl and PERL.";
-$ret = $Collator->gsubst($str, "perl", 'Camel');
+$ret = $Collator->gsubst(\$str, "perl", 'Camel');
 is($ret, 2);
 is($str, "Camel and Camel.");
 
 $str = "P\cBe\x{300}\cBrl and PERL.";
-$ret = $Collator->gsubst($str, "perl", \&strreverse);
+$ret = $Collator->gsubst(\$str, "perl", \&strreverse);
 is($ret, 2);
 is($str, "lr\cB\x{300}e\cBP and LREP.");
 
 $str = "Camel donkey zebra came\x{301}l CAMEL horse cAm\0E\0L...";
-$Collator->gsubst($str, "camel", sub { "<b>@_[0]</b>" });
+$Collator->gsubst(\$str, "camel", sub { "<b>@_[0]</b>" });
 is($str, "<b>Camel</b> donkey zebra <b>came\x{301}l</b> "
    . "<b>CAMEL</b> horse <b>cAm\0E\0L</b>...");
 
 $Collator->change(level => 3);
 
 $str = "P\cBe\x{300}\cBrl and PERL.";
-$ret = $Collator->subst($str, "perl", "Camel");
+$ret = $Collator->subst(\$str, "perl", "Camel");
 ok(! $ret);
 is($str, "P\cBe\x{300}\cBrl and PERL.");
 
 $str = "P\cBe\x{300}\cBrl and PERL.";
-$ret = $Collator->subst($str, "perl", \&strreverse);
+$ret = $Collator->subst(\$str, "perl", \&strreverse);
 ok(! $ret);
 is($str, "P\cBe\x{300}\cBrl and PERL.");
 
 $str = "P\cBe\x{300}\cBrl and PERL.";
-$ret = $Collator->gsubst($str, "perl", "Camel");
+$ret = $Collator->gsubst(\$str, "perl", "Camel");
 is($ret, 0);
 is($str, "P\cBe\x{300}\cBrl and PERL.");
 
 $str = "P\cBe\x{300}\cBrl and PERL.";
-$ret = $Collator->gsubst($str, "perl", \&strreverse);
+$ret = $Collator->gsubst(\$str, "perl", \&strreverse);
 is($ret, 0);
 is($str, "P\cBe\x{300}\cBrl and PERL.");
 
@@ -362,22 +362,22 @@ $Collator->change(< %old_level);
 ##############
 
 $str = "Perl and Camel";
-$ret = $Collator->gsubst($str, "\cA\cA\0", "AB");
+$ret = $Collator->gsubst(\$str, "\cA\cA\0", "AB");
 is($ret, 15);
 is($str, "ABPABeABrABlAB ABaABnABdAB ABCABaABmABeABlAB");
 
 $str = '';
-$ret = $Collator->subst($str, "", "ABC");
+$ret = $Collator->subst(\$str, "", "ABC");
 is($ret, 1);
 is($str, "ABC");
 
 $str = '';
-$ret = $Collator->gsubst($str, "", "ABC");
+$ret = $Collator->gsubst(\$str, "", "ABC");
 is($ret, 1);
 is($str, "ABC");
 
 $str = 'PPPPP';
-$ret = $Collator->gsubst($str, 'PP', "ABC");
+$ret = $Collator->gsubst(\$str, 'PP', "ABC");
 is($ret, 2);
 is($str, "ABCABCP");
 

@@ -140,7 +140,6 @@ sub prompt($mess, ?$def) {
     $def = defined $def ?? $def !! "";
 
     local $^OUTPUT_AUTOFLUSH = 1;
-    local $^OUTPUT_RECORD_SEPARATOR = undef;
     print $^STDOUT, "$mess $dispdef";
 
     my $ans;
@@ -181,7 +180,7 @@ sub eval_in_x($self,$dir) {
 
     do {
         package main;
-        do './Makefile.PL';
+        evalfile './Makefile.PL';
     };;
     if ($^EVAL_ERROR) {
         #         if ($@ =~ /prerequisites/) {
@@ -778,7 +777,7 @@ sub _run_hintfile {
     # Just in case the ./ isn't on the hint file, which File::Spec can
     # often strip off, we bung the curdir into $^INCLUDE_PATH
     local $^INCLUDE_PATH = @( File::Spec->curdir, < $^INCLUDE_PATH);
-    my $ret = do $hint_file;
+    my $ret = evalfile $hint_file;
     if( !defined $ret ) {
         my $error = $^EVAL_ERROR && $^EVAL_ERROR->message || $^OS_ERROR;
         print $^STDERR, $error;

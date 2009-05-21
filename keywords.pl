@@ -100,6 +100,7 @@ endservent
 eof
 eq
 eval
+evalfile
 exec
 exists
 exit

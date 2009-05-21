@@ -59,9 +59,9 @@ sub code2script
         $code = lc($code);
     }
 
-    if (exists $CODES->[$codeset]->{$code})
+    if (exists $CODES->[$codeset]{$code})
     {
-        return $CODES->[$codeset]->{?$code};
+        return $CODES->[$codeset]{?$code};
     }
     else
     {
@@ -86,9 +86,9 @@ sub script2code
 
     return undef unless defined $script;
     $script = lc($script);
-    if (exists $COUNTRIES->[$codeset]->{$script})
+    if (exists $COUNTRIES->[$codeset]{$script})
     {
-        return $COUNTRIES->[$codeset]->{?$script};
+        return $COUNTRIES->[$codeset]{?$script};
     }
     else
     {
@@ -133,7 +133,7 @@ sub all_script_codes
 {
     my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT;
 
-    return keys  $CODES->[$codeset]->%;
+    return keys  $CODES->[$codeset];
 }
 
 
@@ -146,7 +146,7 @@ sub all_script_names
 {
     my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT;
 
-    return values  $CODES->[$codeset]->%;
+    return values  $CODES->[$codeset];
 }
 
 
@@ -167,19 +167,19 @@ do {
         chop;
         @($alpha2, $alpha3, $numeric, $script) =  split(m/:/, $_, 4);
 
-        $CODES->[+LOCALE_CODE_ALPHA_2]->{+$alpha2} = $script;
-        $COUNTRIES->[+LOCALE_CODE_ALPHA_2]->{+lc "$script"} = $alpha2;
+        $CODES->[+LOCALE_CODE_ALPHA_2]{+$alpha2} = $script;
+        $COUNTRIES->[+LOCALE_CODE_ALPHA_2]{+lc "$script"} = $alpha2;
 
         if ($alpha3)
         {
-            $CODES->[+LOCALE_CODE_ALPHA_3]->{+$alpha3} = $script;
-            $COUNTRIES->[+LOCALE_CODE_ALPHA_3]->{+lc "$script"} = $alpha3;
+            $CODES->[+LOCALE_CODE_ALPHA_3]{+$alpha3} = $script;
+            $COUNTRIES->[+LOCALE_CODE_ALPHA_3]{+lc "$script"} = $alpha3;
         }
 
         if ($numeric)
         {
-            $CODES->[+LOCALE_CODE_NUMERIC]->{+$numeric} = $script;
-            $COUNTRIES->[+LOCALE_CODE_NUMERIC]->{+lc "$script"} = $numeric;
+            $CODES->[+LOCALE_CODE_NUMERIC]{+$numeric} = $script;
+            $COUNTRIES->[+LOCALE_CODE_NUMERIC]{+lc "$script"} = $numeric;
         }
 
     }

@@ -12,7 +12,7 @@ BEGIN {
 use warnings;
 use Config;
 
-plan tests => 30;
+plan tests => 28;
 
 
 my $Is_MSWin32  = $^OS_NAME eq 'MSWin32';
@@ -252,24 +252,6 @@ ok $^EXCEPTIONS_BEING_CAUGHT == 0 && defined $^EXCEPTIONS_BEING_CAUGHT;
 try { ok $^EXCEPTIONS_BEING_CAUGHT == 1 };
 eval " BEGIN \{ ok ! defined \$^S \} ";
 ok $^EXCEPTIONS_BEING_CAUGHT == 0 && defined $^EXCEPTIONS_BEING_CAUGHT;
-
-# Tests for the magic get of $\
-do {
-    my $ok = 0;
-    # [perl #19330]
-    do {
-        local $^OUTPUT_RECORD_SEPARATOR = undef;
-        $^OUTPUT_RECORD_SEPARATOR++; $^OUTPUT_RECORD_SEPARATOR++;
-        $ok = $^OUTPUT_RECORD_SEPARATOR eq 2;
-    };
-    ok $ok;
-    $ok = 0;
-    do {
-        local $^OUTPUT_RECORD_SEPARATOR = "a\0b";
-        $ok = "a$($^OUTPUT_RECORD_SEPARATOR)b" eq "aa\0bb";
-    };
-    ok $ok;
-};
 
 # Test for bug [perl #36434]
 do {

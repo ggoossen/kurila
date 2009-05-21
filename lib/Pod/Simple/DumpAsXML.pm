@@ -10,8 +10,7 @@ use Carp ();
 
 BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
 
-sub new {
-    my $self = shift;
+sub new($self, @< @_) {
     my $new = $self->SUPER::new(< @_);
     $new->{+'output_fh'} ||= $^STDOUT;
     $new->accept_codes('VerbatimFormatted');
@@ -34,7 +33,7 @@ sub _handle_element_start {
             if (@_[1] eq 'L' and $key =~ m/^(?:section|to)$/) {
                 $value = $value->as_string;
             }
-            _xml_escape($value);
+            $value = _xml_escape($value);
             print $fh, ' ', $key, '="', $value, '"';
         }
     }
@@ -50,8 +49,8 @@ sub _handle_text {
     if(length @_[1]) {
         my $indent = '  ' x @_[0]->{?'indent'};
         my $text = @_[1];
-        _xml_escape($text);
-            $text =~  # A not-totally-brilliant wrapping algorithm:
+        $text = _xml_escape($text);
+        $text =~  # A not-totally-brilliant wrapping algorithm:
         s/(
          [^\n]{55}         # Snare some characters from a line
          [^\n\ ]{0,50}     #  and finish any current word
@@ -65,25 +64,23 @@ sub _handle_text {
     return;
 }
 
-sub _handle_element_end {
-    DEBUG and print $^STDOUT, "-- @_[1]\n";
-    print @_[0]->{?'output_fh'}
-        ,'  ' x --@_[0]->{+'indent'}, "</", @_[1], ">\n";
+sub _handle_element_end($self, $name) {
+    DEBUG and print $^STDOUT, "-- $name\n";
+    print $self->{?'output_fh'}
+        ,'  ' x --$self->{+'indent'}, "</", $name, ">\n";
     return;
 }
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-sub _xml_escape {
-    foreach my $x ( @_) {
-        # Escape things very cautiously:
-        $x =~ s/([^-\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/$('&#'.(ord($1)).';')/g;
+sub _xml_escape($x) {
+    # Escape things very cautiously:
+    $x =~ s/([^-\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/$('&#'.(ord($1)).';')/g;
     # Yes, stipulate the list without a range, so that this can work right on
     #  all charsets that this module happens to run under.
     # Altho, hmm, what about that ord?  Presumably that won't work right
     #  under non-ASCII charsets.  Something should be done about that.
-    }
-    return;
+    return $x;
 }
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

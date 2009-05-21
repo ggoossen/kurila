@@ -11,7 +11,7 @@ BEGIN {
 			$h_addrtype 	$h_length
 			@h_addr_list 	$h_addr
 		   );
-    %EXPORT_TAGS = %( FIELDS => \@( < @EXPORT_OK, < @EXPORT ) );
+    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT );
 }
 our ($h_name, @h_aliases, $h_addrtype, $h_length,
     @h_addr_list, $h_addr);
@@ -31,7 +31,7 @@ struct 'Net::hostent' => \@(
        addr_list	=> '@',
        );
 
-sub addr { shift->addr_list->[0] }
+sub addr($self, @< @_) { $self->addr_list->[0] }
 
 sub populate {
     return unless (nelems @_);

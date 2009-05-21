@@ -12,13 +12,13 @@ sub new {
     my $class = shift;
     my $self = bless \%(< @_), $class;
 
-    $self->{+properties}->{+perl} = $class->find_perl_interpreter
+    $self->{+properties}{+perl} = $class->find_perl_interpreter
     or warn "Warning: Can't locate your perl binary";
 
-    $self->{+config} = \%();
+    $self->{+config} = %();
     for my $k (config_keys) {
         my $v = config_value($k);
-        $self->{config}->{+$k} = $v unless exists $self->{config}->{$k};
+        $self->{config}{+$k} = $v unless exists $self->{config}{$k};
     }
     return $self;
 }
@@ -49,7 +49,7 @@ sub object_file($self, $filename) {
 
     # File name, minus the suffix
     (my $file_base = $filename) =~ s/\.[^.]+$//;
-    return "$file_base$self->{config}->{?obj_ext}";
+    return "$file_base$self->{config}{?obj_ext}";
 }
 
 sub arg_include_dirs {
@@ -64,7 +64,7 @@ sub arg_object_file($self, $file) {
 }
 
 sub arg_share_object_file($self, $file) {
-    return  @(< $self->split_like_shell($self->{config}->{lddlflags}), '-o', $file);
+    return  @(< $self->split_like_shell($self->{config}{lddlflags}), '-o', $file);
 }
 
 sub arg_exec_file($self, $file) {
@@ -89,16 +89,16 @@ sub compile($self, %< %args) {
     my @defines = $self->arg_defines( < (%args{?defines} || \%())->% );
 
     my @extra_compiler_flags = $self->split_like_shell(%args{?extra_compiler_flags});
-    my @cccdlflags = $self->split_like_shell($cf->{cccdlflags});
-    my @ccflags = $self->split_like_shell($cf->{ccflags});
-    my @optimize = $self->split_like_shell($cf->{optimize});
+    my @cccdlflags = $self->split_like_shell($cf{cccdlflags});
+    my @ccflags = $self->split_like_shell($cf{ccflags});
+    my @optimize = $self->split_like_shell($cf{optimize});
     my @flags = @(< @include_dirs, < @defines, < @cccdlflags, < @extra_compiler_flags,
                 $self->arg_nolink,
                 < @ccflags, < @optimize,
                 < $self->arg_object_file(%args{object_file}),
         );
 
-    my @cc = $self->split_like_shell($cf->{cc});
+    my @cc = $self->split_like_shell($cf{cc});
 
     $self->do_system(< @cc, < @flags, %args{source})
         or die "error building %args{?object_file} from '%args{?source}'";
@@ -133,14 +133,14 @@ sub have_compiler($self) {
 sub lib_file($self, $dl_file) {
     $dl_file =~ s/\.[^.]+$//;
     $dl_file =~ s/"//g;
-    return "$dl_file.$self->{config}->{?dlext}";
+    return "$dl_file.$self->{config}{?dlext}";
 }
 
 
 sub exe_file($self, $dl_file) {
     $dl_file =~ s/\.[^.]+$//;
     $dl_file =~ s/"//g;
-    return "$dl_file$self->{config}->{?_exe}";
+    return "$dl_file$self->{config}{?_exe}";
 }
 
 sub need_prelink { 0 }
@@ -193,8 +193,8 @@ sub _do_link($self, $type, %< %args) {
                         prelink_res => \@temp_files));
 
     my @output = @( %args{?lddl} ?? < $self->arg_share_object_file($out) !! < $self->arg_exec_file($out) );
-    my @shrp = $self->split_like_shell($cf->{shrpenv});
-    my @ld = $self->split_like_shell($cf->{ld});
+    my @shrp = $self->split_like_shell($cf{shrpenv});
+    my @ld = $self->split_like_shell($cf{ld});
 
     $self->do_system(< @shrp, < @ld, < @output, < $objects->@, < @linker_flags)
         or die "error building $out from $(join ' ',$objects->@)";

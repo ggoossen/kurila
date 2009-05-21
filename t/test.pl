@@ -29,13 +29,13 @@ $TODO = 0;
 $NO_ENDING = 0;
 
 # Use this instead of print to avoid interference while testing globals.
-sub _print {
-    local@($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR) = @(undef, '');
+sub _print(@< @_) {
+    local $^OUTPUT_FIELD_SEPARATOR = '';
     print $^STDOUT, < @_;
 }
 
-sub _print_stderr {
-    local@($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR) = @(undef, '');
+sub _print_stderr(@< @_) {
+    local $^OUTPUT_FIELD_SEPARATOR = '';
     print $^STDERR, < @_;
 }
 

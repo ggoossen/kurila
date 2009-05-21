@@ -33,12 +33,11 @@ sub encmodver {
     return __PACKAGE__ . " v" .($VERSION || '?');
 }
 
-sub make_transcoder {
-    my $e = @_[1];
+sub make_transcoder(_, $e) {
     die "WHAT ENCODING!?!?" unless $e;
     my $x;
     if ($e eq "latin1") {
-        return sub { return map { join '', map { utf8::chr($_) }, @( unpack "C*", $_) }, @_ };
+        return sub (@< @a) { return map { join '', map { utf8::chr($_) }, @( unpack "C*", $_) }, @a };
     }
 
     return sub {;

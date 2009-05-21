@@ -63,7 +63,7 @@ ok( exists $^INCLUDED{'Foo1.pm'},        '  $^INCLUDED sees Foo1.pm' );
 is( ref $^INCLUDED{?'Foo1.pm'}, 'CODE',   '  val Foo1.pm is a coderef in $^INCLUDED' );
 cmp_ok( $^INCLUDED{?'Foo1.pm'}, '\==', \&fooinc,     '  val Foo1.pm is correct in $^INCLUDED' );
 
-$evalret = try { do 'Foo2.pl'; 1 };
+$evalret = try { evalfile 'Foo2.pl'; 1 };
 die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'do "Foo2.pl"' );
 ok( exists $^INCLUDED{'Foo2.pl'},        '  $^INCLUDED sees Foo2.pl' );
@@ -103,7 +103,7 @@ ok( exists $^INCLUDED{'Bar1.pm'},       '  $^INCLUDED sees Bar1.pm' );
 is( ref $^INCLUDED{?'Bar1.pm'}, 'ARRAY', '  val Bar1.pm is an arrayref in $^INCLUDED' );
 cmp_ok( $^INCLUDED{?'Bar1.pm'}, '\==', $arrayref,   '  val Bar1.pm is correct in $^INCLUDED' );
 
-ok( try { do 'Bar2.pl'; 1 },     'do "Bar2.pl"' );
+ok( try { evalfile 'Bar2.pl'; 1 },     'do "Bar2.pl"' );
 ok( exists $^INCLUDED{'Bar2.pl'},       '  $^INCLUDED sees Bar2.pl' );
 is( ref $^INCLUDED{?'Bar2.pl'}, 'ARRAY', '  val Bar2.pl is an arrayref in $^INCLUDED' );
 cmp_ok( $^INCLUDED{?'Bar2.pl'}, '\==', $arrayref,   '  val Bar2.pl is correct in $^INCLUDED' );
@@ -189,7 +189,7 @@ push $^INCLUDE_PATH, sub {
 };
 
 my $ret = "";
-$ret ||= do 'abc.pl';
+$ret ||= evalfile 'abc.pl';
 is( $ret, 'abc', 'do "abc.pl" sees return value' );
 
 do {

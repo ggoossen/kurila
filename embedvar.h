@@ -172,11 +172,8 @@
 #define PL_memory_debug_header	(vTHX->Imemory_debug_header)
 #define PL_mess_sv		(vTHX->Imess_sv)
 #define PL_min_intro_pending	(vTHX->Imin_intro_pending)
-#define PL_minus_a		(vTHX->Iminus_a)
 #define PL_minus_c		(vTHX->Iminus_c)
 #define PL_minus_l		(vTHX->Iminus_l)
-#define PL_minus_n		(vTHX->Iminus_n)
-#define PL_minus_p		(vTHX->Iminus_p)
 #define PL_modglobal		(vTHX->Imodglobal)
 #define PL_my_cxt_keys		(vTHX->Imy_cxt_keys)
 #define PL_my_cxt_list		(vTHX->Imy_cxt_list)
@@ -199,7 +196,6 @@
 #define PL_origargv		(vTHX->Iorigargv)
 #define PL_origenviron		(vTHX->Iorigenviron)
 #define PL_origfilename		(vTHX->Iorigfilename)
-#define PL_ors_sv		(vTHX->Iors_sv)
 #define PL_osname		(vTHX->Iosname)
 #define PL_pad_reset_pending	(vTHX->Ipad_reset_pending)
 #define PL_padix		(vTHX->Ipadix)
@@ -452,11 +448,8 @@
 #define PL_Imemory_debug_header	PL_memory_debug_header
 #define PL_Imess_sv		PL_mess_sv
 #define PL_Imin_intro_pending	PL_min_intro_pending
-#define PL_Iminus_a		PL_minus_a
 #define PL_Iminus_c		PL_minus_c
 #define PL_Iminus_l		PL_minus_l
-#define PL_Iminus_n		PL_minus_n
-#define PL_Iminus_p		PL_minus_p
 #define PL_Imodglobal		PL_modglobal
 #define PL_Imy_cxt_keys		PL_my_cxt_keys
 #define PL_Imy_cxt_list		PL_my_cxt_list
@@ -479,7 +472,6 @@
 #define PL_Iorigargv		PL_origargv
 #define PL_Iorigenviron		PL_origenviron
 #define PL_Iorigfilename	PL_origfilename
-#define PL_Iors_sv		PL_ors_sv
 #define PL_Iosname		PL_osname
 #define PL_Ipad_reset_pending	PL_pad_reset_pending
 #define PL_Ipadix		PL_padix

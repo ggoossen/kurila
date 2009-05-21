@@ -88,8 +88,8 @@ EOC
 SKIP: do {
     skip "Output for |- doesn't go to shell on MacOS", 5 if $Is_MacOS;
 
-    ok( open(my $f, '|-', <<EOC),     'open |-' );
-    $Perl -pe "s/^not //"
+    ok( open(my $f, '|-', $Perl . <<'EOC'),     'open |-' );
+    -e 'while (my $_ = ~< $^STDIN) { s/^not //; print $^STDOUT, $_; }'
 EOC
 
     my @rows = @( ~< $f );
@@ -181,8 +181,8 @@ EOC
 SKIP: do {
     skip "Output for |- doesn't go to shell on MacOS", 5 if $Is_MacOS;
 
-    ok( open(local $f, '|-', <<EOC),  'open local $f, "|-", ...' );
-    $Perl -pe "s/^not //"
+    ok( open(local $f, '|-', $Perl . <<'EOC'),  'open local $f, "|-", ...' );
+    -e 'while (my $_ = ~< $^STDIN) { s/^not //; print $^STDOUT, $_; }'
 EOC
 
     my @rows = @( ~< $f );
@@ -204,7 +204,7 @@ like( $^EVAL_ERROR->message, qr/Bad filehandle:\s+afile/,          '       right
 
 do {
     for (1..2) {
-        ok( open(my $f, "-|", qq{$Perl -le "print \\\$^STDOUT, 'ok'"}), 'open -|');
+        ok( open(my $f, "-|", qq{$Perl -e "print \\\$^STDOUT, 'ok\n'"}), 'open -|');
         is( scalar ~< $f, "ok\n", '       readline');
         ok( close $f,            '       close' );
     }

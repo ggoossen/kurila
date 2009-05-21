@@ -75,7 +75,7 @@ END {
 chdir $dir or die $^OS_ERROR;
 push $^INCLUDE_PATH, '../../lib', '../../../lib';
 
-    package main;
+package main;
 
 sub check_for_bonus_files {
     my $dir = shift;
@@ -94,7 +94,7 @@ sub check_for_bonus_files {
     ok( ! $fail );
 }
 
-sub build_and_run($tests, $expect, $files) {
+sub build_and_run($tests, $files) {
     my $core = env::var('PERL_CORE') ?? ' PERL_CORE=1' !! '';
     my @perlout = @( `$runperl Makefile.PL $core` );
     if ($^CHILD_ERROR) {
@@ -176,21 +176,6 @@ sub build_and_run($tests, $expect, $files) {
         pass("maketest");
     }
 
-    if (defined $expect) {
-        my $regen = `$runperl -x $package.xs`;
-        if ($^CHILD_ERROR) {
-            fail("$runperl -x $package.xs failed: $^CHILD_ERROR");
-        } else {
-            pass("regen");
-        }
-
-        is($expect eq $regen, "regen worked");
-    } else {
-        for (0..1) {
-            ok(1, "skip no regen or expect for this set of tests");
-        }
-    }
-
     my $makeclean = "$make clean";
     diag "make = '$makeclean'";
     @makeout = @( `$makeclean` );
@@ -264,8 +249,7 @@ sub MANIFEST {
     return @files;
 }
 
-sub write_and_run_extension($name, $items, $export_names, $package, $header, $testfile, $num_tests,
-$wc_args) {
+sub write_and_run_extension($name, $items, $export_names, $package, $header, $testfile, $num_tests, $wc_args) {
 
         my $c = '';
         open my $c_fh, '>>', \$c or die;
@@ -277,16 +261,10 @@ $wc_args) {
             NAME => $package,
             NAMES => $items,
             PROXYSUBS => 1,
-            < $wc_args->@,
             );
 
         my $C_code = $c;
         my $XS_code = $xs;
-
-        # Don't check the regeneration code if we specify extra arguments to
-        # WriteConstants. (Fix this to give finer grained control if needed)
-        my $expect;
-        $expect = $C_code . "\n#### XS Section:\n" . $XS_code unless $wc_args;
 
         diag "$name\n$dir/$subdir being created...";
         mkdir $subdir, 0777 or die "mkdir: $^OS_ERROR\n";
@@ -368,7 +346,7 @@ EOT
         push @files, Makefile_PL($package);
         @files = MANIFEST (< @files);
 
-        build_and_run ($num_tests, $expect, \@files);
+        build_and_run ($num_tests, \@files);
 
         chdir $updir or die "chdir '$updir': $^OS_ERROR";
         ++$subdir;
@@ -378,7 +356,7 @@ EOT
 # $name, [items], [export_names], $package, $header, $testfile, $num_tests
 my @tests;
 my $before_tests = 4; # Number of "ok"s emitted to build extension
-my $after_tests = 8; # Number of "ok"s emitted after make test run
+my $after_tests = 6; # Number of "ok"s emitted after make test run
 my $dummytest = 1;
 
 my $here;
@@ -387,7 +365,7 @@ sub start_tests {
     $here = $dummytest;
 }
 sub end_tests($name, $items, $export_names, $header, $testfile, ?$args) {
-    push @tests, \@($name, $items, $export_names, $package, $header, $testfile,
+    push @tests, @($name, $items, $export_names, $package, $header, $testfile,
                   $dummytest - $here, $args);
     $dummytest += $after_tests;
 }
@@ -405,7 +383,6 @@ my @common_items = @(
     );
 
 my @args = @( undef );
-push @args, \@(PROXYSUBS => 1);
 foreach my $args ( @args)
 {
     # Simple tests
@@ -479,7 +456,7 @@ my $five = FIVE;
 if ($five == 5) {
   print $^STDOUT, "ok $test\n";
 } else {
-  print $^STDOUT, "not ok $test # \$five\n";
+  print $^STDOUT, "not ok $test # five: \$five\n";
 }
 $test++;
 
@@ -755,7 +732,7 @@ simple ("Twos and three middle", < qw(aa ae ai ea eu ie io oe era eta));
 # Given the choice go for the end, else the earliest point
 simple ("Three end and four symetry", < qw(ean ear eat barb marm tart));
 
-write_and_run_extension < $_->@ foreach  @tests;
+write_and_run_extension < $_ foreach  @tests;
 
 # This was causing an assertion failure (a C<confess>ion)
 # Any single byte > 128 should do it.

@@ -829,9 +829,11 @@ subscripted:    star '{' expr ';' '}'       /* *main::{something} like *STDOUT{I
                             TOKEN_GETMAD($5,$$,']');
 			}
 	|	term ARROW HSLICE expr ']' ';' '}'   /* someref->{[bar();]} */
-			{ $$ = newLISTOP(OP_HSLICE, 0,
-                                    scalar($4),
-                                    ref(newHVREF($1, LOCATION($2)), OP_HSLICE), LOCATION($3));
+			{ 
+                            $$ = newLISTOP(OP_HSLICE, 0,
+                                scalar($4),
+                                ref(newHVREF($1, LOCATION($2)), OP_HSLICE), LOCATION($3));
+                            $$->op_private = IVAL($3);
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'{');
@@ -852,6 +854,7 @@ subscripted:    star '{' expr ';' '}'       /* *main::{something} like *STDOUT{I
 			{ $$ = newLISTOP(OP_HSLICE, 0,
 					scalar($3),
 					ref($1, OP_HSLICE), LOCATION($2));
+                            $$->op_private = IVAL($2);
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
 			  TOKEN_GETMAD($4,$$,'j');
@@ -1049,12 +1052,7 @@ anonymous:
 	;
 
 /* Things called with "do" */
-termdo	:       DO term	%prec UNIOP                     /* do $filename */
-			{ 
-                            $$ = dofile($2, IVAL($1), LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'o');
-			}
-	|	DO dblock cont %prec '('               /* do { code */
+termdo	:	DO dblock cont %prec '('               /* do { code */
                         {
                             OP* op_scope =
                                 scope(newWHILEOP(0, 1, (LOOP*)(OP*)NULL,

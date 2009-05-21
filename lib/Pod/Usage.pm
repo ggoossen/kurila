@@ -628,8 +628,7 @@ sub _handle_element_end($self, $element) {
     }
 }
 
-sub start_document {
-    my $self = shift;
+sub start_document($self, ...) {
     $self->SUPER::start_document();
     my $msg = $self->{USAGE_OPTIONS}->{?message}  or  return 1;
     my $out_fh = $self->output_fh();

@@ -9,7 +9,7 @@ do {
 	require XSLoader;
 
 	my @load;
-	local $^WARNING;
+	local $^WARNING = 0;
 	local *XSLoader::load = sub {
 		push @load, \@_;
 	};

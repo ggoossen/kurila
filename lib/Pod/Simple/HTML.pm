@@ -168,8 +168,8 @@ sub go { exit Pod::Simple::HTML->parse_from_file(< @ARGV) }
 #  For that, use perldoc!
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sub new {
-    my $new = shift->SUPER::new(< @_);
+sub new($self, @< @_) {
+    my $new = $self->SUPER::new(< @_);
     #$new->nix_X_codes(1);
     $new->nbsp_for_S(1);
     $new->accept_targets( 'html', 'HTML' );
@@ -370,17 +370,17 @@ sub index_as_html {
     my $self = @_[0];
     # This is meant to be called AFTER the input document has been parsed!
 
-    my $points = $self->{?'PSHTML_index_points'} || \@();
+    my $points = $self->{?'PSHTML_index_points'} || @();
 
-    (nelems $points->@) +> 1 or return qq[<div class='indexgroupEmpty'></div>\n];
+    (nelems $points) +> 1 or return qq[<div class='indexgroupEmpty'></div>\n];
     # There's no point in having a 0-item or 1-item index, I dare say.
 
     my@(@out) =@( @( qq{\n<div class='indexgroup'>} ));
     my $level = 0;
 
     my( $target_level, $previous_tagname, $tagname, $text, $anchorname, $indent);
-    foreach my $p ( @( < $points->@, \@('head0', '(end)') ) ) {
-        @($tagname, $text) =  $p->@;
+    foreach my $p ( $points +@+ @: @: 'head0', '(end)' ) {
+        @($tagname, $text) =  $p;
         $anchorname = $self->section_escape($text);
         if( $tagname =~ m{^head(\d+)$} ) {
             $target_level = 0 + $1;
@@ -464,7 +464,7 @@ sub _do_middle_main_loop {
                     print $fh, qq[name="$esc"];
                         DEBUG and print $^STDOUT, "Linearized ", scalar(nelems @to_unget),
                     " tokens as \"$name\".\n";
-                    push  $self->{+'PSHTML_index_points'}->@, \@($tagname, $name)
+                    push  $self->{+'PSHTML_index_points'}, @($tagname, $name)
                         if %ToIndex{?$tagname };
                 # Obviously, this discards all formatting codes (saving
                 #  just their content), but ahwell.
@@ -636,8 +636,8 @@ sub section_name_tidy($self, $section) {
     return $section;
 }
 
-sub section_url_escape  { shift->general_url_escape(< @_) }
-sub pagepath_url_escape { shift->general_url_escape(< @_) }
+sub section_url_escape($self, @< @_)  { $self->general_url_escape(< @_) }
+sub pagepath_url_escape($self, @< @_) { $self->general_url_escape(< @_) }
 
 sub general_url_escape($self, $string) {
 

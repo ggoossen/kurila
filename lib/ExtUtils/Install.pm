@@ -439,7 +439,7 @@ sub _mkpath($dir,$show,$mode,?$verbose,?$dry_run) {
     }
     if (!$dry_run) {
         if ( ! try { File::Path::mkpath($dir,$show,$mode); 1 } ) {
-            _choke("Can't create '$dir'","$^EVAL_ERROR");
+            _choke("Can't create '$dir'",$^EVAL_ERROR->message);
         }
 
     }
@@ -791,14 +791,14 @@ sub install { #XXX OS-SPECIFIC
                 $mode = $mode ^|^ 0222
                     if $realtarget ne $targetfile;
                 _chmod( $mode, $targetfile, $verbose );
-                $result->{+install}->{+$targetfile} = $sourcefile;
+                $result->{+install}{+$targetfile} = $sourcefile;
                 1
             } or do {
-                $result->{+install_fail}->{+$targetfile} = $sourcefile;
+                $result->{+install_fail}{+$targetfile} = $sourcefile;
                 die $^EVAL_ERROR;
             };
         } else {
-            $result->{+install_unchanged}->{+$targetfile} = $sourcefile;
+            $result->{+install_unchanged}{+$targetfile} = $sourcefile;
             print $^STDOUT, "Skipping $targetfile (unchanged)\n" if $verbose;
         }
 
@@ -1063,7 +1063,7 @@ sub inc_uninstall($filepath,$libdir,$verbose,$dry_run,$ignore,$results) {
             next;
         }
         if ($dry_run) {
-            $results->{uninstall}->{+$targetfile} = $filepath;
+            $results->{uninstall}{+$targetfile} = $filepath;
             if ($verbose) {
                 $Inc_uninstall_warn_handler ||= ExtUtils::Install::Warn->new();
                 $libdir =~ s|^\./||s ; # That's just cosmetics, no need to port. It looks prettier.
@@ -1080,10 +1080,10 @@ sub inc_uninstall($filepath,$libdir,$verbose,$dry_run,$ignore,$results) {
                     if $ExtUtils::Install::Testing and
                     File::Spec->canonpath($ExtUtils::Install::Testing) eq $targetfile;
                 forceunlink($targetfile,'tryhard');
-                $results->{+uninstall}->{+$targetfile} = $filepath;
+                $results->{+uninstall}{+$targetfile} = $filepath;
                 1;
             } or do {
-                $results->{+fail_uninstall}->{+$targetfile} = $filepath;
+                $results->{+fail_uninstall}{+$targetfile} = $filepath;
                 if ($seen_ours) { 
                     warn "Failed to remove probably harmless shadow file '$targetfile'\n";
                 } else {

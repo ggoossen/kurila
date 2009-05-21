@@ -42,5 +42,5 @@ do {
 do {
     # OPpDEREF and OPpHELEM_OPTIONAL
     my %c = %();
-    is( %c{?"aap"}->{?"noot"}, undef );
+    is( %c{?"aap"}{?"noot"}, undef );
 }

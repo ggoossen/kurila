@@ -26,19 +26,11 @@ printf $^STDOUT, < @a;
 printf $^STDOUT, < @a;
 
 $^OUTPUT_FIELD_SEPARATOR = ' ';
-$^OUTPUT_RECORD_SEPARATOR = "\n";
 
-print $^STDOUT, "ok","11";
-
-my @x = @("ok","12\nok","13\nok");
-my @y = @("15\nok","16");
-print $^STDOUT, < @x,"14\nok",< @y;
-do {
-    local $^OUTPUT_RECORD_SEPARATOR = "ok 17\n# null =>[\000]\nok 18\n";
-    print $^STDOUT, "";
-};
-
-$^OUTPUT_RECORD_SEPARATOR = '';
+print $^STDOUT, "ok","11\n";
+for (12..18) {
+    print $^STDOUT, "ok","$_\n";
+}
 
 if (!exists &Errno::EBADF) {
     print $^STDOUT, "ok 19 # skipped: no EBADF\n";

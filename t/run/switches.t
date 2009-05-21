@@ -6,7 +6,7 @@
 
 BEGIN { require "./test.pl"; }
 
-plan(tests => 60);
+plan(tests => 55);
 
 use Config;
 
@@ -36,39 +36,11 @@ $r = runperl(
 is( $r, "<foo\0><bar\0><baz\0>", "-0" );
 
 $r = runperl(
-    switches	=> \@( '-l', '-0', '-p' ),
-    stdin	=> 'foo\0bar\0baz\0',
-    prog	=> '1',
-    );
-is( $r, "foo\nbar\nbaz\n", "-0 after a -l" );
-
-$r = runperl(
-    switches	=> \@( '-0', '-l', '-p' ),
-    stdin	=> 'foo\0bar\0baz\0',
-    prog	=> '1',
-    );
-is( $r, "foo\0bar\0baz\0", "-0 before a -l" );
-
-$r = runperl(
     switches	=> \@( sprintf('-0%o', ord 'x') ),
     stdin	=> 'fooxbarxbazx',
     prog	=> 'print $^STDOUT, qq(<$_>) while ~< *ARGV',
     );
 is( $r, "<foox><barx><bazx>", "-0 with octal number" );
-
-$r = runperl(
-    switches	=> \@( '-00', '-p' ),
-    stdin	=> 'abc\ndef\n\nghi\njkl\nmno\n\npq\n',
-    prog	=> 's/\n/-/g;$_.=q(/)',
-    );
-is( $r, 'abc-def--/ghi-jkl-mno--/pq-/', '-00 (paragraph mode)' );
-
-$r = runperl(
-    switches	=> \@( '-0777', '-p' ),
-    stdin	=> 'abc\ndef\n\nghi\njkl\nmno\n\npq\n',
-    prog	=> 's/\n/-/g;$_.=q(/)',
-    );
-is( $r, 'abc-def--ghi-jkl-mno--pq-/', '-0777 (slurp mode)' );
 
 $r = runperl(
     switches	=> \@( '-066' ),
@@ -109,14 +81,6 @@ SWTEST
  );
     push @tmpfiles, $filename;
 };
-
-# Tests for -l
-
-$r = runperl(
-    switches	=> \@( sprintf('-l%o', ord 'x') ),
-    prog	=> 'print $^STDOUT, $_ for qw/foo bar/'
-    );
-is( $r, 'fooxbarx', '-l with octal number' );
 
 # Tests for -m and -M
 

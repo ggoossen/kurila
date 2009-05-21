@@ -60,7 +60,7 @@ print $^STDOUT, "not "
     unless compare_addr($udpa->peername,$udpb->sockname, 'peername', 'sockname');
 print $^STDOUT, "ok 3\n";
 
-my $where = $udpb->recv((my $buf=""),5);
+my $where = $udpb->recv(\(my $buf=""),5);
 print $^STDOUT, $buf;
 
 my @xtra = @( () );
@@ -72,7 +72,7 @@ unless(compare_addr($where,$udpa->sockname, 'recv name', 'sockname')) {
 print $^STDOUT, "ok 5\n";
 
 $udpb->send("ok 6\n",< @xtra);
-$udpa->recv(($buf=""),5);
+$udpa->recv(\($buf=""),5);
 print $^STDOUT, $buf;
 
 print $^STDOUT, "not " if $udpa->connected;

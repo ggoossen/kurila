@@ -133,7 +133,6 @@ sub copy {
     my $closefrom = 0;
     my $closeto = 0;
     my ($size, $status, $r, $buf);
-          local($^OUTPUT_RECORD_SEPARATOR) = '';
 
     my $from_h;
     my $to_h;

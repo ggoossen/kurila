@@ -15,7 +15,7 @@ our @EXPORT_OK = qw(
   e2char
   e2charnum
 );
-our %EXPORT_TAGS = %('ALL' => \@EXPORT_OK);
+our %EXPORT_TAGS = %('ALL' => @EXPORT_OK);
 
 #==========================================================================
 

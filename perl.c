@@ -600,10 +600,7 @@ perl_destruct(pTHXx)
     }
 
     /* switches */
-    PL_minus_n      = FALSE;
-    PL_minus_p      = FALSE;
     PL_minus_l      = FALSE;
-    PL_minus_a      = FALSE;
     PL_dowarn       = G_WARN_OFF;
     PL_doextract    = FALSE;
     PL_unsafe       = FALSE;
@@ -622,9 +619,6 @@ perl_destruct(pTHXx)
 
     SvREFCNT_dec(PL_ofs_sv);	/* $, */
     PL_ofs_sv = NULL;
-
-    SvREFCNT_dec(PL_ors_sv);	/* $\ */
-    PL_ors_sv = NULL;
 
     SVcpNULL(PL_rs);	/* $/ */
 
@@ -1345,16 +1339,12 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #endif
 	    case ' ':
 	    case '0':
-	    case 'a':
 	    case 'c':
 	    case 'd':
 	    case 'D':
 	    case 'h':
-	    case 'l':
 	    case 'M':
 	    case 'm':
-	    case 'n':
-	    case 'p':
 	    case 'u':
 	    case 'U':
 	    case 'v':
@@ -2438,24 +2428,16 @@ S_usage(pTHX_ const char *name)		/* XXX move this out into a module ? */
 
     static const char * const usage_msg[] = {
 "-0[octal]         specify record separator (\\0, if no argument)",
-"-a                autosplit mode with -n or -p (splits $_ into @F)",
 "-C[number/list]   enables the listed Unicode features",
 "-c                check syntax only (runs BEGIN and CHECK blocks)",
 "-d[:debugger]     run program under debugger",
 "-D[number/list]   set debugging flags (argument is a bit mask or alphabets)",
 "-e program        one line of program (several -e's allowed, omit programfile)",
 "-f                don't do $sitelib/sitecustomize.pl at startup",
-"-F/pattern/       split() pattern for -a switch (//'s are optional)",
-"-i[extension]     edit <> files in place (makes backup if extension supplied)",
 "-Idirectory       specify $^INCLUDE_PATH/#include directory (several -I's allowed)",
-"-l[octal]         enable line ending processing, specifies line terminator",
 "-[mM][-]module    execute \"use/no module...\" before executing program",
-"-n                assume \"while (<>) { ... }\" loop around program",
-"-p                assume loop like -n but print line also, like sed",
 "-s                enable rudimentary parsing for switches after programfile",
 "-S                look for programfile using PATH environment variable",
-"-t                enable tainting warnings",
-"-T                enable tainting checks",
 "-u                dump core after parsing program",
 "-U                allow unsafe operations",
 "-v                print version, subversion (includes VERY IMPORTANT perl info)",
@@ -2604,10 +2586,6 @@ Perl_moreswitches(pTHX_ const char *s)
 	if (PL_unicode & PERL_UNICODE_UTF8CACHEASSERT_FLAG)
 	    PL_utf8cache = -1;
 	return s;
-    case 'a':
-	PL_minus_a = TRUE;
-	s++;
-	return s;
     case 'c':
 	PL_minus_c = TRUE;
 	s++;
@@ -2690,30 +2668,6 @@ Perl_moreswitches(pTHX_ const char *s)
 	else
 	    Perl_croak(aTHX_ "No directory specified for -I");
 	return s;
-    case 'l':
-	PL_minus_l = TRUE;
-	s++;
-	if (PL_ors_sv) {
-	    SvREFCNT_dec(PL_ors_sv);
-	    PL_ors_sv = NULL;
-	}
-	if (isDIGIT(*s)) {
-            I32 flags = 0;
-	    STRLEN numlen;
-	    PL_ors_sv = newSVpvs("\n");
-	    numlen = 3 + (*s == '0');
-	    *SvPVX_mutable(PL_ors_sv) = (char)grok_oct(s, &numlen, &flags, NULL);
-	    s += numlen;
-	}
-	else {
-	    if (RsPARA(PL_rs)) {
-		PL_ors_sv = newSVpvs("\n\n");
-	    }
-	    else {
-		PL_ors_sv = newSVsv(PL_rs);
-	    }
-	}
-	return s;
     case 'M':
 	forbid_setid('M', FALSE);	/* XXX ? */
 	/* FALL THROUGH */
@@ -2768,14 +2722,6 @@ Perl_moreswitches(pTHX_ const char *s)
 	}
 	else
 	    Perl_croak(aTHX_ "Missing argument to -%c", option);
-	return s;
-    case 'n':
-	PL_minus_n = TRUE;
-	s++;
-	return s;
-    case 'p':
-	PL_minus_p = TRUE;
-	s++;
 	return s;
     case 'u':
 #ifdef MACOS_TRADITIONAL
@@ -4077,11 +4023,6 @@ S_init_postdump_symbols(pTHX_ register int argc, register char **argv, register 
 #ifdef THREADS_HAVE_PIDS
     PL_ppid = (IV)getppid();
 #endif
-
-    /* touch @F array to prevent spurious warnings 20020415 MJD */
-    if (PL_minus_a) {
-      (void) get_av("main::F", TRUE | GV_ADDMULTI);
-    }
 }
 
 STATIC void
