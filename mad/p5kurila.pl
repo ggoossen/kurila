@@ -1594,7 +1594,10 @@ sub indent {
               or $null_type eq "use"
                 or $is_subdef) {
             if ($auto_indent) {
-                set_madprop($op, 'semicolon', '');
+                my ($next_indent_line, undef) = first_token($op->next_siblings);
+                if ($next_indent_line and (not $first_indent_line or $next_indent_line > $first_indent_line) ) {
+                    set_madprop($op, 'semicolon', '');
+                }
             }
             ($first_indent_line, undef) = first_token( $op->tag eq 'op_nextstate' ? $op->next_sibling() : $op );
             $cont = 0;

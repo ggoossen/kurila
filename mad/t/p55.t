@@ -367,3 +367,6 @@ BEGIN { my $x = DEBUG(); }
 1;
 ########
 evalfile "foo.pl"
+########
+sub foo() { 33 };
+foo

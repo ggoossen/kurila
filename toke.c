@@ -948,8 +948,6 @@ S_skipspace(pTHX_ register char *s, bool continuous_line)
 	    SvCUR_set(PL_linestr, curoff);
 	    s = SvPVX_mutable(PL_linestr) + curoff;
 	    *s = 0;
-            if (curoff && s[-1] == '\n')
-		s[-1] = ' ';
 #endif
 
 	    /* end of file. */
@@ -1259,7 +1257,7 @@ S_force_word(pTHX_ register char *start, int token, int check_keyword, int allow
 	    return start;
 	start_force(PL_curforce);
 	if (PL_madskills)
-	    curmad('X', newSVpvn(start,s-start), NULL);
+	    curmad('X', newSVpvn(start,s-start), S_curlocation(start));
 	if (token == METHOD) {
 	    s = SKIPSPACE1(s);
 	    if (*s == '(')
@@ -2514,14 +2512,15 @@ Perl_madlex(pTHX)
     assert(PL_curforce < 0);
 
     if (!PL_thismad || PL_thismad->mad_key == '^') {	/* not forced already? */
-	if (!PL_thistoken) {
-	    if (PL_realtokenstart < 0 )
+	if (PL_realtokenstart < 0 ) {
+	    if (!PL_thistoken)
 		PL_thistoken = newSVpvs("");
-	    else {
-		char * const tstart = SvPVX_mutable(PL_linestr) + PL_realtokenstart;
+	}
+	else {
+	    char * const tstart = SvPVX_mutable(PL_linestr) + PL_realtokenstart;
+	    if (!PL_thistoken)
 		PL_thistoken = newSVpvn(tstart, s - tstart);
-		realstart = tstart;
-	    }
+	    realstart = tstart;
 	}
 	if (PL_thismad)	/* install head */
 	    CURMAD('X', PL_thistoken, NULL);
@@ -4571,7 +4570,7 @@ Perl_yylex(pTHX)
 #ifdef PERL_MAD
 		    if (PL_madskills) {
 			PL_nextwhite = nextPL_nextwhite;
-			curmad('X', PL_thistoken, NULL);
+			curmad('X', PL_thistoken, S_curlocation(PL_bufptr));
 			PL_thistoken = newSVpvs("");
 		    }
 #endif
