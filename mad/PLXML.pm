@@ -3822,6 +3822,15 @@ sub check { 'ck_fun' }
 sub flags { 'd1' }
 sub args { 'S' }
 
+package PLXML::op_evalfile;
+
+our @ISA = ('PLXML::unop');
+
+sub key { 'evalfile' }
+sub desc { 'evalfile "file"' }
+sub check { 'ck_fun' }
+sub flags { 'd1' }
+sub args { 'S' }
 
 package PLXML::op_entereval;
 

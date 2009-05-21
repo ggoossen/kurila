@@ -361,3 +361,9 @@ local &{"foo"};
 ########
 BEGIN { unless(defined &DEBUG) { *DEBUG = sub () {0} } }
 BEGIN { my $x = DEBUG(); }
+########
+
+#initial comment
+1;
+########
+evalfile "foo.pl"
