@@ -939,38 +939,7 @@ S_skipspace(pTHX_ register char *s, bool continuous_line)
 	if ((s = filter_gets(PL_linestr, PL_rsfp,
 			     (prevlen = SvCUR(PL_linestr)))) == NULL)
 	{
-#ifdef PERL_MAD
-	    if (PL_madskills && curoff != startoff) {
-		if (!PL_skipwhite)
-		    PL_skipwhite = newSVpvs("");
-		sv_catpvn(PL_skipwhite, SvPVX_mutable(PL_linestr) + startoff,
-					curoff - startoff);
-	    }
-
-	    /* mustn't throw out old stuff yet if madpropping */
-	    SvCUR_set(PL_linestr, curoff);
-	    s = SvPVX_mutable(PL_linestr) + curoff;
-	    *s = 0;
-	    if (curoff && s[-1] == '\n')
-		s[-1] = ' ';
-#endif
-
-	    /* end of file. */
-#ifdef PERL_MAD
-	    sv_catpvn(PL_linestr,";", 1);
-#else
-	    sv_setpvn(PL_linestr,";", 1);
-#endif
-
-	    /* reset variables for next time we lex */
-	    PL_oldoldbufptr = PL_oldbufptr = PL_bufptr = s = PL_linestart
-		= SvPVX_mutable(PL_linestr)
-#ifdef PERL_MAD
-		+ curoff
-#endif
-		;
-	    PL_bufend = SvPVX_mutable(PL_linestr) + SvCUR(PL_linestr);
-	    PL_last_lop = PL_last_uni = NULL;
+	    s = PL_bufend;
 
 	    /* Close the filehandle.  Could be from
 	     * STDIN, or a regular file.  If we were reading code from
