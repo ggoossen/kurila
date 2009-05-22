@@ -271,20 +271,20 @@ sideff	:	error
                             $$ = newLOOPOP(OPf_PARENS, 1, scalar($3), $1, FALSE, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'w');
 			}
-	|	LOOPDO block WHILE expr
+	|	LOOPDO block optional_semicolon WHILE expr
                         {
-                            $$ = newLOOPOP(OPf_PARENS, 1, scalar($4), $2, TRUE, LOCATION($3));
-                            TOKEN_GETMAD($3,$$,'w');
+                            $$ = newLOOPOP(OPf_PARENS, 1, scalar($5), $2, TRUE, LOCATION($4));
+                            TOKEN_GETMAD($4,$$,'w');
 			}
 	|	expr UNTIL iexpr
 			{ 
                             $$ = newLOOPOP(OPf_PARENS, 1, $3, $1, FALSE, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'w');
 			}
-	|	LOOPDO block UNTIL iexpr
+	|	LOOPDO block optional_semicolon UNTIL iexpr
                         {
-                            $$ = newLOOPOP(OPf_PARENS, 1, $4, $2, TRUE, LOCATION($3));
-                            TOKEN_GETMAD($3,$$,'w');
+                            $$ = newLOOPOP(OPf_PARENS, 1, $5, $2, TRUE, LOCATION($4));
+                            TOKEN_GETMAD($4,$$,'w');
 			}
 	|	expr FOR expr
 			{ $$ = newFOROP(0, NULL,
