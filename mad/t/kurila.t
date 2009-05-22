@@ -2143,6 +2143,54 @@ elsif ($b)
 $a; $b;
 ----
 $a; $b
+====
+try {
+    1;
+};
+----
+try {
+    1;
+}
+====
+do {
+ {
+  $b;
+ } while $a;
+};
+----
+do
+    loop
+        $b
+    while $a
+====
+if ($a) {
+     local($Foo::b) = '';
+  $a;
+}
+----
+if ($a)
+    local($Foo::b) = ''
+    $a
+====
+do {
+  package foo;
+  3;
+};
+----
+do
+    package foo
+    3
+====
+sub mkpath {
+    my $old_style = (
+    UNIVERSAL::isa(@_[0],'ARRAY')
+        ) ?? 1 !! 0;
+}
+----
+sub mkpath
+    my $old_style = (
+        UNIVERSAL::isa(@_[0],'ARRAY')
+        ) ?? 1 !! 0
 END
 }
 

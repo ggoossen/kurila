@@ -2941,6 +2941,7 @@ sub ast {
     if ($self->{mp}{w}) {
 	my @newkids;
 	my @tmpkids;
+	push @newkids, $self->madness('D');
 	push @tmpkids, $self->{Kids};
 	my $anddo = $$self{Kids}[-1]{Kids}[0]{Kids};
 	eval { push @newkids, $anddo->[1]->ast($self,@_); };
@@ -3080,7 +3081,7 @@ sub ast {
     my $nextthing = $$self{Kids}[1];
 
     if ($$self{mp}{W}) {
-	push @retval, $self->madness('L');
+	push @retval, $self->madness('L D');
 	push @newkids, $self->madness('W d');
 
 	if (ref $enterloop eq 'PLXML::op_enteriter') {

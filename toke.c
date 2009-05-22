@@ -1159,6 +1159,8 @@ S_curmad(pTHX_ char slot, SV *sv, SV* location)
 	(*where)->mad_key = slot;
 	sv_free((SV*)((*where)->mad_val));
 	(*where)->mad_val = (void*)sv;
+	(*where)->mad_linenr = linenr;
+	(*where)->mad_charoffset = charoffset;
     }
     else
 	addmad(newMADsv(slot, sv, linenr, charoffset), where, 0);
@@ -4515,7 +4517,7 @@ Perl_yylex(pTHX)
 #ifdef PERL_MAD
 		    if (PL_madskills) {
 			PL_nextwhite = nextPL_nextwhite;
-			curmad('X', PL_thistoken, NULL);
+			curmad('X', PL_thistoken, S_curlocation(PL_bufptr));
 			PL_thistoken = newSVpvs("");
 		    }
 #endif
