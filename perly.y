@@ -374,47 +374,47 @@ loop	:	label WHILE remember '(' texpr ')'
                                 $<opval>$ = $5;
                             }
                         }
-                    mintro mblock cont
+                    mintro mblock optional_semicolon cont
 			{
                             OP *innerop;
 			    $$ = block_end($3,
                                 newSTATEOP(0, PVAL($1),
                                     innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                        LOCATION($2), $<opval>7, $9, $10, $8), LOCATION($2)));
+                                        LOCATION($2), $<opval>7, $9, $11, $8), LOCATION($2)));
                             TOKEN_GETMAD($1,innerop,'L');
                             TOKEN_GETMAD($2,innerop,'W');
                             TOKEN_GETMAD($4,innerop,'(');
                             TOKEN_GETMAD($6,innerop,')');
 			}
 
-	|	label UNTIL '(' remember iexpr ')' mintro mblock cont
+	|	label UNTIL '(' remember iexpr ')' mintro mblock optional_semicolon cont
 			{ 
                             OP *innerop;
 			    $$ = block_end($4,
 				   newSTATEOP(0, PVAL($1),
 				     innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                         LOCATION($2), $5, $8, $9, $7), LOCATION($2)));
+                                         LOCATION($2), $5, $8, $10, $7), LOCATION($2)));
                             TOKEN_GETMAD($1,innerop,'L');
                             TOKEN_GETMAD($2,innerop,'W');
                             TOKEN_GETMAD($3,innerop,'(');
                             TOKEN_GETMAD($6,innerop,')');
 			}
-	|	label FOR MY remember my_scalar '(' mexpr ')' mblock cont
+	|	label FOR MY remember my_scalar '(' mexpr ')' mblock optional_semicolon cont
 			{ OP *innerop;
 			  $$ = block_end($4,
                               innerop = newFOROP(0, PVAL($1),
-                                  $5, scalar($7), $9, $10, LOCATION($2)));
+                                  $5, scalar($7), $9, $11, LOCATION($2)));
 			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first->op_sibling,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
 			  TOKEN_GETMAD($3,((LISTOP*)innerop)->op_first->op_sibling,'d');
 			  TOKEN_GETMAD($6,((LISTOP*)innerop)->op_first->op_sibling,'(');
 			  TOKEN_GETMAD($8,((LISTOP*)innerop)->op_first->op_sibling,')');
 			}
-	|	label FOR remember mydef '(' mexpr ')' mblock cont
+	|	label FOR remember mydef '(' mexpr ')' mblock optional_semicolon cont
 			{ OP *innerop;
 			  $$ = block_end($3,
 			     innerop = newFOROP(0, PVAL($1),
-                                 $4, scalar($6), $8, $9, LOCATION($2)));
+                                 $4, scalar($6), $8, $10, LOCATION($2)));
 			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first->op_sibling,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
 			  TOKEN_GETMAD($5,((LISTOP*)innerop)->op_first->op_sibling,'(');

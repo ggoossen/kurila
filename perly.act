@@ -294,14 +294,14 @@ case 2:
 #line 378 "perly.y"
     {
                             OP *innerop;
-			    (yyval.opval) = block_end((ps[(3) - (10)].val.ionlyval),
-                                newSTATEOP(0, PVAL((ps[(1) - (10)].val.p_tkval)),
+			    (yyval.opval) = block_end((ps[(3) - (11)].val.ionlyval),
+                                newSTATEOP(0, PVAL((ps[(1) - (11)].val.p_tkval)),
                                     innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                        LOCATION((ps[(2) - (10)].val.i_tkval)), (ps[(7) - (10)].val.opval), (ps[(9) - (10)].val.opval), (ps[(10) - (10)].val.opval), (ps[(8) - (10)].val.ionlyval)), LOCATION((ps[(2) - (10)].val.i_tkval))));
-                            TOKEN_GETMAD((ps[(1) - (10)].val.p_tkval),innerop,'L');
-                            TOKEN_GETMAD((ps[(2) - (10)].val.i_tkval),innerop,'W');
-                            TOKEN_GETMAD((ps[(4) - (10)].val.i_tkval),innerop,'(');
-                            TOKEN_GETMAD((ps[(6) - (10)].val.i_tkval),innerop,')');
+                                        LOCATION((ps[(2) - (11)].val.i_tkval)), (ps[(7) - (11)].val.opval), (ps[(9) - (11)].val.opval), (ps[(11) - (11)].val.opval), (ps[(8) - (11)].val.ionlyval)), LOCATION((ps[(2) - (11)].val.i_tkval))));
+                            TOKEN_GETMAD((ps[(1) - (11)].val.p_tkval),innerop,'L');
+                            TOKEN_GETMAD((ps[(2) - (11)].val.i_tkval),innerop,'W');
+                            TOKEN_GETMAD((ps[(4) - (11)].val.i_tkval),innerop,'(');
+                            TOKEN_GETMAD((ps[(6) - (11)].val.i_tkval),innerop,')');
 			;}
     break;
 
@@ -309,41 +309,41 @@ case 2:
 #line 391 "perly.y"
     { 
                             OP *innerop;
-			    (yyval.opval) = block_end((ps[(4) - (9)].val.ionlyval),
-				   newSTATEOP(0, PVAL((ps[(1) - (9)].val.p_tkval)),
+			    (yyval.opval) = block_end((ps[(4) - (10)].val.ionlyval),
+				   newSTATEOP(0, PVAL((ps[(1) - (10)].val.p_tkval)),
 				     innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                         LOCATION((ps[(2) - (9)].val.i_tkval)), (ps[(5) - (9)].val.opval), (ps[(8) - (9)].val.opval), (ps[(9) - (9)].val.opval), (ps[(7) - (9)].val.ionlyval)), LOCATION((ps[(2) - (9)].val.i_tkval))));
-                            TOKEN_GETMAD((ps[(1) - (9)].val.p_tkval),innerop,'L');
-                            TOKEN_GETMAD((ps[(2) - (9)].val.i_tkval),innerop,'W');
-                            TOKEN_GETMAD((ps[(3) - (9)].val.i_tkval),innerop,'(');
-                            TOKEN_GETMAD((ps[(6) - (9)].val.i_tkval),innerop,')');
+                                         LOCATION((ps[(2) - (10)].val.i_tkval)), (ps[(5) - (10)].val.opval), (ps[(8) - (10)].val.opval), (ps[(10) - (10)].val.opval), (ps[(7) - (10)].val.ionlyval)), LOCATION((ps[(2) - (10)].val.i_tkval))));
+                            TOKEN_GETMAD((ps[(1) - (10)].val.p_tkval),innerop,'L');
+                            TOKEN_GETMAD((ps[(2) - (10)].val.i_tkval),innerop,'W');
+                            TOKEN_GETMAD((ps[(3) - (10)].val.i_tkval),innerop,'(');
+                            TOKEN_GETMAD((ps[(6) - (10)].val.i_tkval),innerop,')');
 			;}
     break;
 
   case 40:
 #line 403 "perly.y"
     { OP *innerop;
-			  (yyval.opval) = block_end((ps[(4) - (10)].val.ionlyval),
-                              innerop = newFOROP(0, PVAL((ps[(1) - (10)].val.p_tkval)),
-                                  (ps[(5) - (10)].val.opval), scalar((ps[(7) - (10)].val.opval)), (ps[(9) - (10)].val.opval), (ps[(10) - (10)].val.opval), LOCATION((ps[(2) - (10)].val.i_tkval))));
-			  TOKEN_GETMAD((ps[(1) - (10)].val.p_tkval),((LISTOP*)innerop)->op_first->op_sibling,'L');
-			  TOKEN_GETMAD((ps[(2) - (10)].val.i_tkval),((LISTOP*)innerop)->op_first->op_sibling,'W');
-			  TOKEN_GETMAD((ps[(3) - (10)].val.i_tkval),((LISTOP*)innerop)->op_first->op_sibling,'d');
-			  TOKEN_GETMAD((ps[(6) - (10)].val.i_tkval),((LISTOP*)innerop)->op_first->op_sibling,'(');
-			  TOKEN_GETMAD((ps[(8) - (10)].val.i_tkval),((LISTOP*)innerop)->op_first->op_sibling,')');
+			  (yyval.opval) = block_end((ps[(4) - (11)].val.ionlyval),
+                              innerop = newFOROP(0, PVAL((ps[(1) - (11)].val.p_tkval)),
+                                  (ps[(5) - (11)].val.opval), scalar((ps[(7) - (11)].val.opval)), (ps[(9) - (11)].val.opval), (ps[(11) - (11)].val.opval), LOCATION((ps[(2) - (11)].val.i_tkval))));
+			  TOKEN_GETMAD((ps[(1) - (11)].val.p_tkval),((LISTOP*)innerop)->op_first->op_sibling,'L');
+			  TOKEN_GETMAD((ps[(2) - (11)].val.i_tkval),((LISTOP*)innerop)->op_first->op_sibling,'W');
+			  TOKEN_GETMAD((ps[(3) - (11)].val.i_tkval),((LISTOP*)innerop)->op_first->op_sibling,'d');
+			  TOKEN_GETMAD((ps[(6) - (11)].val.i_tkval),((LISTOP*)innerop)->op_first->op_sibling,'(');
+			  TOKEN_GETMAD((ps[(8) - (11)].val.i_tkval),((LISTOP*)innerop)->op_first->op_sibling,')');
 			;}
     break;
 
   case 41:
 #line 414 "perly.y"
     { OP *innerop;
-			  (yyval.opval) = block_end((ps[(3) - (9)].val.ionlyval),
-			     innerop = newFOROP(0, PVAL((ps[(1) - (9)].val.p_tkval)),
-                                 (ps[(4) - (9)].val.opval), scalar((ps[(6) - (9)].val.opval)), (ps[(8) - (9)].val.opval), (ps[(9) - (9)].val.opval), LOCATION((ps[(2) - (9)].val.i_tkval))));
-			  TOKEN_GETMAD((ps[(1) - (9)].val.p_tkval),((LISTOP*)innerop)->op_first->op_sibling,'L');
-			  TOKEN_GETMAD((ps[(2) - (9)].val.i_tkval),((LISTOP*)innerop)->op_first->op_sibling,'W');
-			  TOKEN_GETMAD((ps[(5) - (9)].val.i_tkval),((LISTOP*)innerop)->op_first->op_sibling,'(');
-			  TOKEN_GETMAD((ps[(7) - (9)].val.i_tkval),((LISTOP*)innerop)->op_first->op_sibling,')');
+			  (yyval.opval) = block_end((ps[(3) - (10)].val.ionlyval),
+			     innerop = newFOROP(0, PVAL((ps[(1) - (10)].val.p_tkval)),
+                                 (ps[(4) - (10)].val.opval), scalar((ps[(6) - (10)].val.opval)), (ps[(8) - (10)].val.opval), (ps[(10) - (10)].val.opval), LOCATION((ps[(2) - (10)].val.i_tkval))));
+			  TOKEN_GETMAD((ps[(1) - (10)].val.p_tkval),((LISTOP*)innerop)->op_first->op_sibling,'L');
+			  TOKEN_GETMAD((ps[(2) - (10)].val.i_tkval),((LISTOP*)innerop)->op_first->op_sibling,'W');
+			  TOKEN_GETMAD((ps[(5) - (10)].val.i_tkval),((LISTOP*)innerop)->op_first->op_sibling,'(');
+			  TOKEN_GETMAD((ps[(7) - (10)].val.i_tkval),((LISTOP*)innerop)->op_first->op_sibling,')');
 			;}
     break;
 
