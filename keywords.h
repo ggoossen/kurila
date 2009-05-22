@@ -248,5 +248,6 @@
 #define KEY_x			233
 #define KEY_xor			234
 #define KEY_y			235
+#define KEY_loop			236
 
 /* ex: set ro: */

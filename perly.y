@@ -79,7 +79,7 @@
 %token <i_tkval> LOOPEX DOTDOT
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
-%token <i_tkval> DO NOAMP
+%token <i_tkval> DO LOOPDO NOAMP
 %token <i_tkval> ANONARY ANONARYL ANONHSH ANONHSHL ANONSCALAR ANONSCALARL
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
@@ -271,20 +271,20 @@ sideff	:	error
                             $$ = newLOOPOP(OPf_PARENS, 1, scalar($3), $1, FALSE, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'w');
 			}
-	|	block WHILE expr
+	|	LOOPDO block WHILE expr
                         {
-                            $$ = newLOOPOP(OPf_PARENS, 1, scalar($3), $1, TRUE, LOCATION($2));
-                            TOKEN_GETMAD($2,$$,'w');
+                            $$ = newLOOPOP(OPf_PARENS, 1, scalar($4), $2, TRUE, LOCATION($3));
+                            TOKEN_GETMAD($3,$$,'w');
 			}
 	|	expr UNTIL iexpr
 			{ 
                             $$ = newLOOPOP(OPf_PARENS, 1, $3, $1, FALSE, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'w');
 			}
-	|	block UNTIL iexpr
+	|	LOOPDO block UNTIL iexpr
                         {
-                            $$ = newLOOPOP(OPf_PARENS, 1, $3, $1, TRUE, LOCATION($2));
-                            TOKEN_GETMAD($2,$$,'w');
+                            $$ = newLOOPOP(OPf_PARENS, 1, $4, $2, TRUE, LOCATION($3));
+                            TOKEN_GETMAD($3,$$,'w');
 			}
 	|	expr FOR expr
 			{ $$ = newFOROP(0, NULL,

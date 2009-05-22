@@ -158,6 +158,7 @@ local
 localtime
 lock
 log
+loop
 lstat
 nelems
 nkeys

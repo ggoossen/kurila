@@ -5064,6 +5064,13 @@ Perl_yylex(pTHX)
 	case KEY_log:
 	    UNI(OP_LOG);
 
+	case KEY_loop:
+	    s = SKIPSPACE1(s);
+	    if (*s != '{') {
+		S_start_statement_indent(s);
+	    }
+	    PRETERMBLOCK(LOOPDO);
+
 	case KEY_link:
 	    LOP(OP_LINK,XTERM);
 
@@ -6339,6 +6346,12 @@ Perl_keyword (pTHX_ const char *name, I32 len)
                   name[3] == 'k')
               {                                   /* lock       */
                 return -KEY_lock;
+              }
+
+              if (name[2] == 'o' &&
+                  name[3] == 'p')
+              {                                   /* loop       */
+		  return KEY_loop;
               }
 
               goto unknown;

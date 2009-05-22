@@ -167,8 +167,8 @@ case 2:
   case 24:
 #line 275 "perly.y"
     {
-                            (yyval.opval) = newLOOPOP(OPf_PARENS, 1, scalar((ps[(3) - (3)].val.opval)), (ps[(1) - (3)].val.opval), TRUE, LOCATION((ps[(2) - (3)].val.i_tkval)));
-                            TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'w');
+                            (yyval.opval) = newLOOPOP(OPf_PARENS, 1, scalar((ps[(4) - (4)].val.opval)), (ps[(2) - (4)].val.opval), TRUE, LOCATION((ps[(3) - (4)].val.i_tkval)));
+                            TOKEN_GETMAD((ps[(3) - (4)].val.i_tkval),(yyval.opval),'w');
 			;}
     break;
 
@@ -183,8 +183,8 @@ case 2:
   case 26:
 #line 285 "perly.y"
     {
-                            (yyval.opval) = newLOOPOP(OPf_PARENS, 1, (ps[(3) - (3)].val.opval), (ps[(1) - (3)].val.opval), TRUE, LOCATION((ps[(2) - (3)].val.i_tkval)));
-                            TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'w');
+                            (yyval.opval) = newLOOPOP(OPf_PARENS, 1, (ps[(4) - (4)].val.opval), (ps[(2) - (4)].val.opval), TRUE, LOCATION((ps[(3) - (4)].val.i_tkval)));
+                            TOKEN_GETMAD((ps[(3) - (4)].val.i_tkval),(yyval.opval),'w');
 			;}
     break;
 
