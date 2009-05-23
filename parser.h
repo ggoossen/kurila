@@ -39,6 +39,11 @@ typedef struct yy_str_info {
     I32 line_number; /* line number */
 } yy_str_info;
 
+typedef struct yy_lexbrackstack_item {
+    char state;
+    int prev_statement_indent;
+} yy_lex_brackstack_item;
+
 typedef struct yy_parser {
 
     /* parser state */
@@ -59,7 +64,7 @@ typedef struct yy_parser {
 
     I32		lex_brackets;	/* bracket count */
     I32		lex_casemods;	/* casemod count */
-    char	*lex_brackstack;/* what kind of brackets to pop */
+    yy_lex_brackstack_item	*lex_brackstack;/* what kind of brackets to pop */
     char	*lex_casestack;	/* what kind of case mods in effect */
     U8		lex_defer;	/* state after determined token */
     U8		lex_expect;	/* expect after determined token */

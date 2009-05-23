@@ -169,7 +169,7 @@ dblock	:
                         }
 	'{' 
                         {
-                            PL_parser->expect = XTERM;
+                            PL_parser->expect = XSTATE;
                         }
             remember lineseq '}'
 			{

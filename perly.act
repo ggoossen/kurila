@@ -24,7 +24,7 @@ case 2:
   case 5:
 #line 171 "perly.y"
     {
-                            PL_parser->expect = XTERM;
+                            PL_parser->expect = XSTATE;
                         ;}
     break;
 

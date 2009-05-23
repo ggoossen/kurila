@@ -647,7 +647,7 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
     parser->rsfp_filters = (new_filter || !oparser) ? newAV()
 		: AvREFCNT_inc(oparser->rsfp_filters);
 
-    Newx(parser->lex_brackstack, 120, char);
+    Newx(parser->lex_brackstack, 120, yy_lex_brackstack_item);
     Newx(parser->lex_casestack, 12, char);
     *parser->lex_casestack = '\0';
 
@@ -1501,7 +1501,7 @@ S_sublex_push(pTHX)
 
     PL_parser->statement_indent = -1;
     PL_lex_brackets = 0;
-    Newx(PL_lex_brackstack, 120, char);
+    Newx(PL_lex_brackstack, 120, yy_lex_brackstack_item);
     Newx(PL_lex_casestack, 12, char);
     PL_lex_casemods = 0;
     *PL_lex_casestack = '\0';
@@ -1515,6 +1515,9 @@ S_sublex_push(pTHX)
 	if (((PMOP*)PL_sublex_info.sub_op)->op_pmflags & PMf_EXTENDED)
 	    PL_lex_flags |= LEXf_EXT_PAT;
     }
+
+    DEBUG_T({ PerlIO_printf(Perl_debug_log,
+		"### New sublex of '%s'", PL_bufptr); });
 
     return '(';
 }
@@ -1591,15 +1594,18 @@ S_sublex_done(pTHX)
 STATIC void
 S_start_statement_indent(pTHX_ char* s)
 {
-    ENTER;
-    SAVEI32(PL_parser->statement_indent);
+    if (PL_lex_brackets > 100) {
+	Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+    }
+    PL_lex_brackstack[PL_lex_brackets].state = 0;
+    PL_lex_brackstack[PL_lex_brackets].prev_statement_indent = PL_parser->statement_indent;
+    ++PL_lex_brackets;
     PL_parser->statement_indent = s - PL_linestart;
     assert(PL_parser->statement_indent >= 0);
     DEBUG_T({ PerlIO_printf(Perl_debug_log,
 		"### New statement indent level, %d.\n",
 		(int)PL_parser->statement_indent); });
-    start_force(PL_curforce);
-    force_next('{');
+    PL_expect = XSTATE;
 }
 
 /* 
@@ -1610,7 +1616,11 @@ S_start_statement_indent(pTHX_ char* s)
 STATIC void
 S_stop_statement_indent(pTHX)
 {
-    LEAVE;
+    --PL_lex_brackets;
+    if (PL_lex_brackstack[PL_lex_brackets].state != 0) {
+	Perl_croak("wrong matching parens");
+    }
+    PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
     start_force(PL_curforce);
     force_next('}');
 }
@@ -2602,7 +2612,7 @@ Perl_madlex(pTHX)
 	    break;
 	/* remember any fake bracket that lexer is about to discard */ 
 	if (PL_lex_brackets == 1 &&
-	    ((expectation)PL_lex_brackstack[0] & XFAKEBRACK))
+	    ((expectation)PL_lex_brackstack[0].state & XFAKEBRACK))
 	{
 	    s = PL_bufptr;
 	    while (s < PL_bufend && (*s == ' ' || *s == '\t'))
@@ -2982,18 +2992,22 @@ Perl_yylex(pTHX)
     PL_oldbufptr = s;
 
     if (PL_expect == XBLOCK) {
-	s = SKIPSPACE1(s);
-	if (*s != '{') {
-	    ENTER;
-	    SAVEI32(PL_parser->statement_indent);
-	    PL_parser->statement_indent = s - PL_linestart;
-	    DEBUG_T({ PerlIO_printf(Perl_debug_log,
-			"### New statement indent level, %d.\n",
-		    (int)PL_parser->statement_indent); });
-	    PL_expect = XSTATE;
-	    TOKEN('{');
+	bool is_continuation;
+	s = skipspace(s, &is_continuation);
+	if (is_continuation) {
+	    if (*s != '{') {
+		S_start_statement_indent(s);
+		TOKEN('{');
+	    }
+	}
+	else {
+	    /* empty block */
+	    force_next('{');
+	    force_next('}');
+	    TOKEN(';');
 	}
     }
+
 
   retry:
     PL_bufptr = s;
@@ -3183,7 +3197,7 @@ Perl_yylex(pTHX)
 				    (int)PL_parser->statement_indent, (s - PL_linestart)); });
 			S_stop_statement_indent();
 		    }
-		    OPERATOR(';');
+		    TOKEN(';');
 		}
 	    }
 	    goto retry;
@@ -3541,8 +3555,8 @@ Perl_yylex(pTHX)
 	s++;
 	if (PL_expect == XOPERATOR && *s == '[') {
 	    s++;
-	    PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
-	    PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
+	    PL_lex_brackstack[PL_lex_brackets++].state = XSTATE;
+	    PL_lex_brackstack[PL_lex_brackets++].state = XSTATE;
 	    PL_expect = XSTATE;
 	    TOKEN(ASLICE);
 	    /* NOT REACHED */
@@ -3714,21 +3728,21 @@ Perl_yylex(pTHX)
     case '{':
 	s++;
 	if (PL_lex_brackets > 100) {
-	    Renew(PL_lex_brackstack, PL_lex_brackets + 10, char);
+	    Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
 	}
 	switch (PL_expect) {
 	case XTERM:
 	    if (PL_oldoldbufptr == PL_last_lop)
-		PL_lex_brackstack[PL_lex_brackets++] = XTERM;
+		PL_lex_brackstack[PL_lex_brackets++].state = XTERM;
 	    else
-		PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
+		PL_lex_brackstack[PL_lex_brackets++].state = XOPERATOR;
 	    force_next('{');
 	    TOKEN(BLOCKSUB);
 	case XOPERATOR:
 	    if (*s == '[') {
 		s++;
-		PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
-		PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
+		PL_lex_brackstack[PL_lex_brackets++].state = XSTATE;
+		PL_lex_brackstack[PL_lex_brackets++].state = XSTATE;
 		PL_expect = XSTATE;
 		if ( *s == '+' || *s == '?' ) {
 		    pl_yylval.i_tkval.ival = *s == '+' ? OPpELEM_ADD : OPpELEM_OPTIONAL;
@@ -3763,12 +3777,12 @@ Perl_yylex(pTHX)
 	    /* FALL THROUGH */
 	case XATTRBLOCK:
 	case XBLOCK:
-	    PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
+	    PL_lex_brackstack[PL_lex_brackets++].state = XSTATE;
 	    PL_expect = XSTATE;
 	    break;
 	case XATTRTERM:
 	case XTERMBLOCK:
-	    PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
+	    PL_lex_brackstack[PL_lex_brackets++].state = XOPERATOR;
 	    PL_expect = XSTATE;
 	    break;
 	default:
@@ -3777,14 +3791,14 @@ Perl_yylex(pTHX)
 	case XSTATE:
 	case XREF:
 	    if (PL_oldoldbufptr == PL_last_lop)
-		PL_lex_brackstack[PL_lex_brackets++] = XTERM;
+		PL_lex_brackstack[PL_lex_brackets++].state = XTERM;
 	    else
-		PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
+		PL_lex_brackstack[PL_lex_brackets++].state = XOPERATOR;
 	    s = SKIPSPACE1(s);
 	    if (PL_expect == XREF)
 		PL_expect = XTERM;
 	    else {
-		PL_lex_brackstack[PL_lex_brackets-1] = XSTATE;
+		PL_lex_brackstack[PL_lex_brackets-1].state = XSTATE;
 		PL_expect = XSTATE;
 	    }
 	    break;
@@ -3795,7 +3809,7 @@ Perl_yylex(pTHX)
 	if (PL_lex_brackets <= 0)
 	    yyerror("Unmatched right curly bracket");
 	else
-	    PL_expect = (expectation)PL_lex_brackstack[--PL_lex_brackets];
+	    PL_expect = (expectation)PL_lex_brackstack[--PL_lex_brackets].state;
 	if (PL_lex_state == LEX_INTERPBLOCK) {
 	    if (PL_lex_brackets == 0) 
 		PL_lex_state = LEX_INTERPEND;
@@ -4004,7 +4018,7 @@ Perl_yylex(pTHX)
 	if (s[1] == '(') {
 	    /* anon scalar constructor */
 	    s += 2;
-	    PL_lex_brackstack[PL_lex_brackets++] = XTERM;
+	    PL_lex_brackstack[PL_lex_brackets++].state = XTERM;
 	    OPERATOR(ANONSCALAR);
 	}
 
@@ -4281,7 +4295,7 @@ Perl_yylex(pTHX)
 	    goto just_a_word;
 
 	d = s;
-	if (!tmp && isSPACE(*s))
+	if (isSPACE(*s))
 	    s = SKIPSPACE0(s);
 
 	/* Is this a label? */
@@ -4292,9 +4306,6 @@ Perl_yylex(pTHX)
 	    TOKEN(LABEL);
 	}
 
-	/* Check for keywords */
-	tmp = keyword(PL_tokenbuf, len);
-
 	/* Is this a word before a => operator? */
 	if (*s == '=' && s[1] == '>') {
 	    pl_yylval.opval
@@ -4303,6 +4314,9 @@ Perl_yylex(pTHX)
 	    pl_yylval.opval->op_private = OPpCONST_BARE;
 	    TERM(WORD);
 	}
+
+	/* Check for keywords */
+	tmp = keyword(PL_tokenbuf, len);
 
 	if (tmp < 0) {			/* second-class keyword? */
 	    GV *ogv = NULL;	/* override (winner) */
@@ -4727,7 +4741,9 @@ Perl_yylex(pTHX)
 	    if (PL_expect == XSTATE) {
 		s = skipspace(s, NULL);
 		if (*s != '{') {
-		    yyerror("Illegal declaration of special block");
+		    S_start_statement_indent(s);
+		    start_force(PL_curforce);
+		    force_next('{');
 		}
 
 		pl_yylval.i_tkval.ival = tmp;
@@ -4829,6 +4845,8 @@ Perl_yylex(pTHX)
 	    s = SKIPSPACE1(s);
 	    if (*s != '{') {
 		S_start_statement_indent(s);
+		start_force(PL_curforce);
+		force_next('{');
 	    }
 	    PRETERMBLOCK(DO);
 
@@ -5076,6 +5094,8 @@ Perl_yylex(pTHX)
 	    s = SKIPSPACE1(s);
 	    if (*s != '{') {
 		S_start_statement_indent(s);
+		start_force(PL_curforce);
+		force_next('{');
 	    }
 	    PRETERMBLOCK(LOOPDO);
 
