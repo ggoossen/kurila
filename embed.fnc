@@ -1440,7 +1440,7 @@ sR	|char*	|scan_str	|NN char *start|int keep_quoted|int keep_delims|NN yy_str_in
 sR	|char*	|scan_subst	|NN char *start
 s	|char*	|scan_word	|NN char *s|NN char *dest|STRLEN destlen \
 				|int allow_package|NN STRLEN *slp
-sR	|char*	|skipspace	|NN char *s|bool continuous_line
+sR	|char*	|skipspace	|NN char *s|NULLOK bool* iscontinuationp
 sR	|char*	|swallow_bom	|NN char *s
 s	|void	|checkcomma	|NN const char *s|NN const char *name \
 				|NN const char *what

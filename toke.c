@@ -148,10 +148,10 @@ static const char* const lex_state_names[] = {
 #  define SKIPSPACE2(s,tsv) skipspace2(s,&tsv)
 #  define PEEKSPACE(s) skipspace2(s,0)
 #else
-#  define SKIPSPACE0(s) skipspace(s, TRUE)
-#  define SKIPSPACE1(s) skipspace(s, TRUE)
-#  define SKIPSPACE2(s,tsv) skipspace(s, TRUE)
-#  define PEEKSPACE(s) skipspace(s, TRUE)
+#  define SKIPSPACE0(s) skipspace(s, NULL)
+#  define SKIPSPACE1(s) skipspace(s, NULL)
+#  define SKIPSPACE2(s,tsv) skipspace(s, NULL)
+#  define PEEKSPACE(s) skipspace(s, NULL)
 #endif
 
 /*
@@ -874,12 +874,12 @@ S_skipspace2(pTHX_ register char *s, SV **svp)
  * S_skipspace
  * Called to gobble the appropriate amount and type of whitespace.
  * Skips comments as well.
- * If continuous line is true and the next line isn't a continuation the last
+ * If iscontinuationp is NULL is true and the next line isn't a continuation the last
  * newline is returned
  */
 
 STATIC char *
-S_skipspace(pTHX_ register char *s, bool continuous_line)
+S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
 {
     dVAR;
 #ifdef PERL_MAD
@@ -894,6 +894,9 @@ S_skipspace(pTHX_ register char *s, bool continuous_line)
     }
 #endif
     PERL_ARGS_ASSERT_SKIPSPACE;
+
+    if (iscontinuationp)
+	*iscontinuationp = TRUE;
 
     /* skip space on the current line */
     while (s < PL_bufend && isSPACE(*s) && *s != '\n') {
@@ -939,7 +942,22 @@ S_skipspace(pTHX_ register char *s, bool continuous_line)
 	if ((s = filter_gets(PL_linestr, PL_rsfp,
 			     (prevlen = SvCUR(PL_linestr)))) == NULL)
 	{
-	    s = PL_bufend;
+	    /* end of file. */
+#ifdef PERL_MAD
+	    sv_catpvn(PL_linestr,"\n", 1);
+#else
+	    sv_setpvn(PL_linestr,"\n", 1);
+#endif
+
+	    /* reset variables for next time we lex */
+	    PL_oldoldbufptr = PL_oldbufptr = PL_bufptr = s = PL_linestart
+		= SvPVX_mutable(PL_linestr) + 1
+#ifdef PERL_MAD
+		+ curoff
+#endif
+               ;
+	    PL_bufend = SvPVX_mutable(PL_linestr) + SvCUR(PL_linestr);
+	    PL_last_lop = PL_last_uni = NULL;
 
 	    /* Close the filehandle.  Could be from
 	     * STDIN, or a regular file.  If we were reading code from
@@ -977,11 +995,16 @@ S_skipspace(pTHX_ register char *s, bool continuous_line)
     }
 
     /* reset if this isn't a continuation of the original line */
-    if (continuous_line
-	&& PL_parser->statement_indent != -1
+    if (PL_parser->statement_indent != -1
 	&& (s - PL_linestart) <= PL_parser->statement_indent
 	) {
-	return PL_linestart - 1;
+	if (iscontinuationp) {
+	    *iscontinuationp = FALSE;
+	}
+	else {
+	    assert(PL_linestart[-1] == '\n');
+	    return PL_linestart - 1;
+	}
     }
 
 #ifdef PERL_MAD
@@ -995,6 +1018,7 @@ S_skipspace(pTHX_ register char *s, bool continuous_line)
 				curoff - startoff);
     }
 #endif
+    assert(!isSPACE(*s));
     return s;
 }
 
@@ -1570,6 +1594,7 @@ S_start_statement_indent(pTHX_ char* s)
     ENTER;
     SAVEI32(PL_parser->statement_indent);
     PL_parser->statement_indent = s - PL_linestart;
+    assert(PL_parser->statement_indent >= 0);
     DEBUG_T({ PerlIO_printf(Perl_debug_log,
 		"### New statement indent level, %d.\n",
 		(int)PL_parser->statement_indent); });
@@ -2444,7 +2469,11 @@ S_process_shebang(pTHX_ char* s) {
 	    }
 	}
     }
-    return skipspace(s, FALSE);
+    {
+	bool is_continuation;
+	s = skipspace(s, &is_continuation);
+    }
+    return s;
 }
 
 #ifdef PERL_MAD 
@@ -2975,6 +3004,7 @@ Perl_yylex(pTHX)
     }
     PL_realtokenstart = s - SvPVX_mutable(PL_linestr);	/* assume but undo on ws */
 #endif
+    assert(s <= PL_bufend);
     pl_yylval.i_tkval.location = S_curlocation(PL_bufptr);
     switch (*s) {
     default:
@@ -3141,24 +3171,24 @@ Perl_yylex(pTHX)
     case '#':
     case '\n': {
 	/* might be non continuous line */
-	char* next_s = skipspace(s, FALSE);
-	if (next_s != s) {
+	bool is_continuation;
+	s = skipspace(s, &is_continuation);
+	assert(!isSPACE(*s));
+	if (!is_continuation) {
 	    if (PL_parser->statement_indent != -1) {
-		if ((next_s - PL_linestart) <= PL_parser->statement_indent) {
-		    if ((next_s - PL_linestart) < PL_parser->statement_indent) {
+		if ((s - PL_linestart) <= PL_parser->statement_indent) {
+		    if ((s - PL_linestart) < PL_parser->statement_indent) {
 			DEBUG_T({ PerlIO_printf(Perl_debug_log,
 				    "### End statement indent level, %d (line indentation: %d).\n",
-				    (int)PL_parser->statement_indent, (next_s - PL_linestart)); });
+				    (int)PL_parser->statement_indent, (s - PL_linestart)); });
 			S_stop_statement_indent();
 		    }
-		    else 
-			s = next_s;
 		    OPERATOR(';');
 		}
 	    }
-	    s = next_s;
 	    goto retry;
 	}
+	goto retry;
 
 #ifdef PERL_MAD
 	PL_realtokenstart = -1;
@@ -4251,13 +4281,13 @@ Perl_yylex(pTHX)
 	    goto just_a_word;
 
 	d = s;
-	if (!tmp)
-	    d = SKIPSPACE0(d);
+	if (!tmp && isSPACE(*s))
+	    s = SKIPSPACE0(s);
 
 	/* Is this a label? */
 	if (!tmp && PL_expect == XSTATE
-	      && d < PL_bufend && *d == ':' && *(d + 1) != ':') {
-	    s = d + 1;
+	      && s < PL_bufend && *s == ':' && *(s + 1) != ':') {
+	    s = s + 1;
 	    pl_yylval.pval = CopLABEL_alloc(PL_tokenbuf);
 	    TOKEN(LABEL);
 	}
@@ -4266,7 +4296,7 @@ Perl_yylex(pTHX)
 	tmp = keyword(PL_tokenbuf, len);
 
 	/* Is this a word before a => operator? */
-	if (*d == '=' && d[1] == '>') {
+	if (*s == '=' && s[1] == '>') {
 	    pl_yylval.opval
 		= (OP*)newSVOP(OP_CONST, 0,
 			       newSVpvn(PL_tokenbuf, len), S_curlocation(PL_bufptr));
@@ -4277,7 +4307,7 @@ Perl_yylex(pTHX)
 	if (tmp < 0) {			/* second-class keyword? */
 	    GV *ogv = NULL;	/* override (winner) */
 	    GV *hgv = NULL;	/* hidden (loser) */
-	    if (PL_expect != XOPERATOR && (*s != ':' || s[1] != ':')) {
+	    if (PL_expect != XOPERATOR && (d ==s && (*s != ':' || s[1] != ':'))) {
 		CV *cv;
 		if ((gv = gv_fetchpvn_flags(PL_tokenbuf, len, 0, SVt_PVCV)) &&
 		    (cv = GvCVu(gv)))
@@ -4314,6 +4344,8 @@ Perl_yylex(pTHX)
 			 GvENAME(hgv), "qualify as such or use &");
 	    }
 	}
+	if (!tmp && d != s)
+	    goto just_a_word_without_qualifier;
 
       reserved_word:
 	switch (tmp) {
@@ -4332,7 +4364,7 @@ Perl_yylex(pTHX)
 	  just_a_word: {
 		SV *sv;
 		int pkgname = 0;
-		const char lastchar = (PL_bufptr == PL_oldoldbufptr ? 0 : PL_bufptr[-1]);
+		char lastchar;
 		CV *cv;
 		SV **compsubtable;
 
@@ -4352,6 +4384,13 @@ Perl_yylex(pTHX)
 		    len += morelen;
 		    pkgname = 1;
 		}
+
+		if (0) {
+		  just_a_word_without_qualifier:
+		    pkgname  = 0;
+		}
+
+		lastchar = (PL_bufptr == PL_oldoldbufptr ? 0 : PL_bufptr[-1]);
 
 		if (PL_expect == XOPERATOR) {
 		    if (PL_bufptr == PL_linestart) {
@@ -4686,7 +4725,7 @@ Perl_yylex(pTHX)
 	case KEY_INIT:
 	case KEY_END:
 	    if (PL_expect == XSTATE) {
-		s = skipspace(s, TRUE);
+		s = skipspace(s, NULL);
 		if (*s != '{') {
 		    yyerror("Illegal declaration of special block");
 		}
@@ -5278,8 +5317,8 @@ Perl_yylex(pTHX)
 	    PL_bufptr = s;
 	    PL_last_uni = PL_oldbufptr;
 	    PL_last_lop_op = OP_REQUIRE;
-	    s = skipspace(s, TRUE);
-	    return REPORT( (int)REQUIRE );
+	    s = skipspace(s, NULL);
+	    TOKEN(REQUIRE);
 
 	case KEY_redo:
 	    s = force_word(s,WORD,TRUE,FALSE,FALSE);
