@@ -1896,9 +1896,9 @@ sub SpecialCasing_txt()
 
         my @OUT =
             @(
-            $HEADER, "\n",
-            "# The key UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
-            "\%utf8::ToSpec$case =\n\%(\n",
+              $HEADER, "\n",
+              "# The key UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
+              "\%utf8::ToSpec$case =\n\%(\n",
             )
 
         for my $prop (sort { $a->[0] <+> $b->[0] }, %CaseInfo{?$case})

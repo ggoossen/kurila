@@ -124,15 +124,15 @@ sub _unix_os2_ext($self,$potential_libs, ?$verbose, ?$give_libs)
              elsif (-f ($fullname="$thispth/lib$thislib.$so")
                 && ((config_value('dlsrc') ne "dl_dld.xs") || ($thislib eq "m"))){
             } elsif (-f ($fullname="$thispth/lib$($thislib)_s$Config_libext")
-            && (! config_value('archname') =~ m/RM\d\d\d-svr4/)
-            && ($thislib .= "_s") ){ # we must explicitly use _s version
+                     && (! config_value('archname') =~ m/RM\d\d\d-svr4/)
+                     && ($thislib .= "_s") ){ # we must explicitly use _s version
             } elsif (-f ($fullname="$thispth/lib$thislib$Config_libext")){
             } elsif (-f ($fullname="$thispth/$thislib$Config_libext")){
             } elsif (-f ($fullname="$thispth/lib$thislib.dll$Config_libext")){
             } elsif (-f ($fullname="$thispth/Slib$thislib$Config_libext")){
             }elsif ($^OS_NAME eq 'dgux'
-            && -l ($fullname="$thispth/lib$thislib$Config_libext")
-            && readlink($fullname) =~ m/^elink:/s) {
+                     && -l ($fullname="$thispth/lib$thislib$Config_libext")
+                     && readlink($fullname) =~ m/^elink:/s) {
             # Some of DG's libraries look like misconnected symbolic
             # links, but development tools can follow them.  (They
             # look like this:

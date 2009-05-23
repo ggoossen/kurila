@@ -388,7 +388,7 @@ sub GetOptionsFromArray($argv, @< @optionlist)	# local copy of the option descri
             elsif ( $rl eq "HASH" )
                 %opctl{$name}->[CTL_DEST] = CTL_DEST_HASH
             
-                elsif ( $rl eq "SCALAR" || $rl eq "REF" ) {
+            elsif ( $rl eq "SCALAR" || $rl eq "REF" ) {
             #		if ( $opctl{$name}[CTL_DEST] == CTL_DEST_ARRAY ) {
             #		    my $t = $linkage{$orig};
             #		    $$t = $linkage{$orig} = [];

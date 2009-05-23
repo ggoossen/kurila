@@ -98,7 +98,7 @@ my $CanMoveAtBoot = ($Is_Win32 || $Is_cygwin)
 # *note* CanMoveAtBoot is only incidentally the same condition as below
 # this needs not hold true in the future.
 my $Has_Win32API_File = ($Is_Win32 || $Is_cygwin)
-?? (try {require Win32API::File; 1} || 0)
+    ?? (try {require Win32API::File; 1} || 0)
     !! 0
 
 
@@ -944,7 +944,7 @@ Consider its use discouraged.
 
 =cut
 
-sub install_default
+sub install_default(@< @_)
     (nelems @_) +< 2 or Carp::croak("install_default should be called with 0 or 1 argument")
     my $FULLEXT = (nelems @_) ?? shift !! @ARGV[0]
     defined $FULLEXT or die "Do not know to where to write install log"
