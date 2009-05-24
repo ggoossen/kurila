@@ -152,8 +152,8 @@ sub delete_package($pkg)
     # expand to full symbol table name if needed
 
     unless ($pkg =~ m/^main::.*::$/)
-        $pkg = "main$pkg"	if	$pkg =~ m/^::/
-        $pkg .= '::'		unless	$pkg =~ m/::$/
+        $pkg = "main$pkg"       if      $pkg =~ m/^::/
+        $pkg .= '::'            unless  $pkg =~ m/::$/
     
 
     my@($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/

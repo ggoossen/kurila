@@ -13,7 +13,7 @@ our ($columns, $debug, $break, $huge, $unexpand, $tabstop,
     $separator, $separator2)
 
 
-BEGIN	
+BEGIN   
     $columns = 76  # <= screen width
     $debug = 0
     $break = '\s'

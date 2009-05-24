@@ -54,7 +54,7 @@ sub _unix_os2_ext($self,$potential_libs, ?$verbose, ?$give_libs)
     foreach my $thislib (split ' ', $potential_libs)
 
         # Handle possible linker path arguments.
-        if ($thislib =~ s/^(-[LR]|-Wl,-R)//)	# save path flag type
+        if ($thislib =~ s/^(-[LR]|-Wl,-R)//)    # save path flag type
             my $ptype = $1
             unless (-d $thislib)
                 warn "$ptype$thislib ignored, directory does not exist\n"
@@ -195,7 +195,7 @@ sub _unix_os2_ext($self,$potential_libs, ?$verbose, ?$give_libs)
                     push(@ldloadlibs, "-l$thislib")
                 
             
-            last	# found one here so don't bother looking further
+            last        # found one here so don't bother looking further
         
         warn "Note (probably harmless): "
             ."No library found for -l$thislib\n"
@@ -220,14 +220,14 @@ sub _win32_ext($self, $potential_libs, $verbose, $give_libs)
     # (caller should probably use the list in $Config{libs})
     return  @("", "", "", "",  @($give_libs ?? \@() !! ())) unless $potential_libs
 
-    my $cc		= config_value("cc")
-    my $VC		= $cc =~ m/^cl/i
-    my $BC		= $cc =~ m/^bcc/i
-    my $GC		= $cc =~ m/^gcc/i
-    my $so		= config_value('so')
-    my $libs		= config_value('perllibs')
-    my $libpth		= config_value('libpth')
-    my $libext		= config_value('lib_ext') || ".lib"
+    my $cc              = config_value("cc")
+    my $VC              = $cc =~ m/^cl/i
+    my $BC              = $cc =~ m/^bcc/i
+    my $GC              = $cc =~ m/^gcc/i
+    my $so              = config_value('so')
+    my $libs            = config_value('perllibs')
+    my $libpth          = config_value('libpth')
+    my $libext          = config_value('lib_ext') || ".lib"
     my(@libs, %libs_seen)
 
     if ($libs and $potential_libs !~ m/:nodefault/i)
@@ -246,13 +246,13 @@ sub _win32_ext($self, $potential_libs, $verbose, $give_libs)
 
     # compute $extralibs from $potential_libs
 
-    my @searchpath		    # from "-L/path" in $potential_libs
-    my @libpath		= Text::ParseWords::quotewords('\s+', 0, $libpth)
+    my @searchpath                  # from "-L/path" in $potential_libs
+    my @libpath         = Text::ParseWords::quotewords('\s+', 0, $libpth)
     my @extralibs
-    my $pwd		= cwd()    # from Cwd.pm
-    my $lib		= ''
-    my $found		= 0
-    my $search		= 1
+    my $pwd             = cwd()    # from Cwd.pm
+    my $lib             = ''
+    my $found           = 0
+    my $search          = 1
     my($fullname)
 
     # add "$Config{installarchlib}/CORE" to default search path
@@ -269,8 +269,8 @@ sub _win32_ext($self, $potential_libs, $verbose, $give_libs)
 
         # see if entry is a flag
         if (m/^:\w+$/)
-            $search	= 0 if lc eq ':nosearch'
-            $search	= 1 if lc eq ':search'
+            $search     = 0 if lc eq ':nosearch'
+            $search     = 1 if lc eq ':search'
             warn "Ignoring unknown flag '$thislib'\n"
                 if $verbose and !m/^:(no)?(search|default)$/i
             next

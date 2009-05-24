@@ -30,10 +30,10 @@ $VERSION = '0.06'
     UV => sub (@< @_) { @( @_[0] . '->value' ) },
     PV => sub (@< @_) { @( @_[0] . '->value' ) },
     PVN => sub (@< @_) { @( @_[0] . '->value', @_[0] . '->len' ) },
-    YES => sub {},
-NO => sub {},
-UNDEF => sub {},
-'' => sub {},
+    YES => sub (_) {},
+    NO => sub (_) {},
+    UNDEF => sub (_) {},
+    '' => sub (_) {},
     )
 
 %type_to_sv =
@@ -52,10 +52,10 @@ UNDEF => sub {},
 
 %type_to_C_value =
     %(
-    YES => sub {},
-NO => sub {},
-UNDEF => sub {},
-'' => sub {},
+    YES => sub (_) {},
+    NO => sub (_) {},
+    UNDEF => sub (_){},
+    '' => sub (_) {},
     )
 
 sub type_to_C_value

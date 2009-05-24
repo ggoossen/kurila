@@ -99,8 +99,8 @@ sub copy
 
     if (defined &syscopy && !$Syscopy_is_copy
           && !$to_a_handle
-          && !($from_a_handle && $^OS_NAME eq 'os2' )	# OS/2 cannot handle handles
-          && !($from_a_handle && $^OS_NAME eq 'mpeix')	# and neither can MPE/iX.
+          && !($from_a_handle && $^OS_NAME eq 'os2' )   # OS/2 cannot handle handles
+          && !($from_a_handle && $^OS_NAME eq 'mpeix')  # and neither can MPE/iX.
           && !($from_a_handle && $^OS_NAME eq 'MSWin32')
           && !($from_a_handle && $^OS_NAME eq 'MacOS')
           && !($from_a_handle && $^OS_NAME eq 'NetWare')
@@ -249,8 +249,8 @@ sub move
     # Did rename return an error even though it succeeded, because $to
     # is on a remote NFS file system, and NFS lost the server's ack?
     return 1 if defined($fromsz) && !-e $from &&           # $from disappeared
-      (@($tosz2,$tomt2) =  @(stat($to))[[@:7,9]]) &&    # $to's there
-      ((!defined $tosz1) ||			   #  not before or
+        (@($tosz2,$tomt2) =  @(stat($to))[[@:7,9]]) &&    # $to's there
+        ((!defined $tosz1) ||                      #  not before or
          ($tosz1 != $tosz2 or $tomt1 != $tomt2)) &&  #   was changed
       $tosz2 == $fromsz                         # it's all there
 
@@ -333,16 +333,16 @@ File::Copy - Copy files or filehandles
 
 =head1 SYNOPSIS
 
-	use File::Copy;
+        use File::Copy;
 
-	copy("file1","file2") or die "Copy failed: $!";
-	copy("Copy.pm",$^STDOUT);
-	move("/dev1/fileA","/dev2/fileB");
+        copy("file1","file2") or die "Copy failed: $!";
+        copy("Copy.pm",$^STDOUT);
+        move("/dev1/fileA","/dev2/fileB");
 
-	use File::Copy "cp";
+        use File::Copy "cp";
 
-	$n = FileHandle->new("/a/file","r");
-	cp($n,"x");
+        $n = FileHandle->new("/a/file","r");
+        cp($n,"x");
 
 =head1 DESCRIPTION
 

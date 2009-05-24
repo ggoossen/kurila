@@ -243,7 +243,7 @@ sub write_errno_pm
 
     close($cppi)
 
-    unless ($^OS_NAME eq 'MacOS' || $^OS_NAME eq 'beos')	# trust what we have / get later
+    unless ($^OS_NAME eq 'MacOS' || $^OS_NAME eq 'beos')        # trust what we have / get later
         # invoke CPP and read the output
 
         my $cppo
@@ -334,7 +334,7 @@ use Config;
 
 "\$(config_value('archname'))-\$(config_value('osvers'))" eq
 "$(config_value('archname'))-$(config_value('osvers'))" or
-	die "Errno architecture ($(config_value('archname'))-$(config_value('osvers'))) does not match executable architecture (\$(config_value('archname'))-\$(config_value('osvers')))";
+        die "Errno architecture ($(config_value('archname'))-$(config_value('osvers'))) does not match executable architecture (\$(config_value('archname'))-\$(config_value('osvers')))";
 
 \$VERSION = "$VERSION";
 \$VERSION = eval \$VERSION;
@@ -357,18 +357,18 @@ ESQ
 
     my $k = join(" ", grep { exists %err{$_} },
         qw(E2BIG EACCES EADDRINUSE EADDRNOTAVAIL EAFNOSUPPORT
-	EAGAIN EALREADY EBADF EBUSY ECHILD ECONNABORTED
-	ECONNREFUSED ECONNRESET EDEADLK EDESTADDRREQ EDOM EDQUOT
-	EEXIST EFAULT EFBIG EHOSTDOWN EHOSTUNREACH EINPROGRESS
-	EINTR EINVAL EIO EISCONN EISDIR ELOOP EMFILE EMLINK
-	EMSGSIZE ENAMETOOLONG ENETDOWN ENETRESET ENETUNREACH
-	ENFILE ENOBUFS ENODEV ENOENT ENOEXEC ENOLCK ENOMEM
-	ENOPROTOOPT ENOSPC ENOSYS ENOTBLK ENOTCONN ENOTDIR
-	ENOTEMPTY ENOTSOCK ENOTTY ENXIO EOPNOTSUPP EPERM
-	EPFNOSUPPORT EPIPE EPROCLIM EPROTONOSUPPORT EPROTOTYPE
-	ERANGE EREMOTE ERESTART EROFS ESHUTDOWN ESOCKTNOSUPPORT
-	ESPIPE ESRCH ESTALE ETIMEDOUT ETOOMANYREFS ETXTBSY
-	EUSERS EWOULDBLOCK EXDEV))
+        EAGAIN EALREADY EBADF EBUSY ECHILD ECONNABORTED
+        ECONNREFUSED ECONNRESET EDEADLK EDESTADDRREQ EDOM EDQUOT
+        EEXIST EFAULT EFBIG EHOSTDOWN EHOSTUNREACH EINPROGRESS
+        EINTR EINVAL EIO EISCONN EISDIR ELOOP EMFILE EMLINK
+        EMSGSIZE ENAMETOOLONG ENETDOWN ENETRESET ENETUNREACH
+        ENFILE ENOBUFS ENODEV ENOENT ENOEXEC ENOLCK ENOMEM
+        ENOPROTOOPT ENOSPC ENOSYS ENOTBLK ENOTCONN ENOTDIR
+        ENOTEMPTY ENOTSOCK ENOTTY ENXIO EOPNOTSUPP EPERM
+        EPFNOSUPPORT EPIPE EPROCLIM EPROTONOSUPPORT EPROTOTYPE
+        ERANGE EREMOTE ERESTART EROFS ESHUTDOWN ESOCKTNOSUPPORT
+        ESPIPE ESRCH ESTALE ETIMEDOUT ETOOMANYREFS ETXTBSY
+        EUSERS EWOULDBLOCK EXDEV))
 
     $k =~ s/(.{50,70})\s/$1\n\t/g
     print $out, "\t",$k,"\n    )\n);\n\n"

@@ -7,12 +7,12 @@ my $object = 're_exec$(OBJ_EXT) re_comp$(OBJ_EXT) re$(OBJ_EXT)'
 my $defines = '-DPERL_EXT_RE_BUILD -DPERL_EXT_RE_DEBUG -DPERL_EXT'
 
 WriteMakefile(
-    NAME		=> 're',
-    VERSION_FROM	=> 're.pm',
-    XSPROTOARG		=> '-noprototypes',
-    OBJECT		=> $object,
+    NAME                => 're',
+    VERSION_FROM        => 're.pm',
+    XSPROTOARG          => '-noprototypes',
+    OBJECT              => $object,
     DEFINE             => $defines,
-    clean		=> %( FILES => '*$(OBJ_EXT) *.c ../../lib/re.pm' ),
+    clean               => %( FILES => '*$(OBJ_EXT) *.c ../../lib/re.pm' ),
     )
 
 package MY

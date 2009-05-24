@@ -13,7 +13,7 @@ WriteMakefile(
     DISTNAME            => "Storable",
     # We now ship this in t/
     #    PREREQ_PM           => { 'Test::More' => '0.41' },
-    INSTALLDIRS		=> 'perl',
+    INSTALLDIRS         => 'perl',
     VERSION_FROM        => 'Storable.pm',
     )
 

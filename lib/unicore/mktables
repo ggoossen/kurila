@@ -39,7 +39,7 @@ while ((nelems @ARGV))
     elsif ($arg eq '-q')
         $Verbose = 0
     elsif ($arg eq '-w')
-        $AlwaysWrite = 1	# update the files even if they havent changed
+        $AlwaysWrite = 1        # update the files even if they havent changed
         $FileList = ""
     elsif ($arg eq '-check')
         my $this = shift @ARGV
@@ -1044,13 +1044,15 @@ sub UnicodeData_Txt()
 
     do
         my @PVA = @( $HEADER )
+        push @PVA, "do \{\n";
         foreach my $name (qw (PropertyAlias PA_reverse PropValueAlias
-			      PVA_reverse PVA_abbr_map))
+                              PVA_reverse PVA_abbr_map))
             # Should I really jump through typeglob hoops just to avoid a
             # symbolic reference? (%{"utf8::$name})
             push @PVA, "\n", "\%utf8::$name = \%(\n", <
-                simple_dumper (< Symbol::fetch_glob("utf8::$name")->*->%), ");\n"
+               simple_dumper (< Symbol::fetch_glob("utf8::$name")->*->%), ");\n"
         
+        push @PVA, "\};\n\n"
         push @PVA, "1;\n"
         WriteIfChanged("PVA.pl", @PVA)
     

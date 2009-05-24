@@ -214,68 +214,68 @@ my %METHOD_MAP =
     %(
     VMS =>
     %(
-    cwd			=> '_vms_cwd',
-    getcwd		=> '_vms_cwd',
-    fastcwd		=> '_vms_cwd',
-    fastgetcwd		=> '_vms_cwd',
-    abs_path		=> '_vms_abs_path',
-    fast_abs_path	=> '_vms_abs_path',
+    cwd                 => '_vms_cwd',
+    getcwd              => '_vms_cwd',
+    fastcwd             => '_vms_cwd',
+    fastgetcwd          => '_vms_cwd',
+    abs_path            => '_vms_abs_path',
+    fast_abs_path       => '_vms_abs_path',
     ),
 
     MSWin32 =>
     %(
     # We assume that &_NT_cwd is defined as an XSUB or in the core.
-    cwd			=> '_NT_cwd',
-    getcwd		=> '_NT_cwd',
-    fastcwd		=> '_NT_cwd',
-    fastgetcwd		=> '_NT_cwd',
-    abs_path		=> 'fast_abs_path',
-    realpath		=> 'fast_abs_path',
+    cwd                 => '_NT_cwd',
+    getcwd              => '_NT_cwd',
+    fastcwd             => '_NT_cwd',
+    fastgetcwd          => '_NT_cwd',
+    abs_path            => 'fast_abs_path',
+    realpath            => 'fast_abs_path',
     ),
 
     dos =>
     %(
-    cwd			=> '_dos_cwd',
-    getcwd		=> '_dos_cwd',
-    fastgetcwd		=> '_dos_cwd',
-    fastcwd		=> '_dos_cwd',
-    abs_path		=> 'fast_abs_path',
+    cwd                 => '_dos_cwd',
+    getcwd              => '_dos_cwd',
+    fastgetcwd          => '_dos_cwd',
+    fastcwd             => '_dos_cwd',
+    abs_path            => 'fast_abs_path',
     ),
 
     qnx =>
     %(
-    cwd			=> '_qnx_cwd',
-    getcwd		=> '_qnx_cwd',
-    fastgetcwd		=> '_qnx_cwd',
-    fastcwd		=> '_qnx_cwd',
-    abs_path		=> '_qnx_abs_path',
-    fast_abs_path	=> '_qnx_abs_path',
+    cwd                 => '_qnx_cwd',
+    getcwd              => '_qnx_cwd',
+    fastgetcwd          => '_qnx_cwd',
+    fastcwd             => '_qnx_cwd',
+    abs_path            => '_qnx_abs_path',
+    fast_abs_path       => '_qnx_abs_path',
     ),
 
     cygwin =>
     %(
-    getcwd		=> 'cwd',
-    fastgetcwd		=> 'cwd',
-    fastcwd		=> 'cwd',
-    abs_path		=> 'fast_abs_path',
-    realpath		=> 'fast_abs_path',
+    getcwd              => 'cwd',
+    fastgetcwd          => 'cwd',
+    fastcwd             => 'cwd',
+    abs_path            => 'fast_abs_path',
+    realpath            => 'fast_abs_path',
     ),
 
     epoc =>
     %(
-    cwd			=> '_epoc_cwd',
-    getcwd	        => '_epoc_cwd',
-    fastgetcwd		=> '_epoc_cwd',
-    fastcwd		=> '_epoc_cwd',
-    abs_path		=> 'fast_abs_path',
+    cwd                 => '_epoc_cwd',
+    getcwd              => '_epoc_cwd',
+    fastgetcwd          => '_epoc_cwd',
+    fastcwd             => '_epoc_cwd',
+    abs_path            => 'fast_abs_path',
     ),
 
     MacOS =>
     %(
-    getcwd		=> 'cwd',
-    fastgetcwd		=> 'cwd',
-    fastcwd		=> 'cwd',
-    abs_path		=> 'fast_abs_path',
+    getcwd              => 'cwd',
+    fastgetcwd          => 'cwd',
+    fastcwd             => 'cwd',
+    abs_path            => 'fast_abs_path',
     ),
     )
 
@@ -411,7 +411,7 @@ sub fastcwd_
     if ($^OS_NAME eq 'apollo') { $path = "/".$path; }
     # At this point $path may be tainted (if tainting) and chdir would fail.
     # Untaint it then check that we landed where we started.
-    $path =~ m/^(.*)\z/s		# untaint
+    $path =~ m/^(.*)\z/s                # untaint
         && CORE::chdir($1) or return undef
     @($cdev, $cino) = stat@('.')
     die "Unstable directory path, current directory changed unexpectedly"
@@ -423,8 +423,8 @@ if (not defined &fastcwd) { *fastcwd = \&fastcwd_ }
 
 # Keeps track of current working directory in PWD environment var
 # Usage:
-#	use Cwd 'chdir';
-#	chdir $newdir;
+#       use Cwd 'chdir';
+#       chdir $newdir;
 
 my $chdir_init = 0
 
@@ -452,7 +452,7 @@ sub chdir_init
 
 
 sub chdir
-    my $newdir = (nelems @_) ?? shift !! ''	# allow for no arg (chdir to HOME dir)
+    my $newdir = (nelems @_) ?? shift !! ''     # allow for no arg (chdir to HOME dir)
     $newdir =~ s|///*|/|g unless $^OS_NAME eq 'MSWin32'
     chdir_init() unless $chdir_init
     my $newpwd

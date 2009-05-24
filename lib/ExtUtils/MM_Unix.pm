@@ -415,9 +415,9 @@ MM_REVISION = $self->{?MM_REVISION}
 
     for my $macro (qw/
               MAKE
-	      FULLEXT BASEEXT PARENT_NAME DLBASE VERSION_FROM INC DEFINE OBJECT
-	      LDFROM LINKTYPE BOOTDEP
-	      /	)
+              FULLEXT BASEEXT PARENT_NAME DLBASE VERSION_FROM INC DEFINE OBJECT
+              LDFROM LINKTYPE BOOTDEP
+              / )
         next unless defined $self->{?$macro}
         push @m, "$macro = $self->{?$macro}\n"
     
@@ -886,7 +886,7 @@ sub dynamic_lib($self, %< %attribs)
     my $ldfrom = '$(LDFROM)'
     $armaybe = 'ar' if (%Is{?OSF} and $armaybe eq ':')
     my(@m)
-    my $ld_opt = %Is{?OS2} ?? '$(OPTIMIZE) ' !! ''	# Useful on other systems too?
+    my $ld_opt = %Is{?OS2} ?? '$(OPTIMIZE) ' !! ''      # Useful on other systems too?
     my $ld_fix = %Is{?OS2} ?? '|| ( $(RM_F) $@ && sh -c false )' !! ''
     push(@m,'
 # This section creates the dynamically loadable $(INST_DYNAMIC)
@@ -1472,7 +1472,7 @@ sub init_PM
                              my $parentlibs_re = join '|', $self->{?PMLIBPARENTDIRS}
                              $prefix =  $self->{?INST_LIB}
                                  if ($striplibpath = $path) =~ s{^(\W*)($parentlibs_re)\W}
-	                                       {$1}i
+                                               {$1}i
 
                              my $inst = $self->catfile($prefix,$striplibpath)
                              local($_) = $inst # for backwards compatibility
@@ -1631,17 +1631,15 @@ from the perl source tree.
                 my $inc = %Is{?Win32} ?? $self->catdir($lib, "CORE" )
                     !! dirname $lib
                 if (-e $self->catdir($inc, "perl.h"))
-                    $self->{+PERL_LIB}	   = $lib
-                    $self->{+PERL_ARCHLIB}	   = $lib
-                    $self->{+PERL_INC}	   = $inc
+                    $self->{+PERL_LIB}     = $lib
+                    $self->{+PERL_ARCHLIB}         = $lib
+                    $self->{+PERL_INC}     = $inc
                     $self->{+UNINSTALLED_PERL}  = 1
                     print $^STDOUT, <<EOP
 ... Detected uninstalled Perl.  Trying to continue.
 EOP
-                
-            
-        
-    
+
+
 
     # We get SITELIBEXP and SITEARCHEXP directly via
     # Get_from_Config. When we are running standard modules, these
@@ -1701,7 +1699,7 @@ TOUCH, CP, MV, CHMOD, UMASK_NULL, ECHO, ECHO_N
 
 =cut
 
-sub init_others	# --- Initialize Other Attributes
+sub init_others # --- Initialize Other Attributes
     my@($self) =@( shift)
 
     $self->{+LD} ||= 'ld'
@@ -3085,9 +3083,9 @@ but handles simple ones.
 
 sub quote_paren
     my $arg = shift
-    $arg =~ s{\$\((.+?)\)}{\$\\\\($1\\\\)}g	# protect $(...)
-    $arg =~ s{(?<!\\)([()])}{\\$1}g		# quote unprotected
-    $arg =~ s{\$\\\\\((.+?)\\\\\)}{\$($1)}g	# unprotect $(...)
+    $arg =~ s{\$\((.+?)\)}{\$\\\\($1\\\\)}g     # protect $(...)
+    $arg =~ s{(?<!\\)([()])}{\\$1}g             # quote unprotected
+    $arg =~ s{\$\\\\\((.+?)\\\\\)}{\$($1)}g     # unprotect $(...)
     return $arg
 
 
@@ -3281,13 +3279,13 @@ sub staticmake($self, %< %attribs)
     # runtime.
     my@(@perlinc) =@( @($self->{?INST_ARCHLIB}, $self->{?INST_LIB}, $self->{?PERL_ARCHLIB}, $self->{?PERL_LIB}))
 
-    $self->makeaperl(MAKE	=> $self->{?MAKEFILE},
-        DIRS	=> \@searchdirs,
-        STAT	=> \@static,
-        INCL	=> \@perlinc,
-        TARGET	=> $self->{?MAP_TARGET},
-        TMP	=> "",
-        LIBPERL	=> $self->{LIBPERL_A}
+    $self->makeaperl(MAKE       => $self->{?MAKEFILE},
+        DIRS    => \@searchdirs,
+        STAT    => \@static,
+        INCL    => \@perlinc,
+        TARGET  => $self->{?MAP_TARGET},
+        TMP     => "",
+        LIBPERL => $self->{LIBPERL_A}
         )
 
 
@@ -3632,7 +3630,7 @@ only intended for broken make implementations.
 
 =cut
 
-sub xs_o	# many makes are too dumb to use xs_c then c_o
+sub xs_o        # many makes are too dumb to use xs_c then c_o
     my@($self) =@( shift)
     return '' unless $self->needs_linking()
     '

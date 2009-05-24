@@ -113,7 +113,7 @@ sub fileparse($fullname, @< @suffices)
         $dirpath .= '.\' unless $dirpath =~ m/[\\\/]\z/
     elsif ($type eq "OS2")
         @($dirpath,$basename) = @($fullname =~ m#^((?:.*[:\\/])?)(.*)#s)
-        $dirpath = './' unless $dirpath	# Can't be 0
+        $dirpath = './' unless $dirpath # Can't be 0
         $dirpath .= '/' unless $dirpath =~ m#[\\/]\z#
     elsif ($type eq "MacOS")
         @($dirpath,$basename) = @($fullname =~ m/^(.*:)?(.*)/s)

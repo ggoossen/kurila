@@ -66,8 +66,8 @@ print $^STDOUT, qq/ok 14\n/;
 print $^STDOUT, qq(ok 15\n);
 
 print $^STDOUT, qq
-[ok 16\n]
-;
+ [ok 16\n]
+ ;
 
 print $^STDOUT, q<ok 17
 >;
@@ -160,8 +160,8 @@ sub T($where, $num)
 
 my $test = 42;
 
-    do {
-    # line 42 "plink"
+do {
+# line 42 "plink"
     local $_ = "not ok ";
     eval q{
 	s/^not /{<<EOT}/ and T '^main:\(eval \d+\):2$', $test++;

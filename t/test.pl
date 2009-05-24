@@ -55,16 +55,14 @@ sub plan
     $planned = $n
 
 
-END 
+END
     my $ran = $test - 1
     if (!$NO_ENDING)
         if (defined $planned && $planned != $ran)
-                _print_stderr
-  "# Looks like you planned $planned tests but ran $ran.\n"
+            _print_stderr
+               "# Looks like you planned $planned tests but ran $ran.\n"
         elsif ($noplan)
             _print "1..$ran\n"
-        
-    
 
 
 # Use this instead of "print STDERR" when outputing failure diagnostic

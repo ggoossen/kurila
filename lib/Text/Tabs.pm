@@ -10,7 +10,7 @@ our @EXPORT = qw(expand unexpand $tabstop)
 our ($VERSION, $tabstop, $debug)
 $VERSION = 2007.1117
 
-BEGIN	
+BEGIN
     $tabstop = 8
     $debug = 0
 

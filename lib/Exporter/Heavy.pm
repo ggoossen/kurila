@@ -167,12 +167,9 @@ sub export($pkg, $callpkg, @< @imports)
     
 
 
-sub export_to_level
-    my $pkg = shift
-    my $level = shift
-    shift			# XXX redundant arg
+sub export_to_level($pkg, $level, _, @< @args)
     my $callpkg = caller($level)
-    $pkg->export($callpkg, < @_)
+    $pkg->export($callpkg, < @args)
 
 
 # Utility functions

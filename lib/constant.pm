@@ -25,7 +25,7 @@ my %forbidden = %(< %keywords, < %forced_into_main)
 #=======================================================================
 sub import
     my $class = shift
-    return unless (nelems @_)			# Ignore 'use constant;'
+    return unless (nelems @_)                   # Ignore 'use constant;'
     my $constants
     my $multiple  = ref @_[0]
     my $pkg = caller

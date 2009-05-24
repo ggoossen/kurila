@@ -757,9 +757,9 @@ sub _find_dir($wanted, $p_dir, $nlink)
         $dir_pref = ($p_dir =~ m|\w:/$| ?? $p_dir !! "$p_dir/" )
     elsif ($^OS_NAME eq 'VMS')
 
-        #	VMS is returning trailing .dir on directories
-        #	and trailing . on files and symbolic links
-        #	in UNIX syntax.
+        #       VMS is returning trailing .dir on directories
+        #       and trailing . on files and symbolic links
+        #       in UNIX syntax.
         #
 
         $p_dir =~ s/\.(dir)?$//i unless $p_dir eq '.'
@@ -803,7 +803,7 @@ sub _find_dir($wanted, $p_dir, $nlink)
             $_= ($no_chdir ?? $dir_name !! $dir_rel ) # $_
             # prune may happen here
             $prune= 0
-            do { $wanted_callback->() };	# protect against wild "next"
+            do { $wanted_callback->() };        # protect against wild "next"
             next if $prune
         
 
@@ -955,7 +955,7 @@ sub _find_dir($wanted, $p_dir, $nlink)
             if ( $nlink == -2 )
                 $name = $dir = $p_dir # $File::Find::name / dir
                 $_ = $File::Find::current_dir
-                $post_process->()		# End-of-directory processing
+                $post_process->()               # End-of-directory processing
             elsif ( $nlink +< 0 )  # must be finddepth, report dirname now
                 $name = $dir_name
                 if ($Is_MacOS)

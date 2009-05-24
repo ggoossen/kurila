@@ -71,38 +71,38 @@ sub ConfigDefaults()
     # Handle POSIX compliancy.
     if ( defined env::var("POSIXLY_CORRECT") )
         $genprefix = "(--|-)"
-        $autoabbrev = 0		# no automatic abbrev of options
-        $bundling = 0			# no bundling of single letter switches
-        $getopt_compat = 0		# disallow '+' to start options
+        $autoabbrev = 0         # no automatic abbrev of options
+        $bundling = 0                   # no bundling of single letter switches
+        $getopt_compat = 0              # disallow '+' to start options
         $order = $REQUIRE_ORDER
     else
         $genprefix = "(--|-|\\+)"
-        $autoabbrev = 1		# automatic abbrev of options
-        $bundling = 0			# bundling off by default
-        $getopt_compat = 1		# allow '+' to start options
+        $autoabbrev = 1         # automatic abbrev of options
+        $bundling = 0                   # bundling off by default
+        $getopt_compat = 1              # allow '+' to start options
         $order = $PERMUTE
     
     # Other configurable settings.
-    $debug = 0			# for debugging
-    $error = 0			# error tally
-    $ignorecase = 1		# ignore case when matching options
-    $passthrough = 0		# leave unrecognized options alone
-    $gnu_compat = 0		# require --opt=val if value is optional
+    $debug = 0                  # for debugging
+    $error = 0                  # error tally
+    $ignorecase = 1             # ignore case when matching options
+    $passthrough = 0            # leave unrecognized options alone
+    $gnu_compat = 0             # require --opt=val if value is optional
     $longprefix = "(--)"       # what does a long prefix look like
 
 
 # Override import.
 sub import
-    my $pkg = shift		# package
-    my @syms = @( () )		# symbols to import
-    my @config = @( () )		# configuration
-    my $dest = \@syms		# symbols first
+    my $pkg = shift             # package
+    my @syms = @( () )          # symbols to import
+    my @config = @( () )                # configuration
+    my $dest = \@syms           # symbols first
     for (  @_ )
         if ( $_ eq ':config' )
-            $dest = \@config	# config next
+            $dest = \@config    # config next
             next
         
-        push($dest->@, $_)	# push
+        push($dest->@, $_)      # push
     
     # Hide one level and call super.
     local $Exporter::ExportLevel = 1
@@ -148,7 +148,7 @@ sub new
         $self->{+settings} = $default_config
     
 
-    if ( %atts )		# Oops
+    if ( %atts )                # Oops
         die(__PACKAGE__.": unhandled attributes: ".
             join(" ", sort(keys(%atts)))."\n")
     
@@ -247,7 +247,7 @@ sub GetOptions(@< @args)
 sub GetOptionsFromString($string, @< @args)
     require Text::ParseWords
     my $args = \ Text::ParseWords::shellwords($string)
-    $caller ||= @(caller)[0]	# current context
+    $caller ||= @(caller)[0]    # current context
     my $ret = GetOptionsFromArray($args, < @args)
     if ( (nelems $args->@) )
         $ret = 0
@@ -256,16 +256,16 @@ sub GetOptionsFromString($string, @< @args)
     return $ret
 
 
-sub GetOptionsFromArray($argv, @< @optionlist)	# local copy of the option descriptions
-    my $argend = '--'		# option list terminator
-    my %opctl = %( () )		# table of option specs
-    my $pkg = $caller || @(caller)[0]	# current context
+sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descriptions
+    my $argend = '--'           # option list terminator
+    my %opctl = %( () )         # table of option specs
+    my $pkg = $caller || @(caller)[0]   # current context
     # Needed if linkage is omitted.
-    my @ret = @( () )		# accum for non-options
-    my %linkage		# linkage
-    my $userlinkage		# user supplied HASH
-    my $opt			# current option
-    my $prefix = $genprefix	# current prefix
+    my @ret = @( () )           # accum for non-options
+    my %linkage         # linkage
+    my $userlinkage             # user supplied HASH
+    my $opt                     # current option
+    my $prefix = $genprefix     # current prefix
 
     $error = ''
 
@@ -474,10 +474,10 @@ sub GetOptionsFromArray($argv, @< @optionlist)	# local copy of the option descri
 
         # Look it up.
         my $tryopt = $opt
-        my $found		# success status
-        my $key		# key (if hash type)
-        my $arg		# option argument
-        my $ctl		# the opctl entry
+        my $found               # success status
+        my $key         # key (if hash type)
+        my $arg         # option argument
+        my $ctl         # the opctl entry
 
         @(?$found, ?$opt, ?$ctl, ?$arg, ?$key) =
             FindOption ($argv, $prefix, $argend, $opt, \%opctl)
@@ -836,8 +836,8 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl)
 
     print $^STDERR, ("=> split \"$starter\"+\"$opt\"\n") if $debug
 
-    my $optarg			# value supplied with --opt=value
-    my $rest			# remainder from unbundling
+    my $optarg                  # value supplied with --opt=value
+    my $rest                    # remainder from unbundling
 
     # If it is a long option, it may include the value.
     # With getopt_compat, only if not bundling.
@@ -852,7 +852,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl)
 
     #### Look it up ###
 
-    my $tryopt = $opt		# option to try
+    my $tryopt = $opt           # option to try
 
     if ( $bundling && $starter eq '-' )
 
@@ -961,8 +961,8 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl)
             # Supply explicit value.
             $arg = 1
         else
-            $opt =~ s/^no-?//i	# strip NO prefix
-            $arg = 0		# supply explicit value
+            $opt =~ s/^no-?//i  # strip NO prefix
+            $arg = 0            # supply explicit value
         
         unshift ($argv->@, $starter.$rest) if defined $rest
         return  @(1, $opt, $ctl, $arg)
@@ -1024,7 +1024,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl)
 
     my $key_valid = $ctl->[CTL_DEST] == CTL_DEST_HASH ?? "[^=]+=" !! ""
 
-    if ( $type eq 's' )	# string
+    if ( $type eq 's' ) # string
         # A mandatory string takes anything.
         return  @(1, $opt, $ctl, $arg, $key) if $mand
 
@@ -1045,8 +1045,8 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl)
             # Supply empty value.
             $arg = ''
         
-    elsif ( $type eq 'i'	# numeric/integer
-        || $type eq 'I'	# numeric/integer w/ incr default
+    elsif ( $type eq 'i'        # numeric/integer
+        || $type eq 'I' # numeric/integer w/ incr default
         || $type eq 'o' ) # dec/oct/hex/bin value
 
         my $o_valid = $type eq 'o' ?? PAT_XINT !! PAT_INT
@@ -1136,7 +1136,7 @@ sub ValidValue($ctl, $arg, $mand, $argend, $prefix)
 
     my $type = $ctl->[CTL_TYPE]
 
-    if ( $type eq 's' )	# string
+    if ( $type eq 's' ) # string
         # A mandatory string takes anything.
         return  @(1) if $mand
 
@@ -1145,8 +1145,8 @@ sub ValidValue($ctl, $arg, $mand, $argend, $prefix)
         # Check for option or option list terminator.
         return 0 if $arg eq $argend || $arg =~ m/^$prefix.+/
         return 1
-    elsif ( $type eq 'i'	# numeric/integer
-        || $type eq 'I'	# numeric/integer w/ incr default
+    elsif ( $type eq 'i'        # numeric/integer
+        || $type eq 'I' # numeric/integer w/ incr default
         || $type eq 'o' ) # dec/oct/hex/bin value
 
         my $o_valid = $type eq 'o' ?? PAT_XINT !! PAT_INT

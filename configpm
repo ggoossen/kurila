@@ -150,9 +150,9 @@ sub import {
 
     my $callpkg = caller(0);
     foreach my $func (@funcs) {
-	die qq{"$func" is not exported by the $(__PACKAGE__) module\n}
+        die qq{"$func" is not exported by the $(__PACKAGE__) module\n}
              unless %%Export_Cache{$func};
-	*{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{*{Symbol::fetch_glob($func)}};
+        *{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{*{Symbol::fetch_glob($func)}};
     }
 
     return;
@@ -261,22 +261,22 @@ if (!%seen_quotes{?'"'})
     $fetch_string .= <<'EOT'
     my $value = substr($Config_SH_expanded, $start,
                        index($Config_SH_expanded, "'\n", $start)
-		       - $start);
+                       - $start);
 EOT
 else
     $fetch_string .= <<'EOT'
     my $value = substr($Config_SH_expanded, $start,
                        index($Config_SH_expanded, "$quote_type\n", $start)
-		       - $start);
+                       - $start);
 
     # If we had a double-quote, we'd better eval it so escape
     # sequences and such can be interpolated. Since the incoming
     # value is supposed to follow shell rules and not perl rules,
     # we escape any perl variable markers
     if ($quote_type eq '"') {
-	$value =~ s/\$/\\\$/g;
-	$value =~ s/\@/\\\@/g;
-	eval "\$value = \"$value\"";
+        $value =~ s/\$/\\\$/g;
+        $value =~ s/\@/\\\@/g;
+        eval "\$value = \"$value\"";
     }
 EOT
 
@@ -324,60 +324,60 @@ my @need_relocation
 if (fetch_string(\%(),'userelocatableinc'))
     foreach my $what (qw(prefixexp
 
-			 archlibexp
-			 html1direxp
-			 html3direxp
-			 man1direxp
-			 man3direxp
-			 privlibexp
-			 scriptdirexp
-			 sitearchexp
-			 sitebinexp
-			 sitehtml1direxp
-			 sitehtml3direxp
-			 sitelibexp
-			 siteman1direxp
-			 siteman3direxp
-			 sitescriptexp
-			 vendorarchexp
-			 vendorbinexp
-			 vendorhtml1direxp
-			 vendorhtml3direxp
-			 vendorlibexp
-			 vendorman1direxp
-			 vendorman3direxp
-			 vendorscriptexp
+                         archlibexp
+                         html1direxp
+                         html3direxp
+                         man1direxp
+                         man3direxp
+                         privlibexp
+                         scriptdirexp
+                         sitearchexp
+                         sitebinexp
+                         sitehtml1direxp
+                         sitehtml3direxp
+                         sitelibexp
+                         siteman1direxp
+                         siteman3direxp
+                         sitescriptexp
+                         vendorarchexp
+                         vendorbinexp
+                         vendorhtml1direxp
+                         vendorhtml3direxp
+                         vendorlibexp
+                         vendorman1direxp
+                         vendorman3direxp
+                         vendorscriptexp
 
-			 siteprefixexp
-			 sitelib_stem
-			 vendorlib_stem
+                         siteprefixexp
+                         sitelib_stem
+                         vendorlib_stem
 
-			 installarchlib
-			 installhtml1dir
-			 installhtml3dir
-			 installman1dir
-			 installman3dir
-			 installprefix
-			 installprefixexp
-			 installprivlib
-			 installscript
-			 installsitearch
-			 installsitebin
-			 installsitehtml1dir
-			 installsitehtml3dir
-			 installsitelib
-			 installsiteman1dir
-			 installsiteman3dir
-			 installsitescript
-			 installvendorarch
-			 installvendorbin
-			 installvendorhtml1dir
-			 installvendorhtml3dir
-			 installvendorlib
-			 installvendorman1dir
-			 installvendorman3dir
-			 installvendorscript
-			 ))
+                         installarchlib
+                         installhtml1dir
+                         installhtml3dir
+                         installman1dir
+                         installman3dir
+                         installprefix
+                         installprefixexp
+                         installprivlib
+                         installscript
+                         installsitearch
+                         installsitebin
+                         installsitehtml1dir
+                         installsitehtml3dir
+                         installsitelib
+                         installsiteman1dir
+                         installsiteman3dir
+                         installsitescript
+                         installvendorarch
+                         installvendorbin
+                         installvendorhtml1dir
+                         installvendorhtml3dir
+                         installvendorlib
+                         installvendorman1dir
+                         installvendorman3dir
+                         installvendorscript
+                         ))
         push @need_relocation, $what if fetch_string(\%(), $what) =~ m!^\.\.\./!
     
 
@@ -404,10 +404,10 @@ sub relocate_inc {
       # but bail out if the directory we picked off the end of $prefix is .
       # or ..
       if ($1 eq '.' or $1 eq '..') {
-	# Undo! This should be rare, hence code it this way rather than a
-	# check each time before the s!!! above.
-	$prefix = "$prefix/$1";
-	last;
+        # Undo! This should be rare, hence code it this way rather than a
+        # check each time before the s!!! above.
+        $prefix = "$prefix/$1";
+        last;
       }
       # Remove that leading ../ and loop again
       substr ($libdir, 0, 3, '');
@@ -551,7 +551,7 @@ if (%seen_quotes{?'"'})
     $heavy_txt .= <<'ENDOFEND'
     # Find out how the current key's quoted so we can skip to its end.
     my $quote = substr($Config_SH_expanded,
-		       index($Config_SH_expanded, "=", $prevpos)+1, 1);
+                       index($Config_SH_expanded, "=", $prevpos)+1, 1);
     my $pos = index($Config_SH_expanded, qq($quote\n), $prevpos) + 2;
 ENDOFEND
 else
@@ -579,22 +579,22 @@ sub config_re {
 sub config_vars {
     # implements -V:cfgvar option (see perlrun -V:)
     foreach my $cfgvar (@_) {
-	# find optional leading, trailing colons; and query-spec
-	my @($notag,$qry,$lncont) = @: $cfgvar =~ m/^(:)?(.*?)(:)?$/;	# flags fore and aft, 
-	# map colon-flags to print decorations
-	my $prfx = $notag ?? '' !! "$qry=";		# tag-prefix for print
-	my $lnend = $lncont ?? ' ' !! ";\n";		# line ending for print
+        # find optional leading, trailing colons; and query-spec
+        my @($notag,$qry,$lncont) = @: $cfgvar =~ m/^(:)?(.*?)(:)?$/;   # flags fore and aft, 
+        # map colon-flags to print decorations
+        my $prfx = $notag ?? '' !! "$qry=";             # tag-prefix for print
+        my $lnend = $lncont ?? ' ' !! ";\n";            # line ending for print
 
-	# all config-vars are by definition \w only, any \W means regex
-	if ($qry =~ m/\W/) {
-	    my @matches = @(<config_re($qry));
-	    print $^STDOUT, < map { "$_$lnend" }, @matches || @("$qry: not found")		if !$notag;
-	    print $^STDOUT, < map { s/\w+=//; "$_$lnend" }, @matches || @("$qry: not found")	if  $notag;
-	} else {
-	    my $v = config_value($qry);
-	    $v = 'undef' unless defined $v;
-	    print $^STDOUT, "$($prfx)'$($v)'$lnend";
-	}
+        # all config-vars are by definition \w only, any \W means regex
+        if ($qry =~ m/\W/) {
+            my @matches = @(<config_re($qry));
+            print $^STDOUT, < map { "$_$lnend" }, @matches || @("$qry: not found")              if !$notag;
+            print $^STDOUT, < map { s/\w+=//; "$_$lnend" }, @matches || @("$qry: not found")    if  $notag;
+        } else {
+            my $v = config_value($qry);
+            $v = 'undef' unless defined $v;
+            print $^STDOUT, "$($prfx)'$($v)'$lnend";
+        }
     }
 }
 
@@ -709,7 +709,7 @@ Config - access Perl configuration information
 
     use Config;
     if (%Config{usethreads}) {
-	print "has thread support\n"
+        print "has thread support\n"
     } 
 
     use Config qw(myconfig config_sh config_vars config_re);
@@ -774,18 +774,18 @@ Here's a more sophisticated example of using %Config:
     my %sig_num;
     my @sig_name;
     unless(%Config{sig_name} && %Config{sig_num}) {
-	die "No sigs?";
+        die "No sigs?";
     } else {
-	my @names = split ' ', %Config{sig_name};
-	%sig_num{[@names]} = split ' ', %Config{sig_num};
-	foreach (@names) {
-	    @sig_name[$sig_num{$_}] ||= $_;
-	}   
+        my @names = split ' ', %Config{sig_name};
+        %sig_num{[@names]} = split ' ', %Config{sig_num};
+        foreach (@names) {
+            @sig_name[$sig_num{$_}] ||= $_;
+        }   
     }
 
     print "signal #17 = @sig_name[17]\n";
     if (%sig_num{ALRM}) { 
-	print "SIGALRM is %sig_num{ALRM}\n";
+        print "SIGALRM is %sig_num{ALRM}\n";
     }   
 
 =head1 WARNING
@@ -852,37 +852,37 @@ EOF
         warn "Expected a Configure variable header",
             ($text ?? " or another paragraph of description" !! () )
     
-    s/n't/n\00t/g		# leave can't, won't etc untouched
-    s/^\t\s+(.*)/\n$1/gm		# Indented lines ===> new paragraph
-    s/^(?<!\n\n)\t(.*)/$1/gm	# Not indented lines ===> text
+    s/n't/n\00t/g               # leave can't, won't etc untouched
+    s/^\t\s+(.*)/\n$1/gm                # Indented lines ===> new paragraph
+    s/^(?<!\n\n)\t(.*)/$1/gm    # Not indented lines ===> text
     s{([\'\"])(?=[^\'\"\s]*[./][^\'\"\s]*\1)([^\'\"\s]+)\1}(F<$2>)g # '.o'
     s{([\'\"])([^\'\"\s]+)\1}(C<$2>)g # "date" command
     s{\'([A-Za-z_\- *=/]+)\'}(C<$1>)g # 'ln -s'
     s{
-     (?<! [\w./<\'\"] )		# Only standalone file names
-     (?! e \. g \. )		# Not e.g.
-     (?! \. \. \. )		# Not ...
-     (?! \d )			# Not 5.004
-     (?! read/ )		# Not read/write
-     (?! etc\. )		# Not etc.
-     (?! I/O )			# Not I/O
+     (?<! [\w./<\'\"] )         # Only standalone file names
+     (?! e \. g \. )            # Not e.g.
+     (?! \. \. \. )             # Not ...
+     (?! \d )                   # Not 5.004
+     (?! read/ )                # Not read/write
+     (?! etc\. )                # Not etc.
+     (?! I/O )                  # Not I/O
      (
-	\$ ?			# Allow leading $
-	[\w./]* [./] [\w./]*	# Require . or / inside
+        \$ ?                    # Allow leading $
+        [\w./]* [./] [\w./]*    # Require . or / inside
      )
-     (?<! \. (?= [\s)] ) )	# Do not include trailing dot
-     (?! [\w/] )		# Include all of it
+     (?<! \. (?= [\s)] ) )      # Do not include trailing dot
+     (?! [\w/] )                # Include all of it
       }
-      (F<$1>)xg			# /usr/local
-    s/((?<=\s)~\w*)/F<$1>/g	# ~name
-    s/(?<![.<\'\"])\b([A-Z_]{2,})\b(?![\'\"])/C<$1>/g	# UNISTD
+      (F<$1>)xg                 # /usr/local
+    s/((?<=\s)~\w*)/F<$1>/g     # ~name
+    s/(?<![.<\'\"])\b([A-Z_]{2,})\b(?![\'\"])/C<$1>/g   # UNISTD
     s/(?<![.<\'\"])\b(?!the\b)(\w+)\s+macro\b/C<$1> macro/g # FILE_cnt macro
-    s/n[\0]t/n't/g		# undo can't, won't damage
+    s/n[\0]t/n't/g              # undo can't, won't damage
 
 
 if (%Opts{?glossary})
-    ~< *GLOS				# Skip the "DO NOT EDIT"
-    ~< *GLOS				# Skip the preamble
+    ~< *GLOS                            # Skip the "DO NOT EDIT"
+    ~< *GLOS                            # Skip the preamble
     while ( ~< *GLOS)
         process($_)
         print $config_pod, $_
@@ -982,103 +982,103 @@ exit 0
 # Popularity of various entries in %Config, based on a large build and test
 # run of code in the Fotango build system:
 __DATA__
-path_sep:	8490
-d_readlink:	7101
-d_symlink:	7101
-archlibexp:	4318
-sitearchexp:	4305
-sitelibexp:	4305
-privlibexp:	4163
-ldlibpthname:	4041
-libpth:	2134
-archname:	1591
-exe_ext:	1256
-scriptdir:	1155
-version:	1116
-useithreads:	1002
-osvers:	982
-osname:	851
-inc_version_list:	783
-dont_use_nlink:	779
-intsize:	759
-usevendorprefix:	642
-dlsrc:	624
-cc:	541
-lib_ext:	520
-so:	512
-ld:	501
-ccdlflags:	500
-ldflags:	495
-obj_ext:	495
-cccdlflags:	493
-lddlflags:	493
-ar:	492
-dlext:	492
-libc:	492
-ranlib:	492
-full_ar:	491
-vendorarchexp:	491
-vendorlibexp:	491
-installman1dir:	489
-installman3dir:	489
-installsitebin:	489
-installsiteman1dir:	489
-installsiteman3dir:	489
-installvendorman1dir:	489
-installvendorman3dir:	489
-d_flexfnam:	474
-eunicefix:	360
-d_link:	347
-installsitearch:	344
-installscript:	341
-installprivlib:	337
-binexp:	336
-installarchlib:	336
-installprefixexp:	336
-installsitelib:	336
-installstyle:	336
-installvendorarch:	336
-installvendorbin:	336
-installvendorlib:	336
-man1ext:	336
-man3ext:	336
-sh:	336
-siteprefixexp:	336
-installbin:	335
-usedl:	332
-ccflags:	285
-startperl:	232
-optimize:	231
-usemymalloc:	229
-cpprun:	228
-sharpbang:	228
-perllibs:	225
-usesfio:	224
-usethreads:	220
-perlpath:	218
-extensions:	217
-usesocks:	208
-shellflags:	198
-make:	191
-d_pwage:	189
-d_pwchange:	189
-d_pwclass:	189
-d_pwcomment:	189
-d_pwexpire:	189
-d_pwgecos:	189
-d_pwpasswd:	189
-d_pwquota:	189
-gccversion:	189
-libs:	186
-useshrplib:	186
-cppflags:	185
-ptrsize:	185
-shrpenv:	185
-static_ext:	185
-use5005threads:	185
-uselargefiles:	185
-alignbytes:	184
-byteorder:	184
-ccversion:	184
-config_args:	184
-cppminus:	184
+path_sep:       8490
+d_readlink:     7101
+d_symlink:      7101
+archlibexp:     4318
+sitearchexp:    4305
+sitelibexp:     4305
+privlibexp:     4163
+ldlibpthname:   4041
+libpth: 2134
+archname:       1591
+exe_ext:        1256
+scriptdir:      1155
+version:        1116
+useithreads:    1002
+osvers: 982
+osname: 851
+inc_version_list:       783
+dont_use_nlink: 779
+intsize:        759
+usevendorprefix:        642
+dlsrc:  624
+cc:     541
+lib_ext:        520
+so:     512
+ld:     501
+ccdlflags:      500
+ldflags:        495
+obj_ext:        495
+cccdlflags:     493
+lddlflags:      493
+ar:     492
+dlext:  492
+libc:   492
+ranlib: 492
+full_ar:        491
+vendorarchexp:  491
+vendorlibexp:   491
+installman1dir: 489
+installman3dir: 489
+installsitebin: 489
+installsiteman1dir:     489
+installsiteman3dir:     489
+installvendorman1dir:   489
+installvendorman3dir:   489
+d_flexfnam:     474
+eunicefix:      360
+d_link: 347
+installsitearch:        344
+installscript:  341
+installprivlib: 337
+binexp: 336
+installarchlib: 336
+installprefixexp:       336
+installsitelib: 336
+installstyle:   336
+installvendorarch:      336
+installvendorbin:       336
+installvendorlib:       336
+man1ext:        336
+man3ext:        336
+sh:     336
+siteprefixexp:  336
+installbin:     335
+usedl:  332
+ccflags:        285
+startperl:      232
+optimize:       231
+usemymalloc:    229
+cpprun: 228
+sharpbang:      228
+perllibs:       225
+usesfio:        224
+usethreads:     220
+perlpath:       218
+extensions:     217
+usesocks:       208
+shellflags:     198
+make:   191
+d_pwage:        189
+d_pwchange:     189
+d_pwclass:      189
+d_pwcomment:    189
+d_pwexpire:     189
+d_pwgecos:      189
+d_pwpasswd:     189
+d_pwquota:      189
+gccversion:     189
+libs:   186
+useshrplib:     186
+cppflags:       185
+ptrsize:        185
+shrpenv:        185
+static_ext:     185
+use5005threads: 185
+uselargefiles:  185
+alignbytes:     184
+byteorder:      184
+ccversion:      184
+config_args:    184
+cppminus:       184

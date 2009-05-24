@@ -16,11 +16,11 @@ if ($^OS_NAME ne 'MSWin32')
     @libs = @('LIBS' => @("-lm -lposix -lcposix"))
 
 WriteMakefile(
-    NAME	=> 'POSIX',
+    NAME        => 'POSIX',
     < @libs,
-    XSPROTOARG	=> '-noprototypes',	# XXX remove later?
+    XSPROTOARG  => '-noprototypes',     # XXX remove later?
     VERSION_FROM => 'POSIX.pm',
-    realclean	=> %(FILES=> 'const-c.inc const-xs.inc'),
+    realclean   => %(FILES=> 'const-c.inc const-xs.inc'),
     )
 
 my @names =
@@ -76,8 +76,8 @@ my @names =
        \%(name=>"HUGE_VAL", type=>"NV", not_constant=>1,
        macro=>\@(<<'END', "#endif\n"),
 #if (defined(USE_LONG_DOUBLE) && defined(HUGE_VALL)) || defined(HUGE_VAL)
-	/* HUGE_VALL is admittedly non-POSIX but if we are using long doubles
-	 * we might as well use long doubles. --jhi */
+        /* HUGE_VALL is admittedly non-POSIX but if we are using long doubles
+         * we might as well use long doubles. --jhi */
 END
        value=>'
 #if defined(USE_LONG_DOUBLE) && defined(HUGE_VALL)
@@ -92,13 +92,13 @@ push @names, \%(name=>$_, type=>"UV")
              SA_RESTART SA_SIGINFO UCHAR_MAX UINT_MAX ULONG_MAX USHRT_MAX)))
 push @names, \%(name=>$_, type=>"NV", not_constant=>1)
     foreach @( ( <qw(DBL_MAX FLT_MAX LDBL_MAX LDBL_MIN LDBL_EPSILON
-	       DBL_EPSILON DBL_MIN FLT_EPSILON FLT_MIN)))
+               DBL_EPSILON DBL_MIN FLT_EPSILON FLT_MIN)))
 
 push @names, \%(name=>$_, type=>"NV")
     foreach @( ( <qw(DBL_DIG DBL_MANT_DIG DBL_MAX_10_EXP DBL_MAX_EXP DBL_MIN_10_EXP
-	      DBL_MIN_EXP FLT_DIG FLT_MANT_DIG FLT_MAX_10_EXP FLT_MAX_EXP
-	      FLT_MIN_10_EXP FLT_MIN_EXP FLT_RADIX LDBL_DIG LDBL_MANT_DIG
-	      LDBL_MAX_10_EXP LDBL_MAX_EXP LDBL_MIN_10_EXP LDBL_MIN_EXP)))
+              DBL_MIN_EXP FLT_DIG FLT_MANT_DIG FLT_MAX_10_EXP FLT_MAX_EXP
+              FLT_MIN_10_EXP FLT_MIN_EXP FLT_RADIX LDBL_DIG LDBL_MANT_DIG
+              LDBL_MAX_10_EXP LDBL_MAX_EXP LDBL_MIN_10_EXP LDBL_MIN_EXP)))
 
 push @names, \%(name=>$_, type=>"IV", default=> \@("IV", "0"))
     foreach @( ( <qw(_POSIX_ARG_MAX _POSIX_CHILD_MAX _POSIX_CHOWN_RESTRICTED

@@ -163,9 +163,9 @@ print $^STDOUT, $a eq "123.456" ?? "ok 44\n" !! "not ok 44 # $a\n"
 
 $a = 1e34; "$a"
 unless ($^OS_NAME eq 'posix-bc')
-{ print $^STDOUT, $a eq "1e+34" || $a eq "1e+034" ?? "ok 45\n" !! "not ok 45 # $a\n"; }
+  print $^STDOUT, $a eq "1e+34" || $a eq "1e+034" ?? "ok 45\n" !! "not ok 45 # $a\n"
 else
-{ print $^STDOUT, "ok 45 # skipped on $^OS_NAME\n"; }
+  print $^STDOUT, "ok 45 # skipped on $^OS_NAME\n"
 
 # see bug #15073
 

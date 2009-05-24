@@ -1,9 +1,9 @@
 use ExtUtils::MakeMaker
 use ExtUtils::Constant v0.11 'WriteConstants'
 WriteMakefile(
-    NAME		=> 'File::Glob',
-    VERSION_FROM	=> 'Glob.pm',
-    OBJECT		=> 'bsd_glob$(OBJ_EXT) Glob$(OBJ_EXT)',
+    NAME                => 'File::Glob',
+    VERSION_FROM        => 'Glob.pm',
+    OBJECT              => 'bsd_glob$(OBJ_EXT) Glob$(OBJ_EXT)',
     realclean => %( FILES=> 'const-c.inc const-xs.inc' ),
 
     ## uncomment for glob debugging (will cause make test to fail)
