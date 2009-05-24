@@ -5820,7 +5820,7 @@ Perl_peep(pTHX_ register OP *o)
 			Perl_warner(aTHX_ packWARN(WARN_EXEC),
 				    "Statement unlikely to be reached");
 			Perl_warner(aTHX_ packWARN(WARN_EXEC),
-				    "\t(Maybe you meant system() when you said exec()?)\n");
+				    "        (Maybe you meant system() when you said exec()?)\n");
 		    }
 		}
 	    }

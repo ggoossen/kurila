@@ -3482,7 +3482,7 @@ Perl_report_evil_fh(pTHX_ IO *io, I32 op)
 		if (io && IoDIRP(io) && !(IoFLAGS(io) & IOf_FAKE_DIRP))
 		    Perl_warner(
 			aTHX_ packWARN(warn_type),
-			"\t(Are you trying to call %s%s on dirhandle %s?)\n",
+			"        (Are you trying to call %s%s on dirhandle %s?)\n",
 			func, pars, name
 		    );
 	    }
@@ -3492,7 +3492,7 @@ Perl_report_evil_fh(pTHX_ IO *io, I32 op)
 		if (io && IoDIRP(io) && !(IoFLAGS(io) & IOf_FAKE_DIRP))
 		    Perl_warner(
 			aTHX_ packWARN(warn_type),
-			"\t(Are you trying to call %s%s on dirhandle?)\n",
+			"        (Are you trying to call %s%s on dirhandle?)\n",
 			func, pars
 		    );
 	    }
