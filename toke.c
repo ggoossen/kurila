@@ -4305,10 +4305,6 @@ Perl_yylex(pTHX)
 	if (!tmp && *s == ':' && s[1] == ':' && strNE(PL_tokenbuf, "CORE"))
 	    goto just_a_word;
 
-	d = s;
-	if (isSPACE(*s))
-	    s = SKIPSPACE0(s);
-
 	/* Is this a label? */
 	if (!tmp && PL_expect == XSTATE
 	      && s < PL_bufend && *s == ':' && *(s + 1) != ':') {
@@ -4317,17 +4313,21 @@ Perl_yylex(pTHX)
 	    TOKEN(LABEL);
 	}
 
+	/* Check for keywords */
+	tmp = keyword(PL_tokenbuf, len);
+
+	d = s;
+	if ((isSPACE(*s) || *s == '\t') && (tmp != KEY___END__ && tmp != KEY___DATA__))
+	    s = SKIPSPACE0(s);
+
 	/* Is this a word before a => operator? */
-	if (*s == '=' && s[1] == '>') {
+	if (s < PL_bufend && *s == '=' && s[1] == '>') {
 	    pl_yylval.opval
 		= (OP*)newSVOP(OP_CONST, 0,
 			       newSVpvn(PL_tokenbuf, len), S_curlocation(PL_bufptr));
 	    pl_yylval.opval->op_private = OPpCONST_BARE;
 	    TERM(WORD);
 	}
-
-	/* Check for keywords */
-	tmp = keyword(PL_tokenbuf, len);
 
 	if (tmp < 0) {			/* second-class keyword? */
 	    GV *ogv = NULL;	/* override (winner) */
