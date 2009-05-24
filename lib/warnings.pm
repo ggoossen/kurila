@@ -324,7 +324,7 @@ sub bits
             $mask ^&^= ^~^(%DeadBits{$word}^|^$All) if $no_fatal 
         
         else
-        { die("Unknown warnings category '$word'")}
+            die("Unknown warnings category '$word'")
     
 
     return $mask 
@@ -359,7 +359,7 @@ sub import
             $mask ^&^= ^~^(%DeadBits{$word}^|^$All) if $no_fatal 
         
         else
-        { die("Unknown warnings category '$word'")}
+            die("Unknown warnings category '$word'")
     
 
     $^WARNING_BITS = $mask 
@@ -385,7 +385,7 @@ sub unimport
             $mask ^&^= ^~^($catmask ^|^ %DeadBits{$word} ^|^ $All)
         
         else
-        { die("Unknown warnings category '$word'")}
+            die("Unknown warnings category '$word'")
     
 
     $^WARNING_BITS = $mask 

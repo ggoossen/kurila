@@ -675,7 +675,7 @@ for my $name (@heavy_subs) {
 
 # tie returns the object, so the value returned to require will be true.
 my %%Config = %%(
-%s);
+%s  );
 
 sub config_value {
     my $key = shift;
@@ -858,7 +858,7 @@ EOF
     s{([\'\"])(?=[^\'\"\s]*[./][^\'\"\s]*\1)([^\'\"\s]+)\1}(F<$2>)g # '.o'
     s{([\'\"])([^\'\"\s]+)\1}(C<$2>)g # "date" command
     s{\'([A-Za-z_\- *=/]+)\'}(C<$1>)g # 'ln -s'
-        s{
+    s{
      (?<! [\w./<\'\"] )		# Only standalone file names
      (?! e \. g \. )		# Not e.g.
      (?! \. \. \. )		# Not ...
@@ -872,8 +872,8 @@ EOF
      )
      (?<! \. (?= [\s)] ) )	# Do not include trailing dot
      (?! [\w/] )		# Include all of it
-   }
-   (F<$1>)xg			# /usr/local
+      }
+      (F<$1>)xg			# /usr/local
     s/((?<=\s)~\w*)/F<$1>/g	# ~name
     s/(?<![.<\'\"])\b([A-Z_]{2,})\b(?![\'\"])/C<$1>/g	# UNISTD
     s/(?<![.<\'\"])\b(?!the\b)(\w+)\s+macro\b/C<$1> macro/g # FILE_cnt macro
