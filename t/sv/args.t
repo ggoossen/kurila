@@ -67,6 +67,3 @@ do
         ok(!$flag, 'delete $_[0] : after f')
     
     ok($flag, 'delete $_[0] : outside block')
-
-
-	

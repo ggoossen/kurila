@@ -66,7 +66,7 @@ Can't call method "go" on UNDEF at - line 1 character 21.
 ########
 BEGIN
         {
-	    "foo";
+            "foo";
         }
 ########
 our @array;

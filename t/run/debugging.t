@@ -15,9 +15,9 @@ BEGIN
 
 plan(tests => 1)
 
-my $result = runperl( prog	=> 'print $^STDOUT, "foo"',
-                      args	=> \@( '-Dx' ),
-                      stderr	=> 1,
+my $result = runperl( prog      => 'print $^STDOUT, "foo"',
+                      args      => \@( '-Dx' ),
+                      stderr    => 1,
                       )
 
 my $refdump = <<'EO_DX_OUT'

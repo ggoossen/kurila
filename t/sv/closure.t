@@ -523,9 +523,10 @@ test { $a->() == 123 },
 $x = 123
 $a = eval q(
     eval q[
-	sub { eval '$x' }
+        sub { eval '$x' }
     ]
 )
+die if $^EVAL_ERROR
 @a = @( ('\1\1\1\1\1\1\1') x 100 ) # realloc recently-freed CVs
 test { $a->() == 123 },
 
@@ -538,7 +539,7 @@ sub (@< @_)
     $x->()
     $a = \@( 99 )
     $x->()
-->()
+ ->()
 test {1},
 
 # [perl #17605] found that an empty block called in scalar context
@@ -617,7 +618,7 @@ do
     sub f16302
         sub (@< @_)
             test { defined $x and $x == 1 },
-        ->()
+         ->()
     
 
 f16302()

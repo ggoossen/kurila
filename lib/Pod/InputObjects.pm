@@ -164,7 +164,7 @@ contents of the given argument.
 
 =cut
 
-sub name
+sub name(@< @_)
     ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1]
     return @_[0]->{?'name'}
 
@@ -208,7 +208,7 @@ state is restored to this value.
 
 =cut
 
-sub was_cutting
+sub was_cutting(@< @_)
     ((nelems @_) +> 1)  and  @_[0]->{+was_cutting} = @_[1]
     return @_[0]->{?was_cutting}
 
@@ -291,7 +291,7 @@ the name of the command (I<without> any leading C<=> prefix).
 
 =cut
 
-sub cmd_name
+sub cmd_name(@< @_)
     ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1]
     return @_[0]->{?'name'}
 
@@ -309,7 +309,7 @@ This method will return the corresponding text of the paragraph.
 
 =cut
 
-sub text
+sub text(@< @_)
     ((nelems @_) +> 1)  and  @_[0]->{+'text'} = @_[1]
     return @_[0]->{?'text'}
 
@@ -375,7 +375,7 @@ This method will get/set the corresponding parse-tree of the paragraph's text.
 
 =cut
 
-sub parse_tree
+sub parse_tree(@< @_)
     ((nelems @_) +> 1)  and  @_[0]->{+'ptree'} = @_[1]
     return @_[0]->{?'ptree'}
 
@@ -503,7 +503,7 @@ The name of the interior sequence command.
 
 =cut
 
-sub cmd_name
+sub cmd_name(@< @_)
     ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1]
     return @_[0]->{?'name'}
 
@@ -628,7 +628,7 @@ sequence (should be "<").
 
 =cut
 
-sub left_delimiter
+sub left_delimiter(@< @_)
     ((nelems @_) +> 1)  and  @_[0]->{+'ldelim'} = @_[1]
     return @_[0]->{?'ldelim'}
 
@@ -645,7 +645,7 @@ sequence (should be ">").
 
 =cut
 
-sub right_delimiter
+sub right_delimiter(@< @_)
     ((nelems @_) +> 1)  and  @_[0]->{+'rdelim'} = @_[1]
     return @_[0]->{?'rdelim'}
 
@@ -666,7 +666,7 @@ sequence's text.
 
 =cut
 
-sub parse_tree
+sub parse_tree(@< @_)
     ((nelems @_) +> 1)  and  @_[0]->{+'ptree'} = @_[1]
     return @_[0]->{?'ptree'}
 

@@ -166,11 +166,11 @@ sub textblock($self, $_, $line, _)
     return if $self->%{?EXCLUDE}
     $self->output ($_), return if $self->%{?VERBATIM}
 
-        # Perform a little magic to collapse multiple L<> references.  This is
-        # here mostly for backwards-compatibility.  We'll just rewrite the whole
-        # thing into actual text at this part, bypassing the whole internal
-        # sequence parsing thing.
-        s{
+    # Perform a little magic to collapse multiple L<> references.  This is
+    # here mostly for backwards-compatibility.  We'll just rewrite the whole
+    # thing into actual text at this part, bypassing the whole internal
+    # sequence parsing thing.
+    s{
         (
           L<                    # A link of the form L</something>.
               /

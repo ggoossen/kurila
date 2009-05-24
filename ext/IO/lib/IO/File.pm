@@ -166,7 +166,7 @@ sub new
 ## Open
 ##
 
-sub open
+sub open(@< @_)
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $fh->open(FILENAME [,MODE [,PERMS]])'
     my @($fh, $file, ...) =  @_
     if ((nelems @_) +> 2)
@@ -189,11 +189,7 @@ sub open
 ## Binmode
 ##
 
-sub binmode
-    ( (nelems @_) == 1 or (nelems @_) == 2 ) or die 'usage $fh->binmode([LAYER])'
-
-    my @($fh, ?$layer) =  @_
-
+sub binmode($fh, ?$layer)
     return binmode $fh->$ unless $layer
     return binmode $fh->$, $layer
 

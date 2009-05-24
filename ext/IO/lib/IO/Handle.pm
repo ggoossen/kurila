@@ -311,9 +311,7 @@ sub _open_mode_string($mode)
     $mode
 
 
-sub fdopen
-    (nelems @_) == 3 or die 'usage: $io->fdopen(FD, MODE)'
-    my @($io, $fd, $mode) =  @_
+sub fdopen($io, $fd, $mode)
 
     my $fdmode = '&'
     if (!ref($fd) && $fd =~ m#^\d+$#)
@@ -325,10 +323,7 @@ sub fdopen
         ?? $io !! undef
 
 
-sub close
-    (nelems @_) == 1 or die 'usage: $io->close()'
-    my@($io) =  @_
-
+sub close($io)
     close($io)
 
 
@@ -339,55 +334,42 @@ sub close
 # flock
 # select
 
-sub opened
-    (nelems @_) == 1 or die 'usage: $io->opened()'
-    defined fileno(@_[0])
+sub opened($io)
+    defined fileno($io)
 
 
-sub fileno
-    (nelems @_) == 1 or die 'usage: $io->fileno()'
-    fileno(@_[0])
+sub fileno($io)
+    fileno($io)
 
 
-sub getc
-    (nelems @_) == 1 or die 'usage: $io->getc()'
-    getc(@_[0])
+sub getc($io)
+    getc($io)
 
 
-sub eof
-    (nelems @_) == 1 or die 'usage: $io->eof()'
-    eof(@_[0])
+sub eof($io)
+    eof($io)
 
 
-sub print
-    (nelems @_) or die 'usage: $io->print(ARGS)'
-    my $this = shift
-    print $this, < @_
+sub print($this, @< @args)
+    print $this, < @args
 
 
-sub printf
-    (nelems @_) +>= 2 or die 'usage: $io->printf(FMT,[ARGS])'
-    my $this = shift
-    printf $this, < @_
+sub printf($this, @< @args)
+    printf $this, < @args
 
 
-sub getline
-    (nelems @_) == 1 or die 'usage: $io->getline()'
-    my $this = shift
+sub getline($this)
     return scalar ~< $this
 
 
 *gets = \&getline  # deprecated
 
-sub getlines
-    (nelems @_) == 1 or die 'usage: $io->getlines()'
-    my $this = shift
+sub getlines($this)
     return @( ~< $this )
 
 
-sub truncate
-    (nelems @_) == 2 or die 'usage: $io->truncate(LEN)'
-    truncate(@_[0], @_[1])
+sub truncate($io, $len)
+    truncate($io, $len)
 
 
 sub read($io, $bufref, $len, ?$offset)
@@ -398,23 +380,22 @@ sub sysread($io, $bufref, $len, ?$offset)
     sysread($io, $bufref->$, $len, $offset || 0)
 
 
-sub write
-    (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])'
-    @_[+2] = length(@_[1]) unless defined @_[?2]
-    print  @_[0]  ,substr(@_[1], @_[?3] || 0, @_[2])
+sub write {
+    (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])';
+    @_[+2] = length(@_[1]) unless defined @_[?2];
+    print  @_[0]  ,substr(@_[1], @_[?3] || 0, @_[2]);
+}
 
-
-sub syswrite
-    (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])'
+sub syswrite {
+    (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])';
     if (defined(@_[?2]))
         syswrite(@_[0], @_[1], @_[2], @_[?3] || 0)
     else
         syswrite(@_[0], @_[1])
-    
+}
 
 
-sub stat
-    (nelems @_) == 1 or die 'usage: $io->stat()'
+sub stat($io)
     stat(@_[0])
 
 
@@ -453,17 +434,13 @@ sub input_line_number
 
 
 # XXX undocumented
-sub fcntl
-    (nelems @_) == 3 || die 'usage: $io->fcntl( OP, VALUE );'
-    my @($io, $op) =  @_
-    return fcntl($io, $op, @_[2])
+sub fcntl($io, $op, $value)
+    return fcntl($io, $op, $value)
 
 
 # XXX undocumented
-sub ioctl
-    (nelems @_) == 3 || die 'usage: $io->ioctl( OP, VALUE );'
-    my @($io, $op) =  @_
-    return ioctl($io, $op, @_[2])
+sub ioctl($io, $op, $value)
+    return ioctl($io, $op, $value)
 
 
 # this sub is for compatability with older releases of IO that used
@@ -472,17 +449,15 @@ sub ioctl
 # The SEEK_* and _IO?BF constants were the only constants at that time
 # any new code should just chech defined(&CONSTANT_NAME)
 
-sub constant
-    my $name = shift
+sub constant($name)
     (($name =~ m/^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && defined &{Symbol::fetch_glob($name)->*})
-    ?? &{Symbol::fetch_glob($name)->*}() !! undef
+        ?? &{Symbol::fetch_glob($name)->*}() !! undef
 
 
 
-sub printflush
-    my $io = shift
+sub printflush($io, @< @args)
     my $prev_autoflush = iohandle::output_autoflush($io, 1)
-    print $io, < @_
+    print $io, < @args
     iohandle::output_autoflush($io, $prev_autoflush)
     return
 

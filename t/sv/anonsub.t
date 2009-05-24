@@ -19,7 +19,7 @@ $^OUTPUT_AUTOFLUSH=1
 
 undef $^INPUT_RECORD_SEPARATOR
 my @prgs = split "\n########\n", ~< $^DATA
-plan(6 + scalar nelems @prgs)
+plan(1 + scalar nelems @prgs)
 
 my $tmpfile = "asubtmp000"
 1 while -f ++$tmpfile
@@ -55,23 +55,11 @@ for ( @prgs)
     is($results, $expected)
 
 
-sub test_invalid_decl
-    my @($code,?$todo) =  @_
-    local our $TODO = $todo
-    eval_dies_like( $code,
-                    qr/^Illegal declaration of anonymous subroutine/)
-
-
-test_invalid_decl('sub;')
-test_invalid_decl('sub ($s) ;', " # TODO ")
-test_invalid_decl('do { my $x = sub }')
-test_invalid_decl('sub ($s) && 1', " # TODO ")
-test_invalid_decl('sub ($s) : lvalue;',' # TODO')
-
-eval "sub #foo\n\{print \$^STDOUT, 1\}"
+eval "sub #foo\n \{ print \$^STDOUT, 1 \}"
 is $^EVAL_ERROR, '', "No error"
 
-__END__
+__DATA__
+do {
 sub X {
     my $n = "ok 1\n";
     sub { print $^STDOUT, $n };
@@ -79,23 +67,27 @@ sub X {
 my $x = X();
 undef &X;
 $x->();
+};
 EXPECT
 ok 1
 ########
+do {
 sub X {
     my $n = "ok 1\n";
     sub {
-        my $dummy = $n;	# eval can't close on $n without internal reference
-	eval 'print $^STDOUT, $n';
-	die $^EVAL_ERROR if $^EVAL_ERROR;
+        my $dummy = $n; # eval can't close on $n without internal reference
+        eval 'print $^STDOUT, $n';
+        die $^EVAL_ERROR if $^EVAL_ERROR;
     };
 }
 my $x = X();
 undef &X;
 $x->();
+};
 EXPECT
 ok 1
 ########
+do {
 sub X {
     my $n = "ok 1\n";
     eval 'sub { print $^STDOUT, $n }';
@@ -104,9 +96,10 @@ my $x = X();
 die $^EVAL_ERROR if $^EVAL_ERROR;
 undef &X;
 $x->();
+};
 EXPECT
 ok 1
 ########
-print $^STDOUT, sub { return "ok 1\n" } -> ();
+print $^STDOUT, sub { return "ok 1\n" } -> ()
 EXPECT
 ok 1

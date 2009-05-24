@@ -889,8 +889,8 @@ sub is_fh
     return 1 if ref \$maybe_fh eq 'GLOB' # its a glob
 
     return try { $maybe_fh->isa("IO::Handle") } ||
-    # 5.5.4's tied() and can() doesn't like getting undef
-    try { (tied($maybe_fh) || '')->can('TIEHANDLE') }
+        # 5.5.4's tied() and can() doesn't like getting undef
+        try { (tied($maybe_fh) || '')->can('TIEHANDLE') }
 
 
 
@@ -1270,7 +1270,7 @@ sub _copy_io_layers($self, $src, $dest)
         my @layers = PerlIO::get_layers($src)
 
         binmode $dest, join " ", map { ":$_" }, @layers if (nelems @layers)
-    )
+      )
 
 
 sub _plan_check

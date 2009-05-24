@@ -276,10 +276,9 @@ sub _handle_encoding_line($self, $line)
     if (
         # OK, let's turn on the encoding
         do
-        DEBUG +> 1 and print $^STDOUT, " Setting encoding to $e\n"
-        $self->{+'encoding'} = $e
-        1
-    
+            DEBUG +> 1 and print $^STDOUT, " Setting encoding to $e\n"
+            $self->{+'encoding'} = $e
+            1
         and $e eq 'HACKRAW'
         )
         DEBUG and print $^STDOUT, " Putting in HACKRAW (no-op) encoding mode.\n"
