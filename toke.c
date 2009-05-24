@@ -3005,10 +3005,10 @@ Perl_yylex(pTHX)
 	    }
 	}
 	else {
+            yyerror("Expected block");
 	    /* empty block */
-	    force_next('{');
 	    force_next('}');
-	    TOKEN(';');
+	    TOKEN('{');
 	}
     }
 
@@ -4763,12 +4763,6 @@ Perl_yylex(pTHX)
 	case KEY_INIT:
 	case KEY_END:
 	    if (PL_expect == XSTATE) {
-		s = skipspace(s, NULL);
-		if (*s != '{') {
-		    S_start_statement_indent(s);
-		    start_force(PL_curforce);
-		    force_next('{');
-		}
 
 		pl_yylval.i_tkval.ival = tmp;
 
@@ -4866,13 +4860,7 @@ Perl_yylex(pTHX)
 	    UNI(OP_CHROOT);
 
 	case KEY_do:
-	    s = SKIPSPACE1(s);
-	    if (*s != '{') {
-		S_start_statement_indent(s);
-		start_force(PL_curforce);
-		force_next('{');
-	    }
-	    PRETERMBLOCK(DO);
+	    PREBLOCK(DO);
 
 	case KEY_die:
 	    PL_hints |= HINT_BLOCK_SCOPE;
@@ -5115,13 +5103,7 @@ Perl_yylex(pTHX)
 	    UNI(OP_LOG);
 
 	case KEY_loop:
-	    s = SKIPSPACE1(s);
-	    if (*s != '{') {
-		S_start_statement_indent(s);
-		start_force(PL_curforce);
-		force_next('{');
-	    }
-	    PRETERMBLOCK(LOOPDO);
+	    PREBLOCK(LOOPDO);
 
 	case KEY_link:
 	    LOP(OP_LINK,XTERM);
