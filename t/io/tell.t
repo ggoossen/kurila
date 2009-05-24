@@ -102,9 +102,11 @@ if (0)
 
 print $tst, "xxxx\n"
 
-if (tell($tst) == 15 ||
-    tell($tst) == 5) # unset PERLIO or PERLIO=stdio (e.g. HP-UX, Solaris)
-{ print $^STDOUT, "ok 27\n"; } else { print $^STDOUT, "not ok 27\n"; }
+if ( tell($tst) == 15 ||
+     tell($tst) == 5) # unset PERLIO or PERLIO=stdio (e.g. HP-UX, Solaris)
+    print $^STDOUT, "ok 27\n"
+else
+    print $^STDOUT, "not ok 27\n"
 
 close($tst)
 
@@ -120,6 +122,6 @@ my $todo = $^OS_NAME eq "cygwin" && &PerlIO::get_layers($tst) eq 'stdio'
     && ' # TODO: file pointer not at eof'
 
 if (tell($tst) == 6)
-{ print $^STDOUT, "ok 28$todo\n"; } else { print $^STDOUT, "not ok 28$todo\n"; }
+  { print $^STDOUT, "ok 28$todo\n"; } else { print $^STDOUT, "not ok 28$todo\n"; }
 close $tst
 

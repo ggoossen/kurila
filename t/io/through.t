@@ -22,11 +22,11 @@ EOD
 my $t1 = \%( data => $data,  write_c => \@(1,2,length $data),  read_c => \@(1,2,3,length $data))
 my $t2 = \%( data => $data2, write_c => \@(1,2,length $data2), read_c => \@(1,2,3,length $data2))
 
-my $c	# len write tests, for each: one _all test, and 3 each len+2
+my $c   # len write tests, for each: one _all test, and 3 each len+2
 $c += (nelems $_->{?write_c}->@) * (1 + 3*nelems $_->{?read_c}->@) for @( $t1, $t2)
-$c *= 3*2*2	# $how_w, file/pipe, 2 reports
+$c *= 3*2*2     # $how_w, file/pipe, 2 reports
 
-$c += 6	# Tests with sleep()...
+$c += 6 # Tests with sleep()...
 
 print $^STDOUT, "1..$c\n"
 
@@ -60,7 +60,7 @@ sub testread($fh, $str, $read_c, $how_r, $write_c, $how_w, $why)
 sub testpipe($str, $write_c, $read_c, $how_w, $how_r, $why)
     (my $quoted = $str) =~ s/\n/\\n/g;
     my $fh
-    if ($how_w eq 'print')	# AUTOFLUSH???
+    if ($how_w eq 'print')      # AUTOFLUSH???
         # Should be shell-neutral:
         open $fh, '-|', qq[$Perl -we "$set_out;print \\\$^STDOUT, \\\$_ for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted)"] or die "open: $^OS_ERROR"
     elsif ($how_w eq 'print/flush')
@@ -84,7 +84,7 @@ sub testfile($str, $write_c, $read_c, $how_w, $how_r, $why)
     open my $fh, '>', 'io_io.tmp' or die
     binmode $fh, ':crlf'
         if defined $main::use_crlf && $main::use_crlf == 1
-    if ($how_w eq 'print')	# AUTOFLUSH???
+    if ($how_w eq 'print')      # AUTOFLUSH???
         $^OUTPUT_AUTOFLUSH = 0
         print $fh, $_ for  @data
     elsif ($how_w eq 'print/flush')
@@ -126,10 +126,6 @@ for my $s (1..2)
                 for my $how_w (qw(print print/flush syswrite))
                     testfile($str, $write_c, $read_c, $how_w, $how_r, $s)
                     testpipe($str, $write_c, $read_c, $how_w, $how_r, $s)
-                
-            
-        
-    
 
 
 unlink 'io_io.tmp'

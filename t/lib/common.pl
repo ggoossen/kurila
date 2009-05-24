@@ -24,15 +24,13 @@ my @prgs = @( () )
 my @w_files = @( () ) 
 
 if ((nelems @ARGV))
-{ print $^STDOUT, "ARGV = [$(join ' ',@ARGV)]\n" ;
+    print $^STDOUT, "ARGV = [$(join ' ',@ARGV)]\n"
     if ($Is_MacOS)
         @w_files = map { s#^#:lib:$pragma_name:#; $_ }, @ARGV
     else
         @w_files = map { s#^#./lib/$pragma_name/#; $_ }, @ARGV
-    
-}
 else
-{ @w_files = sort glob(catfile(curdir(), "lib", $pragma_name, "*")) }
+    @w_files = sort glob(catfile(curdir(), "lib", $pragma_name, "*"))
 
 my $files = 0
 foreach my $file ( @w_files)
@@ -202,9 +200,9 @@ for ( @prgs)
     ok($ok)
 
     foreach ( @temps)
-    { unlink $_ if $_ }
+        unlink $_ if $_
     foreach ( @temp_path)
-    { rmtree $_ if -d $_ }
+        rmtree $_ if -d $_
 
 
 sub randomMatch

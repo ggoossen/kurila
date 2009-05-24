@@ -113,13 +113,13 @@ SKIP: do
             my $tnum = curr_test
             next_test
             exec $Perl, '-e', "print \$^STDOUT, q\{not ok $tnum -     with fh dup \n\}"
-        
+
 
         # This has to be done *outside* the fork.
         next_test() for 1..2
-    
 
-wait				# Collect from $pid
+
+wait                            # Collect from $pid
 
 pipe(my $reader, my $writer) || die "Can't open pipe"
 close $reader

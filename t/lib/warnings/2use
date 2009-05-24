@@ -50,8 +50,7 @@ Use of uninitialized value $b in chop at - line 6 character 24.
 no warnings 'reserved' ;
 foo.bar;
 EXPECT
-Unknown bare word foo at - line 3, near ";
-"
+Unknown bare word foo at - line 3, at end of line
 Unknown bare word bar at - line 3, at end of line
 Bareword "foo" not allowed while "strict subs" in use at - line 3 character 1.
 ########

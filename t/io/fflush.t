@@ -102,19 +102,20 @@ else
 # Test flush on system/qx/pipe open
 my %subs = %(
     "system" => sub (@< @_)
-    my $c = shift
-    system $c
-,
+        my $c = shift
+        system $c
+    ,
     "qx"     => sub (@< @_)
-    my $c = shift
-    qx{$c}
-,
+        my $c = shift
+        qx{$c}
+    ,
     "popen"  => sub (@< @_)
-    my $c = shift
-    open my $pipe, "-|", "$c" or die "$c: $^OS_ERROR"
-    close $pipe
-,
+        my $c = shift
+        open my $pipe, "-|", "$c" or die "$c: $^OS_ERROR"
+        close $pipe
+    ,
     )
+
 my $t = 2
 for (qw(system qx popen))
     my $code    = %subs{?$_}

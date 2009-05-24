@@ -38,8 +38,8 @@ open($fh, "<",'Cmd_while.tmp') || die "Can't open Cmd_while.tmp."
 loop: while ( ~< $fh->*)
     if (s/vt100/VT100/g)
         s/VT100/Vt100/g
-        redo loop
-    
+        redo 'loop'
+
     $bad = 1 if m/vt100/
     $bad = 1 if m/VT100/
 continue
@@ -99,16 +99,9 @@ do
     
 
 
+print $^STDOUT, "ok 18\n"
+
 our $l
-do
-    local $l = 18
-    do
-        local $l = 0
-    continue
-        print $^STDOUT, "ok $l\n"
-    
-
-
 do
     local $l = 19
     my $x = 0

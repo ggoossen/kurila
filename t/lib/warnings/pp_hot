@@ -1,44 +1,44 @@
-  pp_hot.c	
+  pp_hot.c      
 
-  print() on unopened filehandle abc		[pp_print]
+  print() on unopened filehandle abc            [pp_print]
     $f = $a = "abc" ; print $f $a
 
-  Filehandle %s opened only for input		[pp_print]
+  Filehandle %s opened only for input           [pp_print]
     print STDIN "abc" ;
 
-  Filehandle %s opened only for output		[pp_print]
+  Filehandle %s opened only for output          [pp_print]
     $a = ~< $^STDOUT ;
 
-  print() on closed filehandle %s		[pp_print]
+  print() on closed filehandle %s               [pp_print]
     close STDIN ; print STDIN "abc" ;
 
-  uninitialized					[pp_rv2av]
-	my $a = undef ; my @b = @$a
+  uninitialized                                 [pp_rv2av]
+        my $a = undef ; my @b = @$a
 
-  uninitialized					[pp_rv2hv]
-	my $a = undef ; my %b = %$a
+  uninitialized                                 [pp_rv2hv]
+        my $a = undef ; my %b = %$a
 
-  Odd number of elements in hash list		[pp_aassign]
-	%X = (1,2,3) ;
+  Odd number of elements in hash list           [pp_aassign]
+        %X = (1,2,3) ;
 
-  Filehandle %s opened only for output		[Perl_do_readline] 
-  	open (FH, ">./xcv") ;
-	my $a = ~< *FH ;
+  Filehandle %s opened only for output          [Perl_do_readline] 
+        open (FH, ">./xcv") ;
+        my $a = ~< *FH ;
 
-  glob failed (can't start child: %s)		[Perl_do_readline] <<TODO
+  glob failed (can't start child: %s)           [Perl_do_readline] <<TODO
 
-  readline() on closed filehandle %s		[Perl_do_readline]
+  readline() on closed filehandle %s            [Perl_do_readline]
     close STDIN ; $a = ~< *STDIN;
 
-  readline() on closed filehandle %s		[Perl_do_readline]
+  readline() on closed filehandle %s            [Perl_do_readline]
     readline(NONESUCH);
 
-  glob failed (child exited with status %d%s)	[Perl_do_readline] <<TODO
+  glob failed (child exited with status %d%s)   [Perl_do_readline] <<TODO
 
-  Deep recursion on subroutine \"%s\"		[Perl_sub_crush_depth]
+  Deep recursion on subroutine \"%s\"           [Perl_sub_crush_depth]
     sub fred { fred() if $a++ +< 200} fred()
 
-  Deep recursion on anonymous subroutine 	[Perl_sub_crush_depth]
+  Deep recursion on anonymous subroutine        [Perl_sub_crush_depth]
     $a = sub { &$a if $a++ +< 200} &$a
 
   Use of reference "%s" as array index [pp_aelem]
@@ -91,7 +91,7 @@ print $^STDIN, "anc";
 EXPECT
 print() on closed filehandle STDIN at - line 4 character 1.
 print() on closed filehandle STDIN at - line 6 character 1.
-	(Are you trying to call print() on dirhandle STDIN?)
+        (Are you trying to call print() on dirhandle STDIN?)
  at - line 6 character 1.
 ########
 # pp_hot.c [pp_print]
@@ -129,7 +129,7 @@ $a = ~< *STDIN ;
 EXPECT
 readline() on closed filehandle STDIN at - line 3 character 29.
 readline() on closed filehandle STDIN at - line 4 character 29.
-	(Are you trying to call readline() on dirhandle STDIN?)
+        (Are you trying to call readline() on dirhandle STDIN?)
  at - line 4 character 29.
 ########
 # pp_hot.c [Perl_do_readline]
@@ -158,11 +158,11 @@ Filehandle opened only for output at - line 15 character 6.
 ########
 # pp_hot.c [Perl_sub_crush_depth]
 use warnings 'recursion' ;
+
 sub fred 
-{ 
     fred() if $a++ +< 200
-} 
-do {
+
+do
   local $^WARN_HOOK = sub {
     if (@_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
         print $^STDOUT, "ok\n";
@@ -170,16 +170,15 @@ do {
     }
   };
   fred();
-};
+
 EXPECT
 ok
 ########
 # pp_hot.c [Perl_sub_crush_depth]
 no warnings 'recursion' ;
 sub fred 
-{ 
     fred() if $a++ +< 200
-} 
+ 
 do {
   local $^WARN_HOOK = sub {
     if (@_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
@@ -194,10 +193,9 @@ EXPECT
 ########
 # pp_hot.c [Perl_sub_crush_depth]
 use warnings 'recursion' ;
+
 $b = sub 
-{ 
     &$b() if $a++ +< 200
-}  ;
 
 &$b() ;
 EXPECT
@@ -301,14 +299,13 @@ Deep recursion on subroutine "main::__ANON__" at - line 5 character 5.
     main::__ANON__ called at - line 5 character 5.
     main::__ANON__ called at - line 5 character 5.
     main::__ANON__ called at - line 5 character 5.
-    main::__ANON__ called at - line 8 character 1.
+    main::__ANON__ called at - line 7 character 1.
 ########
 # pp_hot.c [Perl_sub_crush_depth]
 no warnings 'recursion' ;
+
 $b = sub 
-{ 
     &$b if $a++ +< 200
-}  ;
 
 &$b ;
 EXPECT
@@ -318,10 +315,10 @@ EXPECT
 use warnings 'uninitialized';
 my($x, $y);
 sub a { shift }
-a($x . "x");	# should warn once
-a($x . $y);	# should warn twice
-$x .= $y;	# should warn once
-$y .= $y;	# should warn once
+a($x . "x");    # should warn once
+a($x . $y);     # should warn twice
+$x .= $y;       # should warn once
+$y .= $y;       # should warn once
 EXPECT
 Use of uninitialized value $x in concatenation (.) or string at - line 5 character 6.
 Use of uninitialized value $x in concatenation (.) or string at - line 6 character 6.

@@ -49,8 +49,8 @@ sub import($class,@< @args)
         my @val
         foreach my $layer (split(m/\s+/,$dscp))
             $layer =~ s/^://
-            my $target = $layer		# the layer name itself
-            $target =~ s/^(\w+)\(.+\)$/$1/	# strip parameters
+            my $target = $layer         # the layer name itself
+            $target =~ s/^(\w+)\(.+\)$/$1/      # strip parameters
 
             unless(PerlIO::Layer->find($target,1))
                 warnings::warnif("layer", "Unknown PerlIO layer '$target'")

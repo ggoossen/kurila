@@ -127,8 +127,8 @@ do
 
 
 do
-# delete on undef.
-my $h
+    # delete on undef.
+    my $h
     is( delete $h{?foo}, undef )
     dies_like( { delete $h{foo} }, qr/delete expects a HASH not UNDEF/ )
 

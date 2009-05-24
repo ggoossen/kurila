@@ -19,7 +19,7 @@ is( $y, "old" )
 $x = "old"
 $y = "old"
 do
-local $y = "new"
+   local $y = "new"
    $x = "new"
 
 is( $x, "new" )
@@ -38,9 +38,9 @@ is( $y, "old" )
 # nesting
 @: $x, $y = qw[old old]
 do
-do
-    local $x = "new"
- local $y = "new"
+    do
+        local $x = "new"
+    local $y = "new"
 
 is($x, "old")
 is($y, "old")
@@ -48,9 +48,9 @@ is($y, "old")
 # ending multiple nested blocks at once
 @: $x, $y = qw[old old]
 do
-local $y = "new"
- do
-    local $x = "new"
+    local $y = "new"
+    do
+        local $x = "new"
 
 is($x, "old")
 is($y, "old")

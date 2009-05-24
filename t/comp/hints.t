@@ -63,10 +63,10 @@ do
     
     # op_entereval should keep the pragmas it was compiled with
     eval q<
-	print $^STDOUT, "not " if $^HINTS{foo} ne "a";
-	print $^STDOUT, "ok 13 - \$^HINTS\{foo\} is 'a' at eval-\"\" time\n";
-	print $^STDOUT, "not " unless $^HINT_BITS ^&^ 0x00020000;
-	print $^STDOUT, "ok 14 - \$^HINTS contains HINT_LOCALIZE_HH at eval\"\"-time\n";
+        print $^STDOUT, "not " if $^HINTS{foo} ne "a";
+        print $^STDOUT, "ok 13 - \$^HINTS\{foo\} is 'a' at eval-\"\" time\n";
+        print $^STDOUT, "not " unless $^HINT_BITS ^&^ 0x00020000;
+        print $^STDOUT, "ok 14 - \$^HINTS contains HINT_LOCALIZE_HH at eval\"\"-time\n";
     >
     die if $^EVAL_ERROR
 

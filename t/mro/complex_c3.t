@@ -59,30 +59,30 @@ do
     package Test::C; use mro 'c3';
     our @ISA
 
-    package Test::D use mro 'c3'
+    package Test::D; use mro 'c3'
     use base < qw/Test::A Test::B Test::C/
 
-    package Test::E use mro 'c3'
+    package Test::E; use mro 'c3'
     use base < qw/Test::D/
 
-    package Test::F use mro 'c3'
+    package Test::F; use mro 'c3'
     use base < qw/Test::E/
     sub testmeth { "wrong" }
 
-    package Test::G use mro 'c3'
+    package Test::G; use mro 'c3'
     use base < qw/Test::D/
 
-    package Test::H use mro 'c3'
+    package Test::H; use mro 'c3'
     use base < qw/Test::G/
 
-    package Test::I use mro 'c3'
+    package Test::I; use mro 'c3'
     use base < qw/Test::H Test::F/
     sub testmeth { "right" }
 
-    package Test::J use mro 'c3'
+    package Test::J; use mro 'c3'
     use base < qw/Test::F/
 
-    package Test::K use mro 'c3'
+    package Test::K; use mro 'c3'
     use base < qw/Test::J Test::I/
     sub testmeth($self) { $self->SUPER::testmeth() }
 

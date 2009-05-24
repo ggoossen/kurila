@@ -25,7 +25,7 @@ do
     is(Sans_mypragma::affected(), undef,
        "pragma not in effect outside this file")
     eval qq{is(mypragma::in_effect(), 42,
-	       "pragma is in effect within this eval"); 1} or die $^EVAL_ERROR
+               "pragma is in effect within this eval"); 1} or die $^EVAL_ERROR
 
     do
         no mypragma
@@ -36,7 +36,7 @@ do
 
     is(mypragma::in_effect(), 42, "pragma is in effect within this block")
     eval qq{is(mypragma::in_effect(), 42,
-	       "pragma is in effect within this eval"); 1} or die $^EVAL_ERROR
+               "pragma is in effect within this eval"); 1} or die $^EVAL_ERROR
 
 is(mypragma::in_effect(), undef, "pragma no longer in effect")
 eval qq{is(mypragma::in_effect(), undef, "pragma not in effect"); 1} or die $^EVAL_ERROR

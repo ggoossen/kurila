@@ -14,15 +14,15 @@ close $try or die "Could not close: $^OS_ERROR"
 
 do
     my $x = runperl(
-        prog	=> 'while (~< *ARGV) { print $^STDOUT, $_; }',
-        stdin	=> "foo\n",
-        args	=> \@( 'Io_argv1.tmp', '-' ),
+        prog    => 'while (~< *ARGV) { print $^STDOUT, $_; }',
+        stdin   => "foo\n",
+        args    => \@( 'Io_argv1.tmp', '-' ),
         )
     is($x, "a line\nfoo\n", '   from a file and STDIN')
 
     $x = runperl(
-        prog	=> 'while (~< *ARGV) { print $^STDOUT, $_; }',
-        stdin	=> "foo\n",
+        prog    => 'while (~< *ARGV) { print $^STDOUT, $_; }',
+        stdin   => "foo\n",
         )
     is($x, "foo\n", '   from just STDIN')
 
@@ -82,7 +82,7 @@ ok( eof(),      'eof() true after closing ARGV' )
 do
     local $^INPUT_RECORD_SEPARATOR = undef
     open my $f, "<", 'Io_argv1.tmp' or die "Could not open Io_argv1.tmp: $^OS_ERROR"
-    ~< $f->*	# set $. = 1
+    ~< $f->*    # set $. = 1
     is( ($: ~< $f->*), undef )
 
     open $f, "<", $devnull or die
@@ -91,7 +91,7 @@ do
     is(($: ~< $f->*), undef )
     is(($: ~< $f->*), undef )
 
-    open $f, "<", $devnull or die	# restart cycle again
+    open $f, "<", $devnull or die       # restart cycle again
     ok( defined( ~< $f->*) )
     is(($: ~< $f->*), undef )
     close $f or die "Could not close: $^OS_ERROR"

@@ -60,7 +60,7 @@ do
     sub testfunc { return 123 }
     package MRO_TestOtherBase
     sub testfunctwo { return 321 }
-    package MRO_M our @ISA = qw/MRO_TestBase/
+    package MRO_M; our @ISA = qw/MRO_TestBase/
 
 
 # XXX TODO (when there's a way to backtrack through a glob's aliases)

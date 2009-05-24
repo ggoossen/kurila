@@ -8,10 +8,10 @@ eval 'print $^STDOUT, "ok 1\n";'
 
 if ($^EVAL_ERROR eq '') {print $^STDOUT, "ok 2\n";} else {print $^STDOUT, "not ok 2\n";}
 
-eval "\$foo\n    = # this is a comment\n'ok 3';"
+eval "\$foo\n    = # this is a comment\n  'ok 3';"
 print $^STDOUT, $foo,"\n"
 
-eval "\$foo\n    = # this is a comment\n'ok 4\n';"
+eval "\$foo\n    = # this is a comment\n  'ok 4\n';"
 print $^STDOUT, $foo
 
 print $^STDOUT, eval '
@@ -77,7 +77,7 @@ my $X = sub (@< @_)
 # check navigation of multiple eval boundaries to find lexicals
 
 my $x = 25
-eval <<'EOT' die if $^EVAL_ERROR
+eval <<'EOT'; die if $^EVAL_ERROR
   print $^STDOUT, "# $x\n";	# clone into eval's pad
   sub do_eval1 {
      eval @_[0]; die if $^EVAL_ERROR;
@@ -92,7 +92,7 @@ $x++
 
 # calls from within eval'' should clone outer lexicals
 
-eval <<'EOT' die if $^EVAL_ERROR
+eval <<'EOT'; die if $^EVAL_ERROR
   sub do_eval2 {
      eval @_[0]; die if $^EVAL_ERROR;
   }
@@ -108,7 +108,7 @@ EOT
 
 $main::ok = 'not ok'
 my $ok = 'ok'
-eval <<'EOT' die if $^EVAL_ERROR
+eval <<'EOT'; die if $^EVAL_ERROR
   # $x unbound here
   sub do_eval3 {
      eval @_[0]; die if $^EVAL_ERROR;
@@ -182,9 +182,9 @@ do
 # ditto for eval ""
 do
     my $status = eval q{
-	eval q{ die };
-	print $^STDOUT, "# eval ' return ' test\n";
-	return; # removing this changes behavior
+        eval q{ die };
+        print $^STDOUT, "# eval ' return ' test\n";
+        return; # removing this changes behavior
     }
     print $^STDOUT, "not " if $^EVAL_ERROR
     print $^STDOUT, "ok $x - return from eval\n"
@@ -222,7 +222,7 @@ my $zzz = 1
 
 eval q{
     sub fred1 {
-	eval q{ print $^STDOUT, eval '$zzz' == 1 ?? 'ok' !! 'not ok', " @_[?0]\n"}
+        eval q{ print $^STDOUT, eval '$zzz' == 1 ?? 'ok' !! 'not ok', " @_[?0]\n"}
     }
     fred1(47);
     do { my $zzz = 2; fred1(48) };
@@ -230,9 +230,9 @@ eval q{
 
 eval q{
     sub fred2 {
-	print $^STDOUT, eval('$zzz') == 1 ?? 'ok' !! 'not ok', " @_[?0]\n";
+        print $^STDOUT, eval('$zzz') == 1 ?? 'ok' !! 'not ok', " @_[?0]\n";
     }
-} die if $^EVAL_ERROR
+}; die if $^EVAL_ERROR
 fred2(49)
 do { my $zzz = 2; fred2(50) }
 
@@ -253,14 +253,14 @@ eval q{
     my $r = -1;
     my $yyy = 9;
     sub fred3 {
-	my $l = shift;
-	my $r = -2;
-	return 1 if $l +< 1;
-	return 0 if eval '$zzz' != 1;
-	return 0 if       $yyy  != 9;
-	return 0 if eval '$yyy' != 9;
-	return 0 if eval '$l' != $l;
-	return $l * fred3($l-1);
+        my $l = shift;
+        my $r = -2;
+        return 1 if $l +< 1;
+        return 0 if eval '$zzz' != 1;
+        return 0 if       $yyy  != 9;
+        return 0 if eval '$yyy' != 9;
+        return 0 if eval '$l' != $l;
+        return $l * fred3($l-1);
     }
     my $r = fred3(5);
     print $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 52\n";
@@ -313,14 +313,14 @@ $test=61
 our $x = 1
 do
     my $x=2
-    sub db1	{ $x; eval '$x' }
-    sub DB::db2	{ $x; eval '$x' }
+    sub db1     { $x; eval '$x' }
+    sub DB::db2 { $x; eval '$x' }
     package DB
-    sub db3	{ eval '$x' }
-    sub DB::db4	{ eval '$x' }
-    sub db5	{ my $x=4; eval '$x' }
+    sub db3     { eval '$x' }
+    sub DB::db4 { eval '$x' }
+    sub db5     { my $x=4; eval '$x' }
     package main
-    sub db6	{ my $x=4; eval '$x' }
+    sub db6     { my $x=4; eval '$x' }
 
 do
     my $x = 3

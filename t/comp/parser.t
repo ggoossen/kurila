@@ -4,7 +4,7 @@
 # (including weird syntax errors)
 
 BEGIN { require "./test.pl"; }
-plan( tests => 76 );
+plan( tests => 75 );
 
 # Bug 20010528.007
 eval q/"\x{"/;
@@ -81,8 +81,7 @@ $($a)\{ $($a)[ $(join ' ', @b)\{
 # with the test output.
 my %data = %( foo => "\n" );
 print $^STDOUT, "#";
-print($^STDOUT, 
-%data{?foo});
+print($^STDOUT, %data{?foo});
 pass();
 
 # Bug #24212
@@ -92,8 +91,8 @@ do {
     like( $^EVAL_ERROR->{?description}, qr/(?i:syntax|parse) error .* near "F 1"/, "unknown filetest operators" );
     is(
         eval q{ sub F { 42 } -F 1 },
-	'-42',
-	'-F calls the F function'
+        '-42',
+        '-F calls the F function'
     );
 };
 
@@ -116,9 +115,6 @@ do {
 
     eval q{ $s = sub <> {} };
     like($^EVAL_ERROR->{?description}, qr/'>' is reserved for hashes/, "readline operator as prototype");
-
-    eval q{ sub _ __FILE__ {} };
-    like($^EVAL_ERROR->{?description}, qr/Illegal declaration of subroutine main::_/, "__FILE__ as prototype");
 };
 
 # tests for "Bad name"
@@ -133,27 +129,27 @@ is( $^EVAL_ERROR, '', 'comments in s///e' );
 
 eval q[
     sub { our $a= 1;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;
-	    sub { my $z
+            sub { my $z
 ];
 
 like($^EVAL_ERROR->{?description}, qr/Missing right curly/, 'nested sub syntax error' );
 
 eval q[
     sub { my ($a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s,$r);
-	    sub { my $z
+            sub { my $z
 ];
 like($^EVAL_ERROR->{?description}, qr/Missing right curly/, 'nested sub syntax error 2' );
 
 eval q[
     sub { our $a= 1;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;
-	    use DieDieDie;
+            use DieDieDie;
 ];
 
 like($^EVAL_ERROR->{?description}, qr/Can't locate DieDieDie.pm/, 'croak cleanup' );
 
 eval q[
     sub { my ($a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s,$r);
-	    use DieDieDie;
+            use DieDieDie;
 ];
 
 like($^EVAL_ERROR->{?description}, qr/Can't locate DieDieDie.pm/, 'croak cleanup 2' );
@@ -204,10 +200,10 @@ check(qr/parser\.t$/, 7, "trailing space still valid");
 # line 11 
 check(qr/parser\.t$/, 11, "leading and trailing");
 
-#	line 13
+#       line 13
 check(qr/parser\.t$/, 13, "leading tab");
 
-#line	17
+#line   17
 check(qr/parser\.t$/, 17, "middle tab");
 
 #line                                                                        19
@@ -222,8 +218,8 @@ check(qr/^KAHEEEE$/, 29, "filename in quotes");
 #line 31 "CLINK CLOINK BZZT"
 check(qr/^CLINK CLOINK BZZT$/, 31, "filename with spaces in quotes");
 
-#line 37 "THOOM	THOOM"
-check(qr/^THOOM	THOOM$/, 37, "filename with tabs in quotes");
+#line 37 "THOOM THOOM"
+check(qr/^THOOM THOOM$/, 37, "filename with tabs in quotes");
 
 #line 41 "GLINK PLINK GLUNK DINK" 
 check(qr/^GLINK PLINK GLUNK DINK$/, 41, "a space after the quotes");
@@ -258,7 +254,7 @@ EOSTANZA
 do {
     my @x = @( 'string' );
     is(eval q{ "@x[0]->strung" }, 'string->strung',
-	'literal -> after an array subscript within ""');
+        'literal -> after an array subscript within ""');
     @x = @( \@('string') );
     # this used to give "string"
     dies_like( sub { "@x[0]-> [0]" }, qr/reference as string/ );

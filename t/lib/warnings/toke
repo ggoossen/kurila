@@ -141,7 +141,7 @@ no warnings 'qw' ;
 EXPECT
 Possible attempt to put comments in qw() list at - line 3 character 10.
 ########
-# toke.c
+# TODO toke.c
 use warnings 'syntax' ; our $x;
 print ($^STDOUT, "");
 print ($^STDOUT, "") and $x = 1;
@@ -158,7 +158,7 @@ print ($^STDOUT, "")
 EXPECT
 
 ########
-# toke.c
+# TODO toke.c
 use warnings 'syntax' ;
 printf ($^STDOUT, "");
 printf ($^STDOUT, "") . '';
@@ -535,6 +535,7 @@ Number found where operator expected at (eval 1) line 1, near "5 6"
  at (eval 1) line 1 character 4.
     (eval) called at - line 3 character 1.
 	(Missing operator before 6?)
+ at (eval 1) line 1, near "5 6"
  at (eval 1) line 1 character 4.
     (eval) called at - line 3 character 1.
 ########

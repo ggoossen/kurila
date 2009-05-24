@@ -1,93 +1,93 @@
-  pp_sys.c 	AOK
+  pp_sys.c      AOK
 
-  fileno() on unopened filehandle abc		[pp_fileno]
+  fileno() on unopened filehandle abc           [pp_fileno]
     $a = "abc"; fileno($a)
 
-  binmode() on unopened filehandle abc		[pp_binmode]
+  binmode() on unopened filehandle abc          [pp_binmode]
     $a = "abc"; fileno($a)
 
-  printf() on unopened filehandle abc		[pp_prtf]
+  printf() on unopened filehandle abc           [pp_prtf]
     $a = "abc"; printf $a "fred"
 
-  printf() on unopened filehandle abc		[pp_prtf]
+  printf() on unopened filehandle abc           [pp_prtf]
     $a = "abc"; printf $a "fred"
 
-  Filehandle %s opened only for input		[pp_prtf]
+  Filehandle %s opened only for input           [pp_prtf]
     $a = "abc"; 
     printf $a "fred"
 
-  printf() on closed filehandle %s		[pp_prtf]
+  printf() on closed filehandle %s              [pp_prtf]
     close STDIN ;
     printf STDIN "fred"
 
-  syswrite() on closed filehandle %s		[pp_send]
+  syswrite() on closed filehandle %s            [pp_send]
     close STDIN; 
     syswrite STDIN, "fred", 1;
 
-  send() on closed socket %s			[pp_send]
+  send() on closed socket %s                    [pp_send]
     close STDIN; 
     send STDIN, "fred", 1
 
-  bind() on closed socket %s			[pp_bind]
+  bind() on closed socket %s                    [pp_bind]
     close STDIN; 
     bind STDIN, "fred" ;
 
 
-  connect() on closed socket %s			[pp_connect]
+  connect() on closed socket %s                 [pp_connect]
     close STDIN; 
     connect STDIN, "fred" ;
 
-  listen() on closed socket %s			[pp_listen]
+  listen() on closed socket %s                  [pp_listen]
     close STDIN; 
     listen STDIN, 2;
 
-  accept() on closed socket %s			[pp_accept]
+  accept() on closed socket %s                  [pp_accept]
     close STDIN; 
     accept "fred", STDIN ;
 
-  shutdown() on closed socket %s		[pp_shutdown]
+  shutdown() on closed socket %s                [pp_shutdown]
     close STDIN; 
     shutdown STDIN, 0;
 
-  setsockopt() on closed socket %s		[pp_ssockopt]
-  getsockopt() on closed socket	%s		[pp_ssockopt]
+  setsockopt() on closed socket %s              [pp_ssockopt]
+  getsockopt() on closed socket %s              [pp_ssockopt]
     close STDIN; 
     setsockopt STDIN, 1,2,3;
     getsockopt STDIN, 1,2;
 
-  getsockname() on closed socket %s		[pp_getpeername]
-  getpeername() on closed socket %s		[pp_getpeername]
+  getsockname() on closed socket %s             [pp_getpeername]
+  getpeername() on closed socket %s             [pp_getpeername]
     close STDIN; 
     getsockname STDIN;
     getpeername STDIN;
 
-  flock() on closed socket %s			[pp_flock]
-  flock() on closed socket			[pp_flock]
+  flock() on closed socket %s                   [pp_flock]
+  flock() on closed socket                      [pp_flock]
     close STDIN;
     flock STDIN, 8;
     flock $a, 8;
 
-  warn(warn_nl, "stat");			[pp_stat]
+  warn(warn_nl, "stat");                        [pp_stat]
 
   -T on closed filehandle %s
   stat() on closed filehandle %s
-	close STDIN ; -T STDIN ; stat(STDIN) ;
+        close STDIN ; -T STDIN ; stat(STDIN) ;
 
-  warn(warn_nl, "open");			[pp_fttext]
+  warn(warn_nl, "open");                        [pp_fttext]
     -T "abc\ndef" ;
 
-  Filehandle %s opened only for output		[pp_sysread]
-	my $file = "./xcv" ;
-	open(F, ">$file") ; 
-	my $a = sysread(F, $a,10) ;
+  Filehandle %s opened only for output          [pp_sysread]
+        my $file = "./xcv" ;
+        open(F, ">$file") ; 
+        my $a = sysread(F, $a,10) ;
 
-  lstat on filehandle %s			[pp_lstat]
+  lstat on filehandle %s                        [pp_lstat]
 
-  getc() on unopened filehandle			[pp_getc]
+  getc() on unopened filehandle                 [pp_getc]
 
-  getc() on closed filehandle			[pp_getc]
+  getc() on closed filehandle                   [pp_getc]
 
-  Non-string passed as bitmask			[pp_sselect]
+  Non-string passed as bitmask                  [pp_sselect]
 
 __END__
 # pp_sys.c [pp_send]
@@ -104,7 +104,7 @@ syswrite $^STDIN, "fred", 1;
 EXPECT
 syswrite() on closed filehandle STDIN at - line 4 character 1.
 syswrite() on closed filehandle STDIN at - line 6 character 1.
-	(Are you trying to call syswrite() on dirhandle STDIN?)
+        (Are you trying to call syswrite() on dirhandle STDIN?)
  at - line 6 character 1.
 ########
 # pp_sys.c [pp_flock]
@@ -136,7 +136,7 @@ flock $a, 8;
 EXPECT
 flock() on closed filehandle STDIN at - line 16 character 1.
 flock() on closed filehandle STDIN at - line 18 character 1.
-	(Are you trying to call flock() on dirhandle STDIN?)
+        (Are you trying to call flock() on dirhandle STDIN?)
  at - line 18 character 1.
 flock() on unopened filehandle at - line 19 character 1.
 Can't use an undefined value as a symbol reference at - line 20 character 7.
@@ -218,34 +218,34 @@ getsockopt() on closed socket STDIN at - line 29 character 1.
 getsockname() on closed socket STDIN at - line 30 character 1.
 getpeername() on closed socket STDIN at - line 31 character 1.
 send() on closed socket STDIN at - line 33 character 1.
-	(Are you trying to call send() on dirhandle STDIN?)
+        (Are you trying to call send() on dirhandle STDIN?)
  at - line 33 character 1.
 bind() on closed socket STDIN at - line 34 character 1.
-	(Are you trying to call bind() on dirhandle STDIN?)
+        (Are you trying to call bind() on dirhandle STDIN?)
  at - line 34 character 1.
 connect() on closed socket STDIN at - line 35 character 1.
-	(Are you trying to call connect() on dirhandle STDIN?)
+        (Are you trying to call connect() on dirhandle STDIN?)
  at - line 35 character 1.
 listen() on closed socket STDIN at - line 36 character 1.
-	(Are you trying to call listen() on dirhandle STDIN?)
+        (Are you trying to call listen() on dirhandle STDIN?)
  at - line 36 character 1.
 accept() on closed socket STDIN at - line 37 character 1.
-	(Are you trying to call accept() on dirhandle STDIN?)
+        (Are you trying to call accept() on dirhandle STDIN?)
  at - line 37 character 1.
 shutdown() on closed socket STDIN at - line 38 character 1.
-	(Are you trying to call shutdown() on dirhandle STDIN?)
+        (Are you trying to call shutdown() on dirhandle STDIN?)
  at - line 38 character 1.
 setsockopt() on closed socket STDIN at - line 39 character 1.
-	(Are you trying to call setsockopt() on dirhandle STDIN?)
+        (Are you trying to call setsockopt() on dirhandle STDIN?)
  at - line 39 character 1.
 getsockopt() on closed socket STDIN at - line 40 character 1.
-	(Are you trying to call getsockopt() on dirhandle STDIN?)
+        (Are you trying to call getsockopt() on dirhandle STDIN?)
  at - line 40 character 1.
 getsockname() on closed socket STDIN at - line 41 character 1.
-	(Are you trying to call getsockname() on dirhandle STDIN?)
+        (Are you trying to call getsockname() on dirhandle STDIN?)
  at - line 41 character 1.
 getpeername() on closed socket STDIN at - line 42 character 1.
-	(Are you trying to call getpeername() on dirhandle STDIN?)
+        (Are you trying to call getpeername() on dirhandle STDIN?)
  at - line 42 character 1.
 ########
 # pp_sys.c [pp_stat]
@@ -341,11 +341,11 @@ Non-string passed as bitmask at - line 4 character 1.
 use Config;
 BEGIN {
     if (!config_value("d_fchdir")) {
-	print $^STDOUT, <<EOM;
+        print $^STDOUT, <<EOM;
 SKIPPED
 # fchdir not present
 EOM
-	exit;
+        exit;
     }
 }
 opendir \*FOO, '.'; closedir \*FOO;
