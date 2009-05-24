@@ -3555,8 +3555,8 @@ Perl_yylex(pTHX)
 	s++;
 	if (PL_expect == XOPERATOR && *s == '[') {
 	    s++;
-	    PL_lex_brackstack[PL_lex_brackets++].state = XSTATE;
-	    PL_lex_brackstack[PL_lex_brackets++].state = XSTATE;
+	    PL_lex_brackstack[PL_lex_brackets++].state = XTERM;
+	    PL_lex_brackstack[PL_lex_brackets++].state = XTERM;
 	    PL_expect = XSTATE;
 	    TOKEN(ASLICE);
 	    /* NOT REACHED */
@@ -3741,8 +3741,8 @@ Perl_yylex(pTHX)
 	case XOPERATOR:
 	    if (*s == '[') {
 		s++;
-		PL_lex_brackstack[PL_lex_brackets++].state = XSTATE;
-		PL_lex_brackstack[PL_lex_brackets++].state = XSTATE;
+		PL_lex_brackstack[PL_lex_brackets++].state = XTERM;
+		PL_lex_brackstack[PL_lex_brackets++].state = XTERM;
 		PL_expect = XSTATE;
 		if ( *s == '+' || *s == '?' ) {
 		    pl_yylval.i_tkval.ival = *s == '+' ? OPpELEM_ADD : OPpELEM_OPTIONAL;
@@ -3774,10 +3774,15 @@ Perl_yylex(pTHX)
 		    s = force_word(s, WORD, FALSE, TRUE, FALSE);
 		}
 	    }
-	    /* FALL THROUGH */
+	    PL_lex_brackstack[PL_lex_brackets++].state = XTERM;
+	    PL_expect = XSTATE;
+	    break;
 	case XATTRBLOCK:
 	case XBLOCK:
-	    PL_lex_brackstack[PL_lex_brackets++].state = XSTATE;
+	    PL_lex_brackstack[PL_lex_brackets].state = XSTATE;
+	    PL_lex_brackstack[PL_lex_brackets].prev_statement_indent = PL_parser->statement_indent;
+            ++PL_lex_brackets;
+	    PL_parser->statement_indent = -1;
 	    PL_expect = XSTATE;
 	    break;
 	case XATTRTERM:
@@ -3799,6 +3804,8 @@ Perl_yylex(pTHX)
 		PL_expect = XTERM;
 	    else {
 		PL_lex_brackstack[PL_lex_brackets-1].state = XSTATE;
+                PL_lex_brackstack[PL_lex_brackets-1].prev_statement_indent = PL_parser->statement_indent;
+                PL_parser->statement_indent = -1;
 		PL_expect = XSTATE;
 	    }
 	    break;
@@ -3808,8 +3815,12 @@ Perl_yylex(pTHX)
 	s++;
 	if (PL_lex_brackets <= 0)
 	    yyerror("Unmatched right curly bracket");
-	else
+	else {
 	    PL_expect = (expectation)PL_lex_brackstack[--PL_lex_brackets].state;
+            if (PL_expect == XSTATE) {
+                PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
+            }
+        }
 	if (PL_lex_state == LEX_INTERPBLOCK) {
 	    if (PL_lex_brackets == 0) 
 		PL_lex_state = LEX_INTERPEND;
