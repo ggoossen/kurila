@@ -14,26 +14,26 @@
 
 # obviously, 0, 1 and 2, 3 are destructive.  (XXXX 64-bit? 4 destructive too)
 
-# *0 = sub {--@_[0]};		# -
-# *1 = sub {++@_[0]};		# +
+# *0 = sub {--@_[0]};           # -
+# *1 = sub {++@_[0]};           # +
 
 # # Converters
 # *2 = sub { @_[0] = $max_uv & @_[0]}; # U
 # *3 = sub { use integer; @_[0] += $zero}; # I
-# *4 = sub { @_[0] += $zero};	# N
-# *5 = sub { @_[0] = "@_[0]" };	# P
+# *4 = sub { @_[0] += $zero};   # N
+# *5 = sub { @_[0] = "@_[0]" }; # P
 
 # # Side effects
-# *6 = sub { $max_uv & @_[0]};	# u
-# *7 = sub { use integer; @_[0] + $zero};	# i
-# *8 = sub { @_[0] + $zero};	# n
-# *9 = sub { @_[0] . "" };	# p
+# *6 = sub { $max_uv & @_[0]};  # u
+# *7 = sub { use integer; @_[0] + $zero};       # i
+# *8 = sub { @_[0] + $zero};    # n
+# *9 = sub { @_[0] . "" };      # p
 
 # # Reporters
-# sub a2 { sprintf "%u", @_[0] }	# U
-# sub a3 { sprintf "%d", @_[0] }	# I
-# sub a4 { sprintf "%g", @_[0] }	# N
-# sub a5 { "@_[0]" }		# P
+# sub a2 { sprintf "%u", @_[0] }        # U
+# sub a3 { sprintf "%d", @_[0] }        # I
+# sub a4 { sprintf "%g", @_[0] }        # N
+# sub a5 { "@_[0]" }            # P
 
 BEGIN { require './test.pl' }
 
@@ -62,7 +62,7 @@ if ($max_uv_less3 =~ s/[^0-9]//g)
     exit 0
 
 
-my $st_t = 4*4			# We try 4 initializers and 4 reporters
+my $st_t = 4*4                  # We try 4 initializers and 4 reporters
 
 my $num = 0
 $num += 10**$_ - 4**$_ for 1.. $max_chain
@@ -131,18 +131,18 @@ for my $num_chain (1..$max_chain)
                     my @ans
 
                     for my $short (@(0, 1))
-                        # undef $inpt;	# Forget all we had - some bugs were masked
+                        # undef $inpt;  # Forget all we had - some bugs were masked
 
-                        $inpt = $num	# Try to not contaminate $num...
+                        $inpt = $num    # Try to not contaminate $num...
                         $inpt = "$inpt"
                         if ($first == 2)
                             $inpt = $max_uv ^&^ $inpt # U 2
                         elsif ($first == 3)
                             use integer; $inpt += $zero # I 3
                         elsif ($first == 4)
-                            $inpt += $zero	# N 4
+                            $inpt += $zero      # N 4
                         else
-                            $inpt = "$inpt"	# P 5
+                            $inpt = "$inpt"     # P 5
                         
 
                         # Saves 20% of time - not with this logic:
@@ -155,9 +155,9 @@ for my $num_chain (1..$max_chain)
                             if ($curop +< 5)
                                 if ($curop +< 3)
                                     if ($curop == 0)
-                                        --$inpt	# - 0
+                                        --$inpt # - 0
                                     elsif ($curop == 1)
-                                        ++$inpt	# + 1
+                                        ++$inpt # + 1
                                     else
                                         $inpt = $max_uv ^&^ $inpt # U 2
                                     
@@ -175,9 +175,9 @@ for my $num_chain (1..$max_chain)
                                     use integer; $inpt + $zero
                                 
                             elsif ($curop == 8)
-                                $inpt + $zero	# n 8
+                                $inpt + $zero   # n 8
                             else
-                                $inpt . ""	# p 9
+                                $inpt . ""      # p 9
                             
                         
 
@@ -188,7 +188,7 @@ for my $num_chain (1..$max_chain)
                         elsif ($last == 4)
                             $inpt = sprintf "\%g", $inpt # N 4
                         else
-                            $inpt = "$inpt"	# P 5
+                            $inpt = "$inpt"     # P 5
                         
                         push @ans, $inpt
                     

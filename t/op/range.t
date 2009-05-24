@@ -21,7 +21,7 @@ is(join(':', @bar[[1..5]]), ':c:d:e:')
 
 TODO: do
     todo_skip("slices in the middle of a list assignment", 1)
-    eval <<'TODO' die if $^EVAL_ERROR
+    eval <<'TODO'; die if $^EVAL_ERROR
    ($a, < @bcd[[0..2]],$e) = ('a','b','c','d','e');
    is(join(':', @($a, < @bcd[[0..2]],$e)), 'a:b:c:d:e');
 TODO

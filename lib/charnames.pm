@@ -44,7 +44,7 @@ my %alias3 = %( (
     ) )
 my $txt
 
-sub alias
+sub alias(@< @_)
     (nelems @_) or return %alias3
     my $alias = ref @_[0] ?? @_[0] !! \%( < @_ )
     %alias3{[keys $alias->%]} =  values $alias->%

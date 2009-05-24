@@ -22,8 +22,8 @@ ok( -r 'TEST' )
 try { chmod 0555, 'TEST' or die "chmod 0555, 'TEST' failed: $^OS_ERROR" }
 chomp ($bad_chmod = $^EVAL_ERROR)
 
-$oldeuid = $^EUID		# root can read and write anything
-eval '$^EUID = 1'		# so switch uid (may not be implemented)
+$oldeuid = $^EUID               # root can read and write anything
+eval '$^EUID = 1'               # so switch uid (may not be implemented)
 
 print $^STDOUT, "# oldeuid = $oldeuid, euid = $^EUID\n"
 
@@ -41,7 +41,7 @@ SKIP: do
 
 # Scripts are not -x everywhere so cannot test that.
 
-eval '$> = $oldeuid'	# switch uid back (may not be implemented)
+eval '$> = $oldeuid'    # switch uid back (may not be implemented)
 
 # this would fail for the euid 1
 # (unless we have unpacked the source code as uid 1...)

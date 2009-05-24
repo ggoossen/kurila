@@ -16,7 +16,7 @@ BEGIN
         $reason = 'no /etc/passwd file'
     
 
-    if (not defined $where)	# Try NIS.
+    if (not defined $where)     # Try NIS.
         foreach my $ypcat (qw(/usr/bin/ypcat /bin/ypcat /etc/ypcat))
             my $pw
             if (-x $ypcat &&
@@ -29,7 +29,7 @@ BEGIN
         
     
 
-    if (not defined $where)	# Try NetInfo.
+    if (not defined $where)     # Try NetInfo.
         foreach my $nidump (qw(/usr/bin/nidump))
             my $pw
             if (-x $nidump &&
@@ -42,7 +42,7 @@ BEGIN
         
     
 
-    if (not defined $where)	# Try local.
+    if (not defined $where)     # Try local.
         my $PW = "/etc/passwd"
         my $pw_fh
         if (-f $PW && open($pw_fh, "<", $PW) && defined( ~< $pw_fh))
@@ -64,7 +64,7 @@ BEGIN
         
     
 
-    if ($reason)	# Give up.
+    if ($reason)        # Give up.
         print $^STDOUT, "1..0 # Skip: $reason\n"
         exit 0
     

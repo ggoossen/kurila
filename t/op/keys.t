@@ -14,7 +14,7 @@ is keys(undef), undef
 sub foo { return %('aap', 'noot'); }
 is join('*', keys(foo)), 'aap'
 
-    dies_like
+dies_like
   sub (@< @_) { keys("teun") },
   qr/keys expected a hash but got PLAINVALUE/,
   'keys on plain value'

@@ -102,7 +102,7 @@ for my  $i (1 .. nelems(@tests))
         print $^STDOUT, "ok $i\n"
     elsif ($skip)
         print $^STDOUT, "ok $i # skip $comment\n"
-    elsif ($y eq ">$result<")				# three-digit exponent
+    elsif ($y eq ">$result<")                           # three-digit exponent
         print($^STDOUT, "ok $i # >$result< $x three-digit exponent accepted\n")
     elsif ($result =~ m/[-+]\d{3}$/ &&
         # Suppress tests with modulo of exponent >= 100 on platforms

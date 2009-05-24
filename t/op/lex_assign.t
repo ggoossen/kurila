@@ -139,145 +139,145 @@ die if $^EVAL_ERROR
 ok 1
 
 __END__
-ref $xref			# ref
-ref $cstr			# ref nonref
-`$runme -e "print \\\$^STDOUT, qq[1\\n]"`				# backtick skip(MSWin32)
-`$undefed`			# backtick undef skip(MSWin32)
-~< $op_fh				# readline
-'faked'				# rcatline
-chop $chopit			# chop
-(chop (@x=@chopar))		# schop
-chomp $chopit			# chomp
-(chop (@x=@chopar))		# schomp
-pos $posstr			# pos
-pos $chopit			# pos returns undef
-$nn++==2			# postinc
-$nn++==3			# i_postinc
-$nn--==4			# postdec
-$nn--==3			# i_postdec
-$n ** $n			# pow
-$n * $n				# multiply
-$n * $n				# i_multiply
-$n / $n				# divide
-$n / $n				# i_divide
-$n % $n				# modulo
-$n % $n				# i_modulo
-$n x $n				# repeat
-$n + $n				# add
-$n + $n				# i_add
-$n - $n				# subtract
-$n - $n				# i_subtract
-$n . $n				# concat
-$n . $a=='2fake'		# concat with self
-"3$a"=='3fake'			# concat with self in stringify
-"$n"				# stringify
-$n << $n			# left_shift
-$n >> $n			# right_shift
-$n <+> $n			# ncmp
-$n <+> $n			# i_ncmp
-$n cmp $n			# scmp
-$n ^&^ $n				# bit_and
-$n ^^^ $n				# bit_xor
-$n ^|^ $n				# bit_or
--$n				# negate
--$n				# i_negate
-^~^$n				# complement
-atan2 $n,$n			# atan2
-sin $n				# sin
-cos $n				# cos
-'???'				# rand
-exp $n				# exp
-log $n				# log
-sqrt $n				# sqrt
-int $n				# int
-hex $n				# hex
-oct $n				# oct
-abs $n				# abs
-length $posstr			# length
-substr $posstr, 2, 2		# substr
-vec("abc",2,8)			# vec
-index $posstr, 2		# index
-rindex $posstr, 2		# rindex
-sprintf '%i%i', $n, $n		# sprintf
-ord $n				# ord
-chr $n				# chr
-crypt $n, $n			# crypt
-ucfirst ($cstr . "a")		# ucfirst padtmp
-ucfirst $cstr			# ucfirst
-lcfirst $cstr			# lcfirst
-uc $cstr			# uc
-lc $cstr			# lc
-quotemeta $cstr			# quotemeta
-(each %h) % 2 == 1		# each
-nkeys %h				# nkeys
-pack "C2", $n,$n		# pack
-join "a", @a			# join
-push @a,3==6			# push
-unshift @aaa			# unshift
-'???'		# grepwhile
-subb()				# entersub
-caller				# caller
+ref $xref                       # ref
+ref $cstr                       # ref nonref
+`$runme -e "print \\\$^STDOUT, qq[1\\n]"`                               # backtick skip(MSWin32)
+`$undefed`                      # backtick undef skip(MSWin32)
+~< $op_fh                               # readline
+'faked'                         # rcatline
+chop $chopit                    # chop
+(chop (@x=@chopar))             # schop
+chomp $chopit                   # chomp
+(chop (@x=@chopar))             # schomp
+pos $posstr                     # pos
+pos $chopit                     # pos returns undef
+$nn++==2                        # postinc
+$nn++==3                        # i_postinc
+$nn--==4                        # postdec
+$nn--==3                        # i_postdec
+$n ** $n                        # pow
+$n * $n                         # multiply
+$n * $n                         # i_multiply
+$n / $n                         # divide
+$n / $n                         # i_divide
+$n % $n                         # modulo
+$n % $n                         # i_modulo
+$n x $n                         # repeat
+$n + $n                         # add
+$n + $n                         # i_add
+$n - $n                         # subtract
+$n - $n                         # i_subtract
+$n . $n                         # concat
+$n . $a=='2fake'                # concat with self
+"3$a"=='3fake'                  # concat with self in stringify
+"$n"                            # stringify
+$n << $n                        # left_shift
+$n >> $n                        # right_shift
+$n <+> $n                       # ncmp
+$n <+> $n                       # i_ncmp
+$n cmp $n                       # scmp
+$n ^&^ $n                               # bit_and
+$n ^^^ $n                               # bit_xor
+$n ^|^ $n                               # bit_or
+-$n                             # negate
+-$n                             # i_negate
+^~^$n                           # complement
+atan2 $n,$n                     # atan2
+sin $n                          # sin
+cos $n                          # cos
+'???'                           # rand
+exp $n                          # exp
+log $n                          # log
+sqrt $n                         # sqrt
+int $n                          # int
+hex $n                          # hex
+oct $n                          # oct
+abs $n                          # abs
+length $posstr                  # length
+substr $posstr, 2, 2            # substr
+vec("abc",2,8)                  # vec
+index $posstr, 2                # index
+rindex $posstr, 2               # rindex
+sprintf '%i%i', $n, $n          # sprintf
+ord $n                          # ord
+chr $n                          # chr
+crypt $n, $n                    # crypt
+ucfirst ($cstr . "a")           # ucfirst padtmp
+ucfirst $cstr                   # ucfirst
+lcfirst $cstr                   # lcfirst
+uc $cstr                        # uc
+lc $cstr                        # lc
+quotemeta $cstr                 # quotemeta
+(each %h) % 2 == 1              # each
+nkeys %h                                # nkeys
+pack "C2", $n,$n                # pack
+join "a", @a                    # join
+push @a,3==6                    # push
+unshift @aaa                    # unshift
+'???'           # grepwhile
+subb()                          # entersub
+caller                          # caller
 '???'                           # warn
-'faked'				# die
-open my $blah, "<", "non-existent"	# open
-fileno $^STDERR			# fileno
-umask 0				# umask
-select undef,undef,undef,0	# select
-getc($op_fh)				# getc
-'???'				# read
-'???'				# sysread
-'???'				# syswrite
-'???'				# send
-'???'				# recv
-'???'				# tell
-'???'				# fcntl
-'???'				# ioctl
-'???'				# flock
-'???'				# accept
-'???'				# shutdown
-'???'				# ftsize
-'???'				# ftmtime
-'???'				# ftatime
-'???'				# ftctime
-chdir 'non-existent'		# chdir
-'???'				# chown
-'???'				# chroot
-unlink 'non-existent'		# unlink
-chmod 'non-existent'		# chmod
-utime 'non-existent'		# utime
-rename 'non-existent', 'non-existent1'	# rename
+'faked'                         # die
+open my $blah, "<", "non-existent"      # open
+fileno $^STDERR                 # fileno
+umask 0                         # umask
+select undef,undef,undef,0      # select
+getc($op_fh)                            # getc
+'???'                           # read
+'???'                           # sysread
+'???'                           # syswrite
+'???'                           # send
+'???'                           # recv
+'???'                           # tell
+'???'                           # fcntl
+'???'                           # ioctl
+'???'                           # flock
+'???'                           # accept
+'???'                           # shutdown
+'???'                           # ftsize
+'???'                           # ftmtime
+'???'                           # ftatime
+'???'                           # ftctime
+chdir 'non-existent'            # chdir
+'???'                           # chown
+'???'                           # chroot
+unlink 'non-existent'           # unlink
+chmod 'non-existent'            # chmod
+utime 'non-existent'            # utime
+rename 'non-existent', 'non-existent1'  # rename
 link 'non-existent', 'non-existent1' # link
-'???'				# symlink
+'???'                           # symlink
 readlink 'non-existent' # readlink
-'???'				# mkdir
-'???'				# rmdir
-'???'				# telldir
-'???'				# fork
-'???'				# wait
-'???'				# waitpid
-system "$runme -e 0"		# system skip(VMS)
-'???'				# exec
-'???'				# kill
-getppid				# getppid
-getpgrp				# getpgrp
-'???'				# setpgrp
-getpriority $^PID, $^PID		# getpriority
-'???'				# setpriority
-time				# time
-localtime $^BASETIME			# localtime
-gmtime $^BASETIME			# gmtime
-'???'				# sleep: can randomly fail
-'???'				# alarm
-'???'				# shmget
-'???'				# shmctl
-'???'				# shmread
-'???'				# shmwrite
-'???'				# msgget
-'???'				# msgctl
-'???'				# msgsnd
-'???'				# msgrcv
-'???'				# semget
-'???'				# semctl
-'???'				# semop
-'???'				# getlogin
-'???'				# syscall
+'???'                           # mkdir
+'???'                           # rmdir
+'???'                           # telldir
+'???'                           # fork
+'???'                           # wait
+'???'                           # waitpid
+system "$runme -e 0"            # system skip(VMS)
+'???'                           # exec
+'???'                           # kill
+getppid                         # getppid
+getpgrp                         # getpgrp
+'???'                           # setpgrp
+getpriority $^PID, $^PID                # getpriority
+'???'                           # setpriority
+time                            # time
+localtime $^BASETIME                    # localtime
+gmtime $^BASETIME                       # gmtime
+'???'                           # sleep: can randomly fail
+'???'                           # alarm
+'???'                           # shmget
+'???'                           # shmctl
+'???'                           # shmread
+'???'                           # shmwrite
+'???'                           # msgget
+'???'                           # msgctl
+'???'                           # msgsnd
+'???'                           # msgrcv
+'???'                           # semget
+'???'                           # semctl
+'???'                           # semop
+'???'                           # getlogin
+'???'                           # syscall

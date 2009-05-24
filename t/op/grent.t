@@ -18,7 +18,7 @@ elsif (not -f "/etc/group" ) # Play safe.
     $reason = 'no /etc/group file'
 
 
-if (not defined $where)	# Try NIS.
+if (not defined $where) # Try NIS.
     foreach my $ypcat (qw(/usr/bin/ypcat /bin/ypcat /etc/ypcat))
         my $gr
         if (-x $ypcat &&
@@ -44,7 +44,7 @@ if (not defined $where)	# Try NIS.
     
 
 
-if (not defined $where)	# Try NetInfo.
+if (not defined $where) # Try NetInfo.
     foreach my $nidump (qw(/usr/bin/nidump))
         my $gr
         if (-x $nidump &&
@@ -57,7 +57,7 @@ if (not defined $where)	# Try NetInfo.
     
 
 
-if (not defined $where)	# Try local.
+if (not defined $where) # Try local.
     my $GR = "/etc/group"
     my $gr_fh
     if (-f $GR && open($gr_fh, "<", $GR) && defined( ~< $gr_fh))

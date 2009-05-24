@@ -109,7 +109,7 @@ DIAG
     # If this test is failing, something is seriously wrong,
     # either in perl or your system's rand function.
     #
-    unless (ok( !($min +< 0 or $max +>= 1) ))	# Slightly redundant...
+    unless (ok( !($min +< 0 or $max +>= 1) ))   # Slightly redundant...
         print $^STDOUT, "# min too low\n" if $min +< 0
         print $^STDOUT, "# max too high\n" if $max +>= 1
     

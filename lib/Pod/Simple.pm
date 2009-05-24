@@ -415,8 +415,8 @@ sub parse_from_file($self, ?$source, ?$to)
     } elsif(ref(\$source) eq 'GLOB') { # stet
     } elsif(ref($source)           ) { # stet
     }elsif(!length $source
-    or $source eq '-' or $source =~ m/^<&(STDIN|0)$/i
-    )
+           or $source eq '-' or $source =~ m/^<&(STDIN|0)$/i
+          )
         $source = $^STDIN{IO}
     
 
@@ -675,7 +675,7 @@ sub _remap_sequences
                 else
                     print $^STDOUT, "   Code $was<> maps to ",
                         ref($is)
-                    ?? ( "tags ", < map( {"$_<" }, $is->@), '...', < map( {'>' }, $is->@), "\n" )
+                        ?? ( "tags ", < map( {"$_<" }, $is->@), '...', < map( {'>' }, $is->@), "\n" )
                         !! "tag $is<...>.\n"
                 
             
@@ -1151,7 +1151,7 @@ sub _treat_Ls($self,@< @stack)
 
             # Turn L<Foo Bar> into L</Foo Bar>.
             if(!$section_name and !$link_text and nelems @ell_content
-            and grep { !ref($_) && m/ /s }, @ell_content
+                 and grep { !ref($_) && m/ /s }, @ell_content
                 )
                 $section_name = \@(splice @ell_content)
             # That's support for the now-deprecated syntax.

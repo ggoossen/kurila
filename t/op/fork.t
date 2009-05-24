@@ -80,12 +80,12 @@ $^OUTPUT_AUTOFLUSH = 1;
 if (my $cid = fork) {
     sleep 1;
     if (my $result = (kill 9, $cid)) {
-	print $^STDOUT, "ok 2\n";
+        print $^STDOUT, "ok 2\n";
     }
     else {
-	print $^STDOUT, "not ok 2 $result\n";
+        print $^STDOUT, "not ok 2 $result\n";
     }
-    sleep 1 if $^OS_NAME eq 'MSWin32';	# avoid WinNT race bug
+    sleep 1 if $^OS_NAME eq 'MSWin32';  # avoid WinNT race bug
 }
 else {
     print $^STDOUT, "ok 1\n";
@@ -120,15 +120,15 @@ sub forkit {
     print $^STDOUT, "iteration $i start\n";
     my $x = fork;
     if (defined $x) {
-	if ($x) {
-	    print $^STDOUT, "iteration $i parent\n";
-	}
-	else {
-	    print $^STDOUT, "iteration $i child\n";
-	}
+        if ($x) {
+            print $^STDOUT, "iteration $i parent\n";
+        }
+        else {
+            print $^STDOUT, "iteration $i child\n";
+        }
     }
     else {
-	print $^STDOUT, "pid $^PID failed to fork\n";
+        print $^STDOUT, "pid $^PID failed to fork\n";
     }
 }
 while ($i++ +< 3) { do { forkit(); }; }
@@ -175,12 +175,12 @@ $^OUTPUT_AUTOFLUSH = 1;
 my @a = 1..3;
 for (@a) {
     if (fork) {
-	print $^STDOUT, "parent $_\n";
-	$_ = "[$_]";
+        print $^STDOUT, "parent $_\n";
+        $_ = "[$_]";
     }
     else {
-	print $^STDOUT, "child $_\n";
-	$_ = "-$_-";
+        print $^STDOUT, "child $_\n";
+        $_ = "-$_-";
     }
 }
 print $^STDOUT, "$(join ' ', @a)\n";
@@ -211,11 +211,11 @@ child 3
 $^OUTPUT_AUTOFLUSH = 1;
 foreach my $c (@(1,2,3)) {
     if (fork) {
-	print $^STDOUT, "parent $c\n";
+        print $^STDOUT, "parent $c\n";
     }
     else {
-	print $^STDOUT, "child $c\n";
-	exit;
+        print $^STDOUT, "child $c\n";
+        exit;
     }
 }
 while (wait() != -1) { print $^STDOUT, "waited\n" }

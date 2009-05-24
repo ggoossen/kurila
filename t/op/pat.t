@@ -1039,12 +1039,12 @@ sub run_tests
 
             $i = 0
             $input = "a\{b\}c\{d\}"
-            eval <<EOT die if $^EVAL_ERROR
-	while (eval \$input =~ $rx) \{
+            eval <<EOT; die if $^EVAL_ERROR
+        while (eval \$input =~ $rx) \{
             die if \$^EVAL_ERROR;
-	    diag "\\\$1 = '\$1' \\\$2 = '\$2'";
-	    ++\$i;
-	\}
+            diag "\\\$1 = '\$1' \\\$2 = '\$2'";
+            ++\$i;
+        \}
 EOT
             ok( $i == 2 )
         
@@ -1169,7 +1169,7 @@ EOT
 
     $_ = "foo"
 
-    ok( eval <<"EOT" ) die if $^EVAL_ERROR
+    ok( eval <<"EOT" ); die if $^EVAL_ERROR
   m/f
    o\r
    o
@@ -1177,7 +1177,7 @@ EOT
   /x && 1;
 EOT
 
-    ok( eval <<"EOT" ) die if $^EVAL_ERROR
+    ok( eval <<"EOT" ); die if $^EVAL_ERROR
   m/f
    o
    o
@@ -2259,9 +2259,9 @@ END
         my $head = 'x' x $_
         for my $tail (@('\x{0061}', '\x{1234}'))
             ok(
-     eval qq{use utf8; "$head$tail" =~ m/$head$tail/ },
-     '\x{...} misparsed in regexp near 127 char EXACT limit'
-     ) die if $^EVAL_ERROR
+                eval qq{use utf8; "$head$tail" =~ m/$head$tail/ },
+                '\x{...} misparsed in regexp near 127 char EXACT limit'
+              ); die if $^EVAL_ERROR
         
     
 
@@ -2269,7 +2269,7 @@ END
     ok("a-bc" eq try {
            my @($x, $y) = @: "bca" =~ m/^(?=.*(a)).*(bc)/;
            "$x-$y";
-       }, 'captures can move backwards in string') die if $^EVAL_ERROR
+       }, 'captures can move backwards in string'); die if $^EVAL_ERROR
 
     # perl #27940: \cA not recognized in character classes
     ok("a\cAb" =~ m/\cA/, '\cA in pattern')
@@ -2509,7 +2509,7 @@ END
                 local $^WARN_HOOK = undef
                 undef $^EVAL_ERROR
                 eval 'BEGIN { use warnings; $^WARN_HOOK = sub ($e) { $warning = $e->message }; }' . "\n"
-                    . $code die if $^EVAL_ERROR
+                    . $code; die if $^EVAL_ERROR
                 ok( $warning =~ m/$warn_pat/, "expected warning: $(dump::view($warn_pat)), got: $(dump::view($warning))" )
             
         
