@@ -1,14 +1,14 @@
-package I18N::Langinfo;
+package I18N::Langinfo
 
-use warnings;
-use Carp;
+use warnings
+use Carp
 
-require Exporter;
-require DynaLoader;
+require Exporter
+require DynaLoader
 
-our @ISA = qw(Exporter DynaLoader);
+our @ISA = qw(Exporter DynaLoader)
 
-our @EXPORT = qw(langinfo);
+our @EXPORT = qw(langinfo)
 
 our @EXPORT_OK = qw(
 	ABDAY_1
@@ -68,13 +68,13 @@ our @EXPORT_OK = qw(
 	T_FMT_AMPM
 	YESEXPR
 	YESSTR
-);
+)
 
-our $VERSION = '0.02';
+our $VERSION = '0.02'
 
-I18N::Langinfo->bootstrap( $VERSION);
+I18N::Langinfo->bootstrap( $VERSION)
 
-1;
+1
 __END__
 
 =head1 NAME

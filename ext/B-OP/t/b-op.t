@@ -1,22 +1,22 @@
 #!/usr/bin/perl -w
 
-use Test::More tests => 1;
+use Test::More tests => 1
 
-use B < qw|svref_2object|;
+use B < qw|svref_2object|
 
-do {
+do
     # cop_io
-    use open IN  => ":crlf", OUT => ":bytes";
-    sub foo {
-        return (nelems @_) + 1;
-    }
+    use open IN  => ":crlf", OUT => ":bytes"
+    sub foo
+        return (nelems @_) + 1
+    
 
-    my $op = svref_2object(\&foo)->START;
-    is ref($op), "B::COP", "start opcode";
-};
+    my $op = svref_2object(\&foo)->START
+    is ref($op), "B::COP", "start opcode"
 
-do {
+
+do
     # new
-    my $op = B::OP->new('null', 0, undef);
-    $op->free;
-};
+    my $op = B::OP->new('null', 0, undef)
+    $op->free
+

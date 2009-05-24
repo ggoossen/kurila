@@ -4,90 +4,90 @@
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
-package IO::Dir;
+package IO::Dir
 
 
-use Carp;
-use Symbol;
-use Exporter;
-use IO::File;
-our(@ISA, $VERSION, @EXPORT_OK);
+use Carp
+use Symbol
+use Exporter
+use IO::File
+our(@ISA, $VERSION, @EXPORT_OK)
 use Tie::Hash;
 use File::stat;
 use File::Spec;
 
-@ISA = qw(Tie::Hash Exporter);
-$VERSION = "1.06";
-$VERSION = eval $VERSION;
-@EXPORT_OK = qw(DIR_UNLINK);
+@ISA = qw(Tie::Hash Exporter)
+$VERSION = "1.06"
+$VERSION = eval $VERSION
+@EXPORT_OK = qw(DIR_UNLINK)
 
 sub DIR_UNLINK () { 1 }
 
-sub new {
-    (nelems @_) +>= 1 && (nelems @_) +<= 2 or croak 'usage: new IO::Dir [DIRNAME]';
-    my $class = shift;
-    my $dh = gensym;
-    if ((nelems @_)) {
+sub new
+    (nelems @_) +>= 1 && (nelems @_) +<= 2 or croak 'usage: new IO::Dir [DIRNAME]'
+    my $class = shift
+    my $dh = gensym
+    if ((nelems @_))
         IO::Dir::open($dh, @_[0])
-            or return undef;
-    }
-    bless $dh, $class;
-}
+            or return undef
+    
+    bless $dh, $class
+
 
 sub DESTROY($dh) {;
     no warnings 'io';
     closedir($dh);
 }
 
-sub open {
-    (nelems @_) == 2 or croak 'usage: $dh->open(DIRNAME)';
-    my @($dh, $dirname) =  @_;
+sub open
+    (nelems @_) == 2 or croak 'usage: $dh->open(DIRNAME)'
+    my @($dh, $dirname) =  @_
     return undef
-        unless opendir($dh, $dirname);
+        unless opendir($dh, $dirname)
     # a dir name should always have a ":" in it; assume dirname is
     # in current directory
-    $dirname = ':' .  $dirname if ( ($^OS_NAME eq 'MacOS') && ($dirname !~ m/:/) );
-    $dh->*->{+io_dir_path} = $dirname;
-    1;
-}
+    $dirname = ':' .  $dirname if ( ($^OS_NAME eq 'MacOS') && ($dirname !~ m/:/) )
+    $dh->*->{+io_dir_path} = $dirname
+    1
 
-sub close {
-    (nelems @_) == 1 or croak 'usage: $dh->close()';
-    my @($dh) =  @_;
-    closedir($dh);
-}
 
-sub read {
-    (nelems @_) == 1 or croak 'usage: $dh->read()';
-    my @($dh) =  @_;
-    readdir($dh);
-}
+sub close
+    (nelems @_) == 1 or croak 'usage: $dh->close()'
+    my @($dh) =  @_
+    closedir($dh)
 
-sub read_all {
-    (nelems @_) == 1 or croak 'usage: $dh->read_all()';
-    my @($dh) =  @_;
-    return @( readdir($dh) );
-}
 
-sub seek {
-    (nelems @_) == 2 or croak 'usage: $dh->seek(POS)';
-    my @($dh,$pos) =  @_;
-    seekdir($dh,$pos);
-}
+sub read
+    (nelems @_) == 1 or croak 'usage: $dh->read()'
+    my @($dh) =  @_
+    readdir($dh)
 
-sub tell {
-    (nelems @_) == 1 or croak 'usage: $dh->tell()';
-    my @($dh) =  @_;
-    telldir($dh);
-}
 
-sub rewind {
-    (nelems @_) == 1 or croak 'usage: $dh->rewind()';
-    my @($dh) =  @_;
-    rewinddir($dh);
-}
+sub read_all
+    (nelems @_) == 1 or croak 'usage: $dh->read_all()'
+    my @($dh) =  @_
+    return @( readdir($dh) )
 
-1;
+
+sub seek
+    (nelems @_) == 2 or croak 'usage: $dh->seek(POS)'
+    my @($dh,$pos) =  @_
+    seekdir($dh,$pos)
+
+
+sub tell
+    (nelems @_) == 1 or croak 'usage: $dh->tell()'
+    my @($dh) =  @_
+    telldir($dh)
+
+
+sub rewind
+    (nelems @_) == 1 or croak 'usage: $dh->rewind()'
+    my @($dh) =  @_
+    rewinddir($dh)
+
+
+1
 
 __END__
 

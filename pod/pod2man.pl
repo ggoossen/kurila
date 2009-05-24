@@ -8,50 +8,50 @@
 # This program is free software; you may redistribute it and/or modify it
 # under the same terms as Perl itself.
 
-use Getopt::Long < qw(GetOptions);
-use Pod::Man ();
-use Pod::Usage < qw(pod2usage);
+use Getopt::Long < qw(GetOptions)
+use Pod::Man ()
+use Pod::Usage < qw(pod2usage)
 
 # Silence -w warnings.
-our ($running_under_some_shell);
+our ($running_under_some_shell)
 
 # Insert -- into @ARGV before any single dash argument to hide it from
 # Getopt::Long; we want to interpret it as meaning stdin.
-my $stdin;
-@ARGV = @+: map { $_ eq '-' && !$stdin++ ?? @('--', $_) !! @: $_ }, @ARGV;
+my $stdin
+@ARGV = @+: map { $_ eq '-' && !$stdin++ ?? @('--', $_) !! @: $_ }, @ARGV
 
 # Parse our options, trying to retain backwards compatibility with pod2man but
 # allowing short forms as well.  --lax is currently ignored.
-my %options;
-Getopt::Long::config ('bundling_override');
+my %options
+Getopt::Long::config ('bundling_override')
 GetOptions (\%options, 'section|s=s', 'release|r:s', 'center|c=s',
             'date|d=s', 'fixed=s', 'fixedbold=s', 'fixeditalic=s',
             'fixedbolditalic=s', 'name|n=s', 'official|o', 'quotes|q=s',
-            'lax|l', 'help|h', 'verbose|v') or exit 1;
-pod2usage (0) if %options{?help};
+            'lax|l', 'help|h', 'verbose|v') or exit 1
+pod2usage (0) if %options{?help}
 
 # Official sets --center, but don't override things explicitly set.
-if (%options{?official} && !defined %options{?center}) {
-    %options{+center} = 'Perl Programmers Reference Guide';
-}
+if (%options{?official} && !defined %options{?center})
+    %options{+center} = 'Perl Programmers Reference Guide'
+
 
 # Verbose is only our flag, not a Pod::Man flag.
-my $verbose = %options{?verbose};
-delete %options{verbose};
+my $verbose = %options{?verbose}
+delete %options{verbose}
 
 # This isn't a valid Pod::Man option and is only accepted for backwards
 # compatibility.
-delete %options{lax};
+delete %options{lax}
 
 # Initialize and run the formatter, pulling a pair of input and output off at
 # a time.
-my $parser = Pod::Man->new( < %options);
-my @files;
-do {
-    @files = splice (@ARGV, 0, 2);
-    print $^STDOUT, "  @files[1]\n" if $verbose;
-    $parser->parse_from_file (@files);
-} while (@ARGV);
+my $parser = Pod::Man->new( < %options)
+my @files
+do
+    @files = splice (@ARGV, 0, 2)
+    print $^STDOUT, "  @files[1]\n" if $verbose
+    $parser->parse_from_file (@files)
+ while (@ARGV)
 
 __END__
 

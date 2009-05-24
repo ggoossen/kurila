@@ -1,7 +1,7 @@
-package Sans_mypragma;
+package Sans_mypragma
 
-sub affected {
-    mypragma::in_effect();
-}
+sub affected
+    mypragma::in_effect()
 
-1;
+
+1

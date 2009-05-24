@@ -13,64 +13,64 @@
 # which Storable should (correctly) throw errors.
 
 
-use Storable ();
-use Test::More tests => 9;
+use Storable ()
+use Test::More tests => 9
 
-my $ddd = bless \%( ), 'Foo';
-my $eee = bless \%( Bar => $ddd ), 'Bar';
-$ddd->{+Foo} = $eee;
+my $ddd = bless \%( ), 'Foo'
+my $eee = bless \%( Bar => $ddd ), 'Bar'
+$ddd->{+Foo} = $eee
 
-my $array = \@( $ddd );
+my $array = \@( $ddd )
 
-my $string = Storable::freeze( $array );
-my $thawed = Storable::thaw( $string );
+my $string = Storable::freeze( $array )
+my $thawed = Storable::thaw( $string )
 
 # is_deeply infinite loops in ciculars, so do it manually
 # is_deeply( $array, $thawed, 'Circular hooked objects work' );
-is( ref($thawed), 'ARRAY', 'Top level ARRAY' );
-is( scalar(nelems $thawed->@), 1, 'ARRAY contains one element' );
-isa_ok( $thawed->[0], 'Foo' );
-is( nkeys($thawed->[0]->%), 1, 'Foo contains one element' );
-isa_ok( $thawed->[0]->{?Foo}, 'Bar' );
-is( nkeys($thawed->[0]->{?Foo}->%), 1, 'Bar contains one element' );
-isa_ok( $thawed->[0]->{Foo}->{?Bar}, 'Foo' );
-is( $thawed->[0], $thawed->[0]->{Foo}->{?Bar}, 'Circular is... well... circular' );
+is( ref($thawed), 'ARRAY', 'Top level ARRAY' )
+is( scalar(nelems $thawed->@), 1, 'ARRAY contains one element' )
+isa_ok( $thawed->[0], 'Foo' )
+is( nkeys($thawed->[0]->%), 1, 'Foo contains one element' )
+isa_ok( $thawed->[0]->{?Foo}, 'Bar' )
+is( nkeys($thawed->[0]->{?Foo}->%), 1, 'Bar contains one element' )
+isa_ok( $thawed->[0]->{Foo}->{?Bar}, 'Foo' )
+is( $thawed->[0], $thawed->[0]->{Foo}->{?Bar}, 'Circular is... well... circular' )
 
 # Make sure the thawing went the way we expected
-is_deeply( \@Foo::order, \@( 'Bar', 'Foo' ), 'thaw order is correct (depth first)' );
+is_deeply( \@Foo::order, \@( 'Bar', 'Foo' ), 'thaw order is correct (depth first)' )
 
 
 
 
 
-    package Foo;
+package Foo;
 
-our @order = @( () );
+our @order = @( () )
 
-sub STORABLE_freeze($self, $clone) {
-    my $class = ref $self;
+sub STORABLE_freeze($self, $clone)
+    my $class = ref $self
 
     # print "# Freezing $class\n";
 
-    return  @($class, $self->{?$class});
-}
+    return  @($class, $self->{?$class})
 
-sub STORABLE_thaw($self, $clone, $string, @< @refs) {
-    my $class = ref $self;
+
+sub STORABLE_thaw($self, $clone, $string, @< @refs)
+    my $class = ref $self
 
     # print "# Thawing $class\n";
 
-    $self->{+$class} = shift @refs;
+    $self->{+$class} = shift @refs
 
-    push @order, $class;
+    push @order, $class
 
-    return;
-}
+    return
+
 
 package Bar;
 
-BEGIN {
-    our @ISA = @( 'Foo' );
-}
+BEGIN 
+    our @ISA = @( 'Foo' )
 
-1;
+
+1

@@ -1,54 +1,54 @@
 #!perl -w
 
 
-BEGIN {
+BEGIN 
     try {
         require warnings;
-    };
-    if ($^EVAL_ERROR) {
-        print $^STDOUT, "1..0\n";
-        print $^STDOUT, $^EVAL_ERROR;
-        exit;
     }
-}
+    if ($^EVAL_ERROR)
+        print $^STDOUT, "1..0\n"
+        print $^STDOUT, $^EVAL_ERROR
+        exit
+    
 
-use Test::More tests => 1;
-use MIME::Base64 < qw(decode_base64);
 
-use warnings;
+use Test::More tests => 1
+use MIME::Base64 < qw(decode_base64)
 
-my @warn;
-$^WARN_HOOK = sub { push(@warn, @_[0]->{?description} . "\n") };
+use warnings
 
-warn;
-my $a;
-$a = decode_base64("aa");
-$a = decode_base64("a===");
-warn;
-$a = do {
-    no warnings;
-    decode_base64("aa");
-};
-$a = do {
-    no warnings;
-    decode_base64("a===");
-};
-warn;
-$a = do {
-    local $^WARNING = 0;
-    decode_base64("aa");
-};
-$a = do {
-    local $^WARNING = 0;
-    decode_base64("a===");
-};
-warn;
+my @warn
+$^WARN_HOOK = sub (@< @_) { push(@warn, @_[0]->{?description} . "\n") }
 
-for ( @warn) {
-    print $^STDOUT, "# $_";
-}
+warn
+my $a
+$a = decode_base64("aa")
+$a = decode_base64("a===")
+warn
+$a = do
+    no warnings
+    decode_base64("aa")
 
-is(join("", @warn), <<"EOT");
+$a = do
+    no warnings
+    decode_base64("a===")
+
+warn
+$a = do
+    local $^WARNING = 0
+    decode_base64("aa")
+
+$a = do
+    local $^WARNING = 0
+    decode_base64("a===")
+
+warn
+
+for ( @warn)
+    print $^STDOUT, "# $_"
+
+
+is(join("", @warn), <<"EOT")
 Warning: something's wrong
 Premature end of base64 data
 Premature padding of base64 data

@@ -1,6 +1,6 @@
 #
 
-package IO::Seekable;
+package IO::Seekable
 
 =head1 NAME
 
@@ -83,7 +83,7 @@ Returns the IO::File's current position, or -1 on error.
 
 =head1 SEE ALSO
 
-L<perlfunc>, 
+L<perlfunc>,
 L<perlop/"I/O Operators">,
 L<IO::Handle>
 L<IO::File>
@@ -94,32 +94,32 @@ Derived from FileHandle.pm by Graham Barr E<lt>gbarr@pobox.comE<gt>
 
 =cut
 
-our($VERSION, @EXPORT, @ISA);
+our($VERSION, @EXPORT, @ISA)
 use IO::Handle ();
 # XXX we can't get these from IO::Handle or we'll get prototype
 # mismatch warnings on C<use POSIX; use IO::File;> :-(
 use Fcntl < qw(SEEK_SET SEEK_CUR SEEK_END);
-require Exporter;
+require Exporter
 
-@EXPORT = qw(SEEK_SET SEEK_CUR SEEK_END);
-@ISA = qw(Exporter);
+@EXPORT = qw(SEEK_SET SEEK_CUR SEEK_END)
+@ISA = qw(Exporter)
 
-$VERSION = "1.10";
-$VERSION = eval $VERSION;
+$VERSION = "1.10"
+$VERSION = eval $VERSION
 
-sub seek {
-    (nelems @_) == 3 or die 'usage: $io->seek(POS, WHENCE)';
-    seek(@_[0], @_[1], @_[2]);
-}
+sub seek
+    (nelems @_) == 3 or die 'usage: $io->seek(POS, WHENCE)'
+    seek(@_[0], @_[1], @_[2])
 
-sub sysseek {
-    (nelems @_) == 3 or die 'usage: $io->sysseek(POS, WHENCE)';
-    sysseek(@_[0], @_[1], @_[2]);
-}
 
-sub tell {
-    (nelems @_) == 1 or die 'usage: $io->tell()';
-    tell(@_[0]);
-}
+sub sysseek
+    (nelems @_) == 3 or die 'usage: $io->sysseek(POS, WHENCE)'
+    sysseek(@_[0], @_[1], @_[2])
 
-1;
+
+sub tell
+    (nelems @_) == 1 or die 'usage: $io->tell()'
+    tell(@_[0])
+
+
+1

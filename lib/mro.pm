@@ -5,15 +5,15 @@
 #      You may distribute under the terms of either the GNU General Public
 #      License or the Artistic License, as specified in the README file.
 #
-package mro;
+package mro
 
-use warnings;
+use warnings
 
 # mro.pm versions < 1.00 reserved for MRO::Compat
 #  for partial back-compat to 5.[68].x
-our $VERSION = '1.00';
+our $VERSION = '1.00'
 
-1;
+1
 
 __END__
 

@@ -1,22 +1,22 @@
 
-BEGIN {
-    unless ("A" eq pack('U', 0x41)) {
+BEGIN 
+    unless ("A" eq pack('U', 0x41))
         print $^STDOUT, "1..0 # Unicode::Collate " .
-            "cannot stringify a Unicode code point\n";
-        exit 0;
-    }
-    if (env::var('PERL_CORE')) {
-        chdir('t') if -d 't';
-        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
-    }
-}
+            "cannot stringify a Unicode code point\n"
+        exit 0
+    
+    if (env::var('PERL_CORE'))
+        chdir('t') if -d 't'
+        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) )
+    
 
-use Test::More;
+
+use Test::More
 BEGIN { plan tests => 17 };
 
-use warnings;
+use warnings
 
-ok(1);
+ok(1)
 
 #
 # No test for Unicode::Collate is included in this .t file.
@@ -50,27 +50,27 @@ ok(1);
 
 no warnings 'utf8';
 
-is("\x{206F}!" cmp "\x{D800}!", -1);
-is(pack('U*', 0x206F, 0x21) cmp pack('U*', 0xD800, 0x21), -1);
+is("\x{206F}!" cmp "\x{D800}!", -1)
+is(pack('U*', 0x206F, 0x21) cmp pack('U*', 0xD800, 0x21), -1)
 
-is("\x{D800}!" cmp "\x{DFFF}!", -1);
-is(pack('U*', 0xD800, 0x21) cmp pack('U*', 0xDFFF, 0x21), -1);
+is("\x{D800}!" cmp "\x{DFFF}!", -1)
+is(pack('U*', 0xD800, 0x21) cmp pack('U*', 0xDFFF, 0x21), -1)
 
-is("\x{DFFF}!" cmp "\x{FDD0}!", -1);
-is(pack('U*', 0xDFFF, 0x21) cmp pack('U*', 0xFDD0, 0x21), -1 );
+is("\x{DFFF}!" cmp "\x{FDD0}!", -1)
+is(pack('U*', 0xDFFF, 0x21) cmp pack('U*', 0xFDD0, 0x21), -1 )
 
-is("\x{FDD0}!" cmp "\x{FFFB}!", -1);
-is(pack('U*', 0xFDD0, 0x21) cmp pack('U*', 0xFFFB, 0x21), -1);
+is("\x{FDD0}!" cmp "\x{FFFB}!", -1)
+is(pack('U*', 0xFDD0, 0x21) cmp pack('U*', 0xFFFB, 0x21), -1)
 
-is("\x{FFFB}!" cmp "\x{FFFE}!", -1);
-is(pack('U*', 0xFFFB, 0x21) cmp pack('U*', 0xFFFE, 0x21), -1);
+is("\x{FFFB}!" cmp "\x{FFFE}!", -1)
+is(pack('U*', 0xFFFB, 0x21) cmp pack('U*', 0xFFFE, 0x21), -1)
 
-is("\x{FFFE}!" cmp "\x{FFFF}!", -1);
-is(pack('U*', 0xFFFE, 0x21) cmp pack('U*', 0xFFFF, 0x21), -1);
+is("\x{FFFE}!" cmp "\x{FFFF}!", -1)
+is(pack('U*', 0xFFFE, 0x21) cmp pack('U*', 0xFFFF, 0x21), -1)
 
-is("\x{FFFF}!" cmp "\x{1D165}!", -1);
-is(pack('U*', 0xFFFF, 0x21) cmp pack('U*', 0x1D165, 0x21), -1);
+is("\x{FFFF}!" cmp "\x{1D165}!", -1)
+is(pack('U*', 0xFFFF, 0x21) cmp pack('U*', 0x1D165, 0x21), -1)
 
-is("\000!" cmp "\x{FFFF}!", -1);
-is(pack('U*', 0, 0x21) cmp pack('U*', 0xFFFF, 0x21), -1);
+is("\000!" cmp "\x{FFFF}!", -1)
+is(pack('U*', 0, 0x21) cmp pack('U*', 0xFFFF, 0x21), -1)
 

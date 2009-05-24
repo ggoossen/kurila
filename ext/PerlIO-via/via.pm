@@ -1,8 +1,8 @@
-package PerlIO::via;
-our $VERSION = '0.08';
+package PerlIO::via
+our $VERSION = '0.08'
 use XSLoader ();
-XSLoader::load 'PerlIO::via';
-1;
+XSLoader::load 'PerlIO::via'
+1
 __END__
 
 =head1 NAME

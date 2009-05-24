@@ -1,4 +1,4 @@
-# DB_File.pm -- Perl 5 interface to Berkeley DB 
+# DB_File.pm -- Perl 5 interface to Berkeley DB
 #
 # written by Paul Marquess (pmqs@cpan.org)
 # last modified 4th February 2007
@@ -9,107 +9,103 @@
 #     modify it under the same terms as Perl itself.
 
 
-package DB_File::HASHINFO ;
+package DB_File::HASHINFO 
 
 
-use warnings;
+use warnings
 
-require Tie::Hash;
-@DB_File::HASHINFO::ISA = qw(Tie::Hash);
+require Tie::Hash
+@DB_File::HASHINFO::ISA = qw(Tie::Hash)
 
 sub new
-{
-    my $pkg = shift ;
-    return bless \%( VALID => \%( 
-                bsize	  => 1,
-                    ffactor	  => 1,
-                    nelem	  => 1,
-                    cachesize => 1,
-                    hash	  => 2,
-                    lorder	  => 1,
-            ), 
-            GOT   => \%()
-        ), $pkg ;
-}
+    my $pkg = shift 
+    return bless \%( VALID => \%(
+        bsize	  => 1,
+        ffactor	  => 1,
+        nelem	  => 1,
+        cachesize => 1,
+        hash	  => 2,
+        lorder	  => 1,
+        ),
+        GOT   => \%()
+        ), $pkg 
+
 
 sub NotHere
-{
-    my $self = shift ;
-    my $method = shift ;
+    my $self = shift 
+    my $method = shift 
 
-    die ref($self) . " does not define the method $($method)" ;
-}
+    die ref($self) . " does not define the method $($method)" 
+
 
 package DB_File::RECNOINFO ;
 
 use warnings;
 
 
-@DB_File::RECNOINFO::ISA = qw(DB_File::HASHINFO) ;
+@DB_File::RECNOINFO::ISA = qw(DB_File::HASHINFO) 
 
 sub TIEHASH
-{
-    my $pkg = shift ;
+    my $pkg = shift 
 
-    bless \%( VALID => \%( < @+: map { @: $_, 1}, 
-                qw( bval cachesize psize flags lorder reclen bfname )
-            ),
-            GOT   => \%(),
-        ), $pkg ;
-}
+    bless \%( VALID => \%( < @+: map { @: $_, 1},
+        qw( bval cachesize psize flags lorder reclen bfname )
+        ),
+        GOT   => \%(),
+        ), $pkg 
+
 
 package DB_File::BTREEINFO ;
 
 use warnings;
 
 
-@DB_File::BTREEINFO::ISA = qw(DB_File::HASHINFO) ;
+@DB_File::BTREEINFO::ISA = qw(DB_File::HASHINFO) 
 
 sub TIEHASH
-{
-    my $pkg = shift ;
+    my $pkg = shift 
 
-    bless \%( VALID => \%( 
-                flags	   => 1,
-                    cachesize  => 1,
-                    maxkeypage => 1,
-                    minkeypage => 1,
-                    psize	   => 1,
-                    compare	   => 2,
-                    prefix	   => 2,
-                    lorder	   => 1,
-            ),
-            GOT   => \%(),
-        ), $pkg ;
-}
+    bless \%( VALID => \%(
+        flags	   => 1,
+        cachesize  => 1,
+        maxkeypage => 1,
+        minkeypage => 1,
+        psize	   => 1,
+        compare	   => 2,
+        prefix	   => 2,
+        lorder	   => 1,
+        ),
+        GOT   => \%(),
+        ), $pkg 
+
 
 
 package DB_File ;
 
 use warnings;
 
-our ($VERSION, @ISA, @EXPORT, $DB_BTREE, $DB_HASH, $DB_RECNO);
-our ($db_version, $use_XSLoader, $splice_end_array, $Error);
+our ($VERSION, @ISA, @EXPORT, $DB_BTREE, $DB_HASH, $DB_RECNO)
+our ($db_version, $use_XSLoader, $splice_end_array, $Error)
 
 
-$VERSION = "1.816_2" ;
-$VERSION = eval $VERSION; # needed for dev releases 
+$VERSION = "1.816_2" 
+$VERSION = eval $VERSION # needed for dev releases
 
-$splice_end_array = 'splice() offset past end of array';
+$splice_end_array = 'splice() offset past end of array'
 
 #typedef enum { DB_BTREE, DB_HASH, DB_RECNO } DBTYPE;
-$DB_BTREE = DB_File::BTREEINFO->new() ;
-$DB_HASH  = DB_File::HASHINFO->new() ;
-$DB_RECNO = DB_File::RECNOINFO->new() ;
+$DB_BTREE = DB_File::BTREEINFO->new() 
+$DB_HASH  = DB_File::HASHINFO->new() 
+$DB_RECNO = DB_File::RECNOINFO->new() 
 
-require Tie::Hash;
-require Exporter;
-BEGIN {
-    $use_XSLoader = 1 ;
-    require XSLoader;
-}
+require Tie::Hash
+require Exporter
+BEGIN 
+    $use_XSLoader = 1 
+    require XSLoader
 
-push @ISA, < qw(Tie::Hash Exporter);
+
+push @ISA, < qw(Tie::Hash Exporter)
 @EXPORT = qw(
         $DB_BTREE $DB_HASH $DB_RECNO 
 
@@ -141,7 +137,7 @@ push @ISA, < qw(Tie::Hash Exporter);
 	R_SETCURSOR
 	R_SNAPSHOT
 	__R_UNUSED
-);
+)
 
 try {
     # Make all Fcntl O_XXX constants available for importing
@@ -149,7 +145,7 @@ try {
     my @O = grep { m/^O_/ }, @Fcntl::EXPORT;
     Fcntl->import(< @O);  # first we import what we want to export
     push(@EXPORT, < @O);
-};
+}
 
 if ($use_XSLoader)
 { XSLoader::load("DB_File", $VERSION)}
@@ -160,116 +156,111 @@ else
 # processed by the autosplit program.
 
 sub new($class, $filename, ?$flags, ?$mode, ?$hash_info)
-{ 
 
-    $flags //= O_CREAT()^|^O_RDWR();
-    $mode //= 0666;
+    $flags //= O_CREAT()^|^O_RDWR()
+    $mode //= 0666
 
-    # make recno in Berkeley DB version 2 (or better) work like 
+    # make recno in Berkeley DB version 2 (or better) work like
     # recno in version 1.
-    if ($db_version +> 1 and defined $hash_info and (ref $hash_info) =~ m/RECNO/ and 
-        $filename and ! -e $filename) {
-        open(my $fh, ">", $filename) or return undef ;
-        close $fh ;
-        chmod $mode || 0666 , $filename;
-    }
+    if ($db_version +> 1 and defined $hash_info and (ref $hash_info) =~ m/RECNO/ and
+        $filename and ! -e $filename)
+        open(my $fh, ">", $filename) or return undef 
+        close $fh 
+        chmod $mode || 0666 , $filename
+    
 
-    DoTie_(0, $class, $filename, $flags, $mode, $hash_info || () );
-}
+    DoTie_(0, $class, $filename, $flags, $mode, $hash_info || () )
+
 
 sub clear
-{
-    my $self = shift;
-    my $key = 0 ;
-    my $value = "" ;
-    my $status = $self->seq($key, $value, R_FIRST());
-    my @keys;
+    my $self = shift
+    my $key = 0 
+    my $value = "" 
+    my $status = $self->seq($key, $value, R_FIRST())
+    my @keys
 
-    while ($status == 0) {
-        push @keys, $key;
-        $status = $self->seq($key, $value, R_NEXT());
-    }
-    foreach my $key (reverse @keys) {
-        my $s = $self->del($key); 
-    }
-}
+    while ($status == 0)
+        push @keys, $key
+        $status = $self->seq($key, $value, R_NEXT())
+    
+    foreach my $key (reverse @keys)
+        my $s = $self->del($key)
+    
 
-sub iterate($self, $callback) {
 
-    my ($key, $value);
-    my $status = $self->seq($key, $value, R_FIRST());
-    while ($status == 0) {
-        $callback->($key, $value);
-        $status = $self->seq($key, $value, R_NEXT());
-    }
-    return;
-}
+sub iterate($self, $callback)
 
-sub keys {
-    my @($self) = @_;
-    my @keys = @();
-    $self->iterate( sub { my @($key, $value) = @_; push @keys, $key; } );
-    return @keys;
-}
+    my ($key, $value)
+    my $status = $self->seq($key, $value, R_FIRST())
+    while ($status == 0)
+        $callback->($key, $value)
+        $status = $self->seq($key, $value, R_NEXT())
+    
+    return
 
-sub values {
-    my @($self) = @_;
-    my @values = @();
-    $self->iterate( sub { my @($key, $value) = @_; push @values, $value; } );
-    return @values;
-}
+
+sub keys
+    my @($self) = @_
+    my @keys = @()
+    $self->iterate( sub (@< @_) { my @($key, $value) = @_; push @keys, $key; } )
+    return @keys
+
+
+sub values
+    my @($self) = @_
+    my @values = @()
+    $self->iterate( sub (@< @_) { my @($key, $value) = @_; push @values, $value; } )
+    return @values
+
 
 sub find_dup
-{
     die "Usage: \$db->find_dup(key,value)\n"
-        unless (nelems @_) == 3 ;
+        unless (nelems @_) == 3 
 
-    my $db        = shift ;
-    my @($origkey, $value_wanted) =  @_ ;
-    my @($key, $value) = @($origkey, 0);
+    my $db        = shift 
+    my @($origkey, $value_wanted) =  @_ 
+    my @($key, $value) = @($origkey, 0)
 
-    my $status = $db->seq($key, $value, R_CURSOR());
-    while ($status == 0) {
-        return 0 if $key eq $origkey and $value eq $value_wanted ;
+    my $status = $db->seq($key, $value, R_CURSOR())
+    while ($status == 0)
+        return 0 if $key eq $origkey and $value eq $value_wanted 
 
-        $status = $db->seq($key, $value, R_NEXT() );
-    }
+        $status = $db->seq($key, $value, R_NEXT() )
+    
 
-    return $status ;
-}
+    return $status 
+
 
 sub del_dup
-{
     die "Usage: \$db->del_dup(key,value)\n"
-        unless (nelems @_) == 3 ;
+        unless (nelems @_) == 3 
 
-    my $db        = shift ;
-    my @($key, $value) =  @_ ;
-    my $status = $db->find_dup($key, $value) ;
-    return $status if $status != 0 ;
+    my $db        = shift 
+    my @($key, $value) =  @_ 
+    my $status = $db->find_dup($key, $value) 
+    return $status if $status != 0 
 
-    $status = $db->del($key, R_CURSOR() ) ;
-    return $status ;
-}
+    $status = $db->del($key, R_CURSOR() ) 
+    return $status 
+
 
 sub get_dup
-{
     die "Usage: \$db->get_dup(key [,flag])\n"
-        unless (nelems @_) == 2 or (nelems @_) == 3 ;
+        unless (nelems @_) == 2 or (nelems @_) == 3 
 
-    my $db        = shift ;
-    my $key       = shift ;
-    my $flag	  = shift ;
-    my $value 	  = 0 ;
-    my $origkey   = $key ;
-    my %values	  = %( () ) ;
-    my @values    = @( () ) ;
-    my $counter   = 0 ;
+    my $db        = shift 
+    my $key       = shift 
+    my $flag	  = shift 
+    my $value 	  = 0 
+    my $origkey   = $key 
+    my %values	  = %( () ) 
+    my @values    = @( () ) 
+    my $counter   = 0 
 
     # iterate through the database until either EOF ($status == 0)
     # or a different key is encountered ($key ne $origkey).
-    my $status = $db->seq($key, $value, R_CURSOR());
-    while ( $status == 0 and $key eq $origkey ) {
+    my $status = $db->seq($key, $value, R_CURSOR())
+    while ( $status == 0 and $key eq $origkey )
 
         # save the value or count number of matches
         if ($flag)
@@ -277,14 +268,14 @@ sub get_dup
         else
         { push (@values, $value) }
 
-        $status = $db->seq($key, $value, R_NEXT());
-    }
+        $status = $db->seq($key, $value, R_NEXT())
+    
 
-    return  $flag ?? %values !! @values;
-}
+    return  $flag ?? %values !! @values
 
 
-1;
+
+1
 __END__
 
 =head1 NAME

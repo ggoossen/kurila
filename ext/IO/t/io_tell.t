@@ -1,36 +1,35 @@
 #!./perl
 
-our $tell_file;
+our $tell_file
 
-BEGIN {
-    unless(grep { m/blib/ }, $^INCLUDE_PATH) {
-        $tell_file = "TEST";
-    }
-    else {
-        $tell_file = "Makefile";
-    }
-}
+BEGIN 
+    unless(grep { m/blib/ }, $^INCLUDE_PATH)
+        $tell_file = "TEST"
+    else
+        $tell_file = "Makefile"
+    
+
 
 use Config;
 
-print $^STDOUT, "1..13\n";
+print $^STDOUT, "1..13\n"
 
 use IO::File;
 
-my $tst = IO::File->new("$tell_file","r") || die("Can't open $tell_file");
-binmode $tst; # its a nop unless it matters. Was only if ($^O eq 'MSWin32' or $^O eq 'dos');
+my $tst = IO::File->new("$tell_file","r") || die("Can't open $tell_file")
+binmode $tst # its a nop unless it matters. Was only if ($^O eq 'MSWin32' or $^O eq 'dos');
 if ($tst->eof) { print $^STDOUT, "not ok 1\n"; } else { print $^STDOUT, "ok 1\n"; }
 
-my $firstline = ~< $tst;
-my $secondpos = tell $tst;
+my $firstline = ~< $tst
+my $secondpos = tell $tst
 
-my $x = 0;
-while ( ~< $tst) {
+my $x = 0
+while ( ~< $tst)
     if (eof $tst) {$x++;}
-}
+
 if ($x == 1) { print $^STDOUT, "ok 2\n"; } else { print $^STDOUT, "not ok 2\n"; }
 
-my $lastpos = tell $tst;
+my $lastpos = tell $tst
 
 unless (eof $tst) { print $^STDOUT, "not ok 3\n"; } else { print $^STDOUT, "ok 3\n"; }
 

@@ -1,31 +1,31 @@
-package Pod::Plainer;
+package Pod::Plainer
 
-use Pod::Parser;
-our @ISA = qw(Pod::Parser);
-our $VERSION = '0.01';
+use Pod::Parser
+our @ISA = qw(Pod::Parser)
+our $VERSION = '0.01'
 
-our %E = %( < qw( < lt > gt ) );
+our %E = %( < qw( < lt > gt ) )
 
-sub escape_ltgt(_, my $text, _) {
-    $text =~ s/([<>])/E<%E{?$1}>/g;
-    $text 
-} 
+sub escape_ltgt(_, my $text, _)
+    $text =~ s/([<>])/E<%E{?$1}>/g
+    $text
 
-sub simple_delimiters(_, my $seq) {
-    $seq -> left_delimiter( '<' ); 
-    $seq -> right_delimiter( '>' );  
-    $seq;
-}
 
-sub textblock($parser,$text,$line, _) {
+sub simple_delimiters(_, my $seq)
+    $seq -> left_delimiter( '<' )
+    $seq -> right_delimiter( '>' )
+    $seq
+
+
+sub textblock($parser,$text,$line, _)
     print $parser->output_handle()
         ,$parser->parse_text(
         \%( expand_text => q(escape_ltgt),
-            expand_seq => q(simple_delimiters) ),
-        $text, $line ) -> raw_text(); 
-}
+        expand_seq => q(simple_delimiters) ),
+        $text, $line ) -> raw_text()
 
-1;
+
+1
 
 __END__
 

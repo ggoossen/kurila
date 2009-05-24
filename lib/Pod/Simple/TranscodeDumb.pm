@@ -1,64 +1,64 @@
 
 ## This module is to be use()'d only by Pod::Simple::Transcode
 
-package Pod::Simple::TranscodeDumb;
+package Pod::Simple::TranscodeDumb
 
-our ($VERSION, %Supported);
-$VERSION = '2.02';
+our ($VERSION, %Supported)
+$VERSION = '2.02'
 # This module basically pretends it knows how to transcode, except
 #  only for null-transcodings!  We use this when Encode isn't
 #  available.
 
 %Supported = %(
-        'ascii'       => 1,
-            'ascii-ctrl'  => 1,
-            'utf8'  => 1,
-            'null'        => 1,
-            'latin1' => 1,
-            < %Supported,
-    );
+    'ascii'       => 1,
+    'ascii-ctrl'  => 1,
+    'utf8'  => 1,
+    'null'        => 1,
+    'latin1' => 1,
+    < %Supported,
+    )
 
 sub is_dumb  {1}
 sub is_smart {0}
 
-sub all_encodings {
-    return sort keys %Supported;
-}
+sub all_encodings
+    return sort keys %Supported
 
-sub encoding_is_available {
-    return exists %Supported{lc @_[1]};
-}
 
-sub encmodver {
-    return __PACKAGE__ . " v" .($VERSION || '?');
-}
+sub encoding_is_available
+    return exists %Supported{lc @_[1]}
 
-sub make_transcoder(_, $e) {
-    die "WHAT ENCODING!?!?" unless $e;
-    my $x;
-    if ($e eq "latin1") {
-        return sub (@< @a) { return map { join '', map { utf8::chr($_) }, @( unpack "C*", $_) }, @a };
+
+sub encmodver
+    return __PACKAGE__ . " v" .($VERSION || '?')
+
+
+sub make_transcoder(_, $e)
+    die "WHAT ENCODING!?!?" unless $e
+    my $x
+    if ($e eq "latin1")
+        return sub (@< @a) { return map { join '', map { utf8::chr($_) }, @( unpack "C*", $_) }, @a }
+    
+
+    return sub (@< @_) {;
+    #foreach $x (@_) {
+    #  if(Pod::Simple::ASCII and !Pod::Simple::UNICODE) {
+    #    # We're in horrible gimp territory, so we need to knock out
+    #    # all the highbit things
+    #    $x =
+    #      pack 'C*',
+    #      map {; ($_ < 128) ? $_ : 0x7e }
+    #      unpack "C*",
+    #      $x
+    #    ;
+    #  }
+    #}
+    #
+    #return;
     }
 
-    return sub {;
-        #foreach $x (@_) {
-        #  if(Pod::Simple::ASCII and !Pod::Simple::UNICODE) {
-        #    # We're in horrible gimp territory, so we need to knock out
-        #    # all the highbit things
-        #    $x =
-        #      pack 'C*',
-        #      map {; ($_ < 128) ? $_ : 0x7e }
-        #      unpack "C*",
-        #      $x
-        #    ;
-        #  }
-        #}
-        #
-        #return;
-        };
-}
 
 
-1;
+1
 
 

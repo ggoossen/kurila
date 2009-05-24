@@ -1,54 +1,54 @@
-use Perl6::Form;
+use Perl6::Form
 
-my @data = @( ~< $^DATA );
+my @data = @( ~< $^DATA )
 
-for ( @data) {
-    my @($pid, $cmd, $time, $cpu) =  split;
-    $cmd =~ s/_/ /g;
+for ( @data)
+    my @($pid, $cmd, $time, $cpu) =  split
+    $cmd =~ s/_/ /g
     print $^STDOUT, < form
    "\{>>>\}  \{<<<<<<<<<<<<<<\}  \{>>>>>>\}  \{>>.\}\%",
-   $pid,  $cmd,             $time,    $cpu;
-}
+   $pid,  $cmd,             $time,    $cpu
 
-print $^STDOUT, "---------------------------------------------\n";
 
-for ( @data) {
-    my @($pid, $cmd, $time, $cpu) =  split;
-    $cmd =~ s/_/ /g;
+print $^STDOUT, "---------------------------------------------\n"
+
+for ( @data)
+    my @($pid, $cmd, $time, $cpu) =  split
+    $cmd =~ s/_/ /g
     print $^STDOUT, < form
    "\{>>>\}  \{<<<<<<<<<<<<<<\}  \{]]]]]]\}   \{>\{5.2\}.<\%\}",
-   $pid,  $cmd,             $time,    $cpu;
-}
+   $pid,  $cmd,             $time,    $cpu
 
-print $^STDOUT, "---------------------------------------------\n";
 
-for ( @data) {
-    my @($pid, $cmd, $time, $cpu) =  split;
-    $cmd =~ s/_/ /g;
+print $^STDOUT, "---------------------------------------------\n"
+
+for ( @data)
+    my @($pid, $cmd, $time, $cpu) =  split
+    $cmd =~ s/_/ /g
     print $^STDOUT, < form
    \%(single=>'%'),
    "\{>>>\}  \{<<<<<<<<<<<<<<\}  \{]]]]]]\}  \{>>.\}\%",
-   $pid,  $cmd,             $time,    $cpu, '%';
-}
+   $pid,  $cmd,             $time,    $cpu, '%'
 
-print $^STDOUT, "---------------------------------------------\n";
 
-for ( @data) {
-    my @($pid, $cmd, $time, $cpu) =  split;
-    $cmd =~ s/_/ /g;
+print $^STDOUT, "---------------------------------------------\n"
+
+for ( @data)
+    my @($pid, $cmd, $time, $cpu) =  split
+    $cmd =~ s/_/ /g
     print $^STDOUT, < form
    "\{>>>\}  \{<<<<<<<<<<<<<<\}  \{]]]]]+\}  \{>>.\}\%",
-   $pid,  $cmd,             $time,    $cpu;
-}
+   $pid,  $cmd,             $time,    $cpu
 
-print $^STDOUT, "---------------------------------------------\n";
 
-for ( @data) {
-    my @($pid, $cmd, $time, $cpu) =  split;
-    $cmd =~ s/_/ /g;
+print $^STDOUT, "---------------------------------------------\n"
+
+for ( @data)
+    my @($pid, $cmd, $time, $cpu) =  split
+    $cmd =~ s/_/ /g
     printf $^STDOUT, "\%5d  \%-16s  \%8s  \%5.1f\%\%\n",
-        $pid,  $cmd,  $time, $cpu;
-}
+        $pid,  $cmd,  $time, $cpu
+
 
 __DATA__
  2461  vi_henry           0:55.83   11.6

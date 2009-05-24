@@ -1,6 +1,6 @@
-package ExtUtils::Constant;
-our (@ISA, $VERSION, @EXPORT_OK, %EXPORT_TAGS);
-$VERSION = 0.20;
+package ExtUtils::Constant
+our (@ISA, $VERSION, @EXPORT_OK, %EXPORT_TAGS)
+$VERSION = 0.20
 
 =head1 NAME
 
@@ -97,14 +97,14 @@ use Exporter;
 use ExtUtils::Constant::Utils < qw(C_stringify);
 use ExtUtils::Constant::XS < qw(%XS_Constant %XS_TypeSet);
 
-@ISA = @( 'Exporter' );
+@ISA = @( 'Exporter' )
 
 %EXPORT_TAGS = %( 'all' => qw(
 	XS_constant constant_types C_stringify
 	C_constant WriteConstants WriteMakefileSnippet
-) );
+) )
 
-@EXPORT_OK =  %EXPORT_TAGS{?'all'};
+@EXPORT_OK =  %EXPORT_TAGS{?'all'}
 
 =item constant_types
 
@@ -113,16 +113,16 @@ constants used internally between the generated C and XS functions.
 
 =cut
 
-sub constant_types {
-    ExtUtils::Constant::XS->header();
-}
+sub constant_types
+    ExtUtils::Constant::XS->header()
 
-sub C_constant($package, $subname, $default_type, $what, $indent, $breakout, @< @items) {
+
+sub C_constant($package, $subname, $default_type, $what, $indent, $breakout, @< @items)
     ExtUtils::Constant::XS->C_constant(\%(package => $package, subname => $subname,
-            default_type => $default_type,
-                types => $what, indent => $indent,
-                breakout => $breakout), < @items);
-}
+        default_type => $default_type,
+        types => $what, indent => $indent,
+        breakout => $breakout), < @items)
+
 
 =item XS_constant PACKAGE, TYPES, SUBNAME, C_SUBNAME
 
@@ -144,21 +144,21 @@ I<C_SUBNAME>.
 
 =cut
 
-sub XS_constant {
-    my $package = shift;
-    my $what = shift;
-    my $subname = shift;
-    my $C_subname = shift;
-    $subname ||= 'constant';
-    $C_subname ||= $subname;
+sub XS_constant
+    my $package = shift
+    my $what = shift
+    my $subname = shift
+    my $C_subname = shift
+    $subname ||= 'constant'
+    $C_subname ||= $subname
 
-    if (!ref $what) {
+    if (!ref $what)
         # Convert line of the form IV,UV,NV to hash
-        $what = \%( < @+: map { @: $_ => 1}, split m/,\s*/, ($what) );
-    }
-    my $params = ExtUtils::Constant::XS->params ($what);
+        $what = \%( < @+: map { @: $_ => 1}, split m/,\s*/, ($what) )
+    
+    my $params = ExtUtils::Constant::XS->params ($what)
 
-    my $xs = <<"EOT";
+    my $xs = <<"EOT"
 void
 $subname(sv)
     PREINIT:
@@ -171,50 +171,50 @@ $subname(sv)
         int		type;
 EOT
 
-    if ($params->{?IV}) {
-        $xs .= "	IV		iv;\n";
-    } else {
-        $xs .= "	/* IV\t\tiv;\tUncomment this if you need to return IVs */\n";
-    }
-    if ($params->{?NV}) {
-        $xs .= "	NV		nv;\n";
-    } else {
-        $xs .= "	/* NV\t\tnv;\tUncomment this if you need to return NVs */\n";
-    }
-    if ($params->{?PV}) {
-        $xs .= "	const char	*pv;\n";
-    } else {
+    if ($params->{?IV})
+        $xs .= "	IV		iv;\n"
+    else
+        $xs .= "	/* IV\t\tiv;\tUncomment this if you need to return IVs */\n"
+    
+    if ($params->{?NV})
+        $xs .= "	NV		nv;\n"
+    else
+        $xs .= "	/* NV\t\tnv;\tUncomment this if you need to return NVs */\n"
+    
+    if ($params->{?PV})
+        $xs .= "	const char	*pv;\n"
+    else
         $xs .=
-            "	/* const char\t*pv;\tUncomment this if you need to return PVs */\n";
-    }
+            "	/* const char\t*pv;\tUncomment this if you need to return PVs */\n"
+    
 
-    $xs .= << 'EOT';
+    $xs .= << 'EOT'
     INPUT:
 	SV *		sv;
         const char *	s = SvPV(sv, len);
 EOT
-    $xs .= << 'EOT';
+    $xs .= << 'EOT'
     PPCODE:
 EOT
 
-    if ($params->{?IV} xor $params->{?NV}) {
-        $xs .= << "EOT";
+    if ($params->{?IV} xor $params->{?NV})
+        $xs .= << "EOT"
         /* Change this to $C_subname(aTHX_ s, len, &iv, &nv);
            if you need to return both NVs and IVs */
 EOT
-    }
-    $xs .= "	type = $C_subname(aTHX_ s, len";
-    $xs .= ', &iv' if $params->{?IV};
-    $xs .= ', &nv' if $params->{?NV};
-    $xs .= ', &pv' if $params->{?PV};
-    $xs .= ', &sv' if $params->{?SV};
-    $xs .= ");\n";
+    
+    $xs .= "	type = $C_subname(aTHX_ s, len"
+    $xs .= ', &iv' if $params->{?IV}
+    $xs .= ', &nv' if $params->{?NV}
+    $xs .= ', &pv' if $params->{?PV}
+    $xs .= ', &sv' if $params->{?SV}
+    $xs .= ");\n"
 
     # If anyone is insane enough to suggest a package name containing %
-    my $package_sprintf_safe = $package;
-    $package_sprintf_safe =~ s/%/\%\%/g;
+    my $package_sprintf_safe = $package
+    $package_sprintf_safe =~ s/%/\%\%/g
 
-    $xs .= << "EOT";
+    $xs .= << "EOT"
       /* Return 1 or 2 items. First is error message, or undef if no error.
            Second, if present, is found value */
         switch (type) \{
@@ -231,29 +231,29 @@ EOT
           break;
 EOT
 
-    foreach my $type (sort keys %XS_Constant) {
+    foreach my $type (sort keys %XS_Constant)
         # '' marks utf8 flag needed.
-        next if $type eq '';
+        next if $type eq ''
         $xs .= "\t/* Uncomment this if you need to return $($type)s\n"
-            unless $what->{?$type};
-        $xs .= "        case PERL_constant_IS$type:\n";
-        if (length %XS_Constant{?$type}) {
-            $xs .= << "EOT";
+            unless $what->{?$type}
+        $xs .= "        case PERL_constant_IS$type:\n"
+        if (length %XS_Constant{?$type})
+            $xs .= << "EOT"
           EXTEND(SP, 1);
           PUSHs(&PL_sv_undef);
           %XS_Constant{?$type};
 EOT
-        } else {
+         else {
         # Do nothing. return (), which will be correctly interpreted as
         # (undef, undef)
         }
-        $xs .= "          break;\n";
-        unless ($what->{?$type}) {
-            chop $xs; # Yes, another need for chop not chomp.
-            $xs .= " */\n";
-        }
-    }
-    $xs .= << "EOT";
+        $xs .= "          break;\n"
+        unless ($what->{?$type})
+            chop $xs # Yes, another need for chop not chomp.
+            $xs .= " */\n"
+        
+    
+    $xs .= << "EOT"
         default:
           sv = sv_2mortal(newSVpvf(
 	    "Unexpected return type \%d while processing $package_sprintf_safe macro \%s, used",
@@ -262,12 +262,12 @@ EOT
         \}
 EOT
 
-    return $xs;
-}
+    return $xs
+
 
 =item WriteMakefileSnippet
 
-WriteMakefileSnippet ATTRIBUTE =E<gt> VALUE [, ...] 
+WriteMakefileSnippet ATTRIBUTE =E<gt> VALUE [, ...]
 
 A function to generate perl code for Makefile.PL that will regenerate
 the constant subroutines.  Parameters are named as passed to C<WriteConstants>,
@@ -279,32 +279,32 @@ C<XS_FILE> are recognised.
 
 =cut
 
-sub WriteMakefileSnippet {
-    my %args = %( < @_ );
-    my $indent = %args{?INDENT} || 2;
+sub WriteMakefileSnippet
+    my %args = %( < @_ )
+    my $indent = %args{?INDENT} || 2
 
-    my $result = <<"EOT";
+    my $result = <<"EOT"
 ExtUtils::Constant::WriteConstants(
                                    NAME         => '%args{?NAME}',
                                    NAMES        => \\\@names,
                                    DEFAULT_TYPE => '%args{?DEFAULT_TYPE}',
                                    PROXYSUBS    => 1,
 EOT
-    foreach (qw (C_FILE XS_FILE)) {
-        next unless exists %args{$_};
+    foreach (qw (C_FILE XS_FILE))
+        next unless exists %args{$_}
         $result .= sprintf "                                   \%-12s => '\%s',\n",
-            $_, %args{?$_};
-    }
-    $result .= <<'EOT';
+            $_, %args{?$_}
+    
+    $result .= <<'EOT'
                                 );
 EOT
 
-    $result =~ s/^/$(' 'x$indent)/gm;
+    $result =~ s/^/$(' 'x$indent)/gm
     return ExtUtils::Constant::XS->dump_names(\%(default_type=>%args{?DEFAULT_TYPE},
-            indent=>$indent,),
+        indent=>$indent,),
         < %args{NAMES}->@)
-        . $result;
-}
+        . $result
+
 
 =item WriteConstants ATTRIBUTE =E<gt> VALUE [, ...]
 
@@ -373,47 +373,47 @@ C<constant_10> with the default I<XS_SUBNAME>.
 
 =cut
 
-sub WriteConstants {
+sub WriteConstants
     my %ARGS =
         %( # defaults
-            C_FILE =>       'const-c.inc',
-                XS_FILE =>      'const-xs.inc',
-                SUBNAME =>      'constant',
-                DEFAULT_TYPE => 'IV',
-                < @_);
+        C_FILE =>       'const-c.inc',
+        XS_FILE =>      'const-xs.inc',
+        SUBNAME =>      'constant',
+        DEFAULT_TYPE => 'IV',
+        < @_)
 
-    %ARGS{+C_SUBNAME} ||= %ARGS{?SUBNAME}; # No-one sane will have C_SUBNAME eq '0'
+    %ARGS{+C_SUBNAME} ||= %ARGS{?SUBNAME} # No-one sane will have C_SUBNAME eq '0'
 
-    die "Module name not specified" unless length %ARGS{?NAME};
+    die "Module name not specified" unless length %ARGS{?NAME}
 
-    my $c_fh = %ARGS{?C_FH};
-    if (!$c_fh) {
-        open $c_fh, ">", "%ARGS{?C_FILE}" or die "Can't open %ARGS{?C_FILE}: $^OS_ERROR";
-    }
+    my $c_fh = %ARGS{?C_FH}
+    if (!$c_fh)
+        open $c_fh, ">", "%ARGS{?C_FILE}" or die "Can't open %ARGS{?C_FILE}: $^OS_ERROR"
+    
 
-    my $xs_fh = %ARGS{?XS_FH};
-    if (!$xs_fh) {
-        open $xs_fh, ">", "%ARGS{?XS_FILE}" or die "Can't open %ARGS{?XS_FILE}: $^OS_ERROR";
-    }
+    my $xs_fh = %ARGS{?XS_FH}
+    if (!$xs_fh)
+        open $xs_fh, ">", "%ARGS{?XS_FILE}" or die "Can't open %ARGS{?XS_FILE}: $^OS_ERROR"
+    
 
     # As this subroutine is intended to make code that isn't edited, there's no
     # need for the user to specify any types that aren't found in the list of
     # names.
 
-    if (%ARGS{?PROXYSUBS}) {
-        require ExtUtils::Constant::ProxySubs;
-        %ARGS{+C_FH} = $c_fh;
-        %ARGS{+XS_FH} = $xs_fh;
-        ExtUtils::Constant::ProxySubs->WriteConstants(< %ARGS);
-    } else {
-        die "Ony ProxySubs are supported";
-    }
+    if (%ARGS{?PROXYSUBS})
+        require ExtUtils::Constant::ProxySubs
+        %ARGS{+C_FH} = $c_fh
+        %ARGS{+XS_FH} = $xs_fh
+        ExtUtils::Constant::ProxySubs->WriteConstants(< %ARGS)
+    else
+        die "Ony ProxySubs are supported"
+    
 
-    close $c_fh or warn "Error closing %ARGS{?C_FILE}: $^OS_ERROR" unless %ARGS{?C_FH};
-    close $xs_fh or warn "Error closing %ARGS{?XS_FILE}: $^OS_ERROR" unless %ARGS{?XS_FH};
-}
+    close $c_fh or warn "Error closing %ARGS{?C_FILE}: $^OS_ERROR" unless %ARGS{?C_FH}
+    close $xs_fh or warn "Error closing %ARGS{?XS_FILE}: $^OS_ERROR" unless %ARGS{?XS_FH}
 
-1;
+
+1
 __END__
 
 =back

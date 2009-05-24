@@ -4,51 +4,50 @@
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
-package Scalar::Util;
+package Scalar::Util
 
-our (@ISA, @EXPORT_OK, $VERSION);
-require Exporter;
-require List::Util; # List::Util loads the XS
+our (@ISA, @EXPORT_OK, $VERSION)
+require Exporter
+require List::Util # List::Util loads the XS
 
-@ISA       = qw(Exporter);
-@EXPORT_OK = qw(blessed dualvar reftype weaken isweak tainted readonly openhandle refaddr isvstring looks_like_number);
-$VERSION    = "1.19";
-$VERSION   = eval $VERSION;
+@ISA       = qw(Exporter)
+@EXPORT_OK = qw(blessed dualvar reftype weaken isweak tainted readonly openhandle refaddr isvstring looks_like_number)
+$VERSION    = "1.19"
+$VERSION   = eval $VERSION
 
-sub export_fail {
-    if (grep { m/^(weaken|isweak)$/ }, @_ ) {
-        require Carp;
-        Carp::croak("Weak references are not implemented in the version of perl");
-    }
-    if (grep { m/^(isvstring)$/ }, @_ ) {
-        require Carp;
-        Carp::croak("Vstrings are not implemented in the version of perl");
-    }
-    if (grep { m/^(dualvar)$/ }, @_ ) {
-        require Carp;
-        Carp::croak("$1 is only avaliable with the XS version");
-    }
+sub export_fail
+    if (grep { m/^(weaken|isweak)$/ }, @_ )
+        require Carp
+        Carp::croak("Weak references are not implemented in the version of perl")
+    
+    if (grep { m/^(isvstring)$/ }, @_ )
+        require Carp
+        Carp::croak("Vstrings are not implemented in the version of perl")
+    
+    if (grep { m/^(dualvar)$/ }, @_ )
+        require Carp
+        Carp::croak("$1 is only avaliable with the XS version")
+    
 
-    < @_;
-}
+    < @_
 
-sub openhandle($fh) {
-    my $rt = reftype($fh) || '';
+
+sub openhandle($fh)
+    my $rt = reftype($fh) || ''
 
     return defined(fileno($fh)) ?? $fh !! undef
-        if $rt eq 'IO';
+        if $rt eq 'IO'
 
-    if (reftype(\$fh) eq 'GLOB') { # handle  openhandle(*DATA)
-        $fh = \(my $tmp=$fh);
-    }
-    elsif ($rt ne 'GLOB') {
-        return undef;
-    }
+    if (reftype(\$fh) eq 'GLOB') # handle  openhandle(*DATA)
+        $fh = \(my $tmp=$fh)
+    elsif ($rt ne 'GLOB')
+        return undef
+    
 
-    defined(fileno($fh)) ?? $fh !! undef;
-}
+    defined(fileno($fh)) ?? $fh !! undef
 
-eval <<'ESQ' unless defined &dualvar;
+
+eval <<'ESQ' unless defined &dualvar
 
 our @EXPORT_FAIL;
 push @EXPORT_FAIL, qw(weaken isweak dualvar isvstring);
@@ -139,7 +138,7 @@ sub looks_like_number {
 
 ESQ
 
-1;
+1
 
 __END__
 

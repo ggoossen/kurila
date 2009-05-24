@@ -1,25 +1,25 @@
 #!perl
 
-BEGIN {
-    if (env::var('PERL_CORE')){
-        push $^INCLUDE_PATH, '../ext/B/t';
-    } else {
-        unshift $^INCLUDE_PATH, 't';
-        push $^INCLUDE_PATH, "../../t";
-    }
-    require Config;
-    if (!Config::config_value("useperlio")) {
-        print $^STDOUT, "1..0 # Skip -- need perlio to walk the optree\n";
-        exit 0;
-    }
+BEGIN 
+    if (env::var('PERL_CORE'))
+        push $^INCLUDE_PATH, '../ext/B/t'
+    else
+        unshift $^INCLUDE_PATH, 't'
+        push $^INCLUDE_PATH, "../../t"
+    
+    require Config
+    if (!Config::config_value("useperlio"))
+        print $^STDOUT, "1..0 # Skip -- need perlio to walk the optree\n"
+        exit 0
+    
 # require q(test.pl); # now done by OptreeCheck
-}
 
-print $^STDOUT, "1..0 # Skip -- TODO for kurila\n";
-exit 0;
+
+print $^STDOUT, "1..0 # Skip -- TODO for kurila\n"
+exit 0
 
 use OptreeCheck;
-plan tests => 7;
+plan tests => 7
 
 
 =head1 f_map.t
@@ -49,9 +49,9 @@ mkCheckRex(), therefore the skip is removed too.
 =cut
 
 checkOptree(note   => q{},
-    bcopts => q{-exec},
-    code   => q{@chars = map(chr, @nums); },
-    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
+            bcopts => q{-exec},
+            code   => q{@chars = map(chr, @nums); },
+            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
 # 1  <;> nextstate(main 475 (eval 10):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -93,9 +93,9 @@ EONT_EONT
 =cut
 
 checkOptree(note   => q{},
-    bcopts => q{-exec},
-    code   => q{%hash = map { getkey($_) => $_ } @array; },
-    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
+            bcopts => q{-exec},
+            code   => q{%hash = map { getkey($_) => $_ } @array; },
+            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
 # 1  <;> nextstate(main 476 (eval 10):1) v:{
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -158,9 +158,9 @@ EONT_EONT
 =cut
 
 checkOptree(note   => q{},
-    bcopts => q{-exec},
-    code   => q{{ %hash = (); foreach $_ (@array) { %hash{getkey($_)} = $_; } } },
-    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
+            bcopts => q{-exec},
+            code   => q{{ %hash = (); foreach $_ (@array) { %hash{getkey($_)} = $_; } } },
+            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
 # 1  <;> nextstate(main 478 (eval 10):1) v:{
 # 2  <{> enterloop(next->u last->u redo->3) 
 # 3  <;> nextstate(main 475 (eval 10):1) v
@@ -237,9 +237,9 @@ EONT_EONT
 =cut
 
 checkOptree(note   => q{},
-    bcopts => q{-exec},
-    code   => q{%hash = map { lc($_), 1 } @array; },
-    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
+            bcopts => q{-exec},
+            code   => q{%hash = map { lc($_), 1 } @array; },
+            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
 # 1  <;> nextstate(main 476 (eval 10):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -289,9 +289,9 @@ EONT_EONT
 =cut
 
 checkOptree(note   => q{},
-    bcopts => q{-exec},
-    code   => q{%hash = map +( lc($_), 1 ), @array; },
-    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
+            bcopts => q{-exec},
+            code   => q{%hash = map +( lc($_), 1 ), @array; },
+            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
 # 1  <;> nextstate(main 475 (eval 10):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -339,9 +339,9 @@ EONT_EONT
 =cut
 
 checkOptree(note   => q{},
-    bcopts => q{-exec},
-    code   => q{%hash = map ( lc($_), 1 ), @array; },
-    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
+            bcopts => q{-exec},
+            code   => q{%hash = map ( lc($_), 1 ), @array; },
+            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
 # 1  <;> nextstate(main 475 (eval 10):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s
@@ -389,9 +389,9 @@ EONT_EONT
 =cut
 
 checkOptree(note   => q{},
-    bcopts => q{-exec},
-    code   => q{@hashes = map \%( lc($_), 1 ), @array },
-    expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT');
+            bcopts => q{-exec},
+            code   => q{@hashes = map \%( lc($_), 1 ), @array },
+            expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT')
 # 1  <;> nextstate(main 475 (eval 10):1) v
 # 2  <0> pushmark s
 # 3  <0> pushmark s

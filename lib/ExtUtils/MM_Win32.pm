@@ -1,4 +1,4 @@
-package ExtUtils::MM_Win32;
+package ExtUtils::MM_Win32
 
 
 
@@ -16,22 +16,22 @@ See ExtUtils::MM_Unix for a documentation of the methods provided
 there. This package overrides the implementation of these methods, not
 the semantics.
 
-=cut 
+=cut
 
-use ExtUtils::MakeMaker::Config;
-use File::Basename;
-use File::Spec;
-use ExtUtils::MakeMaker < qw( neatvalue );
+use ExtUtils::MakeMaker::Config
+use File::Basename
+use File::Spec
+use ExtUtils::MakeMaker < qw( neatvalue )
 
-require ExtUtils::MM_Any;
-require ExtUtils::MM_Unix;
-our @ISA = qw( ExtUtils::MM_Unix );
-our $VERSION = '6.44';
+require ExtUtils::MM_Any
+require ExtUtils::MM_Unix
+our @ISA = qw( ExtUtils::MM_Unix )
+our $VERSION = '6.44'
 
-env::var('EMXSHELL' ) = 'sh'; # to run `commands`
+env::var('EMXSHELL' ) = 'sh' # to run `commands`
 
-my $BORLAND = %Config{?'cc'} =~ m/^bcc/i ?? 1 !! 0;
-my $GCC     = %Config{?'cc'} =~ m/^gcc/i ?? 1 !! 0;
+my $BORLAND = %Config{?'cc'} =~ m/^bcc/i ?? 1 !! 0
+my $GCC     = %Config{?'cc'} =~ m/^gcc/i ?? 1 !! 0
 
 
 =head2 Overridden methods
@@ -42,15 +42,15 @@ my $GCC     = %Config{?'cc'} =~ m/^gcc/i ?? 1 !! 0;
 
 =cut
 
-sub dlsyms($self,%< %attribs) {
+sub dlsyms($self,%< %attribs)
 
-    my@($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \%();
-    my@($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \@();
-    my@($funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \@();
-    my@($imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \%();
-    my(@m);
+    my@($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \%()
+    my@($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \@()
+    my@($funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \@()
+    my@($imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \%()
+    my(@m)
 
-    if (not $self->{SKIPHASH}->{?'dynamic'}) {
+    if (not $self->{SKIPHASH}->{?'dynamic'})
         push(@m,"
 $self->{?BASEEXT}.def: Makefile.PL
 ",
@@ -65,10 +65,10 @@ $self->{?BASEEXT}.def: Makefile.PL
             q!, 'FUNCLIST' => !, <neatvalue($funclist),
             q!, 'IMPORTS' => !, <neatvalue($imports),
             q!, 'DL_VARS' => !, < neatvalue($vars), q!);"
-!);
-    }
-    join('', @m);
-}
+!)
+    
+    join('', @m)
+
 
 =item replace_manpage_separator
 
@@ -76,10 +76,10 @@ Changes the path separator with .
 
 =cut
 
-sub replace_manpage_separator($self,$man) {
-    $man =~ s,/+,.,g;
-    $man;
-}
+sub replace_manpage_separator($self,$man)
+    $man =~ s,/+,.,g
+    $man
+
 
 
 =item B<maybe_command>
@@ -93,24 +93,23 @@ used by default.
 
 =cut
 
-sub maybe_command($self,$file) {
+sub maybe_command($self,$file)
     my @e = defined(env::var('PATHEXT'))
         ?? split(m/;/, env::var('PATHEXT'))
-        !! qw(.com .exe .bat .cmd);
-    my $e = '';
+        !! qw(.com .exe .bat .cmd)
+    my $e = ''
     for ( @e) { $e .= "\Q$_\E|" }
-    chop $e;
+    chop $e
     # see if file ends in one of the known extensions
-    if ($file =~ m/($e)$/i) {
-        return $file if -e $file;
-    }
-    else {
-        for ( @e) {
-            return "$file$_" if -e "$file$_";
-        }
-    }
-    return;
-}
+    if ($file =~ m/($e)$/i)
+        return $file if -e $file
+    else
+        for ( @e)
+            return "$file$_" if -e "$file$_"
+        
+    
+    return
+
 
 
 =item B<init_DIRFILESEP>
@@ -119,16 +118,16 @@ Using \ for Windows.
 
 =cut
 
-sub init_DIRFILESEP {
-    my@($self) =@( shift);
+sub init_DIRFILESEP
+    my@($self) =@( shift)
 
-    my $make = $self->make;
+    my $make = $self->make
 
     # The ^ makes sure its not interpreted as an escape in nmake
     $self->{+DIRFILESEP} = $make eq 'nmake' ?? '^\' !!
-    $make eq 'dmake' ?? '\\'
-        !! '\';
-}
+        $make eq 'dmake' ?? '\\'
+        !! '\'
+
 
 =item B<init_others>
 
@@ -144,50 +143,50 @@ Adjustments are made for Borland's quirks needing -L to come first.
 
 =cut
 
-sub init_others($self) {
+sub init_others($self)
 
     # Used in favor of echo because echo won't strip quotes. :(
-    $self->{+ECHO}     ||= $self->oneliner('print qq{@ARGV}', \@('-l'));
-    $self->{+ECHO_N}   ||= $self->oneliner('print qq{@ARGV}');
+    $self->{+ECHO}     ||= $self->oneliner('print qq{@ARGV}', \@('-l'))
+    $self->{+ECHO_N}   ||= $self->oneliner('print qq{@ARGV}')
 
-    $self->{+TOUCH}    ||= '$(ABSPERLRUN) -MExtUtils::Command -e touch';
-    $self->{+CHMOD}    ||= '$(ABSPERLRUN) -MExtUtils::Command -e chmod'; 
-    $self->{+CP}       ||= '$(ABSPERLRUN) -MExtUtils::Command -e cp';
-    $self->{+RM_F}     ||= '$(ABSPERLRUN) -MExtUtils::Command -e rm_f';
-    $self->{+RM_RF}    ||= '$(ABSPERLRUN) -MExtUtils::Command -e rm_rf';
-    $self->{+MV}       ||= '$(ABSPERLRUN) -MExtUtils::Command -e mv';
-    $self->{+NOOP}     ||= 'rem';
-    $self->{+TEST_F}   ||= '$(ABSPERLRUN) -MExtUtils::Command -e test_f';
-    $self->{+DEV_NULL} ||= '> NUL';
+    $self->{+TOUCH}    ||= '$(ABSPERLRUN) -MExtUtils::Command -e touch'
+    $self->{+CHMOD}    ||= '$(ABSPERLRUN) -MExtUtils::Command -e chmod'
+    $self->{+CP}       ||= '$(ABSPERLRUN) -MExtUtils::Command -e cp'
+    $self->{+RM_F}     ||= '$(ABSPERLRUN) -MExtUtils::Command -e rm_f'
+    $self->{+RM_RF}    ||= '$(ABSPERLRUN) -MExtUtils::Command -e rm_rf'
+    $self->{+MV}       ||= '$(ABSPERLRUN) -MExtUtils::Command -e mv'
+    $self->{+NOOP}     ||= 'rem'
+    $self->{+TEST_F}   ||= '$(ABSPERLRUN) -MExtUtils::Command -e test_f'
+    $self->{+DEV_NULL} ||= '> NUL'
 
-    $self->{+FIXIN}    ||= $self->{?PERL_CORE} ?? 
-    "\$(PERLRUN) $self->{?PERL_SRC}/win32/bin/pl2bat.pl" !! 
-        'pl2bat.bat';
+    $self->{+FIXIN}    ||= $self->{?PERL_CORE} ??
+        "\$(PERLRUN) $self->{?PERL_SRC}/win32/bin/pl2bat.pl" !!
+        'pl2bat.bat'
 
-    $self->{+LD}     ||= %Config{?ld} || 'link';
-    $self->{+AR}     ||= %Config{?ar} || 'lib';
+    $self->{+LD}     ||= %Config{?ld} || 'link'
+    $self->{+AR}     ||= %Config{?ar} || 'lib'
 
-    $self->SUPER::init_others;
+    $self->SUPER::init_others
 
     # Setting SHELL from $Config{sh} can break dmake.  Its ok without it.
-    delete $self->{SHELL};
+    delete $self->{SHELL}
 
-    $self->{+LDLOADLIBS} ||= %Config{?libs};
+    $self->{+LDLOADLIBS} ||= %Config{?libs}
     # -Lfoo must come first for Borland, so we put it in LDDLFLAGS
-    if ($BORLAND) {
-        my $libs = $self->{?LDLOADLIBS};
-        my $libpath = '';
-        while ($libs =~ s/(?:^|\s)(("?)-L.+?\2)(?:\s|$)/ /) {
-            $libpath .= ' ' if length $libpath;
-            $libpath .= $1;
-        }
-        $self->{+LDLOADLIBS} = $libs;
-        $self->{+LDDLFLAGS} ||= %Config{?lddlflags};
-        $self->{+LDDLFLAGS} .= " $libpath";
-    }
+    if ($BORLAND)
+        my $libs = $self->{?LDLOADLIBS}
+        my $libpath = ''
+        while ($libs =~ s/(?:^|\s)(("?)-L.+?\2)(?:\s|$)/ /)
+            $libpath .= ' ' if length $libpath
+            $libpath .= $1
+        
+        $self->{+LDLOADLIBS} = $libs
+        $self->{+LDDLFLAGS} ||= %Config{?lddlflags}
+        $self->{+LDDLFLAGS} .= " $libpath"
+    
 
-    return 1;
-}
+    return 1
+
 
 
 =item init_platform
@@ -198,24 +197,23 @@ Add MM_Win32_VERSION.
 
 =cut
 
-sub init_platform {
-    my@($self) =@( shift);
+sub init_platform
+    my@($self) =@( shift)
 
-    $self->{+MM_Win32_VERSION} = $VERSION;
-}
+    $self->{+MM_Win32_VERSION} = $VERSION
 
-sub platform_constants {
-    my@($self) =@( shift);
-    my $make_frag = '';
+
+sub platform_constants
+    my@($self) =@( shift)
+    my $make_frag = ''
 
     foreach my $macro (qw(MM_Win32_VERSION))
-    {
-        next unless defined $self->{?$macro};
-        $make_frag .= "$macro = $self->{?$macro}\n";
-    }
+        next unless defined $self->{?$macro}
+        $make_frag .= "$macro = $self->{?$macro}\n"
+    
 
-    return $make_frag;
-}
+    return $make_frag
+
 
 
 =item special_targets
@@ -224,16 +222,16 @@ Add .USESHELL target for dmake.
 
 =cut
 
-sub special_targets($self) {
+sub special_targets($self)
 
-    my $make_frag = $self->SUPER::special_targets;
+    my $make_frag = $self->SUPER::special_targets
 
-    $make_frag .= <<'MAKE_FRAG' if $self->make eq 'dmake';
+    $make_frag .= <<'MAKE_FRAG' if $self->make eq 'dmake'
 .USESHELL :
 MAKE_FRAG
 
-    return $make_frag;
-}
+    return $make_frag
+
 
 
 =item static_lib
@@ -245,36 +243,36 @@ to its own method.
 
 =cut
 
-sub static_lib($self) {
-    return '' unless $self->has_link_code;
+sub static_lib($self)
+    return '' unless $self->has_link_code
 
-    my(@m);
-    push(@m, <<'END');
+    my(@m)
+    push(@m, <<'END')
 $(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists
 	$(RM_RF) $@
 END
 
     # If this extension has its own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
-    push @m, <<'MAKE_FRAG' if $self->{?MYEXTLIB};
+    push @m, <<'MAKE_FRAG' if $self->{?MYEXTLIB}
 	$(CP) $(MYEXTLIB) $@
 MAKE_FRAG
 
     push @m,
         q{	$(AR) }.($BORLAND ?? '$@ $(OBJECT:^"+")'
-            !! ($GCC ?? '-ru $@ $(OBJECT)'
-         !! '-out:$@ $(OBJECT)')).q{
+                    !! ($GCC ?? '-ru $@ $(OBJECT)'
+                !! '-out:$@ $(OBJECT)')).q{
 	$(CHMOD) $(PERM_RWX) $@
 	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)\extralibs.ld
-};
+}
 
     # Old mechanism - still available:
-    push @m, <<'MAKE_FRAG' if $self->{?PERL_SRC} && $self->{?EXTRALIBS};
+    push @m, <<'MAKE_FRAG' if $self->{?PERL_SRC} && $self->{?EXTRALIBS}
 	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)\ext.libs
 MAKE_FRAG
 
-    join('', @m);
-}
+    join('', @m)
+
 
 
 =item dynamic_lib
@@ -283,26 +281,26 @@ Complicated stuff for Win32 that I don't understand. :(
 
 =cut
 
-sub dynamic_lib($self, %< %attribs) {
-    return '' unless $self->needs_linking(); #might be because of a subdir
+sub dynamic_lib($self, %< %attribs)
+    return '' unless $self->needs_linking() #might be because of a subdir
 
-    return '' unless $self->has_link_code;
+    return '' unless $self->has_link_code
 
-    my@($otherldflags) = %attribs{?OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '');
-    my@($inst_dynamic_dep) = %attribs{?INST_DYNAMIC_DEP} || "";
-    my@($ldfrom) = '$(LDFROM)';
-    my(@m);
+    my@($otherldflags) = %attribs{?OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '')
+    my@($inst_dynamic_dep) = %attribs{?INST_DYNAMIC_DEP} || ""
+    my@($ldfrom) = '$(LDFROM)'
+    my(@m)
 
     # one thing for GCC/Mingw32:
     # we try to overcome non-relocateable-DLL problems by generating
     #    a (hopefully unique) image-base from the dll's name
     # -- BKS, 10-19-1999
-    if ($GCC) { 
-        my $dllname = $self->{?BASEEXT} . "." . $self->{?DLEXT};
-        $dllname =~ m/(....)(.{0,4})/;
-        my $baseaddr = unpack("n", $1 ^^^ $2);
-        $otherldflags .= sprintf("-Wl,--image-base,0x\%x0000 ", $baseaddr);
-    }
+    if ($GCC)
+        my $dllname = $self->{?BASEEXT} . "." . $self->{?DLEXT}
+        $dllname =~ m/(....)(.{0,4})/
+        my $baseaddr = unpack("n", $1 ^^^ $2)
+        $otherldflags .= sprintf("-Wl,--image-base,0x\%x0000 ", $baseaddr)
+    
 
     push(@m,'
 # This section creates the dynamically loadable $(INST_DYNAMIC)
@@ -311,41 +309,40 @@ OTHERLDFLAGS = '.$otherldflags.'
 INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
 
 $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
-');
-    if ($GCC) {
-        push(@m,  
+')
+    if ($GCC)
+        push(@m,
             q{	dlltool --def $(EXPORT_LIST) --output-exp dll.exp
 	$(LD) -o $@ -Wl,--base-file -Wl,dll.base $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) $(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) dll.exp
 	dlltool --def $(EXPORT_LIST) --base-file dll.base --output-exp dll.exp
-	$(LD) -o $@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) $(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) dll.exp });
-    } elsif ($BORLAND) {
+	$(LD) -o $@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) $(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) dll.exp })
+    elsif ($BORLAND)
         push(@m,
             q{	$(LD) $(LDDLFLAGS) $(OTHERLDFLAGS) }.$ldfrom.q{,$@,,}
-            .($self->make eq 'dmake' 
-         ?? q{$(PERL_ARCHIVE:s,/,\,) $(LDLOADLIBS:s,/,\,) }
-         .q{$(MYEXTLIB:s,/,\,),$(EXPORT_LIST:s,/,\,)}
-         !! q{$(subst /,\,$(PERL_ARCHIVE)) $(subst /,\,$(LDLOADLIBS)) }
-         .q{$(subst /,\,$(MYEXTLIB)),$(subst /,\,$(EXPORT_LIST))})
-            .q{,$(RESFILES)});
-    } else {	# VC
+            .($self->make eq 'dmake'
+              ?? q{$(PERL_ARCHIVE:s,/,\,) $(LDLOADLIBS:s,/,\,) }
+              .q{$(MYEXTLIB:s,/,\,),$(EXPORT_LIST:s,/,\,)}
+              !! q{$(subst /,\,$(PERL_ARCHIVE)) $(subst /,\,$(LDLOADLIBS)) }
+              .q{$(subst /,\,$(MYEXTLIB)),$(subst /,\,$(EXPORT_LIST))})
+            .q{,$(RESFILES)})
+    else	# VC
         push(@m,
             q{	$(LD) -out:$@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) }
-            .q{$(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) -def:$(EXPORT_LIST)});
+            .q{$(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) -def:$(EXPORT_LIST)})
 
         # VS2005 (aka VC 8) or higher, but not for 64-bit compiler from Platform SDK
-        if (%Config{?ivsize} == 4 && %Config{?cc} eq 'cl' and %Config{?ccversion} =~ m/^(\d+)/ and $1 +>= 14) 
-        {
+        if (%Config{?ivsize} == 4 && %Config{?cc} eq 'cl' and %Config{?ccversion} =~ m/^(\d+)/ and $1 +>= 14)
             push(@m,
                 q{
-	mt -nologo -manifest $@.manifest -outputresource:$@;2 && del $@.manifest});
-        }
-    }
+	mt -nologo -manifest $@.manifest -outputresource:$@;2 && del $@.manifest})
+        
+    
     push @m, '
 	$(CHMOD) $(PERM_RWX) $@
-';
+'
 
-    join('', @m);
-}
+    join('', @m)
+
 
 =item extra_clean_files
 
@@ -354,23 +351,23 @@ gcc.  Otherwise, take out all *.pdb files.
 
 =cut
 
-sub extra_clean_files {
-    my $self = shift;
+sub extra_clean_files
+    my $self = shift
 
-    return $GCC ??  @(qw(dll.base dll.exp)) !!  @('*.pdb');
-}
+    return $GCC ??  @(qw(dll.base dll.exp)) !!  @('*.pdb')
+
 
 =item init_linker
 
 =cut
 
-sub init_linker {
-    my $self = shift;
+sub init_linker
+    my $self = shift
 
-    $self->{+PERL_ARCHIVE}       = "\$(PERL_INC)\\%Config{?libperl}";
-    $self->{+PERL_ARCHIVE_AFTER} = '';
-    $self->{+EXPORT_LIST}        = '$(BASEEXT).def';
-}
+    $self->{+PERL_ARCHIVE}       = "\$(PERL_INC)\\%Config{?libperl}"
+    $self->{+PERL_ARCHIVE_AFTER} = ''
+    $self->{+EXPORT_LIST}        = '$(BASEEXT).def'
+
 
 
 =item perl_script
@@ -379,13 +376,13 @@ Checks for the perl program under several common perl extensions.
 
 =cut
 
-sub perl_script($self,$file) {
-    return $file if -r $file && -f _;
-    return "$file.pl"  if -r "$file.pl" && -f _;
-    return "$file.plx" if -r "$file.plx" && -f _;
-    return "$file.bat" if -r "$file.bat" && -f _;
-    return;
-}
+sub perl_script($self,$file)
+    return $file if -r $file && -f _
+    return "$file.pl"  if -r "$file.pl" && -f _
+    return "$file.plx" if -r "$file.plx" && -f _
+    return "$file.bat" if -r "$file.bat" && -f _
+    return
+
 
 
 =item xs_o
@@ -394,9 +391,9 @@ This target is stubbed out.  Not sure why.
 
 =cut
 
-sub xs_o {
+sub xs_o
     return ''
-}
+
 
 
 =item pasthru
@@ -406,10 +403,10 @@ banner.
 
 =cut
 
-sub pasthru {
-    my@($self) =@( shift);
-    return "PASTHRU = " . ($self->make eq 'nmake' ?? "-nologo" !! "");
-}
+sub pasthru
+    my@($self) =@( shift)
+    return "PASTHRU = " . ($self->make eq 'nmake' ?? "-nologo" !! "")
+
 
 
 =item oneliner
@@ -419,48 +416,48 @@ for other Windows shells, I don't know.
 
 =cut
 
-sub oneliner($self, $cmd, $switches) {
-    $switches = \@() unless defined $switches;
+sub oneliner($self, $cmd, $switches)
+    $switches = \@() unless defined $switches
 
     # Strip leading and trailing newlines
-    $cmd =~ s{^\n+}{};
-    $cmd =~ s{\n+$}{};
+    $cmd =~ s{^\n+}{}
+    $cmd =~ s{\n+$}{}
 
-    $cmd = $self->quote_literal($cmd);
-    $cmd = $self->escape_newlines($cmd);
+    $cmd = $self->quote_literal($cmd)
+    $cmd = $self->escape_newlines($cmd)
 
-    $switches = join ' ', $switches->@;
+    $switches = join ' ', $switches->@
 
-    return qq{\$(ABSPERLRUN) $switches -e $cmd --};
-}
+    return qq{\$(ABSPERLRUN) $switches -e $cmd --}
 
 
-sub quote_literal($self, $text) {
+
+sub quote_literal($self, $text)
 
     # I don't know if this is correct, but it seems to work on
     # Win98's command.com
-    $text =~ s{"}{\\"}g;
+    $text =~ s{"}{\\"}g
 
     # dmake eats '{' inside double quotes and leaves alone { outside double
     # quotes; however it transforms {{ into { either inside and outside double
     # quotes.  It also translates }} into }.  The escaping below is not
     # 100% correct.
-    if( $self->make eq 'dmake' ) {
-        $text =~ s/{/\{\{/g;
-        $text =~ s/}}/\}\}\}/g;
-    }
+    if( $self->make eq 'dmake' )
+        $text =~ s/{/\{\{/g
+        $text =~ s/}}/\}\}\}/g
+    
 
-    return qq{"$text"};
-}
+    return qq{"$text"}
 
 
-sub escape_newlines($self, $text) {
+
+sub escape_newlines($self, $text)
 
     # Escape newlines
-    $text =~ s{\n}{\\\n}g;
+    $text =~ s{\n}{\\\n}g
 
-    return $text;
-}
+    return $text
+
 
 
 =item cd
@@ -477,25 +474,25 @@ NOTE: This only works with simple relative directories.  Throw it an absolute di
 
 =cut
 
-sub cd($self, $dir, @< @cmds) {
+sub cd($self, $dir, @< @cmds)
 
-    return $self->SUPER::cd($dir, < @cmds) unless $self->make eq 'nmake';
+    return $self->SUPER::cd($dir, < @cmds) unless $self->make eq 'nmake'
 
-    my $cmd = join "\n\t", map { "$_" }, @cmds;
+    my $cmd = join "\n\t", map { "$_" }, @cmds
 
-    my $updirs = $self->catdir(< map { $self->updir }, $self->splitdir($dir));
+    my $updirs = $self->catdir(< map { $self->updir }, $self->splitdir($dir))
 
     # No leading tab and no trailing newline makes for easier embedding.
-    my $make_frag = sprintf <<'MAKE_FRAG', $dir, $cmd, $updirs;
+    my $make_frag = sprintf <<'MAKE_FRAG', $dir, $cmd, $updirs
 cd %s
 	%s
 	cd %s
 MAKE_FRAG
 
-    chomp $make_frag;
+    chomp $make_frag
 
-    return $make_frag;
-}
+    return $make_frag
+
 
 
 =item max_exec_len
@@ -504,11 +501,11 @@ nmake 1.50 limits command length to 2048 characters.
 
 =cut
 
-sub max_exec_len {
-    my $self = shift;
+sub max_exec_len
+    my $self = shift
 
-    return ($self->{+_MAX_EXEC_LEN} ||= 2 * 1024);
-}
+    return ($self->{+_MAX_EXEC_LEN} ||= 2 * 1024)
+
 
 
 =item os_flavor
@@ -517,9 +514,9 @@ Windows is Win32.
 
 =cut
 
-sub os_flavor {
-    return @('Win32');
-}
+sub os_flavor
+    return @('Win32')
+
 
 
 =item cflags
@@ -530,25 +527,25 @@ defined.
 
 =cut
 
-sub cflags($self,$libperl) {
-    return $self->{?CFLAGS} if $self->{?CFLAGS};
-    return '' unless $self->needs_linking();
+sub cflags($self,$libperl)
+    return $self->{?CFLAGS} if $self->{?CFLAGS}
+    return '' unless $self->needs_linking()
 
-    my $base = $self->SUPER::cflags($libperl);
-    foreach (split m/\n/, $base) {
-        m/^(\S*)\s*=\s*(\S*)$/ and $self->{+$1} = $2;
-    };
-    $self->{+CCFLAGS} .= " -DPERLDLL" if ($self->{?LINKTYPE} eq 'static');
+    my $base = $self->SUPER::cflags($libperl)
+    foreach (split m/\n/, $base)
+        m/^(\S*)\s*=\s*(\S*)$/ and $self->{+$1} = $2
+    ;
+    $self->{+CCFLAGS} .= " -DPERLDLL" if ($self->{?LINKTYPE} eq 'static')
 
     return ($self->{+CFLAGS} = qq{
 CCFLAGS = $self->{?CCFLAGS}
 OPTIMIZE = $self->{?OPTIMIZE}
 PERLTYPE = $self->{?PERLTYPE}
-});
+})
 
-}
 
-1;
+
+1
 __END__
 
 =back

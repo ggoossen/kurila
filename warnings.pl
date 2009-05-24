@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-our $VERSION = '1.02_02';
+our $VERSION = '1.02_02'
 
-BEGIN {
-    require 'regen_lib.pl';
-    push $^INCLUDE_PATH, './lib';
-}
+BEGIN 
+    require 'regen_lib.pl'
+    push $^INCLUDE_PATH, './lib'
+
 use kurila;
 
 
@@ -14,228 +14,219 @@ sub DEFAULT_OFF () { 2 }
 
 my $tree = \%(
 
-        'all' => \@( 5.008, \%(
-                'io'		=> \@( 5.008, \%( 	
-                        'pipe' 		=> \@( 5.008, DEFAULT_OFF),
-                            'unopened'	=> \@( 5.008, DEFAULT_OFF),
-                            'closed'	=> \@( 5.008, DEFAULT_OFF),
-                            'newline'	=> \@( 5.008, DEFAULT_OFF),
-                            'exec'		=> \@( 5.008, DEFAULT_OFF),
-                            'layer'		=> \@( 5.008, DEFAULT_OFF),
-                    )),
-                    'syntax'	=> \@( 5.008, \%( 	
-                        'ambiguous'	=> \@( 5.008, DEFAULT_OFF),
-                            'semicolon'	=> \@( 5.008, DEFAULT_OFF),
-                            'precedence'	=> \@( 5.008, DEFAULT_OFF),
-                            'bareword'	=> \@( 5.008, DEFAULT_OFF),
-                            'reserved'	=> \@( 5.008, DEFAULT_OFF),
-                            'digit'		=> \@( 5.008, DEFAULT_OFF),
-                            'parenthesis'	=> \@( 5.008, DEFAULT_OFF),
-                            'printf'	=> \@( 5.008, DEFAULT_OFF),
-                            'prototype'	=> \@( 5.008, DEFAULT_OFF),
-                            'qw'		=> \@( 5.008, DEFAULT_OFF),
-                    )),
-                    'severe'	=> \@( 5.008, \%( 	
-                        'inplace'	=> \@( 5.008, DEFAULT_ON),
-                            'internal'	=> \@( 5.008, DEFAULT_ON),
-                            'debugging'	=> \@( 5.008, DEFAULT_ON),
-                            'malloc'	=> \@( 5.008, DEFAULT_ON),
-                    )),
-                    'deprecated'	=> \@( 5.008, DEFAULT_OFF),
-                    'void'		=> \@( 5.008, DEFAULT_OFF),
-                    'recursion'	=> \@( 5.008, DEFAULT_OFF),
-                    'redefine'	=> \@( 5.008, DEFAULT_OFF),
-                    'numeric'	=> \@( 5.008, DEFAULT_OFF),
-                    'uninitialized'	=> \@( 5.008, DEFAULT_OFF),
-                    'once'		=> \@( 5.008, DEFAULT_OFF),
-                    'misc'		=> \@( 5.008, DEFAULT_OFF),
-                    'regexp'	=> \@( 5.008, DEFAULT_OFF),
-                    'glob'		=> \@( 5.008, DEFAULT_OFF),
-                    'untie'		=> \@( 5.008, DEFAULT_OFF),
-                    'substr'	=> \@( 5.008, DEFAULT_OFF),
-                    'taint'		=> \@( 5.008, DEFAULT_OFF),
-                    'signal'	=> \@( 5.008, DEFAULT_OFF),
-                    'closure'	=> \@( 5.008, DEFAULT_OFF),
-                    'overflow'	=> \@( 5.008, DEFAULT_OFF),
-                    'portable'	=> \@( 5.008, DEFAULT_OFF),
-                    'utf8'		=> \@( 5.008, DEFAULT_OFF),
-                    'exiting'	=> \@( 5.008, DEFAULT_OFF),
-                    'pack'		=> \@( 5.008, DEFAULT_OFF),
-                    'unpack'	=> \@( 5.008, DEFAULT_OFF),
-                    'threads'	=> \@( 5.008, DEFAULT_OFF),
-                    'imprecision'	=> \@( 5.011, DEFAULT_OFF),
+    'all' => \@( 5.008, \%(
+                     'io'		=> \@( 5.008, \%(
+                             'pipe' 		=> \@( 5.008, DEFAULT_OFF),
+                             'unopened'	=> \@( 5.008, DEFAULT_OFF),
+                             'closed'	=> \@( 5.008, DEFAULT_OFF),
+                             'newline'	=> \@( 5.008, DEFAULT_OFF),
+                             'exec'		=> \@( 5.008, DEFAULT_OFF),
+                             'layer'		=> \@( 5.008, DEFAULT_OFF),
+                             )),
+                     'syntax'	=> \@( 5.008, \%(
+                                    'ambiguous'	=> \@( 5.008, DEFAULT_OFF),
+                                    'semicolon'	=> \@( 5.008, DEFAULT_OFF),
+                                    'precedence'	=> \@( 5.008, DEFAULT_OFF),
+                                    'bareword'	=> \@( 5.008, DEFAULT_OFF),
+                                    'reserved'	=> \@( 5.008, DEFAULT_OFF),
+                                    'digit'		=> \@( 5.008, DEFAULT_OFF),
+                                    'parenthesis'	=> \@( 5.008, DEFAULT_OFF),
+                                    'printf'	=> \@( 5.008, DEFAULT_OFF),
+                                    'prototype'	=> \@( 5.008, DEFAULT_OFF),
+                                    'qw'		=> \@( 5.008, DEFAULT_OFF),
+                                    )),
+                     'severe'	=> \@( 5.008, \%(
+                                    'inplace'	=> \@( 5.008, DEFAULT_ON),
+                                    'internal'	=> \@( 5.008, DEFAULT_ON),
+                                    'debugging'	=> \@( 5.008, DEFAULT_ON),
+                                    'malloc'	=> \@( 5.008, DEFAULT_ON),
+                                    )),
+                     'deprecated'	=> \@( 5.008, DEFAULT_OFF),
+                     'void'		=> \@( 5.008, DEFAULT_OFF),
+                     'recursion'	=> \@( 5.008, DEFAULT_OFF),
+                     'redefine'	=> \@( 5.008, DEFAULT_OFF),
+                     'numeric'	=> \@( 5.008, DEFAULT_OFF),
+                     'uninitialized'	=> \@( 5.008, DEFAULT_OFF),
+                     'once'		=> \@( 5.008, DEFAULT_OFF),
+                     'misc'		=> \@( 5.008, DEFAULT_OFF),
+                     'regexp'	=> \@( 5.008, DEFAULT_OFF),
+                     'glob'		=> \@( 5.008, DEFAULT_OFF),
+                     'untie'		=> \@( 5.008, DEFAULT_OFF),
+                     'substr'	=> \@( 5.008, DEFAULT_OFF),
+                     'taint'		=> \@( 5.008, DEFAULT_OFF),
+                     'signal'	=> \@( 5.008, DEFAULT_OFF),
+                     'closure'	=> \@( 5.008, DEFAULT_OFF),
+                     'overflow'	=> \@( 5.008, DEFAULT_OFF),
+                     'portable'	=> \@( 5.008, DEFAULT_OFF),
+                     'utf8'		=> \@( 5.008, DEFAULT_OFF),
+                     'exiting'	=> \@( 5.008, DEFAULT_OFF),
+                     'pack'		=> \@( 5.008, DEFAULT_OFF),
+                     'unpack'	=> \@( 5.008, DEFAULT_OFF),
+                     'threads'	=> \@( 5.008, DEFAULT_OFF),
+                     'imprecision'	=> \@( 5.011, DEFAULT_OFF),
 
-            #'default'	=> [ 5.008, DEFAULT_ON ],
-            )),
-    ) ;
-
-###########################################################################
-sub tab {
-    my@($l, $t) =  @_;
-    $t .= "\t" x ($l - (length($t) + 1) / 8);
-    $t;
-}
+                     #'default'	=> [ 5.008, DEFAULT_ON ],
+                     )),
+    ) 
 
 ###########################################################################
+sub tab
+    my@($l, $t) =  @_
+    $t .= "\t" x ($l - (length($t) + 1) / 8)
+    $t
 
-my %list ;
-my %Value ;
-my %ValueToName ;
-my %NameToValue ;
-my $index ;
 
-my %v_list = %() ;
+###########################################################################
+
+my %list 
+my %Value 
+my %ValueToName 
+my %NameToValue 
+my $index 
+
+my %v_list = %() 
 
 sub valueWalk
-{
-    my $tre = shift ;
-    my @list = @() ;
+    my $tre = shift 
+    my @list = @() 
 
-    foreach my $k (sort keys $tre->%) {
-        my $v = $tre->{?$k};
-        die "duplicate key $k\n" if defined %list{?$k} ;
+    foreach my $k (sort keys $tre->%)
+        my $v = $tre->{?$k}
+        die "duplicate key $k\n" if defined %list{?$k} 
         die "Value associated with key '$k' is not an ARRAY reference"
-            if !ref $v || ref $v ne 'ARRAY' ;
+            if !ref $v || ref $v ne 'ARRAY' 
 
-        my @($ver, $rest) =   $v->@ ;
-        %v_list{+$ver} //= @: ;
-        push %v_list{+$ver}, $k;
+        my @($ver, $rest) =   $v->@ 
+        %v_list{+$ver} //= @: 
+        push %v_list{+$ver}, $k
 
         if (ref $rest)
         { valueWalk ($rest) }
 
-    }
+    
 
-}
+
 
 sub orderValues
-{
-    my $index = 0;
-    foreach my $ver ( sort { $a <+> $b }, keys %v_list ) {
-        foreach my $name ( %v_list{$ver} ) {
-            %ValueToName{+$index } = \@( uc $name, $ver ) ;
-            %NameToValue{+uc $name } = $index ++ ;
-        }
-    }
+    my $index = 0
+    foreach my $ver ( sort { $a <+> $b }, keys %v_list )
+        foreach my $name ( %v_list{$ver} )
+            %ValueToName{+$index } = \@( uc $name, $ver ) 
+            %NameToValue{+uc $name } = $index ++ 
+        
+    
 
-    return $index ;
-}
+    return $index 
+
 
 ###########################################################################
 
 sub walk
-{
-    my $tre = shift ;
-    my @list = @() ;
+    my $tre = shift 
+    my @list = @() 
 
-    foreach my $k (sort keys $tre->%) {
-        my $v = $tre->{?$k};
-        die "duplicate key $k\n" if defined %list{?$k} ;
+    foreach my $k (sort keys $tre->%)
+        my $v = $tre->{?$k}
+        die "duplicate key $k\n" if defined %list{?$k} 
         #$Value{$index} = uc $k ;
         die "Can't find key '$k'"
-            if ! defined %NameToValue{?uc $k} ;
-        push  %list{+$k}->@, %NameToValue{?uc $k} ;
+            if ! defined %NameToValue{?uc $k} 
+        push  %list{+$k}->@, %NameToValue{?uc $k} 
         die "Value associated with key '$k' is not an ARRAY reference"
-            if !ref $v || ref $v ne 'ARRAY' ;
+            if !ref $v || ref $v ne 'ARRAY' 
 
-        my @($ver, $rest) =   $v->@ ;
-        if (ref $rest) {
-            push ( %list{$k}->@, < walk ($rest));
-        }
+        my @($ver, $rest) =   $v->@ 
+        if (ref $rest)
+            push ( %list{$k}->@, < walk ($rest))
+        
 
-        push @list, <  %list{?$k}->@ ;
-    }
+        push @list, <  %list{?$k}->@ 
+    
 
-    return @list ;
-}
+    return @list 
+
 
 ###########################################################################
 
 sub mkRange
-{
-    my @a = shift ;
-    my @out = @a ;
+    my @a = shift 
+    my @out = @a 
 
-    for my $i (1..nelems(@a)-1) {
+    for my $i (1..nelems(@a)-1)
         @out[+$i] = ".."
-            if @a[$i] == @a[$i - 1] + 1 && @a[$i] + 1 == @a[?$i + 1] ;
-    }
+            if @a[$i] == @a[$i - 1] + 1 && @a[$i] + 1 == @a[?$i + 1] 
+    
 
-    my $out = join(",",@out);
+    my $out = join(",",@out)
 
-    $out =~ s/,(\.\.,)+/../g ;
-    return $out;
-}
+    $out =~ s/,(\.\.,)+/../g 
+    return $out
+
 
 ###########################################################################
 sub printTree
-{
-    my $tre = shift ;
-    my $prefix = shift ;
-    my ($k, $v) ;
+    my $tre = shift 
+    my $prefix = shift 
+    my ($k, $v) 
 
-    my $max = (sort {$a <+> $b}, map { length $_ }, keys $tre->%)[-1] ;
-    my @keys = sort keys $tre->% ;
+    my $max = (sort {$a <+> $b}, map { length $_ }, keys $tre->%)[-1] 
+    my @keys = sort keys $tre->% 
 
-    while ($k = shift @keys) {
-        $v = $tre->{?$k};
+    while ($k = shift @keys)
+        $v = $tre->{?$k}
         die "Value associated with key '$k' is not an ARRAY reference"
-            if !ref $v || ref $v ne 'ARRAY' ;
+            if !ref $v || ref $v ne 'ARRAY' 
 
-        my $offset ;
-        if ($tre ne $tree) {
-            print $^STDOUT, $prefix . "|\n" ;
-            print $^STDOUT, $prefix . "+- $k" ;
-            $offset = ' ' x ($max + 4) ;
-        }
-        else {
-            print $^STDOUT, $prefix . "$k" ;
-            $offset = ' ' x ($max + 1) ;
-        }
+        my $offset 
+        if ($tre ne $tree)
+            print $^STDOUT, $prefix . "|\n" 
+            print $^STDOUT, $prefix . "+- $k" 
+            $offset = ' ' x ($max + 4) 
+        else
+            print $^STDOUT, $prefix . "$k" 
+            $offset = ' ' x ($max + 1) 
+        
 
-        my @($ver, $rest) =  $v->@ ;
+        my @($ver, $rest) =  $v->@ 
         if (ref $rest)
-        {
-            my $bar = @keys ?? "|" !! " ";
-            print $^STDOUT, " -" . "-" x ($max - length $k ) . "+\n" ;
+            my $bar = @keys ?? "|" !! " "
+            print $^STDOUT, " -" . "-" x ($max - length $k ) . "+\n" 
             printTree ($rest, $prefix . $bar . $offset )
-        }
+        
         else
         { print $^STDOUT, "\n" }
-    }
+    
 
-}
+
 
 ###########################################################################
 
 sub mkHex
-{
-    my @($max, @< @a) =  @_ ;
-    my $mask = "\x[00]" x $max;
-    my $string = "" ;
+    my @($max, @< @a) =  @_ 
+    my $mask = "\x[00]" x $max
+    my $string = "" 
 
-    foreach ( @a) {
-        vec($mask, $_, 1 => 1);
-    }
+    foreach ( @a)
+        vec($mask, $_, 1 => 1)
+    
 
-    foreach (@(unpack("C*", $mask))) {
-        $string .= sprintf("\%2.2x", $_);
-    }
-    return "\\x[$string]";
-}
+    foreach (@(unpack("C*", $mask)))
+        $string .= sprintf("\%2.2x", $_)
+    
+    return "\\x[$string]"
+
 
 ###########################################################################
 
 if (@ARGV && @ARGV[0] eq "tree")
-{
-    printTree($tree, "    ") ;
-    exit ;
-}
+    printTree($tree, "    ") 
+    exit 
 
-my $warn = safer_open("warnings.h-new");
-my $pm = safer_open("lib/warnings.pm-new");
 
-print $warn, <<'EOM' ;
+my $warn = safer_open("warnings.h-new")
+my $pm = safer_open("lib/warnings.pm-new")
+
+print $warn, <<'EOM' 
 /* -*- buffer-read-only: t -*-
    !!!!!!!   DO NOT EDIT THIS FILE   !!!!!!!
    This file is built by warnings.pl
@@ -269,39 +260,39 @@ print $warn, <<'EOM' ;
 #define PERL_DIEHOOK_IGNORE	(&PL_sv_undef)
 EOM
 
-my $offset = 0 ;
+my $offset = 0 
 
-$index = $offset ;
+$index = $offset 
 #@{ $list{"all"} } = walk ($tree) ;
-valueWalk ($tree) ;
-my $index = orderValues();
+valueWalk ($tree) 
+my $index = orderValues()
 
-die <<EOM if $index +> 255 ;
+die <<EOM if $index +> 255 
 Too many warnings categories -- max is 255
     rewrite packWARN* & unpackWARN* macros 
 EOM
 
-walk ($tree) ;
+walk ($tree) 
 
-$index *= 2 ;
-my $warn_size = int($index / 8) + ($index % 8 != 0) ;
+$index *= 2 
+my $warn_size = int($index / 8) + ($index % 8 != 0) 
 
-my $last_ver = 0;
-foreach my $k (sort { $a <+> $b }, keys %ValueToName) {
-    my @($name, $version) =   %ValueToName{?$k}->@;
+my $last_ver = 0
+foreach my $k (sort { $a <+> $b }, keys %ValueToName)
+    my @($name, $version) =   %ValueToName{?$k}->@
     print $warn, "\n/* Warnings Categories added in Perl $version */\n\n"
-        if $last_ver != $version ;
-    print $warn, tab(5, "#define WARN_$name"), "$k\n" ;
-    $last_ver = $version ;
-}
-print $warn, "\n" ;
+        if $last_ver != $version 
+    print $warn, tab(5, "#define WARN_$name"), "$k\n" 
+    $last_ver = $version 
 
-print $warn, tab(5, '#define WARNsize'),	"$warn_size\n" ;
+print $warn, "\n" 
+
+print $warn, tab(5, '#define WARNsize'),	"$warn_size\n" 
 #print WARN tab(5, '#define WARN_ALLstring'), '"', ('\377' x $warn_size) , "\"\n" ;
-print $warn, tab(5, '#define WARN_ALLstring'), '"', ('\125' x $warn_size) , "\"\n" ;
-print $warn, tab(5, '#define WARN_NONEstring'), '"', ('\0' x $warn_size) , "\"\n" ;
+print $warn, tab(5, '#define WARN_ALLstring'), '"', ('\125' x $warn_size) , "\"\n" 
+print $warn, tab(5, '#define WARN_NONEstring'), '"', ('\0' x $warn_size) , "\"\n" 
 
-print $warn, <<'EOM';
+print $warn, <<'EOM'
 
 #define isLEXWARN_on 	(PL_curcop->cop_warnings != pWARN_STD)
 #define isLEXWARN_off	(PL_curcop->cop_warnings == pWARN_STD)
@@ -346,70 +337,70 @@ print $warn, <<'EOM';
 /* ex: set ro: */
 EOM
 
-safer_close $warn;
-rename_if_different("warnings.h-new", "warnings.h");
+safer_close $warn
+rename_if_different("warnings.h-new", "warnings.h")
 
-while ( ~< $^DATA) {
-    last if m/^KEYWORDS$/ ;
-    print $pm, $_ ;
-}
+while ( ~< $^DATA)
+    last if m/^KEYWORDS$/ 
+    print $pm, $_ 
+
 
 #$list{'all'} = [ $offset .. 8 * ($warn_size/2) - 1 ] ;
 
-$last_ver = 0;
-print $pm, "our \%Offsets = \%(\n" ;
-foreach my $k (sort { $a <+> $b }, keys %ValueToName) {
-    my @($name, $version) =   %ValueToName{?$k}->@;
-    $name = lc $name;
-    $k *= 2 ;
-    if ( $last_ver != $version ) {
-        print $pm, "\n";
-        print $pm, tab(4, "    # Warnings Categories added in Perl $version");
-        print $pm, "\n\n";
-    }
-    print $pm, tab(4, "    '$name'"), "=> $k,\n" ;
-    $last_ver = $version;
-}
+$last_ver = 0
+print $pm, "our \%Offsets = \%(\n" 
+foreach my $k (sort { $a <+> $b }, keys %ValueToName)
+    my @($name, $version) =   %ValueToName{?$k}->@
+    $name = lc $name
+    $k *= 2 
+    if ( $last_ver != $version )
+        print $pm, "\n"
+        print $pm, tab(4, "    # Warnings Categories added in Perl $version")
+        print $pm, "\n\n"
+    
+    print $pm, tab(4, "    '$name'"), "=> $k,\n" 
+    $last_ver = $version
 
-print $pm, "  );\n\n" ;
 
-print $pm, "our \%Bits = %(\n" ;
-foreach my $k (sort keys  %list) {
+print $pm, "  );\n\n" 
 
-    my $v = %list{?$k} ;
-    my @list = sort { $a <+> $b }, $v->@;
+print $pm, "our \%Bits = %(\n" 
+foreach my $k (sort keys  %list)
+
+    my $v = %list{?$k} 
+    my @list = sort { $a <+> $b }, $v->@
 
     print $pm, tab(4, "    '$k'"), '=> "',
         # mkHex($warn_size, @list),
         mkHex($warn_size, < map { $_ * 2 }, @list),
-        '", # [', mkRange(@list), "]\n" ;
-}
+        '", # [', mkRange(@list), "]\n" 
 
-print $pm, "  );\n\n" ;
 
-print $pm, "our \%DeadBits = %(\n" ;
-foreach my $k (sort keys  %list) {
+print $pm, "  );\n\n" 
 
-    my $v = %list{?$k} ;
-    my @list = sort { $a <+> $b }, $v->@;
+print $pm, "our \%DeadBits = %(\n" 
+foreach my $k (sort keys  %list)
+
+    my $v = %list{?$k} 
+    my @list = sort { $a <+> $b }, $v->@
 
     print $pm, tab(4, "    '$k'"), '=> "',
         # mkHex($warn_size, @list),
         mkHex($warn_size, < map { $_ * 2 + 1 }, @list),
-        '", # [', mkRange(@list), "]\n" ;
-}
+        '", # [', mkRange(@list), "]\n" 
 
-print $pm, "  );\n\n" ;
-print $pm, 'our $NONE     = "', ('\0' x $warn_size) , "\";\n" ;
-print $pm, 'our $LAST_BIT = ' . "$index ;\n" ;
-print $pm, 'our $BYTES    = ' . "$warn_size ;\n" ;
-while ( ~< $^DATA) {
-    print $pm, $_ ;
-}
 
-print $pm, "# ex: set ro:\n";
-safer_close $pm;
-rename_if_different("lib/warnings.pm-new", "lib/warnings.pm");
+print $pm, "  );\n\n" 
+print $pm, 'our $NONE     = "', ('\0' x $warn_size) , "\";\n" 
+print $pm, 'our $LAST_BIT = ' . "$index ;\n" 
+print $pm, 'our $BYTES    = ' . "$warn_size ;\n" 
+while ( ~< $^DATA)
+    print $pm, $_ 
+
+
+print $pm, "# ex: set ro:\n"
+safer_close $pm
+rename_if_different("lib/warnings.pm-new", "lib/warnings.pm")
 
 __END__
 # -*- buffer-read-only: t -*-

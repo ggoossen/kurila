@@ -7,21 +7,20 @@
 
 
 
-BEGIN {
+BEGIN 
     die "Oi! No! Don't change this test so that Carp is used before Storable"
-        if defined &Carp::carp;
-}
-use Storable < qw(freeze thaw);
+        if defined &Carp::carp
 
-print $^STDOUT, "1..2\n";
+use Storable < qw(freeze thaw)
 
-for my $test (@(1,2)) {
-    try {thaw "\xFF\xFF"};
+print $^STDOUT, "1..2\n"
+
+for my $test (@(1,2))
+    try {thaw "\xFF\xFF"}
     if ($^EVAL_ERROR->{?description} =~ m/Storable binary image v127.255 more recent than I am \(v2\.\d+\)/)
-    {
-        print $^STDOUT, "ok $test\n";
-    } else {
-        chomp $^EVAL_ERROR;
-        print $^STDOUT, "not ok $test # Expected a meaningful croak. Got '$^EVAL_ERROR'\n";
-    }
-}
+        print $^STDOUT, "ok $test\n"
+    else
+        chomp $^EVAL_ERROR
+        print $^STDOUT, "not ok $test # Expected a meaningful croak. Got '$^EVAL_ERROR'\n"
+    
+

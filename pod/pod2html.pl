@@ -138,6 +138,6 @@ This program is distributed under the Artistic License.
 
 =cut
 
-use Pod::Html;
+use Pod::Html
 
-pod2html @ARGV;
+pod2html @ARGV

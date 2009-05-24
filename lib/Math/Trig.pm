@@ -4,30 +4,30 @@
 # -- Raphael Manfredi, September 1996 (indirectly: because of Math::Complex)
 #
 
-require Exporter;
-    package Math::Trig;
+require Exporter
+package Math::Trig;
 
 
-our ($VERSION, $PACKAGE, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
+our ($VERSION, $PACKAGE, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS)
 
-@ISA = qw(Exporter);
+@ISA = qw(Exporter)
 
-$VERSION = 1.16;
+$VERSION = 1.16
 
 my @angcnv = qw(rad2deg rad2grad
 		deg2rad deg2grad
-		grad2rad grad2deg);
+		grad2rad grad2deg)
 
-my @areal = qw(asin_real acos_real);
+my @areal = qw(asin_real acos_real)
 
-@EXPORT = @(< @angcnv, < @areal);
+@EXPORT = @(< @angcnv, < @areal)
 
 my @rdlcnv = qw(cartesian_to_cylindrical
 		cartesian_to_spherical
 		cylindrical_to_cartesian
 		cylindrical_to_spherical
 		spherical_to_cartesian
-		spherical_to_cylindrical);
+		spherical_to_cylindrical)
 
 my @greatcircle = qw(
 		     great_circle_distance
@@ -36,25 +36,25 @@ my @greatcircle = qw(
 		     great_circle_waypoint
 		     great_circle_midpoint
 		     great_circle_destination
-		    );
+		    )
 
-my @pi = qw(pi pi2 pi4 pip2 pip4);
+my @pi = qw(pi pi2 pi4 pip2 pip4)
 
-@EXPORT_OK = @(< @rdlcnv, < @greatcircle, < @pi, 'tan' );
+@EXPORT_OK = @(< @rdlcnv, < @greatcircle, < @pi, 'tan' )
 
 # See e.g. the following pages:
 # http://www.movable-type.co.uk/scripts/LatLong.html
 # http://williams.best.vwh.net/avform.htm
 
 %EXPORT_TAGS = %('radial' => @rdlcnv,
-        'great_circle' => @greatcircle,
-            'pi'     => @pi);
+    'great_circle' => @greatcircle,
+    'pi'     => @pi)
 
-sub tan($z) {
-    my $cz = cos($z);
-    die "Division by zero in tan($z)" if $cz == 0;
-    return sin($z) / $cz;
-}
+sub tan($z)
+    my $cz = cos($z)
+    die "Division by zero in tan($z)" if $cz == 0
+    return sin($z) / $cz
+
 
 sub pi () { 4 * CORE::atan2(1, 1) }
 sub pi2 () { 2 * pi }
@@ -73,10 +73,10 @@ sub _GR  () { pi2/400 }
 # Truncating remainder.
 #
 
-sub _remt ($v, $p) {
+sub _remt ($v, $p)
     # Oh yes, POSIX::fmod() would be faster. Possibly. If it is available.
-    $v - $p * int($v / $p);
-}
+    $v - $p * int($v / $p)
+
 
 #
 # Angle conversions.
@@ -104,137 +104,137 @@ sub grad2rad ($v, ?$wrap) { my $d = _GR * $v; $wrap ?? $d !! rad2rad($d) }
 # acos and asin functions which always return a real number
 #
 
-sub acos_real {
-    my $z = @_[0];
-    return 0  if @_[0] +>=  1;
-    return pi if @_[0] +<= -1;
-    return CORE::atan2(CORE::sqrt(1-$z*$z), $z);
-}
+sub acos_real
+    my $z = @_[0]
+    return 0  if @_[0] +>=  1
+    return pi if @_[0] +<= -1
+    return CORE::atan2(CORE::sqrt(1-$z*$z), $z)
 
-sub asin_real {
-    my $z = @_[0];
-    return  &pip2( < @_ ) if @_[0] +>=  1;
-    return -&pip2( < @_ ) if @_[0] +<= -1;
-    return CORE::atan2($z, CORE::sqrt(1-$z*$z));
-}
 
-sub cartesian_to_spherical( $x, $y, $z) {
+sub asin_real
+    my $z = @_[0]
+    return  &pip2( < @_ ) if @_[0] +>=  1
+    return -&pip2( < @_ ) if @_[0] +<= -1
+    return CORE::atan2($z, CORE::sqrt(1-$z*$z))
 
-    my $rho = sqrt( $x * $x + $y * $y + $z * $z );
+
+sub cartesian_to_spherical( $x, $y, $z)
+
+    my $rho = sqrt( $x * $x + $y * $y + $z * $z )
 
     return  @( $rho,
                atan2( $y, $x ),
-               $rho ?? acos_real( $z / $rho ) !! 0 );
-}
+               $rho ?? acos_real( $z / $rho ) !! 0 )
 
-sub spherical_to_cartesian( $rho, $theta, $phi) {
+
+sub spherical_to_cartesian( $rho, $theta, $phi)
 
     return  @( $rho * cos( $theta ) * sin( $phi ),
                $rho * sin( $theta ) * sin( $phi ),
-               $rho * cos( $phi   ) );
-}
+               $rho * cos( $phi   ) )
 
-sub spherical_to_cylindrical {
-    my @( $x, $y, $z ) =  spherical_to_cartesian( < @_ );
 
-    return  @( sqrt( $x * $x + $y * $y ), @_[1], $z );
-}
+sub spherical_to_cylindrical
+    my @( $x, $y, $z ) =  spherical_to_cartesian( < @_ )
 
-sub cartesian_to_cylindrical( $x, $y, $z) {
+    return  @( sqrt( $x * $x + $y * $y ), @_[1], $z )
 
-    return  @( sqrt( $x * $x + $y * $y ), atan2( $y, $x ), $z );
-}
 
-sub cylindrical_to_cartesian( $rho, $theta, $z) {
+sub cartesian_to_cylindrical( $x, $y, $z)
 
-    return  @( $rho * cos( $theta ), $rho * sin( $theta ), $z );
-}
+    return  @( sqrt( $x * $x + $y * $y ), atan2( $y, $x ), $z )
 
-sub cylindrical_to_spherical {
-    return cartesian_to_spherical( < cylindrical_to_cartesian( < @_ ) );
-}
 
-sub great_circle_distance( $theta0, $phi0, $theta1, $phi1, ?$rho) {
+sub cylindrical_to_cartesian( $rho, $theta, $z)
 
-    $rho = 1 unless defined $rho; # Default to the unit sphere.
+    return  @( $rho * cos( $theta ), $rho * sin( $theta ), $z )
 
-    my $lat0 = pip2 - $phi0;
-    my $lat1 = pip2 - $phi1;
+
+sub cylindrical_to_spherical
+    return cartesian_to_spherical( < cylindrical_to_cartesian( < @_ ) )
+
+
+sub great_circle_distance( $theta0, $phi0, $theta1, $phi1, ?$rho)
+
+    $rho = 1 unless defined $rho # Default to the unit sphere.
+
+    my $lat0 = pip2 - $phi0
+    my $lat1 = pip2 - $phi1
 
     return $rho *
         acos_real( cos( $lat0 ) * cos( $lat1 ) * cos( $theta0 - $theta1 ) +
-            sin( $lat0 ) * sin( $lat1 ) );
-}
+                   sin( $lat0 ) * sin( $lat1 ) )
 
-sub great_circle_direction {
-    my @( $theta0, $phi0, $theta1, $phi1 ) =  @_;
 
-    my $distance = &great_circle_distance( < @_ );
+sub great_circle_direction
+    my @( $theta0, $phi0, $theta1, $phi1 ) =  @_
 
-    my $lat0 = pip2 - $phi0;
-    my $lat1 = pip2 - $phi1;
+    my $distance = &great_circle_distance( < @_ )
+
+    my $lat0 = pip2 - $phi0
+    my $lat1 = pip2 - $phi1
 
     my $direction =
         acos_real((sin($lat1) - sin($lat0) * cos($distance)) /
-            (cos($lat0) * sin($distance)));
+                  (cos($lat0) * sin($distance)))
 
     $direction = pi2 - $direction
-        if sin($theta1 - $theta0) +< 0;
+        if sin($theta1 - $theta0) +< 0
 
-    return rad2rad($direction);
-}
+    return rad2rad($direction)
 
-*great_circle_bearing = \&great_circle_direction;
 
-sub great_circle_waypoint( $theta0, $phi0, $theta1, $phi1, $point) {
+*great_circle_bearing = \&great_circle_direction
 
-    $point = 0.5 unless defined $point;
+sub great_circle_waypoint( $theta0, $phi0, $theta1, $phi1, $point)
 
-    my $d = great_circle_distance( $theta0, $phi0, $theta1, $phi1 );
+    $point = 0.5 unless defined $point
 
-    return undef if $d == pi;
+    my $d = great_circle_distance( $theta0, $phi0, $theta1, $phi1 )
 
-    my $sd = sin($d);
+    return undef if $d == pi
 
-    return  @($theta0, $phi0) if $sd == 0;
+    my $sd = sin($d)
 
-    my $A = sin((1 - $point) * $d) / $sd;
-    my $B = sin(     $point  * $d) / $sd;
+    return  @($theta0, $phi0) if $sd == 0
 
-    my $lat0 = pip2 - $phi0;
-    my $lat1 = pip2 - $phi1;
+    my $A = sin((1 - $point) * $d) / $sd
+    my $B = sin(     $point  * $d) / $sd
 
-    my $x = $A * cos($lat0) * cos($theta0) + $B * cos($lat1) * cos($theta1);
-    my $y = $A * cos($lat0) * sin($theta0) + $B * cos($lat1) * sin($theta1);
-    my $z = $A * sin($lat0)                + $B * sin($lat1);
+    my $lat0 = pip2 - $phi0
+    my $lat1 = pip2 - $phi1
 
-    my $theta = atan2($y, $x);
-    my $phi   = acos_real($z);
+    my $x = $A * cos($lat0) * cos($theta0) + $B * cos($lat1) * cos($theta1)
+    my $y = $A * cos($lat0) * sin($theta0) + $B * cos($lat1) * sin($theta1)
+    my $z = $A * sin($lat0)                + $B * sin($lat1)
 
-    return  @($theta, $phi);
-}
+    my $theta = atan2($y, $x)
+    my $phi   = acos_real($z)
 
-sub great_circle_midpoint {
-    great_circle_waypoint( <@_[[0..3]], 0.5);
-}
+    return  @($theta, $phi)
 
-sub great_circle_destination( $theta0, $phi0, $dir0, $dst) {
 
-    my $lat0 = pip2 - $phi0;
+sub great_circle_midpoint
+    great_circle_waypoint( <@_[[0..3]], 0.5)
 
-    my $phi1   = asin_real(sin($lat0)*cos($dst) + 
-                           cos($lat0)*sin($dst)*cos($dir0));
+
+sub great_circle_destination( $theta0, $phi0, $dir0, $dst)
+
+    my $lat0 = pip2 - $phi0
+
+    my $phi1   = asin_real(sin($lat0)*cos($dst) +
+                           cos($lat0)*sin($dst)*cos($dir0))
     my $theta1 = $theta0 + atan2(sin($dir0)*sin($dst)*cos($lat0),
-        cos($dst)-sin($lat0)*sin($phi1));
+        cos($dst)-sin($lat0)*sin($phi1))
 
-    my $dir1 = great_circle_bearing($theta1, $phi1, $theta0, $phi0) + pi;
+    my $dir1 = great_circle_bearing($theta1, $phi1, $theta0, $phi0) + pi
 
-    $dir1 -= pi2 if $dir1 +> pi2;
+    $dir1 -= pi2 if $dir1 +> pi2
 
-    return  @($theta1, $phi1, $dir1);
-}
+    return  @($theta1, $phi1, $dir1)
 
-1;
+
+1
 
 __END__
 =pod

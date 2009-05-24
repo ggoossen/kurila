@@ -1,9 +1,9 @@
 #!./perl
 
 
-use warnings;
+use warnings
 
-require q(./test.pl); plan(tests => 12);
+require q(./test.pl); plan(tests => 12)
 
 =pod
 
@@ -49,97 +49,97 @@ KJIHGFEDABC
 
 =cut
 
-do {
-    package Test::A; use mro 'c3';
-    our @ISA;
+do
+    package Test::A; use mro 'c3'
+    our @ISA
 
-        package Test::B; use mro 'c3';
-    our @ISA;
+    package Test::B; use mro 'c3';
+    our @ISA
 
-        package Test::C; use mro 'c3';
-    our @ISA;
+    package Test::C; use mro 'c3';
+    our @ISA
 
-        package Test::D; use mro 'c3';
-    use base < qw/Test::A Test::B Test::C/;
+    package Test::D use mro 'c3'
+    use base < qw/Test::A Test::B Test::C/
 
-        package Test::E; use mro 'c3';
-    use base < qw/Test::D/;
+    package Test::E use mro 'c3'
+    use base < qw/Test::D/
 
-        package Test::F; use mro 'c3';
-    use base < qw/Test::E/;
+    package Test::F use mro 'c3'
+    use base < qw/Test::E/
     sub testmeth { "wrong" }
 
-    package Test::G; use mro 'c3';
-    use base < qw/Test::D/;
+    package Test::G use mro 'c3'
+    use base < qw/Test::D/
 
-        package Test::H; use mro 'c3';
-    use base < qw/Test::G/;
+    package Test::H use mro 'c3'
+    use base < qw/Test::G/
 
-        package Test::I; use mro 'c3';
-    use base < qw/Test::H Test::F/;
+    package Test::I use mro 'c3'
+    use base < qw/Test::H Test::F/
     sub testmeth { "right" }
 
-    package Test::J; use mro 'c3';
-    use base < qw/Test::F/;
+    package Test::J use mro 'c3'
+    use base < qw/Test::F/
 
-        package Test::K; use mro 'c3';
-    use base < qw/Test::J Test::I/;
+    package Test::K use mro 'c3'
+    use base < qw/Test::J Test::I/
     sub testmeth($self) { $self->SUPER::testmeth() }
-};
+
 
 ok(eq_array(
     mro::get_linear_isa('Test::A'),
     \ qw(Test::A)
-    ), '... got the right C3 merge order for Test::A');
+    ), '... got the right C3 merge order for Test::A')
 
 ok(eq_array(
     mro::get_linear_isa('Test::B'),
     \ qw(Test::B)
-    ), '... got the right C3 merge order for Test::B');
+    ), '... got the right C3 merge order for Test::B')
 
 ok(eq_array(
     mro::get_linear_isa('Test::C'),
     \ qw(Test::C)
-    ), '... got the right C3 merge order for Test::C');
+    ), '... got the right C3 merge order for Test::C')
 
 ok(eq_array(
     mro::get_linear_isa('Test::D'),
     \ qw(Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::D');
+    ), '... got the right C3 merge order for Test::D')
 
 ok(eq_array(
     mro::get_linear_isa('Test::E'),
     \ qw(Test::E Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::E');
+    ), '... got the right C3 merge order for Test::E')
 
 ok(eq_array(
     mro::get_linear_isa('Test::F'),
     \ qw(Test::F Test::E Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::F');
+    ), '... got the right C3 merge order for Test::F')
 
 ok(eq_array(
     mro::get_linear_isa('Test::G'),
     \ qw(Test::G Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::G');
+    ), '... got the right C3 merge order for Test::G')
 
 ok(eq_array(
     mro::get_linear_isa('Test::H'),
     \ qw(Test::H Test::G Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::H');
+    ), '... got the right C3 merge order for Test::H')
 
 ok(eq_array(
     mro::get_linear_isa('Test::I'),
     \ qw(Test::I Test::H Test::G Test::F Test::E Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::I');
+    ), '... got the right C3 merge order for Test::I')
 
 ok(eq_array(
     mro::get_linear_isa('Test::J'),
     \ qw(Test::J Test::F Test::E Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::J');
+    ), '... got the right C3 merge order for Test::J')
 
 ok(eq_array(
     mro::get_linear_isa('Test::K'),
     \ qw(Test::K Test::J Test::I Test::H Test::G Test::F Test::E Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::K');
+    ), '... got the right C3 merge order for Test::K')
 
-is('Test::K'->testmeth(), "right", 'next::method working ok');
+is('Test::K'->testmeth(), "right", 'next::method working ok')

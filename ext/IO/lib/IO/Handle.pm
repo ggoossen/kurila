@@ -1,4 +1,4 @@
-package IO::Handle;
+package IO::Handle
 
 =head1 NAME
 
@@ -171,7 +171,7 @@ If called with an argument C<blocking> will turn on non-blocking IO if
 C<BOOL> is false, and turn it off if C<BOOL> is true.
 
 C<blocking> will return the value of the previous setting, or the
-current setting if C<BOOL> is not given. 
+current setting if C<BOOL> is not given.
 
 If an error occurs C<blocking> will return undef and C<$!> will be set.
 
@@ -227,7 +227,7 @@ module keeps a C<timeout> variable in 'io_socket_timeout'.
 
 =head1 SEE ALSO
 
-L<perlfunc>, 
+L<perlfunc>,
 L<perlop/"I/O Operators">,
 L<IO::File>
 
@@ -235,7 +235,7 @@ L<IO::File>
 
 Due to backwards compatibility, all filehandles resemble objects
 of class C<IO::Handle>, or actually classes derived from that class.
-They actually aren't.  Which means you can't derive your own 
+They actually aren't.  Which means you can't derive your own
 class from C<IO::Handle> and inherit those methods.
 
 =head1 HISTORY
@@ -244,15 +244,15 @@ Derived from FileHandle.pm by Graham Barr E<lt>F<gbarr@pobox.com>E<gt>
 
 =cut
 
-our($VERSION, @EXPORT_OK, @ISA);
+our($VERSION, @EXPORT_OK, @ISA)
 use Symbol;
 use IO ();	# Load the XS module
 
-require Exporter;
-@ISA = qw(Exporter);
+require Exporter
+@ISA = qw(Exporter)
 
-$VERSION = "1.27_01";
-$VERSION = eval $VERSION;
+$VERSION = "1.27_01"
+$VERSION = eval $VERSION
 
 @EXPORT_OK = qw(
     autoflush
@@ -275,62 +275,62 @@ $VERSION = eval $VERSION;
     _IOFBF
     _IOLBF
     _IONBF
-);
+)
 
 ################################################
 ## Constructors, destructors.
 ##
 
-sub new {
-    my $class = ref(@_[0]) || @_[0] || "IO::Handle";
-    (nelems @_) == 1 or die "usage: new $class";
-    my $io = gensym;
-    bless $io, $class;
-}
+sub new
+    my $class = ref(@_[0]) || @_[0] || "IO::Handle"
+    (nelems @_) == 1 or die "usage: new $class"
+    my $io = gensym
+    bless $io, $class
 
-sub new_from_fd {
-    my $class = ref(@_[0]) || @_[0] || "IO::Handle";
-    (nelems @_) == 3 or die "usage: new_from_fd $class FD, MODE";
-    my $io = gensym;
-    shift;
+
+sub new_from_fd
+    my $class = ref(@_[0]) || @_[0] || "IO::Handle"
+    (nelems @_) == 3 or die "usage: new_from_fd $class FD, MODE"
+    my $io = gensym
+    shift
     IO::Handle::fdopen($io, < @_)
-        or return undef;
-    bless $io, $class;
-}
+        or return undef
+    bless $io, $class
+
 
 ################################################
 ## Open and close.
 ##
 
-sub _open_mode_string($mode) {
+sub _open_mode_string($mode)
     $mode =~ m/^\+?(<|>>?)$/
         or $mode =~ s/^r(\+?)$/$1</
         or $mode =~ s/^w(\+?)$/$1>/
         or $mode =~ s/^a(\+?)$/$1>>/
-        or die "IO::Handle: bad open mode: $mode";
-    $mode;
-}
+        or die "IO::Handle: bad open mode: $mode"
+    $mode
 
-sub fdopen {
-    (nelems @_) == 3 or die 'usage: $io->fdopen(FD, MODE)';
-    my @($io, $fd, $mode) =  @_;
 
-    my $fdmode = '&';
-    if (!ref($fd) && $fd =~ m#^\d+$#) {
+sub fdopen
+    (nelems @_) == 3 or die 'usage: $io->fdopen(FD, MODE)'
+    my @($io, $fd, $mode) =  @_
+
+    my $fdmode = '&'
+    if (!ref($fd) && $fd =~ m#^\d+$#)
         # It's an FD number; prefix with "=".
-        $fdmode .= "=";
-    }
+        $fdmode .= "="
+    
 
     open($io, _open_mode_string($mode) . $fdmode, $fd)
-        ?? $io !! undef;
-}
+        ?? $io !! undef
 
-sub close {
-    (nelems @_) == 1 or die 'usage: $io->close()';
-    my@($io) =  @_;
 
-    close($io);
-}
+sub close
+    (nelems @_) == 1 or die 'usage: $io->close()'
+    my@($io) =  @_
+
+    close($io)
+
 
 ################################################
 ## Normal I/O functions.
@@ -339,132 +339,132 @@ sub close {
 # flock
 # select
 
-sub opened {
-    (nelems @_) == 1 or die 'usage: $io->opened()';
-    defined fileno(@_[0]);
-}
+sub opened
+    (nelems @_) == 1 or die 'usage: $io->opened()'
+    defined fileno(@_[0])
 
-sub fileno {
-    (nelems @_) == 1 or die 'usage: $io->fileno()';
-    fileno(@_[0]);
-}
 
-sub getc {
-    (nelems @_) == 1 or die 'usage: $io->getc()';
-    getc(@_[0]);
-}
+sub fileno
+    (nelems @_) == 1 or die 'usage: $io->fileno()'
+    fileno(@_[0])
 
-sub eof {
-    (nelems @_) == 1 or die 'usage: $io->eof()';
-    eof(@_[0]);
-}
 
-sub print {
-    (nelems @_) or die 'usage: $io->print(ARGS)';
-    my $this = shift;
-    print $this, < @_;
-}
+sub getc
+    (nelems @_) == 1 or die 'usage: $io->getc()'
+    getc(@_[0])
 
-sub printf {
-    (nelems @_) +>= 2 or die 'usage: $io->printf(FMT,[ARGS])';
-    my $this = shift;
-    printf $this, < @_;
-}
 
-sub getline {
-    (nelems @_) == 1 or die 'usage: $io->getline()';
-    my $this = shift;
-    return scalar ~< $this;
-} 
+sub eof
+    (nelems @_) == 1 or die 'usage: $io->eof()'
+    eof(@_[0])
 
-*gets = \&getline;  # deprecated
 
-sub getlines {
-    (nelems @_) == 1 or die 'usage: $io->getlines()';
-    my $this = shift;
-    return @( ~< $this );
-}
+sub print
+    (nelems @_) or die 'usage: $io->print(ARGS)'
+    my $this = shift
+    print $this, < @_
 
-sub truncate {
-    (nelems @_) == 2 or die 'usage: $io->truncate(LEN)';
-    truncate(@_[0], @_[1]);
-}
 
-sub read($io, $bufref, $len, ?$offset) {
-    read($io, $bufref->$, $len, $offset || 0);
-}
+sub printf
+    (nelems @_) +>= 2 or die 'usage: $io->printf(FMT,[ARGS])'
+    my $this = shift
+    printf $this, < @_
 
-sub sysread($io, $bufref, $len, ?$offset) {
-    sysread($io, $bufref->$, $len, $offset || 0);
-}
 
-sub write {
-    (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])';
-    @_[+2] = length(@_[1]) unless defined @_[?2];
-    print  @_[0]  ,substr(@_[1], @_[?3] || 0, @_[2]);
-}
+sub getline
+    (nelems @_) == 1 or die 'usage: $io->getline()'
+    my $this = shift
+    return scalar ~< $this
 
-sub syswrite {
-    (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])';
-    if (defined(@_[?2])) {
-        syswrite(@_[0], @_[1], @_[2], @_[?3] || 0);
-    } else {
-        syswrite(@_[0], @_[1]);
-    }
-}
 
-sub stat {
-    (nelems @_) == 1 or die 'usage: $io->stat()';
-    stat(@_[0]);
-}
+*gets = \&getline  # deprecated
+
+sub getlines
+    (nelems @_) == 1 or die 'usage: $io->getlines()'
+    my $this = shift
+    return @( ~< $this )
+
+
+sub truncate
+    (nelems @_) == 2 or die 'usage: $io->truncate(LEN)'
+    truncate(@_[0], @_[1])
+
+
+sub read($io, $bufref, $len, ?$offset)
+    read($io, $bufref->$, $len, $offset || 0)
+
+
+sub sysread($io, $bufref, $len, ?$offset)
+    sysread($io, $bufref->$, $len, $offset || 0)
+
+
+sub write
+    (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])'
+    @_[+2] = length(@_[1]) unless defined @_[?2]
+    print  @_[0]  ,substr(@_[1], @_[?3] || 0, @_[2])
+
+
+sub syswrite
+    (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])'
+    if (defined(@_[?2]))
+        syswrite(@_[0], @_[1], @_[2], @_[?3] || 0)
+    else
+        syswrite(@_[0], @_[1])
+    
+
+
+sub stat
+    (nelems @_) == 1 or die 'usage: $io->stat()'
+    stat(@_[0])
+
 
 ################################################
 ## State modification functions.
 ##
 
-sub autoflush($fh, @< @_) {
-    my $prev = iohandle::output_autoflush($fh);
-    iohandle::output_autoflush($fh, @_ ?? @_[0] !! 1);
-    return $prev;
-}
+sub autoflush($fh, @< @_)
+    my $prev = iohandle::output_autoflush($fh)
+    iohandle::output_autoflush($fh, @_ ?? @_[0] !! 1)
+    return $prev
 
-sub output_field_separator {
+
+sub output_field_separator
     warn "output_field_separator is not supported on a per-handle basis"
-        if ref(@_[0]);
-    my $prev = $^OUTPUT_FIELD_SEPARATOR;
-    $^OUTPUT_FIELD_SEPARATOR = @_[1] if (nelems @_) +> 1;
-    $prev;
-}
+        if ref(@_[0])
+    my $prev = $^OUTPUT_FIELD_SEPARATOR
+    $^OUTPUT_FIELD_SEPARATOR = @_[1] if (nelems @_) +> 1
+    $prev
 
-sub input_record_separator(@< @_) {
+
+sub input_record_separator(@< @_)
     warn "input_record_separator is not supported on a per-handle basis"
-        if ref(@_[0]);
-    my $prev = $^INPUT_RECORD_SEPARATOR;
-    $^INPUT_RECORD_SEPARATOR = @_[1] if (nelems @_) +> 1;
-    $prev;
-}
+        if ref(@_[0])
+    my $prev = $^INPUT_RECORD_SEPARATOR
+    $^INPUT_RECORD_SEPARATOR = @_[1] if (nelems @_) +> 1
+    $prev
 
-sub input_line_number {
-    ref(@_[0]) or die 'usage: $io->input_line_number';
-    my $fh = qualify(@_[0], $: caller);
-    my $prev = iohandle::input_line_number($fh);
-    iohandle::input_line_number($fh, @_[1]) if (nelems @_) +> 1;
-    return $prev;
-}
 
-# XXX undocumented
-sub fcntl {
-    (nelems @_) == 3 || die 'usage: $io->fcntl( OP, VALUE );';
-    my @($io, $op) =  @_;
-    return fcntl($io, $op, @_[2]);
-}
+sub input_line_number
+    ref(@_[0]) or die 'usage: $io->input_line_number'
+    my $fh = qualify(@_[0], $: caller)
+    my $prev = iohandle::input_line_number($fh)
+    iohandle::input_line_number($fh, @_[1]) if (nelems @_) +> 1
+    return $prev
+
 
 # XXX undocumented
-sub ioctl {
-    (nelems @_) == 3 || die 'usage: $io->ioctl( OP, VALUE );';
-    my @($io, $op) =  @_;
-    return ioctl($io, $op, @_[2]);
-}
+sub fcntl
+    (nelems @_) == 3 || die 'usage: $io->fcntl( OP, VALUE );'
+    my @($io, $op) =  @_
+    return fcntl($io, $op, @_[2])
+
+
+# XXX undocumented
+sub ioctl
+    (nelems @_) == 3 || die 'usage: $io->ioctl( OP, VALUE );'
+    my @($io, $op) =  @_
+    return ioctl($io, $op, @_[2])
+
 
 # this sub is for compatability with older releases of IO that used
 # a sub called constant to detemine if a constant existed -- GMB
@@ -472,19 +472,19 @@ sub ioctl {
 # The SEEK_* and _IO?BF constants were the only constants at that time
 # any new code should just chech defined(&CONSTANT_NAME)
 
-sub constant {
-    my $name = shift;
+sub constant
+    my $name = shift
     (($name =~ m/^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && defined &{Symbol::fetch_glob($name)->*})
-        ?? &{Symbol::fetch_glob($name)->*}() !! undef;
-}
+    ?? &{Symbol::fetch_glob($name)->*}() !! undef
 
 
-sub printflush {
-    my $io = shift;
-    my $prev_autoflush = iohandle::output_autoflush($io, 1);
-    print $io, < @_;
-    iohandle::output_autoflush($io, $prev_autoflush);
-    return;
-}
 
-1;
+sub printflush
+    my $io = shift
+    my $prev_autoflush = iohandle::output_autoflush($io, 1)
+    print $io, < @_
+    iohandle::output_autoflush($io, $prev_autoflush)
+    return
+
+
+1

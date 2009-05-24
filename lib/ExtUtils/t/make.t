@@ -1,24 +1,23 @@
 #!/usr/bin/perl -w
 
-BEGIN {
-    if( env::var('PERL_CORE') ) {
-        chdir 't';
-        $^INCLUDE_PATH = @('../lib', 'lib/');
-    }
-    else {
-        unshift $^INCLUDE_PATH, 't/lib/';
-    }
-}
+BEGIN 
+    if( env::var('PERL_CORE') )
+        chdir 't'
+        $^INCLUDE_PATH = @('../lib', 'lib/')
+    else
+        unshift $^INCLUDE_PATH, 't/lib/'
+    
 
-use Test::More tests => 3;
 
-use ExtUtils::MakeMaker;
+use Test::More tests => 3
 
-my $MM = bless \%( MAKE => "nmake6" ), "MM";
-is $MM->make, 'nmake';
+use ExtUtils::MakeMaker
 
-$MM->{MAKE} = 'GNUmake';
-is $MM->make, 'gmake';
+my $MM = bless \%( MAKE => "nmake6" ), "MM"
+is $MM->make, 'nmake'
 
-$MM->{MAKE} = 'MMS';
-is $MM->make, 'mms';
+$MM->{MAKE} = 'GNUmake'
+is $MM->make, 'gmake'
+
+$MM->{MAKE} = 'MMS'
+is $MM->make, 'mms'

@@ -1,6 +1,6 @@
-package integer;
+package integer
 
-our $VERSION = '1.00';
+our $VERSION = '1.00'
 
 =head1 NAME
 
@@ -80,14 +80,14 @@ See L<perlmodlib/"Pragmatic Modules">, L<perlop/"Integer Arithmetic">
 
 =cut
 
-$integer::hint_bits = 0x1;
+$integer::hint_bits = 0x1
 
-sub import {
-    $^HINT_BITS ^|^= $integer::hint_bits;
-}
+sub import
+    $^HINT_BITS ^|^= $integer::hint_bits
 
-sub unimport {
-    $^HINT_BITS ^&^= ^~^$integer::hint_bits;
-}
 
-1;
+sub unimport
+    $^HINT_BITS ^&^= ^~^$integer::hint_bits
+
+
+1

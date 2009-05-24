@@ -1,5 +1,5 @@
-use ExtUtils::MakeMaker;
-use ExtUtils::Constant v0.11 'WriteConstants';
+use ExtUtils::MakeMaker
+use ExtUtils::Constant v0.11 'WriteConstants'
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
@@ -17,7 +17,7 @@ WriteMakefile(
     # 'OBJECT'		=> '$(O_FILES)', # link all the C files too
     MAN3PODS		=> %(),  # Pods will be built by installman.
     realclean => %(FILES	=> 'const-c.inc const-xs.inc'),
-    );
+    )
 
 WriteConstants(
     PROXYSUBS => 1,
@@ -27,6 +27,6 @@ WriteConstants(
 		 G_SCALAR G_ARRAY G_VOID G_DISCARD G_EVAL
 		 G_KEEPERR G_NODEBUG G_METHOD G_FAKINGEVAL),
                  \%(name=>"G_WANT", default=>\@("IV", "G_ARRAY|G_VOID"))),
-    );
+    )
 
 sub MY::install { "install ::\n"  };

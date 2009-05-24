@@ -1,11 +1,11 @@
-package File::Spec::Epoc;
+package File::Spec::Epoc
 
-our ($VERSION, @ISA);
+our ($VERSION, @ISA)
 
-$VERSION = '3.2701';
+$VERSION = '3.2701'
 
-require File::Spec::Unix;
-@ISA = qw(File::Spec::Unix);
+require File::Spec::Unix
+@ISA = qw(File::Spec::Unix)
 
 =head1 NAME
 
@@ -25,9 +25,9 @@ This package is still work in progress ;-)
 
 =cut
 
-sub case_tolerant {
-    return 1;
-}
+sub case_tolerant
+    return 1
+
 
 =pod
 
@@ -42,16 +42,16 @@ path. On UNIX eliminated successive slashes and successive "/.".
 
 =cut
 
-sub canonpath($self,?$path) {
-    return unless defined $path;
+sub canonpath($self,?$path)
+    return unless defined $path
 
-    $path =~ s|/+|/|g;                             # xx////xx  -> xx/xx
-    $path =~ s|(/\.)+/|/|g;                        # xx/././xx -> xx/xx
-    $path =~ s|^(\./)+||s unless $path eq "./";    # ./xx      -> xx
-    $path =~ s|^/(\.\./)+|/|s;                     # /../../xx -> xx
-    $path =~  s|/\Z(?!\n)|| unless $path eq "/";          # xx/       -> xx
-    return $path;
-}
+    $path =~ s|/+|/|g                             # xx////xx  -> xx/xx
+    $path =~ s|(/\.)+/|/|g                        # xx/././xx -> xx/xx
+    $path =~ s|^(\./)+||s unless $path eq "./"    # ./xx      -> xx
+    $path =~ s|^/(\.\./)+|/|s                     # /../../xx -> xx
+    $path =~  s|/\Z(?!\n)|| unless $path eq "/"          # xx/       -> xx
+    return $path
+
 
 =pod
 
@@ -73,4 +73,4 @@ implementation of these methods, not the semantics.
 
 =cut
 
-1;
+1

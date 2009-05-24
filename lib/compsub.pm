@@ -1,16 +1,16 @@
-package compsub;
+package compsub
 
-sub define {
-    my %arg = %( < @_ );
+sub define
+    my %arg = %( < @_ )
     # warning: alwyas create a new hash; %^H is saved, and altering
     # values referenced by it, will have effect on it.
     $^HINTS{+'compsub'} = \%(
         < ( $^HINTS{?'compsub'} || \%() )->%,
-            < %arg,
-    );
-}
+        < %arg,
+        )
 
-1;
+
+1
 __END__
 
 =head1 NAME

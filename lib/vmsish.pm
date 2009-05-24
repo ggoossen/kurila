@@ -1,6 +1,6 @@
-package vmsish;
+package vmsish
 
-our $VERSION = '1.02';
+our $VERSION = '1.02'
 
 =head1 NAME
 
@@ -95,7 +95,7 @@ it.
 EXAMPLE:
     if ($quiet_exit) {
         vmsish::hushed(1);
-    } 
+    }
     print "Sssshhhh...I'm hushed...\n" if vmsish::hushed();
     exit 44;
 
@@ -111,42 +111,42 @@ See L<perlmod/Pragmatic Modules>.
 
 =cut
 
-my $IsVMS = $^OS_NAME eq 'VMS';
+my $IsVMS = $^OS_NAME eq 'VMS'
 
-sub bits {
-    my $bits = 0;
-    foreach my $sememe ( @_) {
+sub bits
+    my $bits = 0
+    foreach my $sememe ( @_)
         # Those hints are defined in vms/vmsish.h :
         # HINT_M_VMSISH_STATUS and HINT_M_VMSISH_TIME
-        ($bits ^|^= 0x40000000), next if $sememe eq 'status' || $sememe eq '$?';
-        ($bits ^|^= 0x80000000), next if $sememe eq 'time';
-    }
-    $bits;
-}
+        ($bits ^|^= 0x40000000), next if $sememe eq 'status' || $sememe eq '$?'
+        ($bits ^|^= 0x80000000), next if $sememe eq 'time'
+    
+    $bits
 
-sub import {
-    return unless $IsVMS;
 
-    shift;
-    $^HINT_BITS ^|^= bits((nelems @_) ?? < @_ !! < qw(status time));
-    my $sememe;
+sub import
+    return unless $IsVMS
 
-    foreach my $sememe (@((nelems @_) ?? < @_ !! < qw(exit hushed))) {
-        $^HINTS{+'vmsish_exit'}   = 1 if $sememe eq 'exit';
-        vmsish::hushed(1) if $sememe eq 'hushed';
-    }
-}
+    shift
+    $^HINT_BITS ^|^= bits((nelems @_) ?? < @_ !! < qw(status time))
+    my $sememe
 
-sub unimport {
-    return unless $IsVMS;
+    foreach my $sememe (@((nelems @_) ?? < @_ !! < qw(exit hushed)))
+        $^HINTS{+'vmsish_exit'}   = 1 if $sememe eq 'exit'
+        vmsish::hushed(1) if $sememe eq 'hushed'
+    
 
-    shift;
-    $^HINT_BITS ^&^= ^~^ bits((nelems @_) ?? < @_ !! < qw(status time));
 
-    foreach my $sememe (@((nelems @_) ?? < @_ !! < qw(exit hushed))) {
-        $^HINTS{+'vmsish_exit'}   = 0 if $sememe eq 'exit';
-        vmsish::hushed(0) if $sememe eq 'hushed';
-    }
-}
+sub unimport
+    return unless $IsVMS
 
-1;
+    shift
+    $^HINT_BITS ^&^= ^~^ bits((nelems @_) ?? < @_ !! < qw(status time))
+
+    foreach my $sememe (@((nelems @_) ?? < @_ !! < qw(exit hushed)))
+        $^HINTS{+'vmsish_exit'}   = 0 if $sememe eq 'exit'
+        vmsish::hushed(0) if $sememe eq 'hushed'
+    
+
+
+1

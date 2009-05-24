@@ -1,11 +1,11 @@
 #!./perl -w
 
-BEGIN {
-    require './test.pl';
-}
+BEGIN 
+    require './test.pl'
 
-plan tests => 1;
 
-my $rx = qr//;
+plan tests => 1
 
-is(ref $rx, "Regexp", "qr// blessed into `Regexp' by default");
+my $rx = qr//
+
+is(ref $rx, "Regexp", "qr// blessed into `Regexp' by default")

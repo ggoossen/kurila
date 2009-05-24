@@ -7,10 +7,10 @@
 # as Perl itself.
 #############################################################################
 
-package Pod::ParseUtils;
+package Pod::ParseUtils
 
-our ($VERSION);
-$VERSION = 1.35;   ## Current version of this package
+our ($VERSION)
+$VERSION = 1.35   ## Current version of this package
 
 =head1 NAME
 
@@ -30,13 +30,13 @@ POD parsing and processing (i.e. in POD formatters and translators).
 
 =cut
 
-    #-----------------------------------------------------------------------------
-    # Pod::List
-    #
-    # class to hold POD list info (=over, =item, =back)
-    #-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+# Pod::List
+#
+# class to hold POD list info (=over, =item, =back)
+#-----------------------------------------------------------------------------
 
-    package Pod::List;
+package Pod::List;
 
 =head2 Pod::List
 
@@ -57,24 +57,24 @@ See the individual methods/properties for details.
 
 =cut
 
-sub new {
-    my $this = shift;
-    my $class = ref($this) || $this;
-    my %params = %( < @_ );
-    my $self = \%(< %params);
-    bless $self, $class;
-    $self->initialize();
-    return $self;
-}
+sub new
+    my $this = shift
+    my $class = ref($this) || $this
+    my %params = %( < @_ )
+    my $self = \%(< %params)
+    bless $self, $class
+    $self->initialize()
+    return $self
 
-sub initialize {
-    my $self = shift;
-    $self->{+file} ||= 'unknown';
-    $self->{+start} ||= 'unknown';
-    $self->{+indent} ||= 4; # perlpod: "should be the default"
-    $self->{+_items} = \@();
-    $self->{+type} ||= '';
-}
+
+sub initialize
+    my $self = shift
+    $self->{+file} ||= 'unknown'
+    $self->{+start} ||= 'unknown'
+    $self->{+indent} ||= 4 # perlpod: "should be the default"
+    $self->{+_items} = \@()
+    $self->{+type} ||= ''
+
 
 =item $list-E<gt>file()
 
@@ -85,9 +85,9 @@ method or by calling the B<file()> method with a scalar argument.
 =cut
 
 # The POD file name the list appears in
-sub file {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{file} = @_[1]) !! @_[0]->{file};
-}
+sub file
+    return ((nelems @_) +> 1) ??  @(@_[0]->{file} = @_[1]) !! @_[0]->{file}
+
 
 =item $list-E<gt>start()
 
@@ -99,9 +99,9 @@ argument.
 =cut
 
 # The line in the file the node appears
-sub start {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{start} = @_[1]) !! @_[0]->{start};
-}
+sub start
+    return ((nelems @_) +> 1) ??  @(@_[0]->{start} = @_[1]) !! @_[0]->{start}
+
 
 =item $list-E<gt>indent()
 
@@ -113,9 +113,9 @@ with a scalar argument.
 =cut
 
 # indent level
-sub indent {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{indent} = @_[1]) !! @_[0]->{indent};
-}
+sub indent
+    return ((nelems @_) +> 1) ??  @(@_[0]->{indent} = @_[1]) !! @_[0]->{indent}
+
 
 =item $list-E<gt>type()
 
@@ -128,13 +128,13 @@ with a scalar argument.
 =cut
 
 # The type of the list (UL, OL, ...)
-sub type {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{type} = @_[1]) !! @_[0]->{type};
-}
+sub type
+    return ((nelems @_) +> 1) ??  @(@_[0]->{type} = @_[1]) !! @_[0]->{type}
+
 
 =item $list-E<gt>rx()
 
-Without argument, retrieves a regular expression for simplifying the 
+Without argument, retrieves a regular expression for simplifying the
 individual item strings once the list type has been determined. Usage:
 E.g. when converting to HTML, one might strip the leading number in
 an ordered list as C<E<lt>OLE<gt>> already prints numbers itself.
@@ -145,9 +145,9 @@ with a scalar argument.
 =cut
 
 # The regular expression to simplify the items
-sub rx {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{rx} = @_[1]) !! @_[0]->{rx};
-}
+sub rx
+    return ((nelems @_) +> 1) ??  @(@_[0]->{rx} = @_[1]) !! @_[0]->{rx}
+
 
 =item $list-E<gt>item()
 
@@ -158,15 +158,14 @@ If an argument has been given, it is pushed on the list of items.
 =cut
 
 # The individual =items of this list
-sub item($self, ?$item) {
-    if(defined $item) {
-        push($self->{_items}->@, $item);
-        return $item;
-    }
-    else {
-        return $self->{_items}->@;
-    }
-}
+sub item($self, ?$item)
+    if(defined $item)
+        push($self->{_items}->@, $item)
+        return $item
+    else
+        return $self->{_items}->@
+    
+
 
 =item $list-E<gt>parent()
 
@@ -180,9 +179,9 @@ with a scalar argument.
 
 # possibility for parsers/translators to store information about the
 # lists's parent object
-sub parent {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{parent} = @_[1]) !! @_[0]->{parent};
-}
+sub parent
+    return ((nelems @_) +> 1) ??  @(@_[0]->{parent} = @_[1]) !! @_[0]->{parent}
+
 
 =item $list-E<gt>tag()
 
@@ -198,9 +197,9 @@ with a scalar argument.
 
 # possibility for parsers/translators to store information about the
 # list's object
-sub tag {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{tag} = @_[1]) !! @_[0]->{tag};
-}
+sub tag
+    return ((nelems @_) +> 1) ??  @(@_[0]->{tag} = @_[1]) !! @_[0]->{tag}
+
 
 #-----------------------------------------------------------------------------
 # Pod::Hyperlink
@@ -232,36 +231,35 @@ failure, the error message is stored in C<$@>.
 
 =cut
 
-sub new {
-    my $this = shift;
-    my $class = ref($this) || $this;
-    my $self = \%();
-    bless $self, $class;
-    $self->initialize();
-    if(defined @_[0]) {
-        if(ref(@_[0])) {
+sub new
+    my $this = shift
+    my $class = ref($this) || $this
+    my $self = \%()
+    bless $self, $class
+    $self->initialize()
+    if(defined @_[0])
+        if(ref(@_[0]))
             # called with a list of parameters
-            $self->% = %( < @_[0]->% );
-            $self->_construct_text();
-        }
-        else {
+            $self->% = %( < @_[0]->% )
+            $self->_construct_text()
+        else
             # called with L<> contents
-            return undef unless($self->parse(@_[0]));
-        }
-    }
-    return $self;
-}
+            return undef unless($self->parse(@_[0]))
+        
+    
+    return $self
 
-sub initialize {
-    my $self = shift;
-    $self->{+line} ||= 'undef';
-    $self->{+file} ||= 'undef';
-    $self->{+page} ||= '';
-    $self->{+node} ||= '';
-    $self->{+alttext} ||= '';
-    $self->{+type} ||= 'undef';
-    $self->{+_warnings} = \@();
-}
+
+sub initialize
+    my $self = shift
+    $self->{+line} ||= 'undef'
+    $self->{+file} ||= 'undef'
+    $self->{+page} ||= ''
+    $self->{+node} ||= ''
+    $self->{+alttext} ||= ''
+    $self->{+type} ||= 'undef'
+    $self->{+_warnings} = \@()
+
 
 =item $link-E<gt>parse($string)
 
@@ -274,28 +272,28 @@ section can simply be dropped.
 
 =cut
 
-sub parse {
-    my $self = shift;
-          local($_) = @_[0];
+sub parse
+    my $self = shift
+    local($_) = @_[0]
     # syntax check the link and extract destination
-    my @($alttext,$page,$node,$type,$quoted) = @(undef,'','','',0);
+    my @($alttext,$page,$node,$type,$quoted) = @(undef,'','','',0)
 
-    $self->{+_warnings} = \@();
+    $self->{+_warnings} = \@()
 
     # collapse newlines with whitespace
-    s/\s*\n+\s*/ /g;
+    s/\s*\n+\s*/ /g
 
     # strip leading/trailing whitespace
-    if(s/^[\s\n]+//) {
-        $self->warning("ignoring leading whitespace in link");
-    }
-    if(s/[\s\n]+$//) {
-        $self->warning("ignoring trailing whitespace in link");
-    }
-    unless(length($_)) {
-        _invalid_link("empty link");
-        return undef;
-    }
+    if(s/^[\s\n]+//)
+        $self->warning("ignoring leading whitespace in link")
+    
+    if(s/[\s\n]+$//)
+        $self->warning("ignoring trailing whitespace in link")
+    
+    unless(length($_))
+        _invalid_link("empty link")
+        return undef
+    
 
     ## Check for different possibilities. This is tedious and error-prone
     # we match all possibilities (alttext, page, section/item)
@@ -305,142 +303,111 @@ sub parse {
     # problem: a lot of people use (), or (1) or the like to indicate
     # man page sections. But this collides with L<func()> that is supposed
     # to point to an internal funtion...
-    my $page_rx = '[\w.-]+(?:::[\w.-]+)*(?:[(](?:\d\w*|)[)]|)';
+    my $page_rx = '[\w.-]+(?:::[\w.-]+)*(?:[(](?:\d\w*|)[)]|)'
     # page name only
-    if(m!^($page_rx)$!o) {
-        $page = $1;
-        $type = 'page';
-    }
-    # alttext, page and "section"
-    elsif(m!^(.*?)\s*[|]\s*($page_rx)\s*/\s*"(.+)"$!o) {
-        @($alttext, $page, $node) = @($1, $2, $3);
-        $type = 'section';
-        $quoted = 1; #... therefore | and / are allowed
-    }
-    # alttext and page
-    elsif(m!^(.*?)\s*[|]\s*($page_rx)$!o) {
-        @($alttext, $page) = @($1, $2);
-        $type = 'page';
-    }
-    # alttext and "section"
-    elsif(m!^(.*?)\s*[|]\s*(?:/\s*|)"(.+)"$!) {
-        @($alttext, $node) = @($1,$2);
-        $type = 'section';
-        $quoted = 1;
-    }
-    # page and "section"
-    elsif(m!^($page_rx)\s*/\s*"(.+)"$!o) {
-        @($page, $node) = @($1, $2);
-        $type = 'section';
-        $quoted = 1;
-    }
-    # page and item
-    elsif(m!^($page_rx)\s*/\s*(.+)$!o) {
-        @($page, $node) = @($1, $2);
-        $type = 'item';
-    }
-    # only "section"
-    elsif(m!^/?"(.+)"$!) {
-        $node = $1;
-        $type = 'section';
-        $quoted = 1;
-    }
-    # only item
-    elsif(m!^\s*/(.+)$!) {
-        $node = $1;
-        $type = 'item';
-    }
-
-    # non-standard: Hyperlink with alt-text - doesn't remove protocol prefix, maybe it should?
-    elsif(m!^ \s* (.*?) \s* [|] \s* (\w+:[^:\s] [^\s|]*?) \s* $!ix) {
-        @($alttext,$node) = @($1,$2);
-        $type = 'hyperlink';
-    }
-
-    # non-standard: Hyperlink
-    elsif(m!^(\w+:[^:\s]\S*)$!i) {
-        $node = $1;
-        $type = 'hyperlink';
-    }
-    # alttext, page and item
-    elsif(m!^(.*?)\s*[|]\s*($page_rx)\s*/\s*(.+)$!o) {
-        @($alttext, $page, $node) = @($1, $2, $3);
-        $type = 'item';
-    }
-    # alttext and item
-    elsif(m!^(.*?)\s*[|]\s*/(.+)$!) {
-        @($alttext, $node) = @($1,$2);
-    }
-    # must be an item or a "malformed" section (without "")
-    else {
-        $node = $_;
-        $type = 'item';
-    }
+    if(m!^($page_rx)$!o)
+        $page = $1
+        $type = 'page'
+    elsif(m!^(.*?)\s*[|]\s*($page_rx)\s*/\s*"(.+)"$!o)
+        @($alttext, $page, $node) = @($1, $2, $3)
+        $type = 'section'
+        $quoted = 1 #... therefore | and / are allowed
+    elsif(m!^(.*?)\s*[|]\s*($page_rx)$!o)
+        @($alttext, $page) = @($1, $2)
+        $type = 'page'
+    elsif(m!^(.*?)\s*[|]\s*(?:/\s*|)"(.+)"$!)
+        @($alttext, $node) = @($1,$2)
+        $type = 'section'
+        $quoted = 1
+    elsif(m!^($page_rx)\s*/\s*"(.+)"$!o)
+        @($page, $node) = @($1, $2)
+        $type = 'section'
+        $quoted = 1
+    elsif(m!^($page_rx)\s*/\s*(.+)$!o)
+        @($page, $node) = @($1, $2)
+        $type = 'item'
+    elsif(m!^/?"(.+)"$!)
+        $node = $1
+        $type = 'section'
+        $quoted = 1
+    elsif(m!^\s*/(.+)$!)
+        $node = $1
+        $type = 'item'
+    elsif(m!^ \s* (.*?) \s* [|] \s* (\w+:[^:\s] [^\s|]*?) \s* $!ix)
+        @($alttext,$node) = @($1,$2)
+        $type = 'hyperlink'
+    elsif(m!^(\w+:[^:\s]\S*)$!i)
+        $node = $1
+        $type = 'hyperlink'
+    elsif(m!^(.*?)\s*[|]\s*($page_rx)\s*/\s*(.+)$!o)
+        @($alttext, $page, $node) = @($1, $2, $3)
+        $type = 'item'
+    elsif(m!^(.*?)\s*[|]\s*/(.+)$!)
+        @($alttext, $node) = @($1,$2)
+    else
+        $node = $_
+        $type = 'item'
+    
     # collapse whitespace in nodes
-    $node =~ s/\s+/ /gs;
+    $node =~ s/\s+/ /gs
 
     # empty alternative text expands to node name
-    if(defined $alttext) {
-        if(!length($alttext)) {
-            $alttext = $node ^|^ $page;
-        }
-    }
-    else {
-        $alttext = '';
-    }
+    if(defined $alttext)
+        if(!length($alttext))
+            $alttext = $node ^|^ $page
+        
+    else
+        $alttext = ''
+    
 
-    if($page =~ m/[(]\w*[)]$/) {
-        $self->warning("(section) in '$page' deprecated");
-    }
-    if(!$quoted && $node =~ m:[|/]: && $type ne 'hyperlink') {
-        $self->warning("node '$node' contains non-escaped | or /");
-    }
-    if($alttext =~ m:[|/]:) {
-        $self->warning("alternative text '$node' contains non-escaped | or /");
-    }
-    $self->{+page} = $page;
-    $self->{+node} = $node;
-    $self->{+alttext} = $alttext;
+    if($page =~ m/[(]\w*[)]$/)
+        $self->warning("(section) in '$page' deprecated")
+    
+    if(!$quoted && $node =~ m:[|/]: && $type ne 'hyperlink')
+        $self->warning("node '$node' contains non-escaped | or /")
+    
+    if($alttext =~ m:[|/]:)
+        $self->warning("alternative text '$node' contains non-escaped | or /")
+    
+    $self->{+page} = $page
+    $self->{+node} = $node
+    $self->{+alttext} = $alttext
     #warn "DEBUG: page=$page section=$section item=$item alttext=$alttext\n";
-    $self->{+type} = $type;
-    $self->_construct_text();
-    1;
-}
+    $self->{+type} = $type
+    $self->_construct_text()
+    1
 
-sub _construct_text {
-    my $self = shift;
-    my $alttext = $self->alttext();
-    my $type = $self->type();
-    my $section = $self->node();
-    my $page = $self->page();
-    my $page_ext = '';
-    $page =~ s/([(]\w*[)])$// && ($page_ext = $1);
-    if($alttext) {
-        $self->{+_text} = $alttext;
-    }
-    elsif($type eq 'hyperlink') {
-        $self->{+_text} = $section;
-    }
-    else {
+
+sub _construct_text
+    my $self = shift
+    my $alttext = $self->alttext()
+    my $type = $self->type()
+    my $section = $self->node()
+    my $page = $self->page()
+    my $page_ext = ''
+    $page =~ s/([(]\w*[)])$// && ($page_ext = $1)
+    if($alttext)
+        $self->{+_text} = $alttext
+    elsif($type eq 'hyperlink')
+        $self->{+_text} = $section
+    else
         $self->{+_text} = ($section || '') .
-        (($page && $section) ?? ' in ' !! '') .
-            "$page$page_ext";
-    }
+            (($page && $section) ?? ' in ' !! '') .
+            "$page$page_ext"
+    
     # for being marked up later
     # use the non-standard markers P<> and Q<>, so that the resulting
     # text can be parsed by the translators. It's their job to put
     # the correct hypertext around the linktext
-    if($alttext) {
-        $self->{+_markup} = "Q<$alttext>";
-    }
-    elsif($type eq 'hyperlink') {
-        $self->{+_markup} = "Q<$section>";
-    }
-    else {
+    if($alttext)
+        $self->{+_markup} = "Q<$alttext>"
+    elsif($type eq 'hyperlink')
+        $self->{+_markup} = "Q<$section>"
+    else
         $self->{+_markup} = (!$section ?? '' !! "Q<$section>") .
-        ($page ?? ($section ?? ' in '!!'') . "P<$page>$page_ext" !! '');
-    }
-}
+            ($page ?? ($section ?? ' in '!!'') . "P<$page>$page_ext" !! '')
+    
+
 
 =item $link-E<gt>markup($string)
 
@@ -453,9 +420,9 @@ have to be implemented in the translator.
 =cut
 
 #' retrieve/set markuped text
-sub markup {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{+_markup} = @_[1]) !! @_[0]->{?_markup};
-}
+sub markup
+    return ((nelems @_) +> 1) ??  @(@_[0]->{+_markup} = @_[1]) !! @_[0]->{?_markup}
+
 
 =item $link-E<gt>text()
 
@@ -472,9 +439,9 @@ that are marked up):
 =cut
 
 # The complete link's text
-sub text {
-    @_[0]->{?_text};
-}
+sub text
+    @_[0]->{?_text}
+
 
 =item $link-E<gt>warning()
 
@@ -484,14 +451,14 @@ parsing process.
 =cut
 
 # Set/retrieve warnings
-sub warning {
-    my $self = shift;
-    if((nelems @_)) {
-        push($self->{_warnings}->@, < @_);
-        return @_;
-    }
-    return $self->{?_warnings}->@;
-}
+sub warning
+    my $self = shift
+    if((nelems @_))
+        push($self->{_warnings}->@, < @_)
+        return @_
+    
+    return $self->{?_warnings}->@
+
 
 =item $link-E<gt>file()
 
@@ -503,14 +470,14 @@ the link was encountered in. Has to be filled in manually.
 =cut
 
 # The line in the file the link appears
-sub line {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{+line} = @_[1]) !! @_[0]->{?line};
-}
+sub line
+    return ((nelems @_) +> 1) ??  @(@_[0]->{+line} = @_[1]) !! @_[0]->{?line}
+
 
 # The POD file name the link appears in
-sub file {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{+file} = @_[1]) !! @_[0]->{?file};
-}
+sub file
+    return ((nelems @_) +> 1) ??  @(@_[0]->{+file} = @_[1]) !! @_[0]->{?file}
+
 
 =item $link-E<gt>page()
 
@@ -519,13 +486,13 @@ This method sets or returns the POD page this link points to.
 =cut
 
 # The POD page the link appears on
-sub page {
-    if ((nelems @_) +> 1) {
-        @_[0]->{+page} = @_[1];
-        @_[0]->_construct_text();
-    }
-    @_[0]->{?page};
-}
+sub page
+    if ((nelems @_) +> 1)
+        @_[0]->{+page} = @_[1]
+        @_[0]->_construct_text()
+    
+    @_[0]->{?page}
+
 
 =item $link-E<gt>node()
 
@@ -534,13 +501,13 @@ As above, but the destination node text of the link.
 =cut
 
 # The link destination
-sub node {
-    if ((nelems @_) +> 1) {
-        @_[0]->{+node} = @_[1];
-        @_[0]->_construct_text();
-    }
-    @_[0]->{?node};
-}
+sub node
+    if ((nelems @_) +> 1)
+        @_[0]->{+node} = @_[1]
+        @_[0]->_construct_text()
+    
+    @_[0]->{?node}
+
 
 =item $link-E<gt>alttext()
 
@@ -549,13 +516,13 @@ Sets or returns an alternative text specified in the link.
 =cut
 
 # Potential alternative text
-sub alttext {
-    if ((nelems @_) +> 1) {
-        @_[0]->{+alttext} = @_[1];
-        @_[0]->_construct_text();
-    }
-    @_[0]->{?alttext};
-}
+sub alttext
+    if ((nelems @_) +> 1)
+        @_[0]->{+alttext} = @_[1]
+        @_[0]->_construct_text()
+    
+    @_[0]->{?alttext}
+
 
 =item $link-E<gt>type()
 
@@ -565,9 +532,9 @@ there is also C<hyperlink>, derived from e.g. C<LE<lt>http://perl.comE<gt>>
 =cut
 
 # The type: item or headn
-sub type {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{+type} = @_[1]) !! @_[0]->{?type};
-}
+sub type
+    return ((nelems @_) +> 1) ??  @(@_[0]->{+type} = @_[1]) !! @_[0]->{?type}
+
 
 =item $link-E<gt>link()
 
@@ -578,37 +545,35 @@ Returns the link as contents of C<LE<lt>E<gt>>. Reciprocal to B<parse()>.
 =cut
 
 # The link itself
-sub link {
-    my $self = shift;
-    my $link = $self->page() || '';
-    if($self->node()) {
-        my $node = $self->node();
-        if($self->type() eq 'section') {
-            $link .= ($link ?? '/' !! '') . '"' . $node . '"';
-        }
-        elsif($self->type() eq 'hyperlink') {
-            $link = $self->node();
-        }
-        else { # item
-            $link .= '/' . $node;
-        }
-    }
-    if($self->alttext()) {
-        my $text = $self->alttext();
-        $text =~ s/\|/E<verbar>/g;
-        $text =~ s:/:E<sol>:g;
-        $link = "$text|$link";
-    }
-    $link;
-}
+sub link
+    my $self = shift
+    my $link = $self->page() || ''
+    if($self->node())
+        my $node = $self->node()
+        if($self->type() eq 'section')
+            $link .= ($link ?? '/' !! '') . '"' . $node . '"'
+        elsif($self->type() eq 'hyperlink')
+            $link = $self->node()
+        else # item
+            $link .= '/' . $node
+        
+    
+    if($self->alttext())
+        my $text = $self->alttext()
+        $text =~ s/\|/E<verbar>/g
+        $text =~ s:/:E<sol>:g
+        $link = "$text|$link"
+    
+    $link
 
-sub _invalid_link($msg) {
+
+sub _invalid_link($msg)
     # this sets @_
     #try { die "$msg\n" };
     #chomp $@;
-    $^EVAL_ERROR = $msg; # this seems to work, too!
-    undef;
-}
+    $^EVAL_ERROR = $msg # this seems to work, too!
+    undef
+
 
 #-----------------------------------------------------------------------------
 # Pod::Cache
@@ -633,13 +598,13 @@ POD documents of class Pod::Cache::Item.
 
 =cut
 
-sub new {
-    my $this = shift;
-    my $class = ref($this) || $this;
-    my $self = \@();
-    bless $self, $class;
-    return $self;
-}
+sub new
+    my $this = shift
+    my $class = ref($this) || $this
+    my $self = \@()
+    bless $self, $class
+    return $self
+
 
 =item $cache-E<gt>item()
 
@@ -648,16 +613,15 @@ list of all cache elements.
 
 =cut
 
-sub item($self,%< %param) {
-    if(%param) {
-        my $item = Pod::Cache::Item->new(< %param);
-        push($self->@, $item);
-        return $item;
-    }
-    else {
-        return $self->@;
-    }
-}
+sub item($self,%< %param)
+    if(%param)
+        my $item = Pod::Cache::Item->new(< %param)
+        push($self->@, $item)
+        return $item
+    else
+        return $self->@
+    
+
 
 =item $cache-E<gt>find_page($name)
 
@@ -669,14 +633,14 @@ not found.
 
 =cut
 
-sub find_page($self,$page) {
-    foreach( $self->@) {
-        if($_->page() eq $page) {
-            return $_;
-        }
-    }
-    undef;
-}
+sub find_page($self,$page)
+    foreach( $self->@)
+        if($_->page() eq $page)
+            return $_
+        
+    
+    undef
+
 
 package Pod::Cache::Item;
 
@@ -696,20 +660,20 @@ Create a new object.
 
 =cut
 
-sub new {
-    my $this = shift;
-    my $class = ref($this) || $this;
-    my %params = %( < @_ );
-    my $self = \%(< %params);
-    bless $self, $class;
-    $self->initialize();
-    return $self;
-}
+sub new
+    my $this = shift
+    my $class = ref($this) || $this
+    my %params = %( < @_ )
+    my $self = \%(< %params)
+    bless $self, $class
+    $self->initialize()
+    return $self
 
-sub initialize {
-    my $self = shift;
-    $self->{+nodes} = \@() unless(defined $self->{?nodes});
-}
+
+sub initialize
+    my $self = shift
+    $self->{+nodes} = \@() unless(defined $self->{?nodes})
+
 
 =item $cacheitem-E<gt>page()
 
@@ -718,9 +682,9 @@ Set/retrieve the POD document name (e.g. "Pod::Parser").
 =cut
 
 # The POD page
-sub page {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{+page} = @_[1]) !! @_[0]->{?page};
-}
+sub page
+    return ((nelems @_) +> 1) ??  @(@_[0]->{+page} = @_[1]) !! @_[0]->{?page}
+
 
 =item $cacheitem-E<gt>description()
 
@@ -730,9 +694,9 @@ section.
 =cut
 
 # The POD description, taken out of NAME if present
-sub description {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{+description} = @_[1]) !! @_[0]->{?description};
-}
+sub description
+    return ((nelems @_) +> 1) ??  @(@_[0]->{+description} = @_[1]) !! @_[0]->{?description}
+
 
 =item $cacheitem-E<gt>path()
 
@@ -741,9 +705,9 @@ Set/retrieve the POD file storage path.
 =cut
 
 # The file path
-sub path {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{+path} = @_[1]) !! @_[0]->{?path};
-}
+sub path
+    return ((nelems @_) +> 1) ??  @(@_[0]->{+path} = @_[1]) !! @_[0]->{?path}
+
 
 =item $cacheitem-E<gt>file()
 
@@ -752,9 +716,9 @@ Set/retrieve the POD file name.
 =cut
 
 # The POD file name
-sub file {
-    return ((nelems @_) +> 1) ??  @(@_[0]->{+file} = @_[1]) !! @_[0]->{?file};
-}
+sub file
+    return ((nelems @_) +> 1) ??  @(@_[0]->{+file} = @_[1]) !! @_[0]->{?file}
+
 
 =item $cacheitem-E<gt>nodes()
 
@@ -768,15 +732,14 @@ unique id for the C<find_node> method to work correctly.
 =cut
 
 # The POD nodes
-sub nodes($self,@< @nodes) {
-    if((nelems @nodes)) {
-        push($self->{nodes}->@, < @nodes);
-        return @nodes;
-    }
-    else {
-        return $self->{?nodes}->@;
-    }
-}
+sub nodes($self,@< @nodes)
+    if((nelems @nodes))
+        push($self->{nodes}->@, < @nodes)
+        return @nodes
+    else
+        return $self->{?nodes}->@
+    
+
 
 =item $cacheitem-E<gt>find_node($name)
 
@@ -786,17 +749,17 @@ stored in the node array) or undef if not found.
 
 =cut
 
-sub find_node($self,$node) {
-    my @search;
-    push(@search, < $self->{?nodes}->@) if($self->{?nodes});
-    push(@search, < $self->{?idx}->@) if($self->{?idx});
-    foreach( @search) {
-        if($_->[0] eq $node) {
-            return $_->[1]; # id
-        }
-    }
-    undef;
-}
+sub find_node($self,$node)
+    my @search
+    push(@search, < $self->{?nodes}->@) if($self->{?nodes})
+    push(@search, < $self->{?idx}->@) if($self->{?idx})
+    foreach( @search)
+        if($_->[0] eq $node)
+            return $_->[1] # id
+        
+    
+    undef
+
 
 =item $cacheitem-E<gt>idx()
 
@@ -812,15 +775,14 @@ unique id.
 =cut
 
 # The POD index entries
-sub idx($self,@< @idx) {
-    if((nelems @idx)) {
-        push($self->{idx}->@, < @idx);
-        return @idx;
-    }
-    else {
-        return $self->{?idx}->@;
-    }
-}
+sub idx($self,@< @idx)
+    if((nelems @idx))
+        push($self->{idx}->@, < @idx)
+        return @idx
+    else
+        return $self->{?idx}->@
+    
+
 
 =head1 AUTHOR
 
@@ -837,4 +799,4 @@ L<pod2html>
 
 =cut
 
-1;
+1

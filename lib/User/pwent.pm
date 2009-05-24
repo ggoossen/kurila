@@ -1,15 +1,15 @@
-package User::pwent;
+package User::pwent
 
-our $VERSION = '1.00';
+our $VERSION = '1.00'
 
 use warnings;
 
 use Config;
 
-our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-BEGIN {
-    use Exporter   ();
-    @EXPORT      = qw(getpwent getpwuid getpwnam getpw);
+our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS)
+BEGIN 
+    use Exporter   ()
+    @EXPORT      = qw(getpwent getpwuid getpwnam getpw)
     @EXPORT_OK   = qw(
                         pw_has
 
@@ -20,27 +20,27 @@ BEGIN {
                         $pw_quota   $pw_comment
                         $pw_expire
 
-                   );
+                   )
     %EXPORT_TAGS = %(
-            FIELDS => (grep( {m/^\$pw_/ }, @EXPORT_OK)) +@+ @EXPORT,
-            ALL    => @EXPORT +@+ @EXPORT_OK,
-        );
-}
+        FIELDS => (grep( {m/^\$pw_/ }, @EXPORT_OK)) +@+ @EXPORT,
+        ALL    => @EXPORT +@+ @EXPORT_OK,
+        )
+
 
 our ($pw_name, $pw_passwd, $pw_uid, $pw_gid, $pw_change, $pw_age,
     $pw_class, $pw_comment, $pw_gecos, $pw_dir, $pw_shell, $pw_expire,
-    $pw_quota);
+    $pw_quota)
 #
 # XXX: these mean somebody hacked this module's source
 #      without understanding the underlying assumptions.
 #
-my $IE = "[INTERNAL ERROR]";
+my $IE = "[INTERNAL ERROR]"
 
 # Class::Struct forbids use of @ISA
-sub import {
-    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
-    return Exporter::import(< @_);
-}
+sub import
+    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1
+    return Exporter::import(< @_)
+
 
 use Class::Struct < qw(struct);
 struct 'User::pwent' => \@(
@@ -67,37 +67,36 @@ struct 'User::pwent' => \@(
        # you might not have this one
        expire  => '$',         # pwent[9]
 
-       );
+       )
 
 
 # init our groks hash to be true if the built platform knew how
 # to do each struct pwd field that perl can ever under any circumstances
 # know about.  we do not use /^pw_?/, but just the tails.
-sub _feature_init {
-    our %Groks;         # whether build system knew how to do this feature
+sub _feature_init
+    our %Groks         # whether build system knew how to do this feature
     for my $feep ( qw{
                          pwage      pwchange   pwclass    pwcomment
                          pwexpire   pwgecos    pwpasswd   pwquota
                      }
-    )
-    {
+        )
         my $short = $feep =~ m/^pw(.*)/
-            ?? $1
-        !! do {
+        ?? $1
+        !! do
             # not cluck, as we know we called ourselves,
             # and a confession is probably imminent anyway
-            warn("$IE $feep is a funny struct pwd field");
-            $feep;
-        };
+            warn("$IE $feep is a funny struct pwd field")
+            $feep
+        
 
-        %Groks{+$short} = defined config_value("d_" . $feep);
-    }
+        %Groks{+$short} = defined config_value("d_" . $feep)
+    
     # assume that any that are left are always there
-    for my $feep ( grep { m/^\$pw_/s }, @EXPORT_OK) {
-        $feep =~ m/^\$pw_(.*)/;
-        %Groks{+$1} = 1 unless defined %Groks{?$1};
-    }
-}
+    for my $feep ( grep { m/^\$pw_/s }, @EXPORT_OK)
+        $feep =~ m/^\$pw_(.*)/
+        %Groks{+$1} = 1 unless defined %Groks{?$1}
+    
+
 
 # With arguments, reports whether one or more fields are all implemented
 # in the build machine's struct pwd pw_*.  May be whitespace separated.
@@ -110,73 +109,70 @@ sub _feature_init {
 # a field that Perl never knows how to provide under any circumstances.
 # If the module does this idiocy to itself, the explosion is noisier.
 #
-sub pw_has {
-    our %Groks;         # whether build system knew how to do this feature
-    my $cando = 1;
+sub pw_has
+    our %Groks         # whether build system knew how to do this feature
+    my $cando = 1
     my $sploder = caller() ne __PACKAGE__
-        ?? \&die
-        !! sub { die("$IE $(join ' ',@_)") };
-    if ((nelems @_) == 0) {
-        my @valid = sort grep { %Groks{?$_} }, keys %Groks;
-        return @valid;
-    }
-    for my $feep ( @+: map { split }, @_) {
+    ?? \&die
+    !! sub (@< @_) { die("$IE $(join ' ',@_)") }
+    if ((nelems @_) == 0)
+        my @valid = sort grep { %Groks{?$_} }, keys %Groks
+        return @valid
+    
+    for my $feep ( @+: map { split }, @_)
         defined %Groks{?$feep}
-            || $sploder->("$feep is never a valid struct pwd field");
-        $cando &&= %Groks{?$feep};
-    }
-    return $cando;
-}
+            || $sploder->("$feep is never a valid struct pwd field")
+        $cando &&= %Groks{?$feep}
+    
+    return $cando
 
-sub _populate {
-    return unless (nelems @_);
-    my $pwob = new();
+
+sub _populate
+    return unless (nelems @_)
+    my $pwob = new()
 
     # Any that haven't been pw_had are assumed on "all" platforms of
     # course, this may not be so, but you can't get here otherwise,
     # since the underlying core call already took exception to your
     # impudence.
 
-    $pw_name    = $pwob->name   ( @_[0] );
-    $pw_passwd  = $pwob->passwd ( @_[1] )   if pw_has("passwd");
-    $pw_uid     = $pwob->uid    ( @_[2] );
-    $pw_gid     = $pwob->gid    ( @_[3] );
+    $pw_name    = $pwob->name   ( @_[0] )
+    $pw_passwd  = $pwob->passwd ( @_[1] )   if pw_has("passwd")
+    $pw_uid     = $pwob->uid    ( @_[2] )
+    $pw_gid     = $pwob->gid    ( @_[3] )
 
-    if (pw_has("change")) {
-        $pw_change      = $pwob->change ( @_[4] );
-    }
-    elsif (pw_has("age")) {
-        $pw_age         = $pwob->age    ( @_[4] );
-    }
-    elsif (pw_has("quota")) {
-        $pw_quota       = $pwob->quota  ( @_[4] );
-    }
+    if (pw_has("change"))
+        $pw_change      = $pwob->change ( @_[4] )
+    elsif (pw_has("age"))
+        $pw_age         = $pwob->age    ( @_[4] )
+    elsif (pw_has("quota"))
+        $pw_quota       = $pwob->quota  ( @_[4] )
+    
 
-    if (pw_has("class")) {
-        $pw_class       = $pwob->class  ( @_[5] );
-    }
-    elsif (pw_has("comment")) {
-        $pw_comment     = $pwob->comment( @_[5] );
-    }
+    if (pw_has("class"))
+        $pw_class       = $pwob->class  ( @_[5] )
+    elsif (pw_has("comment"))
+        $pw_comment     = $pwob->comment( @_[5] )
+    
 
-    $pw_gecos   = $pwob->gecos  ( @_[6] ) if pw_has("gecos");
+    $pw_gecos   = $pwob->gecos  ( @_[6] ) if pw_has("gecos")
 
-    $pw_dir     = $pwob->dir    ( @_[7] );
-    $pw_shell   = $pwob->shell  ( @_[8] );
+    $pw_dir     = $pwob->dir    ( @_[7] )
+    $pw_shell   = $pwob->shell  ( @_[8] )
 
-    $pw_expire  = $pwob->expire ( @_[9] ) if pw_has("expire");
+    $pw_expire  = $pwob->expire ( @_[9] ) if pw_has("expire")
 
-    return $pwob;
-}
+    return $pwob
+
 
 sub getpwent () { _populate(CORE::getpwent()) }
 sub getpwnam ($v) { _populate(CORE::getpwnam($v)) }
 sub getpwuid ($v) { _populate(CORE::getpwuid($v)) }
 sub getpw    ($v) { ($v =~ m/^\d+\z/s) ?? &getpwuid($v) !! &getpwnam($v) }
 
-_feature_init();
+_feature_init()
 
-1;
+1
 __END__
 
 =head1 NAME

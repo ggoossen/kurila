@@ -1,10 +1,10 @@
 
 # Time-stamp: "2004-06-17 23:06:22 PDT"
 
-use I18N::LangTags::Detect;
-use env;
+use I18N::LangTags::Detect
+use env
 
-use Test::More;
+use Test::More
 BEGIN { plan tests => 87 };
 
 my @in = grep { m/\S/ }, split m/\n/, q{
@@ -57,49 +57,49 @@ my @in = grep { m/\S/ }, split m/\n/, q{
 [ en ja       ]  en; q=0.5, ja; q=0.5
 [ fr-ca fr en ]  fr-ca, fr;q=0.8, en;q=0.7
 [ NIX ] NIX
-};
+}
 
-foreach my $in ( @in) {
-    $in =~ s/^\s*\[([^\]]+)\]\s*//s or die "Bad input: $in";
-    my @should = @( do { my $x = $1; $x =~ m/(\S+)/g } );
+foreach my $in ( @in)
+    $in =~ s/^\s*\[([^\]]+)\]\s*//s or die "Bad input: $in"
+    my @should = @( do { my $x = $1; $x =~ m/(\S+)/g } )
 
     if($in eq 'NIX') { $in = ''; @should = @( () ); }
 
-    local env::var('HTTP_ACCEPT_LANGUAGE') = undef;
+    local env::var('HTTP_ACCEPT_LANGUAGE') = undef
 
     foreach my $modus (@(
-    sub {
-            print $^STDOUT, "# Testing with arg...\n";
-            env::var('HTTP_ACCEPT_LANGUAGE' ) = 'PLORK';
-            return @(@_[0]);
-        },
-        sub {
-            print $^STDOUT, "# Testing wath HTTP_ACCEPT_LANGUAGE...\n";
-            env::var('HTTP_ACCEPT_LANGUAGE' ) = @_[0];
-            return();
-        },)
-    ) {
-        my @args = &$modus($in);
+        sub (@< @_)
+        print $^STDOUT, "# Testing with arg...\n"
+        env::var('HTTP_ACCEPT_LANGUAGE' ) = 'PLORK'
+        return @(@_[0])
+    ,
+        sub (@< @_)
+        print $^STDOUT, "# Testing wath HTTP_ACCEPT_LANGUAGE...\n"
+        env::var('HTTP_ACCEPT_LANGUAGE' ) = @_[0]
+        return()
+    ,)
+        )
+        my @args = &$modus($in)
 
         # ////////////////////////////////////////////////////
-        my @out = I18N::LangTags::Detect->http_accept_langs(< @args);
+        my @out = I18N::LangTags::Detect->http_accept_langs(< @args)
         # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
         if(
-            (nelems @out) == nelems @should
+              (nelems @out) == nelems @should
             and lc( join "\e", @(<@out) ) eq lc( join "\e", @should )
-        ) {
-                print $^STDOUT, "# Happily got [$(join ' ',@(<@out))] from [$in]\n";
-                ok 1;
-            } else {
-                ok 0;
-                print $^STDOUT, "#Got:         [$(join ' ',@out)]\n",
-                    "# but wanted: [$(join ' ',@should)]\n",
-                    "# < \"$in\"\n#\n";
-            }
-    }
-}
+            )
+            print $^STDOUT, "# Happily got [$(join ' ',@(<@out))] from [$in]\n"
+            ok 1
+        else
+            ok 0
+            print $^STDOUT, "#Got:         [$(join ' ',@out)]\n",
+                "# but wanted: [$(join ' ',@should)]\n",
+                "# < \"$in\"\n#\n"
+        
+    
 
-print $^STDOUT, "#\n#\n# Bye-bye!\n";
-ok 1;
+
+print $^STDOUT, "#\n#\n# Bye-bye!\n"
+ok 1
 

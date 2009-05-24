@@ -1,96 +1,92 @@
 
-use lib 't';
+use lib 't'
 
-use warnings;
-use bytes;
+use warnings
+use bytes
 
-use Test::More ;
-use CompTestUtils;
+use Test::More 
+use CompTestUtils
 
-BEGIN {
+BEGIN 
     # use Test::NoWarnings, if available
-    my $extra = 0 ;
+    my $extra = 0 
     $extra = 1
-        if try { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 };
+        if try { require Test::NoWarnings ;  'Test::NoWarnings'->import(); 1 }
 
-    plan tests => 48 + $extra ;
+    plan tests => 48 + $extra 
 
-}
+
 
 sub run
-{
-    my $CompressClass   = identify();
-    my $AnyClass        = getClass();
-    my $UncompressClass = getInverse($CompressClass);
-    my $Error           = getErrorRef($CompressClass);
-    my $UnError         = getErrorRef($UncompressClass);
+    my $CompressClass   = identify()
+    my $AnyClass        = getClass()
+    my $UncompressClass = getInverse($CompressClass)
+    my $Error           = getErrorRef($CompressClass)
+    my $UnError         = getErrorRef($UncompressClass)
 
-    my $AnyConstruct = "IO::Uncompress::$($AnyClass)" ;
-    my $AnyError = \Symbol::fetch_glob( "IO::Uncompress::$($AnyClass)::$($AnyClass)Error")->$;
+    my $AnyConstruct = "IO::Uncompress::$($AnyClass)" 
+    my $AnyError = \Symbol::fetch_glob( "IO::Uncompress::$($AnyClass)::$($AnyClass)Error")->$
 
     for my $trans (@( 0, 1) )
-    {
         for my $file (@( 0, 1) )
-        {
-            title "$AnyClass(Transparent => $trans, File=>$file) with $CompressClass" ;
-            my $string = "some text" x 100 ;
+            title "$AnyClass(Transparent => $trans, File=>$file) with $CompressClass" 
+            my $string = "some text" x 100 
 
-            my $buffer ;
-            my $x = $CompressClass-> new((\$buffer)) ;
-            ok $x, "  create $CompressClass object" ;
-            ok $x->write($string), "  write to object" ;
-            ok $x->close, "  close ok" ;
+            my $buffer 
+            my $x = $CompressClass-> new((\$buffer)) 
+            ok $x, "  create $CompressClass object" 
+            ok $x->write($string), "  write to object" 
+            ok $x->close, "  close ok" 
 
-            my $lex = LexFile->new( my $output);
-            my $input ;
+            my $lex = LexFile->new( my $output)
+            my $input 
 
-            if ($file) {
-                writeFile($output, $buffer);
-                $input = $output;
-            }
-            else {
-                $input = \$buffer;
-            }
+            if ($file)
+                writeFile($output, $buffer)
+                $input = $output
+            else
+                $input = \$buffer
+            
 
-            do {
+            do
                 my $unc = $AnyConstruct-> new( $input, Transparent => $trans,
                     RawInflate => 1,
-                    Append => 1)  ;
+                    Append => 1)  
 
-                ok $unc, "  Created $AnyClass object" 
-                    or print $^STDOUT, "# $AnyError->$\n";
-                my $uncomp ;
-                1 while  $unc->read($uncomp) +> 0 ;
-                #ok $unc->read($uncomp) > 0 
+                ok $unc, "  Created $AnyClass object"
+                    or print $^STDOUT, "# $AnyError->$\n"
+                my $uncomp 
+                1 while  $unc->read($uncomp) +> 0 
+                #ok $unc->read($uncomp) > 0
                 #    or print "# $$AnyError\n";
-                my $y;
-                is $unc->read($y, 1), 0, "  at eof" ;
-                ok $unc->eof(), "  at eof" ;
+                my $y
+                is $unc->read($y, 1), 0, "  at eof" 
+                ok $unc->eof(), "  at eof" 
                 #ok $unc->type eq $Type;
 
-                is $uncomp, $string, "  expected output" ;
-            };
+                is $uncomp, $string, "  expected output" 
+            
 
-            do {
+            do
                 my $unc = $AnyConstruct-> new( $input, Transparent => $trans,
                     RawInflate => 1,
-                    Append => 1)  ;
+                    Append => 1)  
 
-                ok $unc, "  Created $AnyClass object" 
-                    or print $^STDOUT, "# $AnyError->$\n";
-                my $uncomp ;
-                1 while  $unc->read($uncomp, 100) +> 0 ;
-                #ok $unc->read($uncomp) > 0 
+                ok $unc, "  Created $AnyClass object"
+                    or print $^STDOUT, "# $AnyError->$\n"
+                my $uncomp 
+                1 while  $unc->read($uncomp, 100) +> 0 
+                #ok $unc->read($uncomp) > 0
                 #    or print "# $$AnyError\n";
-                my $y;
-                is $unc->read($y, 1), 0, "  at eof" ;
-                ok $unc->eof(), "  at eof" ;
+                my $y
+                is $unc->read($y, 1), 0, "  at eof" 
+                ok $unc->eof(), "  at eof" 
                 #ok $unc->type eq $Type;
 
-                is $uncomp, $string, "  expected output" ;
-            };
-        }
-    }
-}
+                is $uncomp, $string, "  expected output" 
+            
+        
+    
 
-1;
+
+1

@@ -1,11 +1,11 @@
-package HAS_HOOK;
+package HAS_HOOK
 
-our ($thawed_count, $loaded_count);
+our ($thawed_count, $loaded_count)
 
-sub STORABLE_thaw {
-    ++$thawed_count;
-}
+sub STORABLE_thaw
+    ++$thawed_count
 
-++$loaded_count;
 
-1;
+++$loaded_count
+
+1

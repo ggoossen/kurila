@@ -1,14 +1,14 @@
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker
 
-my $clean = %();
+my $clean = %()
 
-if (-f "Normalize.xs") {
-    print $^STDERR, "Making header files for XS...\n";
+if (-f "Normalize.xs")
+    print $^STDERR, "Making header files for XS...\n"
 
-    evalfile 'mkheader' or die $^EVAL_ERROR || "mkheader: $^OS_ERROR";
+    evalfile 'mkheader' or die $^EVAL_ERROR || "mkheader: $^OS_ERROR"
 
-    $clean = %( FILES => 'unfcan.h unfcmb.h unfcmp.h unfcpt.h unfexc.h' );
-}
+    $clean = %( FILES => 'unfcan.h unfcmb.h unfcmp.h unfcpt.h unfexc.h' )
+
 
 WriteMakefile(
     'INSTALLDIRS'	=> 'perl',
@@ -16,13 +16,13 @@ WriteMakefile(
     'VERSION_FROM'	=> 'Normalize.pm', # finds $VERSION
     'clean'		=> $clean,
     'PREREQ_PM'	  	=> %(
-        Carp		=> 0,
-            constant	=> 0,
-            DynaLoader	=> 0,
-            Exporter	=> 0,
-            'File::Copy'	=> 0,
-            'File::Spec'	=> 0,
-            Test		=> 0,
-            warnings	=> 0,
+    Carp		=> 0,
+    constant	=> 0,
+    DynaLoader	=> 0,
+    Exporter	=> 0,
+    'File::Copy'	=> 0,
+    'File::Spec'	=> 0,
+    Test		=> 0,
+    warnings	=> 0,
     ),
-    );
+    )

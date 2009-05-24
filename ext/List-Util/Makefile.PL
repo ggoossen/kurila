@@ -1,12 +1,12 @@
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker
 
 WriteMakefile(
     VERSION_FROM    => "lib/List/Util.pm",
     NAME            => "List::Util",
     DEFINE          => "-DPERL_EXT",
-    );
+    )
 
-    package MY;
+package MY
 
 # We go through the ListUtil.c trickery to foil platforms
 # that have the feature combination of
@@ -17,10 +17,10 @@ WriteMakefile(
 # and the extension-level Util.o in the same build.
 # One such platform is the POSIX-BC BS2000 EBCDIC mainframe platform.
 
-BEGIN {
-    use Config;
-    unless (defined config_value("usedl")) {
-        eval <<'__EOMM__';
+BEGIN 
+    use Config
+    unless (defined config_value("usedl"))
+        eval <<'__EOMM__'
 sub xs_c {
     my($self) = shift;
     return '' unless $self->needs_linking();
@@ -42,5 +42,5 @@ Util$(OBJ_EXT):	ListUtil.c
 }
 
 __EOMM__
-    }
-}
+    
+

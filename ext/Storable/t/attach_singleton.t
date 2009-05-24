@@ -9,65 +9,65 @@
 # Tests freezing/thawing structures containing Singleton objects,
 # which should see both structs pointing to the same object.
 
-use Test::More tests => 11;
-use Storable ();
+use Test::More tests => 11
+use Storable ()
 
 # Get the singleton
-my $object = My::Singleton->new;
-isa_ok( $object, 'My::Singleton' );
+my $object = My::Singleton->new
+isa_ok( $object, 'My::Singleton' )
 
 # Confirm (for the record) that the class is actually a Singleton
-my $object2 = My::Singleton->new;
-isa_ok( $object2, 'My::Singleton' );
-is( $object, $object2, 'Class is a singleton' );
+my $object2 = My::Singleton->new
+isa_ok( $object2, 'My::Singleton' )
+is( $object, $object2, 'Class is a singleton' )
 
 ############
 # Main Tests
 
-my $struct = \@( 1, $object, 3 );
+my $struct = \@( 1, $object, 3 )
 
 # Freeze the struct
-my $frozen = Storable::freeze( $struct );
-ok( (defined($frozen) and ! ref($frozen) and length($frozen)), 'freeze returns a string' );
+my $frozen = Storable::freeze( $struct )
+ok( (defined($frozen) and ! ref($frozen) and length($frozen)), 'freeze returns a string' )
 
 # Thaw the struct
-my $thawed = Storable::thaw( $frozen );
+my $thawed = Storable::thaw( $frozen )
 
 # Now it should look exactly like the original
-is_deeply( $struct, $thawed, 'Struct superficially looks like the original' );
+is_deeply( $struct, $thawed, 'Struct superficially looks like the original' )
 
 # ... EXCEPT that the Singleton should be the same instance of the object
-is( $struct->[1], $thawed->[1], 'Singleton thaws correctly' );
+is( $struct->[1], $thawed->[1], 'Singleton thaws correctly' )
 
 # We can also test this empirically
-$struct->[1]->{+value} = 'Goodbye cruel world!';
-is_deeply( $struct, $thawed, 'Empiric testing corfirms correct behaviour' );
+$struct->[1]->{+value} = 'Goodbye cruel world!'
+is_deeply( $struct, $thawed, 'Empiric testing corfirms correct behaviour' )
 
-    # End Tests
-    ###########
+# End Tests
+###########
 
-    package My::Singleton;
+package My::Singleton;
 
-my $SINGLETON = undef;
+my $SINGLETON = undef
 
-sub new {
+sub new
     $SINGLETON or
-        $SINGLETON = bless \%( value => 'Hello World!' ), @_[0];
-}
+        $SINGLETON = bless \%( value => 'Hello World!' ), @_[0]
 
-sub STORABLE_freeze($self, ...) {
+
+sub STORABLE_freeze($self, ...)
 
     # We don't actually need to return anything, but provide a null string
     # to avoid the null-list-return behaviour.
-    return  @('foo');
-}
+    return  @('foo')
 
-sub STORABLE_attach($class, $clone, $string) {
-    Test::More::ok( ! ref $class, 'STORABLE_attach passed class, and not an object' );
-    Test::More::is( $class, 'My::Singleton', 'STORABLE_attach is passed the correct class name' );
-    Test::More::is( $clone, 0, 'We are not in a dclone' );
-    Test::More::is( $string, 'foo', 'STORABLE_attach gets the string back' );
+
+sub STORABLE_attach($class, $clone, $string)
+    Test::More::ok( ! ref $class, 'STORABLE_attach passed class, and not an object' )
+    Test::More::is( $class, 'My::Singleton', 'STORABLE_attach is passed the correct class name' )
+    Test::More::is( $clone, 0, 'We are not in a dclone' )
+    Test::More::is( $string, 'foo', 'STORABLE_attach gets the string back' )
 
     # Get the Singleton object and return it
-    return $class->new;
-}
+    return $class->new
+

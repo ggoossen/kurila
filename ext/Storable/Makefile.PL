@@ -1,12 +1,12 @@
 #
 #  Copyright (c) 1995-2000, Raphael Manfredi
-#  
+#
 #  You may redistribute only under the same terms as Perl 5, as specified
 #  in the README file that comes with the distribution.
 #
 
-use ExtUtils::MakeMaker;
-use Config;
+use ExtUtils::MakeMaker
+use Config
 
 WriteMakefile(
     NAME                => 'Storable',
@@ -15,13 +15,13 @@ WriteMakefile(
     #    PREREQ_PM           => { 'Test::More' => '0.41' },
     INSTALLDIRS		=> 'perl',
     VERSION_FROM        => 'Storable.pm',
-    );
+    )
 
-my $ivtype = config_value("ivtype");
+my $ivtype = config_value("ivtype")
 
 # I don't know if the VMS folks ever supported long long on 5.6.x
-if ($ivtype and $ivtype eq 'long long' and $^OS_NAME !~ m/^MSWin/) {
-    print $^STDOUT, <<'EOM';
+if ($ivtype and $ivtype eq 'long long' and $^OS_NAME !~ m/^MSWin/)
+    print $^STDOUT, <<'EOM'
 
 You appear to have a perl configured to use 64 bit integers in its scalar
 variables.  If you have existing data written with an earlier version of
@@ -35,4 +35,4 @@ in the Storable documentation for instructions on how to read your data.
 (You can find the documentation at the end of Storable.pm in POD format)
 
 EOM
-}
+

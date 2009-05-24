@@ -6,35 +6,35 @@
 #  in the README file that comes with the distribution.
 #
 
-use Config;
+use Config
 
-sub BEGIN {
-    if (env::var('PERL_CORE')){
-        chdir('t') if -d 't';
-        $^INCLUDE_PATH = @('.', '../lib');
-    } else {
-        unshift $^INCLUDE_PATH, 't';
-    }
-}
+sub BEGIN
+    if (env::var('PERL_CORE'))
+        chdir('t') if -d 't'
+        $^INCLUDE_PATH = @('.', '../lib')
+    else
+        unshift $^INCLUDE_PATH, 't'
+    
 
-BEGIN {
+
+BEGIN 
     if (!eval q{
        use Test::More;
        1;
-    }) {
-        print $^STDOUT, "1..0 # skip: tests only work with Test::More\n";
-        exit;
-    }
-}
+    })
+        print $^STDOUT, "1..0 # skip: tests only work with Test::More\n"
+        exit
+    
+
 
 BEGIN { plan tests => 1 }
 
-my @warns;
-$^WARN_HOOK = sub { push @warns, shift };
-$^DIE_HOOK  = sub { require Carp; warn < Carp::longmess(); warn "Evil die!" };
+my @warns
+$^WARN_HOOK = sub (@< @_) { push @warns, shift }
+$^DIE_HOOK  = sub (@< @_) { require Carp; warn < Carp::longmess(); warn "Evil die!" }
 
-require Storable;
+require Storable
 
-Storable::dclone(\%(foo => "bar"));
+Storable::dclone(\%(foo => "bar"))
 
-is(join("", @warns), "", "__DIE__ is not evil here");
+is(join("", @warns), "", "__DIE__ is not evil here")

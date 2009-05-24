@@ -1,32 +1,27 @@
-package PerlIO;
+package PerlIO
 
-our $VERSION = '1.04';
+our $VERSION = '1.04'
 
 # Map layer name to package that defines it
-our %alias;
+our %alias
 
 sub import
-{
-    my $class = shift;
+    my $class = shift
     while ((nelems @_))
-    {
-        my $layer = shift;
+        my $layer = shift
         if (exists %alias{$layer})
-        {
             $layer = %alias{?$layer}
-        }
         else
-        {
-            $layer = "$($class)::$layer";
-        }
-        eval "require $layer";
-        warn "failed loading $layer\: $($^EVAL_ERROR->message)" if $^EVAL_ERROR;
-    }
-}
+            $layer = "$($class)::$layer"
+        
+        eval "require $layer"
+        warn "failed loading $layer\: $($^EVAL_ERROR->message)" if $^EVAL_ERROR
+    
+
 
 sub F_UTF8 () { 0x8000 }
 
-1;
+1
 __END__
 
 =head1 NAME

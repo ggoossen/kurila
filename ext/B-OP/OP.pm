@@ -1,124 +1,117 @@
-package B::OP;
+package B::OP
 
-use warnings;
-use B;
+use warnings
+use B
 
-require DynaLoader;
-our @ISA = qw(DynaLoader);
-our $VERSION = '1.10';
+require DynaLoader
+our @ISA = qw(DynaLoader)
+our $VERSION = '1.10'
 
-B::OP->bootstrap($VERSION);
+B::OP->bootstrap($VERSION)
 
-@B::OP::ISA = @( 'B::OBJECT' );
-@B::UNOP::ISA = @( 'B::OP' );
-@B::BINOP::ISA = @( 'B::UNOP' );
-@B::LOGOP::ISA = @( 'B::UNOP' );
-@B::LISTOP::ISA = @( 'B::BINOP' );
-@B::SVOP::ISA = @( 'B::OP' );
-@B::PADOP::ISA = @( 'B::OP' );
-@B::PVOP::ISA = @( 'B::OP' );
-@B::LOOP::ISA = @( 'B::LISTOP' );
-@B::PMOP::ISA = @( 'B::LISTOP' );
-@B::COP::ISA = @( 'B::OP' );
-@B::ROOTOP::ISA = @( 'B::UNOP' );
+@B::OP::ISA = @( 'B::OBJECT' )
+@B::UNOP::ISA = @( 'B::OP' )
+@B::BINOP::ISA = @( 'B::UNOP' )
+@B::LOGOP::ISA = @( 'B::UNOP' )
+@B::LISTOP::ISA = @( 'B::BINOP' )
+@B::SVOP::ISA = @( 'B::OP' )
+@B::PADOP::ISA = @( 'B::OP' )
+@B::PVOP::ISA = @( 'B::OP' )
+@B::LOOP::ISA = @( 'B::LISTOP' )
+@B::PMOP::ISA = @( 'B::LISTOP' )
+@B::COP::ISA = @( 'B::OP' )
+@B::ROOTOP::ISA = @( 'B::UNOP' )
 
-@B::optype = qw(OP UNOP BINOP LOGOP LISTOP PMOP SVOP PADOP PVOP LOOP COP ROOTOP);
+@B::optype = qw(OP UNOP BINOP LOGOP LISTOP PMOP SVOP PADOP PVOP LOOP COP ROOTOP)
 
 use constant OP_LIST    => 141;    # MUST FIX CONSTANTS.
 
 # This is where we implement op.c in Perl. Sssh.
-sub linklist {
-    my $o = shift;
-    if ( $o->can("first") and $o->first and  $o->first->$ ) {
-        $o->next( < $o->first->linklist );
-        my $kid = $o->first;
-        while ($kid->$) {
-            if (  $kid->sibling->$ ) {
-                $kid->next( < $kid->sibling->linklist );
-            }
-            else {
-                $kid->next($o);
-            }
-            $kid = $kid->sibling;
-        }
-    }
-    else {
-        $o->next($o);
-    }
-    $o->clean;
-    return $o->next;
-}
+sub linklist
+    my $o = shift
+    if ( $o->can("first") and $o->first and  $o->first->$ )
+        $o->next( < $o->first->linklist )
+        my $kid = $o->first
+        while ($kid->$)
+            if (  $kid->sibling->$ )
+                $kid->next( < $kid->sibling->linklist )
+            else
+                $kid->next($o)
+            
+            $kid = $kid->sibling
+        
+    else
+        $o->next($o)
+    
+    $o->clean
+    return $o->next
 
-sub append_elem( $class, $type, $first, $last) {
-    return $last  unless $first and $first->$;
-    return $first unless $last  and $last->$;
+
+sub append_elem( $class, $type, $first, $last)
+    return $last  unless $first and $first->$
+    return $first unless $last  and $last->$
 
     if ( $first->type() != $type
-        or ( $type == OP_LIST and ( $first->flags ^&^ B::OPf_PARENS ) ) )
-    {
-        return B::LISTOP->new( $type, 0, $first, $last );
-    }
+           or ( $type == OP_LIST and ( $first->flags ^&^ B::OPf_PARENS ) ) )
+        return B::LISTOP->new( $type, 0, $first, $last )
+    
 
-    if ( $first->flags() ^&^ B::OPf_KIDS ) {
+    if ( $first->flags() ^&^ B::OPf_KIDS )
 
-        $first->last->sibling($last);
-    }
-    else {
-        $first->flags( $first->flags ^|^ B::OPf_KIDS );
-        $first->first($last);
-    }
-    $first->last($last);
-    return $first;
-}
+        $first->last->sibling($last)
+    else
+        $first->flags( $first->flags ^|^ B::OPf_KIDS )
+        $first->first($last)
+    
+    $first->last($last)
+    return $first
 
-sub prepend_elem( $class, $type, $first, $last) {
-    if ( $last->type() != $type ) {
-        return B::LISTOP->new( $type, 0, $first, $last );
-    }
 
-    if ( $type == OP_LIST ) {
-        $first->sibling( < $last->first->sibling );
-        $last->first->sibling($first);
+sub prepend_elem( $class, $type, $first, $last)
+    if ( $last->type() != $type )
+        return B::LISTOP->new( $type, 0, $first, $last )
+    
+
+    if ( $type == OP_LIST )
+        $first->sibling( < $last->first->sibling )
+        $last->first->sibling($first)
         $last->flags( $last->flags ^&^ ^~^B::OPf_PARENS )
-            unless ( $first->flags ^&^ B::OPf_PARENS );
-    }
-    else {
-        unless ( $last->flags ^&^ B::OPf_KIDS ) {
-            $last->last($first);
-            $last->flags( $last->flags ^|^ B::OPf_KIDS );
-        }
-        $first->sibling( < $last->first );
-        $last->first($first);
-    }
-    $last->flags( $last->flags ^|^ B::OPf_KIDS );
-    return $last;    # I cannot believe this works.
-}
+            unless ( $first->flags ^&^ B::OPf_PARENS )
+    else
+        unless ( $last->flags ^&^ B::OPf_KIDS )
+            $last->last($first)
+            $last->flags( $last->flags ^|^ B::OPf_KIDS )
+        
+        $first->sibling( < $last->first )
+        $last->first($first)
+    
+    $last->flags( $last->flags ^|^ B::OPf_KIDS )
+    return $last    # I cannot believe this works.
 
-sub scope {
-    my $o = shift;
-    return unless $o and $o->$;
-    if ( $o->flags ^&^ B::OPf_PARENS ) {
+
+sub scope
+    my $o = shift
+    return unless $o and $o->$
+    if ( $o->flags ^&^ B::OPf_PARENS )
         $o = B::OP->prepend_elem( < B::opnumber("lineseq"), <
-            B::OP->new( "enter", 0 ), $o );
-        $o->type( < B::opnumber("leave") );
-    }
-    else {
-        if ( $o->type == B::opnumber("lineseq") ) {
-            my $kid;
-            $o->type( < B::opnumber("scope") );
-            $kid = $o->first;
+            B::OP->new( "enter", 0 ), $o )
+        $o->type( < B::opnumber("leave") )
+    else
+        if ( $o->type == B::opnumber("lineseq") )
+            my $kid
+            $o->type( < B::opnumber("scope") )
+            $kid = $o->first
             die "This probably shouldn't happen (\$kid->null)\n"
                 if ( $kid->type == B::opnumber("nextstate")
-                     or $kid->type == B::opnumber("dbstate") );
-        }
-        else {
-            $o = B::LISTOP->new( "scope", 0, $o, undef );
-        }
-    }
-    return  @($o);
-}
+                     or $kid->type == B::opnumber("dbstate") )
+        else
+            $o = B::LISTOP->new( "scope", 0, $o, undef )
+        
+    
+    return  @($o)
 
-1;
+
+1
 __END__
 
 =head1 NAME

@@ -4,25 +4,25 @@
 # $Id: Language.pm,v 2.7 2004/06/10 21:19:34 neilb Exp $
 #
 
-package Locale::Language;
+package Locale::Language
 
 
-require Exporter;
+require Exporter
 
 #-----------------------------------------------------------------------
 #	Public Global Variables
 #-----------------------------------------------------------------------
-our ($VERSION, @ISA, @EXPORT);
-$VERSION      = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
-@ISA          = qw(Exporter);
+our ($VERSION, @ISA, @EXPORT)
+$VERSION      = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/)
+@ISA          = qw(Exporter)
 @EXPORT       = qw(&code2language &language2code
-                   &all_language_codes &all_language_names );
+                   &all_language_codes &all_language_names )
 
 #-----------------------------------------------------------------------
 #	Private Global Variables
 #-----------------------------------------------------------------------
-my %CODES     = %( () );
-my %LANGUAGES = %( () );
+my %CODES     = %( () )
+my %LANGUAGES = %( () )
 
 
 #=======================================================================
@@ -31,24 +31,20 @@ my %LANGUAGES = %( () );
 #
 #=======================================================================
 sub code2language
-{
-    my $code = shift;
+    my $code = shift
 
 
-    return undef unless defined $code;
-    $code = lc($code);
+    return undef unless defined $code
+    $code = lc($code)
     if (exists %CODES{$code})
-    {
-        return %CODES{?$code};
-    }
+        return %CODES{?$code}
     else
-    {
         #---------------------------------------------------------------
         # no such language code!
         #---------------------------------------------------------------
-        return undef;
-    }
-}
+        return undef
+    
+
 
 
 #=======================================================================
@@ -57,24 +53,20 @@ sub code2language
 #
 #=======================================================================
 sub language2code
-{
-    my $lang = shift;
+    my $lang = shift
 
 
-    return undef unless defined $lang;
-    $lang = lc($lang);
+    return undef unless defined $lang
+    $lang = lc($lang)
     if (exists %LANGUAGES{$lang})
-    {
-        return %LANGUAGES{?$lang};
-    }
+        return %LANGUAGES{?$lang}
     else
-    {
         #---------------------------------------------------------------
         # no such language!
         #---------------------------------------------------------------
-        return undef;
-    }
-}
+        return undef
+    
+
 
 
 #=======================================================================
@@ -83,9 +75,8 @@ sub language2code
 #
 #=======================================================================
 sub all_language_codes
-{
-    return keys %CODES;
-}
+    return keys %CODES
+
 
 
 #=======================================================================
@@ -94,33 +85,31 @@ sub all_language_codes
 #
 #=======================================================================
 sub all_language_names
-{
-    return values %CODES;
-}
+    return values %CODES
+
 
 
 #=======================================================================
 # initialisation code - stuff the DATA into the CODES hash
 #=======================================================================
-do {
-    my    $code;
-    my    $language;
-    local $_ = undef;
+do
+    my    $code
+    my    $language
+    local $_ = undef
 
 
     while ( ~< $^DATA)
-    {
-        next unless m/\S/;
-        chop;
-        @($code, $language) =  split(m/:/, $_, 2);
-        %CODES{+$code} = $language;
-        %LANGUAGES{+lc "$language"} = $code;
-    }
+        next unless m/\S/
+        chop
+        @($code, $language) =  split(m/:/, $_, 2)
+        %CODES{+$code} = $language
+        %LANGUAGES{+lc "$language"} = $code
+    
 
-    close($^DATA);
-};
+    close($^DATA)
 
-1;
+
+1
 
 __DATA__
 aa:Afar

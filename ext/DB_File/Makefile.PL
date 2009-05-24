@@ -1,16 +1,16 @@
 
-use warnings;
+use warnings
 
-use ExtUtils::MakeMaker ;
-use ExtUtils::Constant < qw(WriteConstants);
-use Config ;
+use ExtUtils::MakeMaker 
+use ExtUtils::Constant < qw(WriteConstants)
+use Config 
 
 # OS2 is a special case, so check for it now.
-my $OS2 = "-DOS2" if config_value('osname') eq 'os2' ;
+my $OS2 = "-DOS2" if config_value('osname') eq 'os2' 
 
-my $LIB = "-ldb" ;
+my $LIB = "-ldb" 
 # so is win32
-$LIB = "-llibdb" if $^OS_NAME eq 'MSWin32' ;
+$LIB = "-llibdb" if $^OS_NAME eq 'MSWin32' 
 
 WriteMakefile(
     NAME 		=> 'DB_File',
@@ -28,7 +28,7 @@ WriteMakefile(
 
     'depend'	=> %('version$(OBJ_EXT)' => 'version.c'),
     'clean'		=> %(FILES => 'constants.h constants.xs'),
-    );
+    )
 
 my @names = qw(
 	BTREEMAGIC
@@ -59,35 +59,32 @@ my @names = qw(
 	R_SETCURSOR
 	R_SNAPSHOT
 	__R_UNUSED
-	);
+	)
 
 # Check the constants above all appear in @EXPORT in DB_File.pm
-my %names = %( < @+: map { @: $_, 1}, @names );
-open my $f, "<", "DB_File.pm" or die "Cannot open DB_File.pm: $^OS_ERROR\n";
+my %names = %( < @+: map { @: $_, 1}, @names )
+open my $f, "<", "DB_File.pm" or die "Cannot open DB_File.pm: $^OS_ERROR\n"
 while ( ~< $f)
-{
-    last if m/^\s*\@EXPORT\s+=\s+ qw\(/x ;
-}
+    last if m/^\s*\@EXPORT\s+=\s+ qw\(/x 
+
 
 while ( ~< $f)
-{
-    last if m/^\s*\)/ ;
-    m/(\S+)/ ;
-    delete %names{$1} if defined $1 ;
-}
-close $f ;
+    last if m/^\s*\)/ 
+    m/(\S+)/ 
+    delete %names{$1} if defined $1 
+
+close $f 
 
 if ( %names )
-{
-    my $missing = join ("\n\t", sort keys %names) ;
+    my $missing = join ("\n\t", sort keys %names) 
     die "The following names are missing from \@EXPORT in DB_File.pm\n" .
-        "\t$missing\n" ;
-}
+        "\t$missing\n" 
+
 
 
 WriteConstants( NAME => 'DB_File',
-    NAMES => \@names,
-    C_FILE  => 'constants.h',
-    XS_FILE  => 'constants.xs',
-    PROXYSUBS => 1,
-    );
+                NAMES => \@names,
+                C_FILE  => 'constants.h',
+                XS_FILE  => 'constants.xs',
+                PROXYSUBS => 1,
+                )

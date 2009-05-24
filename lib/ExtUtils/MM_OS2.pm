@@ -1,14 +1,14 @@
-package ExtUtils::MM_OS2;
+package ExtUtils::MM_OS2
 
 
-use ExtUtils::MakeMaker < qw(neatvalue);
-use File::Spec;
+use ExtUtils::MakeMaker < qw(neatvalue)
+use File::Spec
 
-our $VERSION = '6.44';
+our $VERSION = '6.44'
 
-require ExtUtils::MM_Any;
-require ExtUtils::MM_Unix;
-our @ISA = qw(ExtUtils::MM_Unix);
+require ExtUtils::MM_Any
+require ExtUtils::MM_Unix
+our @ISA = qw(ExtUtils::MM_Unix)
 
 =pod
 
@@ -36,25 +36,25 @@ Define TO_UNIX to convert OS2 linefeeds to Unix style.
 
 =cut
 
-sub init_dist($self) {
+sub init_dist($self)
 
-    $self->{+TO_UNIX} ||= <<'MAKE_TEXT';
+    $self->{+TO_UNIX} ||= <<'MAKE_TEXT'
 $(NOECHO) $(TEST_F) tmp.zip && $(RM_F) tmp.zip; $(ZIP) -ll -mr tmp.zip $(DISTVNAME) && unzip -o tmp.zip && $(RM_F) tmp.zip
 MAKE_TEXT
 
-    $self->SUPER::init_dist;
-}
+    $self->SUPER::init_dist
 
-sub dlsyms($self,%< %attribs) {
 
-    my@($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \%();
-    my@($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \@();
-    my@($funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \@();
-    my@($imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \%();
-    my(@m);
-    (my $boot = $self->{?NAME}) =~ s/:/_/g;
+sub dlsyms($self,%< %attribs)
 
-    if (not $self->{SKIPHASH}->{?'dynamic'}) {
+    my@($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \%()
+    my@($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \@()
+    my@($funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \@()
+    my@($imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \%()
+    my(@m)
+    (my $boot = $self->{?NAME}) =~ s/:/_/g
+
+    if (not $self->{SKIPHASH}->{?'dynamic'})
         push(@m,"
 $self->{?BASEEXT}.def: Makefile.PL
 ",
@@ -66,67 +66,67 @@ $self->{?BASEEXT}.def: Makefile.PL
             ', "FUNCLIST" => ', <neatvalue($funclist),
             ', "IMPORTS" => ', <neatvalue($imports),
             ', "DL_VARS" => ', < neatvalue($vars), q|);'
-|);
-    }
-    if ($self->{?IMPORTS} && $self->{?IMPORTS}->%) {
+|)
+    
+    if ($self->{?IMPORTS} && $self->{?IMPORTS}->%)
         # Make import files (needed for static build)
-        -d 'tmp_imp' or mkdir 'tmp_imp', 0777 or die "Can't mkdir tmp_imp";
-        open my $imp, '>', 'tmpimp.imp' or die "Can't open tmpimp.imp";
-        while (my@($name, $exp) =@( each $self->{IMPORTS}->%)) {
-            my @($lib, $id) = @($exp =~ m/(.*)\.(.*)/) or die "Malformed IMPORT `$exp'";
-            print $imp, "$name $lib $id ?\n";
-        }
-        close $imp or die "Can't close tmpimp.imp";
+        -d 'tmp_imp' or mkdir 'tmp_imp', 0777 or die "Can't mkdir tmp_imp"
+        open my $imp, '>', 'tmpimp.imp' or die "Can't open tmpimp.imp"
+        while (my@($name, $exp) =@( each $self->{IMPORTS}->%))
+            my @($lib, $id) = @($exp =~ m/(.*)\.(.*)/) or die "Malformed IMPORT `$exp'"
+            print $imp, "$name $lib $id ?\n"
+        
+        close $imp or die "Can't close tmpimp.imp"
         # print "emximp -o tmpimp$Config::Config{lib_ext} tmpimp.imp\n";
-        system "emximp -o tmpimp%Config::Config{?lib_ext} tmpimp.imp" 
-            and die "Cannot make import library: $^OS_ERROR, \$?=$^CHILD_ERROR";
-        unlink glob( <"tmp_imp/*");
-        system "cd tmp_imp; %Config::Config{?ar} x ../tmpimp%Config::Config{?lib_ext}" 
-            and die "Cannot extract import objects: $^OS_ERROR, \$?=$^CHILD_ERROR";      
-    }
-    join('', @m);
-}
+        system "emximp -o tmpimp%Config::Config{?lib_ext} tmpimp.imp"
+            and die "Cannot make import library: $^OS_ERROR, \$?=$^CHILD_ERROR"
+        unlink glob( <"tmp_imp/*")
+        system "cd tmp_imp; %Config::Config{?ar} x ../tmpimp%Config::Config{?lib_ext}"
+            and die "Cannot extract import objects: $^OS_ERROR, \$?=$^CHILD_ERROR"
+    
+    join('', @m)
 
-sub static_lib($self) {
-    my $old = $self->ExtUtils::MM_Unix::static_lib();
-    return $old unless $self->{?IMPORTS} && $self->{?IMPORTS}->%;
 
-    my @chunks = split m/\n{2,}/, $old;
-    shift @chunks unless length @chunks[0]; # Empty lines at the start
-    @chunks[0] .= <<'EOC';
+sub static_lib($self)
+    my $old = $self->ExtUtils::MM_Unix::static_lib()
+    return $old unless $self->{?IMPORTS} && $self->{?IMPORTS}->%
+
+    my @chunks = split m/\n{2,}/, $old
+    shift @chunks unless length @chunks[0] # Empty lines at the start
+    @chunks[0] .= <<'EOC'
 
 	$(AR) $(AR_STATIC_ARGS) $@ tmp_imp/* && $(RANLIB) $@
 EOC
-    return join "\n\n". '', @chunks;
-}
+    return join "\n\n". '', @chunks
 
-sub replace_manpage_separator($self,$man) {
-    $man =~ s,/+,.,g;
-    $man;
-}
 
-sub maybe_command($self,$file) {
-    $file =~ s,[/\\]+,/,g;
-    return $file if -x $file && ! -d _;
-    return "$file.exe" if -x "$file.exe" && ! -d _;
-    return "$file.cmd" if -x "$file.cmd" && ! -d _;
-    return;
-}
+sub replace_manpage_separator($self,$man)
+    $man =~ s,/+,.,g
+    $man
+
+
+sub maybe_command($self,$file)
+    $file =~ s,[/\\]+,/,g
+    return $file if -x $file && ! -d _
+    return "$file.exe" if -x "$file.exe" && ! -d _
+    return "$file.cmd" if -x "$file.cmd" && ! -d _
+    return
+
 
 =item init_linker
 
 =cut
 
-sub init_linker {
-    my $self = shift;
+sub init_linker
+    my $self = shift
 
-    $self->{+PERL_ARCHIVE} = "\$(PERL_INC)/libperl\$(LIB_EXT)";
+    $self->{+PERL_ARCHIVE} = "\$(PERL_INC)/libperl\$(LIB_EXT)"
 
     $self->{+PERL_ARCHIVE_AFTER} = $OS2::is_aout
         ?? ''
-    !! '$(PERL_INC)/libperl_override$(LIB_EXT)';
-    $self->{+EXPORT_LIST} = '$(BASEEXT).def';
-}
+        !! '$(PERL_INC)/libperl_override$(LIB_EXT)'
+    $self->{+EXPORT_LIST} = '$(BASEEXT).def'
+
 
 =item os_flavor
 
@@ -134,12 +134,12 @@ OS/2 is OS/2
 
 =cut
 
-sub os_flavor {
-    return @('OS/2');
-}
+sub os_flavor
+    return @('OS/2')
+
 
 =back
 
 =cut
 
-1;
+1

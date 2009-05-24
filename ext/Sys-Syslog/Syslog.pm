@@ -1,15 +1,15 @@
-package Sys::Syslog;
+package Sys::Syslog
 
-use warnings::register;
-use Fcntl < qw(O_WRONLY);
-use File::Basename;
-use POSIX < qw(strftime setlocale LC_TIME);
-use Socket ':all';
-require Exporter;
+use warnings::register
+use Fcntl < qw(O_WRONLY)
+use File::Basename
+use POSIX < qw(strftime setlocale LC_TIME)
+use Socket ':all'
+require Exporter
 
-do {
-    our $VERSION = '0.24';
-    our @ISA = qw(Exporter);
+do
+    our $VERSION = '0.24'
+    our @ISA = qw(Exporter)
 
     our %EXPORT_TAGS = %(
         standard => qw(openlog syslog closelog setlogmask),
@@ -46,671 +46,666 @@ do {
                 LOG_MASK LOG_UPTO
             ),
         ),
-    );
+        )
 
-    our @EXPORT = %EXPORT_TAGS{?standard};
+    our @EXPORT = %EXPORT_TAGS{?standard}
 
-    our @EXPORT_OK = %EXPORT_TAGS{?extended} +@+ %EXPORT_TAGS{?macros};
+    our @EXPORT_OK = %EXPORT_TAGS{?extended} +@+ %EXPORT_TAGS{?macros}
 
     try {
         require XSLoader;
         XSLoader::load('Sys::Syslog', $VERSION);
         1
-    } or do {
-        require DynaLoader;
-        push @ISA, 'DynaLoader';
-        Sys::Syslog->bootstrap($VERSION);
-    };
-};
+    } or do
+        require DynaLoader
+        push @ISA, 'DynaLoader'
+        Sys::Syslog->bootstrap($VERSION)
+    
 
 
-# 
+
+#
 # Public variables
-# 
-our ($host);             # host to send syslog messages to (see notes at end)
+#
+our ($host)             # host to send syslog messages to (see notes at end)
 
-# 
+#
 # Global variables
-# 
-our ($facility);
-my $connected = 0;              # flag to indicate if we're connected or not
-my $syslog_send;                # coderef of the function used to send messages
-my $syslog_path = undef;        # syslog path for "stream" and "unix" mechanisms
-my $syslog_xobj = undef;        # if defined, holds the external object used to send messages
-my $transmit_ok = 0;            # flag to indicate if the last message was transmited
-my $sock_timeout  = 0;          # socket timeout, see below
-my $current_proto = undef;      # current mechanism used to transmit messages
-my $ident = '';                 # identifiant prepended to each message
-$facility = '';                 # current facility
-my $maskpri = LOG_UPTO(LOG_DEBUG());     # current log mask
+#
+our ($facility)
+my $connected = 0              # flag to indicate if we're connected or not
+my $syslog_send                # coderef of the function used to send messages
+my $syslog_path = undef        # syslog path for "stream" and "unix" mechanisms
+my $syslog_xobj = undef        # if defined, holds the external object used to send messages
+my $transmit_ok = 0            # flag to indicate if the last message was transmited
+my $sock_timeout  = 0          # socket timeout, see below
+my $current_proto = undef      # current mechanism used to transmit messages
+my $ident = ''                 # identifiant prepended to each message
+$facility = ''                 # current facility
+my $maskpri = LOG_UPTO(LOG_DEBUG())     # current log mask
 
-my $syslogfh;
+my $syslogfh
 
 my %options = %(
-    ndelay  => 0, 
-    nofatal => 0, 
-    nowait  => 0, 
-    pid     => 0, 
-);
+    ndelay  => 0,
+    nofatal => 0,
+    nowait  => 0,
+    pid     => 0,
+    )
 
-# Default is now to first use the native mechanism, so Perl programs 
+# Default is now to first use the native mechanism, so Perl programs
 # behave like other normal Unix programs, then try other mechanisms.
-my @connectMethods = qw(native tcp udp unix pipe stream console);
-if ($^OS_NAME =~ m/^(freebsd|linux)$/) {
-    @connectMethods = grep { $_ ne 'udp' }, @connectMethods;
-}
+my @connectMethods = qw(native tcp udp unix pipe stream console)
+if ($^OS_NAME =~ m/^(freebsd|linux)$/)
+    @connectMethods = grep { $_ ne 'udp' }, @connectMethods
+
 
 # use EventLog on Win32
-my $is_Win32 = $^OS_NAME =~ m/Win32/i;
-eval "use Sys::Syslog::Win32";
+my $is_Win32 = $^OS_NAME =~ m/Win32/i
+eval "use Sys::Syslog::Win32"
 
-if (not $^EVAL_ERROR) {
-    unshift @connectMethods, 'eventlog';
-} elsif ($is_Win32) {
-    warn $^EVAL_ERROR;
-}
+if (not $^EVAL_ERROR)
+    unshift @connectMethods, 'eventlog'
+elsif ($is_Win32)
+    warn $^EVAL_ERROR
 
-my @defaultMethods = @connectMethods;
-my @fallbackMethods = @( () );
 
-$sock_timeout = 0.25 if $^OS_NAME =~ m/darwin/;
+my @defaultMethods = @connectMethods
+my @fallbackMethods = @( () )
+
+$sock_timeout = 0.25 if $^OS_NAME =~ m/darwin/
 
 # coderef for a nicer handling of errors
-my $err_sub = %options{?nofatal} ?? \&warnings::warnif !! sub { die shift; };
+my $err_sub = %options{?nofatal} ?? \&warnings::warnif !! sub (@< @_) { die shift; }
 
 
-sub openlog(?$ident, ?$logopt, ?$facility) {
+sub openlog(?$ident, ?$logopt, ?$facility)
 
     # default values
-    $ident    ||= basename($^PROGRAM_NAME) || getlogin() || getpwuid($^UID) || 'syslog';
-    $logopt   ||= '';
-    $facility ||= LOG_USER();
+    $ident    ||= basename($^PROGRAM_NAME) || getlogin() || getpwuid($^UID) || 'syslog'
+    $logopt   ||= ''
+    $facility ||= LOG_USER()
 
-    for my $opt (split m/\b/, $logopt) {
+    for my $opt (split m/\b/, $logopt)
         %options{+$opt} = 1 if exists %options{$opt}
-    }
+    
 
-    $err_sub = %options{?nofatal} ?? \&warnings::warnif !! sub { die shift; };
-    return 1 unless %options{?ndelay};
-    connect_log();
-}
+    $err_sub = %options{?nofatal} ?? \&warnings::warnif !! sub (@< @_) { die shift; }
+    return 1 unless %options{?ndelay}
+    connect_log()
 
-sub closelog {
-    $facility = $ident = '';
-    disconnect_log();
-} 
 
-sub setlogmask {
-    my $oldmask = $maskpri;
-    $maskpri = shift unless @_[0] == 0;
-    $oldmask;
-}
- 
-sub setlogsock {
-    my $setsock = shift;
-    $syslog_path = shift;
-    disconnect_log() if $connected;
-    $transmit_ok = 0;
-    @fallbackMethods = @( () );
-    @connectMethods = @defaultMethods;
+sub closelog
+    $facility = $ident = ''
+    disconnect_log()
 
-    if (ref $setsock eq 'ARRAY') {
-	@connectMethods = $setsock->@;
 
-    } elsif (lc $setsock eq 'stream') {
-	if (not defined $syslog_path) {
-	    my @try = qw(/dev/log /dev/conslog);
+sub setlogmask
+    my $oldmask = $maskpri
+    $maskpri = shift unless @_[0] == 0
+    $oldmask
 
-            if (length _PATH_LOG()) {        # Undefined _PATH_LOG is "".
-		unshift @try, _PATH_LOG();
-            }
 
-	    for my $try ( @try) {
-		if (-w $try) {
-		    $syslog_path = $try;
-		    last;
-		}
-	    }
+sub setlogsock
+    my $setsock = shift
+    $syslog_path = shift
+    disconnect_log() if $connected
+    $transmit_ok = 0
+    @fallbackMethods = @( () )
+    @connectMethods = @defaultMethods
 
-            if (not defined $syslog_path) {
-                warnings::warnif "stream passed to setlogsock, but could not find any device";
+    if (ref $setsock eq 'ARRAY')
+        @connectMethods = $setsock->@
+
+    elsif (lc $setsock eq 'stream')
+        if (not defined $syslog_path)
+            my @try = qw(/dev/log /dev/conslog)
+
+            if (length _PATH_LOG())        # Undefined _PATH_LOG is "".
+                unshift @try, _PATH_LOG()
+            
+
+            for my $try ( @try)
+                if (-w $try)
+                    $syslog_path = $try
+                    last
+                
+            
+
+            if (not defined $syslog_path)
+                warnings::warnif "stream passed to setlogsock, but could not find any device"
                 return undef
-            }
-        }
+            
+        
 
-	if (not -w $syslog_path) {
-            warnings::warnif "stream passed to setlogsock, but $syslog_path is not writable";
-	    return undef;
-	} else {
-            @connectMethods = qw(stream);
-	}
-
-    } elsif (lc $setsock eq 'unix') {
-        if (length _PATH_LOG() || (defined $syslog_path && -w $syslog_path)) {
-	    $syslog_path = _PATH_LOG() unless defined $syslog_path;
-            @connectMethods = qw(unix);
-        } else {
-            warnings::warnif 'unix passed to setlogsock, but path not available';
-	    return undef;
-        }
-
-    } elsif (lc $setsock eq 'pipe') {
-        for my $path (@: $syslog_path, _PATH_LOG(), "/dev/log") {
-            next unless defined $path and length $path and -p $path and -w _;
-            $syslog_path = $path;
-            last
-        }
-
-        if (not $syslog_path) {
-            warnings::warnif "pipe passed to setlogsock, but path not available";
+        if (not -w $syslog_path)
+            warnings::warnif "stream passed to setlogsock, but $syslog_path is not writable"
             return undef
-        }
+        else
+            @connectMethods = qw(stream)
+        
 
-        @connectMethods = qw(pipe);
+    elsif (lc $setsock eq 'unix')
+        if (length _PATH_LOG() || (defined $syslog_path && -w $syslog_path))
+            $syslog_path = _PATH_LOG() unless defined $syslog_path
+            @connectMethods = qw(unix)
+        else
+            warnings::warnif 'unix passed to setlogsock, but path not available'
+            return undef
+        
 
-    } elsif (lc $setsock eq 'native') {
-        @connectMethods = qw(native);
+    elsif (lc $setsock eq 'pipe')
+        for my $path (@: $syslog_path, _PATH_LOG(), "/dev/log")
+            next unless defined $path and length $path and -p $path and -w _
+            $syslog_path = $path
+            last
+        
 
-    } elsif (lc $setsock eq 'eventlog') {
-        if (eval "use Win32::EventLog; 1") {
-            @connectMethods = qw(eventlog);
-        } else {
-            warnings::warnif "eventlog passed to setlogsock, but operating system isn't Win32-compatible";
-            return undef;
-        }
+        if (not $syslog_path)
+            warnings::warnif "pipe passed to setlogsock, but path not available"
+            return undef
+        
 
-    } elsif (lc $setsock eq 'tcp') {
-	if (getservbyname('syslog', 'tcp') || getservbyname('syslogng', 'tcp')) {
-            @connectMethods = qw(tcp);
-	} else {
-            warnings::warnif "tcp passed to setlogsock, but tcp service unavailable";
-	    return undef;
-	}
+        @connectMethods = qw(pipe)
 
-    } elsif (lc $setsock eq 'udp') {
-	if (getservbyname('syslog', 'udp')) {
-            @connectMethods = qw(udp);
-	} else {
-            warnings::warnif "udp passed to setlogsock, but udp service unavailable";
-	    return undef;
-	}
+    elsif (lc $setsock eq 'native')
+        @connectMethods = qw(native)
 
-    } elsif (lc $setsock eq 'inet') {
-	@connectMethods = @( 'tcp', 'udp' );
+    elsif (lc $setsock eq 'eventlog')
+        if (eval "use Win32::EventLog; 1")
+            @connectMethods = qw(eventlog)
+        else
+            warnings::warnif "eventlog passed to setlogsock, but operating system isn't Win32-compatible"
+            return undef
+        
 
-    } elsif (lc $setsock eq 'console') {
-	@connectMethods = qw(console);
+    elsif (lc $setsock eq 'tcp')
+        if (getservbyname('syslog', 'tcp') || getservbyname('syslogng', 'tcp'))
+            @connectMethods = qw(tcp)
+        else
+            warnings::warnif "tcp passed to setlogsock, but tcp service unavailable"
+            return undef
+        
 
-    } else {
+    elsif (lc $setsock eq 'udp')
+        if (getservbyname('syslog', 'udp'))
+            @connectMethods = qw(udp)
+        else
+            warnings::warnif "udp passed to setlogsock, but udp service unavailable"
+            return undef
+        
+
+    elsif (lc $setsock eq 'inet')
+        @connectMethods = @( 'tcp', 'udp' )
+
+    elsif (lc $setsock eq 'console')
+        @connectMethods = qw(console)
+
+    else
         die "Invalid argument passed to setlogsock; must be 'stream', 'pipe', "
-          . "'unix', 'native', 'eventlog', 'tcp', 'udp' or 'inet'";
-    }
+            . "'unix', 'native', 'eventlog', 'tcp', 'udp' or 'inet'"
+    
 
-    return 1;
-}
+    return 1
 
-sub syslog {
-    my $priority = shift;
-    my $mask = shift;
-    my ($message, $buf);
-    my (@words, $num, $numpri, $numfac, $sum);
-    my $failed = undef;
-    my $fail_time = undef;
-    my $error = $^OS_ERROR;
+
+sub syslog
+    my $priority = shift
+    my $mask = shift
+    my ($message, $buf)
+    my (@words, $num, $numpri, $numfac, $sum)
+    my $failed = undef
+    my $fail_time = undef
+    my $error = $^OS_ERROR
 
     # if $ident is undefined, it means openlog() wasn't previously called
     # so do it now in order to have sensible defaults
-    openlog() unless $ident;
+    openlog() unless $ident
 
-    local $facility = $facility;    # may need to change temporarily.
+    local $facility = $facility    # may need to change temporarily.
 
-    die "syslog: expecting argument \$priority" unless defined $priority;
-    die "syslog: expecting argument \$format"   unless defined $mask;
+    die "syslog: expecting argument \$priority" unless defined $priority
+    die "syslog: expecting argument \$format"   unless defined $mask
 
-    @words = split(m/\W+/, $priority, 2);    # Allow "level" or "level|facility".
-    undef $numpri;
-    undef $numfac;
+    @words = split(m/\W+/, $priority, 2)    # Allow "level" or "level|facility".
+    undef $numpri
+    undef $numfac
 
-    foreach ( @words) {
-	$num = xlate($_);		    # Translate word to number.
-	if ($num +< 0) {
-	    die "syslog: invalid level/facility: $_"
-	}
-	elsif ($num +<= LOG_PRIMASK()) {
-	    die "syslog: too many levels given: $_" if defined $numpri;
-	    $numpri = $num;
-	    return 0 unless LOG_MASK($numpri) ^&^ $maskpri;
-	}
-	else {
-	    die "syslog: too many facilities given: $_" if defined $numfac;
-	    $facility = $_;
-	    $numfac = $num;
-	}
-    }
+    foreach ( @words)
+        $num = xlate($_)		    # Translate word to number.
+        if ($num +< 0)
+            die "syslog: invalid level/facility: $_"
+        elsif ($num +<= LOG_PRIMASK())
+            die "syslog: too many levels given: $_" if defined $numpri
+            $numpri = $num
+            return 0 unless LOG_MASK($numpri) ^&^ $maskpri
+        else
+            die "syslog: too many facilities given: $_" if defined $numfac
+            $facility = $_
+            $numfac = $num
+        
+    
 
-    die "syslog: level must be given" unless defined $numpri;
+    die "syslog: level must be given" unless defined $numpri
 
-    if (not defined $numfac) {  # Facility not specified in this call.
-	$facility = 'user' unless $facility;
-	$numfac = xlate($facility);
-    }
+    if (not defined $numfac)  # Facility not specified in this call.
+        $facility = 'user' unless $facility
+        $numfac = xlate($facility)
+    
 
-    connect_log() unless $connected;
+    connect_log() unless $connected
 
-    if ($mask =~ m/\%m/) {
+    if ($mask =~ m/\%m/)
         # escape percent signs for sprintf()
-        $error =~ s/%/\%\%/g if @_;
+        $error =~ s/%/\%\%/g if @_
         # replace %m with $error, if preceded by an even number of percent signs
-        $mask =~ s/(?<!\%)((?:\%\%)*)\%m/$1$error/g;
-    }
+        $mask =~ s/(?<!\%)((?:\%\%)*)\%m/$1$error/g
+    
 
-    $mask .= "\n" unless $mask =~ m/\n$/;
-    $message = @_ ?? sprintf($mask, < @_) !! $mask;
+    $mask .= "\n" unless $mask =~ m/\n$/
+    $message = @_ ?? sprintf($mask, < @_) !! $mask
 
     # See CPAN-RT#24431. Opened on Apple Radar as bug #4944407 on 2007.01.21
-    chomp $message if $^OS_NAME =~ m/darwin/;
+    chomp $message if $^OS_NAME =~ m/darwin/
 
-    if ($current_proto eq 'native') {
-        $buf = $message;
+    if ($current_proto eq 'native')
+        $buf = $message
 
-    }
-    elsif ($current_proto eq 'eventlog') {
-        $buf = $message;
-    }
-    else {
-        my $whoami = $ident;
-        $whoami .= "[$^PID]" if %options{?pid};
+    elsif ($current_proto eq 'eventlog')
+        $buf = $message
+    else
+        my $whoami = $ident
+        $whoami .= "[$^PID]" if %options{?pid}
 
-        $sum = $numpri + $numfac;
-        my $oldlocale = setlocale(LC_TIME);
-        setlocale(LC_TIME, 'C');
-        my $timestamp = strftime "\%b \%e \%T", localtime;
-        setlocale(LC_TIME, $oldlocale);
-        $buf = "<$sum>$timestamp $whoami: $message\0";
-    }
+        $sum = $numpri + $numfac
+        my $oldlocale = setlocale(LC_TIME)
+        setlocale(LC_TIME, 'C')
+        my $timestamp = strftime "\%b \%e \%T", localtime
+        setlocale(LC_TIME, $oldlocale)
+        $buf = "<$sum>$timestamp $whoami: $message\0"
+    
 
     # it's possible that we'll get an error from sending
     # (e.g. if method is UDP and there is no UDP listener,
     # then we'll get ECONNREFUSED on the send). So what we
     # want to do at this point is to fallback onto a different
     # connection method.
-    while (@fallbackMethods || $syslog_send) {
-	if ($failed && (time - $fail_time) +> 60) {
-	    # it's been a while... maybe things have been fixed
-	    @fallbackMethods = @( () );
-	    disconnect_log();
-	    $transmit_ok = 0; # make it look like a fresh attempt
-	    connect_log();
-        }
+    while (@fallbackMethods || $syslog_send)
+        if ($failed && (time - $fail_time) +> 60)
+            # it's been a while... maybe things have been fixed
+            @fallbackMethods = @( () )
+            disconnect_log()
+            $transmit_ok = 0 # make it look like a fresh attempt
+            connect_log()
+        
 
-	if ($connected && !connection_ok()) {
-	    # Something was OK, but has now broken. Remember coz we'll
-	    # want to go back to what used to be OK.
-	    $failed = $current_proto unless $failed;
-	    $fail_time = time;
-	    disconnect_log();
-	}
+        if ($connected && !connection_ok())
+            # Something was OK, but has now broken. Remember coz we'll
+            # want to go back to what used to be OK.
+            $failed = $current_proto unless $failed
+            $fail_time = time
+            disconnect_log()
+        
 
-	connect_log() unless $connected;
-	$failed = undef if ($current_proto && $failed && $current_proto eq $failed);
+        connect_log() unless $connected
+        $failed = undef if ($current_proto && $failed && $current_proto eq $failed)
 
-	if ($syslog_send) {
-            if ($syslog_send->($buf, $numpri, $numfac)) {
-		$transmit_ok++;
-		return 1;
-	    }
-	    # typically doesn't happen, since errors are rare from write().
-	    disconnect_log();
-	}
-    }
+        if ($syslog_send)
+            if ($syslog_send->($buf, $numpri, $numfac))
+                $transmit_ok++
+                return 1
+            
+            # typically doesn't happen, since errors are rare from write().
+            disconnect_log()
+        
+    
     # could not send, could not fallback onto a working
     # connection method. Lose.
-    return 0;
-}
+    return 0
 
-sub _syslog_send_console($buf) {
-    chop($buf); # delete the NUL from the end
+
+sub _syslog_send_console($buf)
+    chop($buf) # delete the NUL from the end
     # The console print is a method which could block
     # so we do it in a child process and always return success
     # to the caller.
-    if (my $pid = fork) {
+    if (my $pid = fork)
 
-	if (%options{?nowait}) {
-	    return 1;
-	} else {
-	    if (waitpid($pid, 0) +>= 0) {
-	    	return  $^CHILD_ERROR >> 8;
-	    } else {
-		# it's possible that the caller has other
-		# plans for SIGCHLD, so let's not interfere
-		return 1;
-	    }
-	}
-    } else {
-        if (open(my $consfh, ">", "/dev/console")) {
-	    my $ret = print $consfh, $buf . "\r";  # XXX: should this be \x0A ?
-	    exit $ret if defined $pid;
-	    close $consfh;
-	}
-	exit if defined $pid;
-    }
-}
+        if (%options{?nowait})
+            return 1
+        else
+            if (waitpid($pid, 0) +>= 0)
+                return  $^CHILD_ERROR >> 8
+            else
+                # it's possible that the caller has other
+                # plans for SIGCHLD, so let's not interfere
+                return 1
+            
+        
+    else
+        if (open(my $consfh, ">", "/dev/console"))
+            my $ret = print $consfh, $buf . "\r"  # XXX: should this be \x0A ?
+            exit $ret if defined $pid
+            close $consfh
+        
+        exit if defined $pid
+    
 
-sub _syslog_send_stream($buf) {
-    # XXX: this only works if the OS stream implementation makes a write 
-    # look like a putmsg() with simple header. For instance it works on 
+
+sub _syslog_send_stream($buf)
+    # XXX: this only works if the OS stream implementation makes a write
+    # look like a putmsg() with simple header. For instance it works on
     # Solaris 8 but not Solaris 7.
     # To be correct, it should use a STREAMS API, but perl doesn't have one.
-    return syswrite($syslogfh, $buf, length($buf));
-}
+    return syswrite($syslogfh, $buf, length($buf))
 
-sub _syslog_send_pipe($buf) {
-    return print $syslogfh, $buf;
-}
 
-sub _syslog_send_socket($buf, ...) {
-    return syswrite($syslogfh, $buf, length($buf));
-    #return send($syslogfh, $buf, 0);
-}
+sub _syslog_send_pipe($buf)
+    return print $syslogfh, $buf
 
-sub _syslog_send_native($buf, $numpri, ...) {
-    syslog_xs($numpri, $buf);
-    return 1;
-}
+
+sub _syslog_send_socket($buf, ...)
+    return syswrite($syslogfh, $buf, length($buf))
+#return send($syslogfh, $buf, 0);
+
+
+sub _syslog_send_native($buf, $numpri, ...)
+    syslog_xs($numpri, $buf)
+    return 1
+
 
 
 # xlate()
 # -----
 # private function to translate names to numeric values
-# 
-sub xlate {
-    my@($name) =  @_;
-    return $name+0 if $name =~ m/^\s*\d+\s*$/;
-    $name = uc $name;
-    $name = "LOG_$name" unless $name =~ m/^LOG_/;
-    $name = "Sys::Syslog::$name";
+#
+sub xlate
+    my@($name) =  @_
+    return $name+0 if $name =~ m/^\s*\d+\s*$/
+    $name = uc $name
+    $name = "LOG_$name" unless $name =~ m/^LOG_/
+    $name = "Sys::Syslog::$name"
     # Can't have just try { &$name } || -1 because some LOG_XXX may be zero.
-    my $value = try { &{Symbol::fetch_glob($name)->*} ( < @_ )};
-    defined $value ?? $value !! -1;
-}
+    my $value = try { &{Symbol::fetch_glob($name)->*} ( < @_ )}
+    defined $value ?? $value !! -1
+
 
 
 # connect_log()
 # -----------
-# This function acts as a kind of front-end: it tries to connect to 
-# a syslog service using the selected methods, trying each one in the 
-# selected order. 
-# 
-sub connect_log {
-    @fallbackMethods = @connectMethods unless @fallbackMethods;
+# This function acts as a kind of front-end: it tries to connect to
+# a syslog service using the selected methods, trying each one in the
+# selected order.
+#
+sub connect_log
+    @fallbackMethods = @connectMethods unless @fallbackMethods
 
-    if ($transmit_ok && $current_proto) {
+    if ($transmit_ok && $current_proto)
         # Retry what we were on, because it has worked in the past.
-	unshift(@fallbackMethods, $current_proto);
-    }
+        unshift(@fallbackMethods, $current_proto)
+    
 
-    $connected = 0;
-    my @errs = @( () );
-    my $proto = undef;
+    $connected = 0
+    my @errs = @( () )
+    my $proto = undef
 
-    while ($proto = shift @fallbackMethods) {
-	my $fn = "connect_$proto";
-	$connected = &{Symbol::fetch_glob($fn)->*}(\@errs) if defined &{Symbol::fetch_glob($fn)->*};
-	last if $connected;
-    }
+    while ($proto = shift @fallbackMethods)
+        my $fn = "connect_$proto"
+        $connected = &{Symbol::fetch_glob($fn)->*}(\@errs) if defined &{Symbol::fetch_glob($fn)->*}
+        last if $connected
+    
 
-    $transmit_ok = 0;
-    if ($connected) {
-	$current_proto = $proto;
-        iohandle::output_autoflush($syslogfh, 1);
-    } else {
-	@fallbackMethods = @( () );
-        $err_sub->(join "\n\t- ", @( "no connection to syslog available", < @errs));
-        return undef;
-    }
-}
+    $transmit_ok = 0
+    if ($connected)
+        $current_proto = $proto
+        iohandle::output_autoflush($syslogfh, 1)
+    else
+        @fallbackMethods = @( () )
+        $err_sub->(join "\n\t- ", @( "no connection to syslog available", < @errs))
+        return undef
+    
 
-sub connect_tcp($errs) {
 
-    my $tcp = getprotobyname('tcp');
-    if (!defined $tcp) {
-	push $errs->@, "getprotobyname failed for tcp";
-	return 0;
-    }
+sub connect_tcp($errs)
 
-    my $syslog = getservbyname('syslog', 'tcp');
-    $syslog = getservbyname('syslogng', 'tcp') unless defined $syslog;
-    if (!defined $syslog) {
-	push $errs->@, "getservbyname failed for syslog/tcp and syslogng/tcp";
-	return 0;
-    }
+    my $tcp = getprotobyname('tcp')
+    if (!defined $tcp)
+        push $errs->@, "getprotobyname failed for tcp"
+        return 0
+    
 
-    my $addr;
-    if (defined $host) {
-        $addr = inet_aton($host);
-        if (!$addr) {
-	    push $errs->@, "can't lookup $host";
-	    return 0;
-	}
-    } else {
-        $addr = INADDR_LOOPBACK;
-    }
-    $addr = sockaddr_in($syslog, $addr);
+    my $syslog = getservbyname('syslog', 'tcp')
+    $syslog = getservbyname('syslogng', 'tcp') unless defined $syslog
+    if (!defined $syslog)
+        push $errs->@, "getservbyname failed for syslog/tcp and syslogng/tcp"
+        return 0
+    
 
-    if (!socket($syslogfh, AF_INET, SOCK_STREAM, $tcp)) {
-	push $errs->@, "tcp socket: $^OS_ERROR";
-	return 0;
-    }
+    my $addr
+    if (defined $host)
+        $addr = inet_aton($host)
+        if (!$addr)
+            push $errs->@, "can't lookup $host"
+            return 0
+        
+    else
+        $addr = INADDR_LOOPBACK
+    
+    $addr = sockaddr_in($syslog, $addr)
 
-    setsockopt($syslogfh, SOL_SOCKET, SO_KEEPALIVE, 1);
-    if (try { IPPROTO_TCP() }) {
+    if (!socket($syslogfh, AF_INET, SOCK_STREAM, $tcp))
+        push $errs->@, "tcp socket: $^OS_ERROR"
+        return 0
+    
+
+    setsockopt($syslogfh, SOL_SOCKET, SO_KEEPALIVE, 1)
+    if (try { IPPROTO_TCP() })
         # These constants don't exist in 5.005. They were added in 1999
-        setsockopt($syslogfh, IPPROTO_TCP(), TCP_NODELAY(), 1);
-    }
-    if (!connect($syslogfh, $addr)) {
-	push $errs->@, "tcp connect: $^OS_ERROR";
-	return 0;
-    }
+        setsockopt($syslogfh, IPPROTO_TCP(), TCP_NODELAY(), 1)
+    
+    if (!connect($syslogfh, $addr))
+        push $errs->@, "tcp connect: $^OS_ERROR"
+        return 0
+    
 
-    $syslog_send = \&_syslog_send_socket;
+    $syslog_send = \&_syslog_send_socket
 
-    return 1;
-}
+    return 1
 
-sub connect_udp($errs) {
 
-    my $udp = getprotobyname('udp');
-    if (!defined $udp) {
-	push $errs->@, "getprotobyname failed for udp";
-	return 0;
-    }
+sub connect_udp($errs)
 
-    my $syslog = getservbyname('syslog', 'udp');
-    if (!defined $syslog) {
-	push $errs->@, "getservbyname failed for syslog/udp";
-	return 0;
-    }
+    my $udp = getprotobyname('udp')
+    if (!defined $udp)
+        push $errs->@, "getprotobyname failed for udp"
+        return 0
+    
 
-    my $addr;
-    if (defined $host) {
-        $addr = inet_aton($host);
-        if (!$addr) {
-	    push $errs->@, "can't lookup $host";
-	    return 0;
-	}
-    } else {
-        $addr = INADDR_LOOPBACK;
-    }
-    $addr = sockaddr_in($syslog, $addr);
+    my $syslog = getservbyname('syslog', 'udp')
+    if (!defined $syslog)
+        push $errs->@, "getservbyname failed for syslog/udp"
+        return 0
+    
 
-    if (!socket($syslogfh, AF_INET, SOCK_DGRAM, $udp)) {
-	push $errs->@, "udp socket: $^OS_ERROR";
-	return 0;
-    }
-    if (!connect($syslogfh, $addr)) {
-	push $errs->@, "udp connect: $^OS_ERROR";
-	return 0;
-    }
+    my $addr
+    if (defined $host)
+        $addr = inet_aton($host)
+        if (!$addr)
+            push $errs->@, "can't lookup $host"
+            return 0
+        
+    else
+        $addr = INADDR_LOOPBACK
+    
+    $addr = sockaddr_in($syslog, $addr)
+
+    if (!socket($syslogfh, AF_INET, SOCK_DGRAM, $udp))
+        push $errs->@, "udp socket: $^OS_ERROR"
+        return 0
+    
+    if (!connect($syslogfh, $addr))
+        push $errs->@, "udp connect: $^OS_ERROR"
+        return 0
+    
 
     # We want to check that the UDP connect worked. However the only
     # way to do that is to send a message and see if an ICMP is returned
-    _syslog_send_socket("");
-    if (!connection_ok()) {
-	push $errs->@, "udp connect: nobody listening";
-	return 0;
-    }
+    _syslog_send_socket("")
+    if (!connection_ok())
+        push $errs->@, "udp connect: nobody listening"
+        return 0
+    
 
-    $syslog_send = \&_syslog_send_socket;
+    $syslog_send = \&_syslog_send_socket
 
-    return 1;
-}
+    return 1
 
-sub connect_stream($errs) {
+
+sub connect_stream($errs)
     # might want syslog_path to be variable based on syslog.h (if only
     # it were in there!)
-    $syslog_path = '/dev/conslog' unless defined $syslog_path; 
-    if (!-w $syslog_path) {
-	push $errs->@, "stream $syslog_path is not writable";
-	return 0;
-    }
-    if (!sysopen($syslogfh, $syslog_path, 0400, O_WRONLY)) {
-	push $errs->@, "stream can't open $syslog_path: $^OS_ERROR";
-	return 0;
-    }
-    $syslog_send = \&_syslog_send_stream;
-    return 1;
-}
+    $syslog_path = '/dev/conslog' unless defined $syslog_path
+    if (!-w $syslog_path)
+        push $errs->@, "stream $syslog_path is not writable"
+        return 0
+    
+    if (!sysopen($syslogfh, $syslog_path, 0400, O_WRONLY))
+        push $errs->@, "stream can't open $syslog_path: $^OS_ERROR"
+        return 0
+    
+    $syslog_send = \&_syslog_send_stream
+    return 1
 
-sub connect_pipe($errs) {
 
-    $syslog_path ||= _PATH_LOG() || "/dev/log";
+sub connect_pipe($errs)
 
-    if (not -w $syslog_path) {
-        push $errs->@, "$syslog_path is not writable";
-        return 0;
-    }
+    $syslog_path ||= _PATH_LOG() || "/dev/log"
 
-    if (not open($syslogfh, ">", "$syslog_path")) {
-        push $errs->@, "can't write to $syslog_path: $^OS_ERROR";
-        return 0;
-    }
+    if (not -w $syslog_path)
+        push $errs->@, "$syslog_path is not writable"
+        return 0
+    
 
-    $syslog_send = \&_syslog_send_pipe;
+    if (not open($syslogfh, ">", "$syslog_path"))
+        push $errs->@, "can't write to $syslog_path: $^OS_ERROR"
+        return 0
+    
 
-    return 1;
-}
+    $syslog_send = \&_syslog_send_pipe
 
-sub connect_unix($errs) {
+    return 1
 
-    $syslog_path ||= _PATH_LOG() if length _PATH_LOG();
 
-    if (not defined $syslog_path) {
-        push $errs->@, "_PATH_LOG not available in syslog.h and no user-supplied socket path";
-	return 0;
-    }
+sub connect_unix($errs)
 
-    if (! -S $syslog_path) {
-        push $errs->@, "$syslog_path is not a socket";
-	return 0;
-    }
+    $syslog_path ||= _PATH_LOG() if length _PATH_LOG()
 
-    my $addr = pack_sockaddr_un($syslog_path);
-    if (!$addr) {
-	push $errs->@, "can't locate $syslog_path";
-	return 0;
-    }
-    if (!socket($syslogfh, AF_UNIX, SOCK_STREAM, 0)) {
-        push $errs->@, "unix stream socket: $^OS_ERROR";
-	return 0;
-    }
+    if (not defined $syslog_path)
+        push $errs->@, "_PATH_LOG not available in syslog.h and no user-supplied socket path"
+        return 0
+    
 
-    if (!connect($syslogfh, $addr)) {
-        if (!socket($syslogfh, AF_UNIX, SOCK_DGRAM, 0)) {
-	    push $errs->@, "unix dgram socket: $^OS_ERROR";
-	    return 0;
-	}
-        if (!connect($syslogfh, $addr)) {
-	    push $errs->@, "unix dgram connect: $^OS_ERROR";
-	    return 0;
-	}
-    }
+    if (! -S $syslog_path)
+        push $errs->@, "$syslog_path is not a socket"
+        return 0
+    
 
-    $syslog_send = \&_syslog_send_socket;
+    my $addr = pack_sockaddr_un($syslog_path)
+    if (!$addr)
+        push $errs->@, "can't locate $syslog_path"
+        return 0
+    
+    if (!socket($syslogfh, AF_UNIX, SOCK_STREAM, 0))
+        push $errs->@, "unix stream socket: $^OS_ERROR"
+        return 0
+    
 
-    return 1;
-}
+    if (!connect($syslogfh, $addr))
+        if (!socket($syslogfh, AF_UNIX, SOCK_DGRAM, 0))
+            push $errs->@, "unix dgram socket: $^OS_ERROR"
+            return 0
+        
+        if (!connect($syslogfh, $addr))
+            push $errs->@, "unix dgram connect: $^OS_ERROR"
+            return 0
+        
+    
 
-sub connect_native($errs) {
-    my $logopt = 0;
+    $syslog_send = \&_syslog_send_socket
+
+    return 1
+
+
+sub connect_native($errs)
+    my $logopt = 0
 
     # reconstruct the numeric equivalent of the options
-    for my $opt (keys %options) {
+    for my $opt (keys %options)
         $logopt += xlate($opt) if %options{?$opt}
-    }
+    
 
-    try { openlog_xs($ident, $logopt, xlate($facility)) };
-    if ($^EVAL_ERROR) {
-        push $errs->@, $^EVAL_ERROR->message;
-        return 0;
-    }
+    try { openlog_xs($ident, $logopt, xlate($facility)) }
+    if ($^EVAL_ERROR)
+        push $errs->@, $^EVAL_ERROR->message
+        return 0
+    
 
-    $syslog_send = \&_syslog_send_native;
+    $syslog_send = \&_syslog_send_native
 
-    return 1;
-}
+    return 1
 
-sub connect_eventlog($errs) {
 
-    $syslog_xobj = Sys::Syslog::Win32::_install();
-    $syslog_send = \&Sys::Syslog::Win32::_syslog_send;
+sub connect_eventlog($errs)
 
-    return 1;
-}
+    $syslog_xobj = Sys::Syslog::Win32::_install()
+    $syslog_send = \&Sys::Syslog::Win32::_syslog_send
 
-sub connect_console($errs) {
-    if (!-w '/dev/console') {
-	push $errs->@, "console is not writable";
-	return 0;
-    }
-    $syslog_send = \&_syslog_send_console;
-    return 1;
-}
+    return 1
+
+
+sub connect_console($errs)
+    if (!-w '/dev/console')
+        push $errs->@, "console is not writable"
+        return 0
+    
+    $syslog_send = \&_syslog_send_console
+    return 1
+
 
 # To test if the connection is still good, we need to check if any
 # errors are present on the connection. The errors will not be raised
 # by a write. Instead, sockets are made readable and the next read
-# would cause the error to be returned. Unfortunately the syslog 
-# 'protocol' never provides anything for us to read. But with 
+# would cause the error to be returned. Unfortunately the syslog
+# 'protocol' never provides anything for us to read. But with
 # judicious use of select(), we can see if it would be readable...
-sub connection_ok {
+sub connection_ok
     return 1 if defined $current_proto and (
         $current_proto eq 'native' or $current_proto eq 'console'
         or $current_proto eq 'eventlog'
-    );
+        )
 
-    my $rin = '';
-    vec($rin, fileno($syslogfh), 1, 1);
-    my $ret = select $rin, undef, $rin, $sock_timeout;
-    return $ret ?? 0 !! 1;
-}
+    my $rin = ''
+    vec($rin, fileno($syslogfh), 1, 1)
+    my $ret = select $rin, undef, $rin, $sock_timeout
+    return $ret ?? 0 !! 1
 
-sub disconnect_log {
-    $connected = 0;
-    $syslog_send = undef;
 
-    if (defined $current_proto and $current_proto eq 'native') {
-        closelog_xs();
-        return 1;
-    }
-    elsif (defined $current_proto and $current_proto eq 'eventlog') {
-        $syslog_xobj->Close();
-        return 1;
-    }
+sub disconnect_log
+    $connected = 0
+    $syslog_send = undef
 
-    return close $syslogfh;
-}
+    if (defined $current_proto and $current_proto eq 'native')
+        closelog_xs()
+        return 1
+    elsif (defined $current_proto and $current_proto eq 'eventlog')
+        $syslog_xobj->Close()
+        return 1
+    
 
-1;
+    return close $syslogfh
+
+
+1
 
 __END__
 

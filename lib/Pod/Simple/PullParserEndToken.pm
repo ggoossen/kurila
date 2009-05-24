@@ -1,13 +1,13 @@
 
-package Pod::Simple::PullParserEndToken;
-use Pod::Simple::PullParserToken ();
-our @ISA = @('Pod::Simple::PullParserToken');
+package Pod::Simple::PullParserEndToken
+use Pod::Simple::PullParserToken ()
+our @ISA = @('Pod::Simple::PullParserToken')
 
 
-sub new {  # Class->new(tagname);
-    my $class = shift;
-    return bless \@('end', < @_), ref($class) || $class;
-}
+sub new  # Class->new(tagname);
+    my $class = shift
+    return bless \@('end', < @_), ref($class) || $class
+
 
 # Purely accessors:
 
@@ -18,7 +18,7 @@ sub tag { shift->tagname(< @_) }
 sub is_tagname { @_[0]->[1] eq @_[1] }
 sub is_tag { shift->is_tagname(< @_) }
 
-1;
+1
 
 
 __END__

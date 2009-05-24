@@ -1,9 +1,9 @@
-package ExtUtils::MM_AIX;
+package ExtUtils::MM_AIX
 
-our $VERSION = '6.44';
+our $VERSION = '6.44'
 
-require ExtUtils::MM_Unix;
-our @ISA = qw(ExtUtils::MM_Unix);
+require ExtUtils::MM_Unix
+our @ISA = qw(ExtUtils::MM_Unix)
 
 use ExtUtils::MakeMaker < qw(neatvalue);
 
@@ -32,24 +32,24 @@ Define DL_FUNCS and DL_VARS and write the *.exp files.
 
 =cut
 
-sub dlsyms($self,%< %attribs) {
+sub dlsyms($self,%< %attribs)
 
-    return '' unless $self->needs_linking();
+    return '' unless $self->needs_linking()
 
-    my@($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \%();
-    my@($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \@();
-    my@($funclist)  = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \@();
-    my(@m);
+    my@($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \%()
+    my@($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \@()
+    my@($funclist)  = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \@()
+    my(@m)
 
     push(@m,"
 dynamic :: $self->{?BASEEXT}.exp
 
-") unless $self->{SKIPHASH}->{?'dynamic'}; # dynamic and static are subs, so...
+") unless $self->{SKIPHASH}->{?'dynamic'} # dynamic and static are subs, so...
 
     push(@m,"
 static :: $self->{?BASEEXT}.exp
 
-") unless $self->{SKIPHASH}->{?'static'};  # we avoid a warning if we tick them
+") unless $self->{SKIPHASH}->{?'static'}  # we avoid a warning if we tick them
 
     push(@m,"
 $self->{?BASEEXT}.exp: Makefile.PL
@@ -57,10 +57,10 @@ $self->{?BASEEXT}.exp: Makefile.PL
 	Mksymlists("NAME" => "|,$self->{?NAME},'", "DL_FUNCS" => ', <
         neatvalue($funcs), ', "FUNCLIST" => ', < neatvalue($funclist),
         ', "DL_VARS" => ', < neatvalue($vars), q|);'
-|);
+|)
 
-    join('', @m);
-}
+    join('', @m)
+
 
 
 =head1 AUTHOR
@@ -74,4 +74,4 @@ L<ExtUtils::MakeMaker>
 =cut
 
 
-1;
+1

@@ -1,21 +1,21 @@
-package Config::Extensions;
+package Config::Extensions
 
-our (%Extensions, $VERSION, @ISA, @EXPORT_OK);
+our (%Extensions, $VERSION, @ISA, @EXPORT_OK)
 use Config;
-require Exporter;
+require Exporter
 
-$VERSION = '0.01';
-@ISA = @( 'Exporter' );
-@EXPORT_OK = @( '%Extensions' );
+$VERSION = '0.01'
+@ISA = @( 'Exporter' )
+@EXPORT_OK = @( '%Extensions' )
 
-foreach my $type (qw(static dynamic nonxs)) {
-    foreach (split m/\s+/, config_value($type . '_ext')) {
-        s!/!::!g;
-        %Extensions{+$_} = $type;
-    }
-}
+foreach my $type (qw(static dynamic nonxs))
+    foreach (split m/\s+/, config_value($type . '_ext'))
+        s!/!::!g
+        %Extensions{+$_} = $type
+    
 
-1;
+
+1
 __END__
 =head1 NAME
 

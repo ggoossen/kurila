@@ -1,5 +1,5 @@
-use Perl6::Form;
+use Perl6::Form
 
 print $^STDOUT, < form
  'A left-justified field look like this: \{[[[[[[[[[[[}',
- 'The escape character for formats is: \';
+ 'The escape character for formats is: \'

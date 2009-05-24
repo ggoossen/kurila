@@ -3,29 +3,29 @@
 #
 # Generate overload.h
 # This allows the order of overloading constants to be changed.
-# 
+#
 
-BEGIN {
+BEGIN 
     # Get function prototypes
-    require 'regen_lib.pl';
-}
+    require 'regen_lib.pl'
 
 
-my (@enums, @names);
-while ( ~< $^DATA) {
-    next if m/^#/;
-    next if m/^$/;
-    my @($enum, $name) = @: m/^(\S+)\s+(\S+)/ or die "Can't parse $_";
-    push @enums, $enum;
-    push @names, $name;
-}
 
-safer_unlink ('overload.h', 'overload.c');
-my $c = safer_open("overload.c");
-my $h = safer_open("overload.h");
+my (@enums, @names)
+while ( ~< $^DATA)
+    next if m/^#/
+    next if m/^$/
+    my @($enum, $name) = @: m/^(\S+)\s+(\S+)/ or die "Can't parse $_"
+    push @enums, $enum
+    push @names, $name
 
-sub print_header($fh, $file) {
-    print $fh, <<"EOF";
+
+safer_unlink ('overload.h', 'overload.c')
+my $c = safer_open("overload.c")
+my $h = safer_open("overload.h")
+
+sub print_header($fh, $file)
+    print $fh, <<"EOF"
 /* -*- buffer-read-only: t -*-
  *
  *    $file
@@ -40,19 +40,19 @@ sub print_header($fh, $file) {
  *  This file is built by overload.pl
  */
 EOF
-}
 
-print_header($c, 'overload.c');
 
-print_header($h, 'overload.h');
-print $h, <<'EOF';
+print_header($c, 'overload.c')
+
+print_header($h, 'overload.h')
+print $h, <<'EOF'
 
 enum {
 EOF
 
-print $h, "    $($_)_amg,\n", foreach  @enums;
+print $h, "    $($_)_amg,\n", foreach  @enums
 
-print $h, <<'EOF';
+print $h, <<'EOF'
     max_amg_code
     /* Do not leave a trailing comma here.  C9X allows it, C89 doesn't. */
 };
@@ -61,7 +61,7 @@ print $h, <<'EOF';
 
 EOF
 
-print $c, <<'EOF';
+print $c, <<'EOF'
 
 #define AMG_id2name(id) (PL_AMG_names[id]+1)
 #define AMG_id2namelen(id) (PL_AMG_namelens[id]-1)
@@ -74,16 +74,16 @@ char * const PL_AMG_names[NofAMmeth] = {
      overload.pm.  */
 EOF
 
-my $last = pop @names;
-print $c, "    \"$_\",\n" foreach map { s/(["\\"])/\\$1/g; $_ }, @names;
+my $last = pop @names
+print $c, "    \"$_\",\n" foreach map { s/(["\\"])/\\$1/g; $_ }, @names
 
-print $c, <<"EOT";
+print $c, <<"EOT"
     "$last"
 \};
 EOT
 
-safer_close($h);
-safer_close($c);
+safer_close($h)
+safer_close($c)
 
 __DATA__
 # Fallback should be the first

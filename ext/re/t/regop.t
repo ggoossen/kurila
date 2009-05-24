@@ -1,42 +1,42 @@
 #!./perl
 
 BEGIN { require "./test.pl"; }
-our $NUM_SECTS;
-my @strs = map { chomp ; $_ }, grep { !m/^\s*\#/ }, @( ~< $^DATA);
-my $out = runperl(progfile => "../ext/re/t/regop.pl", stderr => 1 );
+our $NUM_SECTS
+my @strs = map { chomp ; $_ }, grep { !m/^\s*\#/ }, @( ~< $^DATA)
+my $out = runperl(progfile => "../ext/re/t/regop.pl", stderr => 1 )
 # VMS currently embeds linefeeds in the output.
-$out =~ s/\cJ//g if $^OS_NAME = 'VMS';
-my @tests = grep { m/\S/ }, split m/(?=Compiling REx)/, $out;
+$out =~ s/\cJ//g if $^OS_NAME = 'VMS'
+my @tests = grep { m/\S/ }, split m/(?=Compiling REx)/, $out
 # on debug builds we get an EXECUTING... message in there at the top
 shift @tests
-    if @tests[0] =~ m/EXECUTING.../;
+    if @tests[0] =~ m/EXECUTING.../
 
-plan( (nelems @tests) + 2 + ( (nelems @strs) - nelems(grep { !$_ or m/^---/ }, @strs )));
+plan( (nelems @tests) + 2 + ( (nelems @strs) - nelems(grep { !$_ or m/^---/ }, @strs )))
 
 is( nelems @tests, $NUM_SECTS,
-    "Expecting output for $NUM_SECTS patterns" );
-ok( defined $out, 'regop.pl returned something defined' );
+    "Expecting output for $NUM_SECTS patterns" )
+ok( defined $out, 'regop.pl returned something defined' )
 
-$out ||= "";
-my $test= 1;
-foreach my $testout (  @tests ) {
-    my @( $pattern )= @: $testout=~m/Compiling REx "([^"]+)"/;
-    ok( $pattern, "Pattern for test " . ($test++) );
-    my $diaged;
+$out ||= ""
+my $test= 1
+foreach my $testout (  @tests )
+    my @( $pattern )= @: $testout=~m/Compiling REx "([^"]+)"/
+    ok( $pattern, "Pattern for test " . ($test++) )
+    my $diaged
 
-    while ((nelems @strs)) {
-        local $_ = shift @strs;
+    while ((nelems @strs))
+        local $_ = shift @strs
         last if !$_
-            or m/^---/;
-        next if m/^\s*#/;
-        s/^\s+//;
-        s/\s+$//;
+          or m/^---/
+        next if m/^\s*#/
+        s/^\s+//
+        s/\s+$//
         ok( $testout=~m/\Q$_\E/, "$_: /$pattern/" )
-            or do {
-            !$diaged++ and diag("$_: /$pattern/\n'$testout'");
-        };
-    }
-}
+            or do
+            !$diaged++ and diag("$_: /$pattern/\n'$testout'")
+        
+    
+
 
 # The format below is simple. Each line is an exact
 # string that must be found in the output.

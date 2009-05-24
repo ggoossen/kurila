@@ -1,56 +1,55 @@
 #!./perl
 
 # ** DO NOT ADD ANY MORE TESTS HERE **
-# Instead, put the test in the appropriate test file and use the 
+# Instead, put the test in the appropriate test file and use the
 # fresh_perl_is()/fresh_perl_like() functions in t/test.pl.
 
 # This is for tests that used to abnormally cause segfaults, and other nasty
 # errors that might kill the interpreter and for some reason you can't
 # use an eval().
 
-BEGIN {
-    require './test.pl';	# for which_perl() etc
-}
+BEGIN 
+    require './test.pl'	# for which_perl() etc
 
 
-my $Perl = which_perl();
 
-$^OUTPUT_AUTOFLUSH=1;
+my $Perl = which_perl()
 
-my @prgs = @( () );
-while( ~< $^DATA) { 
-    if(m/^#{8,}\s*(.*)/) { 
-        push @prgs, \@('', $1);
-    }
-    else { 
-        @prgs[-1]->[0] .= $_;
-    }
-}
-plan tests => scalar nelems @prgs;
+$^OUTPUT_AUTOFLUSH=1
 
-foreach my $prog ( @prgs) {
-    my@($raw_prog, $name) =  $prog->@;
+my @prgs = @( () )
+while( ~< $^DATA)
+    if(m/^#{8,}\s*(.*)/)
+        push @prgs, \@('', $1)
+    else
+        @prgs[-1]->[0] .= $_
+    
 
-    my $switch;
-    if ($raw_prog =~ s/^\s*(-\w.*)\n//){
-        $switch = $1;
-    }
+plan tests => scalar nelems @prgs
 
-    my@($prog,?$expected) =  split(m/\nEXPECT\n/, $raw_prog);
-    $prog .= "\n";
-    $expected = '' unless defined $expected;
+foreach my $prog ( @prgs)
+    my@($raw_prog, $name) =  $prog->@
 
-    if ($prog =~ m/^\# SKIP: (.+)/m) {
-        if (eval $1) {
-            ok(1, "Skip: $1");
-            next;
-        }
-    }
+    my $switch
+    if ($raw_prog =~ s/^\s*(-\w.*)\n//)
+        $switch = $1
+    
 
-    $expected =~ s/\n+$//;
+    my@($prog,?$expected) =  split(m/\nEXPECT\n/, $raw_prog)
+    $prog .= "\n"
+    $expected = '' unless defined $expected
 
-    fresh_perl_is($prog, $expected, \%( switches => \@($switch || '') ), $name);
-}
+    if ($prog =~ m/^\# SKIP: (.+)/m)
+        if (eval $1)
+            ok(1, "Skip: $1")
+            next
+        
+    
+
+    $expected =~ s/\n+$//
+
+    fresh_perl_is($prog, $expected, \%( switches => \@($switch || '') ), $name)
+
 
 __END__
 ########

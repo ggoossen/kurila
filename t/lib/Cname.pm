@@ -1,22 +1,22 @@
-package Cname;
-our $Evil='A';
+package Cname
+our $Evil='A'
 
-sub translator {
-    my $str = shift;
-    if ( $str eq 'EVIL' ) {
-        (my $c=substr("A".$Evil,-1))++;
-        my $r=$Evil;
-        $Evil.=$c;
-        return $r;
-    }
-    if ( $str eq 'EMPTY-STR') {
-        return "";
-    }
-    return $str;
-}
+sub translator
+    my $str = shift
+    if ( $str eq 'EVIL' )
+        (my $c=substr("A".$Evil,-1))++
+        my $r=$Evil
+        $Evil.=$c
+        return $r
+    
+    if ( $str eq 'EMPTY-STR')
+        return ""
+    
+    return $str
 
-sub import {
-    shift;
-    $^HINTS{+charnames} = \&translator;
-}
-1;  
+
+sub import
+    shift
+    $^HINTS{+charnames} = \&translator
+
+1  

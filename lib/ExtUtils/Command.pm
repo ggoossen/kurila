@@ -1,17 +1,17 @@
-package ExtUtils::Command;
+package ExtUtils::Command
 
-use File::Copy;
-use File::Compare;
-use File::Basename;
-use File::Path < qw(rmtree);
-require Exporter;
-our (@ISA, @EXPORT, @EXPORT_OK, $VERSION);
-@ISA       = qw(Exporter);
+use File::Copy
+use File::Compare
+use File::Basename
+use File::Path < qw(rmtree)
+require Exporter
+our (@ISA, @EXPORT, @EXPORT_OK, $VERSION)
+@ISA       = qw(Exporter)
 @EXPORT    = qw(cp rm_f rm_rf mv cat eqtime mkpath touch test_f test_d chmod
-                dos2unix);
-$VERSION = '1.13';
+                dos2unix)
+$VERSION = '1.13'
 
-my $Is_VMS = $^OS_NAME eq 'VMS';
+my $Is_VMS = $^OS_NAME eq 'VMS'
 
 =head1 NAME
 
@@ -56,11 +56,10 @@ Filenames with * and ? will be glob expanded.
 =cut
 
 # VMS uses % instead of ? to mean "one character"
-my $wild_regex = $Is_VMS ?? '*%' !! '*?';
+my $wild_regex = $Is_VMS ?? '*%' !! '*?'
 sub expand_wildcards
-{
-    @ARGV = @+: map( { m/[$wild_regex]/o ?? glob($_) !! @: $_ }, @ARGV);
-}
+    @ARGV = @+: map( { m/[$wild_regex]/o ?? glob($_) !! @: $_ }, @ARGV)
+
 
 
 =item cat
@@ -69,13 +68,12 @@ sub expand_wildcards
 
 Concatenates all files mentioned on command line to STDOUT.
 
-=cut 
+=cut
 
 sub cat ()
-{
-    expand_wildcards();
-    print $^STDOUT, $_ while ( ~< *ARGV);
-}
+    expand_wildcards()
+    print $^STDOUT, $_ while ( ~< *ARGV)
+
 
 =item eqtime
 
@@ -83,14 +81,13 @@ sub cat ()
 
 Sets modified time of destination to that of source.
 
-=cut 
+=cut
 
 sub eqtime
-{
-    my @($src,$dst) =  @ARGV;
-    local @ARGV = @($dst);  touch();  # in case $dst doesn't exist
-    utime(< @(stat($src))[[8..9]],$dst);
-}
+    my @($src,$dst) =  @ARGV
+    local @ARGV = @($dst);  touch()  # in case $dst doesn't exist
+    utime(< @(stat($src))[[8..9]],$dst)
+
 
 =item rm_rf
 
@@ -98,13 +95,12 @@ sub eqtime
 
 Removes files and directories - recursively (even if readonly)
 
-=cut 
+=cut
 
 sub rm_rf
-{
-    expand_wildcards();
-    rmtree(< grep { -e $_ }, @ARGV );
-}
+    expand_wildcards()
+    rmtree(< grep { -e $_ }, @ARGV )
+
 
 =item rm_f
 
@@ -112,52 +108,52 @@ sub rm_rf
 
 Removes files (even if readonly)
 
-=cut 
+=cut
 
-sub rm_f {
-    expand_wildcards();
+sub rm_f
+    expand_wildcards()
 
-    foreach my $file ( @ARGV) {
-        next unless -f $file;
+    foreach my $file ( @ARGV)
+        next unless -f $file
 
-        next if _unlink($file);
+        next if _unlink($file)
 
-        chmod(0777, $file);
+        chmod(0777, $file)
 
-        next if _unlink($file);
+        next if _unlink($file)
 
-        warn "Cannot delete $file: $^OS_ERROR";
-    }
-}
+        warn "Cannot delete $file: $^OS_ERROR"
+    
 
-sub _unlink {
-    my $files_unlinked = 0;
-    foreach my $file ( @_) {
-        my $delete_count = 0;
-        $delete_count++ while unlink $file;
-        $files_unlinked++ if $delete_count;
-    }
-    return $files_unlinked;
-}
+
+sub _unlink
+    my $files_unlinked = 0
+    foreach my $file ( @_)
+        my $delete_count = 0
+        $delete_count++ while unlink $file
+        $files_unlinked++ if $delete_count
+    
+    return $files_unlinked
+
 
 
 =item touch
 
     touch file ...
 
-Makes files exist, with current timestamp 
+Makes files exist, with current timestamp
 
-=cut 
+=cut
 
-sub touch {
-    my $t    = time;
-    expand_wildcards();
-    foreach my $file ( @ARGV) {
-        open(my $fh, ">>","$file") || die "Cannot write $file:$^OS_ERROR";
-        close($fh);
-        utime($t,$t,$file);
-    }
-}
+sub touch
+    my $t    = time
+    expand_wildcards()
+    foreach my $file ( @ARGV)
+        open(my $fh, ">>","$file") || die "Cannot write $file:$^OS_ERROR"
+        close($fh)
+        utime($t,$t,$file)
+    
+
 
 =item mv
 
@@ -169,21 +165,21 @@ destination is an existing directory.
 
 Returns true if all moves succeeded, false otherwise.
 
-=cut 
+=cut
 
-sub mv {
-    expand_wildcards();
-    my @src = @ARGV;
-    my $dst = pop @src;
+sub mv
+    expand_wildcards()
+    my @src = @ARGV
+    my $dst = pop @src
 
-    die("Too many arguments") if ((nelems @src) +> 1 && ! -d $dst);
+    die("Too many arguments") if ((nelems @src) +> 1 && ! -d $dst)
 
-    my $nok = 0;
-    foreach my $src ( @src) {
-        $nok ||= !move($src,$dst);
-    }
-    return !$nok;
-}
+    my $nok = 0
+    foreach my $src ( @src)
+        $nok ||= !move($src,$dst)
+    
+    return !$nok
+
 
 =item cp
 
@@ -197,19 +193,19 @@ Returns true if all copies succeeded, false otherwise.
 
 =cut
 
-sub cp {
-    expand_wildcards();
-    my @src = @ARGV;
-    my $dst = pop @src;
+sub cp
+    expand_wildcards()
+    my @src = @ARGV
+    my $dst = pop @src
 
-    die("Too many arguments") if ((nelems @src) +> 1 && ! -d $dst);
+    die("Too many arguments") if ((nelems @src) +> 1 && ! -d $dst)
 
-    my $nok = 0;
-    foreach my $src ( @src) {
-        $nok ||= !copy($src,$dst);
-    }
-    return $nok;
-}
+    my $nok = 0
+    foreach my $src ( @src)
+        $nok ||= !copy($src,$dst)
+    
+    return $nok
+
 
 =item chmod
 
@@ -217,30 +213,30 @@ sub cp {
 
 Sets UNIX like permissions 'mode' on all the files.  e.g. 0666
 
-=cut 
+=cut
 
-sub chmod {
-    local @ARGV = @ARGV;
-    my $mode = shift(@ARGV);
-    expand_wildcards();
+sub chmod
+    local @ARGV = @ARGV
+    my $mode = shift(@ARGV)
+    expand_wildcards()
 
-    if( $Is_VMS ) {
-        foreach my $idx (0..((nelems @ARGV)-1)) {
-            my $path = @ARGV[$idx];
-            next unless -d $path;
+    if( $Is_VMS )
+        foreach my $idx (0..((nelems @ARGV)-1))
+            my $path = @ARGV[$idx]
+            next unless -d $path
 
             # chmod 0777, [.foo.bar] doesn't work on VMS, you have to do
             # chmod 0777, [.foo]bar.dir
-            my @dirs = File::Spec->splitdir( $path );
-            @dirs[-1] .= '.dir';
-            $path = File::Spec->catfile(< @dirs);
+            my @dirs = File::Spec->splitdir( $path )
+            @dirs[-1] .= '.dir'
+            $path = File::Spec->catfile(< @dirs)
 
-            @ARGV[$idx] = $path;
-        }
-    }
+            @ARGV[$idx] = $path
+        
+    
 
-    chmod(oct $mode,< @ARGV) || die "Cannot chmod ".join(' ', @($mode,< @ARGV)).":$^OS_ERROR";
-}
+    chmod(oct $mode,< @ARGV) || die "Cannot chmod ".join(' ', @($mode,< @ARGV)).":$^OS_ERROR"
+
 
 =item mkpath
 
@@ -248,13 +244,12 @@ sub chmod {
 
 Creates directories, including any parent directories.
 
-=cut 
+=cut
 
 sub mkpath
-{
-    expand_wildcards();
-    File::Path::mkpath(\ @ARGV,0,0777);
-}
+    expand_wildcards()
+    File::Path::mkpath(\ @ARGV,0,0777)
+
 
 =item test_f
 
@@ -263,12 +258,11 @@ sub mkpath
 Tests if a file exists.  I<Exits> with 0 if it does, 1 if it does not (ie.
 shell's idea of true and false).
 
-=cut 
+=cut
 
 sub test_f
-{
-    exit(-f @ARGV[0] ?? 0 !! 1);
-}
+    exit(-f @ARGV[0] ?? 0 !! 1)
+
 
 =item test_d
 
@@ -280,9 +274,8 @@ not (ie. shell's idea of true and false).
 =cut
 
 sub test_d
-{
-    exit(-d @ARGV[0] ?? 0 !! 1);
-}
+    exit(-d @ARGV[0] ?? 0 !! 1)
+
 
 =item dos2unix
 
@@ -292,29 +285,29 @@ Converts DOS and OS/2 linefeeds to Unix style recursively.
 
 =cut
 
-sub dos2unix {
-    require File::Find;
-    File::Find::find(sub {
-                         return if -d;
-                         return unless -w _;
-                         return unless -r _;
-                         return if -B _;
+sub dos2unix
+    require File::Find
+    File::Find::find(sub (@< @_)
+                         return if -d
+                         return unless -w _
+                         return unless -r _
+                         return if -B _
 
-                         my $orig = $_;
-                         my $temp = '.dos2unix_tmp';
-                         open my $orig_fh, "<", $_ or do { warn "dos2unix can't open $_: $^OS_ERROR"; return };
-                         open my $temp_fh, ">", "$temp" or 
-                             do { warn "dos2unix can't create .dos2unix_tmp: $^OS_ERROR"; return };
-                         while (my $line = ~< $orig_fh) { 
-                             $line =~ s/\015\012/\012/g;
-                             print $temp_fh ,$line;
-                         }
-                         close $orig_fh;
-                         close $temp_fh;
-                         rename $temp, $orig;
+                         my $orig = $_
+                         my $temp = '.dos2unix_tmp'
+                         open my $orig_fh, "<", $_ or do { warn "dos2unix can't open $_: $^OS_ERROR"; return }
+                         open my $temp_fh, ">", "$temp" or
+                             do { warn "dos2unix can't create .dos2unix_tmp: $^OS_ERROR"; return }
+                         while (my $line = ~< $orig_fh)
+                             $line =~ s/\015\012/\012/g
+                             print $temp_fh ,$line
+                         
+                         close $orig_fh
+                         close $temp_fh
+                         rename $temp, $orig
 
-                     }, < @ARGV);
-}
+                     , < @ARGV)
+
 
 =back
 

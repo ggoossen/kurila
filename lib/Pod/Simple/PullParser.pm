@@ -1,6 +1,6 @@
 
-package Pod::Simple::PullParser;
-our $VERSION = '2.02';
+package Pod::Simple::PullParser
+our $VERSION = '2.02'
 use Pod::Simple ();
 BEGIN {our @ISA = @('Pod::Simple')}
 
@@ -13,275 +13,275 @@ use Pod::Simple::PullParserTextToken;
 
 BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
 
-    __PACKAGE__->_accessorize(
+__PACKAGE__->_accessorize(
     'source_fh',         # the filehandle we're reading from
     'source_scalar_ref', # the scalarref we're reading from
     'source_arrayref',   # the arrayref we're reading from
-);
+    )
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #
 #  And here is how we implement a pull-parser on top of a push-parser...
 
-sub filter($self, $source) {
-    $self = $self->new unless ref $self;
+sub filter($self, $source)
+    $self = $self->new unless ref $self
 
-    $source = $^STDIN{IO} unless defined $source;
-    $self->set_source($source);
-    $self->output_fh($^STDOUT{IO});
+    $source = $^STDIN{IO} unless defined $source
+    $self->set_source($source)
+    $self->output_fh($^STDOUT{IO})
 
-    $self->run; # define run() in a subclass if you want to use filter()!
-    return $self;
-}
+    $self->run # define run() in a subclass if you want to use filter()!
+    return $self
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub parse_string_document {
-    my $this = shift;
-    $this->set_source(\ @_[0]);
-    $this->run;
-}
+sub parse_string_document
+    my $this = shift
+    $this->set_source(\ @_[0])
+    $this->run
 
-sub parse_file($this, $filename) {
-    $this->set_source($filename);
-    $this->run;
-}
+
+sub parse_file($this, $filename)
+    $this->set_source($filename)
+    $this->run
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #  In case anyone tries to use them:
 
-sub run {
-    use Carp ();
-    if( __PACKAGE__ eq ref(@_[0]) || @_[0]) { # I'm not being subclassed!
+sub run
+    use Carp ()
+    if( __PACKAGE__ eq ref(@_[0]) || @_[0]) # I'm not being subclassed!
         Carp::croak "You can call run() only on subclasses of "
-                . __PACKAGE__;
-    } else {
+                    . __PACKAGE__
+    else
         Carp::croak join '', @(
-      "You can't call run() because ",
-      ref(@_[0]) || @_[0], " didn't define a run() method");
-    }
-}
+            "You can't call run() because ",
+            ref(@_[0]) || @_[0], " didn't define a run() method")
+    
 
-sub parse_lines {
-    use Carp ();
-    Carp::croak "Use set_source with ", __PACKAGE__,
-              " and subclasses, not parse_lines";
-}
 
-sub parse_line {
-    use Carp ();
+sub parse_lines
+    use Carp ()
     Carp::croak "Use set_source with ", __PACKAGE__,
-              " and subclasses, not parse_line";
-}
+                " and subclasses, not parse_lines"
+
+
+sub parse_line
+    use Carp ()
+    Carp::croak "Use set_source with ", __PACKAGE__,
+                " and subclasses, not parse_line"
+
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sub new {
-    my $class = shift;
-    my $self = $class->SUPER::new(< @_);
-    die "Couldn't construct for $class" unless $self;
+sub new
+    my $class = shift
+    my $self = $class->SUPER::new(< @_)
+    die "Couldn't construct for $class" unless $self
 
-    $self->{+'token_buffer'} ||= \@();
-    $self->{+'start_token_class'} ||= 'Pod::Simple::PullParserStartToken';
-    $self->{+'text_token_class'}  ||= 'Pod::Simple::PullParserTextToken';
-    $self->{+'end_token_class'}   ||= 'Pod::Simple::PullParserEndToken';
+    $self->{+'token_buffer'} ||= \@()
+    $self->{+'start_token_class'} ||= 'Pod::Simple::PullParserStartToken'
+    $self->{+'text_token_class'}  ||= 'Pod::Simple::PullParserTextToken'
+    $self->{+'end_token_class'}   ||= 'Pod::Simple::PullParserEndToken'
 
-    DEBUG +> 1 and print $^STDOUT, "New pullparser object: $self\n";
+    DEBUG +> 1 and print $^STDOUT, "New pullparser object: $self\n"
 
-    return $self;
-}
+    return $self
+
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-sub get_token {
-    my $self = shift;
-    DEBUG +> 1 and print $^STDOUT, "\nget_token starting up on $self.\n";
+sub get_token
+    my $self = shift
+    DEBUG +> 1 and print $^STDOUT, "\nget_token starting up on $self.\n"
     DEBUG +> 2 and print $^STDOUT, " Items in token-buffer (",
         scalar( nelems  $self->{?'token_buffer'}->@ ) ,
         ") :\n", < map( {
-            "    " . $_->dump . "\n" },  $self->{'token_buffer'}->@
+        "    " . $_->dump . "\n" },  $self->{'token_buffer'}->@
         ),
         (nelems  $self->{?'token_buffer'}->@) ?? '' !! '       (no tokens)',
         "\n"
-    ;
+    
 
-        until( nelems  $self->{?'token_buffer'}->@ ) {
-        DEBUG +> 3 and print $^STDOUT, "I need to get something into my empty token buffer...\n";
-        if($self->{?'source_dead'}) {
-            DEBUG and print $^STDOUT, "$self 's source is dead.\n";
-            push  $self->{'token_buffer'}->@, undef;
-        } elsif(exists $self->{'source_fh'}) {
-            my @lines;
+    until( nelems  $self->{?'token_buffer'}->@ )
+        DEBUG +> 3 and print $^STDOUT, "I need to get something into my empty token buffer...\n"
+        if($self->{?'source_dead'})
+            DEBUG and print $^STDOUT, "$self 's source is dead.\n"
+            push  $self->{'token_buffer'}->@, undef
+        elsif(exists $self->{'source_fh'})
+            my @lines
             my $fh = $self->{?'source_fh'}
-                || Carp::croak('You have to call set_source before you can call get_token');
+                || Carp::croak('You have to call set_source before you can call get_token')
 
-            DEBUG and print $^STDOUT, "$self 's source is filehandle $fh.\n";
+            DEBUG and print $^STDOUT, "$self 's source is filehandle $fh.\n"
             # Read those many lines at a time
-            my $i = Pod::Simple::MANY_LINES;
-            while (1) {
-                DEBUG +> 3 and print $^STDOUT, " Fetching a line from source filehandle $fh...\n";
-                local $^INPUT_RECORD_SEPARATOR = $Pod::Simple::NL;
-                push @lines, scalar( ~< $fh); # readline
+            my $i = Pod::Simple::MANY_LINES
+            while (1)
+                DEBUG +> 3 and print $^STDOUT, " Fetching a line from source filehandle $fh...\n"
+                local $^INPUT_RECORD_SEPARATOR = $Pod::Simple::NL
+                push @lines, scalar( ~< $fh) # readline
                 DEBUG +> 3 and print $^STDOUT, "  Line is: ",
-                    defined(@lines[-1]) ?? @lines[-1] !! "<undef>\n";
-                unless( defined @lines[-1] ) {
-                    DEBUG and print $^STDOUT, "That's it for that source fh!  Killing.\n";
-                    delete $self->{'source_fh'}; # so it can be GC'd
-                    last;
-                }
+                    defined(@lines[-1]) ?? @lines[-1] !! "<undef>\n"
+                unless( defined @lines[-1] )
+                    DEBUG and print $^STDOUT, "That's it for that source fh!  Killing.\n"
+                    delete $self->{'source_fh'} # so it can be GC'd
+                    last
+                
                 # but pass thru the undef, which will set source_dead to true
 
                 # TODO: look to see if $lines[-1] is =encoding, and if so,
                 # do horribly magic things
 
-                $i--;
-            }
+                $i--
+            
 
-            if(DEBUG +> 8) {
-                print $^STDOUT, "* I've gotten ", scalar(nelems @lines), " lines:\n";
-                foreach my $l ( @lines) {
-                    if(defined $l) {
-                        print $^STDOUT, "  line \{$l\}\n";
-                    } else {
-                        print $^STDOUT, "  line undef\n";
-                    }
-                }
-                print $^STDOUT, "* end of ", scalar(nelems @lines), " lines\n";
-            }
+            if(DEBUG +> 8)
+                print $^STDOUT, "* I've gotten ", scalar(nelems @lines), " lines:\n"
+                foreach my $l ( @lines)
+                    if(defined $l)
+                        print $^STDOUT, "  line \{$l\}\n"
+                    else
+                        print $^STDOUT, "  line undef\n"
+                    
+                
+                print $^STDOUT, "* end of ", scalar(nelems @lines), " lines\n"
+            
 
-            $self->SUPER::parse_lines(< @lines);
+            $self->SUPER::parse_lines(< @lines)
 
-        } elsif(exists $self->{'source_arrayref'}) {
-                DEBUG and print $^STDOUT, "$self 's source is arrayref $self->{?'source_arrayref'}, with ",
-            scalar(nelems $self->{?'source_arrayref'}->@), " items left in it.\n";
+        elsif(exists $self->{'source_arrayref'})
+            DEBUG and print $^STDOUT, "$self 's source is arrayref $self->{?'source_arrayref'}, with ",
+                scalar(nelems $self->{?'source_arrayref'}->@), " items left in it.\n"
 
-            DEBUG +> 3 and print $^STDOUT, "  Fetching ", Pod::Simple::MANY_LINES, " lines.\n";
-                $self->SUPER::parse_lines(
+            DEBUG +> 3 and print $^STDOUT, "  Fetching ", Pod::Simple::MANY_LINES, " lines.\n"
+            $self->SUPER::parse_lines(
                 splice  $self->{'source_arrayref'}->@,
                 0,
                 Pod::Simple::MANY_LINES
-            );
-            unless( nelems  $self->{?'source_arrayref'}->@ ) {
-                DEBUG and print $^STDOUT, "That's it for that source arrayref!  Killing.\n";
-                $self->SUPER::parse_lines(undef);
-                delete $self->{'source_arrayref'}; # so it can be GC'd
-            }
+                )
+            unless( nelems  $self->{?'source_arrayref'}->@ )
+                DEBUG and print $^STDOUT, "That's it for that source arrayref!  Killing.\n"
+                $self->SUPER::parse_lines(undef)
+                delete $self->{'source_arrayref'} # so it can be GC'd
+            
         # to make sure that an undef is always sent to signal end-of-stream
 
-        } elsif(exists $self->{'source_scalar_ref'}) {
+        elsif(exists $self->{'source_scalar_ref'})
 
-                DEBUG and print $^STDOUT, "$self 's source is scalarref $self->{?'source_scalar_ref'}, with ",
-            length( $self->{?'source_scalar_ref'}->$) -
+            DEBUG and print $^STDOUT, "$self 's source is scalarref $self->{?'source_scalar_ref'}, with ",
+                length( $self->{?'source_scalar_ref'}->$) -
                 (pos( $self->{?'source_scalar_ref'}->$) || 0),
-                " characters left to parse.\n";
+                " characters left to parse.\n"
 
-            DEBUG +> 3 and print $^STDOUT, " Fetching a line from source-string...\n";
+            DEBUG +> 3 and print $^STDOUT, " Fetching a line from source-string...\n"
             if(  $self->{?'source_scalar_ref'}->$ =~
                 m/([^\n\r]*)((?:\r?\n)?)/g
-            ) {
-                    #print(">> $1\n"),
-                    $self->SUPER::parse_lines($1)
-                        if length($1) or length($2)
-                        or pos(      $self->{?'source_scalar_ref'}->$)
-                        != length(  $self->{?'source_scalar_ref'}->$);
-                # I.e., unless it's a zero-length "empty line" at the very
-                #  end of "foo\nbar\n" (i.e., between the \n and the EOS).
-                } else { # that's the end.  Byebye
-                    $self->SUPER::parse_lines(undef);
-                    delete $self->{'source_scalar_ref'};
-                    DEBUG and print $^STDOUT, "That's it for that source scalarref!  Killing.\n";
-                }
+                )
+                #print(">> $1\n"),
+                $self->SUPER::parse_lines($1)
+                    if length($1) or length($2)
+                      or pos(      $self->{?'source_scalar_ref'}->$)
+                      != length(  $self->{?'source_scalar_ref'}->$)
+            # I.e., unless it's a zero-length "empty line" at the very
+            #  end of "foo\nbar\n" (i.e., between the \n and the EOS).
+            else # that's the end.  Byebye
+                $self->SUPER::parse_lines(undef)
+                delete $self->{'source_scalar_ref'}
+                DEBUG and print $^STDOUT, "That's it for that source scalarref!  Killing.\n"
+            
 
 
-        } else {
-            die "What source??";
-        }
-    }
-        DEBUG and print $^STDOUT, "get_token about to return ", <
-    Pod::Simple::pretty( (nelems $self->{?'token_buffer'}->@
-                         )     ?? $self->{'token_buffer'}->[-1] !! undef
-                        ), "\n";
-    return shift $self->{'token_buffer'}->@; # that's an undef if empty
-}
+        else
+            die "What source??"
+        
+    
+    DEBUG and print $^STDOUT, "get_token about to return ", <
+        Pod::Simple::pretty( (nelems $self->{?'token_buffer'}->@
+                          )     ?? $self->{'token_buffer'}->[-1] !! undef
+                         ), "\n"
+    return shift $self->{'token_buffer'}->@ # that's an undef if empty
+
 
 use UNIVERSAL ();
-sub unget_token {
-    my $self = shift;
-        DEBUG and print $^STDOUT, "Ungetting ", scalar(nelems @_), " tokens: ",
-    (nelems @_) ?? "$(join ' ',@_)\n" !! "().\n";
-    foreach my $t ( @_) {
+sub unget_token
+    my $self = shift
+    DEBUG and print $^STDOUT, "Ungetting ", scalar(nelems @_), " tokens: ",
+        (nelems @_) ?? "$(join ' ',@_)\n" !! "().\n"
+    foreach my $t ( @_)
         Carp::croak "Can't unget that, because it's not a token -- it's undef!"
-            unless defined $t;
+            unless defined $t
         Carp::croak "Can't unget $t, because it's not a token -- it's a string!"
-            unless ref $t;
+            unless ref $t
         Carp::croak "Can't unget $t, because it's not a token object!"
-            unless UNIVERSAL::can($t, 'type');
-    }
+            unless UNIVERSAL::can($t, 'type')
+    
 
-    unshift $self->{'token_buffer'}->@, < @_;
+    unshift $self->{'token_buffer'}->@, < @_
     DEBUG +> 1 and print $^STDOUT, "Token buffer now has ",
-        scalar(nelems $self->{?'token_buffer'}->@), " items in it.\n";
-    return;
-}
+        scalar(nelems $self->{?'token_buffer'}->@), " items in it.\n"
+    return
+
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 # $self->{'source_filename'} = $source;
 
-sub set_source {
-    my $self = shift @_;
-    return $self->{?'source_fh'} unless (nelems @_);
-    my $handle;
-    if(!defined @_[0]) {
-        Carp::croak("Can't use empty-string as a source for set_source");
-    } elsif(ref(\( @_[0] )) eq 'GLOB') {
-        $self->{+'source_filename'} = '*' . Symbol::glob_name($handle = @_[0]);
-        DEBUG and print $^STDOUT, "$self 's source is glob " . Symbol::glob_name(@_[0]) . "\n";
-    # and fall thru   
-    } elsif(ref( @_[0] ) eq 'SCALAR') {
-        $self->{+'source_scalar_ref'} = @_[0];
-        DEBUG and print $^STDOUT, "$self 's source is scalar ref @_[0]\n";
-        return;
-    } elsif(ref( @_[0] ) eq 'ARRAY') {
-        $self->{+'source_arrayref'} = @_[0];
-        DEBUG and print $^STDOUT, "$self 's source is array ref @_[0]\n";
-        return;
-    } elsif(ref @_[0]) {
-        $self->{+'source_filename'} = dump::view($handle = @_[0]);
-        DEBUG and print $^STDOUT, "$self 's source is fh-obj @_[0]\n";
-    } elsif(!length @_[0]) {
-        Carp::croak("Can't use empty-string as a source for set_source");
-    } else {  # It's a filename!
-        DEBUG and print $^STDOUT, "$self 's source is filename @_[0]\n";
-        do {
-            my $podsource;
-            open($podsource, "<", "@_[0]") || Carp::croak "Can't open @_[0]: $^OS_ERROR";
-            $handle = $podsource;
-        };
-        $self->{+'source_filename'} = @_[0];
-        DEBUG and print $^STDOUT, "  Its name is @_[0].\n";
+sub set_source
+    my $self = shift @_
+    return $self->{?'source_fh'} unless (nelems @_)
+    my $handle
+    if(!defined @_[0])
+        Carp::croak("Can't use empty-string as a source for set_source")
+    elsif(ref(\( @_[0] )) eq 'GLOB')
+        $self->{+'source_filename'} = '*' . Symbol::glob_name($handle = @_[0])
+        DEBUG and print $^STDOUT, "$self 's source is glob " . Symbol::glob_name(@_[0]) . "\n"
+    # and fall thru
+    elsif(ref( @_[0] ) eq 'SCALAR')
+        $self->{+'source_scalar_ref'} = @_[0]
+        DEBUG and print $^STDOUT, "$self 's source is scalar ref @_[0]\n"
+        return
+    elsif(ref( @_[0] ) eq 'ARRAY')
+        $self->{+'source_arrayref'} = @_[0]
+        DEBUG and print $^STDOUT, "$self 's source is array ref @_[0]\n"
+        return
+    elsif(ref @_[0])
+        $self->{+'source_filename'} = dump::view($handle = @_[0])
+        DEBUG and print $^STDOUT, "$self 's source is fh-obj @_[0]\n"
+    elsif(!length @_[0])
+        Carp::croak("Can't use empty-string as a source for set_source")
+    else  # It's a filename!
+        DEBUG and print $^STDOUT, "$self 's source is filename @_[0]\n"
+        do
+            my $podsource
+            open($podsource, "<", "@_[0]") || Carp::croak "Can't open @_[0]: $^OS_ERROR"
+            $handle = $podsource
+        
+        $self->{+'source_filename'} = @_[0]
+        DEBUG and print $^STDOUT, "  Its name is @_[0].\n"
 
     # TODO: file-discipline things here!
-    }
+    
 
-    $self->{+'source_fh'} = $handle;
-    DEBUG and print $^STDOUT, "  Its handle is $handle\n";
-    return 1;
-}
+    $self->{+'source_fh'} = $handle
+    DEBUG and print $^STDOUT, "  Its handle is $handle\n"
+    return 1
+
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 sub get_title_short($self, @< @_) {  $self->get_short_title(< @_)  } # alias
 
-sub get_short_title($self, @< @_) {
-    my $title = $self->get_title(< @_);
-    $title = $1 if $title =~ m/^(\S{1,60})\s+--?\s+./s;
+sub get_short_title($self, @< @_)
+    my $title = $self->get_title(< @_)
+    $title = $1 if $title =~ m/^(\S{1,60})\s+--?\s+./s
     # turn "Foo::Bar -- bars for your foo" into "Foo::Bar"
-    return $title;
-}
+    return $title
+
 
 sub get_title($self, @< @_)       { $self->_get_titled_section(
-    'NAME', max_token => 50, desperate => 1, < @_)
+        'NAME', max_token => 50, desperate => 1, < @_)
 }
 sub get_version($self, @< @_)     { $self->_get_titled_section(
         'VERSION',
@@ -289,207 +289,199 @@ sub get_version($self, @< @_)     { $self->_get_titled_section(
         accept_verbatim => 1,
         max_content_length => 3_000,
         < @_,
-    );
+        );
 }
 sub get_description($self, @< @_) { $self->_get_titled_section(
         'DESCRIPTION',
         max_token => 400,
         max_content_length => 3_000,
         < @_,
-    ) }
+        ) }
 
 sub get_authors($self, @< @_)     { $self->get_author(< @_) }  # a harmless alias
 
-sub get_author($this, @< @_)      {
+sub get_author($this, @< @_)
     # Max_token is so high because these are
     #  typically at the end of the document:
     $this->_get_titled_section('AUTHOR' , max_token => 10_000, < @_) ||
-        $this->_get_titled_section('AUTHORS', max_token => 10_000, < @_);
-}
+        $this->_get_titled_section('AUTHORS', max_token => 10_000, < @_)
+
 
 #--------------------------------------------------------------------------
 
-sub _get_titled_section($self, $titlename, %< %options) {
+sub _get_titled_section($self, $titlename, %< %options)
     # Based on a get_title originally contributed by Graham Barr
 
-    my $max_token            = delete %options{'max_token'};
-    my $desperate_for_title  = delete %options{'desperate'};
-    my $accept_verbatim      = delete %options{'accept_verbatim'};
-    my $max_content_length   = delete %options{'max_content_length'};
-    $max_content_length = 120 unless defined $max_content_length;
+    my $max_token            = delete %options{'max_token'}
+    my $desperate_for_title  = delete %options{'desperate'}
+    my $accept_verbatim      = delete %options{'accept_verbatim'}
+    my $max_content_length   = delete %options{'max_content_length'}
+    $max_content_length = 120 unless defined $max_content_length
 
     die( "Unknown " . ((2 == nelems(%options)) ?? "option: " !! "options: ")
         . (join " ", map { "[$_]" }, sort keys %options)
         )
-        if %options;
+        if %options
 
-    my %content_containers;
-    %content_containers{+'Para'} = 1;
-    if($accept_verbatim) {
-        %content_containers{+'Verbatim'} = 1;
-        %content_containers{+'VerbatimFormatted'} = 1;
-    }
+    my %content_containers
+    %content_containers{+'Para'} = 1
+    if($accept_verbatim)
+        %content_containers{+'Verbatim'} = 1
+        %content_containers{+'VerbatimFormatted'} = 1
+    
 
-    my $token_count = 0;
-    my $title;
-    my @to_unget;
-    my $state = 0;
-    my $depth = 0;
+    my $token_count = 0
+    my $title
+    my @to_unget
+    my $state = 0
+    my $depth = 0
 
     Carp::croak "What kind of titlename is \"$titlename\"?!" unless
-        defined $titlename and $titlename =~ m/^[A-Z ]{1,60}$/s; #sanity
-    my $titlename_re = quotemeta($titlename);
+          defined $titlename and $titlename =~ m/^[A-Z ]{1,60}$/s #sanity
+    my $titlename_re = quotemeta($titlename)
 
-    my $head1_text_content;
-    my $para_text_content;
+    my $head1_text_content
+    my $para_text_content
 
     while(
-    ++$token_count +<= ($max_token || 1_000_000)
-        and defined(my $token = $self->get_token)
-    ) {
-            push @to_unget, $token;
+      ++$token_count +<= ($max_token || 1_000_000)
+      and defined(my $token = $self->get_token)
+        )
+        push @to_unget, $token
 
-            if ($state == 0) { # seeking =head1
-                if( $token->is_start and $token->tagname eq 'head1' ) {
-                    DEBUG and print $^STDOUT, "  Found head1.  Seeking content...\n";
-                    ++$state;
-                    $head1_text_content = '';
-                }
-            }
-
-            elsif($state == 1) { # accumulating text until end of head1
-                if( $token->is_text ) {
-                    DEBUG and print $^STDOUT, "   Adding \"", < $token->text, "\" to head1-content.\n";
-                    $head1_text_content .= $token->text;
-                } elsif( $token->is_end and $token->tagname eq 'head1' ) {
-                    DEBUG and print $^STDOUT, "  Found end of head1.  Considering content...\n";
-                    if($head1_text_content eq $titlename
-                        or $head1_text_content =~ m/\($titlename_re\)/s
+        if ($state == 0) # seeking =head1
+            if( $token->is_start and $token->tagname eq 'head1' )
+                DEBUG and print $^STDOUT, "  Found head1.  Seeking content...\n"
+                ++$state
+                $head1_text_content = ''
+            
+        elsif($state == 1) # accumulating text until end of head1
+            if( $token->is_text )
+                DEBUG and print $^STDOUT, "   Adding \"", < $token->text, "\" to head1-content.\n"
+                $head1_text_content .= $token->text
+            elsif( $token->is_end and $token->tagname eq 'head1' )
+                DEBUG and print $^STDOUT, "  Found end of head1.  Considering content...\n"
+                if($head1_text_content eq $titlename
+                    or $head1_text_content =~ m/\($titlename_re\)/s
                     # We accept "=head1 Nomen Modularis (NAME)" for sake of i18n
-                    ) {
-                            DEBUG and print $^STDOUT, "  Yup, it was $titlename.  Seeking next para-content...\n";
-                            ++$state;
-                        } elsif(
-                        $desperate_for_title
-                        # if we're so desperate we'll take the first
-                        #  =head1's content as a title
-                        and $head1_text_content =~ m/\S/
-                        and $head1_text_content !~ m/^[ A-Z]+$/s
-                        and $head1_text_content !~
-                        m/\((?:
+                    )
+                    DEBUG and print $^STDOUT, "  Yup, it was $titlename.  Seeking next para-content...\n"
+                    ++$state
+                elsif(
+                          $desperate_for_title
+                          # if we're so desperate we'll take the first
+                          #  =head1's content as a title
+                          and $head1_text_content =~ m/\S/
+                          and $head1_text_content !~ m/^[ A-Z]+$/s
+                          and $head1_text_content !~
+                    m/\((?:
              NAME | TITLE | VERSION | AUTHORS? | DESCRIPTION | SYNOPSIS
              | COPYRIGHT | LICENSE | NOTES? | FUNCTIONS? | METHODS?
              | CAVEATS? | BUGS? | SEE\ ALSO | SWITCHES | ENVIRONMENT
             )\)/sx
-                        # avoid accepting things like =head1 Thingy Thongy (DESCRIPTION)
-                        and ($max_content_length
-               ?? (length($head1_text_content) +<= $max_content_length) # sanity
-               !! 1)
-                    ) {
-                                DEBUG and print $^STDOUT, "  It looks titular: \"$head1_text_content\".\n",
-                            "\n  Using that.\n";
-                            $title = $head1_text_content;
-                            last;
-                        } else {
-                            --$state;
-                                DEBUG and print $^STDOUT, "  Didn't look titular ($head1_text_content).\n",
-                            "\n  Dropping back to seeking-head1-content mode...\n";
-                        }
-                }
-            }
+                    # avoid accepting things like =head1 Thingy Thongy (DESCRIPTION)
+                    and ($max_content_length
+                             ?? (length($head1_text_content) +<= $max_content_length) # sanity
+                             !! 1)
+                    )
+                    DEBUG and print $^STDOUT, "  It looks titular: \"$head1_text_content\".\n",
+                        "\n  Using that.\n"
+                    $title = $head1_text_content
+                    last
+                else
+                    --$state
+                    DEBUG and print $^STDOUT, "  Didn't look titular ($head1_text_content).\n",
+                        "\n  Dropping back to seeking-head1-content mode...\n"
+                
+            
+        elsif($state == 2)
+            # seeking start of para (which must immediately follow)
+            if($token->is_start and %content_containers{?$token->tagname })
+                DEBUG and print $^STDOUT, "  Found start of Para.  Accumulating content...\n"
+                $para_text_content = ''
+                ++$state
+            else
+                DEBUG and print $^STDOUT,
+                    "  Didn't see an immediately subsequent start-Para.  Reseeking H1\n"
+                $state = 0
+            
+        elsif($state == 3)
+            # accumulating text until end of Para
+            if( $token->is_text )
+                DEBUG and print $^STDOUT, "   Adding \"", < $token->text, "\" to para-content.\n"
+                $para_text_content .= $token->text
+            # and keep looking
 
-            elsif($state == 2) {
-                # seeking start of para (which must immediately follow)
-                if($token->is_start and %content_containers{?$token->tagname }) {
-                    DEBUG and print $^STDOUT, "  Found start of Para.  Accumulating content...\n";
-                    $para_text_content = '';
-                    ++$state;
-                } else {
-                        DEBUG and print $^STDOUT,
-                    "  Didn't see an immediately subsequent start-Para.  Reseeking H1\n";
-                    $state = 0;
-                }
-            }
+            elsif( $token->is_end and %content_containers{?$token->tagname } )
+                DEBUG and print $^STDOUT, "  Found end of Para.  Considering content: ",
+                    $para_text_content, "\n"
 
-            elsif($state == 3) {
-                # accumulating text until end of Para
-                if( $token->is_text ) {
-                    DEBUG and print $^STDOUT, "   Adding \"", < $token->text, "\" to para-content.\n";
-                    $para_text_content .= $token->text;
-                # and keep looking
+                if( $para_text_content =~ m/\S/
+                    and ($max_content_length
+                             ?? (length($para_text_content) +<= $max_content_length)
+                             !! 1)
+                    )
+                    # Some minimal sanity constraints, I think.
+                    DEBUG and print $^STDOUT, "  It looks contentworthy, I guess.  Using it.\n"
+                    $title = $para_text_content
+                    last
+                else
+                    DEBUG and print $^STDOUT, "  Doesn't look at all contentworthy!\n  Giving up.\n"
+                    undef $title
+                    last
+                
+            
+        else
+            die "IMPOSSIBLE STATE $state!\n"  # should never happen
+        
 
-                } elsif( $token->is_end and %content_containers{?$token->tagname } ) {
-                        DEBUG and print $^STDOUT, "  Found end of Para.  Considering content: ",
-                    $para_text_content, "\n";
-
-                    if( $para_text_content =~ m/\S/
-                        and ($max_content_length
-               ?? (length($para_text_content) +<= $max_content_length)
-               !! 1)
-                    ) {
-                            # Some minimal sanity constraints, I think.
-                            DEBUG and print $^STDOUT, "  It looks contentworthy, I guess.  Using it.\n";
-                            $title = $para_text_content;
-                            last;
-                        } else {
-                            DEBUG and print $^STDOUT, "  Doesn't look at all contentworthy!\n  Giving up.\n";
-                            undef $title;
-                            last;
-                        }
-                }
-            }
-
-            else {
-                die "IMPOSSIBLE STATE $state!\n";  # should never happen
-            }
-
-        }
+    
 
     # Put it all back!
-    $self->unget_token(< @to_unget);
+    $self->unget_token(< @to_unget)
 
-    if(DEBUG) {
+    if(DEBUG)
         if(defined $title) { print $^STDOUT, "  Returing title <$title>\n" }
         else { print $^STDOUT, "Returning title <>\n" }
-    }
+    
 
-    return '' unless defined $title;
-    $title =~ s/^\s+//;
-    return $title;
-}
+    return '' unless defined $title
+    $title =~ s/^\s+//
+    return $title
+
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #
 #  Methods that actually do work at parse-time:
 
-sub _handle_element_start {
-    my $self = shift;   # leaving ($element_name, $attr_hash_r)
-    DEBUG +> 2 and print $^STDOUT, "++ @_[0] (", < map( {"<$_> " }, @_[1]->%), ")\n";
+sub _handle_element_start
+    my $self = shift   # leaving ($element_name, $attr_hash_r)
+    DEBUG +> 2 and print $^STDOUT, "++ @_[0] (", < map( {"<$_> " }, @_[1]->%), ")\n"
 
-    push  $self->{'token_buffer'}->@, 
-        $self->{?'start_token_class'}->new(< @_);
-    return;
-}
-
-sub _handle_text {
-    my $self = shift;   # leaving ($text)
-    DEBUG +> 2 and print $^STDOUT, "== @_[0]\n";
     push  $self->{'token_buffer'}->@,
-        $self->{?'text_token_class'}->new(< @_);
-    return;
-}
+        $self->{?'start_token_class'}->new(< @_)
+    return
 
-sub _handle_element_end {
-    my $self = shift;   # leaving ($element_name);
-    DEBUG +> 2 and print $^STDOUT, "-- @_[0]\n";
+
+sub _handle_text
+    my $self = shift   # leaving ($text)
+    DEBUG +> 2 and print $^STDOUT, "== @_[0]\n"
     push  $self->{'token_buffer'}->@,
-        $self->{?'end_token_class'}->new(< @_);
-    return;
-}
+        $self->{?'text_token_class'}->new(< @_)
+    return
+
+
+sub _handle_element_end
+    my $self = shift   # leaving ($element_name);
+    DEBUG +> 2 and print $^STDOUT, "-- @_[0]\n"
+    push  $self->{'token_buffer'}->@,
+        $self->{?'end_token_class'}->new(< @_)
+    return
+
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-1;
+1
 
 
 __END__

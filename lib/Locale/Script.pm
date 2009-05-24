@@ -4,10 +4,10 @@
 # $Id: Script.pm,v 2.7 2004/06/10 21:19:34 neilb Exp $
 #
 
-package Locale::Script;
+package Locale::Script
 
 
-require Exporter;
+require Exporter
 use Carp;
 use Locale::Constants;
 
@@ -15,19 +15,19 @@ use Locale::Constants;
 #-----------------------------------------------------------------------
 #	Public Global Variables
 #-----------------------------------------------------------------------
-our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-$VERSION   = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
-@ISA       = qw(Exporter);
+our ($VERSION, @ISA, @EXPORT, @EXPORT_OK)
+$VERSION   = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/)
+@ISA       = qw(Exporter)
 @EXPORT    = qw(code2script script2code
                 all_script_codes all_script_names
 		script_code2code
-		LOCALE_CODE_ALPHA_2 LOCALE_CODE_ALPHA_3 LOCALE_CODE_NUMERIC);
+		LOCALE_CODE_ALPHA_2 LOCALE_CODE_ALPHA_3 LOCALE_CODE_NUMERIC)
 
 #-----------------------------------------------------------------------
 #	Private Global Variables
 #-----------------------------------------------------------------------
-my $CODES     = \@();
-my $COUNTRIES = \@();
+my $CODES     = \@()
+my $COUNTRIES = \@()
 
 
 #=======================================================================
@@ -36,12 +36,11 @@ my $COUNTRIES = \@();
 #
 #=======================================================================
 sub code2script
-{
-    my $code = shift;
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT;
+    my $code = shift
+    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT
 
 
-    return undef unless defined $code;
+    return undef unless defined $code
 
     #-------------------------------------------------------------------
     # Make sure the code is in the right form before we use it
@@ -50,27 +49,21 @@ sub code2script
     # with leading 0's. Eg 070 for Egyptian demotic.
     #-------------------------------------------------------------------
     if ($codeset == LOCALE_CODE_NUMERIC)
-    {
-        return undef if ($code =~ m/\D/);
-        $code = sprintf("\%.3d", $code);
-    }
+        return undef if ($code =~ m/\D/)
+        $code = sprintf("\%.3d", $code)
     else
-    {
-        $code = lc($code);
-    }
+        $code = lc($code)
+    
 
     if (exists $CODES->[$codeset]{$code})
-    {
-        return $CODES->[$codeset]{?$code};
-    }
+        return $CODES->[$codeset]{?$code}
     else
-    {
         #---------------------------------------------------------------
         # no such script code!
         #---------------------------------------------------------------
-        return undef;
-    }
-}
+        return undef
+    
+
 
 
 #=======================================================================
@@ -79,25 +72,21 @@ sub code2script
 #
 #=======================================================================
 sub script2code
-{
-    my $script = shift;
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT;
+    my $script = shift
+    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT
 
 
-    return undef unless defined $script;
-    $script = lc($script);
+    return undef unless defined $script
+    $script = lc($script)
     if (exists $COUNTRIES->[$codeset]{$script})
-    {
-        return $COUNTRIES->[$codeset]{?$script};
-    }
+        return $COUNTRIES->[$codeset]{?$script}
     else
-    {
         #---------------------------------------------------------------
         # no such script!
         #---------------------------------------------------------------
-        return undef;
-    }
-}
+        return undef
+    
+
 
 
 #=======================================================================
@@ -106,22 +95,21 @@ sub script2code
 #
 #=======================================================================
 sub script_code2code
-{
-    ((nelems @_) == 3) or croak "script_code2code() takes 3 arguments!";
+    ((nelems @_) == 3) or croak "script_code2code() takes 3 arguments!"
 
-    my $code = shift;
-    my $inset = shift;
-    my $outset = shift;
-    my $outcode;
-    my $script;
+    my $code = shift
+    my $inset = shift
+    my $outset = shift
+    my $outcode
+    my $script
 
 
-    return undef if $inset == $outset;
-    $script = code2script($code, $inset);
-    return undef if not defined $script;
-    $outcode = script2code($script, $outset);
-    return $outcode;
-}
+    return undef if $inset == $outset
+    $script = code2script($code, $inset)
+    return undef if not defined $script
+    $outcode = script2code($script, $outset)
+    return $outcode
+
 
 
 #=======================================================================
@@ -130,11 +118,10 @@ sub script_code2code
 #
 #=======================================================================
 sub all_script_codes
-{
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT;
+    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT
 
-    return keys  $CODES->[$codeset];
-}
+    return keys  $CODES->[$codeset]
+
 
 
 #=======================================================================
@@ -143,11 +130,10 @@ sub all_script_codes
 #
 #=======================================================================
 sub all_script_names
-{
-    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT;
+    my $codeset = (nelems @_) +> 0 ?? shift !! LOCALE_CODE_DEFAULT
 
-    return values  $CODES->[$codeset];
-}
+    return values  $CODES->[$codeset]
+
 
 
 #=======================================================================
@@ -155,39 +141,36 @@ sub all_script_names
 # initialisation code - stuff the DATA into the ALPHA2 hash
 #
 #=======================================================================
-do {
-    my   ($alpha2, $alpha3, $numeric);
-    my    $script;
-    local $_ = undef;
+do
+    my   ($alpha2, $alpha3, $numeric)
+    my    $script
+    local $_ = undef
 
 
     while ( ~< $^DATA)
-    {
-        next unless m/\S/;
-        chop;
-        @($alpha2, $alpha3, $numeric, $script) =  split(m/:/, $_, 4);
+        next unless m/\S/
+        chop
+        @($alpha2, $alpha3, $numeric, $script) =  split(m/:/, $_, 4)
 
-        $CODES->[+LOCALE_CODE_ALPHA_2]{+$alpha2} = $script;
-        $COUNTRIES->[+LOCALE_CODE_ALPHA_2]{+lc "$script"} = $alpha2;
+        $CODES->[+LOCALE_CODE_ALPHA_2]{+$alpha2} = $script
+        $COUNTRIES->[+LOCALE_CODE_ALPHA_2]{+lc "$script"} = $alpha2
 
         if ($alpha3)
-        {
-            $CODES->[+LOCALE_CODE_ALPHA_3]{+$alpha3} = $script;
-            $COUNTRIES->[+LOCALE_CODE_ALPHA_3]{+lc "$script"} = $alpha3;
-        }
+            $CODES->[+LOCALE_CODE_ALPHA_3]{+$alpha3} = $script
+            $COUNTRIES->[+LOCALE_CODE_ALPHA_3]{+lc "$script"} = $alpha3
+        
 
         if ($numeric)
-        {
-            $CODES->[+LOCALE_CODE_NUMERIC]{+$numeric} = $script;
-            $COUNTRIES->[+LOCALE_CODE_NUMERIC]{+lc "$script"} = $numeric;
-        }
+            $CODES->[+LOCALE_CODE_NUMERIC]{+$numeric} = $script
+            $COUNTRIES->[+LOCALE_CODE_NUMERIC]{+lc "$script"} = $numeric
+        
 
-    }
+    
 
-    close($^DATA);
-};
+    close($^DATA)
 
-1;
+
+1
 
 __DATA__
 am:ama:130:Aramaic

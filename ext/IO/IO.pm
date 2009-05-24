@@ -1,27 +1,27 @@
 #
 
-package IO;
+package IO
 
-use XSLoader ();
+use XSLoader ()
 
-use warnings;
+use warnings
 
-our $VERSION = "1.23_01";
-XSLoader::load 'IO', $VERSION;
+our $VERSION = "1.23_01"
+XSLoader::load 'IO', $VERSION
 
-sub import {
-    shift;
+sub import
+    shift
 
     warnings::warnif('deprecated', qq{Parameterless "use IO" deprecated})
-        if (nelems @_) == 0 ;
+        if (nelems @_) == 0 
 
-    my @l = @( (nelems @_) ?? < @_ !! < qw(Handle Seekable File Socket Dir) );
+    my @l = @( (nelems @_) ?? < @_ !! < qw(Handle Seekable File Socket Dir) )
 
     eval join("", map { "require IO::" . @(m/(\w+)/)[0] . ";\n" }, @l)
-        or die $^EVAL_ERROR;
-}
+        or die $^EVAL_ERROR
 
-1;
+
+1
 
 __END__
 

@@ -1,29 +1,29 @@
 
-package Pod::Perldoc::ToChecker;
+package Pod::Perldoc::ToChecker
 
-use warnings;
-our (@ISA);
+use warnings
+our (@ISA)
 
 # Pick our superclass...
 #
-eval 'require Pod::Simple::Checker';
-if($^EVAL_ERROR) {
-    require Pod::Checker;
-    @ISA = @('Pod::Checker');
-} else {
-    @ISA = @('Pod::Simple::Checker');
-}
+eval 'require Pod::Simple::Checker'
+if($^EVAL_ERROR)
+    require Pod::Checker
+    @ISA = @('Pod::Checker')
+else
+    @ISA = @('Pod::Simple::Checker')
+
 
 sub is_pageable        { 1 }
 sub write_with_binmode { 0 }
 sub output_extension   { 'txt' }
 
-sub if_zero_length( $self, $file, $tmp, $tmpfd) {
-    print $^STDOUT, "No Pod errors in $file\n";
-}
+sub if_zero_length( $self, $file, $tmp, $tmpfd)
+    print $^STDOUT, "No Pod errors in $file\n"
 
 
-1;
+
+1
 
 __END__
 

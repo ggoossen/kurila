@@ -1,8 +1,8 @@
-package ExtUtils::testlib;
+package ExtUtils::testlib
 
-use warnings;
+use warnings
 
-our $VERSION = 6.44;
+our $VERSION = 6.44
 
 use Cwd;
 use File::Spec;
@@ -10,14 +10,14 @@ use File::Spec;
 # So the tests can chdir around and not break $^INCLUDE_PATH.
 # We use getcwd() because otherwise rel2abs will blow up under taint
 # mode pre-5.8.  We detaint is so $^INCLUDE_PATH won't be tainted.  This is
-# no worse, and probably better, than just shoving an untainted, 
+# no worse, and probably better, than just shoving an untainted,
 # relative "blib/lib" onto $^INCLUDE_PATH.
-my $cwd;
-BEGIN {
-    @($cwd) = @: getcwd() =~ m/(.*)/;
-}
+my $cwd
+BEGIN 
+    @($cwd) = @: getcwd() =~ m/(.*)/
+
 use lib < map { File::Spec->rel2abs($_, $cwd) }, qw(blib/arch blib/lib);
-1;
+1
 __END__
 
 =head1 NAME

@@ -1,12 +1,12 @@
-package Test::Builder::Module;
+package Test::Builder::Module
 
 
-use Test::Builder;
+use Test::Builder
 
-require Exporter;
-our @ISA = qw(Exporter);
+require Exporter
+our @ISA = qw(Exporter)
 
-our $VERSION = '0.78';
+our $VERSION = '0.78'
 
 =head1 NAME
 
@@ -53,8 +53,8 @@ same basic way as Test::More's, setting the plan and controling
 exporting of functions and variables.  This allows your module to set
 the plan independent of Test::More.
 
-All arguments passed to import() are passed onto 
-C<< Your::Module->builder->plan() >> with the exception of 
+All arguments passed to import() are passed onto
+C<< Your::Module->builder->plan() >> with the exception of
 C<import =>[qw(things to import)]>.
 
     use Your::Module import => [qw(this that)], tests => 23;
@@ -70,54 +70,53 @@ import_extra().
 
 =cut
 
-sub import {
-    my@($class) =@( shift);
+sub import
+    my@($class) =@( shift)
 
     # Don't run all this when loading ourself.
-    return 1 if $class eq 'Test::Builder::Module';
+    return 1 if $class eq 'Test::Builder::Module'
 
-    my $test = $class->builder;
+    my $test = $class->builder
 
-    my $caller = caller;
+    my $caller = caller
 
-    $test->exported_to($caller);
+    $test->exported_to($caller)
 
-    $class->import_extra(\@_);
-    my @imports = $class->_strip_imports(\@_);
+    $class->import_extra(\@_)
+    my @imports = $class->_strip_imports(\@_)
 
-    if (@_) {
-        $test->plan(< @_);
-    }
+    if (@_)
+        $test->plan(< @_)
+    
 
-    $class->export_to_level(1, $class, < @imports);
-}
+    $class->export_to_level(1, $class, < @imports)
 
 
-sub _strip_imports {
-    my $class = shift;
-    my $list  = shift;
 
-    my @imports = @( () );
-    my @other   = @( () );
-    my $idx = 0;
-    while( $idx +<= (nelems $list->@) -1 ) {
-        my $item = $list->[$idx];
+sub _strip_imports
+    my $class = shift
+    my $list  = shift
 
-        if( defined $item and $item eq 'import' ) {
-            push @imports, < $list->[$idx+1]->@;
-            $idx++;
-        }
-        else {
-            push @other, $item;
-        }
+    my @imports = @( () )
+    my @other   = @( () )
+    my $idx = 0
+    while( $idx +<= (nelems $list->@) -1 )
+        my $item = $list->[$idx]
 
-        $idx++;
-    }
+        if( defined $item and $item eq 'import' )
+            push @imports, < $list->[$idx+1]->@
+            $idx++
+        else
+            push @other, $item
+        
 
-    $list->@ = @other;
+        $idx++
+    
 
-    return @imports;
-}
+    $list->@ = @other
+
+    return @imports
+
 
 
 =head3 import_extra
@@ -127,7 +126,7 @@ sub _strip_imports {
 import_extra() is called by import().  It provides an opportunity for you
 to add behaviors to your module based on its import list.
 
-Any extra arguments which shouldn't be passed on to plan() should be 
+Any extra arguments which shouldn't be passed on to plan() should be
 stripped off by this method.
 
 See Test::More for an example of its use.
@@ -168,9 +167,9 @@ call builder() inside each function rather than store it in a global.
 
 =cut
 
-sub builder {
-    return Test::Builder->new;
-}
+sub builder
+    return Test::Builder->new
 
 
-1;
+
+1

@@ -1,21 +1,21 @@
-package Net::servent;
+package Net::servent
 
 
-our $VERSION = '1.01';
-our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-BEGIN {
-    use Exporter   ();
-    @EXPORT      = qw(getservbyname getservbyport getservent getserv);
-    @EXPORT_OK   = qw( $s_name @s_aliases $s_port $s_proto );
-    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT );
-}
-our ($s_name, @s_aliases, $s_port, $s_proto);
+our $VERSION = '1.01'
+our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS)
+BEGIN 
+    use Exporter   ()
+    @EXPORT      = qw(getservbyname getservbyport getservent getserv)
+    @EXPORT_OK   = qw( $s_name @s_aliases $s_port $s_proto )
+    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT )
+
+our ($s_name, @s_aliases, $s_port, $s_proto)
 
 # Class::Struct forbids use of @ISA
-sub import {
-    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
-    return Exporter::import(< @_);
-}
+sub import
+    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1
+    return Exporter::import(< @_)
+
 
 use Class::Struct < qw(struct);
 struct 'Net::servent' => \@(
@@ -23,27 +23,27 @@ struct 'Net::servent' => \@(
        aliases	=> '@',
        port		=> '$',
        proto	=> '$',
-       );
+       )
 
-sub populate {
-    return unless (nelems @_);
-    my $sob = new();
-    $s_name 	 =    $sob->[0]     	     = @_[0];
-    @s_aliases	 = @(  $sob->[1]->@ = split ' ', @_[1] );
-    $s_port	 =    $sob->[2] 	     = @_[2];
-    $s_proto	 =    $sob->[3] 	     = @_[3];
-    return $sob;
-}
+sub populate
+    return unless (nelems @_)
+    my $sob = new()
+    $s_name 	 =    $sob->[0]     	     = @_[0]
+    @s_aliases	 = @(  $sob->[1]->@ = split ' ', @_[1] )
+    $s_port	 =    $sob->[2] 	     = @_[2]
+    $s_proto	 =    $sob->[3] 	     = @_[3]
+    return $sob
+
 
 sub getservent    (   ) { populate(CORE::getservent()) }
 sub getservbyname ($name, ?$proto) { populate(CORE::getservbyname($name,$proto||'tcp')) }
 sub getservbyport ($port, ?$proto) { populate(CORE::getservbyport($port,$proto||'tcp')) }
 
-sub getserv ($serv, ?$proto) {
-    return &{'getservby' . ($serv=~m/^\d+$/ ?? 'port' !! 'name')}($serv, $proto);
-}
+sub getserv ($serv, ?$proto)
+    return &{'getservby' . ($serv=~m/^\d+$/ ?? 'port' !! 'name')}($serv, $proto)
 
-1;
+
+1
 
 __END__
 

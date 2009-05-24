@@ -1,11 +1,11 @@
 #!/usr/local/bin/perl
 # Time-stamp: "2004-12-29 20:01:02 AST" -*-Perl-*-
 
-package Class::ISA;
+package Class::ISA
 
-our ($Debug, $VERSION);
-$VERSION = '0.33';
-$Debug = 0 unless defined $Debug;
+our ($Debug, $VERSION)
+$VERSION = '0.33'
+$Debug = 0 unless defined $Debug
 
 =head1 NAME
 
@@ -154,7 +154,7 @@ sub self_and_super_versions { @+: map {
 #
 # Or even consider this incantation for doing something like hash-data
 # inheritance:
-#   %union_hash = 
+#   %union_hash =
 #     map { defined(%{"$_\::SomeHash"}) ? %{"$_\::SomeHash"}) : () }
 #         reverse(Class::ISA::self_and_super_path($class));
 # Consider that reverse() is necessary because with
@@ -162,47 +162,47 @@ sub self_and_super_versions { @+: map {
 # $foo{'a'} is 'foist', not 'wun'.
 
 ###########################################################################
-sub super_path {
-    my @ret = &self_and_super_path(< @_);
-    shift @ret if (nelems @ret);
-    return @ret;
-}
+sub super_path
+    my @ret = &self_and_super_path(< @_)
+    shift @ret if (nelems @ret)
+    return @ret
+
 
 #--------------------------------------------------------------------------
-sub self_and_super_path {
+sub self_and_super_path
     # Assumption: searching is depth-first.
     # Assumption: '' (empty string) can't be a class package name.
     # Note: 'UNIVERSAL' is not given any special treatment.
-    return () unless (nelems @_);
+    return () unless (nelems @_)
 
-    my @out = @( () );
+    my @out = @( () )
 
-    my @in_stack = @(@_[0]);
-    my %seen = %(@_[0] => 1);
+    my @in_stack = @(@_[0])
+    my %seen = %(@_[0] => 1)
 
-    my $current;
-    while((nelems @in_stack)) {
-        next unless defined($current = shift @in_stack) && length($current);
-        print $^STDOUT, "At $current\n" if $Debug;
-        push @out, $current;
+    my $current
+    while((nelems @in_stack))
+        next unless defined($current = shift @in_stack) && length($current)
+        print $^STDOUT, "At $current\n" if $Debug
+        push @out, $current
         unshift @in_stack,
             < map
             { my $c = $_; # copy, to avoid being destructive
-                substr($c,0,2, "main::") if substr($c,0,2) eq '::';
-                # Canonize the :: -> main::, ::foo -> main::foo thing.
-                # Should I ever canonize the Foo'Bar = Foo::Bar thing? 
-                %seen{+$c}++ ?? () !! $c;
-            },
+            substr($c,0,2, "main::") if substr($c,0,2) eq '::';
+            # Canonize the :: -> main::, ::foo -> main::foo thing.
+            # Should I ever canonize the Foo'Bar = Foo::Bar thing?
+            %seen{+$c}++ ?? () !! $c;
+        },
             Symbol::fetch_glob("$current\::ISA")->*->@
-    ;
+        
     # I.e., if this class has any parents (at least, ones I've never seen
     # before), push them, in order, onto the stack of classes I need to
     # explore.
-    }
+    
 
-    return @out;
-}
+    return @out
+
 #--------------------------------------------------------------------------
-1;
+1
 
 __END__

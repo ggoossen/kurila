@@ -1,49 +1,48 @@
-package Digest;
+package Digest
 
-our ($VERSION, %MMAP, $AUTOLOAD);
+our ($VERSION, %MMAP, $AUTOLOAD)
 
-$VERSION = "1.15";
+$VERSION = "1.15"
 
 %MMAP = %(
-        "SHA-1"      => \@("Digest::SHA1", \@("Digest::SHA", 1), \@("Digest::SHA2", 1)),
-            "SHA-224"    => \@(\@("Digest::SHA", 224)),
-            "SHA-256"    => \@(\@("Digest::SHA", 256), \@("Digest::SHA2", 256)),
-            "SHA-384"    => \@(\@("Digest::SHA", 384), \@("Digest::SHA2", 384)),
-            "SHA-512"    => \@(\@("Digest::SHA", 512), \@("Digest::SHA2", 512)),
-            "HMAC-MD5"   => "Digest::HMAC_MD5",
-            "HMAC-SHA-1" => "Digest::HMAC_SHA1",
-            "CRC-16"     => \@(\@("Digest::CRC", type => "crc16")),
-            "CRC-32"     => \@(\@("Digest::CRC", type => "crc32")),
-            "CRC-CCITT"  => \@(\@("Digest::CRC", type => "crcccitt")),
-    );
+    "SHA-1"      => \@("Digest::SHA1", \@("Digest::SHA", 1), \@("Digest::SHA2", 1)),
+    "SHA-224"    => \@(\@("Digest::SHA", 224)),
+    "SHA-256"    => \@(\@("Digest::SHA", 256), \@("Digest::SHA2", 256)),
+    "SHA-384"    => \@(\@("Digest::SHA", 384), \@("Digest::SHA2", 384)),
+    "SHA-512"    => \@(\@("Digest::SHA", 512), \@("Digest::SHA2", 512)),
+    "HMAC-MD5"   => "Digest::HMAC_MD5",
+    "HMAC-SHA-1" => "Digest::HMAC_SHA1",
+    "CRC-16"     => \@(\@("Digest::CRC", type => "crc16")),
+    "CRC-32"     => \@(\@("Digest::CRC", type => "crc32")),
+    "CRC-CCITT"  => \@(\@("Digest::CRC", type => "crcccitt")),
+    )
 
 sub new
-{
-    shift;  # class ignored
-    my $algorithm = shift;
-    my $impl = %MMAP{?$algorithm} || do {
-        $algorithm =~ s/\W+//;
-        "Digest::$algorithm";
-    };
-    $impl = \@($impl) unless ref($impl);
-    my $err;
-    for  ( $impl->@) {
-        my $class = $_;
-        my @args;
-        @($class, @< @args) =  $class->@ if ref($class);
-        unless (exists Symbol::fetch_glob("$class\::")->*->{"VERSION"}) {
-            eval "require $class";
-            if ($^EVAL_ERROR) {
-                $err ||= $^EVAL_ERROR;
-                next;
-            }
-        }
-        return $class->new(< @args, < @_);
-    }
-    die $err;
-}
+    shift  # class ignored
+    my $algorithm = shift
+    my $impl = %MMAP{?$algorithm} || do
+        $algorithm =~ s/\W+//
+        "Digest::$algorithm"
+    
+    $impl = \@($impl) unless ref($impl)
+    my $err
+    for  ( $impl->@)
+        my $class = $_
+        my @args
+        @($class, @< @args) =  $class->@ if ref($class)
+        unless (exists Symbol::fetch_glob("$class\::")->*->{"VERSION"})
+            eval "require $class"
+            if ($^EVAL_ERROR)
+                $err ||= $^EVAL_ERROR
+                next
+            
+        
+        return $class->new(< @args, < @_)
+    
+    die $err
 
-1;
+
+1
 
 __END__
 

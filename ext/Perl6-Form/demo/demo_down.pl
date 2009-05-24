@@ -1,4 +1,4 @@
-use Perl6::Form;
+use Perl6::Form
 
 print $^STDOUT, < form \%(layout=>'down'),
                        "                     \{<<<<<<<<<<<\}",
@@ -6,4 +6,4 @@ print $^STDOUT, < form \%(layout=>'down'),
                        "\{[[[[[[[[[[[[\}       \{VVVVVVVVVVV\}",
                        "foo "x20,
                        "--------------       \{VVVVVVVVVVV\}",
-                       "                     \{VVVVVVVVVVV\}";
+                       "                     \{VVVVVVVVVVV\}"

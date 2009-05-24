@@ -1,9 +1,9 @@
-package PerlIO::via::QuotedPrint;
+package PerlIO::via::QuotedPrint
 
 # Set the version info
 # Make sure we do things by the book from now on
 
-our $VERSION = '0.06';
+our $VERSION = '0.06'
 
 
 # Make sure the encoding/decoding stuff is available
@@ -12,7 +12,7 @@ use MIME::QuotedPrint (); # no need to pollute this namespace
 
 # Satisfy -require-
 
-1;
+1
 
 #-----------------------------------------------------------------------
 #  IN: 1 class to bless with
@@ -27,14 +27,14 @@ sub PUSHED { bless \*PUSHED,@_[0] } #PUSHED
 #      2 handle to read from
 # OUT: 1 decoded string
 
-sub FILL {
+sub FILL
 
     # Read the line from the handle
     # Decode if there is something decode and return result or signal eof
 
-    my $line = readline( @_[1] );
-    (defined $line) ?? MIME::QuotedPrint::decode_qp( $line ) !! undef;
-} #FILL
+    my $line = readline( @_[1] )
+    (defined $line) ?? MIME::QuotedPrint::decode_qp( $line ) !! undef
+ #FILL
 
 #-----------------------------------------------------------------------
 #  IN: 1 instantiated object (ignored)
@@ -42,12 +42,12 @@ sub FILL {
 #      3 handle to write to
 # OUT: 1 number of bytes written
 
-sub WRITE {
+sub WRITE
 
     # Encode whatever needs to be encoded and write to handle: indicate result
 
-    (print @_[2] ,MIME::QuotedPrint::encode_qp(@_[1])) ?? length(@_[1]) !! -1;
-} #WRITE
+    (print @_[2] ,MIME::QuotedPrint::encode_qp(@_[1])) ?? length(@_[1]) !! -1
+ #WRITE
 
 __END__
 

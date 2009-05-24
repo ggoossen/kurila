@@ -1,57 +1,57 @@
-package bytes;
+package bytes
 
-our $VERSION = '1.03';
+our $VERSION = '1.03'
 
-BEGIN {
-    $bytes::hint_bits = 0x00000008;
-    $bytes::codepoints_hint_bits = 0x01000000;
-}
+BEGIN 
+    $bytes::hint_bits = 0x00000008
+    $bytes::codepoints_hint_bits = 0x01000000
 
-sub import {
-    $^HINT_BITS ^|^= $bytes::hint_bits;
-    $^HINT_BITS ^&^= ^~^$bytes::codepoints_hint_bits;
-}
 
-sub unimport {
-    $^HINT_BITS ^&^= ^~^$bytes::hint_bits;
-}
+sub import
+    $^HINT_BITS ^|^= $bytes::hint_bits
+    $^HINT_BITS ^&^= ^~^$bytes::codepoints_hint_bits
+
+
+sub unimport
+    $^HINT_BITS ^&^= ^~^$bytes::hint_bits
+
 
 BEGIN { bytes::import() }
 
-sub length ($s) {
-    return CORE::length($s);
-}
+sub length ($s)
+    return CORE::length($s)
 
-sub substr {
+
+sub substr
     return
         (nelems @_) == 2 ?? CORE::substr(@_[0], @_[1]) !!
         (nelems @_) == 3 ?? CORE::substr(@_[0], @_[1], @_[2]) !!
-        CORE::substr(@_[0], @_[1], @_[2], @_[3]) ;
-}
+        CORE::substr(@_[0], @_[1], @_[2], @_[3]) 
 
-sub ord($s) {
-    return CORE::ord($s);
-}
 
-sub chr($s) {
-    return CORE::chr($s);
-}
+sub ord($s)
+    return CORE::ord($s)
 
-sub index {
+
+sub chr($s)
+    return CORE::chr($s)
+
+
+sub index
     return
         (nelems @_) == 2 ?? CORE::index(@_[0], @_[1]) !!
-        CORE::index(@_[0], @_[1], @_[2]) ;
-}
+        CORE::index(@_[0], @_[1], @_[2]) 
 
-sub rindex {
+
+sub rindex
     return
         (nelems @_) == 2 ?? CORE::rindex(@_[0], @_[1]) !!
-        CORE::rindex(@_[0], @_[1], @_[2]) ;
-}
+        CORE::rindex(@_[0], @_[1], @_[2]) 
+
 
 BEGIN { bytes::import() }
 
-1;
+1
 __END__
 
 =head1 NAME

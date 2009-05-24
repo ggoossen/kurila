@@ -35,16 +35,16 @@ is equivalent to the original path for all systems but VMS.
 =cut
 
 
-package File::Basename;
+package File::Basename
 
-use warnings;
-our(@ISA, @EXPORT, $VERSION, $Fileparse_fstype, $Fileparse_igncase);
-require Exporter;
-@ISA = qw(Exporter);
-@EXPORT = qw(fileparse fileparse_set_fstype basename dirname);
-$VERSION = "2.76";
+use warnings
+our(@ISA, @EXPORT, $VERSION, $Fileparse_fstype, $Fileparse_igncase)
+require Exporter
+@ISA = qw(Exporter)
+@EXPORT = qw(fileparse fileparse_set_fstype basename dirname)
+$VERSION = "2.76"
 
-fileparse_set_fstype($^OS_NAME);
+fileparse_set_fstype($^OS_NAME)
 
 
 =over 4
@@ -89,76 +89,71 @@ denote the same location as the original $path.
 =cut
 
 
-sub fileparse($fullname, @< @suffices) {
+sub fileparse($fullname, @< @suffices)
 
-    unless (defined $fullname) {
-        die("fileparse(): need a valid pathname");
-    }
+    unless (defined $fullname)
+        die("fileparse(): need a valid pathname")
+    
 
-    my $orig_type = '';
-    my@($type,$igncase) = @($Fileparse_fstype, $Fileparse_igncase);
+    my $orig_type = ''
+    my@($type,$igncase) = @($Fileparse_fstype, $Fileparse_igncase)
 
-    my $taint = substr($fullname,0,0);  # Is $fullname tainted?
+    my $taint = substr($fullname,0,0)  # Is $fullname tainted?
 
-    if ($type eq "VMS" and $fullname =~ m{/} ) {
+    if ($type eq "VMS" and $fullname =~ m{/} )
         # We're doing Unix emulation
-        $orig_type = $type;
-        $type = 'Unix';
-    }
+        $orig_type = $type
+        $type = 'Unix'
+    
 
-    my($dirpath, $basename);
+    my($dirpath, $basename)
 
-    if (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 Epoc)) {
-        @($dirpath,$basename) = @($fullname =~ m/^((?:.*[:\\\/])?)(.*)/s);
-        $dirpath .= '.\' unless $dirpath =~ m/[\\\/]\z/;
-    }
-    elsif ($type eq "OS2") {
-        @($dirpath,$basename) = @($fullname =~ m#^((?:.*[:\\/])?)(.*)#s);
-        $dirpath = './' unless $dirpath;	# Can't be 0
-        $dirpath .= '/' unless $dirpath =~ m#[\\/]\z#;
-    }
-    elsif ($type eq "MacOS") {
-        @($dirpath,$basename) = @($fullname =~ m/^(.*:)?(.*)/s);
-        $dirpath = ':' unless $dirpath;
-    }
-    elsif ($type eq "AmigaOS") {
-        @($dirpath,$basename) = @($fullname =~ m/(.*[:\/])?(.*)/s);
-        $dirpath = './' unless $dirpath;
-    }
-    elsif ($type eq 'VMS' ) {
-        @($dirpath,$basename) = @($fullname =~ m/^(.*[:>\]])?(.*)/s);
-        $dirpath ||= '';  # should always be defined
-    }
-    else { # Default to Unix semantics.
-        @($dirpath,$basename) = @($fullname =~ m{^(.*/)?(.*)}s);
-        if ($orig_type eq 'VMS' and $fullname =~ m{^(/[^/]+/000000(/|$))(.*)}) {
+    if (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 Epoc))
+        @($dirpath,$basename) = @($fullname =~ m/^((?:.*[:\\\/])?)(.*)/s)
+        $dirpath .= '.\' unless $dirpath =~ m/[\\\/]\z/
+    elsif ($type eq "OS2")
+        @($dirpath,$basename) = @($fullname =~ m#^((?:.*[:\\/])?)(.*)#s)
+        $dirpath = './' unless $dirpath	# Can't be 0
+        $dirpath .= '/' unless $dirpath =~ m#[\\/]\z#
+    elsif ($type eq "MacOS")
+        @($dirpath,$basename) = @($fullname =~ m/^(.*:)?(.*)/s)
+        $dirpath = ':' unless $dirpath
+    elsif ($type eq "AmigaOS")
+        @($dirpath,$basename) = @($fullname =~ m/(.*[:\/])?(.*)/s)
+        $dirpath = './' unless $dirpath
+    elsif ($type eq 'VMS' )
+        @($dirpath,$basename) = @($fullname =~ m/^(.*[:>\]])?(.*)/s)
+        $dirpath ||= ''  # should always be defined
+    else # Default to Unix semantics.
+        @($dirpath,$basename) = @($fullname =~ m{^(.*/)?(.*)}s)
+        if ($orig_type eq 'VMS' and $fullname =~ m{^(/[^/]+/000000(/|$))(.*)})
             # dev:[000000] is top of VMS tree, similar to Unix '/'
             # so strip it off and treat the rest as "normal"
-            my $devspec  = $1;
-            my $remainder = $3;
-            @($dirpath,$basename) = @($remainder =~ m{^(.*/)?(.*)}s);
-            $dirpath ||= '';  # should always be defined
-            $dirpath = $devspec.$dirpath;
-        }
-        $dirpath = './' unless $dirpath;
-    }
+            my $devspec  = $1
+            my $remainder = $3
+            @($dirpath,$basename) = @($remainder =~ m{^(.*/)?(.*)}s)
+            $dirpath ||= ''  # should always be defined
+            $dirpath = $devspec.$dirpath
+        
+        $dirpath = './' unless $dirpath
+    
 
 
-    my $tail   = '';
-    if ((nelems @suffices)) {
-        foreach my $suffix ( @suffices) {
-            my $pat = ($igncase ?? '(?i)' !! '') . "($suffix)\$";
-            if ($basename =~ s/$pat//s) {
-                $taint .= substr($suffix,0,0);
-                $tail = $1 . $tail;
-            }
-        }
-    }
+    my $tail   = ''
+    if ((nelems @suffices))
+        foreach my $suffix ( @suffices)
+            my $pat = ($igncase ?? '(?i)' !! '') . "($suffix)\$"
+            if ($basename =~ s/$pat//s)
+                $taint .= substr($suffix,0,0)
+                $tail = $1 . $tail
+            
+        
+    
 
     # Ensure taint is propgated from the path to its pieces.
-    $tail .= $taint;
-    return @(($basename .= $taint), ($dirpath .= $taint), $tail);
-}
+    $tail .= $taint
+    return @(($basename .= $taint), ($dirpath .= $taint), $tail)
+
 
 
 
@@ -195,29 +190,29 @@ remaining characters in the filename.
 =cut
 
 
-sub basename($path, @< @_) {
+sub basename($path, @< @_)
 
     # From BSD basename(1)
     # The basename utility deletes any prefix ending with the last slash `/'
     # character present in string (after first stripping trailing slashes)
-    $path = _strip_trailing_sep($path);
+    $path = _strip_trailing_sep($path)
 
-    my@($basename, $dirname, $suffix) =  fileparse( $path, < map( {"\Q$_\E" }, @_) );
+    my@($basename, $dirname, $suffix) =  fileparse( $path, < map( {"\Q$_\E" }, @_) )
 
     # From BSD basename(1)
-    # The suffix is not stripped if it is identical to the remaining 
+    # The suffix is not stripped if it is identical to the remaining
     # characters in string.
-    if( length $suffix and !length $basename ) {
-        $basename = $suffix;
-    }
+    if( length $suffix and !length $basename )
+        $basename = $suffix
+    
 
     # Ensure that basename '/' == '/'
-    if( !length $basename ) {
-        $basename = $dirname;
-    }
+    if( !length $basename )
+        $basename = $dirname
+    
 
-    return $basename;
-}
+    return $basename
+
 
 
 
@@ -250,7 +245,7 @@ its returned path.
     # returns /foo/bar.  fileparse() would return /foo/bar/
     dirname("/foo/bar/baz");
 
-    # also returns /foo/bar despite the fact that baz is clearly a 
+    # also returns /foo/bar despite the fact that baz is clearly a
     # directory.  fileparse() would return /foo/bar/baz/
     dirname("/foo/bar/baz/");
 
@@ -263,68 +258,62 @@ current default device and directory is used.
 =cut
 
 
-sub dirname {
-    my $path = shift;
+sub dirname
+    my $path = shift
 
-    my $type = $Fileparse_fstype;
+    my $type = $Fileparse_fstype
 
-    if( $type eq 'VMS' and $path =~ m{/} ) {
-              # Parse as Unix
-              local($File::Basename::Fileparse_fstype) = '';
-        return dirname($path);
-    }
+    if( $type eq 'VMS' and $path =~ m{/} )
+        # Parse as Unix
+        local($File::Basename::Fileparse_fstype) = ''
+        return dirname($path)
+    
 
-    my @($basename, $dirname, ...) =  fileparse($path);
+    my @($basename, $dirname, ...) =  fileparse($path)
 
-    if ($type eq 'VMS') { 
-        $dirname ||= env::var('DEFAULT');
-    }
-    elsif ($type eq 'MacOS') {
-        if( !length($basename) && $dirname !~ m/^[^:]+:\z/) {
-            $dirname = _strip_trailing_sep($dirname);
-            @($basename,$dirname, _) =  fileparse $dirname;
-        }
-        $dirname .= ":" unless $dirname =~ m/:\z/;
-    }
-    elsif (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 OS2)) { 
-        $dirname = _strip_trailing_sep($dirname);
-        unless( length($basename) ) {
-            @($basename,$dirname, _) =  fileparse $dirname;
-            $dirname = _strip_trailing_sep($dirname);
-        }
-    }
-    elsif ($type eq 'AmigaOS') {
+    if ($type eq 'VMS')
+        $dirname ||= env::var('DEFAULT')
+    elsif ($type eq 'MacOS')
+        if( !length($basename) && $dirname !~ m/^[^:]+:\z/)
+            $dirname = _strip_trailing_sep($dirname)
+            @($basename,$dirname, _) =  fileparse $dirname
+        
+        $dirname .= ":" unless $dirname =~ m/:\z/
+    elsif (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 OS2))
+        $dirname = _strip_trailing_sep($dirname)
+        unless( length($basename) )
+            @($basename,$dirname, _) =  fileparse $dirname
+            $dirname = _strip_trailing_sep($dirname)
+        
+    elsif ($type eq 'AmigaOS')
         if ( $dirname =~ m/:\z/) { return $dirname }
-        chop $dirname;
-        $dirname =~ s{[^:/]+\z}{} unless length($basename);
-    }
-    else {
-        $dirname = _strip_trailing_sep($dirname);
-        unless( length($basename) ) {
-            @($basename,$dirname, _) =  fileparse $dirname;
-            $dirname = _strip_trailing_sep($dirname);
-        }
-    }
+        chop $dirname
+        $dirname =~ s{[^:/]+\z}{} unless length($basename)
+    else
+        $dirname = _strip_trailing_sep($dirname)
+        unless( length($basename) )
+            @($basename,$dirname, _) =  fileparse $dirname
+            $dirname = _strip_trailing_sep($dirname)
+        
+    
 
-    $dirname;
-}
+    $dirname
+
 
 
 # Strip the trailing path separator.
-sub _strip_trailing_sep($v)  {
-    my $type = $Fileparse_fstype;
+sub _strip_trailing_sep($v)
+    my $type = $Fileparse_fstype
 
-    if ($type eq 'MacOS') {
-        $v =~ s/([^:]):\z/$1/s;
-    }
-    elsif (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 OS2)) { 
-        $v =~ s/([^:])[\\\/]*\z/$1/;
-    }
-    else {
-        $v =~ s{(.)/*\z}{$1}s;
-    }
-    return $v;
-}
+    if ($type eq 'MacOS')
+        $v =~ s/([^:]):\z/$1/s
+    elsif (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 OS2))
+        $v =~ s/([^:])[\\\/]*\z/$1/
+    else
+        $v =~ s{(.)/*\z}{$1}s
+    
+    return $v
+
 
 
 =item C<fileparse_set_fstype>
@@ -351,33 +340,33 @@ call only.
 
 =cut
 
-my (@Ignore_Case, @Types);
+my (@Ignore_Case, @Types)
 
-BEGIN {
-    @Ignore_Case = qw(MacOS VMS AmigaOS OS2 RISCOS MSWin32 MSDOS DOS Epoc);
-    @Types = @(< @Ignore_Case, < qw(Unix));
-}
-
-sub fileparse_set_fstype {
-    my $old = $Fileparse_fstype;
-
-    if ((nelems @_)) {
-        my $new_type = shift;
-
-        $Fileparse_fstype = 'Unix';  # default
-        foreach my $type ( @Types) {
-            $Fileparse_fstype = $type if $new_type =~ m/^$type/i;
-        }
-
-        $Fileparse_igncase = 
-            (grep { $Fileparse_fstype eq $_ }, @Ignore_Case) ?? 1 !! 0;
-    }
-
-    return $old;
-}
+BEGIN 
+    @Ignore_Case = qw(MacOS VMS AmigaOS OS2 RISCOS MSWin32 MSDOS DOS Epoc)
+    @Types = @(< @Ignore_Case, < qw(Unix))
 
 
-1;
+sub fileparse_set_fstype
+    my $old = $Fileparse_fstype
+
+    if ((nelems @_))
+        my $new_type = shift
+
+        $Fileparse_fstype = 'Unix'  # default
+        foreach my $type ( @Types)
+            $Fileparse_fstype = $type if $new_type =~ m/^$type/i
+        
+
+        $Fileparse_igncase =
+            (grep { $Fileparse_fstype eq $_ }, @Ignore_Case) ?? 1 !! 0
+    
+
+    return $old
+
+
+
+1
 
 
 =head1 SEE ALSO

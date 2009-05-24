@@ -4,63 +4,62 @@
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
-package IO::Socket::UNIX;
+package IO::Socket::UNIX
 
-our(@ISA, $VERSION);
+our(@ISA, $VERSION)
 use IO::Socket;
 use Carp;
 
-@ISA = qw(IO::Socket);
-$VERSION = "1.23";
-$VERSION = eval $VERSION;
+@ISA = qw(IO::Socket)
+$VERSION = "1.23"
+$VERSION = eval $VERSION
 
-IO::Socket::UNIX->register_domain( AF_UNIX );
+IO::Socket::UNIX->register_domain( AF_UNIX )
 
-sub new {
-    my $class = shift;
-    unshift(@_, "Peer") if (nelems @_) == 1;
-    return $class->SUPER::new(< @_);
-}
+sub new
+    my $class = shift
+    unshift(@_, "Peer") if (nelems @_) == 1
+    return $class->SUPER::new(< @_)
 
-sub configure($sock,$arg) {
-    my ($bport,$cport);
 
-    my $type = $arg->{?Type} || SOCK_STREAM;
+sub configure($sock,$arg)
+    my ($bport,$cport)
+
+    my $type = $arg->{?Type} || SOCK_STREAM
 
     $sock->socket(AF_UNIX, $type, 0) or
-        return undef;
+        return undef
 
-    if(exists $arg->{Local}) {
-        my $addr = pack_sockaddr_un($arg->{?Local});
+    if(exists $arg->{Local})
+        my $addr = pack_sockaddr_un($arg->{?Local})
         $sock->bind($addr) or
-            return undef;
-    }
-    if(exists $arg->{Listen} && $type != SOCK_DGRAM) {
+            return undef
+    
+    if(exists $arg->{Listen} && $type != SOCK_DGRAM)
         $sock->listen($arg->{?Listen} || 5) or
-            return undef;
-    }
-    elsif(exists $arg->{Peer}) {
-        my $addr = pack_sockaddr_un($arg->{?Peer});
+            return undef
+    elsif(exists $arg->{Peer})
+        my $addr = pack_sockaddr_un($arg->{?Peer})
         $sock->connect($addr) or
-            return undef;
-    }
+            return undef
+    
 
-    $sock;
-}
+    $sock
 
-sub hostpath {
-    (nelems @_) == 1 or croak 'usage: $sock->hostpath()';
-    my $n = @_[0]->sockname || return undef;
-    ( <sockaddr_un($n))[0];
-}
 
-sub peerpath {
-    (nelems @_) == 1 or croak 'usage: $sock->peerpath()';
-    my $n = @_[0]->peername || return undef;
-    ( <sockaddr_un($n))[0];
-}
+sub hostpath
+    (nelems @_) == 1 or croak 'usage: $sock->hostpath()'
+    my $n = @_[0]->sockname || return undef
+    ( <sockaddr_un($n))[0]
 
-1; # Keep require happy
+
+sub peerpath
+    (nelems @_) == 1 or croak 'usage: $sock->peerpath()'
+    my $n = @_[0]->peername || return undef
+    ( <sockaddr_un($n))[0]
+
+
+1 # Keep require happy
 
 __END__
 

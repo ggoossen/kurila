@@ -1,6 +1,6 @@
-package UNIVERSAL;
+package UNIVERSAL
 
-our $VERSION = '1.04';
+our $VERSION = '1.04'
 
 # UNIVERSAL should not contain any extra subs/methods beyond those
 # that it exists to define. The use of Exporter below is a historical
@@ -8,18 +8,18 @@ our $VERSION = '1.04';
 # *don't* set @ISA here, as we don't want all classes/objects inheriting from
 # Exporter.  It's bad enough that all classes have a import() method
 # whenever UNIVERSAL.pm is loaded.
-require Exporter;
-our @EXPORT_OK = qw(isa can VERSION);
+require Exporter
+our @EXPORT_OK = qw(isa can VERSION)
 
 # Make sure that even though the import method is called, it doesn't do
 # anything unless called on UNIVERSAL.
-sub import {
-    return unless @_[0] eq __PACKAGE__;
-    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
-    return Exporter::import(< @_);
-}
+sub import
+    return unless @_[0] eq __PACKAGE__
+    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1
+    return Exporter::import(< @_)
 
-1;
+
+1
 __END__
 
 =head1 NAME

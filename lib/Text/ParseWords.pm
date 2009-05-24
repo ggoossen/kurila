@@ -1,62 +1,62 @@
-package Text::ParseWords;
+package Text::ParseWords
 
-our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, $PERL_SINGLE_QUOTE);
+our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, $PERL_SINGLE_QUOTE)
 $VERSION = "3.26"
-;
-
-use Exporter;
-    @ISA = qw(Exporter);
-@EXPORT = qw(shellwords quotewords nested_quotewords parse_line);
-@EXPORT_OK = qw(old_shellwords);
 
 
-sub shellwords {
-    my @lines = @_;
-    my @allwords;
-
-    foreach my $line ( @lines) {
-        $line =~ s/^\s+//;
-        my @words = parse_line('\s+', 0, $line);
-        pop @words if (nelems @words) and !defined @words[-1];
-        return @() unless ((nelems @words) || !length($line));
-        push(@allwords, < @words);
-    }
-    return @allwords;
-}
+use Exporter
+@ISA = qw(Exporter)
+@EXPORT = qw(shellwords quotewords nested_quotewords parse_line)
+@EXPORT_OK = qw(old_shellwords)
 
 
+sub shellwords
+    my @lines = @_
+    my @allwords
 
-sub quotewords($delim, $keep, @< @lines) {
-    my(@words, @allwords);
-
-    foreach my $line ( @lines) {
-        @words = parse_line($delim, $keep, $line);
-        return() unless ((nelems @words) || !length($line));
-        push(@allwords, < @words);
-    }
-    return @allwords;
-}
+    foreach my $line ( @lines)
+        $line =~ s/^\s+//
+        my @words = parse_line('\s+', 0, $line)
+        pop @words if (nelems @words) and !defined @words[-1]
+        return @() unless ((nelems @words) || !length($line))
+        push(@allwords, < @words)
+    
+    return @allwords
 
 
 
-sub nested_quotewords($delim, $keep, @< @lines) {
-    my(@allwords);
 
-    for my $i (0 .. nelems(@lines) -1) {
-        @allwords[+$i] = parse_line($delim, $keep, @lines[$i]);
-        return() unless (nelems @allwords[$i]) || !length(@lines[$i]);
-    }
-    return @allwords;
-}
+sub quotewords($delim, $keep, @< @lines)
+    my(@words, @allwords)
+
+    foreach my $line ( @lines)
+        @words = parse_line($delim, $keep, $line)
+        return() unless ((nelems @words) || !length($line))
+        push(@allwords, < @words)
+    
+    return @allwords
 
 
 
-sub parse_line($delimiter, $keep, $line) {
-    my($word, @pieces);
+
+sub nested_quotewords($delim, $keep, @< @lines)
+    my(@allwords)
+
+    for my $i (0 .. nelems(@lines) -1)
+        @allwords[+$i] = parse_line($delim, $keep, @lines[$i])
+        return() unless (nelems @allwords[$i]) || !length(@lines[$i])
+    
+    return @allwords
+
+
+
+
+sub parse_line($delimiter, $keep, $line)
+    my($word, @pieces)
 
     no warnings 'uninitialized';	# we will be testing undef strings
 
-    while (length($line)) {
+    while (length($line))
         # This pattern is optimised to be stack conservative on older perls.
         # Do not refactor without being careful and testing it on very long strings.
         # See Perl bug #42980 for an example of a stack busting input.
@@ -82,39 +82,38 @@ sub parse_line($delimiter, $keep, $line) {
                         |   # --OR--
                             (?!^)(?=["'])               # a quote
                         )
-		    )//xs or return @();		# extended layout
-        my @($quote, $quoted, $unquoted, $delim) = @(($1 ?? ($1,$2) !! ($3,$4)), $5, $6);
+		    )//xs or return @()		# extended layout
+        my @($quote, $quoted, $unquoted, $delim) = @(($1 ?? ($1,$2) !! ($3,$4)), $5, $6)
 
 
-        return @() unless( defined($quote) || length($unquoted) || length($delim));
+        return @() unless( defined($quote) || length($unquoted) || length($delim))
 
-        if ($keep) {
-            $quoted = "$quote$quoted$quote";
-        }
-        else {
-            $unquoted =~ s/\\(.)/$1/sg;
-            if (defined $quote) {
-                $quoted =~ s/\\(.)/$1/sg if ($quote eq '"');
-            }
-        }
-        $word .= substr($line, 0, 0);	# leave results tainted
-        $word .= defined $quote ?? $quoted !! $unquoted;
+        if ($keep)
+            $quoted = "$quote$quoted$quote"
+        else
+            $unquoted =~ s/\\(.)/$1/sg
+            if (defined $quote)
+                $quoted =~ s/\\(.)/$1/sg if ($quote eq '"')
+            
+        
+        $word .= substr($line, 0, 0)	# leave results tainted
+        $word .= defined $quote ?? $quoted !! $unquoted
 
-        if (length($delim)) {
-            push(@pieces, $word);
-            push(@pieces, $delim) if ($keep eq 'delimiters');
-            undef $word;
-        }
-        if (!length($line)) {
-            push(@pieces, $word);
-        }
-    }
-    return @pieces;
-}
+        if (length($delim))
+            push(@pieces, $word)
+            push(@pieces, $delim) if ($keep eq 'delimiters')
+            undef $word
+        
+        if (!length($line))
+            push(@pieces, $word)
+        
+    
+    return @pieces
 
 
 
-sub old_shellwords {
+
+sub old_shellwords
 
     # Usage:
     #	use ParseWords;
@@ -124,48 +123,42 @@ sub old_shellwords {
     #	or
     #	@words = old_shellwords();	# defaults to $_ (and clobbers it)
 
-    no warnings 'uninitialized';	# we will be testing undef strings
-    my $_ = join('', @_) if (nelems @_);
-    my (@words, $snippet);
+    no warnings 'uninitialized'	# we will be testing undef strings
+    my $_ = join('', @_) if (nelems @_)
+    my (@words, $snippet)
 
-    s/\A\s+//;
-    while ($_ ne '') {
-        my $field = substr($_, 0, 0);	# leave results tainted
-        while (1) {
-            if (s/\A"(([^"\\]|\\.)*)"//s) {
-                ($snippet = $1) =~ s#\\(.)#$1#sg;
-            }
-            elsif (m/\A"/) {
-                require Carp;
-                Carp::carp("Unmatched double quote: $_");
-                return();
-            }
-            elsif (s/\A'(([^'\\]|\\.)*)'//s) {
-                ($snippet = $1) =~ s#\\(.)#$1#sg;
-            }
-            elsif (m/\A'/) {
-                require Carp;
-                Carp::carp("Unmatched single quote: $_");
-                return();
-            }
-            elsif (s/\A\\(.?)//s) {
-                $snippet = $1;
-            }
-            elsif (s/\A([^\s\\'"]+)//) {
-                $snippet = $1;
-            }
-            else {
-                s/\A\s+//;
-                last;
-            }
-            $field .= $snippet;
-        }
-        push(@words, $field);
-    }
-    return @words;
-}
+    s/\A\s+//
+    while ($_ ne '')
+        my $field = substr($_, 0, 0)	# leave results tainted
+        while (1)
+            if (s/\A"(([^"\\]|\\.)*)"//s)
+                ($snippet = $1) =~ s#\\(.)#$1#sg
+            elsif (m/\A"/)
+                require Carp
+                Carp::carp("Unmatched double quote: $_")
+                return()
+            elsif (s/\A'(([^'\\]|\\.)*)'//s)
+                ($snippet = $1) =~ s#\\(.)#$1#sg
+            elsif (m/\A'/)
+                require Carp
+                Carp::carp("Unmatched single quote: $_")
+                return()
+            elsif (s/\A\\(.?)//s)
+                $snippet = $1
+            elsif (s/\A([^\s\\'"]+)//)
+                $snippet = $1
+            else
+                s/\A\s+//
+                last
+            
+            $field .= $snippet
+        
+        push(@words, $field)
+    
+    return @words
 
-1;
+
+1
 
 __END__
 

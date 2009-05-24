@@ -1,15 +1,15 @@
 
-use Test::More  'no_plan';
+use Test::More  'no_plan'
 
-my $Class   = 'Module::Loaded';
-my @Funcs   = qw[mark_as_loaded mark_as_unloaded is_loaded];
-my $Mod     = 'Foo::Bar'.$^PID;
-my $Strict  = 'error';
+my $Class   = 'Module::Loaded'
+my @Funcs   = qw[mark_as_loaded mark_as_unloaded is_loaded]
+my $Mod     = 'Foo::Bar'.$^PID
+my $Strict  = 'error'
 
 ### load the thing
 do {   use_ok( $Class );
     can_ok( $Class, < @Funcs );
-};    
+}
 
 do {   ok( !is_loaded($Mod),       "$Mod not loaded yet" );
     ok( mark_as_loaded($Mod),   "   $Mod now marked as loaded" );
@@ -18,7 +18,7 @@ do {   ok( !is_loaded($Mod),       "$Mod not loaded yet" );
     my $rv = eval "require $Mod; 1";
     ok( $rv,                    "$Mod required" );
     ok( !$^EVAL_ERROR,                    "   require did not die" );
-};
+}
 
 ### unload again
 do {   ok( mark_as_unloaded($Mod), "$Mod now marked as unloaded" );
@@ -28,10 +28,10 @@ do {   ok( mark_as_unloaded($Mod), "$Mod now marked as unloaded" );
     ok( !$rv,                   "$Mod require failed" );
     ok( $^EVAL_ERROR,                     "   require died" );
     like( $^EVAL_ERROR->{?description}, qr/locate/,       "       with expected error" );
-};
+}
 
 ### check for an already loaded module
-use error;
+use error
 do {   my $where = is_loaded( $Strict );
     ok( $where,                 "$Strict loaded" );
     ok( mark_as_unloaded( $Strict ),
@@ -43,6 +43,6 @@ do {   my $where = is_loaded( $Strict );
         ok( $rv,                "$Strict loaded again" );
     };
 
-    is( is_loaded( $Strict ), $where, 
+    is( is_loaded( $Strict ), $where,
         "   $Strict is loaded" );
-};
+}

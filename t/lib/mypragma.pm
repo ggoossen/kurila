@@ -24,21 +24,21 @@ Rafael Garcia-Suarez
 
 =cut
 
-package mypragma;
+package mypragma
 
-use warnings;
+use warnings
 
-sub import {
-    $^HINTS{+mypragma} = 42;
-}
+sub import
+    $^HINTS{+mypragma} = 42
 
-sub unimport {
-    $^HINTS{+mypragma} = 0;
-}
 
-sub in_effect {
-    my $hinthash = @(caller(0))[10];
-    return $hinthash->{?mypragma};
-}
+sub unimport
+    $^HINTS{+mypragma} = 0
 
-1;
+
+sub in_effect
+    my $hinthash = @(caller(0))[10]
+    return $hinthash->{?mypragma}
+
+
+1

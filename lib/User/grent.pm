@@ -1,22 +1,22 @@
-package User::grent;
+package User::grent
 
 
-our $VERSION = '1.01';
-our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-BEGIN { 
-    use Exporter   ();
-    @EXPORT      = qw(getgrent getgrgid getgrnam getgr);
-    @EXPORT_OK   = qw($gr_name $gr_gid $gr_passwd $gr_mem @gr_members);
-    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT );
-}
+our $VERSION = '1.01'
+our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS)
+BEGIN 
+    use Exporter   ()
+    @EXPORT      = qw(getgrent getgrgid getgrnam getgr)
+    @EXPORT_OK   = qw($gr_name $gr_gid $gr_passwd $gr_mem @gr_members)
+    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT )
 
-our ($gr_name, $gr_gid, $gr_passwd, $gr_mem, @gr_members);
+
+our ($gr_name, $gr_gid, $gr_passwd, $gr_mem, @gr_members)
 
 # Class::Struct forbids use of @ISA
-sub import {
-    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
-    return Exporter::import(< @_);
-}
+sub import
+    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1
+    return Exporter::import(< @_)
+
 
 use Class::Struct < qw(struct);
 struct 'User::grent' => \@(
@@ -24,22 +24,22 @@ struct 'User::grent' => \@(
        passwd  => '$',
        gid	    => '$',
        members => '@',
-       );
+       )
 
-sub populate {
-    return unless (nelems @_);
-    my $gob = new();
-    @($gr_name, $gr_passwd, $gr_gid) = $gob->@[[@(0,1,2)]] =  @_[[@(0,1,2)]];
-    @gr_members = @( $gob->[3]->@ = split ' ', @_[3] );
-    return $gob;
-} 
+sub populate
+    return unless (nelems @_)
+    my $gob = new()
+    @($gr_name, $gr_passwd, $gr_gid) = $gob->@[[@(0,1,2)]] =  @_[[@(0,1,2)]]
+    @gr_members = @( $gob->[3]->@ = split ' ', @_[3] )
+    return $gob
 
-sub getgrent ( ) { populate(CORE::getgrent()) } 
-sub getgrnam ($v) { populate(CORE::getgrnam($v)) } 
-sub getgrgid ($v) { populate(CORE::getgrgid($v)) } 
-sub getgr    ($v) { ($v =~ m/^\d+/) ?? &getgrgid($v) !! &getgrnam($v) } 
 
-1;
+sub getgrent ( ) { populate(CORE::getgrent()) }
+sub getgrnam ($v) { populate(CORE::getgrnam($v)) }
+sub getgrgid ($v) { populate(CORE::getgrgid($v)) }
+sub getgr    ($v) { ($v =~ m/^\d+/) ?? &getgrgid($v) !! &getgrnam($v) }
+
+1
 __END__
 
 =head1 NAME

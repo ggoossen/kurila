@@ -1,11 +1,11 @@
-package ExtUtils::MM_DOS;
+package ExtUtils::MM_DOS
 
 
-our $VERSION = 6.44;
+our $VERSION = 6.44
 
-require ExtUtils::MM_Any;
-require ExtUtils::MM_Unix;
-our @ISA = qw( ExtUtils::MM_Unix );
+require ExtUtils::MM_Any
+require ExtUtils::MM_Unix
+our @ISA = qw( ExtUtils::MM_Unix )
 
 
 =head1 NAME
@@ -32,9 +32,9 @@ Unless otherwise stated, it works just like ExtUtils::MM_Unix
 
 =cut
 
-sub os_flavor {
-    return @('DOS');
-}
+sub os_flavor
+    return @('DOS')
+
 
 =item B<replace_manpage_separator>
 
@@ -42,11 +42,11 @@ Generates Foo__Bar.3 style man page names
 
 =cut
 
-sub replace_manpage_separator($self, $man) {
+sub replace_manpage_separator($self, $man)
 
-    $man =~ s,/+,__,g;
-    return $man;
-}
+    $man =~ s,/+,__,g
+    return $man
+
 
 =back
 
@@ -60,4 +60,4 @@ L<ExtUtils::MM_Unix>, L<ExtUtils::MakeMaker>
 
 =cut
 
-1;
+1

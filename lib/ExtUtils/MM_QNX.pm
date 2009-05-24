@@ -1,9 +1,9 @@
-package ExtUtils::MM_QNX;
+package ExtUtils::MM_QNX
 
-our $VERSION = '6.44';
+our $VERSION = '6.44'
 
-require ExtUtils::MM_Unix;
-our @ISA = qw(ExtUtils::MM_Unix);
+require ExtUtils::MM_Unix
+our @ISA = qw(ExtUtils::MM_Unix)
 
 
 =head1 NAME
@@ -30,16 +30,16 @@ Add .err files corresponding to each .c file.
 
 =cut
 
-sub extra_clean_files {
-    my $self = shift;
+sub extra_clean_files
+    my $self = shift
 
-    my @errfiles = $self->{?C}->@;
-    for (  @errfiles ) {
-        s/.c$/.err/;
-    }
+    my @errfiles = $self->{?C}->@
+    for (  @errfiles )
+        s/.c$/.err/
+    
 
-    return @( @errfiles, 'perlmain.err' );
-}
+    return @( @errfiles, 'perlmain.err' )
+
 
 
 =head1 AUTHOR
@@ -53,4 +53,4 @@ L<ExtUtils::MakeMaker>
 =cut
 
 
-1;
+1

@@ -7,47 +7,47 @@
 # "expected" output look exactly the same, then watch for trailing, invisible
 # spaces.
 
-BEGIN {
-    if (env::var('PERL_CORE')){
-        push $^INCLUDE_PATH, '../ext/B/t';
-    } else {
-        unshift $^INCLUDE_PATH, 't';
-        push $^INCLUDE_PATH, "../../t";
-    }
-    require Config;
+BEGIN 
+    if (env::var('PERL_CORE'))
+        push $^INCLUDE_PATH, '../ext/B/t'
+    else
+        unshift $^INCLUDE_PATH, 't'
+        push $^INCLUDE_PATH, "../../t"
+    
+    require Config
 # require 'test.pl'; # now done by OptreeCheck
-}
+
 
 # import checkOptree(), and %gOpts (containing test state)
-use OptreeCheck;	# ALSO DOES @ARGV HANDLING !!!!!!
-use Config;
+use OptreeCheck	# ALSO DOES @ARGV HANDLING !!!!!!
+use Config
 
-plan tests => 8;
+plan tests => 8
 
-require_ok("B::Concise");
+require_ok("B::Concise")
 
 my $out = runperl(
     switches => \@("-MO=Concise,BEGIN,CHECK,INIT,END,-exec"),
     prog => q{$a=$b && print q/foo/},
-    stderr => 1 );
+    stderr => 1 )
 
 #print "out:$out\n";
 
-my $src = q[our ($beg, $chk, $init, $end, $uc) = qq{'foo'}; BEGIN { $beg++ } CHECK { $chk++ } INIT { $init++ } END { $end++ } UNITCHECK {$uc++}];
+my $src = q[our ($beg, $chk, $init, $end, $uc) = qq{'foo'}; BEGIN { $beg++ } CHECK { $chk++ } INIT { $init++ } END { $end++ } UNITCHECK {$uc++}]
 
 
-my @warnings_todo;
+my @warnings_todo
 @warnings_todo = @(todo =>
-    "Change 23768 (Remove Carp from warnings.pm) alters expected output, not"
-    . "propagated to 5.8.x");
+                   "Change 23768 (Remove Carp from warnings.pm) alters expected output, not"
+                   . "propagated to 5.8.x")
 
 checkOptree ( name	=> 'BEGIN',
-    bcopts	=> 'BEGIN',
-    prog	=> $src,
-    < @warnings_todo,
-    strip_open_hints => 1,
-    todo      => "kurila changes",
-    expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
+              bcopts	=> 'BEGIN',
+              prog	=> $src,
+              < @warnings_todo,
+              strip_open_hints => 1,
+              todo      => "kurila changes",
+              expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT')
 # BEGIN 1:
 # b  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->b
@@ -151,11 +151,11 @@ EONT_EONT
 
 
 checkOptree ( name	=> 'END',
-    bcopts	=> 'END',
-    prog	=> $src,
-    strip_open_hints => 1,
-    todo      => "kurila changes",
-    expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
+              bcopts	=> 'END',
+              prog	=> $src,
+              strip_open_hints => 1,
+              todo      => "kurila changes",
+              expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT')
 # END 1:
 # 4  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->4
@@ -175,11 +175,11 @@ EONT_EONT
 
 
 checkOptree ( name	=> 'CHECK',
-    bcopts	=> 'CHECK',
-    prog	=> $src,
-    strip_open_hints => 1,
-    todo      => "kurila changes",
-    expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
+              bcopts	=> 'CHECK',
+              prog	=> $src,
+              strip_open_hints => 1,
+              todo      => "kurila changes",
+              expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT')
 # CHECK 1:
 # 4  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->4
@@ -198,11 +198,11 @@ EOT_EOT
 EONT_EONT
 
 checkOptree ( name	=> 'UNITCHECK',
-    bcopts=> 'UNITCHECK',
-    prog	=> $src,
-    strip_open_hints => 1,
-    todo      => "kurila changes",
-    expect=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
+              bcopts=> 'UNITCHECK',
+              prog	=> $src,
+              strip_open_hints => 1,
+              todo      => "kurila changes",
+              expect=> <<'EOT_EOT', expect_nt => <<'EONT_EONT')
 # UNITCHECK 1:
 # 4  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->4
@@ -221,12 +221,12 @@ EOT_EOT
 EONT_EONT
 
 checkOptree ( name	=> 'INIT',
-    bcopts	=> 'INIT',
-    #todo	=> 'get working',
-    prog	=> $src,
-    strip_open_hints => 1,
-    todo      => "kurila changes",
-    expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
+              bcopts	=> 'INIT',
+              #todo	=> 'get working',
+              prog	=> $src,
+              strip_open_hints => 1,
+              todo      => "kurila changes",
+              expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT')
 # INIT 1:
 # 4  <1> leavesub[1 ref] K/REFC,1 ->(end)
 # -     <@> lineseq KP ->4
@@ -246,12 +246,12 @@ EONT_EONT
 
 
 checkOptree ( name	=> 'all of BEGIN END INIT CHECK UNITCHECK -exec',
-    bcopts	=> \qw/ BEGIN END INIT CHECK UNITCHECK -exec /,
-    prog	=> $src,
-    < @warnings_todo,
-    todo      => "kurila changes",
-    strip_open_hints => 1,
-    expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
+              bcopts	=> \qw/ BEGIN END INIT CHECK UNITCHECK -exec /,
+              prog	=> $src,
+              < @warnings_todo,
+              todo      => "kurila changes",
+              strip_open_hints => 1,
+              expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT')
 # BEGIN 1:
 # 1  <;> nextstate(B::Concise -275 Concise.pm:356) v:*,&,{,$
 # 2  <$> const[PV "strict.pm"] s/BARE
@@ -383,11 +383,11 @@ EONT_EONT
 
 
 checkOptree ( name	=> 'regression test for patch 25352',
-    bcopts	=> \qw/ BEGIN END INIT CHECK -exec /,
-    prog	=> 'print q/foo/',
-    todo      => "kurila changes",
-    < @warnings_todo,
-    expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
+              bcopts	=> \qw/ BEGIN END INIT CHECK -exec /,
+              prog	=> 'print q/foo/',
+              todo      => "kurila changes",
+              < @warnings_todo,
+              expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT')
 # BEGIN 1:
 # 1  <;> nextstate(B::Concise -275 Concise.pm:356) v:*,&,{,$
 # 2  <$> const[PV "strict.pm"] s/BARE

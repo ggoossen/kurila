@@ -1,5 +1,5 @@
-package Locale::Maketext::Simple;
-$Locale::Maketext::Simple::VERSION = '0.18';
+package Locale::Maketext::Simple
+$Locale::Maketext::Simple::VERSION = '0.18'
 
 
 =head1 NAME
@@ -102,42 +102,42 @@ locale setting is used.  Implies a true value for C<Decode>.
 
 =cut
 
-sub import($class, %< %args) {
+sub import($class, %< %args)
 
-    %args{+Class}    ||= caller;
-    %args{+Style}    ||= 'maketext';
-    %args{+Export}   ||= 'loc';
-    %args{+Subclass} ||= 'I18N';
+    %args{+Class}    ||= caller
+    %args{+Style}    ||= 'maketext'
+    %args{+Export}   ||= 'loc'
+    %args{+Subclass} ||= 'I18N'
 
-    my @(?$loc, ?$loc_lang) =  $class->load_loc(< %args) || @();
-    $loc ||= $class->default_loc(< %args);
+    my @(?$loc, ?$loc_lang) =  $class->load_loc(< %args) || @()
+    $loc ||= $class->default_loc(< %args)
 
-    Symbol::fetch_glob(caller(0) . "::%args{?Export}")->* = $loc if %args{?Export};
-    Symbol::fetch_glob(caller(0) . "::%args{?Export}_lang")->* = $loc_lang || sub { 1 };
-}
+    Symbol::fetch_glob(caller(0) . "::%args{?Export}")->* = $loc if %args{?Export}
+    Symbol::fetch_glob(caller(0) . "::%args{?Export}_lang")->* = $loc_lang || sub (@< @_) { 1 }
 
-my %Loc;
+
+my %Loc
 
 sub reload_loc { %Loc = %( () ) }
 
-sub load_loc {
-    my @($class, %< %args) =  @_;
+sub load_loc
+    my @($class, %< %args) =  @_
 
-    my $pkg = join('::', grep { defined and length }, @( %args{?Class}, %args{?Subclass}));
-    return %Loc{?$pkg} if exists %Loc{$pkg};
+    my $pkg = join('::', grep { defined and length }, @( %args{?Class}, %args{?Subclass}))
+    return %Loc{?$pkg} if exists %Loc{$pkg}
 
-    try { require Locale::Maketext::Lexicon; 1 }   or return;
-    $Locale::Maketext::Lexicon::VERSION +> 0.20	    or return;
-    try { require File::Spec; 1 }		    or return;
+    try { require Locale::Maketext::Lexicon; 1 }   or return
+    $Locale::Maketext::Lexicon::VERSION +> 0.20	    or return
+    try { require File::Spec; 1 }		    or return
 
-    my $path = %args{?Path} || $class->auto_path(%args{Class}) or return;
-    my $pattern = File::Spec->catfile($path, '*.[pm]o');
-    my $decode = %args{?Decode} || 0;
-    my $encoding = %args{?Encoding} || undef;
+    my $path = %args{?Path} || $class->auto_path(%args{Class}) or return
+    my $pattern = File::Spec->catfile($path, '*.[pm]o')
+    my $decode = %args{?Decode} || 0
+    my $encoding = %args{?Encoding} || undef
 
-    $decode = 1 if $encoding;
+    $decode = 1 if $encoding
 
-    $pattern =~ s{\\}{/}g; # to counter win32 paths
+    $pattern =~ s{\\}{/}g # to counter win32 paths
 
     eval "
 	package $pkg;
@@ -153,20 +153,19 @@ sub load_loc {
 	    unless defined &tense;
 
 	1;
-    " or die $^EVAL_ERROR;
+    " or die $^EVAL_ERROR
 
-    my $lh = try { $pkg->get_handle } or return;
-    my $style = lc(%args{?Style});
-    if ($style eq 'maketext') {
-        %Loc{+$pkg} = sub {
+    my $lh = try { $pkg->get_handle } or return
+    my $style = lc(%args{?Style})
+    if ($style eq 'maketext')
+        %Loc{+$pkg} = sub (@< @_)
             $lh->maketext(< @_)
-        };
-    }
-    elsif ($style eq 'gettext') {
-        %Loc{+$pkg} = sub {
-            my $str = shift;
-            $str =~ s{([\~\[\]])}{~$1}g;
-                $str =~ s{
+        
+    elsif ($style eq 'gettext')
+        %Loc{+$pkg} = sub (@< @_)
+            my $str = shift
+            $str =~ s{([\~\[\]])}{~$1}g
+            $str =~ s{
                 ([%\\]%)                        # 1 - escaped sequence
             |
                 %   (?:
@@ -179,43 +178,40 @@ sub load_loc {
                 $1 ?? $1
                 !! $2 ?? "\[$2,"._unescape($3)."]"
                 !! "[_$4]"
-            )}gx;
-            return $lh->maketext($str, < @_);
-        };
-    }
-    else {
-        die "Unknown Style: $style";
-    }
+                )}gx
+            return $lh->maketext($str, < @_)
+        
+    else
+        die "Unknown Style: $style"
+    
 
-    return @(%Loc{?$pkg}, sub {
-                 $lh = $pkg->get_handle(< @_);
-                 $lh = $pkg->get_handle(< @_);
-             });
-}
+    return @(%Loc{?$pkg}, sub (@< @_)
+                 $lh = $pkg->get_handle(< @_)
+                 $lh = $pkg->get_handle(< @_)
+             )
 
-sub default_loc {
-    my @($self, %< %args) =  @_;
-    my $style = lc(%args{?Style});
-    if ($style eq 'maketext') {
-        return sub {
-                my $str = shift;
-                $str =~ s{((?<!~)(?:~~)*)\[_([1-9]\d*|\*)\]}
-                     {$1\%$2}g;
-                $str =~ s{((?<!~)(?:~~)*)\[([A-Za-z#*]\w*),([^\]]+)\]} 
-                     {$("$1\%$2(" . _escape($3) . ')')}g;
-                _default_gettext($str, < @_);
-            };
-    }
-    elsif ($style eq 'gettext') {
-        return \&_default_gettext;
-    }
-    else {
-        die "Unknown Style: $style";
-    }
-}
 
-sub _default_gettext {
-    my $str = shift;
+sub default_loc
+    my @($self, %< %args) =  @_
+    my $style = lc(%args{?Style})
+    if ($style eq 'maketext')
+        return sub (@< @_)
+            my $str = shift
+            $str =~ s{((?<!~)(?:~~)*)\[_([1-9]\d*|\*)\]}
+                     {$1\%$2}g
+            $str =~ s{((?<!~)(?:~~)*)\[([A-Za-z#*]\w*),([^\]]+)\]} 
+                     {$("$1\%$2(" . _escape($3) . ')')}g
+            _default_gettext($str, < @_)
+        
+    elsif ($style eq 'gettext')
+        return \&_default_gettext
+    else
+        die "Unknown Style: $style"
+    
+
+
+sub _default_gettext
+    my $str = shift
     $str =~ s{
 	%			# leading symbol
 	(?:			# either one of
@@ -241,52 +237,52 @@ sub _default_gettext {
     }{$( do {
         my $digit = $2 || shift;
         $digit . (
-                                                   $1 ?? (
-                                                             ($1 eq 'tense') ?? (($3 eq 'present') ?? 'ing' !! 'ed') !!
-                                                             ($1 eq 'quant') ?? ' ' . (($digit +> 1) ?? ($4 || "$3s") !! $3) !!
-                                                             ''
-                                                             ) !! ''
-                                                   );
-    })}gx;
-    return $str;
-};
+        $1 ?? (
+        ($1 eq 'tense') ?? (($3 eq 'present') ?? 'ing' !! 'ed') !!
+        ($1 eq 'quant') ?? ' ' . (($digit +> 1) ?? ($4 || "$3s") !! $3) !!
+        ''
+        ) !! ''
+        );
+    })}gx
+    return $str
+;
 
-sub _escape {
-    my $text = shift;
-    $text =~ s/\b_([1-9]\d*)/$1->%/g;
-    return $text;
-}
+sub _escape
+    my $text = shift
+    $text =~ s/\b_([1-9]\d*)/$1->%/g
+    return $text
 
-sub _unescape {
+
+sub _unescape
     join(',', map {
-            m/\A(\s*)%([1-9]\d*|\*)(\s*)\z/ ?? "$1_$2$3" !! $_
-        }, split(m/,/, @_[0]));
-}
+        m/\A(\s*)%([1-9]\d*|\*)(\s*)\z/ ?? "$1_$2$3" !! $_
+    }, split(m/,/, @_[0]))
 
-sub auto_path($self, $calldir) {
-    $calldir =~ s#::#/#g;
-    my $path = $^INCLUDED{?$calldir . '.pm'} or return;
+
+sub auto_path($self, $calldir)
+    $calldir =~ s#::#/#g
+    my $path = $^INCLUDED{?$calldir . '.pm'} or return
 
     # Try absolute path name.
-    if ($^OS_NAME eq 'MacOS') {
-        (my $malldir = $calldir) =~ s!/!:!g;
-        $path =~ s#^(.*)$malldir\.pm\z#$1auto:$malldir:#s;
-    } else {
-        $path =~ s#^(.*)$calldir\.pm\z#$1auto/$calldir/#;
-    }
+    if ($^OS_NAME eq 'MacOS')
+        (my $malldir = $calldir) =~ s!/!:!g
+        $path =~ s#^(.*)$malldir\.pm\z#$1auto:$malldir:#s
+    else
+        $path =~ s#^(.*)$calldir\.pm\z#$1auto/$calldir/#
+    
 
-    return $path if -d $path;
+    return $path if -d $path
 
     # If that failed, try relative path with normal $^INCLUDE_PATH searching.
-    $path = "auto/$calldir/";
-    foreach my $inc ( $^INCLUDE_PATH) {
-        return "$inc/$path" if -d "$inc/$path";
-    }
+    $path = "auto/$calldir/"
+    foreach my $inc ( $^INCLUDE_PATH)
+        return "$inc/$path" if -d "$inc/$path"
+    
 
-    return;
-}
+    return
 
-1;
+
+1
 
 =head1 ACKNOWLEDGMENTS
 

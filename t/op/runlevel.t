@@ -6,22 +6,22 @@
 ## Adapted and expanded by Gurusamy Sarathy <gsar@activestate.com>
 ##
 
-require './test.pl';
+require './test.pl'
 
-undef $^INPUT_RECORD_SEPARATOR;
-our @prgs = split "\n########\n", ~< $^DATA;
+undef $^INPUT_RECORD_SEPARATOR
+our @prgs = split "\n########\n", ~< $^DATA
 
-plan(tests => nelems @prgs);
+plan(tests => nelems @prgs)
 
-for ( @prgs){
-    my $switch = "";
-    if (s/^\s*(-\w+)//){
-        $switch = $1;
-    }
-    my@($prog,$expected) =  split(m/\nEXPECT\n/, $_);
+for ( @prgs)
+    my $switch = ""
+    if (s/^\s*(-\w+)//)
+        $switch = $1
+    
+    my@($prog,$expected) =  split(m/\nEXPECT\n/, $_)
 
-    fresh_perl_is( $prog, $expected, \%( switch => $switch, stderr => 1, ) );
-}
+    fresh_perl_is( $prog, $expected, \%( switch => $switch, stderr => 1, ) )
+
 
 __END__
 our @a = @(1, 2, 3);

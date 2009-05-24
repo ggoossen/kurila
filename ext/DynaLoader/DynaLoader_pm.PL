@@ -1,10 +1,10 @@
-use Config;
+use Config
 
-sub to_string($value) {
-    $value =~ s/\\/\\\\/g;
-    $value =~ s/'/\\'/g;
-    return "'$value'";
-}
+sub to_string($value)
+    $value =~ s/\\/\\\\/g
+    $value =~ s/'/\\'/g
+    return "'$value'"
+
 
 #
 # subroutine expand_os_specific expands $^O-specific preprocessing information
@@ -20,55 +20,52 @@ sub to_string($value) {
 #   <</$^O-eq-osname>>
 #   <</$^O-ne-osname>>
 #  construct <<|$^O-ne-osname>> means #else
-#  nested <<$^O...>>-constructs are allowed but nested values must be for 
+#  nested <<$^O...>>-constructs are allowed but nested values must be for
 #   different OS-names!
-#   
+#
 #  -- added by VKON, 03-10-2004 to separate $^O-specific between OSes
 #     (so that Win32 never checks for $^O eq 'VMS' for example)
 #
 # The $^O tests test both for $^O and for $Config{osname}.
 # The latter is better for some for cross-compilation setups.
 #
-sub _expansion($op, $os, $expr) {
+sub _expansion($op, $os, $expr)
     if ($op ne 'eq' and $op ne 'ne') {die "wrong eq-ne arg"};
-    if ($expr =~ m[^(.*?)<<\|\$\^O-$op-$os>>(.*?)$]s) {
-        my @($if,$el) = @($1,$2);
+    if ($expr =~ m[^(.*?)<<\|\$\^O-$op-$os>>(.*?)$]s)
+        my @($if,$el) = @($1,$2)
         if (($op eq 'eq' and ($^OS_NAME eq $os || config_value("osname") eq $os))
-            || ($op eq 'ne' and ($^OS_NAME ne $os || config_value("osname") ne $os))) {
+            || ($op eq 'ne' and ($^OS_NAME ne $os || config_value("osname") ne $os)))
             return $if
-        }
-        else {
+        else
             return $el
-        }
-    }
-    else {
+        
+    else
         # #if;#endif
         if (($op eq 'eq' and ($^OS_NAME eq $os || config_value("osname") eq $os))
-            || ($op eq 'ne' and ($^OS_NAME ne $os || config_value("osname") ne $os))) {
+            || ($op eq 'ne' and ($^OS_NAME ne $os || config_value("osname") ne $os)))
             return $expr
-        }
-        else {
+        else
             return ""
-        }
-    }
-}
+        
+    
 
-sub expand_os_specific {
-    my $s = shift;
-    $s =~ s/<<=(.*?)>>/$(eval $1)/g;
-        $s =~ s/<<\$\^O-(eq|ne)-(\w+)>>(.*?)<<\/\$\^O-\1-\2>>/$(
-        _expansion($1,$2,$3)
-    )/gs;
-    if ($s =~ m/<<(=|\$\^O-)/) {
+
+sub expand_os_specific
+    my $s = shift
+    $s =~ s/<<=(.*?)>>/$(eval $1)/g
+    $s =~ s/<<\$\^O-(eq|ne)-(\w+)>>(.*?)<<\/\$\^O-\1-\2>>/$(
+    _expansion($1,$2,$3)
+    )/gs
+    if ($s =~ m/<<(=|\$\^O-)/)
         die "bad <<\$^O-eq/ne-osname>> expression.".
-            " Unclosed brackets?";
-    }
-    $s;
-}
+            " Unclosed brackets?"
+    
+    $s
 
-unlink "DynaLoader.pm" if -f "DynaLoader.pm";
-open my $out, ">", "DynaLoader.pm" or die $^OS_ERROR;
-print $out, <<'EOT';
+
+unlink "DynaLoader.pm" if -f "DynaLoader.pm"
+open my $out, ">", "DynaLoader.pm" or die $^OS_ERROR
+print $out, <<'EOT'
 
 # Generated from DynaLoader_pm.PL
 
@@ -111,19 +108,18 @@ sub dl_load_flags { 0x00 }
 
 EOT
 
-if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS')) {
+if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS'))
     print $out, "our @(\$dl_dlext, \$dl_so, \$dlsrc) = @(",
         < to_string(config_value('dlext')), ",",
         < to_string(config_value('so')), ",",
-        < to_string(config_value('dlsrc')), ")\n;" ;
-}
-else {
-    print $out, <<'EOT';
+        < to_string(config_value('dlsrc')), ")\n;" 
+else
+    print $out, <<'EOT'
 our @($dl_dlext, $dl_so, $dlsrc) = map { config_value($_) }, qw(dlext so dlsrc);
 EOT
-}
 
-print $out, expand_os_specific(<<'EOT');
+
+print $out, expand_os_specific(<<'EOT')
 
 <<$^O-eq-VMS>>
 # Some systems need special handling to expand file specifications
@@ -153,60 +149,58 @@ our @dl_modules;              # Modules we have loaded
 
 EOT
 
-my $cfg_dl_library_path = <<'EOT';
+my $cfg_dl_library_path = <<'EOT'
 push(@dl_library_path, < split(' ', config_value('libpth')));
 EOT
 
-sub dquoted_comma_list {
-    join(", ", map {'"'.quotemeta($_).'"'}, @_);
-}
+sub dquoted_comma_list
+    join(", ", map {'"'.quotemeta($_).'"'}, @_)
 
-our @dl_library_path;
 
-if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS')) {
-    eval $cfg_dl_library_path;
-    if (!env::var('PERL_BUILD_EXPAND_ENV_VARS')) {
-        my $dl_library_path = dquoted_comma_list(< @dl_library_path);
-        print $out, <<EOT;
+our @dl_library_path
+
+if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS'))
+    eval $cfg_dl_library_path
+    if (!env::var('PERL_BUILD_EXPAND_ENV_VARS'))
+        my $dl_library_path = dquoted_comma_list(< @dl_library_path)
+        print $out, <<EOT
 # The below \@dl_library_path has been expanded (\%Config) in Perl build time.
 
 \@dl_library_path = ($dl_library_path);
 
 EOT
-    }
-}
-else {
-    print $out, <<EOT;
+    
+else
+    print $out, <<EOT
 # Initialise \@dl_library_path with the 'standard' library path
 # for this platform as determined by Configure.
 
 $cfg_dl_library_path
 
 EOT
-}
 
-my $ldlibpthname;
-my $ldlibpthname_defined;
-my $pthsep;
 
-if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS')) {
-    $ldlibpthname         = to_string(config_value("ldlibpthname"));
-    $ldlibpthname_defined = to_string(defined config_value("ldlibpthname") ?? 1 !! 0);
-    $pthsep               = to_string(config_value("path_sep"));
-}
-else {
-    $ldlibpthname         = q(config_value("ldlibpthname"));
-    $ldlibpthname_defined = q(defined config_value("ldlibpthname"));
-    $pthsep               = q(config_value("path_sep"));
-}
-print $out, <<EOT;
+my $ldlibpthname
+my $ldlibpthname_defined
+my $pthsep
+
+if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS'))
+    $ldlibpthname         = to_string(config_value("ldlibpthname"))
+    $ldlibpthname_defined = to_string(defined config_value("ldlibpthname") ?? 1 !! 0)
+    $pthsep               = to_string(config_value("path_sep"))
+else
+    $ldlibpthname         = q(config_value("ldlibpthname"))
+    $ldlibpthname_defined = q(defined config_value("ldlibpthname"))
+    $pthsep               = q(config_value("path_sep"))
+
+print $out, <<EOT
 my \$ldlibpthname         = $ldlibpthname;
 my \$ldlibpthname_defined = $ldlibpthname_defined;
 my \$pthsep               = $pthsep;
 
 EOT
 
-my $env_dl_library_path = <<'EOT';
+my $env_dl_library_path = <<'EOT'
 if ($ldlibpthname_defined &&
     defined env::var($ldlibpthname)) {
     push(@dl_library_path, < split(m/$pthsep/, env::var($ldlibpthname)));
@@ -221,33 +215,32 @@ if ($ldlibpthname_defined &&
 }
 EOT
 
-if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS') && env::var('PERL_BUILD_EXPAND_ENV_VARS')) {
-    eval $env_dl_library_path;
-}
-else {
-    print $out, <<EOT;
+if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS') && env::var('PERL_BUILD_EXPAND_ENV_VARS'))
+    eval $env_dl_library_path
+else
+    print $out, <<EOT
 # Add to \@dl_library_path any extra directories we can gather from environment
 # during runtime.
 
 $env_dl_library_path
 
 EOT
-}
 
-if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS') && env::var('PERL_BUILD_EXPAND_ENV_VARS')) {
-    my $dl_library_path = dquoted_comma_list(< @dl_library_path);
-    print $out, <<EOT;
+
+if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS') && env::var('PERL_BUILD_EXPAND_ENV_VARS'))
+    my $dl_library_path = dquoted_comma_list(< @dl_library_path)
+    print $out, <<EOT
 # The below \@dl_library_path has been expanded (\%Config, \%ENV)
 # in Perl build time.
 
 \@dl_library_path = ($dl_library_path);
 
 EOT
-}
+
 
 
 # following long string contains $^O-specific stuff, which is factored out
-print $out, expand_os_specific(<<'EOT');
+print $out, expand_os_specific(<<'EOT')
 # No prizes for guessing why we don't say 'bootstrap DynaLoader;' here.
 # NOTE: All dl_*.xs (including dl_none.xs) define a dl_error() XSUB
 boot_DynaLoader('DynaLoader') if defined(&boot_DynaLoader) &&
@@ -998,5 +991,5 @@ assistance from Tim Bunce, January 1996.
 =cut
 EOT
 
-close $out or die $^OS_ERROR;
+close $out or die $^OS_ERROR
 

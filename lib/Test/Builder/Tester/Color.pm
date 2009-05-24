@@ -1,7 +1,7 @@
-package Test::Builder::Tester::Color;
+package Test::Builder::Tester::Color
 
 
-require Test::Builder::Tester;
+require Test::Builder::Tester
 
 =head1 NAME
 
@@ -25,9 +25,8 @@ from the command line.
 =cut
 
 sub import
-{
-    Test::Builder::Tester::color(1);
-}
+    Test::Builder::Tester::color(1)
+
 
 =head1 AUTHOR
 
@@ -46,4 +45,4 @@ L<Test::Builder::Tester>, L<Term::ANSIColor>
 
 =cut
 
-1;
+1

@@ -3,7 +3,7 @@
 # Tests to make sure the regexp engine doesn't run into limits too soon.
 #
 
-print $^STDOUT, "1..13\n";
+print $^STDOUT, "1..13\n"
 
 my $email = qr {
     (?(DEFINE)
@@ -59,25 +59,25 @@ my $email = qr {
     )
 
     (?&address)
-}x;
+}x
 
 
-run_tests() unless caller;
+run_tests() unless caller
 
-sub run_tests {
-    my $count = 0;
+sub run_tests
+    my $count = 0
 
-    $^OUTPUT_AUTOFLUSH = 1;
+    $^OUTPUT_AUTOFLUSH = 1
     # rewinding DATA is necessary with PERLIO=stdio when this
     # test is run from another thread
-    seek $^DATA, 0, 0;
+    seek $^DATA, 0, 0
     while (~< $^DATA) { last if m/^__DATA__/ }
-    while (~< $^DATA) {
-        chomp;
-        next if m/^#/;
-        print $^STDOUT, m/^$email$/ ?? "ok " !! "not ok ", ++ $count, "\n";
-    }
-}
+    while (~< $^DATA)
+        chomp
+        next if m/^#/
+        print $^STDOUT, m/^$email$/ ?? "ok " !! "not ok ", ++ $count, "\n"
+    
+
 
 #
 # Acme::MetaSyntactic ++

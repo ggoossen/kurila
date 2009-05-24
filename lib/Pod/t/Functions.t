@@ -1,60 +1,60 @@
 #!perl
 
-use File::Basename;
-use File::Spec;
+use File::Basename
+use File::Spec
 
-use Test::More;
-plan tests => 8;
+use Test::More
+plan tests => 8
 
 use Pod::Functions;
 
 # How do you test exported vars?
-my@( $pkg_ref, $exp_ref ) = @( \%Pod::Functions::Kinds, \%Kinds );
-is( $pkg_ref, $exp_ref, '%Pod::Functions::Kinds exported' );
+my@( $pkg_ref, $exp_ref ) = @( \%Pod::Functions::Kinds, \%Kinds )
+is( $pkg_ref, $exp_ref, '%Pod::Functions::Kinds exported' )
 
-@( $pkg_ref, $exp_ref ) = @( \%Pod::Functions::Type, \%Type );
-is( $pkg_ref, $exp_ref, '%Pod::Functions::Type exported' );
+@( $pkg_ref, $exp_ref ) = @( \%Pod::Functions::Type, \%Type )
+is( $pkg_ref, $exp_ref, '%Pod::Functions::Type exported' )
 
-@( $pkg_ref, $exp_ref ) = @( \%Pod::Functions::Flavor, \%Flavor );
-is( $pkg_ref, $exp_ref, '%Pod::Functions::Flavor exported' );
+@( $pkg_ref, $exp_ref ) = @( \%Pod::Functions::Flavor, \%Flavor )
+is( $pkg_ref, $exp_ref, '%Pod::Functions::Flavor exported' )
 
-@( $pkg_ref, $exp_ref ) = @( \%Pod::Functions::Type_Description, 
-                             \%Type_Description );
-is( $pkg_ref, $exp_ref, '%Pod::Functions::Type_Description exported' );
+@( $pkg_ref, $exp_ref ) = @( \%Pod::Functions::Type_Description,
+                             \%Type_Description )
+is( $pkg_ref, $exp_ref, '%Pod::Functions::Type_Description exported' )
 
-@( $pkg_ref, $exp_ref ) = @( \@Pod::Functions::Type_Order, \@Type_Order );
-is( $pkg_ref, $exp_ref, '@Pod::Functions::Type_Order exported' );
+@( $pkg_ref, $exp_ref ) = @( \@Pod::Functions::Type_Order, \@Type_Order )
+is( $pkg_ref, $exp_ref, '@Pod::Functions::Type_Order exported' )
 
 # Check @Type_Order
 my @catagories = qw(
     String  Regexp Math ARRAY     LIST    HASH    I/O
     Binary  File   Flow Namespace Misc    Process Modules
     Objects Socket SysV User      Network Time
-);
+)
 
 ok( eq_array( \@Type_Order, \@catagories ),
-    '@Type_Order' );
+    '@Type_Order' )
 
-my @cat_keys = grep { exists %Type_Description{ $_ } }, @Type_Order;
+my @cat_keys = grep { exists %Type_Description{ $_ } }, @Type_Order
 
 ok( eq_array( \@cat_keys, \@catagories ),
-    'keys() %Type_Description' );
+    'keys() %Type_Description' )
 
-my@( _, $path, _ ) =  fileparse( $^PROGRAM_NAME );
-my $pod_functions = File::Spec->catfile( 
-    $path, File::Spec->updir, 'Functions.pm' );
+my@( _, $path, _ ) =  fileparse( $^PROGRAM_NAME )
+my $pod_functions = File::Spec->catfile(
+    $path, File::Spec->updir, 'Functions.pm' )
 
-SKIP: do {
-    my $test_out = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $^DATA }; 
+SKIP: do
+    my $test_out = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $^DATA }
 
-    skip( "Can't fork '$^EXECUTABLE_NAME': $^OS_ERROR", 1) 
-        unless open my $fh, "-|", qq[$^EXECUTABLE_NAME "-I../lib" $pod_functions];
-    my $fake_out = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $fh };
+    skip( "Can't fork '$^EXECUTABLE_NAME': $^OS_ERROR", 1)
+        unless open my $fh, "-|", qq[$^EXECUTABLE_NAME "-I../lib" $pod_functions]
+    my $fake_out = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $fh }
     skip( "Pipe error: $^OS_ERROR", 1)
-        unless close $fh;
+        unless close $fh
 
-    is( $fake_out, $test_out, 'run as plain program' );
-};
+    is( $fake_out, $test_out, 'run as plain program' )
+
 
 =head1 NAME
 

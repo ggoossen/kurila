@@ -1,11 +1,11 @@
-package File::Spec::Cygwin;
+package File::Spec::Cygwin
 
-our (@ISA, $VERSION);
-require File::Spec::Unix;
+our (@ISA, $VERSION)
+require File::Spec::Unix
 
-$VERSION = '3.2701';
+$VERSION = '3.2701'
 
-@ISA = qw(File::Spec::Unix);
+@ISA = qw(File::Spec::Unix)
 
 =head1 NAME
 
@@ -36,31 +36,31 @@ and then File::Spec::Unix canonpath() is called on the result.
 
 =cut
 
-sub canonpath($self,?$path) {
-    return unless defined $path;
+sub canonpath($self,?$path)
+    return unless defined $path
 
-    $path =~ s|\\|/|g;
+    $path =~ s|\\|/|g
 
     # Handle network path names beginning with double slash
-    my $node = '';
-    if ( $path =~ s@^(//[^/]+)(?:/|\z)@/@s ) {
-        $node = $1;
-    }
-    return $node . $self->SUPER::canonpath($path);
-}
+    my $node = ''
+    if ( $path =~ s@^(//[^/]+)(?:/|\z)@/@s )
+        $node = $1
+    
+    return $node . $self->SUPER::canonpath($path)
 
-sub catdir {
-    my $self = shift;
-    return '' unless (nelems @_);
+
+sub catdir
+    my $self = shift
+    return '' unless (nelems @_)
 
     # Don't create something that looks like a //network/path
-    if (@_[0] and (@_[0] eq '/' or @_[0] eq '\')) {
-        shift;
-        return $self->SUPER::catdir('', < @_);
-    }
+    if (@_[0] and (@_[0] eq '/' or @_[0] eq '\'))
+        shift
+        return $self->SUPER::catdir('', < @_)
+    
 
-    $self->SUPER::catdir(< @_);
-}
+    $self->SUPER::catdir(< @_)
+
 
 =pod
 
@@ -72,10 +72,10 @@ and if not, File::Spec::Unix file_name_is_absolute() is called.
 =cut
 
 
-sub file_name_is_absolute($self,$file) {
-    return 1 if $file =~ m{^([a-z]:)?[\\/]}is; # C:/test
-    return $self->SUPER::file_name_is_absolute($file);
-}
+sub file_name_is_absolute($self,$file)
+    return 1 if $file =~ m{^([a-z]:)?[\\/]}is # C:/test
+    return $self->SUPER::file_name_is_absolute($file)
+
 
 =item tmpdir (override)
 
@@ -93,11 +93,11 @@ variables are tainted, they are not used.
 
 =cut
 
-my $tmpdir;
-sub tmpdir {
-    return $tmpdir if defined $tmpdir;
-    $tmpdir = @_[0]->_tmpdir( env::var('TMPDIR'), "/tmp", env::var('TMP'), env::var('TEMP'), 'C:/temp' );
-}
+my $tmpdir
+sub tmpdir
+    return $tmpdir if defined $tmpdir
+    $tmpdir = @_[0]->_tmpdir( env::var('TMPDIR'), "/tmp", env::var('TMP'), env::var('TEMP'), 'C:/temp' )
+
 
 =item case_tolerant
 
@@ -108,33 +108,33 @@ Default: 1
 
 =cut
 
-sub case_tolerant(?$drive) {
+sub case_tolerant(?$drive)
     return 1 unless $^OS_NAME eq 'cygwin'
-        and defined &Cygwin::mount_flags;
+        and defined &Cygwin::mount_flags
 
-    if (! $drive) {
-        my @flags = split(m/,/, Cygwin::mount_flags('/cygwin'));
-        my $prefix = pop(@flags);
-        if (! $prefix || $prefix eq 'cygdrive') {
-            $drive = '/cygdrive/c';
-        } elsif ($prefix eq '/') {
-            $drive = '/c';
-        } else {
-            $drive = "$prefix/c";
-        }
-    }
-    my $mntopts = Cygwin::mount_flags($drive);
-    if ($mntopts and ($mntopts =~ m/,managed/)) {
-        return 0;
-    }
-    try { require Win32API::File; } or return 1;
-    my $osFsType = "\0"x256;
-    my $osVolName = "\0"x256;
-    my $ouFsFlags = 0;
-    Win32API::File::GetVolumeInformation($drive, $osVolName, 256, \@(), \@(), $ouFsFlags, $osFsType, 256 );
+    if (! $drive)
+        my @flags = split(m/,/, Cygwin::mount_flags('/cygwin'))
+        my $prefix = pop(@flags)
+        if (! $prefix || $prefix eq 'cygdrive')
+            $drive = '/cygdrive/c'
+        elsif ($prefix eq '/')
+            $drive = '/c'
+        else
+            $drive = "$prefix/c"
+        
+    
+    my $mntopts = Cygwin::mount_flags($drive)
+    if ($mntopts and ($mntopts =~ m/,managed/))
+        return 0
+    
+    try { require Win32API::File; } or return 1
+    my $osFsType = "\0"x256
+    my $osVolName = "\0"x256
+    my $ouFsFlags = 0
+    Win32API::File::GetVolumeInformation($drive, $osVolName, 256, \@(), \@(), $ouFsFlags, $osFsType, 256 )
     if ($ouFsFlags ^&^ Win32API::File::FS_CASE_SENSITIVE()) { return 0; }
     else { return 1; }
-}
+
 
 =back
 
@@ -147,4 +147,4 @@ it under the same terms as Perl itself.
 
 =cut
 
-1;
+1
