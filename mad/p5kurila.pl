@@ -10,7 +10,7 @@ use XML::Twig;
 use XML::Twig::XPath;
 use Getopt::Long;
 use Carp::Assert;
-use List::Util qw(min);
+use List::Util qw(min max);
 
 sub fst(@) {
     return $_[0];
@@ -1529,7 +1529,9 @@ sub indent {
         my $old_cont;
         my $old_use_layout = $use_layout;
 
-        my $new_block = (defined(get_madprop($op, 'curly_open')) and get_madprop($op, 'curly_open') !~ m/^ ( \%\( | \{\[ ) $/x);
+        my $new_block = (defined(get_madprop($op, 'curly_open')) 
+                           and not $op->tag =~ m/ op_helem | op_gelem | op_hslice | op_anonhash | op_listfirst /x
+                             and not $op->parent->tag =~ m/ op_exists | op_delete /x );
 
         my $null_type = get_madprop($op, 'null_type') || '';
         my $is_binop = $null_type eq "operator";
@@ -1537,29 +1539,29 @@ sub indent {
         my $is_modif = $null_type eq "modif";
         my $is_subdef = (get_madprop($op, 'null_type_first')||'') eq "sub";
 
+        if ((get_madprop($op, 'operator')||'') eq 'sub' and not $is_subdef) {
+            if ($op->findnodes('./op_anoncode/op_root/op_leavesub/op_lineseq/madprops/mad_curly_open')) {
+                set_madprop($op, 'operator', get_madprop($op, 'operator') . ' (@&lt; @_)');
+            }
+        }
+
 
         if ($new_block) {
             $old_indent_level = $indent_level;
             $new_indent_level = $indent_level + 4 + $cont;
-            $first_indent_line = undef;
-            for ($op->children) {
-                my ($child_line, undef) = first_token($_);
-                next if not $child_line;
-                $first_indent_line = $first_indent_line ? min($first_indent_line, $child_line ) : $child_line;
-            }
+            ($first_indent_line, undef) = first_token($op->children);
             $indent_level = $indent_level + $cont;
             $old_cont = $cont;
             $cont = 0;
 
-            $use_layout = ! get_madprop($op, 'curly_open');
+            $use_layout = 0;
 
-            if (not $use_layout) {
+            if (get_madprop($op, 'curly_open') and $null_type ne 'uniop') {
                 # Possibly convert to "use_layout"
                 my $open_indent_line = get_madprop($op, 'curly_open', 'linenr');
                 if ($first_indent_line
                       and $open_indent_line < $first_indent_line
-                        and $null_type ne 'uniop'
-                  ) {
+                    ) {
                     my $mad_parent_while = get_madprop($op->parent->parent->parent, 'whilepost');
                     if ($mad_parent_while) {
                         set_madprop($op->parent->parent->parent, 'whilepost', $mad_parent_while,
@@ -1579,6 +1581,15 @@ sub indent {
                     }
                     set_madprop($op, 'semicolon', '');
                     $use_layout = 1;
+                }
+                else {
+                    my $mad_parent_while = $op->parent->parent->parent && get_madprop($op->parent->parent->parent, 'whilepost');
+                    if ($mad_parent_while) {
+                        set_madprop($op, 'curly_open', 'loop ' . get_madprop($op, 'curly_open'));
+                    }
+                    else {
+                        --$first_indent_line;
+                    }
                 }
             }
         }
@@ -1613,8 +1624,9 @@ sub indent {
                             $lines[$i] =~ s/^(\s|&#x9;)*/ ' ' x $ws_indent /ge;
                             $i++;
                         }
+                        warn "ws - $ws_indent - $cont - $first_indent_line - $linenr - " . $madv->tag;
                         $ws = join '&#xA;', @lines;
-                        $ws =~ s/&#xA;(\s|&#x9;)+&#xA;/&#xA;&#xA;/g for 1..2;
+                        $ws =~ s/(\s|&#x9;)+&#xA;/&#xA;/g;
                         $madv->set_att($wsname, $ws);
                     }
                 }
@@ -1624,7 +1636,7 @@ sub indent {
             $cont = 0;
         }
 
-        if ($op->tag =~ m/^op_(nextstate|enterloop)$/
+        if ($op->tag =~ m/^op_(nextstate)$/
               or $null_type eq "use" or $null_type eq "package"
                 or $is_subdef) {
             if ($use_layout) {
@@ -1660,20 +1672,19 @@ sub indent {
             my ($madif) = $op->findnodes("madprops/mad_if");
             $wsreplace->($madif);
             $opsub->($op->child(-1)->child(0));
-            $cont = 0;
         }
 
         if ($null_type eq "?") {
             $opsub->($op->child(1));
         }
 
-        if ((get_madprop($op, 'round_open') || '') =~ m/[(]$/ and $null_type eq "(" ) {
+        if ((get_madprop($op, 'round_open') || '') =~ m/[(]$/ and $null_type eq "(") {
             my ($madx) = $op->findnodes("madprops/mad_round_open");
             $wsreplace->($madx);
-            my ($linenr, $charoffset) = first_token($op->child(1));
+            my ($linenr, $charoffset) = first_token($op->children);
             if ($linenr) {
                 $old_cont = $cont;
-                $cont = $charoffset - $indent_level - 1;
+                $cont = max(0, $charoffset - $indent_level - 1);
             }
         }
 
@@ -1693,7 +1704,7 @@ sub indent {
                     my ($linenr, $charoffset) = first_token($subop->parent->child(1));
                     if ($linenr) {
                         $old_cont = $cont;
-                        $cont = $charoffset - $indent_level - 1;
+                        max(0, $cont = $charoffset - $indent_level - 1);
                     }
                 }
             }
@@ -1715,12 +1726,22 @@ sub indent {
             }
         }
 
+        if ( $op->tag eq "op_and" and not get_madprop($op, "operator")) {
+            my ($linenr, $charoffset) = first_token($op->children);
+            if ($linenr) {
+                my $prev_cont = $cont;
+                $cont = max(0, $charoffset - $indent_level - 1) + 2;
+                $opsub->($op->child(0));
+                $cont = $prev_cont;
+            }
+        }
+
         if ( $op->tag eq "op_anonarray") {
             if ($op->child(2)) {
                 my ($linenr, $charoffset) = first_token($op->child(2));
                 if ($linenr) {
                     $old_cont = $cont;
-                    $cont = $charoffset - $indent_level - 1;
+                    $cont = max(0, $charoffset - $indent_level - 1);
                 }
             }
         }

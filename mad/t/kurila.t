@@ -1803,7 +1803,7 @@ foox(sub { @_ },
  'arg');
 ----
 sub foox { }
-foox(sub { @_ },
+foox(sub (@< @_) { @_ },
      'arg')
 ====
 do {
@@ -1891,7 +1891,7 @@ $^WARN_HOOK = sub { print $^STDOUT, $warn; $warn .= @_[0]->{?description} . "\n"
   sub tiex { }
 ----
 my $warn
-$^WARN_HOOK = sub { print $^STDOUT, $warn; $warn .= @_[0]->{?description} . "\n" }
+$^WARN_HOOK = sub (@< @_) { print $^STDOUT, $warn; $warn .= @_[0]->{?description} . "\n" }
 sub tiex { }
 ====
 sub tiex { }
@@ -1928,7 +1928,7 @@ do {
 };
 ----
 do
-    local $^WARN_HOOK = sub { push $a, @_[0]->message }
+    local $^WARN_HOOK = sub (@< @_) { push $a, @_[0]->message }
     use warnings
 ====
 do {
@@ -1987,7 +1987,7 @@ pass();
 ----
 warn "yy"
 if ($a
-    || $b)
+      || $b)
     pass()
 ====
 @('aa',
@@ -2025,7 +2025,7 @@ foo( "mies",
 ----
 warn "yy"
 foo( "mies",
-     sub
+     sub (@< @_)
          "aap"
          "zus"
      , 'noot')
@@ -2126,7 +2126,7 @@ sub
  $a;
 }
 ----
-sub
+sub (@< @_)
     $a
 ====
 if ($a) {
@@ -2191,6 +2191,139 @@ sub mkpath
     my $old_style = (
         UNIVERSAL::isa(@_[0],'ARRAY')
         ) ?? 1 !! 0
+====
+{ 1 } while $a;
+----
+loop { 1 } while $a
+====
+my ($arg, $root);
+do {
+  my $canon = $arg{?prefix}
+  ?? File::Spec->catfile($arg{?prefix}, $root)
+  !! $root;
+};
+----
+my ($arg, $root)
+do
+    my $canon = $arg{?prefix}
+        ?? File::Spec->catfile($arg{?prefix}, $root)
+        !! $root
+====
+sort { $a;
+       $b;
+     }, $a;
+----
+sort { $a;
+    $b;
+}, $a
+====
+sub geniosym () {
+    my $sym = gensym();
+    # force the IO slot to be filled
+    open $sym;
+        $sym->*{IO};
+}
+----
+sub geniosym ()
+    my $sym = gensym()
+    # force the IO slot to be filled
+    open $sym
+    $sym->*{IO}
+====
+do {
+ $a;
+ "he
+ $a lp";
+};
+----
+do
+    $a
+    "he
+ $a lp"
+====
+$a = sub {
+      33;
+    };
+$a = sub (@< @_) {
+      33;
+    };
+----
+$a = sub (@< @_)
+    33
+
+$a = sub (@< @_)
+    33
+====
+my (@XSStack, @fns);
+do {
+     # Hide the functions defined in other #if branches, and reset.
+     @XSStack[-1]->{+other_functions}{[+@fns]} = @(1) x nelems @fns;
+ @XSStack[-1]->{[qw(varname functions)]} = @('', %());
+};
+----
+my (@XSStack, @fns)
+do
+    # Hide the functions defined in other #if branches, and reset.
+    @XSStack[-1]->{+other_functions}{[+@fns]} = @(1) x nelems @fns
+    @XSStack[-1]->{[qw(varname functions)]} = @('', %())
+====
+do {
+    my $a = @(
+  "aap",
+  );
+};
+----
+do
+    my $a = @(
+        "aap",
+        )
+====
+while( $a
+=~ m/foo/
+) {
+ blaa();
+}
+----
+while( $a
+         =~ m/foo/
+    )
+    blaa()
+====
+if ( $a
+  and $b
+) {
+   blaa();
+}
+----
+if ( $a
+       and $b
+    )
+    blaa()
+====
+my ($self, $opt);
+if (exists $self->{PARENT}->{$opt}
+       and not exists $self->{$opt}) {
+ # inherit, but only if already unspecified
+ $self->{+$opt} = $self->{PARENT}->{?$opt};
+}
+----
+my ($self, $opt)
+if (exists $self->{PARENT}->{$opt}
+      and not exists $self->{$opt})
+    # inherit, but only if already unspecified
+    $self->{+$opt} = $self->{PARENT}->{?$opt}
+====
+#next line has a tab
+	
+33;
+----
+#next line has a tab
+
+33
+====
+for ($a)
+    { $b }
+----
 END
 }
 

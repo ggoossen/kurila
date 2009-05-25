@@ -1129,7 +1129,7 @@ S_start_force(pTHX_ int where)
     PL_curforce = where;
     if (PL_nextwhite) {
 	if (PL_madskills)
-	    curmad('^', newSVpvs(""), NULL);
+	    curmad('^', newSVpvs(""), S_curlocation(PL_bufptr));
 	CURMAD('_', PL_nextwhite, NULL);
     }
 }
@@ -1193,6 +1193,13 @@ S_force_next(pTHX_ I32 type)
     if (PL_curforce < 0)
 	start_force(PL_lasttoke);
     PL_nexttoke[PL_curforce].next_type = type;
+    {
+	SV* location = S_curlocation(PL_bufptr);
+	IV linenr = location ? SvIV(*av_fetch(svTav(location), 1, FALSE)) : 0;
+	IV charoffset = location ? SvIV(*av_fetch(svTav(location), 2, FALSE)) : 0;
+	PL_nexttoke[PL_curforce].next_linenr = linenr;
+	PL_nexttoke[PL_curforce].next_charoffset = charoffset;
+    }
     if (PL_lex_state != LEX_KNOWNEXT)
  	PL_lex_defer = PL_lex_state;
     PL_lex_state = LEX_KNOWNEXT;
@@ -2552,7 +2559,7 @@ Perl_madlex(pTHX)
 	    while (start < PL_bufend && isSPACE(*start)) {
 		start++;
 	    }
-	    CURMAD('q', PL_thisopen, S_curlocation(start));
+	    CURMAD('q', PL_thisopen, newSVsv(pl_yylval.p_tkval.location));
 	    if (PL_thistoken)
 		sv_free(PL_thistoken);
 	    PL_thistoken = 0;
@@ -2744,6 +2751,7 @@ Perl_yylex(pTHX)
 #ifdef PERL_MAD
 	PL_lasttoke--;
 	pl_yylval = PL_nexttoke[PL_lasttoke].next_val;
+	pl_yylval.i_tkval.location = S_curlocation(PL_bufptr);
 	if (PL_madskills) {
 	    PL_thismad = PL_nexttoke[PL_lasttoke].next_mad;
 	    PL_nexttoke[PL_lasttoke].next_mad = 0;
@@ -3816,7 +3824,7 @@ Perl_yylex(pTHX)
 	}
 
 	start_force(-1);
-	curmad('X', newSVpvs("}"), NULL);
+	curmad('X', newSVpvs("}"), S_curlocation(PL_bufptr));
 	CURMAD('_', PL_thiswhite, NULL);
 	force_next('}');
 #ifdef PERL_MAD
