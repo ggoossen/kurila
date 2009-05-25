@@ -247,57 +247,45 @@ sub configure($sock,$arg)
 
 
 sub connect
-    (nelems @_) == 2 || (nelems @_) == 3 or
+    nelems(@_) == 2 || (nelems @_) == 3 or
         croak 'usage: $sock->connect(NAME) or $sock->connect(PORT, ADDR)'
     my $sock = shift
     return $sock->SUPER::connect((nelems @_) == 1 ?? shift !! pack_sockaddr_in(< @_))
 
 
 sub bind
-    (nelems @_) == 2 || (nelems @_) == 3 or
+    nelems(@_) == 2 || (nelems @_) == 3 or
         croak 'usage: $sock->bind(NAME) or $sock->bind(PORT, ADDR)'
     my $sock = shift
     return $sock->SUPER::bind((nelems @_) == 1 ?? shift !! pack_sockaddr_in(< @_))
 
 
-sub sockaddr
-    (nelems @_) == 1 or croak 'usage: $sock->sockaddr()'
-    my@($sock) =  @_
+sub sockaddr($sock)
     my $name = $sock->sockname
     $name ?? sockaddr_in($name)[1] !! undef
 
 
-sub sockport
-    (nelems @_) == 1 or croak 'usage: $sock->sockport()'
-    my@($sock) =  @_
+sub sockport($sock)
     my $name = $sock->sockname
     $name ?? sockaddr_in($name)[0] !! undef
 
 
-sub sockhost
-    (nelems @_) == 1 or croak 'usage: $sock->sockhost()'
-    my@($sock) =  @_
+sub sockhost($sock)
     my $addr = $sock->sockaddr
     $addr ?? inet_ntoa($addr) !! undef
 
 
-sub peeraddr
-    (nelems @_) == 1 or croak 'usage: $sock->peeraddr()'
-    my@($sock) =  @_
+sub peeraddr($sock)
     my $name = $sock->peername
     $name ?? sockaddr_in($name)[1] !! undef
 
 
-sub peerport
-    (nelems @_) == 1 or croak 'usage: $sock->peerport()'
-    my@($sock) =  @_
+sub peerport($sock)
     my $name = $sock->peername
     $name ?? sockaddr_in($name)[0] !! undef
 
 
-sub peerhost
-    (nelems @_) == 1 or croak 'usage: $sock->peerhost()'
-    my@($sock) =  @_
+sub peerhost($sock)
     my $addr = $sock->peeraddr
     $addr ?? inet_ntoa($addr) !! undef
 

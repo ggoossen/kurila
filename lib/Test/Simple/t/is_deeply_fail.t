@@ -299,6 +299,8 @@ do
     my $array = \@()
     my $hash  = \%()
 
+    local our $TODO = "Fix line numbers";
+
     #line 321
     ok !is_deeply( $array, $hash )
     is( $out, "not ok 24\n", 'is_deeply and different reference types' )

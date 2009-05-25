@@ -35,14 +35,14 @@ BEGIN
     # okay,
 
     } elsif( -e
-    ($thefile = File::Spec->catfile( File::Spec->curdir, 'corpus', 'nonesuch.txt' ))
-    #or (print("# Nope, not $thefile\n"), 0)
-    ) {
-    # okay,
+             ($thefile = File::Spec->catfile( File::Spec->curdir, 'corpus', 'nonesuch.txt' ))
+             #or (print("# Nope, not $thefile\n"), 0)
+         ) {
+         # okay,
     }elsif (-e
-    ($thefile = File::Spec->catfile( File::Spec->curdir, 't', 'corpus', 'nonesuch.txt' ))
-    #or (print("# Nope, not $thefile\n"), 0)
-    ) {
+            ($thefile = File::Spec->catfile( File::Spec->curdir, 't', 'corpus', 'nonesuch.txt' ))
+            #or (print("# Nope, not $thefile\n"), 0)
+           ) {
     # okay,
     }else
         die "Can't find the corpus directory\n Aborting"

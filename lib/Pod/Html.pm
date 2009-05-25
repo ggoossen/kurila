@@ -293,33 +293,33 @@ sub init_globals
     # to make relative urls that point to
     # other files.
 
-    $Podfile = ""		# read from stdin by default
-    @Podpath = @( () )		# list of directories containing library pods.
-    $Podroot = $Curdir	        # filesystem base directory from which all
+    $Podfile = ""               # read from stdin by default
+    @Podpath = @( () )          # list of directories containing library pods.
+    $Podroot = $Curdir          # filesystem base directory from which all
     #   relative paths in $podpath stem.
     $Css = ''                  # Cascading style sheet
-    $Recurse = 1		# recurse on subdirectories in $podpath.
-    $Quiet = 0		        # not quiet by default
-    $Verbose = 0		# not verbose by default
-    $Doindex = 1   	    	# non-zero if we should generate an index
-    $Backlink = ''		# text for "back to top" links
-    $Listlevel = 0		# current list depth
-    @Listtype = @( () )		# list types for open lists
-    $ListNewTerm = 0		# indicates new term in definition list; used
+    $Recurse = 1                # recurse on subdirectories in $podpath.
+    $Quiet = 0                  # not quiet by default
+    $Verbose = 0                # not verbose by default
+    $Doindex = 1                # non-zero if we should generate an index
+    $Backlink = ''              # text for "back to top" links
+    $Listlevel = 0              # current list depth
+    @Listtype = @( () )         # list types for open lists
+    $ListNewTerm = 0            # indicates new term in definition list; used
     # to correctly open/close <dd> tags
-    $Ignore = 1		# whether or not to format text.  we don't
+    $Ignore = 1         # whether or not to format text.  we don't
     #   format text until we hit our first pod
     #   directive.
 
-    @Items_Seen = @( () )	        # for multiples of the same item in perlfunc
+    @Items_Seen = @( () )               # for multiples of the same item in perlfunc
     %Items_Named = %( () )
-    $Header = 0		# produce block header/footer
-    $Title = ''		# title to give the pod(s)
-    $Top = 1			# true if we are at the top of the doc.  used
+    $Header = 0         # produce block header/footer
+    $Title = ''         # title to give the pod(s)
+    $Top = 1                    # true if we are at the top of the doc.  used
     #   to prevent the first <hr /> directive.
-    $Paragraph = ''		# which paragraph we're processing (used
+    $Paragraph = ''             # which paragraph we're processing (used
     #   for error messages)
-    %Sections = %( () )		# sections within this page
+    %Sections = %( () )         # sections within this page
 
     %Local_Items = %( () )
     $Is83 = $^OS_NAME eq 'dos'       # Is it an 8.3 filesystem?
@@ -363,15 +363,15 @@ sub pod2html
     # set some variables to their default values if necessary
     my $pod
     unless ((nelems @ARGV) && @ARGV[0])
-        $Podfile  = "-" unless $Podfile	# stdin
+        $Podfile  = "-" unless $Podfile # stdin
         open($pod, "<", "$Podfile")
             || die "$^PROGRAM_NAME: cannot open $Podfile file for input: $^OS_ERROR\n"
     else
         $Podfile = @ARGV[0]  # XXX: might be more filenames
         $pod = \*ARGV
     
-    $Htmlfile = "-" unless $Htmlfile	# stdout
-    $Htmlroot = "" if $Htmlroot eq "/"	# so we don't get a //
+    $Htmlfile = "-" unless $Htmlfile    # stdout
+    $Htmlroot = "" if $Htmlroot eq "/"  # so we don't get a //
     $Htmldir =~ s#/\z##                # so we don't get a //
     if (  $Htmlroot eq ''
             && defined( $Htmldir )
@@ -523,7 +523,7 @@ END_OF_INDEX
     foreach my $i (0..(nelems @poddata)-1)
         $_ = @poddata[$i]
         $Paragraph = $i+1
-        if (m/^(=.*)/s)	# is it a pod directive?
+        if (m/^(=.*)/s) # is it a pod directive?
             $Ignore = 0
             $after_item = 0
             $_ = $1
@@ -531,21 +531,21 @@ END_OF_INDEX
                 process_begin($1, $2)
             elsif (m/^=end\s+(\S+)\s*(.*)/si)# =end
                 process_end($1, $2)
-            elsif (m/^=cut/)			# =cut
+            elsif (m/^=cut/)                    # =cut
                 process_cut()
-            elsif (m/^=pod/)			# =pod
+            elsif (m/^=pod/)                    # =pod
                 process_pod()
             else
                 next if (nelems @Begin_Stack) && @Begin_Stack[-1] ne 'html'
 
-                if (m/^=(head[1-6])\s+(.*\S)/s)	# =head[1-6] heading
+                if (m/^=(head[1-6])\s+(.*\S)/s) # =head[1-6] heading
                     process_head( $1, $2, $Doindex && $index )
-                elsif (m/^=item\s*(.*\S)?/sm)	# =item text
+                elsif (m/^=item\s*(.*\S)?/sm)   # =item text
                     process_item( $1 )
                     $after_item = 1
-                elsif (m/^=over\s*(.*)/)		# =over N
+                elsif (m/^=over\s*(.*)/)                # =over N
                     process_over()
-                elsif (m/^=back/)		# =back
+                elsif (m/^=back/)               # =back
                     process_back()
                 elsif (m/^=for\s+(\S+)\s*(.*)/si)# =for
                     process_for($1,$2)
@@ -700,8 +700,8 @@ sub parse_command_line
        )
     usage("-", "invalid parameters") if not $result
 
-    usage("-") if defined $opt_help	# see if the user asked for help
-    $opt_help = ""			# just to make -w shut-up.
+    usage("-") if defined $opt_help     # see if the user asked for help
+    $opt_help = ""                      # just to make -w shut-up.
 
     @Podpath  = split(":", $opt_podpath) if defined $opt_podpath
     @Libpods  = split(":", $opt_libpods) if defined $opt_libpods
@@ -869,7 +869,7 @@ sub scan_podpath($podroot, $recurse, $append)
 
         # if there is a directory then use the .pod and .pm files within it.
         # NOTE: Only finds the first so-named directory in the tree.
-        #	if ($Pages{$libpod} =~ /([^:]*[^(\.pod|\.pm)]):/) {
+        #       if ($Pages{$libpod} =~ /([^:]*[^(\.pod|\.pm)]):/) {
         if (%Pages{?$libpod} =~ m/([^:]*(?<!\.pod)(?<!\.pm)):/)
             #  find all the .pod and .pm files within the directory
             $dirname = $1
@@ -891,10 +891,10 @@ sub scan_podpath($podroot, $recurse, $append)
 
         # use the names of files as =item directives too.
         ### Don't think this should be done this way - confuses issues.(WL)
-        ###	    foreach $pod (@files) {
-        ###		$pod =~ /^(.*)(\.pod|\.pm)$/;
-        ###		$Items{$1} = "$dirname/$1.html" if $1;
-        ###	    }
+        ###         foreach $pod (@files) {
+        ###             $pod =~ /^(.*)(\.pod|\.pm)$/;
+        ###             $Items{$1} = "$dirname/$1.html" if $1;
+        ###         }
         elsif (%Pages{?$libpod} =~ m/([^:]*\.pod):/ ||
             %Pages{?$libpod} =~ m/([^:]*\.pm):/)
             # scan the .pod or .pm file for =item directives
@@ -910,7 +910,7 @@ sub scan_podpath($podroot, $recurse, $append)
             warn "$^PROGRAM_NAME: shouldn't be here (line ".__LINE__."\n" unless $Quiet
         
     
-    @poddata = @( () )	# clean-up a bit
+    @poddata = @( () )  # clean-up a bit
 
     chdir($pwd)
         || die "$^PROGRAM_NAME: error changing to directory $pwd: $^OS_ERROR\n"
@@ -962,21 +962,21 @@ sub scan_dir($dir, $recurse)
             %Pages{+$_}  = "" unless defined %Pages{?$_}
             %Pages{+$_} .= "$dir/$_:"
             push(@subdirs, $_)
-        elsif (m/\.pod\z/)	    	    	    	    # .pod
+        elsif (m/\.pod\z/)                                  # .pod
             s/\.pod\z//
             %Pages{+$_}  = "" unless defined %Pages{?$_}
             %Pages{+$_} .= "$dir/$_.pod:"
             push(@pods, "$dir/$_.pod")
-        elsif (m/\.html\z/) 	    	    	    	    # .html
+        elsif (m/\.html\z/)                                 # .html
             s/\.html\z//
             %Pages{+$_}  = "" unless defined %Pages{?$_}
             %Pages{+$_} .= "$dir/$_.pod:"
-        elsif (m/\.pm\z/) 	    	    	    	    # .pm
+        elsif (m/\.pm\z/)                                   # .pm
             s/\.pm\z//
             %Pages{+$_}  = "" unless defined %Pages{?$_}
             %Pages{+$_} .= "$dir/$_.pm:"
             push(@pods, "$dir/$_.pm")
-        elsif (-T "$dir/$_")			    # script(?)
+        elsif (-T "$dir/$_")                        # script(?)
             if (open(my $f, "<", "$dir/$_"))
                 my $line
                 while (defined($line = ~< $f))
@@ -1190,7 +1190,7 @@ sub process_item( $otext)
             print $html_fh, "\n"
         
 
-    else			# definition list
+    else                        # definition list
         # new_listitem takes care of opening the <dt> tag
         new_listitem( 'dl' )
         if ($text =~ m/\A(.+)\Z/s ) # should have text
@@ -1320,11 +1320,11 @@ sub process_pre( $text)
     # try and create links for all occurrences of perl.* within
     # the preformatted text.
     $rest =~ s{
-	         (\s*)(perl\w+)
-	      }{$( do {
-        if ( defined %Pages{?$2} ){	# is a link
+                 (\s*)(perl\w+)
+              }{$( do {
+        if ( defined %Pages{?$2} ){     # is a link
             qq($1<a href="$Htmlroot/%Pages{?$2}">$2</a>);
-        } elsif (defined %Pages{?dosify($2)}) {	# is a link
+        } elsif (defined %Pages{?dosify($2)}) { # is a link
             qq($1<a href="$Htmlroot/%Pages{?dosify($2)}">$2</a>);
         } else {
             "$1$2";
@@ -1332,7 +1332,7 @@ sub process_pre( $text)
 
     })}xg
     $rest =~ s{
-		 (<a\ href="?) ([^>:]*:)? ([^>:]*) \.pod: ([^>:]*:)?
+                 (<a\ href="?) ([^>:]*:)? ([^>:]*) \.pod: ([^>:]*:)?
                }{$( do {
         my $url ;
         if ( $Htmlfileurl ne '' ){
@@ -1358,8 +1358,8 @@ sub process_pre( $text)
     my $urls = '(' . join ('|', qw{
                 http
                 telnet
-		mailto
-		news
+                mailto
+                news
                 gopher
                 file
                 wais
@@ -1373,25 +1373,25 @@ sub process_pre( $text)
     my $any  = "$($ltrs)$($gunk)$($punc)"
 
     $rest =~ s{
-	\b			# start at word boundary
-	(			# begin $1  \{
-	    $urls :		# need resource and a colon
-	    (?!:)		# Ignore File::, among others.
-	    [$any] +?		# followed by one or more of any valid
-				#   character, but be conservative and
-				#   take only what you need to....
-	)			# end   $1  \}
-	(?=
-	    &quot; &gt;		# maybe pre-quoted '<a href="...">'
-	|			# or:
-	    [$punc]*		# 0 or more punctuation
-	    (?:			#   followed
-		[^$any]		#   by a non-url char
-	    |			#   or
-		$		#   end of the string
-	    )			#
-	|			# or else
-	    $			#   then end of the string
+        \b                      # start at word boundary
+        (                       # begin $1  \{
+            $urls :             # need resource and a colon
+            (?!:)               # Ignore File::, among others.
+            [$any] +?           # followed by one or more of any valid
+                                #   character, but be conservative and
+                                #   take only what you need to....
+        )                       # end   $1  \}
+        (?=
+            &quot; &gt;         # maybe pre-quoted '<a href="...">'
+        |                       # or:
+            [$punc]*            # 0 or more punctuation
+            (?:                 #   followed
+                [^$any]         #   by a non-url char
+            |                   #   or
+                $               #   end of the string
+            )                   #
+        |                       # or else
+            $                   #   then end of the string
         )
       }{<a href="$1">$1</a>}igox
 
@@ -1445,15 +1445,15 @@ sub process_puretext($text, $notinIS)
 
         if( $notinIS && $word =~
             m/
-		^([a-z_]{2,})                 # The function name
-		\(
-		    ([0-9][a-z]*              # Manual page(1) or page(1M)
-		    |[^)]*[\$\@\%][^)]+       # ($foo), (1, @foo), (%hash)
-		    |                         # ()
-		    )
-		\)
-		([.,;]?)$                     # a possible punctuation follows
-	    /xi
+                ^([a-z_]{2,})                 # The function name
+                \(
+                    ([0-9][a-z]*              # Manual page(1) or page(1M)
+                    |[^)]*[\$\@\%][^)]+       # ($foo), (1, @foo), (%hash)
+                    |                         # ()
+                    )
+                \)
+                ([.,;]?)$                     # a possible punctuation follows
+            /xi
             )
             # has parenthesis so should have been a C<> ref
             ## try for a pagename (perlXXX(1))?
@@ -1470,8 +1470,8 @@ sub process_puretext($text, $notinIS)
 
         #### disabled. either all (including $\W, $\w+{.*} etc.) or nothing.
         ##      } elsif( $notinIS && $word =~ /^[\$\@%&*]+\w+$/) {
-        ##	    # perl variables, should be a C<> ref
-        ##	    $word = emit_C( $word );
+        ##          # perl variables, should be a C<> ref
+        ##          $word = emit_C( $word );
 
         elsif ($word =~ m,^\w+://\w,)
             # looks like a URL
@@ -1510,18 +1510,17 @@ sub process_text( $tref)
     $tref->$ = $res
 
 
-sub process_text_rfc_links
-    my $text = shift
+sub process_text_rfc_links($text)
 
     # For every "RFCnnnn" or "RFC nnn", link it to the authoritative
     # ource. Do not use the /i modifier here. Require "RFC" to be written in
     #  in capital letters.
 
     $text =~ s{
-	(?<=[^<>[:alpha:]])           # Make sure this is not an URL already
-	(RFC\s*([0-9]{1,5}))(?![0-9]) # max 5 digits
-    }
-    {<a href="http://www.ietf.org/rfc/rfc$2.txt" class="rfc">$1</a>}gx
+        (?<=[^<>[:alpha:]])           # Make sure this is not an URL already
+        (RFC\s*([0-9]{1,5}))(?![0-9]) # max 5 digits
+      }
+      {<a href="http://www.ietf.org/rfc/rfc$2.txt" class="rfc">$1</a>}gx
 
     $text
 
@@ -1803,7 +1802,7 @@ sub dosify($str)
 # page_sect - make a URL from the text of a L<>
 #
 sub page_sect( $page, $section)
-    my( $linktext, $page83, $link)	# work strings
+    my( $linktext, $page83, $link)      # work strings
 
     # check if we know that this is a section in this page
     if (!defined %Pages{?$page} && defined %Sections{?$page})
@@ -1829,7 +1828,7 @@ sub page_sect( $page, $section)
             )
             $page = $1 
         
-            else {
+        else {
         # NOTE: This branch assumes that all A::B pages are located in
         # $Htmlroot/A/B.html . This is often incorrect, since they are
         # often in $Htmlroot/lib/A/B.html or such like. Perhaps we could
@@ -1851,7 +1850,7 @@ sub page_sect( $page, $section)
 
         # if there is a directory by the name of the page, then assume that an
         # appropriate section will exist in the subdirectory
-        #	if ($section ne "" && $Pages{$page} =~ /([^:]*[^(\.pod|\.pm)]):/) {
+        #       if ($section ne "" && $Pages{$page} =~ /([^:]*[^(\.pod|\.pm)]):/) {
         if ($section ne "" && %Pages{?$page} =~ m/([^:]*(?<!\.pod)(?<!\.pm)):/)
             $link = "$Htmlroot/$1/$section.html"
         ### print STDERR "...link=$link\n";

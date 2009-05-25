@@ -213,6 +213,8 @@ do
     my $warnings
     local $^WARN_HOOK = sub (@< @_) { $warnings .= @_[0]->message }
 
+    local our $TODO = "Fix line numbers"
+
     # line 211
     cmp_ok( 42,    '==', "foo", '       == with strings' )
     err_ok( <<ERR )
@@ -282,13 +284,13 @@ not ok -        ==
 not ok -        !=
 not ok -        &&
 not ok -        eq with numbers
-not ok -        == with strings
+not ok -        == with strings # TODO Fix line numbers
 not ok - use Hooble::mooble::yooble;
 not ok - require ALL::YOUR::BASE::ARE::BELONG::TO::US::wibble;
 OUT
 
     err_ok( <<ERR )
-# Looks like you failed $Total tests of $Total.
+# Looks like you failed $($Total-1) tests of $Total.
 ERR
 
     exit(0)

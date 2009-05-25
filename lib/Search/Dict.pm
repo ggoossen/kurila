@@ -71,7 +71,7 @@ sub look
         $mid = int(($max + $min) / 2)
         seek($fh, $mid * $blksize, 0)
             or return -1
-        ~< $fh if $mid			# probably a partial line
+        ~< $fh if $mid                  # probably a partial line
         $_ = ~< $fh
         $_ = $xfrm->($_) if defined $xfrm
         chomp

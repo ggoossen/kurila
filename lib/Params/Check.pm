@@ -333,9 +333,8 @@ sub check($utmpl, $href, ?$verbose)
         ### check if we have an allow handler, to validate against ###
         ### allow() will report its own errors ###
         if( exists %tmpl{'allow'} and not do
-            local $_ERROR_STRING = undef
-            allow( %args{?$key}, %tmpl{?'allow'} )
-        
+                local $_ERROR_STRING = undef
+                allow( %args{?$key}, %tmpl{?'allow'} )
             )
             ### stringify the value in the error report -- we don't want dumps
             ### of objects, but we do want to see *roughly* what we passed

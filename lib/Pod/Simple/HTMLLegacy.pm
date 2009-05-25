@@ -25,15 +25,15 @@ sub pod2html
         my($netscape) # dummy
         local @ARGV = @args
         GetOptions(
-      "help"       => \$help,
-      "verbose!"   => \$verbose,
-      "infile=s"   => \$infile,
-      "outfile=s"  => \$outfile,
-      "title=s"    => \$title,
-      "index!"     => \$index,
+            "help"       => \$help,
+            "verbose!"   => \$verbose,
+            "infile=s"   => \$infile,
+            "outfile=s"  => \$outfile,
+            "title=s"    => \$title,
+            "index!"     => \$index,
 
-      "netscape!"   => \$netscape,
-      ) or return bad_opts(< @args)
+            "netscape!"   => \$netscape,
+            ) or return bad_opts(< @args)
         bad_opts(< @args) if (nelems @ARGV) # it should be all switches!
         return help_message() if $help
     

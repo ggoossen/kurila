@@ -394,9 +394,9 @@ sub index_as_html
 
         # Get to target_level by opening or closing ULs
         while($level +> $target_level)
-        { --$level; push @out, ("  " x $level) . "</ul>"; }
+          { --$level; push @out, ("  " x $level) . "</ul>"; }
         while($level +< $target_level)
-        { ++$level; push @out, ("  " x ($level-1))
+          { ++$level; push @out, ("  " x ($level-1))
                 . "<ul   class='indexList indexList$level'>"; }
 
         $previous_tagname = $tagname

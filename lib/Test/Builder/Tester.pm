@@ -315,7 +315,8 @@ sub test_test
     my $mess
     my %args
     if ((nelems @_) == 1)
-    { $mess = shift }else
+        $mess = shift
+    else
         %args = %( < @_ )
         $mess = %args{?name} if exists(%args{name})
         $mess = %args{?title} if exists(%args{title})

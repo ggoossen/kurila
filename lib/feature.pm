@@ -5,14 +5,14 @@ our $VERSION = '1.13';
 # (feature name) => (internal name, used in %^H)
 my %feature = %(
     switch => 'feature_switch',
-);
+    );
 
 # NB. the latest bundle must be loaded by the -E switch (see toke.c)
 
 my %feature_bundle = %(
     "5.10" => \qw(switch),
     "5.11" => \qw(switch),
-);
+    );
 
 # special case
 %feature_bundle{+"5.9.5"} = %feature_bundle{?"5.10"};
@@ -129,25 +129,25 @@ with the same effect.
 sub import {
     my $class = shift;
     if ((nelems @_) == 0) {
-	die("No features specified");
+        die("No features specified");
     }
     while ((nelems @_)) {
-	my $name = shift(@_);
-	if (substr($name, 0, 1) eq ":") {
-	    my $v = substr($name, 1);
-	    if (!exists %feature_bundle{$v}) {
-		$v =~ s/^([0-9]+)\.([0-9]+).[0-9]+$/$1.$2/;
-		if (!exists %feature_bundle{$v}) {
-		    unknown_feature_bundle(substr($name, 1));
-		}
-	    }
-	    unshift @_, < %feature_bundle{?$v}->@;
-	    next;
-	}
-	if (!exists %feature{$name}) {
-	    unknown_feature($name);
-	}
-	$^HINTS{+%feature{?$name}} = 1;
+        my $name = shift(@_);
+        if (substr($name, 0, 1) eq ":") {
+            my $v = substr($name, 1);
+            if (!exists %feature_bundle{$v}) {
+                $v =~ s/^([0-9]+)\.([0-9]+).[0-9]+$/$1.$2/;
+                if (!exists %feature_bundle{$v}) {
+                    unknown_feature_bundle(substr($name, 1));
+                }
+            }
+            unshift @_, < %feature_bundle{?$v}->@;
+            next;
+        }
+        if (!exists %feature{$name}) {
+            unknown_feature($name);
+        }
+        $^HINTS{+%feature{?$name}} = 1;
     }
 }
 
@@ -156,29 +156,29 @@ sub unimport {
 
     # A bare C<no feature> should disable *all* features
     if (!nelems @_) {
-	delete $^HINTS{[ <values(%feature) ]};
-	return;
+        delete $^HINTS{[ <values(%feature) ]};
+        return;
     }
 
     while ((nelems @_)) {
-	my $name = shift;
-	if (substr($name, 0, 1) eq ":") {
-	    my $v = substr($name, 1);
-	    if (!exists %feature_bundle{$v}) {
-		$v =~ s/^([0-9]+)\.([0-9]+).[0-9]+$/$1.$2/;
-		if (!exists %feature_bundle{$v}) {
-		    unknown_feature_bundle(substr($name, 1));
-		}
-	    }
-	    unshift @_, < %feature_bundle{?$v}->@;
-	    next;
-	}
-	if (!exists(%feature{$name})) {
-	    unknown_feature($name);
-	}
-	else {
-	    delete $^HINTS{%feature{?$name}};
-	}
+        my $name = shift;
+        if (substr($name, 0, 1) eq ":") {
+            my $v = substr($name, 1);
+            if (!exists %feature_bundle{$v}) {
+                $v =~ s/^([0-9]+)\.([0-9]+).[0-9]+$/$1.$2/;
+                if (!exists %feature_bundle{$v}) {
+                    unknown_feature_bundle(substr($name, 1));
+                }
+            }
+            unshift @_, < %feature_bundle{?$v}->@;
+            next;
+        }
+        if (!exists(%feature{$name})) {
+            unknown_feature($name);
+        }
+        else {
+            delete $^HINTS{%feature{?$name}};
+        }
     }
 }
 
@@ -191,7 +191,7 @@ sub unknown_feature {
 sub unknown_feature_bundle {
     my $feature = shift;
     die(sprintf('Feature bundle "%s" is not supported by Perl %s',
-	    $feature, $^PERL_VERSION));
+            $feature, $^PERL_VERSION));
 }
 
 1;

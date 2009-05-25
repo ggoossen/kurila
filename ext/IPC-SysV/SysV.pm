@@ -51,9 +51,8 @@ BOOT_XS: do
     # DynaLoader calls dl_load_flags as a static method.
     *dl_load_flags = DynaLoader->can('dl_load_flags')
 
-    do
-        __PACKAGE__->can('bootstrap') || \&DynaLoader::bootstrap
-    ->(__PACKAGE__, $XS_VERSION)
+    ( __PACKAGE__->can('bootstrap') || \&DynaLoader::bootstrap )
+       ->(__PACKAGE__, $XS_VERSION)
 
 
 1

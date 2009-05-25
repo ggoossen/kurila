@@ -20,7 +20,7 @@ WriteMakefile(
                     'multi.PL'  => \qw(1.out 2.out),
                     'Bar_pm.PL' => '$(INST_LIB)/PL/Bar.pm',
     )
-);
+  );
 END
 
     'PL_FILES-Module/single.PL'        => _gen_pl_files(),

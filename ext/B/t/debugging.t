@@ -25,7 +25,7 @@ use OptreeCheck;
 plan(tests => 3)
 
 checkOptree ( name      => '-Dx -e print 42',
-              Dx	=> 'print 42',
+              Dx        => 'print 42',
               noanchors => 1, # unanchored match
               expect    => << 'EO_THR', expect_nt => << 'EO_NOTHR')
 {
@@ -104,8 +104,8 @@ EO_THR
 EO_NOTHR
 
 checkOptree ( name      => '-Dx -e print $a+42',
-              Dx	=> 'print $a+42',
-              errs	=> 'Name "main::a" used only once: possible typo at -e line 1.',
+              Dx        => 'print $a+42',
+              errs      => 'Name "main::a" used only once: possible typo at -e line 1.',
               noanchors => 1, # unanchored match
               expect    => << 'EO_THR', expect_nt => << 'EO_NOTHR')
 # {
@@ -198,8 +198,8 @@ EO_THR
 EO_NOTHR
 
 checkOptree ( name      => '-Dx -e print sort our @a',
-              Dx	=> 'print sort our @a',
-              errs	=> 'Name "main::a" used only once: possible typo at -e line 1.',
+              Dx        => 'print sort our @a',
+              errs      => 'Name "main::a" used only once: possible typo at -e line 1.',
               noanchors => 1, # unanchored match
               expect    => << 'EO_THR', expect_nt => << 'EO_NOTHR')
 {

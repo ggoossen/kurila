@@ -2,7 +2,7 @@
 
 use warnings
 our (@warnings, $fagwoosh, $putt, $kloong)
-BEGIN 				# ...and save 'em for later
+BEGIN                           # ...and save 'em for later
     $^WARN_HOOK = sub (@< @_) { push @warnings, @_[0]->{?description} }
 
 END { print $^STDERR, < @warnings }
@@ -13,7 +13,7 @@ my $TB = Test::More->builder
 
 BEGIN { use_ok('constant'); }
 
-use constant PI		=> 4 * atan2 1, 1;
+use constant PI         => 4 * atan2 1, 1;
 
 ok defined PI,                          'basic scalar constant'
 is substr(PI, 0, 7), '3.14159',         '    in substr()'
@@ -24,10 +24,10 @@ my $ninety = deg2rad 90
 
 cmp_ok abs($ninety - 1.5707), '+<', 0.0001, '    in math expression'
 
-use constant UNDEF1	=> undef;	# the right way
-use constant UNDEF2	=>	;	# the weird way
-use constant 'UNDEF3'		;	# the 'short' way
-use constant EMPTY	=> ( )  ;	# the right way for lists
+use constant UNDEF1     => undef;       # the right way
+use constant UNDEF2     =>      ;       # the weird way
+use constant 'UNDEF3'           ;       # the 'short' way
+use constant EMPTY      => ( )  ;       # the right way for lists
 
 is UNDEF1, undef,       'right way to declare an undef'
 is UNDEF2, undef,       '    weird way'
@@ -45,9 +45,9 @@ is( (nelems @undef), 0)
 @undef = EMPTY
 is( (nelems @undef), 0)
 
-use constant COUNTDOWN	=> '54321';
-use constant COUNTLIST	=> < reverse @( 1, 2, 3, 4, 5);
-use constant COUNTLAST	=> (COUNTLIST)[-1];
+use constant COUNTDOWN  => '54321';
+use constant COUNTLIST  => < reverse @( 1, 2, 3, 4, 5);
+use constant COUNTLAST  => (COUNTLIST)[-1];
 
 is COUNTDOWN, '54321'
 my @cl = COUNTLIST
@@ -56,43 +56,43 @@ is COUNTDOWN, join '', @cl
 is COUNTLAST, 1
 is((COUNTLIST)[1], 4)
 
-use constant ABC	=> 'ABC';
+use constant ABC        => 'ABC';
 is "abc$( ABC )abc", "abcABCabc"
 
-use constant DEF	=> 'D', 'E', chr ord 'F';
+use constant DEF        => 'D', 'E', chr ord 'F';
 is "d e f $(join ' ', DEF) d e f", "d e f D E F d e f"
 
-use constant SINGLE	=> "'";
-use constant DOUBLE	=> '"';
-use constant BACK	=> '\';
+use constant SINGLE     => "'";
+use constant DOUBLE     => '"';
+use constant BACK       => '\';
 my $tt = BACK . SINGLE . DOUBLE 
 is $tt, q(\'")
 
-use constant MESS	=> q('"'\"'"\);
+use constant MESS       => q('"'\"'"\);
 is MESS, q('"'\"'"\)
 is length(MESS), 8
 
-use constant TRAILING	=> '12 cats';
+use constant TRAILING   => '12 cats';
 do
     local $^WARNING = 0
     cmp_ok TRAILING, '==', 12
 
 is TRAILING, '12 cats'
 
-use constant LEADING	=> " \t1234";
+use constant LEADING    => " \t1234";
 cmp_ok LEADING, '==', 1234
 is LEADING, " \t1234"
 
-use constant ZERO1	=> 0;
-use constant ZERO2	=> 0.0;
-use constant ZERO3	=> '0.0';
+use constant ZERO1      => 0;
+use constant ZERO2      => 0.0;
+use constant ZERO3      => '0.0';
 is ZERO1, '0'
 is ZERO2, '0'
 is ZERO3, '0.0'
 
 do
     package Other
-    use constant PI	=> 3.141
+    use constant PI     => 3.141
 
 
 cmp_ok(abs(PI - 3.1416), '+<', 0.0001)
@@ -111,10 +111,10 @@ is nelems(@warnings), 0, "unexpected warning"
 ok 1
 
 my $curr_test = $TB->current_test
-use constant CSCALAR	=> \"ok 37\n";
-use constant CHASH	=> \%( foo => "ok 38\n" );
-use constant CARRAY	=> \@( undef, "ok 39\n" );
-use constant CCODE	=> sub (@< @_) { "ok @_[0]\n" };
+use constant CSCALAR    => \"ok 37\n";
+use constant CHASH      => \%( foo => "ok 38\n" );
+use constant CARRAY     => \@( undef, "ok 39\n" );
+use constant CCODE      => sub (@< @_) { "ok @_[0]\n" };
 
 my $output = $TB->output 
 print $output, $: CSCALAR->$

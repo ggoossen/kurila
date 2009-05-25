@@ -128,7 +128,7 @@ sub _where
 
 
 # DON'T use this for matches. Use like() instead.
-sub ok ($pass, ?$name, @< @mess)
+sub ok($pass, ?$name, @< @mess)
     _ok($pass, _where(), $name, < @mess)
 
 

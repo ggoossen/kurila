@@ -47,15 +47,13 @@ sub configure($sock,$arg)
     $sock
 
 
-sub hostpath
-    (nelems @_) == 1 or croak 'usage: $sock->hostpath()'
-    my $n = @_[0]->sockname || return undef
+sub hostpath($sock)
+    my $n = $sock->sockname || return undef
     ( <sockaddr_un($n))[0]
 
 
-sub peerpath
-    (nelems @_) == 1 or croak 'usage: $sock->peerpath()'
-    my $n = @_[0]->peername || return undef
+sub peerpath($sock)
+    my $n = $sock->peername || return undef
     ( <sockaddr_un($n))[0]
 
 

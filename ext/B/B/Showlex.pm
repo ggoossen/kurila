@@ -93,7 +93,7 @@ sub compile
     return sub (@< @_)
         my $objref
         foreach my $objname ( @args)
-            next unless $objname	# skip nulls w/o carping
+            next unless $objname        # skip nulls w/o carping
 
             if (ref $objname)
                 print $walkHandle, "B::Showlex::compile($(dump::view($objname)))\n"
@@ -121,7 +121,7 @@ B::Showlex - Show lexical variables used in functions or files
 
 =head1 SYNOPSIS
 
-	perl -MO=Showlex[,-OPTIONS][,SUBROUTINE] foo.pl
+        perl -MO=Showlex[,-OPTIONS][,SUBROUTINE] foo.pl
 
 =head1 DESCRIPTION
 

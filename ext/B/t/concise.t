@@ -355,7 +355,7 @@ like($out, qr/FUNC: \*B::Concise::PAD_FAKELEX_MULTI/,
 like($out, qr/PAD_FAKELEX_MULTI is a constant sub, optimized to a IV/,
      "stash rendering identifies it as constant")
 
-like($out, qr/\# 4\d\d: \s+ \$l->concise\(\$level\);/,
+like($out, qr/\# 4\d\d: \s+ \$l->concise\(\$level\)/,
      "src-line rendering works")
 
 $out = runperl ( switches => \@("-MO=Concise,-stash=Data::Dumper,-src,-exec"),

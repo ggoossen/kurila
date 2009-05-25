@@ -90,8 +90,8 @@ sub recursive_dump($object, $link)
 
     croak "Unknown simple type '$ref'" unless defined %dump{?$ref}
 
-    &{Symbol::fetch_glob(%dump{?$ref})->*}($object)	# Dump object
-    &bless($bless) if $bless	# Mark it as blessed, if necessary
+    &{Symbol::fetch_glob(%dump{?$ref})->*}($object)     # Dump object
+    &bless($bless) if $bless    # Mark it as blessed, if necessary
 
     $dumped .= "OBJECT $objcount\n"
 
@@ -144,9 +144,9 @@ sub dump_hash($href)
 
 # Dump reference to reference
 sub dump_ref($rref)
-    my $deref = $rref->$				# Follow reference to reference
+    my $deref = $rref->$                                # Follow reference to reference
     $dumped .= 'REF '
-    &recursive_dump($deref, 1)		# $dref is a reference
+    &recursive_dump($deref, 1)          # $dref is a reference
 
 
 1

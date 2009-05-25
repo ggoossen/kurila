@@ -94,21 +94,21 @@ use Text::Tabs;
 my $rerun = env::var('PERL_DL_NONLAZY') ?? 0 !! 1;
 
 while (@tests) {
-	my $in = shift(@tests);
-	my $out = shift(@tests);
+        my $in = shift(@tests);
+        my $out = shift(@tests);
 
-	$in =~ s/^TEST\s*(\d+)?\s*(\S+)?\n//;
+        $in =~ s/^TEST\s*(\d+)?\s*(\S+)?\n//;
 
         my ($f, $fn);
-	if ($2 eq 'e') {
-		$f = \&expand;
-		$fn = 'expand';
-	} else {
-		$f = \&unexpand;
-		$fn = 'unexpand';
-	}
+        if ($2 eq 'e') {
+                $f = \&expand;
+                $fn = 'expand';
+        } else {
+                $f = \&unexpand;
+                $fn = 'unexpand';
+        }
 
-	my $back = &$f($in);
+        my $back = &$f($in);
 
-	is($back, $out);
+        is($back, $out);
 }

@@ -96,7 +96,7 @@ sub getopt($argumentative, ?$hash)
 
     while ((nelems @ARGV) && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/)
         @($first,$rest) = @($1,$2)
-        if (m/^--$/)	# early exit if --
+        if (m/^--$/)    # early exit if --
             shift @ARGV
             last
         
@@ -182,7 +182,7 @@ sub help_mess
             $help .= "\n\tBoolean (without arguments): -" . join " -", @rest
         
         my @($scr) = @($^PROGRAM_NAME =~ m,([^/\\]+)$,)
-        print $h, <<EOH if (nelems @_)			# Let the script override this
+        print $h, <<EOH if (nelems @_)                  # Let the script override this
 
 Usage: $scr [-OPTIONS [-MORE_OPTIONS]] [--] [PROGRAM_ARG1 ...]
 EOH
@@ -202,14 +202,14 @@ EOH
         print $h, <<EOH if $has_pod
 
 For more details run
-	perldoc -F $^PROGRAM_NAME
+        perldoc -F $^PROGRAM_NAME
 EOH
     
 
 
 # Usage:
-#   getopts('a:bc');	# -a takes arg. -b & -c not. Sets opt_* as a
-#			#  side effect.
+#   getopts('a:bc');    # -a takes arg. -b & -c not. Sets opt_* as a
+#                       #  side effect.
 
 sub getopts($argumentative, ?$hash)
     my (@args,$first,$rest,$exit)
@@ -220,7 +220,7 @@ sub getopts($argumentative, ?$hash)
     @args = split( m/ */, $argumentative )
     while((nelems @ARGV) && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/s)
         @($first,$rest) = @($1,$2)
-        if (m/^--$/)	# early exit if --
+        if (m/^--$/)    # early exit if --
             shift @ARGV
             last
         

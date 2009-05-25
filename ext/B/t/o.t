@@ -66,9 +66,9 @@ $^OUTPUT_AUTOFLUSH = 1;
 print $^STDOUT, "Compiling!\n";
 
 sub compile {
-	return 'fail' if (@_[0] eq 'fail');
-	print $^STDOUT, "(@_[0]) <@_[1]>\n";
-	return sub { print $^STDOUT, "[$O::BEGIN_output]\n" };
+        return 'fail' if (@_[0] eq 'fail');
+        print $^STDOUT, "(@_[0]) <@_[1]>\n";
+        return sub { print $^STDOUT, "[$O::BEGIN_output]\n" };
 }
 
 1;

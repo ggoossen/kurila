@@ -19,12 +19,10 @@ sub _handle_element_start
         )
 
 
-sub _handle_text
-    ( @_[0]->can( 'handle_text' )
+sub _handle_text($self, @< @args)
+    ( $self->can( 'handle_text' )
       || return
-      )->(
-        < @_
-        )
+      )->( $self, < @args )
 
 
 sub _handle_element_end

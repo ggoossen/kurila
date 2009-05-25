@@ -9,7 +9,7 @@ Carp::Heavy - heavy machinery, no user serviceable parts inside
 =cut
 
 # On one line so MakeMaker will see it.
-use Carp  our $VERSION = $Carp::VERSION
+use Carp;  our $VERSION = $Carp::VERSION
 # use strict; # not yet
 
 # 'use Carp' just installs some very lightweight stubs; the first time

@@ -32,24 +32,24 @@ sub fill_protos
 
 
 sub write_invocation($core, $call, $name, @< @argvs)
-    if ((nelems @argvs) == 1)		# No optional arguments
+    if ((nelems @argvs) == 1)           # No optional arguments
         my @argv = @argvs[0]->@
         shift @argv
-        return "\t" . one_invocation($core, $call, $name, < @argv) . ";\n"
+        return "        " . one_invocation($core, $call, $name, < @argv) . ";\n"
     else
-        my $else = "\t"
+        my $else = "        "
         my (@out, @argv, $n)
         while ((nelems @argvs))
             @argv = (shift @argvs)->@
             $n = shift @argv
             push @out, "$($else)if (nelems(\@_) == $n) \{\n"
-            $else = "\t\} els"
+            $else = "    \} els"
             push @out,
-                "\t\treturn " . one_invocation($core, $call, $name, < @argv) . ";\n"
+                "        return " . one_invocation($core, $call, $name, < @argv) . ";\n"
         
         push @out, <<EOC
-	\}
-	die "$name(\$(join ' ', map \{ dump::view(\$_) \}, \@_): Do not expect to get \$(nelems(\@_)) arguments";
+        \}
+        die "$name(\$(join ' ', map \{ dump::view(\$_) \}, \@_): Do not expect to get \$(nelems(\@_)) arguments";
 EOC
         return join '', @out
     
@@ -70,11 +70,11 @@ sub _make_fatal($sub, $pkg)
     $sub = Symbol::fetch_glob($sub)
     print $^STDOUT, "# _make_fatal: sub=$sub pkg=$pkg name=$name\n" if $Debug
     die "Bad subroutine name for Fatal: $name" unless $name =~ m/^\w+$/
-    if (defined(&$sub))	# user subroutine
+    if (defined(&$sub)) # user subroutine
         $sref = \&$sub
         $proto = prototype $sref
         $call = '&$sref'
-    else			# CORE subroutine
+    else                        # CORE subroutine
         $proto = try { prototype "CORE::$name" }
         die "$name is neither a builtin, nor a Perl subroutine"
             if $^EVAL_ERROR
@@ -91,7 +91,7 @@ sub _make_fatal($sub, $pkg)
     
     $code = <<EOS
 sub \{
-	local(\$^OS_ERROR) = (0);
+        local(\$^OS_ERROR) = (0);
 EOS
     my @protos = fill_protos($proto)
     $code .= write_invocation($core, $call, $name, < @protos)

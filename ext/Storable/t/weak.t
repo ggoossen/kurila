@@ -50,40 +50,40 @@ ok (isweak($w->[0]), "element 0 is a weak reference");
     package main;
 
 my @tests = @(
-\@($s1,
-   sub  {
-       my @($clone, $what) = @_;
-       isa_ok($clone,'ARRAY');
-       isa_ok($clone->[0],'HASH');
-       isa_ok($clone->[1],'HASH');
-       ok(!isweak($clone->[0]), "Element 0 isn't weak");
-       ok(isweak($clone->[1]), "Element 1 is weak");
-   }
+    \@($s1,
+       sub  {
+           my @($clone, $what) = @_;
+           isa_ok($clone,'ARRAY');
+           isa_ok($clone->[0],'HASH');
+           isa_ok($clone->[1],'HASH');
+           ok(!isweak($clone->[0]), "Element 0 isn't weak");
+           ok(isweak($clone->[1]), "Element 1 is weak");
+       }
     ),
     # The weak reference needs to hang around long enough for other stuff to
     # be able to make references to it. So try it second.
     \@($s0,
-   sub  {
-       my @($clone, $what) = @_;
-       isa_ok($clone,'ARRAY');
-       isa_ok($clone->[0],'HASH');
-       isa_ok($clone->[1],'HASH');
-       ok(isweak($clone->[0]), "Element 0 is weak");
-       ok(!isweak($clone->[1]), "Element 1 isn't weak");
-   }
+       sub  {
+           my @($clone, $what) = @_;
+           isa_ok($clone,'ARRAY');
+           isa_ok($clone->[0],'HASH');
+           isa_ok($clone->[1],'HASH');
+           ok(isweak($clone->[0]), "Element 0 is weak");
+           ok(!isweak($clone->[1]), "Element 1 isn't weak");
+       }
     ),
     \@($w,
-   sub  {
-       my @($clone, $what) = @_;
-       isa_ok($clone,'ARRAY');
-       if ($what eq 'nothing') {
-           # We're the original, so we're still a weakref to a hash
-           isa_ok($clone->[0],'HASH');
-           ok(isweak($clone->[0]), "Element 0 is weak");
-       } else {
-           is($clone->[0],undef);
+       sub  {
+           my @($clone, $what) = @_;
+           isa_ok($clone,'ARRAY');
+           if ($what eq 'nothing') {
+               # We're the original, so we're still a weakref to a hash
+               isa_ok($clone->[0],'HASH');
+               ok(isweak($clone->[0]), "Element 0 is weak");
+           } else {
+               is($clone->[0],undef);
+           }
        }
-   }
     ),
     );
 

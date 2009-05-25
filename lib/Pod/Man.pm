@@ -423,7 +423,7 @@ sub guesswork
         #
         # Note that this is not user-controllable; we pretty much have to do this
         # transformation or *roff will mangle the output in unacceptable ways.
-        s{
+    s{
         ( (?:\G|^|\s) [\(\"]* [a-zA-Z] ) ( \\- )?
         ( (?: [a-zA-Z\']+ \\-)+ )
         ( [a-zA-Z\']+ ) (?= [\)\".?!,;:]* (?:\s|\Z|\\\ ) )

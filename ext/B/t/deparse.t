@@ -127,7 +127,7 @@ sub testsub
     42
 
 my ($q,$p)
-my $x=sub (@< @_) { @( ++$q,++$p ) }
+my $x=sub { @( ++$q,++$p ) }
 test($x)
 eval <<EOFCODE and test($x)
    package bar;

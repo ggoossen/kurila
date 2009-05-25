@@ -15,7 +15,7 @@ my $cl  = ($^OS_NAME eq 'MSWin32' && $cc eq 'cl')
 my $borl  = ($^OS_NAME eq 'MSWin32' && $cc eq 'bcc32')
 my $skip_exe = $^OS_NAME eq 'os2' && config_value("ldflags") =~ m/(?<!\S)-Zexe\b/
 my $exe = 'embed_test'
-$exe .= config_value('exe_ext') unless $skip_exe	# Linker will auto-append it
+$exe .= config_value('exe_ext') unless $skip_exe        # Linker will auto-append it
 my $obj = 'embed_test' . config_value('obj_ext')
 my $inc = File::Spec->updir
 my $lib = File::Spec->updir

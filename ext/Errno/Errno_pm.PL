@@ -333,7 +333,7 @@ use Exporter ();
 use Config;
 
 "\$(config_value('archname'))-\$(config_value('osvers'))" eq
-"$(config_value('archname'))-$(config_value('osvers'))" or
+    "$(config_value('archname'))-$(config_value('osvers'))" or
         die "Errno architecture ($(config_value('archname'))-$(config_value('osvers'))) does not match executable architecture (\$(config_value('archname'))-\$(config_value('osvers')))";
 
 \$VERSION = "$VERSION";
@@ -347,7 +347,7 @@ EDQ
     map { $len = length if length +> $len }, @err
 
     my $j = "\@EXPORT_OK = qw(" . join(" ",keys %err) . ");\n"
-    $j =~ s/(.{50,70})\s/$1\n\t/g
+    $j =~ s/(.{50,70})\s/$1\n        /g
     print $out, $j,"\n"
 
     print $out, <<'ESQ'
@@ -371,7 +371,7 @@ ESQ
         EUSERS EWOULDBLOCK EXDEV))
 
     $k =~ s/(.{50,70})\s/$1\n\t/g
-    print $out, "\t",$k,"\n    )\n);\n\n"
+    print $out, "\t",$k,"\n    )\n    )\n\n"
 
     foreach my $err ( @err)
         printf $out, "sub \%s () \{ \%d \}\n",$err,%err{?$err}
@@ -386,7 +386,7 @@ ESQ
     
 
     print $out, <<'ESQ'
-);
+    );
 ESQ
 
     print $out, <<'ESQ'

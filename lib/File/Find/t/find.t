@@ -356,9 +356,9 @@ delete %Expect_File{ file_path('fsl') } unless $symlink_exists
 delete %Expect_Dir{[@: dir_path('fb'), dir_path('fba') ]} unless $symlink_exists
 
 File::Find::find( \%(wanted => sub (@< @_) { wanted_File_Dir_prune();
-                      File::Find::find( \%(wanted => sub
-                                                      {} ), File::Spec->curdir ); } ),
-topdir('fa') )
+                      File::Find::find( \%(wanted => sub {} ),
+                                        File::Spec->curdir ); } ),
+                  topdir('fa') )
 
 Check( (nkeys %Expect_File) == 0 )
 
@@ -389,7 +389,7 @@ delete %Expect_Dir{[@: dir_path('fb'), dir_path('fb', 'fba') ]}
     unless $symlink_exists
 
 File::Find::find( \%(wanted => \&wanted_File_Dir, no_chdir => 1),
-                  topdir('fa') ) Check( (nkeys %Expect_File) == 0 )
+                  topdir('fa') ); Check( (nkeys %Expect_File) == 0 )
 
 
 %Expect_File = %( () )

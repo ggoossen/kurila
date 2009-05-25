@@ -122,14 +122,16 @@ EOE
         syswrite => sub (@< @_) { syswrite $g, shift; },
         'syswrite len' => sub (@< @_) { syswrite $g, shift, 1; },
         'syswrite len pad' => sub (@< @_)
-        my $temp = shift() . "\243"
-        syswrite $g, $temp, 1 ,
+            my $temp = shift() . "\243"
+            syswrite $g, $temp, 1
+        ,
         'syswrite off' => sub (@< @_)
-        my $temp = "\351" . shift()
-        syswrite $g, $temp, 1, 1 ,
+            my $temp = "\351" . shift()
+            syswrite $g, $temp, 1, 1
+        ,
         'syswrite off pad' => sub (@< @_)
-        my $temp = "\351" . shift() . "\243"
-        syswrite $g, $temp, 1, 1 ,
+            my $temp = "\351" . shift() . "\243"
+            syswrite $g, $temp, 1, 1
         )
 
     foreach my $key (sort keys %actions)

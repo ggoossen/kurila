@@ -27,7 +27,7 @@ sub nowhine {
 is( <e(
     "=begin :foo\n\n=begin :bar\n\nZaz\n\n",
     "=begin :foo\n\n=begin :bar\n\nZaz\n\n=end :bar\n\n=end :foo\n\n",
-));
+  ));
 
 
 print $^STDOUT, "# Ending ", __FILE__, "\n";

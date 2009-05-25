@@ -15,7 +15,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME          => 'Recurs',
     VERSION       => 1.00,
-);
+  );
 END
 
     'Recurs/prj2/Makefile.PL'     => <<'END',
@@ -24,7 +24,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME => 'Recurs::prj2',
     VERSION => 1.00,
-);
+  );
 END
 
     # Check if a test failure in a subdir causes make test to fail

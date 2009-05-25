@@ -69,7 +69,7 @@ B::Terse - Walk Perl syntax tree, printing terse info about ops
 
 =head1 SYNOPSIS
 
-	perl -MO=Terse[,OPTIONS] foo.pl
+        perl -MO=Terse[,OPTIONS] foo.pl
 
 =head1 DESCRIPTION
 

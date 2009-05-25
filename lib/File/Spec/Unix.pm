@@ -102,7 +102,7 @@ Returns a string representation of the current directory.  "." on UNIX.
 
 =cut
 
-sub curdir () { '.' }
+sub curdir() { '.' }
 
 =item devnull
 
@@ -160,7 +160,7 @@ Returns a string representation of the parent directory.  ".." on UNIX.
 
 =cut
 
-sub updir () { '..' }
+sub updir() { '..' }
 
 =item no_upwards
 

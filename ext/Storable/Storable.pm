@@ -250,8 +250,8 @@ sub _store
     else
         open($fh, ">", "$file") || logcroak "can't create $file: $^OS_ERROR"
     
-    binmode $fh				# Archaic systems...
-    my $da = $^EVAL_ERROR				# Don't mess if called from exception handler
+    binmode $fh                         # Archaic systems...
+    my $da = $^EVAL_ERROR                               # Don't mess if called from exception handler
     my $ret
     # Call C routine nstore or pstore, depending on network order
     try { $ret = &$xsptr($fh, $self) }
@@ -288,15 +288,15 @@ sub _store_fd
     my $self = shift
     my @($file) =  @_
     logcroak "not a reference" unless ref($self)
-    logcroak "too many arguments" unless (nelems @_) == 1	# No @foo in arglist
+    logcroak "too many arguments" unless (nelems @_) == 1       # No @foo in arglist
     my $fd = fileno($file)
     logcroak "not a valid file descriptor" unless defined $fd
-    my $da = $^EVAL_ERROR				# Don't mess if called from exception handler
+    my $da = $^EVAL_ERROR                               # Don't mess if called from exception handler
     my $ret
     # Call C routine nstore or pstore, depending on network order
     try { $ret = &$xsptr($file, $self) }
     logcroak $^EVAL_ERROR if $^EVAL_ERROR
-    $file->print('')	# Autoflush the file if wanted
+    $file->print('')    # Autoflush the file if wanted
     $^EVAL_ERROR = $da
     return $ret ?? $ret !! undef
 
@@ -325,8 +325,8 @@ sub _freeze
     my $xsptr = shift
     my $self = shift
     logcroak "not a reference" unless ref($self)
-    logcroak "too many arguments" unless (nelems @_) == 0	# No @foo in arglist
-    my $da = $^EVAL_ERROR				# Don't mess if called from exception handler
+    logcroak "too many arguments" unless (nelems @_) == 0       # No @foo in arglist
+    my $da = $^EVAL_ERROR                               # Don't mess if called from exception handler
     my $ret
     # Call C routine mstore or net_mstore, depending on network order
     try { $ret = $xsptr->($self) }
@@ -359,9 +359,9 @@ sub _retrieve
     my @($file, $use_locking) =  @_
     my $fh
     open($fh, "<", $file) || logcroak "can't open $file: $^OS_ERROR"
-    binmode $fh							# Archaic systems...
+    binmode $fh                                                 # Archaic systems...
     my $self
-    my $da = $^EVAL_ERROR							# Could be from exception handler
+    my $da = $^EVAL_ERROR                                                       # Could be from exception handler
     if ($use_locking)
         unless (&CAN_FLOCK( < @_ ))
             logcarp "Storable::lock_store: fcntl/flock emulation broken on $^OS_NAME"
@@ -370,7 +370,7 @@ sub _retrieve
         flock($fh, LOCK_SH) || logcroak "can't get shared lock on $file: $^OS_ERROR"
     # Unlocking will happen when $fh is closed
     
-    try { $self = pretrieve($fh) }		# Call C routine
+    try { $self = pretrieve($fh) }              # Call C routine
     close($fh)
     logcroak $^EVAL_ERROR if $^EVAL_ERROR
     $^EVAL_ERROR = $da
@@ -386,8 +386,8 @@ sub fd_retrieve($file)
     my $fd = fileno($file)
     logcroak "not a valid file descriptor" unless defined $fd
     my $self
-    my $da = $^EVAL_ERROR							# Could be from exception handler
-    try { $self = pretrieve($file) }		# Call C routine
+    my $da = $^EVAL_ERROR                                                       # Could be from exception handler
+    try { $self = pretrieve($file) }            # Call C routine
     logcroak $^EVAL_ERROR if $^EVAL_ERROR
     $^EVAL_ERROR = $da
     return $self
@@ -402,8 +402,8 @@ sub fd_retrieve($file)
 sub thaw($frozen)
     return undef unless defined $frozen
     my $self
-    my $da = $^EVAL_ERROR							# Could be from exception handler
-    try { $self = mretrieve($frozen) }	# Call C routine
+    my $da = $^EVAL_ERROR                                                       # Could be from exception handler
+    try { $self = mretrieve($frozen) }  # Call C routine
     logcroak $^EVAL_ERROR if $^EVAL_ERROR
     $^EVAL_ERROR = $da
     return $self
@@ -426,7 +426,7 @@ Storable - persistence for Perl data structures
 
  # Network order
  nstore \%table, 'file';
- $hashref = retrieve('file');	# There is NO nretrieve()
+ $hashref = retrieve('file');   # There is NO nretrieve()
 
  # Storing to and retrieving from an already opened file
  store_fd \@array, $^STDOUT;
@@ -478,8 +478,8 @@ so you will have to do that explicitly if you need those routines.
 The file descriptor you supply must be already opened, for read
 if you're going to retrieve and for write if you wish to store.
 
-	store_fd(\%table, $^STDOUT) || die "can't store to stdout\n";
-	$hashref = fd_retrieve($^STDIN);
+        store_fd(\%table, $^STDOUT) || die "can't store to stdout\n";
+        $hashref = fd_retrieve($^STDIN);
 
 You can also store data in network order to allow easy sharing across
 multiple platforms, or when storing on a socket known to be remotely
@@ -831,7 +831,7 @@ stay shared.
 
 In the above [A, C] example, the C<STORABLE_freeze> hook could return:
 
-	("something", $self->{B})
+        ("something", $self->{B})
 
 and the B part would be serialized by the engine.  In C<STORABLE_thaw>, you
 would get back the reference to the B' object, deserialized for you.
@@ -965,40 +965,40 @@ such.
 
 Here are some code samples showing a possible usage of Storable:
 
-	use Storable qw(store retrieve freeze thaw dclone);
+        use Storable qw(store retrieve freeze thaw dclone);
 
-	%color = ('Blue' => 0.1, 'Red' => 0.8, 'Black' => 0, 'White' => 1);
+        %color = ('Blue' => 0.1, 'Red' => 0.8, 'Black' => 0, 'White' => 1);
 
-	store(\%color, 'mycolors') or die "Can't store %a in mycolors!\n";
+        store(\%color, 'mycolors') or die "Can't store %a in mycolors!\n";
 
-	$colref = retrieve('mycolors');
-	die "Unable to retrieve from mycolors!\n" unless defined $colref;
-	printf "Blue is still %lf\n", $colref->{'Blue'};
+        $colref = retrieve('mycolors');
+        die "Unable to retrieve from mycolors!\n" unless defined $colref;
+        printf "Blue is still %lf\n", $colref->{'Blue'};
 
-	$colref2 = dclone(\%color);
+        $colref2 = dclone(\%color);
 
-	$str = freeze(\%color);
-	printf "Serialization of %%color is %d bytes long.\n", length($str);
-	$colref3 = thaw($str);
+        $str = freeze(\%color);
+        printf "Serialization of %%color is %d bytes long.\n", length($str);
+        $colref3 = thaw($str);
 
 which prints (on my machine):
 
-	Blue is still 0.100000
-	Serialization of %color is 102 bytes long.
+        Blue is still 0.100000
+        Serialization of %color is 102 bytes long.
 
 Serialization of CODE references and deserialization in a safe
 compartment:
 
 =for example begin
 
-	use Storable qw(freeze thaw);
-	use Safe;
-	my $safe = new Safe;
-	local $Storable::Deparse = 1;
-	local $Storable::Eval = sub { $safe->reval($_[0]) };
-	my $serialized = freeze(sub { 42 });
-	my $code = thaw($serialized);
-	$code->() == 42;
+        use Storable qw(freeze thaw);
+        use Safe;
+        my $safe = new Safe;
+        local $Storable::Deparse = 1;
+        local $Storable::Eval = sub { $safe->reval($_[0]) };
+        my $serialized = freeze(sub { 42 });
+        my $code = thaw($serialized);
+        $code->() == 42;
 
 =for example end
 
@@ -1133,19 +1133,19 @@ reading them.
 
 Thank you to (in chronological order):
 
-	Jarkko Hietaniemi <jhi@iki.fi>
-	Ulrich Pfeifer <pfeifer@charly.informatik.uni-dortmund.de>
-	Benjamin A. Holzman <bah@ecnvantage.com>
-	Andrew Ford <A.Ford@ford-mason.co.uk>
-	Gisle Aas <gisle@aas.no>
-	Jeff Gresham <gresham_jeffrey@jpmorgan.com>
-	Murray Nesbitt <murray@activestate.com>
-	Marc Lehmann <pcg@opengroup.org>
-	Justin Banks <justinb@wamnet.com>
-	Jarkko Hietaniemi <jhi@iki.fi> (AGAIN, as perl 5.7.0 Pumpkin!)
-	Salvador Ortiz Garcia <sog@msg.com.mx>
-	Dominic Dunlop <domo@computer.org>
-	Erik Haugan <erik@solbors.no>
+        Jarkko Hietaniemi <jhi@iki.fi>
+        Ulrich Pfeifer <pfeifer@charly.informatik.uni-dortmund.de>
+        Benjamin A. Holzman <bah@ecnvantage.com>
+        Andrew Ford <A.Ford@ford-mason.co.uk>
+        Gisle Aas <gisle@aas.no>
+        Jeff Gresham <gresham_jeffrey@jpmorgan.com>
+        Murray Nesbitt <murray@activestate.com>
+        Marc Lehmann <pcg@opengroup.org>
+        Justin Banks <justinb@wamnet.com>
+        Jarkko Hietaniemi <jhi@iki.fi> (AGAIN, as perl 5.7.0 Pumpkin!)
+        Salvador Ortiz Garcia <sog@msg.com.mx>
+        Dominic Dunlop <domo@computer.org>
+        Erik Haugan <erik@solbors.no>
 
 for their bug reports, suggestions and contributions.
 

@@ -402,8 +402,8 @@ sub run(?$file, ?$name)
         
         print $^STDOUT, "$name\t$version\t$file\n"
         return
-    # End of callback!
-    )
+      # End of callback!
+      )
 
     $self->survey
 
@@ -605,10 +605,8 @@ sub _accessorize  # A simple-minded method-maker
     shift
     foreach my $attrname ( @_)
         Symbol::fetch_glob(caller() . '::' . $attrname)->* = sub (@< @_)
-
-            ($Carp::CarpLevel = 1),  Carp::croak(
-       "Accessor usage: \$obj->$attrname() or \$obj->$attrname(\$new_value)"
-       ) unless ((nelems @_) == 1 or (nelems @_) == 2) and ref @_[0]
+            die "Accessor usage: \$obj->$attrname() or \$obj->$attrname(\$new_value)"
+                unless ((nelems @_) == 1 or (nelems @_) == 2) and ref @_[0]
 
             # Read access:
             return @_[0]->{?$attrname} if (nelems @_) == 1
@@ -616,7 +614,6 @@ sub _accessorize  # A simple-minded method-maker
             # Write access:
             @_[0]->{+$attrname} = @_[1]
             return @_[0] # RETURNS MYSELF!
-        
     
     # Ya know, they say accessories make the ensemble!
     return

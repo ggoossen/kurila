@@ -89,7 +89,7 @@ EOM
 sub normalise
     return unless $^OS_NAME eq 'cygwin' 
     foreach ( @_)
-    { s#\r\n#\n#g }
+        s#\r\n#\n#g
 
 
 BEGIN 

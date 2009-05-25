@@ -73,8 +73,8 @@ do
 
 
 my $obj = ''
-sub Foo::PUSHED			{ $obj = shift; -1; }
-sub PerlIO::via::Bar::PUSHED	{ $obj = shift; -1; }
+sub Foo::PUSHED                 { $obj = shift; -1; }
+sub PerlIO::via::Bar::PUSHED    { $obj = shift; -1; }
 open $fh, '<:via(Foo)', "foo"
 is( $obj, 'Foo', 'search for package Foo' )
 open $fh, '<:via(Bar)', "bar"

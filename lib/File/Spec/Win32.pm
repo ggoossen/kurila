@@ -412,14 +412,14 @@ sub _canon_cat
     $path =~ s#\A\\##			# \xx --> xx  NOTE: this is *not* root
     $path =~ s#\\\z##			# xx\ --> xx
 
-    if ( $volume =~ m#\\\z# )					# <vol>\.. --> <vol>\
-        $path =~ s{ \A			# at begin
-		    \.\.
-		    (?:\\\.\.)*		# and more
-		    (?:\\|\z) 		# at end or followed by slash
-		 }{}x
+    if ( $volume =~ m#\\\z# )                                   # <vol>\.. --> <vol>\
+        $path =~ s{ \A                  # at begin
+                    \.\.
+                    (?:\\\.\.)*         # and more
+                    (?:\\|\z)           # at end or followed by slash
+                 }{}x
 
-        return $1			# \\HOST\SHARE\ --> \\HOST\SHARE
+        return $1                       # \\HOST\SHARE\ --> \\HOST\SHARE
             if    $path eq ""
           and $volume =~ m#\A(\\\\.*)\\\z#s
     

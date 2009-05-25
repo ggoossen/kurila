@@ -22,7 +22,7 @@ use Class::Struct < qw(struct);
 struct 'User::grent' => \@(
        name    => '$',
        passwd  => '$',
-       gid	    => '$',
+       gid          => '$',
        members => '@',
        )
 

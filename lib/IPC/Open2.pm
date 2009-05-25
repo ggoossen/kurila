@@ -4,9 +4,9 @@ our ($VERSION, @ISA, @EXPORT)
 
 require Exporter
 
-$VERSION	= 1.02
-@ISA		= qw(Exporter)
-@EXPORT		= qw(open2)
+$VERSION        = 1.02
+@ISA            = qw(Exporter)
+@EXPORT         = qw(open2)
 
 =head1 NAME
 
@@ -102,8 +102,8 @@ function is really just a wrapper around open3().
 # $wtr is left unbuffered.
 #
 # abort program if
-#	rdr or wtr are null
-# 	a system call fails
+#       rdr or wtr are null
+#       a system call fails
 
 require IPC::Open3
 

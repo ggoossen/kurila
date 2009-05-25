@@ -588,12 +588,10 @@ my %compass = %(
 EOT
 
     while (my @(?$point, ?$bearing) =@( each %compass))
-        $test_body .= "'$point' => $bearing, "
-    
+        $test_body .= "    '$point' => $bearing, "
 
     $test_body .= <<'EOT'
-
-);
+  );
 
 my $fail;
 while (my @(?$point, ?$bearing) = @: each %compass) {

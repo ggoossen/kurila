@@ -5,12 +5,12 @@ BEGIN {
     require "../t/test.pl";
     skip_all("No perlio") unless (PerlIO::Layer->find( 'perlio'));
     if (ord("A") == 193) {
-	print $^STDOUT, "1..0 # Skip: EBCDIC\n";
-	exit 0;
+        print $^STDOUT, "1..0 # Skip: EBCDIC\n";
+        exit 0;
     }
     unless( try { require Encode } ) { 
-	print $^STDOUT, "1..0 # Skip: No Encode\n";
-	exit 0;
+        print $^STDOUT, "1..0 # Skip: No Encode\n";
+        exit 0;
     }
     plan (9);
     Encode->import( qw(:fallback_all));

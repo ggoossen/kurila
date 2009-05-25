@@ -23,7 +23,7 @@ BEGIN
 
 my $PATH = "sock-$^PID"
 
-if ($^OS_NAME eq 'os2')	# Can't create sockets with relative path...
+if ($^OS_NAME eq 'os2') # Can't create sockets with relative path...
     require Cwd
     my $d = Cwd::cwd()
     $d =~ s/^[a-z]://i

@@ -20,26 +20,23 @@ do
     use Class::Struct < qw(struct)
 
     struct 'IPC::Msg::stat' => \@(
-           uid	=> '$',
-           gid	=> '$',
-           cuid	=> '$',
-           cgid	=> '$',
-           mode	=> '$',
-           qnum	=> '$',
-           qbytes	=> '$',
-           lspid	=> '$',
-           lrpid	=> '$',
-           stime	=> '$',
-           rtime	=> '$',
-           ctime	=> '$',
+           uid  => '$',
+           gid  => '$',
+           cuid => '$',
+           cgid => '$',
+           mode => '$',
+           qnum => '$',
+           qbytes       => '$',
+           lspid        => '$',
+           lrpid        => '$',
+           stime        => '$',
+           rtime        => '$',
+           ctime        => '$',
            )
 
 
-sub new
-    (nelems @_) == 3 || croak 'new IPC::Msg ( KEY , FLAGS )'
-    my $class = shift
-
-    my $id = msgget(@_[0],@_[1])
+sub new($class, $key, $flags)
+    my $id = msgget($key, $flags)
 
     defined($id)
         ?? bless \$id, $class
@@ -92,10 +89,8 @@ sub rcv($self, $buf, $len, ?$type, ?$flags)
     return $type
 
 
-sub snd
-    (nelems @_) +<= 4 && (nelems @_) +>= 3 or  croak '$msg->snd( TYPE, BUF, FLAGS )'
-    my $self = shift
-    msgsnd($self->$,pack("l! a*",@_[0],@_[1]), @_[2] || 0)
+sub snd($self, $type, $buf, ?$flags)
+    msgsnd($self->$,pack("l! a*", $type, $buf), $flags || 0)
 
 
 

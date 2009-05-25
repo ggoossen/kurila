@@ -603,8 +603,8 @@ sub getWt
     elsif (_isUIdeo($u, $self->{?UCA_Version}))
         my $cjk  = $self->{?overrideCJK}
         return map { _varCE($vbl, $_) },
-            @(	    $cjk
-        ?? < map( {pack(VCE_TEMPLATE, NON_VAR, < $_->@) }, &$cjk($u))
+            @(	   $cjk
+                   ?? < map( {pack(VCE_TEMPLATE, NON_VAR, < $_->@) }, &$cjk($u))
                    !! defined $cjk && $self->{?UCA_Version} +<= 8 && $u +< 0x10000
                    ?? _uideoCE_8($u)
                    !! < $der->($u))
@@ -824,8 +824,8 @@ sub getHST
     my $u = shift
     return
                      Hangul_LIni +<= $u && $u +<= Hangul_LFin || $u == Hangul_LFill ?? "L" !!
-                     Hangul_VIni +<= $u && $u +<= Hangul_VFin	     ?? "V" !!
-                     Hangul_TIni +<= $u && $u +<= Hangul_TFin	     ?? "T" !!
+                     Hangul_VIni +<= $u && $u +<= Hangul_VFin        ?? "V" !!
+                     Hangul_TIni +<= $u && $u +<= Hangul_TFin        ?? "T" !!
                      Hangul_SIni +<= $u && $u +<= Hangul_SFin ??
         ($u - Hangul_SBase) % Hangul_TCount ?? "LVT" !! "LV" !! ""
 
@@ -881,7 +881,7 @@ sub index($self, $str, $substr, ?$pos, ?$grob)
     if (! nelems $subE->@)
         my $temp = $pos +<= 0 ?? 0 !! $len +<= $pos ?? $len !! $pos
         return $grob
-        ?? map( {\@($_, 0) }, $temp..$len)
+            ?? map( {\@($_, 0) }, $temp..$len)
             !! @($temp,0)
     
     $len +< $pos
@@ -1615,17 +1615,17 @@ an empty list in list context.
 e.g.
 
     if ($match_ref = $Collator->match($str, $sub)) { # scalar context
-	print "matches [$$match_ref].\n";
+        print "matches [$$match_ref].\n";
     } else {
-	print "doesn't match.\n";
+        print "doesn't match.\n";
     }
 
      or
 
     if (($match) = $Collator->match($str, $sub)) { # list context
-	print "matches [$match].\n";
+        print "matches [$match].\n";
     } else {
-	print "doesn't match.\n";
+        print "doesn't match.\n";
     }
 
 =item C<@match = $Collator-E<gt>gmatch($string, $substring)>

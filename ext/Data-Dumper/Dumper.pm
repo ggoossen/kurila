@@ -52,27 +52,27 @@ sub new($c, $v, ?$n)
     my $s = \%(
         level      => 0,           # current recursive depth
         indent     => $Indent,     # various styles of indenting
-        pad	=> $Pad,        # all lines prefixed by this string
+        pad     => $Pad,        # all lines prefixed by this string
         xpad       => "",          # padding-per-level
         apad       => "",          # added padding for hash keys n such
         sep        => "",          # list separator
-        pair	=> $Pair,	# hash key/value separator: defaults to ' => '
+        pair    => $Pair,       # hash key/value separator: defaults to ' => '
         seen       => \%(),        # local (nested) refs (id => [name, val])
         todump     => $v,          # values to dump []
         names      => $n,          # optional names for values []
         varname    => $Varname,    # prefix to use for tagging nameless ones
         purity     => $Purity,     # degree to which output is evalable
-        useqq 	=> $Useqq,      # use "" for strings (backslashitis ensues)
-        terse 	=> $Terse,      # avoid name output (where feasible)
-        freezer	=> $Freezer,    # name of Freezer method for objects
-        toaster	=> $Toaster,    # name of method to revive objects
-        deepcopy	=> $Deepcopy,   # dont cross-ref, except to stop recursion
-        quotekeys	=> $Quotekeys,  # quote hash keys
-        'bless'	=> $Bless,	# keyword to use for "bless"
-        #	     expdepth   => $Expdepth,   # cutoff depth for explicit dumping
-        maxdepth	=> $Maxdepth,   # depth beyond which we give up
+        useqq   => $Useqq,      # use "" for strings (backslashitis ensues)
+        terse   => $Terse,      # avoid name output (where feasible)
+        freezer => $Freezer,    # name of Freezer method for objects
+        toaster => $Toaster,    # name of method to revive objects
+        deepcopy        => $Deepcopy,   # dont cross-ref, except to stop recursion
+        quotekeys       => $Quotekeys,  # quote hash keys
+        'bless' => $Bless,      # keyword to use for "bless"
+        #            expdepth   => $Expdepth,   # cutoff depth for explicit dumping
+        maxdepth        => $Maxdepth,   # depth beyond which we give up
         sortkeys   => $Sortkeys,   # flag or filter for sorting hash keys
-        deparse	=> $Deparse,	# use B::Deparse for coderefs
+        deparse => $Deparse,    # use B::Deparse for coderefs
         )
 
     if ($Indent +> 0)
@@ -253,7 +253,7 @@ sub _dump
         if (defined($name) and length($name))
             # keep a tab on it so that we dont fall into recursive pit
             if (exists $s->{seen}->{$id})
-                #	if ($s->{expdepth} < $s->{level}) {
+                #       if ($s->{expdepth} < $s->{level}) {
                 if ($s->{?purity} and $s->{?level} +> 0)
                     $out = ($realtype eq 'HASH')  ?? '\%()' !!
                         ($realtype eq 'ARRAY') ?? '\@()' !!
@@ -461,7 +461,7 @@ sub _dump
     elsif ($realtype eq 'PLAINVALUE')
         if ($rval->$ =~ m/^(?:0|-?[1-9]\d{0,8})\z/) # safe decimal number
             $out .= $rval->$
-        else				 # string
+        else                             # string
             if ($s->{?useqq} or $rval->$ =~ m/[\x[80]-\x[FF]]/)
                 # Fall back to qq if there's Unicode
                 $out .= qquote($rval->$, $s->{?useqq})
@@ -1075,17 +1075,17 @@ distribution for more examples.)
     sub new { bless { state => 'awake' }, shift }
     sub Freeze {
         my $s = shift;
-	print STDERR "preparing to sleep\n";
-	$s->{state} = 'asleep';
-	return bless $s, 'Foo::ZZZ';
+        print STDERR "preparing to sleep\n";
+        $s->{state} = 'asleep';
+        return bless $s, 'Foo::ZZZ';
     }
 
     package Foo::ZZZ;
     sub Thaw {
         my $s = shift;
-	print STDERR "waking up\n";
-	$s->{state} = 'awake';
-	return bless $s, 'Foo';
+        print STDERR "waking up\n";
+        $s->{state} = 'awake';
+        return bless $s, 'Foo';
     }
 
     package Foo;

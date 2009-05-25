@@ -9,8 +9,8 @@ use Pod::Simple::Text;
 
 BEGIN 
     *mytime = defined(&Win32::GetTickCount)
-    ?? sub () {Win32::GetTickCount() / 1000}
-    !! sub () {time()}
+        ?? sub () {Win32::GetTickCount() / 1000}
+        !! sub () {time()}
 
 
 $Pod::Simple::Text::FREAKYMODE = 1
@@ -125,9 +125,9 @@ sub compare2
         ok 1
         return 0
     elsif( do
-        for (@(@out[0], @out[1])) { s/[ ]//g; };
-        @out[0] eq @out[1]
-    )
+            for (@(@out[0], @out[1])) { s/[ ]//g; };
+            @out[0] eq @out[1]
+        )
         print $^STDOUT, "# Differ only in whitespace.\n"
         ok 1
         return 0

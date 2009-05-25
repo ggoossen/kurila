@@ -5148,6 +5148,9 @@ Perl_yylex(pTHX)
 
 	case KEY_our:
 	case KEY_my:
+            if (PL_expect == XOPERATOR) {
+                no_op( tmp == KEY_my ? "'my'" : "'our'", s);
+            }
 	    PL_in_my = (U16)tmp;
 	    s = SKIPSPACE1(s);
 	    if (isIDFIRST_lazy_if(s,UTF)) {

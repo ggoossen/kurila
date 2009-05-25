@@ -49,7 +49,7 @@ Pod::Simple::_accessorize( __PACKAGE__,
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Just so we can run from the command line more easily
-sub go
+sub go()
     (nelems @ARGV) == 2 or die sprintf(
         "Usage: perl -M\%s -e \%s:go indirs outdir\n  (or use \"\$^INCLUDE_PATH\" for indirs)\n",
         __PACKAGE__, __PACKAGE__,
@@ -683,9 +683,9 @@ sub _gen_css_wad
                   |$( join '', @( '#', < @($1,$2,$3)[[@swap]]) )|g   if (nelems @swap)
 
         if(   $flipmode =~ m/a/)
-        { $this_css =~ s/#fff\b/#999/gi } # black -> dark grey
-            elsif($flipmode =~ m/b/)
-        { $this_css =~ s/#000\b/#666/gi } # white -> light grey
+            $this_css =~ s/#fff\b/#999/gi  # black -> dark grey
+        elsif($flipmode =~ m/b/)
+            $this_css =~ s/#000\b/#666/gi  # white -> light grey
 
         my $name = $outname
         $name =~ s/-|_/ /g

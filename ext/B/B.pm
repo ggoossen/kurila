@@ -55,7 +55,7 @@ BEGIN
 # Nullsv *must* come first in the following so that the condition
 # ($$sv == 0) can continue to be used to test (sv == Nullsv).
 @B::specialsv_name = qw(Nullsv &PL_sv_undef &PL_sv_yes &PL_sv_no
-			(SV*)pWARN_ALL (SV*)pWARN_NONE (SV*)pWARN_STD)
+                        (SV*)pWARN_ALL (SV*)pWARN_NONE (SV*)pWARN_STD)
 
 do
     # Stop "-w" from complaining about the lack of a real B::OBJECT class
@@ -306,7 +306,7 @@ B - The Perl Compiler
 
 =head1 SYNOPSIS
 
-	use B;
+        use B;
 
 =head1 DESCRIPTION
 

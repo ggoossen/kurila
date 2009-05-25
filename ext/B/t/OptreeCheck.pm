@@ -312,28 +312,28 @@ sub import
 our %gOpts = 	# values are replaced at runtime !!
     %(
     # scalar values are help string
-    retry	=> 'retry failures after turning on re debug',
-    debug	=> 'turn on re debug for those retries',
-    selftest	=> 'self-tests mkCheckRex vs the reference rendering',
+    retry       => 'retry failures after turning on re debug',
+    debug       => 'turn on re debug for those retries',
+    selftest    => 'self-tests mkCheckRex vs the reference rendering',
 
-    fail	=> 'force all test to fail, print to stdout',
-    dump	=> 'dump cmdline arg prcessing',
-    noanchors	=> 'dont anchor match rex',
+    fail        => 'force all test to fail, print to stdout',
+    dump        => 'dump cmdline arg prcessing',
+    noanchors   => 'dont anchor match rex',
 
     # array values are one-of selections, with 1st value as default
     #  array: 2nd value is used as help-str, 1st val (still) default
-    help	=> \@(0, 'provides help and exits', 0),
-    testmode	=> \qw/ native cross both /,
+    help        => \@(0, 'provides help and exits', 0),
+    testmode    => \qw/ native cross both /,
 
     # reporting mode for rendering errs
-    report	=> \qw/ diag fail print /,
-    errcont	=> \@(1, 'if 1, tests match even if report is fail', 0),
+    report      => \qw/ diag fail print /,
+    errcont     => \@(1, 'if 1, tests match even if report is fail', 0),
 
     # fixup for VMS, cygwin, which dont have stderr b4 stdout
-    rxnoorder	=> \@(1, 'if 1, dont req match on -e lines, and -banner',0),
-    strip	=> \@(1, 'if 1, catch errs and remove from renderings',0),
-    stripv	=> 'if strip&&1, be verbose about it',
-    errs	=> 'expected compile errs, array if several',
+    rxnoorder   => \@(1, 'if 1, dont req match on -e lines, and -banner',0),
+    strip       => \@(1, 'if 1, catch errs and remove from renderings',0),
+    stripv      => 'if strip&&1, be verbose about it',
+    errs        => 'expected compile errs, array if several',
     )
 
 
@@ -354,11 +354,11 @@ our $platform = "plain"
 our $thrstat = "nonthreaded"
 
 our %modes = %(
-    both	=> \@( 'expect', 'expect_nt'),
-    native	=> \@( 'expect_nt'),
-    cross	=> \@( !'expect_nt'),
-    expect	=> \@( 'expect' ),
-    expect_nt	=> \@( 'expect_nt' ),
+    both        => \@( 'expect', 'expect_nt'),
+    native      => \@( 'expect_nt'),
+    cross       => \@( !'expect_nt'),
+    expect      => \@( 'expect' ),
+    expect_nt   => \@( 'expect_nt' ),
     )
 
 our %msgs # announce cross-testing.
@@ -367,16 +367,16 @@ our %msgs # announce cross-testing.
     'expect_nt-threaded' => " (nT on T) ",
     'expect-nonthreaded' => " (T on nT) ",
     # native - nothing to say (must stay empty - used for $crosstesting)
-    'expect_nt-nonthreaded'	=> '',
-    'expect-threaded'	=> '',
+    'expect_nt-nonthreaded'     => '',
+    'expect-threaded'   => '',
     )
 
 #######
-sub getCmdLine	# import assistant
+sub getCmdLine  # import assistant
     # offer help
     print($^STDOUT, qq{\n$^PROGRAM_NAME accepts args to update these state-vars:
-	     turn on a flag by typing its name,
-	     select a value from list by typing name=val.\n    }, <
+             turn on a flag by typing its name,
+             select a value from list by typing name=val.\n    }, <
         mydumper(\%gOpts))
         if grep { m/help/ }, @ARGV
 
@@ -424,7 +424,7 @@ sub getCmdLine	# import assistant
 # the API (1 function)
 
 sub checkOptree
-    my $tc = newTestCases(< @_)	# ctor
+    my $tc = newTestCases(< @_) # ctor
     my ($rendering)
 
     print $^STDOUT, "checkOptree args: ", <mydumper($tc) if $tc->{?dump}
@@ -433,7 +433,7 @@ sub checkOptree
 
         return runSelftest($tc) if %gOpts{?selftest}
 
-        $tc->getRendering()	# get the actual output
+        $tc->getRendering()     # get the actual output
         $tc->checkErrs()
 
         local $Level = $Level + 2
@@ -500,7 +500,7 @@ sub getRendering
 
     my @opts = get_bcopts($tc)
     my $rendering = '' # suppress "Use of uninitialized value in open"
-    my @errs		# collect errs via
+    my @errs            # collect errs via
 
     if ($tc->{?Dx})
         $rendering = runperl( switches => \@('-w',join(',', @("-Dx",< @opts))),
@@ -550,7 +550,7 @@ sub getRendering
         $rendering =~ s/-e syntax OK\n//
         $rendering =~ s/-e had compilation errors\.\n//
     
-    $tc->{+got}	   = $rendering
+    $tc->{+got}    = $rendering
     $tc->{+goterrs} = \@errs if (nelems @errs)
     return @($rendering, @errs)
 
@@ -602,9 +602,9 @@ sub diag_or_fail
         unshift @lines, $tc->{?name}
         my $report = join("\n", @lines)
 
-        if    (%gOpts{?report} eq 'diag')	{ _diag ($report) }
-            elsif (%gOpts{?report} eq 'fail')	{ fail  ($report) }
-        else					{ print ($^STDOUT, $report) }
+        if    (%gOpts{?report} eq 'diag')       { _diag ($report) }
+            elsif (%gOpts{?report} eq 'fail')   { fail  ($report) }
+        else                                    { print ($^STDOUT, $report) }
         next unless %gOpts{?errcont} # skip block
     
 
@@ -653,12 +653,12 @@ my $announce = 'B::Concise::compile\(CODE\(0x[0-9a-f]+\)\)';
 sub mkCheckRex($tc, $want)
     eval "no re 'debug'"
 
-    my $str = $tc->{?expect} || $tc->{?expect_nt}	# standard bias
-    $str = $tc->{?$want} if $want && $tc->{?$want}	# stated pref
+    my $str = $tc->{?expect} || $tc->{?expect_nt}       # standard bias
+    $str = $tc->{?$want} if $want && $tc->{?$want}      # stated pref
 
     die("no '$want' golden-sample found: $tc->{?name}") unless $str
 
-    $str =~ s/^\# //mg	# ease cut-paste testcase authoring
+    $str =~ s/^\# //mg  # ease cut-paste testcase authoring
 
     $tc->{+wantstr} = $str
 
@@ -677,44 +677,44 @@ sub mkCheckRex($tc, $want)
     # from the golden result.
 
     $str =~ s{(?:next|db)state
-	      \\\(			# opening literal ( (backslash escaped)
-	      [^()]*?			# not ()
-	      (\\\(eval\ \d+\\\)	# maybe /eval \d+/ in ()
-	       [^()]*?			# which might be followed by something
-	      )?
-	      \\\)			# closing literal )
-	     }{$( '(?:next|db)state\([^()]*?' .
-        ($1 ?? '\(eval \d+\)[^()]*' !! '')	# Match the eval if present
+              \\\(                      # opening literal ( (backslash escaped)
+              [^()]*?                   # not ()
+              (\\\(eval\ \d+\\\)        # maybe /eval \d+/ in ()
+               [^()]*?                  # which might be followed by something
+              )?
+              \\\)                      # closing literal )
+             }{$( '(?:next|db)state\([^()]*?' .
+        ($1 ?? '\(eval \d+\)[^()]*' !! '')      # Match the eval if present
         . '\)'
         )}msgx
     # widened for -terse mode
     $str =~ s/(?:next|db)state/(?:next|db)state/msg
 
     # don't care about:
-    $str =~ s/:-?\d+,-?\d+/:-?\\d+,-?\\d+/msg		# FAKE line numbers
-    $str =~ s/match\\\(.*?\\\)/match\(.*?\)/msg	# match args
-    $str =~ s/(0x[0-9A-Fa-f]+)/0x[0-9A-Fa-f]+/msg	# hexnum values
-    $str =~ s/".*?"/".*?"/msg				# quoted strings
-    $str =~ s/FAKE:(\w):\d+/FAKE:$1:\\d+/msg		# parent pad index
+    $str =~ s/:-?\d+,-?\d+/:-?\\d+,-?\\d+/msg           # FAKE line numbers
+    $str =~ s/match\\\(.*?\\\)/match\(.*?\)/msg # match args
+    $str =~ s/(0x[0-9A-Fa-f]+)/0x[0-9A-Fa-f]+/msg       # hexnum values
+    $str =~ s/".*?"/".*?"/msg                           # quoted strings
+    $str =~ s/FAKE:(\w):\d+/FAKE:$1:\\d+/msg            # parent pad index
 
-    $str =~ s/(\d refs?)/\\d+ refs?/msg		# 1 ref, 2+ refs (plural)
-    $str =~ s/leavesub \[\d\]/leavesub [\\d]/msg	# for -terse
-    #$str =~ s/(\s*)\n/\n/msg;				# trailing spaces
+    $str =~ s/(\d refs?)/\\d+ refs?/msg         # 1 ref, 2+ refs (plural)
+    $str =~ s/leavesub \[\d\]/leavesub [\\d]/msg        # for -terse
+    #$str =~ s/(\s*)\n/\n/msg;                          # trailing spaces
 
     croak "no reftext found for $want: $tc->{?name}"
         unless $str =~ m/\w+/ # fail unless a real test
 
-    # $str = '.*'	if 1;	# sanity test
-    # $str .= 'FAIL'	if 1;	# sanity test
+    # $str = '.*'       if 1;   # sanity test
+    # $str .= 'FAIL'    if 1;   # sanity test
 
     # allow -eval, banner at beginning of anchored matches
     $str = "(-e .*?)?(B::Concise::compile.*?)?\n" . $str
         unless $tc->{?noanchors} or $tc->{?rxnoorder}
 
-    my $qr = ($tc->{?noanchors})	?? qr/$str/ms !! qr/^$str$/ms 
+    my $qr = ($tc->{?noanchors})        ?? qr/$str/ms !! qr/^$str$/ms 
 
-    $tc->{+rex}		= $qr
-    $tc->{+rexstr}	= $str
+    $tc->{+rex}         = $qr
+    $tc->{+rexstr}      = $str
     $tc
 
 
@@ -723,15 +723,15 @@ sub mkCheckRex($tc, $want)
 
 sub mylike
     # reworked mylike to use hash-obj
-    my $tc	= shift
-    my $got	= $tc->{?got}
-    my $want	= $tc->{?rex}
-    my $cmnt	= $tc->{?name}
-    my $cross	= $tc->{?cross}
+    my $tc      = shift
+    my $got     = $tc->{?got}
+    my $want    = $tc->{?rex}
+    my $cmnt    = $tc->{?name}
+    my $cross   = $tc->{?cross}
 
-    my $msgs	= $tc->{?msgs}
-    my $retry	= $tc->{?retry} # || $gopts{retry};
-    my $debug	= $tc->{?debug} #|| $gopts{retrydbg};
+    my $msgs    = $tc->{?msgs}
+    my $retry   = $tc->{?retry} # || $gopts{retry};
+    my $debug   = $tc->{?debug} #|| $gopts{retrydbg};
 
     # bad is anticipated failure
     my $bad = (0 or ( $cross && $tc->{?crossfail})
@@ -761,11 +761,11 @@ sub reduceDiffs
     # 2. single op diff, the rest of the chain is unaltered
     # in either case, std err report is inadequate;
 
-    my $tc	= shift
-    my $got	= $tc->{?got}
-    my @got	= split(m/\n/, $got)
-    my $want	= $tc->{?wantstr}
-    my @want	= split(m/\n/, $want)
+    my $tc      = shift
+    my $got     = $tc->{?got}
+    my @got     = split(m/\n/, $got)
+    my $want    = $tc->{?wantstr}
+    my @want    = split(m/\n/, $want)
 
     # split rexstr into units that should eat leading lines.
     my @rexs = map { qr/$_/ }, split (m/\n/, $tc->{?rexstr})
@@ -882,7 +882,7 @@ sub runSelftest
         #next unless $tc->{$provenance};
 
         $tc->mkCheckRex($provenance)
-        $tc->{+got} = $tc->{?wantstr}	# fake the rendering
+        $tc->{+got} = $tc->{?wantstr}   # fake the rendering
         $tc->mylike()
     
 
@@ -940,11 +940,11 @@ sub OptreeCheck::wrap
     my $comment = $1
 
     my $testcode = qq{
-	
+        
 checkOptree(note   => q\{$comment\},
-	    bcopts => q\{-exec\},
-	    code   => q\{$code\},
-	    expect => <<EOT_EOT, expect_nt => <<EONT_EONT);
+            bcopts => q\{-exec\},
+            code   => q\{$code\},
+            expect => <<EOT_EOT, expect_nt => <<EONT_EONT);
 ThreadedRef
     paste your 'golden-example' here, then retest
 EOT_EOT
@@ -1015,9 +1015,9 @@ if ($^PROGRAM_NAME =~ m/OptreeCheck\.pm/)
     Getopt::Std::getopts('') or
         die qq{ $^PROGRAM_NAME sample-files*    # no options
 
-	  expecting filenames as args.  Each should have paragraphs,
-	  these are converted to checkOptree() tests, and printed to
-	  stdout.  Redirect to file then edit for test. \n}
+          expecting filenames as args.  Each should have paragraphs,
+          these are converted to checkOptree() tests, and printed to
+          stdout.  Redirect to file then edit for test. \n}
 
     OptreeCheck::processExamples(< @ARGV)
 

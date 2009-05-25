@@ -50,11 +50,11 @@ my @map = @(
     path    => '/pub/mirror/',
     file    => 'index.txt'
     ),
-    \%(	uri	    => 'rsync://cpan.pair.com/CPAN/MIRRORING.FROM',
-    scheme	=> 'rsync',
-    host	=> 'cpan.pair.com',
-    path	=> '/CPAN/',
-    file	=> 'MIRRORING.FROM',
+    \%( uri         => 'rsync://cpan.pair.com/CPAN/MIRRORING.FROM',
+    scheme      => 'rsync',
+    host        => 'cpan.pair.com',
+    path        => '/CPAN/',
+    file        => 'MIRRORING.FROM',
     ),
     \%(   uri     => 'http://localhost/tmp/index.txt',
     scheme  => 'http',
@@ -209,14 +209,3 @@ sub _fetch_uri
                 "   File has expected name" )
 
             unlink $file
-        
-    
-
-
-
-
-
-
-
-
-

@@ -210,13 +210,10 @@ ok( ((nelems @keys)-1) == 29 && ((nelems @values)-1) == 29)
 
 my $i = 0 
 %h->iterate(
-    sub (@< @_)
-    my @($key, $value) = @_
-    if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value))
-        $key = uc($key)
-        $i++ if $key eq $value
-    
-
+    sub($key, $value)
+        if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value))
+            $key = uc($key)
+            $i++ if $key eq $value
     )
 
 ok( $i == 30) 
@@ -240,7 +237,7 @@ if ($null_keys_allowed)
     $result = ( %h->FETCH('') eq 'bar' )
 
 else
-{ $result = 1 }
+    $result = 1
 ok( $result) 
 
 # check cache overflow and numeric keys and contents
@@ -474,15 +471,13 @@ my $Dfile1 = "btree1"
 
 ok( %h = DB_File->new( $Dfile1, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ) )
 foreach (1 .. 10)
-{ %h->put( $_ => $_ * 100 ) }
+    %h->put( $_ => $_ * 100 )
 
 # check that there are 10 elements in the hash
 $i = 0 
 %h->iterate(
-    sub (@< @_)
-    my @($key, $value) = @_
-    $i++
-
+    sub($key, $value)
+        $i++
     )
 ok( $i == 10)
 

@@ -152,13 +152,10 @@ is( nelems(@values), 30 )
 
 $i = 0 
 %h->iterate(
-    sub (@< @_)
-    my @($key,$value) = @_
-    if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value))
-        $key = uc($key)
-        $i++ if $key eq $value
-    
-
+    sub($key,$value)
+        if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value))
+            $key = uc($key)
+            $i++ if $key eq $value
     )
 
 ok( $i == 30) 
@@ -177,7 +174,7 @@ if ($null_keys_allowed)
     $result = ( %h->FETCH('') eq 'bar' )
 
 else
-{ $result = 1 }
+   $result = 1
 ok( $result) 
 
 # check cache overflow and numeric keys and contents

@@ -3,11 +3,11 @@
 use Test::More;
 
 BEGIN {
-	if ($^OS_NAME =~ m/NetWare/i) {
-		plan tests => 39;
-	} else {
-		plan skip_all => 'This is not NW5';
-	}
+        if ($^OS_NAME =~ m/NetWare/i) {
+                plan tests => 39;
+        } else {
+                plan skip_all => 'This is not NW5';
+        }
 }
 
 use Config;

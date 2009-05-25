@@ -109,11 +109,11 @@ use Test::More 'no_plan'
 require_ok("B::Concise")
 
 my %matchers =
-    %( constant	=> qr{ (?-x: is a constant sub, optimized to a \w+)
-		      |(?-x: is XS code) }x,
-    XS	=> qr/ is XS code/,
-    perl	=> qr/ (next|db)state/,
-    noSTART	=> qr/coderef .* has no START/,
+    %( constant => qr{ (?-x: is a constant sub, optimized to a \w+)
+                      |(?-x: is XS code) }x,
+    XS  => qr/ is XS code/,
+    perl        => qr/ (next|db)state/,
+    noSTART     => qr/coderef .* has no START/,
     )
 
 my $testpkgs = \%(
@@ -121,48 +121,48 @@ my $testpkgs = \%(
 
     'Data::Dumper' => %( dflt => 'perl' ),
     B => %(
-    dflt => 'constant',		# all but 47/297
-    skip => @( 'regex_padav' ),	# threaded only
+    dflt => 'constant',         # all but 47/297
+    skip => @( 'regex_padav' ), # threaded only
     perl => qw(
-		    walksymtable walkoptree_slow walkoptree_exec
-		    timing_info savesym peekop parents objsym debug
-		    compile_stats clearsym class
-		    ),
+                    walksymtable walkoptree_slow walkoptree_exec
+                    timing_info savesym peekop parents objsym debug
+                    compile_stats clearsym class
+                    ),
     XS => qw(
-		  warnhook walkoptree_debug walkoptree 
-		  svref_2object sv_yes sv_undef sv_no save_BEGINs
-		  regex_padav ppname perlstring opnumber minus_c
-		  main_start main_root main_cv init_av hash
-		  end_av dowarn diehook defstash curstash
-		  cstring comppadlist check_av cchar cast_I32 bootstrap
-		  sub_generation address
+                  warnhook walkoptree_debug walkoptree 
+                  svref_2object sv_yes sv_undef sv_no save_BEGINs
+                  regex_padav ppname perlstring opnumber minus_c
+                  main_start main_root main_cv init_av hash
+                  end_av dowarn diehook defstash curstash
+                  cstring comppadlist check_av cchar cast_I32 bootstrap
+                  sub_generation address
                   fudge unitcheck_av),
     ),
 
-    'B::Deparse' => %( dflt => 'perl',	# 235 functions
+    'B::Deparse' => %( dflt => 'perl',  # 235 functions
 
     XS => qw( svref_2object perlstring opnumber main_start
-		   main_root main_cv ),
+                   main_root main_cv ),
 
     constant => qw/ ASSIGN
-		     LIST_CONTEXT OP_CONST OP_LIST OP_RV2SV
-		     OP_STRINGIFY OPf_KIDS OPf_MOD OPf_REF OPf_SPECIAL
-		     OPf_STACKED OPf_WANT OPf_WANT_LIST OPf_WANT_SCALAR
-		     OPf_WANT_VOID OPpCONST_BARE
-		     OPpENTERSUB_AMPER OPpEXISTS_SUB OPpITER_REVERSED
-		     OPpLVAL_INTRO OPpOUR_INTRO OPpSLICE OPpSORT_DESCEND
-		     OPpSORT_INTEGER OPpSORT_NUMERIC
-		     OPpSORT_REVERSE OPf_TARGET_MY 
-		     PMf_CONTINUE
-		     PMf_EXTENDED PMf_FOLD PMf_GLOBAL PMf_KEEP
-		     PMf_MULTILINE PMf_SINGLELINE
-		     POSTFIX SVf_FAKE SVf_IOK SVf_NOK SVf_POK SVf_ROK
-		     SVpad_OUR SVs_RMG SVs_SMG SWAP_CHILDREN
-		     RXf_SKIPWHITE/,
+                     LIST_CONTEXT OP_CONST OP_LIST OP_RV2SV
+                     OP_STRINGIFY OPf_KIDS OPf_MOD OPf_REF OPf_SPECIAL
+                     OPf_STACKED OPf_WANT OPf_WANT_LIST OPf_WANT_SCALAR
+                     OPf_WANT_VOID OPpCONST_BARE
+                     OPpENTERSUB_AMPER OPpEXISTS_SUB OPpITER_REVERSED
+                     OPpLVAL_INTRO OPpOUR_INTRO OPpSLICE OPpSORT_DESCEND
+                     OPpSORT_INTEGER OPpSORT_NUMERIC
+                     OPpSORT_REVERSE OPf_TARGET_MY 
+                     PMf_CONTINUE
+                     PMf_EXTENDED PMf_FOLD PMf_GLOBAL PMf_KEEP
+                     PMf_MULTILINE PMf_SINGLELINE
+                     POSTFIX SVf_FAKE SVf_IOK SVf_NOK SVf_POK SVf_ROK
+                     SVpad_OUR SVs_RMG SVs_SMG SWAP_CHILDREN
+                     RXf_SKIPWHITE/,
     ),
 
-    POSIX => %( dflt => 'constant',			# all but 252/589
-    skip => qw/ _POSIX_JOB_CONTROL /,	# platform varying
+    POSIX => %( dflt => 'constant',                     # all but 252/589
+    skip => qw/ _POSIX_JOB_CONTROL /,   # platform varying
     perl => qw/ import load_imports
                             usage redef unimpl assert tolower toupper closedir
                             opendir readdir rewinddir errno creat fcntl getgrgid
@@ -187,57 +187,57 @@ my $testpkgs = \%(
                             /,
 
     XS => qw/ write wctomb wcstombs uname tzset tzname
-		      ttyname tmpnam times tcsetpgrp tcsendbreak
-		      tcgetpgrp tcflush tcflow tcdrain tanh tan
-		      sysconf strxfrm strtoul strtol strtod
-		      strftime strcoll sinh sigsuspend sigprocmask
-		      sigpending sigaction setuid setsid setpgid
-		      setlocale setgid read pipe pause pathconf
-		      open nice modf mktime mkfifo mbtowc mbstowcs
-		      mblen lseek log10 localeconv ldexp lchown
-		      isxdigit isupper isspace ispunct isprint
-		      islower isgraph isdigit iscntrl isalpha
-		      isalnum int_macro_int getcwd frexp fpathconf
-		      fmod floor dup2 dup difftime cuserid ctime
-		      ctermid cosh constant close clock ceil
-		      bootstrap atan asin asctime acos access abort
-		      _exit
-		      /,
+                      ttyname tmpnam times tcsetpgrp tcsendbreak
+                      tcgetpgrp tcflush tcflow tcdrain tanh tan
+                      sysconf strxfrm strtoul strtol strtod
+                      strftime strcoll sinh sigsuspend sigprocmask
+                      sigpending sigaction setuid setsid setpgid
+                      setlocale setgid read pipe pause pathconf
+                      open nice modf mktime mkfifo mbtowc mbstowcs
+                      mblen lseek log10 localeconv ldexp lchown
+                      isxdigit isupper isspace ispunct isprint
+                      islower isgraph isdigit iscntrl isalpha
+                      isalnum int_macro_int getcwd frexp fpathconf
+                      fmod floor dup2 dup difftime cuserid ctime
+                      ctermid cosh constant close clock ceil
+                      bootstrap atan asin asctime acos access abort
+                      _exit
+                      /,
     ),
 
-    'IO::Socket' => %( dflt => 'constant',		# 157/190
+    'IO::Socket' => %( dflt => 'constant',              # 157/190
 
     perl => qw/ timeout socktype sockopt sockname
-			     socketpair socket sockdomain
-			     sockaddr_in shutdown setsockopt send
-			     register_domain recv protocol peername
-			     new listen import getsockopt croak
-			     connected connect configure confess close
-			     carp bind atmark accept blocking
+                             socketpair socket sockdomain
+                             sockaddr_in shutdown setsockopt send
+                             register_domain recv protocol peername
+                             new listen import getsockopt croak
+                             connected connect configure confess close
+                             carp bind atmark accept blocking
                              /,
 
     XS => qw/ unpack_sockaddr_un unpack_sockaddr_in
-			   sockatmark sockaddr_family pack_sockaddr_un
-			   pack_sockaddr_in inet_ntoa inet_aton
-			   /,
+                           sockatmark sockaddr_family pack_sockaddr_un
+                           pack_sockaddr_in inet_ntoa inet_aton
+                           /,
     ),
     )
 
 ############
 
-B::Concise::compile('-nobanner')	# set a silent default
+B::Concise::compile('-nobanner')        # set a silent default
 getopts('vaVcr:', \my %opts) or
     die <<EODIE
 
 usage: PERL_CORE=1 ./perl ext/B/t/concise-xs.t [-av] [module-list]
     tests ability to discern XS funcs using Digest::MD5 package
-    -v	: runs verbosely
-    -V	: more verbosity
-    -a	: runs all modules in CoreList
+    -v  : runs verbosely
+    -V  : more verbosity
+    -a  : runs all modules in CoreList
     -c  : writes test corrections as a Data::Dumper expression
-    -r <file>	: reads file of tests, as written by -c
-    <args>	: additional modules are loaded and tested
-    	(will report failures, since no XS funcs are known apriori)
+    -r <file>   : reads file of tests, as written by -c
+    <args>      : additional modules are loaded and tested
+        (will report failures, since no XS funcs are known apriori)
 
 EODIE
     ;
@@ -276,9 +276,9 @@ sub test_pkg($pkg, ?$fntypes)
     # build %stash: keys are func-names, vals filled in below
     my %stash = %+: map
         { %: $_ => 0 },
-        grep { exists &{Symbol::fetch_glob("$pkg\::$_")->*}	# grab CODE symbols
+        grep { exists &{Symbol::fetch_glob("$pkg\::$_")->*}     # grab CODE symbols
     },
-        grep { !m/__ANON__/ }, keys Symbol::fetch_glob($pkg.'::')->*->%		# from symbol table
+        grep { !m/__ANON__/ }, keys Symbol::fetch_glob($pkg.'::')->*->%         # from symbol table
     
 
     for my $type (keys %matchers)
@@ -368,3 +368,4 @@ END
 
 
 __END__
+;

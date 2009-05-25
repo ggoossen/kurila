@@ -26,9 +26,7 @@ sub attr
     elsif((nelems @_) +> 2)  # Writing: $token->attr('attrname', 'newval')
         (@_[0]->[2] ||= \%())->{+@_[1] } = @_[2]
     else
-        require Carp
-        Carp::croak(
-      'usage: $object->attr("val") or $object->attr("key", "newval")')
+        die('usage: $object->attr("val") or $object->attr("key", "newval")')
         return undef
     
 

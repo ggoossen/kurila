@@ -53,9 +53,9 @@ foreach my $file (@(
         ok 1
         next
     elsif( do
-        for ($strings) { s/[ ]//g; };
-        $strings[0] eq $strings[1]
-    )
+            for ($strings) { s/[ ]//g; };
+            $strings[0] eq $strings[1]
+        )
         print $^STDOUT, "# Differ only in whitespace.\n"
         ok 1
         next

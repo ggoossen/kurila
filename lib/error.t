@@ -23,9 +23,9 @@ do
     sub new_error { return error::create("my message"); } $line1 = __LINE__;
     sub new_error2 { return new_error(); } $line2 = __LINE__
     my $err = new_error2(); $line3 = __LINE__
-    is( (nelems $err->{?stack}), 2)
-    is((join '**', $err->{?stack}[0]), "../lib/error.t**$line2**29**main::new_error**")
-    is((join '**', $err->{?stack}[1]), "../lib/error.t**$line3**15**main::new_error2**")
+    is( (nelems $err->{stack}), 2)
+    is((join '**', $err->{stack}[0]), "../lib/error.t**$line2**29**main::new_error**")
+    is((join '**', $err->{stack}[1]), "../lib/error.t**$line3**15**main::new_error2**")
     is $err->description, "my message"
     is $err->stacktrace, <<MSG
 
@@ -128,8 +128,7 @@ MSG
 do
     fresh_perl_is("\$x = 1;\n\$y = 1;\n", <<'MSG' )
 Global symbol "$x" requires explicit package name at - line 1, near "$x "
-Global symbol "$y" requires explicit package name at - line 2, near ";
-$y "
+Global symbol "$y" requires explicit package name at - line 2, near "$y "
 Execution of - aborted due to compilation errors.
 MSG
 

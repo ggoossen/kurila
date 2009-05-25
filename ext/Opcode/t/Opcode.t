@@ -25,7 +25,7 @@ is((nelems @empty_l), 0)
 
 my @full_l1  = opset_to_ops(full_opset)
 is((nelems @full_l1), $: opcodes())
-my @full_l2 = @full_l1	# = opcodes();	# XXX to be fixed
+my @full_l2 = @full_l1  # = opcodes();  # XXX to be fixed
 is("$(join ' ',@full_l1)", "$(join ' ',@full_l2)")
 
 @empty_l = opset_to_ops(opset(':none'))
@@ -63,7 +63,7 @@ ok( verify_opset($s1) && !verify_opset(42) )
 
 # --- opmask_add
 
-opmask_add(opset( <qw(fileno)))	# add to global op_mask
+opmask_add(opset( <qw(fileno))) # add to global op_mask
 ok( ! eval 'fileno STDOUT' ) # fail
 ok( $^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/'fileno' trapped/ )
 

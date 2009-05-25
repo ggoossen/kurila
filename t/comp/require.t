@@ -158,7 +158,7 @@ do
     
     require urkkk
     require krunch
-      try {CORE::require whap; 1} and die
+    try {CORE::require whap; 1} and die
 
     if ($^EVAL_ERROR->message =~ m/^This is an expected error/)
         print $^STDOUT, "ok $pmc_dies\n"

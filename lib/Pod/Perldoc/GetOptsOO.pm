@@ -20,8 +20,8 @@ package Pod::Perldoc::GetOptsOO
 
 BEGIN  # Make a DEBUG constant ASAP
     *DEBUG = defined( &Pod::Perldoc::DEBUG )
-    ?? \&Pod::Perldoc::DEBUG
-    !! sub(){10}
+        ?? \&Pod::Perldoc::DEBUG
+        !! sub(){10}
 
 
 
@@ -45,7 +45,7 @@ sub getopts
 
     while( (nelems $args->@)  and  ($_ = $args->[0]) =~ m/^-(.)(.*)/s )
         my@($first,$rest) = @($1,$2)
-        if ($_ eq '--')	# early exit if "--"
+        if ($_ eq '--') # early exit if "--"
             shift $args->@
             last
         

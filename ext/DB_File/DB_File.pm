@@ -20,12 +20,12 @@ require Tie::Hash
 sub new
     my $pkg = shift 
     return bless \%( VALID => \%(
-        bsize	  => 1,
-        ffactor	  => 1,
-        nelem	  => 1,
+        bsize     => 1,
+        ffactor   => 1,
+        nelem     => 1,
         cachesize => 1,
-        hash	  => 2,
-        lorder	  => 1,
+        hash      => 2,
+        lorder    => 1,
         ),
         GOT   => \%()
         ), $pkg 
@@ -66,14 +66,14 @@ sub TIEHASH
     my $pkg = shift 
 
     bless \%( VALID => \%(
-        flags	   => 1,
+        flags      => 1,
         cachesize  => 1,
         maxkeypage => 1,
         minkeypage => 1,
-        psize	   => 1,
-        compare	   => 2,
-        prefix	   => 2,
-        lorder	   => 1,
+        psize      => 1,
+        compare    => 2,
+        prefix     => 2,
+        lorder     => 1,
         ),
         GOT   => \%(),
         ), $pkg 
@@ -109,34 +109,34 @@ push @ISA, < qw(Tie::Hash Exporter)
 @EXPORT = qw(
         $DB_BTREE $DB_HASH $DB_RECNO 
 
-	BTREEMAGIC
-	BTREEVERSION
-	DB_LOCK
-	DB_SHMEM
-	DB_TXN
-	HASHMAGIC
-	HASHVERSION
-	MAX_PAGE_NUMBER
-	MAX_PAGE_OFFSET
-	MAX_REC_NUMBER
-	RET_ERROR
-	RET_SPECIAL
-	RET_SUCCESS
-	R_CURSOR
-	R_DUP
-	R_FIRST
-	R_FIXEDLEN
-	R_IAFTER
-	R_IBEFORE
-	R_LAST
-	R_NEXT
-	R_NOKEY
-	R_NOOVERWRITE
-	R_PREV
-	R_RECNOSYNC
-	R_SETCURSOR
-	R_SNAPSHOT
-	__R_UNUSED
+        BTREEMAGIC
+        BTREEVERSION
+        DB_LOCK
+        DB_SHMEM
+        DB_TXN
+        HASHMAGIC
+        HASHVERSION
+        MAX_PAGE_NUMBER
+        MAX_PAGE_OFFSET
+        MAX_REC_NUMBER
+        RET_ERROR
+        RET_SPECIAL
+        RET_SUCCESS
+        R_CURSOR
+        R_DUP
+        R_FIRST
+        R_FIXEDLEN
+        R_IAFTER
+        R_IBEFORE
+        R_LAST
+        R_NEXT
+        R_NOKEY
+        R_NOOVERWRITE
+        R_PREV
+        R_RECNOSYNC
+        R_SETCURSOR
+        R_SNAPSHOT
+        __R_UNUSED
 )
 
 try {
@@ -148,9 +148,9 @@ try {
 }
 
 if ($use_XSLoader)
-{ XSLoader::load("DB_File", $VERSION)}
+    XSLoader::load("DB_File", $VERSION)
 else
-{ DB_File->bootstrap( $VERSION) }
+    DB_File->bootstrap( $VERSION)
 
 # Preloaded methods go here.  Autoload methods go after __END__, and are
 # processed by the autosplit program.
@@ -250,10 +250,10 @@ sub get_dup
 
     my $db        = shift 
     my $key       = shift 
-    my $flag	  = shift 
-    my $value 	  = 0 
+    my $flag      = shift 
+    my $value     = 0 
     my $origkey   = $key 
-    my %values	  = %( () ) 
+    my %values    = %( () ) 
     my @values    = @( () ) 
     my $counter   = 0 
 
@@ -264,9 +264,9 @@ sub get_dup
 
         # save the value or count number of matches
         if ($flag)
-        { ++ %values{+$value} }
+            ++ %values{+$value}
         else
-        { push (@values, $value) }
+            push (@values, $value)
 
         $status = $db->seq($key, $value, R_NEXT())
     
@@ -434,7 +434,7 @@ C<ffactor>, C<hash>, C<lorder> and C<nelem>.
 
 To change one of these elements, just assign to it like this:
 
-	$DB_HASH->{'cachesize'} = 10000 ;
+        $DB_HASH->{'cachesize'} = 10000 ;
 
 The three predefined variables $DB_HASH, $DB_BTREE and $DB_RECNO are
 usually adequate for most applications.  If you do need to create extra
@@ -490,12 +490,12 @@ to Perl subs. Below are templates for each of the subs:
         my ($data) = @_ ;
         ...
         # return the hash value for $data
-	return $hash ;
+        return $hash ;
     }
 
     sub compare
     {
-	my ($key, $key2) = @_ ;
+        my ($key, $key2) = @_ ;
         ...
         # return  0 if $key1 eq $key2
         #        -1 if $key1 lt $key2
@@ -505,7 +505,7 @@ to Perl subs. Below are templates for each of the subs:
 
     sub prefix
     {
-	my ($key, $key2) = @_ ;
+        my ($key, $key2) = @_ ;
         ...
         # return number of bytes of $key2 which are 
         # necessary to determine that it is greater than $key1
@@ -719,7 +719,7 @@ code:
     $DB_BTREE->{'flags'} = R_DUP ;
 
     tie %h, "DB_File", $filename, O_RDWR|O_CREAT, 0666, $DB_BTREE 
-	or die "Cannot open $filename: $!\n";
+        or die "Cannot open $filename: $!\n";
 
     # Add some key/value pairs to the file
     $h{'Wall'} = 'Larry' ;
@@ -773,7 +773,7 @@ Here is the script above rewritten using the C<seq> API method.
     $DB_BTREE->{'flags'} = R_DUP ;
 
     $x = tie %h, "DB_File", $filename, O_RDWR|O_CREAT, 0666, $DB_BTREE 
-	or die "Cannot open $filename: $!\n";
+        or die "Cannot open $filename: $!\n";
 
     # Add some key/value pairs to the file
     $h{'Wall'} = 'Larry' ;
@@ -843,7 +843,7 @@ this:
     $DB_BTREE->{'flags'} = R_DUP ;
 
     $x = tie %h, "DB_File", $filename, O_RDWR|O_CREAT, 0666, $DB_BTREE 
-	or die "Cannot open $filename: $!\n";
+        or die "Cannot open $filename: $!\n";
 
     my $cnt  = $x->get_dup("Wall") ;
     print "Wall occurred $cnt times\n" ;
@@ -853,13 +853,13 @@ this:
     print "There are $hash{'Brick'} Brick Walls\n" ;
 
     my @list = sort $x->get_dup("Wall") ;
-    print "Wall =>	[@list]\n" ;
+    print "Wall =>      [@list]\n" ;
 
     @list = $x->get_dup("Smith") ;
-    print "Smith =>	[@list]\n" ;
+    print "Smith =>     [@list]\n" ;
 
     @list = $x->get_dup("Dog") ;
-    print "Dog =>	[@list]\n" ;
+    print "Dog =>       [@list]\n" ;
 
 
 and it will print:
@@ -867,9 +867,9 @@ and it will print:
     Wall occurred 3 times
     Larry is there
     There are 2 Brick Walls
-    Wall =>	[Brick Brick Larry]
-    Smith =>	[John]
-    Dog =>	[]
+    Wall =>     [Brick Brick Larry]
+    Smith =>    [John]
+    Dog =>      []
 
 =head2 The find_dup() Method
 
@@ -892,7 +892,7 @@ Assuming the database from the previous example:
     $DB_BTREE->{'flags'} = R_DUP ;
 
     $x = tie %h, "DB_File", $filename, O_RDWR|O_CREAT, 0666, $DB_BTREE 
-	or die "Cannot open $filename: $!\n";
+        or die "Cannot open $filename: $!\n";
 
     $found = ( $x->find_dup("Wall", "Larry") == 0 ? "" : "not") ; 
     print "Larry Wall is $found there\n" ;
@@ -930,7 +930,7 @@ Again assuming the existence of the C<tree> database
     $DB_BTREE->{'flags'} = R_DUP ;
 
     $x = tie %h, "DB_File", $filename, O_RDWR|O_CREAT, 0666, $DB_BTREE 
-	or die "Cannot open $filename: $!\n";
+        or die "Cannot open $filename: $!\n";
 
     $x->del_dup("Wall", "Larry") ;
 
@@ -994,10 +994,10 @@ and print the first matching key/value pair given a partial key.
     $key = $value = 0 ;
     print "IN ORDER\n" ;
     for ($st = $x->seq($key, $value, R_FIRST) ;
-	 $st == 0 ;
+         $st == 0 ;
          $st = $x->seq($key, $value, R_NEXT) )
 
-      {  print "$key	-> $value\n" }
+      {  print "$key    -> $value\n" }
 
     print "\nPARTIAL MATCH\n" ;
 
@@ -1296,12 +1296,12 @@ Berkeley DB documentation.
 
 To do this you need to store a copy of the object returned from the tie.
 
-	$db = tie %hash, "DB_File", "filename" ;
+        $db = tie %hash, "DB_File", "filename" ;
 
 Once you have done that, you can access the Berkeley DB API functions
 as B<DB_File> methods directly like this:
 
-	$db->put($key, $value, R_NOOVERWRITE) ;
+        $db->put($key, $value, R_NOOVERWRITE) ;
 
 B<Important:> If you have saved a copy of the object returned from
 C<tie>, the underlying database file will I<not> be closed until both

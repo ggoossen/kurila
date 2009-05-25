@@ -21,37 +21,37 @@ sub import($class, @< @options)
     
     my $backend = shift (@options)
     eval q[
-	BEGIN {
-	    minus_c;
-	    save_BEGINs;
-	}
+        BEGIN {
+            minus_c;
+            save_BEGINs;
+        }
 
-	CHECK {
-	    if ($quiet) {
-		close $^STDOUT;
-		open ($^STDOUT, ">&", \*$saveout);
-		close $saveout;
-	    }
+        CHECK {
+            if ($quiet) {
+                close $^STDOUT;
+                open ($^STDOUT, ">&", \*$saveout);
+                close $saveout;
+            }
 
-	    # Note: if you change the code after this 'use', please
-	    # change the fudge factors in B::Concise (grep for
-	    # "fragile kludge") so that its output still looks
-	    # nice. Thanks. --smcc
-	    use B::].$backend.q[ ();
-	    if ($^EVAL_ERROR) {
-		croak "use of backend $backend failed: $($^EVAL_ERROR->message)";
-	    }
+            # Note: if you change the code after this 'use', please
+            # change the fudge factors in B::Concise (grep for
+            # "fragile kludge") so that its output still looks
+            # nice. Thanks. --smcc
+            use B::].$backend.q[ ();
+            if ($^EVAL_ERROR) {
+                croak "use of backend $backend failed: $($^EVAL_ERROR->message)";
+            }
 
-	    my $compilesub = &{*{Symbol::fetch_glob("B::$($backend)::compile")}}( < @options);
-	    if (ref($compilesub) ne "CODE") {
-		die $compilesub;
-	    }
+            my $compilesub = &{*{Symbol::fetch_glob("B::$($backend)::compile")}}( < @options);
+            if (ref($compilesub) ne "CODE") {
+                die $compilesub;
+            }
 
-	    local $^OUTPUT_FIELD_SEPARATOR = '';
-	    &$compilesub();
+            local $^OUTPUT_FIELD_SEPARATOR = '';
+            &$compilesub();
 
-	    close $^STDERR if $veryquiet;
-	}
+            close $^STDERR if $veryquiet;
+        }
     ]
     die $^EVAL_ERROR if $^EVAL_ERROR
 
@@ -66,7 +66,7 @@ O - Generic interface to Perl Compiler backends
 
 =head1 SYNOPSIS
 
-	perl -MO=[-q,]Backend[,OPTIONS] foo.pl
+        perl -MO=[-q,]Backend[,OPTIONS] foo.pl
 
 =head1 DESCRIPTION
 

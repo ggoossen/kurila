@@ -1583,12 +1583,11 @@ sub prefixify($self, $var, $sprefix, $rprefix, $default)
         print $^STDERR, "  no Config found for $var.\n" if $Verbose +>= 2
         $path = $self->_prefixify_default($rprefix, $default)
     
-        elsif( !$self->{ARGS}->{?PREFIX} || !$self->file_name_is_absolute($path) ) {
-    # do nothing if there's no prefix or if its relative
-    }elsif( $sprefix eq $rprefix )
+    elsif( !$self->{ARGS}->{?PREFIX} || !$self->file_name_is_absolute($path) )
+        { } # do nothing if there's no prefix or if its relative
+    elsif( $sprefix eq $rprefix )
         print $^STDERR, "  no new prefix.\n" if $Verbose +>= 2
     else
-
         print $^STDERR, "  prefixify $var => $path\n"     if $Verbose +>= 2
         print $^STDERR, "    from $sprefix to $rprefix\n" if $Verbose +>= 2
 

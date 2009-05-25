@@ -3,11 +3,11 @@
 use Test::More;
 
 BEGIN {
-	if ($^OS_NAME =~ m/beos/i) {
-		plan tests => 4;
-	} else {
-		plan skip_all => 'This is not BeOS';
-	}
+        if ($^OS_NAME =~ m/beos/i) {
+                plan tests => 4;
+        } else {
+                plan skip_all => 'This is not BeOS';
+        }
 }
 
 use Config;

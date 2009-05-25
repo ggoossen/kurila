@@ -22,19 +22,19 @@ sub import
 
 use Class::Struct < qw(struct);
 struct 'Net::netent' => \@(
-       name		=> '$',
-       aliases	=> '@',
-       addrtype	=> '$',
-       net		=> '$',
+       name             => '$',
+       aliases  => '@',
+       addrtype => '$',
+       net              => '$',
        )
 
 sub populate
     return unless (nelems @_)
     my $nob = new()
-    $n_name 	 =    $nob->[0]     	     = @_[0]
-    @n_aliases	 = @(  $nob->[1]->@ = split ' ', @_[1] )
-    $n_addrtype  =    $nob->[2] 	     = @_[2]
-    $n_net	 =    $nob->[3] 	     = @_[3]
+    $n_name      =    $nob->[0]              = @_[0]
+    @n_aliases   = @(  $nob->[1]->@ = split ' ', @_[1] )
+    $n_addrtype  =    $nob->[2]              = @_[2]
+    $n_net       =    $nob->[3]              = @_[3]
     return $nob
 
 
@@ -65,12 +65,12 @@ Net::netent - by-name interface to Perl's built-in getnet*() functions
 =head1 SYNOPSIS
 
  use Net::netent qw(:FIELDS);
- getnetbyname("loopback") 		or die "bad net";
+ getnetbyname("loopback")               or die "bad net";
  printf "%s is %08X\n", $n_name, $n_net;
 
  use Net::netent;
 
- $n = getnetbyname("loopback") 		or die "bad net";
+ $n = getnetbyname("loopback")          or die "bad net";
  { # there's gotta be a better way, eh?
      @bytes = unpack("C4", pack("N", $n->net));
      shift @bytes while @bytes && $bytes[0] == 0;
@@ -129,33 +129,33 @@ This seems a bug, but here's how to deal with it:
  for $net ( @ARGV ) {
 
      unless ($n = getnetbyname($net)) {
- 	warn "$0: no such net: $net\n";
- 	next;
+        warn "$0: no such net: $net\n";
+        next;
      }
 
      printf "\n%s is %s%s\n", 
- 	    $net, 
- 	    lc($n->name) eq lc($net) ? "" : "*really* ",
- 	    $n->name;
+            $net, 
+            lc($n->name) eq lc($net) ? "" : "*really* ",
+            $n->name;
 
      print "\taliases are ", join(", ", @{$n->aliases}), "\n"
- 		if @{$n->aliases};     
+                if @{$n->aliases};     
 
      # this is stupid; first, why is this not in binary?
      # second, why am i going through these convolutions
      # to make it looks right
      {
- 	my @a = unpack("C4", pack("N", $n->net));
- 	shift @a while @a && $a[0] == 0;
- 	printf "\taddr is %s [%d.%d.%d.%d]\n", $n->net, @a;
+        my @a = unpack("C4", pack("N", $n->net));
+        shift @a while @a && $a[0] == 0;
+        printf "\taddr is %s [%d.%d.%d.%d]\n", $n->net, @a;
      }
 
      if ($n = getnetbyaddr($n->net)) {
- 	if (lc($n->name) ne lc($net)) {
- 	    printf "\tThat addr reverses to net %s!\n", $n->name;
- 	    $net = $n->name;
- 	    redo;
- 	} 
+        if (lc($n->name) ne lc($net)) {
+            printf "\tThat addr reverses to net %s!\n", $n->name;
+            $net = $n->name;
+            redo;
+        } 
      }
  }
 

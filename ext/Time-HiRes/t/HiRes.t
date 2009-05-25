@@ -12,12 +12,12 @@ use Time::HiRes v1.9704 < qw(tv_interval);
 ok 1;
 
 
-my $have_gettimeofday	 = &Time::HiRes::d_gettimeofday( < @_ );
-my $have_usleep		 = &Time::HiRes::d_usleep( < @_ );
-my $have_nanosleep	 = &Time::HiRes::d_nanosleep( < @_ );
-my $have_ualarm		 = &Time::HiRes::d_ualarm( < @_ );
-my $have_clock_gettime	 = &Time::HiRes::d_clock_gettime( < @_ );
-my $have_clock_getres	 = &Time::HiRes::d_clock_getres( < @_ );
+my $have_gettimeofday    = &Time::HiRes::d_gettimeofday( < @_ );
+my $have_usleep          = &Time::HiRes::d_usleep( < @_ );
+my $have_nanosleep       = &Time::HiRes::d_nanosleep( < @_ );
+my $have_ualarm          = &Time::HiRes::d_ualarm( < @_ );
+my $have_clock_gettime   = &Time::HiRes::d_clock_gettime( < @_ );
+my $have_clock_getres    = &Time::HiRes::d_clock_getres( < @_ );
 my $have_clock_nanosleep = &Time::HiRes::d_clock_nanosleep( < @_ );
 my $have_clock           = &Time::HiRes::d_clock( < @_ );
 my $have_hires_stat      = &Time::HiRes::d_hires_stat( < @_ );
@@ -40,14 +40,14 @@ info sprintf "have_clock_nanosleep = \%d\n", $have_clock_nanosleep;
 info sprintf "have_clock           = \%d\n", $have_clock;
 info sprintf "have_hires_stat      = \%d\n", $have_hires_stat;
 
-Time::HiRes->import('gettimeofday')	if $have_gettimeofday;
-Time::HiRes->import('usleep')		if $have_usleep;
-Time::HiRes->import('nanosleep')	if $have_nanosleep;
-Time::HiRes->import('ualarm')		if $have_ualarm;
-Time::HiRes->import('clock_gettime')	if $have_clock_gettime;
-Time::HiRes->import('clock_getres')	if $have_clock_getres;
-Time::HiRes->import('clock_nanosleep')	if $have_clock_nanosleep;
-Time::HiRes->import('clock')		if $have_clock;
+Time::HiRes->import('gettimeofday')     if $have_gettimeofday;
+Time::HiRes->import('usleep')           if $have_usleep;
+Time::HiRes->import('nanosleep')        if $have_nanosleep;
+Time::HiRes->import('ualarm')           if $have_ualarm;
+Time::HiRes->import('clock_gettime')    if $have_clock_gettime;
+Time::HiRes->import('clock_getres')     if $have_clock_getres;
+Time::HiRes->import('clock_nanosleep')  if $have_clock_nanosleep;
+Time::HiRes->import('clock')            if $have_clock;
 
 use Config;
 
@@ -102,8 +102,7 @@ if (open(my $fh, "<", "xdefine")) {
 # --A.D., Nov 27, 2001
 my $limit = 0.25; # 25% is acceptable slosh for testing timers
 
-SKIP:
-do {
+SKIP: do {
     skip 4, "no gettimeofday" unless $have_gettimeofday;
 
     my @one = gettimeofday();
@@ -307,8 +306,7 @@ unless (   defined &Time::HiRes::gettimeofday
     ok ! $not;
 }
 
-SKIP:
-do{
+SKIP: do{
     if ( not(   defined &Time::HiRes::setitimer
         && defined &Time::HiRes::getitimer
         && has_symbol('ITIMER_VIRTUAL')
@@ -346,8 +344,7 @@ do{
     signals::handler("VTALRM") = 'DEFAULT';
 };
 
-SKIP:
-do {
+SKIP: do {
     if (not $have_gettimeofday &&
         $have_usleep) {
         skip 2, "no gettimeofday";
@@ -392,8 +389,7 @@ do {
 
 };
 
-SKIP:
-do {
+SKIP: do {
     unless ($have_nanosleep) {
         skip 2, "no nanosleep";
     }
@@ -454,18 +450,18 @@ if ($have_ualarm) {
     use Time::HiRes < qw(time);
     my $DelayN = 1024;
     my $i;
-  N: do {
-        {
-            my $t0 = time();
-            my $i = 0;
+  N: do
+        loop
+            my $t0 = time()
+            my $i = 0
             while ($i +< $DelayN) { $i++ }
-            my $t1 = time();
-            my $dt = $t1 - $t0;
-            info "N = $DelayN, t1 = $t1, t0 = $t0, dt = $dt";
-            last N if $dt +> $T;
-            $DelayN *= 2;
-        } while (1);
-    };
+            my $t1 = time()
+            my $dt = $t1 - $t0
+            info "N = $DelayN, t1 = $t1, t0 = $t0, dt = $dt"
+            last N if $dt +> $T
+            $DelayN *= 2
+        while (1)
+    ;
 
     # The time-burner which takes at least T (default 1) seconds.
     my $Delay = sub {

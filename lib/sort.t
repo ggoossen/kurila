@@ -6,29 +6,29 @@
 my ($BigWidth, $BigEnough, $RootWidth, $ItemFormat, @TestSizes, $WellSoaked)
 
 BEGIN 
-    $BigWidth  = 6				# Digits in $BigEnough-1
-    $BigEnough = 10**$BigWidth			# Largest array we'll attempt
-    $RootWidth = int(($BigWidth+1)/2)		# Digits in sqrt($BigEnough-1)
-    $ItemFormat = "\%0$($RootWidth)d\%0$($BigWidth)d"	# Array item format
-    @TestSizes = @(0, 1, 2)			# Small special cases
+    $BigWidth  = 6                              # Digits in $BigEnough-1
+    $BigEnough = 10**$BigWidth                  # Largest array we'll attempt
+    $RootWidth = int(($BigWidth+1)/2)           # Digits in sqrt($BigEnough-1)
+    $ItemFormat = "\%0$($RootWidth)d\%0$($BigWidth)d"   # Array item format
+    @TestSizes = @(0, 1, 2)                     # Small special cases
     # Testing all the way up to $BigEnough takes too long
     # for casual testing.  There are some cutoffs (~256)
     # in pp_sort that should be tested, but 10_000 is ample.
-    $WellSoaked = 10_000			# <= $BigEnough
+    $WellSoaked = 10_000                        # <= $BigEnough
     my $ts = 3
     while ($ts +< $WellSoaked)
-        push(@TestSizes, int($ts))		# about 3 per decade
+        push(@TestSizes, int($ts))              # about 3 per decade
         $ts *= 10**(1/3)
     
 
 
 use warnings;
 
-use Test::More tests => (nelems @TestSizes) * 2	# sort() tests
-    * 6		# number of pragmas to test
-    + 1 		# extra test for qsort instability
-    + 3		# tests for sort::current
-    + 3;		# tests for "defaults" and "no sort"
+use Test::More tests => (nelems @TestSizes) * 2 # sort() tests
+    * 6         # number of pragmas to test
+    + 1                 # extra test for qsort instability
+    + 3         # tests for sort::current
+    + 3;                # tests for "defaults" and "no sort"
 
 # Generate array of specified size for testing sort.
 #
@@ -38,13 +38,13 @@ use Test::More tests => (nelems @TestSizes) * 2	# sort() tests
 # and reconstruct the original array order.
 
 sub genarray
-    my $size = int(shift)		# fractions not welcome
+    my $size = int(shift)               # fractions not welcome
     my ($items)
     my @a
 
-    if    ($size +< 0) { $size = 0; }	# avoid complexity with sqrt
+    if    ($size +< 0) { $size = 0; }   # avoid complexity with sqrt
         elsif ($size +> $BigEnough) { $size = $BigEnough; }
-    $items = int(sqrt($size))		# number of distinct items
+    $items = int(sqrt($size))           # number of distinct items
     for my $i (0 .. $size -1)
         @a[+$i] = sprintf($ItemFormat, int($items * rand()), $i)
     
@@ -56,7 +56,7 @@ sub genarray
 
 sub checkorder
     my $aref = shift
-    my $status = ''			# so far, so good
+    my $status = ''                     # so far, so good
     my ($disorder)
 
     for my $i (0 .. nelems($aref->@)-2)
@@ -132,21 +132,21 @@ main(sub (@< @_) {sort {&{@_[0]}( < @_ )}, @_[1]->@ }, 0)
 
 do
     use sort < qw(_qsort)
-    my $sort_current BEGIN { $sort_current = sort::current(); }
+    my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort', 'sort::current for _qsort')
     main(sub (@< @_) {sort {&{@_[0]}( < @_ )}, @_[1]->@ }, 1)
 
 
 do
     use sort < qw(_mergesort)
-    my $sort_current BEGIN { $sort_current = sort::current(); }
+    my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'mergesort', 'sort::current for _mergesort')
     main(sub (@< @_) {sort {&{@_[0]}( < @_ )}, @_[1]->@ }, 0)
 
 
 do
     use sort < qw(_qsort stable)
-    my $sort_current BEGIN { $sort_current = sort::current(); }
+    my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort stable', 'sort::current for _qsort stable')
     main(sub (@< @_) {sort {&{@_[0]}( < @_ )}, @_[1]->@ }, 0)
 
@@ -156,21 +156,21 @@ do
 do
     use sort < qw(_qsort stable)
     no sort < qw(_qsort)
-    my $sort_current BEGIN { $sort_current = sort::current(); }
+    my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after no _qsort')
     main(sub (@< @_) {sort {&{@_[0]}( < @_ )}, @_[1]->@ }, 0)
 
 
 do
     use sort < qw(defaults _qsort)
-    my $sort_current BEGIN { $sort_current = sort::current(); }
+    my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort', 'sort::current after defaults _qsort')
 # Not expected to be stable, so don't test for stability here
 
 
 do
     use sort < qw(defaults stable)
-    my $sort_current BEGIN { $sort_current = sort::current(); }
+    my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after defaults stable')
     main(sub (@< @_) {sort {&{@_[0]}( < @_ )}, @_[1]->@ }, 0)
 

@@ -12,7 +12,7 @@ BEGIN
 
 
 # import checkOptree(), and %gOpts (containing test state)
-use OptreeCheck	# ALSO DOES @ARGV HANDLING !!!!!!
+use OptreeCheck # ALSO DOES @ARGV HANDLING !!!!!!
 use Config
 
 plan tests => 4
@@ -35,7 +35,7 @@ SKIP: do
 
     checkOptree ( name => 'cmdline invoke -basic works',
                   prog => 'my $f',
-                  #bcopts	=> '-basic', # default
+                  #bcopts       => '-basic', # default
                   expect_nt => <<'EOT')
 # -  <!> root[1 ref] K ->(end)
 # 4     <@> leave vKP ->(end)

@@ -255,7 +255,7 @@ my $graph_dissassembly =
     \n[ \t]*(\w+)[ \t]+([0-9.]+(?:/s)?)[ \t]+(-+)[ \t]+(-?\d+%)[ \t]*
     \n[ \t]*(\w+)[ \t]+([0-9.]+(?:/s)?)[ \t]+(-?\d+%)[ \t]+(-+)[ \t]*$!xm
 
-sub check_graph_consistency(	$ratetext, $slowc, $fastc,
+sub check_graph_consistency(    $ratetext, $slowc, $fastc,
     $slowr, $slowratet, $slowslow, $slowfastt,
     $fastr, $fastratet, $fastslowt, $fastfast)
     my $all_passed = 1
@@ -318,7 +318,7 @@ sub check_graph_consistency(	$ratetext, $slowc, $fastc,
 
 
 sub check_graph_vs_output($chart, $got)
-    my @(	$ratetext, $slowc, $fastc,
+    my @(       $ratetext, $slowc, $fastc,
           $slowr, $slowratet, $slowslow, $slowfastt,
           $fastr, $fastratet, $fastslowt, $fastfast)
         = @: $got =~ $graph_dissassembly

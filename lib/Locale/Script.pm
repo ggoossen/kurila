@@ -94,12 +94,7 @@ sub script2code
 # script_code2code ( CODE, IN-CODESET, OUT-CODESET )
 #
 #=======================================================================
-sub script_code2code
-    ((nelems @_) == 3) or croak "script_code2code() takes 3 arguments!"
-
-    my $code = shift
-    my $inset = shift
-    my $outset = shift
+sub script_code2code($code, $inset, $outset)
     my $outcode
     my $script
 

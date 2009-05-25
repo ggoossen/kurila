@@ -94,15 +94,9 @@ sub country2code
 # country_code2code ( NAME [, CODESET ] )
 #
 #=======================================================================
-sub country_code2code
-    ((nelems @_) == 3) or croak "country_code2code() takes 3 arguments!"
-
-    my $code = shift
-    my $inset = shift
-    my $outset = shift
+sub country_code2code($code, $inset, $outset)
     my $outcode
     my $country
-
 
     return undef if $inset == $outset
     $country = code2country($code, $inset)

@@ -6,9 +6,9 @@ require Exporter
 
 use Symbol < qw(gensym qualify);
 
-$VERSION	= 1.02
-@ISA		= qw(Exporter)
-@EXPORT		= qw(open3)
+$VERSION        = 1.02
+@ISA            = qw(Exporter)
+@EXPORT         = qw(open3)
 
 =head1 NAME
 
@@ -17,11 +17,11 @@ IPC::Open3, open3 - open a process for reading, writing, and error handling
 =head1 SYNOPSIS
 
     $pid = open3(\*CHLD_IN, \*CHLD_OUT, \*CHLD_ERR,
-		    'some cmd and args', 'optarg', ...);
+                    'some cmd and args', 'optarg', ...);
 
     my($wtr, $rdr, $err);
     $pid = open3($wtr, $rdr, $err,
-		    'some cmd and args', 'optarg', ...);
+                    'some cmd and args', 'optarg', ...);
 
 =head1 DESCRIPTION
 
@@ -139,7 +139,7 @@ The order of arguments differs from that of open2().
 #   rdr or wtr are null
 #   a system call fails
 
-our $Me = 'open3 (bug)'	# you should never see this, it's always localized
+our $Me = 'open3 (bug)' # you should never see this, it's always localized
 
 # Fatal.pm needs to be fixed WRT prototypes.
 
@@ -230,7 +230,7 @@ sub _open3
     xpipe $dad_err, $kid_err if !$dup_err && ($dad_err \!= $dad_rdr)
 
     $kidpid = $do_spawn ?? -1 !! xfork
-    if ($kidpid == 0)		# Kid
+    if ($kidpid == 0)           # Kid
         # If she wants to dup the kid's stderr onto her stdout I need to
         # save a copy of her stdout before I put something else there.
         if (($dad_rdr \!= $dad_err) && $dup_err
@@ -334,7 +334,7 @@ sub open3
 
 
 sub spawn_with_handles
-    my $fds = shift		# Fields: handle, mode, open_as
+    my $fds = shift             # Fields: handle, mode, open_as
     my $close_in_child = shift
     my ($pid, @saved_fh, $saved, %saved, @errs)
     require Fcntl

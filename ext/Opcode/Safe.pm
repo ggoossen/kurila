@@ -226,7 +226,7 @@ sub share_from
         $type = $1 if ($var = $arg) =~ s/^(\W)//
         # warn "share_from $pkg $type $var";
         Symbol::fetch_glob($root."::$var")->* = (!$type)       ?? \&{Symbol::fetch_glob($pkg."::$var")->*}
-        !! ($type eq '&') ?? \&{Symbol::fetch_glob($pkg."::$var")->*}
+            !! ($type eq '&') ?? \&{Symbol::fetch_glob($pkg."::$var")->*}
             !! ($type eq '$') ?? \Symbol::fetch_glob($pkg."::$var")->*->$
             !! ($type eq '@') ?? \Symbol::fetch_glob($pkg."::$var")->*->@
             !! ($type eq '%') ?? \Symbol::fetch_glob($pkg."::$var")->*->%

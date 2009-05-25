@@ -42,7 +42,7 @@ EOT
 use Search::Dict
 
 open(my $dict_fh, "+>", "dict-$^PID") or die "Can't create dict-$^PID: $^OS_ERROR"
-binmode $dict_fh			# To make length expected one.
+binmode $dict_fh                        # To make length expected one.
 print $dict_fh, $DICT
 
 my $pos = look $dict_fh, "Ababa"

@@ -178,7 +178,7 @@ or you can try using the 4-argument form of Term::ReadLine->new().
 package Term::ReadLine::Stub
 our @ISA = qw'Term::ReadLine::Tk Term::ReadLine::TermCap'
 
-$DB::emacs = $DB::emacs	# To peacify -w
+$DB::emacs = $DB::emacs # To peacify -w
 our @rl_term_set
 *rl_term_set = \@Term::ReadLine::TermCap::rl_term_set
 
@@ -254,7 +254,7 @@ sub new
 
         iohandle::output_autoflush($fout, 1)
         $ret = bless \@(\$fin->*, \$fout->*)
-    else			# Filehandles supplied
+    else                        # Filehandles supplied
         $FIN = @_[2]; $FOUT = @_[3]
         iohandle::output_autoflush($FOUT, 1)
         $ret = bless \@($FIN, $FOUT)
@@ -288,7 +288,7 @@ sub get_line
     return scalar ~< $in
 
 
-package Term::ReadLine;		# So late to allow the above code be defined?
+package Term::ReadLine;         # So late to allow the above code be defined?
 
 our $VERSION = '1.03'
 
@@ -301,7 +301,7 @@ if ($which)
     else
         eval "use Term::ReadLine::$which;"
     
-elsif (defined $which and $which ne '') {	# Defined but false
+elsif (defined $which and $which ne '') {       # Defined but false
 # Do nothing fancy
 }else
     eval "use Term::ReadLine::Gnu; 1" or eval "use Term::ReadLine::Perl; 1"
@@ -365,7 +365,7 @@ our($giveup)
 sub handle {$giveup = 1; $count_handle++}
 
 sub Tk_loop
-    # Tk->tkwait('variable',\$giveup);	# needs Widget
+    # Tk->tkwait('variable',\$giveup);  # needs Widget
     $count_DoOne++, Tk::DoOneEvent(0) until $giveup
     $count_loop++
     $giveup = 0

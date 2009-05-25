@@ -42,11 +42,11 @@ sub FILL
 #      3 handle to write to
 # OUT: 1 number of bytes written
 
-sub WRITE
+sub WRITE(_, $buffer, $handle)
 
     # Encode whatever needs to be encoded and write to handle: indicate result
 
-    (print @_[2] ,MIME::QuotedPrint::encode_qp(@_[1])) ?? length(@_[1]) !! -1
+    (print $handle,MIME::QuotedPrint::encode_qp($buffer)) ?? length($buffer) !! -1
  #WRITE
 
 __END__

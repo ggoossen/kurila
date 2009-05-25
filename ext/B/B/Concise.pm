@@ -16,18 +16,18 @@ use Exporter () # use #5
 our $VERSION   = "0.74"
 our @ISA       = qw(Exporter)
 our @EXPORT_OK = qw( set_style set_style_standard add_callback
-		     concise_subref concise_cv concise_main
-		     add_style walk_output compile reset_sequence )
+                     concise_subref concise_cv concise_main
+                     add_style walk_output compile reset_sequence )
 our %EXPORT_TAGS =
-    %( io	=> qw( walk_output compile reset_sequence ),
-    style	=> qw( add_style set_style_standard ),
-    cb	=> qw( add_callback ),
-    mech	=> qw( concise_subref concise_cv concise_main ),  )
+    %( io       => qw( walk_output compile reset_sequence ),
+    style       => qw( add_style set_style_standard ),
+    cb  => qw( add_callback ),
+    mech        => qw( concise_subref concise_cv concise_main ),  )
 
 # use #6
 use B < qw(class ppname main_start main_root main_cv cstring svref_2object
-	 SVf_IOK SVf_NOK SVf_POK SVf_IVisUV SVf_FAKE OPf_KIDS OPf_SPECIAL
-	 CVf_ANON PAD_FAKELEX_ANON PAD_FAKELEX_MULTI SVf_ROK)
+         SVf_IOK SVf_NOK SVf_POK SVf_IVisUV SVf_FAKE OPf_KIDS OPf_SPECIAL
+         CVf_ANON PAD_FAKELEX_ANON PAD_FAKELEX_MULTI SVf_ROK)
 
 my %style =
     %("terse" =>
@@ -58,8 +58,8 @@ my %style =
 
 # Renderings, ie how Concise prints, is controlled by these vars
 # primary:
-our $stylename		# selects current style from %style
-my $order = "basic"	# how optree is walked & printed: basic, exec, tree
+our $stylename          # selects current style from %style
+my $order = "basic"     # how optree is walked & printed: basic, exec, tree
 
 # rendering mechanics:
 # these 'formats' are the line-rendering templates
@@ -67,15 +67,15 @@ my $order = "basic"	# how optree is walked & printed: basic, exec, tree
 my ($format, $gotofmt, $treefmt)
 
 # lesser players:
-my $base = 36		# how <sequence#> is displayed
-my $big_endian = 1	# more <sequence#> display
-my $tree_style = 0	# tree-order details
-my $banner = 1		# print banner before optree is traversed
-my $do_main = 0	# force printing of main routine
-my $show_src		# show source code
+my $base = 36           # how <sequence#> is displayed
+my $big_endian = 1      # more <sequence#> display
+my $tree_style = 0      # tree-order details
+my $banner = 1          # print banner before optree is traversed
+my $do_main = 0 # force printing of main routine
+my $show_src            # show source code
 
 # another factor: can affect all styles!
-our @callbacks		# allow external management
+our @callbacks          # allow external management
 
 set_style_standard("concise")
 
@@ -108,7 +108,7 @@ sub add_callback
 
 
 # output handle, used with all Concise-output printing
-our $walkHandle	# public for your convenience
+our $walkHandle # public for your convenience
 BEGIN { $walkHandle = $^STDOUT }
 
 sub walk_output(?$handle) # updates $walkHandle
@@ -119,8 +119,8 @@ sub walk_output(?$handle) # updates $walkHandle
         die "no perlio in this build, can't call walk_output (\\\$scalar)\n"
             unless Config::config_value("useperlio")
         # in 5.8+, open(FILEHANDLE,MODE,REFERENCE) writes to string
-        open my $tmp, '>', $handle	# but cant re-set existing STDOUT
-        $walkHandle = $tmp		# so use my $tmp as intermediate var
+        open my $tmp, '>', $handle      # but cant re-set existing STDOUT
+        $walkHandle = $tmp              # so use my $tmp as intermediate var
         return $walkHandle
     
     my $iotype = ref $handle
@@ -344,12 +344,12 @@ sub compile
             print $walkHandle, "main program:\n" if $do_main
             concise_main($order)
         
-        return @args	# something
+        return @args    # something
     
 
 
 my %labels
-my $lastnext	# remembers op-chain, used to insert gotos
+my $lastnext    # remembers op-chain, used to insert gotos
 
 my %opclass = %('OP' => "0", 'UNOP' => "1", 'BINOP' => "2", 'LOGOP' => "|",
     'LISTOP' => "@", 'PMOP' => "/", 'SVOP' => "\$", 'GVOP' => "*",
@@ -513,8 +513,8 @@ sub fmt_line($hr, $op, $text, $level)
 
     $_->($hr, $op, \$text, \$level, $stylename) for  @callbacks
 
-    return '' if $hr->{?SKIP}	# suppress line if a callback said so
-    return '' if $hr->{?goto} and $hr->{?goto} eq '-'	# no goto nowhere
+    return '' if $hr->{?SKIP}   # suppress line if a callback said so
+    return '' if $hr->{?goto} and $hr->{?goto} eq '-'   # no goto nowhere
 
     # spec: (?(text1#varText2)?)
     $text =~ s/\(\?\(([^\#]*?)\#(\w+)([^\#]*?)\)\?\)/$(
@@ -536,8 +536,8 @@ sub fmt_line($hr, $op, $text, $level)
     # spec: #varN
     $text =~ s/\#([a-zA-Z]+)(\d+)/$( sprintf("\%-$2s", $hr->{?$1}) )/g
 
-    $text =~ s/\#([a-zA-Z]+)/$( $hr->{?$1} )/g	# populate #var's
-    $text =~ s/[ \t]*~+[ \t]*/ /g		# squeeze tildes
+    $text =~ s/\#([a-zA-Z]+)/$( $hr->{?$1} )/g  # populate #var's
+    $text =~ s/[ \t]*~+[ \t]*/ /g               # squeeze tildes
 
     $text = "# $hr->{?src}\n$text" if $show_src and $hr->{?src}
 
@@ -1719,10 +1719,10 @@ you've built perl with -Uuseperlio).
 
     my $walker = B::Concise::compile('-terse','aFuncName', \&aSubRef);  # 1
     walk_output(\my $buf);
-    $walker->();			# 1 renders -terse
-    set_style_standard('concise');	# 2
-    $walker->();			# 2 renders -concise
-    $walker->(@new);			# 3 renders whatever
+    $walker->();                        # 1 renders -terse
+    set_style_standard('concise');      # 2
+    $walker->();                        # 2 renders -concise
+    $walker->(@new);                    # 3 renders whatever
     print "3 different renderings: terse, concise, and @new: $buf\n";
 
 When $walker is called, it traverses the subroutines supplied when it

@@ -168,8 +168,7 @@ is( ExtUtils::Manifest::maniread()->{?none}, '#none',
 
 ok( mkdir( 'copy', 0777 ), 'made copy directory' )
 $files = maniread()
-try { @(_, $warn) =  catch_warning( sub (@< @_)
-                                        manicopy( $files, 'copy', 'cp' ) )
+try { @(_, $warn) =  catch_warning( sub (@< @_) { manicopy( $files, 'copy', 'cp' ) } )
 }
 like( $^EVAL_ERROR->{?description}, qr/^Can't read none: /, 'croaked about none' )
 

@@ -283,7 +283,7 @@ EOF
 #..........................................................................
 
 sub usage_brief
-    my $me = $^PROGRAM_NAME		# Editing $0 is unportable
+    my $me = $^PROGRAM_NAME             # Editing $0 is unportable
 
     $me =~ s,.*[/\\],, # get basename
 
@@ -555,19 +555,17 @@ sub render_and_page($self, $found_list)
     elsif(  # Allow the formatter to "page" itself, if it wants.
       $formatter->can('page_for_perldoc')
         and do
-        $self->aside("Going to call $formatter\->page_for_perldoc(\"$out\")\n")
-        if( $formatter->page_for_perldoc($out, $self) )
-            $self->aside("page_for_perldoc returned true, so NOT paging with $self.\n")
-            1
-        else
-            $self->aside("page_for_perldoc returned false, so paging with $self instead.\n")
-            ''
-        
-    
-        ) {
-    # Do nothing, since the formatter has "paged" it for itself.
-
-    }else
+            $self->aside("Going to call $formatter\->page_for_perldoc(\"$out\")\n")
+            if( $formatter->page_for_perldoc($out, $self) )
+                $self->aside("page_for_perldoc returned true, so NOT paging with $self.\n")
+                1
+            else
+                $self->aside("page_for_perldoc returned false, so paging with $self instead.\n")
+                ''
+        )
+        # Do nothing, since the formatter has "paged" it for itself.
+        { }
+    else
         # Page it normally (internally)
 
         if( -s $out )  # Usual case:
@@ -1161,7 +1159,7 @@ sub after_rendering_MSWin32
 
 
 #..........................................................................
-#	:	:	:	:	:	:	:	:	:
+#       :       :       :       :       :       :       :       :       :
 #..........................................................................
 
 
@@ -1387,14 +1385,14 @@ sub containspod($self, $file, ?$readit)
     
 
     local($_)
-    open(my $test,"<", $file) 	or die "Can't open $file: $^OS_ERROR"   # XXX 5.6ism
+    open(my $test,"<", $file)   or die "Can't open $file: $^OS_ERROR"   # XXX 5.6ism
     while ( ~< $test->*)
         if (m/^=head/)
-            close($test) 	or die "Can't close $file: $^OS_ERROR"
+            close($test)        or die "Can't close $file: $^OS_ERROR"
             return 1
         
     
-    close($test) 		or die "Can't close $file: $^OS_ERROR"
+    close($test)                or die "Can't close $file: $^OS_ERROR"
     return 0
 
 
@@ -1557,13 +1555,13 @@ sub searchfor($self, $recurse,$s,@< @dirs)
         
 
         if ($recurse)
-            opendir(my $d,$dir)	or die "Can't opendir $dir: $^OS_ERROR"
+            opendir(my $d,$dir) or die "Can't opendir $dir: $^OS_ERROR"
             my @newdirs = map { < catfile($dir, $_) }, grep {
                 not m/^\.\.?\z/s and
                     not m/^auto\z/s  and   # save time! don't search auto dirs
                     -d  catfile($dir, $_)
             }, @( readdir $d)
-            closedir($d)		or die "Can't closedir $dir: $^OS_ERROR"
+            closedir($d)                or die "Can't closedir $dir: $^OS_ERROR"
             next unless (nelems @newdirs)
             # what a wicked map!
             @newdirs = map( {@(s/\.dir\z//,$_)[1] }, @newdirs) if IS_VMS
@@ -1601,7 +1599,7 @@ sub tweak_found_pathnames($self, $found)
 
 
 #..........................................................................
-#	:	:	:	:	:	:	:	:	:
+#       :       :       :       :       :       :       :       :       :
 #..........................................................................
 
 sub am_taint_checking
@@ -1698,17 +1696,17 @@ __END__
 #~~~~~~
 #
 # Version 2.05: Sat Oct 12 16:09:00 CEST 2002
-#	Hugo van der Sanden <hv@crypt.org>
-#	Made -U the default, based on patch from Simon Cozens
+#       Hugo van der Sanden <hv@crypt.org>
+#       Made -U the default, based on patch from Simon Cozens
 # Version 2.04: Sun Aug 18 13:27:12 BST 2002
-#	Randy W. Sims <RandyS@ThePierianSpring.org>
-#	allow -n to enable nroff under Win32
+#       Randy W. Sims <RandyS@ThePierianSpring.org>
+#       allow -n to enable nroff under Win32
 # Version 2.03: Sun Apr 23 16:56:34 BST 2000
-#	Hugo van der Sanden <hv@crypt.org>
-#	don't die when 'use blib' fails
+#       Hugo van der Sanden <hv@crypt.org>
+#       don't die when 'use blib' fails
 # Version 2.02: Mon Mar 13 18:03:04 MST 2000
 #       Tom Christiansen <tchrist@perl.com>
-#	Added -U insecurity option
+#       Added -U insecurity option
 # Version 2.01: Sat Mar 11 15:22:33 MST 2000 
 #       Tom Christiansen <tchrist@perl.com>, querulously.
 #       Security and correctness patches.
@@ -1719,33 +1717,33 @@ __END__
 #
 # Version 1.15: Tue Aug 24 01:50:20 EST 1999
 #       Charles Wilson <cwilson@ece.gatech.edu>
-#	changed /pod/ directory to /pods/ for cygwin
+#       changed /pod/ directory to /pods/ for cygwin
 #         to support cygwin/win32
 # Version 1.14: Wed Jul 15 01:50:20 EST 1998
 #       Robin Barker <rmb1@cise.npl.co.uk>
-#	-strict, -w cleanups
+#       -strict, -w cleanups
 # Version 1.13: Fri Feb 27 16:20:50 EST 1997
 #       Gurusamy Sarathy <gsar@activestate.com>
-#	-doc tweaks for -F and -X options
+#       -doc tweaks for -F and -X options
 # Version 1.12: Sat Apr 12 22:41:09 EST 1997
 #       Gurusamy Sarathy <gsar@activestate.com>
-#	-various fixes for win32
+#       -various fixes for win32
 # Version 1.11: Tue Dec 26 09:54:33 EST 1995
 #       Kenneth Albanowski <kjahds@kjahds.com>
 #   -added Charles Bailey's further VMS patches, and -u switch
 #   -added -t switch, with pod2text support
 #
 # Version 1.10: Thu Nov  9 07:23:47 EST 1995
-#		Kenneth Albanowski <kjahds@kjahds.com>
-#	-added VMS support
-#	-added better error recognition (on no found pages, just exit. On
-#	 missing nroff/pod2man, just display raw pod.)
-#	-added recursive/case-insensitive matching (thanks, Andreas). This
-#	 slows things down a bit, unfortunately. Give a precise name, and
-#	 it'll run faster.
+#               Kenneth Albanowski <kjahds@kjahds.com>
+#       -added VMS support
+#       -added better error recognition (on no found pages, just exit. On
+#        missing nroff/pod2man, just display raw pod.)
+#       -added recursive/case-insensitive matching (thanks, Andreas). This
+#        slows things down a bit, unfortunately. Give a precise name, and
+#        it'll run faster.
 #
-# Version 1.01:	Tue May 30 14:47:34 EDT 1995
-#		Andy Dougherty  <doughera@lafcol.lafayette.edu>
+# Version 1.01: Tue May 30 14:47:34 EDT 1995
+#               Andy Dougherty  <doughera@lafcol.lafayette.edu>
 #   -added pod documentation.
 #   -added PATH searching.
 #   -added searching pod/ subdirectory (mainly to pick up perlfunc.pod
@@ -1755,7 +1753,7 @@ __END__
 #
 # TODO:
 #
-#	Cache the directories read during sloppy match
+#       Cache the directories read during sloppy match
 #       (To disk, or just in-memory?)
 #
 #       Backport this to perl 5.005?

@@ -13,7 +13,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME    => 'Problem::Module',
-);
+  );
 END
 
     'Problem-Module/subdir/Makefile.PL'    => <<'END',

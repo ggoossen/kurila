@@ -49,9 +49,9 @@ my ($exe_file, @temps)
 @($exe_file, @< @temps) =  $b->link_executable(objects => $object_file)
 ok $exe_file
 
-if ($^OS_NAME eq 'os2')		# Analogue of LDLOADPATH...
+if ($^OS_NAME eq 'os2')         # Analogue of LDLOADPATH...
     # Actually, not needed now, since we do not link with the generated DLL
-    my $old = OS2::extLibpath()	# [builtin function]
+    my $old = OS2::extLibpath() # [builtin function]
     $old = ";$old" if defined $old and length $old
     # To pass the sanity check, components must have backslashes...
     OS2::extLibpath_set(".\\$old")

@@ -38,7 +38,7 @@ WriteMakefile(
     PREREQ_PM     => %( strict => 0 ),
     ABSTRACT_FROM => 'lib/Big/Dummy.pm',
     AUTHOR        => 'Michael G Schwern <schwern@pobox.com>',
-);
+  );
 END
 
     'Big-Dummy/bin/program'          => <<'END',

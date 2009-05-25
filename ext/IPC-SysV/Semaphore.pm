@@ -21,22 +21,19 @@ do
     use Class::Struct < qw(struct)
 
     struct 'IPC::Semaphore::stat' => \@(
-           uid	=> '$',
-           gid	=> '$',
-           cuid	=> '$',
-           cgid	=> '$',
-           mode	=> '$',
-           ctime	=> '$',
-           otime	=> '$',
-           nsems	=> '$',
+           uid  => '$',
+           gid  => '$',
+           cuid => '$',
+           cgid => '$',
+           mode => '$',
+           ctime        => '$',
+           otime        => '$',
+           nsems        => '$',
            )
 
 
-sub new
-    (nelems @_) == 4 || croak 'new ' . __PACKAGE__ . '( KEY, NSEMS, FLAGS )'
-    my $class = shift
-
-    my $id = semget(@_[0],@_[1],@_[2])
+sub new($class, $key, $nsems, $flags)
+    my $id = semget($key, $nsems, $flags)
 
     defined($id)
         ?? bless \$id, $class
@@ -53,43 +50,30 @@ sub remove
     @(semctl($self->$,0,IPC_RMID,0), undef $self->$)[0]
 
 
-sub getncnt
-    (nelems @_) == 2 || croak '$sem->getncnt( SEM )'
-    my $self = shift
-    my $sem = shift
+sub getncnt($self, $sem)
     my $v = semctl($self->$,$sem,GETNCNT,0)
     $v ?? 0 + $v !! undef
 
 
-sub getzcnt
-    (nelems @_) == 2 || croak '$sem->getzcnt( SEM )'
-    my $self = shift
-    my $sem = shift
+sub getzcnt($self, $sem)
     my $v = semctl($self->$,$sem,GETZCNT,0)
     $v ?? 0 + $v !! undef
 
 
-sub getval
-    (nelems @_) == 2 || croak '$sem->getval( SEM )'
-    my $self = shift
-    my $sem = shift
+sub getval($self, $sem)
     my $v = semctl($self->$,$sem,GETVAL,0)
     $v ?? 0 + $v !! undef
 
 
-sub getpid
-    (nelems @_) == 2 || croak '$sem->getpid( SEM )'
-    my $self = shift
-    my $sem = shift
+sub getpid($self, $sem)
     my $v = semctl($self->$,$sem,GETPID,0)
     $v ?? 0 + $v !! undef
 
 
-sub op
-    (nelems @_) +>= 4 || croak '$sem->op( OPLIST )'
-    my $self = shift
-    croak 'Bad arg count' if (nelems @_) % 3
-    my $data = pack("s!*",< @_)
+sub op($self, @< $oplist)
+    (nelems $oplist) +>= 3 || croak '$sem->op( OPLIST )'
+    croak 'Bad arg count' if (nelems $oplist) % 3
+    my $data = pack("s!*",< $oplist)
     semop($self->$,$data)
 
 
@@ -135,11 +119,8 @@ sub setall
     semctl($self->$,0,SETALL,$data)
 
 
-sub setval
+sub setval($self, $sem, $val)
     (nelems @_) == 3 || croak '$sem->setval( SEM, VAL )'
-    my $self = shift
-    my $sem = shift
-    my $val = shift
     semctl($self->$,$sem,SETVAL,$val)
 
 
@@ -236,8 +217,8 @@ first is the semaphore number, the second is the operation and the last
 is a flags value. See L<semop> for more details. For example
 
     $sem->op(
-	0, -1, IPC_NOWAIT,
-	1,  1, IPC_NOWAIT
+        0, -1, IPC_NOWAIT,
+        1,  1, IPC_NOWAIT
     );
 
 =item remove

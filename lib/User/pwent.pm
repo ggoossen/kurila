@@ -81,16 +81,15 @@ sub _feature_init
                      }
         )
         my $short = $feep =~ m/^pw(.*)/
-        ?? $1
-        !! do
-            # not cluck, as we know we called ourselves,
-            # and a confession is probably imminent anyway
-            warn("$IE $feep is a funny struct pwd field")
-            $feep
-        
+            ?? $1
+            !! do
+                # not cluck, as we know we called ourselves,
+                # and a confession is probably imminent anyway
+                warn("$IE $feep is a funny struct pwd field")
+                $feep
 
         %Groks{+$short} = defined config_value("d_" . $feep)
-    
+
     # assume that any that are left are always there
     for my $feep ( grep { m/^\$pw_/s }, @EXPORT_OK)
         $feep =~ m/^\$pw_(.*)/
@@ -113,8 +112,8 @@ sub pw_has
     our %Groks         # whether build system knew how to do this feature
     my $cando = 1
     my $sploder = caller() ne __PACKAGE__
-    ?? \&die
-    !! sub (@< @_) { die("$IE $(join ' ',@_)") }
+        ?? \&die
+        !! sub (@< @_) { die("$IE $(join ' ',@_)") }
     if ((nelems @_) == 0)
         my @valid = sort grep { %Groks{?$_} }, keys %Groks
         return @valid
