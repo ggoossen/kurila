@@ -1007,6 +1007,7 @@ S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
         }
         else {
             assert(PL_linestart[-1] == '\n');
+            PL_bufptr = PL_linestart - 1;
             return PL_linestart - 1;
         }
     }
@@ -4330,8 +4331,8 @@ Perl_yylex(pTHX)
 	tmp = keyword(PL_tokenbuf, len);
 
 	d = s;
-	if ((isSPACE(*s) || *s == '\t') && (tmp != KEY___END__ && tmp != KEY___DATA__))
-	    s = SKIPSPACE0(s);
+	while (s < PL_bufend && isSPACE_notab(*s) && *s != '\n')
+	    ++s;
 
 	/* Is this a word before a => operator? */
 	if (s < PL_bufend && *s == '=' && s[1] == '>') {
@@ -4345,7 +4346,7 @@ Perl_yylex(pTHX)
 	if (tmp < 0) {			/* second-class keyword? */
 	    GV *ogv = NULL;	/* override (winner) */
 	    GV *hgv = NULL;	/* hidden (loser) */
-	    if (PL_expect != XOPERATOR && (d ==s && (*s != ':' || s[1] != ':'))) {
+	    if (PL_expect != XOPERATOR && (d != s || *s != ':' || s[1] != ':')) {
 		CV *cv;
 		if ((gv = gv_fetchpvn_flags(PL_tokenbuf, len, 0, SVt_PVCV)) &&
 		    (cv = GvCVu(gv)))
