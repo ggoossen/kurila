@@ -39,9 +39,11 @@ sub p5convert {
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_scope_deref();
-die "END";
 t_indent();
+die "END";
+t_defargs();
+t_dofile_to_evalfile();
+t_scope_deref();
 t_env_sub();
 t_local();
 t_stdin();
@@ -1751,36 +1753,35 @@ sub t_indent {
 "dd";
 1;
 ----
-1;
+1
 "aa"
     +
-    "bb";
+    "bb"
 "cc"
     +
-    "dd";
-1;
+    "dd"
+1
 ====
 1;
 $a
 and $b;
 ----
-1;
+1
 $a
-    and $b;
+    and $b
 ====
 do {
 3;
 };
 ----
-do {
-    3;
-};
+do
+    3
 ====
 foobar("aap",
  "noot");
 ----
 foobar("aap",
-       "noot");
+       "noot")
 ====
 foobar('aap',
   qr/help/,
@@ -1788,35 +1789,33 @@ foobar('aap',
 ----
 foobar('aap',
        qr/help/,
-       "noot");
+       "noot")
 ====
 BEGIN {
  require "./test.pl";
 }
 ----
-BEGIN {
-    require "./test.pl";
-}
+BEGIN 
+    require "./test.pl"
 ====
 sub foox { }
 foox(sub { @_ },
  'arg');
 ----
 sub foox { }
-foox(sub { @_ },
-     'arg');
+foox(sub (@< @_) { @_ },
+     'arg')
 ====
 do {
   foo(1,2);
 
   "noot";
-};
+}
 ----
-do {
-    foo(1,2);
+do
+    foo(1,2)
 
-    "noot";
-};
+    "noot"
 ====
 BEGIN { require "./test.pl"; }
 do {
@@ -1824,19 +1823,18 @@ do {
 }
 ----
 BEGIN { require "./test.pl"; }
-do {
-    1;
-}
+do
+    1
 ====
 use constant foo => 33;
 foo
 ----
-use constant foo => 33;
+use constant foo => 33
 foo
 ====
 baz();
 ----
-baz();
+baz()
 ====
 warn "help";
 
@@ -1844,11 +1842,10 @@ sub foo($x) {
   warn $x;
 }
 ----
-warn "help";
+warn "help"
 
-sub foo($x) {
-    warn $x;
-}
+sub foo($x)
+    warn $x
 ====
 warn "x";
 if ($a) {
@@ -1857,18 +1854,17 @@ if ($a) {
  $a+1;
 }
 ----
-warn "x";
-if ($a) {
-    $a;
-} else {
-    $a+1;
-}
+warn "x"
+if ($a)
+    $a
+else
+    $a+1
 ====
 warn "y";
  my $vms_no_ieee = 1 unless defined(config_value('useieee'));
 ----
-warn "y";
-my $vms_no_ieee = 1 unless defined(config_value('useieee'));
+warn "y"
+my $vms_no_ieee = 1 unless defined(config_value('useieee'))
 ====
 warn "z";
 while($a) {
@@ -1876,11 +1872,10 @@ while($a) {
   "noot";
 }
 ----
-warn "z";
-while($a) {
-    "aap";
-    "noot";
-}
+warn "z"
+while($a)
+    "aap"
+    "noot"
 ====
 #!./perl
 BEGIN {
@@ -1888,16 +1883,15 @@ BEGIN {
 }
 ----
 #!./perl
-BEGIN {
-    require './test.pl';
-}
+BEGIN 
+    require './test.pl'
 ====
 my $warn;
 $^WARN_HOOK = sub { print $^STDOUT, $warn; $warn .= @_[0]->{?description} . "\n" };
   sub tiex { }
 ----
-my $warn;
-$^WARN_HOOK = sub { print $^STDOUT, $warn; $warn .= @_[0]->{?description} . "\n" };
+my $warn
+$^WARN_HOOK = sub (@< @_) { print $^STDOUT, $warn; $warn .= @_[0]->{?description} . "\n" }
 sub tiex { }
 ====
 sub tiex { }
@@ -1906,47 +1900,43 @@ for my $tie (@("")) {
 }
 ----
 sub tiex { }
-for my $tie (@("")) {
-    do { 1 };
-}
+for my $tie (@(""))
+    do { 1 }
 ====
 my %x;
 %x{+0} = 100;
 ----
-my %x;
-%x{+0} = 100;
+my %x
+%x{+0} = 100
 ====
 if (foo("aap") eq "noot") {
   $a;
 }
 ----
-if (foo("aap") eq "noot") {
-    $a;
-}
+if (foo("aap") eq "noot")
+    $a
 ====
 # tab
 	foo($1);
 ----
 # tab
-foo($1);
+foo($1)
 ====
 do {
  local $^WARN_HOOK = sub { push $a, @_[0]->message };
  use warnings;
 };
 ----
-do {
-    local $^WARN_HOOK = sub { push $a, @_[0]->message };
-    use warnings;
-};
+do
+    local $^WARN_HOOK = sub (@< @_) { push $a, @_[0]->message }
+    use warnings
 ====
 do {
  $^HINTS{+doot} = 1;
 };
 ----
-do {
-    $^HINTS{+doot} = 1;
-};
+do
+    $^HINTS{+doot} = 1
 ====
 sub show_bits
  {
@@ -1955,18 +1945,16 @@ sub show_bits
  }
 ----
 sub show_bits
-{
-    my $out = '';
-    return $out;
-}
+    my $out = ''
+    return $out
 ====
 warn "xx";
 my $has_dirfd = ($a
   || $b);
 ----
-warn "xx";
+warn "xx"
 my $has_dirfd = ($a
-                 || $b);
+                 || $b)
 ====
 do {
  SKIP: do {
@@ -1974,11 +1962,9 @@ do {
 };
 };
 ----
-do {
-  SKIP: do {
-        2;
-    };
-};
+do
+    SKIP: do
+        2
 ====
 do {
  SKIP:
@@ -1987,12 +1973,10 @@ do {
 };
 };
 ----
-do {
-  SKIP:
-    do {
-        2;
-    };
-};
+do
+    SKIP:
+        do
+        2
 ====
 warn "yy";
 if ($a
@@ -2001,38 +1985,36 @@ if ($a
 pass();
 }
 ----
-warn "yy";
+warn "yy"
 if ($a
-    || $b)
-{
-    pass();
-}
+      || $b)
+    pass()
 ====
 @('aa',
 'noot');
 ----
 @('aa',
-  'noot');
+  'noot')
 ====
 ( "aap"
  . "mies" );
 ----
 ( "aap"
-  . "mies" );
+  . "mies" )
 ====
 warn "xx";
  my @($a) = "aap";
 ----
-warn "xx";
-my @($a) = "aap";
+warn "xx"
+my @($a) = "aap"
 ====
 warn "yy";
 @: 'aa',
  'noot';
 ----
-warn "yy";
+warn "yy"
 @: 'aa',
-   'noot';
+   'noot'
 ====
 warn "yy";
 foo( "mies",
@@ -2041,20 +2023,20 @@ foo( "mies",
  "zus";
  }, 'noot');
 ----
-warn "yy";
+warn "yy"
 foo( "mies",
-     sub {
-         "aap";
-         "zus";
-     }, 'noot');
+     sub (@< @_)
+         "aap"
+         "zus"
+     , 'noot')
 ====
 warn "yy";
  "aap"
  for $a;
 ----
-warn "yy";
+warn "yy"
 "aap"
-    for $a;
+    for $a
 ====
 "aap";
 foo( "noot",
@@ -2064,21 +2046,21 @@ foo( "noot",
  },
 );
 ----
-"aap";
+"aap"
 foo( "noot",
      "mies",
      {
          "zus";
      },
-     );
+     )
 ====
 "aap";
 push $a,
   "noot";
 ----
-"aap";
+"aap"
 push $a,
-    "noot";
+    "noot"
 ====
 do {
  "aap";
@@ -2088,23 +2070,260 @@ Foo
  "noot";
 };
 ----
-do {
-    "aap";
+do
+    "aap"
 =pod
 Foo
 =cut
-    "noot";
-};
+    "noot"
 ====
 "aap";
  $a->docall(
   "noot",
  );
 ----
-"aap";
+"aap"
 $a->docall(
     "noot",
-    );
+    )
+====
+$a
+ unless $b;
+----
+$a
+    unless $b
+====
+sub foo { 1 }
+our ($aap);
+1;
+----
+sub foo { 1 }
+our ($aap)
+1
+====
+my %foo = %(
+   aap => 1,
+ noot => 2,
+);
+sub test { 3 }
+1;
+----
+my %foo = %(
+    aap => 1,
+    noot => 2,
+    )
+sub test { 3 }
+1
+====
+my ($foo, $bar);
+$foo{[$bar]} = $bar;
+----
+my ($foo, $bar)
+$foo{[$bar]} = $bar
+====
+sub
+{
+ $a;
+}
+----
+sub (@< @_)
+    $a
+====
+if ($a) {
+ $b;
+} elsif ($b) {
+ $a;
+}
+----
+if ($a)
+    $b
+elsif ($b)
+    $a
+====
+$a; $b;
+----
+$a; $b
+====
+try {
+    1;
+};
+----
+try {
+    1;
+}
+====
+do {
+ {
+  $b;
+ } while $a;
+};
+----
+do
+    loop
+        $b
+    while $a
+====
+if ($a) {
+     local($Foo::b) = '';
+  $a;
+}
+----
+if ($a)
+    local($Foo::b) = ''
+    $a
+====
+do {
+  package foo;
+  3;
+};
+----
+do
+    package foo
+    3
+====
+sub mkpath {
+    my $old_style = (
+    UNIVERSAL::isa(@_[0],'ARRAY')
+        ) ?? 1 !! 0;
+}
+----
+sub mkpath
+    my $old_style = (
+        UNIVERSAL::isa(@_[0],'ARRAY')
+        ) ?? 1 !! 0
+====
+{ 1 } while $a;
+----
+loop { 1 } while $a
+====
+my ($arg, $root);
+do {
+  my $canon = $arg{?prefix}
+  ?? File::Spec->catfile($arg{?prefix}, $root)
+  !! $root;
+};
+----
+my ($arg, $root)
+do
+    my $canon = $arg{?prefix}
+        ?? File::Spec->catfile($arg{?prefix}, $root)
+        !! $root
+====
+sort { $a;
+       $b;
+     }, $a;
+----
+sort { $a;
+    $b;
+}, $a
+====
+sub geniosym () {
+    my $sym = gensym();
+    # force the IO slot to be filled
+    open $sym;
+        $sym->*{IO};
+}
+----
+sub geniosym ()
+    my $sym = gensym()
+    # force the IO slot to be filled
+    open $sym
+    $sym->*{IO}
+====
+do {
+ $a;
+ "he
+ $a lp";
+};
+----
+do
+    $a
+    "he
+ $a lp"
+====
+$a = sub {
+      33;
+    };
+$a = sub (@< @_) {
+      33;
+    };
+----
+$a = sub (@< @_)
+    33
+
+$a = sub (@< @_)
+    33
+====
+my (@XSStack, @fns);
+do {
+     # Hide the functions defined in other #if branches, and reset.
+     @XSStack[-1]->{+other_functions}{[+@fns]} = @(1) x nelems @fns;
+ @XSStack[-1]->{[qw(varname functions)]} = @('', %());
+};
+----
+my (@XSStack, @fns)
+do
+    # Hide the functions defined in other #if branches, and reset.
+    @XSStack[-1]->{+other_functions}{[+@fns]} = @(1) x nelems @fns
+    @XSStack[-1]->{[qw(varname functions)]} = @('', %())
+====
+do {
+    my $a = @(
+  "aap",
+  );
+};
+----
+do
+    my $a = @(
+        "aap",
+        )
+====
+while( $a
+=~ m/foo/
+) {
+ blaa();
+}
+----
+while( $a
+         =~ m/foo/
+    )
+    blaa()
+====
+if ( $a
+  and $b
+) {
+   blaa();
+}
+----
+if ( $a
+       and $b
+    )
+    blaa()
+====
+my ($self, $opt);
+if (exists $self->{PARENT}->{$opt}
+       and not exists $self->{$opt}) {
+ # inherit, but only if already unspecified
+ $self->{+$opt} = $self->{PARENT}->{?$opt};
+}
+----
+my ($self, $opt)
+if (exists $self->{PARENT}->{$opt}
+      and not exists $self->{$opt})
+    # inherit, but only if already unspecified
+    $self->{+$opt} = $self->{PARENT}->{?$opt}
+====
+#next line has a tab
+	
+33;
+----
+#next line has a tab
+
+33
+====
+for ($a)
+    { $b }
+----
 END
 }
 
@@ -2171,5 +2390,43 @@ $a->%;
 %$a{aap};
 ----
 $a->{aap};
+END
+}
+
+sub t_dofile_to_evalfile {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+do "aap.pm";
+----
+evalfile "aap.pm";
+====
+require "aap.pm";
+----
+require "aap.pm";
+END
+}
+
+sub t_defargs {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+sub foo { }
+sub aap { 5+$a }
+sub noot { 5+@_[0] }
+sub mies { my $x = shift; $x; }
+sub vuur { my $self = shift; $self; }
+sub zus { my $x = shift; my $y = shift; }
+sub bar($a) { }
+BEGIN { $a }
+----
+sub foo(...) { }
+sub aap(...) { 5+$a }
+sub noot(@< @_) { 5+@_[0] }
+sub mies(?$x) { $x; }
+sub vuur($self) { $self; }
+sub zus(@< @_) { my $x = shift @_; my $y = shift @_; }
+sub bar($a) { }
+BEGIN { $a }
+====
+sub teun { @_; shift; shift $a; }
+----
+sub teun(@< @_) { @_; shift @_; shift $a; }
 END
 }

@@ -1016,7 +1016,7 @@ BEGIN {
 	'nullstatement' => sub {		# null statements/blocks
 	    my $self = shift;
 	    my @newkids;
-	    push @newkids, $self->madness('{ ; } fake_semicolon');
+	    push @newkids, $self->madness('wrap_open { ; } fake_semicolon wrap_close');
 	    $::curstate = 0;
 	    return P5AST::nothing->new(Kids => [@newkids])
 	},
@@ -2538,6 +2538,10 @@ package PLXML::op_mapwhile;
 sub ast {
     my $self = shift;
 
+    if ($self->{Kids}->[-1]->{flags} =~ m/\bSPECIAL\b/) {
+        return $self->SUPER::ast(@_);
+    }
+
     my @newkids;
     push @newkids, $self->madness('wrap_open o (');
     my @kids = @{$$self{Kids}};
@@ -2861,7 +2865,7 @@ sub blockast {
     local $::curstate;
 
     my @retval;
-    push @retval, $self->madness('{');
+    push @retval, $self->madness('wrap_open {');
  
     my @newkids = $self->PLXML::op_lineseq::lineseq(@_);
     push @retval, @newkids;
@@ -2870,7 +2874,7 @@ sub blockast {
                  and $::version_from->{'v'} > v1.14 ) ) {
         push @retval, $self->madness(';');
     }
-    push @retval, $self->madness('} fake_semicolon');
+    push @retval, $self->madness('} fake_semicolon wrap_close');
     return $self->newtype->new(Kids => [@retval]);
 }
 
@@ -2937,6 +2941,7 @@ sub ast {
     if ($self->{mp}{w}) {
 	my @newkids;
 	my @tmpkids;
+	push @newkids, $self->madness('D');
 	push @tmpkids, $self->{Kids};
 	my $anddo = $$self{Kids}[-1]{Kids}[0]{Kids};
 	eval { push @newkids, $anddo->[1]->ast($self,@_); };
@@ -3038,8 +3043,14 @@ sub ast {
 	if (defined $max) {
 	    if (exists $$range{mp}{O}) {	# deeply buried .. operator
 		PLXML::prepreproc($$range{mp}{O});
-		push @retval,
-		  $$range{mp}{'O'}{Kids}[0]->madness('o')
+                if ($::version->{branch} eq "perl") {
+                    push @retval,
+                      $$range{mp}{'O'}{Kids}[0]{Kids}[0]{Kids}[0]{Kids}[0]->madness('o');
+                }
+                else {
+                    push @retval,
+                      $$range{mp}{'O'}{Kids}[0]->madness('o');
+                }
 	    }
 	    else {
 		push @retval, '..';		# XXX missing whitespace
@@ -3070,7 +3081,7 @@ sub ast {
     my $nextthing = $$self{Kids}[1];
 
     if ($$self{mp}{W}) {
-	push @retval, $self->madness('L');
+	push @retval, $self->madness('L D');
 	push @newkids, $self->madness('W d');
 
 	if (ref $enterloop eq 'PLXML::op_enteriter') {

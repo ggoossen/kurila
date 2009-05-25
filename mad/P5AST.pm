@@ -496,6 +496,7 @@ package P5AST::op_semctl; 	@ISA = 'P5AST::listop';
 package P5AST::op_semop; 	@ISA = 'P5AST::listop';
 package P5AST::op_require; 	@ISA = 'P5AST::baseop_unop';
 package P5AST::op_dofile; 	@ISA = 'P5AST::unop';
+package P5AST::op_evalfile; 	@ISA = 'P5AST::unop';
 package P5AST::op_entereval; 	@ISA = 'P5AST::baseop_unop';
 package P5AST::op_leaveeval; 	@ISA = 'P5AST::unop';
 package P5AST::op_entertry; 	@ISA = 'P5AST::logop';

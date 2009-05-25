@@ -3243,6 +3243,8 @@ typedef        struct crypt_data {     /* straight from /usr/include/crypt.h */
 struct nextmadtoken {
     YYSTYPE next_val;	/* value of next token, if any */
     I32 next_type;	/* type of next token */
+    IV next_linenr;
+    IV next_charoffset;
     MADPROP *next_mad;	/* everything else about that token */
 };
 #endif
