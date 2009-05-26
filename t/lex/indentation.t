@@ -4,7 +4,7 @@ BEGIN
     require './test.pl'
 
 
-plan tests => 10
+plan tests => 11
 
 our ($x, $y)
 
@@ -54,3 +54,9 @@ do
 
 is($x, "old")
 is($y, "old")
+
+eval_dies_like(<<'EOE', qr/statement end found where string delimeter expected/);
+do
+    s(foo)
+    {bar}g
+EOE

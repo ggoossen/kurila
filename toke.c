@@ -9698,6 +9698,11 @@ S_scan_str(pTHX_ char *start, int escape, int keep_delims, yy_str_info *str_info
     /* skip space before the delimiter */
     if (isSPACE(*s)) {
 	s = PEEKSPACE(s);
+	if (isSPACE(*s)) {
+	    yyerror("statement end found where string delimeter expected");
+	    str_info->str_sv = newSVpvs("");
+	    return s;
+	}
     }
 
 #ifdef PERL_MAD
