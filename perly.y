@@ -1359,11 +1359,6 @@ scalar  :	PRIVATEVAR
                             TOKEN_GETMAD($1,$$,'[');
                             TOKEN_GETMAD($3,$$,']');
 
-                            if (PL_parser->lex_brackets <= 0)
-                                yyerror("Unmatched right paren");
-                            else
-                                --PL_parser->lex_brackets;
-
                             if (PL_parser->lex_state == LEX_INTERPNORMAL) {
                                 if ( PL_parser->lex_brackets == 0 )
                                     PL_parser->lex_state = LEX_INTERPEND;

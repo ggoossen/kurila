@@ -41,7 +41,8 @@ typedef struct yy_str_info {
 
 typedef struct yy_lexbrackstack_item {
     char state;
-    int prev_statement_indent;
+    int prev_statement_indent; /* The previous statement_indent,
+				  only valid if state == XSTATE */
 } yy_lex_brackstack_item;
 
 typedef struct yy_parser {

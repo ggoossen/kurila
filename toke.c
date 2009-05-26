@@ -2743,11 +2743,12 @@ Perl_yylex(pTHX)
 
     DEBUG_T( {
 	SV* tmp = newSVpvs("");
-	PerlIO_printf(Perl_debug_log, "### %"IVdf":LEX_%s/X%s/%"IVdf" %s\n",
+	PerlIO_printf(Perl_debug_log, "### %"IVdf":LEX_%s/X%s/%"IVdf"/%"IVdf" %s\n",
 	    (IV)PL_parser->lex_line_number,
 	    lex_state_names[PL_lex_state],
 	    exp_name[PL_expect],
 	    (IV)PL_parser->statement_indent,
+	    PL_lex_brackets,
 	    pv_display(tmp, s, strlen(s), 0, 60));
 	SvREFCNT_dec(tmp);
     } );
@@ -3541,6 +3542,11 @@ Perl_yylex(pTHX)
 
 	if (s[1] == '(') {
 	    /* anonymous hash constructor '%(' */
+	    if (PL_lex_brackets > 100)
+		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
+	    ++PL_lex_brackets;
+
 	    s += 2;
 	    OPERATOR(ANONHSH);
 	}
@@ -3741,6 +3747,12 @@ Perl_yylex(pTHX)
 	    PL_oldbufptr = PL_oldoldbufptr;		/* allow print(STDOUT 123) */
 	else
 	    PL_expect = XTERM;
+
+	if (PL_lex_brackets > 100)
+	    Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+	PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
+	++PL_lex_brackets;
+
 	s = SKIPSPACE1(s);
 	TOKEN('(');
     case ';':
@@ -3751,6 +3763,13 @@ Perl_yylex(pTHX)
     case ')':
 	{
 	    const char tmp = *s++;
+	    if (PL_lex_brackets <= 0)
+		yyerror("Unmatched right parenthesis");
+	    else {
+		--PL_lex_brackets;
+		if (PL_lex_brackstack[PL_lex_brackets].state != XOPERATOR)
+		    yyerror("Closing parenthesis did not match open parenthesis");
+	    }
 	    PL_expect = XOPERATOR;
 	    TERM(tmp);
 	}
@@ -3767,9 +3786,8 @@ Perl_yylex(pTHX)
 	TERM(']');
     case '{':
 	s++;
-	if (PL_lex_brackets > 100) {
+	if (PL_lex_brackets > 100)
 	    Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
-	}
 	switch (PL_expect) {
 	case XTERM:
 	    if (PL_oldoldbufptr == PL_last_lop)
@@ -4067,9 +4085,13 @@ Perl_yylex(pTHX)
 	}
 
 	if (s[1] == '(') {
-	    /* anon scalar constructor */
+	    /* anon scalar constructor $( */
+	    if (PL_lex_brackets > 100)
+		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
+	    ++PL_lex_brackets;
+
 	    s += 2;
-	    PL_lex_brackstack[PL_lex_brackets++].state = XTERM;
 	    OPERATOR(ANONSCALAR);
 	}
 
@@ -4101,7 +4123,12 @@ Perl_yylex(pTHX)
 	    no_op("Array", s);
 
 	if (s[1] == '(') {
-	    /* array constructor */
+	    /* array constructor  @( */
+	    if (PL_lex_brackets > 100)
+		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
+	    ++PL_lex_brackets;
+
 	    s += 2;
 	    OPERATOR(ANONARY);
 	}

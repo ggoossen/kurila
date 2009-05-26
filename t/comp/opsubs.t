@@ -60,7 +60,7 @@ is( &qx('amper'), "qx-amper", "&qx() is func" )
 # s operator
 can_ok( 'main', "s" )
 eval "s('unqualified')"
-like( $^EVAL_ERROR->{?description}, qr/^Substitution replacement not terminated/, "s('unqualified') doesn't work" )
+like( $^EVAL_ERROR->{?description}, qr/^statement end found where string delimeter expected/, "s('unqualified') doesn't work" )
 is( main::s('main'), "s-main", "main::s() is func" )
 is( &s('amper'), "s-amper", "&s() is func" )
 
