@@ -1024,6 +1024,50 @@ S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
     return s;
 }
 
+/* skips_pod
+   returns the first position after the pod, or NULL if the is no pod.
+ */
+STATIC char *
+S_skip_pod(pTHX_ register char *s)
+{
+    DEBUG_T({ PerlIO_printf(Perl_debug_log,
+                "### New skippod of '%s'", s); });
+    if (s[0] == '=' && isALPHA(s[1]) 
+	&& (s == PL_linestart || s[-1] == '\n') ) {
+	if (PL_in_eval && !PL_rsfp) {
+	    char* d;
+	    d = PL_bufend;
+	    while (s < d) {
+		if (*s++ == '\n') {
+		    incline(s);
+		    if (strnEQ(s,"=cut",4)) {
+			s = strchr(s,'\n');
+			if (s)
+			    s++;
+			else
+			    s = d;
+			incline(s);
+			return s;
+		    }
+		}
+	    }
+	    return s;
+	}
+#ifdef PERL_MAD
+	if (PL_madskills) {
+	    if (!PL_thiswhite)
+		PL_thiswhite = newSVpvs("");
+	    sv_catpvn(PL_thiswhite, PL_linestart,
+		PL_bufend - PL_linestart);
+	}
+#endif
+	s = PL_bufend;
+	PL_doextract = TRUE;
+	return s;
+    }
+    return NULL;
+}
+
 /*
  * S_check_uni
  * Check the unary operators to ensure there's no ambiguity in how they're
@@ -3222,10 +3266,12 @@ Perl_yylex(pTHX)
 	if (!is_continuation) {
 	    if (PL_parser->statement_indent != -1) {
 		if ((s - PL_linestart) <= PL_parser->statement_indent) {
+		    d = S_skip_pod(s);
+		    if (d) {
+			s = d;
+			TOKEN(';');
+		    }
 		    if ((s - PL_linestart) < PL_parser->statement_indent) {
-			DEBUG_T({ PerlIO_printf(Perl_debug_log,
-				    "### End statement indent level, %d (line indentation: %d).\n",
-				    (int)PL_parser->statement_indent, (s - PL_linestart)); });
 			S_stop_statement_indent();
 			s = PL_linestart - 1;
 			assert(*s == '\n');
@@ -3958,39 +4004,13 @@ Perl_yylex(pTHX)
 		Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
 			    "Reversed %c= operator",(int)tmp);
 	    s--;
-	    if (PL_expect == XSTATE && isALPHA(tmp) &&
-		(s == PL_linestart+1 || s[-2] == '\n') )
-		{
-		    if (PL_in_eval && !PL_rsfp) {
-			d = PL_bufend;
-			while (s < d) {
-			    if (*s++ == '\n') {
-				incline(s);
-				if (strnEQ(s,"=cut",4)) {
-				    s = strchr(s,'\n');
-				    if (s)
-					s++;
-				    else
-					s = d;
-				    incline(s);
-				    goto retry;
-				}
-			    }
-			}
-			goto retry;
-		    }
-#ifdef PERL_MAD
-		    if (PL_madskills) {
-			if (!PL_thiswhite)
-			    PL_thiswhite = newSVpvs("");
-			sv_catpvn(PL_thiswhite, PL_linestart,
-				  PL_bufend - PL_linestart);
-		    }
-#endif
-		    s = PL_bufend;
-		    PL_doextract = TRUE;
+	    if (PL_expect == XSTATE) {
+		d = S_skip_pod(s-1);
+		if (d) {
+		    s = d;
 		    goto retry;
 		}
+	    }
 	}
 	pl_yylval.i_tkval.ival = 0;
 	OPERATOR(ASSIGNOP);

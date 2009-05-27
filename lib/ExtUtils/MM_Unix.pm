@@ -1188,7 +1188,7 @@ NAME attribute.
 
 sub guess_name($self) {;
     use Cwd 'cwd';
-    my $name = basename( <cwd());
+    my $name = basename(cwd());
     $name =~ s|[\-_][\d\.\-]+\z||;  # this is new with MM 5.00, we
     # strip minus or underline
     # followed by a float or some such

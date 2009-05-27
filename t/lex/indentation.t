@@ -4,7 +4,7 @@ BEGIN
     require './test.pl'
 
 
-plan tests => 11
+plan tests => 12
 
 our ($x, $y)
 
@@ -55,8 +55,16 @@ do
 is($x, "old")
 is($y, "old")
 
+# s/// seperared by statement end
 eval_dies_like(<<'EOE', qr/statement end found where string delimeter expected/);
 do
     s(foo)
     {bar}g
 EOE
+
+# block divided using pod
+do
+    my $tmpvar = "aap"
+=head1 TEST
+=cut
+    is $tmpvar, "aap"
