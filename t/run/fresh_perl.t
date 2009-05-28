@@ -261,14 +261,6 @@ print $^STDOUT, "ok\n";
 EXPECT
 ok
 ########
-sub C () { 1 }
-sub M { @_[0] = 2; }
-eval "C";
-M(C);
-EXPECT
-Modification of a read-only value attempted at - line 2 character 11.
-    main::M called at - line 4 character 1.
-########
 print $^STDOUT, < qw(ab a\b a\\b);
 EXPECT
 aba\ba\\b

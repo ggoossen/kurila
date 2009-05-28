@@ -6108,13 +6108,6 @@ indentation and initial hashes.  Behaves usually outside of comment."
 	  ;; Do it the dull way, without choose-color
 	  (defvar kurila-guessed-background nil
 	    "Display characteristics as guessed by kurila.")
-	  ;;	  (or (fboundp 'x-color-defined-p)
-	  ;;	      (defalias 'x-color-defined-p
-	  ;;		(cond ((fboundp 'color-defined-p) 'color-defined-p)
-	  ;;		      ;; XEmacs >= 19.12
-	  ;;		      ((fboundp 'valid-color-name-p) 'valid-color-name-p)
-	  ;;		      ;; XEmacs 19.11
-	  ;;		      (t 'x-valid-color-name-p))))
 	  (kurila-force-face font-lock-constant-face
 			    "Face for constant and label names")
 	  (kurila-force-face font-lock-variable-name-face
@@ -6133,29 +6126,6 @@ indentation and initial hashes.  Behaves usually outside of comment."
 			    "Face for hashes")
 	  (kurila-force-face kurila-array-face
 			    "Face for arrays")
-	  ;;(defvar font-lock-constant-face 'font-lock-constant-face)
-	  ;;(defvar font-lock-variable-name-face 'font-lock-variable-name-face)
-	  ;;(or (boundp 'font-lock-type-face)
-	  ;;    (defconst font-lock-type-face
-	  ;;	'font-lock-type-face
-	  ;;	"Face to use for data types."))
-	  ;;(or (boundp 'kurila-nonoverridable-face)
-	  ;;    (defconst kurila-nonoverridable-face
-	  ;;	'kurila-nonoverridable-face
-	  ;;	"Face to use for data types from another group."))
-	  ;;(if (not kurila-xemacs-p) nil
-	  ;;  (or (boundp 'font-lock-comment-face)
-	  ;;	(defconst font-lock-comment-face
-	  ;;	  'font-lock-comment-face
-	  ;;	  "Face to use for comments."))
-	  ;;  (or (boundp 'font-lock-keyword-face)
-	  ;;	(defconst font-lock-keyword-face
-	  ;;	  'font-lock-keyword-face
-	  ;;	  "Face to use for keywords."))
-	  ;;  (or (boundp 'font-lock-function-name-face)
-	  ;;	(defconst font-lock-function-name-face
-	  ;;	  'font-lock-function-name-face
-	  ;;	  "Face to use for function names.")))
 	  (if (and
 	       (not (kurila-is-face 'kurila-array-face))
 	       (kurila-is-face 'font-lock-emphasized-face))
@@ -6170,27 +6140,12 @@ indentation and initial hashes.  Behaves usually outside of comment."
 	       (kurila-is-face 'font-lock-other-type-face))
 	      (copy-face 'font-lock-other-type-face
 			 'kurila-nonoverridable-face))
-	  ;;(or (boundp 'kurila-hash-face)
-	  ;;    (defconst kurila-hash-face
-	  ;;	'kurila-hash-face
-	  ;;	"Face to use for hashes."))
-	  ;;(or (boundp 'kurila-array-face)
-	  ;;    (defconst kurila-array-face
-	  ;;	'kurila-array-face
-	  ;;	"Face to use for arrays."))
 	  ;; Here we try to guess background
 	  (let ((background
 		 (if (boundp 'font-lock-background-mode)
 		     font-lock-background-mode
 		   'light))
 		(face-list (and (fboundp 'face-list) (face-list))))
-;;;;	    (fset 'kurila-is-face
-;;;;		  (cond ((fboundp 'find-face)
-;;;;			 (symbol-function 'find-face))
-;;;;			(face-list
-;;;;			 (function (lambda (face) (member face face-list))))
-;;;;			(t
-;;;;			 (function (lambda (face) (boundp face))))))
 	    (defvar kurila-guessed-background
 	      (if (and (boundp 'font-lock-display-type)
 		       (eq font-lock-display-type 'grayscale))
@@ -6229,40 +6184,6 @@ indentation and initial hashes.  Behaves usually outside of comment."
 				     (if (x-color-defined-p "orchid1")
 					 "orchid1"
 				       "orange")))))
-;;;	    (if (kurila-is-face 'font-lock-other-emphasized-face) nil
-;;;	      (copy-face 'bold-italic 'font-lock-other-emphasized-face)
-;;;	      (cond
-;;;	       ((eq background 'light)
-;;;		(set-face-background 'font-lock-other-emphasized-face
-;;;				     (if (x-color-defined-p "lightyellow2")
-;;;					 "lightyellow2"
-;;;				       (if (x-color-defined-p "lightyellow")
-;;;					   "lightyellow"
-;;;					 "light yellow"))))
-;;;	       ((eq background 'dark)
-;;;		(set-face-background 'font-lock-other-emphasized-face
-;;;				     (if (x-color-defined-p "navy")
-;;;					 "navy"
-;;;				       (if (x-color-defined-p "darkgreen")
-;;;					   "darkgreen"
-;;;					 "dark green"))))
-;;;	       (t (set-face-background 'font-lock-other-emphasized-face "gray90"))))
-;;;	    (if (kurila-is-face 'font-lock-emphasized-face) nil
-;;;	      (copy-face 'bold 'font-lock-emphasized-face)
-;;;	      (cond
-;;;	       ((eq background 'light)
-;;;		(set-face-background 'font-lock-emphasized-face
-;;;				     (if (x-color-defined-p "lightyellow2")
-;;;					 "lightyellow2"
-;;;				       "lightyellow")))
-;;;	       ((eq background 'dark)
-;;;		(set-face-background 'font-lock-emphasized-face
-;;;				     (if (x-color-defined-p "navy")
-;;;					 "navy"
-;;;				       (if (x-color-defined-p "darkgreen")
-;;;					   "darkgreen"
-;;;					 "dark green"))))
-;;;	       (t (set-face-background 'font-lock-emphasized-face "gray90"))))
 	    (if (kurila-is-face 'font-lock-variable-name-face) nil
 	      (copy-face 'italic 'font-lock-variable-name-face))
 	    (if (kurila-is-face 'font-lock-constant-face) nil
@@ -6314,39 +6235,6 @@ Style of printout regulated by the variable `kurila-ps-print-face-properties'."
 	(ps-print-face-extension-alist ps-print-face-extension-alist))
     (kurila-ps-extend-face-list kurila-ps-print-face-properties)
     (ps-print-buffer-with-faces file)))
-
-;;; (defun kurila-ps-print-init ()
-;;;   "Initialization of `ps-print' components for faces used in Kurila."
-;;;   ;; Guard against old versions
-;;;   (defvar ps-underlined-faces nil)
-;;;   (defvar ps-bold-faces nil)
-;;;   (defvar ps-italic-faces nil)
-;;;   (setq ps-bold-faces
-;;; 	(append '(font-lock-emphasized-face
-;;; 		  kurila-array-face
-;;; 		  font-lock-keyword-face
-;;; 		  font-lock-variable-name-face
-;;; 		  font-lock-constant-face
-;;; 		  font-lock-reference-face
-;;; 		  font-lock-other-emphasized-face
-;;; 		  kurila-hash-face)
-;;; 		ps-bold-faces))
-;;;   (setq ps-italic-faces
-;;; 	(append '(kurila-nonoverridable-face
-;;; 		  font-lock-constant-face
-;;; 		  font-lock-reference-face
-;;; 		  font-lock-other-emphasized-face
-;;; 		  kurila-hash-face)
-;;; 		ps-italic-faces))
-;;;   (setq ps-underlined-faces
-;;; 	(append '(font-lock-emphasized-face
-;;; 		  kurila-array-face
-;;; 		  font-lock-other-emphasized-face
-;;; 		  kurila-hash-face
-;;; 		  kurila-nonoverridable-face font-lock-type-face)
-;;; 		ps-underlined-faces))
-;;;   (cons 'font-lock-type-face ps-underlined-faces))
-
 
 (if (kurila-enable-font-lock) (kurila-windowed-init))
 

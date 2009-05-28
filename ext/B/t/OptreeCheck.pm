@@ -291,15 +291,13 @@ use Config
 use Carp
 use B::Concise < qw(walk_output)
 
-BEGIN 
+BEGIN
     $^WARN_HOOK = sub (@< @_)
         my $err = shift->{?description}
         $err =~ m/Subroutine re::(un)?install redefined/ and return
-    
 
 
-sub import
-    my $pkg = shift
+sub import($pkg)
     $pkg->export_to_level(1,'checkOptree', < @EXPORT)
     getCmdLine()	# process @ARGV
 

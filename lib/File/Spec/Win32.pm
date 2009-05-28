@@ -40,7 +40,7 @@ sub devnull
     return "nul"
 
 
-sub rootdir () { '\' }
+sub rootdir(?_) { '\' }
 
 
 =item tmpdir

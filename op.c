@@ -3449,92 +3449,6 @@ Perl_cv_const_sv(pTHX_ CV *cv)
     return CvCONST(cv) ? (SV*)CvXSUBANY(cv).any_ptr : NULL;
 }
 
-/* op_const_sv:  examine an optree to determine whether it's in-lineable.
- * Can be called in 3 ways:
- *
- * !cv
- * 	look for a single OP_CONST with attached value: return the value
- *
- * cv && CvCLONE(cv) && !CvCONST(cv)
- *
- * 	examine the clone prototype, and if contains only a single
- * 	OP_CONST referencing a pad const, or a single PADSV referencing
- * 	an outer lexical, return a non-zero value to indicate the CV is
- * 	a candidate for "constizing" at clone time
- *
- * cv && CvCONST(cv)
- *
- *	We have just cloned an anon prototype that was marked as a const
- *	candidiate. Try to grab the current value, and in the case of
- *	PADSV, ignore it if it has multiple references. Return the value.
- */
-
-SV *
-Perl_op_const_sv(pTHX_ const OP *o, CV *cv)
-{
-    dVAR;
-    SV *sv = NULL;
-
-    if (PL_madskills)
-	return NULL;
-
-    if (!o)
-	return NULL;
-
-    if (o->op_type == OP_ROOT && cLISTOPo->op_first)
-	o = cLISTOPo->op_first;
-
-    if (o->op_type == OP_LEAVESUB && cLISTOPo->op_first)
-	o = cLISTOPo->op_first;
-
-    if (o->op_type == OP_LINESEQ && cLISTOPo->op_first)
-	o = cLISTOPo->op_first->op_sibling;
-
-    for (; o; o = o->op_next) {
-	const OPCODE type = o->op_type;
-
-	if (sv && o->op_next == o)
-	    return sv;
-	if (o->op_next != o) {
-	    if (type == OP_NEXTSTATE || type == OP_NULL || type == OP_PUSHMARK)
-		continue;
-	    if (type == OP_DBSTATE)
-		continue;
-	}
-	if (type == OP_LEAVESUB || type == OP_RETURN)
-	    break;
-	if (sv)
-	    return NULL;
-	if (type == OP_CONST && cSVOPo->op_sv)
-	    sv = cSVOPo->op_sv;
-	else if (cv && type == OP_CONST) {
-	    sv = PAD_BASE_SV(CvPADLIST(cv), o->op_targ);
-	    if (!sv)
-		return NULL;
-	}
-	else if (cv && type == OP_PADSV) {
-	    if (CvCONST(cv)) { /* newly cloned anon */
-		sv = PAD_BASE_SV(CvPADLIST(cv), o->op_targ);
-		/* the candidate should have 1 ref from this pad and 1 ref
-		 * from the parent */
-		if (!sv || SvREFCNT(sv) != 2)
-		    return NULL;
-		sv = newSVsv(sv);
-		SvREADONLY_on(sv);
-		return sv;
-	    }
-	    else {
-		if (PAD_COMPNAME_FLAGS(o->op_targ) & SVf_FAKE)
-		    sv = &PL_sv_undef; /* an arbitrary non-null value */
-	    }
-	}
-	else {
-	    return NULL;
-	}
-    }
-    return sv;
-}
-
 #ifdef PERL_MAD
 OP *
 #else
@@ -3635,28 +3549,8 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 {
     dVAR;
     register CV *cv = NULL;
-    SV *const_sv;
 
     cv = NULL;
-
-    if (!block || !proto || proto->op_type != OP_STUB
-#ifdef PERL_MAD
-	|| block->op_type == OP_NULL
-#endif
-	)
-	const_sv = NULL;
-    else
-	const_sv = op_const_sv(block, NULL);
-
-    if (const_sv) {
-	SvREFCNT_inc_void_NN(const_sv);
-	cv = newCONSTSUB(NULL, const_sv);
-	if (PL_madskills)
-	    goto install_block;
-	op_free(block);
-	LEAVE_SCOPE(floor);
-	return cv;
-    }
 
     cv = PL_compcv;
     SVcpSTEAL(SvLOCATION(cv), newSVsv(PL_curcop->op_location));
@@ -3732,12 +3626,6 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
     /* now that optimizer has done its work, adjust pad values */
 
     pad_tidy(CvCLONE(cv) ? padtidy_SUBCLONE : padtidy_SUB);
-
-    if (CvANON(cv)) {
-	assert(!CvCONST(cv));
-	if (CvN_MINARGS(cv) == 0 && CvN_MAXARGS(cv) == 0 && op_const_sv(block, cv))
-	    CvCONST_on(cv);
-    }
 
   done:
     CvREFCNT_inc(cv);

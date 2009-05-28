@@ -27,7 +27,7 @@ $NL = $^INPUT_RECORD_SEPARATOR unless defined $NL
 #-----------------------------------------------------------------------------
 # Set up some constants:
 
-BEGIN 
+BEGIN
     if(defined &ASCII)    { }
     elsif(chr(65) eq 'A') { *ASCII = sub () {1}  }
     else                  { *ASCII = sub () {''} }
@@ -35,7 +35,7 @@ BEGIN
     unless(defined &MANY_LINES) { *MANY_LINES = sub () {20} }
     DEBUG +> 4 and print $^STDOUT, "MANY_LINES is ", MANY_LINES(), "\n"
     unless(MANY_LINES() +>= 1)
-        die "MANY_LINES is too small (", MANY_LINES(), ")!\nAborting"
+        die "MANY_LINES is too small (" . MANY_LINES() . ")!\nAborting"
     
     if(defined &UNICODE) { }
     else                 { *UNICODE = sub() {1} }
