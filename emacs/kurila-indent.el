@@ -3,8 +3,8 @@
   "Return a list of possible indentations for the current line.
 These are then used by `kurila-indent-cycle'.
 START if non-nil is a presumed start pos of the current definition."
+  (print (kurila-sniff-for-indent nil) (get-buffer "*Messages*"))
   '((0) (4) (8) (12)))
-
 
 (defvar kurila-indent-last-info nil)
 

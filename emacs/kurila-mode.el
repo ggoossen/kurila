@@ -1257,7 +1257,6 @@ versions of Emacs."
   (kurila-define-key ":" 'kurila-electric-terminator)
   (kurila-define-key "\C-j" 'newline-and-indent)
   (kurila-define-key "\C-c\C-j" 'kurila-linefeed)
-  (kurila-define-key "\C-c\C-t" 'kurila-invert-if-unless)
   (kurila-define-key "\C-c\C-a" 'kurila-toggle-auto-newline)
   (kurila-define-key "\C-c\C-k" 'kurila-toggle-abbrev)
   (kurila-define-key "\C-c\C-w" 'kurila-toggle-construct-fix)
@@ -1344,7 +1343,6 @@ versions of Emacs."
 	 ["Fill paragraph/comment" kurila-fill-paragraph t]
 	 "----"
 	 ["Line up a construction" kurila-lineup (kurila-use-region-p)]
-	 ["Invert if/unless/while etc" kurila-invert-if-unless t]
 	 ("Regexp"
 	  ["Beautify" kurila-beautify-regexp
 	   kurila-use-syntax-table-text-property]
@@ -1696,14 +1694,6 @@ appropriately indented blank line.  If you need a usual
 `newline-and-indent' behaviour, it is on \\[newline-and-indent],
 see documentation on `kurila-electric-linefeed'.
 
-Use \\[kurila-invert-if-unless] to change a construction of the form
-
-	    if (A) { B }
-
-into
-
-            B if A;
-
 \\{kurila-mode-map}
 
 Setting the variable `kurila-font-lock' to t switches on font-lock-mode
@@ -1873,8 +1863,6 @@ or as help on variables `kurila-tips', `kurila-problems',
     (progn
       (make-local-variable 'paren-backwards-message)
       (set 'paren-backwards-message t)))
-  (make-local-variable 'indent-line-function)
-  (setq indent-line-function 'kurila-indent-line)
   (make-local-variable 'require-final-newline)
   (setq require-final-newline t)
   (make-local-variable 'comment-start)
@@ -8390,192 +8378,6 @@ We suppose that the regexp is scanned already."
       (forward-sexp 1)
       (set-marker e (1- (point)))
       (kurila-beautify-regexp-piece b e nil deep))))
-
-(defun kurila-invert-if-unless-modifiers ()
-  "Change `B if A;' into `if (A) {B}' etc if possible.
-\(Unfinished.)"
-  (interactive)				; 
-  (let (A B pre-B post-B pre-if post-if pre-A post-A if-string
-	  (w-rex "\\<\\(if\\|unless\\|while\\|until\\|for\\|foreach\\)\\>"))
-    (and (= (char-syntax (preceding-char)) ?w)
-	 (forward-sexp -1))
-    (setq pre-if (point))
-    (kurila-backward-to-start-of-expr)
-    (setq pre-B (point))
-    (forward-sexp 1)		; otherwise forward-to-end-of-expr is NOP
-    (kurila-forward-to-end-of-expr)
-    (setq post-A (point))
-    (goto-char pre-if)
-    (or (looking-at w-rex)
-	;; Find the position
-	(progn (goto-char post-A)
-	       (while (and
-		       (not (looking-at w-rex))
-		       (> (point) pre-B))
-		 (forward-sexp -1))
-	       (setq pre-if (point))))
-    (or (looking-at w-rex)
-	(error "Can't find `if', `unless', `while', `until', `for' or `foreach'"))
-    ;; 1 B 2 ... 3 B-com ... 4 if 5 ... if-com 6 ... 7 A 8
-    (setq if-string (buffer-substring (match-beginning 0) (match-end 0)))
-    ;; First, simple part: find code boundaries
-    (forward-sexp 1)
-    (setq post-if (point))
-    (forward-sexp -2)
-    (forward-sexp 1)
-    (setq post-B (point))
-    (kurila-backward-to-start-of-expr)
-    (setq pre-B (point))
-    (setq B (buffer-substring pre-B post-B))
-    (goto-char pre-if)
-    (forward-sexp 2)
-    (forward-sexp -1)
-    ;; May be after $, @, $# etc of a variable
-    (skip-chars-backward "$@%#")
-    (setq pre-A (point))
-    (kurila-forward-to-end-of-expr)
-    (setq post-A (point))
-    (setq A (buffer-substring pre-A post-A))
-    ;; Now modify (from end, to not break the stuff)
-    (skip-chars-forward " \t;")
-    (delete-region pre-A (point))	; we move to pre-A
-    (insert "\n" B ";\n}")
-    (and (looking-at "[ \t]*#") (kurila-indent-for-comment))
-    (delete-region pre-if post-if)
-    (delete-region pre-B post-B)
-    (goto-char pre-B)
-    (insert if-string " (" A ") {")
-    (setq post-B (point))
-    (if (looking-at "[ \t]+$")
-	(delete-horizontal-space)
-      (if (looking-at "[ \t]*#")
-	  (kurila-indent-for-comment)
-	(just-one-space)))
-    (forward-line 1)
-    (if (looking-at "[ \t]*$")
-	(progn				; delete line
-	  (delete-horizontal-space)
-	  (delete-region (point) (1+ (point)))))
-    (kurila-indent-line)
-    (goto-char (1- post-B))
-    (forward-sexp 1)
-    (kurila-indent-line)
-    (goto-char pre-B)))
-
-(defun kurila-invert-if-unless ()
-  "Change `if (A) {B}' into `B if A;' etc (or visa versa) if possible.
-If the cursor is not on the leading keyword of the BLOCK flavor of
-construct, will assume it is the STATEMENT flavor, so will try to find
-the appropriate statement modifier."
-  (interactive)
-  (and (= (char-syntax (preceding-char)) ?w)
-       (forward-sexp -1))
-  (if (looking-at "\\<\\(if\\|unless\\|while\\|until\\|for\\|foreach\\)\\>")
-      (let ((pre-if (point))
-	    pre-A post-A pre-B post-B A B state p end-B-code is-block B-comment
-	    (if-string (buffer-substring (match-beginning 0) (match-end 0))))
-	(forward-sexp 2)
-	(setq post-A (point))
-	(forward-sexp -1)
-	(setq pre-A (point))
-	(setq is-block (and (eq (following-char) ?\( )
-			    (save-excursion
-			      (condition-case nil
-				  (progn
-				    (forward-sexp 2)
-				    (forward-sexp -1)
-				    (eq (following-char) ?\{ ))
-				(error nil)))))
-	(if is-block
-	    (progn
-	      (goto-char post-A)
-	      (forward-sexp 1)
-	      (setq post-B (point))
-	      (forward-sexp -1)
-	      (setq pre-B (point))
-	      (if (and (eq (following-char) ?\{ )
-		       (progn
-			 (kurila-backward-to-noncomment post-A)
-			 (eq (preceding-char) ?\) )))
-		  (if (condition-case nil
-			  (progn
-			    (goto-char post-B)
-			    (forward-sexp 1)
-			    (forward-sexp -1)
-			    (looking-at "\\<els\\(e\\|if\\)\\>"))
-			(error nil))
-		      (error
-		       "`%s' (EXPR) {BLOCK} with `else'/`elsif'" if-string)
-		    (goto-char (1- post-B))
-		    (kurila-backward-to-noncomment pre-B)
-		    (if (eq (preceding-char) ?\;)
-			(forward-char -1))
-		    (setq end-B-code (point))
-		    (goto-char pre-B)
-		    (while (re-search-forward "\\<\\(for\\|foreach\\|if\\|unless\\|while\\|until\\)\\>\\|;" end-B-code t)
-		      (setq p (match-beginning 0)
-			    A (buffer-substring p (match-end 0))
-			    state (parse-partial-sexp pre-B p))
-		      (or (nth 3 state)
-			  (nth 4 state)
-			  (nth 5 state)
-			  (error "`%s' inside `%s' BLOCK" A if-string))
-		      (goto-char (match-end 0)))
-		    ;; Finally got it
-		    (goto-char (1+ pre-B))
-		    (skip-chars-forward " \t\n")
-		    (setq B (buffer-substring (point) end-B-code))
-		    (goto-char end-B-code)
-		    (or (looking-at ";?[ \t\n]*}")
-			(progn
-			  (skip-chars-forward "; \t\n")
-			  (setq B-comment
-				(buffer-substring (point) (1- post-B)))))
-		    (and (equal B "")
-			 (setq B "1"))
-		    (goto-char (1- post-A))
-		    (kurila-backward-to-noncomment pre-A)
-		    (or (looking-at "[ \t\n]*)")
-			(goto-char (1- post-A)))
-		    (setq p (point))
-		    (goto-char (1+ pre-A))
-		    (skip-chars-forward " \t\n")
-		    (setq A (buffer-substring (point) p))
-		    (delete-region pre-B post-B)
-		    (delete-region pre-A post-A)
-		    (goto-char pre-if)
-		    (insert B " ")
-		    (and B-comment (insert B-comment " "))
-		    (just-one-space)
-		    (forward-word 1)
-		    (setq pre-A (point))
-		    (insert " " A ";")
-		    (delete-horizontal-space)
-		    (setq post-B (point))
-		    (if (looking-at "#")
-			(indent-for-comment))
-		    (goto-char post-B)
-		    (forward-char -1)
-		    (delete-horizontal-space)
-		    (goto-char pre-A)
-		    (just-one-space)
-		    (goto-char pre-if)
-		    (setq pre-A (set-marker (make-marker) pre-A))
-		    (while (<= (point) (marker-position pre-A))
-		      (kurila-indent-line)
-		      (forward-line 1))
-		    (goto-char (marker-position pre-A))
-		    (if B-comment
-			(progn
-			  (forward-line -1)
-			  (indent-for-comment)
-			  (goto-char (marker-position pre-A)))))
-		(error "`%s' (EXPR) not with an {BLOCK}" if-string)))
-	  ;; (error "`%s' not with an (EXPR)" if-string)
-	  (forward-sexp -1)
-	  (kurila-invert-if-unless-modifiers)))
-    ;;(error "Not at `if', `unless', `while', `until', `for' or `foreach'")
-    (kurila-invert-if-unless-modifiers)))
 
 ;;; By Anthony Foiani <afoiani@uswest.com>
 ;;; Getting help on modules in C-h f ?
