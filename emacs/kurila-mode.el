@@ -5872,27 +5872,10 @@ indentation and initial hashes.  Behaves usually outside of comment."
 			  "\\([^ \n\t{;()]+\\)" ; 2=name (assume non-anonymous)
 			  "\\("
 			    kurila-maybe-white-and-comment-rex ;whitespace/comments?
-			    "([^()]*)\\)?" ; prototype
-			  kurila-maybe-white-and-comment-rex ; whitespace/comments?
-			  "[{;]")
-		  2 (if kurila-font-lock-multiline
-			'(if (eq (char-after (kurila-1- (match-end 0))) ?\{ )
-			     'font-lock-function-name-face
-			   'font-lock-variable-name-face)
-		      ;; need to manually set 'multiline' for older font-locks
-		      '(progn
-			 (if (< 1 (count-lines (match-beginning 0)
-					       (match-end 0)))
-			     (put-text-property
-			      (+ 3 (match-beginning 0)) (match-end 0)
-			      'syntax-type 'multiline))
-			 (if (eq (char-after (kurila-1- (match-end 0))) ?\{ )
-			     'font-lock-function-name-face
-			   'font-lock-variable-name-face))))
+			    "([^()]*)\\)?") ; prototype
+		  2 font-lock-function-name-face)
 	    '("\\<\\(package\\|require\\|use\\|import\\|no\\|bootstrap\\)[ \t]+\\([a-zA-z_][a-zA-z_0-9:]*\\)[ \t;]" ; require A if B;
 	      2 font-lock-function-name-face)
-	    '("^[ \t]*format[ \t]+\\([a-zA-z_][a-zA-z_0-9:]*\\)[ \t]*=[ \t]*$"
-	      1 font-lock-function-name-face)
 	    (cond ((featurep 'font-lock-extra)
 		   '("\\([]}\\\\%@>*&]\\|\\$[a-zA-Z0-9_:]*\\)[ \t]*{[ \t]*\\(-?[a-zA-Z0-9_:]+\\)[ \t]*}"
 		     (2 font-lock-string-face t)
@@ -5987,32 +5970,9 @@ indentation and initial hashes.  Behaves usually outside of comment."
 		 (and (string< "21.1.10" emacs-version)
 		      (string< emacs-version "21.1.2")))
 		'(
-		  ("\\(\\([@%]\\|\$#\\)[a-zA-Z_:][a-zA-Z0-9_:]*\\)" 1
-		   (if (eq (char-after (match-beginning 2)) ?%)
-		       kurila-hash-face
-		     kurila-array-face)
+		  ("\\(\\([$@%]\\)[a-zA-Z_:][a-zA-Z0-9_:]*\\)" 1
+		   font-lock-variable-name-face
 		   t)			; arrays and hashes
-		  ("\\(\\([$@]+\\)[a-zA-Z_:][a-zA-Z0-9_:]*\\)[ \t]*\\([[{]\\)"
-		   1
-		   (if (= (- (match-end 2) (match-beginning 2)) 1)
-		       (if (eq (char-after (match-beginning 3)) ?{)
-			   kurila-hash-face
-			 kurila-array-face) ; arrays and hashes
-		     font-lock-variable-name-face) ; Just to put something
-		   t)
-		  ("\\(@\\|\\$#\\)\\(\\$+\\([a-zA-Z_:][a-zA-Z0-9_:]*\\|[^ \t\n]\\)\\)"
-		   (1 kurila-array-face)
-		   (2 font-lock-variable-name-face))
-		  ("\\(%\\)\\(\\$+\\([a-zA-Z_:][a-zA-Z0-9_:]*\\|[^ \t\n]\\)\\)"
-		   (1 kurila-hash-face)
-		   (2 font-lock-variable-name-face))
-		  ;;("\\([smy]\\|tr\\)\\([^a-z_A-Z0-9]\\)\\(\\([^\n\\]*||\\)\\)\\2")
-		       ;;; Too much noise from \s* @s[ and friends
-		  ;;("\\(\\<\\([msy]\\|tr\\)[ \t]*\\([^ \t\na-zA-Z0-9_]\\)\\|\\(/\\)\\)"
-		  ;;(3 font-lock-function-name-face t t)
-		  ;;(4
-		  ;; (if (kurila-slash-is-regexp)
-		  ;;    font-lock-function-name-face 'default) nil t))
 		  )))
 	  (if kurila-highlight-variables-indiscriminately
 	      (setq t-font-lock-keywords-1
