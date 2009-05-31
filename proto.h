@@ -514,9 +514,6 @@ PERL_CALLCONV void	Perl_cv_setcv(pTHX_ CV* dst, CV* src)
 PERL_CALLCONV SV*	Perl_cv_const_sv(pTHX_ CV* cv)
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV SV*	Perl_op_const_sv(pTHX_ const OP* o, CV* cv)
-			__attribute__warn_unused_result__;
-
 PERL_INLINE_CALLCONV bool	Perl_cv_assignarg_flag(pTHX_ CV* cv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_CV_ASSIGNARG_FLAG	\

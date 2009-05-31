@@ -74,14 +74,14 @@ sub walk_table ($function, ?$filename, ?$leader, ?$trailer)
     $filename //= '-'
     $leader //= do_not_edit($filename)
     my $F
-    if (ref $filename)	# filehandle
+    if (ref $filename)  # filehandle
         $F = $filename
     else
         # safer_unlink $filename if $filename ne '/dev/null';
         $F = safer_open("$filename-new")
     
     print $F, $leader if $leader
-    seek $in, 0, 0		# so we may restart
+    seek $in, 0, 0              # so we may restart
     while ( ~< $in->*)
         chomp
         next if m/^:/
@@ -119,7 +119,7 @@ sub munge_c_files ()
                }, '/dev/null', '', ''
     while ( ~< *ARGV)
         s{(\b(\w+)[ \t]*\([ \t]*(?!aTHX))}
-	 {$( do {
+         {$( do {
             my $repl = $1;
             my $f = $2;
             if (exists $functions->{$f}) {
@@ -129,7 +129,7 @@ sub munge_c_files ()
             $repl;
         })}g
         print $^STDOUT, $_
-        close *ARGV if eof	# restart $.
+        close *ARGV if eof      # restart $.
     
     exit
 
@@ -237,10 +237,10 @@ sub write_protos
             push @attrs, "__attribute__pure__"
         
         if( $flags =~ m/f/ )
-            my $prefix	= $has_context ?? 'pTHX_' !! ''
-            my $args	= scalar nelems @args
-            my $pat	= $args - 1
-            my $macro	= (nelems @nonnull) && @nonnull[-1] == $pat
+            my $prefix  = $has_context ?? 'pTHX_' !! ''
+            my $args    = scalar nelems @args
+            my $pat     = $args - 1
+            my $macro   = (nelems @nonnull) && @nonnull[-1] == $pat
                 ?? '__attribute__format__'
                 !! '__attribute__format__null_ok__'
             push @attrs, sprintf "\%s(__printf__,\%s\%d,\%s\%d)", $macro,
@@ -295,20 +295,20 @@ walk_table(\&write_global_sym, "global.sym", undef, "# ex: set ro:\n")
 #       warnhook
 #       hints
 my @extvars = qw(sv_undef sv_yes sv_no na dowarn
-		 curcop compiling
-		 tainting tainted stack_base stack_sp sv_arenaroot
-		 no_modify
-		 curstash DBsub DBsingle DBassertion debstash
-		 rsfp
-		 stdingv
-		 defgv
-		 errgv
-		 rsfp_filters
-		 perldb
-		 diehook
-		 dirty
-		 perl_destruct_level
-		 ppaddr
+                 curcop compiling
+                 tainting tainted stack_base stack_sp sv_arenaroot
+                 no_modify
+                 curstash DBsub DBsingle DBassertion debstash
+                 rsfp
+                 stdingv
+                 defgv
+                 errgv
+                 rsfp_filters
+                 perldb
+                 diehook
+                 dirty
+                 perl_destruct_level
+                 ppaddr
                 )
 
 sub readsyms($syms, $file)
@@ -317,7 +317,7 @@ sub readsyms($syms, $file)
     open($fh, "<", "$file")
         or die "embed.pl: Can't open $file: $^OS_ERROR\n"
     while ( ~< $fh->*)
-        s/[ \t]*#.*//		# Delete comments.
+        s/[ \t]*#.*//           # Delete comments.
         if (m/^\s*(\S+)\s*$/)
             my $sym = $1
             warn "duplicate symbol $sym while processing $file line $(iohandle::input_line_number(\*FILE)).\n"
@@ -336,7 +336,7 @@ sub readvars($syms, $file,$pre,?$keep_pre)
     open(my $fh, "<", "$file")
         or die "embed.pl: Can't open $file: $^OS_ERROR\n"
     while ( ~< $fh->*)
-        s/[ \t]*#.*//		# Delete comments.
+        s/[ \t]*#.*//           # Delete comments.
         if (m/PERLVARA?I?S?C?\($pre(\w+)/)
             my $sym = $1
             $sym = $pre . $sym if $keep_pre
@@ -478,7 +478,7 @@ for my $sym (sort keys %ppsym)
 
 print $em, <<'END'
 
-#else	/* PERL_IMPLICIT_CONTEXT */
+#else   /* PERL_IMPLICIT_CONTEXT */
 
 END
 
@@ -557,9 +557,9 @@ for my $sym (sort keys %ppsym)
 
 print $em, <<'END'
 
-#endif	/* PERL_IMPLICIT_CONTEXT */
+#endif  /* PERL_IMPLICIT_CONTEXT */
 
-#endif	/* #ifndef PERL_NO_SHORT_NAMES */
+#endif  /* #ifndef PERL_NO_SHORT_NAMES */
 
 END
 
@@ -570,8 +570,8 @@ print $em, <<'END'
  */
 
 #if !defined(PERL_CORE)
-#  define sv_setptrobj(rv,ptr,name)	sv_setref_iv(rv,name,PTR2IV(ptr))
-#  define sv_setptrref(rv,ptr)		sv_setref_iv(rv,NULL,PTR2IV(ptr))
+#  define sv_setptrobj(rv,ptr,name)     sv_setref_iv(rv,name,PTR2IV(ptr))
+#  define sv_setptrref(rv,ptr)          sv_setref_iv(rv,NULL,PTR2IV(ptr))
 #endif
 
 #if !defined(PERL_CORE) && !defined(PERL_NOCOMPAT)
@@ -582,23 +582,23 @@ print $em, <<'END'
    The following are not like that, but since they had a "perl_"
    prefix in previous versions, we provide compatibility macros.
  */
-#  define perl_atexit(a,b)		call_atexit(a,b)
-#  define perl_call_argv(a,b,c)		call_argv(a,b,c)
-#  define perl_call_pv(a,b)		call_pv(a,b)
-#  define perl_call_method(a,b)		call_method(a,b)
-#  define perl_call_sv(a,b)		call_sv(a,b)
-#  define perl_eval_sv(a,b)		eval_sv(a,b)
-#  define perl_eval_pv(a,b)		eval_pv(a,b)
-#  define perl_require_pv(a)		require_pv(a)
-#  define perl_get_sv(a,b)		get_sv(a,b)
-#  define perl_get_av(a,b)		get_av(a,b)
-#  define perl_get_hv(a,b)		get_hv(a,b)
-#  define perl_get_cv(a,b)		get_cv(a,b)
-#  define perl_init_i18nl10n(a)		init_i18nl10n(a)
-#  define perl_init_i18nl14n(a)		init_i18nl14n(a)
-#  define perl_new_ctype(a)		new_ctype(a)
-#  define perl_new_collate(a)		new_collate(a)
-#  define perl_new_numeric(a)		new_numeric(a)
+#  define perl_atexit(a,b)              call_atexit(a,b)
+#  define perl_call_argv(a,b,c)         call_argv(a,b,c)
+#  define perl_call_pv(a,b)             call_pv(a,b)
+#  define perl_call_method(a,b)         call_method(a,b)
+#  define perl_call_sv(a,b)             call_sv(a,b)
+#  define perl_eval_sv(a,b)             eval_sv(a,b)
+#  define perl_eval_pv(a,b)             eval_pv(a,b)
+#  define perl_require_pv(a)            require_pv(a)
+#  define perl_get_sv(a,b)              get_sv(a,b)
+#  define perl_get_av(a,b)              get_av(a,b)
+#  define perl_get_hv(a,b)              get_hv(a,b)
+#  define perl_get_cv(a,b)              get_cv(a,b)
+#  define perl_init_i18nl10n(a)         init_i18nl10n(a)
+#  define perl_init_i18nl14n(a)         init_i18nl14n(a)
+#  define perl_new_ctype(a)             new_ctype(a)
+#  define perl_new_collate(a)           new_collate(a)
+#  define perl_new_numeric(a)           new_numeric(a)
 
 /* varargs functions can't be handled with CPP macros. :-(
    This provides a set of compatibility functions that don't take
@@ -606,38 +606,38 @@ print $em, <<'END'
    dTHX.
  */
 #if defined(PERL_IMPLICIT_CONTEXT) && !defined(PERL_NO_SHORT_NAMES)
-#  define croak				Perl_croak_nocontext
-#  define deb				Perl_deb_nocontext
-#  define die				Perl_die_nocontext
-#  define form				Perl_form_nocontext
-#  define load_module			Perl_load_module_nocontext
-#  define mess				Perl_mess_nocontext
-#  define newSVpvf			Perl_newSVpvf_nocontext
-#  define sv_catpvf			Perl_sv_catpvf_nocontext
-#  define sv_setpvf			Perl_sv_setpvf_nocontext
-#  define warn				Perl_warn_nocontext
-#  define warner			Perl_warner_nocontext
-#  define sv_catpvf_mg			Perl_sv_catpvf_mg_nocontext
-#  define sv_setpvf_mg			Perl_sv_setpvf_mg_nocontext
+#  define croak                         Perl_croak_nocontext
+#  define deb                           Perl_deb_nocontext
+#  define die                           Perl_die_nocontext
+#  define form                          Perl_form_nocontext
+#  define load_module                   Perl_load_module_nocontext
+#  define mess                          Perl_mess_nocontext
+#  define newSVpvf                      Perl_newSVpvf_nocontext
+#  define sv_catpvf                     Perl_sv_catpvf_nocontext
+#  define sv_setpvf                     Perl_sv_setpvf_nocontext
+#  define warn                          Perl_warn_nocontext
+#  define warner                        Perl_warner_nocontext
+#  define sv_catpvf_mg                  Perl_sv_catpvf_mg_nocontext
+#  define sv_setpvf_mg                  Perl_sv_setpvf_mg_nocontext
 #endif
 
 #endif /* !defined(PERL_CORE) && !defined(PERL_NOCOMPAT) */
 
 #if !defined(PERL_IMPLICIT_CONTEXT)
 /* undefined symbols, point them back at the usual ones */
-#  define Perl_croak_nocontext		Perl_croak
-#  define Perl_die_nocontext		Perl_die
-#  define Perl_deb_nocontext		Perl_deb
-#  define Perl_form_nocontext		Perl_form
-#  define Perl_load_module_nocontext	Perl_load_module
-#  define Perl_mess_nocontext		Perl_mess
-#  define Perl_newSVpvf_nocontext	Perl_newSVpvf
-#  define Perl_sv_catpvf_nocontext	Perl_sv_catpvf
-#  define Perl_sv_setpvf_nocontext	Perl_sv_setpvf
-#  define Perl_warn_nocontext		Perl_warn
-#  define Perl_warner_nocontext		Perl_warner
-#  define Perl_sv_catpvf_mg_nocontext	Perl_sv_catpvf_mg
-#  define Perl_sv_setpvf_mg_nocontext	Perl_sv_setpvf_mg
+#  define Perl_croak_nocontext          Perl_croak
+#  define Perl_die_nocontext            Perl_die
+#  define Perl_deb_nocontext            Perl_deb
+#  define Perl_form_nocontext           Perl_form
+#  define Perl_load_module_nocontext    Perl_load_module
+#  define Perl_mess_nocontext           Perl_mess
+#  define Perl_newSVpvf_nocontext       Perl_newSVpvf
+#  define Perl_sv_catpvf_nocontext      Perl_sv_catpvf
+#  define Perl_sv_setpvf_nocontext      Perl_sv_setpvf
+#  define Perl_warn_nocontext           Perl_warn
+#  define Perl_warner_nocontext         Perl_warner
+#  define Perl_sv_catpvf_mg_nocontext   Perl_sv_catpvf_mg
+#  define Perl_sv_setpvf_mg_nocontext   Perl_sv_setpvf_mg
 #endif
 
 /* ex: set ro: */
@@ -656,7 +656,7 @@ print $em, do_not_edit ("embedvar.h"), <<'END'
    The following combinations of MULTIPLICITY and PERL_IMPLICIT_CONTEXT
    are supported:
      1) none
-     2) MULTIPLICITY	# supported for compatibility
+     2) MULTIPLICITY    # supported for compatibility
      3) MULTIPLICITY && PERL_IMPLICIT_CONTEXT
 
    All other combinations of these flags are errors.
@@ -669,9 +669,9 @@ print $em, do_not_edit ("embedvar.h"), <<'END'
 /* cases 2 and 3 above */
 
 #  if defined(PERL_IMPLICIT_CONTEXT)
-#    define vTHX	aTHX
+#    define vTHX        aTHX
 #  else
-#    define vTHX	PERL_GET_INTERP
+#    define vTHX        PERL_GET_INTERP
 #  endif
 
 END
@@ -682,7 +682,7 @@ for my $sym (sort keys %intrp)
 
 print $em, <<'END'
 
-#else	/* !MULTIPLICITY */
+#else   /* !MULTIPLICITY */
 
 /* case 1 above */
 
@@ -698,7 +698,7 @@ END
 
 print $em, <<'END'
 
-#endif	/* MULTIPLICITY */
+#endif  /* MULTIPLICITY */
 
 #if defined(PERL_GLOBAL_STRUCT)
 
@@ -723,7 +723,7 @@ print $em, <<'END'
 
 #endif /* PERL_GLOBAL_STRUCT */
 
-#ifdef PERL_POLLUTE		/* disabled by default in 5.6.0 */
+#ifdef PERL_POLLUTE             /* disabled by default in 5.6.0 */
 
 END
 
@@ -759,13 +759,13 @@ START_EXTERN_C
 #undef PERLVARI
 #undef PERLVARIC
 #undef PERLVARISC
-#define PERLVAR(v,t)	EXTERN_C t* Perl_##v##_ptr(pTHX);
-#define PERLVARA(v,n,t)	typedef t PL_##v##_t[n];			\
-			EXTERN_C PL_##v##_t* Perl_##v##_ptr(pTHX);
-#define PERLVARI(v,t,i)	PERLVAR(v,t)
+#define PERLVAR(v,t)    EXTERN_C t* Perl_##v##_ptr(pTHX);
+#define PERLVARA(v,n,t) typedef t PL_##v##_t[n];                        \
+                        EXTERN_C PL_##v##_t* Perl_##v##_ptr(pTHX);
+#define PERLVARI(v,t,i) PERLVAR(v,t)
 #define PERLVARIC(v,t,i) PERLVAR(v, const t)
-#define PERLVARISC(v,i)	typedef const char PL_##v##_t[sizeof(i)];	\
-			EXTERN_C PL_##v##_t* Perl_##v##_ptr(pTHX);
+#define PERLVARISC(v,i) typedef const char PL_##v##_t[sizeof(i)];       \
+                        EXTERN_C PL_##v##_t* Perl_##v##_ptr(pTHX);
 
 #include "intrpvar.h"
 #include "perlvars.h"
@@ -806,9 +806,9 @@ EXTCONST void * const PL_force_link_funcs[] = {
 #undef PERLVARA
 #undef PERLVARI
 #undef PERLVARIC
-#define PERLVAR(v,t)	(void*)Perl_##v##_ptr,
-#define PERLVARA(v,n,t)	PERLVAR(v,t)
-#define PERLVARI(v,t,i)	PERLVAR(v,t)
+#define PERLVAR(v,t)    (void*)Perl_##v##_ptr,
+#define PERLVARA(v,n,t) PERLVAR(v,t)
+#define PERLVARI(v,t,i) PERLVAR(v,t)
 #define PERLVARIC(v,t,i) PERLVAR(v,t)
 #define PERLVARISC(v,i) PERLVAR(v,char)
 
@@ -838,13 +838,13 @@ EXTCONST void * const PL_force_link_funcs[] = {
 #undef PERLVARIC
 #undef PERLVARISC
 };
-#endif	/* DOINIT */
+#endif  /* DOINIT */
 
 END_EXTERN_C
 
-#endif	/* PERL_NO_FORCE_LINK */
+#endif  /* PERL_NO_FORCE_LINK */
 
-#else	/* !PERL_CORE */
+#else   /* !PERL_CORE */
 
 EOT
 
@@ -885,31 +885,31 @@ START_EXTERN_C
 #undef PERLVARIC
 #undef PERLVARISC
 
-#define PERLVAR(v,t)	t* Perl_##v##_ptr(pTHX)				\
-			{ dVAR; PERL_UNUSED_CONTEXT; return &(aTHX->v); }
-#define PERLVARA(v,n,t)	PL_##v##_t* Perl_##v##_ptr(pTHX)		\
-			{ dVAR; PERL_UNUSED_CONTEXT; return &(aTHX->v); }
+#define PERLVAR(v,t)    t* Perl_##v##_ptr(pTHX)                         \
+                        { dVAR; PERL_UNUSED_CONTEXT; return &(aTHX->v); }
+#define PERLVARA(v,n,t) PL_##v##_t* Perl_##v##_ptr(pTHX)                \
+                        { dVAR; PERL_UNUSED_CONTEXT; return &(aTHX->v); }
 
-#define PERLVARI(v,t,i)	PERLVAR(v,t)
+#define PERLVARI(v,t,i) PERLVAR(v,t)
 #define PERLVARIC(v,t,i) PERLVAR(v, const t)
-#define PERLVARISC(v,i)	PL_##v##_t* Perl_##v##_ptr(pTHX)		\
-			{ dVAR; PERL_UNUSED_CONTEXT; return &(aTHX->v); }
+#define PERLVARISC(v,i) PL_##v##_t* Perl_##v##_ptr(pTHX)                \
+                        { dVAR; PERL_UNUSED_CONTEXT; return &(aTHX->v); }
 
 #include "intrpvar.h"
 
 #undef PERLVAR
 #undef PERLVARA
-#define PERLVAR(v,t)	t* Perl_##v##_ptr(pTHX)				\
-			{ dVAR; PERL_UNUSED_CONTEXT; return &(PL_##v); }
-#define PERLVARA(v,n,t)	PL_##v##_t* Perl_##v##_ptr(pTHX)		\
-			{ dVAR; PERL_UNUSED_CONTEXT; return &(PL_##v); }
+#define PERLVAR(v,t)    t* Perl_##v##_ptr(pTHX)                         \
+                        { dVAR; PERL_UNUSED_CONTEXT; return &(PL_##v); }
+#define PERLVARA(v,n,t) PL_##v##_t* Perl_##v##_ptr(pTHX)                \
+                        { dVAR; PERL_UNUSED_CONTEXT; return &(PL_##v); }
 #undef PERLVARIC
 #undef PERLVARISC
-#define PERLVARIC(v,t,i)	\
-			const t* Perl_##v##_ptr(pTHX)		\
-			{ PERL_UNUSED_CONTEXT; return (const t *)&(PL_##v); }
-#define PERLVARISC(v,i)	PL_##v##_t* Perl_##v##_ptr(pTHX)	\
-			{ dVAR; PERL_UNUSED_CONTEXT; return &(PL_##v); }
+#define PERLVARIC(v,t,i)        \
+                        const t* Perl_##v##_ptr(pTHX)           \
+                        { PERL_UNUSED_CONTEXT; return (const t *)&(PL_##v); }
+#define PERLVARISC(v,i) PL_##v##_t* Perl_##v##_ptr(pTHX)        \
+                        { dVAR; PERL_UNUSED_CONTEXT; return &(PL_##v); }
 #include "perlvars.h"
 
 #undef PERLVAR
@@ -954,21 +954,21 @@ rename_if_different('perlapi.c-new', 'perlapi.c')
 # NOTE: makedef.pl must be updated if you add symbols to %vfuncs
 # XXX %vfuncs currently unused
 my %vfuncs = %( < qw(
-    Perl_croak			Perl_vcroak
-    Perl_warn			Perl_vwarn
-    Perl_warner			Perl_vwarner
-    Perl_die			Perl_vdie
-    Perl_form			Perl_vform
-    Perl_load_module		Perl_vload_module
-    Perl_mess			Perl_vmess
-    Perl_deb			Perl_vdeb
-    Perl_newSVpvf		Perl_vnewSVpvf
-    Perl_sv_setpvf		Perl_sv_vsetpvf
-    Perl_sv_setpvf_mg		Perl_sv_vsetpvf_mg
-    Perl_sv_catpvf		Perl_sv_vcatpvf
-    Perl_sv_catpvf_mg		Perl_sv_vcatpvf_mg
-    Perl_dump_indent		Perl_dump_vindent
-    Perl_default_protect	Perl_vdefault_protect
+    Perl_croak                  Perl_vcroak
+    Perl_warn                   Perl_vwarn
+    Perl_warner                 Perl_vwarner
+    Perl_die                    Perl_vdie
+    Perl_form                   Perl_vform
+    Perl_load_module            Perl_vload_module
+    Perl_mess                   Perl_vmess
+    Perl_deb                    Perl_vdeb
+    Perl_newSVpvf               Perl_vnewSVpvf
+    Perl_sv_setpvf              Perl_sv_vsetpvf
+    Perl_sv_setpvf_mg           Perl_sv_vsetpvf_mg
+    Perl_sv_catpvf              Perl_sv_vcatpvf
+    Perl_sv_catpvf_mg           Perl_sv_vcatpvf_mg
+    Perl_dump_indent            Perl_dump_vindent
+    Perl_default_protect        Perl_vdefault_protect
 ) )
 
 # ex: set ts=8 sts=4 sw=4 noet:

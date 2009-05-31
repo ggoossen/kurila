@@ -184,9 +184,6 @@
 #define cv_setcv		Perl_cv_setcv
 #endif
 #define cv_const_sv		Perl_cv_const_sv
-#ifdef PERL_CORE
-#define op_const_sv		Perl_op_const_sv
-#endif
 #define cv_assignarg_flag	Perl_cv_assignarg_flag
 #define cv_optassignarg_flag	Perl_cv_optassignarg_flag
 #define cv_undef		Perl_cv_undef
@@ -2229,7 +2226,7 @@
 #define pp_warn			Perl_pp_warn
 #define pp_xor			Perl_pp_xor
 
-#else	/* PERL_IMPLICIT_CONTEXT */
+#else   /* PERL_IMPLICIT_CONTEXT */
 
 #if defined(PERL_IMPLICIT_SYS)
 #endif
@@ -2370,9 +2367,6 @@
 #define cv_setcv(a,b)		Perl_cv_setcv(aTHX_ a,b)
 #endif
 #define cv_const_sv(a)		Perl_cv_const_sv(aTHX_ a)
-#ifdef PERL_CORE
-#define op_const_sv(a,b)	Perl_op_const_sv(aTHX_ a,b)
-#endif
 #define cv_assignarg_flag(a)	Perl_cv_assignarg_flag(aTHX_ a)
 #define cv_optassignarg_flag(a)	Perl_cv_optassignarg_flag(aTHX_ a)
 #define cv_undef(a)		Perl_cv_undef(aTHX_ a)
@@ -4423,9 +4417,9 @@
 #define pp_warn()		Perl_pp_warn(aTHX)
 #define pp_xor()		Perl_pp_xor(aTHX)
 
-#endif	/* PERL_IMPLICIT_CONTEXT */
+#endif  /* PERL_IMPLICIT_CONTEXT */
 
-#endif	/* #ifndef PERL_NO_SHORT_NAMES */
+#endif  /* #ifndef PERL_NO_SHORT_NAMES */
 
 
 /* Compatibility stubs.  Compile extensions with -DPERL_NOCOMPAT to
@@ -4433,8 +4427,8 @@
  */
 
 #if !defined(PERL_CORE)
-#  define sv_setptrobj(rv,ptr,name)	sv_setref_iv(rv,name,PTR2IV(ptr))
-#  define sv_setptrref(rv,ptr)		sv_setref_iv(rv,NULL,PTR2IV(ptr))
+#  define sv_setptrobj(rv,ptr,name)     sv_setref_iv(rv,name,PTR2IV(ptr))
+#  define sv_setptrref(rv,ptr)          sv_setref_iv(rv,NULL,PTR2IV(ptr))
 #endif
 
 #if !defined(PERL_CORE) && !defined(PERL_NOCOMPAT)
@@ -4445,23 +4439,23 @@
    The following are not like that, but since they had a "perl_"
    prefix in previous versions, we provide compatibility macros.
  */
-#  define perl_atexit(a,b)		call_atexit(a,b)
-#  define perl_call_argv(a,b,c)		call_argv(a,b,c)
-#  define perl_call_pv(a,b)		call_pv(a,b)
-#  define perl_call_method(a,b)		call_method(a,b)
-#  define perl_call_sv(a,b)		call_sv(a,b)
-#  define perl_eval_sv(a,b)		eval_sv(a,b)
-#  define perl_eval_pv(a,b)		eval_pv(a,b)
-#  define perl_require_pv(a)		require_pv(a)
-#  define perl_get_sv(a,b)		get_sv(a,b)
-#  define perl_get_av(a,b)		get_av(a,b)
-#  define perl_get_hv(a,b)		get_hv(a,b)
-#  define perl_get_cv(a,b)		get_cv(a,b)
-#  define perl_init_i18nl10n(a)		init_i18nl10n(a)
-#  define perl_init_i18nl14n(a)		init_i18nl14n(a)
-#  define perl_new_ctype(a)		new_ctype(a)
-#  define perl_new_collate(a)		new_collate(a)
-#  define perl_new_numeric(a)		new_numeric(a)
+#  define perl_atexit(a,b)              call_atexit(a,b)
+#  define perl_call_argv(a,b,c)         call_argv(a,b,c)
+#  define perl_call_pv(a,b)             call_pv(a,b)
+#  define perl_call_method(a,b)         call_method(a,b)
+#  define perl_call_sv(a,b)             call_sv(a,b)
+#  define perl_eval_sv(a,b)             eval_sv(a,b)
+#  define perl_eval_pv(a,b)             eval_pv(a,b)
+#  define perl_require_pv(a)            require_pv(a)
+#  define perl_get_sv(a,b)              get_sv(a,b)
+#  define perl_get_av(a,b)              get_av(a,b)
+#  define perl_get_hv(a,b)              get_hv(a,b)
+#  define perl_get_cv(a,b)              get_cv(a,b)
+#  define perl_init_i18nl10n(a)         init_i18nl10n(a)
+#  define perl_init_i18nl14n(a)         init_i18nl14n(a)
+#  define perl_new_ctype(a)             new_ctype(a)
+#  define perl_new_collate(a)           new_collate(a)
+#  define perl_new_numeric(a)           new_numeric(a)
 
 /* varargs functions can't be handled with CPP macros. :-(
    This provides a set of compatibility functions that don't take
@@ -4469,38 +4463,38 @@
    dTHX.
  */
 #if defined(PERL_IMPLICIT_CONTEXT) && !defined(PERL_NO_SHORT_NAMES)
-#  define croak				Perl_croak_nocontext
-#  define deb				Perl_deb_nocontext
-#  define die				Perl_die_nocontext
-#  define form				Perl_form_nocontext
-#  define load_module			Perl_load_module_nocontext
-#  define mess				Perl_mess_nocontext
-#  define newSVpvf			Perl_newSVpvf_nocontext
-#  define sv_catpvf			Perl_sv_catpvf_nocontext
-#  define sv_setpvf			Perl_sv_setpvf_nocontext
-#  define warn				Perl_warn_nocontext
-#  define warner			Perl_warner_nocontext
-#  define sv_catpvf_mg			Perl_sv_catpvf_mg_nocontext
-#  define sv_setpvf_mg			Perl_sv_setpvf_mg_nocontext
+#  define croak                         Perl_croak_nocontext
+#  define deb                           Perl_deb_nocontext
+#  define die                           Perl_die_nocontext
+#  define form                          Perl_form_nocontext
+#  define load_module                   Perl_load_module_nocontext
+#  define mess                          Perl_mess_nocontext
+#  define newSVpvf                      Perl_newSVpvf_nocontext
+#  define sv_catpvf                     Perl_sv_catpvf_nocontext
+#  define sv_setpvf                     Perl_sv_setpvf_nocontext
+#  define warn                          Perl_warn_nocontext
+#  define warner                        Perl_warner_nocontext
+#  define sv_catpvf_mg                  Perl_sv_catpvf_mg_nocontext
+#  define sv_setpvf_mg                  Perl_sv_setpvf_mg_nocontext
 #endif
 
 #endif /* !defined(PERL_CORE) && !defined(PERL_NOCOMPAT) */
 
 #if !defined(PERL_IMPLICIT_CONTEXT)
 /* undefined symbols, point them back at the usual ones */
-#  define Perl_croak_nocontext		Perl_croak
-#  define Perl_die_nocontext		Perl_die
-#  define Perl_deb_nocontext		Perl_deb
-#  define Perl_form_nocontext		Perl_form
-#  define Perl_load_module_nocontext	Perl_load_module
-#  define Perl_mess_nocontext		Perl_mess
-#  define Perl_newSVpvf_nocontext	Perl_newSVpvf
-#  define Perl_sv_catpvf_nocontext	Perl_sv_catpvf
-#  define Perl_sv_setpvf_nocontext	Perl_sv_setpvf
-#  define Perl_warn_nocontext		Perl_warn
-#  define Perl_warner_nocontext		Perl_warner
-#  define Perl_sv_catpvf_mg_nocontext	Perl_sv_catpvf_mg
-#  define Perl_sv_setpvf_mg_nocontext	Perl_sv_setpvf_mg
+#  define Perl_croak_nocontext          Perl_croak
+#  define Perl_die_nocontext            Perl_die
+#  define Perl_deb_nocontext            Perl_deb
+#  define Perl_form_nocontext           Perl_form
+#  define Perl_load_module_nocontext    Perl_load_module
+#  define Perl_mess_nocontext           Perl_mess
+#  define Perl_newSVpvf_nocontext       Perl_newSVpvf
+#  define Perl_sv_catpvf_nocontext      Perl_sv_catpvf
+#  define Perl_sv_setpvf_nocontext      Perl_sv_setpvf
+#  define Perl_warn_nocontext           Perl_warn
+#  define Perl_warner_nocontext         Perl_warner
+#  define Perl_sv_catpvf_mg_nocontext   Perl_sv_catpvf_mg
+#  define Perl_sv_setpvf_mg_nocontext   Perl_sv_setpvf_mg
 #endif
 
 /* ex: set ro: */

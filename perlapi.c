@@ -37,31 +37,31 @@ START_EXTERN_C
 #undef PERLVARIC
 #undef PERLVARISC
 
-#define PERLVAR(v,t)	t* Perl_##v##_ptr(pTHX)				\
-			{ dVAR; PERL_UNUSED_CONTEXT; return &(aTHX->v); }
-#define PERLVARA(v,n,t)	PL_##v##_t* Perl_##v##_ptr(pTHX)		\
-			{ dVAR; PERL_UNUSED_CONTEXT; return &(aTHX->v); }
+#define PERLVAR(v,t)    t* Perl_##v##_ptr(pTHX)                         \
+                        { dVAR; PERL_UNUSED_CONTEXT; return &(aTHX->v); }
+#define PERLVARA(v,n,t) PL_##v##_t* Perl_##v##_ptr(pTHX)                \
+                        { dVAR; PERL_UNUSED_CONTEXT; return &(aTHX->v); }
 
-#define PERLVARI(v,t,i)	PERLVAR(v,t)
+#define PERLVARI(v,t,i) PERLVAR(v,t)
 #define PERLVARIC(v,t,i) PERLVAR(v, const t)
-#define PERLVARISC(v,i)	PL_##v##_t* Perl_##v##_ptr(pTHX)		\
-			{ dVAR; PERL_UNUSED_CONTEXT; return &(aTHX->v); }
+#define PERLVARISC(v,i) PL_##v##_t* Perl_##v##_ptr(pTHX)                \
+                        { dVAR; PERL_UNUSED_CONTEXT; return &(aTHX->v); }
 
 #include "intrpvar.h"
 
 #undef PERLVAR
 #undef PERLVARA
-#define PERLVAR(v,t)	t* Perl_##v##_ptr(pTHX)				\
-			{ dVAR; PERL_UNUSED_CONTEXT; return &(PL_##v); }
-#define PERLVARA(v,n,t)	PL_##v##_t* Perl_##v##_ptr(pTHX)		\
-			{ dVAR; PERL_UNUSED_CONTEXT; return &(PL_##v); }
+#define PERLVAR(v,t)    t* Perl_##v##_ptr(pTHX)                         \
+                        { dVAR; PERL_UNUSED_CONTEXT; return &(PL_##v); }
+#define PERLVARA(v,n,t) PL_##v##_t* Perl_##v##_ptr(pTHX)                \
+                        { dVAR; PERL_UNUSED_CONTEXT; return &(PL_##v); }
 #undef PERLVARIC
 #undef PERLVARISC
-#define PERLVARIC(v,t,i)	\
-			const t* Perl_##v##_ptr(pTHX)		\
-			{ PERL_UNUSED_CONTEXT; return (const t *)&(PL_##v); }
-#define PERLVARISC(v,i)	PL_##v##_t* Perl_##v##_ptr(pTHX)	\
-			{ dVAR; PERL_UNUSED_CONTEXT; return &(PL_##v); }
+#define PERLVARIC(v,t,i)        \
+                        const t* Perl_##v##_ptr(pTHX)           \
+                        { PERL_UNUSED_CONTEXT; return (const t *)&(PL_##v); }
+#define PERLVARISC(v,i) PL_##v##_t* Perl_##v##_ptr(pTHX)        \
+                        { dVAR; PERL_UNUSED_CONTEXT; return &(PL_##v); }
 #include "perlvars.h"
 
 #undef PERLVAR

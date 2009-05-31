@@ -103,6 +103,7 @@ typedef struct yy_parser {
     PerlIO	*rsfp;		/* current source file pointer */
     AV		*rsfp_filters;	/* holds chain of active source filters */
     I32         statement_indent; /* the indentation level of the current statement scope */
+    bool        doextract;       /* indicates pod extracting */
 
 #ifdef PERL_MAD
     SV		*endwhite;

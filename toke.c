@@ -638,6 +638,7 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
 #else
     parser->nexttoke = 0;
 #endif
+    parser->doextract = FALSE;
     parser->error_count = oparser ? oparser->error_count : 0;
     parser->lex_state = LEX_NORMAL;
     parser->expect = XSTATE;
@@ -716,7 +717,6 @@ void
 Perl_lex_end(pTHX)
 {
     dVAR;
-    PL_doextract = FALSE;
 }
 
 /*
@@ -1062,7 +1062,7 @@ S_skip_pod(pTHX_ register char *s)
 	}
 #endif
 	s = PL_bufend;
-	PL_doextract = TRUE;
+	PL_parser->doextract = TRUE;
 	return s;
     }
     return NULL;
@@ -3172,7 +3172,7 @@ Perl_yylex(pTHX)
 		    else
 			(void)PerlIO_close(PL_rsfp);
 		    PL_rsfp = NULL;
-		    PL_doextract = FALSE;
+		    PL_parser->doextract = FALSE;
 		}
 		PL_oldoldbufptr = PL_oldbufptr = s = PL_linestart = SvPVX_mutable(PL_linestr);
 		PL_last_lop = PL_last_uni = NULL;
@@ -3205,7 +3205,7 @@ Perl_yylex(pTHX)
 		    s = swallow_bom(s);
 		}
 	    }
-	    if (PL_doextract) {
+	    if (PL_parser->doextract) {
 		/* Incest with pod. */
 #ifdef PERL_MAD
 		if (PL_madskills)
@@ -3216,11 +3216,11 @@ Perl_yylex(pTHX)
 		    PL_oldoldbufptr = PL_oldbufptr = s = PL_linestart = SvPVX_mutable(PL_linestr);
 		    PL_bufend = SvPVX_mutable(PL_linestr) + SvCUR(PL_linestr);
 		    PL_last_lop = PL_last_uni = NULL;
-		    PL_doextract = FALSE;
+		    PL_parser->doextract = FALSE;
 		}
 	    }
 	    incline(s);
-	} while (PL_doextract);
+	} while (PL_parser->doextract);
 	PL_oldoldbufptr = PL_oldbufptr = PL_bufptr = PL_linestart = s;
 	PL_bufend = SvPVX_mutable(PL_linestr) + SvCUR(PL_linestr);
 	PL_last_lop = PL_last_uni = NULL;

@@ -22,7 +22,7 @@
    The following combinations of MULTIPLICITY and PERL_IMPLICIT_CONTEXT
    are supported:
      1) none
-     2) MULTIPLICITY	# supported for compatibility
+     2) MULTIPLICITY    # supported for compatibility
      3) MULTIPLICITY && PERL_IMPLICIT_CONTEXT
 
    All other combinations of these flags are errors.
@@ -35,9 +35,9 @@
 /* cases 2 and 3 above */
 
 #  if defined(PERL_IMPLICIT_CONTEXT)
-#    define vTHX	aTHX
+#    define vTHX        aTHX
 #  else
-#    define vTHX	PERL_GET_INTERP
+#    define vTHX        PERL_GET_INTERP
 #  endif
 
 #define PL_Argv			(vTHX->IArgv)
@@ -105,7 +105,6 @@
 #define PL_destroyav		(vTHX->Idestroyav)
 #define PL_diehook		(vTHX->Idiehook)
 #define PL_dirty		(vTHX->Idirty)
-#define PL_doextract		(vTHX->Idoextract)
 #define PL_dowarn		(vTHX->Idowarn)
 #define PL_dumper_fd		(vTHX->Idumper_fd)
 #define PL_dumpindent		(vTHX->Idumpindent)
@@ -241,6 +240,7 @@
 #define PL_sig_pending		(vTHX->Isig_pending)
 #define PL_sighandlerp		(vTHX->Isighandlerp)
 #define PL_signals		(vTHX->Isignals)
+#define PL_skiptoshebang	(vTHX->Iskiptoshebang)
 #define PL_slab_count		(vTHX->Islab_count)
 #define PL_slabs		(vTHX->Islabs)
 #define PL_sort_RealCmp		(vTHX->Isort_RealCmp)
@@ -312,7 +312,7 @@
 #define PL_watchok		(vTHX->Iwatchok)
 #define PL_xmlfp		(vTHX->Ixmlfp)
 
-#else	/* !MULTIPLICITY */
+#else   /* !MULTIPLICITY */
 
 /* case 1 above */
 
@@ -381,7 +381,6 @@
 #define PL_Idestroyav		PL_destroyav
 #define PL_Idiehook		PL_diehook
 #define PL_Idirty		PL_dirty
-#define PL_Idoextract		PL_doextract
 #define PL_Idowarn		PL_dowarn
 #define PL_Idumper_fd		PL_dumper_fd
 #define PL_Idumpindent		PL_dumpindent
@@ -517,6 +516,7 @@
 #define PL_Isig_pending		PL_sig_pending
 #define PL_Isighandlerp		PL_sighandlerp
 #define PL_Isignals		PL_signals
+#define PL_Iskiptoshebang	PL_skiptoshebang
 #define PL_Islab_count		PL_slab_count
 #define PL_Islabs		PL_slabs
 #define PL_Isort_RealCmp	PL_sort_RealCmp
@@ -589,7 +589,7 @@
 #define PL_Ixmlfp		PL_xmlfp
 
 
-#endif	/* MULTIPLICITY */
+#endif  /* MULTIPLICITY */
 
 #if defined(PERL_GLOBAL_STRUCT)
 
@@ -713,7 +713,7 @@
 
 #endif /* PERL_GLOBAL_STRUCT */
 
-#ifdef PERL_POLLUTE		/* disabled by default in 5.6.0 */
+#ifdef PERL_POLLUTE             /* disabled by default in 5.6.0 */
 
 #define DBassertion		PL_DBassertion
 #define DBsingle		PL_DBsingle

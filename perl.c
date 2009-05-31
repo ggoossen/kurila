@@ -602,7 +602,6 @@ perl_destruct(pTHXx)
     /* switches */
     PL_minus_l      = FALSE;
     PL_dowarn       = G_WARN_OFF;
-    PL_doextract    = FALSE;
     PL_unsafe       = FALSE;
 
     SvREFCNT_dec(PL_patchlevel);
@@ -1507,7 +1506,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 		goto reswitch;
 	    }
 	    case 'x':
-		PL_doextract = TRUE;
+		PL_skiptoshebang = TRUE;
 		s++;
 		if (*s)
 		    cddir = s;
@@ -1633,7 +1632,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #  endif
 #endif
 
-	if (PL_doextract
+	if (PL_skiptoshebang
 #ifdef MACOS_TRADITIONAL
 	    || gMacPerl_AlwaysExtract
 #endif
@@ -3713,14 +3712,14 @@ S_find_beginning(pTHX_ SV* linestr_sv, PerlIO *rsfp)
 	    break;
 	}
 #else
-    while (PL_doextract) {
+    while (PL_skiptoshebang) {
 	if ((s = sv_gets(linestr_sv, rsfp, 0)) == NULL)
 	    Perl_croak(aTHX_ "No Perl script found in input\n");
 #endif
 	s2 = s;
 	if (*s == '#' && s[1] == '!' && ((s = instr(s,"perl")) || (s = instr(s2,"PERL")))) {
 	    PerlIO_ungetc(rsfp, '\n');		/* to keep line count right */
-	    PL_doextract = FALSE;
+	    PL_skiptoshebang = FALSE;
 	    while (*s && !(isSPACE (*s) || *s == '#')) s++;
 	    s2 = s;
 	    while (*s == ' ' || *s == '\t') s++;
