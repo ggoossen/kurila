@@ -1175,9 +1175,13 @@ In regular expressions (except character classes):
     (put-text-property (max (point-min) (1- from))
 		       to kurila-do-not-fontify t)))
 
+(autoload 'turn-on-kurila-indent "kurila-indent"
+  "Turn on Kurila indentation." t)
+
 (defcustom kurila-mode-hook nil
   "Hook run by Kurila mode."
   :type 'hook
+  :options '(turn-on-kurila-indent)
   :group 'kurila)
 
 (defvar kurila-syntax-state nil)
@@ -1513,7 +1517,7 @@ Should contain exactly one group.")
 ;;; Details of groups in this may be used in several functions; see comments
 ;;; near mentioned above variable(s)...
 ;;; sub($$):lvalue{}  sub:lvalue{} Both allowed...
-(defsubst kurila-after-sub-regexp (named attr) ; 9 groups without attr...
+(defsubst kurila-after-sub-regexp (named) ; 9 groups without attr...
   "Match the text after `sub' in a subroutine declaration.
 If NAMED is nil, allows anonymous subroutines.  Matches up to the first \":\"
 of attributes (if present), or end of the name or prototype (whatever is
@@ -1528,23 +1532,6 @@ the last)."
      kurila-maybe-white-and-comment-rex	; n+5=pre-proto
      "\\(([^()]*)\\)"			; n+6=prototype
    "\\)?"				; END n+4=proto-group
-   "\\("				; n+7=attr-group
-     kurila-maybe-white-and-comment-rex	; n+8=pre-attr
-     "\\("				; n+9=start-attr
-        ":"
-	(if attr (concat
-		  "\\("
-		     kurila-maybe-white-and-comment-rex ; whitespace-comments
-		     "\\(\\sw\\|_\\)+"	; attr-name
-		     ;; attr-arg (1 level of internal parens allowed!)
-		     "\\((\\(\\\\.\\|[^\\\\()]\\|([^\\\\()]*)\\)*)\\)?"
-		     "\\("		; optional : (XXX allows trailing???)
-		        kurila-maybe-white-and-comment-rex ; whitespace-comments
-		     ":\\)?"
-		  "\\)+")
-	  "[^:]")
-     "\\)"
-   "\\)?"				; END n+6=proto-group
    ))
 
 ;;; Details of groups in this are used in `kurila-imenu--create-perl-index'
@@ -1559,7 +1546,7 @@ the last)."
 	       "\\([a-zA-Z_0-9:']+\\)\\)?\\)" ; 5 = package-name
        "\\|"
           "[ \t]*sub"
-	  (kurila-after-sub-regexp 'named nil) ; 8=name 11=proto 14=attr-start
+	  (kurila-after-sub-regexp 'named) ; 8=name 11=proto 14=attr-start
 	  kurila-maybe-white-and-comment-rex	; 15=pre-block
    "\\|"
      "=head\\([1-4]\\)[ \t]+"		; 16=level
@@ -1874,12 +1861,9 @@ or as help on variables `kurila-tips', `kurila-problems',
   (make-local-variable 'comment-start-skip)
   (setq comment-start-skip "#+ *")
   (make-local-variable 'defun-prompt-regexp)
-;;;       "[ \t]*sub"
-;;;	  (kurila-after-sub-regexp 'named nil) ; 8=name 11=proto 14=attr-start
-;;;	  kurila-maybe-white-and-comment-rex	; 15=pre-block
   (setq defun-prompt-regexp
 	(concat "[ \t]*\\(sub"
-		(kurila-after-sub-regexp 'named 'attr-groups)
+		(kurila-after-sub-regexp 'named)
 		"\\|"			; per toke.c
 		"\\(BEGIN\\|CHECK\\|INIT\\|END\\|AUTOLOAD\\|DESTROY\\)"
 		"\\)"
