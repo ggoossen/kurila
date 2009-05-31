@@ -1282,7 +1282,6 @@ versions of Emacs."
   ;;(kurila-define-key "\M-q" 'kurila-fill-paragraph)
   ;;(kurila-define-key "\e;" 'kurila-indent-for-comment)
   (kurila-define-key "\177" 'kurila-electric-backspace)
-  (kurila-define-key "\t" 'kurila-indent-command)
   ;; don't clobber the backspace binding:
   (kurila-define-key "\C-c\C-hF" 'kurila-info-on-command
 		    [(control c) (control h) F])
@@ -2664,41 +2663,6 @@ key.  Will untabivy if `kurila-electric-backspace-untabify' is non-nil."
       (if kurila-electric-backspace-untabify
 	  (backward-delete-char-untabify arg)
 	(delete-backward-char arg)))))
-
-(defun kurila-indent-command (&optional whole-exp)
-  "Indent current line as Perl code, or in some cases insert a tab character.
-If `kurila-tab-always-indent' is non-nil (the default), always indent current
-line.  Otherwise, indent the current line only if point is at the left margin
-or in the line's indentation; otherwise insert a tab.
-
-A numeric argument, regardless of its value,
-means indent rigidly all the lines of the expression starting after point
-so that this line becomes properly indented.
-The relative indentation among the lines of the expression are preserved."
-  (interactive "P")
-  (kurila-update-syntaxification (point) (point))
-  (if whole-exp
-      ;; If arg, always indent this line as Perl
-      ;; and shift remaining lines of expression the same amount.
-      (let ((shift-amt (kurila-indent-line))
-	    beg end)
-	(save-excursion
-	  (if kurila-tab-always-indent
-	      (beginning-of-line))
-	  (setq beg (point))
-	  (forward-sexp 1)
-	  (setq end (point))
-	  (goto-char beg)
-	  (forward-line 1)
-	  (setq beg (point)))
-	(if (and shift-amt (> end beg))
-	    (indent-code-rigidly beg end shift-amt "#")))
-    (if (and (not kurila-tab-always-indent)
-	     (save-excursion
-	       (skip-chars-backward " \t")
-	       (not (bolp))))
-	(insert-tab)
-      (kurila-indent-line))))
 
 (defun kurila-indent-line (&optional parse-data)
   "Indent current line as Perl code.

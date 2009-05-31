@@ -95,10 +95,10 @@ START if non-nil is a presumed start pos of the current definition."
       (setq indentations (list (list (+ sniff-i 4))))
       )
      ((eq (elt sniff 0) 'statement)
-      (setq indentations (append (list (list (car sniff-i)) (list (+ (car sniff-i) 4)))
-                               (mapcar 'list (cdr sniff-i))))
-      )
-     )
+      (setq indentations (append (list (list (car sniff-i))
+                                       (list (+ (car sniff-i) 4)))
+                                 (mapcar 'list (cdr sniff-i))))
+      ))
     indentations
     ))
 

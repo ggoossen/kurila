@@ -25,13 +25,6 @@ sub aap
         (kurila-sniff-for-block-start)
       ))
   (expect
-      '(0 next-line)
-    (save-excursion
-      (kurila-test-simple-buffer)
-      (goto-line 7)
-        (kurila-sniff-for-block-start)
-      ))
-  (expect
       [code-start-in-block 0]
     (save-excursion
       (kurila-test-simple-buffer)
@@ -63,5 +56,39 @@ sub aap
       (goto-line 5)
       (kurila-indent-indentation-info)
       ))
+
+  (expect
+      '(0 next-line)
+    (save-excursion
+      (kurila-test-simple-buffer)
+      (goto-line 7)
+        (kurila-sniff-for-block-start)
+      ))
+  (expect
+      [code-start-in-block 0]
+    (save-excursion
+      (kurila-test-simple-buffer)
+      (goto-line 8)
+      (let (parse-data)
+        (kurila-sniff-for-indent parse-data)
+        )
+      ))
+  (expect
+      [statement (6 0)]
+    (save-excursion
+      (kurila-test-simple-buffer)
+      (goto-line 9)
+      (let (parse-data)
+        (kurila-sniff-for-indent parse-data)
+        )
+      ))
+  (expect
+      '((6) (10) (0))
+    (save-excursion
+      (kurila-test-simple-buffer)
+      (goto-line 9)
+      (kurila-indent-indentation-info)
+      ))
+
     )
 
