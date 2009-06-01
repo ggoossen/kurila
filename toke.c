@@ -3055,9 +3055,17 @@ Perl_yylex(pTHX)
     PL_oldoldbufptr = PL_oldbufptr;
     PL_oldbufptr = s;
 
-    if (PL_expect == XBLOCK) {
+  retry:
+    PL_bufptr = s;
+
+    if (PL_expect == XBLOCK && !PL_parser->doextract) {
 	bool is_continuation;
 	s = skipspace(s, &is_continuation);
+	d = S_skip_pod(s);
+	if (d) {
+	    s = d;
+	    goto retry;
+	}
 	if (is_continuation) {
 	    if (*s != '{') {
 		S_start_statement_indent(s);
@@ -3072,9 +3080,6 @@ Perl_yylex(pTHX)
 	}
     }
 
-
-  retry:
-    PL_bufptr = s;
 #ifdef PERL_MAD
     if (PL_thistoken) {
 	sv_free(PL_thistoken);
