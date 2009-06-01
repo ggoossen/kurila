@@ -1,5 +1,25 @@
 
 
+(defun kurila-sniff-for-paren-open ()
+  (let (end bol indents)
+    (end-of-line)
+    (setq end (point))
+    (beginning-of-line)
+    (setq bol (point))
+    (skip-chars-forward "^(")
+    (if (< (point) end)
+        (let ((p (point)) endp)
+          (forward-sexp)
+          (setq endp (point))
+          (goto-char p)
+          (forward-char)
+          (skip-chars-forward " ")
+          (if (> endp end)
+              (setq indents (cons (- (point) bol) indents)))
+          ))
+    indents
+    ))
+
 (defun kurila-sniff-for-block-start ()
   ;; Looks at the current line for a possible block starts, returns a list of positions for new blocks,
   ;; with possibly 'next-line at the end indicating the block is started at the next line
@@ -9,12 +29,23 @@
     (end-of-line)
     (setq end (point))
     (beginning-of-line)
-    (while (re-search-forward "sub\\s-+\\<\\w+\\>\\s-*" end t)
-      (if (looking-at "(")
-          (forward-sexp))
-      (if (looking-at "\\s*\\(#\\|$\\)")
-          (setq points (cons (- (point) bol) points))
-        (setq points (cons 'next-line points))))
+    (while (re-search-forward "\\(sub\\s-+\\<\\w+\\>\\s-*\\)\\|\\(if\\b\\s-*\\|while\\b\\s-*\\)" end t)
+      (cond 
+       ((match-beginning 1) ;; sub
+        (if (looking-at "(")
+            (forward-sexp))
+        (if (looking-at "\\s*\\(#\\|$\\)")
+            (setq points (cons (- (point) bol) points))
+          (setq points (cons 'next-line points))))
+       ((match-beginning 2) ;; keyword which must be followed by parens
+        (if (looking-at "(")
+            (progn
+              (forward-sexp)
+              (if (looking-at "\\s*\\(#\\|$\\)")
+                  (setq points (cons (- (point) bol) points))
+                (setq points (cons 'next-line points))))
+          )))
+      )
     (setq points (cons (current-indentation) points))
     points
   ))
@@ -63,21 +94,26 @@
 	  (goto-char pre-indent-point)	; Orig line skipping preceeding pod/etc
           (kurila-backward-to-noncomment nil)
           (let ((blocks (kurila-sniff-for-block-start))
+                (parens (kurila-sniff-for-paren-open))
                 )
-            (if (eq (elt blocks (- (length blocks) 1)) 'next-line)
-                (vector 'code-start-in-block (car blocks))
-              (progn
-                (while (and (> (car blocks) 0) 
-                            (= (forward-line -1) 0))
-                  (let ((new-blocks (kurila-sniff-for-block-start)))
-                    (while (and new-blocks 
-                                (not (eq (car new-blocks) 'next-line))
-                                (< (car new-blocks) (elt blocks (- (length blocks) 1))))
-                      (setq blocks (append blocks (list (car new-blocks))))
-                      (setq new-blocks (cdr new-blocks))
-                      )))
-                (vector 'statement blocks)))
-            )))))))
+            (if parens
+                (vector 'cont-expr (list (car (reverse parens)) (car blocks)))
+              (if (eq (elt blocks (- (length blocks) 1)) 'next-line)
+                  (vector 'code-start-in-block (car blocks))
+                (progn
+                  (setq blocks (reverse blocks))
+                  (while (and (> (car blocks) 0) 
+                              (= (forward-line -1) 0))
+                    (let ((new-blocks (kurila-sniff-for-block-start)))
+                      (while (and new-blocks 
+                                  (not (eq (car new-blocks) 'next-line))
+                                  (< (car new-blocks) (car blocks)))
+                        (setq blocks (cons (car new-blocks) blocks))
+                        (setq new-blocks (cdr new-blocks))
+                        )))
+                  (setq blocks (reverse blocks))
+                  (vector 'statement blocks)))
+            ))))))))
 
 (defun kurila-indent-indentation-info (&optional start)
   "Return a list of possible indentations for the current line.
@@ -97,8 +133,11 @@ START if non-nil is a presumed start pos of the current definition."
      ((eq (elt sniff 0) 'statement)
       (setq indentations (append (list (list (car sniff-i))
                                        (list (+ (car sniff-i) 4)))
-                                 (mapcar 'list (cdr sniff-i))))
-      ))
+                                 (mapcar 'list (cdr sniff-i)))))
+     ((eq (elt sniff 0) 'cont-expr)
+      (setq indentations (list (list (car sniff-i)) (list (+ (car sniff-i) 4)) (list (+ (cadr sniff-i) 4))))
+      )
+      )
     indentations
     ))
 
