@@ -1,55 +1,58 @@
 
 
 (defun kurila-sniff-for-paren-open ()
-  (let (end bol indents)
-    (end-of-line)
-    (setq end (point))
-    (beginning-of-line)
-    (setq bol (point))
-    (skip-chars-forward "^(")
-    (if (< (point) end)
-        (let ((p (point)) endp)
-          (forward-sexp)
-          (setq endp (point))
-          (goto-char p)
-          (forward-char)
-          (skip-chars-forward " ")
-          (if (> endp end)
-              (setq indents (cons (- (point) bol) indents)))
-          ))
-    indents
-    ))
+  (save-excursion
+    (let (end bol indents)
+      (end-of-line)
+      (setq end (point))
+      (beginning-of-line)
+      (setq bol (point))
+      (skip-chars-forward "^(")
+      (if (< (point) end)
+          (let ((p (point)) endp)
+            (forward-sexp)
+            (setq endp (point))
+            (goto-char p)
+            (forward-char)
+            (skip-chars-forward " ")
+            (if (> endp end)
+                (setq indents (cons (- (point) bol) indents)))
+            ))
+      indents
+      )))
 
 (defun kurila-sniff-for-block-start ()
   ;; Looks at the current line for a possible block starts, returns a list of positions for new blocks,
   ;; with possibly 'next-line at the end indicating the block is started at the next line
-  (let (bol end points)
-    (beginning-of-line)
-    (setq bol (point))
-    (end-of-line)
-    (setq end (point))
-    (beginning-of-line)
-    (while (re-search-forward "\\(sub\\s-+\\<\\w+\\>\\s-*\\)\\|\\(if\\b\\s-*\\|while\\b\\s-*\\)" end t)
-      (cond 
-       ((match-beginning 1) ;; sub
-        (if (looking-at "(")
-            (forward-sexp))
-        (if (looking-at "\\s*\\(#\\|$\\)")
+  (save-excursion
+    (let (bol end points)
+      (beginning-of-line)
+      (setq bol (point))
+      (end-of-line)
+      (setq end (point))
+      (beginning-of-line)
+      (while (and (< (point) end)
+                  (re-search-forward "\\(sub\\s-+\\<\\w+\\>\\s-*\\)\\|\\(if\\b\\s-*\\|while\\b\\s-*\\)" end t))
+        (cond 
+         ((match-beginning 1) ;; sub
+          (if (looking-at "(")
+              (forward-sexp))
+          (if (looking-at "\\s*\\(#\\|$\\)")
             (setq points (cons (- (point) bol) points))
-          (setq points (cons 'next-line points))))
-       ((match-beginning 2) ;; keyword which must be followed by parens
-        (if (looking-at "(")
-            (progn
-              (forward-sexp)
-              (if (looking-at "\\s*\\(#\\|$\\)")
-                  (setq points (cons (- (point) bol) points))
+            (setq points (cons 'next-line points))))
+         ((match-beginning 2) ;; keyword which must be followed by parens
+          (if (looking-at "(")
+              (progn
+                (forward-sexp)
+                (if (looking-at "\\s*\\(#\\|$\\)")
+                    (setq points (cons (- (point) bol) points))
                 (setq points (cons 'next-line points))))
-          )))
-      )
-    (setq points (cons (current-indentation) points))
-    points
-  ))
-
+            )))
+        )
+      (setq points (cons (current-indentation) points))
+      points
+      )))
+  
 (defun kurila-sniff-for-indent (&optional parse-data) ; was parse-start
   ;; Old workhorse for calculation of indentation; the major problem
   ;; is that it mixes the sniffer logic to understand what the current line
@@ -119,7 +122,6 @@
   "Return a list of possible indentations for the current line.
 These are then used by `kurila-indent-cycle'.
 START if non-nil is a presumed start pos of the current definition."
-  (print (kurila-sniff-for-indent nil) (get-buffer "*Messages*"))
   (let* (parse-data
          (sniff (kurila-sniff-for-indent parse-data))
          (sniff-i (elt sniff 1))
