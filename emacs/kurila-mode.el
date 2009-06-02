@@ -3738,33 +3738,11 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 	   (if kurila-use-syntax-table-text-property
 	       (concat
 		"\\|"
-		;; 1+6+2=9 extra () before this:
-		"\\<\\(q[wxqr]?\\|[msy]\\|tr\\)\\>" ; QUOTED CONSTRUCT
-		;; 1+6+2+1=10 extra () before this:
+		"\\<\\(q[wxqr]?\\|[msy]\\|tr\\)\\>" ; 10: QUOTED CONSTRUCT
 		"\\|"
-		"\\(somethingveryrare\\)"	; Perserver count of pars
+		"__\\(END\\|DATA\\)__"	; 11: __END__ or __DATA__
 		"\\|"
-		;; 1+6+2+1+1=11 extra () before this
-		"\\<sub\\>"		;  sub with proto/attr
-		"\\("
-		   kurila-white-and-comment-rex
-		   "\\(::[a-zA-Z_:'0-9]*\\|[a-zA-Z_'][a-zA-Z_:'0-9]*\\)\\)?" ; name
-		"\\("
-		   kurila-maybe-white-and-comment-rex
-		   "\\(([^()]*)\\|:[^:]\\)\\)" ; prototype or attribute start
-		"\\|"
-		;; 1+6+2+1+1+6=17 extra () before this:
-		"\\$\\(['{]\\)"		; $' or ${foo}
-		"\\|"
-		;; 1+6+2+1+1+6+1=18 extra () before this (old pack'var syntax;
-		;; we do not support intervening comments...):
-		"\\(\\<sub[ \t\n\f]+\\|[&*$@%]\\)[a-zA-Z0-9_]*'"
-		;; 1+6+2+1+1+6+1+1=19 extra () before this:
-		"\\|"
-		"__\\(END\\|DATA\\)__"	; __END__ or __DATA__
-		;; 1+6+2+1+1+6+1+1+1=20 extra () before this:
-		"\\|"
-		"\\\\\\(['`\"($]\\)")	; BACKWACKED something-hairy
+		"\\\\\\(['`\"($]\\)")	; 21: BACKWACKED something-hairy
 	     ""))))
     (unwind-protect
 	(progn
@@ -3807,21 +3785,6 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 					   state-point b nil nil state))
 		    state-point b)
 	      (cond
-	       ;; 1+6+2+1+1+6=17 extra () before this:
-	       ;;    "\\$\\(['{]\\)"
-	       ((match-beginning 18) ; $' or ${foo}
-		(if (eq (preceding-char) ?\') ; $'
-		    (progn
-		      (setq b (1- (point))
-			    state (parse-partial-sexp
-				   state-point (1- b) nil nil state)
-			    state-point (1- b))
-		      (if (nth 3 state)	; in string
-			  (kurila-modify-syntax-type (1- b) kurila-st-punct))
-		      (goto-char (1+ b)))
-		  ;; else: ${
-		  (setq bb (match-beginning 0))
-		  (kurila-modify-syntax-type bb kurila-st-punct)))
 	       ;; No processing in strings/comments beyond this point:
 	       ((or (nth 3 state) (nth 4 state))
 		t)			; Do nothing in comment/string
@@ -4077,12 +4040,9 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		    (setq tmpend tb))
 		(put-text-property b (point) 'syntax-type 'format))
 	       ;; qq-like String or Regexp:
-	       ((or (match-beginning 10) (match-beginning 11))
-		;; 1+6+2=9 extra () before this:
+	       ((match-beginning 10)
 		;; "\\<\\(q[wxqr]?\\|[msy]\\|tr\\)\\>"
-		;; "\\|"
-		;; "\\([?/<]\\)"	; /blah/ or ?blah? or <file*glob>
-		(setq b1 (if (match-beginning 10) 10 11)
+		(setq b1 10
 		      argument (buffer-substring
 				(match-beginning b1) (match-end b1))
 		      b (point)		; end of qq etc
@@ -4090,8 +4050,7 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		      c (char-after (match-beginning b1))
 		      bb (char-after (1- (match-beginning b1))) ; tmp holder
 		      ;; bb == "Not a stringy"
-		      bb (if (eq b1 10) ; user variables/whatever
-			     (and (memq bb (append "$@%*#_:-&>" nil)) ; $#y)
+		      bb (and (memq bb (append "$@%*#_:-&>" nil)) ; $#y)
 				  (cond ((eq bb ?-) (eq c ?s)) ; -s file test
 					((eq bb ?\:) ; $opt::s
 					 (eq (char-after
@@ -4106,12 +4065,6 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 						   (- (match-beginning b1) 2))
 						  ?\&)))
 					(t t)))
-			   ;; <file> or <$file>
-			   (and (eq c ?\<)
-				;; Do not stringify <FH>, <$fh> :
-				(save-match-data
-				  (looking-at
-				   "\\$?\\([_a-zA-Z:][_a-zA-Z0-9:]*\\)?>"))))
 		      tb (match-beginning 0))
 		(goto-char (match-beginning b1))
 		(kurila-backward-to-noncomment (point-min))
@@ -4647,46 +4600,14 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 					   'REx-part2 t)))))
 		  (if (> (point) max)
 		      (setq tmpend tb))))
-	       ((match-beginning 17)	; sub with prototype or attribute
-		;; 1+6+2+1+1=11 extra () before this (sub with proto/attr):
-		;;"\\<sub\\>\\("			;12
-		;;   kurila-white-and-comment-rex	;13
-		;;   "\\([a-zA-Z_:'0-9]+\\)\\)?" ; name	;14
-		;;"\\(" kurila-maybe-white-and-comment-rex	;15,16
-		;;   "\\(([^()]*)\\|:[^:]\\)\\)" ; 17:proto or attribute start
-		(setq b1 (match-beginning 14) e1 (match-end 14))
-		(if (memq (char-after (1- b))
-			  '(?\$ ?\@ ?\% ?\& ?\*))
-		    nil
-		  (goto-char b)
-		  (if (eq (char-after (match-beginning 17)) ?\( )
-		      (progn
-			(kurila-commentify ; Prototypes; mark as string
-			 (match-beginning 17) (match-end 17) t)
-			(goto-char (match-end 0))
-			;; Now look for attributes after prototype:
-			(forward-comment (buffer-size))
-			(and (looking-at ":[^:]")
-			     (kurila-find-sub-attrs st-l b1 e1 b)))
-		    ;; treat attributes without prototype
-		    (goto-char (match-beginning 17))
-		    (kurila-find-sub-attrs st-l b1 e1 b))))
-	       ;; 1+6+2+1+1+6+1=18 extra () before this:
-	       ;;    "\\(\\<sub[ \t\n\f]+\\|[&*$@%]\\)[a-zA-Z0-9_]*'")
-	       ((match-beginning 19)	; old $abc'efg syntax
-		(setq bb (match-end 0))
-		;;;(if (nth 3 state) nil	; in string
-		(put-text-property (1- bb) bb 'syntax-table kurila-st-word)
-		(goto-char bb))
-	       ;; 1+6+2+1+1+6+1+1=19 extra () before this:
-	       ;; "__\\(END\\|DATA\\)__"
-	       ((match-beginning 20)	; __END__, __DATA__
+	       ;; 11: "__\\(END\\|DATA\\)__"
+	       ((match-beginning 11)	; __END__, __DATA__
 		(setq bb (match-end 0))
 		;; (put-text-property b (1+ bb) 'syntax-type 'pod) ; Cheat
 		(kurila-commentify b bb nil)
 		(setq end t))
-	       ;; "\\\\\\(['`\"($]\\)"
-	       ((match-beginning 21)
+	       ;; 12: "\\\\\\(['`\"($]\\)"
+	       ((match-beginning 12)
 		;; Trailing backslash; make non-quoting outside string/comment
 		(setq bb (match-end 0))
 		(goto-char b)
