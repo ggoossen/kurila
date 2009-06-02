@@ -4,7 +4,7 @@ BEGIN
     require './test.pl'
 
 
-plan tests => 12
+plan tests => 14
 
 our ($x, $y)
 
@@ -68,3 +68,15 @@ do
 =head1 TEST
 =cut
     is $tmpvar, "aap"
+
+eval_dies_like(<<'EOE', qr/syntax error .* near "elsif/);
+if ($a)
+    1
+    elsif { 2 }
+EOE
+
+eval_dies_like(<<'EOE', qr/wrong matching parens .* at end of line/);
+if ($a)
+    1
+    $a[
+EOE

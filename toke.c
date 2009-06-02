@@ -1673,7 +1673,12 @@ S_stop_statement_indent(pTHX)
 {
     --PL_lex_brackets;
     if (PL_lex_brackstack[PL_lex_brackets].state != 0) {
-        Perl_croak("wrong matching parens");
+        yyerror("wrong matching parens");
+	while (PL_lex_brackstack[PL_lex_brackets].state != 0) {
+	    PL_lex_brackets--;
+	    if (PL_lex_brackets < 0)
+		return;
+	}
     }
     PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
     start_force(PL_curforce);
