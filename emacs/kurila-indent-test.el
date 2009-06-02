@@ -1,4 +1,6 @@
 
+(setq debug-on-error t)
+
 (require 'etest)
 
 (defun kt-simple-buffer ()
@@ -28,6 +30,46 @@ sub aap
          'wim')
 ")
 
+(defun indent-test (buffer)
+  (set-buffer (get-buffer-create "*kurila-indent-test*"))
+  (erase-buffer)
+  (insert buffer)
+  (let (indents)
+    (let ((linenr 1) start str)
+      (while (and (= (goto-line linenr) 0) (not (eobp)))
+        (setq start (point))
+        (skip-chars-forward "^|")
+        (setq str (car (read-from-string (buffer-substring start (point)))))
+        (delete-region start (1+ (point)))
+        (setq indents (cons str indents))
+        (setq linenr (+ linenr 1))
+        ))
+    (setq indents (reverse indents))
+    (let ((linenr 1) got)
+      (while indents
+        (goto-line linenr)
+        ;(message "sniff for block start: %S" (kurila-sniff-for-block-start))
+        ;(message "sniff for indent: %S" (kurila-sniff-for-indent))
+        (setq got (kurila-indent-indentation-info))
+        (if (not (equal (car indents) got))
+            (progn
+              (message "Failed on %s - got %S - exp %S" linenr got (car indents))
+              ))
+        (setq linenr (+ linenr 1))
+        (setq indents (cdr indents))
+        )))
+  )
+
+(indent-test "((0) (4))|package Foo::Bar
+((0) (4))         |
+((0) (4))         |sub foo
+((4))             |    help
+((4) (8) (0))     |    if (1)
+((8))             |
+((8))             |        my $a = $a->{?$b}
+((8) (12) (4) (0))|
+((8) (12) (4) (0))|        # foo ")
+
 (defun kt-is (buffer line exp func)
   (save-excursion
     (set-buffer (get-buffer-create "*kurila-indent-test*"))
@@ -41,8 +83,6 @@ sub aap
 )
 
 (deftest '(kt-is 4) 'kt-is)
-
-(setq debug-on-error t)
 
 (etest 
  (kt-is (kt-simple-buffer)

@@ -40,7 +40,7 @@
           (if (looking-at "(")
               (forward-sexp))
           (if (looking-at "\\s*\\(#\\|$\\)")
-            (setq points (cons (- (point) bol) points))
+              (setq points (cons (- (point) bol) points))
             (setq points (cons 'next-line points))))
          ((match-beginning 2) ;; keyword which must be followed by parens
           (if (looking-at "(")
@@ -48,10 +48,11 @@
                 (forward-sexp)
                 (if (looking-at "\\s*\\(#\\|$\\)")
                     (setq points (cons (- (point) bol) points))
-                (setq points (cons 'next-line points))))
+                  (setq points (cons 'next-line points))))
             )))
         )
-      (setq points (cons (current-indentation) points))
+      (and (< (+ bol (current-indentation)) end)
+           (setq points (cons (current-indentation) points)))
       points
       )))
   
@@ -107,7 +108,7 @@
                   (vector 'code-start-in-block (car blocks))
                 (progn
                   (setq blocks (reverse blocks))
-                  (while (and (> (car blocks) 0) 
+                  (while (and (or (not blocks) (> (car blocks) 0))
                               (= (forward-line -1) 0))
                     (let ((new-blocks (kurila-sniff-for-block-start)))
                       (while (and new-blocks 
