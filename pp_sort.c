@@ -1670,6 +1670,7 @@ S_sortcv(pTHX_ SV *const a, SV *const b)
     SVcpREPLACE(GvSV(PL_secondgv), b);
     PL_stack_sp = PL_stack_base;
     PL_op = PL_sortcop;
+    pp_pushmark();
     CALLRUNOPS(aTHX);
     if (PL_stack_sp != PL_stack_base + 1)
 	Perl_croak(aTHX_ "Sort subroutine didn't return single value");
