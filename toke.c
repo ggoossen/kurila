@@ -2740,8 +2740,8 @@ S_tokenize_use(pTHX_ int is_use, char *s) {
 }
 #ifdef DEBUGGING
     static const char* const exp_name[] =
-	{ "OPERATOR", "TERM", "REF", "STATE", "BLOCK", "ATTRBLOCK",
-	  "ATTRTERM", "TERMBLOCK", "TERMORDORDOR"
+	{ "OPERATOR", "TERM", "REF", "STATE", "BLOCK",
+	  "TERMBLOCK", "TERMORDORDOR"
 	};
 #endif
 
@@ -3685,117 +3685,8 @@ Perl_yylex(pTHX)
 	    goto just_a_word_zero_gv;
 	}
 	s++;
-	switch (PL_expect) {
-	    OP *attrs;
-#ifdef PERL_MAD
-	    I32 stuffstart;
-#endif
-	case XOPERATOR:
-	    if (!PL_in_my || PL_lex_state != LEX_NORMAL)
-		break;
-	    PL_bufptr = s;	/* update in case we back off */
-	    goto grabattrs;
-	case XATTRBLOCK:
-	    PL_expect = XBLOCK;
-	    goto grabattrs;
-	case XATTRTERM:
-	    PL_expect = XTERMBLOCK;
-	 grabattrs:
-#ifdef PERL_MAD
-	    stuffstart = s - SvPVX_mutable(PL_linestr) - 1;
-#endif
-	    s = PEEKSPACE(s);
-	    attrs = NULL;
-	    while (isIDFIRST_lazy_if(s,UTF)) {
-		I32 tmp;
-		SV *sv;
-		d = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, FALSE, &len);
-		if (isLOWER(*s) && (tmp = keyword(PL_tokenbuf, len))) {
-		    if (tmp < 0) tmp = -tmp;
-		    switch (tmp) {
-		    case KEY_or:
-		    case KEY_and:
-		    case KEY_for:
-		    case KEY_unless:
-		    case KEY_if:
-		    case KEY_while:
-		    case KEY_until:
-			goto got_attrs;
-		    default:
-			break;
-		    }
-		}
-		sv = newSVpvn(s, len);
-		if (*d == '(') {
-		    PL_lex_stuff.flags = LEXf_ATTRS;
-		    d = scan_str(d,TRUE,TRUE,&PL_lex_stuff);
-		    if (!d) {
-			/* MUST advance bufptr here to avoid bogus
-			   "at end of line" context messages from yyerror().
-			 */
-			PL_bufptr = s + len;
-			yyerror("Unterminated attribute parameter in attribute list");
-			if (attrs)
-			    op_free(attrs);
-			sv_free(sv);
-			return REPORT(0);	/* EOF indicator */
-		    }
-		}
-		if (PL_lex_stuff.str_sv) {
-		    sv_catsv(sv, PL_lex_stuff.str_sv);
-		    attrs = append_elem(OP_LIST, attrs,
-					newSVOP(OP_CONST, 0, sv, S_curlocation(PL_bufptr)));
-		    SvREFCNT_dec(PL_lex_stuff.str_sv);
-		    PL_lex_stuff.str_sv = NULL;
-		}
-		s = PEEKSPACE(d);
-		if (*s == ':' && s[1] != ':')
-		    s = PEEKSPACE(s+1);
-		else if (s == d)
-		    break;	/* require real whitespace or :'s */
-		/* XXX losing whitespace on sequential attributes here */
-	    }
-	    {
-		const char tmp
-		    = (PL_expect == XOPERATOR ? '=' : '{'); /*'}(' for vi */
-		if (*s != ';' && *s != '}' && *s != tmp
-		    && (tmp != '=' || *s != ')')) {
-		    const char q = ((*s == '\'') ? '"' : '\'');
-		    /* If here for an expression, and parsed no attrs, back
-		       off. */
-		    if (tmp == '=' && !attrs) {
-			s = PL_bufptr;
-			break;
-		    }
-		    /* MUST advance bufptr here to avoid bogus "at end of line"
-		       context messages from yyerror().
-		    */
-		    PL_bufptr = s;
-		    yyerror( (const char *)
-			     (*s
-			      ? Perl_form(aTHX_ "Invalid separator character "
-					  "%c%c%c in attribute list", q, *s, q)
-			      : "Unterminated attribute list" ) );
-		    if (attrs)
-			op_free(attrs);
-		    OPERATOR(':');
-		}
-	    }
-	got_attrs:
-	    if (attrs) {
-		start_force(PL_curforce);
-		NEXTVAL_NEXTTOKE.opval = attrs;
-		CURMAD('_', PL_nextwhite, NULL);
-		force_next(THING);
-	    }
-#ifdef PERL_MAD
-	    if (PL_madskills) {
-		PL_thistoken = newSVpvn(SvPVX_mutable(PL_linestr) + stuffstart,
-				     (s - SvPVX_mutable(PL_linestr)) - stuffstart);
-	    }
-#endif
-	    TOKEN(COLONATTR);
-	}
+	if(PL_expect == XOPERATOR)
+	    no_op("':'", s);
 	OPERATOR(':');
     case '(':
 	s++;
@@ -3891,7 +3782,6 @@ Perl_yylex(pTHX)
 	    PL_lex_brackstack[PL_lex_brackets++].state = XTERM;
 	    PL_expect = XSTATE;
 	    break;
-	case XATTRBLOCK:
 	case XBLOCK:
 	    PL_lex_brackstack[PL_lex_brackets].state = XSTATE;
 	    PL_lex_brackstack[PL_lex_brackets].prev_statement_indent = PL_parser->statement_indent;
@@ -3899,7 +3789,6 @@ Perl_yylex(pTHX)
 	    PL_parser->statement_indent = -1;
 	    PL_expect = XSTATE;
 	    break;
-	case XATTRTERM:
 	case XTERMBLOCK:
 	    PL_lex_brackstack[PL_lex_brackets++].state = XOPERATOR;
 	    PL_expect = XSTATE;
@@ -5589,7 +5478,6 @@ Perl_yylex(pTHX)
 		char tmpbuf[sizeof PL_tokenbuf];
 		SSize_t tboffset = 0;
                 SSize_t tblen;
-		expectation attrful;
 		bool have_name;
 		const int key = tmp;
 
@@ -5613,8 +5501,6 @@ Perl_yylex(pTHX)
 		    SV *nametoke = NULL;
 #endif
 
-		    PL_expect = XTERM;
-		    attrful = XATTRBLOCK;
 		    /* remember buffer pos'n for later force_word */
 		    tboffset = s - PL_oldbufptr;
 		    d = scan_word(s, tmpbuf, sizeof tmpbuf, TRUE, &len);
@@ -5650,16 +5536,15 @@ Perl_yylex(pTHX)
 		else {
 		    if (key == KEY_my)
 			Perl_croak(aTHX_ "Missing name in \"my sub\"");
-		    PL_expect = XTERMBLOCK;
-		    attrful = XATTRTERM;
 		    sv_setpvn(PL_subname,"?",1);
 		    have_name = FALSE;
 		}
 
-		if (*s == ':' && s[1] != ':')
-		    PL_expect = attrful;
-		else if (*s != '(' && key == KEY_sub) {
+		if (*s != '(' && key == KEY_sub) {
 		    PL_expect = XBLOCK;
+		}
+		else {
+		    PL_expect = XTERM;
 		}
 
 #ifdef PERL_MAD
