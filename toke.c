@@ -5481,6 +5481,9 @@ Perl_yylex(pTHX)
 		bool have_name;
 		const int key = tmp;
 
+		if (PL_expect == XOPERATOR)
+		    no_op("'sub'", s);
+
 #ifdef PERL_MAD
 		SV *tmpwhite = 0;
 
