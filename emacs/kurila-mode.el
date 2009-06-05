@@ -1580,7 +1580,7 @@ the last)."
   (modify-syntax-entry ?< "." kurila-mode-syntax-table)
   (modify-syntax-entry ?> "." kurila-mode-syntax-table)
   (modify-syntax-entry ?& "." kurila-mode-syntax-table)
-  (modify-syntax-entry ?$ "\\" kurila-mode-syntax-table)
+  (modify-syntax-entry ?$ "." kurila-mode-syntax-table)
   (modify-syntax-entry ?\n ">" kurila-mode-syntax-table)
   (modify-syntax-entry ?# "<" kurila-mode-syntax-table)
   (modify-syntax-entry ?' "\"" kurila-mode-syntax-table)
@@ -5708,27 +5708,23 @@ indentation and initial hashes.  Behaves usually outside of comment."
 	    '("\\<\\(package\\|require\\|use\\|import\\|no\\|bootstrap\\)[ \t]+\\([a-zA-z_][a-zA-z_0-9:]*\\)[ \t;]" ; require A if B;
 	      2 font-lock-function-name-face)
 	    (cond ((featurep 'font-lock-extra)
-		   '("\\([]}\\\\%@>*&]\\|\\$[a-zA-Z0-9_:]*\\)[ \t]*{[ \t]*\\(-?[a-zA-Z0-9_:]+\\)[ \t]*}"
+		   '("\\([]}\\\\%@>*&]\\|\\$[a-zA-Z0-9_:]*\\)[ \t]*{[ ]*[+?]?[ ]*\\([a-zA-Z0-9_:]+\\)[ ]*}"
 		     (2 font-lock-string-face t)
 		     (0 '(restart 2 t)))) ; To highlight $a{bc}{ef}
 		  (font-lock-anchored
-		   '("\\([]}\\\\%@>*&]\\|\\$[a-zA-Z0-9_:]*\\)[ \t]*{[ \t]*\\(-?[a-zA-Z0-9_:]+\\)[ \t]*}"
+		   '("\\([]}\\\\%@>*&]\\|\\$[a-zA-Z0-9_:]*\\)[ ]*{[ ]*[+?]?[ ]*\\([a-zA-Z0-9_:]+\\)[ ]*}"
 		     (2 font-lock-string-face t)
-		     ("\\=[ \t]*{[ \t]*\\(-?[a-zA-Z0-9_:]+\\)[ \t]*}"
+		     ("\\=[ ]*{[ ]*[+?]?[ ]*\\([a-zA-Z0-9_:]+\\)[ ]*}"
 		      nil nil
 		      (1 font-lock-string-face t))))
-		  (t '("\\([]}\\\\%@>*&]\\|\\$[a-zA-Z0-9_:]*\\)[ \t]*{[ \t]*\\(-?[a-zA-Z0-9_:]+\\)[ \t]*}"
+		  (t '("\\([]}\\\\%@>*&]\\|\\$[a-zA-Z0-9_:]*\\)[ ]*{[ ]*[+?][ ]*\\([a-zA-Z0-9_:]+\\)[ ]*}"
 		       2 font-lock-string-face t)))
-	    '("[\[ \t{,(]\\(-?[a-zA-Z0-9_:]+\\)[ \t]*=>" 1
+	    '("[\[ {,(]\\([a-zA-Z0-9_:]+\\)[ ]*=>" 1
 	      font-lock-string-face t)
-	    '("^[ \t]*\\([a-zA-Z0-9_]+[ \t]*:\\)[ \t]*\\($\\|{\\|\\<\\(until\\|while\\|for\\(each\\)?\\|do\\)\\>\\)" 1
+	    '("^[ ]*\\([a-zA-Z0-9_]+[ ]*:\\)[ \t]*\\($\\|{\\|\\<\\(until\\|while\\|for\\(each\\)?\\|do\\)\\>\\)" 1
 	      font-lock-constant-face)	; labels
 	    '("\\<\\(continue\\|next\\|last\\|redo\\|goto\\)\\>[ \t]+\\([a-zA-Z0-9_:]+\\)" ; labels as targets
 	      2 font-lock-constant-face)
-	    ;; Uncomment to get perl-mode-like vars
-            ;;; '("[$*]{?\\(\\sw+\\)" 1 font-lock-variable-name-face)
-            ;;; '("\\([@%]\\|\\$#\\)\\(\\sw+\\)"
-            ;;;  (2 (cons font-lock-variable-name-face '(underline))))
 	    (cond ((featurep 'font-lock-extra)
 		   '("^[ \t]*\\(my\\|local\\|our\\)[ \t]*\\(([ \t]*\\)?\\([$@%*][a-zA-Z0-9_:]+\\)\\([ \t]*,\\)?"
 		     (3 font-lock-variable-name-face)
