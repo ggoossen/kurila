@@ -144,9 +144,8 @@ my $testpkgs = \%(
     XS => qw( svref_2object perlstring opnumber main_start
                    main_root main_cv ),
 
-    constant => qw/ ASSIGN
-                     LIST_CONTEXT OP_CONST OP_LIST OP_RV2SV
-                     OP_STRINGIFY OPf_KIDS OPf_MOD OPf_REF OPf_SPECIAL
+    constant => qw/ 
+                     OPf_KIDS OPf_MOD OPf_REF OPf_SPECIAL
                      OPf_STACKED OPf_WANT OPf_WANT_LIST OPf_WANT_SCALAR
                      OPf_WANT_VOID OPpCONST_BARE
                      OPpENTERSUB_AMPER OPpEXISTS_SUB OPpITER_REVERSED
@@ -156,8 +155,8 @@ my $testpkgs = \%(
                      PMf_CONTINUE
                      PMf_EXTENDED PMf_FOLD PMf_GLOBAL PMf_KEEP
                      PMf_MULTILINE PMf_SINGLELINE
-                     POSTFIX SVf_FAKE SVf_IOK SVf_NOK SVf_POK SVf_ROK
-                     SVpad_OUR SVs_RMG SVs_SMG SWAP_CHILDREN
+                     SVf_FAKE SVf_IOK SVf_NOK SVf_POK SVf_ROK
+                     SVpad_OUR SVs_RMG SVs_SMG
                      RXf_SKIPWHITE/,
     ),
 
@@ -207,16 +206,17 @@ my $testpkgs = \%(
 
     'IO::Socket' => %( dflt => 'constant',              # 157/190
 
-    perl => qw/ timeout socktype sockopt sockname
+                       perl => qw/ timeout socktype sockopt sockname
                              socketpair socket sockdomain
                              sockaddr_in shutdown setsockopt send
                              register_domain recv protocol peername
                              new listen import getsockopt croak
                              connected connect configure confess close
                              carp bind atmark accept blocking
+                             EWOULDBLOCK EISCONN EINPROGRESS
                              /,
 
-    XS => qw/ unpack_sockaddr_un unpack_sockaddr_in
+                       XS => qw/ unpack_sockaddr_un unpack_sockaddr_in
                            sockatmark sockaddr_family pack_sockaddr_un
                            pack_sockaddr_in inet_ntoa inet_aton
                            /,
