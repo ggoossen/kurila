@@ -3727,22 +3727,18 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 	   "\\3"
 	   "\\|"
 	   ;; Second variant: Identifier or \ID (same as 'ID') or empty
-	   "\\\\?\\(\\([a-zA-Z_][a-zA-Z_0-9]*\\)?\\)" ; 4 + 1, 5 + 1
+	   "\\\\?\\(\\([a-zA-Z_][a-zA-Z_0-9]*\\)?\\)" ; 4, 5
 	   ;; Do not have <<= or << 30 or <<30 or << $blah.
 	   ;; "\\([^= \t0-9$@%&]\\|[ \t]+[^ \t\n0-9$@%&]\\)" ; 6 + 1
-	   "\\(\\)"		; To preserve count of pars :-( 6 + 1
 	   "\\)"
-	   "\\|"
-	   ;; 1+6 extra () before this:
-	   "^[ \t]*\\(format\\)[ \t]*\\([a-zA-Z0-9_]+\\)?[ \t]*=[ \t]*$" ;FRMAT
 	   (if kurila-use-syntax-table-text-property
 	       (concat
 		"\\|"
-		"\\<\\(q[wxqr]?\\|[msy]\\|tr\\)\\>" ; 10: QUOTED CONSTRUCT
+		"\\<\\(q[wxqr]?\\|[ms]\\)\\>" ; 7: QUOTED CONSTRUCT
 		"\\|"
-		"__\\(END\\|DATA\\)__"	; 11: __END__ or __DATA__
+		"__\\(END\\|DATA\\)__"	; 8: __END__ or __DATA__
 		"\\|"
-		"\\\\\\(['`\"($]\\)")	; 21: BACKWACKED something-hairy
+		"\\\\\\(['`\"($]\\)")	; 9: BACKWACKED something-hairy
 	     ""))))
     (unwind-protect
 	(progn
@@ -3987,62 +3983,10 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		    (setq overshoot e1))
 		  (if (> e1 max)
 		      (setq tmpend tb))))
-	       ;; format
-	       ((match-beginning 8)
-		;; 1+6=7 extra () before this:
-		;;"^[ \t]*\\(format\\)[ \t]*\\([a-zA-Z0-9_]+\\)?[ \t]*=[ \t]*$"
-		(setq b (point)
-		      name (if (match-beginning 8) ; 7 + 1
-			       (buffer-substring (match-beginning 8) ; 7 + 1
-						 (match-end 8)) ; 7 + 1
-			     "")
-		      tb (match-beginning 0))
-		(setq argument nil)
-		(put-text-property (save-excursion
-				     (beginning-of-line)
-				     (point))
-				   b 'first-format-line 't)
-		(if kurila-pod-here-fontify
-		    (while (and (eq (forward-line) 0)
-				(not (looking-at "^[.;]$")))
-		      (cond
-		       ((looking-at "^#")) ; Skip comments
-		       ((and argument	; Skip argument multi-lines
-			     (looking-at "^[ \t]*{"))
-			(forward-sexp 1)
-			(setq argument nil))
-		       (argument	; Skip argument lines
-			(setq argument nil))
-		       (t		; Format line
-			(setq b1 (point))
-			(setq argument (looking-at "^[^\n]*[@^]"))
-			(end-of-line)
-			;; Highlight the format line
-			(kurila-postpone-fontification b1 (point)
-						      'face font-lock-string-face)
-			(kurila-commentify b1 (point) nil)
-			(kurila-put-do-not-fontify b1 (point) t))))
-		  ;; We do not search to max, since we may be called from
-		  ;; some hook of fontification, and max is random
-		  (re-search-forward "^[.;]$" stop-point 'toend))
-		(beginning-of-line)
-		(if (looking-at "^\\.$") ; ";" is not supported yet
-		    (progn
-		      ;; Highlight the ending delimiter
-		      (kurila-postpone-fontification (point) (+ (point) 2)
-						    'face font-lock-string-face)
-		      (kurila-commentify (point) (+ (point) 2) nil)
-		      (kurila-put-do-not-fontify (point) (+ (point) 2) t))
-		  (message "End of format `%s' not found." name)
-		  (or (car err-l) (setcar err-l b)))
-		(forward-line)
-		(if (> (point) max)
-		    (setq tmpend tb))
-		(put-text-property b (point) 'syntax-type 'format))
-	       ;; qq-like String or Regexp:
-	       ((match-beginning 10)
-		;; "\\<\\(q[wxqr]?\\|[msy]\\|tr\\)\\>"
-		(setq b1 10
+	       ;; 7: QUOTED CONSTRUCT
+	       ((match-beginning 7)
+		;; "\\<\\(q[wxqr]?\\|[ms]\\)\\>"
+		(setq b1 7
 		      argument (buffer-substring
 				(match-beginning b1) (match-end b1))
 		      b (point)		; end of qq etc
@@ -4133,7 +4077,7 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		  ;; e1 means matching-char matcher.
 		  (setq b (point)	; before the first delimiter
 			;; has 2 args
-			i2 (string-match "^\\([sy]\\|tr\\)$" argument)
+			i2 (string-match "^\\(s\\)$" argument)
 			;; We do not search to max, since we may be called from
 			;; some hook of fontification, and max is random
 			i (kurila-forward-re stop-point end
@@ -4178,31 +4122,13 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 			     (or (eobp)
 				 (forward-char 1))))
 		    (kurila-commentify b i t)
-		    (if (looking-at "\\sw*e") ; s///e
-			(progn
-			  ;; Cache the syntax info...
-			  (setq kurila-syntax-state (cons state-point state))
-			  (and
-			   ;; silent:
-			   (car (kurila-find-pods-heres b1 (1- (point)) t end))
-			   ;; Error
-			   (goto-char (1+ max)))
-			  (if (and tag (eq (preceding-char) ?\>))
-			      (progn
-				(kurila-modify-syntax-type (1- (point)) kurila-st-ket)
-				(kurila-modify-syntax-type i kurila-st-bra)))
-			  (put-text-property b i 'syntax-type 'string)
-			  (put-text-property i (point) 'syntax-type 'multiline)
-			  (if is-x-REx
-			      (put-text-property b i 'indentable t)))
-		      (kurila-commentify b1 (point) t)
-		      (put-text-property b (point) 'syntax-type 'string)
-		      (if is-x-REx
-			  (put-text-property b i 'indentable t))
-		      (if qtag
-			  (kurila-modify-syntax-type (1+ i) kurila-st-punct))
-		      (setq tail nil)))
-		  ;; Now: tail: if the second part is non-matching without ///e
+                    (kurila-commentify b1 (point) t)
+                    (put-text-property b (point) 'syntax-type 'string)
+                    (if is-x-REx
+                        (put-text-property b i 'indentable t))
+                    (if qtag
+                        (kurila-modify-syntax-type (1+ i) kurila-st-punct))
+                    (setq tail nil))
 		  (if (eq (char-syntax (following-char)) ?w)
 		      (progn
 			(forward-word 1) ; skip modifiers s///s
@@ -4600,14 +4526,14 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 					   'REx-part2 t)))))
 		  (if (> (point) max)
 		      (setq tmpend tb))))
-	       ;; 11: "__\\(END\\|DATA\\)__"
-	       ((match-beginning 11)	; __END__, __DATA__
+	       ;; 8: "__\\(END\\|DATA\\)__"
+	       ((match-beginning 8)	; __END__, __DATA__
 		(setq bb (match-end 0))
 		;; (put-text-property b (1+ bb) 'syntax-type 'pod) ; Cheat
 		(kurila-commentify b bb nil)
 		(setq end t))
-	       ;; 12: "\\\\\\(['`\"($]\\)"
-	       ((match-beginning 12)
+	       ;; 9: "\\\\\\(['`\"($]\\)"
+	       ((match-beginning 9)
 		;; Trailing backslash; make non-quoting outside string/comment
 		(setq bb (match-end 0))
 		(goto-char b)
