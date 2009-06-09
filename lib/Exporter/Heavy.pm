@@ -74,7 +74,7 @@ sub export($pkg, $callpkg, @< @imports)
                 if ($remove)
                     foreach my $sym ( @names) { delete %imports{$sym} }
                 else
-                    %imports{[ @names]} = @(1) x nelems @names
+                    %imports{[@names]} = @(1) x nelems @names
                 
             
             @imports = keys %imports

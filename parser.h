@@ -39,7 +39,18 @@ typedef struct yy_str_info {
     I32 line_number; /* line number */
 } yy_str_info;
 
+enum yy_lexbrackstack_item_type {
+    LB_PAREN,
+    LB_AELEM,
+    LB_HELEM,
+    LB_ASLICE,
+    LB_HSLICE,
+    LB_BLOCK,
+    LB_LAYOUT_BLOCK
+};
+    
 typedef struct yy_lexbrackstack_item {
+    enum yy_lexbrackstack_item_type type;
     char state;
     int prev_statement_indent; /* The previous statement_indent,
 				  only valid if state == XSTATE */

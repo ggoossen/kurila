@@ -842,7 +842,7 @@ subscripted:    star '{' expr ';' '}'       /* *main::{something} like *STDOUT{I
                             TOKEN_GETMAD($3,$$,'[');
                             TOKEN_GETMAD($5,$$,']');
 			}
-	|	term ARROW HSLICE expr ']' ';' '}'   /* someref->{[bar();]} */
+	|	term ARROW HSLICE expr ']'   /* someref->{[bar();]} */
 			{ 
                             $$ = newLISTOP(OP_HSLICE, 0,
                                 scalar($4),
@@ -851,38 +851,32 @@ subscripted:    star '{' expr ';' '}'       /* *main::{something} like *STDOUT{I
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'{');
-			  TOKEN_GETMAD($5,$$,'j');
-			  TOKEN_GETMAD($6,$$,';');
-			  TOKEN_GETMAD($7,$$,'}');
+			  TOKEN_GETMAD($5,$$,'}');
 			}
-	|	term ARROW ASLICE expr ']' ']'                     /* someref->[[...]] */
+	|	term ARROW ASLICE expr ']'                     /* someref->[[...]] */
 			{ $$ = newLISTOP(OP_ASLICE, 0,
 					scalar($4),
 					ref(newAVREF($1, LOCATION($2)), OP_ASLICE), LOCATION($3));
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'[');
-			  TOKEN_GETMAD($5,$$,'j');
-			  TOKEN_GETMAD($6,$$,']');
+			  TOKEN_GETMAD($5,$$,']');
 			}
-	|	term HSLICE expr ']' ';' '}'    /* %foo{[bar();]} */
+	|	term HSLICE expr ']'    /* %foo{[bar();]} */
 			{ $$ = newLISTOP(OP_HSLICE, 0,
 					scalar($3),
 					ref($1, OP_HSLICE), LOCATION($2));
                             $$->op_private = IVAL($2);
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
-			  TOKEN_GETMAD($4,$$,'j');
-			  TOKEN_GETMAD($5,$$,';');
-			  TOKEN_GETMAD($6,$$,'}');
+			  TOKEN_GETMAD($4,$$,'}');
 			}
-	|	term ASLICE expr ']' ']'    /* foo[[bar()]] */
+	|	term ASLICE expr ']'    /* foo[[bar()]] */
 			{ $$ = newLISTOP(OP_ASLICE, 0,
 					scalar($3),
 					ref($1, OP_ASLICE), LOCATION($2));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'[');
-			  TOKEN_GETMAD($4,$$,'j');
-			  TOKEN_GETMAD($5,$$,']');
+			  TOKEN_GETMAD($4,$$,']');
 			}
 	|	term '{' expr ';' '}'   /* %foo{bar} or %foo{bar();} */
                         { 
