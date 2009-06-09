@@ -364,10 +364,9 @@ TODO: do
 # test dereferencing errors
 do
     foreach my $ref (@($^STDOUT))
-        dies_like(sub (@< @_) { $ref->@ }, qr/Expected an ARRAY ref but got a IO ref/, "Array dereference")
-        dies_like(sub (@< @_) { $ref->% }, qr/Expected a HASH ref but got a IO ref/, "Hash dereference")
-        dies_like(sub (@< @_) { &$ref( < @_ ) }, qr/Not a CODE reference/, "Code dereference")
-    
+        dies_like({ $ref->@ }, qr/Expected an ARRAY reference but got a IO reference/, "Array dereference")
+        dies_like({ $ref->% }, qr/Expected a HASH reference but got a IO reference/, "Hash dereference")
+        dies_like({ $ref->() }, qr/Expected a CODE reference but got a IO reference/, "Code dereference")
 
     $ref = $^STDOUT
     try { $ref->* }

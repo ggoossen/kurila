@@ -1335,7 +1335,7 @@ PP(pp_entersub)
     }
 
     if (!sv)
-	DIE(aTHX_ "Not a CODE reference");
+	DIE(aTHX_ "Expected a CODE reference but got nothing");
     switch (SvTYPE(sv)) {
 	/* This is overwhelming the most common case:  */
     case SVt_PVGV:
@@ -1366,10 +1366,10 @@ PP(pp_entersub)
 	cv = (CV*)SvRV(sv);
 	if (SvTYPE(cv) == SVt_PVCV)
 	    break;
-	/* FALL THROUGH */
+	DIE(aTHX_ "Expected a CODE reference but got a %s reference", Ddesc(SvRV(sv)));
     case SVt_PVHV:
     case SVt_PVAV:
-	DIE(aTHX_ "Not a CODE reference");
+	DIE(aTHX_ "Expected a CODE reference but got a %s", Ddesc(sv));
 	/* This is the second most common case:  */
     case SVt_PVCV:
 	cv = (CV*)sv;

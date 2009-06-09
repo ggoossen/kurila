@@ -165,12 +165,12 @@ PP(pp_rv2sv)
     if ( ! is_pp_rv2sv ) {
 	if (is_pp_rv2av) {
 	    if ( SvOK(sv) && ! SvAVOK(sv) )
-		Perl_croak(aTHX_ "Expected an ARRAY ref but got a %s ref",
+		Perl_croak(aTHX_ "Expected an ARRAY reference but got a %s reference",
 		    Ddesc(sv));
 	}
 	else {
 	    if ( SvOK(sv) && ! SvHVOK(sv) )
-		Perl_croak(aTHX_ "Expected a HASH ref but got a %s ref",
+		Perl_croak(aTHX_ "Expected a HASH reference but got a %s reference",
 		    Ddesc(sv));
 	}
     }
