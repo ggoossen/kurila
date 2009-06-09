@@ -12,13 +12,13 @@ do
 
 
 do
+    # array assignments
     my ($x, $y, $z)
     @($x, $y) = qw|Mies Wim|
     is( $x, "Mies" )
     is( $y, "Wim" )
 
-    dies_like( sub (@< @_) { @($x, $y) = qw|zus Jet Teun| },
+    dies_like( { @($x, $y) = qw|zus Jet Teun| },
                qr/\QGot extra value(s) in anonymous array (@()) assignment\E/, "assignment with one extra item" )
-    dies_like( sub (@< @_) { @($x, $y) = qw|zus|; },
+    dies_like( { @($x, $y) = qw|zus|; },
                qr/Missing required assignment value/, "assignment with one missing item" )
-
