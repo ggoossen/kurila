@@ -125,7 +125,7 @@ print $output, CCODE->($curr_test+4)
 $TB->current_test += 4
 
 eval q{ CCODE->{foo} }
-like($^EVAL_ERROR->{?description}, qr/^Expected a HASH ref but got a CODE ref|Constant is not a HASH reference/)
+like($^EVAL_ERROR->{?description}, qr/^Expected a HASH reference but got a CODE reference/)
 
 
 # Allow leading underscore
