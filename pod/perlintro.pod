@@ -126,7 +126,7 @@ occasionally to clarify issues of precedence.
     print("Hello, world\n");
     print "Hello, world\n";
 
-More detailed information about Perl syntax can be found in L<perlsyn>.
+More detailed information about Perl syntax can be found in L<kurilasyn>.
 
 =head2 Perl variable types
 
@@ -392,7 +392,7 @@ the more friendly list scanning C<foreach> loop.
 =back
 
 For more detail on looping constructs (and some that weren't mentioned in
-this overview) see L<perlsyn>.
+this overview) see L<kurilasyn>.
 
 =head2 Builtin operators and functions
 

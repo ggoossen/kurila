@@ -604,7 +604,7 @@ sub do_nmake
     $makefile =~ s/\0+/$(join ("", &generate_nmake_1( < @_ )))/s
 
     $makefile =~ s{(del /f [^\n]+checkpods[^\n]+).*?(pod2html)}
-    {$("$1\n" . &generate_nmake_2( < @_ )."\n\t    $2")}s
+                  {$("$1\n" . &generate_nmake_2( < @_ )."\n\t    $2")}s
     $makefile
 
 
@@ -621,7 +621,7 @@ sub do_perlpod
 		    |\s*\n		# blank line
 		   )+
 		  }
-	  {$($1 . join "", &generate_perlpod( < @_ ))}mx)
+                  {$($1 . join "", &generate_perlpod( < @_ ))}mx)
         die "$^PROGRAM_NAME: Failed to insert amendments in do_perlpod"
     
     $pod
@@ -633,8 +633,7 @@ sub do_podmak
     foreach my $variable (qw(pod man html tex))
         die "$^PROGRAM_NAME: could not find $variable in $name"
             unless $body =~ s{\n\U$variable\E = (?:[^\n]*\\\n)*[^\n]*}
-	{$("\n" . generate_pod_mak ($variable))}s
-    
+                             {$("\n" . generate_pod_mak ($variable))}s
     $body
 
 
@@ -653,13 +652,13 @@ sub do_vms
 
     # Looking for rules like this
     # [.lib.pods]perl.pod : [.pod]perl.pod
-    #	@ If F$Search("[.lib]pods.dir").eqs."" Then Create/Directory [.lib.pods]
-    #	Copy/NoConfirm/Log $(MMS$SOURCE) [.lib.pods]
+    #   @ If F$Search("[.lib]pods.dir").eqs."" Then Create/Directory [.lib.pods]
+    #   Copy/NoConfirm/Log $(MMS$SOURCE) [.lib.pods]
 
     $makefile =~ s/\n\Q[.lib.pods]\Eperl[^\n\.]*\.pod[^\n]+\n
-		 [^\n]+\n	# Another line
-		 [^\n]+\Q[.lib.pods]\E\n		# ends [.lib.pods]
-		    /\0/gsx
+                 [^\n]+\n       # Another line
+                 [^\n]+\Q[.lib.pods]\E\n                # ends [.lib.pods]
+                    /\0/gsx
     $sections = @: $makefile =~ m/\0+/g
     die "$^PROGRAM_NAME: $name contains no copy rules" if $sections +< 1
     die "$^PROGRAM_NAME: $name contains $sections discontigous copy rules"

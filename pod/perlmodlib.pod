@@ -217,14 +217,6 @@ Report the search path for a class's ISA tree
 
 Declare struct-like datatypes as Perl classes
 
-=item Compress::Raw::Zlib
-
-Low-Level Interface to zlib compression library
-
-=item Compress::Zlib
-
-Interface to zlib compression library
-
 =item Config
 
 Access Perl configuration information
@@ -485,10 +477,6 @@ Traverse a directory tree.
 
 Perl extension for BSD glob routine
 
-=item File::GlobMapper
-
-Extend File Glob to Allow Input and Output Files
-
 =item File::Path
 
 Create or remove directory trees
@@ -573,26 +561,6 @@ Query locale information
 
 Load various IO modules
 
-=item IO::Compress::Base
-
-Base Class for IO::Compress modules 
-
-=item IO::Compress::Deflate
-
-Write RFC 1950 files/buffers
-
-=item IO::Compress::Gzip
-
-Write RFC 1952 files/buffers
-
-=item IO::Compress::RawDeflate
-
-Write RFC 1951 files/buffers
-
-=item IO::Compress::Zip
-
-Write zip files/buffers
-
 =item IO::Dir
 
 Supply object methods for directory handles
@@ -628,34 +596,6 @@ Object interface for AF_INET domain sockets
 =item IO::Socket::UNIX
 
 Object interface for AF_UNIX domain sockets
-
-=item IO::Uncompress::AnyInflate
-
-Uncompress zlib-based (zip, gzip) file/buffer
-
-=item IO::Uncompress::AnyUncompress
-
-Uncompress gzip, zip, bzip2 or lzop file/buffer
-
-=item IO::Uncompress::Base
-
-Base Class for IO::Uncompress modules 
-
-=item IO::Uncompress::Gunzip
-
-Read RFC 1952 files/buffers
-
-=item IO::Uncompress::Inflate
-
-Read RFC 1950 files/buffers
-
-=item IO::Uncompress::RawInflate
-
-Read RFC 1951 files/buffers
-
-=item IO::Uncompress::Unzip
-
-Read zip files/buffers
 
 =item IPC::Cmd
 
@@ -1003,7 +943,7 @@ Search for key in dictionary file
 
 =item Socket
 
-Load the C socket.h defines and structure manipulators 
+Load the C socket.h defines and structure manipulators
 
 =item Storable
 

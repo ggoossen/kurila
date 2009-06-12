@@ -66,8 +66,6 @@ h Reference Manual
   perlreref		Perl regular expressions quick reference
   perlref		Perl references, the rest of the story
   perlobj		Perl objects
-  perltie		Perl objects hidden behind simple variables
-2 perldbmfilter		Perl DBM filters
 
   perlipc		Perl interprocess communication
   perlfork		Perl fork() information
