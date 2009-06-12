@@ -91,20 +91,20 @@ things, Changing old design decisions, Readable, modifiable perl source
 
 =item SEE ALSO
 
-L<kurila119delta> What is new for Perl Kurila 1.19, L<kurila118delta> What
-is new for Perl Kurila 1.18, L<kurila117delta> What is new for Perl Kurila
-1.17, L<kurila116delta> What is new for Perl Kurila 1.16, L<kurila115delta>
-What is new for Perl Kurila 1.15, L<kurila114delta> What is new for Perl
-Kurila 1.14, L<kurila113delta> What is new for Perl Kurila 1.13,
-L<kurila112delta> What is new for Perl Kurila 1.12, L<kurila111delta> What
-is new for Perl Kurila 1.11, L<kurila110delta> What is new for Perl Kurila
-1.10, L<kurila19delta> What is new for Perl Kurila 1.9, L<kurila18delta>
-What is new for Perl Kurila 1.8, L<kurila17delta> What is new for Perl
-Kurila 1.7, L<kurila16delta> What is new for Perl Kurila 1.6,
-L<kurila15delta> What is new for Perl Kurila 1.5, L<kurila14delta> What is
-new for Perl Kurila 1.4, L<kurila13delta> What is new for Perl Kurila 1.3,
-L<kurila02delta> What is new for Perl Kurila 0.2, L<kurila01delta> What is
-new for Perl Kurila 0.1
+L<kurila120delta> What is new for Perl Kurila 1.20, L<kurila119delta> What
+is new for Perl Kurila 1.19, L<kurila118delta> What is new for Perl Kurila
+1.18, L<kurila117delta> What is new for Perl Kurila 1.17, L<kurila116delta>
+What is new for Perl Kurila 1.16, L<kurila115delta> What is new for Perl
+Kurila 1.15, L<kurila114delta> What is new for Perl Kurila 1.14,
+L<kurila113delta> What is new for Perl Kurila 1.13, L<kurila112delta> What
+is new for Perl Kurila 1.12, L<kurila111delta> What is new for Perl Kurila
+1.11, L<kurila110delta> What is new for Perl Kurila 1.10, L<kurila19delta>
+What is new for Perl Kurila 1.9, L<kurila18delta> What is new for Perl
+Kurila 1.8, L<kurila17delta> What is new for Perl Kurila 1.7,
+L<kurila16delta> What is new for Perl Kurila 1.6, L<kurila15delta> What is
+new for Perl Kurila 1.5, L<kurila14delta> What is new for Perl Kurila 1.4,
+L<kurila13delta> What is new for Perl Kurila 1.3, L<kurila02delta> What is
+new for Perl Kurila 0.2, L<kurila01delta> What is new for Perl Kurila 0.1
 
 =item AUTHOR
 
@@ -6369,6 +6369,44 @@ B<-V>
 =item ENVIRONMENT
 
 =item AUTHOR
+
+=back
+
+=head2 kurila120delta - what is new for Perl Kurila 1.20
+
+=over 4
+
+=item DESCRIPTION
+
+=item Highlights In Perl Kurila 1.20
+
+=item Core Enhancements
+
+=over 4
+
+=item Layout
+
+=item New syntax for loops which are executed at least once
+
+=item Derefence can only be done using postfix dereference
+
+=back
+
+=item KNOWN BUGS
+
+=over 4
+
+=item Documentation
+
+=item Self referential assignment problems
+
+=item Limited platform support
+
+=back
+
+=item SEE ALSO
+
+=item HISTORY
 
 =back
 
