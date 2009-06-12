@@ -2960,7 +2960,7 @@ A program technique that lets you evaluate an L</expression> and then,
 based on the value of the expression, do a multiway branch to the
 appropriate piece of code for that value.  Also called a "case
 structure", named after the similar Pascal construct.  Most switch
-statements in Perl are spelled C<for>.  See L<perlsyn/Basic BLOCKs and
+statements in Perl are spelled C<for>.  See L<kurilasyn/Basic BLOCKs and
 Switch Statements>.
 
 =item symbol

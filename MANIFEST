@@ -1787,7 +1787,7 @@ pod/perlrun.pod			Perl execution and options
 pod/perlsec.pod			Perl security
 pod/perlstyle.pod		Perl style guide
 pod/perlsub.pod			Perl subroutines
-pod/perlsyn.pod			Perl syntax
+pod/kurilasyn.pod			Perl Kurila syntax
 pod/perlthrtut.pod		Perl threads tutorial
 pod/perltodo.pod		Perl things to do
 pod/perltooc.pod		Perl OO tutorial, part 2

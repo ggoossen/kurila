@@ -1,0 +1,302 @@
+=head1 NAME
+X<syntax>
+
+kurilasyn - Perl Kurila syntax
+
+=head1 DESCRIPTION
+
+A Perl Kurila program consists of a sequence statements
+which run from the top to the bottom.  Loops, subroutines and other
+control structures allow you to jump around within the code.
+
+Perl Kurila is a B<layout dependent> language, the indentation is part of the syntax.
+
+Perl Kurila B<borrows syntax> and concepts from many languages: Perl 5, awk, sed, C,
+Bourne Shell, Smalltalk, Lisp, Haskell and even English.  Other
+languages have borrowed syntax from Perl, particularly its regular
+expression extensions.  So if you have programmed in another language
+you will see familiar pieces in Perl Kurila.  They often work the same, but
+see L<perltrap> for information about how they differ.
+
+=head2 Comments
+X<comment> X<#>
+
+Text from a C<"#"> character until the end of the line is a comment,
+and is ignored.  Exceptions include C<"#"> inside a string or regular
+expression.
+
+=head2 Simple Statements
+X<statement> X<semicolon> X<expression> X<;>
+
+The only kind of simple statement is an expression evaluated for its
+side effects. A statement can be terminated with a semicolon.  Note that there are some operators like C<try {}> and
+C<do> that look like compound statements, but aren't (they're just
+TERMs in an expression), and thus need an explicit termination if used
+as the last item in a statement.
+
+=head2 Truth and Falsehood
+X<truth> X<falsehood> X<true> X<false> X<!> X<not> X<negation> X<0>
+
+The number 0, the strings C<'0'> and C<''>, the empty list C<()>, an empty
+array C<@()>, an empty hash C<%()> and
+C<undef> are all false in a boolean context. All other values are true.
+Negation of a true value by C<!> or C<not> returns a special false value.
+When evaluated as a string it is treated as C<''>, but as a number, it
+is treated as 0.
+
+=head2 Statement Modifiers
+X<statement modifier> X<modifier> X<if> X<unless> X<while>
+X<until> X<foreach> X<for>
+
+Any simple statement may optionally be followed by a I<SINGLE> modifier.  The possible
+modifiers are:
+
+    if EXPR
+    unless EXPR
+    while EXPR
+    until EXPR
+    foreach EXPR
+
+The C<EXPR> following the modifier is referred to as the "condition".
+Its truth or falsehood determines how the modifier will behave.
+
+C<if> executes the statement once I<if> and only if the condition is
+true.  C<unless> is the opposite, it executes the statement I<unless>
+the condition is true (i.e., if the condition is false).
+
+    print $^STDOUT, "Basset hounds got long ears" if length $ear +>= 10;
+    go_outside() and play() unless $is_raining;
+
+The C<foreach> modifier is an iterator: it executes the statement once
+for each element of the array EXPR (with C<$_> aliased to each item in turn).
+
+    print $^STDOUT, "Hello $_!\n" foreach qw(world Dolly nurse);
+
+C<while> repeats the statement I<while> the condition is true.
+C<until> does the opposite, it repeats the statement I<until> the
+condition is true (or while the condition is false):
+
+    # Both of these count from 0 to 10.
+    print $i++ while $i +<= 10;
+    print $j++ until $j +>  10;
+
+The C<while> and C<until> modifiers have the usual "C<while> loop"
+semantics (conditional evaluated first). Note also that the loop control statements described
+later will I<NOT> work in this construct, because modifiers don't take
+loop labels.
+
+B<NOTE:> The behaviour of a C<my> statement modified with a statement
+modifier conditional or loop construct (e.g. C<my $x if ...>) is
+B<undefined>.  The value of the C<my> variable may be C<undef>, any
+previously assigned value, or possibly anything else.  Don't rely on
+it.  Future versions of perl might do something different from the
+version of perl you try it out on.  Here be dragons.
+X<my>
+
+=head2 Compound Statements
+X<statement, compound> X<block> X<bracket, curly> X<curly bracket> X<brace>
+X<{> X<}> X<if> X<unless> X<while> X<until> X<foreach> X<for> X<continue>
+
+In Perl, a sequence of statements that defines a scope is called a block.
+Sometimes a block is delimited by the file containing it (in the case
+of a required file, or the program as a whole), and sometimes a block
+is delimited by the extent of a string (in the case of an eval).
+
+But generally, a block is delimited by the layout, or delimited by curly brackets, also known as braces.
+We will call this syntactic construct a BLOCK.
+
+The following compound statements may be used to control flow:
+
+    if (EXPR) BLOCK
+    if (EXPR) BLOCK else BLOCK
+    if (EXPR) BLOCK elsif (EXPR) BLOCK ... else BLOCK
+    LABEL while (EXPR) BLOCK
+    LABEL while (EXPR) BLOCK continue BLOCK
+    LABEL until (EXPR) BLOCK
+    LABEL until (EXPR) BLOCK continue BLOCK
+    LABEL for VAR (EXPR) BLOCK
+    LABEL for VAR (EXPR) BLOCK continue BLOCK
+    LABEL loop BLOCK while (EXPR)
+    LABEL loop BLOCK until (EXPR)
+
+The C<if> statement is straightforward. If you use C<unless> in place of C<if>,
+the sense of the test is reversed.
+
+The C<while> statement executes the block as long as the expression is
+L<true|/"Truth and Falsehood">.
+The C<until> statement executes the block as long as the expression is
+false.
+The LABEL is optional, and if present, consists of an identifier followed
+by a colon.  The LABEL identifies the loop for the loop control
+statements C<next>, C<last>, and C<redo>.
+If the LABEL is omitted, the loop control statement
+refers to the innermost enclosing loop.  This may include dynamically
+looking back your call-stack at run time to find the LABEL.  Such
+desperate behavior triggers a warning if you use the C<use warnings>
+pragma or the B<-w> flag.
+
+If there is a C<continue> BLOCK, it is always executed just before the
+conditional is about to be evaluated again.  Thus it can be used to
+increment a loop variable, even when the loop has been continued via
+the C<next> statement.
+
+=head2 Loop Control
+X<loop control> X<loop, control> X<next> X<last> X<redo> X<continue>
+
+The C<next> command starts the next iteration of the loop:
+
+    LINE: while (~< $^STDIN)
+        next LINE if m/^#/       # discard comments
+        ...
+
+The C<last> command immediately exits the loop in question.  The
+C<continue> block, if any, is not executed:
+
+    LINE: while (~< $^STDIN)
+        last LINE if m/^$/      # exit when done with header
+        ...
+
+The C<redo> command restarts the loop block without evaluating the
+conditional again.  The C<continue> block, if any, is I<not> executed.
+This command is normally used by programs that want to lie to themselves
+about what was just input.
+
+For example, when processing a file like F</etc/termcap>.
+If your input lines might end in backslashes to indicate continuation, you
+want to skip ahead and get the next record.
+
+    while (~< *ARGV)
+        chomp
+        if (s/\\$//)
+            $_ .= ~< *ARGV
+            redo unless eof()
+        # now process $_
+
+which is Perl Kurila short-hand for the more explicitly written version:
+
+    LINE: while (defined($line = ~< *ARGV))
+        chomp($line)
+        if ($line =~ s/\\$//)
+            $line .= ~< *ARGV
+            redo LINE unless eof() # not eof(ARGV)!
+        # now process $line
+
+Note that if there were a C<continue> block on the above code, it would
+get executed only on lines discarded by the regex (since redo skips the
+continue block).
+
+If the word C<while> is replaced by the word C<until>, the sense of the
+test is reversed, but the conditional is still tested before the first
+iteration.
+
+The loop control statements don't work in an C<if> or C<unless>, since
+they aren't loops. 
+
+=head2 For Loops
+X<for> X<foreach>
+
+The C<for> loop iterates over an array and sets the
+variable VAR to be each element of the list in turn.  If the variable
+is preceded with the keyword C<my>, then it is lexically scoped, and
+is therefore visible only within the loop.  Otherwise, the variable is
+implicitly local to the loop and regains its former value upon exiting
+the loop.  If the variable was previously declared with C<my>, it uses
+that variable instead of the global one, but it's still localized to
+the loop.  This implicit localisation occurs I<only> in a C<for>
+loop.
+X<my> X<local>
+
+The C<foreach> keyword is a synonym for the C<for> keyword.
+
+If the array is an lvalue, you can modify it by modifying
+VAR inside the loop.  Conversely, if the array is NOT an
+lvalue, any attempt to modify that element will fail.  In other words,
+the C<for> loop index variable is an implicit alias for each element
+in the array that you're looping over.
+X<alias>
+
+Examples:
+
+    for (@ary) s/foo/bar/
+
+    for my $elem (@elements)
+        $elem *= 2
+
+    for $count (10,9,8,7,6,5,4,3,2,1,'BOOM')
+        print $^STDOUT, $count, "\n"; sleep(1)
+
+    for (1..15) print $^STDOUT, "Merry Christmas\n"
+
+    foreach $item (split(qr/:[\\\n:]*/, env::var('TERMCAP')))
+        print $^STDOUT, "Item: $item\n"
+
+=head2 PODs: Embedded Documentation
+X<POD> X<documentation>
+
+Perl Kurila has a mechanism for intermixing documentation with source code.
+While it's expecting the beginning of a new statement, if the compiler
+encounters a line that begins with an equal sign and a word, like this
+
+    =head1 Here There Be Pods!
+
+Then that text and all remaining text up through and including a line
+beginning with C<=cut> will be ignored.  The format of the intervening
+text is described in L<perlpod>.
+
+This allows you to intermix your source code
+and your documentation text freely, as in
+
+    =item snazzle($)
+
+    The snazzle() function will behave in the most spectacular
+    form that you can possibly imagine, not even excepting
+    cybernetic pyrotechnics.
+
+    =cut back to the compiler, nuff of this pod stuff!
+
+    sub snazzle($thingie)
+        .........
+
+Note that pod translators should look at only paragraphs beginning
+with a pod directive (it makes parsing easier), whereas the compiler
+actually knows to look for pod escapes even in the middle of a
+paragraph.  This means that the following secret stuff will be
+ignored by both the compiler and the translators.
+
+    $a=3
+    =secret stuff
+     warn "Neither POD nor CODE!?"
+    =cut back
+    print $^STDOUT, "got $a\n"
+
+You probably shouldn't rely upon the C<warn()> being podded out forever.
+Not all pod translators are well-behaved in this regard, and perhaps
+the compiler will become pickier.
+
+One may also use pod directives to quickly comment out a section
+of code.
+
+=head2 Plain Old Comments (Not!)
+X<comment> X<line> X<#> X<preprocessor> X<eval>
+
+Perl Kurila can process line directives, much like the C preprocessor.  Using
+this, one can control Perl's idea of filenames and line numbers in
+error or warning messages (especially for strings that are processed
+with C<eval()>).  The syntax for this mechanism is the same as for most
+C preprocessors: it matches the regular expression
+
+    # example: '# line 42 "new_filename.plx"'
+    /^\#   \s*
+      line \s+ (\d+)   \s*
+      (?:\s("?)([^"]+)\2)? \s*
+     $/x
+
+with C<$1> being the line number for the next line, and C<$3> being
+the optional filename (specified with or without quotes).
+
+There is a fairly obvious gotcha included with the line directive:
+Debuggers and profilers will only show the last source line to appear
+at a particular line number in a given file.  Care should be taken not
+to cause line number collisions in code you'd like to debug later.
+
+=cut

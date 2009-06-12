@@ -1281,7 +1281,7 @@ first.)
 
 C<do BLOCK> does I<not> count as a loop, so the loop control statements
 C<next>, C<last>, or C<redo> cannot be used to leave or restart the block.
-See L<perlsyn> for alternative strategies.
+See L<kurilasyn> for alternative strategies.
 
 =item do SUBROUTINE(LIST)
 X<do>
@@ -4978,7 +4978,7 @@ The values to be compared are always passed by reference and should not
 be modified.
 
 You also cannot exit out of the sort block or subroutine using any of the
-loop control operators described in L<perlsyn> or with C<goto>.
+loop control operators described in L<kurilasyn> or with C<goto>.
 
 When C<use locale> is in effect, C<sort LIST> sorts LIST according to the
 current collation locale.  See L<perllocale>.

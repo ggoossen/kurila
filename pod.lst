@@ -46,7 +46,7 @@ h Tutorials
 
 h Reference Manual
 
-  perlsyn		Perl syntax
+  kurilasyn		Perl Kurila syntax
   perldata		Perl data structures
   perlop		Perl operators and precedence
   perlsub		Perl subroutines
