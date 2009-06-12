@@ -5,18 +5,19 @@ kurilasyn - Perl Kurila syntax
 
 =head1 DESCRIPTION
 
-A Perl Kurila program consists of a sequence statements
-which run from the top to the bottom.  Loops, subroutines and other
-control structures allow you to jump around within the code.
+A Perl Kurila program consists of a sequence statements which run from
+the top to the bottom.  Loops, subroutines and other control
+structures allow you to jump around within the code.
 
-Perl Kurila is a B<layout dependent> language, the indentation is part of the syntax.
+Perl Kurila is a B<layout dependent> language, the indentation is an
+important part of the syntax.
 
-Perl Kurila B<borrows syntax> and concepts from many languages: Perl 5, awk, sed, C,
-Bourne Shell, Smalltalk, Lisp, Haskell and even English.  Other
-languages have borrowed syntax from Perl, particularly its regular
-expression extensions.  So if you have programmed in another language
-you will see familiar pieces in Perl Kurila.  They often work the same, but
-see L<perltrap> for information about how they differ.
+Perl Kurila B<borrows syntax> and concepts from many languages: Perl
+5, awk, sed, C, Bourne Shell, Smalltalk, Lisp, Haskell and even
+English. So if you have programmed in
+another language you will see familiar pieces in Perl Kurila.  They
+often work the same, but see L<perltrap> for information about how
+they differ.
 
 =head2 Comments
 X<comment> X<#>
@@ -24,6 +25,60 @@ X<comment> X<#>
 Text from a C<"#"> character until the end of the line is a comment,
 and is ignored.  Exceptions include C<"#"> inside a string or regular
 expression.
+
+=head2 Layout
+X<layout>
+
+Blocks are usually made using layout. When a block is expected the
+column of the first token of block, determines the indentation of the
+block.
+
+The next token after when a block is expected determines the starting
+column.  A statement is terminated if the next line is equally or less
+indented as the block.  The block is terminated if a line is indented
+less than the indentation of the block.
+
+Each file or eval string is started with an implicit block with zero
+indentation.
+
+Empty lines, Comments, Pod and heredocs are ignored for the layout.
+
+=head3 Layout insensitivity
+X<Layout insensitivity>
+
+Instead of using layout to make blocks, they can also be created by
+using a C<{> to start a block. If this is done layout is ignored, and
+statements have to be terminated by a semicolon C<;>. The block has to
+be ended with with a closing brace C<}>, after which the previous
+layout rule is restored.
+
+=head3 Examples
+
+An example of layout based blocks and statements,
+
+    if ($cond)
+        statement1()
+        statement2()
+            + cont_statement2()
+        statement3()
+    else
+        else_statement1()
+
+or equivalent,
+
+    if ($cond) statement1()
+               statement2() + cont_statement2()
+               statement3()
+    else else_statement1()
+
+or using layout insensitive syntax,
+
+    if ($cond) {
+      statement1();
+      statement2() + cont_statement2();
+    } else {
+      else_statement1();
+    }
 
 =head2 Simple Statements
 X<statement> X<semicolon> X<expression> X<;>
