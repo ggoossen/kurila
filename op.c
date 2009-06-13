@@ -3562,7 +3562,6 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	op_free(block);
 	block = NULL;
     }
- install_block:
     if (!block)
 	goto done;
 

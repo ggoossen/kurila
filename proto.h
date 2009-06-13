@@ -5063,7 +5063,7 @@ STATIC void	S_force_ident(pTHX_ const char *s, int kind)
 #define PERL_ARGS_ASSERT_FORCE_IDENT	\
 	assert(s)
 
-STATIC void	S_incline(pTHX_ const char *s)
+STATIC void	S_incline(pTHX_ char *s)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_INCLINE	\
 	assert(s)

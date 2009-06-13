@@ -1444,7 +1444,7 @@ sR	|char*	|swallow_bom	|NN char *s
 s	|void	|checkcomma	|NN const char *s|NN const char *name \
 				|NN const char *what
 s	|void	|force_ident	|NN const char *s|int kind
-s	|void	|incline	|NN const char *s
+s	|void	|incline	|NN char *s
 s	|int	|intuit_more	|NN char *s
 s	|I32	|lop		|I32 f|int x|NN char *s
 rs	|void	|missingterminator	|NULLOK char *s

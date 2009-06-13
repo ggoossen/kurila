@@ -730,7 +730,7 @@ Perl_lex_end(pTHX)
  */
 
 STATIC void
-S_incline(pTHX_ const char *s)
+S_incline(pTHX_ char *s)
 {
     dVAR;
     const char *t;
@@ -5513,7 +5513,6 @@ Perl_yylex(pTHX)
 	    LOP(OP_SUBSTR,XTERM);
 
 	case KEY_sub:
-	  really_sub:
 	    {
 		char tmpbuf[sizeof PL_tokenbuf];
 		SSize_t tboffset = 0;
