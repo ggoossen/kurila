@@ -2324,6 +2324,20 @@ if (exists $self->{PARENT}->{$opt}
 for ($a)
     { $b }
 ----
+for ($a)
+    { $b }
+====
+my $x = %(
+   aap => sub {
+     return "noot";
+   },
+);
+----
+my $x = %(
+    aap => sub (@< @_)
+        return "noot"
+    ,
+    )
 END
 }
 

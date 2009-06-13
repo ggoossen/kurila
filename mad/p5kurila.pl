@@ -456,13 +456,15 @@ sub change_deref {
     # '@{...}' to '...->@', etc.
     for (['@', 'ary', 'av'], [qw|$ variable sv|], [qw|% hsh hv|], [qw|* star gv|], [qw|&amp; ampersand cv|]) {
         my ($sigil, $token, $xv) = @$_;
-        for my $rv2av ($xml->findnodes("//op_rv2$xv"), $xml->findnodes("//op_null[\@was='rv2$xv']")) {
-            next unless (get_madprop($rv2av, $token) || '') eq $sigil or # =~ m/^([\$\@\%*]|&amp;)$/ or
+        for my $rv2av (find_ops($xml, "rv2$xv")) {
+            next unless (get_madprop($rv2av, $token) || '') =~ m/\Q$sigil\E$/ or # =~ m/^([\$\@\%*]|&amp;)$/ or
               (get_madprop($rv2av, 'variable') || '') eq '$' or # sigil change
               (get_madprop($rv2av, 'ary') || '') eq '@';        # sigil change
             set_madprop($rv2av, 'variable', '');
             set_madprop($rv2av, 'ary', '');
-            set_madprop($rv2av, $token, '');
+            my $token_v = get_madprop($rv2av, $token);
+            $token_v =~ s/\Q$sigil\E$//;
+            set_madprop($rv2av, $token, $token_v);
             set_madprop($rv2av, 'arrow', '-&gt;' . $sigil);
             if (my ($scope) = $rv2av->findnodes('op_scope')) {
                 set_madprop($rv2av, 'arrow', "-&gt;$sigil", wsafter => get_madprop($scope, 'curly_close', 'wsafter'));
@@ -913,8 +915,21 @@ sub sv_array_hash {
         set_madprop($op, $type."_close", ' )');
     }
 
+    for my $op (find_ops($xml, 'null')) {
+        next unless (get_madprop($op, 'null_type_first') || '') eq "quote";
+        next unless get_madprop($op, "quote_open") =~ m/^qw/;
+        if ($op->parent->tag eq "op_anonlist" and $op->children_count == 2) {
+            my $square_open = get_madprop($op->parent, "square_open");
+            $square_open =~ s/[@][:(]//;
+            set_madprop($op->parent, "square_open", $square_open);
+            set_madprop($op->parent, "square_close", "");
+            next;
+        }
+        set_madprop($op, "quote_open", "&lt; " . get_madprop($op, "quote_open"));
+    }
+
     for my $op (map { $xml->findnodes(qq|//op_$_|) } qw|return|) {
-        next unless $op->children > 3;
+        next unless $op->children_count > 3;
         set_madprop($op, 'operator', 'return @(');
         set_madprop($op, 'round_close', ' )');
     }
@@ -1108,7 +1123,7 @@ sub env_using_package {
     my $xml = shift;
 
     for my $op ($xml->findnodes("//op_rv2hv")) {
-        next unless get_madprop($op, "hsh") eq "\%ENV";
+        next unless (get_madprop($op, "hsh") || '') eq "\%ENV";
         next unless $op->parent->tag eq "op_helem";
         if (get_madprop($op->parent, "local")) {
             set_madprop($op, "hsh", "env::temp_set_var");
@@ -1548,20 +1563,27 @@ sub indent {
 
         if ($new_block) {
             $old_indent_level = $indent_level;
-            $new_indent_level = $indent_level + 4 + $cont;
-            ($first_indent_line, undef) = first_token($op->children);
-            $indent_level = $indent_level + $cont;
+            $new_indent_level = $indent_level + 4;
+            my ($new_first_indent_line, undef) = first_token($op->children);
+            $indent_level = $indent_level;
+
+            if ($op->ancestors > 3 and ($op->ancestors)[2]->tag eq "op_anoncode") {
+                if ($first_indent_line < get_madprop(($op->ancestors)[3], 'operator', 'linenr')) {
+                    $new_indent_level += $cont || 4;
+                    $indent_level += $cont || 4;
+                }
+            }
+            $first_indent_line = $new_first_indent_line;
             $old_cont = $cont;
             $cont = 0;
+
 
             $use_layout = 0;
 
             if (get_madprop($op, 'curly_open') and $null_type ne 'uniop') {
                 # Possibly convert to "use_layout"
                 my $open_indent_line = get_madprop($op, 'curly_open', 'linenr');
-                if ($first_indent_line
-                      and $open_indent_line < $first_indent_line
-                    ) {
+                if ($first_indent_line and $open_indent_line < $first_indent_line ) {
                     my $mad_parent_while = get_madprop($op->parent->parent->parent, 'whilepost');
                     if ($mad_parent_while) {
                         set_madprop($op->parent->parent->parent, 'whilepost', $mad_parent_while,
@@ -1583,7 +1605,7 @@ sub indent {
                     $use_layout = 1;
                 }
                 else {
-                    my $mad_parent_while = $op->parent->parent->parent && get_madprop($op->parent->parent->parent, 'whilepost');
+                    my $mad_parent_while = ($op->ancestors)[2] && get_madprop(($op->ancestors)[2], 'whilepost');
                     if ($mad_parent_while) {
                         set_madprop($op, 'curly_open', 'loop ' . get_madprop($op, 'curly_open'));
                     }
@@ -1624,7 +1646,7 @@ sub indent {
                             $lines[$i] =~ s/^(\s|&#x9;)*/ ' ' x $ws_indent /ge;
                             $i++;
                         }
-                        warn "ws - $ws_indent - $cont - $first_indent_line - $linenr - " . $madv->tag;
+                        # warn "ws - $ws_indent - $cont - $first_indent_line - $linenr - " . $madv->tag;
                         $ws = join '&#xA;', @lines;
                         $ws =~ s/(\s|&#x9;)+&#xA;/&#xA;/g;
                         $madv->set_att($wsname, $ws);
@@ -1645,7 +1667,7 @@ sub indent {
                     set_madprop($op, 'semicolon', '');
                 }
             }
-            ($first_indent_line, undef) = first_token( $op->tag eq 'op_nextstate' ? $op->next_sibling() : $op );
+            ($first_indent_line, undef) = first_token( ($op->tag eq 'op_nextstate' and $op->next_sibling) ? $op->next_sibling() : $op );
             $cont = 0;
         }
 
@@ -1772,9 +1794,13 @@ sub indent {
 }
 
 my $from; # floating point number with starting version of kurila.
-GetOptions("from=s" => \$from);
+my $to;
+GetOptions("from=s" => \$from, "to=s" => \$to);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
 $from = { branch => $1, 'v' => qv $2};
+$to =~ m/(\w+)[-]([\d.]+)$/ or die "invalid to: '$to'";
+$to = { branch => $1, 'v' => qv $2};
+$to->{branch} eq "kurila" or die "Can only convert to 'kurila' not $to->{branch}";
 
 my $filename = shift @ARGV;
 
@@ -1890,14 +1916,15 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.19') {
     mg_stdin($twig);
     local_undef($twig);
     env_sub($twig);
+    change_deref($twig);
+    scope_deref($twig);
+    dofile_to_evalfile($twig);
+    sub_defargs($twig);
 }
 
-# scope_deref($twig);
-# mg_stdin($twig);
-# dofile_to_evalfile($twig);
-# sub_defargs($twig);
-
-indent($twig);
+if ($to->{v} >= qv '1.20') {
+    indent($twig);
+}
 
 #future: add_call_parens($twig);
 

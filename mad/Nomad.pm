@@ -1891,8 +1891,10 @@ sub ast {
     my @newkids;
 
     my $right = $$self{Kids}[1];
-    eval { push @newkids, $right->ast($self, @_); };
-    die if $@;
+    if ($right) {
+        eval { push @newkids, $right->ast($self, @_); };
+        die if $@;
+    }
 
     push @newkids, $self->madness('o');
 
