@@ -46,11 +46,9 @@ sub plan
         if ($n eq 'no_plan')
             undef $n
             $noplan = 1
-        
     else
         my %plan = %( < @_ )
         $n = %plan{?tests}
-    
     _print "1..$n\n" unless $noplan
     $planned = $n
 
@@ -154,7 +152,6 @@ sub display
 
 
 sub is ($got, $expected, ?$name, @< @mess)
-
     my $pass
     if( !defined $got || !defined $expected )
         # undef only matches undef
@@ -162,14 +159,12 @@ sub is ($got, $expected, ?$name, @< @mess)
     elsif (ref $got and ref $expected)
         $pass = $got \== $expected
     else
-        local $^EVAL_ERROR = undef
         $pass = try { $got eq $expected }
-    
 
     unless ($pass)
         unshift(@mess, "#      got "._q($got)."\n",
             "# expected "._q($expected)."\n")
-    
+
     _ok($pass, _where(), $name, < @mess)
 
 

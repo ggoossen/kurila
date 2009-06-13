@@ -142,12 +142,8 @@ sub export($pkg, $callpkg, @< @imports)
             foreach my $sym ( @failed)
                 warn(qq["$sym" is not implemented by the $pkg module ]
                     . "on this architecture")
-            
             if ((nelems @failed))
                 die("Can't continue after import errors")
-            
-        
-    
 
     warn "Importing into $callpkg from $pkg: ",
         join(", ",sort @imports) if $Exporter::Verbose
