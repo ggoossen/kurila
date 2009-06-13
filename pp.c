@@ -3409,11 +3409,11 @@ PP(pp_delete)
 	}
 	else if (!SvOK(hv)) {
 	    if (!(PL_op->op_private & OPpELEM_OPTIONAL))
-		DIE(aTHX_ "%s expects a HASH not %s", OP_DESC(PL_op), Ddesc(hv));
+		DIE(aTHX_ "%s expects a HASH not %s", OP_DESC(PL_op), Ddesc(hvTsv(hv)));
 	    sv = NULL;
 	}
 	else
-	    DIE(aTHX_ "%s expects a HASH not %s", OP_DESC(PL_op), Ddesc(hv));
+	    DIE(aTHX_ "%s expects a HASH not %s", OP_DESC(PL_op), Ddesc(hvTsv(hv)));
 	if (!sv)
 	    sv = &PL_sv_undef;
 	if (!discard)
@@ -3488,7 +3488,7 @@ PP(pp_hslice)
 	    Perl_croak(aTHX_ "%s expects a HASH but got UNDEF", OP_DESC(PL_op));
 	if (SvREADONLY(hv))
 	    Perl_croak(aTHX_ PL_no_modify);
-	sv_upgrade(hv, SVt_PVHV);
+	sv_upgrade(hvTsv(hv), SVt_PVHV);
     }
     else if ( ! SvHVOK(hv) )
 	Perl_croak(aTHX_ "Not a HASH");
@@ -4268,7 +4268,7 @@ PP(pp_push)
 	if (SvREADONLY(ary))
 	    Perl_croak(aTHX_ PL_no_modify);
 
-	sv_upgrade(ary, SVt_PVAV);
+	sv_upgrade(avTsv(ary), SVt_PVAV);
     }
 
     {
@@ -4315,10 +4315,10 @@ PP(pp_unshift)
 
     if ( ! SvAVOK(ary) ) {
 	if ( SvOK(ary) )
-	    Perl_croak(aTHX_ "Can't %s a %s", OP_DESC(PL_op), Ddesc(ary));
+	    Perl_croak(aTHX_ "Can't %s a %s", OP_DESC(PL_op), Ddesc(avTsv(ary)));
 	if (SvREADONLY(ary))
 	    Perl_croak(aTHX_ PL_no_modify);
-	sv_upgrade(ary, SVt_PVAV);
+	sv_upgrade(avTsv(ary), SVt_PVAV);
     }
 
     {

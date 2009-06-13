@@ -936,7 +936,7 @@ PP(pp_helem)
 
     if ( ! SvHVOK(hv) ) {
 	if ( SvOK(hv) ) {
-	    Perl_croak(aTHX_ "Expected a HASH not %s", Ddesc(hv));
+	    Perl_croak(aTHX_ "Expected a HASH not %s", Ddesc(hvTsv(hv)));
 	}
 
 	/* hv must be "undef" */
@@ -1398,6 +1398,7 @@ PP(pp_entersub)
 	/* This path taken at least 75% of the time   */
 	dMARK;
 	register I32 items = SP - MARK;
+	AV* padlist;
 	if (CvCONST(cv)) {
 	    if (items)
 		Perl_croak(aTHX_ "constant subroutine does not expect any arguments");
@@ -1408,7 +1409,7 @@ PP(pp_entersub)
 	    LEAVE;
 	    return NORMAL;
 	}
-	AV* const padlist = CvPADLIST(cv);
+	padlist = CvPADLIST(cv);
 	PUSHBLOCK(cx, CXt_SUB, is_assignment ? MARK - 1 : MARK );
 	PUSHSUB(cx);
 	cx->blk_sub.retop = PL_op->op_next;

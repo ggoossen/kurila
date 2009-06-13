@@ -1295,9 +1295,6 @@ void Perl_cv_setcv(pTHX_ CV *dst, CV* src)
 	OP_REFCNT_UNLOCK;
 	CvSTART(dst)		= CvSTART(src);
 
-	if (SvPOK(src))
-	    sv_setpvn((SV*)dst, SvPVX_const((SV*)src), SvCUR(src));
-
 	CvPADLIST(dst) = pad_new(padnew_CLONE|padnew_SAVE,
 	    parent_padnames,
 	    parent_pad,
