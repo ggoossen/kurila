@@ -39,6 +39,23 @@ typedef struct yy_str_info {
     I32 line_number; /* line number */
 } yy_str_info;
 
+enum yy_lexbrackstack_item_type {
+    LB_PAREN,
+    LB_AELEM,
+    LB_HELEM,
+    LB_ASLICE,
+    LB_HSLICE,
+    LB_BLOCK,
+    LB_LAYOUT_BLOCK
+};
+    
+typedef struct yy_lexbrackstack_item {
+    enum yy_lexbrackstack_item_type type;
+    char state;
+    int prev_statement_indent; /* The previous statement_indent,
+				  only valid if state == XSTATE */
+} yy_lex_brackstack_item;
+
 typedef struct yy_parser {
 
     /* parser state */
@@ -59,7 +76,7 @@ typedef struct yy_parser {
 
     I32		lex_brackets;	/* bracket count */
     I32		lex_casemods;	/* casemod count */
-    char	*lex_brackstack;/* what kind of brackets to pop */
+    yy_lex_brackstack_item	*lex_brackstack;/* what kind of brackets to pop */
     char	*lex_casestack;	/* what kind of case mods in effect */
     U8		lex_defer;	/* state after determined token */
     U8		lex_expect;	/* expect after determined token */
@@ -97,6 +114,7 @@ typedef struct yy_parser {
     PerlIO	*rsfp;		/* current source file pointer */
     AV		*rsfp_filters;	/* holds chain of active source filters */
     I32         statement_indent; /* the indentation level of the current statement scope */
+    bool        doextract;       /* indicates pod extracting */
 
 #ifdef PERL_MAD
     SV		*endwhite;

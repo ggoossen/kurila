@@ -1,4 +1,4 @@
-package Pod::Functions;
+package Pod::Functions
 
 
 =head1 NAME
@@ -16,7 +16,7 @@ or
 
     perl /path/to/lib/Pod/Functions.pm
 
-This will print a grouped list of Perl's functions, like the 
+This will print a grouped list of Perl's functions, like the
 L<perlfunc/"Perl Functions by Category"> section.
 
 =head1 DESCRIPTION
@@ -37,12 +37,12 @@ The category can be a comma separated list.
 
 =item %Flavor
 
-In this hash each key represents a function and the value is a short 
+In this hash each key represents a function and the value is a short
 description of that function.
 
 =item %Type_Description
 
-In this hash each key represents a category of functions and the value is 
+In this hash each key represents a category of functions and the value is
 a short description of that category.
 
 =item @Type_Order
@@ -67,39 +67,39 @@ L<perlfunc/"Perl Functions by Category"> section.
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.03'
 
-require Exporter;
+require Exporter
 
-our @ISA = qw(Exporter);
-our @EXPORT = qw(%Kinds %Type %Flavor %Type_Description @Type_Order);
+our @ISA = qw(Exporter)
+our @EXPORT = qw(%Kinds %Type %Flavor %Type_Description @Type_Order)
 
 use Perl6::Form;
 
-our(%Kinds, %Type, %Flavor);
+our(%Kinds, %Type, %Flavor)
 
 our %Type_Description = %(
-        'ARRAY'	=> 'Functions for real @ARRAYs',
-            'Binary'	=> 'Functions for fixed length data or records',
-            'File'	=> 'Functions for filehandles, files, or directories',
-            'Flow'	=> 'Keywords related to control flow of your perl program',
-            'HASH'	=> 'Functions for real %HASHes',
-            'I/O'	=> 'Input and output functions',
-            'LIST'	=> 'Functions for list data',
-            'Math'	=> 'Numeric functions',
-            'Misc'	=> 'Miscellaneous functions',
-            'Modules'	=> 'Keywords related to perl modules',
-            'Network'	=> 'Fetching network info',
-            'Objects'	=> 'Keywords related to classes and object-orientedness',
-            'Process'	=> 'Functions for processes and process groups',
-            'Regexp'	=> 'Regular expressions and pattern matching',
-            'Socket'	=> 'Low-level socket functions',
-            'String'	=> 'Functions for SCALARs or strings',
-            'SysV'	=> 'System V interprocess communication functions',
-            'Time'	=> 'Time-related functions',
-            'User'	=> 'Fetching user and group info',
-            'Namespace'	=> 'Keywords altering or affecting scoping of identifiers',
-    );
+    'ARRAY'	=> 'Functions for real @ARRAYs',
+    'Binary'	=> 'Functions for fixed length data or records',
+    'File'	=> 'Functions for filehandles, files, or directories',
+    'Flow'	=> 'Keywords related to control flow of your perl program',
+    'HASH'	=> 'Functions for real %HASHes',
+    'I/O'	=> 'Input and output functions',
+    'LIST'	=> 'Functions for list data',
+    'Math'	=> 'Numeric functions',
+    'Misc'	=> 'Miscellaneous functions',
+    'Modules'	=> 'Keywords related to perl modules',
+    'Network'	=> 'Fetching network info',
+    'Objects'	=> 'Keywords related to classes and object-orientedness',
+    'Process'	=> 'Functions for processes and process groups',
+    'Regexp'	=> 'Regular expressions and pattern matching',
+    'Socket'	=> 'Low-level socket functions',
+    'String'	=> 'Functions for SCALARs or strings',
+    'SysV'	=> 'System V interprocess communication functions',
+    'Time'	=> 'Time-related functions',
+    'User'	=> 'Fetching user and group info',
+    'Namespace'	=> 'Keywords altering or affecting scoping of identifiers',
+    )
 
 our @Type_Order = qw{
     String
@@ -122,39 +122,39 @@ our @Type_Order = qw{
     User
     Network
     Time
-};
-
-while ( ~< $^DATA) {
-    chomp;
-    s/#.*//;
-    next unless $_;
-    my@($name, $type, $text) =  split " ", $_, 3;
-    %Type{+$name} = $type;
-    %Flavor{+$name} = $text;
-    for my $t ( split m/[,\s]+/, $type ) {
-        push %Kinds{+$t}, $name;
-    }
 }
 
-close $^DATA;
+while ( ~< $^DATA)
+    chomp
+    s/#.*//
+    next unless $_
+    my@($name, $type, $text) =  split " ", $_, 3
+    %Type{+$name} = $type
+    %Flavor{+$name} = $text
+    for my $t ( split m/[,\s]+/, $type )
+        push %Kinds{+$t}, $name
+    
 
-my( $typedesc, $list );
-unless (caller) {
-    foreach my $type (  @Type_Order ) {
-        $list = join(", ", sort %Kinds{?$type});
-        $typedesc = %Type_Description{?$type} . ":";
+
+close $^DATA
+
+my( $typedesc, $list )
+unless (caller)
+    foreach my $type (  @Type_Order )
+        $list = join(", ", sort %Kinds{?$type})
+        $typedesc = %Type_Description{?$type} . ":"
 
         print $^STDOUT, < form("",
                                "\{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",
                                $typedesc,
                                "     \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",
                                $list,
-                               );
-    }
-}
+                               )
+    
 
 
-1;
+
+1
 
 __DATA__
 -X	File	a file test (-r, -x, etc)

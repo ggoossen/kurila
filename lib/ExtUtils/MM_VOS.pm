@@ -1,9 +1,9 @@
-package ExtUtils::MM_VOS;
+package ExtUtils::MM_VOS
 
-our $VERSION = '6.44';
+our $VERSION = '6.44'
 
-require ExtUtils::MM_Unix;
-our @ISA = qw(ExtUtils::MM_Unix);
+require ExtUtils::MM_Unix
+our @ISA = qw(ExtUtils::MM_Unix)
 
 
 =head1 NAME
@@ -30,9 +30,9 @@ Cleanup VOS core files
 
 =cut
 
-sub extra_clean_files {
-    return qw(*.kp);
-}
+sub extra_clean_files
+    return qw(*.kp)
+
 
 
 =head1 AUTHOR
@@ -46,4 +46,4 @@ L<ExtUtils::MakeMaker>
 =cut
 
 
-1;
+1

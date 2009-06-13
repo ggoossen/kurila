@@ -12,7 +12,7 @@ BEGIN {
 
     chdir('t') if -d 't';
     if (env::var('PERL_CORE')){
-	$^INCLUDE_PATH = @('.', '../lib', '../ext/Storable/t');
+        $^INCLUDE_PATH = @('.', '../lib', '../ext/Storable/t');
     } else {
         if (!eval "require Hash::Util") {
             if ($^EVAL_ERROR->{description} =~ m/Can\'t locate Hash\/Util\.pm in \$^INCLUDE_PATH/s) {
@@ -22,7 +22,7 @@ BEGIN {
                 die;
             }
         }
-	unshift $^INCLUDE_PATH, 't';
+        unshift $^INCLUDE_PATH, 't';
     }
     require 'st-dump.pl';
 }
@@ -67,7 +67,7 @@ sub testit {
     print "# Copy's keys: $(join ' ',@out_keys)\n";
   }
 
-  # $copy = $hash;	# used in initial debug of the tests
+  # $copy = $hash;      # used in initial debug of the tests
 
   ok ++$test, Internals::HvRESTRICTED(%$copy), "cloned hash restricted?";
 

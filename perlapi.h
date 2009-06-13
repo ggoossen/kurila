@@ -29,13 +29,13 @@ START_EXTERN_C
 #undef PERLVARI
 #undef PERLVARIC
 #undef PERLVARISC
-#define PERLVAR(v,t)	EXTERN_C t* Perl_##v##_ptr(pTHX);
-#define PERLVARA(v,n,t)	typedef t PL_##v##_t[n];			\
-			EXTERN_C PL_##v##_t* Perl_##v##_ptr(pTHX);
-#define PERLVARI(v,t,i)	PERLVAR(v,t)
+#define PERLVAR(v,t)    EXTERN_C t* Perl_##v##_ptr(pTHX);
+#define PERLVARA(v,n,t) typedef t PL_##v##_t[n];                        \
+                        EXTERN_C PL_##v##_t* Perl_##v##_ptr(pTHX);
+#define PERLVARI(v,t,i) PERLVAR(v,t)
 #define PERLVARIC(v,t,i) PERLVAR(v, const t)
-#define PERLVARISC(v,i)	typedef const char PL_##v##_t[sizeof(i)];	\
-			EXTERN_C PL_##v##_t* Perl_##v##_ptr(pTHX);
+#define PERLVARISC(v,i) typedef const char PL_##v##_t[sizeof(i)];       \
+                        EXTERN_C PL_##v##_t* Perl_##v##_ptr(pTHX);
 
 #include "intrpvar.h"
 #include "perlvars.h"
@@ -76,9 +76,9 @@ EXTCONST void * const PL_force_link_funcs[] = {
 #undef PERLVARA
 #undef PERLVARI
 #undef PERLVARIC
-#define PERLVAR(v,t)	(void*)Perl_##v##_ptr,
-#define PERLVARA(v,n,t)	PERLVAR(v,t)
-#define PERLVARI(v,t,i)	PERLVAR(v,t)
+#define PERLVAR(v,t)    (void*)Perl_##v##_ptr,
+#define PERLVARA(v,n,t) PERLVAR(v,t)
+#define PERLVARI(v,t,i) PERLVAR(v,t)
 #define PERLVARIC(v,t,i) PERLVAR(v,t)
 #define PERLVARISC(v,i) PERLVAR(v,char)
 
@@ -108,13 +108,13 @@ EXTCONST void * const PL_force_link_funcs[] = {
 #undef PERLVARIC
 #undef PERLVARISC
 };
-#endif	/* DOINIT */
+#endif  /* DOINIT */
 
 END_EXTERN_C
 
-#endif	/* PERL_NO_FORCE_LINK */
+#endif  /* PERL_NO_FORCE_LINK */
 
-#else	/* !PERL_CORE */
+#else   /* !PERL_CORE */
 
 #undef  PL_Argv
 #define PL_Argv			(*Perl_IArgv_ptr(aTHX))
@@ -246,8 +246,6 @@ END_EXTERN_C
 #define PL_diehook		(*Perl_Idiehook_ptr(aTHX))
 #undef  PL_dirty
 #define PL_dirty		(*Perl_Idirty_ptr(aTHX))
-#undef  PL_doextract
-#define PL_doextract		(*Perl_Idoextract_ptr(aTHX))
 #undef  PL_dowarn
 #define PL_dowarn		(*Perl_Idowarn_ptr(aTHX))
 #undef  PL_dumper_fd
@@ -518,6 +516,8 @@ END_EXTERN_C
 #define PL_sighandlerp		(*Perl_Isighandlerp_ptr(aTHX))
 #undef  PL_signals
 #define PL_signals		(*Perl_Isignals_ptr(aTHX))
+#undef  PL_skiptoshebang
+#define PL_skiptoshebang	(*Perl_Iskiptoshebang_ptr(aTHX))
 #undef  PL_slab_count
 #define PL_slab_count		(*Perl_Islab_count_ptr(aTHX))
 #undef  PL_slabs

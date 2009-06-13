@@ -1,9 +1,9 @@
 #!./perl
 
 
-use warnings;
+use warnings
 
-require q(./test.pl); plan(tests => 1);
+require q(./test.pl); plan(tests => 1)
 
 =pod
 
@@ -22,17 +22,17 @@ except TypeError:
 
 =cut
 
-do {
-    package X;
+do
+    package X
 
-        package Y;
+    package Y
 
-        package XY;
-    our @ISA = @('X', 'Y');
+    package XY
+    our @ISA = @('X', 'Y')
 
-        package YX;
-    our @ISA = @('Y', 'X');
-};
+    package YX;
+    our @ISA = @('Y', 'X')
 
-try { @Z::ISA = @('XY', 'YX') };
-like($^EVAL_ERROR->{?description}, qr/^Inconsistent /, '... got the right error with an inconsistent hierarchy');
+
+try { @Z::ISA = @('XY', 'YX') }
+like($^EVAL_ERROR->{?description}, qr/^Inconsistent /, '... got the right error with an inconsistent hierarchy')

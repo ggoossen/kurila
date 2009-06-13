@@ -42,9 +42,9 @@ my $x ;
 my $y ;
 my $p ;
 EXPECT
-"my" variable $x masks earlier declaration in same scope at - line 4 character 7.
-"my" variable $y masks earlier declaration in same statement at - line 5 character 15.
-"my" variable $p masks earlier declaration in same scope at - line 8 character 7.
+"my" variable $x masks earlier declaration in same scope at - line 4 character 6.
+"my" variable $y masks earlier declaration in same statement at - line 5 character 14.
+"my" variable $p masks earlier declaration in same scope at - line 8 character 6.
 ########
 # pad.c
 use warnings 'misc' ;
@@ -63,9 +63,9 @@ our $q ;
 package X ;
 my $q ;
 EXPECT
-"my" variable $x masks earlier declaration in same scope at - line 4 character 7.
-"my" variable $y masks earlier declaration in same statement at - line 5 character 16.
-"my" variable $p masks earlier declaration in same scope at - line 8 character 7.
+"my" variable $x masks earlier declaration in same scope at - line 4 character 6.
+"my" variable $y masks earlier declaration in same statement at - line 5 character 15.
+"my" variable $p masks earlier declaration in same scope at - line 8 character 6.
 ########
 # pad.c
 use warnings 'misc' ;
@@ -84,9 +84,9 @@ my $q ;
 package X ;
 our $q ;
 EXPECT
-"our" variable $x masks earlier declaration in same scope at - line 4 character 8.
-"our" variable $y masks earlier declaration in same statement at - line 5 character 16.
-"our" variable $p masks earlier declaration in same scope at - line 8 character 8.
+"our" variable $x masks earlier declaration in same scope at - line 4 character 7.
+"our" variable $y masks earlier declaration in same statement at - line 5 character 15.
+"our" variable $p masks earlier declaration in same scope at - line 8 character 7.
 ########
 # TODO pad.c
 use warnings 'closure' ;

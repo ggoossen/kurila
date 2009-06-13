@@ -31,6 +31,10 @@ Both can be installed at the same time.
 
 =item *
 
+Layout based blocks and statements
+
+=item *
+
 Sigil invariant of value
 
 =item *
@@ -110,6 +114,8 @@ at git://dev.tty.nl/perl
 =head1 SEE ALSO
 
 =over 4
+
+=item L<kurila120delta> What is new for Perl Kurila 1.20
 
 =item L<kurila119delta> What is new for Perl Kurila 1.19
 

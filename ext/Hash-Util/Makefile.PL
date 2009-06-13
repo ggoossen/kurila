@@ -1,4 +1,4 @@
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker
 
 # this file was templated from ext/List/Util/Makefile.PL
 # thanks to Graham Barr who wrote that module.
@@ -7,9 +7,9 @@ WriteMakefile(
     VERSION_FROM    => "lib/Hash/Util.pm",
     NAME            => "Hash::Util",
     DEFINE          => "-DPERL_EXT",
-    );
+    )
 
-    package MY;
+package MY
 
 # We go through the HashUtil.c trickery to foil platforms
 # that have the feature combination of
@@ -20,10 +20,10 @@ WriteMakefile(
 # and the extension-level Util.o in the same build.
 # One such platform is the POSIX-BC BS2000 EBCDIC mainframe platform.
 
-BEGIN {
-    use Config;
-    unless (defined config_value("usedl")) {
-        eval <<'__EOMM__';
+BEGIN 
+    use Config
+    unless (defined config_value("usedl"))
+        eval <<'__EOMM__'
 sub xs_c {
     my($self) = shift;
     return '' unless $self->needs_linking();
@@ -45,5 +45,5 @@ Util$(OBJ_EXT):	HashUtil.c
 }
 
 __EOMM__
-    }
-}
+    
+

@@ -1,7 +1,7 @@
-package Text::Abbrev;
-require Exporter;
+package Text::Abbrev
+require Exporter
 
-our $VERSION = '1.01';
+our $VERSION = '1.01'
 
 =head1 NAME
 
@@ -32,44 +32,44 @@ The values are the original list elements.
 =cut
 
 
-our @ISA = qw(Exporter);
-our @EXPORT = qw(abbrev);
+our @ISA = qw(Exporter)
+our @EXPORT = qw(abbrev)
 
 # Usage:
 #	abbrev \%foo, LIST;
 #	...
 #	$long = $foo{$short};
 
-sub abbrev {
-    my ($hashref, $glob, %table, $returnvoid);
+sub abbrev
+    my ($hashref, $glob, %table, $returnvoid)
 
-    (nelems @_) or return;   # So we don't autovivify onto @_ and trigger warning
-    $hashref = shift;
-    $returnvoid = 1;
-    $hashref->% = %( () );
+    (nelems @_) or return   # So we don't autovivify onto @_ and trigger warning
+    $hashref = shift
+    $returnvoid = 1
+    $hashref->% = %( () )
 
-  WORD: foreach my $word ( @_) {
-        for my $len ( reverse( 1 .. (length $word) - 1 ) ) {
-            my $abbrev = substr($word,0,$len);
-            my $seen = ++%table{+$abbrev};
-            if ($seen == 1) {	    # We're the first word so far to have
+    WORD: foreach my $word ( @_)
+        for my $len ( reverse( 1 .. (length $word) - 1 ) )
+            my $abbrev = substr($word,0,$len)
+            my $seen = ++%table{+$abbrev}
+            if ($seen == 1)         # We're the first word so far to have
                 # this abbreviation.
-                $hashref->{+$abbrev} = $word;
-            } elsif ($seen == 2) {  # We're the second word to have this
+                $hashref->{+$abbrev} = $word
+            elsif ($seen == 2)  # We're the second word to have this
                 # abbreviation, so we can't use it.
-                delete $hashref->{$abbrev};
-            } else {		    # We're the third word to have this
+                delete $hashref->{$abbrev}
+            else                    # We're the third word to have this
                 # abbreviation, so skip to the next word.
-                next WORD;
-            }
-        }
-    }
+                next WORD
+            
+        
+    
     # Non-abbreviations always get entered, even if they aren't unique
-    foreach my $word ( @_) {
-        $hashref->{+$word} = $word;
-    }
-    return if $returnvoid;
-    $hashref->%;
-}
+    foreach my $word ( @_)
+        $hashref->{+$word} = $word
+    
+    return if $returnvoid
+    $hashref->%
 
-1;
+
+1

@@ -79,7 +79,7 @@
 %token <i_tkval> LOOPEX DOTDOT
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
-%token <i_tkval> DO NOAMP
+%token <i_tkval> DO LOOPDO NOAMP
 %token <i_tkval> ANONARY ANONARYL ANONHSH ANONHSHL ANONSCALAR ANONSCALARL
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
@@ -153,7 +153,8 @@ prog	:	progstart
 	;
 
 /* An ordinary block */
-block	:	'{' remember lineseq '}'
+block	:
+	'{' remember lineseq '}'
 			{
                             $$ = block_end($2, $3);
                             TOKEN_GETMAD($1,$$,'{');
@@ -161,11 +162,20 @@ block	:	'{' remember lineseq '}'
 			}
 	;
 
-dblock	:	'{' remember lineseq '}'
+/* A block which must be a block */
+dblock	:
+                        {
+                            PL_parser->expect = XBLOCK;
+                        }
+	'{' 
+                        {
+                            PL_parser->expect = XSTATE;
+                        }
+            remember lineseq '}'
 			{
-                            $$ = block_end($2, $3);
-                            TOKEN_GETMAD($1,$$,'{');
-                            TOKEN_GETMAD($4,$$,'}');
+                            $$ = block_end($4, $5);
+                            TOKEN_GETMAD($2,$$,'{');
+                            TOKEN_GETMAD($6,$$,'}');
 			}
 	;
 
@@ -261,20 +271,20 @@ sideff	:	error
                             $$ = newLOOPOP(OPf_PARENS, 1, scalar($3), $1, FALSE, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'w');
 			}
-	|	block WHILE expr
+	|	LOOPDO block optional_semicolon WHILE expr
                         {
-                            $$ = newLOOPOP(OPf_PARENS, 1, scalar($3), $1, TRUE, LOCATION($2));
-                            TOKEN_GETMAD($2,$$,'w');
+                            $$ = newLOOPOP(OPf_PARENS, 1, scalar($5), $2, TRUE, LOCATION($4));
+                            TOKEN_GETMAD($4,$$,'w');
 			}
 	|	expr UNTIL iexpr
 			{ 
                             $$ = newLOOPOP(OPf_PARENS, 1, $3, $1, FALSE, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'w');
 			}
-	|	block UNTIL iexpr
+	|	LOOPDO block optional_semicolon UNTIL iexpr
                         {
-                            $$ = newLOOPOP(OPf_PARENS, 1, $3, $1, TRUE, LOCATION($2));
-                            TOKEN_GETMAD($2,$$,'w');
+                            $$ = newLOOPOP(OPf_PARENS, 1, $5, $2, TRUE, LOCATION($4));
+                            TOKEN_GETMAD($4,$$,'w');
 			}
 	|	expr FOR expr
 			{ $$ = newFOROP(0, NULL,
@@ -283,6 +293,14 @@ sideff	:	error
 			}
 	;
 
+optional_semicolon
+        :       /* NULL */
+        |       ';'
+                        {
+                            PL_parser->expect = XSTATE;
+                        }
+        ;
+
 /* else and elsif blocks */
 else	:	/* NULL */
 			{ $$ = (OP*)NULL; }
@@ -290,9 +308,9 @@ else	:	/* NULL */
 			{ ($2)->op_flags |= OPf_PARENS; $$ = scope($2);
 			  TOKEN_GETMAD($1,$$,'o');
 			}
-	|	ELSIF '(' mexpr ')' mblock else
+	|	ELSIF '(' mexpr ')' mblock optional_semicolon else
 			{ 
-			    $$ = newCONDOP(0, $3, scope($5), $6, LOCATION($1));
+			    $$ = newCONDOP(0, $3, scope($5), $7, LOCATION($1));
 			    PL_hints |= HINT_BLOCK_SCOPE;
                             TOKEN_GETMAD($1,$$,'I');
                             TOKEN_GETMAD($2,$$,'(');
@@ -302,19 +320,19 @@ else	:	/* NULL */
 	;
 
 /* Real conditional expressions */
-cond	:	IF '(' remember mexpr ')' mblock else
+cond	:	IF '(' remember mexpr ')' mblock optional_semicolon else
 			{
 			    $$ = block_end($3,
-                                newCONDOP(0, $4, scope($6), $7, LOCATION($1)));
+                                newCONDOP(0, $4, scope($6), $8, LOCATION($1)));
                             TOKEN_GETMAD($1,$$,'I');
                             TOKEN_GETMAD($2,$$,'(');
                             TOKEN_GETMAD($5,$$,')');
                             APPEND_MADPROPS_PV("if", $$, '>');
 			}
-	|	UNLESS '(' remember miexpr ')' mblock else
+	|	UNLESS '(' remember miexpr ')' mblock optional_semicolon else
 			{
 			    $$ = block_end($3,
-                                newCONDOP(0, $4, scope($6), $7, LOCATION($1)));
+                                newCONDOP(0, $4, scope($6), $8, LOCATION($1)));
                             TOKEN_GETMAD($1,$$,'I');
                             TOKEN_GETMAD($2,$$,'(');
                             TOKEN_GETMAD($5,$$,')');
@@ -334,7 +352,7 @@ cont	:	/* NULL */
                             }
 #endif /* PERL_MAD */
                         }
-        |       CONTINUE block
+        |       CONTINUE dblock
                         { $$ = scope($2);
                             TOKEN_GETMAD($1,$$,'o');
                         }
@@ -356,47 +374,47 @@ loop	:	label WHILE remember '(' texpr ')'
                                 $<opval>$ = $5;
                             }
                         }
-                    mintro mblock cont
+                    mintro mblock optional_semicolon cont
 			{
                             OP *innerop;
 			    $$ = block_end($3,
                                 newSTATEOP(0, PVAL($1),
                                     innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                        LOCATION($2), $<opval>7, $9, $10, $8), LOCATION($2)));
+                                        LOCATION($2), $<opval>7, $9, $11, $8), LOCATION($2)));
                             TOKEN_GETMAD($1,innerop,'L');
                             TOKEN_GETMAD($2,innerop,'W');
                             TOKEN_GETMAD($4,innerop,'(');
                             TOKEN_GETMAD($6,innerop,')');
 			}
 
-	|	label UNTIL '(' remember iexpr ')' mintro mblock cont
+	|	label UNTIL '(' remember iexpr ')' mintro mblock optional_semicolon cont
 			{ 
                             OP *innerop;
 			    $$ = block_end($4,
 				   newSTATEOP(0, PVAL($1),
 				     innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                         LOCATION($2), $5, $8, $9, $7), LOCATION($2)));
+                                         LOCATION($2), $5, $8, $10, $7), LOCATION($2)));
                             TOKEN_GETMAD($1,innerop,'L');
                             TOKEN_GETMAD($2,innerop,'W');
                             TOKEN_GETMAD($3,innerop,'(');
                             TOKEN_GETMAD($6,innerop,')');
 			}
-	|	label FOR MY remember my_scalar '(' mexpr ')' mblock cont
+	|	label FOR MY remember my_scalar '(' mexpr ')' mblock optional_semicolon cont
 			{ OP *innerop;
 			  $$ = block_end($4,
                               innerop = newFOROP(0, PVAL($1),
-                                  $5, scalar($7), $9, $10, LOCATION($2)));
+                                  $5, scalar($7), $9, $11, LOCATION($2)));
 			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first->op_sibling,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
 			  TOKEN_GETMAD($3,((LISTOP*)innerop)->op_first->op_sibling,'d');
 			  TOKEN_GETMAD($6,((LISTOP*)innerop)->op_first->op_sibling,'(');
 			  TOKEN_GETMAD($8,((LISTOP*)innerop)->op_first->op_sibling,')');
 			}
-	|	label FOR remember mydef '(' mexpr ')' mblock cont
+	|	label FOR remember mydef '(' mexpr ')' mblock optional_semicolon cont
 			{ OP *innerop;
 			  $$ = block_end($3,
 			     innerop = newFOROP(0, PVAL($1),
-                                 $4, scalar($6), $8, $9, LOCATION($2)));
+                                 $4, scalar($6), $8, $10, LOCATION($2)));
 			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first->op_sibling,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
 			  TOKEN_GETMAD($5,((LISTOP*)innerop)->op_first->op_sibling,'(');
@@ -625,12 +643,8 @@ proto	:	/* NULL */
                         }
 	;
 
-/* Subroutine body - either null or a block */
-subbody	:	block	{ $$ = $1; }
-        |	';'	{
-                           $$ = newOP(OP_NULL, 0, LOCATION($1) );
-                           yyerror("forward subroutine declartion not allowed");
-                        }
+/* Subroutine body - a block */
+subbody	:	dblock	{ $$ = $1; }
 	;
 
 package :	PACKAGE WORD ';'
@@ -828,7 +842,7 @@ subscripted:    star '{' expr ';' '}'       /* *main::{something} like *STDOUT{I
                             TOKEN_GETMAD($3,$$,'[');
                             TOKEN_GETMAD($5,$$,']');
 			}
-	|	term ARROW HSLICE expr ']' ';' '}'   /* someref->{[bar();]} */
+	|	term ARROW HSLICE expr ']'   /* someref->{[bar();]} */
 			{ 
                             $$ = newLISTOP(OP_HSLICE, 0,
                                 scalar($4),
@@ -837,38 +851,32 @@ subscripted:    star '{' expr ';' '}'       /* *main::{something} like *STDOUT{I
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'{');
-			  TOKEN_GETMAD($5,$$,'j');
-			  TOKEN_GETMAD($6,$$,';');
-			  TOKEN_GETMAD($7,$$,'}');
+			  TOKEN_GETMAD($5,$$,'}');
 			}
-	|	term ARROW ASLICE expr ']' ']'                     /* someref->[[...]] */
+	|	term ARROW ASLICE expr ']'                     /* someref->[[...]] */
 			{ $$ = newLISTOP(OP_ASLICE, 0,
 					scalar($4),
 					ref(newAVREF($1, LOCATION($2)), OP_ASLICE), LOCATION($3));
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'[');
-			  TOKEN_GETMAD($5,$$,'j');
-			  TOKEN_GETMAD($6,$$,']');
+			  TOKEN_GETMAD($5,$$,']');
 			}
-	|	term HSLICE expr ']' ';' '}'    /* %foo{[bar();]} */
+	|	term HSLICE expr ']'    /* %foo{[bar();]} */
 			{ $$ = newLISTOP(OP_HSLICE, 0,
 					scalar($3),
 					ref($1, OP_HSLICE), LOCATION($2));
                             $$->op_private = IVAL($2);
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
-			  TOKEN_GETMAD($4,$$,'j');
-			  TOKEN_GETMAD($5,$$,';');
-			  TOKEN_GETMAD($6,$$,'}');
+			  TOKEN_GETMAD($4,$$,'}');
 			}
-	|	term ASLICE expr ']' ']'    /* foo[[bar()]] */
+	|	term ASLICE expr ']'    /* foo[[bar()]] */
 			{ $$ = newLISTOP(OP_ASLICE, 0,
 					scalar($3),
 					ref($1, OP_ASLICE), LOCATION($2));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'[');
-			  TOKEN_GETMAD($4,$$,'j');
-			  TOKEN_GETMAD($5,$$,']');
+			  TOKEN_GETMAD($4,$$,']');
 			}
 	|	term '{' expr ';' '}'   /* %foo{bar} or %foo{bar();} */
                         { 
@@ -1044,7 +1052,7 @@ anonymous:
                             $$ = newANONSUB($2, NULL, scalar($3));
                             TOKEN_GETMAD($1,$$,'o');
 			}
-        |       ANONSUB startanonsub proto block	%prec '('
+        |       ANONSUB startanonsub proto dblock	%prec '('
 			{
                             $$ = newANONSUB($2, $3, scalar($4));
                             TOKEN_GETMAD($1,$$,'o');
@@ -1344,11 +1352,6 @@ scalar  :	PRIVATEVAR
                             $$ = newUNOP(OP_ANONSCALAR, 0, scalar($2), LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
                             TOKEN_GETMAD($3,$$,']');
-
-                            if (PL_parser->lex_brackets <= 0)
-                                yyerror("Unmatched right paren");
-                            else
-                                --PL_parser->lex_brackets;
 
                             if (PL_parser->lex_state == LEX_INTERPNORMAL) {
                                 if ( PL_parser->lex_brackets == 0 )

@@ -1,20 +1,20 @@
-package ExtUtils::MakeMaker::bytes;
+package ExtUtils::MakeMaker::bytes
 
 
-our $VERSION = 6.44;
+our $VERSION = 6.44
 
-my $Have_Bytes = try { require bytes; 1; };
+my $Have_Bytes = try { require bytes; 1; }
 
-sub import {
-    return unless $Have_Bytes;
+sub import
+    return unless $Have_Bytes
 
-    shift;
-    unshift @_, 'bytes';
+    shift
+    unshift @_, 'bytes'
 
-    return bytes::import(< @_);
-}
+    return bytes::import(< @_)
 
-1;
+
+1
 
 
 =head1 NAME

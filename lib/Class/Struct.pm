@@ -1,42 +1,42 @@
-package Class::Struct;
+package Class::Struct
 
 ## See POD after __END__
 
 
-use warnings::register;
-our(@ISA, @EXPORT, $VERSION);
+use warnings::register
+our(@ISA, @EXPORT, $VERSION)
 
-require Exporter;
-@ISA = qw(Exporter);
-@EXPORT = qw(struct);
+require Exporter
+@ISA = qw(Exporter)
+@EXPORT = qw(struct)
 
-$VERSION = '0.63';
+$VERSION = '0.63'
 
-my $print = 0;
-sub printem {
+my $print = 0
+sub printem
     if ((nelems @_)) { $print = shift }
     else    { $print++ }
-}
 
-sub import {
-    my $self = shift;
 
-    if ( (nelems @_) == 0 ) {
-        $self->export_to_level( 1, $self, < @EXPORT );
-    } elsif ( (nelems @_) == 1 ) {
+sub import
+    my $self = shift
+
+    if ( (nelems @_) == 0 )
+        $self->export_to_level( 1, $self, < @EXPORT )
+    elsif ( (nelems @_) == 1 )
         # This is admittedly a little bit silly:
         # do we ever export anything else than 'struct'...?
-        $self->export_to_level( 1, $self, < @_ );
-    } else {
-        if (not ref @_[1]) {
-            return struct( @(caller)[0] => \@_);
-        } else {
-            return struct(< @_);
-        }
-    }
-}
+        $self->export_to_level( 1, $self, < @_ )
+    else
+        if (not ref @_[1])
+            return struct( @(caller)[0] => \@_)
+        else
+            return struct(< @_)
+        
+    
 
-sub struct {
+
+sub struct
 
     # Determine parameter list structure, one of:
     #   struct( class => [ element-list ])
@@ -44,163 +44,151 @@ sub struct {
     #   struct( element-list )
     # Latter form assumes current package name as struct name.
 
-    my ($class, @decls);
-    my $base_type = ref @_[1];
-    if ( $base_type eq 'HASH' ) {
-        $class = shift;
-        @decls = @: < shift()->%;
-        _usage_error() if (nelems @_);
-    }
-    elsif ( $base_type eq 'ARRAY' ) {
-        $class = shift;
-        @decls = shift()->@;
-        _usage_error() if (nelems @_);
-    }
-    else {
-        $base_type = 'ARRAY';
-        $class = @(caller())[0];
-        @decls = @_;
-    }
+    my ($class, @decls)
+    my $base_type = ref @_[1]
+    if ( $base_type eq 'HASH' )
+        $class = shift
+        @decls = @: < shift()->%
+        _usage_error() if (nelems @_)
+    elsif ( $base_type eq 'ARRAY' )
+        $class = shift
+        @decls = shift()->@
+        _usage_error() if (nelems @_)
+    else
+        $base_type = 'ARRAY'
+        $class = @(caller())[0]
+        @decls = @_
+    
 
-    _usage_error() if (nelems @decls) % 2 == 1;
+    _usage_error() if (nelems @decls) % 2 == 1
 
     # Create constructor.
 
     die "function 'new' already defined in package $class"
-        if do { defined &{Symbol::fetch_glob($class . "::new")} };
+        if do { defined &{Symbol::fetch_glob($class . "::new")} }
 
-    my @methods = @( () );
-    my %refs = %( () );
-    my %arrays = %( () );
-    my %hashes = %( () );
-    my %classes = %( () );
-    my $got_class = 0;
-    my $out = '';
+    my @methods = @( () )
+    my %refs = %( () )
+    my %arrays = %( () )
+    my %hashes = %( () )
+    my %classes = %( () )
+    my $got_class = 0
+    my $out = ''
 
-    $out = "do \{\n  package $class;\n  sub new \{\n";
-    $out .= "    my \@(?\$class, \%< \%init) = \@_;\n";
-    $out .= "    \$class = __PACKAGE__ unless \@_;\n";
+    $out = "do \{\n  package $class;\n  sub new \{\n"
+    $out .= "    my \@(?\$class, \%< \%init) = \@_;\n"
+    $out .= "    \$class = __PACKAGE__ unless \@_;\n"
 
-    my $cnt = 0;
-    my $idx = 0;
-    my( $cmt, $name, $type, $elem );
+    my $cnt = 0
+    my $idx = 0
+    my( $cmt, $name, $type, $elem )
 
-    if( $base_type eq 'HASH' ){
-        $out .= '    my($r) = \%();'."\n";
-        $cmt = '';
-    }
-    elsif( $base_type eq 'ARRAY' ){
-        $out .= '    my($r) = \@();'."\n";
-    }
-    while( $idx +< nelems @decls ){
-        $name = @decls[$idx];
-        $type = @decls[$idx+1];
-        push( @methods, $name );
-        if( $base_type eq 'HASH' ){
-            $elem = "\{+'$($class)::$name'\}";
-        }
-        elsif( $base_type eq 'ARRAY' ){
-            $elem = "[+$cnt]";
-            ++$cnt;
-            $cmt = " # $name";
-        }
-        if( $type =~ m/^\*(.)/ ){
-            %refs{+$name}++;
-            $type = $1;
-        }
-        my $init = "defined(\%init\{?'$name'\}) ?? \%init\{'$name'\} !! ";
-        if( $type eq '@' ){
-            $out .= "    die 'Initializer for $name must be array reference'\n"; 
-            $out .= "        if defined(\%init\{?'$name'\}) && ref(\%init\{'$name'\}) ne 'ARRAY';\n";
-            $out .= "    \$r->$elem = $init \\\@();$cmt\n";
-            %arrays{+$name}++;
-        }
-        elsif( $type eq '%' ){
-            $out .= "    die 'Initializer for $name must be hash reference'\n";
-            $out .= "        if defined(\%init\{?'$name'\}) && ref(\%init\{'$name'\}) ne 'HASH';\n";
-            $out .= "    \$r->$elem = $init \\\%();$cmt\n";
-            %hashes{+$name}++;
-        }
-        elsif ( $type eq '$') {
-            $out .= "    \$r->$elem = $init undef;$cmt\n";
-        }
-        elsif( $type =~ m/^\w+(?:::\w+)*$/ ){
-            $out .= "    if (defined(\%init\{?'$name'\})) \{\n";
-            $out .= "       if (ref \%init\{'$name'\} eq 'HASH')\n";
-            $out .= "            \{ \$r->$elem = $type->new(\%init\{'$name'\}->\%) \} $cmt\n";
-            $out .= "       elsif (UNIVERSAL::isa(\%init\{'$name'\}, '$type'))\n";
-            $out .= "            \{ \$r->$elem = \%init\{'$name'\} \} $cmt\n";
-            $out .= "       else \{ die 'Initializer for $name must be hash or $type reference' \}\n";
-            $out .= "    \}\n";
-            %classes{+$name} = $type;
-            $got_class = 1;
-        }
-        else{
-            die "'$type' is not a valid struct element type";
-        }
-        $idx += 2;
-    }
-    $out .= "    bless \$r, \$class;\n  \}\n";
+    if( $base_type eq 'HASH' )
+        $out .= '    my($r) = \%();'."\n"
+        $cmt = ''
+    elsif( $base_type eq 'ARRAY' )
+        $out .= '    my($r) = \@();'."\n"
+    
+    while( $idx +< nelems @decls )
+        $name = @decls[$idx]
+        $type = @decls[$idx+1]
+        push( @methods, $name )
+        if( $base_type eq 'HASH' )
+            $elem = "\{+'$($class)::$name'\}"
+        elsif( $base_type eq 'ARRAY' )
+            $elem = "[+$cnt]"
+            ++$cnt
+            $cmt = " # $name"
+        
+        if( $type =~ m/^\*(.)/ )
+            %refs{+$name}++
+            $type = $1
+        
+        my $init = "defined(\%init\{?'$name'\}) ?? \%init\{'$name'\} !! "
+        if( $type eq '@' )
+            $out .= "    die 'Initializer for $name must be array reference'\n"
+            $out .= "        if defined(\%init\{?'$name'\}) && ref(\%init\{'$name'\}) ne 'ARRAY';\n"
+            $out .= "    \$r->$elem = $init \\\@();$cmt\n"
+            %arrays{+$name}++
+        elsif( $type eq '%' )
+            $out .= "    die 'Initializer for $name must be hash reference'\n"
+            $out .= "        if defined(\%init\{?'$name'\}) && ref(\%init\{'$name'\}) ne 'HASH';\n"
+            $out .= "    \$r->$elem = $init \\\%();$cmt\n"
+            %hashes{+$name}++
+        elsif ( $type eq '$')
+            $out .= "    \$r->$elem = $init undef;$cmt\n"
+        elsif( $type =~ m/^\w+(?:::\w+)*$/ )
+            $out .= "    if (defined(\%init\{?'$name'\})) \{\n"
+            $out .= "       if (ref \%init\{'$name'\} eq 'HASH')\n"
+            $out .= "            \{ \$r->$elem = $type->new(\%init\{'$name'\}->\%) \} $cmt\n"
+            $out .= "       elsif (UNIVERSAL::isa(\%init\{'$name'\}, '$type'))\n"
+            $out .= "            \{ \$r->$elem = \%init\{'$name'\} \} $cmt\n"
+            $out .= "       else \{ die 'Initializer for $name must be hash or $type reference' \}\n"
+            $out .= "    \}\n"
+            %classes{+$name} = $type
+            $got_class = 1
+        else
+            die "'$type' is not a valid struct element type"
+        
+        $idx += 2
+    
+    $out .= "    bless \$r, \$class;\n  \}\n"
 
     # Create accessor methods.
 
-    my( $pre, $pst, $sel );
-    $cnt = 0;
-    foreach my $name ( @methods){
-        if ( defined &{Symbol::fetch_glob($class . "::$name")} ) {
-            warnings::warnif("function '$name' already defined, overrides struct accessor method");
-        }
-        else {
-            $pre = $pst = $cmt = $sel = '';
-            if( defined %refs{?$name} ){
-                $pre = "\\(";
-                $pst = ")";
-                $cmt = " # returns ref";
-            }
-            $out .= "  sub $name \{$cmt\n    my \$r = shift;\n";
-            if( $base_type eq 'ARRAY' ){
-                $elem = "[+$cnt]";
-                ++$cnt;
-            }
-            elsif( $base_type eq 'HASH' ){
-                $elem = "\{+'$($class)::$name'\}";
-            }
-            if( defined %arrays{?$name} ){
-                $out .= "    my \$i;\n";
-                $out .= "    \@_ ?? (\$i = shift) !! return \$r->$elem;\n"; 
-                $out .= "    if (ref(\$i) eq 'ARRAY' && !\@_) \{ \$r->$elem = \$i; return \$r \}\n";
-                $sel = "->[+\$i]";
-            }
-            elsif( defined %hashes{?$name} ){
-                $out .= "    my \$i;\n";
-                $out .= "    \@_ ?? (\$i = shift) !! return \$r->$elem;\n";
-                $out .= "    if (ref(\$i) eq 'HASH' && !\@_) \{ \$r->$elem = \$i; return \$r \}\n";
-                $sel = "->\{+\$i\}";
-            }
-            elsif( defined %classes{?$name} ){
-                $out .= "    die '$name argument is wrong class' if \@_ && ! UNIVERSAL::isa(\@_[0], '%classes{?$name}');\n";
-            }
-            $out .= "    die 'Too many args to $name' if nelems(\@_) +> 1;\n";
-            $out .= "    \@_ ?? ($pre\$r->$elem$sel = shift$pst) !! $pre\$r->$elem$sel$pst;\n";
-            $out .= "  \}\n";
-        }
-    }
-    $out .= "\};\n1;\n";
+    my( $pre, $pst, $sel )
+    $cnt = 0
+    foreach my $name ( @methods)
+        if ( defined &{Symbol::fetch_glob($class . "::$name")} )
+            warnings::warnif("function '$name' already defined, overrides struct accessor method")
+        else
+            $pre = $pst = $cmt = $sel = ''
+            if( defined %refs{?$name} )
+                $pre = "\\("
+                $pst = ")"
+                $cmt = " # returns ref"
+            
+            $out .= "  sub $name \{$cmt\n    my \$r = shift;\n"
+            if( $base_type eq 'ARRAY' )
+                $elem = "[+$cnt]"
+                ++$cnt
+            elsif( $base_type eq 'HASH' )
+                $elem = "\{+'$($class)::$name'\}"
+            
+            if( defined %arrays{?$name} )
+                $out .= "    my \$i;\n"
+                $out .= "    \@_ ?? (\$i = shift) !! return \$r->$elem;\n"
+                $out .= "    if (ref(\$i) eq 'ARRAY' && !\@_) \{ \$r->$elem = \$i; return \$r \}\n"
+                $sel = "->[+\$i]"
+            elsif( defined %hashes{?$name} )
+                $out .= "    my \$i;\n"
+                $out .= "    \@_ ?? (\$i = shift) !! return \$r->$elem;\n"
+                $out .= "    if (ref(\$i) eq 'HASH' && !\@_) \{ \$r->$elem = \$i; return \$r \}\n"
+                $sel = "->\{+\$i\}"
+            elsif( defined %classes{?$name} )
+                $out .= "    die '$name argument is wrong class' if \@_ && ! UNIVERSAL::isa(\@_[0], '%classes{?$name}');\n"
+            
+            $out .= "    die 'Too many args to $name' if nelems(\@_) +> 1;\n"
+            $out .= "    \@_ ?? ($pre\$r->$elem$sel = shift$pst) !! $pre\$r->$elem$sel$pst;\n"
+            $out .= "  \}\n"
+        
+    
+    $out .= "\};\n1;\n"
 
-    print $^STDOUT, $out if $print;
-    my $result = eval $out;
-    warn $^EVAL_ERROR if $^EVAL_ERROR;
-}
+    print $^STDOUT, $out if $print
+    my $result = eval $out
+    warn $^EVAL_ERROR if $^EVAL_ERROR
 
-sub _usage_error {
-    die "struct usage error";
-}
 
-sub _subclass_error {
-    die 'struct class cannot be a subclass (@ISA not allowed)';
-}
+sub _usage_error
+    die "struct usage error"
 
-1; # for require
+
+sub _subclass_error
+    die 'struct class cannot be a subclass (@ISA not allowed)'
+
+
+1 # for require
 
 
 __END__

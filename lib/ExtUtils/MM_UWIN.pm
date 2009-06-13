@@ -1,9 +1,9 @@
-package ExtUtils::MM_UWIN;
+package ExtUtils::MM_UWIN
 
-our $VERSION = 6.44;
+our $VERSION = 6.44
 
-require ExtUtils::MM_Unix;
-our @ISA = qw(ExtUtils::MM_Unix);
+require ExtUtils::MM_Unix
+our @ISA = qw(ExtUtils::MM_Unix)
 
 
 =head1 NAME
@@ -32,20 +32,20 @@ In addition to being Unix, we're U/WIN.
 
 =cut
 
-sub os_flavor {
-    return @('Unix', 'U/WIN');
-}
+sub os_flavor
+    return @('Unix', 'U/WIN')
+
 
 
 =item B<replace_manpage_separator>
 
 =cut
 
-sub replace_manpage_separator($self, $man) {
+sub replace_manpage_separator($self, $man)
 
-    $man =~ s,/+,.,g;
-    return $man;
-}
+    $man =~ s,/+,.,g
+    return $man
+
 
 =back
 
@@ -59,4 +59,4 @@ L<ExtUtils::MM_Win32>, L<ExtUtils::MakeMaker>
 
 =cut
 
-1;
+1

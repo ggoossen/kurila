@@ -1,6 +1,6 @@
-use Perl6::Form;
+use Perl6::Form
 
-my $eulogy = <<EOTEXT;
+my $eulogy = <<EOTEXT
 Friends,   Romans  , countrymen, lend me your ears;
 I come to bury    Caesar   , not to praise him.
 The evil that men do lives after them;
@@ -16,7 +16,7 @@ EOTEXT
 
 print $^STDOUT, < form
   "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
-  $eulogy, "","";
+  $eulogy, "",""
 
 
 # Squeeze all whitespace...
@@ -24,7 +24,7 @@ print $^STDOUT, < form
 print $^STDOUT, < form
   \%(ws=>qr/\s+/),
   "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
-  $eulogy, "","";
+  $eulogy, "",""
 
 
 # Squeeze all whitespace except newlines...
@@ -32,14 +32,14 @@ print $^STDOUT, < form
 print $^STDOUT, < form
   \%(ws=>qr/[^\S\n]+/),
   "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
-  $eulogy, "","";
+  $eulogy, "",""
 
 # Squeeze even harder before punctuation
 
 print $^STDOUT, < form
   \%(ws=>qr/[^\S\n]+ ([,.!])?/x),
   "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
-  $eulogy, "","";
+  $eulogy, "",""
 
 
 # Form is smart enough not to squeeze zero-width matches...
@@ -47,6 +47,6 @@ print $^STDOUT, < form
 print $^STDOUT, < form
   \%(ws=>qr/\s*/),
   "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
-  $eulogy, "","";
+  $eulogy, "",""
 
 

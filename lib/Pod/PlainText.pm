@@ -15,18 +15,18 @@
 # Modules and declarations
 ############################################################################
 
-package Pod::PlainText;
+package Pod::PlainText
 
 
-use Pod::Select ();
+use Pod::Select ()
 
-our (@ISA, %ESCAPES, $VERSION);
+our (@ISA, %ESCAPES, $VERSION)
 
 # We inherit from Pod::Select instead of Pod::Parser so that we can be used
 # by Pod::Usage.
-@ISA = qw(Pod::Select);
+@ISA = qw(Pod::Select)
 
-$VERSION = '2.02';
+$VERSION = '2.02'
 
 
 ############################################################################
@@ -37,77 +37,77 @@ $VERSION = '2.02';
 # which got it near verbatim from the original Pod::Text.  It is therefore
 # credited to Tom Christiansen, and I'm glad I didn't have to write it.  :)
 %ESCAPES = %(
-        'amp'       =>    '&',      # ampersand
-            'lt'        =>    '<',      # left chevron, less-than
-            'gt'        =>    '>',      # right chevron, greater-than
-            'quot'      =>    '"',      # double quote
+    'amp'       =>    '&',      # ampersand
+    'lt'        =>    '<',      # left chevron, less-than
+    'gt'        =>    '>',      # right chevron, greater-than
+    'quot'      =>    '"',      # double quote
 
-            "Aacute"    =>    "\x{C1}",   # capital A, acute accent
-            "aacute"    =>    "\x{E1}",   # small a, acute accent
-            "Acirc"     =>    "\x{C2}",   # capital A, circumflex accent
-            "acirc"     =>    "\x{E2}",   # small a, circumflex accent
-            "AElig"     =>    "\x{C6}",   # capital AE diphthong (ligature)
-            "aelig"     =>    "\x{E6}",   # small ae diphthong (ligature)
-            "Agrave"    =>    "\x{C0}",   # capital A, grave accent
-            "agrave"    =>    "\x{E0}",   # small a, grave accent
-            "Aring"     =>    "\x{C5}",   # capital A, ring
-            "aring"     =>    "\x{E5}",   # small a, ring
-            "Atilde"    =>    "\x{C3}",   # capital A, tilde
-            "atilde"    =>    "\x{E3}",   # small a, tilde
-            "Auml"      =>    "\x{C4}",   # capital A, dieresis or umlaut mark
-            "auml"      =>    "\x{E4}",   # small a, dieresis or umlaut mark
-            "Ccedil"    =>    "\x{C7}",   # capital C, cedilla
-            "ccedil"    =>    "\x{E7}",   # small c, cedilla
-            "Eacute"    =>    "\x{C9}",   # capital E, acute accent
-            "eacute"    =>    "\x{E9}",   # small e, acute accent
-            "Ecirc"     =>    "\x{CA}",   # capital E, circumflex accent
-            "ecirc"     =>    "\x{EA}",   # small e, circumflex accent
-            "Egrave"    =>    "\x{C8}",   # capital E, grave accent
-            "egrave"    =>    "\x{E8}",   # small e, grave accent
-            "ETH"       =>    "\x{D0}",   # capital Eth, Icelandic
-            "eth"       =>    "\x{F0}",   # small eth, Icelandic
-            "Euml"      =>    "\x{CB}",   # capital E, dieresis or umlaut mark
-            "euml"      =>    "\x{EB}",   # small e, dieresis or umlaut mark
-            "Iacute"    =>    "\x{CD}",   # capital I, acute accent
-            "iacute"    =>    "\x{ED}",   # small i, acute accent
-            "Icirc"     =>    "\x{CE}",   # capital I, circumflex accent
-            "icirc"     =>    "\x{EE}",   # small i, circumflex accent
-            "Igrave"    =>    "\x{CD}",   # capital I, grave accent
-            "igrave"    =>    "\x{ED}",   # small i, grave accent
-            "Iuml"      =>    "\x{CF}",   # capital I, dieresis or umlaut mark
-            "iuml"      =>    "\x{EF}",   # small i, dieresis or umlaut mark
-            "Ntilde"    =>    "\x{D1}",   # capital N, tilde
-            "ntilde"    =>    "\x{F1}",   # small n, tilde
-            "Oacute"    =>    "\x{D3}",   # capital O, acute accent
-            "oacute"    =>    "\x{F3}",   # small o, acute accent
-            "Ocirc"     =>    "\x{D4}",   # capital O, circumflex accent
-            "ocirc"     =>    "\x{F4}",   # small o, circumflex accent
-            "Ograve"    =>    "\x{D2}",   # capital O, grave accent
-            "ograve"    =>    "\x{F2}",   # small o, grave accent
-            "Oslash"    =>    "\x{D8}",   # capital O, slash
-            "oslash"    =>    "\x{F8}",   # small o, slash
-            "Otilde"    =>    "\x{D5}",   # capital O, tilde
-            "otilde"    =>    "\x{F5}",   # small o, tilde
-            "Ouml"      =>    "\x{D6}",   # capital O, dieresis or umlaut mark
-            "ouml"      =>    "\x{F6}",   # small o, dieresis or umlaut mark
-            "szlig"     =>    "\x{DF}",   # small sharp s, German (sz ligature)
-            "THORN"     =>    "\x{DE}",   # capital THORN, Icelandic
-            "thorn"     =>    "\x{FE}",   # small thorn, Icelandic
-            "Uacute"    =>    "\x{DA}",   # capital U, acute accent
-            "uacute"    =>    "\x{FA}",   # small u, acute accent
-            "Ucirc"     =>    "\x{DB}",   # capital U, circumflex accent
-            "ucirc"     =>    "\x{FB}",   # small u, circumflex accent
-            "Ugrave"    =>    "\x{D9}",   # capital U, grave accent
-            "ugrave"    =>    "\x{F9}",   # small u, grave accent
-            "Uuml"      =>    "\x{DC}",   # capital U, dieresis or umlaut mark
-            "uuml"      =>    "\x{FC}",   # small u, dieresis or umlaut mark
-            "Yacute"    =>    "\x{DD}",   # capital Y, acute accent
-            "yacute"    =>    "\x{FD}",   # small y, acute accent
-            "yuml"      =>    "\x{FF}",   # small y, dieresis or umlaut mark
+    "Aacute"    =>    "\x{C1}",   # capital A, acute accent
+    "aacute"    =>    "\x{E1}",   # small a, acute accent
+    "Acirc"     =>    "\x{C2}",   # capital A, circumflex accent
+    "acirc"     =>    "\x{E2}",   # small a, circumflex accent
+    "AElig"     =>    "\x{C6}",   # capital AE diphthong (ligature)
+    "aelig"     =>    "\x{E6}",   # small ae diphthong (ligature)
+    "Agrave"    =>    "\x{C0}",   # capital A, grave accent
+    "agrave"    =>    "\x{E0}",   # small a, grave accent
+    "Aring"     =>    "\x{C5}",   # capital A, ring
+    "aring"     =>    "\x{E5}",   # small a, ring
+    "Atilde"    =>    "\x{C3}",   # capital A, tilde
+    "atilde"    =>    "\x{E3}",   # small a, tilde
+    "Auml"      =>    "\x{C4}",   # capital A, dieresis or umlaut mark
+    "auml"      =>    "\x{E4}",   # small a, dieresis or umlaut mark
+    "Ccedil"    =>    "\x{C7}",   # capital C, cedilla
+    "ccedil"    =>    "\x{E7}",   # small c, cedilla
+    "Eacute"    =>    "\x{C9}",   # capital E, acute accent
+    "eacute"    =>    "\x{E9}",   # small e, acute accent
+    "Ecirc"     =>    "\x{CA}",   # capital E, circumflex accent
+    "ecirc"     =>    "\x{EA}",   # small e, circumflex accent
+    "Egrave"    =>    "\x{C8}",   # capital E, grave accent
+    "egrave"    =>    "\x{E8}",   # small e, grave accent
+    "ETH"       =>    "\x{D0}",   # capital Eth, Icelandic
+    "eth"       =>    "\x{F0}",   # small eth, Icelandic
+    "Euml"      =>    "\x{CB}",   # capital E, dieresis or umlaut mark
+    "euml"      =>    "\x{EB}",   # small e, dieresis or umlaut mark
+    "Iacute"    =>    "\x{CD}",   # capital I, acute accent
+    "iacute"    =>    "\x{ED}",   # small i, acute accent
+    "Icirc"     =>    "\x{CE}",   # capital I, circumflex accent
+    "icirc"     =>    "\x{EE}",   # small i, circumflex accent
+    "Igrave"    =>    "\x{CD}",   # capital I, grave accent
+    "igrave"    =>    "\x{ED}",   # small i, grave accent
+    "Iuml"      =>    "\x{CF}",   # capital I, dieresis or umlaut mark
+    "iuml"      =>    "\x{EF}",   # small i, dieresis or umlaut mark
+    "Ntilde"    =>    "\x{D1}",   # capital N, tilde
+    "ntilde"    =>    "\x{F1}",   # small n, tilde
+    "Oacute"    =>    "\x{D3}",   # capital O, acute accent
+    "oacute"    =>    "\x{F3}",   # small o, acute accent
+    "Ocirc"     =>    "\x{D4}",   # capital O, circumflex accent
+    "ocirc"     =>    "\x{F4}",   # small o, circumflex accent
+    "Ograve"    =>    "\x{D2}",   # capital O, grave accent
+    "ograve"    =>    "\x{F2}",   # small o, grave accent
+    "Oslash"    =>    "\x{D8}",   # capital O, slash
+    "oslash"    =>    "\x{F8}",   # small o, slash
+    "Otilde"    =>    "\x{D5}",   # capital O, tilde
+    "otilde"    =>    "\x{F5}",   # small o, tilde
+    "Ouml"      =>    "\x{D6}",   # capital O, dieresis or umlaut mark
+    "ouml"      =>    "\x{F6}",   # small o, dieresis or umlaut mark
+    "szlig"     =>    "\x{DF}",   # small sharp s, German (sz ligature)
+    "THORN"     =>    "\x{DE}",   # capital THORN, Icelandic
+    "thorn"     =>    "\x{FE}",   # small thorn, Icelandic
+    "Uacute"    =>    "\x{DA}",   # capital U, acute accent
+    "uacute"    =>    "\x{FA}",   # small u, acute accent
+    "Ucirc"     =>    "\x{DB}",   # capital U, circumflex accent
+    "ucirc"     =>    "\x{FB}",   # small u, circumflex accent
+    "Ugrave"    =>    "\x{D9}",   # capital U, grave accent
+    "ugrave"    =>    "\x{F9}",   # small u, grave accent
+    "Uuml"      =>    "\x{DC}",   # capital U, dieresis or umlaut mark
+    "uuml"      =>    "\x{FC}",   # small u, dieresis or umlaut mark
+    "Yacute"    =>    "\x{DD}",   # capital Y, acute accent
+    "yacute"    =>    "\x{FD}",   # small y, acute accent
+    "yuml"      =>    "\x{FF}",   # small y, dieresis or umlaut mark
 
-            "lchevron"  =>    "\x{AB}",   # left chevron (double less than)
-            "rchevron"  =>    "\x{BB}",   # right chevron (double greater than)
-    );
+    "lchevron"  =>    "\x{AB}",   # left chevron (double less than)
+    "rchevron"  =>    "\x{BB}",   # right chevron (double greater than)
+    )
 
 
 ############################################################################
@@ -115,20 +115,20 @@ $VERSION = '2.02';
 ############################################################################
 
 # Initialize the object.  Must be sure to call our parent initializer.
-sub initialize {
-    my $self = shift;
+sub initialize
+    my $self = shift
 
-    $self->%{+alt}      = 0  unless defined $self->%{?alt};
-    $self->%{+indent}   = 4  unless defined $self->%{?indent};
-    $self->%{+loose}    = 0  unless defined $self->%{?loose};
-    $self->%{+sentence} = 0  unless defined $self->%{?sentence};
-    $self->%{+width}    = 76 unless defined $self->%{?width};
+    $self->%{+alt}      = 0  unless defined $self->%{?alt}
+    $self->%{+indent}   = 4  unless defined $self->%{?indent}
+    $self->%{+loose}    = 0  unless defined $self->%{?loose}
+    $self->%{+sentence} = 0  unless defined $self->%{?sentence}
+    $self->%{+width}    = 76 unless defined $self->%{?width}
 
-    $self->%{+INDENTS}  = \@();              # Stack of indentations.
-    $self->%{+MARGIN}   = $self->%{?indent};  # Current left margin in spaces.
+    $self->%{+INDENTS}  = \@()              # Stack of indentations.
+    $self->%{+MARGIN}   = $self->%{?indent}  # Current left margin in spaces.
 
-    $self->SUPER::initialize;
-}
+    $self->SUPER::initialize
+
 
 
 ############################################################################
@@ -139,32 +139,32 @@ sub initialize {
 # paragraph, the line number, and a Pod::Paragraph object.  Just dispatches
 # the command to a method named the same as the command.  =cut is handled
 # internally by Pod::Parser.
-sub command {
-    my $self = shift;
-    my $command = shift;
-    return if $command eq 'pod';
-    return if ($self->%{?EXCLUDE} && $command ne 'end');
-    $self->item ("\n") if defined $self->%{?ITEM};
-    $command = 'cmd_' . $command;
-    $self->?$command (< @_);
-}
+sub command
+    my $self = shift
+    my $command = shift
+    return if $command eq 'pod'
+    return if ($self->%{?EXCLUDE} && $command ne 'end')
+    $self->item ("\n") if defined $self->%{?ITEM}
+    $command = 'cmd_' . $command
+    $self->?$command (< @_)
+
 
 # Called for a verbatim paragraph.  Gets the paragraph, the line number, and
 # a Pod::Paragraph object.  Just output it verbatim, but with tabs converted
 # to spaces.
-sub verbatim($self, $_, _, ?_) {
-    return if $self->%{?EXCLUDE};
-    $self->item if defined $self->%{?ITEM};
-    return if m/^\s*$/;
-    s/^(\s*\S+)/$((' ' x $self->%{?MARGIN}) . $1)/gm;
-    $self->output ($_);
-}
+sub verbatim($self, $_, _, ?_)
+    return if $self->%{?EXCLUDE}
+    $self->item if defined $self->%{?ITEM}
+    return if m/^\s*$/
+    s/^(\s*\S+)/$((' ' x $self->%{?MARGIN}) . $1)/gm
+    $self->output ($_)
+
 
 # Called for a regular text block.  Gets the paragraph, the line number, and
 # a Pod::Paragraph object.  Perform interpolation and output the results.
-sub textblock($self, $_, $line, _) {
-    return if $self->%{?EXCLUDE};
-    $self->output ($_), return if $self->%{?VERBATIM};
+sub textblock($self, $_, $line, _)
+    return if $self->%{?EXCLUDE}
+    $self->output ($_), return if $self->%{?VERBATIM}
 
     # Perform a little magic to collapse multiple L<> references.  This is
     # here mostly for backwards-compatibility.  We'll just rewrite the whole
@@ -203,63 +203,63 @@ sub textblock($self, $_, $line, _) {
         $string .= " entries elsewhere in this document";
         $string;
 
-    })}gx;
+    })}gx
 
     # Now actually interpolate and output the paragraph.
-    $_ = $self->interpolate ($_, $line);
-    s/\s+$/\n/;
-    if (defined $self->%{?ITEM}) {
-        $self->item ($_ . "\n");
-    } else {
-        $self->output ( $self->reformat ($_ . "\n"));
-    }
-}
+    $_ = $self->interpolate ($_, $line)
+    s/\s+$/\n/
+    if (defined $self->%{?ITEM})
+        $self->item ($_ . "\n")
+    else
+        $self->output ( $self->reformat ($_ . "\n"))
+    
+
 
 # Called for an interior sequence.  Gets the command, argument, and a
 # Pod::InteriorSequence object and is expected to return the resulting text.
 # Calls code, bold, italic, file, and link to handle those types of
 # sequences, and handles S<>, E<>, X<>, and Z<> directly.
-sub interior_sequence {
-    my $self = shift;
-    my $command = shift;
-    local $_ = shift;
-    return '' if ($command eq 'X' || $command eq 'Z');
+sub interior_sequence
+    my $self = shift
+    my $command = shift
+    local $_ = shift
+    return '' if ($command eq 'X' || $command eq 'Z')
 
     # Expand escapes into the actual character now, warning if invalid.
-    if ($command eq 'E') {
-        return %ESCAPES{?$_} if defined %ESCAPES{?$_};
-        warn "Unknown escape: E<$_>";
-        return "E<$_>";
-    }
+    if ($command eq 'E')
+        return %ESCAPES{?$_} if defined %ESCAPES{?$_}
+        warn "Unknown escape: E<$_>"
+        return "E<$_>"
+    
 
     # For all the other sequences, empty content produces no output.
-    return if $_ eq '';
+    return if $_ eq ''
 
     # For S<>, compress all internal whitespace and then map spaces to \01.
     # When we output the text, we'll map this back.
-    if ($command eq 'S') {
-        s/\s{2,}/ /g;
-        s/ /\01/g;
-        return $_;
-    }
+    if ($command eq 'S')
+        s/\s{2,}/ /g
+        s/ /\01/g
+        return $_
+    
 
     # Anything else needs to get dispatched to another method.
     if    ($command eq 'B') { return $self->seq_b ($_) }
-    elsif ($command eq 'C') { return $self->seq_c ($_) }
-    elsif ($command eq 'F') { return $self->seq_f ($_) }
-    elsif ($command eq 'I') { return $self->seq_i ($_) }
-    elsif ($command eq 'L') { return $self->seq_l ($_) }
+        elsif ($command eq 'C') { return $self->seq_c ($_) }
+        elsif ($command eq 'F') { return $self->seq_f ($_) }
+        elsif ($command eq 'I') { return $self->seq_i ($_) }
+        elsif ($command eq 'L') { return $self->seq_l ($_) }
     else { warn "Unknown sequence $command<$_>" }
-}
+
 
 # Called for each paragraph that's actually part of the POD.  We take
 # advantage of this opportunity to untabify the input.
-sub preprocess_paragraph {
-    my $self = shift;
-    local $_ = shift;
-    1 while s/^(.*?)(\t+)/$($1 . ' ' x (length ($2) * 8 - length ($1) % 8))/m;
-    $_;
-}
+sub preprocess_paragraph
+    my $self = shift
+    local $_ = shift
+    1 while s/^(.*?)(\t+)/$($1 . ' ' x (length ($2) * 8 - length ($1) % 8))/m
+    $_
+
 
 
 ############################################################################
@@ -269,105 +269,105 @@ sub preprocess_paragraph {
 # All command paragraphs take the paragraph and the line number.
 
 # First level heading.
-sub cmd_head1 {
-    my $self = shift;
-    local $_ = shift;
-    s/\s+$//;
-    $_ = $self->interpolate ($_, shift);
-    if ($self->%{?alt}) {
-        $self->output ("\n==== $_ ====\n\n");
-    } else {
-        $_ .= "\n" if $self->%{?loose};
-        $self->output ($_ . "\n");
-    }
-}
+sub cmd_head1
+    my $self = shift
+    local $_ = shift
+    s/\s+$//
+    $_ = $self->interpolate ($_, shift)
+    if ($self->%{?alt})
+        $self->output ("\n==== $_ ====\n\n")
+    else
+        $_ .= "\n" if $self->%{?loose}
+        $self->output ($_ . "\n")
+    
+
 
 # Second level heading.
-sub cmd_head2 {
-    my $self = shift;
-    local $_ = shift;
-    s/\s+$//;
-    $_ = $self->interpolate ($_, shift);
-    if ($self->%{?alt}) {
-        $self->output ("\n==   $_   ==\n\n");
-    } else {
-        $self->output (' ' x ($self->%{?indent} / 2) . $_ . "\n\n");
-    }
-}
+sub cmd_head2
+    my $self = shift
+    local $_ = shift
+    s/\s+$//
+    $_ = $self->interpolate ($_, shift)
+    if ($self->%{?alt})
+        $self->output ("\n==   $_   ==\n\n")
+    else
+        $self->output (' ' x ($self->%{?indent} / 2) . $_ . "\n\n")
+    
+
 
 # third level heading - not strictly perlpodspec compliant
-sub cmd_head3 {
-    my $self = shift;
-    local $_ = shift;
-    s/\s+$//;
-    $_ = $self->interpolate ($_, shift);
-    if ($self->%{?alt}) {
-        $self->output ("\n= $_ =\n");
-    } else {
-        $self->output (' ' x ($self->%{?indent}) . $_ . "\n");
-    }
-}
+sub cmd_head3
+    my $self = shift
+    local $_ = shift
+    s/\s+$//
+    $_ = $self->interpolate ($_, shift)
+    if ($self->%{?alt})
+        $self->output ("\n= $_ =\n")
+    else
+        $self->output (' ' x ($self->%{?indent}) . $_ . "\n")
+    
+
 
 # fourth level heading - not strictly perlpodspec compliant
 # just like head3
-*cmd_head4 = \&cmd_head3;
+*cmd_head4 = \&cmd_head3
 
 # Start a list.
-sub cmd_over {
-    my $self = shift;
-    local $_ = shift;
+sub cmd_over
+    my $self = shift
+    local $_ = shift
     unless (m/^[-+]?\d+\s+$/) { $_ = $self->%{?indent} }
-    push ( $self->%{INDENTS}->@, $self->%{?MARGIN});
-    $self->%{+MARGIN} += ($_ + 0);
-}
+    push ( $self->%{INDENTS}->@, $self->%{?MARGIN})
+    $self->%{+MARGIN} += ($_ + 0)
+
 
 # End a list.
-sub cmd_back($self, ...) {
-    $self->%{+MARGIN} = pop  $self->%{INDENTS}->@;
-    unless (defined $self->%{?MARGIN}) {
-        warn "Unmatched =back";
-        $self->%{+MARGIN} = $self->%{?indent};
-    }
-}
+sub cmd_back($self, ...)
+    $self->%{+MARGIN} = pop  $self->%{INDENTS}->@
+    unless (defined $self->%{?MARGIN})
+        warn "Unmatched =back"
+        $self->%{+MARGIN} = $self->%{?indent}
+    
+
 
 # An individual list item.
-sub cmd_item {
-    my $self = shift;
+sub cmd_item
+    my $self = shift
     if (defined $self->%{?ITEM}) { $self->item }
-    local $_ = shift;
-    s/\s+$//;
-    $self->%{+ITEM} = $self->interpolate ($_);
-}
+    local $_ = shift
+    s/\s+$//
+    $self->%{+ITEM} = $self->interpolate ($_)
+
 
 # Begin a block for a particular translator.  Setting VERBATIM triggers
 # special handling in textblock().
-sub cmd_begin {
-    my $self = shift;
-    local $_ = shift;
-    my @($kind) = @: m/^(\S+)/ or return;
-    if ($kind eq 'text') {
-        $self->%{+VERBATIM} = 1;
-    } else {
-        $self->%{+EXCLUDE} = 1;
-    }
-}
+sub cmd_begin
+    my $self = shift
+    local $_ = shift
+    my @($kind) = @: m/^(\S+)/ or return
+    if ($kind eq 'text')
+        $self->%{+VERBATIM} = 1
+    else
+        $self->%{+EXCLUDE} = 1
+    
+
 
 # End a block for a particular translator.  We assume that all =begin/=end
 # pairs are properly closed.
-sub cmd_end($self, ...) {
-    $self->%{+EXCLUDE} = 0;
-    $self->%{+VERBATIM} = 0;
-}    
+sub cmd_end($self, ...)
+    $self->%{+EXCLUDE} = 0
+    $self->%{+VERBATIM} = 0
+
 
 # One paragraph for a particular translator.  Ignore it unless it's intended
 # for text, in which case we treat it as a verbatim text block.
-sub cmd_for {
-    my $self = shift;
-    local $_ = shift;
-    my $line = shift;
-    return unless s/^text\b[ \t]*\n?//;
-    $self->verbatim ($_, $line);
-}
+sub cmd_for
+    my $self = shift
+    local $_ = shift
+    my $line = shift
+    return unless s/^text\b[ \t]*\n?//
+    $self->verbatim ($_, $line)
+
 
 
 ############################################################################
@@ -384,52 +384,52 @@ sub seq_i { return '*' . @_[1] . '*' }
 # The complicated one.  Handle links.  Since this is plain text, we can't
 # actually make any real links, so this is all to figure out what text we
 # print out.
-sub seq_l {
-    my $self = shift;
-    local $_ = shift;
+sub seq_l
+    my $self = shift
+    local $_ = shift
 
     # Smash whitespace in case we were split across multiple lines.
-    s/\s+/ /g;
+    s/\s+/ /g
 
     # If we were given any explicit text, just output it.
     if (m/^([^|]+)\|/) { return $1 }
 
     # Okay, leading and trailing whitespace isn't important; get rid of it.
-    s/^\s+//;
-    s/\s+$//;
+    s/^\s+//
+    s/\s+$//
 
     # Default to using the whole content of the link entry as a section
     # name.  Note that L<manpage/> forces a manpage interpretation, as does
     # something looking like L<manpage(section)>.  The latter is an
     # enhancement over the original Pod::Text.
-    my @($manpage, $section) = @('', $_);
-    if (m/^(?:https?|ftp|news):/) {
+    my @($manpage, $section) = @('', $_)
+    if (m/^(?:https?|ftp|news):/)
         # a URL
-        return $_;
-    } elsif (m/^"\s*(.*?)\s*"$/) {
-        $section = '"' . $1 . '"';
-    } elsif (m/^[-:.\w]+(?:\(\S+\))?$/) {
-        @($manpage, $section) = @($_, '');
-    } elsif (m%/%) {
-        @($manpage, $section) =  split (m/\s*\/\s*/, $_, 2);
-    }
+        return $_
+    elsif (m/^"\s*(.*?)\s*"$/)
+        $section = '"' . $1 . '"'
+    elsif (m/^[-:.\w]+(?:\(\S+\))?$/)
+        @($manpage, $section) = @($_, '')
+    elsif (m%/%)
+        @($manpage, $section) =  split (m/\s*\/\s*/, $_, 2)
+    
 
-    my $text = '';
+    my $text = ''
     # Now build the actual output text.
-    if (!length $section) {
-        $text = "the $manpage manpage" if length $manpage;
-    } elsif ($section =~ m/^[:\w]+(?:\(\))?/) {
-        $text .= 'the ' . $section . ' entry';
+    if (!length $section)
+        $text = "the $manpage manpage" if length $manpage
+    elsif ($section =~ m/^[:\w]+(?:\(\))?/)
+        $text .= 'the ' . $section . ' entry'
         $text .= (length $manpage) ?? " in the $manpage manpage"
-            !! " elsewhere in this document";
-    } else {
-        $section =~ s/^\"\s*//;
-        $section =~ s/\s*\"$//;
-        $text .= 'the section on "' . $section . '"';
-        $text .= " in the $manpage manpage" if length $manpage;
-    }
-    $text;
-}
+            !! " elsewhere in this document"
+    else
+        $section =~ s/^\"\s*//
+        $section =~ s/\s*\"$//
+        $text .= 'the section on "' . $section . '"'
+        $text .= " in the $manpage manpage" if length $manpage
+    
+    $text
+
 
 
 ############################################################################
@@ -443,35 +443,35 @@ sub seq_l {
 # contains a newline, output the item tag followed by the newline.
 # Otherwise, see if there's enough room for us to output the item tag in the
 # margin of the text or if we have to put it on a separate line.
-sub item {
-    my $self = shift;
-    local $_ = shift;
-    my $tag = $self->%{?ITEM};
-    unless (defined $tag) {
-        warn "item called without tag";
-        return;
-    }
-    undef $self->%{+ITEM};
-    my $indent = $self->%{INDENTS}->[-1];
+sub item
+    my $self = shift
+    local $_ = shift
+    my $tag = $self->%{?ITEM}
+    unless (defined $tag)
+        warn "item called without tag"
+        return
+    
+    undef $self->%{+ITEM}
+    my $indent = $self->%{INDENTS}->[-1]
     unless (defined $indent) { $indent = $self->%{?indent} }
-    my $space = ' ' x $indent;
-    $space =~ s/^ /:/ if $self->%{?alt};
-    if (!$_ || m/^\s+$/ || ($self->%{?MARGIN} - $indent +< length ($tag) + 1)) {
-        my $margin = $self->%{?MARGIN};
-        $self->%{+MARGIN} = $indent;
-        my $output = $self->reformat ($tag);
-        $output =~ s/\n*$/\n/;
-        $self->output ($output);
-        $self->%{+MARGIN} = $margin;
-        $self->output ( $self->reformat ($_)) if m/\S/;
-    } else {
-        $_ = $self->reformat ($_);
-        s/^ /:/ if ($self->%{?alt} && $indent +> 0);
-        my $tagspace = ' ' x length $tag;
-        s/^($space)$tagspace/$1$tag/ or warn "Bizarre space in item";
-        $self->output ($_);
-    }
-}
+    my $space = ' ' x $indent
+    $space =~ s/^ /:/ if $self->%{?alt}
+    if (!$_ || m/^\s+$/ || ($self->%{?MARGIN} - $indent +< length ($tag) + 1))
+        my $margin = $self->%{?MARGIN}
+        $self->%{+MARGIN} = $indent
+        my $output = $self->reformat ($tag)
+        $output =~ s/\n*$/\n/
+        $self->output ($output)
+        $self->%{+MARGIN} = $margin
+        $self->output ( $self->reformat ($_)) if m/\S/
+    else
+        $_ = $self->reformat ($_)
+        s/^ /:/ if ($self->%{?alt} && $indent +> 0)
+        my $tagspace = ' ' x length $tag
+        s/^($space)$tagspace/$1$tag/ or warn "Bizarre space in item"
+        $self->output ($_)
+    
+
 
 
 ############################################################################
@@ -482,42 +482,42 @@ sub item {
 # Text::Wrap because it plays games with tabs.  We can't use formline, even
 # though we'd really like to, because it screws up non-printing characters.
 # So we have to do the wrapping ourselves.
-sub wrap {
-    my $self = shift;
-    local $_ = shift;
-    my $output = '';
-    my $spaces = ' ' x $self->%{?MARGIN};
-    my $width = $self->%{?width} - $self->%{?MARGIN};
-    while (length +> $width) {
-        if (s/^([^\n]{0,$width})\s+// || s/^([^\n]{$width})//) {
-            $output .= $spaces . $1 . "\n";
-        } else {
-            last;
-        }
-    }
-    $output .= $spaces . $_;
-    $output =~ s/\s+$/\n\n/;
-    $output;
-}
+sub wrap
+    my $self = shift
+    local $_ = shift
+    my $output = ''
+    my $spaces = ' ' x $self->%{?MARGIN}
+    my $width = $self->%{?width} - $self->%{?MARGIN}
+    while (length +> $width)
+        if (s/^([^\n]{0,$width})\s+// || s/^([^\n]{$width})//)
+            $output .= $spaces . $1 . "\n"
+        else
+            last
+        
+    
+    $output .= $spaces . $_
+    $output =~ s/\s+$/\n\n/
+    $output
+
 
 # Reformat a paragraph of text for the current margin.  Takes the text to
 # reformat and returns the formatted text.
-sub reformat {
-    my $self = shift;
-    local $_ = shift;
+sub reformat
+    my $self = shift
+    local $_ = shift
 
     # If we're trying to preserve two spaces after sentences, do some
     # munging to support that.  Otherwise, smash all repeated whitespace.
-    if ($self->%{?sentence}) {
-        s/ +$//mg;
-        s/\.\n/. \n/g;
-        s/\n/ /g;
-        s/   +/  /g;
-    } else {
-        s/\s+/ /g;
-    }
-    $self->wrap ($_);
-}
+    if ($self->%{?sentence})
+        s/ +$//mg
+        s/\.\n/. \n/g
+        s/\n/ /g
+        s/   +/  /g
+    else
+        s/\s+/ /g
+    
+    $self->wrap ($_)
+
 
 # Output text to the output device.
 sub output { @_[1] =~ s/\01/ /g; print  @_[0]->output_handle  ,@_[1] }
@@ -529,48 +529,46 @@ sub output { @_[1] =~ s/\01/ /g; print  @_[0]->output_handle  ,@_[1] }
 
 # The old Pod::Text module did everything in a pod2text() function.  This
 # tries to provide the same interface for legacy applications.
-sub pod2text {
-    my @args;
+sub pod2text
+    my @args
 
     # This is really ugly; I hate doing option parsing in the middle of a
     # module.  But the old Pod::Text module supported passing flags to its
     # entry function, so handle -a and -<number>.
-    while (@_[0] =~ m/^-/) {
-        my $flag = shift;
-        if    ($flag eq '-a')       { push (@args, alt => 1)    }
-        elsif ($flag =~ m/^-(\d+)$/) { push (@args, width => $1) }
-        else {
-            unshift (@_, $flag);
-            last;
-        }
-    }
+    while (@_[0] =~ m/^-/)
+        my $flag = shift
+        if    ($flag eq '-a')       { push (@args, alt => 1)    }elsif ($flag =~ m/^-(\d+)$/) { push (@args, width => $1) }else
+            unshift (@_, $flag)
+            last
+        
+    
 
     # Now that we know what arguments we're using, create the parser.
-    my $parser = Pod::PlainText->new (< @args);
+    my $parser = Pod::PlainText->new (< @args)
 
     # If two arguments were given, the second argument is going to be a file
     # handle.  That means we want to call parse_from_filehandle(), which
     # means we need to turn the first argument into a file handle.  Magic
     # open will handle the <&STDIN case automagically.
-    if (defined @_[1]) {
-        my $in;
-        unless (open ($in, "<", @_[0])) {
-            die ("Can't open @_[0] for reading: $^OS_ERROR\n");
-            return;
-        }
-        @_[0] = $in;
-        return $parser->parse_from_filehandle (< @_);
-    } else {
-        return $parser->parse_from_file (< @_);
-    }
-}
+    if (defined @_[1])
+        my $in
+        unless (open ($in, "<", @_[0]))
+            die ("Can't open @_[0] for reading: $^OS_ERROR\n")
+            return
+        
+        @_[0] = $in
+        return $parser->parse_from_filehandle (< @_)
+    else
+        return $parser->parse_from_file (< @_)
+    
+
 
 
 ############################################################################
 # Module return value and documentation
 ############################################################################
 
-1;
+1
 __END__
 
 =head1 NAME

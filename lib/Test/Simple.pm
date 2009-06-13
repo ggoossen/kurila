@@ -1,15 +1,15 @@
-package Test::Simple;
+package Test::Simple
 
 
-our ($VERSION, @ISA, @EXPORT);
-$VERSION = '0.78';
-$VERSION = eval $VERSION;    # make the alpha version come out as a number
+our ($VERSION, @ISA, @EXPORT)
+$VERSION = '0.78'
+$VERSION = eval $VERSION    # make the alpha version come out as a number
 
 use Test::Builder::Module;
-@ISA    = qw(Test::Builder::Module);
-@EXPORT = qw(ok);
+@ISA    = qw(Test::Builder::Module)
+@EXPORT = qw(ok)
 
-my $CLASS = __PACKAGE__;
+my $CLASS = __PACKAGE__
 
 
 =head1 NAME
@@ -75,9 +75,9 @@ will do what you mean (fail if stuff is empty)
 
 =cut
 
-sub ok($ok, ?$name) {
-    $CLASS->builder->ok($ok, $name);
-}
+sub ok($ok, ?$name)
+    $CLASS->builder->ok($ok, $name)
+
 
 
 =back
@@ -218,11 +218,11 @@ E<lt>schwern@pobox.comE<gt>, wardrobe by Calvin Klein.
 
 Copyright 2001, 2002, 2004 by Michael G Schwern E<lt>schwern@pobox.comE<gt>.
 
-This program is free software; you can redistribute it and/or 
+This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 See F<http://www.perl.com/perl/misc/Artistic.html>
 
 =cut
 
-1;
+1

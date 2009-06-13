@@ -1,15 +1,15 @@
-package ExtUtils::Command::MM;
+package ExtUtils::Command::MM
 
-use warnings;
+use warnings
 
-require Exporter;
-our @ISA = qw(Exporter);
+require Exporter
+our @ISA = qw(Exporter)
 
 our @EXPORT  = qw(test_harness pod2man perllocal_install uninstall 
-                  warn_if_old_packlist);
-our $VERSION = '6.44';
+                  warn_if_old_packlist)
+our $VERSION = '6.44'
 
-my $Is_VMS = $^OS_NAME eq 'VMS';
+my $Is_VMS = $^OS_NAME eq 'VMS'
 
 
 =head1 NAME
@@ -43,21 +43,21 @@ flag.  Any @test_libs will be unshifted onto the test's $^INCLUDE_PATH.
 
 =cut
 
-sub test_harness {
-    require Test::Harness;
-    require File::Spec;
+sub test_harness
+    require Test::Harness
+    require File::Spec
 
-    $Test::Harness::verbose = shift;
+    $Test::Harness::verbose = shift
 
     # Because Windows doesn't do this for us and listing all the *.t files
     # out on the command line can blow over its exec limit.
-    require ExtUtils::Command;
-    my @argv = ExtUtils::Command::expand_wildcards(< @ARGV);
+    require ExtUtils::Command
+    my @argv = ExtUtils::Command::expand_wildcards(< @ARGV)
 
-    local $^INCLUDE_PATH = $^INCLUDE_PATH;
-    unshift $^INCLUDE_PATH, < map { File::Spec->rel2abs($_) }, @_;
-    Test::Harness::runtests( <sort { lc $a cmp lc $b }, @argv);
-}
+    local $^INCLUDE_PATH = $^INCLUDE_PATH
+    unshift $^INCLUDE_PATH, < map { File::Spec->rel2abs($_) }, @_
+    Test::Harness::runtests( <sort { lc $a cmp lc $b }, @argv)
+
 
 
 
@@ -86,56 +86,56 @@ If no arguments are given to pod2man it will read from @ARGV.
 
 =cut
 
-sub pod2man {
-    local @ARGV = @( (nelems @_) ?? < @_ !! < @ARGV );
+sub pod2man
+    local @ARGV = @( (nelems @_) ?? < @_ !! < @ARGV )
 
-    require Pod::Man;
-    require Getopt::Long;
+    require Pod::Man
+    require Getopt::Long
 
     # We will cheat and just use Getopt::Long.  We fool it by putting
     # our arguments into @ARGV.  Should be safe.
-    my %options = %( () );
-    Getopt::Long::config ('bundling_override');
-    Getopt::Long::GetOptions (\%options, 
+    my %options = %( () )
+    Getopt::Long::config ('bundling_override')
+    Getopt::Long::GetOptions (\%options,
                               'section|s=s', 'release|r=s', 'center|c=s',
                               'date|d=s', 'fixed=s', 'fixedbold=s', 'fixeditalic=s',
                               'fixedbolditalic=s', 'official|o', 'quotes|q=s', 'lax|l',
                               'name|n=s', 'perm_rw:i'
-                              );
+                              )
 
     # If there's no files, don't bother going further.
-    return 0 unless (nelems @ARGV);
+    return 0 unless (nelems @ARGV)
 
     # Official sets --center, but don't override things explicitly set.
-    if (%options{?official} && !defined %options{?center}) {
-        %options{+center} = q[Perl Programmer's Reference Guide];
-    }
+    if (%options{?official} && !defined %options{?center})
+        %options{+center} = q[Perl Programmer's Reference Guide]
+    
 
     # This isn't a valid Pod::Man option and is only accepted for backwards
     # compatibility.
-    delete %options{lax};
+    delete %options{lax}
 
-    do {  # so 'next' works
-        my @($pod, $man) = @: splice(@ARGV, 0, 2);
+    do  # so 'next' works
+        my @($pod, $man) = @: splice(@ARGV, 0, 2)
 
         next if ((-e $man) &&
                  (-M $man +< -M $pod) &&
-                 (-M $man +< -M "Makefile"));
+                 (-M $man +< -M "Makefile"))
 
-        print $^STDOUT, "Manifying $man\n";
+        print $^STDOUT, "Manifying $man\n"
 
-        my $parser = Pod::Man->new(< %options);
+        my $parser = Pod::Man->new(< %options)
         $parser->parse_from_file($pod, $man)
-            or do { warn("Could not install $man\n");  next };
+            or do { warn("Could not install $man\n");  next }
 
-        if (length %options{?perm_rw}) {
+        if (length %options{?perm_rw})
             chmod(oct(%options{?perm_rw}), $man)
-                or do { warn("chmod %options{?perm_rw} $man: $^OS_ERROR\n"); next };
-        }
-    } while (nelems @ARGV);
+                or do { warn("chmod %options{?perm_rw} $man: $^OS_ERROR\n"); next }
+        
+     while (nelems @ARGV)
 
-    return 1;
-}
+    return 1
+
 
 
 =item B<warn_if_old_packlist>
@@ -147,22 +147,22 @@ filename from @ARGV.
 
 =cut
 
-sub warn_if_old_packlist {
-    my $packlist = @ARGV[0];
+sub warn_if_old_packlist
+    my $packlist = @ARGV[0]
 
-    return unless -f $packlist;
-    print $^STDOUT, <<"PACKLIST_WARNING";
+    return unless -f $packlist
+    print $^STDOUT, <<"PACKLIST_WARNING"
 WARNING: I have found an old package in
     $packlist.
 Please make sure the two installations are not conflicting
 PACKLIST_WARNING
 
-}
+
 
 
 =item B<perllocal_install>
 
-    perl "-MExtUtils::Command::MM" -e perllocal_install 
+    perl "-MExtUtils::Command::MM" -e perllocal_install
         <type> <module name> <key> <value> ...
 
     # VMS only, key|value pairs come on STDIN
@@ -181,29 +181,29 @@ Key/value pairs are extra information about the module.  Fields include:
     installed into      which directory your module was out into
     LINKTYPE            dynamic or static linking
     VERSION             module version number
-    EXE_FILES           any executables installed in a space seperated 
+    EXE_FILES           any executables installed in a space seperated
                         list
 
 =cut
 
-sub perllocal_install {
-    my@($type, $name) = @: splice(@ARGV, 0, 2);
+sub perllocal_install
+    my@($type, $name) = @: splice(@ARGV, 0, 2)
 
     # VMS feeds args as a piped file on STDIN since it usually can't
     # fit all the args on a single command line.
     my @mod_info = @( $Is_VMS ?? < split m/\|/, ~< $^STDIN
-                      !! < @ARGV );
+                      !! < @ARGV )
 
-    my $pod;
-    $pod = sprintf <<POD, scalar localtime;
+    my $pod
+    $pod = sprintf <<POD, scalar localtime
  =head2 \%s: C<$type> L<$name|$name>
  
  =over 4
  
 POD
 
-    {
-        my@($key, $val) = @: splice(@mod_info, 0, 2);
+    loop
+        my@($key, $val) = @: splice(@mod_info, 0, 2)
 
         $pod .= <<POD
  =item *
@@ -212,14 +212,14 @@ POD
  
 POD
 
-    } while(nelems @mod_info);
+    while(nelems @mod_info)
 
-    $pod .= "=back\n\n";
-    $pod =~ s/^ //mg;
-    print $^STDOUT, $pod;
+    $pod .= "=back\n\n"
+    $pod =~ s/^ //mg
+    print $^STDOUT, $pod
 
-    return 1;
-}
+    return 1
+
 
 =item B<uninstall>
 
@@ -231,21 +231,21 @@ uninstallation.
 
 =cut
 
-sub uninstall {
-    my@($packlist) =@( shift @ARGV);
+sub uninstall
+    my@($packlist) =@( shift @ARGV)
 
-    require ExtUtils::Install;
+    require ExtUtils::Install
 
-    print $^STDOUT, <<'WARNING';
+    print $^STDOUT, <<'WARNING'
 
 Uninstall is unsafe and deprecated, the uninstallation was not performed.
 We will show what would have been done.
 
 WARNING
 
-    ExtUtils::Install::uninstall($packlist, 1, 1);
+    ExtUtils::Install::uninstall($packlist, 1, 1)
 
-    print $^STDOUT, <<'WARNING';
+    print $^STDOUT, <<'WARNING'
 
 Uninstall is unsafe and deprecated, the uninstallation was not performed.
 Please check the list above carefully, there may be errors.
@@ -254,10 +254,10 @@ Sorry for the inconvenience.
 
 WARNING
 
-}
+
 
 =back
 
 =cut
 
-1;
+1

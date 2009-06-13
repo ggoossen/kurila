@@ -1,71 +1,68 @@
-package less;
+package less
 
-use warnings;
+use warnings
 
-our $VERSION = '0.02';
+our $VERSION = '0.02'
 
-sub _pack_tags {
-    return join ' ', @_;
-}
+sub _pack_tags
+    return join ' ', @_
 
-sub _unpack_tags {
+
+sub _unpack_tags
     return grep { defined and length },
         @+: map  { split ' ' },
-        grep {defined}, @_;
-}
+        grep {defined}, @_
 
-sub of {
-    my $class = shift @_;
+
+sub of
+    my $class = shift @_
 
     # If no one wants the result, don't bother computing it.
-    my $hinthash = @( caller 0 )[10];
-    my %tags;
-        %tags{[_unpack_tags( $hinthash->{?$class} ) ]} = @();
+    my $hinthash = @( caller 0 )[10]
+    my %tags
+    %tags{[_unpack_tags( $hinthash->{?$class} ) ]} = @()
 
-    if ((nelems @_)) {
-        exists %tags{$_} and return ! ! 1 for  @_;
-        return;
-    }
-    else {
-        return keys %tags;
-    }
-}
+    if ((nelems @_))
+        exists %tags{$_} and return ! ! 1 for  @_
+        return
+    else
+        return keys %tags
+    
 
-sub import {
-    my $class = shift @_;
 
-    @_ = @( 'please' ) if not nelems @_;
-    my %tags;
-        %tags{[_unpack_tags( < @_, $^HINTS{?$class} ) ]} = @();
+sub import
+    my $class = shift @_
 
-    $^HINTS{+$class} = _pack_tags( < keys %tags );
-    return;
-}
+    @_ = @( 'please' ) if not nelems @_
+    my %tags
+    %tags{[_unpack_tags( < @_, $^HINTS{?$class} ) ]} = @()
 
-sub unimport {
-    my $class = shift @_;
+    $^HINTS{+$class} = _pack_tags( < keys %tags )
+    return
 
-    if ((nelems @_)) {
-        my %tags;
-            %tags{[_unpack_tags( $^HINTS{?$class} ) ]} = @();
-        delete %tags{[ <_unpack_tags(< @_) ]};
-        my $new = _pack_tags( < keys %tags );
 
-        if ( not length $new ) {
-            delete $^HINTS{$class};
-        }
-        else {
-            $^HINTS{+$class} = $new;
-        }
-    }
-    else {
-        delete $^HINTS{$class};
-    }
+sub unimport
+    my $class = shift @_
 
-    return;
-}
+    if ((nelems @_))
+        my %tags
+        %tags{[_unpack_tags( $^HINTS{?$class} ) ]} = @()
+        delete %tags{[ <_unpack_tags(< @_) ]}
+        my $new = _pack_tags( < keys %tags )
 
-1;
+        if ( not length $new )
+            delete $^HINTS{$class}
+        else
+            $^HINTS{+$class} = $new
+        
+    else
+        delete $^HINTS{$class}
+    
+
+    return
+
+
+1
 
 __END__
 

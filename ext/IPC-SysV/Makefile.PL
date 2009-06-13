@@ -1,27 +1,26 @@
 # This -*- perl -*- script makes the Makefile
 # $Id: Makefile.PL,v 1.3 1997/03/04 09:21:12 gbarr Exp $
 
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker
 
 #--- MY package
 
 sub MY::libscan($self, $path)
-{
-    package MY;
+    package MY
 
     return $path if $self->SUPER::libscan($path) and
-        $path !~ m! [~%]$
+      $path !~ m! [~%]$
                             | \.(cache\.cm|swp|orig|rej)$
                             | regen\.pl$
-                            !x;
-    return '';
-}
+                            !x
+    return ''
+
 
 WriteMakefile(
-    VERSION_FROM	=> "SysV.pm",
-    NAME      	=> "IPC::SysV",
-    'clean'   	=> %(FILES => join(" ", map { "$_ */$_ */*/$_" },
-        qw(*% *.html *.b[ac]k *.old))
+    VERSION_FROM        => "SysV.pm",
+    NAME        => "IPC::SysV",
+    'clean'     => %(FILES => join(" ", map { "$_ */$_ */*/$_" },
+    qw(*% *.html *.b[ac]k *.old))
     ),
-    'macro'		=> %( INSTALLDIRS => 'perl' ),
-    );
+    'macro'             => %( INSTALLDIRS => 'perl' ),
+    )

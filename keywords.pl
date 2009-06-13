@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
 
 
-require 'regen_lib.pl';
+require 'regen_lib.pl'
 
-my $kw = safer_open("keywords.h-new");
+my $kw = safer_open("keywords.h-new")
 
-print $kw, <<EOM;
+print $kw, <<EOM
 /* -*- buffer-read-only: t -*-
  *
  *    keywords.h
@@ -24,26 +24,26 @@ EOM
 
 # Read & print data.
 
-my $keynum = 0;
-while ( ~< $^DATA) {
-    chop;
-    next unless $_;
-    next if m/^#/;
-    my @($keyword) =  split;
-    print $kw, &tab(5, "#define KEY_$keyword"), $keynum++, "\n";
-}
+my $keynum = 0
+while ( ~< $^DATA)
+    chop
+    next unless $_
+    next if m/^#/
+    my @($keyword) =  split
+    print $kw, &tab(5, "#define KEY_$keyword"), $keynum++, "\n"
 
-print $kw, "\n/* ex: set ro: */\n";
 
-safer_close($kw);
+print $kw, "\n/* ex: set ro: */\n"
 
-rename_if_different("keywords.h-new", "keywords.h");
+safer_close($kw)
+
+rename_if_different("keywords.h-new", "keywords.h")
 
 ###########################################################################
-sub tab($l, $t) {
-    $t .= "\t" x ($l - (length($t) + 1) / 8);
-    $t;
-}
+sub tab($l, $t)
+    $t .= "\t" x ($l - (length($t) + 1) / 8)
+    $t
+
 ###########################################################################
 __END__
 
@@ -158,6 +158,7 @@ local
 localtime
 lock
 log
+loop
 lstat
 nelems
 nkeys

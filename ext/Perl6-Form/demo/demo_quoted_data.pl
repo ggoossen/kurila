@@ -1,13 +1,13 @@
-use Perl6::Form;
+use Perl6::Form
 
-my $bullet = "<>";
+my $bullet = "<>"
 
-my @items = @( ~< $^DATA );
+my @items = @( ~< $^DATA )
 
-for my $item ( @items) {
+for my $item ( @items)
     print $^STDOUT, < form "\{'\{*\}'\} \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",
-                        $bullet,      $item;
-}
+                           $bullet,      $item
+
 
 __DATA__
 A rubber sword, laminated with mylar to look suitably shiny.

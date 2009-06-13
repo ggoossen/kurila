@@ -1,46 +1,46 @@
 #!/usr/bin/perl -w
 
-use kurila;
+use kurila
 
-BEGIN {
+BEGIN 
     # Get function prototypes
-    require 'regen_lib.pl';
-}
+    require 'regen_lib.pl'
 
-my $opcode_new = 'opcode.h-new';
-my $opname_new = 'opnames.h-new';
-my $oc = safer_open($opcode_new);
-my $on = safer_open($opname_new);
+
+my $opcode_new = 'opcode.h-new'
+my $opname_new = 'opnames.h-new'
+my $oc = safer_open($opcode_new)
+my $on = safer_open($opname_new)
 
 # Read data.
 
-my %seen;
-my (@ops, %desc, %check, %ckname, %flags, %args, %opnum);
+my %seen
+my (@ops, %desc, %check, %ckname, %flags, %args, %opnum)
 
-while ( ~< $^DATA) {
-    chop;
-    next unless $_;
-    next if m/^#/;
-    my @($key, $desc, $check, $flags, ? $args) =  split(m/\t+/, $_, 5);
-    $args = '' unless defined $args;
+while ( ~< $^DATA)
+    chop
+    next unless $_
+    next if m/^#/
+    my @($key, $desc, $check, $flags, ? $args) =  split(m/\t+/, $_, 5)
+    $args = '' unless defined $args
 
-    warn qq[Description "$desc" duplicates %seen{?$desc}\n] if %seen{?$desc};
-    die qq[Opcode "$key" duplicates %seen{?$key}\n] if %seen{?$key};
-    %seen{+$desc} = qq[description of opcode "$key"];
-    %seen{+$key} = qq[opcode "$key"];
+    warn qq[Description "$desc" duplicates %seen{?$desc}\n] if %seen{?$desc}
+    die qq[Opcode "$key" duplicates %seen{?$key}\n] if %seen{?$key}
+    %seen{+$desc} = qq[description of opcode "$key"]
+    %seen{+$key} = qq[opcode "$key"]
 
-    push(@ops, $key);
-    %opnum{+$key} =( (nelems @ops)-1);
-    %desc{+$key} = $desc;
-    %check{+$key} = $check;
-    %ckname{+$check}++;
-    %flags{+$key} = $flags;
-    %args{+$key} = $args;
-}
+    push(@ops, $key)
+    %opnum{+$key} =( (nelems @ops)-1)
+    %desc{+$key} = $desc
+    %check{+$key} = $check
+    %ckname{+$check}++
+    %flags{+$key} = $flags
+    %args{+$key} = $args
+
 
 # Set up aliases
 
-my %alias;
+my %alias
 
 # Format is "this function" => "does these op names"
 my @raw_alias = @(
@@ -87,16 +87,16 @@ my @raw_alias = @(
     Perl_pp_sin => \qw(cos exp log sqrt),
     Perl_pp_bit_or => \@('bit_xor'),
     Perl_pp_rv2sv => \@('rv2av rv2hv'),
-    );
+    )
 
-while (@raw_alias) {
-    my @($func, $names) = @: splice @raw_alias, 0, 2;
-    %alias{+$_} = $func for  $names->@;
-}
+while (@raw_alias)
+    my @($func, $names) = @: splice @raw_alias, 0, 2
+    %alias{+$_} = $func for  $names->@
+
 
 # Emit defines.
 
-print $oc, <<"END";
+print $oc, <<"END"
 /* -*- buffer-read-only: t -*-
  *
  *    opcode.h
@@ -123,7 +123,7 @@ PERL_PPDEF(Perl_unimplemented_op)
 
 END
 
-print $on, <<"END";
+print $on, <<"END"
 /* -*- buffer-read-only: t -*-
  *
  *    opnames.h
@@ -143,20 +143,20 @@ print $on, <<"END";
 typedef enum opcode \{
 END
 
-my $i = 0;
-for ( @ops) {
+my $i = 0
+for ( @ops)
     # print $on, "\t", &tab(3,"OP_\U$_,"), "/* ", $i++, " */\n";
-    print $on, "\t", &tab(3,"OP_\U$_"), " = ", $i++, ",\n";
-}
-print $on, "\t", &tab(3,"OP_max"), "\n";
-print $on, "\} opcode;\n";
-print $on, "\n#define MAXO ", scalar nelems @ops, "\n";
-print $on, "#define OP_phoney_INPUT_ONLY -1\n";
-print $on, "#define OP_phoney_OUTPUT_ONLY -2\n\n";
+    print $on, "\t", &tab(3,"OP_\U$_"), " = ", $i++, ",\n"
+
+print $on, "\t", &tab(3,"OP_max"), "\n"
+print $on, "\} opcode;\n"
+print $on, "\n#define MAXO ", scalar nelems @ops, "\n"
+print $on, "#define OP_phoney_INPUT_ONLY -1\n"
+print $on, "#define OP_phoney_OUTPUT_ONLY -2\n\n"
 
 # Emit op names and descriptions.
 
-print $oc, <<END;
+print $oc, <<END
 START_EXTERN_C
 
 #define OP_NAME(o) ((o)->op_type == OP_CUSTOM ? custom_op_name(o) : \\
@@ -171,34 +171,34 @@ EXTCONST char* const PL_op_name[];
 EXTCONST char* const PL_op_name[] = \{
 END
 
-for ( @ops) {
-    print $oc, qq(\t"$_",\n);
-}
+for ( @ops)
+    print $oc, qq(\t"$_",\n)
 
-print $oc, <<END;
+
+print $oc, <<END
 \tNULL,\n
 \};
 #endif
 
 END
 
-print $oc, <<END;
+print $oc, <<END
 #ifndef DOINIT
 EXTCONST char* const PL_op_desc[];
 #else
 EXTCONST char* const PL_op_desc[] = \{
 END
 
-for ( @ops) {
-    my $safe_desc = %desc{?$_};
+for ( @ops)
+    my $safe_desc = %desc{?$_}
 
     # Have to escape double quotes and escape characters.
-    $safe_desc =~ s/(^|[^\\])([\\"])/$1\\$2/g;
+    $safe_desc =~ s/(^|[^\\])([\\"])/$1\\$2/g
 
-    print $oc, qq(\t"$safe_desc",\n);
-}
+    print $oc, qq(\t"$safe_desc",\n)
 
-print $oc, <<END;
+
+print $oc, <<END
 \};
 #endif
 
@@ -221,7 +221,7 @@ END
 
 # Emit ppcode switch array.
 
-print $oc, <<END;
+print $oc, <<END
 
 START_EXTERN_C
 
@@ -239,16 +239,15 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 = \{
 END
 
-for ( @ops) {
-    if (my $name = %alias{?$_}) {
-        print $oc, "\tMEMBER_TO_FPTR($name),\t/* Perl_pp_$_ */\n";
-    }
-    else {
-        print $oc, "\tMEMBER_TO_FPTR(Perl_pp_$_),\n";
-    }
-}
+for ( @ops)
+    if (my $name = %alias{?$_})
+        print $oc, "\tMEMBER_TO_FPTR($name),\t/* Perl_pp_$_ */\n"
+    else
+        print $oc, "\tMEMBER_TO_FPTR(Perl_pp_$_),\n"
+    
 
-print $oc, <<END;
+
+print $oc, <<END
 \}
 #endif
 #ifdef PERL_PPADDR_INITED
@@ -259,7 +258,7 @@ END
 
 # Emit check routines.
 
-print $oc, <<END;
+print $oc, <<END
 #ifdef PERL_GLOBAL_STRUCT_INIT
 #  define PERL_CHECK_INITED
 static const Perl_check_t Gcheck[]
@@ -274,11 +273,11 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 = \{
 END
 
-for ( @ops) {
-    print $oc, "\t", tab(3, "MEMBER_TO_FPTR(Perl_%check{?$_}),"), "\t/* $_ */\n";
-}
+for ( @ops)
+    print $oc, "\t", tab(3, "MEMBER_TO_FPTR(Perl_%check{?$_}),"), "\t/* $_ */\n"
 
-print $oc, <<END;
+
+print $oc, <<END
 \}
 #endif
 #ifdef PERL_CHECK_INITED
@@ -289,9 +288,9 @@ END
 
 # Emit allowed argument types.
 
-my $ARGBITS = 32;
+my $ARGBITS = 32
 
-print $oc, <<END;
+print $oc, <<END
 #ifndef PERL_GLOBAL_STRUCT_INIT
 
 #ifndef DOINIT
@@ -301,86 +300,86 @@ EXTCONST U32 PL_opargs[] = \{
 END
 
 my %argnum = %(
-        'S',  1,		# scalar
-            'L',  2,		# list
-            'A',  3,		# array value
-            'H',  4,		# hash value
-            'C',  5,		# code value
-            'F',  6,		# file value
-            'R',  7,		# scalar reference
-    );
+    'S',  1,		# scalar
+    'L',  2,		# list
+    'A',  3,		# array value
+    'H',  4,		# hash value
+    'C',  5,		# code value
+    'F',  6,		# file value
+    'R',  7,		# scalar reference
+    )
 
 my %opclass = %(
-        '0',  0,		# baseop
-            '1',  1,		# unop
-            '2',  2,		# binop
-            '|',  3,		# logop
-            '@',  4,		# listop
-            '/',  5,		# pmop
-            '$',  6,		# svop_or_padop
-            '#',  7,		# padop
-            '{',  9,		# loop
-            ';',  10,		# cop
-            '%',  11,		# baseop_or_unop
-            '-',  12,		# filestatop
-            '}',  13,		# loopexop
-            '!',  14,		# rootop
-    );
+    '0',  0,		# baseop
+    '1',  1,		# unop
+    '2',  2,		# binop
+    '|',  3,		# logop
+    '@',  4,		# listop
+    '/',  5,		# pmop
+    '$',  6,		# svop_or_padop
+    '#',  7,		# padop
+    '{',  9,		# loop
+    ';',  10,		# cop
+    '%',  11,		# baseop_or_unop
+    '-',  12,		# filestatop
+    '}',  13,		# loopexop
+    '!',  14,		# rootop
+    )
 
 my %opflags = %(
-        'm' =>   1,		# needs stack mark
-            'f' =>   2,		# fold constants
-            's' =>   4,		# always produces scalar
-            't' =>   8,		# needs target scalar
-            'T' =>   8 ^|^ 256,	# ... which may be lexical
-            'i' =>  16,		# always produces integer
-            'I' =>  32,		# has corresponding int op
-            'd' =>  64,		# danger, unknown side effects
-            'u' => 128,		# defaults to $_
-    );
+    'm' =>   1,		# needs stack mark
+    'f' =>   2,		# fold constants
+    's' =>   4,		# always produces scalar
+    't' =>   8,		# needs target scalar
+    'T' =>   8 ^|^ 256,	# ... which may be lexical
+    'i' =>  16,		# always produces integer
+    'I' =>  32,		# has corresponding int op
+    'd' =>  64,		# danger, unknown side effects
+    'u' => 128,		# defaults to $_
+    )
 
-my %OP_IS_SOCKET;
-my %OP_IS_FILETEST;
-my %OP_IS_FT_ACCESS;
-my $OCSHIFT = 9;
-my $OASHIFT = 13;
+my %OP_IS_SOCKET
+my %OP_IS_FILETEST
+my %OP_IS_FT_ACCESS
+my $OCSHIFT = 9
+my $OASHIFT = 13
 
-for my $op ( @ops) {
-    my $argsum = 0;
-    my $flags = %flags{?$op};
-    for my $flag (keys %opflags) {
-        if ($flags =~ s/$flag//) {
+for my $op ( @ops)
+    my $argsum = 0
+    my $flags = %flags{?$op}
+    for my $flag (keys %opflags)
+        if ($flags =~ s/$flag//)
             die "Flag collision for '$op' (%flags{?$op}, $flag)"
-                if $argsum ^&^ %opflags{?$flag};
-            $argsum ^|^= %opflags{?$flag};
-        }
-    }
+                if $argsum ^&^ %opflags{?$flag}
+            $argsum ^|^= %opflags{?$flag}
+        
+    
     die qq[Opcode '$op' has no class indicator (%flags{?$op} => $flags)\n]
-        unless exists %opclass{$flags};
-    $argsum ^|^= %opclass{?$flags} << $OCSHIFT;
-    my $argshift = $OASHIFT;
-    for my $arg (split(' ',%args{?$op})) {
-        if ($arg =~ m/^F/) {
+        unless exists %opclass{$flags}
+    $argsum ^|^= %opclass{?$flags} << $OCSHIFT
+    my $argshift = $OASHIFT
+    for my $arg (split(' ',%args{?$op}))
+        if ($arg =~ m/^F/)
             # record opnums of these opnames
-            %OP_IS_SOCKET{+$op}   = %opnum{?$op} if $arg =~ s/s//;
-            %OP_IS_FILETEST{+$op} = %opnum{?$op} if $arg =~ s/-//;
-            %OP_IS_FT_ACCESS{+$op} = %opnum{?$op} if $arg =~ s/\+//;
-        }
-        my $argnum = ($arg =~ s/\?//) ?? 8 !! 0;
+            %OP_IS_SOCKET{+$op}   = %opnum{?$op} if $arg =~ s/s//
+            %OP_IS_FILETEST{+$op} = %opnum{?$op} if $arg =~ s/-//
+            %OP_IS_FT_ACCESS{+$op} = %opnum{?$op} if $arg =~ s/\+//
+        
+        my $argnum = ($arg =~ s/\?//) ?? 8 !! 0
         die "op = $op, arg = $arg\n"
-            unless exists %argnum{$arg};
-        $argnum += %argnum{?$arg};
+            unless exists %argnum{$arg}
+        $argnum += %argnum{?$arg}
         die "Argument overflow for '$op'\n"
             if $argshift +>= $ARGBITS ||
-            $argnum +> ((1 << ($ARGBITS - $argshift)) - 1);
-        $argsum += $argnum << $argshift;
-        $argshift += 4;
-    }
-    $argsum = sprintf("0x\%08x", $argsum);
-    print $oc, "\t",  tab(3, "$argsum,"), "/* $op */\n";
-}
+          $argnum +> ((1 << ($ARGBITS - $argshift)) - 1)
+        $argsum += $argnum << $argshift
+        $argshift += 4
+    
+    $argsum = sprintf("0x\%08x", $argsum)
+    print $oc, "\t",  tab(3, "$argsum,"), "/* $op */\n"
 
-print $oc, <<END;
+
+print $oc, <<END
 \};
 #endif
 
@@ -392,7 +391,7 @@ END
 
 # Emit OP_IS_* macros
 
-print $on, <<EO_OP_IS_COMMENT;
+print $on, <<EO_OP_IS_COMMENT
 
 /* the OP_IS_(SOCKET|FILETEST) macros are optimized to a simple range
     check because all the member OPs are contiguous in opcode.pl
@@ -400,54 +399,53 @@ print $on, <<EO_OP_IS_COMMENT;
 
 EO_OP_IS_COMMENT
 
-gen_op_is_macro( \%OP_IS_SOCKET, 'OP_IS_SOCKET');
-gen_op_is_macro( \%OP_IS_FILETEST, 'OP_IS_FILETEST');
-gen_op_is_macro( \%OP_IS_FT_ACCESS, 'OP_IS_FILETEST_ACCESS');
+gen_op_is_macro( \%OP_IS_SOCKET, 'OP_IS_SOCKET')
+gen_op_is_macro( \%OP_IS_FILETEST, 'OP_IS_FILETEST')
+gen_op_is_macro( \%OP_IS_FT_ACCESS, 'OP_IS_FILETEST_ACCESS')
 
-sub gen_op_is_macro($op_is, $macname) {
-    if ($op_is->%) {
+sub gen_op_is_macro($op_is, $macname)
+    if ($op_is->%)
 
         # get opnames whose numbers are lowest and highest
         my @($first, @< @rest) =  sort {
-                $op_is->{?$a} <+> $op_is->{?$b}
-            }, keys $op_is->%;
+            $op_is->{?$a} <+> $op_is->{?$b}
+        }, keys $op_is->%
 
-        my $last = pop @rest;	# @rest slurped, get its last
-        die "Invalid range of ops: $first .. $last\n" unless $last;
+        my $last = pop @rest	# @rest slurped, get its last
+        die "Invalid range of ops: $first .. $last\n" unless $last
 
-        print $on, "#define $macname(op)	\\\n\t(";
+        print $on, "#define $macname(op)	\\\n\t("
 
         # verify that op-ct matches 1st..last range (and fencepost)
         # (we know there are no dups)
-        if ( $op_is->{?$last} - $op_is->{?$first} == scalar (nelems @rest) + 1) {
+        if ( $op_is->{?$last} - $op_is->{?$first} == scalar (nelems @rest) + 1)
 
             # contiguous ops -> optimized version
-            print $on, "(op) >= OP_" . uc($first) . " && (op) <= OP_" . uc($last);
-            print $on, ")\n\n";
-        }
-        else {
-            print $on, join(" || \\\n\t ", map { "(op) == OP_" . uc() }, sort keys $op_is->%);
-            print $on, ")\n\n";
-        }
-    }
-}
+            print $on, "(op) >= OP_" . uc($first) . " && (op) <= OP_" . uc($last)
+            print $on, ")\n\n"
+        else
+            print $on, join(" || \\\n\t ", map { "(op) == OP_" . uc() }, sort keys $op_is->%)
+            print $on, ")\n\n"
+        
+    
 
-print $oc, "/* ex: set ro: */\n";
-print $on, "/* ex: set ro: */\n";
 
-safer_close($oc);
-safer_close($on);
+print $oc, "/* ex: set ro: */\n"
+print $on, "/* ex: set ro: */\n"
 
-rename_if_different $opcode_new, 'opcode.h';
-rename_if_different $opname_new, 'opnames.h';
+safer_close($oc)
+safer_close($on)
 
-my $pp_proto_new = 'pp_proto.h-new';
-my $pp_sym_new  = 'pp.sym-new';
+rename_if_different $opcode_new, 'opcode.h'
+rename_if_different $opname_new, 'opnames.h'
 
-my $pp = safer_open($pp_proto_new);
-my $ppsym = safer_open($pp_sym_new);
+my $pp_proto_new = 'pp_proto.h-new'
+my $pp_sym_new  = 'pp.sym-new'
 
-print $pp, <<"END";
+my $pp = safer_open($pp_proto_new)
+my $ppsym = safer_open($pp_sym_new)
+
+print $pp, <<"END"
 /* -*- buffer-read-only: t -*-
    !!!!!!!   DO NOT EDIT THIS FILE   !!!!!!!
    This file is built by opcode.pl from its data.  Any changes made here
@@ -456,7 +454,7 @@ print $pp, <<"END";
 
 END
 
-print $ppsym, <<"END";
+print $ppsym, <<"END"
 # -*- buffer-read-only: t -*-
 #
 # !!!!!!!   DO NOT EDIT THIS FILE   !!!!!!!
@@ -467,40 +465,40 @@ print $ppsym, <<"END";
 END
 
 
-for (sort keys %ckname) {
-    print $pp, "PERL_CKDEF(Perl_$_)\n";
-    print $ppsym, "Perl_$_\n";
+for (sort keys %ckname)
+    print $pp, "PERL_CKDEF(Perl_$_)\n"
+    print $ppsym, "Perl_$_\n"
 #OP *\t", &tab(3,$_),"(OP* o);\n";
-}
 
-print $pp, "\n\n";
 
-for ( @ops) {
-    next if m/^i_(pre|post)(inc|dec)$/;
-    next if m/^custom$/;
-    print $pp, "PERL_PPDEF(Perl_pp_$_)\n";
-    print $ppsym, "Perl_pp_$_\n";
-}
-print $pp, "\n/* ex: set ro: */\n";
-print $ppsym, "\n# ex: set ro:\n";
+print $pp, "\n\n"
 
-safer_close($pp);
-safer_close($ppsym);
+for ( @ops)
+    next if m/^i_(pre|post)(inc|dec)$/
+    next if m/^custom$/
+    print $pp, "PERL_PPDEF(Perl_pp_$_)\n"
+    print $ppsym, "Perl_pp_$_\n"
 
-rename_if_different $pp_proto_new, 'pp_proto.h';
-rename_if_different $pp_sym_new, 'pp.sym';
+print $pp, "\n/* ex: set ro: */\n"
+print $ppsym, "\n# ex: set ro:\n"
 
-END {
-    foreach (@('opcode.h', 'opnames.h', 'pp_proto.h', 'pp.sym')) {
-        1 while unlink "$_-old";
-    }
-}
+safer_close($pp)
+safer_close($ppsym)
+
+rename_if_different $pp_proto_new, 'pp_proto.h'
+rename_if_different $pp_sym_new, 'pp.sym'
+
+END 
+    foreach (@('opcode.h', 'opnames.h', 'pp_proto.h', 'pp.sym'))
+        1 while unlink "$_-old"
+    
+
 
 ###########################################################################
-sub tab($l, $t) {
-    $t .= "\t" x ($l - (length($t) + 1) / 8);
-    $t;
-}
+sub tab($l, $t)
+    $t .= "\t" x ($l - (length($t) + 1) / 8)
+    $t
+
 ###########################################################################
 
 # Some comments about 'T' opcode classifier:

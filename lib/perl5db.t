@@ -8,12 +8,12 @@ use warnings;
 
 BEGIN {
     if (!-c "/dev/null") {
-	print $^STDOUT, "1..0 # Skip: no /dev/null\n";
-	exit 0;
+        print $^STDOUT, "1..0 # Skip: no /dev/null\n";
+        exit 0;
     }
     if (!-c "/dev/tty") {
-	print $^STDOUT, "1..0 # Skip: no /dev/tty\n";
-	exit 0;
+        print $^STDOUT, "1..0 # Skip: no /dev/tty\n";
+        exit 0;
     }
 }
 
@@ -42,16 +42,16 @@ rc(
 
     qq|
     sub afterinit \{
-	push(\@DB::typeahead,
-	    'b 23',
-	    'n',
-	    'n',
-	    'n',
-	    'c', # line 23
-	    'n',
-	    q!p \@\{*\{Symbol::fetch_glob('main::_<$target')\}\}!,
-	    'q',
-	);
+        push(\@DB::typeahead,
+            'b 23',
+            'n',
+            'n',
+            'n',
+            'c', # line 23
+            'n',
+            q!p \@\{*\{Symbol::fetch_glob('main::_<$target')\}\}!,
+            'q',
+        );
     \}\n|,
 );
 

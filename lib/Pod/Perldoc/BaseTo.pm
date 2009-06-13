@@ -1,7 +1,7 @@
 
-package Pod::Perldoc::BaseTo;
+package Pod::Perldoc::BaseTo
 
-use warnings;
+use warnings
 
 sub is_pageable        { '' }
 sub write_with_binmode {  1 }
@@ -13,15 +13,15 @@ sub output_extension   { 'txt' }  # override in subclass!
 
 #sub new { return bless {}, ref($_[0]) || $_[0] }
 
-sub _perldoc_elem {
-    my@($self, $name) =@( splice @_,0,2);
-    if((nelems @_)) {
-        $self->{+$name} = @_[0];
-    } else {
-        $self->{?$name};
-    }
-}
+sub _perldoc_elem
+    my@($self, $name) =@( splice @_,0,2)
+    if((nelems @_))
+        $self->{+$name} = @_[0]
+    else
+        $self->{?$name}
+    
 
 
-1;
+
+1
 

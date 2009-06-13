@@ -1,6 +1,6 @@
-package filetest;
+package filetest
 
-our $VERSION = '1.02';
+our $VERSION = '1.02'
 
 =head1 NAME
 
@@ -96,22 +96,22 @@ This limitation might be removed in a future version of perl.
 
 =cut
 
-$filetest::hint_bits = 0x00400000; # HINT_FILETEST_ACCESS
+$filetest::hint_bits = 0x00400000 # HINT_FILETEST_ACCESS
 
-sub import {
-    if ( @_[?1] eq 'access' ) {
-        $^HINT_BITS ^|^= $filetest::hint_bits;
-    } else {
-        die "filetest: the only implemented subpragma is 'access'.\n";
-    }
-}
+sub import
+    if ( @_[?1] eq 'access' )
+        $^HINT_BITS ^|^= $filetest::hint_bits
+    else
+        die "filetest: the only implemented subpragma is 'access'.\n"
+    
 
-sub unimport {
-    if ( @_[?1] eq 'access' ) {
-        $^HINT_BITS ^&^= ^~^$filetest::hint_bits;
-    } else {
-        die "filetest: the only implemented subpragma is 'access'.\n";
-    }
-}
 
-1;
+sub unimport
+    if ( @_[?1] eq 'access' )
+        $^HINT_BITS ^&^= ^~^$filetest::hint_bits
+    else
+        die "filetest: the only implemented subpragma is 'access'.\n"
+    
+
+
+1

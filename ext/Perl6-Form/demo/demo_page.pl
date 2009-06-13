@@ -1,13 +1,13 @@
-use Perl6::Form;
+use Perl6::Form
 
 print < form \%( ws=>qr/\s/, page=>\%(header=>"Report",
-                     footer=>\%(other=>sub{"../".(@_[0]->{page}->{number}+1)},
-                             last=>"THE\nEND"
-                         ),
-                         feed=>\%(other=>sub{".\n.\n.\n"}, last=>""),
-                         body=>'{=I{*}I=}',
-                         length=>5,
-                 )
+             footer=>\%(other=>sub (@< @_){"../".(@_[0]->{page}->{number}+1)},
+             last=>"THE\nEND"
+             ),
+             feed=>\%(other=>sub (@< @_){".\n.\n.\n"}, last=>""),
+             body=>'{=I{*}I=}',
+             length=>5,
+             )
              ),
              "= [\{[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]\}]",
              \@( ~< $^DATA),

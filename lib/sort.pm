@@ -1,73 +1,73 @@
-package sort;
+package sort
 
-our $VERSION = '2.01';
+our $VERSION = '2.01'
 
 # The hints for pp_sort are now stored in $^H{sort}; older versions
 # of perl used the global variable $sort::hints. -- rjh 2005-12-19
 
-$sort::quicksort_bit   = 0x00000001;
-$sort::mergesort_bit   = 0x00000002;
-$sort::sort_bits       = 0x000000FF; # allow 256 different ones
-$sort::stable_bit      = 0x00000100;
+$sort::quicksort_bit   = 0x00000001
+$sort::mergesort_bit   = 0x00000002
+$sort::sort_bits       = 0x000000FF # allow 256 different ones
+$sort::stable_bit      = 0x00000100
 
 
-sub import {
-    shift;
-    if ((nelems @_) == 0) {
-        require Carp;
-        Carp::croak("sort pragma requires arguments");
-    }
-    local $_ = undef;
-    $^HINTS{+sort} //= 0;
-    while ($_ = shift(@_)) {
-        if (m/^_q(?:uick)?sort$/) {
-            $^HINTS{+sort} ^&^= ^~^$sort::sort_bits;
-            $^HINTS{+sort} ^|^=  $sort::quicksort_bit;
-        } elsif ($_ eq '_mergesort') {
-            $^HINTS{+sort} ^&^= ^~^$sort::sort_bits;
-            $^HINTS{+sort} ^|^=  $sort::mergesort_bit;
-        } elsif ($_ eq 'stable') {
-            $^HINTS{+sort} ^|^=  $sort::stable_bit;
-        } elsif ($_ eq 'defaults') {
-            $^HINTS{+sort} =   0;
-        } else {
-            die("sort: unknown subpragma '$_'");
-        }
-    }
-}
+sub import
+    shift
+    if ((nelems @_) == 0)
+        require Carp
+        Carp::croak("sort pragma requires arguments")
+    
+    local $_ = undef
+    $^HINTS{+sort} //= 0
+    while ($_ = shift(@_))
+        if (m/^_q(?:uick)?sort$/)
+            $^HINTS{+sort} ^&^= ^~^$sort::sort_bits
+            $^HINTS{+sort} ^|^=  $sort::quicksort_bit
+        elsif ($_ eq '_mergesort')
+            $^HINTS{+sort} ^&^= ^~^$sort::sort_bits
+            $^HINTS{+sort} ^|^=  $sort::mergesort_bit
+        elsif ($_ eq 'stable')
+            $^HINTS{+sort} ^|^=  $sort::stable_bit
+        elsif ($_ eq 'defaults')
+            $^HINTS{+sort} =   0
+        else
+            die("sort: unknown subpragma '$_'")
+        
+    
 
-sub unimport {
-    shift;
-    if ((nelems @_) == 0) {
-        die("sort pragma requires arguments");
-    }
-    local $_ = undef;
+
+sub unimport
+    shift
+    if ((nelems @_) == 0)
+        die("sort pragma requires arguments")
+    
+    local $_ = undef
     no warnings 'uninitialized';	# bitops would warn
-    while ($_ = shift(@_)) {
-        if (m/^_q(?:uick)?sort$/) {
-            $^HINTS{+sort} ^&^= ^~^$sort::sort_bits;
-        } elsif ($_ eq '_mergesort') {
-            $^HINTS{+sort} ^&^= ^~^$sort::sort_bits;
-        } elsif ($_ eq 'stable') {
-            $^HINTS{+sort} ^&^= ^~^$sort::stable_bit;
-        } else {
-            die("sort: unknown subpragma '$_'");
-        }
-    }
-}
+    while ($_ = shift(@_))
+        if (m/^_q(?:uick)?sort$/)
+            $^HINTS{+sort} ^&^= ^~^$sort::sort_bits
+        elsif ($_ eq '_mergesort')
+            $^HINTS{+sort} ^&^= ^~^$sort::sort_bits
+        elsif ($_ eq 'stable')
+            $^HINTS{+sort} ^&^= ^~^$sort::stable_bit
+        else
+            die("sort: unknown subpragma '$_'")
+        
+    
 
-sub current {
-    my @sort;
-    if ($^HINTS{?sort}) {
-        push @sort, 'quicksort' if $^HINTS{?sort} ^&^ $sort::quicksort_bit;
-        push @sort, 'mergesort' if $^HINTS{?sort} ^&^ $sort::mergesort_bit;
-        push @sort, 'stable'    if $^HINTS{?sort} ^&^ $sort::stable_bit;
-    }
-    push @sort, 'mergesort' unless (nelems @sort);
-    join(' ', @sort);
-}
 
-1;
+sub current
+    my @sort
+    if ($^HINTS{?sort})
+        push @sort, 'quicksort' if $^HINTS{?sort} ^&^ $sort::quicksort_bit
+        push @sort, 'mergesort' if $^HINTS{?sort} ^&^ $sort::mergesort_bit
+        push @sort, 'stable'    if $^HINTS{?sort} ^&^ $sort::stable_bit
+    
+    push @sort, 'mergesort' unless (nelems @sort)
+    join(' ', @sort)
+
+
+1
 __END__
 
 =head1 NAME

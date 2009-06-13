@@ -1,4 +1,4 @@
-package Fcntl;
+package Fcntl
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ Fcntl - load the C Fcntl.h defines
 This module is just a translation of the C F<fcntl.h> file.
 Unlike the old mechanism of requiring a translated F<fcntl.ph>
 file, this uses the B<h2xs> program (see the Perl source distribution)
-and your native C compiler.  This means that it has a 
+and your native C compiler.  This means that it has a
 far more likely chance of getting the numbers right.
 
 =head1 NOTE
@@ -55,14 +55,14 @@ See L<perlfunc/stat> about the S_I* constants.
 
 =cut
 
-our($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
+our($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS)
 
-require Exporter;
+require Exporter
 use XSLoader ();
-@ISA = qw(Exporter);
-BEGIN {
-    $VERSION = "1.06";
-}
+@ISA = qw(Exporter)
+BEGIN 
+    $VERSION = "1.06"
+
 
 # Items to export into callers namespace by default
 # (move infrequently used names to @EXPORT_OK below)
@@ -136,7 +136,7 @@ BEGIN {
 	O_TEXT
 	O_TRUNC
 	O_WRONLY
-     );
+     )
 
 # Other items we are prepared to export if requested
 @EXPORT_OK = qw(
@@ -188,14 +188,14 @@ BEGIN {
 	_S_IFMT S_IFREG S_IFDIR S_IFLNK
 	&S_ISREG &S_ISDIR &S_ISLNK &S_ISSOCK &S_ISBLK &S_ISCHR &S_ISFIFO
 	&S_ISWHT &S_ISENFMT &S_IFMT &S_IMODE
-);
+)
 # Named groups of exports
 %EXPORT_TAGS = %(
-        'flock'   => qw(LOCK_SH LOCK_EX LOCK_NB LOCK_UN),
-            'Fcompat' => qw(FAPPEND FASYNC FCREAT FDEFER FDSYNC FEXCL FLARGEFILE
+    'flock'   => qw(LOCK_SH LOCK_EX LOCK_NB LOCK_UN),
+    'Fcompat' => qw(FAPPEND FASYNC FCREAT FDEFER FDSYNC FEXCL FLARGEFILE
 		     FNDELAY FNONBLOCK FRSYNC FSYNC FTRUNC),
-            'seek'    => qw(SEEK_SET SEEK_CUR SEEK_END),
-            'mode'    => qw(S_ISUID S_ISGID S_ISVTX S_ISTXT
+    'seek'    => qw(SEEK_SET SEEK_CUR SEEK_END),
+    'mode'    => qw(S_ISUID S_ISGID S_ISVTX S_ISTXT
 		     _S_IFMT S_IFREG S_IFDIR S_IFLNK
 		     S_IFSOCK S_IFBLK S_IFCHR S_IFIFO S_IFWHT S_ENFMT
 		     S_IRUSR S_IWUSR S_IXUSR S_IRWXU
@@ -207,12 +207,12 @@ BEGIN {
 		     S_ISWHT S_ISENFMT		
 		     S_IFMT S_IMODE
                   ),
-    );
+    )
 
 # Force the constants to become inlined
-BEGIN {
-    XSLoader::load 'Fcntl', $VERSION;
-}
+BEGIN 
+    XSLoader::load 'Fcntl', $VERSION
+
 
 sub S_IFMT  { (nelems @_) ??  @( @_[0] ^&^ _S_IFMT() ) !! _S_IFMT()  }
 sub S_IMODE { @_[0] ^&^ 07777 }
@@ -227,4 +227,4 @@ sub S_ISFIFO   { ( @_[0] ^&^ _S_IFMT() ) == S_IFIFO()   }
 sub S_ISWHT    { ( @_[0] ^&^ _S_IFMT() ) == S_IFWHT()   }
 sub S_ISENFMT  { ( @_[0] ^&^ _S_IFMT() ) == S_IFENFMT() }
 
-1;
+1

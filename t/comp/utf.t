@@ -4,12 +4,12 @@ use Config;
 
 BEGIN {
     unless ('PerlIO::Layer'->find('perlio')) {
-	print $^STDOUT, "1..0 # Skip: not perlio\n";
-	exit 0;
+        print $^STDOUT, "1..0 # Skip: not perlio\n";
+        exit 0;
     }
     if (env::var('PERL_CORE_MINITEST')) {
-	print $^STDOUT, "1..0 # Skip: no dynamic loading on miniperl, no threads\n";
-	exit 0;
+        print $^STDOUT, "1..0 # Skip: no dynamic loading on miniperl, no threads\n";
+        exit 0;
     }
     if (config_value('extensions') !~ m/\bEncode\b/) {
       print $^STDOUT, "1..0 # Skip: Encode was not built\n";
@@ -28,7 +28,7 @@ sub test {
   SKIP: {
     skip "Only utf8 support", 1 if $enc ne "utf8" or $bom;
     open(UTF_PL, ">:raw:encoding($enc)", "utf.pl")
-	or die "utf.pl($enc,$tag,$bom): $!";
+        or die "utf.pl($enc,$tag,$bom): $!";
     print UTF_PL $BOM if $bom;
     print UTF_PL "$tag\n";
     print UTF_PL $BOM if $bom;

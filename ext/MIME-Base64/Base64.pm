@@ -1,22 +1,22 @@
-package MIME::Base64;
+package MIME::Base64
 
 # $Id: Base64.pm,v 3.11 2005/11/29 20:59:55 gisle Exp $
 
-our (@ISA, @EXPORT, $VERSION);
+our (@ISA, @EXPORT, $VERSION)
 
-require Exporter;
-@ISA = qw(Exporter);
-@EXPORT = qw(encode_base64 decode_base64);
+require Exporter
+@ISA = qw(Exporter)
+@EXPORT = qw(encode_base64 decode_base64)
 
-$VERSION = '3.07_01';
+$VERSION = '3.07_01'
 
-require XSLoader;
-XSLoader::load('MIME::Base64', $VERSION);
+require XSLoader
+XSLoader::load('MIME::Base64', $VERSION)
 
-*encode = \&encode_base64;
-*decode = \&decode_base64;
+*encode = \&encode_base64
+*decode = \&decode_base64
 
-1;
+1
 
 __END__
 

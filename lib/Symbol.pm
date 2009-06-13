@@ -1,4 +1,4 @@
-package Symbol;
+package Symbol
 
 =head1 NAME
 
@@ -92,87 +92,86 @@ you reload the C<Foo> module afterwards.
 =cut
 
 
-require Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT = qw(gensym ungensym qualify qualify_to_ref);
-our @EXPORT_OK = qw(delete_package geniosym);
+require Exporter
+our @ISA = qw(Exporter)
+our @EXPORT = qw(gensym ungensym qualify qualify_to_ref)
+our @EXPORT_OK = qw(delete_package geniosym)
 
-our $VERSION = '1.06';
+our $VERSION = '1.06'
 
-my $genpkg = "Symbol";
-my $genseq = 0;
+my $genpkg = "Symbol"
+my $genseq = 0
 
-my %global = %+: map { %: $_ => 1 }, qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT) ;
+my %global = %+: map { %: $_ => 1 }, qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT) 
 
 #
 # Note that we never _copy_ the glob; we just make a ref to it.
 # If we did copy it, then SVf_FAKE would be set on the copy, and
 # glob-specific behaviors (e.g. C<*$ref = \&func>) wouldn't work.
 #
-sub gensym () {
-    my $name = "GEN" . $genseq++;
-    my $ref = \Symbol::qualify_to_ref($genpkg . "::" . $name)->*;
-    $ref = \Symbol::qualify_to_ref($genpkg . "::" . $name)->*;  # second time to supress only-used once warning.
-    delete Symbol::stash($genpkg)->{$name};
-    $ref;
-}
+sub gensym ()
+    my $name = "GEN" . $genseq++
+    my $ref = \Symbol::qualify_to_ref($genpkg . "::" . $name)->*
+    $ref = \Symbol::qualify_to_ref($genpkg . "::" . $name)->*  # second time to supress only-used once warning.
+    delete Symbol::stash($genpkg)->{$name}
+    $ref
 
-sub geniosym () {
-    my $sym = gensym();
+
+sub geniosym ()
+    my $sym = gensym()
     # force the IO slot to be filled
-    open $sym;
-        $sym->*{IO};
-}
+    open $sym
+    $sym->*{IO}
+
 
 sub ungensym(_) {}
 
-sub qualify($name, ? $pkg) {
-    ref \$name eq "GLOB" and Carp::confess("glob..." . ref $name);
-    if (!ref($name) && index($name, '::') == -1 && index($name, "'") == -1) {
-        # Global names: special character, "^xyz", or other. 
-        if ($name =~ m/^(([^a-z])|(\^[a-z_]+))\z/i || %global{?$name}) {
-            $pkg = "";
-        }
-        else {
-            $pkg //= caller;
-        }
-        $name = $pkg . "::" . $name;
-    }
-    $name;
-}
+sub qualify($name, ? $pkg)
+    ref \$name eq "GLOB" and Carp::confess("glob..." . ref $name)
+    if (!ref($name) && index($name, '::') == -1 && index($name, "'") == -1)
+        # Global names: special character, "^xyz", or other.
+        if ($name =~ m/^(([^a-z])|(\^[a-z_]+))\z/i || %global{?$name})
+            $pkg = ""
+        else
+            $pkg //= caller
+        
+        $name = $pkg . "::" . $name
+    
+    $name
 
-sub qualify_to_ref($name, ?$package) {
-    return \ Symbol::fetch_glob( qualify $name, (defined $package) ?? $package !! scalar(caller) )->*;
-}
+
+sub qualify_to_ref($name, ?$package)
+    return \ Symbol::fetch_glob( qualify $name, (defined $package) ?? $package !! scalar(caller) )->*
+
 
 #
 # of Safe.pm lineage
 #
-sub delete_package($pkg) {
+sub delete_package($pkg)
 
     # expand to full symbol table name if needed
 
-    unless ($pkg =~ m/^main::.*::$/) {
-        $pkg = "main$pkg"	if	$pkg =~ m/^::/;
-        $pkg .= '::'		unless	$pkg =~ m/::$/;
-    }
+    unless ($pkg =~ m/^main::.*::$/)
+        $pkg = "main$pkg"       if      $pkg =~ m/^::/
+        $pkg .= '::'            unless  $pkg =~ m/::$/
+    
 
-    my@($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/;
-    my $stem_symtab = Symbol::stash($stem);
-    return unless defined $stem_symtab and exists $stem_symtab->{$leaf};
+    my@($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/
+    my $stem_symtab = Symbol::stash($stem)
+    return unless defined $stem_symtab and exists $stem_symtab->{$leaf}
 
 
     # free all the symbols in the package
 
-    my $leaf_symtab = $stem_symtab->{?$leaf}->{HASH};
-    foreach my $name (keys $leaf_symtab->%) {
-        undef Symbol::qualify_to_ref($pkg . $name)->*;
-    }
+    my $leaf_symtab = $stem_symtab->{?$leaf}->{HASH}
+    foreach my $name (keys $leaf_symtab->%)
+        undef Symbol::qualify_to_ref($pkg . $name)->*
+    
 
     # delete the symbol table
 
-    $leaf_symtab->% = %( () );
-    delete $stem_symtab->{$leaf};
-}
+    $leaf_symtab->% = %( () )
+    delete $stem_symtab->{$leaf}
 
-1;
+
+1

@@ -76,133 +76,133 @@ requested perl versions.
 
 =cut
 
-use Module::CoreList;
-use Getopt::Long;
-use Pod::Usage;
+use Module::CoreList
+use Getopt::Long
+use Pod::Usage
 
-use warnings;
+use warnings
 
-my %Opts;
+my %Opts
 
-GetOptions(\%Opts, < qw[ help|?! man! v|version:f a! d ] );
+GetOptions(\%Opts, < qw[ help|?! man! v|version:f a! d ] )
 
-pod2usage(1) if %Opts{?help};
-pod2usage(-verbose=>2) if %Opts{?man};
+pod2usage(1) if %Opts{?help}
+pod2usage(-verbose=>2) if %Opts{?man}
 
-if(exists %Opts{v} ){
-    if( !%Opts{?v} ) {
-        print $^STDOUT, "\nModule::CoreList has info on the following perl versions:\n";
-        print $^STDOUT, "$_\n" for sort keys %Module::CoreList::version;
-        print $^STDOUT, "\n";
-        exit 0;
-    }
+if(exists %Opts{v} )
+    if( !%Opts{?v} )
+        print $^STDOUT, "\nModule::CoreList has info on the following perl versions:\n"
+        print $^STDOUT, "$_\n" for sort keys %Module::CoreList::version
+        print $^STDOUT, "\n"
+        exit 0
+    
 
-    %Opts{+v} = numify_version( %Opts{?v} );
-    my $version_hash = Module::CoreList->find_version(%Opts{v});
-    if( !$version_hash ) {
-        print $^STDOUT, "\nModule::CoreList has no info on perl v%Opts{?v}\n\n";
-        exit 1;
-    }
+    %Opts{+v} = numify_version( %Opts{?v} )
+    my $version_hash = Module::CoreList->find_version(%Opts{v})
+    if( !$version_hash )
+        print $^STDOUT, "\nModule::CoreList has no info on perl v%Opts{?v}\n\n"
+        exit 1
+    
 
-    if ( !nelems @ARGV ) {
-        print $^STDOUT, "\nThe following modules were in perl v%Opts{?v} CORE\n";
+    if ( !nelems @ARGV )
+        print $^STDOUT, "\nThe following modules were in perl v%Opts{?v} CORE\n"
         print $^STDOUT, "$_ ", $version_hash->{?$_} || " ","\n"
-            for sort keys $version_hash->%;
-        print $^STDOUT, "\n";
-        exit 0;
-    }
-}
+            for sort keys $version_hash->%
+        print $^STDOUT, "\n"
+        exit 0
+    
 
-if ( !nelems @ARGV ) {
-    pod2usage(0);
-}
 
-while ((nelems @ARGV)) {
-    my ($mod, $ver);
-    if (@ARGV[0] =~ m/=/) {
-        @($mod, $ver) =  split m/=/, shift @ARGV;
-    } else {
-        $mod = shift @ARGV;
-        $ver = ((nelems @ARGV) && @ARGV[0] =~ m/^\d/) ?? shift @ARGV !! "";
-    }
+if ( !nelems @ARGV )
+    pod2usage(0)
 
-    if ($mod !~ m|^/(.*)/([imosx]*)$|) { # not a regex
-        module_version($mod,$ver);
-    } else {
-        my $re;
-        try { $re = $2 ?? qr/(?$2)($1)/ !! qr/$1/; }; # trap exceptions while building regex
-        if ($^EVAL_ERROR) {
+
+while ((nelems @ARGV))
+    my ($mod, $ver)
+    if (@ARGV[0] =~ m/=/)
+        @($mod, $ver) =  split m/=/, shift @ARGV
+    else
+        $mod = shift @ARGV
+        $ver = ((nelems @ARGV) && @ARGV[0] =~ m/^\d/) ?? shift @ARGV !! ""
+    
+
+    if ($mod !~ m|^/(.*)/([imosx]*)$|) # not a regex
+        module_version($mod,$ver)
+    else
+        my $re
+        try { $re = $2 ?? qr/(?$2)($1)/ !! qr/$1/; } # trap exceptions while building regex
+        if ($^EVAL_ERROR)
             # regex errors are usually like 'Quantifier follow nothing in regex; marked by ...'
             # then we drop text after ';' to shorten message
-            my $errmsg = $^EVAL_ERROR->{?description} =~ m/(.*);/ ?? $1 !! $^EVAL_ERROR;
-            warn "\n$mod  is a bad regex: $errmsg\n";
-            next;
-        }
-        my @mod = Module::CoreList->find_modules($re);
-        if ((nelems @mod)) {
-            module_version($_, $ver) for  @mod;
-        } else {
-            $ver ^|^= '';
-            print $^STDOUT, "\n$mod $ver has no match in CORE (or so I think)\n";
-        }
+            my $errmsg = $^EVAL_ERROR->{?description} =~ m/(.*);/ ?? $1 !! $^EVAL_ERROR
+            warn "\n$mod  is a bad regex: $errmsg\n"
+            next
+        
+        my @mod = Module::CoreList->find_modules($re)
+        if ((nelems @mod))
+            module_version($_, $ver) for  @mod
+        else
+            $ver ^|^= ''
+            print $^STDOUT, "\n$mod $ver has no match in CORE (or so I think)\n"
+        
 
-    }
-}
+    
 
-exit();
 
-sub module_version {
-    my@($mod,$ver) =  @_;
+exit()
 
-    if ( %Opts{?v} ) {
-        my $version_hash = Module::CoreList->find_version(%Opts{v});
-        if ($version_hash) {
-            print $^STDOUT, $mod, " ", $version_hash->{?$mod} || 'undef', "\n";
-            return;
-        }
+sub module_version
+    my@($mod,$ver) =  @_
+
+    if ( %Opts{?v} )
+        my $version_hash = Module::CoreList->find_version(%Opts{v})
+        if ($version_hash)
+            print $^STDOUT, $mod, " ", $version_hash->{?$mod} || 'undef', "\n"
+            return
+        
         else { die "Shouldn't happen" }
-    }
+    
 
     my $ret = %Opts{?d}
         ?? Module::CoreList->first_release_by_date(< @_)
-        !! Module::CoreList->first_release(< @_);
-    my $msg = $mod;
-    $msg .= " $ver" if $ver;
+        !! Module::CoreList->first_release(< @_)
+    my $msg = $mod
+    $msg .= " $ver" if $ver
 
-    if( defined $ret ) {
-        $msg .= " was ";
-        $msg .= "first " unless $ver;
+    if( defined $ret )
+        $msg .= " was "
+        $msg .= "first " unless $ver
         $msg .= "released with perl $ret"
-    } else {
-        $msg .= " was not in CORE (or so I think)";
-    }
+    else
+        $msg .= " was not in CORE (or so I think)"
+    
 
-    print $^STDOUT, "\n",$msg,"\n";
+    print $^STDOUT, "\n",$msg,"\n"
 
-    if(defined $ret and exists %Opts{a} and %Opts{?a}){
+    if(defined $ret and exists %Opts{a} and %Opts{?a})
         for my $v(
-        sort keys %Module::CoreList::version ){
+            sort keys %Module::CoreList::version )
 
-                printf $^STDOUT, "  \%-10s \%-10s\n",
-                    $v,
-                    %Module::CoreList::version{$v}->{?$mod}
-                    || 'undef'
-                    if exists %Module::CoreList::version{$v}->{$mod};
-            }
-        print $^STDOUT, "\n";
-    }
-}
+            printf $^STDOUT, "  \%-10s \%-10s\n",
+                $v,
+                %Module::CoreList::version{$v}->{?$mod}
+                || 'undef'
+                if exists %Module::CoreList::version{$v}->{$mod}
+        
+        print $^STDOUT, "\n"
+    
 
-sub numify_version {
-    my $ver = shift;
-    if ($ver =~ m/\..+\./) {
+
+sub numify_version
+    my $ver = shift
+    if ($ver =~ m/\..+\./)
         try { require version ; 1 }
-        or die "You need to install version.pm to use dotted version numbers\n";
-        $ver = version->new($ver)->numify;
-    }
-    $ver += 0;
-    return $ver;
-}
+            or die "You need to install version.pm to use dotted version numbers\n"
+        $ver = version->new($ver)->numify
+    
+    $ver += 0
+    return $ver
+
 
 =head1 EXAMPLES
 

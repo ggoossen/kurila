@@ -14,51 +14,51 @@
 # Modules and declarations
 ##############################################################################
 
-package Term::ANSIColor;
+package Term::ANSIColor
 
 our ($AUTORESET, $EACHLINE, @ISA, @EXPORT, @EXPORT_OK
-    ,            %EXPORT_TAGS, $VERSION, %attributes, %attributes_r);
+    ,            %EXPORT_TAGS, $VERSION, %attributes, %attributes_r)
 
-use Exporter ();
-@ISA         = qw(Exporter);
-@EXPORT      = qw(color colored);
-@EXPORT_OK   = qw(uncolor);
+use Exporter ()
+@ISA         = qw(Exporter)
+@EXPORT      = qw(color colored)
+@EXPORT_OK   = qw(uncolor)
 %EXPORT_TAGS = %(constants => qw(CLEAR RESET BOLD DARK UNDERLINE UNDERSCORE
                                  BLINK REVERSE CONCEALED BLACK RED GREEN
                                  YELLOW BLUE MAGENTA CYAN WHITE ON_BLACK
                                  ON_RED ON_GREEN ON_YELLOW ON_BLUE ON_MAGENTA
-                                 ON_CYAN ON_WHITE));
-Exporter::export_ok_tags ('constants');
+                                 ON_CYAN ON_WHITE))
+Exporter::export_ok_tags ('constants')
 
-$VERSION = '1.12';
+$VERSION = '1.12'
 
 ##############################################################################
 # Internal data structures
 ##############################################################################
 
 %attributes = %('clear'      => 0,
-        'reset'      => 0,
-            'bold'       => 1,
-            'dark'       => 2,
-            'underline'  => 4,
-            'underscore' => 4,
-            'blink'      => 5,
-            'reverse'    => 7,
-            'concealed'  => 8,
+    'reset'      => 0,
+    'bold'       => 1,
+    'dark'       => 2,
+    'underline'  => 4,
+    'underscore' => 4,
+    'blink'      => 5,
+    'reverse'    => 7,
+    'concealed'  => 8,
 
-            'black'      => 30,   'on_black'   => 40,
-            'red'        => 31,   'on_red'     => 41,
-            'green'      => 32,   'on_green'   => 42,
-            'yellow'     => 33,   'on_yellow'  => 43,
-            'blue'       => 34,   'on_blue'    => 44,
-            'magenta'    => 35,   'on_magenta' => 45,
-            'cyan'       => 36,   'on_cyan'    => 46,
-            'white'      => 37,   'on_white'   => 47);
+    'black'      => 30,   'on_black'   => 40,
+    'red'        => 31,   'on_red'     => 41,
+    'green'      => 32,   'on_green'   => 42,
+    'yellow'     => 33,   'on_yellow'  => 43,
+    'blue'       => 34,   'on_blue'    => 44,
+    'magenta'    => 35,   'on_magenta' => 45,
+    'cyan'       => 36,   'on_cyan'    => 46,
+    'white'      => 37,   'on_white'   => 47)
 
 # Reverse lookup.  Alphabetically first name for a sequence is preferred.
-for (reverse sort keys %attributes) {
-    %attributes_r{+%attributes{?$_}} = $_;
-}
+for (reverse sort keys %attributes)
+    %attributes_r{+%attributes{?$_}} = $_
+
 
 ##############################################################################
 # Implementation (constant form)
@@ -86,66 +86,66 @@ for (reverse sort keys %attributes) {
 # generated subs into pass-through functions that don't add any escape
 # sequences.  This is to make it easier to write scripts that also work on
 # systems without any ANSI support, like Windows consoles.
-for my $attr (keys %attributes) {
-    my $enable_colors = !defined env::var('ANSI_COLORS_DISABLED');
+for my $attr (keys %attributes)
+    my $enable_colors = !defined env::var('ANSI_COLORS_DISABLED')
     Symbol::fetch_glob(uc $attr)->* =
-        sub {
-            my $xattr = $enable_colors ?? "\e[" . $attr . 'm' !! '';
-            if (\$AUTORESET && \@_) {
-                '$xattr' . "\@_" . "\e[0m";
-            } else {
-                ('$xattr' . "\@_");
-            }
-        };
-}
+        sub (@< @_)
+        my $xattr = $enable_colors ?? "\e[" . $attr . 'm' !! ''
+        if (\$AUTORESET && \@_)
+            '$xattr' . "\@_" . "\e[0m"
+        else
+            ('$xattr' . "\@_")
+        
+    
+
 
 ##############################################################################
 # Implementation (attribute string form)
 ##############################################################################
 
 # Return the escape code for a given set of color attributes.
-sub color {
-    return '' if defined env::var('ANSI_COLORS_DISABLED');
-    my @codes = @+: map { split }, @_;
-    my $attribute = '';
-    foreach ( @codes) {
-        $_ = lc $_;
-        unless (defined %attributes{?$_}) {
-            require Carp;
-            Carp::croak ("Invalid attribute name $_");
-        }
-        $attribute .= %attributes{?$_} . ';';
-    }
-    chop $attribute;
-    ($attribute ne '') ?? "\e[$($attribute)m" !! undef;
-}
+sub color
+    return '' if defined env::var('ANSI_COLORS_DISABLED')
+    my @codes = @+: map { split }, @_
+    my $attribute = ''
+    foreach ( @codes)
+        $_ = lc $_
+        unless (defined %attributes{?$_})
+            require Carp
+            Carp::croak ("Invalid attribute name $_")
+        
+        $attribute .= %attributes{?$_} . ';'
+    
+    chop $attribute
+    ($attribute ne '') ?? "\e[$($attribute)m" !! undef
+
 
 # Return a list of named color attributes for a given set of escape codes.
 # Escape sequences can be given with or without enclosing "\e[" and "m".  The
 # empty escape sequence '' or "\e[m" gives an empty list of attrs.
-sub uncolor {
-    my (@nums, @result);
-    for ( @_) {
-        my $escape = $_;
-        $escape =~ s/^\e\[//;
-        $escape =~ s/m$//;
-        unless ($escape =~ m/^((?:\d+;)*\d*)$/) {
-            require Carp;
-            Carp::croak ("Bad escape sequence $_");
-        }
-        push (@nums, < split (m/;/, $1));
-    }
-    for ( @nums) {
-        $_ += 0; # Strip leading zeroes
-        my $name = %attributes_r{?$_};
-        if (!defined $name) {
-            require Carp;
-            Carp::croak ("No name for escape sequence $_" );
-        }
-        push (@result, $name);
-    }
-    @result;
-}
+sub uncolor
+    my (@nums, @result)
+    for ( @_)
+        my $escape = $_
+        $escape =~ s/^\e\[//
+        $escape =~ s/m$//
+        unless ($escape =~ m/^((?:\d+;)*\d*)$/)
+            require Carp
+            Carp::croak ("Bad escape sequence $_")
+        
+        push (@nums, < split (m/;/, $1))
+    
+    for ( @nums)
+        $_ += 0 # Strip leading zeroes
+        my $name = %attributes_r{?$_}
+        if (!defined $name)
+            require Carp
+            Carp::croak ("No name for escape sequence $_" )
+        
+        push (@result, $name)
+    
+    @result
+
 
 # Given a string and a set of attributes, returns the string surrounded by
 # escape codes to set those attributes and then clear them at the end of the
@@ -155,32 +155,32 @@ sub uncolor {
 # the starting attribute code after the string $EACHLINE, so that no attribute
 # crosses line delimiters (this is often desirable if the output is to be
 # piped to a pager or some other program).
-sub colored {
-    my ($string, @codes);
-    if (ref @_[0]) {
-        @codes = $:(shift @_)->@;
-        $string = join ('', @_);
-    } else {
-        $string = shift;
-        @codes = @_;
-    }
-    return $string if defined env::var('ANSI_COLORS_DISABLED');
-    if (defined $EACHLINE) {
-        my $attr = color (< @codes);
+sub colored
+    my ($string, @codes)
+    if (ref @_[0])
+        @codes = $:(shift @_)->@
+        $string = join ('', @_)
+    else
+        $string = shift
+        @codes = @_
+    
+    return $string if defined env::var('ANSI_COLORS_DISABLED')
+    if (defined $EACHLINE)
+        my $attr = color (< @codes)
         join '', map { $_ ne $EACHLINE ?? $attr . $_ . "\e[0m" !! $_ },
             grep { length ($_) +> 0 },
-            split (m/(\Q$EACHLINE\E)/, $string);
-    } else {
-        color (< @codes) . $string . "\e[0m";
-    }
-}
+            split (m/(\Q$EACHLINE\E)/, $string)
+    else
+        color (< @codes) . $string . "\e[0m"
+    
+
 
 ##############################################################################
 # Module return value and documentation
 ##############################################################################
 
 # Ensure we evaluate to true.
-1;
+1
 __END__
 
 =head1 NAME

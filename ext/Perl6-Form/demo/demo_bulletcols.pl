@@ -1,23 +1,23 @@
-use Perl6::Form;
+use Perl6::Form
 
-my $bullet = "<>";
+my $bullet = "<>"
 
-my @items = @( ~< $^DATA );
-s/\\n/\n/g for  @items;
-s/\\r/\r/g for  @items;
+my @items = @( ~< $^DATA )
+s/\\n/\n/g for  @items
+s/\\r/\r/g for  @items
 
 print $^STDOUT, < form
  \%(bullet=>'<>'),
  "<> \{:[[[[[[[[[[[[[[[[[[:\}    <> \{:[[[[[[[[[[[[[[[[[[:\}",
- \@items,                     \@items;
+ \@items,                     \@items
 
-my $items = join "", @items;
+my $items = join "", @items
 
 print $^STDOUT, < form
   "-----------------------",
   \%(bullet=>'<>'),
   "<> \{:[[[[[[[[[[[[[[[[[[:\}    <> \{:[[[[[[[[[[[[[[[[[[:\}",
-  $items,                      $items;
+  $items,                      $items
 
 __DATA__
 A rubber sword, laminated with mylar to look suitably shiny.

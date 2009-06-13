@@ -74,7 +74,7 @@ that matches C<m/\A=cut/> -- or up to the end of the file, if there is
 no C<m/\A=cut/> line.
 
 =for comment
- The current perlsyn says:
+ The current kurilasyn says:
  [beginquote]
    Note that pod translators should look at only paragraphs beginning
    with a pod directive (it makes parsing easier), whereas the compiler
@@ -1887,7 +1887,7 @@ parameter.
 
 =head1 SEE ALSO
 
-L<perlpod>, L<perlsyn/"PODs: Embedded Documentation">,
+L<perlpod>, L<kurilasyn/"PODs: Embedded Documentation">,
 L<podchecker>
 
 =head1 AUTHOR

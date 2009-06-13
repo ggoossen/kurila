@@ -4,17 +4,17 @@
 # Any changes made here will be lost.
 #
 
-package warnings;
+package warnings
 
-our $VERSION = '1.06';
+our $VERSION = '1.06'
 
 # Verify that we're called correctly so that warnings will work.
 # see also strict.pm.
-my $pkg = __PACKAGE__;
-unless ( __FILE__ =~ m/(^|[\/\\])\Q$pkg\E\.pmc?$/ ) {
-    my @(_, $f, $l) = @: caller;
-    die("Incorrect use of pragma '$(__PACKAGE__)' at $f line $l.\n");
-}
+my $pkg = __PACKAGE__
+unless ( __FILE__ =~ m/(^|[\/\\])\Q$pkg\E\.pmc?$/ )
+    my @(_, $f, $l) = @: caller
+    die("Incorrect use of pragma '$(__PACKAGE__)' at $f line $l.\n")
+
 
 =head1 NAME
 
@@ -141,355 +141,341 @@ See L<perlmodlib/Pragmatic Modules> and L<perllexwarn>.
 
 our %Offsets = %(
 
-        # Warnings Categories added in Perl 5.008
+    # Warnings Categories added in Perl 5.008
 
-        'all'		=> 0,
-            'closure'		=> 2,
-            'deprecated'	=> 4,
-            'exiting'		=> 6,
-            'glob'		=> 8,
-            'io'		=> 10,
-            'closed'		=> 12,
-            'exec'		=> 14,
-            'layer'		=> 16,
-            'newline'		=> 18,
-            'pipe'		=> 20,
-            'unopened'		=> 22,
-            'misc'		=> 24,
-            'numeric'		=> 26,
-            'once'		=> 28,
-            'overflow'		=> 30,
-            'pack'		=> 32,
-            'portable'		=> 34,
-            'recursion'		=> 36,
-            'redefine'		=> 38,
-            'regexp'		=> 40,
-            'severe'		=> 42,
-            'debugging'		=> 44,
-            'inplace'		=> 46,
-            'internal'		=> 48,
-            'malloc'		=> 50,
-            'signal'		=> 52,
-            'substr'		=> 54,
-            'syntax'		=> 56,
-            'ambiguous'		=> 58,
-            'bareword'		=> 60,
-            'digit'		=> 62,
-            'parenthesis'	=> 64,
-            'precedence'	=> 66,
-            'printf'		=> 68,
-            'prototype'		=> 70,
-            'qw'		=> 72,
-            'reserved'		=> 74,
-            'semicolon'		=> 76,
-            'taint'		=> 78,
-            'threads'		=> 80,
-            'uninitialized'	=> 82,
-            'unpack'		=> 84,
-            'untie'		=> 86,
-            'utf8'		=> 88,
-            'void'		=> 90,
+    'all'               => 0,
+    'closure'           => 2,
+    'deprecated'        => 4,
+    'exiting'           => 6,
+    'glob'              => 8,
+    'io'                => 10,
+    'closed'            => 12,
+    'exec'              => 14,
+    'layer'             => 16,
+    'newline'           => 18,
+    'pipe'              => 20,
+    'unopened'          => 22,
+    'misc'              => 24,
+    'numeric'           => 26,
+    'once'              => 28,
+    'overflow'          => 30,
+    'pack'              => 32,
+    'portable'          => 34,
+    'recursion'         => 36,
+    'redefine'          => 38,
+    'regexp'            => 40,
+    'severe'            => 42,
+    'debugging'         => 44,
+    'inplace'           => 46,
+    'internal'          => 48,
+    'malloc'            => 50,
+    'signal'            => 52,
+    'substr'            => 54,
+    'syntax'            => 56,
+    'ambiguous'         => 58,
+    'bareword'          => 60,
+    'digit'             => 62,
+    'parenthesis'       => 64,
+    'precedence'        => 66,
+    'printf'            => 68,
+    'prototype'         => 70,
+    'qw'                => 72,
+    'reserved'          => 74,
+    'semicolon'         => 76,
+    'taint'             => 78,
+    'threads'           => 80,
+    'uninitialized'     => 82,
+    'unpack'            => 84,
+    'untie'             => 86,
+    'utf8'              => 88,
+    'void'              => 90,
 
-            # Warnings Categories added in Perl 5.011
+    # Warnings Categories added in Perl 5.011
 
-            'imprecision'	=> 92,
-    );
+    'imprecision'       => 92,
+    )
 
 our %Bits = %(
-        'all'		=> "\x[555555555555555555555515]", # [0..46]
-            'ambiguous'		=> "\x[000000000000000400000000]", # [29]
-            'bareword'		=> "\x[000000000000001000000000]", # [30]
-            'closed'		=> "\x[001000000000000000000000]", # [6]
-            'closure'		=> "\x[040000000000000000000000]", # [1]
-            'debugging'		=> "\x[000000000010000000000000]", # [22]
-            'deprecated'	=> "\x[100000000000000000000000]", # [2]
-            'digit'		=> "\x[000000000000004000000000]", # [31]
-            'exec'		=> "\x[004000000000000000000000]", # [7]
-            'exiting'		=> "\x[400000000000000000000000]", # [3]
-            'glob'		=> "\x[000100000000000000000000]", # [4]
-            'imprecision'	=> "\x[000000000000000000000010]", # [46]
-            'inplace'		=> "\x[000000000040000000000000]", # [23]
-            'internal'		=> "\x[000000000000010000000000]", # [24]
-            'io'		=> "\x[005455000000000000000000]", # [5..11]
-            'layer'		=> "\x[000001000000000000000000]", # [8]
-            'malloc'		=> "\x[000000000000040000000000]", # [25]
-            'misc'		=> "\x[000000010000000000000000]", # [12]
-            'newline'		=> "\x[000004000000000000000000]", # [9]
-            'numeric'		=> "\x[000000040000000000000000]", # [13]
-            'once'		=> "\x[000000100000000000000000]", # [14]
-            'overflow'		=> "\x[000000400000000000000000]", # [15]
-            'pack'		=> "\x[000000000100000000000000]", # [16]
-            'parenthesis'	=> "\x[000000000000000001000000]", # [32]
-            'pipe'		=> "\x[000010000000000000000000]", # [10]
-            'portable'		=> "\x[000000000400000000000000]", # [17]
-            'precedence'	=> "\x[000000000000000004000000]", # [33]
-            'printf'		=> "\x[000000000000000010000000]", # [34]
-            'prototype'		=> "\x[000000000000000040000000]", # [35]
-            'qw'		=> "\x[000000000000000000010000]", # [36]
-            'recursion'		=> "\x[000000001000000000000000]", # [18]
-            'redefine'		=> "\x[000000004000000000000000]", # [19]
-            'regexp'		=> "\x[000000000001000000000000]", # [20]
-            'reserved'		=> "\x[000000000000000000040000]", # [37]
-            'semicolon'		=> "\x[000000000000000000100000]", # [38]
-            'severe'		=> "\x[000000000054050000000000]", # [21..25]
-            'signal'		=> "\x[000000000000100000000000]", # [26]
-            'substr'		=> "\x[000000000000400000000000]", # [27]
-            'syntax'		=> "\x[000000000000005555150000]", # [28..38]
-            'taint'		=> "\x[000000000000000000400000]", # [39]
-            'threads'		=> "\x[000000000000000000000100]", # [40]
-            'uninitialized'	=> "\x[000000000000000000000400]", # [41]
-            'unopened'		=> "\x[000040000000000000000000]", # [11]
-            'unpack'		=> "\x[000000000000000000001000]", # [42]
-            'untie'		=> "\x[000000000000000000004000]", # [43]
-            'utf8'		=> "\x[000000000000000000000001]", # [44]
-            'void'		=> "\x[000000000000000000000004]", # [45]
-    );
+    'all'               => "\x[555555555555555555555515]", # [0..46]
+    'ambiguous'         => "\x[000000000000000400000000]", # [29]
+    'bareword'          => "\x[000000000000001000000000]", # [30]
+    'closed'            => "\x[001000000000000000000000]", # [6]
+    'closure'           => "\x[040000000000000000000000]", # [1]
+    'debugging'         => "\x[000000000010000000000000]", # [22]
+    'deprecated'        => "\x[100000000000000000000000]", # [2]
+    'digit'             => "\x[000000000000004000000000]", # [31]
+    'exec'              => "\x[004000000000000000000000]", # [7]
+    'exiting'           => "\x[400000000000000000000000]", # [3]
+    'glob'              => "\x[000100000000000000000000]", # [4]
+    'imprecision'       => "\x[000000000000000000000010]", # [46]
+    'inplace'           => "\x[000000000040000000000000]", # [23]
+    'internal'          => "\x[000000000000010000000000]", # [24]
+    'io'                => "\x[005455000000000000000000]", # [5..11]
+    'layer'             => "\x[000001000000000000000000]", # [8]
+    'malloc'            => "\x[000000000000040000000000]", # [25]
+    'misc'              => "\x[000000010000000000000000]", # [12]
+    'newline'           => "\x[000004000000000000000000]", # [9]
+    'numeric'           => "\x[000000040000000000000000]", # [13]
+    'once'              => "\x[000000100000000000000000]", # [14]
+    'overflow'          => "\x[000000400000000000000000]", # [15]
+    'pack'              => "\x[000000000100000000000000]", # [16]
+    'parenthesis'       => "\x[000000000000000001000000]", # [32]
+    'pipe'              => "\x[000010000000000000000000]", # [10]
+    'portable'          => "\x[000000000400000000000000]", # [17]
+    'precedence'        => "\x[000000000000000004000000]", # [33]
+    'printf'            => "\x[000000000000000010000000]", # [34]
+    'prototype'         => "\x[000000000000000040000000]", # [35]
+    'qw'                => "\x[000000000000000000010000]", # [36]
+    'recursion'         => "\x[000000001000000000000000]", # [18]
+    'redefine'          => "\x[000000004000000000000000]", # [19]
+    'regexp'            => "\x[000000000001000000000000]", # [20]
+    'reserved'          => "\x[000000000000000000040000]", # [37]
+    'semicolon'         => "\x[000000000000000000100000]", # [38]
+    'severe'            => "\x[000000000054050000000000]", # [21..25]
+    'signal'            => "\x[000000000000100000000000]", # [26]
+    'substr'            => "\x[000000000000400000000000]", # [27]
+    'syntax'            => "\x[000000000000005555150000]", # [28..38]
+    'taint'             => "\x[000000000000000000400000]", # [39]
+    'threads'           => "\x[000000000000000000000100]", # [40]
+    'uninitialized'     => "\x[000000000000000000000400]", # [41]
+    'unopened'          => "\x[000040000000000000000000]", # [11]
+    'unpack'            => "\x[000000000000000000001000]", # [42]
+    'untie'             => "\x[000000000000000000004000]", # [43]
+    'utf8'              => "\x[000000000000000000000001]", # [44]
+    'void'              => "\x[000000000000000000000004]", # [45]
+    )
 
 our %DeadBits = %(
-        'all'		=> "\x[aaaaaaaaaaaaaaaaaaaaaa2a]", # [0..46]
-            'ambiguous'		=> "\x[000000000000000800000000]", # [29]
-            'bareword'		=> "\x[000000000000002000000000]", # [30]
-            'closed'		=> "\x[002000000000000000000000]", # [6]
-            'closure'		=> "\x[080000000000000000000000]", # [1]
-            'debugging'		=> "\x[000000000020000000000000]", # [22]
-            'deprecated'	=> "\x[200000000000000000000000]", # [2]
-            'digit'		=> "\x[000000000000008000000000]", # [31]
-            'exec'		=> "\x[008000000000000000000000]", # [7]
-            'exiting'		=> "\x[800000000000000000000000]", # [3]
-            'glob'		=> "\x[000200000000000000000000]", # [4]
-            'imprecision'	=> "\x[000000000000000000000020]", # [46]
-            'inplace'		=> "\x[000000000080000000000000]", # [23]
-            'internal'		=> "\x[000000000000020000000000]", # [24]
-            'io'		=> "\x[00a8aa000000000000000000]", # [5..11]
-            'layer'		=> "\x[000002000000000000000000]", # [8]
-            'malloc'		=> "\x[000000000000080000000000]", # [25]
-            'misc'		=> "\x[000000020000000000000000]", # [12]
-            'newline'		=> "\x[000008000000000000000000]", # [9]
-            'numeric'		=> "\x[000000080000000000000000]", # [13]
-            'once'		=> "\x[000000200000000000000000]", # [14]
-            'overflow'		=> "\x[000000800000000000000000]", # [15]
-            'pack'		=> "\x[000000000200000000000000]", # [16]
-            'parenthesis'	=> "\x[000000000000000002000000]", # [32]
-            'pipe'		=> "\x[000020000000000000000000]", # [10]
-            'portable'		=> "\x[000000000800000000000000]", # [17]
-            'precedence'	=> "\x[000000000000000008000000]", # [33]
-            'printf'		=> "\x[000000000000000020000000]", # [34]
-            'prototype'		=> "\x[000000000000000080000000]", # [35]
-            'qw'		=> "\x[000000000000000000020000]", # [36]
-            'recursion'		=> "\x[000000002000000000000000]", # [18]
-            'redefine'		=> "\x[000000008000000000000000]", # [19]
-            'regexp'		=> "\x[000000000002000000000000]", # [20]
-            'reserved'		=> "\x[000000000000000000080000]", # [37]
-            'semicolon'		=> "\x[000000000000000000200000]", # [38]
-            'severe'		=> "\x[0000000000a80a0000000000]", # [21..25]
-            'signal'		=> "\x[000000000000200000000000]", # [26]
-            'substr'		=> "\x[000000000000800000000000]", # [27]
-            'syntax'		=> "\x[00000000000000aaaa2a0000]", # [28..38]
-            'taint'		=> "\x[000000000000000000800000]", # [39]
-            'threads'		=> "\x[000000000000000000000200]", # [40]
-            'uninitialized'	=> "\x[000000000000000000000800]", # [41]
-            'unopened'		=> "\x[000080000000000000000000]", # [11]
-            'unpack'		=> "\x[000000000000000000002000]", # [42]
-            'untie'		=> "\x[000000000000000000008000]", # [43]
-            'utf8'		=> "\x[000000000000000000000002]", # [44]
-            'void'		=> "\x[000000000000000000000008]", # [45]
-    );
+    'all'               => "\x[aaaaaaaaaaaaaaaaaaaaaa2a]", # [0..46]
+    'ambiguous'         => "\x[000000000000000800000000]", # [29]
+    'bareword'          => "\x[000000000000002000000000]", # [30]
+    'closed'            => "\x[002000000000000000000000]", # [6]
+    'closure'           => "\x[080000000000000000000000]", # [1]
+    'debugging'         => "\x[000000000020000000000000]", # [22]
+    'deprecated'        => "\x[200000000000000000000000]", # [2]
+    'digit'             => "\x[000000000000008000000000]", # [31]
+    'exec'              => "\x[008000000000000000000000]", # [7]
+    'exiting'           => "\x[800000000000000000000000]", # [3]
+    'glob'              => "\x[000200000000000000000000]", # [4]
+    'imprecision'       => "\x[000000000000000000000020]", # [46]
+    'inplace'           => "\x[000000000080000000000000]", # [23]
+    'internal'          => "\x[000000000000020000000000]", # [24]
+    'io'                => "\x[00a8aa000000000000000000]", # [5..11]
+    'layer'             => "\x[000002000000000000000000]", # [8]
+    'malloc'            => "\x[000000000000080000000000]", # [25]
+    'misc'              => "\x[000000020000000000000000]", # [12]
+    'newline'           => "\x[000008000000000000000000]", # [9]
+    'numeric'           => "\x[000000080000000000000000]", # [13]
+    'once'              => "\x[000000200000000000000000]", # [14]
+    'overflow'          => "\x[000000800000000000000000]", # [15]
+    'pack'              => "\x[000000000200000000000000]", # [16]
+    'parenthesis'       => "\x[000000000000000002000000]", # [32]
+    'pipe'              => "\x[000020000000000000000000]", # [10]
+    'portable'          => "\x[000000000800000000000000]", # [17]
+    'precedence'        => "\x[000000000000000008000000]", # [33]
+    'printf'            => "\x[000000000000000020000000]", # [34]
+    'prototype'         => "\x[000000000000000080000000]", # [35]
+    'qw'                => "\x[000000000000000000020000]", # [36]
+    'recursion'         => "\x[000000002000000000000000]", # [18]
+    'redefine'          => "\x[000000008000000000000000]", # [19]
+    'regexp'            => "\x[000000000002000000000000]", # [20]
+    'reserved'          => "\x[000000000000000000080000]", # [37]
+    'semicolon'         => "\x[000000000000000000200000]", # [38]
+    'severe'            => "\x[0000000000a80a0000000000]", # [21..25]
+    'signal'            => "\x[000000000000200000000000]", # [26]
+    'substr'            => "\x[000000000000800000000000]", # [27]
+    'syntax'            => "\x[00000000000000aaaa2a0000]", # [28..38]
+    'taint'             => "\x[000000000000000000800000]", # [39]
+    'threads'           => "\x[000000000000000000000200]", # [40]
+    'uninitialized'     => "\x[000000000000000000000800]", # [41]
+    'unopened'          => "\x[000080000000000000000000]", # [11]
+    'unpack'            => "\x[000000000000000000002000]", # [42]
+    'untie'             => "\x[000000000000000000008000]", # [43]
+    'utf8'              => "\x[000000000000000000000002]", # [44]
+    'void'              => "\x[000000000000000000000008]", # [45]
+    )
 
-our $NONE     = "\0\0\0\0\0\0\0\0\0\0\0\0";
-our $LAST_BIT = 94 ;
-our $BYTES    = 12 ;
+our $NONE     = "\0\0\0\0\0\0\0\0\0\0\0\0"
+our $LAST_BIT = 94 
+our $BYTES    = 12 
 
-our $All = "" ; vec($All, %Offsets{'all'}, 2 => 3);
+our $All = "" ; vec($All, %Offsets{'all'}, 2 => 3)
 
 sub bits
-{
     # called from B::Deparse.pm
 
-    push @_, 'all' unless @_;
+    push @_, 'all' unless @_
 
-    my $mask;
-    my $catmask ;
-    my $fatal = 0 ;
-    my $no_fatal = 0 ;
+    my $mask
+    my $catmask 
+    my $fatal = 0 
+    my $no_fatal = 0 
 
-    foreach my $word ( @_ ) {
-        if ($word eq 'FATAL') {
-            $fatal = 1;
-            $no_fatal = 0;
-        }
-        elsif ($word eq 'NONFATAL') {
-            $fatal = 0;
-            $no_fatal = 1;
-        }
-        elsif ($catmask = %Bits{?$word}) {
-            $mask ^|^= $catmask ;
-            $mask ^|^= %DeadBits{$word} if $fatal ;
-            $mask ^&^= ^~^(%DeadBits{$word}^|^$All) if $no_fatal ;
-        }
+    foreach my $word ( @_ )
+        if ($word eq 'FATAL')
+            $fatal = 1
+            $no_fatal = 0
+        elsif ($word eq 'NONFATAL')
+            $fatal = 0
+            $no_fatal = 1
+        elsif ($catmask = %Bits{?$word})
+            $mask ^|^= $catmask 
+            $mask ^|^= %DeadBits{$word} if $fatal 
+            $mask ^&^= ^~^(%DeadBits{$word}^|^$All) if $no_fatal 
+        
         else
-        { die("Unknown warnings category '$word'")}
-    }
+            die("Unknown warnings category '$word'")
+    
 
-    return $mask ;
-}
+    return $mask 
 
-sub import 
-{
-    shift;
 
-    my $catmask ;
-    my $fatal = 0 ;
-    my $no_fatal = 0 ;
+sub import
+    shift
 
-    my $mask = $^WARNING_BITS ;
+    my $catmask 
+    my $fatal = 0 
+    my $no_fatal = 0 
 
-    if (vec($mask, %Offsets{'all'}, 1)) {
-        $mask ^|^= %Bits{'all'} ;
-        $mask ^|^= %DeadBits{'all'} if vec($mask, %Offsets{'all'}+1, 1);
-    }
+    my $mask = $^WARNING_BITS 
 
-    push @_, 'all' unless @_;
+    if (vec($mask, %Offsets{'all'}, 1))
+        $mask ^|^= %Bits{'all'} 
+        $mask ^|^= %DeadBits{'all'} if vec($mask, %Offsets{'all'}+1, 1)
+    
 
-    foreach my $word ( @_ ) {
-        if ($word eq 'FATAL') {
-            $fatal = 1;
-            $no_fatal = 0;
-        }
-        elsif ($word eq 'NONFATAL') {
-            $fatal = 0;
-            $no_fatal = 1;
-        }
-        elsif ($catmask = %Bits{?$word}) {
-            $mask ^|^= $catmask ;
-            $mask ^|^= %DeadBits{$word} if $fatal ;
-            $mask ^&^= ^~^(%DeadBits{$word}^|^$All) if $no_fatal ;
-        }
+    push @_, 'all' unless @_
+
+    foreach my $word ( @_ )
+        if ($word eq 'FATAL')
+            $fatal = 1
+            $no_fatal = 0
+        elsif ($word eq 'NONFATAL')
+            $fatal = 0
+            $no_fatal = 1
+        elsif ($catmask = %Bits{?$word})
+            $mask ^|^= $catmask 
+            $mask ^|^= %DeadBits{$word} if $fatal 
+            $mask ^&^= ^~^(%DeadBits{$word}^|^$All) if $no_fatal 
+        
         else
-        { die("Unknown warnings category '$word'")}
-    }
+            die("Unknown warnings category '$word'")
+    
 
-    $^WARNING_BITS = $mask ;
-}
+    $^WARNING_BITS = $mask 
 
-sub unimport 
-{
-    shift;
 
-    my $catmask ;
-    my $mask = $^WARNING_BITS ;
+sub unimport
+    shift
 
-    if (vec($mask, %Offsets{'all'}, 1)) {
-        $mask ^|^= %Bits{'all'} ;
-        $mask ^|^= %DeadBits{'all'} if vec($mask, %Offsets{'all'}+1, 1);
-    }
+    my $catmask 
+    my $mask = $^WARNING_BITS 
 
-    push @_, 'all' unless @_;
+    if (vec($mask, %Offsets{'all'}, 1))
+        $mask ^|^= %Bits{'all'} 
+        $mask ^|^= %DeadBits{'all'} if vec($mask, %Offsets{'all'}+1, 1)
+    
 
-    foreach my $word ( @_ ) {
-        if ($word eq 'FATAL') {
-            next; 
-        }
-        elsif ($catmask = %Bits{?$word}) {
-            $mask ^&^= ^~^($catmask ^|^ %DeadBits{$word} ^|^ $All);
-        }
+    push @_, 'all' unless @_
+
+    foreach my $word ( @_ )
+        if ($word eq 'FATAL')
+            next
+        elsif ($catmask = %Bits{?$word})
+            $mask ^&^= ^~^($catmask ^|^ %DeadBits{$word} ^|^ $All)
+        
         else
-        { die("Unknown warnings category '$word'")}
-    }
+            die("Unknown warnings category '$word'")
+    
 
-    $^WARNING_BITS = $mask ;
-}
+    $^WARNING_BITS = $mask 
 
-my %builtin_type; %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = @();
+
+my %builtin_type; %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = @()
 
 sub __chk
-{
-    my $category ;
-    my $offset ;
-    my $isobj = 0 ;
+    my $category 
+    my $offset 
+    my $isobj = 0 
 
-    if (@_) {
+    if (@_)
         # check the category supplied.
-        $category = shift ;
-        if (my $type = ref $category) {
+        $category = shift 
+        if (my $type = ref $category)
             die("not an object")
-                if exists %builtin_type{$type};
-            $category = $type;
-            $isobj = 1 ;
-        }
-        $offset = %Offsets{?$category};
+                if exists %builtin_type{$type}
+            $category = $type
+            $isobj = 1 
+        
+        $offset = %Offsets{?$category}
         die("Unknown warnings category '$category'")
-            unless defined $offset;
-    }
-    else {
-        $category = @(caller(1))[0] ;
-        $offset = %Offsets{?$category};
+            unless defined $offset
+    else
+        $category = @(caller(1))[0] 
+        $offset = %Offsets{?$category}
         die("package '$category' not registered for warnings")
-            unless defined $offset ;
-    }
+            unless defined $offset 
+    
 
-    my $this_pkg = @(caller(1))[0] ;
-    my $i = 2 ;
-    my $pkg ;
+    my $this_pkg = @(caller(1))[0] 
+    my $i = 2 
+    my $pkg 
 
-    if ($isobj) {
-        while (do { package DB; $pkg = @(caller($i++))[0] } ) {
-            last unless @DB::args && @DB::args[0] =~ m/^$category=/ ;
-        }
-        $i -= 2 ;
-    }
-    else {
-        $i = 2;
-    }
+    if ($isobj)
+        while (do { package DB; $pkg = @(caller($i++))[0] } )
+            last unless @DB::args && @DB::args[0] =~ m/^$category=/ 
+        
+        $i -= 2 
+    else
+        $i = 2
+    
 
-    my $callers_bitmask = @(caller($i))[9] ;
-    return @($callers_bitmask, $offset, $i) ;
-}
+    my $callers_bitmask = @(caller($i))[9] 
+    return @($callers_bitmask, $offset, $i) 
+
 
 sub enabled
-{
     die("Usage: warnings::enabled([category])")
-        unless nelems(@_) == 1 || nelems(@_) == 0 ;
+        unless nelems(@_) == 1 || nelems(@_) == 0 
 
-    my @($callers_bitmask, $offset, $i) = __chk(< @_) ;
+    my @($callers_bitmask, $offset, $i) = __chk(< @_) 
 
-    return 0 unless defined $callers_bitmask ;
+    return 0 unless defined $callers_bitmask 
     return vec($callers_bitmask, $offset, 1) ||
-        vec($callers_bitmask, %Offsets{'all'}, 1) ;
-}
+        vec($callers_bitmask, %Offsets{'all'}, 1) 
+
 
 
 sub warn
-{
     die("Usage: warnings::warn([category,] 'message')")
-        unless nelems(@_) == 2 || nelems(@_) == 1 ;
+        unless nelems(@_) == 2 || nelems(@_) == 1 
 
-    my $message = pop ;
-    my @($callers_bitmask, $offset, $i) = __chk(<@_) ;
+    my $message = pop 
+    my @($callers_bitmask, $offset, $i) = __chk(<@_) 
     die($message)
         if vec($callers_bitmask, $offset+1, 1) ||
-        vec($callers_bitmask, %Offsets{'all'}+1, 1) ;
-    CORE::warn($message) ;
-}
+      vec($callers_bitmask, %Offsets{'all'}+1, 1) 
+    CORE::warn($message) 
+
 
 sub warnif
-{
     die("Usage: warnings::warnif([category,] 'message')")
-        unless nelems(@_) == 2 || nelems(@_) == 1 ;
+        unless nelems(@_) == 2 || nelems(@_) == 1 
 
-    my $message = pop ;
-    my @($callers_bitmask, $offset, $i) = __chk(<@_) ;
+    my $message = pop 
+    my @($callers_bitmask, $offset, $i) = __chk(<@_) 
 
     return
         unless defined $callers_bitmask &&
         (vec($callers_bitmask, $offset, 1) ||
-              vec($callers_bitmask, %Offsets{'all'}, 1)) ;
+         vec($callers_bitmask, %Offsets{'all'}, 1)) 
 
     die($message)
         if vec($callers_bitmask, $offset+1, 1) ||
-        vec($callers_bitmask, %Offsets{'all'}+1, 1) ;
+      vec($callers_bitmask, %Offsets{'all'}+1, 1) 
 
-    CORE::warn($message) ;
-}
+    CORE::warn($message) 
 
-1;
+
+1
 # ex: set ro:

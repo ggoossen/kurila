@@ -1,33 +1,33 @@
 #!./perl -w
 # Test -DEBUGGING things (in dump.c)
 
-BEGIN {
-    if (env::var('PERL_CORE')){
-        push $^INCLUDE_PATH, '../ext/B/t';
-    } else {
-        unshift $^INCLUDE_PATH, 't';
-        push $^INCLUDE_PATH, "../../t";
-    }
+BEGIN 
+    if (env::var('PERL_CORE'))
+        push $^INCLUDE_PATH, '../ext/B/t'
+    else
+        unshift $^INCLUDE_PATH, 't'
+        push $^INCLUDE_PATH, "../../t"
+    
     # skip all tests unless perl was compiled with -DDEBUGGING
-    require Config;
-    if (Config::config_value('ccflags') !~ m/-DDEBUGGING /) {
-        print $^STDOUT, "1..0 # Skip -- Perl built w/o -DEBUGGING\n";
-        exit 0;
-    }
+    require Config
+    if (Config::config_value('ccflags') !~ m/-DDEBUGGING /)
+        print $^STDOUT, "1..0 # Skip -- Perl built w/o -DEBUGGING\n"
+        exit 0
+    
 # require 'test.pl'; # now done by OptreeCheck
-}
 
-print $^STDOUT, "1..0 # Skip -- TODO for kurila\n";
-exit 0;
+
+print $^STDOUT, "1..0 # Skip -- TODO for kurila\n"
+exit 0
 
 use OptreeCheck;
 
-plan(tests => 3);
+plan(tests => 3)
 
 checkOptree ( name      => '-Dx -e print 42',
-    Dx	=> 'print 42',
-    noanchors => 1, # unanchored match
-    expect    => << 'EO_THR', expect_nt => << 'EO_NOTHR');
+              Dx        => 'print 42',
+              noanchors => 1, # unanchored match
+              expect    => << 'EO_THR', expect_nt => << 'EO_NOTHR')
 {
 1   TYPE = leave  ===> DONE
     TARG = 1
@@ -104,10 +104,10 @@ EO_THR
 EO_NOTHR
 
 checkOptree ( name      => '-Dx -e print $a+42',
-    Dx	=> 'print $a+42',
-    errs	=> 'Name "main::a" used only once: possible typo at -e line 1.',
-    noanchors => 1, # unanchored match
-    expect    => << 'EO_THR', expect_nt => << 'EO_NOTHR');
+              Dx        => 'print $a+42',
+              errs      => 'Name "main::a" used only once: possible typo at -e line 1.',
+              noanchors => 1, # unanchored match
+              expect    => << 'EO_THR', expect_nt => << 'EO_NOTHR')
 # {
 # 1   TYPE = leave  ===> DONE
 #     TARG = 1
@@ -198,10 +198,10 @@ EO_THR
 EO_NOTHR
 
 checkOptree ( name      => '-Dx -e print sort our @a',
-    Dx	=> 'print sort our @a',
-    errs	=> 'Name "main::a" used only once: possible typo at -e line 1.',
-    noanchors => 1, # unanchored match
-    expect    => << 'EO_THR', expect_nt => << 'EO_NOTHR');
+              Dx        => 'print sort our @a',
+              errs      => 'Name "main::a" used only once: possible typo at -e line 1.',
+              noanchors => 1, # unanchored match
+              expect    => << 'EO_THR', expect_nt => << 'EO_NOTHR')
 {
 1   TYPE = leave  ===> DONE
     TARG = 1

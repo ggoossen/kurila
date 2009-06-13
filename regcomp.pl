@@ -1,74 +1,74 @@
-BEGIN {
+BEGIN 
     # Get function prototypes
-    require 'regen_lib.pl';
-}
+    require 'regen_lib.pl'
+
 #use Fatal qw(open close rename chmod unlink);
-use kurila;
-use warnings;
+use kurila
+use warnings
 
-open my $desc_fh, "<", 'regcomp.sym';
+open my $desc_fh, "<", 'regcomp.sym'
 
-my $ind = 0;
-my (@name,@rest,@type,@code,@args,@longj);
-my ($desc,$lastregop);
-while ( ~< $desc_fh) {
-    s/#.*$//;
-    next if m/^\s*$/;
-    s/\s*\z//;
-    if (m/^-+\s*$/) {
-        $lastregop= $ind;
-        next;
-    }
-    unless ($lastregop) {
-        $ind++;
-        @(@name[+$ind], $desc, @rest[+$ind]) = split m/\t+/, $_, 3;
+my $ind = 0
+my (@name,@rest,@type,@code,@args,@longj)
+my ($desc,$lastregop)
+while ( ~< $desc_fh)
+    s/#.*$//
+    next if m/^\s*$/
+    s/\s*\z//
+    if (m/^-+\s*$/)
+        $lastregop= $ind
+        next
+    
+    unless ($lastregop)
+        $ind++
+        @(@name[+$ind], $desc, @rest[+$ind]) = split m/\t+/, $_, 3
         @(@type[+$ind], @code[+$ind], ?@args[+$ind], ?@longj[+$ind])
-            = split m/[,\s]\s*/, $desc, 4;
-    } else {
-        my @($type, @< @lists)= split m/\s*\t+\s*/, $_;
-        die "No list? $type" if !nelems @lists;
-        foreach my $list ( @lists) {
-            my @($names,$special)= split m/:/, $list , 2;
-            $special ||= "";
-            foreach my $name (split m/,/,$names) {
+            = split m/[,\s]\s*/, $desc, 4
+    else
+        my @($type, @< @lists)= split m/\s*\t+\s*/, $_
+        die "No list? $type" if !nelems @lists
+        foreach my $list ( @lists)
+            my @($names,$special)= split m/:/, $list , 2
+            $special ||= ""
+            foreach my $name (split m/,/,$names)
                 my $real= $name eq 'resume'
                     ?? "resume_$type"
-                    !! "$($type)_$name";
-                my @suffix;
-                if (!$special) {
-                    @suffix=@("");
-                } elsif ($special=~m/\d/) {
-                    @suffix=1..$special;
-                } elsif ($special eq 'FAIL') {
-                    @suffix=@("","_fail");
-                } else {
-                    die "unknown :type ':$special'";
-                }
-                foreach my $suffix ( @suffix) {
-                    $ind++;
-                    @name[+$ind]="$real$suffix";
-                    @type[+$ind]=$type;
-                    @rest[+$ind]="state for $type";
-                }
-            }
-        }
+                    !! "$($type)_$name"
+                my @suffix
+                if (!$special)
+                    @suffix=@("")
+                elsif ($special=~m/\d/)
+                    @suffix=1..$special
+                elsif ($special eq 'FAIL')
+                    @suffix=@("","_fail")
+                else
+                    die "unknown :type ':$special'"
+                
+                foreach my $suffix ( @suffix)
+                    $ind++
+                    @name[+$ind]="$real$suffix"
+                    @type[+$ind]=$type
+                    @rest[+$ind]="state for $type"
+                
+            
+        
 
-    }
-}
+    
+
 # use fixed width to keep the diffs between regcomp.pl recompiles
 # as small as possible.
-my @($width,$rwidth,$twidth) = @(22,12,9);
-$lastregop ||= $ind;
-my $tot = $ind;
-close $desc_fh;
+my @($width,$rwidth,$twidth) = @(22,12,9)
+$lastregop ||= $ind
+my $tot = $ind
+close $desc_fh
 die "Too many regexp/state opcodes! Maximum is 256, but there are $lastregop in file!"
-    if $lastregop+>256;
+    if $lastregop+>256
 
-my $tmp_h = 'tmp_reg.h';
+my $tmp_h = 'tmp_reg.h'
 
-unlink $tmp_h if -f $tmp_h;
+unlink $tmp_h if -f $tmp_h
 
-my $out = safer_open($tmp_h);
+my $out = safer_open($tmp_h)
 
 printf $out, <<EOP,
 /* -*- buffer-read-only: t -*-
@@ -85,21 +85,21 @@ printf $out, <<EOP,
 EOP
     -$width, REGNODE_MAX        => $lastregop - 1,
     -$width, REGMATCH_STATE_MAX => $tot - 1
-;
 
 
-    for my $ind (1 .. $lastregop) {
-        my $oind = $ind - 1;
-        printf $out, "#define\t\%*s\t\%d\t/* \%#04x \%s */\n",
-            -$width, @name[$ind], $ind-1, $ind-1, @rest[$ind];
-    }
-print $out, "\t/* ------------ States ------------- */\n";
-for my $ind ($lastregop+1 .. $tot) {
+
+for my $ind (1 .. $lastregop)
+    my $oind = $ind - 1
+    printf $out, "#define\t\%*s\t\%d\t/* \%#04x \%s */\n",
+        -$width, @name[$ind], $ind-1, $ind-1, @rest[$ind]
+
+print $out, "\t/* ------------ States ------------- */\n"
+for my $ind ($lastregop+1 .. $tot)
     printf $out, "#define\t\%*s\t(REGNODE_MAX + \%d)\t/* \%s */\n",
-        -$width, @name[$ind], $ind - $lastregop, @rest[$ind];
-}
+        -$width, @name[$ind], $ind - $lastregop, @rest[$ind]
 
-print $out, <<EOP;
+
+print $out, <<EOP
 
 /* PL_regkind[] What type of regop or state is this. */
 
@@ -109,15 +109,15 @@ EXTCONST U8 PL_regkind[];
 EXTCONST U8 PL_regkind[] = \{
 EOP
 
-$ind = 0;
-while (++$ind +<= $tot) {
+$ind = 0
+while (++$ind +<= $tot)
     printf $out, "\t\%*s\t/* \%*s */\n",
-        -1-$twidth, "@type[$ind],", -$width, @name[$ind];
+        -1-$twidth, "@type[$ind],", -$width, @name[$ind]
     print $out, "\t/* ------------ States ------------- */\n"
-        if $ind == $lastregop and $lastregop != $tot;
-}
+        if $ind == $lastregop and $lastregop != $tot
 
-print $out, <<EOP;
+
+print $out, <<EOP
 \};
 #endif
 
@@ -127,16 +127,16 @@ print $out, <<EOP;
 static const U8 regarglen[] = \{
 EOP
 
-$ind = 0;
-while (++$ind +<= $lastregop) {
-    my $size = 0;
-    $size = "EXTRA_SIZE(struct regnode_@args[$ind])" if @args[$ind];
+$ind = 0
+while (++$ind +<= $lastregop)
+    my $size = 0
+    $size = "EXTRA_SIZE(struct regnode_@args[$ind])" if @args[$ind]
 
     printf $out, "\t\%*s\t/* \%*s */\n",
-        -37, "$size,",-$rwidth,@name[$ind];
-}
+        -37, "$size,",-$rwidth,@name[$ind]
 
-print $out, <<EOP;
+
+print $out, <<EOP
 \};
 
 /* reg_off_by_arg[] - Which argument holds the offset to the next node */
@@ -144,15 +144,15 @@ print $out, <<EOP;
 static const char reg_off_by_arg[] = \{
 EOP
 
-$ind = 0;
-while (++$ind +<= $lastregop) {
-    my $size = @longj[$ind] || 0;
+$ind = 0
+while (++$ind +<= $lastregop)
+    my $size = @longj[$ind] || 0
 
     printf $out, "\t\%d,\t/* \%*s */\n",
         $size, -$rwidth, @name[$ind]
-}
 
-print $out, <<EOP;
+
+print $out, <<EOP
 \};
 
 #endif /* REG_COMP_C */
@@ -165,23 +165,23 @@ EXTCONST char * PL_reg_name[];
 EXTCONST char * const PL_reg_name[] = \{
 EOP
 
-$ind = 0;
-my $ofs = 1;
-my $sym = "";
-while (++$ind +<= $tot) {
-    my $size = @longj[?$ind] || 0;
+$ind = 0
+my $ofs = 1
+my $sym = ""
+while (++$ind +<= $tot)
+    my $size = @longj[?$ind] || 0
 
     printf $out, "\t\%*s\t/* $sym\%#04x */\n",
-        -3-$width,qq("@name[$ind]",), $ind - $ofs;
-    if ($ind == $lastregop and $lastregop != $tot) {
-        print $out, "\t/* ------------ States ------------- */\n";
-        $ofs = $lastregop;
-        $sym = 'REGNODE_MAX +';
-    }
+        -3-$width,qq("@name[$ind]",), $ind - $ofs
+    if ($ind == $lastregop and $lastregop != $tot)
+        print $out, "\t/* ------------ States ------------- */\n"
+        $ofs = $lastregop
+        $sym = 'REGNODE_MAX +'
+    
 
-}
 
-print $out, <<EOP;
+
+print $out, <<EOP
 \};
 #endif /* DOINIT */
 
@@ -193,36 +193,36 @@ EXTCONST char * PL_reg_extflags_name[];
 EXTCONST char * const PL_reg_extflags_name[] = \{
 EOP
 
-open my $fh, "<","regexp.h" or die "Can't read regexp.h: $^OS_ERROR";
-my %rxfv;
-my $val = 0;
-my %reverse;
-while (~< $fh) {
-    if (m/#define\s+(RXf_\w+)\s+(0x[A-F\d]+)/i) {
-        my $newval = eval $2;
-        if($val ^&^ $newval) {
-            die sprintf "Both $1 and %reverse{$newval} use \%08X", $newval;
-        }
-        $val^|^=$newval;
-        %rxfv{+$1}= $newval;
-        %reverse{+$newval} = $1;
-    }
-}    
-my %vrxf= %: < reverse @: < %rxfv ;
-printf $out, "\t/* Bits in extflags defined: \%032b */\n",$val;
-for (0..31) {
-    my $n=%vrxf{?2**$_}||"UNUSED_BIT_$_";
-    $n=~s/^RXf_(PMf_)?//;
-    printf $out, qq(\t\%-20s/* 0x\%08x */\n), 
-        qq("$n",),2**$_;
-}  
+open my $fh, "<","regexp.h" or die "Can't read regexp.h: $^OS_ERROR"
+my %rxfv
+my $val = 0
+my %reverse
+while (~< $fh)
+    if (m/#define\s+(RXf_\w+)\s+(0x[A-F\d]+)/i)
+        my $newval = eval $2
+        if($val ^&^ $newval)
+            die sprintf "Both $1 and %reverse{$newval} use \%08X", $newval
+        
+        $val^|^=$newval
+        %rxfv{+$1}= $newval
+        %reverse{+$newval} = $1
+    
 
-print $out, <<EOP;
+my %vrxf= %: < reverse @: < %rxfv 
+printf $out, "\t/* Bits in extflags defined: \%032b */\n",$val
+for (0..31)
+    my $n=%vrxf{?2**$_}||"UNUSED_BIT_$_"
+    $n=~s/^RXf_(PMf_)?//
+    printf $out, qq(\t\%-20s/* 0x\%08x */\n),
+        qq("$n",),2**$_
+
+
+print $out, <<EOP
 \};
 #endif /* DOINIT */
 
 /* ex: set ro: */
 EOP
-safer_close($out);
+safer_close($out)
 
-rename_if_different $tmp_h, 'regnodes.h';
+rename_if_different $tmp_h, 'regnodes.h'

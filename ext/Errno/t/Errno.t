@@ -1,7 +1,7 @@
 #!./perl -w
 
-use Test::More tests => 1;
+use Test::More tests => 1
 
-use Errno;
+use Errno
 
-ok( Errno::EINPROGRESS() );
+ok( Errno::EINPROGRESS() )

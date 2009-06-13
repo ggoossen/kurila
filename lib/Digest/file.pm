@@ -1,40 +1,40 @@
-package Digest::file;
+package Digest::file
 
 
-use Exporter ();
-use Carp < qw(croak);
-use Digest ();
+use Exporter ()
+use Carp < qw(croak)
+use Digest ()
 
-our ($VERSION, @ISA, @EXPORT_OK);
+our ($VERSION, @ISA, @EXPORT_OK)
 
-$VERSION = "1.00";
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(digest_file_ctx digest_file digest_file_hex digest_file_base64);
+$VERSION = "1.00"
+@ISA = qw(Exporter)
+@EXPORT_OK = qw(digest_file_ctx digest_file digest_file_hex digest_file_base64)
 
-sub digest_file_ctx {
-    my $file = shift;
-    croak("No digest algorithm specified") unless (nelems @_);
-    open(my $fh, "<", $file) || croak("Can't open '$file': $^OS_ERROR");
-    binmode($fh);
-    my $ctx = Digest->new(< @_);
-    $ctx->addfile($fh);
-    close($fh);
-    return $ctx;
-}
+sub digest_file_ctx
+    my $file = shift
+    croak("No digest algorithm specified") unless (nelems @_)
+    open(my $fh, "<", $file) || croak("Can't open '$file': $^OS_ERROR")
+    binmode($fh)
+    my $ctx = Digest->new(< @_)
+    $ctx->addfile($fh)
+    close($fh)
+    return $ctx
 
-sub digest_file {
-    digest_file_ctx(< @_)->digest;
-}
 
-sub digest_file_hex {
-    digest_file_ctx(< @_)->hexdigest;
-}
+sub digest_file
+    digest_file_ctx(< @_)->digest
 
-sub digest_file_base64 {
-    digest_file_ctx(< @_)->b64digest;
-}
 
-1;
+sub digest_file_hex
+    digest_file_ctx(< @_)->hexdigest
+
+
+sub digest_file_base64
+    digest_file_ctx(< @_)->b64digest
+
+
+1
 
 __END__
 

@@ -1,0 +1,71 @@
+=head1 NAME
+
+kurila120delta - what is new for Perl Kurila 1.20
+
+=head1 DESCRIPTION
+
+This document describes differences between Perl Kurila 1.19 and Perl Kurila 1.20
+
+=head1 Highlights In Perl Kurila 1.20
+
+Layout based syntax
+
+=head1 Core Enhancements
+
+=head2 Layout
+
+Layout can be used to make blocks and statements.
+See L<kurilasyn/"Layout"> for a description of how it works.
+
+=head3 Rationale
+
+Clean and easy to read statements and block specification.
+
+=head2 New syntax for loops which are executed at least once
+
+Loops which are executed at least once now have syntax 
+C<loop BLOCK while (EXPR)> and C<loop BLOCK until (EXPR)>.
+
+=head3 Rationale
+
+The C<loop> keyword indicates a new block, which works much better with
+layout syntax.
+
+=head2 Derefence can only be done using postfix dereference
+
+Dereferncing can only be done using the C<< ->$ >>, and similar operators,
+prefix dereferncing like C<${ ...}> does no longer work.
+
+=head3 Rationale
+
+Single simple dereference syntax.
+
+=head1 KNOWN BUGS
+
+=head2 Documentation
+
+Documentation has not been updated for many of the changes for kurila.
+
+=head2 Self referential assignment problems
+
+Assigning some value to a part of itself behaves unexpected.
+
+=head2 Limited platform support
+
+Perl Kurila has only been tested/build for x86_64-linux-gnu-thread-multi platform.
+
+=head1 SEE ALSO
+
+The F<INSTALL> file for how to build Perl Kurila.
+
+The F<README> file for general stuff.
+
+The F<Artistic> and F<Copying> files for copyright information.
+
+=head1 HISTORY
+
+Written by Gerard Goossen <F<gerard@tty.nl>>.
+
+=cut
+
+ LocalWords:  lvalues paramter defintion

@@ -1,40 +1,40 @@
-package Time::localtime;
+package Time::localtime
 
 
-use Time::tm;
+use Time::tm
 
-our(@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION);
-BEGIN {
-    use Exporter   ();
-    @ISA         = qw(Exporter Time::tm);
-    @EXPORT      = qw(localtime ctime);
+our(@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION)
+BEGIN 
+    use Exporter   ()
+    @ISA         = qw(Exporter Time::tm)
+    @EXPORT      = qw(localtime ctime)
     @EXPORT_OK   = qw(  
 			$tm_sec $tm_min $tm_hour $tm_mday 
 			$tm_mon $tm_year $tm_wday $tm_yday 
 			$tm_isdst
-		    );
-    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT );
-    $VERSION     = 1.02;
-}
+		    )
+    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT )
+    $VERSION     = 1.02
+
 our ($tm_sec, $tm_min, $tm_hour, $tm_mday,
     $tm_mon, $tm_year, $tm_wday, $tm_yday,
-    $tm_isdst);
+    $tm_isdst)
 
-sub populate {
-    return unless (nelems @_);
-    my $tmob = Time::tm->new();
+sub populate
+    return unless (nelems @_)
+    my $tmob = Time::tm->new()
     $tmob->@ = @(
-  $tm_sec, $tm_min, $tm_hour, $tm_mday, 
-  $tm_mon, $tm_year, $tm_wday, $tm_yday, 
-  $tm_isdst )
-        =  @_ ;
-    return $tmob;
-} 
+        $tm_sec, $tm_min, $tm_hour, $tm_mday,
+        $tm_mon, $tm_year, $tm_wday, $tm_yday,
+        $tm_isdst )
+        =  @_ 
+    return $tmob
+
 
 sub localtime { populate CORE::localtime((nelems @_) ?? shift !! time)}
-sub ctime     { scalar   CORE::localtime((nelems @_) ?? shift !! time) } 
+sub ctime     { scalar   CORE::localtime((nelems @_) ?? shift !! time) }
 
-1;
+1
 
 __END__
 

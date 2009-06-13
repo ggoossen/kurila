@@ -351,7 +351,7 @@ and check for NULL.
    has exactly one character at the end, a ')'. Will that always be true?  */
 #define RX_PRELEN(prog)		(RX_WRAPLEN(prog) - ((struct regexp *)SvANY(prog))->pre_prefix - 1)
 #define RX_WRAPPED(prog)	SvPVX_mutable(reTsv(prog))
-#define RX_WRAPLEN(prog)	SvCUR(prog)
+#define RX_WRAPLEN(prog)	SvCUR(reTsv(prog))
 #define RX_CHECK_SUBSTR(prog)	(((struct regexp *)SvANY(prog))->check_substr)
 #define RX_REFCNT(prog)		SvREFCNT(prog)
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)

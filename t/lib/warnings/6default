@@ -59,7 +59,7 @@ use warnings;
 do {
     no warnings ;
     eval '
-	my $a = oct "0xfffffffffffffffffg" ;
+        my $a = oct "0xfffffffffffffffffg" ;
     '; print $^STDERR, $^EVAL_ERROR ;
     my $a = oct "0xfffffffffffffffffg" ;
 };
@@ -73,16 +73,16 @@ do {
     no warnings ;
     eval q[ 
         use warnings ;
-	my $a = oct "0xfffffffffffffffffg" ;
+        my $a = oct "0xfffffffffffffffffg" ;
     ]; print $^STDERR, $^EVAL_ERROR;
     my $a = oct "0xfffffffffffffffffg" ;
 };
 EXPECT
-Integer overflow in hexadecimal number at (eval 1) line 3 character 10.
+Integer overflow in hexadecimal number at (eval 1) line 3 character 17.
     (eval) called at - line 6 character 5.
-Illegal hexadecimal digit 'g' ignored at (eval 1) line 3 character 10.
+Illegal hexadecimal digit 'g' ignored at (eval 1) line 3 character 17.
     (eval) called at - line 6 character 5.
-Hexadecimal number > 0xffffffff non-portable at (eval 1) line 3 character 10.
+Hexadecimal number > 0xffffffff non-portable at (eval 1) line 3 character 17.
     (eval) called at - line 6 character 5.
 ########
 
@@ -91,15 +91,15 @@ no warnings;
 do {
     use warnings ;
     eval '
-	my $a = oct "0xfffffffffffffffffg" ;
+        my $a = oct "0xfffffffffffffffffg" ;
     '; print $^STDERR, $^EVAL_ERROR ;
 };
 EXPECT
-Integer overflow in hexadecimal number at (eval 1) line 2 character 10.
+Integer overflow in hexadecimal number at (eval 1) line 2 character 17.
     (eval) called at - line 6 character 5.
-Illegal hexadecimal digit 'g' ignored at (eval 1) line 2 character 10.
+Illegal hexadecimal digit 'g' ignored at (eval 1) line 2 character 17.
     (eval) called at - line 6 character 5.
-Hexadecimal number > 0xffffffff non-portable at (eval 1) line 2 character 10.
+Hexadecimal number > 0xffffffff non-portable at (eval 1) line 2 character 17.
     (eval) called at - line 6 character 5.
 ########
 
@@ -109,7 +109,7 @@ do {
     use warnings;
     eval '
         no warnings ;
-	my $a = oct "0xfffffffffffffffffg" ;
+        my $a = oct "0xfffffffffffffffffg" ;
     '; print $^STDERR, $^EVAL_ERROR ;
 };
 EXPECT
@@ -121,7 +121,7 @@ no warnings;
 do {
     use warnings 'deprecated' ;
     eval '
-	my $a = oct "0xfffffffffffffffffg" ;
+        my $a = oct "0xfffffffffffffffffg" ;
     '; print $^STDERR, $^EVAL_ERROR;
 };
 EXPECT

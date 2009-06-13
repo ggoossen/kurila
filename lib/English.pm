@@ -1,9 +1,9 @@
-package English;
+package English
 
-our $VERSION = '1.04';
+our $VERSION = '1.04'
 
-require Exporter;
-our @ISA = qw(Exporter);
+require Exporter
+our @ISA = qw(Exporter)
 
 =head1 NAME
 
@@ -20,12 +20,12 @@ English - use nice English (or awk) names for ugly punctuation variables
 
 This module provides aliases for the built-in variables whose
 names no one seems to like to read.  Variables with side-effects
-which get triggered just by accessing them (like $0) will still 
+which get triggered just by accessing them (like $0) will still
 be affected.
 
 For those variables that have an B<awk> version, both long
-and short English alternatives are provided.  For example, 
-the C<$/> variable can be referred to either $RS or 
+and short English alternatives are provided.  For example,
+the C<$/> variable can be referred to either $RS or
 $INPUT_RECORD_SEPARATOR if you are using the English module.
 
 See L<perlvar> for a complete list of these.
@@ -34,17 +34,17 @@ See L<perlvar> for a complete list of these.
 
 no warnings;
 
-my $globbed_match ;
+my $globbed_match 
 
-our @MINIMAL_EXPORT = qw();
+our @MINIMAL_EXPORT = qw()
 
 # Grandfather $NAME import
-sub import {
-    my $this = shift;
-    my @list = grep { ! m/^-no_match_vars$/ }, @_ ;
-    local $Exporter::ExportLevel = 1;
-    *EXPORT = \@MINIMAL_EXPORT ;
-    Exporter::import($this,< grep {s/^\$/*/}, @list);
-}
+sub import
+    my $this = shift
+    my @list = grep { ! m/^-no_match_vars$/ }, @_ 
+    local $Exporter::ExportLevel = 1
+    *EXPORT = \@MINIMAL_EXPORT 
+    Exporter::import($this,< grep {s/^\$/*/}, @list)
 
-1;
+
+1

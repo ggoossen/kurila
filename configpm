@@ -37,79 +37,78 @@ usage: $^PROGRAM_NAME  [ options ]
 EOF
 
 
-our ($Config_SH_expanded);
+our ($Config_SH_expanded)
 
-my $how_many_common = 22;
+my $how_many_common = 22
 
 # commonly used names to precache (and hence lookup fastest)
-my %Common;
+my %Common
 
-while ($how_many_common--) {
-    my $_ = ~< $^DATA;
-    chomp;
-    m/^(\S+):\s*(\d+)$/ or die "Malformed line '$_'";
-    %Common{+$1} = $1;
-}
+while ($how_many_common--)
+    my $_ = ~< $^DATA
+    chomp
+    m/^(\S+):\s*(\d+)$/ or die "Malformed line '$_'"
+    %Common{+$1} = $1
+
 
 # names of things which may need to have slashes changed to double-colons
 my %Extensions = %+: map {%($_,$_)},
-    qw(dynamic_ext static_ext extensions known_extensions);
+    qw(dynamic_ext static_ext extensions known_extensions)
 
 # allowed opts as well as specifies default and initial values
 my %Allowed_Opts = %(
-        'cross'    => '', # --cross=PLATFORM - crosscompiling for PLATFORM
-            'glossary' => 1,  # --no-glossary  - no glossary file inclusion,
+    'cross'    => '', # --cross=PLATFORM - crosscompiling for PLATFORM
+    'glossary' => 1,  # --no-glossary  - no glossary file inclusion,
     #                  for compactness
-    );
+    )
 
-sub opts {
+sub opts
     # user specified options
     my %given_opts = %(
-            # --opt=smth
-            (< map {m/^--([\-_\w]+)=(.*)$/}, @ARGV),
-                # --opt --no-opt --noopt
-                (< @+: map {m/^no-?(.*)$/i??@($1=>0)!!@($_=>1)},
-         map {m/^--([\-_\w]+)$/}, @ARGV),
-        );
+        # --opt=smth
+        (< map {m/^--([\-_\w]+)=(.*)$/}, @ARGV),
+        # --opt --no-opt --noopt
+        (< @+: map {m/^no-?(.*)$/i??@($1=>0)!!@($_=>1)},
+                 map {m/^--([\-_\w]+)$/}, @ARGV),
+        )
 
-    my %opts = %(< %Allowed_Opts, < %given_opts);
+    my %opts = %(< %Allowed_Opts, < %given_opts)
 
-    for my $opt ( grep {!exists %Allowed_Opts{$_}}, keys %given_opts) {
-        warn "option '$opt' is not recognized";
-        usage;
-    }
-    @ARGV = grep {!m/^--/}, @ARGV;
+    for my $opt ( grep {!exists %Allowed_Opts{$_}}, keys %given_opts)
+        warn "option '$opt' is not recognized"
+        usage
+    
+    @ARGV = grep {!m/^--/}, @ARGV
 
-    return %opts;
-}
+    return %opts
 
 
-my %Opts = %( < opts() );
 
-my ($Config_SH, $Config_PM, $Config_heavy, $Config_POD);
-my $Glossary = 'Porting/Glossary';
+my %Opts = %( < opts() )
 
-if (%Opts{?cross}) {
+my ($Config_SH, $Config_PM, $Config_heavy, $Config_POD)
+my $Glossary = 'Porting/Glossary'
+
+if (%Opts{?cross})
     # creating cross-platform config file
-    mkdir "xlib";
-    mkdir "xlib/%Opts{?cross}";
-    $Config_PM = "xlib/%Opts{?cross}/Config.pm";
-    $Config_POD = "xlib/%Opts{?cross}/Config.pod";
-    $Config_SH = "Cross/config-%Opts{?cross}.sh";
-}
-else {
-    $Config_PM = "lib/Config.pm";
-    $Config_POD = "lib/Config.pod";
-    $Config_SH = "config.sh";
-}
-($Config_heavy = $Config_PM) =~ s/\.pm$/_heavy.pl/;
+    mkdir "xlib"
+    mkdir "xlib/%Opts{?cross}"
+    $Config_PM = "xlib/%Opts{?cross}/Config.pm"
+    $Config_POD = "xlib/%Opts{?cross}/Config.pod"
+    $Config_SH = "Cross/config-%Opts{?cross}.sh"
+else
+    $Config_PM = "lib/Config.pm"
+    $Config_POD = "lib/Config.pod"
+    $Config_SH = "config.sh"
+
+($Config_heavy = $Config_PM) =~ s/\.pm$/_heavy.pl/
 die "Can't automatically determine name for Config_heavy.pl from '$Config_PM'"
-    if $Config_heavy eq $Config_PM;
+    if $Config_heavy eq $Config_PM
 
-my $config_txt;
-my $heavy_txt;
+my $config_txt
+my $heavy_txt
 
-$heavy_txt .= <<'ENDOFBEG';
+$heavy_txt .= <<'ENDOFBEG'
 # This file was created by configpm when Perl was built. Any changes
 # made to this file will be lost the next time perl is built.
 
@@ -125,9 +124,9 @@ BEGIN {
 
 ENDOFBEG
 
-my $myver = $^PERL_VERSION;
+my $myver = $^PERL_VERSION
 
-$config_txt .= sprintf <<'ENDOFBEG', < @($myver) x 3;
+$config_txt .= sprintf <<'ENDOFBEG', < @($myver) x 3
 # This file was created by configpm when Perl was built. Any changes
 # made to this file will be lost the next time perl is built.
 
@@ -151,9 +150,9 @@ sub import {
 
     my $callpkg = caller(0);
     foreach my $func (@funcs) {
-	die qq{"$func" is not exported by the $(__PACKAGE__) module\n}
+        die qq{"$func" is not exported by the $(__PACKAGE__) module\n}
              unless %%Export_Cache{$func};
-	*{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{*{Symbol::fetch_glob($func)}};
+        *{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{*{Symbol::fetch_glob($func)}};
     }
 
     return;
@@ -165,66 +164,63 @@ $^PERL_VERSION eq '%s'
 ENDOFBEG
 
 
-my @non_v    = @();
-my @v_others = @();
-my $in_v     = 0;
-my %Data     = %();
+my @non_v    = @()
+my @v_others = @()
+my $in_v     = 0
+my %Data     = %()
 
 
-my %seen_quotes;
-do {
-    my ($name, $val);
-    open(*CONFIG_SH, '<', $Config_SH) || die "Can't open $Config_SH: $^OS_ERROR";
-    while (~< *CONFIG_SH) {
-        next if m:^#!/bin/sh:;
+my %seen_quotes
+do
+    my ($name, $val)
+    open(*CONFIG_SH, '<', $Config_SH) || die "Can't open $Config_SH: $^OS_ERROR"
+    while (~< *CONFIG_SH)
+        next if m:^#!/bin/sh:
 
         # Catch PERL_CONFIG_SH=true and PERL_VERSION=n line from Configure.
-        s/^(\w+)=(true|\d+)\s*$/$1='$2'\n/ or m/^(\w+)='(.*)'$/;
-        my@($k, $v) = @($1, $2);
+        s/^(\w+)=(true|\d+)\s*$/$1='$2'\n/ or m/^(\w+)='(.*)'$/
+        my@($k, $v) = @($1, $2)
 
         # grandfather PATCHLEVEL and SUBVERSION and CONFIG
-        if ($k) {
-            if ($k eq 'PERL_VERSION') {
-                push @v_others, "PATCHLEVEL='$v'\n";
-            }
-            elsif ($k eq 'PERL_SUBVERSION') {
-                push @v_others, "SUBVERSION='$v'\n";
-            }
-            elsif ($k eq 'PERL_CONFIG_SH') {
-                push @v_others, "CONFIG='$v'\n";
-            }
-        }
+        if ($k)
+            if ($k eq 'PERL_VERSION')
+                push @v_others, "PATCHLEVEL='$v'\n"
+            elsif ($k eq 'PERL_SUBVERSION')
+                push @v_others, "SUBVERSION='$v'\n"
+            elsif ($k eq 'PERL_CONFIG_SH')
+                push @v_others, "CONFIG='$v'\n"
+            
+        
 
-        # We can delimit things in config.sh with either ' or ". 
-        unless ($in_v or m/^(\w+)=(['"])(.*\n)/){
-            push(@non_v, "#$_"); # not a name='value' line
-            next;
-        }
-        my $quote = $2;
-        if ($in_v) { 
-            $val .= $_;
-        }
-        else { 
-            @($name,$val) = @($1,$3); 
-        }
-        $in_v = $val !~ m/$quote\n/;
-        next if $in_v;
+        # We can delimit things in config.sh with either ' or ".
+        unless ($in_v or m/^(\w+)=(['"])(.*\n)/)
+            push(@non_v, "#$_") # not a name='value' line
+            next
+        
+        my $quote = $2
+        if ($in_v)
+            $val .= $_
+        else
+            @($name,$val) = @($1,$3)
+        
+        $in_v = $val !~ m/$quote\n/
+        next if $in_v
 
-        s,/,::,g if %Extensions{?$name};
+        s,/,::,g if %Extensions{?$name}
 
-        $val =~ s/$quote\n?\z//;
+        $val =~ s/$quote\n?\z//
 
-        my $line = "$name=$quote$val$quote\n";
-        push(@v_others, $line);
-        %seen_quotes{+$quote}++;
-    }
-    close *CONFIG_SH;
-};
+        my $line = "$name=$quote$val$quote\n"
+        push(@v_others, $line)
+        %seen_quotes{+$quote}++
+    
+    close *CONFIG_SH
+
 
 # This is somewhat grim, but I want the code for parsing config.sh here and
 # now so that I can expand $Config{ivsize} and $Config{ivtype}
 
-my $fetch_string = <<'EOT';
+my $fetch_string = <<'EOT'
 
 # Search for it in the big string
 sub fetch_string {
@@ -232,9 +228,9 @@ sub fetch_string {
 
 EOT
 
-if (%seen_quotes{?'"'}) {
+if (%seen_quotes{?'"'})
     # We need the full ' and " code
-    $fetch_string .= <<'EOT';
+    $fetch_string .= <<'EOT'
     my $quote_type = "'";
     my $marker = "$key=";
 
@@ -246,13 +242,13 @@ if (%seen_quotes{?'"'}) {
         $start = index($Config_SH_expanded, "\n$marker$quote_type");
     }
 EOT
-} else {
-    $fetch_string .= <<'EOT';
+else
+    $fetch_string .= <<'EOT'
     # We only have ' delimted.
     my $start = index($Config_SH_expanded, "\n$key=\'");
 EOT
-}
-$fetch_string .= <<'EOT';
+
+$fetch_string .= <<'EOT'
     # Start can never be -1 now, as we've rigged the long string we're
     # searching with an initial dummy newline.
     return undef if $start == -1;
@@ -260,141 +256,141 @@ $fetch_string .= <<'EOT';
     $start += length($key) + 3;
 
 EOT
-if (!%seen_quotes{?'"'}) {
+if (!%seen_quotes{?'"'})
     # Don't need the full ' and " code, or the eval expansion.
-    $fetch_string .= <<'EOT';
+    $fetch_string .= <<'EOT'
     my $value = substr($Config_SH_expanded, $start,
                        index($Config_SH_expanded, "'\n", $start)
-		       - $start);
+                       - $start);
 EOT
-} else {
-    $fetch_string .= <<'EOT';
+else
+    $fetch_string .= <<'EOT'
     my $value = substr($Config_SH_expanded, $start,
                        index($Config_SH_expanded, "$quote_type\n", $start)
-		       - $start);
+                       - $start);
 
     # If we had a double-quote, we'd better eval it so escape
     # sequences and such can be interpolated. Since the incoming
     # value is supposed to follow shell rules and not perl rules,
     # we escape any perl variable markers
     if ($quote_type eq '"') {
-	$value =~ s/\$/\\\$/g;
-	$value =~ s/\@/\\\@/g;
-	eval "\$value = \"$value\"";
+        $value =~ s/\$/\\\$/g;
+        $value =~ s/\@/\\\@/g;
+        eval "\$value = \"$value\"";
     }
 EOT
-}
-$fetch_string .= <<'EOT';
+
+$fetch_string .= <<'EOT'
     # So we can say "if %Config{'foo'}".
     $value = undef if $value eq 'undef';
     $self->{+$key} = $value; # cache it
 }
 EOT
 
-eval $fetch_string;
-die if $^EVAL_ERROR;
+eval $fetch_string
+die if $^EVAL_ERROR
 
 # Calculation for the keys for byteorder
 # This is somewhat grim, but I need to run fetch_string here.
-$Config_SH_expanded = join "\n", @( '', < @v_others);
+$Config_SH_expanded = join "\n", @( '', < @v_others)
 
-my $t = fetch_string (\%(), 'ivtype');
-my $s = fetch_string (\%(), 'ivsize');
+my $t = fetch_string (\%(), 'ivtype')
+my $s = fetch_string (\%(), 'ivsize')
 
 # byteorder does exist on its own but we overlay a virtual
 # dynamically recomputed value.
 
 # However, ivtype and ivsize will not vary for sane fat binaries
 
-my $f = $t eq 'long' ?? 'L!' !! $s == 8 ?? 'Q'!! 'I';
+my $f = $t eq 'long' ?? 'L!' !! $s == 8 ?? 'Q'!! 'I'
 
-my $byteorder_code;
-if ($s == 4 || $s == 8) {
-    my $list = join ',', reverse(2..$s);
-    my $format = 'a'x$s;
-    $byteorder_code = <<"EOT";
+my $byteorder_code
+if ($s == 4 || $s == 8)
+    my $list = join ',', reverse(2..$s)
+    my $format = 'a'x$s
+    $byteorder_code = <<"EOT"
 
 my \$i = 0;
 foreach my \$c (\@($list)) \{ \$i ^|^= ord(\$c); \$i <<= 8 \}
 \$i ^|^= ord(1);
 our \$byteorder = join('', @(unpack('$format', pack('$f', \$i))));
 EOT
-} else {
-    $byteorder_code = "our \$byteorder = '?'x$s;\n";
-}
+else
+    $byteorder_code = "our \$byteorder = '?'x$s;\n"
 
-my @need_relocation;
 
-if (fetch_string(\%(),'userelocatableinc')) {
+my @need_relocation
+
+if (fetch_string(\%(),'userelocatableinc'))
     foreach my $what (qw(prefixexp
 
-			 archlibexp
-			 html1direxp
-			 html3direxp
-			 man1direxp
-			 man3direxp
-			 privlibexp
-			 scriptdirexp
-			 sitearchexp
-			 sitebinexp
-			 sitehtml1direxp
-			 sitehtml3direxp
-			 sitelibexp
-			 siteman1direxp
-			 siteman3direxp
-			 sitescriptexp
-			 vendorarchexp
-			 vendorbinexp
-			 vendorhtml1direxp
-			 vendorhtml3direxp
-			 vendorlibexp
-			 vendorman1direxp
-			 vendorman3direxp
-			 vendorscriptexp
+                         archlibexp
+                         html1direxp
+                         html3direxp
+                         man1direxp
+                         man3direxp
+                         privlibexp
+                         scriptdirexp
+                         sitearchexp
+                         sitebinexp
+                         sitehtml1direxp
+                         sitehtml3direxp
+                         sitelibexp
+                         siteman1direxp
+                         siteman3direxp
+                         sitescriptexp
+                         vendorarchexp
+                         vendorbinexp
+                         vendorhtml1direxp
+                         vendorhtml3direxp
+                         vendorlibexp
+                         vendorman1direxp
+                         vendorman3direxp
+                         vendorscriptexp
 
-			 siteprefixexp
-			 sitelib_stem
-			 vendorlib_stem
+                         siteprefixexp
+                         sitelib_stem
+                         vendorlib_stem
 
-			 installarchlib
-			 installhtml1dir
-			 installhtml3dir
-			 installman1dir
-			 installman3dir
-			 installprefix
-			 installprefixexp
-			 installprivlib
-			 installscript
-			 installsitearch
-			 installsitebin
-			 installsitehtml1dir
-			 installsitehtml3dir
-			 installsitelib
-			 installsiteman1dir
-			 installsiteman3dir
-			 installsitescript
-			 installvendorarch
-			 installvendorbin
-			 installvendorhtml1dir
-			 installvendorhtml3dir
-			 installvendorlib
-			 installvendorman1dir
-			 installvendorman3dir
-			 installvendorscript
-			 )) {
-        push @need_relocation, $what if fetch_string(\%(), $what) =~ m!^\.\.\./!;
-    }
-}
+                         installarchlib
+                         installhtml1dir
+                         installhtml3dir
+                         installman1dir
+                         installman3dir
+                         installprefix
+                         installprefixexp
+                         installprivlib
+                         installscript
+                         installsitearch
+                         installsitebin
+                         installsitehtml1dir
+                         installsitehtml3dir
+                         installsitelib
+                         installsiteman1dir
+                         installsiteman3dir
+                         installsitescript
+                         installvendorarch
+                         installvendorbin
+                         installvendorhtml1dir
+                         installvendorhtml3dir
+                         installvendorlib
+                         installvendorman1dir
+                         installvendorman3dir
+                         installvendorscript
+                         ))
+        push @need_relocation, $what if fetch_string(\%(), $what) =~ m!^\.\.\./!
+    
 
-my %need_relocation;
-    %need_relocation{[ @need_relocation]} =  @need_relocation;
+
+my %need_relocation
+%need_relocation{[ @need_relocation]} =  @need_relocation
 
 # This can have .../ anywhere:
-if (fetch_string(\%(), 'otherlibdirs') =~ m!\.\.\./!) {
-    %need_relocation{+otherlibdirs} = 'otherlibdirs';
-}
+if (fetch_string(\%(), 'otherlibdirs') =~ m!\.\.\./!)
+    %need_relocation{+otherlibdirs} = 'otherlibdirs'
 
-my $relocation_code = <<'EOT';
+
+my $relocation_code = <<'EOT'
 
 sub relocate_inc {
   my $libdir = shift;
@@ -408,10 +404,10 @@ sub relocate_inc {
       # but bail out if the directory we picked off the end of $prefix is .
       # or ..
       if ($1 eq '.' or $1 eq '..') {
-	# Undo! This should be rare, hence code it this way rather than a
-	# check each time before the s!!! above.
-	$prefix = "$prefix/$1";
-	last;
+        # Undo! This should be rare, hence code it this way rather than a
+        # check each time before the s!!! above.
+        $prefix = "$prefix/$1";
+        last;
       }
       # Remove that leading ../ and loop again
       substr ($libdir, 0, 3, '');
@@ -422,29 +418,29 @@ sub relocate_inc {
 }
 EOT
 
-if (%need_relocation) {
-    my $relocations_in_common;
+if (%need_relocation)
+    my $relocations_in_common
     # otherlibdirs only features in the hash
-    foreach (keys %need_relocation) {
-        $relocations_in_common++ if %Common{?$_};
-    }
-    if ($relocations_in_common) {
-        $config_txt .= $relocation_code;
-    } else {
-        $heavy_txt .= $relocation_code;
-    }
-}
+    foreach (keys %need_relocation)
+        $relocations_in_common++ if %Common{?$_}
+    
+    if ($relocations_in_common)
+        $config_txt .= $relocation_code
+    else
+        $heavy_txt .= $relocation_code
+    
 
-$heavy_txt .= join('', @non_v) . "\n";
+
+$heavy_txt .= join('', @non_v) . "\n"
 
 # copy config summary format from the myconfig.SH script
-$heavy_txt .= "our \$summary = <<'!END!';\n";
-open(*MYCONFIG,"<", "myconfig.SH") || die "open myconfig.SH failed: $^OS_ERROR";
-1 while defined($_ = ~< *MYCONFIG) && !m/^Summary of/;
-{ $heavy_txt .= $_ } until !defined($_ = ~< *MYCONFIG) || m/^\s*$/;
-close(*MYCONFIG);
+$heavy_txt .= "our \$summary = <<'!END!';\n"
+open(*MYCONFIG,"<", "myconfig.SH") || die "open myconfig.SH failed: $^OS_ERROR"
+1 while defined($_ = ~< *MYCONFIG) && !m/^Summary of/
+loop { $heavy_txt .= $_ } until !defined($_ = ~< *MYCONFIG) || m/^\s*$/
+close(*MYCONFIG)
 
-$heavy_txt .= "\n!END!\n" . <<'EOT';
+$heavy_txt .= "\n!END!\n" . <<'EOT'
 my $summary_expanded;
 
 sub myconfig {
@@ -457,34 +453,34 @@ sub myconfig {
 my $_ = <<'!END!';
 EOT
 
-$heavy_txt .= join('', sort @v_others) . "!END!\n";
+$heavy_txt .= join('', sort @v_others) . "!END!\n"
 
 # Only need the dynamic byteorder code in Config.pm if 'byteorder' is one of
 # the precached keys
-if (%Common{?byteorder}) {
-    $config_txt .= $byteorder_code;
-} else {
-    $heavy_txt .= $byteorder_code;
-}
+if (%Common{?byteorder})
+    $config_txt .= $byteorder_code
+else
+    $heavy_txt .= $byteorder_code
 
-if ((nelems @need_relocation)) {
+
+if ((nelems @need_relocation))
     $heavy_txt .= 'foreach my $what (qw(' . join (' ', @need_relocation) .
-        ")) \{\n" . <<'EOT';
+        ")) \{\n" . <<'EOT'
     s/^($what=)(['"])(.*?)\2/$1 . $2 . relocate_inc($3) . $2/me;
 }
 EOT
     # Currently it only makes sense to do the ... relocation on Unix, so there's
     # no need to emulate the "which separator for this platform" logic in perl.c -
     # ':' will always be applicable
-    if (%need_relocation{?otherlibdirs}) {
-        $heavy_txt .= << 'EOT';
+    if (%need_relocation{?otherlibdirs})
+        $heavy_txt .= << 'EOT'
 s\{^(otherlibdirs=)(['"])(.*?)\2\}
  \{$1 . $2 . join ':', < map \{relocate_inc($_)\} split ':', $3 . $2 )\}me;
 EOT
-    }
-}
+    
 
-$heavy_txt .= <<'EOT';
+
+$heavy_txt .= <<'EOT'
 s/(byteorder=)(['"]).*?\2/$1$2$Config::byteorder$2/m;
 
 my $config_sh_len = length $_;
@@ -492,43 +488,43 @@ my $config_sh_len = length $_;
 our $Config_SH_expanded = "\n$_" . << 'EOVIRTUAL';
 EOT
 
-foreach my $prefix (qw(ccflags ldflags)) {
-    my $value = fetch_string (\%(), $prefix);
-    my $withlargefiles = fetch_string (\%(), $prefix . "_uselargefiles");
-    if (defined $withlargefiles) {
-        $value =~ s/\Q$withlargefiles\E\b//;
-        $heavy_txt .= "$($prefix)_nolargefiles='$value'\n";
-    }
-}
+foreach my $prefix (qw(ccflags ldflags))
+    my $value = fetch_string (\%(), $prefix)
+    my $withlargefiles = fetch_string (\%(), $prefix . "_uselargefiles")
+    if (defined $withlargefiles)
+        $value =~ s/\Q$withlargefiles\E\b//
+        $heavy_txt .= "$($prefix)_nolargefiles='$value'\n"
+    
 
-foreach my $prefix (qw(libs libswanted)) {
-    my $value = fetch_string (\%(), $prefix);
-    my $withlf = fetch_string (\%(), 'libswanted_uselargefiles');
-    next unless defined $withlf;
+
+foreach my $prefix (qw(libs libswanted))
+    my $value = fetch_string (\%(), $prefix)
+    my $withlf = fetch_string (\%(), 'libswanted_uselargefiles')
+    next unless defined $withlf
     my @lflibswanted
-        = split(' ', fetch_string (\%(), 'libswanted_uselargefiles'));
-    if ((nelems @lflibswanted)) {
-        my %lflibswanted;
-            %lflibswanted{[ @lflibswanted]} = @();
-        if ($prefix eq 'libs') {
+        = split(' ', fetch_string (\%(), 'libswanted_uselargefiles'))
+    if ((nelems @lflibswanted))
+        my %lflibswanted
+        %lflibswanted{[ @lflibswanted]} = @()
+        if ($prefix eq 'libs')
             my @libs = grep { m/^-l(.+)/ &&
                     not exists %lflibswanted{$1} },
-                split(' ', fetch_string (\%(), 'libs'));
-            $value = join(' ', @libs);
-        } else {
+                split(' ', fetch_string (\%(), 'libs'))
+            $value = join(' ', @libs)
+        else
             my @libswanted = grep { not exists %lflibswanted{$_} },
-                split(' ', fetch_string (\%(), 'libswanted'));
-            $value = join(' ', @libswanted);
-        }
-    }
-    $heavy_txt .= "$($prefix)_nolargefiles='$value'\n";
-}
+                split(' ', fetch_string (\%(), 'libswanted'))
+            $value = join(' ', @libswanted)
+        
+    
+    $heavy_txt .= "$($prefix)_nolargefiles='$value'\n"
 
-$heavy_txt .= "EOVIRTUAL\n";
 
-$heavy_txt .= $fetch_string;
+$heavy_txt .= "EOVIRTUAL\n"
 
-$config_txt .= <<'ENDOFEND';
+$heavy_txt .= $fetch_string
+
+$config_txt .= <<'ENDOFEND'
 
 sub FETCH {
     my @($self, $key) = @_;
@@ -540,7 +536,7 @@ sub FETCH {
 }
 ENDOFEND
 
-$heavy_txt .= <<'ENDOFEND';
+$heavy_txt .= <<'ENDOFEND'
 
 my $prevpos = 0;
 
@@ -551,20 +547,20 @@ sub FIRSTKEY {
 
 sub NEXTKEY {
 ENDOFEND
-if (%seen_quotes{?'"'}) {
-    $heavy_txt .= <<'ENDOFEND';
+if (%seen_quotes{?'"'})
+    $heavy_txt .= <<'ENDOFEND'
     # Find out how the current key's quoted so we can skip to its end.
     my $quote = substr($Config_SH_expanded,
-		       index($Config_SH_expanded, "=", $prevpos)+1, 1);
+                       index($Config_SH_expanded, "=", $prevpos)+1, 1);
     my $pos = index($Config_SH_expanded, qq($quote\n), $prevpos) + 2;
 ENDOFEND
-} else {
+else
     # Just ' quotes, so it's much easier.
-    $heavy_txt .= <<'ENDOFEND';
+    $heavy_txt .= <<'ENDOFEND'
     my $pos = index($Config_SH_expanded, qq('\n), $prevpos) + 2;
 ENDOFEND
-}
-$heavy_txt .= <<'ENDOFEND';
+
+$heavy_txt .= <<'ENDOFEND'
     my $len = index($Config_SH_expanded, "=", $pos) - $pos;
     $prevpos = $pos;
     $len +> 0 ?? substr($Config_SH_expanded, $pos, $len) !! undef;
@@ -583,30 +579,30 @@ sub config_re {
 sub config_vars {
     # implements -V:cfgvar option (see perlrun -V:)
     foreach my $cfgvar (@_) {
-	# find optional leading, trailing colons; and query-spec
-	my @($notag,$qry,$lncont) = @: $cfgvar =~ m/^(:)?(.*?)(:)?$/;	# flags fore and aft, 
-	# map colon-flags to print decorations
-	my $prfx = $notag ?? '' !! "$qry=";		# tag-prefix for print
-	my $lnend = $lncont ?? ' ' !! ";\n";		# line ending for print
+        # find optional leading, trailing colons; and query-spec
+        my @($notag,$qry,$lncont) = @: $cfgvar =~ m/^(:)?(.*?)(:)?$/;   # flags fore and aft, 
+        # map colon-flags to print decorations
+        my $prfx = $notag ?? '' !! "$qry=";             # tag-prefix for print
+        my $lnend = $lncont ?? ' ' !! ";\n";            # line ending for print
 
-	# all config-vars are by definition \w only, any \W means regex
-	if ($qry =~ m/\W/) {
-	    my @matches = @(<config_re($qry));
-	    print $^STDOUT, < map { "$_$lnend" }, @matches || @("$qry: not found")		if !$notag;
-	    print $^STDOUT, < map { s/\w+=//; "$_$lnend" }, @matches || @("$qry: not found")	if  $notag;
-	} else {
-	    my $v = config_value($qry);
-	    $v = 'undef' unless defined $v;
-	    print $^STDOUT, "$($prfx)'$($v)'$lnend";
-	}
+        # all config-vars are by definition \w only, any \W means regex
+        if ($qry =~ m/\W/) {
+            my @matches = @(<config_re($qry));
+            print $^STDOUT, < map { "$_$lnend" }, @matches || @("$qry: not found")              if !$notag;
+            print $^STDOUT, < map { s/\w+=//; "$_$lnend" }, @matches || @("$qry: not found")    if  $notag;
+        } else {
+            my $v = config_value($qry);
+            $v = 'undef' unless defined $v;
+            print $^STDOUT, "$($prfx)'$($v)'$lnend";
+        }
     }
 }
 
 1;
 ENDOFEND
 
-if ($^OS_NAME eq 'os2') {
-    $config_txt .= <<'ENDOFSET';
+if ($^OS_NAME eq 'os2')
+    $config_txt .= <<'ENDOFSET'
 my %preconfig;
 if ($OS2::is_aout) {
     my ($value, $v) = $Config_SH_expanded =~ m/^used_aout='(.*)'\s*$/m;
@@ -619,54 +615,54 @@ if ($OS2::is_aout) {
 sub TIEHASH { bless {%preconfig} }
 ENDOFSET
     # Extract the name of the DLL from the makefile to avoid duplication
-    my @($f) =  grep { -r }, qw(GNUMakefile Makefile);
-    my $dll;
-    if (open my $fh, '<', $f) {
-        while ( ~< $fh) {
-            next unless m/^PERL_DLL_BASE\s*=\s*(\S*)\s*$/;
-            $dll = $1;
-            last;
-        }
-    }
-    $config_txt .= <<ENDOFSET if $dll;
+    my @($f) =  grep { -r }, qw(GNUMakefile Makefile)
+    my $dll
+    if (open my $fh, '<', $f)
+        while ( ~< $fh)
+            next unless m/^PERL_DLL_BASE\s*=\s*(\S*)\s*$/
+            $dll = $1
+            last
+        
+    
+    $config_txt .= <<ENDOFSET if $dll
 \%preconfig\{dll_name\} = '$dll';
 ENDOFSET
-} else {
-    $config_txt .= <<'ENDOFSET';
+else
+    $config_txt .= <<'ENDOFSET'
 sub TIEHASH {
     bless @_[1], @_[0];
 }
 ENDOFSET
-}
 
-foreach my $key (keys %Common) {
-    my $value = fetch_string (\%(), $key);
+
+foreach my $key (keys %Common)
+    my $value = fetch_string (\%(), $key)
     # Is it safe on the LHS of => ?
-    my $qkey = $key =~ m/^[A-Za-z_][A-Za-z0-9_]*$/ ?? $key !! "'$key'";
-    if (defined $value) {
+    my $qkey = $key =~ m/^[A-Za-z_][A-Za-z0-9_]*$/ ?? $key !! "'$key'"
+    if (defined $value)
         # Quote things for a '' string
-        $value =~ s!\\!\\\\!g;
-        $value =~ s!'!\\'!g;
-        $value = "'$value'";
-        if ($key eq 'otherlibdirs') {
-            $value = "join (':', map \{relocate_inc(\$_)\} split (':', $value) )";
-        } elsif (%need_relocation{?$key}) {
-            $value = "relocate_inc($value)";
-        }
-    } else {
-        $value = "undef";
-    }
-    %Common{+$key} = "$qkey => $value";
-}
+        $value =~ s!\\!\\\\!g
+        $value =~ s!'!\\'!g
+        $value = "'$value'"
+        if ($key eq 'otherlibdirs')
+            $value = "join (':', map \{relocate_inc(\$_)\} split (':', $value) )"
+        elsif (%need_relocation{?$key})
+            $value = "relocate_inc($value)"
+        
+    else
+        $value = "undef"
+    
+    %Common{+$key} = "$qkey => $value"
 
-if (%Common{?byteorder}) {
-    %Common{+byteorder} = 'byteorder => $byteorder';
-}
-my $fast_config = join '', map { "    $_,\n" }, sort values %Common;
+
+if (%Common{?byteorder})
+    %Common{+byteorder} = 'byteorder => $byteorder'
+
+my $fast_config = join '', map { "    $_,\n" }, sort values %Common
 
 # Sanity check needed to stop an infite loop if Config_heavy.pl fails to define
 # &launcher for some reason (eg it got truncated)
-$config_txt .= sprintf <<'ENDOFTIE', $fast_config;
+$config_txt .= sprintf <<'ENDOFTIE', $fast_config
 
 my @heavy_subs = qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config_sh config_re
                      config_vars|;
@@ -679,7 +675,7 @@ for my $name (@heavy_subs) {
 
 # tie returns the object, so the value returned to require will be true.
 my %%Config = %%(
-%s);
+%s  );
 
 sub config_value {
     my $key = shift;
@@ -702,9 +698,9 @@ sub config_keys {
 
 ENDOFTIE
 
-my $config_pod;
-open($config_pod, ">", "$Config_POD") or die "Can't open $Config_POD: $^OS_ERROR";
-print $config_pod, <<'ENDOFTAIL';
+my $config_pod
+open($config_pod, ">", "$Config_POD") or die "Can't open $Config_POD: $^OS_ERROR"
+print $config_pod, <<'ENDOFTAIL'
 =head1 NAME
 
 Config - access Perl configuration information
@@ -713,7 +709,7 @@ Config - access Perl configuration information
 
     use Config;
     if (%Config{usethreads}) {
-	print "has thread support\n"
+        print "has thread support\n"
     } 
 
     use Config qw(myconfig config_sh config_vars config_re);
@@ -778,18 +774,18 @@ Here's a more sophisticated example of using %Config:
     my %sig_num;
     my @sig_name;
     unless(%Config{sig_name} && %Config{sig_num}) {
-	die "No sigs?";
+        die "No sigs?";
     } else {
-	my @names = split ' ', %Config{sig_name};
-	%sig_num{[@names]} = split ' ', %Config{sig_num};
-	foreach (@names) {
-	    @sig_name[$sig_num{$_}] ||= $_;
-	}   
+        my @names = split ' ', %Config{sig_name};
+        %sig_num{[@names]} = split ' ', %Config{sig_num};
+        foreach (@names) {
+            @sig_name[$sig_num{$_}] ||= $_;
+        }   
     }
 
     print "signal #17 = @sig_name[17]\n";
     if (%sig_num{ALRM}) { 
-	print "SIGALRM is %sig_num{ALRM}\n";
+        print "SIGALRM is %sig_num{ALRM}\n";
     }   
 
 =head1 WARNING
@@ -824,25 +820,25 @@ in such cases.
 
 ENDOFTAIL
 
-if (%Opts{?glossary}) {
-    open(*GLOS, "<", "$Glossary") or die "Can't open $Glossary: $^OS_ERROR";
-}
-my %seen = %( () );
-my $text = 0;
-$^INPUT_RECORD_SEPARATOR = '';
+if (%Opts{?glossary})
+    open(*GLOS, "<", "$Glossary") or die "Can't open $Glossary: $^OS_ERROR"
 
-sub process {
-    my $_ = shift;
-    if (s/\A(\w*)\s+\(([\w.]+)\):\s*\n(\t?)/=item C<$1>\n\nFrom F<$2>:\n\n/m) {
-        my $c = substr $1, 0, 1;
-        unless (%seen{+$c}++) {
-            print $config_pod, <<EOF if $text;
+my %seen = %( () )
+my $text = 0
+$^INPUT_RECORD_SEPARATOR = ''
+
+sub process
+    my $_ = shift
+    if (s/\A(\w*)\s+\(([\w.]+)\):\s*\n(\t?)/=item C<$1>\n\nFrom F<$2>:\n\n/m)
+        my $c = substr $1, 0, 1
+        unless (%seen{+$c}++)
+            print $config_pod, <<EOF if $text
 =back
 
 =cut
 
 EOF
-            print $config_pod, <<EOF;
+            print $config_pod, <<EOF
 =head2 $c
 
 =over 4
@@ -850,51 +846,50 @@ EOF
 =cut
 
 EOF
-            $text = 1;
-        }
-    }
-    elsif (!$text || !m/\A\t/) {
+            $text = 1
+        
+    elsif (!$text || !m/\A\t/)
         warn "Expected a Configure variable header",
-            ($text ?? " or another paragraph of description" !! () );
-    }
-    s/n't/n\00t/g;		# leave can't, won't etc untouched
-    s/^\t\s+(.*)/\n$1/gm;		# Indented lines ===> new paragraph
-    s/^(?<!\n\n)\t(.*)/$1/gm;	# Not indented lines ===> text
-    s{([\'\"])(?=[^\'\"\s]*[./][^\'\"\s]*\1)([^\'\"\s]+)\1}(F<$2>)g; # '.o'
-    s{([\'\"])([^\'\"\s]+)\1}(C<$2>)g; # "date" command
-    s{\'([A-Za-z_\- *=/]+)\'}(C<$1>)g; # 'ln -s'
+            ($text ?? " or another paragraph of description" !! () )
+    
+    s/n't/n\00t/g               # leave can't, won't etc untouched
+    s/^\t\s+(.*)/\n$1/gm                # Indented lines ===> new paragraph
+    s/^(?<!\n\n)\t(.*)/$1/gm    # Not indented lines ===> text
+    s{([\'\"])(?=[^\'\"\s]*[./][^\'\"\s]*\1)([^\'\"\s]+)\1}(F<$2>)g # '.o'
+    s{([\'\"])([^\'\"\s]+)\1}(C<$2>)g # "date" command
+    s{\'([A-Za-z_\- *=/]+)\'}(C<$1>)g # 'ln -s'
     s{
-     (?<! [\w./<\'\"] )		# Only standalone file names
-     (?! e \. g \. )		# Not e.g.
-     (?! \. \. \. )		# Not ...
-     (?! \d )			# Not 5.004
-     (?! read/ )		# Not read/write
-     (?! etc\. )		# Not etc.
-     (?! I/O )			# Not I/O
+     (?<! [\w./<\'\"] )         # Only standalone file names
+     (?! e \. g \. )            # Not e.g.
+     (?! \. \. \. )             # Not ...
+     (?! \d )                   # Not 5.004
+     (?! read/ )                # Not read/write
+     (?! etc\. )                # Not etc.
+     (?! I/O )                  # Not I/O
      (
-	\$ ?			# Allow leading $
-	[\w./]* [./] [\w./]*	# Require . or / inside
+        \$ ?                    # Allow leading $
+        [\w./]* [./] [\w./]*    # Require . or / inside
      )
-     (?<! \. (?= [\s)] ) )	# Do not include trailing dot
-     (?! [\w/] )		# Include all of it
-   }
-   (F<$1>)xg;			# /usr/local
-    s/((?<=\s)~\w*)/F<$1>/g;	# ~name
-    s/(?<![.<\'\"])\b([A-Z_]{2,})\b(?![\'\"])/C<$1>/g;	# UNISTD
-    s/(?<![.<\'\"])\b(?!the\b)(\w+)\s+macro\b/C<$1> macro/g; # FILE_cnt macro
-    s/n[\0]t/n't/g;		# undo can't, won't damage
-}
+     (?<! \. (?= [\s)] ) )      # Do not include trailing dot
+     (?! [\w/] )                # Include all of it
+      }
+      (F<$1>)xg                 # /usr/local
+    s/((?<=\s)~\w*)/F<$1>/g     # ~name
+    s/(?<![.<\'\"])\b([A-Z_]{2,})\b(?![\'\"])/C<$1>/g   # UNISTD
+    s/(?<![.<\'\"])\b(?!the\b)(\w+)\s+macro\b/C<$1> macro/g # FILE_cnt macro
+    s/n[\0]t/n't/g              # undo can't, won't damage
 
-if (%Opts{?glossary}) {
-    ~< *GLOS;				# Skip the "DO NOT EDIT"
-    ~< *GLOS;				# Skip the preamble
-    while ( ~< *GLOS) {
-        process($_);
-        print $config_pod, $_;
-    }
-}
 
-print $config_pod, <<'ENDOFTAIL';
+if (%Opts{?glossary})
+    ~< *GLOS                            # Skip the "DO NOT EDIT"
+    ~< *GLOS                            # Skip the preamble
+    while ( ~< *GLOS)
+        process($_)
+        print $config_pod, $_
+    
+
+
+print $config_pod, <<'ENDOFTAIL'
 
 =back
 
@@ -908,35 +903,35 @@ outside of it.
 
 ENDOFTAIL
 
-close(*GLOS) if %Opts{?glossary};
-close($config_pod);
-print $^STDOUT, "written $Config_POD\n";
+close(*GLOS) if %Opts{?glossary}
+close($config_pod)
+print $^STDOUT, "written $Config_POD\n"
 
-my $orig_config_txt = "";
-my $orig_heavy_txt = "";
-do {
-    local $^INPUT_RECORD_SEPARATOR = undef;
-    my $fh;
-    $orig_config_txt = ~< $fh if open $fh, "<", $Config_PM;
-    $orig_heavy_txt  = ~< $fh if open $fh, "<", $Config_heavy;
-};
+my $orig_config_txt = ""
+my $orig_heavy_txt = ""
+do
+    local $^INPUT_RECORD_SEPARATOR = undef
+    my $fh
+    $orig_config_txt = ~< $fh if open $fh, "<", $Config_PM
+    $orig_heavy_txt  = ~< $fh if open $fh, "<", $Config_heavy
 
-if ($orig_config_txt ne $config_txt or $orig_heavy_txt ne $heavy_txt) {
-    open my $config_fh, ">", $Config_PM or die "Can't open $Config_PM: $^OS_ERROR\n";
-    open my $config_heavy_fh, ">", $Config_heavy or die "Can't open $Config_heavy: $^OS_ERROR\n";
-    print $config_fh, $config_txt;
-    print $config_heavy_fh, $heavy_txt;
-    close($config_heavy_fh);
-    close($config_fh);
-    print $^STDOUT, "updated $Config_PM\n";
-    print $^STDOUT, "updated $Config_heavy\n";
-}
+
+if ($orig_config_txt ne $config_txt or $orig_heavy_txt ne $heavy_txt)
+    open my $config_fh, ">", $Config_PM or die "Can't open $Config_PM: $^OS_ERROR\n"
+    open my $config_heavy_fh, ">", $Config_heavy or die "Can't open $Config_heavy: $^OS_ERROR\n"
+    print $config_fh, $config_txt
+    print $config_heavy_fh, $heavy_txt
+    close($config_heavy_fh)
+    close($config_fh)
+    print $^STDOUT, "updated $Config_PM\n"
+    print $^STDOUT, "updated $Config_heavy\n"
+
 
 
 # Now create Cross.pm if needed
-if (%Opts{?cross}) {
-    open my $cross_fh, ">", "lib/Cross.pm" or die "Can not open >lib/Cross.pm: $^OS_ERROR";
-    my $cross = <<'EOS';
+if (%Opts{?cross})
+    open my $cross_fh, ">", "lib/Cross.pm" or die "Can not open >lib/Cross.pm: $^OS_ERROR"
+    my $cross = <<'EOS'
 # typical invocation:
 #   perl -MCross Makefile.PL
 #   perl -MCross=wince -V:cc
@@ -955,135 +950,135 @@ sub import {
 
 1;
 EOS
-    $cross =~ s/\*\*\*replace-marker\*\*\*/%Opts{?cross}/g;
-    print $cross_fh, $cross;
-    close $cross_fh;
-    print $^STDOUT, "written lib/Cross.pm\n";
-    unshift($^INCLUDE_PATH,"xlib/%Opts{?cross}");
-}
+    $cross =~ s/\*\*\*replace-marker\*\*\*/%Opts{?cross}/g
+    print $cross_fh, $cross
+    close $cross_fh
+    print $^STDOUT, "written lib/Cross.pm\n"
+    unshift($^INCLUDE_PATH,"xlib/%Opts{?cross}")
+
 
 # Now do some simple tests on the Config.pm file we have created
-unshift($^INCLUDE_PATH,'lib');
-unshift($^INCLUDE_PATH,'xlib/symbian') if %Opts{?cross};
-require $Config_PM;
-require $Config_heavy;
-Config->import();
+unshift($^INCLUDE_PATH,'lib')
+unshift($^INCLUDE_PATH,'xlib/symbian') if %Opts{?cross}
+require $Config_PM
+require $Config_heavy
+Config->import()
 
 die "$^PROGRAM_NAME: $Config_PM not valid"
-    unless config_value('PERL_CONFIG_SH') eq 'true';
+    unless config_value('PERL_CONFIG_SH') eq 'true'
 
 die "$^PROGRAM_NAME: error processing $Config_PM"
     if defined(config_value('an impossible name'))
-    or config_value('PERL_CONFIG_SH') ne 'true' # test cache
-;
+  or config_value('PERL_CONFIG_SH') ne 'true' # test cache
 
-    die "$^PROGRAM_NAME: error processing $Config_PM"
+
+die "$^PROGRAM_NAME: error processing $Config_PM"
     if eval '%Config{"cc"} = 1'
-    or eval 'delete %Config{"cc"}'
-;
+      or eval 'delete %Config{"cc"}'
 
 
-    exit 0;
+
+exit 0
 # Popularity of various entries in %Config, based on a large build and test
 # run of code in the Fotango build system:
 __DATA__
-path_sep:	8490
-d_readlink:	7101
-d_symlink:	7101
-archlibexp:	4318
-sitearchexp:	4305
-sitelibexp:	4305
-privlibexp:	4163
-ldlibpthname:	4041
-libpth:	2134
-archname:	1591
-exe_ext:	1256
-scriptdir:	1155
-version:	1116
-useithreads:	1002
-osvers:	982
-osname:	851
-inc_version_list:	783
-dont_use_nlink:	779
-intsize:	759
-usevendorprefix:	642
-dlsrc:	624
-cc:	541
-lib_ext:	520
-so:	512
-ld:	501
-ccdlflags:	500
-ldflags:	495
-obj_ext:	495
-cccdlflags:	493
-lddlflags:	493
-ar:	492
-dlext:	492
-libc:	492
-ranlib:	492
-full_ar:	491
-vendorarchexp:	491
-vendorlibexp:	491
-installman1dir:	489
-installman3dir:	489
-installsitebin:	489
-installsiteman1dir:	489
-installsiteman3dir:	489
-installvendorman1dir:	489
-installvendorman3dir:	489
-d_flexfnam:	474
-eunicefix:	360
-d_link:	347
-installsitearch:	344
-installscript:	341
-installprivlib:	337
-binexp:	336
-installarchlib:	336
-installprefixexp:	336
-installsitelib:	336
-installstyle:	336
-installvendorarch:	336
-installvendorbin:	336
-installvendorlib:	336
-man1ext:	336
-man3ext:	336
-sh:	336
-siteprefixexp:	336
-installbin:	335
-usedl:	332
-ccflags:	285
-startperl:	232
-optimize:	231
-usemymalloc:	229
-cpprun:	228
-sharpbang:	228
-perllibs:	225
-usesfio:	224
-usethreads:	220
-perlpath:	218
-extensions:	217
-usesocks:	208
-shellflags:	198
-make:	191
-d_pwage:	189
-d_pwchange:	189
-d_pwclass:	189
-d_pwcomment:	189
-d_pwexpire:	189
-d_pwgecos:	189
-d_pwpasswd:	189
-d_pwquota:	189
-gccversion:	189
-libs:	186
-useshrplib:	186
-cppflags:	185
-ptrsize:	185
-shrpenv:	185
-static_ext:	185
-use5005threads:	185
-uselargefiles:	185
-alignbytes:	184
-byteorder:	184
-ccversion:	184
-config_args:	184
-cppminus:	184
+path_sep:       8490
+d_readlink:     7101
+d_symlink:      7101
+archlibexp:     4318
+sitearchexp:    4305
+sitelibexp:     4305
+privlibexp:     4163
+ldlibpthname:   4041
+libpth: 2134
+archname:       1591
+exe_ext:        1256
+scriptdir:      1155
+version:        1116
+useithreads:    1002
+osvers: 982
+osname: 851
+inc_version_list:       783
+dont_use_nlink: 779
+intsize:        759
+usevendorprefix:        642
+dlsrc:  624
+cc:     541
+lib_ext:        520
+so:     512
+ld:     501
+ccdlflags:      500
+ldflags:        495
+obj_ext:        495
+cccdlflags:     493
+lddlflags:      493
+ar:     492
+dlext:  492
+libc:   492
+ranlib: 492
+full_ar:        491
+vendorarchexp:  491
+vendorlibexp:   491
+installman1dir: 489
+installman3dir: 489
+installsitebin: 489
+installsiteman1dir:     489
+installsiteman3dir:     489
+installvendorman1dir:   489
+installvendorman3dir:   489
+d_flexfnam:     474
+eunicefix:      360
+d_link: 347
+installsitearch:        344
+installscript:  341
+installprivlib: 337
+binexp: 336
+installarchlib: 336
+installprefixexp:       336
+installsitelib: 336
+installstyle:   336
+installvendorarch:      336
+installvendorbin:       336
+installvendorlib:       336
+man1ext:        336
+man3ext:        336
+sh:     336
+siteprefixexp:  336
+installbin:     335
+usedl:  332
+ccflags:        285
+startperl:      232
+optimize:       231
+usemymalloc:    229
+cpprun: 228
+sharpbang:      228
+perllibs:       225
+usesfio:        224
+usethreads:     220
+perlpath:       218
+extensions:     217
+usesocks:       208
+shellflags:     198
+make:   191
+d_pwage:        189
+d_pwchange:     189
+d_pwclass:      189
+d_pwcomment:    189
+d_pwexpire:     189
+d_pwgecos:      189
+d_pwpasswd:     189
+d_pwquota:      189
+gccversion:     189
+libs:   186
+useshrplib:     186
+cppflags:       185
+ptrsize:        185
+shrpenv:        185
+static_ext:     185
+use5005threads: 185
+uselargefiles:  185
+alignbytes:     184
+byteorder:      184
+ccversion:      184
+config_args:    184
+cppminus:       184

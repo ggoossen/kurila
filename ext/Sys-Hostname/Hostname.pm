@@ -1,37 +1,37 @@
-package Sys::Hostname;
+package Sys::Hostname
 
 
-use Carp;
+use Carp
 
-require Exporter;
+require Exporter
 
-our @ISA     = qw/ Exporter /;
-our @EXPORT  = qw/ hostname /;
+our @ISA     = qw/ Exporter /
+our @EXPORT  = qw/ hostname /
 
-our $VERSION;
+our $VERSION
 
-our $host;
+our $host
 
-BEGIN {
-    $VERSION = '1.11';
+BEGIN 
+    $VERSION = '1.11'
     use XSLoader ();
-    XSLoader::load('Sys::Hostname', $VERSION);
-}
+    XSLoader::load('Sys::Hostname', $VERSION)
 
 
-sub hostname {
+
+sub hostname
 
     # we already know it
-    return $host if defined $host;
+    return $host if defined $host
 
     # try to ask the system
-    $host = ghname() if defined &ghname;
-    return $host if defined $host;
+    $host = ghname() if defined &ghname
+    return $host if defined $host
 
-    die "Cannot get host name of local machine";
-}
+    die "Cannot get host name of local machine"
 
-1;
+
+1
 
 __END__
 

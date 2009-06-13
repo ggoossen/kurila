@@ -61,7 +61,7 @@ For ease of access, the Perl manual has been split up into several sections.
 
 =head2 Reference Manual
 
-    perlsyn		Perl syntax
+    kurilasyn		Perl Kurila syntax
     perldata		Perl data structures
     perlop		Perl operators and precedence
     perlsub		Perl subroutines
@@ -144,6 +144,7 @@ For ease of access, the Perl manual has been split up into several sections.
     perldoc		Look up Perl documentation in Pod format
 
     perlhist		Perl history records
+    kurila120delta	What is new for Perl Kurila 1.20
     kurila119delta	What is new for Perl Kurila 1.19
     kurila118delta	What is new for Perl Kurila 1.18
     kurila117delta	What is new for Perl Kurila 1.17

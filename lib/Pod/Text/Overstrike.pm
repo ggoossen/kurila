@@ -22,66 +22,66 @@
 # Modules and declarations
 ##############################################################################
 
-package Pod::Text::Overstrike;
+package Pod::Text::Overstrike
 
 
-use Pod::Text ();
+use Pod::Text ()
 
-our (@ISA, $VERSION);
+our (@ISA, $VERSION)
 use utf8;
 
-@ISA = qw(Pod::Text);
+@ISA = qw(Pod::Text)
 
 # Don't use the CVS revision as the version, since this module is also in Perl
 # core and too many things could munge CVS magic revision strings.  This
 # number should ideally be the same as the CVS revision in podlators, however.
-$VERSION = 2.00;
+$VERSION = 2.00
 
 ##############################################################################
 # Overrides
 ##############################################################################
 
 # Make level one headings bold, overridding any existing formatting.
-sub cmd_head1($self, $attrs, $text) {
-    $text =~ s/\s+$//;
-    $text = $self->strip_format ($text);
-    $text =~ s/(.)/$1\b$1/g;
-    return $self->SUPER::cmd_head1 ($attrs, $text);
-}
+sub cmd_head1($self, $attrs, $text)
+    $text =~ s/\s+$//
+    $text = $self->strip_format ($text)
+    $text =~ s/(.)/$1\b$1/g
+    return $self->SUPER::cmd_head1 ($attrs, $text)
+
 
 # Make level two headings bold, overriding any existing formatting.
-sub cmd_head2($self, $attrs, $text) {
-    $text =~ s/\s+$//;
-    $text = $self->strip_format ($text);
-    $text =~ s/(.)/$1\b$1/g;
-    return $self->SUPER::cmd_head2 ($attrs, $text);
-}
+sub cmd_head2($self, $attrs, $text)
+    $text =~ s/\s+$//
+    $text = $self->strip_format ($text)
+    $text =~ s/(.)/$1\b$1/g
+    return $self->SUPER::cmd_head2 ($attrs, $text)
+
 
 # Make level three headings underscored, overriding any existing formatting.
-sub cmd_head3($self, $attrs, $text) {
-    $text =~ s/\s+$//;
-    $text = $self->strip_format ($text);
-    $text =~ s/(.)/_\b$1/g;
-    return $self->SUPER::cmd_head3 ($attrs, $text);
-}
+sub cmd_head3($self, $attrs, $text)
+    $text =~ s/\s+$//
+    $text = $self->strip_format ($text)
+    $text =~ s/(.)/_\b$1/g
+    return $self->SUPER::cmd_head3 ($attrs, $text)
+
 
 # Level four headings look like level three headings.
-sub cmd_head4($self, $attrs, $text) {
-    $text =~ s/\s+$//;
-    $text = $self->strip_format ($text);
-    $text =~ s/(.)/_\b$1/g;
-    return $self->SUPER::cmd_head4 ($attrs, $text);
-}
+sub cmd_head4($self, $attrs, $text)
+    $text =~ s/\s+$//
+    $text = $self->strip_format ($text)
+    $text =~ s/(.)/_\b$1/g
+    return $self->SUPER::cmd_head4 ($attrs, $text)
+
 
 # The common code for handling all headers.  We have to override to avoid
 # interpolating twice and because we don't want to honor alt.
-sub heading($self, $text, $indent, $marker) {
-    $self->item ("\n\n") if defined $self->%{?ITEM};
-    $text .= "\n" if $self->%{?opt_loose};
-    my $margin = ' ' x ($self->%{?opt_margin} + $indent);
-    $self->output ($margin . $text . "\n");
-    return '';
-}
+sub heading($self, $text, $indent, $marker)
+    $self->item ("\n\n") if defined $self->%{?ITEM}
+    $text .= "\n" if $self->%{?opt_loose}
+    my $margin = ' ' x ($self->%{?opt_margin} + $indent)
+    $self->output ($margin . $text . "\n")
+    return ''
+
 
 # Fix the various formatting codes.
 sub cmd_b { local $_ = @_[0]->strip_format (@_[2]); s/(.)/$1\b$1/g; $_ }
@@ -89,35 +89,35 @@ sub cmd_f { local $_ = @_[0]->strip_format (@_[2]); s/(.)/_\b$1/g; $_ }
 sub cmd_i { local $_ = @_[0]->strip_format (@_[2]); s/(.)/_\b$1/g; $_ }
 
 # Output any included code in bold.
-sub output_code($self, $code) {
-    $code =~ s/(.)/$1\b$1/g;
-    $self->output ($code);
-}
+sub output_code($self, $code)
+    $code =~ s/(.)/$1\b$1/g
+    $self->output ($code)
+
 
 # We unfortunately have to override the wrapping code here, since the normal
 # wrapping code gets really confused by all the backspaces.
-sub wrap {
-    my $self = shift;
-    local $_ = shift;
-    my $output = '';
-    my $spaces = ' ' x $self->%{?MARGIN};
-    my $width = $self->%{?opt_width} - $self->%{?MARGIN};
-    while (length +> $width) {
+sub wrap
+    my $self = shift
+    local $_ = shift
+    my $output = ''
+    my $spaces = ' ' x $self->%{?MARGIN}
+    my $width = $self->%{?opt_width} - $self->%{?MARGIN}
+    while (length +> $width)
         # This regex represents a single character, that's possibly underlined
         # or in bold (in which case, it's three characters; the character, a
         # backspace, and a character).  Use [^\n] rather than . to protect
         # against odd settings of $*.
-        my $char = '(?:[^\n][\b])?[^\n]';
-        if (s/^((?>$char){0,$width})(?:\Z|[\ \t]+)//) {
-            $output .= $spaces . $1 . "\n";
-        } else {
-            last;
-        }
-    }
-    $output .= $spaces . $_;
-    $output =~ s/\s+$/\n\n/;
-    return $output;
-}
+        my $char = '(?:[^\n][\b])?[^\n]'
+        if (s/^((?>$char){0,$width})(?:\Z|[\ \t]+)//)
+            $output .= $spaces . $1 . "\n"
+        else
+            last
+        
+    
+    $output .= $spaces . $_
+    $output =~ s/\s+$/\n\n/
+    return $output
+
 
 ##############################################################################
 # Utility functions
@@ -125,17 +125,17 @@ sub wrap {
 
 # Strip all of the formatting from a provided string, returning the stripped
 # version.
-sub strip_format($self, $text) {
-    $text =~ s/(.)[\b]\1/$1/g;
-    $text =~ s/_[\b]//g;
-    return $text;
-}
+sub strip_format($self, $text)
+    $text =~ s/(.)[\b]\1/$1/g
+    $text =~ s/_[\b]//g
+    return $text
+
 
 ##############################################################################
 # Module return value and documentation
 ##############################################################################
 
-1;
+1
 __END__
 
 =head1 NAME

@@ -1,5 +1,5 @@
-package signals;
+package signals
 
-use warnings;
+use warnings
 
-1;
+1

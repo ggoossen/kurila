@@ -1,74 +1,74 @@
-package utf8;
+package utf8
 
-BEGIN {
-    $utf8::hint_bits = 0x01000000;
-    $bytes::hint_bits = 0x00000008;
-    $utf8::codepoints_hint_bits = 0x00800000;
+BEGIN 
+    $utf8::hint_bits = 0x01000000
+    $bytes::hint_bits = 0x00000008
+    $utf8::codepoints_hint_bits = 0x00800000
 
-    $^HINT_BITS ^|^= $utf8::codepoints_hint_bits;
-    $^HINT_BITS ^&^= ^~^$bytes::hint_bits;
-}
+    $^HINT_BITS ^|^= $utf8::codepoints_hint_bits
+    $^HINT_BITS ^&^= ^~^$bytes::hint_bits
 
-our $VERSION = '1.07';
+
+our $VERSION = '1.07'
 
 # toggle utf8/codepoints hints
-sub import {
-    $^HINT_BITS ^|^= $utf8::hint_bits;
-    $^HINT_BITS ^|^= $utf8::codepoints_hint_bits;
-    $^HINT_BITS ^&^= ^~^$bytes::hint_bits;
-}
+sub import
+    $^HINT_BITS ^|^= $utf8::hint_bits
+    $^HINT_BITS ^|^= $utf8::codepoints_hint_bits
+    $^HINT_BITS ^&^= ^~^$bytes::hint_bits
 
-sub unimport {
-    $^HINT_BITS ^&^= ^~^$utf8::hint_bits;
-    $^HINT_BITS ^&^= ^~^$utf8::codepoints_hint_bits;
-}
+
+sub unimport
+    $^HINT_BITS ^&^= ^~^$utf8::hint_bits
+    $^HINT_BITS ^&^= ^~^$utf8::codepoints_hint_bits
+
 
 # SWASHNEW
-sub SWASHNEW {
-    require "utf8_heavy.pl";
-    return utf8::SWASHNEW_real(< @_);
-}
+sub SWASHNEW
+    require "utf8_heavy.pl"
+    return utf8::SWASHNEW_real(< @_)
+
 
 # utf version of string functions
 
-sub length($s) {
+sub length($s)
     BEGIN { utf8::import() }
-    return CORE::length($s);
-}
+    return CORE::length($s)
 
-sub substr($strref, @< @_) {
+
+sub substr($strref, @< @_)
     BEGIN { utf8::import() }
     return
         (nelems @_) == 1 ?? CORE::substr($strref->$, @_[0]) !!
         (nelems @_) == 2 ?? CORE::substr($strref->$, @_[0], @_[1]) !!
-        CORE::substr($strref->$, @_[0], @_[1], @_[2]) ;
-}
+        CORE::substr($strref->$, @_[0], @_[1], @_[2]) 
 
-sub ord($s) {
+
+sub ord($s)
     BEGIN { utf8::import() }
-    return CORE::ord($s);
-}
+    return CORE::ord($s)
 
-sub chr ($s) {
+
+sub chr ($s)
     BEGIN { utf8::import() }
-    return CORE::chr($s);
-}
+    return CORE::chr($s)
 
-sub index($s, @< @_) {
+
+sub index($s, @< @_)
     BEGIN { utf8::import() }
     return
         (nelems @_) == 1 ?? CORE::index($s, @_[0]) !!
-        CORE::index($s, @_[0], @_[1]) ;
-}
+        CORE::index($s, @_[0], @_[1]) 
 
-sub rindex($s, @< @_) {
+
+sub rindex($s, @< @_)
     BEGIN { utf8::import() }
     return
         (nelems @_) == 1 ?? CORE::rindex($s, @_[0]) !!
-        CORE::rindex($s, @_[0], @_[1]) ;
-}
+        CORE::rindex($s, @_[0], @_[1]) 
 
-1;
+
+1
 __END__
 
 =head1 NAME

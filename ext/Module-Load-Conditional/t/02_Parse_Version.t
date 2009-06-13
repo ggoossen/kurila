@@ -1,27 +1,27 @@
 
-use Test::More  'no_plan';
+use Test::More  'no_plan'
 
-my $Class   = 'Module::Load::Conditional';
-my $Meth    = '_parse_version';
-my $Verbose = (nelems @ARGV) ?? 1 !! 0;
+my $Class   = 'Module::Load::Conditional'
+my $Meth    = '_parse_version'
+my $Verbose = (nelems @ARGV) ?? 1 !! 0
 
-use_ok( $Class );
+use_ok( $Class )
 
 ### versions that should parse
-do {   for my $str (  __PACKAGE__->_succeed ) {
-        my $res = $Class->?$Meth( $str, $Verbose );
-        ok( defined $res,       "String '$str' identified as version string" );
+do {   for my $str (  __PACKAGE__->_succeed )
+        my $res = $Class->?$Meth( $str, $Verbose )
+        ok( defined $res,       "String '$str' identified as version string" )
 
-        is( $res->vcmp(0), 1,              "   Version is '$($res->stringify)'" );
-    }             
-};
+        is( $res->vcmp(0), 1,              "   Version is '$($res->stringify)'" )
+    
+}
 
 ### version that should fail
-do {   for my $str (  __PACKAGE__->_fail ) {
-        my $res = $Class->?$Meth( $str, $Verbose );
-        ok( ! defined $res,     "String '$str' is not a version string" );
-    }
-};    
+do {   for my $str (  __PACKAGE__->_fail )
+        my $res = $Class->?$Meth( $str, $Verbose )
+        ok( ! defined $res,     "String '$str' is not a version string" )
+    
+}
 
 
 ################################
@@ -30,7 +30,7 @@ do {   for my $str (  __PACKAGE__->_fail ) {
 ###
 ################################
 
-sub _succeed {
+sub _succeed
     return grep { m/\S/ }, map { s/^\s*//; $_ }, split "\n", q[
         our $VERSION = 1;
         *VERSION = \'1.01';
@@ -52,10 +52,10 @@ sub _succeed {
         (our $VERSION) = q$Revision: 1.00 $ =~ m/([\d.]+)/;
         our $VERSION = "3.0.8";
         our $VERSION = '1.0.5';
-    ];
-}
+    ]
 
-sub _fail {
+
+sub _fail
     return grep { m/\S/ }, map { s/^\s*//; $_ }, split "\n", q[
         our ($VERSION, %ERROR, $ERROR, $Warn, $Die);
         sub version { $GD::Graph::colour::VERSION }
@@ -73,5 +73,5 @@ sub _fail {
         # ( $VERSION ) = '$Revision: 1.56 $ ' =~ m/\$Revision:\s+([^\s]+)/;
         #$VERSION = sprintf('%d.%s', map {s/_//g; $_} q$Name: $ =~ m/-(\d+)_([\d_]+)/);
         #$VERSION = sprintf('%d.%s', map {s/_//g; $_} q$Name: $ =~ m/-(\d+)_([\d_]+)/);
-    ];
-}
+    ]
+

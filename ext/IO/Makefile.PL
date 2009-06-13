@@ -1,7 +1,7 @@
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker
 
 WriteMakefile(
-    VERSION_FROM	=> "IO.pm",
-    NAME      	=> "IO",
-    OBJECT		=> '$(O_FILES)', 
-    );
+    VERSION_FROM        => "IO.pm",
+    NAME        => "IO",
+    OBJECT              => '$(O_FILES)', 
+    )

@@ -3,7 +3,7 @@
 # script.t - tests for Locale::Script
 #
 
-use Locale::Script;
+use Locale::Script
 
 #-----------------------------------------------------------------------
 # This is an array of tests specs. Each spec is [TEST, OK_TO_DIE]
@@ -78,19 +78,18 @@ our @TESTS =
  \@('script_code2code(170, LOCALE_CODE_NUMERIC, LOCALE_CODE_ALPHA_3) eq "tna"', 0),
  \@('script_code2code("rr", LOCALE_CODE_ALPHA_2, LOCALE_CODE_NUMERIC) eq "620"', 0),
 
-    );
+    )
 
-use Test::More;
+use Test::More
 
-plan tests => (nelems @TESTS);
+plan tests => (nelems @TESTS)
 
 foreach my $test ( @TESTS)
-{
-    diag($test->[0]);
-    my $ok = eval "$test->[0]";
-    if ($test->[1]) {
-        ok($^EVAL_ERROR);
-    } else {
-        ok($ok);
-    }
-}
+    diag($test->[0])
+    my $ok = eval "$test->[0]"
+    if ($test->[1])
+        ok($^EVAL_ERROR)
+    else
+        ok($ok)
+    
+

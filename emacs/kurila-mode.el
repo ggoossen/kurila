@@ -111,1400 +111,8 @@
 ;;; lot of faces can be set up, but are not visible on your screen
 ;;; since the coloring rules for this faces are not defined.
 
-;;; Updates: ========================================
-
-;;; Made less hairy by default: parentheses not electric,
-;;; linefeed not magic. Bug with abbrev-mode corrected.
-
-;;;; After 1.4:
-;;;  Better indentation:
-;;;  subs inside braces should work now,
-;;;  Toplevel braces obey customization.
-;;;  indent-for-comment knows about bad cases, kurila-indent-for-comment
-;;;  moves cursor to a correct place.
-;;;  kurila-indent-exp written from the scratch! Slow... (quadratic!) :-(
-;;;        (50 secs on DB::DB (sub of 430 lines), 486/66)
-;;;  Minor documentation fixes.
-;;;  Imenu understands packages as prefixes (including nested).
-;;;  Hairy options can be switched off one-by-one by setting to null.
-;;;  Names of functions and variables changed to conform to `kurila-' style.
-
-;;;; After 1.5:
-;;;  Some bugs with indentation of labels (and embedded subs) corrected.
-;;;  `kurila-indent-region' done (slow :-()).
-;;;  `kurila-fill-paragraph' done.
-;;;  Better package support for `imenu'.
-;;;  Progress indicator for indentation (with `imenu' loaded).
-;;;  `Kurila-set' was busted, now setting the individual hairy option
-;;;     should be better.
-
-;;;; After 1.6:
-;;; `kurila-set-style' done.
-;;; `kurila-check-syntax' done.
-;;; Menu done.
-;;; New config variables `kurila-close-paren-offset' and `kurila-comment-column'.
-;;; Bugs with `kurila-auto-newline' corrected.
-;;; `kurila-electric-lbrace' can work with `kurila-auto-newline' in situation
-;;; like $hash{.
-
-;;;; 1.7 XEmacs (arius@informatik.uni-erlangen.de):
-;;; - use `next-command-event', if `next-command-events' does not exist
-;;; - use `find-face' as def. of `is-face'
-;;; - corrected def. of `x-color-defined-p'
-;;; - added const defs for font-lock-comment-face,
-;;;   font-lock-keyword-face and font-lock-function-name-face
-;;; - added def. of font-lock-variable-name-face
-;;; - added (require 'easymenu) inside an `eval-when-compile'
-;;; - replaced 4-argument `substitute-key-definition' with ordinary
-;;;   `define-key's
-;;; - replaced `mark-active' in menu definition by `kurila-use-region-p'.
-;;; Todo (at least):
-;;; - use emacs-vers.el (http://www.cs.utah.edu/~eeide/emacs/emacs-vers.el.gz)
-;;;   for portable code?
-;;; - should `kurila-mode' do a
-;;;	(if (featurep 'easymenu) (easy-menu-add kurila-menu))
-;;;   or should this be left to the user's `kurila-mode-hook'?
-
-;;; Some bugs introduced by the above fix corrected (IZ ;-).
-;;; Some bugs under XEmacs introduced by the correction corrected.
-
-;;; Some more can remain since there are two many different variants.
-;;; Please feedback!
-
-;;; We do not support fontification of arrays and hashes under
-;;; obsolete font-lock any more. Upgrade.
-
-;;;; after 1.8 Minor bug with parentheses.
-;;;; after 1.9 Improvements from Joe Marzot.
-;;;; after 1.10
-;;;  Does not need easymenu to compile under XEmacs.
-;;;  `vc-insert-headers' should work better.
-;;;  Should work with 19.29 and 19.12.
-;;;  Small improvements to fontification.
-;;;  Expansion of keywords does not depend on C-? being backspace.
-
-;;; after 1.10+
-;;; 19.29 and 19.12 supported.
-;;; `kurila-font-lock-enhanced' deprecated. Use font-lock-extra.el.
-;;; Support for font-lock-extra.el.
-
-;;;; After 1.11:
-;;; Tools submenu.
-;;; Support for perl5-info.
-;;; `imenu-go-find-at-position' in Tools requires imenu-go.el (see hints above)
-;;; Imenu entries do not work with stock imenu.el. Patch sent to maintainers.
-;;; Fontifies `require a if b;', __DATA__.
-;;; Arglist for auto-fill-mode was incorrect.
-
-;;;; After 1.12:
-;;; `kurila-lineup-step' and `kurila-lineup' added: lineup constructions
-;;; vertically.
-;;; `kurila-do-auto-fill' updated for 19.29 style.
-;;; `kurila-info-on-command' now has a default.
-;;; Workaround for broken C-h on XEmacs.
-;;; VC strings escaped.
-;;; C-h f now may prompt for function name instead of going on,
-;;; controlled by `kurila-info-on-command-no-prompt'.
-
-;;;; After 1.13:
-;;; Msb buffer list includes perl files
-;;; Indent-for-comment uses indent-to
-;;; Can write tag files using etags.
-
-;;;; After 1.14:
-;;; Recognizes (tries to ;-) {...} which are not blocks during indentation.
-;;; `kurila-close-paren-offset' affects ?\] too (and ?\} if not block)
-;;; Bug with auto-filling comments started with "##" corrected.
-
-;;;; Very slow now: on DB::DB 0.91, 486/66:
-
-;;;Function Name                             Call Count  Elapsed Time  Average Time
-;;;========================================  ==========  ============  ============
-;;;kurila-block-p                             469         3.7799999999  0.0080597014
-;;;kurila-get-state                           505         163.39000000  0.3235445544
-;;;kurila-comment-indent                      12          0.0299999999  0.0024999999
-;;;kurila-backward-to-noncomment              939         4.4599999999  0.0047497337
-;;;kurila-calculate-indent                    505         172.22000000  0.3410297029
-;;;kurila-indent-line                         505         172.88000000  0.3423366336
-;;;kurila-use-region-p                        40          0.0299999999  0.0007499999
-;;;kurila-indent-exp                          1           177.97000000  177.97000000
-;;;kurila-to-comment-or-eol                   1453        3.9800000000  0.0027391603
-;;;kurila-backward-to-start-of-continued-exp  9           0.0300000000  0.0033333333
-;;;kurila-indent-region                       1           177.94000000  177.94000000
-
-;;;; After 1.15:
-;;; Takes into account white space after opening parentheses during indent.
-;;; May highlight pods and here-documents: see `kurila-pod-here-scan',
-;;; `kurila-pod-here-fontify', `kurila-pod-face'. Does not use this info
-;;; for indentation so far.
-;;; Fontification updated to 19.30 style.
-;;; The change 19.29->30 did not add all the required functionality,
-;;;     but broke "font-lock-extra.el". Get "choose-color.el" from
-;;;       http://ilyaz.org/software/emacs
-
-;;;; After 1.16:
-;;;       else # comment
-;;;    recognized as a start of a block.
-;;;  Two different font-lock-levels provided.
-;;;  `kurila-pod-head-face' introduced. Used for highlighting.
-;;;  `imenu' marks pods, +Packages moved to the head.
-
-;;;; After 1.17:
-;;;  Scan for pods highlights here-docs too.
-;;;  Note that the tag of here-doc may be rehighlighted later by lazy-lock.
-;;;  Only one here-doc-tag per line is supported, and one in comment
-;;;  or a string may break fontification.
-;;;  POD headers were supposed to fill one line only.
-
-;;;; After 1.18:
-;;;  `font-lock-keywords' were set in 19.30 style _always_. Current scheme
-;;;    may  break under XEmacs.
-;;;  `kurila-calculate-indent' dis suppose that `parse-start' was defined.
-;;;  `fontified' tag is added to fontified text as well as `lazy-lock' (for
-;;;    compatibility with older lazy-lock.el) (older one overfontifies
-;;;    something nevertheless :-().
-;;;  Will not indent something inside pod and here-documents.
-;;;  Fontifies the package name after import/no/bootstrap.
-;;;  Added new entry to menu with meta-info about the mode.
-
-;;;; After 1.19:
-;;;  Prefontification works much better with 19.29. Should be checked
-;;;   with 19.30 as well.
-;;;  Some misprints in docs corrected.
-;;;  Now $a{-text} and -text => "blah" are fontified as strings too.
-;;;  Now the pod search is much stricter, so it can help you to find
-;;;    pod sections which are broken because of whitespace before =blah
-;;;    - just observe the fontification.
-
-;;;; After 1.20
-;;;  Anonymous subs are indented with respect to the level of
-;;;    indentation of `sub' now.
-;;;  {} is recognized as hash after `bless' and `return'.
-;;;  Anonymous subs are split by `kurila-linefeed' as well.
-;;;  Electric parens embrace a region if present.
-;;;  To make `kurila-auto-newline' useful,
-;;;    `kurila-auto-newline-after-colon' is introduced.
-;;;  `kurila-electric-parens' is now t or nul. The old meaning is moved to
-;;;  `kurila-electric-parens-string'.
-;;;  `kurila-toggle-auto-newline' introduced, put on C-c C-a.
-;;;  `kurila-toggle-abbrev' introduced, put on C-c C-k.
-;;;  `kurila-toggle-electric' introduced, put on C-c C-e.
-;;;  Beginning-of-defun-regexp was not anchored.
-
-;;;; After 1.21
-;;;  Auto-newline grants `kurila-extra-newline-before-brace' if "{" is typed
-;;;    after ")".
-;;;  {} is recognized as expression after `tr' and friends.
-
-;;;; After 1.22
-;;;  Entry Hierarchy added to imenu. Very primitive so far.
-;;;  One needs newer `imenu-go'.el. A patch to `imenu' is needed as well.
-;;;  Writes its own TAGS files.
-;;;  Class viewer based on TAGS files. Does not trace @ISA so far.
-;;;  19.31: Problems with scan for PODs corrected.
-;;;  First POD header correctly fontified.
-;;;  I needed (setq imenu-use-keymap-menu t) to get good imenu in 19.31.
-;;;  Apparently it makes a lot of hierarchy code obsolete...
-
-;;;; After 1.23
-;;;  Tags filler now scans *.xs as well.
-;;;  The info from *.xs scan is used by the hierarchy viewer.
-;;;  Hierarchy viewer documented.
-;;;  Bug in 19.31 imenu documented.
-
-;;;; After 1.24
-;;;  New location for info-files mentioned,
-;;;  Electric-; should work better.
-;;;  Minor bugs with POD marking.
-
-;;;; After 1.25 (probably not...)
-;;;  `kurila-info-page' introduced.
-;;;  To make `uncomment-region' working, `comment-region' would
-;;;  not insert extra space.
-;;;  Here documents delimiters better recognized
-;;;  (empty one, and non-alphanums in quotes handled). May be wrong with 1<<14?
-;;;  `kurila-db' added, used in menu.
-;;;  imenu scan removes text-properties, for better debugging
-;;;    - but the bug is in 19.31 imenu.
-;;;  formats highlighted by font-lock and prescan, embedded comments
-;;;  are not treated.
-;;;  POD/friends scan merged in one pass.
-;;;  Syntax class is not used for analyzing the code, only char-syntax
-;;;  may be checked against _ or'ed with w.
-;;;  Syntax class of `:' changed to be _.
-;;;  `kurila-find-bad-style' added.
-
-;;;; After 1.25
-;;;  When search for here-documents, we ignore commented << in simplest cases.
-;;;  `kurila-get-help' added, available on C-h v and from menu.
-;;;  Auto-help added. Default with `kurila-hairy', switchable on/off
-;;;   with startup variable `kurila-lazy-help-time' and from
-;;;   menu. Requires `run-with-idle-timer'.
-;;;  Highlighting of @abc{@efg} was wrong - interchanged two regexps.
-
-;;;; After 1.27
-;;;  Indentation: At toplevel after a label - fixed.
-;;;  1.27 was put to archives in binary mode ===> DOSish :-(
-
-;;;; After 1.28
-;;;  Thanks to Martin Buchholz <mrb@Eng.Sun.COM>: misprints in
-;;;  comments and docstrings corrected, XEmacs support cleaned up.
-;;;  The closing parenths would enclose the region into matching
-;;;  parens under the same conditions as the opening ones.
-;;;  Minor updates to `kurila-short-docs'.
-;;;  Will not consider <<= as start of here-doc.
-
-;;;; After 1.29
-;;;  Added an extra advice to look into Micro-docs. ;-).
-;;;  Enclosing of region when you press a closing parenth is regulated by
-;;;  `kurila-electric-parens-string'.
-;;;  Minor updates to `kurila-short-docs'.
-;;;  `initialize-new-tags-table' called only if present (Does this help
-;;;     with generation of tags under XEmacs?).
-;;;  When creating/updating tag files, new info is written at the old place,
-;;;     or at the end (is this a wanted behaviour? I need this in perl build directory).
-
-;;;; After 1.30
-;;;  All the keywords from keywords.pl included (maybe with dummy explanation).
-;;;  No auto-help inside strings, comment, here-docs, formats, and pods.
-;;;  Shrinkwrapping of info, regulated by `kurila-max-help-size',
-;;;  `kurila-shrink-wrap-info-frame'.
-;;;  Info on variables as well.
-;;;  Recognision of HERE-DOCS improved yet more.
-;;;  Autonewline works on `}' without warnings.
-;;;  Autohelp works again on $_[0].
-
-;;;; After 1.31
-;;;  perl-descr.el found its author - hi, Johan!
-;;;  Some support for correct indent after here-docs and friends (may
-;;;  be superseeded by eminent change to Emacs internals).
-;;;  Should work with older Emaxen as well ( `-style stuff removed).
-
-;;;; After 1.32
-
-;;;  Started to add support for `syntax-table' property (should work
-;;;  with patched Emaxen), controlled by
-;;;  `kurila-use-syntax-table-text-property'. Currently recognized:
-;;;    All quote-like operators: m, s, y, tr, qq, qw, qx, q,
-;;;    // in most frequent context:
-;;;          after block or
-;;;                    ~ { ( = | & + - * ! , ;
-;;;          or
-;;;                    while if unless until and or not xor split grep map
-;;;    Here-documents, formats, PODs,
-;;;    ${...}
-;;;    'abc$'
-;;;    sub a ($); sub a ($) {}
-;;;  (provide 'kurila-mode) was missing!
-;;;  `kurila-after-expr-p' is now much smarter after `}'.
-;;;  `kurila-praise' added to mini-docs.
-;;;  Utilities try to support subs-with-prototypes.
-
-;;;; After 1.32.1
-;;;  `kurila-after-expr-p' is now much smarter after "() {}" and "word {}":
-;;;     if word is "else, map, grep".
-;;;  Updated for new values of syntax-table constants.
-;;;  Uses `help-char' (at last!) (disabled, does not work?!)
-;;;  A couple of regexps where missing _ in character classes.
-;;;  -s could be considered as start of regexp, 1../blah/ was not,
-;;;  as was not /blah/ at start of file.
-
-;;;; After 1.32.2
-;;;  "\C-hv" was wrongly "\C-hf"
-;;;  C-hv was not working on `[index()]' because of [] in skip-chars-*.
-;;;  `__PACKAGE__' supported.
-;;;  Thanks for Greg Badros: `kurila-lazy-unstall' is more complete,
-;;;  `kurila-get-help' is made compatible with `query-replace'.
-
-;;;; As of Apr 15, development version of 19.34 supports
-;;;; `syntax-table' text properties. Try setting
-;;;; `kurila-use-syntax-table-text-property'.
-
-;;;; After 1.32.3
-;;;  We scan for s{}[] as well (in simplest situations).
-;;;  We scan for $blah'foo as well.
-;;;  The default is to use `syntax-table' text property if Emacs is good enough.
-;;;  `kurila-lineup' is put on C-M-| (=C-M-S-\\).
-;;;  Start of `kurila-beautify-regexp'.
-
-;;;; After 1.32.4
-;;; `kurila-tags-hier-init' did not work in text-mode.
-;;; `kurila-noscan-files-regexp' had a misprint.
-;;; Generation of Class Hierarchy was broken due to a bug in `x-popup-menu'
-;;;  in 19.34.
-
-;;;; After 1.33:
-;;; my,local highlight vars after {} too.
-;;; TAGS could not be created before imenu was loaded.
-;;; `kurila-indent-left-aligned-comments' created.
-;;; Logic of `kurila-indent-exp' changed a little bit, should be more
-;;;  robust w.r.t. multiline strings.
-;;; Recognition of blah'foo takes into account strings.
-;;; Added '.al' to the list of Perl extensions.
-;;; Class hierarchy is "mostly" sorted (need to rethink algorthm
-;;;  of pruning one-root-branch subtrees to get yet better sorting.)
-;;; Regeneration of TAGS was busted.
-;;; Can use `syntax-table' property when generating TAGS
-;;;  (governed by  `kurila-use-syntax-table-text-property-for-tags').
-
-;;;; After 1.35:
-;;; Can process several =pod/=cut sections one after another.
-;;; Knows of `extproc' when under `emx', indents with `__END__' and `__DATA__'.
-;;; `kurila-under-as-char' implemented (XEmacs people like broken behaviour).
-;;; Beautifier for regexps fixed.
-;;; `kurila-beautify-level', `kurila-contract-level' coded
-;;;
-;;;; Emacs's 20.2 problems:
-;;; `imenu.el' has bugs, `imenu-add-to-menubar' does not work.
-;;; Couple of others problems with 20.2 were reported, my ability to check/fix
-;;; them is very reduced now.
-
-;;;; After 1.36:
-;;;  'C-M-|' in XEmacs fixed
-
-;;;; After 1.37:
-;;;  &&s was not recognized as start of regular expression;
-;;;  Will "preprocess" the contents of //e part of s///e too;
-;;;  What to do with s# blah # foo #e ?
-;;;  Should handle s;blah;foo;; better.
-;;;  Now the only known problems with regular expression recognition:
-;;;;;;;  s<foo>/bar/	- different delimiters (end ignored)
-;;;;;;;  s/foo/\\bar/	- backslash at start of subst (made into one chunk)
-;;;;;;;  s/foo//	- empty subst (made into one chunk + '/')
-;;;;;;;  s/foo/(bar)/	- start-group at start of subst (internal group will not match backwards)
-
-;;;; After 1.38:
-;;;  We highlight closing / of s/blah/foo/e;
-;;;  This handles s# blah # foo #e too;
-;;;  s//blah/, s///, s/blah// works again, and s#blah## too, the algorithm
-;;;   is much simpler now;
-;;;  Next round of changes: s\\\ works, s<blah>/foo/,
-;;;   comments between the first and the second part allowed
-;;;  Another problem discovered:
-;;;;;;;  s[foo] <blah>e	- e part delimited by different <> (will not match)
-;;;  `kurila-find-pods-heres' somehow maybe called when string-face is undefined
-;;;   - put a stupid workaround for 20.1
-
-;;;; After 1.39:
-;;;  Could indent here-docs for comments;
-;;;  These problems fixed:
-;;;;;;;  s/foo/\\bar/	- backslash at start of subst (made into two chunk)
-;;;;;;;  s[foo] <blah>e	- "e" part delimited by "different" <> (will match)
-;;;  Matching brackets honor prefices, may expand abbreviations;
-;;;  When expanding abbrevs, will remove last char only after
-;;;    self-inserted whitespace;
-;;;  More convenient "Refress hard constructs" in menu;
-;;;  `kurila-add-tags-recurse', `kurila-add-tags-recurse-noxs'
-;;;    added (for -batch mode);
-;;;  Better handling of errors when scanning for Perl constructs;
-;;;;;;;  Possible "problem" with class hierarchy in Perl distribution
-;;;;;;;    directory: ./ext duplicates ./lib;
-;;;  Write relative paths for generated TAGS;
-
-;;;; After 1.40:
-;;;  s  /// may be separated by "\n\f" too;
-;;;  `s  #blah' recognized as a comment;
-;;;  Would highlight s/abc//s wrong;
-;;;  Debugging code in `kurila-electric-keywords' was leaking a message;
-
-;;;; After 1.41:
-;;;  RMS changes for 20.3 merged
-
-;;;; 2.0.1.0: RMS mode (has 3 misprints)
-
-;;;; After 2.0:
-;;;  RMS whitespace changes for 20.3 merged
-
-;;;; After 2.1:
-;;;  History updated
-
-;;;; After 2.2:
-;;;  Merge `c-style-alist' since `c-mode' is no more.  (Somebody who
-;;;    uses the styles should check that they work OK!)
-;;;  All the variable warnings go away, some undef functions too.
-
-;;;; After 2.3:
-;;;  Added `kurila-perldoc' (thanks to Anthony Foiani <afoiani@uswest.com>)
-;;;  Added `kurila-pod-to-manpage' (thanks to Nick Roberts <Nick.Roberts@src.bae.co.uk>)
-;;;  All the function warnings go away.
-
-;;;; After 2.4:
-;;;  `Perl doc', `Regexp' submenus created (latter to allow short displays).
-;;;  `kurila-clobber-lisp-bindings' added.
-;;;  $a->y() is not y///.
-;;;  `kurila-after-block-p' was missing a `save-excursion' => wrong results.
-;;;  `kurila-val' was defined too late.
-;;;  `kurila-init-faces' was failing.
-;;;  Init faces when loading `ps-print'.
-
-;;;; After 2.4:
-;;;  `kurila-toggle-autohelp' implemented.
-;;;  `while SPACE LESS' was buggy.
-;;;  `-text' in `[-text => 1]' was not highlighted.
-;;;  `kurila-after-block-p' was FALSE after `sub f {}'.
-
-;;;; After 2.5:
-;;;  `foreachmy', `formy' expanded too.
-;;;  Expand `=pod-directive'.
-;;;  `kurila-linefeed' behaves reasonable in POD-directive lines.
-;;;  `kurila-electric-keyword' prints a message, governed by
-;;;    `kurila-message-electric-keyword'.
-
-;;;; After 2.6:
-;;;  Typing `}' was not checking for being block or not.
-;;;  Beautifying levels in RE: Did not know about lookbehind;
-;;;			       finding *which* level was not intuitive;
-;;;			       `kurila-beautify-levels' added.
-;;;  Allow here-docs contain `=head1' and friends (at least for keywords).
-
-;;;; After 2.7:
-;;;  Fix for broken `font-lock-unfontify-region-function'.  Should
-;;;    preserve `syntax-table' properties even with `lazy-lock'.
-
-;;;; After 2.8:
-;;;  Some more compile time warnings crept in.
-;;;  `kurila-indent-region-fix-else' implemented.
-;;;  `kurila-fix-line-spacing' implemented.
-;;;  `kurila-invert-if-unless' implemented (C-c C-t and in Menu).
-;;;  Upgraded hints to mention 20.2's goods/bads.
-;;;  Started to use `kurila-extra-newline-before-brace-multiline',
-;;;    `kurila-break-one-line-blocks-when-indent',
-;;;    `kurila-fix-hanging-brace-when-indent', `kurila-merge-trailing-else'.
-
-;;;; After 2.9:
-;;;  Workaround for another `font-lock's `syntax-table' text-property bug.
-;;;  `zerop' could be applied to nil.
-;;;  At last, may work with `font-lock' without setting `kurila-font-lock'.
-;;;    (We expect that starting from 19.33, `font-lock' supports keywords
-;;;     being a function - what is a correct version?)
-;;;  Rename `kurila-indent-region-fix-else' to
-;;;    `kurila-indent-region-fix-constructs'.
-;;;  `kurila-fix-line-spacing' could be triggered inside strings, would not
-;;;     know what to do with BLOCKs of map/printf/etc.
-;;;  `kurila-merge-trailing-else' and `kurila-fix-line-spacing' handle
-;;;     `continue' too.
-;;;  Indentation after {BLOCK} knows about map/printf/etc.
-;;;  Finally: treat after-comma lines as continuation lines.
-
-;;;; After 2.10:
-;;;  `continue' made electric.
-;;;  Electric `do' inserts `do/while'.
-;;;  Some extra compile-time warnings crept in.
-;;;  `font-lock' of 19.33 could not handle font-lock-keywords being a function
-;;;      returning a symbol.
-
-;;;; After 2.11:
-;;;  Changes to make syntaxification to be autoredone via `font-lock'.
-;;;    Switched on by `kurila-syntaxify-by-font-lock', off by default so far.
-
-;;;; After 2.12:
-;;;  Remove some commented out chunks.
-;;;  Styles are slightly updated (a lot of work is needed, especially
-;;;    with new `kurila-fix-line-spacing').
-
-;;;; After 2.13:
-;;;  Old value of style is memorized when choosing a new style, may be
-;;;    restored from the same menu.
-;;;  Mode-documentation added to micro-docs.
-;;;  `kurila-praise' updated.
-;;;  `kurila-toggle-construct-fix' added on C-c C-w and menu.
-;;;  `auto-fill-mode' added on C-c C-f and menu.
-;;;  `PerlStyle' style added.
-;;;  Message for termination of scan corrected.
-
-;;;; After 2.14:
-
-;;;  Did not work with -q
-
-;;;; After 2.15:
-
-;;;  `kurila-speed' hints added.
-;;;  Minor style fixes.
-
-;;;; After 2.15:
-;;;  Make backspace electric after expansion of `else/continue' too.
-
-;;;; After 2.16:
-;;;  Starting to merge changes to RMS emacs version.
-
-;;;; After 2.17:
-;;;  Merged custom stuff and darn `font-lock-constant-face'.
-
-;;;; After 2.18:
-;;;  Bumped the version to 3.1
-
-;;;; After 3.1:
-;;;  Fixed customization to honor kurila-hairy.
-;;;  Created customization groups.  Sent to RMS to include into 2.3.
-
-;;;; After 3.2:
-;;;  Interaction of `font-lock-hot-pass' and `kurila-syntaxify-by-font-lock'.
-;;;  (`kurila-after-block-and-statement-beg'):
-;;;  (`kurila-after-block-p'):
-;;;  (`kurila-after-expr-p'):	It is BLOCK if we reach lim when backup sexp.
-;;;  (`kurila-indent-region'):	Make a marker for END - text added/removed.
-;;;  (`kurila-style-alist', `kurila-styles-entries')
-;;;		Include `kurila-merge-trailing-else' where the value is clear.
-
-;;;; After 3.3:
-;;;  (`kurila-tips'):
-;;;  (`kurila-problems'):	Improvements to docs.
-
-;;;; After 3.4:
-;;;  (`kurila-mode'):		Make lazy syntaxification possible.
-;;;  (`kurila-find-pods-heres'): Safe a position in buffer where it is safe to
-;;;				restart syntaxification.
-;;;  (`kurila-syntaxify-by-font-lock'): Set to t, should be safe now.
-
-;;;; After 3.5:
-;;;  (`kurila-syntaxify-by-font-lock'): Better default, customizes to
-;;;				`message' too.
-
-;;;; After 3.6:
-;;;  (`kurila-find-pods-heres'): changed so that -d ?foo? is a RE.
-;;;  (`kurila-array-face'): changed name from `font-lock-emphasized-face'.
-;;;  (`kurila-hash-face'): changed name from  `font-lock-other-emphasized-face'.
-;;;  Use `defface' to define these two extra faces.
-
-;;;; After 3.7:
-;;;  Can use linear algorithm for indentation if Emacs supports it:
-;;;  indenting DB::DB (800+ lines) improved from 69 sec to 11 sec
-;;;  (73 vs 15 with imenu).
-;;;  (`kurila-emacs-can-parse'):	New state.
-;;;  (`kurila-indent-line'):	Corrected to use global state.
-;;;  (`kurila-calculate-indent'):	Likewise.
-;;;  (`kurila-fix-line-spacing'):	Likewise (not used yet).
-
-;;;; After 3.8:
-;;;  (`kurila-choose-color'):	Converted to a function (to be compilable in text-mode).
-
-;;;; After 3.9:
-;;;  (`kurila-dark-background '):	Disable without window-system.
-
-;;;; After 3.10:
-;;;  Do `defface' only if window-system.
-
-;;;; After 3.11:
-;;;  (`kurila-fix-line-spacing'):	sped up to bail out early.
-;;;  (`kurila-indent-region'):	Disable hooks during the call (how to call them later?).
-
-;;;  Now indents 820-line-long function in 6.5 sec (including syntaxification) the first time
-;;;  (when buffer has few properties), 7.1 sec the second time.
-
-;;;Function Name                              Call Count  Elapsed Time  Average Time
-;;;=========================================  ==========  ============  ============
-;;;kurila-indent-exp                           1           10.039999999  10.039999999
-;;;kurila-indent-region                        1           10.0          10.0
-;;;kurila-indent-line                          821         6.2100000000  0.0075639464
-;;;kurila-calculate-indent                     821         5.0199999999  0.0061144945
-;;;kurila-backward-to-noncomment               2856        2.0500000000  0.0007177871
-;;;kurila-fontify-syntaxically                 2           1.78          0.8900000000
-;;;kurila-find-pods-heres                      2           1.78          0.8900000000
-;;;kurila-update-syntaxification               1           1.78          1.78
-;;;kurila-fix-line-spacing                     769         1.4800000000  0.0019245773
-;;;kurila-after-block-and-statement-beg        163         1.4100000000  0.0086503067
-;;;kurila-block-p                              775         1.1800000000  0.0015225806
-;;;kurila-to-comment-or-eol                    3652        1.1200000000  0.0003066812
-;;;kurila-after-block-p                        165         1.0500000000  0.0063636363
-;;;kurila-commentify                           141         0.22          0.0015602836
-;;;kurila-get-state                            813         0.16          0.0001968019
-;;;kurila-backward-to-start-of-continued-exp   26          0.12          0.0046153846
-;;;kurila-delay-update-hook                    2107        0.0899999999  4.271...e-05
-;;;kurila-protect-defun-start                  141         0.0700000000  0.0004964539
-;;;kurila-after-label                          407         0.0599999999  0.0001474201
-;;;kurila-forward-re                           139         0.0299999999  0.0002158273
-;;;kurila-comment-indent                       26          0.0299999999  0.0011538461
-;;;kurila-use-region-p                         8           0.0           0.0
-;;;kurila-lazy-hook                            15          0.0           0.0
-;;;kurila-after-expr-p                         8           0.0           0.0
-;;;kurila-font-lock-unfontify-region-function  1           0.0           0.0
-
-;;;Function Name                              Call Count  Elapsed Time  Average Time
-;;;=========================================  ==========  ============  ============
-;;;kurila-fix-line-spacing                     769         1.4500000000  0.0018855656
-;;;kurila-indent-line                          13          0.3100000000  0.0238461538
-;;;kurila-after-block-and-statement-beg        69          0.2700000000  0.0039130434
-;;;kurila-after-block-p                        69          0.2099999999  0.0030434782
-;;;kurila-calculate-indent                     13          0.1000000000  0.0076923076
-;;;kurila-backward-to-noncomment               177         0.0700000000  0.0003954802
-;;;kurila-get-state                            13          0.0           0.0
-;;;kurila-to-comment-or-eol                    179         0.0           0.0
-;;;kurila-get-help-defer                       1           0.0           0.0
-;;;kurila-lazy-hook                            11          0.0           0.0
-;;;kurila-after-expr-p                         2           0.0           0.0
-;;;kurila-block-p                              13          0.0           0.0
-;;;kurila-after-label                          5           0.0           0.0
-
-;;;; After 3.12:
-;;;  (`kurila-find-pods-heres'): do not warn on `=cut' if doing a chunk only.
-
-;;;; After 3.13:
-;;;  (`kurila-mode'): load pseudo-faces on `kurila-find-pods-heres' (for 19.30).
-;;;  (`x-color-defined-p'): was not compiling on XEmacs
-;;;  (`kurila-find-pods-heres'): 1 << 6 was OK, but 1<<6 was considered as HERE
-;;;                             <file/glob> made into a string.
-
-;;;; After 3.14:
-;;;  (`kurila-find-pods-heres'): Postpone addition of faces after syntactic step
-;;;				Recognition of <FH> was wrong.
-;;;  (`kurila-clobber-lisp-bindings'): if set, C-c variants are the old ones
-;;;  (`kurila-unwind-to-safe'):	New function.
-;;;  (`kurila-fontify-syntaxically'): Use `kurila-unwind-to-safe' to start at reasonable position.
-
-;;;; After 3.15:
-;;;  (`kurila-forward-re'):	Highlight the trailing / in s/foo// as string.
-;;;			Highlight the starting // in s//foo/ as function-name.
-
-;;;; After 3.16:
-;;;  (`kurila-find-pods-heres'): Highlight `gem' in s///gem as a keyword.
-
-;;;; After 4.0:
-;;;  (`kurila-find-pods-heres'): `qr' added
-;;;  (`kurila-electric-keyword'):	Likewise
-;;;  (`kurila-electric-else'):		Likewise
-;;;  (`kurila-to-comment-or-eol'):	Likewise
-;;;  (`kurila-make-regexp-x'):	Likewise
-;;;  (`kurila-init-faces'):	Likewise, and `lock' (as overridable?).
-;;;  (`kurila-find-pods-heres'): Knows that split// is null-RE.
-;;;				Highlights separators in 3-parts expressions
-;;;				as labels.
-
-;;;; After 4.1:
-;;;  (`kurila-find-pods-heres'):	<> was considered as a glob
-;;;  (`kurila-syntaxify-unwind'): New configuration variable
-;;;  (`kurila-fontify-m-as-s'):	New configuration variable
-
-;;;; After 4.2:
-;;;  (`kurila-find-pods-heres'): of the last line being `=head1' fixed.
-
-;;;  Handling of a long construct is still buggy if only the part of
-;;;  construct touches the updated region (we unwind to the start of
-;;;  long construct, but the end may have residual properties).
-
-;;;  (`kurila-unwind-to-safe'):	would not go to beginning of buffer.
-;;;  (`kurila-electric-pod'):	check for after-expr was performed
-;;;				inside of POD too.
-
-;;;; After 4.3:
-;;;  (`kurila-backward-to-noncomment'):	better treatment of PODs and HEREs.
-
-;;;  Indent-line works good, but indent-region does not - at toplevel...
-;;;  (`kurila-unwind-to-safe'):	Signature changed.
-;;;  (`x-color-defined-p'):     was defmacro'ed with a tick.  Remove another def.
-;;;  (`kurila-clobber-mode-lists'): New configuration variable.
-;;;  (`kurila-array-face'): One of definitions was garbled.
-
-;;;; After 4.4:
-;;;  (`kurila-not-bad-style-regexp'):	Updated.
-;;;  (`kurila-make-regexp-x'):	Misprint in a message.
-;;;  (`kurila-find-pods-heres'):	$a-1 ? foo : bar; was a regexp.
-;;;                             `<< (' was considered a start of POD.
-;;;  Init:			`kurila-is-face' was busted.
-;;;  (`kurila-make-face'):	New macros.
-;;;  (`kurila-force-face'):	New macros.
-;;;  (`kurila-init-faces'):	Corrected to use new macros;
-;;;				`if' for copying `reference-face' to
-;;;				`constant-face' was backward.
-;;;  (`font-lock-other-type-face'): Done via `defface' too.
-
-;;;; After 4.5:
-;;;  (`kurila-init-faces-weak'):	use `kurila-force-face'.
-;;;  (`kurila-after-block-p'):	After END/BEGIN we are a block.
-;;;  (`kurila-mode'):		`font-lock-unfontify-region-function'
-;;;				was set to a wrong function.
-;;;  (`kurila-comment-indent'):	Commenting __END__ was not working.
-;;;  (`kurila-indent-for-comment'):	Likewise.
-;;;				(Indenting is still misbehaving at toplevel.)
-
-;;;; After 4.5:
-;;;  (`kurila-unwind-to-safe'):	Signature changed, unwinds end too.
-;;;  (`kurila-find-pods-heres'):	mark qq[]-etc sections as syntax-type=string
-;;;  (`kurila-fontify-syntaxically'): Unwinds start and end to go out of
-;;;				     long strings (not very successful).
-
-;;;   >>>>  Kurila should be usable in write mode too now <<<<
-
-;;;  (`kurila-syntaxify-by-font-lock'): Better default - off in text-mode.
-;;;  (`kurila-tips'): 		Updated docs.
-;;;  (`kurila-problems'):	Updated docs.
-
-;;;; After 4.6:
-;;;  (`kurila-calculate-indent'):	Did not consider `,' as continuation mark for statements.
-;;;  (`kurila-write-tags'):	Correct for XEmacs's `visit-tags-table-buffer'.
-
-;;;; After 4.7:
-;;;  (`kurila-calculate-indent'): Avoid parse-data optimization at toplevel.
-;;;				 Should indent correctly at toplevel too.
-;;;  (`kurila-tags-hier-init'):	Gross hack to pretend we work (are we?).
-;;;  (`kurila-find-pods-heres'):	Was not processing sub protos after a comment ine.
-;;;				Was treating $a++ <= 5 as a glob.
-
-;;;; After 4.8:
-;;;  (toplevel):		require custom unprotected => failure on 19.28.
-;;;  (`kurila-xemacs-p')		defined when compile too
-;;;  (`kurila-tags-hier-init'):	Another try to work around XEmacs problems
-;;;				Better progress messages.
-;;;  (`kurila-find-tags'):	Was writing line/pos in a wrong order,
-;;;				pos off by 1 and not at beg-of-line.
-;;;  (`kurila-etags-snarf-tag'): New macro
-;;;  (`kurila-etags-goto-tag-location'): New macro
-;;;  (`kurila-write-tags'):	When removing old TAGS info was not
-;;;				relativizing filename
-
-;;;; After 4.9:
-;;;  (`kurila-version'):		New variable.  New menu entry
-
-;;;; After 4.10:
-;;;  (`kurila-tips'):		Updated.
-;;;  (`kurila-non-problems'):	Updated.
-;;;  random:			References to future 20.3 removed.
-
-;;;; After 4.11:
-;;;  (`perl-font-lock-keywords'): Would not highlight `sub foo($$);'.
-;;;  Docstrings:		Menu was described as `Kurila' instead of `Perl'
-
-;;;; After 4.12:
-;;;  (`kurila-toggle-construct-fix'): Was toggling to t instead of 1.
-;;;  (`kurila-ps-print-init'):	Associate `kurila-array-face', `kurila-hash-face'
-;;;				remove `font-lock-emphasized-face'.
-;;;				remove `font-lock-other-emphasized-face'.
-;;;				remove `font-lock-reference-face'.
-;;;				remove `font-lock-keyword-face'.
-;;;				Use `eval-after-load'.
-;;;  (`kurila-init-faces'):	remove init `font-lock-other-emphasized-face'.
-;;;				remove init `font-lock-emphasized-face'.
-;;;				remove init `font-lock-keyword-face'.
-;;;  (`kurila-tips-faces'):	New variable and an entry into Mini-docs.
-;;;  (`kurila-indent-region'):	Do not indent whitespace lines
-;;;  (`kurila-indent-exp'):	Was not processing else-blocks.
-;;;  (`kurila-calculate-indent'): Remove another parse-data optimization
-;;;				 at toplevel: would indent correctly.
-;;;  (`kurila-get-state'):	NOP line removed.
-
-;;;; After 4.13:
-;;;  (`kurila-ps-print-init'):	Remove not-Kurila-related faces.
-;;;  (`kurila-ps-print'):	New function and menu entry.
-;;;  (`kurila-ps-print-face-properties'):	New configuration variable.
-;;;  (`kurila-invalid-face'):	New configuration variable.
-;;;  (`kurila-nonoverridable-face'):	New face.  Renamed from
-;;;					`font-lock-other-type-face'.
-;;;  (`perl-font-lock-keywords'):	Highlight trailing whitespace
-;;;  (`kurila-contract-levels'):	Documentation corrected.
-;;;  (`kurila-contract-level'):	Likewise.
-
-;;;; After 4.14:
-;;;  (`kurila-ps-print'): `ps-print-face-extension-alist' was not in old Emaxen,
-;;;				same with `ps-extend-face-list'
-;;;  (`kurila-ps-extend-face-list'):	New macro.
-
-;;;; After 4.15:
-;;;  (`kurila-init-faces'):	Interpolate `kurila-invalid-face'.
-;;;  (`kurila-forward-re'):	Emit a meaningful error instead of a cryptic
-;;;				one for uncomplete REx near end-of-buffer.
-;;;  (`kurila-find-pods-heres'):	Tolerate unfinished REx at end-of-buffer.
-
-;;;; After 4.16:
-;;;  (`kurila-find-pods-heres'): `unwind-protect' was left commented.
-
-;;;; After 4.17:
-;;;  (`kurila-invalid-face'):	Change to ''underline.
-
-;;;; After 4.18:
-;;;  (`kurila-find-pods-heres'):	/ and ? after : start a REx.
-;;;  (`kurila-after-expr-p'):	Skip labels when checking
-;;;  (`kurila-calculate-indent'): Correct for labels when calculating
-;;;					indentation of continuations.
-;;;				Docstring updated.
-
-;;;; After 4.19:
-;;;  Minor (mostly spelling) corrections from 20.3.3 merged.
-
-;;;; After 4.20:
-;;;  (`kurila-tips'):		Another workaround added.  Sent to RMS for 20.4.
-
-;;;; After 4.21:
-;;;  (`kurila-praise'):		Mention linear-time indent.
-;;;  (`kurila-find-pods-heres'):	@if ? a : b was considered a REx.
-
-;;;; After 4.22:
-;;;  (`kurila-after-expr-p'):	Make true after __END__.
-;;;  (`kurila-electric-pod'):	"SYNOPSIS" was misspelled.
-
-;;;; After 4.23:
-;;;  (`kurila-beautify-regexp-piece'):	Was not allowing for *? after a class.
-;;;					Allow for POSIX char-classes.
-;;;					Remove trailing whitespace when
-;;;					adding new linebreak.
-;;;					Add a level counter to stop shallow.
-;;;					Indents unprocessed groups rigidly.
-;;;  (`kurila-beautify-regexp'):	Add an optional count argument to go that
-;;;				many levels deep.
-;;;  (`kurila-beautify-level'):	Likewise
-;;;  Menu:			Add new entries to Regexp menu to do one level
-;;;  (`kurila-contract-level'):	Was entering an infinite loop
-;;;  (`kurila-find-pods-heres'):	Typo (double quoting).
-;;;				Was detecting < $file > as FH instead of glob.
-;;;				Support for comments in RExen (except
-;;;				for m#\#comment#x), governed by
-;;;				`kurila-regexp-scan'.
-;;;  (`kurila-regexp-scan'):	New customization variable.
-;;;  (`kurila-forward-re'):	Improve logic of resetting syntax table.
-
-;;;; After 4.23 and: After 4.24:
-;;;  (`kurila-contract-levels'):	Restore position.
-;;;  (`kurila-beautify-level'):	Likewise.
-;;;  (`kurila-beautify-regexp'):	Likewise.
-;;;  (`kurila-commentify'):	Rudimental support for length=1 runs
-;;;  (`kurila-find-pods-heres'):	Process 1-char long REx comments too /a#/x
-;;;				Processes REx-comments in #-delimited RExen.
-;;;				MAJOR BUG CORRECTED: after a misparse
-;;;				  a body of a subroutine could be corrupted!!!
-;;;				  One might need to reeval the function body
-;;;				  to fix things.  (A similar bug was
-;;;				  present in `kurila-indent-region' eons ago.)
-;;; To reproduce:
-;;   (defun foo () (let ((a '(t))) (insert (format "%s" a)) (setcar a 'BUG) t))
-;;   (foo)
-;;   (foo)
-;;; C-x C-e the above three lines (at end-of-line).  First evaluation
-;;; of `foo' inserts (t), second one inserts (BUG) ?!
-;;;
-;;; In Kurila it was triggered by inserting then deleting `/' at start of
-;;;      /  a (?# asdf  {[(}asdf )ef,/;
-
-;;;; After 4.25:
-;;; (`kurila-commentify'):	Was recognizing length=2 "strings" as length=1.
-;;; (`imenu-example--create-perl-index'):
-;;;				Was not enforcing syntaxification-to-the-end.
-;;; (`kurila-invert-if-unless'):	Allow `for', `foreach'.
-;;; (`kurila-find-pods-heres'):	Quote `kurila-nonoverridable-face'.
-;;;				Mark qw(), m()x as indentable.
-;;; (`kurila-init-faces'):	Highlight `sysopen' too.
-;;;				Highlight $var in `for my $var' too.
-;;; (`kurila-invert-if-unless'):	Was leaving whitespace at end.
-;;; (`kurila-linefeed'):		Was splitting $var{$foo} if point after `{'.
-;;; (`kurila-calculate-indent'): Remove old commented out code.
-;;;				Support (primitive) indentation of qw(), m()x.
-
-
-;;;; After 4.26:
-;;; (`kurila-problems'):		Mention `fill-paragraph' on comment. \"" and
-;;;				q [] with intervening newlines.
-;;; (`kurila-autoindent-on-semi'):	New customization variable.
-;;; (`kurila-electric-semi'):	Use `kurila-autoindent-on-semi'.
-;;; (`kurila-tips'):		Mention how to make Kurila the default mode.
-;;; (`kurila-mode'):		Support `outline-minor-mode'
-;;;				(Thanks to Mark A. Hershberger).
-;;; (`kurila-outline-level'):	New function.
-;;; (`kurila-highlight-variables-indiscriminately'):	New customization var.
-;;; (`kurila-init-faces'):	Use `kurila-highlight-variables-indiscriminately'.
-;;;				(Thanks to Sean Kamath <kamath@pogo.wv.tek.com>).
-;;; (`kurila-after-block-p'):	Support CHECK and INIT.
-;;; (`kurila-init-faces'):	Likewise and "our".
-;;;				(Thanks to Doug MacEachern <dougm@covalent.net>).
-;;; (`kurila-short-docs'):	Likewise and "our".
-
-
-;;;; After 4.27:
-;;; (`kurila-find-pods-heres'):	Recognize \"" as a string.
-;;;				Mark whitespace and comments between q and []
-;;;				  as `syntax-type' => `prestring'.
-;;;				Allow whitespace between << and "FOO".
-;;; (`kurila-problems'):		Remove \"" and q [] with intervening newlines.
-;;;				Mention multiple <<EOF as unsupported.
-;;; (`kurila-highlight-variables-indiscriminately'):	Doc misprint fixed.
-;;; (`kurila-indent-parens-as-block'):	New configuration variable.
-;;; (`kurila-calculate-indent'):	Merge cases of indenting non-BLOCK groups.
-;;;				Use `kurila-indent-parens-as-block'.
-;;; (`kurila-find-pods-heres'):	Test for =cut without empty line instead of
-;;;				complaining about no =cut.
-;;; (`kurila-electric-pod'):	Change the REx for POD from "\n\n=" to "^\n=".
-;;; (`kurila-find-pods-heres'):	Likewise.
-;;; (`kurila-electric-pod'):	Change `forward-sexp' to `forward-word':
-;;;				POD could've been marked as comment already.
-;;; (`kurila-unwind-to-safe'):	Unwind before start of POD too.
-
-;;;; After 4.28:
-;;; (`kurila-forward-re'):	Throw an error at proper moment REx unfinished.
-
-;;;; After 4.29:
-;;; (`x-color-defined-p'):	Make an extra case to peacify the warning.
-;;; Toplevel:			`defvar' to peacify the warnings.
-;;; (`kurila-find-pods-heres'):	Could access `font-lock-comment-face' in -nw.
-;;;;				No -nw-compile time warnings now.
-;;; (`kurila-find-tags'):	TAGS file had too short substring-to-search.
-;;;				Be less verbose in non-interactive mode
-;;; (`imenu-example--create-perl-index'):	Set index-marker after name
-;;; (`kurila-outline-regexp'):	New variable.
-;;; (`kurila-outline-level'):	Made compatible with `kurila-outline-regexp'.
-;;; (`kurila-mode'):		Made use `kurila-outline-regexp'.
-
-;;;; After 4.30:
-;;; (`kurila-find-pods-heres'):	=cut the last thing, no blank line, was error.
-;;; (`kurila-outline-level'):	Make start-of-file same level as `package'.
-
-;;;; After 4.31:
-;;; (`kurila-electric-pod'):	`head1' and `over' electric only if empty.
-;;; (`kurila-unreadable-ok'):	New variable.
-;;; (`kurila-find-tags'):	Use `kurila-unreadable-ok', do not fail
-;;;				on an unreadable file
-;;; (`kurila-write-tags'):	Use `kurila-unreadable-ok', do not fail
-;;;				on an unreadable directory
-
-;;;; After 4.32:
-;;;  Syncronized with v1.60 from Emacs 21.3.
-;;;  Mostly docstring and formatting changes, and:
-
-;;;  (`kurila-noscan-files-regexp'): Do not scan CVS subdirs
-;;;  (`kurila-problems'):	Note that newer XEmacsen may syntaxify too
-;;;  (`imenu-example--create-perl-index'):
-;;;				Renamed to `kurila-imenu--create-perl-index'
-;;;  (`kurila-mode'):		Replace `make-variable-buffer-local' by `make-local-variable'
-;;;  (`kurila-setup-tmp-buf'):	Likewise
-;;;  (`kurila-fix-line-spacing'): Fix a misprint of "t" for "\t"
-;;;  (`kurila-next-bad-style'):  Fix misprints in character literals
-
-;;;; After 4.33:
-;;;  (`kurila-font-lock-keywords'): +etc: Aliased to perl-font-lock-keywords.
-
-;;;; After 4.34:
-;;;  Further updates of whitespace and spelling w.r.t. RMS version.
-;;;  (`kurila-font-lock-keywords'): +etc: Avoid warnings when aliasing.
-;;;  (`kurila-mode'):		Use `normal-auto-fill-function' if present.
-;;;  (`kurila-use-major-mode'):	New variable
-;;;  (`kurila-can-font-lock'):	New variable; replaces `window-system'
-;;;  (`kurila-tags-hier-init'):	use `display-popup-menus-p' (if present)
-;;;				to choose `x-popup-menu' vs `tmm-prompt'
-
-;;;; 4.35 has the following differences from version 1.40+ of RMS Emacs:
-
-;;; New variables `kurila-use-major-mode', `kurila-can-font-lock';
-;;; `kurila-use-major-mode' is (effectively) 'kurila-mode in RMS.
-;;; `kurila-under-as-char'  is nil in RMS.
-;;; Minor differences in docstrings, and `kurila-non-problems'.
-;;; Backward compatibility addressed: (`); (function (lambda ...)); font-lock;
-;;; (:italic t bold t) vs (:slant italic :weight bold) in faces;
-;;; `normal-auto-fill-function'.
-;;; RMS version has wrong logic in `kurila-calculate-indent': $a = { } is
-;;; wrongly indented if the closing brace is on a separate line.
-;;; Different choice of ordering if's for is-x-REx and (eq (char-after b) ?\#)
-;;; in `kurila-find-pods-heres'. [Cosmetic]
-
-;;;; After 4.35:
-;;;  (`kurila-find-pods-heres'):	If no end of HERE-doc found, mark to the end
-;;;				of buffer.  This enables recognition of end
-;;;				of HERE-doc "as one types".
-;;;				Require "\n" after trailing tag of HERE-doc.
-;;;				\( made non-quoting outside of string/comment
-;;;				(gdj-contributed).
-;;;				Likewise for \$.
-;;;				Remove `here-doc-group' text property at start
-;;;				(makes this property reliable).
-;;;				Text property `first-format-line' ==> t.
-;;;				Do not recognize $opt_s and $opt::s as s///.
-;;;  (`kurila-perldoc'):		Use case-sensitive search (contributed).
-;;;  (`kurila-fix-line-spacing'): Allow "_" in $vars of foreach etc. when
-;;;				underscore isn't a word char (gdj-contributed).
-;;;  (`defun-prompt-regexp'):	Allow prototypes.
-;;;  (`kurila-vc-header-alist'):	Extract numeric version from the Id.
-;;;  Toplevel:			Put toggle-autohelp into the mode menu.
-;;;				Better docs for toggle/set/unset autohelp.
-;;;  (`kurila-electric-backspace-untabify'): New customization variable
-;;;  (`kurila-after-expr-p'):	Works after here-docs, formats, and PODs too
-;;;				(affects many electric constructs).
-;;;  (`kurila-calculate-indent'): Takes into account `first-format-line' ==>
-;;;				works after format.
-;;;  (`kurila-short-docs'):	Make it work with ... too.
-;;;				"array context" ==> "list context"
-;;;  (`kurila-electric-keyword'): make $if (etc: "$@%&*") non-electric
-;;;				'(' after keyword would insert a doubled paren
-;;;  (`kurila-electric-paren'):	documented affected by `kurila-electric-parens'
-;;;  (`kurila-electric-rparen'):	Likewise
-;;;  (`kurila-build-manpage'):	New function by Nick Roberts
-;;;  (`kurila-perldoc'):		Make it work in XEmacs too
-
-;;;; After 4.36:
-;;;  (`kurila-find-pods-heres'):	Recognize s => 1 and {s} (as a key or varname),
-;;;				{ s:: } and { s::bar::baz } as varnames.
-;;;  (`kurila-after-expr-p'):	Updates syntaxification before checks
-;;;  (`kurila-calculate-indent'): Likewise
-;;;				Fix wrong indent of blocks starting with POD
-;;;  (`kurila-after-block-p'):	Optional argument for checking for a pre-block
-;;;				Recognize `continue' blocks too.
-;;;  (`kurila-electric-brace'):	use `kurila-after-block-p' for detection;
-;;;				Now works for else/continue/sub blocks
-;;;  (`kurila-short-docs'):	Minor edits; make messages fit 80-column screen
-
-;;;; After 5.0:
-;;;  `kurila-add-tags-recurse-noxs-fullpath': new function (for -batch mode)
-
-;;;; After 5.1:
-;;;;;; Major edit.  Summary of most visible changes:
-
-;;;;;; a) Multiple <<HERE per line allowed.
-;;;;;; b) Handles multiline subroutine declaration headers (with comments).
-;;;;;;    (The exception is `kurila-etags' - but it is not used in the rest
-;;;;;;    of the mode.)
-;;;;;; c) Fontifies multiline my/our declarations (even with comments,
-;;;;;;    and with legacy `font-lock').
-;;;;;; d) Major speedup of syntaxification, both immediate and postponed
-;;;;;;    (3.5x to 15x [for different CPUs and versions of Emacs] on the
-;;;;;;    huge real-life document I tested).
-;;;;;; e) New bindings, edits to imenu.
-;;;;;; f) "_" is made into word-char during fontification/syntaxification;
-;;;;;;    some attempts to recognize non-word "_" during other operations too.
-;;;;;; g) Detect bug in Emacs with `looking-at' inside `narrow' and bulk out.
-;;;;;; h) autoload some more perldoc-related stuff
-;;;;;; i) Some new convenience features: ISpell POD/HEREDOCs, narrow-to-HEREDOC
-;;;;;; j) Attempt to incorporate XEmacs edits which reached me
-
-;;;; Fine-grained changelog:
-;;; `kurila-hook-after-change':	New configuration variable
-;;; `kurila-vc-sccs-header':	Likewise
-;;; `kurila-vc-sccs-header':	Likewise
-;;; `kurila-vc-header-alist':	Default via two preceding variables
-;;; `kurila-invalid-face':	Remove double quoting under XEmacs
-;;;					(still needed under 21.2)
-;;; `kurila-tips':		Update URLs for resources
-;;; `kurila-problems':		Likewise
-;;; `kurila-praise':		Mention new features
-;;; New C-c key bindings:	for `kurila-find-bad-style',
-;;;	`kurila-pod-spell', `kurila-here-doc-spell', `kurila-narrow-to-here-doc',
-;;;	`kurila-perdoc', `kurila-perldoc-at-point'
-;;; Kurila Mode menu changes:	"Fix style by spaces", "Imenu on Perl Info"
-;;;	moved, new submenu of Tools with Ispell entries and narrowing.
-;;; `kurila-after-sub-regexp':	New defsubst
-;;; `kurila-imenu--function-name-regexp-perl': Use `kurila-after-sub-regexp',
-;;;				Allows heads up to head4
-;;;				Allow "package;"
-;;; `defun-prompt-regexp':	Use `kurila-after-sub-regexp',
-;;; `paren-backwards-message':	??? Something for XEmacs???
-;;; `kurila-mode':		Never auto-switch abbrev-mode off
-;;;				Try to allow '_' be non-word char
-;;;				Do not use `font-lock-unfontify-region-function' on XEmacs
-;;;				Reset syntax cache on mode start
-;;;				Support multiline facification (even
-;;;				        on legacy `font-lock')
-;;; `kurila-facemenu-add-face-function':	??? Some contributed code ???
-;;; `kurila-after-change-function':	Since `font-lock' and `lazy-lock'
-;;;         refuse to inform us whether the fontification is due to lazy
-;;;         calling or due to edit to a buffer, install our own hook
-;;;         (controlled by `kurila-hook-after-change')
-;;; `kurila-electric-pod':	=cut may have been recognized as start
-;;; `kurila-block-p':		Moved, updated for attributes
-;;; `kurila-calculate-indent':	Try to allow '_' be non-word char
-;;;				Support subs with attributes
-;;; `kurila-where-am-i':		Queit (?) a warning
-;;; `kurila-cached-syntax-table'	New function
-;;; `kurila-forward-re':		Use `kurila-cached-syntax-table'
-;;; `kurila-unwind-to-safe':	Recognize `syntax-type' property
-;;;					changing in a middle of line
-;;; `kurila-find-sub-attrs':	New function
-;;; `kurila-find-pods-heres':	Allow many <<EOP per line
-;;;				Allow subs with attributes
-;;;				Major speedups (3.5x..15x on a real-life
-;;;				        test file nph-proxy.pl)
-;;;				Recognize "extproc " (OS/2)
-;;;				        case-folded and only at start
-;;;				/x on s///x with empty replacement was
-;;;				        not recognized
-;;;				Better comments
-;;; `kurila-after-block-p':	Remarks on diff with `kurila-block-p'
-;;;				Allow subs with attributes, labels
-;;;				Do not confuse "else::foo" with "else"
-;;;				Minor optimizations...
-;;; `kurila-after-expr-p':	Try to allow '_' be non-word char
-;;; `kurila-fill-paragraph':	Try to detect a major bug in Emacs
-;;;         with `looking-at' inside `narrow' and bulk out if found
-;;; `kurila-imenu--create-perl-index':	Updates for new
-;;;         `kurila-imenu--function-name-regexp-perl'
-;;; `kurila-outline-level':	Likewise
-;;; `kurila-init-faces':		Allow multiline subroutine headers
-;;;         and my/our declarations, and ones with comments
-;;;				Allow subroutine attributes
-;;; `kurila-imenu-on-info':	Better docstring.
-;;; `kurila-etags'		Rudimentary support for attributes
-;;;				Support for packages and "package;"
-;;; `kurila-add-tags-recurse-noxs':	Better (?) docstring
-;;; `kurila-add-tags-recurse-noxs-fullpath': Likewise
-;;; `kurila-tags-hier-init':	Misprint for `fboundp' fixed
-;;; `kurila-not-bad-style-regexp':	Try to allow '_' be non-word char
-;;; `kurila-perldoc':		Add autoload
-;;; `kurila-perldoc-at-point':	Likewise
-;;; `kurila-here-doc-spell':	New function
-;;; `kurila-pod-spell':		Likewise
-;;; `kurila-map-pods-heres':	Likewise
-;;; `kurila-get-here-doc-region':	Likewise
-;;; `kurila-font-lock-fontify-region-function': Likewise (backward compatibility
-;;;					        for legacy `font-lock')
-;;; `kurila-font-lock-unfontify-region-function': Fix style
-;;; `kurila-fontify-syntaxically':	Recognize and optimize away
-;;;         deferred calls with no-change.  Governed by `kurila-hook-after-change'
-;;; `kurila-fontify-update':	Recognize that syntaxification region
-;;;         can be larger than fontification one.
-;;;         XXXX we leave `kurila-postpone' property, so this is quadratic...
-;;; `kurila-fontify-update-bad':	Temporary placeholder until
-;;;         it is clear how to implement `kurila-fontify-update'.
-;;; `kurila-time-fontification':	New function
-;;; `attrib-group':		New text attribute
-;;; `multiline':		New value: `syntax-type' text attribute
-
-;;;; After 5.2:
-;;; `kurila-emulate-lazy-lock':	New function
-;;; `kurila-fontify-syntaxically': Would skip large regions
-;;; Add `kurila-time-fontification', `kurila-emulate-lazy-lock' to menu
-;;; Some globals were declared, but uninitialized
-
-;;;; After 5.3, 5.4:
-;;; `kurila-facemenu-add-face-function':	Add docs, fix U<>
-;;; Copyright message updated.
-;;; `kurila-init-faces':		Work around a bug in `font-lock'. May slow
-;;;					facification down a bit.
-;;;				Misprint for my|our|local for old `font-lock'
-;;;				"our" was not fontified same as "my|local"
-;;;				Highlight variables after "my" etc even in
-;;;					a middle of an expression
-;;;				Do not facify multiple variables after my etc
-;;;					unless parentheses are present
-
-;;; After 5.5, 5.6
-;;; `kurila-fontify-syntaxically': after-change hook could reset
-;;;	`kurila-syntax-done-to' to a middle of line; unwind to BOL.
-
-;;; After 5.7:
-;;; `kurila-init-faces':		Allow highlighting of local ($/)
-;;; `kurila-problems-old-emaxen': New variable (for the purpose of DOCSTRING).
-;;; `kurila-problems':		Remove fixed problems.
-;;; `kurila-find-pods-heres':	Recognize #-comments in m##x too
-;;;				Recognize charclasses (unless delimiter is \).
-;;; `kurila-fontify-syntaxically': Unwinding to safe was done in wrong order
-;;; `kurila-regexp-scan':	Update docs
-;;; `kurila-beautify-regexp-piece': use information got from regexp scan
-
-;;; After 5.8:
-;;; Major user visible changes:
-;;; Recognition and fontification of character classes in RExen.
-;;; Variable indentation of RExen according to groups
-;;;
-;;; `kurila-find-pods-heres':	Recognize POSIX classes in REx charclasses
-;;;				Fontify REx charclasses in variable-name face
-;;;				Fontify POSIX charclasses in "type" face
-;;;				Fontify unmatched "]" in function-name face
-;;;				Mark first-char of HERE-doc as `front-sticky'
-;;;				Reset `front-sticky' property when needed
-;;; `kurila-calculate-indent':	Indents //x -RExen accordning to parens level
-;;; `kurila-to-comment-or-eol':	Recognize ends of `syntax-type' constructs
-;;; `kurila-backward-to-noncomment': Recognize stringy `syntax-type' constructs
-;;;				Support `narrow'ed buffers.
-;;; `kurila-praise':		Remove a reservation
-;;; `kurila-make-indent':	New function
-;;; `kurila-indent-for-comment':	Use `kurila-make-indent'
-;;; `kurila-indent-line':	Likewise
-;;; `kurila-lineup':		Likewise
-;;; `kurila-beautify-regexp-piece': Likewise
-;;; `kurila-contract-level':	Likewise
-;;; `kurila-toggle-set-debug-unwind': New function
-;;;				New menu entry for this
-;;; `fill-paragraph-function':	Use when `boundp'
-;;; `kurila-calculate-indent':	Take into account groups when indenting RExen
-;;; `kurila-to-comment-or-eol':	Recognize # which end a string
-;;; `kurila-modify-syntax-type':	Make only syntax-table property non-sticky
-;;; `kurila-fill-paragraph':	Return t: needed for `fill-paragraph-function'
-;;; `kurila-fontify-syntaxically': More clear debugging message
-;;; `kurila-pod2man-build-command': XEmacs portability: check `Man-filter-list'
-;;; `kurila-init-faces':		More complicated highlight even on XEmacs (new)
-;;; Merge cosmetic changes from XEmacs
-
-;;; After 5.9:
-;;; `kurila-1+':			Moved to before the first use
-;;; `kurila-1-':			Likewise
-
-;;; After 5.10:
-
-;;; This code may lock Emacs hard!!!  Use on your own risk!
-
-;;; `kurila-font-locking':	New internal variable
-;;; `kurila-beginning-of-property': New function
-;;; `kurila-calculate-indent':	Use `kurila-beginning-of-property'
-;;;	instead of `previous-single-property-change'
-;;; `kurila-unwind-to-safe':	Likewise
-;;; `kurila-after-expr-p':	Likewise
-;;; `kurila-get-here-doc-region': Likewise
-;;; `kurila-font-lock-fontify-region-function': Likewise
-;;; `kurila-to-comment-or-eol':	Do not call `kurila-update-syntaxification'
-;;;					recursively
-;;;				Bound `next-single-property-change'
-;;;					via `point-max'
-;;; `kurila-unwind-to-safe':	Bound likewise
-;;; `kurila-font-lock-fontify-region-function': Likewise
-;;; `kurila-find-pods-heres':	Mark as recursive for `kurila-to-comment-or-eol'
-;;;				Initialization of
-;;;	`kurila-font-lock-multiline-start' could be missed if the "main"
-;;;	fontification did not run due to the keyword being already fontified.
-;;; `kurila-pod-spell':		Return t from do-one-chunk function
-;;; `kurila-map-pods-heres':	Stop when the worker returns nil
-;;;				Call `kurila-update-syntaxification'
-;;; `kurila-get-here-doc-region': Call `kurila-update-syntaxification'
-;;; `kurila-get-here-doc-delim':	Remove unused function
-
-;;; After 5.11:
-
-;;;  The possible lockup of Emacs (introduced in 5.10) fixed
-
-;;; `kurila-unwind-to-safe':	`kurila-beginning-of-property' won't return nil
-;;; `kurila-syntaxify-for-menu':	New customization variable
-;;; `kurila-select-this-pod-or-here-doc': New function
-;;; `kurila-get-here-doc-region': Extra argument
-;;;				Do not adjust pos by 1
-
-;;; New menu entries (Perl/Tools): selection of current POD or HERE-DOC section
-;;;				(Debugging Kurila:) backtrace on fontification
-
-;;; After 5.12:
-;;; `kurila-cached-syntax-table': use `car-safe'
-;;; `kurila-forward-re':		Remove spurious argument SET-ST
-;;;				Add documentation
-;;; `kurila-forward-group-in-re': New function
-;;; `kurila-find-pods-heres':	Find and highlight (?{}) blocks in RExen
-;;;	(XXXX Temporary (?) hack is to syntax-mark them as comment)
-
-;;; After 5.13:
-;;; `kurila-string-syntax-table': Make { and } not-grouping
-;;;   (Sometimes they ARE grouping in RExen, but matching them would only
-;;;    confuse in many situations when they are not)
-;;; `beginning-of-buffer':	Replaced two occurences with goto-char...
-;;; `kurila-calculate-indent':	`char-after' could be nil...
-;;; `kurila-find-pods-heres':	REx can start after "[" too
-;;;				Hightlight (??{}) in RExen too 
-;;; `kurila-maybe-white-and-comment-rex': New constant
-;;; `kurila-white-and-comment-rex': Likewise
-;;;				XXXX Not very efficient, but hard to make
-;;;				better while keeping 1 group
-
-;;; After 5.13:
-;;; `kurila-find-pods-heres':	$foo << identifier() is not a HERE-DOC
-;;;				Likewise for 1 << identifier
-
-;;; After 5.14:
-;;; `kurila-find-pods-heres':	Different logic for $foo .= <<EOF etc
-;;;				Error-less condition-case could fail
-;;; `kurila-font-lock-fontify-region-function': Likewise
-;;; `kurila-init-faces':		Likewise
-
-;;; After 5.15:
-;;; `kurila-find-pods-heres':	Support property REx-part2
-;;; `kurila-calculate-indent':	Likewise
-;;;				Don't special-case REx with non-empty 1st line
-;;; `kurila-find-pods-heres':	In RExen, highlight non-literal backslashes
-;;;				Invert highlighting of charclasses: 
-;;;					now the envelop is highlighted
-;;;				Highlight many others 0-length builtins
-;;; `kurila-praise':		Mention indenting and highlight in RExen
-
-;;; After 5.15:
-;;; `kurila-find-pods-heres':	Highlight capturing parens in REx
-
-;;; After 5.16:
-;;; `kurila-find-pods-heres':	Highlight '|' for alternation
-;;;	Initialize `font-lock-warning-face' if not present
-;;; `kurila-find-pods-heres':	Use `font-lock-warning-face' instead of
-;;;					 `font-lock-function-name-face'
-;;; `kurila-look-at-leading-count': Likewise
-;;; `kurila-find-pods-heres':	localize `font-lock-variable-name-face'
-;;;					`font-lock-keyword-face' (needed for
-;;;					batch processing) etc
-;;;				Use `font-lock-builtin-face' for builtin in REx
-;;;					Now `font-lock-variable-name-face'
-;;;					is used for interpolated variables
-;;;				Use "talking aliases" for faces inside REx
-;;;				Highlight parts of REx (except in charclasses)
-;;;					according to the syntax and/or semantic
-;;;				Syntax-mark a {}-part of (?{}) as "comment"
-;;;					(it was the ()-part)
-;;;				Better logic to distinguish what is what in REx
-;;; `kurila-tips-faces':		Document REx highlighting
-;;; `kurila-praise':		Mention REx syntax highlight etc.
-
-;;; After 5.17:
-;;; `kurila-find-sub-attrs':	Would not always manage to print error message
-;;; `kurila-find-pods-heres':	localize `font-lock-constant-face'
-
-;;; After 5.18:
-;;; `kurila-find-pods-heres':	Misprint in REx for parsing REx
-;;;				Very minor optimization
-;;;				`my-kurila-REx-modifiers-face' got quoted
-;;;				Recognize "print $foo <<END" as HERE-doc
-;;;				Put `REx-interpolated' text attribute if needed
-;;; `kurila-invert-if-unless-modifiers':	New function
-;;; `kurila-backward-to-start-of-expr': Likewise
-;;; `kurila-forward-to-end-of-expr': Likewise
-;;; `kurila-invert-if-unless':	Works in "the opposite way" too
-;;;				Cursor position on return is on the switch-word
-;;;				Indents comments better
-;;; `REx-interpolated':		New text attribute
-;;; `kurila-next-interpolated-REx': New function
-;;; `kurila-next-interpolated-REx-0': Likewise
-;;; `kurila-next-interpolated-REx-1': Likewise
-;;; "\C-c\C-x", "\C-c\C-y", "\C-c\C-v":	New keybinding for these functions
-;;; Perl/Regexp menu:		3 new entries for `kurila-next-interpolated-REx'
-;;; `kurila-praise':		Mention finded interpolated RExen
-
-;;; After 5.19:
-;;; `kurila-init-faces':		Highlight %$foo, @$foo too
-;;; `kurila-short-docs':		Better docs for system, exec
-;;; `kurila-find-pods-heres':	Better detect << after print {FH} <<EOF etc.
-;;;				Would not find HERE-doc ended by EOF without NL
-;;; `kurila-short-docs':		Correct not-doubled \-escapes
-;;; start block:		Put some `defvar' for stuff gone from XEmacs
-
-;;; After 5.20:
-;;; initial comment:		Extend copyright, fix email address
-;;; `kurila-indent-comment-at-column-0': New customization variable
-;;; `kurila-comment-indent':	Indentation after $#a would increasy by 1
-;;; `kurila-mode':		Make `defun-prompt-regexp' grok BEGIN/END etc
-;;; `kurila-find-pods-heres':	Mark CODE of s///e as `syntax-type' `multiline'
-;;; `kurila-at-end-of-expr':	Would fail if @BAR=12 follows after ";"
-;;; `kurila-init-faces':		If `kurila-highlight-variables-indiscriminately'
-;;;					highlight $ in $foo too (UNTESTED)
-;;; `kurila-set-style':		Docstring missed some available styles
-;;; toplevel:			Menubar/Perl/Indent-Styles had FSF, now K&R
-;;;				Change "Current" to "Memorize Current"
-;;; `kurila-indent-wrt-brace':	New customization variable; the default is
-;;;				as for pre-5.2 version
-;;; `kurila-styles-entries':	Keep `kurila-extra-newline-before-brace-multiline'
-;;; `kurila-style-alist':	Likewise
-;;; `kurila-fix-line-spacing':	Support `kurila-merge-trailing-else' being nil,
-;;;				and `kurila-extra-newline-before-brace' etc
-;;;				being t
-;;; `kurila-indent-exp':		Plans B and C to find continuation blocks even
-;;;				if `kurila-extra-newline-before-brace' is t
-
-;;; After 5.21:
-;;; Improve some docstrings concerning indentation.
-;;; `kurila-indent-rules-alist':	New variable
-;;; `kurila-sniff-for-indent':	New function name
-;;				(separated from `kurila-calculate-indent')
-;;; `kurila-calculate-indent':	Separated the sniffer and the indenter;
-;;;				uses `kurila-sniff-for-indent' now
-;;; `kurila-comment-indent':	Test for `kurila-indent-comment-at-column-0'
-;;;				was inverted;
-;;;				Support `comment-column' = 0
-
-;;; After 5.22:
-;;; `kurila-where-am-i':		Remove function
-;;; `kurila-backward-to-noncomment': Would go too far when skipping POD/HEREs
-;;; `kurila-sniff-for-indent':	[string] and [comment] were inverted
-;;;				When looking for label, skip s:m:y:tr
-;;; `kurila-indent-line':	Likewise.
-;;; `kurila-mode':		`font-lock-multiline' was assumed auto-local
-;;; `kurila-windowed-init':	Wrong `ps-print' handling
-;;;				 (both thanks to Chong Yidong)
-;;; `kurila-look-at-leading-count': Could fail with unfinished RExen
-;;; `kurila-find-pods-heres':	If the second part of s()[] is missing,
-;;;					could try to highlight delimiters...
-
 ;;; Code:
-
+
 (if (fboundp 'eval-when-compile)
     (eval-when-compile
       (condition-case nil
@@ -2567,9 +1175,13 @@ In regular expressions (except character classes):
     (put-text-property (max (point-min) (1- from))
 		       to kurila-do-not-fontify t)))
 
+(autoload 'turn-on-kurila-indent "kurila-indent"
+  "Turn on Kurila indentation." t)
+
 (defcustom kurila-mode-hook nil
   "Hook run by Kurila mode."
   :type 'hook
+  :options '(turn-on-kurila-indent)
   :group 'kurila)
 
 (defvar kurila-syntax-state nil)
@@ -2649,7 +1261,6 @@ versions of Emacs."
   (kurila-define-key ":" 'kurila-electric-terminator)
   (kurila-define-key "\C-j" 'newline-and-indent)
   (kurila-define-key "\C-c\C-j" 'kurila-linefeed)
-  (kurila-define-key "\C-c\C-t" 'kurila-invert-if-unless)
   (kurila-define-key "\C-c\C-a" 'kurila-toggle-auto-newline)
   (kurila-define-key "\C-c\C-k" 'kurila-toggle-abbrev)
   (kurila-define-key "\C-c\C-w" 'kurila-toggle-construct-fix)
@@ -2671,7 +1282,6 @@ versions of Emacs."
   ;;(kurila-define-key "\M-q" 'kurila-fill-paragraph)
   ;;(kurila-define-key "\e;" 'kurila-indent-for-comment)
   (kurila-define-key "\177" 'kurila-electric-backspace)
-  (kurila-define-key "\t" 'kurila-indent-command)
   ;; don't clobber the backspace binding:
   (kurila-define-key "\C-c\C-hF" 'kurila-info-on-command
 		    [(control c) (control h) F])
@@ -2736,7 +1346,6 @@ versions of Emacs."
 	 ["Fill paragraph/comment" kurila-fill-paragraph t]
 	 "----"
 	 ["Line up a construction" kurila-lineup (kurila-use-region-p)]
-	 ["Invert if/unless/while etc" kurila-invert-if-unless t]
 	 ("Regexp"
 	  ["Beautify" kurila-beautify-regexp
 	   kurila-use-syntax-table-text-property]
@@ -2907,7 +1516,7 @@ Should contain exactly one group.")
 ;;; Details of groups in this may be used in several functions; see comments
 ;;; near mentioned above variable(s)...
 ;;; sub($$):lvalue{}  sub:lvalue{} Both allowed...
-(defsubst kurila-after-sub-regexp (named attr) ; 9 groups without attr...
+(defsubst kurila-after-sub-regexp (named) ; 9 groups without attr...
   "Match the text after `sub' in a subroutine declaration.
 If NAMED is nil, allows anonymous subroutines.  Matches up to the first \":\"
 of attributes (if present), or end of the name or prototype (whatever is
@@ -2922,23 +1531,6 @@ the last)."
      kurila-maybe-white-and-comment-rex	; n+5=pre-proto
      "\\(([^()]*)\\)"			; n+6=prototype
    "\\)?"				; END n+4=proto-group
-   "\\("				; n+7=attr-group
-     kurila-maybe-white-and-comment-rex	; n+8=pre-attr
-     "\\("				; n+9=start-attr
-        ":"
-	(if attr (concat
-		  "\\("
-		     kurila-maybe-white-and-comment-rex ; whitespace-comments
-		     "\\(\\sw\\|_\\)+"	; attr-name
-		     ;; attr-arg (1 level of internal parens allowed!)
-		     "\\((\\(\\\\.\\|[^\\\\()]\\|([^\\\\()]*)\\)*)\\)?"
-		     "\\("		; optional : (XXX allows trailing???)
-		        kurila-maybe-white-and-comment-rex ; whitespace-comments
-		     ":\\)?"
-		  "\\)+")
-	  "[^:]")
-     "\\)"
-   "\\)?"				; END n+6=proto-group
    ))
 
 ;;; Details of groups in this are used in `kurila-imenu--create-perl-index'
@@ -2953,7 +1545,7 @@ the last)."
 	       "\\([a-zA-Z_0-9:']+\\)\\)?\\)" ; 5 = package-name
        "\\|"
           "[ \t]*sub"
-	  (kurila-after-sub-regexp 'named nil) ; 8=name 11=proto 14=attr-start
+	  (kurila-after-sub-regexp 'named) ; 8=name 11=proto 14=attr-start
 	  kurila-maybe-white-and-comment-rex	; 15=pre-block
    "\\|"
      "=head\\([1-4]\\)[ \t]+"		; 16=level
@@ -2988,7 +1580,7 @@ the last)."
   (modify-syntax-entry ?< "." kurila-mode-syntax-table)
   (modify-syntax-entry ?> "." kurila-mode-syntax-table)
   (modify-syntax-entry ?& "." kurila-mode-syntax-table)
-  (modify-syntax-entry ?$ "\\" kurila-mode-syntax-table)
+  (modify-syntax-entry ?$ "." kurila-mode-syntax-table)
   (modify-syntax-entry ?\n ">" kurila-mode-syntax-table)
   (modify-syntax-entry ?# "<" kurila-mode-syntax-table)
   (modify-syntax-entry ?' "\"" kurila-mode-syntax-table)
@@ -3087,14 +1679,6 @@ transform the construct into a multiline and will place you into an
 appropriately indented blank line.  If you need a usual
 `newline-and-indent' behaviour, it is on \\[newline-and-indent],
 see documentation on `kurila-electric-linefeed'.
-
-Use \\[kurila-invert-if-unless] to change a construction of the form
-
-	    if (A) { B }
-
-into
-
-            B if A;
 
 \\{kurila-mode-map}
 
@@ -3265,8 +1849,6 @@ or as help on variables `kurila-tips', `kurila-problems',
     (progn
       (make-local-variable 'paren-backwards-message)
       (set 'paren-backwards-message t)))
-  (make-local-variable 'indent-line-function)
-  (setq indent-line-function 'kurila-indent-line)
   (make-local-variable 'require-final-newline)
   (setq require-final-newline t)
   (make-local-variable 'comment-start)
@@ -3278,12 +1860,9 @@ or as help on variables `kurila-tips', `kurila-problems',
   (make-local-variable 'comment-start-skip)
   (setq comment-start-skip "#+ *")
   (make-local-variable 'defun-prompt-regexp)
-;;;       "[ \t]*sub"
-;;;	  (kurila-after-sub-regexp 'named nil) ; 8=name 11=proto 14=attr-start
-;;;	  kurila-maybe-white-and-comment-rex	; 15=pre-block
   (setq defun-prompt-regexp
 	(concat "[ \t]*\\(sub"
-		(kurila-after-sub-regexp 'named 'attr-groups)
+		(kurila-after-sub-regexp 'named)
 		"\\|"			; per toke.c
 		"\\(BEGIN\\|CHECK\\|INIT\\|END\\|AUTOLOAD\\|DESTROY\\)"
 		"\\)"
@@ -4084,41 +2663,6 @@ key.  Will untabivy if `kurila-electric-backspace-untabify' is non-nil."
       (if kurila-electric-backspace-untabify
 	  (backward-delete-char-untabify arg)
 	(delete-backward-char arg)))))
-
-(defun kurila-indent-command (&optional whole-exp)
-  "Indent current line as Perl code, or in some cases insert a tab character.
-If `kurila-tab-always-indent' is non-nil (the default), always indent current
-line.  Otherwise, indent the current line only if point is at the left margin
-or in the line's indentation; otherwise insert a tab.
-
-A numeric argument, regardless of its value,
-means indent rigidly all the lines of the expression starting after point
-so that this line becomes properly indented.
-The relative indentation among the lines of the expression are preserved."
-  (interactive "P")
-  (kurila-update-syntaxification (point) (point))
-  (if whole-exp
-      ;; If arg, always indent this line as Perl
-      ;; and shift remaining lines of expression the same amount.
-      (let ((shift-amt (kurila-indent-line))
-	    beg end)
-	(save-excursion
-	  (if kurila-tab-always-indent
-	      (beginning-of-line))
-	  (setq beg (point))
-	  (forward-sexp 1)
-	  (setq end (point))
-	  (goto-char beg)
-	  (forward-line 1)
-	  (setq beg (point)))
-	(if (and shift-amt (> end beg))
-	    (indent-code-rigidly beg end shift-amt "#")))
-    (if (and (not kurila-tab-always-indent)
-	     (save-excursion
-	       (skip-chars-backward " \t")
-	       (not (bolp))))
-	(insert-tab)
-      (kurila-indent-line))))
 
 (defun kurila-indent-line (&optional parse-data)
   "Indent current line as Perl code.
@@ -5183,44 +3727,18 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 	   "\\3"
 	   "\\|"
 	   ;; Second variant: Identifier or \ID (same as 'ID') or empty
-	   "\\\\?\\(\\([a-zA-Z_][a-zA-Z_0-9]*\\)?\\)" ; 4 + 1, 5 + 1
+	   "\\\\?\\(\\([a-zA-Z_][a-zA-Z_0-9]*\\)?\\)" ; 4, 5
 	   ;; Do not have <<= or << 30 or <<30 or << $blah.
 	   ;; "\\([^= \t0-9$@%&]\\|[ \t]+[^ \t\n0-9$@%&]\\)" ; 6 + 1
-	   "\\(\\)"		; To preserve count of pars :-( 6 + 1
 	   "\\)"
-	   "\\|"
-	   ;; 1+6 extra () before this:
-	   "^[ \t]*\\(format\\)[ \t]*\\([a-zA-Z0-9_]+\\)?[ \t]*=[ \t]*$" ;FRMAT
 	   (if kurila-use-syntax-table-text-property
 	       (concat
 		"\\|"
-		;; 1+6+2=9 extra () before this:
-		"\\<\\(q[wxqr]?\\|[msy]\\|tr\\)\\>" ; QUOTED CONSTRUCT
-		;; 1+6+2+1=10 extra () before this:
+		"\\<\\(q[wxqr]?\\|[ms]\\)\\>" ; 7: QUOTED CONSTRUCT
 		"\\|"
-		"\\(somethingveryrare\\)"	; Perserver count of pars
+		"__\\(END\\|DATA\\)__"	; 8: __END__ or __DATA__
 		"\\|"
-		;; 1+6+2+1+1=11 extra () before this
-		"\\<sub\\>"		;  sub with proto/attr
-		"\\("
-		   kurila-white-and-comment-rex
-		   "\\(::[a-zA-Z_:'0-9]*\\|[a-zA-Z_'][a-zA-Z_:'0-9]*\\)\\)?" ; name
-		"\\("
-		   kurila-maybe-white-and-comment-rex
-		   "\\(([^()]*)\\|:[^:]\\)\\)" ; prototype or attribute start
-		"\\|"
-		;; 1+6+2+1+1+6=17 extra () before this:
-		"\\$\\(['{]\\)"		; $' or ${foo}
-		"\\|"
-		;; 1+6+2+1+1+6+1=18 extra () before this (old pack'var syntax;
-		;; we do not support intervening comments...):
-		"\\(\\<sub[ \t\n\f]+\\|[&*$@%]\\)[a-zA-Z0-9_]*'"
-		;; 1+6+2+1+1+6+1+1=19 extra () before this:
-		"\\|"
-		"__\\(END\\|DATA\\)__"	; __END__ or __DATA__
-		;; 1+6+2+1+1+6+1+1+1=20 extra () before this:
-		"\\|"
-		"\\\\\\(['`\"($]\\)")	; BACKWACKED something-hairy
+		"\\\\\\(['`\"($]\\)")	; 9: BACKWACKED something-hairy
 	     ""))))
     (unwind-protect
 	(progn
@@ -5263,21 +3781,6 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 					   state-point b nil nil state))
 		    state-point b)
 	      (cond
-	       ;; 1+6+2+1+1+6=17 extra () before this:
-	       ;;    "\\$\\(['{]\\)"
-	       ((match-beginning 18) ; $' or ${foo}
-		(if (eq (preceding-char) ?\') ; $'
-		    (progn
-		      (setq b (1- (point))
-			    state (parse-partial-sexp
-				   state-point (1- b) nil nil state)
-			    state-point (1- b))
-		      (if (nth 3 state)	; in string
-			  (kurila-modify-syntax-type (1- b) kurila-st-punct))
-		      (goto-char (1+ b)))
-		  ;; else: ${
-		  (setq bb (match-beginning 0))
-		  (kurila-modify-syntax-type bb kurila-st-punct)))
 	       ;; No processing in strings/comments beyond this point:
 	       ((or (nth 3 state) (nth 4 state))
 		t)			; Do nothing in comment/string
@@ -5480,65 +3983,10 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		    (setq overshoot e1))
 		  (if (> e1 max)
 		      (setq tmpend tb))))
-	       ;; format
-	       ((match-beginning 8)
-		;; 1+6=7 extra () before this:
-		;;"^[ \t]*\\(format\\)[ \t]*\\([a-zA-Z0-9_]+\\)?[ \t]*=[ \t]*$"
-		(setq b (point)
-		      name (if (match-beginning 8) ; 7 + 1
-			       (buffer-substring (match-beginning 8) ; 7 + 1
-						 (match-end 8)) ; 7 + 1
-			     "")
-		      tb (match-beginning 0))
-		(setq argument nil)
-		(put-text-property (save-excursion
-				     (beginning-of-line)
-				     (point))
-				   b 'first-format-line 't)
-		(if kurila-pod-here-fontify
-		    (while (and (eq (forward-line) 0)
-				(not (looking-at "^[.;]$")))
-		      (cond
-		       ((looking-at "^#")) ; Skip comments
-		       ((and argument	; Skip argument multi-lines
-			     (looking-at "^[ \t]*{"))
-			(forward-sexp 1)
-			(setq argument nil))
-		       (argument	; Skip argument lines
-			(setq argument nil))
-		       (t		; Format line
-			(setq b1 (point))
-			(setq argument (looking-at "^[^\n]*[@^]"))
-			(end-of-line)
-			;; Highlight the format line
-			(kurila-postpone-fontification b1 (point)
-						      'face font-lock-string-face)
-			(kurila-commentify b1 (point) nil)
-			(kurila-put-do-not-fontify b1 (point) t))))
-		  ;; We do not search to max, since we may be called from
-		  ;; some hook of fontification, and max is random
-		  (re-search-forward "^[.;]$" stop-point 'toend))
-		(beginning-of-line)
-		(if (looking-at "^\\.$") ; ";" is not supported yet
-		    (progn
-		      ;; Highlight the ending delimiter
-		      (kurila-postpone-fontification (point) (+ (point) 2)
-						    'face font-lock-string-face)
-		      (kurila-commentify (point) (+ (point) 2) nil)
-		      (kurila-put-do-not-fontify (point) (+ (point) 2) t))
-		  (message "End of format `%s' not found." name)
-		  (or (car err-l) (setcar err-l b)))
-		(forward-line)
-		(if (> (point) max)
-		    (setq tmpend tb))
-		(put-text-property b (point) 'syntax-type 'format))
-	       ;; qq-like String or Regexp:
-	       ((or (match-beginning 10) (match-beginning 11))
-		;; 1+6+2=9 extra () before this:
-		;; "\\<\\(q[wxqr]?\\|[msy]\\|tr\\)\\>"
-		;; "\\|"
-		;; "\\([?/<]\\)"	; /blah/ or ?blah? or <file*glob>
-		(setq b1 (if (match-beginning 10) 10 11)
+	       ;; 7: QUOTED CONSTRUCT
+	       ((match-beginning 7)
+		;; "\\<\\(q[wxqr]?\\|[ms]\\)\\>"
+		(setq b1 7
 		      argument (buffer-substring
 				(match-beginning b1) (match-end b1))
 		      b (point)		; end of qq etc
@@ -5546,8 +3994,7 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		      c (char-after (match-beginning b1))
 		      bb (char-after (1- (match-beginning b1))) ; tmp holder
 		      ;; bb == "Not a stringy"
-		      bb (if (eq b1 10) ; user variables/whatever
-			     (and (memq bb (append "$@%*#_:-&>" nil)) ; $#y)
+		      bb (and (memq bb (append "$@%*#_:-&>" nil)) ; $#y)
 				  (cond ((eq bb ?-) (eq c ?s)) ; -s file test
 					((eq bb ?\:) ; $opt::s
 					 (eq (char-after
@@ -5562,55 +4009,11 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 						   (- (match-beginning b1) 2))
 						  ?\&)))
 					(t t)))
-			   ;; <file> or <$file>
-			   (and (eq c ?\<)
-				;; Do not stringify <FH>, <$fh> :
-				(save-match-data
-				  (looking-at
-				   "\\$?\\([_a-zA-Z:][_a-zA-Z0-9:]*\\)?>"))))
 		      tb (match-beginning 0))
 		(goto-char (match-beginning b1))
 		(kurila-backward-to-noncomment (point-min))
 		(or bb
-		    (if (eq b1 11)	; bare /blah/ or ?blah? or <foo>
-			(setq argument ""
-			      b1 nil
-			      bb	; Not a regexp?
-			      (not
-			       ;; What is below: regexp-p?
-			       (and
-				(or (memq (preceding-char)
-					  (append (if (memq c '(?\? ?\<))
-						      ;; $a++ ? 1 : 2
-						      "~{(=|&*!,;:["
-						    "~{(=|&+-*!,;:[") nil))
-				    (and (eq (preceding-char) ?\})
-					 (kurila-after-block-p (point-min)))
-				    (and (eq (char-syntax (preceding-char)) ?w)
-					 (progn
-					   (forward-sexp -1)
-;;; After these keywords `/' starts a RE.  One should add all the
-;;; functions/builtins which expect an argument, but ...
-					   (if (eq (preceding-char) ?-)
-					       ;; -d ?foo? is a RE
-					       (looking-at "[a-zA-Z]\\>")
-					     (and
-					      (not (memq (preceding-char)
-							 '(?$ ?@ ?& ?%)))
-					      (looking-at
-					       "\\(while\\|if\\|unless\\|until\\|and\\|or\\|not\\|xor\\|split\\|grep\\|map\\|print\\)\\>")))))
-				    (and (eq (preceding-char) ?.)
-					 (eq (char-after (- (point) 2)) ?.))
-				    (bobp))
-				;;  m|blah| ? foo : bar;
-				(not
-				 (and (eq c ?\?)
-				      kurila-use-syntax-table-text-property
-				      (not (bobp))
-				      (progn
-					(forward-char -1)
-					(looking-at "\\s|"))))))
-			      b (1- b))
+		    (progn
 		      ;; s y tr m
 		      ;; Check for $a -> y
 		      (setq b1 (preceding-char)
@@ -5674,7 +4077,7 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 		  ;; e1 means matching-char matcher.
 		  (setq b (point)	; before the first delimiter
 			;; has 2 args
-			i2 (string-match "^\\([sy]\\|tr\\)$" argument)
+			i2 (string-match "^\\(s\\)$" argument)
 			;; We do not search to max, since we may be called from
 			;; some hook of fontification, and max is random
 			i (kurila-forward-re stop-point end
@@ -5719,31 +4122,13 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 			     (or (eobp)
 				 (forward-char 1))))
 		    (kurila-commentify b i t)
-		    (if (looking-at "\\sw*e") ; s///e
-			(progn
-			  ;; Cache the syntax info...
-			  (setq kurila-syntax-state (cons state-point state))
-			  (and
-			   ;; silent:
-			   (car (kurila-find-pods-heres b1 (1- (point)) t end))
-			   ;; Error
-			   (goto-char (1+ max)))
-			  (if (and tag (eq (preceding-char) ?\>))
-			      (progn
-				(kurila-modify-syntax-type (1- (point)) kurila-st-ket)
-				(kurila-modify-syntax-type i kurila-st-bra)))
-			  (put-text-property b i 'syntax-type 'string)
-			  (put-text-property i (point) 'syntax-type 'multiline)
-			  (if is-x-REx
-			      (put-text-property b i 'indentable t)))
-		      (kurila-commentify b1 (point) t)
-		      (put-text-property b (point) 'syntax-type 'string)
-		      (if is-x-REx
-			  (put-text-property b i 'indentable t))
-		      (if qtag
-			  (kurila-modify-syntax-type (1+ i) kurila-st-punct))
-		      (setq tail nil)))
-		  ;; Now: tail: if the second part is non-matching without ///e
+                    (kurila-commentify b1 (point) t)
+                    (put-text-property b (point) 'syntax-type 'string)
+                    (if is-x-REx
+                        (put-text-property b i 'indentable t))
+                    (if qtag
+                        (kurila-modify-syntax-type (1+ i) kurila-st-punct))
+                    (setq tail nil))
 		  (if (eq (char-syntax (following-char)) ?w)
 		      (progn
 			(forward-word 1) ; skip modifiers s///s
@@ -6141,46 +4526,14 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 					   'REx-part2 t)))))
 		  (if (> (point) max)
 		      (setq tmpend tb))))
-	       ((match-beginning 17)	; sub with prototype or attribute
-		;; 1+6+2+1+1=11 extra () before this (sub with proto/attr):
-		;;"\\<sub\\>\\("			;12
-		;;   kurila-white-and-comment-rex	;13
-		;;   "\\([a-zA-Z_:'0-9]+\\)\\)?" ; name	;14
-		;;"\\(" kurila-maybe-white-and-comment-rex	;15,16
-		;;   "\\(([^()]*)\\|:[^:]\\)\\)" ; 17:proto or attribute start
-		(setq b1 (match-beginning 14) e1 (match-end 14))
-		(if (memq (char-after (1- b))
-			  '(?\$ ?\@ ?\% ?\& ?\*))
-		    nil
-		  (goto-char b)
-		  (if (eq (char-after (match-beginning 17)) ?\( )
-		      (progn
-			(kurila-commentify ; Prototypes; mark as string
-			 (match-beginning 17) (match-end 17) t)
-			(goto-char (match-end 0))
-			;; Now look for attributes after prototype:
-			(forward-comment (buffer-size))
-			(and (looking-at ":[^:]")
-			     (kurila-find-sub-attrs st-l b1 e1 b)))
-		    ;; treat attributes without prototype
-		    (goto-char (match-beginning 17))
-		    (kurila-find-sub-attrs st-l b1 e1 b))))
-	       ;; 1+6+2+1+1+6+1=18 extra () before this:
-	       ;;    "\\(\\<sub[ \t\n\f]+\\|[&*$@%]\\)[a-zA-Z0-9_]*'")
-	       ((match-beginning 19)	; old $abc'efg syntax
-		(setq bb (match-end 0))
-		;;;(if (nth 3 state) nil	; in string
-		(put-text-property (1- bb) bb 'syntax-table kurila-st-word)
-		(goto-char bb))
-	       ;; 1+6+2+1+1+6+1+1=19 extra () before this:
-	       ;; "__\\(END\\|DATA\\)__"
-	       ((match-beginning 20)	; __END__, __DATA__
+	       ;; 8: "__\\(END\\|DATA\\)__"
+	       ((match-beginning 8)	; __END__, __DATA__
 		(setq bb (match-end 0))
 		;; (put-text-property b (1+ bb) 'syntax-type 'pod) ; Cheat
 		(kurila-commentify b bb nil)
 		(setq end t))
-	       ;; "\\\\\\(['`\"($]\\)"
-	       ((match-beginning 21)
+	       ;; 9: "\\\\\\(['`\"($]\\)"
+	       ((match-beginning 9)
 		;; Trailing backslash; make non-quoting outside string/comment
 		(setq bb (match-end 0))
 		(goto-char b)
@@ -7276,49 +5629,28 @@ indentation and initial hashes.  Behaves usually outside of comment."
 			  "\\([^ \n\t{;()]+\\)" ; 2=name (assume non-anonymous)
 			  "\\("
 			    kurila-maybe-white-and-comment-rex ;whitespace/comments?
-			    "([^()]*)\\)?" ; prototype
-			  kurila-maybe-white-and-comment-rex ; whitespace/comments?
-			  "[{;]")
-		  2 (if kurila-font-lock-multiline
-			'(if (eq (char-after (kurila-1- (match-end 0))) ?\{ )
-			     'font-lock-function-name-face
-			   'font-lock-variable-name-face)
-		      ;; need to manually set 'multiline' for older font-locks
-		      '(progn
-			 (if (< 1 (count-lines (match-beginning 0)
-					       (match-end 0)))
-			     (put-text-property
-			      (+ 3 (match-beginning 0)) (match-end 0)
-			      'syntax-type 'multiline))
-			 (if (eq (char-after (kurila-1- (match-end 0))) ?\{ )
-			     'font-lock-function-name-face
-			   'font-lock-variable-name-face))))
+			    "([^()]*)\\)?") ; prototype
+		  2 font-lock-function-name-face)
 	    '("\\<\\(package\\|require\\|use\\|import\\|no\\|bootstrap\\)[ \t]+\\([a-zA-z_][a-zA-z_0-9:]*\\)[ \t;]" ; require A if B;
 	      2 font-lock-function-name-face)
-	    '("^[ \t]*format[ \t]+\\([a-zA-z_][a-zA-z_0-9:]*\\)[ \t]*=[ \t]*$"
-	      1 font-lock-function-name-face)
 	    (cond ((featurep 'font-lock-extra)
-		   '("\\([]}\\\\%@>*&]\\|\\$[a-zA-Z0-9_:]*\\)[ \t]*{[ \t]*\\(-?[a-zA-Z0-9_:]+\\)[ \t]*}"
+		   '("\\([]}\\\\%@>*&]\\|\\$[a-zA-Z0-9_:]*\\)[ \t]*{[ ]*[+?]?[ ]*\\([a-zA-Z0-9_:]+\\)[ ]*}"
 		     (2 font-lock-string-face t)
 		     (0 '(restart 2 t)))) ; To highlight $a{bc}{ef}
 		  (font-lock-anchored
-		   '("\\([]}\\\\%@>*&]\\|\\$[a-zA-Z0-9_:]*\\)[ \t]*{[ \t]*\\(-?[a-zA-Z0-9_:]+\\)[ \t]*}"
+		   '("\\([]}\\\\%@>*&]\\|\\$[a-zA-Z0-9_:]*\\)[ ]*{[ ]*[+?]?[ ]*\\([a-zA-Z0-9_:]+\\)[ ]*}"
 		     (2 font-lock-string-face t)
-		     ("\\=[ \t]*{[ \t]*\\(-?[a-zA-Z0-9_:]+\\)[ \t]*}"
+		     ("\\=[ ]*{[ ]*[+?]?[ ]*\\([a-zA-Z0-9_:]+\\)[ ]*}"
 		      nil nil
 		      (1 font-lock-string-face t))))
-		  (t '("\\([]}\\\\%@>*&]\\|\\$[a-zA-Z0-9_:]*\\)[ \t]*{[ \t]*\\(-?[a-zA-Z0-9_:]+\\)[ \t]*}"
+		  (t '("\\([]}\\\\%@>*&]\\|\\$[a-zA-Z0-9_:]*\\)[ ]*{[ ]*[+?][ ]*\\([a-zA-Z0-9_:]+\\)[ ]*}"
 		       2 font-lock-string-face t)))
-	    '("[\[ \t{,(]\\(-?[a-zA-Z0-9_:]+\\)[ \t]*=>" 1
+	    '("[\[ {,(]\\([a-zA-Z0-9_:]+\\)[ ]*=>" 1
 	      font-lock-string-face t)
-	    '("^[ \t]*\\([a-zA-Z0-9_]+[ \t]*:\\)[ \t]*\\($\\|{\\|\\<\\(until\\|while\\|for\\(each\\)?\\|do\\)\\>\\)" 1
+	    '("^[ ]*\\([a-zA-Z0-9_]+[ ]*:\\)[ \t]*\\($\\|{\\|\\<\\(until\\|while\\|for\\(each\\)?\\|do\\)\\>\\)" 1
 	      font-lock-constant-face)	; labels
 	    '("\\<\\(continue\\|next\\|last\\|redo\\|goto\\)\\>[ \t]+\\([a-zA-Z0-9_:]+\\)" ; labels as targets
 	      2 font-lock-constant-face)
-	    ;; Uncomment to get perl-mode-like vars
-            ;;; '("[$*]{?\\(\\sw+\\)" 1 font-lock-variable-name-face)
-            ;;; '("\\([@%]\\|\\$#\\)\\(\\sw+\\)"
-            ;;;  (2 (cons font-lock-variable-name-face '(underline))))
 	    (cond ((featurep 'font-lock-extra)
 		   '("^[ \t]*\\(my\\|local\\|our\\)[ \t]*\\(([ \t]*\\)?\\([$@%*][a-zA-Z0-9_:]+\\)\\([ \t]*,\\)?"
 		     (3 font-lock-variable-name-face)
@@ -7391,32 +5723,9 @@ indentation and initial hashes.  Behaves usually outside of comment."
 		 (and (string< "21.1.10" emacs-version)
 		      (string< emacs-version "21.1.2")))
 		'(
-		  ("\\(\\([@%]\\|\$#\\)[a-zA-Z_:][a-zA-Z0-9_:]*\\)" 1
-		   (if (eq (char-after (match-beginning 2)) ?%)
-		       kurila-hash-face
-		     kurila-array-face)
+		  ("\\(\\([$@%]\\)[a-zA-Z_:][a-zA-Z0-9_:]*\\)" 1
+		   font-lock-variable-name-face
 		   t)			; arrays and hashes
-		  ("\\(\\([$@]+\\)[a-zA-Z_:][a-zA-Z0-9_:]*\\)[ \t]*\\([[{]\\)"
-		   1
-		   (if (= (- (match-end 2) (match-beginning 2)) 1)
-		       (if (eq (char-after (match-beginning 3)) ?{)
-			   kurila-hash-face
-			 kurila-array-face) ; arrays and hashes
-		     font-lock-variable-name-face) ; Just to put something
-		   t)
-		  ("\\(@\\|\\$#\\)\\(\\$+\\([a-zA-Z_:][a-zA-Z0-9_:]*\\|[^ \t\n]\\)\\)"
-		   (1 kurila-array-face)
-		   (2 font-lock-variable-name-face))
-		  ("\\(%\\)\\(\\$+\\([a-zA-Z_:][a-zA-Z0-9_:]*\\|[^ \t\n]\\)\\)"
-		   (1 kurila-hash-face)
-		   (2 font-lock-variable-name-face))
-		  ;;("\\([smy]\\|tr\\)\\([^a-z_A-Z0-9]\\)\\(\\([^\n\\]*||\\)\\)\\2")
-		       ;;; Too much noise from \s* @s[ and friends
-		  ;;("\\(\\<\\([msy]\\|tr\\)[ \t]*\\([^ \t\na-zA-Z0-9_]\\)\\|\\(/\\)\\)"
-		  ;;(3 font-lock-function-name-face t t)
-		  ;;(4
-		  ;; (if (kurila-slash-is-regexp)
-		  ;;    font-lock-function-name-face 'default) nil t))
 		  )))
 	  (if kurila-highlight-variables-indiscriminately
 	      (setq t-font-lock-keywords-1
@@ -7512,13 +5821,6 @@ indentation and initial hashes.  Behaves usually outside of comment."
 	  ;; Do it the dull way, without choose-color
 	  (defvar kurila-guessed-background nil
 	    "Display characteristics as guessed by kurila.")
-	  ;;	  (or (fboundp 'x-color-defined-p)
-	  ;;	      (defalias 'x-color-defined-p
-	  ;;		(cond ((fboundp 'color-defined-p) 'color-defined-p)
-	  ;;		      ;; XEmacs >= 19.12
-	  ;;		      ((fboundp 'valid-color-name-p) 'valid-color-name-p)
-	  ;;		      ;; XEmacs 19.11
-	  ;;		      (t 'x-valid-color-name-p))))
 	  (kurila-force-face font-lock-constant-face
 			    "Face for constant and label names")
 	  (kurila-force-face font-lock-variable-name-face
@@ -7537,29 +5839,6 @@ indentation and initial hashes.  Behaves usually outside of comment."
 			    "Face for hashes")
 	  (kurila-force-face kurila-array-face
 			    "Face for arrays")
-	  ;;(defvar font-lock-constant-face 'font-lock-constant-face)
-	  ;;(defvar font-lock-variable-name-face 'font-lock-variable-name-face)
-	  ;;(or (boundp 'font-lock-type-face)
-	  ;;    (defconst font-lock-type-face
-	  ;;	'font-lock-type-face
-	  ;;	"Face to use for data types."))
-	  ;;(or (boundp 'kurila-nonoverridable-face)
-	  ;;    (defconst kurila-nonoverridable-face
-	  ;;	'kurila-nonoverridable-face
-	  ;;	"Face to use for data types from another group."))
-	  ;;(if (not kurila-xemacs-p) nil
-	  ;;  (or (boundp 'font-lock-comment-face)
-	  ;;	(defconst font-lock-comment-face
-	  ;;	  'font-lock-comment-face
-	  ;;	  "Face to use for comments."))
-	  ;;  (or (boundp 'font-lock-keyword-face)
-	  ;;	(defconst font-lock-keyword-face
-	  ;;	  'font-lock-keyword-face
-	  ;;	  "Face to use for keywords."))
-	  ;;  (or (boundp 'font-lock-function-name-face)
-	  ;;	(defconst font-lock-function-name-face
-	  ;;	  'font-lock-function-name-face
-	  ;;	  "Face to use for function names.")))
 	  (if (and
 	       (not (kurila-is-face 'kurila-array-face))
 	       (kurila-is-face 'font-lock-emphasized-face))
@@ -7574,27 +5853,12 @@ indentation and initial hashes.  Behaves usually outside of comment."
 	       (kurila-is-face 'font-lock-other-type-face))
 	      (copy-face 'font-lock-other-type-face
 			 'kurila-nonoverridable-face))
-	  ;;(or (boundp 'kurila-hash-face)
-	  ;;    (defconst kurila-hash-face
-	  ;;	'kurila-hash-face
-	  ;;	"Face to use for hashes."))
-	  ;;(or (boundp 'kurila-array-face)
-	  ;;    (defconst kurila-array-face
-	  ;;	'kurila-array-face
-	  ;;	"Face to use for arrays."))
 	  ;; Here we try to guess background
 	  (let ((background
 		 (if (boundp 'font-lock-background-mode)
 		     font-lock-background-mode
 		   'light))
 		(face-list (and (fboundp 'face-list) (face-list))))
-;;;;	    (fset 'kurila-is-face
-;;;;		  (cond ((fboundp 'find-face)
-;;;;			 (symbol-function 'find-face))
-;;;;			(face-list
-;;;;			 (function (lambda (face) (member face face-list))))
-;;;;			(t
-;;;;			 (function (lambda (face) (boundp face))))))
 	    (defvar kurila-guessed-background
 	      (if (and (boundp 'font-lock-display-type)
 		       (eq font-lock-display-type 'grayscale))
@@ -7633,40 +5897,6 @@ indentation and initial hashes.  Behaves usually outside of comment."
 				     (if (x-color-defined-p "orchid1")
 					 "orchid1"
 				       "orange")))))
-;;;	    (if (kurila-is-face 'font-lock-other-emphasized-face) nil
-;;;	      (copy-face 'bold-italic 'font-lock-other-emphasized-face)
-;;;	      (cond
-;;;	       ((eq background 'light)
-;;;		(set-face-background 'font-lock-other-emphasized-face
-;;;				     (if (x-color-defined-p "lightyellow2")
-;;;					 "lightyellow2"
-;;;				       (if (x-color-defined-p "lightyellow")
-;;;					   "lightyellow"
-;;;					 "light yellow"))))
-;;;	       ((eq background 'dark)
-;;;		(set-face-background 'font-lock-other-emphasized-face
-;;;				     (if (x-color-defined-p "navy")
-;;;					 "navy"
-;;;				       (if (x-color-defined-p "darkgreen")
-;;;					   "darkgreen"
-;;;					 "dark green"))))
-;;;	       (t (set-face-background 'font-lock-other-emphasized-face "gray90"))))
-;;;	    (if (kurila-is-face 'font-lock-emphasized-face) nil
-;;;	      (copy-face 'bold 'font-lock-emphasized-face)
-;;;	      (cond
-;;;	       ((eq background 'light)
-;;;		(set-face-background 'font-lock-emphasized-face
-;;;				     (if (x-color-defined-p "lightyellow2")
-;;;					 "lightyellow2"
-;;;				       "lightyellow")))
-;;;	       ((eq background 'dark)
-;;;		(set-face-background 'font-lock-emphasized-face
-;;;				     (if (x-color-defined-p "navy")
-;;;					 "navy"
-;;;				       (if (x-color-defined-p "darkgreen")
-;;;					   "darkgreen"
-;;;					 "dark green"))))
-;;;	       (t (set-face-background 'font-lock-emphasized-face "gray90"))))
 	    (if (kurila-is-face 'font-lock-variable-name-face) nil
 	      (copy-face 'italic 'font-lock-variable-name-face))
 	    (if (kurila-is-face 'font-lock-constant-face) nil
@@ -7718,39 +5948,6 @@ Style of printout regulated by the variable `kurila-ps-print-face-properties'."
 	(ps-print-face-extension-alist ps-print-face-extension-alist))
     (kurila-ps-extend-face-list kurila-ps-print-face-properties)
     (ps-print-buffer-with-faces file)))
-
-;;; (defun kurila-ps-print-init ()
-;;;   "Initialization of `ps-print' components for faces used in Kurila."
-;;;   ;; Guard against old versions
-;;;   (defvar ps-underlined-faces nil)
-;;;   (defvar ps-bold-faces nil)
-;;;   (defvar ps-italic-faces nil)
-;;;   (setq ps-bold-faces
-;;; 	(append '(font-lock-emphasized-face
-;;; 		  kurila-array-face
-;;; 		  font-lock-keyword-face
-;;; 		  font-lock-variable-name-face
-;;; 		  font-lock-constant-face
-;;; 		  font-lock-reference-face
-;;; 		  font-lock-other-emphasized-face
-;;; 		  kurila-hash-face)
-;;; 		ps-bold-faces))
-;;;   (setq ps-italic-faces
-;;; 	(append '(kurila-nonoverridable-face
-;;; 		  font-lock-constant-face
-;;; 		  font-lock-reference-face
-;;; 		  font-lock-other-emphasized-face
-;;; 		  kurila-hash-face)
-;;; 		ps-italic-faces))
-;;;   (setq ps-underlined-faces
-;;; 	(append '(font-lock-emphasized-face
-;;; 		  kurila-array-face
-;;; 		  font-lock-other-emphasized-face
-;;; 		  kurila-hash-face
-;;; 		  kurila-nonoverridable-face font-lock-type-face)
-;;; 		ps-underlined-faces))
-;;;   (cons 'font-lock-type-face ps-underlined-faces))
-
 
 (if (kurila-enable-font-lock) (kurila-windowed-init))
 
@@ -9782,192 +7979,6 @@ We suppose that the regexp is scanned already."
       (forward-sexp 1)
       (set-marker e (1- (point)))
       (kurila-beautify-regexp-piece b e nil deep))))
-
-(defun kurila-invert-if-unless-modifiers ()
-  "Change `B if A;' into `if (A) {B}' etc if possible.
-\(Unfinished.)"
-  (interactive)				; 
-  (let (A B pre-B post-B pre-if post-if pre-A post-A if-string
-	  (w-rex "\\<\\(if\\|unless\\|while\\|until\\|for\\|foreach\\)\\>"))
-    (and (= (char-syntax (preceding-char)) ?w)
-	 (forward-sexp -1))
-    (setq pre-if (point))
-    (kurila-backward-to-start-of-expr)
-    (setq pre-B (point))
-    (forward-sexp 1)		; otherwise forward-to-end-of-expr is NOP
-    (kurila-forward-to-end-of-expr)
-    (setq post-A (point))
-    (goto-char pre-if)
-    (or (looking-at w-rex)
-	;; Find the position
-	(progn (goto-char post-A)
-	       (while (and
-		       (not (looking-at w-rex))
-		       (> (point) pre-B))
-		 (forward-sexp -1))
-	       (setq pre-if (point))))
-    (or (looking-at w-rex)
-	(error "Can't find `if', `unless', `while', `until', `for' or `foreach'"))
-    ;; 1 B 2 ... 3 B-com ... 4 if 5 ... if-com 6 ... 7 A 8
-    (setq if-string (buffer-substring (match-beginning 0) (match-end 0)))
-    ;; First, simple part: find code boundaries
-    (forward-sexp 1)
-    (setq post-if (point))
-    (forward-sexp -2)
-    (forward-sexp 1)
-    (setq post-B (point))
-    (kurila-backward-to-start-of-expr)
-    (setq pre-B (point))
-    (setq B (buffer-substring pre-B post-B))
-    (goto-char pre-if)
-    (forward-sexp 2)
-    (forward-sexp -1)
-    ;; May be after $, @, $# etc of a variable
-    (skip-chars-backward "$@%#")
-    (setq pre-A (point))
-    (kurila-forward-to-end-of-expr)
-    (setq post-A (point))
-    (setq A (buffer-substring pre-A post-A))
-    ;; Now modify (from end, to not break the stuff)
-    (skip-chars-forward " \t;")
-    (delete-region pre-A (point))	; we move to pre-A
-    (insert "\n" B ";\n}")
-    (and (looking-at "[ \t]*#") (kurila-indent-for-comment))
-    (delete-region pre-if post-if)
-    (delete-region pre-B post-B)
-    (goto-char pre-B)
-    (insert if-string " (" A ") {")
-    (setq post-B (point))
-    (if (looking-at "[ \t]+$")
-	(delete-horizontal-space)
-      (if (looking-at "[ \t]*#")
-	  (kurila-indent-for-comment)
-	(just-one-space)))
-    (forward-line 1)
-    (if (looking-at "[ \t]*$")
-	(progn				; delete line
-	  (delete-horizontal-space)
-	  (delete-region (point) (1+ (point)))))
-    (kurila-indent-line)
-    (goto-char (1- post-B))
-    (forward-sexp 1)
-    (kurila-indent-line)
-    (goto-char pre-B)))
-
-(defun kurila-invert-if-unless ()
-  "Change `if (A) {B}' into `B if A;' etc (or visa versa) if possible.
-If the cursor is not on the leading keyword of the BLOCK flavor of
-construct, will assume it is the STATEMENT flavor, so will try to find
-the appropriate statement modifier."
-  (interactive)
-  (and (= (char-syntax (preceding-char)) ?w)
-       (forward-sexp -1))
-  (if (looking-at "\\<\\(if\\|unless\\|while\\|until\\|for\\|foreach\\)\\>")
-      (let ((pre-if (point))
-	    pre-A post-A pre-B post-B A B state p end-B-code is-block B-comment
-	    (if-string (buffer-substring (match-beginning 0) (match-end 0))))
-	(forward-sexp 2)
-	(setq post-A (point))
-	(forward-sexp -1)
-	(setq pre-A (point))
-	(setq is-block (and (eq (following-char) ?\( )
-			    (save-excursion
-			      (condition-case nil
-				  (progn
-				    (forward-sexp 2)
-				    (forward-sexp -1)
-				    (eq (following-char) ?\{ ))
-				(error nil)))))
-	(if is-block
-	    (progn
-	      (goto-char post-A)
-	      (forward-sexp 1)
-	      (setq post-B (point))
-	      (forward-sexp -1)
-	      (setq pre-B (point))
-	      (if (and (eq (following-char) ?\{ )
-		       (progn
-			 (kurila-backward-to-noncomment post-A)
-			 (eq (preceding-char) ?\) )))
-		  (if (condition-case nil
-			  (progn
-			    (goto-char post-B)
-			    (forward-sexp 1)
-			    (forward-sexp -1)
-			    (looking-at "\\<els\\(e\\|if\\)\\>"))
-			(error nil))
-		      (error
-		       "`%s' (EXPR) {BLOCK} with `else'/`elsif'" if-string)
-		    (goto-char (1- post-B))
-		    (kurila-backward-to-noncomment pre-B)
-		    (if (eq (preceding-char) ?\;)
-			(forward-char -1))
-		    (setq end-B-code (point))
-		    (goto-char pre-B)
-		    (while (re-search-forward "\\<\\(for\\|foreach\\|if\\|unless\\|while\\|until\\)\\>\\|;" end-B-code t)
-		      (setq p (match-beginning 0)
-			    A (buffer-substring p (match-end 0))
-			    state (parse-partial-sexp pre-B p))
-		      (or (nth 3 state)
-			  (nth 4 state)
-			  (nth 5 state)
-			  (error "`%s' inside `%s' BLOCK" A if-string))
-		      (goto-char (match-end 0)))
-		    ;; Finally got it
-		    (goto-char (1+ pre-B))
-		    (skip-chars-forward " \t\n")
-		    (setq B (buffer-substring (point) end-B-code))
-		    (goto-char end-B-code)
-		    (or (looking-at ";?[ \t\n]*}")
-			(progn
-			  (skip-chars-forward "; \t\n")
-			  (setq B-comment
-				(buffer-substring (point) (1- post-B)))))
-		    (and (equal B "")
-			 (setq B "1"))
-		    (goto-char (1- post-A))
-		    (kurila-backward-to-noncomment pre-A)
-		    (or (looking-at "[ \t\n]*)")
-			(goto-char (1- post-A)))
-		    (setq p (point))
-		    (goto-char (1+ pre-A))
-		    (skip-chars-forward " \t\n")
-		    (setq A (buffer-substring (point) p))
-		    (delete-region pre-B post-B)
-		    (delete-region pre-A post-A)
-		    (goto-char pre-if)
-		    (insert B " ")
-		    (and B-comment (insert B-comment " "))
-		    (just-one-space)
-		    (forward-word 1)
-		    (setq pre-A (point))
-		    (insert " " A ";")
-		    (delete-horizontal-space)
-		    (setq post-B (point))
-		    (if (looking-at "#")
-			(indent-for-comment))
-		    (goto-char post-B)
-		    (forward-char -1)
-		    (delete-horizontal-space)
-		    (goto-char pre-A)
-		    (just-one-space)
-		    (goto-char pre-if)
-		    (setq pre-A (set-marker (make-marker) pre-A))
-		    (while (<= (point) (marker-position pre-A))
-		      (kurila-indent-line)
-		      (forward-line 1))
-		    (goto-char (marker-position pre-A))
-		    (if B-comment
-			(progn
-			  (forward-line -1)
-			  (indent-for-comment)
-			  (goto-char (marker-position pre-A)))))
-		(error "`%s' (EXPR) not with an {BLOCK}" if-string)))
-	  ;; (error "`%s' not with an (EXPR)" if-string)
-	  (forward-sexp -1)
-	  (kurila-invert-if-unless-modifiers)))
-    ;;(error "Not at `if', `unless', `while', `until', `for' or `foreach'")
-    (kurila-invert-if-unless-modifiers)))
 
 ;;; By Anthony Foiani <afoiani@uswest.com>
 ;;; Getting help on modules in C-h f ?

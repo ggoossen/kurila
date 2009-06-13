@@ -2,30 +2,30 @@
 # TODO: copy tests and try to run them...
 # this file may be used as example on how to use comp.pl
 
-my @files;
+my @files
 
-my %dirs;
-sub mk {
-    my $r = shift;
-    return if exists %dirs{$r};
-    if ($r=~m/\//) {
-        $r=~m/^(.*)\/[^\/]*?$/;
-        mk($1);
-    }
-    print $^STDERR, "..\\miniperl.exe -MCross comp.pl --do cemkdir [p]\\lib\\$r\n";
-    system("..\\miniperl.exe -I..\\lib -MCross comp.pl --do cemkdir [p]\\lib\\$r");
-    %dirs{+$r}++;
-}
-for ( @files) {
-    if (m/\//) {
-        m/^(.*)\/[^\/]*?$/;
-        mk($1);
-    }
+my %dirs
+sub mk
+    my $r = shift
+    return if exists %dirs{$r}
+    if ($r=~m/\//)
+        $r=~m/^(.*)\/[^\/]*?$/
+        mk($1)
+    
+    print $^STDERR, "..\\miniperl.exe -MCross comp.pl --do cemkdir [p]\\lib\\$r\n"
+    system("..\\miniperl.exe -I..\\lib -MCross comp.pl --do cemkdir [p]\\lib\\$r")
+    %dirs{+$r}++
+
+for ( @files)
+    if (m/\//)
+        m/^(.*)\/[^\/]*?$/
+        mk($1)
+    
     # currently no stripping POD
-    system("..\\miniperl.exe -I..\\lib -MCross comp.pl --copy pc:..\\lib\\$_ ce:[p]\\lib\\$_");
-}
+    system("..\\miniperl.exe -I..\\lib -MCross comp.pl --copy pc:..\\lib\\$_ ce:[p]\\lib\\$_")
 
-sub BEGIN {
+
+sub BEGIN
     @files = qw(
     attributes.pm
     AutoLoader.pm
@@ -202,5 +202,5 @@ sub BEGIN {
     Attribute/Handlers/demo/Demo.pm
     Attribute/Handlers/demo/Descriptions.pm
     Attribute/Handlers/demo/MyClass.pm
-  );
-}
+  )
+

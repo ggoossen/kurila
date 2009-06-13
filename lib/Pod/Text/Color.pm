@@ -14,37 +14,37 @@
 # Modules and declarations
 ##############################################################################
 
-package Pod::Text::Color;
+package Pod::Text::Color
 
 
-use Pod::Text ();
-use Term::ANSIColor < qw(colored);
+use Pod::Text ()
+use Term::ANSIColor < qw(colored)
 
-our (@ISA, $VERSION);
+our (@ISA, $VERSION)
 use utf8;
 
-@ISA = qw(Pod::Text);
+@ISA = qw(Pod::Text)
 
 # Don't use the CVS revision as the version, since this module is also in Perl
 # core and too many things could munge CVS magic revision strings.  This
 # number should ideally be the same as the CVS revision in podlators, however.
-$VERSION = 2.03;
+$VERSION = 2.03
 
 ##############################################################################
 # Overrides
 ##############################################################################
 
 # Make level one headings bold.
-sub cmd_head1($self, $attrs, $text) {
-    $text =~ s/\s+$//;
-    $self->SUPER::cmd_head1 ($attrs, colored ($text, 'bold'));
-}
+sub cmd_head1($self, $attrs, $text)
+    $text =~ s/\s+$//
+    $self->SUPER::cmd_head1 ($attrs, colored ($text, 'bold'))
+
 
 # Make level two headings bold.
-sub cmd_head2($self, $attrs, $text) {
-    $text =~ s/\s+$//;
-    $self->SUPER::cmd_head2 ($attrs, colored ($text, 'bold'));
-}
+sub cmd_head2($self, $attrs, $text)
+    $text =~ s/\s+$//
+    $self->SUPER::cmd_head2 ($attrs, colored ($text, 'bold'))
+
 
 # Fix the various formatting codes.
 sub cmd_b { return colored (@_[2], 'bold')   }
@@ -52,42 +52,42 @@ sub cmd_f { return colored (@_[2], 'cyan')   }
 sub cmd_i { return colored (@_[2], 'yellow') }
 
 # Output any included code in green.
-sub output_code($self, $code) {
-    $code = colored ($code, 'green');
-    $self->output ($code);
-}
+sub output_code($self, $code)
+    $code = colored ($code, 'green')
+    $self->output ($code)
+
 
 # We unfortunately have to override the wrapping code here, since the normal
 # wrapping code gets really confused by all the escape sequences.
-sub wrap {
-    my $self = shift;
-    local $_ = shift;
-    my $output = '';
-    my $spaces = ' ' x $self->%{?MARGIN};
-    my $width = $self->%{?opt_width} - $self->%{?MARGIN};
+sub wrap
+    my $self = shift
+    local $_ = shift
+    my $output = ''
+    my $spaces = ' ' x $self->%{?MARGIN}
+    my $width = $self->%{?opt_width} - $self->%{?MARGIN}
 
     # We have to do $shortchar and $longchar in variables because the
     # construct ${char}{0,$width} didn't do the right thing until Perl 5.8.x.
-    my $char = '(?:(?:\e\[[\d;]+m)*[^\n])';
-    my $shortchar = $char . "\{0,$width\}";
-    my $longchar = $char . "\{$width\}";
-    while (length +> $width) {
-        if (s/^($shortchar)[\ \t]+// || s/^($longchar)//) {
-            $output .= $spaces . $1 . "\n";
-        } else {
-            last;
-        }
-    }
-    $output .= $spaces . $_;
-    $output =~ s/\s+$/\n\n/;
-    $output;
-}
+    my $char = '(?:(?:\e\[[\d;]+m)*[^\n])'
+    my $shortchar = $char . "\{0,$width\}"
+    my $longchar = $char . "\{$width\}"
+    while (length +> $width)
+        if (s/^($shortchar)[\ \t]+// || s/^($longchar)//)
+            $output .= $spaces . $1 . "\n"
+        else
+            last
+        
+    
+    $output .= $spaces . $_
+    $output =~ s/\s+$/\n\n/
+    $output
+
 
 ##############################################################################
 # Module return value and documentation
 ##############################################################################
 
-1;
+1
 __END__
 
 =head1 NAME

@@ -1,4 +1,4 @@
-package squaa;
+package squaa
 
 =head1 NAME
 

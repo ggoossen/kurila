@@ -1,14 +1,14 @@
-package ExtUtils::MY;
+package ExtUtils::MY
 
-require ExtUtils::MM;
+require ExtUtils::MM
 
-our $VERSION = 6.44;
-our @ISA = qw(ExtUtils::MM);
+our $VERSION = 6.44
+our @ISA = qw(ExtUtils::MM)
 
-do {
-    package MY;
-    our @ISA = qw(ExtUtils::MY);
-};
+do
+    package MY
+    our @ISA = qw(ExtUtils::MY)
+
 
 sub DESTROY {}
 

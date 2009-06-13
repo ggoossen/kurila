@@ -1,4 +1,4 @@
 #! perl
 
-use Pod::Perldoc;
-exit( Pod::Perldoc->run() );
+use Pod::Perldoc
+exit( Pod::Perldoc->run() )

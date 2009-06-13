@@ -94,76 +94,75 @@ Looking at ../foo2, you'll see 34 occurrences of the following error:
 
 =cut
 
-BEGIN {
-    require Config;
-    unless (Config::config_value("useperlio")) {
-        print $^STDOUT, "1..0 # Skip -- Perl configured without perlio\n";
-        exit 0;
-    }
-}
+BEGIN 
+    require Config
+    unless (Config::config_value("useperlio"))
+        print $^STDOUT, "1..0 # Skip -- Perl configured without perlio\n"
+        exit 0
+    
 
-use Getopt::Std;
-use Carp;
-use Test::More 'no_plan';
 
-require_ok("B::Concise");
+use Getopt::Std
+use Carp
+use Test::More 'no_plan'
 
-my %matchers = 
-    %( constant	=> qr{ (?-x: is a constant sub, optimized to a \w+)
-		      |(?-x: is XS code) }x,
-        XS	=> qr/ is XS code/,
-            perl	=> qr/ (next|db)state/,
-            noSTART	=> qr/coderef .* has no START/,
-    );
+require_ok("B::Concise")
+
+my %matchers =
+    %( constant => qr{ (?-x: is a constant sub, optimized to a \w+)
+                      |(?-x: is XS code) }x,
+    XS  => qr/ is XS code/,
+    perl        => qr/ (next|db)state/,
+    noSTART     => qr/coderef .* has no START/,
+    )
 
 my $testpkgs = \%(
-        # packages to test, with expected types for named funcs
+    # packages to test, with expected types for named funcs
 
-        'Data::Dumper' => %( dflt => 'perl' ),
-            B => %( 
-                dflt => 'constant',		# all but 47/297
-                    skip => @( 'regex_padav' ),	# threaded only
-                    perl => qw(
-		    walksymtable walkoptree_slow walkoptree_exec
-		    timing_info savesym peekop parents objsym debug
-		    compile_stats clearsym class
-		    ),
-                    XS => qw(
-		  warnhook walkoptree_debug walkoptree 
-		  svref_2object sv_yes sv_undef sv_no save_BEGINs
-		  regex_padav ppname perlstring opnumber minus_c
-		  main_start main_root main_cv init_av hash
-		  end_av dowarn diehook defstash curstash
-		  cstring comppadlist check_av cchar cast_I32 bootstrap
-		  sub_generation address
+    'Data::Dumper' => %( dflt => 'perl' ),
+    B => %(
+    dflt => 'constant',         # all but 47/297
+    skip => @( 'regex_padav' ), # threaded only
+    perl => qw(
+                    walksymtable walkoptree_slow walkoptree_exec
+                    timing_info savesym peekop parents objsym debug
+                    compile_stats clearsym class
+                    ),
+    XS => qw(
+                  warnhook walkoptree_debug walkoptree 
+                  svref_2object sv_yes sv_undef sv_no save_BEGINs
+                  regex_padav ppname perlstring opnumber minus_c
+                  main_start main_root main_cv init_av hash
+                  end_av dowarn diehook defstash curstash
+                  cstring comppadlist check_av cchar cast_I32 bootstrap
+                  sub_generation address
                   fudge unitcheck_av),
-            ),
+    ),
 
-            'B::Deparse' => %( dflt => 'perl',	# 235 functions
+    'B::Deparse' => %( dflt => 'perl',  # 235 functions
 
-                XS => qw( svref_2object perlstring opnumber main_start
-		   main_root main_cv ),
+    XS => qw( svref_2object perlstring opnumber main_start
+                   main_root main_cv ),
 
-                    constant => qw/ ASSIGN
-		     LIST_CONTEXT OP_CONST OP_LIST OP_RV2SV
-		     OP_STRINGIFY OPf_KIDS OPf_MOD OPf_REF OPf_SPECIAL
-		     OPf_STACKED OPf_WANT OPf_WANT_LIST OPf_WANT_SCALAR
-		     OPf_WANT_VOID OPpCONST_BARE
-		     OPpENTERSUB_AMPER OPpEXISTS_SUB OPpITER_REVERSED
-		     OPpLVAL_INTRO OPpOUR_INTRO OPpSLICE OPpSORT_DESCEND
-		     OPpSORT_INTEGER OPpSORT_NUMERIC
-		     OPpSORT_REVERSE OPf_TARGET_MY 
-		     PMf_CONTINUE
-		     PMf_EXTENDED PMf_FOLD PMf_GLOBAL PMf_KEEP
-		     PMf_MULTILINE PMf_SINGLELINE
-		     POSTFIX SVf_FAKE SVf_IOK SVf_NOK SVf_POK SVf_ROK
-		     SVpad_OUR SVs_RMG SVs_SMG SWAP_CHILDREN
-		     RXf_SKIPWHITE/,
-            ),
+    constant => qw/ 
+                     OPf_KIDS OPf_MOD OPf_REF OPf_SPECIAL
+                     OPf_STACKED OPf_WANT OPf_WANT_LIST OPf_WANT_SCALAR
+                     OPf_WANT_VOID OPpCONST_BARE
+                     OPpENTERSUB_AMPER OPpEXISTS_SUB OPpITER_REVERSED
+                     OPpLVAL_INTRO OPpOUR_INTRO OPpSLICE OPpSORT_DESCEND
+                     OPpSORT_INTEGER OPpSORT_NUMERIC
+                     OPpSORT_REVERSE OPf_TARGET_MY 
+                     PMf_CONTINUE
+                     PMf_EXTENDED PMf_FOLD PMf_GLOBAL PMf_KEEP
+                     PMf_MULTILINE PMf_SINGLELINE
+                     SVf_FAKE SVf_IOK SVf_NOK SVf_POK SVf_ROK
+                     SVpad_OUR SVs_RMG SVs_SMG
+                     RXf_SKIPWHITE/,
+    ),
 
-            POSIX => %( dflt => 'constant',			# all but 252/589
-                skip => qw/ _POSIX_JOB_CONTROL /,	# platform varying
-                    perl => qw/ import load_imports
+    POSIX => %( dflt => 'constant',                     # all but 252/589
+    skip => qw/ _POSIX_JOB_CONTROL /,   # platform varying
+    perl => qw/ import load_imports
                             usage redef unimpl assert tolower toupper closedir
                             opendir readdir rewinddir errno creat fcntl getgrgid
                             getgrnam atan2 cos exp fabs log pow sin sqrt getpwnam
@@ -186,185 +185,187 @@ my $testpkgs = \%(
                             WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG
                             /,
 
-                    XS => qw/ write wctomb wcstombs uname tzset tzname
-		      ttyname tmpnam times tcsetpgrp tcsendbreak
-		      tcgetpgrp tcflush tcflow tcdrain tanh tan
-		      sysconf strxfrm strtoul strtol strtod
-		      strftime strcoll sinh sigsuspend sigprocmask
-		      sigpending sigaction setuid setsid setpgid
-		      setlocale setgid read pipe pause pathconf
-		      open nice modf mktime mkfifo mbtowc mbstowcs
-		      mblen lseek log10 localeconv ldexp lchown
-		      isxdigit isupper isspace ispunct isprint
-		      islower isgraph isdigit iscntrl isalpha
-		      isalnum int_macro_int getcwd frexp fpathconf
-		      fmod floor dup2 dup difftime cuserid ctime
-		      ctermid cosh constant close clock ceil
-		      bootstrap atan asin asctime acos access abort
-		      _exit
-		      /,
-            ),
+    XS => qw/ write wctomb wcstombs uname tzset tzname
+                      ttyname tmpnam times tcsetpgrp tcsendbreak
+                      tcgetpgrp tcflush tcflow tcdrain tanh tan
+                      sysconf strxfrm strtoul strtol strtod
+                      strftime strcoll sinh sigsuspend sigprocmask
+                      sigpending sigaction setuid setsid setpgid
+                      setlocale setgid read pipe pause pathconf
+                      open nice modf mktime mkfifo mbtowc mbstowcs
+                      mblen lseek log10 localeconv ldexp lchown
+                      isxdigit isupper isspace ispunct isprint
+                      islower isgraph isdigit iscntrl isalpha
+                      isalnum int_macro_int getcwd frexp fpathconf
+                      fmod floor dup2 dup difftime cuserid ctime
+                      ctermid cosh constant close clock ceil
+                      bootstrap atan asin asctime acos access abort
+                      _exit
+                      /,
+    ),
 
-            'IO::Socket' => %( dflt => 'constant',		# 157/190
+    'IO::Socket' => %( dflt => 'constant',              # 157/190
 
-                perl => qw/ timeout socktype sockopt sockname
-			     socketpair socket sockdomain
-			     sockaddr_in shutdown setsockopt send
-			     register_domain recv protocol peername
-			     new listen import getsockopt croak
-			     connected connect configure confess close
-			     carp bind atmark accept blocking
+                       perl => qw/ timeout socktype sockopt sockname
+                             socketpair socket sockdomain
+                             sockaddr_in shutdown setsockopt send
+                             register_domain recv protocol peername
+                             new listen import getsockopt croak
+                             connected connect configure confess close
+                             carp bind atmark accept blocking
+                             EWOULDBLOCK EISCONN EINPROGRESS
                              /,
 
-                    XS => qw/ unpack_sockaddr_un unpack_sockaddr_in
-			   sockatmark sockaddr_family pack_sockaddr_un
-			   pack_sockaddr_in inet_ntoa inet_aton
-			   /,
-            ),
-    );
+                       XS => qw/ unpack_sockaddr_un unpack_sockaddr_in
+                           sockatmark sockaddr_family pack_sockaddr_un
+                           pack_sockaddr_in inet_ntoa inet_aton
+                           /,
+    ),
+    )
 
 ############
 
-B::Concise::compile('-nobanner');	# set a silent default
+B::Concise::compile('-nobanner')        # set a silent default
 getopts('vaVcr:', \my %opts) or
-    die <<EODIE;
+    die <<EODIE
 
 usage: PERL_CORE=1 ./perl ext/B/t/concise-xs.t [-av] [module-list]
     tests ability to discern XS funcs using Digest::MD5 package
-    -v	: runs verbosely
-    -V	: more verbosity
-    -a	: runs all modules in CoreList
+    -v  : runs verbosely
+    -V  : more verbosity
+    -a  : runs all modules in CoreList
     -c  : writes test corrections as a Data::Dumper expression
-    -r <file>	: reads file of tests, as written by -c
-    <args>	: additional modules are loaded and tested
-    	(will report failures, since no XS funcs are known apriori)
+    -r <file>   : reads file of tests, as written by -c
+    <args>      : additional modules are loaded and tested
+        (will report failures, since no XS funcs are known apriori)
 
 EODIE
     ;
 
-if (%opts) {
-    require Data::Dumper;
-    Data::Dumper->import('Dumper');
-    $Data::Dumper::Sortkeys = 1;
-}
-my @argpkgs = @ARGV;
-my %report;
+if (%opts)
+    require Data::Dumper
+    Data::Dumper->import('Dumper')
+    $Data::Dumper::Sortkeys = 1
 
-if (%opts{?r}) {
-    my $refpkgs = require "%opts{?r}";
-    $testpkgs->{+$_} = $refpkgs->{?$_} foreach keys $refpkgs->%;
-}
+my @argpkgs = @ARGV
+my %report
 
-unless (%opts{?a}) {
-    unless (nelems @argpkgs) {
-        foreach my $pkg (sort keys $testpkgs->%) {
-            test_pkg($pkg, $testpkgs->{?$pkg});
-        }
-    } else {
-        foreach my $pkg ( @argpkgs) {
-            test_pkg($pkg, $testpkgs->{?$pkg});
-        }
-    }
-} else {
-    corecheck();
-}
+if (%opts{?r})
+    my $refpkgs = require "%opts{?r}"
+    $testpkgs->{+$_} = $refpkgs->{?$_} foreach keys $refpkgs->%
+
+
+unless (%opts{?a})
+    unless (nelems @argpkgs)
+        foreach my $pkg (sort keys $testpkgs->%)
+            test_pkg($pkg, $testpkgs->{?$pkg})
+        
+    else
+        foreach my $pkg ( @argpkgs)
+            test_pkg($pkg, $testpkgs->{?$pkg})
+        
+    
+else
+    corecheck()
+
 ############
 
-sub test_pkg($pkg, ?$fntypes) {
-    require_ok($pkg);
+sub test_pkg($pkg, ?$fntypes)
+    require_ok($pkg)
 
     # build %stash: keys are func-names, vals filled in below
     my %stash = %+: map
         { %: $_ => 0 },
-        grep { exists &{Symbol::fetch_glob("$pkg\::$_")->*}	# grab CODE symbols
-        },
-        grep { !m/__ANON__/ }, keys Symbol::fetch_glob($pkg.'::')->*->%		# from symbol table
-    ;
+        grep { exists &{Symbol::fetch_glob("$pkg\::$_")->*}     # grab CODE symbols
+    },
+        grep { !m/__ANON__/ }, keys Symbol::fetch_glob($pkg.'::')->*->%         # from symbol table
+    
 
-        for my $type (keys %matchers) {
-            foreach my $fn ( $fntypes{?$type}) {
-                carp "$fn can only be one of $type, %stash{?$fn}\n"
-                    if %stash{?$fn};
-                %stash{+$fn} = $type;
-            }
-        }
+    for my $type (keys %matchers)
+        foreach my $fn ( $fntypes{?$type})
+            carp "$fn can only be one of $type, %stash{?$fn}\n"
+                if %stash{?$fn}
+            %stash{+$fn} = $type
+        
+    
     # set default type for un-named functions
-    my $dflt = $fntypes{?dflt} || 'perl';
-    for my $k (keys %stash) {
-        %stash{+$k} = $dflt unless %stash{?$k};
-    }
-    %stash{+$_} = 'skip' foreach  $fntypes{?skip};
+    my $dflt = $fntypes{?dflt} || 'perl'
+    for my $k (keys %stash)
+        %stash{+$k} = $dflt unless %stash{?$k}
+    
+    %stash{+$_} = 'skip' foreach  $fntypes{?skip}
 
-    if (%opts{?v}) {
-        diag("fntypes: " => < Dumper($fntypes));
-        diag("$pkg stash: " => < Dumper(\%stash));
-    }
-    foreach my $fn (reverse sort keys %stash) {
-        next if %stash{?$fn} eq 'skip';
-        my $res = checkXS("$($pkg)::$fn", %stash{?$fn});
-        if ($res ne '1') {
-            push %report{$pkg}->{$res}->@, $fn;
-        }
-    }
-}
+    if (%opts{?v})
+        diag("fntypes: " => < Dumper($fntypes))
+        diag("$pkg stash: " => < Dumper(\%stash))
+    
+    foreach my $fn (reverse sort keys %stash)
+        next if %stash{?$fn} eq 'skip'
+        my $res = checkXS("$($pkg)::$fn", %stash{?$fn})
+        if ($res ne '1')
+            push %report{$pkg}->{$res}->@, $fn
+        
+    
 
-sub checkXS($func_name, $want) {
+
+sub checkXS($func_name, $want)
 
     croak "unknown type $want: $func_name\n"
-        unless defined %matchers{?$want};
+        unless defined %matchers{?$want}
 
-    my @($buf, $err) =  render($func_name);
-    my $res = like($buf, %matchers{?$want}, "$want sub:\t $func_name");
+    my @($buf, $err) =  render($func_name)
+    my $res = like($buf, %matchers{?$want}, "$want sub:\t $func_name")
 
-    unless ($res) {
+    unless ($res)
         # test failed. return type that would give success
-        for my $m (keys %matchers) {
-            return $m if $buf =~ %matchers{?$m};
-        }
-    }
-    $res;
-}
+        for my $m (keys %matchers)
+            return $m if $buf =~ %matchers{?$m}
+        
+    
+    $res
 
-sub render($func_name) {
 
-    B::Concise::reset_sequence();
-    B::Concise::walk_output(\my $buf);
+sub render($func_name)
 
-    my $walker = B::Concise::compile($func_name);
-    try { $walker->() };
-    diag("err: $($^EVAL_ERROR->message) $buf") if $^EVAL_ERROR;
-    diag("verbose: $buf") if %opts{?V};
+    B::Concise::reset_sequence()
+    B::Concise::walk_output(\my $buf)
 
-    return  @($buf, $^EVAL_ERROR);
-}
+    my $walker = B::Concise::compile($func_name)
+    try { $walker->() }
+    diag("err: $($^EVAL_ERROR->message) $buf") if $^EVAL_ERROR
+    diag("verbose: $buf") if %opts{?V}
 
-sub corecheck {
-    try { require Module::CoreList };
-    if ($^EVAL_ERROR) {
-        warn "Module::CoreList not available on $^PERL_VERSION\n";
-        return;
-    }
-    my $mods = %Module::CoreList::version{?'5.009002'};
-    $mods = \ sort keys $mods->%;
-    print $^STDOUT, < Dumper($mods);
+    return  @($buf, $^EVAL_ERROR)
 
-    foreach my $pkgnm ( $mods->@) {
-        test_pkg($pkgnm);
-    }
-}
 
-END {
-    if (%opts{?c}) {
-        $Data::Dumper::Indent = 1;
-        print $^STDOUT, "Corrections: ", < Dumper(\%report);
+sub corecheck
+    try { require Module::CoreList }
+    if ($^EVAL_ERROR)
+        warn "Module::CoreList not available on $^PERL_VERSION\n"
+        return
+    
+    my $mods = %Module::CoreList::version{?'5.009002'}
+    $mods = \ sort keys $mods->%
+    print $^STDOUT, < Dumper($mods)
 
-        foreach my $pkg (sort keys %report) {
-            for my $type (keys %matchers) {
+    foreach my $pkgnm ( $mods->@)
+        test_pkg($pkgnm)
+    
+
+
+END 
+    if (%opts{?c})
+        $Data::Dumper::Indent = 1
+        print $^STDOUT, "Corrections: ", < Dumper(\%report)
+
+        foreach my $pkg (sort keys %report)
+            for my $type (keys %matchers)
                 print $^STDOUT, "$pkg: $type: $(join ' ',%report{$pkg}->{?$type}->@)\n"
-                    if (nelems %report{$pkg}->{?$type}->@);
-            }
-        }
-    }
-}
+                    if (nelems %report{$pkg}->{?$type}->@)
+            
+        
+    
+
 
 __END__
+;

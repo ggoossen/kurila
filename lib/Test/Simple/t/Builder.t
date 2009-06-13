@@ -1,30 +1,30 @@
 #!/usr/bin/perl -w
 
-BEGIN {
-    if( env::var('PERL_CORE') ) {
-        chdir 't';
-        $^INCLUDE_PATH = @( '../lib' );
-    }
-}
+BEGIN 
+    if( env::var('PERL_CORE') )
+        chdir 't'
+        $^INCLUDE_PATH = @( '../lib' )
+    
 
-use Test::Builder;
-my $Test = Test::Builder->new;
 
-$Test->plan( tests => 7 );
+use Test::Builder
+my $Test = Test::Builder->new
 
-my $default_lvl = $Test->level;
-$Test->level(0);
+$Test->plan( tests => 7 )
 
-$Test->ok( 1,  'compiled and new()' );
-$Test->ok( $default_lvl == 1,      'level()' );
+my $default_lvl = $Test->level
+$Test->level(0)
 
-$Test->is_eq('foo', 'foo',      'is_eq');
-$Test->is_num('23.0', '23',     'is_num');
+$Test->ok( 1,  'compiled and new()' )
+$Test->ok( $default_lvl == 1,      'level()' )
 
-$Test->is_num( $Test->current_test, 4,  'current_test() get' );
+$Test->is_eq('foo', 'foo',      'is_eq')
+$Test->is_num('23.0', '23',     'is_num')
 
-my $test_num = $Test->current_test + 1;
-$Test->current_test = $test_num;
-print $^STDOUT, "ok $test_num - current_test() set\n";
+$Test->is_num( $Test->current_test, 4,  'current_test() get' )
 
-$Test->ok( 1, 'counter still good' );
+my $test_num = $Test->current_test + 1
+$Test->current_test = $test_num
+print $^STDOUT, "ok $test_num - current_test() set\n"
+
+$Test->ok( 1, 'counter still good' )

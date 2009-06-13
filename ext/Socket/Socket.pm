@@ -1,11 +1,11 @@
-package Socket;
+package Socket
 
-our($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-$VERSION = "1.80";
+our($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS)
+$VERSION = "1.80"
 
 =head1 NAME
 
-Socket, sockaddr_in, inet_aton, inet_ntoa - load the C socket.h defines and structure manipulators 
+Socket, sockaddr_in, inet_aton, inet_ntoa - load the C socket.h defines and structure manipulators
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ Socket, sockaddr_in, inet_aton, inet_ntoa - load the C socket.h defines and stru
 This module is just a translation of the C F<socket.h> file.
 Unlike the old mechanism of requiring a translated F<socket.ph>
 file, this uses the B<h2xs> program (see the Perl source distribution)
-and your native C compiler.  This means that it has a 
+and your native C compiler.  This means that it has a
 far more likely chance of getting the numbers right.  This includes
 all of the commonly used pound-defines like AF_INET, SOCK_STREAM, etc.
 
@@ -168,9 +168,9 @@ have AF_UNIX in the right place.
 use Carp;
 use warnings::register;
 
-require Exporter;
+require Exporter
 use XSLoader ();
-@ISA = qw(Exporter);
+@ISA = qw(Exporter)
 @EXPORT = qw(
 	inet_aton inet_ntoa
 	sockaddr_family
@@ -330,7 +330,7 @@ use XSLoader ();
 	SO_XOPEN
 	SO_XSE
 	UIO_MAXIOV
-);
+)
 
 @EXPORT_OK = qw(CR LF CRLF $CR $LF $CRLF
 
@@ -345,32 +345,32 @@ use XSLoader ();
 	       TCP_MAXRT
 	       TCP_MAXSEG
 	       TCP_NODELAY
-	       TCP_STDURG);
+	       TCP_STDURG)
 
 %EXPORT_TAGS = %(
-        crlf    => qw(CR LF CRLF $CR $LF $CRLF),
-            all     => @EXPORT +@+ @EXPORT_OK,
-    );
+    crlf    => qw(CR LF CRLF $CR $LF $CRLF),
+    all     => @EXPORT +@+ @EXPORT_OK,
+    )
 
-BEGIN {
+BEGIN 
     sub CR   () {"\015"}
     sub LF   () {"\012"}
     sub CRLF () {"\015\012"}
-}
 
-*CR   = \CR();
-*LF   = \LF();
-*CRLF = \CRLF();
 
-sub sockaddr_in {
-    if (nelems @_ == 1) {
-        return unpack_sockaddr_in(< @_);
-    } else {
-        die "usage:   sin_sv = sockaddr_in(port,iaddr))" unless (nelems @_) == 2;
-        return pack_sockaddr_in(< @_);
-    }
-}
+*CR   = \CR()
+*LF   = \LF()
+*CRLF = \CRLF()
 
-XSLoader::load 'Socket', $VERSION;
+sub sockaddr_in
+    if (nelems @_ == 1)
+        return unpack_sockaddr_in(< @_)
+    else
+        die "usage:   sin_sv = sockaddr_in(port,iaddr))" unless (nelems @_) == 2
+        return pack_sockaddr_in(< @_)
+    
 
-1;
+
+XSLoader::load 'Socket', $VERSION
+
+1

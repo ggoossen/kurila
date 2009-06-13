@@ -166,12 +166,12 @@ You must use C<elsif> rather than C<else if>.
 
 The C<break> and C<continue> keywords from C become in Perl C<last>
 and C<next>, respectively.  Unlike in C, these do I<not> work within a
-C<do { } while> construct.  See L<perlsyn/"Loop Control">.
+C<do { } while> construct.  See L<kurilasyn/"Loop Control">.
 
 =item *
 
 There's no switch statement.  (But it's easy to build one on the fly,
-see L<perlsyn/"Basic BLOCKs and Switch Statements">)
+see L<kurilasyn/"Basic BLOCKs and Switch Statements">)
 
 =item *
 

@@ -1,9 +1,9 @@
-package XS::APItest;
+package XS::APItest
 
-use warnings;
-use Carp;
+use warnings
+use Carp
 
-use base < qw/ DynaLoader Exporter /;
+use base < qw/ DynaLoader Exporter /
 
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
@@ -21,46 +21,46 @@ our @EXPORT = qw( print_double print_int print_long
 		  my_cxt_getint my_cxt_getsv my_cxt_setint my_cxt_setsv
 		  sv_setsv_cow_hashkey_core sv_setsv_cow_hashkey_notcore
 		  rmagical_cast rmagical_flags
-);
+)
 
-our $VERSION = '0.14';
+our $VERSION = '0.14'
 
-our $WARNINGS_ON_BOOTSTRAP;
+our $WARNINGS_ON_BOOTSTRAP
 our ($BEGIN_called_PP, $UNITCHECK_called_PP, $CHECK_called_PP,
-    $INIT_called_PP, $END_called_PP);
+    $INIT_called_PP, $END_called_PP)
 
 # Do these here to verify that XS code and Perl code get called at the same
 # times
-BEGIN {
-    $BEGIN_called_PP++;
-}
-UNITCHECK {
-    $UNITCHECK_called_PP++;
-};
-do {
+BEGIN 
+    $BEGIN_called_PP++
+
+UNITCHECK 
+    $UNITCHECK_called_PP++
+;
+do
     # Need $W false by default, as some tests run under -w, and under -w we
     # can get warnings about "Too late to run CHECK" block (and INIT block)
-    no warnings 'void';
-    CHECK {
-        $CHECK_called_PP++;
-    }
-    INIT {
-        $INIT_called_PP++;
-    }
-};
-END {
-    $END_called_PP++;
-}
+    no warnings 'void'
+    CHECK 
+        $CHECK_called_PP++
+    
+    INIT 
+        $INIT_called_PP++
+    
 
-if ($WARNINGS_ON_BOOTSTRAP) {
-    XS::APItest->bootstrap( $VERSION);
-} else {
+END 
+    $END_called_PP++
+
+
+if ($WARNINGS_ON_BOOTSTRAP)
+    XS::APItest->bootstrap( $VERSION)
+else
     # More CHECK and INIT blocks that could warn:
-    local $^WARNING = 0;
-    XS::APItest->bootstrap( $VERSION);
-}
+    local $^WARNING = 0
+    XS::APItest->bootstrap( $VERSION)
 
-1;
+
+1
 __END__
 
 =head1 NAME

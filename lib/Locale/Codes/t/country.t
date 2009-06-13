@@ -3,7 +3,7 @@
 # country.t - tests for Locale::Country
 #
 
-use Locale::Country;
+use Locale::Country
 
 #-----------------------------------------------------------------------
 # This is an array of tests specs. Each spec is [TEST, OK_TO_DIE]
@@ -128,20 +128,18 @@ our @TESTS =
  \@('country2code("Congo, The Democratic Republic of the", LOCALE_CODE_ALPHA_3)	eq "cod"', 0),	# new name
  \@('country2code("Congo, The Democratic Republic of the", LOCALE_CODE_NUMERIC)	eq "180"', 0),	# new name
 
-    );
+    )
 
-use Test::More;
-plan tests => nelems(@TESTS);
+use Test::More
+plan tests => nelems(@TESTS)
 
 foreach my $test ( @TESTS)
-{
-    if ($test->[1]) {
-        eval "$test->[0]";
-        ok $^EVAL_ERROR && $^EVAL_ERROR->message;
-    }
-    else {
-        ok($test->[0]);
-    }
-}
+    if ($test->[1])
+        eval "$test->[0]"
+        ok $^EVAL_ERROR && $^EVAL_ERROR->message
+    else
+        ok($test->[0])
+    
 
-exit 0;
+
+exit 0

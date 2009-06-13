@@ -1,12 +1,12 @@
-package ExtUtils::CBuilder;
+package ExtUtils::CBuilder
 
-use File::Spec ();
-use File::Path ();
-use File::Basename ();
+use File::Spec ()
+use File::Path ()
+use File::Basename ()
 
-our ($VERSION, @ISA);
-$VERSION = '0.22_01';
-$VERSION = eval $VERSION;
+our ($VERSION, @ISA)
+$VERSION = '0.22_01'
+$VERSION = eval $VERSION
 
 # Okay, this is the brute-force method of finding out what kind of
 # platform we're on.  I don't know of a systematic way.  These values
@@ -51,35 +51,35 @@ my %OSTYPES = %( < qw(
 		 riscos    RiscOS
 		 amigaos   Amiga
 		 mpeix     MPEiX
-		) );
+		) )
 
 # We only use this once - don't waste a symbol table entry on it.
 # More importantly, don't make it an inheritable method.
-my $load = sub {
-        my $mod = shift;
-        eval "use $mod";
-        die $^EVAL_ERROR if $^EVAL_ERROR;
-        @ISA = @($mod);
-    };
+my $load = sub (@< @_)
+    my $mod = shift
+    eval "use $mod"
+    die $^EVAL_ERROR if $^EVAL_ERROR
+    @ISA = @($mod)
 
-do {
-    my @package = split m/::/, __PACKAGE__;
 
-    if (grep {-e File::Spec->catfile($_, < @package, 'Platform', $^OS_NAME) . '.pm'}, $^INCLUDE_PATH) {
-        $load->(__PACKAGE__ . "::Platform::$^OS_NAME");
+do
+    my @package = split m/::/, __PACKAGE__
 
-    } elsif (exists %OSTYPES{$^OS_NAME} and
-    grep {-e File::Spec->catfile($_, < @package, 'Platform', %OSTYPES{$^OS_NAME}) . '.pm'}, $^INCLUDE_PATH) {
-        $load->(__PACKAGE__ . "::Platform::%OSTYPES{?$^OS_NAME}");
+    if (grep {-e File::Spec->catfile($_, < @package, 'Platform', $^OS_NAME) . '.pm'}, $^INCLUDE_PATH)
+        $load->(__PACKAGE__ . "::Platform::$^OS_NAME")
 
-    } else {
-        $load->(__PACKAGE__ . "::Base");
-    }
-};
+    elsif (exists %OSTYPES{$^OS_NAME} and
+        grep {-e File::Spec->catfile($_, < @package, 'Platform', %OSTYPES{$^OS_NAME}) . '.pm'}, $^INCLUDE_PATH)
+        $load->(__PACKAGE__ . "::Platform::%OSTYPES{?$^OS_NAME}")
+
+    else
+        $load->(__PACKAGE__ . "::Base")
+    
+
 
 sub os_type { %OSTYPES{?$^OS_NAME} }
 
-1;
+1
 __END__
 
 =head1 NAME

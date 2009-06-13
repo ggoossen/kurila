@@ -1,0 +1,147 @@
+
+(setq debug-on-error t)
+
+(require 'etest)
+
+(defun kt-simple-buffer ()
+  "package Foo::Bar
+
+sub foo()
+    'noot'
+    return 'bar'
+")
+
+(defun kt-buffer-if-block ()
+  "package Foo::Bar
+
+sub aap
+      'noot'
+      'mies'
+      if ('mies')
+        'wim'
+        'zus'
+")
+
+(defun kt-buffer-paren ()
+  "package Foo::Bar
+
+sub aap
+    noot('mies',
+         'wim')
+")
+
+(defun indent-test (buffer)
+  (set-buffer (get-buffer-create "*kurila-indent-test*"))
+  (erase-buffer)
+  (insert buffer)
+  (let (indents)
+    (let ((linenr 1) start str)
+      (while (and (= (goto-line linenr) 0) (not (eobp)))
+        (setq start (point))
+        (skip-chars-forward "^|")
+        (setq str (car (read-from-string (buffer-substring start (point)))))
+        (delete-region start (1+ (point)))
+        (setq indents (cons str indents))
+        (setq linenr (+ linenr 1))
+        ))
+    (setq indents (reverse indents))
+    (let ((linenr 1) got)
+      (while indents
+        (goto-line linenr)
+        ;(message "sniff for block start: %S" (kurila-sniff-for-block-start))
+        ;(message "sniff for indent: %S" (kurila-sniff-for-indent))
+        (setq got (kurila-indent-indentation-info))
+        (if (not (equal (car indents) got))
+            (progn
+              (message "Failed on %s - got %S - exp %S" linenr got (car indents))
+              ))
+        (setq linenr (+ linenr 1))
+        (setq indents (cdr indents))
+        )))
+  )
+
+(indent-test "((0) (4))|package Foo::Bar
+((0) (4))         |
+((0) (4))         |sub foo
+((4))             |    help
+((4) (8) (0))     |    if (1)
+((8))             |
+((8))             |        my $a = $a->{?$b}
+((8) (12) (4) (0))|
+((8) (12) (4) (0))|        # foo ")
+
+(defun kt-is (buffer line exp func)
+  (save-excursion
+    (set-buffer (get-buffer-create "*kurila-indent-test*"))
+    (erase-buffer)
+    (insert (eval buffer))
+    (kurila-mode)
+    (kurila-indent-mode)
+    (goto-line line)
+    (etest-equality-test 'equal exp func)
+    )
+)
+
+(deftest '(kt-is 4) 'kt-is)
+
+(etest 
+ (kt-is (kt-simple-buffer)
+        3
+        '(0 next-line)
+        (kurila-sniff-for-block-start))
+ (kt-is (kt-simple-buffer) 
+        3
+        nil
+        (kurila-sniff-for-paren-open))
+ (kt-is (kt-simple-buffer)
+        4
+        [code-start-in-block 0]
+        (kurila-sniff-for-indent))
+ (kt-is (kt-simple-buffer) 
+        4
+        '((4))
+        (kurila-indent-indentation-info))
+ (kt-is (kt-simple-buffer)
+        5
+        [statement (4 0)]
+        (kurila-sniff-for-indent))
+ (kt-is (kt-simple-buffer)
+        5
+        '((4) (8) (0))
+        (kurila-indent-indentation-info))
+ 
+ (kt-is (kt-buffer-if-block)
+        5
+        [statement (6 0)]
+        (kurila-sniff-for-indent))
+ (kt-is (kt-buffer-if-block)
+        6
+        '(6 next-line)
+        (kurila-sniff-for-block-start))
+ (kt-is (kt-buffer-if-block)
+        6
+        '()
+        (kurila-sniff-for-paren-open))
+ (kt-is (kt-buffer-if-block)
+        7
+        '((10))
+        (kurila-indent-indentation-info))
+ (kt-is (kt-buffer-if-block)
+        8
+        '((8) (12) (6) (0))
+        (kurila-indent-indentation-info))
+ 
+ (kt-is (kt-buffer-paren)
+        4
+        '(9)
+        (kurila-sniff-for-paren-open))
+ (kt-is (kt-buffer-paren)
+        5
+        [cont-expr (9 4)]
+        (kurila-sniff-for-indent))
+ (kt-is (kt-buffer-paren)
+        5
+        '((9) (13) (8))
+        (kurila-indent-indentation-info))
+ )
+

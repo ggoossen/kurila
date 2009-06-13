@@ -1,14 +1,14 @@
-package ExtUtils::MM_MacOS;
+package ExtUtils::MM_MacOS
 
 
-our $VERSION = 6.44;
+our $VERSION = 6.44
 
-sub new {
-    die <<'UNSUPPORTED';
+sub new
+    die <<'UNSUPPORTED'
 MacOS Classic (MacPerl) is no longer supported by MakeMaker.
 Please use Module::Build instead.
 UNSUPPORTED
-}
+
 
 =head1 NAME
 
@@ -36,4 +36,4 @@ really encourage you to work on Module::Build instead.
 
 =cut
 
-1;
+1

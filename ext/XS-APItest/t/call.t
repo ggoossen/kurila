@@ -55,8 +55,7 @@ for my $test ( @:
     \@( G_SCALAR,  \qw(a p q), 'x',     '3 args, G_SCALAR' ),
     \@( G_DISCARD, \@( ),           undef,       '0 args, G_DISCARD' ),
     \@( G_DISCARD, \qw(a p q), undef,       '3 args, G_DISCARD' ),
-)
-{
+  ) {
     my @($flags, $args, $expected, $description) = $test->@;
 
     is(call_sv(\&f, $flags, < $args->@), $expected,

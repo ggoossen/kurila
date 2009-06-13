@@ -3,11 +3,11 @@
 use Test::More;
 
 BEGIN {
-	if ($^OS_NAME =~ m/MSWin32/i) {
-		plan tests => 41;
-	} else {
-		plan skip_all => 'This is not Win32';
-	}
+        if ($^OS_NAME =~ m/MSWin32/i) {
+                plan tests => 41;
+        } else {
+                plan skip_all => 'This is not Win32';
+        }
 }
 
 use Config;

@@ -8,73 +8,73 @@
 # will probably not match what is currently there. You
 # will need to adjust it to match (assuming it is correct).
 
-use Test::More;
+use Test::More
 
 
 BEGIN { plan tests => 177 }
 
-use Pod::LaTeX;
+use Pod::LaTeX
 
 # The link parsing changed between v0.22 and v0.30 of Pod::ParseUtils
-use Pod::ParseUtils;
-my $linkver = $Pod::ParseUtils::VERSION;
+use Pod::ParseUtils
+my $linkver = $Pod::ParseUtils::VERSION
 
 # Set up an END block to remove the test output file
-END {
-    unlink "test.tex";
-};
+END 
+    unlink "test.tex"
+;
 
-ok(1);
+ok(1)
 
 # First thing to do is to read the expected output from
 # the DATA filehandle and store it in a scalar.
 # Do this until we read an =pod
-my @reference;
-while (my $line = ~< $^DATA) {
-    last if $line =~ m/^=pod/;
-    push(@reference,$line);
-}
+my @reference
+while (my $line = ~< $^DATA)
+    last if $line =~ m/^=pod/
+    push(@reference,$line)
+
 
 # Create a new parser
-my $parser = Pod::LaTeX->new;
-ok($parser);
-$parser->Head1Level(1);
+my $parser = Pod::LaTeX->new
+ok($parser)
+$parser->Head1Level(1)
 # Add the preamble but remember not to compare the timestamps
-$parser->AddPreamble(1);
-$parser->AddPostamble(1);
+$parser->AddPreamble(1)
+$parser->AddPostamble(1)
 
 # For a laugh add a table of contents
-$parser->TableOfContents(1);
+$parser->TableOfContents(1)
 
 # Create an output file
-open(my $outfh, ">", "test.tex" ) or die "Unable to open test tex file: $^OS_ERROR\n";
+open(my $outfh, ">", "test.tex" ) or die "Unable to open test tex file: $^OS_ERROR\n"
 
 # Read from the DATA filehandle and write to a new output file
 # Really want to write this to a scalar
-$parser->parse_from_filehandle($^DATA,$outfh);
+$parser->parse_from_filehandle($^DATA,$outfh)
 
-close($outfh) or die "Error closing OUTFH test.tex: $^OS_ERROR\n";
+close($outfh) or die "Error closing OUTFH test.tex: $^OS_ERROR\n"
 
 # Now read in OUTFH and compare
-open(my $infh, "<", "test.tex") or die "Unable to read test tex file: $^OS_ERROR\n";
-my @output = @( ~< $infh );
+open(my $infh, "<", "test.tex") or die "Unable to read test tex file: $^OS_ERROR\n"
+my @output = @( ~< $infh )
 
-is((nelems @output), nelems @reference);
-for my $i (0..((nelems @reference)-1)) {
-    next if @reference[$i] =~ m/^%%/; # skip timestamp comments
+is((nelems @output), nelems @reference)
+for my $i (0..((nelems @reference)-1))
+    next if @reference[$i] =~ m/^%%/ # skip timestamp comments
 
     # if we are running a new version of Pod::ParseUtils we need
     # to change the link text. This is a kluge until we drop support
     # for older versions of Pod::ParseUtils
-    if ($linkver +< 0.29 && @output[$i] =~ m/manpage/) {
-        # convert our expectations from new to old new format 
-        @reference[$i] =~ s/Standard link: \\emph\{Pod::LaTeX\}/Standard link: the \\emph\{Pod::LaTeX\} manpage/;
-        @reference[$i] =~ s/\\textsf\{sec\} in \\emph\{Pod::LaTeX\}/the section on \\textsf\{sec\} in the \\emph\{Pod::LaTeX\} manpage/;
-    }
-    is(@output[$i], @reference[$i]);
-}
+    if ($linkver +< 0.29 && @output[$i] =~ m/manpage/)
+        # convert our expectations from new to old new format
+        @reference[$i] =~ s/Standard link: \\emph\{Pod::LaTeX\}/Standard link: the \\emph\{Pod::LaTeX\} manpage/
+        @reference[$i] =~ s/\\textsf\{sec\} in \\emph\{Pod::LaTeX\}/the section on \\textsf\{sec\} in the \\emph\{Pod::LaTeX\} manpage/
+    
+    is(@output[$i], @reference[$i])
 
-close($infh) or die "Error closing INFH test.tex: $^OS_ERROR\n";
+
+close($infh) or die "Error closing INFH test.tex: $^OS_ERROR\n"
 
 
 __DATA__

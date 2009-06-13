@@ -1,5 +1,5 @@
-use ExtUtils::MakeMaker;
-use ExtUtils::Constant v0.11 'WriteConstants';
+use ExtUtils::MakeMaker
+use ExtUtils::Constant v0.11 'WriteConstants'
 
 my @names = @( <qw(
 	       DN_ACCESS DN_MODIFY DN_CREATE DN_DELETE DN_RENAME
@@ -31,16 +31,16 @@ my @names = @( <qw(
                \%(name=>"SEEK_SET", default=>\@("IV", "0")),
                \%(name=>"SEEK_CUR", default=>\@("IV", "1")),
                \%(name=>"SEEK_END", default=>\@("IV", "2")),
-               \%(name=>"_S_IFMT", macro=>"S_IFMT", value=>"S_IFMT"));
+               \%(name=>"_S_IFMT", macro=>"S_IFMT", value=>"S_IFMT"))
 WriteConstants(
     PROXYSUBS => 1,
     NAME => 'Fcntl',
     NAMES => \@names,
-    );
+    )
 
 WriteMakefile(
-    NAME 	=> 'Fcntl',
-    XSPROTOARG => '-noprototypes', 		# XXX remove later?
+    NAME        => 'Fcntl',
+    XSPROTOARG => '-noprototypes',              # XXX remove later?
     VERSION_FROM => 'Fcntl.pm',
     realclean => %( FILES=> 'const-c.inc const-xs.inc'),
-    );
+    )

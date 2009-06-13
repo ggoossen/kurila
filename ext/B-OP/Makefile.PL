@@ -1,7 +1,7 @@
 
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker
 
 WriteMakefile(
-    NAME	    => "B::OP",
+    NAME            => "B::OP",
     VERSION_FROM    => "OP.pm",
-    );
+    )

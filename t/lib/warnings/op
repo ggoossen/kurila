@@ -1,28 +1,28 @@
-  op.c		AOK
+  op.c          AOK
 
      Found = in conditional, should be ==
-	1 if $a = 1 ;
+        1 if $a = 1 ;
 
      Useless use of time in void context
      Useless use of a variable in void context
      Useless use of a constant in void context
-	time ;
-	$a ;
-	"abc"
+        time ;
+        $a ;
+        "abc"
 
      Useless use of sort in scalar context
-	my $x = sort (2,1,3);
+        my $x = sort (2,1,3);
 
      Applying %s to %s will act on scalar(%s)
-	my $a ; my @a = () ; my %a = () ; my $b = \@a ; my $c = \%a ;
-	@a =~ m/abc/ ;
-	@a =~ s/a/b/ ;
-	@$b =~ m/abc/ ;
-	@$b =~ s/a/b/ ;
-	%a =~ m/abc/ ;
-	%a =~ s/a/b/ ;
-	%$c =~ m/abc/ ;
-	%$c =~ s/a/b/ ;
+        my $a ; my @a = () ; my %a = () ; my $b = \@a ; my $c = \%a ;
+        @a =~ m/abc/ ;
+        @a =~ s/a/b/ ;
+        @$b =~ m/abc/ ;
+        @$b =~ s/a/b/ ;
+        %a =~ m/abc/ ;
+        %a =~ s/a/b/ ;
+        %$c =~ m/abc/ ;
+        %$c =~ s/a/b/ ;
 
 
      Parentheses missing around "my" list at -e line 1.
@@ -35,8 +35,8 @@
        use warnings 'bareword'; my $x = print(ABC || 1);
  
      Value of %s may be \"0\"; use \"defined\" 
-	$x = 1 if $x = ~< *FH ;
-	$x = 1 while $x = ~< *FH ;
+        $x = 1 if $x = ~< *FH ;
+        $x = 1 while $x = ~< *FH ;
 
      Subroutine fred redefined at -e line 1.
        sub fred{1;} sub fred{1;}
@@ -45,19 +45,19 @@
         sub fred() {1;} sub fred() {1;}
  
      Statement unlikely to be reached
-     	(Maybe you meant system() when you said exec()?
- 	exec "true" ; my $a
+        (Maybe you meant system() when you said exec()?
+        exec "true" ; my $a
 
      defined(@array) is deprecated
-     	(Maybe you should just omit the defined()?)
-	my @a ; defined @a ;
-	defined (@a = (1,2,3)) ;
+        (Maybe you should just omit the defined()?)
+        my @a ; defined @a ;
+        defined (@a = (1,2,3)) ;
 
      defined(%hash) is deprecated
-     	(Maybe you should just omit the defined()?)
-	my %h ; defined %h ;
+        (Maybe you should just omit the defined()?)
+        my %h ; defined %h ;
     
-    %s() called too early to check prototype		[Perl_peep]
+    %s() called too early to check prototype            [Perl_peep]
         fred() ; sub fred ($$) {}
 
 
@@ -65,17 +65,17 @@
 
     Use of /g modifier is meaningless in split
 
-    Possible precedence problem on bitwise %c operator	[Perl_ck_bitop]
+    Possible precedence problem on bitwise %c operator  [Perl_ck_bitop]
 
     Mandatory Warnings 
     ------------------
-    Prototype mismatch:		[cv_ckproto]
+    Prototype mismatch:         [cv_ckproto]
         sub fred() ;
         sub fred($) {}
 
-    Runaway prototype		[newSUB]	TODO
-    oops: oopsAV		[oopsAV]	TODO
-    oops: oopsHV		[oopsHV]	TODO
+    Runaway prototype           [newSUB]        TODO
+    oops: oopsAV                [oopsAV]        TODO
+    oops: oopsHV                [oopsHV]        TODO
     
 __END__
 # op.c
@@ -88,9 +88,9 @@ Found = in conditional, should be == at - line 3 character 14.
 ########
 # op.c
 use warnings 'void' ;
-for (@: 0) { "$_" }		# check warning isn't duplicated
+for (@: 0) { "$_" }             # check warning isn't duplicated
 no warnings 'void' ;
-for (@: 0) { "$_" }		# check warning isn't duplicated
+for (@: 0) { "$_" }             # check warning isn't duplicated
 EXPECT
 Useless use of string in void context at - line 3 character 14.
 ########
@@ -106,9 +106,9 @@ EOM
         exit 
     }
 }
-getppid ;		# OP_GETPPID
+getppid ;               # OP_GETPPID
 no warnings 'void' ;
-getppid ;		# OP_GETPPID
+getppid ;               # OP_GETPPID
 EXPECT
 Useless use of getppid in void context at - line 13 character 1.
 ########
@@ -124,9 +124,9 @@ EOM
         exit 
     }
 }
-getpgrp ;		# OP_GETPGRP
+getpgrp ;               # OP_GETPGRP
 no warnings 'void' ;
-getpgrp ;		# OP_GETPGRP
+getpgrp ;               # OP_GETPGRP
 EXPECT
 Useless use of getpgrp in void context at - line 13 character 1.
 ########
@@ -142,9 +142,9 @@ EOM
         exit 
     }
 }
-times ;			# OP_TMS
+times ;                 # OP_TMS
 no warnings 'void' ;
-times ;			# OP_TMS
+times ;                 # OP_TMS
 EXPECT
 Useless use of times in void context at - line 13 character 1.
 ########
@@ -160,9 +160,9 @@ EOM
         exit 
     }
 }
-getpriority 1,2;	# OP_GETPRIORITY
+getpriority 1,2;        # OP_GETPRIORITY
 no warnings 'void' ;
-getpriority 1,2;	# OP_GETPRIORITY
+getpriority 1,2;        # OP_GETPRIORITY
 EXPECT
 Useless use of getpriority in void context at - line 13 character 1.
 ########
@@ -178,9 +178,9 @@ EOM
         exit 
     }
 }
-getlogin ;			# OP_GETLOGIN
+getlogin ;                      # OP_GETLOGIN
 no warnings 'void' ;
-getlogin ;			# OP_GETLOGIN
+getlogin ;                      # OP_GETLOGIN
 EXPECT
 Useless use of getlogin in void context at - line 13 character 1.
 ########
@@ -207,36 +207,36 @@ SKIPPED
 EOM
     exit 
 } }
-getsockname $^STDIN ;	# OP_GETSOCKNAME
-getpeername $^STDIN ;	# OP_GETPEERNAME
-gethostbyname 1 ;	# OP_GHBYNAME
-gethostbyaddr 1,2;	# OP_GHBYADDR
-gethostent ;		# OP_GHOSTENT
-getnetbyname 1 ;	# OP_GNBYNAME
-getnetbyaddr 1,2 ;	# OP_GNBYADDR
-getnetent ;		# OP_GNETENT
-getprotobyname 1;	# OP_GPBYNAME
-getprotobynumber 1;	# OP_GPBYNUMBER
-getprotoent ;		# OP_GPROTOENT
-getservbyname 1,2;	# OP_GSBYNAME
-getservbyport 1,2;	# OP_GSBYPORT
-getservent ;		# OP_GSERVENT
+getsockname $^STDIN ;   # OP_GETSOCKNAME
+getpeername $^STDIN ;   # OP_GETPEERNAME
+gethostbyname 1 ;       # OP_GHBYNAME
+gethostbyaddr 1,2;      # OP_GHBYADDR
+gethostent ;            # OP_GHOSTENT
+getnetbyname 1 ;        # OP_GNBYNAME
+getnetbyaddr 1,2 ;      # OP_GNBYADDR
+getnetent ;             # OP_GNETENT
+getprotobyname 1;       # OP_GPBYNAME
+getprotobynumber 1;     # OP_GPBYNUMBER
+getprotoent ;           # OP_GPROTOENT
+getservbyname 1,2;      # OP_GSBYNAME
+getservbyport 1,2;      # OP_GSBYPORT
+getservent ;            # OP_GSERVENT
 
 no warnings 'void' ;
-getsockname $^STDIN ;	# OP_GETSOCKNAME
-getpeername $^STDIN ;	# OP_GETPEERNAME
-gethostbyname 1 ;	# OP_GHBYNAME
-gethostbyaddr 1,2;	# OP_GHBYADDR
-gethostent ;		# OP_GHOSTENT
-getnetbyname 1 ;	# OP_GNBYNAME
-getnetbyaddr 1,2 ;	# OP_GNBYADDR
-getnetent ;		# OP_GNETENT
-getprotobyname 1;	# OP_GPBYNAME
-getprotobynumber 1;	# OP_GPBYNUMBER
-getprotoent ;		# OP_GPROTOENT
-getservbyname 1,2;	# OP_GSBYNAME
-getservbyport 1,2;	# OP_GSBYPORT
-getservent ;		# OP_GSERVENT
+getsockname $^STDIN ;   # OP_GETSOCKNAME
+getpeername $^STDIN ;   # OP_GETPEERNAME
+gethostbyname 1 ;       # OP_GHBYNAME
+gethostbyaddr 1,2;      # OP_GHBYADDR
+gethostent ;            # OP_GHOSTENT
+getnetbyname 1 ;        # OP_GNBYNAME
+getnetbyaddr 1,2 ;      # OP_GNBYADDR
+getnetent ;             # OP_GNETENT
+getprotobyname 1;       # OP_GPBYNAME
+getprotobynumber 1;     # OP_GPBYNUMBER
+getprotoent ;           # OP_GPROTOENT
+getservbyname 1,2;      # OP_GSBYNAME
+getservbyport 1,2;      # OP_GSBYPORT
+getservent ;            # OP_GSERVENT
 INIT {
    # some functions may not be there, so we exit without running
    exit;
@@ -281,8 +281,8 @@ use warnings 'void' ;
 "x" . "y"; # optimized to OP_CONST
 2 + 2; # optimized to OP_CONST
 use constant U => undef;
-5 || print $^STDOUT, "bad\n";	# test OPpCONST_SHORTCIRCUIT
-print $^STDOUT, "boo\n" if U;	# test OPpCONST_SHORTCIRCUIT
+5 || print $^STDOUT, "bad\n";   # test OPpCONST_SHORTCIRCUIT
+print $^STDOUT, "boo\n" if U;   # test OPpCONST_SHORTCIRCUIT
 
 no warnings 'void' ;
 "abc"; # OP_CONST
@@ -355,7 +355,7 @@ sub fred {}
 no warnings 'redefine' ;
 sub fred {}
 EXPECT
-Subroutine fred redefined at - line 4 character 1.
+Subroutine fred redefined at - line 4 character 5.
 ########
 # op.c
 use warnings 'redefine' ;
@@ -364,23 +364,16 @@ sub fred () { 1 }
 no warnings 'redefine' ;
 sub fred () { 1 }
 EXPECT
-Constant subroutine fred redefined at - line 4 character 1.
-########
-# op.c
-no warnings 'redefine' ;
-sub fred () { 1 }
-*fred = sub () { 2 };
-EXPECT
-Constant subroutine main::fred redefined at - line 4 character 1.
+Subroutine fred redefined at - line 4 character 5.
 ########
 # op.c
 BEGIN {
     if ($^OS_NAME eq 'MacOS') {
-	print $^STDOUT, <<EOM;
+        print $^STDOUT, <<EOM;
 SKIPPED
 # no exec on Mac OS
 EOM
-	exit;
+        exit;
     }
 }
 use warnings 'syntax' ;
@@ -388,17 +381,17 @@ exec "$^EXECUTABLE_NAME -e 1" ;
 my $a
 EXPECT
 Statement unlikely to be reached at - line 12 character 1.
-	(Maybe you meant system() when you said exec()?)
+        (Maybe you meant system() when you said exec()?)
  at - line 12 character 1.
 ########
 # op.c
 BEGIN {
     if ($^OS_NAME eq 'MacOS') {
-	print $^STDOUT, <<EOM;
+        print $^STDOUT, <<EOM;
 SKIPPED
 # no exec on Mac OS
 EOM
-	exit;
+        exit;
     }
 }
 no warnings 'syntax' ;

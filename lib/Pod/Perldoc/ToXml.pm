@@ -1,22 +1,22 @@
 
-package Pod::Perldoc::ToXml;
+package Pod::Perldoc::ToXml
 
-use warnings;
-our ($VERSION);
+use warnings
+our ($VERSION)
 
 use base < qw( Pod::Simple::XMLOutStream );
 
 $VERSION   # so that ->VERSION is happy
     # stop CPAN from seeing this
     =
-    $Pod::Simple::XMLOutStream::VERSION;
+    $Pod::Simple::XMLOutStream::VERSION
 
 
 sub is_pageable        { 0 }
 sub write_with_binmode { 0 }
 sub output_extension   { 'xml' }
 
-1;
+1
 __END__
 
 =head1 NAME

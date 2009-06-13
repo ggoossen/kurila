@@ -936,7 +936,7 @@ PP(pp_helem)
 
     if ( ! SvHVOK(hv) ) {
 	if ( SvOK(hv) ) {
-	    Perl_croak(aTHX_ "Expected a HASH not %s", Ddesc(hv));
+	    Perl_croak(aTHX_ "Expected a HASH not %s", Ddesc(hvTsv(hv)));
 	}
 
 	/* hv must be "undef" */
@@ -1335,7 +1335,7 @@ PP(pp_entersub)
     }
 
     if (!sv)
-	DIE(aTHX_ "Not a CODE reference");
+	DIE(aTHX_ "Expected a CODE reference but got nothing");
     switch (SvTYPE(sv)) {
 	/* This is overwhelming the most common case:  */
     case SVt_PVGV:
@@ -1366,10 +1366,10 @@ PP(pp_entersub)
 	cv = (CV*)SvRV(sv);
 	if (SvTYPE(cv) == SVt_PVCV)
 	    break;
-	/* FALL THROUGH */
+	DIE(aTHX_ "Expected a CODE reference but got a %s reference", Ddesc(SvRV(sv)));
     case SVt_PVHV:
     case SVt_PVAV:
-	DIE(aTHX_ "Not a CODE reference");
+	DIE(aTHX_ "Expected a CODE reference but got a %s", Ddesc(sv));
 	/* This is the second most common case:  */
     case SVt_PVCV:
 	cv = (CV*)sv;
@@ -1398,6 +1398,7 @@ PP(pp_entersub)
 	/* This path taken at least 75% of the time   */
 	dMARK;
 	register I32 items = SP - MARK;
+	AV* padlist;
 	if (CvCONST(cv)) {
 	    if (items)
 		Perl_croak(aTHX_ "constant subroutine does not expect any arguments");
@@ -1408,7 +1409,7 @@ PP(pp_entersub)
 	    LEAVE;
 	    return NORMAL;
 	}
-	AV* const padlist = CvPADLIST(cv);
+	padlist = CvPADLIST(cv);
 	PUSHBLOCK(cx, CXt_SUB, is_assignment ? MARK - 1 : MARK );
 	PUSHSUB(cx);
 	cx->blk_sub.retop = PL_op->op_next;

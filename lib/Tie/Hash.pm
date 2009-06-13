@@ -1,6 +1,6 @@
-package Tie::Hash;
+package Tie::Hash
 
-our $VERSION = '1.02';
+our $VERSION = '1.02'
 
 =head1 NAME
 
@@ -35,8 +35,8 @@ Tie::Hash, Tie::StdHash, Tie::ExtraHash - base class definitions for tied hashes
     # All methods provided by default, define only those needing overrides
     # Accessors access the storage in %{$_[0][0]};
     # TIEHASH should return an array reference with the first element being
-    # the reference to the actual storage 
-    sub DELETE { 
+    # the reference to the actual storage
+    sub DELETE {
       $_[0][1]->('del', $_[0][0], $_[1]); # Call the report writer
       delete $_[0][0]->{$_[1]};		  #  $_[0]->SUPER::DELETE($_[1])
     }
@@ -187,42 +187,41 @@ good working examples.
 
 use warnings::register;
 
-sub new {
-    my $pkg = shift;
-    $pkg->TIEHASH(< @_);
-}
+sub new
+    my $pkg = shift
+    $pkg->TIEHASH(< @_)
+
 
 # Grandfather "new"
 
-sub TIEHASH {
-    my $pkg = shift;
-    if (defined &{Symbol::fetch_glob("$($pkg)::new")}) {
-        warnings::warnif("WARNING: calling $($pkg)->new since $($pkg)->TIEHASH is missing");
-        $pkg->new(< @_);
-    }
-    else {
-        die "$pkg doesn't define a TIEHASH method";
-    }
-}
+sub TIEHASH
+    my $pkg = shift
+    if (defined &{Symbol::fetch_glob("$($pkg)::new")})
+        warnings::warnif("WARNING: calling $($pkg)->new since $($pkg)->TIEHASH is missing")
+        $pkg->new(< @_)
+    else
+        die "$pkg doesn't define a TIEHASH method"
+    
 
-sub EXISTS {
-    my $pkg = ref @_[0];
-    die "$pkg doesn't define an EXISTS method";
-}
 
-sub CLEAR {
-    my $self = shift;
-    my $key = $self->FIRSTKEY(< @_);
-    my @keys;
+sub EXISTS
+    my $pkg = ref @_[0]
+    die "$pkg doesn't define an EXISTS method"
 
-    while (defined $key) {
-        push @keys, $key;
-        $key = $self->NEXTKEY(< @_, $key);
-    }
-    foreach my $key ( @keys) {
-        $self->DELETE(< @_, $key);
-    }
-}
+
+sub CLEAR
+    my $self = shift
+    my $key = $self->FIRSTKEY(< @_)
+    my @keys
+
+    while (defined $key)
+        push @keys, $key
+        $key = $self->NEXTKEY(< @_, $key)
+    
+    foreach my $key ( @keys)
+        $self->DELETE(< @_, $key)
+    
+
 
 # The Tie::StdHash package implements standard perl hash behaviour.
 # It exists to act as a base class for classes which only wish to
@@ -253,4 +252,4 @@ sub DELETE   { delete @_[0]->[0]->{@_[1]} }
 sub CLEAR    { @_[0]->[0]->% = %( () ) }
 sub SCALAR   { scalar @_[0]->[0]->% }
 
-1;
+1

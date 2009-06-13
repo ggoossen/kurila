@@ -1,12 +1,12 @@
 #!./perl -w
 
-BEGIN {
-    require './test.pl';
-}
+BEGIN 
+    require './test.pl'
 
-plan tests => 56;
 
-my @comma = @("key", "value");
+plan tests => 56
+
+my @comma = @("key", "value")
 
 # The peephole optimiser already knows that it should convert the string in
 # $foo{string} into a shared hash key scalar. It might be worth making the
@@ -16,180 +16,180 @@ my @comma = @("key", "value");
 # And really we should also try utf8 literals in {} and => in utf8.t
 
 # Some of these tests are (effectively) duplicated in each.t
-my %comma = %( < @comma );
-ok (nelems(keys %comma) == 1, 'keys on comma hash');
-ok (nelems(values %comma) == 1, 'values on comma hash');
+my %comma = %( < @comma )
+ok (nelems(keys %comma) == 1, 'keys on comma hash')
+ok (nelems(values %comma) == 1, 'values on comma hash')
 # defeat any tokeniser or optimiser cunning
-my $key = 'ey';
-is (%comma{?"k" . $key}, "value", 'is key present? (unoptimised)');
+my $key = 'ey'
+is (%comma{?"k" . $key}, "value", 'is key present? (unoptimised)')
 # now with cunning:
-is (%comma{?key}, "value", 'is key present? (maybe optimised)');
+is (%comma{?key}, "value", 'is key present? (maybe optimised)')
 #tokeniser may treat => differently.
-my @temp = @(key=>undef);
-is (%comma{?@temp[0]}, "value", 'is key present? (using LHS of =>)');
+my @temp = @(key=>undef)
+is (%comma{?@temp[0]}, "value", 'is key present? (using LHS of =>)')
 
-@temp = @( < %comma );
-ok (eq_array(\@comma, \@temp), 'list from comma hash');
+@temp = @( < %comma )
+ok (eq_array(\@comma, \@temp), 'list from comma hash')
 
-@temp = @( each %comma );
-ok (eq_array (\@comma, \@temp), 'first each from comma hash');
-@temp = @( each %comma );
-ok (eq_array (\@(), \@temp), 'last each from comma hash');
+@temp = @( each %comma )
+ok (eq_array (\@comma, \@temp), 'first each from comma hash')
+@temp = @( each %comma )
+ok (eq_array (\@(), \@temp), 'last each from comma hash')
 
-my %temp = %( < %comma );
+my %temp = %( < %comma )
 
-ok (nelems(keys %temp) == 1, 'keys on copy of comma hash');
-ok (nelems(values %temp) == 1, 'values on copy of comma hash');
-is (%temp{?'k' . $key}, "value", 'is key present? (unoptimised)');
+ok (nelems(keys %temp) == 1, 'keys on copy of comma hash')
+ok (nelems(values %temp) == 1, 'values on copy of comma hash')
+is (%temp{?'k' . $key}, "value", 'is key present? (unoptimised)')
 # now with cunning:
-is (%temp{?key}, "value", 'is key present? (maybe optimised)');
-@temp = @(key=>undef);
-is (%comma{?@temp[0]}, "value", 'is key present? (using LHS of =>)');
+is (%temp{?key}, "value", 'is key present? (maybe optimised)')
+@temp = @(key=>undef)
+is (%comma{?@temp[0]}, "value", 'is key present? (using LHS of =>)')
 
-@temp = @( < %temp );
-ok (eq_array (\@temp, \@temp), 'list from copy of comma hash');
+@temp = @( < %temp )
+ok (eq_array (\@temp, \@temp), 'list from copy of comma hash')
 
-@temp = @( each %temp );
-ok (eq_array (\@temp, \@temp), 'first each from copy of comma hash');
-@temp = @( each %temp );
-ok (eq_array (\@(), \@temp), 'last each from copy of comma hash');
+@temp = @( each %temp )
+ok (eq_array (\@temp, \@temp), 'first each from copy of comma hash')
+@temp = @( each %temp )
+ok (eq_array (\@(), \@temp), 'last each from copy of comma hash')
 
-my @arrow = @(Key =>"Value");
+my @arrow = @(Key =>"Value")
 
-my %arrow = %( < @arrow );
-ok (nelems(keys %arrow) == 1, 'keys on arrow hash');
-ok (nelems(values %arrow) == 1, 'values on arrow hash');
+my %arrow = %( < @arrow )
+ok (nelems(keys %arrow) == 1, 'keys on arrow hash')
+ok (nelems(values %arrow) == 1, 'values on arrow hash')
 # defeat any tokeniser or optimiser cunning
-$key = 'ey';
-is (%arrow{?"K" . $key}, "Value", 'is key present? (unoptimised)');
+$key = 'ey'
+is (%arrow{?"K" . $key}, "Value", 'is key present? (unoptimised)')
 # now with cunning:
-is (%arrow{?Key}, "Value", 'is key present? (maybe optimised)');
+is (%arrow{?Key}, "Value", 'is key present? (maybe optimised)')
 #tokeniser may treat => differently.
-@temp = @('Key', undef);
-is (%arrow{?@temp[0]}, "Value", 'is key present? (using LHS of =>)');
+@temp = @('Key', undef)
+is (%arrow{?@temp[0]}, "Value", 'is key present? (using LHS of =>)')
 
-@temp = @( < %arrow );
-ok (eq_array (\@arrow, \@temp), 'list from arrow hash');
+@temp = @( < %arrow )
+ok (eq_array (\@arrow, \@temp), 'list from arrow hash')
 
-@temp = @( each %arrow );
-ok (eq_array (\@arrow, \@temp), 'first each from arrow hash');
-@temp = @( each %arrow );
-ok (eq_array (\@(), \@temp), 'last each from arrow hash');
+@temp = @( each %arrow )
+ok (eq_array (\@arrow, \@temp), 'first each from arrow hash')
+@temp = @( each %arrow )
+ok (eq_array (\@(), \@temp), 'last each from arrow hash')
 
-%temp = %( < %arrow );
+%temp = %( < %arrow )
 
-ok (nelems(keys %temp) == 1, 'keys on copy of arrow hash');
-ok (nelems(values %temp) == 1, 'values on copy of arrow hash');
-is (%temp{?'K' . $key}, "Value", 'is key present? (unoptimised)');
+ok (nelems(keys %temp) == 1, 'keys on copy of arrow hash')
+ok (nelems(values %temp) == 1, 'values on copy of arrow hash')
+is (%temp{?'K' . $key}, "Value", 'is key present? (unoptimised)')
 # now with cunning:
-is (%temp{?Key}, "Value", 'is key present? (maybe optimised)');
-@temp = @('Key', undef);
-is (%arrow{?@temp[0]}, "Value", 'is key present? (using LHS of =>)');
+is (%temp{?Key}, "Value", 'is key present? (maybe optimised)')
+@temp = @('Key', undef)
+is (%arrow{?@temp[0]}, "Value", 'is key present? (using LHS of =>)')
 
-@temp = @:< %temp;
-ok (eq_array (\@temp, \@temp), 'list from copy of arrow hash');
+@temp = @:< %temp
+ok (eq_array (\@temp, \@temp), 'list from copy of arrow hash')
 
-@temp = @( each %temp );
-ok (eq_array (\@temp, \@temp), 'first each from copy of arrow hash');
-@temp = @( each %temp );
-ok (eq_array (\@(), \@temp), 'last each from copy of arrow hash');
+@temp = @( each %temp )
+ok (eq_array (\@temp, \@temp), 'first each from copy of arrow hash')
+@temp = @( each %temp )
+ok (eq_array (\@(), \@temp), 'last each from copy of arrow hash')
 
-my %direct = %('Camel', 2, 'Dromedary', 1);
-my %slow;
-%slow{+Dromedary} = 1;
-%slow{+Camel} = 2;
+my %direct = %('Camel', 2, 'Dromedary', 1)
+my %slow
+%slow{+Dromedary} = 1
+%slow{+Camel} = 2
 
-ok (eq_hash (\%slow, \%direct), "direct list assignment to hash");
-%direct = %(Camel => 2, 'Dromedary' => 1);
-ok (eq_hash (\%slow, \%direct), "direct list assignment to hash using =>");
+ok (eq_hash (\%slow, \%direct), "direct list assignment to hash")
+%direct = %(Camel => 2, 'Dromedary' => 1)
+ok (eq_hash (\%slow, \%direct), "direct list assignment to hash using =>")
 
-%slow{+Llama} = 0; # A llama is not a camel :-)
-ok (!eq_hash (\%direct, \%slow), "different hashes should not be equal!");
+%slow{+Llama} = 0 # A llama is not a camel :-)
+ok (!eq_hash (\%direct, \%slow), "different hashes should not be equal!")
 
-my (%names, %names_copy);
+my (%names, %names_copy)
 %names = %('$' => 'Scalar', '@' => 'Array', # Grr '
-        '%', 'Hash', '&', 'Code');
-%names_copy = %( < %names );
-ok (eq_hash (\%names, \%names_copy), "check we can copy our hash");
+    '%', 'Hash', '&', 'Code')
+%names_copy = %( < %names )
+ok (eq_hash (\%names, \%names_copy), "check we can copy our hash")
 
-sub in {
-    my %args = %( < @_ );
-    return eq_hash (\%names, \%args);
-}
+sub in
+    my %args = %( < @_ )
+    return eq_hash (\%names, \%args)
 
-ok (in (< %names), "pass hash into a method");
 
-sub in_method {
-    my $self = shift;
-    my %args = %( < @_ );
-    return eq_hash (\%names, \%args);
-}
+ok (in (< %names), "pass hash into a method")
 
-ok (main->in_method (< %names), "pass hash into a method");
+sub in_method
+    my $self = shift
+    my %args = %( < @_ )
+    return eq_hash (\%names, \%args)
 
-sub out {
-    return %names;
-}
-%names_copy = %( < out () );
 
-ok (eq_hash (\%names, \%names_copy), "pass hash from a subroutine");
+ok (main->in_method (< %names), "pass hash into a method")
 
-sub out_method {
-    my $self = shift;
-    return %names;
-}
-%names_copy = %( < main->out_method () );
+sub out
+    return %names
 
-ok (eq_hash (\%names, \%names_copy), "pass hash from a method");
+%names_copy = %( < out () )
 
-sub in_out {
-    my %args = %( < @_ );
-    return %args;
-}
-%names_copy = %( < in_out (< %names) );
+ok (eq_hash (\%names, \%names_copy), "pass hash from a subroutine")
 
-ok (eq_hash (\%names, \%names_copy), "pass hash to and from a subroutine");
+sub out_method
+    my $self = shift
+    return %names
 
-sub in_out_method {
-    my $self = shift;
-    my %args = %( < @_ );
-    return %args;
-}
-%names_copy = %( < main->in_out_method (< %names) );
+%names_copy = %( < main->out_method () )
 
-ok (eq_hash (\%names, \%names_copy), "pass hash to and from a method");
+ok (eq_hash (\%names, \%names_copy), "pass hash from a method")
 
-my %names_copy2 = %( < %names );
-ok (eq_hash (\%names, \%names_copy2), "check copy worked");
+sub in_out
+    my %args = %( < @_ )
+    return %args
+
+%names_copy = %( < in_out (< %names) )
+
+ok (eq_hash (\%names, \%names_copy), "pass hash to and from a subroutine")
+
+sub in_out_method
+    my $self = shift
+    my %args = %( < @_ )
+    return %args
+
+%names_copy = %( < main->in_out_method (< %names) )
+
+ok (eq_hash (\%names, \%names_copy), "pass hash to and from a method")
+
+my %names_copy2 = %( < %names )
+ok (eq_hash (\%names, \%names_copy2), "check copy worked")
 
 # This should get ignored.
-%names_copy = %('%', 'Associative Array', < %names);
+%names_copy = %('%', 'Associative Array', < %names)
 
-ok (eq_hash (\%names, \%names_copy), "duplicates at the start of a list");
+ok (eq_hash (\%names, \%names_copy), "duplicates at the start of a list")
 
 # This should not
-%names_copy = %('*', 'Typeglob', < %names);
+%names_copy = %('*', 'Typeglob', < %names)
 
-%names_copy2{+'*'} = 'Typeglob';
-ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at the end of a list");
+%names_copy2{+'*'} = 'Typeglob'
+ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at the end of a list")
 
 %names_copy = %('%', 'Associative Array', '*', 'Endangered species', < %names,
-        '*', 'Typeglob',);
+    '*', 'Typeglob',)
 
-ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at both ends");
+ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at both ends")
 
 # test stringification of keys
-do {
-    no warnings 'once';
-    my @refs =    @( \ do { my $x }, \@(),   \%(),  sub {}, \ *x);
-    our %h;
-    for my $ref ( @refs) {
-        dies_like( sub { %h{?$ref} }, qr/reference as string/ );
-    }
+do
+    no warnings 'once'
+    my @refs =    @( \ do { my $x }, \@(),   \%(),  sub {}, \ *x)
+    our %h
+    for my $ref ( @refs)
+        dies_like( sub (@< @_) { %h{?$ref} }, qr/reference as string/ )
+    
 
-    bless $_ for  @refs;
-    %h = %( () );
-    for my $ref ( @refs) {
-        dies_like( sub { %h{?$ref} }, qr/reference as string/ );
-    }
-};
+    bless $_ for  @refs
+    %h = %( () )
+    for my $ref ( @refs)
+        dies_like( sub (@< @_) { %h{?$ref} }, qr/reference as string/ )
+    
+

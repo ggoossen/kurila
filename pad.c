@@ -1295,9 +1295,6 @@ void Perl_cv_setcv(pTHX_ CV *dst, CV* src)
 	OP_REFCNT_UNLOCK;
 	CvSTART(dst)		= CvSTART(src);
 
-	if (SvPOK(src))
-	    sv_setpvn((SV*)dst, SvPVX_const((SV*)src), SvCUR(src));
-
 	CvPADLIST(dst) = pad_new(padnew_CLONE|padnew_SAVE,
 	    parent_padnames,
 	    parent_pad,
@@ -1366,13 +1363,7 @@ void Perl_cv_setcv(pTHX_ CV *dst, CV* src)
 	 * so try to grab the current const value, and if successful,
 	 * turn into a const sub:
 	 */
-	SV* const const_sv = op_const_sv(RootopOp(CvROOT(dst)), dst);
-	if (const_sv) {
-	    CvXSUBANY(dst).any_ptr = SvREFCNT_inc(const_sv);
-	}
-	else {
-	    CvCONST_off(dst);
-	}
+	CvCONST_off(dst);
     }
 
     return;

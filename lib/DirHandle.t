@@ -1,35 +1,35 @@
 #!./perl
 
-use Config;
+use Config
 
-BEGIN {
-    if (not config_value('d_readdir')) {
-        print $^STDOUT, "1..0\n";
-        exit 0;
-    }
-}
+BEGIN 
+    if (not config_value('d_readdir'))
+        print $^STDOUT, "1..0\n"
+        exit 0
+    
 
-use DirHandle;
-require './test.pl';
 
-plan(5);
+use DirHandle
+require './test.pl'
 
-my $dot = DirHandle->new($^OS_NAME eq 'MacOS' ?? ':' !! '.');
+plan(5)
 
-ok(defined($dot));
+my $dot = DirHandle->new($^OS_NAME eq 'MacOS' ?? ':' !! '.')
 
-my @a = sort glob("*");
-my $first;
-{ $first = $dot->readdir } while defined($first) && $first =~ m/^\./;
-ok(grep { $_ eq $first }, @a);
+ok(defined($dot))
 
-my @b = sort( @($first, (< grep {m/^[^.]/}, $dot->readdirs)));
-is(join("\0", @a), join("\0", @b));
+my @a = sort glob("*")
+my $first
+loop { $first = $dot->readdir } while defined($first) && $first =~ m/^\./
+ok(grep { $_ eq $first }, @a)
 
-$dot->rewind;
-my @c = sort grep {m/^[^.]/}, $dot->readdirs;
-is(join("\0", @b), join("\0", @c));
+my @b = sort( @($first, (< grep {m/^[^.]/}, $dot->readdirs)))
+is(join("\0", @a), join("\0", @b))
 
-$dot->close;
-$dot->rewind;
-ok(!defined($dot->readdir));
+$dot->rewind
+my @c = sort grep {m/^[^.]/}, $dot->readdirs
+is(join("\0", @b), join("\0", @c))
+
+$dot->close
+$dot->rewind
+ok(!defined($dot->readdir))

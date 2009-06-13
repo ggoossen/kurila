@@ -1,11 +1,11 @@
 #!./perl
 
-use Config;
+use Config
 
-use Test::More tests => 20;
+use Test::More tests => 20
 
-use Scalar::Util < qw(reftype);
-our ($t, $y, $x);
+use Scalar::Util < qw(reftype)
+our ($t, $y, $x)
 use Symbol < qw(gensym);
 
 my @test = @(
@@ -18,22 +18,22 @@ my @test = @(
  \@( GLOB   => gensym,	'GLOB ref'	),
  \@( CODE   => sub {},	'CODE ref'	),
     # \@( IO => *STDIN{IO} ) the internal sv_reftype returns UNKNOWN
-    );
+    )
 
-foreach my $test (@test) {
-    my@($type,$what, $n) =  $test->@;
+foreach my $test (@test)
+    my@($type,$what, $n) =  $test->@
 
-    is( reftype($what), $type, $n);
-    next unless ref($what);
+    is( reftype($what), $type, $n)
+    next unless ref($what)
 
-    bless $what, "ABC";
-    is( reftype($what), $type, $n);
+    bless $what, "ABC"
+    is( reftype($what), $type, $n)
 
-    bless $what, "0";
-    is( reftype($what), $type, $n);
-}
+    bless $what, "0"
+    is( reftype($what), $type, $n)
 
-package MyTie;
+
+package MyTie
 
 sub TIEHANDLE { bless \%() }
 sub DESTROY {}

@@ -1,47 +1,47 @@
-package Net::protoent;
+package Net::protoent
 
 
-our $VERSION = '1.00';
-our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-BEGIN { 
-    use Exporter   ();
-    @EXPORT      = qw(getprotobyname getprotobynumber getprotoent getproto);
-    @EXPORT_OK   = qw( $p_name @p_aliases $p_proto );
-    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT );
-}
-our ($p_name, @p_aliases, $p_proto);
+our $VERSION = '1.00'
+our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS)
+BEGIN 
+    use Exporter   ()
+    @EXPORT      = qw(getprotobyname getprotobynumber getprotoent getproto)
+    @EXPORT_OK   = qw( $p_name @p_aliases $p_proto )
+    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT )
+
+our ($p_name, @p_aliases, $p_proto)
 
 # Class::Struct forbids use of @ISA
-sub import {
-    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
-    return Exporter::import(< @_);
-}
+sub import
+    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1
+    return Exporter::import(< @_)
+
 
 use Class::Struct < qw(struct);
 struct 'Net::protoent' => \@(
-       name		=> '$',
-       aliases	=> '@',
-       proto	=> '$',
-       );
+       name             => '$',
+       aliases  => '@',
+       proto    => '$',
+       )
 
-sub populate {
-    return unless (nelems @_);
-    my $pob = new();
-    $p_name 	 =    $pob->[0]     	     = @_[0];
-    @p_aliases	 = @(  $pob->[1]->@ = split ' ', @_[1] );
-    $p_proto	 =    $pob->[2] 	     = @_[2];
-    return $pob;
-} 
+sub populate
+    return unless (nelems @_)
+    my $pob = new()
+    $p_name      =    $pob->[0]              = @_[0]
+    @p_aliases   = @(  $pob->[1]->@ = split ' ', @_[1] )
+    $p_proto     =    $pob->[2]              = @_[2]
+    return $pob
 
-sub getprotoent      ( )  { populate(CORE::getprotoent()) } 
-sub getprotobyname   ($name)  { populate(CORE::getprotobyname($name)) } 
-sub getprotobynumber ($number)  { populate(CORE::getprotobynumber($number)) } 
 
-sub getproto {
-    return &{'getprotoby' . (@_[0]=~m/^\d+$/ ?? 'number' !! 'name')}(< @_);
-}
+sub getprotoent      ( )  { populate(CORE::getprotoent()) }
+sub getprotobyname   ($name)  { populate(CORE::getprotobyname($name)) }
+sub getprotobynumber ($number)  { populate(CORE::getprotobynumber($number)) }
 
-1;
+sub getproto
+    return &{'getprotoby' . (@_[0]=~m/^\d+$/ ?? 'number' !! 'name')}(< @_)
+
+
+1
 
 __END__
 

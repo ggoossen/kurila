@@ -4377,8 +4377,6 @@ typedef enum {
     XREF,
     XSTATE,
     XBLOCK,
-    XATTRBLOCK,
-    XATTRTERM,
     XTERMBLOCK,
     XTERMORDORDOR /* evil hack */
     /* update exp_name[] in toke.c if adding to this enum */

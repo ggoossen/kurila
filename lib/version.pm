@@ -1,21 +1,21 @@
 #!perl -w
-package version;
+package version
 
 
-our (@ISA, $VERSION, $CLASS);
+our (@ISA, $VERSION, $CLASS)
 
-$VERSION = 0.73;
+$VERSION = 0.73
 
-$CLASS = 'version';
+$CLASS = 'version'
 
 # Preloaded methods go here.
-sub import($class, ...) {
-    my $callpkg = caller();
+sub import($class, ...)
+    my $callpkg = caller()
 
-    Symbol::fetch_glob($callpkg."::qv")->* = 
-        sub {return bless version::qv(shift), $class }
-        unless defined (&{Symbol::fetch_glob("$callpkg\::qv")});
+    Symbol::fetch_glob($callpkg."::qv")->* =
+        sub (@< @_) {return bless version::qv(shift), $class }
+        unless defined (&{Symbol::fetch_glob("$callpkg\::qv")})
 
-}
 
-1;
+
+1

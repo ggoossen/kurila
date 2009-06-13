@@ -1,111 +1,110 @@
 #!./perl -w
 
-BEGIN {    ## no critic strict
-    if ( env::var('PERL_CORE') ) {
-        push $^INCLUDE_PATH, < qw(lib);
-    }
-    else {
-        unshift $^INCLUDE_PATH, 't';
-    }
-}
+BEGIN     ## no critic strict
+    if ( env::var('PERL_CORE') )
+        push $^INCLUDE_PATH, < qw(lib)
+    else
+        unshift $^INCLUDE_PATH, 't'
+    
 
-use warnings;
-use Test::More tests => 3 * 3;
-use B 'svref_2object';
+
+use warnings
+use Test::More tests => 3 * 3
+use B 'svref_2object'
 
 # use Data::Dumper 'Dumper';
 
-sub foo {
-    my ( $x, $y, $z );
+sub foo
+    my ( $x, $y, $z )
 
     # hh => {},
-    $z = $x * $y;
+    $z = $x * $y
 
     # hh => { mypragma => 42 }
     use mypragma;
-    $z = $x + $y;
+    $z = $x + $y
 
     # hh => { mypragma => 0 }
     no mypragma;
-    $z = $x - $y;
-}
+    $z = $x - $y
 
-do {
+
+do
 
     # Pragmas don't appear til they're used.
-    my $cop = find_op_cop( \&foo, qr/multiply/ );
-    isa_ok( $cop, 'B::COP', 'found pp_multiply opnode' );
+    my $cop = find_op_cop( \&foo, qr/multiply/ )
+    isa_ok( $cop, 'B::COP', 'found pp_multiply opnode' )
 
-    my $hints_hash = $cop->hints_hash;
-    is( ref($hints_hash), 'HASH', 'Got hash reference' );
+    my $hints_hash = $cop->hints_hash
+    is( ref($hints_hash), 'HASH', 'Got hash reference' )
 
-    ok( not( exists $hints_hash->{mypragma} ), q[! exists mypragma] );
-};
+    ok( not( exists $hints_hash->{mypragma} ), q[! exists mypragma] )
 
-do {
+
+do
 
     # Pragmas can be fetched.
-    my $cop = find_op_cop( \&foo, qr/add/ );
-    isa_ok( $cop, 'B::COP', 'found pp_add opnode' );
+    my $cop = find_op_cop( \&foo, qr/add/ )
+    isa_ok( $cop, 'B::COP', 'found pp_add opnode' )
 
-    my $hints_hash = $cop->hints_hash;
-    is( ref($hints_hash), 'HASH', 'Got hash reference' );
+    my $hints_hash = $cop->hints_hash
+    is( ref($hints_hash), 'HASH', 'Got hash reference' )
 
-    is( $hints_hash->{?mypragma}, 42, q[mypragma => 42] );
-};
+    is( $hints_hash->{?mypragma}, 42, q[mypragma => 42] )
 
-do {
+
+do
 
     # Pragmas can be changed.
-    my $cop = find_op_cop( \&foo, qr/subtract/ );
-    isa_ok( $cop, 'B::COP', 'found pp_subtract opnode' );
+    my $cop = find_op_cop( \&foo, qr/subtract/ )
+    isa_ok( $cop, 'B::COP', 'found pp_subtract opnode' )
 
-    my $hints_hash = $cop->hints_hash;
-    is( ref($hints_hash), 'HASH', 'Got hash reference' );
+    my $hints_hash = $cop->hints_hash
+    is( ref($hints_hash), 'HASH', 'Got hash reference' )
 
-    is( $hints_hash->{?mypragma}, 0, q[mypragma => 0] );
-};
-exit;
+    is( $hints_hash->{?mypragma}, 0, q[mypragma => 0] )
 
-our $COP;
+exit
 
-sub find_op_cop( $sub, $op) {
-    my $cv = svref_2object($sub);
-    local $COP = undef;
+our $COP
 
-    if ( not _find_op_cop( $cv->ROOT, $op ) ) {
-        $COP = undef;
-    }
+sub find_op_cop( $sub, $op)
+    my $cv = svref_2object($sub)
+    local $COP = undef
 
-    return $COP;
-}
+    if ( not _find_op_cop( $cv->ROOT, $op ) )
+        $COP = undef
+    
 
-sub _find_op_cop( $op, $name) {
+    return $COP
+
+
+sub _find_op_cop( $op, $name)
 
     # Fail on B::NULL or whatever.
-    return 0 if not $op or $op->isa("B::NULL");
+    return 0 if not $op or $op->isa("B::NULL")
 
     # Succeed when we find our match.
-    return 1 if $op->name =~ $name;
+    return 1 if $op->name =~ $name
 
     # Stash the latest seen COP opnode. This has our hints hash.
-    if ( $op->isa('B::COP') ) {
+    if ( $op->isa('B::COP') )
 
         # print Dumper(
         #     {   cop   => $op,
         #         hints => $op->hints_hash->HASH
         #     }
         # );
-        $COP = $op;
-    }
+        $COP = $op
+    
 
     # Recurse depth first passing success up if it happens.
-    if ( $op->can('first') ) {
-        return 1 if _find_op_cop( $op->first, $name );
-    }
-    return 1 if _find_op_cop( $op->sibling, $name );
+    if ( $op->can('first') )
+        return 1 if _find_op_cop( $op->first, $name )
+    
+    return 1 if _find_op_cop( $op->sibling, $name )
 
     # Oh well. Hopefully our caller knows where to try next.
-    return 0;
-}
+    return 0
+
 

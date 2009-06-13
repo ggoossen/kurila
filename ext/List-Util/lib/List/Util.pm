@@ -4,21 +4,21 @@
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
-package List::Util;
+package List::Util
 
-our (@ISA, @EXPORT_OK, $VERSION, $XS_VERSION, $TESTING_PERL_ONLY);
-require Exporter;
+our (@ISA, @EXPORT_OK, $VERSION, $XS_VERSION, $TESTING_PERL_ONLY)
+require Exporter
 
-@ISA        = qw(Exporter);
-@EXPORT_OK  = qw(first min max minstr maxstr reduce sum shuffle);
-$VERSION    = "1.19";
-$XS_VERSION = $VERSION;
-$VERSION    = eval $VERSION;
+@ISA        = qw(Exporter)
+@EXPORT_OK  = qw(first min max minstr maxstr reduce sum shuffle)
+$VERSION    = "1.19"
+$XS_VERSION = $VERSION
+$VERSION    = eval $VERSION
 
-require XSLoader;
-XSLoader::load('List::Util', $XS_VERSION);
+require XSLoader
+XSLoader::load('List::Util', $XS_VERSION)
 
-1;
+1
 
 
 __END__

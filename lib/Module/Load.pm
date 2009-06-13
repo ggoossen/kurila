@@ -1,81 +1,81 @@
-package Module::Load;
+package Module::Load
 
-our $VERSION = '0.12';
+our $VERSION = '0.12'
 
 use File::Spec ();
 
-sub import {
-    my $who = _who();
+sub import
+    my $who = _who()
 
-    Symbol::fetch_glob("$($who)::load")->* = \&load;
-}
+    Symbol::fetch_glob("$($who)::load")->* = \&load
 
-sub load ($mod, @< @args)  {
-    $mod or return;
-    my $who = _who();
 
-    if( _is_file( $mod ) ) {
-        require $mod;
-    } else {
-      LOAD: do {
-            my $err;
-            for my $flag ( qw[1 0] ) {
-                my $file = _to_file( $mod, $flag);
-                try { require $file };
-                $^EVAL_ERROR ?? ($err .= $^EVAL_ERROR->message) !! last LOAD;
-            }
-            die $err if $err;
-        };
-    }
-    __PACKAGE__->_export_to_level(1, $mod, < @args) if @args;
-}
+sub load ($mod, @< @args)
+    $mod or return
+    my $who = _who()
+
+    if( _is_file( $mod ) )
+        require $mod
+    else
+        LOAD: do
+            my $err
+            for my $flag ( qw[1 0] )
+                my $file = _to_file( $mod, $flag)
+                try { require $file }
+                $^EVAL_ERROR ?? ($err .= $^EVAL_ERROR->message) !! last LOAD
+            
+            die $err if $err
+        
+    
+    __PACKAGE__->_export_to_level(1, $mod, < @args) if @args
+
 
 ### 5.004's Exporter doesn't have export_to_level.
 ### Taken from Michael Schwerns Test::More and slightly modified
-sub _export_to_level {
-    my $pkg     = shift;
-    my $level   = shift;
-    my $mod     = shift;
-    my $callpkg = caller($level);
+sub _export_to_level
+    my $pkg     = shift
+    my $level   = shift
+    my $mod     = shift
+    my $callpkg = caller($level)
 
-    $mod->export($callpkg, < @_);
-}
+    $mod->export($callpkg, < @_)
 
-sub _to_file{
-    local $_ = shift;
-    my $pm      = shift || '';
 
-    my @parts = split m/::/;
+sub _to_file
+    local $_ = shift
+    my $pm      = shift || ''
+
+    my @parts = split m/::/
 
     ### because of [perl #19213], see caveats ###
     my $file = $^OS_NAME eq 'MSWin32'
         ?? join "/", @parts
-        !! File::Spec->catfile( < @parts );
+        !! File::Spec->catfile( < @parts )
 
-    $file   .= '.pm' if $pm;
+    $file   .= '.pm' if $pm
 
     ### on perl's before 5.10 (5.9.5@31746) if you require
     ### a file in VMS format, it's stored in $^INCLUDED in VMS
     ### format. Therefor, better unixify it first
     ### Patch in reply to John Malmbergs patch (as mentioned
     ### above) on p5p Tue 21 Aug 2007 04:55:07
-    $file = VMS::Filespec::unixify($file) if $^OS_NAME eq 'VMS';
+    $file = VMS::Filespec::unixify($file) if $^OS_NAME eq 'VMS'
 
-    return $file;
-}
+    return $file
+
 
 sub _who { @(caller(1))[0] }
 
-sub _is_file {
-    local $_ = shift;
+sub _is_file
+    local $_ = shift
     return  m/^\./               ?? 1 !!
         m/[^\w:']/           ?? 1 !!
         undef
 #' silly bbedit..
-}
 
 
-1;
+
+1
 
 __END__
 

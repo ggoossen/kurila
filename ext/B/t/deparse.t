@@ -1,90 +1,88 @@
 #!./perl
 
-use warnings;
+use warnings
 
-use feature ":5.10";
-use Test::More tests => 50;
+use feature ":5.10"
+use Test::More tests => 50
 
-use B::Deparse;
-my $deparse = B::Deparse->new();
-ok($deparse);
+use B::Deparse
+my $deparse = B::Deparse->new()
+ok($deparse)
 
 # Tell B::Deparse about our ambient pragmas
 do { my ($hint_bits, $warning_bits, $hinthash);
     BEGIN { @($hint_bits, $warning_bits, $hinthash) = @($^HINT_BITS, $^WARNING_BITS, \$^HINTS); }
-        $deparse->ambient_pragmas (
+    $deparse->ambient_pragmas (
         hint_bits    => $hint_bits,
         warning_bits => $warning_bits,
         '%^H'	  => $hinthash,
-    );
-};
-
-$^INPUT_RECORD_SEPARATOR = "\n####\n";
-while ( ~< $^DATA) {
-    chomp;
-    my ($num, $testname, $todo);
-    if (s/#\s*(.*)$//mg) {
-        @($num, $todo, $testname) = @: $1 =~ m/(\d*)\s*(TODO)?\s*(.*)/;
-    }
-    my ($input, $expected);
-    if (m/(.*)\n>>>>\n(.*)/s) {
-        @($input, $expected) = @($1, $2);
-    }
-    else {
-        @($input, $expected) = @($_, $_);
-    }
-
-    local our $TODO = $todo;
-
-    my $coderef = eval "sub \{$input\}";
-
-    if ($^EVAL_ERROR and $^EVAL_ERROR->{?description}) {
-        diag("$num deparsed: $($^EVAL_ERROR->message)");
-        diag("input: '$input'");
-        ok(0, $testname);
-    }
-    else {
-        my $deparsed = $deparse->coderef2text( $coderef );
-        my $regex = $expected;
-        $regex =~ s/(\S+)/\Q$1/g;
-        $regex =~ s/\s+/ \\s+ /g;
-        $regex = '^ \{ \s* ' . $regex . ' \s* \} $';
-        like($deparsed, qr/$regex/x, $testname);
-    }
+        );
 }
 
-use constant 'c', 'stuff';
-TODO: do {
-    todo_skip("fix deparse", 4);
-    my $deparsed_txt = "sub ".$deparse->coderef2text(\&c);
-    my $deparsed_sub = eval $deparsed_txt; die if $^EVAL_ERROR;
-    is($deparsed_sub->(), 'stuff');
+$^INPUT_RECORD_SEPARATOR = "\n####\n"
+while ( ~< $^DATA)
+    chomp
+    my ($num, $testname, $todo)
+    if (s/#\s*(.*)$//mg)
+        @($num, $todo, $testname) = @: $1 =~ m/(\d*)\s*(TODO)?\s*(.*)/
+    
+    my ($input, $expected)
+    if (m/(.*)\n>>>>\n(.*)/s)
+        @($input, $expected) = @($1, $2)
+    else
+        @($input, $expected) = @($_, $_)
+    
 
-    my $a = 0;
-    is("\{\n    (-1) ** \$a;\n\}", $deparse->coderef2text(sub{(-1) ** $a }));
+    local our $TODO = $todo
+
+    my $coderef = eval "sub \{$input\}"
+
+    if ($^EVAL_ERROR and $^EVAL_ERROR->{?description})
+        diag("$num deparsed: $($^EVAL_ERROR->message)")
+        diag("input: '$input'")
+        ok(0, $testname)
+    else
+        my $deparsed = $deparse->coderef2text( $coderef )
+        my $regex = $expected
+        $regex =~ s/(\S+)/\Q$1/g
+        $regex =~ s/\s+/ \\s+ /g
+        $regex = '^ \{ \s* ' . $regex . ' \s* \} $'
+        like($deparsed, qr/$regex/x, $testname)
+    
+
+
+use constant 'c', 'stuff'
+TODO: do
+    todo_skip("fix deparse", 4)
+    my $deparsed_txt = "sub ".$deparse->coderef2text(\&c)
+    my $deparsed_sub = eval $deparsed_txt; die if $^EVAL_ERROR
+    is($deparsed_sub->(), 'stuff')
+
+    my $a = 0
+    is("\{\n    (-1) ** \$a;\n\}", $deparse->coderef2text(sub (@< @_){(-1) ** $a }))
 
     use constant cr => \@('hello');
-    my $string = "sub " . $deparse->coderef2text(\&cr);
-    my $subref = eval $string;
-    die "Failed eval '$string': $($^EVAL_ERROR->message)" if $^EVAL_ERROR;
-    my $val = $subref->() or diag $string;
-    is(ref($val), 'ARRAY');
-    is($val->[0], 'hello');
-};
+    my $string = "sub " . $deparse->coderef2text(\&cr)
+    my $subref = eval $string
+    die "Failed eval '$string': $($^EVAL_ERROR->message)" if $^EVAL_ERROR
+    my $val = $subref->() or diag $string
+    is(ref($val), 'ARRAY')
+    is($val->[0], 'hello')
 
-my $Is_VMS = $^OS_NAME eq 'VMS';
-my $Is_MacOS = $^OS_NAME eq 'MacOS';
 
-my $path = join " ", map { qq["-I$_"] }, $^INCLUDE_PATH;
-$path .= " -MMac::err=unix" if $Is_MacOS;
-my $redir = $Is_MacOS ?? "" !! "2>&1";
+my $Is_VMS = $^OS_NAME eq 'VMS'
+my $Is_MacOS = $^OS_NAME eq 'MacOS'
 
-$a = `$^EXECUTABLE_NAME $path "-MO=Deparse" -w -e 1 $redir`;
-$a =~ s/-e syntax OK\n//g;
-$a =~ s/.*possible typo.*\n//;	   # Remove warning line
-$a =~ s{\\340\\242}{\\s} if (ord("\\") == 224); # EBCDIC, cp 1047 or 037
-$a =~ s{\\274\\242}{\\s} if (ord("\\") == 188); # $^O eq 'posix-bc'
-$b = <<'EOF';
+my $path = join " ", map { qq["-I$_"] }, $^INCLUDE_PATH
+$path .= " -MMac::err=unix" if $Is_MacOS
+my $redir = $Is_MacOS ?? "" !! "2>&1"
+
+$a = `$^EXECUTABLE_NAME $path "-MO=Deparse" -w -e 1 $redir`
+$a =~ s/-e syntax OK\n//g
+$a =~ s/.*possible typo.*\n//	   # Remove warning line
+$a =~ s{\\340\\242}{\\s} if (ord("\\") == 224) # EBCDIC, cp 1047 or 037
+$a =~ s{\\274\\242}{\\s} if (ord("\\") == 188) # $^O eq 'posix-bc'
+$b = <<'EOF'
 BEGIN { $^WARNING = 1; }
 BEGIN { $^INPUT_RECORD_SEPARATOR = "\n"; }
 LINE: while (defined($_ = ~< *ARGV)) {
@@ -100,38 +98,38 @@ $b =~ s/(LINE:)/sub BEGIN \{
     'OSA'->bootstrap;
     'XL'->bootstrap;
 \}
-$1/ if $Is_MacOS;
-do {
-    local our $TODO = 1;
-    is($a, $b);
-};
+$1/ if $Is_MacOS
+do
+    local our $TODO = 1
+    is($a, $b)
+
 
 #Re: perlbug #35857, patch #24505
 #handle warnings::register-ed packages properly.
-package B::Deparse::Wrapper;
+package B::Deparse::Wrapper
 
 use warnings;
 use warnings::register;
-sub getcode {
-    my $deparser = B::Deparse->new();
-    return $deparser->coderef2text(shift);
-}
+sub getcode
+    my $deparser = B::Deparse->new()
+    return $deparser->coderef2text(shift)
+
 
 package main;
 
 use warnings;
-sub test {
-    my $val = shift;
-    my $res = B::Deparse::Wrapper::getcode($val);
-    like( $res, qr/use warnings/);
-}
-sub testsub {
-    42;
-}
-my ($q,$p);
-my $x=sub { @( ++$q,++$p ) };
-test($x);
-eval <<EOFCODE and test($x);
+sub test
+    my $val = shift
+    my $res = B::Deparse::Wrapper::getcode($val)
+    like( $res, qr/use warnings/)
+
+sub testsub
+    42
+
+my ($q,$p)
+my $x=sub { @( ++$q,++$p ) }
+test($x)
+eval <<EOFCODE and test($x)
    package bar;
    use warnings;
    use warnings::register;

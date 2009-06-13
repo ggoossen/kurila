@@ -427,7 +427,9 @@ Converts the specified character to lowercase.
 #define isIDFIRST(c)	(isALPHA(c) || (c) == '_')
 #define isALPHA(c)	(isUPPER(c) || isLOWER(c))
 #define isSPACE(c) \
-	((c) == ' ' || (c) == '\t' || (c) == '\n' || (c) =='\r' || (c) == '\f')
+    ((c) == ' ' || (c) == '\t' || (c) == '\n' || (c) =='\r' || (c) == '\f')
+#define isSPACE_notab(c) \
+    ((c) == ' ' || (c) == '\n' || (c) =='\r' || (c) == '\f')
 #define isPSXSPC(c)	(isSPACE(c) || (c) == '\v')
 #define isBLANK(c)	((c) == ' ' || (c) == '\t')
 #define isDIGIT(c)	((c) >= '0' && (c) <= '9')

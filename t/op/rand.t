@@ -3,7 +3,7 @@
 # From Tom Phoenix <rootbeer@teleport.com> 22 Feb 1997
 # Based upon a test script by kgb@ast.cam.ac.uk (Karl Glazebrook)
 
-# Looking for the hints? You're in the right place. 
+# Looking for the hints? You're in the right place.
 # The hints are near each test, so search for "TEST #", where
 # the pound sign is replaced by the number of the test.
 
@@ -16,37 +16,37 @@
 # chapter 3. ISBN 0-201-03822-6 (v. 2)
 
 
-use Config;
+use Config
 
-require "./test.pl";
-plan(tests => 8);
+require "./test.pl"
+plan(tests => 8)
 
 
-my $reps = 15000;	# How many times to try rand each time.
+my $reps = 15000	# How many times to try rand each time.
 # May be changed, but should be over 500.
 # The more the better! (But slower.)
 
-sub bits($b) {
+sub bits($b)
     # Takes a small integer and returns the number of one-bits in it.
-    my $total;
-    my $bits = sprintf '%o', $b;
-    while (length $bits) {
-        $total += @(0,1,1,2,1,2,2,3)[chop $bits];	# Oct to bits
-    }
-    $total;
-}
+    my $total
+    my $bits = sprintf '%o', $b
+    while (length $bits)
+        $total += @(0,1,1,2,1,2,2,3)[chop $bits]	# Oct to bits
+    
+    $total
+
 
 # First, let's see whether randbits is set right
-do {
-    my($max, $min, $sum);	# Characteristics of rand
-    my($off, $shouldbe);	# Problems with randbits
-    my($dev, $bits);		# Number of one bits
-    my $randbits = config_value('randbits');
-    $max = $min = rand(1);
-    for (1..$reps) {
-        my $n = rand(1);
-        if ($n +< 0.0 or $n +>= 1.0) {
-            print $^STDOUT, <<EOM;
+do
+    my($max, $min, $sum)	# Characteristics of rand
+    my($off, $shouldbe)	# Problems with randbits
+    my($dev, $bits)		# Number of one bits
+    my $randbits = config_value('randbits')
+    $max = $min = rand(1)
+    for (1..$reps)
+        my $n = rand(1)
+        if ($n +< 0.0 or $n +>= 1.0)
+            print $^STDOUT, <<EOM
 # WHOA THERE!  \%Config\{drand01\} is set to '$(config_value('drand01'))',
 # but that apparently produces values < 0.0 or >= 1.0.
 # Make sure \$Config\{drand01\} is a valid expression in the
@@ -54,17 +54,17 @@ do {
 #
 # I give up.
 EOM
-            exit;
-        }
-        $sum += $n;
-        $bits += bits($n * 256);	# Don't be greedy; 8 is enough
+            exit
+        
+        $sum += $n
+        $bits += bits($n * 256)	# Don't be greedy; 8 is enough
         # It's too many if randbits is less than 8!
         # But that should never be the case... I hope.
         # Note: If you change this, you must adapt the
         # formula for absolute standard deviation, below.
-        $max = $n if $n +> $max;
-        $min = $n if $n +< $min;
-    }
+        $max = $n if $n +> $max
+        $min = $n if $n +< $min
+    
 
 
     # This test checks for one of Perl's most frequent
@@ -72,12 +72,12 @@ EOM
     # for rand(2) should tell you what value you need
     # for randbits. Usually the diagnostic message
     # has the right value as well. Just fix it and
-    # recompile, and you'll usually be fine. (The main 
+    # recompile, and you'll usually be fine. (The main
     # reason that the diagnostic message might get the
     # wrong value is that Config.pm is incorrect.)
     #
-    unless (ok( !$max +<= 0 or $max +>= (2 ** $randbits))) {# Just in case...
-        print $^STDOUT, <<DIAG;
+    unless (ok( !$max +<= 0 or $max +>= (2 ** $randbits)))# Just in case...
+        print $^STDOUT, <<DIAG
 # max=[$max] min=[$min]
 # This perl was compiled with randbits=$randbits
 # which is _way_ off. Or maybe your system rand is broken,
@@ -87,32 +87,32 @@ EOM
 DIAG
 
         # If that isn't the problem, we'll have
-        # to put d_martians into Config.pm 
-        print $^STDOUT, "# Skipping remaining tests until randbits is fixed.\n";
-        exit;
-    }
+        # to put d_martians into Config.pm
+        print $^STDOUT, "# Skipping remaining tests until randbits is fixed.\n"
+        exit
+    
 
-    $off = log($max) / log(2);			# log2
-    $off = int($off) + ($off +> 0);		# Next more positive int
-    unless (is( $off, 0 )) {
-        $shouldbe = config_value('randbits') + $off;
-        print $^STDOUT, "# max=[$max] min=[$min]\n";
-        print $^STDOUT, "# This perl was compiled with randbits=$randbits on $^OS_NAME.\n";
-        print $^STDOUT, "# Consider using randbits=$shouldbe instead.\n";
+    $off = log($max) / log(2)			# log2
+    $off = int($off) + ($off +> 0)		# Next more positive int
+    unless (is( $off, 0 ))
+        $shouldbe = config_value('randbits') + $off
+        print $^STDOUT, "# max=[$max] min=[$min]\n"
+        print $^STDOUT, "# This perl was compiled with randbits=$randbits on $^OS_NAME.\n"
+        print $^STDOUT, "# Consider using randbits=$shouldbe instead.\n"
         # And skip the remaining tests; they would be pointless now.
-        print $^STDOUT, "# Skipping remaining tests until randbits is fixed.\n";
-        exit;
-    }
+        print $^STDOUT, "# Skipping remaining tests until randbits is fixed.\n"
+        exit
+    
 
 
     # This should always be true: 0 <= rand(1) < 1
     # If this test is failing, something is seriously wrong,
     # either in perl or your system's rand function.
     #
-    unless (ok( !($min +< 0 or $max +>= 1) )) {	# Slightly redundant...
-        print $^STDOUT, "# min too low\n" if $min +< 0;
-        print $^STDOUT, "# max too high\n" if $max +>= 1;
-    }
+    unless (ok( !($min +< 0 or $max +>= 1) ))   # Slightly redundant...
+        print $^STDOUT, "# min too low\n" if $min +< 0
+        print $^STDOUT, "# max too high\n" if $max +>= 1
+    
 
 
     # This is just a crude test. The average number produced
@@ -121,10 +121,10 @@ DIAG
     # occasionally fail on a perfectly good system!
     # See the hints for test 4 to see why.
     #
-    $sum /= $reps;
-    unless (ok( !($sum +< 0.4 or $sum +> 0.6) )) {
-        print $^STDOUT, "# Average random number is far from 0.5\n";
-    }
+    $sum /= $reps
+    unless (ok( !($sum +< 0.4 or $sum +> 0.6) ))
+        print $^STDOUT, "# Average random number is far from 0.5\n"
+    
 
 
     #   NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
@@ -135,7 +135,7 @@ DIAG
     #
     # There is probably no reason to be alarmed that
     # something is wrong with your rand function. But,
-    # if you're curious or if you can't help being 
+    # if you're curious or if you can't help being
     # alarmed, keep reading.
     #
     # This is a less-crude test than test 3. But it has
@@ -171,69 +171,69 @@ DIAG
     #
     # Calculating absoulute standard deviation for number of bits set
     # (eight bits per rep)
-    $dev = abs ($bits - $reps * 4) / sqrt($reps * 2);
+    $dev = abs ($bits - $reps * 4) / sqrt($reps * 2)
 
-    ok( $dev +< 3.3 );
+    ok( $dev +< 3.3 )
 
-    if ($dev +< 1.96) {
-        print $^STDOUT, "# Your rand seems fine. If this test failed\n";
-        print $^STDOUT, "# previously, you may want to run it again.\n";
-    } elsif ($dev +< 2.575) {
-        print $^STDOUT, "# This is ok, but suspicious. But it will happen\n";
-        print $^STDOUT, "# one time out of 25, more or less.\n";
-        print $^STDOUT, "# You should run this test again to be sure.\n";
-    } elsif ($dev +< 3.3) {
-        print $^STDOUT, "# This is very suspicious. It will happen only\n";
-        print $^STDOUT, "# about one time out of 100, more or less.\n";
-        print $^STDOUT, "# You should run this test again to be sure.\n";
-    } elsif ($dev +< 3.9) {
-        print $^STDOUT, "# This is VERY suspicious. It will happen only\n";
-        print $^STDOUT, "# about one time out of 1000, more or less.\n";
-        print $^STDOUT, "# You should run this test again to be sure.\n";
-    } else {
-        print $^STDOUT, "# This is VERY VERY suspicious.\n";
-        print $^STDOUT, "# Your rand seems to be bogus.\n";
-    }
-    print $^STDOUT, "#\n# If you are having random number troubles,\n";
-    print $^STDOUT, "# see the hints within the test script for more\n";
-    printf $^STDOUT, "# information on why this might fail. [ %.3f ]\n", $dev;
-};
+    if ($dev +< 1.96)
+        print $^STDOUT, "# Your rand seems fine. If this test failed\n"
+        print $^STDOUT, "# previously, you may want to run it again.\n"
+    elsif ($dev +< 2.575)
+        print $^STDOUT, "# This is ok, but suspicious. But it will happen\n"
+        print $^STDOUT, "# one time out of 25, more or less.\n"
+        print $^STDOUT, "# You should run this test again to be sure.\n"
+    elsif ($dev +< 3.3)
+        print $^STDOUT, "# This is very suspicious. It will happen only\n"
+        print $^STDOUT, "# about one time out of 100, more or less.\n"
+        print $^STDOUT, "# You should run this test again to be sure.\n"
+    elsif ($dev +< 3.9)
+        print $^STDOUT, "# This is VERY suspicious. It will happen only\n"
+        print $^STDOUT, "# about one time out of 1000, more or less.\n"
+        print $^STDOUT, "# You should run this test again to be sure.\n"
+    else
+        print $^STDOUT, "# This is VERY VERY suspicious.\n"
+        print $^STDOUT, "# Your rand seems to be bogus.\n"
+    
+    print $^STDOUT, "#\n# If you are having random number troubles,\n"
+    print $^STDOUT, "# see the hints within the test script for more\n"
+    printf $^STDOUT, "# information on why this might fail. [ %.3f ]\n", $dev
+
 
 
 # Now, let's see whether rand accepts its argument
-do {
-    my($max, $min);
-    $max = $min = rand(100);
-    for (1..$reps) {
-        my $n = rand(100);
-        $max = $n if $n +> $max;
-        $min = $n if $n +< $min;
-    }
+do
+    my($max, $min)
+    $max = $min = rand(100)
+    for (1..$reps)
+        my $n = rand(100)
+        $max = $n if $n +> $max
+        $min = $n if $n +< $min
+    
 
-    # This test checks to see that rand(100) really falls 
+    # This test checks to see that rand(100) really falls
     # within the range 0 - 100, and that the numbers produced
     # have a reasonably-large range among them.
     #
-    unless ( ok( !($min +< 0 or $max +>= 100 or ($max - $min) +< 65) ) ) {
-        print $^STDOUT, "# min too low\n" if $min +< 0;
-        print $^STDOUT, "# max too high\n" if $max +>= 100;
-        print $^STDOUT, "# range too narrow\n" if ($max - $min) +< 65;
-    }
+    unless ( ok( !($min +< 0 or $max +>= 100 or ($max - $min) +< 65) ) )
+        print $^STDOUT, "# min too low\n" if $min +< 0
+        print $^STDOUT, "# max too high\n" if $max +>= 100
+        print $^STDOUT, "# range too narrow\n" if ($max - $min) +< 65
+    
 
 
     # This test checks that rand without an argument
     # is equivalent to rand(1).
     #
-    $_ = 12345;		# Just for fun.
-    srand 12345;
-    my $r = rand;
-    srand 12345;
-    is(rand(1),  $r,  'rand() without args is rand(1)');
+    $_ = 12345		# Just for fun.
+    srand 12345
+    my $r = rand
+    srand 12345
+    is(rand(1),  $r,  'rand() without args is rand(1)')
 
 
     # This checks that rand without an argument is not
     # rand($_). (In case somebody got overzealous.)
-    # 
-    ok($r +< 1,        'rand() without args is under 1');
-};
+    #
+    ok($r +< 1,        'rand() without args is under 1')
+
 

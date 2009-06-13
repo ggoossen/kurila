@@ -1,60 +1,60 @@
-  doio.c	
+  doio.c        
 
-  Can't open bidirectional pipe		[Perl_do_open9]
+  Can't open bidirectional pipe         [Perl_do_open9]
     open($f, "| true |");
 
-  Missing command in piped open		[Perl_do_open9]
+  Missing command in piped open         [Perl_do_open9]
     open($f, "| ");
 
-  Missing command in piped open		[Perl_do_open9]
+  Missing command in piped open         [Perl_do_open9]
     open($f, " |");
 
-  warn(warn_nl, "open");		[Perl_do_open9]
+  warn(warn_nl, "open");                [Perl_do_open9]
     open($f, "true\ncd")
 
-  close() on unopened filehandle %s	[Perl_do_close]
+  close() on unopened filehandle %s     [Perl_do_close]
     $a = "fred";close("$a")
 
-  tell() on closed filehandle		[Perl_do_tell]
+  tell() on closed filehandle           [Perl_do_tell]
     $a = "fred";$a = tell($a)
 
-  seek() on closed filehandle		[Perl_do_seek]
+  seek() on closed filehandle           [Perl_do_seek]
     $a = "fred";$a = seek($a,1,1)
 
-  sysseek() on closed filehandle	[Perl_do_sysseek]
+  sysseek() on closed filehandle        [Perl_do_sysseek]
     $a = "fred";$a = seek($a,1,1)
 
-  warn(warn_uninit);			[Perl_do_print]
+  warn(warn_uninit);                    [Perl_do_print]
     print $a ;
 
-  -x on closed filehandle %s 		[Perl_my_stat]
+  -x on closed filehandle %s            [Perl_my_stat]
     close STDIN ; -x STDIN ;
 
-  warn(warn_nl, "stat");		[Perl_my_stat]
+  warn(warn_nl, "stat");                [Perl_my_stat]
     stat "ab\ncd"
 
-  warn(warn_nl, "lstat");		[Perl_my_lstat]
+  warn(warn_nl, "lstat");               [Perl_my_lstat]
     lstat "ab\ncd"
 
-  Use of -l on filehandle %s		[Perl_my_lstat]
+  Use of -l on filehandle %s            [Perl_my_lstat]
 
-  Can't exec \"%s\": %s 		[Perl_do_aexec5]
+  Can't exec \"%s\": %s                 [Perl_do_aexec5]
 
-  Can't exec \"%s\": %s 		[Perl_do_exec3]
+  Can't exec \"%s\": %s                 [Perl_do_exec3]
 
-  Filehandle %s opened only for output	[Perl_do_eof]
-	my $a = eof STDOUT
+  Filehandle %s opened only for output  [Perl_do_eof]
+        my $a = eof STDOUT
 
   Mandatory Warnings ALL TODO
   ------------------
-  Can't do inplace edit: %s is not a regular file	[Perl_nextargv]
+  Can't do inplace edit: %s is not a regular file       [Perl_nextargv]
      edit a directory
 
-  Can't do inplace edit: %s would not be unique		[Perl_nextargv]
-  Can't rename %s to %s: %s, skipping file		[Perl_nextargv]
-  Can't rename %s to %s: %s, skipping file		[Perl_nextargv]
-  Can't remove %s: %s, skipping file			[Perl_nextargv]
-  Can't do inplace edit on %s: %s			[Perl_nextargv]
+  Can't do inplace edit: %s would not be unique         [Perl_nextargv]
+  Can't rename %s to %s: %s, skipping file              [Perl_nextargv]
+  Can't rename %s to %s: %s, skipping file              [Perl_nextargv]
+  Can't remove %s: %s, skipping file                    [Perl_nextargv]
+  Can't do inplace edit on %s: %s                       [Perl_nextargv]
   
 
 __END__
@@ -153,11 +153,11 @@ Unsuccessful stat on filename containing newline at - line 4 character 1.
 # doio.c [Perl_do_aexec5]
 BEGIN {
     if ($^OS_NAME eq 'MacOS') {
-	print $^STDOUT, <<EOM;
+        print $^STDOUT, <<EOM;
 SKIPPED
 # no exec on Mac OS
 EOM
-	exit;
+        exit;
     }
 }
 use warnings 'io' ;
@@ -171,11 +171,11 @@ Can't exec "lskdjfalksdjfdjfkls": .+
 # doio.c [Perl_do_exec3]
 BEGIN {
     if ($^OS_NAME eq 'MacOS') {
-	print $^STDOUT, <<EOM;
+        print $^STDOUT, <<EOM;
 SKIPPED
 # no exec on Mac OS
 EOM
-	exit;
+        exit;
     }
 }
 use warnings 'io' ;
@@ -189,11 +189,11 @@ Can't exec "lskdjfalksdjfdjfkls(:? abc)?": .+
 # doio.c [win32_execvp]
 BEGIN {
     if ($^OS_NAME eq 'MacOS') {
-	print $^STDOUT, <<EOM;
+        print $^STDOUT, <<EOM;
 SKIPPED
 # no exec on Mac OS
 EOM
-	exit;
+        exit;
     }
 }
 use warnings 'exec' ;
@@ -213,11 +213,11 @@ Filehandle STDOUT opened only for output at - line 3 character 9.
 use Config;
 BEGIN {
     if (config_value("useperlio")) {
-	print $^STDOUT, <<EOM;
+        print $^STDOUT, <<EOM;
 SKIPPED
 # warns only without perlio
 EOM
-	exit;
+        exit;
     }
 }
 use warnings 'io';
@@ -233,11 +233,11 @@ Can't open a reference at - line 14 character 1.
 use Config;
 BEGIN {
     if (!config_value("useperlio")) {
-	print $^STDOUT, <<EOM;
+        print $^STDOUT, <<EOM;
 SKIPPED
 # warns only with perlio
 EOM
-	exit;
+        exit;
     }
 }
 use warnings 'io' ;
@@ -252,11 +252,11 @@ Filehandle STDOUT reopened only for input at - line 14 character 1.
 use Config;
 BEGIN {
     if (!config_value("useperlio")) {
-	print $^STDOUT, <<EOM;
+        print $^STDOUT, <<EOM;
 SKIPPED
 # warns only with perlio
 EOM
-	exit;
+        exit;
     }
 }
 use warnings 'io' ;

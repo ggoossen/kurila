@@ -43,37 +43,37 @@ sub canonpath {
       else          { return vmsify($path);  }
     }
     else {
-	$path =~ s/</[/g;
-        $path =~ s/>/]/g;			# < and >       ==> [ and ]
-	$path =~ s/\]\[\./\.\]\[/g;		# ][.		==> .][
-	$path =~ s/\[000000\.\]\[/\[/g;		# [000000.][	==> [
-	$path =~ s/\[000000\./\[/g;		# [000000.	==> [
-	$path =~ s/\.\]\[000000\]/\]/g;		# .][000000]	==> ]
-	$path =~ s/\.\]\[/\./g;			# foo.][bar     ==> foo.bar
-	1 while ($path =~ s/([\[\.])(-+)\.(-+)([\.\]])/$1$2$3$4/);
-						# That loop does the following
-						# with any amount of dashes:
-						# .-.-.		==> .--.
-						# [-.-.		==> [--.
-						# .-.-]		==> .--]
-						# [-.-]		==> [--]
-	1 while ($path =~ s/([\[\.])[^\]\.]+\.-(-+)([\]\.])/$1$2$3/);
-						# That loop does the following
-						# with any amount (minimum 2)
-						# of dashes:
-						# .foo.--.	==> .-.
-						# .foo.--]	==> .-]
-						# [foo.--.	==> [-.
-						# [foo.--]	==> [-]
-						#
-						# And then, the remaining cases
-	$path =~ s/\[\.-/[-/;			# [.-		==> [-
-	$path =~ s/\.[^\]\.]+\.-\./\./g;	# .foo.-.	==> .
-	$path =~ s/\[[^\]\.]+\.-\./\[/g;	# [foo.-.	==> [
-	$path =~ s/\.[^\]\.]+\.-\]/\]/g;	# .foo.-]	==> ]
-	$path =~ s/\[[^\]\.]+\.-\]/\[000000\]/g;# [foo.-]       ==> [000000]
-	$path =~ s/\[\]// unless $path eq '[]';	# []		==>
-	return $path;
+        $path =~ s/</[/g;
+        $path =~ s/>/]/g;                       # < and >       ==> [ and ]
+        $path =~ s/\]\[\./\.\]\[/g;             # ][.           ==> .][
+        $path =~ s/\[000000\.\]\[/\[/g;         # [000000.][    ==> [
+        $path =~ s/\[000000\./\[/g;             # [000000.      ==> [
+        $path =~ s/\.\]\[000000\]/\]/g;         # .][000000]    ==> ]
+        $path =~ s/\.\]\[/\./g;                 # foo.][bar     ==> foo.bar
+        1 while ($path =~ s/([\[\.])(-+)\.(-+)([\.\]])/$1$2$3$4/);
+                                                # That loop does the following
+                                                # with any amount of dashes:
+                                                # .-.-.         ==> .--.
+                                                # [-.-.         ==> [--.
+                                                # .-.-]         ==> .--]
+                                                # [-.-]         ==> [--]
+        1 while ($path =~ s/([\[\.])[^\]\.]+\.-(-+)([\]\.])/$1$2$3/);
+                                                # That loop does the following
+                                                # with any amount (minimum 2)
+                                                # of dashes:
+                                                # .foo.--.      ==> .-.
+                                                # .foo.--]      ==> .-]
+                                                # [foo.--.      ==> [-.
+                                                # [foo.--]      ==> [-]
+                                                #
+                                                # And then, the remaining cases
+        $path =~ s/\[\.-/[-/;                   # [.-           ==> [-
+        $path =~ s/\.[^\]\.]+\.-\./\./g;        # .foo.-.       ==> .
+        $path =~ s/\[[^\]\.]+\.-\./\[/g;        # [foo.-.       ==> [
+        $path =~ s/\.[^\]\.]+\.-\]/\]/g;        # .foo.-]       ==> ]
+        $path =~ s/\[[^\]\.]+\.-\]/\[000000\]/g;# [foo.-]       ==> [000000]
+        $path =~ s/\[\]// unless $path eq '[]'; # []            ==>
+        return $path;
     }
 }
 
@@ -92,22 +92,22 @@ sub catdir {
 
     my $rslt;
     if (@dirs) {
-	my $path = ((nelems @dirs) == 1) ?? @dirs[0] !! $self->catdir(< @dirs);
-	my @($spath,$sdir) = @($path,$dir);
-	$spath =~ s/\.dir\Z(?!\n)//; $sdir =~ s/\.dir\Z(?!\n)//; 
-	$sdir = $self->eliminate_macros($sdir) unless $sdir =~ m/^[\w\-]+\Z(?!\n)/s;
-	$rslt = $self->fixpath($self->eliminate_macros($spath)."/$sdir",1);
+        my $path = ((nelems @dirs) == 1) ?? @dirs[0] !! $self->catdir(< @dirs);
+        my @($spath,$sdir) = @($path,$dir);
+        $spath =~ s/\.dir\Z(?!\n)//; $sdir =~ s/\.dir\Z(?!\n)//; 
+        $sdir = $self->eliminate_macros($sdir) unless $sdir =~ m/^[\w\-]+\Z(?!\n)/s;
+        $rslt = $self->fixpath($self->eliminate_macros($spath)."/$sdir",1);
 
-	# Special case for VMS absolute directory specs: these will have had device
-	# prepended during trip through Unix syntax in eliminate_macros(), since
-	# Unix syntax has no way to express "absolute from the top of this device's
-	# directory tree".
-	if ($spath =~ m/^[\[<][^.\-]/s) { $rslt =~ s/^[^\[<]+//s; }
+        # Special case for VMS absolute directory specs: these will have had device
+        # prepended during trip through Unix syntax in eliminate_macros(), since
+        # Unix syntax has no way to express "absolute from the top of this device's
+        # directory tree".
+        if ($spath =~ m/^[\[<][^.\-]/s) { $rslt =~ s/^[^\[<]+//s; }
     }
     else {
-	if    (not defined $dir or not length $dir) { $rslt = ''; }
-	elsif ($dir =~ m/^\$\([^\)]+\)\Z(?!\n)/s)          { $rslt = $dir; }
-	else                                        { $rslt = vmspath($dir); }
+        if    (not defined $dir or not length $dir) { $rslt = ''; }
+        elsif ($dir =~ m/^\$\([^\)]+\)\Z(?!\n)/s)          { $rslt = $dir; }
+        else                                        { $rslt = vmspath($dir); }
     }
     return $self->canonpath($rslt);
 }
@@ -126,16 +126,16 @@ sub catfile {
 
     my $rslt;
     if (@files) {
-	my $path = ((nelems @files) == 1) ?? @files[0] !! $self->catdir(<@files);
-	my $spath = $path;
-	$spath =~ s/\.dir\Z(?!\n)//;
-	if ($spath =~ m/^[^\)\]\/:>]+\)\Z(?!\n)/s && basename($file) eq $file) {
-	    $rslt = "$spath$file";
-	}
-	else {
-	    $rslt = $self->eliminate_macros($spath);
-	    $rslt = vmsify($rslt.((defined $rslt) && ($rslt ne '') ?? '/' !! '').unixify($file));
-	}
+        my $path = ((nelems @files) == 1) ?? @files[0] !! $self->catdir(<@files);
+        my $spath = $path;
+        $spath =~ s/\.dir\Z(?!\n)//;
+        if ($spath =~ m/^[^\)\]\/:>]+\)\Z(?!\n)/s && basename($file) eq $file) {
+            $rslt = "$spath$file";
+        }
+        else {
+            $rslt = $self->eliminate_macros($spath);
+            $rslt = vmsify($rslt.((defined $rslt) && ($rslt ne '') ?? '/' !! '').unixify($file));
+        }
     }
     else { $rslt = (defined($file) && length($file)) ?? vmsify($file) !! ''; }
     return $self->canonpath($rslt);
@@ -235,8 +235,8 @@ sub file_name_is_absolute {
     # If it's a logical name, expand it.
     $file = env::var($file) while $file =~ m/^[\w\$\-]+\Z(?!\n)/s && env::var($file);
     return scalar($file =~ m!^/!s             ||
-		  $file =~ m![<\[][^.\-\]>]!  ||
-		  $file =~ m/:[^<\[]/);
+                  $file =~ m![<\[][^.\-\]>]!  ||
+                  $file =~ m/:[^<\[]/);
 }
 
 =item splitpath (override)
@@ -264,19 +264,19 @@ sub splitdir {
     my @dirs = @();
     return @dirs if ( (!defined $dirspec) || ('' eq $dirspec) );
     $dirspec =~ s/</[/g;
-    $dirspec =~ s/>/]/g;			# < and >	==> [ and ]
-    $dirspec =~ s/\]\[\./\.\]\[/g;		# ][.		==> .][
-    $dirspec =~ s/\[000000\.\]\[/\[/g;		# [000000.][	==> [
-    $dirspec =~ s/\[000000\./\[/g;		# [000000.	==> [
-    $dirspec =~ s/\.\]\[000000\]/\]/g;		# .][000000]	==> ]
-    $dirspec =~ s/\.\]\[/\./g;			# foo.][bar	==> foo.bar
+    $dirspec =~ s/>/]/g;                        # < and >       ==> [ and ]
+    $dirspec =~ s/\]\[\./\.\]\[/g;              # ][.           ==> .][
+    $dirspec =~ s/\[000000\.\]\[/\[/g;          # [000000.][    ==> [
+    $dirspec =~ s/\[000000\./\[/g;              # [000000.      ==> [
+    $dirspec =~ s/\.\]\[000000\]/\]/g;          # .][000000]    ==> ]
+    $dirspec =~ s/\.\]\[/\./g;                  # foo.][bar     ==> foo.bar
     while ($dirspec =~ s/(^|[\[\<\.])\-(\-+)($|[\]\>\.])/$1-.$2$3/g) {}
-						# That loop does the following
-						# with any amount of dashes:
-						# .--.		==> .-.-.
-						# [--.		==> [-.-.
-						# .--]		==> .-.-]
-						# [--]		==> [-.-]
+                                                # That loop does the following
+                                                # with any amount of dashes:
+                                                # .--.          ==> .-.-.
+                                                # [--.          ==> [-.-.
+                                                # .--]          ==> .-.-]
+                                                # [--]          ==> [-.-]
     $dirspec = "[$dirspec]" unless $dirspec =~ m/[\[<]/; # make legal
     $dirspec =~ s/^(\[|<)\./$1/;
     @dirs = @( split m/(?<!\^)\./, vmspath($dirspec) );
@@ -381,9 +381,9 @@ sub rel2abs {
     my @($path,$base ) = @_;
     return undef unless defined $path;
     if ($path =~ m/\//) {
-	$path = ( -d $path || $path =~ m/\/\z/  # educated guessing about
-		   ?? vmspath($path)             # whether it's a directory
-		   !! vmsify($path) );
+        $path = ( -d $path || $path =~ m/\/\z/  # educated guessing about
+                   ?? vmspath($path)             # whether it's a directory
+                   !! vmsify($path) );
     }
     $base = vmspath($base) if defined $base && $base =~ m/\//;
     # Clean up and split up $path
@@ -477,7 +477,7 @@ sub fixpath {
     if ($path =~ m/\s/) {
       return join ' ',
              map { $self->fixpath($_,$force_path) },
-	     split m/\s+/, $path;
+             split m/\s+/, $path;
     }
 
     if ($path =~ m#^\$\([^\)]+\)\Z(?!\n)#s || $path =~ m#[/:>\]]#) { 

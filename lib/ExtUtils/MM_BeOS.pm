@@ -1,4 +1,4 @@
-package ExtUtils::MM_BeOS;
+package ExtUtils::MM_BeOS
 
 
 =head1 NAME
@@ -19,13 +19,13 @@ the semantics.
 
 =cut
 
-use ExtUtils::MakeMaker::Config;
-use File::Spec;
-require ExtUtils::MM_Any;
-require ExtUtils::MM_Unix;
+use ExtUtils::MakeMaker::Config
+use File::Spec
+require ExtUtils::MM_Any
+require ExtUtils::MM_Unix
 
-our @ISA = qw( ExtUtils::MM_Unix );
-our $VERSION = '6.44';
+our @ISA = qw( ExtUtils::MM_Unix )
+our $VERSION = '6.44'
 
 
 =item os_flavor
@@ -34,9 +34,9 @@ BeOS is BeOS.
 
 =cut
 
-sub os_flavor {
-    return @('BeOS');
-}
+sub os_flavor
+    return @('BeOS')
+
 
 =item init_linker
 
@@ -44,14 +44,14 @@ libperl.a equivalent to be linked to dynamic extensions.
 
 =cut
 
-sub init_linker {
-    my@($self) =@( shift);
+sub init_linker
+    my@($self) =@( shift)
 
-    $self->{+PERL_ARCHIVE} ||= 
-    File::Spec->catdir('$(PERL_INC)',%Config{libperl});
-    $self->{+PERL_ARCHIVE_AFTER} ||= '';
-    $self->{+EXPORT_LIST}  ||= '';
-}
+    $self->{+PERL_ARCHIVE} ||=
+        File::Spec->catdir('$(PERL_INC)',%Config{libperl})
+    $self->{+PERL_ARCHIVE_AFTER} ||= ''
+    $self->{+EXPORT_LIST}  ||= ''
+
 
 =back
 

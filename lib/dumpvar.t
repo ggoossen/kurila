@@ -3,8 +3,8 @@
 BEGIN {
     require Config;
     if ((Config::config_value('extensions') !~ m!\bList/Util\b!) ){
-	print $^STDOUT, "1..0 # Skip -- Perl configured without List::Util module\n";
-	exit 0;
+        print $^STDOUT, "1..0 # Skip -- Perl configured without List::Util module\n";
+        exit 0;
     }
 }
 
@@ -29,7 +29,7 @@ sub unctrl    { print dumpvar::unctrl(@_[0]), "\n" }
 sub uniescape { print dumpvar::uniescape(@_[0]), "\n" }
 sub stringify { print dumpvar::stringify(@_[0]), "\n" }
 sub dumpvalue { 
-	# Call main::dumpValue exactly as the perl5db.pl calls it.
+        # Call main::dumpValue exactly as the perl5db.pl calls it.
         local $\ = '';
         local $, = '';
         local $" = ' ';
@@ -64,11 +64,11 @@ for (<@prgs) {
     if ($ERR) {
         ok(0, "$prog - {$ERR->message}");
     } else {
-	if ($expected =~ m:^/:) {
-	    like($$out, $expected, $prog);
-	} else {
-	    is($$out, $expected, $prog);
-	}
+        if ($expected =~ m:^/:) {
+            like($$out, $expected, $prog);
+        } else {
+            is($$out, $expected, $prog);
+        }
     }
 }
 

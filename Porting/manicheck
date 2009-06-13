@@ -12,72 +12,72 @@
 # With option -m prints out only the extra files (and without the "missing: ")
 #
 
-sub help {
-    die <<EOF;
+sub help
+    die <<EOF
 $^PROGRAM_NAME: Usage: $^PROGRAM_NAME [-x|-m|-l|-h]
 -x show only the extra files
 -m show only the missing files
 -l show the files one per line instead of one line
 -h show only this help
 EOF
-}
 
-use Getopt::Long;
 
-our ($x, $m, $l, $h);
+use Getopt::Long
 
-GetOptions("extra" => \$x, missing => \$m, lines => \$l, help => \$h);
+our ($x, $m, $l, $h)
 
-help() if $h;
+GetOptions("extra" => \$x, missing => \$m, lines => \$l, help => \$h)
 
-open(my $manifest_fh, "<", "MANIFEST") or die "MANIFEST: $^OS_ERROR";
+help() if $h
 
-my %mani;
-my %mand = %: ".", 1;
+open(my $manifest_fh, "<", "MANIFEST") or die "MANIFEST: $^OS_ERROR"
+
+my %mani
+my %mand = %: ".", 1
 use File::Basename < qw(dirname);
 
-while ( ~< $manifest_fh ) {
-    if (m/^(\S+)\s+(.+)$/) {
-        %mani{+$1}++;
-        my $d = dirname($1);
-        while($d ne '.') {
-            %mand{+$d}++;
-            $d = dirname($d);
-        }
-    } else {
-        warn "MANIFEST:$(iohandle::input_line_number($manifest_fh)):$_";
-    }
-}
+while ( ~< $manifest_fh )
+    if (m/^(\S+)\s+(.+)$/)
+        %mani{+$1}++
+        my $d = dirname($1)
+        while($d ne '.')
+            %mand{+$d}++
+            $d = dirname($d)
+        
+    else
+        warn "MANIFEST:$(iohandle::input_line_number($manifest_fh)):$_"
+    
 
-close($manifest_fh);
 
-my %find;
+close($manifest_fh)
+
+my %find
 use File::Find;
-find(sub {
-         my $n = $File::Find::name;
-         $n =~ s:^\./::;
-         return if $n =~ m{^\.git/};
-         %find{+$n}++;
-     }, '.' );
+find(sub (@< @_)
+         my $n = $File::Find::name
+         $n =~ s:^\./::
+         return if $n =~ m{^\.git/}
+         %find{+$n}++
+     , '.' )
 
-my @xtra;
-my @miss;
+my @xtra
+my @miss
 
-for (sort keys %find) {
-    push @xtra, $_ unless %mani{?$_} || %mand{?$_};
-}
+for (sort keys %find)
+    push @xtra, $_ unless %mani{?$_} || %mand{?$_}
 
-for (sort keys %mani) {
-    push @miss, $_ unless %find{$_};
-}
 
-my $separator = $l ?? "\n" !! " ";
+for (sort keys %mani)
+    push @miss, $_ unless %find{$_}
 
-unshift @xtra, "extra:"   if (nelems @xtra) && !$x;
-unshift @miss, "missing:" if (nelems @miss) && !$m;
 
-print $^STDOUT, join($separator, @xtra) . "\n", if (nelems @xtra) && !$m;
-print $^STDOUT, join($separator, @miss) . "\n"  if (nelems @miss) && !$x;
+my $separator = $l ?? "\n" !! " "
 
-exit 0;
+unshift @xtra, "extra:"   if (nelems @xtra) && !$x
+unshift @miss, "missing:" if (nelems @miss) && !$m
+
+print $^STDOUT, join($separator, @xtra) . "\n", if (nelems @xtra) && !$m
+print $^STDOUT, join($separator, @miss) . "\n"  if (nelems @miss) && !$x
+
+exit 0
 

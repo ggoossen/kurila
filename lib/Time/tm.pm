@@ -1,12 +1,12 @@
-package Time::tm;
+package Time::tm
 
 
-our $VERSION = '1.00';
+our $VERSION = '1.00'
 
 use Class::Struct < qw(struct);
-struct('Time::tm' => \ @+: map { @: $_ => '$' }, qw{ sec min hour mday mon year wday yday isdst });
+struct('Time::tm' => \ @+: map { @: $_ => '$' }, qw{ sec min hour mday mon year wday yday isdst })
 
-1;
+1
 __END__
 
 =head1 NAME

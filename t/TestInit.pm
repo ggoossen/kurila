@@ -13,18 +13,18 @@
 # P.S. This documentation is not in POD format in order to avoid
 # problems when there are fundamental bugs in perl.
 
-package TestInit;
+package TestInit
 
-our $VERSION = 1.01;
+our $VERSION = 1.01
 
-BEGIN {
-    chdir 't' if -d 't';
-    $^INCLUDE_PATH = @('../lib');
-}
+BEGIN 
+    chdir 't' if -d 't'
+    $^INCLUDE_PATH = @('../lib')
 
-env::var('PERL_CORE' ) = 1;
 
-$^PROGRAM_NAME =~ s/\.dp$//; # for the test.deparse make target
+env::var('PERL_CORE' ) = 1
 
-1;
+$^PROGRAM_NAME =~ s/\.dp$// # for the test.deparse make target
+
+1
 

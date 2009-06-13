@@ -3,9 +3,9 @@
 # uk.t - tests for Locale::Country with "uk" aliases to "gb"
 #
 
-use Locale::Country;
+use Locale::Country
 
-Locale::Country::alias_code('uk' => 'gb');
+Locale::Country::alias_code('uk' => 'gb')
 
 #-----------------------------------------------------------------------
 # This is an array of tests. Each test is eval'd as an expression.
@@ -14,49 +14,48 @@ Locale::Country::alias_code('uk' => 'gb');
 #-----------------------------------------------------------------------
 our @TESTS =
     @(
-#================================================
-# TESTS FOR code2country
-#================================================
+    #================================================
+    # TESTS FOR code2country
+    #================================================
 
-#---- selection of examples which should all result in undef -----------
-'!defined code2country()',                  # no argument
-'!defined code2country(undef)',             # undef argument
-'!defined code2country("zz")',              # illegal code
-'!defined code2country("ja")',              # should be jp for country
+    #---- selection of examples which should all result in undef -----------
+    '!defined code2country()',                  # no argument
+    '!defined code2country(undef)',             # undef argument
+    '!defined code2country("zz")',              # illegal code
+    '!defined code2country("ja")',              # should be jp for country
 
-#---- some successful examples -----------------------------------------
-'code2country("BO") eq "Bolivia"',
-'code2country("pk") eq "Pakistan"',
-'code2country("sn") eq "Senegal"',
-'code2country("us") eq "United States"',
-'code2country("ad") eq "Andorra"',          # first in DATA segment
-'code2country("zw") eq "Zimbabwe"',         # last in DATA segment
-'code2country("uk") eq "United Kingdom"',   # normally "gb"
+    #---- some successful examples -----------------------------------------
+    'code2country("BO") eq "Bolivia"',
+    'code2country("pk") eq "Pakistan"',
+    'code2country("sn") eq "Senegal"',
+    'code2country("us") eq "United States"',
+    'code2country("ad") eq "Andorra"',          # first in DATA segment
+    'code2country("zw") eq "Zimbabwe"',         # last in DATA segment
+    'code2country("uk") eq "United Kingdom"',   # normally "gb"
 
-#================================================
-# TESTS FOR country2code
-#================================================
+    #================================================
+    # TESTS FOR country2code
+    #================================================
 
-#---- selection of examples which should all result in undef -----------
-'!defined country2code()',                  # no argument
-'!defined country2code(undef)',             # undef argument
-'!defined country2code("Banana")',          # illegal country name
+    #---- selection of examples which should all result in undef -----------
+    '!defined country2code()',                  # no argument
+    '!defined country2code(undef)',             # undef argument
+    '!defined country2code("Banana")',          # illegal country name
 
-#---- some successful examples -----------------------------------------
-'country2code("japan")          eq "jp"',
-'country2code("japan")          ne "ja"',
-'country2code("Japan")          eq "jp"',
-'country2code("United States")  eq "us"',
-'country2code("United Kingdom") eq "uk"',
-'country2code("Andorra")        eq "ad"',    # first in DATA segment
-'country2code("Zimbabwe")       eq "zw"',    # last in DATA segment
-    );
+    #---- some successful examples -----------------------------------------
+    'country2code("japan")          eq "jp"',
+    'country2code("japan")          ne "ja"',
+    'country2code("Japan")          eq "jp"',
+    'country2code("United States")  eq "us"',
+    'country2code("United Kingdom") eq "uk"',
+    'country2code("Andorra")        eq "ad"',    # first in DATA segment
+    'country2code("Zimbabwe")       eq "zw"',    # last in DATA segment
+    )
 
-require "./test.pl";
+require "./test.pl"
 
-plan(int(nelems @TESTS));
+plan(int(nelems @TESTS))
 
 foreach my $test ( @TESTS)
-{
-    dies_not( sub { eval "$test" } );
-}
+    dies_not( sub (@< @_) { eval "$test" } )
+

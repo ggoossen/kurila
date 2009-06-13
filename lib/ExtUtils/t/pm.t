@@ -2,46 +2,45 @@
 
 # Test that MakeMaker honors user's PM override.
 
-BEGIN {
-    if( env::var('PERL_CORE') ) {
-        chdir 't' if -d 't';
-        $^INCLUDE_PATH = @('../lib', 'lib');
-    }
-    else {
-        unshift $^INCLUDE_PATH, 't/lib';
-    }
-}
+BEGIN 
+    if( env::var('PERL_CORE') )
+        chdir 't' if -d 't'
+        $^INCLUDE_PATH = @('../lib', 'lib')
+    else
+        unshift $^INCLUDE_PATH, 't/lib'
+    
 
-use Test::More tests => 5;
 
-use MakeMaker::Test::Utils;
-use MakeMaker::Test::Setup::BFD;
+use Test::More tests => 5
 
-use ExtUtils::MakeMaker;
+use MakeMaker::Test::Utils
+use MakeMaker::Test::Setup::BFD
 
-chdir 't';
+use ExtUtils::MakeMaker
 
-perl_lib();
+chdir 't'
 
-ok( setup_recurs(), 'setup' );
-END {
-    ok( chdir File::Spec->updir );
-    ok( teardown_recurs(), 'teardown' );
-}
+perl_lib()
+
+ok( setup_recurs(), 'setup' )
+END 
+    ok( chdir File::Spec->updir )
+    ok( teardown_recurs(), 'teardown' )
+
 
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
-    diag("chdir failed: $^OS_ERROR");
+    diag("chdir failed: $^OS_ERROR")
 
-my $stdout = '';
-close $^STDOUT;
-open $^STDOUT, '>>', \$stdout or die;
+my $stdout = ''
+close $^STDOUT
+open $^STDOUT, '>>', \$stdout or die
 
-do {
+do
     my $mm = WriteMakefile(
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
         PM              => %( 'wibble' => 'woof' )
-        );
+        )
 
-    is_deeply( $mm->{PM},  %( wibble => 'woof' ) );
-};
+    is_deeply( $mm->{PM},  %( wibble => 'woof' ) )
+

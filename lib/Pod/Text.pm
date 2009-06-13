@@ -22,24 +22,24 @@
 # Modules and declarations
 ##############################################################################
 
-package Pod::Text;
+package Pod::Text
 
 
-use utf8;
-our (@ISA, @EXPORT, $VERSION);
+use utf8
+our (@ISA, @EXPORT, $VERSION)
 
 use Exporter ();
 use Pod::Simple ();
 
-@ISA = qw(Pod::Simple Exporter);
+@ISA = qw(Pod::Simple Exporter)
 
 # We have to export pod2text for backward compatibility.
-@EXPORT = qw(pod2text);
+@EXPORT = qw(pod2text)
 
 # Don't use the CVS revision as the version, since this module is also in Perl
 # core and too many things could munge CVS magic revision strings.  This
 # number should ideally be the same as the CVS revision in podlators, however.
-$VERSION = 3.08;
+$VERSION = 3.08
 
 ##############################################################################
 # Initialization
@@ -48,72 +48,72 @@ $VERSION = 3.08;
 # This function handles code blocks.  It's registered as a callback to
 # Pod::Simple and therefore doesn't work as a regular method call, but all it
 # does is call output_code with the line.
-sub handle_code($line, $number, $parser) {
-    $parser->output_code ($line . "\n");
-}
+sub handle_code($line, $number, $parser)
+    $parser->output_code ($line . "\n")
+
 
 # Initialize the object and set various Pod::Simple options that we need.
 # Here, we also process any additional options passed to the constructor or
 # set up defaults if none were given.  Note that all internal object keys are
 # in all-caps, reserving all lower-case object keys for Pod::Simple and user
 # arguments.
-sub new {
-    my $class = shift;
-    my $self = $class->SUPER::new;
+sub new
+    my $class = shift
+    my $self = $class->SUPER::new
 
     # Tell Pod::Simple to handle S<> by automatically inserting &nbsp;.
-    $self->nbsp_for_S (1);
+    $self->nbsp_for_S (1)
 
     # Tell Pod::Simple to keep whitespace whenever possible.
-    if ($self->can ('preserve_whitespace')) {
-        $self->preserve_whitespace (1);
-    } else {
-        $self->fullstop_space_harden (1);
-    }
+    if ($self->can ('preserve_whitespace'))
+        $self->preserve_whitespace (1)
+    else
+        $self->fullstop_space_harden (1)
+    
 
     # The =for and =begin targets that we accept.
-    $self->accept_targets ( <qw/text TEXT/);
+    $self->accept_targets ( <qw/text TEXT/)
 
     # Ensure that contiguous blocks of code are merged together.  Otherwise,
     # some of the guesswork heuristics don't work right.
-    $self->merge_text (1);
+    $self->merge_text (1)
 
     # Pod::Simple doesn't do anything useful with our arguments, but we want
     # to put them in our object as hash keys and values.  This could cause
     # problems if we ever clash with Pod::Simple's own internal class
     # variables.
-    my %opts = %( < @_ );
-    my @opts = @+: map { @("opt_$_", %opts{?$_}) }, keys %opts;
-    $self->% = %(< $self->%, < @opts);
+    my %opts = %( < @_ )
+    my @opts = @+: map { @("opt_$_", %opts{?$_}) }, keys %opts
+    $self->% = %(< $self->%, < @opts)
 
     # Initialize various things from our parameters.
-    $self->%{+opt_alt}      = 0  unless defined $self->%{?opt_alt};
-    $self->%{+opt_indent}   = 4  unless defined $self->%{?opt_indent};
-    $self->%{+opt_margin}   = 0  unless defined $self->%{?opt_margin};
-    $self->%{+opt_loose}    = 0  unless defined $self->%{?opt_loose};
-    $self->%{+opt_sentence} = 0  unless defined $self->%{?opt_sentence};
-    $self->%{+opt_width}    = 76 unless defined $self->%{?opt_width};
+    $self->%{+opt_alt}      = 0  unless defined $self->%{?opt_alt}
+    $self->%{+opt_indent}   = 4  unless defined $self->%{?opt_indent}
+    $self->%{+opt_margin}   = 0  unless defined $self->%{?opt_margin}
+    $self->%{+opt_loose}    = 0  unless defined $self->%{?opt_loose}
+    $self->%{+opt_sentence} = 0  unless defined $self->%{?opt_sentence}
+    $self->%{+opt_width}    = 76 unless defined $self->%{?opt_width}
 
     # Figure out what quotes we'll be using for C<> text.
-    $self->%{+opt_quotes} ||= '"';
-    if ($self->%{?opt_quotes} eq 'none') {
-        $self->%{+LQUOTE} = $self->%{+RQUOTE} = '';
-    } elsif (length ($self->%{?opt_quotes}) == 1) {
-        $self->%{+LQUOTE} = $self->%{+RQUOTE} = $self->%{?opt_quotes};
-    } elsif ($self->%{?opt_quotes} =~ m/^(.)(.)$/
-    || $self->%{?opt_quotes} =~ m/^(..)(..)$/) {
-        $self->%{+LQUOTE} = $1;
-        $self->%{+RQUOTE} = $2;
-    } else {
-        die qq(Invalid quote specification "$self->{?opt_quotes}");
-    }
+    $self->%{+opt_quotes} ||= '"'
+    if ($self->%{?opt_quotes} eq 'none')
+        $self->%{+LQUOTE} = $self->%{+RQUOTE} = ''
+    elsif (length ($self->%{?opt_quotes}) == 1)
+        $self->%{+LQUOTE} = $self->%{+RQUOTE} = $self->%{?opt_quotes}
+    elsif ($self->%{?opt_quotes} =~ m/^(.)(.)$/
+        || $self->%{?opt_quotes} =~ m/^(..)(..)$/)
+        $self->%{+LQUOTE} = $1
+        $self->%{+RQUOTE} = $2
+    else
+        die qq(Invalid quote specification "$self->{?opt_quotes}")
+    
 
     # If requested, do something with the non-POD text.
-    $self->code_handler (\&handle_code) if $self->%{?opt_code};
+    $self->code_handler (\&handle_code) if $self->%{?opt_code}
 
     # Return the created object.
-    return $self;
-}
+    return $self
+
 
 ##############################################################################
 # Core parsing
@@ -135,60 +135,60 @@ sub new {
 
 # Add a block of text to the contents of the current node, formatting it
 # according to the current formatting instructions as we do.
-sub _handle_text($self, $text) {
-    my $tag = $self->%{PENDING}->[-1];
-    $tag->@[1] .= $text;
-}
+sub _handle_text($self, $text)
+    my $tag = $self->%{PENDING}->[-1]
+    $tag->@[1] .= $text
+
 
 # Given an element name, get the corresponding method name.
-sub method_for_element($self, $element) {
-    $element =~ s/-/_/;
-    $element =~ s/([A-Z])/$(lc($1))/g;
-    $element =~ s/[^_a-z0-9]//g;
-    return $element;
-}
+sub method_for_element($self, $element)
+    $element =~ s/-/_/
+    $element =~ s/([A-Z])/$(lc($1))/g
+    $element =~ s/[^_a-z0-9]//g
+    return $element
+
 
 # Handle the start of a new element.  If cmd_element is defined, assume that
 # we need to collect the entire tree for this element before passing it to the
 # element method, and create a new tree into which we'll collect blocks of
 # text and nested elements.  Otherwise, if start_element is defined, call it.
-sub _handle_element_start($self, $element, $attrs) {
-    my $method = $self->method_for_element ($element);
+sub _handle_element_start($self, $element, $attrs)
+    my $method = $self->method_for_element ($element)
 
     # If we have a command handler, we need to accumulate the contents of the
     # tag before calling it.
-    if ($self->can ("cmd_$method")) {
-        push ( $self->%{PENDING}->@, \@( $attrs, '' ));
-    } elsif ($self->can ("start_$method")) {
-        my $method = 'start_' . $method;
-        $self->?$method ($attrs, '');
-    }
-}
+    if ($self->can ("cmd_$method"))
+        push ( $self->%{PENDING}->@, \@( $attrs, '' ))
+    elsif ($self->can ("start_$method"))
+        my $method = 'start_' . $method
+        $self->?$method ($attrs, '')
+    
+
 
 # Handle the end of an element.  If we had a cmd_ method for this element,
 # this is where we pass along the text that we've accumulated.  Otherwise, if
 # we have an end_ method for the element, call that.
-sub _handle_element_end($self, $element) {
-    my $method = $self->method_for_element ($element);
+sub _handle_element_end($self, $element)
+    my $method = $self->method_for_element ($element)
 
     # If we have a command handler, pull off the pending text and pass it to
     # the handler along with the saved attribute hash.
-    if ($self->can ("cmd_$method")) {
-        my $tag = pop  $self->%{PENDING}->@;
-        my $method = 'cmd_' . $method;
-        my $text = $self->?$method (< $tag->@);
-        if (defined $text) {
-            if ((nelems  $self->%{?PENDING}->@) +> 1) {
-                $self->%{PENDING}->[-1]->[1] .= $text;
-            } else {
-                $self->output ($text);
-            }
-        }
-    } elsif ($self->can ("end_$method")) {
-        my $method = 'end_' . $method;
-        $self->?$method ();
-    }
-}
+    if ($self->can ("cmd_$method"))
+        my $tag = pop  $self->%{PENDING}->@
+        my $method = 'cmd_' . $method
+        my $text = $self->?$method (< $tag->@)
+        if (defined $text)
+            if ((nelems  $self->%{?PENDING}->@) +> 1)
+                $self->%{PENDING}->[-1]->[1] .= $text
+            else
+                $self->output ($text)
+            
+        
+    elsif ($self->can ("end_$method"))
+        my $method = 'end_' . $method
+        $self->?$method ()
+    
+
 
 ##############################################################################
 # Output formatting
@@ -198,49 +198,49 @@ sub _handle_element_end($self, $element) {
 # because it plays games with tabs.  We can't use formline, even though we'd
 # really like to, because it screws up non-printing characters.  So we have to
 # do the wrapping ourselves.
-sub wrap {
-    my $self = shift;
-    local $_ = shift;
-    my $output = '';
-    my $spaces = ' ' x $self->%{?MARGIN};
-    my $width = $self->%{?opt_width} - $self->%{?MARGIN};
-    while (length +> $width) {
-        if (s/^([^\n]{0,$width})[ \t]+// || s/^([^\n]{$width})//) {
-            $output .= $spaces . $1 . "\n";
-        } else {
-            last;
-        }
-    }
-    $output .= $spaces . $_;
-    $output =~ s/\s+$/\n\n/;
-    return $output;
-}
+sub wrap
+    my $self = shift
+    local $_ = shift
+    my $output = ''
+    my $spaces = ' ' x $self->%{?MARGIN}
+    my $width = $self->%{?opt_width} - $self->%{?MARGIN}
+    while (length +> $width)
+        if (s/^([^\n]{0,$width})[ \t]+// || s/^([^\n]{$width})//)
+            $output .= $spaces . $1 . "\n"
+        else
+            last
+        
+    
+    $output .= $spaces . $_
+    $output =~ s/\s+$/\n\n/
+    return $output
+
 
 # Reformat a paragraph of text for the current margin.  Takes the text to
 # reformat and returns the formatted text.
-sub reformat {
-    my $self = shift;
-    local $_ = shift;
+sub reformat
+    my $self = shift
+    local $_ = shift
 
     # If we're trying to preserve two spaces after sentences, do some munging
     # to support that.  Otherwise, smash all repeated whitespace.
-    if ($self->%{?opt_sentence}) {
-        s/ +$//mg;
-        s/\.\n/. \n/g;
-        s/\n/ /g;
-        s/   +/  /g;
-    } else {
-        s/[ \t\n\r\f]+/ /g;
-    }
-    return $self->wrap ($_);
-}
+    if ($self->%{?opt_sentence})
+        s/ +$//mg
+        s/\.\n/. \n/g
+        s/\n/ /g
+        s/   +/  /g
+    else
+        s/[ \t\n\r\f]+/ /g
+    
+    return $self->wrap ($_)
+
 
 # Output text to the output device.
-sub output($self, $text) {
-    $text =~ s/\x{a0}/ /g; # non-breaking space
-    $text =~ s/\x{ad}//g; # soft hyphen
-    print  $self->%{?output_fh}  ,$text;
-}
+sub output($self, $text)
+    $text =~ s/\x{a0}/ /g # non-breaking space
+    $text =~ s/\x{ad}//g # soft hyphen
+    print  $self->%{?output_fh}  ,$text
+
 
 # Output a block of code (something that isn't part of the POD text).  Called
 # by preprocess_paragraph only if we were given the code option.  Exists here
@@ -252,16 +252,16 @@ sub output_code { @_[0]->output (@_[1]) }
 ##############################################################################
 
 # Set up various things that have to be initialized on a per-document basis.
-sub start_document($self, ...) {
-    my $margin = $self->%{?opt_indent} + $self->%{?opt_margin};
+sub start_document($self, ...)
+    my $margin = $self->%{?opt_indent} + $self->%{?opt_margin}
 
     # Initialize a few per-document variables.
-    $self->%{+INDENTS} = \@();       # Stack of indentations.
-    $self->%{+MARGIN}  = $margin;  # Default left margin.
-    $self->%{+PENDING} = \@(\@());     # Pending output.
+    $self->%{+INDENTS} = \@()       # Stack of indentations.
+    $self->%{+MARGIN}  = $margin  # Default left margin.
+    $self->%{+PENDING} = \@(\@())     # Pending output.
 
-    return '';
-}
+    return ''
+
 
 ##############################################################################
 # Text blocks
@@ -274,81 +274,81 @@ sub start_document($self, ...) {
 # output the item tag followed by the newline.  Otherwise, see if there's
 # enough room for us to output the item tag in the margin of the text or if we
 # have to put it on a separate line.
-sub item($self, ?$text) {
-    my $tag = $self->%{?ITEM};
-    unless (defined $tag) {
-        warn "Item called without tag";
-        return;
-    }
-    undef $self->%{+ITEM};
+sub item($self, ?$text)
+    my $tag = $self->%{?ITEM}
+    unless (defined $tag)
+        warn "Item called without tag"
+        return
+    
+    undef $self->%{+ITEM}
 
     # Calculate the indentation and margin.  $fits is set to true if the tag
     # will fit into the margin of the paragraph given our indentation level.
-    my $indent = $self->%{INDENTS}->[-1];
-    $indent = $self->%{?opt_indent} unless defined $indent;
-    my $margin = ' ' x $self->%{?opt_margin};
-    my $fits = ($self->%{?MARGIN} - $indent +>= length ($tag) + 1);
+    my $indent = $self->%{INDENTS}->[-1]
+    $indent = $self->%{?opt_indent} unless defined $indent
+    my $margin = ' ' x $self->%{?opt_margin}
+    my $fits = ($self->%{?MARGIN} - $indent +>= length ($tag) + 1)
 
     # If the tag doesn't fit, or if we have no associated text, print out the
     # tag separately.  Otherwise, put the tag in the margin of the paragraph.
-    if (!$text || $text =~ m/^\s+$/ || !$fits) {
-        my $realindent = $self->%{?MARGIN};
-        $self->%{+MARGIN} = $indent;
-        my $output = $self->reformat ($tag);
-        $output =~ s/^$margin /$margin:/ if ($self->%{?opt_alt} && $indent +> 0);
-        $output =~ s/\n*$/\n/;
+    if (!$text || $text =~ m/^\s+$/ || !$fits)
+        my $realindent = $self->%{?MARGIN}
+        $self->%{+MARGIN} = $indent
+        my $output = $self->reformat ($tag)
+        $output =~ s/^$margin /$margin:/ if ($self->%{?opt_alt} && $indent +> 0)
+        $output =~ s/\n*$/\n/
 
         # If the text is just whitespace, we have an empty item paragraph;
         # this can result from =over/=item/=back without any intermixed
         # paragraphs.  Insert some whitespace to keep the =item from merging
         # into the next paragraph.
-        $output .= "\n" if $text && $text =~ m/^\s*$/;
+        $output .= "\n" if $text && $text =~ m/^\s*$/
 
-        $self->output ($output);
-        $self->%{+MARGIN} = $realindent;
-        $self->output ( $self->reformat ($text)) if ($text && $text =~ m/\S/);
-    } else {
-        my $space = ' ' x $indent;
-        $space =~ s/^$margin /$margin:/ if $self->%{?opt_alt};
-        $text = $self->reformat ($text);
-        $text =~ s/^$margin /$margin:/ if ($self->%{?opt_alt} && $indent +> 0);
-        my $tagspace = ' ' x length $tag;
-        $text =~ s/^($space)$tagspace/$1$tag/ or warn "Bizarre space in item";
-        $self->output ($text);
-    }
-}
+        $self->output ($output)
+        $self->%{+MARGIN} = $realindent
+        $self->output ( $self->reformat ($text)) if ($text && $text =~ m/\S/)
+    else
+        my $space = ' ' x $indent
+        $space =~ s/^$margin /$margin:/ if $self->%{?opt_alt}
+        $text = $self->reformat ($text)
+        $text =~ s/^$margin /$margin:/ if ($self->%{?opt_alt} && $indent +> 0)
+        my $tagspace = ' ' x length $tag
+        $text =~ s/^($space)$tagspace/$1$tag/ or warn "Bizarre space in item"
+        $self->output ($text)
+    
+
 
 # Handle a basic block of text.  The only tricky thing here is that if there
 # is a pending item tag, we need to format this as an item paragraph.
-sub cmd_para($self, $attrs, $text) {
-    $text =~ s/\s+$/\n/;
-    if (defined $self->%{?ITEM}) {
-        $self->item ($text . "\n");
-    } else {
-        $self->output ( $self->reformat ($text . "\n"));
-    }
-    return '';
-}
+sub cmd_para($self, $attrs, $text)
+    $text =~ s/\s+$/\n/
+    if (defined $self->%{?ITEM})
+        $self->item ($text . "\n")
+    else
+        $self->output ( $self->reformat ($text . "\n"))
+    
+    return ''
+
 
 # Handle a verbatim paragraph.  Just print it out, but indent it according to
 # our margin.
-sub cmd_verbatim($self, $attrs, $text) {
-    $self->item if defined $self->%{?ITEM};
-    return if $text =~ m/^\s*$/;
-    $text =~ s/^(\n*)(\s*\S+)/$($1 . (' ' x $self->%{?MARGIN}) . $2)/gm;
-    $text =~ s/\s*$/\n\n/;
-    $self->output ($text);
-    return '';
-}
+sub cmd_verbatim($self, $attrs, $text)
+    $self->item if defined $self->%{?ITEM}
+    return if $text =~ m/^\s*$/
+    $text =~ s/^(\n*)(\s*\S+)/$($1 . (' ' x $self->%{?MARGIN}) . $2)/gm
+    $text =~ s/\s*$/\n\n/
+    $self->output ($text)
+    return ''
+
 
 # Handle literal text (produced by =for and similar constructs).  Just output
 # it with the minimum of changes.
-sub cmd_data($self, $attrs, $text) {
-    $text =~ s/^\n+//;
-    $text =~ s/\n{0,2}$/\n/;
-    $self->output ($text);
-    return '';
-}
+sub cmd_data($self, $attrs, $text)
+    $text =~ s/^\n+//
+    $text =~ s/\n{0,2}$/\n/
+    $self->output ($text)
+    return ''
+
 
 ##############################################################################
 # Headings
@@ -356,40 +356,40 @@ sub cmd_data($self, $attrs, $text) {
 
 # The common code for handling all headers.  Takes the header text, the
 # indentation, and the surrounding marker for the alt formatting method.
-sub heading($self, $text, $indent, $marker) {
-    $self->item ("\n\n") if defined $self->%{?ITEM};
-    $text =~ s/\s+$//;
-    if ($self->%{?opt_alt}) {
-        my $closemark = join '', reverse (split (m//, $marker));
-        my $margin = ' ' x $self->%{?opt_margin};
-        $self->output ("\n" . "$margin$marker $text $closemark" . "\n\n");
-    } else {
-        $text .= "\n" if $self->%{?opt_loose};
-        my $margin = ' ' x ($self->%{?opt_margin} + $indent);
-        $self->output ($margin . $text . "\n");
-    }
-    return '';
-}
+sub heading($self, $text, $indent, $marker)
+    $self->item ("\n\n") if defined $self->%{?ITEM}
+    $text =~ s/\s+$//
+    if ($self->%{?opt_alt})
+        my $closemark = join '', reverse (split (m//, $marker))
+        my $margin = ' ' x $self->%{?opt_margin}
+        $self->output ("\n" . "$margin$marker $text $closemark" . "\n\n")
+    else
+        $text .= "\n" if $self->%{?opt_loose}
+        my $margin = ' ' x ($self->%{?opt_margin} + $indent)
+        $self->output ($margin . $text . "\n")
+    
+    return ''
+
 
 # First level heading.
-sub cmd_head1($self, $attrs, $text) {
-    $self->heading ($text, 0, '====');
-}
+sub cmd_head1($self, $attrs, $text)
+    $self->heading ($text, 0, '====')
+
 
 # Second level heading.
-sub cmd_head2($self, $attrs, $text) {
-    $self->heading ($text, $self->%{?opt_indent} / 2, '==  ');
-}
+sub cmd_head2($self, $attrs, $text)
+    $self->heading ($text, $self->%{?opt_indent} / 2, '==  ')
+
 
 # Third level heading.
-sub cmd_head3($self, $attrs, $text) {
-    $self->heading ($text, $self->%{?opt_indent} * 2 / 3 + 0.5, '=   ');
-}
+sub cmd_head3($self, $attrs, $text)
+    $self->heading ($text, $self->%{?opt_indent} * 2 / 3 + 0.5, '=   ')
+
 
 # Fourth level heading.
-sub cmd_head4($self, $attrs, $text) {
-    $self->heading ($text, $self->%{?opt_indent} * 3 / 4 + 0.5, '-   ');
-}
+sub cmd_head4($self, $attrs, $text)
+    $self->heading ($text, $self->%{?opt_indent} * 3 / 4 + 0.5, '-   ')
+
 
 ##############################################################################
 # List handling
@@ -398,28 +398,28 @@ sub cmd_head4($self, $attrs, $text) {
 # Handle the beginning of an =over block.  Takes the type of the block as the
 # first argument, and then the attr hash.  This is called by the handlers for
 # the four different types of lists (bullet, number, text, and block).
-sub over_common_start($self, $attrs) {
-    $self->item ("\n\n") if defined $self->%{?ITEM};
+sub over_common_start($self, $attrs)
+    $self->item ("\n\n") if defined $self->%{?ITEM}
 
     # Find the indentation level.
-    my $indent = $attrs->%{?indent};
-    unless (defined ($indent) && $indent =~ m/^\s*[-+]?\d{1,4}\s*$/) {
-        $indent = $self->%{?opt_indent};
-    }
+    my $indent = $attrs->%{?indent}
+    unless (defined ($indent) && $indent =~ m/^\s*[-+]?\d{1,4}\s*$/)
+        $indent = $self->%{?opt_indent}
+    
 
     # Add this to our stack of indents and increase our current margin.
-    push ( $self->%{INDENTS}->@, $self->%{?MARGIN});
-    $self->%{+MARGIN} += ($indent + 0);
-    return '';
-}
+    push ( $self->%{INDENTS}->@, $self->%{?MARGIN})
+    $self->%{+MARGIN} += ($indent + 0)
+    return ''
+
 
 # End an =over block.  Takes no options other than the class pointer.  Output
 # any pending items and then pop one level of indentation.
-sub over_common_end($self) {
-    $self->item ("\n\n") if defined $self->%{?ITEM};
-    $self->%{+MARGIN} = pop  $self->%{INDENTS}->@;
-    return '';
-}
+sub over_common_end($self)
+    $self->item ("\n\n") if defined $self->%{?ITEM}
+    $self->%{+MARGIN} = pop  $self->%{INDENTS}->@
+    return ''
+
 
 # Dispatch the start and end calls as appropriate.
 sub start_over_bullet { @_[0]->over_common_start (@_[1]) }
@@ -433,33 +433,33 @@ sub end_over_block  { @_[0]->over_common_end }
 
 # The common handler for all item commands.  Takes the type of the item, the
 # attributes, and then the text of the item.
-sub item_common($self, $type, $attrs, $text) {
-    $self->item if defined $self->%{?ITEM};
+sub item_common($self, $type, $attrs, $text)
+    $self->item if defined $self->%{?ITEM}
 
     # Clean up the text.  We want to end up with two variables, one ($text)
     # which contains any body text after taking out the item portion, and
     # another ($item) which contains the actual item text.  Note the use of
     # the internal Pod::Simple attribute here; that's a potential land mine.
-    $text =~ s/\s+$//;
-    my ($item, $index);
-    if ($type eq 'bullet') {
-        $item = '*';
-    } elsif ($type eq 'number') {
-        $item = $attrs->%{?'~orig_content'};
-    } else {
-        $item = $text;
-        $item =~ s/\s*\n\s*/ /g;
-        $text = '';
-    }
-    $self->%{+ITEM} = $item;
+    $text =~ s/\s+$//
+    my ($item, $index)
+    if ($type eq 'bullet')
+        $item = '*'
+    elsif ($type eq 'number')
+        $item = $attrs->%{?'~orig_content'}
+    else
+        $item = $text
+        $item =~ s/\s*\n\s*/ /g
+        $text = ''
+    
+    $self->%{+ITEM} = $item
 
     # If body text for this item was included, go ahead and output that now.
-    if ($text) {
-        $text =~ s/\s*$/\n/;
-        $self->item ($text);
-    }
-    return '';
-}
+    if ($text)
+        $text =~ s/\s*$/\n/
+        $self->item ($text)
+    
+    return ''
+
 
 # Dispatch the item commands to the appropriate place.
 sub cmd_item_bullet { my $self = shift; $self->item_common ('bullet', < @_) }
@@ -480,12 +480,12 @@ sub cmd_x { return '' }
 # Apply a whole bunch of messy heuristics to not quote things that don't
 # benefit from being quoted.  These originally come from Barrie Slaymaker and
 # largely duplicate code in Pod::Man.
-sub cmd_c($self, $attrs, $text) {
+sub cmd_c($self, $attrs, $text)
 
     # A regex that matches the portion of a variable reference that's the
     # array or hash index, separated out just because we want to use it in
     # several places in the following regex.
-    my $index = '(?: \[.*\] | \{.*\} )?';
+    my $index = '(?: \[.*\] | \{.*\} )?'
 
     # Check for things that we don't want to quote, and if we find any of
     # them, return the string with just a font change and no quoting.
@@ -501,19 +501,19 @@ sub cmd_c($self, $attrs, $text) {
        | 0x [a-fA-F\d]+                                 # a hex constant
       )
       \s*\z
-     }xo && return $text;
+     }xo && return $text
 
     # If we didn't return, go ahead and quote the text.
     return $self->%{?opt_alt}
         ?? "``$text''"
-        !! "$self->{?LQUOTE}$text$self->{?RQUOTE}";
-}
+        !! "$self->{?LQUOTE}$text$self->{?RQUOTE}"
+
 
 # Links reduce to the text that we're given, wrapped in angle brackets if it's
 # a URL.
-sub cmd_l($self, $attrs, $text) {
-    return $attrs->%{?type} eq 'url' ?? "<$text>" !! $text;
-}
+sub cmd_l($self, $attrs, $text)
+    return $attrs->%{?type} eq 'url' ?? "<$text>" !! $text
+
 
 ##############################################################################
 # Backwards compatibility
@@ -521,90 +521,88 @@ sub cmd_l($self, $attrs, $text) {
 
 # The old Pod::Text module did everything in a pod2text() function.  This
 # tries to provide the same interface for legacy applications.
-sub pod2text {
-    my @args;
+sub pod2text
+    my @args
 
     # This is really ugly; I hate doing option parsing in the middle of a
     # module.  But the old Pod::Text module supported passing flags to its
     # entry function, so handle -a and -<number>.
-    while (@_[0] =~ m/^-/) {
-        my $flag = shift;
-        if    ($flag eq '-a')       { push (@args, alt => 1)    }
-        elsif ($flag =~ m/^-(\d+)$/) { push (@args, width => $1) }
-        else {
-            unshift (@_, $flag);
-            last;
-        }
-    }
+    while (@_[0] =~ m/^-/)
+        my $flag = shift
+        if    ($flag eq '-a')       { push (@args, alt => 1)    }elsif ($flag =~ m/^-(\d+)$/) { push (@args, width => $1) }else
+            unshift (@_, $flag)
+            last
+        
+    
 
     # Now that we know what arguments we're using, create the parser.
-    my $parser = Pod::Text->new (< @args);
+    my $parser = Pod::Text->new (< @args)
 
     # If two arguments were given, the second argument is going to be a file
     # handle.  That means we want to call parse_from_filehandle(), which means
     # we need to turn the first argument into a file handle.  Magic open will
     # handle the <&STDIN case automagically.
-    if (defined @_[1]) {
-        my @fhs = @_;
-        my $in;
-        unless (open ($in, "<", @fhs[0])) {
-            die ("Can't open @fhs[0] for reading: $^OS_ERROR\n");
-            return;
-        }
-        @fhs[0] = $in;
-        $parser->output_fh (@fhs[1]);
-        my $retval = $parser->parse_file (@fhs[0]);
-        my $fh = $parser->output_fh ();
-        close $fh;
-        return $retval;
-    } else {
-        return $parser->parse_file (< @_);
-    }
-}
+    if (defined @_[1])
+        my @fhs = @_
+        my $in
+        unless (open ($in, "<", @fhs[0]))
+            die ("Can't open @fhs[0] for reading: $^OS_ERROR\n")
+            return
+        
+        @fhs[0] = $in
+        $parser->output_fh (@fhs[1])
+        my $retval = $parser->parse_file (@fhs[0])
+        my $fh = $parser->output_fh ()
+        close $fh
+        return $retval
+    else
+        return $parser->parse_file (< @_)
+    
+
 
 # Reset the underlying Pod::Simple object between calls to parse_from_file so
 # that the same object can be reused to convert multiple pages.
-sub parse_from_file {
-    my $self = shift;
-    $self->reinit;
+sub parse_from_file
+    my $self = shift
+    $self->reinit
 
     # Fake the old cutting option to Pod::Parser.  This fiddings with internal
     # Pod::Simple state and is quite ugly; we need a better approach.
-    if (ref (@_[0]) eq 'HASH') {
-        my $opts = shift @_;
-        if (defined ($opts->%{?cutting}) && !$opts->%{?cutting}) {
-            $self->%{+in_pod} = 1;
-            $self->%{+last_was_blank} = 1;
-        }
-    }
+    if (ref (@_[0]) eq 'HASH')
+        my $opts = shift @_
+        if (defined ($opts->%{?cutting}) && !$opts->%{?cutting})
+            $self->%{+in_pod} = 1
+            $self->%{+last_was_blank} = 1
+        
+    
 
     # Do the work.
-    my $retval = $self->Pod::Simple::parse_from_file (< @_);
+    my $retval = $self->Pod::Simple::parse_from_file (< @_)
 
     # Flush output, since Pod::Simple doesn't do this.  Ideally we should also
     # close the file descriptor if we had to open one, but we can't easily
     # figure this out.
-    my $fh = $self->output_fh ();
-    my $oldflush = iohandle::output_autoflush($fh);
-    iohandle::output_autoflush($fh, 1);
-    print $fh, '';
-    iohandle::output_autoflush($fh, $oldflush);
-    return $retval;
-}
+    my $fh = $self->output_fh ()
+    my $oldflush = iohandle::output_autoflush($fh)
+    iohandle::output_autoflush($fh, 1)
+    print $fh, ''
+    iohandle::output_autoflush($fh, $oldflush)
+    return $retval
+
 
 # Pod::Simple failed to provide this backward compatibility function, so
 # implement it ourselves.  File handles are one of the inputs that
 # parse_from_file supports.
-sub parse_from_filehandle {
-    my $self = shift;
-    $self->parse_from_file (< @_);
-}
+sub parse_from_filehandle
+    my $self = shift
+    $self->parse_from_file (< @_)
+
 
 ##############################################################################
 # Module return value and documentation
 ##############################################################################
 
-1;
+1
 __END__
 
 =head1 NAME

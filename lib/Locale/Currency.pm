@@ -5,25 +5,25 @@
 # $Id: Currency.pm,v 2.7 2004/06/10 21:19:34 neilb Exp $
 #
 
-package Locale::Currency;
+package Locale::Currency
 
 
-require Exporter;
+require Exporter
 
 #-----------------------------------------------------------------------
 #	Public Global Variables
 #-----------------------------------------------------------------------
-our ($VERSION, @ISA, @EXPORT);
-$VERSION      = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
-@ISA          = qw(Exporter);
+our ($VERSION, @ISA, @EXPORT)
+$VERSION      = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/)
+@ISA          = qw(Exporter)
 @EXPORT       = qw(&code2currency &currency2code
-                   &all_currency_codes &all_currency_names );
+                   &all_currency_codes &all_currency_names )
 
 #-----------------------------------------------------------------------
 #	Private Global Variables
 #-----------------------------------------------------------------------
-my %CODES      = %( () );
-my %CURRENCIES = %( () );
+my %CODES      = %( () )
+my %CURRENCIES = %( () )
 
 
 #=======================================================================
@@ -32,24 +32,20 @@ my %CURRENCIES = %( () );
 #
 #=======================================================================
 sub code2currency
-{
-    my $code = shift;
+    my $code = shift
 
 
-    return undef unless defined $code;
-    $code = lc($code);
+    return undef unless defined $code
+    $code = lc($code)
     if (exists %CODES{$code})
-    {
-        return %CODES{?$code};
-    }
+        return %CODES{?$code}
     else
-    {
         #---------------------------------------------------------------
         # no such currency code!
         #---------------------------------------------------------------
-        return undef;
-    }
-}
+        return undef
+    
+
 
 
 #=======================================================================
@@ -58,24 +54,20 @@ sub code2currency
 #
 #=======================================================================
 sub currency2code
-{
-    my $curr = shift;
+    my $curr = shift
 
 
-    return undef unless defined $curr;
-    $curr = lc($curr);
+    return undef unless defined $curr
+    $curr = lc($curr)
     if (exists %CURRENCIES{$curr})
-    {
-        return %CURRENCIES{?$curr};
-    }
+        return %CURRENCIES{?$curr}
     else
-    {
         #---------------------------------------------------------------
         # no such currency!
         #---------------------------------------------------------------
-        return undef;
-    }
-}
+        return undef
+    
+
 
 
 #=======================================================================
@@ -84,9 +76,8 @@ sub currency2code
 #
 #=======================================================================
 sub all_currency_codes
-{
-    return keys %CODES;
-}
+    return keys %CODES
+
 
 
 #=======================================================================
@@ -95,33 +86,31 @@ sub all_currency_codes
 #
 #=======================================================================
 sub all_currency_names
-{
-    return values %CODES;
-}
+    return values %CODES
+
 
 
 #=======================================================================
 # initialisation code - stuff the DATA into the CODES hash
 #=======================================================================
-do {
-    my    $code;
-    my    $currency;
-    local $_ = undef;
+do
+    my    $code
+    my    $currency
+    local $_ = undef
 
 
     while ( ~< $^DATA)
-    {
-        next unless m/\S/;
-        chop;
-        @($code, $currency) =  split(m/:/, $_, 2);
-        %CODES{+$code} = $currency;
-        %CURRENCIES{+lc "$currency"} = $code;
-    }
+        next unless m/\S/
+        chop
+        @($code, $currency) =  split(m/:/, $_, 2)
+        %CODES{+$code} = $currency
+        %CURRENCIES{+lc "$currency"} = $code
+    
 
-    close($^DATA);
-};
+    close($^DATA)
 
-1;
+
+1
 
 __DATA__
 adp:Andorran Peseta

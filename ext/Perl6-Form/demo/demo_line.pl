@@ -1,4 +1,4 @@
-use Perl6::Form;
+use Perl6::Form
 
 print $^STDOUT, < form
  \%(page=>\%(length=>4, header=>'==========')),

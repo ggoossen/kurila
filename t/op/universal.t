@@ -3,197 +3,197 @@
 # check UNIVERSAL
 #
 
-BEGIN {
-    $^OUTPUT_AUTOFLUSH = 1;
-    require "./test.pl";
-}
+BEGIN 
+    $^OUTPUT_AUTOFLUSH = 1
+    require "./test.pl"
 
-plan tests => 88;
 
-$a = \%();
-bless $a, "Bob";
-ok $a->isa("Bob");
+plan tests => 88
 
-    package Human;
+$a = \%()
+bless $a, "Bob"
+ok $a->isa("Bob")
+
+package Human;
 sub eat {}
 
-package Female;
-our @ISA=qw(Human);
+package Female
+our @ISA=qw(Human)
 
-    package Alice;
-our @ISA=qw(Bob Female);
+package Alice;
+our @ISA=qw(Bob Female)
 sub drink { return "drinking " . @_[1]  }
 sub new { bless \%() }
 
-$Alice::VERSION = 2.718;
+$Alice::VERSION = 2.718
 
-do {
-    package Cedric;
-    our @ISA;
-    use base < qw(Human);
-};
+do
+    package Cedric
+    our @ISA
+    use base < qw(Human)
 
-do {
-    package Programmer;
-    our $VERSION = 1.667;
+
+do
+    package Programmer
+    our $VERSION = 1.667
 
     sub write_perl { 1 }
-};
-
-package main;
 
 
+package main
 
-$a = Alice->new();
 
-ok $a->isa("Alice");
 
-ok $a->isa("Bob");
+$a = Alice->new()
 
-ok $a->isa("Female");
+ok $a->isa("Alice")
 
-ok $a->isa("Human");
+ok $a->isa("Bob")
 
-ok ! $a->isa("Male");
+ok $a->isa("Female")
 
-ok ! $a->isa('Programmer');
+ok $a->isa("Human")
 
-ok $a->isa("HASH");
+ok ! $a->isa("Male")
 
-ok $a->can("eat");
-ok ! $a->can("sleep");
-ok(my $ref = $a->can("drink"));        # returns a coderef
-is $a->?$ref("tea"), "drinking tea"; # ... which works
+ok ! $a->isa('Programmer')
 
-ok (!Cedric->isa('Programmer'));
+ok $a->isa("HASH")
 
-ok (Cedric->isa('Human'));
+ok $a->can("eat")
+ok ! $a->can("sleep")
+ok(my $ref = $a->can("drink"))        # returns a coderef
+is $a->?$ref("tea"), "drinking tea" # ... which works
 
-push(@Cedric::ISA,'Programmer');
+ok (!Cedric->isa('Programmer'))
 
-ok (Cedric->isa('Programmer'));
+ok (Cedric->isa('Human'))
 
-do {
-    package Alice;
-    'base'->import('Programmer');
-};
+push(@Cedric::ISA,'Programmer')
 
-ok $a->isa('Programmer');
-ok $a->isa("Female");
+ok (Cedric->isa('Programmer'))
 
-@Cedric::ISA = qw(Bob);
+do
+    package Alice
+    'base'->import('Programmer')
 
-ok (!Cedric->isa('Programmer'));
 
-my $b = 'abc';
-my @refs = qw(SCALAR SCALAR     GLOB ARRAY HASH CODE);
-my @vals = @(  \$b,   \3.14, \*b,  \@(),  \%(), sub {} );
-for my $p (0 .. nelems(@refs) -1) {
-    for my $q (0 .. nelems(@vals) -1) {
-        is UNIVERSAL::isa(@vals[$p], @refs[$q]), ($p==$q or $p+$q==1);
-    };
-};
+ok $a->isa('Programmer')
+ok $a->isa("Female")
 
-ok ! UNIVERSAL::can(23, "can");
+@Cedric::ISA = qw(Bob)
 
-ok $a->can("VERSION");
+ok (!Cedric->isa('Programmer'))
 
-ok $a->can("can");
-ok ! $a->can("export_tags");	# a method in Exporter
+my $b = 'abc'
+my @refs = qw(SCALAR SCALAR     GLOB ARRAY HASH CODE)
+my @vals = @(  \$b,   \3.14, \*b,  \@(),  \%(), sub {} )
+for my $p (0 .. nelems(@refs) -1)
+    for my $q (0 .. nelems(@vals) -1)
+        is UNIVERSAL::isa(@vals[$p], @refs[$q]), ($p==$q or $p+$q==1)
+    ;
+;
 
-cmp_ok try { $a->VERSION }, '==', 2.718;
+ok ! UNIVERSAL::can(23, "can")
 
-dies_like( sub { $a->VERSION(2.719) }, 
-           qr/^Alice version 2.719 required--this is only version 2.718/ );
+ok $a->can("VERSION")
 
-ok (try { $a->VERSION(2.718) });
-is $^EVAL_ERROR, '';
+ok $a->can("can")
+ok ! $a->can("export_tags")	# a method in Exporter
 
-my $subs = join ' ', sort grep { defined &{Symbol::fetch_glob("UNIVERSAL::$_")} }, keys %UNIVERSAL::;
+cmp_ok try { $a->VERSION }, '==', 2.718
+
+dies_like( sub (@< @_) { $a->VERSION(2.719) },
+           qr/^Alice version 2.719 required--this is only version 2.718/ )
+
+ok (try { $a->VERSION(2.718) })
+is $^EVAL_ERROR, ''
+
+my $subs = join ' ', sort grep { defined &{Symbol::fetch_glob("UNIVERSAL::$_")} }, keys %UNIVERSAL::
 ## The test for import here is *not* because we want to ensure that UNIVERSAL
 ## can always import; it is an historical accident that UNIVERSAL can import.
-is $subs, "DOES VERSION can import isa";
+is $subs, "DOES VERSION can import isa"
 
-ok $a->isa("UNIVERSAL");
+ok $a->isa("UNIVERSAL")
 
-ok ! UNIVERSAL::isa(\@(), "UNIVERSAL");
+ok ! UNIVERSAL::isa(\@(), "UNIVERSAL")
 
-ok ! UNIVERSAL::can(\%(), "can");
+ok ! UNIVERSAL::can(\%(), "can")
 
-ok UNIVERSAL::isa(Alice => "UNIVERSAL");
+ok UNIVERSAL::isa(Alice => "UNIVERSAL")
 
-cmp_ok UNIVERSAL::can(Alice => "can"), '\==', \&UNIVERSAL::can;
+cmp_ok UNIVERSAL::can(Alice => "can"), '\==', \&UNIVERSAL::can
 
 # now use UNIVERSAL.pm and see what changes
-eval "use UNIVERSAL";
+eval "use UNIVERSAL"
 
-ok $a->isa("UNIVERSAL");
+ok $a->isa("UNIVERSAL")
 
-my $sub2 = join ' ', sort grep { defined &{Symbol::fetch_glob("UNIVERSAL::$_")} }, keys %UNIVERSAL::;
+my $sub2 = join ' ', sort grep { defined &{Symbol::fetch_glob("UNIVERSAL::$_")} }, keys %UNIVERSAL::
 # XXX import being here is really a bug
-is $sub2, "DOES VERSION can import isa";
+is $sub2, "DOES VERSION can import isa"
 
-eval 'sub UNIVERSAL::sleep {}';
-ok $a->can("sleep");
+eval 'sub UNIVERSAL::sleep {}'
+ok $a->can("sleep")
 
-ok ! UNIVERSAL::can($b, "can");
+ok ! UNIVERSAL::can($b, "can")
 
-ok ! $a->can("export_tags");	# a method in Exporter
+ok ! $a->can("export_tags")	# a method in Exporter
 
-ok ! UNIVERSAL::isa("\x[ffffff]\0", 'HASH');
+ok ! UNIVERSAL::isa("\x[ffffff]\0", 'HASH')
 
-do {
-    package Pickup;
-    use UNIVERSAL < qw( isa can VERSION );
+do
+    package Pickup
+    use UNIVERSAL < qw( isa can VERSION )
 
-    main::ok isa "Pickup", 'UNIVERSAL';
-    main::cmp_ok can( "Pickup", "can" ), '\==', \&UNIVERSAL::can;
-    main::ok VERSION "UNIVERSAL" ;
-};
+    main::ok isa "Pickup", 'UNIVERSAL'
+    main::cmp_ok can( "Pickup", "can" ), '\==', \&UNIVERSAL::can
+    main::ok VERSION "UNIVERSAL" 
+
 
 # bugid 3284
 # a second call to isa('UNIVERSAL') when @ISA is null failed due to caching
 
-@X::ISA= @(() );
-my $x = \%(); bless $x, 'X';
-ok $x->isa('UNIVERSAL');
-ok $x->isa('UNIVERSAL');
+@X::ISA= @(() )
+my $x = \%(); bless $x, 'X'
+ok $x->isa('UNIVERSAL')
+ok $x->isa('UNIVERSAL')
 
 
 # Check that the "historical accident" of UNIVERSAL having an import()
 # method doesn't effect anyone else.
-try { 'Some::Package'->import("bar") };
-is $^EVAL_ERROR, '';
+try { 'Some::Package'->import("bar") }
+is $^EVAL_ERROR, ''
 
 
 # This segfaulted in a blead.
-fresh_perl_is('package Foo; Foo->VERSION;  print $^STDOUT, "ok"', 'ok');
+fresh_perl_is('package Foo; Foo->VERSION;  print $^STDOUT, "ok"', 'ok')
 
-    package Foo;
+package Foo;
 
 sub DOES { 1 }
 
 package Bar;
 
-@Bar::ISA = @( 'Foo' );
+@Bar::ISA = @( 'Foo' )
 
-    package Baz;
+package Baz;
 
-    package main;
-ok( Foo->DOES( 'bar' ), 'DOES() should call DOES() on class' );
-ok( Bar->DOES( 'Bar' ), '... and should fall back to isa()' );
-ok( Bar->DOES( 'Foo' ), '... even when inherited' );
-ok( Baz->DOES( 'Baz' ), '... even without inheriting any other DOES()' );
-ok( ! Baz->DOES( 'Foo' ), '... returning true or false appropriately' );
+package main;
+ok( Foo->DOES( 'bar' ), 'DOES() should call DOES() on class' )
+ok( Bar->DOES( 'Bar' ), '... and should fall back to isa()' )
+ok( Bar->DOES( 'Foo' ), '... even when inherited' )
+ok( Baz->DOES( 'Baz' ), '... even without inheriting any other DOES()' )
+ok( ! Baz->DOES( 'Foo' ), '... returning true or false appropriately' )
 
-    package Pig;
-    package Bodine;
-Bodine->isa('Pig');
-*isa = \&UNIVERSAL::isa;
-try { isa(\%(), 'HASH') };
-main::is($^EVAL_ERROR, '', "*isa correctly found");
+package Pig;
+package Bodine;
+Bodine->isa('Pig')
+*isa = \&UNIVERSAL::isa
+try { isa(\%(), 'HASH') }
+main::is($^EVAL_ERROR, '', "*isa correctly found")
 
-    package main;
-main::dies_like( sub { UNIVERSAL::DOES(\@(), "foo") },
+package main;
+main::dies_like( sub (@< @_) { UNIVERSAL::DOES(\@(), "foo") },
                  qr/Can't call method "DOES" on unblessed reference/,
-                 'DOES call error message says DOES, not isa' );
+                 'DOES call error message says DOES, not isa' )

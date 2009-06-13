@@ -1,17 +1,16 @@
 #!./perl -w
 
-BEGIN {
-    use Config;
+BEGIN 
+    use Config
 
-    require "./test.pl";
+    require "./test.pl"
 
-    if( ! config_value("d_crypt") ) {
-        skip_all("crypt unimplemented");
-    }
-    else {
-        plan(tests => 4);
-    }
-}
+    if( ! config_value("d_crypt") )
+        skip_all("crypt unimplemented")
+    else
+        plan(tests => 4)
+    
+
 
 # Can't assume too much about the string returned by crypt(),
 # and about how many bytes of the encrypted (really, hashed)
@@ -23,21 +22,21 @@ BEGIN {
 # bets, given alternative encryption/hashing schemes like MD5,
 # C2 (or higher) security schemes, and non-UNIX platforms.
 
-SKIP: do {
-    skip ("VOS crypt ignores salt.", 1) if ($^OS_NAME eq 'vos');
-    ok(substr(crypt("ab", "cd"), 2) ne substr(crypt("ab", "ce"), 2), "salt makes a difference");
-};
+SKIP: do
+    skip ("VOS crypt ignores salt.", 1) if ($^OS_NAME eq 'vos')
+    ok(substr(crypt("ab", "cd"), 2) ne substr(crypt("ab", "ce"), 2), "salt makes a difference")
 
-use utf8;
 
-$a = "a\x[FF]\x{100}";
+use utf8
 
-try {$b = crypt($a, "cd")};
-is($^EVAL_ERROR, '',   "treat all strings as byte-strings");
+$a = "a\x[FF]\x{100}"
 
-chop $a; # throw away the wide character
+try {$b = crypt($a, "cd")}
+is($^EVAL_ERROR, '',   "treat all strings as byte-strings")
 
-try {$b = crypt($a, "cd")};
-is($^EVAL_ERROR, '',                   "downgrade to eight bit characters");
-is($b, crypt("a\x[FF]", "cd"), "downgrade results agree");
+chop $a # throw away the wide character
+
+try {$b = crypt($a, "cd")}
+is($^EVAL_ERROR, '',                   "downgrade to eight bit characters")
+is($b, crypt("a\x[FF]", "cd"), "downgrade results agree")
 

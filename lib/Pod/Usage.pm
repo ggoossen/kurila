@@ -7,10 +7,10 @@
 # as Perl itself.
 #############################################################################
 
-package Pod::Usage;
+package Pod::Usage
 
-our ($VERSION);
-$VERSION = "1.35";  ## Current version of this package
+our ($VERSION)
+$VERSION = "1.35"  ## Current version of this package
 
 =head1 NAME
 
@@ -30,13 +30,13 @@ Pod::Usage, pod2usage() - print a usage message from embedded pod documentation
   pod2usage($exit_status);
 
   pod2usage( { message => $message_text ,
-               exitval => $exit_status  ,  
-               verbose => $verbose_level,  
+               exitval => $exit_status  ,
+               verbose => $verbose_level,
                output  => $filehandle } );
 
   pod2usage(   msg     => $message_text ,
-               exitval => $exit_status  ,  
-               verbose => $verbose_level,  
+               exitval => $exit_status  ,
+               verbose => $verbose_level,
                output  => $filehandle   );
 
   pod2usage(   verbose => 2,
@@ -77,7 +77,7 @@ keys:
 =item C<msg>
 
 The text of a message to print immediately prior to printing the
-program's usage message. 
+program's usage message.
 
 =item C<exitval>
 
@@ -131,7 +131,7 @@ MSWin32 and DOS).
 By default, Pod::Usage will call L<perldoc> when verbose >= 2 is
 specified. This does not work well e.g. if the script was packed
 with L<PAR>. The noperldoc option suppresses the external call to
-L<perldoc> and uses the simple text formatter (L<Pod::Text>) to 
+L<perldoc> and uses the simple text formatter (L<Pod::Text>) to
 output the POD.
 
 =back
@@ -426,12 +426,12 @@ use Config;
 use Exporter;
 use File::Spec;
 
-our (@ISA, @EXPORT);
-@EXPORT = qw(&pod2usage);
-BEGIN {
-    require Pod::Text;
-    @ISA = qw( Pod::Text );
-}
+our (@ISA, @EXPORT)
+@EXPORT = qw(&pod2usage)
+BEGIN 
+    require Pod::Text
+    @ISA = qw( Pod::Text )
+
 
 
 ##---------------------------------------------------------------------------
@@ -440,116 +440,105 @@ BEGIN {
 ## Function definitions begin here
 ##---------------------------------
 
-sub pod2usage {
-          local($_) = shift;
-    my %opts;
+sub pod2usage
+    local($_) = shift
+    my %opts
     ## Collect arguments
-    if ((nelems @_) +> 0) {
+    if ((nelems @_) +> 0)
         ## Too many arguments - assume that this is a hash and
         ## the user forgot to pass a reference to it.
-        %opts = %($_, < @_);
-    }
-    elsif (!defined $_) {
-        $_ = "";
-    }
-    elsif (ref $_) {
+        %opts = %($_, < @_)
+    elsif (!defined $_)
+        $_ = ""
+    elsif (ref $_)
         ## User passed a ref to a hash
-        %opts = %( < $_->% )  if (ref($_) eq 'HASH');
-    }
-    elsif (m/^[-+]?\d+$/) {
+        %opts = %( < $_->% )  if (ref($_) eq 'HASH')
+    elsif (m/^[-+]?\d+$/)
         ## User passed in the exit value to use
-        %opts{+"exitval"} =  $_;
-    }
-    else {
+        %opts{+"exitval"} =  $_
+    else
         ## User passed in a message to print before issuing usage.
-        $_  and  %opts{+"message"} = $_;
-    }
+        $_  and  %opts{+"message"} = $_
+    
 
     ## Need this for backward compatibility since we formerly used
     ## options that were all uppercase words rather than ones that
     ## looked like Unix command-line options.
     ## to be uppercase keywords)
     %opts = %: < @+: map {
-                my $val = %opts{?$_};
-                s/^-//;
-                m/^msg/i   and  $_ = 'message';
-                m/^exit/i  and  $_ = 'exitval';
-                @: lc($_) => $val;    
-            }, keys %opts;
+        my $val = %opts{?$_};
+        s/^-//;
+        m/^msg/i   and  $_ = 'message';
+        m/^exit/i  and  $_ = 'exitval';
+        @: lc($_) => $val;
+    }, keys %opts
 
     ## Now determine default exitval and verbose values to use
-    if ((! defined %opts{?"exitval"}) && (! defined %opts{?"verbose"})) {
-        %opts{+"exitval"} = 2;
-        %opts{+"verbose"} = 0;
-    }
-    elsif (! defined %opts{?"exitval"}) {
-        %opts{+"exitval"} = (%opts{"verbose"} +> 0) ?? 1 !! 2;
-    }
-    elsif (! defined %opts{?"verbose"}) {
+    if ((! defined %opts{?"exitval"}) && (! defined %opts{?"verbose"}))
+        %opts{+"exitval"} = 2
+        %opts{+"verbose"} = 0
+    elsif (! defined %opts{?"exitval"})
+        %opts{+"exitval"} = (%opts{"verbose"} +> 0) ?? 1 !! 2
+    elsif (! defined %opts{?"verbose"})
         %opts{+"verbose"} = (lc(%opts{?"exitval"}) eq "noexit" ||
-                             %opts{?"exitval"} +< 2);
-    }
+                             %opts{?"exitval"} +< 2)
+    
 
     ## Default the output file
     %opts{+"output"} = (lc(%opts{?"exitval"}) eq "noexit" ||
                         %opts{?"exitval"} +< 2) ?? $^STDOUT !! $^STDERR
-    unless (defined %opts{?"output"});
+        unless (defined %opts{?"output"})
     ## Default the input file
-    %opts{+"input"} = $^PROGRAM_NAME  unless (defined %opts{?"input"});
+    %opts{+"input"} = $^PROGRAM_NAME  unless (defined %opts{?"input"})
 
     ## Look up input file in path if it doesnt exist.
-    unless ((ref %opts{?"input"}) || (-e %opts{?"input"})) {
-        my @($basename) = @(%opts{?"input"});
+    unless ((ref %opts{?"input"}) || (-e %opts{?"input"}))
+        my @($basename) = @(%opts{?"input"})
         my $pathsep = ($^OS_NAME =~ m/^(?:dos|os2|MSWin32)$/) ?? ";"
-            !! (($^OS_NAME eq 'MacOS' || $^OS_NAME eq 'VMS') ?? ',' !!  ":");
-        my $pathspec = %opts{?"pathlist"} || env::var('PATH') || env::var('PERL5LIB');
+            !! (($^OS_NAME eq 'MacOS' || $^OS_NAME eq 'VMS') ?? ',' !!  ":")
+        my $pathspec = %opts{?"pathlist"} || env::var('PATH') || env::var('PERL5LIB')
 
-        my @paths = @( (ref $pathspec) ?? < $pathspec->@ !! < split($pathsep, $pathspec) );
-        for my $dirname ( @paths) {
-            local $_ = File::Spec->catfile($dirname, $basename) if length $dirname;
-            last if (-e $_) && (%opts{+"input"} = $_);
-        }
-    }
+        my @paths = @( (ref $pathspec) ?? < $pathspec->@ !! < split($pathsep, $pathspec) )
+        for my $dirname ( @paths)
+            local $_ = File::Spec->catfile($dirname, $basename) if length $dirname
+            last if (-e $_) && (%opts{+"input"} = $_)
+        
+    
 
     ## Now create a pod reader and constrain it to the desired sections.
-    my $parser = Pod::Usage->new(USAGE_OPTIONS => \%opts);
-    if (%opts{"verbose"} == 0) {
-        $parser->select('SYNOPSIS\s*');
-    }
-    elsif (%opts{"verbose"} == 1) {
+    my $parser = Pod::Usage->new(USAGE_OPTIONS => \%opts)
+    if (%opts{"verbose"} == 0)
+        $parser->select('SYNOPSIS\s*')
+    elsif (%opts{"verbose"} == 1)
         my $opt_re = '(?i)' .
             '(?:OPTIONS|ARGUMENTS)' .
-            '(?:\s*(?:AND|\/)\s*(?:OPTIONS|ARGUMENTS))?';
-        $parser->select( 'SYNOPSIS', $opt_re, "DESCRIPTION/$opt_re" );
-    }
-    elsif (%opts{"verbose"} +>= 2 && %opts{"verbose"} != 99) {
-        $parser->select('.*');
-    }
-    elsif (%opts{"verbose"} == 99) {
-        $parser->select( %opts{"sections"} );
-        %opts{"verbose"} = 1;
-    }
+            '(?:\s*(?:AND|\/)\s*(?:OPTIONS|ARGUMENTS))?'
+        $parser->select( 'SYNOPSIS', $opt_re, "DESCRIPTION/$opt_re" )
+    elsif (%opts{"verbose"} +>= 2 && %opts{"verbose"} != 99)
+        $parser->select('.*')
+    elsif (%opts{"verbose"} == 99)
+        $parser->select( %opts{"sections"} )
+        %opts{"verbose"} = 1
+    
 
     ## Now translate the pod document and then exit with the desired status
     if ( !%opts{?"noperldoc"}
-        and  %opts{?"verbose"} +>= 2 
-        and  !ref(%opts{?"input"})
+           and  %opts{?"verbose"} +>= 2
+           and  !ref(%opts{?"input"})
         and  %opts{?"output"} \== $^STDOUT )
-    {
         ## spit out the entire PODs. Might as well invoke perldoc
-        my $progpath = File::Spec->catfile(config_value('scriptdir'), "perldoc");
-        system($progpath, %opts{?"input"});
-        if($^CHILD_ERROR) {
+        my $progpath = File::Spec->catfile(config_value('scriptdir'), "perldoc")
+        system($progpath, %opts{?"input"})
+        if($^CHILD_ERROR)
             # RT16091: fall back to more if perldoc failed
-            system(env::var('PAGER') || 'more', %opts{?"input"});
-        }
-    }
-    else {
-        $parser->parse_from_file(%opts{?"input"}, %opts{"output"});
-    }
+            system(env::var('PAGER') || 'more', %opts{?"input"})
+        
+    else
+        $parser->parse_from_file(%opts{?"input"}, %opts{"output"})
+    
 
-    exit(%opts{?"exitval"})  unless (lc(%opts{?"exitval"}) eq 'noexit');
-}
+    exit(%opts{?"exitval"})  unless (lc(%opts{?"exitval"}) eq 'noexit')
+
 
 ##---------------------------------------------------------------------------
 
@@ -557,29 +546,29 @@ sub pod2usage {
 ## Method definitions begin here
 ##-------------------------------
 
-sub new {
-    my $this = shift;
-    my $class = ref($this) || $this;
-    my %params = %( < @_ );
-    my $self = \%(< %params);
-    bless $self, $class;
-    if ($self->can('initialize')) {
-        $self->initialize();
-    } else {
-        $self = $self->SUPER::new();
-        $self->% = %(< $self->%, < %params);
-    }
-    return $self;
-}
+sub new
+    my $this = shift
+    my $class = ref($this) || $this
+    my %params = %( < @_ )
+    my $self = \%(< %params)
+    bless $self, $class
+    if ($self->can('initialize'))
+        $self->initialize()
+    else
+        $self = $self->SUPER::new()
+        $self->% = %(< $self->%, < %params)
+    
+    return $self
 
-sub select {
-    my @($self, @< @res) =  @_;
-    if (@ISA[0]->can('select')) {
-        $self->SUPER::select(< @_);
-    } else {
-        $self->{+USAGE_SELECT} = \@res;
-    }
-}
+
+sub select
+    my @($self, @< @res) =  @_
+    if (@ISA[0]->can('select'))
+        $self->SUPER::select(< @_)
+    else
+        $self->{+USAGE_SELECT} = \@res
+    
+
 
 # Override Pod::Text->seq_i to return just "arg", not "*arg*".
 sub seq_i { return @_[1] }
@@ -587,77 +576,77 @@ sub seq_i { return @_[1] }
 # This overrides the Pod::Text method to do something very akin to what
 # Pod::Select did as well as the work done below by preprocess_paragraph.
 # Note that the below is very, very specific to Pod::Text.
-sub _handle_element_end($self, $element) {
-    if ($element eq 'head1') {
-        $self->%{+USAGE_HEAD1} = $self->%{PENDING}->[-1]->[1];
-        if ($self->{USAGE_OPTIONS}->{?verbose} +< 2) {
-            $self->%{PENDING}->[-1]->[1] =~ s/^\s*SYNOPSIS\s*$/USAGE/;
-        }
-    } elsif ($element eq 'head2') {
-        $self->%{+USAGE_HEAD2} = $self->%{PENDING}->[-1]->[1];
-    }
-    if ($element eq 'head1' || $element eq 'head2') {
-        $self->%{+USAGE_SKIPPING} = 1;
-        my $heading = $self->%{?USAGE_HEAD1};
-        $heading .= '/' . $self->%{?USAGE_HEAD2} if defined $self->%{?USAGE_HEAD2};
-        if (!$self->%{?USAGE_SELECT} || !nelems  $self->%{?USAGE_SELECT}->@) {
-            $self->%{+USAGE_SKIPPING} = 0;
-        } else {
-            for (  $self->%{USAGE_SELECT}->@) {
-                if ($heading =~ m/^$_\s*$/) {
-                    $self->%{+USAGE_SKIPPING} = 0;
-                    last;
-                }
-            }
-        }
+sub _handle_element_end($self, $element)
+    if ($element eq 'head1')
+        $self->%{+USAGE_HEAD1} = $self->%{PENDING}->[-1]->[1]
+        if ($self->{USAGE_OPTIONS}->{?verbose} +< 2)
+            $self->%{PENDING}->[-1]->[1] =~ s/^\s*SYNOPSIS\s*$/USAGE/
+        
+    elsif ($element eq 'head2')
+        $self->%{+USAGE_HEAD2} = $self->%{PENDING}->[-1]->[1]
+    
+    if ($element eq 'head1' || $element eq 'head2')
+        $self->%{+USAGE_SKIPPING} = 1
+        my $heading = $self->%{?USAGE_HEAD1}
+        $heading .= '/' . $self->%{?USAGE_HEAD2} if defined $self->%{?USAGE_HEAD2}
+        if (!$self->%{?USAGE_SELECT} || !nelems  $self->%{?USAGE_SELECT}->@)
+            $self->%{+USAGE_SKIPPING} = 0
+        else
+            for (  $self->%{USAGE_SELECT}->@)
+                if ($heading =~ m/^$_\s*$/)
+                    $self->%{+USAGE_SKIPPING} = 0
+                    last
+                
+            
+        
 
         # Try to do some lowercasing instead of all-caps in headings, and use
         # a colon to end all headings.
-        if($self->{USAGE_OPTIONS}->{?verbose} +< 2) {
-            local $_ = $self->%{PENDING}->[-1]->[1];
-            s{([A-Z])([A-Z]+)}{$(((length($2) +> 2) ?? $1 !! lc($1)) . lc($2))}g;
-            s/\s*$/:/  unless (m/:\s*$/);
-            $_ .= "\n";
-            $self->%{PENDING}->[-1]->[1] = $_;
-        }
-    }
-    if ($self->%{?USAGE_SKIPPING}) {
-        pop  $self->%{PENDING}->@;
-    } else {
-        $self->SUPER::_handle_element_end($element);
-    }
-}
+        if($self->{USAGE_OPTIONS}->{?verbose} +< 2)
+            local $_ = $self->%{PENDING}->[-1]->[1]
+            s{([A-Z])([A-Z]+)}{$(((length($2) +> 2) ?? $1 !! lc($1)) . lc($2))}g
+            s/\s*$/:/  unless (m/:\s*$/)
+            $_ .= "\n"
+            $self->%{PENDING}->[-1]->[1] = $_
+        
+    
+    if ($self->%{?USAGE_SKIPPING})
+        pop  $self->%{PENDING}->@
+    else
+        $self->SUPER::_handle_element_end($element)
+    
 
-sub start_document($self, ...) {
-    $self->SUPER::start_document();
-    my $msg = $self->{USAGE_OPTIONS}->{?message}  or  return 1;
-    my $out_fh = $self->output_fh();
-    print $out_fh, "$msg\n";
-}
 
-sub begin_pod {
-    my $self = shift;
-    $self->SUPER::begin_pod();  ## Have to call superclass
-    my $msg = $self->{USAGE_OPTIONS}->{?message}  or  return 1;
-    my $out_fh = $self->output_handle();
-    print $out_fh, "$msg\n";
-}
+sub start_document($self, ...)
+    $self->SUPER::start_document()
+    my $msg = $self->{USAGE_OPTIONS}->{?message}  or  return 1
+    my $out_fh = $self->output_fh()
+    print $out_fh, "$msg\n"
 
-sub preprocess_paragraph {
-    my $self = shift;
-    local $_ = shift;
-    my $line = shift;
+
+sub begin_pod
+    my $self = shift
+    $self->SUPER::begin_pod()  ## Have to call superclass
+    my $msg = $self->{USAGE_OPTIONS}->{?message}  or  return 1
+    my $out_fh = $self->output_handle()
+    print $out_fh, "$msg\n"
+
+
+sub preprocess_paragraph
+    my $self = shift
+    local $_ = shift
+    my $line = shift
     ## See if this is a heading and we arent printing the entire manpage.
-    if (($self->{USAGE_OPTIONS}->{?verbose} +< 2) && m/^=head/) {
+    if (($self->{USAGE_OPTIONS}->{?verbose} +< 2) && m/^=head/)
         ## Change the title of the SYNOPSIS section to USAGE
-        s/^=head1\s+SYNOPSIS\s*$/=head1 USAGE/;
+        s/^=head1\s+SYNOPSIS\s*$/=head1 USAGE/
         ## Try to do some lowercasing instead of all-caps in headings
-        s{([A-Z])([A-Z]+)}{$(((length($2) +> 2) ?? $1 !! lc($1)) . lc($2))}g;
+        s{([A-Z])([A-Z]+)}{$(((length($2) +> 2) ?? $1 !! lc($1)) . lc($2))}g
         ## Use a colon to end all headings
-        s/\s*$/:/  unless (m/:\s*$/);
-        $_ .= "\n";
-    }
-    return  $self->SUPER::preprocess_paragraph($_);
-}
+        s/\s*$/:/  unless (m/:\s*$/)
+        $_ .= "\n"
+    
+    return  $self->SUPER::preprocess_paragraph($_)
 
-1; # keep require happy
+
+1 # keep require happy

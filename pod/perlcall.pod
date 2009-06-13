@@ -245,11 +245,12 @@ It is possible for the Perl subroutine you are calling to terminate
 abnormally, e.g., by calling I<die> explicitly or by not actually
 existing.  By default, when either of these events occurs, the
 process will terminate immediately.  If you want to trap this
-type of event, specify the G_EVAL flag.  It will put an I<eval { }>
+type of event, specify the G_EVAL flag.  It will put an I<try { }>
 around the subroutine call.
 
 Whenever control returns from the I<call_*> function you need to
-check the C<$@> variable as you would in a normal Perl script.
+check the C<ERRSV> variable as you would in a normal Perl script.
+The error can be rethrown using C<die_where(ERRSV)>.
 
 The value returned from the I<call_*> function is dependent on
 what other flags have been specified and whether an error has

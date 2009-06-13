@@ -1,6 +1,6 @@
 
-package Pod::Simple::DumpAsXML;
-our $VERSION = '2.02';
+package Pod::Simple::DumpAsXML
+our $VERSION = '2.02'
 use Pod::Simple ();
 BEGIN {our @ISA = @('Pod::Simple')}
 
@@ -10,81 +10,81 @@ use Carp ();
 
 BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
 
-sub new($self, @< @_) {
-    my $new = $self->SUPER::new(< @_);
-    $new->{+'output_fh'} ||= $^STDOUT;
-    $new->accept_codes('VerbatimFormatted');
-    return $new;
-}
+sub new($self, @< @_)
+    my $new = $self->SUPER::new(< @_)
+    $new->{+'output_fh'} ||= $^STDOUT
+    $new->accept_codes('VerbatimFormatted')
+    return $new
+
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub _handle_element_start {
+sub _handle_element_start
     # ($self, $element_name, $attr_hash_r)
-    my $fh = @_[0]->{?'output_fh'};
-    DEBUG and print $^STDOUT, "++ @_[1]\n";
+    my $fh = @_[0]->{?'output_fh'}
+    DEBUG and print $^STDOUT, "++ @_[1]\n"
 
-    print $fh,   '  ' x (@_[0]->{?'indent'} || 0),  "<", @_[1];
+    print $fh,   '  ' x (@_[0]->{?'indent'} || 0),  "<", @_[1]
 
-    foreach my $key (sort keys @_[2]->%) {
-        unless($key =~ m/^~/s) {
-            next if $key eq 'start_line' and @_[0]->{?'hide_line_numbers'};
-            my $value = @_[2]->{?$key};
-            if (@_[1] eq 'L' and $key =~ m/^(?:section|to)$/) {
-                $value = $value->as_string;
-            }
-            $value = _xml_escape($value);
-            print $fh, ' ', $key, '="', $value, '"';
-        }
-    }
+    foreach my $key (sort keys @_[2]->%)
+        unless($key =~ m/^~/s)
+            next if $key eq 'start_line' and @_[0]->{?'hide_line_numbers'}
+            my $value = @_[2]->{?$key}
+            if (@_[1] eq 'L' and $key =~ m/^(?:section|to)$/)
+                $value = $value->as_string
+            
+            $value = _xml_escape($value)
+            print $fh, ' ', $key, '="', $value, '"'
+        
+    
 
 
-    print $fh, ">\n";
-    @_[0]->{+'indent'}++;
-    return;
-}
+    print $fh, ">\n"
+    @_[0]->{+'indent'}++
+    return
 
-sub _handle_text {
-    DEBUG and print $^STDOUT, "== \"@_[1]\"\n";
-    if(length @_[1]) {
-        my $indent = '  ' x @_[0]->{?'indent'};
-        my $text = @_[1];
-        $text = _xml_escape($text);
+
+sub _handle_text
+    DEBUG and print $^STDOUT, "== \"@_[1]\"\n"
+    if(length @_[1])
+        my $indent = '  ' x @_[0]->{?'indent'}
+        my $text = @_[1]
+        $text = _xml_escape($text)
         $text =~  # A not-totally-brilliant wrapping algorithm:
-        s/(
+            s/(
          [^\n]{55}         # Snare some characters from a line
          [^\n\ ]{0,50}     #  and finish any current word
         )
         \x20{1,10}(?!\n)   # capture some spaces not at line-end
        /$1\n$indent/gx     # => line-break here
-        ;
+        
 
-            print @_[0]->{?'output_fh'} ,$indent, $text, "\n";
-    }
-    return;
-}
+        print @_[0]->{?'output_fh'} ,$indent, $text, "\n"
+    
+    return
 
-sub _handle_element_end($self, $name) {
-    DEBUG and print $^STDOUT, "-- $name\n";
+
+sub _handle_element_end($self, $name)
+    DEBUG and print $^STDOUT, "-- $name\n"
     print $self->{?'output_fh'}
-        ,'  ' x --$self->{+'indent'}, "</", $name, ">\n";
-    return;
-}
+        ,'  ' x --$self->{+'indent'}, "</", $name, ">\n"
+    return
+
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-sub _xml_escape($x) {
+sub _xml_escape($x)
     # Escape things very cautiously:
-    $x =~ s/([^-\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/$('&#'.(ord($1)).';')/g;
+    $x =~ s/([^-\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/$('&#'.(ord($1)).';')/g
     # Yes, stipulate the list without a range, so that this can work right on
     #  all charsets that this module happens to run under.
     # Altho, hmm, what about that ord?  Presumably that won't work right
     #  under non-ASCII charsets.  Something should be done about that.
-    return $x;
-}
+    return $x
+
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-1;
+1
 
 __END__
 

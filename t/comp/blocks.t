@@ -1,10 +1,10 @@
 #!./perl
 
-BEGIN {
-    require './test.pl';
-}
+BEGIN 
+    require './test.pl'
 
-plan tests => 2;
+
+plan tests => 2
 
 my @expect = qw(
 b1
@@ -27,10 +27,10 @@ u3
 u4
 e2
 e1
-		);
-my $expect = ":" . join(":", @expect);
+		)
+my $expect = ":" . join(":", @expect)
 
-fresh_perl_is(<<'SCRIPT', $expect,\%(switches => \@(''), stdin => '', stderr => 1 ),'Order of execution of special blocks');
+fresh_perl_is(<<'SCRIPT', $expect,\%(switches => \@(''), stdin => '', stderr => 1 ),'Order of execution of special blocks')
 BEGIN {print $^STDOUT, ":b1"}
 END {print $^STDOUT, ":e1"}
 BEGIN {print $^STDOUT, ":b2"}
@@ -44,8 +44,8 @@ eval 'BEGIN {print $^STDOUT, ":b5"}';
 eval 'UNITCHECK {print $^STDOUT, ":u2"}';
 eval 'UNITCHECK {print $^STDOUT, ":u3"; UNITCHECK {print $^STDOUT, ":u4"}}';
 "a" =~ m/(?{UNITCHECK {print $^STDOUT, ":u5"};
-	   CHECK {print $^STDOUT, ":c2"};
-	   BEGIN {print $^STDOUT, ":b6"}})/x;
+           CHECK {print $^STDOUT, ":c2"};
+           BEGIN {print $^STDOUT, ":b6"}})/x;
 try {BEGIN {print $^STDOUT, ":b7"}};
 try {UNITCHECK {print $^STDOUT, ":u6"}};
 try {INIT {print $^STDOUT, ":i2"}};
@@ -63,10 +63,10 @@ SCRIPT
             # INIT
             qw( main bar myfoo foo ), <
             # END
-            qw(foo myfoo bar main  ));
+            qw(foo myfoo bar main  ))
 
-$expect = ":" . join(":", @expect);
-fresh_perl_is(<<'SCRIPT2', $expect,\%(switches => \@(''), stdin => '', stderr => 1 ),'blocks interact with packages/scopes');
+$expect = ":" . join(":", @expect)
+fresh_perl_is(<<'SCRIPT2', $expect,\%(switches => \@(''), stdin => '', stderr => 1 ),'blocks interact with packages/scopes')
 our $f;
 BEGIN {$f = 'main'; print $^STDOUT, ":$f"}
 UNITCHECK {print $^STDOUT, ":$f"}

@@ -194,7 +194,6 @@ Afnp	|int	|printf_nocontext|NN const char *format|...
 #endif
 pd	|void	|cv_setcv	|NN CV* dst|NN CV* src
 ApdR	|SV*	|cv_const_sv	|NULLOK CV* cv
-pR	|SV*	|op_const_sv	|NULLOK const OP* o|NULLOK CV* cv
 Api	|bool	|cv_assignarg_flag	|NN CV* cv
 Api	|bool	|cv_optassignarg_flag	|NN CV* cv
 Apd	|void	|cv_undef	|NN CV* cv
@@ -1440,12 +1439,12 @@ sR	|char*	|scan_str	|NN char *start|int keep_quoted|int keep_delims|NN yy_str_in
 sR	|char*	|scan_subst	|NN char *start
 s	|char*	|scan_word	|NN char *s|NN char *dest|STRLEN destlen \
 				|int allow_package|NN STRLEN *slp
-sR	|char*	|skipspace	|NN char *s|bool continuous_line
+sR	|char*	|skipspace	|NN char *s|NULLOK bool* iscontinuationp
 sR	|char*	|swallow_bom	|NN char *s
 s	|void	|checkcomma	|NN const char *s|NN const char *name \
 				|NN const char *what
 s	|void	|force_ident	|NN const char *s|int kind
-s	|void	|incline	|NN const char *s
+s	|void	|incline	|NN char *s
 s	|int	|intuit_more	|NN char *s
 s	|I32	|lop		|I32 f|int x|NN char *s
 rs	|void	|missingterminator	|NULLOK char *s

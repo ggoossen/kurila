@@ -1,65 +1,65 @@
-package File::stat;
+package File::stat
 
-use warnings;
+use warnings
 
-our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
+our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS)
 
-our $VERSION = '1.00';
+our $VERSION = '1.00'
 
-BEGIN { 
-    use Exporter   ();
-    @EXPORT      = qw(stat lstat);
+BEGIN 
+    use Exporter   ()
+    @EXPORT      = qw(stat lstat)
     @EXPORT_OK   = qw( $st_dev	   $st_ino    $st_mode 
 		       $st_nlink   $st_uid    $st_gid 
 		       $st_rdev    $st_size 
 		       $st_atime   $st_mtime  $st_ctime 
 		       $st_blksize $st_blocks
-		    );
-    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT );
-}
+		    )
+    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT )
+
 our ($st_dev, $st_ino, $st_mode, $st_nlink, $st_uid, $st_gid,
     $st_rdev, $st_size, $st_atime, $st_mtime, $st_ctime,
-    $st_blksize, $st_blocks);
+    $st_blksize, $st_blocks)
 
 # Class::Struct forbids use of @ISA
-sub import {
-    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
-    return Exporter::import(< @_);
-}
+sub import
+    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1
+    return Exporter::import(< @_)
+
 
 use Class::Struct < qw(struct);
 struct 'File::stat' => \ @+: map { @: $_ => '$' }, qw{
 	 dev ino mode nlink uid gid rdev size
 	 atime mtime ctime blksize blocks
-     };
+     }
 
-sub populate {
-    return unless (nelems @_);
-    my $stob = new();
+sub populate
+    return unless (nelems @_)
+    my $stob = new()
     $stob->@ = @(
- $st_dev, $st_ino, $st_mode, $st_nlink, $st_uid, $st_gid, $st_rdev,
- $st_size, $st_atime, $st_mtime, $st_ctime, $st_blksize, $st_blocks ) 
-        =  @_;
-    return $stob;
-} 
+        $st_dev, $st_ino, $st_mode, $st_nlink, $st_uid, $st_gid, $st_rdev,
+        $st_size, $st_atime, $st_mtime, $st_ctime, $st_blksize, $st_blocks )
+        =  @_
+    return $stob
+
 
 sub lstat ($f)  { populate(CORE::lstat($f)) }
 
-sub stat ($arg) {
-    my $st = populate(CORE::stat $arg);
-    return $st if $st;
-    my $fh;
-    do {
-        local $^OS_ERROR = undef;
-        require Symbol;
-        my @($pkg) = caller@();
-        $fh = \ Symbol::fetch_glob( $pkg . "::" . $arg)->*;
-        return unless defined fileno $fh;
-    };
-    return populate(CORE::stat $fh);
-}
+sub stat ($arg)
+    my $st = populate(CORE::stat $arg)
+    return $st if $st
+    my $fh
+    do
+        local $^OS_ERROR = undef
+        require Symbol
+        my @($pkg) = caller@()
+        $fh = \ Symbol::fetch_glob( $pkg . "::" . $arg)->*
+        return unless defined fileno $fh
+    
+    return populate(CORE::stat $fh)
 
-1;
+
+1
 __END__
 
 =head1 NAME

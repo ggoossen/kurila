@@ -1,13 +1,13 @@
-package Time::HiRes;
+package Time::HiRes
 
-our ($VERSION, $XS_VERSION, @ISA, @EXPORT, @EXPORT_OK);
+our ($VERSION, $XS_VERSION, @ISA, @EXPORT, @EXPORT_OK)
 
-require Exporter;
-require DynaLoader;
+require Exporter
+require DynaLoader
 
-@ISA = qw(Exporter DynaLoader);
+@ISA = qw(Exporter DynaLoader)
 
-@EXPORT = @();
+@EXPORT = @()
 @EXPORT_OK = qw (usleep sleep ualarm alarm gettimeofday time tv_interval
 		 getitimer setitimer nanosleep clock_gettime clock_getres
 		 clock clock_nanosleep
@@ -20,40 +20,40 @@ require DynaLoader;
 		 d_nanosleep d_clock_gettime d_clock_getres
 		 d_clock d_clock_nanosleep
 		 stat
-		);
+		)
 
-$VERSION = v1.9712;
-$XS_VERSION = $VERSION;
+$VERSION = v1.9712
+$XS_VERSION = $VERSION
 
-sub import {
-    my $this = shift;
-    for my $i (@_) {
+sub import
+    my $this = shift
+    for my $i (@_)
         if (($i eq 'clock_getres'    && !&d_clock_getres( < @_ ))    ||
             ($i eq 'clock_gettime'   && !&d_clock_gettime( < @_ ))   ||
             ($i eq 'clock_nanosleep' && !&d_clock_nanosleep( < @_ )) ||
             ($i eq 'clock'           && !&d_clock( < @_ ))           ||
             ($i eq 'nanosleep'       && !&d_nanosleep( < @_ ))       ||
             ($i eq 'usleep'          && !&d_usleep( < @_ ))          ||
-            ($i eq 'ualarm'          && !&d_ualarm( < @_ ))) {
-            require Carp;
-            Carp::croak("Time::HiRes::$i(): unimplemented in this platform");
-        }
-    }
-    Time::HiRes->export_to_level(1, $this, < @_);
-}
+            ($i eq 'ualarm'          && !&d_ualarm( < @_ )))
+            require Carp
+            Carp::croak("Time::HiRes::$i(): unimplemented in this platform")
+        
+    
+    Time::HiRes->export_to_level(1, $this, < @_)
 
-Time::HiRes->bootstrap();
+
+Time::HiRes->bootstrap()
 
 # Preloaded methods go here.
 
-sub tv_interval($a, ?$b) {
-    $b = \@( < gettimeofday() ) unless defined($b);
-    ($b->[0] - $a->[0]) + (($b->[1] - $a->[1]) / 1_000_000);
-}
+sub tv_interval($a, ?$b)
+    $b = \@( < gettimeofday() ) unless defined($b)
+    ($b->[0] - $a->[0]) + (($b->[1] - $a->[1]) / 1_000_000)
+
 
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
-1;
+1
 __END__
 
 =head1 NAME

@@ -514,9 +514,6 @@ PERL_CALLCONV void	Perl_cv_setcv(pTHX_ CV* dst, CV* src)
 PERL_CALLCONV SV*	Perl_cv_const_sv(pTHX_ CV* cv)
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV SV*	Perl_op_const_sv(pTHX_ const OP* o, CV* cv)
-			__attribute__warn_unused_result__;
-
 PERL_INLINE_CALLCONV bool	Perl_cv_assignarg_flag(pTHX_ CV* cv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_CV_ASSIGNARG_FLAG	\
@@ -5042,7 +5039,7 @@ STATIC char*	S_scan_word(pTHX_ char *s, char *dest, STRLEN destlen, int allow_pa
 #define PERL_ARGS_ASSERT_SCAN_WORD	\
 	assert(s); assert(dest); assert(slp)
 
-STATIC char*	S_skipspace(pTHX_ char *s, bool continuous_line)
+STATIC char*	S_skipspace(pTHX_ char *s, bool* iscontinuationp)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SKIPSPACE	\
@@ -5066,7 +5063,7 @@ STATIC void	S_force_ident(pTHX_ const char *s, int kind)
 #define PERL_ARGS_ASSERT_FORCE_IDENT	\
 	assert(s)
 
-STATIC void	S_incline(pTHX_ const char *s)
+STATIC void	S_incline(pTHX_ char *s)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_INCLINE	\
 	assert(s)

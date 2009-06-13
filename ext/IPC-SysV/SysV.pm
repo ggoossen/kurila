@@ -4,18 +4,18 @@
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
-package IPC::SysV;
+package IPC::SysV
 
-our (@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION, $XS_VERSION);
+our (@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION, $XS_VERSION)
 use Carp;
 use Config;
 
-require Exporter;
-@ISA = qw(Exporter);
+require Exporter
+@ISA = qw(Exporter)
 
-$VERSION = "1.05";
-$XS_VERSION = $VERSION;
-$VERSION = eval $VERSION;
+$VERSION = "1.05"
+$XS_VERSION = $VERSION
+$VERSION = eval $VERSION
 
 @EXPORT_OK = qw(
 	GETALL GETNCNT GETPID GETVAL GETZCNT
@@ -43,20 +43,19 @@ $VERSION = eval $VERSION;
 	S_IROTH S_IWOTH S_IRWXO
 
 	ftok
-);
+)
 
-BOOT_XS: do {
-    require DynaLoader;
+BOOT_XS: do
+    require DynaLoader
 
     # DynaLoader calls dl_load_flags as a static method.
-    *dl_load_flags = DynaLoader->can('dl_load_flags');
+    *dl_load_flags = DynaLoader->can('dl_load_flags')
 
-    do {
-        __PACKAGE__->can('bootstrap') || \&DynaLoader::bootstrap
-    }->(__PACKAGE__, $XS_VERSION);
-};
+    ( __PACKAGE__->can('bootstrap') || \&DynaLoader::bootstrap )
+       ->(__PACKAGE__, $XS_VERSION)
 
-1;
+
+1
 
 __END__
 

@@ -3867,7 +3867,7 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
             + (sizeof("(?:)") - 1);
 
 	p = sv_grow((SV *)rx, wraplen + 1);
-	SvCUR_set(rx, wraplen);
+	SvCUR_set(reTsv(rx), wraplen);
 	SvPOK_on(rx);
         *p++='('; *p++='?';
         if (has_p)

@@ -1,18 +1,18 @@
-package Unicode::Normalize;
+package Unicode::Normalize
 
-use warnings;
-use Carp;
+use warnings
+use Carp
 
-no warnings 'utf8';
+no warnings 'utf8'
 
-our $VERSION = '1.02';
-our $PACKAGE = __PACKAGE__;
+our $VERSION = '1.02'
+our $PACKAGE = __PACKAGE__
 
-require Exporter;
-require DynaLoader;
+require Exporter
+require DynaLoader
 
-our @ISA = qw(Exporter DynaLoader);
-our @EXPORT = qw( NFC NFD NFKC NFKD );
+our @ISA = qw(Exporter DynaLoader)
+our @EXPORT = qw( NFC NFD NFKC NFKD )
 our @EXPORT_OK = qw(
     normalize decompose reorder compose
     checkNFD checkNFKD checkNFC checkNFKC check
@@ -21,17 +21,17 @@ our @EXPORT_OK = qw(
     isNFD_NO isNFC_NO isNFC_MAYBE isNFKD_NO isNFKC_NO isNFKC_MAYBE
     FCD checkFCD FCC checkFCC composeContiguous
     splitOnLastStarter
-);
+)
 our %EXPORT_TAGS = %(
-        all       => @EXPORT +@+ @EXPORT_OK,
-            normalize => @EXPORT +@+ qw/normalize decompose reorder compose/,
-            check     => qw/checkNFD checkNFKD checkNFC checkNFKC check/,
-            fast      => qw/FCD checkFCD FCC checkFCC composeContiguous/,
-    );
+    all       => @EXPORT +@+ @EXPORT_OK,
+    normalize => @EXPORT +@+ qw/normalize decompose reorder compose/,
+    check     => qw/checkNFD checkNFKD checkNFC checkNFKC check/,
+    fast      => qw/FCD checkFCD FCC checkFCC composeContiguous/,
+    )
 
 ######
 
-Unicode::Normalize->bootstrap( $VERSION);
+Unicode::Normalize->bootstrap( $VERSION)
 
 ######
 
@@ -39,38 +39,37 @@ Unicode::Normalize->bootstrap( $VERSION);
 ## utilites for tests
 ##
 
-sub pack_U {
-    return pack('U*', < @_);
-}
+sub pack_U
+    return pack('U*', < @_)
 
-sub unpack_U {
-    return @( unpack('U*', shift(@_).pack('U*')) );
-}
+
+sub unpack_U
+    return @( unpack('U*', shift(@_).pack('U*')) )
+
 
 
 ##
 ## normalization forms
 ##
 
-sub FCD ($str) {
-    return checkFCD($str) ?? $str !! NFD($str);
-}
+sub FCD ($str)
+    return checkFCD($str) ?? $str !! NFD($str)
+
 
 our %formNorm = %(
-        NFC  => \&NFC,	C  => \&NFC,
-            NFD  => \&NFD,	D  => \&NFD,
-            NFKC => \&NFKC,	KC => \&NFKC,
-            NFKD => \&NFKD,	KD => \&NFKD,
-            FCD  => \&FCD,	FCC => \&FCC,
-    );
+    NFC  => \&NFC,	C  => \&NFC,
+    NFD  => \&NFD,	D  => \&NFD,
+    NFKC => \&NFKC,	KC => \&NFKC,
+    NFKD => \&NFKD,	KD => \&NFKD,
+    FCD  => \&FCD,	FCC => \&FCC,
+    )
 
 sub normalize($form, $str)
-{
-    if (exists %formNorm{$form}) {
-        return %formNorm{?$form}->($str);
-    }
-    croak($PACKAGE."::normalize: invalid form name: $form");
-}
+    if (exists %formNorm{$form})
+        return %formNorm{?$form}->($str)
+    
+    croak($PACKAGE."::normalize: invalid form name: $form")
+
 
 
 ##
@@ -78,22 +77,21 @@ sub normalize($form, $str)
 ##
 
 our %formCheck = %(
-        NFC  => \&checkNFC, 	C  => \&checkNFC,
-            NFD  => \&checkNFD, 	D  => \&checkNFD,
-            NFKC => \&checkNFKC,	KC => \&checkNFKC,
-            NFKD => \&checkNFKD,	KD => \&checkNFKD,
-            FCD  => \&checkFCD, 	FCC => \&checkFCC,
-    );
+    NFC  => \&checkNFC, 	C  => \&checkNFC,
+    NFD  => \&checkNFD, 	D  => \&checkNFD,
+    NFKC => \&checkNFKC,	KC => \&checkNFKC,
+    NFKD => \&checkNFKD,	KD => \&checkNFKD,
+    FCD  => \&checkFCD, 	FCC => \&checkFCC,
+    )
 
 sub check($form, $str)
-{
-    if (exists %formCheck{$form}) {
-        return %formCheck{?$form}->($str);
-    }
-    croak($PACKAGE."::check: invalid form name: $form");
-}
+    if (exists %formCheck{$form})
+        return %formCheck{?$form}->($str)
+    
+    croak($PACKAGE."::check: invalid form name: $form")
 
-1;
+
+1
 __END__
 
 =head1 NAME

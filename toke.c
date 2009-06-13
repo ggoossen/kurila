@@ -148,10 +148,10 @@ static const char* const lex_state_names[] = {
 #  define SKIPSPACE2(s,tsv) skipspace2(s,&tsv)
 #  define PEEKSPACE(s) skipspace2(s,0)
 #else
-#  define SKIPSPACE0(s) skipspace(s, TRUE)
-#  define SKIPSPACE1(s) skipspace(s, TRUE)
-#  define SKIPSPACE2(s,tsv) skipspace(s, TRUE)
-#  define PEEKSPACE(s) skipspace(s, TRUE)
+#  define SKIPSPACE0(s) skipspace(s, NULL)
+#  define SKIPSPACE1(s) skipspace(s, NULL)
+#  define SKIPSPACE2(s,tsv) skipspace(s, NULL)
+#  define PEEKSPACE(s) skipspace(s, NULL)
 #endif
 
 /*
@@ -459,21 +459,19 @@ S_no_op(pTHX_ const char *const what, char *s)
     yywarn(Perl_form(aTHX_ "%s found where operator expected", what));
     if (ckWARN_d(WARN_SYNTAX)) {
 	if (is_first)
-	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
-		    "\t(Missing semicolon on previous line?)\n");
+	    yywarn("\t(Missing semicolon on previous line?)");
 	else if (PL_oldoldbufptr && isIDFIRST_lazy_if(PL_oldoldbufptr,UTF)) {
 	    const char *t;
 	    for (t = PL_oldoldbufptr; (isALNUM_lazy_if(t,UTF) || *t == ':'); t++)
 		NOOP;
 	    if (t < PL_bufptr && isSPACE(*t))
-		Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
+		yywarn(Perl_form(
 			"\t(Do you need to predeclare %.*s?)\n",
-		    (int)(t - PL_oldoldbufptr), PL_oldoldbufptr);
+                            (int)(t - PL_oldoldbufptr), PL_oldoldbufptr));
 	}
 	else {
 	    assert(s >= oldbp);
-	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
-		    "\t(Missing operator before %.*s?)\n", (int)(s - oldbp), oldbp);
+	    yywarn(Perl_form("\t(Missing operator before %.*s?)\n", (int)(s - oldbp), oldbp));
 	}
     }
     PL_bufptr = oldbp;
@@ -640,6 +638,7 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
 #else
     parser->nexttoke = 0;
 #endif
+    parser->doextract = FALSE;
     parser->error_count = oparser ? oparser->error_count : 0;
     parser->lex_state = LEX_NORMAL;
     parser->expect = XSTATE;
@@ -647,7 +646,7 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
     parser->rsfp_filters = (new_filter || !oparser) ? newAV()
 		: AvREFCNT_inc(oparser->rsfp_filters);
 
-    Newx(parser->lex_brackstack, 120, char);
+    Newx(parser->lex_brackstack, 120, yy_lex_brackstack_item);
     Newx(parser->lex_casestack, 12, char);
     *parser->lex_casestack = '\0';
 
@@ -718,7 +717,6 @@ void
 Perl_lex_end(pTHX)
 {
     dVAR;
-    PL_doextract = FALSE;
 }
 
 /*
@@ -732,7 +730,7 @@ Perl_lex_end(pTHX)
  */
 
 STATIC void
-S_incline(pTHX_ const char *s)
+S_incline(pTHX_ char *s)
 {
     dVAR;
     const char *t;
@@ -870,12 +868,12 @@ S_skipspace2(pTHX_ register char *s, SV **svp)
  * S_skipspace
  * Called to gobble the appropriate amount and type of whitespace.
  * Skips comments as well.
- * If continuous line is true and the next line isn't a continuation the last
+ * If iscontinuationp is NULL is true and the next line isn't a continuation the last
  * newline is returned
  */
 
 STATIC char *
-S_skipspace(pTHX_ register char *s, bool continuous_line)
+S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
 {
     dVAR;
 #ifdef PERL_MAD
@@ -891,127 +889,127 @@ S_skipspace(pTHX_ register char *s, bool continuous_line)
 #endif
     PERL_ARGS_ASSERT_SKIPSPACE;
 
+    if (iscontinuationp)
+	*iscontinuationp = TRUE;
+
     /* skip space on the current line */
-    while (s < PL_bufend && isSPACE(*s) && *s != '\n') {
+    while (s < PL_bufend && isSPACE_notab(*s) && *s != '\n') {
 	s++;
     }
 
-    if ( s < PL_bufend && *s != '#' && *s != '\n' )
+    if ( s < PL_bufend && *s != '#' && *s != '\n' && *s != '\t' )
 	goto done;
 
     for (;;) {
 	STRLEN prevlen;
 	SSize_t oldprevlen, oldoldprevlen;
 	SSize_t oldloplen = 0, oldunilen = 0;
-	while (s < PL_bufend && isSPACE(*s)) {
+	while (s < PL_bufend && isSPACE_notab(*s)) {
 	    if (*s++ == '\n' && PL_in_eval && !PL_rsfp)
 		incline(s);
 	}
 
-	/* comment */
-	if (s < PL_bufend && *s == '#') {
-	    while (s < PL_bufend && *s != '\n')
-		s++;
-	    if (s < PL_bufend) {
-		s++;
-		if (PL_in_eval && !PL_rsfp) {
-		    incline(s);
-		    continue;
-		}
-	    }
-	}
+	if (s < PL_bufend && *s == '\t') {
+            yyerror("tab may not be used for spacing");
+            s++;
+            continue;
+        }
 
-	/* only continue to recharge the buffer if we're at the end
-	 * of the buffer, we're not reading from a source filter, and
-	 * we're in normal lexing mode
-	 */
-	if (s < PL_bufend || !PL_rsfp || PL_sublex_info.sub_inwhat)
-	    break;
+        /* comment */
+        if (s < PL_bufend && *s == '#') {
+            while (s < PL_bufend && *s != '\n')
+                s++;
+            if (s < PL_bufend) {
+                s++;
+                if (PL_in_eval && !PL_rsfp)
+                    incline(s);
+                continue;
+            }
+        }
 
-	/* try to recharge the buffer */
+        /* only continue to recharge the buffer if we're at the end
+         * of the buffer, we're not reading from a source filter, and
+         * we're in normal lexing mode
+         */
+        if (s < PL_bufend || !PL_rsfp || PL_lex_inwhat)
+            break;
+
+        /* try to recharge the buffer */
 #ifdef PERL_MAD
-	curoff = s - SvPVX_mutable(PL_linestr);
+        curoff = s - SvPVX_mutable(PL_linestr);
 #endif
 
-	if ((s = filter_gets(PL_linestr, PL_rsfp,
-			     (prevlen = SvCUR(PL_linestr)))) == NULL)
-	{
+        if ((s = filter_gets(PL_linestr, PL_rsfp,
+                             (prevlen = SvCUR(PL_linestr)))) == NULL)
+        {
+            /* end of file. */
 #ifdef PERL_MAD
-	    if (PL_madskills && curoff != startoff) {
-		if (!PL_skipwhite)
-		    PL_skipwhite = newSVpvs("");
-		sv_catpvn(PL_skipwhite, SvPVX_mutable(PL_linestr) + startoff,
-					curoff - startoff);
-	    }
-
-	    /* mustn't throw out old stuff yet if madpropping */
-	    SvCUR_set(PL_linestr, curoff);
-	    s = SvPVX_mutable(PL_linestr) + curoff;
-	    *s = 0;
-#endif
-
-	    /* end of file. */
-#ifdef PERL_MAD
-	    sv_catpvn(PL_linestr,";", 1);
+            sv_catpvn(PL_linestr,"\n", 1);
 #else
-	    sv_setpvn(PL_linestr,";", 1);
+            sv_setpvn(PL_linestr,"\n", 1);
 #endif
 
-	    /* reset variables for next time we lex */
-	    PL_oldoldbufptr = PL_oldbufptr = PL_bufptr = s = PL_linestart
-		= SvPVX_mutable(PL_linestr)
+            /* reset variables for next time we lex */
+            PL_oldoldbufptr = PL_oldbufptr = PL_bufptr = s = PL_linestart
+                = SvPVX_mutable(PL_linestr) + 1
 #ifdef PERL_MAD
-		+ curoff
+                + curoff
 #endif
-		;
-	    PL_bufend = SvPVX_mutable(PL_linestr) + SvCUR(PL_linestr);
-	    PL_last_lop = PL_last_uni = NULL;
+               ;
+            PL_bufend = SvPVX_mutable(PL_linestr) + SvCUR(PL_linestr);
+            PL_last_lop = PL_last_uni = NULL;
 
-	    /* Close the filehandle.  Could be from
-	     * STDIN, or a regular file.  If we were reading code from
-	     * STDIN (because the commandline held no -e or filename)
-	     * then we don't close it, we reset it so the code can
-	     * read from STDIN too.
-	     */
+            /* Close the filehandle.  Could be from
+             * STDIN, or a regular file.  If we were reading code from
+             * STDIN (because the commandline held no -e or filename)
+             * then we don't close it, we reset it so the code can
+             * read from STDIN too.
+             */
 
-	    if ((PerlIO*)PL_rsfp == PerlIO_stdin())
-		PerlIO_clearerr(PL_rsfp);
-	    else
-		(void)PerlIO_close(PL_rsfp);
-	    PL_rsfp = NULL;
-	    break;
-	}
+            if ((PerlIO*)PL_rsfp == PerlIO_stdin())
+                PerlIO_clearerr(PL_rsfp);
+            else
+                (void)PerlIO_close(PL_rsfp);
+            PL_rsfp = NULL;
+            break;
+        }
 
-	/* not at end of file, so we only read another line */
-	/* make corresponding updates to old pointers, for yyerror() */
-	oldprevlen = PL_oldbufptr - PL_bufend;
-	oldoldprevlen = PL_oldoldbufptr - PL_bufend;
-	if (PL_last_uni)
-	    oldunilen = PL_last_uni - PL_bufend;
-	if (PL_last_lop)
-	    oldloplen = PL_last_lop - PL_bufend;
-	PL_bufptr = s + prevlen;
-	PL_bufend = s + SvCUR(PL_linestr);
-	s = PL_bufptr;
-	PL_oldbufptr = s + oldprevlen;
-	PL_oldoldbufptr = s + oldoldprevlen;
-	if (PL_last_uni)
-	    PL_last_uni = s + oldunilen;
-	if (PL_last_lop)
-	    PL_last_lop = s + oldloplen;
-	incline(s);
+        /* not at end of file, so we only read another line */
+        /* make corresponding updates to old pointers, for yyerror() */
+        oldprevlen = PL_oldbufptr - PL_bufend;
+        oldoldprevlen = PL_oldoldbufptr - PL_bufend;
+        if (PL_last_uni)
+            oldunilen = PL_last_uni - PL_bufend;
+        if (PL_last_lop)
+            oldloplen = PL_last_lop - PL_bufend;
+        PL_bufptr = s + prevlen;
+        PL_bufend = s + SvCUR(PL_linestr);
+        s = PL_bufptr;
+        PL_oldbufptr = s + oldprevlen;
+        PL_oldoldbufptr = s + oldoldprevlen;
+        if (PL_last_uni)
+            PL_last_uni = s + oldunilen;
+        if (PL_last_lop)
+            PL_last_lop = s + oldloplen;
+        incline(s);
     }
 
     /* reset if this isn't a continuation of the original line */
-    if (continuous_line
-	&& PL_parser->statement_indent
-	&& (s - PL_linestart) <= PL_parser->statement_indent
-	) {
-	return PL_linestart - 1;
+    if (PL_parser->statement_indent != -1
+        && (s - PL_linestart) <= PL_parser->statement_indent
+        ) {
+        if (iscontinuationp) {
+            *iscontinuationp = FALSE;
+        }
+        else {
+            assert(PL_linestart[-1] == '\n');
+            PL_bufptr = PL_linestart - 1;
+            return PL_linestart - 1;
+        }
     }
 
-#ifdef PERL_MAD
   done:
+#ifdef PERL_MAD
     if (PL_madskills) {
 	if (!PL_skipwhite) {
 	    PL_skipwhite = newSVpvs("");
@@ -1022,7 +1020,50 @@ S_skipspace(pTHX_ register char *s, bool continuous_line)
 	}
     }
 #endif
+    assert(!isSPACE_notab(*s));
     return s;
+}
+
+/* skips_pod
+   returns the first position after the pod, or NULL if the is no pod.
+ */
+STATIC char *
+S_skip_pod(pTHX_ register char *s)
+{
+    if (s[0] == '=' && isALPHA(s[1]) 
+	&& (s == PL_linestart || s[-1] == '\n') ) {
+	if (PL_in_eval && !PL_rsfp) {
+	    char* d;
+	    d = PL_bufend;
+	    while (s < d) {
+		if (*s++ == '\n') {
+		    incline(s);
+		    if (strnEQ(s,"=cut",4)) {
+			s = strchr(s,'\n');
+			if (s)
+			    s++;
+			else
+			    s = d;
+			incline(s);
+			return s;
+		    }
+		}
+	    }
+	    return s;
+	}
+#ifdef PERL_MAD
+	if (PL_madskills) {
+	    if (!PL_thiswhite)
+		PL_thiswhite = newSVpvs("");
+	    sv_catpvn(PL_thiswhite, PL_linestart,
+		PL_bufend - PL_linestart);
+	}
+#endif
+	s = PL_bufend;
+	PL_parser->doextract = TRUE;
+	return s;
+    }
+    return NULL;
 }
 
 /*
@@ -1042,19 +1083,19 @@ S_check_uni(pTHX)
     const char *t;
 
     if (PL_oldoldbufptr != PL_last_uni)
-	return;
+        return;
     while (isSPACE(*PL_last_uni))
-	PL_last_uni++;
+        PL_last_uni++;
     s = PL_last_uni;
     while (isALNUM_lazy_if(s,UTF) || *s == '-')
-	s++;
+        s++;
     if ((t = strchr(s, '(')) && t < PL_bufptr)
-	return;
+        return;
 
     if (ckWARN_d(WARN_AMBIGUOUS)){
         Perl_warner(aTHX_ packWARN(WARN_AMBIGUOUS),
-		   "Warning: Use of \"%.*s\" without parentheses is ambiguous",
-		   (int)(s - PL_last_uni), PL_last_uni);
+                   "Warning: Use of \"%.*s\" without parentheses is ambiguous",
+                   (int)(s - PL_last_uni), PL_last_uni);
     }
 }
 
@@ -1088,18 +1129,18 @@ S_lop(pTHX_ I32 f, int x, char *s)
     PL_last_lop_op = (OPCODE)f;
 #ifdef PERL_MAD
     if (PL_lasttoke)
- 	return REPORT(LSTOP);
+        return REPORT(LSTOP);
 #else
     if (PL_nexttoke)
-	return REPORT(LSTOP);
+        return REPORT(LSTOP);
 #endif
     if (*s == '(')
-	return REPORT(FUNC);
+        return REPORT(FUNC);
     s = PEEKSPACE(s);
     if (*s == '(')
-	return REPORT(FUNC);
+        return REPORT(FUNC);
     else
-	return REPORT(LSTOP);
+        return REPORT(LSTOP);
 }
 
 #ifdef PERL_MAD
@@ -1115,17 +1156,17 @@ S_start_force(pTHX_ int where)
 {
     int i;
 
-    if (where < 0)	/* so people can duplicate start_force(PL_curforce) */
-	where = PL_lasttoke;
+    if (where < 0)      /* so people can duplicate start_force(PL_curforce) */
+        where = PL_lasttoke;
     assert(PL_curforce < 0 || PL_curforce == where);
     if (PL_curforce != where) {
-	for (i = PL_lasttoke; i > where; --i) {
-	    PL_nexttoke[i] = PL_nexttoke[i-1];
-	}
-	PL_lasttoke++;
+        for (i = PL_lasttoke; i > where; --i) {
+            PL_nexttoke[i] = PL_nexttoke[i-1];
+        }
+        PL_lasttoke++;
     }
-    if (PL_curforce < 0)	/* in case of duplicate start_force() */
-	Zero(&PL_nexttoke[where], 1, NEXTMADTOKE);
+    if (PL_curforce < 0)        /* in case of duplicate start_force() */
+        Zero(&PL_nexttoke[where], 1, NEXTMADTOKE);
     PL_curforce = where;
     if (PL_nextwhite) {
 	if (PL_madskills)
@@ -1142,14 +1183,14 @@ S_curmad(pTHX_ char slot, SV *sv, SV* location)
     IV charoffset;
 
     if (!sv)
-	return;
+        return;
     if (PL_curforce < 0)
-	where = &PL_thismad;
+        where = &PL_thismad;
     else
-	where = &PL_nexttoke[PL_curforce].next_mad;
+        where = &PL_nexttoke[PL_curforce].next_mad;
 
     if (PL_faketokens)
-	sv_setpvn(sv, "", 0);
+        sv_setpvn(sv, "", 0);
 
     linenr = location ? SvIV(*av_fetch(svTav(location), 1, FALSE)) : 0;
     charoffset = location ? SvIV(*av_fetch(svTav(location), 2, FALSE)) : 0;
@@ -1163,7 +1204,7 @@ S_curmad(pTHX_ char slot, SV *sv, SV* location)
 	(*where)->mad_charoffset = charoffset;
     }
     else
-	addmad(newMADsv(slot, sv, linenr, charoffset), where, 0);
+        addmad(newMADsv(slot, sv, linenr, charoffset), where, 0);
 }
 #else
 #  define start_force(where)    NOOP
@@ -1186,12 +1227,12 @@ S_force_next(pTHX_ I32 type)
 #ifdef DEBUGGING
     if (DEBUG_T_TEST) {
         PerlIO_printf(Perl_debug_log, "### forced token:\n");
-	tokereport(type, &NEXTVAL_NEXTTOKE);
+        tokereport(type, &NEXTVAL_NEXTTOKE);
     }
 #endif
 #ifdef PERL_MAD
     if (PL_curforce < 0)
-	start_force(PL_lasttoke);
+        start_force(PL_lasttoke);
     PL_nexttoke[PL_curforce].next_type = type;
     {
 	SV* location = S_curlocation(PL_bufptr);
@@ -1201,7 +1242,7 @@ S_force_next(pTHX_ I32 type)
 	PL_nexttoke[PL_curforce].next_charoffset = charoffset;
     }
     if (PL_lex_state != LEX_KNOWNEXT)
- 	PL_lex_defer = PL_lex_state;
+        PL_lex_defer = PL_lex_state;
     PL_lex_state = LEX_KNOWNEXT;
     PL_lex_expect = PL_expect;
     PL_curforce = -1;
@@ -1209,9 +1250,9 @@ S_force_next(pTHX_ I32 type)
     PL_nexttype[PL_nexttoke] = type;
     PL_nexttoke++;
     if (PL_lex_state != LEX_KNOWNEXT) {
-	PL_lex_defer = PL_lex_state;
-	PL_lex_expect = PL_expect;
-	PL_lex_state = LEX_KNOWNEXT;
+        PL_lex_defer = PL_lex_state;
+        PL_lex_expect = PL_expect;
+        PL_lex_state = LEX_KNOWNEXT;
     }
 #endif
 }
@@ -1258,30 +1299,30 @@ S_force_word(pTHX_ register char *start, int token, int check_keyword, int allow
     start = SKIPSPACE1(start);
     s = start;
     if (isIDFIRST_lazy_if(s,UTF) ||
-	(allow_pack && *s == ':') ||
-	(allow_initial_tick && *s == '\'') )
+        (allow_pack && *s == ':') ||
+        (allow_initial_tick && *s == '\'') )
     {
-	s = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, allow_pack, &len);
-	if (check_keyword && keyword(PL_tokenbuf, len))
-	    return start;
-	start_force(PL_curforce);
-	if (PL_madskills)
-	    curmad('X', newSVpvn(start,s-start), S_curlocation(start));
-	if (token == METHOD) {
-	    s = SKIPSPACE1(s);
-	    if (*s == '(')
-		PL_expect = XTERM;
-	    else {
-		PL_expect = XOPERATOR;
-	    }
-	}
-	if (PL_madskills)
-	    curmad('g', newSVpvs( "forced" ), NULL);
-	NEXTVAL_NEXTTOKE.opval
-	    = (OP*)newSVOP(OP_CONST,0,
-			   newSVpvn(PL_tokenbuf, len), S_curlocation(PL_bufptr));
-	NEXTVAL_NEXTTOKE.opval->op_private |= OPpCONST_BARE;
-	force_next(token);
+        s = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, allow_pack, &len);
+        if (check_keyword && keyword(PL_tokenbuf, len))
+            return start;
+        start_force(PL_curforce);
+        if (PL_madskills)
+            curmad('X', newSVpvn(start,s-start), NULL);
+        if (token == METHOD) {
+            s = SKIPSPACE1(s);
+            if (*s == '(')
+                PL_expect = XTERM;
+            else {
+                PL_expect = XOPERATOR;
+            }
+        }
+        if (PL_madskills)
+            curmad('g', newSVpvs( "forced" ), NULL);
+        NEXTVAL_NEXTTOKE.opval
+            = (OP*)newSVOP(OP_CONST,0,
+                           newSVpvn(PL_tokenbuf, len), S_curlocation(PL_bufptr));
+        NEXTVAL_NEXTTOKE.opval->op_private |= OPpCONST_BARE;
+        force_next(token);
     }
     return s;
 }
@@ -1303,25 +1344,25 @@ S_force_ident(pTHX_ register const char *s, int kind)
     PERL_ARGS_ASSERT_FORCE_IDENT;
 
     if (*s) {
-	const STRLEN len = strlen(s);
-	OP* const o = (OP*)newSVOP(OP_CONST, 0, newSVpvn(s, len), S_curlocation(PL_bufptr));
-	start_force(PL_curforce);
-	NEXTVAL_NEXTTOKE.opval = o;
-	force_next(WORD);
-	if (kind) {
-	    o->op_private = OPpCONST_ENTERED;
-	    /* XXX see note in pp_entereval() for why we forgo typo
-	       warnings if the symbol must be introduced in an eval.
-	       GSAR 96-10-12 */
-	    gv_fetchpvn_flags(s, len,
-			      PL_in_eval ? (GV_ADDMULTI | GV_ADDINEVAL)
-			      : GV_ADD,
-			      kind == '$' ? SVt_PV :
-			      kind == '@' ? SVt_PVAV :
-			      kind == '%' ? SVt_PVHV :
-			      SVt_PVGV
-			      );
-	}
+        const STRLEN len = strlen(s);
+        OP* const o = (OP*)newSVOP(OP_CONST, 0, newSVpvn(s, len), S_curlocation(PL_bufptr));
+        start_force(PL_curforce);
+        NEXTVAL_NEXTTOKE.opval = o;
+        force_next(WORD);
+        if (kind) {
+            o->op_private = OPpCONST_ENTERED;
+            /* XXX see note in pp_entereval() for why we forgo typo
+               warnings if the symbol must be introduced in an eval.
+               GSAR 96-10-12 */
+            gv_fetchpvn_flags(s, len,
+                              PL_in_eval ? (GV_ADDMULTI | GV_ADDINEVAL)
+                              : GV_ADD,
+                              kind == '$' ? SVt_PV :
+                              kind == '@' ? SVt_PVAV :
+                              kind == '%' ? SVt_PVHV :
+                              SVt_PVGV
+                              );
+        }
     }
 }
 
@@ -1347,11 +1388,11 @@ S_force_version(pTHX_ char *s)
 
     d = s;
     if (*d == 'v' && isDIGIT(d[1])) {
-	SV *sv;
+        SV *sv;
 
-	sv = newSV(5); /* preallocate storage space */
-	s = scan_vstring(s, PL_bufend, sv);
-	version = newSVOP(OP_CONST, 0, sv, S_curlocation(PL_bufptr));
+        sv = newSV(5); /* preallocate storage space */
+        s = scan_vstring(s, PL_bufend, sv);
+        version = newSVOP(OP_CONST, 0, sv, S_curlocation(PL_bufptr));
     }
 
     /* NOTE: The parser sees the package name and the VERSION swapped */
@@ -1359,11 +1400,11 @@ S_force_version(pTHX_ char *s)
     NEXTVAL_NEXTTOKE.opval = version;
 #ifdef PERL_MAD
     if (PL_madskills && !version) {
-	sv_free(PL_nextwhite);	/* let next token collect whitespace */
-	PL_nextwhite = 0;
-	s = SvPVX_mutable(PL_linestr) + startoff;
+        sv_free(PL_nextwhite);  /* let next token collect whitespace */
+        PL_nextwhite = 0;
+        s = SvPVX_mutable(PL_linestr) + startoff;
     } else {
-	curmad('X', newSVpvn(d,s-d), NULL);
+        curmad('X', newSVpvn(d,s-d), NULL);
     }
 #endif
     force_next(THING);
@@ -1429,25 +1470,25 @@ S_sublex_start(pTHX_ I32 op_type, OP* op)
     pl_yylval.i_tkval.ival = op_type;
 
     if (op_type == OP_NULL) {
-	pl_yylval.opval = op;
-	PL_lex_op = NULL;
-	return THING;
+        pl_yylval.opval = op;
+        PL_lex_op = NULL;
+        return THING;
     }
     if (op_type == OP_CONST) {
-	SV *sv = tokeq(PL_lex_stuff.str_sv);
-	pl_yylval.opval = (OP*)newSVOP(op_type, 0, sv, S_curlocation(PL_bufptr));
-	PL_lex_stuff.str_sv = NULL;
-	PL_lex_stuff.flags = 0;
-	return THING;
+        SV *sv = tokeq(PL_lex_stuff.str_sv);
+        pl_yylval.opval = (OP*)newSVOP(op_type, 0, sv, S_curlocation(PL_bufptr));
+        PL_lex_stuff.str_sv = NULL;
+        PL_lex_stuff.flags = 0;
+        return THING;
     }
     else if (op_type == OP_BACKTICK && PL_lex_op) {
-	/* readpipe() vas overriden */
-	cSVOPx(cLISTOPx(cUNOPx(PL_lex_op)->op_first)->op_first->op_sibling)->op_sv = tokeq(PL_lex_stuff.str_sv);
-	pl_yylval.opval = PL_lex_op;
-	PL_lex_op = NULL;
-	PL_lex_stuff.str_sv = NULL;
-	PL_lex_stuff.flags = 0;
-	return THING;
+        /* readpipe() vas overriden */
+        cSVOPx(cLISTOPx(cUNOPx(PL_lex_op)->op_first)->op_first->op_sibling)->op_sv = tokeq(PL_lex_stuff.str_sv);
+        pl_yylval.opval = PL_lex_op;
+        PL_lex_op = NULL;
+        PL_lex_stuff.str_sv = NULL;
+        PL_lex_stuff.flags = 0;
+        return THING;
     }
 
     PL_sublex_info.super_state = PL_lex_state;
@@ -1457,12 +1498,12 @@ S_sublex_start(pTHX_ I32 op_type, OP* op)
 
     PL_expect = XTERM;
     if (op) {
-	pl_yylval.opval = PL_lex_op;
-	PL_lex_op = NULL;
-	return PMFUNC;
+        pl_yylval.opval = PL_lex_op;
+        PL_lex_op = NULL;
+        return PMFUNC;
     }
     else
-	return FUNC;
+        return FUNC;
 }
 
 /*
@@ -1507,13 +1548,13 @@ S_sublex_push(pTHX)
     SVcpREPLACE(PL_lex_stuff.str_sv, NULL);
 
     PL_bufend = PL_bufptr = PL_oldbufptr = PL_oldoldbufptr = PL_linestart
-	= SvPVX_mutable(PL_linestr);
+        = SvPVX_mutable(PL_linestr);
     PL_bufend += SvCUR(PL_linestr);
     PL_last_lop = PL_last_uni = NULL;
 
-    PL_parser->statement_indent = 0;
+    PL_parser->statement_indent = -1;
     PL_lex_brackets = 0;
-    Newx(PL_lex_brackstack, 120, char);
+    Newx(PL_lex_brackstack, 120, yy_lex_brackstack_item);
     Newx(PL_lex_casestack, 12, char);
     PL_lex_casemods = 0;
     *PL_lex_casestack = '\0';
@@ -1523,10 +1564,13 @@ S_sublex_push(pTHX)
     PL_lex_inwhat = PL_sublex_info.sub_inwhat;
     PL_lex_flags = PL_lex_stuff.flags;
     if (PL_lex_inwhat == OP_MATCH || PL_lex_inwhat == OP_QR || PL_lex_inwhat == OP_SUBST) {
-	PL_lex_flags |= LEXf_INPAT;
-	if (((PMOP*)PL_sublex_info.sub_op)->op_pmflags & PMf_EXTENDED)
-	    PL_lex_flags |= LEXf_EXT_PAT;
+        PL_lex_flags |= LEXf_INPAT;
+        if (((PMOP*)PL_sublex_info.sub_op)->op_pmflags & PMf_EXTENDED)
+            PL_lex_flags |= LEXf_EXT_PAT;
     }
+
+    DEBUG_T({ PerlIO_printf(Perl_debug_log,
+                "### New sublex of '%s'", PL_bufptr); });
 
     return '(';
 }
@@ -1541,55 +1585,55 @@ S_sublex_done(pTHX)
 {
     dVAR;
     if (!PL_lex_starts++) {
-	SV * const sv = newSVpvs("");
-	PL_expect = XOPERATOR;
-	pl_yylval.opval = (OP*)newSVOP(OP_CONST, 0, sv, S_curlocation(PL_bufptr));
-	return THING;
+        SV * const sv = newSVpvs("");
+        PL_expect = XOPERATOR;
+        pl_yylval.opval = (OP*)newSVOP(OP_CONST, 0, sv, S_curlocation(PL_bufptr));
+        return THING;
     }
 
-    if (PL_lex_casemods) {		/* oops, we've got some unbalanced parens */
-	PL_lex_state = LEX_INTERPCASEMOD;
-	return yylex();
+    if (PL_lex_casemods) {              /* oops, we've got some unbalanced parens */
+        PL_lex_state = LEX_INTERPCASEMOD;
+        return yylex();
     }
 
     /* Is there a right-hand side to take care of? (s//RHS/) */
     if (PL_lex_repl.str_sv && (PL_lex_inwhat == OP_SUBST)) {
-	SVcpREPLACE(PL_linestr, PL_lex_repl.str_sv);
-	PL_lex_stuff.flags = PL_lex_repl.flags;
-	PL_lex_repl.flags = 0;
-	PL_lex_flags = 0;
-	PL_bufend = PL_bufptr = PL_oldbufptr = PL_oldoldbufptr = PL_linestart = SvPVX_mutable(PL_linestr);
-	PL_bufend += SvCUR(PL_linestr);
-	PL_last_lop = PL_last_uni = NULL;
-	PL_lex_brackets = 0;
-	PL_lex_casemods = 0;
-	*PL_lex_casestack = '\0';
-	PL_lex_starts = 0;
-	PL_lex_state = LEX_INTERPCONCAT;
-	SVcpREPLACE(PL_lex_repl.str_sv, NULL);
-	return ',';
+        SVcpREPLACE(PL_linestr, PL_lex_repl.str_sv);
+        PL_lex_stuff.flags = PL_lex_repl.flags;
+        PL_lex_repl.flags = 0;
+        PL_lex_flags = 0;
+        PL_bufend = PL_bufptr = PL_oldbufptr = PL_oldoldbufptr = PL_linestart = SvPVX_mutable(PL_linestr);
+        PL_bufend += SvCUR(PL_linestr);
+        PL_last_lop = PL_last_uni = NULL;
+        PL_lex_brackets = 0;
+        PL_lex_casemods = 0;
+        *PL_lex_casestack = '\0';
+        PL_lex_starts = 0;
+        PL_lex_state = LEX_INTERPCONCAT;
+        SVcpREPLACE(PL_lex_repl.str_sv, NULL);
+        return ',';
     }
     else {
 #ifdef PERL_MAD
-	if (PL_madskills) {
-	    if (PL_thiswhite) {
-		if (!PL_endwhite)
-		    PL_endwhite = newSVpvs("");
-		sv_catsv(PL_endwhite, PL_thiswhite);
-		PL_thiswhite = 0;
-	    }
-	    if (PL_thistoken)
-		sv_setpvn(PL_thistoken,"",0);
-	    else
-		PL_realtokenstart = -1;
-	}
+        if (PL_madskills) {
+            if (PL_thiswhite) {
+                if (!PL_endwhite)
+                    PL_endwhite = newSVpvs("");
+                sv_catsv(PL_endwhite, PL_thiswhite);
+                PL_thiswhite = 0;
+            }
+            if (PL_thistoken)
+                sv_setpvn(PL_thistoken,"",0);
+            else
+                PL_realtokenstart = -1;
+        }
 #endif
-	LEAVE;
-	PL_bufend = SvPVX_mutable(PL_linestr);
-	PL_bufend += SvCUR(PL_linestr);
-	PL_expect = XOPERATOR;
-	PL_sublex_info.sub_inwhat = 0;
-	return ')';
+        LEAVE;
+        PL_bufend = SvPVX_mutable(PL_linestr);
+        PL_bufend += SvCUR(PL_linestr);
+        PL_expect = XOPERATOR;
+        PL_sublex_info.sub_inwhat = 0;
+        return ')';
     }
 }
 
@@ -1603,14 +1647,19 @@ S_sublex_done(pTHX)
 STATIC void
 S_start_statement_indent(pTHX_ char* s)
 {
-    ENTER;
-    SAVEI32(PL_parser->statement_indent);
+    if (PL_lex_brackets > 100) {
+        Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+    }
+    PL_lex_brackstack[PL_lex_brackets].type = LB_LAYOUT_BLOCK;
+    PL_lex_brackstack[PL_lex_brackets].state = 0;
+    PL_lex_brackstack[PL_lex_brackets].prev_statement_indent = PL_parser->statement_indent;
+    ++PL_lex_brackets;
     PL_parser->statement_indent = s - PL_linestart;
+    assert(PL_parser->statement_indent >= 0);
     DEBUG_T({ PerlIO_printf(Perl_debug_log,
-		"### New statement indent level, %d.\n",
-		(int)PL_parser->statement_indent); });
-    start_force(PL_curforce);
-    force_next('{');
+                "### New statement indent level, %d.\n",
+                (int)PL_parser->statement_indent); });
+    PL_expect = XSTATE;
 }
 
 /* 
@@ -1621,7 +1670,16 @@ S_start_statement_indent(pTHX_ char* s)
 STATIC void
 S_stop_statement_indent(pTHX)
 {
-    LEAVE;
+    --PL_lex_brackets;
+    assert(PL_lex_brackets >= 0);
+    if (PL_lex_brackstack[PL_lex_brackets].type != LB_LAYOUT_BLOCK) {
+        yyerror("wrong matching parens");
+	while (PL_lex_brackstack[PL_lex_brackets].type != LB_LAYOUT_BLOCK) {
+	    PL_lex_brackets--;
+	    assert(PL_lex_brackets >= 0);
+	}
+    }
+    PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
     start_force(PL_curforce);
     force_next('}');
 }
@@ -1647,187 +1705,187 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 
     default:
     {
-	if ((isALPHA(*s) || isDIGIT(*s)) && ckWARN(WARN_MISC))
-	    Perl_warner(aTHX_ packWARN(WARN_MISC),
-			"Unrecognized escape \\%c passed through",
-			*s);
-	/* default action is to copy the quoted character */
-	/* ignoring invalid UTF sequences */
-	*d++ = *s++;
-	*l = 1;
-	while (UTF8_IS_CONTINUED(*s) && s < send) {
-	    *d++ = *s++;
-	    *l += 1;
-	}
-	return s;
+        if ((isALPHA(*s) || isDIGIT(*s)) && ckWARN(WARN_MISC))
+            Perl_warner(aTHX_ packWARN(WARN_MISC),
+                        "Unrecognized escape \\%c passed through",
+                        *s);
+        /* default action is to copy the quoted character */
+        /* ignoring invalid UTF sequences */
+        *d++ = *s++;
+        *l = 1;
+        while (UTF8_IS_CONTINUED(*s) && s < send) {
+            *d++ = *s++;
+            *l += 1;
+        }
+        return s;
     }
 
     /* \132 indicates an octal constant */
     case '0': case '1': case '2': case '3':
     case '4': case '5': case '6': case '7':
     {
-	I32 flags = 0;
-	STRLEN len = 3;
-	uv = grok_oct(s, &len, &flags, NULL);
-	s += len;
-	*d = (char) uv;
-	*l = 1;
-	return s;
+        I32 flags = 0;
+        STRLEN len = 3;
+        uv = grok_oct(s, &len, &flags, NULL);
+        s += len;
+        *d = (char) uv;
+        *l = 1;
+        return s;
     }
 
     /* \x24 indicates a hex constant */
     case 'x':
-	++s;
-	if (*s == '[') {
-	    /* \x[XX] insert byte XX */
-	    char *const orgd = d;
-	    char *const e = strchr(s, ']');
-	    s++;
-	    if (!e) {
-		Perl_croak(aTHX_ "Missing right square bracket on \\x[]");
-	    }
-	    while ( s + 2 <= e ) {
-		STRLEN len = 2;
-		I32 flags = PERL_SCAN_DISALLOW_PREFIX;
-		uv = grok_hex(s, &len, &flags, NULL);
-		s += 2;
-		*d++ = (char)uv;
-	    }
-	    if (s + 1 == e) {
-		if (ckWARN(WARN_DIGIT))
-		    Perl_warner(aTHX_ packWARN(WARN_DIGIT),
-				"single hexadecimal digit '%c' ignored", *s);
-		s++;
-	    }
-	    s += 1;
-	    *l = d - orgd;
-	    return s;
-	}
-	if (*s == '{') {
-	    /* \x{XX} insert codepoint XX */
-	    char* const e = strchr(s, '}');
-	    I32 flags = PERL_SCAN_ALLOW_UNDERSCORES |
-		PERL_SCAN_DISALLOW_PREFIX;
-	    STRLEN len;
+        ++s;
+        if (*s == '[') {
+            /* \x[XX] insert byte XX */
+            char *const orgd = d;
+            char *const e = strchr(s, ']');
+            s++;
+            if (!e) {
+                Perl_croak(aTHX_ "Missing right square bracket on \\x[]");
+            }
+            while ( s + 2 <= e ) {
+                STRLEN len = 2;
+                I32 flags = PERL_SCAN_DISALLOW_PREFIX;
+                uv = grok_hex(s, &len, &flags, NULL);
+                s += 2;
+                *d++ = (char)uv;
+            }
+            if (s + 1 == e) {
+                if (ckWARN(WARN_DIGIT))
+                    Perl_warner(aTHX_ packWARN(WARN_DIGIT),
+                                "single hexadecimal digit '%c' ignored", *s);
+                s++;
+            }
+            s += 1;
+            *l = d - orgd;
+            return s;
+        }
+        if (*s == '{') {
+            /* \x{XX} insert codepoint XX */
+            char* const e = strchr(s, '}');
+            I32 flags = PERL_SCAN_ALLOW_UNDERSCORES |
+                PERL_SCAN_DISALLOW_PREFIX;
+            STRLEN len;
 
-	    ++s;
-	    if (!e) {
-		Perl_croak(aTHX_ "Missing right brace on \\x{}");
-	    }
-	    len = e - s;
-	    uv = grok_hex(s, &len, &flags, NULL);
-	    s = e + 1;
-	}
-	else {
-	    /* \xXX insert byte or codepoint depending on IN_CODEPOINTS */
-	    STRLEN len = 2;
-	    I32 flags = PERL_SCAN_DISALLOW_PREFIX;
-	    uv = grok_hex(s, &len, &flags, NULL);
-	    s += len;
-	    if ( ! UNI_IS_INVARIANT(uv) )
-		Perl_warner(aTHX_ packWARN(WARN_UTF8),
-			    "\\xXX are assumed bytes");
-	    *d = (char)uv;
-	    *l = 1;
-	    return s;
-	}
+            ++s;
+            if (!e) {
+                Perl_croak(aTHX_ "Missing right brace on \\x{}");
+            }
+            len = e - s;
+            uv = grok_hex(s, &len, &flags, NULL);
+            s = e + 1;
+        }
+        else {
+            /* \xXX insert byte or codepoint depending on IN_CODEPOINTS */
+            STRLEN len = 2;
+            I32 flags = PERL_SCAN_DISALLOW_PREFIX;
+            uv = grok_hex(s, &len, &flags, NULL);
+            s += len;
+            if ( ! UNI_IS_INVARIANT(uv) )
+                Perl_warner(aTHX_ packWARN(WARN_UTF8),
+                            "\\xXX are assumed bytes");
+            *d = (char)uv;
+            *l = 1;
+            return s;
+        }
 
       NUM_ESCAPE_INSERT:
-	/* Insert oct or hex escaped character.
-	 * There will always enough room in sv since such
-	 * escapes will be longer than any UTF-8 sequence
-	 * they can end up as. */
-	
-	/* We need to map to chars to ASCII before doing the tests
-	   to cover EBCDIC
-		*/
-	if (!UNI_IS_INVARIANT(uv)) {
-	    char *orgd = d;
-	    d = uvchr_to_utf8(d, uv);
-	    *l = d-orgd;
-	}
-	else {
-	    *d = (char) uv;
-	    *l = 1;
-	}
-	return s;
-	
-	/* \N{LATIN SMALL LETTER A} is a named character */
+        /* Insert oct or hex escaped character.
+         * There will always enough room in sv since such
+         * escapes will be longer than any UTF-8 sequence
+         * they can end up as. */
+        
+        /* We need to map to chars to ASCII before doing the tests
+           to cover EBCDIC
+                */
+        if (!UNI_IS_INVARIANT(uv)) {
+            char *orgd = d;
+            d = uvchr_to_utf8(d, uv);
+            *l = d-orgd;
+        }
+        else {
+            *d = (char) uv;
+            *l = 1;
+        }
+        return s;
+        
+        /* \N{LATIN SMALL LETTER A} is a named character */
     case 'N':
-	++s;
-	if (*s == '{') {
-	    const char* e = strchr(s, '}');
-	    SV *res;
-	    STRLEN len;
-	    const char *str;
-	    
-	    if (!e || (e >= send)) {
-		Perl_croak(aTHX_ "Missing right brace on \\N{}");
-	    }
-	    if (e > s + 2 && s[1] == 'U' && s[2] == '+') {
-		/* \N{U+...} */
-		I32 flags = PERL_SCAN_ALLOW_UNDERSCORES |
-		    PERL_SCAN_DISALLOW_PREFIX;
-		s += 3;
-		len = e - s;
-		uv = grok_hex(s, &len, &flags, NULL);
-		if ( e > s && len != (STRLEN)(e - s) ) {
-		    uv = 0xFFFD;
-		}
-		s = e + 1;
-		goto NUM_ESCAPE_INSERT;
-	    }
-	    res = newSVpvn(s + 1, e - s - 1);
-	    res = new_constant( NULL, 0, "charnames",
-				res, NULL, s - 2, e - s + 3 );
-	    str = SvPV_const(res,len);
-	    if (len > (STRLEN)(e - s + 4)) { /* I _guess_ 4 is \N{} --jhi */
-		Perl_croak(aTHX_ "panic: \\N{...} replacement too long");
-	    }
-	    Copy(str, d, len, char);
-	    *l = len;
-	    SvREFCNT_dec(res);
-	    s = e + 1;
-	}
-	else
-	    Perl_croak(aTHX_ "Missing braces on \\N{}");
-	return s;
+        ++s;
+        if (*s == '{') {
+            const char* e = strchr(s, '}');
+            SV *res;
+            STRLEN len;
+            const char *str;
+            
+            if (!e || (e >= send)) {
+                Perl_croak(aTHX_ "Missing right brace on \\N{}");
+            }
+            if (e > s + 2 && s[1] == 'U' && s[2] == '+') {
+                /* \N{U+...} */
+                I32 flags = PERL_SCAN_ALLOW_UNDERSCORES |
+                    PERL_SCAN_DISALLOW_PREFIX;
+                s += 3;
+                len = e - s;
+                uv = grok_hex(s, &len, &flags, NULL);
+                if ( e > s && len != (STRLEN)(e - s) ) {
+                    uv = 0xFFFD;
+                }
+                s = e + 1;
+                goto NUM_ESCAPE_INSERT;
+            }
+            res = newSVpvn(s + 1, e - s - 1);
+            res = new_constant( NULL, 0, "charnames",
+                                res, NULL, s - 2, e - s + 3 );
+            str = SvPV_const(res,len);
+            if (len > (STRLEN)(e - s + 4)) { /* I _guess_ 4 is \N{} --jhi */
+                Perl_croak(aTHX_ "panic: \\N{...} replacement too long");
+            }
+            Copy(str, d, len, char);
+            *l = len;
+            SvREFCNT_dec(res);
+            s = e + 1;
+        }
+        else
+            Perl_croak(aTHX_ "Missing braces on \\N{}");
+        return s;
 
-	/* \c is a control character */
+        /* \c is a control character */
     case 'c':
-	s++;
-	if (s < send) {
-	    char c = *s++;
-	    *d++ = NATIVE_TO_UNI(toCTRL(c));
-	    *l = 1;
-	}
-	else {
-	    Perl_croak(aTHX_ "Missing control char name in \\c");
-	}
-	return s;
+        s++;
+        if (s < send) {
+            char c = *s++;
+            *d++ = NATIVE_TO_UNI(toCTRL(c));
+            *l = 1;
+        }
+        else {
+            Perl_croak(aTHX_ "Missing control char name in \\c");
+        }
+        return s;
 
-	/* printf-style backslashes, formfeeds, newlines, etc */
+        /* printf-style backslashes, formfeeds, newlines, etc */
     case 'b':
-	*d++ = '\b';
-	break;
+        *d++ = '\b';
+        break;
     case 'n':
-	*d++ = '\n';
-	break;
+        *d++ = '\n';
+        break;
     case 'r':
-	*d++ = '\r';
-	break;
+        *d++ = '\r';
+        break;
     case 'f':
-	*d++ = '\f';
-	break;
+        *d++ = '\f';
+        break;
     case 't':
-	*d++ = '\t';
-	break;
+        *d++ = '\t';
+        break;
     case 'e':
-	*d++ = ASCII_TO_UNI('\033');
-	break;
+        *d++ = ASCII_TO_UNI('\033');
+        break;
     case 'a':
-	*d++ = ASCII_TO_UNI('\007');
-	break;
+        *d++ = ASCII_TO_UNI('\007');
+        break;
     } /* end switch */
 
     *l = 1;
@@ -1884,26 +1942,26 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
 
   The structure of the code is
       while (there's a character to process) {
-	  handle transliteration ranges
-	  skip regexp comments /(?#comment)/ and codes /(?{code})/
-	  skip #-initiated comments in //x patterns
-	  check for embedded arrays
-	  check for embedded scalars
-	  if (backslash) {
-	      leave intact backslashes from leaveit (below)
-	      deprecate \1 in substitution replacements
-	      handle string-changing backslashes \l \U \Q \E, etc.
-	      switch (what was escaped) {
-		  handle \- in a transliteration (becomes a literal -)
-		  handle \132 (octal characters)
-		  handle \x15 and \x{1234} (hex characters)
-		  handle \N{name} (named characters)
-		  handle \cV (control characters)
-		  handle printf-style backslashes (\f, \r, \n, etc)
-	      } (end switch)
-	  } (end if backslash)
+          handle transliteration ranges
+          skip regexp comments /(?#comment)/ and codes /(?{code})/
+          skip #-initiated comments in //x patterns
+          check for embedded arrays
+          check for embedded scalars
+          if (backslash) {
+              leave intact backslashes from leaveit (below)
+              deprecate \1 in substitution replacements
+              handle string-changing backslashes \l \U \Q \E, etc.
+              switch (what was escaped) {
+                  handle \- in a transliteration (becomes a literal -)
+                  handle \132 (octal characters)
+                  handle \x15 and \x{1234} (hex characters)
+                  handle \N{name} (named characters)
+                  handle \cV (control characters)
+                  handle printf-style backslashes (\f, \r, \n, etc)
+              } (end switch)
+          } (end if backslash)
     } (end while character to read)
-		
+                
 */
 
 
@@ -1911,59 +1969,59 @@ STATIC char *
 S_scan_const(pTHX_ char *start)
 {
     dVAR;
-    register char *send = PL_bufend;		/* end of the constant */
-    SV *sv = newSV(send - start);		/* sv for the constant */
-    register char *s = start;			/* start of the constant */
-    register char *d = SvPVX_mutable(sv);		/* destination for copies */
-    I32  has_utf8 = FALSE;			/* Output constant is UTF8 */
+    register char *send = PL_bufend;            /* end of the constant */
+    SV *sv = newSV(send - start);               /* sv for the constant */
+    register char *s = start;                   /* start of the constant */
+    register char *d = SvPVX_mutable(sv);               /* destination for copies */
+    I32  has_utf8 = FALSE;                      /* Output constant is UTF8 */
     bool in_pat = ((PL_lex_flags & LEXf_INPAT) != 0);
 
     PERL_ARGS_ASSERT_SCAN_CONST;
 
     while (s < send) {
-	if (*s == '\n') {
-	    PL_parser->lex_line_number++;
-	    PL_parser->lex_charoffset = 0;
-	    PL_linestart = s+1;
-	}
+        if (*s == '\n') {
+            PL_parser->lex_line_number++;
+            PL_parser->lex_charoffset = 0;
+            PL_linestart = s+1;
+        }
 
-	/* skip for regexp comments /(?#comment)/ and code /(?{code})/,
-	   except for the last char, which will be done separately. */
-	if (*s == '(' && in_pat && s[1] == '?') {
-	    if (s[2] == '#') {
-		while (s+1 < send && *s != ')')
-		    *d++ = NATIVE_TO_UNI(*s++);
-	    }
-	    else if (s[2] == '{' /* This should match regcomp.c */
-		    || (s[2] == '?' && s[3] == '{'))
-	    {
-		I32 count = 1;
-		char *regparse = s + (s[2] == '{' ? 3 : 4);
-		char c;
+        /* skip for regexp comments /(?#comment)/ and code /(?{code})/,
+           except for the last char, which will be done separately. */
+        if (*s == '(' && in_pat && s[1] == '?') {
+            if (s[2] == '#') {
+                while (s+1 < send && *s != ')')
+                    *d++ = NATIVE_TO_UNI(*s++);
+            }
+            else if (s[2] == '{' /* This should match regcomp.c */
+                    || (s[2] == '?' && s[3] == '{'))
+            {
+                I32 count = 1;
+                char *regparse = s + (s[2] == '{' ? 3 : 4);
+                char c;
 
-		while (count && (c = *regparse)) {
-		    if (c == '\\' && regparse[1])
-			regparse++;
-		    else if (c == '{')
-			count++;
-		    else if (c == '}')
-			count--;
-		    regparse++;
-		}
-		if (*regparse != ')')
-		    regparse--;		/* Leave one char for continuation. */
-		while (s < regparse)
-		    *d++ = NATIVE_TO_UNI(*s++);
-	    }
-	}
+                while (count && (c = *regparse)) {
+                    if (c == '\\' && regparse[1])
+                        regparse++;
+                    else if (c == '{')
+                        count++;
+                    else if (c == '}')
+                        count--;
+                    regparse++;
+                }
+                if (*regparse != ')')
+                    regparse--;         /* Leave one char for continuation. */
+                while (s < regparse)
+                    *d++ = NATIVE_TO_UNI(*s++);
+            }
+        }
 
-	/* likewise skip #-initiated comments in //x patterns */
-	else if (*s == '#' && in_pat && (PL_lex_flags & LEXf_EXT_PAT)) {
-	    while (s+1 < send && *s != '\n')
-		*d++ = NATIVE_TO_UNI(*s++);
-	}
+        /* likewise skip #-initiated comments in //x patterns */
+        else if (*s == '#' && in_pat && (PL_lex_flags & LEXf_EXT_PAT)) {
+            while (s+1 < send && *s != '\n')
+                *d++ = NATIVE_TO_UNI(*s++);
+        }
 
-	/* check for embedded arrays
+        /* check for embedded arrays
 	   (@foo, @::foo, @'foo, @{foo}, @$foo, @+, @-)
 	   */
 	else if (*s == '@' && s[1]) {
@@ -2484,7 +2542,11 @@ S_process_shebang(pTHX_ char* s) {
 	PL_thiswhite = newSVpvs("");
     sv_catpvn(PL_thiswhite, starts, s-starts);
 #endif
-    return skipspace(s, FALSE);
+    {
+	bool is_continuation;
+	s = skipspace(s, &is_continuation);
+    }
+    return s;
 }
 
 #ifdef PERL_MAD 
@@ -2616,7 +2678,7 @@ Perl_madlex(pTHX)
 	    break;
 	/* remember any fake bracket that lexer is about to discard */ 
 	if (PL_lex_brackets == 1 &&
-	    ((expectation)PL_lex_brackstack[0] & XFAKEBRACK))
+	    ((expectation)PL_lex_brackstack[0].state & XFAKEBRACK))
 	{
 	    s = PL_bufptr;
 	    while (s < PL_bufend && (*s == ' ' || *s == '\t'))
@@ -2677,8 +2739,8 @@ S_tokenize_use(pTHX_ int is_use, char *s) {
 }
 #ifdef DEBUGGING
     static const char* const exp_name[] =
-	{ "OPERATOR", "TERM", "REF", "STATE", "BLOCK", "ATTRBLOCK",
-	  "ATTRTERM", "TERMBLOCK", "TERMORDORDOR"
+	{ "OPERATOR", "TERM", "REF", "STATE", "BLOCK",
+	  "TERMBLOCK", "TERMORDORDOR"
 	};
 #endif
 
@@ -2729,10 +2791,12 @@ Perl_yylex(pTHX)
 
     DEBUG_T( {
 	SV* tmp = newSVpvs("");
-	PerlIO_printf(Perl_debug_log, "### %"IVdf":LEX_%s/X%s %s\n",
+	PerlIO_printf(Perl_debug_log, "### %"IVdf":LEX_%s/X%s/%"IVdf"/%"IVdf" %s\n",
 	    (IV)PL_parser->lex_line_number,
 	    lex_state_names[PL_lex_state],
 	    exp_name[PL_expect],
+	    (IV)PL_parser->statement_indent,
+	    PL_lex_brackets,
 	    pv_display(tmp, s, strlen(s), 0, 60));
 	SvREFCNT_dec(tmp);
     } );
@@ -2997,6 +3061,29 @@ Perl_yylex(pTHX)
 
   retry:
     PL_bufptr = s;
+
+    if (PL_expect == XBLOCK && !PL_parser->doextract) {
+	bool is_continuation;
+	s = skipspace(s, &is_continuation);
+	d = S_skip_pod(s);
+	if (d) {
+	    s = d;
+	    goto retry;
+	}
+	if (is_continuation) {
+	    if (*s != '{') {
+		S_start_statement_indent(s);
+		TOKEN('{');
+	    }
+	}
+	else {
+            yyerror("Expected block");
+	    /* empty block */
+	    force_next('}');
+	    TOKEN('{');
+	}
+    }
+
 #ifdef PERL_MAD
     if (PL_thistoken) {
 	sv_free(PL_thistoken);
@@ -3004,6 +3091,7 @@ Perl_yylex(pTHX)
     }
     PL_realtokenstart = s - SvPVX_mutable(PL_linestr);	/* assume but undo on ws */
 #endif
+    assert(s <= PL_bufend);
     pl_yylval.i_tkval.location = S_curlocation(PL_bufptr);
     switch (*s) {
     default:
@@ -3022,6 +3110,12 @@ Perl_yylex(pTHX)
 	if (!PL_rsfp) {
 	    PL_last_uni = 0;
 	    PL_last_lop = 0;
+
+	    if (PL_parser->statement_indent > 0) {
+		S_stop_statement_indent();
+		TOKEN(';');
+	    }
+
 	    if (PL_lex_brackets) {
 		yyerror((const char *)
 			("Missing right curly or square bracket"));
@@ -3029,7 +3123,8 @@ Perl_yylex(pTHX)
             DEBUG_T( { PerlIO_printf(Perl_debug_log,
                         "### Tokener got EOF\n");
             } );
-	    TOKEN(0);
+	    force_next(0);
+	    TOKEN(';');
 	}
 	if (s++ < PL_bufend)
 	    goto retry;			/* ignore stray nulls */
@@ -3086,7 +3181,7 @@ Perl_yylex(pTHX)
 		    else
 			(void)PerlIO_close(PL_rsfp);
 		    PL_rsfp = NULL;
-		    PL_doextract = FALSE;
+		    PL_parser->doextract = FALSE;
 		}
 		PL_oldoldbufptr = PL_oldbufptr = s = PL_linestart = SvPVX_mutable(PL_linestr);
 		PL_last_lop = PL_last_uni = NULL;
@@ -3119,7 +3214,7 @@ Perl_yylex(pTHX)
 		    s = swallow_bom(s);
 		}
 	    }
-	    if (PL_doextract) {
+	    if (PL_parser->doextract) {
 		/* Incest with pod. */
 #ifdef PERL_MAD
 		if (PL_madskills)
@@ -3130,19 +3225,21 @@ Perl_yylex(pTHX)
 		    PL_oldoldbufptr = PL_oldbufptr = s = PL_linestart = SvPVX_mutable(PL_linestr);
 		    PL_bufend = SvPVX_mutable(PL_linestr) + SvCUR(PL_linestr);
 		    PL_last_lop = PL_last_uni = NULL;
-		    PL_doextract = FALSE;
+		    PL_parser->doextract = FALSE;
 		}
 	    }
 	    incline(s);
-	} while (PL_doextract);
+	} while (PL_parser->doextract);
 	PL_oldoldbufptr = PL_oldbufptr = PL_bufptr = PL_linestart = s;
 	PL_bufend = SvPVX_mutable(PL_linestr) + SvCUR(PL_linestr);
 	PL_last_lop = PL_last_uni = NULL;
 	if (PL_parser->lex_line_number == 1) {
 	    s = S_process_shebang(s);
+#ifdef PERL_MAD
 	    if (!PL_thiswhite)
 		PL_thiswhite = newSVpvs("");
 	    sv_catsv(PL_thiswhite, PL_skipwhite);
+#endif
 	}
 	goto retry;
     case '\r':
@@ -3164,28 +3261,43 @@ Perl_yylex(pTHX)
 	s++;
 	goto retry;
     case '#':
+	if (s == PL_linestart && PL_in_eval && !PL_rsfp) {
+	    /* handle eval qq[#line 1 "foo"\n ...] */
+	    PL_parser->lex_line_number--;
+	    incline(s);
+	}
+	/* FALLTROUGHT */
     case '\n': {
 	/* might be non continuous line */
-	char* next_s = skipspace(s, FALSE);
-	if (next_s != s) {
-	    if (PL_parser->statement_indent) {
-		if ((next_s - PL_linestart) <= PL_parser->statement_indent) {
-		    if ((next_s - PL_linestart) < PL_parser->statement_indent) {
-			S_stop_statement_indent();
+	bool is_continuation;
+	s = skipspace(s, &is_continuation);
+	assert(!isSPACE_notab(*s));
+	if (!is_continuation) {
+	    if (PL_parser->statement_indent != -1) {
+		if ((s - PL_linestart) <= PL_parser->statement_indent) {
+		    d = S_skip_pod(s);
+		    if (d) {
+			s = d;
+			TOKEN(';');
 		    }
-		    else 
-			s = next_s;
-		    OPERATOR(';');
+		    if ((s - PL_linestart) < PL_parser->statement_indent) {
+			S_stop_statement_indent();
+			s = PL_linestart - 1;
+			assert(*s == '\n');
+		    }
+		    TOKEN(';');
 		}
 	    }
+#ifdef PERL_MAD
 	    if (PL_madskills) {
 		if (!PL_thiswhite)
 		    PL_thiswhite = newSVpvs("");
 		sv_catsv(PL_thiswhite, PL_skipwhite);
 	    }
-	    s = next_s;
+#endif
 	    goto retry;
 	}
+	goto retry;
 
 #ifdef PERL_MAD
 	PL_realtokenstart = -1;
@@ -3259,6 +3371,7 @@ Perl_yylex(pTHX)
 	}
 	goto retry;
     }
+
     case '-':
 	if (s[1] && isALPHA(s[1]) && !isALNUM(s[2])) {
 	    I32 ftst = 0;
@@ -3484,6 +3597,12 @@ Perl_yylex(pTHX)
 
 	if (s[1] == '(') {
 	    /* anonymous hash constructor '%(' */
+	    if (PL_lex_brackets > 100)
+		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+	    PL_lex_brackstack[PL_lex_brackets].type = LB_PAREN;
+	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
+	    ++PL_lex_brackets;
+
 	    s += 2;
 	    OPERATOR(ANONHSH);
 	}
@@ -3538,8 +3657,9 @@ Perl_yylex(pTHX)
 	s++;
 	if (PL_expect == XOPERATOR && *s == '[') {
 	    s++;
-	    PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
-	    PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
+	    PL_lex_brackstack[PL_lex_brackets].type = LB_ASLICE;
+	    PL_lex_brackstack[PL_lex_brackets].state = XTERM;
+	    ++PL_lex_brackets;
 	    PL_expect = XSTATE;
 	    TOKEN(ASLICE);
 	    /* NOT REACHED */
@@ -3547,6 +3667,8 @@ Perl_yylex(pTHX)
 	if (PL_expect != XOPERATOR) {
 	    yyerror("'[...]' should be '\\@(...)'");
 	}
+	PL_lex_brackstack[PL_lex_brackets].type = LB_AELEM;
+	PL_lex_brackstack[PL_lex_brackets].state = XTERM;
 	PL_lex_brackets++;
 	while (s < PL_bufend && SPACE_OR_TAB(*s))
 	    s++;
@@ -3566,117 +3688,8 @@ Perl_yylex(pTHX)
 	    goto just_a_word_zero_gv;
 	}
 	s++;
-	switch (PL_expect) {
-	    OP *attrs;
-#ifdef PERL_MAD
-	    I32 stuffstart;
-#endif
-	case XOPERATOR:
-	    if (!PL_in_my || PL_lex_state != LEX_NORMAL)
-		break;
-	    PL_bufptr = s;	/* update in case we back off */
-	    goto grabattrs;
-	case XATTRBLOCK:
-	    PL_expect = XBLOCK;
-	    goto grabattrs;
-	case XATTRTERM:
-	    PL_expect = XTERMBLOCK;
-	 grabattrs:
-#ifdef PERL_MAD
-	    stuffstart = s - SvPVX_mutable(PL_linestr) - 1;
-#endif
-	    s = PEEKSPACE(s);
-	    attrs = NULL;
-	    while (isIDFIRST_lazy_if(s,UTF)) {
-		I32 tmp;
-		SV *sv;
-		d = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, FALSE, &len);
-		if (isLOWER(*s) && (tmp = keyword(PL_tokenbuf, len))) {
-		    if (tmp < 0) tmp = -tmp;
-		    switch (tmp) {
-		    case KEY_or:
-		    case KEY_and:
-		    case KEY_for:
-		    case KEY_unless:
-		    case KEY_if:
-		    case KEY_while:
-		    case KEY_until:
-			goto got_attrs;
-		    default:
-			break;
-		    }
-		}
-		sv = newSVpvn(s, len);
-		if (*d == '(') {
-		    PL_lex_stuff.flags = LEXf_ATTRS;
-		    d = scan_str(d,TRUE,TRUE,&PL_lex_stuff);
-		    if (!d) {
-			/* MUST advance bufptr here to avoid bogus
-			   "at end of line" context messages from yyerror().
-			 */
-			PL_bufptr = s + len;
-			yyerror("Unterminated attribute parameter in attribute list");
-			if (attrs)
-			    op_free(attrs);
-			sv_free(sv);
-			return REPORT(0);	/* EOF indicator */
-		    }
-		}
-		if (PL_lex_stuff.str_sv) {
-		    sv_catsv(sv, PL_lex_stuff.str_sv);
-		    attrs = append_elem(OP_LIST, attrs,
-					newSVOP(OP_CONST, 0, sv, S_curlocation(PL_bufptr)));
-		    SvREFCNT_dec(PL_lex_stuff.str_sv);
-		    PL_lex_stuff.str_sv = NULL;
-		}
-		s = PEEKSPACE(d);
-		if (*s == ':' && s[1] != ':')
-		    s = PEEKSPACE(s+1);
-		else if (s == d)
-		    break;	/* require real whitespace or :'s */
-		/* XXX losing whitespace on sequential attributes here */
-	    }
-	    {
-		const char tmp
-		    = (PL_expect == XOPERATOR ? '=' : '{'); /*'}(' for vi */
-		if (*s != ';' && *s != '}' && *s != tmp
-		    && (tmp != '=' || *s != ')')) {
-		    const char q = ((*s == '\'') ? '"' : '\'');
-		    /* If here for an expression, and parsed no attrs, back
-		       off. */
-		    if (tmp == '=' && !attrs) {
-			s = PL_bufptr;
-			break;
-		    }
-		    /* MUST advance bufptr here to avoid bogus "at end of line"
-		       context messages from yyerror().
-		    */
-		    PL_bufptr = s;
-		    yyerror( (const char *)
-			     (*s
-			      ? Perl_form(aTHX_ "Invalid separator character "
-					  "%c%c%c in attribute list", q, *s, q)
-			      : "Unterminated attribute list" ) );
-		    if (attrs)
-			op_free(attrs);
-		    OPERATOR(':');
-		}
-	    }
-	got_attrs:
-	    if (attrs) {
-		start_force(PL_curforce);
-		NEXTVAL_NEXTTOKE.opval = attrs;
-		CURMAD('_', PL_nextwhite, NULL);
-		force_next(THING);
-	    }
-#ifdef PERL_MAD
-	    if (PL_madskills) {
-		PL_thistoken = newSVpvn(SvPVX_mutable(PL_linestr) + stuffstart,
-				     (s - SvPVX_mutable(PL_linestr)) - stuffstart);
-	    }
-#endif
-	    TOKEN(COLONATTR);
-	}
+	if(PL_expect == XOPERATOR)
+	    no_op("':'", s);
 	OPERATOR(':');
     case '(':
 	s++;
@@ -3684,6 +3697,13 @@ Perl_yylex(pTHX)
 	    PL_oldbufptr = PL_oldoldbufptr;		/* allow print(STDOUT 123) */
 	else
 	    PL_expect = XTERM;
+
+	if (PL_lex_brackets > 100)
+	    Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+	PL_lex_brackstack[PL_lex_brackets].type = LB_PAREN;
+	PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
+	++PL_lex_brackets;
+
 	s = SKIPSPACE1(s);
 	TOKEN('(');
     case ';':
@@ -3694,6 +3714,14 @@ Perl_yylex(pTHX)
     case ')':
 	{
 	    const char tmp = *s++;
+	    if (PL_lex_brackets <= 0)
+		yyerror("Unmatched right parenthesis");
+	    else {
+		if (PL_lex_brackstack[PL_lex_brackets-1].type != LB_PAREN)
+		    yyerror("Closing parenthesis did not match open parenthesis");
+		else
+		    --PL_lex_brackets;
+	    }
 	    PL_expect = XOPERATOR;
 	    TERM(tmp);
 	}
@@ -3701,8 +3729,25 @@ Perl_yylex(pTHX)
 	s++;
 	if (PL_lex_brackets <= 0)
 	    yyerror("Unmatched right square bracket");
-	else
-	    --PL_lex_brackets;
+	else {
+	    if (PL_lex_brackstack[PL_lex_brackets-1].type == LB_ASLICE) {
+		if (*s != ']')
+		    yyerror("Closing square bracket did not match opening array slice");
+		++s;
+		--PL_lex_brackets;
+	    }
+	    else if (PL_lex_brackstack[PL_lex_brackets-1].type == LB_HSLICE) {
+		if (*s != '}')
+		    yyerror("Closing square bracket did not match opening hash slice");
+		++s;
+		--PL_lex_brackets;
+	    }
+	    else if (PL_lex_brackstack[PL_lex_brackets-1].type == LB_AELEM) {
+		--PL_lex_brackets;
+	    } else {
+		yyerror("Unmatched right square bracket");
+	    }
+	}
 	if (PL_lex_state == LEX_INTERPNORMAL) {
 	    if ( ! intuit_more(s))
 		PL_lex_state = LEX_INTERPEND;
@@ -3710,22 +3755,24 @@ Perl_yylex(pTHX)
 	TERM(']');
     case '{':
 	s++;
-	if (PL_lex_brackets > 100) {
-	    Renew(PL_lex_brackstack, PL_lex_brackets + 10, char);
-	}
+	if (PL_lex_brackets > 100)
+	    Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
 	switch (PL_expect) {
 	case XTERM:
+	    PL_lex_brackstack[PL_lex_brackets].type = LB_BLOCK;
 	    if (PL_oldoldbufptr == PL_last_lop)
-		PL_lex_brackstack[PL_lex_brackets++] = XTERM;
+		PL_lex_brackstack[PL_lex_brackets].state = XTERM;
 	    else
-		PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
+		PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
+	    ++PL_lex_brackets;
 	    force_next('{');
 	    TOKEN(BLOCKSUB);
 	case XOPERATOR:
 	    if (*s == '[') {
 		s++;
-		PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
-		PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
+		PL_lex_brackstack[PL_lex_brackets].type = LB_HSLICE;
+		PL_lex_brackstack[PL_lex_brackets].state = XTERM;
+		++PL_lex_brackets;
 		PL_expect = XSTATE;
 		if ( *s == '+' || *s == '?' ) {
 		    pl_yylval.i_tkval.ival = *s == '+' ? OPpELEM_ADD : OPpELEM_OPTIONAL;
@@ -3757,15 +3804,23 @@ Perl_yylex(pTHX)
 		    s = force_word(s, WORD, FALSE, TRUE, FALSE);
 		}
 	    }
-	    /* FALL THROUGH */
-	case XATTRBLOCK:
-	case XBLOCK:
-	    PL_lex_brackstack[PL_lex_brackets++] = XSTATE;
+	    PL_lex_brackstack[PL_lex_brackets].type = LB_HELEM;
+	    PL_lex_brackstack[PL_lex_brackets].state = XTERM;
+	    ++PL_lex_brackets;
 	    PL_expect = XSTATE;
 	    break;
-	case XATTRTERM:
+	case XBLOCK:
+	    PL_lex_brackstack[PL_lex_brackets].type = LB_BLOCK;
+	    PL_lex_brackstack[PL_lex_brackets].state = XSTATE;
+	    PL_lex_brackstack[PL_lex_brackets].prev_statement_indent = PL_parser->statement_indent;
+            ++PL_lex_brackets;
+	    PL_parser->statement_indent = -1;
+	    PL_expect = XSTATE;
+	    break;
 	case XTERMBLOCK:
-	    PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
+	    PL_lex_brackstack[PL_lex_brackets].type = LB_BLOCK;
+	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
+	    ++PL_lex_brackets;
 	    PL_expect = XSTATE;
 	    break;
 	default:
@@ -3773,15 +3828,19 @@ Perl_yylex(pTHX)
 	    break;
 	case XSTATE:
 	case XREF:
+	    PL_lex_brackets++;
+	    PL_lex_brackstack[PL_lex_brackets-1].type = LB_BLOCK;
 	    if (PL_oldoldbufptr == PL_last_lop)
-		PL_lex_brackstack[PL_lex_brackets++] = XTERM;
+		PL_lex_brackstack[PL_lex_brackets-1].state = XTERM;
 	    else
-		PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
+		PL_lex_brackstack[PL_lex_brackets-1].state = XOPERATOR;
 	    s = SKIPSPACE1(s);
 	    if (PL_expect == XREF)
 		PL_expect = XTERM;
 	    else {
-		PL_lex_brackstack[PL_lex_brackets-1] = XSTATE;
+		PL_lex_brackstack[PL_lex_brackets-1].state = XSTATE;
+                PL_lex_brackstack[PL_lex_brackets-1].prev_statement_indent = PL_parser->statement_indent;
+                PL_parser->statement_indent = -1;
 		PL_expect = XSTATE;
 	    }
 	    break;
@@ -3791,8 +3850,18 @@ Perl_yylex(pTHX)
 	s++;
 	if (PL_lex_brackets <= 0)
 	    yyerror("Unmatched right curly bracket");
-	else
-	    PL_expect = (expectation)PL_lex_brackstack[--PL_lex_brackets];
+	else {
+	    if (PL_lex_brackstack[PL_lex_brackets-1].type != LB_BLOCK 
+		&& PL_lex_brackstack[PL_lex_brackets-1].type != LB_HELEM) 
+		yyerror("Unmatched right curly bracket");
+	    else {
+		--PL_lex_brackets;
+		PL_expect = (expectation)PL_lex_brackstack[PL_lex_brackets].state;
+		if (PL_expect == XSTATE) {
+		    PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
+		}
+	    }
+        }
 	if (PL_lex_state == LEX_INTERPBLOCK) {
 	    if (PL_lex_brackets == 0) 
 		PL_lex_state = LEX_INTERPEND;
@@ -3872,39 +3941,13 @@ Perl_yylex(pTHX)
 		Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
 			    "Reversed %c= operator",(int)tmp);
 	    s--;
-	    if (PL_expect == XSTATE && isALPHA(tmp) &&
-		(s == PL_linestart+1 || s[-2] == '\n') )
-		{
-		    if (PL_in_eval && !PL_rsfp) {
-			d = PL_bufend;
-			while (s < d) {
-			    if (*s++ == '\n') {
-				incline(s);
-				if (strnEQ(s,"=cut",4)) {
-				    s = strchr(s,'\n');
-				    if (s)
-					s++;
-				    else
-					s = d;
-				    incline(s);
-				    goto retry;
-				}
-			    }
-			}
-			goto retry;
-		    }
-#ifdef PERL_MAD
-		    if (PL_madskills) {
-			if (!PL_thiswhite)
-			    PL_thiswhite = newSVpvs("");
-			sv_catpvn(PL_thiswhite, PL_linestart,
-				  PL_bufend - PL_linestart);
-		    }
-#endif
-		    s = PL_bufend;
-		    PL_doextract = TRUE;
+	    if (PL_expect == XSTATE) {
+		d = S_skip_pod(s-1);
+		if (d) {
+		    s = d;
 		    goto retry;
 		}
+	    }
 	}
 	pl_yylval.i_tkval.ival = 0;
 	OPERATOR(ASSIGNOP);
@@ -3999,9 +4042,14 @@ Perl_yylex(pTHX)
 	}
 
 	if (s[1] == '(') {
-	    /* anon scalar constructor */
+	    /* anon scalar constructor $( */
+	    if (PL_lex_brackets > 100)
+		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+	    PL_lex_brackstack[PL_lex_brackets].type = LB_PAREN;
+	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
+	    ++PL_lex_brackets;
+
 	    s += 2;
-	    PL_lex_brackstack[PL_lex_brackets++] = XTERM;
 	    OPERATOR(ANONSCALAR);
 	}
 
@@ -4033,7 +4081,13 @@ Perl_yylex(pTHX)
 	    no_op("Array", s);
 
 	if (s[1] == '(') {
-	    /* array constructor */
+	    /* array constructor  @( */
+	    if (PL_lex_brackets > 100)
+		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+	    PL_lex_brackstack[PL_lex_brackets].type = LB_PAREN;
+	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
+	    ++PL_lex_brackets;
+
 	    s += 2;
 	    OPERATOR(ANONARY);
 	}
@@ -4272,14 +4326,10 @@ Perl_yylex(pTHX)
 	if (!tmp && *s == ':' && s[1] == ':' && strNE(PL_tokenbuf, "CORE"))
 	    goto just_a_word;
 
-	d = s;
-	while (d < PL_bufend && isSPACE(*d))
-		d++;	/* no comments skipped here, or s### is misparsed */
-
 	/* Is this a label? */
 	if (!tmp && PL_expect == XSTATE
-	      && d < PL_bufend && *d == ':' && *(d + 1) != ':') {
-	    s = d + 1;
+	      && s < PL_bufend && *s == ':' && *(s + 1) != ':') {
+	    s = s + 1;
 	    pl_yylval.pval = CopLABEL_alloc(PL_tokenbuf);
 	    TOKEN(LABEL);
 	}
@@ -4287,8 +4337,12 @@ Perl_yylex(pTHX)
 	/* Check for keywords */
 	tmp = keyword(PL_tokenbuf, len);
 
+	d = s;
+	while (s < PL_bufend && isSPACE_notab(*s) && *s != '\n')
+	    ++s;
+
 	/* Is this a word before a => operator? */
-	if (*d == '=' && d[1] == '>') {
+	if (s < PL_bufend && *s == '=' && s[1] == '>') {
 	    pl_yylval.opval
 		= (OP*)newSVOP(OP_CONST, 0,
 			       newSVpvn(PL_tokenbuf, len), S_curlocation(PL_bufptr));
@@ -4299,7 +4353,7 @@ Perl_yylex(pTHX)
 	if (tmp < 0) {			/* second-class keyword? */
 	    GV *ogv = NULL;	/* override (winner) */
 	    GV *hgv = NULL;	/* hidden (loser) */
-	    if (PL_expect != XOPERATOR && (*s != ':' || s[1] != ':')) {
+	    if (PL_expect != XOPERATOR && (d != s || *s != ':' || s[1] != ':')) {
 		CV *cv;
 		if ((gv = gv_fetchpvn_flags(PL_tokenbuf, len, 0, SVt_PVCV)) &&
 		    (cv = GvCVu(gv)))
@@ -4336,6 +4390,8 @@ Perl_yylex(pTHX)
 			 GvENAME(hgv), "qualify as such or use &");
 	    }
 	}
+	if (!tmp && d != s)
+	    goto just_a_word_without_qualifier;
 
       reserved_word:
 	switch (tmp) {
@@ -4354,7 +4410,7 @@ Perl_yylex(pTHX)
 	  just_a_word: {
 		SV *sv;
 		int pkgname = 0;
-		const char lastchar = (PL_bufptr == PL_oldoldbufptr ? 0 : PL_bufptr[-1]);
+		char lastchar;
 		CV *cv;
 		SV **compsubtable;
 
@@ -4375,10 +4431,17 @@ Perl_yylex(pTHX)
 		    pkgname = 1;
 		}
 
+		if (0) {
+		  just_a_word_without_qualifier:
+		    pkgname  = 0;
+		}
+
+		lastchar = (PL_bufptr == PL_oldoldbufptr ? 0 : PL_bufptr[-1]);
+
 		if (PL_expect == XOPERATOR) {
 		    if (PL_bufptr == PL_linestart) {
 			PL_parser->lex_line_number--;
-			Perl_warner(aTHX_ packWARN(WARN_SEMICOLON), PL_warn_nosemi);
+			yywarn(PL_warn_nosemi);
 			PL_parser->lex_line_number++;
 		    }
 		    else
@@ -4708,10 +4771,6 @@ Perl_yylex(pTHX)
 	case KEY_INIT:
 	case KEY_END:
 	    if (PL_expect == XSTATE) {
-		s = skipspace(s, TRUE);
-		if (*s != '{') {
-		    yyerror("Illegal declaration of special block");
-		}
 
 		pl_yylval.i_tkval.ival = tmp;
 
@@ -4809,11 +4868,7 @@ Perl_yylex(pTHX)
 	    UNI(OP_CHROOT);
 
 	case KEY_do:
-	    s = SKIPSPACE1(s);
-	    if (*s != '{') {
-		S_start_statement_indent(s);
-	    }
-	    PRETERMBLOCK(DO);
+	    PREBLOCK(DO);
 
 	case KEY_die:
 	    PL_hints |= HINT_BLOCK_SCOPE;
@@ -5055,6 +5110,9 @@ Perl_yylex(pTHX)
 	case KEY_log:
 	    UNI(OP_LOG);
 
+	case KEY_loop:
+	    PREBLOCK(LOOPDO);
+
 	case KEY_link:
 	    LOP(OP_LINK,XTERM);
 
@@ -5097,6 +5155,9 @@ Perl_yylex(pTHX)
 
 	case KEY_our:
 	case KEY_my:
+            if (PL_expect == XOPERATOR) {
+                no_op( tmp == KEY_my ? "'my'" : "'our'", s);
+            }
 	    PL_in_my = (U16)tmp;
 	    pl_yylval.i_tkval.ival = 1;
 	    OPERATOR(MY);
@@ -5286,8 +5347,8 @@ Perl_yylex(pTHX)
 	    PL_bufptr = s;
 	    PL_last_uni = PL_oldbufptr;
 	    PL_last_lop_op = OP_REQUIRE;
-	    s = skipspace(s, TRUE);
-	    return REPORT( (int)REQUIRE );
+	    s = skipspace(s, NULL);
+	    TOKEN(REQUIRE);
 
 	case KEY_redo:
 	    s = force_word(s,WORD,TRUE,FALSE,FALSE);
@@ -5452,13 +5513,15 @@ Perl_yylex(pTHX)
 	    LOP(OP_SUBSTR,XTERM);
 
 	case KEY_sub:
-	  really_sub:
 	    {
 		char tmpbuf[sizeof PL_tokenbuf];
 		SSize_t tboffset = 0;
-		expectation attrful;
+                SSize_t tblen;
 		bool have_name;
 		const int key = tmp;
+
+		if (PL_expect == XOPERATOR)
+		    no_op("'sub'", s);
 
 #ifdef PERL_MAD
 		SV *tmpwhite = 0;
@@ -5480,11 +5543,10 @@ Perl_yylex(pTHX)
 		    SV *nametoke = NULL;
 #endif
 
-		    PL_expect = XBLOCK;
-		    attrful = XATTRBLOCK;
 		    /* remember buffer pos'n for later force_word */
 		    tboffset = s - PL_oldbufptr;
 		    d = scan_word(s, tmpbuf, sizeof tmpbuf, TRUE, &len);
+                    tblen = d-s;
 #ifdef PERL_MAD
 		    if (PL_madskills)
 			nametoke = newSVpvn(s, d - s);
@@ -5498,6 +5560,7 @@ Perl_yylex(pTHX)
 		    }
 		    have_name = TRUE;
 
+#ifdef PERL_MAD
 		    start_force(0);
 		    CURMAD('X', nametoke, NULL);
 		    CURMAD('_', tmpwhite, NULL);
@@ -5507,7 +5570,6 @@ Perl_yylex(pTHX)
 		    NEXTVAL_NEXTTOKE.opval->op_private |= OPpCONST_BARE;
 		    force_next(WORD);
 
-#ifdef PERL_MAD
 		    s = SKIPSPACE2(d,tmpwhite);
 #else
 		    s = SKIPSPACE0(d);
@@ -5516,19 +5578,15 @@ Perl_yylex(pTHX)
 		else {
 		    if (key == KEY_my)
 			Perl_croak(aTHX_ "Missing name in \"my sub\"");
-		    PL_expect = XTERMBLOCK;
-		    attrful = XATTRTERM;
 		    sv_setpvn(PL_subname,"?",1);
 		    have_name = FALSE;
 		}
 
-		if (*s == ':' && s[1] != ':')
-		    PL_expect = attrful;
-		else if (*s != '{' && *s != '(' && key == KEY_sub) {
-		    if (!have_name)
-			yyerror("Illegal declaration of anonymous subroutine");
-		    else if (*s != ';')
-			yyerror(Perl_form(aTHX_ "Illegal declaration of subroutine %"SVf, SVfARG(PL_subname)));
+		if (*s != '(' && key == KEY_sub) {
+		    PL_expect = XBLOCK;
+		}
+		else {
+		    PL_expect = XTERM;
 		}
 
 #ifdef PERL_MAD
@@ -5549,6 +5607,12 @@ Perl_yylex(pTHX)
 			sv_setpvs(PL_subname, "__ANON__::__ANON__");
 		    TOKEN(ANONSUB);
 		}
+#ifndef PERL_MAD
+                NEXTVAL_NEXTTOKE.opval = (OP*)newSVOP(OP_CONST,0, newSVpvn(PL_oldbufptr + tboffset, tblen), 
+                    S_curlocation(PL_oldbufptr + tboffset));
+                NEXTVAL_NEXTTOKE.opval->op_private |= OPpCONST_BARE;
+                force_next(WORD);
+#endif
 		if (key == KEY_my)
 		    TOKEN(MYSUB);
 		TOKEN(SUB);
@@ -6324,6 +6388,12 @@ Perl_keyword (pTHX_ const char *name, I32 len)
                   name[3] == 'k')
               {                                   /* lock       */
                 return -KEY_lock;
+              }
+
+              if (name[2] == 'o' &&
+                  name[3] == 'p')
+              {                                   /* loop       */
+		  return KEY_loop;
               }
 
               goto unknown;
@@ -9612,6 +9682,11 @@ S_scan_str(pTHX_ char *start, int escape, int keep_delims, yy_str_info *str_info
     /* skip space before the delimiter */
     if (isSPACE(*s)) {
 	s = PEEKSPACE(s);
+	if (isSPACE(*s)) {
+	    yyerror("statement end found where string delimeter expected");
+	    str_info->str_sv = newSVpvs("");
+	    return s;
+	}
     }
 
 #ifdef PERL_MAD

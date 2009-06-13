@@ -733,7 +733,7 @@ in $whatchamacallit:
 
     }
 
-See L<perlsyn> for other examples in this style.
+See L<kurilasyn> for other examples in this style.
 
 Sometimes you should change the positions of the constant and the variable.
 For example, let's say you wanted to test which of many answers you were
@@ -768,7 +768,7 @@ A totally different approach is to create a hash of function references.
 	}
 
 Note that starting from version 5.10, Perl has now a native switch
-statement. See L<perlsyn>.
+statement. See L<kurilasyn>.
 
 Starting from Perl 5.8, a source filter module, C<Switch>, can also be
 used to get switch and case. Its use is now discouraged, because it's
