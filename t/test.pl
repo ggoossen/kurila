@@ -159,6 +159,7 @@ sub is ($got, $expected, ?$name, @< @mess)
     elsif (ref $got and ref $expected)
         $pass = $got \== $expected
     else
+        local $^EVAL_ERROR
         $pass = try { $got eq $expected }
 
     unless ($pass)
