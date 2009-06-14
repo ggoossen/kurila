@@ -393,3 +393,11 @@ $a
 ########
 try { require utf8 }
 $a
+########
+$a
+
+=pod
+test
+=cut
+
+33

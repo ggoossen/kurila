@@ -3215,8 +3215,11 @@ Perl_yylex(pTHX)
 	    if (PL_parser->doextract) {
 		/* Incest with pod. */
 #ifdef PERL_MAD
-		if (PL_madskills)
+		if (PL_madskills) {
+		    if (!PL_thiswhite)
+			PL_thiswhite = newSVpvs("");
 		    sv_catsv(PL_thiswhite, PL_linestr);
+		}
 #endif
 		if (*s == '=' && strnEQ(s, "=cut", 4) && !isALPHA(s[4])) {
 		    sv_setpvn(PL_linestr, "", 0);
@@ -3276,6 +3279,10 @@ Perl_yylex(pTHX)
 		    d = S_skip_pod(s);
 		    if (d) {
 			s = d;
+			if (PL_madskills) {
+			    sv_catsv(PL_skipwhite, PL_thiswhite);
+			    PL_thiswhite = NULL;
+			}
 			TOKEN(';');
 		    }
 		    if ((s - PL_linestart) < PL_parser->statement_indent) {
@@ -5349,7 +5356,6 @@ Perl_yylex(pTHX)
 	    PL_bufptr = s;
 	    PL_last_uni = PL_oldbufptr;
 	    PL_last_lop_op = OP_REQUIRE;
-	    s = skipspace(s, NULL);
 	    TOKEN(REQUIRE);
 
 	case KEY_redo:
