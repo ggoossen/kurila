@@ -178,6 +178,16 @@ my @prgs = @( split "\n########\n", ~< *DATA );
 if ($a) { $b }
 33
 ########
+do
+    $a
+
+ + $b
+########
+if ($a == 21)
+    next
+
+33
+########
 # unless(eval { })
 unless (try { $a }) { $a = $b }
 ########
@@ -373,3 +383,13 @@ evalfile "foo.pl"
 ########
 sub foo() { 33 };
 foo
+########
+loop
+    1 
+while (1)
+########
+for (1..10) {}
+$a
+########
+try { require utf8 }
+$a

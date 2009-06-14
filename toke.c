@@ -1005,6 +1005,17 @@ S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
 	    }
 	    assert(PL_linestart[-1] == '\n');
 	    PL_bufptr = PL_linestart - 1;
+#ifdef PERL_MAD
+	    if (PL_madskills) {
+		if (!PL_skipwhite) {
+		    PL_skipwhite = newSVpvs("");
+		    curoff = PL_bufptr - SvPVX_mutable(PL_linestr);
+		    if (curoff - startoff)
+			sv_catpvn(PL_skipwhite, SvPVX_mutable(PL_linestr) + startoff,
+			    curoff - startoff);
+		}
+	    }
+#endif
 	    return PL_linestart - 1;
         }
     }
@@ -3110,6 +3121,7 @@ Perl_yylex(pTHX)
                         "### Tokener got EOF\n");
             } );
 	    force_next(0);
+	    PL_thistoken = newSVpvs("");
 	    TOKEN(';');
 	}
 	if (s++ < PL_bufend)
@@ -3268,21 +3280,22 @@ Perl_yylex(pTHX)
 		    }
 		    if ((s - PL_linestart) < PL_parser->statement_indent) {
 			S_stop_statement_indent();
+			if (PL_madskills)
+			    SvCUR_set(PL_skipwhite, SvCUR(PL_skipwhite) - (s - PL_linestart + 1));
 			s = PL_linestart - 1;
 			assert(*s == '\n');
 		    }
 		    TOKEN(';');
 		}
 	    }
-#ifdef PERL_MAD
-	    if (PL_madskills) {
-		if (!PL_thiswhite)
-		    PL_thiswhite = newSVpvs("");
-		sv_catsv(PL_thiswhite, PL_skipwhite);
-	    }
-#endif
-	    goto retry;
 	}
+#ifdef PERL_MAD
+	if (PL_madskills) {
+	    if (!PL_thiswhite)
+		PL_thiswhite = newSVpvs("");
+	    sv_catsv(PL_thiswhite, PL_skipwhite);
+	}
+#endif
 	goto retry;
 
 #ifdef PERL_MAD
@@ -4420,6 +4433,9 @@ Perl_yylex(pTHX)
 		if (0) {
 		  just_a_word_without_qualifier:
 		    pkgname  = 0;
+#ifdef PERL_MAD
+		    nextPL_nextwhite = 0;
+#endif
 		}
 
 		lastchar = (PL_bufptr == PL_oldoldbufptr ? 0 : PL_bufptr[-1]);
@@ -5506,8 +5522,8 @@ Perl_yylex(pTHX)
 		const int key = tmp;
 
 #ifdef PERL_MAD
-		SV *tmpwhite = 0;
-		SV *tmpwhite2 = 0;
+		SV *tmpwhite = NULL;
+		SV *tmpwhite2 = NULL;
 
 		char *tstart = SvPVX_mutable(PL_linestr) + PL_realtokenstart;
 		SV *subtoken = newSVpvn(tstart, s - tstart);

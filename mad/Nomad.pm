@@ -1013,7 +1013,7 @@ BEGIN {
 	'nullstatement' => sub {		# null statements/blocks
 	    my $self = shift;
 	    my @newkids;
-	    push @newkids, $self->madness('wrap_open { ; } fake_semicolon wrap_close');
+	    push @newkids, $self->madness('wrap_open { ; } fake_semicolon extra_semicolon wrap_close');
 	    $::curstate = 0;
 	    return P5AST::nothing->new(Kids => [@newkids])
 	},
@@ -1090,7 +1090,7 @@ BEGIN {
 	'sub' => sub {			# subroutine
 	    my $self = shift;
 	    my @newkids;
-            push @newkids, $self->madness('d n s prototyped a : { & } fake_semicolon ;');
+            push @newkids, $self->madness('d n s prototyped a : { & } fake_semicolon extra_semicolon ;');
 	    $::curstate = 0;
 	    return P5AST::sub->new(Kids => [@newkids])
 	},
@@ -2876,7 +2876,7 @@ sub blockast {
                  and $::version_from->{'v'} > v1.14 ) ) {
         push @retval, $self->madness(';');
     }
-    push @retval, $self->madness('} fake_semicolon wrap_close');
+    push @retval, $self->madness('} fake_semicolon extra_semicolon wrap_close');
     return $self->newtype->new(Kids => [@retval]);
 }
 
@@ -2943,7 +2943,7 @@ sub ast {
     if ($self->{mp}{w}) {
 	my @newkids;
 	my @tmpkids;
-	push @newkids, $self->madness('D');
+	push @newkids, $self->madness('W D');
 	push @tmpkids, $self->{Kids};
 	my $anddo = $$self{Kids}[-1]{Kids}[0]{Kids};
 	eval { push @newkids, $anddo->[1]->ast($self,@_); };
@@ -2992,9 +2992,6 @@ sub ast {
     my @newkids;
     push @newkids, $self->madness('L o {');
     push @newkids, $self->PLXML::op_lineseq::lineseq(@_);
-    if ( $::version_from->{branch} eq 'kurila' and $::version_from->{'v'} > v1.14 ) {
-        push @newkids, $self->madness(';');
-    }
     push @newkids, $self->madness('} fake_semicolon extra_semicolon');
 
     my @folded = $self->madness('C');

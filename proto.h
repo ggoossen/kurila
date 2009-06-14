@@ -5850,36 +5850,11 @@ STATIC SV*	S_dump_op_flags_private(pTHX_ const OP* o)
 #define PERL_ARGS_ASSERT_DUMP_OP_FLAGS_PRIVATE	\
 	assert(o)
 
-STATIC void	S_dump_op_mad(pTHX_ I32 level, PerlIO *file, const OP *o)
+STATIC void	S_dump_op_mad(pTHX_ I32 level, PerlIO *file, const MADPROP *mp)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
 #define PERL_ARGS_ASSERT_DUMP_OP_MAD	\
-	assert(file); assert(o)
-
-STATIC void	S_dump_op_rest(pTHX_ I32 level, PerlIO *file, const OP *o)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3);
-#define PERL_ARGS_ASSERT_DUMP_OP_REST	\
-	assert(file); assert(o)
-
-#endif
-
-#if defined(PERL_IN_DUMP_C)
-STATIC SV*	S_dump_op_flags(pTHX_ const OP* o)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DUMP_OP_FLAGS	\
-	assert(o)
-
-STATIC SV*	S_dump_op_flags_private(pTHX_ const OP* o)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DUMP_OP_FLAGS_PRIVATE	\
-	assert(o)
-
-STATIC void	S_dump_op_mad(pTHX_ I32 level, PerlIO *file, const OP *o)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3);
-#define PERL_ARGS_ASSERT_DUMP_OP_MAD	\
-	assert(file); assert(o)
+	assert(file); assert(mp)
 
 STATIC void	S_dump_op_rest(pTHX_ I32 level, PerlIO *file, const OP *o)
 			__attribute__nonnull__(pTHX_2)

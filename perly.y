@@ -278,6 +278,7 @@ sideff	:	error
                             TOKEN_GETMAD($3,$2,'x');
                             $$ = newLOOPOP(OPf_PARENS, 1, scalar($5), $2, TRUE, LOCATION($4));
                             TOKEN_GETMAD($4,$$,'w');
+                            TOKEN_GETMAD($1,$$,'W');
 			}
 	|	expr UNTIL iexpr
 			{ 
@@ -289,6 +290,7 @@ sideff	:	error
                             TOKEN_GETMAD($3,$2,'x');
                             $$ = newLOOPOP(OPf_PARENS, 1, $5, $2, TRUE, LOCATION($4));
                             TOKEN_GETMAD($4,$$,'w');
+                            TOKEN_GETMAD($1,$$,'W');
 			}
 	|	expr FOR expr
 			{ $$ = newFOROP(0, NULL,
