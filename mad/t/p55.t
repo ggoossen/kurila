@@ -175,6 +175,9 @@ DATA
 # split with PUSHRE
 my @prgs = @( split "\n########\n", ~< *DATA );
 ########
+if ($a) { $b }
+33
+########
 # unless(eval { })
 unless (try { $a }) { $a = $b }
 ########

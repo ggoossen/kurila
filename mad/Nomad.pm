@@ -59,9 +59,6 @@ sub xml_to_p5 {
 
     my $text = $ast->p5text();	# returns encoded, must output raw
 
-    # remove automaticly added ';'
-    $text =~ s/^;//;
-
     return $text;
 }
 
@@ -1374,7 +1371,10 @@ sub ast {
 
     my $const;
     my @args = $self->madness('f');
-    if (@args) {
+    if ($self->madness('C')) {
+        push @args, $self->madness('C');
+    }
+    elsif (@args) {
     }
     elsif (exists $self->{mp}{q}) {
 	push @args, $self->madness('d q');
@@ -2963,7 +2963,7 @@ sub ast {
                  and $::version_from->{'v'} > v1.14 ) ) {
         push @retval, $self->madness(';');
     }
-    push @retval, $self->madness(q/} fake_semicolon/);
+    push @retval, $self->madness(q/} fake_semicolon extra_semicolon/);
     my $retval = $self->newtype->new(Kids => [@retval]);
 
     if ($$self{mp}{C}) {
@@ -2995,7 +2995,7 @@ sub ast {
     if ( $::version_from->{branch} eq 'kurila' and $::version_from->{'v'} > v1.14 ) {
         push @newkids, $self->madness(';');
     }
-    push @newkids, $self->madness('} fake_semicolon');
+    push @newkids, $self->madness('} fake_semicolon extra_semicolon');
 
     my @folded = $self->madness('C');
     if (@folded) {

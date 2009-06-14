@@ -2399,6 +2399,7 @@ static struct { const char slot; const char* name; } const slotnames[] =
     { 't', "something_t" },
     { 'u', "fake_semicolon" },
     { 'v', "for" },
+    { 'x', "extra_semicolon" },
     { 'w', "whilepost" },
     { 'z', "subst_open" },
     { '{', "curly_open" },

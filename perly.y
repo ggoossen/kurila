@@ -85,6 +85,8 @@
 %token <i_tkval> COLONATTR
 %token <i_tkval> SPECIALBLOCK
 
+%type <i_tkval> optional_semicolon
+
 %type <ionlyval> prog progstart remember mremember
 %type <ionlyval> startsub startanonsub startblocksub
 %type <ionlyval> mintro
@@ -273,6 +275,7 @@ sideff	:	error
 			}
 	|	LOOPDO block optional_semicolon WHILE expr
                         {
+                            TOKEN_GETMAD($3,$2,'x');
                             $$ = newLOOPOP(OPf_PARENS, 1, scalar($5), $2, TRUE, LOCATION($4));
                             TOKEN_GETMAD($4,$$,'w');
 			}
@@ -283,6 +286,7 @@ sideff	:	error
 			}
 	|	LOOPDO block optional_semicolon UNTIL iexpr
                         {
+                            TOKEN_GETMAD($3,$2,'x');
                             $$ = newLOOPOP(OPf_PARENS, 1, $5, $2, TRUE, LOCATION($4));
                             TOKEN_GETMAD($4,$$,'w');
 			}
@@ -295,9 +299,13 @@ sideff	:	error
 
 optional_semicolon
         :       /* NULL */
+                        {
+                            $$.ival = 0;
+                        }
         |       ';'
                         {
                             PL_parser->expect = XSTATE;
+                            $$ = $1;
                         }
         ;
 
@@ -310,6 +318,7 @@ else	:	/* NULL */
 			}
 	|	ELSIF '(' mexpr ')' mblock optional_semicolon else
 			{ 
+                            TOKEN_GETMAD($6,$5,'x');
 			    $$ = newCONDOP(0, $3, scope($5), $7, LOCATION($1));
 			    PL_hints |= HINT_BLOCK_SCOPE;
                             TOKEN_GETMAD($1,$$,'I');
@@ -322,6 +331,7 @@ else	:	/* NULL */
 /* Real conditional expressions */
 cond	:	IF '(' remember mexpr ')' mblock optional_semicolon else
 			{
+                            TOKEN_GETMAD($7,$6,'x');
 			    $$ = block_end($3,
                                 newCONDOP(0, $4, scope($6), $8, LOCATION($1)));
                             TOKEN_GETMAD($1,$$,'I');
@@ -331,6 +341,7 @@ cond	:	IF '(' remember mexpr ')' mblock optional_semicolon else
 			}
 	|	UNLESS '(' remember miexpr ')' mblock optional_semicolon else
 			{
+                            TOKEN_GETMAD($7,$6,'x');
 			    $$ = block_end($3,
                                 newCONDOP(0, $4, scope($6), $8, LOCATION($1)));
                             TOKEN_GETMAD($1,$$,'I');
@@ -377,6 +388,7 @@ loop	:	label WHILE remember '(' texpr ')'
                     mintro mblock optional_semicolon cont
 			{
                             OP *innerop;
+                            TOKEN_GETMAD($10,$9,'x');
 			    $$ = block_end($3,
                                 newSTATEOP(0, PVAL($1),
                                     innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
@@ -390,6 +402,7 @@ loop	:	label WHILE remember '(' texpr ')'
 	|	label UNTIL '(' remember iexpr ')' mintro mblock optional_semicolon cont
 			{ 
                             OP *innerop;
+                            TOKEN_GETMAD($9,$8,'x');
 			    $$ = block_end($4,
 				   newSTATEOP(0, PVAL($1),
 				     innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
@@ -401,6 +414,7 @@ loop	:	label WHILE remember '(' texpr ')'
 			}
 	|	label FOR MY remember my_scalar '(' mexpr ')' mblock optional_semicolon cont
 			{ OP *innerop;
+                          TOKEN_GETMAD($10,$9,'x');
 			  $$ = block_end($4,
                               innerop = newFOROP(0, PVAL($1),
                                   $5, scalar($7), $9, $11, LOCATION($2)));
@@ -412,6 +426,7 @@ loop	:	label WHILE remember '(' texpr ')'
 			}
 	|	label FOR remember mydef '(' mexpr ')' mblock optional_semicolon cont
 			{ OP *innerop;
+                          TOKEN_GETMAD($9,$8,'x');
 			  $$ = block_end($3,
 			     innerop = newFOROP(0, PVAL($1),
                                  $4, scalar($6), $8, $10, LOCATION($2)));

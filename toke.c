@@ -794,7 +794,7 @@ S_skipspace0(pTHX_ register char *s)
 {
     PERL_ARGS_ASSERT_SKIPSPACE0;
 
-    s = skipspace(s, TRUE);
+    s = skipspace(s, NULL);
     if (!PL_madskills)
 	return s;
     if (PL_skipwhite) {
@@ -818,7 +818,7 @@ S_skipspace1(pTHX_ register char *s)
 
     PERL_ARGS_ASSERT_SKIPSPACE1;
 
-    s = skipspace(s, TRUE);
+    s = skipspace(s, NULL);
     if (!PL_madskills)
 	return s;
     start = SvPVX_mutable(PL_linestr) + startoff;
@@ -846,7 +846,7 @@ S_skipspace2(pTHX_ register char *s, SV **svp)
 
     PERL_ARGS_ASSERT_SKIPSPACE2;
 
-    s = skipspace(s, TRUE);
+    s = skipspace(s, NULL);
     PL_bufptr = SvPVX_mutable(PL_linestr) + bufptroff;
     if (!PL_madskills || !svp)
 	return s;
@@ -943,15 +943,13 @@ S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
                              (prevlen = SvCUR(PL_linestr)))) == NULL)
         {
             /* end of file. */
-#ifdef PERL_MAD
-            sv_catpvn(PL_linestr,"\n", 1);
-#else
+#ifndef PERL_MAD
             sv_setpvn(PL_linestr,"\n", 1);
 #endif
 
             /* reset variables for next time we lex */
             PL_oldoldbufptr = PL_oldbufptr = PL_bufptr = s = PL_linestart
-                = SvPVX_mutable(PL_linestr) + 1
+                = SvPVX_mutable(PL_linestr)
 #ifdef PERL_MAD
                 + curoff
 #endif
@@ -1002,9 +1000,12 @@ S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
             *iscontinuationp = FALSE;
         }
         else {
-            assert(PL_linestart[-1] == '\n');
-            PL_bufptr = PL_linestart - 1;
-            return PL_linestart - 1;
+	    if (PL_linestart == PL_bufend) {
+		return PL_linestart;
+	    }
+	    assert(PL_linestart[-1] == '\n');
+	    PL_bufptr = PL_linestart - 1;
+	    return PL_linestart - 1;
         }
     }
 
@@ -2611,12 +2612,7 @@ Perl_madlex(pTHX)
 	    return 0;
 	}
 
-	/* put off final whitespace till peg */
-	if (optype == ';' && !PL_rsfp) {
-	    PL_nextwhite = PL_thiswhite;
-	    PL_thiswhite = 0;
-	}
-	else if (PL_thisopen) {
+	if (PL_thisopen) {
 	    curmad('<', newSVpv("quote", 0), NULL);
 	    while (start < PL_bufend && isSPACE(*start)) {
 		start++;
@@ -2627,8 +2623,9 @@ Perl_madlex(pTHX)
 	    PL_thistoken = 0;
 	}
 	else {
-	    /* Store actual token text as madprop X */
-	    CURMAD('X', PL_thistoken, realstart ? S_curlocation(realstart) : NULL );
+	    if (PL_thistoken)
+		/* Store actual token text as madprop X */
+		CURMAD('X', PL_thistoken, realstart ? S_curlocation(realstart) : NULL );
 	}
 
 	if (PL_thiswhite) {
@@ -2693,18 +2690,6 @@ Perl_madlex(pTHX)
 	    else
 		s = PL_bufptr;
 	}
-	if (optype == ']')
-	    break;
-	/* FALLTHROUGH */
-
-    /* attach a trailing comment to its statement instead of next token */
-    case ';':
-	if (PL_faketokens)
-	    break;
-	break;
-
-    /* pval */
-    case LABEL:
 	break;
 
     /* ival */
@@ -2830,8 +2815,8 @@ Perl_yylex(pTHX)
 	    PL_lex_state = PL_lex_defer;
   	    PL_expect = PL_lex_expect;
   	    PL_lex_defer = LEX_NORMAL;
-	    if (!PL_nexttoke[PL_lasttoke].next_type)
-		return yylex();
+/* 	    if (!PL_nexttoke[PL_lasttoke].next_type) */
+/* 		return yylex(); */
   	}
 #else
 	PL_nexttoke--;
@@ -3062,6 +3047,14 @@ Perl_yylex(pTHX)
   retry:
     PL_bufptr = s;
 
+#ifdef PERL_MAD
+    if (PL_thistoken) {
+	sv_free(PL_thistoken);
+	PL_thistoken = 0;
+    }
+    PL_realtokenstart = s - SvPVX_mutable(PL_linestr);	/* assume but undo on ws */
+#endif
+
     if (PL_expect == XBLOCK && !PL_parser->doextract) {
 	bool is_continuation;
 	s = skipspace(s, &is_continuation);
@@ -3084,13 +3077,6 @@ Perl_yylex(pTHX)
 	}
     }
 
-#ifdef PERL_MAD
-    if (PL_thistoken) {
-	sv_free(PL_thistoken);
-	PL_thistoken = 0;
-    }
-    PL_realtokenstart = s - SvPVX_mutable(PL_linestr);	/* assume but undo on ws */
-#endif
     assert(s <= PL_bufend);
     pl_yylval.i_tkval.location = S_curlocation(PL_bufptr);
     switch (*s) {
@@ -5517,102 +5503,66 @@ Perl_yylex(pTHX)
 		char tmpbuf[sizeof PL_tokenbuf];
 		SSize_t tboffset = 0;
                 SSize_t tblen;
-		bool have_name;
 		const int key = tmp;
+
+#ifdef PERL_MAD
+		SV *tmpwhite = 0;
+		SV *tmpwhite2 = 0;
+
+		char *tstart = SvPVX_mutable(PL_linestr) + PL_realtokenstart;
+		SV *subtoken = newSVpvn(tstart, s - tstart);
+		PL_thistoken = 0;
+#endif
 
 		if (PL_expect == XOPERATOR)
 		    no_op("'sub'", s);
 
 #ifdef PERL_MAD
-		SV *tmpwhite = 0;
-
-		char *tstart = SvPVX_mutable(PL_linestr) + PL_realtokenstart;
-		SV *subtoken = newSVpvn(tstart, s - tstart);
-		PL_thistoken = 0;
-
 		d = s;
 		s = SKIPSPACE2(s,tmpwhite);
 #else
 		s = SKIPSPACE0(s);
 #endif
 
-		if (isIDFIRST_lazy_if(s,UTF) ||
-		    (*s == ':' && s[1] == ':'))
-		{
-#ifdef PERL_MAD
-		    SV *nametoke = NULL;
-#endif
-
-		    /* remember buffer pos'n for later force_word */
-		    tboffset = s - PL_oldbufptr;
-		    d = scan_word(s, tmpbuf, sizeof tmpbuf, TRUE, &len);
-                    tblen = d-s;
-#ifdef PERL_MAD
-		    if (PL_madskills)
-			nametoke = newSVpvn(s, d - s);
-#endif
-		    if (memchr(tmpbuf, ':', len))
-			sv_setpvn(PL_subname, tmpbuf, len);
-		    else {
-			sv_setsv(PL_subname,PL_curstname);
-			sv_catpvs(PL_subname,"::");
-			sv_catpvn(PL_subname,tmpbuf,len);
-		    }
-		    have_name = TRUE;
-
-#ifdef PERL_MAD
-		    start_force(0);
-		    CURMAD('X', nametoke, NULL);
-		    CURMAD('_', tmpwhite, NULL);
-		    if (PL_madskills)
-			curmad('g', newSVpvs( "subname" ), NULL);
-		    NEXTVAL_NEXTTOKE.opval = (OP*)newSVOP(OP_CONST,0, newSVpvn(s, d-s), S_curlocation(s));
-		    NEXTVAL_NEXTTOKE.opval->op_private |= OPpCONST_BARE;
-		    force_next(WORD);
-
-		    s = SKIPSPACE2(d,tmpwhite);
-#else
-		    s = SKIPSPACE0(d);
-#endif
-		}
-		else {
-		    if (key == KEY_my)
-			Perl_croak(aTHX_ "Missing name in \"my sub\"");
-		    sv_setpvn(PL_subname,"?",1);
-		    have_name = FALSE;
-		}
-
-		if (*s != '(' && key == KEY_sub) {
-		    PL_expect = XBLOCK;
-		}
-		else {
-		    PL_expect = XTERM;
-		}
-
-#ifdef PERL_MAD
-		start_force(0);
-		if (tmpwhite) {
-		    if (PL_madskills)
-			curmad('^', newSVpvs(""), NULL);
-		    CURMAD('_', tmpwhite, NULL);
-		}
-		force_next(0);
-
-		PL_thistoken = subtoken;
-#endif
-		if (!have_name) {
+		if (!isIDFIRST_lazy_if(s,UTF) &&
+		    (*s != ':' || s[1] != ':')) {
+		    PL_expect = (*s == '(') ? XTERM : XBLOCK;
 		    if (PL_curstash)
 			sv_setpvs(PL_subname, "__ANON__");
 		    else
 			sv_setpvs(PL_subname, "__ANON__::__ANON__");
 		    TOKEN(ANONSUB);
 		}
-#ifndef PERL_MAD
+
+		/* remember buffer pos'n for later force_word */
+		tboffset = s - PL_oldbufptr;
+		d = scan_word(s, tmpbuf, sizeof tmpbuf, TRUE, &len);
+		tblen = d-s;
+		if (memchr(tmpbuf, ':', len))
+		    sv_setpvn(PL_subname, tmpbuf, len);
+		else {
+		    sv_setsv(PL_subname,PL_curstname);
+		    sv_catpvs(PL_subname,"::");
+		    sv_catpvn(PL_subname,tmpbuf,len);
+		}
+
+		s = SKIPSPACE2(d, tmpwhite2);
+		PL_expect = (*s == '(') ? XTERM : XBLOCK;
+
+#ifdef PERL_MAD
+		PL_thistoken = subtoken;
+#endif
+		start_force(0);
+		CURMAD('_', tmpwhite, NULL);
                 NEXTVAL_NEXTTOKE.opval = (OP*)newSVOP(OP_CONST,0, newSVpvn(PL_oldbufptr + tboffset, tblen), 
                     S_curlocation(PL_oldbufptr + tboffset));
                 NEXTVAL_NEXTTOKE.opval->op_private |= OPpCONST_BARE;
+		append_madprops(newMADPROP('C', MAD_SV, newSVpvn(PL_oldbufptr + tboffset, tblen), 0, 0, 0), NEXTVAL_NEXTTOKE.opval, 0);
+		append_madprops(newMADPROP('g', MAD_SV, newSVpvs("subname"), 0, 0, 0), NEXTVAL_NEXTTOKE.opval, 0);
                 force_next(WORD);
-#endif
+
+		PL_nextwhite = tmpwhite2;
+
 		if (key == KEY_my)
 		    TOKEN(MYSUB);
 		TOKEN(SUB);
