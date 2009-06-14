@@ -944,7 +944,7 @@ S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
         {
             /* end of file. */
 #ifndef PERL_MAD
-            sv_setpvn(PL_linestr,"\n", 1);
+            sv_setpvn(PL_linestr,"", 0);
 #endif
 
             /* reset variables for next time we lex */
@@ -3121,7 +3121,9 @@ Perl_yylex(pTHX)
                         "### Tokener got EOF\n");
             } );
 	    force_next(0);
+#ifdef PERL_MAD
 	    PL_thistoken = newSVpvs("");
+#endif
 	    TOKEN(';');
 	}
 	if (s++ < PL_bufend)
@@ -3279,18 +3281,22 @@ Perl_yylex(pTHX)
 		    d = S_skip_pod(s);
 		    if (d) {
 			s = d;
+#ifdef PERL_MAD			
 			if (PL_madskills) {
 			    sv_catsv(PL_skipwhite, PL_thiswhite);
 			    PL_thiswhite = NULL;
 			}
+#endif
 			TOKEN(';');
 		    }
 		    if ((s - PL_linestart) < PL_parser->statement_indent) {
 			S_stop_statement_indent();
+#ifdef PERL_MAD
 			if (PL_madskills)
 			    SvCUR_set(PL_skipwhite, SvCUR(PL_skipwhite) - (s - PL_linestart + 1));
+#endif
 			s = PL_linestart - 1;
-			assert(*s == '\n');
+			assert(*s == '\n' || *s == '\0');
 		    }
 		    TOKEN(';');
 		}
@@ -5579,11 +5585,15 @@ Perl_yylex(pTHX)
                 NEXTVAL_NEXTTOKE.opval = (OP*)newSVOP(OP_CONST,0, newSVpvn(PL_oldbufptr + tboffset, tblen), 
                     S_curlocation(PL_oldbufptr + tboffset));
                 NEXTVAL_NEXTTOKE.opval->op_private |= OPpCONST_BARE;
+#ifdef PERL_MAD
 		append_madprops(newMADPROP('C', MAD_SV, newSVpvn(PL_oldbufptr + tboffset, tblen), 0, 0, 0), NEXTVAL_NEXTTOKE.opval, 0);
 		append_madprops(newMADPROP('g', MAD_SV, newSVpvs("subname"), 0, 0, 0), NEXTVAL_NEXTTOKE.opval, 0);
+#endif
                 force_next(WORD);
 
+#ifdef PERL_MAD
 		PL_nextwhite = tmpwhite2;
+#endif
 
 		if (key == KEY_my)
 		    TOKEN(MYSUB);

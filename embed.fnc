@@ -1791,9 +1791,11 @@ Apon	|void	|sys_term
 #if defined(PERL_IN_DUMP_C)
 s	|SV*	|dump_op_flags		|NN const OP* o
 s	|SV*	|dump_op_flags_private	|NN const OP* o
+#ifdef PERL_MAD
 s	|void	|dump_op_mad	|I32 level|NN PerlIO *file|NN const MADPROP *mp
+#endif /* PERL_MAD */
 s	|void	|dump_op_rest	|I32 level|NN PerlIO *file|NN const OP *o
-#endif
+#endif /* PERL_IN_DUMP_C */
 
 END_EXTERN_C
 /*

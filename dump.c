@@ -774,7 +774,9 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	if (SvCUR(tmpsv))
 	    Perl_dump_indent(aTHX_ level, file, "PRIVATE = (%s)\n", SvPVX_const(tmpsv) + 1);
     }
+#ifdef PERL_MAD
     S_dump_op_mad(aTHX_ level, file, o->op_madprop);
+#endif
     S_dump_op_rest(aTHX_ level, file, o);
 }
     
@@ -945,14 +947,10 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
     return tmpsv;
 }
 
+#ifdef PERL_MAD
 static void S_dump_op_mad (pTHX_ I32 level, PerlIO *file, const MADPROP *mp)
 {
     PERL_ARGS_ASSERT_DUMP_OP_MAD;
-#ifndef PERL_MAD
-    PERL_UNUSED_ARG(level);
-    PERL_UNUSED_ARG(file);
-    PERL_UNUSED_ARG(o);
-#else
     if (mp) {
 	SV * const tmpsv = sv_2mortal(newSVpvn("", 0));
 	Perl_dump_indent(aTHX_ level, file, "MADPROPS = {\n");
@@ -986,8 +984,8 @@ static void S_dump_op_mad (pTHX_ I32 level, PerlIO *file, const MADPROP *mp)
 	level--;
 	Perl_dump_indent(aTHX_ level, file, "}\n");
     }
-#endif
 }
+#endif /* PERL_MAD */
 
 static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
 {

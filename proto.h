@@ -5850,19 +5850,21 @@ STATIC SV*	S_dump_op_flags_private(pTHX_ const OP* o)
 #define PERL_ARGS_ASSERT_DUMP_OP_FLAGS_PRIVATE	\
 	assert(o)
 
+#ifdef PERL_MAD
 STATIC void	S_dump_op_mad(pTHX_ I32 level, PerlIO *file, const MADPROP *mp)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
 #define PERL_ARGS_ASSERT_DUMP_OP_MAD	\
 	assert(file); assert(mp)
 
+#endif /* PERL_MAD */
 STATIC void	S_dump_op_rest(pTHX_ I32 level, PerlIO *file, const OP *o)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
 #define PERL_ARGS_ASSERT_DUMP_OP_REST	\
 	assert(file); assert(o)
 
-#endif
+#endif /* PERL_IN_DUMP_C */
 
 END_EXTERN_C
 /*

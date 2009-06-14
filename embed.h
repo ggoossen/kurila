@@ -1827,10 +1827,16 @@
 #ifdef PERL_CORE
 #define dump_op_flags		S_dump_op_flags
 #define dump_op_flags_private	S_dump_op_flags_private
+#endif
+#ifdef PERL_MAD
+#ifdef PERL_CORE
 #define dump_op_mad		S_dump_op_mad
+#endif
+#endif /* PERL_MAD */
+#ifdef PERL_CORE
 #define dump_op_rest		S_dump_op_rest
 #endif
-#endif
+#endif /* PERL_IN_DUMP_C */
 #define ck_anonarray		Perl_ck_anonarray
 #define ck_anoncode		Perl_ck_anoncode
 #define ck_bitop		Perl_ck_bitop
@@ -4010,10 +4016,16 @@
 #ifdef PERL_CORE
 #define dump_op_flags(a)	S_dump_op_flags(aTHX_ a)
 #define dump_op_flags_private(a)	S_dump_op_flags_private(aTHX_ a)
+#endif
+#ifdef PERL_MAD
+#ifdef PERL_CORE
 #define dump_op_mad(a,b,c)	S_dump_op_mad(aTHX_ a,b,c)
+#endif
+#endif /* PERL_MAD */
+#ifdef PERL_CORE
 #define dump_op_rest(a,b,c)	S_dump_op_rest(aTHX_ a,b,c)
 #endif
-#endif
+#endif /* PERL_IN_DUMP_C */
 #define ck_anonarray(a)		Perl_ck_anonarray(aTHX_ a)
 #define ck_anoncode(a)		Perl_ck_anoncode(aTHX_ a)
 #define ck_bitop(a)		Perl_ck_bitop(aTHX_ a)
