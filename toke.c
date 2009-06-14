@@ -105,9 +105,6 @@ static I32 utf16rev_textfilter(pTHX_ int idx, SV *sv, int maxlen);
 #  define NEXTVAL_NEXTTOKE PL_nextval[PL_nexttoke]
 #endif
 
-#define XFAKEBRACK 128
-#define XENUMMASK 127
-
 #define UTF (!IN_BYTES)
 
 /* In variables named $^X, these are the legal values for X.
@@ -2684,23 +2681,6 @@ Perl_madlex(pTHX)
     case '}':
 	if (PL_faketokens)
 	    break;
-	/* remember any fake bracket that lexer is about to discard */ 
-	if (PL_lex_brackets == 1 &&
-	    ((expectation)PL_lex_brackstack[0].state & XFAKEBRACK))
-	{
-	    s = PL_bufptr;
-	    while (s < PL_bufend && (*s == ' ' || *s == '\t'))
-		s++;
-	    if (*s == '}') {
-		PL_thiswhite = newSVpvn(PL_bufptr, ++s - PL_bufptr);
-		addmad(newMADsv('#', PL_thiswhite, 0, 0), &PL_thismad, 0);
-		PL_thiswhite = 0;
-		PL_bufptr = s - 1;
-		break;	/* don't bother looking for trailing comment */
-	    }
-	    else
-		s = PL_bufptr;
-	}
 	break;
 
     /* ival */
@@ -3877,31 +3857,10 @@ Perl_yylex(pTHX)
 	if (PL_lex_state == LEX_INTERPBLOCK) {
 	    if (PL_lex_brackets == 0) 
 		PL_lex_state = LEX_INTERPEND;
-	    if (PL_lex_brackets == 0) {
-		if (PL_expect & XFAKEBRACK) {
-		    PL_expect &= XENUMMASK;
-		    PL_lex_state = LEX_INTERPEND;
-		    PL_bufptr = s;
-		    return yylex();	/* ignore fake brackets */
-		}
-	    }
 	}
 	if (PL_lex_state == LEX_INTERPNORMAL) {
 	    if ( ! intuit_more(s))
 		PL_lex_state = LEX_INTERPEND;
-	    if (PL_lex_brackets == 0) {
-		if (PL_expect & XFAKEBRACK) {
-		    PL_expect &= XENUMMASK;
-		    PL_lex_state = LEX_INTERPEND;
-		    PL_bufptr = s;
-		    return yylex();	/* ignore fake brackets */
-		}
-	    }
-	}
-	if (PL_expect & XFAKEBRACK) {
-	    PL_expect &= XENUMMASK;
-	    PL_bufptr = s;
-	    return yylex();		/* ignore fake brackets */
 	}
 
 	start_force(-1);
