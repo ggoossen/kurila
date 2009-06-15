@@ -1716,11 +1716,9 @@ package PLXML::op_glob;
 sub astnull {
     my $self = shift;
     my @retval = $self->madness('o q = Q');
-    if (not @retval or $retval[-1]->uni eq 'glob') {
-	push @retval, $self->madness('(');
-	push @retval, $$self{Kids}[0]->ast($self,@_);
-	push @retval, $self->madness(')');
-    }
+    push @retval, $self->madness('(');
+    push @retval, $$self{Kids}[0]->ast($self,@_);
+    push @retval, $self->madness(')');
     return P5AST::op_glob->new(Kids => [@retval]);
 }
 

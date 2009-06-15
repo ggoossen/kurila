@@ -303,6 +303,9 @@ optional_semicolon
         :       /* NULL */
                         {
                             $$.ival = 0;
+#ifdef PERL_MAD
+                            $$.madtoken = newMADTOKEN(0, NULL);
+#endif
                         }
         |       ';'
                         {

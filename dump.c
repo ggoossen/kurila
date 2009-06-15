@@ -775,7 +775,7 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	    Perl_dump_indent(aTHX_ level, file, "PRIVATE = (%s)\n", SvPVX_const(tmpsv) + 1);
     }
 #ifdef PERL_MAD
-    S_dump_op_mad(aTHX_ level, file, o->op_madprop);
+    dump_op_mad(aTHX_ level, file, o->op_madprop);
 #endif
     S_dump_op_rest(aTHX_ level, file, o);
 }
@@ -948,7 +948,7 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 }
 
 #ifdef PERL_MAD
-static void S_dump_op_mad (pTHX_ I32 level, PerlIO *file, const MADPROP *mp)
+void Perl_dump_op_mad (pTHX_ I32 level, PerlIO *file, const MADPROP *mp)
 {
     PERL_ARGS_ASSERT_DUMP_OP_MAD;
     if (mp) {
@@ -964,7 +964,7 @@ static void S_dump_op_mad (pTHX_ I32 level, PerlIO *file, const MADPROP *mp)
 	    switch (mp->mad_type) {
 	    case MAD_SV:
 		sv_catpv(tmpsv, "<");
-		sv_catsv(tmpsv, mp->mad_val);
+		sv_catsv(tmpsv, (SV*)mp->mad_val);
 		sv_catpv(tmpsv, ">");
 		Perl_dump_indent(aTHX_ level, file, "%s\n", SvPVX_const(tmpsv));
 		break;

@@ -1823,17 +1823,15 @@
 #ifdef PERL_CORE
 #define boot_core_mro		Perl_boot_core_mro
 #endif
+#ifdef PERL_MAD
+#ifdef PERL_CORE
+#define dump_op_mad		Perl_dump_op_mad
+#endif
+#endif /* PERL_MAD */
 #if defined(PERL_IN_DUMP_C)
 #ifdef PERL_CORE
 #define dump_op_flags		S_dump_op_flags
 #define dump_op_flags_private	S_dump_op_flags_private
-#endif
-#ifdef PERL_MAD
-#ifdef PERL_CORE
-#define dump_op_mad		S_dump_op_mad
-#endif
-#endif /* PERL_MAD */
-#ifdef PERL_CORE
 #define dump_op_rest		S_dump_op_rest
 #endif
 #endif /* PERL_IN_DUMP_C */
@@ -4012,17 +4010,15 @@
 #ifdef PERL_CORE
 #define boot_core_mro()		Perl_boot_core_mro(aTHX)
 #endif
+#ifdef PERL_MAD
+#ifdef PERL_CORE
+#define dump_op_mad(a,b,c)	Perl_dump_op_mad(aTHX_ a,b,c)
+#endif
+#endif /* PERL_MAD */
 #if defined(PERL_IN_DUMP_C)
 #ifdef PERL_CORE
 #define dump_op_flags(a)	S_dump_op_flags(aTHX_ a)
 #define dump_op_flags_private(a)	S_dump_op_flags_private(aTHX_ a)
-#endif
-#ifdef PERL_MAD
-#ifdef PERL_CORE
-#define dump_op_mad(a,b,c)	S_dump_op_mad(aTHX_ a,b,c)
-#endif
-#endif /* PERL_MAD */
-#ifdef PERL_CORE
 #define dump_op_rest(a,b,c)	S_dump_op_rest(aTHX_ a,b,c)
 #endif
 #endif /* PERL_IN_DUMP_C */

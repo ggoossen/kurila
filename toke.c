@@ -346,6 +346,7 @@ S_tokereport(pTHX_ I32 rv, const YYSTYPE* lvalp)
 		break;
 	    }
 	}
+
 	if (name)
 	    Perl_sv_catpv(aTHX_ report, name);
 	else if ((char)rv > ' ' && (char)rv < '~')
@@ -354,6 +355,7 @@ S_tokereport(pTHX_ I32 rv, const YYSTYPE* lvalp)
 	    sv_catpvs(report, "EOF");
 	else
 	    Perl_sv_catpvf(aTHX_ report, "?? %"IVdf, (IV)rv);
+
 	switch (type) {
 	case TOKENTYPE_NONE:
 	case TOKENTYPE_GVVAL: /* doesn't appear to be used */
@@ -382,6 +384,7 @@ S_tokereport(pTHX_ I32 rv, const YYSTYPE* lvalp)
 		sv_catpvs(report, "(opval=null)");
 	    break;
 	}
+
         PerlIO_printf(Perl_debug_log, "### %s\n\n", SvPV_nolen_const(report));
     };
     return (int)rv;
@@ -2651,6 +2654,8 @@ Perl_madlex(pTHX)
 	    CURMAD('Q', PL_thisclose, NULL);
 	}
     }
+
+    DEBUG_T({ dump_op_mad(4, Perl_debug_log, PL_thismad); });
 
     /* special processing based on optype */
 

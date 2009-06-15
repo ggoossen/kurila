@@ -5838,7 +5838,14 @@ PERL_CALLCONV void	Perl_sys_init3(int* argc, char*** argv, char*** env)
 
 PERL_CALLCONV void	Perl_sys_term(void);
 
+#ifdef PERL_MAD
+PERL_CALLCONV void	Perl_dump_op_mad(pTHX_ I32 level, PerlIO *file, const MADPROP *mp)
+			__attribute__nonnull__(pTHX_2)
+			__attribute__nonnull__(pTHX_3);
+#define PERL_ARGS_ASSERT_DUMP_OP_MAD	\
+	assert(file); assert(mp)
 
+#endif /* PERL_MAD */
 #if defined(PERL_IN_DUMP_C)
 STATIC SV*	S_dump_op_flags(pTHX_ const OP* o)
 			__attribute__nonnull__(pTHX_1);
@@ -5850,14 +5857,6 @@ STATIC SV*	S_dump_op_flags_private(pTHX_ const OP* o)
 #define PERL_ARGS_ASSERT_DUMP_OP_FLAGS_PRIVATE	\
 	assert(o)
 
-#ifdef PERL_MAD
-STATIC void	S_dump_op_mad(pTHX_ I32 level, PerlIO *file, const MADPROP *mp)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3);
-#define PERL_ARGS_ASSERT_DUMP_OP_MAD	\
-	assert(file); assert(mp)
-
-#endif /* PERL_MAD */
 STATIC void	S_dump_op_rest(pTHX_ I32 level, PerlIO *file, const OP *o)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);

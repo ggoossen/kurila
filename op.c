@@ -1756,8 +1756,6 @@ Perl_newMADTOKEN(pTHX_ I32 optype, MADPROP* madprop)
 {
     MADTOKEN *tk;
     Newxz(tk, 1, MADTOKEN);
-    tk->tk_type = (OPCODE)optype;
-    tk->tk_type = 12345;
     tk->tk_mad = madprop;
     return tk;
 }
@@ -1767,8 +1765,6 @@ Perl_token_free(pTHX_ MADTOKEN* tk)
 {
     PERL_ARGS_ASSERT_TOKEN_FREE;
 
-    if (tk->tk_type != 12345)
-	return;
     mad_free(tk->tk_mad);
     Safefree(tk);
 }
@@ -1786,11 +1782,6 @@ Perl_token_getmad(pTHX_ MADTOKEN* tk, OP* o, char slot, SV* location)
     linenr = location ? SvIV(*(av_fetch(svTav(location), 1, FALSE))) : 0;
     charoffset = location ? SvIV(*(av_fetch(svTav(location), 2, FALSE))) : 0;
 
-    if (tk->tk_type != 12345) {
-	Perl_warner(aTHX_ packWARN(WARN_MISC),
-	     "Invalid MADTOKEN object ignored");
-	return;
-    }
     tm = tk->tk_mad;
     if (!tm)
 	return;

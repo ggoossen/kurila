@@ -91,8 +91,10 @@ sub p55_file {
         return;
     }
     # ok($output eq $input, "p55 '$file'");
-    eq_or_diff $output, $input, "p55 '$file'";
+    eq_or_diff $output, $input, "p55 '$file'" or $TODO or die;
 }
+
+p55("glob 'foo'");
 
 undef $/;
 my @prgs = split m/^########\n/m, <DATA>;
@@ -401,3 +403,5 @@ test
 =cut
 
 33
+########
+glob "foo"

@@ -523,7 +523,6 @@ struct madprop {
 };
 
 struct madtoken {
-    I32 tk_type;
     MADPROP* tk_mad;
 };
 #endif
