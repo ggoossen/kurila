@@ -40,13 +40,15 @@ typedef struct yy_str_info {
 } yy_str_info;
 
 enum yy_lexbrackstack_item_type {
+    LB_EMPTY,
     LB_PAREN,
     LB_AELEM,
     LB_HELEM,
     LB_ASLICE,
     LB_HSLICE,
     LB_BLOCK,
-    LB_LAYOUT_BLOCK
+    LB_LAYOUT_BLOCK,
+    LB_LAYOUT_LIST
 };
     
 typedef struct yy_lexbrackstack_item {

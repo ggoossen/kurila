@@ -36,7 +36,7 @@ is( $x, "new" )
 is( $y, "old" )
 
 # nesting
-@: $x, $y = qw[old old]
+(@: $x, $y) = qw[old old]
 do
     do
         local $x = "new"
@@ -54,6 +54,12 @@ do
 
 is($x, "old")
 is($y, "old")
+
+# @: with layout
+$x = @: "aap"
+        "noot"
+
+is_deeply($x, qw[aap noot]);
 
 # s/// seperared by statement end
 eval_dies_like(<<'EOE', qr/statement end found where string delimeter expected/);

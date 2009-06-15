@@ -84,6 +84,7 @@
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
 %token <i_tkval> SPECIALBLOCK
+%token <i_tkval> LAYOUTLISTEND
 
 %type <i_tkval> optional_semicolon
 
@@ -782,7 +783,7 @@ listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
                             $$ = newANONHASH($2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'{');
 			}
-        |       ANONARYL listexpr  /* @: ... */
+        |       ANONARYL listexpr LAYOUTLISTEND  /* @: ... */
                         {
                             $$ = newANONARRAY($2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');

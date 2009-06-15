@@ -321,6 +321,7 @@ static struct debug_tokens {
     { TERNARY_IF,	TOKENTYPE_IVAL,		"TERNARY_IF" },
     { TERNARY_ELSE,	TOKENTYPE_IVAL,		"TERNARY_ELSE" },
     { WORD,		TOKENTYPE_OPVAL,	"WORD" },
+    { LAYOUTLISTEND,	TOKENTYPE_IVAL,	        "LAYOUTLISTEND" },
     { 0,		TOKENTYPE_NONE,		NULL }
 };
 
@@ -647,6 +648,9 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
 		: AvREFCNT_inc(oparser->rsfp_filters);
 
     Newx(parser->lex_brackstack, 120, yy_lex_brackstack_item);
+    parser->lex_brackets = 1;
+    parser->lex_brackstack[0].type = LB_LAYOUT_BLOCK;
+    parser->lex_brackstack[0].state = 0;
     Newx(parser->lex_casestack, 12, char);
     *parser->lex_casestack = '\0';
 
@@ -1681,19 +1685,49 @@ S_start_statement_indent(pTHX_ char* s)
 STATIC void
 S_stop_statement_indent(pTHX)
 {
+    bool is_layout_list;
     --PL_lex_brackets;
     assert(PL_lex_brackets >= 0);
-    if (PL_lex_brackstack[PL_lex_brackets].type != LB_LAYOUT_BLOCK) {
+    if (PL_lex_brackstack[PL_lex_brackets].type != LB_LAYOUT_BLOCK
+	&& PL_lex_brackstack[PL_lex_brackets].type != LB_LAYOUT_LIST) {
         yyerror("wrong matching parens");
-	while (PL_lex_brackstack[PL_lex_brackets].type != LB_LAYOUT_BLOCK) {
+	while (PL_lex_brackstack[PL_lex_brackets].type != LB_LAYOUT_BLOCK
+	    && PL_lex_brackstack[PL_lex_brackets].type != LB_LAYOUT_LIST) {
 	    PL_lex_brackets--;
 	    assert(PL_lex_brackets >= 0);
 	}
     }
+    is_layout_list = (PL_lex_brackstack[PL_lex_brackets].type == LB_LAYOUT_LIST);
     PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
     start_force(PL_curforce);
-    force_next('}');
+    force_next( is_layout_list ? LAYOUTLISTEND : '}' );
 }
+
+/* 
+  start_list_indent
+
+  starts a new layout for a lists at the indentation level of the given character.
+  Must be stopped using "stop_statement_indent"
+
+*/
+STATIC void
+S_start_list_indent(pTHX_ char* s)
+{
+    if (PL_lex_brackets > 100) {
+        Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+    }
+    PL_lex_brackstack[PL_lex_brackets].type = LB_LAYOUT_LIST;
+    PL_lex_brackstack[PL_lex_brackets].state = 0;
+    PL_lex_brackstack[PL_lex_brackets].prev_statement_indent = PL_parser->statement_indent;
+    ++PL_lex_brackets;
+    PL_parser->statement_indent = s - PL_linestart;
+    assert(PL_parser->statement_indent >= 0);
+    DEBUG_T({ PerlIO_printf(Perl_debug_log,
+                "### New statement indent level, %d.\n",
+                (int)PL_parser->statement_indent); });
+    PL_expect = XTERM;
+}
+
 /*
   parse_escape
 
@@ -2750,6 +2784,63 @@ S_tokenize_use(pTHX_ int is_use, char *s) {
 */
 
 
+static int S_process_layout(char* s) {
+    char* d;
+    bool is_layout_list;
+
+    if (PL_lex_brackstack[PL_lex_brackets-1].type != LB_LAYOUT_LIST
+	&& PL_lex_brackstack[PL_lex_brackets-1].type != LB_LAYOUT_BLOCK ) {
+	yyerror("Unmatch paren");
+    }
+    is_layout_list = ( PL_lex_brackstack[PL_lex_brackets-1].type == LB_LAYOUT_LIST );
+
+    d = S_skip_pod(s);
+    if (d) {
+	s = d;
+#ifdef PERL_MAD			
+	if (PL_madskills) {
+	    sv_catsv(PL_skipwhite, PL_thiswhite);
+	    PL_thiswhite = NULL;
+	}
+#endif
+	TOKEN( is_layout_list ? ',' : ';' );
+    }
+    if ((s - PL_linestart) < PL_parser->statement_indent) {
+	S_stop_statement_indent();
+#ifdef PERL_MAD
+	if (PL_madskills)
+	    SvCUR_set(PL_skipwhite, SvCUR(PL_skipwhite) - (s - PL_linestart + 1));
+#endif
+	s = PL_linestart - 1;
+	assert(*s == '\n' || *s == '\0');
+    }
+    TOKEN( is_layout_list ? ',' : ';' );
+}
+
+/* S_closing_bracket
+   should be called with the next token, returns the next token.
+   After calling PL_lex_brackstack[PL_lex_brackets] should be checked
+   agains the expected type.
+ */
+static bool S_closing_bracket() {
+    if (PL_lex_brackets <= 0) {
+	yyerror("Unmatched right curly bracket");
+	PL_lex_brackstack[PL_lex_brackets].type = LB_EMPTY;
+	return 0;
+    }
+    /* close top layout list */
+    if (PL_lex_brackstack[PL_lex_brackets-1].type == LB_LAYOUT_BLOCK) {
+	PL_lex_brackstack[PL_lex_brackets].type = LB_EMPTY;
+	return 0;
+    }
+    --PL_lex_brackets;
+    if (PL_lex_brackstack[PL_lex_brackets].type == LB_LAYOUT_LIST) {
+	PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
+	return 1;
+    }
+    return 0;
+}
+
 #ifdef __SC__
 #pragma segment Perl_yylex
 #endif
@@ -3066,7 +3157,7 @@ Perl_yylex(pTHX)
 	}
 	else {
             yyerror("Expected block");
-	    /* empty block */
+	    /* fake empty block */
 	    force_next('}');
 	    TOKEN('{');
 	}
@@ -3097,7 +3188,7 @@ Perl_yylex(pTHX)
 		TOKEN(';');
 	    }
 
-	    if (PL_lex_brackets) {
+	    if (PL_lex_brackets > 1) {
 		yyerror((const char *)
 			("Missing right curly or square bracket"));
 	    }
@@ -3260,31 +3351,9 @@ Perl_yylex(pTHX)
 	s = skipspace(s, &is_continuation);
 	assert(!isSPACE_notab(*s));
 	if (!is_continuation) {
-	    if (PL_parser->statement_indent != -1) {
-		if ((s - PL_linestart) <= PL_parser->statement_indent) {
-		    d = S_skip_pod(s);
-		    if (d) {
-			s = d;
-#ifdef PERL_MAD			
-			if (PL_madskills) {
-			    sv_catsv(PL_skipwhite, PL_thiswhite);
-			    PL_thiswhite = NULL;
-			}
-#endif
-			TOKEN(';');
-		    }
-		    if ((s - PL_linestart) < PL_parser->statement_indent) {
-			S_stop_statement_indent();
-#ifdef PERL_MAD
-			if (PL_madskills)
-			    SvCUR_set(PL_skipwhite, SvCUR(PL_skipwhite) - (s - PL_linestart + 1));
-#endif
-			s = PL_linestart - 1;
-			assert(*s == '\n' || *s == '\0');
-		    }
-		    TOKEN(';');
-		}
-	    }
+	    assert(PL_parser->statement_indent != -1);
+	    assert((s - PL_linestart) <= PL_parser->statement_indent);
+	    return S_process_layout(s);
 	}
 #ifdef PERL_MAD
 	if (PL_madskills) {
@@ -3709,17 +3778,13 @@ Perl_yylex(pTHX)
 	}
     case ')':
 	{
-	    const char tmp = *s++;
-	    if (PL_lex_brackets <= 0)
-		yyerror("Unmatched right parenthesis");
-	    else {
-		if (PL_lex_brackstack[PL_lex_brackets-1].type != LB_PAREN)
-		    yyerror("Closing parenthesis did not match open parenthesis");
-		else
-		    --PL_lex_brackets;
-	    }
+	    if (S_closing_bracket())
+		TOKEN(LAYOUTLISTEND);
+	    ++s;
+	    if (PL_lex_brackstack[PL_lex_brackets].type != LB_PAREN)
+		yyerror("Closing parenthesis did not match open parenthesis");
 	    PL_expect = XOPERATOR;
-	    TERM(tmp);
+	    TERM(')')
 	}
     case ']':
 	s++;
@@ -3843,21 +3908,22 @@ Perl_yylex(pTHX)
 	}
 	TOKEN('{');
     case '}': {
+
+	if (S_closing_bracket())
+	    TOKEN(LAYOUTLISTEND);
+
 	s++;
-	if (PL_lex_brackets <= 0)
+
+	if (PL_lex_brackstack[PL_lex_brackets].type != LB_BLOCK 
+	    && PL_lex_brackstack[PL_lex_brackets].type != LB_HELEM) {
 	    yyerror("Unmatched right curly bracket");
+	}
 	else {
-	    if (PL_lex_brackstack[PL_lex_brackets-1].type != LB_BLOCK 
-		&& PL_lex_brackstack[PL_lex_brackets-1].type != LB_HELEM) 
-		yyerror("Unmatched right curly bracket");
-	    else {
-		--PL_lex_brackets;
-		PL_expect = (expectation)PL_lex_brackstack[PL_lex_brackets].state;
-		if (PL_expect == XSTATE) {
-		    PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
-		}
-	    }
-        }
+	    PL_expect = (expectation)PL_lex_brackstack[PL_lex_brackets].state;
+	    if (PL_expect == XSTATE)
+		PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
+	}
+
 	if (PL_lex_state == LEX_INTERPBLOCK) {
 	    if (PL_lex_brackets == 0) 
 		PL_lex_state = LEX_INTERPEND;
@@ -3874,6 +3940,7 @@ Perl_yylex(pTHX)
 #ifdef PERL_MAD
 	PL_thistoken = newSVpvs("");
 #endif
+
 	TOKEN(';');
     }
     case '&':
@@ -4074,7 +4141,10 @@ Perl_yylex(pTHX)
 	if (s[1] == ':' && s[2] != ':') {
 	    /* array constructor */
 	    s += 2;
-	    OPERATOR(ANONARYL);
+	    s = skipspace(s, NULL);
+	    S_start_list_indent(s);
+
+	    TOKEN(ANONARYL);
 	}
 	if (s[1] == '<') {
 	    /* array expand */
