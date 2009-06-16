@@ -292,11 +292,6 @@ sideff	:	error
                             TOKEN_GETMAD($4,$$,'w');
                             TOKEN_GETMAD($1,$$,'W');
 			}
-	|	expr FOR expr
-			{ $$ = newFOROP(0, NULL,
-                                (OP*)NULL, scalar($3), $1, (OP*)NULL, LOCATION($2));
-			  TOKEN_GETMAD($2,((LISTOP*)$$)->op_first->op_sibling,'w');
-			}
 	;
 
 optional_semicolon
