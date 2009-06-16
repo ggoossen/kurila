@@ -1000,11 +1000,10 @@ S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
             *iscontinuationp = FALSE;
         }
         else {
-	    if (PL_linestart == PL_bufend) {
-		return PL_linestart;
+	    if (PL_linestart != PL_bufend) {
+		assert(PL_linestart[-1] == '\n');
+		PL_bufptr = PL_linestart - 1;
 	    }
-	    assert(PL_linestart[-1] == '\n');
-	    PL_bufptr = PL_linestart - 1;
 #ifdef PERL_MAD
 	    if (PL_madskills) {
 		if (!PL_skipwhite) {
@@ -1016,7 +1015,7 @@ S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
 		}
 	    }
 #endif
-	    return PL_linestart - 1;
+	    return PL_bufptr;
         }
     }
 
