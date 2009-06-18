@@ -33,6 +33,8 @@ sub aap
 (defun indent-test (buffer)
   (set-buffer (get-buffer-create "*kurila-indent-test*"))
   (erase-buffer)
+  (kurila-mode)
+  (kurila-indent-mode)
   (insert buffer)
   (let (indents)
     (let ((linenr 1) start str)
@@ -100,7 +102,10 @@ sub aap
 ((0) (4))         |
 ((0) (4))         |sub aap
 ((4))             |    noot($a,
-((9) (13))        |         $b)")
+((9) (13))        |         $b)
+((4) (8) (0))     |
+((4) (8) (0))     |'sub aap'
+((0) (4))         |'noot'")
 
 
 (defun kt-is (buffer line exp func)

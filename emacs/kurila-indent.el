@@ -74,7 +74,8 @@
             )))
          ;; sub
          ((match-beginning 3)
-          (setq points (cons 'next-line points)))
+          (if (not (nth 8 (syntax-ppss)))
+              (setq points (cons 'next-line points))))
          ;; keyword which starts a new block
          ((match-beginning 4)
           (unless (looking-at "else [[:space:]]*{")
