@@ -2777,7 +2777,7 @@ Will not look before LIM."
   (let ((res (get-text-property (point) 'syntax-type)))
     (save-excursion
       (cond
-       ((and (memq res '(pod here-doc here-doc-delim format))
+       ((and (memq res '(pod here-doc here-doc-delim))
 	     (not (get-text-property (point) 'indentable)))
 	(vector res))
        ;; before start of POD - whitespace found since do not have 'pod!
@@ -2803,7 +2803,7 @@ Will not look before LIM."
 		  prop (get-text-property p 'syntax-type)
 		  look-prop (or (nth 1 (assoc prop kurila-look-for-prop))
 				'syntax-type))
-	    (if (memq prop '(pod here-doc format here-doc-delim))
+	    (if (memq prop '(pod here-doc here-doc-delim))
 		(progn
 		  (goto-char (kurila-beginning-of-property p look-prop))
 		  (beginning-of-line)
@@ -2885,8 +2885,7 @@ Will not look before LIM."
 				  (progn
 				    (forward-sexp -1)
 				    (skip-chars-backward " \t")
-				    (looking-at "[ \t]*[a-zA-Z_][a-zA-Z_0-9]*[ \t]*:")))
-			     (get-text-property (point) 'first-format-line)))
+				    (looking-at "[ \t]*[a-zA-Z_][a-zA-Z_0-9]*[ \t]*:")))))
 		   
 		   ;; Look at previous line that's at column 0
 		   ;; to determine whether we are in top-level decls
@@ -2942,8 +2941,7 @@ Will not look before LIM."
 				      (append (if is-block " ;{" " ,;{") '(nil)))
 				(and (eq (preceding-char) ?\})
 				     (kurila-after-block-and-statement-beg
-				      containing-sexp))
-				(get-text-property (point) 'first-format-line)))
+				      containing-sexp))))
 		       ;; This line is continuation of preceding line's statement;
 		       ;; indent  `kurila-continued-statement-offset'  more than the
 		       ;; previous line of the statement.
@@ -3046,7 +3044,6 @@ Will not look before LIM."
   '((pod nil)				; via `syntax-type' property
     (here-doc nil)			; via `syntax-type' property
     (here-doc-delim nil)		; via `syntax-type' property
-    (format nil)			; via `syntax-type' property
     (in-pod nil)			; via `in-pod' property
     (comment-special:at-beginning-of-line nil)
     (string t)
@@ -3500,9 +3497,6 @@ Works before syntax recognition is done."
 ;;		Start-to-end is marked `here-doc-group' ==> t
 ;;		The body is marked `syntax-type' ==> `here-doc'
 ;;		The delimiter is marked `syntax-type' ==> `here-doc-delim'
-;;	c) FORMATs:
-;;		First line (to =) marked `first-format-line' ==> t
-;;		After-this--to-end is marked `syntax-type' ==> `format'
 ;;	d) 'Q'uoted string:
 ;;		part between markers inclusive is marked `syntax-type' ==> `string'
 ;;		part between `q' and the first marker is marked `syntax-type' ==> `prestring'
@@ -3760,7 +3754,6 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 						  rear-nonsticky t
 						  front-sticky t
 						  here-doc-group t
-						  first-format-line t
 						  REx-part2 t
 						  indentable t))
 	    ;; Need to remove face as well...
@@ -3825,7 +3818,6 @@ the sections using `kurila-pod-head-face', `kurila-pod-face',
 					      here-doc-group t
 					      rear-nonsticky t
 					      front-sticky t
-					      first-format-line t
 					      REx-part2 t
 					      indentable t))
 			 (setq tmpend tb)))
@@ -4678,7 +4670,7 @@ CHARS is a string that contains good characters to have before us (however,
 	      (beginning-of-line 0)))
 	(if (looking-at "^[ \t]*\\(#\\|$\\)") nil ; Only comment, skip
 	  ;; Else: last iteration, or a label
-	  (kurila-to-comment-or-eol)	; Will not move past "." after a format
+	  (kurila-to-comment-or-eol)
 	  (skip-chars-backward " \t")
 	  (if (< p (point)) (goto-char p))
 	  (setq p (point))
@@ -4697,10 +4689,7 @@ CHARS is a string that contains good characters to have before us (however,
 	    (if test (eval test)
 	      (or (memq (preceding-char) (append (or chars "{;") nil))
 		  (and (eq (preceding-char) ?\})
-		       (kurila-after-block-p lim))
-		  (and (eq (following-char) ?.)	; in format: see comment above
-		       (eq (get-text-property (point) 'syntax-type)
-			   'format)))))))))
+		       (kurila-after-block-p lim)))))))))
 
 (defun kurila-backward-to-start-of-expr (&optional lim)
   (condition-case nil
@@ -7189,7 +7178,7 @@ than a line.  Your contribution to update/shorten it is appreciated."
 		     (or (memq (get-text-property (point) 'face)
 			       '(font-lock-comment-face font-lock-string-face))
 			 (memq (get-text-property (point) 'syntax-type)
-			       '(pod here-doc format))))
+			       '(pod here-doc))))
 		nil
 	      (kurila-describe-perl-symbol word))
 	  (if kurila-message-on-help-error
