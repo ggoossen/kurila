@@ -96,6 +96,12 @@ sub aap
 ((4) (8))         |    $a)
 ((4))             |    44")
 
+(indent-test "((0) (4))|package Foo::Bar
+((0) (4))         |
+((0) (4))         |sub aap
+((4))             |    noot($a,
+((9) (13))        |         $b)")
+
 
 (defun kt-is (buffer line exp func)
   (save-excursion
@@ -168,7 +174,7 @@ sub aap
         (kurila-sniff-for-indent))
  (kt-is (kt-buffer-paren)
         5
-        '((9) (13) (8))
+        '((9) (13))
         (kurila-indent-indentation-info))
  )
 

@@ -42,49 +42,45 @@
       (setq bol (point))
       (end-of-line)
       (setq eol (point))
-      (beginning-of-line)
-      (while (and (< (point) eol)
-                  (re-search-forward (concat "\\(sub\\s-+\\<\\w+\\>\\s-*\\)"
+      (end-of-line)
+      (while (and (>= (point) bol)
+                  (re-search-backward (concat "\\((\\)"
                                              "\\|"
-                                             "\\(\\(?:if\\|unless\\|while\\|for\\|foreach\\)\\b\\s-*\\)"
+                                             "\\()\\)"
+                                             "\\|"
+                                             "\\(sub\\)"
                                              "\\|"
                                              "\\(else\\)"
-                                             "\\|"
-                                             "("
                                              )
-                                     eol t))
+                                     bol t))
         (cond 
-         ;; sub
+         ;; "("
          ((match-beginning 1)
-          (if (looking-at "(")
-              (forward-sexp))
-            (if (looking-at "\\s*\\(#\\|$\\)")
-                (setq points (cons (- (point) bol) points))
-              (setq points (cons 'next-line points))))
-         ;; keyword which must be followed by parens
+          (let ((pt (point)))
+            (setq points (cons (- pt bol) points))))
+         ;; ")"
          ((match-beginning 2)
-          (if (looking-at "(")
-              (progn
-                (forward-sexp)
-                (unless (or (looking-at "[[:space:]]*{")
-                            (> (point) eol))
-                  (if (looking-at "[[:space:]]*\\(#\\|$\\)")
-                      (setq points (cons 'next-line points))
-                    (setq points (cons (- (point) bol) points))
-                    )))
-            ))
-         ;; keyword which starts a new block
+          (let ((pt (point)))
+            (let ((new-point (and (not (looking-at ")[[:space:]]*{"))
+                                  (if (looking-at "\\s*\\(#\\|$\\)")
+                                      (- (point) bol)
+                                    'next-line))))
+              (forward-char)
+              (backward-sexp)
+              (skip-syntax-backward " ")
+              (if (looking-back "if\\|\\unless\\|for\\|while\\|until" 6)
+                  (if new-point
+                      (setq points (cons new-point points))))
+            )))
+         ;; sub
          ((match-beginning 3)
-          (unless (looking-at "[[:space:]]*{")
+          (setq points (cons 'next-line points)))
+         ;; keyword which starts a new block
+         ((match-beginning 4)
+          (unless (looking-at "else [[:space:]]*{")
             (if (looking-at "\\s*\\(#\\|$\\)")
                 (setq points (cons (- (point) bol) points))
               (setq points (cons 'next-line points)))))
-         ;; new "("
-         ((match-beginning 4)
-          (let ((pt (point)))
-            (forward-char -1)
-            (forward-sexp)
-            (setq points (cons (- (pt) bol) points))))
         ))
       (and (< (+ bol (current-indentation)) eol)
            (setq points (cons (current-indentation) points)))
