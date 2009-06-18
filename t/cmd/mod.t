@@ -27,7 +27,8 @@ $x = 15
 $x = 10 while $x +< 10
 if ($x == 15) {print $^STDOUT, "ok 6\n";} else {print $^STDOUT, "not ok 6\n";}
 
-@y[+$_] = $_ * 2 foreach  @x
+foreach (@x)
+    @y[+$_] = $_ * 2
 if (join(' ', @y) eq '0 2 4 6 8 10 12 14 16 18 20')
     print $^STDOUT, "ok 7\n"
 else
@@ -54,5 +55,5 @@ print $^STDOUT, "ok 12\n" unless $x +> 0
 print $^STDOUT, "not ok 12\n" if $x +> 0
 
 # This used to cause a segfault
-$x = "".("".do { "foo" for @( (1))})
+$x = "".("".do { for (@: 1) { "foo" } })
 print $^STDOUT, "ok 13\n"

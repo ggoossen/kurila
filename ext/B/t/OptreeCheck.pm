@@ -576,8 +576,8 @@ sub checkErrs
     foreach my $k (keys(($tc->{+errs} ||= \%())->%))
         if (@got = grep { m/^$k$/ }, keys %goterrs)
             delete $tc->{errs}->{$k}
-            delete %goterrs{$_} foreach  @got
-        
+            for (@got)
+                delete %goterrs{$_}
     
     $tc->{+goterrs} = \%goterrs
 
@@ -897,11 +897,10 @@ sub mydumper
         print $^STDOUT, "half hearted attempt:\n"
         foreach my $it ( @_)
             if (ref $it eq 'HASH')
-                print $^STDOUT, " $_ => $it->{?$_}\n" foreach sort keys $it->%
-            
+                foreach (sort keys $it->%)
+                    print $^STDOUT, " $_ => $it->{?$_}\n"
         
         return
-    
 
     Data::Dumper->import
     $Data::Dumper::Sortkeys = 1

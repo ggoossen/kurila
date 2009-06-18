@@ -454,12 +454,9 @@ sub _mkpath($dir,$show,$mode,?$verbose,?$dry_run)
             _warnonce < @msg
         else
             _choke < @msg
-        
     elsif ($show and $dry_run)
-        print $^STDOUT, "$_\n" for  @make
-    
-
-
+        for (@make)
+            print $^STDOUT, "$_\n"
 
 =pod
 
@@ -483,8 +480,6 @@ sub _copy( $from, $to, $verbose, $dry_run)
     if (!$dry_run)
         File::Copy::copy($from,$to)
             or Carp::croak( < _estr "ERROR: Cannot copy '$from' to '$to': $^OS_ERROR" )
-    
-
 
 =pod
 

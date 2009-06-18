@@ -134,8 +134,8 @@ sub hashify($what, $val, $default_undef, $default_val)
         return \%( other => $val )
     
     if (ref $val eq 'HASH')
-        die "Invalid key for $what: '$_'"
-            for grep { !m/^(first|last|even|odd|other)$/ }, keys $val->%
+        for (grep { !m/^(first|last|even|odd|other)$/ }, keys $val->%)
+            die "Invalid key for $what: '$_'"
         my %hash
         for (keys $val->%)
             if (!ref $val->{?$_})
@@ -153,13 +153,13 @@ sub hashify($what, $val, $default_undef, $default_val)
 
 sub page_hash
     my @($h, _, $opts) =  @_
-    die "Value for 'page' option must be hash reference (not $_)"
-        for grep { $_ ne 'HASH' }, @( ref $h)
+    for (grep { $_ ne 'HASH' }, @( ref $h))
+        die "Value for 'page' option must be hash reference (not $_)"
     $h = \( $opts->{?page}->% +%+ $h->% )
-    die "Unknown page sub-option ('$_')"
-        for grep {!exists %def_page{$_}}, keys $h->%
-    die "Page $_ must be greater than zero"
-        for grep { $h->{?$_} +<= 0 }, qw(length width)
+    for (grep {!exists %def_page{$_}}, keys $h->%)
+        die "Unknown page sub-option ('$_')"
+    for (grep { $h->{?$_} +<= 0 }, qw(length width))
+        die "Page $_ must be greater than zero"
     $h->{+body} =
         hashify("body preprocessor", $h->{?body}, \&std_body, \&form_body)
     for (qw( header footer feed ))
@@ -169,8 +169,8 @@ sub page_hash
 
 
 sub filehandle
-    die "Value for 'out' option must be filehandle (not '$_')"
-        for grep {$_ ne 'GLOB' }, @( ref @_[0])
+    for (grep {$_ ne 'GLOB' }, @( ref @_[0]))
+        die "Value for 'out' option must be filehandle (not '$_')"
     return @_[0]
 
 
@@ -343,7 +343,8 @@ sub jnum
         $places = $setplaces
         $whole = $width - length($point) - $setplaces
     else
-        $_ = length for @( $whole, $places)
+        for (@: $whole, $places)
+            $_ = length
     
     die "Inconsistent number of decimal places in numeric field.\n",
         "Specified as $checkplaces but found $places"
@@ -688,8 +689,8 @@ sub segment($format, $args, $opts, $fldcnt, $argcache)
             $width += $fldwidth - $f->{?width}
         
         $fldwidth = int($width/((nelems @starred)+nelems @vstarred)) if (nelems @starred)
-        $_->{+width} = $fldwidth for  @starred
-    
+        for (@starred)
+            $_->{+width} = $fldwidth
 
     # Attach bullets to neighbouring fields,
     # and compute offsets from left margin...
@@ -1023,8 +1024,8 @@ sub make_underline($under, $prevline, $nextline)
     return \@(\%( < %std_literal, width => length($nextline), src => \$nextline ))
 
 
-sub linecount($v)
-    return (nelems @(m/(\n)/g)) + (m/[^\n]\z/??1!!0) for @: $v
+sub linecount($_)
+    return (nelems @(m/(\n)/g)) + (m/[^\n]\z/??1!!0)
 
 
 use warnings::register;
@@ -1101,7 +1102,8 @@ sub form
                 !! $page->{feed}->{?$parity} ?? $page->{feed}->{?$parity}->($sect_opts)
                 !! $page->{feed}->{?other}   ?? $page->{feed}->{?other}->($sect_opts)
                 !! ""
-            length and s/\n?\z/\n/ for @( $header, $footer)  # NOT for $feed
+            for (@: $header, $footer)   # NOT for $feed
+                length and s/\n?\z/\n/
             my $bodyfn = $page->{body}->{?$pagetype}
                 || $page->{body}->{?$parity}
                 || $page->{body}->{?other}
@@ -1115,7 +1117,8 @@ sub form
                 my $lastfooter =
                     $page->{footer}->{?last} ?? $page->{footer}->{?last}->($sect_opts)
                     !! $footer
-                length and s/\n?\z/\n/ for @( $lastheader, $lastfooter)
+                for (@: $lastheader, $lastfooter)
+                    length and s/\n?\z/\n/
                 my $lastlen =
                     $pagelen-linecount($lastheader)-linecount($lastfooter)
                 if ((nelems $pagetext->@) +<= $lastlen)
@@ -1199,10 +1202,12 @@ sub section($structure, @< @index)
         my $type = ref $row or die "Too many indices (starting with [$(join ' ',@index)])"
         if ($type eq 'HASH')
             @index = keys $row->% unless (nelems @index)
-            push @section[$_]->@, $row->{?@index[$_]} for 0..(nelems @index)-1
+            for (0..(nelems @index)-1)
+                push @section[$_]->@, $row->{?@index[$_]}
         elsif ($type eq 'ARRAY')
             @index =0..(nelems $row->@)-1 unless (nelems @index)
-            push @section[$_]->@, $row->[@index[$_]] for 0..(nelems @index)-1
+            for (0..(nelems @index)-1)
+                push @section[$_]->@, $row->[@index[$_]]
         else
             my $what = ref $structure
             die "Can't drill ", ($what ?? lc $what !! $structure) , " of $type"
@@ -1212,10 +1217,12 @@ sub section($structure, @< @index)
 
 
 sub slice($structure, @< @indices)
-    return ref eq 'HASH' ?? < $_->{[ @indices]} !! < $_->[[@(@indices)]] for @( $structure)
+    my $_ = $structure
+    return ref eq 'HASH' ?? < $_->{[ @indices]} !! < $_->[[@(@indices)]]
 
 
-sub vals { return ref eq 'HASH' ?? values $_->% !! < $_->@ for @( @_[0]) }
+sub vals($_)
+    return ref eq 'HASH' ?? values $_->% !! < $_->@
 
 sub drill($structure, @< @indices)
     return $structure unless (nelems @indices)

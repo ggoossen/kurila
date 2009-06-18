@@ -48,4 +48,5 @@ my @testsubs = @(
 
 plan(tests => scalar(nelems @testsubs))
 
-$_->() for @( (< @testsubs))
+for (@testsubs)
+    $_->()

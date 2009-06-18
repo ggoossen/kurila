@@ -51,7 +51,8 @@ sub catch_warning
 
 
 sub remove_dir
-    ok( rmdir( $_ ), "remove $_ directory" ) for  @_
+    for (@_)
+        ok( rmdir( $_ ), "remove $_ directory" )
 
 
 # use module, import functions
@@ -247,7 +248,8 @@ do
     ok( ! exists $files->{'mydefault.skip'},
         'mydefault.skip excluded via mydefault.skip' )
     my $extsep = $Is_VMS ?? '_' !! '.'
-    %Files{+"$_.bak"}++ for @( ('MANIFEST', "MANIFEST$($extsep)SKIP"))
+    for (@: 'MANIFEST', "MANIFEST$($extsep)SKIP")
+        %Files{+"$_.bak"}++
 
 
 add_file('MANIFEST'   => 'Makefile.PL')

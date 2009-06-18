@@ -254,7 +254,8 @@ do {
     File::Spec->catfile( 'ecmddir', 'temp2', $Testfile ) ) );
     rm_f();
 
-    ok( ! -e $_, "removed $_ successfully" ) for @( (< @ARGV));
+    for (@ARGV)
+        ok( ! -e $_, "removed $_ successfully" )
 
     # rm_f dir
     @ARGV = @( my $dir = File::Spec->catfile( 'ecmddir' ) );

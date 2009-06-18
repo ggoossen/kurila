@@ -116,13 +116,13 @@ sub new
 
     # File::Find does not know how to deal with VMS filepaths.
     if( $Is_VMS )
-        $_ = VMS::Filespec::unixify($_)
-            for  @dirs
-    
+        for (@dirs)
+            $_ = VMS::Filespec::unixify($_)
 
     if ($DOSISH)
-        s|\\|/|g for  @dirs
-    
+        for (@dirs)
+            s|\\|/|g
+
     my $archlib = @dirs[0]
 
     # Read the core packlist

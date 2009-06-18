@@ -487,8 +487,10 @@ do
     my @foo = qw( a b c d e f )
     my %pre = %( < map { $_ => }, @foo )
 
-    File::Find::find( sub {  } , 'fa' ) for  @foo
-    delete %pre{$_} for  @foo
+    for (@foo)
+        File::Find::find( sub {  } , 'fa' )
+    for (@foo)
+        delete %pre{$_}
 
     Check( ( nkeys %pre ) == 0 )
 
@@ -776,7 +778,8 @@ if ( $symlink_exists )
     my @names = sort keys %Expect_File
     Check( (nelems @names) == 1 )
     # Normalise both to the original name
-    s/_sl// foreach  @names
+    foreach (@names)
+        s/_sl//
     Check (@names[0] eq file_path_name('fa', 'faa', 'faa_ord'))
     unlink file_path('fa', 'faa_sl')
 

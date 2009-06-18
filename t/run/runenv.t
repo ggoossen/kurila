@@ -66,8 +66,8 @@ sub runperl
             for (keys $old)
                 env::var($_) = $old{$_}
             
-        
-        env::var($_ ) = $env->{$_} for keys $env->%
+        for (keys $env->%)
+            env::var($_ ) = $env->{$_}
         open $^STDOUT, ">", $STDOUT or exit $FAILURE_CODE
         open $^STDERR, ">", $STDERR or it_didnt_work()
         do { exec $PERL, < $args->@ }

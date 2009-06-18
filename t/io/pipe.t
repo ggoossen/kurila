@@ -45,7 +45,8 @@ SKIP: do
     
 
     # This has to be *outside* the fork
-    next_test() for 1..2
+    for (1..2)
+        next_test()
 
     my $raw = "abc\nrst\rxyz\r\nfoo\n"
     if (open($pipe, "-|", "-"))
@@ -116,8 +117,8 @@ SKIP: do
 
 
         # This has to be done *outside* the fork.
-        next_test() for 1..2
-
+        for (1..2)
+            next_test()
 
 wait                            # Collect from $pid
 

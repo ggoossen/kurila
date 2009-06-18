@@ -68,9 +68,11 @@ SKIP: do
 
     my %local_env_keys = %:< @+: map { @: $_, env::var($_) }, qw[PATH IFS CDPATH ENV BASH_ENV]
     push dynascope->{onleave}, sub (@< @_)
-        env::var($_) = %local_env_keys{$_} for keys %local_env_keys
+        for (keys %local_env_keys)
+            env::var($_) = %local_env_keys{$_}
     
-    env::var($_) = undef for keys %local_env_keys
+    for (keys %local_env_keys)
+        env::var($_) = undef
     my @($pwd_cmd_untainted) = @: $pwd_cmd =~ m/^(.+)$/ # Untaint.
     chomp(my $start = `$pwd_cmd_untainted`)
 

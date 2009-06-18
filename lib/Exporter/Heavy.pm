@@ -20,13 +20,14 @@ No user-serviceable parts inside.
 #
 
 sub _rebuild_cache($pkg, $exports, $cache)
-    s/^&// foreach  $exports->@
+    for ($exports->@)
+        s/^&//
     $cache->{[ $exports->@]} = @(1) x nelems $exports->@
     my $ok = \Symbol::fetch_glob("$($pkg)::EXPORT_OK")->*->@
     if (nelems $ok->@)
-        s/^&// foreach  $ok->@
+        for ($ok->@)
+            s/^&//
         $cache->{[$ok->@]} = @(1) x nelems $ok->@
-    
 
 
 sub export($pkg, $callpkg, @< @imports)

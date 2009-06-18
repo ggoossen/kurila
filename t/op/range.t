@@ -98,42 +98,60 @@ is(join(":",'-2'..undef), '-2:-1:0')
 is(join(":", map { "[$_]" }, undef..undef), '[0]')
 
 # also test undef in foreach loops
-@foo= @(() ); push @foo, $_ for undef..2
+@foo= @()
+for (undef..2)
+    push @foo, $_
 is(join(":", @foo), '0:1:2')
 
-@foo= @(() ); push @foo, $_ for -2..undef
+@foo= @()
+for (-2..undef)
+    push @foo, $_
 is(join(":", @foo), '-2:-1:0')
 
-@foo= @(() ); push @foo, $_ for undef..'2'
+@foo= @()
+for (undef..'2')
+    push @foo, $_
 is(join(":", @foo), '0:1:2')
 
-@foo= @(() ); push @foo, $_ for '-2'..undef
+@foo= @()
+for ('-2'..undef)
+    push @foo, $_
 is(join(":", @foo), '-2:-1:0')
 
-@foo= @(() ); push @foo, $_ for undef..undef
+@foo= @()
+for (undef..undef)
+    push @foo, $_
 is(join(":", map { "[$_]" }, @foo), '[0]')
 
 # again with magic
 do
     my @a =1..3
-    @foo= @(() ); push @foo, $_ for undef..((nelems @a)-1)
+    @foo= @()
+    for (undef..(nelems @a)-1)
+        push @foo, $_
     is(join(":", @foo), '0:1:2')
 
 do
     my @a = @( () )
-    @foo= @(() ); push @foo, $_ for ((nelems @a)-1)..undef
+    @foo= @()
+    for ((nelems @a)-1..undef)
+        push @foo, $_
     is(join(":", @foo), '-1:0')
 
 do
     local $1
     "2" =~ m/(.+)/
-    @foo= @(() ); push @foo, $_ for undef..$1
+    @foo= @()
+    for (undef..$1)
+        push @foo, $_
     is(join(":", @foo), '0:1:2')
 
 do
     local $1
     "-2" =~ m/(.+)/
-    @foo= @(() ); push @foo, $_ for $1..undef
+    @foo= @()
+    for ($1..undef)
+        push @foo, $_
     is(join(":", @foo), '-2:-1:0')
 
 

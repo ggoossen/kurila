@@ -99,7 +99,8 @@ sub build_and_run($tests, $files)
     my @perlout = @( `$runperl Makefile.PL $core` )
     if ($^CHILD_ERROR)
         fail("$runperl Makefile.PL failed: $^CHILD_ERROR")
-        diag "$_" foreach  @perlout
+        foreach (@perlout)
+            diag "$_"
         exit($^CHILD_ERROR)
     else
         pass
@@ -142,7 +143,8 @@ sub build_and_run($tests, $files)
     @makeout = @( `$make` )
     if ($^CHILD_ERROR)
         fail("$make failed: $^CHILD_ERROR")
-        diag "$_" foreach  @makeout
+        foreach (@makeout)
+            diag "$_"
         exit($^CHILD_ERROR)
     else
         pass()
@@ -171,7 +173,8 @@ sub build_and_run($tests, $files)
 
     if ($^CHILD_ERROR)
         fail("$maketest failed: $^CHILD_ERROR")
-        diag "$_" foreach  @makeout
+        foreach (@makeout)
+            diag "$_"
     else
         pass("maketest")
     
@@ -181,7 +184,8 @@ sub build_and_run($tests, $files)
     @makeout = @( `$makeclean` )
     if ($^CHILD_ERROR)
         fail("$make failed: $^CHILD_ERROR")
-        diag "$_" foreach  @makeout
+        foreach (@makeout)
+            diag "$_" 
     else
         pass
     
@@ -199,7 +203,8 @@ sub build_and_run($tests, $files)
     @makeout = @( `$makedistclean` )
     if ($^CHILD_ERROR)
         fail("$make failed: $^CHILD_ERROR")
-        diag "$_" foreach  @makeout
+        foreach (@makeout)
+            diag "$_"
     else
         pass
     
@@ -244,7 +249,8 @@ sub MANIFEST
     my $manifest = "MANIFEST"
     push @files, $manifest
     open my $fh, ">", "$manifest" or die "open >$manifest: $^OS_ERROR\n"
-    print $fh, "$_\n" foreach  @files
+    foreach (@files)
+        print $fh, "$_\n"
     close $fh or die "close $manifest: $^OS_ERROR\n"
     return @files
 
@@ -323,7 +329,8 @@ EOT
     print $fh, "\@EXPORT_OK = qw(\n"
 
     # Print the names of all our autoloaded constants
-    print $fh, "\t$_\n" foreach @( (< $export_names->@))
+    foreach ($export_names->@)
+        print $fh, "\t$_\n"
     print $fh, ");\n"
     print $fh, "$package->bootstrap(\$VERSION);\n1;\n__END__\n"
     close $fh or die "close $pm: $^OS_ERROR\n"
@@ -433,7 +440,8 @@ EOT
                   . "SvIV_set(temp_sv, 1149);"),
         )
 
-    push @items, $_ foreach keys %compass
+    foreach (keys %compass)
+        push @items, $_
 
     # Automatically compile the list of all the macro names, and make them
     # exported constants.
@@ -729,7 +737,8 @@ simple ("Twos and three middle", < qw(aa ae ai ea eu ie io oe era eta))
 # Given the choice go for the end, else the earliest point
 simple ("Three end and four symetry", < qw(ean ear eat barb marm tart))
 
-write_and_run_extension < $_ foreach  @tests
+foreach (@tests)
+    write_and_run_extension < $_
 
 # This was causing an assertion failure (a C<confess>ion)
 # Any single byte > 128 should do it.

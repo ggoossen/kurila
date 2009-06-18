@@ -871,8 +871,8 @@ EOF
         undef %outargs 
         process_keyword("POSTCALL|OUTPUT|ALIAS|ATTRS|PROTOTYPE")
 
-        &generate_output(%var_types{?$_}, %args_match{?$_}, $_, $DoSetMagic)
-            for grep { %in_out{?$_} =~ m/OUT$/ }, keys %in_out
+        for (grep { %in_out{?$_} =~ m/OUT$/ }, keys %in_out)
+            generate_output(%var_types{?$_}, %args_match{?$_}, $_, $DoSetMagic)
 
         # all OUTPUT done, so now push the return value on the stack
         if ($gotRETVAL && $RETVAL_code)
@@ -912,7 +912,8 @@ EOF
         print $output_fh, "\tXSprePUSH;" if $c and not $prepush_done
         print $output_fh, "\tEXTEND(SP,$c);\n" if $c
         $xsreturn += $c
-        generate_output(%var_types{?$_}, $num++, $_, 0, 1) for  @outlist
+        for (@outlist)
+            generate_output(%var_types{?$_}, $num++, $_, 0, 1)
 
         # do cleanup
         process_keyword("CLEANUP|ALIAS|ATTRS|PROTOTYPE") 

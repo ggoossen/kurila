@@ -14,7 +14,8 @@ sub need_prelink { 0 }
 
 sub arg_defines($self, %< %args)
 
-    s/"/""/g foreach values %args
+    foreach (values %args)
+        s/"/""/g
 
     my @config_defines
 

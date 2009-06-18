@@ -552,16 +552,13 @@ SHRDLU_4b
 ### for csh-style shells, like tcsh; or for traditional/modern
 ### Bourne-style shells, like bash, ksh, and zsh, respectively.
 SHRDLU_5
-            
-        
-    
 
     do
         # write failed tests
         open my $fh, ">", "TEST_FAILED" or die
-        print $fh, "$_\n" for reverse sort keys %failed_tests
+        for (reverse sort keys %failed_tests)
+            print $fh, "$_\n"
         close $fh
-    
 
     my @($user,$sys,$cuser,$csys) = @: times
     print $^STDOUT, sprintf('u=%.2f  s=%.2f  cu=%.2f  cs=%.2f  scripts=%d  tests=%d' . "\n",

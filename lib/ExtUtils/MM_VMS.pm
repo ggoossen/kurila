@@ -104,7 +104,8 @@ sub guess_name($self)
     # first .pm file with a matching .xs file.
     if (not -e "$($defpm).pm")
         @pm = glob'*.pm'
-        s/.pm$// for  @pm
+        for (@pm)
+            s/.pm$//
         if ((nelems @pm) == 1) { ($defpm = @pm[0]) =~ s/.pm$//; }elsif ((nelems @pm))
             %xs = %( < @+: map { s/.xs$//; @($_,1) }, @( glob( <'*.xs')) )  ## no critic
             if (keys %xs)
@@ -172,7 +173,8 @@ sub find_perl($self, $ver, $names, $dirs, $trace)
     
 
     # Image names containing Perl version use '_' instead of '.' under VMS
-    s/\.(\d+)$/_$1/ for  @snames
+    for (@snames)
+        s/\.(\d+)$/_$1/
     if ($trace +>= 2)
         print $^STDOUT, "Looking for perl $ver by these names:\n"
         print $^STDOUT, "\t$(join ' ',@snames),\n"

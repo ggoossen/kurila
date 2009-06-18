@@ -22,15 +22,17 @@ sub test_no_error
     printf $^STDOUT, "ok \%d\n",$i++
 
 
-test_too_many($_) for split m/\n/,
-    q[	defined(&foo, $bar);
+for (split m/\n/,
+     q[	defined(&foo, $bar);
 	undef(&foo, $bar);
 	uc($bar,$bar);
-]
+])
+    test_too_many($_)
 
-test_no_error($_) for split m/\n/,
+for (split m/\n/,
     q[ defined &foo, &foo, &foo;
    undef &foo, $bar;
 	uc $bar,$bar;
 	grep( { not($bar) }, @($bar));
-]
+])
+    test_no_error($_)

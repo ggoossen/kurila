@@ -101,13 +101,11 @@ SKIP: do
 
         sub SigINT
             $sigint_called++
-        
 
         # The order of the above tests is very important, so
         # we use literal prints and hard coded numbers.
-        next_test() for 1..4
-    
-
+        for (1..4)
+            next_test()
 
 SKIP: do
     skip("_POSIX_OPEN_MAX is inaccurate on MPE", 1) if $Is_MPE

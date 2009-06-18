@@ -474,7 +474,8 @@ sub switch_clause($self, $args, $namelen, $items, @< @items)
         # OK. Trump that. Now favour the last character of the string, before the
         # rest.
         my $ss
-        $ss += (nelems $_->@) * nelems $_->@ foreach values %spread
+        foreach (values %spread)
+            $ss += (nelems $_->@) * nelems $_->@
         my $rms = sqrt ($ss / keys %spread)
         if ($rms +< @best[0] || ($rms == @best[0] && ($max - $min) +< @best[1]))
             @best = @($rms, $max - $min, $i, \%spread)

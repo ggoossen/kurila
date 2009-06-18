@@ -78,7 +78,8 @@ sub type_to_C_value
     PV => \@('const char *'),
     PVN => \@('const char *', 'STRLEN'),
     )
-%type_temporary{+$_} = \@($_) foreach qw(IV UV NV)
+foreach (qw(IV UV NV))
+    %type_temporary{+$_} = \@($_)
 
 while (my @(?$type, ?$value) =@( each %XS_TypeSet))
     %type_num_args{+$type}
@@ -418,16 +419,16 @@ EOBOOT
         # items use C pre processor directives in their values, and in turn
         # these don't fit nicely in the macro-ised generator functions
         my $counter = 0
-        printf $xs_fh, "            \%s temp\%d;\n", $_, $counter++
-            foreach  %type_temporary{$type}->@
+        foreach (%type_temporary{$type}->@)
+            printf $xs_fh, "            \%s temp\%d;\n", $_, $counter++
 
         print $xs_fh, "            $item->{?pre}\n" if $item->{?pre}
 
         # And because the code in pre might be both declarations and
         # statements, we can't declare and assign to the temporaries in one.
         $counter = 0
-        printf $xs_fh, "            temp\%d = \%s;\n", $counter++, $_
-            foreach  &$type_to_value($value)
+        foreach (&$type_to_value($value))
+            printf $xs_fh, "            temp\%d = \%s;\n", $counter++, $_
 
         my @tempvarnames = map {sprintf 'temp%d', $_}, 0 .. $counter - 1
         printf $xs_fh, <<"EOBOOT", $name, &$generator(<@tempvarnames)

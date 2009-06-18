@@ -40,7 +40,8 @@ print $^STDOUT, "ok 1\n"
 # Check if can fork with dynamic extensions (bug in CRT):
 if ($^OS_NAME eq 'os2' and
     system "$^EXECUTABLE_NAME -I../lib -MOpcode -e 'defined fork or die'  > /dev/null 2>&1")
-    print $^STDOUT, "ok $_ # skipped: broken fork\n" for 2..5
+    for (2..5)
+        print $^STDOUT, "ok $_ # skipped: broken fork\n"
     exit 0
 
 
@@ -290,8 +291,8 @@ if( $server_pid)
             print $^STDOUT, $chr eq "\x{100}" ??
                 "ok 22\n" !! "not ok 22\n"
         else
-            print $^STDOUT, "ok $_ - Skip: no perlio\n" for 20..22
-        
+            for (20.22)
+                print $^STDOUT, "ok $_ - Skip: no perlio\n"
 
         $sock->print("send\n")
 

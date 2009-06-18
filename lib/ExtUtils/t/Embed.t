@@ -122,7 +122,8 @@ chomp($cmd) # where is the newline coming from? ldopts()?
 print $^STDOUT, "# $cmd\n"
 my @out = @( `$cmd` )
 $status = $^CHILD_ERROR
-print $^STDOUT, "# $_\n" foreach  @out
+foreach (@out)
+    print $^STDOUT, "# $_\n"
 
 if ($^OS_NAME eq 'VMS' && !$status)
     print $^STDOUT, "# $(join ' ',@cmd2)\n"

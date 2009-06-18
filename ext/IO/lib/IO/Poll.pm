@@ -77,9 +77,9 @@ sub poll($self,$timeout)
 
     while(@(?$fd,?$iom) =@( each $self->[0]))
         $mask   = 0
-        $mask  ^|^= $_ for values($iom)
+        for (values($iom))
+            $mask  ^|^= $_
         push(@poll,$fd => $mask)
-    
 
     my $ret = (nelems @poll) ?? _poll(defined($timeout) ?? $timeout * 1000 !! -1,< @poll) !! 0
 

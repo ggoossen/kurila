@@ -134,11 +134,11 @@ do
 
     my @x
     my $y = ''
-    @x = map { $y .= $_ for 1..2; 1 }, 3..4
+    @x = map { for (1..2) { $y .= $_ }; 1 }, 3..4
     cmp_ok( "$(join ' ',@x),$y",'eq',"1 1,1212", '[perl #17771] for in map 1')
 
     $y = ''
-    @x = map { $y .= $_ for 1..2; $y .= $_ }, 3..4
+    @x = map { for (1..2) { $y .= $_ }; $y .= $_ }, 3..4
     cmp_ok( "$(join ' ',@x),$y",'eq',"123 123124,123124", '[perl #17771] for in map 2')
 
     $y = ''
@@ -146,7 +146,7 @@ do
     cmp_ok( "$(join ' ',@x),$y",'eq',"123 123124,123124", '[perl #17771] for in map 3')
 
     $y = ''
-    @x = grep { $y .= $_ for 1..2; 1 }, 3..4
+    @x = grep { for (1..2) { $y .= $_ }; 1 }, 3..4
     cmp_ok( "$(join ' ',@x),$y",'eq',"3 4,1212", '[perl #17771] for in grep 1')
 
     $y = ''

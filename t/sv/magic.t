@@ -50,7 +50,7 @@ close $foo # just mention it, squelch used-only-once
 
 # $?, $@, $$
 if ($Is_MacOS)
-    skip('$? + system are broken on MacPerl') for 1..2
+    skip('$? + system are broken on MacPerl', 2)
 else
     system qq[$PERL "-I../lib" -e "use vmsish qw(hushed); exit(0)"]
     ok $^CHILD_ERROR == 0, '$?'
@@ -155,7 +155,7 @@ ok $^OS_NAME
 ok $^BASETIME +> 850000000, $^BASETIME
 
 if ($Is_VMS || $Is_Dos || $Is_MacOS)
-    skip("\%ENV manipulations fail or aren't safe on $^OS_NAME") for 1..4
+    skip("\%ENV manipulations fail or aren't safe on $^OS_NAME", 4)
 else
     if (env::var('PERL_VALGRIND'))
         skip("clearing \%ENV is not safe when running under valgrind")
@@ -211,7 +211,7 @@ else
            || ($^OS_NAME eq 'freebsd' && $ps =~ m/^(?:perl: )?x(?: \(perl\))?$/),
            'altering $0 is effective (testing with `ps`)')
     else
-        skip("\$0 check only on Linux and FreeBSD") for @( 0, 1)
+        skip("\$0 check only on Linux and FreeBSD", 2)
     
 
 

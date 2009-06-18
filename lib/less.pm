@@ -22,13 +22,12 @@ sub of
     my %tags
     %tags{[_unpack_tags( $hinthash->{?$class} ) ]} = @()
 
-    if ((nelems @_))
-        exists %tags{$_} and return ! ! 1 for  @_
+    if (@_)
+        for (@_)
+            exists %tags{$_} and return ! ! 1 
         return
     else
         return keys %tags
-    
-
 
 sub import
     my $class = shift @_

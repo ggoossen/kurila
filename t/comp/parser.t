@@ -159,22 +159,28 @@ like($^EVAL_ERROR->{?description}, qr/Can't locate DieDieDie.pm/, 'croak cleanup
 # the parser stack 'fail in reduce' cleanup code. They're here mainly as
 # something to be run under valgrind, with PERL_DESTRUCT_LEVEL=1.
 
-eval q[ BEGIN { } ] for 1..10;
+for (1..10)
+    eval q[ BEGIN { } ]
 is($^EVAL_ERROR, "", 'BEGIN 1' );
 
-eval q[ BEGIN { my $x; $x = 1 } ] for 1..10;
+for (1..10)
+    eval q[ BEGIN { my $x; $x = 1 } ]
 is($^EVAL_ERROR, "", 'BEGIN 2' );
 
-eval q[ sub foo2 { } ] for 1..10;
+for (1..10)
+    eval q[ sub foo2 { } ]
 is($^EVAL_ERROR, "", 'BEGIN 4' );
 
-eval q[ sub foo3 { my $x; $x=1 } ] for 1..10;
+for (1..10)
+    eval q[ sub foo3 { my $x; $x=1 } ]
 is($^EVAL_ERROR, "", 'BEGIN 5' );
 
-eval q[ BEGIN { die } ] for 1..10;
+for (1..10)
+    eval q[ BEGIN { die } ]
 like($^EVAL_ERROR->stacktrace, qr/BEGIN/, 'BEGIN 6' );
 
-eval q[ BEGIN {\&foo4; die } ] for 1..10;
+for (1..10)
+    eval q[ BEGIN {\&foo4; die } ]
 like($^EVAL_ERROR->stacktrace, qr/BEGIN/, 'BEGIN 7' );
 
 # Add new tests HERE:

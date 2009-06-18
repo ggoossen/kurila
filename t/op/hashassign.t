@@ -185,9 +185,9 @@ do
     our %h
     for my $ref ( @refs)
         dies_like( sub (@< @_) { %h{?$ref} }, qr/reference as string/ )
-    
 
-    bless $_ for  @refs
+    for (@refs)
+        bless $_
     %h = %( () )
     for my $ref ( @refs)
         dies_like( sub (@< @_) { %h{?$ref} }, qr/reference as string/ )

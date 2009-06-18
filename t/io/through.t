@@ -1,10 +1,9 @@
 #!./perl
 
-BEGIN 
+BEGIN
     if ($^OS_NAME eq 'VMS')
         print $^STDOUT, "1..0 # Skip on VMS -- too picky about line endings for record-oriented pipes\n"
         exit
-    
 
 
 require './test.pl'
@@ -23,7 +22,8 @@ my $t1 = \%( data => $data,  write_c => \@(1,2,length $data),  read_c => \@(1,2,
 my $t2 = \%( data => $data2, write_c => \@(1,2,length $data2), read_c => \@(1,2,3,length $data2))
 
 my $c   # len write tests, for each: one _all test, and 3 each len+2
-$c += (nelems $_->{?write_c}->@) * (1 + 3*nelems $_->{?read_c}->@) for @( $t1, $t2)
+for (@: $t1, $t2)
+    $c += (nelems $_->{?write_c}->@) * (1 + 3*nelems $_->{?read_c}->@)
 $c *= 3*2*2     # $how_w, file/pipe, 2 reports
 
 $c += 6 # Tests with sleep()...
@@ -49,7 +49,7 @@ sub testread($fh, $str, $read_c, $how_r, $write_c, $how_w, $why)
         $buf .= $in while $c = sysread($fh, $in, $read_c)
     else
         die "Unrecognized read: '$how_r'"
-    
+
     close $fh or die "close: $^OS_ERROR"
     # The only contamination allowed is with sysread/prints
     $buf =~ s/\r\n/\n/g if $how_r eq 'sysread' and $how_w =~ m/print/
@@ -62,17 +62,17 @@ sub testpipe($str, $write_c, $read_c, $how_w, $how_r, $why)
     my $fh
     if ($how_w eq 'print')      # AUTOFLUSH???
         # Should be shell-neutral:
-        open $fh, '-|', qq[$Perl -we "$set_out;print \\\$^STDOUT, \\\$_ for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted)"] or die "open: $^OS_ERROR"
+        open $fh, '-|', qq[$Perl -we "$set_out; for (grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted)) \{ print \\\$^STDOUT, \\\$_; \} "] or die "open: $^OS_ERROR"
     elsif ($how_w eq 'print/flush')
         # shell-neutral and miniperl-enabled autoflush? qq(\x24) eq '$'
-        open $fh, '-|', qq[$Perl -we "$set_out;eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die;print \\\$^STDOUT, \\\$_ for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted) "] or die "open: $^OS_ERROR"
+        open $fh, '-|', qq[$Perl -we "$set_out;eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die; for (grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted)) \{ print \\\$^STDOUT, \\\$_ \} "] or die "open: $^OS_ERROR"
     elsif ($how_w eq 'syswrite')
         ### How to protect \$_
-        my $cmd = qq[$Perl -we "$set_out;eval qq(sub w \\\{syswrite \\\\\\\$^STDOUT, \\x[24]_\\\} 1) or die; w() for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted)"]
+        my $cmd = qq[$Perl -we "$set_out; sub w(\\\$_) \{ syswrite \\\$^STDOUT, \\\$_ \} for (grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted)) \{ w(\\\$_) \}"]
         open $fh, '-|', $cmd or die "open '$cmd': $^OS_ERROR"
     else
         die "Unrecognized write: '$how_w'"
-    
+
     binmode $fh, ':crlf'
         if defined $main::use_crlf && $main::use_crlf == 1
     testread($fh, $str, $read_c, $how_r, $write_c, $how_w, "pipe$why")
@@ -86,15 +86,18 @@ sub testfile($str, $write_c, $read_c, $how_w, $how_r, $why)
         if defined $main::use_crlf && $main::use_crlf == 1
     if ($how_w eq 'print')      # AUTOFLUSH???
         $^OUTPUT_AUTOFLUSH = 0
-        print $fh, $_ for  @data
+        for (@data)
+            print $fh, $_
     elsif ($how_w eq 'print/flush')
         $^OUTPUT_AUTOFLUSH = 1
-        print $fh, $_ for  @data
+        for (@data)
+            print $fh, $_
     elsif ($how_w eq 'syswrite')
-        syswrite $fh, $_ for  @data
+        for (@data)
+            syswrite $fh, $_
     else
         die "Unrecognized write: '$how_w'"
-    
+
     close $fh or die "close: $^OS_ERROR"
     open $fh, '<', 'io_io.tmp' or die
     binmode $fh, ':crlf'
@@ -103,7 +106,7 @@ sub testfile($str, $write_c, $read_c, $how_w, $how_r, $why)
 
 
 # shell-neutral and miniperl-enabled autoflush? qq(\x24) eq '$'
-open my $fh, '-|', qq[$Perl -we "eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die; binmode \\\$^STDOUT; sleep 1, print \\\$^STDOUT, \\\$_ for split m//, qq(a\nb\n\nc\n\n\n)"] or die "open: $^OS_ERROR"
+open my $fh, '-|', qq[$Perl -we "eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die; binmode \\\$^STDOUT; for (split m//, qq(a\nb\n\nc\n\n\n)) \{ sleep 1; print \\\$^STDOUT, \\\$_; \}"] or die "open: $^OS_ERROR"
 ok(1, 'open pipe')
 binmode $fh, q(:crlf)
 ok(1, 'binmode')
@@ -126,7 +129,6 @@ for my $s (1..2)
                 for my $how_w (qw(print print/flush syswrite))
                     testfile($str, $write_c, $read_c, $how_w, $how_r, $s)
                     testpipe($str, $write_c, $read_c, $how_w, $how_r, $s)
-
 
 unlink 'io_io.tmp'
 

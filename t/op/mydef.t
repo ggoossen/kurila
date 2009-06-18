@@ -70,7 +70,8 @@ do
 
 do
     my $_ = 'local'
-    ok( $_ eq "postfix foo", 'postfix for' ) for @( 'postfix foo')
+    for (@( 'postfix foo'))
+        ok( $_ eq "postfix foo", 'postfix for' )
     ok( $_ eq 'local', '...my $_ restored outside postfix for' )
     ok( our $_ eq 'global', '...our $_ restored outside postfix for' )
 

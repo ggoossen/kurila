@@ -202,8 +202,8 @@ sub echo($self, $text, $file, ?$appending)
     if( $file )
         my $redirect = $appending ?? '>>' !! '>'
         @cmds[0] .= " $redirect $file"
-        $_ .= " >> $file" foreach @cmds[[1..((nelems @cmds)-1)]]
-    
+        foreach (@cmds[[1..((nelems @cmds)-1)]])
+            $_ .= " >> $file"
 
     return @cmds
 

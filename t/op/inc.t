@@ -208,18 +208,15 @@ EOC
 
     if ($warn)
         unless (ok (scalar nelems @warnings == 2, scalar nelems @warnings))
-            print $^STDERR, "# $_" foreach  @warnings
-        
+            foreach (@warnings)
+                print $^STDERR, "# $_" 
         foreach ( @warnings)
             unless (ok (m/Lost precision when incrementing \d+/, $_))
                 print $^STDERR, "# $_"
-            
-        
     else
         unless (ok (scalar nelems @warnings == 0))
-            print $^STDERR, "# $(join ' ',$_->@)" foreach  @warnings
-        
-    
+            foreach (@warnings)
+                print $^STDERR, "# $(join ' ',$_->@)"
 
 
 my $h_uv_max = 1 + (^~^0 >> 1)

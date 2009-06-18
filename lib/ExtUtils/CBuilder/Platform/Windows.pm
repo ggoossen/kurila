@@ -39,7 +39,8 @@ sub split_like_shell(my $self, local $_)
 
 
 sub arg_defines($self, %< %args)
-    s/"/\\"/g foreach values %args
+    foreach (values %args)
+        s/"/\\"/g 
     return map { qq{"-D$_=%args{?$_}"} }, keys %args
 
 
@@ -597,8 +598,8 @@ sub write_linker_script($self, %< %spec)
     open( my $scriptfh, ">$script" )
         or die( "Could not create script '$script': $^OS_ERROR" )
 
-    print( $scriptfh, 'SEARCH_DIR(' . $_ . ")\n" )
-        for  (delete %spec{libpath} || \@())->@
+    for ((delete %spec{libpath} || \@())->@)
+        print( $scriptfh, 'SEARCH_DIR(' . $_ . ")\n" )
 
     # gcc takes only one startup file, so the first object in startup is
     # specified as the startup file and any others are shifted into the

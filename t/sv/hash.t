@@ -42,7 +42,8 @@ ok (!Internals::HvREHASH(\%h2),
     "starting with pre-populated non-pathological hash (rehash flag if off)")
 
 my @keys = get_keys(\%h2)
-%h2{+$_}++ for  @keys
+for (@keys)
+    %h2{+$_}++
 ok (Internals::HvREHASH(\%h2),
     scalar(nelems @keys) . " colliding into the same bucket keys are triggering rehash")
 

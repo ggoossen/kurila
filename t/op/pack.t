@@ -760,7 +760,8 @@ SKIP: do
                 if is_valid_error($^EVAL_ERROR)
 
             my $len = length $nat
-            is($_, "\x[FF]"x$len) for @( $nat, $be, $le)
+            for (@: $nat, $be, $le)
+                is($_, "\x[FF]"x$len)
 
             my(@val,@ref)
             if ($len +>= 8)
@@ -1110,7 +1111,8 @@ do
                 my $p2 = try { pack $c, < @d }
                 is($^EVAL_ERROR, '')
                 is($p1, $p2)
-                s!(/[aAZ])\*!$1!g for @( $t, $c)
+                for (@: $t, $c)
+                    s!(/[aAZ])\*!$1!g
                 my @u1 = @( try { unpack $t, $p1 } )
                 is($^EVAL_ERROR, '')
                 my @u2 = @( try { unpack $c, $p2 } )

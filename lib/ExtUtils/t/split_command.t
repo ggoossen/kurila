@@ -53,12 +53,13 @@ is( (nelems $mm->split_command($echo)), 0,  'no args means no commands' )
 sub _run
     my @cmds = @_
 
-    s{\$\(ABSPERLRUN\)}{$perl} foreach  @cmds
+    foreach (@cmds)
+        s{\$\(ABSPERLRUN\)}{$perl}
     if( $Is_VMS )
-        s{-\n}{} foreach  @cmds
+        foreach (@cmds)
+            s{-\n}{}
     elsif( $Is_Win32 )
-        s{\\\n}{} foreach  @cmds
-    
+        foreach (@cmds)
+            s{\\\n}{}
 
     return map { s/\n+$//; $_ }, map { `$_` }, @cmds
-

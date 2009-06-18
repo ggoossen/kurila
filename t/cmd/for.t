@@ -85,12 +85,13 @@ do
     sub X::DESTROY
         my $o = shift
         $x++
-        1 for @( (1))
-    
+        for (@: 1)
+            1
 
     my %h
     %h{+foo} = bless \@(), 'X'
-    delete %h{foo} for @( %h{?foo}, 1)
+    for (@: %h{?foo}, 1)
+        delete %h{foo}
     print $^STDOUT, $x == 1 ?? "ok" !! "not ok", " 15 - double destroy, x=$x\n"
 
 

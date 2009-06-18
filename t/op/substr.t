@@ -448,9 +448,9 @@ sub run_tests
     do
         my $s = "ab"
         my @r
-        @r[+$_] = \ substr $s, $_, 1 for @( (0, 1))
+        for (@: 0, 1)
+            @r[+$_] = \ substr $s, $_, 1
         is(join("", map { $_->$ }, @r), "ab")
-    
 
     # [perl #24605]
     do

@@ -18,7 +18,8 @@ my @pow = @(\@(  3, 30, 1e-14),
             \@( -3, 30, 1e-14),
     )
 my $tests
-$tests += $_->[1] foreach  @pow
+foreach (@pow)
+    $tests += $_->[1]
 
 plan tests => 13 + $bits_in_uv + $tests
 
