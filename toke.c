@@ -433,7 +433,7 @@ S_ao(pTHX_ int toketype)
 /*
  * S_no_op
  * When Perl expects an operator and finds something else, no_op
- * prints the warning.  It always prints "<something> found where
+ * prints the error.  It always prints "<something> found where
  * operator expected.  It prints "Missing semicolon on previous line?"
  * if the surprise occurs at the start of the line.  "do you need to
  * predeclare ..." is printed out for code like "sub bar; foo bar $x"
@@ -456,7 +456,7 @@ S_no_op(pTHX_ const char *const what, char *s)
 	s = oldbp;
     else
 	PL_bufptr = s;
-    yywarn(Perl_form(aTHX_ "%s found where operator expected", what));
+    yyerror(Perl_form(aTHX_ "%s found where operator expected", what));
     if (ckWARN_d(WARN_SYNTAX)) {
 	if (is_first)
 	    yywarn("\t(Missing semicolon on previous line?)");
