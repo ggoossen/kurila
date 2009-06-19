@@ -193,21 +193,18 @@ sub _unix_os2_ext($self,$potential_libs, ?$verbose, ?$give_libs)
                         unless ($in_perl and $^OS_NAME eq 'sunos')
                 else
                     push(@ldloadlibs, "-l$thislib")
-                
             
             last        # found one here so don't bother looking further
         
         warn "Note (probably harmless): "
             ."No library found for -l$thislib\n"
             unless $found_lib+>0
-    
 
     unless( $found )
         return  @('','','','', $give_libs ?? \@libs !! ())
     else
         return  @("$(join ' ',@extralibs)", "$(join ' ',@bsloadlibs)", "$(join ' ',@ldloadlibs)",
                   join(":", @ld_run_path),  @($give_libs ?? \@libs !! ()))
-    
 
 
 sub _win32_ext($self, $potential_libs, $verbose, $give_libs)

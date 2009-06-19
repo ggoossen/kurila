@@ -107,6 +107,11 @@ sub aap
 ((4) (8) (0))     |'sub aap'
 ((0) (4))         |'noot'")
 
+;; indentation isnside qw() construct
+(indent-test "((0) (4))|package Foo::Bar
+((0) (4))         |
+((0) (4))         |aap(qw(noot
+((7))             |       mies))")
 
 (defun kt-is (buffer line exp func)
   (save-excursion

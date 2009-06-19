@@ -87,26 +87,26 @@ END
 #endif
                            '))
 
-push @names, \%(name=>$_, type=>"UV")
-    foreach @( ( <qw(SA_NOCLDSTOP SA_NOCLDWAIT SA_NODEFER SA_ONSTACK SA_RESETHAND
-             SA_RESTART SA_SIGINFO UCHAR_MAX UINT_MAX ULONG_MAX USHRT_MAX)))
-push @names, \%(name=>$_, type=>"NV", not_constant=>1)
-    foreach @( ( <qw(DBL_MAX FLT_MAX LDBL_MAX LDBL_MIN LDBL_EPSILON
-               DBL_EPSILON DBL_MIN FLT_EPSILON FLT_MIN)))
+foreach (qw(SA_NOCLDSTOP SA_NOCLDWAIT SA_NODEFER SA_ONSTACK SA_RESETHAND
+            SA_RESTART SA_SIGINFO UCHAR_MAX UINT_MAX ULONG_MAX USHRT_MAX))
+    push @names, \%(name=>$_, type=>"UV")
+foreach (qw(DBL_MAX FLT_MAX LDBL_MAX LDBL_MIN LDBL_EPSILON
+            DBL_EPSILON DBL_MIN FLT_EPSILON FLT_MIN))
+    push @names, \%(name=>$_, type=>"NV", not_constant=>1)
 
-push @names, \%(name=>$_, type=>"NV")
-    foreach @( ( <qw(DBL_DIG DBL_MANT_DIG DBL_MAX_10_EXP DBL_MAX_EXP DBL_MIN_10_EXP
-              DBL_MIN_EXP FLT_DIG FLT_MANT_DIG FLT_MAX_10_EXP FLT_MAX_EXP
-              FLT_MIN_10_EXP FLT_MIN_EXP FLT_RADIX LDBL_DIG LDBL_MANT_DIG
-              LDBL_MAX_10_EXP LDBL_MAX_EXP LDBL_MIN_10_EXP LDBL_MIN_EXP)))
+foreach (qw(DBL_DIG DBL_MANT_DIG DBL_MAX_10_EXP DBL_MAX_EXP DBL_MIN_10_EXP
+            DBL_MIN_EXP FLT_DIG FLT_MANT_DIG FLT_MAX_10_EXP FLT_MAX_EXP
+            FLT_MIN_10_EXP FLT_MIN_EXP FLT_RADIX LDBL_DIG LDBL_MANT_DIG
+            LDBL_MAX_10_EXP LDBL_MAX_EXP LDBL_MIN_10_EXP LDBL_MIN_EXP))
+    push @names, \%(name=>$_, type=>"NV")
 
-push @names, \%(name=>$_, type=>"IV", default=> \@("IV", "0"))
-    foreach @( ( <qw(_POSIX_ARG_MAX _POSIX_CHILD_MAX _POSIX_CHOWN_RESTRICTED
-              _POSIX_LINK_MAX _POSIX_MAX_CANON _POSIX_MAX_INPUT _POSIX_NAME_MAX
-              _POSIX_NGROUPS_MAX _POSIX_NO_TRUNC _POSIX_OPEN_MAX
-              _POSIX_PATH_MAX _POSIX_PIPE_BUF _POSIX_SSIZE_MAX
-              _POSIX_STREAM_MAX _POSIX_TZNAME_MAX _POSIX_VDISABLE _POSIX_VERSION
-             )))
+foreach (qw(_POSIX_ARG_MAX _POSIX_CHILD_MAX _POSIX_CHOWN_RESTRICTED
+            _POSIX_LINK_MAX _POSIX_MAX_CANON _POSIX_MAX_INPUT _POSIX_NAME_MAX
+            _POSIX_NGROUPS_MAX _POSIX_NO_TRUNC _POSIX_OPEN_MAX
+            _POSIX_PATH_MAX _POSIX_PIPE_BUF _POSIX_SSIZE_MAX
+            _POSIX_STREAM_MAX _POSIX_TZNAME_MAX _POSIX_VDISABLE _POSIX_VERSION
+           ))
+    push @names, \%(name=>$_, type=>"IV", default=> \@("IV", "0"))
 
 if ($rt_signals)
     push @names, \%(name=>"SIGRTMAX", not_constant=>1),
