@@ -573,14 +573,14 @@ sub _system_run
     return 1
 
 
-do {   use File::Spec;
-    use Symbol;
+do  use File::Spec
+    use Symbol
 
     my %Map = %(
         STDOUT => \@( <qw|>&|, $^STDOUT, Symbol::gensym() ),
         STDERR => \@( <qw|>&|, $^STDERR, Symbol::gensym() ),
         STDIN  => \@( <qw|<&|, $^STDIN,  Symbol::gensym() ),
-        );
+        )
 
     ### dups FDs and stores them in a cache
     sub __dup_fds
@@ -608,11 +608,8 @@ do {   use File::Spec;
                     Carp::carp( <loc("Could not reopen '$name': \%1", $^OS_ERROR)),
                     return
                     )
-            
-        
 
         return 1
-    
 
     ### reopens FDs from the cache
     sub __reopen_fds
@@ -635,8 +632,6 @@ do {   use File::Spec;
         
         return 1
 
-    
-}
 
 sub _debug
     my $self    = shift

@@ -113,6 +113,10 @@ sub aap
 ((0) (4))         |aap(qw(noot
 ((7))             |       mies))")
 
+;;             for (grep {defined},
+;;                  map      { $state->{$type}->{?$_} }, qw(goto continue))
+;;                  %reachable{+$_}++
+
 (defun kt-is (buffer line exp func)
   (save-excursion
     (set-buffer (get-buffer-create "*kurila-indent-test*"))

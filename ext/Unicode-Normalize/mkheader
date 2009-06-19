@@ -139,7 +139,6 @@ while ($Decomp =~ m/(.+)/g)
                     %CompList{ + $listname }{+$dec->[1] } = $ini
                     %Comp1st{+$dec->[0] } = $listname
                     %Comp2nd{+$dec->[1] } = 1 if ! %Exclus{?$ini}
-                
             elsif ((nelems $dec->@) == 1)
                 %Single{+$ini } = 1
             else

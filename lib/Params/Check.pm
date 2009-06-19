@@ -548,7 +548,8 @@ It is exported upon request.
 
 =cut
 
-do {   $_ERROR_STRING = '';
+do
+    $_ERROR_STRING = ''
 
     sub _store_error
         my@($err, $verbose, $offset) =  @_[[0..2]]
@@ -559,14 +560,11 @@ do {   $_ERROR_STRING = '';
         warn $err if $verbose
 
         $_ERROR_STRING .= $err . "\n"
-    
 
     sub _clear_error
         $_ERROR_STRING = ''
-    
 
     sub last_error { $_ERROR_STRING }
-}
 
 1
 
