@@ -113,9 +113,8 @@ while ($Combin =~ m/(.+)/g)
     if (@tab[1] eq '')
         %Combin{+$ini } = @tab[2]
     else
-        %Combin{+$_ } = @tab[2] foreach $ini .. hex(@tab[1])
-    
-
+        foreach ($ini .. hex(@tab[1]))
+            %Combin{+$_ } = @tab[2]
 
 while ($Decomp =~ m/(.+)/g)
     my @tab = split m/\t/, $1
