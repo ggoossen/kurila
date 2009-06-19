@@ -68,7 +68,7 @@
               (forward-char)
               (backward-sexp)
               (skip-syntax-backward " ")
-              (if (looking-back "if\\|\\unless\\|for\\|while\\|until" 6)
+              (if (looking-back "if\\|\\unless\\|for\\|foreach\\|while\\|until" 7)
                   (if new-point
                       (setq points (cons new-point points))))
             )))
