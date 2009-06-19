@@ -132,8 +132,8 @@ sub pod2man {
     my @($poddir, $mandir, $manext, @<@script) = @_;
     if ($mandir eq ' ' or $mandir eq '') {
         if (@script) {
-            warn "Skipping installation of $poddir/$_ man page.\n"
-                foreach @script;
+            foreach (@script)
+                warn "Skipping installation of $poddir/$_ man page.\n"
         } else {
             warn "Skipping installation of $poddir man pages.\n";
         }
