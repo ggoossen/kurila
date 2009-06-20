@@ -210,6 +210,7 @@ ext/IO/Makefile.PL		IO extension makefile writer
 ext/IO/poll.c			IO poll() emulation using select()
 ext/IO/poll.h			IO poll() emulation using select()
 ext/IO/README			IO extension maintenance notice
+ext/IO/t/io-socket.t	See if basic IO::Sockets methods work
 ext/IO/t/io_const.t	See if constants from IO work
 ext/IO/t/io_dir.t	See if directory-related methods from IO work
 ext/IO/t/io_dup.t	See if dup()-related methods from IO work
