@@ -65,8 +65,8 @@ open my $out, ">>", "$f" or die "open $f: $^OS_ERROR";
 print $out, $str;
 close $out;
 EOF
-    ;
-close $prog_fh or die "close ff-prog: $^OS_ERROR";
+    
+close $prog_fh or die "close ff-prog: $^OS_ERROR"
 push @delete, "ff-prog"
 
 $^OUTPUT_AUTOFLUSH = 0 # we want buffered output

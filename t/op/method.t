@@ -154,7 +154,7 @@ is( main::Foo->boogie(), "yes, sir!")
 
 package main;
 our @X
-package Amajor;
+package Amajor
 sub test
     push @main::X, 'Amajor', < @_
 

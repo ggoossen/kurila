@@ -240,7 +240,7 @@ usage: PERL_CORE=1 ./perl ext/B/t/concise-xs.t [-av] [module-list]
         (will report failures, since no XS funcs are known apriori)
 
 EODIE
-    ;
+    
 
 if (%opts)
     require Data::Dumper

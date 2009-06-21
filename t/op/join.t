@@ -33,4 +33,4 @@ do { my $s = 5;
     my $r = join '', @( 'a', undef, $s, 'b', undef, $s, 'c');
     print $^STDOUT, "# expected '21' got '$s'\nnot " if $s != 21;
     print $^STDOUT, "ok 10\n";
-};
+}

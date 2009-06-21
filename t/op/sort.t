@@ -252,7 +252,7 @@ do { no warnings;
     is "$(join ' ',@b)" , "6first 6second 5first 5second", "optimized \{$b <=> $a\} without overloading" ;
     @input =sort {$b <+> $a}, @input;
     is "$(join ' ',@input)" , "6first 6second 5first 5second","inline optimized \{$b <=> $a\} without overloading" ;
-};
+}
 
 my @output
 

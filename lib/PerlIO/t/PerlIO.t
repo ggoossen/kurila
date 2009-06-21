@@ -55,7 +55,7 @@ is(scalar ~< $binfh, "bar\n")
 is(scalar ~< $utffh,  "foo\x{ff}\n")
 is(scalar ~< $utffh, "bar\x{abcd}\n")
 
-ok(eof($txtfh));
+ok(eof($txtfh))
 
 ok(eof($binfh))
 

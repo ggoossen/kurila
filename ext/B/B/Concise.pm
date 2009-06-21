@@ -549,8 +549,8 @@ sub fmt_line($hr, $op, $text, $level)
 
 our %priv # used to display each opcode's BASEOP.op_private values
 
-for (@: "pos", "substr", "vec", "threadsv", "gvsv", "rv2sv", "rv2hv", "rv2gv",
-        "rv2av", "aelem", "helem", "aslice", "hslice", "padsv",
+for (@: "pos", "substr", "vec", "threadsv", "gvsv", "rv2sv", "rv2hv", "rv2gv"
+        "rv2av", "aelem", "helem", "aslice", "hslice", "padsv"
         "padav", "padhv", "enteriter")
     %priv{+$_}{+128} = "LVINTRO"
 for (@: "leave", "leavesub", "leavesublv", "leavewrite")
@@ -574,20 +574,20 @@ for (@: "entersub", "rv2cv")
     %priv{+$_}{[+@(4,8,128)]} = @("INARGS","AMPER","NO()")
 %priv{+"gv"}{+32} = "EARLYCV"
 %priv{+"aelem"}{+16} = %priv{"helem"}{+16} = "LVDEFER"
-for (@: "gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv",
-                                    "enteriter")
+for (@: "gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv"
+        "enteriter")
     %priv{+$_}{+16} = "OURINTR" 
-for (@: (< ( @+: map( {@($_,"s$_") }, @("chop", "chomp")) ),
-        < ( @+: map( {@($_,"i_$_") }, @( "postinc", "postdec", "multiply", "divide", "modulo",
-                                           "add", "subtract", "negate"))), "pow", "concat", "stringify",
-        "left_shift", "right_shift", "bit_and", "bit_xor", "bit_or",
-        "complement", "atan2", "sin", "cos", "rand", "exp", "log", "sqrt",
-        "int", "hex", "oct", "abs", "length", "index", "rindex", "sprintf",
-        "ord", "chr", "crypt", "quotemeta", "join", "push", "unshift", "flock",
-        "chdir", "chown", "chroot", "unlink", "chmod", "utime", "rename",
-        "link", "symlink", "mkdir", "rmdir", "wait", "waitpid", "system",
-        "exec", "kill", "getppid", "getpgrp", "setpgrp", "getpriority",
-        "setpriority", "time", "sleep"))
+for (@: (< ( @+: map( {@($_,"s$_") }, @("chop", "chomp")) )
+         < ( @+: map( {@($_,"i_$_") } @( "postinc", "postdec", "multiply", "divide", "modulo"
+                                         "add", "subtract", "negate"))), "pow", "concat", "stringify"
+         "left_shift", "right_shift", "bit_and", "bit_xor", "bit_or"
+         "complement", "atan2", "sin", "cos", "rand", "exp", "log", "sqrt"
+         "int", "hex", "oct", "abs", "length", "index", "rindex", "sprintf"
+         "ord", "chr", "crypt", "quotemeta", "join", "push", "unshift", "flock"
+         "chdir", "chown", "chroot", "unlink", "chmod", "utime", "rename"
+         "link", "symlink", "mkdir", "rmdir", "wait", "waitpid", "system"
+         "exec", "kill", "getppid", "getpgrp", "setpgrp", "getpriority"
+         "setpriority", "time", "sleep"))
     %priv{+$_}{+16} = "TARGMY"
 for (@: "enteriter", "iter")
     %priv{+$_}{+4} = "REVERSED"
@@ -606,10 +606,10 @@ for (@: "ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec")
 %priv{+"entereval"}{+2} = "HAS_HH"
 do
     # Stacked filetests are post 5.8.x
-    for (@: "ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec",
-            "ftis", "fteowned", "ftrowned", "ftzero", "ftsize", "ftmtime",
-            "ftatime", "ftctime", "ftsock", "ftchr", "ftblk", "ftfile", "ftdir",
-            "ftpipe", "ftlink", "ftsuid", "ftsgid", "ftsvtx", "fttty", "fttext",
+    for (@: "ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec"
+            "ftis", "fteowned", "ftrowned", "ftzero", "ftsize", "ftmtime"
+            "ftatime", "ftctime", "ftsock", "ftchr", "ftblk", "ftfile", "ftdir"
+            "ftpipe", "ftlink", "ftsuid", "ftsgid", "ftsvtx", "fttty", "fttext"
             "ftbinary")
         %priv{+$_}{+4} = "FTSTACKED"
     # Lexical $_ is post 5.8.x

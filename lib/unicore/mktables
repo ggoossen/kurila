@@ -2030,10 +2030,10 @@ if ( $FileList and $MakeList )
 EOFHEADER
     my @input=@("version",glob( <'*.txt'))
     for (@input
-         +@+ @:"\n=================================\n",
-             "# Output files:\n",
-              # special files
-              "Properties")
+         +@+ @:"\n=================================\n"
+               "# Output files:\n"
+               # special files
+               "Properties")
         print $ofh, "$_\n"
 
     require File::Find

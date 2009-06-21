@@ -1,17 +1,17 @@
-BEGIN {
+BEGIN 
     if(env::var('PERL_CORE')) {
         chdir 't';
         $^INCLUDE_PATH = @( '../lib' );
     }
-}
 
-use Test::More;
+
+use Test::More
 BEGIN { plan tests => 8 };
 
-my $d;
+my $d
 #use Pod::Simple::Debug (\$d, 0);
 
-ok 1;
+ok 1
 
 use Pod::Simple::XMLOutStream;
 use Pod::Simple::DumpAsXML;
@@ -27,7 +27,7 @@ my @from = @(
  'Pod::Simple::DumpAsText'
  => "++Document\n  ++head1\n    * \"I LIKE PIE\"\n  --head1\n--Document\n",
 
-    );
+    )
 
 
 # Might as well test all the classes...
@@ -38,12 +38,12 @@ while((nelems @from)) {
     my $p = $x->new;
     my($got, $exp);
     is scalar($got = $x->_out(
-     # Mutor:
-     sub {
-         @_[0]->code_handler(sub { $more .= @_[1] . ":" . @_[0] . "\n"       } );
-         @_[0]->cut_handler( sub { $more .= "~" . @_[1] . ":" .  @_[0]. "\n" } );
-     } => join "\n", @(
-    "",
+       # Mutor:
+       sub 
+           @_[0]->code_handler(sub { $more .= @_[1] . ":" . @_[0] . "\n"       } )
+           @_[0]->cut_handler( sub { $more .= "~" . @_[1] . ":" .  @_[0]. "\n" } )
+        => join "\n", @(
+        "",
         "\t# This is handy...",
         "=head1 I  LIKE   PIE",
         "",
@@ -52,31 +52,31 @@ while((nelems @from)) {
         "runtests(sort glob 't/*.t');",
         "",
         "",)
-     ))
-     => scalar($exp = $expected);
+       ))
+       => scalar($exp = $expected);
         ;
     unless($got eq $exp) {
-        print $^STDOUT, '# Got vs exp:\n# ', < Pod::Simple::BlackBox::pretty($got),
-            "\n# ", <Pod::Simple::BlackBox::pretty($exp),"\n";
+        print $^STDOUT, '# Got vs exp:\n# ', < Pod::Simple::BlackBox::pretty($got)
+            "\n# ", <Pod::Simple::BlackBox::pretty($exp)"\n";
     }
 
-    ok scalar($got = $more), scalar($exp = join "\n", @( 
-   "1:",
-   "2:\t# This is handy...",
-   "~5:=cut",
-   "6:use Test::Harness;",
-   "7:runtests(sort glob 't/*.t');",
-   "8:",
-   "",)
-     );
+    ok scalar($got = $more), scalar($exp = join "\n", @(
+        "1:",
+        "2:\t# This is handy...",
+        "~5:=cut",
+        "6:use Test::Harness;",
+        "7:runtests(sort glob 't/*.t');",
+        "8:",
+        "",)
+       );
     unless($got eq $exp) {
-        print $^STDOUT, '# Got vs exp:\n# ', < Pod::Simple::BlackBox::pretty($got),
-            "\n# ", <Pod::Simple::BlackBox::pretty($exp),"\n";
+        print $^STDOUT, '# Got vs exp:\n# ', < Pod::Simple::BlackBox::pretty($got)
+            "\n# ", <Pod::Simple::BlackBox::pretty($exp)"\n";
     }
 }
 
 
-print $^STDOUT, "# Wrapping up... one for the road...\n";
-ok 1;
-print $^STDOUT, "# --- Done with ", __FILE__, " --- \n";
+print $^STDOUT, "# Wrapping up... one for the road...\n"
+ok 1
+print $^STDOUT, "# --- Done with ", __FILE__, " --- \n"
 

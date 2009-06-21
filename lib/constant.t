@@ -111,7 +111,7 @@ is nelems(@warnings), 0, "unexpected warning"
 ok 1
 
 my $curr_test = $TB->current_test
-use constant CSCALAR    => \"ok 37\n";
+use constant CSCALAR    => \"ok 37\n"
 use constant CHASH      => \%( foo => "ok 38\n" );
 use constant CARRAY     => \@( undef, "ok 39\n" );
 use constant CCODE      => sub (@< @_) { "ok @_[0]\n" };

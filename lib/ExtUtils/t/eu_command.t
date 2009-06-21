@@ -1,39 +1,38 @@
 #!/usr/bin/perl -w
 
-BEGIN {
+BEGIN 
     if( env::var('PERL_CORE') ) {
         chdir 't';
         $^INCLUDE_PATH = @('../lib', 'lib/');
-    }
-    else {
-        unshift $^INCLUDE_PATH, 't/lib/';
-    }
-}
-chdir 't';
+    }else 
+        unshift $^INCLUDE_PATH, 't/lib/'
+    
 
-our $Testfile;
-BEGIN {
-    $Testfile = 'testfile.foo';
-}
+chdir 't'
 
-BEGIN {
-    1 while unlink $Testfile, 'newfile';
+our $Testfile
+BEGIN 
+    $Testfile = 'testfile.foo'
+
+
+BEGIN 
+    1 while unlink $Testfile, 'newfile'
     # forcibly remove ecmddir/temp2, but don't import mkpath
     use File::Path ();
-    File::Path::rmtree( 'ecmddir' );
-}
+    File::Path::rmtree( 'ecmddir' )
 
-BEGIN {
-    use Test::More tests => 41;
-    use File::Spec;
-}
 
-BEGIN {
+BEGIN 
+    use Test::More tests => 41
+    use File::Spec
+
+
+BEGIN 
     # bad neighbor, but test_f() uses exit()
-    *CORE::GLOBAL::exit = '';   # quiet 'only once' warning.
-    *CORE::GLOBAL::exit = sub { return @_[0] };
-    use_ok( 'ExtUtils::Command' );
-}
+    *CORE::GLOBAL::exit = ''   # quiet 'only once' warning.
+    *CORE::GLOBAL::exit = sub { return @_[0] }
+    use_ok( 'ExtUtils::Command' )
+
 
 do
     # concatenate this file with itself
@@ -52,7 +51,7 @@ do
     @ARGV = @($self, $self)
 
     cat()
-    is( scalar( $out =~ s/use_ok\( 'ExtUtils::Command'//g), 2, 
+    is( scalar( $out =~ s/use_ok\( 'ExtUtils::Command'//g), 2,
         'concatenation worked' )
 
     # the truth value here is reversed -- Perl true is shell false
@@ -82,7 +81,7 @@ do
     # There's a small chance of a 1 second flutter here.
     my $stamp = @(stat(@ARGV[0]))[9]
     cmp_ok( abs($now - $stamp), '+<=', 1, 'checking modify time stamp' ) ||
-      diag "mtime == $stamp, should be $now"
+        diag "mtime == $stamp, should be $now"
 
     @ARGV = qw(newfile)
     touch()
@@ -105,35 +104,35 @@ do
     eqtime()
     ok( -s $Testfile, "eqtime doesn't clear the file being equalized" )
 
-    SKIP: do {
+    SKIP: do 
         if ($^OS_NAME eq 'amigaos' || $^OS_NAME eq 'os2' || $^OS_NAME eq 'MSWin32' ||
             $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'cygwin'  ||
             $^OS_NAME eq 'MacOS'
-           ) {
+            ) {
             skip( "different file permission semantics on $^OS_NAME", 3);
         }
 
         # change a file to execute-only
-        @ARGV = @( '0100', $Testfile );
-        ExtUtils::Command::chmod();
+        @ARGV = @( '0100', $Testfile )
+        ExtUtils::Command::chmod()
 
         is( (@(stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
-            0100, 'change a file to execute-only' );
+            0100, 'change a file to execute-only' )
 
         # change a file to read-only
-        @ARGV = @( '0400', $Testfile );
-        ExtUtils::Command::chmod();
+        @ARGV = @( '0400', $Testfile )
+        ExtUtils::Command::chmod()
 
         is( (@(stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
-            ($^OS_NAME eq 'vos' ?? 0500 !! 0400), 'change a file to read-only' );
+            ($^OS_NAME eq 'vos' ?? 0500 !! 0400), 'change a file to read-only' )
 
         # change a file to write-only
-        @ARGV = @( '0200', $Testfile );
-        ExtUtils::Command::chmod();
+        @ARGV = @( '0200', $Testfile )
+        ExtUtils::Command::chmod()
 
         is( (@(stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
-            ($^OS_NAME eq 'vos' ?? 0700 !! 0200), 'change a file to write-only' );
-    };
+            ($^OS_NAME eq 'vos' ?? 0700 !! 0200), 'change a file to write-only' )
+    ;
 
     # change a file to read-write
     @ARGV = @( '0600', $Testfile )
@@ -145,43 +144,43 @@ do
         ($^OS_NAME eq 'vos' ?? 0700 !! 0600), 'change a file to read-write' )
 
 
-    SKIP: do {
+    SKIP: do 
         if ($^OS_NAME eq 'amigaos' || $^OS_NAME eq 'os2' || $^OS_NAME eq 'MSWin32' ||
             $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'cygwin'  ||
             $^OS_NAME eq 'MacOS' || $^OS_NAME eq 'vos'
-           ) {
+            ) {
             skip( "different file permission semantics on $^OS_NAME", 5);
         }
 
-        @ARGV = @('testdir');
-        mkpath;
-        ok( -e 'testdir' );
+        @ARGV = @('testdir')
+        mkpath
+        ok( -e 'testdir' )
 
         # change a dir to execute-only
-        @ARGV = @( '0100', 'testdir' );
-        ExtUtils::Command::chmod();
+        @ARGV = @( '0100', 'testdir' )
+        ExtUtils::Command::chmod()
 
         is( (@(stat('testdir'))[2] ^&^ 07777) ^&^ 0700,
-            0100, 'change a dir to execute-only' );
+            0100, 'change a dir to execute-only' )
 
         # change a dir to read-only
-        @ARGV = @( '0400', 'testdir' );
-        ExtUtils::Command::chmod();
+        @ARGV = @( '0400', 'testdir' )
+        ExtUtils::Command::chmod()
 
         is( (@(stat('testdir'))[2] ^&^ 07777) ^&^ 0700,
-            ($^OS_NAME eq 'vos' ?? 0500 !! 0400), 'change a dir to read-only' );
+            ($^OS_NAME eq 'vos' ?? 0500 !! 0400), 'change a dir to read-only' )
 
         # change a dir to write-only
-        @ARGV = @( '0200', 'testdir' );
-        ExtUtils::Command::chmod();
+        @ARGV = @( '0200', 'testdir' )
+        ExtUtils::Command::chmod()
 
         is( (@(stat('testdir'))[2] ^&^ 07777) ^&^ 0700,
-            ($^OS_NAME eq 'vos' ?? 0700 !! 0200), 'change a dir to write-only' );
+            ($^OS_NAME eq 'vos' ?? 0700 !! 0200), 'change a dir to write-only' )
 
-        @ARGV = @('testdir');
-        rm_rf;
-        ok( ! -e 'testdir', 'rm_rf can delete a read-only dir' );
-    };
+        @ARGV = @('testdir')
+        rm_rf
+        ok( ! -e 'testdir', 'rm_rf can delete a read-only dir' )
+    ;
 
 
     # mkpath
@@ -248,9 +247,9 @@ do
 
         chdir File::Spec->updir
 
-    # remove some files
+        # remove some files
     my @files = @( @ARGV = @( File::Spec->catfile( 'ecmddir', $Testfile ),
-                              File::Spec->catfile( 'ecmddir', 'temp2', $Testfile ) ) )
+                                        File::Spec->catfile( 'ecmddir', 'temp2', $Testfile ) ) )
     rm_f()
 
     for (@ARGV)
@@ -261,36 +260,36 @@ do
     rm_rf()
     ok( ! -e $dir, "removed $dir successfully" )
 
-do {
-    do { local @ARGV = @( 'd2utest' ); mkpath; };
-    open(my $fh, ">", 'd2utest/foo');
-    binmode($fh);
-    print $fh, "stuff\015\012and thing\015\012";
-    close $fh;
+do 
+    do { local @ARGV = @( 'd2utest' ); mkpath; }
+    open(my $fh, ">", 'd2utest/foo')
+    binmode($fh)
+    print $fh, "stuff\015\012and thing\015\012"
+    close $fh
 
-    open($fh, ">", 'd2utest/bar');
-    binmode($fh);
+    open($fh, ">", 'd2utest/bar')
+    binmode($fh)
     my $bin = "\c@\c@\c@\c@\c@\c@\cA\c@\c@\c@\015\012".
-              "\@\c@\cA\c@\c@\c@8__LIN\015\012";
-    print $fh, $bin;
-    close $fh;
+        "\@\c@\cA\c@\c@\c@8__LIN\015\012"
+    print $fh, $bin
+    close $fh
 
-    local @ARGV = @( 'd2utest' );
-    ExtUtils::Command::dos2unix();
+    local @ARGV = @( 'd2utest' )
+    ExtUtils::Command::dos2unix()
 
-    open($fh, "<", 'd2utest/foo');
-    is( join('', @( ~< *$fh)), "stuff\012and thing\012", 'dos2unix' );
-    close $fh;
+    open($fh, "<", 'd2utest/foo')
+    is( join('', @( ~< *$fh)), "stuff\012and thing\012", 'dos2unix' )
+    close $fh
 
-    open($fh, "<", 'd2utest/bar');
-    binmode($fh);
-    ok( -B 'd2utest/bar' );
-    is( join('', @( ~< *$fh)), $bin, 'dos2unix preserves binaries');
-    close $fh;
-};
+    open($fh, "<", 'd2utest/bar')
+    binmode($fh)
+    ok( -B 'd2utest/bar' )
+    is( join('', @( ~< *$fh)), $bin, 'dos2unix preserves binaries')
+    close $fh
 
-END {
-    1 while unlink $Testfile, 'newfile';
-    File::Path::rmtree( 'ecmddir' );
-    File::Path::rmtree( 'd2utest' );
-}
+
+END 
+    1 while unlink $Testfile, 'newfile'
+    File::Path::rmtree( 'ecmddir' )
+    File::Path::rmtree( 'd2utest' )
+

@@ -389,7 +389,7 @@ delete %Expect_Dir{[@: dir_path('fb'), dir_path('fb', 'fba') ]}
     unless $symlink_exists
 
 File::Find::find( \%(wanted => \&wanted_File_Dir, no_chdir => 1),
-                  topdir('fa') ); Check( (nkeys %Expect_File) == 0 )
+                  topdir('fa') ) Check( (nkeys %Expect_File) == 0 )
 
 
 %Expect_File = %( () )

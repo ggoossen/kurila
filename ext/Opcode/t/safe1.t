@@ -8,7 +8,7 @@ exit
 # Tests Todo:
 #	'main' as root
 
-package test;	# test from somewhere other than main
+package test	# test from somewhere other than main
 
 our ($bar)
 

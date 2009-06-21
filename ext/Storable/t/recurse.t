@@ -167,7 +167,7 @@ ok !Storable::is_retrieving
 # sent me, along with a proposed fix.
 #
 
-package Foo;
+package Foo
 
 sub new
     my $class = shift

@@ -10,16 +10,16 @@
 
 use TestInit;
 
-BEGIN {
-    $^OUTPUT_AUTOFLUSH = 1;
-    print $^STDOUT, "1..5\n";
-}
+BEGIN 
+    $^OUTPUT_AUTOFLUSH = 1
+    print $^STDOUT, "1..5\n"
 
-use Pod::Text;
 
-print $^STDOUT, "ok 1\n";
+use Pod::Text
 
-my $n = 2;
+print $^STDOUT, "ok 1\n"
+
+my $n = 2
 while ( ~< $^DATA) {
     my %options;
     next until $_ eq "###\n";
@@ -40,10 +40,10 @@ while ( ~< $^DATA) {
     close $out;
     open ($tmp, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
     my $output;
-    do {
-        local $^INPUT_RECORD_SEPARATOR = undef;
-        $output = ~< $tmp;
-    };
+    do 
+        local $^INPUT_RECORD_SEPARATOR = undef
+        $output = ~< $tmp
+    ;
     close $tmp;
     unlink ('tmp.pod', 'out.tmp');
     my $expected = '';
@@ -53,10 +53,10 @@ while ( ~< $^DATA) {
     }
     if ($output eq $expected) {
         print $^STDOUT, "ok $n\n";
-    } else {
-        print $^STDOUT, "not ok $n\n";
-        print $^STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n";
-    }
+    }else 
+        print $^STDOUT, "not ok $n\n"
+        print $^STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n"
+    
     $n++;
 }
 

@@ -77,7 +77,7 @@ my $X = sub (@< @_)
 # check navigation of multiple eval boundaries to find lexicals
 
 my $x = 25
-eval <<'EOT'; die if $^EVAL_ERROR
+eval <<'EOT' die if $^EVAL_ERROR
   print $^STDOUT, "# $x\n";	# clone into eval's pad
   sub do_eval1 {
      eval @_[0]; die if $^EVAL_ERROR;
@@ -92,7 +92,7 @@ $x++
 
 # calls from within eval'' should clone outer lexicals
 
-eval <<'EOT'; die if $^EVAL_ERROR
+eval <<'EOT' die if $^EVAL_ERROR
   sub do_eval2 {
      eval @_[0]; die if $^EVAL_ERROR;
   }
@@ -108,7 +108,7 @@ EOT
 
 $main::ok = 'not ok'
 my $ok = 'ok'
-eval <<'EOT'; die if $^EVAL_ERROR
+eval <<'EOT' die if $^EVAL_ERROR
   # $x unbound here
   sub do_eval3 {
      eval @_[0]; die if $^EVAL_ERROR;
@@ -232,7 +232,7 @@ eval q{
     sub fred2 {
         print $^STDOUT, eval('$zzz') == 1 ?? 'ok' !! 'not ok', " @_[?0]\n";
     }
-}; die if $^EVAL_ERROR
+} die if $^EVAL_ERROR
 fred2(49)
 do { my $zzz = 2; fred2(50) }
 
@@ -281,7 +281,7 @@ $r = 0
 eval'$r = fred3(5)'
 print $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 58\n"
 $r = 0
-do { my $yyy = 4; my $zzz = 5; my $l = 6; $r = eval 'fred3(5)' };
+do { my $yyy = 4; my $zzz = 5; my $l = 6; $r = eval 'fred3(5)' }
 print $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 59\n"
 
 # check that goto &sub within evals doesn't leak lexical scope

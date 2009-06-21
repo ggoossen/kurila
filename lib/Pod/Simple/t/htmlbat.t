@@ -7,7 +7,7 @@
 use Test::More
 BEGIN { plan tests => 8 }
 
-require Pod::Simple::HTMLBatch;
+require Pod::Simple::HTMLBatch
 
 use File::Spec;
 use Cwd;
@@ -59,7 +59,7 @@ ok 1
 print $^STDOUT, "# OK, back from converting.\n"
 
 my @files
-use File::Find;
+use File::Find
 find( sub (@< @_) { push @files, $File::Find::name; return }, $outdir )
 
 do
