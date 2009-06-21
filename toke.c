@@ -3787,27 +3787,21 @@ Perl_yylex(pTHX)
 	    TERM(')')
 	}
     case ']':
+	if (S_closing_bracket())
+	    TOKEN(LAYOUTLISTEND);
 	s++;
-	if (PL_lex_brackets <= 0)
+	if (PL_lex_brackstack[PL_lex_brackets].type == LB_ASLICE) {
+	    if (*s != ']')
+		yyerror("Closing square bracket did not match opening array slice");
+	    ++s;
+	}
+	else if (PL_lex_brackstack[PL_lex_brackets].type == LB_HSLICE) {
+	    if (*s != '}')
+		yyerror("Closing square bracket did not match opening hash slice");
+	    ++s;
+	}
+	else if (PL_lex_brackstack[PL_lex_brackets].type != LB_AELEM) {
 	    yyerror("Unmatched right square bracket");
-	else {
-	    if (PL_lex_brackstack[PL_lex_brackets-1].type == LB_ASLICE) {
-		if (*s != ']')
-		    yyerror("Closing square bracket did not match opening array slice");
-		++s;
-		--PL_lex_brackets;
-	    }
-	    else if (PL_lex_brackstack[PL_lex_brackets-1].type == LB_HSLICE) {
-		if (*s != '}')
-		    yyerror("Closing square bracket did not match opening hash slice");
-		++s;
-		--PL_lex_brackets;
-	    }
-	    else if (PL_lex_brackstack[PL_lex_brackets-1].type == LB_AELEM) {
-		--PL_lex_brackets;
-	    } else {
-		yyerror("Unmatched right square bracket");
-	    }
 	}
 	if (PL_lex_state == LEX_INTERPNORMAL) {
 	    if ( ! intuit_more(s))

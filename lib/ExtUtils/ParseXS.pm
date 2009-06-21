@@ -197,8 +197,8 @@ sub process_file
                 $_ = TrimWhitespace($_) 
                 # skip blank lines and comment lines
                 next if m/^$/ or m/^#/ 
-                my @($type,$kind, $proto) = @: m/^\s*(.*?\S)\s+(\S+)\s*($proto_re*)\s*$/ or
-                    warn("Warning: File '$typemap' Line $($line_no-1) '$line' TYPEMAP entry needs 2 or 3 columns\n"), next
+                my @($type,$kind, $proto) = @: m/^\s*(.*?\S)\s+(\S+)\s*($proto_re*)\s*$/ 
+                    or warn("Warning: File '$typemap' Line $($line_no-1) '$line' TYPEMAP entry needs 2 or 3 columns\n"), next
                 $type = TidyType($type) 
                 %type_kind{+$type} = $kind 
                 # prototype defaults to '$'

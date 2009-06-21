@@ -788,7 +788,7 @@ sub install #XXX OS-SPECIFIC
                 _chmod( $mode, $targetfile, $verbose );
                 $result->{+install}{+$targetfile} = $sourcefile;
                 1
-            } or do
+                } or do
                 $result->{+install_fail}{+$targetfile} = $sourcefile
                 die $^EVAL_ERROR
             
@@ -1077,7 +1077,7 @@ sub inc_uninstall($filepath,$libdir,$verbose,$dry_run,$ignore,$results)
                 forceunlink($targetfile,'tryhard');
                 $results->{+uninstall}{+$targetfile} = $filepath;
                 1;
-            } or do
+              } or do
                 $results->{+fail_uninstall}{+$targetfile} = $filepath
                 if ($seen_ours)
                     warn "Failed to remove probably harmless shadow file '$targetfile'\n"
