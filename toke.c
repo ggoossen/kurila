@@ -1665,15 +1665,19 @@ S_start_statement_indent(pTHX_ char* s)
     if (PL_lex_brackets > 100) {
         Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
     }
+
     PL_lex_brackstack[PL_lex_brackets].type = LB_LAYOUT_BLOCK;
     PL_lex_brackstack[PL_lex_brackets].state = 0;
     PL_lex_brackstack[PL_lex_brackets].prev_statement_indent = PL_parser->statement_indent;
     ++PL_lex_brackets;
+
     PL_parser->statement_indent = s - PL_linestart;
+
     assert(PL_parser->statement_indent >= 0);
     DEBUG_T({ PerlIO_printf(Perl_debug_log,
                 "### New statement indent level, %d.\n",
                 (int)PL_parser->statement_indent); });
+
     PL_expect = XSTATE;
 }
 
@@ -1686,7 +1690,9 @@ STATIC void
 S_stop_statement_indent(pTHX)
 {
     bool is_layout_list;
+
     --PL_lex_brackets;
+
     assert(PL_lex_brackets >= 0);
     if (PL_lex_brackstack[PL_lex_brackets].type != LB_LAYOUT_BLOCK
 	&& PL_lex_brackstack[PL_lex_brackets].type != LB_LAYOUT_LIST) {
@@ -1697,8 +1703,11 @@ S_stop_statement_indent(pTHX)
 	    assert(PL_lex_brackets >= 0);
 	}
     }
+
     is_layout_list = (PL_lex_brackstack[PL_lex_brackets].type == LB_LAYOUT_LIST);
+
     PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
+
     start_force(PL_curforce);
     force_next( is_layout_list ? LAYOUTLISTEND : '}' );
 }
@@ -2803,7 +2812,11 @@ static int S_process_layout(char* s) {
 	    PL_thiswhite = NULL;
 	}
 #endif
-	TOKEN( is_layout_list ? ',' : ';' );
+	if (is_layout_list) {
+	    OPERATOR(',');
+	} else {
+	    TOKEN(';');
+	}
     }
     if ((s - PL_linestart) < PL_parser->statement_indent) {
 	S_stop_statement_indent();
@@ -2814,7 +2827,11 @@ static int S_process_layout(char* s) {
 	s = PL_linestart - 1;
 	assert(*s == '\n' || *s == '\0');
     }
-    TOKEN( is_layout_list ? ',' : ';' );
+    if (is_layout_list) {
+	OPERATOR(',');
+    } else {
+	TOKEN(';');
+    }
 }
 
 /* S_closing_bracket
@@ -5668,7 +5685,7 @@ Perl_yylex(pTHX)
 	    LOP(OP_TRUNCATE,XTERM);
 
 	case KEY_try:
-	    PL_expect = XTERMBLOCK;
+	    PL_expect = XBLOCK;
 	    UNIBRACK(OP_ENTERTRY);
 
 	case KEY_uc:

@@ -275,7 +275,7 @@ sub test_pkg($pkg, ?$fntypes)
     my %stash = %+: map
         { %: $_ => 0 },
         grep { exists &{Symbol::fetch_glob("$pkg\::$_")->*}     # grab CODE symbols
-    },
+             },
         grep { !m/__ANON__/ }, keys Symbol::fetch_glob($pkg.'::')->*->%         # from symbol table
 
     for my $type (keys %matchers)

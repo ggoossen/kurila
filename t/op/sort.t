@@ -134,7 +134,7 @@ do
 @b = sort {
     my $dummy;		# force blockness
     return $b <+> $a
-}, @a
+  }, @a
 cmp_ok("$(join ' ',@b)",'eq','1996 255 90 19 5','force blockness')
 
 $x = join('', sort { $a cmp $b }, @harry)
@@ -189,7 +189,7 @@ do
         $def = 1 if defined $Bar::a;
         Bar::reenter() unless $init++;
         $a <+> $b
-    }, qw/4 3 1 2/
+      }, qw/4 3 1 2/
     main::cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','reenter 1')
 
     main::ok(!$def,'reenter 2')
@@ -308,7 +308,7 @@ sub min
     my @list = sort {
         $answer = '$a and/or $b are not defined ' if !defined($a) || !defined($b);
         $a <+> $b;
-    }, @_
+      }, @_
     @list[0]
 
 

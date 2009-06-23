@@ -38,7 +38,7 @@ sub _expansion($op, $os, $expr)
             return $if
         else
             return $el
-        
+
     else
         # #if;#endif
         if (($op eq 'eq' and ($^OS_NAME eq $os || config_value("osname") eq $os))
@@ -46,8 +46,8 @@ sub _expansion($op, $os, $expr)
             return $expr
         else
             return ""
-        
-    
+
+
 
 
 sub expand_os_specific
@@ -59,7 +59,7 @@ sub expand_os_specific
     if ($s =~ m/<<(=|\$\^O-)/)
         die "bad <<\$^O-eq/ne-osname>> expression.".
             " Unclosed brackets?"
-    
+
     $s
 
 
@@ -112,7 +112,7 @@ if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS'))
     print $out, "our @(\$dl_dlext, \$dl_so, \$dlsrc) = @(",
         < to_string(config_value('dlext')), ",",
         < to_string(config_value('so')), ",",
-        < to_string(config_value('dlsrc')), ")\n;" 
+        < to_string(config_value('dlsrc')), ")\n;"
 else
     print $out, <<'EOT'
 our @($dl_dlext, $dl_so, $dlsrc) = map { config_value($_) }, qw(dlext so dlsrc);
@@ -140,7 +140,7 @@ our @dl_resolve_using   = @();       # names of files to link with
 our @dl_library_path    = @();       # path to look for files
 
 #XSLoader.pm may have added elements before we were required
-our @dl_shared_objects;       # shared objects for symbols we have 
+our @dl_shared_objects;       # shared objects for symbols we have
 our @dl_librefs;              # things we have loaded
 our @dl_modules;              # Modules we have loaded
 
@@ -169,7 +169,7 @@ if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS'))
 \@dl_library_path = ($dl_library_path);
 
 EOT
-    
+
 else
     print $out, <<EOT
 # Initialise \@dl_library_path with the 'standard' library path
@@ -255,13 +255,11 @@ if ($dl_debug) {
 our (@isa, @args, $module, @dirs, $file, $dl_debug, $dlsrc, @dl_library_path,
      @do_expand);
 
-sub bootstrap_inherit {
-    my $module = @_[0];
-    my $isa_glob = Symbol::fetch_glob("$module\::ISA");
-    local $isa_glob->*->@ = $isa_glob->*->@ +@+ @: 'DynaLoader';
+sub bootstrap_inherit($module, @< @args)
+    my $isa_glob = Symbol::fetch_glob("$module\::ISA")
+    local $isa_glob->*->@ = $isa_glob->*->@ +@+ @: 'DynaLoader'
     # Cannot goto due to delocalization.  Will report errors on a wrong line?
-    bootstrap(<@_);
-}
+    bootstrap($module, <@args)
 
 # The bootstrap function cannot be autoloaded (without complications)
 # so we define it here:
@@ -307,7 +305,7 @@ sub bootstrap {
     my $modpname = join(<<$^O-eq-MacOS>>':'<<|$^O-eq-MacOS>>'/'<</$^O-eq-MacOS>>,@modparts);
 
     print $^STDERR, "DynaLoader::bootstrap for $module ",
-                       <<$^O-eq-MacOS>> "(:auto:$modpname:$modfname.$dl_dlext)\n" 
+                       <<$^O-eq-MacOS>> "(:auto:$modpname:$modfname.$dl_dlext)\n"
                        <<|$^O-eq-MacOS>>"(auto/$modpname/$modfname.$dl_dlext)\n"<</$^O-eq-MacOS>>
         if $dl_debug;
 
@@ -323,15 +321,15 @@ sub bootstrap {
         <<|$^O-eq-MacOS>>
             my $dir = "$_/auto/$modpname";
         <</$^O-eq-MacOS>>
-        
+
         next unless -d $dir; # skip over uninteresting directories
-        
+
         # check for common cases to avoid autoload of dl_findfile
         my $try = <<$^O-eq-MacOS>> "$dir:$modfname.$dl_dlext" <<|$^O-eq-MacOS>> "$dir/$modfname.$dl_dlext"<</$^O-eq-MacOS>>;
         last if $file = <<$^O-eq-VMS>>($do_expand) ?? dl_expandspec($try) !! ((-f $try) && $try);
         <<|$^O-eq-VMS>>(-f $try) && $try;
         <</$^O-eq-VMS>>
-        
+
         # no luck here, save dir for possible later dl_findfile search
         push @dirs, $dir;
     }
@@ -470,7 +468,7 @@ sub dl_findfile {
             }
             next;
         <</$^O-eq-MacOS>>
-        
+
         #  Otherwise we try to try to spot directories by a heuristic
         #  (this is a more complicated issue than it first appears)
         if (m:/: && -d $_) {   push(@dirs, $_); next; }
@@ -577,7 +575,7 @@ DynaLoader - Dynamically load C libraries into Perl code
     bootstrap YourPackage;
 
     # optional method for 'global' loading
-    sub dl_load_flags { 0x01 }     
+    sub dl_load_flags { 0x01 }
 
 
 =head1 DESCRIPTION
@@ -750,7 +748,7 @@ names are treated as filenames to be searched for.
 
 Using arguments of the form C<-Ldir> and C<-lname> is recommended.
 
-Example: 
+Example:
 
     @dl_resolve_using = dl_findfile(qw(-L/usr/5lib -lposix));
 
@@ -779,7 +777,7 @@ Dynamically load $filename, which must be the path to a shared object
 or library.  An opaque 'library reference' is returned as a handle for
 the loaded object.  Returns undef on error.
 
-The $flags argument to alters dl_load_file behaviour.  
+The $flags argument to alters dl_load_file behaviour.
 Assigned bits:
 
  0x01  make symbols available for linking later dl_load_file's.

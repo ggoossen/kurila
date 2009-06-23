@@ -577,17 +577,20 @@ for (@: "entersub", "rv2cv")
 for (@: "gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv"
         "enteriter")
     %priv{+$_}{+16} = "OURINTR" 
-for (@: (< ( @+: map( {@($_,"s$_") }, @("chop", "chomp")) )
-         < ( @+: map( {@($_,"i_$_") } @( "postinc", "postdec", "multiply", "divide", "modulo"
-                                         "add", "subtract", "negate"))), "pow", "concat", "stringify"
-         "left_shift", "right_shift", "bit_and", "bit_xor", "bit_or"
-         "complement", "atan2", "sin", "cos", "rand", "exp", "log", "sqrt"
-         "int", "hex", "oct", "abs", "length", "index", "rindex", "sprintf"
-         "ord", "chr", "crypt", "quotemeta", "join", "push", "unshift", "flock"
-         "chdir", "chown", "chroot", "unlink", "chmod", "utime", "rename"
-         "link", "symlink", "mkdir", "rmdir", "wait", "waitpid", "system"
-         "exec", "kill", "getppid", "getpgrp", "setpgrp", "getpriority"
-         "setpriority", "time", "sleep"))
+for (@: (< @+: map( {@($_,"s$_") }, @("chop", "chomp")) )
+        (< @+: map( {@($_,"i_$_") },
+                 @: "postinc", "postdec", "multiply", "divide", "modulo"
+                    "add", "subtract", "negate"))
+        "pow", "concat", "stringify"
+        "left_shift", "right_shift", "bit_and", "bit_xor", "bit_or"
+        "complement", "atan2", "sin", "cos", "rand", "exp", "log", "sqrt"
+        "int", "hex", "oct", "abs", "length", "index", "rindex", "sprintf"
+        "ord", "chr", "crypt", "quotemeta", "join", "push", "unshift", "flock"
+        "chdir", "chown", "chroot", "unlink", "chmod", "utime", "rename"
+        "link", "symlink", "mkdir", "rmdir", "wait", "waitpid", "system"
+        "exec", "kill", "getppid", "getpgrp", "setpgrp", "getpriority"
+        "setpriority", "time", "sleep"
+        )
     %priv{+$_}{+16} = "TARGMY"
 for (@: "enteriter", "iter")
     %priv{+$_}{+4} = "REVERSED"

@@ -11,7 +11,7 @@ my @tests =
       "quoted printable=\n"),
 
    # 8-bit chars should be encoded
-   \@("v\xe5re kj\xe6re norske tegn b\xf8r \xe6res" =>
+   \@("v\x[e5]re kj\xe6re norske tegn b\x[f8]r \x[e6]res" =>
       "v=E5re kj=E6re norske tegn b=F8r =E6res=\n"),
 
    # trailing space should be encoded
@@ -21,7 +21,7 @@ my @tests =
 
    # "=" is special an should be decoded
    \@("=30\n" => "=3D30\n"),
-   \@("\0\xff0" => "=00=FF0=\n"),
+   \@("\0\x[ff]0" => "=00=FF0=\n"),
 
    # Very long lines should be broken (not more than 76 chars
    \@("The Quoted-Printable encoding is intended to represent data that largly consists of octets that correspond to printable characters in the ASCII character set." =>
@@ -94,8 +94,8 @@ for ( @tests)
     $testno++
     my @($plain, $encoded) =  $_->@
     if (ord('A') == 193)  # EBCDIC 8 bit chars are different
-        if ($testno == 2) { $plain =~ s/\xe5/\x47/; $plain =~ s/\xe6/\x9c/g; $plain =~ s/\xf8/\x70/; }
-        if ($testno == 7) { $plain =~ s/\xff/\xdf/; }
+        if ($testno == 2) { $plain =~ s/\xe5/\x47/; $plain =~ s/\x[e6]/\x[9c]/g; $plain =~ s/\xf8/\x70/; }
+        if ($testno == 7) { $plain =~ s/\x[ff]/\x[df]/; }
     
     my $x = encode_qp($plain)
     if ($x ne $encoded)
@@ -167,7 +167,7 @@ print $^STDOUT, "not " unless encode_qp("foo\nbar\r\n", undef, 1) eq "foo=0Abar=
 $testno++; print $^STDOUT, "ok $testno\n"
 
 use bytes;
-print $^STDOUT, "not " unless encode_qp(join("", map { chr }, 0..255), undef, 1) eq <<'EOT' $testno++; print $^STDOUT, "ok $testno\n"
+print $^STDOUT, "not " unless encode_qp(join("", map { chr }, 0..255), undef, 1) eq <<'EOT'; $testno++; print $^STDOUT, "ok $testno\n"
 =00=01=02=03=04=05=06=07=08=09=0A=0B=0C=0D=0E=0F=10=11=12=13=14=15=16=17=18=
 =19=1A=1B=1C=1D=1E=1F !"#$%&'()*+,-./0123456789:;<=3D>?@ABCDEFGHIJKLMNOPQRS=
 TUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~=7F=80=81=82=83=84=85=86=87=88=

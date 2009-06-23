@@ -255,8 +255,8 @@ sub _escape
 
 sub _unescape
     join(',', map {
-        m/\A(\s*)%([1-9]\d*|\*)(\s*)\z/ ?? "$1_$2$3" !! $_
-    }, split(m/,/, @_[0]))
+            m/\A(\s*)%([1-9]\d*|\*)(\s*)\z/ ?? "$1_$2$3" !! $_
+        }, split(m/,/, @_[0]))
 
 
 sub auto_path($self, $calldir)

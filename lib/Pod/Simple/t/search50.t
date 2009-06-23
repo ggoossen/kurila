@@ -24,11 +24,11 @@ use Pod::Simple;
 *pretty = \&Pod::Simple::BlackBox::pretty
 
 my $found = 0
-$x->callback(sub 
-    print $^STDOUT, "#  ", join("  ", map { "\{$_\}" }, @_), "\n"
-    ++$found
-    return
-)
+$x->callback(sub (@< @args)
+                 print $^STDOUT, "#  ", join("  ", map { "\{$_\}" }, @args), "\n"
+                 ++$found
+                 return
+             )
 
 print $^STDOUT, "# \$^INCLUDE_PATH == $(join ' ',$^INCLUDE_PATH)\n"
 

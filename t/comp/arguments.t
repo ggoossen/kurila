@@ -67,7 +67,7 @@ is( $args, "aap,noot=mies" )
 do
     # assignment inside another assignment
     $args = undef
-    @: my $before, assign("aap", "noot"), my $after = qw[before mies after]
+    (@: my $before, assign("aap", "noot"), my $after) = qw[before mies after]
     is( $args, "aap,noot=mies" )
     is( $before, "before" )
     is( $after, "after" )

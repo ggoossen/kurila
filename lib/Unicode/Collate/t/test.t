@@ -237,8 +237,7 @@ ok($few_entries->eq("\x{AC00}", "\x{1100}\x{1161}"))
 my $dropArticles = Unicode::Collate->new(
     table => "keys.txt",
     normalization => undef,
-    preprocess => sub 
-        my $string = shift
+    preprocess => sub ($string)
         $string =~ s/\b(?:an?|the)\s+//ig
         $string
     ,

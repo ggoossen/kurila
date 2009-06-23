@@ -520,12 +520,10 @@ sub _ipc_run
         push @command, $aref
     else
         @command = map { if( m/([<>|&])/ )
-                $special_chars .= $1; $_
-            else
-                \ split m/ +/
-            
-        }, split( m/\s*([<>|&])\s*/, $cmd )
-    
+                             $special_chars .= $1; $_
+                         else
+                             \ split m/ +/
+                       }, split( m/\s*([<>|&])\s*/, $cmd )
 
     ### if there's a pipe in the command, $^STDIN needs to
     ### be inserted *BEFORE* the pipe, to work on win32

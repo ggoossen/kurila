@@ -344,7 +344,8 @@ sub cmd_item
 sub cmd_begin
     my $self = shift
     local $_ = shift
-    my @($kind) = @: m/^(\S+)/ or return
+    my @($kind) = @: m/^(\S+)/
+        or return
     if ($kind eq 'text')
         $self->%{+VERBATIM} = 1
     else

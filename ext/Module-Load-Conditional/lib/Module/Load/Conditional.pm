@@ -15,7 +15,7 @@ use constant ON_VMS  => $^OS_NAME eq 'VMS'
 our ($VERSION, @ISA, $VERBOSE, $CACHE, @EXPORT_OK,
     $FIND_VERSION, $ERROR, $CHECK_INC_HASH)
 
-BEGIN 
+BEGIN
     use Exporter
     @ISA            = qw[Exporter]
     $VERSION        = '0.22'
@@ -154,7 +154,7 @@ sub check_install(%< %hash)
     unless( $args = check( $tmpl, \%hash, $VERBOSE ) )
         warn < loc( q[A problem occurred checking arguments] ) if $VERBOSE
         return
-    
+
 
     my $file     = File::Spec->catfile( < split m/::/, $args->{?module} ) . '.pm'
     my $file_inc = File::Spec::Unix->catfile( <
@@ -178,8 +178,8 @@ sub check_install(%< %hash)
         ### find the version by inspecting the package
         if( defined $filename && $FIND_VERSION )
             $href{+version} = Symbol::fetch_glob( "$args->{?module}"."::VERSION")->*->$
-        
-    
+
+
 
     ### we didnt find the filename yet by looking in $^INCLUDED,
     ### so scan the dirs
@@ -201,13 +201,13 @@ sub check_install(%< %hash)
 
                 elsif (UNIVERSAL::can($dir, 'INC'))
                     ($fh) = $dir->INC->($dir, $file)
-                
+
 
                 if (!UNIVERSAL::isa($fh, 'GLOB'))
                     warn < loc(q[Cannot open file '%1': %2], $file, $^OS_ERROR)
                         if $args->{?verbose}
                     next
-                
+
 
                 $filename = $^INCLUDED{?$file_inc} || $file
 
@@ -220,8 +220,8 @@ sub check_install(%< %hash)
                     warn < loc(q[Cannot open file '%1': %2], $file, $^OS_ERROR)
                         if $args->{?verbose}
                     next
-                
-            
+
+
 
             ### files need to be in unix format under vms,
             ### or they might be loaded twice
@@ -250,11 +250,11 @@ sub check_install(%< %hash)
                         $href{+version} = $ver
 
                         last DIR
-                    
-                
-            
-        
-    
+
+
+
+
+
 
     ### if we couldn't find the file, return undef ###
     return unless defined $href{?file}
@@ -267,7 +267,7 @@ sub check_install(%< %hash)
             ### if we got here, we didn't find the version
             warn < loc(q[Could not check version on '%1'], $args->{?module} )
                 if $args->{?verbose} and $args->{?version} +> 0
-        
+
         $href{+uptodate} = 1
 
     else
@@ -279,7 +279,7 @@ sub check_install(%< %hash)
         ### #29348: Version compare logic doesn't handle alphas?
         $href{+uptodate} =
             version->new( $args->{version} )->vcmp( $href{version} ) +<= 0
-    
+
 
     return $href
 
@@ -326,7 +326,7 @@ sub _parse_version
         my $result = do
             local $^WARNING = 0
             eval($eval)
-        
+
 
 
         my $rv = defined $result ?? $result !! '0.0'
@@ -334,7 +334,7 @@ sub _parse_version
         print($^STDOUT,  $^EVAL_ERROR ?? "Error: $^EVAL_ERROR\n" !! "Result: $rv\n" ) if $verbose
 
         return version->new($rv)
-    
+
 
     ### unable to find a version in this string
     return
@@ -393,7 +393,7 @@ sub can_load
         $ERROR = loc(q[Problem validating arguments!])
         warn $ERROR if $VERBOSE
         return
-    
+
 
     ### layout of $CACHE:
     ### $CACHE = {
@@ -428,7 +428,7 @@ sub can_load
                 )
                 $error = loc( q[Already tried to use '%1', which was unsuccessful], $mod)
                 last BLOCK
-            
+
 
             my $mod_data = check_install(
                 module  => $mod,
@@ -439,14 +439,12 @@ sub can_load
                 $error = loc(q[Could not find or check module '%1'], $mod)
                 $CACHE->{+$mod}{+usable} = 0
                 last BLOCK
-            
 
             map {
-                $CACHE->{+$mod}{+$_} = $mod_data{?$_}
-            }, qw[version file uptodate]
+                  $CACHE->{+$mod}{+$_} = $mod_data{?$_}
+                }, qw[version file uptodate]
 
             push @load, $mod
-        
 
         for my $mod (  @load )
 
@@ -462,17 +460,13 @@ sub can_load
                     last BLOCK
                 else
                     $CACHE->{$mod}{+usable} = 1
-                
 
             ### module not found in $^INCLUDE_PATH, store the result in
             ### $CACHE and return 0
             else
-
                 $error = loc(q[Module '%1' is not uptodate!], $mod)
                 $CACHE->{$mod}{+usable} = 0
                 last BLOCK
-            
-        
 
      # BLOCK
 
@@ -482,7 +476,7 @@ sub can_load
         return
     else
         return 1
-    
+
 
 
 =back
@@ -510,7 +504,7 @@ sub requires
     unless( check_install( module => $who ) )
         warn < loc(q[You do not have module '%1' installed], $who) if $VERBOSE
         return undef
-    
+
 
     my $lib = join " ", map { qq["-I$_"] }, $^INCLUDE_PATH
     my $cmd = qq[$^EXECUTABLE_NAME $lib -M$who -e"print(join(qq[\\n],keys(\$^INCLUDED)))"]
@@ -540,12 +534,12 @@ The default is 0;
 =head2 $Module::Load::Conditional::FIND_VERSION
 
 This controls whether Module::Load::Conditional will try to parse
-(and eval) the version from the module you're trying to load. 
+(and eval) the version from the module you're trying to load.
 
 If you don't wish to do this, set this variable to C<false>. Understand
 then that version comparisons are not possible, and Module::Load::Conditional
 can not tell you what module version you have installed.
-This may be desirable from a security or performance point of view. 
+This may be desirable from a security or performance point of view.
 Note that C<$FIND_VERSION> code runs safely under C<taint mode>.
 
 The default is 1;
@@ -587,7 +581,7 @@ This module by Jos Boumans E<lt>kane@cpan.orgE<gt>.
 
 =head1 COPYRIGHT
 
-This library is free software; you may redistribute and/or modify it 
+This library is free software; you may redistribute and/or modify it
 under the same terms as Perl itself.
 
 =cut

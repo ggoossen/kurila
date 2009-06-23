@@ -2266,10 +2266,10 @@ END
     
 
     # perl #25269: panic: pp_match start/end pointers
-    ok("a-bc" eq try {
-           my @($x, $y) = @: "bca" =~ m/^(?=.*(a)).*(bc)/;
-           "$x-$y";
-       }, 'captures can move backwards in string'); die if $^EVAL_ERROR
+    ok("a-bc" eq try
+           my @($x, $y) = @: "bca" =~ m/^(?=.*(a)).*(bc)/
+           "$x-$y"
+       , 'captures can move backwards in string'); die if $^EVAL_ERROR
 
     # perl #27940: \cA not recognized in character classes
     ok("a\cAb" =~ m/\cA/, '\cA in pattern')
@@ -2927,7 +2927,7 @@ EOFTEST
     do
         # From Message-ID: <877ixs6oa6.fsf@k75.linux.bogus>
         my $dow_name= "nada"
-        my $parser = "use utf8; \@(\$dow_name) = \@: \$time_string =~ m/(D\x{e9}\\ C\x{e9}adaoin|D\x{e9}\\ Sathairn|\\w+|\x{100})/;"
+        my $parser = "use utf8; \@(\$dow_name) = \@: \$time_string =~ m/(D\x{e9}\\ C\x{e9}adaoin|D\x{e9}\\ Sathairn|\\w+|\x{100})/"
         my $time_string = "D\x{e9} C\x{e9}adaoin"
         eval $parser; die if $^EVAL_ERROR
         ok(!$^EVAL_ERROR,"Test Eval worked")

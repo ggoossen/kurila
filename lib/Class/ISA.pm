@@ -188,17 +188,17 @@ sub self_and_super_path
         unshift @in_stack,
             < map
             { my $c = $_; # copy, to avoid being destructive
-            substr($c,0,2, "main::") if substr($c,0,2) eq '::';
-            # Canonize the :: -> main::, ::foo -> main::foo thing.
-            # Should I ever canonize the Foo'Bar = Foo::Bar thing?
-            %seen{+$c}++ ?? () !! $c;
-        },
+              substr($c,0,2, "main::") if substr($c,0,2) eq '::';
+              # Canonize the :: -> main::, ::foo -> main::foo thing.
+              # Should I ever canonize the Foo'Bar = Foo::Bar thing?
+              %seen{+$c}++ ?? () !! $c;
+            },
             Symbol::fetch_glob("$current\::ISA")->*->@
-        
+
     # I.e., if this class has any parents (at least, ones I've never seen
     # before), push them, in order, onto the stack of classes I need to
     # explore.
-    
+
 
     return @out
 

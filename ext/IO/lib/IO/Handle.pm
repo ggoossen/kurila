@@ -381,13 +381,13 @@ sub sysread($io, $bufref, $len, ?$offset)
 
 
 sub write
-    (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])'
+    nelems(@_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])'
     @_[+2] = length(@_[1]) unless defined @_[?2]
     print  @_[0]  ,substr(@_[1], @_[?3] || 0, @_[2])
 
 
 sub syswrite
-    (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])'
+    nelems(@_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])'
     if (defined(@_[?2]))
         syswrite(@_[0], @_[1], @_[2], @_[?3] || 0)
     else

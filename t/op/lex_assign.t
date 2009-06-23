@@ -102,7 +102,8 @@ for ( @simple_input)
         @($op, _, $comment) = @: m/^([^\#]+)(\#\s+(.*))?/
         $comment = $op unless defined $comment
         chomp
-        @($operator, $variable) = @: m/^\s*(\w+)\s*\$(\w+)/ or warn "misprocessed '$_'\n"
+        @($operator, $variable) = @: m/^\s*(\w+)\s*\$(\w+)/
+            or warn "misprocessed '$_'\n"
         eval <<EOE
   local \$^WARN_HOOK = \\&wrn;
   my \$$variable = "Ac# Ca\\nxxx";

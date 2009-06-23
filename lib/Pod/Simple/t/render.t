@@ -77,7 +77,7 @@ foreach my $file (@(
 
     @out = map {
         join '', @( pack("U*", unpack("C*", $_))) # latin1 decode.
-    }, @out
+      }, @out
 
     for ( @out) { s/\s+/ /g; s/^\s+//s; s/\s+$//s; }
 

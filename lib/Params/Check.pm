@@ -502,9 +502,9 @@ sub _sanity_check_and_defaults
             map {   _store_error(
                         loc(q|Template type '%1' not supported [at key '%2']|,
                             $_, $key), 1, 1 );
-            }, grep {
-                not %known_keys{?$_}
-            }, keys %utmpl{?$key}
+                }, grep {
+                    not %known_keys{?$_}
+                }, keys %utmpl{?$key}
 
             ### make sure you passed a ref, otherwise, complain about it!
             if ( exists %utmpl{$key}{'store'} )

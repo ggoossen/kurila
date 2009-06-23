@@ -541,7 +541,7 @@ sub Table::Merge
         ($a->[RANGE_START] <+> $b->[RANGE_START])
             or
             ($b->[RANGE_END]   <+> $b->[RANGE_END])
-    }, @Records
+      }, @Records
 
     my $New = Table->New()
 

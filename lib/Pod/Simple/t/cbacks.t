@@ -31,12 +31,12 @@ my @from = @(
 
 
 # Might as well test all the classes...
-while((nelems @from)) {
-    my@($x => $expected) = @: splice(@from, 0,2);
-    my $more = '';
-    print $^STDOUT, "#Testing via class $x, version ", $x->VERSION(), "\n";
-    my $p = $x->new;
-    my($got, $exp);
+while(nelems @from)
+    my @($x => $expected) = @: splice(@from, 0,2)
+    my $more = ''
+    print $^STDOUT, "#Testing via class $x, version ", $x->VERSION(), "\n"
+    my $p = $x->new
+    my($got, $exp)
     is scalar($got = $x->_out(
        # Mutor:
        sub 
@@ -55,10 +55,9 @@ while((nelems @from)) {
        ))
        => scalar($exp = $expected);
         ;
-    unless($got eq $exp) {
-        print $^STDOUT, '# Got vs exp:\n# ', < Pod::Simple::BlackBox::pretty($got)
-            "\n# ", <Pod::Simple::BlackBox::pretty($exp)"\n";
-    }
+    unless($got eq $exp)
+        print $^STDOUT, '# Got vs exp:\n# ', < Pod::Simple::BlackBox::pretty($got),
+            "\n# ", <Pod::Simple::BlackBox::pretty($exp), "\n"
 
     ok scalar($got = $more), scalar($exp = join "\n", @(
         "1:",
@@ -68,12 +67,10 @@ while((nelems @from)) {
         "7:runtests(sort glob 't/*.t');",
         "8:",
         "",)
-       );
-    unless($got eq $exp) {
-        print $^STDOUT, '# Got vs exp:\n# ', < Pod::Simple::BlackBox::pretty($got)
-            "\n# ", <Pod::Simple::BlackBox::pretty($exp)"\n";
-    }
-}
+       )
+    unless($got eq $exp)
+        print $^STDOUT, '# Got vs exp:\n# ', < Pod::Simple::BlackBox::pretty($got),
+            "\n# ", <Pod::Simple::BlackBox::pretty($exp), "\n"
 
 
 print $^STDOUT, "# Wrapping up... one for the road...\n"

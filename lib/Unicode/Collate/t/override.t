@@ -147,8 +147,8 @@ my $overCJK = Unicode::Collate->new(
 0041 ; [.0101.0020.0008.0041] # LATIN A
 4E00 ; [.B1FC.0030.0004.4E00] # Ideograph; B1FC = FFFF - 4E03.
 ENTRIES
-    overrideCJK => sub 
-        my $u = 0xFFFF - @_[0] # reversed
+    overrideCJK => sub ($v)
+        my $u = 0xFFFF - $v # reversed
         @(\@($u, 0x20, 0x2, $u))
     ,
     )

@@ -161,7 +161,7 @@ inner peace
 ########
 our $s = 0;
 map {#this newline here tickles the bug
-$s += $_}, @(1,2,4);
+     $s += $_}, @(1,2,4);
 print $^STDOUT, "eat flaming death\n" unless ($s == 7);
 ########
 BEGIN { @ARGV = qw(a b c d e) }

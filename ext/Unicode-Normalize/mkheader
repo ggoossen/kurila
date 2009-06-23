@@ -180,7 +180,7 @@ sub getCanonList
     my @dec = @+: map {
         (SBase +<= $_ && $_ +<= SFinal) ?? decomposeHangul($_)
             !! %Canon{?$_} ??  %Canon{?$_}->@ !! @($_)
-    }, @src
+        }, @src
     return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCanonList(< @dec)
 # condition @src == @dec is not ok.
 
@@ -190,7 +190,7 @@ sub getCompatList
     my @dec = @+: map {
         (SBase +<= $_ && $_ +<= SFinal) ?? decomposeHangul($_)
             !! %Compat{?$_} ??  %Compat{?$_}->@ !! @($_)
-    }, @src
+        }, @src
     return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCompatList(< @dec)
 # condition @src == @dec is not ok.
 

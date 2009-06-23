@@ -9,7 +9,8 @@ Carp::Heavy - heavy machinery, no user serviceable parts inside
 =cut
 
 # On one line so MakeMaker will see it.
-use Carp  our $VERSION = $Carp::VERSION
+use Carp
+our $VERSION = $Carp::VERSION
 # use strict; # not yet
 
 # 'use Carp' just installs some very lightweight stubs; the first time
@@ -266,13 +267,11 @@ sub trusts
 
 
 # Takes a package and gives a list of those trusted directly
-sub trusts_directly
-    my $class = shift
-    no warnings 'once';
+sub trusts_directly($class)
+    no warnings 'once'
     return (nelems Symbol::fetch_glob("$class\::CARP_NOT")->*->@)
         ?? Symbol::fetch_glob("$class\::CARP_NOT")->*->@
         !! Symbol::fetch_glob("$class\::ISA")->*->@
-
 
 1
 

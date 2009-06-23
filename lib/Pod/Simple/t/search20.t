@@ -17,10 +17,10 @@ die "Couldn't make an object!?" unless ok defined $x
 
 $x->inc(0)
 
-$x->callback(sub 
-    print $^STDOUT, "#  ", join("  ", map { "\{$_\}" }, @_), "\n"
-    return
-)
+$x->callback(sub (@< @args)
+                 print $^STDOUT, "#  ", join("  ", map { "\{$_\}" }, @args), "\n"
+                 return
+             )
 
 use File::Spec
 use Cwd;

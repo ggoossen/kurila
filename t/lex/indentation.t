@@ -4,7 +4,7 @@ BEGIN
     require './test.pl'
 
 
-plan tests => 14
+plan tests => 15
 
 our ($x, $y)
 
@@ -46,7 +46,7 @@ is($x, "old")
 is($y, "old")
 
 # ending multiple nested blocks at once
-@: $x, $y = qw[old old]
+(@: $x, $y) = qw[old old]
 do
     local $y = "new"
     do
@@ -59,7 +59,7 @@ is($y, "old")
 $x = @: "aap"
         "noot"
 
-is_deeply($x, qw[aap noot]);
+is(join("*", $x), q[aap*noot]);
 
 # s/// seperared by statement end
 eval_dies_like(<<'EOE', qr/statement end found where string delimeter expected/);

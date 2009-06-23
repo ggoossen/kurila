@@ -96,7 +96,7 @@ do
         do { ok( our $_ eq 'global', 'our $_ still visible' ); };
         ok( $_ == 6 || $_ == 7, 'local lexical $_ is still seen in map' );
         do { my $_ ; ok( !defined, 'nested my $_ is undefined' ); };
-    }, @( 6, 7)
+      }, @( 6, 7)
     ok( $buf eq 'gxgx', q/...map doesn't modify outer lexical $_/ )
     ok( $_ eq 'x', '...my $_ restored outside map' )
     ok( our $_ eq 'global', '...our $_ restored outside map' )
@@ -121,7 +121,7 @@ do
         ok( m/^[89]\z/, 'local lexical $_ is seen in grep' );
         do { ok( our $_ eq 'global', 'our $_ still visible' ); };
         ok( $_ == 8 || $_ == 9, 'local lexical $_ is still seen in grep' );
-    }, @( 8, 9)
+      }, @( 8, 9)
     ok( $buf eq 'gygy', q/...grep doesn't modify outer lexical $_/ )
     ok( $_ eq 'y', '...my $_ restored outside grep' )
     ok( our $_ eq 'global', '...our $_ restored outside grep' )

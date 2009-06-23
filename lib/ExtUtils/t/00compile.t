@@ -19,8 +19,8 @@ chomp @modules
 close $manifestfh
 
 chdir 'lib'
-plan tests => scalar (nelems @modules) * 2
-foreach my $file ( @modules)
+plan tests => (nelems @modules) * 2
+foreach my $file (@modules)
     # Make sure we look at the local files and do not reload them if
     # they're already loaded.  This avoids recompilation warnings.
     local $^INCLUDE_PATH = $^INCLUDE_PATH

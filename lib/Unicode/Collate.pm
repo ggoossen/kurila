@@ -585,20 +585,18 @@ sub getWt
                     else
                         $contract = join(CODE_SEP, @decH[[@(0,1)]])
                         $map{?$contract} and @decH = @($contract, @decH[2])
-                    
+
                 # even if V's ignorable, LT contraction is not supported.
                 # If such a situatution were required, NFD should be used.
-                
+
                 if ((nelems @decH) == 3 && $max{?@decH[1]})
                     my $contract = join(CODE_SEP, @decH[[@(1,2)]])
                     $map{?$contract} and @decH = @(@decH[0], $contract)
-                
-            
 
             @hangulCE = @+: map({
                 $map{?$_} ??  $map{?$_}->@ !! $der->($_);
-            }, @decH)
-        
+              }, @decH)
+
         return map { _varCE($vbl, $_) }, @hangulCE
     elsif (_isUIdeo($u, $self->{?UCA_Version}))
         my $cjk  = $self->{?overrideCJK}

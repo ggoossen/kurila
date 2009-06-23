@@ -1557,10 +1557,10 @@ sub searchfor($self, $recurse,$s,@< @dirs)
         if ($recurse)
             opendir(my $d,$dir) or die "Can't opendir $dir: $^OS_ERROR"
             my @newdirs = map { < catfile($dir, $_) }, grep {
-                not m/^\.\.?\z/s and
-                    not m/^auto\z/s  and   # save time! don't search auto dirs
-                    -d  catfile($dir, $_)
-            }, @( readdir $d)
+                    not m/^\.\.?\z/s and
+                        not m/^auto\z/s  and   # save time! don't search auto dirs
+                        -d  catfile($dir, $_)
+                }, @( readdir $d)
             closedir($d)                or die "Can't closedir $dir: $^OS_ERROR"
             next unless (nelems @newdirs)
             # what a wicked map!

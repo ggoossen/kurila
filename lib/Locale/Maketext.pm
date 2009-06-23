@@ -51,7 +51,7 @@ sub numerate($handle, $num, @< @forms)
         return $s ?? @forms[0] !!  @(@forms[0] . 's') # very cheap hack.
     else # sing and plural were specified
         return $s ?? @forms[0] !! @forms[1]
-    
+
 
 
 #--------------------------------------------------------------------------
@@ -64,7 +64,7 @@ sub numf
     else
         $num = CORE::sprintf("\%G", $num)
     # "CORE::" is there to avoid confusion with the above sub sprintf.
-    
+
     while( $num =~ s/^([-+]?\d+)(\d{3})/$1,$2/s ) {1}  # right from perlfaq5
     # The initial \d+ gobbles as many digits as it can, and then we
     #  backtrack so it un-eats the rightmost three, and then we
@@ -132,7 +132,7 @@ sub failure_handler_auto
     # Dumbly copied from sub maketext:
     do
         try { $value = &$value($handle, < @_) }
-    
+
     # If we make it here, there was an exception thrown in the
     #  call to $value, and so scream:
     if($^EVAL_ERROR)
@@ -146,7 +146,7 @@ sub failure_handler_auto
     # a method that didn't exist.
     else
         return $value
-    
+
 
 
 #==========================================================================
@@ -184,7 +184,7 @@ sub maketext
             unless(ref($value = $h_r->{?$phrase}))
                 # Nonref means it's not yet compiled.  Compile and replace.
                 $value = $h_r->{+$phrase} = $handle->_compile($value)
-            
+
             last
         elsif($phrase !~ m/^_/s and $h_r->{?'_AUTO'})
             # it's an auto lex, and this is an autoable key!
@@ -192,10 +192,10 @@ sub maketext
 
             $value = $h_r->{+$phrase} = $handle->_compile($phrase)
             last
-        
+
         print $^STDOUT, "  Not found in $h_r, nor automakable\n" if DEBUG +> 1
     # else keep looking
-    
+
 
     unless(defined($value))
         print $^STDOUT, "! Lookup of \"$phrase\" in/under ", ref($handle) || $handle,
@@ -209,19 +209,19 @@ sub maketext
             else # It's a method name
                 return $handle->?$fail($phrase, < @_)
             # If it ever returns, it should return a good value.
-            
+
         else
             # All we know how to do is this;
             Carp::croak("maketext doesn't know how to say:\n$phrase\nas needed")
-        
-    
+
+
 
     return $value->$ if ref($value) eq 'SCALAR'
     return $value unless ref($value) eq 'CODE'
 
     do
         try { $value = &$value($handle, < @_) }
-    
+
     # If we make it here, there was an exception thrown in the
     #  call to $value, and so scream:
     if($^EVAL_ERROR)
@@ -235,7 +235,7 @@ sub maketext
     # a method that didn't exist.
     else
         return $value
-    
+
 
 
 ###########################################################################
@@ -250,10 +250,10 @@ sub get_handle($base_class, @< @languages)
             @languages = @+: map { @: $_, < I18N::LangTags::alternate_language_tags($_) },
                 map { I18N::LangTags::locale2language_tag($_) }, @languages
             DEBUG and print $^STDOUT, "Lgs\@", __LINE__, ": ", < map( {"<$_>" }, @languages), "\n"
-        
+
     else
         @languages = $base_class->_ambient_langprefs
-    
+
 
     @languages = $base_class->_langtag_munging(< @languages)
 
@@ -263,7 +263,7 @@ sub get_handle($base_class, @< @languages)
         next if %seen{+$module_name}++        # Already been here, and it was no-go
           || ! _try_use($module_name) # Try to use() it, but can't it.
         return $module_name->new # Make it!
-    
+
 
     return undef # Fail!
 
@@ -290,19 +290,19 @@ sub _langtag_munging($base_class, @< @languages)
         DEBUG and print $^STDOUT, "Lgs\@", __LINE__, ": ", < map( {"<$_>" }, @languages), "\n"
 
         @languages = map {
-            my $it = $_;  # copy
-            $it = lc($it);
-            $it =~ s<-><_>g; # lc, and turn - to _
-            $it =~ s<[^_a-z0-9]><>g;  # remove all but a-z0-9_
-            $it;
-        }, @languages
-        
+                my $it = $_;  # copy
+                $it = lc($it);
+                $it =~ s<-><_>g; # lc, and turn - to _
+                $it =~ s<[^_a-z0-9]><>g;  # remove all but a-z0-9_
+                $it;
+            }, @languages
+
         DEBUG and print $^STDOUT, "Nearing end of munging:\n",
             " Lgs\@", __LINE__, ": ", < map( {"<$_>" }, @languages), "\n"
     else
         DEBUG and print $^STDOUT, "Bypassing language-tags.\n",
             " Lgs\@", __LINE__, ": ", < map( {"<$_>" }, @languages), "\n"
-    
+
 
     DEBUG and print $^STDOUT, "Before adding fallback classes:\n",
         " Lgs\@", __LINE__, ": ", < map( {"<$_>" }, @languages), "\n"
@@ -345,7 +345,7 @@ sub _add_supers($base_class, @< @languages)
         @languages = I18N::LangTags::implicate_supers_strictly( < @languages )
         DEBUG and print $^STDOUT, "After adding supers to end:\n",
             " Lgs\@", __LINE__, ": ", < map( {"<$_>" }, @languages), "\n"
-    
+
 
     return @languages
 
@@ -372,19 +372,19 @@ sub _try_use   # Basically a wrapper around "require Modulename"
         return (%tried{+$module} = 1)
             if Symbol::fetch_glob($module . "::Lexicon")->*->% or Symbol::fetch_glob($module . "::ISA")->*->@
     # weird case: we never use'd it, but there it is!
-    
+
 
     print $^STDOUT, " About to use $module ...\n" if DEBUG
     do
         eval "require $module" # used to be "use $module", but no point in that.
-    
+
     if($^EVAL_ERROR)
         print $^STDOUT, "Error using $module \: $^EVAL_ERROR\n" if DEBUG +> 1
         return (%tried{+$module} = 0)
     else
         print $^STDOUT, " OK, $module is used\n" if DEBUG
         return (%tried{+$module} = 1)
-    
+
 
 
 #--------------------------------------------------------------------------
@@ -402,7 +402,7 @@ sub _lex_refs  # report the lexicon references for this handle's class
         push @lex_refs, Symbol::fetch_glob($class . '::Lexicon')->*{'HASH'}
         print $^STDOUT, "\%" . $class . "::Lexicon contains ",
             scalar(keys Symbol::fetch_glob($class . '::Lexicon')->*->%), " entries\n" if DEBUG
-    
+
 
     # Implements depth(height?)-first recursive searching of superclasses.
     # In hindsight, I suppose I could have just used Class::ISA!
@@ -410,7 +410,7 @@ sub _lex_refs  # report the lexicon references for this handle's class
         print $^STDOUT, " Super-class search into $superclass\n" if DEBUG
         next if $seen_r->{+$superclass}++
         push @lex_refs, < &_lex_refs($superclass, $seen_r)->@  # call myself
-    
+
 
     %isa_scan{+$class} = \@lex_refs # save for next time
     return \@lex_refs

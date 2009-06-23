@@ -10,7 +10,7 @@
 
 use TestInit;
 
-BEGIN 
+BEGIN
     $^OUTPUT_AUTOFLUSH = 1
     print $^STDOUT, "1..5\n"
 
@@ -20,45 +20,41 @@ use Pod::Text
 print $^STDOUT, "ok 1\n"
 
 my $n = 2
-while ( ~< $^DATA) {
-    my %options;
-    next until $_ eq "###\n";
-    while ( ~< $^DATA) {
-        last if $_ eq "###\n";
-        my @($option, $value) =  split;
-        %options{+$option} = $value;
-    }
-    open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
-    while ( ~< $^DATA) {
-        last if $_ eq "###\n";
-        print $tmp, $_;
-    }
-    close $tmp;
-    my $parser = Pod::Text->new (< %options) or die "Cannot create parser\n";
-    open (my $out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
-    $parser->parse_from_file ('tmp.pod', $out);
-    close $out;
-    open ($tmp, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
-    my $output;
-    do 
+while ( ~< $^DATA)
+    my %options
+    next until $_ eq "###\n"
+    while ( ~< $^DATA)
+        last if $_ eq "###\n"
+        my @($option, $value) =  split
+        %options{+$option} = $value
+    open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n"
+    while ( ~< $^DATA)
+        last if $_ eq "###\n"
+        print $tmp, $_
+    close $tmp
+    my $parser = Pod::Text->new (< %options) or die "Cannot create parser\n"
+    open (my $out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n"
+    $parser->parse_from_file ('tmp.pod', $out)
+    close $out
+    open ($tmp, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n"
+    my $output
+    do
         local $^INPUT_RECORD_SEPARATOR = undef
         $output = ~< $tmp
-    ;
-    close $tmp;
-    unlink ('tmp.pod', 'out.tmp');
-    my $expected = '';
-    while ( ~< $^DATA) {
-        last if $_ eq "###\n";
-        $expected .= $_;
-    }
-    if ($output eq $expected) {
-        print $^STDOUT, "ok $n\n";
-    }else 
+
+    close $tmp
+    unlink ('tmp.pod', 'out.tmp')
+    my $expected = ''
+    while ( ~< $^DATA)
+        last if $_ eq "###\n"
+        $expected .= $_
+    if ($output eq $expected)
+        print $^STDOUT, "ok $n\n"
+    else
         print $^STDOUT, "not ok $n\n"
         print $^STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n"
-    
-    $n++;
-}
+
+    $n++
 
 # Below the marker are bits of POD and corresponding expected text output.
 # This is used to test specific features or problems with Pod::Text.  The
