@@ -170,6 +170,7 @@ static const char* const lex_state_names[] = {
  * BAop         : bitwise and
  * SHop         : shift operator
  * PWop         : power operator
+ * AHop         : array or hash operator
  * PMop         : pattern-matching operator
  * Aop          : addition-level operator
  * Mop          : multiplication-level operator
@@ -200,6 +201,7 @@ static const char* const lex_state_names[] = {
 #define BAop(f)  return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)BITANDOP)));
 #define SHop(f)  return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)SHIFTOP)));
 #define PWop(f)  return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)POWOP)));
+#define AHop(f)  return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)AHOP)));
 #define PMop(f)  return(pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)MATCHOP));
 #define Aop(f)   return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)ADDOP)));
 #define Mop(f)   return ao((pl_yylval.i_tkval.ival=f, PL_expect=XTERM, PL_bufptr=s, REPORT((int)MULOP)));
@@ -302,6 +304,7 @@ static struct debug_tokens {
     { POSTDEC,		TOKENTYPE_NONE,		"POSTDEC" },
     { POSTINC,		TOKENTYPE_NONE,		"POSTINC" },
     { POWOP,		TOKENTYPE_OPNUM,	"POWOP" },
+    { AHOP,		TOKENTYPE_OPNUM,	"AHOP" },
     { PREDEC,		TOKENTYPE_NONE,		"PREDEC" },
     { PREINC,		TOKENTYPE_NONE,		"PREINC" },
     { PRIVATEVAR,	TOKENTYPE_NONE,	"PRIVATEVAR" },
@@ -3635,12 +3638,14 @@ Perl_yylex(pTHX)
 		    OPERATOR(PREINC);
 	    }
 	    if (*s == '%' && s[1] == '+') {
+		/* +%+ operator */
 		s += 2;
-		PWop(OP_HASHCONCAT);
+		AHop(OP_HASHCONCAT);
 	    }
 	    if (*s == '@' && s[1] == '+') {
+		/* +@+ operator */
 		s += 2;
-		PWop(OP_ARRAYCONCAT);
+		AHop(OP_ARRAYCONCAT);
 	    }
 	    if (PL_expect == XOPERATOR) {
 		Aop(OP_ADD);

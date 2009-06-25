@@ -121,6 +121,7 @@
 %right <i_tkval> TERNARY_IF TERNARY_ELSE
 %right <i_tkval> '<' ARRAYEXPAND HASHEXPAND
 %right ANONHSHL ANONARYL ANONSCALARL
+%nonassoc <i_tkval> AHOP
 %nonassoc DOTDOT
 %left <i_tkval> OROR DORDOR
 %left <i_tkval> ANDAND
@@ -949,7 +950,12 @@ subscripted:    star '{' expr ';' '}'       /* *main::{something} like *STDOUT{I
     ;
 
 /* Binary operators between terms */
-termbinop:	term POWOP term                        /* $x ** $y */
+termbinop:	term AHOP term                        /* $x +@+ $y */
+                        { $$ = newBINOP(IVAL($2), 0, scalar($1), scalar($3), LOCATION($2));
+			  TOKEN_GETMAD($2,$$,'o');
+                          APPEND_MADPROPS_PV("operator",$$,'>');
+			}
+	|	term POWOP term                        /* $x ** $y */
                         { $$ = newBINOP(IVAL($2), 0, scalar($1), scalar($3), LOCATION($2));
 			  TOKEN_GETMAD($2,$$,'o');
                           APPEND_MADPROPS_PV("operator",$$,'>');

@@ -2152,6 +2152,7 @@ Todo.micro			The Wishlist for microperl
 toke.c				The tokener
 t/op/arith.t			See if arithmetic works
 t/op/arrayexpand.t			See if the array expand operator works
+t/op/arrayconcat.t			See if the array concat operator works
 t/op/hashexpand.t			See if the hash expand operator works
 t/op/assignwarn.t		See if OP= operators warn correctly for undef targets
 t/op/auto.t			See if autoincrement et all work
