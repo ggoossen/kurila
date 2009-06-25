@@ -788,6 +788,13 @@ listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
                             $$ = newANONARRAY($2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
 			}
+        |       ANONARYL listexpr /* @: ... and */
+                        {
+                            $$ = newANONARRAY($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'[');
+                            --PL_parser->lex_brackets;
+                            PL_parser->statement_indent = PL_parser->lex_brackstack[PL_parser->lex_brackets].prev_statement_indent;
+			}
         |       ANONARYL ',' LAYOUTLISTEND  /* @: ... */
                         {
                             $$ = newANONARRAY(NULL, LOCATION($1));
