@@ -748,21 +748,17 @@ sub copy {
     $packlist->{data}{+$xto} = \%( type => 'file' );
 }
 
-sub samepath {
-    my @($p1, $p2) = @_;
+sub samepath($p1, $p2)
 
-    return (lc($p1) eq lc($p2)) if ($Is_W32 || $Is_NetWare);
+    return (lc($p1) eq lc($p2)) if ($Is_W32 || $Is_NetWare)
 
-    if ($p1 ne $p2) {
-        my($dev1, $ino1, $dev2, $ino2);
-        @($dev1, $ino1, ...) = @: stat($p1);
-        @($dev2, $ino2, ...) = @: stat($p2);
-        ($dev1 == $dev2 && $ino1 == $ino2);
-    }
-    else {
-        1;
-    }
-}
+    if ($p1 ne $p2)
+        my($dev1, $ino1, $dev2, $ino2)
+        @($dev1, $ino1, ...) = @: stat($p1)
+        @($dev2, $ino2, ...) = @: stat($p2)
+        ($dev1 == $dev2 && $ino1 == $ino2)
+    else
+        1
 
 sub installlib {
     my $dir = $File::Find::dir;
