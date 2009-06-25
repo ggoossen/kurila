@@ -788,6 +788,11 @@ listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
                             $$ = newANONARRAY($2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
 			}
+        |       ANONARYL ',' LAYOUTLISTEND  /* @: ... */
+                        {
+                            $$ = newANONARRAY(NULL, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'[');
+			}
         |       ANONSCALARL listexpr  /* $: ... */
                         {
                             $$ = newUNOP(OP_ANONSCALAR, 0, scalar($2), LOCATION($1));

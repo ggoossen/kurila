@@ -1729,8 +1729,13 @@ S_start_list_indent(pTHX_ char* s)
     PL_lex_brackstack[PL_lex_brackets].state = 0;
     PL_lex_brackstack[PL_lex_brackets].prev_statement_indent = PL_parser->statement_indent;
     ++PL_lex_brackets;
-    PL_parser->statement_indent = s - PL_linestart;
-    assert(PL_parser->statement_indent >= 0);
+    if (s < PL_linestart) {
+	/* the next line isn't a continuation 
+	   Incrementing the statement_indent will make it close */
+	PL_parser->statement_indent += 1;
+    }
+    else
+	PL_parser->statement_indent = s - PL_linestart;
     DEBUG_T({ PerlIO_printf(Perl_debug_log,
                 "### New statement indent level, %d.\n",
                 (int)PL_parser->statement_indent); });

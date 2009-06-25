@@ -3,8 +3,7 @@
 BEGIN 
     require './test.pl'
 
-
-plan tests => 15
+plan tests => 16
 
 our ($x, $y)
 
@@ -60,6 +59,11 @@ $x = @: "aap"
         "noot"
 
 is(join("*", $x), q[aap*noot]);
+
+# empty @:
+$x = @:
+
+is(join("*", $x), q[]);
 
 # s/// seperared by statement end
 eval_dies_like(<<'EOE', qr/statement end found where string delimeter expected/);
