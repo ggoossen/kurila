@@ -47,6 +47,7 @@ values only, not array values.
     left	&&
     left	|| //
     nonassoc	..
+    left	+@+ +%+
     right	?:
     left	, =>
     nonassoc	list operators (rightward)

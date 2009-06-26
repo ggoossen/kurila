@@ -121,7 +121,7 @@
 %right <i_tkval> TERNARY_IF TERNARY_ELSE
 %right <i_tkval> '<' ARRAYEXPAND HASHEXPAND
 %right ANONHSHL ANONARYL ANONSCALARL
-%nonassoc <i_tkval> AHOP
+%left <i_tkval> AHOP
 %nonassoc DOTDOT
 %left <i_tkval> OROR DORDOR
 %left <i_tkval> ANDAND
