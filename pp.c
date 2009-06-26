@@ -4432,6 +4432,20 @@ PP(pp_hashjoin)
     RETURN;
 }
 
+PP(pp_emptyarray)
+{
+    dSP;
+    XPUSHs(avTsv(newAV()));
+    RETURN;
+}
+
+PP(pp_emptyhash)
+{
+    dSP;
+    XPUSHs(avTsv(newHV()));
+    RETURN;
+}
+
 PP(pp_arrayconcat)
 {
     dVAR; dSP;

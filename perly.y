@@ -85,6 +85,7 @@
 %token <i_tkval> COLONATTR
 %token <i_tkval> SPECIALBLOCK
 %token <i_tkval> LAYOUTLISTEND
+%token <i_tkval> EMPTYAH
 
 %type <i_tkval> optional_semicolon
 
@@ -1416,6 +1417,10 @@ scalar  :	PRIVATEVAR
                             TOKEN_GETMAD($1,$$,'{');
                             TOKEN_GETMAD($2,$$,'}');
 			}
+        |       EMPTYAH
+			{ 
+                            $$ = newOP(IVAL($1), 0, LOCATION($1));
+                        }
 	;
 
 star	:	'*' indirob

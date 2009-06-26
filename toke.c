@@ -4121,6 +4121,13 @@ Perl_yylex(pTHX)
 	    PREREF('$');
 	}
 
+	if (s[1] == '@' || s[1] == '%') {
+	    /* $@ or $% */
+	    pl_yylval.i_tkval.ival = (s[1] == '@' ? OP_EMPTYARRAY : OP_EMPTYHASH);
+	    s += 2;
+	    TERM(EMPTYAH);
+	}
+
 	if (isIDFIRST_lazy_if(s+1,UTF)
 	    || (s[1] >= '0' && s[1] <= '9')
 	    || s[1] == '^' || s[1] == ':') {

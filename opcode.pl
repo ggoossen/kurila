@@ -91,7 +91,8 @@ my @raw_alias = @(
 
 while (@raw_alias)
     my @($func, $names) = @: splice @raw_alias, 0, 2
-    %alias{+$_} = $func for  $names->@
+    for ($names->@)
+        %alias{+$_} = $func
 
 
 # Emit defines.
@@ -408,13 +409,13 @@ sub gen_op_is_macro($op_is, $macname)
 
         # get opnames whose numbers are lowest and highest
         my @($first, @< @rest) =  sort {
-            $op_is->{?$a} <+> $op_is->{?$b}
-        }, keys $op_is->%
+                $op_is->{?$a} <+> $op_is->{?$b}
+            }, keys $op_is->%
 
-        my $last = pop @rest	# @rest slurped, get its last
+        my $last = pop @rest    # @rest slurped, get its last
         die "Invalid range of ops: $first .. $last\n" unless $last
 
-        print $on, "#define $macname(op)	\\\n\t("
+        print $on, "#define $macname(op)        \\\n\t("
 
         # verify that op-ct matches 1st..last range (and fencepost)
         # (we know there are no dups)
@@ -814,6 +815,8 @@ arrayjoin	array join (@+:)	ck_fun		ts@	S
 hashjoin	hash join (%+:)		ck_fun		ts@	S
 arrayconcat	array concat (+@+)	ck_null		ts@	S S
 hashconcat	hash concat (+%+)	ck_null		ts@	S S
+emptyarray	new empty anonymous array ($@)	ck_null		s0	
+emptyhash	new empty anonymous hash ($%)	ck_null		s0	
 
 grepstart	grep			ck_grep		dms@	C L
 grepwhile	grep iterator		ck_null		dt|	

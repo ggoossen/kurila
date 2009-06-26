@@ -193,6 +193,8 @@ EXTCONST char* const PL_op_name[] = {
 	"hashjoin",
 	"arrayconcat",
 	"hashconcat",
+	"emptyarray",
+	"emptyhash",
 	"grepstart",
 	"grepwhile",
 	"mapstart",
@@ -553,6 +555,8 @@ EXTCONST char* const PL_op_desc[] = {
 	"hash join (%+:)",
 	"array concat (+@+)",
 	"hash concat (+%+)",
+	"new empty anonymous array ($@)",
+	"new empty anonymous hash ($%)",
 	"grep",
 	"grep iterator",
 	"map",
@@ -925,6 +929,8 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_hashjoin),
 	MEMBER_TO_FPTR(Perl_pp_arrayconcat),
 	MEMBER_TO_FPTR(Perl_pp_hashconcat),
+	MEMBER_TO_FPTR(Perl_pp_emptyarray),
+	MEMBER_TO_FPTR(Perl_pp_emptyhash),
 	MEMBER_TO_FPTR(Perl_pp_grepstart),
 	MEMBER_TO_FPTR(Perl_pp_grepwhile),
 	MEMBER_TO_FPTR(Perl_unimplemented_op),	/* Perl_pp_mapstart */
@@ -1294,6 +1300,8 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* hashjoin */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* arrayconcat */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* hashconcat */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* emptyarray */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* emptyhash */
 	MEMBER_TO_FPTR(Perl_ck_grep),	/* grepstart */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* grepwhile */
 	MEMBER_TO_FPTR(Perl_ck_grep),	/* mapstart */
@@ -1657,6 +1665,8 @@ EXTCONST U32 PL_opargs[] = {
 	0x0000280c,	/* hashjoin */
 	0x0002280c,	/* arrayconcat */
 	0x0002280c,	/* hashconcat */
+	0x00000004,	/* emptyarray */
+	0x00000004,	/* emptyhash */
 	0x0004a845,	/* grepstart */
 	0x00000648,	/* grepwhile */
 	0x0004a845,	/* mapstart */
