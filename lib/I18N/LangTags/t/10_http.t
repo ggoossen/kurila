@@ -87,9 +87,9 @@ foreach my $in ( @in)
 
         if(
               (nelems @out) == nelems @should
-            and lc( join "\e",@out ) eq lc( join "\e", @should )
+            and lc( join "\e", @out || $@ ) eq lc( join "\e", @should )
             )
-            print $^STDOUT, "# Happily got [$(join ' ',@out)] from [$in]\n"
+            print $^STDOUT, "# Happily got [$(join ' ',@out || $@)] from [$in]\n"
             ok 1
         else
             ok 0
