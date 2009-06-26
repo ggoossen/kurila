@@ -283,12 +283,12 @@ do
 # more tests for AASSIGN_COMMON
 
 do
-    our@($x,$y,$z) = @( <1..3)
+    our@($x,$y,$z) =1..3
     our@($y,$z) = @($x,$y)
     is("$x $y $z", "1 1 2")
 
 do
-    our@($x,$y,$z) = @( <1..3)
+    our@($x,$y,$z) =1..3
     @(our $y, our $z) = @($x,$y)
     is("$x $y $z", "1 1 2")
 

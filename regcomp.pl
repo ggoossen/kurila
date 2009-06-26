@@ -208,7 +208,7 @@ while (~< $fh)
         %reverse{+$newval} = $1
     
 
-my %vrxf= %: < reverse @: < %rxfv 
+my %vrxf= %: < reverse  %rxfv 
 printf $out, "\t/* Bits in extflags defined: \%032b */\n",$val
 for (0..31)
     my $n=%vrxf{?2**$_}||"UNUSED_BIT_$_"

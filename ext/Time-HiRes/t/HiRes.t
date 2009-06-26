@@ -154,7 +154,7 @@ unless ($have_gettimeofday) {
     skip 10;
 }
 else {
-    my $r = \@( < gettimeofday());
+    my $r = \ gettimeofday();
     my $f = tv_interval $r;
     ok $f +< 2, $f;
 }
@@ -163,7 +163,7 @@ unless ($have_usleep && $have_gettimeofday) {
     skip 11;
 }
 else {
-    my $r = \@( < gettimeofday() );
+    my $r = \ gettimeofday();
     Time::HiRes::sleep( 0.5 );
     my $f = tv_interval $r;
     ok $f +> 0.4 && $f +< 0.9, "slept $f instead of 0.5 secs.";
@@ -229,7 +229,7 @@ unless (   defined &Time::HiRes::gettimeofday
     diag "# time...$f\n";
     ok 1;
 
-    $r = \@( <Time::HiRes::gettimeofday());
+    $r = \Time::HiRes::gettimeofday();
     sleep (0.5);
     diag "# sleep..." . Time::HiRes::tv_interval($r);
     ok 1;
@@ -318,7 +318,7 @@ SKIP: do{
     use Time::HiRes < qw(setitimer getitimer ITIMER_VIRTUAL);
 
     my $i = 3;
-    my $r = \@( <Time::HiRes::gettimeofday());
+    my $r = \Time::HiRes::gettimeofday();
 
     signals::handler("VTALRM") = sub {
             $i ?? $i-- !! setitimer(&ITIMER_VIRTUAL( < @_ ), 0);
