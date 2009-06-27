@@ -1103,7 +1103,7 @@ Perl_magic_setdbline(pTHX_ SV *sv, MAGIC *mg)
     PERL_ARGS_ASSERT_MAGIC_SETDBLINE;
 
     if (svp && SvIOKp(*svp)) {
-        OP * const o = INT2PTR(OP*,SvIVX(*svp));
+        OP * const o = INT2PTR(OP*,I_SvIV(*svp));
         if (o) {
             /* set or clear breakpoint in the relevant control op */
             if (i)
@@ -1649,7 +1649,7 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 #else
 #   define PERL_VMS_BANG 0
 #endif
-		SETERRNO(SvIOK(sv) ? SvIVX(sv) : SvOK(sv) ? sv_2iv(sv) : 0,
+		SETERRNO(SvIOK(sv) ? I_SvIV(sv) : SvOK(sv) ? sv_2iv(sv) : 0,
 		    (SvIV(sv) == EVMSERR) ? 4 : PERL_VMS_BANG);
 		break;
 	    }

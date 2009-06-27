@@ -4489,7 +4489,7 @@ Perl_reg_named_buff_fetch(pTHX_ REGEXP * const r, SV * const namesv,
             IV i;
             SV* sv_dat=HeVAL(he_str);
             I32 *nums=(I32*)SvPVX_mutable(sv_dat);
-            for ( i=0; i<SvIVX(sv_dat); i++ ) {
+            for ( i=0; i<I_SvIV(sv_dat); i++ ) {
                 if ((I32)(rx->nparens) >= nums[i]
                     && rx->offs[nums[i]].start != -1
                     && rx->offs[nums[i]].end != -1)
@@ -4570,7 +4570,7 @@ Perl_reg_named_buff_nextkey(pTHX_ REGEXP * const r, const U32 flags)
             IV parno = 0;
             SV* sv_dat = HeVAL(temphe);
             I32 *nums = (I32*)SvPVX_mutable(sv_dat);
-            for ( i = 0; i < SvIVX(sv_dat); i++ ) {
+            for ( i = 0; i < I_SvIV(sv_dat); i++ ) {
                 if ((I32)(rx->lastparen) >= nums[i] &&
                     rx->offs[nums[i]].start != -1 &&
                     rx->offs[nums[i]].end != -1)
@@ -4630,7 +4630,7 @@ Perl_reg_named_buff_all(pTHX_ REGEXP * const r, const U32 flags)
             IV parno = 0;
             SV* sv_dat = HeVAL(temphe);
             I32 *nums = (I32*)SvPVX_mutable(sv_dat);
-            for ( i = 0; i < SvIVX(sv_dat); i++ ) {
+            for ( i = 0; i < I_SvIV(sv_dat); i++ ) {
                 if ((I32)(rx->lastparen) >= nums[i] &&
                     rx->offs[nums[i]].start != -1 &&
                     rx->offs[nums[i]].end != -1)
@@ -5154,13 +5154,13 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                                 pv = (I32*)SvGROW(sv_dat, SvCUR(sv_dat) + sizeof(I32)+1);
                                 SvCUR_set(sv_dat, SvCUR(sv_dat) + sizeof(I32));
                                 pv[count] = RExC_npar;
-                                SvIVX(sv_dat)++;
+                                SvIV_set(sv_dat, SvIV(sv_dat)+1);
                             }
                         } else {
                             (void)SvUPGRADE(sv_dat,SVt_PVNV);
                             sv_setpvn(sv_dat, (char *)&(RExC_npar), sizeof(I32));
                             SvIOK_on(sv_dat);
-                            SvIVX(sv_dat)= 1;
+                            SvIV_set(sv_dat, 1);
                         }
 #ifdef DEBUGGING
                         if (!av_store(RExC_paren_name_list, RExC_npar, SvREFCNT_inc(svname)))
@@ -8567,7 +8567,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
                 SV **name= av_fetch(list, nums[0], 0 );
                 I32 n;
                 if (name) {
-                    for ( n=0; n<SvIVX(sv_dat); n++ ) {
+                    for ( n=0; n<I_SvIV(sv_dat); n++ ) {
                         Perl_sv_catpvf(aTHX_ sv, "%s%"IVdf,
 			   	    (n ? "," : ""), (IV)nums[n]);
                     }

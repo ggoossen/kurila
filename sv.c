@@ -1637,7 +1637,7 @@ Perl_looks_like_number(pTHX_ SV *const sv)
    correctly because if IV & NV were set NV *always* overruled.
    Now, "3.2" will become NV=3.2 IV=3 NOK, IOKp, because the flag's meaning
    changes - now IV and NV together means that the two are interchangeable:
-   SvIVX == (IV) SvNVX && SvNVX == (NV) SvIVX;
+   SvIV == (IV) SvNVX && SvNVX == (NV) SvIVX;
 
    The benefit of this is that operations such as pp_add know that if
    SvIOK is true for both left and right operands, then integer addition
@@ -1747,8 +1747,8 @@ Perl_sv_2iv(pTHX_ register SV *const sv)
 	return 0;
     }
     DEBUG_c(PerlIO_printf(Perl_debug_log, "0x%"UVxf" 2iv(%"IVdf")\n",
-	PTR2UV(sv),SvIVX(sv)));
-    return SvIsUV(sv) ? (IV)SvUVX(sv) : SvIVX(sv);
+	PTR2UV(sv),I_SvIV(sv)));
+    return SvIsUV(sv) ? (IV)SvUVX(sv) : I_SvIV(sv);
 }
 
 /*
@@ -1895,7 +1895,7 @@ Perl_sv_2uv(pTHX_ register SV *const sv)
 
     DEBUG_c(PerlIO_printf(Perl_debug_log, "0x%"UVxf" 2uv(%"UVuf")\n",
 			  PTR2UV(sv),SvUVX(sv)));
-    return SvIsUV(sv) ? SvUVX(sv) : (UV)SvIVX(sv);
+    return SvIsUV(sv) ? SvUVX(sv) : (UV)I_SvIV(sv);
 }
 
 /*
@@ -1932,7 +1932,7 @@ Perl_sv_2nv(pTHX_ register SV *const sv)
 	    if (SvIsUV(sv))
 		return (NV)SvUVX(sv);
 	    else
-		return (NV)SvIVX(sv);
+		return (NV)I_SvIV(sv);
 	}
         if (SvROK(sv)) {
 	    goto return_rok;
@@ -1978,7 +1978,7 @@ Perl_sv_2nv(pTHX_ register SV *const sv)
         return SvNVX(sv);
     }
     if (SvIOKp(sv)) {
-	SvNV_set(sv, SvIsUV(sv) ? (NV)SvUVX(sv) : (NV)SvIVX(sv));
+	SvNV_set(sv, SvIsUV(sv) ? (NV)SvUVX(sv) : (NV)I_SvIV(sv));
 #ifdef NV_PRESERVES_UV
 	if (SvIOK(sv))
 	    SvNOK_on(sv);
@@ -1989,7 +1989,7 @@ Perl_sv_2nv(pTHX_ register SV *const sv)
 	/* Check it's not 0xFFFFFFFFFFFFFFFF */
 	if (SvIOK(sv) &&
 	    SvIsUV(sv) ? ((SvUVX(sv) != UV_MAX)&&(SvUVX(sv) == U_V(SvNVX(sv))))
-		       : (SvIVX(sv) == I_V(SvNVX(sv))))
+		       : (I_SvIV(sv) == I_V(SvNVX(sv))))
 	    SvNOK_on(sv);
 	else
 	    SvNOKp_on(sv);
@@ -2053,7 +2053,7 @@ Perl_sv_2nv(pTHX_ register SV *const sv)
                 } else {
 		    const NV nv = SvNVX(sv);
                     if (SvNVX(sv) < (NV)IV_MAX + 0.5) {
-                        if (SvIVX(sv) == I_V(nv)) {
+                        if (I_SvIV(sv) == I_V(nv)) {
                             SvNOK_on(sv);
                         } else {
                             /* It had no "." so it must be integer.  */
@@ -2235,7 +2235,7 @@ Perl_sv_2pv_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags
 
 	if (SvTYPE(sv) < SVt_PVIV)
 	    sv_upgrade(sv, SVt_PVIV);
- 	ptr = uiv_2buf(buf, SvIVX(sv), SvUVX(sv), isUIOK, &ebuf);
+ 	ptr = uiv_2buf(buf, I_SvIV(sv), SvUVX(sv), isUIOK, &ebuf);
 	len = ebuf - ptr;
 	/* inlined from sv_setpvn */
 	s = SvGROW_mutable(sv, len + 1);
@@ -2371,7 +2371,7 @@ Perl_sv_2bool(pTHX_ register SV *const sv)
     }
     else {
 	if (SvIOKp(sv))
-	    return SvIVX(sv) != 0;
+	    return I_SvIV(sv) != 0;
 	else {
 	    if (SvNOKp(sv))
 		return SvNVX(sv) != 0.0;
@@ -2601,7 +2601,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 		break;
 	    }
 	    (void)SvIOK_only(dstr);
-	    SvIV_set(dstr,  SvIVX(sstr));
+	    SvIV_set(dstr, I_SvIV(sstr));
 	    if (SvIsUV(sstr))
 		SvIsUV_on(dstr);
 	    return;
@@ -2922,7 +2922,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	    SvNV_set(dstr, SvNVX(sstr));
 	}
 	if (sflags & SVp_IOK) {
-	    SvIV_set(dstr, SvIVX(sstr));
+	    SvIV_set(dstr, I_SvIV(sstr));
 	    /* Must do this otherwise some other overloaded use of 0x80000000
 	       gets confused. I guess SVpbm_VALID */
 	    if (sflags & SVf_IVisUV)
@@ -2935,7 +2935,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	SvFLAGS(dstr) |= sflags & (SVf_IOK|SVp_IOK|SVf_IVisUV|SVf_NOK|SVp_NOK);
 	if (sflags & SVp_IOK) {
 	    /* XXXX Do we want to set IsUV for IV(ROK)?  Be extra safe... */
-	    SvIV_set(dstr, SvIVX(sstr));
+	    SvIV_set(dstr, I_SvIV(sstr));
 	}
 	if (sflags & SVp_NOK) {
 	    SvNV_set(dstr, SvNVX(sstr));
@@ -5560,11 +5560,11 @@ Perl_sv_inc(pTHX_ register SV *const sv)
 		(void)SvIOK_only_UV(sv);
 		SvUV_set(sv, SvUVX(sv) + 1);
 	} else {
-	    if (SvIVX(sv) == IV_MAX)
+	    if (I_SvIV(sv) == IV_MAX)
 		sv_setuv(sv, (UV)IV_MAX + 1);
 	    else {
 		(void)SvIOK_only(sv);
-		SvIV_set(sv, SvIVX(sv) + 1);
+		SvIV_set(sv, I_SvIV(sv) + 1);
 	    }	
 	}
 	return;
@@ -5621,10 +5621,10 @@ Perl_sv_inc(pTHX_ register SV *const sv)
 	       Fall through. */
 #if defined(USE_LONG_DOUBLE)
 	    DEBUG_c(PerlIO_printf(Perl_debug_log,"sv_inc punt failed to convert '%s' to IOK or NOKp, UV=0x%"UVxf" NV=%"PERL_PRIgldbl"\n",
-				  SvPVX_const(sv), SvIVX(sv), SvNVX(sv)));
+				  SvPVX_const(sv), I_SvIV(sv), SvNVX(sv)));
 #else
 	    DEBUG_c(PerlIO_printf(Perl_debug_log,"sv_inc punt failed to convert '%s' to IOK or NOKp, UV=0x%"UVxf" NV=%"NVgf"\n",
-				  SvPVX_const(sv), SvIVX(sv), SvNVX(sv)));
+				  SvPVX_const(sv), I_SvIV(sv), SvNVX(sv)));
 #endif
 	}
 #endif /* PERL_PRESERVE_IVUV */
@@ -5716,13 +5716,13 @@ Perl_sv_dec(pTHX_ register SV *const sv)
 		SvUV_set(sv, SvUVX(sv) - 1);
 	    }	
 	} else {
-	    if (SvIVX(sv) == IV_MIN) {
+	    if (I_SvIV(sv) == IV_MIN) {
 		sv_setnv(sv, (NV)IV_MIN);
 		goto oops_its_num;
 	    }
 	    else {
 		(void)SvIOK_only(sv);
-		SvIV_set(sv, SvIVX(sv) - 1);
+		SvIV_set(sv, I_SvIV(sv) - 1);
 	    }	
 	}
 	return;
@@ -5775,10 +5775,10 @@ Perl_sv_dec(pTHX_ register SV *const sv)
 	       Fall through. */
 #if defined(USE_LONG_DOUBLE)
 	    DEBUG_c(PerlIO_printf(Perl_debug_log,"sv_dec punt failed to convert '%s' to IOK or NOKp, UV=0x%"UVxf" NV=%"PERL_PRIgldbl"\n",
-				  SvPVX_const(sv), SvIVX(sv), SvNVX(sv)));
+				  SvPVX_const(sv), I_SvIV(sv), SvNVX(sv)));
 #else
 	    DEBUG_c(PerlIO_printf(Perl_debug_log,"sv_dec punt failed to convert '%s' to IOK or NOKp, UV=0x%"UVxf" NV=%"NVgf"\n",
-				  SvPVX_const(sv), SvIVX(sv), SvNVX(sv)));
+				  SvPVX_const(sv), I_SvIV(sv), SvNVX(sv)));
 #endif
 	}
     }
@@ -6374,7 +6374,7 @@ Perl_sv_true(pTHX_ register SV *const sv)
     }
     else {
 	if (SvIOK(sv))
-	    return SvIVX(sv) != 0;
+	    return I_SvIV(sv) != 0;
 	else {
 	    if (SvNOK(sv))
 		return SvNVX(sv) != 0.0;

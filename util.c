@@ -2788,7 +2788,7 @@ Perl_my_pclose(pTHX_ PerlIO *ptr)
     LOCK_FDPID_MUTEX;
     svp = av_fetch(PL_fdpid,PerlIO_fileno(ptr),TRUE);
     UNLOCK_FDPID_MUTEX;
-    pid = (SvTYPE(*svp) == SVt_IV) ? SvIVX(*svp) : -1;
+    pid = (SvTYPE(*svp) == SVt_IV) ? I_SvIV(*svp) : -1;
     SvREFCNT_dec(*svp);
     *svp = &PL_sv_undef;
 #ifdef OS2
@@ -2850,7 +2850,7 @@ Perl_wait4pid(pTHX_ Pid_t pid, int *statusp, int flags)
 	       pid, rather than a string form.  */
 	    SV * const * const svp = hv_fetch(PL_pidstatus,(const char*) &pid,sizeof(Pid_t),FALSE);
 	    if (svp && *svp != &PL_sv_undef) {
-		*statusp = SvIVX(*svp);
+		*statusp = I_SvIV(*svp);
 		(void)hv_delete(PL_pidstatus,(const char*) &pid,sizeof(Pid_t),
 				G_DISCARD);
 		return pid;
@@ -2867,7 +2867,7 @@ Perl_wait4pid(pTHX_ Pid_t pid, int *statusp, int flags)
 
 		assert (len == sizeof(Pid_t));
 		memcpy((char *)&pid, spid, len);
-		*statusp = SvIVX(sv);
+		*statusp = I_SvIV(sv);
 		/* The hash iterator is currently on this entry, so simply
 		   calling hv_delete would trigger the lazy delete, which on
 		   aggregate does more work, beacuse next call to hv_iterinit()

@@ -711,9 +711,9 @@ PP(pp_predec)
     if (SvTYPE(TOPs) >= SVt_PVGV)
 	DIE(aTHX_ PL_no_modify);
     if (!SvREADONLY(TOPs) && SvIOK_notUV(TOPs) && !SvNOK(TOPs) && !SvPOK(TOPs)
-        && SvIVX(TOPs) != IV_MIN)
+        && I_SvIV(TOPs) != IV_MIN)
     {
-	SvIV_set(TOPs, SvIVX(TOPs) - 1);
+	SvIV_set(TOPs, I_SvIV(TOPs) - 1);
 	SvFLAGS(TOPs) &= ~(SVp_NOK|SVp_POK);
     }
     else
@@ -729,9 +729,9 @@ PP(pp_postinc)
 	Perl_croak(aTHX_ "increment (++) does not work on a %s", Ddesc(TOPs));
     sv_setsv(TARG, TOPs);
     if (!SvREADONLY(TOPs) && SvIOK_notUV(TOPs) && !SvNOK(TOPs) && !SvPOK(TOPs)
-        && SvIVX(TOPs) != IV_MAX)
+        && I_SvIV(TOPs) != IV_MAX)
     {
-	SvIV_set(TOPs, SvIVX(TOPs) + 1);
+	SvIV_set(TOPs, I_SvIV(TOPs) + 1);
 	SvFLAGS(TOPs) &= ~(SVp_NOK|SVp_POK);
     }
     else
@@ -751,9 +751,9 @@ PP(pp_postdec)
 	DIE(aTHX_ PL_no_modify);
     sv_setsv(TARG, TOPs);
     if (!SvREADONLY(TOPs) && SvIOK_notUV(TOPs) && !SvNOK(TOPs) && !SvPOK(TOPs)
-        && SvIVX(TOPs) != IV_MIN)
+        && I_SvIV(TOPs) != IV_MIN)
     {
-	SvIV_set(TOPs, SvIVX(TOPs) - 1);
+	SvIV_set(TOPs, I_SvIV(TOPs) - 1);
 	SvFLAGS(TOPs) &= ~(SVp_NOK|SVp_POK);
     }
     else
@@ -1191,7 +1191,7 @@ PP(pp_modulo)
             if (!right_neg) {
                 right = SvUVX(svr);
             } else {
-		const IV biv = SvIVX(svr);
+		const IV biv = I_SvIV(svr);
                 if (biv >= 0) {
                     right = biv;
                     right_neg = FALSE; /* effectively it's a UV now */
@@ -1224,7 +1224,7 @@ PP(pp_modulo)
                 if (!left_neg) {
                     left = SvUVX(svl);
                 } else {
-		    const IV aiv = SvIVX(svl);
+		    const IV aiv = I_SvIV(svl);
                     if (aiv >= 0) {
                         left = aiv;
                         left_neg = FALSE; /* effectively it's a UV now */
@@ -1412,7 +1412,7 @@ PP(pp_subtract)
 		if ((auvok = SvUOK(svl)))
 		    auv = SvUVX(svl);
 		else {
-		    register const IV aiv = SvIVX(svl);
+		    register const IV aiv = I_SvIV(svl);
 		    if (aiv >= 0) {
 			auv = aiv;
 			auvok = 1;	/* Now acting as a sign flag.  */
@@ -1432,7 +1432,7 @@ PP(pp_subtract)
 	    if (buvok)
 		buv = SvUVX(svr);
 	    else {
-		register const IV biv = SvIVX(svr);
+		register const IV biv = I_SvIV(svr);
 		if (biv >= 0) {
 		    buv = biv;
 		    buvok = 1;
@@ -1547,8 +1547,8 @@ PP(pp_lt)
 	    bool buvok = SvUOK(TOPs);
 	
 	    if (!auvok && !buvok) { /* ## IV < IV ## */
-		const IV aiv = SvIVX(TOPm1s);
-		const IV biv = SvIVX(TOPs);
+		const IV aiv = I_SvIV(TOPm1s);
+		const IV biv = I_SvIV(TOPs);
 		
 		SP--;
 		SETs(boolSV(aiv < biv));
@@ -1564,7 +1564,7 @@ PP(pp_lt)
 	    }
 	    if (auvok) { /* ## UV < IV ## */
 		UV auv;
-		const IV biv = SvIVX(TOPs);
+		const IV biv = I_SvIV(TOPs);
 		SP--;
 		if (biv < 0) {
 		    /* As (a) is a UV, it's >=0, so it cannot be < */
@@ -1576,7 +1576,7 @@ PP(pp_lt)
 		RETURN;
 	    }
 	    { /* ## IV < UV ## */
-		const IV aiv = SvIVX(TOPm1s);
+		const IV aiv = I_SvIV(TOPm1s);
 		UV buv;
 		
 		if (aiv < 0) {
@@ -1617,8 +1617,8 @@ PP(pp_gt)
 	    bool buvok = SvUOK(TOPs);
 	
 	    if (!auvok && !buvok) { /* ## IV > IV ## */
-		const IV aiv = SvIVX(TOPm1s);
-		const IV biv = SvIVX(TOPs);
+		const IV aiv = I_SvIV(TOPm1s);
+		const IV biv = I_SvIV(TOPs);
 
 		SP--;
 		SETs(boolSV(aiv > biv));
@@ -1634,7 +1634,7 @@ PP(pp_gt)
 	    }
 	    if (auvok) { /* ## UV > IV ## */
 		UV auv;
-		const IV biv = SvIVX(TOPs);
+		const IV biv = I_SvIV(TOPs);
 
 		SP--;
 		if (biv < 0) {
@@ -1647,7 +1647,7 @@ PP(pp_gt)
 		RETURN;
 	    }
 	    { /* ## IV > UV ## */
-		const IV aiv = SvIVX(TOPm1s);
+		const IV aiv = I_SvIV(TOPm1s);
 		UV buv;
 		
 		if (aiv < 0) {
@@ -1688,8 +1688,8 @@ PP(pp_le)
 	    bool buvok = SvUOK(TOPs);
 	
 	    if (!auvok && !buvok) { /* ## IV <= IV ## */
-		const IV aiv = SvIVX(TOPm1s);
-		const IV biv = SvIVX(TOPs);
+		const IV aiv = I_SvIV(TOPm1s);
+		const IV biv = I_SvIV(TOPs);
 		
 		SP--;
 		SETs(boolSV(aiv <= biv));
@@ -1705,7 +1705,7 @@ PP(pp_le)
 	    }
 	    if (auvok) { /* ## UV <= IV ## */
 		UV auv;
-		const IV biv = SvIVX(TOPs);
+		const IV biv = I_SvIV(TOPs);
 
 		SP--;
 		if (biv < 0) {
@@ -1718,7 +1718,7 @@ PP(pp_le)
 		RETURN;
 	    }
 	    { /* ## IV <= UV ## */
-		const IV aiv = SvIVX(TOPm1s);
+		const IV aiv = I_SvIV(TOPm1s);
 		UV buv;
 
 		if (aiv < 0) {
@@ -1759,8 +1759,8 @@ PP(pp_ge)
 	    bool buvok = SvUOK(TOPs);
 	
 	    if (!auvok && !buvok) { /* ## IV >= IV ## */
-		const IV aiv = SvIVX(TOPm1s);
-		const IV biv = SvIVX(TOPs);
+		const IV aiv = I_SvIV(TOPm1s);
+		const IV biv = I_SvIV(TOPs);
 
 		SP--;
 		SETs(boolSV(aiv >= biv));
@@ -1776,7 +1776,7 @@ PP(pp_ge)
 	    }
 	    if (auvok) { /* ## UV >= IV ## */
 		UV auv;
-		const IV biv = SvIVX(TOPs);
+		const IV biv = I_SvIV(TOPs);
 
 		SP--;
 		if (biv < 0) {
@@ -1789,7 +1789,7 @@ PP(pp_ge)
 		RETURN;
 	    }
 	    { /* ## IV >= UV ## */
-		const IV aiv = SvIVX(TOPm1s);
+		const IV aiv = I_SvIV(TOPm1s);
 		UV buv;
 
 		if (aiv < 0) {
@@ -1849,7 +1849,7 @@ PP(pp_ne)
 		/* != is commutative so swap if needed (save code) */
 		if (auvok) {
 		    /* swap. top of stack (b) is the iv */
-		    iv = SvIVX(TOPs);
+		    iv = I_SvIV(TOPs);
 		    SP--;
 		    if (iv < 0) {
 			/* As (a) is a UV, it's >0, so it cannot be == */
@@ -1858,7 +1858,7 @@ PP(pp_ne)
 		    }
 		    uv = SvUVX(TOPs);
 		} else {
-		    iv = SvIVX(TOPm1s);
+		    iv = I_SvIV(TOPm1s);
 		    SP--;
 		    if (iv < 0) {
 			/* As (b) is a UV, it's >0, so it cannot be == */
@@ -1898,8 +1898,8 @@ PP(pp_ncmp)
 	    const bool rightuvok = SvUOK(TOPs);
 	    I32 value;
 	    if (!leftuvok && !rightuvok) { /* ## IV <=> IV ## */
-		const IV leftiv = SvIVX(TOPm1s);
-		const IV rightiv = SvIVX(TOPs);
+		const IV leftiv = I_SvIV(TOPm1s);
+		const IV rightiv = I_SvIV(TOPs);
 		
 		if (leftiv > rightiv)
 		    value = 1;
@@ -1918,7 +1918,7 @@ PP(pp_ncmp)
 		else
 		    value = 0;
 	    } else if (leftuvok) { /* ## UV <=> IV ## */
-		const IV rightiv = SvIVX(TOPs);
+		const IV rightiv = I_SvIV(TOPs);
 		if (rightiv < 0) {
 		    /* As (a) is a UV, it's >=0, so it cannot be < */
 		    value = 1;
@@ -1933,7 +1933,7 @@ PP(pp_ncmp)
 		    }
 		}
 	    } else { /* ## IV <=> UV ## */
-		const IV leftiv = SvIVX(TOPm1s);
+		const IV leftiv = I_SvIV(TOPm1s);
 		if (leftiv < 0) {
 		    /* As (b) is a UV, it's >=0, so it must be < */
 		    value = -1;
@@ -2074,18 +2074,18 @@ PP(pp_negate)
 	    /* It's publicly an integer, or privately an integer-not-float */
 	oops_its_an_int:
 	    if (SvIsUV(sv)) {
-		if (SvIVX(sv) == IV_MIN) {
+		if (I_SvIV(sv) == IV_MIN) {
 		    /* 2s complement assumption. */
-		    SETi(SvIVX(sv));	/* special case: -((UV)IV_MAX+1) == IV_MIN */
+		    SETi(I_SvIV(sv));	/* special case: -((UV)IV_MAX+1) == IV_MIN */
 		    RETURN;
 		}
 		else if (SvUVX(sv) <= IV_MAX) {
-		    SETi(-SvIVX(sv));
+		    SETi(-I_SvIV(sv));
 		    RETURN;
 		}
 	    }
-	    else if (SvIVX(sv) != IV_MIN) {
-		SETi(-SvIVX(sv));
+	    else if (I_SvIV(sv) != IV_MIN) {
+		SETi(-I_SvIV(sv));
 		RETURN;
 	    }
 #ifdef PERL_PRESERVE_IVUV

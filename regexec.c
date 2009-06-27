@@ -2328,7 +2328,7 @@ S_reg_check_named_buff_matched(pTHX_ const regexp *rex, const regnode *scan)
 
     PERL_ARGS_ASSERT_REG_CHECK_NAMED_BUFF_MATCHED;
 
-    for ( n=0; n<SvIVX(sv_dat); n++ ) {
+    for ( n=0; n<SvIV(sv_dat); n++ ) {
         if ((I32)*PL_reglastparen >= nums[n] &&
             PL_regoffs[nums[n]].end != -1)
         {

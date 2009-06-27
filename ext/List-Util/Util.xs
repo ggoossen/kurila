@@ -8,9 +8,9 @@
 #include <XSUB.h>
 
 #ifdef SVf_IVisUV
-#  define slu_sv_value(sv) (SvIOK(sv)) ? (SvIOK_UV(sv)) ? (NV)(SvUVX(sv)) : (NV)(SvIVX(sv)) : (SvNV(sv))
+#  define slu_sv_value(sv) (SvIOK(sv)) ? (SvIOK_UV(sv)) ? (NV)(SvUVX(sv)) : (NV)(I_SvIV(sv)) : (SvNV(sv))
 #else
-#  define slu_sv_value(sv) (SvIOK(sv)) ? (NV)(SvIVX(sv)) : (SvNV(sv))
+#  define slu_sv_value(sv) (SvIOK(sv)) ? (NV)(I_SvIV(sv)) : (SvNV(sv))
 #endif
 
 #ifndef Drand01

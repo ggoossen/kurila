@@ -3104,7 +3104,7 @@ win32_pclose(PerlIO *pf)
     sv = *av_fetch(w32_fdpid, PerlIO_fileno(pf), TRUE);
 
     if (SvIOK(sv))
-	childpid = SvIVX(sv);
+	childpid = SvIV(sv);
     else
 	childpid = 0;
 
@@ -3119,7 +3119,7 @@ win32_pclose(PerlIO *pf)
 #else
     fclose(pf);
 #endif
-    SvIVX(sv) = 0;
+    SvIV_set(sv, 0);
     UNLOCK_FDPID_MUTEX;
 
     if (win32_waitpid(childpid, &status, 0) == -1)

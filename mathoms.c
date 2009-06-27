@@ -215,7 +215,7 @@ Perl_sv_iv(pTHX_ register SV *sv)
     if (SvIOK(sv)) {
 	if (SvIsUV(sv))
 	    return (IV)SvUVX(sv);
-	return SvIVX(sv);
+	return I_SvIV(sv);
     }
     return sv_2iv(sv);
 }
@@ -237,7 +237,7 @@ Perl_sv_uv(pTHX_ register SV *sv)
     if (SvIOK(sv)) {
 	if (SvIsUV(sv))
 	    return SvUVX(sv);
-	return (UV)SvIVX(sv);
+	return (UV)I_SvIV(sv);
     }
     return sv_2uv(sv);
 }

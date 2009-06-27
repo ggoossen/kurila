@@ -1465,7 +1465,7 @@ Perl_sortsv_flags(pTHX_ SV **array, size_t nmemb, SVCOMPARE_t cmp, U32 flags)
 
 #define SvNSIOK(sv) ((SvFLAGS(sv) & SVf_NOK) || ((SvFLAGS(sv) & (SVf_IOK|SVf_IVisUV)) == SVf_IOK))
 #define SvSIOK(sv) ((SvFLAGS(sv) & (SVf_IOK|SVf_IVisUV)) == SVf_IOK)
-#define SvNSIV(sv) ( SvNOK(sv) ? SvNVX(sv) : ( SvSIOK(sv) ? SvIVX(sv) : sv_2nv(sv) ) )
+#define SvNSIV(sv) ( SvNOK(sv) ? SvNVX(sv) : ( SvSIOK(sv) ? I_SvIV(sv) : sv_2nv(sv) ) )
 
 PP(pp_sort)
 {

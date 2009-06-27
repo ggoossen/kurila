@@ -3,7 +3,7 @@
 $^OUTPUT_AUTOFLUSH  = 1
 use warnings;
 
-use Test::More tests => 55;
+use Test::More tests => 54;
 
 BEGIN { use_ok( 'B' ); }
 
@@ -60,7 +60,6 @@ is(ref $iv_ret, "SCALAR", "Test object_2svref() return is SCALAR")
 is($iv_ret->$, $iv, "Test object_2svref()")
 is($iv_ref->int_value, $iv, "Test int_value()")
 is($iv_ref->IV, $iv, "Test IV()")
-is($iv_ref->IVX(), $iv, "Test IVX()")
 is($iv_ref->UVX(), $iv, "Test UVX()")
 
 my $pv = "Foo"

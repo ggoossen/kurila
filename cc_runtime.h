@@ -23,7 +23,7 @@
 
 #define PP_PREINC(sv) do {	\
 	if (SvIOK(sv)) {	\
-            ++SvIVX(sv);	\
+            ++I_SvIV(sv);	\
 	    SvFLAGS(sv) &= ~(SVf_NOK|SVf_POK|SVp_NOK|SVp_POK); \
 	}			\
 	else			\
