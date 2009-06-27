@@ -4293,11 +4293,13 @@ PP(pp_shift)
 {
     dVAR;
     dSP;
+    SV * const avsv = POPs;
 
-    do_arg_check(SP);
+    if( ! SvAVOK(avsv) )
+	Perl_croak(aTHX "shift expected an ARRAY not %s", Ddesc(avsv));
 
     {
-	AV * const av = (AV*)POPs;
+	AV* const av = svTav(avsv);
 	SV * const sv = PL_op->op_type == OP_SHIFT ? av_shift(av) : av_pop(av);
 	EXTEND(SP, 1);
 	assert (sv);
@@ -4442,7 +4444,7 @@ PP(pp_emptyarray)
 PP(pp_emptyhash)
 {
     dSP;
-    XPUSHs(avTsv(newHV()));
+    XPUSHs(hvTsv(newHV()));
     RETURN;
 }
 
