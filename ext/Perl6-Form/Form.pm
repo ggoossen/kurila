@@ -67,7 +67,7 @@ sub pos_integer
 
 sub strings_or_undef($val, $name)
     my $type = ref $val
-    if (!defined $val) { $val = \@() }
+    if (!defined $val) { $val = \$@ }
         elsif (!$type)     { $val = \@( "$val" ) }
     die "Value for '$name' option must be string, array of strings, or undef (not $type)"
         unless ref $val eq 'ARRAY'
@@ -134,8 +134,8 @@ sub hashify($what, $val, $default_undef, $default_val)
         return \%( other => $val )
     
     if (ref $val eq 'HASH')
-        die "Invalid key for $what: '$_'"
-            for grep { !m/^(first|last|even|odd|other)$/ }, keys $val->%
+        for (grep { !m/^(first|last|even|odd|other)$/ }, keys $val->%)
+            die "Invalid key for $what: '$_'"
         my %hash
         for (keys $val->%)
             if (!ref $val->{?$_})
@@ -153,13 +153,13 @@ sub hashify($what, $val, $default_undef, $default_val)
 
 sub page_hash
     my @($h, _, $opts) =  @_
-    die "Value for 'page' option must be hash reference (not $_)"
-        for grep { $_ ne 'HASH' }, @( ref $h)
+    for (grep { $_ ne 'HASH' }, @( ref $h))
+        die "Value for 'page' option must be hash reference (not $_)"
     $h = \( $opts->{?page}->% +%+ $h->% )
-    die "Unknown page sub-option ('$_')"
-        for grep {!exists %def_page{$_}}, keys $h->%
-    die "Page $_ must be greater than zero"
-        for grep { $h->{?$_} +<= 0 }, qw(length width)
+    for (grep {!exists %def_page{$_}}, keys $h->%)
+        die "Unknown page sub-option ('$_')"
+    for (grep { $h->{?$_} +<= 0 }, qw(length width))
+        die "Page $_ must be greater than zero"
     $h->{+body} =
         hashify("body preprocessor", $h->{?body}, \&std_body, \&form_body)
     for (qw( header footer feed ))
@@ -169,8 +169,8 @@ sub page_hash
 
 
 sub filehandle
-    die "Value for 'out' option must be filehandle (not '$_')"
-        for grep {$_ ne 'GLOB' }, @( ref @_[0])
+    for (grep {$_ ne 'GLOB' }, @( ref @_[0]))
+        die "Value for 'out' option must be filehandle (not '$_')"
     return @_[0]
 
 
@@ -185,8 +185,8 @@ sub user_def($spec, $name, $opts)
     else
         $spec = \ $spec->%
     
-    my @from = ($opts->{+field}{+from}||=\@())->@
-    my @to   = ($opts->{+field}{+to}||=\@())->@
+    my @from = ($opts->{+field}{+from}||=\$@)->@
+    my @to   = ($opts->{+field}{+to}||=\$@)->@
     my $count = (nelems @from)
     my $i=0
     while ($i+<nelems $spec->@)
@@ -210,8 +210,8 @@ my %std_opt = %(
     bfill       => \%( set => \&defined_or_space,       def => undef,                           ),
     vfill       => \%( set => \&defined_or_space,       def => undef,                           ),
     single      => \%( set => \&one_char,         def => undef,                         ),
-    field       => \%( set => \&user_def,               def => \%(from=>\@(),to=>\@())  ),
-    bullet      => \%( set => \&strings_or_undef, def => \@()                                   ),
+    field       => \%( set => \&user_def,               def => \%(from=>\$@,to=>\$@)  ),
+    bullet      => \%( set => \&strings_or_undef, def => \$@                                   ),
     height      => \%( set => \&height_vals,            def => \%(min=>0, max=>$unlimited) ),
     layout      => \%( set => \&layout_word,            def => 'balanced',                      ),
     break       => \%( set => \&code,                           def => break_at('-'),           ),
@@ -343,7 +343,8 @@ sub jnum
         $places = $setplaces
         $whole = $width - length($point) - $setplaces
     else
-        $_ = length for @( $whole, $places)
+        for (@: $whole, $places)
+            $_ = length
     
     die "Inconsistent number of decimal places in numeric field.\n",
         "Specified as $checkplaces but found $places"
@@ -446,7 +447,7 @@ sub perl6_match($str, $pat) {;
         unshift @vals, $1
         bless \@vals, 'Perl6::Form::Rule::Okay'
     else
-        bless \@(), 'Perl6::Form::Rule::Fail'
+        bless \$@, 'Perl6::Form::Rule::Fail'
     
 }
 
@@ -514,7 +515,7 @@ sub segment($format, $args, $opts, $fldcnt, $argcache)
                 %form{+vjust} = \&jtop
                 %form{+hjust} = \&jbullet
                 %form{+break} = \&break_bullet
-                %form{+src}   = \@()
+                %form{+src}   = \$@
                 (%form{+bullethole} = $field) =~ s/./ /gs
             else
                 %form{+stretch} = !%form{?isbullet} && $fld =~ s/[+]//
@@ -688,8 +689,8 @@ sub segment($format, $args, $opts, $fldcnt, $argcache)
             $width += $fldwidth - $f->{?width}
         
         $fldwidth = int($width/((nelems @starred)+nelems @vstarred)) if (nelems @starred)
-        $_->{+width} = $fldwidth for  @starred
-    
+        for (@starred)
+            $_->{+width} = $fldwidth
 
     # Attach bullets to neighbouring fields,
     # and compute offsets from left margin...
@@ -743,7 +744,7 @@ sub make_col
     my @col
     my @($more, $text) = @(1,"")
     my $bullet = $f->{?hasbullet}
-    $bullet->{+bullets} = \@() if $bullet
+    $bullet->{+bullets} = \$@ if $bullet
     my $bulleted = 1
     until ($f->{?done})
         my $skipped = 0
@@ -760,7 +761,7 @@ sub make_col
         my @($text,$more,$eol) =  $f->{?break}->($str_ref,$width,$f->{?opts}{?ws})
         if ($f->{?opts}{?ws})
             $text =~ s{($f->{?opts}{?ws})}
-                              {$( do { my @caps = @(); #@( < grep { defined $$_ } @( < 2..((nelems @+) -1)) );
+                              {$( do { my @caps = $@; #@( < grep { defined $$_ } @( < 2..((nelems @+) -1)) );
                 @caps = @( length($1) ?? " " !! "" ) unless (nelems @caps);
                 join "", @caps;
             })}g
@@ -778,7 +779,7 @@ sub make_col
         $f->{+done} = 1 if $f->{?line}
         $bulleted = 0
     
-    @col = @( () ) if (nelems @col) == 1 && @col[0] eq ""
+    @col = $@ if (nelems @col) == 1 && @col[0] eq ""
     @_[3] = $more && !$f->{?done} if (nelems @_)+>3
     return \@col
 
@@ -880,13 +881,13 @@ sub make_cols($formatters,$prevformatters,$parts, $opts, $maxheight)
         for my $g ( @maxgroups)
             balance_cols($g,$opts, $maxheight)
         
-        $maxheight = max < map { 0+nelems ($_->{?formcol}||\@())->@ }, $formatters->@
+        $maxheight = max < map { 0+nelems ($_->{?formcol}||\$@)->@ }, $formatters->@
             if grep {!$_->{?literal} && !$_->{?opts}{?height}{?minimal}}, $formatters->@
         for my $g ( @mingroups)
             balance_cols($g, $opts, $maxheight)
         
         for my $f ( $formatters->@)
-            push $parts->@, $f->{?formcol}||$f->{?bullets}||\@()
+            push $parts->@, $f->{?formcol}||$f->{?bullets}||\$@
         
     elsif ($opts->{?layout} eq 'down') # column-by-column
         for my $col (0..(nelems $formatters->@)-1)
@@ -905,7 +906,7 @@ sub make_cols($formatters,$prevformatters,$parts, $opts, $maxheight)
         for my $col (0..(nelems $formatters->@)-1)
             my $f = $formatters->[$col]
             next unless $f->{?isbullet}
-            $parts->[$col] = $f->{?bullets}||\@()
+            $parts->[$col] = $f->{?bullets}||\$@
         
     elsif ($opts->{?layout} eq 'across') # across row-by-row
         my %incomplete = %(first=>1)
@@ -913,7 +914,7 @@ sub make_cols($formatters,$prevformatters,$parts, $opts, $maxheight)
             last unless grep {$_}, values %incomplete
             %incomplete = %( () )
             for my $col (0..(nelems $formatters->@)-1)
-                $parts->[$col] ||= \@()
+                $parts->[$col] ||= \$@
             
             for my $col (0..(nelems $formatters->@)-1)
                 my $f = $formatters->[$col]
@@ -951,7 +952,7 @@ sub make_cols($formatters,$prevformatters,$parts, $opts, $maxheight)
         
     else # tabular layout: down to the first \n, then across, then fill
         my $finished = 0
-        for my $col (0..(nelems $formatters->@)-1) { $parts->[$col] = \@(); }
+        for my $col (0..(nelems $formatters->@)-1) { $parts->[$col] = \$@; }
         while (!$finished)
             $finished = 1
             for my $col (0..(nelems $formatters->@)-1)
@@ -975,7 +976,7 @@ sub make_cols($formatters,$prevformatters,$parts, $opts, $maxheight)
             for my $col (0..(nelems $formatters->@)-2)
                 my $f = $formatters->[$col]
                 if ($f->{?isbullet})
-                    push $parts->[$col]->@, < ($f->{?bullets}||\@())->@
+                    push $parts->[$col]->@, < ($f->{?bullets}||\$@)->@
                     push $parts->[$col]->@,
                         ($f->{?bullethole})x($minimaxheight-nelems $parts->[$col]->@)
                 elsif ($f->{?literal})
@@ -1023,8 +1024,8 @@ sub make_underline($under, $prevline, $nextline)
     return \@(\%( < %std_literal, width => length($nextline), src => \$nextline ))
 
 
-sub linecount($v)
-    return (nelems @(m/(\n)/g)) + (m/[^\n]\z/??1!!0) for @: $v
+sub linecount($_)
+    return (nelems @(m/(\n)/g)) + (m/[^\n]\z/??1!!0)
 
 
 use warnings::register;
@@ -1040,7 +1041,7 @@ sub form
     
     my %opts = %(< %def_opts, < $caller_opts->%)
     my $fldcnt = 0
-    my @section = @( \%(opts=>\%(< %opts), text=>\@()) )
+    my @section = @( \%(opts=>\%(< %opts), text=>\$@) )
     my $formats = \@_
     my $first = 1
     my %argcache
@@ -1101,7 +1102,8 @@ sub form
                 !! $page->{feed}->{?$parity} ?? $page->{feed}->{?$parity}->($sect_opts)
                 !! $page->{feed}->{?other}   ?? $page->{feed}->{?other}->($sect_opts)
                 !! ""
-            length and s/\n?\z/\n/ for @( $header, $footer)  # NOT for $feed
+            for (@: $header, $footer)   # NOT for $feed
+                length and s/\n?\z/\n/
             my $bodyfn = $page->{body}->{?$pagetype}
                 || $page->{body}->{?$parity}
                 || $page->{body}->{?other}
@@ -1115,7 +1117,8 @@ sub form
                 my $lastfooter =
                     $page->{footer}->{?last} ?? $page->{footer}->{?last}->($sect_opts)
                     !! $footer
-                length and s/\n?\z/\n/ for @( $lastheader, $lastfooter)
+                for (@: $lastheader, $lastfooter)
+                    length and s/\n?\z/\n/
                 my $lastlen =
                     $pagelen-linecount($lastheader)-linecount($lastfooter)
                 if ((nelems $pagetext->@) +<= $lastlen)
@@ -1129,7 +1132,7 @@ sub form
                 
             
             my $fill = $pagelen +< $unlimited ?? \@(("\n") x ($bodylen-nelems $pagetext->@))
-                !! \@()
+                !! \$@
 
             my $body = $bodyfn->($pagetext, $fill, \%opts)
 
@@ -1199,10 +1202,12 @@ sub section($structure, @< @index)
         my $type = ref $row or die "Too many indices (starting with [$(join ' ',@index)])"
         if ($type eq 'HASH')
             @index = keys $row->% unless (nelems @index)
-            push @section[$_]->@, $row->{?@index[$_]} for 0..(nelems @index)-1
+            for (0..(nelems @index)-1)
+                push @section[$_]->@, $row->{?@index[$_]}
         elsif ($type eq 'ARRAY')
             @index =0..(nelems $row->@)-1 unless (nelems @index)
-            push @section[$_]->@, $row->[@index[$_]] for 0..(nelems @index)-1
+            for (0..(nelems @index)-1)
+                push @section[$_]->@, $row->[@index[$_]]
         else
             my $what = ref $structure
             die "Can't drill ", ($what ?? lc $what !! $structure) , " of $type"
@@ -1212,10 +1217,12 @@ sub section($structure, @< @index)
 
 
 sub slice($structure, @< @indices)
-    return ref eq 'HASH' ?? < $_->{[ @indices]} !! < $_->[[@(@indices)]] for @( $structure)
+    my $_ = $structure
+    return ref eq 'HASH' ?? < $_->{[ @indices]} !! < $_->[[@(@indices)]]
 
 
-sub vals { return ref eq 'HASH' ?? values $_->% !! < $_->@ for @( @_[0]) }
+sub vals($_)
+    return ref eq 'HASH' ?? values $_->% !! < $_->@
 
 sub drill($structure, @< @indices)
     return $structure unless (nelems @indices)

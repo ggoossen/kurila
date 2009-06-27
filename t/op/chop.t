@@ -121,7 +121,7 @@ do
 
 
 # chomp should not stringify references unless it decides to modify them
-$_ = \@()
+$_ = \$@
 $^INPUT_RECORD_SEPARATOR = "\n"
 dies_like( sub (@< @_) { $got = chomp(); }, qr/reference as string/, "chomp ref" )
 is (ref($_), "ARRAY", "chomp ref (no modify)")

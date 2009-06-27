@@ -29,11 +29,11 @@ plan tests => $tests
 
 package SHORT_NAME;
 
-sub make { bless \@(), shift }
+sub make { bless \$@, shift }
 
 package SHORT_NAME_WITH_HOOK;
 
-sub make { bless \@(), shift }
+sub make { bless \$@, shift }
 
 sub STORABLE_freeze($self, ...)
     return @("", $self)
@@ -148,7 +148,7 @@ our $loaded_count = 0
 our $thawed_count = 0
 
 sub make
-    bless \@()
+    bless \$@
 
 
 sub STORABLE_freeze($self, ...)

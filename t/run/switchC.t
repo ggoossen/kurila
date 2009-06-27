@@ -14,7 +14,7 @@ plan(tests => 6)
 
 my $r
 
-my @tmpfiles = @( () )
+my @tmpfiles = $@
 END { unlink < @tmpfiles }
 
 my $b = pack("C*", unpack("U0C*", pack("U",256)))

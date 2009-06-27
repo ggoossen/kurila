@@ -760,7 +760,8 @@ SKIP: do
                 if is_valid_error($^EVAL_ERROR)
 
             my $len = length $nat
-            is($_, "\x[FF]"x$len) for @( $nat, $be, $le)
+            for (@: $nat, $be, $le)
+                is($_, "\x[FF]"x$len)
 
             my(@val,@ref)
             if ($len +>= 8)
@@ -1062,7 +1063,7 @@ SKIP: do
 
     for my $t (qw{ (s<)> (sl>s)< (s(l(sl)<l)s)> })
         info "testing pattern '$t'"
-        try { @($_) = @: unpack($t, 'x'x18); }
+        try @($_) = @: unpack($t, 'x'x18)
         like($^EVAL_ERROR->{?description}, qr/Can't use '[<>]' in a group with different byte-order in unpack/)
         try { $_ = pack($t, (0)x6); }
         like($^EVAL_ERROR->{?description}, qr/Can't use '[<>]' in a group with different byte-order in pack/)
@@ -1110,7 +1111,8 @@ do
                 my $p2 = try { pack $c, < @d }
                 is($^EVAL_ERROR, '')
                 is($p1, $p2)
-                s!(/[aAZ])\*!$1!g for @( $t, $c)
+                for (@: $t, $c)
+                    s!(/[aAZ])\*!$1!g
                 my @u1 = @( try { unpack $t, $p1 } )
                 is($^EVAL_ERROR, '')
                 my @u2 = @( try { unpack $c, $p2 } )
@@ -1324,7 +1326,7 @@ do  # Repeat count [SUBEXPR]
             $( m/ [pP]  /x )=> "try this buffer",
             );
         $v;
-    }, @codes
+      }, @codes
     my @end = @(0x12345678, 0x23456781, 0x35465768, 0x15263748)
     my $end = "N4"
 

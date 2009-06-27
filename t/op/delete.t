@@ -63,7 +63,7 @@ do
 
 # delete() on array elements
 
-@foo = @( () )
+@foo = $@
 @foo[+1] = 'a'
 @foo[+2] = 'b'
 @foo[+3] = 'c'
@@ -122,7 +122,7 @@ do
 
 do
     my %h
-    my @($x,$y) = @(1, scalar delete %h{[@()]})
+    my @($x,$y) = @(1, scalar delete %h{[$@]})
     ok(!nelems($y),q([perl #29127] scalar delete of empty slice returned garbage))
 
 
@@ -138,7 +138,7 @@ do
     sub X::DESTROY { $x++ }
     do
         my @a
-        @a[+0] = bless \@(), 'X'
+        @a[+0] = bless \$@, 'X'
         my $y = delete @a[0]
     
     cmp_ok($x,'==',1,q([perl #30733] array delete didn't free returned element))

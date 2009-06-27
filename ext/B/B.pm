@@ -87,7 +87,7 @@ sub B::PV::as_string()   { return B::PV::PV(< @_) }
 
 my $debug
 my $op_count = 0
-my @parents = @( () )
+my @parents = $@
 
 sub debug($class, $value)
     $debug = $value

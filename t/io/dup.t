@@ -35,8 +35,8 @@ print $^STDOUT, `$cmd`
 
 # KNOWN BUG system() does not honor STDOUT redirections on VMS.
 if( $^OS_NAME eq 'VMS' )
-    print $^STDOUT, "not ok $_ # TODO system() not honoring STDOUT redirect on VMS\n"
-        for 6..7
+    for (6..7)
+        print $^STDOUT, "not ok $_ # TODO system() not honoring STDOUT redirect on VMS\n"
 else
     system sprintf $echo, 6
     if ($^OS_NAME eq 'MacOS')

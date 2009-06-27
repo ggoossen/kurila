@@ -26,10 +26,12 @@ my $t
 open (my $fh, "<", $File) or die $^OS_ERROR
 my $io = IO::File->new($File) or die $^OS_ERROR
 
-~< $fh->* for @( ( <1 .. 10))
+for (1 .. 10)
+    ~< $fh->*
 is(lineno($io), "0")
 
-$io->getline for @( ( <1 .. 5))
+for (1 .. 5)
+    $io->getline
 is(lineno($io), "5")
 
 ~< $fh->*
@@ -46,10 +48,12 @@ is(lineno($io), "6")
 
 is(lineno($io), "6")
 
-~< $fh->* for 1 .. 10
+for (1 .. 10)
+    ~< $fh->*
 is(lineno($io), "6")
 
-$io->getline for @( ( <1 .. 5))
+for (1 .. 5)
+    $io->getline
 is(lineno($io), "11")
 
 $t = tell $fh
@@ -59,7 +63,8 @@ $t = tell $fh
 is(lineno($io), "11")
 
 do
-    $io->getline for @( ( <1 .. 5))
+    for (1..5)
+        $io->getline
     is(lineno($io), "16")
 
 

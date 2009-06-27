@@ -113,7 +113,7 @@ while ( ~< $tmph_fh->*)
     if (!$endcore_done and m/YYSTYPE_IS_DECLARED/)
         print $h_fh, "#endif /* PERL_CORE */\n"
         $endcore_done = 1
-    
+
     next if m/^#line \d+ ".*"/
     print $h_fh, $_
 
@@ -223,7 +223,7 @@ sub make_type_tab($y_file, $tablines)
     while ( ~< $fh)
         if (m/(\$\d+)\s*=/)
             warn "$y_file:$(iohandle::input_line_number($fh)): dangerous assignment to $1: $_"
-        
+
 
         if (m/__DEFAULT__/)
             m{(\w+) \s* ; \s* /\* \s* __DEFAULT__}x
@@ -232,14 +232,14 @@ sub make_type_tab($y_file, $tablines)
                 if defined $default_token
             $default_token = $1
             next
-        
 
         next unless m/^%(token|type)/
         s/^%(token|type)\s+<(\w+)>\s+//
             or die "$y_file: unparseable token/type line: $_"
-        %tokens{+$_} = $2 for split ' ', $_
+        for (split ' ', $_)
+            %tokens{+$_} = $2
         %types{+$2} = 1
-    
+
     die "$y_file: no __DEFAULT__ token defined\n" unless $default_token
     %types{+$default_token} = 1
 
@@ -277,5 +277,5 @@ sub my_system
             ($^CHILD_ERROR ^&^ 127)
     elsif ($^CHILD_ERROR >> 8)
         die sprintf "command '$(join ' ',@_)' exited with value \%d\n", $^CHILD_ERROR >> 8
-    
+
 

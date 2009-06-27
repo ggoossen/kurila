@@ -517,7 +517,7 @@ XS(XS_PerlIO_get_layers)
 		       else
 			   av_push(retav, &PL_sv_undef);
 		       if (flgok) {
-			    const IV flags = SvIVX(*flgsvp);
+			    const IV flags = SvIV(*flgsvp);
 
 			    if (flags & PERLIO_F_UTF8) {
 				av_push(retav, newSVpvs_flags("utf8", 0));

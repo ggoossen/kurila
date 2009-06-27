@@ -65,8 +65,8 @@ open my $out, ">>", "$f" or die "open $f: $^OS_ERROR";
 print $out, $str;
 close $out;
 EOF
-    ;
-close $prog_fh or die "close ff-prog: $^OS_ERROR";
+    
+close $prog_fh or die "close ff-prog: $^OS_ERROR"
 push @delete, "ff-prog"
 
 $^OUTPUT_AUTOFLUSH = 0 # we want buffered output
@@ -133,7 +133,7 @@ for (qw(system qx popen))
 
 my $cmd = _create_runperl(
     prog =>
-    sprintf('print $^STDOUT, qq[ok $_\n] for (%d..%d)', $t, $t+2))
+    sprintf('for (%d..%d) { print $^STDOUT, qq[ok $_\n] }', $t, $t+2))
 print $^STDOUT, "# cmd = '$cmd'\n"
 open my $CMD, '-|', "$cmd" or die "Can't open pipe to '$cmd': $^OS_ERROR"
 while ( ~< $CMD)

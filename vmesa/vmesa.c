@@ -181,13 +181,13 @@ do_aspawn(SV* really, SV **mark, SV **sp)
              close(fd);
              MUTEX_LOCK(&PL_fdpid_mutex);
              p_sv  = av_fetch(PL_fdpid,fd,TRUE);
-             fd    = (int) SvIVX(*p_sv);
+             fd    = (int) SvIV(*p_sv);
              SvREFCNT_dec(*p_sv);
              *p_sv = &PL_sv_undef;
              sv    = *av_fetch(PL_fdpid,fd,TRUE);
              MUTEX_UNLOCK(&PL_fdpid_mutex);
              (void) SvUPGRADE(sv, SVt_IV);
-             SvIVX(sv) = pid;
+             SvIV_set(sv, pid);
              status    = 0;
           }
           else
@@ -414,7 +414,7 @@ my_popen(char *cmd, char *mode)
             sv = *av_fetch(PL_fdpid,pFd[this],TRUE);
             MUTEX_UNLOCK(&PL_fdpid_mutex);
             (void) SvUPGRADE(sv, SVt_IV);
-            SvIVX(sv) = pid;
+            SvIV_set(sv, pid);
             fd = PerlIO_fdopen(pFd[this], mode);
             close(pFd[that]);
          }
@@ -427,7 +427,7 @@ my_popen(char *cmd, char *mode)
          sv = *av_fetch(PL_fdpid,pFd[that],TRUE);
          MUTEX_UNLOCK(&PL_fdpid_mutex);
          (void) SvUPGRADE(sv, SVt_IV);
-         SvIVX(sv) = pFd[this];
+         SvIV_set(sv, pFd[this]);
          fd = PerlIO_fdopen(pFd[this], mode);
       }
    }
@@ -465,7 +465,7 @@ my_pclose(FILE *fp)
    MUTEX_LOCK(&PL_fdpid_mutex);
    sv        = av_fetch(PL_fdpid,PerlIO_fileno(fp),TRUE);
    MUTEX_UNLOCK(&PL_fdpid_mutex);
-   pid       = (int) SvIVX(*sv);
+   pid       = (int) SvIV(*sv);
    SvREFCNT_dec(*sv);
    *sv       = &PL_sv_undef;
    rc        = PerlIO_close(fp);

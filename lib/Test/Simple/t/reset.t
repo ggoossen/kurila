@@ -17,7 +17,8 @@ use Test::Builder;
 my $tb = Test::Builder->new
 
 my %Original_Output
-%Original_Output{+$_} = $tb->?$_ for qw(output failure_output todo_output)
+for (qw(output failure_output todo_output))
+    %Original_Output{+$_} = $tb->?$_
 
 
 $tb->plan(tests => 14)

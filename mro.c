@@ -199,7 +199,7 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
                     cand = seqhead;
                     if((tail_entry = hv_fetch_ent(tails, cand, 0, 0))
                        && (val = HeVAL(tail_entry))
-                       && (SvIVX(val) > 0))
+                       && (SvIV(val) > 0))
                            continue;
                     winner = newSVsv(cand);
                     av_push(retval, winner);

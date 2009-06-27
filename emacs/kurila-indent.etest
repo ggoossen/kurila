@@ -33,6 +33,8 @@ sub aap
 (defun indent-test (buffer)
   (set-buffer (get-buffer-create "*kurila-indent-test*"))
   (erase-buffer)
+  (kurila-mode)
+  (kurila-indent-mode)
   (insert buffer)
   (let (indents)
     (let ((linenr 1) start str)
@@ -54,6 +56,7 @@ sub aap
         (if (not (equal (car indents) got))
             (progn
               (message "Failed on %s - got %S - exp %S" linenr got (car indents))
+              (assert nil)
               ))
         (setq linenr (+ linenr 1))
         (setq indents (cdr indents))
@@ -69,6 +72,50 @@ sub aap
 ((8))             |        my $a = $a->{?$b}
 ((8) (12) (4) (0))|
 ((8) (12) (4) (0))|        # foo ")
+
+(indent-test "((0) (4))|package Foo::Bar
+((0) (4))         |
+((0) (4))         |for ($a)
+((4))             |    s///")
+
+(indent-test "((0) (4))|package Foo::Bar
+((0) (4))         |
+((0) (4))         |if ($a)
+((4))             |    33
+((4) (8) (0))     |else
+((4))             |    44")
+
+(indent-test "((0) (4))|package Foo::Bar
+((0) (4))         |
+((0) (4))         |if ($a) { 33 }
+((0) (4))         |44
+((0) (4))         |if ($a) { 33 } else { 44 }
+((0) (4))         |55")
+
+(indent-test "((0) (4))|package Foo::Bar
+((0) (4))         |
+((0) (4))         |if (@: $a,
+((4) (8))         |    $a)
+((4))             |    44")
+
+(indent-test "((0) (4))|package Foo::Bar
+((0) (4))         |
+((0) (4))         |sub aap
+((4))             |    noot($a,
+((9) (13))        |         $b)
+((4) (8) (0))     |
+((4) (8) (0))     |'sub aap'
+((0) (4))         |'noot'")
+
+;; indentation isnside qw() construct
+(indent-test "((0) (4))|package Foo::Bar
+((0) (4))         |
+((0) (4))         |aap(qw(noot
+((7))             |       mies))")
+
+;;             for (grep {defined},
+;;                  map      { $state->{$type}->{?$_} }, qw(goto continue))
+;;                  %reachable{+$_}++
 
 (defun kt-is (buffer line exp func)
   (save-excursion
@@ -141,7 +188,7 @@ sub aap
         (kurila-sniff-for-indent))
  (kt-is (kt-buffer-paren)
         5
-        '((9) (13) (8))
+        '((9) (13))
         (kurila-indent-indentation-info))
  )
 

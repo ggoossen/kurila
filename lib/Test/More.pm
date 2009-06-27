@@ -434,7 +434,7 @@ sub can_ok($proto, @< @methods)
         return $ok
     
 
-    my @nok = @( () )
+    my @nok = $@
     foreach my $method ( @methods)
         $tb->_try(sub (@< @_) { $proto->can($method) }) or push @nok, $method
     
@@ -606,7 +606,7 @@ because the notion of "compile-time" is relative.  Instead, you want:
 =cut
 
 sub use_ok($module, @< @imports)
-    @imports = @( () ) unless (nelems @imports)
+    @imports = $@ unless (nelems @imports)
     my $tb = Test::More->builder
 
     my@($pack,$filename,$line) =@( caller)
@@ -757,7 +757,7 @@ along these lines.
 =cut
 
 our (@Data_Stack, %Refs_Seen)
-my $DNE = bless \@(), 'Does::Not::Exist'
+my $DNE = bless \$@, 'Does::Not::Exist'
 
 sub _dne
     ref @_[0] eq ref $DNE
@@ -784,7 +784,7 @@ WARNING
 
     my $ok
 
-    local @Data_Stack = @()
+    local @Data_Stack = $@
     if( _deep_check($got, $expected) )
         $ok = $tb->ok(1, $name)
     else
@@ -829,7 +829,7 @@ sub _format_stack
     
 
     my @vals = @Stack[-1]->{vals}->[[@(0,1)]]
-    my @vars = @( () )
+    my @vars = $@
     (@vars[+0] = $var) =~ s/\$FOO/     \$got/
     (@vars[+1] = $var) =~ s/\$FOO/\$expected/
 

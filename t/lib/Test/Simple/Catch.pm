@@ -9,7 +9,7 @@ $err = \$('')
 open my $out_fh, '>>', $out or die
 open my $err_fh, '>>', $err or die
 
-use Test::Builder;
+use Test::Builder
 my $t = 'Test::Builder'->new
 $t->output($out_fh)
 $t->failure_output($err_fh)

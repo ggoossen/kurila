@@ -34,7 +34,7 @@ ok (eq_array(\@comma, \@temp), 'list from comma hash')
 @temp = @( each %comma )
 ok (eq_array (\@comma, \@temp), 'first each from comma hash')
 @temp = @( each %comma )
-ok (eq_array (\@(), \@temp), 'last each from comma hash')
+ok (eq_array (\$@, \@temp), 'last each from comma hash')
 
 my %temp = %( < %comma )
 
@@ -52,7 +52,7 @@ ok (eq_array (\@temp, \@temp), 'list from copy of comma hash')
 @temp = @( each %temp )
 ok (eq_array (\@temp, \@temp), 'first each from copy of comma hash')
 @temp = @( each %temp )
-ok (eq_array (\@(), \@temp), 'last each from copy of comma hash')
+ok (eq_array (\$@, \@temp), 'last each from copy of comma hash')
 
 my @arrow = @(Key =>"Value")
 
@@ -74,7 +74,7 @@ ok (eq_array (\@arrow, \@temp), 'list from arrow hash')
 @temp = @( each %arrow )
 ok (eq_array (\@arrow, \@temp), 'first each from arrow hash')
 @temp = @( each %arrow )
-ok (eq_array (\@(), \@temp), 'last each from arrow hash')
+ok (eq_array (\$@, \@temp), 'last each from arrow hash')
 
 %temp = %( < %arrow )
 
@@ -92,7 +92,7 @@ ok (eq_array (\@temp, \@temp), 'list from copy of arrow hash')
 @temp = @( each %temp )
 ok (eq_array (\@temp, \@temp), 'first each from copy of arrow hash')
 @temp = @( each %temp )
-ok (eq_array (\@(), \@temp), 'last each from copy of arrow hash')
+ok (eq_array (\$@, \@temp), 'last each from copy of arrow hash')
 
 my %direct = %('Camel', 2, 'Dromedary', 1)
 my %slow
@@ -181,13 +181,13 @@ ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at both ends")
 # test stringification of keys
 do
     no warnings 'once'
-    my @refs =    @( \ do { my $x }, \@(),   \%(),  sub {}, \ *x)
+    my @refs =    @( \ do { my $x }, \$@,   \%(),  sub {}, \ *x)
     our %h
     for my $ref ( @refs)
         dies_like( sub (@< @_) { %h{?$ref} }, qr/reference as string/ )
-    
 
-    bless $_ for  @refs
+    for (@refs)
+        bless $_
     %h = %( () )
     for my $ref ( @refs)
         dies_like( sub (@< @_) { %h{?$ref} }, qr/reference as string/ )

@@ -516,7 +516,7 @@ sub new
     $self->{+'indent_size'} = 4
     $self->{+'linenums'} = 0
     $self->{+'parens'} = 0
-    $self->{+'subs_todo'} = \@()
+    $self->{+'subs_todo'} = \$@
     $self->{+'unquote'} = 0
     $self->{+'use_dumper'} = 0
     $self->{+'use_tabs'} = 0
@@ -2921,7 +2921,7 @@ sub check_proto($self, $proto, @< @args)
             $doneok = 1
         elsif ($chr eq "@" or $chr eq "\%")
             push @reals, < map( {$self->deparse($_, 6) }, @args)
-            @args = @( () )
+            @args = $@
         else
             $arg = shift @args
             last unless $arg

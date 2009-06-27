@@ -53,7 +53,7 @@ __USAGE__
             map {
             my @($v, $d, $f) = File::Spec->splitpath($_);
             my @d;
-            @d = defined $d ?? File::Spec->splitdir($d) !! @();
+            @d = defined $d ?? File::Spec->splitdir($d) !! $@;
             shift @d if (nelems @d);
             File::Spec->catfile((nelems @d)
                 ?? ((nelems @d) == 1 && @d[0] eq '' ?? () !! < @d)
@@ -166,7 +166,7 @@ do
 
     # Things we copy from won't be in perl.pod
     # Things we copy to won't be in MANIFEST
-    %sources{[values %Copies]} = @()
+    %sources{[values %Copies]} = $@
 
     open(my $mani, "<", "../MANIFEST") || die "$^PROGRAM_NAME: opening ../MANIFEST failed: $^OS_ERROR"
     while ( ~< $mani->*)

@@ -16,11 +16,11 @@ use Config;
 our $TODO = "runperl() unable to emulate echo -n due to pipe bug" if $^OS_NAME eq 'VMS'
 
 my $r
-my @tmpfiles = @( () )
+my @tmpfiles = $@
 END { unlink < @tmpfiles }
 
 $r = runperl(
-    switches    => \@(),
+    switches    => \$@,
     stdin       => 'foo\nbar\nbaz\n',
     prog        => 'print $^STDOUT, qq(<$_>) while ~< *ARGV',
     )

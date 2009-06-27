@@ -63,7 +63,7 @@ print $^STDOUT, "ok 3\n"
 my $where = $udpb->recv(\(my $buf=""),5)
 print $^STDOUT, $buf
 
-my @xtra = @( () )
+my @xtra = $@
 
 unless(compare_addr($where,$udpa->sockname, 'recv name', 'sockname'))
     print $^STDOUT, "not "

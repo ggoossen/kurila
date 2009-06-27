@@ -284,13 +284,11 @@ sub atmark($sock)
     sockatmark($sock)
 
 
-sub timeout
-    nelems(@_) == 1 || (nelems @_) == 2 or croak 'usage: $sock->timeout([VALUE])'
-    my@($sock,$val) =  @_
+sub timeout($sock ?= $val)
     my $r = $sock->*->{?'io_socket_timeout'}
 
-    $sock->*->{+'io_socket_timeout'} = defined $val ?? 0 + $val !! $val
-        if((nelems @_) == 2)
+    if ($^is_assignment)
+        $sock->*->{+'io_socket_timeout'} = defined $val ?? 0 + $val !! $val
 
     $r
 

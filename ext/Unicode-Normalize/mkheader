@@ -113,9 +113,8 @@ while ($Combin =~ m/(.+)/g)
     if (@tab[1] eq '')
         %Combin{+$ini } = @tab[2]
     else
-        %Combin{+$_ } = @tab[2] foreach $ini .. hex(@tab[1])
-    
-
+        foreach ($ini .. hex(@tab[1]))
+            %Combin{+$_ } = @tab[2]
 
 while ($Decomp =~ m/(.+)/g)
     my @tab = split m/\t/, $1
@@ -140,7 +139,6 @@ while ($Decomp =~ m/(.+)/g)
                     %CompList{ + $listname }{+$dec->[1] } = $ini
                     %Comp1st{+$dec->[0] } = $listname
                     %Comp2nd{+$dec->[1] } = 1 if ! %Exclus{?$ini}
-                
             elsif ((nelems $dec->@) == 1)
                 %Single{+$ini } = 1
             else
@@ -182,7 +180,7 @@ sub getCanonList
     my @dec = @+: map {
         (SBase +<= $_ && $_ +<= SFinal) ?? decomposeHangul($_)
             !! %Canon{?$_} ??  %Canon{?$_}->@ !! @($_)
-    }, @src
+        }, @src
     return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCanonList(< @dec)
 # condition @src == @dec is not ok.
 
@@ -192,7 +190,7 @@ sub getCompatList
     my @dec = @+: map {
         (SBase +<= $_ && $_ +<= SFinal) ?? decomposeHangul($_)
             !! %Compat{?$_} ??  %Compat{?$_}->@ !! @($_)
-    }, @src
+        }, @src
     return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCompatList(< @dec)
 # condition @src == @dec is not ok.
 

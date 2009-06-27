@@ -40,9 +40,9 @@ do
         my $string = ''
         $string .= pack("U0a*", 'mnopqrstuvwx')
         $string = "abcdefghijkl$string"
-    
 
-    r2() and ok(1) for qw/ 4 5 /
+    for (qw/ 4 5 /)
+        r2() and ok(1)
 
 
 # test that nul bytes get copied

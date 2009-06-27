@@ -15,7 +15,7 @@ my %types = %(
     null => $null,
     iv => 3,
     nv => .5,
-    rv => \@(),
+    rv => \$@,
     pv => "Perl rules",
     pviv => 3,
     pvnv => 1==1,

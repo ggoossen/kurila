@@ -111,7 +111,8 @@ sub check_env
     if( $key eq 'SYS$LOGIN' && !$IsVMS && !$IsMacOS )
         ok( !chdir(),         "chdir() on $^OS_NAME ignores only \$ENV\{$key\} set" )
         is( abs_path, $Cwd,   '  abs_path() did not change' )
-        pass( "  no need to test SYS\$LOGIN on $^OS_NAME" ) for 1..7
+        for (1..7)
+            pass( "  no need to test SYS\$LOGIN on $^OS_NAME" )
     else
         ok( chdir(),              "chdir() w/ only \$ENV\{$key\} set" )
         is( abs_path, env::var($key), '  abs_path() agrees' )
@@ -171,7 +172,6 @@ END
     # Restore the environment for VMS (and doesn't hurt for anyone else)
     for my $key (@magic_envs)
         env::var($key) = %Saved_Env{$key}
-    
 
     # On VMS this must be deleted or process table is wrong on exit
     # when this script is run interactively.

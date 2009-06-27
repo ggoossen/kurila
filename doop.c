@@ -671,16 +671,6 @@ Perl_do_arg_check(pTHX_ SV** base)
     I32 numargs = 0;
 
     PERL_ARGS_ASSERT_DO_ARG_CHECK;
-/*     if (opargs & OA_MARK) { */
-/* 	arg = PL_stack_base + TOPMARK; */
-/*     } else { */
-/* 	I32 xoa = oa; */
-/* 	xoa >>= 4; */
-/* 	while (xoa) { */
-/* 	    arg--; */
-/* 	    xoa >>= 4; */
-/* 	} */
-/*     } */
 
     while (oa) {
 	if ( (oa & 7) == OA_LIST) {
@@ -699,21 +689,13 @@ Perl_do_arg_check(pTHX_ SV** base)
 	case OA_SCALAR:
 	    break;
 	case OA_AVREF:
-	    if ( ! SvAVOK(*arg) && SvOK(*arg) )
+	    if ( ! SvAVOK(*arg) )
 		bad_arg(numargs, "array", PL_op_desc[type], *arg);
 	    break;
 	case OA_HVREF:
-		if ( ! SvHVOK(*arg) )
-		    bad_arg(numargs, "hash", PL_op_desc[type], *arg);
-		break;
-/* 	    case OA_CVREF: */
-/* 		break; */
-/* 	    case OA_FILEREF: */
-/* 		break; */
-/* 	    case OA_SCALARREF: */
-/* 		if ( ! SvROK(*arg) || ! SvAVOK(SvRV(*arg)) ) */
-/* 		    bad_arg(numargs, "array", SvDESC(arg)); */
-/* 		break; */
+	    if ( ! SvHVOK(*arg) )
+		bad_arg(numargs, "hash", PL_op_desc[type], *arg);
+	    break;
 	default:
 	    Perl_croak(aTHX_ "panic: unknown expeced arugment type");
 	}

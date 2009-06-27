@@ -57,8 +57,8 @@ do
     no warnings 'unopened'
     if (tell(\*ETHER) == -1)  { print $^STDOUT, "ok 16\n"; } else { print $^STDOUT, "not ok 16\n"; }
 
-
-print $^STDOUT, "ok $_\n" for 17..23
+for (17..23)
+    print $^STDOUT, "ok $_\n"
 
 # ftell(STDIN) (or any std streams) is undefined, it can return -1 or
 # something else.  ftell() on pipes, fifos, and sockets is defined to

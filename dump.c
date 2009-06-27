@@ -495,7 +495,7 @@ Perl_sv_peek(pTHX_ SV *sv)
 	    SV * const tmp = newSVpvs("");
 	    sv_catpv(t, "(");
 	    if (SvOOK(sv))
-		Perl_sv_catpvf(aTHX_ t, "[%s]", pv_display(tmp, SvPVX_const(sv)-SvIVX(sv), SvIVX(sv), 0, 127));
+		Perl_sv_catpvf(aTHX_ t, "[%s]", pv_display(tmp, SvPVX_const(sv)-I_SvIV(sv), SvIVX(sv), 0, 127));
 	    Perl_sv_catpvf(aTHX_ t, "%s)", pv_display(tmp, SvPVX_const(sv), SvCUR(sv), SvLEN(sv), 127));
 	    Perl_sv_catpvf(aTHX_ t, " [UTF8 \"%s\"]",
 			   sv_uni_display(tmp, sv, 8 * sv_len_utf8(sv),
@@ -510,7 +510,7 @@ Perl_sv_peek(pTHX_ SV *sv)
 	if (SvIsUV(sv))
 	    Perl_sv_catpvf(aTHX_ t, "(%"UVuf")", (UV)SvUVX(sv));
 	else
-            Perl_sv_catpvf(aTHX_ t, "(%"IVdf")", (IV)SvIVX(sv));
+            Perl_sv_catpvf(aTHX_ t, "(%"IVdf")", (IV)I_SvIV(sv));
     }
     else
 	sv_catpv(t, "()");
@@ -753,7 +753,7 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 		    PerlIO_write(file, SvPVX_const(ary[i]), SvCUR(ary[i]));
 		}
 		else if (SvIOK(ary[i])) {
-		    PerlIO_printf(file, "%"IVdf, (IV)SvIVX(ary[i]));
+		    PerlIO_printf(file, "%"IVdf, (IV)I_SvIV(ary[i]));
 		}
 		PerlIO_write(file, STR_WITH_LEN(" "));
 	    }
@@ -1437,7 +1437,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 		    PerlIO_write(file, SvPVX_const(ary[i]), SvCUR(ary[i]));
 		}
 		else if (SvIOK(ary[i])) {
-		    PerlIO_printf(file, "%"IVdf, (IV)SvIVX(ary[i]));
+		    PerlIO_printf(file, "%"IVdf, (IV)I_SvIV(ary[i]));
 		}
 		PerlIO_write(file, STR_WITH_LEN(" "));
 	    }
@@ -1454,7 +1454,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	                             )
 	    Perl_dump_indent(aTHX_ level, file, "  UV = %"UVuf, (UV)SvUVX(sv));
 	else
-	    Perl_dump_indent(aTHX_ level, file, "  IV = %"IVdf, (IV)SvIVX(sv));
+	    Perl_dump_indent(aTHX_ level, file, "  IV = %"IVdf, (IV)I_SvIV(sv));
 #ifdef PERL_OLD_COPY_ON_WRITE
 	if (SvIsCOW_shared_hash(sv))
 	    PerlIO_printf(file, "  (HASH)");
@@ -2269,7 +2269,7 @@ Perl_sv_xmlpeek(pTHX_ SV *sv)
 	if (SvIsUV(sv))
 	    Perl_sv_catpvf(aTHX_ t, "%"UVuf"", (UV)SvUVX(sv));
 	else
-            Perl_sv_catpvf(aTHX_ t, "%"IVdf"", (IV)SvIVX(sv));
+            Perl_sv_catpvf(aTHX_ t, "%"IVdf"", (IV)I_SvIV(sv));
     }
     else
 	sv_catpv(t, "");

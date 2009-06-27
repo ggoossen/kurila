@@ -23,7 +23,8 @@ sub getoutput
         my @out = @( ~< $in )
         close($in)
         my $exit = $^CHILD_ERROR>>8
-        s/^/#/ for  @out
+        for (@out)
+            s/^/#/
         print $^STDOUT, "#EXIT=$exit OUTPUT=+++#$(join '',@out)#+++\n"
         return @($exit, join("", @out))
     

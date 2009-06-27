@@ -54,7 +54,8 @@ if ('PerlIO::Layer'->find( 'perlio'))
         for my $binmode (1..2)
             open(my $foo_fh, ">", "$file")
             # require PerlIO; print PerlIO::get_layers($foo), "\n";
-            binmode($foo_fh, "$utf8:crlf") for 1..$binmode
+            for (1..$binmode)
+                binmode($foo_fh, "$utf8:crlf")
             # require PerlIO; print PerlIO::get_layers($foo), "\n";
             print $foo_fh, "Hello\n"
             close $foo_fh

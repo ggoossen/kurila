@@ -158,7 +158,8 @@ sub catdir
 
 sub path
     my @path = split(';', env::var('PATH'))
-    s/"//g for  @path
+    for (@path)
+        s/"//g
     @path = grep { length }, @path
     unshift(@path, ".")
     return @path

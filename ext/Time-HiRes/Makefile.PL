@@ -104,7 +104,7 @@ __EOD__
             close $cmdfile
             system("\@ $tmp.com")
             $ok = $^CHILD_ERROR==0
-            for (@: "$tmp.c", "$tmp$obj_ext", "$tmp.com",
+            for (@: "$tmp.c", "$tmp$obj_ext", "$tmp.com"
                     $tmp . config_value('exe_ext'))
                 1 while unlink $_
             

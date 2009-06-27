@@ -333,9 +333,8 @@ sub check_graph_vs_output($chart, $got)
                        "check the chart layout matches the formatted output")
     unless ($all_passed)
         print $^STDERR, "# Something went wrong there. I got this chart:\n"
-        print $^STDERR, "# $_\n" foreach split m/\n/, $got
-    
-
+        foreach (split m/\n/, $got)
+            print $^STDERR, "# $_\n"
 
 sub check_graph($title, $row1, $row2)
     is (nelems $title->@, 4, "Four entries in title row")

@@ -48,7 +48,7 @@ sub parse_lines             # Usage: $parser->parse_lines(@lines)
         print $^STDOUT, "#  About to parse lines: ",
         join(' ', map { defined($_) ?? "[$_]" !! "EOF" }, @_), "\n"
 
-    my $paras = ($self->{+'paras'} ||= \@())
+    my $paras = ($self->{+'paras'} ||= \$@)
     # paragraph buffer.  Because we need to defer processing of =over
     # directives and verbatim paragraphs.  We call _ponder_paragraph_buffer
     # to process this.
@@ -372,7 +372,7 @@ do
         # Return 0 or more fake-o paragraphs explaining the accumulated
         #  errors on this document.
 
-        return @() unless $self->{?'errata'}
+        return $@ unless $self->{?'errata'}
 
         my @out
 
@@ -446,7 +446,7 @@ sub _ponder_paragraph_buffer($self)
 
     my $paras
     return unless nelems(($paras = $self->{?'paras'})->@)
-    my $curr_open = ($self->{+'curr_open'} ||= \@())
+    my $curr_open = ($self->{+'curr_open'} ||= \$@)
 
     my $scratch
 
@@ -1776,13 +1776,12 @@ sub _dump_curr_open($self) # return a string representation of the stack
 
     return '[empty]' unless (nelems $curr_open->@)
     return join '; ', map {;
-        ($_->[0] eq '=for')
-            ?? ( ($_->[1]->{?'~really'} || '=over')
-                     . ' ' . $_->[1]->{?'target'})
-            !! $_->[0]
-    },
+            ($_->[0] eq '=for')
+                ?? ( ($_->[1]->{?'~really'} || '=over')
+                         . ' ' . $_->[1]->{?'target'})
+                !! $_->[0]
+        },
         $curr_open->@
-    
 
 
 ###########################################################################
@@ -1810,34 +1809,33 @@ sub pretty(@< @stuff) # adopted from Class::Classless
     my $out =
         # join ",\n" .
         join ", ", map {;
-        if(!defined($_))
-            "undef"
-        elsif(ref($_) eq 'ARRAY' or ref($_) eq 'Pod::Simple::LinkSection')
-            $x = "[ " . pretty(< $_->@) . " ]" 
-            $x
-        elsif(ref($_) eq 'SCALAR')
-            $x = "\\" . pretty($_->$) 
-            $x
-        elsif(ref($_) eq 'HASH')
-            my $hr = $_
-            $x = "\{" . join(", ", map( {pretty($_) . '=>' . pretty($hr->{?$_}) },
-                sort keys $hr->% ) ) . "\}" 
-            $x
-         elsif(!length($_)) { q{''} # empty string
-        }elsif(
-            $_ eq '0' # very common case
-            or(
-           m/^-?(?:[123456789]\d*|0)(?:\.\d+)?$/s
-         and $_ ne '-0' # the strange case that that RE lets thru
-         )
-            ) { $_;
-        }else
-            s<([^\x[20]\x[21]\x[23]\x[27]-\x[3F]\x[41]-\x[5B]\x[5D]-\x[7E]])>
-                #<$pretty_form{$1} || '\\x'.(unpack("H2",$1))>eg;
-                <$(%pretty_form{?$1} || '\\x['.sprintf("\%.2x", ord($1)) . ']')>g
-            qq{"$_"}
-        
-    }, @stuff
+            if(!defined($_))
+                "undef"
+            elsif(ref($_) eq 'ARRAY' or ref($_) eq 'Pod::Simple::LinkSection')
+                $x = "[ " . pretty(< $_->@) . " ]" 
+                $x
+            elsif(ref($_) eq 'SCALAR')
+                $x = "\\" . pretty($_->$) 
+                $x
+            elsif(ref($_) eq 'HASH')
+                my $hr = $_
+                $x = "\{" . join(", ", map( {pretty($_) . '=>' . pretty($hr->{?$_}) },
+                                 sort keys $hr->% ) ) . "\}"
+                $x
+             elsif(!length($_)) { q{''} # empty string
+            }elsif(
+                $_ eq '0' # very common case
+                or(
+               m/^-?(?:[123456789]\d*|0)(?:\.\d+)?$/s
+             and $_ ne '-0' # the strange case that that RE lets thru
+             )
+                ) { $_;
+            }else
+                s<([^\x[20]\x[21]\x[23]\x[27]-\x[3F]\x[41]-\x[5B]\x[5D]-\x[7E]])>
+                    #<$pretty_form{$1} || '\\x'.(unpack("H2",$1))>eg;
+                    <$(%pretty_form{?$1} || '\\x['.sprintf("\%.2x", ord($1)) . ']')>g
+                qq{"$_"}
+        }, @stuff
     # $out =~ s/\n */ /g if length($out) < 75;
     return $out
 

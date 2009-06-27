@@ -279,7 +279,7 @@ for (0..((nelems @opq)-1)) {
 diag "# T_ARRAY\n";
 my @inarr = @(1,2,3,4,5,6,7,8,9,10);
 T_ARRAY( 5, < @inarr );
-my @outarr = @( < T_ARRAY( 5, < @inarr ) );
+my @outarr = T_ARRAY( 5, < @inarr );
 is(scalar(nelems @outarr), scalar(nelems @inarr));
 
 for (0..((nelems @inarr)-1)) {

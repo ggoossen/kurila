@@ -165,7 +165,7 @@ SKIP:
 
     my $dirname = 'File::Spec'->catdir($updir => lib => unicore => lib => 'gc_sc')
     opendir my $dh, $dirname or die $^OS_ERROR
-    %files{[@(readdir($dh))]} = @()
+    %files{[@(readdir($dh))]} = $@
     closedir $dh
 
     for (keys %utf8::PA_reverse)

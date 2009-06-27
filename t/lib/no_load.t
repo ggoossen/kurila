@@ -16,7 +16,8 @@ my @TESTS = @(
     )
 
 my $count = 0
-$count += (nelems $_->@) - 1 for  @TESTS
+for (@TESTS)
+    $count += (nelems $_->@) - 1
 
 print $^STDOUT, "1..$count\n"
 

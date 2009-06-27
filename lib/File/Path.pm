@@ -564,7 +564,7 @@ sub mkpath
             $arg = (pop @_)->%
             exists $arg{mask} and $arg{+mode} = delete $arg{mask}
             $arg{+mode} = 0777 unless exists $arg{mode}
-            $arg{error}->$ = \@() if exists $arg{error}
+            $arg{error}->$ = \$@ if exists $arg{error}
         else
             $arg{[+qw(verbose mode)]} = @(0, 0777)
         
@@ -620,8 +620,8 @@ sub rmtree
     else
         if ((nelems @_) +> 0 and UNIVERSAL::isa(@_[-1],'HASH'))
             $arg = (pop @_)->$
-            $arg{error}->$  = \@() if exists $arg{error}
-            $arg{result}->$ = \@() if exists $arg{result}
+            $arg{error}->$  = \$@ if exists $arg{error}
+            $arg{result}->$ = \$@ if exists $arg{result}
         else
             $arg{[+qw(verbose safe)]} = @(0, 0)
         
@@ -713,7 +713,7 @@ sub _rmtree($arg, $paths)
             my $d
             if (!opendir $d, $curdir)
                 _error($arg, "cannot opendir", $canon)
-                @files = @( () )
+                @files = $@
             else
                 @files = @( readdir $d )
                 closedir $d

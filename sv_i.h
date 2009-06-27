@@ -43,7 +43,11 @@ static __inline__ const char* inlineDdesc(pTHX_ SV *sv) {
 IV
 Perl_SvIV(pTHX_ SV *sv) {
     PERL_ARGS_ASSERT_SVIV;
-    return SvIOK(sv) ? SvIVX(sv) : sv_2iv(sv);
+    assert(SvTYPE(sv) != SVt_PVAV);
+    assert(SvTYPE(sv) != SVt_PVHV);
+    assert(SvTYPE(sv) != SVt_PVCV);
+    assert(!isGV_with_GP(sv));
+    return SvIOK(sv) ? I_SvIV(sv) : sv_2iv(sv);
 }
 UV
 Perl_SvUV(pTHX_ SV *sv) {
@@ -104,7 +108,7 @@ Perl_SvTRUE(pTHX_ SV *sv)
             : 0;
     }					
     if (SvIOK(sv)) {
-        return SvIVX(sv) != 0;
+        return I_SvIV(sv) != 0;
     }
     if (SvNOK(sv))
         return SvNVX(sv) != 0.0;

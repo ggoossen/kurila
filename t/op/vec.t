@@ -19,7 +19,7 @@ is(vec($foo,1,8), 0)
 vec($foo,1,8, 0xf1)
 is(vec($foo,1,8), 0xf1)
 is((unpack('C',substr($foo,1,1)) ^&^ 255), 0xf1)
-is(vec($foo,2,4), 1);
+is(vec($foo,2,4), 1)
 is(vec($foo,3,4), 15)
 vec($Vec, 0, 32, 0xbaddacab)
 is($Vec, "\x[baddacab]")
@@ -55,6 +55,7 @@ do
     vec($s, 0, 1, 0)
     vec($s, 1, 1, 1)
     my @r
-    @r[+$_] = \ vec $s, $_, 1 for @( (0, 1))
+    for (@: 0, 1)
+        @r[+$_] = \ vec $s, $_, 1
     ok(!( @r[0]->$ != 0 ||  @r[1]->$ != 1))
 

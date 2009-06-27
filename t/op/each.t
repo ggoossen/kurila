@@ -98,7 +98,7 @@ do
     package Obj
     sub DESTROY { print $^STDOUT, "ok @::tests[?1] # DESTROY called\n"; }
     do
-        my $h = \%( A => bless \@(), __PACKAGE__ )
+        my $h = \%( A => bless \$@, __PACKAGE__ )
         while (my@(?$k,?$v) =@( each $h->%))
             print $^STDOUT, "ok @::tests[?0]\n" if $k eq 'A' and ref($v) eq 'Obj'
         
@@ -125,9 +125,11 @@ $a = "\x[e3]\x[81]\x[82]"; $A = "\x{3042}"
 
 is (exists %b{$A}, '1', "hash uses byte-string")
 is (exists %u{$a}, '1', "hash uses byte-string")
-print $^STDOUT, "# %b{?$_}\n" for keys %b # Used to core dump before change #8056.
+for (keys %b)
+    print $^STDOUT, "# %b{?$_}\n"  # Used to core dump before change #8056.
 pass ("if we got here change 8056 worked")
-print $^STDOUT, "# %u{?$_}\n" for keys %u # Used to core dump before change #8056.
+for (keys %u)
+    print $^STDOUT, "# %u{?$_}\n" # Used to core dump before change #8056.
 pass ("change 8056 is thanks to Inaba Hiroto")
 
 do

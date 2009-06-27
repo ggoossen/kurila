@@ -15,7 +15,7 @@ my $r = $c->reval(q!
 !)
 
 is( $r, "pwned", "isa overriden in compartment" )
-is( (bless\@(),"Foo")->isa("Foo"), 1, "... but not outside" )
+is( (bless\$@,"Foo")->isa("Foo"), 1, "... but not outside" )
 
 sub Foo::foo {}
 
@@ -25,5 +25,5 @@ $r = $c->reval(q!
 !)
 
 is( $r, "pwned", "can overriden in compartment" )
-is( (bless\@(),"Foo")->can("foo"), \&Foo::foo, "... but not outside" )
+is( (bless\$@,"Foo")->can("foo"), \&Foo::foo, "... but not outside" )
 

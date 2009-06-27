@@ -11,7 +11,7 @@ use version
 use Config
 
 
-my @tests = @( () )
+my @tests = $@
 my ($i, $template, $data, $result, $comment, $w, $x, $evalData, $n, $p)
 
 my $Is_VMS_VAX = 0
@@ -92,7 +92,8 @@ for my  $i (1 .. nelems(@tests))
             my $vsn = defined $1 ?? $1 !! "0"
             # Only compare on the the first pair of digits, as numeric
             # compares don't like 2.6.10-3mdksmp or 2.6.8-24.10-default
-            s/^(\d+(\.\d+)?).*/$1/ for @( $osv, $vsn)
+            for (@: \$osv, \$vsn)
+                $_->$ =~ s/^(\d+(\.\d+)?).*/$1/
             $skip = $vsn ?? ($osv +<= $vsn ?? 1 !! 0) !! 1
         
         $skip and $comment =~ s/$/, failure expected on $^OS_NAME $osv/

@@ -16,7 +16,7 @@ $tb->level(0)
 ok !try { $tb->plan( tests => 'no_plan' ); }
 is $^EVAL_ERROR->{?description}, "Number of tests must be a positive integer.  You gave it 'no_plan'"
 
-my $foo = \@()
+my $foo = \$@
 my @foo = @($foo, 2, 3)
 ok !try { $tb->plan( tests => $foo ) }
 like $^EVAL_ERROR->{?description}, qr/reference as string/

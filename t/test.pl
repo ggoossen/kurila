@@ -386,13 +386,11 @@ my $is_cygwin   = $^OS_NAME eq 'cygwin'
 sub _quote_args
     my @($runperl, $args) =  @_
 
-    foreach ( $args->@)
+    foreach ($args->@)
         # In VMS protect with doublequotes because otherwise
         # DCL will lowercase -- unless already doublequoted.
         $_ = q(").$_.q(") if $is_vms && !m/^\"/ && length($_) +> 0
         $runperl->$ .= ' ' . $_
-    
-
 
 sub _create_runperl # Create the string to qx in runperl().
     my %args = %( < @_ )
@@ -408,8 +406,7 @@ sub _create_runperl # Create the string to qx in runperl().
             $runperl .= ' -MMac::err=unix' if %args{?stderr}
         else
             $runperl .= ' "-I../lib"' # doublequotes because of VMS
-        
-    
+
     if (%args{?switches})
         local $Level = 2
         die "test.pl:runperl(): 'switches' must be an ARRAYREF " . _where()
@@ -429,7 +426,6 @@ sub _create_runperl # Create the string to qx in runperl().
                 $runperl .= qq ( -e "$prog" )
             else
                 $runperl .= qq ( -e '$prog' )
-            
         
     elsif (defined %args{?progfile})
         $runperl .= qq( "%args{?progfile}")
@@ -464,8 +460,6 @@ sub _create_runperl # Create the string to qx in runperl().
         else
             $runperl = qq{$^EXECUTABLE_NAME -e 'print \$^STDOUT, qq(} .
                 %args{?stdin} . q{)' | } . $runperl
-        
-    
     if (defined %args{?args})
         _quote_args(\$runperl, %args{?args})
     
@@ -662,7 +656,7 @@ sub can_ok ($proto, @< @methods)
         return _ok( 0, < _where(), "$class->can(...)" )
     
 
-    my @nok = @( () )
+    my @nok = $@
     foreach my $method ( @methods)
         local($^OS_ERROR, $^EVAL_ERROR)  # don't interfere with caller's $@
         # eval sometimes resets $!

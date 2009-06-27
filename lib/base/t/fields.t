@@ -12,7 +12,7 @@ use fields < qw(_no Pants who _up_yours)
 use fields < qw(what)
 
 sub new { fields::new(shift) }
-sub magic_new { bless \@() }  # Doesn't 100% work, perl's problem.
+sub magic_new { bless \$@ }  # Doesn't 100% work, perl's problem.
 
 package main
 
@@ -78,7 +78,8 @@ use fields < qw(a b c);
 sub new
     my $self = fields::new(shift)
     my @(%<%h) =  @_ if (nelems @_)
-    $self->{+$_} = %h{$_} for keys %h
+    for (keys %h)
+        $self->{+$_} = %h{$_}
     $self
 
 

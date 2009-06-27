@@ -8,7 +8,7 @@
 # errors that might kill the interpreter and for some reason you can't
 # use an eval().
 
-BEGIN 
+BEGIN
     require './test.pl'	# for which_perl() etc
 
 
@@ -17,7 +17,7 @@ my $Perl = which_perl()
 
 $^OUTPUT_AUTOFLUSH=1
 
-my @prgs = @( () )
+my @prgs = $@
 while( ~< $^DATA)
     if(m/^#{8,}\s*(.*)/)
         push @prgs, \@('', $1)
@@ -135,7 +135,9 @@ EXPECT
 # used to attach defelem magic to all immortal values,
 # which made restore of local $_ fail.
 foo(2+>1);
-sub foo { bar() for $: @_;  }
+sub foo
+    for ($: @_)
+        bar()
 sub bar { local $_; }
 print $^STDOUT, "ok\n";
 EXPECT
@@ -159,7 +161,7 @@ inner peace
 ########
 our $s = 0;
 map {#this newline here tickles the bug
-$s += $_}, @(1,2,4);
+     $s += $_}, @(1,2,4);
 print $^STDOUT, "eat flaming death\n" unless ($s == 7);
 ########
 BEGIN { @ARGV = qw(a b c d e) }
@@ -306,14 +308,14 @@ EXPECT
 "x" =~ m/(\G?x)?/;
 ########
 # Bug 20010515.004
-my @h = 1 .. 10;
-bad(<@h);
-sub bad {
-   undef @h;
-   print $^STDOUT, "O";
-   print $^STDOUT, $_ for @_;
-   print $^STDOUT, "K";
-}
+my @h = 1 .. 10
+bad(<@h)
+sub bad
+   undef @h
+   print $^STDOUT, "O"
+   for (@_)
+       print $^STDOUT, $_
+   print $^STDOUT, "K"
 EXPECT
 O12345678910K
 ########

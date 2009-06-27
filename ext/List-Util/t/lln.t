@@ -15,6 +15,6 @@ is(! !looks_like_number("NaN"),	    1,	'NaN')
 is(! !looks_like_number("foo"),	    '',			'foo')
 is(! !looks_like_number(undef),	    '',           	'undef')
 is(! !looks_like_number(\%()),	    '',			'HASH Ref')
-is(! !looks_like_number(\@()),	    '',			'ARRAY Ref')
+is(! !looks_like_number(\$@),	    '',			'ARRAY Ref')
 
 # We should copy some of perl core tests like t/base/num.t here

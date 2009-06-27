@@ -89,7 +89,7 @@ for my $full (keys %fonts)
 #  [perl #29340] optimising away the = () left the padav returning the
 # array rather than the contents, leading to 'Bizarre copy of array' error
 
-sub opta { my @a= @(() ) }
+sub opta { my @a= $@ }
 sub opth { my %h= %(() ) }
 try { my $x = opta }
 print $^STDOUT, "not " if $^EVAL_ERROR

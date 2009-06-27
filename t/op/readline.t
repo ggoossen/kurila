@@ -21,7 +21,7 @@ do
 foreach my $k (@(1, 82))
     my $result
         = runperl (stdin => '', stderr => 1,
-                   prog => "our (\$x, \%a); \$x = q(k) x $k; \%a\{+\$x\} = q(v); \$_ = ~< *ARGV foreach keys \%a; print \$^STDOUT, q(end)",
+                   prog => "our (\$x, \%a); \$x = q(k) x $k; \%a\{+\$x\} = q(v); foreach (keys \%a) \{ \$_ = ~< *ARGV \}; print \$^STDOUT, q(end)",
                    )
     $result =~ s/\n\z// if $^OS_NAME eq 'VMS'
     is ($result, "end", '[perl #21614] for length ' . length('k' x $k))
@@ -81,7 +81,7 @@ fresh_perl_is('BEGIN{~< *ARGV}', '',
               \%( switches => \@('-w'), stdin => '', stderr => 1 ),
               'No ARGVOUT used only once warning')
 
-my $obj = bless \@()
+my $obj = bless \$@
 dies_like( sub (@< @_) { $obj .= ~< $^DATA; }, qr/reference as string/, 'rcatline and refs')
 
 __DATA__

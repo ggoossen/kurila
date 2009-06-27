@@ -2,20 +2,19 @@
 
 use Test::More
 
-BEGIN 
+BEGIN
     use Config
     unless (config_value("usedl"))
         plan skip_all => "no usedl"
-    
 
 
 plan "no_plan"
 
 # use warnings;
-use ExtUtils::MakeMaker;
-use ExtUtils::Constant < qw (C_constant);
-use File::Spec;
-use Cwd;
+use ExtUtils::MakeMaker
+use ExtUtils::Constant < qw (C_constant)
+use File::Spec
+use Cwd
 
 # For debugging set this to 1.
 my $keep_files = 0
@@ -60,7 +59,7 @@ die "Can't get current directory: $^OS_ERROR" unless defined $orig_cwd
 diag "$dir being created..."
 mkdir $dir, 0777 or die "mkdir: $^OS_ERROR\n"
 
-END 
+END
     if (defined $orig_cwd and length $orig_cwd)
         chdir $orig_cwd or die "Can't chdir back to '$orig_cwd': $^OS_ERROR"
         use File::Path;
@@ -69,7 +68,7 @@ END
     else
         # Can't get here.
         die "cwd at start was empty, but directory '$dir' was created" if $dir
-    
+
 
 
 chdir $dir or die $^OS_ERROR
@@ -88,7 +87,7 @@ sub check_for_bonus_files
         next if %expect{$entry}
         diag "Extra file '$entry'"
         $fail = 1
-    
+
 
     closedir $dh or warn "closedir '.': $^OS_ERROR"
     ok( ! $fail )
@@ -99,11 +98,11 @@ sub build_and_run($tests, $files)
     my @perlout = @( `$runperl Makefile.PL $core` )
     if ($^CHILD_ERROR)
         fail("$runperl Makefile.PL failed: $^CHILD_ERROR")
-        diag "$_" foreach  @perlout
+        foreach (@perlout)
+            diag "$_"
         exit($^CHILD_ERROR)
     else
         pass
-    
 
     ok(-f "$makefile$makefile_ext")
 
@@ -136,17 +135,16 @@ sub build_and_run($tests, $files)
         $timewarp = 10 if $timewarp +> 10
         diag "Sleeping for $timewarp second(s) to try to resolve this"
         sleep $timewarp
-    
 
     diag "make = '$make'"
     @makeout = @( `$make` )
     if ($^CHILD_ERROR)
         fail("$make failed: $^CHILD_ERROR")
-        diag "$_" foreach  @makeout
+        foreach (@makeout)
+            diag "$_"
         exit($^CHILD_ERROR)
     else
         pass()
-    
 
     if ($^OS_NAME eq 'VMS') { $make =~ s{ all}{}; }
 
@@ -164,27 +162,28 @@ sub build_and_run($tests, $files)
     else
         # Harness will report missing test results at this point.
         print $^STDOUT, "# Open <$output failed: $^OS_ERROR\n"
-    
 
     my $tb = Test::Builder->new()
     $tb->current_test += $tests
 
     if ($^CHILD_ERROR)
         fail("$maketest failed: $^CHILD_ERROR")
-        diag "$_" foreach  @makeout
+        foreach (@makeout)
+            diag "$_"
     else
         pass("maketest")
-    
+
 
     my $makeclean = "$make clean"
     diag "make = '$makeclean'"
     @makeout = @( `$makeclean` )
     if ($^CHILD_ERROR)
         fail("$make failed: $^CHILD_ERROR")
-        diag "$_" foreach  @makeout
+        foreach (@makeout)
+            diag "$_"
     else
         pass
-    
+
 
     check_for_bonus_files ('.', < $files->@, $output, $makefile_rename, '.', '..')
 
@@ -199,18 +198,19 @@ sub build_and_run($tests, $files)
     @makeout = @( `$makedistclean` )
     if ($^CHILD_ERROR)
         fail("$make failed: $^CHILD_ERROR")
-        diag "$_" foreach  @makeout
+        foreach (@makeout)
+            diag "$_"
     else
         pass
-    
+
 
     check_for_bonus_files ('.', < $files->@, '.', '..')
 
     unless ($keep_files)
         foreach ( $files->@)
             unlink $_ or warn "unlink $_: $^OS_ERROR"
-        
-    
+
+
 
     check_for_bonus_files ('.', '.', '..')
 
@@ -244,7 +244,8 @@ sub MANIFEST
     my $manifest = "MANIFEST"
     push @files, $manifest
     open my $fh, ">", "$manifest" or die "open >$manifest: $^OS_ERROR\n"
-    print $fh, "$_\n" foreach  @files
+    foreach (@files)
+        print $fh, "$_\n"
     close $fh or die "close $manifest: $^OS_ERROR\n"
     return @files
 
@@ -323,7 +324,8 @@ EOT
     print $fh, "\@EXPORT_OK = qw(\n"
 
     # Print the names of all our autoloaded constants
-    print $fh, "\t$_\n" foreach @( (< $export_names->@))
+    foreach ($export_names->@)
+        print $fh, "\t$_\n"
     print $fh, ");\n"
     print $fh, "$package->bootstrap(\$VERSION);\n1;\n__END__\n"
     close $fh or die "close $pm: $^OS_ERROR\n"
@@ -410,7 +412,7 @@ EOT
 
     while (my @(?$point, ?$bearing) =@( each %compass))
         $header .= "#define $point $bearing\n"
-    
+
 
     my @items = @("FIVE", \%(name=>"OK6", type=>"PV",),
                   \%(name=>"OK7", type=>"PVN",
@@ -433,7 +435,8 @@ EOT
                   . "SvIV_set(temp_sv, 1149);"),
         )
 
-    push @items, $_ foreach keys %compass
+    foreach (keys %compass)
+        push @items, $_
 
     # Automatically compile the list of all the macro names, and make them
     # exported constants.
@@ -655,7 +658,7 @@ sub explict_call_constant($string, $expect)
     # This does assume simple strings suitable for ''
     my $test_body = <<"EOT"
 do \{
-  my \@(?\$error, ?\$got) = \@: $($package)::constant ('$string');\n;
+  my \@(?\$error, ?\$got) = (\@: $($package)::constant ('$string'));\n;
 EOT
 
     if (defined $expect)
@@ -677,7 +680,7 @@ EOT
     print \$^STDOUT, "not ok $dummytest # expected error, got no error and '\$got'\n";
   \}
 EOT
-    
+
     $dummytest++
     return $test_body . <<'EOT'
 };
@@ -710,8 +713,8 @@ EOT
             $test_body .= explict_call_constant ($copyname,
                                                  $copyname eq $thisname
                                                  ?? $thisname !! undef)
-        
-    
+
+
     # Ho. This seems to be buggy in 5.005_03:
     # # Now remove $name from @_:
     # shift @_;
@@ -729,7 +732,8 @@ simple ("Twos and three middle", < qw(aa ae ai ea eu ie io oe era eta))
 # Given the choice go for the end, else the earliest point
 simple ("Three end and four symetry", < qw(ean ear eat barb marm tart))
 
-write_and_run_extension < $_ foreach  @tests
+foreach (@tests)
+    write_and_run_extension < $_
 
 # This was causing an assertion failure (a C<confess>ion)
 # Any single byte > 128 should do it.

@@ -36,7 +36,7 @@ my $r = scalar nelems @r
 print $^STDOUT, "ok 4\n"
 
 # check if list context works
-@r = @( () )
+@r = $@
 if ($^OS_NAME eq 'MacOS')
     for (glob(":*:a*.t"))
         print $^STDOUT, "# $_\n"

@@ -9,7 +9,8 @@ use File::Spec
 my($blib, $blib_arch, $blib_lib, @blib_dirs)
 
 sub _cleanup
-    rmdir foreach reverse @_
+    foreach (reverse @_)
+        rmdir
     unlink "stderr" unless $^OS_NAME eq 'MacOS'
 
 

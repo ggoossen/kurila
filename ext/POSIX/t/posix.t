@@ -101,13 +101,11 @@ SKIP: do
 
         sub SigINT
             $sigint_called++
-        
 
         # The order of the above tests is very important, so
         # we use literal prints and hard coded numbers.
-        next_test() for 1..4
-    
-
+        for (1..4)
+            next_test()
 
 SKIP: do
     skip("_POSIX_OPEN_MAX is inaccurate on MPE", 1) if $Is_MPE
@@ -262,8 +260,8 @@ ok(!POSIX::isxdigit('g'), 'isxdigit' )
 ok( POSIX::isalnum(''),   'isalnum empty string' )
 ok( POSIX::isalnum(undef),'isalnum undef' )
 # those functions should stringify their arguments
-dies_like( sub (@< @_) { POSIX::isalpha(\@()) }, qr/reference as string/,   'isalpha []' )
-dies_like( sub (@< @_) { POSIX::isprint(\@()) }, qr/reference as string/,   'isalpha []' )
+dies_like( sub (@< @_) { POSIX::isalpha(\$@) }, qr/reference as string/,   'isalpha []' )
+dies_like( sub (@< @_) { POSIX::isprint(\$@) }, qr/reference as string/,   'isalpha []' )
 
 try {  POSIX->import("S_ISBLK"); my $x = S_ISBLK }
 unlike( $^EVAL_ERROR, qr/Can't use string .* as a symbol ref/, "Can import autoloaded constants" )

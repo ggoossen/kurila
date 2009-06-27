@@ -210,6 +210,7 @@ ext/IO/Makefile.PL		IO extension makefile writer
 ext/IO/poll.c			IO poll() emulation using select()
 ext/IO/poll.h			IO poll() emulation using select()
 ext/IO/README			IO extension maintenance notice
+ext/IO/t/io-socket.t	See if basic IO::Sockets methods work
 ext/IO/t/io_const.t	See if constants from IO work
 ext/IO/t/io_dir.t	See if directory-related methods from IO work
 ext/IO/t/io_dup.t	See if dup()-related methods from IO work
@@ -2049,6 +2050,7 @@ t/op/hashconcat.t		See if +%+ works
 t/op/anon_hash.t		See if %( ... ) work
 t/op/aslice.t		See if [[...]] work
 t/op/hashjoin.t		See if %+: work
+t/op/shift.t		See if shift work
 t/lib/Cname.pm			Test charnames in regexes (op/pat.t)
 t/lib/common.pl			Helper for lib/{warnings,feature}.t
 t/lib/commonsense.t		See if configuration meets basic needs
@@ -2151,6 +2153,7 @@ Todo.micro			The Wishlist for microperl
 toke.c				The tokener
 t/op/arith.t			See if arithmetic works
 t/op/arrayexpand.t			See if the array expand operator works
+t/op/arrayconcat.t			See if the array concat operator works
 t/op/hashexpand.t			See if the hash expand operator works
 t/op/assignwarn.t		See if OP= operators warn correctly for undef targets
 t/op/auto.t			See if autoincrement et all work

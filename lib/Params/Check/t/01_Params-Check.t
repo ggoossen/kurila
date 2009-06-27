@@ -146,8 +146,8 @@ do {   my $tmpl = \%(
 
 ### strict_type tests ###
 do {   my @list = @(
-        \@( %( strict_type => 1, default => \@() ),  0 ),
-        \@( %( default => \@() ),                    1 ),
+        \@( %( strict_type => 1, default => \$@ ),  0 ),
+        \@( %( default => \$@ ),                    1 ),
         );
 
     ### check for strict_type global, and in the template key ###
@@ -157,7 +157,7 @@ do {   my @list = @(
         local   $Params::Check::STRICT_TYPE = $aref->[1]
 
         ### proper value ###
-        do {   my $rv = check( $tmpl, \%( foo => \@() ) );
+        do {   my $rv = check( $tmpl, \%( foo => \$@ ) );
             ok( $rv,                "check() call with strict_type enabled" );
             is( ref $rv->{?foo}, 'ARRAY',
                 "   found provided value in rv" );
@@ -236,7 +236,7 @@ do   ### check if the subs for allow get what you expect ###
 ### invalid key tests
 do {   my $tmpl = \%( foo => %( allow => sub (@< @_) { 0 } ) );
 
-    for my $val (@( 1, 'foo', \@(), bless(\%(),__PACKAGE__)) )
+    for my $val (@( 1, 'foo', \$@, bless(\%(),__PACKAGE__)) )
         my $rv      = check( $tmpl, \%( foo => $val ) )
         my $text    = "Key 'foo' ($(dump::view($val))) is of invalid type"
         my $re      = quotemeta $text
@@ -297,7 +297,7 @@ do
         age         => %( default    => 21,
         allow      => qr/^\d+$/,
         ),
-        id_list     => %( default        => \@(),
+        id_list     => %( default        => \$@,
         strict_type    => 1
         ),
         phone       => %( allow          => sub (@< @_) { 1 if shift } ),

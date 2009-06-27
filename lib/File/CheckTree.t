@@ -47,7 +47,8 @@ do
         };
     }
 
-    print $^STDERR, $_ for  @warnings
+    for (@warnings)
+        print $^STDERR, $_
     if ( !$^EVAL_ERROR && !@warnings && defined($num_warnings) && $num_warnings == 0 )
         ok(1)
     else

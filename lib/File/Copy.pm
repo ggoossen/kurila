@@ -263,7 +263,7 @@ sub move
             my@($atime, $mtime) =  @(stat($from))[[8..9]];
             utime($atime, $mtime, $to);
             unlink($from)   or die;
-        }
+            }
         return 1 unless $^EVAL_ERROR
     
     @($sts,$ossts) = @($^OS_ERROR + 0, $^EXTENDED_OS_ERROR + 0)

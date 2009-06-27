@@ -89,7 +89,7 @@ sub new
     
 
     for my $tuple (@: @(inc_override => INC => $($^INCLUDE_PATH) ),
-                      @( extra_libs => EXTRA => @() ))
+                      @( extra_libs => EXTRA => $@ ))
         my @($arg,$key,$val)= $tuple
         if ( %args{?$arg} )
             try {
@@ -104,7 +104,7 @@ sub new
     do
         my %dupe
         $self->{':private:'}{INC} = grep { -e $_ && !%dupe{+$_}++ },
-            $self->{':private:'}{?INC} +@+ ($self->{':private:'}{?EXTRA}||@:)
+            $self->{':private:'}{?INC} +@+ ($self->{':private:'}{?EXTRA}||$@)
     
     my $perl5lib = defined env::var('PERL5LIB') ?? env::var('PERL5LIB') !! ""
 
@@ -116,13 +116,13 @@ sub new
 
     # File::Find does not know how to deal with VMS filepaths.
     if( $Is_VMS )
-        $_ = VMS::Filespec::unixify($_)
-            for  @dirs
-    
+        for (@dirs)
+            $_ = VMS::Filespec::unixify($_)
 
     if ($DOSISH)
-        s|\\|/|g for  @dirs
-    
+        for (@dirs)
+            s|\\|/|g
+
     my $archlib = @dirs[0]
 
     # Read the core packlist

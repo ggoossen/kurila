@@ -3,7 +3,7 @@
 use warnings
 
 use feature ":5.10"
-use Test::More tests => 50
+use Test::More tests => 49
 
 use B::Deparse
 my $deparse = B::Deparse->new()
@@ -199,13 +199,6 @@ do { my $x; };
 # 17 while loop
 while (1) { my $k; }
 ####
-# 18 postfix for loop
-my ($x,@a);
-$x=1 for @a;
->>>>
-my($x, @a);
-$x = 1 foreach (@a);
-####
 # 22
 my $i;
 while ($i) { my $z = 1; } continue { $i = 99; }
@@ -237,11 +230,13 @@ print *STDOUT, (sort {$b cmp $a} , @x);
 my @x;
 print *STDOUT, sort(sub { $main::b cmp $main::a; } , @x);
 ####
-# 32
-print *STDOUT, $_ foreach (reverse @main::a);
+# 32 TODO
+foreach (reverse @main::a)
+    print $^STDOUT, $_
 ####
 # 33 TODO range
-print *STDOUT, $_ foreach (reverse 2 .. 5);
+foreach (reverse 2 .. 5)
+    print $^STDOUT, $_
 ####
 # 34  (bug #38684)
 @main::ary = @(split(' ', 'foo', 0));

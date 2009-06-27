@@ -104,7 +104,7 @@ sub survey($self, @< @search_dirs)
             # A excursion consisting of just one file!
             $_ = basename($start_in)
             $verbose and print $^STDOUT, "Pondering $start_in ($_)\n"
-            $closure->($start_in, $_, 0, \@())
+            $closure->($start_in, $_, 0, \$@)
 
         else
             $verbose and print $^STDOUT, "Skipping mysterious $start_in\n"
@@ -283,7 +283,7 @@ sub _recurse_dir($self, $startdir, $callback, $modname_bits)
 
     my $here_string = File::Spec->curdir
     my $up_string   = File::Spec->updir
-    $modname_bits ||= \@()
+    $modname_bits ||= \$@
 
     my $recursor
     $recursor = sub ($dir_long, $dir_bare)

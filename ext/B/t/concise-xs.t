@@ -240,7 +240,7 @@ usage: PERL_CORE=1 ./perl ext/B/t/concise-xs.t [-av] [module-list]
         (will report failures, since no XS funcs are known apriori)
 
 EODIE
-    ;
+    
 
 if (%opts)
     require Data::Dumper
@@ -252,19 +252,17 @@ my %report
 
 if (%opts{?r})
     my $refpkgs = require "%opts{?r}"
-    $testpkgs->{+$_} = $refpkgs->{?$_} foreach keys $refpkgs->%
+    foreach (keys $refpkgs->%)
+        $testpkgs->{+$_} = $refpkgs->{?$_}
 
 
 unless (%opts{?a})
     unless (nelems @argpkgs)
         foreach my $pkg (sort keys $testpkgs->%)
             test_pkg($pkg, $testpkgs->{?$pkg})
-        
     else
         foreach my $pkg ( @argpkgs)
             test_pkg($pkg, $testpkgs->{?$pkg})
-        
-    
 else
     corecheck()
 
@@ -277,23 +275,22 @@ sub test_pkg($pkg, ?$fntypes)
     my %stash = %+: map
         { %: $_ => 0 },
         grep { exists &{Symbol::fetch_glob("$pkg\::$_")->*}     # grab CODE symbols
-    },
+             },
         grep { !m/__ANON__/ }, keys Symbol::fetch_glob($pkg.'::')->*->%         # from symbol table
-    
 
     for my $type (keys %matchers)
         foreach my $fn ( $fntypes{?$type})
             carp "$fn can only be one of $type, %stash{?$fn}\n"
                 if %stash{?$fn}
             %stash{+$fn} = $type
-        
     
     # set default type for un-named functions
     my $dflt = $fntypes{?dflt} || 'perl'
     for my $k (keys %stash)
         %stash{+$k} = $dflt unless %stash{?$k}
     
-    %stash{+$_} = 'skip' foreach  $fntypes{?skip}
+    foreach ($fntypes{?skip})
+        %stash{+$_} = 'skip'
 
     if (%opts{?v})
         diag("fntypes: " => < Dumper($fntypes))
@@ -304,8 +301,6 @@ sub test_pkg($pkg, ?$fntypes)
         my $res = checkXS("$($pkg)::$fn", %stash{?$fn})
         if ($res ne '1')
             push %report{$pkg}->{$res}->@, $fn
-        
-    
 
 
 sub checkXS($func_name, $want)

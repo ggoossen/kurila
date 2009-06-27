@@ -63,7 +63,7 @@ for my $i (0 .. $hashsize -1)
         
         %a1{$k}->{+value} = $hash2
     elsif (int(rand(2)))
-        my $arr_ref = \@()
+        my $arr_ref = \$@
         my $arraysize = int(rand($maxarraysize))
         while ($arraysize--)
             push($arr_ref->@, @fixed_strings[rand(int(nelems @fixed_strings))])

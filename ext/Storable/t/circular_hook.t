@@ -45,7 +45,7 @@ is_deeply( \@Foo::order, \@( 'Bar', 'Foo' ), 'thaw order is correct (depth first
 
 package Foo;
 
-our @order = @( () )
+our @order = $@
 
 sub STORABLE_freeze($self, $clone)
     my $class = ref $self

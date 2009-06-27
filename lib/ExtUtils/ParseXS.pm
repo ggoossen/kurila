@@ -84,7 +84,7 @@ sub process_file
         prototypes => 0,
         inout => 1,
         argtypes => 1,
-        typemap => \@(),
+        typemap => \$@,
         output => $^STDOUT,
         csuffix => '.c',
         < %args,
@@ -100,7 +100,7 @@ sub process_file
     
     @XSStack = @(\%(type => 'none'))
     @($XSS_work_idx, $cpp_next_tmp) = @(0, "XSubPPtmpAAAA")
-    @InitFileCode = @( () )
+    @InitFileCode = $@
     $FH = Symbol::gensym()
     $proto_re = "[" . quotemeta('\$%&*@;[]') . "]" 
     $Overload = 0
@@ -197,8 +197,8 @@ sub process_file
                 $_ = TrimWhitespace($_) 
                 # skip blank lines and comment lines
                 next if m/^$/ or m/^#/ 
-                my @($type,$kind, $proto) = @: m/^\s*(.*?\S)\s+(\S+)\s*($proto_re*)\s*$/ or
-                    warn("Warning: File '$typemap' Line $($line_no-1) '$line' TYPEMAP entry needs 2 or 3 columns\n"), next
+                my @($type,$kind, $proto) = @: m/^\s*(.*?\S)\s+(\S+)\s*($proto_re*)\s*$/ 
+                    or warn("Warning: File '$typemap' Line $($line_no-1) '$line' TYPEMAP entry needs 2 or 3 columns\n"), next
                 $type = TidyType($type) 
                 %type_kind{+$type} = $kind 
                 # prototype defaults to '$'
@@ -577,7 +577,7 @@ sub process_para
         last
     
     @XSStack[$XSS_work_idx]->{+functions}{+$Full_func_name} ++ 
-    @Attributes = @()
+    @Attributes = $@
     %XsubAliases = %XsubAliasValues =  %Interfaces = %()
     $DoSetMagic = 1
 
@@ -644,7 +644,7 @@ sub process_para
         
     
     my $extra_args = 0
-    my @args_num = @( () )
+    my @args_num = $@
     my $num_args = 0
     my $report_args = ''
     if (defined($class))
@@ -871,8 +871,8 @@ EOF
         undef %outargs 
         process_keyword("POSTCALL|OUTPUT|ALIAS|ATTRS|PROTOTYPE")
 
-        &generate_output(%var_types{?$_}, %args_match{?$_}, $_, $DoSetMagic)
-            for grep { %in_out{?$_} =~ m/OUT$/ }, keys %in_out
+        for (grep { %in_out{?$_} =~ m/OUT$/ }, keys %in_out)
+            generate_output(%var_types{?$_}, %args_match{?$_}, $_, $DoSetMagic)
 
         # all OUTPUT done, so now push the return value on the stack
         if ($gotRETVAL && $RETVAL_code)
@@ -912,7 +912,8 @@ EOF
         print $output_fh, "\tXSprePUSH;" if $c and not $prepush_done
         print $output_fh, "\tEXTEND(SP,$c);\n" if $c
         $xsreturn += $c
-        generate_output(%var_types{?$_}, $num++, $_, 0, 1) for  @outlist
+        for (@outlist)
+            generate_output(%var_types{?$_}, $num++, $_, 0, 1)
 
         # do cleanup
         process_keyword("CLEANUP|ALIAS|ATTRS|PROTOTYPE") 
@@ -1593,8 +1594,8 @@ sub fetch_para
     # parse paragraph
     death ("Error: Unterminated `#if/#ifdef/#ifndef'")
         if !defined $lastline && @XSStack[-1]->{?type} eq 'if'
-    @line = @( () )
-    @line_no = @( () ) 
+    @line = $@
+    @line_no = $@ 
     return PopFile() if !defined $lastline
 
     if ($lastline =~

@@ -16,7 +16,7 @@ do
     sort { while(0) { last; }     }, @a
 
     # Change 26011: Re: A surprising segfault
-    map { scalar(sort( @())) }, @( ('')x68)
+    map { scalar(sort( $@)) }, @( ('')x68)
 
 
 sub Backwards { ($a cmp $b) +< 0 ?? 1 !! ($a cmp $b) +> 0 ?? -1 !! 0 }
@@ -63,7 +63,7 @@ $expected = $upperfirst ??
     'catchaseddoggonepunishedtoxyzAbelAxedCain' 
 
 cmp_ok($x,'eq',$expected,'upper first 4')
-@a = @( () )
+@a = $@
 @b = reverse @a
 cmp_ok("$(join ' ',@b)",'eq',"",'reverse 1')
 
@@ -134,7 +134,7 @@ do
 @b = sort {
     my $dummy;		# force blockness
     return $b <+> $a
-}, @a
+  }, @a
 cmp_ok("$(join ' ',@b)",'eq','1996 255 90 19 5','force blockness')
 
 $x = join('', sort { $a cmp $b }, @harry)
@@ -189,7 +189,7 @@ do
         $def = 1 if defined $Bar::a;
         Bar::reenter() unless $init++;
         $a <+> $b
-    }, qw/4 3 1 2/
+      }, qw/4 3 1 2/
     main::cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','reenter 1')
 
     main::ok(!$def,'reenter 2')
@@ -252,7 +252,7 @@ do { no warnings;
     is "$(join ' ',@b)" , "6first 6second 5first 5second", "optimized \{$b <=> $a\} without overloading" ;
     @input =sort {$b <+> $a}, @input;
     is "$(join ' ',@input)" , "6first 6second 5first 5second","inline optimized \{$b <=> $a\} without overloading" ;
-};
+}
 
 my @output
 
@@ -308,7 +308,7 @@ sub min
     my @list = sort {
         $answer = '$a and/or $b are not defined ' if !defined($a) || !defined($b);
         $a <+> $b;
-    }, @_
+      }, @_
     @list[0]
 
 

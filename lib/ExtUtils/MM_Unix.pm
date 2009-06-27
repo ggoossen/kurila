@@ -2397,9 +2397,9 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
         next unless m/\Q$self->{?LIB_EXT}\E\z/
         $_ = dirname($_) . "/extralibs.ld"
         push $extra->@, $_
-    
 
-    s/^(.*)/"-I$1"/ for  ($perlinc || \@())->@
+    for (($perlinc || \@())->@)
+        s/^(.*)/"-I$1"/
 
     $target ||= "perl"
     $tmp    ||= "."

@@ -65,7 +65,8 @@ if ($max_uv_less3 =~ s/[^0-9]//g)
 my $st_t = 4*4                  # We try 4 initializers and 4 reporters
 
 my $num = 0
-$num += 10**$_ - 4**$_ for 1.. $max_chain
+for (1.. $max_chain)
+    $num += 10**$_ - 4**$_
 $num *= $st_t
 plan( tests => $num ) # In fact 15 times more subsubtests...
 

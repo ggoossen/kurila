@@ -13,7 +13,8 @@ while (~< $fh)
     my @(?$line, ?$comment)=  split m/\s+#\s+/, $_
     my @(?$cp, ?$type, @< @fc)= split m/[\s;]+/,$line||''
     next unless $type and ($type eq 'F' or $type eq 'C')
-    $_="\\x\{$_\}" for  @fc
+    for (@fc)
+        $_="\\x\{$_\}"
     my $chr="chr(0x$cp)"
     my @str
     push @str,$chr

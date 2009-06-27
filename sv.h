@@ -563,7 +563,7 @@ Returns a U32 indicating whether the pointer to the string buffer is offset.
 This hack is used internally to speed up removal of characters from the
 beginning of a SvPV.  When SvOOK is true, then the start of the
 allocated string buffer is actually C<SvOOK_offset()> bytes before SvPVX.
-This offset used to be stored in SvIVX, but is now stored within the spare
+This offset used to be stored in SvIV, but is now stored within the spare
 part of the buffer.
 
 =for apidoc Am|U32|SvROK|SV* sv
@@ -578,7 +578,7 @@ Unsets the RV status of an SV.
 =for apidoc Am|SV*|SvRV|SV* sv
 Dereferences an RV to return the SV.
 
-=for apidoc Am|IV|SvIVX|SV* sv
+=for apidoc Am|IV|I_SvIV|SV* sv
 Returns the raw value in the SV's IV slot, without checks or conversions.
 Only use when you are sure SvIOK is true. See also C<SvIV()>.
 
@@ -609,10 +609,7 @@ See C<SvCUR>.  Access the character as *(SvEND(sv)).
 Returns the stash of the SV.
 
 =for apidoc Am|void|SvIV_set|SV* sv|IV val
-Set the value of the IV pointer in sv to val.  It is possible to perform
-the same function of this macro with an lvalue assignment to C<SvIVX>.
-With future Perls, however, it will be more efficient to use 
-C<SvIV_set> instead of the lvalue assignment to C<SvIVX>.
+Set the value of the IV pointer in sv to val.
 
 =for apidoc Am|void|SvNV_set|SV* sv|NV val
 Set the value of the NV pointer in sv to val.  See C<SvIV_set>.
@@ -846,17 +843,12 @@ in gv.h: */
        } STMT_END
 
 
-#ifdef PERL_DEBUG_COW
-#else
-#endif
-#define SvRVx(sv) SvRV(sv)
-
-#define I_SvPVX(sv) (sv)->sv_u.svu_pv
+#define I_SvIV(sv) (((XPVIV*) SvANY(sv))->xiv_iv)
+#define I_SvPVX(sv) ((sv)->sv_u.svu_pv)
 
 #ifdef PERL_DEBUG_COW
 /* Need -0.0 for SvNVX to preserve IEEE FP "negative zero" because
    +0.0 + -0.0 => +0.0 but -0.0 + -0.0 => -0.0 */
-#  define SvIVX(sv) (0 + ((XPVIV*) SvANY(sv))->xiv_iv)
 #  define SvUVX(sv) (0 + ((XPVUV*) SvANY(sv))->xuv_uv)
 #  define SvNVX(sv) (-0.0 + ((XPVNV*) SvANY(sv))->xnv_u.xnv_nv)
 #  define SvRV(sv) (0 + (sv)->sv_u.svu_rv)
@@ -927,7 +919,6 @@ in gv.h: */
 	    &(((XPVMG*) SvANY(_svi))->xmg_stash);			\
 	  }))
 #  else
-#    define SvIVX(sv) ((XPVIV*) SvANY(sv))->xiv_iv
 #    define SvUVX(sv) ((XPVUV*) SvANY(sv))->xuv_uv
 #    define SvNVX(sv) ((XPVNV*) SvANY(sv))->xnv_u.xnv_nv
 #    define SvRV(sv) ((sv)->sv_u.svu_rv)
@@ -935,12 +926,6 @@ in gv.h: */
 #    define SvSTASH(sv)	((XPVMG*)  SvANY(sv))->xmg_stash
 #  endif
 #endif
-
-#define SvIVXx(sv) SvIVX(sv)
-#define SvUVXx(sv) SvUVX(sv)
-#define SvNVXx(sv) SvNVX(sv)
-#define SvLENx(sv) SvLEN(sv)
-#define SvENDx(sv) ((PL_Sv = (sv)), SvEND(PL_Sv))
 
 
 #define SvIV_set(sv, val) \

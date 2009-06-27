@@ -53,19 +53,30 @@ sub test_err_localref ()
 
 $x = \$aa
 my $y = \$aa
-try { local $x->$; };      test_err_localref
-try { local $x->$; };    test_err_localref
-try { local $y->$; };      test_err_localref
-try { local $y->$; };    test_err_localref
-try { local (\$aa)->$; };  test_err_localref
+try { local $x->$; }
+test_err_localref
+try { local $x->$; }
+test_err_localref
+try { local $y->$; }
+test_err_localref
+try { local $y->$; }
+test_err_localref
+try { local (\$aa)->$; }
+test_err_localref
 $x = \@aa
 $y = \@aa
-try { local $x->@; };      test_err_localref
-try { local $x->@; };    test_err_localref
-try { local $y->@; };      test_err_localref
-try { local $y->@; };    test_err_localref
-try { local (\@aa)->@; };  test_err_localref
-try { local (\@())->@; };    test_err_localref
+try { local $x->@; }
+test_err_localref
+try { local $x->@; }
+test_err_localref
+try { local $y->@; }
+test_err_localref
+try { local $y->@; }
+test_err_localref
+try { local (\@aa)->@; }
+test_err_localref
+try { local (\$@)->@; }
+test_err_localref
 $x = \%aa
 $y = \%aa
 try { local $x->%; };      test_err_localref

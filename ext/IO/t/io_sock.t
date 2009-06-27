@@ -4,16 +4,16 @@ use Config
 
 use utf8
 
-BEGIN 
+BEGIN
     my $can_fork = config_value("d_fork")
     my $reason
     if (!$can_fork)
         $reason = 'no fork'
-    
+
     if ($reason)
         print $^STDOUT, "1..0 # Skip: $reason\n"
         exit 0
-    
+
 
 
 my $has_perlio = PerlIO::Layer->find( 'perlio')
@@ -40,9 +40,9 @@ print $^STDOUT, "ok 1\n"
 # Check if can fork with dynamic extensions (bug in CRT):
 if ($^OS_NAME eq 'os2' and
     system "$^EXECUTABLE_NAME -I../lib -MOpcode -e 'defined fork or die'  > /dev/null 2>&1")
-    print $^STDOUT, "ok $_ # skipped: broken fork\n" for 2..5
+    for (2..5)
+        print $^STDOUT, "ok $_ # skipped: broken fork\n"
     exit 0
-
 
 my $port = $listen->sockport
 
@@ -101,9 +101,9 @@ if(my $pid = fork())
             last SERVER_LOOP if m/^quit/
             last if m/^done/
             print $^STDOUT, $_
-        
+
         $sock = undef
-    
+
     $listen->close
 elsif (defined $pid)
     # child, try various ways to connect
@@ -124,7 +124,7 @@ elsif (defined $pid)
         print $^STDOUT, "not ok 7\n"
         print $^STDOUT, "not ok 8\n"
         print $^STDOUT, "not ok 9\n"
-    
+
 
     # some machines seem to suffer from a race condition here
     sleep(2)
@@ -137,7 +137,7 @@ elsif (defined $pid)
     else
         print $^STDOUT, "# $^EVAL_ERROR\n"
         print $^STDOUT, "not ok 10\n"
-    
+
 
     # some machines seem to suffer from a race condition here
     sleep(1)
@@ -151,7 +151,7 @@ elsif (defined $pid)
         $sock->print("quit\n")
     else
         print $^STDOUT, "not ok 11\n"
-    
+
     $sock = undef
     sleep(1)
     exit
@@ -237,10 +237,10 @@ if( $server_pid)
     if ($sock)
         $sock->print("send\n")
 
-        my @array = @( () )
+        my @array = $@
         while( ~< $sock)
             push( @array, $_)
-        
+
 
         $sock->print("done\n")
         $sock->close
@@ -248,7 +248,7 @@ if( $server_pid)
         print $^STDOUT, "not " if( (nelems @array) != nelems @data)
     else
         print $^STDOUT, "not "
-    
+
     print $^STDOUT, "ok 18\n"
 
     ### TEST 21
@@ -270,7 +270,7 @@ if( $server_pid)
         print $^STDOUT, binmode($sock, ":utf8") ?? "ok 19\n" !! "not ok 19\n"
     else
         print $^STDOUT, "ok 19 - Skip: no perlio\n"
-    
+
 
     if ($sock)
 
@@ -290,18 +290,18 @@ if( $server_pid)
             print $^STDOUT, $chr eq "\x{100}" ??
                 "ok 22\n" !! "not ok 22\n"
         else
-            print $^STDOUT, "ok $_ - Skip: no perlio\n" for 20..22
-        
+            for (20.22)
+                print $^STDOUT, "ok $_ - Skip: no perlio\n"
 
         $sock->print("send\n")
 
-        my @array = @( () )
+        my @array = $@
         while( !eof( $sock ) )
             while( ~< $sock)
                 push( @array, $_)
                 last
-            
-        
+
+
 
         $sock->print("done\n")
         $sock->close
@@ -309,7 +309,7 @@ if( $server_pid)
         print $^STDOUT, "not " if( (nelems @array) != nelems @data)
     else
         print $^STDOUT, "not "
-    
+
     print $^STDOUT, "ok 23\n"
 
     ### TEST 24
@@ -325,7 +325,7 @@ if( $server_pid)
         print $^STDOUT, "not " if( 1 != kill 0, $server_pid)
     else
         print $^STDOUT, "not "
-    
+
     print $^STDOUT, "ok 24\n"
 
 elsif (defined($server_pid))
@@ -344,23 +344,23 @@ elsif (defined($server_pid))
             if (m/^ping (.+)/)
                 print $sock, "pong $1\n"
                 next
-            
+
             if (m/^ord (.+)/)
                 print $sock, ord($1), "\n"
                 next
-            
+
             if (m/^chr (.+)/)
                 print $sock, chr(hex($1)), "\n"
                 next
-            
+
             if (m/^send/)
                 print $sock, < @data
                 last
-            
+
             print $^STDOUT,
-        
+
         $sock = undef
-    
+
     $listen->close
     exit 0
 

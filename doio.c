@@ -567,7 +567,7 @@ Perl_do_openn(pTHX_ IO *io, register const char *oname, I32 len, int as_raw,
                 LOCK_FDPID_MUTEX;
                 sv = *av_fetch(PL_fdpid,fd,TRUE);
                 SvUPGRADE(sv, SVt_IV);
-                pid = SvIVX(sv);
+                pid = I_SvIV(sv);
                 SvIV_set(sv, 0);
                 sv = *av_fetch(PL_fdpid,savefd,TRUE);
                 SvUPGRADE(sv, SVt_IV);
@@ -987,7 +987,7 @@ Perl_do_print(pTHX_ register SV *sv, PerlIO *fp)
 	if (SvIsUV(sv))
 	    PerlIO_printf(fp, "%"UVuf, (UV)SvUVX(sv));
 	else
-	    PerlIO_printf(fp, "%"IVdf, (IV)SvIVX(sv));
+	    PerlIO_printf(fp, "%"IVdf, (IV)I_SvIV(sv));
 	return !PerlIO_error(fp);
     }
     else {

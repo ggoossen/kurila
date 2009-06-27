@@ -143,7 +143,8 @@ do
 
 
 # modules
-$ei->{+$_} = 1 for qw( abc def ghi )
+for (qw( abc def ghi ))
+    $ei->{+$_} = 1
 is( join(' ', $ei->modules()), 'abc def ghi',
     'modules() should return sorted keys' )
 

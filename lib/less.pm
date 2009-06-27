@@ -20,22 +20,21 @@ sub of
     # If no one wants the result, don't bother computing it.
     my $hinthash = @( caller 0 )[10]
     my %tags
-    %tags{[_unpack_tags( $hinthash->{?$class} ) ]} = @()
+    %tags{[_unpack_tags( $hinthash->{?$class} ) ]} = $@
 
-    if ((nelems @_))
-        exists %tags{$_} and return ! ! 1 for  @_
+    if (@_)
+        for (@_)
+            exists %tags{$_} and return ! ! 1 
         return
     else
         return keys %tags
-    
-
 
 sub import
     my $class = shift @_
 
     @_ = @( 'please' ) if not nelems @_
     my %tags
-    %tags{[_unpack_tags( < @_, $^HINTS{?$class} ) ]} = @()
+    %tags{[_unpack_tags( < @_, $^HINTS{?$class} ) ]} = $@
 
     $^HINTS{+$class} = _pack_tags( < keys %tags )
     return
@@ -46,7 +45,7 @@ sub unimport
 
     if ((nelems @_))
         my %tags
-        %tags{[_unpack_tags( $^HINTS{?$class} ) ]} = @()
+        %tags{[_unpack_tags( $^HINTS{?$class} ) ]} = $@
         delete %tags{[ <_unpack_tags(< @_) ]}
         my $new = _pack_tags( < keys %tags )
 

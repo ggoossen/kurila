@@ -153,13 +153,13 @@ my @_to_accept
 
 sub changes
     return @+: map { m/^([-_:0-9a-zA-Z]+)=([-_:0-9a-zA-Z]+)$/s
-            ?? @( $1, => "\n<$2>", "/$1", => "</$2>\n" ) !! die "Funky $_"
-    }, @_
+                       ?? @( $1, => "\n<$2>", "/$1", => "</$2>\n" ) !! die "Funky $_"
+                   }, @_
 
 sub changes2
-    return @+: map {; m/^([-_:0-9a-zA-Z]+)=([-_:0-9a-zA-Z]+)$/s
-            ?? @( $1, => "<$2>", "/$1", => "</$2>" ) !! die "Funky $_"
-    }, @_
+    return @+: map { m/^([-_:0-9a-zA-Z]+)=([-_:0-9a-zA-Z]+)$/s
+                        ?? @( $1, => "<$2>", "/$1", => "</$2>" ) !! die "Funky $_"
+                   }, @_
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -370,7 +370,7 @@ sub index_as_html
     my $self = @_[0]
     # This is meant to be called AFTER the input document has been parsed!
 
-    my $points = $self->{?'PSHTML_index_points'} || @()
+    my $points = $self->{?'PSHTML_index_points'} || $@
 
     (nelems $points) +> 1 or return qq[<div class='indexgroupEmpty'></div>\n]
     # There's no point in having a 0-item or 1-item index, I dare say.

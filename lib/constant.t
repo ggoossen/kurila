@@ -111,7 +111,7 @@ is nelems(@warnings), 0, "unexpected warning"
 ok 1
 
 my $curr_test = $TB->current_test
-use constant CSCALAR    => \"ok 37\n";
+use constant CSCALAR    => \"ok 37\n"
 use constant CHASH      => \%( foo => "ok 38\n" );
 use constant CARRAY     => \@( undef, "ok 39\n" );
 use constant CCODE      => sub (@< @_) { "ok @_[0]\n" };
@@ -166,7 +166,7 @@ do
 ok declared 'Other::IN_OTHER_PACK'
 ok %constant::declared{?'Other::IN_OTHER_PACK'}
 
-@warnings = @( () )
+@warnings = $@
 eval q{
     no warnings;
     use warnings 'constant';
@@ -225,7 +225,7 @@ for my $idx (0..((nelems @warnings)-1))
     like @warnings[$idx], @Expected_Warnings[$idx]
 
 
-@warnings = @( () )
+@warnings = $@
 
 
 use constant \%(

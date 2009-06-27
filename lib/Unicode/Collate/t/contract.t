@@ -96,7 +96,8 @@ if (!$^EVAL_ERROR)
     is($aaPre->cmp("Z", "A\x{31A}\x{30A}"), -1)
     is($aaPre->cmp("Z", "A\x{30A}\x{31A}"), -1)
 else
-    ok(1) for 1..20
+    for (1..20)
+        ok(1)
 
 
 # again: loading Unicode::Normalize should not affect $kjeNoN.

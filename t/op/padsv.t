@@ -21,7 +21,7 @@ do
 do
     # OPf_OPTIONAL
     my $x = "aap"
-    @( ? $x ) = @()
+    @( ? $x ) = $@
     is( $x, undef )
 
 

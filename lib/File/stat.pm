@@ -52,7 +52,7 @@ sub stat ($arg)
     do
         local $^OS_ERROR = undef
         require Symbol
-        my @($pkg) = caller@()
+        my @($pkg) = caller$@
         $fh = \ Symbol::fetch_glob( $pkg . "::" . $arg)->*
         return unless defined fileno $fh
     

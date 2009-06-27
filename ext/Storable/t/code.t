@@ -246,7 +246,8 @@ do
     ok($^EVAL_ERROR, "")
 
     if ($^EVAL_ERROR ne "")
-        ok(0) for @( ( <1..5))
+        for (1..5)
+            ok(0)
     else
         ok($thawed->[0]->(), "JAPH")
         ok($thawed->[1]->(), 42)

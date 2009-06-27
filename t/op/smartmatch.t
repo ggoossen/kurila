@@ -14,8 +14,8 @@ use Tie::Hash;
 # about feature issues such as scoping etc.
 
 # Predeclare vars used in the tests:
-my $deep1 = \@(); push $deep1->@, \$deep1
-my $deep2 = \@(); push $deep2->@, \$deep2
+my $deep1 = \$@; push $deep1->@, \$deep1
+my $deep2 = \$@; push $deep2->@, \$deep2
 
 do {my $const = "a constant"; sub a_const () {$const}}
 

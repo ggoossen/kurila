@@ -19,9 +19,9 @@ $WRAP = 1 unless defined $WRAP
 
 sub _openclose
     return @+: map {
-        m/^([-A-Za-z]+)=(\w[^\=]*)$/s or die "what's <$_>?";
-        @( $1,  "\{\\$2\n",   "/$1",  "\}" );
-    }, @_
+                      m/^([-A-Za-z]+)=(\w[^\=]*)$/s or die "what's <$_>?";
+                      @( $1,  "\{\\$2\n",   "/$1",  "\}" );
+                   }, @_
 
 
 my @_to_accept
@@ -481,7 +481,7 @@ use integer;
 sub rtf_esc
     my $x # scratch
     ($x = (((nelems @_) == 1) ?? @_[0] !! join '', @_)
-     ) =~ s/([F\x00-\x1F\-\\\{\}\x7F-\xFF])/%Escape{?$1}/g  # ESCAPER
+     ) =~ s/([F\x[00]-\x[1F]\-\\\{\}\x[7F]-\x[FF]])/%Escape{?$1}/g  # ESCAPER
     # Escape \, {, }, -, control chars, and 7f-ff.
     $x =~ s/([^\x[00]-\x[FF]])/$('\\uc1\\u'.((ord($1)+<32768)??ord($1)!!(ord($1)-65536)).'?')/g
     return $x

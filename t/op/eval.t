@@ -281,7 +281,7 @@ $r = 0
 eval'$r = fred3(5)'
 print $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 58\n"
 $r = 0
-do { my $yyy = 4; my $zzz = 5; my $l = 6; $r = eval 'fred3(5)' };
+do { my $yyy = 4; my $zzz = 5; my $l = 6; $r = eval 'fred3(5)' }
 print $^STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 59\n"
 
 # check that goto &sub within evals doesn't leak lexical scope

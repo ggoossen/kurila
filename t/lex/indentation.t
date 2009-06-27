@@ -3,8 +3,7 @@
 BEGIN 
     require './test.pl'
 
-
-plan tests => 14
+plan tests => 18
 
 our ($x, $y)
 
@@ -36,7 +35,7 @@ is( $x, "new" )
 is( $y, "old" )
 
 # nesting
-@: $x, $y = qw[old old]
+(@: $x, $y) = qw[old old]
 do
     do
         local $x = "new"
@@ -46,7 +45,7 @@ is($x, "old")
 is($y, "old")
 
 # ending multiple nested blocks at once
-@: $x, $y = qw[old old]
+(@: $x, $y) = qw[old old]
 do
     local $y = "new"
     do
@@ -54,6 +53,24 @@ do
 
 is($x, "old")
 is($y, "old")
+
+# @: with layout
+$x = @: "aap"
+        "noot"
+
+is(join("*", $x), q[aap*noot]);
+
+# empty @:
+$x = @:
+
+is(join("*", $x), q[]);
+
+# @: terminated by an "and"
+$x = @: or
+        $y = 1
+
+is(join("*", $x), q[])
+is($y, 1)
 
 # s/// seperared by statement end
 eval_dies_like(<<'EOE', qr/statement end found where string delimeter expected/);

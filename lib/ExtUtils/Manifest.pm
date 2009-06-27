@@ -409,8 +409,9 @@ sub _check_mskip_directives
     unless (open $m, ">", "$mfile")
         warn "Problem opening $mfile: $^OS_ERROR"
         return
-    
-    print $m ,$_ for @( (< @lines))
+
+    for (@lines)
+        print $m ,$_
     close $m
     return
 

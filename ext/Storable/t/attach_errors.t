@@ -68,7 +68,7 @@ do
     sub STORABLE_freeze($self, $clone)
 
         # Illegally include a reference in this return
-        return  @('', \@())
+        return  @('', \$@)
     
 
     sub STORABLE_attach($class, $clone, $string)
@@ -145,7 +145,7 @@ do
 
     sub STORABLE_freeze($self, $clone)
 
-        return  @('', \@())
+        return  @('', \$@)
     
 
     # Start with no STORABLE_attach method so we can get a
@@ -212,7 +212,7 @@ do
         undef,
         '',
         1,
-        \@(),
+        \$@,
         \%(),
         \"foo",
         (bless \%( ), 'Foo'),

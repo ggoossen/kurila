@@ -9,7 +9,7 @@ do
 
 package xyz
 
-sub new {bless \@();}
+sub new {bless \$@;}
 
 our $bar = 4
 

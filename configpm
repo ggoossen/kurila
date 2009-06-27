@@ -164,8 +164,8 @@ $^PERL_VERSION eq '%s'
 ENDOFBEG
 
 
-my @non_v    = @()
-my @v_others = @()
+my @non_v    = $@
+my @v_others = $@
 my $in_v     = 0
 my %Data     = %()
 
@@ -505,7 +505,7 @@ foreach my $prefix (qw(libs libswanted))
         = split(' ', fetch_string (\%(), 'libswanted_uselargefiles'))
     if ((nelems @lflibswanted))
         my %lflibswanted
-        %lflibswanted{[ @lflibswanted]} = @()
+        %lflibswanted{[ @lflibswanted]} = $@
         if ($prefix eq 'libs')
             my @libs = grep { m/^-l(.+)/ &&
                     not exists %lflibswanted{$1} },
@@ -576,29 +576,26 @@ sub config_re {
              $Config_SH_expanded;
 }
 
-sub config_vars {
+sub config_vars
     # implements -V:cfgvar option (see perlrun -V:)
-    foreach my $cfgvar (@_) {
+    foreach my $cfgvar (@_)
         # find optional leading, trailing colons; and query-spec
-        my @($notag,$qry,$lncont) = @: $cfgvar =~ m/^(:)?(.*?)(:)?$/;   # flags fore and aft, 
+        my @($notag,$qry,$lncont) = @: $cfgvar =~ m/^(:)?(.*?)(:)?$/   # flags fore and aft, 
         # map colon-flags to print decorations
-        my $prfx = $notag ?? '' !! "$qry=";             # tag-prefix for print
-        my $lnend = $lncont ?? ' ' !! ";\n";            # line ending for print
+        my $prfx = $notag ?? '' !! "$qry="             # tag-prefix for print
+        my $lnend = $lncont ?? ' ' !! ";\n"            # line ending for print
 
         # all config-vars are by definition \w only, any \W means regex
-        if ($qry =~ m/\W/) {
-            my @matches = @(<config_re($qry));
-            print $^STDOUT, < map { "$_$lnend" }, @matches || @("$qry: not found")              if !$notag;
-            print $^STDOUT, < map { s/\w+=//; "$_$lnend" }, @matches || @("$qry: not found")    if  $notag;
-        } else {
+        if ($qry =~ m/\W/)
+            my @matches = config_re($qry)
+            print $^STDOUT, < map { "$_$lnend" }, @matches || @("$qry: not found")              if !$notag
+            print $^STDOUT, < map { s/\w+=//; "$_$lnend" }, @matches || @("$qry: not found")    if  $notag
+        else
             my $v = config_value($qry);
-            $v = 'undef' unless defined $v;
-            print $^STDOUT, "$($prfx)'$($v)'$lnend";
-        }
-    }
-}
+            $v = 'undef' unless defined $v
+            print $^STDOUT, "$($prfx)'$($v)'$lnend"
 
-1;
+1
 ENDOFEND
 
 if ($^OS_NAME eq 'os2')

@@ -1,4 +1,4 @@
-BEGIN {
+BEGIN 
     unless ("A" eq pack('U', 0x41)) {
         print $^STDOUT, "1..0 # Unicode::Collate " .
             "cannot stringify a Unicode code point\n";
@@ -8,23 +8,23 @@ BEGIN {
         chdir('t') if -d 't';
         $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
-}
 
-use Test::More;
+
+use Test::More
 BEGIN { plan tests => 72 };
 
-use warnings;
-use Unicode::Collate;
+use warnings
+use Unicode::Collate
 
 #########################
 
-ok(1);
+ok(1)
 
 # a standard collator (3.1.1)
 my $Collator = Unicode::Collate->new(
     table => 'keys.txt',
     normalization => undef,
-    );
+    )
 
 
 # a collator for hangul sorting,
@@ -55,9 +55,9 @@ my $hangul = Unicode::Collate->new(
 1161      ; [.FE20.0020.0002] # jungseong A <non-initial>
 1163      ; [.FE21.0020.0002] # jungseong YA <non-initial>
 ENTRIES
-    );
+    )
 
-is(ref $hangul, "Unicode::Collate");
+is(ref $hangul, "Unicode::Collate")
 
 my $trailwt = Unicode::Collate->new(
     level => 3,
@@ -77,109 +77,109 @@ my $trailwt = Unicode::Collate->new(
 1102  ; [.1862.0020.0002] # HANGUL CHOSEONG NIEUN
 3042  ; [.1921.0020.000E] # HIRAGANA LETTER A
 ENTRIES
-    );
+    )
 
 #########################
 
 # L(simp)L(simp) vs L(comp): /GGA/
-is($Collator->cmp("\x{1100}\x{1100}\x{1161}", "\x{1101}\x{1161}"), -1);
-ok($hangul  ->eq("\x{1100}\x{1100}\x{1161}", "\x{1101}\x{1161}"));
-ok($trailwt ->eq("\x{1100}\x{1100}\x{1161}", "\x{1101}\x{1161}"));
+is($Collator->cmp("\x{1100}\x{1100}\x{1161}", "\x{1101}\x{1161}"), -1)
+ok($hangul  ->eq("\x{1100}\x{1100}\x{1161}", "\x{1101}\x{1161}"))
+ok($trailwt ->eq("\x{1100}\x{1100}\x{1161}", "\x{1101}\x{1161}"))
 
 # L(simp) vs L(simp)L(simp): /GA/ vs /GGA/
-is($Collator->cmp("\x{1100}\x{1161}", "\x{1100}\x{1100}\x{1161}"), 1);
-is($hangul  ->cmp("\x{1100}\x{1161}", "\x{1100}\x{1100}\x{1161}"), -1);
-is($trailwt ->cmp("\x{1100}\x{1161}", "\x{1100}\x{1100}\x{1161}"), -1);
+is($Collator->cmp("\x{1100}\x{1161}", "\x{1100}\x{1100}\x{1161}"), 1)
+is($hangul  ->cmp("\x{1100}\x{1161}", "\x{1100}\x{1100}\x{1161}"), -1)
+is($trailwt ->cmp("\x{1100}\x{1161}", "\x{1100}\x{1100}\x{1161}"), -1)
 
 # T(simp)T(simp) vs T(comp): /AGG/
-is($Collator->cmp("\x{1161}\x{11A8}\x{11A8}", "\x{1161}\x{11A9}"), -1);
-ok($hangul  ->eq("\x{1161}\x{11A8}\x{11A8}", "\x{1161}\x{11A9}"));
-ok($trailwt ->eq("\x{1161}\x{11A8}\x{11A8}", "\x{1161}\x{11A9}"));
+is($Collator->cmp("\x{1161}\x{11A8}\x{11A8}", "\x{1161}\x{11A9}"), -1)
+ok($hangul  ->eq("\x{1161}\x{11A8}\x{11A8}", "\x{1161}\x{11A9}"))
+ok($trailwt ->eq("\x{1161}\x{11A8}\x{11A8}", "\x{1161}\x{11A9}"))
 
 # T(simp) vs T(simp)T(simp): /AG/ vs /AGG/
-is($Collator->cmp("\x{1161}\x{11A8}", "\x{1161}\x{11A8}\x{11A8}"), -1);
-is($hangul  ->cmp("\x{1161}\x{11A8}", "\x{1161}\x{11A8}\x{11A8}"), -1);
-is($trailwt ->cmp("\x{1161}\x{11A8}", "\x{1161}\x{11A8}\x{11A8}"), -1);
+is($Collator->cmp("\x{1161}\x{11A8}", "\x{1161}\x{11A8}\x{11A8}"), -1)
+is($hangul  ->cmp("\x{1161}\x{11A8}", "\x{1161}\x{11A8}\x{11A8}"), -1)
+is($trailwt ->cmp("\x{1161}\x{11A8}", "\x{1161}\x{11A8}\x{11A8}"), -1)
 
 # LV vs LLV: /GA/ vs /GNA/
-is($Collator->cmp("\x{1100}\x{1161}", "\x{1100}\x{1102}\x{1161}"), 1);
-is($hangul  ->cmp("\x{1100}\x{1161}", "\x{1100}\x{1102}\x{1161}"), -1);
-is($trailwt ->cmp("\x{1100}\x{1161}", "\x{1100}\x{1102}\x{1161}"), -1);
+is($Collator->cmp("\x{1100}\x{1161}", "\x{1100}\x{1102}\x{1161}"), 1)
+is($hangul  ->cmp("\x{1100}\x{1161}", "\x{1100}\x{1102}\x{1161}"), -1)
+is($trailwt ->cmp("\x{1100}\x{1161}", "\x{1100}\x{1102}\x{1161}"), -1)
 
 # LVX vs LVV: /GAA/ vs /GA/.latinA
-is($Collator->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}A"), 1);
-is($hangul  ->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}A"), 1);
-is($trailwt ->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}A"), 1);
+is($Collator->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}A"), 1)
+is($hangul  ->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}A"), 1)
+is($trailwt ->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}A"), 1)
 
 # LVX vs LVV: /GAA/ vs /GA/.hiraganaA
-is($Collator->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{3042}"), -1);
-is($hangul  ->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{3042}"), 1);
-is($trailwt ->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{3042}"), 1);
+is($Collator->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{3042}"), -1)
+is($hangul  ->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{3042}"), 1)
+is($trailwt ->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{3042}"), 1)
 
 # LVX vs LVV: /GAA/ vs /GA/.hanja
-is($Collator->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{4E00}"), -1);
-is($hangul  ->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{4E00}"), 1);
-is($trailwt ->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{4E00}"), 1);
+is($Collator->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{4E00}"), -1)
+is($hangul  ->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{4E00}"), 1)
+is($trailwt ->cmp("\x{1100}\x{1161}\x{1161}", "\x{1100}\x{1161}\x{4E00}"), 1)
 
 # LVL vs LVT: /GA/./G/ vs /GAG/
-is($Collator->cmp("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{11A8}"), -1);
-is($hangul  ->cmp("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{11A8}"), -1);
-is($trailwt ->cmp("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{11A8}"), -1);
+is($Collator->cmp("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{11A8}"), -1)
+is($hangul  ->cmp("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{11A8}"), -1)
+is($trailwt ->cmp("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{11A8}"), -1)
 
 # LVT vs LVX: /GAG/ vs /GA/.latinA
-is($Collator->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}A"), 1);
-is($hangul  ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}A"), 1);
-is($trailwt ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}A"), 1);
+is($Collator->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}A"), 1)
+is($hangul  ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}A"), 1)
+is($trailwt ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}A"), 1)
 
 # LVT vs LVX: /GAG/ vs /GA/.hiraganaA
-is($Collator->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{3042}"), -1);
-is($hangul  ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{3042}"), 1);
-is($trailwt ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{3042}"), 1);
+is($Collator->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{3042}"), -1)
+is($hangul  ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{3042}"), 1)
+is($trailwt ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{3042}"), 1)
 
 # LVT vs LVX: /GAG/ vs /GA/.hanja
-is($Collator->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{4E00}"), -1);
-is($hangul  ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{4E00}"), 1);
-is($trailwt ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{4E00}"), 1);
+is($Collator->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{4E00}"), -1)
+is($hangul  ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{4E00}"), 1)
+is($trailwt ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{4E00}"), 1)
 
 # LVT vs LVV: /GAG/ vs /GAA/
-is($Collator->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{1161}"), 1);
-is($hangul  ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{1161}"), -1);
-is($trailwt ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{1161}"), -1);
+is($Collator->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{1161}"), 1)
+is($hangul  ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{1161}"), -1)
+is($trailwt ->cmp("\x{1100}\x{1161}\x{11A8}", "\x{1100}\x{1161}\x{1161}"), -1)
 
 # LVL vs LVV: /GA/./G/ vs /GAA/
-is($Collator->cmp("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{1161}"), -1);
-is($hangul  ->cmp("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{1161}"), -1);
-is($trailwt ->cmp("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{1161}"), -1);
+is($Collator->cmp("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{1161}"), -1)
+is($hangul  ->cmp("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{1161}"), -1)
+is($trailwt ->cmp("\x{1100}\x{1161}\x{1100}", "\x{1100}\x{1161}\x{1161}"), -1)
 
 # LV vs Syl(LV): /GA/ vs /[GA]/
-ok($Collator->eq("\x{1100}\x{1161}", "\x{AC00}"));
-ok($hangul  ->eq("\x{1100}\x{1161}", "\x{AC00}"));
-ok($trailwt ->eq("\x{1100}\x{1161}", "\x{AC00}"));
+ok($Collator->eq("\x{1100}\x{1161}", "\x{AC00}"))
+ok($hangul  ->eq("\x{1100}\x{1161}", "\x{AC00}"))
+ok($trailwt ->eq("\x{1100}\x{1161}", "\x{AC00}"))
 
 # LVT vs Syl(LV)T: /GAG/ vs /[GA]G/
-ok($Collator->eq("\x{1100}\x{1161}\x{11A8}", "\x{AC00}\x{11A8}"));
-ok($hangul  ->eq("\x{1100}\x{1161}\x{11A8}", "\x{AC00}\x{11A8}"));
-ok($trailwt ->eq("\x{1100}\x{1161}\x{11A8}", "\x{AC00}\x{11A8}"));
+ok($Collator->eq("\x{1100}\x{1161}\x{11A8}", "\x{AC00}\x{11A8}"))
+ok($hangul  ->eq("\x{1100}\x{1161}\x{11A8}", "\x{AC00}\x{11A8}"))
+ok($trailwt ->eq("\x{1100}\x{1161}\x{11A8}", "\x{AC00}\x{11A8}"))
 
 # LVT vs Syl(LVT): /GAG/ vs /[GAG]/
-ok($Collator->eq("\x{1100}\x{1161}\x{11A8}", "\x{AC01}"));
-ok($hangul  ->eq("\x{1100}\x{1161}\x{11A8}", "\x{AC01}"));
-ok($trailwt ->eq("\x{1100}\x{1161}\x{11A8}", "\x{AC01}"));
+ok($Collator->eq("\x{1100}\x{1161}\x{11A8}", "\x{AC01}"))
+ok($hangul  ->eq("\x{1100}\x{1161}\x{11A8}", "\x{AC01}"))
+ok($trailwt ->eq("\x{1100}\x{1161}\x{11A8}", "\x{AC01}"))
 
 # LVTT vs Syl(LVTT): /GAGG/ vs /[GAGG]/
-ok($Collator->eq("\x{1100}\x{1161}\x{11A9}", "\x{AC02}"));
-ok($hangul  ->eq("\x{1100}\x{1161}\x{11A9}", "\x{AC02}"));
-ok($trailwt ->eq("\x{1100}\x{1161}\x{11A9}", "\x{AC02}"));
+ok($Collator->eq("\x{1100}\x{1161}\x{11A9}", "\x{AC02}"))
+ok($hangul  ->eq("\x{1100}\x{1161}\x{11A9}", "\x{AC02}"))
+ok($trailwt ->eq("\x{1100}\x{1161}\x{11A9}", "\x{AC02}"))
 
 # LVTT vs Syl(LVT).T: /GAGG/ vs /[GAG]G/
-is($Collator->cmp("\x{1100}\x{1161}\x{11A9}", "\x{AC01}\x{11A8}"), 1);
-ok($hangul  ->eq("\x{1100}\x{1161}\x{11A9}", "\x{AC01}\x{11A8}"));
-ok($trailwt ->eq("\x{1100}\x{1161}\x{11A9}", "\x{AC01}\x{11A8}"));
+is($Collator->cmp("\x{1100}\x{1161}\x{11A9}", "\x{AC01}\x{11A8}"), 1)
+ok($hangul  ->eq("\x{1100}\x{1161}\x{11A9}", "\x{AC01}\x{11A8}"))
+ok($trailwt ->eq("\x{1100}\x{1161}\x{11A9}", "\x{AC01}\x{11A8}"))
 
 # LLVT vs L.Syl(LVT): /GGAG/ vs /G[GAG]/
-is($Collator->cmp("\x{1101}\x{1161}\x{11A8}", "\x{1100}\x{AC01}"), 1);
-ok($hangul  ->eq("\x{1101}\x{1161}\x{11A8}", "\x{1100}\x{AC01}"));
-ok($trailwt ->eq("\x{1101}\x{1161}\x{11A8}", "\x{1100}\x{AC01}"));
+is($Collator->cmp("\x{1101}\x{1161}\x{11A8}", "\x{1100}\x{AC01}"), 1)
+ok($hangul  ->eq("\x{1101}\x{1161}\x{11A8}", "\x{1100}\x{AC01}"))
+ok($trailwt ->eq("\x{1101}\x{1161}\x{11A8}", "\x{1100}\x{AC01}"))
 
 #########################
 
@@ -201,27 +201,27 @@ my $hangcont = Unicode::Collate->new(
 1161 11A9 ; [.0000.0000.0000] # A-GG <contraction>
 1100 1163 11A8 ; [.1000.0020.0002] # G-YA-G <contraction> eq. U+AC39
 ENTRIES
-    );
+    )
 
 # contracted into VT
-is($Collator->cmp("\x{1101}", "\x{1101}\x{1161}\x{11A9}"), -1);
-ok($hangcont->eq("\x{1101}", "\x{1101}\x{1161}\x{11A9}"));
+is($Collator->cmp("\x{1101}", "\x{1101}\x{1161}\x{11A9}"), -1)
+ok($hangcont->eq("\x{1101}", "\x{1101}\x{1161}\x{11A9}"))
 
 # not contracted into LVT but into VT
-is($Collator->cmp("\x{1100}", "\x{1100}\x{1161}\x{11A9}"), -1);
-ok($hangcont->eq("\x{1100}", "\x{1100}\x{1161}\x{11A9}"));
+is($Collator->cmp("\x{1100}", "\x{1100}\x{1161}\x{11A9}"), -1)
+ok($hangcont->eq("\x{1100}", "\x{1100}\x{1161}\x{11A9}"))
 
 # contracted into LVT
-is($Collator->cmp("\x{1100}\x{1163}\x{11A8}", "\x{1100}"), 1);
-is($hangcont->cmp("\x{1100}\x{1163}\x{11A8}", "\x{1100}"), -1);
+is($Collator->cmp("\x{1100}\x{1163}\x{11A8}", "\x{1100}"), 1)
+is($hangcont->cmp("\x{1100}\x{1163}\x{11A8}", "\x{1100}"), -1)
 
 # LVTT vs Syl(LVTT): /GAGG/ vs /[GAGG]/
-ok($Collator->eq("\x{1100}\x{1161}\x{11A9}", "\x{AC02}"));
-ok($hangcont->eq("\x{1100}\x{1161}\x{11A9}", "\x{AC02}"));
+ok($Collator->eq("\x{1100}\x{1161}\x{11A9}", "\x{AC02}"))
+ok($hangcont->eq("\x{1100}\x{1161}\x{11A9}", "\x{AC02}"))
 
 # LVT vs Syl(LVT): /GYAG/ vs /[GYAG]/
-ok($Collator->eq("\x{1100}\x{1163}\x{11A8}", "\x{AC39}"));
-ok($hangcont->eq("\x{1100}\x{1163}\x{11A8}", "\x{AC39}"));
+ok($Collator->eq("\x{1100}\x{1163}\x{11A8}", "\x{AC39}"))
+ok($hangcont->eq("\x{1100}\x{1163}\x{11A8}", "\x{AC39}"))
 
-1;
+1
 __END__

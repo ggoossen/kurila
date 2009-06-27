@@ -104,7 +104,8 @@ sub guess_name($self)
     # first .pm file with a matching .xs file.
     if (not -e "$($defpm).pm")
         @pm = glob'*.pm'
-        s/.pm$// for  @pm
+        for (@pm)
+            s/.pm$//
         if ((nelems @pm) == 1) { ($defpm = @pm[0]) =~ s/.pm$//; }elsif ((nelems @pm))
             %xs = %( < @+: map { s/.xs$//; @($_,1) }, @( glob( <'*.xs')) )  ## no critic
             if (keys %xs)
@@ -149,30 +150,32 @@ sub find_perl($self, $ver, $names, $dirs, $trace)
     if( $self->{?PERL_CORE} )
         # Check in relative directories first, so we pick up the current
         # version of Perl if we're running MakeMaker as part of the main build.
-        @sdirs = sort { my@($absa) =  $self->file_name_is_absolute($a);
-            my@($absb) =  $self->file_name_is_absolute($b);
-            if ($absa && $absb) { return $a cmp $b }
-            else { return $absa ?? 1 !!  @($absb ?? -1 !!  @($a cmp $b)); }
-        }, $dirs->@
+        @sdirs = sort { my @($absa) =  $self->file_name_is_absolute($a);
+                        my @($absb) =  $self->file_name_is_absolute($b);
+                        if ($absa && $absb) { return $a cmp $b }
+                        else { return $absa ?? 1 !!  @($absb ?? -1 !!  @($a cmp $b)); }
+                      }, $dirs->@
         # Check miniperl before perl, and check names likely to contain
         # version numbers before "generic" names, so we pick up an
         # executable that's less likely to be from an old installation.
         @snames = sort { my@($ba) = $a =~ m!([^:>\]/]+)$!;  # basename
-            my@($bb) = $b =~ m!([^:>\]/]+)$!;
-            my@($ahasdir) = @(length($a) - length($ba) +> 0);
-            my@($bhasdir) = @(length($b) - length($bb) +> 0);
-            if    ($ahasdir and not $bhasdir) { return 1; }
-                elsif ($bhasdir and not $ahasdir) { return -1; }
-            else { $bb =~ m/\d/ <+> $ba =~ m/\d/
-                    or substr($ba,0,1) cmp substr($bb,0,1)
-                    or length($bb) <+> length($ba) } }, $names->@
+                         my@($bb) = $b =~ m!([^:>\]/]+)$!;
+                         my@($ahasdir) = @(length($a) - length($ba) +> 0);
+                         my@($bhasdir) = @(length($b) - length($bb) +> 0);
+                         if    ($ahasdir and not $bhasdir) { return 1; }
+                         elsif ($bhasdir and not $ahasdir) { return -1; }
+                         else
+                             $bb =~ m/\d/ <+> $ba =~ m/\d/
+                                 or substr($ba,0,1) cmp substr($bb,0,1)
+                                 or length($bb) <+> length($ba)
+                       }, $names->@
     else
         @sdirs  = $dirs->@
         @snames = $names->@
-    
 
     # Image names containing Perl version use '_' instead of '.' under VMS
-    s/\.(\d+)$/_$1/ for  @snames
+    for (@snames)
+        s/\.(\d+)$/_$1/
     if ($trace +>= 2)
         print $^STDOUT, "Looking for perl $ver by these names:\n"
         print $^STDOUT, "\t$(join ' ',@snames),\n"

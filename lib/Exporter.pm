@@ -41,15 +41,14 @@ sub import
         for (@_)
             ($heavy = (m/\W/ or $args and not exists $export_cache->{$_}
                        or (nelems $fail->@) and $_ eq $fail->[0])) and last
-        
     else
-        ($heavy = m/\W/) and last
-            foreach @( (< @_))
-    
+        foreach (@_)
+            ($heavy = m/\W/) and last
+
     return export $pkg, $callpkg, ($args ?? < @_ !! ()) if $heavy
     # shortcut for the common case of no type character
-    Symbol::fetch_glob("$callpkg\::$_")->* = \&{Symbol::fetch_glob("$pkg\::$_")->*} foreach  @_
-
+    for (@_)
+        Symbol::fetch_glob("$callpkg\::$_")->* = \&{Symbol::fetch_glob("$pkg\::$_")->*}
 
 # Default methods
 

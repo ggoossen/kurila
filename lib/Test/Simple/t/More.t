@@ -43,8 +43,8 @@ can_ok(bless(\%(), "Test::More"), < qw(require_ok use_ok ok is isnt like skip
                                    can_ok pass fail eq_array eq_hash eq_set))
 
 
-isa_ok(bless(\@(), "Foo"), "Foo")
-isa_ok(\@(), 'ARRAY')
+isa_ok(bless(\$@, "Foo"), "Foo")
+isa_ok(\$@, 'ARRAY')
 isa_ok(\42, 'SCALAR')
 
 

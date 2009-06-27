@@ -511,7 +511,8 @@ sub sequence($op)
 
 sub fmt_line($hr, $op, $text, $level)
 
-    $_->($hr, $op, \$text, \$level, $stylename) for  @callbacks
+    for (@callbacks)
+        $_->($hr, $op, \$text, \$level, $stylename)
 
     return '' if $hr->{?SKIP}   # suppress line if a callback said so
     return '' if $hr->{?goto} and $hr->{?goto} eq '-'   # no goto nowhere
@@ -548,42 +549,51 @@ sub fmt_line($hr, $op, $text, $level)
 
 our %priv # used to display each opcode's BASEOP.op_private values
 
-%priv{+$_}{+128} = "LVINTRO"
-    for @( ("pos", "substr", "vec", "threadsv", "gvsv", "rv2sv", "rv2hv", "rv2gv",
-        "rv2av", "aelem", "helem", "aslice", "hslice", "padsv",
-        "padav", "padhv", "enteriter"))
-%priv{+$_}{+64} = "REFC" for @( ("leave", "leavesub", "leavesublv", "leavewrite"))
+for (@: "pos", "substr", "vec", "threadsv", "gvsv", "rv2sv", "rv2hv", "rv2gv"
+        "rv2av", "aelem", "helem", "aslice", "hslice", "padsv"
+        "padav", "padhv", "enteriter")
+    %priv{+$_}{+128} = "LVINTRO"
+for (@: "leave", "leavesub", "leavesublv", "leavewrite")
+    %priv{+$_}{+64} = "REFC" 
 %priv{+"aassign"}{+64} = "COMMON"
 %priv{"aassign"}{+32} = "STATE"
 %priv{+"sassign"}{+32} = "STATE"
 %priv{+"sassign"}{+64} = "BKWARD"
-%priv{+$_}{+64} = "RTIME" for @( ("match", "subst", "substcont", "qr"))
+for (@: "match", "subst", "substcont", "qr")
+    %priv{+$_}{+64} = "RTIME"
 %priv{+"trans"}{[+@(1,2,4,8,16,64)]} = @("<UTF", ">UTF", "IDENT", "SQUASH", "DEL",
                                          "COMPL", "GROWS")
 %priv{+"repeat"}{+64} = "DOLIST"
 %priv{+"leaveloop"}{+64} = "CONT"
-%priv{+$_}{[@(32,64,96)]} = @("DREFAV", "DREFHV", "DREFSV")
-    for @( ( <qw(rv2gv rv2sv padsv aelem helem)))
-%priv{$_}{+16} = "STATE" for @( ("padav", "padhv", "padsv"))
+for (qw(rv2gv rv2sv padsv aelem helem))
+    %priv{+$_}{[@(32,64,96)]} = @("DREFAV", "DREFHV", "DREFSV")
+for (@: "padav", "padhv", "padsv")
+    %priv{$_}{+16} = "STATE"
 %priv{+"entersub"}{[+@(16,32,64)]} = @("DBG","TARG","NOMOD")
-%priv{+$_}{[+@(4,8,128)]} = @("INARGS","AMPER","NO()") for @( ("entersub", "rv2cv"))
+for (@: "entersub", "rv2cv")
+    %priv{+$_}{[+@(4,8,128)]} = @("INARGS","AMPER","NO()")
 %priv{+"gv"}{+32} = "EARLYCV"
 %priv{+"aelem"}{+16} = %priv{"helem"}{+16} = "LVDEFER"
-%priv{+$_}{+16} = "OURINTR" for @( ("gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv",
-                                    "enteriter"))
-%priv{+$_}{+16} = "TARGMY"
-    for @( (< ( @+: map( {@($_,"s$_") }, @("chop", "chomp")) ),
-        < ( @+: map( {@($_,"i_$_") }, @( "postinc", "postdec", "multiply", "divide", "modulo",
-                                           "add", "subtract", "negate"))), "pow", "concat", "stringify",
-        "left_shift", "right_shift", "bit_and", "bit_xor", "bit_or",
-        "complement", "atan2", "sin", "cos", "rand", "exp", "log", "sqrt",
-        "int", "hex", "oct", "abs", "length", "index", "rindex", "sprintf",
-        "ord", "chr", "crypt", "quotemeta", "join", "push", "unshift", "flock",
-        "chdir", "chown", "chroot", "unlink", "chmod", "utime", "rename",
-        "link", "symlink", "mkdir", "rmdir", "wait", "waitpid", "system",
-        "exec", "kill", "getppid", "getpgrp", "setpgrp", "getpriority",
-        "setpriority", "time", "sleep"))
-%priv{+$_}{+4} = "REVERSED" for @( ("enteriter", "iter"))
+for (@: "gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv"
+        "enteriter")
+    %priv{+$_}{+16} = "OURINTR" 
+for (@: (< @+: map( {@($_,"s$_") }, @("chop", "chomp")) )
+        (< @+: map( {@($_,"i_$_") },
+                 @: "postinc", "postdec", "multiply", "divide", "modulo"
+                    "add", "subtract", "negate"))
+        "pow", "concat", "stringify"
+        "left_shift", "right_shift", "bit_and", "bit_xor", "bit_or"
+        "complement", "atan2", "sin", "cos", "rand", "exp", "log", "sqrt"
+        "int", "hex", "oct", "abs", "length", "index", "rindex", "sprintf"
+        "ord", "chr", "crypt", "quotemeta", "join", "push", "unshift", "flock"
+        "chdir", "chown", "chroot", "unlink", "chmod", "utime", "rename"
+        "link", "symlink", "mkdir", "rmdir", "wait", "waitpid", "system"
+        "exec", "kill", "getppid", "getpgrp", "setpgrp", "getpriority"
+        "setpriority", "time", "sleep"
+        )
+    %priv{+$_}{+16} = "TARGMY"
+for (@: "enteriter", "iter")
+    %priv{+$_}{+4} = "REVERSED"
 %priv{+"const"}{[+@(4,8,16,32,64,128)]} = @("SHORT","STRICT","ENTERED",'$[',"BARE","WARN")
 %priv{+"flip"}{+64} = %priv{+"flop"}{+64} = "LINENUM"
 %priv{+"list"}{+64} = "GUESSED"
@@ -591,23 +601,23 @@ our %priv # used to display each opcode's BASEOP.op_private values
 %priv{+"exists"}{+64} = "SUB"
 %priv{+"sort"}{[+@(1,2,4,8,16,32,64)]} = @("NUM", "INT", "REV", "INPLACE","DESC","QSORT","STABLE")
 %priv{"threadsv"}{+64} = "SVREFd"
-%priv{+$_}{[+@(16,32,64,128)]} = @("INBIN","INCR","OUTBIN","OUTCR")
-    for @( ("open", "backtick"))
+for (@: "open", "backtick")
+    %priv{+$_}{[+@(16,32,64,128)]} = @("INBIN","INCR","OUTBIN","OUTCR")
 %priv{+"exit"}{+128} = "VMS"
-%priv{+$_}{+2} = "FTACCESS"
-    for @( ("ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec"))
+for (@: "ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec")
+    %priv{+$_}{+2} = "FTACCESS"
 %priv{+"entereval"}{+2} = "HAS_HH"
 do
     # Stacked filetests are post 5.8.x
-    %priv{+$_}{+4} = "FTSTACKED"
-        for @( ("ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec",
-            "ftis", "fteowned", "ftrowned", "ftzero", "ftsize", "ftmtime",
-            "ftatime", "ftctime", "ftsock", "ftchr", "ftblk", "ftfile", "ftdir",
-            "ftpipe", "ftlink", "ftsuid", "ftsgid", "ftsvtx", "fttty", "fttext",
-            "ftbinary"))
+    for (@: "ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec"
+            "ftis", "fteowned", "ftrowned", "ftzero", "ftsize", "ftmtime"
+            "ftatime", "ftctime", "ftsock", "ftchr", "ftblk", "ftfile", "ftdir"
+            "ftpipe", "ftlink", "ftsuid", "ftsgid", "ftsvtx", "fttty", "fttext"
+            "ftbinary")
+        %priv{+$_}{+4} = "FTSTACKED"
     # Lexical $_ is post 5.8.x
-    %priv{+$_}{+2} = "GREPLEX"
-        for @( ("mapwhile", "mapstart", "grepwhile", "grepstart"))
+    for (@: "mapwhile", "mapstart", "grepwhile", "grepstart")
+        %priv{+$_}{+2} = "GREPLEX"
 
 
 our %hints # used to display each COP's op_hints values

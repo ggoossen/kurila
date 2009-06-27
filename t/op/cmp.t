@@ -44,9 +44,9 @@ do
     dies_like( sub (@< @_) { @(1,2) +< 3 },
                qr/ARRAY used as a number/)
 
-    for my $sub ( @: sub (@< @_) { \2 +< \3 },
-                     sub (@< @_) { \2 +<= \3 },
-                     sub (@< @_) { \2 +> \3 },
+    for my $sub ( @: sub (@< @_) { \2 +< \3 }
+                     sub (@< @_) { \2 +<= \3 }
+                     sub (@< @_) { \2 +> \3 }
                      sub (@< @_) { \2 +>= \3 } )
         dies_like( sub (@< @_) { $sub->() },
                    qr/REF used as a number/)

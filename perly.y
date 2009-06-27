@@ -84,6 +84,8 @@
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
 %token <i_tkval> SPECIALBLOCK
+%token <i_tkval> LAYOUTLISTEND
+%token <i_tkval> EMPTYAH
 
 %type <i_tkval> optional_semicolon
 
@@ -120,6 +122,7 @@
 %right <i_tkval> TERNARY_IF TERNARY_ELSE
 %right <i_tkval> '<' ARRAYEXPAND HASHEXPAND
 %right ANONHSHL ANONARYL ANONSCALARL
+%left <i_tkval> AHOP
 %nonassoc DOTDOT
 %left <i_tkval> OROR DORDOR
 %left <i_tkval> ANDAND
@@ -291,11 +294,6 @@ sideff	:	error
                             $$ = newLOOPOP(OPf_PARENS, 1, $5, $2, TRUE, LOCATION($4));
                             TOKEN_GETMAD($4,$$,'w');
                             TOKEN_GETMAD($1,$$,'W');
-			}
-	|	expr FOR expr
-			{ $$ = newFOROP(0, NULL,
-                                (OP*)NULL, scalar($3), $1, (OP*)NULL, LOCATION($2));
-			  TOKEN_GETMAD($2,((LISTOP*)$$)->op_first->op_sibling,'w');
 			}
 	;
 
@@ -787,9 +785,21 @@ listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
                             $$ = newANONHASH($2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'{');
 			}
-        |       ANONARYL listexpr  /* @: ... */
+        |       ANONARYL listexpr LAYOUTLISTEND  /* @: ... */
                         {
                             $$ = newANONARRAY($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'[');
+			}
+        |       ANONARYL listexpr /* @: ... and */
+                        {
+                            $$ = newANONARRAY($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'[');
+                            --PL_parser->lex_brackets;
+                            PL_parser->statement_indent = PL_parser->lex_brackstack[PL_parser->lex_brackets].prev_statement_indent;
+			}
+        |       ANONARYL ',' LAYOUTLISTEND  /* @: ... */
+                        {
+                            $$ = newANONARRAY(NULL, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
 			}
         |       ANONSCALARL listexpr  /* $: ... */
@@ -941,7 +951,12 @@ subscripted:    star '{' expr ';' '}'       /* *main::{something} like *STDOUT{I
     ;
 
 /* Binary operators between terms */
-termbinop:	term POWOP term                        /* $x ** $y */
+termbinop:	term AHOP term                        /* $x +@+ $y */
+                        { $$ = newBINOP(IVAL($2), 0, scalar($1), scalar($3), LOCATION($2));
+			  TOKEN_GETMAD($2,$$,'o');
+                          APPEND_MADPROPS_PV("operator",$$,'>');
+			}
+	|	term POWOP term                        /* $x ** $y */
                         { $$ = newBINOP(IVAL($2), 0, scalar($1), scalar($3), LOCATION($2));
 			  TOKEN_GETMAD($2,$$,'o');
                           APPEND_MADPROPS_PV("operator",$$,'>');
@@ -1402,6 +1417,10 @@ scalar  :	PRIVATEVAR
                             TOKEN_GETMAD($1,$$,'{');
                             TOKEN_GETMAD($2,$$,'}');
 			}
+        |       EMPTYAH
+			{ 
+                            $$ = newOP(IVAL($1), 0, LOCATION($1));
+                        }
 	;
 
 star	:	'*' indirob

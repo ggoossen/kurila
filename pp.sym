@@ -200,6 +200,8 @@ Perl_pp_arrayjoin
 Perl_pp_hashjoin
 Perl_pp_arrayconcat
 Perl_pp_hashconcat
+Perl_pp_emptyarray
+Perl_pp_emptyhash
 Perl_pp_grepstart
 Perl_pp_grepwhile
 Perl_pp_mapstart

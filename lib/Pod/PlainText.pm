@@ -124,7 +124,7 @@ sub initialize
     $self->%{+sentence} = 0  unless defined $self->%{?sentence}
     $self->%{+width}    = 76 unless defined $self->%{?width}
 
-    $self->%{+INDENTS}  = \@()              # Stack of indentations.
+    $self->%{+INDENTS}  = \$@              # Stack of indentations.
     $self->%{+MARGIN}   = $self->%{?indent}  # Current left margin in spaces.
 
     $self->SUPER::initialize
@@ -344,7 +344,8 @@ sub cmd_item
 sub cmd_begin
     my $self = shift
     local $_ = shift
-    my @($kind) = @: m/^(\S+)/ or return
+    my @($kind) = @: m/^(\S+)/
+        or return
     if ($kind eq 'text')
         $self->%{+VERBATIM} = 1
     else

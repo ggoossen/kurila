@@ -48,7 +48,7 @@ is ($refref->$->$, 'Good')
 
 # Test nested anonymous lists.
 
-$ref = \@(\@(),2,\@(3,4,5,))
+$ref = \@(\$@,2,\@(3,4,5,))
 is (scalar nelems $ref->@, 3)
 is ($ref->[1], 2)
 is ($ref->[2]->[2], 5)

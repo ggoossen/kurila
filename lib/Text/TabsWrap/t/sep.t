@@ -87,7 +87,7 @@ use Test::More
 
 plan tests => 1 +nelems @tests
 
-use Text::Wrap;
+use Text::Wrap
 $Text::Wrap::separator = '='
 
 my $rerun = env::var('PERL_DL_NONLAZY') ?? 0 !! 1

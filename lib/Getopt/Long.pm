@@ -176,12 +176,11 @@ sub getoptions
     my $ret = 0
     $Getopt::Long::caller = $self->{?caller_pkg}
 
-    try {
+    try
         # Locally set exception handler to default, otherwise it will
         # be called implicitly here, and again explicitly when we try
         # to deliver the messages.
-        $ret = Getopt::Long::GetOptions (< @_);
-    }
+        $ret = Getopt::Long::GetOptions (< @_)
 
     # Restore saved settings.
     Getopt::Long::Configure ($save)

@@ -85,7 +85,7 @@ typedef U64TYPE PADOFFSET;
 	(0 + (((XPVNV*) SvANY(sv))->xnv_u.xpad_cop_seq.xhigh))
 #endif
 
-/* Flags set in the SvIVX field of FAKE namesvs */
+/* Flags set in the SvIV field of FAKE namesvs */
     
 #define PAD_FAKELEX_ANON   1 /* the lex is declared in an ANON, or ... */
 #define PAD_FAKELEX_MULTI  2 /* the lex can be instantiated multiple times */

@@ -502,9 +502,9 @@ sub _sanity_check_and_defaults
             map {   _store_error(
                         loc(q|Template type '%1' not supported [at key '%2']|,
                             $_, $key), 1, 1 );
-            }, grep {
-                not %known_keys{?$_}
-            }, keys %utmpl{?$key}
+                }, grep {
+                    not %known_keys{?$_}
+                }, keys %utmpl{?$key}
 
             ### make sure you passed a ref, otherwise, complain about it!
             if ( exists %utmpl{$key}{'store'} )
@@ -548,7 +548,8 @@ It is exported upon request.
 
 =cut
 
-do {   $_ERROR_STRING = '';
+do
+    $_ERROR_STRING = ''
 
     sub _store_error
         my@($err, $verbose, $offset) =  @_[[0..2]]
@@ -559,14 +560,11 @@ do {   $_ERROR_STRING = '';
         warn $err if $verbose
 
         $_ERROR_STRING .= $err . "\n"
-    
 
     sub _clear_error
         $_ERROR_STRING = ''
-    
 
     sub last_error { $_ERROR_STRING }
-}
 
 1
 

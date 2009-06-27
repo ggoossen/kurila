@@ -83,7 +83,7 @@ sub compile($self, %< %args)
     %args{+object_file} ||= $self->object_file(%args{source})
 
     my @include_dirs = $self->arg_include_dirs
-        (< (%args{?include_dirs} || \@())->@,
+        (< (%args{?include_dirs} || \$@)->@,
         $self->perl_inc())
 
     my @defines = $self->arg_defines( < (%args{?defines} || \%())->% )
@@ -153,9 +153,9 @@ sub prelink($self, %< %args)
 
     require ExtUtils::Mksymlists
     ExtUtils::Mksymlists::Mksymlists( # dl. abbrev for dynamic library
-        DL_VARS  => %args{?dl_vars}      || \@(),
+        DL_VARS  => %args{?dl_vars}      || \$@,
         DL_FUNCS => %args{?dl_funcs}     || \%(),
-        FUNCLIST => %args{?dl_func_list} || \@(),
+        FUNCLIST => %args{?dl_func_list} || \$@,
         IMPORTS  => %args{?dl_imports}   || \%(),
         NAME     => %args{?dl_name},		# Name of the Perl module
         DLBASE   => %args{?dl_base},		# Basename of DLL file

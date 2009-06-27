@@ -28,7 +28,7 @@ my %proto_number
 %proto_number{+tcp}  = Socket::IPPROTO_TCP()  if defined &Socket::IPPROTO_TCP
 %proto_number{+upd}  = Socket::IPPROTO_UDP()  if defined &Socket::IPPROTO_UDP
 %proto_number{+icmp} = Socket::IPPROTO_ICMP() if defined &Socket::IPPROTO_ICMP
-my %proto_name = %( < reverse @: < %proto_number )
+my %proto_name = %( < reverse @:< %proto_number )
 
 sub new
     my $class = shift
@@ -70,7 +70,7 @@ sub _get_proto_name
 
 sub _sock_info($addr,$port,$proto)
     my $origport = $port
-    my @serv = @( () )
+    my @serv = $@
 
     $port = $1
         if(defined $addr && $addr =~ s,:([\w\(\)/]+)$,,)
@@ -163,7 +163,7 @@ sub configure($sock,$arg)
 
     $type = $arg->{?Type} || %socket_type{?lc _get_proto_name($proto)}
 
-    my @raddr = @( () )
+    my @raddr = $@
 
     if(defined $raddr)
         @raddr = $sock->_get_addr($raddr, $arg->{?MultiHomed})

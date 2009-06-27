@@ -9,9 +9,12 @@ my @Meths   = qw[can_use_ipc_run can_use_ipc_open3 can_capture_buffer]
 my $IsWin32 = $^OS_NAME eq 'MSWin32'
 my $Verbose = (nelems @ARGV) ?? 1 !! 0
 
-use_ok( $Class,         $_ ) for  @Funcs
-can_ok( $Class,         $_ ) for  @(< @Funcs, < @Meths)
-can_ok( __PACKAGE__,    $_ ) for  @Funcs
+for (@Funcs)
+    use_ok( $Class,         $_ )
+for (@Funcs +@+ @Meths)
+    can_ok( $Class,         $_ )
+for (@Funcs)
+    can_ok( __PACKAGE__,    $_ )
 
 my $Have_IPC_Run    = $Class->can_use_ipc_run
 my $Have_IPC_Open3  = $Class->can_use_ipc_open3
@@ -88,7 +91,8 @@ do   ### list of commands and regexes matching output ###
                         unless $Class->can_capture_buffer
 
                     ### the last 3 entries from the RV, are they array refs?
-                    isa_ok( @list[$_], 'ARRAY' ) for 2..4
+                    for (2..4)
+                        isa_ok( @list[$_], 'ARRAY' )
 
                     like( "$(join ' ',@list[2]->@)", $regex,
                           "   Combined buffer holds output" )
@@ -164,7 +168,8 @@ do   ### list of commands and regexes matching output ###
                         unless $Class->can_capture_buffer
 
                     ### the last 3 entries from the RV, are they array refs?
-                    isa_ok( @list[$_], 'ARRAY' ) for 2..4
+                    for (2..4)
+                        isa_ok( @list[$_], 'ARRAY' )
 
                     like( join(' ',@list[2]->@), $regex,
                           "   Combined buffer holds output" )

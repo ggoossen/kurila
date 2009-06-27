@@ -10,11 +10,11 @@ do
     is($anchored,'here',"Regmust anchored - qr//")
     is($floating,'there',"Regmust floating - qr//")
     my $foo='blah'
-    @(?$anchored,?$floating)= regmust($foo) || @()
+    @(?$anchored,?$floating)= regmust($foo) || $@
     is($anchored,undef,"Regmust anchored - non ref")
     is($floating,undef,"Regmust anchored - non ref")
     my $bar=\@('blah')
-    @(?$anchored,?$floating)= regmust($foo) || @()
+    @(?$anchored,?$floating)= regmust($foo) || $@
     is($anchored,undef,"Regmust anchored - ref")
     is($floating,undef,"Regmust anchored - ref")
 

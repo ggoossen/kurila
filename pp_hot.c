@@ -315,7 +315,7 @@ PP(pp_eq)
 			uvp = *SP;
 			ivp = *--SP;
 		    }
-		    iv = SvIVX(ivp);
+		    iv = SvIV(ivp);
 		    if (iv < 0)
 			/* As uv is a UV, it's >0, so it cannot be == */
 			SETs(&PL_sv_no);
@@ -348,9 +348,9 @@ PP(pp_preinc)
     if ( SvOK(TOPs) && ! SvPVOK(TOPs) )
 	Perl_croak(aTHX_ "increment (++) does not work on a %s", Ddesc(TOPs));
     if (!SvREADONLY(TOPs) && SvIOK_notUV(TOPs) && !SvNOK(TOPs) && !SvPOK(TOPs)
-        && SvIVX(TOPs) != IV_MAX)
+        && SvIV(TOPs) != IV_MAX)
     {
-	SvIV_set(TOPs, SvIVX(TOPs) + 1);
+	SvIV_set(TOPs, SvIV(TOPs) + 1);
 	SvFLAGS(TOPs) &= ~(SVp_NOK|SVp_POK);
     }
     else /* Do all the PERL_PRESERVE_IVUV conditionals in sv_inc */
@@ -490,7 +490,7 @@ PP(pp_add)
 		if ((auvok = SvUOK(svl)))
 		    auv = SvUVX(svl);
 		else {
-		    register const IV aiv = SvIVX(svl);
+		    register const IV aiv = SvIV(svl);
 		    if (aiv >= 0) {
 			auv = aiv;
 			auvok = 1;	/* Now acting as a sign flag.  */
@@ -510,7 +510,7 @@ PP(pp_add)
 	    if (buvok)
 		buv = SvUVX(svr);
 	    else {
-		register const IV biv = SvIVX(svr);
+		register const IV biv = SvIV(svr);
 		if (biv >= 0) {
 		    buv = biv;
 		    buvok = 1;

@@ -391,7 +391,7 @@ sub unimport
     $^WARNING_BITS = $mask 
 
 
-my %builtin_type; %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = @()
+my %builtin_type; %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = $@
 
 sub __chk
     my $category 

@@ -39,7 +39,8 @@ sub split_like_shell(my $self, local $_)
 
 
 sub arg_defines($self, %< %args)
-    s/"/\\"/g foreach values %args
+    foreach (values %args)
+        s/"/\\"/g 
     return map { qq{"-D$_=%args{?$_}"} }, keys %args
 
 
@@ -69,7 +70,7 @@ sub compile($self, %< %args)
         ),
         optimize    => \ $self->split_like_shell($cf->{optimize}),
         defines     => \@defines,
-        includes    => \ (%args{?include_dirs} || \@())->@,
+        includes    => \ (%args{?include_dirs} || \$@)->@,
         perlinc     => \@( <
                                    $self->perl_inc(), <
                                    $self->split_like_shell($cf->{incpath}),
@@ -115,9 +116,9 @@ sub link($self, %< %args)
     my %spec = %(
         srcdir        => $to,
         builddir      => $to,
-        startup       => \@( ),
+        startup       => \$@,
         objects       => \@objects,
-        libs          => \@( ),
+        libs          => \$@,
         output        => $output,
         ld            => $cf->{?ld},
         libperl       => $cf->{?libperl},
@@ -239,8 +240,8 @@ package ExtUtils::CBuilder::Platform::Windows::MSVC;
 
 sub format_compiler_cmd($self, %< %spec)
 
-    foreach my $path (  ( %spec{?includes} || \@() )->@
-        +@+ ( %spec{?perlinc}  || \@() )->@ )
+    foreach my $path (  ( %spec{?includes} || \$@ )->@
+        +@+ ( %spec{?perlinc}  || \$@ )->@ )
         $path = '-I' . $path
     
 
@@ -362,8 +363,8 @@ package ExtUtils::CBuilder::Platform::Windows::BCC;
 
 sub format_compiler_cmd($self, %< %spec)
 
-    foreach my $path (  ( %spec{?includes} || \@() )->@
-        +@+ ( %spec{?perlinc}  || \@() )->@ )
+    foreach my $path (  ( %spec{?includes} || \$@ )->@
+        +@+ ( %spec{?perlinc}  || \$@ )->@ )
         $path = '-I' . $path
     
 
@@ -471,7 +472,7 @@ sub write_linker_script($self, %< %spec)
 
     print $ld_libs_fh, join( " +\n", @(
      (delete %spec{libperl}  || ''),
-     < (delete %spec{perllibs} || \@())->@,)
+     < (delete %spec{perllibs} || \$@)->@,)
         )
 
     close $ld_libs_fh
@@ -489,8 +490,8 @@ package ExtUtils::CBuilder::Platform::Windows::GCC;
 
 sub format_compiler_cmd($self, %< %spec)
 
-    foreach my $path (  ( %spec{?includes} || \@() )->@
-        +@+ ( %spec{?perlinc}  || \@() )->@ )
+    foreach my $path (  ( %spec{?includes} || \$@ )->@
+        +@+ ( %spec{?perlinc}  || \$@ )->@ )
         $path = '-I' . $path
     
 
@@ -597,8 +598,8 @@ sub write_linker_script($self, %< %spec)
     open( my $scriptfh, ">$script" )
         or die( "Could not create script '$script': $^OS_ERROR" )
 
-    print( $scriptfh, 'SEARCH_DIR(' . $_ . ")\n" )
-        for  (delete %spec{libpath} || \@())->@
+    for ((delete %spec{libpath} || \$@)->@)
+        print( $scriptfh, 'SEARCH_DIR(' . $_ . ")\n" )
 
     # gcc takes only one startup file, so the first object in startup is
     # specified as the startup file and any others are shifted into the
@@ -606,14 +607,14 @@ sub write_linker_script($self, %< %spec)
     if ( %spec{?startup} && nelems %spec{?startup}->@ )
         print $scriptfh, 'STARTUP(' . shift( %spec{startup}->@ ) . ")\n"
         unshift %spec{objects}->@,
-            < (delete %spec{startup} || \@())->@
+            < (delete %spec{startup} || \$@)->@
     
 
-    print $scriptfh, 'INPUT(' . join( ',', (delete %spec{objects}  || \@())->@ ) . ")\n"
+    print $scriptfh, 'INPUT(' . join( ',', (delete %spec{objects}  || \$@)->@ ) . ")\n"
 
     print $scriptfh, 'INPUT(' . join( ' ', @(
      (delete %spec{libperl}  || ''),
-     < (delete %spec{perllibs} || \@())->@,)
+     < (delete %spec{perllibs} || \$@)->@,)
         ) . ")\n"
 
     close $scriptfh

@@ -9,7 +9,7 @@
 
 BEGIN { $^OUTPUT_AUTOFLUSH = 1; print $^STDOUT, "1..16\n" }
 env::var('ANSI_COLORS_DISABLED') = undef
-use Term::ANSIColor < qw(:constants color colored uncolor);
+use Term::ANSIColor < qw(:constants color colored uncolor)
 print $^STDOUT, "ok 1\n"
 
 ##############################################################################

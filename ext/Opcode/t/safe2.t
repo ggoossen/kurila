@@ -54,7 +54,7 @@ print $^STDOUT, $^EVAL_ERROR ?? "not ok 7\n#$($^EVAL_ERROR->message)" !! "ok 7\n
 
 our $foo = "ok 8\n"
 our %bar = %(key => "ok 9\n")
-our @baz = @( () ); push(@baz, "o", "10")
+our @baz = $@; push(@baz, "o", "10")
 our @glob = qw(not ok 16)
 
 sub sayok { print $^STDOUT, "ok $(join ' ',@_)\n" }

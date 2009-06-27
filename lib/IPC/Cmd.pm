@@ -507,11 +507,11 @@ sub _ipc_run
 
     my @command; my $special_chars
     if( ref $cmd )
-        my $aref = \@()
+        my $aref = \$@
         for my $item ( $cmd->@)
             if( $item =~ m/([<>|&])/ )
                 push @command, $aref, $item
-                $aref = \@()
+                $aref = \$@
                 $special_chars .= $1
             else
                 push $aref->@, $item
@@ -520,12 +520,10 @@ sub _ipc_run
         push @command, $aref
     else
         @command = map { if( m/([<>|&])/ )
-                $special_chars .= $1; $_
-            else
-                \ split m/ +/
-            
-        }, split( m/\s*([<>|&])\s*/, $cmd )
-    
+                             $special_chars .= $1; $_
+                         else
+                             \ split m/ +/
+                       }, split( m/\s*([<>|&])\s*/, $cmd )
 
     ### if there's a pipe in the command, $^STDIN needs to
     ### be inserted *BEFORE* the pipe, to work on win32
@@ -573,14 +571,14 @@ sub _system_run
     return 1
 
 
-do {   use File::Spec;
-    use Symbol;
+do  use File::Spec
+    use Symbol
 
     my %Map = %(
         STDOUT => \@( <qw|>&|, $^STDOUT, Symbol::gensym() ),
         STDERR => \@( <qw|>&|, $^STDERR, Symbol::gensym() ),
         STDIN  => \@( <qw|<&|, $^STDIN,  Symbol::gensym() ),
-        );
+        )
 
     ### dups FDs and stores them in a cache
     sub __dup_fds
@@ -608,11 +606,8 @@ do {   use File::Spec;
                     Carp::carp( <loc("Could not reopen '$name': \%1", $^OS_ERROR)),
                     return
                     )
-            
-        
 
         return 1
-    
 
     ### reopens FDs from the cache
     sub __reopen_fds
@@ -635,8 +630,6 @@ do {   use File::Spec;
         
         return 1
 
-    
-}
 
 sub _debug
     my $self    = shift

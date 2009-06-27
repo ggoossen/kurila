@@ -31,11 +31,11 @@ cmp_ok( @ar[1], '==', 102, '..second element pushed' )
 
 unlike( 'a', qr/^a(?{103})b(?{104})/, 'a !~ ab with code push' )
 
-@ar = @( () )
+@ar = $@
 unlike( 'a', qr/^a(?{push @ar,105})b(?{push @ar,106})/, 'a !~ ab (push)' )
 cmp_ok( scalar(nelems @ar), '==', 0, '..nothing pushed' )
 
-@ar = @( () )
+@ar = $@
 unlike( 'abc', qr/^a(?{push @ar,107})b(?{push @ar,108})$/, 'abc !~ ab$ (push)' )
 cmp_ok( scalar(nelems @ar), '==', 0, '..still nothing pushed' )
 
@@ -46,11 +46,11 @@ cmp_ok( scalar(nelems @var), '==', 2, '..@var pushed' )
 cmp_ok( @var[0], '==', 109, '..first element pushed (package)' )
 cmp_ok( @var[1], '==', 110, '..second element pushed (package)' )
 
-@var = @( () )
+@var = $@
 unlike( 'a', qr/^a(?{push @var,111})b(?{push @var,112})/, 'a !~ ab (push package var)' )
 cmp_ok( scalar(nelems @var), '==', 0, '..nothing pushed (package)' )
 
-@var = @( () )
+@var = $@
 unlike( 'abc', qr/^a(?{push @var,113})b(?{push @var,114})$/, 'abc !~ ab$ (push package var)' )
 cmp_ok( scalar(nelems @var), '==', 0, '..still nothing pushed (package)' )
 

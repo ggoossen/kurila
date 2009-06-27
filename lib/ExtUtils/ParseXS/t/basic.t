@@ -1,42 +1,42 @@
 #!/usr/bin/perl
 
-BEGIN {
+BEGIN 
     if (env::var('PERL_CORE')) {
         chdir 't' if -d 't';
         chdir '../lib/ExtUtils/ParseXS'
             or die "Can't chdir to lib/ExtUtils/ParseXS: $^OS_ERROR";
         $^INCLUDE_PATH = qw(../.. ../../.. .);
     }
-}
 
-use Test::More;
+
+use Test::More
 BEGIN { plan tests => 9 };
-use DynaLoader;
-use ExtUtils::ParseXS < qw(process_file);
-use ExtUtils::CBuilder;
-ok(1); # If we made it this far, we're loaded.
+use DynaLoader
+use ExtUtils::ParseXS < qw(process_file)
+use ExtUtils::CBuilder
+ok(1) # If we made it this far, we're loaded.
 
-chdir 't' or die "Can't chdir to t/, $^OS_ERROR";
+chdir 't' or die "Can't chdir to t/, $^OS_ERROR"
 
 #########################
 
 # Try sending to filehandle
-my $out = "";
-open my $fh, '>', \$out or die;
-process_file( filename => 'XSTest.xs', output => $fh, prototypes => 1 );
-like $out, '/is_even/', "Test that output contains some text";
+my $out = ""
+open my $fh, '>', \$out or die
+process_file( filename => 'XSTest.xs', output => $fh, prototypes => 1 )
+like $out, '/is_even/', "Test that output contains some text"
 
-my $source_file = 'XSTest.c';
+my $source_file = 'XSTest.c'
 
 # Try sending to file
-process_file(filename => 'XSTest.xs', output => $source_file, prototypes => 0);
-is -e $source_file, 1, "Create an output file";
+process_file(filename => 'XSTest.xs', output => $source_file, prototypes => 0)
+is -e $source_file, 1, "Create an output file"
 
 # TEST doesn't like extraneous output
-my $quiet = env::var('PERL_CORE') && !env::var('HARNESS_ACTIVE');
+my $quiet = env::var('PERL_CORE') && !env::var('HARNESS_ACTIVE')
 
 # Try to compile the file!  Don't get too fancy, though.
-my $b = ExtUtils::CBuilder->new(quiet => $quiet);
+my $b = ExtUtils::CBuilder->new(quiet => $quiet)
 if ($b->have_compiler) {
     my $module = 'XSTest';
 
@@ -64,9 +64,9 @@ if ($b->have_compiler) {
     }
     1 while unlink $obj_file;
     1 while unlink $lib_file;
-} else {
-    skip "Skipped can't find a C compiler & linker", 1 for 1..7;
-}
+}else 
+    skip "Skipped can't find a C compiler & linker", 7
 
-1 while unlink $source_file;
+
+1 while unlink $source_file
 

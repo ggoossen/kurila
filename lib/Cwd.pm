@@ -204,7 +204,7 @@ if ($^OS_NAME eq 'os2')
 try {
     require XSLoader;
     XSLoader::load( __PACKAGE__, $VERSION );
-}
+    }
 
 # Must be after the DynaLoader stuff:
 $VERSION = eval $VERSION

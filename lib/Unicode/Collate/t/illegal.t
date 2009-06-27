@@ -1,5 +1,5 @@
 
-BEGIN {
+BEGIN 
     unless ("A" eq pack('U', 0x41)) {
         print $^STDOUT, "1..0 # Unicode::Collate " .
             "cannot stringify a Unicode code point\n";
@@ -9,17 +9,17 @@ BEGIN {
         chdir('t') if -d 't';
         $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
-}
 
-use Test::More;
 
-use warnings;
+use Test::More
 
-use Unicode::Collate;
+use warnings
+
+use Unicode::Collate
 
 BEGIN { plan tests => 40 };
 
-ok(1);
+ok(1)
 
 #########################
 
@@ -51,120 +51,120 @@ ENTRIES
     level => 1,
     table => undef,
     normalization => undef,
-    );
+    )
 
 # 2..12
-is($illeg->cmp("", "\x00"), -1);
-is($illeg->cmp("", "\x01"), -1);
-ok($illeg->eq("", "\x{FFFE}"));
-ok($illeg->eq("", "\x{FFFF}"));
-ok($illeg->eq("", "\x{D800}"));
-ok($illeg->eq("", "\x{DFFF}"));
-ok($illeg->eq("", "\x{FDD0}"));
-ok($illeg->eq("", "\x{FDEF}"));
-is($illeg->cmp("", "\x02"), -1);
-ok($illeg->eq("", "\x{10FFFF}"));
-ok($illeg->eq("", "\x{110000}"));
+is($illeg->cmp("", "\x00"), -1)
+is($illeg->cmp("", "\x01"), -1)
+ok($illeg->eq("", "\x{FFFE}"))
+ok($illeg->eq("", "\x{FFFF}"))
+ok($illeg->eq("", "\x{D800}"))
+ok($illeg->eq("", "\x{DFFF}"))
+ok($illeg->eq("", "\x{FDD0}"))
+ok($illeg->eq("", "\x{FDEF}"))
+is($illeg->cmp("", "\x02"), -1)
+ok($illeg->eq("", "\x{10FFFF}"))
+ok($illeg->eq("", "\x{110000}"))
 
 # 13..22
-is($illeg->cmp("\x00", "\x01"), -1);
-is($illeg->cmp("\x01", "\x02"), -1);
-ok($illeg->ne("\0", "\x{D800}"));
-ok($illeg->ne("\0", "\x{DFFF}"));
-ok($illeg->ne("\0", "\x{FDD0}"));
-ok($illeg->ne("\0", "\x{FDEF}"));
-ok($illeg->ne("\0", "\x{FFFE}"));
-ok($illeg->ne("\0", "\x{FFFF}"));
-ok($illeg->ne("\0", "\x{10FFFF}"));
-ok($illeg->ne("\0", "\x{110000}"));
+is($illeg->cmp("\x00", "\x01"), -1)
+is($illeg->cmp("\x01", "\x02"), -1)
+ok($illeg->ne("\0", "\x{D800}"))
+ok($illeg->ne("\0", "\x{DFFF}"))
+ok($illeg->ne("\0", "\x{FDD0}"))
+ok($illeg->ne("\0", "\x{FDEF}"))
+ok($illeg->ne("\0", "\x{FFFE}"))
+ok($illeg->ne("\0", "\x{FFFF}"))
+ok($illeg->ne("\0", "\x{10FFFF}"))
+ok($illeg->ne("\0", "\x{110000}"))
 
 # 23..26
-ok($illeg->eq("A",   "A\x{FFFF}"));
-is($illeg->cmp("A\0", "A\x{FFFF}"), 1);
-is($illeg->cmp("A",  "A\0"), -1);
-is($illeg->cmp("AA", "A\0"), -1);
+ok($illeg->eq("A",   "A\x{FFFF}"))
+is($illeg->cmp("A\0", "A\x{FFFF}"), 1)
+is($illeg->cmp("A",  "A\0"), -1)
+is($illeg->cmp("AA", "A\0"), -1)
 
 ##################
 
-my($match, $str, $sub, $ret);
+my($match, $str, $sub, $ret)
 
 my $Collator = Unicode::Collate->new(
     table => 'keys.txt',
     level => 1,
     normalization => undef,
-    );
+    )
 
-$sub = "pe";
+$sub = "pe"
 
 
-$str = "Pe\x{300}\x{301}rl";
-$ret = "Pe\x{300}\x{301}";
-($match) = $Collator->match($str, $sub);
-ok($match, $ret);
+$str = "Pe\x{300}\x{301}rl"
+$ret = "Pe\x{300}\x{301}"
+($match) = $Collator->match($str, $sub)
+ok($match, $ret)
 
-$str = "Pe\x{300}\0\0\x{301}rl";
-$ret = "Pe\x{300}\0\0\x{301}";
-($match) = $Collator->match($str, $sub);
-ok($match, $ret);
+$str = "Pe\x{300}\0\0\x{301}rl"
+$ret = "Pe\x{300}\0\0\x{301}"
+($match) = $Collator->match($str, $sub)
+ok($match, $ret)
 
-$str = "Pe\x{DA00}\x{301}\x{DFFF}rl";
-$ret = "Pe\x{DA00}\x{301}\x{DFFF}";
-($match) = $Collator->match($str, $sub);
-ok($match, $ret);
+$str = "Pe\x{DA00}\x{301}\x{DFFF}rl"
+$ret = "Pe\x{DA00}\x{301}\x{DFFF}"
+($match) = $Collator->match($str, $sub)
+ok($match, $ret)
 
-$str = "Pe\x{FFFF}\x{301}rl";
-$ret = "Pe\x{FFFF}\x{301}";
-($match) = $Collator->match($str, $sub);
-ok($match, $ret);
+$str = "Pe\x{FFFF}\x{301}rl"
+$ret = "Pe\x{FFFF}\x{301}"
+($match) = $Collator->match($str, $sub)
+ok($match, $ret)
 
-$str = "Pe\x{110000}\x{301}rl";
-$ret = "Pe\x{110000}\x{301}";
-($match) = $Collator->match($str, $sub);
-ok($match, $ret);
+$str = "Pe\x{110000}\x{301}rl"
+$ret = "Pe\x{110000}\x{301}"
+($match) = $Collator->match($str, $sub)
+ok($match, $ret)
 
-$str = "Pe\x{300}\x{d801}\x{301}rl";
-$ret = "Pe\x{300}\x{d801}\x{301}";
-($match) = $Collator->match($str, $sub);
-ok($match, $ret);
+$str = "Pe\x{300}\x{d801}\x{301}rl"
+$ret = "Pe\x{300}\x{d801}\x{301}"
+($match) = $Collator->match($str, $sub)
+ok($match, $ret)
 
-$str = "Pe\x{300}\x{ffff}\x{301}rl";
-$ret = "Pe\x{300}\x{ffff}\x{301}";
-($match) = $Collator->match($str, $sub);
-ok($match, $ret);
+$str = "Pe\x{300}\x{ffff}\x{301}rl"
+$ret = "Pe\x{300}\x{ffff}\x{301}"
+($match) = $Collator->match($str, $sub)
+ok($match, $ret)
 
-$str = "Pe\x{300}\x{110000}\x{301}rl";
-$ret = "Pe\x{300}\x{110000}\x{301}";
-($match) = $Collator->match($str, $sub);
-ok($match, $ret);
+$str = "Pe\x{300}\x{110000}\x{301}rl"
+$ret = "Pe\x{300}\x{110000}\x{301}"
+($match) = $Collator->match($str, $sub)
+ok($match, $ret)
 
-$str = "Pe\x{D9ab}\x{DFFF}rl";
-$ret = "Pe\x{D9ab}\x{DFFF}";
-($match) = $Collator->match($str, $sub);
-ok($match, $ret);
+$str = "Pe\x{D9ab}\x{DFFF}rl"
+$ret = "Pe\x{D9ab}\x{DFFF}"
+($match) = $Collator->match($str, $sub)
+ok($match, $ret)
 
-$str = "Pe\x{FFFF}rl";
-$ret = "Pe\x{FFFF}";
-($match) = $Collator->match($str, $sub);
-ok($match, $ret);
+$str = "Pe\x{FFFF}rl"
+$ret = "Pe\x{FFFF}"
+($match) = $Collator->match($str, $sub)
+ok($match, $ret)
 
-$str = "Pe\x{110000}rl";
-$ret = "Pe\x{110000}";
-($match) = $Collator->match($str, $sub);
-ok($match, $ret);
+$str = "Pe\x{110000}rl"
+$ret = "Pe\x{110000}"
+($match) = $Collator->match($str, $sub)
+ok($match, $ret)
 
-$str = "Pe\x{300}\x{D800}\x{DFFF}rl";
-$ret = "Pe\x{300}\x{D800}\x{DFFF}";
-($match) = $Collator->match($str, $sub);
-ok($match, $ret);
+$str = "Pe\x{300}\x{D800}\x{DFFF}rl"
+$ret = "Pe\x{300}\x{D800}\x{DFFF}"
+($match) = $Collator->match($str, $sub)
+ok($match, $ret)
 
-$str = "Pe\x{300}\x{FFFF}rl";
-$ret = "Pe\x{300}\x{FFFF}";
-($match) = $Collator->match($str, $sub);
-ok($match, $ret);
+$str = "Pe\x{300}\x{FFFF}rl"
+$ret = "Pe\x{300}\x{FFFF}"
+($match) = $Collator->match($str, $sub)
+ok($match, $ret)
 
-$str = "Pe\x{300}\x{110000}rl";
-$ret = "Pe\x{300}\x{110000}";
-($match) = $Collator->match($str, $sub);
-ok($match, $ret);
+$str = "Pe\x{300}\x{110000}rl"
+$ret = "Pe\x{300}\x{110000}"
+($match) = $Collator->match($str, $sub)
+ok($match, $ret)
 
 

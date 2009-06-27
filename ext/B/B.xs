@@ -456,10 +456,6 @@ IV
 SvIV(sv)
 	B::IV	sv
 
-IV
-SvIVX(sv)
-	B::IV	sv
-
 UV 
 SvUVX(sv) 
 	B::IV   sv
@@ -467,7 +463,7 @@ SvUVX(sv)
 
 MODULE = B	PACKAGE = B::IV
 
-#define needs64bits(sv) ((I32)SvIVX(sv) != SvIVX(sv))
+#define needs64bits(sv) ((I32)SvIV(sv) != SvIV(sv))
 
 int
 needs64bits(sv)
@@ -479,7 +475,7 @@ packiv(sv)
     CODE:
 	if (sizeof(IV) == 8) {
 	    U32 wp[2];
-	    const IV iv = SvIVX(sv);
+	    const IV iv = SvIV(sv);
 	    /*
 	     * The following way of spelling 32 is to stop compilers on
 	     * 32-bit architectures from moaning about the shift count
@@ -495,7 +491,7 @@ packiv(sv)
 	    wp[1] = htonl(iv & 0xffffffff);
 	    ST(0) = sv_2mortal(newSVpvn((char *)wp, 8));
 	} else {
-	    U32 w = htonl((U32)SvIVX(sv));
+	    U32 w = htonl((U32)SvIV(sv));
 	    ST(0) = sv_2mortal(newSVpvn((char *)&w, 4));
 	}
 

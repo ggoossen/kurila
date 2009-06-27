@@ -335,8 +335,8 @@ typedef struct stcxt {
 		MY_VERSION, sizeof(MY_VERSION)-1, TRUE)
 
 #define dSTCXT_PTR(T,name)							\
-	T name = ((perinterp_sv && SvIOK(perinterp_sv) && SvIVX(perinterp_sv)	\
-				? (T)SvPVX_mutable(SvRV(INT2PTR(SV*,SvIVX(perinterp_sv)))) : (T) 0))
+	T name = ((perinterp_sv && SvIOK(perinterp_sv) && SvIV(perinterp_sv)	\
+				? (T)SvPVX_mutable(SvRV(INT2PTR(SV*,SvIV(perinterp_sv)))) : (T) 0))
 #define dSTCXT										\
 	dSTCXT_SV;										\
 	dSTCXT_PTR(stcxt_t *, cxt)

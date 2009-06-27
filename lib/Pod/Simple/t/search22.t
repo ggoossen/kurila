@@ -50,7 +50,7 @@ ok 1
 print $^STDOUT, $x->_state_as_string
 #$x->verbose(12);
 
-use Pod::Simple;
+use Pod::Simple
 *pretty = \&Pod::Simple::BlackBox::pretty
 
 my@($name2where, $where2name) = @($x->survey($here1, $here2, $here3), $x->path2name)

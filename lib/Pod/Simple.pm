@@ -1166,7 +1166,7 @@ sub _treat_Ls($self,@< @stack)
             # L<Foo/Bar> -> L<"Bar" in Foo/Foo>
             unless($link_text)
                 $ell->[1]->{+'content-implicit'} = 'yes'
-                $link_text = \@()
+                $link_text = \$@
                 push $link_text->@, '"', < $section_name->@, '"' if $section_name
 
                 if((nelems @ell_content))

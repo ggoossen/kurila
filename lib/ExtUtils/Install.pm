@@ -261,7 +261,7 @@ sub _unlink_or_rename( $file, $tryhard, $installing)
         # IOW, if we cant delete the renamed file at reboot its
         # not the end of the world. The other cases are more serious
         # and need to be fatal.
-        _move_file_at_boot( $tmp, \@(), $installing )
+        _move_file_at_boot( $tmp, \$@, $installing )
         return $file
     elsif ( $installing )
         _warnonce("Rename failed: $^OS_ERROR. Scheduling '$tmp'\nfor".
@@ -293,7 +293,7 @@ sub _get_install_skip( $skip, $verbose)
     if (env::var('EU_INSTALL_IGNORE_SKIP'))
         print $^STDOUT, "EU_INSTALL_IGNORE_SKIP is set, ignore skipfile settings\n"
             if $verbose+>2
-        return \@()
+        return \$@
     
     if ( ! defined $skip )
         print $^STDOUT, "Looking for install skip list\n"
@@ -322,7 +322,7 @@ sub _get_install_skip( $skip, $verbose)
             $skip= \@patterns
         else
             warn "Can't read skip file:'$skip':$^OS_ERROR\n"
-            $skip=\@()
+            $skip=\$@
         
     elsif ( UNIVERSAL::isa($skip,'ARRAY') )
         print $^STDOUT, "Using array for skip list\n"
@@ -330,7 +330,7 @@ sub _get_install_skip( $skip, $verbose)
     elsif ($verbose)
         print $^STDOUT, "No skip list found.\n"
             if $verbose+>1
-        $skip= \@()
+        $skip= \$@
     
     warn "Got $(nelems $skip->@) skip patterns.\n"
         if $verbose+>3
@@ -454,12 +454,9 @@ sub _mkpath($dir,$show,$mode,?$verbose,?$dry_run)
             _warnonce < @msg
         else
             _choke < @msg
-        
     elsif ($show and $dry_run)
-        print $^STDOUT, "$_\n" for  @make
-    
-
-
+        for (@make)
+            print $^STDOUT, "$_\n"
 
 =pod
 
@@ -483,8 +480,6 @@ sub _copy( $from, $to, $verbose, $dry_run)
     if (!$dry_run)
         File::Copy::copy($from,$to)
             or Carp::croak( < _estr "ERROR: Cannot copy '$from' to '$to': $^OS_ERROR" )
-    
-
 
 =pod
 
@@ -729,7 +724,7 @@ sub install #XXX OS-SPECIFIC
                  my $sourcedir  = File::Spec->catdir($source, $File::Find::dir)
                  my $sourcefile = File::Spec->catfile($sourcedir, $origfile)
 
-                 for my $pat ( ($skip || \@())->@)
+                 for my $pat ( ($skip || \$@)->@)
                      if ( $sourcefile=~m/$pat/ )
                          print $^STDOUT, "Skipping $targetfile (filtered)\n"
                              if $verbose+>1
@@ -793,7 +788,7 @@ sub install #XXX OS-SPECIFIC
                 _chmod( $mode, $targetfile, $verbose );
                 $result->{+install}{+$targetfile} = $sourcefile;
                 1
-            } or do
+                } or do
                 $result->{+install_fail}{+$targetfile} = $sourcefile
                 die $^EVAL_ERROR
             
@@ -1082,7 +1077,7 @@ sub inc_uninstall($filepath,$libdir,$verbose,$dry_run,$ignore,$results)
                 forceunlink($targetfile,'tryhard');
                 $results->{+uninstall}{+$targetfile} = $filepath;
                 1;
-            } or do
+              } or do
                 $results->{+fail_uninstall}{+$targetfile} = $filepath
                 if ($seen_ours)
                     warn "Failed to remove probably harmless shadow file '$targetfile'\n"

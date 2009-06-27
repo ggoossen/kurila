@@ -3,7 +3,7 @@
 $^OUTPUT_AUTOFLUSH  = 1
 use warnings;
 
-use Test::More tests => 55;
+use Test::More tests => 54;
 
 BEGIN { use_ok( 'B' ); }
 
@@ -60,7 +60,6 @@ is(ref $iv_ret, "SCALAR", "Test object_2svref() return is SCALAR")
 is($iv_ret->$, $iv, "Test object_2svref()")
 is($iv_ref->int_value, $iv, "Test int_value()")
 is($iv_ref->IV, $iv, "Test IV()")
-is($iv_ref->IVX(), $iv, "Test IVX()")
 is($iv_ref->UVX(), $iv, "Test UVX()")
 
 my $pv = "Foo"
@@ -109,12 +108,12 @@ my $cv_ret = $cv_ref->object_2svref()
 is(ref $cv_ret, "REF", "Test object_2svref() return is REF")
 is($cv_ret->$, $cv, "Test object_2svref()")
 
-my $av = \@()
+my $av = \$@
 my $av_ref = B::svref_2object(\$av)
 is(ref $av_ref, "$RV_class",
    "Test $RV_class return from svref_2object - array")
 
-my $hv = \@()
+my $hv = \$@
 my $hv_ref = B::svref_2object(\$hv)
 is(ref $hv_ref, "$RV_class",
    "Test $RV_class return from svref_2object - hash")

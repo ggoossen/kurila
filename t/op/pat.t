@@ -647,7 +647,8 @@ sub run_tests
     # changing $_
     our @a = qw(foo bar)
     our @b = @( () )
-    s/(\w)(?{push @b, $1})/,$1,/g for  @a
+    for (@a)
+        s/(\w)(?{push @b, $1})/,$1,/g
 
     ok("$(join ' ',@b)" eq "f o o b a r")
 
@@ -1771,7 +1772,8 @@ EOT
         print $^STDOUT, "# Unicode lookbehind\n"
 
         local $TODO = "variable length lookbehehind"
-        ok(0) for 851 .. 854
+        for (851 .. 854)
+            ok(0)
     #print "A\x{100}B"        =~ m/(?<=A.)B/  ? "ok 851\n" : "not ok 851\n";
     #print "A\x{200}\x{300}B" =~ m/(?<=A..)B/ ? "ok 852\n" : "not ok 852\n";
     #print "\x{400}AB"        =~ m/(?<=\x{400}.)B/ ? "ok 853\n" : "not ok 853\n";
@@ -1944,11 +1946,9 @@ EOF
                 my $r = $s =~ m/$char([f]*)/gc
                 ok($r, " # TODO <$type x $len>")
                 ok((!$r or pos($s) == $len + 1), " # TODO <$type x $len> pos $( pos($s) )")
-            
-        
     else
-        ok(1,'Skipped Psycho') for 1..12
-    
+        for (1..12)
+            ok(1,'Skipped Psycho')
 
     $a = bless qr/foo/, 'Foo'
     ok('goodfood' =~ $a)
@@ -2266,10 +2266,10 @@ END
     
 
     # perl #25269: panic: pp_match start/end pointers
-    ok("a-bc" eq try {
-           my @($x, $y) = @: "bca" =~ m/^(?=.*(a)).*(bc)/;
-           "$x-$y";
-       }, 'captures can move backwards in string'); die if $^EVAL_ERROR
+    ok("a-bc" eq try
+           my @($x, $y) = @: "bca" =~ m/^(?=.*(a)).*(bc)/
+           "$x-$y"
+       , 'captures can move backwards in string'); die if $^EVAL_ERROR
 
     # perl #27940: \cA not recognized in character classes
     ok("a\cAb" =~ m/\cA/, '\cA in pattern')
@@ -2309,7 +2309,8 @@ END
         push @got,$1 while m/$re/g
 
         my %count
-        %count{+$_}++ for  @got
+        for (@got)
+            %count{+$_}++
         my $ok=1
         for ( @nums)
             $ok=0 if --%count{+$_}+<0
@@ -2926,7 +2927,7 @@ EOFTEST
     do
         # From Message-ID: <877ixs6oa6.fsf@k75.linux.bogus>
         my $dow_name= "nada"
-        my $parser = "use utf8; \@(\$dow_name) = \@: \$time_string =~ m/(D\x{e9}\\ C\x{e9}adaoin|D\x{e9}\\ Sathairn|\\w+|\x{100})/;"
+        my $parser = "use utf8; \@(\$dow_name) = \@: \$time_string =~ m/(D\x{e9}\\ C\x{e9}adaoin|D\x{e9}\\ Sathairn|\\w+|\x{100})/"
         my $time_string = "D\x{e9} C\x{e9}adaoin"
         eval $parser; die if $^EVAL_ERROR
         ok(!$^EVAL_ERROR,"Test Eval worked")
@@ -3024,14 +3025,18 @@ EOFTEST
             )
             my $m = shift $p
             my @($s, $f) =  map { \split m/ */ }, $p
-            ok(m/$m/, " $m basic match") for  $s->@
-            ok(not m/$m/) for  $f->@
-            ok(m/^$m$/) for  $s->@
-            ok(not m/^$m$/) for  $f->@
-            ok("xxxx$_" =~ m/^.*$m$/) for  $s->@
-            ok("xxxx$_" !~ m/^.*$m$/) for  $f->@
-        
-    
+            for ($s->@)
+                ok(m/$m/, " $m basic match")
+            for ($f->@)
+                ok(not m/$m/)
+            for ($s->@)
+                ok(m/^$m$/)
+            for ($f->@)
+                ok(not m/^$m$/)
+            for ($s->@)
+                ok("xxxx$_" =~ m/^.*$m$/)
+            for ($f->@)
+                ok("xxxx$_" !~ m/^.*$m$/)
 
     do   # Nested EVAL using PL_curpm (via $1 or friends)
         my $re
