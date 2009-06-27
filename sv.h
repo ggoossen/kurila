@@ -936,12 +936,6 @@ in gv.h: */
 #  endif
 #endif
 
-#define SvIVXx(sv) SvIVX(sv)
-#define SvUVXx(sv) SvUVX(sv)
-#define SvNVXx(sv) SvNVX(sv)
-#define SvLENx(sv) SvLEN(sv)
-#define SvENDx(sv) ((PL_Sv = (sv)), SvEND(PL_Sv))
-
 
 #define SvIV_set(sv, val) \
 	STMT_START { assert(SvTYPE(sv) == SVt_IV || SvTYPE(sv) >= SVt_PVIV); \
