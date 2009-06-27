@@ -19,8 +19,8 @@ use Fatal qw|open close|;
 
 use Convert;
 
-my $from = 'kurila-1.18';
-my $to = 'kurila-1.18';
+my $from = 'kurila-1.20';
+my $to = 'kurila-1.21';
 
 sub p5convert {
     my ($input, $expected) = @_;
@@ -29,18 +29,21 @@ sub p5convert {
 
     local $TODO = $TODO || ($input =~ m/^[#]\s*TODO/);
     my $output = Convert::convert($input,
-                                  "/usr/bin/env perl ../mad/p5kurila.pl --from $from",
+                                  "/usr/bin/env perl ../mad/p5kurila.pl --from $from --to $to",
                                   from => $from, to => $to,
                                   switches => "-I../lib",
                                   dumpcommand => "$ENV{madpath}/perl",
                                  );
-    $output =~ s/\s+$//;
-    $expected =~ s/\s+$//;
+    #$output =~ s/\s+$//;
+    #$expected =~ s/\s+$//;
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_indent();
+t_empty_array();
 die "END";
+t_array_simplify();
+t_indent2();
+t_indent();
 t_defargs();
 t_dofile_to_evalfile();
 t_scope_deref();
@@ -1742,15 +1745,63 @@ local env::var('key') = 'value';
 END
 }
 
+sub t_indent2 {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+3 + @: "aap",
+ "noot"
+----
+3 + @: "aap"
+       "noot"
+====
+3 + @: "aap", "noot"
+----
+3 + @: "aap", "noot"
+====
+my %foo
+my %bar
+----
+my %foo
+my %bar
+====
+while ($a)
+    $b
+
+1
+----
+while ($a)
+    $b
+
+1
+====
+do
+ $a
+----
+do
+ $a
+====
+loop { 1 } while (1)
+----
+loop { 1 } while (1)
+====
+warn <<'FOO'; $a
+bla
+FOO
+----
+warn <<'FOO'; $a
+bla
+FOO
+END
+}
+
 sub t_indent {
     p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
 1;
-"aa"
-+
-"bb";
+ "aa"
+ +
+ "bb";
 "cc"
-+
-"dd";
+ +
+ "dd";
 1;
 ----
 1
@@ -1764,17 +1815,17 @@ sub t_indent {
 ====
 1;
 $a
-and $b;
+ and $b;
 ----
 1
 $a
     and $b
 ====
 do {
-3;
+ 3;
 };
 ----
-do
+do 
     3
 ====
 foobar("aap",
@@ -1803,7 +1854,7 @@ foox(sub { @_ },
  'arg');
 ----
 sub foox { }
-foox(sub (@< @_) { @_ },
+foox(sub { @_ },
      'arg')
 ====
 do {
@@ -1812,7 +1863,7 @@ do {
   "noot";
 }
 ----
-do
+do 
     foo(1,2)
 
     "noot"
@@ -1823,7 +1874,7 @@ do {
 }
 ----
 BEGIN { require "./test.pl"; }
-do
+do 
     1
 ====
 use constant foo => 33;
@@ -2442,5 +2493,21 @@ BEGIN { $a }
 sub teun { @_; shift; shift $a; }
 ----
 sub teun(@< @_) { @_; shift @_; shift $a; }
+END
+}
+
+sub t_empty_array {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+@()
+----
+$@
+====
+@(())
+----
+$@
+====
+%()
+----
+$%
 END
 }

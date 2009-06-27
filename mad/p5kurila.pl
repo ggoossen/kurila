@@ -1527,11 +1527,15 @@ sub indent {
     my %done;
     my $indent_level = 0;
     my $use_layout = 1;
+    my $use_list_layout = 0;
     my $cont = 0;
+    my $change_layout = get_madprop($xml->root->child(-1), 'semicolon', '') eq ';';
 
     my ($first_indent_line, undef) = first_token($xml->root);
 
-    set_madprop($xml->root->child(-1), 'semicolon', '');
+    if ($change_layout) {
+        set_madprop($xml->root->child(-1), 'semicolon', '');
+    }
 
     my $opsub;
     $opsub = sub {
@@ -1543,6 +1547,7 @@ sub indent {
         my $new_indent_level;
         my $old_cont;
         my $old_use_layout = $use_layout;
+        my $old_change_layout = $change_layout;
 
         my $new_block = (defined(get_madprop($op, 'curly_open')) 
                            and not $op->tag =~ m/ op_helem | op_gelem | op_hslice | op_anonhash | op_listfirst /x
@@ -1580,7 +1585,8 @@ sub indent {
 
             $use_layout = 0;
 
-            if (get_madprop($op, 'curly_open') and $null_type ne 'uniop') {
+            my $curly_open = get_madprop($op, 'curly_open');
+            if ($curly_open and $curly_open eq '{' and $null_type ne 'uniop') {
                 # Possibly convert to "use_layout"
                 my $open_indent_line = get_madprop($op, 'curly_open', 'linenr');
                 if ($first_indent_line and $open_indent_line < $first_indent_line ) {
@@ -1588,10 +1594,14 @@ sub indent {
                     if ($mad_parent_while) {
                         set_madprop($op->parent->parent->parent, 'whilepost', $mad_parent_while,
                                     wsbefore => '');
-                        set_madprop($op, 'curly_open', 'loop');
+                        if (not get_madprop($op->ancestors(2), "while")) {
+                            set_madprop($op, 'curly_open', 'loop');
+                        }
                     }
                     else {
-                        set_madprop($op, 'curly_open', '', wsbefore => '');
+                        my $curly_open = get_madprop($op, 'curly_open');
+                        $curly_open =~ s/\{//;
+                        set_madprop($op, 'curly_open', $curly_open, wsbefore => '');
                     }
                     set_madprop($op, 'curly_close', '');
                     set_madprop($op, 'operator', get_madprop($op, 'operator'),
@@ -1601,12 +1611,16 @@ sub indent {
                         set_madprop($op->parent->parent, 'if', $mad_parent_if,
                                     wsbefore => '');
                     }
-                    set_madprop($op, 'semicolon', '');
+                    my $semicolon = get_madprop($op, 'semicolon');
+                    if ($semicolon and $semicolon eq ';') {
+                        set_madprop($op, 'semicolon', '');
+                    }
                     $use_layout = 1;
                 }
                 else {
                     my $mad_parent_while = ($op->ancestors)[2] && get_madprop(($op->ancestors)[2], 'whilepost');
-                    if ($mad_parent_while) {
+                    if ($mad_parent_while
+                          and not get_madprop(($op->ancestors)[2], "while")) {
                         set_madprop($op, 'curly_open', 'loop ' . get_madprop($op, 'curly_open'));
                     }
                     else {
@@ -1637,11 +1651,11 @@ sub indent {
                         my $i = 1;
                         while ($i < scalar(@lines)) {
                             if ($lines[$i] =~ m/^=/) {
-                                while ($lines[$i] !~ m/^=cut/) {
+                                while ($i+1 < scalar(@lines) and $lines[$i] !~ m/^=cut/) {
                                     ++$i;
                                 }
                                 $i++;
-                                redo;
+                                next;
                             }
                             $lines[$i] =~ s/^(\s|&#x9;)*/ ' ' x $ws_indent /ge;
                             $i++;
@@ -1664,7 +1678,10 @@ sub indent {
             if ($use_layout) {
                 my ($next_indent_line, undef) = first_token($op->next_siblings);
                 if ($next_indent_line and (not $first_indent_line or $next_indent_line > $first_indent_line) ) {
-                    set_madprop($op, 'semicolon', '');
+                    my $semicolon = get_madprop($op, 'semicolon');
+                    if ($semicolon and $semicolon eq ';') {
+                        set_madprop($op, 'semicolon', '');
+                    }
                 }
             }
             ($first_indent_line, undef) = first_token( ($op->tag eq 'op_nextstate' and $op->next_sibling) ? $op->next_sibling() : $op );
@@ -1690,7 +1707,7 @@ sub indent {
             $opsub->($op->child(2));
         }
 
-        if ($null_type eq "if") {
+        if ($change_layout and $null_type eq "if") {
             my ($madif) = $op->findnodes("madprops/mad_if");
             $wsreplace->($madif);
             $opsub->($op->child(-1)->child(0));
@@ -1700,7 +1717,8 @@ sub indent {
             $opsub->($op->child(1));
         }
 
-        if ((get_madprop($op, 'round_open') || '') =~ m/[(]$/ and $null_type eq "(") {
+        if ($change_layout and
+              (get_madprop($op, 'round_open') || '') =~ m/[(]$/ and $null_type eq "(") {
             my ($madx) = $op->findnodes("madprops/mad_round_open");
             $wsreplace->($madx);
             my ($linenr, $charoffset) = first_token($op->children);
@@ -1740,11 +1758,13 @@ sub indent {
         }
 
         # replace items of op mad properties.
-        my $madprop = $op->child(0);
-        if ($madprop and $madprop->tag eq 'madprops') {
-            for my $madv (sort { $a->tag cmp $b->tag } $madprop->children) {
-                next if $madv->tag eq "mad_peg";
-                $wsreplace->($madv);
+        if ($change_layout) {
+            my $madprop = $op->child(0);
+            if ($madprop and $madprop->tag eq 'madprops') {
+                for my $madv (sort { $a->tag cmp $b->tag } $madprop->children) {
+                    next if $madv->tag eq "mad_peg";
+                    $wsreplace->($madv);
+                }
             }
         }
 
@@ -1758,7 +1778,22 @@ sub indent {
             }
         }
 
+        if ($change_layout and $use_list_layout) {
+            if (get_madprop($op, 'comma')) {
+                my ($next_linenr) = first_token($op->following_elts);
+                my $this_linenr = get_madprop($op, 'comma', 'linenr');
+                if ($next_linenr and $next_linenr > $this_linenr) {
+                    set_madprop($op, 'comma', '');
+                }
+            }
+        }
+
         if ( $op->tag eq "op_anonarray") {
+            if ( get_madprop($op, "square_open") =~ m/\@:/ ) {
+                $change_layout = 1;
+                $use_list_layout = 1;
+            }
+
             if ($op->child(2)) {
                 my ($linenr, $charoffset) = first_token($op->child(2));
                 if ($linenr) {
@@ -1786,11 +1821,45 @@ sub indent {
             $cont = $old_cont;
         }
         $use_layout = $old_use_layout;
+        $change_layout = $old_change_layout;
 
         return;
     };
 
     $opsub->($xml->root);
+}
+
+sub array_simplify {
+    my $xml = shift;
+
+    # convert  @( < ... ) to ...
+    for my $op (find_ops($xml, "anonarray")) {
+        next unless $op->children == 3;
+        next unless $op->child(2)->tag eq "op_expand";
+        set_madprop($op, "square_open", "", wsbefore => "");
+        set_madprop($op, "square_close", "", wsbefore => "");
+        set_madprop($op->child(2), "operator", "", wsbefore => "");
+    }
+}
+
+sub empty_array {
+    my ($xml) = @_;
+
+    for my $op (find_ops($xml, "anonarray"), find_ops($xml, "anonhash")) {
+        my $typechar = $op->tag eq "op_anonarray" ? '@' : '%';
+        my $paren_name = $op->tag eq "op_anonarray" ? 'square' : 'curly';
+        if( $op->children == 2 ) {
+            set_madprop($op, $paren_name . "_open", '$' . $typechar);
+            set_madprop($op, $paren_name . "_close", "", wsbefore => "");
+        }
+        elsif ($op->children == 3 and $op->child(2)->tag eq "op_stub") {
+            set_madprop($op, $paren_name . "_open", '$' . $typechar);
+            set_madprop($op, $paren_name . "_close", "", wsbefore => "");
+            $op->child(2)->delete;
+        }
+    }
+
+    return;
 }
 
 my $from; # floating point number with starting version of kurila.
@@ -1923,8 +1992,11 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.19') {
 }
 
 if ($to->{v} >= qv '1.20') {
-    indent($twig);
+    # indent($twig);
 }
+
+#array_simplify($twig);
+empty_array($twig);
 
 #future: add_call_parens($twig);
 

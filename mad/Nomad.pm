@@ -1110,9 +1110,9 @@ BEGIN {
 	'package' => sub {				# package declaration
 	    my $self = shift;
 	    my @newkids;
-	    push @newkids, $self->madness('o');
+	    push @newkids, $self->madness('{ o');
 	    push @newkids, $self->madness('P');
-	    push @newkids, $self->madness(';');
+	    push @newkids, $self->madness('; }');
 	    $::curstate = 0;
 	    return P5AST::package->new(Kids => [@newkids])
 	},

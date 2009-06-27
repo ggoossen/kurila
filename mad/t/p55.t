@@ -405,3 +405,14 @@ test
 33
 ########
 glob "foo"
+########
+do
+    package Foo::Bar
+    33
+########
+sub foo
+  my @cmds;
+  map { $_ }, @cmds
+########
+my @cmds;
+map { $_ }, $a
