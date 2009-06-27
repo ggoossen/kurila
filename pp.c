@@ -4437,14 +4437,14 @@ PP(pp_hashjoin)
 PP(pp_emptyarray)
 {
     dSP;
-    XPUSHs(avTsv(newAV()));
+    mXPUSHs(avTsv(newAV()));
     RETURN;
 }
 
 PP(pp_emptyhash)
 {
     dSP;
-    XPUSHs(hvTsv(newHV()));
+    mXPUSHs(hvTsv(newHV()));
     RETURN;
 }
 
