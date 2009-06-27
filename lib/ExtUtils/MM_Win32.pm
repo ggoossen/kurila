@@ -45,8 +45,8 @@ my $GCC     = %Config{?'cc'} =~ m/^gcc/i ?? 1 !! 0
 sub dlsyms($self,%< %attribs)
 
     my@($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \%()
-    my@($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \@()
-    my@($funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \@()
+    my@($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \$@
+    my@($funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \$@
     my@($imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \%()
     my(@m)
 
@@ -417,7 +417,7 @@ for other Windows shells, I don't know.
 =cut
 
 sub oneliner($self, $cmd, $switches)
-    $switches = \@() unless defined $switches
+    $switches = \$@ unless defined $switches
 
     # Strip leading and trailing newlines
     $cmd =~ s{^\n+}{}

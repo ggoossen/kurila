@@ -20,8 +20,8 @@ my $tmpfile = "tmp0000"
 1 while -e ++$tmpfile
 END { 1 while unlink $tmpfile }
 
-my @prgs = @( () ) 
-my @w_files = @( () ) 
+my @prgs = $@ 
+my @w_files = $@ 
 
 if ((nelems @ARGV))
     print $^STDOUT, "ARGV = [$(join ' ',@ARGV)]\n"
@@ -76,8 +76,8 @@ for ( @prgs)
     
     my $src = $_
     my $switch = ""
-    my @temps = @( () ) 
-    my @temp_path = @( () ) 
+    my @temps = $@ 
+    my @temp_path = $@ 
     if (s/^(\s*-\w+)//)
         $switch = $1
     

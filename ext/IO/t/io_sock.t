@@ -237,7 +237,7 @@ if( $server_pid)
     if ($sock)
         $sock->print("send\n")
 
-        my @array = @( () )
+        my @array = $@
         while( ~< $sock)
             push( @array, $_)
 
@@ -295,7 +295,7 @@ if( $server_pid)
 
         $sock->print("send\n")
 
-        my @array = @( () )
+        my @array = $@
         while( !eof( $sock ) )
             while( ~< $sock)
                 push( @array, $_)

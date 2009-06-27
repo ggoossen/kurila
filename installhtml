@@ -151,15 +151,15 @@ END_OF_USAGE
 my (@libpods, @podpath, $podroot, $htmldir, $htmlroot, $recurse, @splithead,
     @splititem, $splitpod, $verbose, $pod2html, @ignore)
 
-@libpods = @( () )
+@libpods = $@
 @podpath = @( "." )     # colon-separated list of directories containing .pod
 # and .pm files to be converted.
 $podroot = "."          # assume the pods we want are here
 $htmldir = ""           # nothing for now...
 $htmlroot = "/" # default value
 $recurse = 0            # default behavior
-@splithead = @( () )    # don't split any files by default
-@splititem = @( () )    # don't split any files by default
+@splithead = $@    # don't split any files by default
+@splititem = $@    # don't split any files by default
 $splitpod = ""          # nothing for now.
 
 $verbose = 0            # whether or not to print debugging info
@@ -212,7 +212,7 @@ my @splitdirs
 
 # split pods. It's important to do this before convert ANY pods because
 # it may affect some of the links
-@splitdirs = @( () )    # files in these directories won't get an index
+@splitdirs = $@    # files in these directories won't get an index
 split_on_head($podroot, $htmldir, \@splitdirs, \@ignore, < @splithead)
 split_on_item($podroot,           \@splitdirs, \@ignore, < @splititem)
 
@@ -247,7 +247,7 @@ foreach my $dir ( @splithead)
     open(my $h_fh, "<", "$file.html") ||
         die "$^PROGRAM_NAME: error opening $file.html for input: $^OS_ERROR\n"
     $^INPUT_RECORD_SEPARATOR = ""
-    my @data = @( () )
+    my @data = $@
     while ( ~< $h_fh->*)
         last if m/name="name"/i
         $_ =~ s{href="#(.*)">}{$( do {
@@ -435,7 +435,7 @@ sub splitpod($pod, $poddir, $htmldir, $splitdirs)
         die "$^PROGRAM_NAME: error closing $pod: $^OS_ERROR\n"
 
     # restore the file internally by =head[1-6] sections
-    @poddata = @( () )
+    @poddata = $@
     $i = 0; $j = -1
     while ( $i +<=( (nelems @filedata)-1) )
         $j++ if (@filedata[$i] =~ m/^\s*=head[1-6]/)
@@ -510,9 +510,9 @@ sub splitpod($pod, $poddir, $htmldir, $splitdirs)
 sub installdir($dir, $recurse, $podroot, $splitdirs, $ignore)
     my(@dirlist, @podlist, @pmlist, $doindex)
 
-    @dirlist = @( () )  # directories to recurse on
-    @podlist = @( () )  # .pod files to install
-    @pmlist  = @( () )  # .pm files to install
+    @dirlist = $@  # directories to recurse on
+    @podlist = $@  # .pod files to install
+    @pmlist  = $@  # .pm files to install
 
     # should files in this directory get an index?
     $doindex = (grep( { $_ eq "$podroot/$dir" }, $splitdirs->@) ?? 0 !! 1)

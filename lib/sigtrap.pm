@@ -80,7 +80,7 @@ sub handler_traceback
     # Now go for broke.
     my $i = 1
     while (my @($p,$f,$l,$s,$h,$w,$e,$r) = caller@($i))
-        my @a = @( () )
+        my @a = $@
         for ( @DB::args)
             s/([\'\\])/\\$1/g
             s/([^\0]*)/'$1'/

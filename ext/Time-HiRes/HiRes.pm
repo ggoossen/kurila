@@ -7,7 +7,7 @@ require DynaLoader
 
 @ISA = qw(Exporter DynaLoader)
 
-@EXPORT = @()
+@EXPORT = $@
 @EXPORT_OK = qw (usleep sleep ualarm alarm gettimeofday time tv_interval
 		 getitimer setitimer nanosleep clock_gettime clock_getres
 		 clock clock_nanosleep

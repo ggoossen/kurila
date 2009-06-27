@@ -31,7 +31,7 @@ is($tmp, 5)
 is((nelems @ary)-1, 3)
 is(join('', @ary), '1234')
 
-@foo = @( () )
+@foo = $@
 $r = join(',', @( (nelems @foo)-1, < @foo))
 is($r, "-1")
 @foo[+0] = '0'
@@ -40,12 +40,12 @@ is($r, "0,0")
 @foo[+2] = '2'
 $r = join(',', @( (nelems @foo)-1, < @foo))
 is($r, "2,0,,2")
-@bar = @( () )
+@bar = $@
 @bar[+0] = '0'
 @bar[+1] = '1'
 $r = join(',', @( (nelems @bar)-1, < @bar))
 is($r, "1,0,1")
-@bar = @( () )
+@bar = $@
 $r = join(',', @( (nelems @bar)-1, < @bar))
 is($r, "-1")
 @bar[+0] = '0'
@@ -54,7 +54,7 @@ is($r, "0,0")
 @bar[+2] = '2'
 $r = join(',', @( (nelems @bar)-1, < @bar))
 is($r, "2,0,,2")
-@bar = @( () )
+@bar = $@
 @bar[+0] = '0'
 $r = join(',', @( (nelems @bar)-1, < @bar))
 is($r, "0,0")

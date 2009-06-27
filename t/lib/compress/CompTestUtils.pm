@@ -367,7 +367,7 @@ sub anyUncompress
     my $buffer = shift 
     my $already = shift
 
-    my @opts = @( () )
+    my @opts = $@
     if (ref $buffer && ref $buffer eq 'ARRAY')
         @opts = $buffer->@
         $buffer = shift @opts
@@ -418,7 +418,7 @@ sub getHeaders
     my $buffer = shift 
     my $already = shift
 
-    my @opts = @( () )
+    my @opts = $@
     if (ref $buffer && ref $buffer eq 'ARRAY')
         @opts = $buffer->@
         $buffer = shift @opts

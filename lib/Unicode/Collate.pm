@@ -109,7 +109,7 @@ sub unpack_U
 my (%VariableOK)
 %VariableOK{[qw/
     blanked  non-ignorable  shifted  shift-trimmed
-  / ]} = @() # keys lowercased
+  / ]} = $@ # keys lowercased
 
 our @ChangeOK = qw/
     alternate backwards level normalization rearrange
@@ -137,8 +137,8 @@ sub version
 
 
 my (%ChangeOK, %ChangeNG)
-%ChangeOK{[ @ChangeOK ]} = @()
-%ChangeNG{[ @ChangeNG ]} = @()
+%ChangeOK{[ @ChangeOK ]} = $@
+%ChangeNG{[ @ChangeNG ]} = $@
 
 sub change
     my $self = shift
@@ -210,7 +210,7 @@ sub checkCollator
         
     
 
-    defined $self->{?rearrange} or $self->{+rearrange} = \@()
+    defined $self->{?rearrange} or $self->{+rearrange} = \$@
     ref $self->{?rearrange}
         or die "$PACKAGE: list for rearrangement must be store in ARRAYREF"
 
@@ -218,7 +218,7 @@ sub checkCollator
     $self->{+rearrangeHash} = \%()
 
     if ((nelems  $self->{?rearrange}->@))
-        $self->{rearrangeHash}->{[  $self->{?rearrange}->@ ]} = @()
+        $self->{rearrangeHash}->{[  $self->{?rearrange}->@ ]} = $@
     
 
     $self->{+normCode} = undef
@@ -267,7 +267,7 @@ sub new
     $self->{+normalization} = 'NFD'
         if ! exists $self->{normalization}
     $self->{+rearrange} = $self->{?rearrangeTable} ||
-        ($self->{?UCA_Version} +<= 11 ?? $DefaultRearrange !! \@())
+        ($self->{?UCA_Version} +<= 11 ?? $DefaultRearrange !! \$@)
         if ! exists $self->{rearrange}
     $self->{+backwards} = $self->{?backwardsTable}
         if ! exists $self->{backwards}
@@ -372,7 +372,7 @@ sub parseEntry
     # if and only if "all" CEs are [.0000.0000.0000].
     
 
-    $self->{+mapping}{+$entry} = $is_L3_ignorable ?? \@() !! \@key
+    $self->{+mapping}{+$entry} = $is_L3_ignorable ?? \$@ !! \@key
 
     if ((nelems @uv) +> 1)
         (!$self->{?maxlength}{?@uv[0]} || $self->{maxlength}{?@uv[0]} +< nelems @uv)
@@ -651,7 +651,7 @@ sub getSortKey
     
 
     # make sort key
-    my @ret = @(\@(),\@(),\@(),\@())
+    my @ret = @(\$@,\$@,\$@,\$@)
     my $last_is_variable
 
     foreach my $vwt ( @buf)
@@ -883,10 +883,10 @@ sub index($self, $str, $substr, ?$pos, ?$grob)
             !! @($temp,0)
     
     $len +< $pos
-        and return @()
+        and return $@
     my $strE = $self->splitEnt($pos ?? substr($str, $pos) !! $str, TRUE)
     (nelems $strE->@)
-        or return @()
+        or return $@
 
     my(@strWt, @iniPos, @finPos, @subWt, @g_ret)
 
@@ -979,7 +979,7 @@ sub index($self, $str, $substr, ?$pos, ?$grob)
 
     return $grob
         ?? @g_ret
-        !! @()
+        !! $@
 
 
 ##
@@ -1014,7 +1014,7 @@ sub gmatch
 sub subst($self, $strref, $substr, $replace)
     my $code = ref $replace eq 'CODE' ?? $replace !! FALSE
 
-    if (my @(?$pos,?$len) =  $self->index($strref->$, $substr) || @())
+    if (my @(?$pos,?$len) =  $self->index($strref->$, $substr) || $@)
         if ($code)
             my $mat = substr($strref->$, $pos, $len)
             substr($strref->$, $pos, $len, $code->($mat))

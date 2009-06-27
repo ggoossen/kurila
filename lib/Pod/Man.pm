@@ -670,7 +670,7 @@ sub outindex($self, ?$section, ?$index)
     return unless ($section || nelems @entries)
 
     # We're about to output all pending entries, so clear our pending queue.
-    $self->{+INDEX} = \@()
+    $self->{+INDEX} = \$@
 
     # Build the output.  Regular index entries are marked Xref, and headings
     # pass in their own section.  Undo some *roff formatting on headings.
@@ -724,14 +724,14 @@ sub start_document($self, $attrs, _)
 
     # Initialize a few per-document variables.
     $self->{+INDENT}    = 0      # Current indentation level.
-    $self->{+INDENTS}   = \@()     # Stack of indentations.
-    $self->{+INDEX}     = \@()     # Index keys waiting to be printed.
+    $self->{+INDENTS}   = \$@     # Stack of indentations.
+    $self->{+INDEX}     = \$@     # Index keys waiting to be printed.
     $self->{+IN_NAME}   = 0      # Whether processing the NAME section.
     $self->{+ITEMS}     = 0      # The number of consecutive =items.
-    $self->{+ITEMTYPES} = \@()     # Stack of =item types, one per list.
+    $self->{+ITEMTYPES} = \$@     # Stack of =item types, one per list.
     $self->{+SHIFTWAIT} = 0      # Whether there is a shift waiting.
-    $self->{+SHIFTS}    = \@()     # Stack of .RS shifts.
-    $self->{+PENDING}   = \@(\@())   # Pending output.
+    $self->{+SHIFTS}    = \$@     # Stack of .RS shifts.
+    $self->{+PENDING}   = \@(\$@)   # Pending output.
 
 
 # Handle the end of the document.  This does nothing but print out a final

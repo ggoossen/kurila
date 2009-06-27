@@ -157,7 +157,7 @@ sub import
     ##
     ## fill %h keys with our @_ args.
     ##
-    my @($promote, %h, @args) = @(0, %(), @())
+    my @($promote, %h, @args) = @(0, %(), $@)
     while (my $arg = shift)
         if ($arg eq ":alias")
             (nelems @_) or

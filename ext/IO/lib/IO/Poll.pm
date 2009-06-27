@@ -73,7 +73,7 @@ sub poll($self,$timeout)
     $self->[1] = %()
 
     my($fd,$mask,$iom)
-    my @poll = @( () )
+    my @poll = $@
 
     while(@(?$fd,?$iom) =@( each $self->[0]))
         $mask   = 0
@@ -116,7 +116,7 @@ sub handles
 
     my $events = shift || 0
     my($fd,$ev,$io,$mask)
-    my @handles = @( () )
+    my @handles = $@
 
     while(@($fd,$ev) =@( each $self->[1]))
         while (@($io,$mask) =@( each $self->[0]{$fd}))

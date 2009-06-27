@@ -16,10 +16,10 @@ sub Mksymlists
         unless ( %spec{?NAME} or
                  (%spec{?FILE} and (%spec{?DL_FUNCS} or %spec{?FUNCLIST})) )
 
-    %spec{+DL_VARS} = \@() unless %spec{?DL_VARS}
+    %spec{+DL_VARS} = \$@ unless %spec{?DL_VARS}
     (%spec{+FILE} = %spec{?NAME}) =~ s/.*::// unless %spec{?FILE}
-    %spec{+FUNCLIST} = \@() unless %spec{?FUNCLIST}
-    %spec{+DL_FUNCS} = \%( %spec{?NAME} => \@() )
+    %spec{+FUNCLIST} = \$@ unless %spec{?FUNCLIST}
+    %spec{+DL_FUNCS} = \%( %spec{?NAME} => \$@ )
         unless ( (%spec{?DL_FUNCS} and keys %spec{?DL_FUNCS}->%) or
              nelems %spec{?FUNCLIST}->@)
     if (defined %spec{?DL_FUNCS})

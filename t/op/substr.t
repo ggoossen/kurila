@@ -228,7 +228,7 @@ sub run_tests
     $w = 0 
     # coercion of references
     do
-        my $s = \@()
+        my $s = \$@
         dies_like( sub (@< @_) { substr($s, 0, 1, 'Foo'); }, qr/reference as string/ )
     
 

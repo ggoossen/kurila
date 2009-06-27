@@ -70,7 +70,7 @@ ERR
 
 
 #line 78
-ok !is_deeply(\%(), \@(), 'different types')
+ok !is_deeply(\%(), \$@, 'different types')
 is( $out, "not ok 2 - different types\n",   'different types' )
 is( $err, <<ERRHEAD . <<'ERR',                          '   right diagnostic' )
 #   Failed test 'different types'
@@ -153,7 +153,7 @@ ERRHEAD
 ERR
 
 #line 151
-ok !is_deeply(\@(), \23,    'mixed scalar and array refs')
+ok !is_deeply(\$@, \23,    'mixed scalar and array refs')
 is( $out, "not ok 9 - mixed scalar and array refs\n",
     'mixed scalar and array refs' )
 is( $err, <<ERRHEAD . <<'ERR',                      '    right diagnostic' )
@@ -214,7 +214,7 @@ ERR
 
 
 #line 221
-my @tests = @(\@(),
+my @tests = @(\$@,
               \qw(42),
               \@( <qw(42 23), < qw(42 23))
     )
@@ -239,15 +239,15 @@ ok( (nelems @Test::More::Data_Stack) == 0, '@Data_Stack not holding onto things'
 
 #line 258
 # [rt.cpan.org 7031]
-my $a = \@()
+my $a = \$@
 ok !is_deeply($a, dump::view($a).''),       "don't compare refs like strings"
 ok !is_deeply(\@($a), \@(dump::view($a).'')),   "  even deep inside"
 
 
 #line 265
 # [rt.cpan.org 7030]
-ok !is_deeply( \%(), \%(key => \@()) ),  '\@() could match non-existent values'
-ok !is_deeply( \@(), \@(\@()) )
+ok !is_deeply( \%(), \%(key => \$@) ),  '\@() could match non-existent values'
+ok !is_deeply( \$@, \@(\$@) )
 
 
 #line 273
@@ -284,7 +284,7 @@ is( $err, <<ERR,        '  right diagnostic')
 ERR
 
 #line 306
-ok !is_deeply( undef, \@() )
+ok !is_deeply( undef, \$@ )
 is( $out, "not ok 23\n", 'is_deeply and undef [RT 9441]' )
 like( $err, <<ERR,	 '  right diagnostic' )
 #   Failed test at $Filename line 306\\.
@@ -296,7 +296,7 @@ ERR
 
 # rt.cpan.org 8865
 do
-    my $array = \@()
+    my $array = \$@
     my $hash  = \%()
 
     local our $TODO = "Fix line numbers";

@@ -48,7 +48,7 @@ sub parse_lines             # Usage: $parser->parse_lines(@lines)
         print $^STDOUT, "#  About to parse lines: ",
         join(' ', map { defined($_) ?? "[$_]" !! "EOF" }, @_), "\n"
 
-    my $paras = ($self->{+'paras'} ||= \@())
+    my $paras = ($self->{+'paras'} ||= \$@)
     # paragraph buffer.  Because we need to defer processing of =over
     # directives and verbatim paragraphs.  We call _ponder_paragraph_buffer
     # to process this.
@@ -372,7 +372,7 @@ do
         # Return 0 or more fake-o paragraphs explaining the accumulated
         #  errors on this document.
 
-        return @() unless $self->{?'errata'}
+        return $@ unless $self->{?'errata'}
 
         my @out
 
@@ -446,7 +446,7 @@ sub _ponder_paragraph_buffer($self)
 
     my $paras
     return unless nelems(($paras = $self->{?'paras'})->@)
-    my $curr_open = ($self->{+'curr_open'} ||= \@())
+    my $curr_open = ($self->{+'curr_open'} ||= \$@)
 
     my $scratch
 

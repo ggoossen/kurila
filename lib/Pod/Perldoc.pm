@@ -322,8 +322,8 @@ sub init
     try { umask(0077) }   # doubtless someone has no mask
 
     $self->{+'args'}              ||= \@ARGV
-    $self->{+'found'}             ||= \@()
-    $self->{+'temp_file_list'}    ||= \@()
+    $self->{+'found'}             ||= \$@
+    $self->{+'temp_file_list'}    ||= \$@
 
 
     $self->{+'target'} = undef
@@ -334,7 +334,7 @@ sub init
     $self->{+'bindir' } = $Bindir   unless exists $self->{'bindir'}
     $self->{+'pod2man'} = $Pod2man  unless exists $self->{'pod2man'}
 
-    push(( $self->{+'formatter_switches'} = \@() )->@, (
+    push(( $self->{+'formatter_switches'} = \$@ )->@, (
      # Yeah, we could use a hashref, but maybe there's some class where options
      # have to be ordered; so we'll use an arrayref.
 
@@ -345,8 +345,8 @@ sub init
     DEBUG +> 3 and printf $^STDOUT, "Formatter switches now: [\%s]\n",
         join ' ', map { "[$(join ' ',$_->@)]" },  $self->{'formatter_switches'}->@
 
-    $self->{+'translators'} = \@()
-    $self->{+'extra_search_dirs'} = \@()
+    $self->{+'translators'} = \$@
+    $self->{+'extra_search_dirs'} = \$@
 
     return
 
@@ -355,7 +355,7 @@ sub init
 
 sub init_formatter_class_list
     my $self = shift
-    $self->{+'formatter_classes'} ||= \@()
+    $self->{+'formatter_classes'} ||= \$@
 
     # Remember, no switches have been read yet, when
     # we've started this routine.
@@ -446,7 +446,7 @@ do
     my( %class_seen, %class_loaded )
     sub find_good_formatter_class
         my $self = @_[0]
-        my @class_list = ( $self->{?'formatter_classes'} || \@() )->@
+        my @class_list = ( $self->{?'formatter_classes'} || \$@ )->@
         die "WHAT?  Nothing in the formatter class list!?" unless (nelems @class_list)
 
         my $good_class_found
@@ -784,7 +784,7 @@ sub maybe_generate_dynamic_pod($self, $found_things)
         $self->add_formatter_option('__filter_nroff' => 1)
 
     else
-        $found_things->@ = @( () )
+        $found_things->@ = $@
         $self->aside("I found no Pod from that search!\n")
     
 
@@ -963,7 +963,7 @@ sub render_findings($self, $found_things)
 
     # Set formatter options:
     if( ref $formatter )
-        foreach my $f ( ( $self->{?'formatter_switches'} || \@() )->@)
+        foreach my $f ( ( $self->{?'formatter_switches'} || \$@ )->@)
             my @($switch, $value, ?$silent_fail) =  $f->@
             if( $formatter->can($switch) )
                 try { $formatter->?$switch( defined($value) ?? $value !! () ) }

@@ -27,7 +27,7 @@ sub expected
 
 $a1 = bless \%(), "A"
 expected($a1, "A", "HASH")
-$b1 = bless \@(), "B"
+$b1 = bless \$@, "B"
 expected($b1, "B", "ARRAY")
 $c1 = bless \$("test"), "C"
 expected($c1, "C", "SCALAR")
@@ -35,7 +35,7 @@ our $test = "foo"; $d1 = bless \*test, "D"
 expected($d1, "D", "GLOB")
 $e1 = bless sub (@< @_) { 1 }, "E"
 expected($e1, "E", "CODE")
-$f1 = bless \\@(), "F"
+$f1 = bless \\$@, "F"
 expected($f1, "F", "REF")
 
 # blessing ref to object doesn't modify object
@@ -51,7 +51,7 @@ expected($a1, "A2", "HASH")
 # local and my
 do
     local $a1 = bless $a1, "A3"	# should rebless outer $a1
-    local $b1 = bless \@(), "B3"
+    local $b1 = bless \$@, "B3"
     my $c1 = bless $c1, "C3"		# should rebless outer $c1
     our $test2 = ""; my $d1 = bless \*test2, "D3"
     expected($a1, "A3", "HASH")
@@ -79,19 +79,19 @@ do
 ### example of magic variable that is a reference??
 
 # no class, or empty string (with a warning), or undef (with two)
-expected(bless(\@()), 'main', "ARRAY")
+expected(bless(\$@), 'main', "ARRAY")
 do
     local $^WARN_HOOK = sub (@< @_) { push @w, @_[0]->message }
     use warnings;
 
-    my $m = bless \@()
+    my $m = bless \$@
     expected($m, 'main', "ARRAY")
     is (scalar nelems @w, 0)
 
-    dies_like( sub (@< @_) { $m = bless \@(), '' },
+    dies_like( sub (@< @_) { $m = bless \$@, '' },
                qr/Attempt to bless to ''/ )
 
-    dies_like( sub (@< @_) { $m = bless \@(), undef },
+    dies_like( sub (@< @_) { $m = bless \$@, undef },
                qr/Attempt to bless to ''/ )
 
 

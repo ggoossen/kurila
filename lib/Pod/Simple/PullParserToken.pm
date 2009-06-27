@@ -1,7 +1,7 @@
 
 package Pod::Simple::PullParserToken
 # Base class for tokens gotten from Pod::Simple::PullParser's $parser->get_token
-our @ISA = @( () )
+our @ISA = $@
 our $VERSION = '2.02'
 
 

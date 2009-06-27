@@ -67,7 +67,7 @@ sub struct
     die "function 'new' already defined in package $class"
         if do { defined &{Symbol::fetch_glob($class . "::new")} }
 
-    my @methods = @( () )
+    my @methods = $@
     my %refs = %( () )
     my %arrays = %( () )
     my %hashes = %( () )

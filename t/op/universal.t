@@ -87,7 +87,7 @@ ok (!Cedric->isa('Programmer'))
 
 my $b = 'abc'
 my @refs = qw(SCALAR SCALAR     GLOB ARRAY HASH CODE)
-my @vals = @(  \$b,   \3.14, \*b,  \@(),  \%(), sub {} )
+my @vals = @(  \$b,   \3.14, \*b,  \$@,  \%(), sub {} )
 for my $p (0 .. nelems(@refs) -1)
     for my $q (0 .. nelems(@vals) -1)
         is UNIVERSAL::isa(@vals[$p], @refs[$q]), ($p==$q or $p+$q==1)
@@ -116,7 +116,7 @@ is $subs, "DOES VERSION can import isa"
 
 ok $a->isa("UNIVERSAL")
 
-ok ! UNIVERSAL::isa(\@(), "UNIVERSAL")
+ok ! UNIVERSAL::isa(\$@, "UNIVERSAL")
 
 ok ! UNIVERSAL::can(\%(), "can")
 
@@ -154,7 +154,7 @@ do
 # bugid 3284
 # a second call to isa('UNIVERSAL') when @ISA is null failed due to caching
 
-@X::ISA= @(() )
+@X::ISA= $@
 my $x = \%(); bless $x, 'X'
 ok $x->isa('UNIVERSAL')
 ok $x->isa('UNIVERSAL')
@@ -194,6 +194,6 @@ try { isa(\%(), 'HASH') }
 main::is($^EVAL_ERROR, '', "*isa correctly found")
 
 package main;
-main::dies_like( sub (@< @_) { UNIVERSAL::DOES(\@(), "foo") },
+main::dies_like( sub (@< @_) { UNIVERSAL::DOES(\$@, "foo") },
                  qr/Can't call method "DOES" on unblessed reference/,
                  'DOES call error message says DOES, not isa' )

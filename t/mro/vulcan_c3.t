@@ -34,7 +34,7 @@ example taken from: L<http://gauss.gwydiondylan.org/books/drm/drm_50.html>
 do
     package Object
     use mro 'c3'
-    our @ISA = @()
+    our @ISA = $@
 
     package LifeForm
     use mro 'c3'

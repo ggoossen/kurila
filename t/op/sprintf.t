@@ -11,7 +11,7 @@ use version
 use Config
 
 
-my @tests = @( () )
+my @tests = $@
 my ($i, $template, $data, $result, $comment, $w, $x, $evalData, $n, $p)
 
 my $Is_VMS_VAX = 0

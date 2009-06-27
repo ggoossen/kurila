@@ -167,7 +167,7 @@ do
     %x{+a} = 1
     do { local %x{+b} = 1; }
     ok(! exists %x{b})
-    do { local %x{[@('c','d','e')]} =@(); }
+    do { local %x{[@('c','d','e')]} =$@; }
     ok(! exists %x{c})
 
 
@@ -250,7 +250,7 @@ do
 
 do
     my $x
-    my $y = bless \@(), 'X39012'
+    my $y = bless \$@, 'X39012'
     sub X39012::DESTROY { $x++ }
     sub (@< @_) { local @_[0]; shift }->($y)
     ok(!$x,  '[perl #39012]')

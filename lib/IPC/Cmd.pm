@@ -507,11 +507,11 @@ sub _ipc_run
 
     my @command; my $special_chars
     if( ref $cmd )
-        my $aref = \@()
+        my $aref = \$@
         for my $item ( $cmd->@)
             if( $item =~ m/([<>|&])/ )
                 push @command, $aref, $item
-                $aref = \@()
+                $aref = \$@
                 $special_chars .= $1
             else
                 push $aref->@, $item

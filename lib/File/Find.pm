@@ -744,7 +744,7 @@ sub _find_dir($wanted, $p_dir, $nlink)
     my @Stack
     my @filenames
     my ($subcount,$sub_nlink)
-    my $SE= \@()
+    my $SE= \$@
     my $dir_name= $p_dir
     my $dir_pref
     my $dir_rel = $File::Find::current_dir
@@ -997,7 +997,7 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
     my @filenames
     my $new_loc
     my $updir_loc = $dir_loc # untainted parent directory
-    my $SE = \@()
+    my $SE = \$@
     my $dir_name = $p_dir
     my $dir_pref
     my $loc_pref

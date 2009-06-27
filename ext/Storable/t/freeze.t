@@ -26,7 +26,7 @@ $b = \$a
 our $c = bless \%(), 'CLASS'
 $c->{+attribute} = $b
 our $d = \%()
-our $e = \@()
+our $e = \$@
 $d->{+'a'} = $e
 $e->[+0] = $d
 our %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$c)
@@ -91,7 +91,7 @@ ok $VAR2->[3] eq $VAR1->[3]
 
 # Test the workaround for LVALUE bug in perl 5.004_04 -- from Gisle Aas
 sub foo { @_[0] = 1 }
-$foo = \@()
+$foo = \$@
 foo($foo->[?1])
 freeze($foo)
 ok 1

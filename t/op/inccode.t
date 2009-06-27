@@ -19,7 +19,7 @@ use File::Spec
 require "./test.pl"
 plan(tests => 45 + !$minitest * (3 + 7 * $can_fork))
 
-my @tempfiles = @( () )
+my @tempfiles = $@
 
 sub get_temp_fh
     my $f = "DummyModule0000"
@@ -129,7 +129,7 @@ cmp_ok( $^INCLUDED{?'Quux.pm'}, '\==', $href,        '  val Quux.pm is correct i
 
 pop $^INCLUDE_PATH
 
-my $aref = bless( \@(), 'FooLoader' )
+my $aref = bless( \$@, 'FooLoader' )
 push $^INCLUDE_PATH, $aref
 
 $evalret = try { require Quux1; 1 }
@@ -256,7 +256,7 @@ if ($can_fork)
         die "Can't get here: $^OS_ERROR"
     
 
-    @::bbblplast = @( () )
+    @::bbblplast = $@
     require BBBLPLAST5
     is ("$(join ' ',@main::bbblplast)", "0 1 2 3 4 5", "All ran")
 
@@ -264,5 +264,5 @@ if ($can_fork)
         delete $^INCLUDED{$_} if m/^BBBLPLAST/
     
 
-    @::bbblplast = @( () )
+    @::bbblplast = $@
 

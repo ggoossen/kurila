@@ -13,7 +13,7 @@ is_deeply(\ Module::CoreList->find_modules(qr/IPC::Open/),
           \ qw(IPC::Open2 IPC::Open3),
           'qr/IPC::Open/')
 
-is_deeply(\ Module::CoreList->find_modules(qr/Module::/, 5.008008), \@(), 'qr/Module::/ at 5.008008')
+is_deeply(\ Module::CoreList->find_modules(qr/Module::/, 5.008008), \$@, 'qr/Module::/ at 5.008008')
 
 is_deeply(\ Module::CoreList->find_modules(qr/Test::H.*::.*s/, 5.006001, 5.007003),
           \ qw(Test::Harness::Assert Test::Harness::Straps),

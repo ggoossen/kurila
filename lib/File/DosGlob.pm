@@ -15,12 +15,12 @@ use warnings;
 
 sub doglob
     my $cond = shift
-    my @retval = @( () )
+    my @retval = $@
     #print "doglob: ", join('|', @_), "\n";
     OUTER:
         for my $pat ( @_)
-        my @matched = @( () )
-        my @globdirs = @( () )
+        my @matched = $@
+        my @globdirs = $@
         my $head = '.'
         my $sepchr = '/'
         my $tail
@@ -100,14 +100,14 @@ sub doglob
 #
 sub doglob_Mac
     my $cond = shift
-    my @retval = @( () )
+    my @retval = $@
 
     #print "doglob_Mac: ", join('|', @_), "\n";
     OUTER:
         for my $arg ( @_)
         local $_ = $arg
-        my @matched = @( () )
-        my @globdirs = @( () )
+        my @matched = $@
+        my @globdirs = $@
         my $head = ':'
         my $not_esc_head = $head
         my $sepchr = ':'
@@ -221,9 +221,9 @@ sub _expand_volume
     require MacPerl # to be verbose
 
     my @pat = @_
-    my @new_pat = @( () )
+    my @new_pat = $@
     my @FSSpec_Vols = MacPerl::Volumes()
-    my @mounted_volumes = @( () )
+    my @mounted_volumes = $@
 
     foreach my $spec_vol ( @FSSpec_Vols)
         # push all mounted volumes into array
@@ -324,7 +324,7 @@ sub glob($pat,$cxix)
     #   abc1 abc2 will be put in @appendpat.
     # This was just the esiest way, not nearly the best.
     REHASH: do
-        my @appendpat = @( () )
+        my @appendpat = $@
         for ( @pat)
             # There must be a "," I.E. abc{efg} is not what we want.
             while ( m/^(.*)(?<!\\)\{(.*?)(?<!\\)\,.*?(?<!\\)\}(.*)$/ )
@@ -376,7 +376,7 @@ sub glob($pat,$cxix)
             @pat = _preprocess_pattern(< @pat)
             # expand volume names
             @pat = _expand_volume(< @pat)
-            %entries{+$cxix} = (nelems @pat) ?? \_un_escape( < doglob_Mac(1,< @pat) ) !! \@()
+            %entries{+$cxix} = (nelems @pat) ?? \_un_escape( < doglob_Mac(1,< @pat) ) !! \$@
         else
             %entries{+$cxix} = \doglob(1,< @pat)
         

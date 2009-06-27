@@ -70,7 +70,7 @@ sub _get_proto_name
 
 sub _sock_info($addr,$port,$proto)
     my $origport = $port
-    my @serv = @( () )
+    my @serv = $@
 
     $port = $1
         if(defined $addr && $addr =~ s,:([\w\(\)/]+)$,,)
@@ -163,7 +163,7 @@ sub configure($sock,$arg)
 
     $type = $arg->{?Type} || %socket_type{?lc _get_proto_name($proto)}
 
-    my @raddr = @( () )
+    my @raddr = $@
 
     if(defined $raddr)
         @raddr = $sock->_get_addr($raddr, $arg->{?MultiHomed})

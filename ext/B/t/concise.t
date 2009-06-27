@@ -46,7 +46,7 @@ B::Concise->import( <qw( set_style set_style_standard add_callback
 ## walk_output argument checking
 
 # test that walk_output rejects non-HANDLE args
-foreach my $foo (@("string", \@(), \%()))
+foreach my $foo (@("string", \$@, \%()))
     try {  walk_output($foo) }
     isnt ($^EVAL_ERROR && $^EVAL_ERROR->message, '', "walk_output() rejects arg $(dump::view($foo))")
     $^EVAL_ERROR='' # clear the fail for next test
@@ -107,7 +107,7 @@ $^EVAL_ERROR=''
 try { set_style (< @stylespec) }
 is ($^EVAL_ERROR, '', "set_style accepts 3 style-format args")
 
-@stylespec = @( () ) # bad style
+@stylespec = $@ # bad style
 
 #### for content with doc'd options
 
@@ -160,7 +160,7 @@ SKIP: do
     if (0)
         # pending STASH splaying
 
-        foreach my $ref (@(\@(), \%()))
+        foreach my $ref (@(\$@, \%()))
             my $typ = ref $ref
             walk_output(\my $out)
             try { B::Concise::compile('-basic', $ref)->() }

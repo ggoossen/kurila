@@ -10,7 +10,7 @@ plan( tests => 52 )
 our $test
 
 do
-    my @lol = @(\qw(a b c), \@(), \qw(1 2 3))
+    my @lol = @(\qw(a b c), \$@, \qw(1 2 3))
     my @mapped = map  {scalar nelems $_->@}, @lol
     cmp_ok("$(join ' ',@mapped)", 'eq', "3 0 3", 'map scalar list of list')
 
@@ -160,6 +160,6 @@ do
 
 do
     # This shouldn't loop indefinitively.
-    my @empty = map { while (1) {} }, @( ())
+    my @empty = map { while (1) {} }, $@
     cmp_ok("$(join ' ',@empty)", 'eq', '', 'staying alive')
 

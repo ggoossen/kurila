@@ -256,9 +256,9 @@ sub start_document($self, ...)
     my $margin = $self->%{?opt_indent} + $self->%{?opt_margin}
 
     # Initialize a few per-document variables.
-    $self->%{+INDENTS} = \@()       # Stack of indentations.
+    $self->%{+INDENTS} = \$@       # Stack of indentations.
     $self->%{+MARGIN}  = $margin  # Default left margin.
-    $self->%{+PENDING} = \@(\@())     # Pending output.
+    $self->%{+PENDING} = \@(\$@)     # Pending output.
 
     return ''
 

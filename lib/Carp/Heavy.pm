@@ -260,7 +260,7 @@ sub trusts
         $known->{+$anc}++
         my @($anc_knows, $anc_partial) =  get_status($cache, $anc)
         my @found = keys $anc_knows->%
-        $known->%{[ @found]} = @()
+        $known->%{[ @found]} = $@
         push $partial->@, < $anc_partial->@
     
     return exists $known->{$parent}

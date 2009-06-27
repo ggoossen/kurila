@@ -86,7 +86,7 @@ ok( defined $dlerr, "dl_error() returning an error message: '$dlerr'" )
 
 # ... dl_findfile()
 SKIP: do
-    my @files = @( () )
+    my @files = $@
     try { @files = DynaLoader::dl_findfile("c") }
     is( $^EVAL_ERROR, '', "calling dl_findfile()" )
     # Some platforms are known to not have a "libc"

@@ -95,7 +95,7 @@ sub export($pkg, $callpkg, @< @imports)
                     # We need a way to emulate 'use Foo ()' but still
                     # allow an easy version check: "use Foo 1.23, ''";
                     if ((nelems @imports) == 2 and !@imports[1])
-                        @imports = @( () )
+                        @imports = $@
                         last
                     
                 elsif ($sym !~ s/^&// || !$export_cache->{?$sym})
@@ -172,7 +172,7 @@ sub export_to_level($pkg, $level, _, @< @args)
 # Utility functions
 
 sub _push_tags($pkg, $var, $syms)
-    my @nontag = @( () )
+    my @nontag = $@
     my $export_tags = \Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")->*->%
     push(Symbol::fetch_glob("$($pkg)::$var")->*->@,
         < @+: map { exists $export_tags->{$_} ?? $export_tags->{?$_}

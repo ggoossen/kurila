@@ -12,7 +12,7 @@ use fields < qw(_no Pants who _up_yours)
 use fields < qw(what)
 
 sub new { fields::new(shift) }
-sub magic_new { bless \@() }  # Doesn't 100% work, perl's problem.
+sub magic_new { bless \$@ }  # Doesn't 100% work, perl's problem.
 
 package main
 

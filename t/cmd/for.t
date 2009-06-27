@@ -89,7 +89,7 @@ do
             1
 
     my %h
-    %h{+foo} = bless \@(), 'X'
+    %h{+foo} = bless \$@, 'X'
     for (@: %h{?foo}, 1)
         delete %h{foo}
     print $^STDOUT, $x == 1 ?? "ok" !! "not ok", " 15 - double destroy, x=$x\n"

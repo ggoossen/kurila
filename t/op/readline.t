@@ -81,7 +81,7 @@ fresh_perl_is('BEGIN{~< *ARGV}', '',
               \%( switches => \@('-w'), stdin => '', stderr => 1 ),
               'No ARGVOUT used only once warning')
 
-my $obj = bless \@()
+my $obj = bless \$@
 dies_like( sub (@< @_) { $obj .= ~< $^DATA; }, qr/reference as string/, 'rcatline and refs')
 
 __DATA__

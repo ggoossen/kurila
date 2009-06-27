@@ -12,7 +12,7 @@ my @test = @(
  \@( undef, 1,		'number'	),
  \@( undef, 'A',		'string'	),
  \@( HASH   => \%(),	'HASH ref'	),
- \@( ARRAY  => \@(),	'ARRAY ref'	),
+ \@( ARRAY  => \$@,	'ARRAY ref'	),
  \@( SCALAR => \$t,	'SCALAR ref'	),
  \@( REF    => \(\$t),	'REF ref'	),
  \@( GLOB   => gensym,	'GLOB ref'	),

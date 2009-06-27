@@ -370,7 +370,7 @@ sub index_as_html
     my $self = @_[0]
     # This is meant to be called AFTER the input document has been parsed!
 
-    my $points = $self->{?'PSHTML_index_points'} || @()
+    my $points = $self->{?'PSHTML_index_points'} || $@
 
     (nelems $points) +> 1 or return qq[<div class='indexgroupEmpty'></div>\n]
     # There's no point in having a 0-item or 1-item index, I dare say.

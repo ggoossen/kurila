@@ -28,7 +28,7 @@ my $Is_Rhapsody= $^OS_NAME eq 'rhapsody'
 
 my $Is_Dosish  = $Is_Dos || $Is_OS2 || $Is_MSWin32 || $Is_NetWare || $Is_Cygwin
 
-my $Is_UFS     = $Is_Darwin && (@() = `df -t ufs . 2>/dev/null`) == 2
+my $Is_UFS     = $Is_Darwin && ($@ = `df -t ufs . 2>/dev/null`) == 2
 
 my@($DEV, $INO, $MODE, $NLINK, $UID, $GID, $RDEV, $SIZE,
     $ATIME, $MTIME, $CTIME, $BLKSIZE, $BLOCKS) = @( <0..12)

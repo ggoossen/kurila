@@ -531,7 +531,7 @@ END
     $argv =~ s/^\[/(/
     $argv =~ s/\]$/)/
 
-    $self->{+RESULT} ||= @()
+    $self->{+RESULT} ||= $@
     push $self->{RESULT}, <<END
 # This Makefile is for the $self->{?NAME} extension to perl.
 #
@@ -576,7 +576,7 @@ END
     
 
     # turn the SKIP array into a SKIPHASH hash
-    for my $skip ( $self->{?SKIP} || @() )
+    for my $skip ( $self->{?SKIP} || $@ )
         $self->{+SKIPHASH}{+$skip} = 1
     
     delete $self->{SKIP} # free memory

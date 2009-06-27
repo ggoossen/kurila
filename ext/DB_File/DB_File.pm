@@ -201,14 +201,14 @@ sub iterate($self, $callback)
 
 sub keys
     my @($self) = @_
-    my @keys = @()
+    my @keys = $@
     $self->iterate( sub (@< @_) { my @($key, $value) = @_; push @keys, $key; } )
     return @keys
 
 
 sub values
     my @($self) = @_
-    my @values = @()
+    my @values = $@
     $self->iterate( sub (@< @_) { my @($key, $value) = @_; push @values, $value; } )
     return @values
 
@@ -254,7 +254,7 @@ sub get_dup
     my $value     = 0 
     my $origkey   = $key 
     my %values    = %( () ) 
-    my @values    = @( () ) 
+    my @values    = $@ 
     my $counter   = 0 
 
     # iterate through the database until either EOF ($status == 0)

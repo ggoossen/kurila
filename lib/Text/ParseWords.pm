@@ -18,7 +18,7 @@ sub shellwords
         $line =~ s/^\s+//
         my @words = parse_line('\s+', 0, $line)
         pop @words if (nelems @words) and !defined @words[-1]
-        return @() unless ((nelems @words) || !length($line))
+        return $@ unless ((nelems @words) || !length($line))
         push(@allwords, < @words)
     
     return @allwords
@@ -82,11 +82,11 @@ sub parse_line($delimiter, $keep, $line)
                         |   # --OR--
                             (?!^)(?=["'])               # a quote
                         )
-		    )//xs or return @()		# extended layout
+		    )//xs or return $@		# extended layout
         my @($quote, $quoted, $unquoted, $delim) = @(($1 ?? ($1,$2) !! ($3,$4)), $5, $6)
 
 
-        return @() unless( defined($quote) || length($unquoted) || length($delim))
+        return $@ unless( defined($quote) || length($unquoted) || length($delim))
 
         if ($keep)
             $quoted = "$quote$quoted$quote"

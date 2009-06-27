@@ -13,7 +13,7 @@ foreach my $v (@: undef, 10, 'string')
     is(refaddr($v), undef, "not " . (defined($v) ?? "'$v'" !! "undef"))
 
 
-foreach my $r (@: \%(), \$t, \@(), sub {})
+foreach my $r (@: \%(), \$t, \$@, sub {})
     my $n = dump::view($r)
     $n =~ m/0x(\w+)/
     my $addr = do { local $^WARNING = undef; hex $1 }

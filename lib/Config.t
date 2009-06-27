@@ -140,7 +140,7 @@ die "This perl is $^PERL_VERSION at $^EXECUTABLE_NAME; other perl is $ver (at $p
     . '- failed to find this perl' unless $^PERL_VERSION eq $ver
 
 my %orig_inc
-%orig_inc{[ @orig_inc]} =@( @())
+%orig_inc{[ @orig_inc]} =@( $@)
 
 my $failed
 # This is the order that directories are pushed onto $^INCLUDE_PATH in perl.c:

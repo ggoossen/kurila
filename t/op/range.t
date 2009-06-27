@@ -46,7 +46,7 @@ eval_dies_like( qq[ join('','a'..'z') ],
 is(join(",", @x), '')
 
 # same test with foreach (which is a separate implementation)
-@y = @( () )
+@y = $@
 foreach ('09'..'08')
     push(@y, $_)
 
@@ -98,27 +98,27 @@ is(join(":",'-2'..undef), '-2:-1:0')
 is(join(":", map { "[$_]" }, undef..undef), '[0]')
 
 # also test undef in foreach loops
-@foo= @()
+@foo= $@
 for (undef..2)
     push @foo, $_
 is(join(":", @foo), '0:1:2')
 
-@foo= @()
+@foo= $@
 for (-2..undef)
     push @foo, $_
 is(join(":", @foo), '-2:-1:0')
 
-@foo= @()
+@foo= $@
 for (undef..'2')
     push @foo, $_
 is(join(":", @foo), '0:1:2')
 
-@foo= @()
+@foo= $@
 for ('-2'..undef)
     push @foo, $_
 is(join(":", @foo), '-2:-1:0')
 
-@foo= @()
+@foo= $@
 for (undef..undef)
     push @foo, $_
 is(join(":", map { "[$_]" }, @foo), '[0]')
@@ -126,14 +126,14 @@ is(join(":", map { "[$_]" }, @foo), '[0]')
 # again with magic
 do
     my @a =1..3
-    @foo= @()
+    @foo= $@
     for (undef..(nelems @a)-1)
         push @foo, $_
     is(join(":", @foo), '0:1:2')
 
 do
-    my @a = @( () )
-    @foo= @()
+    my @a = $@
+    @foo= $@
     for ((nelems @a)-1..undef)
         push @foo, $_
     is(join(":", @foo), '-1:0')
@@ -141,7 +141,7 @@ do
 do
     local $1
     "2" =~ m/(.+)/
-    @foo= @()
+    @foo= $@
     for (undef..$1)
         push @foo, $_
     is(join(":", @foo), '0:1:2')
@@ -149,7 +149,7 @@ do
 do
     local $1
     "-2" =~ m/(.+)/
-    @foo= @()
+    @foo= $@
     for ($1..undef)
         push @foo, $_
     is(join(":", @foo), '-2:-1:0')

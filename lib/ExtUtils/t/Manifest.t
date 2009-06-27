@@ -145,7 +145,7 @@ ok( mkdir( 'copy', 0777 ), 'made copy directory' )
 
 # Check that manicopy copies files.
 manicopy( $files, 'copy', 'cp' )
-my @copies = @( () )
+my @copies = $@
 find( sub (@< @_) { push @copies, $_ if -f }, 'copy' )
 @copies = map { s/\.$//; $_ }, @copies if $Is_VMS  # VMS likes to put dots on
 # the end of files.
@@ -204,7 +204,7 @@ add_file( 'MANIFEST.SKIP' => 'foo' )
 add_file( 'MANIFEST'      => "foobar\n"   )
 add_file( 'foobar'        => '123' )
 @($res, $warn) =  catch_warning( \&manicheck )
-is_deeply( $res,  @(),      'MANIFEST overrides MANIFEST.SKIP' )
+is_deeply( $res,  $@,      'MANIFEST overrides MANIFEST.SKIP' )
 is( $warn, '',   'MANIFEST overrides MANIFEST.SKIP, no warnings' )
 
 $files = maniread

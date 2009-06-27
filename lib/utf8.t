@@ -122,7 +122,7 @@ do
 END
     my (@i, $s)
 
-    @i = @()
+    @i = $@
     push @i, ($s = index($a, '6'))     # 60
     push @i, ($s = index($a, '.', $s)) # next . after 60 is 62
     push @i, ($s = index($a, '5'))     # 50
@@ -133,7 +133,7 @@ END
     push @i, ($s = index($a, '.', $s)) # next . after 40 is 42
     is("$(join ' ',@i)", "60 62 50 52 70 72 40 42", "utf8 heredoc index")
 
-    @i = @( () )
+    @i = $@
     push @i, ($s = rindex($a, '6'))     # 60
     push @i, ($s = rindex($a, '.', $s)) # previous . before 60 is 58
     push @i, ($s = rindex($a, '5'))     # 50
@@ -144,7 +144,7 @@ END
     push @i, ($s = rindex($a, '.', $s)) # previous . before 40 is 38
     is("$(join ' ',@i)", "60 58 50 48 70 68 40 38", "utf8 heredoc rindex")
 
-    @i = @( () )
+    @i = $@
     push @i, ($s =  index($a, '6'))     # 60
     push @i,  index($a, '.', $s)      # next     . after  60 is 62
     push @i, rindex($a, '.', $s)      # previous . before 60 is 58

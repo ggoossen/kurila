@@ -86,17 +86,17 @@ do
     use mro 'c3'
     our @ISA = qw/ xx::DBIx::Class /;
 
-    package xx::Class::Data::Accessor; our @ISA = @( () ); use mro 'c3';
-    package xx::DBIx::Class::Relationship::HasMany; our @ISA = @( () ); use mro 'c3';
-    package xx::DBIx::Class::Relationship::HasOne; our @ISA = @( () ); use mro 'c3';
-    package xx::DBIx::Class::Relationship::BelongsTo; our @ISA = @( () ); use mro 'c3';
-    package xx::DBIx::Class::Relationship::ManyToMany; our @ISA = @( () ); use mro 'c3';
-    package xx::DBIx::Class::Componentised; our @ISA = @( () ); use mro 'c3';
-    package xx::DBIx::Class::AccessorGroup; our @ISA = @( () ); use mro 'c3';
-    package xx::DBIx::Class::Serialize::Storable; our @ISA = @( () ); use mro 'c3';
-    package xx::DBIx::Class::Relationship::Accessor; our @ISA = @( () ); use mro 'c3';
+    package xx::Class::Data::Accessor; our @ISA = $@; use mro 'c3';
+    package xx::DBIx::Class::Relationship::HasMany; our @ISA = $@; use mro 'c3';
+    package xx::DBIx::Class::Relationship::HasOne; our @ISA = $@; use mro 'c3';
+    package xx::DBIx::Class::Relationship::BelongsTo; our @ISA = $@; use mro 'c3';
+    package xx::DBIx::Class::Relationship::ManyToMany; our @ISA = $@; use mro 'c3';
+    package xx::DBIx::Class::Componentised; our @ISA = $@; use mro 'c3';
+    package xx::DBIx::Class::AccessorGroup; our @ISA = $@; use mro 'c3';
+    package xx::DBIx::Class::Serialize::Storable; our @ISA = $@; use mro 'c3';
+    package xx::DBIx::Class::Relationship::Accessor; our @ISA = $@; use mro 'c3';
     package xx::DBIx::Class::Relationship::CascadeActions;
-    our @ISA = @( () )
+    our @ISA = $@
     use mro 'c3'
 
 

@@ -11,7 +11,7 @@ BEGIN { unless(defined &DEBUG) { *DEBUG = sub () {0} } }
 # define the constant 'DEBUG' at compile-time
 
 $VERSION = "1.03"
-@ISA = @()
+@ISA = $@
 use I18N::LangTags < qw(alternate_language_tags locale2language_tag);
 
 sub _uniq { my %seen; return grep( {!(%seen{+$_}++) }, @_); }

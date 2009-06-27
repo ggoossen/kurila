@@ -166,7 +166,7 @@ do
 ok declared 'Other::IN_OTHER_PACK'
 ok %constant::declared{?'Other::IN_OTHER_PACK'}
 
-@warnings = @( () )
+@warnings = $@
 eval q{
     no warnings;
     use warnings 'constant';
@@ -225,7 +225,7 @@ for my $idx (0..((nelems @warnings)-1))
     like @warnings[$idx], @Expected_Warnings[$idx]
 
 
-@warnings = @( () )
+@warnings = $@
 
 
 use constant \%(

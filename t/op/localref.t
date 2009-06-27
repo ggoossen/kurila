@@ -75,7 +75,7 @@ try { local $y->@; }
 test_err_localref
 try { local (\@aa)->@; }
 test_err_localref
-try { local (\@())->@; }
+try { local (\$@)->@; }
 test_err_localref
 $x = \%aa
 $y = \%aa

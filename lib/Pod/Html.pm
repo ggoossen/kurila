@@ -280,9 +280,9 @@ sub init_globals
     $Dircache = "pod2htmd.tmp"
     $Itemcache = "pod2htmi.tmp"
 
-    @Begin_Stack = @( () )		# begin/end stack
+    @Begin_Stack = $@		# begin/end stack
 
-    @Libpods = @( () )	    	# files to search for links from C<> directives
+    @Libpods = $@	    	# files to search for links from C<> directives
     $Htmlroot = "/"	    	# http-server base directory from which all
     #   relative paths in $podpath stem.
     $Htmldir = ""	    	# The directory to which the html pages
@@ -294,7 +294,7 @@ sub init_globals
     # other files.
 
     $Podfile = ""               # read from stdin by default
-    @Podpath = @( () )          # list of directories containing library pods.
+    @Podpath = $@          # list of directories containing library pods.
     $Podroot = $Curdir          # filesystem base directory from which all
     #   relative paths in $podpath stem.
     $Css = ''                  # Cascading style sheet
@@ -304,14 +304,14 @@ sub init_globals
     $Doindex = 1                # non-zero if we should generate an index
     $Backlink = ''              # text for "back to top" links
     $Listlevel = 0              # current list depth
-    @Listtype = @( () )         # list types for open lists
+    @Listtype = $@         # list types for open lists
     $ListNewTerm = 0            # indicates new term in definition list; used
     # to correctly open/close <dd> tags
     $Ignore = 1         # whether or not to format text.  we don't
     #   format text until we hit our first pod
     #   directive.
 
-    @Items_Seen = @( () )               # for multiples of the same item in perlfunc
+    @Items_Seen = $@               # for multiples of the same item in perlfunc
     %Items_Named = %( () )
     $Header = 0         # produce block header/footer
     $Title = ''         # title to give the pod(s)
@@ -910,7 +910,7 @@ sub scan_podpath($podroot, $recurse, $append)
             warn "$^PROGRAM_NAME: shouldn't be here (line ".__LINE__."\n" unless $Quiet
         
     
-    @poddata = @( () )  # clean-up a bit
+    @poddata = $@  # clean-up a bit
 
     chdir($pwd)
         || die "$^PROGRAM_NAME: error changing to directory $pwd: $^OS_ERROR\n"
@@ -950,8 +950,8 @@ sub scan_dir($dir, $recurse)
     my($t, @subdirs, @pods, $pod, $dirname, @dirs)
     local $_ = undef
 
-    @subdirs = @( () )
-    @pods = @( () )
+    @subdirs = $@
+    @pods = $@
 
     opendir(my $dh, $dir) ||
         die "$^PROGRAM_NAME: error opening directory $dir: $^OS_ERROR\n"

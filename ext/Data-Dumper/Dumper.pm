@@ -47,7 +47,7 @@ sub new($c, $v, ?$n)
 
     die "Usage:  PACKAGE->new(ARRAYREF, [ARRAYREF])"
         unless (defined($v) && (ref($v) eq 'ARRAY'))
-    $n = \@() unless (defined($n) && (ref($v) eq 'ARRAY'))
+    $n = \$@ unless (defined($n) && (ref($v) eq 'ARRAY'))
 
     my $s = \%(
         level      => 0,           # current recursive depth
@@ -165,7 +165,7 @@ sub Dumpperl
 
     for my $val ( $s->{todump}->@)
         my $out = ""
-        @post = @()
+        @post = $@
         $name = $s->{names}->[?$i++]
         if (defined $name)
             if ($name =~ m/^[*](.*)$/)
@@ -423,7 +423,7 @@ sub _dump
                 $keys = $s->{?sortkeys}->($rval)
                 unless (ref($keys) eq 'ARRAY')
                     warn "Sortkeys subroutine did not return ARRAYREF"
-                    $keys = \@()
+                    $keys = \$@
                 
             else
                 $keys = \ sort keys $rval->%
@@ -431,7 +431,7 @@ sub _dump
         
         while (@(?$k, ?$v) = ! $sortkeys ?? @(each $rval->%) !!
                  (nelems $keys->@) ?? @(($key = shift($keys->@)), $rval->{?$key}) !!
-                 @() )
+                 $@ )
             my $nk = $s->_dump($k, "")
             $nk = $1 if !$s->{?quotekeys} and $nk =~ m/^[\"\']([A-Za-z_]\w*)[\"\']$/
             $sname = $mname . '{' . $nk . '}'
@@ -487,7 +487,7 @@ sub Dumper
 
 # compat stub
 sub DumperX
-    return Data::Dumper->Dumpxs(\ @_, \@())
+    return Data::Dumper->Dumpxs(\ @_, \$@)
 
 
 sub Dumpf { return Data::Dumper->Dump(< @_) }

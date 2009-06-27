@@ -8,7 +8,7 @@ plan 9
 
 my $x = @('a', 'b', 'c')
 is nelems($x), 3
-$x = @()
+$x = $@
 is nelems($x), 0
 $x = undef
 is nelems($x), 0, '$x=undef; nelems($x) == 0'

@@ -156,16 +156,16 @@ sub select
         if defined @_[0] && !ref(@_[0])
 
     my@($r,$w,$e,$t) =  @_
-    my @result = @( () )
+    my @result = $@
 
     my $rb = defined $r ?? $r->[VEC_BITS] !! undef
     my $wb = defined $w ?? $w->[VEC_BITS] !! undef
     my $eb = defined $e ?? $e->[VEC_BITS] !! undef
 
     if(select($rb,$wb,$eb,$t) +> 0)
-        my @r = @( () )
-        my @w = @( () )
-        my @e = @( () )
+        my @r = $@
+        my @w = $@
+        my @e = $@
         my $i = _max(defined $r ?? scalar(nelems $r->@)-1 !! 0,
                      defined $w ?? scalar(nelems $w->@)-1 !! 0,
                      defined $e ?? scalar(nelems $e->@)-1 !! 0)
@@ -190,7 +190,7 @@ sub select
 sub handles
     my $vec = shift
     my $bits = shift
-    my @h = @( () )
+    my @h = $@
     my $max = scalar(nelems $vec->@) - 1
 
     for my $i (FIRST_FD .. $max)

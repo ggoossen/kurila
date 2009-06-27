@@ -10,7 +10,7 @@ use Cwd ()
 env::var('PATH' ) = "/bin"
 for (qw(BASH_ENV CDPATH ENV IFS))
     env::var($_) = undef
-my @correct = @( () )
+my @correct = $@
 if (opendir(my $d, $^OS_NAME eq "MacOS" ?? ":" !! "."))
     @correct = grep { !m/^\./ }, sort @( readdir($d))
     closedir $d
@@ -60,7 +60,7 @@ else
 @a = bsd_glob("asdfasdf", 0)
 SKIP: do
     skip $^OS_NAME, 1 if $^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare'
-    is_deeply(\@a, \@())
+    is_deeply(\@a, \$@)
 
 
 # check bad protections
@@ -78,7 +78,7 @@ SKIP: do
     local $TODO = 'hit VOS bug posix-956' if $^OS_NAME eq 'vos'
 
     isnt(GLOB_ERROR, 0)
-    is_deeply(\@a, \@())
+    is_deeply(\@a, \$@)
 
 
 # check for csh style globbing

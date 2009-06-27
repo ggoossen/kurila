@@ -111,7 +111,7 @@ elsif ($is_Win32)
 
 
 my @defaultMethods = @connectMethods
-my @fallbackMethods = @( () )
+my @fallbackMethods = $@
 
 $sock_timeout = 0.25 if $^OS_NAME =~ m/darwin/
 
@@ -151,7 +151,7 @@ sub setlogsock
     $syslog_path = shift
     disconnect_log() if $connected
     $transmit_ok = 0
-    @fallbackMethods = @( () )
+    @fallbackMethods = $@
     @connectMethods = @defaultMethods
 
     if (ref $setsock eq 'ARRAY')
@@ -333,7 +333,7 @@ sub syslog
     while (@fallbackMethods || $syslog_send)
         if ($failed && (time - $fail_time) +> 60)
             # it's been a while... maybe things have been fixed
-            @fallbackMethods = @( () )
+            @fallbackMethods = $@
             disconnect_log()
             $transmit_ok = 0 # make it look like a fresh attempt
             connect_log()
@@ -446,7 +446,7 @@ sub connect_log
     
 
     $connected = 0
-    my @errs = @( () )
+    my @errs = $@
     my $proto = undef
 
     while ($proto = shift @fallbackMethods)
@@ -460,7 +460,7 @@ sub connect_log
         $current_proto = $proto
         iohandle::output_autoflush($syslogfh, 1)
     else
-        @fallbackMethods = @( () )
+        @fallbackMethods = $@
         $err_sub->(join "\n\t- ", @( "no connection to syslog available", < @errs))
         return undef
     

@@ -67,7 +67,7 @@ sub pos_integer
 
 sub strings_or_undef($val, $name)
     my $type = ref $val
-    if (!defined $val) { $val = \@() }
+    if (!defined $val) { $val = \$@ }
         elsif (!$type)     { $val = \@( "$val" ) }
     die "Value for '$name' option must be string, array of strings, or undef (not $type)"
         unless ref $val eq 'ARRAY'
@@ -185,8 +185,8 @@ sub user_def($spec, $name, $opts)
     else
         $spec = \ $spec->%
     
-    my @from = ($opts->{+field}{+from}||=\@())->@
-    my @to   = ($opts->{+field}{+to}||=\@())->@
+    my @from = ($opts->{+field}{+from}||=\$@)->@
+    my @to   = ($opts->{+field}{+to}||=\$@)->@
     my $count = (nelems @from)
     my $i=0
     while ($i+<nelems $spec->@)
@@ -210,8 +210,8 @@ my %std_opt = %(
     bfill       => \%( set => \&defined_or_space,       def => undef,                           ),
     vfill       => \%( set => \&defined_or_space,       def => undef,                           ),
     single      => \%( set => \&one_char,         def => undef,                         ),
-    field       => \%( set => \&user_def,               def => \%(from=>\@(),to=>\@())  ),
-    bullet      => \%( set => \&strings_or_undef, def => \@()                                   ),
+    field       => \%( set => \&user_def,               def => \%(from=>\$@,to=>\$@)  ),
+    bullet      => \%( set => \&strings_or_undef, def => \$@                                   ),
     height      => \%( set => \&height_vals,            def => \%(min=>0, max=>$unlimited) ),
     layout      => \%( set => \&layout_word,            def => 'balanced',                      ),
     break       => \%( set => \&code,                           def => break_at('-'),           ),
@@ -447,7 +447,7 @@ sub perl6_match($str, $pat) {;
         unshift @vals, $1
         bless \@vals, 'Perl6::Form::Rule::Okay'
     else
-        bless \@(), 'Perl6::Form::Rule::Fail'
+        bless \$@, 'Perl6::Form::Rule::Fail'
     
 }
 
@@ -515,7 +515,7 @@ sub segment($format, $args, $opts, $fldcnt, $argcache)
                 %form{+vjust} = \&jtop
                 %form{+hjust} = \&jbullet
                 %form{+break} = \&break_bullet
-                %form{+src}   = \@()
+                %form{+src}   = \$@
                 (%form{+bullethole} = $field) =~ s/./ /gs
             else
                 %form{+stretch} = !%form{?isbullet} && $fld =~ s/[+]//
@@ -744,7 +744,7 @@ sub make_col
     my @col
     my @($more, $text) = @(1,"")
     my $bullet = $f->{?hasbullet}
-    $bullet->{+bullets} = \@() if $bullet
+    $bullet->{+bullets} = \$@ if $bullet
     my $bulleted = 1
     until ($f->{?done})
         my $skipped = 0
@@ -761,7 +761,7 @@ sub make_col
         my @($text,$more,$eol) =  $f->{?break}->($str_ref,$width,$f->{?opts}{?ws})
         if ($f->{?opts}{?ws})
             $text =~ s{($f->{?opts}{?ws})}
-                              {$( do { my @caps = @(); #@( < grep { defined $$_ } @( < 2..((nelems @+) -1)) );
+                              {$( do { my @caps = $@; #@( < grep { defined $$_ } @( < 2..((nelems @+) -1)) );
                 @caps = @( length($1) ?? " " !! "" ) unless (nelems @caps);
                 join "", @caps;
             })}g
@@ -779,7 +779,7 @@ sub make_col
         $f->{+done} = 1 if $f->{?line}
         $bulleted = 0
     
-    @col = @( () ) if (nelems @col) == 1 && @col[0] eq ""
+    @col = $@ if (nelems @col) == 1 && @col[0] eq ""
     @_[3] = $more && !$f->{?done} if (nelems @_)+>3
     return \@col
 
@@ -881,13 +881,13 @@ sub make_cols($formatters,$prevformatters,$parts, $opts, $maxheight)
         for my $g ( @maxgroups)
             balance_cols($g,$opts, $maxheight)
         
-        $maxheight = max < map { 0+nelems ($_->{?formcol}||\@())->@ }, $formatters->@
+        $maxheight = max < map { 0+nelems ($_->{?formcol}||\$@)->@ }, $formatters->@
             if grep {!$_->{?literal} && !$_->{?opts}{?height}{?minimal}}, $formatters->@
         for my $g ( @mingroups)
             balance_cols($g, $opts, $maxheight)
         
         for my $f ( $formatters->@)
-            push $parts->@, $f->{?formcol}||$f->{?bullets}||\@()
+            push $parts->@, $f->{?formcol}||$f->{?bullets}||\$@
         
     elsif ($opts->{?layout} eq 'down') # column-by-column
         for my $col (0..(nelems $formatters->@)-1)
@@ -906,7 +906,7 @@ sub make_cols($formatters,$prevformatters,$parts, $opts, $maxheight)
         for my $col (0..(nelems $formatters->@)-1)
             my $f = $formatters->[$col]
             next unless $f->{?isbullet}
-            $parts->[$col] = $f->{?bullets}||\@()
+            $parts->[$col] = $f->{?bullets}||\$@
         
     elsif ($opts->{?layout} eq 'across') # across row-by-row
         my %incomplete = %(first=>1)
@@ -914,7 +914,7 @@ sub make_cols($formatters,$prevformatters,$parts, $opts, $maxheight)
             last unless grep {$_}, values %incomplete
             %incomplete = %( () )
             for my $col (0..(nelems $formatters->@)-1)
-                $parts->[$col] ||= \@()
+                $parts->[$col] ||= \$@
             
             for my $col (0..(nelems $formatters->@)-1)
                 my $f = $formatters->[$col]
@@ -952,7 +952,7 @@ sub make_cols($formatters,$prevformatters,$parts, $opts, $maxheight)
         
     else # tabular layout: down to the first \n, then across, then fill
         my $finished = 0
-        for my $col (0..(nelems $formatters->@)-1) { $parts->[$col] = \@(); }
+        for my $col (0..(nelems $formatters->@)-1) { $parts->[$col] = \$@; }
         while (!$finished)
             $finished = 1
             for my $col (0..(nelems $formatters->@)-1)
@@ -976,7 +976,7 @@ sub make_cols($formatters,$prevformatters,$parts, $opts, $maxheight)
             for my $col (0..(nelems $formatters->@)-2)
                 my $f = $formatters->[$col]
                 if ($f->{?isbullet})
-                    push $parts->[$col]->@, < ($f->{?bullets}||\@())->@
+                    push $parts->[$col]->@, < ($f->{?bullets}||\$@)->@
                     push $parts->[$col]->@,
                         ($f->{?bullethole})x($minimaxheight-nelems $parts->[$col]->@)
                 elsif ($f->{?literal})
@@ -1041,7 +1041,7 @@ sub form
     
     my %opts = %(< %def_opts, < $caller_opts->%)
     my $fldcnt = 0
-    my @section = @( \%(opts=>\%(< %opts), text=>\@()) )
+    my @section = @( \%(opts=>\%(< %opts), text=>\$@) )
     my $formats = \@_
     my $first = 1
     my %argcache
@@ -1132,7 +1132,7 @@ sub form
                 
             
             my $fill = $pagelen +< $unlimited ?? \@(("\n") x ($bodylen-nelems $pagetext->@))
-                !! \@()
+                !! \$@
 
             my $body = $bodyfn->($pagetext, $fill, \%opts)
 

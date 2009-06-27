@@ -17,7 +17,7 @@ my $Perl = which_perl()
 
 $^OUTPUT_AUTOFLUSH=1
 
-my @prgs = @( () )
+my @prgs = $@
 while( ~< $^DATA)
     if(m/^#{8,}\s*(.*)/)
         push @prgs, \@('', $1)

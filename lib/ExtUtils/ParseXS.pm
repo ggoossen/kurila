@@ -84,7 +84,7 @@ sub process_file
         prototypes => 0,
         inout => 1,
         argtypes => 1,
-        typemap => \@(),
+        typemap => \$@,
         output => $^STDOUT,
         csuffix => '.c',
         < %args,
@@ -100,7 +100,7 @@ sub process_file
     
     @XSStack = @(\%(type => 'none'))
     @($XSS_work_idx, $cpp_next_tmp) = @(0, "XSubPPtmpAAAA")
-    @InitFileCode = @( () )
+    @InitFileCode = $@
     $FH = Symbol::gensym()
     $proto_re = "[" . quotemeta('\$%&*@;[]') . "]" 
     $Overload = 0
@@ -577,7 +577,7 @@ sub process_para
         last
     
     @XSStack[$XSS_work_idx]->{+functions}{+$Full_func_name} ++ 
-    @Attributes = @()
+    @Attributes = $@
     %XsubAliases = %XsubAliasValues =  %Interfaces = %()
     $DoSetMagic = 1
 
@@ -644,7 +644,7 @@ sub process_para
         
     
     my $extra_args = 0
-    my @args_num = @( () )
+    my @args_num = $@
     my $num_args = 0
     my $report_args = ''
     if (defined($class))
@@ -1594,8 +1594,8 @@ sub fetch_para
     # parse paragraph
     death ("Error: Unterminated `#if/#ifdef/#ifndef'")
         if !defined $lastline && @XSStack[-1]->{?type} eq 'if'
-    @line = @( () )
-    @line_no = @( () ) 
+    @line = $@
+    @line_no = $@ 
     return PopFile() if !defined $lastline
 
     if ($lastline =~

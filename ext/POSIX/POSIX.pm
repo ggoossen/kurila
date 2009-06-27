@@ -717,7 +717,7 @@ sub load_imports
         ctype_h =>      qw(isalnum isalpha iscntrl isdigit isgraph islower
                 isprint ispunct isspace isupper isxdigit tolower toupper),
 
-        dirent_h =>     @(),
+        dirent_h =>     $@,
 
         errno_h =>      qw(E2BIG EACCES EADDRINUSE EADDRNOTAVAIL EAFNOSUPPORT
                 EAGAIN EALREADY EBADF EBUSY ECHILD ECONNABORTED
@@ -754,7 +754,7 @@ sub load_imports
                 LDBL_MAX LDBL_MAX_10_EXP LDBL_MAX_EXP
                 LDBL_MIN LDBL_MIN_10_EXP LDBL_MIN_EXP),
 
-        grp_h =>        @(),
+        grp_h =>        $@,
 
         limits_h =>     qw( ARG_MAX CHAR_BIT CHAR_MAX CHAR_MIN CHILD_MAX
                 INT_MAX INT_MIN LINK_MAX LONG_MAX LONG_MIN MAX_CANON
@@ -774,7 +774,7 @@ sub load_imports
         math_h =>       qw(HUGE_VAL acos asin atan ceil cosh fabs floor fmod
                 frexp ldexp log10 modf pow sinh tan tanh),
 
-        pwd_h =>        @(),
+        pwd_h =>        $@,
 
         setjmp_h =>     qw(longjmp setjmp siglongjmp sigsetjmp),
 
@@ -786,7 +786,7 @@ sub load_imports
                 SIG_BLOCK SIG_DFL SIG_ERR SIG_IGN SIG_SETMASK SIG_UNBLOCK
                 raise sigaction sigpending sigprocmask sigsuspend),
 
-        stdarg_h =>     @(),
+        stdarg_h =>     $@,
 
         stddef_h =>     qw(NULL offsetof),
 
@@ -815,9 +815,9 @@ sub load_imports
                 S_ISUID S_IWGRP S_IWOTH S_IWUSR S_IXGRP S_IXOTH S_IXUSR
                 fstat mkfifo),
 
-        sys_times_h => @(),
+        sys_times_h => $@,
 
-        sys_types_h => @(),
+        sys_types_h => $@,
 
         sys_utsname_h => qw(uname),
 
@@ -855,7 +855,7 @@ sub load_imports
                 getpid getuid isatty lseek pathconf pause setgid setpgid
                 setsid setuid sysconf tcgetpgrp tcsetpgrp ttyname),
 
-        utime_h =>      @(),
+        utime_h =>      $@,
 
         )
 
@@ -863,7 +863,7 @@ sub load_imports
     do
         # De-duplicate the export list:
         my %export
-        %export{[ @+: values %EXPORT_TAGS]} = @()
+        %export{[ @+: values %EXPORT_TAGS]} = $@
         # Doing the de-dup with a temporary hash has the advantage that the SVs in
         # @EXPORT are actually shared hash key sacalars, which will save some memory.
         push @EXPORT, < keys %export

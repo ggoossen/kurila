@@ -25,7 +25,7 @@ use Storable < qw(freeze thaw)
 
 my @x = @('a', 1)
 
-sub make { bless \@(), shift }
+sub make { bless \$@, shift }
 
 sub STORABLE_freeze
     my $self = shift
@@ -97,7 +97,7 @@ my $MAX = 20
 my $recursed = 0
 my $hook_called = 0
 
-sub make { bless \@(), shift }
+sub make { bless \$@, shift }
 
 sub STORABLE_freeze($self, ...)
     $hook_called++

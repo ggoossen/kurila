@@ -95,7 +95,7 @@ SKIP: do
 
 BEGIN { $tests += 20 * 8 }
 # try to open a syslog using all the available connection methods
-my @passed = @( () )
+my @passed = $@
 for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp))
     SKIP: do
         skip "the 'stream' mechanism because a previous mechanism with similar interface succeeded", 20

@@ -144,7 +144,7 @@ sub _liblist_ext($self, $potential_libs,$verbose,$give_libs)
 
     unless ($potential_libs)
         warn "Result:\n\tEXTRALIBS: \n\tLDLOADLIBS: $crtlstr\n" if $verbose
-        return  @('', '', $crtlstr, '',  @($give_libs ?? \@() !! ()))
+        return  @('', '', $crtlstr, '',  @($give_libs ?? \$@ !! ()))
     
 
     my(@dirs,@libs,%found,@fndlibs,$ldlib)

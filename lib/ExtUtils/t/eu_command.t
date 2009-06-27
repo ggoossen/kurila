@@ -227,7 +227,7 @@ do
     # Test expand_wildcards()
     do
         my $file = $Testfile
-        @ARGV = @( () )
+        @ARGV = $@
         chdir 'ecmddir'
 
         # % means 'match one character' on VMS.  Everything else is ?

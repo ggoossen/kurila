@@ -61,13 +61,13 @@ do
 
 
 open $^STDIN, "<", 'Io_argv1.tmp' or die $^OS_ERROR
-@ARGV = @()
+@ARGV = $@
 ok( !eof($^STDIN),     'STDIN has something' )
 
 is( $(~< *ARGV), "a line\n" )
 
 open $^STDIN, '<', $devnull or die $^OS_ERROR
-@ARGV = @( () )
+@ARGV = $@
 ok( eof(),      'eof() true with empty @ARGV' )
 
 @ARGV = @('Io_argv1.tmp')

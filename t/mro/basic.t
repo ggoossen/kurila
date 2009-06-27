@@ -43,7 +43,7 @@ ok(!mro::is_universal('MRO_B'))
 @UNIVERSAL::ISA = qw/MRO_F/
 ok(mro::is_universal('MRO_B'))
 
-@UNIVERSAL::ISA = @( () )
+@UNIVERSAL::ISA = $@
 ok(mro::is_universal('MRO_B'))
 
 # is_universal, get_mro, and get_linear_isa should
@@ -150,8 +150,8 @@ do
     # baseline
     ok(eq_array(mro::get_linear_isa('ISACLEAR1'),\qw/ISACLEAR1 WW XX/))
     ok(eq_array(mro::get_linear_isa('ISACLEAR2'),\qw/ISACLEAR2 YY ZZ/))
-    @ISACLEAR1::ISA = @()
-    @ISACLEAR2::ISA = @()
+    @ISACLEAR1::ISA = $@
+    @ISACLEAR2::ISA = $@
 
     ok(eq_array(mro::get_linear_isa('ISACLEAR1'),\qw/ISACLEAR1/))
     ok(eq_array(mro::get_linear_isa('ISACLEAR2'),\qw/ISACLEAR2/))

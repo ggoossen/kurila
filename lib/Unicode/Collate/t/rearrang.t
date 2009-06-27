@@ -69,7 +69,7 @@ is($all_undef_8->cmp("A\x{0E41}A", "A\x{0E40}B"), -1)
 my $no_rearrange = Unicode::Collate->new(
     table => undef,
     normalization => undef,
-    rearrange => \@(),
+    rearrange => \$@,
     UCA_Version => 9,
     )
 

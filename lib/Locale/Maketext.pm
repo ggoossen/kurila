@@ -14,7 +14,7 @@ BEGIN { unless(defined &DEBUG) { *DEBUG = sub () {0} } }
 # define the constant 'DEBUG' at compile-time
 
 $VERSION = "1.10_01"
-@ISA = @( () )
+@ISA = $@
 
 $MATCH_SUPERS = 1
 $MATCH_SUPERS_TIGHTLY = 1

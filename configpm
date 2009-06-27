@@ -164,8 +164,8 @@ $^PERL_VERSION eq '%s'
 ENDOFBEG
 
 
-my @non_v    = @()
-my @v_others = @()
+my @non_v    = $@
+my @v_others = $@
 my $in_v     = 0
 my %Data     = %()
 
@@ -505,7 +505,7 @@ foreach my $prefix (qw(libs libswanted))
         = split(' ', fetch_string (\%(), 'libswanted_uselargefiles'))
     if ((nelems @lflibswanted))
         my %lflibswanted
-        %lflibswanted{[ @lflibswanted]} = @()
+        %lflibswanted{[ @lflibswanted]} = $@
         if ($prefix eq 'libs')
             my @libs = grep { m/^-l(.+)/ &&
                     not exists %lflibswanted{$1} },

@@ -17,7 +17,7 @@ sub C::d {"C::d"}
 sub D::d {"D::d"}
 
 # First, some basic checks of method-calling syntax:
-my $obj = bless \@(), "Pack"
+my $obj = bless \$@, "Pack"
 sub Pack::method { shift; join(",", @( "method", < @_)) }
 my $mname = "method"
 

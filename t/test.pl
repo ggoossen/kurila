@@ -656,7 +656,7 @@ sub can_ok ($proto, @< @methods)
         return _ok( 0, < _where(), "$class->can(...)" )
     
 
-    my @nok = @( () )
+    my @nok = $@
     foreach my $method ( @methods)
         local($^OS_ERROR, $^EVAL_ERROR)  # don't interfere with caller's $@
         # eval sometimes resets $!

@@ -16,7 +16,7 @@ do
     sort { while(0) { last; }     }, @a
 
     # Change 26011: Re: A surprising segfault
-    map { scalar(sort( @())) }, @( ('')x68)
+    map { scalar(sort( $@)) }, @( ('')x68)
 
 
 sub Backwards { ($a cmp $b) +< 0 ?? 1 !! ($a cmp $b) +> 0 ?? -1 !! 0 }
@@ -63,7 +63,7 @@ $expected = $upperfirst ??
     'catchaseddoggonepunishedtoxyzAbelAxedCain' 
 
 cmp_ok($x,'eq',$expected,'upper first 4')
-@a = @( () )
+@a = $@
 @b = reverse @a
 cmp_ok("$(join ' ',@b)",'eq',"",'reverse 1')
 

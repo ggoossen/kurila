@@ -36,7 +36,7 @@ is_deeply(\(sort keys %Module::CoreList::released),
 is_deeply( \(grep {
                  exists %Module::CoreList::version{ $_ }->{FindExt}
              }, keys %Module::CoreList::version),
-           \@(), "FindExt shouldn't get included rt#6922" )
+           \$@, "FindExt shouldn't get included rt#6922" )
 
 
 my $consistent = 1

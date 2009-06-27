@@ -98,7 +98,7 @@ do
     package Obj
     sub DESTROY { print $^STDOUT, "ok @::tests[?1] # DESTROY called\n"; }
     do
-        my $h = \%( A => bless \@(), __PACKAGE__ )
+        my $h = \%( A => bless \$@, __PACKAGE__ )
         while (my@(?$k,?$v) =@( each $h->%))
             print $^STDOUT, "ok @::tests[?0]\n" if $k eq 'A' and ref($v) eq 'Obj'
         

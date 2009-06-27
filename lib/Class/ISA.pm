@@ -175,7 +175,7 @@ sub self_and_super_path
     # Note: 'UNIVERSAL' is not given any special treatment.
     return () unless (nelems @_)
 
-    my @out = @( () )
+    my @out = $@
 
     my @in_stack = @(@_[0])
     my %seen = %(@_[0] => 1)

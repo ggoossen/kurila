@@ -7,7 +7,7 @@ BEGIN { require "./test.pl"; }
 plan(tests => 2)
 
 my $r
-my @tmpfiles = @( () )
+my @tmpfiles = $@
 END { unlink < @tmpfiles }
 
 my $filename = 'swdtest.tmp'

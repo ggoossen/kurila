@@ -28,7 +28,7 @@ sub d {
     die "its_dead_jim\n";
 }
 
-my $obj = bless \@(), 'Foo';
+my $obj = bless \$@, 'Foo';
 
 sub Foo::meth {
     return 'bad_self' unless (nelems @_) && ref @_[0] && ref(@_[0]) eq 'Foo';
@@ -51,9 +51,9 @@ do {
 
 for my $test ( @:
     # flags      args           expected         description
-    \@( G_SCALAR,  \@( ),           'x',     '0 args, G_SCALAR' ),
+    \@( G_SCALAR,  \$@,           'x',     '0 args, G_SCALAR' ),
     \@( G_SCALAR,  \qw(a p q), 'x',     '3 args, G_SCALAR' ),
-    \@( G_DISCARD, \@( ),           undef,       '0 args, G_DISCARD' ),
+    \@( G_DISCARD, \$@,           undef,       '0 args, G_DISCARD' ),
     \@( G_DISCARD, \qw(a p q), undef,       '3 args, G_DISCARD' ),
   ) {
     my @($flags, $args, $expected, $description) = $test->@;

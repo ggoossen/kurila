@@ -50,7 +50,7 @@ cmp_ok(join(':', @(< @foo,< @bar)),'eq','1:1','list reassign')
 @foo = @bar = @(2,3)
 cmp_ok(join(':', @(join('+', @foo),join('-', @bar))),'eq','2+3:2-3','long list reassign')
 
-@foo = @( () )
+@foo = $@
 @foo = @( 1+2+3 )
 cmp_ok(join(':', @foo),'eq','6','scalar assign to array')
 
