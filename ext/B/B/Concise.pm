@@ -405,7 +405,7 @@ my $seq_max = 1
 
 sub reset_sequence
     # reset the sequence
-    %sequence_num = %( () )
+    %sequence_num = $%
     $seq_max = 1
     $lastnext = 0
 
@@ -453,11 +453,11 @@ sub walk_exec($top, ?$level)
             push $targ->@, $op
             my $name = $op->name
             if (class($op) eq "LOGOP")
-                my $ar = \@()
+                my $ar = \$@
                 push $targ->@, $ar
                 push @todo, \@($op->other, $ar)
             elsif ($name eq "subst" and $op->pmreplstart->$)
-                my $ar = \@()
+                my $ar = \$@
                 push $targ->@, $ar
                 push @todo, \@($op->pmreplstart, $ar)
             elsif ($name =~ m/^enter(loop|iter)$/)
@@ -637,7 +637,7 @@ our %hints # used to display each COP's op_hints values
 
 sub _flags($hash, $x)
     my @s
-    for my $flag (sort {$b <+> $a}, keys($hash || %()))
+    for my $flag (sort {$b <+> $a}, keys($hash || $%))
         if ($hash{?$flag} and $x ^&^ $flag and $x +>= $flag)
             $x -= $flag
             push @s, $hash{?$flag}

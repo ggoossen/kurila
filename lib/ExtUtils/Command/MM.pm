@@ -94,7 +94,7 @@ sub pod2man
 
     # We will cheat and just use Getopt::Long.  We fool it by putting
     # our arguments into @ARGV.  Should be safe.
-    my %options = %( () )
+    my %options = $%
     Getopt::Long::config ('bundling_override')
     Getopt::Long::GetOptions (\%options,
                               'section|s=s', 'release|r=s', 'center|c=s',

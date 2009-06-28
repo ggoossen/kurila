@@ -94,8 +94,8 @@ sub ConfigDefaults()
 # Override import.
 sub import
     my $pkg = shift             # package
-    my @syms = @( () )          # symbols to import
-    my @config = @( () )                # configuration
+    my @syms = $@          # symbols to import
+    my @config = $@                # configuration
     my $dest = \@syms           # symbols first
     for (  @_ )
         if ( $_ eq ':config' )
@@ -257,10 +257,10 @@ sub GetOptionsFromString($string, @< @args)
 
 sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descriptions
     my $argend = '--'           # option list terminator
-    my %opctl = %( () )         # table of option specs
+    my %opctl = $%         # table of option specs
     my $pkg = $caller || @(caller)[0]   # current context
     # Needed if linkage is omitted.
-    my @ret = @( () )           # accum for non-options
+    my @ret = $@           # accum for non-options
     my %linkage         # linkage
     my $userlinkage             # user supplied HASH
     my $opt                     # current option
@@ -317,7 +317,7 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
     
 
     # Verify correctness of optionlist.
-    %opctl = %( () )
+    %opctl = $%
     while ( (nelems @optionlist) )
         my $opt = shift (@optionlist)
 
@@ -513,7 +513,7 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
                                              " to ARRAY\n")
                                 if $debug
                             my $t = %linkage{?$opt}
-                            $t->$ = %linkage{+$opt} = \@()
+                            $t->$ = %linkage{+$opt} = \$@
                             print $^STDERR, ("=> push(\@\{\$L\{$opt\}, \"$arg\")\n")
                                 if $debug
                             push (%linkage{$opt}->@, $arg)
@@ -522,7 +522,7 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
                                              " to HASH\n")
                                 if $debug
                             my $t = %linkage{?$opt}
-                            $t->$ = %linkage{+$opt} = \%()
+                            $t->$ = %linkage{+$opt} = \$%
                             print $^STDERR, ("=> \$\$L\{$opt\}->\{$key\} = \"$arg\"\n")
                                 if $debug
                             %linkage{$opt}->{+$key} = $arg
@@ -1308,13 +1308,13 @@ sub HelpMessage(@args)
 sub setup_pa_args($tag, @args)
     # If called by direct binding to an option, it will get the option
     # name and value as arguments. Remove these, if so.
-    @args = @( () ) if (nelems @args) == 2 && @args[0] eq $tag
+    @args = $@ if (nelems @args) == 2 && @args[0] eq $tag
 
     my $pa
     if ( (nelems @args) +> 1 )
         $pa = \%( < @args )
     else
-        $pa = shift(@args) || \%()
+        $pa = shift(@args) || \$%
     
 
     # At this point, $pa can be a number (exit value), string

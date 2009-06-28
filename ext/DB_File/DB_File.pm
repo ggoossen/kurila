@@ -27,7 +27,7 @@ sub new
         hash      => 2,
         lorder    => 1,
         ),
-        GOT   => \%()
+        GOT   => \$%
         ), $pkg 
 
 
@@ -51,7 +51,7 @@ sub TIEHASH
     bless \%( VALID => \%( < @+: map { @: $_, 1},
         qw( bval cachesize psize flags lorder reclen bfname )
         ),
-        GOT   => \%(),
+        GOT   => \$%,
         ), $pkg 
 
 
@@ -75,7 +75,7 @@ sub TIEHASH
         prefix     => 2,
         lorder     => 1,
         ),
-        GOT   => \%(),
+        GOT   => \$%,
         ), $pkg 
 
 
@@ -253,7 +253,7 @@ sub get_dup
     my $flag      = shift 
     my $value     = 0 
     my $origkey   = $key 
-    my %values    = %( () ) 
+    my %values    = $% 
     my @values    = $@ 
     my $counter   = 0 
 

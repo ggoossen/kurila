@@ -67,10 +67,10 @@ do
     my $mm = WriteMakefile(
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
-        MAN3PODS        => %()
+        MAN3PODS        => $%
         )
 
-    is_deeply( $mm->{MAN3PODS}, %( ) )
+    is_deeply( $mm->{MAN3PODS}, $% )
 
 
 

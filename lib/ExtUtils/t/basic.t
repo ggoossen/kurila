@@ -133,7 +133,7 @@ like( $install_out, qr/^Installing /m )
 like( $install_out, qr/^Writing /m )
 
 ok( -r '../dummy-install',     '  install dir created' )
-my %files = %( () )
+my %files = $%
 find( sub (@< @_)
           # do it case-insensitive for non-case preserving OSs
           my $file = lc $_
@@ -159,7 +159,7 @@ SKIP: do
     like( $install_out, qr/^Writing /m )
 
     ok( -r 'elsewhere',     '  install dir created' )
-    %files = %( () )
+    %files = $%
     find( sub (@< @_) { %files{+$_} = $File::Find::name; }, 'elsewhere' )
     ok( %files{?'Dummy.pm'},     '  Dummy.pm installed' )
     ok( %files{?'Liar.pm'},      '  Liar.pm installed'  )
@@ -180,7 +180,7 @@ SKIP: do
     like( $install_out, qr/^Writing /m )
 
     ok( -d 'other',  '  destdir created' )
-    %files = %( () )
+    %files = $%
     my $perllocal
     find( sub (@< @_)
               %files{+$_} = $File::Find::name
@@ -222,7 +222,7 @@ SKIP: do
 
     ok( !-d 'elsewhere',       '  install dir not created' )
     ok( -d 'other/elsewhere',  '  destdir created' )
-    %files = %( () )
+    %files = $%
     find( sub (@< @_) { %files{+$_} = $File::Find::name; }, 'other/elsewhere' )
     ok( %files{?'Dummy.pm'},     '  Dummy.pm installed' )
     ok( %files{?'Liar.pm'},      '  Liar.pm installed'  )

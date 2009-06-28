@@ -181,14 +181,14 @@ ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at both ends")
 # test stringification of keys
 do
     no warnings 'once'
-    my @refs =    @( \ do { my $x }, \$@,   \%(),  sub {}, \ *x)
+    my @refs =    @( \ do { my $x }, \$@,   \$%,  sub {}, \ *x)
     our %h
     for my $ref ( @refs)
         dies_like( sub (@< @_) { %h{?$ref} }, qr/reference as string/ )
 
     for (@refs)
         bless $_
-    %h = %( () )
+    %h = $%
     for my $ref ( @refs)
         dies_like( sub (@< @_) { %h{?$ref} }, qr/reference as string/ )
     

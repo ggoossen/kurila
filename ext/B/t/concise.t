@@ -46,7 +46,7 @@ B::Concise->import( <qw( set_style set_style_standard add_callback
 ## walk_output argument checking
 
 # test that walk_output rejects non-HANDLE args
-foreach my $foo (@("string", \$@, \%()))
+foreach my $foo (@("string", \$@, \$%))
     try {  walk_output($foo) }
     isnt ($^EVAL_ERROR && $^EVAL_ERROR->message, '', "walk_output() rejects arg $(dump::view($foo))")
     $^EVAL_ERROR='' # clear the fail for next test
@@ -59,7 +59,7 @@ foreach my $foo (@(undef, 0))
 
 do   # any object that can print should be ok for walk_output
     package Hugo
-    sub new { my $foo = bless \%() };
+    sub new { my $foo = bless \$% };
     sub print { CORE::print $^STDOUT, < @_ }
 
 my $foo = Hugo->new()	# suggested this API fix
@@ -160,7 +160,7 @@ SKIP: do
     if (0)
         # pending STASH splaying
 
-        foreach my $ref (@(\$@, \%()))
+        foreach my $ref (@(\$@, \$%))
             my $typ = ref $ref
             walk_output(\my $out)
             try { B::Concise::compile('-basic', $ref)->() }
@@ -265,7 +265,7 @@ SKIP: do
     
 
     my %save = %( < %combos )
-    %combos = %( () )	# outputs for $mode=any($order) and any($style)
+    %combos = $%	# outputs for $mode=any($order) and any($style)
 
     # add more samples with switching modes & sticky styles
     for my $style ( @styles)

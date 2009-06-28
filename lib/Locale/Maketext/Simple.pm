@@ -118,7 +118,7 @@ sub import($class, %< %args)
 
 my %Loc
 
-sub reload_loc { %Loc = %( () ) }
+sub reload_loc { %Loc = $% }
 
 sub load_loc
     my @($class, %< %args) =  @_

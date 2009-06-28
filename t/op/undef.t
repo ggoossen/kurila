@@ -71,8 +71,8 @@ print $^STDOUT, "ok 26\n"
 
 $test = 27
 %hash = %(
-    key1 => bless(\%(), 'X'),
-    key2 => bless(\%(), 'X'),
+    key1 => bless(\$%, 'X'),
+    key2 => bless(\$%, 'X'),
     )
 undef %hash
 sub X::DESTROY

@@ -448,7 +448,7 @@ sub splitpod($pod, $poddir, $htmldir, $splitdirs)
 
     # create list of =head[1-6] sections so that we can rewrite
     #  L<> links as necessary.
-    my %heads = %( () )
+    my %heads = $%
     foreach my $i (0..((nelems @poddata)-1))
         %heads{+anchorify($1)} = 1 if @poddata[$i] =~ m/=head[1-6]\s+(.*)/
 

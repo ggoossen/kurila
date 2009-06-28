@@ -80,7 +80,7 @@ my $default_share = \qw[
 ]
 
 sub new($class, ?$root, ?$mask)
-    my $obj = \%()
+    my $obj = \$%
     bless $obj, $class
 
     if (defined($root))
@@ -240,13 +240,13 @@ sub share_record
     my $obj = shift
     my $pkg = shift
     my $vars = shift
-    my $shares = \($obj->{+Shares} ||= \%())->%
+    my $shares = \($obj->{+Shares} ||= \$%)->%
     # Record shares using keys of $obj->{Shares}. See reinit.
     $shares->{[ $vars->@]} = @($pkg) x nelems $vars->@ if (nelems $vars->@)
 
 sub share_redo
     my $obj = shift
-    my $shares = \($obj->{+Shares} ||= \%())->%
+    my $shares = \($obj->{+Shares} ||= \$%)->%
     my($var, $pkg)
     while(@($var, $pkg) =@( each $shares->%))
         # warn "share_redo $pkg\:: $var";

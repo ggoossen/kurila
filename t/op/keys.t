@@ -8,7 +8,7 @@ plan 5
 
 my $x = %('aap', 'noot', 'mies', 'teun')
 is join('*', sort keys($x)), 'aap*mies'
-$x = %()
+$x = $%
 is join('*', keys($x)), ''
 is keys(undef), undef
 sub foo { return %('aap', 'noot'); }

@@ -131,7 +131,7 @@ do
     dies_like {
                   $mm = WriteMakefile(
             NAME       => 'Big::Dummy',
-            VERSION    => bless \%(), "Some::Class",
+            VERSION    => bless \$%, "Some::Class",
             );
               }, qr/^VERSION takes a version object or PLAINVALUE not a REF/ 
 

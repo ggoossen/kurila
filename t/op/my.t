@@ -90,7 +90,7 @@ for my $full (keys %fonts)
 # array rather than the contents, leading to 'Bizarre copy of array' error
 
 sub opta { my @a= $@ }
-sub opth { my %h= %(() ) }
+sub opth { my %h= $% }
 try { my $x = opta }
 print $^STDOUT, "not " if $^EVAL_ERROR
 print $^STDOUT, "ok 32\n"

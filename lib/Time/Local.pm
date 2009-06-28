@@ -53,7 +53,7 @@ else
     $Epoc = _daygm( gmtime(0) )
 
 
-%Cheat = %( () )    # clear the cache as epoc has changed
+%Cheat = $%    # clear the cache as epoc has changed
 
 sub _daygm
 

@@ -22,6 +22,6 @@ dies_like
 
 $x = %( 'aap', 'noot', 'mies', 'teun' )
 is nelems($x), 4
-$x = %()
+$x = $%
 is nelems($x), 0
 is nelems(%( 'aap', 'noot' )), 2

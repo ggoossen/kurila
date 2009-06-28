@@ -202,7 +202,7 @@ sub short_error_loc
     # You have to create your (hash)ref out here, rather than defaulting it
     # inside trusts *on a lexical*, as you want it to persist across calls.
     # (You can default it on $_[2], but that gets messy)
-    my $cache = \%()
+    my $cache = \$%
     my $i = 1
     my $lvl = $CarpLevel
     do

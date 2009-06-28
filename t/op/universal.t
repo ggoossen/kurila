@@ -10,7 +10,7 @@ BEGIN
 
 plan tests => 88
 
-$a = \%()
+$a = \$%
 bless $a, "Bob"
 ok $a->isa("Bob")
 
@@ -23,7 +23,7 @@ our @ISA=qw(Human)
 package Alice;
 our @ISA=qw(Bob Female)
 sub drink { return "drinking " . @_[1]  }
-sub new { bless \%() }
+sub new { bless \$% }
 
 $Alice::VERSION = 2.718
 
@@ -87,7 +87,7 @@ ok (!Cedric->isa('Programmer'))
 
 my $b = 'abc'
 my @refs = qw(SCALAR SCALAR     GLOB ARRAY HASH CODE)
-my @vals = @(  \$b,   \3.14, \*b,  \$@,  \%(), sub {} )
+my @vals = @(  \$b,   \3.14, \*b,  \$@,  \$%, sub {} )
 for my $p (0 .. nelems(@refs) -1)
     for my $q (0 .. nelems(@vals) -1)
         is UNIVERSAL::isa(@vals[$p], @refs[$q]), ($p==$q or $p+$q==1)
@@ -118,7 +118,7 @@ ok $a->isa("UNIVERSAL")
 
 ok ! UNIVERSAL::isa(\$@, "UNIVERSAL")
 
-ok ! UNIVERSAL::can(\%(), "can")
+ok ! UNIVERSAL::can(\$%, "can")
 
 ok UNIVERSAL::isa(Alice => "UNIVERSAL")
 
@@ -155,7 +155,7 @@ do
 # a second call to isa('UNIVERSAL') when @ISA is null failed due to caching
 
 @X::ISA= $@
-my $x = \%(); bless $x, 'X'
+my $x = \$%; bless $x, 'X'
 ok $x->isa('UNIVERSAL')
 ok $x->isa('UNIVERSAL')
 
@@ -190,7 +190,7 @@ package Pig;
 package Bodine;
 Bodine->isa('Pig')
 *isa = \&UNIVERSAL::isa
-try { isa(\%(), 'HASH') }
+try { isa(\$%, 'HASH') }
 main::is($^EVAL_ERROR, '', "*isa correctly found")
 
 package main;

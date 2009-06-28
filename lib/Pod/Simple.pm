@@ -159,7 +159,7 @@ sub new
     return bless \%(
         'accept_codes'      => \%( < @+: map( { @($_=>$_) }, @Known_formatting_codes ) ),
         'accept_directives' => \%( < %Known_directives ),
-        'accept_targets'    => \%(),
+        'accept_targets'    => \$%,
         ), $class
 
 
@@ -698,7 +698,7 @@ sub _remap_sequences
                     
 
                     #$nugget = ;
-                    splice $treelet->@, $i, 1, \@(pop(@dynasty), \%(), $treelet->[$i])
+                    splice $treelet->@, $i, 1, \@(pop(@dynasty), \$%, $treelet->[$i])
                 # relace node with a new parent
                 
             elsif($is eq '0')
@@ -1190,14 +1190,14 @@ sub _treat_Ls($self,@< @stack)
 
             if( defined $section_name )
                 $ell->[1]->{+'section'} = Pod::Simple::LinkSection->new(
-                    \@('', \%(), < $section_name->@)
+                    \@('', \$%, < $section_name->@)
                     )
                 DEBUG +> 3 and print $^STDOUT, "L-section content: ", < pretty($ell->[1]->{?'section'}), "\n"
             
 
             if( (nelems @ell_content) )
                 $ell->[1]->{+'to'} = Pod::Simple::LinkSection->new(
-                    \@('', \%(), < @ell_content)
+                    \@('', \$%, < @ell_content)
                     )
                 DEBUG +> 3 and print $^STDOUT, "L-to content: ", < pretty($ell->[1]->{?'to'}), "\n"
             

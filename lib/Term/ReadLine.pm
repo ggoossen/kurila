@@ -276,7 +276,7 @@ sub newTTY($self, $in, $out)
 sub IN { shift->[0] }
 sub OUT { shift->[1] }
 sub MinLine { undef }
-sub Attribs { \%() }
+sub Attribs { \$% }
 
 my %features = %(tkRunning => 1, ornaments => 1, 'newTTY' => 1)
 sub Features { \%features }

@@ -49,7 +49,7 @@ sub new($class, ?$packfile)
     $class = ref($class) || $class
 
     my $self = \%( packfile => $packfile,
-        data => %(),
+        data => $%,
         )
     bless($self, $class)
 
@@ -66,7 +66,7 @@ sub read($self, ?$packfile)
 
     my $fh = mkfh()
     open($fh, "<", "$packfile") || die("Can't open file $packfile: $^OS_ERROR")
-    $self->{data} = %()
+    $self->{data} = $%
     my ($line)
     while (defined($line = ~< $fh))
         chomp $line
@@ -112,7 +112,7 @@ sub write($self, ?$packfile)
                         = File::Spec->abs2rel($key, $packfile_prefix)
 
                     if (!ref $data)
-                        $data = \%()
+                        $data = \$%
                     
                     $data->{+relocate_as} = $relocate_as
                 

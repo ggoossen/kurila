@@ -139,7 +139,7 @@ sub params($self, $what)
     foreach (sort keys $what->%)
         warn "ExtUtils::Constant doesn't know how to handle values of type $_" unless defined %XS_Constant{?$_}
     
-    my $params = \%()
+    my $params = \$%
     $params->{+''} = 1 if $what->{?''}
     $params->{+IV} = 1 if $what->{?IV} || $what->{?UV} || $what->{?PVN}
     $params->{+NV} = 1 if $what->{?NV}

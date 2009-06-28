@@ -117,7 +117,7 @@ is(do { eval 'UNIVERSAL->E::D::foo()';
 is(do { eval 'my $e = bless \%(), "UNIVERSAL"; $e->E::E::foo()';
        $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::E" (perhaps / ?? 1 !! $^EVAL_ERROR}, 1)
 
-my $e = bless \%(), "E::F"  # force package to exist
+my $e = bless \$%, "E::F"  # force package to exist
 is(do { eval 'UNIVERSAL->E::F::foo()';
        $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::F"/ ?? 1 !! $^EVAL_ERROR}, 1)
 is(do { eval '$e = bless \%(), "UNIVERSAL"; $e->E::F::foo()';

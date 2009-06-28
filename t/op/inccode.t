@@ -116,7 +116,7 @@ sub FooLoader::INC($self, $filename)
     
 
 
-my $href = bless( \%(), 'FooLoader' )
+my $href = bless( \$%, 'FooLoader' )
 push $^INCLUDE_PATH, $href
 
 $evalret = try { require Quux; 1 }

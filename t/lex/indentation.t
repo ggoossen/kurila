@@ -61,12 +61,11 @@ $x = @: "aap"
 is(join("*", $x), q[aap*noot]);
 
 # empty @:
-$x = @:
-
+$x = $@
 is(join("*", $x), q[]);
 
 # @: terminated by an "and"
-$x = @: or
+$x = $@or
         $y = 1
 
 is(join("*", $x), q[])

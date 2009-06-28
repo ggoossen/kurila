@@ -46,7 +46,7 @@ sub abbrev
     (nelems @_) or return   # So we don't autovivify onto @_ and trigger warning
     $hashref = shift
     $returnvoid = 1
-    $hashref->% = %( () )
+    $hashref->% = $%
 
     WORD: foreach my $word ( @_)
         for my $len ( reverse( 1 .. (length $word) - 1 ) )

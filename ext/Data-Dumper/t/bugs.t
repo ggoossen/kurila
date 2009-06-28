@@ -25,7 +25,7 @@ sub foo
     $d->Freezer('quote')
     return $d->Dump
 
-foo(\%())
+foo(\$%)
 ok(1, "[perl #38612]") # Still no core dump? We are fine.
 
 do

@@ -46,11 +46,11 @@ ok(!deq( 2,     1     ))
 &ok(!deq( \$@,   1      ))
 &ok(!deq( 1,     \$@    ))
 
-&ok( deq( \%(),    \%()     ))
-&ok(!deq( \%(),    1      ))
-&ok(!deq( 1,     \%()     ))
-&ok(!deq( \%(1,2), \%()     ))
-&ok(!deq( \%(),    \%(1,2)  ))
+&ok( deq( \$%,    \$%     ))
+&ok(!deq( \$%,    1      ))
+&ok(!deq( 1,     \$%     ))
+&ok(!deq( \%(1,2), \$%     ))
+&ok(!deq( \$%,    \%(1,2)  ))
 &ok( deq( \%(1,2), \%(1,2)  ))
 &ok(!deq( \%(2,1), \%(1,2)  ))
 
@@ -73,9 +73,9 @@ print $^STDOUT, "# Some real tests...\n"
 $hashes_dont_matter = 1
 
 &ok( deq( x("=pod\n\nB<foo\t>\n"),
-          \@( "Document", \%(),
-              \@( "Para",   \%(),
-          \@("B",     \%(),
+          \@( "Document", \$%,
+              \@( "Para",   \$%,
+          \@("B",     \$%,
            "foo "
           )
               )
@@ -84,27 +84,27 @@ $hashes_dont_matter = 1
 
 
 &ok( deq( x("=pod\n\nB<pieF<zorch>X<foo>I<pling>>\n"),
-          \@( "Document", \%(),
-              \@( "Para",   \%(),
-          \@("B",     \%(),
+          \@( "Document", \$%,
+              \@( "Para",   \$%,
+          \@("B",     \$%,
            "pie",
-           \@('F',\%(), 'zorch'),
-           \@('X',\%(), 'foo'  ),
-           \@('I',\%(), 'pling'),
+           \@('F',\$%, 'zorch'),
+           \@('X',\$%, 'foo'  ),
+           \@('I',\$%, 'pling'),
           )
               )
           )
           ))
 
 &ok( deq( x("=over\n\n=item B<pieF<zorch>X<foo>I<pling>>!\n\n=back"),
-          \@( "Document", \%(),
-              \@( "over-text", \%(),
-          \@( "item-text", \%(),
-            \@("B",     \%(),
+          \@( "Document", \$%,
+              \@( "over-text", \$%,
+          \@( "item-text", \$%,
+            \@("B",     \$%,
              "pie",
-             \@('F',\%(), 'zorch'),
-             \@('X',\%(), 'foo'  ),
-             \@('I',\%(), 'pling'),
+             \@('F',\$%, 'zorch'),
+             \@('X',\$%, 'foo'  ),
+             \@('I',\$%, 'pling'),
             ),
             '!'
           )

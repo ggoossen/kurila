@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker
 WriteMakefile(
     'NAME'		=> 'I18N::Langinfo',
     'VERSION_FROM'	=> 'Langinfo.pm', # finds $VERSION
-    'PREREQ_PM'		=> %(), # e.g., Module::Name => 1.1
+    'PREREQ_PM'		=> $%, # e.g., Module::Name => 1.1
     ABSTRACT_FROM => 'Langinfo.pm', # retrieve abstract from module
     AUTHOR     => 'Jarkko Hietaniemi <jhi@hut.fi>',
     'LIBS'		=> @(''), # e.g., '-lm'

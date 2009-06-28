@@ -44,7 +44,7 @@ do
         )
 
     ### empty args first ###
-    do {   my $args = check( $tmpl, \%() );
+    do {   my $args = check( $tmpl, \$% );
 
         ok( $args,              "check() call with empty args" );
         is( $args->{?'foo'}, 1,  "   got default value" );
@@ -95,9 +95,9 @@ do {   my $tmpl = \%( Foo => %( default => 1 ) );
 do
     ### disallow unknowns ###
     do
-        my $rv = check( \%(), \%( foo => 42 ) )
+        my $rv = check( \$%, \%( foo => 42 ) )
 
-        is_deeply( $rv, \%(),     "check() call with unknown arguments" )
+        is_deeply( $rv, \$%,     "check() call with unknown arguments" )
         like( last_error(), qr/^Key 'foo' is not a valid key/,
               "   warning recorded ok" )
     
@@ -105,7 +105,7 @@ do
     ### allow unknown ###
     do
         local   $Params::Check::ALLOW_UNKNOWN = 1
-        my $rv = check( \%(), \%( foo => 42 ) )
+        my $rv = check( \$%, \%( foo => 42 ) )
 
         is_deeply( $rv, \%( foo => 42 ),
                    "check call() with unknown args allowed" )
@@ -164,7 +164,7 @@ do {   my @list = @(
         }
 
         ### improper value ###
-        do {   my $rv = check( $tmpl, \%( foo => \%() ) );
+        do {   my $rv = check( $tmpl, \%( foo => \$% ) );
             ok( !$rv,               "check() call with strict_type violated" );
             like( last_error(), qr/^Key 'foo' needs to be of type 'ARRAY'/,
                   "   warning recorded ok" );
@@ -184,7 +184,7 @@ do {   my $tmpl = \%(
     };
 
     ### required value omitted ###
-    do {   my $rv = check( $tmpl, \%( ) );
+    do {   my $rv = check( $tmpl, \$% );
         ok( !$rv,                   "check() call with required key omitted" );
         like( last_error, qr/^Required option 'foo' is not provided/,
               "   warning recorded ok" );
@@ -236,7 +236,7 @@ do   ### check if the subs for allow get what you expect ###
 ### invalid key tests
 do {   my $tmpl = \%( foo => %( allow => sub (@< @_) { 0 } ) );
 
-    for my $val (@( 1, 'foo', \$@, bless(\%(),__PACKAGE__)) )
+    for my $val (@( 1, 'foo', \$@, bless(\$%,__PACKAGE__)) )
         my $rv      = check( $tmpl, \%( foo => $val ) )
         my $text    = "Key 'foo' ($(dump::view($val))) is of invalid type"
         my $re      = quotemeta $text
@@ -263,7 +263,7 @@ do   ### quell warnings
     local $^WARN_HOOK = sub {}
 
     my $tmpl = \%( foo => %( store => '' ) )
-    check( $tmpl, \%() )
+    check( $tmpl, \$% )
 
     my $re = quotemeta q|Store variable for 'foo' is not a reference!|
     like(last_error(), qr/$re/, "Caught non-reference 'store' variable" )
@@ -273,7 +273,7 @@ do   ### quell warnings
 do   ### if key is not provided, and value is '', will P::C treat
     ### that correctly?
     my $tmpl = \%( foo => %( default => '' ) )
-    my $rv   = check( $tmpl, \%() )
+    my $rv   = check( $tmpl, \$% )
 
     ok( $rv,                    "check() call with default = ''" )
     ok( exists $rv->{foo},      "   rv exists" )
@@ -333,13 +333,13 @@ do
     sub wrapper { check  ( < @_ ) };
     sub inner   { wrapper( < @_ ) };
     sub outer   { inner  ( < @_ ) };
-    outer( \%( dummy => %( required => 1 )), \%() )
+    outer( \%( dummy => %( required => 1 )), \$% )
 
     like( last_error, qr/for .*::wrapper by .*::inner$/,
           "wrong caller without CALLER_DEPTH" )
 
     local $Params::Check::CALLER_DEPTH = 1
-    outer( \%( dummy => %( required => 1 )), \%() )
+    outer( \%( dummy => %( required => 1 )), \$% )
 
     like( last_error, qr/for .*::inner by .*::outer$/,
           "right caller with CALLER_DEPTH" )
@@ -350,7 +350,7 @@ do
 do {   ok( 1,                      "Test last_error() on recursive check() call" );
 
     ### allow sub to call
-    my $clear   = sub (@< @_) { check( \%(), \%() ) if shift; 1; };
+    my $clear   = sub (@< @_) { check( \$%, \$% ) if shift; 1; };
 
     ### recursively call check() or not?
     for my $recurse (@( 0, 1) )

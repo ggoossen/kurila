@@ -36,7 +36,7 @@ print $^STDOUT, "ok 4\n"
 
 my $test = 5
 
-my %y = %( () )
+my %y = $%
 abbrev \%y, < @z
 
 my $s = join ':', sort keys %y

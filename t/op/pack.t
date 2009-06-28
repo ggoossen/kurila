@@ -1255,12 +1255,12 @@ do # syntax checks (W.Laun)
     
 
     # warning for commas
-    @warning = @( () )
+    @warning = $@
     my $x = pack( 'I,A', 4, 'X' )
     like( @warning[0], qr{Invalid type ','} )
 
     # comma warning only once
-    @warning = @( () )
+    @warning = $@
     $x = pack( 'C(C,C)C,C', < 65..71  )
     like( scalar nelems @warning, 1 )
 
@@ -1282,7 +1282,7 @@ do # syntax checks (W.Laun)
         skip $no_endianness, 6 if $no_endianness
 
         # modifier warnings
-        @warning = @( () )
+        @warning = $@
         $x = pack "I>>s!!", 47, 11
         ($x) = unpack "I<<l!>!>", 'x'x20
         is(scalar nelems @warning, 5)
@@ -1309,7 +1309,7 @@ do  # Repeat count [SUBEXPR]
         push @codes, 'd'	# Keep the count the same
     
 
-    push @codes, < @+: map { m/^[silqjfdp]/i ?? @("$_<", "$_>") !! @() }, @codes
+    push @codes, < @+: map { m/^[silqjfdp]/i ?? @("$_<", "$_>") !! $@ }, @codes
 
     my %val
     %val{[ @codes]} =  map {
@@ -1332,7 +1332,7 @@ do  # Repeat count [SUBEXPR]
 
     for my $type ( @codes)
         my @list = @( %val{?$type} )
-        @list = @( () ) unless defined @list[0]
+        @list = $@ unless defined @list[0]
         for my $count (@('', '3', '[11]'))
             my $c = 1
             $c = $1 if $count =~ m/(\d+)/

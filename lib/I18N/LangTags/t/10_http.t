@@ -63,7 +63,7 @@ foreach my $in ( @in)
     $in =~ s/^\s*\[([^\]]+)\]\s*//s or die "Bad input: $in"
     my @should = @( do { my $x = $1; $x =~ m/(\S+)/g } )
 
-    if($in eq 'NIX') { $in = ''; @should = @( () ); }
+    if($in eq 'NIX') { $in = ''; @should = $@; }
 
     local env::var('HTTP_ACCEPT_LANGUAGE') = undef
 

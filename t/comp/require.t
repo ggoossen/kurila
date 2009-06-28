@@ -16,7 +16,7 @@ my $total_tests = 26
 print $^STDOUT, "1..$total_tests\n"
 
 sub do_require
-    $^INCLUDED = %( () )
+    $^INCLUDED = $%
     write_file('bleah.pm',< @_)
     try { require "bleah.pm" }
     my @a # magic guard for scope violations (must be first lexical in file)

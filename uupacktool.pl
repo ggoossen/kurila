@@ -195,7 +195,7 @@ sub vms_check_name
     return $file
 
 
-my $opts = \%()
+my $opts = \$%
 GetOptions($opts,'u','p','c', 'D', 'm:s','s','d=s','v','h')
 
 die "Can't pack and unpack at the same time!\n", < usage()

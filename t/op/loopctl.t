@@ -674,7 +674,7 @@ do
     sub X::DESTROY { $late_free++ if $n +< 0 };
     LOOP:
         do
-        ($n-- && bless \%(), 'X') && redo
+        ($n-- && bless \$%, 'X') && redo
     
     cmp_ok($late_free,'==',0,"bug 27206: redo memory leak")
 

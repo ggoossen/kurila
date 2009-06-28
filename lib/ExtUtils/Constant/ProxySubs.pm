@@ -159,7 +159,7 @@ sub WriteConstants
         =  $ARGS->{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]}
 
     my $options = $ARGS->{?PROXYSUBS}
-    $options = \%() unless ref $options
+    $options = \$% unless ref $options
     my $explosives = $options->{?croak_on_read}
 
     $xs_subname ||= 'constant'
@@ -169,9 +169,9 @@ sub WriteConstants
     $package_sprintf_safe =~ s/%/\%\%/g
 
     # All the types we see
-    my $what = \%()
+    my $what = \$%
     # A hash to lookup items with.
-    my $items = \%()
+    my $items = \$%
 
     my @items = $self->normalise_items (\%(disable_utf8_duplication => 1),
         $default_type, $what, $items,

@@ -25,7 +25,7 @@ sub set_static_extensions
     # statics in case scan_ext hasn't been called yet.
     # if '*' is passed then all XS extensions are static
     # (with possible exclusions)
-    %static = %( () )
+    %static = $%
     my @list = @_
     if (@_[0] eq '*')
         my %excl = %( < map {$_=>1}, map {m/^!(.*)$/}, @_[[1 .. ((nelems @_)-1)]] )

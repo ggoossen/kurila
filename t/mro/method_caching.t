@@ -40,7 +40,7 @@ my @testsubs = @(
     sub (@< @_) { eval 'package MCTest::Base; sub foo { @_[1]+15 }'; is('MCTest::Derived'->foo(0), 15); },
     sub (@< @_) { undef %MCTest::Base::; try { 'MCTest::Derived'->foo(0) }; like($^EVAL_ERROR->{?description}, qr/locate object method/); },
     sub (@< @_) { eval 'package MCTest::Base; sub foo { @_[1]+16 }'; is('MCTest::Derived'->foo(0), 16); },
-    sub (@< @_) { %MCTest::Base:: = %( () ); try { 'MCTest::Derived'->foo(0) }; like($^EVAL_ERROR->{?description}, qr/locate object method/); },
+    sub (@< @_) { %MCTest::Base:: = $%; try { 'MCTest::Derived'->foo(0) }; like($^EVAL_ERROR->{?description}, qr/locate object method/); },
     sub (@< @_) { eval 'package MCTest::Base; sub foo { @_[1]+17 }'; is('MCTest::Derived'->foo(0), 17); },
     # 5.8.8 fails this one too
     sub (@< @_) { eval 'package MCTest::Base; sub foo { @_[1]+18 }'; is('MCTest::Derived'->foo(0), 18); },

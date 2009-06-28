@@ -507,7 +507,7 @@ USAGE
 
 sub clearallcache
     die usage if (nelems @_)
-    %Cache = %( () )
+    %Cache = $%
 
 
 %_Usage{+enablecache} = <<'USAGE'

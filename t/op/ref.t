@@ -98,7 +98,7 @@ is (ref $refref, 'HASH')
 
 # Test anonymous hash syntax.
 
-$anonhash = \%()
+$anonhash = \$%
 is (ref $anonhash, 'HASH')
 $anonhash2 = \%(FOO => 'BAR', ABC => 'XYZ',)
 is (join('', sort values $anonhash2->%), 'BARXYZ')
@@ -125,7 +125,7 @@ $object = bless $main::anonhash2
 main::is (ref $object, 'MYHASH')
 main::is ($object->{?ABC}, 'XYZ')
 
-$object2 = bless \%()
+$object2 = bless \$%
 main::is (ref $object2,	'MYHASH')
 
 # Test ordinary call on object method.
@@ -215,7 +215,7 @@ do
         like ($m->{?description}, qr/^Modification of a read-only/)
     
     package C
-    sub new { bless \%(), shift }
+    sub new { bless \$%, shift }
     sub DESTROY { @_[0] = 'foo' }
     do
         print $^STDOUT, "# should generate an error...\n"

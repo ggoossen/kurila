@@ -29,7 +29,7 @@ __PACKAGE__->_accessorize(  # Make my dumb accessor methods
 #==========================================================================
 
 sub new($class)
-    my $self = bless \%(), ref($class) || $class
+    my $self = bless \$%, ref($class) || $class
     $self->init
     return $self
 
@@ -50,9 +50,9 @@ sub survey($self, @< @search_dirs)
 
 
     $self->{+'_scan_count'} = 0
-    $self->{+'_dirs_visited'} = \%()
-    $self->path2name( \%() )
-    $self->name2path( \%() )
+    $self->{+'_dirs_visited'} = \$%
+    $self->path2name( \$% )
+    $self->name2path( \$% )
     $self->limit_re( $self->_limit_glob_to_limit_re ) if $self->{?'limit_glob'}
     my $cwd = cwd()
     my $verbose  = $self->verbose

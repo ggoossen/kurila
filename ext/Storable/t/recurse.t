@@ -48,7 +48,7 @@ package OBJ_SYNC;
 
 @x = @('a', 1)
 
-sub make { bless \%(), shift }
+sub make { bless \$%, shift }
 
 sub STORABLE_freeze($self, $cloning)
     return if $cloning
@@ -66,7 +66,7 @@ package OBJ_SYNC2;
 use Storable < qw(dclone);
 
 sub make($class, $ext)
-    my $self = bless \%(), $class
+    my $self = bless \$%, $class
 
     $self->{+sync} = OBJ_SYNC->make
     $self->{+ext} = $ext
@@ -215,14 +215,14 @@ ok ref($bar2->{b}->[1]) eq 'Foo'
 package CLASS_1;
 
 sub make
-    my $self = bless \%(), shift
+    my $self = bless \$%, shift
     return $self
 
 
 package CLASS_2;
 
 sub make($class, $o)
-    my $self = bless \%(), $class
+    my $self = bless \$%, $class
 
     $self->{+c1} = CLASS_1->make()
     $self->{+o} = $o
@@ -247,7 +247,7 @@ sub STORABLE_thaw($self, $clonning, $frozen, $c1, $c3, $o)
 package CLASS_OTHER;
 
 sub make
-    my $self = bless \%(), shift
+    my $self = bless \$%, shift
     return $self
 
 
@@ -260,7 +260,7 @@ sub set_c2 { @_[0]->{+c2} = @_[1] }
 package Foo2;
 
 sub new
-    my $self = bless \%(), @_[0]
+    my $self = bless \$%, @_[0]
     $self->{+freezed} = dump::view($self)
     return $self
 
@@ -273,7 +273,7 @@ sub DESTROY
 package Foo3;
 
 sub new
-    bless \%(), @_[0]
+    bless \$%, @_[0]
 
 
 sub STORABLE_freeze(?$obj, ...)

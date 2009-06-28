@@ -228,7 +228,7 @@ do
 do
     do
         package MySafe
-        sub new { bless \%(), shift }
+        sub new { bless \$%, shift }
         sub reval
             my $source = @_[1]
             # Here you can apply some nifty regexpes to ensure the

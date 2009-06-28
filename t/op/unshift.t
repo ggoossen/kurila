@@ -14,5 +14,5 @@ is(join(' ', @a), '3 2 1 0 1 2 3')
 @a = undef
 unshift(@a, 0)
 is(join(' ', @a), '0', "unshift on UNDEF")
-dies_like( { unshift(%()) }, qr/Can't unshift a HASH/ )
+dies_like( { unshift($%) }, qr/Can't unshift a HASH/ )
 dies_like( { unshift(undef, 0) }, qr/Modification of a read-only value attempted/ )

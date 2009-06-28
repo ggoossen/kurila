@@ -11,7 +11,7 @@ use Symbol < qw(gensym);
 my @test = @(
  \@( undef, 1,		'number'	),
  \@( undef, 'A',		'string'	),
- \@( HASH   => \%(),	'HASH ref'	),
+ \@( HASH   => \$%,	'HASH ref'	),
  \@( ARRAY  => \$@,	'ARRAY ref'	),
  \@( SCALAR => \$t,	'SCALAR ref'	),
  \@( REF    => \(\$t),	'REF ref'	),
@@ -35,6 +35,6 @@ foreach my $test (@test)
 
 package MyTie
 
-sub TIEHANDLE { bless \%() }
+sub TIEHANDLE { bless \$% }
 sub DESTROY {}
 

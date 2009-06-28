@@ -16,7 +16,7 @@
 use Storable ()
 use Test::More tests => 9
 
-my $ddd = bless \%( ), 'Foo'
+my $ddd = bless \$%, 'Foo'
 my $eee = bless \%( Bar => $ddd ), 'Bar'
 $ddd->{+Foo} = $eee
 

@@ -394,7 +394,7 @@ do
             \@('=head1', \%('start_line' => $m, 'errata' => 1), 'POD ERRORS'),
             \@('~Para', \%('start_line' => $m, '~cooked' => 1, 'errata' => 1),
                "Hey! ",
-               \@('B', \%(),
+               \@('B', \$%,
           'The above document had some coding errors, which are explained below:'
                )
             ),
@@ -555,7 +555,7 @@ sub _ponder_paragraph_buffer($self)
                     $para->[1]->{?'start_line'},
                     "You forgot a '=back' before '$para_type'"
                     )
-                unshift $paras->@, \@('=back', \%(), ''), $para   # close the =over
+                unshift $paras->@, \@('=back', \$%, ''), $para   # close the =over
                 next
             
 
@@ -1516,7 +1516,7 @@ sub _verbatim_format($it, $p)
                     $3 ?? 'VerbatimB'  !!
                     $4 ?? 'VerbatimI'  !!
                     $5 ?? 'VerbatimBI' !! die("Should never get called")
-                    ), \%(),
+                    ), \$%,
                     substr($p->[$i-1], pos($formatting)-length($1), length($1))
                     )
             #print "Formatting <$new_line[-1][-1]> as $new_line[-1][0]\n";
@@ -1653,7 +1653,7 @@ sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space)
                 DEBUG +> 3 and print $^STDOUT, "Found simple start-text code \"$1\"\n"
                 push @stack, 0  # signal that we're looking for simple
             
-            push @lineage, \@( substr($1,0,1), \%(), )  # new node object
+            push @lineage, \@( substr($1,0,1), \$%, )  # new node object
             push  @lineage[-2]->@, @lineage[-1]
 
         elsif(defined $4)

@@ -18,13 +18,13 @@ sub is_tagname { @_[0]->[1] eq @_[1] }
 sub is_tag { shift->is_tagname(< @_) }
 
 
-sub attr_hash { @_[0]->[2] ||= \%() }
+sub attr_hash { @_[0]->[2] ||= \$% }
 
 sub attr
     if((nelems @_) == 2)      # Reading: $token->attr('attrname')
         (@_[0]->[2] || return undef)->{?@_[1] }
     elsif((nelems @_) +> 2)  # Writing: $token->attr('attrname', 'newval')
-        (@_[0]->[2] ||= \%())->{+@_[1] } = @_[2]
+        (@_[0]->[2] ||= \$%)->{+@_[1] } = @_[2]
     else
         die('usage: $object->attr("val") or $object->attr("key", "newval")')
         return undef

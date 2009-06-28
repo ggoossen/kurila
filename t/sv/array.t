@@ -75,7 +75,7 @@ ok(!($cnt = (@(?$F1,?$F2,?$Etc) = @($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/))))
 %foo = %('blurfl','dyick','foo','bar','etc.','etc.')
 %bar = %( < %foo )
 is(%bar{?'foo'}, 'bar')
-%bar = %( () )
+%bar = $%
 is(%bar{?'foo'}, undef)
 @(%< %bar ) = @(< %foo,'how','now')
 is(%bar{?'foo'}, 'bar')

@@ -30,7 +30,7 @@ use Storable ()
 
 # Good Case - should not die
 do
-    my $goodfreeze = bless \%(), 'My::GoodFreeze'
+    my $goodfreeze = bless \$%, 'My::GoodFreeze'
     my $frozen = undef
     try {
         $frozen = Storable::freeze( $goodfreeze );
@@ -47,7 +47,7 @@ do
     
 
     sub STORABLE_attach($class, $clone, $string)
-        return bless \%( ), 'My::GoodFreeze'
+        return bless \$%, 'My::GoodFreeze'
     
 
 
@@ -55,7 +55,7 @@ do
 
 # Error Case - should die on freeze
 do
-    my $badfreeze = bless \%(), 'My::BadFreeze'
+    my $badfreeze = bless \$%, 'My::BadFreeze'
     try {
         Storable::freeze( $badfreeze );
     }
@@ -72,7 +72,7 @@ do
     
 
     sub STORABLE_attach($class, $clone, $string)
-        return bless \%( ), 'My::BadFreeze'
+        return bless \$%, 'My::BadFreeze'
     
 
 
@@ -90,7 +90,7 @@ do
 
 # Good Case - should not die
 do
-    my $goodthaw = bless \%(), 'My::GoodThaw'
+    my $goodthaw = bless \$%, 'My::GoodThaw'
     my $frozen = undef
     try {
         $frozen = Storable::freeze( $goodthaw );
@@ -119,7 +119,7 @@ do
 # Bad Case - should die on thaw
 do
     # Create the frozen string normally
-    my $badthaw = bless \%( ), 'My::BadThaw'
+    my $badthaw = bless \$%, 'My::BadThaw'
     my $frozen = undef
     try {
         $frozen = Storable::freeze( $badthaw );
@@ -167,7 +167,7 @@ do
 
 # Good Case - should not die
 do
-    my $goodattach = bless \%( ), 'My::GoodAttach'
+    my $goodattach = bless \$%, 'My::GoodAttach'
     my $frozen = Storable::freeze( $goodattach )
     ok( $frozen, 'My::GoodAttach return as expected' )
     my $thawed = try {
@@ -185,7 +185,7 @@ do
 
     sub STORABLE_attach($class, $cloning, $string)
 
-        return bless \%( ), 'My::GoodAttach::Subclass'
+        return bless \$%, 'My::GoodAttach::Subclass'
     
 
     package My::GoodAttach::Subclass
@@ -202,7 +202,7 @@ do
     my $returnvalue = undef
 
     # Create and freeze the object
-    my $badattach = bless \%( ), 'My::BadAttach'
+    my $badattach = bless \$%, 'My::BadAttach'
     my $frozen = Storable::freeze( $badattach )
     ok( $frozen, 'BadAttach freezes as expected' )
 
@@ -213,9 +213,9 @@ do
         '',
         1,
         \$@,
-        \%(),
+        \$%,
         \"foo",
-        (bless \%( ), 'Foo'),
+        (bless \$%, 'Foo'),
         )
     foreach (  @badthings )
         $returnvalue = $_

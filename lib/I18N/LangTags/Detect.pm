@@ -122,7 +122,7 @@ sub http_accept_langs
 
 #===========================================================================
 
-my %tried = %( () )
+my %tried = $%
 # memoization of whether we've used this module, or found it unusable.
 
 sub _try_use   # Basically a wrapper around "require Modulename"

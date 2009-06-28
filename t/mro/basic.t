@@ -74,7 +74,7 @@ do
 
     do
         package DESTROY_MRO_Baseline
-        sub new { bless \%() => shift }
+        sub new { bless \$% => shift }
         sub DESTROY { $x++ }
 
         package DESTROY_MRO_Baseline_Child
@@ -97,7 +97,7 @@ do
 
     do
         package DESTROY_MRO_Dynamic
-        sub new { bless \%() => shift }
+        sub new { bless \$% => shift }
 
         package DESTROY_MRO_Dynamic_Child
         our @ISA = qw/DESTROY_MRO_Dynamic/
@@ -176,7 +176,7 @@ do
 do
     do
         package SUPERTEST
-        sub new { bless \%() => shift }
+        sub new { bless \$% => shift }
         sub foo { @_[1]+1 }
 
         package SUPERTEST::MID

@@ -145,7 +145,7 @@ WARNING
     
 
 
-my %Saved_Env = %( () )
+my %Saved_Env = $%
 sub clean_env
     foreach my $env ( @magic_envs)
         %Saved_Env{+$env} = env::var($env)

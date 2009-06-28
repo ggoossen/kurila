@@ -24,7 +24,7 @@ sub hock { "yarrow" }
 
 package main;
 our (%Subs)
-local %Subs = %( () )
+local %Subs = $%
 B::walksymtable(\%Testing::Symtable::, 'find_syms', sub (@< @_) { @_[0] =~ m/Foo/ },
                 'Testing::Symtable::')
 
@@ -139,7 +139,7 @@ is(B::cstring("wibble"), '"wibble"', "Testing B::cstring()")
 is(B::perlstring("wibble"), '"wibble"', "Testing B::perlstring()")
 is(B::perlstring("\n"), '"\n"', "Testing B::perlstring()")
 is(B::perlstring("\""), '"\""', "Testing B::perlstring()")
-is(B::class(bless \%(), "Wibble::Bibble"), "Bibble", "Testing B::class()")
+is(B::class(bless \$%, "Wibble::Bibble"), "Bibble", "Testing B::class()")
 is(B::cast_I32(3.14), 3, "Testing B::cast_I32()")
 is(B::opnumber("chop"), 35, "Testing opnumber with opname (chop)")
 

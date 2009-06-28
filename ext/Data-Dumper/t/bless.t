@@ -19,7 +19,7 @@ foreach my $use (@(0, 1))
 
     our $VAR1
     do
-        my $t = bless( \%(), q{a'b} )
+        my $t = bless( \$%, q{a'b} )
         my $dt = Dumper($t)
         my $o = <<'PERL'
 $VAR1 = bless( \%(), "a'b" );
@@ -30,7 +30,7 @@ PERL
     
 
     do
-        my $t = bless( \%(), q{a\} )
+        my $t = bless( \$%, q{a\} )
         my $dt = Dumper($t)
         my $o = <<'PERL'
 $VAR1 = bless( \%(), "a\\" );

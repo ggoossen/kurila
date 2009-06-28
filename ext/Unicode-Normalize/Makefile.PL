@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker
 
-my $clean = %()
+my $clean = $%
 
 if (-f "Normalize.xs")
     print $^STDERR, "Making header files for XS...\n"

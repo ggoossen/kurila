@@ -45,7 +45,7 @@ do
             push @stack, splice $this->@
             push $this->@, ("BAD!") x 3
         elsif(ref($this || '') eq 'HASH')
-            $this->% = %( () )
+            $this->% = $%
         
     
     # These will fail if $treelet and $bare_treelet are coreferential,

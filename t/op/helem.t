@@ -41,6 +41,6 @@ do
 
 do
     # OPpDEREF and OPpHELEM_OPTIONAL
-    my %c = %()
+    my %c = $%
     is( %c{?"aap"}{?"noot"}, undef )
 

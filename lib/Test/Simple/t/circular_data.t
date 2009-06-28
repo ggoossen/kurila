@@ -58,9 +58,9 @@ do
     # rt.cpan.org 11623
     # Make sure the circular ref checks don't get confused by a reference
     # which is simply repeating.
-    my $a = \%()
-    my $b = \%()
-    my $c = \%()
+    my $a = \$%
+    my $b = \$%
+    my $c = \$%
 
     is_deeply( \@($a, $a), \@($b, $c) )
     is_deeply( \%( foo => $a, bar => $a ), \%( foo => $b, bar => $c ) )

@@ -77,8 +77,8 @@ sub new
 
     my %args = %( < @_ )
 
-    my $self = \%( ':private:' => %(),
-        'Perl' => %(),
+    my $self = \%( ':private:' => $%,
+        'Perl' => $%,
         )
 
     if (%args{?config_override})

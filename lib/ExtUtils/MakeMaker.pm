@@ -371,15 +371,15 @@ sub new
         check_manifest()
     
 
-    $self = \%() unless (defined $self)
+    $self = \$% unless (defined $self)
 
     check_hints($self)
 
     my %configure_att         # record &{$self->{CONFIGURE}} attributes
     my %initial_att  = $self->% # record initial attributes
 
-    my %unsatisfied = %()
-    foreach my $prereq (sort keys($self->{?PREREQ_PM} || %()))
+    my %unsatisfied = $%
+    foreach my $prereq (sort keys($self->{?PREREQ_PM} || $%))
         # 5.8.0 has a bug with require Foo::Bar alone in an eval, so an
         # extra statement is a workaround.
         my $file = "$prereq.pm"
@@ -603,7 +603,7 @@ END
         if ($skipit)
             push $self->{RESULT}, "\n# --- MakeMaker $section section $skipit."
         else
-            my %a = $self->{?$section} || %()
+            my %a = $self->{?$section} || $%
             push $self->{RESULT}, "\n# --- MakeMaker $section section:"
             push $self->{RESULT}, "# " . join ", ", %a if $Verbose && %a
             push $self->{RESULT}, $self->maketext_filter(
@@ -698,7 +698,7 @@ sub parse_args($self, @< @args)
         my@($armaybe) = $self->{?ARMAYBE}
         print $^STDOUT, "ARMAYBE => '$armaybe' should be changed to:\n",
             "\t'dynamic_lib' => \{ARMAYBE => '$armaybe'\}\n"
-        my@(%dl) =@( %( < ($self->{?dynamic_lib} || \%())->% ))
+        my@(%dl) =@( %( < ($self->{?dynamic_lib} || \$%)->% ))
         $self->{+dynamic_lib} = \%( < %dl, ARMAYBE => $armaybe)
         delete $self->{ARMAYBE}
     

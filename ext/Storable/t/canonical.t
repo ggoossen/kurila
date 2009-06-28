@@ -55,7 +55,7 @@ for my $i (0 .. $hashsize -1)
     # A third of the elements are references to further hashes
 
     if (int(rand(1.5)))
-        my $hash2 = \%()
+        my $hash2 = \$%
         my $hash2size = int(rand($maxhash2size))
         while ($hash2size--)
             my $k2 = $k . $i . int(rand(100))
@@ -122,7 +122,7 @@ ok 5, ($x1 ne $x2) || ($x1 ne $x3)
 # Ensure refs to "undef" values are properly shared
 # Same test as in t/dclone.t to ensure the "canonical" code is also correct
 
-my $hash = \%:
+my $hash = \$%
 push $hash->%{+''}, \$hash->%{+a}
 ok 6, $hash->%{''}[0] \== \$hash->%{+a}
 

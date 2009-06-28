@@ -54,7 +54,7 @@ sub compile($self, %< %args)
 
     $srcdir ||= File::Spec->curdir()
 
-    my @defines = $self->arg_defines( < ( %args{?defines} || \%() )->% )
+    my @defines = $self->arg_defines( < ( %args{?defines} || \$% )->% )
 
     my %spec = %(
         srcdir      => $srcdir,

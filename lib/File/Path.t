@@ -275,7 +275,7 @@ SKIP: do
 
         $dir = catdir('EXTRA', '3')
         stderr_like(
-            sub (@< @_) {rmtree($dir, \%())},
+            sub (@< @_) {rmtree($dir, \$%)},
             qr{\Acannot make child directory read-write-exec for [^:]+: .* at (\S+) line (\d+)
 cannot make child directory read-write-exec for [^:]+: .* at \1 line \2
 cannot make child directory read-write-exec for [^:]+: .* at \1 line \2
@@ -284,7 +284,7 @@ cannot remove directory for [^:]+: .* at \1 line \2},
             )
 
         stderr_like(
-            sub (@< @_) {rmtree('EXTRA', \%())},
+            sub (@< @_) {rmtree('EXTRA', \$%)},
             qr{\Acannot remove directory for [^:]+: .* at (\S+) line (\d+)
 cannot remove directory for [^:]+: .* at \1 line \2
 cannot make child directory read-write-exec for [^:]+: .* at \1 line \2

@@ -506,13 +506,13 @@ sub style_opts
 
 sub new
     my $class = shift
-    my $self = bless \%(), $class
+    my $self = bless \$%, $class
     $self->{+'cuddle'} = "\n"
     $self->{+'curcop'} = undef
     $self->{+'curstash'} = "main"
     $self->{+'ex_const'} = "'???'"
     $self->{+'expand'} = 0
-    $self->{+'files'} = \%()
+    $self->{+'files'} = \$%
     $self->{+'indent_size'} = 4
     $self->{+'linenums'} = 0
     $self->{+'parens'} = 0
@@ -520,7 +520,7 @@ sub new
     $self->{+'unquote'} = 0
     $self->{+'use_dumper'} = 0
     $self->{+'use_tabs'} = 0
-    $self->{+'global_variables'} = \%()
+    $self->{+'global_variables'} = \$%
 
     $self->{+'ambient_warnings'} = undef # Assume no lexical warnings
     $self->{+'ambient_hints'} = 0
@@ -1277,8 +1277,8 @@ sub pp_nextstate($self, $op, $cx)
     
 
     # hack to check that the hint hash hasn't changed
-    if (join(' ', sort @: < ($self->{?'hinthash'} || \%())->%)
-          ne join(' ', sort @: < ($op->hints_hash || \%())->%))
+    if (join(' ', sort @: < ($self->{?'hinthash'} || \$%)->%)
+          ne join(' ', sort @: < ($op->hints_hash || \$%)->%))
         push @text, declare_hinthash($self->{?'hinthash'}, $op->hints_hash, $self->{?indent_size})
         $self->{+'hinthash'} = $op->hints_hash
     
@@ -1325,8 +1325,8 @@ my %ignored_hints = %(
 
 sub declare_hinthash($from, $to, $indent)
     my @decls
-    $from //= \%()
-    $to //= \%()
+    $from //= \$%
+    $to //= \$%
     for my $key (keys $to->%)
         next if %ignored_hints{?$key}
         if (!defined $from->{?$key} or $from->{?$key} ne $to->{?$key})
@@ -3028,11 +3028,11 @@ sub pp_entersub($self, $op, $cx)
     my $declared
     do
         no warnings 'uninitialized'
-        $declared = exists(($self->{?'subs_declared'} || \%())->{$kid})
+        $declared = exists(($self->{?'subs_declared'} || \$%)->{$kid})
             || (
           defined Symbol::stash($self->{?'curstash'})->{?$kid}
           && !exists(
-            ($self->{?'subs_deparsed'}||\%())->{$self->{?'curstash'}."::".$kid})
+            ($self->{?'subs_deparsed'}||\$%)->{$self->{?'curstash'}."::".$kid})
             && defined prototype(
             \&{Symbol::fetch_glob($self->{?'curstash'}."::".$kid)->*})
             )

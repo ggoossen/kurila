@@ -679,7 +679,7 @@ do
         my $x
         sub newsub {};
         BEGIN {$x = \&newsub }
-        $x = bless \%(), 'X'
+        $x = bless \$%, 'X'
     
     # test { $flag == 1 };
     print $^STDOUT, "not ok $test # TODO cleanup sub freeing\n"

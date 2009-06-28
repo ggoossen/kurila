@@ -170,7 +170,7 @@ sub delete_package($pkg)
 
     # delete the symbol table
 
-    $leaf_symtab->% = %( () )
+    $leaf_symtab->% = $%
     delete $stem_symtab->{$leaf}
 
 

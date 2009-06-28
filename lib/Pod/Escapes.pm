@@ -371,7 +371,7 @@ sub e2charnum
 
 # Fill out %Name2character...
 do
-    %Name2character = %( () )
+    %Name2character = $%
     my($name, $number)
     while( @(?$name, ?$number) =@( each %Name2character_number))
         %Name2character{+$name} = chr $number
@@ -491,7 +491,7 @@ do
 
 #--------------------------------------------------------------------------
 
-%Latin1Code_to_fallback = %( () )
+%Latin1Code_to_fallback = $%
 %Latin1Code_to_fallback{[0xA0 .. 0xFF]} = @(
     # Copied from Text/Unidecode/x00.pm:
 
@@ -506,7 +506,7 @@ do
 
 do
     # Now stuff %Latin1Char_to_fallback:
-    %Latin1Char_to_fallback = %( () )
+    %Latin1Char_to_fallback = $%
     my($k,$v)
     while( @(?$k,?$v) =@( each %Latin1Code_to_fallback))
         %Latin1Char_to_fallback{+chr $k} = $v

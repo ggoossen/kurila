@@ -148,7 +148,7 @@ sub timing_info
 my %symtable
 
 sub clearsym
-    %symtable = %( () )
+    %symtable = $%
 
 
 sub savesym($obj, $value)
@@ -277,7 +277,7 @@ do
 
     sub output($section, $fh, $format)
         my $name = $section->name
-        my $sym = $section->symtable || \%()
+        my $sym = $section->symtable || \$%
         my $default = $section->default
 
         seek($output_fh, 0, 0)

@@ -57,7 +57,7 @@ sub new($c, $v, ?$n)
         apad       => "",          # added padding for hash keys n such
         sep        => "",          # list separator
         pair    => $Pair,       # hash key/value separator: defaults to ' => '
-        seen       => \%(),        # local (nested) refs (id => [name, val])
+        seen       => \$%,        # local (nested) refs (id => [name, val])
         todump     => $v,          # values to dump []
         names      => $n,          # optional names for values []
         varname    => $Varname,    # prefix to use for tagging nameless ones
@@ -499,7 +499,7 @@ sub Dumpp { print $^STDOUT, < Data::Dumper->Dump(< @_) }
 #
 sub Reset
     my@($s) =@( shift)
-    $s->{+seen} = \%()
+    $s->{+seen} = \$%
     return $s
 
 

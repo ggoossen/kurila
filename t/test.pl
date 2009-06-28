@@ -562,7 +562,7 @@ END { unlink_all $tmpfile }
 sub _fresh_perl
     my@($prog, $resolve, $runperl_args, $name) =  @_
 
-    $runperl_args ||= \%()
+    $runperl_args ||= \$%
     $runperl_args->{+progfile} = $tmpfile
     $runperl_args->{+stderr} = 1
 

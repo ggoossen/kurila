@@ -68,7 +68,7 @@ sub go()
 
 
 sub new
-    my $new = bless \%(), ref(@_[0]) || @_[0]
+    my $new = bless \$%, ref(@_[0]) || @_[0]
     $new->html_render_class($HTML_RENDER_CLASS)
     $new->verbose(1 + DEBUG)
     $new->_contents(\$@)

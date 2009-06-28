@@ -259,9 +259,9 @@ my $Paragraph
 my %Sections
 
 # Caches
-my %Pages = %( () )			# associative array used to find the location
+my %Pages = $%			# associative array used to find the location
 #   of pages referenced by L<> links.
-my %Items = %( () )			# associative array used to find the location
+my %Items = $%			# associative array used to find the location
 #   of =item directives referenced by C<> links
 
 my %Local_Items
@@ -312,16 +312,16 @@ sub init_globals
     #   directive.
 
     @Items_Seen = $@               # for multiples of the same item in perlfunc
-    %Items_Named = %( () )
+    %Items_Named = $%
     $Header = 0         # produce block header/footer
     $Title = ''         # title to give the pod(s)
     $Top = 1                    # true if we are at the top of the doc.  used
     #   to prevent the first <hr /> directive.
     $Paragraph = ''             # which paragraph we're processing (used
     #   for error messages)
-    %Sections = %( () )         # sections within this page
+    %Sections = $%         # sections within this page
 
-    %Local_Items = %( () )
+    %Local_Items = $%
     $Is83 = $^OS_NAME eq 'dos'       # Is it an 8.3 filesystem?
 
 
@@ -849,8 +849,8 @@ sub scan_podpath($podroot, $recurse, $append)
     my($dirname, @files, @poddata)
 
     unless($append)
-        %Items = %( () )
-        %Pages = %( () )
+        %Items = $%
+        %Pages = $%
     
 
     # scan each directory listed in @Podpath

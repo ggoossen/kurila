@@ -44,10 +44,10 @@ my $GCC     = %Config{?'cc'} =~ m/^gcc/i ?? 1 !! 0
 
 sub dlsyms($self,%< %attribs)
 
-    my@($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \%()
+    my@($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \$%
     my@($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \$@
     my@($funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \$@
-    my@($imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \%()
+    my@($imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \$%
     my(@m)
 
     if (not $self->{SKIPHASH}->{?'dynamic'})

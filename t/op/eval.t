@@ -300,7 +300,7 @@ sub fred4
 # [perl #9728] used to dump core
 do
     my $eval = eval 'sub { eval q|sub { %S }| }'
-    $eval->(\%())
+    $eval->(\$%)
     print $^STDOUT, "ok $test\n"
     $test++
 

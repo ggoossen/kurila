@@ -68,10 +68,10 @@ sub struct
         if do { defined &{Symbol::fetch_glob($class . "::new")} }
 
     my @methods = $@
-    my %refs = %( () )
-    my %arrays = %( () )
-    my %hashes = %( () )
-    my %classes = %( () )
+    my %refs = $%
+    my %arrays = $%
+    my %hashes = $%
+    my %classes = $%
     my $got_class = 0
     my $out = ''
 

@@ -148,13 +148,13 @@ sub run_tests
     @words = @( m/(\w+)/g )
     ok( join(':', @words) eq "now:is:the:time:for:all:good:men:to:come:to" )
 
-    @words = @( () )
+    @words = $@
     while (m/\w+/gp)
         push(@words, $^MATCH)
     
     ok( join(':', @words) eq "now:is:the:time:for:all:good:men:to:come:to" )
 
-    @words = @( () )
+    @words = $@
     pos($_, 0)
     while (m/to/gp)
         push(@words, $^MATCH)
@@ -352,7 +352,7 @@ sub run_tests
     my $matched
     $matched = qr/\((?:(?>[^()]+)|(??{$matched}))*\)/
 
-    @ans = (@ans1 = @())
+    @ans = (@ans1 = $@)
     push(@ans, $res), push(@ans1, $^MATCH) while $res = m/$matched/gp
 
     ok( "$(join ' ',@ans)" eq "1 1 1" )
@@ -573,7 +573,7 @@ sub run_tests
     ok(  s/b(?{$foo = $_; $bar = pos})c/x/g and $foo eq 'abcde|abcde'
            and $bar eq 8 and $_ eq 'axde|axde' )
 
-    our @res = @( () )
+    our @res = $@
     # List context:
     $_ = 'abcde|abcde'
     our @dummy = @( m/([ace]).(?{push @res, $1,$2})([ce])(?{push @res, $1,$2})/g )
@@ -581,7 +581,7 @@ sub run_tests
     $res = "$(join ' ',@res)"
     ok(  "$(join ' ',@res)" eq "'a' undef 'a' 'c' 'e' undef 'a' undef 'a' 'c'" )
 
-    @res = @( () )
+    @res = $@
     @dummy = @( m/([ace]).(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})([ce])(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})/gp )
     @res = map {defined $_ ?? "'$_'" !! 'undef'}, @res
     $res = "$(join ' ',@res)"
@@ -646,7 +646,7 @@ sub run_tests
     # See if $i work inside (?{}) in the presense of saved substrings and
     # changing $_
     our @a = qw(foo bar)
-    our @b = @( () )
+    our @b = $@
     for (@a)
         s/(\w)(?{push @b, $1})/,$1,/g
 
@@ -743,7 +743,7 @@ sub run_tests
 
     ok("\n\n" =~ m/\n+ $ \n/x)
 
-    dies_like( sub (@< @_) { \@() =~ m/^ARRAY/ },
+    dies_like( sub (@< @_) { \$@ =~ m/^ARRAY/ },
                qr/Tried to use reference as string/)
 
     # test result of match used as match (!)
@@ -2290,10 +2290,10 @@ END
 
 
     do # TRIE related
-        my @got= @(() )
+        my @got= $@
         "words"=~m/(word|word|word)(?{push @got,$1})s$/
         ok((nelems @got)==1,"TRIE optimation is working") or warn "# $(join ' ',@got)"
-        @got= @(() )
+        @got= $@
         "words"=~m/(word|word|word)(?{push @got,$1})s$/i
         ok((nelems @got)==1,"TRIEF optimisation is working") or warn "# $(join ' ',@got)"
 
@@ -2305,7 +2305,7 @@ END
             ok($_=~m/$re/,"Trie nums")
         
         $_=join " ", @nums
-        @got= @(() )
+        @got= $@
         push @got,$1 while m/$re/g
 
         my %count
@@ -2395,7 +2395,7 @@ END
         
         package main
 
-        my $aeek = bless \%(), 'wooosh'
+        my $aeek = bless \$%, 'wooosh'
         try {$aeek->gloople() =~ m/(.)/g;}; die if $^EVAL_ERROR
         ok($^EVAL_ERROR eq "", "//g match against return value of sub") or print $^STDOUT, "# $^EVAL_ERROR\n"
     
@@ -2579,7 +2579,7 @@ EOFTEST
     ok("\{b\{c\}d" !~ m/^((??{ $brackets }))/, "bracket mismatch")
 
     SKIP:do
-        our @stack= @(() )
+        our @stack= $@
         my @expect=qw(
         stuff1
         stuff2
@@ -2754,7 +2754,7 @@ EOFTEST
         is($count,4,"/.(*SKIP)/")
         $_='aaabaaab'
         $count=0
-        our @res= @(() )
+        our @res= $@
         1 while m/(a+b?)(*SKIP)(?{$count++; push @res,$1})(*FAIL)/g
         is($count,2,"Expect 2 with (*SKIP)" )
         is("$(join ' ',@res)","aaab aaab","adjacent (*SKIP) works as expected" )
@@ -2769,7 +2769,7 @@ EOFTEST
         is($count,4,"/.(*SKIP)/")
         $_='aaabaaab'
         $count=0
-        our @res= @(() )
+        our @res= $@
         1 while m/(a+b?)(*MARK:foo)(*SKIP)(?{$count++; push @res,$1})(*FAIL)/g
         is($count,2,"Expect 2 with (*SKIP)" )
         is("$(join ' ',@res)","aaab aaab","adjacent (*SKIP) works as expected" )
@@ -2780,7 +2780,7 @@ EOFTEST
         is($count,3,"expect 3 with *MARK:a)b?(*MARK:b)(*SKIP:a)")
         local $_ = 'aaabaaab'
         $count=0
-        our @res= @(() )
+        our @res= $@
         1 while m/(a*(*MARK:a)b?)(*MARK:x)(*SKIP:a)(?{$count++; push @res,$1})(*FAIL)/g
         is($count,5,"Expect 5 with (*MARK:a)b?)(*MARK:x)(*SKIP:a)" )
         is("$(join ' ',@res)","aaab b aaab b ","adjacent (*MARK:a)b?)(*MARK:x)(*SKIP:a) works as expected" )
@@ -2795,7 +2795,7 @@ EOFTEST
         is($count,1,"/.(*COMMIT)/")
         $_='aaabaaab'
         $count=0
-        our @res= @(() )
+        our @res= $@
         1 while m/(a+b?)(*COMMIT)(?{$count++; push @res,$1})(*FAIL)/g
         is($count,1,"Expect 1 with (*COMMIT)" )
         is("$(join ' ',@res)","aaab","adjacent (*COMMIT) works as expected" )
@@ -2986,7 +2986,7 @@ EOFTEST
     do
         local $Message = "\$REGMARK"
         our ($REGMARK, $REGERROR)
-        our @r= @(() )
+        our @r= $@
         ok('foofoo' =~ m/foo (*MARK:foo) (?{push @r,$REGMARK}) /x)
         is("$(join ' ',@r)","foo")
         is($REGMARK,"foo")

@@ -34,7 +34,7 @@ sub tester
     &$testersub ($clone, $what)
 
 
-my $r = \%()
+my $r = \$%
 my $s1 = \@($r, $r)
 weaken $s1->[1]
 ok (isweak($s1->[1]), "element 1 is a weak reference")

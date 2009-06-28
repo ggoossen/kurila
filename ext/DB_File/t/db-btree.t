@@ -482,7 +482,7 @@ $i = 0
 ok( $i == 10)
 
 # now clear the hash
-%h = %( () ) 
+%h = $% 
 
 # check it is empty
 $i = 0 

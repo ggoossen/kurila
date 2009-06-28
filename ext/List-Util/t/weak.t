@@ -84,7 +84,7 @@ if(1)
 
 my $flag = 0
 do
-    my $y = bless \%(), 'Dest'
+    my $y = bless \$%, 'Dest'
     Dump($y)
     $y->{+Self} = $y
     Dump($y)
@@ -111,8 +111,8 @@ print $^STDOUT, "# FLAGU\n"
 
 $flag = 0
 do
-    my $y = bless \%(), 'Dest'
-    my $x = bless \%(), 'Dest'
+    my $y = bless \$%, 'Dest'
+    my $x = bless \$%, 'Dest'
     $x->{+Ref} = $y
     $y->{+Ref} = $x
     $x->{+Flag} = \$flag
@@ -156,7 +156,7 @@ ok(isweak($b))
 $b = \$a
 ok(!isweak($b))
 
-our $x = \%()
+our $x = \$%
 weaken($x->{+Y} = \$a)
 ok(isweak($x->{?Y}))
 ok(!isweak($x->{?Z}))

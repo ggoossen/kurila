@@ -312,7 +312,7 @@ sub jfatal
 
 sub joverflow($x, $y)
     $x{+overflow} = 1
-    $y->% = %( () )
+    $y->% = $%
     return \&jfatal
 
 
@@ -852,7 +852,7 @@ sub resolve_overflows($formatters,$prevformatters)
                         if $prev->{?overflow} && $prev->{?src} == $fld->{?src}
                     next
                 
-                my %newfld = %( < $prev->%, opts=>\%(), overflow=>1 )
+                my %newfld = %( < $prev->%, opts=>\$%, overflow=>1 )
                 my @keep = qw( width pos complete done line )
                 %newfld{[ @keep]} =  $fld->{[ @keep]}
                 update %newfld{?opts}->%, $fld->{?opts}->%
@@ -912,7 +912,7 @@ sub make_cols($formatters,$prevformatters,$parts, $opts, $maxheight)
         my %incomplete = %(first=>1)
         for my $row (0 .. $maxheight -1)
             last unless grep {$_}, values %incomplete
-            %incomplete = %( () )
+            %incomplete = $%
             for my $col (0..(nelems $formatters->@)-1)
                 $parts->[$col] ||= \$@
             
@@ -1033,10 +1033,10 @@ use warnings::register;
 sub form
     # Handle formatting calls...
     my @($package, $file, $line) =@( caller)
-    my $caller_opts = %caller_opts{+$package.','.$file} ||= \%()
+    my $caller_opts = %caller_opts{+$package.','.$file} ||= \$%
     if ($caller_opts->%)
         $line = first { $_ +< $line }, < sort {$b<+>$a}, keys $caller_opts->%
-        $caller_opts = $caller_opts->{?$line} || \%()
+        $caller_opts = $caller_opts->{?$line} || \$%
             if defined $line
     
     my %opts = %(< %def_opts, < $caller_opts->%)

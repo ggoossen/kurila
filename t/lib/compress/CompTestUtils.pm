@@ -472,7 +472,7 @@ sub mkComplete
     my $Error = getErrorRef($class)
 
     my $buffer 
-    my %params = %( () )
+    my %params = $%
 
     if ($class eq 'IO::Compress::Gzip')
         %params = %(

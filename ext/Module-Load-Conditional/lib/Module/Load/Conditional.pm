@@ -382,7 +382,7 @@ sub can_load
     my %hash = %( < @_ )
 
     my $tmpl = \%(
-        modules     => %( default => \%(), strict_type => 1 ),
+        modules     => %( default => \$%, strict_type => 1 ),
         verbose     => %( default => $VERBOSE ),
         nocache     => %( default => 0 ),
         )
@@ -404,7 +404,7 @@ sub can_load
     ###     },
     ### };
 
-    $CACHE ||= \%() # in case it was undef'd
+    $CACHE ||= \$% # in case it was undef'd
 
     my $error
     BLOCK: do

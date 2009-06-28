@@ -350,7 +350,7 @@ do
     local $^WARN_HOOK = sub (@< @_) {$warned = @_[0]} 
 
     # db-put with substr of key
-    my %remember = %( () ) 
+    my %remember = $% 
     for my $ix ( 1 .. 2 )
         my $key = $ix . "data" 
         my $value = "value$ix" 
@@ -399,7 +399,7 @@ do
     ok $warned eq ''
         or print $^STDOUT, "# Caught warning [$warned]\n" 
 
-    my %bad = %( () ) 
+    my %bad = $% 
     $key = ''
     my $status = %h->seq($key, $value, R_FIRST )
     while ( $status == 0 )

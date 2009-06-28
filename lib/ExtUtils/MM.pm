@@ -47,7 +47,7 @@ sub _is_win95
         !! ! defined env::var('SYSTEMROOT')
 
 
-my %Is = %( () )
+my %Is = $%
 %Is{+VMS}    = $^OS_NAME eq 'VMS'
 %Is{+OS2}    = $^OS_NAME eq 'os2'
 %Is{+MacOS}  = $^OS_NAME eq 'MacOS'

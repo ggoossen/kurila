@@ -15,7 +15,7 @@ sub new
     $self->{+properties}{+perl} = $class->find_perl_interpreter
         or warn "Warning: Can't locate your perl binary"
 
-    $self->{+config} = %()
+    $self->{+config} = $%
     for my $k (config_keys)
         my $v = config_value($k)
         $self->{config}{+$k} = $v unless exists $self->{config}{$k}
@@ -40,7 +40,7 @@ sub add_to_cleanup
 
 sub cleanup
     my $self = shift
-    foreach my $file (keys($self->{?files_to_clean} || %() ))
+    foreach my $file (keys($self->{?files_to_clean} || $% ))
         unlink $file
     
 
@@ -86,7 +86,7 @@ sub compile($self, %< %args)
         (< (%args{?include_dirs} || \$@)->@,
         $self->perl_inc())
 
-    my @defines = $self->arg_defines( < (%args{?defines} || \%())->% )
+    my @defines = $self->arg_defines( < (%args{?defines} || \$%)->% )
 
     my @extra_compiler_flags = $self->split_like_shell(%args{?extra_compiler_flags})
     my @cccdlflags = $self->split_like_shell($cf{cccdlflags})
@@ -154,9 +154,9 @@ sub prelink($self, %< %args)
     require ExtUtils::Mksymlists
     ExtUtils::Mksymlists::Mksymlists( # dl. abbrev for dynamic library
         DL_VARS  => %args{?dl_vars}      || \$@,
-        DL_FUNCS => %args{?dl_funcs}     || \%(),
+        DL_FUNCS => %args{?dl_funcs}     || \$%,
         FUNCLIST => %args{?dl_func_list} || \$@,
-        IMPORTS  => %args{?dl_imports}   || \%(),
+        IMPORTS  => %args{?dl_imports}   || \$%,
         NAME     => %args{?dl_name},		# Name of the Perl module
         DLBASE   => %args{?dl_base},		# Basename of DLL file
         FILE     => %args{?dl_file},		# Dir + Basename of symlist file

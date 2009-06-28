@@ -659,7 +659,7 @@ sub install #XXX OS-SPECIFIC
         $result         = %opts{?result}
     
 
-    $result ||= \%()
+    $result ||= \$%
     $verbose ||= 0
     $dry_run  ||= 0
 
@@ -1020,7 +1020,7 @@ removed and values of the source files they would shadow.
 sub inc_uninstall($filepath,$libdir,$verbose,$dry_run,$ignore,$results)
     $ignore||=""
     my $file = (File::Spec->splitpath($filepath))[2]
-    my %seen_dir = %( () )
+    my %seen_dir = $%
 
     my @PERL_ENV_LIB = split config_value("path_sep"), defined env::var('PERL5LIB')
         ?? env::var('PERL5LIB') !! env::var('PERLLIB') || ''
@@ -1174,7 +1174,7 @@ sub pm_to_blib($fromto,$autodir, ?$pm_filter)
 
 package ExtUtils::Install::Warn;
 
-sub new { bless \%(), shift }
+sub new { bless \$%, shift }
 
 sub add($self,$file,$targetfile)
     push $self->{$file}->@, $targetfile

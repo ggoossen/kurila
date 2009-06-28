@@ -1,9 +1,9 @@
 #!./perl
 
 
-my %Expect_File = %( () ) # what we expect for $_
-my %Expect_Name = %( () ) # what we expect for $File::Find::name/fullname
-my %Expect_Dir  = %( () ) # what we expect for $File::Find::dir
+my %Expect_File = $% # what we expect for $_
+my %Expect_Name = $% # what we expect for $File::Find::name/fullname
+my %Expect_Dir  = $% # what we expect for $File::Find::dir
 my $symlink_exists = try { symlink("",""); 1 }
 my $warn_msg
 
@@ -328,7 +328,7 @@ touch( file_path('fa', 'fab', 'faba', 'faba_ord') )
     file_path('faa') => 1, file_path('faa_ord') => 1)
 
 delete %Expect_File{ file_path('fsl') } unless $symlink_exists
-%Expect_Name = %( () )
+%Expect_Name = $%
 
 %Expect_Dir = %( dir_path('fa') => 1, dir_path('faa') => 1,
     dir_path('fab') => 1, dir_path('faba') => 1,
@@ -347,7 +347,7 @@ print $^STDOUT, "# check re-entrancy\n"
     file_path('faa') => 1, file_path('faa_ord') => 1)
 
 delete %Expect_File{ file_path('fsl') } unless $symlink_exists
-%Expect_Name = %( () )
+%Expect_Name = $%
 
 %Expect_Dir = %( dir_path('fa') => 1, dir_path('faa') => 1,
     dir_path('fab') => 1, dir_path('faba') => 1,
@@ -376,7 +376,7 @@ Check( (nkeys %Expect_File) == 0 )
     file_path_name('fa', 'faa', 'faa_ord') => 1,)
 
 delete %Expect_File{ file_path_name('fa', 'fsl') } unless $symlink_exists
-%Expect_Name = %( () )
+%Expect_Name = $%
 
 %Expect_Dir = %(dir_path('fa') => 1,
     dir_path('fa', 'faa') => 1,
@@ -393,7 +393,7 @@ File::Find::find( \%(wanted => \&wanted_File_Dir, no_chdir => 1),
 Check( (nkeys %Expect_File) == 0 )
 
 
-%Expect_File = %( () )
+%Expect_File = $%
 
 %Expect_Name = %(File::Spec->curdir => 1,
     file_path_name('.', 'fa') => 1,
@@ -411,7 +411,7 @@ Check( (nkeys %Expect_File) == 0 )
     file_path_name('.', 'fb', 'fb_ord') => 1)
 
 delete %Expect_Name{ file_path('.', 'fa', 'fsl') } unless $symlink_exists
-%Expect_Dir = %( () )
+%Expect_Dir = $%
 File::Find::finddepth( \%(wanted => \&wanted_Name), File::Spec->curdir )
 Check( (nkeys %Expect_Name) == 0 )
 
@@ -435,8 +435,8 @@ Check( (nkeys %Expect_Name) == 0 )
     file_path_name('.', 'fb', 'fb_ord') => 1)
 
 delete %Expect_File{ file_path_name('.', 'fa', 'fsl') } unless $symlink_exists
-%Expect_Name = %( () )
-%Expect_Dir = %( () )
+%Expect_Name = $%
+%Expect_Dir = $%
 
 File::Find::finddepth( \%(wanted => \&wanted_File, no_chdir => 1),
                        File::Spec->curdir )
@@ -445,8 +445,8 @@ Check( (nkeys %Expect_File) == 0 )
 
 
 print $^STDOUT, "# check preprocess\n"
-%Expect_File = %( () )
-%Expect_Name = %( () )
+%Expect_File = $%
+%Expect_Name = $%
 %Expect_Dir = %(
     File::Spec->curdir                 => \%(fa => 1, fb => 1),
     dir_path('.', 'fa')                => \%(faa => 1, fab => 1, fa_ord => 1),
@@ -464,8 +464,8 @@ Check( (nkeys %Expect_Dir) == 0 )
 
 
 print $^STDOUT, "# check postprocess\n"
-%Expect_File = %( () )
-%Expect_Name = %( () )
+%Expect_File = $%
+%Expect_Name = $%
 %Expect_Dir = %(
     File::Spec->curdir                 => 1,
     dir_path('.', 'fa')                => 1,
@@ -505,8 +505,8 @@ if ( $symlink_exists )
     # is a symlink to a directory, and it shouldn't follow the link
     # unless follow is set, which it isn't in this case
     %Expect_File = %( file_path('fsl') => 1 )
-    %Expect_Name = %( () )
-    %Expect_Dir = %( () )
+    %Expect_Name = $%
+    %Expect_Dir = $%
     File::Find::find( \%(wanted => \&wanted_File_Dir), topdir('fa', 'fsl') )
     Check( (nkeys %Expect_File) == 0 )
 
@@ -518,7 +518,7 @@ if ( $symlink_exists )
         file_path('faba') => 1, file_path('faa') => 1,
         file_path('faa_ord') => 1)
 
-    %Expect_Name = %( () )
+    %Expect_Name = $%
 
     %Expect_Dir = %(File::Spec->curdir => 1, dir_path('fa') => 1,
         dir_path('faa') => 1, dir_path('fab') => 1,
@@ -547,7 +547,7 @@ if ( $symlink_exists )
         file_path_name('fa', 'faa') => 1,
         file_path_name('fa', 'faa', 'faa_ord') => 1)
 
-    %Expect_Name = %( () )
+    %Expect_Name = $%
 
     %Expect_Dir = %(dir_path('fa') => 1,
         dir_path('fa', 'faa') => 1,
@@ -561,7 +561,7 @@ if ( $symlink_exists )
 
     Check( (nkeys %Expect_File) == 0 )
 
-    %Expect_File = %( () )
+    %Expect_File = $%
 
     %Expect_Name = %(file_path_name('fa') => 1,
         file_path_name('fa', 'fa_ord') => 1,
@@ -576,7 +576,7 @@ if ( $symlink_exists )
         file_path_name('fa', 'faa') => 1,
         file_path_name('fa', 'faa', 'faa_ord') => 1)
 
-    %Expect_Dir = %( () )
+    %Expect_Dir = $%
 
     File::Find::finddepth( \%(wanted => \&wanted_Name,
                            follow_fast => 1), topdir('fa') )
@@ -599,8 +599,8 @@ if ( $symlink_exists )
         file_path_name('fa', 'faa') => 1,
         file_path_name('fa', 'faa', 'faa_ord') => 1)
 
-    %Expect_Name = %( () )
-    %Expect_Dir = %( () )
+    %Expect_Name = $%
+    %Expect_Dir = $%
 
     File::Find::finddepth( \%(wanted => \&wanted_File, follow_fast => 1,
                            no_chdir => 1), topdir('fa') )
@@ -639,8 +639,8 @@ if ( $symlink_exists )
             file_path('faa') => 1,
             file_path('faa_ord') => 1)
 
-        %Expect_Name = %( () )
-        %Expect_Dir = %( () )
+        %Expect_Name = $%
+        %Expect_Dir = $%
         undef $warn_msg
 
         File::Find::find( \%(wanted => \&wanted_File, follow => 1,
@@ -704,7 +704,7 @@ if ( $symlink_exists )
         file_path_name('fa', 'faa') => 1,
         file_path_name('fa', 'faa', 'faa_ord') => 1)
 
-    %Expect_Name = %( () )
+    %Expect_Name = $%
 
     %Expect_Dir = %(dir_path('fa') => 1,
         dir_path('fa', 'faa') => 1,
@@ -762,7 +762,7 @@ if ( $symlink_exists )
         file_path_name('fa', 'faa_sl') => 1,
         file_path_name('fa', 'faa_sl', 'faa_ord') => 1)
 
-    %Expect_Name = %( () )
+    %Expect_Name = $%
 
     %Expect_Dir = %(dir_path('fa') => 1,
         dir_path('fa', 'faa') => 1,

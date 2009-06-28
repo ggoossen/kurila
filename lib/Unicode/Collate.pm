@@ -215,7 +215,7 @@ sub checkCollator
         or die "$PACKAGE: list for rearrangement must be store in ARRAYREF"
 
     # keys of $self->{rearrangeHash} are $self->{rearrange}.
-    $self->{+rearrangeHash} = \%()
+    $self->{+rearrangeHash} = \$%
 
     if ((nelems  $self->{?rearrange}->@))
         $self->{rearrangeHash}->{[  $self->{?rearrange}->@ ]} = $@

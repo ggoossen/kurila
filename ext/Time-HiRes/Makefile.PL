@@ -12,7 +12,7 @@ use ExtUtils::MakeMaker
 
 my $VERBOSE = env::var('VERBOSE')
 my $DEFINE
-my $LIBS = @()
+my $LIBS = $@
 my $XSOPT = ''
 my $SYSCALL_H
 
@@ -325,7 +325,7 @@ sub init
     my $hints = File::Spec->catfile("hints", "$^OS_NAME.pl")
     if (-f $hints)
         print $^STDOUT, "Using hints $hints...\n"
-        local $self = \%()
+        local $self = \$%
         evalfile $hints
         if (exists $self->{LIBS})
             $LIBS = $self->{LIBS}
@@ -700,7 +700,7 @@ EOM
 
 
 sub doMakefile
-    my @makefileopts = @( () )
+    my @makefileopts = $@
 
     DEFINE('ATLEASTFIVEOHOHFIVE')
 
@@ -776,7 +776,7 @@ sub main
 
     if ($^OS_NAME =~ m/Win32/i)
         DEFINE('SELECT_IS_BROKEN')
-        $LIBS = @()
+        $LIBS = $@
         print $^STDOUT, "System is $^OS_NAME, skipping full configure...\n"
     else
         init()

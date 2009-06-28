@@ -34,7 +34,7 @@ use ExtUtils::MakeMaker;
 my $out
 close $^STDERR
 open $^STDERR, '>>', \$out or die
-my $mm = bless \%(), 'ExtUtils::MakeMaker'
+my $mm = bless \$%, 'ExtUtils::MakeMaker'
 $mm->check_hints
 is( $mm->{+CCFLAGS}, 'basset hounds got long ears' )
 is( $out, "Processing hints file $hint_file\n" )
