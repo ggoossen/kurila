@@ -787,7 +787,7 @@ PP(pp_pow)
 		if (SvUOK(svr)) {
 		    power = SvUVX(svr);
 		} else {
-		    const IV iv = SvIVX(svr);
+		    const IV iv = I_SvIV(svr);
 		    if (iv >= 0) {
 			power = iv;
 		    } else {
@@ -799,7 +799,7 @@ PP(pp_pow)
 		if (baseuok) {
 		    baseuv = SvUVX(svl);
 		} else {
-		    const IV iv = SvIVX(svl);
+		    const IV iv = I_SvIV(svl);
 		    if (iv >= 0) {
 			baseuv = iv;
 			baseuok = TRUE; /* effectively it's a UV now */
