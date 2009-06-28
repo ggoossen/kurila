@@ -954,7 +954,7 @@ PP(pp_multiply)
 	    if (auvok) {
 		alow = SvUVX(svl);
 	    } else {
-		const IV aiv = SvIVX(svl);
+		const IV aiv = I_SvIV(svl);
 		if (aiv >= 0) {
 		    alow = aiv;
 		    auvok = TRUE; /* effectively it's a UV now */
@@ -965,7 +965,7 @@ PP(pp_multiply)
 	    if (buvok) {
 		blow = SvUVX(svr);
 	    } else {
-		const IV biv = SvIVX(svr);
+		const IV biv = I_SvIV(svr);
 		if (biv >= 0) {
 		    blow = biv;
 		    buvok = TRUE; /* effectively it's a UV now */
@@ -1089,7 +1089,7 @@ PP(pp_divide)
                 right = SvUVX(svr);
             }
 	    else {
-		const IV biv = SvIVX(svr);
+		const IV biv = I_SvIV(svr);
                 if (biv >= 0) {
                     right = biv;
                     right_non_neg = TRUE; /* effectively it's a UV now */
@@ -1110,7 +1110,7 @@ PP(pp_divide)
                 left = SvUVX(svl);
             }
 	    else {
-		const IV aiv = SvIVX(svl);
+		const IV aiv = I_SvIV(svl);
                 if (aiv >= 0) {
                     left = aiv;
                     left_non_neg = TRUE; /* effectively it's a UV now */
