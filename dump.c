@@ -828,10 +828,6 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	if (o->op_flags & OPf_TARGET_MY)
 	    sv_catpv(tmpsv, ",TARGET_MY");
     }
-    else if (optype == OP_REPEAT) {
-	if (o->op_private & OPpREPEAT_DOLIST)
-	    sv_catpv(tmpsv, ",DOLIST");
-    }
     if (optype == OP_ENTERSUB_SAVE) {
 	if (o->op_private & OPpENTERSUB_SAVE_DISCARD)
 	    sv_catpv(tmpsv, ",DISCARD");

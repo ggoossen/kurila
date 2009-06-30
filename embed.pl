@@ -408,14 +408,13 @@ sub write_xv_defines($retval, $func, @args)
     for my $xv (qw[Av Hv Cv Gv Io Re])
         my $i = 0
         my @arglist = map {
-            my $n = @az[$i++];
-            if ($_ =~ m/XV\s*([*]+)/)
-                my $p = 'p' x (length($1)-1)
-                @: $n, "$(lc $xv)$($p)Tsv$p($n)"
-            else
-                @: $n, $n
-            
-        }, @args
+                my $n = @az[$i++];
+                if ($_ =~ m/XV\s*([*]+)/)
+                    my $p = 'p' x (length($1)-1)
+                    @: $n, "$(lc $xv)$($p)Tsv$p($n)"
+                else
+                    @: $n, $n
+            }, @args
         my $dlist = join(",", map { $_[0] }, @arglist)
         my $alist = join(",", map { $_[1] }, @arglist)
         my $xvname = $func
@@ -424,7 +423,6 @@ sub write_xv_defines($retval, $func, @args)
         my $ret_convert = $retval =~ m/SV/
         my $call = "Perl_" . $func . "(aTHX_ $alist)"
         print $em, "#define $xvname($dlist)\t\t" . ($ret_convert ?? "svT$(lc $xv)" . "($call)" !! $call ) . "\n"
-    
 
 
 walk_table sub (@< @_)

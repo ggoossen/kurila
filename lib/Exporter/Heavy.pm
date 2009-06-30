@@ -33,7 +33,7 @@ sub _rebuild_cache($pkg, $exports, $cache)
 sub export($pkg, $callpkg, @< @imports)
     my ($type, $cache_is_current, $oops)
     my (@: $exports, $export_cache) = @: \Symbol::fetch_glob("$($pkg)::EXPORT")->*->@
-                                       (%Exporter::Cache{+$pkg} ||= \$%)
+                                         (%Exporter::Cache{+$pkg} ||= \$%)
 
     if ((nelems @imports))
         if (!$export_cache->%)

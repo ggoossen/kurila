@@ -1197,7 +1197,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* i_divide */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* modulo */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* i_modulo */
-	MEMBER_TO_FPTR(Perl_ck_repeat),	/* repeat */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* repeat */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* add */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* i_add */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* subtract */
