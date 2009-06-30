@@ -962,11 +962,10 @@ termbinop:	term AHOP term                        /* $x +@+ $y */
                           APPEND_MADPROPS_PV("operator",$$,'>');
 			}
 	|	term MULOP term                        /* $x * $y, $x x $y */
-			{   if (IVAL($2) != OP_REPEAT)
-				scalar($1);
-			    $$ = newBINOP(IVAL($2), 0, $1, scalar($3), LOCATION($2));
-			  TOKEN_GETMAD($2,$$,'o');
-                          APPEND_MADPROPS_PV("operator",$$,'>');
+			{
+			    $$ = newBINOP(IVAL($2), 0, scalar($1), scalar($3), LOCATION($2));
+                            TOKEN_GETMAD($2,$$,'o');
+                            APPEND_MADPROPS_PV("operator",$$,'>');
 			}
 	|	term ADDOP term                        /* $x + $y */
 			{ $$ = newBINOP(IVAL($2), 0, scalar($1), scalar($3), LOCATION($2));
