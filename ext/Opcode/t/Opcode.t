@@ -2,15 +2,15 @@
 
 $^OUTPUT_AUTOFLUSH=1
 
-use Config;
+use Config
 
-use Test::More;
+use Test::More
 
 use Opcode < qw(
 	opcodes opdesc opmask verify_opset
 	opset opset_to_ops opset_to_hex invert_opset
 	opmask_add full_opset empty_opset define_optag
-);
+)
 
 
 plan tests => 16

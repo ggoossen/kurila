@@ -18,8 +18,8 @@ EOD
 
 (my $data2 = $data) =~ s/\n/\n\n/g
 
-my $t1 = \%( data => $data,  write_c => \@(1,2,length $data),  read_c => \@(1,2,3,length $data))
-my $t2 = \%( data => $data2, write_c => \@(1,2,length $data2), read_c => \@(1,2,3,length $data2))
+my $t1 = \%( data => $data,  write_c => \(@: 1,2,length $data),  read_c => \(@: 1,2,3,length $data))
+my $t2 = \%( data => $data2, write_c => \(@: 1,2,length $data2), read_c => \(@: 1,2,3,length $data2))
 
 my $c   # len write tests, for each: one _all test, and 3 each len+2
 for (@: $t1, $t2)
@@ -118,7 +118,7 @@ is("$(join ' ',@c)", '97 10 98 10 10 99 10 10 10', 'got expected chars')
 ok(close($fh), 'close')
 
 for my $s (1..2)
-    my $t = @($t1, $t2)[$s-1]
+    my $t = (@: $t1, $t2)[$s-1]
     my $str = $t->{?data}
     my $r = $t->{?read_c}
     my $w = $t->{?write_c}

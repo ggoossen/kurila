@@ -14,17 +14,17 @@ sub source_path
     
 
 
-use Pod::Simple::Text;
+use Pod::Simple::Text
 $Pod::Simple::Text::FREAKYMODE = 1
 
 my $parser  = Pod::Simple::Text->new()
 
-foreach my $file (@(
-  "junk1.pod",
-  "junk2.pod",
-  "perlcyg.pod",
-  "perlfaq.pod",
-  "perlvar.pod",)
+foreach my $file (@: 
+  "junk1.pod"
+  "junk2.pod"
+  "perlcyg.pod"
+  "perlfaq.pod"
+  "perlvar.pod",
     )
 
     unless(-e source_path($file))
@@ -34,7 +34,7 @@ foreach my $file (@(
     
 
     my $precooked = source_path($file)
-    my $strings = @(undef, undef)
+    my $strings = @: undef, undef
     $precooked =~ s<\.pod><o.txt>s
     $parser->reinit
     $parser->output_string(\$strings[0])

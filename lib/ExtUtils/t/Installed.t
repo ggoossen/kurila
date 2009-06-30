@@ -3,13 +3,13 @@
 my $Is_VMS = $^OS_NAME eq 'VMS'
 
 
-use Config < qw|config_keys config_value|;
-use Cwd;
-use File::Path;
-use File::Basename;
-use File::Spec;
+use Config < qw|config_keys config_value|
+use Cwd
+use File::Path
+use File::Basename
+use File::Spec
 
-use Test::More tests => 51;
+use Test::More tests => 51
 
 BEGIN { use_ok( 'ExtUtils::Installed' ) }
 
@@ -105,7 +105,7 @@ do
     $config_override{+sitearchexp} = $fake_mod_dir
     $config_override{+version} = 'fake_test_version'
 
-    my @inc_override = @(< $^INCLUDE_PATH, $fake_mod_dir)
+    my @inc_override = @: < $^INCLUDE_PATH, $fake_mod_dir
 
     my $realei = ExtUtils::Installed->new(
         'config_override' => $config_override,
@@ -127,7 +127,7 @@ push $^INCLUDE_PATH, $fake_mod_dir
 # Check if extra_libs works.
 do
     my $realei = ExtUtils::Installed->new(
-        'extra_libs' => \@( cwd() ),
+        'extra_libs' => \(@:  cwd() ),
         )
     isa_ok( $realei, 'ExtUtils::Installed' )
     isa_ok( $realei->{Perl}{?packlist}, 'ExtUtils::Packlist' )

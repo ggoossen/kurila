@@ -4,8 +4,8 @@ use charnames ':full'
 
 use Test::More
 plan tests => 26
-use Pod::Simple::TextContent;
-use Pod::Simple::Text;
+use Pod::Simple::TextContent
+use Pod::Simple::Text
 
 BEGIN 
     *mytime = defined(&Win32::GetTickCount)
@@ -31,12 +31,12 @@ sub source_path
 
 my $outfile = '10000'
 
-foreach my $file (@(
-  "junk1.pod",
-  "junk2.pod",
-  "perlcyg.pod",
-  "perlfaq.pod",
-  "perlvar.pod",)
+foreach my $file (@: 
+  "junk1.pod"
+  "junk2.pod"
+  "perlcyg.pod"
+  "perlfaq.pod"
+  "perlvar.pod",
     )
 
     unless(-e source_path($file))
@@ -55,7 +55,7 @@ foreach my $file (@(
     
 
     print $^STDOUT, "#\n#\n#\n###################\n# $file\n"
-    foreach my $class (@('Pod::Simple::TextContent', 'Pod::Simple::Text'))
+    foreach my $class ((@: 'Pod::Simple::TextContent', 'Pod::Simple::Text'))
         my $p = $class->new
         push @out, ''
         $p->output_string(\@out[-1])
@@ -76,7 +76,7 @@ foreach my $file (@(
     print $^STDOUT, "#   ", length(@out[-1]), " bytes pulled in.\n"
 
     @out = map {
-        join '', @( pack("U*", unpack("C*", $_))) # latin1 decode.
+        join '', @:  pack("U*", unpack("C*", $_)) # latin1 decode.
       }, @out
 
     for ( @out) { s/\s+/ /g; s/^\s+//s; s/\s+$//s; }
@@ -125,7 +125,7 @@ sub compare2
         ok 1
         return 0
     elsif( do
-            for (@(@out[0], @out[1])) { s/[ ]//g; };
+            for ((@: @out[0], @out[1])) { s/[ ]//g; };
             @out[0] eq @out[1]
         )
         print $^STDOUT, "# Differ only in whitespace.\n"

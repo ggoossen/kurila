@@ -1,6 +1,6 @@
 BEGIN 
     chdir 't' if -d 't'
-    $^INCLUDE_PATH = @( '../lib' )
+    $^INCLUDE_PATH = (@:  '../lib' )
 
 
 # Time-stamp: "2004-12-29 19:59:33 AST"
@@ -17,7 +17,7 @@ print $^STDOUT, "ok 1\n"
 @Life::ISA = qw(Matter)
 @Matter::ISA = qw()
 
-use Class::ISA;
+use Class::ISA
 my @path = Class::ISA::super_path('Food::Fishstick')
 my $flat_path = join ' ', @path
 print $^STDOUT, "#Food::Fishstick path is:\n# $flat_path\n"

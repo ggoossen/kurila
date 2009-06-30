@@ -9,7 +9,7 @@ plan (90)
 our ($a1, $b1, $c1, $d1, $e1, $f1, $g1, @w)
 
 sub expected
-    my@($object, $package, $type) =  @_
+    my(@: $object, $package, $type) =  @_
     print $^STDOUT, "# $(dump::view($object)) $package $type\n"
     is(ref($object), $package)
     my $r = qr/^\Q$package\E=(\w+)\(0x([0-9a-f]+)\)$/
@@ -102,7 +102,7 @@ like($^EVAL_ERROR->message, qr/Attempt to bless into a reference/, "class is a r
 
 do
     my %h = %( < 1..2 )
-    my@($k) =  keys %h
+    my(@: $k) =  keys %h
     my $x=\$k
     bless $x, 'pam'
     is(ref $x, 'pam')

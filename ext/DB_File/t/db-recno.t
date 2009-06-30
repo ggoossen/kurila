@@ -28,7 +28,7 @@ do
         my $fh = gensym 
         open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" 
         my $real_stdout = $^STDOUT
-        return bless \@($fh, $real_stdout ) 
+        return bless \@: $fh, $real_stdout  
 
     
     sub DESTROY

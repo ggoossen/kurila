@@ -59,7 +59,7 @@ myok( 4, -f $file->filename(), "OO File exists in parent" )
 
 # non-OO interface
 
-my @($fh, $filename) =  File::Temp::tempfile()
+my (@: $fh, $filename) =  File::Temp::tempfile()
 
 myok( 5, -f $filename, "non-OO File exists" )
 

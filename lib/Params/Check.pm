@@ -533,7 +533,7 @@ sub _safe_eq
 sub _who_was_it
     my $level = @_[?0] || 0
 
-    return @(caller(2 + $CALLER_DEPTH + $level))[?3] || 'ANON'
+    return (@: caller(2 + $CALLER_DEPTH + $level))[?3] || 'ANON'
 
 
 =head2 last_error()
@@ -552,7 +552,7 @@ do
     $_ERROR_STRING = ''
 
     sub _store_error
-        my@($err, $verbose, $offset) =  @_[[0..2]]
+        my(@: $err, $verbose, $offset) =  @_[[0..2]]
         $verbose ||= 0
         $offset  ||= 0
         my $level   = 1 + $offset

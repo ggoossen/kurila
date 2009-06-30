@@ -65,7 +65,7 @@ sub parse_lines             # Usage: $parser->parse_lines(@lines)
         unless( defined $source_line )
             DEBUG +> 4 and print $^STDOUT, "# Undef-line seen.\n"
 
-            push $paras->@, \@('~end', \%('start_line' => $self->{?'line_count'}))
+            push $paras->@, \@: '~end', \%('start_line' => $self->{?'line_count'})
             push $paras->@, $paras->[-1], $paras->[-1]
             # So that it definitely fills the buffer.
             $self->{+'source_dead'} = 1
@@ -143,7 +143,7 @@ sub parse_lines             # Usage: $parser->parse_lines(@lines)
                 
             else
                 DEBUG +> 5 and print $^STDOUT, "# It's a code-line.\n"
-                $code_handler->(< map { $_ }, @( $line, $self->{?'line_count'}, $self))
+                $code_handler->(< map { $_ }, (@:  $line, $self->{?'line_count'}, $self))
                     if $code_handler
                 # Note: this may cause code to be processed out of order relative
                 #  to pods, but in order relative to cuts.
@@ -181,7 +181,7 @@ sub parse_lines             # Usage: $parser->parse_lines(@lines)
             # ++$self->{'pod_para_count'};
             $self->_ponder_paragraph_buffer()
             # by now it's safe to consider the previous paragraph as done.
-            $cut_handler->(< map { $_ }, @( $line, $self->{?'line_count'}, $self))
+            $cut_handler->(< map { $_ }, (@:  $line, $self->{?'line_count'}, $self))
                 if $cut_handler
 
         # TODO: add to docs: Note: this may cause cuts to be processed out
@@ -203,7 +203,7 @@ sub parse_lines             # Usage: $parser->parse_lines(@lines)
 
             if($line =~ m/^(=[a-zA-Z][a-zA-Z0-9]*)(?:\s+|$)(.*)/s)
                 # THIS IS THE ONE PLACE WHERE WE CONSTRUCT NEW DIRECTIVE OBJECTS
-                my $new = \@($1, \%('start_line' => $self->{?'line_count'}), $2)
+                my $new = \(@: $1, \%('start_line' => $self->{?'line_count'}), $2)
                 # Note that in "=head1 foo", the WS is lost.
                 # Example: ['=head1', {'start_line' => 123}, ' foo']
 
@@ -225,13 +225,13 @@ sub parse_lines             # Usage: $parser->parse_lines(@lines)
                     $self->_ponder_paragraph_buffer()
                     # by now it's safe to consider the previous paragraph as done.
                     DEBUG +> 1 and print $^STDOUT, "Starting verbatim para at line $self->{?'line_count'}\n"
-                    push $paras->@, \@('~Verbatim', \%('start_line' => $self->{?'line_count'}), $line)
+                    push $paras->@, \@: '~Verbatim', \%('start_line' => $self->{?'line_count'}), $line
                 
             else
                 ++$self->{+'pod_para_count'}
                 $self->_ponder_paragraph_buffer()
                 # by now it's safe to consider the previous paragraph as done.
-                push $paras->@, \@('~Para',  \%('start_line' => $self->{?'line_count'}), $line)
+                push $paras->@, \@: '~Para',  \%('start_line' => $self->{?'line_count'}), $line
                 DEBUG +> 1 and print $^STDOUT, "Starting plain para at line $self->{?'line_count'}\n"
             
             $self->{+'last_was_blank'} = $self->{+'start_of_pod_block'} = 0
@@ -289,7 +289,7 @@ sub _handle_encoding_line($self, $line)
         require Pod::Simple::Transcode
         $self->{+'_transcoder'} = Pod::Simple::Transcode->make_transcoder($e)
         try {
-            my @x = @('', "abc", "123");
+            my @x = (@: '', "abc", "123");
             $self->{?'_transcoder'}->(< @x);
         }
         $^EVAL_ERROR && die( $enc_error =
@@ -316,10 +316,10 @@ sub _handle_encoding_line($self, $line)
             last
         
         my $encmodver = Pod::Simple::Transcode->encmodver
-        $enc_error = join '', @(
-            "This document probably does not appear as it should, because its ",
-            "\"=encoding $e\" line calls for an unsupported encoding.",
-            $suggestion, "  [$encmodver\'s supported encodings are: $(join ' ',@supported)]")
+        $enc_error = join '', @: 
+            "This document probably does not appear as it should, because its "
+            "\"=encoding $e\" line calls for an unsupported encoding."
+            $suggestion, "  [$encmodver\'s supported encodings are: $(join ' ',@supported)]"
         
 
         $self->scream( $self->{?'line_count'}, $enc_error )
@@ -333,7 +333,7 @@ sub _handle_encoding_line($self, $line)
 
 sub _handle_encoding_second_level($self, $para)
     my @x = $para->@
-    my $content = join ' ', @( splice @x, 2)
+    my $content = join ' ', @:  splice @x, 2
     $content =~ s/^\s+//s
     $content =~ s/\s+$//s
 
@@ -378,10 +378,10 @@ do
 
         foreach my $line (sort {$a <+> $b}, keys $self->{?'errata'})
             push @out,
-                \@('=item', \%('start_line' => $m), "Around line $line:"),
-                < map( { \@('~Para', \%('start_line' => $m, '~cooked' => 1),
-                            #['~Top', {'start_line' => $m},
-                            $_
+                \(@: '=item', \%('start_line' => $m), "Around line $line:"),
+                < map( { \(@: '~Para', \%('start_line' => $m, '~cooked' => 1)
+                              #['~Top', {'start_line' => $m},
+                              $_
                     #]
                     ) }, $self->{'errata'}{$line}
                 )
@@ -391,18 +391,18 @@ do
         # TODO: report of unknown entities? unrenderable characters?
 
         unshift @out,
-            \@('=head1', \%('start_line' => $m, 'errata' => 1), 'POD ERRORS'),
-            \@('~Para', \%('start_line' => $m, '~cooked' => 1, 'errata' => 1),
-               "Hey! ",
-               \@('B', \$%,
-          'The above document had some coding errors, which are explained below:'
-               )
+            \(@: '=head1', \%('start_line' => $m, 'errata' => 1), 'POD ERRORS'),
+            \(@: '~Para', \%('start_line' => $m, '~cooked' => 1, 'errata' => 1)
+                 "Hey! "
+                 \@: 'B', \$%
+                   'The above document had some coding errors, which are explained below:'
+                     
             ),
-            \@('=over',  \%('start_line' => $m, 'errata' => 1), ''),
+            \(@: '=over',  \%('start_line' => $m, 'errata' => 1), ''),
         
 
         push @out,
-            \@('=back',  \%('start_line' => $m, 'errata' => 1), ''),
+            \(@: '=back',  \%('start_line' => $m, 'errata' => 1), ''),
         
 
         DEBUG and print $^STDOUT, "\n<<\n", < pretty(\@out), "\n>>\n\n"
@@ -555,7 +555,7 @@ sub _ponder_paragraph_buffer($self)
                     $para->[1]->{?'start_line'},
                     "You forgot a '=back' before '$para_type'"
                     )
-                unshift $paras->@, \@('=back', \$%, ''), $para   # close the =over
+                unshift $paras->@, \(@: '=back', \$%, ''), $para   # close the =over
                 next
             
 
@@ -569,7 +569,7 @@ sub _ponder_paragraph_buffer($self)
                         "'=item' outside of any '=over'"
                         )
                     unshift $paras->@,
-                        \@('=over', \%('start_line' => $para->[1]->{?'start_line'}), ''),
+                        \(@: '=over', \%('start_line' => $para->[1]->{?'start_line'}), ''),
                         $para
                     
                     next
@@ -855,14 +855,14 @@ sub _ponder_for($self,$para,$curr_open,$paras)
     $para->[0] = 'Data'
 
     unshift $paras->@,
-        \@('=begin',
-           \%('start_line' => $para->[1]->{?'start_line'}, '~really' => '=for'),
-           $target,
+        \(@: '=begin'
+             \%('start_line' => $para->[1]->{?'start_line'}, '~really' => '=for')
+             $target
         ),
         $para,
-        \@('=end',
-           \%('start_line' => $para->[1]->{?'start_line'}, '~really' => '=for'),
-           $target,
+        \(@: '=end'
+             \%('start_line' => $para->[1]->{?'start_line'}, '~really' => '=for')
+             $target
         ),
     
 
@@ -870,7 +870,7 @@ sub _ponder_for($self,$para,$curr_open,$paras)
 
 
 sub _ponder_begin($self,$para,$curr_open,$paras)
-    my $content = join ' ', @( splice $para->@, 2)
+    my $content = join ' ', @:  splice $para->@, 2
     $content =~ s/^\s+//s
     $content =~ s/\s+$//s
     unless(length($content))
@@ -902,9 +902,9 @@ sub _ponder_begin($self,$para,$curr_open,$paras)
 
     my $dont_ignore # whether this target matches us
 
-    foreach my $target_name (@( <
-                                split(',', $content, -1),
-                                $neg ?? () !! '*')
+    foreach my $target_name (@:  <
+                                     split(',', $content, -1)
+                                 $neg ?? () !! '*'
         )
         DEBUG +> 2 and
             print $^STDOUT, " Considering whether =begin $content matches $target_name\n"
@@ -954,7 +954,7 @@ sub _ponder_begin($self,$para,$curr_open,$paras)
 
 
 sub _ponder_end($self,$para,$curr_open,$paras)
-    my $content = join ' ', @( splice $para->@, 2)
+    my $content = join ' ', @:  splice $para->@, 2
     $content =~ s/^\s+//s
     $content =~ s/\s+$//s
     DEBUG and print $^STDOUT, "Ogling '=end $content' directive\n"
@@ -1094,7 +1094,7 @@ sub _ponder_over($self,$para,$curr_open,$paras)
     push $curr_open->@, $para
     # yes, we reuse the paragraph as a stack item
 
-    my $content = join ' ', @( splice $para->@, 2)
+    my $content = join ' ', @:  splice $para->@, 2
     my $overness
     if($content =~ m/^\s*$/s)
         $para->[1]->{+'indent'} = 4
@@ -1126,7 +1126,7 @@ sub _ponder_over($self,$para,$curr_open,$paras)
 sub _ponder_back($self,$para,$curr_open,$paras)
     # TODO: fire off </item-number> or </item-bullet> or </item-text> ??
 
-    my $content = join ' ', @( splice $para->@, 2)
+    my $content = join ' ', @:  splice $para->@, 2
     if($content =~ m/\S/)
         $self->whine(
             $para->[1]->{?'start_line'},
@@ -1161,7 +1161,7 @@ sub _ponder_item($self,$para,$curr_open,$paras)
             "'=item' outside of any '=over'"
             )
         unshift $paras->@,
-            \@('=over', \%('start_line' => $para->[1]->{?'start_line'}), ''),
+            \(@: '=over', \%('start_line' => $para->[1]->{?'start_line'}), ''),
             $para
         
         return 1
@@ -1327,7 +1327,7 @@ sub _ponder_Plain($self,$para)
         )
         push $para->@,
             < $self->_make_treelet(
-            join("\n", @( splice($para->@, 2))),
+            join("\n", (@:  splice($para->@, 2))),
             $para->[1]->{'start_line'}
             )->@
     
@@ -1360,12 +1360,12 @@ sub _ponder_Verbatim($self,$para)
     elsif ($self->{?'codes_in_verbatim'})
         push $para->@,
             < $self->_make_treelet(
-            join("\n", @( splice($para->@, 2))),
+            join("\n", (@:  splice($para->@, 2))),
             $para->[1]->{?'start_line'}, $para->[1]->{'xml:space'}
             )->@
         $para->[-1] =~ s/\n+$//s # Kill any number of terminal newlines
     else
-        push $para->@, join "\n", @( splice($para->@, 2)) if (nelems $para->@) +> 3
+        push $para->@, join "\n", (@:  splice($para->@, 2)) if (nelems $para->@) +> 3
         $para->[-1] =~ s/\n+$//s # Kill any number of terminal newlines
     
     return
@@ -1374,7 +1374,7 @@ sub _ponder_Verbatim($self,$para)
 sub _ponder_Data($self,$para)
     DEBUG and print $^STDOUT, " giving data treatment...\n"
     $para->[1]->{+'xml:space'} = 'preserve'
-    push $para->@, join "\n", @( splice($para->@, 2)) if (nelems $para->@) +> 3
+    push $para->@, join "\n", (@:  splice($para->@, 2)) if (nelems $para->@) +> 3
     return
 
 
@@ -1511,18 +1511,18 @@ sub _verbatim_format($it, $p)
                     substr($p->[$i-1], pos($formatting)-length($1), length($1))
             else
                 #print "SNARING $+\n";
-                push @new_line, \@(
+                push @new_line, \(@: 
                     (
-                    $3 ?? 'VerbatimB'  !!
-                    $4 ?? 'VerbatimI'  !!
-                    $5 ?? 'VerbatimBI' !! die("Should never get called")
-                    ), \$%,
+                        $3 ?? 'VerbatimB'  !!
+                        $4 ?? 'VerbatimI'  !!
+                        $5 ?? 'VerbatimBI' !! die("Should never get called")
+                        ), \$%
                     substr($p->[$i-1], pos($formatting)-length($1), length($1))
                     )
             #print "Formatting <$new_line[-1][-1]> as $new_line[-1][0]\n";
             
         
-        my @nixed = @(
+        my @nixed = (@: 
             splice $p->@, $i-1, 2, < @new_line ) # replace myself and the next line
         DEBUG +> 10 and print $^STDOUT, "Nixed count: ", scalar(nelems @nixed), "\n"
 
@@ -1571,7 +1571,7 @@ sub _verbatim_format($it, $p)
 
 sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space)
 
-    my $treelet = \@('~Top', \%('start_line' => $start_line),)
+    my $treelet = \@: '~Top', \%('start_line' => $start_line),
 
     unless ($preserve_space || $self->{?'preserve_whitespace'})
         use utf8
@@ -1586,7 +1586,7 @@ sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space)
     # N<< >>.  But then, word wrapping does that too!  So don't do that!
 
     my @stack
-    my @lineage = @($treelet)
+    my @lineage = @: $treelet
 
     DEBUG +> 4 and print $^STDOUT, "Paragraph:\n$para\n\n"
 
@@ -1653,7 +1653,7 @@ sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space)
                 DEBUG +> 3 and print $^STDOUT, "Found simple start-text code \"$1\"\n"
                 push @stack, 0  # signal that we're looking for simple
             
-            push @lineage, \@( substr($1,0,1), \$%, )  # new node object
+            push @lineage, \(@:  substr($1,0,1), \$%, )  # new node object
             push  @lineage[-2]->@, @lineage[-1]
 
         elsif(defined $4)

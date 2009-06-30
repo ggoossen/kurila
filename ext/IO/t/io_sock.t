@@ -208,7 +208,7 @@ my $src
 if( !open( $src, "<", "$^PROGRAM_NAME"))
     print $^STDOUT, "not ok 15 - $^OS_ERROR\n"
 else
-    @data = @( ~< $src->* )
+    @data = @:  ~< $src->* 
     close($src)
     print $^STDOUT, "ok 15\n"
 

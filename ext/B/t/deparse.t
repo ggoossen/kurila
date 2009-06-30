@@ -11,7 +11,7 @@ ok($deparse)
 
 # Tell B::Deparse about our ambient pragmas
 do { my ($hint_bits, $warning_bits, $hinthash);
-    BEGIN { @($hint_bits, $warning_bits, $hinthash) = @($^HINT_BITS, $^WARNING_BITS, \$^HINTS); }
+    BEGIN { (@: $hint_bits, $warning_bits, $hinthash) = (@: $^HINT_BITS, $^WARNING_BITS, \$^HINTS); }
     $deparse->ambient_pragmas (
         hint_bits    => $hint_bits,
         warning_bits => $warning_bits,
@@ -24,13 +24,13 @@ while ( ~< $^DATA)
     chomp
     my ($num, $testname, $todo)
     if (s/#\s*(.*)$//mg)
-        @($num, $todo, $testname) = @: $1 =~ m/(\d*)\s*(TODO)?\s*(.*)/
+        (@: $num, $todo, $testname) = @: $1 =~ m/(\d*)\s*(TODO)?\s*(.*)/
     
     my ($input, $expected)
     if (m/(.*)\n>>>>\n(.*)/s)
-        @($input, $expected) = @($1, $2)
+        (@: $input, $expected) = @: $1, $2
     else
-        @($input, $expected) = @($_, $_)
+        (@: $input, $expected) = @: $_, $_
     
 
     local our $TODO = $todo
@@ -61,7 +61,7 @@ TODO: do
     my $a = 0
     is("\{\n    (-1) ** \$a;\n\}", $deparse->coderef2text(sub (@< @_){(-1) ** $a }))
 
-    use constant cr => \@('hello');
+    use constant cr => \(@: 'hello');
     my $string = "sub " . $deparse->coderef2text(\&cr)
     my $subref = eval $string
     die "Failed eval '$string': $($^EVAL_ERROR->message)" if $^EVAL_ERROR
@@ -108,16 +108,16 @@ do
 #handle warnings::register-ed packages properly.
 package B::Deparse::Wrapper
 
-use warnings;
-use warnings::register;
+use warnings
+use warnings::register
 sub getcode
     my $deparser = B::Deparse->new()
     return $deparser->coderef2text(shift)
 
 
-package main;
+package main
 
-use warnings;
+use warnings
 sub test
     my $val = shift
     my $res = B::Deparse::Wrapper::getcode($val)
@@ -127,7 +127,7 @@ sub testsub
     42
 
 my ($q,$p)
-my $x=sub { @( ++$q,++$p ) }
+my $x=sub { (@:  ++$q,++$p ) }
 test($x)
 eval <<EOFCODE and test($x)
    package bar;

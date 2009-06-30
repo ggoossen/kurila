@@ -344,7 +344,7 @@ sub cmd_item
 sub cmd_begin
     my $self = shift
     local $_ = shift
-    my @($kind) = @: m/^(\S+)/
+    my (@: $kind) = @: m/^(\S+)/
         or return
     if ($kind eq 'text')
         $self->%{+VERBATIM} = 1
@@ -403,16 +403,16 @@ sub seq_l
     # name.  Note that L<manpage/> forces a manpage interpretation, as does
     # something looking like L<manpage(section)>.  The latter is an
     # enhancement over the original Pod::Text.
-    my @($manpage, $section) = @('', $_)
+    my (@: $manpage, $section) = @: '', $_
     if (m/^(?:https?|ftp|news):/)
         # a URL
         return $_
     elsif (m/^"\s*(.*?)\s*"$/)
         $section = '"' . $1 . '"'
     elsif (m/^[-:.\w]+(?:\(\S+\))?$/)
-        @($manpage, $section) = @($_, '')
+        (@: $manpage, $section) = @: $_, ''
     elsif (m%/%)
-        @($manpage, $section) =  split (m/\s*\/\s*/, $_, 2)
+        (@: $manpage, $section) =  split (m/\s*\/\s*/, $_, 2)
     
 
     my $text = ''

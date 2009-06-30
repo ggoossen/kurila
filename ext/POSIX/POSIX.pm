@@ -6,12 +6,12 @@ our(@ISA, %EXPORT_TAGS, @EXPORT_OK, @EXPORT)
 
 our $VERSION = "1.13"
 
-use XSLoader ();
+use XSLoader ()
 
 use Fcntl < qw(FD_CLOEXEC F_DUPFD F_GETFD F_GETFL F_GETLK F_RDLCK F_SETFD
              F_SETFL F_SETLK F_SETLKW F_UNLCK F_WRLCK O_ACCMODE O_APPEND
              O_CREAT O_EXCL O_NOCTTY O_NONBLOCK O_RDONLY O_RDWR O_TRUNC
-             O_WRONLY);
+             O_WRONLY)
 
 # Grandfather old foo_h form to new :foo_h form
 my $loaded
@@ -26,7 +26,7 @@ sub import
 
 XSLoader::load 'POSIX', $VERSION
 
-my %NON_CONSTS = %(< @+: map {@($_,1)},
+my %NON_CONSTS = %(< @+: map {(@: $_,1)},
     qw(S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG WEXITSTATUS
                      WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG))
 
@@ -536,7 +536,7 @@ sub chmod
 sub fstat
     usage "fstat(fd)" if (nelems @_) != 1
     CORE::open(my $tmp, "<&", @_[0])            # Gross.
-    my @l = @( CORE::stat($tmp) )
+    my @l = @:  CORE::stat($tmp) 
     CORE::close($tmp)
     @l
 

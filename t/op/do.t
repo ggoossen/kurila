@@ -10,7 +10,7 @@ sub ok($ok, ?$name)
         $test,
         defined $name ?? " - $name" !! ''
 
-    printf $^STDOUT, "# Failed test at line \%d\n", @(caller)[2] unless $ok
+    printf $^STDOUT, "# Failed test at line \%d\n", (@: caller)[2] unless $ok
 
     $test++
     return $ok

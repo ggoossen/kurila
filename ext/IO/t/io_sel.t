@@ -5,13 +5,13 @@ iohandle::output_autoflush($^STDOUT, 1)
 
 print $^STDOUT, "1..21\n"
 
-use IO::Select v1.09;
+use IO::Select v1.09
 
 my $sel = IO::Select->new($^STDIN)
 $sel->add(4, 5) == 2 or print $^STDOUT, "not "
 print $^STDOUT, "ok 1\n"
 
-$sel->add(\@($^STDOUT, 'foo')) == 1 or print $^STDOUT, "not "
+$sel->add(\(@: $^STDOUT, 'foo')) == 1 or print $^STDOUT, "not "
 print $^STDOUT, "ok 2\n"
 
 my @handles = $sel->handles
@@ -38,7 +38,7 @@ $sel = IO::Select->new()
 print $^STDOUT, "not " unless $sel->count == 0 && !defined($sel->bits)
 print $^STDOUT, "ok 8\n"
 
-$sel->remove(\@($^STDOUT, 5))
+$sel->remove(\(@: $^STDOUT, 5))
 print $^STDOUT, "not " unless $sel->count == 0 && !defined($sel->bits)
 print $^STDOUT, "ok 9\n"
 
@@ -47,13 +47,13 @@ print $^STDOUT, "not " unless (nelems @a) == 0
 print $^STDOUT, "ok 10\n"
 
 # we assume that we can write to STDOUT :-)
-$sel->add(\@($^STDOUT, "ok 12\n"))
+$sel->add(\(@: $^STDOUT, "ok 12\n"))
 
 @a = $sel->can_write
 print $^STDOUT, "not " unless (nelems @a) == 1
 print $^STDOUT, "ok 11\n"
 
-my@($fd, $msg) =  (shift @a)->@
+my(@: $fd, $msg) =  (shift @a)->@
 print $fd, $msg
 
 $sel->add($^STDOUT)  # update
@@ -62,7 +62,7 @@ $sel->add($^STDOUT)  # update
 print $^STDOUT, "not " unless (nelems @a) == 3
 print $^STDOUT, "ok 13\n"
 
-my @($r, $w, $e) =  @a
+my (@: $r, $w, $e) =  @a
 
 print $^STDOUT, "not " unless (nelems $r->@) == 0 && (nelems $w->@) == 1 && (nelems $e->@) == 0
 print $^STDOUT, "ok 14\n"
@@ -74,7 +74,7 @@ print $fd, "ok 15\n"
 $sel->exists($^STDIN) and print $^STDOUT, "not "
 print $^STDOUT, "ok 16\n"
 
-($sel->exists(0) || $sel->exists(\@($^STDERR))) and print $^STDOUT, "not "
+($sel->exists(0) || $sel->exists(\(@: $^STDERR))) and print $^STDOUT, "not "
 print $^STDOUT, "ok 17\n"
 
 $fd = $sel->exists($^STDOUT)
@@ -84,7 +84,7 @@ else
     print $^STDOUT, "not ok 18\n"
 
 
-$fd = $sel->exists(\@(1, 'foo'))
+$fd = $sel->exists(\(@: 1, 'foo'))
 if ($fd)
     print $fd, "ok 19\n"
 else

@@ -110,7 +110,7 @@ sub hash
 
 # This will crash perl if it fails
 
-use constant PVBM => 'foo';
+use constant PVBM => 'foo'
 
 my $dummy = index 'foo', PVBM
 try { my %h = %(a => PVBM); 1 }

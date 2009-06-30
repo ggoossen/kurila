@@ -6,7 +6,7 @@ use File::Spec
 use Test::More
 plan tests => 7
 
-use Pod::Usage;
+use Pod::Usage
 
 # Test verbose level 0
 my $vbl_0 = << 'EOMSG'
@@ -26,7 +26,7 @@ pod2usage(\%( verbose => 0, exit => 'noexit', output => $fake_out_fh,
 is( $fake_out->$, "$msg\n$vbl_0", 'message parameter' )
 
 SKIP: do
-    my @( $file, $path, _ ) =  fileparse( $^PROGRAM_NAME )
+    my (@:  $file, $path, _ ) =  fileparse( $^PROGRAM_NAME )
     skip( 'File in current directory', 2 ) if -e $file
     $fake_out->$ = ''
     try {
@@ -48,19 +48,19 @@ SKIP: do # Test exit status from pod2usage()
     skip "Exit status broken on Mac OS", 1 if $^OS_NAME eq 'MacOS'
     my $exit = ($^OS_NAME eq 'VMS' ?? 2 !! 42)
     my $dev_null = File::Spec->devnull
-    my $args = join ", ", @( (
-        "verbose => 0",
-        "exit    => $exit",
-        "output  => q\{$dev_null\}",
-        "input   => q\{$^PROGRAM_NAME\}",
-        ))
+    my $args = join ", ", @:  (
+                                  "verbose => 0"
+                              "exit    => $exit"
+                              "output  => q\{$dev_null\}"
+                              "input   => q\{$^PROGRAM_NAME\}"
+                                  )
     my $cq = (($^OS_NAME eq 'MSWin32'
                || $^OS_NAME eq 'NetWare'
                || $^OS_NAME eq 'VMS') ?? '"'
               !! "")
-    my @params = @( "$($cq)-I../lib$cq",  "$($cq)-MPod::Usage$cq", '-e' )
+    my @params = @:  "$($cq)-I../lib$cq",  "$($cq)-MPod::Usage$cq", '-e' 
     my $prg = qq[$($cq)pod2usage(\\\%( $args ))$cq]
-    my @cmd = @( $^EXECUTABLE_NAME, < @params, $prg )
+    my @cmd = @:  $^EXECUTABLE_NAME, < @params, $prg 
 
     print $^STDOUT, "# cmd = $(join ' ',@cmd)\n"
 

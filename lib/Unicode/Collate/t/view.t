@@ -80,11 +80,11 @@ $Collator->change(backwards => 2)
 is($Collator->viewSortKey("A\x{300}z\x{301}"),
    "[0A15 0C13 | 0032 0020 0035 0020 | 0008 0002 0002 0002 |]")
 
-$Collator->change(backwards => \@(1,3))
+$Collator->change(backwards => \(@: 1,3))
 is($Collator->viewSortKey("A\x{300}z\x{301}"),
    "[0C13 0A15 | 0020 0035 0020 0032 | 0002 0002 0002 0008 |]")
 
-$Collator->change(backwards => \@(2))
+$Collator->change(backwards => \(@: 2))
 is($Collator->viewSortKey("\x{300}\x{301}\x{302}\x{303}"),
    "[| 004E 003C 0032 0035 | 0002 0002 0002 0002 |]")
 

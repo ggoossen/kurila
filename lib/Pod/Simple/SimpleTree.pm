@@ -7,7 +7,7 @@ use Pod::Simple ()
 our ($ATTR_PAD, @ISA, $VERSION, $SORT_ATTRS)
 $VERSION = '2.02'
 BEGIN 
-    @ISA = @('Pod::Simple')
+    @ISA = @: 'Pod::Simple'
     *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG
 
 
@@ -19,13 +19,13 @@ __PACKAGE__->_accessorize(
 
 sub _handle_element_start # self, tagname, attrhash
     DEBUG +> 2 and print $^STDOUT, "Handling @_[1] start-event\n"
-    my $x = \@(@_[1], @_[2])
+    my $x = \@: @_[1], @_[2]
     if(@_[0]->{?'_currpos'})
         push     @_[0]->{'_currpos'}->[0]->@, $x # insert in parent's child-list
         unshift  @_[0]->{'_currpos'}->@,    $x # prefix to stack
     else
         DEBUG and print $^STDOUT, " And oo, it gets to be root!\n"
-        @_[0]->{+'_currpos'} = \@(   @_[0]->{+'root'} = $x   )
+        @_[0]->{+'_currpos'} = \(@:    @_[0]->{+'root'} = $x   )
     # first event!  set to stack, and set as root.
     
     DEBUG +> 3 and print $^STDOUT, "Stack is now: ",

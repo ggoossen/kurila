@@ -7,10 +7,10 @@ package Pod::Simple::RTF
 
 our ($VERSION, @ISA, %Escape, $WRAP, %Tagmap)
 $VERSION = '2.02'
-use Pod::Simple::PullParser ();
-BEGIN {@ISA = @('Pod::Simple::PullParser')}
+use Pod::Simple::PullParser ()
+BEGIN {@ISA = (@: 'Pod::Simple::PullParser')}
 
-use Carp ();
+use Carp ()
 BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
 
 $WRAP = 1 unless defined $WRAP
@@ -20,7 +20,7 @@ $WRAP = 1 unless defined $WRAP
 sub _openclose
     return @+: map {
                       m/^([-A-Za-z]+)=(\w[^\=]*)$/s or die "what's <$_>?";
-                      @( $1,  "\{\\$2\n",   "/$1",  "\}" );
+                      (@:  $1,  "\{\\$2\n",   "/$1",  "\}" );
                    }, @_
 
 
@@ -324,14 +324,14 @@ sub do_middle      # the main work
 sub do_beginning
     my $self = @_[0]
     my $fh = $self->{?'output_fh'}
-    return print $fh, join '', @( <
-                                  $self->doc_init, <
-                                  $self->font_table, <
-                                  $self->stylesheet, <
-                                  $self->color_table, <
-                                  $self->doc_info, <
-                                  $self->doc_start,
-                                  "\n")
+    return print $fh, join '', @:  <
+                                       $self->doc_init, <
+                                       $self->font_table, <
+                                       $self->stylesheet, <
+                                       $self->color_table, <
+                                       $self->doc_info, <
+                                       $self->doc_start
+                                   "\n"
     
 
 
@@ -503,10 +503,10 @@ sub rtf_esc_codely
 
 
 %Escape = %(
-    < ( @+: map( { @(chr($_),chr($_)) },       # things not apparently needing escaping
+    < ( @+: map( { (@: chr($_),chr($_)) },       # things not apparently needing escaping
             0x20 .. 0x7E ) ),
-    < ( @+: map( { @(chr($_),sprintf("\\'\%02x", $_)) }, @( <    # apparently escapeworthy things
-                                                                    0x00 .. 0x1F, 0x5c, 0x7b, 0x7d, < 0x7f .. 0xFF, 0x46)) ),
+    < ( @+: map( { (@: chr($_),sprintf("\\'\%02x", $_)) }, (@:  <    # apparently escapeworthy things
+                                                                  0x00 .. 0x1F, 0x5c, 0x7b, 0x7d, < 0x7f .. 0xFF, 0x46)) ),
 
     # We get to escape out 'F' so that we can send RTF files thru the mail
     # without the slightest worry that paragraphs beginning with "From"

@@ -6,13 +6,13 @@ BEGIN
 
 use warnings
 
-our @tests = @(
+our @tests = @: 
     # /p      Pattern   PRE     MATCH   POST
-    \@( '/p',   "456",    "123-", "456",  "-789"),
-    \@( '(?p)', "456",    "123-", "456",  "-789"),
-    \@( '',     "(456)",  "123-", "456",  "-789"),
-    \@( '',     "456",    undef,  undef,  undef ),
-    )
+    \(@:  '/p',   "456",    "123-", "456",  "-789")
+    \(@:  '(?p)', "456",    "123-", "456",  "-789")
+    \(@:  '',     "(456)",  "123-", "456",  "-789")
+    \(@:  '',     "456",    undef,  undef,  undef )
+    
 
 plan tests => 4 * (nelems @tests) + 2
 my $W = ""
@@ -22,7 +22,7 @@ sub _u($x, $y) { "$x is ".(defined $y ?? "'$y'" !! "undef") }
 
 $_ = '123-456-789'
 foreach my $test ( @tests)
-    my @($p, $pat,$l,$m,$r) =  $test->@
+    my (@: $p, $pat,$l,$m,$r) =  $test->@
     my $test_name = $p eq '/p'   ?? "/$pat/p"
         !! $p eq '(?p)' ?? "/(?p)$pat/"
         !!                "/$pat/"

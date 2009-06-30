@@ -140,9 +140,9 @@ else
 
 
 if (config_value("myuname") =~ m/^cygwin_nt/i)  # basegroup on CYGWIN_NT has id = 0.
-    %basegroup{[@($pwgid,$pwgnam)]} = @(0,0)
+    %basegroup{[(@: $pwgid,$pwgnam)]} = @: 0,0
 else
-    %basegroup{[@($pwgid,$pwgnam)]} = @(1,1)
+    %basegroup{[(@: $pwgid,$pwgnam)]} = @: 1,1
 
 $gr2 = join(' ', grep( {!%basegroup{+$_}++ }, sort split(' ',$groups)))
 

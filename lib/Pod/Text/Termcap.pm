@@ -22,7 +22,7 @@ use POSIX ()
 use Term::Cap
 
 our (@ISA, $VERSION)
-use utf8;
+use utf8
 
 @ISA = qw(Pod::Text)
 

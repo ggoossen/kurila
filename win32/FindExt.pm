@@ -2,7 +2,7 @@ package FindExt
 
 our $VERSION = '1.02'
 
-use warnings;
+use warnings
 
 my $no = join('|',qw(GDBM_File ODBM_File NDBM_File DB_File
 		     Syslog SysV Langinfo))
@@ -76,7 +76,7 @@ sub is_static
 # NOTE: recursion limit of 10 to prevent runaway in case of symlink madness
 sub find_ext
     opendir my $dh, '.'
-    my @items = grep { !m/^\.\.?$/ }, @( readdir $dh)
+    my @items = grep { !m/^\.\.?$/ }, @:  readdir $dh
     closedir $dh
     for my $xxx ( @items)
         if ($xxx ne "DynaLoader")

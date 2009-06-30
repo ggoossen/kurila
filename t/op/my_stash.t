@@ -6,7 +6,7 @@ use Test::More
 
 plan tests => 3
 
-use constant MyClass => 'Foo::Bar::Biz::Baz';
+use constant MyClass => 'Foo::Bar::Biz::Baz'
 
 do
     package Foo::Bar::Biz::Baz

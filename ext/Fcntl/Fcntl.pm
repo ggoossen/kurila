@@ -58,7 +58,7 @@ See L<perlfunc/stat> about the S_I* constants.
 our($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS)
 
 require Exporter
-use XSLoader ();
+use XSLoader ()
 @ISA = qw(Exporter)
 BEGIN 
     $VERSION = "1.06"
@@ -214,7 +214,7 @@ BEGIN
     XSLoader::load 'Fcntl', $VERSION
 
 
-sub S_IFMT  { (nelems @_) ??  @( @_[0] ^&^ _S_IFMT() ) !! _S_IFMT()  }
+sub S_IFMT  { (nelems @_) ??  (@:  @_[0] ^&^ _S_IFMT() ) !! _S_IFMT()  }
 sub S_IMODE { @_[0] ^&^ 07777 }
 
 sub S_ISREG    { ( @_[0] ^&^ _S_IFMT() ) == S_IFREG()   }

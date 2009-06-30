@@ -74,7 +74,7 @@ require Exporter
 our @ISA = qw(Exporter)
 our @EXPORT = qw(%Kinds %Type %Flavor %Type_Description @Type_Order)
 
-use Perl6::Form;
+use Perl6::Form
 
 our(%Kinds, %Type, %Flavor)
 
@@ -128,7 +128,7 @@ while ( ~< $^DATA)
     chomp
     s/#.*//
     next unless $_
-    my@($name, $type, $text) =  split " ", $_, 3
+    my(@: $name, $type, $text) =  split " ", $_, 3
     %Type{+$name} = $type
     %Flavor{+$name} = $text
     for my $t ( split m/[,\s]+/, $type )

@@ -28,7 +28,7 @@ package Pod::Text::Overstrike
 use Pod::Text ()
 
 our (@ISA, $VERSION)
-use utf8;
+use utf8
 
 @ISA = qw(Pod::Text)
 

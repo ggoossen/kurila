@@ -20,7 +20,7 @@ $^OUTPUT_AUTOFLUSH=1
 my @prgs = $@
 while( ~< $^DATA)
     if(m/^#{8,}\s*(.*)/)
-        push @prgs, \@('', $1)
+        push @prgs, \@: '', $1
     else
         @prgs[-1]->[0] .= $_
     
@@ -28,14 +28,14 @@ while( ~< $^DATA)
 plan tests => scalar nelems @prgs
 
 foreach my $prog ( @prgs)
-    my@($raw_prog, $name) =  $prog->@
+    my(@: $raw_prog, $name) =  $prog->@
 
     my $switch
     if ($raw_prog =~ s/^\s*(-\w.*)\n//)
         $switch = $1
     
 
-    my@($prog,?$expected) =  split(m/\nEXPECT\n/, $raw_prog)
+    my(@: $prog,?$expected) =  split(m/\nEXPECT\n/, $raw_prog)
     $prog .= "\n"
     $expected = '' unless defined $expected
 
@@ -48,7 +48,7 @@ foreach my $prog ( @prgs)
 
     $expected =~ s/\n+$//
 
-    fresh_perl_is($prog, $expected, \%( switches => \@($switch || '') ), $name)
+    fresh_perl_is($prog, $expected, \%( switches => \(@: $switch || '') ), $name)
 
 
 __END__

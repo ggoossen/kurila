@@ -27,7 +27,7 @@ use Config
 
 # Change 'perl' to './perl' so the shell doesn't go looking through PATH.
 sub safe_rel
-    my@($perl) =@( shift)
+    my(@: $perl) =@:  shift
     $perl = File::Spec->catfile(File::Spec->curdir, $perl) unless
         File::Spec->file_name_is_absolute($perl)
 

@@ -4,9 +4,9 @@ use warnings
 use File::Spec
 our $VERSION = '1.06'
 
-use bytes ();		# for $bytes::hint_bits
+use bytes ()		# for $bytes::hint_bits
 
-use utf8;
+use utf8
 
 my %alias1 = %(
     # Icky 3.2 names with parentheses.
@@ -57,13 +57,13 @@ sub alias_file($arg)
     else
         die "Charnames alias files can only have identifier characters"
     
-    if (my @alias = @( evalfile $file ))
+    if (my @alias = (@:  evalfile $file ))
         (nelems @alias) == 1 && !defined @alias[0] and
             die "$file cannot be used as alias file for charnames"
         (nelems @alias) % 2 and
             die "$file did not return a (valid) list of alias pairs"
         alias (< @alias)
-        return  @(1)
+        return  @: 1
     
     0
  # alias_file
@@ -106,7 +106,7 @@ sub charnames
         ## The short name is like "greek:Sigma"
         unless (defined $hexstr)
             if ($^HINTS{?charnames_short} and $name =~ m/^(.+?):(.+)/s)
-                my @($script, $cname) = @($1, $2)
+                my (@: $script, $cname) = @: $1, $2
                 my $case = $cname =~ m/[[:upper:]]/ ?? "CAPITAL" !! "SMALL"
                 my $uc_cname = uc($cname)
                 my $uc_script = uc($script)
@@ -155,7 +155,7 @@ sub import
     ##
     ## fill %h keys with our @_ args.
     ##
-    my @($promote, %h, @args) = @(0, $%, $@)
+    my (@: $promote, %h, @args) = @: 0, $%, $@
     while (my $arg = shift)
         if ($arg eq ":alias")
             (nelems @_) or
@@ -182,8 +182,8 @@ sub import
         
         push @args, $arg
     
-    (nelems @args) == 0 && $promote and @args = @(":full")
-    %h{[ @args]} = @(1) x nelems @args
+    (nelems @args) == 0 && $promote and @args = @: ":full"
+    %h{[ @args]} = (@: 1) x nelems @args
 
     $^HINTS{+charnames_full} = delete %h{':full'}
     $^HINTS{+charnames_short} = delete %h{':short'}

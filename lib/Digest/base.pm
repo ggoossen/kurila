@@ -39,7 +39,7 @@ sub add_bits
         $bits = pack("B*", $arg)
         $nbits = length($arg)
     else
-        @($bits, $nbits) =  @_
+        (@: $bits, $nbits) =  @_
     
     if (($nbits % 8) != 0)
         require Carp

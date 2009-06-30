@@ -32,18 +32,18 @@ sub reach($self, $point, $note)
     if( (my $now = time) +>= $self->{?'quiet_until'})
         my $goal
         my    $to = $self->{?'to'}
-        print $to, join('', @(
-            ($self->{?'quiet_until'} == 1) ?? () !! '... ',
+        print $to, join('', @: 
+            ($self->{?'quiet_until'} == 1) ?? () !! '... '
             (defined $point) ?? (
-            '#',
+                '#'
             ($goal = $self->{?'goal'}) ?? (
-          ' ' x (length($goal) - length($point)),
-          $point, '/', $goal,
-          ) !! $point,
-            $note ?? ': ' !! (),
-            ) !! (),
-            $note || '',
-            "\n")
+                ' ' x (length($goal) - length($point))
+            $point, '/', $goal
+                ) !! $point
+            $note ?? ': ' !! ()
+                ) !! ()
+            $note || ''
+            "\n"
             )
         $self->{+'quiet_until'} = $now + $self->{?'delay'}
     

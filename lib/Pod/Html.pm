@@ -8,12 +8,12 @@ $VERSION = 1.09
 @EXPORT = qw(pod2html htmlify)
 @EXPORT_OK = qw(anchorify)
 
-use Carp;
-use Config;
-use Cwd;
-use File::Spec;
-use File::Spec::Unix;
-use Getopt::Long;
+use Carp
+use Config
+use Cwd
+use File::Spec
+use File::Spec::Unix
+use Getopt::Long
 
 #use utf8;	# variable length lookbehind "(?<=\s" is not yet supported
 
@@ -388,7 +388,7 @@ sub pod2html
     # read the pod a paragraph at a time
     warn "Scanning for sections in input file(s)\n" if $Verbose
     $^INPUT_RECORD_SEPARATOR = ""
-    my @poddata  = @( ~< $pod )
+    my @poddata  = @:  ~< $pod 
     close($pod)
 
     # be eol agnostic
@@ -398,12 +398,12 @@ sub pod2html
                 @poddata = @+: map { s/\r\n/\n/g;
                     m/\n\n/ ??
                         map { "$_\n\n" }, split m/\n\n/ !!
-                        @($_) }, @poddata
+                        (@: $_) }, @poddata
             else
                 @poddata = @+: map { s/\r/\n/g;
                     m/\n\n/ ??
                         map { "$_\n\n" }, split m/\n\n/ !!
-                        @($_) }, @poddata
+                        (@: $_) }, @poddata
             
             last
         
@@ -427,9 +427,9 @@ sub pod2html
         TITLE_SEARCH: do
             for my $i (0 .. nelems(@poddata) -1)
                 if (@poddata[$i] =~ m/^=head1\s*NAME\b/m)
-                    for my $para ( @poddata[[@($i, $i+1)]] )
+                    for my $para ( @poddata[[(@: $i, $i+1)]] )
                         last TITLE_SEARCH
-                            if @(?$Title) = @: $para =~ m/(\S+\s+-+.*\S)/s
+                            if (@: ?$Title) = @: $para =~ m/(\S+\s+-+.*\S)/s
                     
                 
 
@@ -439,7 +439,7 @@ sub pod2html
     if (!$Title and $Podfile =~ m/\.pod\z/)
         # probably a split pod so take first =head[12] as title
         for my $i (0 .. nelems(@poddata) -1)
-            last if @($Title) = @: @poddata[$i] =~ m/^=head[12]\s*(.*)/
+            last if (@: $Title) = @: @poddata[$i] =~ m/^=head[12]\s*(.*)/
         
         warn "adopted '$Title' as title for $Podfile\n"
             if $Verbose and $Title
@@ -735,7 +735,7 @@ sub parse_command_line
 my $Saved_Cache_Key
 
 sub get_cache
-    my@($dircache, $itemcache, $podpath, $podroot, $recurse) =  @_
+    my(@: $dircache, $itemcache, $podpath, $podroot, $recurse) =  @_
     my @cache_key_args = @_
 
     # A first-level cache:
@@ -764,8 +764,8 @@ sub get_cache
 
 
 sub cache_key($dircache, $itemcache, $podpath, $podroot, $recurse)
-    return join('!', @( $dircache, $itemcache, $recurse,
-                        < $podpath->@, $podroot, stat($dircache), stat($itemcache)))
+    return join('!', (@:  $dircache, $itemcache, $recurse
+                          < $podpath->@, $podroot, stat($dircache), stat($itemcache)))
 
 
 #
@@ -875,14 +875,14 @@ sub scan_podpath($podroot, $recurse, $append)
             $dirname = $1
             opendir(my $dir, $dirname) ||
                 die "$^PROGRAM_NAME: error opening directory $dirname: $^OS_ERROR\n"
-            @files = grep( {m/(\.pod|\.pm)\z/ && ! -d $_ }, @( readdir($dir)))
+            @files = grep( {m/(\.pod|\.pm)\z/ && ! -d $_ }, (@:  readdir($dir)))
             closedir($dir)
 
             # scan each .pod and .pm file for =item directives
             foreach my $pod ( @files)
                 open(my $pod_fh, "<", "$dirname/$pod") ||
                     die "$^PROGRAM_NAME: error opening $dirname/$pod for input: $^OS_ERROR\n"
-                @poddata = @( ~< $pod_fh->* )
+                @poddata = @:  ~< $pod_fh->* 
                 close($pod_fh)
                 clean_data( \@poddata )
 
@@ -901,7 +901,7 @@ sub scan_podpath($podroot, $recurse, $append)
             my $pod = $1
             open(my $pod_fh, "<", "$pod") ||
                 die "$^PROGRAM_NAME: error opening $pod for input: $^OS_ERROR\n"
-            @poddata = @( ~< $pod_fh->* )
+            @poddata = @:  ~< $pod_fh->* 
             close($pod_fh)
             clean_data( \@poddata )
 
@@ -1016,7 +1016,7 @@ sub scan_headings($sections, @< @data)
     #  pointing to each of them.
     foreach my $line ( @data)
         if ($line =~ m/^=(head)([1-6])\s+(.*)/)
-            @($tag, $which_head, $otitle) = @($1,$2,$3)
+            (@: $tag, $which_head, $otitle) = @: $1,$2,$3
 
             my $title = depod( $otitle )
             my $name = anchorify( $title )
@@ -1457,7 +1457,7 @@ sub process_puretext($text, $notinIS)
             )
             # has parenthesis so should have been a C<> ref
             ## try for a pagename (perlXXX(1))?
-            my@( $func, $args, $rest ) = @( $1, $2, $3 || '' )
+            my(@:  $func, $args, $rest ) = @:  $1, $2, $3 || '' 
             if( $args =~ m/^\d+$/ )
                 my $url = page_sect( $word, '' )
                 if( defined $url )
@@ -1479,9 +1479,9 @@ sub process_puretext($text, $notinIS)
             $word = qq(<a href="$word">$word</a>)
         elsif ($word =~ m/[\w.-]+\@[\w-]+\.\w/)
             # looks like an e-mail address
-            my @($w1, $w2, $w3) = @("", $word, "")
-            @($w1, $w2, $w3) = @("(", $1, ")$2") if $word =~ m/^\((.*?)\)(,?)/
-            @($w1, $w2, $w3) = @("&lt;", $1, "&gt;$2") if $word =~ m/^<(.*?)>(,?)/
+            my (@: $w1, $w2, $w3) = @: "", $word, ""
+            (@: $w1, $w2, $w3) = (@: "(", $1, ")$2") if $word =~ m/^\((.*?)\)(,?)/
+            (@: $w1, $w2, $w3) = (@: "&lt;", $1, "&gt;$2") if $word =~ m/^<(.*?)>(,?)/
             $word = qq($w1<a href="mailto:$w2">$w2</a>$w3)
         else
             $word = html_escape($word) if $word =~ m/["&<>]/
@@ -1600,23 +1600,23 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing)
         if( $par =~ m{^([^/]+?)/(?!")(.*?)$} )     # name/ident
             # we've got a name/ident (no quotes)
             if (length $2)
-                @( $page, $ident ) = @( $1, $2 )
+                (@:  $page, $ident ) = @:  $1, $2 
             else
-                @( $page, $section ) = @( $1, $2 )
+                (@:  $page, $section ) = (@:  $1, $2 )
             
         ### print STDERR "--> L<$par> to page $page, ident $ident\n";
 
         elsif( $par =~ m{^(.*?)/"?(.*?)"?$} ) # [name]/"section"
             # even though this should be a "section", we go for ident first
-            @( $page, $ident ) = @( $1, $2 )
+            (@:  $page, $ident ) = (@:  $1, $2 )
         ### print STDERR "--> L<$par> to page $page, section $section\n";
 
         elsif( $par =~ m/\s/ )  # this must be a section with missing quotes
-            @( $page, $section ) = @( '', $par )
+            (@:  $page, $section ) = (@:  '', $par )
         ### print STDERR "--> L<$par> to void page, section $section\n";
 
         else
-            @( $page, $section ) = @( $par, '' )
+            (@:  $page, $section ) = (@:  $par, '' )
         ### print STDERR "--> L<$par> to page $par, void section\n";
         
 
@@ -1628,7 +1628,7 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing)
         RESOLVE: do
             if( defined $ident )
                 ## try to resolve $ident as an item
-                @( $url, $fid ) =  coderef( $page, $ident )
+                (@:  $url, $fid ) =  coderef( $page, $ident )
                 if( $url )
                     if( ! defined( $linktext ) )
                         $linktext = $ident
@@ -1660,7 +1660,7 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing)
                 $ident = $page
                 $page  = undef()
             
-            @( $url, $fid ) =  coderef( $page, $ident )
+            (@:  $url, $fid ) =  coderef( $page, $ident )
             if( $url )
                 if( ! defined( $linktext ) )
                     $linktext = $ident
@@ -1728,7 +1728,7 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing)
 #
 sub go_ahead( $rstr, $func, $closing)
     my $res = ''
-    my @closing = @($closing)
+    my @closing = @: $closing
     while( $rstr->$ =~
              s/\A (.*?) (([BCEFILSXZ])<(<+\s+)?| $(pattern @closing[0]) )//xs )
         $res .= $1
@@ -1754,7 +1754,7 @@ sub go_ahead( $rstr, $func, $closing)
 sub emit_C( $text, ?$nocode, ?$args)
     $args = '' unless defined $args
     my $res
-    my@( $url, $fid ) =  coderef( undef(), $text )
+    my(@:  $url, $fid ) =  coderef( undef(), $text )
 
     # need HTML-safe text
     my $linktext = html_escape( "$text$args" )
@@ -1899,11 +1899,11 @@ sub page_sect( $page, $section)
 #
 sub relativize_url($dest,$source)
 
-    my @($dest_volume,$dest_directory,$dest_file) =
+    my (@: $dest_volume,$dest_directory,$dest_file) =
         File::Spec::Unix->splitpath( $dest ) 
     $dest = File::Spec::Unix->catpath( $dest_volume, $dest_directory, '' ) 
 
-    my @($source_volume,$source_directory,$source_file) =
+    my (@: $source_volume,$source_directory,$source_file) =
         File::Spec::Unix->splitpath( $source ) 
     $source = File::Spec::Unix->catpath( $source_volume, $source_directory, '' ) 
 
@@ -1981,7 +1981,7 @@ sub coderef( $page, $item)
 
         confess "url has space: $url" if $url =~ m/"[^"]*\s[^"]*"/
     
-    return @( $url, $fid )
+    return (@:  $url, $fid )
 
 
 

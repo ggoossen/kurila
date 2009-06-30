@@ -27,7 +27,7 @@ do
     is( $aap, "noot" )
     is( $mies, "Wim" )
 
-    %( aap => @($aap) ) = %: aap => @: "noot"
+    %( aap => (@: $aap) ) = %: aap => @: "noot"
     is( $aap, "noot" )
 
     # with an expansion
@@ -42,7 +42,7 @@ do
                qr/\QGot extra value(s) in anonymous hash (%()) assignment\E/ )
 
     # OPf_ASSIGN & OPf_ASSIGN_PART
-    my @(%( aap => $aap, Mies => $mies)) = @($h)
+    my (@: %( aap => $aap, Mies => $mies)) = @: $h
     is( $aap, "noot" )
     is( $mies, "Wim" )
 

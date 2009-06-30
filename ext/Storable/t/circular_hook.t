@@ -20,7 +20,7 @@ my $ddd = bless \$%, 'Foo'
 my $eee = bless \%( Bar => $ddd ), 'Bar'
 $ddd->{+Foo} = $eee
 
-my $array = \@( $ddd )
+my $array = \@:  $ddd 
 
 my $string = Storable::freeze( $array )
 my $thawed = Storable::thaw( $string )
@@ -37,13 +37,13 @@ isa_ok( $thawed->[0]->{Foo}->{?Bar}, 'Foo' )
 is( $thawed->[0], $thawed->[0]->{Foo}->{?Bar}, 'Circular is... well... circular' )
 
 # Make sure the thawing went the way we expected
-is_deeply( \@Foo::order, \@( 'Bar', 'Foo' ), 'thaw order is correct (depth first)' )
+is_deeply( \@Foo::order, \(@:  'Bar', 'Foo' ), 'thaw order is correct (depth first)' )
 
 
 
 
 
-package Foo;
+package Foo
 
 our @order = $@
 
@@ -52,7 +52,7 @@ sub STORABLE_freeze($self, $clone)
 
     # print "# Freezing $class\n";
 
-    return  @($class, $self->{?$class})
+    return  @: $class, $self->{?$class}
 
 
 sub STORABLE_thaw($self, $clone, $string, @< @refs)
@@ -67,10 +67,10 @@ sub STORABLE_thaw($self, $clone, $string, @< @refs)
     return
 
 
-package Bar;
+package Bar
 
 BEGIN 
-    our @ISA = @( 'Foo' )
+    our @ISA = @:  'Foo' 
 
 
 1

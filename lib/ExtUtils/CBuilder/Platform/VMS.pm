@@ -6,7 +6,7 @@ our ($VERSION, @ISA)
 $VERSION = '0.22'
 @ISA = qw(ExtUtils::CBuilder::Base)
 
-use File::Spec::Functions < qw(catfile catdir);
+use File::Spec::Functions < qw(catfile catdir)
 
 # We do prelink, but don't want the parent to redo it.
 
@@ -26,12 +26,12 @@ sub arg_defines($self, %< %args)
 
     return '' unless keys(%args) || nelems @config_defines
 
-    return  @('/define=('
-              . join(',', @(
-        < @config_defines,
-        < map { "\"$_" . ( length(%args{?$_}) ?? "=%args{?$_}" !! '') . "\"" },
+    return  @: '/define=('
+                   . join(',', (@: 
+        < @config_defines
+        < map { "\"$_" . ( length(%args{?$_}) ?? "=%args{?$_}" !! '') . "\"" }
         keys %args))
-              . ')')
+                   . ')'
 
 
 sub arg_include_dirs($self, @< @dirs)
@@ -42,13 +42,13 @@ sub arg_include_dirs($self, @< @dirs)
     
     return unless (nelems @dirs)
 
-    return  @('/include=(' . join(',', @dirs) . ')')
+    return  @: '/include=(' . join(',', @dirs) . ')'
 
 
 sub _do_link($self, $type, %< %args)
 
     my $objects = delete %args{objects}
-    $objects = \@($objects) unless ref $objects
+    $objects = \(@: $objects) unless ref $objects
 
     if (%args{?lddl})
 
@@ -90,11 +90,11 @@ sub arg_object_file($self, $file)
 
 
 sub arg_exec_file($self, $file)
-    return  @("/exe=$file")
+    return  @: "/exe=$file"
 
 
 sub arg_share_object_file($self, $file)
-    return  @("$self->{config}->{?lddlflags}=$file")
+    return  @: "$self->{config}->{?lddlflags}=$file"
 
 
 
@@ -105,8 +105,8 @@ sub lib_file($self, $dl_file)
 
     # Need to create with the same name as DynaLoader will load with.
     if (defined &DynaLoader::mod2fname)
-        my @($dev,$dir,$file) =  File::Spec->splitpath($dl_file)
-        $file = DynaLoader::mod2fname(\@($file))
+        my (@: $dev,$dir,$file) =  File::Spec->splitpath($dl_file)
+        $file = DynaLoader::mod2fname(\(@: $file))
         $dl_file = File::Spec->catpath($dev,$dir,$file)
     
     return $dl_file
@@ -119,8 +119,8 @@ sub _liblist_ext($self, $potential_libs,$verbose,$give_libs)
     $verbose ||= 0
 
     my(@crtls,$crtlstr)
-    @crtls = @( ($self->{'config'}->{?'ldflags'} =~ m-/Debug-i ?? $self->{'config'}->{?'dbgprefix'} !! '')
-                . 'PerlShr/Share' )
+    @crtls = @:  ($self->{'config'}->{?'ldflags'} =~ m-/Debug-i ?? $self->{'config'}->{?'dbgprefix'} !! '')
+                     . 'PerlShr/Share' 
     push(@crtls, < grep { not m/\(/ }, split m/\s+/, $self->{'config'}->{?'perllibs'})
     push(@crtls, < grep { not m/\(/ }, split m/\s+/, $self->{'config'}->{?'libc'})
     # In general, we pass through the basic libraries from %Config unchanged.
@@ -131,7 +131,7 @@ sub _liblist_ext($self, $potential_libs,$verbose,$give_libs)
     if ($self->perl_src)
         my($locspec,$type)
         foreach my $lib ( @crtls)
-            if (@($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i)
+            if ((@: $locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i)
                 if    (lc $type eq '/share')   { $locspec .= $self->{'config'}->{?'exe_ext'}; }
                     elsif (lc $type eq '/library') { $locspec .= $self->{'config'}->{?'lib_ext'}; }
                 else                           { $locspec .= $self->{'config'}->{?'obj_ext'}; }
@@ -144,12 +144,12 @@ sub _liblist_ext($self, $potential_libs,$verbose,$give_libs)
 
     unless ($potential_libs)
         warn "Result:\n\tEXTRALIBS: \n\tLDLOADLIBS: $crtlstr\n" if $verbose
-        return  @('', '', $crtlstr, '',  @($give_libs ?? \$@ !! ()))
+        return  @: '', '', $crtlstr, '',  (@: $give_libs ?? \$@ !! ())
     
 
     my(@dirs,@libs,%found,@fndlibs,$ldlib)
     my $cwd = cwd()
-    my@($so,$lib_ext,$obj_ext) =  $self->{'config'}->{[@('so','lib_ext','obj_ext')]}
+    my(@: $so,$lib_ext,$obj_ext) =  $self->{'config'}->{[(@: 'so','lib_ext','obj_ext')]}
     # List of common Unix library names and their VMS equivalents
     # (VMS equivalent of '' indicates that the library is automatically
     # searched by the linker, and should be skipped here.)
@@ -197,7 +197,7 @@ sub _liblist_ext($self, $potential_libs,$verbose,$give_libs)
         
 
         my(@variants,$cand)
-        my@($ctype) = ''
+        my(@: $ctype) = ''
 
         # If we don't have a file type, consider it a possibly abbreviated name and
         # check for common variants.  We try these first to grab libraries before
@@ -275,7 +275,7 @@ sub _liblist_ext($self, $potential_libs,$verbose,$give_libs)
 
     $ldlib = $crtlstr ?? "$lib $crtlstr" !! $lib
     warn "Result:\n\tEXTRALIBS: $lib\n\tLDLOADLIBS: $ldlib\n" if $verbose
-    return @($lib, '', $ldlib, '', ($give_libs ?? \@flibs !! ()))
+    return @: $lib, '', $ldlib, '', ($give_libs ?? \@flibs !! ())
 
 
 1

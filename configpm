@@ -68,7 +68,7 @@ sub opts
         # --opt=smth
         (< map {m/^--([\-_\w]+)=(.*)$/}, @ARGV),
         # --opt --no-opt --noopt
-        (< @+: map {m/^no-?(.*)$/i??@($1=>0)!!@($_=>1)},
+        (< @+: map {m/^no-?(.*)$/i??(@: $1=>0)!!(@: $_=>1)},
                  map {m/^--([\-_\w]+)$/}, @ARGV),
         )
 
@@ -126,7 +126,7 @@ ENDOFBEG
 
 my $myver = $^PERL_VERSION
 
-$config_txt .= sprintf <<'ENDOFBEG', < @($myver) x 3
+$config_txt .= sprintf <<'ENDOFBEG', < (@: $myver) x 3
 # This file was created by configpm when Perl was built. Any changes
 # made to this file will be lost the next time perl is built.
 
@@ -179,7 +179,7 @@ do
 
         # Catch PERL_CONFIG_SH=true and PERL_VERSION=n line from Configure.
         s/^(\w+)=(true|\d+)\s*$/$1='$2'\n/ or m/^(\w+)='(.*)'$/
-        my@($k, $v) = @($1, $2)
+        my(@: $k, $v) = (@: $1, $2)
 
         # grandfather PATCHLEVEL and SUBVERSION and CONFIG
         if ($k)
@@ -201,7 +201,7 @@ do
         if ($in_v)
             $val .= $_
         else
-            @($name,$val) = @($1,$3)
+            (@: $name,$val) = @: $1,$3
         
         $in_v = $val !~ m/$quote\n/
         next if $in_v
@@ -292,7 +292,7 @@ die if $^EVAL_ERROR
 
 # Calculation for the keys for byteorder
 # This is somewhat grim, but I need to run fetch_string here.
-$Config_SH_expanded = join "\n", @( '', < @v_others)
+$Config_SH_expanded = join "\n", @:  '', < @v_others
 
 my $t = fetch_string (\$%, 'ivtype')
 my $s = fetch_string (\$%, 'ivsize')
@@ -612,7 +612,7 @@ if ($OS2::is_aout) {
 sub TIEHASH { bless {%preconfig} }
 ENDOFSET
     # Extract the name of the DLL from the makefile to avoid duplication
-    my @($f) =  grep { -r }, qw(GNUMakefile Makefile)
+    my (@: $f) =  grep { -r }, qw(GNUMakefile Makefile)
     my $dll
     if (open my $fh, '<', $f)
         while ( ~< $fh)

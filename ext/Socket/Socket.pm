@@ -169,7 +169,7 @@ use Carp;
 use warnings::register;
 
 require Exporter
-use XSLoader ();
+use XSLoader ()
 @ISA = qw(Exporter)
 @EXPORT = qw(
 	inet_aton inet_ntoa

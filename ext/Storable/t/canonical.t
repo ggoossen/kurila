@@ -40,8 +40,8 @@ if ($debugging)
     our $gotdd  = !$^EVAL_ERROR
 
 
-our @fixed_strings = @("January", "February", "March", "April", "May", "June",
-                       "July", "August", "September", "October", "November", "December" )
+our @fixed_strings = (@: "January", "February", "March", "April", "May", "June"
+                         "July", "August", "September", "October", "November", "December" )
 
 # Build some arbitrarily complex data structure starting with a top level hash
 # (deeper levels contain scalars, references to hashes or references to arrays);

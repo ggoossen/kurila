@@ -7,7 +7,7 @@ BEGIN
     $^DIE_HOOK = $handler
 
 
-use Test::More tests => 1;
+use Test::More tests => 1
 
 do
     local $TODO = "CV refernce changed"

@@ -43,7 +43,7 @@ do
 
 package main
 
-sub c { @(caller(0)) }
+sub c { (@: caller(0)) }
 
 sub foo
     my $s = shift

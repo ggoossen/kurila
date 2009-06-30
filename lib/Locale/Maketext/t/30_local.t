@@ -10,7 +10,7 @@ print $^STDOUT, "# --- Making sure that Perl globals are localized ---\n"
 # declare a class...
 do
     package Woozle
-    our @ISA = @('Locale::Maketext')
+    our @ISA = @: 'Locale::Maketext'
     our %Lexicon = %(
         _AUTO => 1
         )

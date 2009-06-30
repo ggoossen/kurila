@@ -83,7 +83,7 @@ sub parse_line($delimiter, $keep, $line)
                             (?!^)(?=["'])               # a quote
                         )
 		    )//xs or return $@		# extended layout
-        my @($quote, $quoted, $unquoted, $delim) = @(($1 ?? ($1,$2) !! ($3,$4)), $5, $6)
+        my (@: $quote, $quoted, $unquoted, $delim) = @: ($1 ?? ($1,$2) !! ($3,$4)), $5, $6
 
 
         return $@ unless( defined($quote) || length($unquoted) || length($delim))

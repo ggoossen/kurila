@@ -113,7 +113,7 @@ EOM
 
     my $test_name = 'message get data'
     my($rmsgtype,$rmsgtext)
-    @($rmsgtype,$rmsgtext) = @: unpack("L! a*",$msgbuf)
+    (@: $rmsgtype,$rmsgtext) = @: unpack("L! a*",$msgbuf)
     if ($rmsgtype == $msgtype && $rmsgtext eq $msgtext)
         pass($test_name)
     else
@@ -156,14 +156,14 @@ SKIP: do
 
     cmp_ok(length($data),'+>',0,'sem data len')
 
-    ok(semctl($sem,0,SETALL,pack("s!*",< $: @(0) x $nsem)), 'set all sems')
+    ok(semctl($sem,0,SETALL,pack("s!*",< $: (@: 0) x $nsem)), 'set all sems')
 
     $data = ""
     ok(semctl($sem,0,GETALL,$data), 'get all sems')
 
-    is(length($data),length(pack("s!*", < $: @(0) x $nsem)), 'right length')
+    is(length($data),length(pack("s!*", < $: (@: 0) x $nsem)), 'right length')
 
-    my @data = @(unpack("s!*",$data))
+    my @data = @: unpack("s!*",$data)
 
     my $adata = "0" x $nsem
 
@@ -178,7 +178,7 @@ SKIP: do
     $data = ""
     ok(semctl($sem,0,GETALL,$data),'and get it back')
 
-    @data = @(unpack("s!*",$data))
+    @data = @: unpack("s!*",$data)
     my $bdata = "0" x $poke . "1" . "0" x ($nsem-$poke-1)
 
     cmp_ok(join("",@data),'eq',$bdata,'changed')

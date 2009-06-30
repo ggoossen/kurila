@@ -32,7 +32,7 @@ sub import
     # avoid possible typo warnings
     Symbol::fetch_glob("$package\::FIELDS")->*->% = $% unless Symbol::fetch_glob("$package\::FIELDS")->*->%
     my $fields = \Symbol::fetch_glob("$package\::FIELDS")->*->%
-    my $fattr = (%attr{+$package} ||= \@(1))
+    my $fattr = (%attr{+$package} ||= \(@: 1))
     my $next = (nelems $fattr->@)
 
     # Quiet pseudo-hash deprecation warning for uses of fields::new.
@@ -112,10 +112,10 @@ sub new
 
 
 sub _accessible_keys($class)
-    return  @( <
-               keys Symbol::fetch_glob($class.'::FIELDS')->*->%,
-               < @+: map( { _accessible_keys($_) }, Symbol::fetch_glob($class.'::ISA')->*->@),
-        )
+    return  @:  <
+                    keys Symbol::fetch_glob($class.'::FIELDS')->*->%
+                < @+: map( { _accessible_keys($_) }, Symbol::fetch_glob($class.'::ISA')->*->@)
+        
 
 
 sub phash

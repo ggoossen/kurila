@@ -7,7 +7,7 @@ BEGIN
 skip_all "remove smartmach from kurila"
 exit 0
 
-use Tie::Hash;
+use Tie::Hash
 
 # The feature mechanism is tested in t/lib/feature/smartmatch:
 # This file tests the semantics of the operator, without worrying
@@ -24,18 +24,18 @@ my @nums =1..10
 my %hash = %(foo => 17, bar => 23)
 
 # Load and run the tests
-my @tests = map { \@(chomp and < split m/\t+/, $_, 3) }, grep { !m/^#/ && m/\S/ }, @( ~< $^DATA)
+my @tests = map { \(@: chomp and < split m/\t+/, $_, 3) }, grep { !m/^#/ && m/\S/ }, @:  ~< $^DATA
 plan tests => 2 * nelems @tests
 
 for my $test ( @tests)
-    my @($yn, $left, $right) =  $test->@
+    my (@: $yn, $left, $right) =  $test->@
 
     match_test($yn, $left, $right)
     match_test($yn, $right, $left)
 
 
 sub match_test
-    my @($yn, $left, $right) =  @_
+    my (@: $yn, $left, $right) =  @_
 
     die "Bad test spec: ($yn, $left, $right)"
         unless $yn eq "" || $yn eq "!"

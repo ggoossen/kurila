@@ -6,7 +6,7 @@ our $VERSION = '1.06'
 my $locale_encoding
 
 sub _get_encname
-    return  @($1, Encode::resolve_alias($1)) if @_[0] =~ m/^:?encoding\((.+)\)$/
+    return  (@: $1, Encode::resolve_alias($1)) if @_[0] =~ m/^:?encoding\((.+)\)$/
     return
 
 
@@ -17,11 +17,11 @@ sub _drop_oldenc($h, @< @new)
         @old[-1] eq 'utf8' &&
         @old[-2] =~ m/^encoding\(.+\)$/
     require Encode
-    my @($loname, $lcname) =  _get_encname(@old[-2])
+    my (@: $loname, $lcname) =  _get_encname(@old[-2])
     unless (defined $lcname) # Should we trust get_layers()?
         die("open: Unknown encoding '$loname'")
     
-    my @($voname, $vcname) =  _get_encname(@new[-1])
+    my (@: $voname, $vcname) =  _get_encname(@new[-1])
     unless (defined $vcname)
         die("open: Unknown encoding '$voname'")
     
@@ -33,7 +33,7 @@ sub _drop_oldenc($h, @< @new)
 sub import($class,@< @args)
     die("open: needs explicit list of PerlIO layers") unless (nelems @args)
     my $std
-    my @($in,$out) =  split(m/\0/,($^OPEN || "\0"), -1)
+    my (@: $in,$out) =  split(m/\0/,($^OPEN || "\0"), -1)
     while ((nelems @args))
         my $type = shift(@args)
         my $dscp
@@ -74,7 +74,7 @@ sub import($class,@< @args)
             die "Unknown PerlIO layer class '$type'"
         
     
-    $^OPEN = join("\0", @( $in, $out))
+    $^OPEN = join("\0", (@:  $in, $out))
     if ($std)
         if ($in)
             if ($in =~ m/:utf8\b/)

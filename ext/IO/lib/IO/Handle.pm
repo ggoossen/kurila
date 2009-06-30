@@ -245,8 +245,8 @@ Derived from FileHandle.pm by Graham Barr E<lt>F<gbarr@pobox.com>E<gt>
 =cut
 
 our($VERSION, @EXPORT_OK, @ISA)
-use Symbol;
-use IO ();	# Load the XS module
+use Symbol
+use IO ()	# Load the XS module
 
 require Exporter
 @ISA = qw(Exporter)
@@ -365,7 +365,7 @@ sub getline($this)
 *gets = \&getline  # deprecated
 
 sub getlines($this)
-    return @( ~< $this )
+    return @:  ~< $this 
 
 
 sub truncate($io, $len)

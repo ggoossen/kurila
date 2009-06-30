@@ -19,17 +19,17 @@ BaseTests("version")
 
 diag "Tests with empty derived class" unless env::var('PERL_CORE')
 
-package version::Empty;
-use base 'version';
+package version::Empty
+use base 'version'
 our $VERSION = 0.01
-no warnings 'redefine';
+no warnings 'redefine'
 *main::qv = sub (@< @_) { return bless version::qv(shift), __PACKAGE__; }
 
-package version::Bad;
-use base 'version';
+package version::Bad
+use base 'version'
 sub new($self,$n) {  bless \$n, $self }
 
-package main;
+package main
 my $testobj = version::Empty->new(1.002_003)
 isa_ok( $testobj, "version::Empty" )
 ok( $testobj->numify == 1.002003, "Numified correctly" )
@@ -64,7 +64,7 @@ unlike ($^EVAL_ERROR, qr/^Subroutine main::qv redefined/,
 
 sub BaseTests
 
-    my @($CLASS, ?$no_qv) =  @_
+    my (@: $CLASS, ?$no_qv) =  @_
 
     # Insert your test code below, the Test module is use()ed here so read
     # its man page ( perldoc Test ) for help writing this test script.

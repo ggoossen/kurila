@@ -1,13 +1,13 @@
 
 BEGIN 
     chdir 't' if -d 't'
-    $^INCLUDE_PATH = @( '../lib' )
+    $^INCLUDE_PATH = @:  '../lib' 
     require './test.pl'
 
 
 plan tests => 20
 
-use utf8;
+use utf8
 
 my $a = chr(0x100)
 

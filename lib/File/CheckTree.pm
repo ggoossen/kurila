@@ -91,7 +91,7 @@ sub validate
         if ($check =~ m/^\s*"([^"]+)"\s+(.*?)\s*$/ or
             $check =~ m/^\s*'([^']+)'\s+(.*?)\s*$/ or
             $check =~ m/^\s*(\S+?)\s+(\S.*?)\s*$/)
-            @($file, $test) = @($1,$2)
+            (@: $file, $test) = @: $1,$2
         else
             die "Malformed line: '$check'"
         ;
@@ -104,7 +104,7 @@ sub validate
             @testlist = split(m//, $testlist)
         else
             # put in placeholder Z for stand-alone test
-            @testlist = @('Z')
+            @testlist = (@: 'Z')
         
 
         # will compare these two later to stop on 1st warning w/in a bundle
@@ -210,7 +210,7 @@ sub valmess($disposition, $test, $file)
     my $ferror
 
     if ($test =~ m/ ^ (!?) -(\w) \s* $ /x)
-        my @($neg, $ftype) = @($1, $2)
+        my (@: $neg, $ftype) = @: $1, $2
 
         $ferror = "$file %Val_Message{?$ftype}"
 

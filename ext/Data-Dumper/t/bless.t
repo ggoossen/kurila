@@ -12,7 +12,7 @@ BEGIN { use_ok('Data::Dumper') };
 # RT 39420: Data::Dumper fails to escape bless class name
 
 # test under XS and pure Perl version
-foreach my $use (@(0, 1))
+foreach my $use ((@: 0, 1))
     $Data::Dumper::Useperl = $use
 
     #diag("\$Data::Dumper::Useperl = $Data::Dumper::Useperl");

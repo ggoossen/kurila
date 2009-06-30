@@ -512,7 +512,7 @@ sub requires
     return  sort grep { !m/^$who$/  },
         map  { chomp; s|/|::|g; $_ },
         grep { s|\.pm$||i; },
-        @(            `$cmd`)
+        @:             `$cmd`
 
 
 1

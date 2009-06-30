@@ -9,7 +9,7 @@ package IPC::Msg
 use IPC::SysV < qw(IPC_STAT IPC_SET IPC_RMID)
 
 our ($VERSION)
-use Carp;
+use Carp
 
 $VERSION = "1.02"
 $VERSION = eval $VERSION
@@ -19,20 +19,20 @@ do
 
     use Class::Struct < qw(struct)
 
-    struct 'IPC::Msg::stat' => \@(
-           uid  => '$',
-           gid  => '$',
-           cuid => '$',
-           cgid => '$',
-           mode => '$',
-           qnum => '$',
-           qbytes       => '$',
-           lspid        => '$',
-           lrpid        => '$',
-           stime        => '$',
-           rtime        => '$',
-           ctime        => '$',
-           )
+    struct 'IPC::Msg::stat' => \@: 
+           uid  => '$'
+           gid  => '$'
+           cuid => '$'
+           cgid => '$'
+           mode => '$'
+           qnum => '$'
+           qbytes       => '$'
+           lspid        => '$'
+           lrpid        => '$'
+           stime        => '$'
+           rtime        => '$'
+           ctime        => '$'
+           
 
 
 sub new($class, $key, $flags)
@@ -69,7 +69,7 @@ sub set
             or return undef
         my($key,$val)
         $ds->?$key($val)
-            while(@($key,$val) =@( each %arg))
+            while((@: $key,$val) =(@:  each %arg))
     
 
     msgctl($self->$,IPC_SET,$ds->pack)
@@ -77,7 +77,7 @@ sub set
 
 sub remove
     my $self = shift
-    @(msgctl($self->$,IPC_RMID,0), undef $self->$)[0]
+    (@: msgctl($self->$,IPC_RMID,0), undef $self->$)[0]
 
 
 sub rcv($self, $buf, $len, ?$type, ?$flags)
@@ -85,7 +85,7 @@ sub rcv($self, $buf, $len, ?$type, ?$flags)
     msgrcv($self->$,$rcvbuf, $len, $type || 0, $flags || 0) or
         return
     my $type
-    @($type, $buf->$) = @: unpack("l! a*",$rcvbuf)
+    (@: $type, $buf->$) = @: unpack("l! a*",$rcvbuf)
     return $type
 
 

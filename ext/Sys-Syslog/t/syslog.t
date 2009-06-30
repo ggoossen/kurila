@@ -102,7 +102,7 @@ for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp))
             if $sock_type eq 'stream' and grep {m/pipe|unix/}, @passed
 
         # setlogsock() called with an arrayref
-        $r = try { setlogsock(\@($sock_type)) } || 0; die $^EVAL_ERROR->message if $^EVAL_ERROR
+        $r = try { setlogsock(\(@: $sock_type)) } || 0; die $^EVAL_ERROR->message if $^EVAL_ERROR
         skip "can't use '$sock_type' socket", 20 unless $r
         is( $^EVAL_ERROR, '', "[$sock_type] setlogsock() called with ['$sock_type']" )
         ok( $r, "[$sock_type] setlogsock() should return true: '$r'" )
@@ -227,11 +227,11 @@ do
     is( $^EVAL_ERROR, '', "setlogmask() called with a null mask (second time)" )
     is( $r, $oldmask, "setlogmask() must return the same mask as previous call")
 
-    my @masks = @(
-        LOG_MASK(LOG_ERR()),
-        ^~^LOG_MASK(LOG_INFO()),
-        LOG_MASK(LOG_CRIT()) ^|^ LOG_MASK(LOG_ERR()) ^|^ LOG_MASK(LOG_WARNING()),
-        )
+    my @masks = @: 
+        LOG_MASK(LOG_ERR())
+        ^~^LOG_MASK(LOG_INFO())
+        LOG_MASK(LOG_CRIT()) ^|^ LOG_MASK(LOG_ERR()) ^|^ LOG_MASK(LOG_WARNING())
+        
 
     for my $newmask ( @masks)
         $r = try { setlogmask($newmask) } || 0

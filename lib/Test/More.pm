@@ -609,7 +609,7 @@ sub use_ok($module, @< @imports)
     @imports = $@ unless (nelems @imports)
     my $tb = Test::More->builder
 
-    my@($pack,$filename,$line) =@( caller)
+    my(@: $pack,$filename,$line) =@:  caller
 
     my $code
     if( (nelems @imports) == 1 and ref @imports[0] and @imports[0]->isa('version') )
@@ -628,7 +628,7 @@ use $module < \@args[0]->\@;
 USE
     
 
-    my@($eval_result, $eval_error) =  _eval($code, \@imports)
+    my(@: $eval_result, $eval_error) =  _eval($code, \@imports)
     my $ok = $tb->ok( $eval_result, "use $module;" )
 
     unless( $ok )
@@ -644,7 +644,7 @@ DIAGNOSTIC
 
 
 sub _eval
-    my@($code) =@( shift)
+    my(@: $code) =@:  shift
     my @args = @_
 
     # Work around oddities surrounding resetting of $@ by immediately
@@ -653,7 +653,7 @@ sub _eval
     my $eval_result = eval $code
     my $eval_error  = $^EVAL_ERROR
 
-    return @($eval_result, $eval_error)
+    return (@: $eval_result, $eval_error)
 
 
 =item B<dies_like>
@@ -696,7 +696,7 @@ require $module;
 1;
 REQUIRE
 
-    my@($eval_result, $eval_error) =  _eval($code)
+    my(@: $eval_result, $eval_error) =  _eval($code)
     my $ok = $tb->ok( $eval_result, "require $module;" )
 
     unless( $ok )
@@ -780,7 +780,7 @@ WARNING
         return $tb->ok(0)
     
 
-    my @($got, $expected, ?$name) =  @_
+    my (@: $got, $expected, ?$name) =  @_
 
     my $ok
 
@@ -828,7 +828,7 @@ sub _format_stack
         $prev_ref = 0
     
 
-    my @vals = @Stack[-1]->{vals}->[[@(0,1)]]
+    my @vals = @Stack[-1]->{vals}->[[(@: 0,1)]]
     my @vars = $@
     (@vars[+0] = $var) =~ s/\$FOO/     \$got/
     (@vars[+1] = $var) =~ s/\$FOO/\$expected/
@@ -1168,7 +1168,7 @@ sub eq_array
 
 sub _eq_array($a1, $a2)
 
-    if( grep { !_type($_) eq 'ARRAY' }, @( $a1, $a2) )
+    if( grep { !_type($_) eq 'ARRAY' }, (@:  $a1, $a2) )
         warn "eq_array passed a non-array ref"
         return 0
     
@@ -1181,7 +1181,7 @@ sub _eq_array($a1, $a2)
         my $e1 = $_ +> (nelems $a1->@)-1 ?? $DNE !! $a1->[$_]
         my $e2 = $_ +> (nelems $a2->@)-1 ?? $DNE !! $a2->[$_]
 
-        push @Data_Stack, \%( type => 'ARRAY', idx => $_, vals => \@($e1, $e2) )
+        push @Data_Stack, \%( type => 'ARRAY', idx => $_, vals => \(@: $e1, $e2) )
         $ok = _deep_check($e1,$e2)
         pop @Data_Stack if $ok
 
@@ -1219,12 +1219,12 @@ sub _deep_check($e1, $e2)
         $type = 'DIFFERENT' unless ref::svtype($e2) eq $type
 
         if( $type eq 'DIFFERENT' )
-            push @Data_Stack, \%( type => $type, vals => \@($e1, $e2) )
+            push @Data_Stack, \%( type => $type, vals => \(@: $e1, $e2) )
             $ok = 0
         elsif( $type eq 'PLAINVALUE' )
             $ok = ($e1 eq $e2)
             if ( ! $ok )
-                push @Data_Stack, \%( type => '', vals => \@($e1, $e2) )
+                push @Data_Stack, \%( type => '', vals => \(@: $e1, $e2) )
             
         elsif( $type eq 'ARRAY' )
             $ok = _eq_array(\$e1, \$e2)
@@ -1234,13 +1234,13 @@ sub _deep_check($e1, $e2)
             if ($e1 \== $e2)
                 return 1
             
-            push @Data_Stack, \%( type => $type, vals => \@($e1, $e2) )
+            push @Data_Stack, \%( type => $type, vals => \(@: $e1, $e2) )
             $ok = _deep_check($e1->$, $e2->$)
             pop @Data_Stack if $ok
         elsif( $type eq 'UNDEF' )
             $ok = 1
         elsif( $type eq 'COMPLEX' )
-            push @Data_Stack, \%( type => $type, vals => \@('...', '...') )
+            push @Data_Stack, \%( type => $type, vals => \(@: '...', '...') )
             $ok = 0
         else
             _whoa(1, "Unknown type '$type' in _deep_check")
@@ -1277,7 +1277,7 @@ sub eq_hash
 
 sub _eq_hash($a1, $a2)
 
-    if( grep { !_type($_) eq 'HASH' }, @( $a1, $a2) )
+    if( grep { !_type($_) eq 'HASH' }, (@:  $a1, $a2) )
         warn "eq_hash passed a non-hash ref"
         return 0
     
@@ -1290,7 +1290,7 @@ sub _eq_hash($a1, $a2)
         my $e1 = exists $a1->{$k} ?? $a1->{?$k} !! $DNE
         my $e2 = exists $a2->{$k} ?? $a2->{?$k} !! $DNE
 
-        push @Data_Stack, \%( type => 'HASH', idx => $k, vals => \@($e1, $e2) )
+        push @Data_Stack, \%( type => 'HASH', idx => $k, vals => \(@: $e1, $e2) )
         $ok = _deep_check($e1, $e2)
         pop @Data_Stack if $ok
 

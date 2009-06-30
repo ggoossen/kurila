@@ -12,7 +12,7 @@ use Fcntl < qw(SEEK_SET SEEK_CUR SEEK_END) # Not 0, 1, 2 everywhere.
 
 $^OUTPUT_AUTOFLUSH = 1
 
-use Test::More tests => 52;
+use Test::More tests => 52
 
 my $fh
 my $var = "aaa\n"

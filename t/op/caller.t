@@ -10,10 +10,10 @@ my @c
 
 print $^STDOUT, "# Tests with caller(0)\n"
 
-@c = @( caller(0) )
+@c = @:  caller(0) 
 ok( (!nelems @c), "caller(0) in main program" )
 
-try { @c = @( caller(0) ) }
+try { @c = (@:  caller(0) ) }
 is( @c[3], "(eval)", "subroutine name in an eval \{\}" )
 is( @c[4], undef, "args undef in an eval \{\}" )
 
@@ -21,12 +21,12 @@ eval q{ @c = (Caller(0))[3] }
 is( @c[3], "(eval)", "subroutine name in an eval ''" )
 is( @c[4], undef, "args undef in an eval ''" )
 
-sub (@< @_) { @c = @( caller(0) ) } -> ()
+sub (@< @_) { @c = (@:  caller(0) ) } -> ()
 is( @c[3], undef, "anonymous subroutine name" )
 ok( defined @c[4], "hasargs defined with anon sub" )
 
 # Bug 20020517.003, used to dump core
-sub foo { @c = @( caller(0) ) }
+sub foo { @c = (@:  caller(0) ) }
 my $fooref = \(delete %main::{foo})
 $fooref->* -> ()
 is( @c[3], "main::foo", "unknown subroutine name" )
@@ -34,7 +34,7 @@ ok( defined @c[4], "args true with unknown sub" )
 
 print $^STDOUT, "# Tests with caller(1)\n"
 
-sub f { @c = @( caller(1) ) }
+sub f { @c = (@:  caller(1) ) }
 
 sub callf { f(); }
 callf()
@@ -65,7 +65,7 @@ ok( defined @c[4], "hasargs true with unknown sub" )
 sub show_bits
     my $in = shift
     my $out = ''
-    foreach (@(unpack('W*', $in)))
+    foreach ((@: unpack('W*', $in)))
         $out .= sprintf('\x%02x', $_)
     
     return $out
@@ -73,7 +73,7 @@ sub show_bits
 
 sub check_bits
     local our $Level = $Level + 2
-    my @($got, $exp, $desc) =  @_
+    my (@: $got, $exp, $desc) =  @_
     if (! ok($got eq $exp, $desc))
         diag('     got: ' . show_bits($got))
         diag('expected: ' . show_bits($exp))
@@ -83,7 +83,7 @@ sub check_bits
 sub testwarn
     my $w = shift
     my $id = shift
-    check_bits( @(caller(0))[9], $w, "warnings match caller ($id)")
+    check_bits( (@: caller(0))[9], $w, "warnings match caller ($id)")
 
 
 do
@@ -128,7 +128,7 @@ my $debugger_test =  q<
     return nelems @stackinfo;
 >
 
-sub pb { return @(caller(0))[3] }
+sub pb { return (@: caller(0))[3] }
 
 my $i = eval $debugger_test
 is( $i, 11, "do not skip over eval (and caller returns 10 elements)" )
@@ -148,14 +148,14 @@ print $^STDOUT, "# caller can now return the compile time state of \%^H\n"
 sub hint_exists
     my $key = shift
     my $level = shift
-    my @results = @( caller($level||0) )
+    my @results = @:  caller($level||0) 
     exists @results[10]->{$key}
 
 
 sub hint_fetch
     my $key = shift
     my $level = shift
-    my @results = @( caller($level||0) )
+    my @results = @:  caller($level||0) 
     @results[10]->{?$key}
 
 

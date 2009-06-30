@@ -42,7 +42,7 @@ EOF
 
 
 sub MY::c_o
-    my@($self) =  @_
+    my(@: $self) =  @_
     package MY; # so that "SUPER" works right
     my $inh = $self->SUPER::c_o(< @_)
     use Config;

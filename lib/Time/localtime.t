@@ -2,7 +2,7 @@
 
 BEGIN 
     chdir 't' if -d 't'
-    $^INCLUDE_PATH = @( '../lib' )
+    $^INCLUDE_PATH = @:  '../lib' 
 
 
 BEGIN 
@@ -15,13 +15,13 @@ BEGIN
 
 our @localtime
 BEGIN 
-    @localtime = @( localtime 0 ) # This is the function localtime.
+    @localtime = (@:  localtime 0 ) # This is the function localtime.
     unless (nelems @localtime) { print $^STDOUT, "1..0 # Skip: localtime failed\n"; exit 0 }
 
 
 print $^STDOUT, "1..10\n"
 
-use Time::localtime;
+use Time::localtime
 
 print $^STDOUT, "ok 1\n"
 

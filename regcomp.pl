@@ -21,14 +21,14 @@ while ( ~< $desc_fh)
     
     unless ($lastregop)
         $ind++
-        @(@name[+$ind], $desc, @rest[+$ind]) = split m/\t+/, $_, 3
-        @(@type[+$ind], @code[+$ind], ?@args[+$ind], ?@longj[+$ind])
+        (@: @name[+$ind], $desc, @rest[+$ind]) = split m/\t+/, $_, 3
+        @: @type[+$ind], @code[+$ind], ?@args[+$ind], ?@longj[+$ind]
             = split m/[,\s]\s*/, $desc, 4
     else
-        my @($type, @< @lists)= split m/\s*\t+\s*/, $_
+        my (@: $type, @< @lists)= split m/\s*\t+\s*/, $_
         die "No list? $type" if !nelems @lists
         foreach my $list ( @lists)
-            my @($names,$special)= split m/:/, $list , 2
+            my (@: $names,$special)= split m/:/, $list , 2
             $special ||= ""
             foreach my $name (split m/,/,$names)
                 my $real= $name eq 'resume'
@@ -36,11 +36,11 @@ while ( ~< $desc_fh)
                     !! "$($type)_$name"
                 my @suffix
                 if (!$special)
-                    @suffix=@("")
+                    @suffix=@: ""
                 elsif ($special=~m/\d/)
                     @suffix=1..$special
                 elsif ($special eq 'FAIL')
-                    @suffix=@("","_fail")
+                    @suffix=@: "","_fail"
                 else
                     die "unknown :type ':$special'"
                 
@@ -57,7 +57,7 @@ while ( ~< $desc_fh)
 
 # use fixed width to keep the diffs between regcomp.pl recompiles
 # as small as possible.
-my @($width,$rwidth,$twidth) = @(22,12,9)
+my (@: $width,$rwidth,$twidth) = @: 22,12,9
 $lastregop ||= $ind
 my $tot = $ind
 close $desc_fh

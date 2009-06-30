@@ -4,7 +4,7 @@
 package Pod::Escapes
 require Exporter
 
-our @ISA = @('Exporter')
+our @ISA = @: 'Exporter'
 our $VERSION = '1.04'
 our @EXPORT_OK = qw(
   %Code2USASCII
@@ -373,7 +373,7 @@ sub e2charnum
 do
     %Name2character = $%
     my($name, $number)
-    while( @(?$name, ?$number) =@( each %Name2character_number))
+    while( (@: ?$name, ?$number) =(@:  each %Name2character_number))
         %Name2character{+$name} = chr $number
     # normal case
     
@@ -492,23 +492,23 @@ do
 #--------------------------------------------------------------------------
 
 %Latin1Code_to_fallback = $%
-%Latin1Code_to_fallback{[0xA0 .. 0xFF]} = @(
+%Latin1Code_to_fallback{[0xA0 .. 0xFF]} = @: 
     # Copied from Text/Unidecode/x00.pm:
 
-    ' ', qq{!}, qq{C/}, 'PS', qq{\$?}, qq{Y=}, qq{|}, 'SS', qq{"}, qq{(c)}, 'a', qq{<<}, qq{!}, "", qq{(r)}, qq{-},
-    'deg', qq{+-}, '2', '3', qq{'}, 'u', 'P', qq{*}, qq{,}, '1', 'o', qq{>>}, qq{1/4}, qq{1/2}, qq{3/4}, qq{?},
-    'A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I',
-    'D', 'N', 'O', 'O', 'O', 'O', 'O', 'x', 'O', 'U', 'U', 'U', 'U', 'U', 'Th', 'ss',
-    'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i',
-    'd', 'n', 'o', 'o', 'o', 'o', 'o', qq{/}, 'o', 'u', 'u', 'u', 'u', 'y', 'th', 'y',
+    ' ', qq{!}, qq{C/}, 'PS', qq{\$?}, qq{Y=}, qq{|}, 'SS', qq{"}, qq{(c)}, 'a', qq{<<}, qq{!}, "", qq{(r)}, qq{-}
+    'deg', qq{+-}, '2', '3', qq{'}, 'u', 'P', qq{*}, qq{,}, '1', 'o', qq{>>}, qq{1/4}, qq{1/2}, qq{3/4}, qq{?}
+    'A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I'
+    'D', 'N', 'O', 'O', 'O', 'O', 'O', 'x', 'O', 'U', 'U', 'U', 'U', 'U', 'Th', 'ss'
+    'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i'
+    'd', 'n', 'o', 'o', 'o', 'o', 'o', qq{/}, 'o', 'u', 'u', 'u', 'u', 'y', 'th', 'y'
 
-    )
+    
 
 do
     # Now stuff %Latin1Char_to_fallback:
     %Latin1Char_to_fallback = $%
     my($k,$v)
-    while( @(?$k,?$v) =@( each %Latin1Code_to_fallback))
+    while( (@: ?$k,?$v) =(@:  each %Latin1Code_to_fallback))
         %Latin1Char_to_fallback{+chr $k} = $v
     #print chr($k), ' => ', $v, "\n";
     

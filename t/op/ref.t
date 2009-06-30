@@ -24,17 +24,17 @@ is (ref($vstref), "version", "ref(vstr) eq 'version'")
 # Test references to real arrays.
 
 my $test = curr_test()
-@ary = @($test,$test+1,$test+2,$test+3)
+@ary = @: $test,$test+1,$test+2,$test+3
 @ref[+0] = \@a
 @ref[+1] = \@b
 @ref[+2] = \@c
 @ref[+3] = \@d
-for my $i (@(3,1,2,0))
+for my $i ((@: 3,1,2,0))
     push(@ref[$i]->@, "ok @ary[$i]\n")
 
 print $^STDOUT, < @a
 print $^STDOUT, @ref[1]->[0]
-print $^STDOUT, < @ref[2]->[[@(0)]]
+print $^STDOUT, < @ref[2]->[[(@: 0)]]
 do
     print $^STDOUT, < Symbol::fetch_glob('d')->*->@
 
@@ -48,7 +48,7 @@ is ($refref->$->$, 'Good')
 
 # Test nested anonymous lists.
 
-$ref = \@(\$@,2,\@(3,4,5,))
+$ref = \@: \$@,2,\(@: 3,4,5,)
 is (scalar nelems $ref->@, 3)
 is ($ref->[1], 2)
 is ($ref->[2]->[2], 5)
@@ -72,7 +72,7 @@ is (join(':', @spring[5]), "123:456:789")
 
 # Test to see if anonymous subhashes spring into existence.
 
-%spring2{+"foo"} = @(1,2,3)
+%spring2{+"foo"} = @: 1,2,3
 %spring2{"foo"}[+3] = 4
 is (join(':', %spring2{?"foo"}), "1:2:3:4")
 
@@ -107,7 +107,7 @@ is (join('', sort values $anonhash2->%), 'BARXYZ')
 do
     my $z = \66
     is($z->$, 66)
-    my $y = \@(1,2,3,4)
+    my $y = \@: 1,2,3,4
     is(join(':', $y->@), "1:2:3:4")
     my $x = \%( aap => 'noot', mies => "teun" )
     is((join "*", keys $x->%), join "*", keys $x->%)
@@ -159,13 +159,13 @@ sub DESTROY
 
 # Now test inheritance of methods.
 
-package OBJ;
+package OBJ
 
-our @ISA = @('BASEOBJ')
+our @ISA = @: 'BASEOBJ'
 
 $main::object = bless \%(FOO => 'foo', BAR => 'bar')
 
-package main;
+package main
 
 # Test arrow-style method invocation.
 
@@ -177,7 +177,7 @@ sub BASEOBJ::doit
     $ref->{?shift()}
 
 
-package main;
+package main
 
 # test for proper destruction of lexical objects
 $test = curr_test()
@@ -237,7 +237,7 @@ do
 
 
 # This test is the reason for postponed destruction in sv_unref
-$a = \@(1,2,3)
+$a = \@: 1,2,3
 $a = $a->[1]
 is ($a, 2)
 
@@ -247,9 +247,9 @@ is ($a, 2)
 # sure $a = $a->[1] would work didn't work with references to constants.
 
 
-foreach my $lexical (@('', 'my $a; '))
+foreach my $lexical ((@: '', 'my $a; '))
     my $expect = "pass\n"
-    my $result = runperl (switches => \@('-w'), stderr => 1,
+    my $result = runperl (switches => \(@: '-w'), stderr => 1,
                           prog => $lexical . 'BEGIN {$a = \q{pass}}; $a = $a->$; print $^STDOUT, $a, qq[\n]')
 
     is ($^CHILD_ERROR, 0)
@@ -258,10 +258,10 @@ foreach my $lexical (@('', 'my $a; '))
 
 $test = curr_test()
 sub x::DESTROY($self) {print $^STDOUT, "ok ", $test + $self->[0], "\n"}
-do { my $a1 = bless \@(3),"x";
-    my $a2 = bless \@(2),"x";
-    do { my $a3 = bless \@(1),"x";
-        my $a4 = bless \@(0),"x";
+do { my $a1 = bless \(@: 3),"x";
+    my $a2 = bless \(@: 2),"x";
+    do { my $a3 = bless \(@: 1),"x";
+        my $a4 = bless \(@: 0),"x";
         567;
     };
 }
@@ -311,13 +311,13 @@ TODO: do
     ok (!defined Symbol::fetch_glob($name2)->*->[0],
         'defined via a different NUL-containing name gives nothing')
 
-    my @(_, $one) =  Symbol::fetch_glob($name1)->*->[[@(2,3)]]
-    my @(_, $two) =  Symbol::fetch_glob($name2)->*->[[@(2,3)]]
+    my (@: _, $one) =  Symbol::fetch_glob($name1)->*->[[(@: 2,3)]]
+    my (@: _, $two) =  Symbol::fetch_glob($name2)->*->[[(@: 2,3)]]
     is ($one, undef, 'Nothing before we start (array slices)')
     is ($two, undef, 'Nothing before we start')
-    Symbol::fetch_glob($name1)->*->[[@(2,3)]] = @("Very", "Yummy")
-    @(_, $one) =  Symbol::fetch_glob($name1)->*->[[@(2,3)]]
-    @(_, $two) =  Symbol::fetch_glob($name2)->*->[[@(2,3)]]
+    Symbol::fetch_glob($name1)->*->[[(@: 2,3)]] = @: "Very", "Yummy"
+    (@: _, $one) =  Symbol::fetch_glob($name1)->*->[[(@: 2,3)]]
+    (@: _, $two) =  Symbol::fetch_glob($name2)->*->[[(@: 2,3)]]
     is ($one, "Yummy", 'Accessing via the correct name works')
     is ($two, undef,
         'Accessing via a different NUL-containing name gives nothing')
@@ -335,13 +335,13 @@ TODO: do
     ok (!defined Symbol::fetch_glob($name2)->*->{?PWOF},
         'defined via a different NUL-containing name gives nothing')
 
-    my @(_, $one) =  Symbol::fetch_glob($name1)->*->{[@('SNIF', 'BEEYOOP')]}
-    my @(_, $two) =  Symbol::fetch_glob($name2)->*->{[@('SNIF', 'BEEYOOP')]}
+    my (@: _, $one) =  Symbol::fetch_glob($name1)->*->{[(@: 'SNIF', 'BEEYOOP')]}
+    my (@: _, $two) =  Symbol::fetch_glob($name2)->*->{[(@: 'SNIF', 'BEEYOOP')]}
     is ($one, undef, 'Nothing before we start (hash slices)')
     is ($two, undef, 'Nothing before we start')
-    Symbol::fetch_glob($name1)->*->{[@('SNIF', 'BEEYOOP')]} = @("Very", "Yummy")
-    @(_, $one) =  Symbol::fetch_glob($name1)->*->{[@('SNIF', 'BEEYOOP')]}
-    @(_, $two) =  Symbol::fetch_glob($name2)->*->{[@('SNIF', 'BEEYOOP')]}
+    Symbol::fetch_glob($name1)->*->{[(@: 'SNIF', 'BEEYOOP')]} = @: "Very", "Yummy"
+    (@: _, $one) =  Symbol::fetch_glob($name1)->*->{[(@: 'SNIF', 'BEEYOOP')]}
+    (@: _, $two) =  Symbol::fetch_glob($name2)->*->{[(@: 'SNIF', 'BEEYOOP')]}
     is ($one, "Yummy", 'Accessing via the correct name works')
     is ($two, undef,
         'Accessing via a different NUL-containing name gives nothing')
@@ -363,7 +363,7 @@ TODO: do
 
 # test dereferencing errors
 do
-    foreach my $ref (@($^STDOUT))
+    foreach my $ref ((@: $^STDOUT))
         dies_like({ $ref->@ }, qr/Expected an ARRAY reference but got a IO reference/, "Array dereference")
         dies_like({ $ref->% }, qr/Expected a HASH reference but got a IO reference/, "Hash dereference")
         dies_like({ $ref->() }, qr/Expected a CODE reference but got a IO reference/, "Code dereference")
@@ -383,14 +383,14 @@ curr_test($test + 3)
 my $test1 = $test + 1
 my $test2 = $test + 2
 
-package FINALE;
+package FINALE
 
 our ($ref3, $ref1)
 
 do
-    $ref3 = bless \@("ok $test2 - Package destruction\n")	# package destruction
-    my $ref2 = bless \@("ok $test - Lexical destruction\n")	# lexical destruction
-    local $ref1 = bless \@("ok $test1 - Dynamic destruction\n")	# dynamic destruction
+    $ref3 = bless \(@: "ok $test2 - Package destruction\n")	# package destruction
+    my $ref2 = bless \(@: "ok $test - Lexical destruction\n")	# lexical destruction
+    local $ref1 = bless \(@: "ok $test1 - Dynamic destruction\n")	# dynamic destruction
     1					# flush any temp values on stack
 
 

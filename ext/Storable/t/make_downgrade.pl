@@ -6,7 +6,7 @@ use Storable < qw(nfreeze)
 
 # If this looks like a hack, it's probably because it is :-)
 sub uuencode_it
-    my @($data, $name) =  @_
+    my (@: $data, $name) =  @_
     my $frozen = nfreeze $data
 
     my $uu = pack 'u', $frozen
@@ -81,7 +81,7 @@ uuencode_it (\%uhash, "Hash with utf8 flag but no utf8 keys")
 $utf8 = "Schlo\xdf" . chr 256
 chop $utf8
 my $a_circumflex = (ord ('A') == 193 ?? "\x47" !! "\xe5")
-%uhash = %(< map {$_, $_}, @( 'castle', "ch$($a_circumflex)teau", $utf8, "\x{57CE}"))
+%uhash = %(< map {$_, $_}, (@:  'castle', "ch$($a_circumflex)teau", $utf8, "\x{57CE}"))
 
 uuencode_it (\%uhash, "Hash with utf8 keys")
 
@@ -91,7 +91,7 @@ uuencode_it (\%uhash, "Locked hash with utf8 keys")
 
 my (%pre56, %pre58)
 
-while (my @($key, $val) =@( each %uhash))
+while (my (@: $key, $val) =(@:  each %uhash))
     # hash keys are always stored downgraded to bytes if possible, with a flag
     # to say "promote back to utf8"
     # Whereas scalars are stored as is.

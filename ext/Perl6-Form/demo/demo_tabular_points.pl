@@ -1,16 +1,16 @@
 use Perl6::Form
 
-my @play = @(
- "Hamlet",
- "Othello",
- "Richard III",
-    )
+my @play = @: 
+ "Hamlet"
+ "Othello"
+ "Richard III"
+    
 
-my @name = @(
- "Claudius, King of Denmark\r\r",
- "Iago\r\r",
- "Henry, Earl of Richmond\r\r",
-    )
+my @name = @: 
+ "Claudius, King of Denmark\r\r"
+ "Iago\r\r"
+ "Henry, Earl of Richmond\r\r"
+    
 
 
 print $^STDOUT, < form

@@ -15,6 +15,6 @@ $t->output($out_fh)
 $t->failure_output($err_fh)
 $t->todo_output($err_fh)
 
-sub caught { return @($out, $err) }
+sub caught { return (@: $out, $err) }
 
 1

@@ -28,7 +28,7 @@ $sub = B::Terse::compile('', 'bar')
 $sub->()
 
 # now build some regexes that should match the dumped ops
-my @($hex, $op) = @('\(0x[a-f0-9]+\)', '\s+\w+')
+my (@: $hex, $op) = @: '\(0x[a-f0-9]+\)', '\s+\w+'
 my %ops = %( < @+: map { @: $_ => qr/$_ $hex$op/ },
     qw ( OP     COP LOOP PMOP UNOP BINOP LOGOP LISTOP PVOP ) )
 
@@ -59,7 +59,7 @@ warn "# didn't find " . join(' ', keys %ops) if %ops
 our ($a, $b)
 sub bar
     # OP SVOP COP IV here or in sub definition
-    my @bar = @(1, 2, 3)
+    my @bar = (@: 1, 2, 3)
 
     # got a GV here
     my $foo = $a + $b

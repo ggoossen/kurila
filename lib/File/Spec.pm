@@ -19,7 +19,7 @@ my %module = %(MacOS   => 'Mac',
 my $module = %module{?$^OS_NAME} || 'Unix'
 
 require "File/Spec/$module.pm"
-@ISA = @("File::Spec::$module")
+@ISA = @: "File::Spec::$module"
 
 1
 

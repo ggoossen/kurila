@@ -62,8 +62,8 @@ sub recursive_dump($object, $link)
     # Then extract the bless, ref and address parts of that string.
 
     my $what = dump::view($object)		# Stringify
-    my @(?$bless, ?$ref, ?$addr) = @: $what =~ m/^(\w+)=(\w+)\((0x.*)\)$/
-    @($ref, $addr) = (@: $what =~ m/^(\w+)\((0x.*)\)$/) unless $bless
+    my (@: ?$bless, ?$ref, ?$addr) = @: $what =~ m/^(\w+)=(\w+)\((0x.*)\)$/
+    (@: $ref, $addr) = (@: $what =~ m/^(\w+)\((0x.*)\)$/) unless $bless
 
     # Special case for references to references. When stringified,
     # they appear as being scalars. However, ref() correctly pinpoints

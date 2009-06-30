@@ -4,8 +4,8 @@ our @ISA = qw(Exporter)
 require Exporter
 our @EXPORT = qw(setup_recurs teardown_recurs)
 
-use File::Path;
-use File::Basename;
+use File::Path
+use File::Basename
 
 my %Files = %(
     'Problem-Module/Makefile.PL'   => <<'END',
@@ -27,7 +27,7 @@ END
 
 
 sub setup_recurs
-    while(my@(?$file, ?$text) =@( each %Files))
+    while(my(@: ?$file, ?$text) =(@:  each %Files))
         # Convert to a relative, native file path.
         $file = 'File::Spec'->catfile('File::Spec'->curdir, < split m{\/}, $file)
 

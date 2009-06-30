@@ -186,11 +186,11 @@ else
         close $cmdline
         # perlbug #22811
         my $mydollarzero = sub (@< @_)
-            my@($arg) =@( shift)
+            my(@: $arg) =@:  shift
             $^PROGRAM_NAME = $arg if defined $arg
             # In FreeBSD the ps -o command= will cause
             # an empty header line, grab only the last line.
-            my $ps = @(`ps -o command= -p $^PID`)[-1]
+            my $ps = (@: `ps -o command= -p $^PID`)[-1]
             return if $^CHILD_ERROR
             chomp $ps
             printf $^STDOUT, "# 0[\%s]ps[\%s]\n", $^PROGRAM_NAME, $ps

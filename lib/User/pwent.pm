@@ -2,9 +2,9 @@ package User::pwent
 
 our $VERSION = '1.00'
 
-use warnings;
+use warnings
 
-use Config;
+use Config
 
 our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS)
 BEGIN 
@@ -43,29 +43,29 @@ sub import
 
 
 use Class::Struct < qw(struct);
-struct 'User::pwent' => \@(
-       name    => '$',         # pwent[0]
-       passwd  => '$',         # pwent[1]
-       uid     => '$',         # pwent[2]
-       gid     => '$',         # pwent[3]
+struct 'User::pwent' => \(@: 
+       name    => '$'         # pwent[0]
+       passwd  => '$'         # pwent[1]
+       uid     => '$'         # pwent[2]
+       gid     => '$'         # pwent[3]
 
        # you'll only have one/none of these three
-       change  => '$',         # pwent[4]
-       age     => '$',         # pwent[4]
-       quota   => '$',         # pwent[4]
+       change  => '$'         # pwent[4]
+       age     => '$'         # pwent[4]
+       quota   => '$'         # pwent[4]
 
        # you'll only have one/none of these two
-       comment => '$',         # pwent[5]
-       class   => '$',         # pwent[5]
+       comment => '$'         # pwent[5]
+       class   => '$'         # pwent[5]
 
        # you might not have this one
-       gecos   => '$',         # pwent[6]
+       gecos   => '$'         # pwent[6]
 
-       dir     => '$',         # pwent[7]
-       shell   => '$',         # pwent[8]
+       dir     => '$'         # pwent[7]
+       shell   => '$'         # pwent[8]
 
        # you might not have this one
-       expire  => '$',         # pwent[9]
+       expire  => '$'         # pwent[9]
 
        )
 

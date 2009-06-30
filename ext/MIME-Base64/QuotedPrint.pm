@@ -10,7 +10,7 @@ require Exporter
 
 $VERSION = "3.07"
 
-use MIME::Base64;  # will load XS version of {en,de}code_qp()
+use MIME::Base64  # will load XS version of {en,de}code_qp()
 
 *encode = \&encode_qp
 *decode = \&decode_qp

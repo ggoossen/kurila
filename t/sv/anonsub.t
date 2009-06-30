@@ -30,7 +30,7 @@ for ( @prgs)
     if (s/^\s*(-\w+)//)
         $switch = $1
     
-    my@($prog,$expected) =  split(m/\nEXPECT\n/, $_)
+    my(@: $prog,$expected) =  split(m/\nEXPECT\n/, $_)
     open my $test, ">", "$tmpfile"
     print $test, "$prog\n"
     close $test or die "Could not close: $^OS_ERROR"

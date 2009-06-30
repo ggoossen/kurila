@@ -12,8 +12,8 @@ use warnings
 
 my $tmp = "via$^PID"
 
-use Test::More tests => 18;
-use bytes;
+use Test::More tests => 18
+use bytes
 
 my $fh
 my $a = join("", map { chr }, 0..255) x 10

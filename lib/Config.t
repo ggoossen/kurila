@@ -13,13 +13,13 @@ BEGIN
 
 ok(nelems(config_keys) +> 500, "Config has more than 500 entries")
 
-my @($first) = @: Config::config_sh() =~ m/^(\S+)=/m
+my (@: $first) = @: Config::config_sh() =~ m/^(\S+)=/m
 die "Can't find first entry in Config::config_sh()" unless defined $first
 print $^STDOUT, "# First entry is '$first'\n"
 
 # It happens that the we know what the first key should be. This is somewhat
 # cheating, but there was briefly a bug where the key got a bonus newline.
-my @($first_each, ...) =  config_keys
+my (@: $first_each, ...) =  config_keys
 is($first_each, $first, "First key from each is correct")
 
 is(config_value('PERL_REVISION'), undef, "No PERL_REVISION")
@@ -107,8 +107,8 @@ do
 # Signal-related variables
 # (this is actually a regression test for Configure.)
 
-is(nelems @(config_value("sig_num_init")  =~ m/,/g), config_value("sig_size"), "sig_num_init size")
-is(nelems @(config_value("sig_name_init") =~ m/,/g), config_value("sig_size"), "sig_name_init size")
+is(nelems (@: config_value("sig_num_init")  =~ m/,/g), config_value("sig_size"), "sig_num_init size")
+is(nelems (@: config_value("sig_name_init") =~ m/,/g), config_value("sig_size"), "sig_name_init size")
 
 # Test the troublesome virtual stuff
 my @virtual = qw(byteorder ccflags_nolargefiles ldflags_nolargefiles
@@ -117,7 +117,7 @@ my @virtual = qw(byteorder ccflags_nolargefiles ldflags_nolargefiles
 # Also test that the first entry in config.sh is found correctly. There was
 # special casing code for this
 
-foreach my $pain (@($first, < @virtual))
+foreach my $pain ((@: $first, < @virtual))
     # No config var is named with anything that is a regexp metachar
     ok(defined config_value($pain), "\$config('$pain') exists")
 
@@ -131,7 +131,7 @@ foreach my $pain (@($first, < @virtual))
 # TestInit.pm has probably already messed with our $^INCLUDE_PATH
 # This little bit of evil is to avoid a @ in the program, in case it confuses
 # shell 1 liners. Perl 1 rules.
-my @($path, $ver, @< @orig_inc)
+my @: $path, $ver, @< @orig_inc
     =  split m/\n/,
     runperl (nolib=>1,
              prog=>'print $^STDOUT, qq{$^EXECUTABLE_NAME\n$^PERL_VERSION\n}; print $^STDOUT, qq{$_\n} while $_ = shift $^INCLUDE_PATH')
@@ -140,7 +140,7 @@ die "This perl is $^PERL_VERSION at $^EXECUTABLE_NAME; other perl is $ver (at $p
     . '- failed to find this perl' unless $^PERL_VERSION eq $ver
 
 my %orig_inc
-%orig_inc{[ @orig_inc]} =@( $@)
+%orig_inc{[ @orig_inc]} =@:  $@
 
 my $failed
 # This is the order that directories are pushed onto $^INCLUDE_PATH in perl.c:

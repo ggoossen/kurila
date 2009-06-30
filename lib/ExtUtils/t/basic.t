@@ -62,7 +62,7 @@ like( $mpl_out, qr/^Current package is: main$/m,
 ok( -e $makefile,       'Makefile exists' )
 
 # -M is flakey on VMS
-my $mtime = @(stat($makefile))[9]
+my $mtime = (@: stat($makefile))[9]
 cmp_ok( $Touch_Time, '+<=', $mtime,  '  its been touched' )
 
 END { unlink makefile_name(), makefile_backup() }
@@ -257,7 +257,7 @@ ok( -f $meta_yml,    'META.yml written to dist dir' )
 ok( !-e "META_new.yml", 'temp META.yml file not left around' )
 
 ok open my $metafh, "<", $meta_yml or diag $^OS_ERROR
-my $meta = join '', @( ~< \$metafh->*)
+my $meta = join '', @:  ~< \$metafh->*
 ok close $metafh
 
 is $meta, <<"END"
@@ -318,7 +318,7 @@ close $saverr
 sub _normalize
     my $hash = shift
 
-    while(my@(?$k,?$v) =@( each $hash->%))
+    while(my(@: ?$k,?$v) =(@:  each $hash->%))
         delete $hash->{$k}
         $hash->{+lc $k} = $v
     

@@ -60,18 +60,18 @@ do
 
     # We'll get warnings about the bogus libs, that's ok.
     unlike( $warnings, qr/WARNING: .* takes/ )
-    is_deeply( $mm->{?LIBS}, @('-lwibble -lwobble') )
+    is_deeply( $mm->{?LIBS}, (@: '-lwibble -lwobble') )
 
     $warnings = ''
     $mm = WriteMakefile(
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
-        LIBS            => @('-lwibble', '-lwobble'),
+        LIBS            => (@: '-lwibble', '-lwobble'),
         )
 
     # We'll get warnings about the bogus libs, that's ok.
     unlike( $warnings, qr/WARNING: .* takes/ )
-    is_deeply( $mm->{?LIBS}, @('-lwibble', '-lwobble') )
+    is_deeply( $mm->{?LIBS}, (@: '-lwibble', '-lwobble') )
 
     $warnings = ''
     dies_like {
@@ -102,7 +102,7 @@ do
     dies_like {
                   $mm = WriteMakefile(
             NAME       => 'Big::Dummy',
-            VERSION    => \@(1,2,3),
+            VERSION    => \(@: 1,2,3),
             );
               }, qr{^VERSION takes a version object or PLAINVALUE} 
 

@@ -187,7 +187,7 @@ sub PERL_UNICODE_STDIN () { 0x0001 }
 sub ReadLine {'Term::ReadLine::Stub'}
 sub readline
     my $self = shift
-    my @($in,$out,$str) =  $self->@
+    my (@: $in,$out,$str) =  $self->@
     my $prompt = shift
     print $out, @rl_term_set[0], $prompt, @rl_term_set[1], @rl_term_set[2]
     $self->register_Tk
@@ -236,7 +236,7 @@ sub findConsole
     if (!defined $consoleOUT)
         $consoleOUT = defined fileno($^STDERR) && $^OS_NAME ne 'MSWin32' ?? "&STDERR" !! "&STDOUT"
     
-    return @($console,$consoleOUT)
+    return @: $console,$consoleOUT
 
 
 sub new
@@ -244,7 +244,7 @@ sub new
         unless (nelems @_)==2 or (nelems @_)==4
     my ($FIN, $FOUT, $ret)
     if ((nelems @_)==2)
-        my@($console, $consoleOUT) =  @_[0]->findConsole
+        my(@: $console, $consoleOUT) =  @_[0]->findConsole
 
 
         # the Windows CONIN$ needs GENERIC_WRITE mode to allow
@@ -253,11 +253,11 @@ sub new
         open my $fout, ">","$consoleOUT"
 
         iohandle::output_autoflush($fout, 1)
-        $ret = bless \@(\$fin->*, \$fout->*)
+        $ret = bless \@: \$fin->*, \$fout->*
     else                        # Filehandles supplied
         $FIN = @_[2]; $FOUT = @_[3]
         iohandle::output_autoflush($FOUT, 1)
-        $ret = bless \@($FIN, $FOUT)
+        $ret = bless \@: $FIN, $FOUT
     
     if ($ret->Features->{?ornaments}
           and not (env::var('PERL_RL') and env::var('PERL_RL') =~ m/\bo\w*=0/))
@@ -288,11 +288,11 @@ sub get_line
     return scalar ~< $in
 
 
-package Term::ReadLine;         # So late to allow the above code be defined?
+package Term::ReadLine         # So late to allow the above code be defined?
 
 our $VERSION = '1.03'
 
-my @($which) = defined env::var('PERL_RL') ?? split m/\s+/, env::var('PERL_RL') !! @(undef)
+my (@: $which) = defined env::var('PERL_RL') ?? split m/\s+/, env::var('PERL_RL') !! @: undef
 if ($which)
     if ($which =~ m/\bgnu\b/i)
         eval "use Term::ReadLine::Gnu;"
@@ -317,7 +317,7 @@ if (defined &Term::ReadLine::Gnu::readline)
 elsif (defined &Term::ReadLine::Perl::readline)
     @ISA = qw(Term::ReadLine::Perl Term::ReadLine::Stub)
 elsif (defined $which && defined &{Symbol::fetch_glob("Term::ReadLine::$which\::readline")->*})
-    @ISA = @( "Term::ReadLine::$which" )
+    @ISA = @:  "Term::ReadLine::$which" 
 else
     @ISA = qw(Term::ReadLine::Stub)
 
@@ -326,7 +326,7 @@ package Term::ReadLine::TermCap
 
 # Prompt-start, prompt-end, command-line-start, command-line-end
 #     -- zero-width beautifies to emit around prompt and the command line.
-our @rl_term_set = @("","","","")
+our @rl_term_set = (@: "","","","")
 # string encoded:
 our $rl_term_set = ',,,'
 
@@ -356,7 +356,7 @@ sub ornaments
 
 
 
-package Term::ReadLine::Tk;
+package Term::ReadLine::Tk
 
 our($count_handle, $count_DoOne, $count_loop)
 $count_handle = $count_DoOne = $count_loop = 0

@@ -381,8 +381,8 @@ do
 
 do
     # subst with mixed utf8/non-utf8 type
-    my@($ua, $ub, $uc, $ud) = @("\x{101}", "\x{102}", "\x{103}", "\x{104}")
-    my@($na, $nb) = @("\x{ff}", "\x{fe}")
+    my(@: $ua, $ub, $uc, $ud) = @: "\x{101}", "\x{102}", "\x{103}", "\x{104}"
+    my(@: $na, $nb) = @: "\x{ff}", "\x{fe}"
     my $a = "$ua--$ub"
     my $b
     ($b = $a) =~ s/--/$na/

@@ -7,7 +7,7 @@ my %Expect_Dir  = $% # what we expect for $File::Find::dir
 my $symlink_exists = try { symlink("",""); 1 }
 my $warn_msg
 
-use Carp::Heavy (); # make sure Carp::Heavy is already loaded, because $^INCLUDE_PATH is relative
+use Carp::Heavy () # make sure Carp::Heavy is already loaded, because $^INCLUDE_PATH is relative
 
 BEGIN 
     $^WARN_HOOK = sub (@< @_) { $warn_msg = @_[0]; print $^STDERR, "# " . @_[0]->message; }
@@ -40,7 +40,7 @@ BEGIN
         # Win32 or VMS, so force File::Spec to use Unix names.
         # must be set *before* importing File::Find
         require File::Spec::Unix
-        @File::Spec::ISA = @( 'File::Spec::Unix' )
+        @File::Spec::ISA = @:  'File::Spec::Unix' 
     
     require File::Find
     File::Find->import()

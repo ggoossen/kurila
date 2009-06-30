@@ -15,7 +15,7 @@ if (open(my $cf_fh, "<", $CF))
         # Skip S since we are going for 'F'ull case folding
         if (m/^([0-9A-F]+); ([CFI]); ((?:[0-9A-F]+)(?: [0-9A-F]+)*); \# (.+)/)
             next if EBCDIC && hex $1 +< 0x100
-            push @CF, \@($1, $2, $3, $4)
+            push @CF, \@: $1, $2, $3, $4
         
     
 
@@ -27,7 +27,7 @@ if (open(my $cf_fh, "<", $CF))
 
     my $i = 0
     for my $cf (@CF)
-        my @($code, $status, $mapping, $name) =  $cf->@
+        my (@: $code, $status, $mapping, $name) =  $cf->@
         $i++
         my $a = pack("U0U*", hex $code)
         my $b = pack("U0U*", < map { hex }, split " ", $mapping)

@@ -48,7 +48,7 @@ do
 $_ = "global"
 do
     my $_ = 'local'
-    for my $_ (@("foo"))
+    for my $_ ((@: "foo"))
         ok( $_ eq "foo", 'for my $_' )
         m/(.)/
         ok( $1 eq "f", '...m// in for my $_' )
@@ -59,7 +59,7 @@ do
 
 do
     my $_ = 'local'
-    for (@("implicit foo")) # implicit "my $_"
+    for ((@: "implicit foo")) # implicit "my $_"
         ok( $_ eq "implicit foo", 'for implicit my $_' )
         m/(.)/
         ok( $1 eq "i", '...m// in for implicity my $_' )
@@ -70,13 +70,13 @@ do
 
 do
     my $_ = 'local'
-    for (@( 'postfix foo'))
+    for ((@:  'postfix foo'))
         ok( $_ eq "postfix foo", 'postfix for' )
     ok( $_ eq 'local', '...my $_ restored outside postfix for' )
     ok( our $_ eq 'global', '...our $_ restored outside postfix for' )
 
 do
-    for our $_ (@("bar"))
+    for our $_ ((@: "bar"))
         ok( $_ eq "bar", 'for our $_' )
         m/(.)/
         ok( $1 eq "b", '...m// in for our $_' )
@@ -96,13 +96,13 @@ do
         do { ok( our $_ eq 'global', 'our $_ still visible' ); };
         ok( $_ == 6 || $_ == 7, 'local lexical $_ is still seen in map' );
         do { my $_ ; ok( !defined, 'nested my $_ is undefined' ); };
-      }, @( 6, 7)
+      }, @:  6, 7
     ok( $buf eq 'gxgx', q/...map doesn't modify outer lexical $_/ )
     ok( $_ eq 'x', '...my $_ restored outside map' )
     ok( our $_ eq 'global', '...our $_ restored outside map' )
-    map { my $_; ok( !defined, 'redeclaring $_ in map block undefs it' ); }, @( 1)
+    map { my $_; ok( !defined, 'redeclaring $_ in map block undefs it' ); }, @:  1
 
-do { map { my $_; ok( !defined, 'declaring $_ in map block undefs it' ); }, @( 1); }
+do { map { my $_; ok( !defined, 'declaring $_ in map block undefs it' ); }, (@:  1); }
 do
     sub tmap3 () { return $_ };
     my $_ = 'local'
@@ -121,7 +121,7 @@ do
         ok( m/^[89]\z/, 'local lexical $_ is seen in grep' );
         do { ok( our $_ eq 'global', 'our $_ still visible' ); };
         ok( $_ == 8 || $_ == 9, 'local lexical $_ is still seen in grep' );
-      }, @( 8, 9)
+      }, @:  8, 9
     ok( $buf eq 'gygy', q/...grep doesn't modify outer lexical $_/ )
     ok( $_ eq 'y', '...my $_ restored outside grep' )
     ok( our $_ eq 'global', '...our $_ restored outside grep' )

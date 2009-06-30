@@ -15,13 +15,13 @@ our (
     $NL,
     )
 
-@ISA = @('Pod::Simple::BlackBox')
+@ISA = @: 'Pod::Simple::BlackBox'
 $VERSION = '3.05'
 
 @Known_formatting_codes = qw(I B C L E F S X Z)
-%Known_formatting_codes = %( < @+: map( {@($_=>1) }, @Known_formatting_codes) )
+%Known_formatting_codes = %( < @+: map( {(@: $_=>1) }, @Known_formatting_codes) )
 @Known_directives       = qw(head1 head2 head3 head4 item over back)
-%Known_directives       = %( < @+: map( {@($_=>'Plain') }, @Known_directives) )
+%Known_directives       = %( < @+: map( {(@: $_=>'Plain') }, @Known_directives) )
 $NL = $^INPUT_RECORD_SEPARATOR unless defined $NL
 
 #-----------------------------------------------------------------------------
@@ -157,7 +157,7 @@ sub new
     #Carp::croak(__PACKAGE__ . " is a virtual base class -- see perldoc "
     #  . __PACKAGE__ );
     return bless \%(
-        'accept_codes'      => \%( < @+: map( { @($_=>$_) }, @Known_formatting_codes ) ),
+        'accept_codes'      => \%( < @+: map( { (@: $_=>$_) }, @Known_formatting_codes ) ),
         'accept_directives' => \%( < %Known_directives ),
         'accept_targets'    => \$%,
         ), $class
@@ -190,7 +190,7 @@ sub accept_directive_as_data($self, @< @_)      { $self->_accept_directives('Dat
 sub accept_directive_as_processed($self, @< @_) { $self->_accept_directives('Plain',    < @_) }
 
 sub _accept_directives
-    my@($this, $type) =@( splice @_,0,2)
+    my(@: $this, $type) =@:  splice @_,0,2
     foreach my $d ( @_)
         next unless defined $d and length $d
         die "\"$d\" isn't a valid directive name"
@@ -239,7 +239,7 @@ sub accept_targets_as_text($self, @< @_) { $self->_accept_targets('force_resolve
 # forces them to be processed, even when there's no ":".
 
 sub _accept_targets
-    my@($this, $type) =@( splice @_,0,2)
+    my(@: $this, $type) =@:  splice @_,0,2
     foreach my $t ( @_)
         next unless defined $t and length $t
         # TODO: enforce some limitations on what a target name can be?
@@ -367,7 +367,7 @@ sub _init_fh_source($self, $source)
 #
 
 sub parse_file
-    my@($self, $source) = @(< @_)
+    my(@: $self, $source) = @: < @_
 
     if(!defined $source)
         die("Can't use empty-string as a source for parse_file")
@@ -536,7 +536,7 @@ sub _make_treelet
     my $self = shift  # and ($para, $start_line)
     my $treelet
     if(!nelems @_)
-        return \@('')
+        return \@: ''
      if(ref @_[0] and ref @_[0]->[0] and @_[0]->[0]->[0] eq '~Top')
         # Hack so we can pass in fake-o pre-cooked paragraphs:
         #  just have the first line be a reference to a ['~Top', {}, ...]
@@ -598,7 +598,7 @@ sub _wrap_up($self, @< @stack)
                 )
                 DEBUG +> 3 and print $^STDOUT, "   Merging ", $i-1,
                     ":[$treelet->[$i-1]] and $i\:[$treelet->[$i]]\n"
-                $treelet->[$i-1] .= @(splice($treelet->@, $i, 1))[0]
+                $treelet->[$i-1] .= (@: splice($treelet->@, $i, 1))[0]
                 DEBUG +> 4 and print $^STDOUT, "    Now: ", $i-1, ":[$treelet->[$i-1]]\n"
                 next
             # since we just pulled the possibly last node out from under
@@ -610,7 +610,7 @@ sub _wrap_up($self, @< @stack)
 
                 if($treelet->[$i]->[0] eq 'L')
                     my $thing
-                    foreach my $attrname (@('section', 'to'))
+                    foreach my $attrname ((@: 'section', 'to'))
                         if(defined($thing = $treelet->[$i]->[1]->{?$attrname}) and ref $thing)
                             unshift @stack, $thing
                             DEBUG +> 4 and print $^STDOUT, "  +Enqueuing ", <
@@ -631,7 +631,7 @@ sub _wrap_up($self, @< @stack)
 #:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
 
 sub _remap_sequences
-    my@($self,@< @stack) =  @_
+    my(@: $self,@< @stack) =  @_
 
     if((nelems @stack) == 1 and (nelems @stack[0]->@) == 3 and !ref @stack[0]->[2])
         # VERY common case: abort it.
@@ -698,7 +698,7 @@ sub _remap_sequences
                     
 
                     #$nugget = ;
-                    splice $treelet->@, $i, 1, \@(pop(@dynasty), \$%, $treelet->[$i])
+                    splice $treelet->@, $i, 1, \(@: pop(@dynasty), \$%, $treelet->[$i])
                 # relace node with a new parent
                 
             elsif($is eq '0')
@@ -731,7 +731,7 @@ sub _remap_sequences
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sub _ponder_extend($self, $para)
-    my $content = join ' ', @( splice $para->@, 2)
+    my $content = join ' ', @:  splice $para->@, 2
     $content =~ s/^\s+//s
     $content =~ s/\s+$//s
 
@@ -1070,7 +1070,7 @@ sub _treat_Ls($self,@< @stack)
                     print $^STDOUT, "    Peering at L-content text bit \"@ell_content[$j]\" for a '|'.\n"
 
                 if(@ell_content[$j] =~ m/^([^\|]*)\|(.*)$/s)
-                    my @link_text = @($1)   # might be 0-length
+                    my @link_text = (@: $1)   # might be 0-length
                     @ell_content[$j] = $2  # might be 0-length
 
                     DEBUG +> 3 and
@@ -1099,7 +1099,7 @@ sub _treat_Ls($self,@< @stack)
                     print $^STDOUT, "    Peering at L-content text bit \"@ell_content[$j]\" for a '/'.\n"
 
                 if(@ell_content[$j] =~ m/^([^\/]*)\/(.*)$/s)
-                    my @section_name = @($2) # might be 0-length
+                    my @section_name = (@: $2) # might be 0-length
                     @ell_content[$j] =  $1  # might be 0-length
 
                     DEBUG +> 3 and
@@ -1144,7 +1144,7 @@ sub _treat_Ls($self,@< @stack)
               (nelems @ell_content) == 1 and @ell_content[0] eq '"'
                 )
                 )
-                $section_name = \@(splice @ell_content)
+                $section_name = \@: splice @ell_content
                 $section_name->[ 0] =~ s/^\"//s
                 $section_name->[-1] =~ s/\"$//s
             
@@ -1153,7 +1153,7 @@ sub _treat_Ls($self,@< @stack)
             if(!$section_name and !$link_text and nelems @ell_content
                  and grep { !ref($_) && m/ /s }, @ell_content
                 )
-                $section_name = \@(splice @ell_content)
+                $section_name = \(@: splice @ell_content)
             # That's support for the now-deprecated syntax.
             # (Maybe generate a warning eventually?)
             # Note that it deliberately won't work on L<...|Foo Bar>
@@ -1190,20 +1190,20 @@ sub _treat_Ls($self,@< @stack)
 
             if( defined $section_name )
                 $ell->[1]->{+'section'} = Pod::Simple::LinkSection->new(
-                    \@('', \$%, < $section_name->@)
+                    \@: '', \$%, < $section_name->@
                     )
                 DEBUG +> 3 and print $^STDOUT, "L-section content: ", < pretty($ell->[1]->{?'section'}), "\n"
             
 
             if( (nelems @ell_content) )
                 $ell->[1]->{+'to'} = Pod::Simple::LinkSection->new(
-                    \@('', \$%, < @ell_content)
+                    \@: '', \$%, < @ell_content
                     )
                 DEBUG +> 3 and print $^STDOUT, "L-to content: ", < pretty($ell->[1]->{?'to'}), "\n"
             
 
             # And update children to be the link-text:
-            $ell->@ = @( <$ell->[[@(0,1)]], defined($link_text) ?? splice($link_text->@) !! '')
+            $ell->@ = @:  <$ell->[[(@: 0,1)]], defined($link_text) ?? splice($link_text->@) !! ''
 
             DEBUG +> 2 and print $^STDOUT, "End of L-parsing for this node $treelet->[$i]\n"
 
@@ -1236,7 +1236,7 @@ sub _treat_Es($self,@< @stack)
                 # SPECIAL STUFF for semi-processed L<>'s
 
                 my $thing
-                foreach my $attrname (@('section', 'to'))
+                foreach my $attrname ((@: 'section', 'to'))
                     if(defined($thing = $treelet->[$i]->[1]->{?$attrname}) and ref $thing)
                         unshift @stack, $thing
                         DEBUG +> 2 and print $^STDOUT, "  Enqueuing ", <

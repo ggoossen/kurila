@@ -59,7 +59,7 @@ my $load = sub (@< @_)
     my $mod = shift
     eval "use $mod"
     die $^EVAL_ERROR if $^EVAL_ERROR
-    @ISA = @($mod)
+    @ISA = @: $mod
 
 
 do

@@ -23,13 +23,13 @@ sub import
 
 
 use Class::Struct < qw(struct);
-struct 'Net::hostent' => \@(
-       name             => '$',
-       aliases  => '@',
-       addrtype => '$',
-       'length' => '$',
-       addr_list        => '@',
-       )
+struct 'Net::hostent' => \@: 
+       name             => '$'
+       aliases  => '@'
+       addrtype => '$'
+       'length' => '$'
+       addr_list        => '@'
+       
 
 sub addr($self, @< @_) { $self->addr_list->[0] }
 
@@ -37,11 +37,11 @@ sub populate
     return unless (nelems @_)
     my $hob = new()
     $h_name      =    $hob->[0]              = @_[0]
-    @h_aliases   = @(  $hob->[1]->@ = split ' ', @_[1] )
+    @h_aliases   = @:   $hob->[1]->@ = split ' ', @_[1] 
     $h_addrtype  =    $hob->[2]              = @_[2]
     $h_length    =    $hob->[3]              = @_[3]
     $h_addr      =                             @_[4]
-    @h_addr_list = @(  $hob->[4]->@ =          @_[[@( ( <4 .. ((nelems @_)-1))) ]] )
+    @h_addr_list = @:   $hob->[4]->@ =          @_[[(@:  ( <4 .. ((nelems @_)-1))) ]] 
     return $hob
 
 

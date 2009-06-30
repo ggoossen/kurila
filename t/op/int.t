@@ -28,7 +28,7 @@ do
 
 # check bad strings still get converted
 
-@x = @( 6, 8, 10)
+@x = @:  6, 8, 10
 print $^STDOUT, "not " if @x["1foo"] != 8
 print $^STDOUT, "ok 7\n"
 

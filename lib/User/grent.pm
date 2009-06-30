@@ -19,18 +19,18 @@ sub import
 
 
 use Class::Struct < qw(struct);
-struct 'User::grent' => \@(
-       name    => '$',
-       passwd  => '$',
-       gid          => '$',
-       members => '@',
-       )
+struct 'User::grent' => \@: 
+       name    => '$'
+       passwd  => '$'
+       gid          => '$'
+       members => '@'
+       
 
 sub populate
     return unless (nelems @_)
     my $gob = new()
-    @($gr_name, $gr_passwd, $gr_gid) = $gob->@[[@(0,1,2)]] =  @_[[@(0,1,2)]]
-    @gr_members = @( $gob->[3]->@ = split ' ', @_[3] )
+    (@: $gr_name, $gr_passwd, $gr_gid) = $gob->@[[(@: 0,1,2)]] =  @_[[(@: 0,1,2)]]
+    @gr_members = @:  $gob->[3]->@ = split ' ', @_[3] 
     return $gob
 
 

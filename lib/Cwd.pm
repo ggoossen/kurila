@@ -169,7 +169,7 @@ L<File::chdir>
 
 use Exporter
 our (@ISA, @EXPORT, @EXPORT_OK, $VERSION)
-use env;
+use env
 
 $VERSION = '3.2701'
 
@@ -287,9 +287,9 @@ my %METHOD_MAP =
 # are safe.  This prevents _backtick_pwd() consulting $ENV{PATH}
 # so everything works under taint mode.
 my $pwd_cmd
-foreach my $try (@('/bin/pwd',
-                   '/usr/bin/pwd',
-                   '/QOpenSys/bin/pwd',) # OS/400 PASE.
+foreach my $try (@: '/bin/pwd'
+                    '/usr/bin/pwd'
+                    '/QOpenSys/bin/pwd', # OS/400 PASE.
     )
 
     if( -x $try )
@@ -385,13 +385,13 @@ sub fastcwd_
     my($odev, $oino, $cdev, $cino, $tdev, $tino)
     my(@path, $path)
 
-    my@($orig_cdev, $orig_cino) = stat@('.')
-    @($cdev, $cino) = @($orig_cdev, $orig_cino)
+    my(@: $orig_cdev, $orig_cino) = stat@: '.'
+    (@: $cdev, $cino) = @: $orig_cdev, $orig_cino
     while (1)
         my $direntry
-        @($odev, $oino) = @($cdev, $cino)
+        (@: $odev, $oino) = @: $cdev, $cino
         CORE::chdir('..') || return undef
-        @($cdev, $cino) = stat@('.')
+        (@: $cdev, $cino) = stat@: '.'
         last if $odev == $cdev && $oino == $cino
         opendir(my $dir, '.') || return undef
         while (1)
@@ -400,7 +400,7 @@ sub fastcwd_
             next if $direntry eq '.'
             next if $direntry eq '..'
 
-            @($tdev, $tino) = lstat@($direntry)
+            (@: $tdev, $tino) = lstat@: $direntry
             last unless $tdev != $odev || $tino != $oino
         
         closedir($dir)
@@ -413,7 +413,7 @@ sub fastcwd_
     # Untaint it then check that we landed where we started.
     $path =~ m/^(.*)\z/s                # untaint
         && CORE::chdir($1) or return undef
-    @($cdev, $cino) = stat@('.')
+    (@: $cdev, $cino) = stat@: '.'
     die "Unstable directory path, current directory changed unexpectedly"
         if $cdev != $orig_cdev || $cino != $orig_cino
     $path
@@ -430,8 +430,8 @@ my $chdir_init = 0
 
 sub chdir_init
     if (env::var('PWD') and $^OS_NAME ne 'os2' and $^OS_NAME ne 'dos' and $^OS_NAME ne 'MSWin32')
-        my@($dd,$di, ...) = @: stat('.')
-        my@($pd,$pi, ...) = @: stat(env::var('PWD'))
+        my(@: $dd,$di, ...) = @: stat('.')
+        my(@: $pd,$pi, ...) = @: stat(env::var('PWD'))
         if (!defined $dd or !defined $pd or $di != $pi or $dd != $pd)
             env::var('PWD' ) = cwd()
         
@@ -442,8 +442,8 @@ sub chdir_init
     
     # Strip an automounter prefix (where /tmp_mnt/foo/bar == /foo/bar)
     if ($^OS_NAME ne 'MSWin32' and env::var('PWD') =~ m|(/[^/]+(/[^/]+/[^/]+))(.*)|s)
-        my@(?$pd,?$pi, ...) = @: stat($2)
-        my@(?$dd,?$di, ...) = @: stat($1)
+        my(@: ?$pd,?$pi, ...) = @: stat($2)
+        my(@: ?$dd,?$di, ...) = @: stat($1)
         if (defined $pd and defined $dd and $di == $pi and $dd == $pd)
             env::var('PWD' ) = "$2$3"
         
@@ -478,7 +478,7 @@ sub chdir
         env::var('PWD' ) = $newdir
     else
         my @curdir = split(m#/#,env::var('PWD'))
-        @curdir = @('') unless (nelems @curdir)
+        @curdir = (@: '') unless (nelems @curdir)
         foreach my $component (split(m#/#, $newdir))
             next if $component eq '.'
             pop(@curdir),next if $component eq '..'
@@ -494,7 +494,7 @@ sub _perl_abs_path
     my $start = (nelems @_) ?? shift !! '.'
     my($dotdots, $cwd, @pst, @cst, $dir, @tst)
 
-    unless (@cst = @( stat( $start ) ))
+    unless (@cst = (@:  stat( $start ) ))
         warn("stat($start): $^OS_ERROR")
         return ''
     
@@ -503,7 +503,7 @@ sub _perl_abs_path
         # Make sure we can be invoked on plain files, not just directories.
         # NOTE that this routine assumes that '/' is the only directory separator.
 
-        my @(?$dir, ?$file) = @: $start =~ m{^(.*)/(.+)$}
+        my (@: ?$dir, ?$file) = @: $start =~ m{^(.*)/(.+)$}
             or return cwd() . '/' . $start
 
         # Can't use "-l _" here, because the previous stat was a stat(), not an lstat().
@@ -531,7 +531,7 @@ sub _perl_abs_path
             # probably a permissions issue.  Try the native command.
             return File::Spec->rel2abs( $start, < _backtick_pwd() )
         
-        unless (@cst = @( stat($dotdots) ))
+        unless (@cst = (@:  stat($dotdots) ))
             war("stat($dotdots): $^OS_ERROR")
             closedir($parent)
             return ''
@@ -545,7 +545,7 @@ sub _perl_abs_path
                     closedir($parent)
                     return ''
                 
-                @tst[0] = @pst[0]+1 unless (@tst = @( lstat("$dotdots/$dir") ))
+                @tst[0] = @pst[0]+1 unless (@tst = (@:  lstat("$dotdots/$dir") ))
             while ( $dir eq '.' || $dir eq '..' || @tst[0] != @pst[0] ||
                       @tst[1] != @pst[1] )
         
@@ -566,8 +566,8 @@ sub fast_abs_path
 
     # Detaint else we'll explode in taint mode.  This is safe because
     # we're not doing anything dangerous with it.
-    @($path) = @: $path =~ m/(.*)/
-    @($cwd)  = @: $cwd  =~ m/(.*)/
+    (@: $path) = @: $path =~ m/(.*)/
+    (@: $cwd)  = @: $cwd  =~ m/(.*)/
 
     unless (-e $path)
         die("$path: No such file or directory")
@@ -576,7 +576,7 @@ sub fast_abs_path
     unless (-d _)
         # Make sure we can be invoked on plain files, not just directories.
 
-        my @($vol, $dir, $file) =  File::Spec->splitpath($path)
+        my (@: $vol, $dir, $file) =  File::Spec->splitpath($path)
         return File::Spec->catfile($cwd, $path) unless length $dir
 
         if (-l $path)

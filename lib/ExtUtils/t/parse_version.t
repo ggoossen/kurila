@@ -23,12 +23,12 @@ my %versions = %(q[$VERSION = '1.00']        => '1.00',
 
 plan tests => (2 * nkeys %versions) + 8
 
-while( my@(?$code, ?$expect) =@( each %versions) )
+while( my(@: ?$code, ?$expect) =(@:  each %versions) )
     is( parse_version_string($code), $expect, $code )
 
 
-for my $v (@: @(q[use version; $VERSION = v1.2.3;], v1.2.3)
-              @(q[$VERSION = v1.2.3], v1.2.3))
+for my $v (@: @: q[use version; $VERSION = v1.2.3;], v1.2.3
+              (@: q[$VERSION = v1.2.3], v1.2.3))
     is( parse_version_string($v[0]), $v[1]->stringify, $v[0])
 
 

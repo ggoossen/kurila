@@ -17,7 +17,7 @@ print $^STDOUT, < form \%(single=>'='), \%(interleave=>1), <<'.',
    +--------------------------------------->
     {|||||||||||||||||||||||||||||||||||}
 .
-                       "Height", \@( ~< $^DATA), "Time"
+                       "Height", \(@:  ~< $^DATA), "Time"
 
 
 print $^STDOUT, < form <<'.',

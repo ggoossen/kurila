@@ -23,10 +23,10 @@ BEGIN
 
 
 require Carp
-use File::Spec;
-use Params::Check <               qw[check];
-use Module::Load::Conditional <   qw[can_load];
-use Locale::Maketext::Simple    Style => 'gettext';
+use File::Spec
+use Params::Check <               qw[check]
+use Module::Load::Conditional <   qw[can_load]
+use Locale::Maketext::Simple    Style => 'gettext'
 
 =pod
 
@@ -190,7 +190,7 @@ sub can_run
 
     else
         for my $dir (@:
-            < split(m/\Q$(Config::config_value('path_sep'))\E/, env::var('PATH')),
+            < split(m/\Q$(Config::config_value('path_sep'))\E/, env::var('PATH'))
             File::Spec->curdir
             )
             my $abs = File::Spec->catfile($dir, $command)
@@ -380,8 +380,8 @@ sub run
     ### return a list of flags and buffers (if available) in list
     ### context, or just a simple 'ok' in scalar
     return $have_buffer
-        ??  @($ok, $^CHILD_ERROR, \@buffer, \@buff_out, \@buff_err)
-        !!  @($ok, $^CHILD_ERROR )
+        ??  @: $ok, $^CHILD_ERROR, \@buffer, \@buff_out, \@buff_err
+        !!  @: $ok, $^CHILD_ERROR 
 
 
 sub _open3_run
@@ -408,10 +408,10 @@ sub _open3_run
     ### to revive the FH afterwards, as IPC::Open3 closes it.
     ### We'll do the same for STDOUT and STDERR. It works without
     ### duping them on non-unix derivatives, but not on win32.
-    my @fds_to_dup = @( IS_WIN32 && !$verbose
-                                ?? < qw[STDIN STDOUT STDERR]
-                                !! < qw[STDIN]
-        )
+    my @fds_to_dup = @:  IS_WIN32 && !$verbose
+                                      ?? < qw[STDIN STDOUT STDERR]
+                                      !! < qw[STDIN]
+        
     __PACKAGE__->__dup_fds( < @fds_to_dup )
 
 
@@ -559,7 +559,7 @@ sub _system_run
     my $cmd     = shift
     my $verbose = shift || 0
 
-    my @fds_to_dup = @( $verbose ?? () !! < qw[STDOUT STDERR] )
+    my @fds_to_dup = @:  $verbose ?? () !! < qw[STDOUT STDERR] 
     __PACKAGE__->__dup_fds( < @fds_to_dup )
 
     ### system returns 'true' on failure -- the exit code of the cmd
@@ -575,9 +575,9 @@ do  use File::Spec
     use Symbol
 
     my %Map = %(
-        STDOUT => \@( <qw|>&|, $^STDOUT, Symbol::gensym() ),
-        STDERR => \@( <qw|>&|, $^STDERR, Symbol::gensym() ),
-        STDIN  => \@( <qw|<&|, $^STDIN,  Symbol::gensym() ),
+        STDOUT => \(@:  <qw|>&|, $^STDOUT, Symbol::gensym() ),
+        STDERR => \(@:  <qw|>&|, $^STDERR, Symbol::gensym() ),
+        STDIN  => \(@:  <qw|<&|, $^STDIN,  Symbol::gensym() ),
         )
 
     ### dups FDs and stores them in a cache
@@ -588,7 +588,7 @@ do  use File::Spec
         __PACKAGE__->_debug( "# Closing the following fds: $(join ' ',@fds)" ) if $DEBUG
 
         for my $name (  @fds )
-            my@($redir, $fh, $glob) =  %Map{?$name}->@ or (
+            my(@: $redir, $fh, $glob) =  %Map{?$name}->@ or (
                 Carp::carp( <loc("No such FD: '\%1'", $name)), next )
 
             ### MUST use the 2-arg version of open for dup'ing for
@@ -617,7 +617,7 @@ do  use File::Spec
         __PACKAGE__->_debug( "# Reopening the following fds: $(join ' ',@fds)" ) if $DEBUG
 
         for my $name (  @fds )
-            my@($redir, $fh, $glob) =  %Map{?$name}->@ or (
+            my(@: $redir, $fh, $glob) =  %Map{?$name}->@ or (
                 Carp::carp( <loc("No such FD: '\%1'", $name)), next )
 
             open( $fh, $redir, fileno($glob) ) or (

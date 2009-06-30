@@ -60,15 +60,15 @@ sub arg_include_dirs
 sub arg_nolink { '-c' }
 
 sub arg_object_file($self, $file)
-    return  @('-o', $file)
+    return  @: '-o', $file
 
 
 sub arg_share_object_file($self, $file)
-    return  @(< $self->split_like_shell($self->{config}{lddlflags}), '-o', $file)
+    return  @: < $self->split_like_shell($self->{config}{lddlflags}), '-o', $file
 
 
 sub arg_exec_file($self, $file)
-    return  @('-o', $file)
+    return  @: '-o', $file
 
 
 sub arg_defines($self, %< %args)
@@ -92,11 +92,11 @@ sub compile($self, %< %args)
     my @cccdlflags = $self->split_like_shell($cf{cccdlflags})
     my @ccflags = $self->split_like_shell($cf{ccflags})
     my @optimize = $self->split_like_shell($cf{optimize})
-    my @flags = @(< @include_dirs, < @defines, < @cccdlflags, < @extra_compiler_flags,
-                  $self->arg_nolink,
-                  < @ccflags, < @optimize,
-                  < $self->arg_object_file(%args{object_file}),
-        )
+    my @flags = @: < @include_dirs, < @defines, < @cccdlflags, < @extra_compiler_flags
+                   $self->arg_nolink
+                   < @ccflags, < @optimize
+                   < $self->arg_object_file(%args{object_file})
+        
 
     my @cc = $self->split_like_shell($cf{cc})
 
@@ -124,7 +124,7 @@ sub have_compiler($self)
     warn $^EVAL_ERROR if $^EVAL_ERROR
     my $result = $self->{+have_compiler} = $^EVAL_ERROR ?? 0 !! 1
 
-    foreach ( grep { defined }, @( $tmpfile, $obj_file, < @lib_files))
+    foreach ( grep { defined }, (@:  $tmpfile, $obj_file, < @lib_files))
         1 while unlink
     
     return $result
@@ -180,7 +180,7 @@ sub _do_link($self, $type, %< %args)
     my $cf = $self->{?config} # For convenience
 
     my $objects = delete %args{objects}
-    $objects = \@($objects) unless ref $objects
+    $objects = \(@: $objects) unless ref $objects
     my $out = %args{?$type} || $self->?$type($objects->[0])
 
     my @temp_files
@@ -188,18 +188,18 @@ sub _do_link($self, $type, %< %args)
         $self->prelink(< %args,
         dl_name => %args{module_name}) if %args{?lddl} && $self->need_prelink
 
-    my @linker_flags = @( <$self->split_like_shell(%args{?extra_linker_flags}), <
-                          $self->extra_link_args_after_prelink(< %args, dl_name => %args{?module_name},
-                          prelink_res => \@temp_files))
+    my @linker_flags = @:  <$self->split_like_shell(%args{?extra_linker_flags}), <
+                               $self->extra_link_args_after_prelink(< %args, dl_name => %args{?module_name}
+                           prelink_res => \@temp_files)
 
-    my @output = @( %args{?lddl} ?? < $self->arg_share_object_file($out) !! < $self->arg_exec_file($out) )
+    my @output = @:  %args{?lddl} ?? < $self->arg_share_object_file($out) !! < $self->arg_exec_file($out) 
     my @shrp = $self->split_like_shell($cf{shrpenv})
     my @ld = $self->split_like_shell($cf{ld})
 
     $self->do_system(< @shrp, < @ld, < @output, < $objects->@, < @linker_flags)
         or die "error building $out from $(join ' ',$objects->@)"
 
-    return @($out, < @temp_files)
+    return @: $out, < @temp_files
 
 
 

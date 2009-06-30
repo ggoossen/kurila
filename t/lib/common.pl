@@ -52,7 +52,7 @@ foreach my $file ( @w_files)
     do
         local $^INPUT_RECORD_SEPARATOR = undef
         $files++
-        @prgs = @(< @prgs, $file, < split "\n########\n", ~< $f) 
+        @prgs = @: < @prgs, $file, < split "\n########\n", ~< $f 
     
     close $f 
 
@@ -81,7 +81,7 @@ for ( @prgs)
     if (s/^(\s*-\w+)//)
         $switch = $1
     
-    my@($prog,$expected) =  split(m/\nEXPECT(?:\n|$)/, $_, 2)
+    my(@: $prog,$expected) =  split(m/\nEXPECT(?:\n|$)/, $_, 2)
 
     my ($todo, $todo_reason)
     $todo = $prog =~ s/^#\s*TODO\s*(.*)\n//m and $todo_reason = $1
@@ -133,7 +133,7 @@ for ( @prgs)
     open my $test, ">", "$tmpfile" or die "Cannot open >$tmpfile: $^OS_ERROR"
     print $test, $real_prog, "\n"
     close $test or die "Cannot close $tmpfile: $^OS_ERROR"
-    my $results = runperl( switches => \@($switch), stderr => 1, progfile => $tmpfile )
+    my $results = runperl( switches => \(@: $switch), stderr => 1, progfile => $tmpfile )
     my $status = $^CHILD_ERROR
     $results =~ s/\n+$//
     # allow expected output to be written as if $prog is on STDIN
@@ -217,7 +217,7 @@ sub randomMatch
 
 
 sub print_err_line
-    my @($switch, $prog, $expected, $results, $todo, $file) =  @_
+    my (@: $switch, $prog, $expected, $results, $todo, $file) =  @_
     my $err_line = "FILE: $file\n" .
         "PROG: $switch\n$prog\n" .
         "EXPECTED:\n$expected\n" .

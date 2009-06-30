@@ -1,8 +1,8 @@
 use Perl6::Form
 
-my @text = @( ~< $^DATA )
+my @text = @:  ~< $^DATA 
 
-my @title = @("Hamlet's Soliloquy","W. Shakespeare")
+my @title = @: "Hamlet's Soliloquy","W. Shakespeare"
 
 my %header = %(
     first => sub (@< @_) { form(\%( page => \%(width=>@_[0]->{page}->{?width})),

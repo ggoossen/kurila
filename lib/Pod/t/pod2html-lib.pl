@@ -1,7 +1,7 @@
 require Cwd
 require Pod::Html
-use Config < qw(config_value);
-use File::Spec::Functions;
+use Config < qw(config_value)
+use File::Spec::Functions
 
 sub convert_n_test($podfile, $testname)
 

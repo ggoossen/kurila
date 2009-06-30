@@ -368,7 +368,7 @@ sub _parse_uri
         
 
         ### rebuild the path from the leftover parts;
-        $href->{+path} = join '/', @( '', splice( @parts, $index, ((nelems @parts)-1) ))
+        $href->{+path} = join '/', @:  '', splice( @parts, $index, ((nelems @parts)-1) )
 
     else
         ### using anything but qw() in hash slices may produce warnings
@@ -607,7 +607,7 @@ sub _wget_fetch
     if( my $wget = can_run('wget') )
 
         ### no verboseness, thanks ###
-        my $cmd = \@( $wget, '--quiet' )
+        my $cmd = \(@:  $wget, '--quiet' )
 
         ### if a timeout is set, add it ###
         push($cmd->@, '--timeout=' . $TIMEOUT) if $TIMEOUT
@@ -666,16 +666,16 @@ sub _ftp_fetch
             return $self->_error( <loc("\%1 creation failed: \%2", $ftp, $^OS_ERROR))
         
 
-        my @dialog = @(
-            "lcd " . dirname($to),
-            "open " . $self->host,
-            "user anonymous $FROM_EMAIL",
-            "cd /",
-            "cd " . $self->path,
-            "binary",
-            "get " . $self->file . " " . $self->output_file,
-            "quit",
-            )
+        my @dialog = @: 
+            "lcd " . dirname($to)
+            "open " . $self->host
+            "user anonymous $FROM_EMAIL"
+            "cd /"
+            "cd " . $self->path
+            "binary"
+            "get " . $self->file . " " . $self->output_file
+            "quit"
+            
 
         foreach ( @dialog) { $fh->print($_, "\n") }
         $fh->close or return
@@ -713,11 +713,11 @@ sub _lynx_fetch
                             "Could not open '\%1' for writing: \%2",$to,$^OS_ERROR))
 
         ### dump to stdout ###
-        my $cmd = \@(
-            $lynx,
-            '-source',
-            "-auth=anonymous:$FROM_EMAIL",
-            )
+        my $cmd = \@: 
+            $lynx
+            '-source'
+            "-auth=anonymous:$FROM_EMAIL"
+            
 
         push $cmd->@, "-connect_timeout=$TIMEOUT" if $TIMEOUT
 
@@ -773,18 +773,18 @@ sub _ncftp_fetch
     ### see if we have a ncftp binary ###
     if( my $ncftp = can_run('ncftp') )
 
-        my $cmd = \@(
-            $ncftp,
-            '-V',                   # do not be verbose
+        my $cmd = \(@: 
+            $ncftp
+            '-V'                   # do not be verbose
             '-p', $FROM_EMAIL, <      # email as password
-            $self->host, <            # hostname
-            dirname($to),           # local dir for the file
+                $self->host, <            # hostname
+                dirname($to)           # local dir for the file
             # remote path to the file
             ### DO NOT quote things for IPC::Run, it breaks stuff.
             $IPC::Cmd::USE_IPC_RUN
             ?? < File::Spec::Unix->catdir( < $self->path, < $self->file )
             !! QUOTE. File::Spec::Unix->catdir( <
-            $self->path, < $self->file ) .QUOTE
+                $self->path, < $self->file ) .QUOTE
 
             )
 
@@ -819,7 +819,7 @@ sub _curl_fetch
     if (my $curl = can_run('curl'))
 
         ### these long opts are self explanatory - I like that -jmb
-        my $cmd = \@( $curl )
+        my $cmd = \@:  $curl 
 
         push($cmd->@, '--connect-timeout', $TIMEOUT) if $TIMEOUT
 
@@ -937,7 +937,7 @@ sub _rsync_fetch
 
     if (my $rsync = can_run('rsync'))
 
-        my $cmd = \@( $rsync )
+        my $cmd = \(@:  $rsync )
 
         ### XXX: rsync has no I/O timeouts at all, by default
         push($cmd->@, '--timeout=' . $TIMEOUT) if $TIMEOUT

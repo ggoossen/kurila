@@ -122,7 +122,7 @@ my $testpkgs = \%(
     'Data::Dumper' => %( dflt => 'perl' ),
     B => %(
     dflt => 'constant',         # all but 47/297
-    skip => @( 'regex_padav' ), # threaded only
+    skip => (@:  'regex_padav' ), # threaded only
     perl => qw(
                     walksymtable walkoptree_slow walkoptree_exec
                     timing_info savesym peekop parents objsym debug
@@ -308,7 +308,7 @@ sub checkXS($func_name, $want)
     croak "unknown type $want: $func_name\n"
         unless defined %matchers{?$want}
 
-    my @($buf, $err) =  render($func_name)
+    my (@: $buf, $err) =  render($func_name)
     my $res = like($buf, %matchers{?$want}, "$want sub:\t $func_name")
 
     unless ($res)
@@ -330,7 +330,7 @@ sub render($func_name)
     diag("err: $($^EVAL_ERROR->message) $buf") if $^EVAL_ERROR
     diag("verbose: $buf") if %opts{?V}
 
-    return  @($buf, $^EVAL_ERROR)
+    return  @: $buf, $^EVAL_ERROR
 
 
 sub corecheck

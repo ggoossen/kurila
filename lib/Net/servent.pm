@@ -18,18 +18,18 @@ sub import
 
 
 use Class::Struct < qw(struct);
-struct 'Net::servent' => \@(
-       name             => '$',
-       aliases  => '@',
-       port             => '$',
-       proto    => '$',
-       )
+struct 'Net::servent' => \@: 
+       name             => '$'
+       aliases  => '@'
+       port             => '$'
+       proto    => '$'
+       
 
 sub populate
     return unless (nelems @_)
     my $sob = new()
     $s_name      =    $sob->[0]              = @_[0]
-    @s_aliases   = @(  $sob->[1]->@ = split ' ', @_[1] )
+    @s_aliases   = @:   $sob->[1]->@ = split ' ', @_[1] 
     $s_port      =    $sob->[2]              = @_[2]
     $s_proto     =    $sob->[3]              = @_[3]
     return $sob

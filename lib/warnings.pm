@@ -12,7 +12,7 @@ our $VERSION = '1.06'
 # see also strict.pm.
 my $pkg = __PACKAGE__
 unless ( __FILE__ =~ m/(^|[\/\\])\Q$pkg\E\.pmc?$/ )
-    my @(_, $f, $l) = @: caller
+    my (@: _, $f, $l) = @: caller
     die("Incorrect use of pragma '$(__PACKAGE__)' at $f line $l.\n")
 
 
@@ -411,18 +411,18 @@ sub __chk
         die("Unknown warnings category '$category'")
             unless defined $offset
     else
-        $category = @(caller(1))[0] 
+        $category = (@: caller(1))[0] 
         $offset = %Offsets{?$category}
         die("package '$category' not registered for warnings")
             unless defined $offset 
     
 
-    my $this_pkg = @(caller(1))[0] 
+    my $this_pkg = (@: caller(1))[0] 
     my $i = 2 
     my $pkg 
 
     if ($isobj)
-        while (do { package DB; $pkg = @(caller($i++))[0] } )
+        while (do { package DB; $pkg = (@: caller($i++))[0] } )
             last unless @DB::args && @DB::args[0] =~ m/^$category=/ 
         
         $i -= 2 
@@ -430,15 +430,15 @@ sub __chk
         $i = 2
     
 
-    my $callers_bitmask = @(caller($i))[9] 
-    return @($callers_bitmask, $offset, $i) 
+    my $callers_bitmask = (@: caller($i))[9] 
+    return @: $callers_bitmask, $offset, $i 
 
 
 sub enabled
     die("Usage: warnings::enabled([category])")
         unless nelems(@_) == 1 || nelems(@_) == 0 
 
-    my @($callers_bitmask, $offset, $i) = __chk(< @_) 
+    my (@: $callers_bitmask, $offset, $i) = __chk(< @_) 
 
     return 0 unless defined $callers_bitmask 
     return vec($callers_bitmask, $offset, 1) ||
@@ -451,7 +451,7 @@ sub warn
         unless nelems(@_) == 2 || nelems(@_) == 1 
 
     my $message = pop 
-    my @($callers_bitmask, $offset, $i) = __chk(<@_) 
+    my (@: $callers_bitmask, $offset, $i) = __chk(<@_) 
     die($message)
         if vec($callers_bitmask, $offset+1, 1) ||
       vec($callers_bitmask, %Offsets{'all'}+1, 1) 
@@ -463,7 +463,7 @@ sub warnif
         unless nelems(@_) == 2 || nelems(@_) == 1 
 
     my $message = pop 
-    my @($callers_bitmask, $offset, $i) = __chk(<@_) 
+    my (@: $callers_bitmask, $offset, $i) = __chk(<@_) 
 
     return
         unless defined $callers_bitmask &&

@@ -22,7 +22,7 @@ is_deeply($v, \qw(d e f), 'reference args')
 
 # Check that try{} inside the block works correctly
 my $i = 0
-$v = first { try { die }; @(($i == 5), ($i = $_))[0] }, 0,1,2,3,4,5,5
+$v = first { try { die }; (@: ($i == 5), ($i = $_))[0] }, 0,1,2,3,4,5,5
 is($v, 5, 'use of eval')
 
 $v = try { first { die if $_ }, 0,0,1 }

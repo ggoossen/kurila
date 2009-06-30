@@ -57,7 +57,7 @@ close($outfh) or die "Error closing OUTFH test.tex: $^OS_ERROR\n"
 
 # Now read in OUTFH and compare
 open(my $infh, "<", "test.tex") or die "Unable to read test tex file: $^OS_ERROR\n"
-my @output = @( ~< $infh )
+my @output = @:  ~< $infh 
 
 is((nelems @output), nelems @reference)
 for my $i (0..((nelems @reference)-1))

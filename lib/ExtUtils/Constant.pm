@@ -97,7 +97,7 @@ use Exporter;
 use ExtUtils::Constant::Utils < qw(C_stringify);
 use ExtUtils::Constant::XS < qw(%XS_Constant %XS_TypeSet);
 
-@ISA = @( 'Exporter' )
+@ISA = @:  'Exporter' 
 
 %EXPORT_TAGS = %( 'all' => qw(
 	XS_constant constant_types C_stringify

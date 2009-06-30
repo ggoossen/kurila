@@ -44,7 +44,7 @@ isa_ok $obj->a, 'ARRAY'
 $obj->a(2, 'secundus')
 is $obj->a(2), 'secundus'
 
-$obj->a(\@(4,5,6))
+$obj->a(\(@: 4,5,6))
 is $obj->a(1), 5
 
 isa_ok $obj->h, 'HASH'
@@ -71,7 +71,7 @@ isa_ok $obj->a, 'ARRAY'
 $obj->a(2, 'secundus')
 is $obj->a(2), 'secundus'
 
-$obj->a(\@(4,5,6))
+$obj->a(\(@: 4,5,6))
 is $obj->a(1), 5
 
 isa_ok $obj->h, 'HASH'

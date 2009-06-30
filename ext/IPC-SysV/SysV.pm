@@ -7,8 +7,8 @@
 package IPC::SysV
 
 our (@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION, $XS_VERSION)
-use Carp;
-use Config;
+use Carp
+use Config
 
 require Exporter
 @ISA = qw(Exporter)

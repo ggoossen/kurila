@@ -10,7 +10,7 @@ sub ok($ok, ?$name)
     printf $^STDOUT, "\%s $test\%s\n", $ok   ?? 'ok' !! 'not ok',
         $name ?? " - $name" !! ''
 
-    printf $^STDOUT, "# Failed test at line \%d\n", @(caller($Ok_Level))[2] unless $ok
+    printf $^STDOUT, "# Failed test at line \%d\n", (@: caller($Ok_Level))[2] unless $ok
 
     $test++
     return $ok
@@ -21,8 +21,8 @@ sub nok($nok, ?$name)
     ok( !$nok, $name )
 
 
-use Config;
-use signals;
+use Config
+use signals
 
 my $have_alarm = config_value('d_alarm')
 sub alarm_ok($test)

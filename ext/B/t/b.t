@@ -1,14 +1,14 @@
 #!./perl
 
 $^OUTPUT_AUTOFLUSH  = 1
-use warnings;
+use warnings
 
-use Test::More tests => 54;
+use Test::More tests => 54
 
 BEGIN { use_ok( 'B' ); }
 
 
-package Testing::Symtable;
+package Testing::Symtable
 our ($This, @That, %wibble, $moo, %moo)
 my $not_a_sym = 'moo'
 
@@ -16,13 +16,13 @@ sub moo { 42 }
 sub car { 23 }
 
 
-package Testing::Symtable::Foo;
+package Testing::Symtable::Foo
 sub yarrow { "Hock" }
 
-package Testing::Symtable::Bar;
+package Testing::Symtable::Bar
 sub hock { "yarrow" }
 
-package main;
+package main
 our (%Subs)
 local %Subs = $%
 B::walksymtable(\%Testing::Symtable::, 'find_syms', sub (@< @_) { @_[0] =~ m/Foo/ },

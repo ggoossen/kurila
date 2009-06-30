@@ -94,10 +94,10 @@ under the same terms as Perl itself.
 package FindBin
 use Carp
 require Exporter
-use Cwd < qw(getcwd cwd abs_path);
-use Config;
-use File::Basename;
-use File::Spec;
+use Cwd < qw(getcwd cwd abs_path)
+use Config
+use File::Basename
+use File::Spec
 
 
 our ($Bin, $Script, $RealBin, $RealScript, $Dir, $RealDir)
@@ -135,10 +135,10 @@ sub init
         my $script = $^PROGRAM_NAME
 
         if ($^OS_NAME eq 'VMS')
-            @($Bin,$Script) = VMS::Filespec::rmsexpand($^PROGRAM_NAME) =~ m/(.*[\]>\/]+)(.*)/s
+            (@: $Bin,$Script) = VMS::Filespec::rmsexpand($^PROGRAM_NAME) =~ m/(.*[\]>\/]+)(.*)/s
             # C<use disk:[dev]/lib> isn't going to work, so unixify first
             ($Bin = VMS::Filespec::unixify($Bin)) =~ s/\/\z//
-            @($RealBin,$RealScript) = @($Bin,$Script)
+            (@: $RealBin,$RealScript) = @: $Bin,$Script
         else
             my $dosish = ($^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'os2')
             unless(($script =~ m#/# || ($dosish && $script =~ m#\\#))
@@ -167,13 +167,13 @@ sub init
             $script = File::Spec->catfile(cwd2(), $script)
                 unless File::Spec->file_name_is_absolute($script)
 
-            @($Script,$Bin, _) =  fileparse($script)
+            (@: $Script,$Bin, _) =  fileparse($script)
 
             # Resolve $script if it is a link
             while(1)
                 my $linktext = readlink($script)
 
-                @($RealScript,$RealBin, _) =  fileparse($script)
+                (@: $RealScript,$RealBin, _) =  fileparse($script)
                 last unless defined $linktext
 
                 $script = (File::Spec->file_name_is_absolute($linktext))

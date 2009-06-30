@@ -111,7 +111,7 @@ print $^STDOUT, "ABC" =~ m/^@ary[$A]$/ ?? "ok 25\n" !! "not ok 25\n";
 print $^STDOUT, "ok 26\n";
 
 # MJD 19980425
-@($X, @< @X) =  qw(a b c d);
+(@: $X, @< @X) =  qw(a b c d);
 print $^STDOUT, "d" =~ m/^@X[-1]$/ ?? "ok 27\n" !! "not ok 27\n";
 print $^STDOUT, "a1" !~ m/^@X[-1]$/ ?? "ok 28\n" !! "not ok 28\n";
 
@@ -153,7 +153,7 @@ do
 # see if eval '', s///e, and heredocs mix
 
 sub T($where, $num)
-    my @($p,$f,$l) =@( caller)
+    my (@: $p,$f,$l) =@:  caller
     print $^STDOUT, "# $p:$f:$l vs /$where/\nnot " unless "$p:$f:$l" =~ m/$where/
     print $^STDOUT, "ok $num\n"
 
@@ -191,7 +191,7 @@ do
 
     # Let's make sure that normal array interpolation still works right
     # For some reason, this appears not to be tested anywhere else.
-    my @a = @(1,2,3)
+    my @a = @: 1,2,3
     print($^STDOUT,  ((">$(join ' ',@a)<" eq ">1 2 3<") ?? '' !! 'not '), "ok $test\n")
     ++$test
 
@@ -203,7 +203,7 @@ do
 
     # This isn't actually a lex test, but it's testing the same feature
     sub makearray
-        my @array = @('fish', 'dog', 'carrot')
+        my @array = @: 'fish', 'dog', 'carrot'
         *R::crackers = \@array
     
 

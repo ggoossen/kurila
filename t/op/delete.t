@@ -22,7 +22,7 @@ cmp_ok(%foo{?3},'eq','c','c exists')
 cmp_ok(%foo{?4},'eq','d','d exists')
 cmp_ok(%foo{?5},'eq','e','e exists')
 
-@foo = delete %foo{[@(4, 5)]}
+@foo = delete %foo{[(@: 4, 5)]}
 
 cmp_ok(scalar(nelems @foo),'==',2,'deleted slice')
 cmp_ok(@foo[0],'eq','d','slice 1')
@@ -79,7 +79,7 @@ cmp_ok(@foo[3],'eq','c','ary c exists')
 cmp_ok(@foo[4],'eq','d','ary d exists')
 cmp_ok(@foo[5],'eq','e','ary e exists')
 
-@bar = delete @foo[[@(4,5)]]
+@bar = delete @foo[[(@: 4,5)]]
 
 cmp_ok(scalar(nelems @bar),'==',2,'ary deleted slice')
 cmp_ok(@bar[0],'eq','d','ary slice 1')
@@ -113,7 +113,7 @@ delete @refary[0][3]
 cmp_ok( scalar(nelems @refary[0]),'==',1,'one down')
 
 do
-    my @a = @( 33 )
+    my @a = @:  33 
     my $b = \@a[0]
     my $c = \delete @a['bar']
 
@@ -122,7 +122,7 @@ do
 
 do
     my %h
-    my @($x,$y) = @(1, scalar delete %h{[$@]})
+    my (@: $x,$y) = @: 1, scalar delete %h{[$@]}
     ok(!nelems($y),q([perl #29127] scalar delete of empty slice returned garbage))
 
 

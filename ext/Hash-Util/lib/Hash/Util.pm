@@ -123,8 +123,8 @@ Both routines return a reference to the hash operated on.
 sub lock_ref_keys($hash, @< @keys)
     Internals::hv_clear_placeholders(\$hash->%)
     if( (nelems @keys) )
-        my %keys = %( < @+: map { @($_ => 1) }, @keys )
-        my %original_keys = %( < @+: map { @($_ => 1) }, keys $hash->% )
+        my %keys = %( < @+: map { (@: $_ => 1) }, @keys )
+        my %original_keys = %( < @+: map { (@: $_ => 1) }, keys $hash->% )
         foreach my $k (keys %original_keys)
             die "Hash has key '$k' which is not in the new key set"
                 unless %keys{?$k}

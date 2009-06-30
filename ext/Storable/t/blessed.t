@@ -27,23 +27,23 @@ my $test = 12
 my $tests = $test + 6 + 2 * 6 * nkeys %::immortals
 plan tests => $tests
 
-package SHORT_NAME;
+package SHORT_NAME
 
 sub make { bless \$@, shift }
 
-package SHORT_NAME_WITH_HOOK;
+package SHORT_NAME_WITH_HOOK
 
 sub make { bless \$@, shift }
 
 sub STORABLE_freeze($self, ...)
-    return @("", $self)
+    return @: "", $self
 
 
 sub STORABLE_thaw($self, $cloning, $x, $obj)
     die "STORABLE_thaw" unless $obj \== $self
 
 
-package main;
+package main
 
 # Still less than 256 bytes, so long classname logic not fully exercised
 # Wait until Perl removes the restriction on identifier lengths.
@@ -96,7 +96,7 @@ for my $i (0..9)
 ok $good
 
 do
-    my $blessed_ref = bless \\\@(1,2,3), 'Foobar'
+    my $blessed_ref = bless \\\(@: 1,2,3), 'Foobar'
     my $x = freeze $blessed_ref
     my $y = thaw $x
     ok ref $y eq 'Foobar'
@@ -108,12 +108,12 @@ package RETURNS_IMMORTALS
 sub make { my $self = shift; bless \ @_, $self }
 
 sub STORABLE_freeze($self, ...)
-    my @($what, $times) =  $self->@
-    return @("$what$times", < (@(%::immortals{?$what}) x $times))
+    my (@: $what, $times) =  $self->@
+    return @: "$what$times", < ((@: %::immortals{?$what}) x $times)
 
 
 sub STORABLE_thaw($self, $cloning, $x, @< @refs)
-    my @($what, $times) = @: $x =~ m/(.)(\d+)/
+    my (@: $what, $times) = @: $x =~ m/(.)(\d+)/
     die "'$x' didn't match" unless defined $times
     main::ok nelems(@refs) == $times
     my $expect = %::immortals{?$what}
@@ -125,7 +125,7 @@ sub STORABLE_thaw($self, $cloning, $x, @< @refs)
     main::ok !$fail
 
 
-package main;
+package main
 
 # $Storable::DEBUGME = 1;
 foreach my $count (1..3)
@@ -152,10 +152,10 @@ sub make
 
 
 sub STORABLE_freeze($self, ...)
-    return @('')
+    return @: ''
 
 
-package main;
+package main
 
 my $f = freeze (HAS_HOOK->make)
 

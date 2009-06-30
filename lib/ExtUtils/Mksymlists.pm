@@ -9,8 +9,8 @@ our @EXPORT = qw(&Mksymlists)
 our $VERSION = '6.44'
 
 sub Mksymlists
-    my@(%spec) =@( %( < @_ ))
-    my@($osname) = $^OS_NAME
+    my(@: %spec) =@:  %( < @_ )
+    my(@: $osname) = $^OS_NAME
 
     croak("Insufficient information specified to Mksymlists")
         unless ( %spec{?NAME} or
@@ -60,8 +60,8 @@ sub _write_aix($data)
 
     open( my $exp, ">", "$data->{?FILE}.exp")
         or croak("Can't create $data->{?FILE}.exp: $^OS_ERROR\n")
-    print $exp, join("\n", @(< $data->{?DL_VARS}->@, "\n")) if (nelems $data->{?DL_VARS}->@)
-    print $exp, join("\n", @(< $data->{?FUNCLIST}->@, "\n")) if (nelems $data->{?FUNCLIST}->@)
+    print $exp, join("\n", (@: < $data->{?DL_VARS}->@, "\n")) if (nelems $data->{?DL_VARS}->@)
+    print $exp, join("\n", (@: < $data->{?FUNCLIST}->@, "\n")) if (nelems $data->{?FUNCLIST}->@)
     close $exp
 
 
@@ -95,12 +95,12 @@ sub _write_os2($data)
     print $def, "CODE LOADONCALL\n"
     print $def, "DATA LOADONCALL NONSHARED MULTIPLE\n"
     print $def, "EXPORTS\n  "
-    print $def, join("\n  ", @(< $data->{?DL_VARS}->@, "\n")) if (nelems $data->{?DL_VARS}->@)
-    print $def, join("\n  ", @(< $data->{?FUNCLIST}->@, "\n")) if (nelems $data->{?FUNCLIST}->@)
+    print $def, join("\n  ", (@: < $data->{?DL_VARS}->@, "\n")) if (nelems $data->{?DL_VARS}->@)
+    print $def, join("\n  ", (@: < $data->{?FUNCLIST}->@, "\n")) if (nelems $data->{?FUNCLIST}->@)
     if ($data->{?IMPORTS}->%)
         print $def, "IMPORTS\n"
         my ($name, $exp)
-        while (@($name, $exp)=@( each $data->{IMPORTS}->%))
+        while ((@: $name, $exp)=(@:  each $data->{IMPORTS}->%))
             print $def, "  $name=$exp\n"
         
     
@@ -138,11 +138,11 @@ sub _write_win32($data)
             push @syms, "$_", "_$_ = $_"
         
     
-    print $def, join("\n  ", @(< @syms, "\n")) if (nelems @syms)
+    print $def, join("\n  ", (@: < @syms, "\n")) if (nelems @syms)
     if ($data->{?IMPORTS}->%)
         print $def, "IMPORTS\n"
         my ($name, $exp)
-        while (@($name, $exp)=@( each $data->{IMPORTS}->%))
+        while ((@: $name, $exp)=(@:  each $data->{IMPORTS}->%))
             print $def, "  $name=$exp\n"
         
     
@@ -155,8 +155,8 @@ sub _write_vms($data)
     require Config # a reminder for once we do $^O
     require ExtUtils::XSSymSet
 
-    my@($isvax) = Config::config_value('archname') =~ m/VAX/i
-    my@($set) =  ExtUtils::XSSymSet->new
+    my(@: $isvax) = Config::config_value('archname') =~ m/VAX/i
+    my(@: $set) =  ExtUtils::XSSymSet->new
 
     rename "$data->{?FILE}.opt", "$data->{?FILE}.opt_old"
 

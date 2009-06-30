@@ -71,7 +71,7 @@ sub handler_traceback
     syswrite($^STDERR, 'Caught a SIG', 12)
     syswrite($^STDERR, @_[0], length(@_[0]))
     syswrite($^STDERR, ' at ', 4)
-    our @($pack,$file,$line) =@( caller)
+    our (@: $pack,$file,$line) =@:  caller
     syswrite($^STDERR, $file, length($file))
     syswrite($^STDERR, ' line ', 6)
     syswrite($^STDERR, $line, length($line))
@@ -79,7 +79,7 @@ sub handler_traceback
 
     # Now go for broke.
     my $i = 1
-    while (my @($p,$f,$l,$s,$h,$w,$e,$r) = caller@($i))
+    while (my (@: $p,$f,$l,$s,$h,$w,$e,$r) = caller(@: $i))
         my @a = $@
         for ( @DB::args)
             s/([\'\\])/\\$1/g

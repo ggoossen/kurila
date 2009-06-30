@@ -58,7 +58,7 @@ do
 sub hexes
     no warnings 'utf8' # avoid surrogate and beyond Unicode warnings
     use utf8
-    join(" ", map{sprintf"\%02x",$_}, @(unpack("C*",chr(@_[0]))))
+    join(" ", map{sprintf"\%02x",$_}, (@: unpack("C*",chr(@_[0]))))
 
 
 # The following code points are some interesting steps in UTF-8.

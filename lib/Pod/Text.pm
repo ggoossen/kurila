@@ -28,8 +28,8 @@ package Pod::Text
 use utf8
 our (@ISA, @EXPORT, $VERSION)
 
-use Exporter ();
-use Pod::Simple ();
+use Exporter ()
+use Pod::Simple ()
 
 @ISA = qw(Pod::Simple Exporter)
 
@@ -83,7 +83,7 @@ sub new
     # problems if we ever clash with Pod::Simple's own internal class
     # variables.
     my %opts = %( < @_ )
-    my @opts = @+: map { @("opt_$_", %opts{?$_}) }, keys %opts
+    my @opts = @+: map { (@: "opt_$_", %opts{?$_}) }, keys %opts
     $self->% = %(< $self->%, < @opts)
 
     # Initialize various things from our parameters.
@@ -158,7 +158,7 @@ sub _handle_element_start($self, $element, $attrs)
     # If we have a command handler, we need to accumulate the contents of the
     # tag before calling it.
     if ($self->can ("cmd_$method"))
-        push ( $self->%{PENDING}->@, \@( $attrs, '' ))
+        push ( $self->%{PENDING}->@, \(@:  $attrs, '' ))
     elsif ($self->can ("start_$method"))
         my $method = 'start_' . $method
         $self->?$method ($attrs, '')
@@ -258,7 +258,7 @@ sub start_document($self, ...)
     # Initialize a few per-document variables.
     $self->%{+INDENTS} = \$@       # Stack of indentations.
     $self->%{+MARGIN}  = $margin  # Default left margin.
-    $self->%{+PENDING} = \@(\$@)     # Pending output.
+    $self->%{+PENDING} = \(@: \$@)     # Pending output.
 
     return ''
 

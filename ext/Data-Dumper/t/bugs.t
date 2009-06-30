@@ -21,7 +21,7 @@ sub foo
     my $c = eval Dumper($s)
     sub bar::quote { }
     bless $c, 'bar'
-    my $d = Data::Dumper->new(\@($c))
+    my $d = Data::Dumper->new(\(@: $c))
     $d->Freezer('quote')
     return $d->Dump
 
@@ -32,7 +32,7 @@ do
     my %h = %(1,2,3,4)
     each %h
 
-    my $d = Data::Dumper->new(\@(\%h))
+    my $d = Data::Dumper->new(\(@: \%h))
     $d->Useqq(1)
     my $txt = $d->Dump()
     my $VAR1

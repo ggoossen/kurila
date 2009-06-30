@@ -10,13 +10,13 @@ print $^STDOUT, "# --- Making sure that get_handle works ---\n"
 # declare some classes...
 do
     package Woozle
-    our @ISA = @('Locale::Maketext')
+    our @ISA = @: 'Locale::Maketext'
     sub dubbil   { return @_[1] * 2 }
     sub numerate { return @_[2] . 'en' }
 
 do
     package Woozle::eu_mt
-    our @ISA = @('Woozle')
+    our @ISA = @: 'Woozle'
     our %Lexicon = %(
         'd2' => 'hum [dubbil,_1]',
         'd3' => 'hoo [quant,_1,zaz]',

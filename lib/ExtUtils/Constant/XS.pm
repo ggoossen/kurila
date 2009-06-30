@@ -1,7 +1,7 @@
 package ExtUtils::Constant::XS
 
 our ($VERSION, %XS_Constant, %XS_TypeSet, @ISA, @EXPORT_OK)
-use ExtUtils::Constant::Utils 'perl_stringify';
+use ExtUtils::Constant::Utils 'perl_stringify'
 require ExtUtils::Constant::Base
 
 
@@ -56,7 +56,7 @@ others
     UV    => '*iv_return = (IV)',
     NV    => '*nv_return = ',
     PV    => '*pv_return = ',
-    PVN   => \@('*pv_return = ', '*iv_return = (IV)'),
+    PVN   => \(@: '*pv_return = ', '*iv_return = (IV)'),
     SV    => '*sv_return = ',
     YES   => undef,
     NO    => undef,
@@ -180,7 +180,7 @@ sub C_constant_other_params($self, $params)
 
 
 sub dogfood($self, $args, @< @items)
-    my @($package, $subname, $default_type, $what, $indent, $breakout) =
+    my (@: $package, $subname, $default_type, $what, $indent, $breakout) =
         $args->{[qw(package subname default_type what indent breakout)]}
     my $result = <<"EOT"
   /* When generated this function returned values for the list of names given

@@ -43,7 +43,7 @@ do
     sub STORABLE_freeze($self, $clone)
 
         # Illegally include a reference in this return
-        return  @('')
+        return  @: ''
     
 
     sub STORABLE_attach($class, $clone, $string)
@@ -68,7 +68,7 @@ do
     sub STORABLE_freeze($self, $clone)
 
         # Illegally include a reference in this return
-        return  @('', \$@)
+        return  @: '', \$@
     
 
     sub STORABLE_attach($class, $clone, $string)
@@ -106,7 +106,7 @@ do
 
     sub STORABLE_freeze($self, $clone)
 
-        return  @('')
+        return  @: ''
     
 
     sub STORABLE_attach($class, $clone, $string)
@@ -145,7 +145,7 @@ do
 
     sub STORABLE_freeze($self, $clone)
 
-        return  @('', \$@)
+        return  (@: '', \$@)
     
 
     # Start with no STORABLE_attach method so we can get a
@@ -180,7 +180,7 @@ do
     package My::GoodAttach
 
     sub STORABLE_freeze($self, $cloning)
-        return  @('')
+        return  @: ''
     
 
     sub STORABLE_attach($class, $cloning, $string)
@@ -191,7 +191,7 @@ do
     package My::GoodAttach::Subclass
 
     BEGIN 
-        our @ISA = @( 'My::GoodAttach' )
+        our @ISA = (@:  'My::GoodAttach' )
     
 
 
@@ -208,15 +208,15 @@ do
 
     # Try a number of different return values, all of which
     # should cause Storable to die.
-    my @badthings = @(
-        undef,
-        '',
-        1,
-        \$@,
-        \$%,
-        \"foo",
-        (bless \$%, 'Foo'),
-        )
+    my @badthings = @: 
+        undef
+        ''
+        1
+        \$@
+        \$%
+        \"foo"
+        (bless \$%, 'Foo')
+        
     foreach (  @badthings )
         $returnvalue = $_
 
@@ -233,7 +233,7 @@ do
     package My::BadAttach
 
     sub STORABLE_freeze($self, $cloning)
-        return  @('')
+        return  @: ''
     
 
     sub STORABLE_attach($class, $cloning, $string)

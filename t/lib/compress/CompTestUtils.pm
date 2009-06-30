@@ -70,13 +70,13 @@ sub readFile
     if (IO::Compress::Base::Common::isaFilehandle($f))
         my $pos = tell($f)
         seek($f, 0,0)
-        @strings = @( ~< $f ) 
+        @strings = @:  ~< $f  
         seek($f, 0, $pos)
     else
         open (my $fh, "<", "$f")
             or die "Cannot open $f: $^OS_ERROR\n" 
         binmode $fh
-        @strings = @( ~< $fh->* ) 
+        @strings = @:  ~< $fh->*  
         close $fh 
     
 
@@ -100,7 +100,7 @@ sub writeFile($filename, @< @strings)
 
 
 sub GZreadFile
-    my @($filename) =@( shift) 
+    my (@: $filename) =@:  shift 
 
     my $uncomp = "" 
     my $line = "" 
@@ -134,7 +134,7 @@ sub hexDump
         printf $^STDOUT, "# \%8.8lx    ", $offset
         $offset += 16
 
-        my @array = @( unpack('C*', $data) )
+        my @array = @:  unpack('C*', $data) 
         foreach ( @array)
             printf($^STDOUT, '%2.2x ', $_)
         
@@ -272,8 +272,8 @@ my %TopFuncMap = %(  'IO::Compress::Gzip'          => 'IO::Compress::Gzip::gzip'
     'IO::Uncompress::DummyUncomp' => 'IO::Uncompress::DummyUncomp::dummyuncomp',
     )
 
-%TopFuncMap = %( < @+: map { @($_              => %TopFuncMap{?$_},
-                               %TopFuncMap{?$_} => %TopFuncMap{?$_}) },
+%TopFuncMap = %( < @+: map { (@: $_              => %TopFuncMap{?$_}
+                                 %TopFuncMap{?$_} => %TopFuncMap{?$_}) },
     keys %TopFuncMap ) 
 
 #%TopFuncMap = map { ($_              => \&{ $TopFuncMap{$_} ) }
@@ -298,7 +298,7 @@ my %inverse  = %( 'IO::Compress::Gzip'                    => 'IO::Uncompress::Gu
     'IO::Compress::DummyComp'               => 'IO::Uncompress::DummyUncomp',
     )
 
-%inverse  = %( < @+: map { @($_ => %inverse{?$_}, %inverse{?$_} => $_) }, keys %inverse )
+%inverse  = %( < @+: map { (@: $_ => %inverse{?$_}, %inverse{?$_} => $_) }, keys %inverse )
 
 sub getInverse
     my $class = shift 
@@ -462,7 +462,7 @@ sub getHeaders
     croak "Error uncompressing -- " . $o->error()
         if $o->error() 
 
-    return  @($o->getHeaderInfo()) 
+    return  @: $o->getHeaderInfo() 
 
 
 
@@ -478,16 +478,16 @@ sub mkComplete
         %params = %(
             Name       => "My name",
             Comment    => "a comment",
-            ExtraField => \@('ab' => "extra"),
+            ExtraField => \(@: 'ab' => "extra"),
             HeaderCRC  => 1)
     elsif ($class eq 'IO::Compress::Zip')
         %params = %(
             Name              => "My name",
             Comment           => "a comment",
             ZipComment        => "last comment",
-            exTime            => \@(100, 200, 300),
-            ExtraFieldLocal   => \@("ab" => "extra1"),
-            ExtraFieldCentral => \@("cd" => "extra2"),
+            exTime            => \(@: 100, 200, 300),
+            ExtraFieldLocal   => \(@: "ab" => "extra1"),
+            ExtraFieldCentral => \(@: "cd" => "extra2"),
             )
     
 
@@ -503,12 +503,12 @@ sub mkComplete
     my $info = $u->getHeaderInfo() 
 
 
-    return @($info, $buffer)
+    return @: $info, $buffer
 
 
 sub mkErr
     my $string = shift 
-    my @($dummy, $file, $line) =@( caller) 
+    my (@: $dummy, $file, $line) =@:  caller 
     -- $line 
 
     $file = quotemeta($file)
@@ -525,7 +525,7 @@ sub mkEvalErr
 sub dumpObj
     my $obj = shift 
 
-    my @($dummy, $file, $line) =@( caller) 
+    my (@: $dummy, $file, $line) =@:  caller 
 
     if ((nelems @_))
         print $^STDOUT, "#\n# dumpOBJ from $file line $line $(join ' ',@_)\n" 
@@ -551,8 +551,8 @@ sub dumpObj
 sub getMultiValues
     my $class = shift 
 
-    return  @(0,0) if $class =~ m/lzf/i
-    return  @(1,0)
+    return  (@: 0,0) if $class =~ m/lzf/i
+    return  @: 1,0
 
 
 
@@ -561,7 +561,7 @@ sub gotScalarUtilXS
     return $^EVAL_ERROR ?? 0 !! 1 
 
 
-package CompTestUtils;
+package CompTestUtils
 
 1
 __END__

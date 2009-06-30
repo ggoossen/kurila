@@ -53,7 +53,7 @@ SKIP: do
         fake => undef,
         )
 
-    is( nelems @(ExtUtils::Packlist::validate($pl)), 1,
+    is( nelems (@: ExtUtils::Packlist::validate($pl)), 1,
         'validate() should find missing files' )
     ExtUtils::Packlist::validate($pl, 1)
     ok( !exists $pl->{data}{fake},

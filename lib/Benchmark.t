@@ -3,9 +3,9 @@
 use warnings
 
 our ($foo, $bar, $baz, $ballast)
-use Test::More tests => 182;
+use Test::More tests => 182
 
-use Benchmark < qw(:all);
+use Benchmark < qw(:all)
 
 my $delta = 0.4
 
@@ -106,7 +106,7 @@ do
     like ($all, $All_Pattern, 'timestr ($diff, "all")')
     print $^STDOUT, "# $all\n"
 
-    my @($wallclock, $usr, $sys, $cusr, $csys, $cpu) = @: $all =~ $All_Pattern
+    my (@: $wallclock, $usr, $sys, $cusr, $csys, $cpu) = @: $all =~ $All_Pattern
 
     is (timestr ($diff, 'none'), '', "none supresses output")
 
@@ -318,18 +318,18 @@ sub check_graph_consistency(    $ratetext, $slowc, $fastc,
 
 
 sub check_graph_vs_output($chart, $got)
-    my @(       $ratetext, $slowc, $fastc,
-          $slowr, $slowratet, $slowslow, $slowfastt,
-          $fastr, $fastratet, $fastslowt, $fastfast)
+    my @:        $ratetext, $slowc, $fastc
+                 $slowr, $slowratet, $slowslow, $slowfastt
+                 $fastr, $fastratet, $fastslowt, $fastfast
         = @: $got =~ $graph_dissassembly
     my $all_passed
         = check_graph_consistency (        $ratetext, $slowc, $fastc,
                                            $slowr, $slowratet, $slowslow, $slowfastt,
                                            $fastr, $fastratet, $fastslowt, $fastfast)
     $all_passed
-        &&= is_deeply ($chart, \@(\@('', $ratetext, $slowc, $fastc),
-                                  \@($slowr, $slowratet, $slowslow, $slowfastt),
-                                  \@($fastr, $fastratet, $fastslowt, $fastfast)),
+        &&= is_deeply ($chart, \(@: \(@: '', $ratetext, $slowc, $fastc)
+                                    \(@: $slowr, $slowratet, $slowslow, $slowfastt)
+                                    \(@: $fastr, $fastratet, $fastslowt, $fastfast)),
                        "check the chart layout matches the formatted output")
     unless ($all_passed)
         print $^STDERR, "# Something went wrong there. I got this chart:\n"
@@ -519,7 +519,7 @@ do   # Check usage error messages
         'not result' => 'cmpthese(42)',
         'array ref'  => 'cmpthese( 42, \@( foo => sub { 1 } ) )',
         )
-    while( my@(?$name, ?$code) =@( each %cmpthese) )
+    while( my(@: ?$name, ?$code) =(@:  each %cmpthese) )
         eval $code
         is( $^EVAL_ERROR->{?description}, %usage{?cmpthese}, "cmpthese usage: $name" )
     
@@ -528,7 +528,7 @@ do   # Check usage error messages
         'array ref'  => 'timethese( 42, \@( foo => sub { 1 } ) )',
         )
 
-    while( my@(?$name, ?$code) =@( each %timethese) )
+    while( my(@: ?$name, ?$code) =(@:  each %timethese) )
         eval $code
         is( $^EVAL_ERROR->{?description}, %usage{?timethese}, "timethese usage: $name" )
     

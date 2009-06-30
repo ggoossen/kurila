@@ -12,9 +12,9 @@ use Symbol
 use Exporter
 use IO::File
 our(@ISA, $VERSION, @EXPORT_OK)
-use Tie::Hash;
-use File::stat;
-use File::Spec;
+use Tie::Hash
+use File::stat
+use File::Spec
 
 @ISA = qw(Tie::Hash Exporter)
 $VERSION = "1.06"
@@ -58,7 +58,7 @@ sub read($dh)
 
 
 sub read_all($dh)
-    return @( readdir($dh) )
+    return @:  readdir($dh) 
 
 
 sub seek($dh,$pos)

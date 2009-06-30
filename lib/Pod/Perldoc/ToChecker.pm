@@ -9,9 +9,9 @@ our (@ISA)
 eval 'require Pod::Simple::Checker'
 if($^EVAL_ERROR)
     require Pod::Checker
-    @ISA = @('Pod::Checker')
+    @ISA = @: 'Pod::Checker'
 else
-    @ISA = @('Pod::Simple::Checker')
+    @ISA = @: 'Pod::Simple::Checker'
 
 
 sub is_pageable        { 1 }

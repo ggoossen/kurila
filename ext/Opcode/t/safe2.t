@@ -1,6 +1,6 @@
 #!./perl -w
 $^OUTPUT_AUTOFLUSH=1
-use Config;
+use Config
 
 print $^STDOUT, "1..0\n# TODO for changes pckage system"
 exit
@@ -11,9 +11,9 @@ exit
 our ($bar)
 
 use Opcode v1.00 < qw(opdesc opset opset_to_ops opset_to_hex
-	opmask_add full_opset empty_opset opcodes opmask define_optag);
+	opmask_add full_opset empty_opset opcodes opmask define_optag)
 
-use Safe v1.00;
+use Safe v1.00
 
 my $last_test # initalised at end
 print $^STDOUT, "1..$last_test\n"
@@ -81,7 +81,7 @@ print $^STDOUT, $foo, %bar{?new}, "$(join ' ',@glob)\n"
 $Root::foo = "not ok 17"
 $cpt->varglob('bar')->@ = qw(not ok 18)
 $cpt->varglob('foo')->$ = "ok 17"
-@Root::bar = @( "ok" )
+@Root::bar = @:  "ok" 
 push(@Root::bar, "18") # Two steps to prevent "Identifier used only once..."
 
 print $^STDOUT, "$Root::foo\n"

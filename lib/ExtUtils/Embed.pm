@@ -3,9 +3,9 @@
 package ExtUtils::Embed
 require Exporter
 require IO::File
-use Config;
-use Getopt::Std;
-use File::Spec;
+use Config
+use Getopt::Std
+use File::Spec
 
 #Only when we need them
 #require ExtUtils::MakeMaker;
@@ -43,7 +43,7 @@ sub my_return
 
 
 sub xsinit
-    my@($file, $std, $mods) =  @_
+    my(@: $file, $std, $mods) =  @_
     my($fh,@mods,%seen)
     $file ||= "perlxsi.c"
     my $xsinit_proto = "pTHX"
@@ -89,11 +89,11 @@ sub xsi_protos(@exts)
     my(@retval,%seen)
     my $boot_proto = "pTHX_ CV* cv"
     foreach my $_ ( @exts)
-        my@($pname) =  canon('/', $_)
+        my(@: $pname) =  canon('/', $_)
         my($mname, $cname)
         ($mname = $pname) =~ s!/!::!g
         ($cname = $pname) =~ s!/!__!g
-        my@($ccode) = "EXTERN_C void boot_$($cname) ($boot_proto);\n"
+        my(@: $ccode) = "EXTERN_C void boot_$($cname) ($boot_proto);\n"
         next if %seen{+$ccode}++
         push(@retval, $ccode)
     
@@ -102,13 +102,13 @@ sub xsi_protos(@exts)
 
 sub xsi_body(@exts)
     my($pname,@retval,%seen)
-    my@($dl) =  canon('/','DynaLoader')
+    my(@: $dl) =  canon('/','DynaLoader')
     push(@retval, "\tchar *file = __FILE__;\n")
     push(@retval, "\tdXSUB_SYS;\n")
     push(@retval, "\n")
 
     foreach my $_ ( @exts)
-        my@($pname) =  canon('/', $_)
+        my(@: $pname) =  canon('/', $_)
         my($mname, $cname, $ccode)
         ($mname = $pname) =~ s!/!::!g
         ($cname = $pname) =~ s!/!__!g
@@ -161,7 +161,7 @@ sub _ccdlflags
 sub ldopts
     require ExtUtils::MakeMaker
     require ExtUtils::Liblist
-    my @(?$std,?$mods,?$link_args,?$path) =  @_
+    my (@: ?$std,?$mods,?$link_args,?$path) =  @_
     my(@mods,@link_args,@argv)
     my($dllib,$config_libs,@potential_libs,@path)
     if (scalar nelems @_)
@@ -179,7 +179,7 @@ sub ldopts
     
     $std = 1 unless scalar nelems @link_args
     my $sep = config_value("path_sep") || ':'
-    @path = @( $path ?? < split(m/\Q$sep/, $path) !! < $^INCLUDE_PATH )
+    @path = @:  $path ?? < split(m/\Q$sep/, $path) !! < $^INCLUDE_PATH 
 
     push(@potential_libs, < @link_args)    if scalar nelems @link_args
     # makemaker includes std libs on windows by default
@@ -202,7 +202,7 @@ sub ldopts
             push @archives, $archive
             if(-e ($extra = File::Spec->catdir($_,"auto",$root,"extralibs.ld")))
                 if(open(my $fh, "<", $extra))
-                    my@($libs) = ~< $fh->*; chomp $libs
+                    my(@: $libs) = ~< $fh->*; chomp $libs
                     push @potential_libs, < split m/\s+/, $libs
                 else
                     warn "Couldn't open '$extra'"
@@ -227,8 +227,8 @@ sub ldopts
 
     my $lpath = File::Spec->catdir(config_value("archlibexp"), 'CORE')
     $lpath = qq["$lpath"] if $^OS_NAME eq 'MSWin32'
-    my @($extralibs, $bsloadlibs, $ldloadlibs, $ld_run_path, ...) =
-        MM->ext(join ' ', @( "-L$lpath", $libperl, < @potential_libs))
+    my (@: $extralibs, $bsloadlibs, $ldloadlibs, $ld_run_path, ...) =
+        MM->ext(join ' ', (@:  "-L$lpath", $libperl, < @potential_libs))
 
     my $ld_or_bs = $bsloadlibs || $ldloadlibs
     print $^STDERR, "bs: $bsloadlibs ** ld: $ldloadlibs" if $Verbose

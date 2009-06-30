@@ -8,7 +8,7 @@ use Test::More tests => 7
 use ExtUtils::MM
 use MakeMaker::Test::Setup::Problem
 
-my $MM = bless \%( DIR => @('subdir') ), 'MM'
+my $MM = bless \%( DIR => (@: 'subdir') ), 'MM'
 
 ok( setup_recurs(), 'setup' )
 END 

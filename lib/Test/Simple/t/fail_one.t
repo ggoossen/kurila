@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -11,8 +11,8 @@ BEGIN
 
 
 require Test::Simple::Catch
-use env;
-my@($out, $err) =  Test::Simple::Catch::caught()
+use env
+my(@: $out, $err) =  Test::Simple::Catch::caught()
 local env::var('HARNESS_ACTIVE' ) = 0
 
 

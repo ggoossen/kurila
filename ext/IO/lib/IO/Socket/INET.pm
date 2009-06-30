@@ -7,11 +7,11 @@
 package IO::Socket::INET
 
 our(@ISA, $VERSION)
-use IO::Socket;
-use Socket;
-use Carp;
-use Exporter;
-use Errno;
+use IO::Socket
+use Socket
+use Carp
+use Exporter
+use Errno
 
 @ISA = qw(IO::Socket)
 $VERSION = "1.31"
@@ -38,7 +38,7 @@ sub new
 
 sub _cache_proto
     my @proto = @_
-    for ( map { lc($_) }, @( @proto[0], < split(' ', @proto[1])))
+    for ( map { lc($_) }, (@:  @proto[0], < split(' ', @proto[1])))
         %proto_number{+$_} = @proto[2]
     
     %proto_name{+@proto[2]} = @proto[0]
@@ -49,7 +49,7 @@ sub _get_proto_number
     return undef unless defined $name
     return %proto_number{?$name} if exists %proto_number{$name}
 
-    my @proto = @( getprotobyname($name) )
+    my @proto = @:  getprotobyname($name) 
     return undef unless (nelems @proto)
     _cache_proto(< @proto)
 
@@ -61,7 +61,7 @@ sub _get_proto_name
     return undef unless defined $num
     return %proto_name{?$num} if exists %proto_name{$num}
 
-    my @proto = @( getprotobynumber($num) )
+    my @proto = @:  getprotobynumber($num) 
     return undef unless (nelems @proto)
     _cache_proto(< @proto)
 
@@ -86,9 +86,9 @@ sub _sock_info($addr,$port,$proto)
 
     if(defined $port)
         my $defport = ($port =~ s,\((\d+)\)$,,) ?? $1 !! undef
-        my $pnum = @($port =~ m,^(\d+)$,)[0]
+        my $pnum = (@: $port =~ m,^(\d+)$,)[0]
 
-        @serv = @( getservbyname($port, _get_proto_name($proto) || "") )
+        @serv = @:  getservbyname($port, _get_proto_name($proto) || "") 
             if ($port =~ m,\D,)
 
         $port = @serv[?2] || $defport || $pnum
@@ -100,10 +100,10 @@ sub _sock_info($addr,$port,$proto)
         $proto = _get_proto_number(@serv[3]) if (nelems @serv) && !$proto
     
 
-    return  @($addr || undef,
-              $port || undef,
-              $proto || undef
-        )
+    return  @: $addr || undef
+               $port || undef
+               $proto || undef
+        
 
 
 sub _error
@@ -112,7 +112,7 @@ sub _error
     do
         local($^OS_ERROR)
         my $title = ref($sock).": "
-        $^EVAL_ERROR = join("", @( @_[0] =~ m/^$title/ ?? "" !! $title, < @_))
+        $^EVAL_ERROR = join("", (@:  @_[0] =~ m/^$title/ ?? "" !! $title, < @_))
         $sock->close()
             if(defined fileno($sock))
     
@@ -123,7 +123,7 @@ sub _error
 sub _get_addr($sock,$addr_str, $multi)
     my @addr
     if ($multi && $addr_str !~ m/^\d+(?:\.\d+){3}$/)
-        @(_, _, _, _, @< @addr) = @: gethostbyname($addr_str)
+        (@: _, _, _, _, @< @addr) = @: gethostbyname($addr_str)
     else
         my $h = inet_aton($addr_str)
         push(@addr, $h) if defined $h
@@ -138,7 +138,7 @@ sub configure($sock,$arg)
     $arg->{+LocalAddr} = $arg->{?LocalHost}
         if exists $arg->{LocalHost} && !exists $arg->{LocalAddr}
 
-    @($laddr,$lport,$proto) =  _sock_info($arg->{?LocalAddr},
+    (@: $laddr,$lport,$proto) =  _sock_info($arg->{?LocalAddr},
                                           $arg->{?LocalPort},
                                           $arg->{?Proto})
         or return _error($sock, $^OS_ERROR, $^EVAL_ERROR)
@@ -153,7 +153,7 @@ sub configure($sock,$arg)
         if exists $arg->{PeerHost} && !exists $arg->{PeerAddr}
 
     unless(exists $arg->{Listen})
-        @($raddr,$rport,$proto) =  _sock_info($arg->{?PeerAddr},
+        (@: $raddr,$rport,$proto) =  _sock_info($arg->{?PeerAddr},
                                               $arg->{?PeerPort},
                                               $proto)
             or return _error($sock, $^OS_ERROR, $^EVAL_ERROR)

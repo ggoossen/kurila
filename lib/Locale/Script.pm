@@ -8,8 +8,8 @@ package Locale::Script
 
 
 require Exporter
-use Carp;
-use Locale::Constants;
+use Carp
+use Locale::Constants
 
 
 #-----------------------------------------------------------------------
@@ -145,7 +145,7 @@ do
     while ( ~< $^DATA)
         next unless m/\S/
         chop
-        @($alpha2, $alpha3, $numeric, $script) =  split(m/:/, $_, 4)
+        (@: $alpha2, $alpha3, $numeric, $script) =  split(m/:/, $_, 4)
 
         $CODES->[+LOCALE_CODE_ALPHA_2]{+$alpha2} = $script
         $COUNTRIES->[+LOCALE_CODE_ALPHA_2]{+lc "$script"} = $alpha2

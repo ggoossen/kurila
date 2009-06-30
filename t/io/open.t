@@ -5,8 +5,8 @@ BEGIN
 
 
 $^OUTPUT_AUTOFLUSH  = 1
-use warnings;
-use Config;
+use warnings
+use Config
 my $Is_VMS = $^OS_NAME eq 'VMS'
 my $Is_MacOS = $^OS_NAME eq 'MacOS'
 
@@ -52,7 +52,7 @@ do
 
 do
     ok( open(my $f, '<', 'afile'),      "open(my \$f, '<', 'afile')" )
-    my @rows = @( ~< $f )
+    my @rows = @:  ~< $f 
     is( scalar nelems @rows, 2,                '       readline, list context' )
     is( @rows[0], "a row\n",            '       first line read' )
     is( @rows[1], "a row\n",            '       second line' )
@@ -63,7 +63,7 @@ do
     ok( -s 'afile' +< 20,                '-s' )
 
     ok( open(my $f, '+<', 'afile'),     'open +<' )
-    my @rows = @( ~< $f )
+    my @rows = @:  ~< $f 
     is( scalar nelems @rows, 2,                '       readline, list context' )
     ok( seek($f, 0, 1),                 '       seek cur' )
     ok( (print $f, "yet another row\n"), '       print' )
@@ -80,7 +80,7 @@ SKIP: do
     $Perl -e "print \\\$^STDOUT, qq(a row\\n); print  \\\$^STDOUT,qq(another row\\n)"
 EOC
 
-    my @rows = @( ~< $f )
+    my @rows = @:  ~< $f 
     is( scalar nelems @rows, 2,                '       readline, list context' )
     ok( close($f),                      '       close' )
 
@@ -92,7 +92,7 @@ SKIP: do
     -e 'while (my $_ = ~< $^STDIN) { s/^not //; print $^STDOUT, $_; }'
 EOC
 
-    my @rows = @( ~< $f )
+    my @rows = @:  ~< $f 
     my $test = curr_test
     print $f, "not ok $test - piped in\n"
     next_test
@@ -147,7 +147,7 @@ do
 
 do
     ok( open(local $f, '<', 'afile'),   'open local $f, "<", ...' )
-    my @rows = @( ~< $f )
+    my @rows = @:  ~< $f 
     is( scalar nelems @rows, 2,                '       readline list context' )
     ok( close($f),                      '       close' )
 
@@ -156,7 +156,7 @@ ok( -s 'afile' +< 20,                '       -s' )
 
 do
     ok( open(local $f, '+<', 'afile'),  'open local $f, "+<", ...' )
-    my @rows = @( ~< $f )
+    my @rows = @:  ~< $f 
     is( scalar nelems @rows, 2,                '       readline list context' )
     ok( seek($f, 0, 1),                 '       seek cur' )
     ok( (print $f, "yet another row\n"), '       print' )
@@ -172,7 +172,7 @@ SKIP: do
     ok( open(local $f, '-|', <<EOC),  'open local $f, "-|", ...' )
     $Perl -e "print \\\$^STDOUT, qq(a row\\n); print \\\$^STDOUT, qq(another row\\n)"
 EOC
-    my @rows = @( ~< $f )
+    my @rows = @:  ~< $f 
 
     is( scalar nelems @rows, 2,                '       readline list context' )
     ok( close($f),                      '       close' )
@@ -185,7 +185,7 @@ SKIP: do
     -e 'while (my $_ = ~< $^STDIN) { s/^not //; print $^STDOUT, $_; }'
 EOC
 
-    my @rows = @( ~< $f )
+    my @rows = @:  ~< $f 
     my $test = curr_test
     print $f, "not ok $test - piping\n"
     next_test

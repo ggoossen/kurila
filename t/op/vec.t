@@ -47,7 +47,7 @@ ok(! vec('abcd', 7, 8))
 use utf8;
 our $x = "\x{263a}"  # == \xE2\x98\xBA
 is(vec($x, 0, 8), 0xE2)
-no utf8;
+no utf8
 
 # A variation of [perl #20933]
 do

@@ -34,7 +34,7 @@ sub _ok($type, $got, $expected, ?$name)
         else
             print $^STDOUT, "not ok $test\n"
         
-        my @caller = @( caller(2) )
+        my @caller = @:  caller(2) 
         print $^STDOUT, "# Failed test at @caller[1] line @caller[2]\n"
         print $^STDOUT, "# Got      '$got'\n"
         if ($type eq 'is')

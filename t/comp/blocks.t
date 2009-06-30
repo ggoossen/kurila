@@ -30,7 +30,7 @@ e1
 		)
 my $expect = ":" . join(":", @expect)
 
-fresh_perl_is(<<'SCRIPT', $expect,\%(switches => \@(''), stdin => '', stderr => 1 ),'Order of execution of special blocks')
+fresh_perl_is(<<'SCRIPT', $expect,\%(switches => \(@: ''), stdin => '', stderr => 1 ),'Order of execution of special blocks')
 BEGIN {print $^STDOUT, ":b1"}
 END {print $^STDOUT, ":e1"}
 BEGIN {print $^STDOUT, ":b2"}
@@ -53,20 +53,20 @@ try {CHECK {print $^STDOUT, ":c3"}};
 END {print $^STDOUT, ":e2"}
 SCRIPT
 
-@expect =@( <
-            # BEGIN
-            qw( main bar myfoo foo ), <
-            # UNITCHECK
-            qw( foo myfoo bar main ), <
-            # CHECK
-            qw( foo myfoo bar main ), <
-            # INIT
-            qw( main bar myfoo foo ), <
-            # END
-            qw(foo myfoo bar main  ))
+@expect =@:  <
+                 # BEGIN
+                 qw( main bar myfoo foo ), <
+                 # UNITCHECK
+                 qw( foo myfoo bar main ), <
+                 # CHECK
+                 qw( foo myfoo bar main ), <
+                 # INIT
+                 qw( main bar myfoo foo ), <
+                 # END
+                 qw(foo myfoo bar main  )
 
 $expect = ":" . join(":", @expect)
-fresh_perl_is(<<'SCRIPT2', $expect,\%(switches => \@(''), stdin => '', stderr => 1 ),'blocks interact with packages/scopes')
+fresh_perl_is(<<'SCRIPT2', $expect,\%(switches => \(@: ''), stdin => '', stderr => 1 ),'blocks interact with packages/scopes')
 our $f;
 BEGIN {$f = 'main'; print $^STDOUT, ":$f"}
 UNITCHECK {print $^STDOUT, ":$f"}

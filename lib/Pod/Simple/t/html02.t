@@ -13,13 +13,13 @@ sub x ($v) { Pod::Simple::HTML->_out(
 
 ok 1
 
-my @pairs = @(
-    \@( "I<italicized>"   => qq{\n<p><i>italicized</i></p>\n} ),
-    \@( 'B<bolded>'       => qq{\n<p><b>bolded</b></p>\n}           ),
-    \@( 'C<code>'         => qq{\n<p><code>code</code></p>\n} ),
-    \@( 'F</tmp/foo>'     => qq{\n<p><em>/tmp/foo</em></p>\n} ),
-    \@( 'F</tmp/foo>'     => qq{\n<p><em>/tmp/foo</em></p>\n} ),
-    )
+my @pairs = @: 
+    \(@:  "I<italicized>"   => qq{\n<p><i>italicized</i></p>\n} )
+    \(@:  'B<bolded>'       => qq{\n<p><b>bolded</b></p>\n}           )
+    \(@:  'C<code>'         => qq{\n<p><code>code</code></p>\n} )
+    \(@:  'F</tmp/foo>'     => qq{\n<p><em>/tmp/foo</em></p>\n} )
+    \(@:  'F</tmp/foo>'     => qq{\n<p><em>/tmp/foo</em></p>\n} )
+    
 
 
 foreach(  @pairs )

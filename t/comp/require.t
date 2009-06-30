@@ -47,7 +47,7 @@ print $^STDOUT, "ok ",$i++,"\n"
 
 my $flag_file = 'bleah.flg'
 # run-time error in require
-for my $expected_compile (@(1,0))
+for my $expected_compile ((@: 1,0))
     write_file($flag_file, 1)
     print $^STDOUT, "not " unless -e $flag_file
     print $^STDOUT, "ok ",$i++,"\n"

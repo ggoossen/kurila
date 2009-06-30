@@ -15,23 +15,23 @@ use constant TRUE   => sub (@< @_) { 1 };
 ### allow tests ###
 do {   ok( allow( 42, qr/^\d+$/ ), "Allow based on regex" );
     ok( allow( $^PROGRAM_NAME, $^PROGRAM_NAME),         "   Allow based on string" );
-    ok( allow( 42, \@(0,42) ),    "   Allow based on list" );
-    ok( allow( 42, \@(50,sub (@< @_){1})),"   Allow based on list containing sub");
+    ok( allow( 42, \(@: 0,42) ),    "   Allow based on list" );
+    ok( allow( 42, \(@: 50,sub (@< @_){1})),"   Allow based on list containing sub");
     ok( allow( 42, TRUE ),      "   Allow based on constant sub" );
     ok(!allow( $^PROGRAM_NAME, qr/^\d+$/ ), "Disallowing based on regex" );
     ok(!allow( 42, $^PROGRAM_NAME ),        "   Disallowing based on string" );
-    ok(!allow( 42, \@(0,$^PROGRAM_NAME) ),    "   Disallowing based on list" );
-    ok(!allow( 42, \@(50,sub (@< @_){0})),"   Disallowing based on list containing sub");
+    ok(!allow( 42, \(@: 0,$^PROGRAM_NAME) ),    "   Disallowing based on list" );
+    ok(!allow( 42, \(@: 50,sub (@< @_){0})),"   Disallowing based on list containing sub");
     ok(!allow( 42, FALSE ),     "   Disallowing based on constant sub" );
 
     ### check that allow short circuits where required
     do {   my $sub_called;
-        allow( 1, \@( 1, sub (@< @_) { $sub_called++ } ) );
+        allow( 1, \(@:  1, sub (@< @_) { $sub_called++ } ) );
         ok( !$sub_called,       "Allow short-circuits properly" );
     };
 
     ### check if the subs for allow get what you expect ###
-    for my $thing (@(1,'foo',\@(1)))
+    for my $thing ((@: 1,'foo',\(@: 1)))
         allow( $thing,
                sub (@< @_) { is_deeply(shift,$thing,  "Allow coderef gets proper args") }
                )
@@ -79,7 +79,7 @@ do
 ### preserve case tests ###
 do {   my $tmpl = \%( Foo => %( default => 1 ) );
 
-    for (@(1,0))
+    for ((@: 1,0))
         local $Params::Check::PRESERVE_CASE = $_
 
         my $expect = $_ ?? \%( Foo => 42 ) !! \%( Foo => 1 )
@@ -119,7 +119,7 @@ do {   my $foo;
         );
 
     ### with/without store duplicates ###
-    for(@( 1, 0) )
+    for((@:  1, 0) )
         local   $Params::Check::NO_DUPLICATES = $_
 
         my $expect = $_ ?? undef !! 42
@@ -145,9 +145,9 @@ do {   my $tmpl = \%(
 }
 
 ### strict_type tests ###
-do {   my @list = @(
-        \@( %( strict_type => 1, default => \$@ ),  0 ),
-        \@( %( default => \$@ ),                    1 ),
+do {   my @list = (@: 
+        \(@:  %( strict_type => 1, default => \$@ ),  0 )
+        \(@:  %( default => \$@ ),                    1 )
         );
 
     ### check for strict_type global, and in the template key ###
@@ -192,9 +192,9 @@ do {   my $tmpl = \%(
 }
 
 ### defined tests ###
-do {   my @list = @(
-        \@( %( defined => 1, default => 1 ),  0 ),
-        \@( %( default => 1 ),                1 ),
+do {   my @list = (@: 
+        \(@:  %( defined => 1, default => 1 ),  0 )
+        \(@:  %( default => 1 ),                1 )
         );
 
     ### check for strict_type global, and in the template key ###
@@ -220,7 +220,7 @@ do {   my @list = @(
 
 ### check + allow tests ###
 do   ### check if the subs for allow get what you expect ###
-    for my $thing (@(1,'foo',\@(1)))
+    for my $thing ((@: 1,'foo',\(@: 1)))
         my $tmpl = \%(
             foo => %( allow =>
             sub (@< @_) { is_deeply(shift,$thing,
@@ -236,7 +236,7 @@ do   ### check if the subs for allow get what you expect ###
 ### invalid key tests
 do {   my $tmpl = \%( foo => %( allow => sub (@< @_) { 0 } ) );
 
-    for my $val (@( 1, 'foo', \$@, bless(\$%,__PACKAGE__)) )
+    for my $val ((@:  1, 'foo', \$@, bless(\$%,__PACKAGE__)) )
         my $rv      = check( $tmpl, \%( foo => $val ) )
         my $text    = "Key 'foo' ($(dump::view($val))) is of invalid type"
         my $re      = quotemeta $text
@@ -291,9 +291,9 @@ do
         firstname   => %( required   => 1, defined => 1 ),
         lastname    => %( required   => 1, store => \$lastname ),
         gender      => %( required   => 1,
-        allow      => \@(qr/M/i, qr/F/i),
+        allow      => \(@: qr/M/i, qr/F/i),
         ),
-        married     => %( allow      => \@(0,1) ),
+        married     => %( allow      => \(@: 0,1) ),
         age         => %( default    => 21,
         allow      => qr/^\d+$/,
         ),
@@ -353,7 +353,7 @@ do {   ok( 1,                      "Test last_error() on recursive check() call"
     my $clear   = sub (@< @_) { check( \$%, \$% ) if shift; 1; };
 
     ### recursively call check() or not?
-    for my $recurse (@( 0, 1) )
+    for my $recurse ((@:  0, 1) )
 
         check(
             \%( a => %( defined => 1 ),

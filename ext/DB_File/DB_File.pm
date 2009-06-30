@@ -38,9 +38,9 @@ sub NotHere
     die ref($self) . " does not define the method $($method)" 
 
 
-package DB_File::RECNOINFO ;
+package DB_File::RECNOINFO 
 
-use warnings;
+use warnings
 
 
 @DB_File::RECNOINFO::ISA = qw(DB_File::HASHINFO) 
@@ -55,9 +55,9 @@ sub TIEHASH
         ), $pkg 
 
 
-package DB_File::BTREEINFO ;
+package DB_File::BTREEINFO 
 
-use warnings;
+use warnings
 
 
 @DB_File::BTREEINFO::ISA = qw(DB_File::HASHINFO) 
@@ -80,9 +80,9 @@ sub TIEHASH
 
 
 
-package DB_File ;
+package DB_File 
 
-use warnings;
+use warnings
 
 our ($VERSION, @ISA, @EXPORT, $DB_BTREE, $DB_HASH, $DB_RECNO)
 our ($db_version, $use_XSLoader, $splice_end_array, $Error)
@@ -200,16 +200,16 @@ sub iterate($self, $callback)
 
 
 sub keys
-    my @($self) = @_
+    my (@: $self) = @_
     my @keys = $@
-    $self->iterate( sub (@< @_) { my @($key, $value) = @_; push @keys, $key; } )
+    $self->iterate( sub (@< @_) { my (@: $key, $value) = @_; push @keys, $key; } )
     return @keys
 
 
 sub values
-    my @($self) = @_
+    my (@: $self) = @_
     my @values = $@
-    $self->iterate( sub (@< @_) { my @($key, $value) = @_; push @values, $value; } )
+    $self->iterate( sub (@< @_) { my (@: $key, $value) = @_; push @values, $value; } )
     return @values
 
 
@@ -218,8 +218,8 @@ sub find_dup
         unless (nelems @_) == 3 
 
     my $db        = shift 
-    my @($origkey, $value_wanted) =  @_ 
-    my @($key, $value) = @($origkey, 0)
+    my (@: $origkey, $value_wanted) =  @_ 
+    my (@: $key, $value) = @: $origkey, 0
 
     my $status = $db->seq($key, $value, R_CURSOR())
     while ($status == 0)
@@ -236,7 +236,7 @@ sub del_dup
         unless (nelems @_) == 3 
 
     my $db        = shift 
-    my @($key, $value) =  @_ 
+    my (@: $key, $value) =  @_ 
     my $status = $db->find_dup($key, $value) 
     return $status if $status != 0 
 

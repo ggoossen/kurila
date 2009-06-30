@@ -18,7 +18,7 @@ for ( @prgs)
     if (s/^\s*(-\w+)//)
         $switch = $1
     
-    my@($prog,$expected) =  split(m/\nEXPECT\n/, $_)
+    my(@: $prog,$expected) =  split(m/\nEXPECT\n/, $_)
 
     fresh_perl_is( $prog, $expected, \%( switch => $switch, stderr => 1, ) )
 

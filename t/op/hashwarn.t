@@ -3,7 +3,7 @@
 require './test.pl'
 plan( tests => 8 )
 
-use warnings;
+use warnings
 
 our (@warnings)
 
@@ -19,12 +19,12 @@ my $fail_not_hr   = 'Not a HASH reference'
 
 do
     @warnings = $@
-    my @(%<%hash) =  1..3
+    my (@: %<%hash) =  1..3
     cmp_ok(nelems(@warnings),'==',1,'odd count')
     cmp_ok(substr(@warnings[0],0,length($fail_odd)),'eq',$fail_odd,'odd msg')
 
     @warnings = $@
-    @(%<%hash) = @: 1
+    (@: %<%hash) = @: 1
     cmp_ok(scalar(nelems @warnings),'==',1,'scalar count')
     cmp_ok(substr(@warnings[0],0,length($fail_odd)),'eq',$fail_odd,'scalar msg')
 

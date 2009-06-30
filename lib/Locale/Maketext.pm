@@ -6,7 +6,7 @@ package Locale::Maketext
 our (@ISA, $VERSION, $MATCH_SUPERS, $USING_LANGUAGE_TAGS,
     $USE_LITERALS, $MATCH_SUPERS_TIGHTLY)
 use Carp ()
-use I18N::LangTags v0.30 ();
+use I18N::LangTags v0.30 ()
 
 #--------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ sub numerate($handle, $num, @< @forms)
 
     return '' unless (nelems @forms)
     if((nelems @forms) == 1) # only the headword form specified
-        return $s ?? @forms[0] !!  @(@forms[0] . 's') # very cheap hack.
+        return $s ?? @forms[0] !!  (@: @forms[0] . 's') # very cheap hack.
     else # sing and plural were specified
         return $s ?? @forms[0] !! @forms[1]
 
@@ -57,7 +57,7 @@ sub numerate($handle, $num, @< @forms)
 #--------------------------------------------------------------------------
 
 sub numf
-    my@($handle, $num) =  @_[[@(0,1)]]
+    my(@: $handle, $num) =  @_[[(@: 0,1)]]
     if($num +< 10_000_000_000 and $num +> -10_000_000_000 and $num == int($num))
         $num += 0  # Just use normal integer stringification.
     # Specifically, don't let %G turn ten million into 1E+007
@@ -96,15 +96,15 @@ sub language_tag
 
 sub encoding
     my $it = @_[0]
-    return @(
+    return (@: 
         (ref($it) && $it->{?'encoding'})
-        || "iso-8859-1"   # Latin-1
+            || "iso-8859-1"   # Latin-1
         )
 
 
 #--------------------------------------------------------------------------
 
-sub fallback_languages { return @('i-default', 'en', 'en-US') }
+sub fallback_languages { return (@: 'i-default', 'en', 'en-US') }
 
 sub fallback_language_classes { return () }
 
@@ -122,7 +122,7 @@ sub failure_handler_auto
     # Meant to be used like:
     #  $handle->fail_with('failure_handler_auto')
 
-    my@($handle, $phrase, @< @params) =  @_
+    my(@: $handle, $phrase, @< @params) =  @_
     $handle->{+'failure_lex'} ||= \$%
     my $lex = $handle->{?'failure_lex'}
 
@@ -167,7 +167,7 @@ sub maketext
     # Remember, this can fail.  Failure is controllable many ways.
     Carp::croak "maketext requires at least one parameter" unless (nelems @_) +> 1
 
-    my@($handle, $phrase) = @: splice(@_,0,2)
+    my(@: $handle, $phrase) = @: splice(@_,0,2)
 
     # Don't interefere with $@ in case that's being interpolated into the msg.
     local $^EVAL_ERROR

@@ -18,17 +18,17 @@ sub import
 
 
 use Class::Struct < qw(struct);
-struct 'Net::protoent' => \@(
-       name             => '$',
-       aliases  => '@',
-       proto    => '$',
-       )
+struct 'Net::protoent' => \@: 
+       name             => '$'
+       aliases  => '@'
+       proto    => '$'
+       
 
 sub populate
     return unless (nelems @_)
     my $pob = new()
     $p_name      =    $pob->[0]              = @_[0]
-    @p_aliases   = @(  $pob->[1]->@ = split ' ', @_[1] )
+    @p_aliases   = @:   $pob->[1]->@ = split ' ', @_[1] 
     $p_proto     =    $pob->[2]              = @_[2]
     return $pob
 

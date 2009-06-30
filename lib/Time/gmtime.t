@@ -2,7 +2,7 @@
 
 BEGIN 
     chdir 't' if -d 't'
-    $^INCLUDE_PATH = @( '../lib' )
+    $^INCLUDE_PATH = @:  '../lib' 
 
 
 BEGIN 
@@ -16,13 +16,13 @@ BEGIN
 our @gmtime
 
 BEGIN 
-    @gmtime = @( gmtime 0 ) # This is the function gmtime.
+    @gmtime = (@:  gmtime 0 ) # This is the function gmtime.
     unless (nelems @gmtime) { print $^STDOUT, "1..0 # Skip: gmtime failed\n"; exit 0 }
 
 
 print $^STDOUT, "1..10\n"
 
-use Time::gmtime;
+use Time::gmtime
 
 print $^STDOUT, "ok 1\n"
 

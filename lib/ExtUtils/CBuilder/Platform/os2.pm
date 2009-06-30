@@ -19,7 +19,7 @@ sub prelink
         unless @res[0] =~ m,^(.*)\.def$,si
     my $libname = "$1$self->{config}->{?lib_ext}"	# Put .LIB file near .DEF file
     $self->do_system('emximp', '-o', $libname, @res[0]) or die "emxexp: res=$^CHILD_ERROR"
-    return  @(@res, $libname)
+    return  @: @res, $libname
 
 
 sub _do_link($self, $how, %< %args)
@@ -30,7 +30,7 @@ sub _do_link($self, $how, %< %args)
         my $lib = DynaLoader::mod2fname(\split m/::/, %args{?module_name})
 
         # Now know the basename, find directory parts via lib_file, or objects
-        my $objs = ( (ref %args{?objects}) ?? %args{?objects} !! \@(%args{?objects}) )
+        my $objs = ( (ref %args{?objects}) ?? %args{?objects} !! \(@: %args{?objects}) )
         my $near_obj = $self->lib_file(< $objs->@)
         my $ref_file = ( defined %args{?lib_file} ?? %args{?lib_file} !! $near_obj )
         my $lib_dir = ($ref_file =~ m,(.*)[/\\],s ?? "$1/" !! '' )
@@ -57,10 +57,10 @@ sub extra_link_args_after_prelink($self, %< %args)
     die "No .def file created by `prelink' stage"
         unless (nelems @DEF) or not nelems %args{?prelink_res}->@
 
-    my @after_libs = @($OS2::is_aout ?? ()
-                       !! $self->perl_inc() . "/libperl_override$self->{config}->{?lib_ext}")
+    my @after_libs = (@: $OS2::is_aout ?? ()
+                             !! $self->perl_inc() . "/libperl_override$self->{config}->{?lib_ext}")
     # , "-L", "-lperl"
-    return @(@after_libs, @DEF)
+    return @: @after_libs, @DEF
 
 
 sub link_executable

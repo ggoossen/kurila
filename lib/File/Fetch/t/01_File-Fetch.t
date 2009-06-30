@@ -43,30 +43,30 @@ if( $File::Fetch::DEBUG )
 
 ### _parse_uri tests
 ### these go on all platforms
-my @map = @(
-    \%(   uri     => 'ftp://cpan.org/pub/mirror/index.txt',
-    scheme  => 'ftp',
-    host    => 'cpan.org',
-    path    => '/pub/mirror/',
+my @map = (@: 
+    \%(   uri     => 'ftp://cpan.org/pub/mirror/index.txt'
+    scheme  => 'ftp'
+    host    => 'cpan.org'
+    path    => '/pub/mirror/'
     file    => 'index.txt'
-    ),
-    \%( uri         => 'rsync://cpan.pair.com/CPAN/MIRRORING.FROM',
-    scheme      => 'rsync',
-    host        => 'cpan.pair.com',
-    path        => '/CPAN/',
-    file        => 'MIRRORING.FROM',
-    ),
-    \%(   uri     => 'http://localhost/tmp/index.txt',
-    scheme  => 'http',
-    host    => 'localhost',          # host is empty only on 'file://'
-    path    => '/tmp/',
-    file    => 'index.txt',
-    ),
+        )
+    \%( uri         => 'rsync://cpan.pair.com/CPAN/MIRRORING.FROM'
+    scheme      => 'rsync'
+    host        => 'cpan.pair.com'
+    path        => '/CPAN/'
+    file        => 'MIRRORING.FROM'
+        )
+    \%(   uri     => 'http://localhost/tmp/index.txt'
+    scheme  => 'http'
+    host    => 'localhost'          # host is empty only on 'file://'
+    path    => '/tmp/'
+    file    => 'index.txt'
+        )
 
     ### only test host part, the rest is OS dependant
-    \%(   uri     => 'file://localhost/tmp/index.txt',
-    host    => '',                  # host should be empty on 'file://'
-    ),
+    \%(   uri     => 'file://localhost/tmp/index.txt'
+    host    => ''                  # host should be empty on 'file://'
+        )
     )
 
 ### these only if we're not on win32/vms
@@ -162,8 +162,8 @@ do {   my $uri = 'ftp://ftp.funet.fi/pub/CPAN/index.html';
 }
 
 ### http:// tests ###
-do {   for my $uri (@( 'http://www.cpan.org/index.html',
-                       'http://www.cpan.org/index.html?q=1&y=2')
+do {   for my $uri (@:  'http://www.cpan.org/index.html'
+                        'http://www.cpan.org/index.html?q=1&y=2'
         )
         for (qw[lwp wget curl lynx])
             _fetch_uri( http => $uri, $_ )
@@ -190,7 +190,7 @@ sub _fetch_uri
 
         ### stupid warnings ###
         $File::Fetch::METHODS =
-            $File::Fetch::METHODS = \%( $type => \@($method) )
+            $File::Fetch::METHODS = \%( $type => \(@: $method) )
 
         my $ff  = File::Fetch->new( uri => $uri )
 

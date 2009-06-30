@@ -15,7 +15,7 @@ my $Is_VMS   = $^OS_NAME eq 'VMS'
 
 # first check for stupid permissions second for full, so we clean up
 # behind ourselves
-for my $perm (@(0111,0777))
+for my $perm ((@: 0111,0777))
     my $path = catdir(curdir(), "mhx", "bar")
     mkpath($path)
     chmod $perm, "mhx", $path
@@ -36,11 +36,11 @@ my $tmp_base = catdir(
     )
 
 # invent some names
-my @dir = @(
-    catdir($tmp_base, < qw(a b)),
-    catdir($tmp_base, < qw(a c)),
-    catdir($tmp_base, < qw(z b)),
-    catdir($tmp_base, < qw(z c)),
+my @dir = (@: 
+    catdir($tmp_base, < qw(a b))
+    catdir($tmp_base, < qw(a c))
+    catdir($tmp_base, < qw(z b))
+    catdir($tmp_base, < qw(z c))
     )
 
 # create them
@@ -49,7 +49,7 @@ my @created = mkpath(< @dir)
 is(scalar(nelems @created), 7, "created list of directories")
 
 # pray for no race conditions blowing them out from under us
-@created = mkpath(\@($tmp_base))
+@created = mkpath(\(@: $tmp_base))
 is(scalar(nelems @created), 0, "skipped making existing directory")
     or diag("unexpectedly recreated $(join ' ',@created)")
 
@@ -201,7 +201,7 @@ SKIP: do
 
     mkpath( $entry, \%(error => \$error) )
     is( scalar(nelems $error->@), 1, "caught error condition" )
-    @($file, $message) =@( each $error->[0]->%)
+    (@: $file, $message) =@:  each $error->[0]->%
     is( $entry, $file, "and the message is: $message")
 
     try {@created = mkpath($entry, 0, 0700)}
@@ -231,21 +231,21 @@ SKIP: do
     $dir = catdir('EXTRA', '3', 'S')
     rmtree($dir, \%(error => \$error))
     is( scalar(nelems $error->@), 1, 'one error for an unreadable dir' )
-    try { @($file, $message) =@( each $error->[0]->%)}
+    try { (@: $file, $message) =(@:  each $error->[0]->%)}
     is( $file, $dir, 'unreadable dir reported in error' )
         or diag($message)
 
     $dir = catdir('EXTRA', '3', 'T')
     rmtree($dir, \%(error => \$error))
     is( scalar(nelems $error->@), 1, 'one error for an unreadable dir T' )
-    try { @($file, $message) =@( each $error->[0]->%)}
+    try { (@: $file, $message) =(@:  each $error->[0]->%)}
     is( $file, $dir, 'unreadable dir reported in error T' )
 
     $dir = catdir( 'EXTRA', '4' )
     rmtree($dir,  \%(result => \$list, error => \$err) )
     is( scalar(nelems $list->@), 0, q{don't follow a symlinked dir} )
     is( scalar(nelems $err->@),  2, q{two errors when removing a symlink in r/o dir} )
-    try { @($file, $message) =@( each $err->[0]->%) }
+    try { (@: $file, $message) =(@:  each $err->[0]->%) }
     is( $file, $dir, 'symlink reported in error' )
 
     $dir  = catdir('EXTRA', '3', 'U')
@@ -253,7 +253,7 @@ SKIP: do
     rmtree($dir, $dir2, \%(verbose => 0, error => \$err, result => \$list))
     is( scalar(nelems $list->@),  1, q{deleted 1 out of 2 directories} )
     is( scalar(nelems $error->@), 1, q{left behind 1 out of 2 directories} )
-    try { @($file, $message) =@( each $err->[0]->%) }
+    try { (@: $file, $message) =(@:  each $err->[0]->%) }
     is( $file, $dir, 'first dir reported in error' )
 
 
@@ -326,13 +326,13 @@ cannot restore permissions to \d+ for [^:]+: .* at \1 line \2},
         )
 
     stdout_is(
-        sub (@< @_) {@created = mkpath(\@($dir2), 1)},
+        sub (@< @_) {@created = mkpath(\(@: $dir2), 1)},
         "mkdir $dir2\n",
         'mkpath verbose (old style 2)'
         )
 
     stdout_is(
-        sub (@< @_) {$count = rmtree(\@($dir, $dir2), 1, 1)},
+        sub (@< @_) {$count = rmtree(\(@: $dir, $dir2), 1, 1)},
         "rmdir $dir\nrmdir $dir2\n",
         'rmtree verbose (old style)'
         )
@@ -375,7 +375,7 @@ SKIP: do
     rmtree 'EXTRA', \%(safe => 1, error => \$error)
     is( scalar(nelems $error->@), 9, 'safe is better' )
     for ( $error->@)
-        @($file, $message) =@( each $_->%)
+        (@: $file, $message) =@:  each $_->%
         if ($file =~  m/[123]\z/)
             is(index($message, 'cannot remove directory: '), 0, "failed to remove $file with rmdir")
                 or diag($message)
