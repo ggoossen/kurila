@@ -1516,7 +1516,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000c44,	/* gv */
 	0x00022440,	/* gelem */
 	0x00000044,	/* padsv */
-	0x00000044,	/* magicsv */
+	0x00000c44,	/* magicsv */
 	0x00000a40,	/* pushre */
 	0x00000244,	/* rv2gv */
 	0x00000244,	/* rv2sv */

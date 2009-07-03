@@ -25,7 +25,7 @@ sub _handle_element_start # self, tagname, attrhash
         unshift  @_[0]->{'_currpos'}->@,    $x # prefix to stack
     else
         DEBUG and print $^STDOUT, " And oo, it gets to be root!\n"
-        @_[0]->{+'_currpos'} = \(@:    @_[0]->{+'root'} = $x   )
+        @_[0]->{+'_currpos'} = \ @: (  @_[0]->{+'root'} = $x )
     # first event!  set to stack, and set as root.
     
     DEBUG +> 3 and print $^STDOUT, "Stack is now: ",

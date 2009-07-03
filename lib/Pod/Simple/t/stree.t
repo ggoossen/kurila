@@ -64,7 +64,7 @@ ok x( "=pod\n\nI like pie.\n" )
 print $^STDOUT, "# Some real tests...\n"
 &ok( deq( x( "=pod\n\nI like pie.\n"),
           \@:  "Document", \%("start_line"=>1)
-               \@:  "Para",   \%("start_line"=>3)
+               \@: "Para",   \%("start_line"=>3)
                    "I like pie."
                          
           
@@ -75,41 +75,31 @@ $hashes_dont_matter = 1
 &ok( deq( x("=pod\n\nB<foo\t>\n"),
           \@:  "Document", \$%
                \@:  "Para",   \$%
-                   \@: "B",     \$%
-              "foo "
-                             
-                         
-          
+                    \@: "B",     \$%
+                        "foo "
           ))
 
 
 &ok( deq( x("=pod\n\nB<pieF<zorch>X<foo>I<pling>>\n"),
-          \@:  "Document", \$%
-               \@:  "Para",   \$%
+          \@: "Document", \$%
+              \@:  "Para",   \$%
                    \@: "B",     \$%
-              "pie"
-              \(@: 'F',\$%, 'zorch')
-              \(@: 'X',\$%, 'foo'  )
-              \(@: 'I',\$%, 'pling')
-                             
-                         
-          
+                       "pie"
+                       \ @: 'F',\$%, 'zorch'
+                       \ @: 'X',\$%, 'foo'  
+                       \ @: 'I',\$%, 'pling'
           ))
 
 &ok( deq( x("=over\n\n=item B<pieF<zorch>X<foo>I<pling>>!\n\n=back"),
           \@:  "Document", \$%
-               \@:  "over-text", \$%
-                   \@:  "item-text", \$%
-               \(@: "B",     \$%
-                 "pie"
-                 \(@: 'F',\$%, 'zorch')
-                 \(@: 'X',\$%, 'foo'  )
-                 \(@: 'I',\$%, 'pling')
-                         )
-               '!'
-                             
-                         
-          
+               \ @: "over-text", \$%
+                    \@:  "item-text", \$%
+                         \ @: "B",     \$%
+                              "pie"
+                              \ @: 'F',\$%, 'zorch'
+                              \ @: 'X',\$%, 'foo'
+                              \ @: 'I',\$%, 'pling'
+                         '!'
           ))
 
 print $^STDOUT, "# Wrapping up... one for the road...\n"

@@ -188,9 +188,9 @@ sub _do_link($self, $type, %< %args)
         $self->prelink(< %args,
         dl_name => %args{module_name}) if %args{?lddl} && $self->need_prelink
 
-    my @linker_flags = @:  <$self->split_like_shell(%args{?extra_linker_flags}), <
-                               $self->extra_link_args_after_prelink(< %args, dl_name => %args{?module_name}
-                           prelink_res => \@temp_files)
+    my @linker_flags = @:  < $self->split_like_shell(%args{?extra_linker_flags})
+                           < $self->extra_link_args_after_prelink(< %args, dl_name => %args{?module_name},
+                                 prelink_res => \@temp_files)
 
     my @output = @:  %args{?lddl} ?? < $self->arg_share_object_file($out) !! < $self->arg_exec_file($out) 
     my @shrp = $self->split_like_shell($cf{shrpenv})

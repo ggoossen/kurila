@@ -192,7 +192,7 @@ ok( $size +> 0 )
 # Check NOOVERWRITE will make put fail when attempting to overwrite
 # an existing record.
 
-my $status = %h->put( 'x', 'newvalue', R_NOOVERWRITE) 
+my $status = %h->put( 'x', 'newvalue', R_NOOVERWRITE())
 ok( $status == 1 )
 
 # check that the value of the key 'x' has not been changed by the

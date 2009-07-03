@@ -27,10 +27,9 @@ sub arg_defines($self, %< %args)
     return '' unless keys(%args) || nelems @config_defines
 
     return  @: '/define=('
-                   . join(',', (@: 
-        < @config_defines
-        < map { "\"$_" . ( length(%args{?$_}) ?? "=%args{?$_}" !! '') . "\"" }
-        keys %args))
+                   . join(',', @config_defines
+                               +@+ map { "\"$_" . ( length(%args{?$_}) ?? "=%args{?$_}" !! '') . "\"" },
+                                     keys %args)
                    . ')'
 
 

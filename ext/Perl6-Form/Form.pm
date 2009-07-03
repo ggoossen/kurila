@@ -458,7 +458,7 @@ sub litval(?= $newlitval)
 
 
 my ($fld, $udnum)
-sub fldvals
+sub fldvals( @< @_ )
     (@: $fld, $udnum) =  @_ if (nelems @_)
     return  @: $fld, $udnum
 

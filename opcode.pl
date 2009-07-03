@@ -613,7 +613,7 @@ gvsv		scalar variable		ck_null		ds$
 gv		glob value		ck_null		ds$	
 gelem		glob elem		ck_null		d2	S S
 padsv		private variable	ck_null		ds0
-magicsv		magic variable	ck_null		ds0
+magicsv		magic variable	ck_null		ds$
 
 pushre		push regexp		ck_null		d/
 

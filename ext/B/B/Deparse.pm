@@ -2559,6 +2559,8 @@ sub padany
 sub pp_padsv($self, $op, $cx)
     return $self->maybe_my($op, $cx, $self->padname($op->targ))
 
+sub pp_magicsv($self, $op, $cx)
+    return $op->targ;
 
 sub pp_padav { pp_padsv(< @_) }
 sub pp_padhv { pp_padsv(< @_) }

@@ -2842,6 +2842,16 @@ static int S_process_layout(char* s) {
     }
 }
 
+static bool S_close_layout_lists() {
+    if (PL_lex_brackets > 0 
+	&& PL_lex_brackstack[PL_lex_brackets -1].type == LB_LAYOUT_LIST) {
+	--PL_lex_brackets;
+	PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
+	return 1;
+    }
+    return 0;
+}
+
 /* S_closing_bracket
    should be called with the next token, returns the next token.
    After calling PL_lex_brackstack[PL_lex_brackets] should be checked
@@ -3207,6 +3217,9 @@ Perl_yylex(pTHX)
 	if (!PL_rsfp) {
 	    PL_last_uni = 0;
 	    PL_last_lop = 0;
+
+	    if (S_close_layout_lists())
+		TOKEN(LAYOUTLISTEND);
 
 	    if (PL_parser->statement_indent > 0) {
 		S_stop_statement_indent();

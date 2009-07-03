@@ -80,7 +80,7 @@
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
 %token <i_tkval> DO LOOPDO NOAMP
-%token <i_tkval> ANONARY ANONARYL ANONHSH ANONHSHL ANONSCALAR ANONSCALARL
+%token <i_tkval> ANONARY ANONHSH ANONSCALAR
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
 %token <i_tkval> SPECIALBLOCK
@@ -121,7 +121,7 @@
 %right <i_tkval> ASSIGNOP
 %right <i_tkval> TERNARY_IF TERNARY_ELSE
 %right <i_tkval> '<' ARRAYEXPAND HASHEXPAND
-%right ANONHSHL ANONARYL ANONSCALARL
+%right <i_tkval> ANONHSHL ANONARYL ANONSCALARL
 %left <i_tkval> AHOP
 %nonassoc DOTDOT
 %left <i_tkval> OROR DORDOR
@@ -780,28 +780,6 @@ listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
                             TOKEN_GETMAD($1,$$,'o');
                             APPEND_MADPROPS_PV("listop", $$, '>');
 			}
-        |       ANONHSHL listexpr  /* %: ... */
-                        {
-                            $$ = newANONHASH($2, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'{');
-			}
-        |       ANONARYL listexpr LAYOUTLISTEND  /* @: ... */
-                        {
-                            $$ = newANONARRAY($2, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'[');
-			}
-        |       ANONARYL listexpr /* @: ... and */
-                        {
-                            $$ = newANONARRAY($2, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'[');
-                            --PL_parser->lex_brackets;
-                            PL_parser->statement_indent = PL_parser->lex_brackstack[PL_parser->lex_brackets].prev_statement_indent;
-			}
-        |       ANONARYL ',' LAYOUTLISTEND  /* @: ... */
-                        {
-                            $$ = newANONARRAY(NULL, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'[');
-			}
         |       ANONSCALARL listexpr  /* $: ... */
                         {
                             $$ = newUNOP(OP_ANONSCALAR, 0, scalar($2), LOCATION($1));
@@ -1415,6 +1393,28 @@ scalar  :	PRIVATEVAR
                             $$ = newANONHASH((OP*)NULL, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'{');
                             TOKEN_GETMAD($2,$$,'}');
+			}
+        |       ANONHSHL listexpr /* %: ... */
+                        {
+                            $$ = newANONHASH($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'{');
+			}
+        |       ANONARYL listexpr LAYOUTLISTEND  /* @: ... */
+                        {
+                            $$ = newANONARRAY($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'[');
+			}
+        |       ANONARYL listexpr /* @: ... and */
+                        {
+                            $$ = newANONARRAY($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'[');
+                            --PL_parser->lex_brackets;
+                            PL_parser->statement_indent = PL_parser->lex_brackstack[PL_parser->lex_brackets].prev_statement_indent;
+			}
+        |       ANONARYL ',' LAYOUTLISTEND  /* @: ... */
+                        {
+                            $$ = newANONARRAY(NULL, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'[');
 			}
         |       EMPTYAH
 			{ 

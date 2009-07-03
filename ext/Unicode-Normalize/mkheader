@@ -234,26 +234,25 @@ foreach my $hash ((@: \%Canon, \%Compat))
 
 my @boolfunc = @: 
     \%(
-        name => "Exclusion"
-    type => "bool"
-    hash => \%Exclus
+        name => "Exclusion",
+        type => "bool",
+        hash => \%Exclus,
         )
     \%(
-        name => "Singleton"
-    type => "bool"
-    hash => \%Single
+        name => "Singleton",
+        type => "bool",
+        hash => \%Single,
         )
     \%(
-        name => "NonStDecomp"
-    type => "bool"
-    hash => \%NonStD
+        name => "NonStDecomp",
+        type => "bool",
+        hash => \%NonStD,
         )
     \%(
-        name => "Comp2nd"
-    type => "bool"
-    hash => \%Comp2nd
+        name => "Comp2nd",
+        type => "bool",
+        hash => \%Comp2nd,
         )
-    
 
 my $file = "unfexc.h"
 open my $fh, ">", "$file" or die "$PACKAGE: $file can't be made"
@@ -305,35 +304,34 @@ foreach my $i (sort keys %CompList)
 
 my @tripletable = @: 
     \%(
-        file => "unfcmb"
-    name => "combin"
-    type => "STDCHAR"
-    hash => \%Combin
-    null =>  0
+        file => "unfcmb",
+        name => "combin",
+        type => "STDCHAR",
+        hash => \%Combin,
+        null =>  0,
         )
     \%(
-        file => "unfcan"
-    name => "canon"
-    type => "char*"
-    hash => \%Canon
-    null => "NULL"
+        file => "unfcan",
+        name => "canon",
+        type => "char*",
+        hash => \%Canon,
+        null => "NULL",
         )
     \%(
-        file => "unfcpt"
-    name => "compat"
-    type => "char*"
-    hash => \%Compat
-    null => "NULL"
+        file => "unfcpt",
+        name => "compat",
+        type => "char*",
+        hash => \%Compat,
+        null => "NULL",
         )
     \%(
-        file => "unfcmp"
-    name => "compos"
-    type => "$structname *"
-    hash => \%Comp1st
-    null => "NULL"
-    init => $compinit
+        file => "unfcmp",
+        name => "compos",
+        type => "$structname *",
+        hash => \%Comp1st,
+        null => "NULL",
+        init => $compinit,
         )
-    
 
 foreach my $tbl ( @tripletable)
     my $file = "$tbl->{?file}.h"

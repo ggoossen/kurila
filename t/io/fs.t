@@ -234,7 +234,7 @@ SKIP: do
 
 
 
-sub check_utime_result
+sub check_utime_result()
     (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
         $blksize,$blocks) = @: stat('b')
 

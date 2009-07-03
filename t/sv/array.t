@@ -165,7 +165,7 @@ do
             my @bee = @: 'XXX',< @bee,'YYY'
             is((join ' ',@bee), "XXX bar burbl blah YYY")		# 56
             do
-                my @bee = @:  my @bee = qw(foo bar burbl blah) 
+                my @bee = @: (my @bee = qw(foo bar burbl blah))
                 is((join ' ',@bee), "foo bar burbl blah")		# 57
                 do
                     my @bim = my @bee = qw(foo bar)

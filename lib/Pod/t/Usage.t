@@ -48,12 +48,10 @@ SKIP: do # Test exit status from pod2usage()
     skip "Exit status broken on Mac OS", 1 if $^OS_NAME eq 'MacOS'
     my $exit = ($^OS_NAME eq 'VMS' ?? 2 !! 42)
     my $dev_null = File::Spec->devnull
-    my $args = join ", ", @:  (
-                                  "verbose => 0"
-                              "exit    => $exit"
-                              "output  => q\{$dev_null\}"
-                              "input   => q\{$^PROGRAM_NAME\}"
-                                  )
+    my $args = join ", ", @: "verbose => 0"
+                             "exit    => $exit"
+                             "output  => q\{$dev_null\}"
+                             "input   => q\{$^PROGRAM_NAME\}"
     my $cq = (($^OS_NAME eq 'MSWin32'
                || $^OS_NAME eq 'NetWare'
                || $^OS_NAME eq 'VMS') ?? '"'

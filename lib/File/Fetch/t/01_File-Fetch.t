@@ -44,28 +44,28 @@ if( $File::Fetch::DEBUG )
 ### _parse_uri tests
 ### these go on all platforms
 my @map = (@: 
-    \%(   uri     => 'ftp://cpan.org/pub/mirror/index.txt'
-    scheme  => 'ftp'
-    host    => 'cpan.org'
-    path    => '/pub/mirror/'
-    file    => 'index.txt'
+    \%(   uri     => 'ftp://cpan.org/pub/mirror/index.txt',
+          scheme  => 'ftp',
+          host    => 'cpan.org',
+          path    => '/pub/mirror/',
+          file    => 'index.txt',
         )
-    \%( uri         => 'rsync://cpan.pair.com/CPAN/MIRRORING.FROM'
-    scheme      => 'rsync'
-    host        => 'cpan.pair.com'
-    path        => '/CPAN/'
-    file        => 'MIRRORING.FROM'
+    \%( uri         => 'rsync://cpan.pair.com/CPAN/MIRRORING.FROM',
+        scheme      => 'rsync',
+        host        => 'cpan.pair.com',
+        path        => '/CPAN/',
+        file        => 'MIRRORING.FROM',
         )
-    \%(   uri     => 'http://localhost/tmp/index.txt'
-    scheme  => 'http'
-    host    => 'localhost'          # host is empty only on 'file://'
-    path    => '/tmp/'
-    file    => 'index.txt'
+    \%(   uri     => 'http://localhost/tmp/index.txt',
+          scheme  => 'http',
+          host    => 'localhost',          # host is empty only on 'file://'
+          path    => '/tmp/',
+          file    => 'index.txt',
         )
 
     ### only test host part, the rest is OS dependant
-    \%(   uri     => 'file://localhost/tmp/index.txt'
-    host    => ''                  # host should be empty on 'file://'
+    \%(   uri     => 'file://localhost/tmp/index.txt',
+          host    => ''                  # host should be empty on 'file://'
         )
     )
 

@@ -385,8 +385,6 @@ do
                     #]
                     ) }, $self->{'errata'}{$line}
                 )
-            
-        
 
         # TODO: report of unknown entities? unrenderable characters?
 
@@ -395,20 +393,16 @@ do
             \(@: '~Para', \%('start_line' => $m, '~cooked' => 1, 'errata' => 1)
                  "Hey! "
                  \@: 'B', \$%
-                   'The above document had some coding errors, which are explained below:'
-                     
+                     'The above document had some coding errors, which are explained below:'
             ),
             \(@: '=over',  \%('start_line' => $m, 'errata' => 1), ''),
-        
 
         push @out,
             \(@: '=back',  \%('start_line' => $m, 'errata' => 1), ''),
-        
 
         DEBUG and print $^STDOUT, "\n<<\n", < pretty(\@out), "\n>>\n\n"
 
         return @out
-    
 
 
 

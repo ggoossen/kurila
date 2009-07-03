@@ -1040,10 +1040,10 @@ sub standard_typemap_locations
     my @tm = qw(typemap)
 
     my $updir = File::Spec->updir
-    foreach my $dir ((@: File::Spec->catdir(< $: (@: $updir) x 1)
-                                   File::Spec->catdir(< $: (@: $updir) x 2)
-                                   File::Spec->catdir(< $: (@: $updir) x 3)
-                                   File::Spec->catdir(< $: (@: $updir) x 4)))
+    foreach my $dir (@: File::Spec->catdir(< $: (@: $updir) x 1)
+                        File::Spec->catdir(< $: (@: $updir) x 2)
+                        File::Spec->catdir(< $: (@: $updir) x 3)
+                        File::Spec->catdir(< $: (@: $updir) x 4))
 
         unshift @tm, File::Spec->catfile($dir, 'typemap')
         unshift @tm, File::Spec->catfile($dir, lib => ExtUtils => 'typemap')
