@@ -165,9 +165,6 @@ Deprecated.  Use C<GIMME_V> instead.
 /* Private for OP_MATCH and OP_SUBST{,CONST} */
 #define OPpRUNTIME		64	/* Pattern coming in on the stack */
 
-/* Private for OP_REPEAT */
-#define OPpREPEAT_DOLIST	64	/* List replication. */
-
 /* Private for OP_RV2GV, OP_RV2SV, OP_AELEM, OP_HELEM, OP_PADSV */
 #define OPpDEREF		(32|64)	/* autovivify: Want ref to something: */
 #define OPpDEREF_AV		32	/*   Want ref to AV. */

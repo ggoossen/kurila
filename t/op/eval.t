@@ -160,11 +160,8 @@ do
 
 $x++
 
-# does scalar eval"" pop stack correctly?
-do
-    my $c = eval "(1,2)x10"
-    print $^STDOUT, $c eq '2222222222' ?? "ok $x\n" !! "# $c\nnot ok $x\n"
-    $x++
+print $^STDOUT, "ok $x\n"
+$x++
 
 
 # return from try {} should clear $^EVAL_ERROR correctly

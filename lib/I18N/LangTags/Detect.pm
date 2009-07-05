@@ -131,7 +131,7 @@ sub _try_use   # Basically a wrapper around "require Modulename"
 
     my $module = @_[0]   # ASSUME sane module name!
     do
-        return @: %tried{+$module} = 1
+        return @: ( %tried{+$module} = 1 )
             if defined(Symbol::fetch_glob($module . "::Lexicon")->*->%) or defined(Symbol::fetch_glob($module . "::ISA")->*->@)
     # weird case: we never use'd it, but there it is!
     

@@ -1063,7 +1063,7 @@ SKIP: do
 
     for my $t (qw{ (s<)> (sl>s)< (s(l(sl)<l)s)> })
         info "testing pattern '$t'"
-        try (@: $_) = @: unpack($t, 'x'x18)
+        try @: $_ = @: unpack($t, 'x'x18)
         like($^EVAL_ERROR->{?description}, qr/Can't use '[<>]' in a group with different byte-order in unpack/)
         try { $_ = pack($t, (0)x6); }
         like($^EVAL_ERROR->{?description}, qr/Can't use '[<>]' in a group with different byte-order in pack/)

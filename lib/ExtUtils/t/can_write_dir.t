@@ -19,10 +19,8 @@ is_deeply \ can_write_dir($dne),
           \@: 1
               FS->curdir
               @: FS->catdir('does')
-                  FS->catdir('does', 'not')
-                  FS->catdir('does', 'not', 'exist')
-          
-
+                 FS->catdir('does', 'not')
+                 FS->catdir('does', 'not', 'exist')
 
 my $abs_dne = FS->rel2abs($dne)
 ok ! -e $abs_dne
@@ -30,9 +28,8 @@ is_deeply \ can_write_dir($abs_dne),
           \@: 1
               FS->rel2abs(FS->curdir)
               (@: FS->rel2abs(FS->catdir('does'))
-                   FS->rel2abs(FS->catdir('does', 'not'))
-                   FS->rel2abs(FS->catdir('does', 'not', 'exist')))
-          
+                  FS->rel2abs(FS->catdir('does', 'not'))
+                  FS->rel2abs(FS->catdir('does', 'not', 'exist')))
 
 SKIP: do
     my $exists = FS->catdir( <qw(exists))
@@ -57,5 +54,3 @@ SKIP: do
               \@: 1
                   $exists
                   @: $subdir
-              
-

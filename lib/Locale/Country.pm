@@ -187,8 +187,8 @@ sub rename_country
     $country = $CODES[$codeset]{?$code}
 
     foreach my $cset ((@: LOCALE_CODE_ALPHA_2
-                                             LOCALE_CODE_ALPHA_3
-                                             LOCALE_CODE_NUMERIC))
+                          LOCALE_CODE_ALPHA_3
+                          LOCALE_CODE_NUMERIC))
         if ($cset == $codeset)
             $c = $code
         else
@@ -216,7 +216,7 @@ sub _code2codeset
 
 
     foreach my $codeset ((@: LOCALE_CODE_ALPHA_2, LOCALE_CODE_ALPHA_3
-                                                LOCALE_CODE_NUMERIC))
+                             LOCALE_CODE_NUMERIC))
         return $codeset if (exists $CODES[$codeset]{$code})
     
 

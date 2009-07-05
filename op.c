@@ -5004,20 +5004,6 @@ Perl_ck_open(pTHX_ OP *o)
 }
 
 OP *
-Perl_ck_repeat(pTHX_ OP *o)
-{
-    PERL_ARGS_ASSERT_CK_REPEAT;
-
-    if (cBINOPo->op_first->op_flags & OPf_PARENS) {
-	o->op_private |= OPpREPEAT_DOLIST;
-	cBINOPo->op_first = force_list(cBINOPo->op_first);
-    }
-    else
-	scalar(o);
-    return o;
-}
-
-OP *
 Perl_ck_require(pTHX_ OP *o)
 {
     dVAR;

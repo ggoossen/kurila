@@ -433,7 +433,6 @@ EOT
                        pre=>"SV *temp_sv = newSVpv(RFC1149, 0); "
                            . "(void) SvUPGRADE(temp_sv,SVt_PVIV); SvIOK_on(temp_sv); "
                            . "SvIV_set(temp_sv, 1149);")
-        
 
     foreach (keys %compass)
         push @items, $_

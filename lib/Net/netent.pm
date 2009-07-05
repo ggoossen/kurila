@@ -32,7 +32,7 @@ sub populate
     return unless (nelems @_)
     my $nob = new()
     $n_name      =    $nob->[0]              = @_[0]
-    @n_aliases   = @:   $nob->[1]->@ = split ' ', @_[1] 
+    @n_aliases   = @: ( $nob->[1]->@ = split ' ', @_[1] )
     $n_addrtype  =    $nob->[2]              = @_[2]
     $n_net       =    $nob->[3]              = @_[3]
     return $nob

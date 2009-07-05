@@ -74,12 +74,12 @@ my @names =
         \(%: name=>"_POSIX_SAVED_IDS", type=>"YES", default=>\(@: "IV", "0"))
         \(%: name=>'FLT_ROUNDS', type=>"NV", not_constant=>1)
         \(%: name=>"HUGE_VAL", type=>"NV", not_constant=>1
-            macro=>\(@: <<'END', "#endif\n")
+             macro=>\(@: <<'END', "#endif\n")
 #if (defined(USE_LONG_DOUBLE) && defined(HUGE_VALL)) || defined(HUGE_VAL)
         /* HUGE_VALL is admittedly non-POSIX but if we are using long doubles
          * we might as well use long doubles. --jhi */
 END
-            value=>'
+             value=>'
 #if defined(USE_LONG_DOUBLE) && defined(HUGE_VALL)
                    HUGE_VALL
 #else

@@ -562,7 +562,7 @@ for (@: "leave", "leavesub", "leavesublv", "leavewrite")
 for (@: "match", "subst", "substcont", "qr")
     %priv{+$_}{+64} = "RTIME"
 %priv{+"trans"}{[+(@: 1,2,4,8,16,64)]} = @: "<UTF", ">UTF", "IDENT", "SQUASH", "DEL"
-                                          "COMPL", "GROWS"
+                                            "COMPL", "GROWS"
 %priv{+"repeat"}{+64} = "DOLIST"
 %priv{+"leaveloop"}{+64} = "CONT"
 for (qw(rv2gv rv2sv padsv aelem helem))
@@ -578,8 +578,8 @@ for (@: "gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv"
         "enteriter")
     %priv{+$_}{+16} = "OURINTR" 
 for (@: (< @+: map( {(@: $_,"s$_") }, (@: "chop", "chomp")) )
-        (< @+: map( {(@: $_,"i_$_") }
-        @: "postinc", "postdec", "multiply", "divide", "modulo"
+        (< @+: map( {(@: $_,"i_$_") },
+                 @: "postinc", "postdec", "multiply", "divide", "modulo"
                     "add", "subtract", "negate"))
         "pow", "concat", "stringify"
         "left_shift", "right_shift", "bit_and", "bit_xor", "bit_or"
@@ -590,8 +590,9 @@ for (@: (< @+: map( {(@: $_,"s$_") }, (@: "chop", "chomp")) )
         "link", "symlink", "mkdir", "rmdir", "wait", "waitpid", "system"
         "exec", "kill", "getppid", "getpgrp", "setpgrp", "getpriority"
         "setpriority", "time", "sleep"
-        )
+      )
     %priv{+$_}{+16} = "TARGMY"
+
 for (@: "enteriter", "iter")
     %priv{+$_}{+4} = "REVERSED"
 %priv{+"const"}{[+(@: 4,8,16,32,64,128)]} = @: "SHORT","STRICT","ENTERED",'$[',"BARE","WARN"

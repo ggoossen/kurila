@@ -1370,15 +1370,6 @@ PP(pp_repeat)
 	}
 	(void)SvPOK_only(TARG);
 
-	if (PL_op->op_private & OPpREPEAT_DOLIST) {
-	    /* The parser saw this as a list repeat, and there
-	       are probably several items on the stack. But we're
-	       in scalar context, and there's no pp_list to save us
-	       now. So drop the rest of the items -- robin@kitsite.com
-	     */
-	    dMARK;
-	    SP = MARK;
-	}
 	PUSHTARG;
     }
     RETURN;

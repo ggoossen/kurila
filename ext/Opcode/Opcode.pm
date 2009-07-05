@@ -328,7 +328,7 @@ invert_opset function.
 
     warn die lineseq nextstate scope enter leave
 
-    rv2cv anoncode prototype
+    rv2cv anoncode prototype emptyarray emptyhash
 
     entersub entersub_save entersub_targargs leavesub return method method_named -- XXX loops via recursion?
 
