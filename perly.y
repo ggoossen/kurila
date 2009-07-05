@@ -1394,9 +1394,21 @@ scalar  :	PRIVATEVAR
                             TOKEN_GETMAD($1,$$,'{');
                             TOKEN_GETMAD($2,$$,'}');
 			}
+        |       ANONHSHL listexpr LAYOUTLISTEND /* %: ... */
+                        {
+                            $$ = newANONHASH($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'{');
+			}
         |       ANONHSHL listexpr /* %: ... */
                         {
                             $$ = newANONHASH($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'{');
+                            --PL_parser->lex_brackets;
+                            PL_parser->statement_indent = PL_parser->lex_brackstack[PL_parser->lex_brackets].prev_statement_indent;
+			}
+        |       ANONHSHL ',' LAYOUTLISTEND /* %: ... */
+                        {
+                            $$ = newANONHASH(NULL, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'{');
 			}
         |       ANONARYL listexpr LAYOUTLISTEND  /* @: ... */

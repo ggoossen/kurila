@@ -3714,6 +3714,9 @@ Perl_yylex(pTHX)
 	if (s[1] == ':' && s[2] != ':') {
 	    /* hash constructor '%:' */
 	    s += 2;
+	    s = skipspace(s, NULL);
+	    S_start_list_indent(s);
+
 	    OPERATOR(ANONHSHL);
 	}
 	if (s[1] == '+' && s[2] == ':') {
@@ -4175,12 +4178,12 @@ Perl_yylex(pTHX)
 	    OPERATOR(ANONARY);
 	}
 	if (s[1] == '+' && s[2] == ':') {
-	    /* arrayjoin  */
+	    /* arrayjoin '@+:' */
 	    s += 3;
 	    LOP(OP_ARRAYJOIN, XTERM);
 	}
 	if (s[1] == ':' && s[2] != ':') {
-	    /* array constructor */
+	    /* array constructor '@:' */
 	    s += 2;
 	    s = skipspace(s, NULL);
 	    S_start_list_indent(s);
@@ -4188,7 +4191,7 @@ Perl_yylex(pTHX)
 	    TOKEN(ANONARYL);
 	}
 	if (s[1] == '<') {
-	    /* array expand */
+	    /* array expand '@<' */
 	    s += 2;
 	    OPERATOR(ARRAYEXPAND);
 	}
