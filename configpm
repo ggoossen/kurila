@@ -68,9 +68,8 @@ sub opts
         # --opt=smth
         (< map {m/^--([\-_\w]+)=(.*)$/}, @ARGV)
         # --opt --no-opt --noopt
-        (< @+: map {m/^no-?(.*)$/i??(@: $1=>0)!!(@: $_=>1)}
-        map {m/^--([\-_\w]+)$/}, @ARGV)
-        
+        (< @+: map {m/^no-?(.*)$/i??(@: $1=>0)!!(@: $_=>1)},
+                   map {m/^--([\-_\w]+)$/}, @ARGV)
 
     my %opts = %: < %Allowed_Opts, < %given_opts
 

@@ -294,12 +294,10 @@ sub run
 
     my($verbose,$cmd,$buffer)
     my $tmpl = \%: 
-        verbose => (%:  default  => $VERBOSE,  store => \$verbose )
-        buffer  => (%:  default  => \$def_buf, store => \$buffer )
-        command => (%:  required => 1,         store => \$cmd
+        verbose =>  %:  default  => $VERBOSE,  store => \$verbose
+        buffer  =>  %:  default  => \$def_buf, store => \$buffer
+        command =>  %:  required => 1,         store => \$cmd
                         allow    => sub (@< @_) { !ref(@_[0]) or ref(@_[0]) eq 'ARRAY' }
-        )
-        
 
     unless( check( $tmpl, \%hash, $VERBOSE ) )
         Carp::carp( <loc("Could not validate input: \%1", < Params::Check->last_error))

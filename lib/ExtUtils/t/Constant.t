@@ -416,12 +416,12 @@ EOT
 
     my @items = @: "FIVE", \(%: name=>"OK6", type=>"PV",)
                    \(%: name=>"OK7", type=>"PVN"
-                       value=>\(@: '"not ok 7\n\0ok 7\n"', 15))
+                        value=>\(@: '"not ok 7\n\0ok 7\n"', 15))
                    \(%: name => "FARTHING", type=>"NV")
                    \(%: name => "NOT_ZERO", type=>"UV", value=>"~(UV)0")
                    \(%: name => "OPEN", type=>"PV", value=>'"/*"', macro=>1)
                    \(%: name => "CLOSE", type=>"PV", value=>'"*/"'
-                       macro=>\(@: "#if 1\n", "#endif\n"))
+                        macro=>\(@: "#if 1\n", "#endif\n"))
                    \(%: name => "ANSWER", default=>\(@: "UV", 42)), "NOTDEF"
                    \(%: name => "Yes", type=>"YES")
                    \(%: name => "No", type=>"NO")
@@ -430,7 +430,7 @@ EOT
                    # constants.
                    # It was more for INADDR_ANY INADDR_BROADCAST INADDR_LOOPBACK INADDR_NONE
                    \(%: name=>"RFC1149", type=>"SV", value=>"sv_2mortal(temp_sv)"
-                       pre=>"SV *temp_sv = newSVpv(RFC1149, 0); "
+                        pre=>"SV *temp_sv = newSVpv(RFC1149, 0); "
                            . "(void) SvUPGRADE(temp_sv,SVt_PVIV); SvIOK_on(temp_sv); "
                            . "SvIV_set(temp_sv, 1149);")
 

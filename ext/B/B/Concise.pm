@@ -31,29 +31,29 @@ use B < qw(class ppname main_start main_root main_cv cstring svref_2object
 
 my %style =
     (%: "terse" =>
-        \(@: "(?(#label =>\n)?)(*(    )*)#class (#addr) #name (?([#targ])?) "
-             . "#svclass~(?((#svaddr))?)~#svval~(?(label \"#coplabel\")?)\n"
-         "(*(    )*)goto #class (#addr)\n"
-         "#class pp_#name")
+            \(@: "(?(#label =>\n)?)(*(    )*)#class (#addr) #name (?([#targ])?) "
+                     . "#svclass~(?((#svaddr))?)~#svval~(?(label \"#coplabel\")?)\n"
+                 "(*(    )*)goto #class (#addr)\n"
+                 "#class pp_#name")
         "concise" =>
         \(@: "#hyphseq2 (*(   (x( ;)x))*)<#classsym> #exname#arg(?([#targarglife])?)"
-             . "~#flags(?(/#private)?)(?(:#hints)?)(x(;~->#next)x)\n"
-             , "  (*(    )*)     goto #seq\n"
-         "(?(<#seq>)?)#exname#arg(?([#targarglife])?)")
+                 . "~#flags(?(/#private)?)(?(:#hints)?)(x(;~->#next)x)\n"
+                 , "  (*(    )*)     goto #seq\n"
+             "(?(<#seq>)?)#exname#arg(?([#targarglife])?)")
         "linenoise" =>
         \(@: "(x(;(*( )*))x)#noise#arg(?([#targarg])?)(x( ;\n)x)"
-         "gt_#seq "
-         "(?(#seq)?)#noise#arg(?([#targarg])?)")
+             "gt_#seq "
+             "(?(#seq)?)#noise#arg(?([#targarg])?)")
         "debug" =>
         \(@: "#class (#addr)\n\top_next\t\t#nextaddr\n\top_sibling\t#sibaddr\n\t"
-             . "op_ppaddr\tPL_ppaddr[OP_#NAME]\n\top_type\t\t#typenum\n"
-             . "\top_flags\t#flagval\n\top_private\t#privval\t#hintsval\n"
-             . "(?(\top_first\t#firstaddr\n)?)(?(\top_last\t\t#lastaddr\n)?)"
-             . "(?(\top_sv\t\t#svaddr\n)?)"
-         "    GOTO #addr\n"
-         "#addr")
+                 . "op_ppaddr\tPL_ppaddr[OP_#NAME]\n\top_type\t\t#typenum\n"
+                 . "\top_flags\t#flagval\n\top_private\t#privval\t#hintsval\n"
+                 . "(?(\top_first\t#firstaddr\n)?)(?(\top_last\t\t#lastaddr\n)?)"
+                 . "(?(\top_sv\t\t#svaddr\n)?)"
+             "    GOTO #addr\n"
+             "#addr")
         "env" => \(@: env::var('B_CONCISE_FORMAT'), env::var('B_CONCISE_GOTO_FORMAT')
-                  env::var('B_CONCISE_TREE_FORMAT'))
+                      env::var('B_CONCISE_TREE_FORMAT'))
     )
 
 # Renderings, ie how Concise prints, is controlled by these vars

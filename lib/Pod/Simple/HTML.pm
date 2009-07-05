@@ -104,36 +104,36 @@ my @_to_accept
     '/head4' => "</a></h4>\n"
 
     'X'  => "<!--\n\tINDEX: "
-    '/X' => "\n-->", <
+    '/X' => "\n-->"
 
-        changes( <qw(
-    Para=p
-    B=b I=i
-    over-bullet=ul
-    over-number=ol
-    over-text=dl
-    over-block=blockquote
-    item-bullet=li
-    item-number=li
-    item-text=dt
-  )), <
-        changes2(
-        < map {; m/^([-a-z]+)/s && push @_to_accept, $1; $_ }
-    qw[
-      sample=samp
-      definition=dfn
-      kbd=keyboard
-      variable=var
-      citation=cite
-      abbreviation=abbr
-      acronym=acronym
-      subscript=sub
-      superscript=sup
-      big=big
-      small=small
-      underline=u
-      strikethrough=s
-    ]  # no point in providing a way to get <q>...</q>, I think
+    < changes( <qw(
+        Para=p
+        B=b I=i
+        over-bullet=ul
+        over-number=ol
+        over-text=dl
+        over-block=blockquote
+        item-bullet=li
+        item-number=li
+        item-text=dt
+      ))
+    < changes2(
+        < map {; m/^([-a-z]+)/s && push @_to_accept, $1; $_ },
+            qw[
+              sample=samp
+              definition=dfn
+              kbd=keyboard
+              variable=var
+              citation=cite
+              abbreviation=abbr
+              acronym=acronym
+              subscript=sub
+              superscript=sup
+              big=big
+              small=small
+              underline=u
+              strikethrough=s
+            ]  # no point in providing a way to get <q>...</q>, I think
         )
 
     '/item-bullet' => "</li>$LamePad\n"
