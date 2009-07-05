@@ -97,12 +97,12 @@ use Exporter;
 use ExtUtils::Constant::Utils < qw(C_stringify);
 use ExtUtils::Constant::XS < qw(%XS_Constant %XS_TypeSet);
 
-@ISA = @( 'Exporter' )
+@ISA = @:  'Exporter' 
 
-%EXPORT_TAGS = %( 'all' => qw(
+%EXPORT_TAGS = %:  'all' => qw(
 	XS_constant constant_types C_stringify
 	C_constant WriteConstants WriteMakefileSnippet
-) )
+) 
 
 @EXPORT_OK =  %EXPORT_TAGS{?'all'}
 
@@ -118,10 +118,10 @@ sub constant_types
 
 
 sub C_constant($package, $subname, $default_type, $what, $indent, $breakout, @< @items)
-    ExtUtils::Constant::XS->C_constant(\%(package => $package, subname => $subname,
-        default_type => $default_type,
-        types => $what, indent => $indent,
-        breakout => $breakout), < @items)
+    ExtUtils::Constant::XS->C_constant(\(%: package => $package, subname => $subname
+                                            default_type => $default_type
+                                            types => $what, indent => $indent
+                                            breakout => $breakout), < @items)
 
 
 =item XS_constant PACKAGE, TYPES, SUBNAME, C_SUBNAME
@@ -154,7 +154,7 @@ sub XS_constant
 
     if (!ref $what)
         # Convert line of the form IV,UV,NV to hash
-        $what = \%( < @+: map { @: $_ => 1}, split m/,\s*/, ($what) )
+        $what = \%:  < @+: map { @: $_ => 1}, split m/,\s*/, ($what) 
     
     my $params = ExtUtils::Constant::XS->params ($what)
 
@@ -280,7 +280,7 @@ C<XS_FILE> are recognised.
 =cut
 
 sub WriteMakefileSnippet
-    my %args = %( < @_ )
+    my %args = %:  < @_ 
     my $indent = %args{?INDENT} || 2
 
     my $result = <<"EOT"
@@ -300,8 +300,8 @@ EOT
 EOT
 
     $result =~ s/^/$(' 'x$indent)/gm
-    return ExtUtils::Constant::XS->dump_names(\%(default_type=>%args{?DEFAULT_TYPE},
-        indent=>$indent,),
+    return ExtUtils::Constant::XS->dump_names(\(%: default_type=>%args{?DEFAULT_TYPE}
+                                                   indent=>$indent,),
         < %args{NAMES}->@)
         . $result
 
@@ -375,12 +375,12 @@ C<constant_10> with the default I<XS_SUBNAME>.
 
 sub WriteConstants
     my %ARGS =
-        %( # defaults
-        C_FILE =>       'const-c.inc',
-        XS_FILE =>      'const-xs.inc',
-        SUBNAME =>      'constant',
-        DEFAULT_TYPE => 'IV',
-        < @_)
+        %:  # defaults
+        C_FILE =>       'const-c.inc'
+        XS_FILE =>      'const-xs.inc'
+        SUBNAME =>      'constant'
+        DEFAULT_TYPE => 'IV'
+        < @_
 
     %ARGS{+C_SUBNAME} ||= %ARGS{?SUBNAME} # No-one sane will have C_SUBNAME eq '0'
 

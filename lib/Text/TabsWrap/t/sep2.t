@@ -129,7 +129,7 @@ while((nelems @st))
     $in =~ s/^TEST(\d+)?\n//
 
     my @in = split("\n", $in, -1)
-    @in = @((< map { "$_\n" }, @in[[0..((nelems @in)-1)-1]]), @in[-1])
+    @in = @: (< map { "$_\n" }, @in[[0..((nelems @in)-1)-1]]), @in[-1]
 
     my $back = wrap('   ', ' ', < @in)
 

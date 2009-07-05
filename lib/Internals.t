@@ -102,7 +102,7 @@ is(@foo[2], 'xyzzy')
 my %foo
 
 ok( !Internals::SvREADONLY \%foo )
-%foo = %('foo' => 1, 2 => 'bar')
+%foo = %: 'foo' => 1, 2 => 'bar'
 is((nkeys(%foo)), 2)
 is(%foo{?'foo'}, 1)
 
@@ -110,7 +110,7 @@ ok(  Internals::SvREADONLY \%foo, 1 )
 ok(  Internals::SvREADONLY \%foo )
 try { undef(%foo); }
 like($^EVAL_ERROR->message, $ro_err, q/Can't undef read-only hash/)
-dies_like( sub (@< @_) { %foo = %('ping' => 'pong'); },
+dies_like( sub (@< @_) { %foo = (%: 'ping' => 'pong'); },
            $ro_err, q/Can't modify read-only hash/ )
 do
     local our $TODO = 1

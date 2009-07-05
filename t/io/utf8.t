@@ -15,8 +15,8 @@ plan(tests => 46)
 
 $^OUTPUT_AUTOFLUSH = 1
 
-use bytes;
-use utf8;
+use bytes
+use utf8
 
 open(my $f,"+>:utf8",'a')
 print $f, chr(0x100)."\x[c2]\x[a3]"
@@ -190,10 +190,10 @@ close $f
 is($failed, undef)
 
 do
-    my @a = @( \@( 0x007F, "bytes" ),
-               \@( 0x0080, "bytes" ),
-               \@( 0x0080, "utf8"  ),
-               \@( 0x0100, "utf8"  ) )
+    my @a = @:  \(@:  0x007F, "bytes" )
+                \(@:  0x0080, "bytes" )
+                \(@:  0x0080, "utf8"  )
+                \(@:  0x0100, "utf8"  ) 
     my $t = 34
     for my $u ( @a)
         for my $v ( @a)
@@ -237,14 +237,14 @@ do
     local $^WARN_HOOK = sub (@< @_) { $^EVAL_ERROR = shift }
     open $f, ">", "a"
     binmode $f
-    my @($chrE4, $chrF6) = @("\x[E4]", "\x[F6]")
+    my (@: $chrE4, $chrF6) = @: "\x[E4]", "\x[F6]"
     print $f, "foo", $chrE4, "\n"
     print $f, "foo", $chrF6, "\n"
     close $f
     open $f, "<:utf8", "a"
     undef $^EVAL_ERROR
     my $line = ~< $f
-    my @($chrE4, $chrF6) = @("E4", "F6")
+    my (@: $chrE4, $chrF6) = @: "E4", "F6"
     like( $^EVAL_ERROR->message, qr/utf8 "\\x$chrE4" does not map to Unicode/,
           "<:utf8 readline must warn about bad utf8")
     undef $^EVAL_ERROR

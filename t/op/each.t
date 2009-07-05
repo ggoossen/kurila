@@ -46,7 +46,7 @@ is (((nelems @values)-1), 27, "values")
 
 $i = 0		# stop -w complaints
 
-while (@(?$key,?$value) = @: each(%h))
+while ((@: ?$key,?$value) = @: each(%h))
     if ($key eq @keys[$i] && $value eq @values[$i]
           && (($key cmp $value) +> 0))
         $key =~ s/([a-z])/$(uc($1))/g
@@ -56,50 +56,50 @@ while (@(?$key,?$value) = @: each(%h))
 
 is ($i, 28, "each count")
 
-@keys = @('blurfl', < keys(%h), 'dyick')
+@keys = @: 'blurfl', < keys(%h), 'dyick'
 is (((nelems @keys)-1), 29, "added a key")
 
 # test scalar each
-%hash = %( < 1..20 )
+%hash = %:  < 1..20 
 $total = 0
 $total += $key while $key = each %hash
 is ($total, 100, "test scalar each")
 
-for (1..3) { @foo = @( each %hash ) }
+for (1..3) { @foo = (@:  each %hash ) }
 keys %hash
 $total = 0
 $total += $key while $key = each %hash
 is ($total, 100, "test scalar keys resets iterator")
 
-for (1..3) { @foo = @( each %hash ) }
+for (1..3) { @foo = (@:  each %hash ) }
 $total = 0
 $total += $key while $key = each %hash
 isnt ($total, 100, "test iterator of each is being maintained")
 
-for (1..3) { @foo = @( each %hash ) }
+for (1..3) { @foo = (@:  each %hash ) }
 values %hash
 $total = 0
 $total += $key while $key = each %hash
 is ($total, 100, "test values keys resets iterator")
 
 $i = 0
-%h = %(a => 'A', b => 'B', c=> 'C', d => 'D', abc => 'ABC')
+%h = %: a => 'A', b => 'B', c=> 'C', d => 'D', abc => 'ABC'
 @keys = keys(%h)
 @values = values(%h)
-while (@(?$key, ?$value) = @: each(%h))
+while ((@: ?$key, ?$value) = @: each(%h))
     if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value))
         $i++
     
 
 is ($i, 5)
 
-our @tests = @(&next_test( < @_ ), &next_test( < @_ ), &next_test( < @_ ))
+our @tests = @: &next_test( < @_ ), &next_test( < @_ ), &next_test( < @_ )
 do
     package Obj
     sub DESTROY { print $^STDOUT, "ok @::tests[?1] # DESTROY called\n"; }
     do
-        my $h = \%( A => bless \$@, __PACKAGE__ )
-        while (my@(?$k,?$v) =@( each $h->%))
+        my $h = \%:  A => bless \$@, __PACKAGE__ 
+        while (my(@: ?$k,?$v) =(@:  each $h->%))
             print $^STDOUT, "ok @::tests[?0]\n" if $k eq 'A' and ref($v) eq 'Obj'
         
     
@@ -108,9 +108,9 @@ do
 
 # Check for Unicode hash keys.
 use utf8
-%u = %("\x{12}", "f", "\x{123}", "fo", "\x{1234}",  "foo")
+%u = %: "\x{12}", "f", "\x{123}", "fo", "\x{1234}",  "foo"
 %u{+"\x{12345}"}  = "bar"
-%u{[@("\x{10FFFD}")]} = @: "zap"
+%u{[(@: "\x{10FFFD}")]} = @: "zap"
 
 my %u2
 foreach (keys %u)
@@ -120,8 +120,8 @@ foreach (keys %u)
 ok (eq_hash(\%u, \%u2), "copied unicode hash keys correctly?")
 
 $a = "\x[e3]\x[81]\x[82]"; $A = "\x{3042}"
-%b = %( $a => "non-utf8")
-%u = %( $A => "utf8")
+%b = %:  $a => "non-utf8"
+%u = %:  $A => "utf8"
 
 is (exists %b{$A}, '1', "hash uses byte-string")
 is (exists %u{$a}, '1', "hash uses byte-string")

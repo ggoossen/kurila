@@ -269,7 +269,7 @@ sub write_errno_pm
 
         while( ~< $cppo)
             my($name,$expr)
-            next unless @(?$name, ?$expr) = @: m/"(.*?)"\s*\[\s*\[\s*(.*?)\s*\]\s*\]/
+            next unless (@: ?$name, ?$expr) = @: m/"(.*?)"\s*\[\s*\[\s*(.*?)\s*\]\s*\]/
             next if $name eq $expr
             $expr =~ s/\(?\([a-z_]\w*\)([^\)]*)\)?/$1/i # ((type)0xcafebabe) at alia
             $expr =~ s/((?:0x)?[0-9a-fA-F]+)[LU]+\b/$1/g # 2147483647L et alia

@@ -4,7 +4,7 @@ BEGIN { require "./test.pl" }
 
 plan tests => 5
 
-our @a = @(1,2,3)
+our @a = @: 1,2,3
 my $cnt1 = unshift(@a,0)
 
 is(join(' ', @a), '0 1 2 3')

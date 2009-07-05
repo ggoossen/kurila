@@ -121,7 +121,7 @@ use Test::More
 
 plan tests => 2 + nelems(@tests)
 
-use Text::Wrap;
+use Text::Wrap
 
 my $rerun = env::var('PERL_DL_NONLAZY') ?? 0 !! 1
 
@@ -146,7 +146,7 @@ while(@st)
     $in =~ s/^TEST(\d+)?\n//
 
     my @in =split("\n", $in, -1)
-    @in = @((< map { "$_\n" }, @in[[0..(nelems @in)-2]]), @in[-1])
+    @in = @: (< map { "$_\n" }, @in[[0..(nelems @in)-2]]), @in[-1]
 
     my $back = wrap('   ', ' ', <@in)
 

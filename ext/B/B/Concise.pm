@@ -19,10 +19,10 @@ our @EXPORT_OK = qw( set_style set_style_standard add_callback
                      concise_subref concise_cv concise_main
                      add_style walk_output compile reset_sequence )
 our %EXPORT_TAGS =
-    %( io       => qw( walk_output compile reset_sequence ),
-    style       => qw( add_style set_style_standard ),
-    cb  => qw( add_callback ),
-    mech        => qw( concise_subref concise_cv concise_main ),  )
+    (%:  io       => qw( walk_output compile reset_sequence )
+         style       => qw( add_style set_style_standard )
+         cb  => qw( add_callback )
+         mech        => qw( concise_subref concise_cv concise_main ),  )
 
 # use #6
 use B < qw(class ppname main_start main_root main_cv cstring svref_2object
@@ -30,30 +30,30 @@ use B < qw(class ppname main_start main_root main_cv cstring svref_2object
          CVf_ANON PAD_FAKELEX_ANON PAD_FAKELEX_MULTI SVf_ROK)
 
 my %style =
-    %("terse" =>
-    \@("(?(#label =>\n)?)(*(    )*)#class (#addr) #name (?([#targ])?) "
-           . "#svclass~(?((#svaddr))?)~#svval~(?(label \"#coplabel\")?)\n",
-           "(*(    )*)goto #class (#addr)\n",
-           "#class pp_#name"),
-    "concise" =>
-    \@("#hyphseq2 (*(   (x( ;)x))*)<#classsym> #exname#arg(?([#targarglife])?)"
-               . "~#flags(?(/#private)?)(?(:#hints)?)(x(;~->#next)x)\n"
-               , "  (*(    )*)     goto #seq\n",
-               "(?(<#seq>)?)#exname#arg(?([#targarglife])?)"),
-    "linenoise" =>
-    \@("(x(;(*( )*))x)#noise#arg(?([#targarg])?)(x( ;\n)x)",
-               "gt_#seq ",
-               "(?(#seq)?)#noise#arg(?([#targarg])?)"),
-    "debug" =>
-    \@("#class (#addr)\n\top_next\t\t#nextaddr\n\top_sibling\t#sibaddr\n\t"
-               . "op_ppaddr\tPL_ppaddr[OP_#NAME]\n\top_type\t\t#typenum\n"
-               . "\top_flags\t#flagval\n\top_private\t#privval\t#hintsval\n"
-               . "(?(\top_first\t#firstaddr\n)?)(?(\top_last\t\t#lastaddr\n)?)"
-               . "(?(\top_sv\t\t#svaddr\n)?)",
-               "    GOTO #addr\n",
-               "#addr"),
-    "env" => \@(env::var('B_CONCISE_FORMAT'), env::var('B_CONCISE_GOTO_FORMAT'),
-                        env::var('B_CONCISE_TREE_FORMAT')),
+    (%: "terse" =>
+        \(@: "(?(#label =>\n)?)(*(    )*)#class (#addr) #name (?([#targ])?) "
+             . "#svclass~(?((#svaddr))?)~#svval~(?(label \"#coplabel\")?)\n"
+         "(*(    )*)goto #class (#addr)\n"
+         "#class pp_#name")
+        "concise" =>
+        \(@: "#hyphseq2 (*(   (x( ;)x))*)<#classsym> #exname#arg(?([#targarglife])?)"
+             . "~#flags(?(/#private)?)(?(:#hints)?)(x(;~->#next)x)\n"
+             , "  (*(    )*)     goto #seq\n"
+         "(?(<#seq>)?)#exname#arg(?([#targarglife])?)")
+        "linenoise" =>
+        \(@: "(x(;(*( )*))x)#noise#arg(?([#targarg])?)(x( ;\n)x)"
+         "gt_#seq "
+         "(?(#seq)?)#noise#arg(?([#targarg])?)")
+        "debug" =>
+        \(@: "#class (#addr)\n\top_next\t\t#nextaddr\n\top_sibling\t#sibaddr\n\t"
+             . "op_ppaddr\tPL_ppaddr[OP_#NAME]\n\top_type\t\t#typenum\n"
+             . "\top_flags\t#flagval\n\top_private\t#privval\t#hintsval\n"
+             . "(?(\top_first\t#firstaddr\n)?)(?(\top_last\t\t#lastaddr\n)?)"
+             . "(?(\top_sv\t\t#svaddr\n)?)"
+         "    GOTO #addr\n"
+         "#addr")
+        "env" => \(@: env::var('B_CONCISE_FORMAT'), env::var('B_CONCISE_GOTO_FORMAT')
+                  env::var('B_CONCISE_TREE_FORMAT'))
     )
 
 # Renderings, ie how Concise prints, is controlled by these vars
@@ -130,7 +130,7 @@ sub walk_output(?$handle) # updates $walkHandle
 
 
 sub concise_subref
-    my@($order, $coderef, ?$name) =  @_
+    my(@: $order, $coderef, ?$name) =  @_
     my $codeobj = svref_2object($coderef)
 
     return concise_stashref(< @_)
@@ -157,7 +157,7 @@ sub concise_stashref($order, $h)
 *concise_cv = \&concise_subref
 
 sub concise_cv_obj
-    my @($order, $cv, $name) =  @_
+    my (@: $order, $cv, $name) =  @_
     # name is either a string, or a CODE ref (copy of $cv arg??)
 
     $curcv = $cv
@@ -191,7 +191,7 @@ sub concise_cv_obj
 
 
 sub concise_main
-    my@($order) =  @_
+    my(@: $order) =  @_
     sequence(main_start)
     $curcv = main_cv
     if ($order eq "exec")
@@ -225,11 +225,11 @@ my $start_sym = "\e(0" # "\cN" sometimes also works
 my $end_sym   = "\e(B" # "\cO" respectively
 
 my @tree_decorations =
-    @(\@("  ", "--", "+-", "|-", "| ", "`-", "-", 1),
-      \@(" ", "-", "+", "+", "|", "`", "", 0),
-      \@("  ", < map( {"$start_sym$_$end_sym" }, @( "qq", "wq", "tq", "x ", "mq", "q")), 1),
-      \@(" ", < map( {"$start_sym$_$end_sym" }, @( "q", "w", "t", "x", "m")), "", 0),
-    )
+    @: \(@: "  ", "--", "+-", "|-", "| ", "`-", "-", 1)
+       \(@: " ", "-", "+", "+", "|", "`", "", 0)
+       \(@: "  ", < map( {"$start_sym$_$end_sym" }, (@:  "qq", "wq", "tq", "x ", "mq", "q")), 1)
+       \(@: " ", < map( {"$start_sym$_$end_sym" }, (@:  "q", "w", "t", "x", "m")), "", 0)
+    
 
 my @render_packs # collect -stash=<packages>
 
@@ -351,11 +351,11 @@ sub compile
 my %labels
 my $lastnext    # remembers op-chain, used to insert gotos
 
-my %opclass = %('OP' => "0", 'UNOP' => "1", 'BINOP' => "2", 'LOGOP' => "|",
-    'LISTOP' => "@", 'PMOP' => "/", 'SVOP' => "\$", 'GVOP' => "*",
-    'PVOP' => '"', 'LOOP' => "\{", 'COP' => ";", 'PADOP' => "#",
-    'ROOTOP' => '!',
-    )
+my %opclass = %: 'OP' => "0", 'UNOP' => "1", 'BINOP' => "2", 'LOGOP' => "|"
+                 'LISTOP' => "@", 'PMOP' => "/", 'SVOP' => "\$", 'GVOP' => "*"
+                 'PVOP' => '"', 'LOOP' => "\{", 'COP' => ";", 'PADOP' => "#"
+                 'ROOTOP' => '!'
+    
 
 no warnings 'qw' # "Possible attempt to put comments..."; use #7
 my @linenoise =
@@ -446,8 +446,8 @@ sub walklines($ar, $level)
 sub walk_exec($top, ?$level)
     my %opsseen
     my @lines
-    my @todo = @(\@($top, \@lines))
-    while ((nelems @todo) and my@($op, $targ) =  (shift @todo)->@)
+    my @todo = @: \(@: $top, \@lines)
+    while ((nelems @todo) and my(@: $op, $targ) =  (shift @todo)->@)
         while ($op->$)
             last if %opsseen{+$op->$}++
             push $targ->@, $op
@@ -455,11 +455,11 @@ sub walk_exec($top, ?$level)
             if (class($op) eq "LOGOP")
                 my $ar = \$@
                 push $targ->@, $ar
-                push @todo, \@($op->other, $ar)
+                push @todo, \@: $op->other, $ar
             elsif ($name eq "subst" and $op->pmreplstart->$)
                 my $ar = \$@
                 push $targ->@, $ar
-                push @todo, \@($op->pmreplstart, $ar)
+                push @todo, \@: $op->pmreplstart, $ar
             elsif ($name =~ m/^enter(loop|iter)$/)
                 %labels{+$op->nextop->$} = "NEXT"
                 %labels{+$op->lastop->$} = "LAST"
@@ -561,25 +561,25 @@ for (@: "leave", "leavesub", "leavesublv", "leavewrite")
 %priv{+"sassign"}{+64} = "BKWARD"
 for (@: "match", "subst", "substcont", "qr")
     %priv{+$_}{+64} = "RTIME"
-%priv{+"trans"}{[+@(1,2,4,8,16,64)]} = @("<UTF", ">UTF", "IDENT", "SQUASH", "DEL",
-                                         "COMPL", "GROWS")
+%priv{+"trans"}{[+(@: 1,2,4,8,16,64)]} = @: "<UTF", ">UTF", "IDENT", "SQUASH", "DEL"
+                                          "COMPL", "GROWS"
 %priv{+"repeat"}{+64} = "DOLIST"
 %priv{+"leaveloop"}{+64} = "CONT"
 for (qw(rv2gv rv2sv padsv aelem helem))
-    %priv{+$_}{[@(32,64,96)]} = @("DREFAV", "DREFHV", "DREFSV")
+    %priv{+$_}{[(@: 32,64,96)]} = @: "DREFAV", "DREFHV", "DREFSV"
 for (@: "padav", "padhv", "padsv")
     %priv{$_}{+16} = "STATE"
-%priv{+"entersub"}{[+@(16,32,64)]} = @("DBG","TARG","NOMOD")
+%priv{+"entersub"}{[+(@: 16,32,64)]} = @: "DBG","TARG","NOMOD"
 for (@: "entersub", "rv2cv")
-    %priv{+$_}{[+@(4,8,128)]} = @("INARGS","AMPER","NO()")
+    %priv{+$_}{[+(@: 4,8,128)]} = @: "INARGS","AMPER","NO()"
 %priv{+"gv"}{+32} = "EARLYCV"
 %priv{+"aelem"}{+16} = %priv{"helem"}{+16} = "LVDEFER"
 for (@: "gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv"
         "enteriter")
     %priv{+$_}{+16} = "OURINTR" 
-for (@: (< @+: map( {@($_,"s$_") }, @("chop", "chomp")) )
-        (< @+: map( {@($_,"i_$_") },
-                 @: "postinc", "postdec", "multiply", "divide", "modulo"
+for (@: (< @+: map( {(@: $_,"s$_") }, (@: "chop", "chomp")) )
+        (< @+: map( {(@: $_,"i_$_") }
+        @: "postinc", "postdec", "multiply", "divide", "modulo"
                     "add", "subtract", "negate"))
         "pow", "concat", "stringify"
         "left_shift", "right_shift", "bit_and", "bit_xor", "bit_or"
@@ -594,15 +594,15 @@ for (@: (< @+: map( {@($_,"s$_") }, @("chop", "chomp")) )
     %priv{+$_}{+16} = "TARGMY"
 for (@: "enteriter", "iter")
     %priv{+$_}{+4} = "REVERSED"
-%priv{+"const"}{[+@(4,8,16,32,64,128)]} = @("SHORT","STRICT","ENTERED",'$[',"BARE","WARN")
+%priv{+"const"}{[+(@: 4,8,16,32,64,128)]} = @: "SHORT","STRICT","ENTERED",'$[',"BARE","WARN"
 %priv{+"flip"}{+64} = %priv{+"flop"}{+64} = "LINENUM"
 %priv{+"list"}{+64} = "GUESSED"
 %priv{+"delete"}{+64} = "SLICE"
 %priv{+"exists"}{+64} = "SUB"
-%priv{+"sort"}{[+@(1,2,4,8,16,32,64)]} = @("NUM", "INT", "REV", "INPLACE","DESC","QSORT","STABLE")
+%priv{+"sort"}{[+(@: 1,2,4,8,16,32,64)]} = @: "NUM", "INT", "REV", "INPLACE","DESC","QSORT","STABLE"
 %priv{"threadsv"}{+64} = "SVREFd"
 for (@: "open", "backtick")
-    %priv{+$_}{[+@(16,32,64,128)]} = @("INBIN","INCR","OUTBIN","OUTCR")
+    %priv{+$_}{[+(@: 16,32,64,128)]} = @: "INBIN","INCR","OUTBIN","OUTCR"
 %priv{+"exit"}{+128} = "VMS"
 for (@: "ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec")
     %priv{+$_}{+2} = "FTACCESS"
@@ -623,17 +623,17 @@ do
 our %hints # used to display each COP's op_hints values
 
 # strict refs, subs, vars
-%hints{[@(2,512,1024)]} = @('$', '&', '*')
+%hints{[(@: 2,512,1024)]} = (@: '$', '&', '*')
 # integers, locale, bytes
-%hints{[@(1,4,8,16)]} = @('i', 'l', 'b')
+%hints{[(@: 1,4,8,16)]} = (@: 'i', 'l', 'b')
 # block scope, localise %^H, $^OPEN (in), $^OPEN (out)
-%hints{[@(256,131072,262144,524288)]} = @('{','%','<','>')
+%hints{[(@: 256,131072,262144,524288)]} = (@: '{','%','<','>')
 # overload new integer, float, binary, string, re
-%hints{[@(4096,8192,16384,32768,65536)]} = @('I', 'F', 'B', 'S', 'R')
+%hints{[(@: 4096,8192,16384,32768,65536)]} = (@: 'I', 'F', 'B', 'S', 'R')
 # taint and eval
-%hints{[@(1048576,2097152)]} = @('T', 'E')
+%hints{[(@: 1048576,2097152)]} = (@: 'T', 'E')
 # filetest access, UTF-8
-%hints{[@(4194304,8388608)]} = @('X', 'U')
+%hints{[(@: 4194304,8388608)]} = @: 'X', 'U'
 
 sub _flags($hash, $x)
     my @s
@@ -677,7 +677,7 @@ sub concise_sv($sv, $hr, ?$preferpv)
             $sv = $sv->RV
         
         if (class($sv) eq "SPECIAL")
-            $hr->{+svval} .= @("Null", "sv_undef", "sv_yes", "sv_no")[$sv->$]
+            $hr->{+svval} .= (@: "Null", "sv_undef", "sv_yes", "sv_no")[$sv->$]
         elsif ($preferpv && $sv->FLAGS ^&^ SVf_POK)
             $hr->{+svval} .= cstring($sv->PV)
         elsif ($sv->FLAGS ^&^ SVf_NOK)
@@ -701,13 +701,13 @@ my %srclines
 sub fill_srclines
     my $fullnm = shift
     if ($fullnm eq '-e')
-        %srclines{+$fullnm} = \@( $fullnm, "-src not supported for -e" )
+        %srclines{+$fullnm} = \@:  $fullnm, "-src not supported for -e" 
         return
     
     open (my $fh, '<', $fullnm)
         or warn "# $fullnm: $^OS_ERROR, (chdirs not supported by this feature yet)\n"
         and return
-    my @l = @( ~< $fh )
+    my @l = @:  ~< $fh 
     chomp @l
     unshift @l, $fullnm # like @{_<$fullnm} in debug, array starts at 1
     %srclines{+$fullnm} = \@l
@@ -783,7 +783,7 @@ sub concise_op($op, $level, $format)
         elsif ($op->pmreplstart->$)
             undef $lastnext
             $pmreplstart = "replstart->" . seq($op->pmreplstart)
-            %h{+arg} = "(" . join(" ", @( $precomp, $pmreplstart)) . ")"
+            %h{+arg} = "(" . join(" ", (@:  $precomp, $pmreplstart)) . ")"
         else
             %h{+arg} = "($precomp)"
         
@@ -799,7 +799,7 @@ sub concise_op($op, $level, $format)
         $loc =~ s[.*/][]
         my $ln = $op->location ?? $op->location[1] !! '-1'
         $loc .= ":$ln"
-        my@($stash, $cseq) = @($op->stash->NAME, $op->cop_seq - $cop_seq_base)
+        my(@: $stash, $cseq) = @: $op->stash->NAME, $op->cop_seq - $cop_seq_base
         %h{+arg} = "($label$stash $cseq $loc)"
         if ($show_src)
             fill_srclines($pathnm) unless exists %srclines{$pathnm}
@@ -857,10 +857,10 @@ sub concise_op($op, $level, $format)
 sub B::OP::concise($op, $level)
     if ($order eq "exec" and $lastnext and $lastnext->$ != $op->$)
         # insert a 'goto' line
-        my $synth = \%("seq" => seq($lastnext), "class" => class($lastnext),
-            "addr" => sprintf("\%#x", $lastnext->$),
-            "goto" => seq($lastnext), # simplify goto '-' removal
-            )
+        my $synth = \%: "seq" => seq($lastnext), "class" => class($lastnext)
+                        "addr" => sprintf("\%#x", $lastnext->$)
+                        "goto" => seq($lastnext) # simplify goto '-' removal
+            
         print $walkHandle, fmt_line($synth, $op, $gotofmt, $level+1)
     
     $lastnext = $op->next
@@ -883,8 +883,8 @@ sub b_terse($op, $level)
 
     if ($order eq "exec" and $lastnext and $lastnext->$ != $op->$)
         # insert a 'goto'
-        my $h = \%("seq" => seq($lastnext), "class" => class($lastnext),
-            "addr" => sprintf("\%#x", $lastnext->$))
+        my $h = \%: "seq" => seq($lastnext), "class" => class($lastnext)
+                    "addr" => sprintf("\%#x", $lastnext->$)
         print $^STDOUT, # $walkHandle
             fmt_line($h, $op, %style{"terse"}->[1], $level+1)
     
@@ -897,7 +897,7 @@ sub tree
     my $op = shift
     my $level = shift
     my $style = @tree_decorations[$tree_style]
-    my@($space, $single, $kids, $nokid, $last, $lead, $size) =  $style->@
+    my(@: $space, $single, $kids, $nokid, $last, $lead, $size) =  $style->@
     my $name = concise_op($op, $level, $treefmt)
     if (not $op->flags ^&^ OPf_KIDS)
         return $name . "\n"
@@ -926,8 +926,8 @@ sub tree
     else
         @lines[0] = $single . @lines[0]
     
-    return @("$name$lead" . shift @lines,
-             < map( {" " x (length($name)+$size) . $_ }, @lines))
+    return (@: "$name$lead" . shift @lines
+               < map( {" " x (length($name)+$size) . $_ }, @lines))
 
 
 # *** Warning: fragile kludge ahead ***

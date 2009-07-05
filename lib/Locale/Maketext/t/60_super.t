@@ -10,16 +10,16 @@ print $^STDOUT, "# Locale::Maketext version $Locale::Maketext::VERSION\n"
 #sub Locale::Maketext::DEBUG () {10};
 use Locale::Maketext ();
 do { package  Whunk::L10N;
-    our @ISA = @(  'Locale::Maketext' );
-    our %Lexicon = %("hello" => "SROBLR!");
+    our @ISA = (@:   'Locale::Maketext' );
+    our %Lexicon = (%: "hello" => "SROBLR!");
 }
 do { package  Whunk::L10N::en;
-    our @ISA = @(  'Whunk::L10N' );
-    our %Lexicon = %("hello" => "HI AND STUFF!");
+    our @ISA = (@:   'Whunk::L10N' );
+    our %Lexicon = (%: "hello" => "HI AND STUFF!");
 }
 do {  package  Whunk::L10N::zh_tw;
-    our @ISA = @(  'Whunk::L10N' );
-    our %Lexicon = %("hello" => "NIHAU JOE!");
+    our @ISA = (@:   'Whunk::L10N' );
+    our %Lexicon = (%: "hello" => "NIHAU JOE!");
 }
 
 env::var('REQUEST_METHOD' ) = 'GET'

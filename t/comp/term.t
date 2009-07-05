@@ -26,5 +26,5 @@ if (length("\\$($one)") == 2) {print $^STDOUT, "ok 10\n";} else {print $^STDOUT,
 
 if ("$($one)b" eq "ab") { print $^STDOUT, "ok 11\n";} else {print $^STDOUT, "not ok 11\n";}
 
-my @foo = @(1,2,3)
+my @foo = @: 1,2,3
 if ("@foo[1]b" eq "2b") { print $^STDOUT, "ok 12\n";} else {print $^STDOUT, "not ok 12\n";}

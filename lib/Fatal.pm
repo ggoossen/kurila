@@ -8,7 +8,7 @@ $Debug = 0 unless defined $Debug
 
 sub import
     my $self = shift(@_)
-    my $pkg = @(caller)[0]
+    my $pkg = (@: caller)[0]
     foreach my $sym (@_)
         &_make_fatal($sym, $pkg)
     
@@ -20,14 +20,14 @@ sub fill_protos
     my ($isref, @out, @out1, $seen_semi)
     while ($proto =~ m/\S/)
         $n++
-        push(@out1,\@($n,< @out)) if $seen_semi
+        push(@out1,\(@: $n,< @out)) if $seen_semi
         push(@out, $1 . "\{\@_[$n]\}"), next if $proto =~ s/^\s*\\([\@%\$\&])//
         push(@out, "\@_[$n]"), next if $proto =~ s/^\s*([_*\$&])//
         push(@out, " < \@_[[ $n..nelems(\@_)-1]]"), last if $proto =~ s/^\s*(;\s*)?\@//
         ($seen_semi = 1), $n--, next if $proto =~ s/^\s*;// # XXXX ????
         die "Unknown prototype letters: \"$proto\""
     
-    push(@out1,\@($n+1,< @out))
+    push(@out1,\(@: $n+1,< @out))
     return @out1
 
 

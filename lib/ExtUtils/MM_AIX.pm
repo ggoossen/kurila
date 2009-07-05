@@ -5,7 +5,7 @@ our $VERSION = '6.44'
 require ExtUtils::MM_Unix
 our @ISA = qw(ExtUtils::MM_Unix)
 
-use ExtUtils::MakeMaker < qw(neatvalue);
+use ExtUtils::MakeMaker < qw(neatvalue)
 
 
 =head1 NAME
@@ -36,9 +36,9 @@ sub dlsyms($self,%< %attribs)
 
     return '' unless $self->needs_linking()
 
-    my@($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \$%
-    my@($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \$@
-    my@($funclist)  = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \$@
+    my(@: $funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \$%
+    my(@: $vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \$@
+    my(@: $funclist)  = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \$@
     my(@m)
 
     push(@m,"

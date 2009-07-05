@@ -26,7 +26,7 @@ BEGIN  # Make a DEBUG constant ASAP
 
 
 sub getopts
-    my@($target, $args, $truth) =  @_
+    my(@: $target, $args, $truth) =  @_
 
     $args ||= \@ARGV
 
@@ -44,7 +44,7 @@ sub getopts
     my $error_count = 0
 
     while( (nelems $args->@)  and  ($_ = $args->[0]) =~ m/^-(.)(.*)/s )
-        my@($first,$rest) = @($1,$2)
+        my(@: $first,$rest) = @: $1,$2
         if ($_ eq '--') # early exit if "--"
             shift $args->@
             last

@@ -3,13 +3,13 @@
 BEGIN { require "./test.pl"; }
 plan( tests => 15 )
 
-my $x = \ %( aap => 'noot', Mies => 'Wim' )
+my $x = \ %:  aap => 'noot', Mies => 'Wim' 
 is $x->{?aap}, 'noot', "anon hash ref construction"
 is $x->{?Mies}, 'Wim', "anon hash ref construction"
 
-is( (join '*', sort @: < %( aap => 'noot', Mies => 'Wim' )), 'Mies*Wim*aap*noot', "anon hash is list in list context")
+is( (join '*', sort @: < (%:  aap => 'noot', Mies => 'Wim' )), 'Mies*Wim*aap*noot', "anon hash is list in list context")
 
-is %(aap => 'noot', Mies => 'Wim'){?aap}, 'noot', "using helem directy on anon hash"
+is (%: aap => 'noot', Mies => 'Wim'){?aap}, 'noot', "using helem directy on anon hash"
 is( (%: aap => 'noot'){?aap}, 'noot', "using \%: hash constructor")
 
 my $x = \ $%
@@ -20,29 +20,29 @@ eval_dies_like( q| %( aap => 'noot', Mies => 'Wim' )->{aap}; |,
                 "anon hash as reference" )
 
 do
-    my $h = %( aap => "noot", Mies => "Wim" )
+    my $h = (%:  aap => "noot", Mies => "Wim" )
     # OPf_ASSIGN
     my ($aap, $mies)
-    %( aap => $aap, Mies => $mies ) = $h
+    (%:  aap => $aap, Mies => $mies ) = $h
     is( $aap, "noot" )
     is( $mies, "Wim" )
 
-    %( aap => @($aap) ) = %: aap => @: "noot"
+    (%:  aap => (@: $aap) ) = %: aap => @: "noot"
     is( $aap, "noot" )
 
     # with an expansion
     my $rest
-    %( aap => $aap, @< $rest ) = $h
+    (%:  aap => $aap, @< $rest ) = $h
     is( join("*", $rest), "Mies*Wim")
 
     eval_dies_like( q|my ($rest, $aap, $h); %( @< $rest, aap => $aap ) = $h|,
                     qr/\Qarray expand must be the last item in anonymous hash (%()) assignment\E/ )
 
-    dies_like( sub (@< @_) { %( aap => $aap ) = $h; },
+    dies_like( sub (@< @_) { (%:  aap => $aap ) = $h; },
                qr/\QGot extra value(s) in anonymous hash (%()) assignment\E/ )
 
     # OPf_ASSIGN & OPf_ASSIGN_PART
-    my @(%( aap => $aap, Mies => $mies)) = @($h)
+    my (@: (%:  aap => $aap, Mies => $mies)) = @: $h
     is( $aap, "noot" )
     is( $mies, "Wim" )
 

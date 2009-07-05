@@ -32,7 +32,7 @@ require Foo
 is( $r, "Foo.pm" )
 
 require Foo::Bar
-is( $r, join($dirsep, @( "Foo", "Bar.pm")) )
+is( $r, join($dirsep, (@:  "Foo", "Bar.pm")) )
 
 require 'Foo'
 is( $r, "Foo" )
@@ -41,7 +41,7 @@ eval "use Foo"
 is( $r, "Foo.pm" )
 
 eval "use Foo::Bar"
-is( $r, join($dirsep, @( "Foo", "Bar.pm")) )
+is( $r, join($dirsep, (@:  "Foo", "Bar.pm")) )
 
 #
 # readline() has special behaviour too
@@ -98,7 +98,7 @@ do
 BEGIN { *OverridenPop::pop = sub (@< @_) { main::is( @_[0]->[0], "ok" ) }; }
 do
     package OverridenPop
-    sub foo { \@( "ok" ) }
+    sub foo { \(@:  "ok" ) }
     pop( OverridenPop->foo() )
     pop OverridenPop->foo()
 

@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @( '../lib' )
+        $^INCLUDE_PATH = (@:  '../lib' )
     
 
 
@@ -17,15 +17,15 @@ my $TB = Test::Builder->create
 $TB->plan(tests => 2)
 
 
-package main;
+package main
 
 require Test::Simple
 
 chdir 't'
 push $^INCLUDE_PATH, '../t/lib/'
 require Test::Simple::Catch
-use env;
-my@($out, $err) =  Test::Simple::Catch::caught()
+use env
+my(@: $out, $err) =  Test::Simple::Catch::caught()
 local env::var('HARNESS_ACTIVE' ) = 0
 
 Test::Simple->import(tests => 3);

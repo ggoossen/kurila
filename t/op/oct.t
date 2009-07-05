@@ -142,6 +142,6 @@ test ('hex', "x3A",	 0x3A)
 test ('hex', "0x4",	 4)
 test ('hex', "x4",	 4)
 
-use utf8;
+use utf8
 test ('oct', "10\x{100}", 8)
 test ('hex', "ab\x{100}", 0xab)

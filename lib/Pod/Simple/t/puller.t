@@ -123,7 +123,7 @@ do
     $t = $p->get_token
     ok $t && $t->type, 'start'
     ok $t && $t->tagname, 'Document'
-    my @to_save = @($t)
+    my @to_save = @: $t
 
     $t = $p->get_token
     ok $t && $t->type, 'start'
@@ -154,7 +154,7 @@ do
     print $^STDOUT, "# Testing pullparsing from an arrayref\n"
     my $p = Pod::Simple::PullParser->new
     ok 1
-    $p->set_source( \@('','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut') )
+    $p->set_source( \(@: '','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut') )
     ok 1
     my( @t, $t )
     while($t = $p->get_token)
@@ -182,7 +182,7 @@ do
     print $^STDOUT, "# Testing pullparsing from an arrayref with terminal newlines\n"
     my $p = Pod::Simple::PullParser->new
     ok 1
-    $p->set_source( \ map { "$_\n" }, @(
+    $p->set_source( \ map { "$_\n" }, (@: 
         '','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut') )
     ok 1
     my( @t, $t )
@@ -214,8 +214,8 @@ do
     ok 1
     open(my $out, ">", "temp.pod") || die "Can't write-open temp.pod: $^OS_ERROR"
     print $out,
-        < map { "$_\n" }, @(
-        '','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut')
+        < map { "$_\n" }, @: 
+        '','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut'
     
     close($out)
     ok 1

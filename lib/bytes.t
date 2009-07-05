@@ -1,13 +1,13 @@
 
 BEGIN 
     chdir 't' if -d 't'
-    $^INCLUDE_PATH = @( '../lib' )
+    $^INCLUDE_PATH = @:  '../lib' 
     require './test.pl'
 
 
 plan tests => 20
 
-use utf8;
+use utf8
 
 my $a = chr(0x100)
 
@@ -61,6 +61,6 @@ do
 
 do
     fresh_perl_like ('use bytes; bytes::moo()',
-                     qr/Undefined subroutine &bytes::moo/, \%(stderr=>1),
+                     qr/Undefined subroutine &bytes::moo/, \(%: stderr=>1),
                      "Check Carp is loaded for AUTOLOADing errors")
 

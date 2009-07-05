@@ -24,7 +24,7 @@ plan( 9 ) # And someone's responsible.
 # use() makes it difficult to avoid O::import()
 require_ok( 'O' )
 
-my @args = @('-Ilib', '-MO=success,foo,bar', '-e', '1' )
+my @args = @: '-Ilib', '-MO=success,foo,bar', '-e', '1' 
 my @lines = get_lines( < @args )
 
 is( @lines[0], 'Compiling!', 'Output should not be saved without -q switch' )

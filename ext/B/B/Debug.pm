@@ -3,7 +3,7 @@ package B::Debug
 our $VERSION = '1.05_02'
 
 use B < qw(peekop class walkoptree walkoptree_exec
-         main_start main_root cstring sv_undef @specialsv_name);
+         main_start main_root cstring sv_undef @specialsv_name)
 
 my %done_gv
 
@@ -166,12 +166,12 @@ sub B::BM::debug($sv)
 
 sub B::CV::debug($sv)
     $sv->B::PVNV::debug()
-    my @($stash) =  $sv->STASH
-    my @($start) =  $sv->START
-    my @($root) =  $sv->ROOT
-    my @($padlist) =  $sv->PADLIST
-    my @($file) =  $sv->FILE
-    my @($gv) =  $sv->GV
+    my (@: $stash) =  $sv->STASH
+    my (@: $start) =  $sv->START
+    my (@: $root) =  $sv->ROOT
+    my (@: $padlist) =  $sv->PADLIST
+    my (@: $file) =  $sv->FILE
+    my (@: $gv) =  $sv->GV
     printf $^STDOUT, <<'EOT', $stash->$, $start->$, $root->$, $gv->$, $file, < $sv->DEPTH, $padlist, $sv->OUTSIDE->$, < $sv->OUTSIDE_SEQ
 	STASH		0x%x
 	START		0x%x
@@ -205,9 +205,9 @@ sub B::GV::debug($gv)
         printf $^STDOUT, "GV \%s::\%s\n", < $gv->STASH->NAME, < $gv->SAFENAME
         return
     
-    my @($sv) =  $gv->SV
-    my @($av) =  $gv->AV
-    my @($cv) =  $gv->CV
+    my (@: $sv) =  $gv->SV
+    my (@: $av) =  $gv->AV
+    my (@: $cv) =  $gv->CV
     $gv->B::SV::debug
     printf $^STDOUT, <<'EOT', < $gv->SAFENAME, < $gv->STASH->NAME, < $gv->STASH, $sv->$, < $gv->GvREFCNT, < $gv->FORM, $av->$, $gv->HV->$, $gv->EGV->$, $cv->$, < $gv->CVGEN, < $gv->LINE, < $gv->FILE, < $gv->GvFLAGS
 	NAME		%s

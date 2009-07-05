@@ -32,7 +32,7 @@ sub fork_and_retrieve
         $_ = ~< $r
         chomp
         die "Garbled output '$_'"
-            unless my @($first, $second) = @: m/^(\d+),(\d+)\z/
+            unless my (@: $first, $second) = @: m/^(\d+),(\d+)\z/
         cmp_ok ($first, '+>=', 1, "Parent of $which grandchild")
         cmp_ok ($second, '+>=', 1, "New parent of orphaned $which grandchild")
         SKIP: do

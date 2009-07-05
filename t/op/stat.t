@@ -30,8 +30,8 @@ my $Is_Dosish  = $Is_Dos || $Is_OS2 || $Is_MSWin32 || $Is_NetWare || $Is_Cygwin
 
 my $Is_UFS     = $Is_Darwin && (@: `df -t ufs . 2>/dev/null`) == 2
 
-my@($DEV, $INO, $MODE, $NLINK, $UID, $GID, $RDEV, $SIZE,
-    $ATIME, $MTIME, $CTIME, $BLKSIZE, $BLOCKS) = @( <0..12)
+my(@: $DEV, $INO, $MODE, $NLINK, $UID, $GID, $RDEV, $SIZE
+      $ATIME, $MTIME, $CTIME, $BLKSIZE, $BLOCKS) = @:  <0..12
 
 my $Curdir = File::Spec->curdir
 
@@ -46,7 +46,7 @@ close $foo
 
 open($foo, ">", "$tmpfile") || DIE("Can't open temp test file: $^OS_ERROR")
 
-my@($nlink, $mtime, $ctime) =  @(stat($foo))[[@($NLINK, $MTIME, $CTIME)]]
+my(@: $nlink, $mtime, $ctime) =  (@: stat($foo))[[(@: $NLINK, $MTIME, $CTIME)]]
 
 #nlink should if link support configured in Perl.
 SKIP: do
@@ -84,7 +84,7 @@ SKIP: do
     ok( $lnk_result,    'linked tmp testfile' )
     ok( chmod(0644, $tmpfile),             'chmoded tmp testfile' )
 
-    my@($nlink, $mtime, $ctime) =  @(stat($tmpfile))[[@($NLINK, $MTIME, $CTIME)]]
+    my(@: $nlink, $mtime, $ctime) =  (@: stat($tmpfile))[[(@: $NLINK, $MTIME, $CTIME)]]
 
     SKIP: do
         skip "No link count", 1 if config_value('dont_use_nlink')
@@ -236,7 +236,7 @@ SKIP: do
 
     skip "$CMD failed", 6 if $DEV eq ''
 
-    my @DEV = @( do { my $dev; opendir($dev, "/dev") ?? readdir($dev) !! () } )
+    my @DEV = @:  do { my $dev; opendir($dev, "/dev") ?? readdir($dev) !! () } 
 
     skip "opendir failed: $^OS_ERROR", 6 if (nelems @DEV) == 0
 
@@ -266,7 +266,7 @@ SKIP: do
     
 
     my $try = sub (@< @_)
-        my @c1 = @( eval qq[\$DEV =~ m/^@_[0].*/mg] )
+        my @c1 = @:  eval qq[\$DEV =~ m/^@_[0].*/mg] 
         my @c2 = eval qq[grep \{ @_[1] "/dev/\$_" \}, \@DEV]
         my $c1 = nelems @c1
         my $c2 = nelems @c2
@@ -411,7 +411,7 @@ ok(-f(),    '     -f() "')
 unlink $tmpfile or print $^STDOUT, "# unlink failed: $^OS_ERROR\n"
 
 # bug id 20011101.069
-my @r = @( stat($Curdir) )
+my @r = @:  stat($Curdir) 
 is(nelems @r, 13,   'stat returns full 13 elements')
 
 stat $^PROGRAM_NAME
@@ -452,9 +452,9 @@ my $f = 'tstamp.tmp'
 unlink $f
 ok (open(my $s, ">", "$f"), 'can create tmp file')
 close $s or die
-my @a = @( stat $f )
+my @a = @:  stat $f 
 print $^STDOUT, "# time=$^BASETIME, stat=($(join ' ',@a))\n"
-my @b = @(-M _, -A _, -C _)
+my @b = @: -M _, -A _, -C _
 print $^STDOUT, "# -MAC=($(join ' ',@b))\n"
 ok( (-M _) +< 0, 'negative -M works')
 ok( (-A _) +< 0, 'negative -A works')
@@ -465,7 +465,7 @@ do
     ok(open(my $f, ">", $tmpfile), 'can create temp file')
     close $f
     chmod 0077, $tmpfile
-    my @a = @( stat($tmpfile) )
+    my @a = @:  stat($tmpfile) 
     my $s1 = -s _
     -T _
     my $s2 = -s _
@@ -483,7 +483,7 @@ SKIP: do
     # And now for the ambigious bareword case
     ok(open($dir, "<", "TEST"), 'Can open "TEST" dir')
         || diag "Can't open 'TEST':  $^OS_ERROR"
-    my $size = @(stat($dir))[7]
+    my $size = (@: stat($dir))[7]
     ok(defined $size, "stat() on bareword works")
     is($size, -s "TEST", "size returned by stat of bareword is for the file")
     ok(-f _, "ambiguous bareword uses file handle, not dir handle")
@@ -495,7 +495,7 @@ SKIP: do
 do
     # RT #8244: *FILE{IO} does not behave like *FILE for stat() and -X() operators
     ok(open(my $f, ">", $tmpfile), 'can create temp file')
-    my @thwap = @( stat $f )
+    my @thwap = @:  stat $f 
     ok((nelems @thwap), "stat(\$f) works")
     ok( -f $f, "single file tests work with *F\{IO\}")
     close $f
@@ -513,7 +513,7 @@ do
         # And now for the ambigious bareword case
         ok(open($dir, "<", "TEST"), 'Can open "TEST" dir')
             || diag "Can't open 'TEST':  $^OS_ERROR"
-        my $size = @(stat($dir))[7]
+        my $size = (@: stat($dir))[7]
         ok(defined $size, "stat() on *THINGY\{IO\} works")
         is($size, -s "TEST",
            "size returned by stat of *THINGY\{IO\} is for the file")

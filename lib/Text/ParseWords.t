@@ -116,6 +116,6 @@ is($result, "aa| | bb| |cc|dd|ee ")
 
 signals::handler("ALRM") = sub (@< @_) {die "Timeout!"}
 alarm(3)
-@words = @( Text::ParseWords::old_shellwords("foo\\") )
+@words = @:  Text::ParseWords::old_shellwords("foo\\") 
 is((nelems @words), 1)
 alarm(0)

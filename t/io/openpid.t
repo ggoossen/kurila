@@ -18,8 +18,8 @@ if ($^OS_NAME eq 'dos' || $^OS_NAME eq 'MacOS')
 plan tests => 10
 
 
-use Config;
-use signals;
+use Config
+use signals
 $^OUTPUT_AUTOFLUSH = 1
 signals::handler("PIPE") = 'IGNORE'
 signals::handler("HUP") = 'IGNORE' if $^OS_NAME eq 'interix'

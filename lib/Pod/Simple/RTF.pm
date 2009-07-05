@@ -7,10 +7,10 @@ package Pod::Simple::RTF
 
 our ($VERSION, @ISA, %Escape, $WRAP, %Tagmap)
 $VERSION = '2.02'
-use Pod::Simple::PullParser ();
-BEGIN {@ISA = @('Pod::Simple::PullParser')}
+use Pod::Simple::PullParser ()
+BEGIN {@ISA = (@: 'Pod::Simple::PullParser')}
 
-use Carp ();
+use Carp ()
 BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
 
 $WRAP = 1 unless defined $WRAP
@@ -20,26 +20,26 @@ $WRAP = 1 unless defined $WRAP
 sub _openclose
     return @+: map {
                       m/^([-A-Za-z]+)=(\w[^\=]*)$/s or die "what's <$_>?";
-                      @( $1,  "\{\\$2\n",   "/$1",  "\}" );
+                      (@:  $1,  "\{\\$2\n",   "/$1",  "\}" );
                    }, @_
 
 
 my @_to_accept
 
-%Tagmap = %( <
-    # 'foo=bar' means ('foo' => '{\bar'."\n", '/foo' => '}')
-    _openclose(
-  'B=cs18\b',
-  'I=cs16\i',
-  'C=cs19\f1\lang1024\noproof',
-  'F=cs17\i\lang1024\noproof',
+%Tagmap = (%:  <
+                   # 'foo=bar' means ('foo' => '{\bar'."\n", '/foo' => '}')
+                   _openclose(
+  'B=cs18\b'
+               'I=cs16\i'
+               'C=cs19\f1\lang1024\noproof'
+               'F=cs17\i\lang1024\noproof'
 
-  'VerbatimI=cs26\i',
-  'VerbatimB=cs27\b',
-  'VerbatimBI=cs28\b\i',
+               'VerbatimI=cs26\i'
+               'VerbatimB=cs27\b'
+               'VerbatimBI=cs28\b\i'
 
-  < map {; m/^([-a-z]+)/s && push @_to_accept, $1; $_ },
-  qw[
+               < map {; m/^([-a-z]+)/s && push @_to_accept, $1; $_ }
+               qw[
        underline=ul         smallcaps=scaps  shadow=shad
        superscript=super    subscript=sub    strikethrough=strike
        outline=outl         emboss=embo      engrave=impr   
@@ -50,39 +50,39 @@ my @_to_accept
    ]
   # But no double-strikethrough, because MSWord can't agree with the
   #  RTF spec on whether it's supposed to be \strikedl or \striked1 (!!!)
-  ),
+  )
 
-    # Bit of a hack here:
-    'L=pod' => '{\cs22\i'."\n",
-    'L=url' => '{\cs23\i'."\n",
-    'L=man' => '{\cs24\i'."\n",
-    '/L' => '}',
+               # Bit of a hack here:
+               'L=pod' => '{\cs22\i'."\n"
+               'L=url' => '{\cs23\i'."\n"
+               'L=man' => '{\cs24\i'."\n"
+               '/L' => '}'
 
-    'Data'  => "\n",
-    '/Data' => "\n",
+               'Data'  => "\n"
+               '/Data' => "\n"
 
-    'Verbatim'  => "\n\{\\pard\\li#rtfindent##rtfkeep#\\plain\\s20\\sa180\\f1\\fs18\\lang1024\\noproof\n",
-    '/Verbatim' => "\n\\par\}\n",
-    'VerbatimFormatted'  => "\n\{\\pard\\li#rtfindent##rtfkeep#\\plain\\s20\\sa180\\f1\\fs18\\lang1024\\noproof\n",
-    '/VerbatimFormatted' => "\n\\par\}\n",
-    'Para'    => "\n\{\\pard\\li#rtfindent#\\sa180\n",
-    '/Para'   => "\n\\par\}\n",
-    'head1'   => "\n\{\\pard\\li#rtfindent#\\s31\\keepn\\sb90\\sa180\\f2\\fs#head1_halfpoint_size#\\ul\{\n",
-    '/head1'  => "\n\}\\par\}\n",
-    'head2'   => "\n\{\\pard\\li#rtfindent#\\s32\\keepn\\sb90\\sa180\\f2\\fs#head2_halfpoint_size#\\ul\{\n",
-    '/head2'  => "\n\}\\par\}\n",
-    'head3'   => "\n\{\\pard\\li#rtfindent#\\s33\\keepn\\sb90\\sa180\\f2\\fs#head3_halfpoint_size#\\ul\{\n",
-    '/head3'  => "\n\}\\par\}\n",
-    'head4'   => "\n\{\\pard\\li#rtfindent#\\s34\\keepn\\sb90\\sa180\\f2\\fs#head4_halfpoint_size#\\ul\{\n",
-    '/head4'  => "\n\}\\par\}\n",
-    # wordpad borks on \tc\tcl1, or I'd put that in =head1 and =head2
+               'Verbatim'  => "\n\{\\pard\\li#rtfindent##rtfkeep#\\plain\\s20\\sa180\\f1\\fs18\\lang1024\\noproof\n"
+               '/Verbatim' => "\n\\par\}\n"
+               'VerbatimFormatted'  => "\n\{\\pard\\li#rtfindent##rtfkeep#\\plain\\s20\\sa180\\f1\\fs18\\lang1024\\noproof\n"
+               '/VerbatimFormatted' => "\n\\par\}\n"
+               'Para'    => "\n\{\\pard\\li#rtfindent#\\sa180\n"
+               '/Para'   => "\n\\par\}\n"
+               'head1'   => "\n\{\\pard\\li#rtfindent#\\s31\\keepn\\sb90\\sa180\\f2\\fs#head1_halfpoint_size#\\ul\{\n"
+               '/head1'  => "\n\}\\par\}\n"
+               'head2'   => "\n\{\\pard\\li#rtfindent#\\s32\\keepn\\sb90\\sa180\\f2\\fs#head2_halfpoint_size#\\ul\{\n"
+               '/head2'  => "\n\}\\par\}\n"
+               'head3'   => "\n\{\\pard\\li#rtfindent#\\s33\\keepn\\sb90\\sa180\\f2\\fs#head3_halfpoint_size#\\ul\{\n"
+               '/head3'  => "\n\}\\par\}\n"
+               'head4'   => "\n\{\\pard\\li#rtfindent#\\s34\\keepn\\sb90\\sa180\\f2\\fs#head4_halfpoint_size#\\ul\{\n"
+               '/head4'  => "\n\}\\par\}\n"
+               # wordpad borks on \tc\tcl1, or I'd put that in =head1 and =head2
 
-    'item-bullet'  => "\n\{\\pard\\li#rtfindent##rtfitemkeepn#\\sb60\\sa150\\fi-120\n",
-    '/item-bullet' => "\n\\par\}\n",
-    'item-number'  => "\n\{\\pard\\li#rtfindent##rtfitemkeepn#\\sb60\\sa150\\fi-120\n",
-    '/item-number' => "\n\\par\}\n",
-    'item-text'    => "\n\{\\pard\\li#rtfindent##rtfitemkeepn#\\sb60\\sa150\\fi-120\n",
-    '/item-text'   => "\n\\par\}\n",
+               'item-bullet'  => "\n\{\\pard\\li#rtfindent##rtfitemkeepn#\\sb60\\sa150\\fi-120\n"
+               '/item-bullet' => "\n\\par\}\n"
+               'item-number'  => "\n\{\\pard\\li#rtfindent##rtfitemkeepn#\\sb60\\sa150\\fi-120\n"
+               '/item-number' => "\n\\par\}\n"
+               'item-text'    => "\n\{\\pard\\li#rtfindent##rtfitemkeepn#\\sb60\\sa150\\fi-120\n"
+               '/item-text'   => "\n\\par\}\n"
 
     # we don't need any styles for over-* and /over-*
     )
@@ -95,7 +95,7 @@ sub new
     $new->nbsp_for_S(1)
     $new->accept_targets( 'rtf', 'RTF' )
 
-    $new->{+'Tagmap'} = \%(< %Tagmap)
+    $new->{+'Tagmap'} = \%: < %Tagmap
 
     $new->accept_codes(< @_to_accept)
     $new->accept_codes('VerbatimFormatted')
@@ -324,14 +324,14 @@ sub do_middle      # the main work
 sub do_beginning
     my $self = @_[0]
     my $fh = $self->{?'output_fh'}
-    return print $fh, join '', @( <
-                                  $self->doc_init, <
-                                  $self->font_table, <
-                                  $self->stylesheet, <
-                                  $self->color_table, <
-                                  $self->doc_info, <
-                                  $self->doc_start,
-                                  "\n")
+    return print $fh, join '', @:  <
+                                       $self->doc_init, <
+                                       $self->font_table, <
+                                       $self->stylesheet, <
+                                       $self->color_table, <
+                                       $self->doc_info, <
+                                       $self->doc_start
+                                   "\n"
     
 
 
@@ -502,33 +502,33 @@ sub rtf_esc_codely
     return $x
 
 
-%Escape = %(
-    < ( @+: map( { @(chr($_),chr($_)) },       # things not apparently needing escaping
-            0x20 .. 0x7E ) ),
-    < ( @+: map( { @(chr($_),sprintf("\\'\%02x", $_)) }, @( <    # apparently escapeworthy things
-                                                                    0x00 .. 0x1F, 0x5c, 0x7b, 0x7d, < 0x7f .. 0xFF, 0x46)) ),
+%Escape = %: 
+    < ( @+: map( { (@: chr($_),chr($_)) }       # things not apparently needing escaping
+    0x20 .. 0x7E ) )
+    < ( @+: map( { (@: chr($_),sprintf("\\'\%02x", $_)) }, (@:  <    # apparently escapeworthy things
+                                                                  0x00 .. 0x1F, 0x5c, 0x7b, 0x7d, < 0x7f .. 0xFF, 0x46)) )
 
     # We get to escape out 'F' so that we can send RTF files thru the mail
     # without the slightest worry that paragraphs beginning with "From"
     # will get munged.
 
     # And some refinements:
-    "\cm"  => "\n",
-    "\cj"  => "\n",
-    "\n"   => "\n\\line ",
+    "\cm"  => "\n"
+    "\cj"  => "\n"
+    "\n"   => "\n\\line "
 
-    "\t"   => "\\tab ",     # Tabs (altho theoretically raw \t's are okay)
-    "\f"   => "\n\\page\n", # Formfeed
-    "-"    => "\\_",        # Turn plaintext '-' into a non-breaking hyphen
-    "\xA0" => "\\~",        # Latin-1 non-breaking space
-    "\xAD" => "\\-",        # Latin-1 soft (optional) hyphen
+    "\t"   => "\\tab "     # Tabs (altho theoretically raw \t's are okay)
+    "\f"   => "\n\\page\n" # Formfeed
+    "-"    => "\\_"        # Turn plaintext '-' into a non-breaking hyphen
+    "\xA0" => "\\~"        # Latin-1 non-breaking space
+    "\xAD" => "\\-"        # Latin-1 soft (optional) hyphen
 
     # CRAZY HACKS:
-    "\n" => "\\line\n",
-    "\r" => "\n",
-    "\cb" => "\{\n\\cs21\\lang1024\\noproof ",  # \\cf1
-    "\cc" => "\}",
-    )
+    "\n" => "\\line\n"
+    "\r" => "\n"
+    "\cb" => "\{\n\\cs21\\lang1024\\noproof "  # \\cf1
+    "\cc" => "\}"
+    
 1
 
 __END__

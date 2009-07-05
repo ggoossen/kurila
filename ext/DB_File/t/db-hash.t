@@ -23,7 +23,7 @@ do
         my $fh = gensym 
         open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" 
         my $real_stdout = $^STDOUT
-        return bless \@($fh, $real_stdout ) 
+        return bless \@: $fh, $real_stdout  
 
     
     sub DESTROY
@@ -94,10 +94,10 @@ ok( $dbh->{?lorder} == 1234 )
 my %h = DB_File->new($Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH )
 ok( %h)
 
-my @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-     $blksize,$blocks) = @: stat($Dfile)
+my (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
+       $blksize,$blocks) = @: stat($Dfile)
 
-my %noMode = %( < @+: map { @: $_, 1 }, qw( amigaos MSWin32 NetWare cygwin ) ) 
+my %noMode = %:  < @+: map { @: $_, 1 }, qw( amigaos MSWin32 NetWare cygwin )  
 
 ok( ($mode ^&^ 0777) == (($^OS_NAME eq 'os2' || $^OS_NAME eq 'MacOS') ?? 0666 !! 0640) ||
     %noMode{?$^OS_NAME} )
@@ -160,7 +160,7 @@ $i = 0
 
 ok( $i == 30) 
 
-@keys = @('blurfl', < %h->keys, 'dyick')
+@keys = @: 'blurfl', < %h->keys, 'dyick'
 ok( (nelems @keys) == 32) 
 
 %h->STORE('foo' => '')
@@ -183,8 +183,8 @@ for my $i (1..199) { %h->put( $i + 0 => $i + 0 ); }
 for my $i (1..199) { $ok = 0 unless %h->FETCH($i) == $i; }
 ok( $ok )
 
-@($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-  $blksize,$blocks) = @: stat($Dfile)
+(@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
+    $blksize,$blocks) = @: stat($Dfile)
 ok( $size +> 0 )
 
 # Now check all the non-tie specific stuff
@@ -418,8 +418,8 @@ do
     ok nkeys %bad == 0 
     ok nkeys %remember == 0 
 
-    print $^STDOUT, "# missing -- $key=>$value\n" while @(?$key, ?$value) =@( each %remember)
-    print $^STDOUT, "# bad     -- $key=>$value\n" while @(?$key, ?$value) =@( each %bad)
+    print $^STDOUT, "# missing -- $key=>$value\n" while (@: ?$key, ?$value) =@:  each %remember
+    print $^STDOUT, "# bad     -- $key=>$value\n" while (@: ?$key, ?$value) =(@:  each %bad)
 
     # Make sure this fix does not break code to handle an undef key
     # Berkeley DB undef key is broken between versions 2.3.16 and 3.1

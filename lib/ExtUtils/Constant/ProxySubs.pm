@@ -4,84 +4,84 @@ our ($VERSION, @ISA, %type_to_struct, %type_from_struct, %type_to_sv
     ,    %type_to_C_value, %type_is_a_problem, %type_num_args
     ,    %type_temporary)
 require ExtUtils::Constant::XS
-use ExtUtils::Constant::Utils < qw(C_stringify);
-use ExtUtils::Constant::XS < qw(%XS_TypeSet);
+use ExtUtils::Constant::Utils < qw(C_stringify)
+use ExtUtils::Constant::XS < qw(%XS_TypeSet)
 
 $VERSION = '0.06'
-@ISA = @( 'ExtUtils::Constant::XS' )
+@ISA = @:  'ExtUtils::Constant::XS' 
 
 %type_to_struct =
-    %(
-    IV => '{const char *name; I32 namelen; IV value;}',
-    NV => '{const char *name; I32 namelen; NV value;}',
-    UV => '{const char *name; I32 namelen; UV value;}',
-    PV => '{const char *name; I32 namelen; const char *value;}',
-    PVN => '{const char *name; I32 namelen; const char *value; STRLEN len;}',
-    YES => '{const char *name; I32 namelen;}',
-    NO => '{const char *name; I32 namelen;}',
-    UNDEF => '{const char *name; I32 namelen;}',
-    '' => '{const char *name; I32 namelen;} ',
-    )
+    %: 
+    IV => '{const char *name; I32 namelen; IV value;}'
+    NV => '{const char *name; I32 namelen; NV value;}'
+    UV => '{const char *name; I32 namelen; UV value;}'
+    PV => '{const char *name; I32 namelen; const char *value;}'
+    PVN => '{const char *name; I32 namelen; const char *value; STRLEN len;}'
+    YES => '{const char *name; I32 namelen;}'
+    NO => '{const char *name; I32 namelen;}'
+    UNDEF => '{const char *name; I32 namelen;}'
+    '' => '{const char *name; I32 namelen;} '
+    
 
 %type_from_struct =
-    %(
-    IV => sub (@< @_) { @( @_[0] . '->value' ) },
-    NV => sub (@< @_) { @( @_[0] . '->value' ) },
-    UV => sub (@< @_) { @( @_[0] . '->value' ) },
-    PV => sub (@< @_) { @( @_[0] . '->value' ) },
-    PVN => sub (@< @_) { @( @_[0] . '->value', @_[0] . '->len' ) },
-    YES => sub (_) {},
-    NO => sub (_) {},
-    UNDEF => sub (_) {},
-    '' => sub (_) {},
-    )
+    %: 
+    IV => sub (@< @_) { (@:  @_[0] . '->value' ) }
+    NV => sub (@< @_) { (@:  @_[0] . '->value' ) }
+    UV => sub (@< @_) { (@:  @_[0] . '->value' ) }
+    PV => sub (@< @_) { (@:  @_[0] . '->value' ) }
+    PVN => sub (@< @_) { (@:  @_[0] . '->value', @_[0] . '->len' ) }
+    YES => sub (_) {}
+    NO => sub (_) {}
+    UNDEF => sub (_) {}
+    '' => sub (_) {}
+    
 
 %type_to_sv =
-    %(
-    IV => sub (@< @_) { "newSViv(@_[0])" },
-    NV => sub (@< @_) { "newSVnv(@_[0])" },
-    UV => sub (@< @_) { "newSVuv(@_[0])" },
-    PV => sub (@< @_) { "newSVpv(@_[0], 0)" },
-    PVN => sub (@< @_) { "newSVpvn(@_[0], @_[1])" },
-    YES => sub (@< @_) { '&PL_sv_yes' },
-    NO => sub (@< @_) { '&PL_sv_no' },
-    UNDEF => sub (@< @_) { '&PL_sv_undef' },
-    '' => sub (@< @_) { '&PL_sv_yes' },
-    SV => sub (@< @_) {"SvREFCNT_inc(@_[0])"},
-    )
+    %: 
+    IV => sub (@< @_) { "newSViv(@_[0])" }
+    NV => sub (@< @_) { "newSVnv(@_[0])" }
+    UV => sub (@< @_) { "newSVuv(@_[0])" }
+    PV => sub (@< @_) { "newSVpv(@_[0], 0)" }
+    PVN => sub (@< @_) { "newSVpvn(@_[0], @_[1])" }
+    YES => sub (@< @_) { '&PL_sv_yes' }
+    NO => sub (@< @_) { '&PL_sv_no' }
+    UNDEF => sub (@< @_) { '&PL_sv_undef' }
+    '' => sub (@< @_) { '&PL_sv_yes' }
+    SV => sub (@< @_) {"SvREFCNT_inc(@_[0])"}
+    
 
 %type_to_C_value =
-    %(
-    YES => sub (_) {},
-    NO => sub (_) {},
-    UNDEF => sub (_){},
-    '' => sub (_) {},
-    )
+    %: 
+    YES => sub (_) {}
+    NO => sub (_) {}
+    UNDEF => sub (_){}
+    '' => sub (_) {}
+    
 
 sub type_to_C_value
-    my @($self, $type) =  @_
-    return %type_to_C_value{?$type} || sub (@< @_) {return @+: map {ref $_ ?? $_->@ !! @($_) }, @_ }
+    my (@: $self, $type) =  @_
+    return %type_to_C_value{?$type} || sub (@< @_) {return @+: map {ref $_ ?? $_->@ !! (@: $_) }, @_ }
 
 
 # TODO - figure out if there is a clean way for the type_to_sv code to
 # attempt s/sv_2mortal// and if it succeeds tell type_to_sv not to add
 # SvREFCNT_inc
 %type_is_a_problem =
-    %(
+    %: 
     # The documentation says *mortal SV*, but we now need a non-mortal copy.
-    SV => 1,
-    )
+    SV => 1
+    
 
 %type_temporary =
-    %(
-    SV => \@('SV *'),
-    PV => \@('const char *'),
-    PVN => \@('const char *', 'STRLEN'),
-    )
+    %: 
+    SV => \(@: 'SV *')
+    PV => \(@: 'const char *')
+    PVN => \(@: 'const char *', 'STRLEN')
+    
 foreach (qw(IV UV NV))
-    %type_temporary{+$_} = \@($_)
+    %type_temporary{+$_} = \@: $_
 
-while (my @(?$type, ?$value) =@( each %XS_TypeSet))
+while (my (@: ?$type, ?$value) =(@:  each %XS_TypeSet))
     %type_num_args{+$type}
         = defined $value ?? ref $value ?? scalar nelems $value->@ !! 1 !! 0
 
@@ -95,7 +95,7 @@ sub partition_names($self, $default_type, @< @items)
         if ($default)
             # If we find a default value, convert it into a regular item and
             # append it to the queue of items to process
-            my $default_item = \%(< $item->%)
+            my $default_item = \%: < $item->%
             $default_item->{+invert_macro} = 1
             $default_item->{+pre} = delete $item->{def_pre}
             $default_item->{+post} = delete $item->{def_post}
@@ -117,7 +117,7 @@ sub partition_names($self, $default_type, @< @items)
         
     
     # use Data::Dumper; print Dumper \%found;
-    return @(\%found, \@notfound, \@trouble)
+    return @: \%found, \@notfound, \@trouble
 
 
 sub boottime_iterator($self, $type, $iterator, $hash, $subname)
@@ -148,14 +148,14 @@ sub name_len_value_macro($self, $item)
     $name = C_stringify($name)
 
     my $macro = $self->macro_from_item($item)
-    return @($name, $namelen, $value, $macro)
+    return @: $name, $namelen, $value, $macro
 
 
 sub WriteConstants
     my $self = shift
-    my $ARGS = \%(< @_)
+    my $ARGS = \%: < @_
 
-    my @($c_fh, $xs_fh, $c_subname, $xs_subname, $default_type, $package)
+    my @: $c_fh, $xs_fh, $c_subname, $xs_subname, $default_type, $package
         =  $ARGS->{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]}
 
     my $options = $ARGS->{?PROXYSUBS}
@@ -173,7 +173,7 @@ sub WriteConstants
     # A hash to lookup items with.
     my $items = \$%
 
-    my @items = $self->normalise_items (\%(disable_utf8_duplication => 1),
+    my @items = $self->normalise_items (\(%: disable_utf8_duplication => 1),
         $default_type, $what, $items,
         < $ARGS->{NAMES}->@)
 
@@ -181,7 +181,7 @@ sub WriteConstants
     # Everything that doesn't have a default needs alternative code for
     # "I'm missing"
     # And everything that has pre or post code ends up in a private block
-    my @($found, $notfound, $trouble)
+    my @: $found, $notfound, $trouble
         =  $self->partition_names($default_type, < @items)
 
     my $pthx = $self->C_constant_prefix_param_defintion()
@@ -285,7 +285,7 @@ EOBOOT
     my %iterator
 
     $found->{+''}
-        = map {\%(< $_->%, type=>'', invert_macro => 1)}, $notfound->@
+        = map {\(%: < $_->%, type=>'', invert_macro => 1)}, $notfound->@
 
     foreach my $type (sort keys $found->%)
         my $struct = %type_to_struct{?$type}
@@ -306,7 +306,7 @@ EOBOOT
 
 
         foreach my $item ( $found->{$type})
-            my @($name, $namelen, $value, $macro)
+            my @: $name, $namelen, $value, $macro
                 =  $self->name_len_value_macro($item)
 
             my $ifdef = $self->macro_to_ifdef($macro)
@@ -320,8 +320,8 @@ EOBOOT
                     "        /* This is the default value: */\n" if $type
                 print $xs_fh, "#else\n"
             
-            print $xs_fh, "        \{ ", join (', ', @( "\"$name\"", $namelen,
-                                                        < &$type_to_value($value))), " \},\n",
+            print $xs_fh, "        \{ ", join (', ', (@:  "\"$name\"", $namelen
+                                                          < &$type_to_value($value))), " \},\n",
                 $self->macro_to_endif($macro)
         
 
@@ -398,7 +398,7 @@ DONT
 EOBOOT
 
     foreach my $item ( $trouble->@)
-        my @($name, $namelen, $value, $macro)
+        my @: $name, $namelen, $value, $macro
             =  $self->name_len_value_macro($item)
         my $ifdef = $self->macro_to_ifdef($macro)
         my $type = $item->{?type}

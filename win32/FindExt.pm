@@ -2,7 +2,7 @@ package FindExt
 
 our $VERSION = '1.02'
 
-use warnings;
+use warnings
 
 my $no = join('|',qw(GDBM_File ODBM_File NDBM_File DB_File
 		     Syslog SysV Langinfo))
@@ -28,7 +28,7 @@ sub set_static_extensions
     %static = $%
     my @list = @_
     if (@_[0] eq '*')
-        my %excl = %( < map {$_=>1}, map {m/^!(.*)$/}, @_[[1 .. ((nelems @_)-1)]] )
+        my %excl = %:  < map {$_=>1}, map {m/^!(.*)$/}, @_[[1 .. ((nelems @_)-1)]] 
         @list = grep {!exists %excl{$_}}, keys %ext
     
     for ( @list)
@@ -76,7 +76,7 @@ sub is_static
 # NOTE: recursion limit of 10 to prevent runaway in case of symlink madness
 sub find_ext
     opendir my $dh, '.'
-    my @items = grep { !m/^\.\.?$/ }, @( readdir $dh)
+    my @items = grep { !m/^\.\.?$/ }, @:  readdir $dh
     closedir $dh
     for my $xxx ( @items)
         if ($xxx ne "DynaLoader")

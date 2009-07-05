@@ -20,10 +20,10 @@ require utf8
 
 our (@RESTRICT_TESTS, %R_HASH, %U_HASH, $UTF8_CROAK, $RESTRICTED_CROAK)
 
-@RESTRICT_TESTS = @('Locked hash', 'Locked hash placeholder',
-                    'Locked keys', 'Locked keys placeholder',
-    )
-%R_HASH = %(perl => 'rules')
+@RESTRICT_TESTS = @: 'Locked hash', 'Locked hash placeholder'
+                     'Locked keys', 'Locked keys placeholder'
+    
+%R_HASH = %: perl => 'rules'
 
 do
     # This is cheating. "\xdf" in Latin 1 is beta S, so will match \w if it
@@ -38,7 +38,7 @@ do
     # an a circumflex, so we need to be explicit.
 
     my $a_circumflex = "\x[e5]" # a byte.
-    %U_HASH = %(< @+: map { @: $_, $_}, @( 'castle', "ch$($a_circumflex)teau", $utf8, chr 0x57CE))
+    %U_HASH = %: < @+: map { @: $_, $_}, (@:  'castle', "ch$($a_circumflex)teau", $utf8, chr 0x57CE)
     plan tests => 162
 
 
@@ -89,7 +89,7 @@ sub thaw_fail($name, $expected)
 sub test_locked_hash
     my $hash = shift
     my @keys = keys $hash->%
-    my @($key, $value) =@( each $hash->%)
+    my (@: $key, $value) =@:  each $hash->%
     try {$hash->{+$key} = 'x' . $value}
     like( $^EVAL_ERROR->{?description}, "/^Modification of a read-only value attempted/",
           'trying to change a locked key' )
@@ -103,7 +103,7 @@ sub test_locked_hash
 sub test_restricted_hash
     my $hash = shift
     my @keys = keys $hash->%
-    my @($key, $value) =@( each $hash->%)
+    my (@: $key, $value) =@:  each $hash->%
     try {$hash->{+$key} = 'x' . $value}
     is( $^EVAL_ERROR, '',
         'trying to change a restricted key' )
@@ -133,7 +133,7 @@ thaw_hash ('Hash with utf8 flag but no utf8 keys', \%R_HASH)
 
 if (eval "use Hash::Util; 1")
     print $^STDOUT, "# We have Hash::Util, so test that the restricted hashes in <DATA> are valid\n"
-    for my $downgrade (@(0, 1, undef, "cheese"))
+    for my $downgrade ((@: 0, 1, undef, "cheese"))
         local $TODO = 1
         $Storable::downgrade_restricted = $downgrade
         my $hash = thaw_hash ('Locked hash', \%R_HASH)

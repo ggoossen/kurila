@@ -16,7 +16,7 @@ sub compare
     die("Usage: compare( file1, file2 [, buffersize]) ")
         unless((nelems @_) == 2 || (nelems @_) == 3)
 
-    my @($from,$to,?$size) =  @_
+    my (@: $from,$to,?$size) =  @_
     my $text_mode = defined($size) && (ref($size) eq 'CODE' || $size +< 0)
 
     my ($fromsize,$closefrom,$closeto)
@@ -116,7 +116,7 @@ sub compare
 *cmp = \&compare
 
 sub compare_text
-    my @($from,$to,?$cmp) =  @_
+    my (@: $from,$to,?$cmp) =  @_
     die("Usage: compare_text( file1, file2 [, cmp-function])")
         unless (nelems @_) == 2 || (nelems @_) == 3
     die("Third arg to compare_text() function must be a code reference")

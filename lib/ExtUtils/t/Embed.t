@@ -29,7 +29,7 @@ my (@cmd2) if $^OS_NAME eq 'VMS'
 # will be wrong.
 if ($^OS_NAME eq 'VMS')
     push(@cmd,$cc,"/Obj=$obj")
-    my @(@incs) =@( @($inc))
+    my (@: @incs) =@:  (@: $inc)
     my $crazy = ccflags()
     if ($crazy =~ s#/inc[^=/]*=([\w\$\_\-\.\[\]\:]+)##i)
         push(@incs,$1)
@@ -86,11 +86,11 @@ else
         push(@cmd, ldopts())
     
     if ($borl)
-        @cmd = @(@cmd[0],(< grep{m/^-[LI]/},@cmd[[1..((nelems @cmd)-1)]]),(< grep{!m/^-[LI]/},@cmd[[1..((nelems @cmd)-1)]]))
+        @cmd = @: @cmd[0],(< grep{m/^-[LI]/},@cmd[[1..((nelems @cmd)-1)]]),(< grep{!m/^-[LI]/},@cmd[[1..((nelems @cmd)-1)]])
     
 
     if ($^OS_NAME eq 'aix') # AIX needs an explicit symbol export list.
-        my @($perl_exp) =  grep { -f }, qw(perl.exp ../perl.exp)
+        my (@: $perl_exp) =  grep { -f }, qw(perl.exp ../perl.exp)
         die "where is perl.exp?\n" unless defined $perl_exp
         for ( @cmd)
             s!-bE:(\S+)!-bE:$perl_exp!
@@ -120,7 +120,7 @@ my $status
 my $cmd = join ' ', @cmd
 chomp($cmd) # where is the newline coming from? ldopts()?
 print $^STDOUT, "# $cmd\n"
-my @out = @( `$cmd` )
+my @out = @:  `$cmd` 
 $status = $^CHILD_ERROR
 foreach (@out)
     print $^STDOUT, "# $_\n"

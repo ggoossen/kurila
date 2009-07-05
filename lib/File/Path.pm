@@ -534,7 +534,7 @@ sub _error
 
     if ($arg{?error})
         $object = '' unless defined $object
-        push $arg{error}->$->@, \%($object => "$message: $^OS_ERROR")
+        push $arg{error}->$->@, \%: $object => "$message: $^OS_ERROR"
     else
         warn(defined($object) ?? "$message for $object: $^OS_ERROR" !! "$message: $^OS_ERROR")
     
@@ -555,8 +555,8 @@ sub mkpath
 
     if ($old_style)
         my ($verbose, $mode)
-        @($paths, ?$verbose, ?$mode) =  @_
-        $paths = \@($paths) unless UNIVERSAL::isa($paths,'ARRAY')
+        (@: $paths, ?$verbose, ?$mode) =  @_
+        $paths = \(@: $paths) unless UNIVERSAL::isa($paths,'ARRAY')
         $arg{+verbose} = defined $verbose ?? $verbose !! 0
         $arg{+mode}    = defined $mode    ?? $mode    !! 0777
     else
@@ -566,7 +566,7 @@ sub mkpath
             $arg{+mode} = 0777 unless exists $arg{mode}
             $arg{error}->$ = \$@ if exists $arg{error}
         else
-            $arg{[+qw(verbose mode)]} = @(0, 0777)
+            $arg{[+qw(verbose mode)]} = @: 0, 0777
         
         $paths = \$: @_
     
@@ -586,20 +586,20 @@ sub _mkpath($arg, $paths)
         next if -d $path
         my $parent = File::Basename::dirname($path)
         unless (-d $parent or $path eq $parent)
-            push(@created, <_mkpath($arg, \@($parent)))
+            push(@created, <_mkpath($arg, \(@: $parent)))
         
         print $^STDOUT, "mkdir $path\n" if $arg{?verbose}
         if (mkdir($path,$arg{?mode}))
             push(@created, $path)
         else
             my $save_bang = $^OS_ERROR
-            my @($e, $e1) = @($save_bang, $^EXTENDED_OS_ERROR)
+            my (@: $e, $e1) = @: $save_bang, $^EXTENDED_OS_ERROR
             $e .= "; $e1" if $e ne $e1
             # allow for another process to have created it meanwhile
             if (!-d $path)
                 $^OS_ERROR = $save_bang
                 if ($arg{?error})
-                    push $arg{error}->$->@, \%($path => $e)
+                    push $arg{error}->$->@, \%: $path => $e
                 else
                     die("mkdir $path: $e")
                 
@@ -623,7 +623,7 @@ sub rmtree
             $arg{error}->$  = \$@ if exists $arg{error}
             $arg{result}->$ = \$@ if exists $arg{result}
         else
-            $arg{[+qw(verbose safe)]} = @(0, 0)
+            $arg{[+qw(verbose safe)]} = @: 0, 0
         
         $paths = \ @_
     
@@ -635,8 +635,8 @@ sub rmtree
         _error($arg, "cannot fetch initial working directory")
         return 0
     
-    for (@($arg{?cwd})) { m/\A(.*)\Z/; $_ = $1 } # untaint
-    $arg{[qw(device inode)]} = @(stat $arg{?cwd})[[0..1]] or do
+    for ((@: $arg{?cwd})) { m/\A(.*)\Z/; $_ = $1 } # untaint
+    $arg{[qw(device inode)]} = (@: stat $arg{?cwd})[[0..1]] or do
         _error($arg, "cannot stat initial working directory", $arg{?cwd})
         return 0
     
@@ -670,7 +670,7 @@ sub _rmtree($arg, $paths)
             !! $root
         
 
-        my @($ldev, $lino, $perm) =  @(lstat $root)[[0..2]]
+        my (@: $ldev, $lino, $perm) =  (@: lstat $root)[[0..2]]
         $ldev or next ROOT_DIR
 
         if ( -d _ )
@@ -689,7 +689,7 @@ sub _rmtree($arg, $paths)
                 
             
 
-            my @($device, $inode, $perm) =  @(stat $curdir)[[0..2]] or do
+            my (@: $device, $inode, $perm) =  (@: stat $curdir)[[0..2]] or do
                 _error($arg, "cannot stat current working directory", $canon)
                 next ROOT_DIR
             
@@ -715,7 +715,7 @@ sub _rmtree($arg, $paths)
                 _error($arg, "cannot opendir", $canon)
                 @files = $@
             else
-                @files = @( readdir $d )
+                @files = @:  readdir $d 
                 closedir $d
             
 
@@ -732,7 +732,7 @@ sub _rmtree($arg, $paths)
                 # remove the contained files before the directory itself
                 my $narg = $arg
                 $narg{[qw(device inode cwd prefix depth)]}
-                    = @($device, $inode, $updir, $canon, $arg{?depth}+1)
+                    = @: $device, $inode, $updir, $canon, $arg{?depth}+1
                 $count += _rmtree($narg, \@files)
             
 
@@ -749,7 +749,7 @@ sub _rmtree($arg, $paths)
 
             # ensure that a chdir upwards didn't take us somewhere other
             # than we expected (see CVE-2002-0435)
-            @($device, $inode) =  @(stat $curdir)[[@(0,1)]]
+            (@: $device, $inode) =  (@: stat $curdir)[[(@: 0,1)]]
                 or die("cannot stat prior working directory $arg{?cwd}: $^OS_ERROR, aborting.")
 
             ($arg{?device} eq $device and $arg{?inode} eq $inode)

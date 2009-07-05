@@ -4,10 +4,10 @@ print $^STDOUT, "1..6\n"
 
 BEGIN 
     chdir 't' if -d 't'
-    $^INCLUDE_PATH = @( '../lib' )
+    $^INCLUDE_PATH = @:  '../lib' 
 
 
-use Text::Abbrev;
+use Text::Abbrev
 
 print $^STDOUT, "ok 1\n"
 

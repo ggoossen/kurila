@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker
 use ExtUtils::Constant v0.11 'WriteConstants'
 
-my @names = @( <qw(
+my @names = @:  <qw(
 	       DN_ACCESS DN_MODIFY DN_CREATE DN_DELETE DN_RENAME
 	       DN_ATTRIB DN_MULTISHOT FAPPEND FASYNC FCREAT FDEFER
 	       FDSYNC FD_CLOEXEC FEXCL FLARGEFILE FNDELAY FNONBLOCK
@@ -23,15 +23,15 @@ my @names = @( <qw(
 	       S_IFIFO S_IFLNK S_IFREG S_IFSOCK S_IFWHT S_IREAD
 	       S_IRGRP S_IROTH S_IRUSR S_IRWXG S_IRWXO S_IRWXU S_ISGID
 	       S_ISTXT S_ISUID S_ISVTX S_IWGRP S_IWOTH S_IWRITE
-	       S_IWUSR S_IXGRP S_IXOTH S_IXUSR),
-               \%(name=>"LOCK_SH", default=>\@("IV", "1")),
-               \%(name=>"LOCK_EX", default=>\@("IV", "2")),
-               \%(name=>"LOCK_NB", default=>\@("IV", "4")),
-               \%(name=>"LOCK_UN", default=>\@("IV", "8")),
-               \%(name=>"SEEK_SET", default=>\@("IV", "0")),
-               \%(name=>"SEEK_CUR", default=>\@("IV", "1")),
-               \%(name=>"SEEK_END", default=>\@("IV", "2")),
-               \%(name=>"_S_IFMT", macro=>"S_IFMT", value=>"S_IFMT"))
+	       S_IWUSR S_IXGRP S_IXOTH S_IXUSR)
+                \(%: name=>"LOCK_SH", default=>\(@: "IV", "1"))
+                \(%: name=>"LOCK_EX", default=>\(@: "IV", "2"))
+                \(%: name=>"LOCK_NB", default=>\(@: "IV", "4"))
+                \(%: name=>"LOCK_UN", default=>\(@: "IV", "8"))
+                \(%: name=>"SEEK_SET", default=>\(@: "IV", "0"))
+                \(%: name=>"SEEK_CUR", default=>\(@: "IV", "1"))
+                \(%: name=>"SEEK_END", default=>\(@: "IV", "2"))
+                \(%: name=>"_S_IFMT", macro=>"S_IFMT", value=>"S_IFMT")
 WriteConstants(
     PROXYSUBS => 1,
     NAME => 'Fcntl',
@@ -42,5 +42,5 @@ WriteMakefile(
     NAME        => 'Fcntl',
     XSPROTOARG => '-noprototypes',              # XXX remove later?
     VERSION_FROM => 'Fcntl.pm',
-    realclean => %( FILES=> 'const-c.inc const-xs.inc'),
+    realclean => (%:  FILES=> 'const-c.inc const-xs.inc'),
     )

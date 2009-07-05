@@ -17,7 +17,7 @@ EOF
 print $^STDOUT, "1..", 2 + nelems @tests, "\n"
 die "blech" unless (nelems @tests)
 
-our @x = @(1,2,3)
+our @x = @: 1,2,3
 push(@x,< @x)
 if (join(':', @x) eq '1:2:3:1:2:3') {print $^STDOUT, "ok 1\n";} else {print $^STDOUT, "not ok 1\n";}
 push(@x,4)
@@ -25,16 +25,16 @@ if (join(':', @x) eq '1:2:3:1:2:3:4') {print $^STDOUT, "ok 2\n";} else {print $^
 
 our $test = 3
 foreach my $line ( @tests)
-    my @($list,$get,$leave) =  split(m/,\t*/,$line)
-    my @($pos, ?$len, @< @list) =  split(' ',$list)
+    my (@: $list,$get,$leave) =  split(m/,\t*/,$line)
+    my (@: $pos, ?$len, @< @list) =  split(' ',$list)
     my @get = split(' ',$get)
     my @leave = split(' ',$leave)
-    @x = @(0,1,2,3,4,5,6,7)
+    @x = @: 0,1,2,3,4,5,6,7
     my @got
     if (defined $len)
-        @got = @( splice(@x, $pos, $len, < @list) )
+        @got = @:  splice(@x, $pos, $len, < @list) 
     else
-        @got = @( splice(@x, $pos) )
+        @got = @:  splice(@x, $pos) 
     
     if (join(':', @got) eq join(':', @get) &&
         join(':', @x) eq join(':', @leave))

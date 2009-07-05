@@ -11,7 +11,7 @@ require_ok("B::Concise")
 
 our ($out, $op_base, $op_base_p1, $cop_base)
 
-$out = runperl(switches => \@("-MO=Concise"), prog => '$a', stderr => 1)
+$out = runperl(switches => \(@: "-MO=Concise"), prog => '$a', stderr => 1)
 
 # If either of the next two tests fail, it probably means you need to
 # fix the section labeled 'fragile kludge' in Concise.pm
@@ -20,8 +20,8 @@ $out = runperl(switches => \@("-MO=Concise"), prog => '$a', stderr => 1)
 
 is($op_base, 1, "Smallest OP sequence number")
 
-@($op_base_p1, $cop_base)
-    = @($out =~ m/^(\d+)\s*<;>\s*nextstate\(main (-?\d+) /m)
+@: $op_base_p1, $cop_base
+    = @: $out =~ m/^(\d+)\s*<;>\s*nextstate\(main (-?\d+) /m
 
 is($op_base_p1, 2, "Second-smallest OP sequence number")
 
@@ -30,7 +30,7 @@ is($cop_base, 1, "Smallest COP sequence number")
 # test that with -exec B::Concise navigates past logops (bug #18175)
 
 $out = runperl(
-    switches => \@("-MO=Concise,-exec"),
+    switches => \(@: "-MO=Concise,-exec"),
     prog => q{$a=$b && print \*STDOUT, q/foo/},
     stderr => 1,
     )
@@ -46,13 +46,13 @@ B::Concise->import( <qw( set_style set_style_standard add_callback
 ## walk_output argument checking
 
 # test that walk_output rejects non-HANDLE args
-foreach my $foo (@("string", \$@, \$%))
+foreach my $foo ((@: "string", \$@, \$%))
     try {  walk_output($foo) }
     isnt ($^EVAL_ERROR && $^EVAL_ERROR->message, '', "walk_output() rejects arg $(dump::view($foo))")
     $^EVAL_ERROR='' # clear the fail for next test
 
 # test accessor mode when arg undefd or 0
-foreach my $foo (@(undef, 0))
+foreach my $foo ((@: undef, 0))
     my $handle = walk_output($foo)
     is ($handle, $^STDOUT, "walk_output set to STDOUT (default)")
 
@@ -71,7 +71,7 @@ SKIP: do
     skip("no perlio in this build", 4)
         unless Config::config_value("useperlio")
 
-    foreach my $foo (@($^STDOUT, $^STDERR))
+    foreach my $foo ((@: $^STDOUT, $^STDERR))
         walk_output($foo)
         pass("walk_output() accepts STD* " . ref $foo)
     
@@ -92,7 +92,7 @@ try { add_style ('junk_B' => < @stylespec) }
 like ($^EVAL_ERROR->{?description}, 'expecting 3 style-format args',
       "add_style rejects insufficient args")
 
-@stylespec = @(0,0,0) # right length, invalid values
+@stylespec = (@: 0,0,0) # right length, invalid values
 $^EVAL_ERROR=''
 try { add_style ('junk' => < @stylespec) }
 is ($^EVAL_ERROR, '', "add_style accepts: stylename => 3-arg-array")
@@ -118,7 +118,7 @@ sub render
     walk_output(\my $out)
     try { B::Concise::compile(< @_)->() }
     # diag "rendering $@\n";
-    return  @($out, $^EVAL_ERROR)
+    return  @: $out, $^EVAL_ERROR
 
 
 SKIP: do
@@ -133,7 +133,7 @@ SKIP: do
 		  -base10 -bigendian -littleendian
 		  )
     foreach my $opt ( @options)
-        my @($out, ...) =  render($opt, $func)
+        my (@: $out, ...) =  render($opt, $func)
         isnt($out, '', "got output with option $opt")
     
 
@@ -160,7 +160,7 @@ SKIP: do
     if (0)
         # pending STASH splaying
 
-        foreach my $ref (@(\$@, \$%))
+        foreach my $ref ((@: \$@, \$%))
             my $typ = ref $ref
             walk_output(\my $out)
             try { B::Concise::compile('-basic', $ref)->() }
@@ -180,7 +180,7 @@ SKIP: do
         #local $TODO = "\tdoes this handling make sense ?";
 
         sub defd_empty {};
-        @($res,$err) =  render('-basic', \&defd_empty)
+        (@: $res,$err) =  render('-basic', \&defd_empty)
         my @lines = split(m/\n/, $res)
         is(scalar nelems @lines, 4,
            "'sub defd_empty \{\}' seen as 7 liner")
@@ -193,16 +193,16 @@ SKIP: do
             our $AUTOLOAD = 'garbage'
             sub AUTOLOAD { print $^STDOUT, "# in AUTOLOAD body: $AUTOLOAD\n" }
         
-        @($res,$err) =  render('-basic', 'Bar::auto_func')
+        (@: $res,$err) =  render('-basic', 'Bar::auto_func')
         like ($res, qr/unknown function \(Bar::auto_func\)/,
               "Bar::auto_func seen as unknown function")
 
-        @($res,$err) =  render('-basic', \&Bar::AUTOLOAD)
+        (@: $res,$err) =  render('-basic', \&Bar::AUTOLOAD)
         like ($res, qr/in AUTOLOAD body: /, "found body of Bar::AUTOLOAD")
 
     
     do
-        @($res,$err) =  render('-basic', 'Foo::bar')
+        (@: $res,$err) =  render('-basic', 'Foo::bar')
         like ($res, qr/unknown function \(Foo::bar\)/,
               "BC::compile detects fn-name as unknown function")
     
@@ -264,7 +264,7 @@ SKIP: do
         
     
 
-    my %save = %( < %combos )
+    my %save = %:  < %combos 
     %combos = $%	# outputs for $mode=any($order) and any($style)
 
     # add more samples with switching modes & sticky styles
@@ -311,7 +311,7 @@ SKIP: do
 
 
     #now do double crosschecks: commutativity across stick / nostick
-    %combos = %(< %combos, < %save)
+    %combos = (%: < %combos, < %save)
 
     # test commutativity of flags, ie that AB == BA
     for my $mode ( @modes)
@@ -340,7 +340,7 @@ SKIP: do
 # test -stash and -src rendering
 # todo: stderr=1 puts '-e syntax OK' into $out,
 # conceivably fouling one of the lines that are tested
-$out = runperl ( switches => \@("-MO=Concise,-stash=B::Concise,-src"),
+$out = runperl ( switches => \(@: "-MO=Concise,-stash=B::Concise,-src"),
                  prog => '-e 1', stderr => 1 )
 
 like($out, qr/FUNC: \*B::Concise::concise_cv_obj/,
@@ -358,7 +358,7 @@ like($out, qr/PAD_FAKELEX_MULTI is a constant sub, optimized to a IV/,
 like($out, qr/\# 4\d\d: \s+ \$l->concise\(\$level\)/,
      "src-line rendering works")
 
-$out = runperl ( switches => \@("-MO=Concise,-stash=Data::Dumper,-src,-exec"),
+$out = runperl ( switches => \(@: "-MO=Concise,-stash=Data::Dumper,-src,-exec"),
                  prog => '-e 1', stderr => 1 )
 
 like($out, qr/FUNC: \*Data::Dumper::format_refaddr/,
@@ -367,7 +367,7 @@ like($out, qr/FUNC: \*Data::Dumper::format_refaddr/,
 my $prog = q{package FOO; sub bar { print \*STDOUT, "bar" } package main; FOO::bar(); }
 
 # this would fail if %INC used for -stash test
-$out = runperl ( switches => \@("-MO=Concise,-src,-stash=FOO,-main"),
+$out = runperl ( switches => \(@: "-MO=Concise,-src,-stash=FOO,-main"),
                  prog => $prog, stderr => 1 )
 
 like($out, qr/FUNC: \*FOO::bar/,

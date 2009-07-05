@@ -20,7 +20,7 @@ my $Collator = Unicode::Collate->new(
     normalization => undef,
     )
 
-my %origVar = %( < $Collator->change(variable => 'Blanked') )
+my %origVar = %:  < $Collator->change(variable => 'Blanked') 
 
 is($Collator->cmp("death", "de luge"), -1)
 is($Collator->cmp("de luge", "de-luge"), -1)

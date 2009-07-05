@@ -1,13 +1,13 @@
 package compsub
 
 sub define
-    my %arg = %( < @_ )
+    my %arg = (%:  < @_ )
     # warning: alwyas create a new hash; %^H is saved, and altering
     # values referenced by it, will have effect on it.
-    $^HINTS{+'compsub'} = \%(
-        < ( $^HINTS{?'compsub'} || \$% )->%,
-        < %arg,
-        )
+    $^HINTS{+'compsub'} = \%: 
+        < ( $^HINTS{?'compsub'} || \$% )->%
+        < %arg
+        
 
 
 1

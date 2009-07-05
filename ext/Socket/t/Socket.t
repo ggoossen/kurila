@@ -9,8 +9,8 @@ BEGIN
     $has_alarm = config_value('d_alarm')
 
 
-use Socket < qw(:all);
-use signals;
+use Socket < qw(:all)
+use signals
 
 plan tests => 14
 
@@ -122,7 +122,7 @@ is(inet_ntoa("\x{a}\x{14}\x{1e}\x{28}"), "10.20.30.40")
 # the value thru the entire chain.
 is(inet_ntoa(unpack_sockaddr_in( pack_sockaddr_in(100, inet_aton("10.250.230.10")))[1]), '10.250.230.10')
 do
-    my @($port,$addr) =  unpack_sockaddr_in(pack_sockaddr_in(100,"\x{a}\x{a}\x{a}\x{a}"))
+    my (@: $port,$addr) =  unpack_sockaddr_in(pack_sockaddr_in(100,"\x{a}\x{a}\x{a}\x{a}"))
     is($port, 100)
     is(inet_ntoa($addr), "10.10.10.10")
 

@@ -6,24 +6,24 @@ use Test::More tests => 10
 use_ok('base')
 
 
-package No::Version;
+package No::Version
 
 our ($Foo)
 sub VERSION { 42 }
 
-package Test::Version;
+package Test::Version
 
 # Test Inverse of $VERSION bug base.pm should not clobber existing $VERSION
-package Has::Version;
+package Has::Version
 
 BEGIN { $Has::Version::VERSION = '42' };
 
-package Test::Version2;
+package Test::Version2
 
-use base < qw(Has::Version);
+use base < qw(Has::Version)
 main::is( $Has::Version::VERSION, 42 )
 
-package main;
+package main
 
 my $eval1 = q{
   do {

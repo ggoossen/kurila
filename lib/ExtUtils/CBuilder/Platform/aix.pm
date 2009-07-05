@@ -17,7 +17,7 @@ sub link($self, %< %args)
 
     # Massage some very naughty bits in %Config
     local $cf->{+lddlflags} = $cf->{?lddlflags}
-    for (@($cf->{?lddlflags}))
+    for ((@: $cf->{?lddlflags}))
         s/\$ [(] BASEEXT [)] /$baseext/x
         s/\$ [(] PERL_INC [)] /$perl_inc/x
     

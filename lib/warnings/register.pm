@@ -32,7 +32,7 @@ sub mkMask($bit)
 
 sub import
     shift
-    my $package = @(caller(0))[0]
+    my $package = (@: caller(0))[0]
     if (! defined %warnings::Bits{?$package})
         %warnings::Bits{+$package}     = mkMask($warnings::LAST_BIT)
         vec(%warnings::Bits{?'all'}, $warnings::LAST_BIT, 1 => 1)

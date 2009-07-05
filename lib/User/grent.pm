@@ -7,7 +7,7 @@ BEGIN
     use Exporter   ()
     @EXPORT      = qw(getgrent getgrgid getgrnam getgr)
     @EXPORT_OK   = qw($gr_name $gr_gid $gr_passwd $gr_mem @gr_members)
-    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT )
+    %EXPORT_TAGS = %:  FIELDS => @EXPORT_OK +@+ @EXPORT 
 
 
 our ($gr_name, $gr_gid, $gr_passwd, $gr_mem, @gr_members)
@@ -19,18 +19,18 @@ sub import
 
 
 use Class::Struct < qw(struct);
-struct 'User::grent' => \@(
-       name    => '$',
-       passwd  => '$',
-       gid          => '$',
-       members => '@',
-       )
+struct 'User::grent' => \@: 
+       name    => '$'
+       passwd  => '$'
+       gid          => '$'
+       members => '@'
+       
 
 sub populate
     return unless (nelems @_)
     my $gob = new()
-    @($gr_name, $gr_passwd, $gr_gid) = $gob->@[[@(0,1,2)]] =  @_[[@(0,1,2)]]
-    @gr_members = @( $gob->[3]->@ = split ' ', @_[3] )
+    (@: $gr_name, $gr_passwd, $gr_gid) = $gob->@[[(@: 0,1,2)]] =  @_[[(@: 0,1,2)]]
+    @gr_members = @:  $gob->[3]->@ = split ' ', @_[3] 
     return $gob
 
 

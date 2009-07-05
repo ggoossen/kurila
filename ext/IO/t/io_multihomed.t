@@ -27,7 +27,7 @@ package Multi
 require IO::Socket::INET
 our @ISA=qw(IO::Socket::INET)
 
-use Socket < qw(inet_aton inet_ntoa unpack_sockaddr_in);
+use Socket < qw(inet_aton inet_ntoa unpack_sockaddr_in)
 
 sub _get_addr($sock,$addr_str, $multi)
     #print "_get_addr($sock, $addr_str, $multi)\n";
@@ -35,18 +35,18 @@ sub _get_addr($sock,$addr_str, $multi)
     print $^STDOUT, "not " unless $multi
     print $^STDOUT, "ok 2\n"
 
-    @(
+    @: 
      # private IP-addresses which I hope does not work anywhere :-)
-     inet_aton("10.250.230.10"),
-     inet_aton("10.250.230.12"),
+     inet_aton("10.250.230.10")
+     inet_aton("10.250.230.12")
      inet_aton("127.0.0.1")        # loopback
-        )
+        
 
 
 sub connect
     my $self = shift
     if ((nelems @_) == 1)
-        my@($port, $addr) =  unpack_sockaddr_in(@_[0])
+        my(@: $port, $addr) =  unpack_sockaddr_in(@_[0])
         $addr = inet_ntoa($addr)
         #print "connect($self, $port, $addr)\n";
         if($addr eq "10.250.230.10")
@@ -63,9 +63,9 @@ sub connect
 
 
 
-package main;
+package main
 
-use IO::Socket;
+use IO::Socket
 
 my $listen = IO::Socket::INET->new(Listen => 2,
     Proto => 'tcp',

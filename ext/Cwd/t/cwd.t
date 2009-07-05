@@ -73,7 +73,7 @@ SKIP: do
     
     for (keys %local_env_keys)
         env::var($_) = undef
-    my @($pwd_cmd_untainted) = @: $pwd_cmd =~ m/^(.+)$/ # Untaint.
+    my (@: $pwd_cmd_untainted) = @: $pwd_cmd =~ m/^(.+)$/ # Untaint.
     chomp(my $start = `$pwd_cmd_untainted`)
 
     # Win32's cd returns native C:\ style
@@ -114,7 +114,7 @@ SKIP: do
 my @test_dirs = qw{_ptrslt_ _path_ _to_ _a_ _dir_}
 my $Test_Dir     = File::Spec->catdir(< @test_dirs)
 
-mkpath(\@($Test_Dir), 0, 0777)
+mkpath(\(@: $Test_Dir), 0, 0777)
 Cwd::chdir $Test_Dir
 
 foreach my $func (qw(cwd getcwd fastcwd fastgetcwd))
@@ -152,7 +152,7 @@ do
 do
     # Make sure abs_path() doesn't trample $ENV{PWD}
     my $start_pwd = env::var('PWD')
-    mkpath(\@($Test_Dir), 0, 0777)
+    mkpath(\(@: $Test_Dir), 0, 0777)
     Cwd::abs_path($Test_Dir)
     is env::var('PWD'), $start_pwd
     rmtree(@test_dirs[0], 0, 0)
@@ -161,7 +161,7 @@ do
 SKIP: do
     skip "no symlinks on this platform", 2+$EXTRA_ABSPATH_TESTS unless config_value('d_symlink')
 
-    mkpath(\@($Test_Dir), 0, 0777)
+    mkpath(\(@: $Test_Dir), 0, 0777)
     symlink $Test_Dir, "linktest"
 
     my $abs_path      =  Cwd::abs_path("linktest")
@@ -205,7 +205,7 @@ SKIP: do
     do
         my $root = Cwd::abs_path(File::Spec->rootdir)	# Add drive letter?
         opendir my $fh, $root or skip("Can't opendir($root): $^OS_ERROR", 2+$EXTRA_ABSPATH_TESTS)
-        @(?$file) = grep {-f $_ and not -l $_}, map { File::Spec->catfile($root, $_) }, @( readdir $fh)
+        (@: ?$file) = grep {-f $_ and not -l $_}, map { File::Spec->catfile($root, $_) }, @:  readdir $fh
         closedir $fh
     
     skip "No plain file in root directory to test with", 2+$EXTRA_ABSPATH_TESTS unless $file
@@ -227,7 +227,7 @@ sub bracketed_form_dir
 
 
 sub dir_ends_with
-    my @($dir, $expect) = @(shift, shift)
+    my (@: $dir, $expect) = @: shift, shift
     my $bracketed_expect = quotemeta bracketed_form_dir($expect)
     like( bracketed_form_dir($dir), qr|$bracketed_expect$|i, ((nelems @_) ?? shift !! ()) )
 
@@ -237,7 +237,7 @@ sub bracketed_form_path
 
 
 sub path_ends_with
-    my @($dir, $expect) = @(shift, shift)
+    my (@: $dir, $expect) = @: shift, shift
     my $bracketed_expect = quotemeta bracketed_form_path($expect)
     like( bracketed_form_path($dir), qr|$bracketed_expect$|i, ((nelems @_) ?? shift !! ()) )
 

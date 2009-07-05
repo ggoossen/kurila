@@ -49,31 +49,31 @@ sub new($c, $v, ?$n)
         unless (defined($v) && (ref($v) eq 'ARRAY'))
     $n = \$@ unless (defined($n) && (ref($v) eq 'ARRAY'))
 
-    my $s = \%(
-        level      => 0,           # current recursive depth
-        indent     => $Indent,     # various styles of indenting
-        pad     => $Pad,        # all lines prefixed by this string
-        xpad       => "",          # padding-per-level
-        apad       => "",          # added padding for hash keys n such
-        sep        => "",          # list separator
-        pair    => $Pair,       # hash key/value separator: defaults to ' => '
-        seen       => \$%,        # local (nested) refs (id => [name, val])
-        todump     => $v,          # values to dump []
-        names      => $n,          # optional names for values []
-        varname    => $Varname,    # prefix to use for tagging nameless ones
-        purity     => $Purity,     # degree to which output is evalable
-        useqq   => $Useqq,      # use "" for strings (backslashitis ensues)
-        terse   => $Terse,      # avoid name output (where feasible)
-        freezer => $Freezer,    # name of Freezer method for objects
-        toaster => $Toaster,    # name of method to revive objects
-        deepcopy        => $Deepcopy,   # dont cross-ref, except to stop recursion
-        quotekeys       => $Quotekeys,  # quote hash keys
-        'bless' => $Bless,      # keyword to use for "bless"
+    my $s = \%: 
+        level      => 0           # current recursive depth
+        indent     => $Indent     # various styles of indenting
+        pad     => $Pad        # all lines prefixed by this string
+        xpad       => ""          # padding-per-level
+        apad       => ""          # added padding for hash keys n such
+        sep        => ""          # list separator
+        pair    => $Pair       # hash key/value separator: defaults to ' => '
+        seen       => \$%        # local (nested) refs (id => [name, val])
+        todump     => $v          # values to dump []
+        names      => $n          # optional names for values []
+        varname    => $Varname    # prefix to use for tagging nameless ones
+        purity     => $Purity     # degree to which output is evalable
+        useqq   => $Useqq      # use "" for strings (backslashitis ensues)
+        terse   => $Terse      # avoid name output (where feasible)
+        freezer => $Freezer    # name of Freezer method for objects
+        toaster => $Toaster    # name of method to revive objects
+        deepcopy        => $Deepcopy   # dont cross-ref, except to stop recursion
+        quotekeys       => $Quotekeys  # quote hash keys
+        'bless' => $Bless      # keyword to use for "bless"
         #            expdepth   => $Expdepth,   # cutoff depth for explicit dumping
-        maxdepth        => $Maxdepth,   # depth beyond which we give up
-        sortkeys   => $Sortkeys,   # flag or filter for sorting hash keys
-        deparse => $Deparse,    # use B::Deparse for coderefs
-        )
+        maxdepth        => $Maxdepth   # depth beyond which we give up
+        sortkeys   => $Sortkeys   # flag or filter for sorting hash keys
+        deparse => $Deparse    # use B::Deparse for coderefs
+        
 
     if ($Indent +> 0)
         $s->{+xpad} = "  "
@@ -99,7 +99,7 @@ sub Seen($s, $g)
     if (defined($g) && (ref($g) eq 'HASH'))
         init_refaddr_format()
         my($k, $v, $id)
-        while (@($k, $v) =@( each $g->%))
+        while ((@: $k, $v) =(@:  each $g->%))
             if (defined $v and ref $v)
                 $id = format_refaddr($v)
                 if ($k =~ m/^[*](.*)$/)
@@ -110,7 +110,7 @@ sub Seen($s, $g)
                 elsif ($k !~ m/^\$/)
                     $k = "\$" . $k
                 
-                $s->{seen}->{+$id} = \@($k, $v)
+                $s->{seen}->{+$id} = \@: $k, $v
             else
                 warn "Only refs supported, ignoring non-ref item \$$k"
             
@@ -274,11 +274,11 @@ sub _dump
             #        }
             else
                 # store our name
-                $s->{seen}->{+$id} = \@( (($name =~ m/^[@%]/)     ?? ('\' . $name ) !!
-                                          ($realtype eq 'CODE' and
+                $s->{seen}->{+$id} = \@:  (($name =~ m/^[@%]/)     ?? ('\' . $name ) !!
+                                              ($realtype eq 'CODE' and
                                            $name =~ m/^[*](.*)$/) ?? ('\&' . $1 )   !!
-                                          $name          ),
-                                         $val )
+                                              $name          )
+                                          $val 
             
         
         my $no_bless = 0
@@ -364,7 +364,7 @@ sub _dump
                 
             else
                 #warn "[>\\$name]\n";
-                $s->{seen}->{+$id} = \@("\\$name", $rval)
+                $s->{seen}->{+$id} = \@: "\\$name", $rval
             
         
 
@@ -417,7 +417,7 @@ sub _dump
         $pair = $s->{?pair}
         $mname = $name . '->'
         $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/
-        my @($sortkeys, ?$keys, ?$key) = @($s->{?sortkeys})
+        my (@: $sortkeys, ?$keys, ?$key) = @: $s->{?sortkeys}
         if ($sortkeys)
             if (ref($s->{?sortkeys}) eq 'CODE')
                 $keys = $s->{?sortkeys}->($rval)
@@ -429,8 +429,8 @@ sub _dump
                 $keys = \ sort keys $rval->%
             
         
-        while (@(?$k, ?$v) = ! $sortkeys ?? @(each $rval->%) !!
-                 (nelems $keys->@) ?? @(($key = shift($keys->@)), $rval->{?$key}) !!
+        while ((@: ?$k, ?$v) = ! $sortkeys ?? (@: each $rval->%) !!
+                 (nelems $keys->@) ?? (@: ($key = shift($keys->@)), $rval->{?$key}) !!
                  $@ )
             my $nk = $s->_dump($k, "")
             $nk = $1 if !$s->{?quotekeys} and $nk =~ m/^[\"\']([A-Za-z_]\w*)[\"\']$/
@@ -498,7 +498,7 @@ sub Dumpp { print $^STDOUT, < Data::Dumper->Dump(< @_) }
 # reset the "seen" cache
 #
 sub Reset
-    my@($s) =@( shift)
+    my(@: $s) =@:  shift
     $s->{+seen} = \$%
     return $s
 
@@ -576,14 +576,14 @@ sub Deparse($s, $v)
 
 
 # used by qquote below
-my %esc = %(
-    "\a" => "\\a",
-    "\b" => "\\b",
-    "\t" => "\\t",
-    "\n" => "\\n",
-    "\f" => "\\f",
-    "\r" => "\\r",
-    "\e" => "\\e",
+my %esc = (%: 
+    "\a" => "\\a"
+    "\b" => "\\b"
+    "\t" => "\\t"
+    "\n" => "\\n"
+    "\f" => "\\f"
+    "\r" => "\\r"
+    "\e" => "\\e"
     )
 
 # put a string value in double quotes

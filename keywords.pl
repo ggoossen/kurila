@@ -29,7 +29,7 @@ while ( ~< $^DATA)
     chop
     next unless $_
     next if m/^#/
-    my @($keyword) =  split
+    my (@: $keyword) =  split
     print $kw, &tab(5, "#define KEY_$keyword"), $keynum++, "\n"
 
 

@@ -8,9 +8,9 @@ print $^STDOUT, "not ok 1\n" unless 1
 print $^STDOUT, "ok 2\n" unless 0
 print $^STDOUT, "not ok 2\n" if 0
 
-1 &&  @(print $^STDOUT, "not ok 3\n") if 0
+1 &&  (@: print $^STDOUT, "not ok 3\n") if 0
 1 && (print $^STDOUT, "ok 3\n") if 1
-0 ||  @(print $^STDOUT, "not ok 4\n") if 0
+0 ||  (@: print $^STDOUT, "not ok 4\n") if 0
 0 || (print $^STDOUT, "ok 4\n") if 1
 
 our ($x, @x, @y)

@@ -1,7 +1,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -30,7 +30,7 @@ package main;
 require Test::More
 
 require Test::Simple::Catch
-my@($out, $err) =  Test::Simple::Catch::caught()
+my(@: $out, $err) =  Test::Simple::Catch::caught()
 
 Test::More->import('skip_all')
 

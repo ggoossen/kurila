@@ -15,7 +15,7 @@ do
     $_ = quotemeta $_
     is(length($_), 129, "quotemeta string")
     # 95 non-backslash characters
-    is((nelems @(m/([^\\])/g)), 95, "tr count non-backslashed")
+    is((nelems (@: m/([^\\])/g)), 95, "tr count non-backslashed")
 
 
 is(length(quotemeta ""), 0, "quotemeta empty string")
@@ -24,10 +24,10 @@ is(quotemeta('{'), '\{', 'quotemeta {')
 
 is("Pe\Q#x#\ErL", "Pe\\#x\\#rL", '\u\LpE\Q#X#\ER\EL')
 
-use utf8;
+use utf8
 my $x = "\x{263a}"
 is(quotemeta($x), "\x{263a}", "quotemeta Unicode")
-no utf8;
+no utf8
 is(quotemeta($x), "\\\x[E2]\\\x[98]\\\x[BA]", "quotemeta bytes")
 
 $a = "foo|bar"

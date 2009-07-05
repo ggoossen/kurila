@@ -40,7 +40,7 @@
 
 my $file
 
-use warnings FATAL=>"all";
+use warnings FATAL=>"all"
 our ($iters, $numtests, $bang, $ffff, $nulnul, $OP, $utf8)
 our ($qr, $skip_amp, $qr_embed) # set by our callers
 
@@ -56,7 +56,7 @@ BEGIN
     
 
 
-use warnings FATAL=>"all";
+use warnings FATAL=>"all"
 our ($iters, $numtests, $bang, $ffff, $nulnul, $OP)
 our ($qr, $skip_amp, $qr_embed, $qr_embed_thr) # set by our callers
 
@@ -66,7 +66,7 @@ if (!defined $file)
         || open($tests_fh, "<",':op:re_tests') || die "Can't open re_tests"
 
 
-my @tests = @( ~< $tests_fh )
+my @tests = @:  ~< $tests_fh 
 
 close $tests_fh
 
@@ -97,13 +97,13 @@ TEST:
     
     chomp
     s/\\n/\n/g
-    my @($pat, $subject, $result, $repl, $expect, ?$reason) =  split(m/\t/,$_,6)
+    my (@: $pat, $subject, $result, $repl, $expect, ?$reason) =  split(m/\t/,$_,6)
     if ($result =~ m/c/ and env::var('PERL_VALGRIND'))
         print $^STDOUT, "ok $test # TODO fix memory leak with compilation error\n"
         next
     
     $reason = '' unless defined $reason
-    my $input = join(':', @($pat,$subject,$result,$repl,$expect))
+    my $input = join(':', (@: $pat,$subject,$result,$repl,$expect))
     $pat = "'$pat'" unless $pat =~ m/^[:'\/]/
     $pat =~ s/\$\{(\w+)\}/$(eval '$'.$1)/g
     $pat =~ s/\\n/\n/g
@@ -115,7 +115,7 @@ TEST:
     $reason = 'skipping $&' if $reason eq  '' && $skip_amp
     $result =~ s/B//i unless $skip
 
-    for my $study (@('', 'study $subject'))
+    for my $study ((@: '', 'study $subject'))
         # Need to make a copy, else the utf8::upgrade of an alreay studied
         # scalar confuses things.
         my $subject = $subject
@@ -184,8 +184,8 @@ EOFCODE
                 if ($^EVAL_ERROR)
                     print $^STDOUT, "not ok $test ($study) $input => `$got', match=$match\n$code\n"
                 else # better diagnostics
-                    my $s = 'Data::Dumper'->new(\@($subject),\@('subject'))->Useqq(1)->Dump
-                    my $g = 'Data::Dumper'->new(\@($got),\@('got'))->Useqq(1)->Dump
+                    my $s = 'Data::Dumper'->new(\(@: $subject),\(@: 'subject'))->Useqq(1)->Dump
+                    my $g = 'Data::Dumper'->new(\(@: $got),\(@: 'got'))->Useqq(1)->Dump
                     print $^STDOUT, "not ok $test ($study) $input => `$got', match=$match\n$s\n$g\n$code\n"
                 
                 next TEST

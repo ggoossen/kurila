@@ -10,7 +10,7 @@ $^OUTPUT_AUTOFLUSH = 1
 
 our $Message = "Noname test"
 
-use utf8;
+use utf8
 
 our %Config
 eval 'use Config'          #  Defaults assumed if this fails
@@ -37,7 +37,7 @@ eval 'use Config'          #  Defaults assumed if this fails
 # warn ((":İ:" =~ m/:$a:/i) ? "a" : "b");
 
 require bytes
-use utf8;
+use utf8
 
 BEGIN 
     require "./test.pl"
@@ -145,7 +145,7 @@ sub run_tests
     ok( not m/^xxx {3,4}/ )
 
     $_ = "now is the time for all good men to come to."
-    @words = @( m/(\w+)/g )
+    @words = @:  m/(\w+)/g 
     ok( join(':', @words) eq "now:is:the:time:for:all:good:men:to:come:to" )
 
     @words = $@
@@ -162,7 +162,7 @@ sub run_tests
     ok( join(':', @words) eq "to:to" )
 
     pos($_, 0)
-    @words = @( m/to/g )
+    @words = @:  m/to/g 
     ok( join(':', @words) eq "to:to" )
 
     $_ = "abcdefghi"
@@ -177,7 +177,7 @@ sub run_tests
     my $pat8 = '\w*ghi'
     my $pat9 = 'ghi$'
 
-    my @($t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9) = (@: 0) x 9
+    my (@: $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9) = (@: 0) x 9
 
     for my $iter (1..5)
         $t1++ if m/$pat1/o
@@ -224,7 +224,7 @@ sub run_tests
     $x=m/abc/gp
     ok( $x and $^POSTMATCH eq "bar" )
     $_ .= ''
-    @x= @(m/abc/g )
+    @x= @: m/abc/g 
     ok( scalar nelems @x == 2 )
 
     $_ = "abdc"
@@ -243,7 +243,7 @@ sub run_tests
     ok($out == 1)
 
     $_ = 'foobar1 bar2 foobar3 barfoobar5 foobar6'
-    our @out = @( m/(?<!foo)bar./g )
+    our @out = @:  m/(?<!foo)bar./g 
     ok("$(join ' ',@out)" eq 'bar2 barf')
 
     # Tests which depend on REG_INFTY
@@ -281,7 +281,7 @@ sub run_tests
     ok(1)
 
     # Long Monsters
-    for my $l (@(125, 140, 250, 270, 300000, 30)) # Ordered to free memory
+    for my $l ((@: 125, 140, 250, 270, 300000, 30)) # Ordered to free memory
         $a = 'a' x $l
         ok("ba$a=" =~ m/a$a=/)
 
@@ -291,15 +291,15 @@ sub run_tests
     # 20000 nodes, each taking 3 words per string, and 1 per branch
     my $long_constant_len = join '|', 12120 .. 32645
     my $long_var_len = join '|', 8120 .. 28645
-    my %ans = %( 'ax13876y25677lbc' => 1,
-        'ax13876y25677mcb' => 0, # not b.
-        'ax13876y35677nbc' => 0, # Num too big
-        'ax13876y25677y21378obc' => 1,
-        'ax13876y25677y21378zbc' => 0,	# Not followed by [k-o]
-        'ax13876y25677y21378y21378kbc' => 1,
-        'ax13876y25677y21378y21378kcb' => 0, # Not b.
-        'ax13876y25677y21378y21378y21378kbc' => 0, # 5 runs
-        )
+    my %ans = %:  'ax13876y25677lbc' => 1
+                  'ax13876y25677mcb' => 0 # not b.
+                  'ax13876y35677nbc' => 0 # Num too big
+                  'ax13876y25677y21378obc' => 1
+                  'ax13876y25677y21378zbc' => 0	# Not followed by [k-o]
+                  'ax13876y25677y21378y21378kbc' => 1
+                  'ax13876y25677y21378y21378kcb' => 0 # Not b.
+                  'ax13876y25677y21378y21378y21378kbc' => 0 # 5 runs
+        
 
     for ( keys %ans )
         ok( not ( %ans{?$_} xor m/a(?=([yx]($long_constant_len)){2,4}[k-o]).*b./o ))
@@ -359,11 +359,11 @@ sub run_tests
 
     ok( "$(join ' ',@ans1)" eq $expect )
 
-    @ans = @( m/$matched/g )
+    @ans = @:  m/$matched/g 
 
     ok( "$(join ' ',@ans)" eq $expect )
 
-    @ans = @('a/b' =~ m%(.*/)?(.*)%)	# Stack may be bad
+    @ans = (@: 'a/b' =~ m%(.*/)?(.*)%)	# Stack may be bad
     ok( "$(join ' ',@ans)" eq 'a/ b' )
 
     my $code = '{$blah = 45}'
@@ -372,7 +372,7 @@ sub run_tests
                qr/not allowed at runtime/)
     ok( $blah == 12 , "blah not changed by the eval" )
 
-    for my $code (@('{$blah = 45}','=xx'))
+    for my $code ((@: '{$blah = 45}','=xx'))
         $blah = 12
         if ($code eq '=xx')
             $res = try { "xx" =~ m/(?$code)/o }; die if $^EVAL_ERROR
@@ -417,20 +417,20 @@ sub run_tests
     ok(qr/\b\v$/ eq '(?u-xism:\b\v$)')
 
     $_ = 'xabcx'
-    foreach my $ans (@('', 'c'))
+    foreach my $ans ((@: '', 'c'))
         use bytes
         m/(?<=(?=a)..)((?=c)|.)/g
         ok($1 eq $ans)
     
 
     $_ = 'a'
-    foreach my $ans (@('', 'a', ''))
+    foreach my $ans ((@: '', 'a', ''))
         m/^|a|$/gp
         ok( $^MATCH eq $ans )
     
 
     sub prefixify
-        my@($v,$a,$b,$res) =  @_
+        my(@: $v,$a,$b,$res) =  @_
         $v =~ s/\Q$a\E/$b/
         ok($res eq $v)
     
@@ -508,21 +508,21 @@ sub run_tests
 
     # test if failure of patterns returns empty list
     $_ = 'aaa'
-    @_ = @( m/bbb/ )
+    @_ = @:  m/bbb/ 
     ok( ! nelems @_ )
 
-    @_ = @( m/bbb/g )
+    @_ = @:  m/bbb/g 
     ok( not nelems @_ )
 
-    @_ = @( m/(bbb)/ )
+    @_ = @:  m/(bbb)/ 
     ok( not nelems @_ )
 
-    @_ = @( m/(bbb)/g )
+    @_ = @:  m/(bbb)/g 
     ok( not nelems @_ )
 
     $_ = 'aaa'
     pos($_, 1)
-    my @a = @( m/\Ga/g )
+    my @a = @:  m/\Ga/g 
     ok("$(join ' ',@a)" eq "a a")
 
     my $str = 'abcde'
@@ -576,13 +576,13 @@ sub run_tests
     our @res = $@
     # List context:
     $_ = 'abcde|abcde'
-    our @dummy = @( m/([ace]).(?{push @res, $1,$2})([ce])(?{push @res, $1,$2})/g )
+    our @dummy = @:  m/([ace]).(?{push @res, $1,$2})([ce])(?{push @res, $1,$2})/g 
     @res = map {defined $_ ?? "'$_'" !! 'undef'}, @res
     $res = "$(join ' ',@res)"
     ok(  "$(join ' ',@res)" eq "'a' undef 'a' 'c' 'e' undef 'a' undef 'a' 'c'" )
 
     @res = $@
-    @dummy = @( m/([ace]).(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})([ce])(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})/gp )
+    @dummy = @:  m/([ace]).(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})([ce])(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})/gp 
     @res = map {defined $_ ?? "'$_'" !! 'undef'}, @res
     $res = "$(join ' ',@res)"
     ok(  "$(join ' ',@res)" eq
@@ -635,12 +635,12 @@ sub run_tests
     ok($1  eq 'cd')
 
     $_='123x123'
-    @res = @( m/(\d*|x)/g )
+    @res = @:  m/(\d*|x)/g 
     ok( ('123||x|123|' eq join '|', @res) )
 
     # see if matching against temporaries (created via pp_helem()) is safe
     my $x = "abc"
-    %( foo => "ok $x\n".$^EXECUTABLE_NAME ){?foo} =~ m/^(.*)\n/g
+    (%:  foo => "ok $x\n".$^EXECUTABLE_NAME ){?foo} =~ m/^(.*)\n/g
     ok( $1 eq "ok abc" )
 
     # See if $i work inside (?{}) in the presense of saved substrings and
@@ -680,7 +680,7 @@ sub run_tests
     ok( not $text =~ m/^\s*A/m )
 
     $text = "abc dbf"
-    @res = @($text =~ m/.*?(b).*?\b/g)
+    @res = @: $text =~ m/.*?(b).*?\b/g
     ok("$(join ' ',@res)" eq 'b b')
 
     do
@@ -759,15 +759,15 @@ sub run_tests
     
     ok( not $w )
 
-    my %space = %( spc   => " ",
-        tab   => "\t",
-        cr    => "\r",
-        lf    => "\n",
-        ff    => "\f",
-        # There's no \v but the vertical tabulator seems miraculously
-        # be 11 both in ASCII and EBCDIC.
-        vt    => chr(11),
-        false => "space" )
+    my %space = %:  spc   => " "
+                    tab   => "\t"
+                    cr    => "\r"
+                    lf    => "\n"
+                    ff    => "\f"
+                    # There's no \v but the vertical tabulator seems miraculously
+                    # be 11 both in ASCII and EBCDIC.
+                    vt    => chr(11)
+                    false => "space" 
 
     my @space0 = sort grep { %space{?$_} =~ m/\s/ },          keys %space
     my @space1 = sort grep { %space{?$_} =~ m/[[:space:]]/ }, keys %space
@@ -835,7 +835,7 @@ sub run_tests
 
     do
         # japhy -- added 03/03/2001
-        @(_) = @: (my $str = "abc") =~ m/(...)/
+        (@: _) = @: (my $str = "abc") =~ m/(...)/
         $str = "def"
         ok($1 eq "abc")
     
@@ -857,10 +857,10 @@ sub run_tests
     do
         # bug id 20001008.001
 
-        my @x = @("stra\x{DF}e 138","stra\x{DF}e 138")
+        my @x = @: "stra\x{DF}e 138","stra\x{DF}e 138"
         for ( @x)
             s/(\d+)\s*([\w\-]+)/$($1 . uc $2)/
-            my @($latin) = @: m/^(.+)(?:\s+\d)/
+            my (@: $latin) = @: m/^(.+)(?:\s+\d)/
             ok($latin eq "stra\x{DF}e")
             $latin =~ s/stra\x{DF}e/straße/ # \303\237 after the 2nd a
             use utf8; # needed for the raw UTF-8
@@ -876,20 +876,20 @@ sub run_tests
         # intentional so that in non-Latin-1 places we test the native
         # characters, not the Unicode code points.
 
-        my %s = %(
-            "a" 				=> 'Ll',
-            "\N{CYRILLIC SMALL LETTER A}"	=> 'Ll',
-            "A" 				=> 'Lu',
-            "\N{GREEK CAPITAL LETTER ALPHA}"	=> 'Lu',
-            "\N{HIRAGANA LETTER SMALL A}"	=> 'Lo',
-            "\N{COMBINING GRAVE ACCENT}"	=> 'Mn',
-            "0"				=> 'Nd',
-            "\N{ARABIC-INDIC DIGIT ZERO}"	=> 'Nd',
-            "_"				=> 'N',
-            "!"				=> 'P',
-            " "				=> 'Zs',
-            "\0"				=> 'Cc',
-            )
+        my %s = %: 
+            "a" 				=> 'Ll'
+            "\N{CYRILLIC SMALL LETTER A}"	=> 'Ll'
+            "A" 				=> 'Lu'
+            "\N{GREEK CAPITAL LETTER ALPHA}"	=> 'Lu'
+            "\N{HIRAGANA LETTER SMALL A}"	=> 'Lo'
+            "\N{COMBINING GRAVE ACCENT}"	=> 'Mn'
+            "0"				=> 'Nd'
+            "\N{ARABIC-INDIC DIGIT ZERO}"	=> 'Nd'
+            "_"				=> 'N'
+            "!"				=> 'P'
+            " "				=> 'Zs'
+            "\0"				=> 'Cc'
+            
 
         for my $char ( map { s/^\S+ //; $_ },
             sort map { sprintf("\%06x", ord($_))." $_" }, keys %s)
@@ -1029,12 +1029,12 @@ sub run_tests
 
     do
         # bugid 20010410.006
-        for my $rx (@(
-            'm/(.*?)\{(.*?)\}/csg',
-            'm/(.*?)\{(.*?)\}/cg',
-            'm/(.*?)\{(.*?)\}/sg',
-            'm/(.*?)\{(.*?)\}/g',
-            'm/(.+?)\{(.+?)\}/csg',)
+        for my $rx (@: 
+            'm/(.*?)\{(.*?)\}/csg'
+            'm/(.*?)\{(.*?)\}/cg'
+            'm/(.*?)\{(.*?)\}/sg'
+            'm/(.*?)\{(.*?)\}/g'
+            'm/(.+?)\{(.+?)\}/csg',
             )
             my($input, $i)
 
@@ -1270,51 +1270,51 @@ EOT
         use bytes
         our $AllBytes = join('', map { chr($_) }, 0..255)
         ($x = $AllBytes) =~ s/[[:cntrl:]]//g
-        ok($x eq join('', map { chr($_) }, @( < 0x20..0x7E, < 0x80..0xFF)))
+        ok($x eq join('', map { chr($_) }, (@:  < 0x20..0x7E, < 0x80..0xFF)))
 
         ($x = $AllBytes) =~ s/[^[:cntrl:]]//g
-        ok($x eq join('', map { chr($_) }, @( < 0..0x1F, 0x7F)))
+        ok($x eq join('', map { chr($_) }, (@:  < 0..0x1F, 0x7F)))
     
 
     # With /s modifier UTF8 chars were interpreted as bytes
     do
         my $a = "Hello \x{263A} World"
 
-        my @a = @($a =~ m/./gs)
+        my @a = @: $a =~ m/./gs
 
         ok( (nelems @a) == 13 )
     
 
-    @a = @("foo\nbar" =~ m/./g)
+    @a = @: "foo\nbar" =~ m/./g
     ok( (nelems @a) == 6 && "$(join ' ',@a)" eq "f o o b a r" )
 
-    @a = @("foo\nbar" =~ m/./gs)
+    @a = @: "foo\nbar" =~ m/./gs
     ok( (nelems @a) == 7 && "$(join ' ',@a)" eq "f o o \n b a r" )
 
-    @a = @("foo\nbar" =~ m/\C/g)
+    @a = @: "foo\nbar" =~ m/\C/g
     ok( (nelems @a) == 7 && "$(join ' ',@a)" eq "f o o \n b a r" )
 
-    @a = @("foo\nbar" =~ m/\C/gs)
+    @a = @: "foo\nbar" =~ m/\C/gs
     ok( (nelems @a) == 7 && "$(join ' ',@a)" eq "f o o \n b a r" )
 
-    @a = @("foo\n\x{100}bar" =~ m/./g)
+    @a = @: "foo\n\x{100}bar" =~ m/./g
     ok( (nelems @a) == 7 && "$(join ' ',@a)" eq "f o o \x{100} b a r" )
 
-    @a = @("foo\n\x{100}bar" =~ m/./gs)
+    @a = @: "foo\n\x{100}bar" =~ m/./gs
     ok( (nelems @a) == 8 && "$(join ' ',@a)" eq "f o o \n \x{100} b a r" )
 
-    @($a, $b) = @("\x[c4]", "\x[80]")
-    @a = @("foo\n\x{100}bar" =~ m/\C/g)
+    (@: $a, $b) = @: "\x[c4]", "\x[80]"
+    @a = @: "foo\n\x{100}bar" =~ m/\C/g
     ok( scalar( (nelems @a) == 9 && "$(join ' ',@a)" eq "f o o \n $a $b b a r" ) )
 
-    @a = @("foo\n\x{100}bar" =~ m/\C/gs)
+    @a = @: "foo\n\x{100}bar" =~ m/\C/gs
     ok(  (nelems @a) == 9 && "$(join ' ',@a)" eq "f o o \n $a $b b a r" )
 
     do
         # [ID 20010814.004] pos() doesn't work when using =~m// in list context
         $_ = "ababacadaea"
-        $a = join ":", @( m/b./gc)
-        $b = join ":", @( m/a./gc)
+        $a = join ":", @:  m/b./gc
+        $b = join ":", @:  m/a./gc
         $c = pos
         ok("$a $b $c" eq 'ba:ba ad:ae 10', "$a $b $c")
     
@@ -1787,7 +1787,7 @@ EOT
         my $u = "a\x{100}"
         my $v = substr($u,0,1)
         my $w = substr($u,1,1)
-        my %u = %( $u => $u, $v => $v, $w => $w )
+        my %u = %:  $u => $u, $v => $v, $w => $w 
         for (keys %u)
             my $m1 = m/^\w*$/ ?? 1 !! 0
             my $m2 = %u{?$_}=~m/^\w*$/ ?? 1 !! 0
@@ -1798,7 +1798,7 @@ EOT
     do
         print $^STDOUT, "# [ID 20020124.005]\n"
         # Fixed by #14795.
-        for my $char (@("a", "\x{df}", "\x{100}"))
+        for my $char ((@: "a", "\x{df}", "\x{100}"))
             $x = "$char b $char"
             $x =~ s{($char)}{$( do {
                 "c" =~ m/c/;
@@ -1837,25 +1837,25 @@ EOT
         # try to force all float/anchored check combinations
         my $c = "\x{100}"
         my $subst
-        for my $re (@(
-            "xx.*$c", "x.*$c$c", "$c.*xx", "$c$c.*x", "xx.*(?=$c)", "(?=$c).*xx",)
+        for my $re (@: 
+            "xx.*$c", "x.*$c$c", "$c.*xx", "$c$c.*x", "xx.*(?=$c)", "(?=$c).*xx",
             )
             ok( not "xxx" =~ m/$re/ )
             ok( not( ($subst = "xxx") =~ s/$re// ))
         
-        for my $re (@("xx.*$c*", "$c*.*xx"))
+        for my $re ((@: "xx.*$c*", "$c*.*xx"))
             ok( "xxx" =~ m/$re/ )
             ($subst = "xxx") =~ s/$re//
             ok( $subst eq '' )
         
-        for my $re (@("xxy*", "y*xx"))
+        for my $re ((@: "xxy*", "y*xx"))
             ok( "xx$c" =~ m/$re/ )
             ($subst = "xx$c") =~ s/$re//
             ok( $subst eq $c )
             ok( not "xy$c" =~ m/$re/ )
             ok( not (($subst = "xy$c") =~ m/$re/ ))
         
-        for my $re (@("xy$c*z", "x$c*yz"))
+        for my $re ((@: "xy$c*z", "x$c*yz"))
             ok( "xyz" =~ m/$re/ )
             ($subst = "xyz") =~ s/$re//
             ok( $subst eq '' )
@@ -1939,9 +1939,9 @@ EOF
 
     if (!env::var('PERL_SKIP_PSYCHO_TEST'))
         print $^STDOUT, "# [ID 20020630.002] utf8 regex only matches 32k\n"
-        for (@(\@( 'byte', "\x{ff}" ), \@( 'utf8', "\x{1ff}" )))
-            my@($type, $char) =  $_->@
-            for my $len (@(32000, 32768, 33000))
+        for ((@: \(@:  'byte', "\x{ff}" ), \(@:  'utf8', "\x{1ff}" )))
+            my(@: $type, $char) =  $_->@
+            for my $len ((@: 32000, 32768, 33000))
                 my $s = $char . "f" x $len
                 my $r = $s =~ m/$char([f]*)/gc
                 ok($r, " # TODO <$type x $len>")
@@ -2025,7 +2025,7 @@ END
         # previously failed with "panic: end_shift
         my $s = "\x{100}" x 5
         my $ok = $s =~ m/(\x{100}{4})/
-        my@($ord, $len) = @(ord $1, length $1)
+        my(@: $ord, $len) = @: ord $1, length $1
         ok($ok && $ord == 0x100 && $len == 4, "[#18179] $ok/$ord/$len")
     
 
@@ -2196,7 +2196,7 @@ END
 
     # bug RT#19049
     $_="abcdef\n"
-    @x = @( m/./gp )
+    @x = @:  m/./gp 
     ok("abcde" eq "$^PREMATCH", 'RT#19049 - global match not setting $^PREMATCH')
 
     ok("123\x{100}" =~ m/^.*1.*23\x{100}$/, 'uft8 + multiple floating substr')
@@ -2257,7 +2257,7 @@ END
 
     for (120 .. 130)
         my $head = 'x' x $_
-        for my $tail (@('\x{0061}', '\x{1234}'))
+        for my $tail ((@: '\x{0061}', '\x{1234}'))
             ok(
                 eval qq{use utf8; "$head$tail" =~ m/$head$tail/ },
                 '\x{...} misparsed in regexp near 127 char EXACT limit'
@@ -2267,7 +2267,7 @@ END
 
     # perl #25269: panic: pp_match start/end pointers
     ok("a-bc" eq try
-           my @($x, $y) = @: "bca" =~ m/^(?=.*(a)).*(bc)/
+           my (@: $x, $y) = @: "bca" =~ m/^(?=.*(a)).*(bc)/
            "$x-$y"
        , 'captures can move backwards in string'); die if $^EVAL_ERROR
 
@@ -2371,7 +2371,7 @@ END
     if (!env::var('PERL_SKIP_PSYCHO_TEST'))
         my @normal=qw(these are some normal words)
         use utf8;
-        my $psycho=join "|", @(< @normal,< map { chr $_ },255..20000)
+        my $psycho=join "|", @: < @normal,< map { chr $_ },255..20000
         ok(('these'=~m/($psycho)/) && $1 eq 'these','Pyscho')
     else
         ok(1,'Skipped Psycho')
@@ -2505,7 +2505,7 @@ END
         sub make_must_warn
             my $warn_pat = shift
             return sub (@< @_)
-                my @($code) =  @_
+                my (@: $code) =  @_
                 my $warning
                 local $^WARN_HOOK = undef
                 undef $^EVAL_ERROR
@@ -2652,28 +2652,28 @@ EOFTEST
         my $ok = 1
         my $msg = "CURLYX stress test"
         OUTER:
-            for my $a (@("x","a","aa"))
-            for my $b (@("x","bbb","bbbb"))
+            for my $a ((@: "x","a","aa"))
+            for my $b ((@: "x","bbb","bbbb"))
                 my $bs = $a.$b
-                for my $c (@("x","c","cc"))
+                for my $c ((@: "x","c","cc"))
                     my $cs = $bs.$c
-                    for my $d (@("x","d","dd"))
+                    for my $d ((@: "x","d","dd"))
                         my $ds = $cs.$d
-                        for my $e (@("x","e","ee"))
+                        for my $e ((@: "x","e","ee"))
                             my $es = $ds.$e
-                            for my $f (@("x","f","ff"))
+                            for my $f ((@: "x","f","ff"))
                                 my $fs = $es.$f
-                                for my $g (@("x","g","gg"))
+                                for my $g ((@: "x","g","gg"))
                                     my $gs = $fs.$g
-                                    for my $h (@("x","h","hh"))
+                                    for my $h ((@: "x","h","hh"))
                                         my $hs = $gs.$h
-                                        for my $i (@("x","i","ii"))
+                                        for my $i ((@: "x","i","ii"))
                                             my $is = $hs.$i
-                                            for my $j (@("x","j","jj"))
+                                            for my $j ((@: "x","j","jj"))
                                                 my $js = $is.$j
-                                                for my $k (@("x","k","kk"))
+                                                for my $k ((@: "x","k","kk"))
                                                     my $ks = $js.$k
-                                                    for my $l (@("x","l","ll"))
+                                                    for my $l ((@: "x","l","ll"))
                                                         my $ls = $ks.$l
                                                         if ($ls =~ $r)
                                                             if ($ls =~ m/x/)
@@ -2718,7 +2718,7 @@ EOFTEST
     ok("x\c\_y"   =~ m/x\c\_y/,    "\_ in a pattern")
 
     # \c\ followed by other characters
-    for my $c (@("z", "\0", "!", chr(254), chr(256)))
+    for my $c ((@: "z", "\0", "!", chr(254), chr(256)))
         my $targ = "a\034$c"
         my $reg  = "a\\c\\$c"
         local $TODO = $c eq "\0" && '\c\0'
@@ -2803,12 +2803,12 @@ EOFTEST
     do
         # Test named commits and the $REGERROR var
         our $REGERROR
-        for my $name (@('',':foo'))
-            for my $pat (@("(*PRUNE$name)",
-                           ($name?? "(*MARK$name)" !! "")
-                           . "(*SKIP$name)",
-                           "(*COMMIT$name)"))
-                for my $suffix (@('(*FAIL)',''))
+        for my $name ((@: '',':foo'))
+            for my $pat ((@: "(*PRUNE$name)"
+                             ($name?? "(*MARK$name)" !! "")
+                                 . "(*SKIP$name)"
+                             "(*COMMIT$name)"))
+                for my $suffix ((@: '(*FAIL)',''))
                     'aaaab'=~m/a+b$pat$suffix/
                     is(
                         $REGERROR,
@@ -2823,12 +2823,12 @@ EOFTEST
         # Test named commits and the $REGERROR var
         package Fnorble
         our $REGERROR
-        for my $name (@('',':foo'))
-            for my $pat (@("(*PRUNE$name)",
-                           ($name?? "(*MARK$name)" !! "")
-                           . "(*SKIP$name)",
-                           "(*COMMIT$name)"))
-                for my $suffix (@('(*FAIL)',''))
+        for my $name ((@: '',':foo'))
+            for my $pat ((@: "(*PRUNE$name)"
+                             ($name?? "(*MARK$name)" !! "")
+                                 . "(*SKIP$name)"
+                             "(*COMMIT$name)"))
+                for my $suffix ((@: '(*FAIL)',''))
                     'aaaab'=~m/a+b$pat$suffix/
                     main::is(
                         $REGERROR,
@@ -2858,7 +2858,7 @@ EOFTEST
     
     do
         #Mindnumbingly simple test of (*THEN)
-        for (@("ABC","BAX"))
+        for ((@: "ABC","BAX"))
             ok(m/A (*THEN) X | B (*THEN) C/x,"Simple (*THEN) test")
         
     
@@ -2867,7 +2867,7 @@ EOFTEST
         local $Message = "Relative Recursion"
         my $parens=qr/(\((?:[^()]++|(?-1))*+\))/
         local $_ ='foo((2*3)+4-3) + bar(2*(3+4)-1*(2-3))'
-        my @($all,$one,$two)=@('','','')
+        my (@: $all,$one,$two)=@: '','',''
         if (m/foo $parens \s* \+ \s* bar $parens/xp)
             $all=$^MATCH
             $one=$1
@@ -2880,7 +2880,7 @@ EOFTEST
     
     do
         my $spaces="      "
-        local $_ =join 'bar', @($spaces,$spaces)
+        local $_ =join 'bar', @: $spaces,$spaces
         our $count=0
         s/(?>\s+bar)(?{$count++})//g
         is($_,$spaces,"SUSPEND final string")
@@ -2890,7 +2890,7 @@ EOFTEST
         local $Message ="RT 22395"
         local $TODO = 'Should be L+1 not L*(L+3)/2 (L=$l)'
         our $count
-        for my $l (@(10,100,1000))
+        for my $l ((@: 10,100,1000))
             $count=0
             ('a' x $l) =~ m/(.*)(?{$count++})[bc]/
             is( $count, $l + 1)
@@ -2900,7 +2900,7 @@ EOFTEST
         local $Message = "RT#18209"
         my $text = ' word1 word2 word3 word4 word5 word6 '
 
-        my @words = @('word1', 'word3', 'word5')
+        my @words = @: 'word1', 'word3', 'word5'
         my $count
         foreach my $word ( @words)
             $text =~ s/$word\s//gip # Leave a space to seperate words in the resultant str.
@@ -2952,8 +2952,8 @@ EOFTEST
     
     do
         local $Message = "RT#41010"
-        my @tails=@('','(?(1))','(|)','()?')
-        my @quants=@('*','+')
+        my @tails=@: '','(?(1))','(|)','()?'
+        my @quants=@: '*','+'
         my $doit=sub ($pats, @< @_)
             for ( @_)
                 for my $pat ( $pats->@)
@@ -2968,17 +2968,17 @@ EOFTEST
             
         
 
-        my @dpats=@(
-                '\d',
-                '[1234567890]',
-                '(1|[23]|4|[56]|[78]|[90])',
-                '(?:1|[23]|4|[56]|[78]|[90])',
-                '(1|2|3|4|5|6|7|8|9|0)',
-                '(?:1|2|3|4|5|6|7|8|9|0)',
-            )
-        my @spats=@('[ ]',' ','( |\t)','(?: |\t)','[ \t]','\s')
-        my @sstrs=@('  ')
-        my @dstrs=@('12345')
+        my @dpats=@: 
+                '\d'
+                '[1234567890]'
+                '(1|[23]|4|[56]|[78]|[90])'
+                '(?:1|[23]|4|[56]|[78]|[90])'
+                '(1|2|3|4|5|6|7|8|9|0)'
+                '(?:1|2|3|4|5|6|7|8|9|0)'
+            
+        my @spats=@: '[ ]',' ','( |\t)','(?: |\t)','[ \t]','\s'
+        my @sstrs=@: '  '
+        my @dstrs=@: '12345'
         $doit->(\@spats,< @sstrs)
         $doit->(\@dpats,< @dstrs)
     
@@ -3017,14 +3017,14 @@ EOFTEST
 
         # ANYOF tests
 
-        for my $p ( @(qw|\w aA #@!|,
-                      qw|[abc] abc def|,
-                      qw|[^abc] def abc|,
-                      qw|[[:word:]] abc #@!|,
-                      qw|[[:^word:]] #@! abc|,)
+        for my $p ( @: qw|\w aA #@!|
+                       qw|[abc] abc def|
+                       qw|[^abc] def abc|
+                       qw|[[:word:]] abc #@!|
+                       qw|[[:^word:]] #@! abc|,
             )
             my $m = shift $p
-            my @($s, $f) =  map { \split m/ */ }, $p
+            my (@: $s, $f) =  map { \split m/ */ }, $p
             for ($s->@)
                 ok(m/$m/, " $m basic match")
             for ($f->@)
@@ -3042,7 +3042,7 @@ EOFTEST
         my $re
         our $grabit = qr/ ([0-6][0-9]{7}) (??{ kt $1 }) [890] /x
         $re = qr/^ ( (??{ $grabit }) ) $ /x
-        my @res = @( '0902862349' =~ $re )
+        my @res = @:  '0902862349' =~ $re 
         is(join("-", @res),"0902862349",
            'PL_curpm is set properly on nested eval')
 
@@ -3068,7 +3068,7 @@ EOFTEST
     do
         # requirement of Unicode Technical Standard #18, 1.7 Code Points
         # cf. http://www.unicode.org/reports/tr18/#Supplementary_Characters
-        for my $u (@(0x7FF, 0x800, 0xFFFF, 0x10000))
+        for my $u ((@: 0x7FF, 0x800, 0xFFFF, 0x10000))
             no warnings 'utf8' # oops
             my $c = chr $u
             my $x = sprintf '%04X', $u
@@ -3106,9 +3106,9 @@ EOFTEST
     
     do
         local $Message = "Various whitespace special patterns"
-        my @lb=@( "\x{0D}\x{0A}",
-                  < map { chr( $_ ) }, @( ( < 0x0A..0x0D,0x85,0x2028,0x2029 )))
-        foreach my $t (@(\@(\@lb,qr/\R/,qr/\R+/),))
+        my @lb=@:  "\x{0D}\x{0A}"
+                   < map { chr( $_ ) }, (@:  ( < 0x0A..0x0D,0x85,0x2028,0x2029 ))
+        foreach my $t ((@: \(@: \@lb,qr/\R/,qr/\R+/),))
             my $ary=shift $t->@
             foreach my $pat ( $t->@)
                 foreach my $str ( $ary->@)
@@ -3123,8 +3123,8 @@ EOFTEST
         # test that \xDF matches properly. this is pretty hacky stuff,
         # but its actually needed. the malarky with '-' is to prevent
         # compilation caching from playing any role in the test.
-        my @df= @(chr(0xDF),'-',chr(0xDF))
-        my @strs= @('ss','sS','Ss','SS',chr(0xDF))
+        my @df= @: chr(0xDF),'-',chr(0xDF)
+        my @strs= @: 'ss','sS','Ss','SS',chr(0xDF)
         my @ss= @strs
 
         for my $ssi (0..(nelems @ss)-1)
@@ -3148,7 +3148,7 @@ EOFTEST
         my $esc = "\0\0\0\\"
 
         my $str = "$esc$hyp$hyp$esc$esc"
-        my @a = @($str =~ m/\G(?:\Q$esc$esc\E|\Q$esc$hyp\E|$re)/g)
+        my @a = @: $str =~ m/\G(?:\Q$esc$esc\E|\Q$esc$hyp\E|$re)/g
 
         is(0+nelems @a,3)
         is(join('=', @a),"$esc$hyp=$hyp=$esc$esc")
@@ -3182,7 +3182,7 @@ EOFTEST
         
         is(length($str),"0","Trie scope error, string should be empty")
         $str=""
-        my @foo = @( ('a')x5 )
+        my @foo = @:  ('a')x5 
         for ( @foo)
             my @bar
             $str .= "$(join ' ',@bar)"

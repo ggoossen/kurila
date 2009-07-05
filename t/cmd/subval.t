@@ -64,7 +64,7 @@ sub fib($arg)
     $foo
 
 
-our @good = @(0,1,1,2,3,5,8,13,21,34,55,89)
+our @good = @: 0,1,1,2,3,5,8,13,21,34,55,89
 
 our $foo
 
@@ -78,7 +78,7 @@ for my $i (1..10)
 
 
 sub ary1
-    return @(1,2,3)
+    return @: 1,2,3
 
 
 print $^STDOUT, "ok 23\n"
@@ -86,7 +86,7 @@ print $^STDOUT, join(':',&ary1( < @_ )) eq '1:2:3' ?? "ok 24\n" !! "not ok 24\n"
 
 sub ary2
     do
-        return  @(1,2,3)
+        return  @: 1,2,3
         (3,2,1)
     
     0
@@ -98,11 +98,11 @@ our $x = join(':',&ary2( < @_ ))
 print $^STDOUT, $x eq '1:2:3' ?? "ok 26\n" !! "not ok 26 $x\n"
 
 sub somesub($num,$P,$F,$L)
-    our @($p,$f,$l) =@( caller)
+    our (@: $p,$f,$l) =@:  caller
     print $^STDOUT, "$p:$f:$l" eq "$P:$F:$L" ?? "ok $num\n" !! "not ok $num $p:$f:$l ne $P:$F:$L\n"
 
 
 &somesub(27, 'main', __FILE__, __LINE__)
 
-package foo;
+package foo
 &main::somesub(28, 'foo', __FILE__, __LINE__)

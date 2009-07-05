@@ -6,7 +6,7 @@ BEGIN
 
 plan tests => 22
 
-use File::Path;
+use File::Path
 rmtree('blurfl')
 
 # tests 3 and 7 rather naughtily expect English error messages

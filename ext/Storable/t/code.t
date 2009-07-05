@@ -14,8 +14,8 @@ use File::Spec v0.8
 plan skip_all => "Fix B::Deparse to produce valid code"
 plan tests => 59
 
-use Storable < qw(retrieve store nstore freeze nfreeze thaw dclone);
-use Safe;
+use Storable < qw(retrieve store nstore freeze nfreeze thaw dclone)
+use Safe
 
 #$Storable::DEBUGME = 1;
 
@@ -31,25 +31,25 @@ do
 local *FOO
 
 @obj =
-    @(\@(\&code,                   # code reference
-         sub (@< @_) { 6*7 },
-         $blessed_code,            # blessed code reference
-         \&Another::Package::foo,  # code in another package
-         sub ($x, $y) { 0 },         # prototypes
-         sub (@< @_) { print $^STDOUT, "test\n" },
-         \&Test::ok,               # large scalar
-      ),
+    @: \(@: \&code                   # code reference
+           sub (@< @_) { 6*7 }
+           $blessed_code            # blessed code reference
+           \&Another::Package::foo  # code in another package
+           sub ($x, $y) { 0 }         # prototypes
+           sub (@< @_) { print $^STDOUT, "test\n" }
+           \&Test::ok               # large scalar
+           )
 
-      \%("a" => sub (@< @_) { "srt" }, "b" => \&code),
+       \(%: "a" => sub (@< @_) { "srt" }, "b" => \&code)
 
-      sub (@< @_) { ord("a")-ord("7") },
+       sub (@< @_) { ord("a")-ord("7") }
 
-      \&code,
+       \&code
 
-      \&dclone,                 # XS function
+       \&dclone                 # XS function
 
-      sub (@< @_) { open my $foo, "/" },
-    )
+       sub (@< @_) { open my $foo, "/" }
+    
 
 $Storable::Deparse = 1
 $Storable::Eval    = 1
@@ -268,17 +268,17 @@ do
     local $Storable::Deparse = 1
     local $Storable::Eval     = 1
 
-    for my $sub (@($short_sub, $long_sub))
+    for my $sub ((@: $short_sub, $long_sub))
         my $res
 
-        $res = thaw < freeze \@($sub, $sub)
+        $res = thaw < freeze \@: $sub, $sub
         ok(int($res->[0]), int($res->[1]))
 
-        $res = thaw < freeze \@($sclr, $sub, $sub, $sclr)
+        $res = thaw < freeze \@: $sclr, $sub, $sub, $sclr
         ok(int($res->[0]), int($res->[3]))
         ok(int($res->[1]), int($res->[2]))
 
-        $res = thaw < freeze \@($sub, $sub, $sclr, $sclr)
+        $res = thaw < freeze \@: $sub, $sub, $sclr, $sclr
         ok(int($res->[0]), int($res->[1]))
         ok(int($res->[2]), int($res->[3]))
     

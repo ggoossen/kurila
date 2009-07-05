@@ -4,7 +4,7 @@ BEGIN
     require "./test.pl"
 
 plan tests => 9
-use env;
+use env
 
 is( env::var("PERL_CORE"), 1, "PERL_CORE is set to '1'" )
 is( env::var("PERL_DO_NOT_EXIST"), undef, "PERL_DO_NOT_EXIST does not exist" )

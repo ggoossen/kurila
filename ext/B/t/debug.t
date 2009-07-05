@@ -1,10 +1,10 @@
 #!./perl
 
 $^OUTPUT_AUTOFLUSH  = 1
-use warnings;
+use warnings
 
-use Config;
-use Test::More tests=>3;
+use Config
+use Test::More tests=>3
 
 my $a
 my $Is_VMS = $^OS_NAME eq 'VMS'

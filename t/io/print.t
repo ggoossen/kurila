@@ -19,7 +19,7 @@ print $foo, "ok 6\n"
 printf $^STDOUT, "ok \%d\n",7
 printf($^STDOUT, "ok \%d\n",8)
 
-my @a = @("ok \%d\%c",9,ord("\n"))
+my @a = @: "ok \%d\%c",9,ord("\n")
 printf $^STDOUT, < @a
 
 @a[1] = 10
@@ -47,9 +47,9 @@ do
     #               before pushing its return value
     # to make sure only that these obfuscated sentences will not crash.
 
-    map { print($^STDOUT, < reverse @($_)) }, @(('')x68)
+    map { print($^STDOUT, < reverse (@: $_)) }, @: ('')x68
     print $^STDOUT, "ok 20\n"
 
-    map { print($^STDOUT, ) }, @(('')x68)
+    map { print($^STDOUT, ) }, @: ('')x68
     print $^STDOUT, "ok 21\n"
 

@@ -14,13 +14,13 @@ BEGIN
 
 
 
-my %modules = %(
+my %modules = %: 
     # ModuleName  => q|code to check that it was loaded|,
-    'Cwd'        => q| main::can_ok( 'Cwd' => 'fastcwd'         ) |,
-    'File::Glob' => q| main::can_ok( 'File::Glob' => 'doglob'   ) |,
-    'Socket'     => q| main::can_ok( 'Socket' => 'inet_aton'    ) |,
-    'Time::HiRes'=> q| main::can_ok( 'Time::HiRes' => 'usleep'  ) |,
-    )
+    'Cwd'        => q| main::can_ok( 'Cwd' => 'fastcwd'         ) |
+    'File::Glob' => q| main::can_ok( 'File::Glob' => 'doglob'   ) |
+    'Socket'     => q| main::can_ok( 'Socket' => 'inet_aton'    ) |
+    'Time::HiRes'=> q| main::can_ok( 'Time::HiRes' => 'usleep'  ) |
+    
 
 plan tests => nelems(keys(%modules)) * 3 + 5
 

@@ -119,7 +119,7 @@ sub erase($obj, $action)
     my ($stem, $leaf)
 
     $pkg = "$($pkg)::"	# expand to full symbol table name
-    @($stem, $leaf) = @: $pkg =~ m/(.*)::(\w+::)$/
+    (@: $stem, $leaf) = @: $pkg =~ m/(.*)::(\w+::)$/
 
     # The 'my $foo' is needed! Without it you get an
     # 'Attempt to free unreferenced scalar' warning!
@@ -242,15 +242,15 @@ sub share_record
     my $vars = shift
     my $shares = \($obj->{+Shares} ||= \$%)->%
     # Record shares using keys of $obj->{Shares}. See reinit.
-    $shares->{[ $vars->@]} = @($pkg) x nelems $vars->@ if (nelems $vars->@)
+    $shares->{[ $vars->@]} = (@: $pkg) x nelems $vars->@ if (nelems $vars->@)
 
 sub share_redo
     my $obj = shift
     my $shares = \($obj->{+Shares} ||= \$%)->%
     my($var, $pkg)
-    while(@($var, $pkg) =@( each $shares->%))
+    while((@: $var, $pkg) =(@:  each $shares->%))
         # warn "share_redo $pkg\:: $var";
-        $obj->share_from($pkg,  \@( $var ), 1)
+        $obj->share_from($pkg,  \(@:  $var ), 1)
     
 
 sub share_forget($self)

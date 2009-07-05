@@ -12,7 +12,7 @@ BEGIN { unless(defined &DEBUG) { *DEBUG = sub () {0} } }
 
 $VERSION = "1.03"
 @ISA = $@
-use I18N::LangTags < qw(alternate_language_tags locale2language_tag);
+use I18N::LangTags < qw(alternate_language_tags locale2language_tag)
 
 sub _uniq { my %seen; return grep( {!(%seen{+$_}++) }, @_); }
 sub _normalize
@@ -88,7 +88,7 @@ sub http_accept_langs
     # Else it's complicated...
 
     $in =~ s/\s+//g  # Yes, we can just do without the WS!
-    my @in = @( $in =~ m/([^,]+)/g )
+    my @in = @:  $in =~ m/([^,]+)/g 
     my %pref
 
     my $q
@@ -131,7 +131,7 @@ sub _try_use   # Basically a wrapper around "require Modulename"
 
     my $module = @_[0]   # ASSUME sane module name!
     do
-        return @(%tried{+$module} = 1)
+        return @: %tried{+$module} = 1
             if defined(Symbol::fetch_glob($module . "::Lexicon")->*->%) or defined(Symbol::fetch_glob($module . "::ISA")->*->@)
     # weird case: we never use'd it, but there it is!
     

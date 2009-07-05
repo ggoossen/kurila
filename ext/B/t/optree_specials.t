@@ -27,7 +27,7 @@ plan tests => 8
 require_ok("B::Concise")
 
 my $out = runperl(
-    switches => \@("-MO=Concise,BEGIN,CHECK,INIT,END,-exec"),
+    switches => \(@: "-MO=Concise,BEGIN,CHECK,INIT,END,-exec"),
     prog => q{$a=$b && print q/foo/},
     stderr => 1 )
 
@@ -37,9 +37,9 @@ my $src = q[our ($beg, $chk, $init, $end, $uc) = qq{'foo'}; BEGIN { $beg++ } CHE
 
 
 my @warnings_todo
-@warnings_todo = @(todo =>
-                   "Change 23768 (Remove Carp from warnings.pm) alters expected output, not"
-                   . "propagated to 5.8.x")
+@warnings_todo = @: todo =>
+                    "Change 23768 (Remove Carp from warnings.pm) alters expected output, not"
+                        . "propagated to 5.8.x"
 
 checkOptree ( name      => 'BEGIN',
               bcopts    => 'BEGIN',

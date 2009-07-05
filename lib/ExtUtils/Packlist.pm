@@ -48,9 +48,9 @@ sub __find_relocations
 sub new($class, ?$packfile)
     $class = ref($class) || $class
 
-    my $self = \%( packfile => $packfile,
-        data => $%,
-        )
+    my $self = \%:  packfile => $packfile
+                    data => $%
+        
     bless($self, $class)
 
     $self->read($packfile) if (defined($packfile) && -f $packfile)
@@ -74,12 +74,12 @@ sub read($self, ?$packfile)
         my $data
         if ($key =~ m/^(.*?)( \w+=.*)$/)
             $key = $1
-            $data = \%( < @+: map { split('=', $_) }, split(' ', $2))
+            $data = \%:  < @+: map { split('=', $_) }, split(' ', $2)
 
             if (config_value("userelocatableinc") && $data->{?relocate_as})
                 require File::Spec
                 require Cwd
-                my @($vol, $dir) =  File::Spec->splitpath($packfile)
+                my (@: $vol, $dir) =  File::Spec->splitpath($packfile)
                 my $newpath = File::Spec->catpath($vol, $dir, $data->{relocate_as})
                 $key = Cwd::realpath($newpath)
             
@@ -106,7 +106,7 @@ sub write($self, ?$packfile)
                 my $prefix = $1
                 if (File::Spec->no_upwards( <File::Spec->abs2rel($key, $prefix)))
                     # The relocated path is within the found prefix
-                    my @(_, $packfile_prefix) = File::Spec->splitpath($packfile)
+                    my (@: _, $packfile_prefix) = File::Spec->splitpath($packfile)
 
                     my $relocate_as
                         = File::Spec->abs2rel($key, $packfile_prefix)
@@ -137,11 +137,11 @@ sub validate($self, ?$remove)
             delete($self->{data}{$key}) if ($remove)
         
     
-    return @(@missing)
+    return @: @missing
 
 
 sub packlist_file($self)
-    return @($self->{?packfile})
+    return @: $self->{?packfile}
 
 
 1

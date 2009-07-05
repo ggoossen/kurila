@@ -15,7 +15,7 @@ my $test = 1
 sub test($sub, @< @args)
     my $ok = $sub->( < @args )
     print $^STDOUT, $ok ?? "ok $test\n" !! "not ok $test\n"
-    printf $^STDOUT, "# Failed at line \%d\n", @(caller)[2] unless $ok
+    printf $^STDOUT, "# Failed at line \%d\n", (@: caller)[2] unless $ok
     $test++
 
 
@@ -174,7 +174,7 @@ test {
 do
     my $w
     $w = sub (@< @_)
-        my @($i) =  @_
+        my (@: $i) =  @_
         test { $i == 10 },
         sub (@< @_) { $w }
     
@@ -192,16 +192,16 @@ do
     $debugging = 1 if defined(@ARGV[?0]) and @ARGV[0] eq '-debug'
 
     # The expected values for these tests
-    %expected = %(
-        'global_scalar'	=> 1001,
-        'global_array'	=> 2101,
-        'global_hash'	=> 3004,
-        'fs_scalar'	=> 4001,
-        'fs_array'	=> 5101,
-        'fs_hash'	=> 6004,
-        'sub_scalar'	=> 7001,
-        'sub_array'	=> 8101,
-        'sub_hash'	=> 9004,
+    %expected = (%: 
+        'global_scalar'	=> 1001
+        'global_array'	=> 2101
+        'global_hash'	=> 3004
+        'fs_scalar'	=> 4001
+        'fs_array'	=> 5101
+        'fs_hash'	=> 6004
+        'sub_scalar'	=> 7001
+        'sub_array'	=> 8101
+        'sub_hash'	=> 9004
         )
 
     # Our innermost sub is either named or anonymous
@@ -311,8 +311,8 @@ END
                 
 
                 $sub_test = $test
-                @inners = @( < qw!global_scalar global_array global_hash! , <
-                             qw!fs_scalar fs_array fs_hash! )
+                @inners = @:  < qw!global_scalar global_array global_hash! , <
+                                  qw!fs_scalar fs_array fs_hash! 
                 if ($where_declared ne 'filescope')
                     push @inners, < qw!sub_scalar sub_array sub_hash!
                 
@@ -443,8 +443,8 @@ END
                         print $perl_fh, $code
                         close $perl_fh
                         do { local $^INPUT_RECORD_SEPARATOR = undef;
-                            $output = join '', @( ~< $read);
-                            $errors = join '', @( ~< $read2); }
+                            $output = join '', (@:  ~< $read);
+                            $errors = join '', (@:  ~< $read2); }
                         close $read
                         close $read2
                     
@@ -452,7 +452,7 @@ END
                     # No fork().  Do it the hard way.
                     my $cmdfile = "tcmd$^PID";  $cmdfile++ while -e $cmdfile
                     my $errfile = "terr$^PID";  $errfile++ while -e $errfile
-                    my @tmpfiles = @($cmdfile, $errfile)
+                    my @tmpfiles = @: $cmdfile, $errfile
                     open my $cmd_fh, ">", "$cmdfile"; print $cmd_fh, $code; close $cmd_fh
                     my $cmd = which_perl()
                     $cmd .= " -w $cmdfile 2>$errfile"
@@ -461,7 +461,7 @@ END
                         # this process, and then foul our pipe back to parent by
                         # redirecting output in the child.
                         open my $perl_fh, "-", "$cmd" or die "Can't open pipe: $^OS_ERROR\n"
-                        do { local $^INPUT_RECORD_SEPARATOR = undef; $output = join '', @( ~< $perl_fh) }
+                        do { local $^INPUT_RECORD_SEPARATOR = undef; $output = join '', (@:  ~< $perl_fh) }
                         close $perl_fh
                     else
                         my $outfile = "tout$^PID";  $outfile++ while -e $outfile
@@ -527,7 +527,7 @@ $a = eval q(
     ]
 )
 die if $^EVAL_ERROR
-@a = @( ('\1\1\1\1\1\1\1') x 100 ) # realloc recently-freed CVs
+@a = (@:  ('\1\1\1\1\1\1\1') x 100 ) # realloc recently-freed CVs
 test { $a->() == 123 },
 
 # this coredumped on <= 5.8.0 because evaling the closure caused
@@ -537,7 +537,7 @@ sub (@< @_)
     my $x
     $x = eval 'sub { $outer }'
     $x->()
-    $a = \@( 99 )
+    $a = \@:  99 
     $x->()
  ->()
 test {1},
@@ -577,7 +577,7 @@ do
 
 # handy class: $x = Watch->new(\$foo,'bar')
 # causes 'bar' to be appended to $foo when $x is destroyed
-sub Watch::new { bless \@( @_[1], @_[2] ), @_[0] }
+sub Watch::new { bless \(@:  @_[1], @_[2] ), @_[0] }
 sub Watch::DESTROY { @_[0]->[0]->$ .= @_[0]->[1] }
 
 
@@ -628,7 +628,7 @@ f16302()
 
 do
     my %a
-    for my $x (@(7,11))
+    for my $x ((@: 7,11))
         %a{+$x} = sub (@< @_) { $x=$x; sub (@< @_) { eval '$x' } }
     
     test { %a{?7}->()->() + %a{?11}->()->() == 18 },

@@ -2,7 +2,7 @@ package ExtUtils::Constant::Utils
 
 our ($VERSION, @EXPORT_OK, @ISA)
 
-@ISA = @( 'Exporter' )
+@ISA = @:  'Exporter' 
 @EXPORT_OK = qw(C_stringify perl_stringify)
 $VERSION = '0.01'
 

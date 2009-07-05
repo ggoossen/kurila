@@ -24,14 +24,14 @@ BEGIN
     $separator2 = undef
 
 
-use Text::Tabs < qw(expand unexpand);
+use Text::Tabs < qw(expand unexpand)
 
 sub wrap($ip, $xp, @< @t)
 
     local($Text::Tabs::tabstop) = $tabstop
     my $r = ""
     my $tail = pop(@t)
-    my $t = expand(join("", @: < (@+: map { m/\s+\z/ ?? @( $_ ) !! @($_, ' ') }, @t), $tail))
+    my $t = expand(join("", @: < (@+: map { m/\s+\z/ ?? (@:  $_ ) !! (@: $_, ' ') }, @t), $tail))
     my $lead = $ip
     my $ll = $columns - length(expand($ip)) - 1
     $ll = 0 if $ll +< 0
@@ -60,7 +60,7 @@ sub wrap($ip, $xp, @< @t)
         elsif ($columns +< 2)
             warnings::warnif "Increasing \$Text::Wrap::columns from $columns to 2"
             $columns = 2
-            return  @($ip, $xp, @t)
+            return  @: $ip, $xp, @t
         else
             die "This shouldn't happen"
         

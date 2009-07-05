@@ -22,7 +22,7 @@ sub new
     my $self = shift
     my $type = ref($self) || $self
 
-    my $vec = bless \@(undef,0), $type
+    my $vec = bless \(@: undef,0), $type
 
     $vec->add(< @_)
         if (nelems @_)
@@ -91,7 +91,7 @@ sub can_read
     my $timeout = shift
     my $r = $vec->[VEC_BITS]
 
-    defined($r) && ((nelems @(select($r,undef,undef,$timeout))) +> 0)
+    defined($r) && ((nelems (@: select($r,undef,undef,$timeout))) +> 0)
         ?? handles($vec, $r)
         !! ()
 
@@ -155,7 +155,7 @@ sub select
     shift
         if defined @_[0] && !ref(@_[0])
 
-    my@($r,$w,$e,$t) =  @_
+    my(@: $r,$w,$e,$t) =  @_
     my @result = $@
 
     my $rb = defined $r ?? $r->[VEC_BITS] !! undef
@@ -181,7 +181,7 @@ sub select
             $i--
         
 
-        @result = @(\@r, \@w, \@e)
+        @result = @: \@r, \@w, \@e
     
     @result
 

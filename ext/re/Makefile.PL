@@ -12,7 +12,7 @@ WriteMakefile(
     XSPROTOARG          => '-noprototypes',
     OBJECT              => $object,
     DEFINE             => $defines,
-    clean               => %( FILES => '*$(OBJ_EXT) *.c ../../lib/re.pm' ),
+    clean               => (%:  FILES => '*$(OBJ_EXT) *.c ../../lib/re.pm' ),
     )
 
 package MY
@@ -42,7 +42,7 @@ EOF
 
 
 sub MY::c_o
-    my@($self) =  @_
+    my(@: $self) =  @_
     package MY; # so that "SUPER" works right
     my $inh = $self->SUPER::c_o(< @_)
     use Config;

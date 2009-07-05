@@ -22,7 +22,7 @@ print $^STDOUT, < form
 # Squeeze all whitespace...
 
 print $^STDOUT, < form
-  \%(ws=>qr/\s+/),
+  \(%: ws=>qr/\s+/),
   "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
   $eulogy, "",""
 
@@ -30,14 +30,14 @@ print $^STDOUT, < form
 # Squeeze all whitespace except newlines...
 
 print $^STDOUT, < form
-  \%(ws=>qr/[^\S\n]+/),
+  \(%: ws=>qr/[^\S\n]+/),
   "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
   $eulogy, "",""
 
 # Squeeze even harder before punctuation
 
 print $^STDOUT, < form
-  \%(ws=>qr/[^\S\n]+ ([,.!])?/x),
+  \(%: ws=>qr/[^\S\n]+ ([,.!])?/x),
   "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
   $eulogy, "",""
 
@@ -45,7 +45,7 @@ print $^STDOUT, < form
 # Form is smart enough not to squeeze zero-width matches...
 
 print $^STDOUT, < form
-  \%(ws=>qr/\s*/),
+  \(%: ws=>qr/\s*/),
   "| \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\} |",
   $eulogy, "",""
 

@@ -38,9 +38,9 @@ do
         ### converts the file spec back to VMS format.
         my $class = ON_VMS ?? 'File::Spec::Unix' !! 'File::Spec'
 
-        my@($vol, $path, $file) =  $class->splitpath( $rv{'file'} )
+        my(@: $vol, $path, $file) =  $class->splitpath( $rv{'file'} )
 
-        my @path = @($vol, < $class->splitdir( $path ), $file )
+        my @path = (@: $vol, < $class->splitdir( $path ), $file )
 
         ### First element could be blank for some system types like VMS
         shift @path if $vol eq ''
@@ -124,21 +124,21 @@ do {   local $Module::Load::Conditional::FIND_VERSION = 0;
 ### test 'can_load' ###
 
 do
-    my $use_list = \%( 'LoadIt' => 1 )
+    my $use_list = \%:  'LoadIt' => 1 
     my $bool = can_load( modules => $use_list )
 
     ok( $bool, q[Load simple module] )
 
 
 do
-    my $use_list = \%( 'Commented' => 2 )
+    my $use_list = \%:  'Commented' => 2 
     my $bool = can_load( modules => $use_list )
 
     ok( $bool, q[Load module with a second, commented-out $VERSION] )
 
 
 do
-    my $use_list = \%( 'MustBe::Loaded' => 1 )
+    my $use_list = \%:  'MustBe::Loaded' => 1 
     my $bool = can_load( modules => $use_list )
 
     ok( !$bool, q[Detect out of date module] )
@@ -148,7 +148,7 @@ do
     delete $^INCLUDED{'LoadIt.pm'}
     delete $^INCLUDED{'MustBe/Loaded.pm'}
 
-    my $use_list = \%( 'LoadIt' => 1, 'MustBe::Loaded' => 1 )
+    my $use_list = \%:  'LoadIt' => 1, 'MustBe::Loaded' => 1 
     my $bool = can_load( modules => $use_list )
 
     ok( !$^INCLUDED{?'LoadIt.pm'} && !$^INCLUDED{?'MustBe/Loaded.pm'},
@@ -162,7 +162,7 @@ SKIP:do
     skip "Depends on \$^X, which doesn't work well when testing the Perl core",
          1 if env::var('PERL_CORE')
 
-    my %list = %( < @+: map { @: $_ => 1 }, requires('Carp') )
+    my %list = %:  < @+: map { @: $_ => 1 }, requires('Carp') 
 
     my $flag
     $flag++ unless delete %list{'Exporter'}
@@ -188,7 +188,7 @@ do {   local $Module::Load::Conditional::CHECK_INC_HASH = 1;
     is( $href{?'file'}, $^PID.$^PID, '   Found correct file' );
     is( $href{?'version'}, $^PID, '   Found correct version' );
     ok( $href{?'uptodate'},    '   Marked as uptodate' );
-    ok( can_load( modules => \%( 'A::B::C::D' => 0 ) ),
+    ok( can_load( modules => \(%:  'A::B::C::D' => 0 ) ),
         '   can_load successful' );
 }
 

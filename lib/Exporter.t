@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't' if -d 't'
-        $^INCLUDE_PATH = @( '../lib' )
+        $^INCLUDE_PATH = (@:  '../lib' )
     
 
 
@@ -15,7 +15,7 @@ sub ok($ok, $name)
     printf $^STDOUT, "\%sok \%d\%s\n", ($ok ?? '' !! 'not '), $test,
         (defined $name ?? " - $name" !! '')
 
-    printf $^STDOUT, "# Failed test at line \%d\n", @(caller)[2] unless $ok
+    printf $^STDOUT, "# Failed test at line \%d\n", (@: caller)[2] unless $ok
 
     $test++
     return $ok
@@ -52,11 +52,11 @@ do
         main::ok( Testing->can($meth), "subclass can $meth()" )
     
 
-    our %EXPORT_TAGS = %(
-        This => qw(stuff %left),
-        That => qw(Above the @wailing),
-        tray => qw(Fasten $seatbelt),
-        )
+    our %EXPORT_TAGS = %: 
+        This => qw(stuff %left)
+        That => qw(Above the @wailing)
+        tray => qw(Fasten $seatbelt)
+        
     our @EXPORT    = qw(lifejacket is)
     our @EXPORT_OK = qw(under &your $seat)
     our $VERSION = '1.05'
@@ -77,7 +77,7 @@ do
     $seatbelt = 'seatbelt'
     $seat     = 'seat'
     @wailing = qw(AHHHHHH)
-    %left = %( left => "right" )
+    %left = %:  left => "right" 
 
     sub Is { 'Is' };
     BEGIN {*is = \&Is};
@@ -141,11 +141,11 @@ Testing->import( <qw(!lifejacket))
 main::ok( !defined &lifejacket,     'deny import by !' )
 
 
-package Mars;
+package Mars
 Testing->import('/e/')
 
 main::ok( (!grep { eval "!defined $_" }, map { m/^\w/ ?? "&$_" !! $_ },
-           grep { m/e/ }, @( < @Testing::EXPORT, < @Testing::EXPORT_OK)),
+           grep { m/e/ }, (@:  < @Testing::EXPORT, < @Testing::EXPORT_OK)),
           'import by regex')
 
 
@@ -153,7 +153,7 @@ package Venus
 Testing->import('!/e/')
 
 main::ok( (!grep { eval "defined $_" }, map { m/^\w/ ?? "&$_" !! $_ },
-           grep { m/e/ }, @( < @Testing::EXPORT, < @Testing::EXPORT_OK)),
+           grep { m/e/ }, (@:  < @Testing::EXPORT, < @Testing::EXPORT_OK)),
           'deny import by regex')
 main::ok( !defined &lifejacket, 'further denial' )
 
@@ -173,7 +173,7 @@ our @EXPORT_OK = qw (foo)
 sub foo {"This is foo"};
 sub bar {"This is bar"};
 
-package Moving::Target::Test;
+package Moving::Target::Test
 
 Moving::Target->import ('foo')
 
@@ -185,16 +185,16 @@ Moving::Target->import ('bar')
 
 main::ok (bar() eq "This is bar", "imported bar after EXPORT_OK changed")
 
-package The::Import;
+package The::Import
 
-use Exporter 'import';
+use Exporter 'import'
 
 main::ok(\&import \== \&Exporter::import, "imported the import routine")
 
 our @EXPORT = qw( wibble )
 sub wibble {return "wobble"};
 
-package Use::The::Import;
+package Use::The::Import
 
 The::Import->import
 

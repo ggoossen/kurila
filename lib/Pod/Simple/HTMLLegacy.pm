@@ -3,7 +3,7 @@ package Pod::Simple::HTMLLegacy
 
 
 our ($VERSION)
-use Getopt::Long;
+use Getopt::Long
 
 $VERSION = "5.01"
 
@@ -38,15 +38,15 @@ sub pod2html
         return help_message() if $help
     
 
-    for(@($infile, $outfile)) { $_ = undef unless defined and length }
+    for((@: $infile, $outfile)) { $_ = undef unless defined and length }
 
     if($verbose)
         warn sprintf "\%s version \%s\n", __PACKAGE__, $VERSION
         warn "OK, processed args [$(join ' ',@args)] ...\n"
         warn sprintf
             " Verbose: \%s\n Index: \%s\n Infile: \%s\n Outfile: \%s\n Title: \%s\n",
-            < map { defined($_) ?? $_ !! "(nil)" }, @(
-            $verbose,     $index,     $infile,     $outfile,     $title,)
+            < map { defined($_) ?? $_ !! "(nil)" }, @: 
+            $verbose,     $index,     $infile,     $outfile,     $title,
         
         *Pod::Simple::HTML::DEBUG = sub(){1}
     
@@ -72,7 +72,7 @@ sub help_message { print $^STDOUT, < _help_message() }
 
 sub _help_message
 
-    join '', @(
+    join '', @: 
 
         "[", __PACKAGE__, " version ", $VERSION, qq~]
 Usage:  pod2html --help --infile=<name> --outfile=<name>
@@ -92,7 +92,7 @@ Options:
 Note that pod2html is DEPRECATED, and this version implements only
  some of the options known to older versions.
 For more information, see 'perldoc pod2html'.
-~)
+~
 
 
 

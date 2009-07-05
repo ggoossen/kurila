@@ -9,8 +9,8 @@ sub foo($a, $b)
     my $d
     $c = "ok 3\n"
     $d = "ok 4\n"
-    do { my@($a, _, $c) = @("ok 9\n", "not ok 10\n", "ok 10\n");
-        @($x, $y) = @($a, $c); }
+    do { my(@: $a, _, $c) = (@: "ok 9\n", "not ok 10\n", "ok 10\n");
+        (@: $x, $y) = (@: $a, $c); }
     print $^STDOUT, $a, $b
     $c . $d
 
@@ -28,16 +28,16 @@ print $^STDOUT, $a,$b,$c,$d,$x,$y
 
 sub foo2($a, @< @b)
     my(@c, %d)
-    @c = @( "ok 13\n" )
+    @c = @:  "ok 13\n" 
     %d{+''} = "ok 14\n"
-    do { my@($a,@< @c) = @("ok 19\n", "ok 20\n"); @($x, $y) = @($a, < @c); }
+    do { my(@: $a,@< @c) = (@: "ok 19\n", "ok 20\n"); (@: $x, $y) = (@: $a, < @c); }
     print $^STDOUT, $a, < @b
     @c[0] . %d{?''}
 
 
 $a = "ok 15\n"
-@b = @( "ok 16\n" )
-@c = @( "ok 17\n" )
+@b = @:  "ok 16\n" 
+@c = @:  "ok 17\n" 
 %d{+''} = "ok 18\n"
 
 print $^STDOUT, &foo2("ok 11\n","ok 12\n")
@@ -68,7 +68,7 @@ print $^STDOUT, "ok 23\n"
 print $^STDOUT, "ok 24\n"
 print $^STDOUT, "ok 25\n"
 
-foreach my $i (@(26, 27))
+foreach my $i ((@: 26, 27))
     print $^STDOUT, "ok $i\n"
 
 
@@ -79,7 +79,7 @@ print $^STDOUT, "ok 29\n"
 print $^STDOUT, "ok 30\n"
 
 # Found in HTML::FormatPS
-my %fonts = %( < qw(nok 31) )
+my %fonts = %:  < qw(nok 31) 
 for my $full (keys %fonts)
     $full =~ s/^n//
     # Supposed to be copy-on-write via force_normal after a THINKFIRST check.

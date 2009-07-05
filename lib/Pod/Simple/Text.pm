@@ -8,13 +8,13 @@ use Pod::Simple::Methody ()
 use Pod::Simple ()
 our (@ISA, $VERSION, $FREAKYMODE)
 $VERSION = '2.02'
-@ISA = @('Pod::Simple::Methody')
+@ISA = @: 'Pod::Simple::Methody'
 BEGIN { *DEBUG = defined(&Pod::Simple::DEBUG)
     ?? \&Pod::Simple::DEBUG
     !! sub() {0}
 }
 
-use Text::Wrap v98.112902 ();
+use Text::Wrap v98.112902 ()
 $Text::Wrap::huge = 'overflow'
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -69,7 +69,7 @@ sub end_item_number { @_[0]->emit_par( 0) }
 sub end_item_text   { @_[0]->emit_par(-2) }
 
 sub emit_par
-    my@($self, $tweak_indent) = @: splice(@_,0,2)
+    my(@: $self, $tweak_indent) = @: splice(@_,0,2)
     my $indent = ' ' x ( 2 * $self->{?'Indent'} + 4 + ($tweak_indent||0) )
     # Yes, 'STRING' x NEGATIVE gives '', same as 'STRING' x 0
 

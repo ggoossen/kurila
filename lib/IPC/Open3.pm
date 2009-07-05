@@ -4,7 +4,7 @@ our ($VERSION, @ISA, @EXPORT)
 
 require Exporter
 
-use Symbol < qw(gensym qualify);
+use Symbol < qw(gensym qualify)
 
 $VERSION        = 1.02
 @ISA            = qw(Exporter)
@@ -177,7 +177,7 @@ my $do_spawn = $^OS_NAME eq 'os2' || $^OS_NAME eq 'MSWin32'
 
 sub _open3
     local $Me = shift
-    my@($package, $dad_wtr, $dad_rdr, $dad_err, @< @cmd) =  @_
+    my(@: $package, $dad_wtr, $dad_rdr, $dad_err, @< @cmd) =  @_
     my($dup_wtr, $dup_rdr, $dup_err, $kidpid)
 
     if ((nelems @cmd) +> 1 and @cmd[0] eq '-')
@@ -301,15 +301,15 @@ sub _open3
         
         require IO::Pipe
         $kidpid = try {
-            spawn_with_handles( \@( \%( mode => 'r',
-                                        open_as => $kid_rdr,
-                                        handle => $^STDIN ),
-                                        \%( mode => 'w',
-                                        open_as => $kid_wtr,
-                                        handle => $^STDOUT ),
-                                        \%( mode => 'w',
-                                        open_as => $kid_err,
-                                        handle => $^STDERR ),
+            spawn_with_handles( \(@:  \(%:  mode => 'r'
+                                          open_as => $kid_rdr
+                                          handle => $^STDIN )
+                                      \(%:  mode => 'w'
+                                              open_as => $kid_wtr
+                                              handle => $^STDOUT )
+                                      \(%:  mode => 'w'
+                                              open_as => $kid_err
+                                              handle => $^STDERR )
                                     ), \@close, < @cmd);
         }
         die "$Me: $^EVAL_ERROR" if $^EVAL_ERROR

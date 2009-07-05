@@ -9,22 +9,22 @@ our $VERSION = '1.10'
 
 B::OP->bootstrap($VERSION)
 
-@B::OP::ISA = @( 'B::OBJECT' )
-@B::UNOP::ISA = @( 'B::OP' )
-@B::BINOP::ISA = @( 'B::UNOP' )
-@B::LOGOP::ISA = @( 'B::UNOP' )
-@B::LISTOP::ISA = @( 'B::BINOP' )
-@B::SVOP::ISA = @( 'B::OP' )
-@B::PADOP::ISA = @( 'B::OP' )
-@B::PVOP::ISA = @( 'B::OP' )
-@B::LOOP::ISA = @( 'B::LISTOP' )
-@B::PMOP::ISA = @( 'B::LISTOP' )
-@B::COP::ISA = @( 'B::OP' )
-@B::ROOTOP::ISA = @( 'B::UNOP' )
+@B::OP::ISA = @:  'B::OBJECT' 
+@B::UNOP::ISA = @:  'B::OP' 
+@B::BINOP::ISA = @:  'B::UNOP' 
+@B::LOGOP::ISA = @:  'B::UNOP' 
+@B::LISTOP::ISA = @:  'B::BINOP' 
+@B::SVOP::ISA = @:  'B::OP' 
+@B::PADOP::ISA = @:  'B::OP' 
+@B::PVOP::ISA = @:  'B::OP' 
+@B::LOOP::ISA = @:  'B::LISTOP' 
+@B::PMOP::ISA = @:  'B::LISTOP' 
+@B::COP::ISA = @:  'B::OP' 
+@B::ROOTOP::ISA = @:  'B::UNOP' 
 
 @B::optype = qw(OP UNOP BINOP LOGOP LISTOP PMOP SVOP PADOP PVOP LOOP COP ROOTOP)
 
-use constant OP_LIST    => 141;    # MUST FIX CONSTANTS.
+use constant OP_LIST    => 141    # MUST FIX CONSTANTS.
 
 # This is where we implement op.c in Perl. Sssh.
 sub linklist
@@ -108,7 +108,7 @@ sub scope
             $o = B::LISTOP->new( "scope", 0, $o, undef )
         
     
-    return  @($o)
+    return  @: $o
 
 
 1

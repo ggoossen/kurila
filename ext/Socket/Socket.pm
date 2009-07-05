@@ -169,7 +169,7 @@ use Carp;
 use warnings::register;
 
 require Exporter
-use XSLoader ();
+use XSLoader ()
 @ISA = qw(Exporter)
 @EXPORT = qw(
 	inet_aton inet_ntoa
@@ -347,10 +347,10 @@ use XSLoader ();
 	       TCP_NODELAY
 	       TCP_STDURG)
 
-%EXPORT_TAGS = %(
-    crlf    => qw(CR LF CRLF $CR $LF $CRLF),
-    all     => @EXPORT +@+ @EXPORT_OK,
-    )
+%EXPORT_TAGS = %: 
+    crlf    => qw(CR LF CRLF $CR $LF $CRLF)
+    all     => @EXPORT +@+ @EXPORT_OK
+    
 
 BEGIN 
     sub CR   () {"\015"}

@@ -45,7 +45,7 @@ is($a, 'xyzxyz',        'x=1')
 $a x= 0
 is($a, '',              'x=0')
 
-my @x = @(1,2,3)
+my @x = @: 1,2,3
 
 is(join('', (@x x 4)),      '123123123123',         '(@x) x Y')
 is(join('', (@x x -14)),    '',                     '(@x) x -14')
@@ -108,7 +108,7 @@ is("\x[dd]" x 24, "\x[dddddddddddddddddddddddddddddddddddddddddddddddd]", 'Dec C
 
 # perlbug 20011113.110 works in 5.6.1, broken in 5.7.2
 do
-    my $x= \@(("foo") x 2)
+    my $x= \@: ("foo") x 2
     is( join('', $x->@), 'foofoo', 'list repeat in anon array ref broken [ID 20011113.110]' )
 
 
@@ -117,7 +117,7 @@ do
     local our $TODO = "x operator not copying elements in 'for' list? [ID 20010809.028]"
     my $x = 'abcd'
     my $y = ''
-    for (@($x =~ m/./g) x 2)
+    for ((@: $x =~ m/./g) x 2)
         $y .= chop
     
     is($y, 'abcdabcd')

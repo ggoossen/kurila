@@ -101,7 +101,7 @@ do # test package Pod::ParseTree
     is( $p_pt1->top( $p_pt1, $p_pt2 ), $p_pt1,
         'set new Pod::ParseTree->top()' )
 
-    ok( eq_array( \ $p_pt1->children(), \@( $p_pt1, $p_pt2) ),
+    ok( eq_array( \ $p_pt1->children(), \(@:  $p_pt1, $p_pt2) ),
         'Pod::ParseTree->children()' )
 
     my $text = 'This is the test suite.'

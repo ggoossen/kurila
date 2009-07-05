@@ -10,7 +10,7 @@ sub ok($pass, ?$err)
         $test = $test + 1 # Would be doubleplusbad to use ++ in the ++ test.
         return 1
     else
-        printf $^STDOUT, "not ok $test # line \%d\n", @(caller)[2]
+        printf $^STDOUT, "not ok $test # line \%d\n", (@: caller)[2]
     
     $test = $test + 1
     return
@@ -84,7 +84,7 @@ ok (!defined($a--), "postdec undef returns undef")
 
 sub check_same($orig, $suspect)
     my $fail
-    while (my @(?$key, ?$value) =@( each $suspect->%))
+    while (my (@: ?$key, ?$value) =(@:  each $suspect->%))
         if (exists $orig->{$key})
             if ($orig->{?$key} ne $value)
                 print $^STDOUT, "# key '$key' was '$orig->{?$key}' now '$value'\n"
@@ -104,9 +104,9 @@ sub check_same($orig, $suspect)
 
 
 my %orig = my %inc = my %dec = my %postinc = my %postdec
-    = %(1 => 1, ab => "ab")
-my %up = %(1=>2, ab => 'ac')
-my %down = %(1=>0, ab => -1)
+    = %: 1 => 1, ab => "ab"
+my %up = %: 1=>2, ab => 'ac'
+my %down = %: 1=>0, ab => -1
 
 foreach (keys %inc)
     my $ans = %up{?$_}
@@ -190,7 +190,7 @@ do
 # sparcs have a 112 bit mantissa for their long doubles. Just to be awkward :-)
 
 sub check_some_code
-    my @($start, $warn, $action, $description) =  @_
+    my (@: $start, $warn, $action, $description) =  @_
     my $warn_line = ($warn ?? 'use' !! 'no') . " warnings 'imprecision';"
     my @warnings
     local $^WARN_HOOK = sub (@< @_) {push @warnings, @_[0]->message}
@@ -243,11 +243,11 @@ for my $n (47..113)
             unless $start_p == $check
     
 
-    foreach my $warn (@(0, 1))
-        foreach (@(\@('++$i', 'pre-inc'), \@('$i++', 'post-inc')))
+    foreach my $warn ((@: 0, 1))
+        foreach ((@: \(@: '++$i', 'pre-inc'), \(@: '$i++', 'post-inc')))
             check_some_code($start_p, $warn, < $_->@)
         
-        foreach (@(\@('--$i', 'pre-dec'), \@('$i--', 'post-dec')))
+        foreach ((@: \(@: '--$i', 'pre-dec'), \(@: '$i--', 'post-dec')))
             check_some_code($start_n, $warn, < $_->@)
         
     
