@@ -196,7 +196,7 @@ do
     ++$test
 
     # Ditto.
-    eval(q{@nosuch = @('a', 'b', 'c'); ">$(join ' ', @nosuch)<" eq ">a b c<"})
+    eval(q{@nosuch = @: 'a', 'b', 'c'; ">$(join ' ', @nosuch)<" eq ">a b c<"})
         || print $^STDOUT, "# $^EVAL_ERROR", "not "
     print $^STDOUT, "ok $test\n"
     ++$test

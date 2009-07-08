@@ -18,8 +18,7 @@ sub output_extension   { 'pod' }
 
 sub new { return bless \%(), ref(@_[0]) || @_[0] }
 
-sub parse_from_file {
-  my@( $self, $in, $outfh ) =  @_;
+sub parse_from_file( $self, $in, $outfh )
 
   open(IN, "<", $in) or die "Can't read-open $in: $^OS_ERROR\nAborting";
 

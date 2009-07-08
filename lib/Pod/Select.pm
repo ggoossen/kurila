@@ -273,11 +273,9 @@ sub _init_headings
 
     ## Initialize current section heading titles if necessary
     unless (defined $self->%{?_SECTION_HEADINGS})
-        my $section_headings = $self->%{+_SECTION_HEADINGS} = \@()
+        my $section_headings = $self->%{+_SECTION_HEADINGS} = \$@
         for my $i (0..$MAX_HEADING_LEVEL-1)
             $section_headings->@[+$i] = ''
-        
-    
 
 
 ##---------------------------------------------------------------------------

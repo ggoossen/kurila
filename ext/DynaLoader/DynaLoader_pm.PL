@@ -109,13 +109,13 @@ sub dl_load_flags { 0x00 }
 EOT
 
 if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS'))
-    print $out, "our @(\$dl_dlext, \$dl_so, \$dlsrc) = @(",
+    print $out, "our \@: \$dl_dlext, \$dl_so, \$dlsrc = \@: ",
         < to_string(config_value('dlext')), ",",
         < to_string(config_value('so')), ",",
         < to_string(config_value('dlsrc')), ")\n;"
 else
     print $out, <<'EOT'
-our @($dl_dlext, $dl_so, $dlsrc) = map { config_value($_) }, qw(dlext so dlsrc);
+our @: $dl_dlext, $dl_so, $dlsrc = map { config_value($_) }, qw(dlext so dlsrc);
 EOT
 
 
@@ -135,9 +135,9 @@ my $Mac_FS;
 $Mac_FS = try { require Mac::FileSpec::Unixish };
 <</$^O-eq-MacOS>>
 
-our @dl_require_symbols = @();       # names of symbols we need
-our @dl_resolve_using   = @();       # names of files to link with
-our @dl_library_path    = @();       # path to look for files
+our @dl_require_symbols = $@;       # names of symbols we need
+our @dl_resolve_using   = $@;       # names of files to link with
+our @dl_library_path    = $@;       # path to look for files
 
 #XSLoader.pm may have added elements before we were required
 our @dl_shared_objects;       # shared objects for symbols we have
@@ -334,7 +334,7 @@ sub bootstrap {
         push @dirs, $dir;
     }
     # last resort, let dl_findfile have a go in all known locations
-    @(?$file) = dl_findfile(< map({ "-L$_" } ,@(<@dirs,<$^INCLUDE_PATH)), $modfname) unless $file;
+    @: ?$file = dl_findfile(< map({ "-L$_" } , @dirs +@+ $^INCLUDE_PATH), $modfname) unless $file;
 
     die("Can't locate loadable object for module $module in \$^INCLUDE_PATH (\$^INCLUDE_PATH contains: $(join ' ', $^INCLUDE_PATH))")
         unless $file;   # wording similar to error from 'require'
@@ -342,7 +342,7 @@ sub bootstrap {
     <<$^O-eq-VMS>>$file = uc($file) if config_value("d_vms_case_sensitive_symbols");<</$^O-eq-VMS>>
     my $bootname = "boot_$module";
     $bootname =~ s/\W/_/g;
-    @dl_require_symbols = @($bootname);
+    @dl_require_symbols = @: $bootname;
 
     # Execute optional '.bootstrap' perl script for this module.
     # The .bs file can be used to configure @dl_resolve_using etc to
@@ -453,7 +453,7 @@ sub dl_findfile {
             my(@names, $name);    # what filenames to look for
             s/^-l//;
             push(@names, $_);
-            foreach my $dir (@(<@dirs, <@dl_library_path)) {
+            foreach my $dir (@dirs +@+ @dl_library_path) {
                 next unless -d $dir;
                 $dir =~ s/^([^:]+)$/:$1/;
                 $dir =~ s/:$//;
@@ -502,7 +502,7 @@ sub dl_findfile {
             @dl_library_path = map { "$drive:$_" }, @dl_library_path;
         }
         <</$^O-eq-symbian>>
-        foreach my $dir (@(<@dirs, <@dl_library_path)) {
+        foreach my $dir (@dirs +@+ @dl_library_path) {
             next unless -d $dir;
             <<$^O-eq-VMS>>
             chop($dir = VMS::Filespec::unixpath($dir));
