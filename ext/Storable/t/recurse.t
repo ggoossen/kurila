@@ -172,14 +172,14 @@ package Foo
 sub new
     my $class = shift
     my $dat = shift
-    return bless \%(dat => $dat), $class
+    return bless \(%: dat => $dat), $class
 
 
 package Bar
 sub new
     my $class = shift
-    return bless \%(
-        a => 'dummy',
+    return bless \(%: 
+        a => 'dummy'
         b => \@: 
             Foo->new(1)
             Foo->new(2) # Second instance of a Foo
@@ -279,7 +279,7 @@ sub new
 sub STORABLE_freeze(?$obj, ...)
     return @: "", $obj, Foo2->new
 
-
+                  
 sub STORABLE_thaw { } # Not really used
 
 package main

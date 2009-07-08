@@ -172,11 +172,11 @@ ok( $_ eq 'aabbcc  224466xxyyzz' )
 # test recursive substitutions
 # code based on the recursive expansion of makefile variables
 
-my %MK = %(
-    AAAAA => '$(B)', B=>'$(C)', C => 'D',			# long->short
-    E     => '$(F)', F=>'p $(G) q', G => 'HHHHH',	# short->long
-    DIR => '$(UNDEFINEDNAME)/xxx',
-    )
+my %MK = %: 
+    AAAAA => '$(B)', B=>'$(C)', C => 'D'			# long->short
+    E     => '$(F)', F=>'p $(G) q', G => 'HHHHH'	# short->long
+    DIR => '$(UNDEFINEDNAME)/xxx'
+    
 sub var($var,$level)
     return "\$($var)" unless exists %MK{$var}
     return exp_vars(%MK{?$var}, $level+1) # can recurse

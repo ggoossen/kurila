@@ -34,9 +34,9 @@ is_deeply( \sort(&show_fields('Foo', fields::PRIVATE)),
 
 foreach ((@: Foo->new))
     my $obj = $_
-    my %test = %( Pants => 'Whatever', _no => 'Yeah',
-        what  => 'Ahh',      who => 'Moo',
-        _up_yours => 'Yip' )
+    my %test = %:  Pants => 'Whatever', _no => 'Yeah'
+                   what  => 'Ahh',      who => 'Moo'
+                   _up_yours => 'Yip' 
 
     $obj->{+Pants} = 'Whatever'
     $obj->{+_no}   = 'Yeah'
@@ -66,7 +66,7 @@ do
     package main
     my $a = Foo::Autoviv->new()
     $a->{+foo} = \@: 'a', 'ok', 'c'
-    $a->{+bar} = \%( A => 'ok' )
+    $a->{+bar} = \%:  A => 'ok' 
     is( $a->{foo}->[1],    'ok' )
     is( $a->{bar}->{?A},, 'ok' )
 

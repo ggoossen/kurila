@@ -78,28 +78,28 @@ use Perl6::Form
 
 our(%Kinds, %Type, %Flavor)
 
-our %Type_Description = %(
-    'ARRAY'	=> 'Functions for real @ARRAYs',
-    'Binary'	=> 'Functions for fixed length data or records',
-    'File'	=> 'Functions for filehandles, files, or directories',
-    'Flow'	=> 'Keywords related to control flow of your perl program',
-    'HASH'	=> 'Functions for real %HASHes',
-    'I/O'	=> 'Input and output functions',
-    'LIST'	=> 'Functions for list data',
-    'Math'	=> 'Numeric functions',
-    'Misc'	=> 'Miscellaneous functions',
-    'Modules'	=> 'Keywords related to perl modules',
-    'Network'	=> 'Fetching network info',
-    'Objects'	=> 'Keywords related to classes and object-orientedness',
-    'Process'	=> 'Functions for processes and process groups',
-    'Regexp'	=> 'Regular expressions and pattern matching',
-    'Socket'	=> 'Low-level socket functions',
-    'String'	=> 'Functions for SCALARs or strings',
-    'SysV'	=> 'System V interprocess communication functions',
-    'Time'	=> 'Time-related functions',
-    'User'	=> 'Fetching user and group info',
-    'Namespace'	=> 'Keywords altering or affecting scoping of identifiers',
-    )
+our %Type_Description = %: 
+    'ARRAY'	=> 'Functions for real @ARRAYs'
+    'Binary'	=> 'Functions for fixed length data or records'
+    'File'	=> 'Functions for filehandles, files, or directories'
+    'Flow'	=> 'Keywords related to control flow of your perl program'
+    'HASH'	=> 'Functions for real %HASHes'
+    'I/O'	=> 'Input and output functions'
+    'LIST'	=> 'Functions for list data'
+    'Math'	=> 'Numeric functions'
+    'Misc'	=> 'Miscellaneous functions'
+    'Modules'	=> 'Keywords related to perl modules'
+    'Network'	=> 'Fetching network info'
+    'Objects'	=> 'Keywords related to classes and object-orientedness'
+    'Process'	=> 'Functions for processes and process groups'
+    'Regexp'	=> 'Regular expressions and pattern matching'
+    'Socket'	=> 'Low-level socket functions'
+    'String'	=> 'Functions for SCALARs or strings'
+    'SysV'	=> 'System V interprocess communication functions'
+    'Time'	=> 'Time-related functions'
+    'User'	=> 'Fetching user and group info'
+    'Namespace'	=> 'Keywords altering or affecting scoping of identifiers'
+    
 
 our @Type_Order = qw{
     String

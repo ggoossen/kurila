@@ -23,7 +23,7 @@ our (@RESTRICT_TESTS, %R_HASH, %U_HASH, $UTF8_CROAK, $RESTRICTED_CROAK)
 @RESTRICT_TESTS = @: 'Locked hash', 'Locked hash placeholder'
                      'Locked keys', 'Locked keys placeholder'
     
-%R_HASH = %(perl => 'rules')
+%R_HASH = %: perl => 'rules'
 
 do
     # This is cheating. "\xdf" in Latin 1 is beta S, so will match \w if it
@@ -38,7 +38,7 @@ do
     # an a circumflex, so we need to be explicit.
 
     my $a_circumflex = "\x[e5]" # a byte.
-    %U_HASH = %(< @+: map { @: $_, $_}, (@:  'castle', "ch$($a_circumflex)teau", $utf8, chr 0x57CE))
+    %U_HASH = %: < @+: map { @: $_, $_}, (@:  'castle', "ch$($a_circumflex)teau", $utf8, chr 0x57CE)
     plan tests => 162
 
 

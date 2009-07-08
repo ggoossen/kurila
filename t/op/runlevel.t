@@ -20,7 +20,7 @@ for ( @prgs)
     
     my(@: $prog,$expected) =  split(m/\nEXPECT\n/, $_)
 
-    fresh_perl_is( $prog, $expected, \%( switch => $switch, stderr => 1, ) )
+    fresh_perl_is( $prog, $expected, \(%:  switch => $switch, stderr => 1, ) )
 
 
 __END__

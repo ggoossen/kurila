@@ -8,7 +8,7 @@
 # This program is free software; you may redistribute it and/or modify it
 # under the same terms as Perl itself.
 
-use TestInit;
+use TestInit
 
 BEGIN 
     $^OUTPUT_AUTOFLUSH = 1

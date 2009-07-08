@@ -52,11 +52,11 @@ do
         main::ok( Testing->can($meth), "subclass can $meth()" )
     
 
-    our %EXPORT_TAGS = %(
-        This => qw(stuff %left),
-        That => qw(Above the @wailing),
-        tray => qw(Fasten $seatbelt),
-        )
+    our %EXPORT_TAGS = %: 
+        This => qw(stuff %left)
+        That => qw(Above the @wailing)
+        tray => qw(Fasten $seatbelt)
+        
     our @EXPORT    = qw(lifejacket is)
     our @EXPORT_OK = qw(under &your $seat)
     our $VERSION = '1.05'
@@ -77,7 +77,7 @@ do
     $seatbelt = 'seatbelt'
     $seat     = 'seat'
     @wailing = qw(AHHHHHH)
-    %left = %( left => "right" )
+    %left = %:  left => "right" 
 
     sub Is { 'Is' };
     BEGIN {*is = \&Is};

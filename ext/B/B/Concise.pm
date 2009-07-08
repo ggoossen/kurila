@@ -19,10 +19,10 @@ our @EXPORT_OK = qw( set_style set_style_standard add_callback
                      concise_subref concise_cv concise_main
                      add_style walk_output compile reset_sequence )
 our %EXPORT_TAGS =
-    %( io       => qw( walk_output compile reset_sequence ),
-    style       => qw( add_style set_style_standard ),
-    cb  => qw( add_callback ),
-    mech        => qw( concise_subref concise_cv concise_main ),  )
+    (%:  io       => qw( walk_output compile reset_sequence )
+         style       => qw( add_style set_style_standard )
+         cb  => qw( add_callback )
+         mech        => qw( concise_subref concise_cv concise_main ),  )
 
 # use #6
 use B < qw(class ppname main_start main_root main_cv cstring svref_2object
@@ -30,30 +30,30 @@ use B < qw(class ppname main_start main_root main_cv cstring svref_2object
          CVf_ANON PAD_FAKELEX_ANON PAD_FAKELEX_MULTI SVf_ROK)
 
 my %style =
-    %("terse" =>
-    \(@: "(?(#label =>\n)?)(*(    )*)#class (#addr) #name (?([#targ])?) "
+    (%: "terse" =>
+        \(@: "(?(#label =>\n)?)(*(    )*)#class (#addr) #name (?([#targ])?) "
              . "#svclass~(?((#svaddr))?)~#svval~(?(label \"#coplabel\")?)\n"
          "(*(    )*)goto #class (#addr)\n"
-         "#class pp_#name"),
-    "concise" =>
-    \(@: "#hyphseq2 (*(   (x( ;)x))*)<#classsym> #exname#arg(?([#targarglife])?)"
+         "#class pp_#name")
+        "concise" =>
+        \(@: "#hyphseq2 (*(   (x( ;)x))*)<#classsym> #exname#arg(?([#targarglife])?)"
              . "~#flags(?(/#private)?)(?(:#hints)?)(x(;~->#next)x)\n"
              , "  (*(    )*)     goto #seq\n"
-         "(?(<#seq>)?)#exname#arg(?([#targarglife])?)"),
-    "linenoise" =>
-    \(@: "(x(;(*( )*))x)#noise#arg(?([#targarg])?)(x( ;\n)x)"
+         "(?(<#seq>)?)#exname#arg(?([#targarglife])?)")
+        "linenoise" =>
+        \(@: "(x(;(*( )*))x)#noise#arg(?([#targarg])?)(x( ;\n)x)"
          "gt_#seq "
-         "(?(#seq)?)#noise#arg(?([#targarg])?)"),
-    "debug" =>
-    \(@: "#class (#addr)\n\top_next\t\t#nextaddr\n\top_sibling\t#sibaddr\n\t"
+         "(?(#seq)?)#noise#arg(?([#targarg])?)")
+        "debug" =>
+        \(@: "#class (#addr)\n\top_next\t\t#nextaddr\n\top_sibling\t#sibaddr\n\t"
              . "op_ppaddr\tPL_ppaddr[OP_#NAME]\n\top_type\t\t#typenum\n"
              . "\top_flags\t#flagval\n\top_private\t#privval\t#hintsval\n"
              . "(?(\top_first\t#firstaddr\n)?)(?(\top_last\t\t#lastaddr\n)?)"
              . "(?(\top_sv\t\t#svaddr\n)?)"
          "    GOTO #addr\n"
-         "#addr"),
-    "env" => \(@: env::var('B_CONCISE_FORMAT'), env::var('B_CONCISE_GOTO_FORMAT')
-                  env::var('B_CONCISE_TREE_FORMAT')),
+         "#addr")
+        "env" => \(@: env::var('B_CONCISE_FORMAT'), env::var('B_CONCISE_GOTO_FORMAT')
+                  env::var('B_CONCISE_TREE_FORMAT'))
     )
 
 # Renderings, ie how Concise prints, is controlled by these vars
@@ -351,11 +351,11 @@ sub compile
 my %labels
 my $lastnext    # remembers op-chain, used to insert gotos
 
-my %opclass = %('OP' => "0", 'UNOP' => "1", 'BINOP' => "2", 'LOGOP' => "|",
-    'LISTOP' => "@", 'PMOP' => "/", 'SVOP' => "\$", 'GVOP' => "*",
-    'PVOP' => '"', 'LOOP' => "\{", 'COP' => ";", 'PADOP' => "#",
-    'ROOTOP' => '!',
-    )
+my %opclass = %: 'OP' => "0", 'UNOP' => "1", 'BINOP' => "2", 'LOGOP' => "|"
+                 'LISTOP' => "@", 'PMOP' => "/", 'SVOP' => "\$", 'GVOP' => "*"
+                 'PVOP' => '"', 'LOOP' => "\{", 'COP' => ";", 'PADOP' => "#"
+                 'ROOTOP' => '!'
+    
 
 no warnings 'qw' # "Possible attempt to put comments..."; use #7
 my @linenoise =
@@ -578,8 +578,8 @@ for (@: "gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv"
         "enteriter")
     %priv{+$_}{+16} = "OURINTR" 
 for (@: (< @+: map( {(@: $_,"s$_") }, (@: "chop", "chomp")) )
-        (< @+: map( {(@: $_,"i_$_") },
-                 @: "postinc", "postdec", "multiply", "divide", "modulo"
+        (< @+: map( {(@: $_,"i_$_") }
+        @: "postinc", "postdec", "multiply", "divide", "modulo"
                     "add", "subtract", "negate"))
         "pow", "concat", "stringify"
         "left_shift", "right_shift", "bit_and", "bit_xor", "bit_or"
@@ -858,10 +858,10 @@ sub concise_op($op, $level, $format)
 sub B::OP::concise($op, $level)
     if ($order eq "exec" and $lastnext and $lastnext->$ != $op->$)
         # insert a 'goto' line
-        my $synth = \%("seq" => seq($lastnext), "class" => class($lastnext),
-            "addr" => sprintf("\%#x", $lastnext->$),
-            "goto" => seq($lastnext), # simplify goto '-' removal
-            )
+        my $synth = \%: "seq" => seq($lastnext), "class" => class($lastnext)
+                        "addr" => sprintf("\%#x", $lastnext->$)
+                        "goto" => seq($lastnext) # simplify goto '-' removal
+            
         print $walkHandle, fmt_line($synth, $op, $gotofmt, $level+1)
     
     $lastnext = $op->next
@@ -884,8 +884,8 @@ sub b_terse($op, $level)
 
     if ($order eq "exec" and $lastnext and $lastnext->$ != $op->$)
         # insert a 'goto'
-        my $h = \%("seq" => seq($lastnext), "class" => class($lastnext),
-            "addr" => sprintf("\%#x", $lastnext->$))
+        my $h = \%: "seq" => seq($lastnext), "class" => class($lastnext)
+                    "addr" => sprintf("\%#x", $lastnext->$)
         print $^STDOUT, # $walkHandle
             fmt_line($h, $op, %style{"terse"}->[1], $level+1)
     

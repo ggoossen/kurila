@@ -104,9 +104,9 @@ sub check_same($orig, $suspect)
 
 
 my %orig = my %inc = my %dec = my %postinc = my %postdec
-    = %(1 => 1, ab => "ab")
-my %up = %(1=>2, ab => 'ac')
-my %down = %(1=>0, ab => -1)
+    = %: 1 => 1, ab => "ab"
+my %up = %: 1=>2, ab => 'ac'
+my %down = %: 1=>0, ab => -1
 
 foreach (keys %inc)
     my $ans = %up{?$_}

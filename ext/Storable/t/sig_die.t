@@ -35,6 +35,6 @@ $^DIE_HOOK  = sub (@< @_) { require Carp; warn < Carp::longmess(); warn "Evil di
 
 require Storable
 
-Storable::dclone(\%(foo => "bar"))
+Storable::dclone(\(%: foo => "bar"))
 
 is(join("", @warns), "", "__DIE__ is not evil here")

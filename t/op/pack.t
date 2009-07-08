@@ -499,7 +499,7 @@ foreach (@:
     \(@: 'p', 'Z11', "foo\0bar\0 ", "foo\0bar\0 \0\0")
     \(@: 'p', 'Z3',  "foo",         "fo\0")
     \(@: 'u', 'Z*',  "foo\0bar \0", "foo")
-    \(@: 'u', 'Z8',  "foo\0bar \0", "foo"),
+    \(@: 'u', 'Z8',  "foo\0bar \0", "foo")
     )
     my (@: $what, $template, $in, $out) =  $_->@
     my $got = $what eq 'u' ?? (unpack $template, $in) !! (pack $template, $in)
@@ -852,7 +852,7 @@ do
     foreach (@: 
            \(@: 'a/a*/a*', '212ab345678901234567','ab3456789012')
            \(@: 'a/a*/a*', '3012ab345678901234567', 'ab3456789012')
-           \(@: 'a/a*/b*', '212ab', '100001100100'),
+           \(@: 'a/a*/b*', '212ab', '100001100100')
         )
         my (@: $pat, $in, $expect) =  $_->@
         undef $x
@@ -994,7 +994,7 @@ foreach (@:
          \(@: 'a5Xa5', "cameL", "llama", "camellama")
          \(@: '@4', 'N', "\0"x4)
          \(@: 'a*@8a*', 'Camel', 'Dromedary', "Camel\0\0\0Dromedary")
-         \(@: 'a*@4a', 'Perl rules', '!', 'Perl!'),
+         \(@: 'a*@4a', 'Perl rules', '!', 'Perl!')
     )
     my (@: $template, @< @in) =  $_->@
     my $out = pop @in
@@ -1013,7 +1013,7 @@ foreach (@:
          \(@: 'a5Xa5', "camellama", "camel", "llama")
          \(@: '@3', "ice")
          \(@: '@2a2', "water", "te")
-         \(@: 'a*@1a3', "steam", "steam", "tea"),
+         \(@: 'a*@1a3', "steam", "steam", "tea")
     )
     my (@: $template, $in, @< @out) =  $_->@
     my @got = @:  try {unpack $template, $in} 
@@ -1085,18 +1085,18 @@ do
         return $t
     
 
-    my %templates = %(
-        's<'                  => \(@: -42),
-        's<c2x![S]S<'         => \(@: -42, -11, 12, 4711),
+    my %templates = %: 
+        's<'                  => \(@: -42)
+        's<c2x![S]S<'         => \(@: -42, -11, 12, 4711)
         '(i<j<[s]l<)3'        => \(@: -11, -22, -33, 1000000, 1100, 2201, 3302
-                                      -1000000, 32767, -32768, 1, -123456789 ),
-        '(I!<4(J<2L<)3)5'     => \(1 .. 65),
-        'q<Q<'                => \(@: -50000000005, 60000000006),
-        'f<F<d<'              => \(@: 3.14159, 111.11, 2222.22),
-        'D<cCD<'              => \(@: 1e42, -128, 255, 1e-42),
-        'n/a*'                => \(@: '/usr/bin/perl'),
-        'C/a*S</A*L</Z*I</a*' => \qw(Just another Perl hacker),
-        )
+                                      -1000000, 32767, -32768, 1, -123456789 )
+        '(I!<4(J<2L<)3)5'     => \(1 .. 65)
+        'q<Q<'                => \(@: -50000000005, 60000000006)
+        'f<F<d<'              => \(@: 3.14159, 111.11, 2222.22)
+        'D<cCD<'              => \(@: 1e42, -128, 255, 1e-42)
+        'n/a*'                => \(@: '/usr/bin/perl')
+        'C/a*S</A*L</Z*I</a*' => \qw(Just another Perl hacker)
+        
 
     for my $tle (sort keys %templates)
         my @d = %templates{?$tle}->@
@@ -1313,17 +1313,17 @@ do  # Repeat count [SUBEXPR]
 
     my %val
     %val{[ @codes]} =  map {
-        my %( 1 => $v, ...) =
-            %( $( m/ [Xx] /x )=> undef,
-            $( m/ [AZa] /x )=> 'something',
-            $( m/ C     /x )=> 214,
-            $( m/ W     /x )=> 188,
-            $( m/ c     /x )=> 114,
-            $( m/ [Bb]  /x )=> '101',
-            $( m/ [Hh]  /x )=> 'b8',
-            $( m/ [svnSiIlVNLqQjJ]  /x )=> 10111,
-            $( m/ [FfDd]  /x )=> 1.36514538e67,
-            $( m/ [pP]  /x )=> "try this buffer",
+        my (%:  1 => $v, ...) =
+            (%:  $( m/ [Xx] /x )=> undef
+                 $( m/ [AZa] /x )=> 'something'
+                 $( m/ C     /x )=> 214
+                 $( m/ W     /x )=> 188
+                 $( m/ c     /x )=> 114
+                 $( m/ [Bb]  /x )=> '101'
+                 $( m/ [Hh]  /x )=> 'b8'
+                 $( m/ [svnSiIlVNLqQjJ]  /x )=> 10111
+                 $( m/ [FfDd]  /x )=> 1.36514538e67
+                 $( m/ [pP]  /x )=> "try this buffer"
             );
         $v;
       }, @codes
@@ -1433,7 +1433,7 @@ SKIP: do
 
 # Maybe this knowledge needs to be "global" for all of pack.t
 # Or a "can checksum" which would effectively be all the number types"
-my %cant_checksum = %( < @+: map { @: $_=> 1 }, qw(A Z u w) )
+my %cant_checksum = (%:  < @+: map { @: $_=> 1 }, qw(A Z u w) )
 # not a b B h H
 foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w))
     SKIP: do
@@ -1555,31 +1555,31 @@ do
         # [expected result,
         #  how many chars it should progress,
         #  (optional) expected result of pack]
-        %(a5 => \(@: "\x[f8f9fafbfc]", 5),
-        A5 => \(@: "\x[f8f9fafbfc]", 5),
-        Z5 => \(@: "\x[f8f9fafbfc]", 5, "\x[f8f9fafb00fd]"),
-        b21 => \(@: "000111111001111101011", 3, "\x[f8f91afb]"),
-        B21 => \(@: "111110001111100111111", 3, "\x[f8f9f8fb]"),
-        H5 => \(@: "f8f9f", 3, "\x[f8f9f0fb]"),
-        h5 => \(@: "8f9fa", 3, "\x[f8f90afb]"),
-        "s<"  => \(@: -1544, 2),
-        "s>"  => \(@: -1799, 2),
-        "S<"  => \(@: 0xf9f8, 2),
-        "S>"  => \(@: 0xf8f9, 2),
-        "l<"  => \(@: -67438088, 4),
-        "l>"  => \(@: -117835013, 4),
-        "L>"  => \(@: 0xf8f9fafb, 4),
-        "L<"  => \(@: 0xfbfaf9f8, 4),
-        n     => \(@: 0xf8f9, 2),
-        N     => \(@: 0xf8f9fafb, 4),
-        v     => \(@: 63992, 2),
-        V     => \(@: 0xfbfaf9f8, 4),
-        c     => \(@: -8, 1),
-        # (invalid unicode) U0U   => \@(0xf8, 1),
-        w     => \(@: "8715569050387726213", 9),
-        q     => \(@: "-283686952306184", 8),
-        Q     => \(@: "18446460386757245432", 8),
-        )
+        %: a5 => \(@: "\x[f8f9fafbfc]", 5)
+           A5 => \(@: "\x[f8f9fafbfc]", 5)
+           Z5 => \(@: "\x[f8f9fafbfc]", 5, "\x[f8f9fafb00fd]")
+           b21 => \(@: "000111111001111101011", 3, "\x[f8f91afb]")
+           B21 => \(@: "111110001111100111111", 3, "\x[f8f9f8fb]")
+           H5 => \(@: "f8f9f", 3, "\x[f8f9f0fb]")
+           h5 => \(@: "8f9fa", 3, "\x[f8f90afb]")
+           "s<"  => \(@: -1544, 2)
+           "s>"  => \(@: -1799, 2)
+           "S<"  => \(@: 0xf9f8, 2)
+           "S>"  => \(@: 0xf8f9, 2)
+           "l<"  => \(@: -67438088, 4)
+           "l>"  => \(@: -117835013, 4)
+           "L>"  => \(@: 0xf8f9fafb, 4)
+           "L<"  => \(@: 0xfbfaf9f8, 4)
+           n     => \(@: 0xf8f9, 2)
+           N     => \(@: 0xf8f9fafb, 4)
+           v     => \(@: 63992, 2)
+           V     => \(@: 0xfbfaf9f8, 4)
+           c     => \(@: -8, 1)
+           # (invalid unicode) U0U   => \@(0xf8, 1),
+           w     => \(@: "8715569050387726213", 9)
+           q     => \(@: "-283686952306184", 8)
+           Q     => \(@: "18446460386757245432", 8)
+        
 
     for my $string ((@: $down, $up))
         for my $format (sort {lc($a) cmp lc($b) || $a cmp $b }, keys %expect)

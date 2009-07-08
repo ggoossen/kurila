@@ -69,25 +69,25 @@ sub process_file
 
     # Allow for $package->process_file(%hash) in the future
     my (@: $pkg, %< %args) = (nelems @_) % 2 ?? @_ !! @: __PACKAGE__, < @_
-
+                                                             
     $ProtoUsed = exists %args{prototypes}
 
     # Set defaults.
-    %args = %(
+    %args = (%: 
         # 'C++' => 0, # Doesn't seem to *do* anything...
-        hiertype => 0,
-        except => 0,
-        prototypes => 0,
-        versioncheck => 1,
-        linenumbers => 1,
-        optimize => 1,
-        prototypes => 0,
-        inout => 1,
-        argtypes => 1,
-        typemap => \$@,
-        output => $^STDOUT,
-        csuffix => '.c',
-        < %args,
+        hiertype => 0
+        except => 0
+        prototypes => 0
+        versioncheck => 1
+        linenumbers => 1
+        optimize => 1
+        prototypes => 0
+        inout => 1
+        argtypes => 1
+        typemap => \$@
+        output => $^STDOUT
+        csuffix => '.c'
+        < %args
         )
 
     # Global Constants
@@ -98,7 +98,7 @@ sub process_file
         require ExtUtils::XSSymSet
         $SymSet = ExtUtils::XSSymSet->new( 28)
     
-    @XSStack = @: \%(type => 'none')
+    @XSStack = @: \%: type => 'none'
     (@: $XSS_work_idx, $cpp_next_tmp) = @: 0, "XSubPPtmpAAAA"
     @InitFileCode = $@
     $FH = Symbol::gensym()
@@ -449,7 +449,7 @@ EOF
 
 
 sub process_para
-    my %args = %( < @_ )
+    my %args = (%:  < @_ )
 
     # Print initial preprocessor statements and blank lines
     while ((nelems @line) && @line[0] !~ m/^[^\#]/)
@@ -459,7 +459,7 @@ sub process_para
         my $statement = $1
         if ($statement =~ m/^if/)
             $XSS_work_idx = (nelems @XSStack)
-            push(@XSStack, \%(type => 'if'))
+            push(@XSStack, \(%: type => 'if'))
         else
             death ("Error: `$statement' with no matching `if'")
                 if @XSStack[-1]->{?type} ne 'if'
@@ -1336,10 +1336,10 @@ sub FALLBACK_handler()
     # FALSE or UNDEF
 
     $_ = TrimWhitespace($_) 
-    my %map = %(
-        TRUE => "&PL_sv_yes", 1 => "&PL_sv_yes",
-        FALSE => "&PL_sv_no", 0 => "&PL_sv_no",
-        UNDEF => "&PL_sv_undef",
+    my %map = (%: 
+        TRUE => "&PL_sv_yes", 1 => "&PL_sv_yes"
+        FALSE => "&PL_sv_no", 0 => "&PL_sv_no"
+        UNDEF => "&PL_sv_undef"
         ) 
 
     # check for valid FALLBACK value
@@ -1465,15 +1465,15 @@ sub INCLUDE_handler ()
     ++ %IncludedFiles{+$_} unless m/\|\s*$/ 
 
     # Save the current file context.
-    push(@XSStack, \%(
-        type            => 'file',
-        LastLine        => $lastline,
-        LastLineNo      => $lastline_no,
-        Line            => \@line,
-        LineNo          => \@line_no,
-        Filename        => $filename,
-        Filepathname    => $filepathname,
-        Handle          => $FH,
+    push(@XSStack, \(%: 
+        type            => 'file'
+        LastLine        => $lastline
+        LastLineNo      => $lastline_no
+        Line            => \@line
+        LineNo          => \@line_no
+        Filename        => $filename
+        Filepathname    => $filepathname
+        Handle          => $FH
         )) 
 
     $FH = Symbol::gensym()
@@ -1881,9 +1881,9 @@ sub PUSHED($class, $mode, $fh)
     $mcfile =~ s/\\/\\\\/g
     $SECTION_END_MARKER = qq{#line --- "$mcfile"}
 
-    return bless \%(buffer => '',
-        fh => $fh,
-        line_no => 1,
+    return bless \(%: buffer => ''
+                      fh => $fh
+                      line_no => 1
         ), $class
 
 

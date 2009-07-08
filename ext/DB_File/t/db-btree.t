@@ -134,7 +134,7 @@ do
     my (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
            $blksize,$blocks) = @: stat($Dfile)
 
-    my %noMode = %( < @+: map { @: $_, 1 }, qw( amigaos MSWin32 NetWare cygwin ) ) 
+    my %noMode = %:  < @+: map { @: $_, 1 }, qw( amigaos MSWin32 NetWare cygwin )  
 
     ok( ($mode ^&^ 0777) == (($^OS_NAME eq 'os2' || $^OS_NAME eq 'MacOS') ?? 0666 !! 0640)
         || %noMode{?$^OS_NAME} )
@@ -451,13 +451,13 @@ do
 
 
 # hash
-my %unknown = %( < %hh->get_dup('Unknown', 1) ) 
+my %unknown = %:  < %hh->get_dup('Unknown', 1)  
 ok( ! %unknown )
 
-my %smith = %( < %hh->get_dup('Smith', 1) ) 
+my %smith = %:  < %hh->get_dup('Smith', 1)  
 ok( nkeys %smith == 1 && %smith{?'John'}) 
 
-my %wall = %( < %hh->get_dup('Wall', 1) ) 
+my %wall = %:  < %hh->get_dup('Wall', 1)  
 ok( nkeys %wall == 3 && %wall{?'Larry'} == 1 && %wall{?'Stone'} == 1
     && %wall{?'Brick'} == 2)
 

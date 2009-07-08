@@ -6,7 +6,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't' if -d 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -43,18 +43,18 @@ do
 
     WriteMakefile(
         NAME            => 'Big::Dummy',
-        PREREQ_PM       => %(
+        PREREQ_PM       => %: 
         error  => 0
-        )
+        
         )
     is $warnings, ''
 
     $warnings = ''
     WriteMakefile(
         NAME            => 'Big::Dummy',
-        PREREQ_PM       => %(
+        PREREQ_PM       => %: 
         error  => 99999
-        )
+        
         )
     is $warnings,
        sprintf("Warning: prerequisite error 99999 not found. We have \%s.\n",
@@ -63,9 +63,9 @@ do
     $warnings = ''
     WriteMakefile(
         NAME            => 'Big::Dummy',
-        PREREQ_PM       => %(
-        "I::Do::Not::Exist" => 0,
-        )
+        PREREQ_PM       => %: 
+        "I::Do::Not::Exist" => 0
+        
         )
     is $warnings,
        "Warning: prerequisite I::Do::Not::Exist 0 not found."
@@ -73,10 +73,10 @@ do
     $warnings = ''
     WriteMakefile(
         NAME            => 'Big::Dummy',
-        PREREQ_PM       => %(
-        "I::Do::Not::Exist" => 0,
-        "error"            => 99999,
-        )
+        PREREQ_PM       => %: 
+        "I::Do::Not::Exist" => 0
+        "error"            => 99999
+        
         )
     is $warnings,
        "Warning: prerequisite I::Do::Not::Exist 0 not found.".
@@ -87,10 +87,10 @@ do
     try {
         WriteMakefile(
             NAME            => 'Big::Dummy',
-            PREREQ_PM       => %(
-            "I::Do::Not::Exist" => 0,
-            "Nor::Do::I"        => 0,
-            "error"            => 99999,
+            PREREQ_PM       => (%: 
+            "I::Do::Not::Exist" => 0
+            "Nor::Do::I"        => 0
+            "error"            => 99999
             ),
             PREREQ_FATAL    => 1,
             );
@@ -111,8 +111,8 @@ END
     try {
         WriteMakefile(
             NAME            => 'Big::Dummy',
-            PREREQ_PM       => %(
-            "I::Do::Not::Exist" => 0,
+            PREREQ_PM       => (%: 
+            "I::Do::Not::Exist" => 0
             ),
             CONFIGURE => sub (@< @_)
                 require I::Do::Not::Exist

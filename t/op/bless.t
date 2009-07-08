@@ -101,7 +101,7 @@ $b1 = try { bless \$%, $a1 }
 like($^EVAL_ERROR->message, qr/Attempt to bless into a reference/, "class is a ref")
 
 do
-    my %h = %( < 1..2 )
+    my %h = %:  < 1..2 
     my(@: $k) =  keys %h
     my $x=\$k
     bless $x, 'pam'

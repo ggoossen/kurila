@@ -9,14 +9,14 @@ $VERSION = '2.02'
 #  only for null-transcodings!  We use this when Encode isn't
 #  available.
 
-%Supported = %(
-    'ascii'       => 1,
-    'ascii-ctrl'  => 1,
-    'utf8'  => 1,
-    'null'        => 1,
-    'latin1' => 1,
-    < %Supported,
-    )
+%Supported = %: 
+    'ascii'       => 1
+    'ascii-ctrl'  => 1
+    'utf8'  => 1
+    'null'        => 1
+    'latin1' => 1
+    < %Supported
+    
 
 sub is_dumb  {1}
 sub is_smart {0}

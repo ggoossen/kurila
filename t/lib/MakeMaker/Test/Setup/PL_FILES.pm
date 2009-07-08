@@ -9,8 +9,8 @@ use File::Basename
 use File::Spec
 use MakeMaker::Test::Utils
 
-my %Files = %(
-    'PL_FILES-Module/Makefile.PL'   => <<'END',
+my %Files = %: 
+    'PL_FILES-Module/Makefile.PL'   => <<'END'
 use ExtUtils::MakeMaker;
 
 # A module for testing PL_FILES
@@ -23,17 +23,17 @@ WriteMakefile(
   );
 END
 
-    'PL_FILES-Module/single.PL'        => _gen_pl_files(),
-    'PL_FILES-Module/multi.PL'         => _gen_pl_files(),
-    'PL_FILES-Module/Bar_pm.PL'        => _gen_pm_files(),
-    'PL_FILES-Module/lib/PL/Foo.pm' => <<'END',
+    'PL_FILES-Module/single.PL'        => _gen_pl_files()
+    'PL_FILES-Module/multi.PL'         => _gen_pl_files()
+    'PL_FILES-Module/Bar_pm.PL'        => _gen_pm_files()
+    'PL_FILES-Module/lib/PL/Foo.pm' => <<'END'
 # Module to load to ensure PL_FILES have blib in $^INCLUDE_PATH.
 package PL::Foo;
 sub bar { 42 }
 1;
 END
 
-    )
+    
 
 
 sub _gen_pl_files

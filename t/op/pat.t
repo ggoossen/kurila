@@ -291,15 +291,15 @@ sub run_tests
     # 20000 nodes, each taking 3 words per string, and 1 per branch
     my $long_constant_len = join '|', 12120 .. 32645
     my $long_var_len = join '|', 8120 .. 28645
-    my %ans = %( 'ax13876y25677lbc' => 1,
-        'ax13876y25677mcb' => 0, # not b.
-        'ax13876y35677nbc' => 0, # Num too big
-        'ax13876y25677y21378obc' => 1,
-        'ax13876y25677y21378zbc' => 0,	# Not followed by [k-o]
-        'ax13876y25677y21378y21378kbc' => 1,
-        'ax13876y25677y21378y21378kcb' => 0, # Not b.
-        'ax13876y25677y21378y21378y21378kbc' => 0, # 5 runs
-        )
+    my %ans = %:  'ax13876y25677lbc' => 1
+                  'ax13876y25677mcb' => 0 # not b.
+                  'ax13876y35677nbc' => 0 # Num too big
+                  'ax13876y25677y21378obc' => 1
+                  'ax13876y25677y21378zbc' => 0	# Not followed by [k-o]
+                  'ax13876y25677y21378y21378kbc' => 1
+                  'ax13876y25677y21378y21378kcb' => 0 # Not b.
+                  'ax13876y25677y21378y21378y21378kbc' => 0 # 5 runs
+        
 
     for ( keys %ans )
         ok( not ( %ans{?$_} xor m/a(?=([yx]($long_constant_len)){2,4}[k-o]).*b./o ))
@@ -640,7 +640,7 @@ sub run_tests
 
     # see if matching against temporaries (created via pp_helem()) is safe
     my $x = "abc"
-    %( foo => "ok $x\n".$^EXECUTABLE_NAME ){?foo} =~ m/^(.*)\n/g
+    (%:  foo => "ok $x\n".$^EXECUTABLE_NAME ){?foo} =~ m/^(.*)\n/g
     ok( $1 eq "ok abc" )
 
     # See if $i work inside (?{}) in the presense of saved substrings and
@@ -759,15 +759,15 @@ sub run_tests
     
     ok( not $w )
 
-    my %space = %( spc   => " ",
-        tab   => "\t",
-        cr    => "\r",
-        lf    => "\n",
-        ff    => "\f",
-        # There's no \v but the vertical tabulator seems miraculously
-        # be 11 both in ASCII and EBCDIC.
-        vt    => chr(11),
-        false => "space" )
+    my %space = %:  spc   => " "
+                    tab   => "\t"
+                    cr    => "\r"
+                    lf    => "\n"
+                    ff    => "\f"
+                    # There's no \v but the vertical tabulator seems miraculously
+                    # be 11 both in ASCII and EBCDIC.
+                    vt    => chr(11)
+                    false => "space" 
 
     my @space0 = sort grep { %space{?$_} =~ m/\s/ },          keys %space
     my @space1 = sort grep { %space{?$_} =~ m/[[:space:]]/ }, keys %space
@@ -876,20 +876,20 @@ sub run_tests
         # intentional so that in non-Latin-1 places we test the native
         # characters, not the Unicode code points.
 
-        my %s = %(
-            "a" 				=> 'Ll',
-            "\N{CYRILLIC SMALL LETTER A}"	=> 'Ll',
-            "A" 				=> 'Lu',
-            "\N{GREEK CAPITAL LETTER ALPHA}"	=> 'Lu',
-            "\N{HIRAGANA LETTER SMALL A}"	=> 'Lo',
-            "\N{COMBINING GRAVE ACCENT}"	=> 'Mn',
-            "0"				=> 'Nd',
-            "\N{ARABIC-INDIC DIGIT ZERO}"	=> 'Nd',
-            "_"				=> 'N',
-            "!"				=> 'P',
-            " "				=> 'Zs',
-            "\0"				=> 'Cc',
-            )
+        my %s = %: 
+            "a" 				=> 'Ll'
+            "\N{CYRILLIC SMALL LETTER A}"	=> 'Ll'
+            "A" 				=> 'Lu'
+            "\N{GREEK CAPITAL LETTER ALPHA}"	=> 'Lu'
+            "\N{HIRAGANA LETTER SMALL A}"	=> 'Lo'
+            "\N{COMBINING GRAVE ACCENT}"	=> 'Mn'
+            "0"				=> 'Nd'
+            "\N{ARABIC-INDIC DIGIT ZERO}"	=> 'Nd'
+            "_"				=> 'N'
+            "!"				=> 'P'
+            " "				=> 'Zs'
+            "\0"				=> 'Cc'
+            
 
         for my $char ( map { s/^\S+ //; $_ },
             sort map { sprintf("\%06x", ord($_))." $_" }, keys %s)
@@ -1034,7 +1034,7 @@ sub run_tests
             'm/(.*?)\{(.*?)\}/cg'
             'm/(.*?)\{(.*?)\}/sg'
             'm/(.*?)\{(.*?)\}/g'
-            'm/(.+?)\{(.+?)\}/csg',
+            'm/(.+?)\{(.+?)\}/csg'
             )
             my($input, $i)
 
@@ -1787,7 +1787,7 @@ EOT
         my $u = "a\x{100}"
         my $v = substr($u,0,1)
         my $w = substr($u,1,1)
-        my %u = %( $u => $u, $v => $v, $w => $w )
+        my %u = %:  $u => $u, $v => $v, $w => $w 
         for (keys %u)
             my $m1 = m/^\w*$/ ?? 1 !! 0
             my $m2 = %u{?$_}=~m/^\w*$/ ?? 1 !! 0
@@ -1838,7 +1838,7 @@ EOT
         my $c = "\x{100}"
         my $subst
         for my $re (@: 
-            "xx.*$c", "x.*$c$c", "$c.*xx", "$c$c.*x", "xx.*(?=$c)", "(?=$c).*xx",
+            "xx.*$c", "x.*$c$c", "$c.*xx", "$c$c.*x", "xx.*(?=$c)", "(?=$c).*xx"
             )
             ok( not "xxx" =~ m/$re/ )
             ok( not( ($subst = "xxx") =~ s/$re// ))
@@ -3021,7 +3021,7 @@ EOFTEST
                        qw|[abc] abc def|
                        qw|[^abc] def abc|
                        qw|[[:word:]] abc #@!|
-                       qw|[[:^word:]] #@! abc|,
+                       qw|[[:^word:]] #@! abc|
             )
             my $m = shift $p
             my (@: $s, $f) =  map { \split m/ */ }, $p

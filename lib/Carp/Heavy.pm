@@ -107,7 +107,7 @@ sub format_arg
 sub get_status
     my $cache = shift
     my $pkg = shift
-    $cache->{+$pkg} ||= \@: \%($pkg => $pkg), \trusts_directly($pkg)
+    $cache->{+$pkg} ||= \@: \(%: $pkg => $pkg), \trusts_directly($pkg)
     return $cache->{?$pkg}->@
 
 
@@ -173,10 +173,10 @@ sub ret_backtrace($i, @< @error)
         $tid_msg = " thread $tid" if $tid
     
 
-    my %i = %( < caller_info($i) )
+    my %i = %:  < caller_info($i) 
     $mess = "$err at %i{?file} line %i{?line}$tid_msg\n"
 
-    while (my %i = %( < caller_info(++$i) ))
+    while (my %i = (%:  < caller_info(++$i) ))
         $mess .= "\t$(%i{?sub_name}//'(unnamed sub)') called at %i{?file} line %i{?line}$tid_msg\n"
     
 
@@ -193,7 +193,7 @@ sub ret_summary($i, @< @error)
         $tid_msg = " thread $tid" if $tid
     
 
-    my %i = %( < caller_info($i) )
+    my %i = %:  < caller_info($i) 
     return "$err at %i{?file} line %i{?line}$tid_msg\n"
 
 

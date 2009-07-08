@@ -1,7 +1,7 @@
 BEGIN 
     if(env::var('PERL_CORE')) {
         chdir 't';
-        $^INCLUDE_PATH = @( '../lib' );
+        $^INCLUDE_PATH = (@:  '../lib' );
     }
 
 
@@ -24,8 +24,8 @@ print $^STDOUT, "# Testing the surveying of the current directory...\n"
 
 $x->inc(0)
 
-use File::Spec;
-use Cwd;
+use File::Spec
+use Cwd
 my $cwd = cwd()
 print $^STDOUT, "# CWD: $cwd\n"
 
@@ -55,10 +55,10 @@ ok 1
 print $^STDOUT, $x->_state_as_string
 #$x->verbose(12);
 
-use Pod::Simple;
+use Pod::Simple
 *pretty = \&Pod::Simple::BlackBox::pretty
 
-my@($name2where, $where2name) = @($x->survey($here), $x->path2name)
+my(@: $name2where, $where2name) = @: $x->survey($here), $x->path2name
 
 my $p = pretty( $where2name, $name2where )."\n"
 $p =~ s/, +/,\n/g

@@ -96,7 +96,7 @@ $Collator->change(level => 4)
 
 # Variable
 
-our %origVar = %( < $Collator->change(variable => 'Blanked') )
+our %origVar = %:  < $Collator->change(variable => 'Blanked') 
 is($Collator->viewSortKey("1+2"),
    '[0A0C 0A0D | 0020 0020 | 0002 0002 | 0031 002B 0032]')
 

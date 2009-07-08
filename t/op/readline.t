@@ -78,7 +78,7 @@ SKIP: do
 
 
 fresh_perl_is('BEGIN{~< *ARGV}', '',
-              \%( switches => \(@: '-w'), stdin => '', stderr => 1 ),
+              \(%:  switches => \(@: '-w'), stdin => '', stderr => 1 ),
               'No ARGVOUT used only once warning')
 
 my $obj = bless \$@

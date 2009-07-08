@@ -8,43 +8,43 @@ use bytes ()		# for $bytes::hint_bits
 
 use utf8
 
-my %alias1 = %(
+my %alias1 = %: 
     # Icky 3.2 names with parentheses.
-    'LINE FEED'		=> 'LINE FEED (LF)',
-    'FORM FEED'		=> 'FORM FEED (FF)',
-    'CARRIAGE RETURN'	=> 'CARRIAGE RETURN (CR)',
-    'NEXT LINE'		=> 'NEXT LINE (NEL)',
+    'LINE FEED'		=> 'LINE FEED (LF)'
+    'FORM FEED'		=> 'FORM FEED (FF)'
+    'CARRIAGE RETURN'	=> 'CARRIAGE RETURN (CR)'
+    'NEXT LINE'		=> 'NEXT LINE (NEL)'
     # Convenience.
-    'LF'			=> 'LINE FEED (LF)',
-    'FF'			=> 'FORM FEED (FF)',
-    'CR'			=> 'CARRIAGE RETURN (CR)',
-    'NEL'			=> 'NEXT LINE (NEL)',
+    'LF'			=> 'LINE FEED (LF)'
+    'FF'			=> 'FORM FEED (FF)'
+    'CR'			=> 'CARRIAGE RETURN (CR)'
+    'NEL'			=> 'NEXT LINE (NEL)'
     # More convenience.  For futher convencience,
     # it is suggested some way using using the NamesList
     # aliases is implemented.
-    'ZWNJ'			=> 'ZERO WIDTH NON-JOINER',
-    'ZWJ'			=> 'ZERO WIDTH JOINER',
-    'BOM'			=> 'BYTE ORDER MARK',
-    )
+    'ZWNJ'			=> 'ZERO WIDTH NON-JOINER'
+    'ZWJ'			=> 'ZERO WIDTH JOINER'
+    'BOM'			=> 'BYTE ORDER MARK'
+    
 
-my %alias2 = %(
+my %alias2 = %: 
     # Pre-3.2 compatibility (only for the first 256 characters).
-    'HORIZONTAL TABULATION'	=> 'CHARACTER TABULATION',
-    'VERTICAL TABULATION'	=> 'LINE TABULATION',
-    'FILE SEPARATOR'	=> 'INFORMATION SEPARATOR FOUR',
-    'GROUP SEPARATOR'	=> 'INFORMATION SEPARATOR THREE',
-    'RECORD SEPARATOR'	=> 'INFORMATION SEPARATOR TWO',
-    'UNIT SEPARATOR'	=> 'INFORMATION SEPARATOR ONE',
-    'PARTIAL LINE DOWN'	=> 'PARTIAL LINE FORWARD',
-    'PARTIAL LINE UP'	=> 'PARTIAL LINE BACKWARD',
-    )
+    'HORIZONTAL TABULATION'	=> 'CHARACTER TABULATION'
+    'VERTICAL TABULATION'	=> 'LINE TABULATION'
+    'FILE SEPARATOR'	=> 'INFORMATION SEPARATOR FOUR'
+    'GROUP SEPARATOR'	=> 'INFORMATION SEPARATOR THREE'
+    'RECORD SEPARATOR'	=> 'INFORMATION SEPARATOR TWO'
+    'UNIT SEPARATOR'	=> 'INFORMATION SEPARATOR ONE'
+    'PARTIAL LINE DOWN'	=> 'PARTIAL LINE FORWARD'
+    'PARTIAL LINE UP'	=> 'PARTIAL LINE BACKWARD'
+    
 
 my %alias3 = $%
 my $txt
 
 sub alias(@< @_)
     (nelems @_) or return %alias3
-    my $alias = ref @_[0] ?? @_[0] !! \%( < @_ )
+    my $alias = ref @_[0] ?? @_[0] !! \%:  < @_ 
     %alias3{[keys $alias->%]} =  values $alias->%
  # alias
 

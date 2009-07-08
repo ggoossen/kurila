@@ -1181,7 +1181,7 @@ sub _eq_array($a1, $a2)
         my $e1 = $_ +> (nelems $a1->@)-1 ?? $DNE !! $a1->[$_]
         my $e2 = $_ +> (nelems $a2->@)-1 ?? $DNE !! $a2->[$_]
 
-        push @Data_Stack, \%( type => 'ARRAY', idx => $_, vals => \(@: $e1, $e2) )
+        push @Data_Stack, \%:  type => 'ARRAY', idx => $_, vals => \(@: $e1, $e2) 
         $ok = _deep_check($e1,$e2)
         pop @Data_Stack if $ok
 
@@ -1199,7 +1199,7 @@ sub _deep_check($e1, $e2)
     # Effectively turn %Refs_Seen into a stack.  This avoids picking up
     # the same referenced used twice (such as [\$a, \$a]) to be considered
     # circular.
-    local %Refs_Seen = %( < %Refs_Seen )
+    local %Refs_Seen = %:  < %Refs_Seen 
 
     do
         # Quiet uninitialized value warnings when comparing undefs.
@@ -1219,12 +1219,12 @@ sub _deep_check($e1, $e2)
         $type = 'DIFFERENT' unless ref::svtype($e2) eq $type
 
         if( $type eq 'DIFFERENT' )
-            push @Data_Stack, \%( type => $type, vals => \(@: $e1, $e2) )
+            push @Data_Stack, \%:  type => $type, vals => \(@: $e1, $e2) 
             $ok = 0
         elsif( $type eq 'PLAINVALUE' )
             $ok = ($e1 eq $e2)
             if ( ! $ok )
-                push @Data_Stack, \%( type => '', vals => \(@: $e1, $e2) )
+                push @Data_Stack, \%:  type => '', vals => \(@: $e1, $e2) 
             
         elsif( $type eq 'ARRAY' )
             $ok = _eq_array(\$e1, \$e2)
@@ -1234,13 +1234,13 @@ sub _deep_check($e1, $e2)
             if ($e1 \== $e2)
                 return 1
             
-            push @Data_Stack, \%( type => $type, vals => \(@: $e1, $e2) )
+            push @Data_Stack, \%:  type => $type, vals => \(@: $e1, $e2) 
             $ok = _deep_check($e1->$, $e2->$)
             pop @Data_Stack if $ok
         elsif( $type eq 'UNDEF' )
             $ok = 1
         elsif( $type eq 'COMPLEX' )
-            push @Data_Stack, \%( type => $type, vals => \(@: '...', '...') )
+            push @Data_Stack, \%:  type => $type, vals => \(@: '...', '...') 
             $ok = 0
         else
             _whoa(1, "Unknown type '$type' in _deep_check")
@@ -1290,7 +1290,7 @@ sub _eq_hash($a1, $a2)
         my $e1 = exists $a1->{$k} ?? $a1->{?$k} !! $DNE
         my $e2 = exists $a2->{$k} ?? $a2->{?$k} !! $DNE
 
-        push @Data_Stack, \%( type => 'HASH', idx => $k, vals => \(@: $e1, $e2) )
+        push @Data_Stack, \%:  type => 'HASH', idx => $k, vals => \(@: $e1, $e2) 
         $ok = _deep_check($e1, $e2)
         pop @Data_Stack if $ok
 

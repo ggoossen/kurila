@@ -5,7 +5,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't' if -d 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -13,9 +13,9 @@ BEGIN
 
 chdir 't'
 
-use Test::More tests => 4;
+use Test::More tests => 4
 
-use ExtUtils::MakeMaker < qw(WriteEmptyMakefile);
+use ExtUtils::MakeMaker < qw(WriteEmptyMakefile)
 
 can_ok __PACKAGE__, 'WriteEmptyMakefile'
 

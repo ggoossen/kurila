@@ -3,16 +3,16 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib/')
+        $^INCLUDE_PATH = @: '../lib', 'lib/'
     else
         unshift $^INCLUDE_PATH, 't/lib/'
     
 
 chdir 't'
 
-use File::Spec;
+use File::Spec
 
-use Test::More tests => 3;
+use Test::More tests => 3
 
 # Having the CWD in $^INCLUDE_PATH masked a bug in finding hint files
 my $curdir = File::Spec->curdir
@@ -29,7 +29,7 @@ $self->{+CCFLAGS} = 'basset hounds got long ears';
 CLOO
 close $hintfh
 
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker
 
 my $out
 close $^STDERR

@@ -17,7 +17,7 @@ our $show_elapsed_time = env::var("HARNESS_TIMER") || 0
 
 # Cheesy version of Getopt::Std.  Maybe we should replace it with that.
 do
-    my @argv = @( () )
+    my @argv = @:  () 
     foreach my $iargv ( @ARGV)
         push( @argv, $iargv ), next unless $iargv =~ m/^-(\S+)$/
         $::core    = 1 if $1 eq 'core'
@@ -69,9 +69,9 @@ my $curdir = File::Spec->curdir
 my $updir  = File::Spec->updir
 
 sub _find_tests
-    my @($dir) = @_
+    my (@: $dir) = @_
     opendir my $dirh, $dir or die "Trouble opening $dir: $^OS_ERROR"
-    foreach my $f (sort { $a cmp $b }, @( readdir $dirh))
+    foreach my $f (sort { $a cmp $b }, (@:  readdir $dirh))
         next if $f eq $curdir or $f eq $updir or
           $f =~ m/^(?:CVS|RCS|SCCS|\.svn)$/
 
@@ -84,7 +84,7 @@ sub _find_tests
 
 
 sub _quote_args
-    my @($args) = @_
+    my (@: $args) = @_
     my $argstring = ''
 
     foreach (split(m/\s+/,$args))
@@ -103,10 +103,10 @@ sub _populate_hash
 if ($::failed)
     # get tests to run from TEST_FAILED
     open my $fh, "<", "TEST_FAILED"
-    push @ARGV, < map { chomp; $_ }, @( ~< $fh)
+    push @ARGV, < map { chomp; $_ }, @:  ~< $fh
     close $fh
     if ($::failed +> 1)
-        @ARGV = @(@ARGV[?0])
+        @ARGV = @: @ARGV[?0]
     
 
 
@@ -127,9 +127,9 @@ unless (nelems @ARGV)
             if (m/^extensions=['"](.*)['"]$/)
                 # Deliberate string interpolation to avoid triggering possible
                 # $1 resetting bugs.
-                %extensions = %( < _populate_hash ("$1") )
+                %extensions = %:  < _populate_hash ("$1") 
             elsif (m/^known_extensions=['"](.*)['"]$/)
-                %known_extensions = %( < _populate_hash ($1) )
+                %known_extensions = %:  < _populate_hash ($1) 
             
         
         if (%extensions)
@@ -176,8 +176,8 @@ unless (nelems @ARGV)
 if ($::deparse)
     _testprogs('deparse', '',   < @ARGV)
 elsif ($::with_utf16)
-    for my $e (@(0, 1))
-        for my $b (@(0, 1))
+    for my $e ((@: 0, 1))
+        for my $b ((@: 0, 1))
             print $^STDERR, "# ENDIAN $e BOM $b\n"
             my @UARGV
             for my $a ( @ARGV)
@@ -205,7 +205,7 @@ else
 
 
 sub _testprogs
-    my @($type, $args, @< @tests) = @_
+    my (@: $type, $args, @< @tests) = @_
 
     print $^STDOUT, <<'EOT' if ($type eq 'deparse')
 ------------------------------------------------------------------------------
@@ -223,7 +223,7 @@ EOT
         
     
     my $maxlen = 0
-    foreach (@( <%::path_to_name{[@tests]}))
+    foreach ((@:  <%::path_to_name{[@tests]}))
         s/\.\w+\z/./
         my $len = length 
         $maxlen = $len if $len +> $maxlen
@@ -356,7 +356,7 @@ EOT
                         $failure ||= 'FAILED--seen duplicate leader'
                     
                     $max = $1
-                    %todo = %( < @+: map { @: $_ => 1 }, split m/ /, $3) if $3
+                    %todo = (%:  < @+: map { @: $_ => 1 }, split m/ /, $3) if $3
                     $totmax += $max
                     $tested_files++
                     if ($seen_ok)
@@ -378,7 +378,7 @@ EOT
                         
                         $seen_ok = 1
                         $next++
-                        my @($not, $num, $extra, $istodo) = @($1, $2, $3, 0)
+                        my (@: $not, $num, $extra, $istodo) = @: $1, $2, $3, 0
                         $num = $next unless $num
 
                         if ($num == $next)
@@ -416,7 +416,7 @@ EOT
             my @valgrind
             if (-e $valgrind_log)
                 if (open(my $v, "<", $valgrind_log))
-                    @valgrind = @( ~< $v )
+                    @valgrind = @:  ~< $v 
                     close $v
                 else
                     warn "$^PROGRAM_NAME: Failed to open '$valgrind_log': $^OS_ERROR\n"
@@ -560,7 +560,7 @@ SHRDLU_5
             print $fh, "$_\n"
         close $fh
 
-    my @($user,$sys,$cuser,$csys) = @: times
+    my (@: $user,$sys,$cuser,$csys) = @: times
     print $^STDOUT, sprintf('u=%.2f  s=%.2f  cu=%.2f  cs=%.2f  scripts=%d  tests=%d' . "\n",
         $user,$sys,$cuser,$csys,$tested_files,$totmax)
     if (env::var("PERL_VALGRIND"))

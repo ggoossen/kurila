@@ -109,7 +109,7 @@ do
     is("$(join ' ',@a)", $d)
 
 
-%h = %('a' => 1, 'b' => 2, 'c' => 3)
+%h = %: 'a' => 1, 'b' => 2, 'c' => 3
 do
     local(%h{+'a'}) = 'foo'
     local(%h{+'b'}) = %h{?'b'}
@@ -122,7 +122,7 @@ is(%h{?'a'}, 1)
 is(%h{?'b'}, 2)
 do
     my $d = join("\n", map { "$_=>%h{?$_}" }, sort keys %h)
-    local %h = %( < %h )
+    local %h = %:  < %h 
     is(join("\n", map { "$_=>%h{?$_}" }, sort keys %h), $d)
 
 is(%h{?'c'}, 3)
@@ -260,7 +260,7 @@ do
 # when localising a hash element, the key should be copied, not referenced
 
 do
-    my %h=%('k1' => 111)
+    my %h=%: 'k1' => 111
     my $k='k1'
     do
         local %h{+$k}=222
@@ -272,7 +272,7 @@ do
     is(%h{?'k1'},111)
 
 do
-    my %h=%('k1' => 111)
+    my %h=%: 'k1' => 111
     our $k = 'k1'  # try dynamic too
     do
         local %h{+$k}=222

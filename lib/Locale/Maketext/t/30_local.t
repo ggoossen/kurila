@@ -11,9 +11,9 @@ print $^STDOUT, "# --- Making sure that Perl globals are localized ---\n"
 do
     package Woozle
     our @ISA = @: 'Locale::Maketext'
-    our %Lexicon = %(
+    our %Lexicon = %: 
         _AUTO => 1
-        )
+        
     keys %Lexicon # dodges the 'used only once' warning
 
 

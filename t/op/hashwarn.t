@@ -29,15 +29,15 @@ do
     cmp_ok(substr(@warnings[0],0,length($fail_odd)),'eq',$fail_odd,'scalar msg')
 
     @warnings = $@
-    dies_like( sub (@< @_) { %hash = %( \%( < 1..3 ) ); }, qr/reference as string/ )
+    dies_like( sub (@< @_) { %hash = (%:  \(%:  < 1..3 ) ); }, qr/reference as string/ )
 
     @warnings = $@
-    dies_like( sub (@< @_) { %hash = %( \( 1..3 ) ); }, qr/reference as string/ )
+    dies_like( sub (@< @_) { %hash = (%:  \( 1..3 ) ); }, qr/reference as string/ )
 
     @warnings = $@
-    dies_like( sub (@< @_) { %hash = %( sub (@< @_) { print $^STDOUT, "fenice" } ); }, qr/reference as string/ )
+    dies_like( sub (@< @_) { %hash = (%:  sub (@< @_) { print $^STDOUT, "fenice" } ); }, qr/reference as string/ )
 
     @warnings = $@
-    $_ = \%( < 1..10 )
+    $_ = \%:  < 1..10 
     cmp_ok(scalar(nelems @warnings),'==',0,'hashref assign')
 

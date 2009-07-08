@@ -5,21 +5,21 @@ use Test::More
 use ExtUtils::MakeMaker
 use version
 
-my %versions = %(q[$VERSION = '1.00']        => '1.00',
-    q[*VERSION = \'1.01']       => '1.01',
-    q[@($VERSION) = @: q$Revision: 32208 $ =~ m/(\d+)/g] => 32208,
-    q[$FOO::VERSION = '1.10';]  => '1.10',
-    q[*FOO::VERSION = \'1.11';] => '1.11',
-    '$VERSION = 0.02'   => 0.02,
-    '$VERSION = 0.0'    => 0.0,
-    '$VERSION = -1.0'   => -1.0,
-    '$VERSION = undef'  => 'undef',
-    '$wibble  = 1.0'    => 'undef',
-    q[my $VERSION = '1.01']         => 'undef',
-    q[local $VERISON = '1.02']      => 'undef',
-    q[local $FOO::VERSION = '1.30'] => 'undef',
-    q[our $VERSION = '1.23';]       => '1.23',
-    )
+my %versions = %: q[$VERSION = '1.00']        => '1.00'
+                  q[*VERSION = \'1.01']       => '1.01'
+                  q[@($VERSION) = @: q$Revision: 32208 $ =~ m/(\d+)/g] => 32208
+                  q[$FOO::VERSION = '1.10';]  => '1.10'
+                  q[*FOO::VERSION = \'1.11';] => '1.11'
+                  '$VERSION = 0.02'   => 0.02
+                  '$VERSION = 0.0'    => 0.0
+                  '$VERSION = -1.0'   => -1.0
+                  '$VERSION = undef'  => 'undef'
+                  '$wibble  = 1.0'    => 'undef'
+                  q[my $VERSION = '1.01']         => 'undef'
+                  q[local $VERISON = '1.02']      => 'undef'
+                  q[local $FOO::VERSION = '1.30'] => 'undef'
+                  q[our $VERSION = '1.23';]       => '1.23'
+    
 
 plan tests => (2 * nkeys %versions) + 8
 

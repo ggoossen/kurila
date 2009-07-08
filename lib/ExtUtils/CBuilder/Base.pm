@@ -10,7 +10,7 @@ $VERSION = '0.22'
 
 sub new
     my $class = shift
-    my $self = bless \%(< @_), $class
+    my $self = bless \(%: < @_), $class
 
     $self->{+properties}{+perl} = $class->find_perl_interpreter
         or warn "Warning: Can't locate your perl binary"
@@ -189,8 +189,8 @@ sub _do_link($self, $type, %< %args)
         dl_name => %args{module_name}) if %args{?lddl} && $self->need_prelink
 
     my @linker_flags = @:  < $self->split_like_shell(%args{?extra_linker_flags})
-                           < $self->extra_link_args_after_prelink(< %args, dl_name => %args{?module_name},
-                                 prelink_res => \@temp_files)
+                           < $self->extra_link_args_after_prelink(< %args, dl_name => %args{?module_name}
+                           prelink_res => \@temp_files)
 
     my @output = @:  %args{?lddl} ?? < $self->arg_share_object_file($out) !! < $self->arg_exec_file($out) 
     my @shrp = $self->split_like_shell($cf{shrpenv})
@@ -202,7 +202,7 @@ sub _do_link($self, $type, %< %args)
     return @: $out, < @temp_files
 
 
-
+                  
 sub do_system($self, @< @cmd)
     print $^STDOUT, "$(join ' ',@cmd)\n" if !$self->{?quiet}
     return !system(< @cmd)

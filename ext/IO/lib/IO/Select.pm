@@ -182,7 +182,7 @@ sub select
         
 
         @result = @: \@r, \@w, \@e
-    
+                         
     @result
 
 

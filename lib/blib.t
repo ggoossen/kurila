@@ -2,7 +2,7 @@
 
 BEGIN 
     chdir 't' if -d 't'
-    $^INCLUDE_PATH = @('../lib')
+    $^INCLUDE_PATH = @: '../lib'
 
 
 use File::Spec
@@ -28,17 +28,17 @@ BEGIN
         $blib = ":blib:"
         $blib_lib = ":blib:lib:"
         $blib_arch = ":blib:lib:$MacPerl::Architecture:"
-        @blib_dirs = @($blib, $blib_lib, $blib_arch) # order
+        @blib_dirs = (@: $blib, $blib_lib, $blib_arch) # order
     else
         $blib = "blib"
         $blib_arch = "blib/arch"
         $blib_lib = "blib/lib"
-        @blib_dirs = @($blib, $blib_arch, $blib_lib)
+        @blib_dirs = @: $blib, $blib_arch, $blib_lib
     
     _cleanup( < @blib_dirs )
 
 
-use Test::More tests => 7;
+use Test::More tests => 7
 
 eval 'use blib;'
 like( $^EVAL_ERROR->message, qr/Cannot find blib/, 'Fails if blib directory not found' )

@@ -105,14 +105,14 @@ cmp_ok E2BIG, '==', 7
 cmp_ok length(E2BIG), '+>', 6
 
 is nelems(@warnings), 0 or diag join "\n", @:  "unexpected warning", < @warnings
-
+                                                                               
 is nelems(@warnings), 0, "unexpected warning"
 
 ok 1
 
 my $curr_test = $TB->current_test
 use constant CSCALAR    => \"ok 37\n"
-use constant CHASH      => \%( foo => "ok 38\n" )
+use constant CHASH      => \%:  foo => "ok 38\n" 
 use constant CARRAY     => \(@:  undef, "ok 39\n" )
 use constant CCODE      => sub (@< @_) { "ok @_[0]\n" }
 
@@ -228,13 +228,13 @@ for my $idx (0..((nelems @warnings)-1))
 @warnings = $@
 
 
-use constant \%(
-    THREE  => 3,
-    FAMILY => \ qw( John Jane Sally ),
-    AGES   => \%( John => 33, Jane => 28, Sally => 3 ),
-    RFAM   => \(@:  \ qw( John Jane Sally ) ),
-    SPIT   => sub (@< @_) { shift },
-    )
+use constant \%: 
+    THREE  => 3
+    FAMILY => \ qw( John Jane Sally )
+    AGES   => \(%:  John => 33, Jane => 28, Sally => 3 )
+    RFAM   => \(@:  \ qw( John Jane Sally ) )
+    SPIT   => sub (@< @_) { shift }
+    
 
 is nelems($:FAMILY->@), THREE
 is nelems($:FAMILY->@), nelems RFAM->[0]->@

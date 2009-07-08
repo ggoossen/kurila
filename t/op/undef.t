@@ -44,7 +44,7 @@ undef %ary
 print $^STDOUT, defined(%ary) ?? "not ok 16 # TODO\n" !! "ok 16\n"
 @ary = @: 1
 print $^STDOUT, defined @ary ?? "ok 17\n" !! "not ok 17\n"
-%ary = %(1,1)
+%ary = %: 1,1
 print $^STDOUT, defined %ary ?? "ok 18\n" !! "not ok 18\n"
 
 sub foo { print $^STDOUT, "ok 19\n"; }
@@ -70,10 +70,10 @@ print $^STDOUT, "ok 26\n"
 # modify the hash. To them, the hash should appear empty.
 
 $test = 27
-%hash = %(
-    key1 => bless(\$%, 'X'),
-    key2 => bless(\$%, 'X'),
-    )
+%hash = %: 
+    key1 => bless(\$%, 'X')
+    key2 => bless(\$%, 'X')
+    
 undef %hash
 sub X::DESTROY
     print $^STDOUT, "not " if %hash; print $^STDOUT, "ok $test\n"; $test++

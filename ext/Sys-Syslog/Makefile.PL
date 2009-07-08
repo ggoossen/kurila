@@ -11,7 +11,7 @@ use File::Spec
 mkdir "lib", 0755
 
 # virtual paths given to EU::MM
-my %virtual_path = %( 'Syslog.pm' => '$(INST_LIBDIR)/Syslog.pm' )
+my %virtual_path = (%:  'Syslog.pm' => '$(INST_LIBDIR)/Syslog.pm' )
 
 # detect when to use Win32::EvenLog
 my (@extra_params, @extra_prereqs)
@@ -65,14 +65,14 @@ WriteMakefile(
     INSTALLDIRS     => 'perl',
     XSPROTOARG      => '-noprototypes',
     PM              => %virtual_path,
-    PREREQ_PM       => %(
-    'Test::More' => 0,
-    'XSLoader'   => 0,
-    < @extra_prereqs,
+    PREREQ_PM       => (%: 
+    'Test::More' => 0
+    'XSLoader'   => 0
+    < @extra_prereqs
     ),
-    dist            => %( COMPRESS => 'gzip -9f', SUFFIX => 'gz', ),
-    clean           => %( FILES => 'Sys-Syslog-*' ),
-    realclean       => %( FILES => 'lib const-c.inc const-xs.inc macros.all PerlLog.h *.bak *.bin *.rc' ),
+    dist            => (%:  COMPRESS => 'gzip -9f', SUFFIX => 'gz', ),
+    clean           => (%:  FILES => 'Sys-Syslog-*' ),
+    realclean       => (%:  FILES => 'lib const-c.inc const-xs.inc macros.all PerlLog.h *.bak *.bin *.rc' ),
     < @extra_params
     )
 
@@ -117,18 +117,18 @@ if(try {require ExtUtils::Constant; 1})
             LOG_SYSLOG LOG_USER LOG_UUCP
         )
                          # Mac OS X specific facilities
-                         \%( name => "LOG_INSTALL",    type => "IV", default => \(@:  "IV", "LOG_USER"  ) )
-                         \%( name => "LOG_LAUNCHD",    type => "IV", default => \(@:  "IV", "LOG_DAEMON") )
-                         \%( name => "LOG_NETINFO",    type => "IV", default => \(@:  "IV", "LOG_DAEMON") )
-                         \%( name => "LOG_RAS",        type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) )
-                         \%( name => "LOG_REMOTEAUTH", type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) )
+                         \%:  name => "LOG_INSTALL",    type => "IV", default => \(@:  "IV", "LOG_USER"  ) 
+                         \%:  name => "LOG_LAUNCHD",    type => "IV", default => \(@:  "IV", "LOG_DAEMON") 
+                         \%:  name => "LOG_NETINFO",    type => "IV", default => \(@:  "IV", "LOG_DAEMON") 
+                         \%:  name => "LOG_RAS",        type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) 
+                         \(%:  name => "LOG_REMOTEAUTH", type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) )
                          # modern BSD specific facilities
-                         \%( name => "LOG_CONSOLE",    type => "IV", default => \(@:  "IV", "LOG_USER"  ) )
-                         \%( name => "LOG_NTP",        type => "IV", default => \(@:  "IV", "LOG_DAEMON") )
-                         \%( name => "LOG_SECURITY",   type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) )
+                         \%:  name => "LOG_CONSOLE",    type => "IV", default => \(@:  "IV", "LOG_USER"  ) 
+                         \%:  name => "LOG_NTP",        type => "IV", default => \(@:  "IV", "LOG_DAEMON") 
+                         \(%:  name => "LOG_SECURITY",   type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) )
                          # IRIX specific facilities
-                         \%( name => "LOG_AUDIT",      type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) )
-                         \%( name => "LOG_LFMT",       type => "IV", default => \(@:  "IV", "LOG_USER"  ) )
+                         \%:  name => "LOG_AUDIT",      type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) 
+                         \%:  name => "LOG_LFMT",       type => "IV", default => \(@:  "IV", "LOG_USER"  ) 
         
 
     my @options = qw(
@@ -137,9 +137,9 @@ if(try {require ExtUtils::Constant; 1})
 
     my @others_macros = @:  <
                                 qw(LOG_FACMASK)
-                            \%( name => "_PATH_LOG", type => "PV", default => \(@:  "PV", qq("$_PATH_LOG") ) )
-                            \%( name => "LOG_PRIMASK",     type => "IV", default => \(@:  "IV", 7) )
-                            \%( name => "LOG_NFACILITIES", type => "IV", default => \(@:  "IV", scalar nelems @facilities) )
+                            \%:  name => "_PATH_LOG", type => "PV", default => \(@:  "PV", qq("$_PATH_LOG") ) 
+                            \%:  name => "LOG_PRIMASK",     type => "IV", default => \(@:  "IV", 7) 
+                            \%:  name => "LOG_NFACILITIES", type => "IV", default => \(@:  "IV", scalar nelems @facilities) 
         
 
     ExtUtils::Constant::WriteConstants(

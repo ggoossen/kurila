@@ -14,7 +14,7 @@ umask 0
 $xref = \ ""
 $runme = $^EXECUTABLE_NAME
 @a =1..5
-%h = %( <1..6)
+%h = %:  <1..6
 $aref = \@a
 $href = \%h
 open my $op_fh, '-|', qq{$runme -le "print \\\$^STDOUT, 'aaa Ok ok' for 1..100"}

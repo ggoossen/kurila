@@ -72,8 +72,8 @@ $foo = 'lskjdf'
 ok(!($cnt = ((@: ?$F1,?$F2,?$Etc) = (@: $foo =~ m/^(\S+)\s+(\S+)\s*(.*)/))))
     or diag("$cnt $F1:$F2:$Etc")
 
-%foo = %('blurfl','dyick','foo','bar','etc.','etc.')
-%bar = %( < %foo )
+%foo = %: 'blurfl','dyick','foo','bar','etc.','etc.'
+%bar = %:  < %foo 
 is(%bar{?'foo'}, 'bar')
 %bar = $%
 is(%bar{?'foo'}, undef)

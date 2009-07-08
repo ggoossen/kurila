@@ -136,7 +136,7 @@ for my $p ((@: 'gc', 'sc'))
 
         my $str = char_range($h1, $h2)
 
-        for my $x ((@: $p, %( gc => 'General Category', sc => 'Script' ){?$p}))
+        for my $x ((@: $p, (%:  gc => 'General Category', sc => 'Script' ){?$p}))
             for my $y ((@: $abbr, %utf8::PropValueAlias{$p}{?$abbr}, %utf8::PVA_abbr_map{gc_sc}{?$abbr}))
                 is($str =~ m/(\p{$x: $y}+)/ && $1, substr($str, 0, -1))
                 is($str =~ m/(\P{$x= $y}+)/ && $1, substr($str, -1))

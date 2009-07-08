@@ -39,7 +39,7 @@ local *FOO
            sub() { print $^STDOUT, "test\n" }
            \&Test::ok               # large scalar
 
-       \%("a" => sub (@< @_) { "srt" }, "b" => \&code)
+       \%: "a" => sub (@< @_) { "srt" }, "b" => \&code
 
        sub (@< @_) { ord("a")-ord("7") }
 

@@ -19,15 +19,15 @@ require Tie::Hash
 
 sub new
     my $pkg = shift 
-    return bless \%( VALID => \%(
-        bsize     => 1,
-        ffactor   => 1,
-        nelem     => 1,
-        cachesize => 1,
-        hash      => 2,
-        lorder    => 1,
-        ),
-        GOT   => \$%
+    return bless \(%:  VALID => \(%: 
+                           bsize     => 1
+                           ffactor   => 1
+                           nelem     => 1
+                           cachesize => 1
+                           hash      => 2
+                           lorder    => 1
+        )
+                       GOT   => \$%
         ), $pkg 
 
 
@@ -48,10 +48,10 @@ use warnings
 sub TIEHASH
     my $pkg = shift 
 
-    bless \%( VALID => \%( < @+: map { @: $_, 1},
-        qw( bval cachesize psize flags lorder reclen bfname )
-        ),
-        GOT   => \$%,
+    bless \(%:  VALID => \(%:  < @+: map { @: $_, 1}
+                             qw( bval cachesize psize flags lorder reclen bfname )
+        )
+                GOT   => \$%
         ), $pkg 
 
 
@@ -65,17 +65,17 @@ use warnings
 sub TIEHASH
     my $pkg = shift 
 
-    bless \%( VALID => \%(
-        flags      => 1,
-        cachesize  => 1,
-        maxkeypage => 1,
-        minkeypage => 1,
-        psize      => 1,
-        compare    => 2,
-        prefix     => 2,
-        lorder     => 1,
-        ),
-        GOT   => \$%,
+    bless \(%:  VALID => \(%: 
+                    flags      => 1
+                    cachesize  => 1
+                    maxkeypage => 1
+                    minkeypage => 1
+                    psize      => 1
+                    compare    => 2
+                    prefix     => 2
+                    lorder     => 1
+        )
+                GOT   => \$%
         ), $pkg 
 
 

@@ -8,8 +8,8 @@ use File::Path
 use File::Basename
 use MakeMaker::Test::Utils
 
-my %Files = %(
-    'Recurs/Makefile.PL'          => <<'END',
+my %Files = %: 
+    'Recurs/Makefile.PL'          => <<'END'
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -18,7 +18,7 @@ WriteMakefile(
   );
 END
 
-    'Recurs/prj2/Makefile.PL'     => <<'END',
+    'Recurs/prj2/Makefile.PL'     => <<'END'
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -28,13 +28,13 @@ WriteMakefile(
 END
 
     # Check if a test failure in a subdir causes make test to fail
-    'Recurs/prj2/t/fail.t'         => <<'END',
+    'Recurs/prj2/t/fail.t'         => <<'END'
 #!/usr/bin/perl -w
 
 print "1..1\n";
 print "not ok 1\n";
 END
-    )
+    
 
 sub setup_recurs
     setup_mm_test_root()

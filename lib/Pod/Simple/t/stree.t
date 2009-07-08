@@ -49,10 +49,10 @@ ok(!deq( 2,     1     ))
 &ok( deq( \$%,    \$%     ))
 &ok(!deq( \$%,    1      ))
 &ok(!deq( 1,     \$%     ))
-&ok(!deq( \%(1,2), \$%     ))
-&ok(!deq( \$%,    \%(1,2)  ))
-&ok( deq( \%(1,2), \%(1,2)  ))
-&ok(!deq( \%(2,1), \%(1,2)  ))
+&ok(!deq( \(%: 1,2), \$%     ))
+&ok(!deq( \$%,    \(%: 1,2)  ))
+&ok( deq( \(%: 1,2), \(%: 1,2)  ))
+&ok(!deq( \(%: 2,1), \(%: 1,2)  ))
 
 
 
@@ -63,8 +63,8 @@ ok x( "=pod\n\nI like pie.\n" )
 
 print $^STDOUT, "# Some real tests...\n"
 &ok( deq( x( "=pod\n\nI like pie.\n"),
-          \@:  "Document", \%("start_line"=>1)
-               \@: "Para",   \%("start_line"=>3)
+          \@:  "Document", \%: "start_line"=>1
+               \@: "Para",   \%: "start_line"=>3
                    "I like pie."
                          
           

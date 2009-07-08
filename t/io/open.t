@@ -277,11 +277,11 @@ SKIP: do
 # [perl #28986] "open m" crashes Perl
 
 fresh_perl_like('open m', qr/^Search pattern not terminated at/,
-                \%( stderr => 1 ), 'open m test')
+                \(%:  stderr => 1 ), 'open m test')
 
 fresh_perl_is(
     'sub f { open(my $fh, "<", "xxx"); $fh = "f"; } f; f;print $^STDOUT, "ok"',
-    'ok', \%( stderr => 1 ),
+    'ok', \(%:  stderr => 1 ),
     '#29102: Crash on assignment to lexical filehandle')
 
 # [perl #31767] Using $1 as a filehandle via open $1, "file" doesn't raise

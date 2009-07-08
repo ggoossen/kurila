@@ -100,7 +100,7 @@ is (ref $refref, 'HASH')
 
 $anonhash = \$%
 is (ref $anonhash, 'HASH')
-$anonhash2 = \%(FOO => 'BAR', ABC => 'XYZ',)
+$anonhash2 = \%: FOO => 'BAR', ABC => 'XYZ',
 is (join('', sort values $anonhash2->%), 'BARXYZ')
 
 # Test ->[$@%&*] derefence syntax
@@ -109,7 +109,7 @@ do
     is($z->$, 66)
     my $y = \@: 1,2,3,4
     is(join(':', $y->@), "1:2:3:4")
-    my $x = \%( aap => 'noot', mies => "teun" )
+    my $x = \%:  aap => 'noot', mies => "teun" 
     is((join "*", keys $x->%), join "*", keys $x->%)
     my $w = \*foo428
     is(Symbol::glob_name($w->*), "main::foo428")
@@ -163,7 +163,7 @@ package OBJ
 
 our @ISA = @: 'BASEOBJ'
 
-$main::object = bless \%(FOO => 'foo', BAR => 'bar')
+$main::object = bless \%: FOO => 'foo', BAR => 'bar'
 
 package main
 

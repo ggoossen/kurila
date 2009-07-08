@@ -48,7 +48,7 @@ foreach my $prog ( @prgs)
 
     $expected =~ s/\n+$//
 
-    fresh_perl_is($prog, $expected, \%( switches => \(@: $switch || '') ), $name)
+    fresh_perl_is($prog, $expected, \(%:  switches => \(@: $switch || '') ), $name)
 
 
 __END__

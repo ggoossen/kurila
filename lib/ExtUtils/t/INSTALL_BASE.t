@@ -5,7 +5,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't' if -d 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -53,12 +53,12 @@ like( $install_out, qr/^Writing /m )
 ok( -r '../dummy-install',      '  install dir created' )
 
 my @installed_files =
-    @('../dummy-install/lib/perl5/Big/Dummy.pm',
-      '../dummy-install/lib/perl5/Big/Liar.pm',
-      '../dummy-install/bin/program',
-      "../dummy-install/lib/perl5/$(config_value('archname'))/perllocal.pod",
-      "../dummy-install/lib/perl5/$(config_value('archname'))/auto/Big/Dummy/.packlist"
-    )
+    @: '../dummy-install/lib/perl5/Big/Dummy.pm'
+       '../dummy-install/lib/perl5/Big/Liar.pm'
+       '../dummy-install/bin/program'
+       "../dummy-install/lib/perl5/$(config_value('archname'))/perllocal.pod"
+       "../dummy-install/lib/perl5/$(config_value('archname'))/auto/Big/Dummy/.packlist"
+    
 
 foreach my $file ( @installed_files)
     ok( -e $file, "  $file installed" )

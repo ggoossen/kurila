@@ -29,13 +29,13 @@ sub num_equal($num, $left, $right, $name)
 package dump
 use Carp
 
-my %dump = %(
-    'SCALAR'	=> 'dump_scalar',
-    'LVALUE'	=> 'dump_scalar',
-    'ARRAY'		=> 'dump_array',
-    'HASH'		=> 'dump_hash',
-    'REF'		=> 'dump_ref',
-    )
+my %dump = %: 
+    'SCALAR'	=> 'dump_scalar'
+    'LVALUE'	=> 'dump_scalar'
+    'ARRAY'		=> 'dump_array'
+    'HASH'		=> 'dump_hash'
+    'REF'		=> 'dump_ref'
+    
 
 our (%dumped, %object, $count, $dumped)
 

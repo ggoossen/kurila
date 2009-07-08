@@ -17,10 +17,10 @@ if ($^OS_NAME eq 'MSWin32')
 WriteMakefile(
     NAME            => "B",
     VERSION_FROM    => "B.pm",
-    PL_FILES        => %( 'defsubs_h.PL' => 'defsubs.h' ),
-    clean           => %(
+    PL_FILES        => (%:  'defsubs_h.PL' => 'defsubs.h' ),
+    clean           => %: 
     FILES           => "perl$e *$o B.c defsubs.h *~"
-    )
+    
     )
 
 package MY

@@ -407,7 +407,7 @@ sub _can_write_dir
             return @: 1,$dir,@make
         else
             return @: 0,$dir,@make
-        
+                          
     continue
         pop @dirs
     
@@ -648,7 +648,7 @@ provided then the returned hashref will be the passed in hashref.
 sub install #XXX OS-SPECIFIC
     my(@: $from_to,?$verbose,?$dry_run,?$uninstall_shadows,?$skip,?$always_copy,?$result) =  @_
     if ((nelems @_)==1 and try { 1+nelems $from_to->@ })
-        my %opts        = %( < $from_to->@ )
+        my %opts        = %:  < $from_to->@ 
         $from_to        = %opts{?from_to}
             or Carp::confess("from_to is a mandatory parameter")
         $verbose        = %opts{?verbose}
@@ -669,7 +669,7 @@ sub install #XXX OS-SPECIFIC
         || 0
         unless defined $always_copy
 
-    my(@: %from_to) =@:  %( < $from_to->% )
+    my(@: %from_to) =@:  %:  < $from_to->% 
     my(%pack, $dir, %warned)
     my $packlist = ExtUtils::Packlist->new()
 
@@ -949,17 +949,17 @@ sub install_default(@< @_)
     my $INST_SCRIPT = File::Spec->catdir($Curdir,'blib','script')
     my $INST_MAN1DIR = File::Spec->catdir($Curdir,'blib','man1')
     my $INST_MAN3DIR = File::Spec->catdir($Curdir,'blib','man3')
-    install(\%(
-            read => config_value("sitearchexp") . "/auto/$FULLEXT/.packlist",
-            write => config_value("installsitearch") . "/auto/$FULLEXT/.packlist",
+    install(\(%: 
+            read => config_value("sitearchexp") . "/auto/$FULLEXT/.packlist"
+            write => config_value("installsitearch") . "/auto/$FULLEXT/.packlist"
             $INST_LIB => (directory_not_empty($INST_ARCHLIB)) ??
-            config_value("installsitearch") !!
-            config_value("installsitelib"),
-            $INST_ARCHLIB => config_value("installsitearch"),
-            $INST_BIN => config_value("installbin") ,
-            $INST_SCRIPT => config_value("installscript"),
-            $INST_MAN1DIR => config_value("installman1dir"),
-            $INST_MAN3DIR => config_value("installman3dir"),
+                    config_value("installsitearch") !!
+                    config_value("installsitelib")
+            $INST_ARCHLIB => config_value("installsitearch")
+            $INST_BIN => config_value("installbin") 
+            $INST_SCRIPT => config_value("installscript")
+            $INST_MAN1DIR => config_value("installman1dir")
+            $INST_MAN3DIR => config_value("installman3dir")
             ),1,0,0)
 
 

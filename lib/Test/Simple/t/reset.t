@@ -5,7 +5,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -13,7 +13,7 @@ BEGIN
 chdir 't'
 
 
-use Test::Builder;
+use Test::Builder
 my $tb = Test::Builder->new
 
 my %Original_Output

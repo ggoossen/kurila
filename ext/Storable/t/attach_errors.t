@@ -110,7 +110,7 @@ do
     
 
     sub STORABLE_attach($class, $clone, $string)
-        return bless \%( 'foo' => 'bar' ), 'My::GoodThaw'
+        return bless \(%:  'foo' => 'bar' ), 'My::GoodThaw'
     
 
 
@@ -151,7 +151,7 @@ do
     # Start with no STORABLE_attach method so we can get a
     # frozen object-containing-a-reference into the freeze string.
     sub STORABLE_thaw($class, $clone, $string)
-        return bless \%( 'foo' => 'bar' ), 'My::BadThaw'
+        return bless \(%:  'foo' => 'bar' ), 'My::BadThaw'
     
 
 

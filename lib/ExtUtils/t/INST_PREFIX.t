@@ -8,7 +8,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't' if -d 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -112,13 +112,13 @@ is( $mm_perl_src, $perl_src,     'PERL_SRC' )
 
 
 # Every INSTALL* variable must start with some PREFIX.
-my %Install_Vars = %(
-    PERL   => \qw(archlib    privlib   bin       man1dir       man3dir   script),
-    SITE   => \qw(sitearch   sitelib   sitebin   siteman1dir   siteman3dir),
+my %Install_Vars = %: 
+    PERL   => \qw(archlib    privlib   bin       man1dir       man3dir   script)
+    SITE   => \qw(sitearch   sitelib   sitebin   siteman1dir   siteman3dir)
     VENDOR => \qw(vendorarch vendorlib vendorbin vendorman1dir vendorman3dir)
-    )
+    
 
-while( my@(?$type, ?$vars) =@( each %Install_Vars))
+while( my(@: ?$type, ?$vars) =(@:  each %Install_Vars))
     SKIP: do
         skip "VMS must expand macros in INSTALL* vars", scalar nelems $vars->@
             if $Is_VMS
@@ -253,7 +253,7 @@ do
 
 
 sub _set_config
-    my@($k,$v) =  @_
+    my(@: $k,$v) =  @_
     (my $k_no_install = $k) =~ s/^install//i
     %Config{$k} = $v
 

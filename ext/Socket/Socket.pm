@@ -347,10 +347,10 @@ use XSLoader ()
 	       TCP_NODELAY
 	       TCP_STDURG)
 
-%EXPORT_TAGS = %(
-    crlf    => qw(CR LF CRLF $CR $LF $CRLF),
-    all     => @EXPORT +@+ @EXPORT_OK,
-    )
+%EXPORT_TAGS = %: 
+    crlf    => qw(CR LF CRLF $CR $LF $CRLF)
+    all     => @EXPORT +@+ @EXPORT_OK
+    
 
 BEGIN 
     sub CR   () {"\015"}

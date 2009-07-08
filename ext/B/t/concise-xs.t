@@ -109,26 +109,26 @@ use Test::More 'no_plan'
 require_ok("B::Concise")
 
 my %matchers =
-    %( constant => qr{ (?-x: is a constant sub, optimized to a \w+)
-                      |(?-x: is XS code) }x,
-    XS  => qr/ is XS code/,
-    perl        => qr/ (next|db)state/,
-    noSTART     => qr/coderef .* has no START/,
-    )
+    %:  constant => qr{ (?-x: is a constant sub, optimized to a \w+)
+                      |(?-x: is XS code) }x
+        XS  => qr/ is XS code/
+        perl        => qr/ (next|db)state/
+        noSTART     => qr/coderef .* has no START/
+    
 
-my $testpkgs = \%(
+my $testpkgs = \(%: 
     # packages to test, with expected types for named funcs
 
-    'Data::Dumper' => %( dflt => 'perl' ),
-    B => %(
-    dflt => 'constant',         # all but 47/297
-    skip => (@:  'regex_padav' ), # threaded only
-    perl => qw(
+    'Data::Dumper' => (%:  dflt => 'perl' )
+    B => (%: 
+        dflt => 'constant'         # all but 47/297
+        skip => (@:  'regex_padav' ) # threaded only
+        perl => qw(
                     walksymtable walkoptree_slow walkoptree_exec
                     timing_info savesym peekop parents objsym debug
                     compile_stats clearsym class
-                    ),
-    XS => qw(
+                    )
+        XS => qw(
                   warnhook walkoptree_debug walkoptree 
                   svref_2object sv_yes sv_undef sv_no save_BEGINs
                   regex_padav ppname perlstring opnumber minus_c
@@ -136,15 +136,15 @@ my $testpkgs = \%(
                   end_av dowarn diehook defstash curstash
                   cstring comppadlist check_av cchar cast_I32 bootstrap
                   sub_generation address
-                  fudge unitcheck_av),
-    ),
+                  fudge unitcheck_av)
+    )
 
-    'B::Deparse' => %( dflt => 'perl',  # 235 functions
+    'B::Deparse' => (%:  dflt => 'perl'  # 235 functions
 
-    XS => qw( svref_2object perlstring opnumber main_start
-                   main_root main_cv ),
+                         XS => qw( svref_2object perlstring opnumber main_start
+                   main_root main_cv )
 
-    constant => qw/ 
+                         constant => qw/ 
                      OPf_KIDS OPf_MOD OPf_REF OPf_SPECIAL
                      OPf_STACKED OPf_WANT OPf_WANT_LIST OPf_WANT_SCALAR
                      OPf_WANT_VOID OPpCONST_BARE
@@ -157,12 +157,12 @@ my $testpkgs = \%(
                      PMf_MULTILINE PMf_SINGLELINE
                      SVf_FAKE SVf_IOK SVf_NOK SVf_POK SVf_ROK
                      SVpad_OUR SVs_RMG SVs_SMG
-                     RXf_SKIPWHITE/,
-    ),
+                     RXf_SKIPWHITE/
+    )
 
-    POSIX => %( dflt => 'constant',                     # all but 252/589
-    skip => qw/ _POSIX_JOB_CONTROL /,   # platform varying
-    perl => qw/ import load_imports
+    POSIX => (%:  dflt => 'constant'                     # all but 252/589
+                  skip => qw/ _POSIX_JOB_CONTROL /   # platform varying
+                  perl => qw/ import load_imports
                             usage redef unimpl assert tolower toupper closedir
                             opendir readdir rewinddir errno creat fcntl getgrgid
                             getgrnam atan2 cos exp fabs log pow sin sqrt getpwnam
@@ -183,9 +183,9 @@ my $testpkgs = \%(
 
                             S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG WEXITSTATUS
                             WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG
-                            /,
+                            /
 
-    XS => qw/ write wctomb wcstombs uname tzset tzname
+                  XS => qw/ write wctomb wcstombs uname tzset tzname
                       ttyname tmpnam times tcsetpgrp tcsendbreak
                       tcgetpgrp tcflush tcflow tcdrain tanh tan
                       sysconf strxfrm strtoul strtol strtod
@@ -201,12 +201,12 @@ my $testpkgs = \%(
                       ctermid cosh constant close clock ceil
                       bootstrap atan asin asctime acos access abort
                       _exit
-                      /,
-    ),
+                      /
+    )
 
-    'IO::Socket' => %( dflt => 'constant',              # 157/190
+    'IO::Socket' => (%:  dflt => 'constant'              # 157/190
 
-                       perl => qw/ timeout socktype sockopt sockname
+                         perl => qw/ timeout socktype sockopt sockname
                              socketpair socket sockdomain
                              sockaddr_in shutdown setsockopt send
                              register_domain recv protocol peername
@@ -214,13 +214,13 @@ my $testpkgs = \%(
                              connected connect configure confess close
                              carp bind atmark accept blocking
                              EWOULDBLOCK EISCONN EINPROGRESS
-                             /,
+                             /
 
-                       XS => qw/ unpack_sockaddr_un unpack_sockaddr_in
+                         XS => qw/ unpack_sockaddr_un unpack_sockaddr_in
                            sockatmark sockaddr_family pack_sockaddr_un
                            pack_sockaddr_in inet_ntoa inet_aton
-                           /,
-    ),
+                           /
+    )
     )
 
 ############

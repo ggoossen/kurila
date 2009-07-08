@@ -278,7 +278,7 @@ sub OUT { shift->[1] }
 sub MinLine { undef }
 sub Attribs { \$% }
 
-my %features = %(tkRunning => 1, ornaments => 1, 'newTTY' => 1)
+my %features = %: tkRunning => 1, ornaments => 1, 'newTTY' => 1
 sub Features { \%features }
 
 sub get_line
@@ -335,7 +335,7 @@ sub LoadTermCap
     return if defined $terminal
 
     require Term::Cap
-    $terminal = Term::Cap->Tgetent(\%(OSPEED => 9600)) # Avoid warning.
+    $terminal = Term::Cap->Tgetent(\(%: OSPEED => 9600)) # Avoid warning.
 
 
 sub ornaments

@@ -50,7 +50,7 @@ our (%a1, %a2)
 for my $i (0 .. $hashsize -1)
     my $k = int(rand(1_000_000))
     $k = MD5->hexhash($k) if $gotmd5 and int(rand(2))
-    %a1{+$k} = \%( key => "$k", "value" => $i )
+    %a1{+$k} = \(%:  key => "$k", "value" => $i )
 
     # A third of the elements are references to further hashes
 
@@ -79,7 +79,7 @@ print $^STDERR, < Data::Dumper::Dumper(\%a1) if ($verbose and $gotdd)
 # Copy the hash, element by element in order of the keys
 
 foreach my $k (sort keys %a1)
-    %a2{+$k} = \%( key => "$k", "value" => %a1{$k}->{?value} )
+    %a2{+$k} = \(%:  key => "$k", "value" => %a1{$k}->{?value} )
 
 
 # Deep clone the hash

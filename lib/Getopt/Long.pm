@@ -132,10 +132,10 @@ my $default_config = &Getopt::Long::Configure ()
 sub new
     my $that = shift
     my $class = ref($that) || $that
-    my %atts = %( < @_ )
+    my %atts = (%:  < @_ )
 
     # Register the callers package.
-    my $self = \%( caller_pkg => (@: caller)[0] )
+    my $self = \%:  caller_pkg => (@: caller)[0] 
 
     bless ($self, $class)
 
@@ -595,7 +595,7 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
                     else
                         print $^STDERR, ("=>\$L\{$opt\} = \{$key => \"$arg\"\}\n")
                             if $debug
-                        $userlinkage->{+$opt} = \%($key => $arg)
+                        $userlinkage->{+$opt} = \%: $key => $arg
                     
                 else
                     if ( $ctl->[CTL_TYPE] eq '+' )
@@ -1312,7 +1312,7 @@ sub setup_pa_args($tag, @args)
 
     my $pa
     if ( (nelems @args) +> 1 )
-        $pa = \%( < @args )
+        $pa = \%:  < @args 
     else
         $pa = shift(@args) || \$%
     
@@ -1325,9 +1325,9 @@ sub setup_pa_args($tag, @args)
         $pa->{+message} = $pa->{?msg}
         delete($pa->{"-msg"})
     elsif ( $pa =~ m/^-?\d+$/ )
-        $pa = \%( "-exitval" => $pa )
+        $pa = \%:  "-exitval" => $pa 
     else
-        $pa = \%( "-message" => $pa )
+        $pa = \(%:  "-message" => $pa )
     
 
     # These are _our_ defaults.
@@ -1345,7 +1345,7 @@ sub VERSION
 package Getopt::Long::CallBack
 
 sub new($pkg, %< %atts)
-    bless \%( < %atts ), $pkg
+    bless \(%:  < %atts ), $pkg
 
 
 sub name

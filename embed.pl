@@ -92,11 +92,11 @@ sub walk_table ($function, ?$filename, ?$leader, ?$trailer)
         s/\s+$//
         my @args
         if (m/^\s*(#|$)/)
-            @args = @( $_ )
+            @args = @:  $_ 
         else
             @args = split m/\s*\|\s*/, $_
         
-        my @outs = @( $function->(< @args) )
+        my @outs = @:  $function->(< @args) 
         print $F, < @outs
     
     print $F, $trailer if $trailer
@@ -107,7 +107,7 @@ sub walk_table ($function, ?$filename, ?$leader, ?$trailer)
 
 
 sub munge_c_files ()
-    my $functions = \%()
+    my $functions = \%: 
     unless (nelems @ARGV)
         warn "\@ARGV empty, nothing to do\n"
         return
@@ -145,7 +145,7 @@ sub write_protos
         my $arg = shift
         $ret .= "$arg\n"
     else
-        my @($flags,$retval,$plain_func,@< @args) =  @_
+        my (@: $flags,$retval,$plain_func,@< @args) =  @_
         my @nonnull
         my $has_context = ( $flags !~ m/n/ )
         my $never_returns = ( $flags =~ m/r/ )
@@ -271,7 +271,7 @@ do
     sub write_global_sym
         my $ret = ""
         if ((nelems @_) +> 1)
-            my @($flags,$retval,$func,@< @args) =  @_
+            my (@: $flags,$retval,$func,@< @args) =  @_
             # If a function is defined twice, for example before and after an
             # #else, only process the flags on the first instance for global.sym
             return $ret if %seen{+$func}++
@@ -432,7 +432,7 @@ walk_table sub (@< @_)
                    my $arg = shift
                    $ret .= "$arg\n" if $arg =~ m/^#\s*(if|ifn?def|else|endif)\b/
                else
-                   my @($flags,$retval,$func,@< @args) =  @_
+                   my (@: $flags,$retval,$func,@< @args) =  @_
                    unless ($flags =~ m/[om]/)
                        if ($flags =~ m/s/)
                            $ret .= hide($func,"S_$func")
@@ -488,7 +488,7 @@ walk_table sub (@< @_)
                    my $arg = shift
                    $ret .= "$arg\n" if $arg =~ m/^#\s*(if|ifn?def|else|endif)\b/
                else
-                   my @($flags,$retval,$func,@< @args) =  @_
+                   my (@: $flags,$retval,$func,@< @args) =  @_
                    unless ($flags =~ m/[om]/)
                        my $args = scalar nelems @args
                        if ($args and @args[$args-1] =~ m/\.\.\./) {
@@ -951,7 +951,7 @@ rename_if_different('perlapi.c-new', 'perlapi.c')
 # functions that take va_list* for implementing vararg functions
 # NOTE: makedef.pl must be updated if you add symbols to %vfuncs
 # XXX %vfuncs currently unused
-my %vfuncs = %( < qw(
+my %vfuncs = (%:  < qw(
     Perl_croak                  Perl_vcroak
     Perl_warn                   Perl_vwarn
     Perl_warner                 Perl_vwarner

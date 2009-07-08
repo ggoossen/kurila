@@ -4,33 +4,33 @@ my @text = @:  ~< $^DATA
 
 my @title = @: "Hamlet's Soliloquy","W. Shakespeare"
 
-my %header = %(
-    first => sub (@< @_) { form(\%( page => \%(width=>@_[0]->{page}->{?width})),
-                            "\{II\{*\}II\}", \@title) . "\n";
-},
-    odd => sub (@< @_) { form(\%( page => \%(width=>@_[0]->{page}->{?width})),
-                              "\{]]\{*\}]]\}", @title[0]) . "\n";
-},
-    even => sub (@< @_) { form(\%( page => \%(width=>@_[0]->{page}->{?width})),
-                               "\{[[\{*\}[[\}", @title[1]) . "\n";
-},
-    )
+my %header = %: 
+    first => sub (@< @_) { form(\(%:  page => \(%: width=>@_[0]->{page}->{?width}))
+        "\{II\{*\}II\}", \@title) . "\n";
+    }
+    odd => sub (@< @_) { form(\(%:  page => \(%: width=>@_[0]->{page}->{?width}))
+        "\{]]\{*\}]]\}", @title[0]) . "\n";
+    }
+    even => sub (@< @_) { form(\(%:  page => \(%: width=>@_[0]->{page}->{?width}))
+        "\{[[\{*\}[[\}", @title[1]) . "\n";
+    }
+    
 
 sub footer
-    form \%( page => \%(width=>@_[0]->{page}->{?width}) ),
+    form \(%:  page => \(%: width=>@_[0]->{page}->{?width}) ),
          "\n\{|\{*\}|\}",
          "(page @_[0]->{page}->{?number})"
 
 
-my %page = %(
-    header => \%header,
-    footer => \&footer,
-    length => 15,
-    width  => 72,
-    feed   => ('_'x72)."\n",
-    )
+my %page = %: 
+    header => \%header
+    footer => \&footer
+    length => 15
+    width  => 72
+    feed   => ('_'x72)."\n"
+    
 
-print $^STDOUT, < form \%(page=>\%page),
+print $^STDOUT, < form \(%: page=>\%page),
                        '{]]]]]}  {"{*}"}  {[[[[[}',
                        \1..nelems @text, \@text,  \1..nelems @text
 

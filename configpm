@@ -52,27 +52,27 @@ while ($how_many_common--)
 
 
 # names of things which may need to have slashes changed to double-colons
-my %Extensions = %+: map {%($_,$_)},
+my %Extensions = %+: map {(%: $_,$_)},
     qw(dynamic_ext static_ext extensions known_extensions)
 
 # allowed opts as well as specifies default and initial values
-my %Allowed_Opts = %(
-    'cross'    => '', # --cross=PLATFORM - crosscompiling for PLATFORM
-    'glossary' => 1,  # --no-glossary  - no glossary file inclusion,
+my %Allowed_Opts = %: 
+    'cross'    => '' # --cross=PLATFORM - crosscompiling for PLATFORM
+    'glossary' => 1  # --no-glossary  - no glossary file inclusion,
     #                  for compactness
-    )
+    
 
 sub opts
     # user specified options
-    my %given_opts = %(
+    my %given_opts = %: 
         # --opt=smth
-        (< map {m/^--([\-_\w]+)=(.*)$/}, @ARGV),
+        (< map {m/^--([\-_\w]+)=(.*)$/}, @ARGV)
         # --opt --no-opt --noopt
-        (< @+: map {m/^no-?(.*)$/i??(@: $1=>0)!!(@: $_=>1)},
-                 map {m/^--([\-_\w]+)$/}, @ARGV),
-        )
+        (< @+: map {m/^no-?(.*)$/i??(@: $1=>0)!!(@: $_=>1)}
+        map {m/^--([\-_\w]+)$/}, @ARGV)
+        
 
-    my %opts = %(< %Allowed_Opts, < %given_opts)
+    my %opts = %: < %Allowed_Opts, < %given_opts
 
     for my $opt ( grep {!exists %Allowed_Opts{$_}}, keys %given_opts)
         warn "option '$opt' is not recognized"
@@ -84,7 +84,7 @@ sub opts
 
 
 
-my %Opts = %( < opts() )
+my %Opts = %:  < opts() 
 
 my ($Config_SH, $Config_PM, $Config_heavy, $Config_POD)
 my $Glossary = 'Porting/Glossary'
@@ -293,7 +293,7 @@ die if $^EVAL_ERROR
 # Calculation for the keys for byteorder
 # This is somewhat grim, but I need to run fetch_string here.
 $Config_SH_expanded = join "\n", @:  '', < @v_others
-
+                                         
 my $t = fetch_string (\$%, 'ivtype')
 my $s = fetch_string (\$%, 'ivsize')
 

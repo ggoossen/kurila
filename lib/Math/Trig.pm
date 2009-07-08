@@ -21,7 +21,7 @@ my @angcnv = qw(rad2deg rad2grad
 my @areal = qw(asin_real acos_real)
 
 @EXPORT = @: < @angcnv, < @areal
-
+                 
 my @rdlcnv = qw(cartesian_to_cylindrical
 		cartesian_to_spherical
 		cylindrical_to_cartesian
@@ -46,9 +46,9 @@ my @pi = qw(pi pi2 pi4 pip2 pip4)
 # http://www.movable-type.co.uk/scripts/LatLong.html
 # http://williams.best.vwh.net/avform.htm
 
-%EXPORT_TAGS = %('radial' => @rdlcnv,
-    'great_circle' => @greatcircle,
-    'pi'     => @pi)
+%EXPORT_TAGS = %: 'radial' => @rdlcnv
+                  'great_circle' => @greatcircle
+                  'pi'     => @pi
 
 sub tan($z)
     my $cz = cos($z)

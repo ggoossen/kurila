@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -19,11 +19,11 @@ $Test->level(0)
 my @Expected_Details
 
 $Test->is_num( (nelems $Test->summary()), 0,   'no tests yet, no summary' )
-push @Expected_Details, \%( 'ok'      => 1,
-    actual_ok => 1,
-    name      => 'no tests yet, no summary',
-    type      => '',
-    reason    => ''
+push @Expected_Details, \(%:  'ok'      => 1
+                              actual_ok => 1
+                              name      => 'no tests yet, no summary'
+                              type      => ''
+                              reason    => ''
     )
 
 # Inline TODO tests will confuse pre 1.20 Test::Harness, so we
@@ -39,53 +39,53 @@ $Test->todo_output($new_fh)
 SKIP: do
     $Test->skip( 'just testing skip' )
 
-push @Expected_Details, \%( 'ok'      => 1,
-    actual_ok => 1,
-    name      => '',
-    type      => 'skip',
-    reason    => 'just testing skip',
-    )
+push @Expected_Details, \%:  'ok'      => 1
+                             actual_ok => 1
+                             name      => ''
+                             type      => 'skip'
+                             reason    => 'just testing skip'
+    
 
 TODO: do
     local $TODO = 'i need a todo'
     $Test->ok( 0, 'a test to todo!' )
 
-    push @Expected_Details, \%( 'ok'       => 1,
-        actual_ok  => 0,
-        name       => 'a test to todo!',
-        type       => 'todo',
-        reason     => 'i need a todo',
-        )
+    push @Expected_Details, \%:  'ok'       => 1
+                                 actual_ok  => 0
+                                 name       => 'a test to todo!'
+                                 type       => 'todo'
+                                 reason     => 'i need a todo'
+        
 
     $Test->todo_skip( 'i need both' )
 
-push @Expected_Details, \%( 'ok'      => 1,
-    actual_ok => 0,
-    name      => '',
-    type      => 'todo_skip',
-    reason    => 'i need both'
-    )
+push @Expected_Details, \%:  'ok'      => 1
+                             actual_ok => 0
+                             name      => ''
+                             type      => 'todo_skip'
+                             reason    => 'i need both'
+    
 
 for ($start_test..$Test->current_test) { print $^STDOUT, "ok $_\n" }
 $Test->output($out_fh)
 $Test->todo_output($todo_fh)
 
 $Test->is_num( (nelems $Test->summary()), 4,   'summary' )
-push @Expected_Details, \%( 'ok'      => 1,
-    actual_ok => 1,
-    name      => 'summary',
-    type      => '',
-    reason    => '',
-    )
+push @Expected_Details, \%:  'ok'      => 1
+                             actual_ok => 1
+                             name      => 'summary'
+                             type      => ''
+                             reason    => ''
+    
 
 $Test->current_test = 6
 print $^STDOUT, "ok 6 - current_test incremented\n"
-push @Expected_Details, \%( 'ok'      => 1,
-    actual_ok => undef,
-    name      => undef,
-    type      => 'unknown',
-    reason    => 'incrementing test number',
-    )
+push @Expected_Details, \%:  'ok'      => 1
+                             actual_ok => undef
+                             name      => undef
+                             type      => 'unknown'
+                             reason    => 'incrementing test number'
+    
 
 my @details = $Test->details()
 $Test->is_num( scalar nelems @details, 6,

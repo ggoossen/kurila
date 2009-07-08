@@ -15,11 +15,11 @@ do
 do
     package Woozle::elx
     our @ISA = @: 'Woozle'
-    our %Lexicon = %(
-        'd2' => 'hum [dubbil,_1]',
-        'd3' => 'hoo [quant,_1,zaz]',
-        'd4' => 'hoo [*,_1,zaz]',
-        )
+    our %Lexicon = %: 
+        'd2' => 'hum [dubbil,_1]'
+        'd3' => 'hoo [quant,_1,zaz]'
+        'd4' => 'hoo [*,_1,zaz]'
+        
     keys %Lexicon # dodges the 'used only once' warning
 
 

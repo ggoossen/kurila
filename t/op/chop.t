@@ -131,8 +131,8 @@ is (ref($_), "ARRAY", "chomp ref (no modify)")
 
 $^INPUT_RECORD_SEPARATOR = "\n"
 
-%chomp = %("One" => "One", "Two\n" => "Two", "" => "")
-%chop = %("One" => "On", "Two\n" => "Two", "" => "")
+%chomp = %: "One" => "One", "Two\n" => "Two", "" => ""
+%chop = %: "One" => "On", "Two\n" => "Two", "" => ""
 
 foreach (keys %chomp)
     my $key = $_

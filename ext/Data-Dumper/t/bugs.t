@@ -29,7 +29,7 @@ foo(\$%)
 ok(1, "[perl #38612]") # Still no core dump? We are fine.
 
 do
-    my %h = %(1,2,3,4)
+    my %h = %: 1,2,3,4
     each %h
 
     my $d = Data::Dumper->new(\(@: \%h))

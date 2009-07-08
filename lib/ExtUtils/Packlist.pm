@@ -48,9 +48,9 @@ sub __find_relocations
 sub new($class, ?$packfile)
     $class = ref($class) || $class
 
-    my $self = \%( packfile => $packfile,
-        data => $%,
-        )
+    my $self = \%:  packfile => $packfile
+                    data => $%
+        
     bless($self, $class)
 
     $self->read($packfile) if (defined($packfile) && -f $packfile)
@@ -74,7 +74,7 @@ sub read($self, ?$packfile)
         my $data
         if ($key =~ m/^(.*?)( \w+=.*)$/)
             $key = $1
-            $data = \%( < @+: map { split('=', $_) }, split(' ', $2))
+            $data = \%:  < @+: map { split('=', $_) }, split(' ', $2)
 
             if (config_value("userelocatableinc") && $data->{?relocate_as})
                 require File::Spec
@@ -139,7 +139,7 @@ sub validate($self, ?$remove)
     
     return @: @missing
 
-
+                  
 sub packlist_file($self)
     return @: $self->{?packfile}
 

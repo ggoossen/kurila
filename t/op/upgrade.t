@@ -11,14 +11,14 @@ BEGIN
 my $null
 
 $^OS_ERROR = 1
-my %types = %(
-    null => $null,
-    iv => 3,
-    nv => .5,
-    rv => \$@,
-    pv => "Perl rules",
-    pviv => 3,
-    pvnv => 1==1,
+my %types = (%: 
+    null => $null
+    iv => 3
+    nv => .5
+    rv => \$@
+    pv => "Perl rules"
+    pviv => 3
+    pvnv => 1==1
     )
 
 # This is somewhat cheating but I can't think of anything built in that I can

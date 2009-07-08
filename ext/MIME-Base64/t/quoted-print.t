@@ -28,7 +28,7 @@ my @tests =
         "The Quoted-Printable encoding is intended to represent data that largly con=
 sists of octets that correspond to printable characters in the ASCII charac=
 ter set.=\n"
-       )
+     )
 
    # Long lines after short lines were broken through 2.01.
    \(@: "short line

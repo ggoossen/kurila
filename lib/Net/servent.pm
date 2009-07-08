@@ -7,7 +7,7 @@ BEGIN
     use Exporter   ()
     @EXPORT      = qw(getservbyname getservbyport getservent getserv)
     @EXPORT_OK   = qw( $s_name @s_aliases $s_port $s_proto )
-    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT )
+    %EXPORT_TAGS = %:  FIELDS => @EXPORT_OK +@+ @EXPORT 
 
 our ($s_name, @s_aliases, $s_port, $s_proto)
 

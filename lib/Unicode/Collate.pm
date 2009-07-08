@@ -142,7 +142,7 @@ my (%ChangeOK, %ChangeNG)
 
 sub change
     my $self = shift
-    my %hash = %( < @_ )
+    my %hash = %:  < @_ 
     my %old
     if (exists %hash{variable} && exists %hash{alternate})
         delete %hash{alternate}
@@ -173,12 +173,12 @@ sub _checkLevel
         $level, $key, < MaxLevel
 
 
-my %DerivCode = %(
-    8 => \&_derivCE_8,
-    9 => \&_derivCE_9,
-    11 => \&_derivCE_9, # 11 == 9
-    14 => \&_derivCE_14,
-    )
+my %DerivCode = %: 
+    8 => \&_derivCE_8
+    9 => \&_derivCE_9
+    11 => \&_derivCE_9 # 11 == 9
+    14 => \&_derivCE_14
+    
 
 sub checkCollator
     my $self = shift
@@ -245,7 +245,7 @@ sub checkCollator
 
 sub new
     my $class = shift
-    my $self = bless \%( < @_ ), $class
+    my $self = bless \(%:  < @_ ), $class
 
     # If undef is passed explicitly, no file is read.
     $self->{+table} = $KeyFile if ! exists $self->{table}
@@ -602,7 +602,7 @@ sub getWt
         my $cjk  = $self->{?overrideCJK}
         return map { _varCE($vbl, $_) },
                 @: $cjk
-                       ?? < map( {pack(VCE_TEMPLATE, NON_VAR, < $_->@) }, &$cjk($u))
+                   ?? < map( {pack(VCE_TEMPLATE, NON_VAR, < $_->@) }, &$cjk($u))
                        !! defined $cjk && $self->{?UCA_Version} +<= 8 && $u +< 0x10000
                        ?? _uideoCE_8($u)
                        !! < $der->($u)
@@ -909,10 +909,10 @@ sub index($self, $str, $substr, ?$pos, ?$grob)
         if ((nelems @subWt) && !$var && !@wt[0])
             push  @subWt[-1]->@, \@wt if $to_be_pushed
         else
-            push @subWt, \@:  \@wt 
-        
-    
+            push @subWt, \@:  \@wt
 
+
+                                  
     my $count = 0
     my $end = (nelems $strE->@) - 1
 

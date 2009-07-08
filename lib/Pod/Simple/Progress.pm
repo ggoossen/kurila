@@ -16,7 +16,7 @@ our $VERSION = "1.01"
 #--------------------------------------------------------------------------
 
 sub new($class,$delay)
-    my $self = bless \%('quiet_until' => 1),  ref($class) || $class
+    my $self = bless \(%: 'quiet_until' => 1),  ref($class) || $class
     $self->to($^STDOUT{IO})
     $self->delay(defined($delay) ?? $delay !! 5)
     return $self
@@ -24,7 +24,7 @@ sub new($class,$delay)
 
 sub copy
     my $orig = shift
-    bless \%(< $orig->%, 'quiet_until' => 1), ref($orig)
+    bless \(%: < $orig->%, 'quiet_until' => 1), ref($orig)
 
 #--------------------------------------------------------------------------
 
@@ -35,12 +35,12 @@ sub reach($self, $point, $note)
         print $to, join('', @: 
             ($self->{?'quiet_until'} == 1) ?? () !! '... '
             (defined $point) ?? (
-                '#',
-                ($goal = $self->{?'goal'}) ?? (
-                        ' ' x (length($goal) - length($point)),
-                        $point, '/', $goal
-                    ) !! $point,
-                $note ?? ': ' !! ()
+                '#'
+            ($goal = $self->{?'goal'}) ?? (
+                        ' ' x (length($goal) - length($point))
+            $point, '/', $goal
+                        ) !! $point
+            $note ?? ': ' !! ()
                 ) !! ()
             $note || ''
             "\n"

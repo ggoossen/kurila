@@ -12,7 +12,7 @@ $VERSION = eval $VERSION
 # platform we're on.  I don't know of a systematic way.  These values
 # came from the latest (bleadperl) perlport.pod.
 
-my %OSTYPES = %( < qw(
+my %OSTYPES = (%:  < qw(
 		 aix       Unix
 		 bsdos     Unix
 		 dgux      Unix

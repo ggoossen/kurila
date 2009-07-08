@@ -97,7 +97,7 @@ ok( %h)
 my (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
        $blksize,$blocks) = @: stat($Dfile)
 
-my %noMode = %( < @+: map { @: $_, 1 }, qw( amigaos MSWin32 NetWare cygwin ) ) 
+my %noMode = %:  < @+: map { @: $_, 1 }, qw( amigaos MSWin32 NetWare cygwin )  
 
 ok( ($mode ^&^ 0777) == (($^OS_NAME eq 'os2' || $^OS_NAME eq 'MacOS') ?? 0666 !! 0640) ||
     %noMode{?$^OS_NAME} )

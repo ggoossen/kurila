@@ -11,9 +11,9 @@ do
     our $VERSION = '0.24'
     our @ISA = qw(Exporter)
 
-    our %EXPORT_TAGS = %(
-        standard => qw(openlog syslog closelog setlogmask),
-        extended => qw(setlogsock),
+    our %EXPORT_TAGS = %: 
+        standard => qw(openlog syslog closelog setlogmask)
+        extended => qw(setlogsock)
         macros => (@: 
             # levels
             < qw(
@@ -45,8 +45,8 @@ do
                 LOG_FACMASK LOG_NFACILITIES LOG_PRIMASK 
                 LOG_MASK LOG_UPTO
             )
-        ),
-        )
+                   )
+        
 
     our @EXPORT = %EXPORT_TAGS{?standard}
 
@@ -86,11 +86,11 @@ my $maskpri = LOG_UPTO(LOG_DEBUG())     # current log mask
 
 my $syslogfh
 
-my %options = %(
-    ndelay  => 0,
-    nofatal => 0,
-    nowait  => 0,
-    pid     => 0,
+my %options = (%: 
+    ndelay  => 0
+    nofatal => 0
+    nowait  => 0
+    pid     => 0
     )
 
 # Default is now to first use the native mechanism, so Perl programs

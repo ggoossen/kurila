@@ -16,10 +16,10 @@ BEGIN
 use Storable < qw(freeze thaw)
 
 %::immortals
-    = %(u => \undef,
-    'y' => \(1 == 1),
-    n => \(1 == 0)
-    )
+    = %: u => \undef
+         'y' => \(1 == 1)
+         n => \(1 == 0)
+    
 
 use Test::More
 

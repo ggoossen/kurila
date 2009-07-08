@@ -46,10 +46,10 @@ my $user_postamble = <<POST
 POST
 
 # Create a new parser
-my %params = %(
-    UserPreamble => $user_preamble,
+my %params = %: 
+    UserPreamble => $user_preamble
     UserPostamble => $user_postamble
-    )
+    
 
 my $parser = Pod::LaTeX->new(< %params)
 ok($parser)

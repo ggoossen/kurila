@@ -10,8 +10,8 @@ use MakeMaker::Test::Utils
 
 my $Is_VMS = $^OS_NAME eq 'VMS'
 
-my %Files = %(
-    'XS-Test/lib/XS/Test.pm'     => <<'END',
+my %Files = %: 
+    'XS-Test/lib/XS/Test.pm'     => <<'END'
 package XS::Test;
 
 require Exporter;
@@ -26,7 +26,7 @@ bootstrap XS::Test $VERSION;
 1;
 END
 
-    'XS-Test/Makefile.PL'          => <<'END',
+    'XS-Test/Makefile.PL'          => <<'END'
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -35,7 +35,7 @@ WriteMakefile(
     );
 END
 
-    'XS-Test/Test.xs'              => <<'END',
+    'XS-Test/Test.xs'              => <<'END'
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -53,7 +53,7 @@ is_even(input)
        RETVAL        
 END
 
-    'XS-Test/t/is_even.t'          => <<'END',
+    'XS-Test/t/is_even.t'          => <<'END'
 #!/usr/bin/perl -w
 
 use Test::More tests => 3;
@@ -62,7 +62,7 @@ use_ok "XS::Test";
 ok !is_even(1);
 ok is_even(2);
 END
-    )
+    
 
 
 sub setup_xs

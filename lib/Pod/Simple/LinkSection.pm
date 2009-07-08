@@ -36,7 +36,7 @@ sub new($class, @< @_)
         if(ref($x || '') eq 'ARRAY')
             $x = $class->new($x) # recurse
         elsif(ref($x || '') eq 'HASH')
-            $x = \%( < $x->% )
+            $x = \(%:  < $x->% )
         
     # otherwise leave it.
     

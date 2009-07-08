@@ -29,8 +29,8 @@ $sub->()
 
 # now build some regexes that should match the dumped ops
 my (@: $hex, $op) = @: '\(0x[a-f0-9]+\)', '\s+\w+'
-my %ops = %( < @+: map { @: $_ => qr/$_ $hex$op/ },
-    qw ( OP     COP LOOP PMOP UNOP BINOP LOGOP LISTOP PVOP ) )
+my %ops = (%:  < @+: map { @: $_ => qr/$_ $hex$op/ }
+               qw ( OP     COP LOOP PMOP UNOP BINOP LOGOP LISTOP PVOP ) )
 
 # split up the output lines into individual ops (terse is, well, terse!)
 # use an array here so $_ is modifiable

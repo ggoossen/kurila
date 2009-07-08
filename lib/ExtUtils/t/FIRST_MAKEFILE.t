@@ -3,17 +3,17 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't' if -d 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
 
 chdir 't'
 
-use Test::More tests => 7;
+use Test::More tests => 7
 
-use MakeMaker::Test::Setup::BFD;
-use MakeMaker::Test::Utils;
+use MakeMaker::Test::Setup::BFD
+use MakeMaker::Test::Utils
 
 my $perl = which_perl()
 my $make = make_run()

@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @( '../lib' )
+        $^INCLUDE_PATH = @:  '../lib' 
     
 
 
@@ -36,7 +36,7 @@ SKIP: do
 SKIP: do
     skip "Again, not skipping", 2 if 0
 
-    my @(?$pack, ?$file, ?$line) =@( caller)
+    my (@: ?$pack, ?$file, ?$line) =@:  caller
     is( $pack || '', '',      'calling package not interfered with' )
     is( $file || '', '',      '  or file' )
     is( $line || '', '',      '  or line' )

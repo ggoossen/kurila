@@ -264,7 +264,7 @@ SKIP: do
         
     
 
-    my %save = %( < %combos )
+    my %save = %:  < %combos 
     %combos = $%	# outputs for $mode=any($order) and any($style)
 
     # add more samples with switching modes & sticky styles
@@ -311,7 +311,7 @@ SKIP: do
 
 
     #now do double crosschecks: commutativity across stick / nostick
-    %combos = %(< %combos, < %save)
+    %combos = (%: < %combos, < %save)
 
     # test commutativity of flags, ie that AB == BA
     for my $mode ( @modes)

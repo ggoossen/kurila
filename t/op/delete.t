@@ -54,7 +54,7 @@ delete %refhash{"top"}{"bar"}
 cmp_ok("$(join ' ',@list)",'eq',"foo", 'autoviv and delete hashref')
 
 do
-    my %a = %('bar', 33)
+    my %a = %: 'bar', 33
     my $b = \%a{+bar}
     my $c = \delete %a{bar}
 

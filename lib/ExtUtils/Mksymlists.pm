@@ -9,7 +9,7 @@ our @EXPORT = qw(&Mksymlists)
 our $VERSION = '6.44'
 
 sub Mksymlists
-    my(@: %spec) =@:  %( < @_ )
+    my(@: %spec) =@:  %:  < @_ 
     my(@: $osname) = $^OS_NAME
 
     croak("Insufficient information specified to Mksymlists")
@@ -19,7 +19,7 @@ sub Mksymlists
     %spec{+DL_VARS} = \$@ unless %spec{?DL_VARS}
     (%spec{+FILE} = %spec{?NAME}) =~ s/.*::// unless %spec{?FILE}
     %spec{+FUNCLIST} = \$@ unless %spec{?FUNCLIST}
-    %spec{+DL_FUNCS} = \%( %spec{?NAME} => \$@ )
+    %spec{+DL_FUNCS} = \%:  %spec{?NAME} => \$@ 
         unless ( (%spec{?DL_FUNCS} and keys %spec{?DL_FUNCS}->%) or
              nelems %spec{?FUNCLIST}->@)
     if (defined %spec{?DL_FUNCS})

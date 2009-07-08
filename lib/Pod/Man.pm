@@ -92,7 +92,7 @@ sub new
     # to put them in our object as hash keys and values.  This could cause
     # problems if we ever clash with Pod::Simple's own internal class
     # variables.
-    $self->% = %(< $self->%, < @_)
+    $self->% = (%: < $self->%, < @_)
 
     # Initialize various other internal constants based on our arguments.
     $self->init_fonts
@@ -138,12 +138,12 @@ sub init_fonts($self)
 
     # Set up a table of font escapes.  First number is fixed-width, second is
     # bold, third is italic.
-    $self->{+FONTS} = \%( '000' => '\fR', '001' => '\fI',
-        '010' => '\fB', '011' => '\f(BI',
-        '100' => toescape ($self->{?fixed}),
-        '101' => toescape ($self->{?fixeditalic}),
-        '110' => toescape ($self->{?fixedbold}),
-        '111' => toescape ($self->{?fixedbolditalic}) )
+    $self->{+FONTS} = \(%:  '000' => '\fR', '001' => '\fI'
+                            '010' => '\fB', '011' => '\f(BI'
+                            '100' => toescape ($self->{?fixed})
+                            '101' => toescape ($self->{?fixeditalic})
+                            '110' => toescape ($self->{?fixedbold})
+                            '111' => toescape ($self->{?fixedbolditalic}) )
 
 
 # Initialize the quotes that we'll be using for C<> text.  This requires some
@@ -152,7 +152,7 @@ sub init_fonts($self)
 # LQUOTE and RQUOTE.
 sub init_quotes
     my (@: $self) = @: < @_
-
+                           
     $self->{+quotes} ||= '"'
     if ($self->{?quotes} eq 'none')
         $self->{+LQUOTE} = $self->{+RQUOTE} = ''
@@ -305,9 +305,9 @@ sub _handle_element_end($self, $element)
 sub formatting($self, $current, $element)
     my %options
     if ($current)
-        %options = %( < $current->% )
+        %options = %:  < $current->% 
     else
-        %options = %(guesswork => 1, cleanup => 1, convert => 1)
+        %options = %: guesswork => 1, cleanup => 1, convert => 1
     
     if ($element eq 'Data')
         %options{+guesswork} = 0
@@ -548,7 +548,7 @@ sub guesswork
 # Idea from Zack Weinberg.
 sub mapfonts($self, $text)
     my (@: $fixed, $bold, $italic) = @: 0, 0, 0
-    my %magic = %(F => \$fixed, B => \$bold, I => \$italic)
+    my %magic = %: F => \$fixed, B => \$bold, I => \$italic
     my $last = '\fR'
     $text =~ s#
         \\f\((.)(.)
@@ -576,7 +576,7 @@ sub mapfonts($self, $text)
 # font is always R and only use the smart mapfonts for headings.
 sub textmapfonts($self, $text)
     my (@: $fixed, $bold, $italic) = @: 0, 0, 0
-    my %magic = %(F => \$fixed, B => \$bold, I => \$italic)
+    my %magic = %: F => \$fixed, B => \$bold, I => \$italic
     $text =~ s#
         \\f\((.)(.)
     #$( do {

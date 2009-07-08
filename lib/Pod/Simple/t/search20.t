@@ -1,7 +1,7 @@
 BEGIN 
     if(env::var('PERL_CORE')) {
         chdir 't';
-        $^INCLUDE_PATH = @( '../lib' );
+        $^INCLUDE_PATH = (@:  '../lib' );
     }
 
 
@@ -23,7 +23,7 @@ $x->callback(sub (@< @args)
              )
 
 use File::Spec
-use Cwd;
+use Cwd
 my $cwd = cwd()
 print $^STDOUT, "# CWD: $cwd\n"
 
@@ -54,11 +54,11 @@ ok 1
 print $^STDOUT, $x->_state_as_string
 #$x->verbose(12);
 
-use Pod::Simple;
+use Pod::Simple
 *pretty = \&Pod::Simple::BlackBox::pretty
 
 print $^STDOUT, "# OK, starting run...\n# [[\n"
-my@($name2where, $where2name) = @($x->survey($here1, $here2), $x->path2name)
+my(@: $name2where, $where2name) = @: $x->survey($here1, $here2), $x->path2name
 print $^STDOUT, "# ]]\n#OK, run done.\n"
 
 my $p = pretty( $where2name, $name2where )."\n"

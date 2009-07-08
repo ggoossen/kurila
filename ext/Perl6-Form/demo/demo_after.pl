@@ -1,7 +1,7 @@
 use Perl6::Form
 
 
-print $^STDOUT, < form \%(interleave=>1,,single=>'^'),\%(single=>'='),\%(single=>'_'),
+print $^STDOUT, < form \(%: interleave=>1,,single=>'^'),\(%: single=>'='),\(%: single=>'_'),
                        <<'.', <
 ~~~~~~~~~
 ^ = ^ _ ^ {|||}
@@ -11,7 +11,7 @@ print $^STDOUT, < form \%(interleave=>1,,single=>'^'),\%(single=>'='),\%(single=
 
 print $^STDOUT, "\n--------------------------\n\n"
 
-print $^STDOUT, < form \%(single=>'='), \%(interleave=>1), <<'.',
+print $^STDOUT, < form \(%: single=>'='), \(%: interleave=>1), <<'.',
    ^
  = | {""""""""""""""""""""""""""""""""""""}
    +--------------------------------------->
@@ -29,7 +29,7 @@ Failed:
                        \qw(Smith Simmons Sutton Smee), \qw(Richards Royce Raighley)
 
 
-print $^STDOUT, < form \%(interleave=>1), <<'.',
+print $^STDOUT, < form \(%: interleave=>1), <<'.',
 Passed:
 	{[[[[[[[[[[[[[[[[[[[}
 Failed:

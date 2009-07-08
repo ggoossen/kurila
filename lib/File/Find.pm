@@ -1213,7 +1213,7 @@ sub wrap_wanted
         
         return $wanted
     else
-        return \%( wanted => $wanted )
+        return \%:  wanted => $wanted 
     
 
 

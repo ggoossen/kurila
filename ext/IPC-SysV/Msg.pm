@@ -64,7 +64,7 @@ sub set
         $ds = shift
     else
         croak 'Bad arg count' if (nelems @_) % 2
-        my %arg = %( < @_ )
+        my %arg = %:  < @_ 
         $ds = $self->stat
             or return undef
         my($key,$val)

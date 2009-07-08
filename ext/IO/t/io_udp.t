@@ -68,7 +68,7 @@ my @xtra = $@
 unless(compare_addr($where,$udpa->sockname, 'recv name', 'sockname'))
     print $^STDOUT, "not "
     @xtra = @: 0, <$udpa->sockname
-
+                   
 print $^STDOUT, "ok 5\n"
 
 $udpb->send("ok 6\n",< @xtra)

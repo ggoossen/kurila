@@ -436,7 +436,7 @@ our(@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION)
 @EXPORT=qw(timeit timethis timethese timediff timestr)
 @EXPORT_OK=qw(timesum cmpthese countit
 	      clearcache clearallcache disablecache enablecache)
-%EXPORT_TAGS=%( all => @EXPORT +@+ @EXPORT_OK ) 
+%EXPORT_TAGS=%:  all => @EXPORT +@+ @EXPORT_OK  
 
 $VERSION = 1.10
 
@@ -924,8 +924,8 @@ sub cmpthese
         ''
         $display_as_rate ?? 'Rate' !! 's/iter'
         < map { $_->[0] }, @vals
-        
 
+            
     push @rows, \@top_row
     @col_widths = map { length( $_ ) }, @top_row
 

@@ -112,11 +112,11 @@ sub opt_V # report version and exit
         "Perldoc v$VERSION, under perl $^PERL_VERSION for $^OS_NAME"
 
         (defined(&Win32::BuildNumber) and defined &Win32::BuildNumber())
-            ?? (" (win32 build ", < &Win32::BuildNumber(), ")") !! ()
+        ?? (" (win32 build ", < &Win32::BuildNumber(), ")") !! ()
 
         (chr(65) eq 'A') ?? () !! " (non-ASCII)"
 
-        "\n",
+        "\n"
 
     exit
 
@@ -196,7 +196,7 @@ sub run  # to be called by the "perldoc" executable
 
 sub new  # yeah, nothing fancy
     my $class = shift
-    my $new = bless \%(< @_), (ref($class) || $class)
+    my $new = bless \(%: < @_), (ref($class) || $class)
     DEBUG +> 1 and print $^STDOUT, "New $class object $new\n"
     $new->init()
     $new
@@ -214,8 +214,8 @@ sub aside  # If we're in -v or DEBUG mode, say this.
                                $callsub =~ s/^$package/'/os
                                # the o is justified, as $package really won't change.
                                $callsub . ": "
-                           !! ''
-                       < @_,
+                                 !! ''
+                       < @_
             )
         if(DEBUG) { print $^STDOUT, $out } else { print $^STDERR, $out }
     

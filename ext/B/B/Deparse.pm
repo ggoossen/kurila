@@ -1173,7 +1173,7 @@ sub populate_curcvlex
                 (@ns[$i]->FLAGS ^&^ SVf_FAKE)
                 ?? @: 0, 999999
                 !! @: @ns[$i]->COP_SEQ_RANGE_LOW, @ns[$i]->COP_SEQ_RANGE_HIGH
-
+                          
             push $self->{+'curcvlex'}{+$name}, \@: $seq_st, $seq_en
         
     continue
@@ -1318,10 +1318,10 @@ sub declare_hints($from, $to)
 
 # Internal implementation hints that the core sets automatically, so don't need
 # (or want) to be passed back to the user
-my %ignored_hints = %(
-    'open<' => 1,
-    'open>' => 1,
-    )
+my %ignored_hints = %: 
+    'open<' => 1
+    'open>' => 1
+    
 
 sub declare_hinthash($from, $to, $indent)
     my @decls
@@ -1643,8 +1643,8 @@ sub padval
 
 
 sub anon_hash_or_list($self, $op, $cx)
-    my(@: $pre, $post) =  %("anonarray" => \(@: '@(',')'),
-        "anonhash" => \(@: '%(',')')){?$op->name}->@
+    my(@: $pre, $post) =  (%: "anonarray" => \(@: '@(',')')
+                              "anonhash" => \(@: '%(',')')){?$op->name}->@
     my($expr, @exprs)
     $op = $op->first->sibling # skip pushmark
     while (!null($op))
@@ -1672,7 +1672,7 @@ sub pp_srefgen($self, $op, $cx)
         $kid = $kid->first
     
     if ($kid->name eq "anoncode")
-        return $self->e_anoncode(%( code => $self->padval($kid->targ) ))
+        return $self->e_anoncode((%:  code => $self->padval($kid->targ) ))
     elsif ($kid->name eq "pushmark")
         my $sib_name = $kid->sibling->name
         if ($sib_name =~ m/^(pad|rv2)[ah]v$/
@@ -1811,19 +1811,19 @@ sub assoc_class
 # $a + $b + $c is equivalent to ($a + $b) + $c
 
 BEGIN 
-    %left = %('multiply' => 19, 'i_multiply' => 19,
-        'divide' => 19, 'i_divide' => 19,
-        'modulo' => 19, 'i_modulo' => 19,
-        'repeat' => 19,
-        'add' => 18, 'i_add' => 18,
-        'subtract' => 18, 'i_subtract' => 18,
-        'concat' => 18,
-        'left_shift' => 17, 'right_shift' => 17,
-        'bit_and' => 13,
-        'bit_or' => 12, 'bit_xor' => 12,
-        'and' => 3,
-        'or' => 2, 'xor' => 2,
-        )
+    %left = %: 'multiply' => 19, 'i_multiply' => 19
+               'divide' => 19, 'i_divide' => 19
+               'modulo' => 19, 'i_modulo' => 19
+               'repeat' => 19
+               'add' => 18, 'i_add' => 18
+               'subtract' => 18, 'i_subtract' => 18
+               'concat' => 18
+               'left_shift' => 17, 'right_shift' => 17
+               'bit_and' => 13
+               'bit_or' => 12, 'bit_xor' => 12
+               'and' => 3
+               'or' => 2, 'xor' => 2
+        
 
 
 sub deparse_binop_left($self, $op, $left, $prec)
@@ -1839,21 +1839,21 @@ sub deparse_binop_left($self, $op, $left, $prec)
 # $a = $b = $c is equivalent to $a = ($b = $c)
 
 BEGIN 
-    %right = %('pow' => 22,
-        'sassign=' => 7, 'aassign=' => 7,
-        'multiply=' => 7, 'i_multiply=' => 7,
-        'divide=' => 7, 'i_divide=' => 7,
-        'modulo=' => 7, 'i_modulo=' => 7,
-        'repeat=' => 7,
-        'add=' => 7, 'i_add=' => 7,
-        'subtract=' => 7, 'i_subtract=' => 7,
-        'concat=' => 7,
-        'left_shift=' => 7, 'right_shift=' => 7,
-        'bit_and=' => 7,
-        'bit_or=' => 7, 'bit_xor=' => 7,
-        'andassign' => 7,
-        'orassign' => 7,
-        )
+    %right = %: 'pow' => 22
+                'sassign=' => 7, 'aassign=' => 7
+                'multiply=' => 7, 'i_multiply=' => 7
+                'divide=' => 7, 'i_divide=' => 7
+                'modulo=' => 7, 'i_modulo=' => 7
+                'repeat=' => 7
+                'add=' => 7, 'i_add=' => 7
+                'subtract=' => 7, 'i_subtract=' => 7
+                'concat=' => 7
+                'left_shift=' => 7, 'right_shift=' => 7
+                'bit_and=' => 7
+                'bit_or=' => 7, 'bit_xor=' => 7
+                'andassign' => 7
+                'orassign' => 7
+        
 
 
 sub deparse_binop_right($self, $op, $right, $prec)
@@ -2438,7 +2438,7 @@ sub loop_common($self, $op, $cx, $init)
         $head = "foreach $var ($ary) "
     elsif ($kid->name eq "null") # while/until
         $kid = $kid->first
-        my $name = %("and" => "while", "or" => "until"){?$kid->name}
+        my $name = (%: "and" => "while", "or" => "until"){?$kid->name}
         $cond = $self->deparse($kid->first, 1)
         $head = "$name ($cond) "
         $body = $kid->first->sibling
@@ -2756,7 +2756,7 @@ sub elem_or_slice_single_index($self, $idx)
 
 sub elem($self, $op, $cx, $left, $right, $padname)
     my(@: $array, $idx) = @: $op->first, $op->first->sibling
-
+                                 
     $idx = $self->elem_or_slice_single_index($idx)
 
     if (my $array_name=$self->elem_or_slice_array_name
@@ -2879,8 +2879,8 @@ sub _method($self, $op, $cx)
         
     
 
-    return \%( method => $meth, variable_method => ref($meth),
-        object => $obj, args => \@exprs  )
+    return \(%:  method => $meth, variable_method => ref($meth)
+                 object => $obj, args => \@exprs  )
 
 
 # compat function only
@@ -2979,7 +2979,7 @@ sub check_proto($self, $proto, @< @args)
     return "&" if (nelems @args)               # too many args
     return  @: "", join ", ", @reals
 
-
+                   
 sub pp_entersub($self, $op, $cx)
     return $self->e_method($self->_method($op, $cx))
         unless null $op->first->sibling
@@ -3159,38 +3159,38 @@ do
 
 
 my %unctrl = # portable to to EBCDIC
-    %(
-    "\c@" => '\c@',	# unused
-    "\cA" => '\cA',
-    "\cB" => '\cB',
-    "\cC" => '\cC',
-    "\cD" => '\cD',
-    "\cE" => '\cE',
-    "\cF" => '\cF',
-    "\cG" => '\cG',
-    "\cH" => '\cH',
-    "\cI" => '\cI',
-    "\cJ" => '\cJ',
-    "\cK" => '\cK',
-    "\cL" => '\cL',
-    "\cM" => '\cM',
-    "\cN" => '\cN',
-    "\cO" => '\cO',
-    "\cP" => '\cP',
-    "\cQ" => '\cQ',
-    "\cR" => '\cR',
-    "\cS" => '\cS',
-    "\cT" => '\cT',
-    "\cU" => '\cU',
-    "\cV" => '\cV',
-    "\cW" => '\cW',
-    "\cX" => '\cX',
-    "\cY" => '\cY',
-    "\cZ" => '\cZ',
-    "\c[" => '\c[',	# unused
-    "\c\\" => '\c\',	# unused
-    "\c]" => '\c]',	# unused
-    "\c_" => '\c_',	# unused
+    (%: 
+    "\c@" => '\c@'	# unused
+    "\cA" => '\cA'
+    "\cB" => '\cB'
+    "\cC" => '\cC'
+    "\cD" => '\cD'
+    "\cE" => '\cE'
+    "\cF" => '\cF'
+    "\cG" => '\cG'
+    "\cH" => '\cH'
+    "\cI" => '\cI'
+    "\cJ" => '\cJ'
+    "\cK" => '\cK'
+    "\cL" => '\cL'
+    "\cM" => '\cM'
+    "\cN" => '\cN'
+    "\cO" => '\cO'
+    "\cP" => '\cP'
+    "\cQ" => '\cQ'
+    "\cR" => '\cR'
+    "\cS" => '\cS'
+    "\cT" => '\cT'
+    "\cU" => '\cU'
+    "\cV" => '\cV'
+    "\cW" => '\cW'
+    "\cX" => '\cX'
+    "\cY" => '\cY'
+    "\cZ" => '\cZ'
+    "\c[" => '\c['	# unused
+    "\c\\" => '\c\'	# unused
+    "\c]" => '\c]'	# unused
+    "\c_" => '\c_'	# unused
     )
 
 # character escapes, but not delimiters that might need to be escaped
@@ -3376,7 +3376,7 @@ sub const($self, $sv, $cx)
         if (class($ref) eq "AV")
             return '\@(' . $self->list_const(2, < $ref->ARRAY) . ")"
         elsif (class($ref) eq "HV")
-            my %hash = %( < $ref->ARRAY )
+            my %hash = %:  < $ref->ARRAY 
             my @elts
             for my $k (sort keys %hash)
                 push @elts, "$k => " . $self->const(%hash{?$k}, 6)

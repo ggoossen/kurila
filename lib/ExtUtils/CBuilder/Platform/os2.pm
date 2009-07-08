@@ -11,7 +11,7 @@ sub need_prelink { 1 }
 sub prelink
     # Generate import libraries (XXXX currently near .DEF; should be near DLL!)
     my $self = shift
-    my %args = %( < @_ )
+    my %args = %:  < @_ 
 
     my @res = $self->SUPER::prelink(< %args)
     die "Unexpected number of DEF files" unless (nelems @res) == 1
@@ -62,7 +62,7 @@ sub extra_link_args_after_prelink($self, %< %args)
     # , "-L", "-lperl"
     return @: @after_libs, @DEF
 
-
+                  
 sub link_executable
     # ldflags is not expecting .exe extension given on command line; remove -Zexe
     my $self = shift

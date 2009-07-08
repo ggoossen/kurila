@@ -38,30 +38,30 @@ others
 
 # '' is used as a flag to indicate non-ascii macro names, and hence the need
 # to pass in the utf8 on/off flag.
-%XS_Constant = %(
-    ''    => '',
-    IV    => 'PUSHi(iv)',
-    UV    => 'PUSHu((UV)iv)',
-    NV    => 'PUSHn(nv)',
-    PV    => 'PUSHp(pv, strlen(pv))',
-    PVN   => 'PUSHp(pv, iv)',
-    SV    => 'PUSHs(sv)',
-    YES   => 'PUSHs(&PL_sv_yes)',
-    NO    => 'PUSHs(&PL_sv_no)',
-    UNDEF => '',	# implicit undef
-    )
+%XS_Constant = %: 
+    ''    => ''
+    IV    => 'PUSHi(iv)'
+    UV    => 'PUSHu((UV)iv)'
+    NV    => 'PUSHn(nv)'
+    PV    => 'PUSHp(pv, strlen(pv))'
+    PVN   => 'PUSHp(pv, iv)'
+    SV    => 'PUSHs(sv)'
+    YES   => 'PUSHs(&PL_sv_yes)'
+    NO    => 'PUSHs(&PL_sv_no)'
+    UNDEF => ''	# implicit undef
+    
 
-%XS_TypeSet = %(
-    IV    => '*iv_return = ',
-    UV    => '*iv_return = (IV)',
-    NV    => '*nv_return = ',
-    PV    => '*pv_return = ',
-    PVN   => \(@: '*pv_return = ', '*iv_return = (IV)'),
-    SV    => '*sv_return = ',
-    YES   => undef,
-    NO    => undef,
-    UNDEF => undef,
-    )
+%XS_TypeSet = %: 
+    IV    => '*iv_return = '
+    UV    => '*iv_return = (IV)'
+    NV    => '*nv_return = '
+    PV    => '*pv_return = '
+    PVN   => \(@: '*pv_return = ', '*iv_return = (IV)')
+    SV    => '*sv_return = '
+    YES   => undef
+    NO    => undef
+    UNDEF => undef
+    
 
 sub header
     my $start = 1
@@ -197,8 +197,8 @@ sub dogfood($self, $args, @< @items)
 use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 
 EOT
-    $result .= $self->dump_names (\%(default_type=>$default_type, what=>$what,
-        indent=>0, declare_types=>1),
+    $result .= $self->dump_names (\(%: default_type=>$default_type, what=>$what
+                                       indent=>0, declare_types=>1),
         < @items)
     $result .= <<'EOT'
 

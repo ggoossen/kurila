@@ -1,7 +1,7 @@
 BEGIN 
     if(env::var('PERL_CORE')) {
         chdir 't';
-        $^INCLUDE_PATH = @( '../lib' );
+        $^INCLUDE_PATH = (@:  '../lib' );
     }
 
 
@@ -13,8 +13,8 @@ my $d
 
 ok 1
 
-use Pod::Simple::DumpAsXML;
-use Pod::Simple::XMLOutStream;
+use Pod::Simple::DumpAsXML
+use Pod::Simple::XMLOutStream
 print $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n"
 sub e ($x, $y) { Pod::Simple::DumpAsXML->_duo($x, $y) }
 
@@ -116,69 +116,69 @@ is( $x->_out("\n=over 19\n\n=item Foo\n\nStuff\n\n=cut\n\nCrunk\nZorp\n\n=item B
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 print $^STDOUT, "# Now testing nesting...\n"
-is( $x->_out(join "\n\n", @( '',
-                             '=over',
-                             '=item *',
-                             'Stuff',
-                             '=cut',
-                             'Stuff',
-                             '=over',
-                             '=item 1.',
-                             '=item 2.',
-                             'Bar I<baz>!',
-                             '=back',
-                             '=item *',
-                             'Bar I<baz>!',
-                             '=back', '')
-    ), join '', @(
-   '<Document>',
-   '<over-bullet indent="4">',
-   '<item-bullet>Stuff</item-bullet>',
-   '<over-number indent="4">',
-   '<item-number number="1"></item-number>',
-   '<item-number number="2">Bar <I>baz</I>!</item-number>',
-   '</over-number>',
-   '<item-bullet>Bar <I>baz</I>!</item-bullet>',
-   '</over-bullet></Document>')
+is( $x->_out(join "\n\n", @:  ''
+                              '=over'
+                              '=item *'
+                              'Stuff'
+                              '=cut'
+                              'Stuff'
+                              '=over'
+                              '=item 1.'
+                              '=item 2.'
+                              'Bar I<baz>!'
+                              '=back'
+                              '=item *'
+                              'Bar I<baz>!'
+                              '=back', ''
+    ), join '', @: 
+   '<Document>'
+   '<over-bullet indent="4">'
+   '<item-bullet>Stuff</item-bullet>'
+   '<over-number indent="4">'
+   '<item-number number="1"></item-number>'
+   '<item-number number="2">Bar <I>baz</I>!</item-number>'
+   '</over-number>'
+   '<item-bullet>Bar <I>baz</I>!</item-bullet>'
+   '</over-bullet></Document>'
     )
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-is( $x->_out( join "\n\n", @( '', '',
-                              '=over',
-                              '=item *',
-                              'Stuff',
-                              '=cut',
-                              'Stuff',
-                              '=over',
-                              '=item 1.',
-                              '=over 19',
-                              'Gleiven',
-                              'Squim F<.thingrc>!',
-                              '=back',
-                              '=item 2.',
-                              'Bar I<baz>!',
-                              '=back',
-                              '=item *',
-                              'Bar I<baz>!',
-                              '=back',
-                              '', '')
-    ), join '', @(
-   '<Document>',
-   '<over-bullet indent="4">',
-   '<item-bullet>Stuff</item-bullet>',
-   '<over-number indent="4">',
-   '<item-number number="1"></item-number>',
+is( $x->_out( join "\n\n", @:  '', ''
+                               '=over'
+                               '=item *'
+                               'Stuff'
+                               '=cut'
+                               'Stuff'
+                               '=over'
+                               '=item 1.'
+                               '=over 19'
+                               'Gleiven'
+                               'Squim F<.thingrc>!'
+                               '=back'
+                               '=item 2.'
+                               'Bar I<baz>!'
+                               '=back'
+                               '=item *'
+                               'Bar I<baz>!'
+                               '=back'
+                               '', ''
+    ), join '', @: 
+   '<Document>'
+   '<over-bullet indent="4">'
+   '<item-bullet>Stuff</item-bullet>'
+   '<over-number indent="4">'
+   '<item-number number="1"></item-number>'
 
-   '<over-block indent="19">',
-   '<Para>Gleiven</Para>',
-   '<Para>Squim <F>.thingrc</F>!</Para>',
-   '</over-block>',
+   '<over-block indent="19">'
+   '<Para>Gleiven</Para>'
+   '<Para>Squim <F>.thingrc</F>!</Para>'
+   '</over-block>'
 
-   '<item-number number="2">Bar <I>baz</I>!</item-number>',
-   '</over-number>',
-   '<item-bullet>Bar <I>baz</I>!</item-bullet>',
-   '</over-bullet></Document>')
+   '<item-number number="2">Bar <I>baz</I>!</item-number>'
+   '</over-number>'
+   '<item-bullet>Bar <I>baz</I>!</item-bullet>'
+   '</over-bullet></Document>'
     )
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -186,31 +186,31 @@ is( $x->_out( join "\n\n", @( '', '',
 $d = 11
 print $^STDOUT, "# Now checking that document-end closes things right...\n"
 
-is( $x->_out( join "\n\n", @( '', '',
-                              '=over',
-                              '=item *',
-                              'Stuff',
-                              '=cut',
-                              'Stuff',
-                              '=over',
-                              '=item 1.',
-                              '=over 19',
-                              'Gleiven',
-                              'Squim F<.thingrc>!',
-                              '', '')
-    ), join '', @(
-   '<Document>',
-   '<over-bullet indent="4">',
-   '<item-bullet>Stuff</item-bullet>',
-   '<over-number indent="4">',
-   '<item-number number="1"></item-number>',
+is( $x->_out( join "\n\n", @:  '', ''
+                               '=over'
+                               '=item *'
+                               'Stuff'
+                               '=cut'
+                               'Stuff'
+                               '=over'
+                               '=item 1.'
+                               '=over 19'
+                               'Gleiven'
+                               'Squim F<.thingrc>!'
+                               '', ''
+    ), join '', @: 
+   '<Document>'
+   '<over-bullet indent="4">'
+   '<item-bullet>Stuff</item-bullet>'
+   '<over-number indent="4">'
+   '<item-number number="1"></item-number>'
 
-   '<over-block indent="19">',
-   '<Para>Gleiven</Para>',
-   '<Para>Squim <F>.thingrc</F>!</Para>',
-   '</over-block>',
-   '</over-number>',
-   '</over-bullet></Document>')
+   '<over-block indent="19">'
+   '<Para>Gleiven</Para>'
+   '<Para>Squim <F>.thingrc</F>!</Para>'
+   '</over-block>'
+   '</over-number>'
+   '</over-bullet></Document>'
     )
 
 

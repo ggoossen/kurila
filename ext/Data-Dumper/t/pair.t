@@ -11,7 +11,7 @@ no warnings < qw(once)
 
 require_ok 'Data::Dumper'
 
-my $HASH = \%( alpha => 'beta', gamma => 'vlissides' )
+my $HASH = \%:  alpha => 'beta', gamma => 'vlissides' 
 my $WANT = q(\%("alpha" => "beta","gamma" => "vlissides"))
 
 $Data::Dumper::Useperl = 1

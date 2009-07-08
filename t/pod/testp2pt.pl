@@ -61,7 +61,7 @@ sub findinclude
     ##   2. the parent directory of the above
     my $parentdir  = dirname $thispoddir
     my @podincdirs = @: $thispoddir, $parentdir, < @PODINCDIRS
-
+                            
     for ( @podincdirs)
         my $incfile = catfile($_, $incname)
         return $incfile  if (-r $incfile)
@@ -90,7 +90,7 @@ sub command
     my $incfile  = $self->findinclude(shift @incargs)  or  return
     my $incbase  = basename $incfile
     print $out_fh, "###### begin =include $incbase #####\n"  if ($incdebug)
-    $self->parse_from_file( \%(cutting => 1), $incfile )
+    $self->parse_from_file( \(%: cutting => 1), $incfile )
     print $out_fh, "###### end =include $incbase #####\n"    if ($incdebug)
 
 
@@ -130,7 +130,7 @@ sub testpodinc2plaintext( %< %args )
 
 
 sub testpodplaintext
-    my %opts = %( (ref @_[0] eq 'HASH') ?? < shift()->% !! () )
+    my %opts = %:  (ref @_[0] eq 'HASH') ?? < shift()->% !! () 
     my @testpods = @_
     my (@: $testname, $testdir) = @: "", ""
     my $cmpfile = ""

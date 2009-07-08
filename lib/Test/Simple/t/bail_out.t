@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -15,8 +15,8 @@ BEGIN
 
 
 
-use Test::Builder;
-use Test::More;
+use Test::Builder
+use Test::More
 
 my $output = ""
 open my $fakeout, '>>', \$output or die

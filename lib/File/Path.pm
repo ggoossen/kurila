@@ -534,7 +534,7 @@ sub _error
 
     if ($arg{?error})
         $object = '' unless defined $object
-        push $arg{error}->$->@, \%($object => "$message: $^OS_ERROR")
+        push $arg{error}->$->@, \%: $object => "$message: $^OS_ERROR"
     else
         warn(defined($object) ?? "$message for $object: $^OS_ERROR" !! "$message: $^OS_ERROR")
     
@@ -599,7 +599,7 @@ sub _mkpath($arg, $paths)
             if (!-d $path)
                 $^OS_ERROR = $save_bang
                 if ($arg{?error})
-                    push $arg{error}->$->@, \%($path => $e)
+                    push $arg{error}->$->@, \%: $path => $e
                 else
                     die("mkdir $path: $e")
                 

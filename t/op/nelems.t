@@ -20,8 +20,8 @@ dies_like
   qr/nelems expected an array or hash but got PLAINVALUE/,
   'nelems on plain value'
 
-$x = %( 'aap', 'noot', 'mies', 'teun' )
+$x = %:  'aap', 'noot', 'mies', 'teun' 
 is nelems($x), 4
 $x = $%
 is nelems($x), 0
-is nelems(%( 'aap', 'noot' )), 2
+is nelems((%:  'aap', 'noot' )), 2

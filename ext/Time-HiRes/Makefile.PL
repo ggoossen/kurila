@@ -716,8 +716,8 @@ sub doMakefile
         # Solaris will avenge.
         'INC'	=> '',     # e.g., '-I/usr/include/other'
         'INSTALLDIRS' => 'perl',
-        clean => %( FILES => "xdefine" ),
-        realclean => %( FILES=> 'const-c.inc const-xs.inc' ),
+        clean => (%:  FILES => "xdefine" ),
+        realclean => (%:  FILES=> 'const-c.inc const-xs.inc' ),
         )
 
     WriteMakefile(< @makefileopts)
@@ -744,14 +744,14 @@ sub doConstants
             elsif ($macro =~ m/^(d_hires_stat)$/)
                 my $d_hires_stat = 0
                 $d_hires_stat = $1 if ($DEFINE =~ m/-DTIME_HIRES_STAT=(\d+)/)
-                push @names, \%(name => $_, macro => "TIME_HIRES_STAT", value => $d_hires_stat,
-                    default => \(@: "IV", "0"))
+                push @names, \%: name => $_, macro => "TIME_HIRES_STAT", value => $d_hires_stat
+                                 default => \(@: "IV", "0")
                 next
             else
                 $macro =~ s/^d_(.+)/HAS_\U$1/
             
-            push @names, \%(name => $_, macro => $macro, value => 1,
-                default => \(@: "IV", "0"))
+            push @names, \%: name => $_, macro => $macro, value => 1
+                             default => \(@: "IV", "0")
         
         ExtUtils::Constant::WriteConstants(
             NAME => 'Time::HiRes',

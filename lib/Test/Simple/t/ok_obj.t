@@ -6,7 +6,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @( '../lib' )
+        $^INCLUDE_PATH = @:  '../lib' 
     
 
 
@@ -20,7 +20,7 @@ sub DESTROY
     $destroyed++
 
 
-package main;
+package main
 
 for (1..3)
     ok((my $foo = Foo->new), 'created Foo object')

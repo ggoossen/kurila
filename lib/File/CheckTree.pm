@@ -180,31 +180,31 @@ sub validate
     return $Warnings
 
 
-my %Val_Message = %(
-    'r' => "is not readable by uid $^UID.",
-    'w' => "is not writable by uid $^UID.",
-    'x' => "is not executable by uid $^UID.",
-    'o' => "is not owned by uid $^UID.",
-    'R' => "is not readable by you.",
-    'W' => "is not writable by you.",
-    'X' => "is not executable by you.",
-    'O' => "is not owned by you.",
-    'e' => "does not exist.",
-    'z' => "does not have zero size.",
-    's' => "does not have non-zero size.",
-    'f' => "is not a plain file.",
-    'd' => "is not a directory.",
-    'l' => "is not a symbolic link.",
-    'p' => "is not a named pipe (FIFO).",
-    'S' => "is not a socket.",
-    'b' => "is not a block special file.",
-    'c' => "is not a character special file.",
-    'u' => "does not have the setuid bit set.",
-    'g' => "does not have the setgid bit set.",
-    'k' => "does not have the sticky bit set.",
-    'T' => "is not a text file.",
+my %Val_Message = %: 
+    'r' => "is not readable by uid $^UID."
+    'w' => "is not writable by uid $^UID."
+    'x' => "is not executable by uid $^UID."
+    'o' => "is not owned by uid $^UID."
+    'R' => "is not readable by you."
+    'W' => "is not writable by you."
+    'X' => "is not executable by you."
+    'O' => "is not owned by you."
+    'e' => "does not exist."
+    'z' => "does not have zero size."
+    's' => "does not have non-zero size."
+    'f' => "is not a plain file."
+    'd' => "is not a directory."
+    'l' => "is not a symbolic link."
+    'p' => "is not a named pipe (FIFO)."
+    'S' => "is not a socket."
+    'b' => "is not a block special file."
+    'c' => "is not a character special file."
+    'u' => "does not have the setuid bit set."
+    'g' => "does not have the setgid bit set."
+    'k' => "does not have the sticky bit set."
+    'T' => "is not a text file."
     'B' => "is not a binary file."
-    )
+    
 
 sub valmess($disposition, $test, $file)
     my $ferror

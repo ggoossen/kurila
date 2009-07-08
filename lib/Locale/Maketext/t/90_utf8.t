@@ -19,11 +19,11 @@ do
 do
     package Woozle::eu_mt
     our @ISA = @: 'Woozle'
-    our %Lexicon = %(
-        'd2' => chr(1000) . 'hum [dubbil,_1]',
-        'd3' => chr(1000) . 'hoo [quant,_1,zaz]',
-        'd4' => chr(1000) . 'hoo [*,_1,zaz]',
-        )
+    our %Lexicon = %: 
+        'd2' => chr(1000) . 'hum [dubbil,_1]'
+        'd3' => chr(1000) . 'hoo [quant,_1,zaz]'
+        'd4' => chr(1000) . 'hoo [*,_1,zaz]'
+        
     keys %Lexicon # dodges the 'used only once' warning
 
 

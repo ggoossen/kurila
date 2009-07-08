@@ -75,17 +75,17 @@ sub new
     my $class = shift(@_)
     $class = ref($class) || $class
 
-    my %args = %( < @_ )
+    my %args = %:  < @_ 
 
-    my $self = \%( ':private:' => $%,
-        'Perl' => $%,
-        )
+    my $self = \%:  ':private:' => $%
+                    'Perl' => $%
+        
 
     if (%args{?config_override})
         $self->{':private:'}{+Config} = %args{?config_override}
     else
         $self->{':private:'}{+Config} = %+:
-            map { %($_ => config_value($_)) }, config_keys()
+            map { (%: $_ => config_value($_)) }, config_keys()
     
 
     for my $tuple (@: (@: inc_override => INC => $($^INCLUDE_PATH) )

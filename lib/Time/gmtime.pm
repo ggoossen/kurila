@@ -13,7 +13,7 @@ BEGIN
 			$tm_mon $tm_year $tm_wday $tm_yday 
 			$tm_isdst
 		    )
-    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT )
+    %EXPORT_TAGS = %:  FIELDS => @EXPORT_OK +@+ @EXPORT 
     $VERSION     = 1.03
 
 our ($tm_sec, $tm_min, $tm_hour, $tm_mday,

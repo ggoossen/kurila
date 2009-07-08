@@ -7,7 +7,7 @@ sub hashes($match,$opts)
 
 
 print $^STDOUT, < form
- \%(field=>\(@: qr/(#+)/=>\&hashes)),
+ \(%: field=>\(@: qr/(#+)/=>\&hashes)),
  "[###|###############################]",
  \(@: 1,2,3), \qw[First Second Last]
 

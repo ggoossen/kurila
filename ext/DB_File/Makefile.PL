@@ -26,8 +26,8 @@ WriteMakefile(
     ABSTRACT_FROM => 'DB_File.pm',
     AUTHOR       => 'Paul Marquess <pmqs@cpan.org>',
 
-    'depend'    => %('version$(OBJ_EXT)' => 'version.c'),
-    'clean'             => %(FILES => 'constants.h constants.xs'),
+    'depend'    => (%: 'version$(OBJ_EXT)' => 'version.c'),
+    'clean'             => (%: FILES => 'constants.h constants.xs'),
     )
 
 my @names = qw(
@@ -62,7 +62,7 @@ my @names = qw(
 	)
 
 # Check the constants above all appear in @EXPORT in DB_File.pm
-my %names = %( < @+: map { @: $_, 1}, @names )
+my %names = %:  < @+: map { @: $_, 1}, @names 
 open my $f, "<", "DB_File.pm" or die "Cannot open DB_File.pm: $^OS_ERROR\n"
 while ( ~< $f)
     last if m/^\s*\@EXPORT\s+=\s+ qw\(/x 

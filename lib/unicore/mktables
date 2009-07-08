@@ -358,7 +358,7 @@ sub New_Prop($Type, $Name, $Table, %< %Args)
 ##
 sub Table::New
     my $class = shift
-    my %Args = %( < @_ )
+    my %Args = %:  < @_ 
 
     my $Table = bless \$@, $class
 
@@ -1584,11 +1584,11 @@ sub MakePropTestScript()
 
     while (my (@: $Name, $Table) =(@:  each %FuzzyNameToTest))
         my $Orig  = %CanonicalToOrig{?$Name}
-        my %Names = %(
-            $Name => 1,
+        my %Names = %: 
+            $Name => 1
             $Orig => 1, <
-            RandomlyFuzzifyName($Orig) => 1
-            )
+                RandomlyFuzzifyName($Orig) => 1
+            
 
         for my $N (keys %Names)
             GenTests(*OUT, $N, $Table->ValidCode, $Table->InvalidCode)
@@ -1794,7 +1794,7 @@ sub WriteAllMappings()
                    "##\n"
                    "## '*' means name may be 'fuzzy'\n"
                    "##\n\n", <
-                       sort { substr($a,2) cmp substr($b, 2) }, @:  < @MAP,
+                       sort { substr($a,2) cmp substr($b, 2) }, @:  < @MAP
             
         WriteIfChanged('Properties', @OUT)
     
@@ -2038,15 +2038,15 @@ EOFHEADER
 
     require File::Find
     my $count=0
-    File::Find::find(\%(
-                     no_chdir=>1,
+    File::Find::find(\(%: 
+                     no_chdir=>1
                      wanted=>sub (@< @_)
                          if (m/\.pl$/)
                              s!^\./!!
                              print $ofh, "$_\n"
                              $count++
                          
-                     ,
+                                      
                      ),".")
 
     print $ofh, "\n# ",scalar(nelems @input)," input files\n",

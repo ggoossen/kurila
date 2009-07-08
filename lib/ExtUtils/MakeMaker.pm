@@ -43,7 +43,7 @@ sub WriteMakefile
     die "WriteMakefile: Need even number of args" if (nelems @_) % 2
 
     require ExtUtils::MY
-    my %att = %( < @_ )
+    my %att = %:  < @_ 
 
     _verify_att(\%att)
 
@@ -58,43 +58,43 @@ sub WriteMakefile
 # reference type.  Empty value indicate it takes a non-reference
 # scalar.
 my %Att_Sigs
-my %Special_Sigs = %(
-    C                  => 'ARRAY',
-    CONFIG             => 'ARRAY',
-    CONFIGURE          => 'CODE',
-    DIR                => 'ARRAY',
-    DL_FUNCS           => 'HASH',
-    DL_VARS            => 'ARRAY',
-    EXCLUDE_EXT        => 'ARRAY',
-    EXE_FILES          => 'ARRAY',
-    FUNCLIST           => 'ARRAY',
-    H                  => 'ARRAY',
-    IMPORTS            => 'HASH',
-    INCLUDE_EXT        => 'ARRAY',
-    LIBS               => (@: 'ARRAY','PLAINVALUE'),
-    MAN1PODS           => 'HASH',
-    MAN3PODS           => 'HASH',
-    PL_FILES           => 'HASH',
-    PM                 => 'HASH',
-    PMLIBDIRS          => 'ARRAY',
-    PMLIBPARENTDIRS    => 'ARRAY',
-    PREREQ_PM          => 'HASH',
-    SKIP               => 'ARRAY',
-    TYPEMAPS           => 'ARRAY',
-    XS                 => 'HASH',
-    VERSION            => (@: 'version','PLAINVALUE'),
-    _KEEP_AFTER_FLUSH  => 'PLAINVALUE',
+my %Special_Sigs = %: 
+    C                  => 'ARRAY'
+    CONFIG             => 'ARRAY'
+    CONFIGURE          => 'CODE'
+    DIR                => 'ARRAY'
+    DL_FUNCS           => 'HASH'
+    DL_VARS            => 'ARRAY'
+    EXCLUDE_EXT        => 'ARRAY'
+    EXE_FILES          => 'ARRAY'
+    FUNCLIST           => 'ARRAY'
+    H                  => 'ARRAY'
+    IMPORTS            => 'HASH'
+    INCLUDE_EXT        => 'ARRAY'
+    LIBS               => (@: 'ARRAY','PLAINVALUE')
+    MAN1PODS           => 'HASH'
+    MAN3PODS           => 'HASH'
+    PL_FILES           => 'HASH'
+    PM                 => 'HASH'
+    PMLIBDIRS          => 'ARRAY'
+    PMLIBPARENTDIRS    => 'ARRAY'
+    PREREQ_PM          => 'HASH'
+    SKIP               => 'ARRAY'
+    TYPEMAPS           => 'ARRAY'
+    XS                 => 'HASH'
+    VERSION            => (@: 'version','PLAINVALUE')
+    _KEEP_AFTER_FLUSH  => 'PLAINVALUE'
 
-    clean      => 'HASH',
-    depend     => 'HASH',
-    dist       => 'HASH',
-    dynamic_lib=> 'HASH',
-    linkext    => 'HASH',
-    macro      => 'HASH',
-    postamble  => 'HASH',
-    realclean  => 'HASH',
-    test       => 'HASH',
-    )
+    clean      => 'HASH'
+    depend     => 'HASH'
+    dist       => 'HASH'
+    dynamic_lib=> 'HASH'
+    linkext    => 'HASH'
+    macro      => 'HASH'
+    postamble  => 'HASH'
+    realclean  => 'HASH'
+    test       => 'HASH'
+    
 
 %Att_Sigs{[keys %Recognized_Att_Keys]} = (@: 'PLAINVALUE') x (nelems(%Recognized_Att_Keys)/2)
 %Att_Sigs{[keys %Special_Sigs]} = values %Special_Sigs
@@ -419,8 +419,8 @@ END
 
     if (defined $self->{?CONFIGURE})
         if (ref $self->{?CONFIGURE} eq 'CODE')
-            %configure_att = %( <  $self->{?CONFIGURE}->( < @_ )->% )
-            $self = \%( < $self->%, < %configure_att )
+            %configure_att = %:  <  $self->{?CONFIGURE}->( < @_ )->% 
+            $self = \%:  < $self->%, < %configure_att 
         else
             die "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n"
         
@@ -620,7 +620,7 @@ END
 sub WriteEmptyMakefile
     die "WriteEmptyMakefile: Need an even number of args" if (nelems @_) % 2
 
-    my %att = %( < @_ )
+    my %att = %:  < @_ 
     my $self = MM->new(\%att)
 
     my $new = $self->{?MAKEFILE}
@@ -698,8 +698,8 @@ sub parse_args($self, @< @args)
         my(@: $armaybe) = $self->{?ARMAYBE}
         print $^STDOUT, "ARMAYBE => '$armaybe' should be changed to:\n",
             "\t'dynamic_lib' => \{ARMAYBE => '$armaybe'\}\n"
-        my(@: %dl) =@:  %( < ($self->{?dynamic_lib} || \$%)->% )
-        $self->{+dynamic_lib} = \%( < %dl, ARMAYBE => $armaybe)
+        my(@: %dl) =@:  %:  < ($self->{?dynamic_lib} || \$%)->% 
+        $self->{+dynamic_lib} = \%:  < %dl, ARMAYBE => $armaybe
         delete $self->{ARMAYBE}
     
     if (defined $self->{?LDTARGET})
@@ -882,7 +882,7 @@ sub flush
         warn "rename MakeMaker.tmp => $finalname: $^OS_ERROR"
     chmod 0644, $finalname unless $Is_VMS
 
-    my %keep = %( < @+: map { (@: $_ => 1) }, qw(NEEDS_LINKING HAS_LINK_CODE) )
+    my %keep = %:  < @+: map { (@: $_ => 1) }, qw(NEEDS_LINKING HAS_LINK_CODE) 
 
     if ($self->{?PARENT} && !$self->{?_KEEP_AFTER_FLUSH})
         foreach (keys $self->%) # safe memory

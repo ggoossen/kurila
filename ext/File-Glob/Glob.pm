@@ -31,7 +31,7 @@ use XSLoader ()
     GLOB_TILDE
 )
 
-%EXPORT_TAGS = %(
+%EXPORT_TAGS = %: 
     'glob' => qw(
                         GLOB_ABEND
 	GLOB_ALPHASORT
@@ -50,8 +50,8 @@ use XSLoader ()
         GLOB_QUOTE
         GLOB_TILDE
         bsd_glob
-    ),
     )
+    
 
 $VERSION = '1.06'
 

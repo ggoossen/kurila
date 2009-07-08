@@ -126,7 +126,7 @@ for my $num_chain (1..$max_chain)
                 my $nok = 0
                 my @otherops = grep { $_ +<= 3 }, $op->@
                 my @curops = @: $op,\@otherops
-
+                                    
                 for my $num ( @list)
                     my $inpt
                     my @ans

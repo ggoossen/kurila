@@ -56,27 +56,27 @@ sub compile($self, %< %args)
 
     my @defines = $self->arg_defines( < ( %args{?defines} || \$% )->% )
 
-    my %spec = %(
-        srcdir      => $srcdir,
-        builddir    => $srcdir,
-        basename    => $basename,
-        source      => %args{?source},
-        output      => File::Spec->catfile($srcdir, $basename) . $cf->{?obj_ext},
-        cc          => $cf->{?cc},
+    my %spec = %: 
+        srcdir      => $srcdir
+        builddir    => $srcdir
+        basename    => $basename
+        source      => %args{?source}
+        output      => File::Spec->catfile($srcdir, $basename) . $cf->{?obj_ext}
+        cc          => $cf->{?cc}
         cflags      => \(@:  <
-                                 $self->split_like_shell($cf->{ccflags}), <
-                                 $self->split_like_shell($cf->{cccdlflags}), <
-                                 $self->split_like_shell(%args{extra_compiler_flags})
-        ),
-        optimize    => \ $self->split_like_shell($cf->{optimize}),
-        defines     => \@defines,
-        includes    => \ (%args{?include_dirs} || \$@)->@,
+                                              $self->split_like_shell($cf->{ccflags}), <
+                                              $self->split_like_shell($cf->{cccdlflags}), <
+                                              $self->split_like_shell(%args{extra_compiler_flags})
+                         )
+        optimize    => \ $self->split_like_shell($cf->{optimize})
+        defines     => \@defines
+        includes    => \ (%args{?include_dirs} || \$@)->@
         perlinc     => \(@:  <
-                                 $self->perl_inc(), <
-                                 $self->split_like_shell($cf->{incpath})
-        ),
-        use_scripts => 1, # XXX provide user option to change this???
-        )
+                                              $self->perl_inc(), <
+                                              $self->split_like_shell($cf->{incpath})
+                         )
+        use_scripts => 1 # XXX provide user option to change this???
+        
 
     $self->normalize_filespecs(
         \%spec{+source},
@@ -113,21 +113,21 @@ sub link($self, %< %args)
     my $perl_src = $self->perl_src()
     $lddlflags =~ s/\Q$cf->{?archlibexp}\E[\\\/]CORE/$perl_src/ if $perl_src
 
-    my %spec = %(
-        srcdir        => $to,
-        builddir      => $to,
-        startup       => \$@,
-        objects       => \@objects,
-        libs          => \$@,
-        output        => $output,
-        ld            => $cf->{?ld},
-        libperl       => $cf->{?libperl},
-        perllibs      => \ $self->split_like_shell($cf->{perllibs}),
-        libpath       => \ $self->split_like_shell($cf->{libpth}),
-        lddlflags     => \ $self->split_like_shell($lddlflags),
-        other_ldflags => \ $self->split_like_shell(%args{?extra_linker_flags} || ''),
-        use_scripts   => 1, # XXX provide user option to change this???
-        )
+    my %spec = %: 
+        srcdir        => $to
+        builddir      => $to
+        startup       => \$@
+        objects       => \@objects
+        libs          => \$@
+        output        => $output
+        ld            => $cf->{?ld}
+        libperl       => $cf->{?libperl}
+        perllibs      => \ $self->split_like_shell($cf->{perllibs})
+        libpath       => \ $self->split_like_shell($cf->{libpth})
+        lddlflags     => \ $self->split_like_shell($lddlflags)
+        other_ldflags => \ $self->split_like_shell(%args{?extra_linker_flags} || '')
+        use_scripts   => 1 # XXX provide user option to change this???
+        
 
     unless ( %spec{?basename} )
         (%spec{+basename} = %args{?module_name}) =~ s/.*:://
@@ -245,7 +245,7 @@ sub format_compiler_cmd($self, %< %spec)
         $path = '-I' . $path
 
 
-    %spec = %( < $self->write_compiler_script(< %spec) )
+    %spec = %:  < $self->write_compiler_script(< %spec) 
         if %spec{?use_scripts}
 
     return \ grep {defined && length}, @:  %spec{?cc},'-nologo','-c'
@@ -297,7 +297,7 @@ sub format_linker_cmd($self, %< %spec)
     %spec{+implib}    &&= '-implib:'   . %spec{?implib}
     %spec{+map_file}  &&= '-map:'      . %spec{?map_file}
 
-    %spec = %( < $self->write_linker_script(< %spec) )
+    %spec = %:  < $self->write_linker_script(< %spec) 
         if %spec{?use_scripts}
 
     my @cmds # Stores the series of commands needed to build the module.
@@ -364,7 +364,7 @@ sub format_compiler_cmd($self, %< %spec)
         $path = '-I' . $path
 
 
-    %spec = %( < $self->write_compiler_script(< %spec) )
+    %spec = %:  < $self->write_compiler_script(< %spec) 
         if %spec{?use_scripts}
 
     return \ grep {defined && length}, @:  %spec{?cc}, '-c'
@@ -416,7 +416,7 @@ sub format_linker_cmd($self, %< %spec)
     push( %spec{startup}->@, 'c0d32.obj' )
         unless ( %spec{?starup} && nelems %spec{?startup}->@ )
 
-    %spec = %( < $self->write_linker_script(< %spec) )
+    %spec = %:  < $self->write_linker_script(< %spec) 
         if %spec{?use_scripts}
 
     return \ grep {defined && length}, @:  %spec{?ld}
@@ -464,7 +464,7 @@ sub write_linker_script($self, %< %spec)
 
     print $ld_libs_fh, join( " +\n", @:
      (delete %spec{libperl}  || '')
-     < (delete %spec{perllibs} || \$@)->@,
+     < (delete %spec{perllibs} || \$@)->@
         )
 
     close $ld_libs_fh
@@ -519,7 +519,7 @@ sub format_linker_cmd($self, %< %spec)
     File::Basename::basename( %spec{?output} ) =~ m/(....)(.{0,4})/
     %spec{+image_base} = sprintf( "0x\%x0000", unpack('n', $1 ^^^ $2) )
 
-    %spec = %( < $self->write_linker_script(< %spec) )
+    %spec = %:  < $self->write_linker_script(< %spec) 
         if %spec{?use_scripts}
 
     foreach my $path (  %spec{libpath}->@ )
@@ -600,7 +600,7 @@ sub write_linker_script($self, %< %spec)
 
     print $scriptfh, 'INPUT(' . join( ' ', @:
      (delete %spec{libperl}  || '')
-     < (delete %spec{perllibs} || \$@)->@,
+     < (delete %spec{perllibs} || \$@)->@
         ) . ")\n"
 
     close $scriptfh

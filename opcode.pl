@@ -300,44 +300,44 @@ EXTCONST U32 PL_opargs[];
 EXTCONST U32 PL_opargs[] = \{
 END
 
-my %argnum = %(
-    'S',  1,		# scalar
-    'L',  2,		# list
-    'A',  3,		# array value
-    'H',  4,		# hash value
-    'C',  5,		# code value
-    'F',  6,		# file value
-    'R',  7,		# scalar reference
-    )
+my %argnum = %: 
+    'S',  1		# scalar
+    'L',  2		# list
+    'A',  3		# array value
+    'H',  4		# hash value
+    'C',  5		# code value
+    'F',  6		# file value
+    'R',  7		# scalar reference
+    
 
-my %opclass = %(
-    '0',  0,		# baseop
-    '1',  1,		# unop
-    '2',  2,		# binop
-    '|',  3,		# logop
-    '@',  4,		# listop
-    '/',  5,		# pmop
-    '$',  6,		# svop_or_padop
-    '#',  7,		# padop
-    '{',  9,		# loop
-    ';',  10,		# cop
-    '%',  11,		# baseop_or_unop
-    '-',  12,		# filestatop
-    '}',  13,		# loopexop
-    '!',  14,		# rootop
-    )
+my %opclass = %: 
+    '0',  0		# baseop
+    '1',  1		# unop
+    '2',  2		# binop
+    '|',  3		# logop
+    '@',  4		# listop
+    '/',  5		# pmop
+    '$',  6		# svop_or_padop
+    '#',  7		# padop
+    '{',  9		# loop
+    ';',  10		# cop
+    '%',  11		# baseop_or_unop
+    '-',  12		# filestatop
+    '}',  13		# loopexop
+    '!',  14		# rootop
+    
 
-my %opflags = %(
-    'm' =>   1,		# needs stack mark
-    'f' =>   2,		# fold constants
-    's' =>   4,		# always produces scalar
-    't' =>   8,		# needs target scalar
-    'T' =>   8 ^|^ 256,	# ... which may be lexical
-    'i' =>  16,		# always produces integer
-    'I' =>  32,		# has corresponding int op
-    'd' =>  64,		# danger, unknown side effects
-    'u' => 128,		# defaults to $_
-    )
+my %opflags = %: 
+    'm' =>   1		# needs stack mark
+    'f' =>   2		# fold constants
+    's' =>   4		# always produces scalar
+    't' =>   8		# needs target scalar
+    'T' =>   8 ^|^ 256	# ... which may be lexical
+    'i' =>  16		# always produces integer
+    'I' =>  32		# has corresponding int op
+    'd' =>  64		# danger, unknown side effects
+    'u' => 128		# defaults to $_
+    
 
 my %OP_IS_SOCKET
 my %OP_IS_FILETEST

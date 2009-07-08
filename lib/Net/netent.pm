@@ -10,7 +10,7 @@ BEGIN
 			$n_name	    	@n_aliases
 			$n_addrtype 	$n_net
 		   )
-    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT )
+    %EXPORT_TAGS = %:  FIELDS => @EXPORT_OK +@+ @EXPORT 
 
 our ($n_name, @n_aliases, $n_addrtype, $n_net)
 

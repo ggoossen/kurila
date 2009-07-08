@@ -1,7 +1,7 @@
 BEGIN 
     if(env::var('PERL_CORE')) {
         chdir 't';
-        $^INCLUDE_PATH = @( '../lib' );
+        $^INCLUDE_PATH = (@:  '../lib' );
     }
 
 
@@ -18,8 +18,8 @@ die "Couldn't make an object!?" unless ok defined $x
 $x->inc(0)
 $x->shadows(1)
 
-use File::Spec;
-use Cwd;
+use File::Spec
+use Cwd
 my $cwd = cwd()
 print $^STDOUT, "# CWD: $cwd\n"
 
@@ -57,7 +57,7 @@ ok 1
 print $^STDOUT, $x->_state_as_string
 #$x->verbose(12);
 
-use Pod::Simple;
+use Pod::Simple
 *pretty = \&Pod::Simple::BlackBox::pretty
 
 my $glob = '*z?k*'

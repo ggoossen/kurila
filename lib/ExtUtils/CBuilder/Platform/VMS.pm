@@ -28,8 +28,8 @@ sub arg_defines($self, %< %args)
 
     return  @: '/define=('
                    . join(',', @config_defines
-                               +@+ map { "\"$_" . ( length(%args{?$_}) ?? "=%args{?$_}" !! '') . "\"" },
-                                     keys %args)
+                   +@+ map { "\"$_" . ( length(%args{?$_}) ?? "=%args{?$_}" !! '') . "\"" }
+               keys %args)
                    . ')'
 
 
@@ -153,11 +153,11 @@ sub _liblist_ext($self, $potential_libs,$verbose,$give_libs)
     # (VMS equivalent of '' indicates that the library is automatically
     # searched by the linker, and should be skipped here.)
     my(@flibs, %libs_seen)
-    my %libmap = %( 'm' => '', 'f77' => '', 'F77' => '', 'V77' => '', 'c' => '',
-        'malloc' => '', 'crypt' => '', 'resolv' => '', 'c_s' => '',
-        'socket' => '', 'X11' => 'DECW$XLIBSHR',
-        'Xt' => 'DECW$XTSHR', 'Xm' => 'DECW$XMLIBSHR',
-        'Xmu' => 'DECW$XMULIBSHR')
+    my %libmap = %:  'm' => '', 'f77' => '', 'F77' => '', 'V77' => '', 'c' => ''
+                     'malloc' => '', 'crypt' => '', 'resolv' => '', 'c_s' => ''
+                     'socket' => '', 'X11' => 'DECW$XLIBSHR'
+                     'Xt' => 'DECW$XTSHR', 'Xm' => 'DECW$XMLIBSHR'
+                     'Xmu' => 'DECW$XMULIBSHR'
     if ($self->{'config'}->{?'vms_cc_type'} ne 'decc') { %libmap{+'curses'} = 'VAXCCURSE'; }
 
     warn "Potential libraries are '$potential_libs'\n" if $verbose

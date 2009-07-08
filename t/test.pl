@@ -47,7 +47,7 @@ sub plan
             undef $n
             $noplan = 1
     else
-        my %plan = %( < @_ )
+        my %plan = %:  < @_ 
         $n = %plan{?tests}
     _print "1..$n\n" unless $noplan
     $planned = $n
@@ -393,7 +393,7 @@ sub _quote_args
         $runperl->$ .= ' ' . $_
 
 sub _create_runperl # Create the string to qx in runperl().
-    my %args = %( < @_ )
+    my %args = %:  < @_ 
     my $runperl = $^EXECUTABLE_NAME =~ m/\s/ ?? qq{"$^EXECUTABLE_NAME"} !! $^EXECUTABLE_NAME
     #- this allows, for example, to set PERL_RUNPERL_DEBUG=/usr/bin/valgrind
     if (env::var('PERL_RUNPERL_DEBUG'))

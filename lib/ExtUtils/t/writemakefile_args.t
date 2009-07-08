@@ -78,7 +78,7 @@ do
                   $mm = WriteMakefile(
             NAME            => 'Big::Dummy',
             VERSION_FROM    => 'lib/Big/Dummy.pm',
-            LIBS            => %( wibble => "wobble" ),
+            LIBS            => (%:  wibble => "wobble" ),
             );
               }, qr{^LIBS takes a ARRAY or PLAINVALUE not a HASH}m 
 
@@ -87,14 +87,14 @@ do
     $mm = WriteMakefile(
         NAME            => 'Big::Dummy',
         WIBBLE          => 'something',
-        wump            => \%( foo => 42 ),
+        wump            => \(%:  foo => 42 ),
         )
 
     like( $warnings, qr{^WARNING: WIBBLE is not a known parameter.\n}m )
     like( $warnings, qr{^WARNING: wump is not a known parameter.\n}m )
 
     is( $mm->{?WIBBLE}, 'something' )
-    is_deeply( $mm->{?wump}, \%( foo => 42 ) )
+    is_deeply( $mm->{?wump}, \(%:  foo => 42 ) )
 
 
     # Test VERSION

@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -13,7 +13,7 @@ BEGIN
 use Test::Builder
 use env
 require Test::Simple::Catch
-my@($out, $err) =  Test::Simple::Catch::caught()
+my(@: $out, $err) =  Test::Simple::Catch::caught()
 Test::Builder->new->no_header(1)
 Test::Builder->new->no_ending(1)
 local env::var('HARNESS_ACTIVE' ) = 0
@@ -52,7 +52,7 @@ sub like($this, $regex, ?$name)
 
 
 require Test::More
-Test::More->import(tests => 11, import => \@('is_deeply'))
+Test::More->import(tests => 11, import => \(@: 'is_deeply'))
 
 my $Filename = quotemeta $^PROGRAM_NAME
 
@@ -82,7 +82,7 @@ ERRHEAD
 ERR
 
 #line 88
-ok !is_deeply(\%( this => 42 ), \%( this => 43 ), 'hashes with different values')
+ok !is_deeply(\(%:  this => 42 ), \(%:  this => 43 ), 'hashes with different values')
 is( $out, "not ok 3 - hashes with different values\n",
     'hashes with different values' )
 is( $err, <<ERRHEAD . <<'ERR',                        '   right diagnostic' )
@@ -95,7 +95,7 @@ ERRHEAD
 ERR
 
 #line 99
-ok !is_deeply(\%( that => 42 ), \%( this => 42 ), 'hashes with different keys')
+ok !is_deeply(\(%:  that => 42 ), \(%:  this => 42 ), 'hashes with different keys')
 is( $out, "not ok 4 - hashes with different keys\n",
     'hashes with different keys' )
 is( $err, <<ERR,                        '    right diagnostic' )
@@ -119,7 +119,7 @@ is( $err, <<ERR,                        '    right diagnostic' )
 ERR
 
 #line 121
-ok !is_deeply(\@(undef, undef), \@(undef), 'arrays of undefs' )
+ok !is_deeply(\(@: undef, undef), \(@: undef), 'arrays of undefs' )
 is( $out, "not ok 6 - arrays of undefs\n",  'arrays of undefs' )
 is( $err, <<ERR,                            '    right diagnostic' )
 #   Failed test 'arrays of undefs'
@@ -130,7 +130,7 @@ is( $err, <<ERR,                            '    right diagnostic' )
 ERR
 
 #line 131
-ok !is_deeply(\%( foo => undef ), \$%,    'hashes of undefs' )
+ok !is_deeply(\(%:  foo => undef ), \$%,    'hashes of undefs' )
 is( $out, "not ok 7 - hashes of undefs\n",  'hashes of undefs' )
 is( $err, <<ERR,                            '    right diagnostic' )
 #   Failed test 'hashes of undefs'
@@ -190,14 +190,14 @@ ERR
 # $b2 = { foo => \$b3 };
 # is_deeply([$a1], [$b1], 'deep mixed scalar refs');
 
-my $foo = \%(
-    this => \(1..10),
-    that => \%( up => "down", left => "right" ),
-    )
+my $foo = \%: 
+    this => \(1..10)
+    that => \(%:  up => "down", left => "right" )
+    
 
-my $bar = \%(
-    this => \(1..10),
-    that => \%( up => "down", left => "right", foo => 42 ),
+my $bar = \(%: 
+    this => \(1..10)
+    that => \(%:  up => "down", left => "right", foo => 42 )
     )
 
 #line 198
@@ -214,10 +214,10 @@ ERR
 
 
 #line 221
-my @tests = @(\$@,
-              \qw(42),
-              \@( <qw(42 23), < qw(42 23))
-    )
+my @tests = @: \$@
+               \qw(42)
+               \@:  <qw(42 23), < qw(42 23)
+    
 
 foreach my $test ( @tests)
     my $num_args = (nelems $test->@)
@@ -233,7 +233,7 @@ foreach my $test ( @tests)
 
 #line 240
 # [rt.cpan.org 6837]
-ok !is_deeply(\@(\%(Foo => undef)),\@(\%(Foo => ""))), 'undef != ""'
+ok !is_deeply(\(@: \(%: Foo => undef)),\(@: \(%: Foo => ""))), 'undef != ""'
 ok( (nelems @Test::More::Data_Stack) == 0, '@Data_Stack not holding onto things' )
 
 
@@ -241,18 +241,18 @@ ok( (nelems @Test::More::Data_Stack) == 0, '@Data_Stack not holding onto things'
 # [rt.cpan.org 7031]
 my $a = \$@
 ok !is_deeply($a, dump::view($a).''),       "don't compare refs like strings"
-ok !is_deeply(\@($a), \@(dump::view($a).'')),   "  even deep inside"
+ok !is_deeply(\(@: $a), \(@: dump::view($a).'')),   "  even deep inside"
 
 
 #line 265
 # [rt.cpan.org 7030]
-ok !is_deeply( \$%, \%(key => \$@) ),  '\@() could match non-existent values'
-ok !is_deeply( \$@, \@(\$@) )
+ok !is_deeply( \$%, \(%: key => \$@) ),  '\@() could match non-existent values'
+ok !is_deeply( \$@, \(@: \$@) )
 
 
 #line 273
 $err->$ = $out->$ = ''
-ok !is_deeply( \@(\'a', 'b'), \@(\'a', 'c') )
+ok !is_deeply( \(@: \'a', 'b'), \(@: \'a', 'c') )
 is( $out, "not ok 20\n",  'scalar refs in an array' )
 is( $err, <<ERR,        '    right diagnostic' )
 #   Failed test at $^PROGRAM_NAME line 274.
@@ -313,7 +313,7 @@ ERRHEAD
 ERR
 
     #line 332
-    ok !is_deeply( \@($array), \@($hash) )
+    ok !is_deeply( \(@: $array), \(@: $hash) )
     is( $out, "not ok 25\n", 'nested different ref types' )
     is( $err, <<ERRHEAD.<<'ERR',	     '  right diagnostic' )
 #   Failed test at $^PROGRAM_NAME line 332.

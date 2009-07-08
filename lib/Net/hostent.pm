@@ -11,7 +11,7 @@ BEGIN
 			$h_addrtype 	$h_length
 			@h_addr_list 	$h_addr
 		   )
-    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT )
+    %EXPORT_TAGS = %:  FIELDS => @EXPORT_OK +@+ @EXPORT 
 
 our ($h_name, @h_aliases, $h_addrtype, $h_length,
     @h_addr_list, $h_addr)

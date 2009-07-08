@@ -192,16 +192,16 @@ do
     $debugging = 1 if defined(@ARGV[?0]) and @ARGV[0] eq '-debug'
 
     # The expected values for these tests
-    %expected = %(
-        'global_scalar'	=> 1001,
-        'global_array'	=> 2101,
-        'global_hash'	=> 3004,
-        'fs_scalar'	=> 4001,
-        'fs_array'	=> 5101,
-        'fs_hash'	=> 6004,
-        'sub_scalar'	=> 7001,
-        'sub_array'	=> 8101,
-        'sub_hash'	=> 9004,
+    %expected = (%: 
+        'global_scalar'	=> 1001
+        'global_array'	=> 2101
+        'global_hash'	=> 3004
+        'fs_scalar'	=> 4001
+        'fs_array'	=> 5101
+        'fs_hash'	=> 6004
+        'sub_scalar'	=> 7001
+        'sub_array'	=> 8101
+        'sub_hash'	=> 9004
         )
 
     # Our innermost sub is either named or anonymous

@@ -61,7 +61,7 @@ sub testpodcheck( %< %args)
         
     
     podchecker($infile, $outfile)
-    if ( testcmp(\%('cmplines' => \&msgcmp), $outfile, $cmpfile) )
+    if ( testcmp(\(%: 'cmplines' => \&msgcmp), $outfile, $cmpfile) )
         $different = "$outfile is different from $cmpfile"
     else
         unlink($outfile)
@@ -70,7 +70,7 @@ sub testpodcheck( %< %args)
 
 
 sub testpodchecker
-    my %opts = %( (ref @_[0] eq 'HASH') ?? < shift()->% !! () )
+    my %opts = %:  (ref @_[0] eq 'HASH') ?? < shift()->% !! () 
     my @testpods = @_
     my (@: $testname, $testdir) = @: "", ""
     my $cmpfile = ""

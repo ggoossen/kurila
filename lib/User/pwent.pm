@@ -21,10 +21,10 @@ BEGIN
                         $pw_expire
 
                    )
-    %EXPORT_TAGS = %(
-        FIELDS => (grep( {m/^\$pw_/ }, @EXPORT_OK)) +@+ @EXPORT,
-        ALL    => @EXPORT +@+ @EXPORT_OK,
-        )
+    %EXPORT_TAGS = %: 
+        FIELDS => (grep( {m/^\$pw_/ }, @EXPORT_OK)) +@+ @EXPORT
+        ALL    => @EXPORT +@+ @EXPORT_OK
+        
 
 
 our ($pw_name, $pw_passwd, $pw_uid, $pw_gid, $pw_change, $pw_age,
