@@ -2,9 +2,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't' if -d 't'
-        $^INCLUDE_PATH = @:  '../lib' 
-    
-
+        $^INCLUDE_PATH = @: '../lib'
 
 use Test::More 'no_plan'
 
@@ -18,7 +16,7 @@ my %types
 
 ok (nkeys %Extensions, "There are some extensions")
 # Check only the 3 valid keys have been used.
-while (my (@: ?$key, ?$val) =(@:  each %Extensions))
+while (my @: ?$key, ?$val = @: each %Extensions)
     my $raw_ext = $key
     # Back to the format in Config
     $raw_ext =~ s!::!/!g

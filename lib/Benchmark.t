@@ -202,8 +202,8 @@ do
 
 $foo = $bar = $baz = 0
 $out = ""
-$got = do_with_out({ timethese($iterations, \%( Foo => sub (@< @_) {++$foo}, Bar => '++$main::bar',
-                               Baz => sub (@< @_) {++$baz} )) })
+$got = do_with_out({ timethese($iterations, \(%:  Foo => sub (@< @_) {++$foo}, Bar => '++$main::bar'
+                                                  Baz => sub (@< @_) {++$baz} )) })
 is(ref ($got), 'HASH', "timethese should return a hashref")
 isa_ok($got->{?Foo}, 'Benchmark', "Foo value")
 isa_ok($got->{?Bar}, 'Benchmark', "Bar value")
@@ -225,8 +225,8 @@ like ($got, qr/\bBar\b.*\bBaz\b.*\bFoo\b/s, 'check output is in sorted order')
 like ($got, $Default_Pattern, 'should find default format somewhere')
 
 
-my $code_to_test =  \%( Foo => sub (@< @_) {$foo+=fib($ballast-2)},
-    Bar => sub (@< @_) {$bar+=fib($ballast)})
+my $code_to_test =  \(%:  Foo => sub (@< @_) {$foo+=fib($ballast-2)}
+                          Bar => sub (@< @_) {$bar+=fib($ballast)})
 # Keep these for later.
 my $results
 do
@@ -347,7 +347,7 @@ sub check_graph($title, $row1, $row2)
 do
     $out = ""
     my $start = times
-    my $chart = do_with_out({ cmpthese( -0.1, \%( a => "++ our \$i", b => "our \$i; \$i = sqrt( \$i++)" ), "auto" )  })
+    my $chart = do_with_out({ cmpthese( -0.1, \(%:  a => "++ our \$i", b => "our \$i; \$i = sqrt( \$i++)" ), "auto" )  })
     my $end = times
     ok (($end - $start) +> 0.05, "benchmarked code ran for over 0.05 seconds")
 
@@ -368,7 +368,7 @@ do
 do
     $out = ""
     my $start = times
-    my $chart = do_with_out({ cmpthese( -0.1, \%( a => "++ our \$i", b => "our \$i; \$i = sqrt(\$i++)" ) )  })
+    my $chart = do_with_out({ cmpthese( -0.1, \(%:  a => "++ our \$i", b => "our \$i; \$i = sqrt(\$i++)" ) )  })
     my $end = times
     ok (($end - $start) +> 0.05, "benchmarked code ran for over 0.05 seconds")
 
@@ -515,18 +515,18 @@ do   # Check usage error messages
 
     my @takes_no_args =qw(clearallcache disablecache enablecache)
 
-    my %cmpthese = %('forgot {}' => 'cmpthese( 42, foo => sub { 1 } )',
-        'not result' => 'cmpthese(42)',
-        'array ref'  => 'cmpthese( 42, \@( foo => sub { 1 } ) )',
-        )
+    my %cmpthese = %: 'forgot {}' => 'cmpthese( 42, foo => sub { 1 } )'
+                      'not result' => 'cmpthese(42)'
+                      'array ref'  => 'cmpthese( 42, \@( foo => sub { 1 } ) )'
+        
     while( my(@: ?$name, ?$code) =(@:  each %cmpthese) )
         eval $code
         is( $^EVAL_ERROR->{?description}, %usage{?cmpthese}, "cmpthese usage: $name" )
     
 
-    my %timethese = %('forgot {}'  => 'timethese( 42, foo => sub { 1 } )',
-        'array ref'  => 'timethese( 42, \@( foo => sub { 1 } ) )',
-        )
+    my %timethese = %: 'forgot {}'  => 'timethese( 42, foo => sub { 1 } )'
+                       'array ref'  => 'timethese( 42, \@( foo => sub { 1 } ) )'
+        
 
     while( my(@: ?$name, ?$code) =(@:  each %timethese) )
         eval $code

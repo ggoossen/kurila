@@ -382,7 +382,6 @@ my @common_items = @:
                     \%: name=>"*/", type=>"PV", value=>'"CLOSE"', macro=>1
                     \%: name=>"/*", type=>"PV", value=>'"OPEN"', macro=>1
                     \%: name=>$pound, type=>"PV", value=>'"Sterling"', macro=>1
-    
 
 my @args = @:  undef 
 foreach my $args ( @args)

@@ -153,7 +153,7 @@ is( (nelems $ei->modules), 3,    'modules() in scalar context' )
 
 # files
 $ei->{+goodmod} = \%: 
-    packlist => \(%: 
+    packlist => \ %: 
         (config_value("man1direxp") ??
             (File::Spec->catdir(config_value("man1direxp"), 'foo') => 1) !!
             ())
@@ -162,8 +162,6 @@ $ei->{+goodmod} = \%:
             ())
         File::Spec->catdir($prefix, 'foobar') => 1
         foobaz  => 1
-    )
-    
 
 dies_like( sub (@< @_) { $ei->files('badmod') },
            qr/badmod is not installed/,'files() should croak given bad modname')

@@ -273,11 +273,9 @@ sub _init_headings
 
     ## Initialize current section heading titles if necessary
     unless (defined $self->%{?_SECTION_HEADINGS})
-        my $section_headings = $self->%{+_SECTION_HEADINGS} = \@()
+        my $section_headings = $self->%{+_SECTION_HEADINGS} = \$@
         for my $i (0..$MAX_HEADING_LEVEL-1)
             $section_headings->@[+$i] = ''
-        
-    
 
 
 ##---------------------------------------------------------------------------
@@ -587,13 +585,13 @@ sub podselect(@argv)
             ## looked like Unix command-line options.
             ## to be uppercase keywords)
             ##-------------------------------------------------------------
-            %opts = %: < @+: map {
-                    my @($key, $val) = @(lc $_, %opts{?$_});
-                    $key =~ s/^(?=\w)/-/;
-                    $key =~ m/^-se[cl]/  and  $key  = '-sections';
-                    #! $key eq '-range'    and  $key .= 's';
-                    @($key => $val);
-                }, keys %opts
+            %opts = %+: map {
+                            my @($key, $val) = @(lc $_, %opts{?$_});
+                            $key =~ s/^(?=\w)/-/;
+                            $key =~ m/^-se[cl]/  and  $key  = '-sections';
+                            #! $key eq '-range'    and  $key .= 's';
+                            %: $key => $val;
+                          }, keys %opts
 
             ## Process the options
             (exists %opts{'-output'})  and  $output = %opts{?'-output'}

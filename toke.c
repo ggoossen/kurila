@@ -266,7 +266,6 @@ static struct debug_tokens {
     { ANDOP,		TOKENTYPE_NONE,		"ANDOP" },
     { ANONSUB,		TOKENTYPE_IVAL,		"ANONSUB" },
     { BLOCKSUB,		TOKENTYPE_IVAL,		"BLOCKSUB" },
-    { ANONARY,		TOKENTYPE_IVAL,		"ANONARY" },
     { ARROW,		TOKENTYPE_NONE,		"ARROW" },
     { ASSIGNOP,		TOKENTYPE_OPNUM,	"ASSIGNOP" },
     { BITANDOP,		TOKENTYPE_OPNUM,	"BITANDOP" },
@@ -4166,17 +4165,6 @@ Perl_yylex(pTHX)
 	if (PL_expect == XOPERATOR)
 	    no_op("Array", s);
 
-	if (s[1] == '(') {
-	    /* array constructor  @( */
-	    if (PL_lex_brackets > 100)
-		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
-	    PL_lex_brackstack[PL_lex_brackets].type = LB_PAREN;
-	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
-	    ++PL_lex_brackets;
-
-	    s += 2;
-	    OPERATOR(ANONARY);
-	}
 	if (s[1] == '+' && s[2] == ':') {
 	    /* arrayjoin '@+:' */
 	    s += 3;
@@ -4215,7 +4203,8 @@ Perl_yylex(pTHX)
 	}
 
 	s++;
-	Perl_croak(aTHX_ "Unknown operator '@'");
+	yyerror(aTHX_ "Unknown operator '@'");
+	goto retry;
     }
 
     case '/':			/* may be division, defined-or */

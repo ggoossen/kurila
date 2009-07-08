@@ -108,7 +108,7 @@ the front of I<name>).
 =cut
 
 sub memEQ_clause($self, $args)
-    my @($name, $checked_at, $indent) =  $args->{[qw(name checked_at indent)]}
+    my @: $name, $checked_at, $indent =  $args->{[qw(name checked_at indent)]}
     $indent = ' ' x ($indent || 4)
     my $front_chop
     if (ref $checked_at)
@@ -197,7 +197,7 @@ I<default_types> and the I<ITEM>s.
 =cut
 
 sub dump_names($self, $args, @< @items)
-    my @($default_type, $what, $indent, $declare_types)
+    my @: $default_type, $what, $indent, $declare_types
         =  $args->{[qw(default_type what indent declare_types)]}
     $indent = ' ' x ($indent || 0)
 
@@ -287,7 +287,7 @@ of a block, so variables may be defined in it.
 sub assign
     my $self = shift
     my $args = shift
-    my @($indent, $type, $pre, $post, $item)
+    my @: $indent, $type, $pre, $post, $item
         =  $args->{[qw(indent type pre post item)]}
     $post ||= ''
     my $clause
@@ -306,7 +306,7 @@ sub assign
         unless $self->valid_type($type)
 
     $clause .= join '', map {"$indent$_\n"},
-        @(    $self->assignment_clause_for_type(\%(type=>$type,item=>$item), < @_))
+        @: $self->assignment_clause_for_type(\%(type=>$type,item=>$item), < @_)
     chomp $post
     if (length $post)
         $clause .= "$post"
@@ -330,7 +330,7 @@ of spaces to indent, defaulting to 6.
 sub return_clause($self, $args, $item)
     my $indent = $args->{?indent}
 
-    my @($name, $value, $default, $pre, $post, $def_pre, $def_post, $type)
+    my @: $name, $value, $default, $pre, $post, $def_pre, $def_post, $type
         =  $item->%{[qw (name value default pre post def_pre def_post type)]}
     $value = $name unless defined $value
     my $macro = $self->macro_from_item($item)
@@ -358,7 +358,7 @@ sub return_clause($self, $args, $item)
             my $notdef = $self->return_statement_for_notdef()
             $clause .= "$indent$notdef\n" if defined $notdef
         else
-            my @default = @( ref $default ?? < $default->@ !! $default )
+            my @default = ref $default ?? $default->@ !! @: $default
             $type = shift @default
             $clause .= $self->assign (\%(indent=>$indent, type=>$type, pre=>$pre,
                 post=>$post, item=>$item), < @default)
@@ -371,7 +371,7 @@ sub return_clause($self, $args, $item)
 
 
 sub match_clause($self, $args, $item)
-    my @(?$offset, ?$indent) =  $args{[?qw(checked_at indent)]}
+    my @:?$offset, ?$indent = $args{[?qw(checked_at indent)]}
     $indent = ' ' x ($indent || 4)
     my $body = ''
     my ($no, $yes, $either, $name, $inner_indent)
@@ -415,7 +415,7 @@ each call).
 =cut
 
 sub switch_clause($self, $args, $namelen, $items, @< @items)
-    my @($indent, $comment) =  $args->{[qw(indent comment)]}
+    my @: $indent, $comment = $args->{[qw(indent comment)]}
     $indent = ' ' x ($indent || 2)
 
     local $Text::Wrap::huge = 'overflow'
@@ -444,11 +444,11 @@ sub switch_clause($self, $args, $namelen, $items, @< @items)
     $body .= wrap ($leader, $follower, join (" ", @safe_names) . " */") . "\n"
     # Figure out what to switch on.
     # (RMS, Spread of jump table, Position, Hashref)
-    my @best = @(1e38, ^~^0)
+    my @best = @: 1e38, ^~^0
     # Prefer the last character over the others. (As it lets us shorten the
     # memEQ clause at no cost).
-    foreach my $i (@($namelen - 1, < 0 .. ($namelen - 2)))
-        my @($min, $max) = @(^~^0, 0)
+    foreach my $i (@: $namelen - 1, < 0 .. ($namelen - 2))
+        my @: $min, $max = @: ^~^0, 0
         my %spread
         foreach ( @names)
             my $char = substr $_, $i, 1
@@ -478,13 +478,12 @@ sub switch_clause($self, $args, $namelen, $items, @< @items)
             $ss += (nelems $_->@) * nelems $_->@
         my $rms = sqrt ($ss / keys %spread)
         if ($rms +< @best[0] || ($rms == @best[0] && ($max - $min) +< @best[1]))
-            @best = @($rms, $max - $min, $i, \%spread)
-        
+            @best = @: $rms, $max - $min, $i, \%spread
     
     die "Internal error. Failed to pick a switch point for $(join ' ',@names)"
         unless defined @best[2]
     # use Data::Dumper; print Dumper (@best);
-    my @($offset, $best) =  @best[[@(2,3)]]
+    my @: $offset, $best = @best[[2..3]]
     $body .= $indent . "/* Offset $offset gives the best switch position.  */\n"
 
     my $do_front_chop = $offset == 0 && $namelen +> 2
@@ -607,7 +606,7 @@ sub normalise_items
         if (ref $orig)
             # Make a copy which is a normalised version of the ref passed in.
             $name = $orig->{?name}
-            my @($type, $macro, $value) =  $orig->%{[qw (type macro value)]}
+            my @: $type, $macro, $value = $orig->%{[qw (type macro value)]}
             $type ||= $default_type
             $what->{+$type} = 1
             $item = \%(name=>$name, type=>$type)
@@ -749,7 +748,7 @@ example C<constant_5> for names 5 characters long.  The default I<breakout> is
 # scalar reference.
 
 sub C_constant($self, $args, @< @items)
-    my @($package, $subname, $default_type, $what, $indent, $breakout) =
+    my @: $package, $subname, $default_type, $what, $indent, $breakout =
         $args->{[qw(package subname default_type types indent breakout)]}
     $package ||= 'Foo'
     $subname ||= 'constant'
@@ -761,7 +760,7 @@ sub C_constant($self, $args, @< @items)
     if (ref $breakout)
         # We are called recursively. We trust @items to be normalised, $what to
         # be a hashref, and pinch %$items from our parent to save recalculation.
-        @($namelen, $items) =  $breakout->@
+        @: $namelen, $items = $breakout->@
     else
         $items = \%()
         $breakout ||= 3
@@ -818,10 +817,10 @@ sub C_constant($self, $args, @< @items)
                 if ($only_thing->{?utf8})
                     if ($only_thing->{?utf8} eq 'yes')
                         # With utf8 on flag item is passed in element 0
-                        $body .= $self->match_clause (undef, \@($only_thing))
+                        $body .= $self->match_clause (undef, \@: $only_thing)
                     else
                         # With utf8 off flag item is passed in element 1
-                        $body .= $self->match_clause (undef, \@(undef, $only_thing))
+                        $body .= $self->match_clause (undef, \@: undef, $only_thing)
                     
                 else
                     $body .= $self->match_clause (undef, $only_thing)
@@ -842,7 +841,7 @@ sub C_constant($self, $args, @< @items)
                     subname=>"$($subname)_$i",
                     default_type => $default_type,
                     types => $what, indent => $indent,
-                    breakout => \@($i, $items)),
+                    breakout => \@: $i, $items),
                     < @by_length[$i])
                 $body .= "    return $($subname)_$i ("
                     # Eg "aTHX_ "
@@ -859,8 +858,7 @@ sub C_constant($self, $args, @< @items)
     my $notfound = $self->return_statement_for_notfound()
     $body .= "  $notfound\n" if $notfound
     $body .= "\}\n"
-    return  @(@subs, $body)
-
+    return  @: @subs, $body
 
 1
 __END__

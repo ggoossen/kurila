@@ -15,12 +15,11 @@ SKIP: do
     # and some test data to be read
     $pl->{+data} = %: 
         single => 1
-        hash => \(%: 
+        hash => \ %: 
             foo => 'bar'
             baz => 'bup'
-        )
         '/./abc' => ''
-        
+
     ExtUtils::Packlist::write($pl, 'eplist')
     is( $pl->{packfile}, 'eplist', 'write() should set packfile name' )
 

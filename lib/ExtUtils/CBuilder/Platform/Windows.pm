@@ -64,17 +64,17 @@ sub compile($self, %< %args)
         output      => File::Spec->catfile($srcdir, $basename) . $cf->{?obj_ext}
         cc          => $cf->{?cc}
         cflags      => \(@:  <
-                                              $self->split_like_shell($cf->{ccflags}), <
-                                              $self->split_like_shell($cf->{cccdlflags}), <
-                                              $self->split_like_shell(%args{extra_compiler_flags})
-                         )
+                                 $self->split_like_shell($cf->{ccflags}), <
+                                 $self->split_like_shell($cf->{cccdlflags}), <
+                                 $self->split_like_shell(%args{extra_compiler_flags})
+            )
         optimize    => \ $self->split_like_shell($cf->{optimize})
         defines     => \@defines
         includes    => \ (%args{?include_dirs} || \$@)->@
         perlinc     => \(@:  <
-                                              $self->perl_inc(), <
-                                              $self->split_like_shell($cf->{incpath})
-                         )
+                                 $self->perl_inc(), <
+                                 $self->split_like_shell($cf->{incpath})
+            )
         use_scripts => 1 # XXX provide user option to change this???
         
 

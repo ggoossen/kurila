@@ -32,6 +32,7 @@ my @names = @:  <qw(
                 \%: name=>"SEEK_CUR", default=>\(@: "IV", "1")
                 \%: name=>"SEEK_END", default=>\(@: "IV", "2")
                 \%: name=>"_S_IFMT", macro=>"S_IFMT", value=>"S_IFMT"
+
 WriteConstants(
     PROXYSUBS => 1,
     NAME => 'Fcntl',

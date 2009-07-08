@@ -9,7 +9,7 @@ our @EXPORT = qw(&Mksymlists)
 our $VERSION = '6.44'
 
 sub Mksymlists
-    my(@: %spec) =@:  %:  < @_ 
+    my %spec = %:  < @_ 
     my(@: $osname) = $^OS_NAME
 
     croak("Insufficient information specified to Mksymlists")

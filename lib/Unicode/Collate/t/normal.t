@@ -1,4 +1,4 @@
-use Test::More
+use Test::More;
 BEGIN 
     unless ("A" eq pack('U', 0x41)) {
         plan skip_all => "Unicode::Collate " .
@@ -7,7 +7,7 @@ BEGIN
     }
     if (env::var('PERL_CORE')) {
         chdir('t') if -d 't';
-        $^INCLUDE_PATH = (@:  $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
+        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
 
 

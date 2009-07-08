@@ -271,7 +271,7 @@ sub new
         line       => 0,
         prefix     => '=',
         separator  => ' ',
-        ptree => \@(),
+        ptree => \$@,
         < @_
         )
 
@@ -399,8 +399,8 @@ by a colon (':'), followed by the line number.
 =cut
 
 sub file_line
-    my @loc = @(@_[0]->{?'file'} || '<unknown-file>',
-                @_[0]->{?'line'} || 0)
+    my @loc = @: @_[0]->{?'file'} || '<unknown-file>'
+                 @_[0]->{?'line'} || 0
     return @loc
 
 
@@ -458,13 +458,13 @@ sub new
     if ((((nelems @_) +<= 2) or ((nelems @_) % 2)) and @_[0] !~ m/^-\w/)
         ## Yup - need an implicit 'name' before first parameter
         unshift @_, 'name'
-    
+
 
     ## See if odd number of args
     if (((nelems @_) % 2) != 0)
         ## Yup - need an implicit 'ptree' before the last parameter
         splice @_, ((nelems @_)-1), 0, 'ptree'
-    
+
 
     ## Any remaining arguments are treated as initial values for the
     ## hash that is used to represent this object. Note that we default
@@ -484,8 +484,8 @@ sub new
     if ( (ref $ptree) =~ m/^(ARRAY)?$/ )
         ## We have an array-ref, or a normal scalar. Pass it as an
         ## an argument to the ptree-constructor
-        $ptree = Pod::ParseTree->new($1 ?? \@($ptree) !! $ptree)
-    
+        $ptree = Pod::ParseTree->new($1 ?? \(@: $ptree) !! $ptree)
+
     $self->{+'ptree'} = $ptree
 
     ## Bless ourselves into the desired class and perform any initialization
@@ -523,8 +523,8 @@ sub _set_child2parent_links($self, @< @children)
         if (UNIVERSAL::isa($_, 'Pod::InteriorSequence') or
             UNIVERSAL::can($_, 'nested'))
             $_->nested($self)
-        
-    
+
+
 
 
 ## Private subroutine to unset child->parent links
@@ -537,7 +537,7 @@ sub _unset_child2parent_links
         next  unless (ref  and  ref ne 'SCALAR')
         $_->_unset_child2parent_links()
             if UNIVERSAL::isa($_, 'Pod::InteriorSequence')
-    
+
 
 
 ##---------------------------------------------------------------------------
@@ -612,7 +612,7 @@ sub raw_text
     my $text = $self->{?'name'} . $self->{?'ldelim'}
     for (  $self->{'ptree'}->children )
         $text .= (ref $_) ?? $_->raw_text !! $_
-    
+
     $text .= $self->{?'rdelim'}
     return $text
 
@@ -690,8 +690,8 @@ by a colon (':'), followed by the line number.
 =cut
 
 sub file_line
-    my @loc = @(@_[0]->{?'file'}  || '<unknown-file>',
-                @_[0]->{?'line'}  || 0)
+    my @loc = @: @_[0]->{?'file'}  || '<unknown-file>'
+                 @_[0]->{?'line'}  || 0
     return @loc
 
 
@@ -753,7 +753,7 @@ sub new
     my $this = shift
     my $class = ref($this) || $this
 
-    my $self = ((nelems @_) == 1  and  ref @_[0]) ?? @_[0] !! \@()
+    my $self = ((nelems @_) == 1  and  ref @_[0]) ?? @_[0] !! \$@
 
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class
@@ -779,9 +779,9 @@ children for the top node.
 
 sub top
     my $self = shift
-    if ((nelems @_) +> 0)
-        $self->@ = @( ((nelems @_) == 1  and  ref @_[0]) ?? ( nelems @_ )->$ !! < @_ )
-    
+    if (@_)
+        $self->@ = @_
+
     return $self
 
 
@@ -803,9 +803,9 @@ children for the top node.
 
 sub children
     my $self = shift
-    if ((nelems @_) +> 0)
-        $self->@ = @( ((nelems @_) == 1  and  ref @_[0]) ?? ( nelems @_ )->$ !! < @_ )
-    
+    if (@_)
+        $self->@ = @_
+
     return  $self->@
 
 
@@ -829,8 +829,8 @@ sub prepend
             $self->@[0] = $_ . $self->@[0]
         else
             unshift $self->@, $_
-        
-    
+
+
 
 
 ##---------------------------------------------------------------------------
@@ -857,8 +857,8 @@ sub append
             $self->@[-1] .= $_
         else
             push $self->@, $_
-        
-    
+
+
 
 
 =head2 $ptree-E<gt>B<raw_text()>
@@ -875,7 +875,7 @@ sub raw_text
     my $text = ""
     for (  $self->@ )
         $text .= (ref $_) ?? $_->raw_text !! $_
-    
+
     return $text
 
 
@@ -889,7 +889,7 @@ sub _unset_child2parent_links
         next  unless (defined and  ref  and  ref ne 'SCALAR')
         $_->_unset_child2parent_links()
             if UNIVERSAL::isa($_, 'Pod::InteriorSequence')
-    
+
 
 
 sub _set_child2parent_links {

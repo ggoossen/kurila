@@ -183,7 +183,7 @@ sub new
         b => \@: 
             Foo->new(1)
             Foo->new(2) # Second instance of a Foo
-        
+            
         ), $class
 
 

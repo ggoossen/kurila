@@ -138,12 +138,11 @@ sub extract_language_tags
 
     ## Changes in the language tagging standards may have to be reflected here.
 
-    my@($text) =
+    my $text =
         @_[0] =~ m/(.+)/  # to make for an untainted result
         ?? $1 !! ''
-    
 
-    return grep( {!m/^[ixIX]$/s }, @( # 'i' and 'x' aren't good tags
+    return grep( {!m/^[ixIX]$/s }, @: # 'i' and 'x' aren't good tags
         $text =~
         m/
       \b
@@ -156,7 +155,6 @@ sub extract_language_tags
       )*
       \b
     /xsg)
-        )
 
 
 ###########################################################################
@@ -354,7 +352,7 @@ sub super_languages
 
     # NB: (i-sil-...)?
 
-    my @supers = @( () )
+    my @supers = $@
     foreach my $bit ( @l1_subtags)
         push @supers,
             scalar(nelems @supers) ?? (@supers[-1] . '-' . $bit) !! $bit
@@ -638,7 +636,7 @@ sub alternate_language_tags
 do
     # Init %Panic...
 
-    my @panic = @(  # MUST all be lowercase!
+    my @panic = @:  # MUST all be lowercase!
         # Only large ("national") languages make it in this list.
         #  If you, as a user, are so bizarre that the /only/ language
         #  you claim to accept is Galician, then no, we won't do you
@@ -676,7 +674,7 @@ do
         # And the panic languages for English is, of course, nil!
 
         # My guesses at Slavic intelligibility:
-        < (@(\qw(ru be uk)) x 2),  # Russian, Belarusian, Ukranian
+        < ((@:\qw(ru be uk)) x 2),  # Russian, Belarusian, Ukranian
         'sr' => 'hr', 'hr' => 'sr', # Serb + Croat
         'cs' => 'sk', 'sk' => 'cs', # Czech + Slovak
 
@@ -689,10 +687,10 @@ do
         )
     my($k,$v)
     while((nelems @panic))
-        @($k,$v) = @: splice(@panic,0,2)
-        foreach my $k (@(ref($k) ?? < $k->@ !! $k))
-            foreach my $v (@(ref($v) ?? < $v->@ !! $v))
-                push((%Panic{+$k} //= @()), $v) unless $k eq $v
+        @: $k,$v = @: splice(@panic,0,2)
+        foreach my $k (ref($k) ?? $k->@ !! @: $k))
+            foreach my $v (ref($v) ?? $v->@ !! @: $v)
+                push((%Panic{+$k} //= $@), $v) unless $k eq $v
             
         
     
@@ -738,7 +736,7 @@ sub panic_languages
         # push @out, super_languages($t); # nah, keep that separate
         push @out, < %Panic{?lc $t}
     
-    return grep { !%seen{+$_}++ }, @(  < @out, 'en')
+    return grep { !%seen{+$_}++ }, @: < @out, 'en'
 
 
 #---------------------------------------------------------------------------

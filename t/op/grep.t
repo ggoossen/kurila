@@ -35,8 +35,7 @@ do
     cmp_ok( scalar(nelems @res), '==', 1, 'linefeed map nr')
     cmp_ok( @res[0], 'eq', 'yoyodyne', 'linefeed map is')
 
-    @res = @:  (map( {
-                   \(%: a =>$_) }, @: "chobb"))[0]->{?a} 
+    @res = @:  (map( { \%: a =>$_ }, @: "chobb"))[0]->{?a} 
     cmp_ok( scalar(nelems @res), '==', 1, 'deref map nr')
     cmp_ok( @res[0], 'eq', 'chobb', 'deref map is')
 
@@ -49,8 +48,7 @@ do
     cmp_ok( scalar(nelems @res), '==', 1, 'no paren linefeed map nr')
     cmp_ok( @res[0], 'eq', 'yoyodyne', 'no paren linefeed map is')
 
-    @res = @:  (map {
-                   \(%: a =>$_) }, (@: "chobb"))[0]->{?a} 
+    @res = @:  (map { \%: a =>$_ }, (@: "chobb"))[0]->{?a} 
     cmp_ok( scalar(nelems @res), '==', 1, 'no paren deref map nr')
     cmp_ok( @res[0], 'eq', 'chobb', 'no paren deref map is')
 

@@ -129,7 +129,6 @@ if(try {require ExtUtils::Constant; 1})
                          # IRIX specific facilities
                          \%:  name => "LOG_AUDIT",      type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) 
                          \%:  name => "LOG_LFMT",       type => "IV", default => \(@:  "IV", "LOG_USER"  ) 
-        
 
     my @options = qw(
         LOG_CONS LOG_PID LOG_NDELAY LOG_NOWAIT LOG_ODELAY LOG_PERROR 
@@ -140,7 +139,6 @@ if(try {require ExtUtils::Constant; 1})
                             \%:  name => "_PATH_LOG", type => "PV", default => \(@:  "PV", qq("$_PATH_LOG") ) 
                             \%:  name => "LOG_PRIMASK",     type => "IV", default => \(@:  "IV", 7) 
                             \%:  name => "LOG_NFACILITIES", type => "IV", default => \(@:  "IV", scalar nelems @facilities) 
-        
 
     ExtUtils::Constant::WriteConstants(
         PROXYSUBS => 1,

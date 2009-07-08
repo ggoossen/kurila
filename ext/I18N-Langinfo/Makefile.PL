@@ -29,12 +29,12 @@ if (try {require ExtUtils::Constant; 1})
         push @names,           # This lot are always enums in old langinfo.h:
             \%:  name=>$_, type=>"IV"
                  macro=> \(@: "#if defined($_) || (defined(__GNU_LIBRARY__) && defined(_NL_ITEM))\n"
-                             "#endif\n")
+                              "#endif\n")
     foreach (qw (CRNCYSTR THOUSEP RADIXCHAR))
         push @names,           # This lot are only enums for __SVR4_I386_ABI_L1__:
             \%: name=>$_, type=>"IV"
                 macro=>\(@: "#if defined($_) || (defined(__GNU_LIBRARY__) && defined(_NL_ITEM) && defined(__SVR4_I386_ABI_L1__))\n"
-                           "#endif\n")
+                            "#endif\n")
     ExtUtils::Constant::WriteConstants(
         NAME => 'I18N::Langinfo',
         NAMES => \@names,

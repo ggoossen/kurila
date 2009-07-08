@@ -234,7 +234,6 @@ use constant \%:
     AGES   => \(%:  John => 33, Jane => 28, Sally => 3 )
     RFAM   => \(@:  \ qw( John Jane Sally ) )
     SPIT   => sub (@< @_) { shift }
-    
 
 is nelems($:FAMILY->@), THREE
 is nelems($:FAMILY->@), nelems RFAM->[0]->@

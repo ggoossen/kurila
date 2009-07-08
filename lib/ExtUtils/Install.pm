@@ -669,7 +669,7 @@ sub install #XXX OS-SPECIFIC
         || 0
         unless defined $always_copy
 
-    my(@: %from_to) =@:  %:  < $from_to->% 
+    my %from_to = %:  < $from_to->% 
     my(%pack, $dir, %warned)
     my $packlist = ExtUtils::Packlist->new()
 

@@ -106,9 +106,9 @@ my %EXPECT = %:
     M  => \(@: qw())
     B2 => \qw(_b1 b1 _b2 b2)
     D3 => \(@: (undef,undef,undef, <
-                qw(b2 b1 d1 _b1 _d1)))     # b1 is hidden
+                   qw(b2 b1 d1 _b1 _d1)))     # b1 is hidden
     D4 => \(@: (undef,undef,undef, <
-                qw(b2 b1 d1),undef,undef, <qw(_d3 d3)))
+                   qw(b2 b1 d1),undef,undef, <qw(_d3 d3)))
 
     D5 => \(@: undef, 'b1', undef, 'b2')
 

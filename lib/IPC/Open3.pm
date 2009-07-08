@@ -301,16 +301,16 @@ sub _open3
         
         require IO::Pipe
         $kidpid = try {
-            spawn_with_handles( \(@:  \%:  mode => 'r'
-                                           open_as => $kid_rdr
-                                           handle => $^STDIN 
-                                      \%:  mode => 'w'
-                                           open_as => $kid_wtr
-                                           handle => $^STDOUT 
-                                      \%:  mode => 'w'
-                                           open_as => $kid_err
-                                           handle => $^STDERR 
-                                    ), \@close, < @cmd);
+            spawn_with_handles( \(@:  \ %:  mode => 'r'
+                                            open_as => $kid_rdr
+                                            handle => $^STDIN
+                                      \ %:  mode => 'w'
+                                            open_as => $kid_wtr
+                                            handle => $^STDOUT
+                                      \ %:  mode => 'w'
+                                            open_as => $kid_err
+                                            handle => $^STDERR
+                                 ), \@close, < @cmd);
         }
         die "$Me: $^EVAL_ERROR" if $^EVAL_ERROR
 

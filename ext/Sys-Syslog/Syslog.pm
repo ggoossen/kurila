@@ -45,8 +45,7 @@ do
                 LOG_FACMASK LOG_NFACILITIES LOG_PRIMASK 
                 LOG_MASK LOG_UPTO
             )
-                   )
-        
+            )
 
     our @EXPORT = %EXPORT_TAGS{?standard}
 

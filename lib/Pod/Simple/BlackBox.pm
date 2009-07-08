@@ -395,7 +395,7 @@ do
                  \@: 'B', \$%
                      'The above document had some coding errors, which are explained below:'
             ),
-            \(@: '=over',  \(%: 'start_line' => $m, 'errata' => 1), ''),
+            \ @: '=over',  \(%: 'start_line' => $m, 'errata' => 1), '',
 
         push @out,
             \(@: '=back',  \(%: 'start_line' => $m, 'errata' => 1), ''),
@@ -858,7 +858,6 @@ sub _ponder_for($self,$para,$curr_open,$paras)
              \%: 'start_line' => $para->[1]->{?'start_line'}, '~really' => '=for'
              $target
         ),
-    
 
     return 1
 
