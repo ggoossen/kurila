@@ -30,8 +30,8 @@ plan tests => 82
 unlink < glob "__db.*"
 
 sub lexical
-    my @a = @( unpack ("C*", $a) ) 
-    my @b = @( unpack ("C*", $b) ) 
+    my @a = @:  unpack ("C*", $a)  
+    my @b = @:  unpack ("C*", $b)  
 
     my $len = ((nelems @a) +> nelems @b ?? (nelems @b) !! nelems @a) 
 
@@ -52,7 +52,7 @@ do
         my $fh = gensym 
         open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" 
         my $real_stdout = $^STDOUT
-        return bless \@($fh, $real_stdout ) 
+        return bless \@: $fh, $real_stdout  
 
     
     sub DESTROY
@@ -131,10 +131,10 @@ my (%h)
 do
     ok( %h = DB_File->new( $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE )) 
 
-    my @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-         $blksize,$blocks) = @: stat($Dfile)
-
-    my %noMode = %( < @+: map { @: $_, 1 }, qw( amigaos MSWin32 NetWare cygwin ) ) 
+    my (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
+           $blksize,$blocks) = @: stat($Dfile)
+                                
+    my %noMode = %:  < @+: map { @: $_, 1 }, qw( amigaos MSWin32 NetWare cygwin )  
 
     ok( ($mode ^&^ 0777) == (($^OS_NAME eq 'os2' || $^OS_NAME eq 'MacOS') ?? 0666 !! 0640)
         || %noMode{?$^OS_NAME} )
@@ -152,7 +152,7 @@ do
 
     %h->put('def' => 'DEF')
     %h->put('jkl'.";".'mno' => "JKL;MNO")
-    %h->put(join(";", @( 'a',2,3,4,5)) => join(";", @('A',2,3,4,5)))
+    %h->put(join(";", (@:  'a',2,3,4,5)) => join(";", (@: 'A',2,3,4,5)))
     %h->put('a' => 'A')
 
     #$h{'b' => 'B';
@@ -218,7 +218,7 @@ my $i = 0
 
 ok( $i == 30) 
 
-@keys = @('blurfl', < %h->keys(), 'dyick')
+@keys = @: 'blurfl', < %h->keys(), 'dyick'
 ok( ((nelems @keys)-1) == 31) 
 
 #Check that the keys can be retrieved in order
@@ -246,8 +246,8 @@ for my $i (1..199) { %h->put( $i + 0 => $i + 0 ); }
 for my $i (1..199) { $ok = 0 unless %h->FETCH($i) == $i; }
 ok( $ok)
 
-my @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-     $blksize,$blocks) = @: stat($Dfile)
+my (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
+       $blksize,$blocks) = @: stat($Dfile)
 ok( $size +> 0 )
 
 # Now check all the non-tie specific stuff
@@ -451,13 +451,13 @@ do
 
 
 # hash
-my %unknown = %( < %hh->get_dup('Unknown', 1) ) 
+my %unknown = %:  < %hh->get_dup('Unknown', 1)  
 ok( ! %unknown )
 
-my %smith = %( < %hh->get_dup('Smith', 1) ) 
+my %smith = %:  < %hh->get_dup('Smith', 1)  
 ok( nkeys %smith == 1 && %smith{?'John'}) 
 
-my %wall = %( < %hh->get_dup('Wall', 1) ) 
+my %wall = %:  < %hh->get_dup('Wall', 1)  
 ok( nkeys %wall == 3 && %wall{?'Larry'} == 1 && %wall{?'Stone'} == 1
     && %wall{?'Brick'} == 2)
 
@@ -486,7 +486,7 @@ ok( $i == 10)
 
 # check it is empty
 $i = 0 
-while (@(?$key,?$value) = @: each(%h))
+while ((@: ?$key,?$value) = @: each(%h))
     $i++
 
 ok( $i == 0)

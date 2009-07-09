@@ -60,7 +60,7 @@ our @CARP_NOT
 
 sub shortmess_real
     # Icky backwards compatibility wrapper. :-(
-    local @CARP_NOT = @( caller() )
+    local @CARP_NOT = @:  caller() 
     shortmess_heavy(< @_)
 ;
 
@@ -71,7 +71,7 @@ sub caller_info
     %call_info{[
         qw(pack file line sub has_args wantarray evaltext is_require)
         ]} = @: caller($i)
-
+                
     unless (defined %call_info{?pack})
         return ()
     
@@ -107,7 +107,7 @@ sub format_arg
 sub get_status
     my $cache = shift
     my $pkg = shift
-    $cache->{+$pkg} ||= \@(\%($pkg => $pkg), \trusts_directly($pkg))
+    $cache->{+$pkg} ||= \@: \(%: $pkg => $pkg), \trusts_directly($pkg)
     return $cache->{?$pkg}->@
 
 
@@ -173,10 +173,10 @@ sub ret_backtrace($i, @< @error)
         $tid_msg = " thread $tid" if $tid
     
 
-    my %i = %( < caller_info($i) )
+    my %i = %:  < caller_info($i) 
     $mess = "$err at %i{?file} line %i{?line}$tid_msg\n"
 
-    while (my %i = %( < caller_info(++$i) ))
+    while (my %i = (%:  < caller_info(++$i) ))
         $mess .= "\t$(%i{?sub_name}//'(unnamed sub)') called at %i{?file} line %i{?line}$tid_msg\n"
     
 
@@ -193,7 +193,7 @@ sub ret_summary($i, @< @error)
         $tid_msg = " thread $tid" if $tid
     
 
-    my %i = %( < caller_info($i) )
+    my %i = %:  < caller_info($i) 
     return "$err at %i{?file} line %i{?line}$tid_msg\n"
 
 
@@ -252,13 +252,13 @@ sub trusts
     my $child = shift
     my $parent = shift
     my $cache = shift
-    my @($known, $partial) =  get_status($cache, $child)
+    my (@: $known, $partial) =  get_status($cache, $child)
     # Figure out consequences until we have an answer
     while ((nelems $partial->@) and not exists $known->{$parent})
         my $anc = shift $partial->@
         next if exists $known->{$anc}
         $known->{+$anc}++
-        my @($anc_knows, $anc_partial) =  get_status($cache, $anc)
+        my (@: $anc_knows, $anc_partial) =  get_status($cache, $anc)
         my @found = keys $anc_knows->%
         $known->%{[ @found]} = $@
         push $partial->@, < $anc_partial->@

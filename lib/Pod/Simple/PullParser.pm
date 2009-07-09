@@ -1,15 +1,15 @@
 
 package Pod::Simple::PullParser
 our $VERSION = '2.02'
-use Pod::Simple ();
-BEGIN {our @ISA = @('Pod::Simple')}
+use Pod::Simple ()
+BEGIN {our @ISA = (@: 'Pod::Simple')}
 
-use utf8;
-use Carp ();
+use utf8
+use Carp ()
 
-use Pod::Simple::PullParserStartToken;
-use Pod::Simple::PullParserEndToken;
-use Pod::Simple::PullParserTextToken;
+use Pod::Simple::PullParserStartToken
+use Pod::Simple::PullParserEndToken
+use Pod::Simple::PullParserTextToken
 
 BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
 
@@ -56,9 +56,9 @@ sub run
         Carp::croak "You can call run() only on subclasses of "
                     . __PACKAGE__
     else
-        Carp::croak join '', @(
-            "You can't call run() because ",
-            ref(@_[0]) || @_[0], " didn't define a run() method")
+        Carp::croak join '', @: 
+            "You can't call run() because "
+            ref(@_[0]) || @_[0], " didn't define a run() method"
     
 
 
@@ -204,7 +204,7 @@ sub get_token
     return shift $self->{'token_buffer'}->@ # that's an undef if empty
 
 
-use UNIVERSAL ();
+use UNIVERSAL ()
 sub unget_token
     my $self = shift
     DEBUG and print $^STDOUT, "Ungetting ", scalar(nelems @_), " tokens: ",

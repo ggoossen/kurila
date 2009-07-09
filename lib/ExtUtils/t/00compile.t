@@ -14,7 +14,7 @@ my $manifest = File::Spec->catfile('MANIFEST')
 open(my $manifestfh, "<", $manifest) or die "Can't open $manifest: $^OS_ERROR"
 my @modules = map { m{^lib/(\S+)}; $1 },
     grep { m{^lib/ExtUtils/\S*\.pm} },
-    grep { !m{/t/} }, @( ~< $manifestfh->*)
+    grep { !m{/t/} }, @:  ~< $manifestfh->*
 chomp @modules
 close $manifestfh
 

@@ -88,7 +88,7 @@ syswrite($big_fh, "big") or
 close($big_fh) or
     do { warn "close big1 failed: $^OS_ERROR\n"; bye }
 
-my @s1 = @( stat("big1") )
+my @s1 = @:  stat("big1") 
 
 print $^STDOUT, "# s1 = $(join ' ',@s1)\n"
 
@@ -101,7 +101,7 @@ syswrite($big_fh, "big") or
 close($big_fh) or
     do { warn "close big2 failed: $^OS_ERROR\n"; bye }
 
-my @s2 = @( stat("big2") )
+my @s2 = @:  stat("big2") 
 
 print $^STDOUT, "# s2 = $(join ' ',@s2)\n"
 
@@ -157,7 +157,7 @@ unless($syswrite && $close)
     bye()
 
 
-@s = @( stat("big") )
+@s = @:  stat("big") 
 
 print $^STDOUT, "# $(join ' ',@s)\n"
 
@@ -175,7 +175,7 @@ sub offset($offset_will_be, $offset_want)
     my $offset_is = eval $offset_will_be
     unless ($offset_is == $offset_want)
         print $^STDOUT, "# bad offset $offset_is, want $offset_want\n"
-        my @($offset_func) = @($offset_will_be =~ m/^(\w+)/)
+        my (@: $offset_func) = @: $offset_will_be =~ m/^(\w+)/
         if (unpack("L", pack("L", $offset_want)) == $offset_is)
             print $^STDOUT, "# 32-bit wraparound suspected in $offset_func() since\n"
             print $^STDOUT, "# $offset_want cast into 32 bits equals $offset_is.\n"

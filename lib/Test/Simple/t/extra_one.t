@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -11,10 +11,10 @@ BEGIN
 
 
 require Test::Simple::Catch
-my@($out, $err) =  Test::Simple::Catch::caught()
+my(@: $out, $err) =  Test::Simple::Catch::caught()
 
 # Can't use Test.pm, that's a 5.005 thing.
-package My::Test;
+package My::Test
 
 # This has to be a require or else the END block below runs before
 # Test::Builder's own and the ending diagnostics don't come out right.
@@ -25,7 +25,7 @@ $TB->plan(tests => 2)
 sub is { $TB->is_eq(< @_) }
 
 
-package main;
+package main
 
 require Test::Simple
 Test::Simple->import(tests => 1)

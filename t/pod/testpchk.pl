@@ -9,14 +9,14 @@ BEGIN
     require "testcmp.pl"
     TestCompare->import()
     my $PARENTDIR = dirname $THISDIR
-    push $^INCLUDE_PATH, < map { 'File::Spec'->catfile($_, 'lib') }, @( ($PARENTDIR, $THISDIR))
+    push $^INCLUDE_PATH, < map { 'File::Spec'->catfile($_, 'lib') }, @:  ($PARENTDIR, $THISDIR)
     require VMS::Filespec if $^OS_NAME eq 'VMS'
 
 
 use Pod::Checker
 our (@ISA, @EXPORT, $MYPKG)
 #use diagnostics;
-use Exporter;
+use Exporter
 #use File::Compare;
 
 @ISA = qw(Exporter)
@@ -56,12 +56,12 @@ sub testpodcheck( %< %args)
     print $^STDOUT, "# Running podchecker for '$testname'...\n"
     ## Compare the output against the expected result
     if ($^OS_NAME eq 'VMS')
-        for (@($infile, $outfile, $cmpfile))
+        for ((@: $infile, $outfile, $cmpfile))
             $_ = VMS::Filespec::unixify($_)  unless  ref
         
     
     podchecker($infile, $outfile)
-    if ( testcmp(\%('cmplines' => \&msgcmp), $outfile, $cmpfile) )
+    if ( testcmp(\(%: 'cmplines' => \&msgcmp), $outfile, $cmpfile) )
         $different = "$outfile is different from $cmpfile"
     else
         unlink($outfile)
@@ -70,11 +70,11 @@ sub testpodcheck( %< %args)
 
 
 sub testpodchecker
-    my %opts = %( (ref @_[0] eq 'HASH') ?? < shift()->% !! () )
+    my %opts = %:  (ref @_[0] eq 'HASH') ?? < shift()->% !! () 
     my @testpods = @_
-    my @($testname, $testdir) = @("", "")
+    my (@: $testname, $testdir) = @: "", ""
     my $cmpfile = ""
-    my @($outfile, $errfile) = @("", "")
+    my (@: $outfile, $errfile) = @: "", ""
     my $passes = 0
     my $failed = 0
     local $_ = undef
@@ -82,7 +82,7 @@ sub testpodchecker
     print $^STDOUT, "1..", nelems @testpods, "\n"  unless (%opts{?'xrgen'})
 
     for my $podfile ( @testpods)
-        @($testname, $_, ...) =  fileparse($podfile)
+        (@: $testname, $_, ...) =  fileparse($podfile)
         $testdir ||=  $_
         $testname  =~ s/\.t$//
         $cmpfile   =  $testdir . $testname . '.xr'

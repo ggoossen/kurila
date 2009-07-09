@@ -20,90 +20,90 @@ our %Config
 my $inf_m1 = (%Config{?reg_infty} || 32767) - 1
 my $inf_p1 = $inf_m1 + 2
 my @death =
-    @(
- 'm/[[=foo=]]/' => 'POSIX syntax [= =] is reserved for future extensions in regex; marked by {#} in m/[[=foo=]{#}]/',
+    @: 
+ 'm/[[=foo=]]/' => 'POSIX syntax [= =] is reserved for future extensions in regex; marked by {#} in m/[[=foo=]{#}]/'
 
- 'm/(?<= .*)/' =>  'Variable length lookbehind not implemented in regex m/(?<= .*)/',
+ 'm/(?<= .*)/' =>  'Variable length lookbehind not implemented in regex m/(?<= .*)/'
 
- 'm/(?<= x{1000})/' => 'Lookbehind longer than 255 not implemented in regex m/(?<= x{1000})/',
+ 'm/(?<= x{1000})/' => 'Lookbehind longer than 255 not implemented in regex m/(?<= x{1000})/'
 
- 'm/(?@)/' => 'Sequence (?@...) not implemented in regex; marked by {#} in m/(?@{#})/',
+ 'm/(?@)/' => 'Sequence (?@...) not implemented in regex; marked by {#} in m/(?@{#})/'
 
- 'm/(?{ 1/' => 'Sequence (?{...}) not terminated or not {}-balanced in regex; marked by {#} in m/(?{{#} 1/',
+ 'm/(?{ 1/' => 'Sequence (?{...}) not terminated or not {}-balanced in regex; marked by {#} in m/(?{{#} 1/'
 
- 'm/(?(1x))/' => 'Switch condition not recognized in regex; marked by {#} in m/(?(1x{#}))/',
+ 'm/(?(1x))/' => 'Switch condition not recognized in regex; marked by {#} in m/(?(1x{#}))/'
 
- 'm/(?(1)x|y|z)/' => 'Switch (?(condition)... contains too many branches in regex; marked by {#} in m/(?(1)x|y|{#}z)/',
+ 'm/(?(1)x|y|z)/' => 'Switch (?(condition)... contains too many branches in regex; marked by {#} in m/(?(1)x|y|{#}z)/'
 
- 'm/(?(x)y|x)/' => 'Unknown switch condition (?(x) in regex; marked by {#} in m/(?({#}x)y|x)/',
+ 'm/(?(x)y|x)/' => 'Unknown switch condition (?(x) in regex; marked by {#} in m/(?({#}x)y|x)/'
 
- 'm/(?/' => 'Sequence (? incomplete in regex; marked by {#} in m/(?{#}/',
+ 'm/(?/' => 'Sequence (? incomplete in regex; marked by {#} in m/(?{#}/'
 
- 'm/(?;x/' => 'Sequence (?;...) not recognized in regex; marked by {#} in m/(?;{#}x/',
- 'm/(?<;x/' => 'Sequence (?<;...) not recognized in regex; marked by {#} in m/(?<;{#}x/',
+ 'm/(?;x/' => 'Sequence (?;...) not recognized in regex; marked by {#} in m/(?;{#}x/'
+ 'm/(?<;x/' => 'Sequence (?<;...) not recognized in regex; marked by {#} in m/(?<;{#}x/'
 
- 'm/(?\ix/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}ix/',
- 'm/(?\mx/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}mx/',
- 'm/(?\:x/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}:x/',
- 'm/(?\=x/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}=x/',
- 'm/(?\!x/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}!x/',
- 'm/(?\<=x/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}<=x/',
- 'm/(?\<!x/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}<!x/',
- 'm/(?\>x/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}>x/',
+ 'm/(?\ix/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}ix/'
+ 'm/(?\mx/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}mx/'
+ 'm/(?\:x/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}:x/'
+ 'm/(?\=x/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}=x/'
+ 'm/(?\!x/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}!x/'
+ 'm/(?\<=x/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}<=x/'
+ 'm/(?\<!x/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}<!x/'
+ 'm/(?\>x/' => 'Sequence (?\...) not recognized in regex; marked by {#} in m/(?\{#}>x/'
 
- 'm/((x)/' => 'Unmatched ( in regex; marked by {#} in m/({#}(x)/',
+ 'm/((x)/' => 'Unmatched ( in regex; marked by {#} in m/({#}(x)/'
 
- "m/x\{$inf_p1\}/" => "Quantifier in \{,\} bigger than $inf_m1 in regex; marked by \{#\} in m/x\{\{#\}$inf_p1\}/",
+ "m/x\{$inf_p1\}/" => "Quantifier in \{,\} bigger than $inf_m1 in regex; marked by \{#\} in m/x\{\{#\}$inf_p1\}/"
 
- 'm/x{3,1}/' => q|Can't do {n,m} with n > m in regex; marked by {#} in m/x{3,1}{#}/|,
+ 'm/x{3,1}/' => q|Can't do {n,m} with n > m in regex; marked by {#} in m/x{3,1}{#}/|
 
- 'm/x**/' => 'Nested quantifiers in regex; marked by {#} in m/x**{#}/',
+ 'm/x**/' => 'Nested quantifiers in regex; marked by {#} in m/x**{#}/'
 
- 'm/x[/' => 'Unmatched [ in regex; marked by {#} in m/x[{#}/',
+ 'm/x[/' => 'Unmatched [ in regex; marked by {#} in m/x[{#}/'
 
- 'm/*/', => 'Quantifier follows nothing in regex; marked by {#} in m/*{#}/',
+ 'm/*/', => 'Quantifier follows nothing in regex; marked by {#} in m/*{#}/'
 
- 'm/\p{x/' => 'Missing right brace on \p{} in regex; marked by {#} in m/\p{{#}x/',
+ 'm/\p{x/' => 'Missing right brace on \p{} in regex; marked by {#} in m/\p{{#}x/'
 
- 'm/[\p{x]/' => 'Missing right brace on \p{} in regex; marked by {#} in m/[\p{{#}x]/',
+ 'm/[\p{x]/' => 'Missing right brace on \p{} in regex; marked by {#} in m/[\p{{#}x]/'
 
- 'm/(x)\2/' => 'Reference to nonexistent group in regex; marked by {#} in m/(x)\2{#}/',
+ 'm/(x)\2/' => 'Reference to nonexistent group in regex; marked by {#} in m/(x)\2{#}/'
 
- 'my $m = "\\"; $m =~ $m', => 'Trailing \ in regex m/\/',
+ 'my $m = "\\"; $m =~ $m', => 'Trailing \ in regex m/\/'
 
- 'm/\x{1/' => 'Missing right brace on \x{} in regex; marked by {#} in m/\x{{#}1/',
+ 'm/\x{1/' => 'Missing right brace on \x{} in regex; marked by {#} in m/\x{{#}1/'
 
- 'm/[\x{X]/' => 'Missing right brace on \x{}',
+ 'm/[\x{X]/' => 'Missing right brace on \x{}'
 
- 'm/[[:barf:]]/' => 'POSIX class [:barf:] unknown in regex; marked by {#} in m/[[:barf:]{#}]/',
+ 'm/[[:barf:]]/' => 'POSIX class [:barf:] unknown in regex; marked by {#} in m/[[:barf:]{#}]/'
 
- 'm/[[=barf=]]/' => 'POSIX syntax [= =] is reserved for future extensions in regex; marked by {#} in m/[[=barf=]{#}]/',
+ 'm/[[=barf=]]/' => 'POSIX syntax [= =] is reserved for future extensions in regex; marked by {#} in m/[[=barf=]{#}]/'
 
- 'm/[[.barf.]]/' => 'POSIX syntax [. .] is reserved for future extensions in regex; marked by {#} in m/[[.barf.]{#}]/',
+ 'm/[[.barf.]]/' => 'POSIX syntax [. .] is reserved for future extensions in regex; marked by {#} in m/[[.barf.]{#}]/'
 
- 'm/[z-a]/' => 'Invalid [] range "z-a" in regex; marked by {#} in m/[z-a{#}]/',
+ 'm/[z-a]/' => 'Invalid [] range "z-a" in regex; marked by {#} in m/[z-a{#}]/'
 
- 'm/\p/' => 'Empty \p{} in regex; marked by {#} in m/\p{#}/',
+ 'm/\p/' => 'Empty \p{} in regex; marked by {#} in m/\p{#}/'
 
- 'm/\P{}/' => 'Empty \P{} in regex; marked by {#} in m/\P{{#}}/',
-    )
+ 'm/\P{}/' => 'Empty \P{} in regex; marked by {#} in m/\P{{#}}/'
+    
 
 ##
 ## Key-value pairs of code/error of code that should have non-fatal warnings.
 ##
-my @warning = @(
-    'm/\b*/' => '\b* matches null string many times in regex; marked by {#} in m/\b*{#}/',
+my @warning = @: 
+    'm/\b*/' => '\b* matches null string many times in regex; marked by {#} in m/\b*{#}/'
 
-    'm/[:blank:]/' => 'POSIX syntax [: :] belongs inside character classes in regex; marked by {#} in m/[:blank:]{#}/',
+    'm/[:blank:]/' => 'POSIX syntax [: :] belongs inside character classes in regex; marked by {#} in m/[:blank:]{#}/'
 
-    "m'[\\y]'"     => 'Unrecognized escape \y passed through',
+    "m'[\\y]'"     => 'Unrecognized escape \y passed through'
 
-    'm/[a-\d]/' => 'False [] range "a-\d" in regex; marked by {#} in m/[a-\d{#}]/',
-    'm/[\w-x]/' => 'False [] range "\w-" in regex; marked by {#} in m/[\w-{#}x]/',
-    'm/[a-\pM]/' => 'False [] range "a-\pM" in regex; marked by {#} in m/[a-\pM{#}]/',
-    'm/[\pM-x]/' => '\p{...} only supported with unicode in regex; marked by {#} in m/[\pM{#}-x]/',
-    "m'\\y'"     => 'Unrecognized escape \y passed through in regex; marked by {#} in m/\y{#}/',
-    )
+    'm/[a-\d]/' => 'False [] range "a-\d" in regex; marked by {#} in m/[a-\d{#}]/'
+    'm/[\w-x]/' => 'False [] range "\w-" in regex; marked by {#} in m/[\w-{#}x]/'
+    'm/[a-\pM]/' => 'False [] range "a-\pM" in regex; marked by {#} in m/[a-\pM{#}]/'
+    'm/[\pM-x]/' => '\p{...} only supported with unicode in regex; marked by {#} in m/[\pM{#}-x]/'
+    "m'\\y'"     => 'Unrecognized escape \y passed through in regex; marked by {#} in m/\y{#}/'
+    
 
 my $total = ((nelems @death) + nelems @warning)/2
 

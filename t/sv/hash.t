@@ -30,13 +30,13 @@ ok (Internals::HvREHASH(\%h), "20 entries triggers rehash")
 # attack on a pre-populated hash. This is also useful if you need normal
 # keys which don't contain \0 -- suitable for stashes
 
-use constant MASK_U32  => 2**32;
-use constant HASH_SEED => 0;
-use constant THRESHOLD => 14;
-use constant START     => "a";
+use constant MASK_U32  => 2**32
+use constant HASH_SEED => 0
+use constant THRESHOLD => 14
+use constant START     => "a"
 
 # some initial hash data
-my %h2 = %( < @+: map { @: $_ => 1 }, 11..222 )
+my %h2 = %:  < @+: map { @: $_ => 1 }, 11..222 
 
 ok (!Internals::HvREHASH(\%h2),
     "starting with pre-populated non-pathological hash (rehash flag if off)")
@@ -110,9 +110,9 @@ sub hash
 
 # This will crash perl if it fails
 
-use constant PVBM => 'foo';
+use constant PVBM => 'foo'
 
 my $dummy = index 'foo', PVBM
-try { my %h = %(a => PVBM); 1 }
+try { my %h = (%: a => PVBM); 1 }
 
 ok (!$^EVAL_ERROR, 'fbm scalar can be inserted into a hash')

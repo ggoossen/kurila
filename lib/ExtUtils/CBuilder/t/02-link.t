@@ -46,7 +46,7 @@ ok($object_file = $b->compile(source => $source_file))
 
 # Link
 my ($exe_file, @temps)
-@($exe_file, @< @temps) =  $b->link_executable(objects => $object_file)
+(@: $exe_file, @< @temps) =  $b->link_executable(objects => $object_file)
 ok $exe_file
 
 if ($^OS_NAME eq 'os2')         # Analogue of LDLOADPATH...
@@ -61,7 +61,7 @@ if ($^OS_NAME eq 'os2')         # Analogue of LDLOADPATH...
 is my_system($exe_file), 11
 
 # Clean up
-for (@($source_file, $object_file, $exe_file))
+for ((@: $source_file, $object_file, $exe_file))
     s/"|'//g
     1 while unlink
 

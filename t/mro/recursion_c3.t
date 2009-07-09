@@ -57,16 +57,16 @@ do
 
 # A series of 8 abberations that would cause infinite loops,
 #  each one undoing the work of the previous
-my @loopies = @(
-    sub (@< @_) { @E::ISA = qw/F/ },
-    sub (@< @_) { @E::ISA = qw/D/; @C::ISA = qw/F/ },
-    sub (@< @_) { @C::ISA = qw//; @A::ISA = qw/K/ },
-    sub (@< @_) { @A::ISA = qw//; @J::ISA = qw/F K/ },
-    sub (@< @_) { @J::ISA = qw/F/; @H::ISA = qw/K G/ },
-    sub (@< @_) { @H::ISA = qw/G/; @B::ISA = qw/B/ },
-    sub (@< @_) { @B::ISA = qw//; @K::ISA = qw/K J I/ },
-    sub (@< @_) { @K::ISA = qw/J I/; @D::ISA = qw/A H B C/ },
-    )
+my @loopies = @: 
+    sub (@< @_) { @E::ISA = qw/F/ }
+    sub (@< @_) { @E::ISA = qw/D/; @C::ISA = qw/F/ }
+    sub (@< @_) { @C::ISA = qw//; @A::ISA = qw/K/ }
+    sub (@< @_) { @A::ISA = qw//; @J::ISA = qw/F K/ }
+    sub (@< @_) { @J::ISA = qw/F/; @H::ISA = qw/K G/ }
+    sub (@< @_) { @H::ISA = qw/G/; @B::ISA = qw/B/ }
+    sub (@< @_) { @B::ISA = qw//; @K::ISA = qw/K J I/ }
+    sub (@< @_) { @K::ISA = qw/J I/; @D::ISA = qw/A H B C/ }
+    
 
 foreach my $loopy ( @loopies)
     try {

@@ -102,7 +102,7 @@ do
     while ( ~< $^DATA)
         next unless m/\S/
         chop
-        @($code, $currency) =  split(m/:/, $_, 2)
+        (@: $code, $currency) =  split(m/:/, $_, 2)
         %CODES{+$code} = $currency
         %CURRENCIES{+lc "$currency"} = $code
     

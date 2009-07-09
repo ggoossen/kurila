@@ -6,7 +6,7 @@ plan( tests => 34 )
 
 # simple error object.
 do
-    my $err = error::create("my message", @("filetest.t", 33, 11))
+    my $err = error::create("my message", (@: "filetest.t", 33, 11))
     ok $err, "error object created"
     is ref $err, "error"
     is $err->{?description}, "my message"

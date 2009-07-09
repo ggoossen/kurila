@@ -8,7 +8,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't' if -d 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -95,7 +95,7 @@ is( $mm->{INST_BIN},     File::Spec->catdir($Curdir, 'blib', 'bin'),
     'INST_BIN' )
 
 is( nkeys $mm->{CHILDREN}, 1 )
-my@($child_pack) =  keys $mm->{CHILDREN}
+my(@: $child_pack) =  keys $mm->{CHILDREN}
 my $c_mm = $mm->{CHILDREN}{$child_pack}
 is( $c_mm->{INST_ARCHLIB},
     $c_mm->{PERL_CORE} ?? $c_mm->{PERL_ARCHLIB}

@@ -6,7 +6,7 @@ require(env::var('PERL_CORE') ?? "./test.pl" !! "./t/test.pl")
 plan(tests => ($^OS_NAME =~ m/MSWin32/ ?? 9 !! 6))
 
 my $Class       = 'IO::File'
-my $All_Chars   = join '', @( "\r\n", < map( { chr }, 1..255 ), "zzz\n\r")
+my $All_Chars   = join '', @:  "\r\n", < map( { chr }, 1..255 ), "zzz\n\r"
 my $File        = 'bin.'.$^PID
 my $Expect      = quotemeta $All_Chars
 

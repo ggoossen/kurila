@@ -10,7 +10,7 @@ BEGIN
     require "testcmp.pl"
     TestCompare->import()
     my $PARENTDIR = dirname $THISDIR
-    push $^INCLUDE_PATH, < map { 'File::Spec'->catfile($_, 'lib') }, @( ($PARENTDIR, $THISDIR))
+    push $^INCLUDE_PATH, < map { 'File::Spec'->catfile($_, 'lib') }, @:  ($PARENTDIR, $THISDIR)
 
 
 #use diagnostics;
@@ -19,7 +19,7 @@ use Exporter
 #use Cwd qw(abs_path);
 
 our ($MYPKG, @EXPORT, @ISA)
-$MYPKG = try { @(caller)[0] }
+$MYPKG = try { (@: caller)[0] }
 @EXPORT = qw(&testpodplaintext)
 BEGIN 
     require Pod::PlainText
@@ -41,11 +41,11 @@ $INSTDIR =~ s#:$## if $^OS_NAME eq 'MacOS'
 $INSTDIR = (dirname $INSTDIR) if (basename($INSTDIR) eq 'pod')
 $INSTDIR =~ s#:$## if $^OS_NAME eq 'MacOS'
 $INSTDIR = (dirname $INSTDIR) if (basename($INSTDIR) eq 't')
-my @PODINCDIRS = @(catfile($INSTDIR, 'lib', 'Pod'),
-                   catfile($INSTDIR, 'scripts'),
-                   catfile($INSTDIR, 'pod'),
-                   catfile($INSTDIR, 't', 'pod')
-    )
+my @PODINCDIRS = @: catfile($INSTDIR, 'lib', 'Pod')
+                    catfile($INSTDIR, 'scripts')
+                    catfile($INSTDIR, 'pod')
+                    catfile($INSTDIR, 't', 'pod')
+    
 
 ## Find the path to the file to =include
 sub findinclude
@@ -60,7 +60,7 @@ sub findinclude
     my $thispoddir = dirname $self->input_file
     ##   2. the parent directory of the above
     my $parentdir  = dirname $thispoddir
-    my @podincdirs = @($thispoddir, $parentdir, < @PODINCDIRS)
+    my @podincdirs = @: $thispoddir, $parentdir, < @PODINCDIRS
 
     for ( @podincdirs)
         my $incfile = catfile($_, $incname)
@@ -72,7 +72,7 @@ sub findinclude
 
 sub command
     my $self = shift
-    my @($cmd, $text, $line_num, $pod_para)  =  @_
+    my (@: $cmd, $text, $line_num, $pod_para)  =  @_
     $cmd     = ''  unless (defined $cmd)
     local $_ = $text || ''
     my $out_fh  = $self->output_handle
@@ -90,7 +90,7 @@ sub command
     my $incfile  = $self->findinclude(shift @incargs)  or  return
     my $incbase  = basename $incfile
     print $out_fh, "###### begin =include $incbase #####\n"  if ($incdebug)
-    $self->parse_from_file( \%(cutting => 1), $incfile )
+    $self->parse_from_file( \(%: cutting => 1), $incfile )
     print $out_fh, "###### end =include $incbase #####\n"    if ($incdebug)
 
 
@@ -130,11 +130,11 @@ sub testpodinc2plaintext( %< %args )
 
 
 sub testpodplaintext
-    my %opts = %( (ref @_[0] eq 'HASH') ?? < shift()->% !! () )
+    my %opts = %:  (ref @_[0] eq 'HASH') ?? < shift()->% !! () 
     my @testpods = @_
-    my @($testname, $testdir) = @("", "")
+    my (@: $testname, $testdir) = @: "", ""
     my $cmpfile = ""
-    my @($outfile, $errfile) = @("", "")
+    my (@: $outfile, $errfile) = @: "", ""
     my $passes = 0
     my $failed = 0
     local $_ = undef
@@ -142,7 +142,7 @@ sub testpodplaintext
     print $^STDOUT, "1..", scalar nelems @testpods, "\n"  unless (%opts{?'xrgen'})
 
     for my $podfile ( @testpods)
-        @($testname, $_, ...) = fileparse($podfile)
+        (@: $testname, $_, ...) = fileparse($podfile)
         $testdir ||=  $_
         $testname  =~ s/\.t$//
         $cmpfile   =  $testdir . $testname . '.xr'

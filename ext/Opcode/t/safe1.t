@@ -1,6 +1,6 @@
 #!./perl -w
 $^OUTPUT_AUTOFLUSH=1
-use Config;
+use Config
 
 print $^STDOUT, "1..0\n# TODO for changes pckage system"
 exit
@@ -13,9 +13,9 @@ package test	# test from somewhere other than main
 our ($bar)
 
 use Opcode v1.00 < qw(opdesc opset opset_to_ops opset_to_hex
-	opmask_add full_opset empty_opset opcodes opmask define_optag);
+	opmask_add full_opset empty_opset opcodes opmask define_optag)
 
-use Safe v1.00;
+use Safe v1.00
 
 my $last_test # initalised at end
 print $^STDOUT, "1..$last_test\n"

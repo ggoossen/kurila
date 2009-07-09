@@ -6,7 +6,7 @@ our ($VERSION, $MAX_VERSION_WITHIN, $SLEEPY)
 $VERSION = 3.04   ## Current version of this package
 
 BEGIN { *DEBUG = sub () {0} unless defined &DEBUG; }   # set DEBUG level
-use Carp ();
+use Carp ()
 
 $SLEEPY = 1 if !defined $SLEEPY and $^OS_NAME =~ m/mswin|mac/i
 # flag to occasionally sleep for $SLEEPY - 1 seconds.
@@ -16,10 +16,10 @@ $MAX_VERSION_WITHIN ||= 60
 #############################################################################
 
 #use diagnostics;
-use File::Spec ();
-use File::Basename < qw( basename );
-use Config ();
-use Cwd < qw( cwd );
+use File::Spec ()
+use File::Basename < qw( basename )
+use Config ()
+use Cwd < qw( cwd )
 
 #==========================================================================
 __PACKAGE__->_accessorize(  # Make my dumb accessor methods
@@ -120,7 +120,7 @@ sub survey($self, @< @search_dirs)
 #==========================================================================
 sub _make_search_callback($self)
     # Put the options in variables, for easy access
-    my@(  $laborious, $verbose, $shadows, $limit_re, $callback, $progress,$path2name,$name2path) =
+    my(@:   $laborious, $verbose, $shadows, $limit_re, $callback, $progress,$path2name,$name2path) =
         map { scalar($self->?$_()) },
         qw(laborious   verbose   shadows   limit_re   callback   progress  path2name  name2path)
 
@@ -235,7 +235,7 @@ sub _path2modname($self, $file, $shortname, $modname_bits)
               or $x eq lc( Config::config_value('archname') )
               )) { shift @m }
 
-    my $name = join '::', @( < @m, $shortname)
+    my $name = join '::', @:  < @m, $shortname
     $name = $self->_simplify_base($name)
 
     # On VMS, case-preserved document names can't be constructed from
@@ -302,7 +302,7 @@ sub _recurse_dir($self, $startdir, $callback, $modname_bits)
             closedir($indir)
             return
         
-        my @items = sort @( readdir($indir))
+        my @items = sort @:  readdir($indir)
         closedir($indir)
 
         push $modname_bits->@, $dir_bare unless $dir_bare eq ''
@@ -390,7 +390,7 @@ sub run(?$file, ?$name)
                     # Like in sprintf("%d.%s", map {s/_//g; $_} q$Name: release-0_55-public $ =~ /-(\d+)_([\d_]+)/)
                     $_ = sprintf("v\%d.\%s",
                         < map {s/_//g; $_},
-                        @(              $1 =~ m/-(\d+)_([\d_]+)/)) # snare just the numeric part
+                        (@:               $1 =~ m/-(\d+)_([\d_]+)/)) # snare just the numeric part
                         if m{\$Name:\s*([^\$]+)\$}s
                     
                     $version = $_
@@ -491,7 +491,7 @@ sub _limit_glob_to_limit_re
          and $limit_glob =~ m/^(?:\w+\:\:)+/s  # like "File::*" or "File::Thing*"
         # Optimize for sane and common cases (but not things like "*::File")
         )
-        $self->{+'dir_prefix'} = join "::", @( $limit_glob =~ m/^(?:\w+::)+/sg)
+        $self->{+'dir_prefix'} = join "::", @:  $limit_glob =~ m/^(?:\w+::)+/sg
         $self->{?'verbose'} and print $^STDOUT, " and setting dir_prefix to $self->{?'dir_prefix'}\n"
     
 
@@ -551,7 +551,7 @@ sub find($self, $pod, @< @search_dirs)
         my $fullname = File::Spec->catfile( $dir, < @parts )
         print $^STDOUT, "Filename is now $fullname\n" if $verbose
 
-        foreach my $ext (@('', '.pod', '.pm', '.pl'))   # possible extensions
+        foreach my $ext ((@: '', '.pod', '.pm', '.pl'))   # possible extensions
             my $fullext = $fullname . $ext
             if( -f $fullext  and  $self->contains_pod( $fullext ) )
                 print $^STDOUT, "FOUND: $fullext\n" if $verbose
@@ -623,7 +623,7 @@ sub _accessorize  # A simple-minded method-maker
 sub _state_as_string
     my $self = @_[0]
     return '' unless ref $self
-    my @out = @( "\{\n  # State of $(dump::view($self)) ...\n" )
+    my @out = @:  "\{\n  # State of $(dump::view($self)) ...\n" 
     foreach my $k (sort keys $self->%)
         push @out, "  $(dump::view($k)) => $(dump::view($self->{?$k}))\n"
     

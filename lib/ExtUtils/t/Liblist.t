@@ -10,7 +10,7 @@ BEGIN
 
 do
     my @warn
-    local $^WARN_HOOK = sub (@< @_) {push @warn, \@(@_[0]->{?description})}
+    local $^WARN_HOOK = sub (@< @_) {push @warn, \(@: @_[0]->{?description})}
 
     my $ll = bless \$%, 'ExtUtils::Liblist'
     my @out = $ll->ext('-ln0tt43r3_perl')

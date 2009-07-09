@@ -18,7 +18,7 @@ sub of
     my $class = shift @_
 
     # If no one wants the result, don't bother computing it.
-    my $hinthash = @( caller 0 )[10]
+    my $hinthash = (@:  caller 0 )[10]
     my %tags
     %tags{[_unpack_tags( $hinthash->{?$class} ) ]} = $@
 
@@ -32,7 +32,7 @@ sub of
 sub import
     my $class = shift @_
 
-    @_ = @( 'please' ) if not nelems @_
+    @_ = (@:  'please' ) if not nelems @_
     my %tags
     %tags{[_unpack_tags( < @_, $^HINTS{?$class} ) ]} = $@
 

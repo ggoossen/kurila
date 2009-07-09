@@ -213,7 +213,7 @@ sub run_tests
     is($txt, "FoX")
 
     # with lexicals (and in re-entered scopes)
-    for (@(0,1))
+    for ((@: 0,1))
         my $txt
         unless ($_)
             $txt = "Foo"
@@ -463,7 +463,7 @@ sub run_tests
     do
         is(ref \substr($x,1,3), "SCALAR", "not an lvalue")
         my $x = "abcdef"
-        for (@(substr($x,1,3)))
+        for ((@: substr($x,1,3)))
             is($_, 'bcd')
             $_ = 'XX'
             is($_, 'XX')

@@ -44,7 +44,7 @@ if ($b->have_compiler) {
     ok $obj_file;
     is -e $obj_file, 1, "Make sure $obj_file exists";
 
-    my @($lib_file) = $b->link( objects => $obj_file, module_name => $module );
+    my (@: $lib_file) = $b->link( objects => $obj_file, module_name => $module );
     ok $lib_file;
     is -e $lib_file, 1, "Make sure $lib_file exists";
 

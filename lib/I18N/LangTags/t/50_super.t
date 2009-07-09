@@ -5,7 +5,7 @@ use Test::More
 BEGIN { plan tests => 26 };
 print $^STDOUT, "#\n# Testing normal (tight) insertion of super-ordinate language tags...\n#\n"
 
-use I18N::LangTags < qw(implicate_supers);
+use I18N::LangTags < qw(implicate_supers)
 
 my @in = grep { m/\S/ }, split m/[\n\r]/, q{
  NIX => NIX
@@ -58,16 +58,16 @@ foreach my $in ( @in)
         die "What kind of line is <$in>?!"
             unless $in =~ m/^(.+)=>(.+)$/s
 
-        my@($i,$s) = @($1, $2)
-        @in     = @($i =~ m/(\S+)/g)
-        @should = @($s =~ m/(\S+)/g)
+        my(@: $i,$s) = @: $1, $2
+        @in     = @: $i =~ m/(\S+)/g
+        @should = @: $s =~ m/(\S+)/g
     #print "{@in}{@should}\n";
     
     my @out = implicate_supers(
         ("$(join ' ',@in)" eq 'NIX') ?? () !! < @in
         )
     #print "O: ", join(' ', map "<$_>", @out), "\n";
-    @out = @( 'NIX' ) unless (nelems @out)
+    @out = (@:  'NIX' ) unless (nelems @out)
 
 
     if( (nelems @out) == nelems @should

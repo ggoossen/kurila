@@ -12,8 +12,8 @@ use Socket v1.3
 use Carp
 
 our(@ISA, $VERSION, @EXPORT_OK)
-use Exporter;
-use Errno < qw|EINPROGRESS EWOULDBLOCK EISCONN|;
+use Exporter
+use Errno < qw|EINPROGRESS EWOULDBLOCK EISCONN|
 
 # legacy
 
@@ -88,7 +88,7 @@ sub socketpair($class,$domain,$type,$protocol)
     $sock1->*->{+'io_socket_type'}  = $sock2->*->{+'io_socket_type'}  = $type
     $sock1->*->{+'io_socket_proto'} = $sock2->*->{+'io_socket_proto'} = $protocol
 
-    return @($sock1, $sock2)
+    return @: $sock1, $sock2
 
 
 sub connect($sock, $addr)
@@ -201,7 +201,7 @@ sub accept($sock, ?$pkg)
 
         my $sel = IO::Select->new( $sock)
 
-        unless ( @( $sel->can_read($timeout) ) )
+        unless ( (@:  $sel->can_read($timeout) ) )
             $^EVAL_ERROR = 'accept: timeout'
             $^OS_ERROR = (exists &Errno::ETIMEDOUT ?? &Errno::ETIMEDOUT( < @_ ) !! 1)
             return

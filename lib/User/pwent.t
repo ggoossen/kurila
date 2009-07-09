@@ -2,7 +2,7 @@
 
 BEGIN 
     our $haspw
-    try { my @n = @( getpwuid 0 ) }
+    try { my @n = (@:  getpwuid 0 ) }
     $haspw = 1 unless $^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/unimplemented/
     unless ($haspw) { print $^STDOUT, "1..0 # Skip: no getpwuid\n"; exit 0 }
     use Config
@@ -19,13 +19,13 @@ BEGIN
     # It is better to use the $< uid for testing on VMS instead.
     if ( $^OS_NAME eq 'VMS' ) { $uid = $^UID ; }
     if ( $^OS_NAME eq 'cygwin' ) { $uid = 500 ; }
-    our @pwent = @( getpwuid $uid ) # This is the function getpwuid.
+    our @pwent = @:  getpwuid $uid  # This is the function getpwuid.
     unless (@pwent) { print $^STDOUT, "1..0 # Skip: no uid $uid\n"; exit 0 }
 
 
 print $^STDOUT, "1..9\n"
 
-use User::pwent;
+use User::pwent
 
 print $^STDOUT, "ok 1\n"
 

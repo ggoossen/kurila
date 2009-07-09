@@ -2,7 +2,7 @@
 
 BEGIN 
     chdir 't' if -d 't'
-    $^INCLUDE_PATH = @( '../lib' )
+    $^INCLUDE_PATH = @:  '../lib' 
     print $^STDOUT, "1..8\n"
 
 
@@ -14,7 +14,7 @@ print $^STDOUT, "not " unless $^EVAL_ERROR->{?description} =~ m/^Can't open/
 print $^STDOUT, "ok $i\n"; ++$i
 
 my $foo = 'FOO'
-for (@("*$foo", "\\*$foo"))
+for ((@: "*$foo", "\\*$foo"))
     eval qq{ open $_, '<', '$^PROGRAM_NAME' }; die if $^EVAL_ERROR
     print $^STDOUT, "not " if $^EVAL_ERROR
     print $^STDOUT, "ok $i\n"; ++$i

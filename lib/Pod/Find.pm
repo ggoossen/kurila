@@ -47,10 +47,10 @@ files/directories like RCS, CVS, SCCS, .svn are ignored.
 =cut
 
 #use diagnostics;
-use Exporter;
-use File::Spec;
-use File::Find;
-use Cwd;
+use Exporter
+use File::Spec
+use File::Find
+use Cwd
 
 our (@ISA, @EXPORT_OK, $VERSION)
 @ISA = qw(Exporter)
@@ -117,7 +117,7 @@ as this is prepended to I<$^INCLUDE_PATH> by the Perl interpreter itself.
 sub pod_find
     my %opts
     if(ref @_[0])
-        %opts = %( < shift()->% )
+        %opts = %:  < shift()->% 
     
 
     %opts{+verbose} ||= 0
@@ -352,18 +352,18 @@ contain some pod documentation.
 sub pod_where
 
     # default options
-    my %options = %(
-        'inc' => 0,
-        'verbose' => 0,
-        'dirs' => \@( File::Spec->curdir ),
-        )
+    my %options = %: 
+        'inc' => 0
+        'verbose' => 0
+        'dirs' => \(@:  File::Spec->curdir )
+        
 
     # Check for an options hash as first argument
     if (defined @_[0] && ref(@_[0]) eq 'HASH')
         my $opt = shift
 
         # Merge default options with supplied options
-        %options = %(< %options, < $opt->%)
+        %options = %: < %options, < $opt->%
     
 
     # Check usage
@@ -429,7 +429,7 @@ sub pod_where
                 if %options{'verbose'}
 
             # Loop over possible extensions
-            foreach my $ext (@('', '.pod', '.pm', '.pl'))
+            foreach my $ext ((@: '', '.pod', '.pm', '.pl'))
                 my $fullext = $fullname . $ext
                 if (-f $fullext &&
                     contains_pod($fullext, %options{'verbose'}) )

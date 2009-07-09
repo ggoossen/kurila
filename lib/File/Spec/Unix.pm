@@ -77,7 +77,7 @@ trailing slash :-)
 sub catdir
     my $self = shift
 
-    $self->canonpath(join('/', @( < @_, ''))) # '' because need a trailing '/'
+    $self->canonpath(join('/', (@:  < @_, ''))) # '' because need a trailing '/'
 
 
 =item catfile
@@ -243,7 +243,7 @@ The results can be passed to L</catpath()> to get back a path equivalent to
 
 sub splitpath($self,$path, ?$nofile)
 
-    my @($volume,$directory,$file) = @('','','')
+    my (@: $volume,$directory,$file) = @: '','',''
 
     if ( $nofile )
         $directory = $path
@@ -253,7 +253,7 @@ sub splitpath($self,$path, ?$nofile)
         $file      = $2
     
 
-    return  @($volume,$directory,$file)
+    return  @: $volume,$directory,$file
 
 
 
@@ -341,17 +341,17 @@ Based on code written by Shigio Yamaguchi.
 sub abs2rel($self,$path,?$base)
     $base = $self->_cwd() unless defined $base and length $base
 
-    @($path, $base) =  map { $self->canonpath($_) }, @( $path, $base)
+    (@: $path, $base) =  map { $self->canonpath($_) }, @:  $path, $base
 
-    if (grep { $self->file_name_is_absolute($_) }, @( $path, $base))
-        @($path, $base) =  map { $self->rel2abs($_) }, @( $path, $base)
+    if (grep { $self->file_name_is_absolute($_) }, (@:  $path, $base))
+        (@: $path, $base) =  map { $self->rel2abs($_) }, @:  $path, $base
     else
         # save a couple of cwd()s if both paths are relative
-        @($path, $base) =  map { $self->catdir('/', $_) }, @( $path, $base)
+        (@: $path, $base) =  map { $self->catdir('/', $_) }, @:  $path, $base
     
 
-    my @($path_volume, ...) =  $self->splitpath($path, 1)
-    my @($base_volume, ...) =  $self->splitpath($base, 1)
+    my (@: $path_volume, ...) =  $self->splitpath($path, 1)
+    my (@: $base_volume, ...) =  $self->splitpath($base, 1)
 
     # Can't relativize across volumes
     return $path unless $path_volume eq $base_volume
@@ -384,7 +384,7 @@ sub abs2rel($self,$path,?$base)
 
     # $base now contains the directories the resulting relative path
     # must ascend out of before it can descend to $path_directory.
-    my $result_dirs = $self->catdir( < (@( $self->updir) x nelems @basechunks), < @pathchunks )
+    my $result_dirs = $self->catdir( < ((@:  $self->updir) x nelems @basechunks), < @pathchunks )
     return $self->canonpath( $self->catpath('', $result_dirs, '') )
 
 
@@ -468,7 +468,7 @@ sub _collapse($fs, $path)
     my $updir  = $fs->updir
     my $curdir = $fs->curdir
 
-    my@($vol, $dirs, $file) =  $fs->splitpath($path)
+    my(@: $vol, $dirs, $file) =  $fs->splitpath($path)
     my @dirs = $fs->splitdir($dirs)
     pop @dirs if (nelems @dirs) && @dirs[-1] eq ''
 

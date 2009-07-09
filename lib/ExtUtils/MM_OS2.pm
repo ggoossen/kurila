@@ -47,10 +47,10 @@ MAKE_TEXT
 
 sub dlsyms($self,%< %attribs)
 
-    my@($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \$%
-    my@($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \$@
-    my@($funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \$@
-    my@($imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \$%
+    my(@: $funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \$%
+    my(@: $vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \$@
+    my(@: $funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \$@
+    my(@: $imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \$%
     my(@m)
     (my $boot = $self->{?NAME}) =~ s/:/_/g
 
@@ -72,8 +72,8 @@ $self->{?BASEEXT}.def: Makefile.PL
         # Make import files (needed for static build)
         -d 'tmp_imp' or mkdir 'tmp_imp', 0777 or die "Can't mkdir tmp_imp"
         open my $imp, '>', 'tmpimp.imp' or die "Can't open tmpimp.imp"
-        while (my@($name, $exp) =@( each $self->{IMPORTS}->%))
-            my @($lib, $id) = @($exp =~ m/(.*)\.(.*)/) or die "Malformed IMPORT `$exp'"
+        while (my(@: $name, $exp) =(@:  each $self->{IMPORTS}->%))
+            my (@: $lib, $id) = (@: $exp =~ m/(.*)\.(.*)/) or die "Malformed IMPORT `$exp'"
             print $imp, "$name $lib $id ?\n"
         
         close $imp or die "Can't close tmpimp.imp"
@@ -135,7 +135,7 @@ OS/2 is OS/2
 =cut
 
 sub os_flavor
-    return @('OS/2')
+    return @: 'OS/2'
 
 
 =back

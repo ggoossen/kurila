@@ -2,7 +2,7 @@ BEGIN
     if( env::var('PERL_CORE') ) {
         chdir 't';
         use File::Spec;
-        $^INCLUDE_PATH = @(File::Spec->rel2abs('../lib') );
+        $^INCLUDE_PATH = (@: File::Spec->rel2abs('../lib') );
     }
 
 
@@ -20,7 +20,7 @@ ok $x->inc # make sure inc=1 is the default
 print $^STDOUT, $x->_state_as_string
 #$x->verbose(12);
 
-use Pod::Simple;
+use Pod::Simple
 *pretty = \&Pod::Simple::BlackBox::pretty
 
 my $found = 0
@@ -43,7 +43,7 @@ like( ($name2where->{?'warnings'} || 'huh???'), qr/warnings\.(pod|pm)$/)
 
 my  $warningspath = $name2where->{?'warnings'}
 if( $warningspath ) {
-    my @x = @($x->find('warnings')||'(nil)', $warningspath);
+    my @x = (@: $x->find('warnings')||'(nil)', $warningspath);
     print $^STDOUT, "# Comparing \"@x[0]\" to \"@x[1]\"\n";
     for( @x) { s{[/\\]}{/}g; }
     print $^STDOUT, "#        => \"@x[0]\" to \"@x[1]\"\n";

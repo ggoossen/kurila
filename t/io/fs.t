@@ -90,11 +90,11 @@ SKIP: do
     ok(link('a','b'), "link a b")
     ok(link('b','c'), "link b c")
 
-    $a_mode = @(stat('a'))[2]
+    $a_mode = (@: stat('a'))[2]
 
-    @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-      $blksize,$blocks) = @: stat('c')
-
+    (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
+        $blksize,$blocks) = @: stat('c')
+                             
     SKIP: do
         skip "no nlink", 1 if config_value('dont_use_nlink')
 
@@ -122,9 +122,9 @@ is(chmod($newmode,'a'), 1, "chmod succeeding")
 SKIP: do
     skip("no link", 7) unless $has_link
 
-    @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-      $blksize,$blocks) = @: stat('c')
-
+    (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
+        $blksize,$blocks) = @: stat('c')
+                             
     SKIP: do
         skip "no mode checks", 1 if $skip_mode_checks
 
@@ -137,18 +137,18 @@ SKIP: do
 
     is(chmod($newmode,'c','x'), 2, "chmod two files")
 
-    @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-      $blksize,$blocks) = @: stat('c')
-
+    (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
+        $blksize,$blocks) = @: stat('c')
+                             
     SKIP: do
         skip "no mode checks", 1 if $skip_mode_checks
 
         is($mode ^&^ 0777, $newmode, "chmod going through to c")
     
 
-    @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-      $blksize,$blocks) = @: stat('x')
-
+    (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
+        $blksize,$blocks) = @: stat('x')
+                             
     SKIP: do
         skip "no mode checks", 1 if $skip_mode_checks
 
@@ -157,14 +157,14 @@ SKIP: do
 
     is(unlink('b','x'), 2, "unlink two files")
 
-    @(?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime,
-      ?$blksize,?$blocks) = @: stat('b')
-
+    (@: ?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime
+        ?$blksize,?$blocks) = @: stat('b')
+                               
     is($ino, undef, "ino of removed file b should be undef")
 
-    @(?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime,
-      ?$blksize,?$blocks) = @: stat('x')
-
+    (@: ?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime
+        ?$blksize,?$blocks) = @: stat('x')
+                               
     is($ino, undef, "ino of removed file x should be undef")
 
 
@@ -172,13 +172,13 @@ SKIP: do
     skip "no fchmod", 5 unless (config_value('d_fchmod') || "") eq "define"
     ok(open(my $fh, "<", "a"), "open a")
     is(chmod(0, $fh), 1, "fchmod")
-    $mode = @(stat "a")[2]
+    $mode = (@: stat "a")[2]
     SKIP: do
         skip "no mode checks", 1 if $skip_mode_checks
         is($mode ^&^ 0777, 0, "perm reset")
     
     is(chmod($newmode, "a"), 1, "fchmod")
-    $mode = @(stat $fh)[2]
+    $mode = (@: stat $fh)[2]
     SKIP: do
         skip "no mode checks", 1 if $skip_mode_checks
         is($mode ^&^ 0777, $newmode, "perm restored")
@@ -207,9 +207,9 @@ SKIP: do
 
 is(rename('a','b'), 1, "rename a b")
 
-@(?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime,
-  ?$blksize,?$blocks) = @: stat('a')
-
+(@: ?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime
+    ?$blksize,?$blocks) = @: stat('a')
+                           
 is($ino, undef, "ino of renamed file a should be undef")
 
 $delta = $accurate_timestamps ?? 1 !! 2	# Granularity of time on the filesystem
@@ -220,7 +220,7 @@ is($foo, 1, "utime")
 check_utime_result()
 
 utime undef, undef, 'b'
-@($atime,$mtime) =  @(stat 'b')[[8..9]]
+(@: $atime,$mtime) =  (@: stat 'b')[[8..9]]
 print $^STDOUT, "# utime undef, undef --> $atime, $mtime\n"
 isnt($atime, 500000000, 'atime')
 isnt($mtime, 500000000 + $delta, 'mtime')
@@ -235,9 +235,9 @@ SKIP: do
 
 
 sub check_utime_result
-    @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-      $blksize,$blocks) = @: stat('b')
-
+    (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
+        $blksize,$blocks) = @: stat('b')
+                             
     SKIP: do
         skip "bogus inode num", 1 if ($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare')
 
@@ -257,7 +257,7 @@ sub check_utime_result
                 print $^STDOUT, "# Maybe stat() cannot get the correct atime, ".
                     "as happens via NFS on linux?\n"
                 $foo = (utime 400000000,500000000 + 2*$delta,'b')
-                my @($new_atime, $new_mtime) =  @(stat('b'))[[8..9]]
+                my (@: $new_atime, $new_mtime) =  (@: stat('b'))[[8..9]]
                 print $^STDOUT, "# newatime - $new_atime  nemtime - $new_mtime\n"
                 if ($new_atime == $atime && $new_mtime - $mtime == $delta)
                     pass("atime - accounted for possible NFS/glibc2.2 bug on linux")
@@ -292,8 +292,8 @@ SKIP: do
 
 is(unlink('b'), 1, "unlink b")
 
-@(?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime,
-  ?$blksize,?$blocks) = @: stat('b')
+(@: ?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime
+    ?$blksize,?$blocks) = @: stat('b')
 is($ino, undef, "ino of unlinked file b should be undef")
 unlink 'c'
 
@@ -431,10 +431,10 @@ do
     # Change 26011: Re: A surprising segfault
     # to make sure only that these obfuscated sentences will not crash.
 
-    map { chmod() }, @( ('')x68)
+    map { chmod() }, @:  ('')x68
     ok(1, "extend sp in pp_chmod")
 
-    map { chown() }, @( ('')x68)
+    map { chown() }, @:  ('')x68
     ok(1, "extend sp in pp_chown")
 
 

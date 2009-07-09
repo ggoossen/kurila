@@ -9,10 +9,10 @@ package ExtUtils::Liblist::Kid
 
 our $VERSION = 6.44
 
-use Config;
-use Cwd 'cwd';
-use File::Basename;
-use File::Spec;
+use Config
+use Cwd 'cwd'
+use File::Basename
+use File::Spec
 
 sub ext
     if   ($^OS_NAME eq 'VMS')     { return &_vms_ext( < @_ );      }
@@ -30,7 +30,7 @@ sub _unix_os2_ext($self,$potential_libs, ?$verbose, ?$give_libs)
         $potential_libs .= " " if $potential_libs
         $potential_libs .= config_value("perllibs")
     
-    return  @("", "", "", "",  @($give_libs ?? \$@ !! ())) unless $potential_libs
+    return  (@: "", "", "", "",  (@: $give_libs ?? \$@ !! ())) unless $potential_libs
     warn "Potential libraries are '$potential_libs':\n" if $verbose
 
     my $so   = config_value("so")
@@ -86,7 +86,7 @@ sub _unix_os2_ext($self,$potential_libs, ?$verbose, ?$give_libs)
         
 
         my $found_lib=0
-        foreach my $thispth ( @( <@searchpath, < @libpath))
+        foreach my $thispth ( (@:  <@searchpath, < @libpath))
 
             # Try to find the full name of the library.  We need this to
             # determine whether it's a dynamically-loadable library or not.
@@ -201,10 +201,10 @@ sub _unix_os2_ext($self,$potential_libs, ?$verbose, ?$give_libs)
             unless $found_lib+>0
 
     unless( $found )
-        return  @('','','','', $give_libs ?? \@libs !! ())
+        return  @: '','','','', $give_libs ?? \@libs !! ()
     else
-        return  @("$(join ' ',@extralibs)", "$(join ' ',@bsloadlibs)", "$(join ' ',@ldloadlibs)",
-                  join(":", @ld_run_path),  @($give_libs ?? \@libs !! ()))
+        return  @: "$(join ' ',@extralibs)", "$(join ' ',@bsloadlibs)", "$(join ' ',@ldloadlibs)"
+                   join(":", @ld_run_path),  (@: $give_libs ?? \@libs !! ())
 
 
 sub _win32_ext($self, $potential_libs, $verbose, $give_libs)
@@ -215,7 +215,7 @@ sub _win32_ext($self, $potential_libs, $verbose, $give_libs)
 
     # If user did not supply a list, we punt.
     # (caller should probably use the list in $Config{libs})
-    return  @("", "", "", "",  @($give_libs ?? \$@ !! ())) unless $potential_libs
+    return  (@: "", "", "", "",  (@: $give_libs ?? \$@ !! ())) unless $potential_libs
 
     my $cc              = config_value("cc")
     my $VC              = $cc =~ m/^cl/i
@@ -345,7 +345,7 @@ sub _win32_ext($self, $potential_libs, $verbose, $give_libs)
         
     
 
-    return  @('','','','',  @($give_libs ?? \@libs !! ())) unless $found
+    return  (@: '','','','',  (@: $give_libs ?? \@libs !! ())) unless $found
 
     # make sure paths with spaces are properly quoted
     @extralibs = map { (m/\s/ && !m/^".*"$/) ?? qq["$_"] !! $_ }, @extralibs
@@ -358,7 +358,7 @@ sub _win32_ext($self, $potential_libs, $verbose, $give_libs)
     $lib =~ s,/,\\,g
 
     warn "Result: $lib\n" if $verbose
-    return @($lib, '', $lib, '', ($give_libs ?? \@libs !! ()))
+    return @: $lib, '', $lib, '', ($give_libs ?? \@libs !! ())
 
 
 
@@ -366,8 +366,8 @@ sub _vms_ext($self, $potential_libs, $verbose, $give_libs)
     $verbose ||= 0
 
     my(@crtls,$crtlstr)
-    @crtls = @( (config_value('ldflags') =~ m-/Debug-i ?? config_value('dbgprefix') !! '')
-                . 'PerlShr/Share' )
+    @crtls = @:  (config_value('ldflags') =~ m-/Debug-i ?? config_value('dbgprefix') !! '')
+                     . 'PerlShr/Share' 
     push(@crtls, < grep { not m/\(/ }, split m/\s+/, config_value('perllibs'))
     push(@crtls, < grep { not m/\(/ }, split m/\s+/, config_value('libc'))
     # In general, we pass through the basic libraries from %Config unchanged.
@@ -378,7 +378,7 @@ sub _vms_ext($self, $potential_libs, $verbose, $give_libs)
     if ($self->{?PERL_SRC})
         my($locspec,$type)
         foreach my $lib ( @crtls)
-            if (@($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i)
+            if ((@: $locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i)
                 if    (lc $type eq '/share')   { $locspec .= config_value('exe_ext'); }
                     elsif (lc $type eq '/library') { $locspec .= config_value('lib_ext'); }
                 else                           { $locspec .= config_value('obj_ext'); }
@@ -391,21 +391,21 @@ sub _vms_ext($self, $potential_libs, $verbose, $give_libs)
 
     unless ($potential_libs)
         warn "Result:\n\tEXTRALIBS: \n\tLDLOADLIBS: $crtlstr\n" if $verbose
-        return  @('', '', $crtlstr, '',  @($give_libs ?? \$@ !! ()))
+        return  @: '', '', $crtlstr, '',  (@: $give_libs ?? \$@ !! ())
     
 
     my(%found,@fndlibs,$ldlib)
     my $cwd = cwd()
-    my@($so,$lib_ext,$obj_ext) =  map { config_value($_) }, @: 'so','lib_ext','obj_ext'
-    # List of common Unix library names and their VMS equivalents
-    # (VMS equivalent of '' indicates that the library is automatically
-    # searched by the linker, and should be skipped here.)
+    my(@: $so,$lib_ext,$obj_ext) =  map { config_value($_) }, @: 'so','lib_ext','obj_ext'
+                                                               # List of common Unix library names and their VMS equivalents
+                                                               # (VMS equivalent of '' indicates that the library is automatically
+                                                               # searched by the linker, and should be skipped here.)
     my(@flibs, %libs_seen)
-    my %libmap = %( 'm' => '', 'f77' => '', 'F77' => '', 'V77' => '', 'c' => '',
-        'malloc' => '', 'crypt' => '', 'resolv' => '', 'c_s' => '',
-        'socket' => '', 'X11' => 'DECW$XLIBSHR',
-        'Xt' => 'DECW$XTSHR', 'Xm' => 'DECW$XMLIBSHR',
-        'Xmu' => 'DECW$XMULIBSHR')
+    my %libmap = %:  'm' => '', 'f77' => '', 'F77' => '', 'V77' => '', 'c' => ''
+                     'malloc' => '', 'crypt' => '', 'resolv' => '', 'c_s' => ''
+                     'socket' => '', 'X11' => 'DECW$XLIBSHR'
+                     'Xt' => 'DECW$XTSHR', 'Xm' => 'DECW$XMLIBSHR'
+                     'Xmu' => 'DECW$XMULIBSHR'
     if (config_value('vms_cc_type') ne 'decc') { %libmap{+'curses'} = 'VAXCCURSE'; }
 
     warn "Potential libraries are '$potential_libs'\n" if $verbose
@@ -447,7 +447,7 @@ sub _vms_ext($self, $potential_libs, $verbose, $give_libs)
         
 
         my(@variants,$cand)
-        my@($ctype) = ''
+        my(@: $ctype) = ''
 
         # If we don't have a file type, consider it a possibly abbreviated name and
         # check for common variants.  We try these first to grab libraries before
@@ -525,7 +525,7 @@ sub _vms_ext($self, $potential_libs, $verbose, $give_libs)
 
     $ldlib = $crtlstr ?? "$lib $crtlstr" !! $lib
     warn "Result:\n\tEXTRALIBS: $lib\n\tLDLOADLIBS: $ldlib\n" if $verbose
-    return @($lib, '', $ldlib, '', ($give_libs ?? \@flibs !! ()))
+    return @: $lib, '', $ldlib, '', ($give_libs ?? \@flibs !! ())
 
 
 1

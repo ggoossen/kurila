@@ -10,8 +10,8 @@ iohandle::output_autoflush($^STDOUT, 1)
 
 print $^STDOUT, "1..10\n"
 
-use IO::Handle;
-use IO::Poll < qw(/POLL/);
+use IO::Handle
+use IO::Poll < qw(/POLL/)
 
 my $poll = IO::Poll->new()
 

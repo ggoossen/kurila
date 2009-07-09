@@ -9,19 +9,19 @@ BEGIN { plan tests => 8 }
 
 require Pod::Simple::HTMLBatch
 
-use File::Spec;
-use Cwd;
+use File::Spec
+use Cwd
 my $cwd = cwd()
 print $^STDOUT, "# CWD: $cwd\n"
 
 my $t_dir
 my $corpus_dir
 
-foreach my $t_maybe (@(
-                      File::Spec->catdir( File::Spec->updir(), 'lib','Pod','Simple','t'),
-                      File::Spec->catdir( $cwd ),
-                      File::Spec->catdir( $cwd, 't' ),
-                      'OHSNAP')
+foreach my $t_maybe (@: 
+                                File::Spec->catdir( File::Spec->updir(), 'lib','Pod','Simple','t')
+                                File::Spec->catdir( $cwd )
+                                File::Spec->catdir( $cwd, 't' )
+                                'OHSNAP'
     )
     die "Can't find the test corpus" if $t_maybe eq 'OHSNAP'
     next unless -e $t_maybe
@@ -54,7 +54,7 @@ mkdir $outdir, 0777 or die "Can't mkdir $outdir: $^OS_ERROR"
 print $^STDOUT, "# Converting $corpus_dir => $outdir\n"
 my $conv = Pod::Simple::HTMLBatch->new
 $conv->verbose(0)
-$conv->batch_convert( \@($corpus_dir), $outdir )
+$conv->batch_convert( \(@: $corpus_dir), $outdir )
 ok 1
 print $^STDOUT, "# OK, back from converting.\n"
 

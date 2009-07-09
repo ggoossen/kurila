@@ -1,12 +1,12 @@
 BEGIN 
     chdir 't' if -d 't'
-    $^INCLUDE_PATH = @( '../lib' )
+    $^INCLUDE_PATH = @:  '../lib' 
     require './test.pl'
 
 
 my $Is_VMS = $^OS_NAME eq 'VMS'
 
-use Carp < qw(carp cluck croak confess);
+use Carp < qw(carp cluck croak confess)
 
 plan tests => 5
 

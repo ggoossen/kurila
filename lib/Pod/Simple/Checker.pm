@@ -9,13 +9,13 @@ use Carp ()
 use Pod::Simple::Methody ()
 use Pod::Simple ()
 our $VERSION = '2.02'
-our @ISA = @('Pod::Simple::Methody')
+our @ISA = @: 'Pod::Simple::Methody'
 BEGIN { *DEBUG = defined(&Pod::Simple::DEBUG)
     ?? \&Pod::Simple::DEBUG
     !! sub() {0}
 }
 
-use Text::Wrap v98.112902 (); # was 2001.0131, but I don't think we need that
+use Text::Wrap v98.112902 () # was 2001.0131, but I don't think we need that
 $Text::Wrap::wrap = 'overflow'
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -86,7 +86,7 @@ sub end_item_text   { @_[0]->emit_par(-2) }
 
 sub emit_par
     return unless @_[0]->{?'Errata_seen'}
-    my@($self, $tweak_indent) = @: splice(@_,0,2)
+    my(@: $self, $tweak_indent) = @: splice(@_,0,2)
     my $indent = ' ' x ( 2 * $self->{?'Indent'} + ($tweak_indent||0) )
     # Yes, 'STRING' x NEGATIVE gives '', same as 'STRING' x 0
 

@@ -2,7 +2,7 @@
 
 BEGIN 
     our $haspe
-    try { my @n = @( getprotobyname "tcp" ) }
+    try { my @n = (@:  getprotobyname "tcp" ) }
     $haspe = 1 unless $^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/unimplemented|unsupported/i
     unless ($haspe) { print $^STDOUT, "1..0 # Skip: no getprotobyname\n"; exit 0 }
     use Config
@@ -14,13 +14,13 @@ BEGIN
 our @protoent
 
 BEGIN 
-    @protoent = @( getprotobyname "tcp" ) # This is the function getprotobyname.
+    @protoent = @:  getprotobyname "tcp"  # This is the function getprotobyname.
     unless (nelems @protoent) { print $^STDOUT, "1..0 # Skip: no tcp protocol\n"; exit 0 }
 
 
 print $^STDOUT, "1..3\n"
 
-use Net::protoent;
+use Net::protoent
 
 print $^STDOUT, "ok 1\n"
 

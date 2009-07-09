@@ -7,58 +7,58 @@ use Time::Local
 
 # Set up time values to test
 my @time =
-    @(
+    @: 
    #year,mon,day,hour,min,sec
-   \@(1970,  1,  2, 00, 00, 00),
-   \@(1980,  2, 28, 12, 00, 00),
-   \@(1980,  2, 29, 12, 00, 00),
-   \@(1999, 12, 31, 23, 59, 59),
-   \@(2000,  1,  1, 00, 00, 00),
-   \@(2010, 10, 12, 14, 13, 12),
+   \(@: 1970,  1,  2, 00, 00, 00)
+   \(@: 1980,  2, 28, 12, 00, 00)
+   \(@: 1980,  2, 29, 12, 00, 00)
+   \(@: 1999, 12, 31, 23, 59, 59)
+   \(@: 2000,  1,  1, 00, 00, 00)
+   \(@: 2010, 10, 12, 14, 13, 12)
    # leap day
-   \@(2020,  2, 29, 12, 59, 59),
-   \@(2030,  7,  4, 17, 07, 06),
+   \(@: 2020,  2, 29, 12, 59, 59)
+   \(@: 2030,  7,  4, 17, 07, 06)
     # The following test fails on a surprising number of systems
     # so it is commented out. The end of the Epoch for a 32-bit signed
     # implementation of time_t should be Jan 19, 2038  03:14:07 UTC.
     #  [2038,  1, 17, 23, 59, 59],     # last full day in any tz
-    )
+    
 
 my @bad_time =
-    @(
+    @: 
      # month too large
-     \@(1995, 13, 01, 01, 01, 01),
+     \(@: 1995, 13, 01, 01, 01, 01)
      # day too large
-     \@(1995, 02, 30, 01, 01, 01),
+     \(@: 1995, 02, 30, 01, 01, 01)
      # hour too large
-     \@(1995, 02, 10, 25, 01, 01),
+     \(@: 1995, 02, 10, 25, 01, 01)
      # minute too large
-     \@(1995, 02, 10, 01, 60, 01),
+     \(@: 1995, 02, 10, 01, 60, 01)
      # second too large
-     \@(1995, 02, 10, 01, 01, 60),
-    )
+     \(@: 1995, 02, 10, 01, 01, 60)
+    
 
 my @neg_time =
-    @(
+    @: 
      # test negative epochs for systems that handle it
-     \@( 1969, 12, 31, 16, 59, 59 ),
-     \@( 1950, 04, 12, 9, 30, 31 ),
-    )
+     \(@:  1969, 12, 31, 16, 59, 59 )
+     \(@:  1950, 04, 12, 9, 30, 31 )
+    
 
 # Leap year tests
 my @years =
-    @(
-     \@( 1900 => 0 ),
-     \@( 1947 => 0 ),
-     \@( 1996 => 1 ),
-     \@( 2000 => 1 ),
-     \@( 2100 => 0 ),
-    )
+    @: 
+     \(@:  1900 => 0 )
+     \(@:  1947 => 0 )
+     \(@:  1996 => 1 )
+     \(@:  2000 => 1 )
+     \(@:  2100 => 0 )
+    
 
 # Use 3 days before the start of the epoch because with Borland on
 # Win32 it will work for -3600 _if_ your time zone is +01:00 (or
 # greater).
-my $neg_epoch_ok = defined (@(localtime(-259200))[0]) ?? 1 !! 0
+my $neg_epoch_ok = defined ((@: localtime(-259200))[0]) ?? 1 !! 0
 
 # use vmsish 'time' makes for oddness around the Unix epoch
 if ($^OS_NAME eq 'VMS')
@@ -75,8 +75,8 @@ $tests += 8 if env::var('MAINTAINER')
 
 plan tests => $tests
 
-for ( @( < @time, < @neg_time) )
-    my@($year, $mon, $mday, $hour, $min, $sec) =  $_->@
+for ( (@:  < @time, < @neg_time) )
+    my(@: $year, $mon, $mday, $hour, $min, $sec) =  $_->@
     $year -= 1900
     $mon--
 
@@ -90,8 +90,8 @@ for ( @( < @time, < @neg_time) )
             my $year_in = $year +< 70 ?? $year + 1900 !! $year
             my $time = timelocal($sec,$min,$hour,$mday,$mon,$year_in)
 
-            my@($s,$m,$h,$D,$M,$Y, ...) = @: localtime($time)
-
+            my(@: $s,$m,$h,$D,$M,$Y, ...) = @: localtime($time)
+                                             
             is($s, $sec, "timelocal second for $(join ' ',$_->@)")
             is($m, $min, "timelocal minute for $(join ' ',$_->@)")
             is($h, $hour, "timelocal hour for $(join ' ',$_->@)")
@@ -104,8 +104,8 @@ for ( @( < @time, < @neg_time) )
             my $year_in = $year +< 70 ?? $year + 1900 !! $year
             my $time = timegm($sec,$min,$hour,$mday,$mon,$year_in)
 
-            my@($s,$m,$h,$D,$M,$Y, ...) = @: gmtime($time)
-
+            my(@: $s,$m,$h,$D,$M,$Y, ...) = @: gmtime($time)
+                                             
             is($s, $sec, "timegm second for $(join ' ',$_->@)")
             is($m, $min, "timegm minute for $(join ' ',$_->@)")
             is($h, $hour, "timegm hour for $(join ' ',$_->@)")
@@ -117,7 +117,7 @@ for ( @( < @time, < @neg_time) )
 
 
 for ( @bad_time)
-    my@($year, $mon, $mday, $hour, $min, $sec) =  $_->@
+    my(@: $year, $mon, $mday, $hour, $min, $sec) =  $_->@
     $year -= 1900
     $mon--
 
@@ -144,14 +144,14 @@ do
 # treated like 03:00:00 rather than 01:00:00 - negative zone offsets used
 # to do the latter
 do
-    my $hour = @(localtime(timelocal(0, 0, 2, 7, 3, 102)))[2]
+    my $hour = (@: localtime(timelocal(0, 0, 2, 7, 3, 102)))[2]
     # testers in US/Pacific should get 3,
     # other testers should get 2
     ok($hour == 2 || $hour == 3, 'hour should be 2 or 3')
 
 
 for my $p ( @years)
-    my @( $year, $is_leap_year ) =  $p->@
+    my (@:  $year, $is_leap_year ) =  $p->@
 
     my $string = $is_leap_year ?? 'is' !! 'is not'
     is( Time::Local::_is_leap_year($year), $is_leap_year,

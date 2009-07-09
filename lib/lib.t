@@ -5,10 +5,10 @@ BEGIN
     @OrigINC = $^INCLUDE_PATH
 
 
-use Test::More tests => 13;
-use Config;
-use File::Spec;
-use File::Path;
+use Test::More tests => 13
+use Config
+use File::Spec
+use File::Path
 
 #set up files and directories
 my @lib_dir
@@ -20,13 +20,13 @@ BEGIN
     # lib.pm is documented to only work with Unix filepaths.
     @lib_dir  =qw(stuff moo)
     $Lib_Dir  = join "/",@lib_dir
-    $Arch_Dir = join "/", @( <@lib_dir, config_value("archname"))
+    $Arch_Dir = join "/", @:  <@lib_dir, config_value("archname")
 
     # create the auto/ directory and a module
     $Auto_Dir = File::Spec->catdir(<@lib_dir, config_value("archname"),'auto')
     $Module   = File::Spec->catfile(<@lib_dir, 'Yup.pm')
 
-    mkpath \@($Auto_Dir)
+    mkpath \@: $Auto_Dir
 
     open(my $mod, ">", "$Module") || $^OS_ERROR-> DIE()
     print $mod ,<<'MODULE'
@@ -44,14 +44,14 @@ END
 
 
 
-use lib $Lib_Dir;
-use lib $Lib_Dir;
+use lib $Lib_Dir
+use lib $Lib_Dir
 
 BEGIN { use_ok('Yup') }
 
 BEGIN 
     if ($^OS_NAME eq 'MacOS')
-        for (@($Lib_Dir, $Arch_Dir))
+        for ((@: $Lib_Dir, $Arch_Dir))
             s|/|:|g
             $_ .= ":" unless m/:$/
             $_ = ":$_" unless m/^:/ # we know this path is relative
@@ -63,7 +63,7 @@ BEGIN
 
     # Yes, $^INCLUDED uses Unixy filepaths.
     # Not on Mac OS, it doesn't ... it never has, at least.
-    my $path = join("/", @($Lib_Dir, 'Yup.pm'))
+    my $path = join("/", (@: $Lib_Dir, 'Yup.pm'))
     if ($^OS_NAME eq 'MacOS')
         $path = $Lib_Dir . 'Yup.pm'
     
@@ -77,7 +77,7 @@ BEGIN
     is_deeply(\@OrigINC, \@lib::ORIG_INCLUDE_PATH,    '@lib::ORIG_INC' )
 
 
-no lib $Lib_Dir;
+no lib $Lib_Dir
 
 unlike( do { eval 'use lib config_value("installsitelib");'; $^EVAL_ERROR || '' },
         qr/::Config is read-only/, 'lib handles readonly stuff' )

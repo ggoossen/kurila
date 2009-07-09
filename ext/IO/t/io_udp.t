@@ -38,9 +38,9 @@ sub compare_addr
 $^OUTPUT_AUTOFLUSH = 1
 print $^STDOUT, "1..7\n"
 
-use Socket;
-use IO::Socket < qw(AF_INET SOCK_DGRAM INADDR_ANY);
-use IO::Socket::INET;
+use Socket
+use IO::Socket < qw(AF_INET SOCK_DGRAM INADDR_ANY)
+use IO::Socket::INET
 
 my $udpa = IO::Socket::INET->new(Proto => 'udp', LocalAddr => 'localhost')
     || IO::Socket::INET->new(Proto => 'udp', LocalAddr => '127.0.0.1')
@@ -67,7 +67,7 @@ my @xtra = $@
 
 unless(compare_addr($where,$udpa->sockname, 'recv name', 'sockname'))
     print $^STDOUT, "not "
-    @xtra = @(0, <$udpa->sockname)
+    @xtra = @: 0, <$udpa->sockname
 
 print $^STDOUT, "ok 5\n"
 

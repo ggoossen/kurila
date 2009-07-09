@@ -34,27 +34,27 @@ my $lots_of_9C = do
 my $max_iv = ^~^0 >> 1
 my $min_iv = do {use integer; -$max_iv-1} # 2s complement assumption
 
-my @processes = @(\@("dclone", \&do_clone),
-                  \@("freeze/thaw", \&freeze_and_thaw),
-                  \@("nfreeze/thaw", \&nfreeze_and_thaw),
-                  \@("store/retrieve", \&store_and_retrieve),
-                  \@("nstore/retrieve", \&nstore_and_retrieve),
-    )
+my @processes = @: \(@: "dclone", \&do_clone)
+                   \(@: "freeze/thaw", \&freeze_and_thaw)
+                   \(@: "nfreeze/thaw", \&nfreeze_and_thaw)
+                   \(@: "store/retrieve", \&store_and_retrieve)
+                   \(@: "nstore/retrieve", \&nstore_and_retrieve)
+    
 my @numbers =
-    @(# IV bounds of 8 bits
-   -1, 0, 1, -127, -128, -129, 42, 126, 127, 128, 129, 254, 255, 256, 257,
+    @: # IV bounds of 8 bits
+   -1, 0, 1, -127, -128, -129, 42, 126, 127, 128, 129, 254, 255, 256, 257
    # IV bounds of 32 bits
-   -2147483647, -2147483648, -2147483649, 2147483646, 2147483647, 2147483648,
+   -2147483647, -2147483648, -2147483649, 2147483646, 2147483647, 2147483648
    # IV bounds
-   $min_iv, do {use integer; $min_iv + 1}, do {use integer; $max_iv - 1},
-   $max_iv,
+   $min_iv, do {use integer; $min_iv + 1}, do {use integer; $max_iv - 1}
+   $max_iv
    # UV bounds at 32 bits
-   0x7FFFFFFF, 0x80000000, 0x80000001, 0xFFFFFFFF, 0xDEADBEEF,
+   0x7FFFFFFF, 0x80000000, 0x80000001, 0xFFFFFFFF, 0xDEADBEEF
    # UV bounds
-   $max_iv_p1, $max_uv_m1, $max_uv, $lots_of_9C,
+   $max_iv_p1, $max_uv_m1, $max_uv, $lots_of_9C
    # NV-UV conversion
-   2559831922.0,
-    )
+   2559831922.0
+    
 
 plan tests => (nelems @processes) * (nelems @numbers) * 5
 
@@ -108,7 +108,7 @@ sub nstore_and_retrieve
 
 
 foreach ( @processes)
-    my @($process, $sub) =  $_->@
+    my (@: $process, $sub) =  $_->@
     foreach my $number ( @numbers)
         # as $number is an alias into @numbers, we don't want any side effects of
         # conversion macros affecting later runs, so pass a copy to Storable:

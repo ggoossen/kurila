@@ -25,7 +25,7 @@ $sym1 = $sym2 = undef
 
 # Test geniosym()
 
-use Symbol q(geniosym);
+use Symbol q(geniosym)
 
 $sym1 = geniosym
 is( (ref $sym1), 'IO::Handle', 'got an IO ref' )
@@ -48,7 +48,7 @@ do
 # Test qualify()
 package foo
 
-use Symbol < qw(qualify qualify_to_ref);  # must import into this package too
+use Symbol < qw(qualify qualify_to_ref)  # must import into this package too
 
 main::ok( qualify("x") eq "foo::x",		'qualify() with a simple identifier' )
 main::ok( qualify("x", "FOO") eq "FOO::x",	'qualify() with a package' )
@@ -85,12 +85,12 @@ main::is( Symbol::glob_name(*FOO), "foo::FOO", "glob_name")
 main::is( Symbol::glob_name(*main::FOO), "main::FOO", "glob_name")
 
 # tests for delete_package
-package main;
+package main
 TODO: do
     todo_skip("fix delete_package", 2)
     $Transient::variable = 42
     ok( defined %Transient::{?variable}, 'transient variable in stash' )
     Symbol::delete_package('Transient')
     ok( !exists %Transient::{variable}, 'transient variable no longer in stash' )
-    is( nelems(@(keys %Transient::)), 0, 'transient stash is empty' )
+    is( nelems((@: keys %Transient::)), 0, 'transient stash is empty' )
 

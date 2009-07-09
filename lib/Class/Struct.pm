@@ -29,7 +29,7 @@ sub import
         $self->export_to_level( 1, $self, < @_ )
     else
         if (not ref @_[1])
-            return struct( @(caller)[0] => \@_)
+            return struct( (@: caller)[0] => \@_)
         else
             return struct(< @_)
         
@@ -56,7 +56,7 @@ sub struct
         _usage_error() if (nelems @_)
     else
         $base_type = 'ARRAY'
-        $class = @(caller())[0]
+        $class = (@: caller())[0]
         @decls = @_
     
 

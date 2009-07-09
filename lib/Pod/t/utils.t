@@ -21,18 +21,18 @@ my @links = qw{
   text|"sec"
 }
 
-my @results = @(
-        "P<name>",
-        "Q<ident> in P<name>",
-        "Q<sec> in P<name>",
-        "Q<sec>",
-        "Q<sec>",
-        "Q<http://www.perl.org/>",
-        "Q<text>",
-        "Q<text>",
-        "Q<text>",
-        "Q<text>",
-    )
+my @results = @: 
+        "P<name>"
+        "Q<ident> in P<name>"
+        "Q<sec> in P<name>"
+        "Q<sec>"
+        "Q<sec>"
+        "Q<http://www.perl.org/>"
+        "Q<text>"
+        "Q<text>"
+        "Q<text>"
+        "Q<text>"
+    
 
 for my $i( 0..nelems @links )
     my $link = Pod::Hyperlink->new( @links[?$i])

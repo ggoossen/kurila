@@ -17,8 +17,8 @@ sub recur($x)
     my $v = recur('depth2')
     return @: $x, $v
 
-
-my @($r1, $r2) = recur('depth1')
+              
+my (@: $r1, $r2) = recur('depth1')
 is($r1, 'depth1')
 is($r2, 'depth2')
 

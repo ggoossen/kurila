@@ -2,8 +2,8 @@ package Test::Builder::Tester
 
 our $VERSION = "1.13"
 
-use Test::Builder;
-use Symbol;
+use Test::Builder
+use Symbol
 
 =head1 NAME
 
@@ -52,7 +52,7 @@ my $t = Test::Builder->new
 # make us an exporter
 ###
 
-use Exporter;
+use Exporter
 our @ISA = qw(Exporter)
 
 our @EXPORT = qw(test_out test_err test_fail test_diag test_test line_num)
@@ -80,7 +80,7 @@ sub import
         $t->plan(< @plan)
     
 
-    my @imports = @( () )
+    my @imports = @:  () 
     foreach my $idx (0..((nelems @plan)-1))
         if( @plan[$idx] eq 'import' )
             @imports = @plan[$idx+1]->@
@@ -225,7 +225,7 @@ sub test_fail
     _start_testing() unless $testing
 
     # work out what line we should be on
-    my @($package, $filename, $line, ...) = @: caller
+    my (@: $package, $filename, $line, ...) = @: caller
     $line = $line + (shift() || 0) # prevent warnings
 
     # expect that on stderr
@@ -317,7 +317,7 @@ sub test_test
     if ((nelems @_) == 1)
         $mess = shift
     else
-        %args = %( < @_ )
+        %args = %:  < @_ 
         $mess = %args{?name} if exists(%args{name})
         $mess = %args{?title} if exists(%args{title})
         $mess = %args{?label} if exists(%args{label})
@@ -348,10 +348,10 @@ sub test_test
 
         local $_ = undef
 
-        $t->diag(< map {"$_\n"}, @( $out->complaint))
+        $t->diag(< map {"$_\n"}, (@:  $out->complaint))
             unless %args{?skip_out} || $out->check
 
-        $t->diag(< map {"$_\n"}, @( $err->complaint))
+        $t->diag(< map {"$_\n"}, (@:  $err->complaint))
             unless %args{?skip_err} || $err->check
     
 
@@ -369,7 +369,7 @@ C<line_num(+3)> idiom is arguably nicer.
 =cut
 
 sub line_num
-    my @($package, $filename, $line, ...) = @: caller
+    my (@: $package, $filename, $line, ...) = @: caller
     return $line + (shift() || 0) # prevent warnings
 
 
@@ -468,14 +468,14 @@ L<Test::Builder>, L<Test::Builder::Tester::Color>, L<Test::More>.
 ####################################################################
 # Helper class that is used to remember expected and received data
 
-package Test::Builder::Tester::Tie;
+package Test::Builder::Tester::Tie
 
 ##
 # add line(s) to be expected
 
 sub new($class, $type)
 
-    my $self = bless \%( got => '', type => $type ), $class
+    my $self = bless \(%:  got => '', type => $type ), $class
     open my $fh, '>', \$self->{+'got'} or die "$^OS_ERROR"
     $self->{+'filehandle'} = $fh
     return $self
@@ -582,7 +582,7 @@ sub reset
     my $self = shift
     seek $self->{?'filehandle'}, 0, 0
     $self->{+'got'} = ''
-    $self->{+'wanted'} = \@()
+    $self->{+'wanted'} = \@: 
 
 
 

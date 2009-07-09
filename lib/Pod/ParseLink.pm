@@ -25,7 +25,7 @@ package Pod::ParseLink
 
 our (@EXPORT, @ISA, $VERSION)
 
-use Exporter;
+use Exporter
 @ISA    = qw(Exporter)
 @EXPORT = qw(parselink)
 
@@ -46,12 +46,12 @@ sub _parse_section($link)
 
     # If the whole link is enclosed in quotes, interpret it all as a section
     # even if it contains a slash.
-    return  @(undef, $1) if ($link =~ m/^"\s*(.*?)\s*"$/)
+    return  (@: undef, $1) if ($link =~ m/^"\s*(.*?)\s*"$/)
 
     # Split into page and section on slash, and then clean up quoting in the
     # section.  If there is no section and the name contains spaces, also
     # guess that it's an old section link.
-    my @($page, ?$section) =  split (m/\s*\/\s*/, $link, 2)
+    my (@: $page, ?$section) =  split (m/\s*\/\s*/, $link, 2)
     $section =~ s/^"\s*(.*?)\s*"$/$1/ if $section
     if ($page && $page =~ m/ / && !defined ($section))
         $section = $page
@@ -60,7 +60,7 @@ sub _parse_section($link)
         $page = undef unless $page
         $section = undef unless $section
     
-    return  @($page, $section)
+    return  @: $page, $section
 
 
 # Infer link text from the page and section.
@@ -82,16 +82,16 @@ sub _infer_text($page, $section)
 sub parselink($link)
     $link =~ s/\s+/ /g
     if ($link =~ m/\A\w+:[^:\s]\S*\Z/)
-        return  @(undef, $link, $link, undef, 'url')
+        return  @: undef, $link, $link, undef, 'url'
     else
         my $text
         if ($link =~ m/\|/)
-            @($text, $link) =  split (m/\|/, $link, 2)
+            (@: $text, $link) =  split (m/\|/, $link, 2)
         
-        my @($name, $section) =  _parse_section ($link)
+        my (@: $name, $section) =  _parse_section ($link)
         my $inferred = $text || _infer_text ($name, $section)
         my $type = ($name && $name =~ m/\(\S*\)/) ?? 'man' !! 'pod'
-        return  @($text, $inferred, $name, $section, $type)
+        return  @: $text, $inferred, $name, $section, $type
     
 
 

@@ -34,7 +34,7 @@ open(my $manifest_fh, "<", "MANIFEST") or die "MANIFEST: $^OS_ERROR"
 
 my %mani
 my %mand = %: ".", 1
-use File::Basename < qw(dirname);
+use File::Basename < qw(dirname)
 
 while ( ~< $manifest_fh )
     if (m/^(\S+)\s+(.+)$/)
@@ -52,7 +52,7 @@ while ( ~< $manifest_fh )
 close($manifest_fh)
 
 my %find
-use File::Find;
+use File::Find
 find(sub (@< @_)
          my $n = $File::Find::name
          $n =~ s:^\./::

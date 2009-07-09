@@ -8,8 +8,8 @@ package Locale::Country
 
 
 require Exporter
-use Carp;
-use Locale::Constants;
+use Carp
+use Locale::Constants
 
 
 #-----------------------------------------------------------------------
@@ -186,9 +186,9 @@ sub rename_country
 
     $country = $CODES[$codeset]{?$code}
 
-    foreach my $cset (@(LOCALE_CODE_ALPHA_2,
-                                           LOCALE_CODE_ALPHA_3,
-                                           LOCALE_CODE_NUMERIC))
+    foreach my $cset ((@: LOCALE_CODE_ALPHA_2
+                                             LOCALE_CODE_ALPHA_3
+                                             LOCALE_CODE_NUMERIC))
         if ($cset == $codeset)
             $c = $code
         else
@@ -215,8 +215,8 @@ sub _code2codeset
     my $code = shift
 
 
-    foreach my $codeset (@(LOCALE_CODE_ALPHA_2, LOCALE_CODE_ALPHA_3,
-                                              LOCALE_CODE_NUMERIC))
+    foreach my $codeset ((@: LOCALE_CODE_ALPHA_2, LOCALE_CODE_ALPHA_3
+                                                LOCALE_CODE_NUMERIC))
         return $codeset if (exists $CODES[$codeset]{$code})
     
 
@@ -238,7 +238,7 @@ do
     while ( ~< $^DATA)
         next unless m/\S/
         chop
-        @($alpha2, $alpha3, $numeric, @< @countries) =  split(m/:/, $_)
+        (@: $alpha2, $alpha3, $numeric, @< @countries) =  split(m/:/, $_)
 
         $CODES[+LOCALE_CODE_ALPHA_2]{+$alpha2} = @countries[0]
         foreach my $country ( @countries)

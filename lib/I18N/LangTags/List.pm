@@ -15,7 +15,7 @@ do
     while( ~< $^DATA)
         if($seeking)
             $seeking = 0 if m/=for woohah/
-        elsif( @(?$disrec, ?$tag, ?$name) =
+        elsif( (@: ?$disrec, ?$tag, ?$name) =
             @: m/(\[?)\{([-0-9a-zA-Z]+)\}(?:\s*:)?\s*([^\[\]]+)/
             )
             $name =~ s/\s*[;\.]*\s*$//g
@@ -100,7 +100,7 @@ sub is_decent
     shift @supers if @supers[0] =~ m<^(i|x|sgn)$>s
     return 0 unless (nelems @supers)
 
-    foreach my $f (@($tag, < @supers))
+    foreach my $f ((@: $tag, < @supers))
         return 0 if %Is_Disrec{?$f}
         return 2 if %Name{?$f}
     # so that decent subforms of indecent tags are decent

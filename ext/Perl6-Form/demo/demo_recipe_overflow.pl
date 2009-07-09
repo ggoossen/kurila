@@ -21,7 +21,7 @@ Remove the legs from the lizard, the wings from the owlet, and the tongue of the
 EOHOW
 
 
-print $^STDOUT, < form \%(bullet=>'*'),
+print $^STDOUT, < form \(%: bullet=>'*'),
                        '=================[ {||||||||||||||||||||||||||} ]=================',
                        $recipe,
                        '                                                                  ',

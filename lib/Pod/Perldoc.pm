@@ -24,7 +24,7 @@ BEGIN   # Make a DEBUG constant very first thing...
     
 
 
-use Pod::Perldoc::GetOptsOO; # uses the DEBUG.
+use Pod::Perldoc::GetOptsOO # uses the DEBUG.
 
 #..........................................................................
 
@@ -108,15 +108,15 @@ sub opt_M_with($self, $classes)
 
 
 sub opt_V # report version and exit
-    print $^STDOUT, join '', @(
-        "Perldoc v$VERSION, under perl $^PERL_VERSION for $^OS_NAME",
+    print $^STDOUT, join '', @: 
+        "Perldoc v$VERSION, under perl $^PERL_VERSION for $^OS_NAME"
 
         (defined(&Win32::BuildNumber) and defined &Win32::BuildNumber())
-        ?? (" (win32 build ", < &Win32::BuildNumber(), ")") !! (),
+        ?? (" (win32 build ", < &Win32::BuildNumber(), ")") !! ()
 
-        (chr(65) eq 'A') ?? () !! " (non-ASCII)",
+        (chr(65) eq 'A') ?? () !! " (non-ASCII)"
 
-        "\n",)
+        "\n",
     
     exit
 
@@ -154,11 +154,11 @@ sub opt_o_with($self, $rest)
     # Figure out what class(es) that could actually mean...
 
     my @classes
-    foreach my $prefix (@("Pod::Perldoc::To", "Pod::Simple::", "Pod::"))
+    foreach my $prefix ((@: "Pod::Perldoc::To", "Pod::Simple::", "Pod::"))
         # Messy but smart:
-        foreach my $stem (@(
-            $rest,  # Yes, try it first with the given capitalization
-            lc("$rest"), ucfirst(lc("$rest")), uc("$rest")) # And then try variations
+        foreach my $stem (@: 
+            $rest  # Yes, try it first with the given capitalization
+            lc("$rest"), ucfirst(lc("$rest")), uc("$rest") # And then try variations
 
             )
             push @classes, $prefix . $stem
@@ -196,7 +196,7 @@ sub run  # to be called by the "perldoc" executable
 
 sub new  # yeah, nothing fancy
     my $class = shift
-    my $new = bless \%(< @_), (ref($class) || $class)
+    my $new = bless \(%: < @_), (ref($class) || $class)
     DEBUG +> 1 and print $^STDOUT, "New $class object $new\n"
     $new->init()
     $new
@@ -207,15 +207,15 @@ sub new  # yeah, nothing fancy
 sub aside  # If we're in -v or DEBUG mode, say this.
     my $self = shift
     if( DEBUG or $self->opt_v )
-        my $out = join( '', @(
-                 DEBUG ?? do
+        my $out = join( '', @: 
+                       DEBUG ?? do
                      my $callsub = (caller(1))[[3]]
-                     my $package = quotemeta(__PACKAGE__ . '::')
-                     $callsub =~ s/^$package/'/os
-                     # the o is justified, as $package really won't change.
-                     $callsub . ": "
-                  !! '',
-                 < @_,)
+                           my $package = quotemeta(__PACKAGE__ . '::')
+                           $callsub =~ s/^$package/'/os
+                           # the o is justified, as $package really won't change.
+                           $callsub . ": "
+                           !! ''
+                       < @_,
             )
         if(DEBUG) { print $^STDOUT, $out } else { print $^STDERR, $out }
     
@@ -338,8 +338,8 @@ sub init
      # Yeah, we could use a hashref, but maybe there's some class where options
      # have to be ordered; so we'll use an arrayref.
 
-     \@( '__bindir'  => $self->{?'bindir' } ),
-     \@( '__pod2man' => $self->{?'pod2man'} ),
+     \(@:  '__bindir'  => $self->{?'bindir' } ),
+     \(@:  '__pod2man' => $self->{?'pod2man'} ),
      ))
 
     DEBUG +> 3 and printf $^STDOUT, "Formatter switches now: [\%s]\n",
@@ -408,7 +408,7 @@ sub process
 
     my @pages
     $self->{+'pages'} = \@pages
-    if(    $self->opt_f) { @pages = @("perlfunc")               }
+    if(    $self->opt_f) { @pages = (@: "perlfunc")               }
         elsif( $self->opt_q) { @pages ="perlfaq1" .. "perlfaq9" }
     else                 { @pages = $self->{?'args'}->@;
     # @pages = __FILE__
@@ -543,7 +543,7 @@ sub render_and_page($self, $found_list)
 
     $self->maybe_generate_dynamic_pod($found_list)
 
-    my@($out, $formatter) =  $self->render_findings($found_list)
+    my(@: $out, $formatter) =  $self->render_findings($found_list)
 
     if($self->opt_d)
         printf $^STDOUT, "Perldoc (\%s) output saved to \%s\n",
@@ -764,7 +764,7 @@ sub maybe_generate_dynamic_pod($self, $found_things)
         DEBUG +> 4 and print $^STDOUT, "That's a non-dynamic pod search.\n"
     elsif ( (nelems @dynamic_pod) )
         $self->aside("Hm, I found some Pod from that search!\n")
-        my @($buffd, $buffer) =  $self->new_tempfile('pod', 'dyn')
+        my (@: $buffd, $buffer) =  $self->new_tempfile('pod', 'dyn')
 
         push  $self->{'temp_file_list'}->@, $buffer
         # I.e., it MIGHT be deleted at the end.
@@ -777,7 +777,7 @@ sub maybe_generate_dynamic_pod($self, $found_things)
 
         close $buffd        or die "Can't close $buffer: $^OS_ERROR"
 
-        $found_things->@ = @( $buffer )
+        $found_things->@ = @:  $buffer 
         # Yes, so found_things never has more than one thing in
         #  it, by time we leave here
 
@@ -964,7 +964,7 @@ sub render_findings($self, $found_things)
     # Set formatter options:
     if( ref $formatter )
         foreach my $f ( ( $self->{?'formatter_switches'} || \$@ )->@)
-            my @($switch, $value, ?$silent_fail) =  $f->@
+            my (@: $switch, $value, ?$silent_fail) =  $f->@
             if( $formatter->can($switch) )
                 try { $formatter->?$switch( defined($value) ?? $value !! () ) }
                 warn "Got an error when setting $formatter_class\->$switch:\n$^EVAL_ERROR\n"
@@ -982,7 +982,7 @@ sub render_findings($self, $found_things)
     $self->{+'output_is_binary'} =
       $formatter->can('write_with_binmode') && $formatter->write_with_binmode
 
-    my @($out_fh, $out) =  $self->new_output_file(
+    my (@: $out_fh, $out) =  $self->new_output_file(
         ( $formatter->can('output_extension') && $formatter->output_extension )
         || undef,
         $self->useful_filename_bit,
@@ -1025,7 +1025,7 @@ sub render_findings($self, $found_things)
     
 
     DEBUG and print $^STDOUT, "Finished writing to $out.\n"
-    return @($out, $formatter)
+    return @: $out, $formatter
 
 
 #..........................................................................
@@ -1130,7 +1130,7 @@ sub MSWin_perldoc_tempfile($self, $suffix, $infix)
         my $fh
         # If we are running before perl5.6.0, we can't autovivify
         DEBUG +> 3 and print $^STDOUT, "About to try making temp file $spec\n"
-        return @($fh, $spec) if open($fh, ">", $spec)    # XXX 5.6ism
+        return (@: $fh, $spec) if open($fh, ">", $spec)    # XXX 5.6ism
         $self->aside("Can't create temp file $spec: $^OS_ERROR\n")
     
 
@@ -1177,7 +1177,7 @@ sub minus_f_nocase($self, $dir, $file)
         return ''
     
 
-    my @p = @($dir)
+    my @p = @: $dir
     my($cip)
     foreach my $p ( splitdir $file)
         my $try = catfile < @p, $p
@@ -1333,10 +1333,10 @@ sub check_file($self, $dir, $file)
         # Should never get called:
         $Carp::Verbose = 1
         require Carp
-        Carp::croak( join '', @(
-            "Crazy ", __PACKAGE__, " error:\n",
-            "check_file must be an object_method!\n",
-            "Aborting")
+        Carp::croak( join '', @: 
+            "Crazy ", __PACKAGE__, " error:\n"
+            "check_file must be an object_method!\n"
+            "Aborting"
                      )
     
 
@@ -1437,7 +1437,7 @@ sub new_output_file
 
     DEBUG +> 3 and print $^STDOUT, "Successfully opened $outspec\n"
     binmode($fh) if $self->{?'output_is_binary'}
-    return @($fh, $outspec)
+    return @: $fh, $outspec
 
 
 #..........................................................................
@@ -1560,11 +1560,11 @@ sub searchfor($self, $recurse,$s,@< @dirs)
                     not m/^\.\.?\z/s and
                         not m/^auto\z/s  and   # save time! don't search auto dirs
                         -d  catfile($dir, $_)
-                }, @( readdir $d)
+                }, @:  readdir $d
             closedir($d)                or die "Can't closedir $dir: $^OS_ERROR"
             next unless (nelems @newdirs)
             # what a wicked map!
-            @newdirs = map( {@(s/\.dir\z//,$_)[1] }, @newdirs) if IS_VMS
+            @newdirs = map( {(@: s/\.dir\z//,$_)[1] }, @newdirs) if IS_VMS
             $self->aside( "Also looking in $(join ' ',@newdirs)\n" )
             push(@dirs,< @newdirs)
         

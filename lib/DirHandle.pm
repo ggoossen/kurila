@@ -40,7 +40,7 @@ with a volume name, a relative pathname should always begin with a
 
 =cut
 
-use Symbol;
+use Symbol
 
 sub new($class, ?$dir)
     my $dh = gensym
@@ -71,7 +71,7 @@ sub readdir($dh)
 
 
 sub readdirs($dh)
-    return @( CORE::readdir($dh) ) # Force list context.
+    return @:  CORE::readdir($dh)  # Force list context.
 
 
 sub rewind($dh)

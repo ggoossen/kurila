@@ -9,7 +9,7 @@ package B
 
 our $VERSION = '1.19'
 
-use XSLoader ();
+use XSLoader ()
 require Exporter
 our @ISA = qw(Exporter)
 
@@ -28,28 +28,28 @@ BEGIN
     XSLoader::load 'B'
 
 
-@B::SV::ISA = @( 'B::OBJECT' )
-@B::NULL::ISA = @( 'B::SV' )
-@B::PV::ISA = @( 'B::SV' )
-@B::IV::ISA = @( 'B::SV' )
-@B::NV::ISA = @( 'B::SV' )
+@B::SV::ISA = @:  'B::OBJECT' 
+@B::NULL::ISA = @:  'B::SV' 
+@B::PV::ISA = @:  'B::SV' 
+@B::IV::ISA = @:  'B::SV' 
+@B::NV::ISA = @:  'B::SV' 
 # RV is eliminated with 5.11.0, but effectively is a specialisation of IV now.
-@B::RV::ISA = @( 'B::IV' )
+@B::RV::ISA = @:  'B::IV' 
 @B::PVIV::ISA = qw(B::PV B::IV)
 @B::PVNV::ISA = qw(B::PVIV B::NV)
-@B::PVMG::ISA = @( 'B::PVNV' )
-@B::REGEXP::ISA = @( 'B::PVMG' )
+@B::PVMG::ISA = @:  'B::PVNV' 
+@B::REGEXP::ISA = @:  'B::PVMG' 
 # Change in the inheritance hierarchy post 5.9.0
-@B::PVLV::ISA = @( 'B::GV' )
-@B::BM::ISA = @( 'B::PVMG' )
-@B::AV::ISA = @( 'B::PVMG' )
-@B::GV::ISA = @( 'B::PVMG' )
-@B::HV::ISA = @( 'B::PVMG' )
-@B::CV::ISA = @( 'B::PVMG' )
-@B::IO::ISA = @( 'B::PVMG' )
-@B::FM::ISA = @( 'B::CV' )
+@B::PVLV::ISA = @:  'B::GV' 
+@B::BM::ISA = @:  'B::PVMG' 
+@B::AV::ISA = @:  'B::PVMG' 
+@B::GV::ISA = @:  'B::PVMG' 
+@B::HV::ISA = @:  'B::PVMG' 
+@B::CV::ISA = @:  'B::PVMG' 
+@B::IO::ISA = @:  'B::PVMG' 
+@B::FM::ISA = @:  'B::CV' 
 
-@B::SPECIAL::ISA = @( 'B::OBJECT' )
+@B::SPECIAL::ISA = @:  'B::OBJECT' 
 
 # bytecode.pl contained the following comment:
 # Nullsv *must* come first in the following so that the condition
@@ -139,8 +139,8 @@ sub compile_stats
 
 
 sub timing_info
-    my @($sec, $min, $hr) =@( localtime)
-    my @($user, $sys) = times
+    my (@: $sec, $min, $hr) =@:  localtime
+    my (@: $user, $sys) = times
     sprintf("\%02d:\%02d:\%02d user=$user sys=$sys",
         $hr, $min, $sec, $user, $sys)
 
@@ -238,7 +238,7 @@ do
 
     sub new($class, $section, $symtable, $default)
         $output_fh ||= FileHandle->new_tmpfile
-        my $obj = bless \@(-1, $section, $symtable, $default), $class
+        my $obj = bless \(@: -1, $section, $symtable, $default), $class
         %sections{+$section} = $obj
         return $obj
     

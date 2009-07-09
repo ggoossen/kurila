@@ -49,16 +49,16 @@ foreach my $in ( @in)
         die "What kind of line is <$in>?!"
             unless $in =~ m/^(.+)=>(.+)$/s
 
-        my@($i,$s) = @($1, $2)
-        @in     = @($i =~ m/(\S+)/g)
-        @should = @($s =~ m/(\S+)/g)
+        my(@: $i,$s) = @: $1, $2
+        @in     = @: $i =~ m/(\S+)/g
+        @should = @: $s =~ m/(\S+)/g
     #print "{@in}{@should}\n";
     
     my @out = Locale::Maketext->_add_supers(
         ("$(join ' ',@in)" eq 'NIX') ?? () !! < @in
         )
     #print "O: ", join(' ', map "<$_>", @out), "\n";
-    @out = @( 'NIX' ) unless (nelems @out)
+    @out = (@:  'NIX' ) unless (nelems @out)
 
 
     if( (nelems @out) == nelems @should

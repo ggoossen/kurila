@@ -3,7 +3,7 @@
 # Avoid using eq_array below as it uses .. internally.
 require './test.pl'
 
-use Config;
+use Config
 
 plan (101)
 
@@ -11,12 +11,12 @@ our (@a, @foo, @bar, @bcd, $e, $x, @x, @b, @y)
 
 is(join(':',1..5), '1:2:3:4:5')
 
-@foo = @(1,2,3,4,5,6,7,8,9)
-@foo[[2..4]] = @('c','d','e')
+@foo = @: 1,2,3,4,5,6,7,8,9
+@foo[[2..4]] = @: 'c','d','e'
 
 is(join(':', @foo[[@foo[0]..5]]), '2:c:d:e:6')
 
-@bar[[2..4]] = @('c','d','e')
+@bar[[2..4]] = @: 'c','d','e'
 is(join(':', @bar[[1..5]]), ':c:d:e:')
 
 TODO: do
@@ -34,7 +34,7 @@ for (1..100)
 is($x, 5050)
 
 $x = 0
-for (@((100, <2..99,1)))
+for ((@: (100, <2..99,1)))
     $x += $_
 
 is($x, 5050)
@@ -215,7 +215,7 @@ do
     ok(! defined($first), 'Range ineffectual')
 
 
-foreach my $ii (@(^~^0, ^~^0+1, ^~^0+(^~^0>>4)))
+foreach my $ii ((@: ^~^0, ^~^0+1, ^~^0+(^~^0>>4)))
     try {
         my $lim=0;
         for ($MAX_INT-10 .. $ii)
@@ -295,7 +295,7 @@ do
     ok(! defined($first), 'Range ineffectual')
 
 
-foreach my $ii (@(^~^0, ^~^0+1, ^~^0+(^~^0>>4)))
+foreach my $ii ((@: ^~^0, ^~^0+1, ^~^0+(^~^0>>4)))
     try {
         my $lim=0;
         for (-$ii .. $MIN_INT+10)

@@ -7,7 +7,7 @@
 print $^STDOUT, "1..5\n"
 
 # override it in main::
-use File::DosGlob 'glob';
+use File::DosGlob 'glob'
 
 # test if $_ takes as the default
 my $expected

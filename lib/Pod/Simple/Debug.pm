@@ -8,9 +8,9 @@ sub import
     if((nelems @_) == 2)
         $value = @_[1]
     elsif((nelems @_) == 3)
-        @($variable, $value) =  @_[[@(1,2)]]
+        (@: $variable, $value) =  @_[[(@: 1,2)]]
 
-        @($variable, $value) = @($value, $variable)
+        (@: $variable, $value) = @: $value, $variable
             if     defined $value    and ref($value)    eq 'SCALAR'
           and not(defined $variable and ref($variable) eq 'SCALAR')
          # tolerate getting it backwards

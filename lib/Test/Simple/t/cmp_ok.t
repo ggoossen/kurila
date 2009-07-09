@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -11,8 +11,8 @@ BEGIN
 
 
 require Test::Simple::Catch
-use env;
-my@($out, $err) =  Test::Simple::Catch::caught()
+use env
+my(@: $out, $err) =  Test::Simple::Catch::caught()
 local env::var('HARNESS_ACTIVE' ) = 0
 
 require Test::Builder
@@ -43,17 +43,17 @@ sub try_cmp_ok($left, $cmp, $right)
 
 
 
-use Test::More;
+use Test::More
 Test::More->builder->no_ending(1)
 
-my @Tests = @(
-    \@(1, '==', 1),
-    \@(1, '==', 2),
-    \@("a", "eq", "b"),
-    \@("a", "eq", "a"),
-    \@(1, "+", 1),
-    \@(1, "-", 1),
-    )
+my @Tests = @: 
+    \(@: 1, '==', 1)
+    \(@: 1, '==', 2)
+    \(@: "a", "eq", "b")
+    \(@: "a", "eq", "a")
+    \(@: 1, "+", 1)
+    \(@: 1, "-", 1)
+    
 
 # These don't work yet.
 if( 0 )
@@ -64,10 +64,10 @@ if( 0 )
     my $ify = Overloaded::Ify->new("bar", 23)
 
     push @Tests, (
-        \@($cmp, '==', 42),
-        \@($cmp, 'eq', "foo"),
-        \@($ify, 'eq', "bar"),
-        \@($ify, "==", 23),
+        \(@: $cmp, '==', 42),
+        \(@: $cmp, 'eq', "foo"),
+        \(@: $ify, 'eq', "bar"),
+        \(@: $ify, "==", 23),
         )
 
 

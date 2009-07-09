@@ -458,7 +458,7 @@ sub splitpath($self,$path, ?$nofile)
     my ($volume,$directory,$file)
 
     if ( $nofile )
-        @( $volume, $directory ) = @: $path =~ m|^((?:[^:]+:)?)(.*)|s
+        (@:  $volume, $directory ) = @: $path =~ m|^((?:[^:]+:)?)(.*)|s
     else
         $path =~
             m|^( (?: [^:]+: )? )
@@ -481,7 +481,7 @@ sub splitpath($self,$path, ?$nofile)
     
     $file = '' unless defined($file)
 
-    return  @($volume,$directory,$file)
+    return  @: $volume,$directory,$file
 
 
 
@@ -521,15 +521,15 @@ yields:
 =cut
 
 sub splitdir($self, ?$path)
-    my @result = @( () )
+    my @result = @:  () 
     my ($head, $sep, $tail, $volume, $directories)
 
     return @result if ( (!defined($path)) || ($path eq '') )
-    return  @(':') if ($path eq ':')
+    return  (@: ':') if ($path eq ':')
 
-    @( $volume, $sep, $directories ) = @: $path =~ m|^((?:[^:]+:)?)(:*)(.*)|s
+    (@:  $volume, $sep, $directories ) = @: $path =~ m|^((?:[^:]+:)?)(:*)(.*)|s
 
-    # deprecated, but handle it correctly
+                                          # deprecated, but handle it correctly
     if ($volume)
         push (@result, $volume)
         $sep .= ':'
@@ -546,7 +546,7 @@ sub splitdir($self, ?$path)
         
         $sep = ''
         if ($directories)
-            @( $head, $sep, $tail ) =
+            (@:  $head, $sep, $tail ) =
                 @: $directories =~ m|^((?:[^:]+)?)(:*)(.*)|s
             push (@result, $head)
             $directories = $tail
@@ -580,7 +580,7 @@ sub catpath($self,$volume,$directory,$file)
 
     # We look for a volume in $volume, then in $directory, but not both
 
-    my @($dir_volume, $dir_dirs, _) =  $self->splitpath($directory, 1)
+    my (@: $dir_volume, $dir_dirs, _) =  $self->splitpath($directory, 1)
 
     $volume = $dir_volume unless length $volume
     my $path = $volume # may be ''
@@ -665,8 +665,8 @@ sub abs2rel($self,$path,$base)
     
 
     # Split up paths - ignore $base's file
-    my @( $path_vol, $path_dirs, $path_file ) =   $self->splitpath( $path )
-    my @( $base_vol, $base_dirs, _ )             =   $self->splitpath( $base )
+    my (@:  $path_vol, $path_dirs, $path_file ) =   $self->splitpath( $path )
+    my (@:  $base_vol, $base_dirs, _ )             =   $self->splitpath( $base )
 
     return $path unless lc( $path_vol ) eq lc( $base_vol )
 
@@ -729,10 +729,10 @@ sub rel2abs($self,$path,?$base)
         # Split up paths
 
         # igonore $path's volume
-        my @( $path_dirs, $path_file ) =  ($self->splitpath($path))[[1..2]] 
+        my (@:  $path_dirs, $path_file ) =  ($self->splitpath($path))[[1..2]] 
 
         # ignore $base's file part
-        my @( $base_vol, $base_dirs, _ ) =  $self->splitpath($base) 
+        my (@:  $base_vol, $base_dirs, _ ) =  $self->splitpath($base) 
 
         # Glom them together
         $path_dirs = ':' if ($path_dirs eq '')

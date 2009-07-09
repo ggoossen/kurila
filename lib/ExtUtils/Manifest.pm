@@ -1,11 +1,11 @@
 package ExtUtils::Manifest
 
 require Exporter
-use Config;
-use File::Basename;
-use File::Copy 'copy';
-use File::Find;
-use File::Spec;
+use Config
+use File::Basename
+use File::Copy 'copy'
+use File::Find
+use File::Spec
 
 
 our ($VERSION, @ISA, @EXPORT_OK,
@@ -13,7 +13,7 @@ our ($VERSION, @ISA, @EXPORT_OK,
     ,          $Debug, $Verbose, $Quiet, $MANIFEST, $DEFAULT_MSKIP)
 
 $VERSION = '1.51_01'
-@ISA=@('Exporter')
+@ISA=@: 'Exporter'
 @EXPORT_OK = qw(mkmanifest
                 manicheck  filecheck  fullcheck  skipcheck
                 manifind   maniread   manicopy   maniadd
@@ -90,7 +90,7 @@ sub _sort
 sub mkmanifest
     my $manimiss = 0
     my $read = (-r 'MANIFEST' && maniread()) or $manimiss++
-    $read = \%() if $manimiss
+    $read = \(%: ) if $manimiss
     my $bakbase = $MANIFEST
     $bakbase =~ s/\./_/g if $Is_VMS # avoid double dots
     rename $MANIFEST, "$bakbase.bak" unless $manimiss
@@ -141,8 +141,8 @@ below the current directory.
 =cut
 
 sub manifind
-    my $p = shift || \%()
-    my $found = \%()
+    my $p = shift || \%: 
+    my $found = \%: 
 
     my $wanted = sub (@< @_)
         my $name = clean_up_filename($File::Find::name)
@@ -160,7 +160,7 @@ sub manifind
     # $File::Find::name is unavailable.
     # Also, it's okay to use / here, because MANIFEST files use Unix-style
     # paths.
-    find(\%(wanted => $wanted),
+    find(\(%: wanted => $wanted),
          $Is_MacOS ?? ":" !! ".")
 
     return $found
@@ -213,7 +213,7 @@ refs.
 =cut
 
 sub fullcheck
-    return @(\_check_files(), \_check_manifest())
+    return @: \_check_files(), \_check_manifest()
 
 
 
@@ -230,7 +230,7 @@ sub skipcheck(?$p)
     my $found = manifind()
     my $matches = _maniskip()
 
-    my @skipped = @( () )
+    my @skipped = @:  () 
     foreach my $file ( _sort < keys $found->%)
         if (&$matches($file))
             warn "Skipping $file\n"
@@ -246,10 +246,10 @@ sub skipcheck(?$p)
 sub _check_files
     my $p = shift
     my $dosnames=(defined(&Dos::UseLFN) && Dos::UseLFN()==0)
-    my $read = maniread() || \%()
+    my $read = maniread() || \%: 
     my $found = manifind($p)
 
-    my@(@missfile) =@( @( () ))
+    my(@: @missfile) =@:  (@:  () )
     foreach my $file ( _sort < keys $read->%)
         warn "Debug: manicheck checking from $MANIFEST $file\n" if $Debug
         if ($dosnames)
@@ -268,11 +268,11 @@ sub _check_files
 
 
 sub _check_manifest(?$p)
-    my $read = maniread() || \%()
+    my $read = maniread() || \%: 
     my $found = manifind($p)
     my $skip  = _maniskip()
 
-    my @missentry = @( () )
+    my @missentry = @:  () 
     foreach my $file ( _sort < keys $found->%)
         next if $skip->($file)
         warn "Debug: manicheck checking from disk $file\n" if $Debug
@@ -301,7 +301,7 @@ start with C<#> in the C<MANIFEST> file are discarded.
 
 sub maniread(?$mfile)
     $mfile ||= $MANIFEST
-    my $read = \%()
+    my $read = \%: 
     my $m
     unless (open $m, "<", $mfile)
         warn "Problem opening $mfile: $^OS_ERROR"
@@ -312,7 +312,7 @@ sub maniread(?$mfile)
         chomp
         next if m/^\s*#/
 
-        my @(?$file, ?$comment) = @: m/^(\S+)\s*(.*)/
+        my (@: ?$file, ?$comment) = @: m/^(\S+)\s*(.*)/
         next unless $file
 
         if ($Is_MacOS)
@@ -320,10 +320,10 @@ sub maniread(?$mfile)
             $file =~ s/\\([0-3][0-7][0-7])/$(sprintf("\%c", oct($1)))/g
         elsif ($Is_VMS)
             require File::Basename
-            my@($base,$dir) =  File::Basename::fileparse($file)
+            my(@: $base,$dir) =  File::Basename::fileparse($file)
             # Resolve illegal file specifications in the same way as tar
             $dir =~ s/./_/g
-            my@(@pieces) = split@(m/\./,$base)
+            my(@: @pieces) = split@: m/\./,$base
             if ((nelems @pieces) +> 2) { $base = shift(@pieces) . '.' . join('_', @pieces); }
             my $okfile = "$dir$base"
             warn "Debug: Illegal name $file changed to $okfile\n" if $Debug
@@ -373,7 +373,7 @@ sub _maniskip
 sub _check_mskip_directives
     my $mfile = shift
     local ($_)
-    my @lines = @( () )
+    my @lines = @:  () 
     my $flag = 0
     my $m
     unless (open $m, "<", $mfile)
@@ -430,7 +430,7 @@ sub _include_mskip_file
         warn "Problem opening $mskip: $^OS_ERROR"
         return
     
-    my @lines = @( () )
+    my @lines = @:  () 
     push @lines, "\n#!start included $mskip\n"
     push @lines, $_ while ~< $m
     close $m
@@ -466,7 +466,7 @@ sub manicopy($read,$target,$how)
     require File::Basename
 
     $target = VMS::Filespec::unixify($target) if $Is_VMS
-    File::Path::mkpath(\@( $target ),! $Quiet,$Is_VMS ?? undef !! 0755)
+    File::Path::mkpath(\(@:  $target ),! $Quiet,$Is_VMS ?? undef !! 0755)
     foreach my $file (keys $read->%)
         if ($Is_MacOS)
             if ($file =~ m!:!)
@@ -480,7 +480,7 @@ sub manicopy($read,$target,$how)
             if ($file =~ m!/!) # Ilya, that hurts, I fear, or maybe not?
                 my $dir = File::Basename::dirname($file)
                 $dir = VMS::Filespec::unixify($dir) if $Is_VMS
-                File::Path::mkpath(\@("$target/$dir"),! $Quiet,$Is_VMS ?? undef !! 0755)
+                File::Path::mkpath(\(@: "$target/$dir"),! $Quiet,$Is_VMS ?? undef !! 0755)
             
             cp_if_diff($file, "$target/$file", $how)
         
@@ -516,7 +516,7 @@ sub cp_if_diff($from, $to, $how)
 
 
 sub cp($srcFile, $dstFile)
-    my @($access,$mod) =  @(stat $srcFile)[[8..9]]
+    my (@: $access,$mod) =  (@: stat $srcFile)[[8..9]]
 
     copy($srcFile,$dstFile)
     utime $access, $mod + ($Is_VMS ?? 1 !! 0), $dstFile
@@ -525,7 +525,7 @@ sub cp($srcFile, $dstFile)
 
 
 sub ln
-    my @($srcFile, $dstFile) =  @_
+    my (@: $srcFile, $dstFile) =  @_
     return &cp( < @_ ) if $Is_VMS or ($^OS_NAME eq 'MSWin32' and Win32::IsWin95())
     link($srcFile, $dstFile)
 
@@ -541,7 +541,7 @@ sub ln
 # 3) If the owner can execute it, everyone can.
 sub _manicopy_chmod($srcFile, $dstFile)
 
-    my $perm = 0444 ^|^ @(stat $srcFile)[2] ^&^ 0700
+    my $perm = 0444 ^|^ (@: stat $srcFile)[2] ^&^ 0700
     chmod( $perm ^|^ ( $perm ^&^ 0100 ?? 0111 !! 0 ), $dstFile )
 
 
@@ -602,7 +602,7 @@ $file will be normalized (ie. Unixified).  B<UNIMPLEMENTED>
 =cut
 
 sub maniadd
-    my@($additions) =@( shift)
+    my(@: $additions) =@:  shift
 
     _normalize($additions)
     _fix_manifest($MANIFEST)
@@ -632,7 +632,7 @@ sub _fix_manifest
 
     # Yes, we should be using seek(), but I'd like to avoid loading POSIX
     # to get SEEK_*
-    my @manifest = @( ~< $manifest_fh )
+    my @manifest = @:  ~< $manifest_fh 
     close $manifest_fh
 
     unless( @manifest[-1] =~ m/\n\z/ )

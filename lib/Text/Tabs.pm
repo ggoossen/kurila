@@ -4,7 +4,7 @@ package Text::Tabs
 require Exporter
 
 
-our @ISA = @('Exporter')
+our @ISA = @: 'Exporter'
 our @EXPORT = qw(expand unexpand $tabstop)
 
 our ($VERSION, $tabstop, $debug)
@@ -53,7 +53,7 @@ sub unexpand
             
             s/  +$/\t/
         
-        $_ = join('', @(< @e, $lastbit))
+        $_ = join('', (@: < @e, $lastbit))
     
     return join("\n", @lines)
 

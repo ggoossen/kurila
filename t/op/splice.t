@@ -35,36 +35,36 @@ ok( j(splice(@a)) eq j(1,2,7,3) && j(< @a) eq '' )
 
 my $foo
 
-@a = @('red', 'green', 'blue')
+@a = @: 'red', 'green', 'blue'
 $foo = splice @a, 1, 2
 ok( $foo eq 'blue' )
 
-@a = @('red', 'green', 'blue')
+@a = @: 'red', 'green', 'blue'
 $foo = shift @a
 ok( $foo eq 'red' )
 
 # Bug [perl #30568] - insertions of deleted elements
-@a = @(1, 2, 3)
+@a = @: 1, 2, 3
 splice( @a, 0, 3, @a[1], @a[0] )
 ok( j(< @a) eq j(2,1) )
 
-@a = @(1, 2, 3)
+@a = @: 1, 2, 3
 splice( @a, 0, 3 ,@a[0], @a[1] )
 ok( j(< @a) eq j(1,2) )
 
-@a = @(1, 2, 3)
+@a = @: 1, 2, 3
 splice( @a, 0, 3 ,@a[2], @a[1], @a[0] )
 ok( j(< @a) eq j(3,2,1) )
 
-@a = @(1, 2, 3)
+@a = @: 1, 2, 3
 splice( @a, 0, 3, @a[0], @a[1], @a[2], @a[0], @a[1], @a[2] )
 ok( j(< @a) eq j(1,2,3,1,2,3) )
 
-@a = @(1, 2, 3)
+@a = @: 1, 2, 3
 splice( @a, 1, 2, @a[2], @a[1] )
 ok( j(< @a) eq j(1,3,2) )
 
-@a = @(1, 2, 3)
+@a = @: 1, 2, 3
 splice( @a, 1, 2, @a[1], @a[1] )
 ok( j(< @a) eq j(1,2,2) )
 

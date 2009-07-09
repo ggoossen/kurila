@@ -5,7 +5,7 @@
 #
 
 require Exporter
-package Math::Trig;
+package Math::Trig
 
 
 our ($VERSION, $PACKAGE, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS)
@@ -20,7 +20,7 @@ my @angcnv = qw(rad2deg rad2grad
 
 my @areal = qw(asin_real acos_real)
 
-@EXPORT = @(< @angcnv, < @areal)
+@EXPORT = @: < @angcnv, < @areal
 
 my @rdlcnv = qw(cartesian_to_cylindrical
 		cartesian_to_spherical
@@ -40,15 +40,15 @@ my @greatcircle = qw(
 
 my @pi = qw(pi pi2 pi4 pip2 pip4)
 
-@EXPORT_OK = @(< @rdlcnv, < @greatcircle, < @pi, 'tan' )
+@EXPORT_OK = @: < @rdlcnv, < @greatcircle, < @pi, 'tan' 
 
 # See e.g. the following pages:
 # http://www.movable-type.co.uk/scripts/LatLong.html
 # http://williams.best.vwh.net/avform.htm
 
-%EXPORT_TAGS = %('radial' => @rdlcnv,
-    'great_circle' => @greatcircle,
-    'pi'     => @pi)
+%EXPORT_TAGS = %: 'radial' => @rdlcnv
+                  'great_circle' => @greatcircle
+                  'pi'     => @pi
 
 sub tan($z)
     my $cz = cos($z)
@@ -122,32 +122,32 @@ sub cartesian_to_spherical( $x, $y, $z)
 
     my $rho = sqrt( $x * $x + $y * $y + $z * $z )
 
-    return  @( $rho,
-               atan2( $y, $x ),
-               $rho ?? acos_real( $z / $rho ) !! 0 )
+    return  @:  $rho
+                atan2( $y, $x )
+                $rho ?? acos_real( $z / $rho ) !! 0 
 
 
 sub spherical_to_cartesian( $rho, $theta, $phi)
 
-    return  @( $rho * cos( $theta ) * sin( $phi ),
-               $rho * sin( $theta ) * sin( $phi ),
-               $rho * cos( $phi   ) )
+    return  @:  $rho * cos( $theta ) * sin( $phi )
+                $rho * sin( $theta ) * sin( $phi )
+                $rho * cos( $phi   ) 
 
 
 sub spherical_to_cylindrical
-    my @( $x, $y, $z ) =  spherical_to_cartesian( < @_ )
+    my (@:  $x, $y, $z ) =  spherical_to_cartesian( < @_ )
 
-    return  @( sqrt( $x * $x + $y * $y ), @_[1], $z )
+    return  @:  sqrt( $x * $x + $y * $y ), @_[1], $z 
 
 
 sub cartesian_to_cylindrical( $x, $y, $z)
 
-    return  @( sqrt( $x * $x + $y * $y ), atan2( $y, $x ), $z )
+    return  @:  sqrt( $x * $x + $y * $y ), atan2( $y, $x ), $z 
 
 
 sub cylindrical_to_cartesian( $rho, $theta, $z)
 
-    return  @( $rho * cos( $theta ), $rho * sin( $theta ), $z )
+    return  @:  $rho * cos( $theta ), $rho * sin( $theta ), $z 
 
 
 sub cylindrical_to_spherical
@@ -167,7 +167,7 @@ sub great_circle_distance( $theta0, $phi0, $theta1, $phi1, ?$rho)
 
 
 sub great_circle_direction
-    my @( $theta0, $phi0, $theta1, $phi1 ) =  @_
+    my (@:  $theta0, $phi0, $theta1, $phi1 ) =  @_
 
     my $distance = &great_circle_distance( < @_ )
 
@@ -196,7 +196,7 @@ sub great_circle_waypoint( $theta0, $phi0, $theta1, $phi1, $point)
 
     my $sd = sin($d)
 
-    return  @($theta0, $phi0) if $sd == 0
+    return  (@: $theta0, $phi0) if $sd == 0
 
     my $A = sin((1 - $point) * $d) / $sd
     my $B = sin(     $point  * $d) / $sd
@@ -211,7 +211,7 @@ sub great_circle_waypoint( $theta0, $phi0, $theta1, $phi1, $point)
     my $theta = atan2($y, $x)
     my $phi   = acos_real($z)
 
-    return  @($theta, $phi)
+    return  @: $theta, $phi
 
 
 sub great_circle_midpoint
@@ -231,7 +231,7 @@ sub great_circle_destination( $theta0, $phi0, $dir0, $dst)
 
     $dir1 -= pi2 if $dir1 +> pi2
 
-    return  @($theta1, $phi1, $dir1)
+    return  @: $theta1, $phi1, $dir1
 
 
 1

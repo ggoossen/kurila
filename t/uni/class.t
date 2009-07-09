@@ -4,7 +4,7 @@ BEGIN
 
 plan tests => 4784
 
-use utf8;
+use utf8
 
 sub MyUniClass
     <<END
@@ -51,35 +51,35 @@ my $str
 $str = join "", map { chr($_) }, 0x20 .. 0x6F
 
 # make sure it finds built-in class
-is(@($str =~ m/(\p{Letter}+)/)[0], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-is(@($str =~ m/(\p{l}+)/)[0], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+is((@: $str =~ m/(\p{Letter}+)/)[0], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+is((@: $str =~ m/(\p{l}+)/)[0], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 
 # make sure it finds user-defined class
-is(@($str =~ m/(\p{main::MyUniClass}+)/)[0], '0123456789:;<=>?@ABCDEFGHIJKLMNO')
+is((@: $str =~ m/(\p{main::MyUniClass}+)/)[0], '0123456789:;<=>?@ABCDEFGHIJKLMNO')
 
 # make sure it finds class in other package
-is(@($str =~ m/(\p{Other::Class}+)/)[0], '@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_')
+is((@: $str =~ m/(\p{Other::Class}+)/)[0], '@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_')
 
 # make sure it finds class in other OTHER package
-is(@($str =~ m/(\p{A::B::Intersection}+)/)[0], '@ABCDEFGHIJKLMNO')
+is((@: $str =~ m/(\p{A::B::Intersection}+)/)[0], '@ABCDEFGHIJKLMNO')
 
 # all of these should look in lib/unicore/bc/AL.pl
 $str = "\x{070D}\x{070E}\x{070F}\x{0710}\x{0711}"
-is(@($str =~ m/(\P{BidiClass: ArabicLetter}+)/)[0], "\x{070E}\x{070F}")
-is(@($str =~ m/(\P{BidiClass: AL}+)/)[0], "\x{070E}\x{070F}")
-is(@($str =~ m/(\P{BC :ArabicLetter}+)/)[0], "\x{070E}\x{070F}")
-is(@($str =~ m/(\P{bc=AL}+)/)[0], "\x{070E}\x{070F}")
+is((@: $str =~ m/(\P{BidiClass: ArabicLetter}+)/)[0], "\x{070E}\x{070F}")
+is((@: $str =~ m/(\P{BidiClass: AL}+)/)[0], "\x{070E}\x{070F}")
+is((@: $str =~ m/(\P{BC :ArabicLetter}+)/)[0], "\x{070E}\x{070F}")
+is((@: $str =~ m/(\P{bc=AL}+)/)[0], "\x{070E}\x{070F}")
 
 # make sure InGreek works
 $str = "[\x{038B}\x{038C}\x{038D}]"
 
-is(@($str =~ m/(\p{InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}")
-is(@($str =~ m/(\p{Script:InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}")
-is(@($str =~ m/(\p{Script=InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}")
-is(@($str =~ m/(\p{sc:InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}")
-is(@($str =~ m/(\p{sc=InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}")
+is((@: $str =~ m/(\p{InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}")
+is((@: $str =~ m/(\p{Script:InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}")
+is((@: $str =~ m/(\p{Script=InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}")
+is((@: $str =~ m/(\p{sc:InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}")
+is((@: $str =~ m/(\p{sc=InGreek}+)/)[0], "\x{038B}\x{038C}\x{038D}")
 
-use File::Spec;
+use File::Spec
 my $updir = 'File::Spec'->updir
 
 # the %utf8::... hashes are already in existence
@@ -87,10 +87,10 @@ my $updir = 'File::Spec'->updir
 
 *utf8::PropertyAlias = *utf8::PropertyAlias # thwart a warning
 
-no warnings 'utf8'; # we do not want warnings about surrogates etc
+no warnings 'utf8' # we do not want warnings about surrogates etc
 
 sub char_range
-    my @($h1, $h2) = @_
+    my (@: $h1, $h2) = @_
 
     my $str
 
@@ -100,7 +100,7 @@ sub char_range
 
 
 # non-General Category and non-Script
-while (my @(?$abbrev, ?$files) =@( each %utf8::PVA_abbr_map))
+while (my (@: ?$abbrev, ?$files) =(@:  each %utf8::PVA_abbr_map))
     my $prop_name = %utf8::PropertyAlias{?$abbrev}
     next unless $prop_name
     next if $abbrev eq "gc_sc"
@@ -111,12 +111,12 @@ while (my @(?$abbrev, ?$files) =@( each %utf8::PVA_abbr_map))
             )
 
         next unless -e $filename
-        my @($h1, $h2) =  map { hex }, (split(m/\t/, (evalfile $filename), 3))[[0..1]]
+        my (@: $h1, $h2) =  map { hex }, (split(m/\t/, (evalfile $filename), 3))[[0..1]]
 
         my $str = char_range($h1, $h2)
 
-        for my $p (@($prop_name, $abbrev))
-            for my $c (@($files{?$_}, $_))
+        for my $p ((@: $prop_name, $abbrev))
+            for my $c ((@: $files{?$_}, $_))
                 is($str =~ m/(\p{$p: $c}+)/ && $1, substr($str, 0, -1), "$filename - $p - $c")
                 is($str =~ m/(\P{$p= $c}+)/ && $1, substr($str, -1))
             
@@ -125,19 +125,19 @@ while (my @(?$abbrev, ?$files) =@( each %utf8::PVA_abbr_map))
 
 
 # General Category and Script
-for my $p (@('gc', 'sc'))
-    while (my @(?$abbr, ?_) =@( each  %utf8::PropValueAlias{$p}))
+for my $p ((@: 'gc', 'sc'))
+    while (my (@: ?$abbr, ?_) =(@:  each  %utf8::PropValueAlias{$p}))
         my $filename = 'File::Spec'->catfile(
             $updir => lib => unicore => lib => gc_sc => "%utf8::PVA_abbr_map{gc_sc}{?$abbr}.pl"
             )
 
         next unless -e $filename
-        my @($h1, $h2) =  map { hex }, (split(m/\t/, (evalfile $filename), 3))[[0..1]]
+        my (@: $h1, $h2) =  map { hex }, (split(m/\t/, (evalfile $filename), 3))[[0..1]]
 
         my $str = char_range($h1, $h2)
 
-        for my $x (@($p, %( gc => 'General Category', sc => 'Script' ){?$p}))
-            for my $y (@($abbr, %utf8::PropValueAlias{$p}{?$abbr}, %utf8::PVA_abbr_map{gc_sc}{?$abbr}))
+        for my $x ((@: $p, (%:  gc => 'General Category', sc => 'Script' ){?$p}))
+            for my $y ((@: $abbr, %utf8::PropValueAlias{$p}{?$abbr}, %utf8::PVA_abbr_map{gc_sc}{?$abbr}))
                 is($str =~ m/(\p{$x: $y}+)/ && $1, substr($str, 0, -1))
                 is($str =~ m/(\P{$x= $y}+)/ && $1, substr($str, -1))
                 SKIP: do
@@ -165,7 +165,7 @@ SKIP:
 
     my $dirname = 'File::Spec'->catdir($updir => lib => unicore => lib => 'gc_sc')
     opendir my $dh, $dirname or die $^OS_ERROR
-    %files{[@(readdir($dh))]} = $@
+    %files{[(@: readdir($dh))]} = $@
     closedir $dh
 
     for (keys %utf8::PA_reverse)
@@ -174,13 +174,13 @@ SKIP:
 
         my $filename = 'File::Spec'->catfile($dirname, $leafname)
 
-        my @($h1, $h2) =  map { hex }, split(m/\t/, (evalfile $filename), 3)[[0..1]]
+        my (@: $h1, $h2) =  map { hex }, split(m/\t/, (evalfile $filename), 3)[[0..1]]
 
         my $str = char_range($h1, $h2)
 
-        for my $x (@('gc', 'General Category'))
+        for my $x ((@: 'gc', 'General Category'))
             print $^STDOUT, "# $filename $x $_, %utf8::PA_reverse{?$_}\n"
-            for my $y (@($_, %utf8::PA_reverse{?$_}))
+            for my $y ((@: $_, %utf8::PA_reverse{?$_}))
                 is($str =~ m/(\p{$x: $y}+)/ && $1, substr($str, 0, -1))
                 is($str =~ m/(\P{$x= $y}+)/ && $1, substr($str, -1))
                 test_regexp ($str, $y)
@@ -199,7 +199,7 @@ for ( grep { %utf8::Canonical{?$_} =~ m/^In/ }, keys %utf8::Canonical)
 
     print $^STDOUT, "# In$_ $filename\n"
 
-    my @($h1, $h2) =  map { hex }, split(m/\t/, (evalfile $filename), 3)[[0..1]]
+    my (@: $h1, $h2) =  map { hex }, split(m/\t/, (evalfile $filename), 3)[[0..1]]
 
     my $str = char_range($h1, $h2)
 

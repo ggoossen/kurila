@@ -3,13 +3,13 @@
 my $Is_VMS = $^OS_NAME eq 'VMS'
 
 
-use Config < qw|config_keys config_value|;
-use Cwd;
-use File::Path;
-use File::Basename;
-use File::Spec;
+use Config < qw|config_keys config_value|
+use Cwd
+use File::Path
+use File::Basename
+use File::Spec
 
-use Test::More tests => 51;
+use Test::More tests => 51
 
 BEGIN { use_ok( 'ExtUtils::Installed' ) }
 
@@ -20,7 +20,7 @@ my $ei = bless( \$%, 'ExtUtils::Installed' )
 
 # Make sure meta info is available
 $ei->{+':private:'}{+Config} = %+:
-    map { %($_ => config_value($_)) }, config_keys()
+    map { (%: $_ => config_value($_)) }, config_keys()
 $ei->{':private:'}{+INC} = $^INCLUDE_PATH
 
 # _is_prefix
@@ -105,7 +105,7 @@ do
     $config_override{+sitearchexp} = $fake_mod_dir
     $config_override{+version} = 'fake_test_version'
 
-    my @inc_override = @(< $^INCLUDE_PATH, $fake_mod_dir)
+    my @inc_override = @: < $^INCLUDE_PATH, $fake_mod_dir
 
     my $realei = ExtUtils::Installed->new(
         'config_override' => $config_override,
@@ -127,7 +127,7 @@ push $^INCLUDE_PATH, $fake_mod_dir
 # Check if extra_libs works.
 do
     my $realei = ExtUtils::Installed->new(
-        'extra_libs' => \@( cwd() ),
+        'extra_libs' => \(@:  cwd() ),
         )
     isa_ok( $realei, 'ExtUtils::Installed' )
     isa_ok( $realei->{Perl}{?packlist}, 'ExtUtils::Packlist' )
@@ -152,18 +152,18 @@ is( join(' ', $ei->modules()), 'abc def ghi',
 is( (nelems $ei->modules), 3,    'modules() in scalar context' )
 
 # files
-$ei->{+goodmod} = \%(
-    packlist => \%(
-    (config_value("man1direxp") ??
-             (File::Spec->catdir(config_value("man1direxp"), 'foo') => 1) !!
-             ()),
-    (config_value("man3direxp") ??
-                 (File::Spec->catdir(config_value("man3direxp"), 'bar') => 1) !!
-                 ()),
-    File::Spec->catdir($prefix, 'foobar') => 1,
-    foobaz  => 1,
-    ),
+$ei->{+goodmod} = \%: 
+    packlist => \(%: 
+        (config_value("man1direxp") ??
+            (File::Spec->catdir(config_value("man1direxp"), 'foo') => 1) !!
+            ())
+        (config_value("man3direxp") ??
+            (File::Spec->catdir(config_value("man3direxp"), 'bar') => 1) !!
+            ())
+        File::Spec->catdir($prefix, 'foobar') => 1
+        foobaz  => 1
     )
+    
 
 dies_like( sub (@< @_) { $ei->files('badmod') },
            qr/badmod is not installed/,'files() should croak given bad modname')
@@ -191,7 +191,7 @@ is( scalar nelems @files, 1, '... should find doc file in correct dir' )
 like( @files[0], qr/foobar[>\]]?$/, '... checking file name' )
 @files = $ei->files('goodmod')
 is( scalar nelems @files, 2 + $mandirs, '... should find all files with no type specified' )
-my %dirnames = %( < @+: map { @: lc($_) => dirname($_) }, @files )
+my %dirnames = %:  < @+: map { @: lc($_) => dirname($_) }, @files 
 
 # directories
 my @dirs = $ei->directories('goodmod', 'prog', 'fake')
@@ -223,10 +223,10 @@ SKIP: do
 
 my $fakepak = Fakepak->new(102)
 
-$ei->{+yesmod} = \%(
-    version         => 101,
-    packlist        => $fakepak,
-    )
+$ei->{+yesmod} = \%: 
+    version         => 101
+    packlist        => $fakepak
+    
 
 # these should all croak
 foreach my $sub (qw( validate packlist version ))

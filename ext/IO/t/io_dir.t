@@ -12,7 +12,7 @@ BEGIN
 iohandle::output_autoflush($^STDERR, 1)
 iohandle::output_autoflush($^STDOUT, 1)
 
-use IO::Dir < qw(DIR_UNLINK);
+use IO::Dir < qw(DIR_UNLINK)
 
 my $tcount = 0
 
@@ -34,7 +34,7 @@ my $first
 loop { $first = $dot->read } while defined($first) && $first =~ m/^\./
 ok( grep { $_ eq $first }, @a )
 
-my @b = sort( @($first, (< grep {m/^[^.]/}, $dot->read_all)))
+my @b = sort( (@: $first, (< grep {m/^[^.]/}, $dot->read_all)))
 ok(join("\0", @a) eq join("\0", @b))
 
 $dot->rewind

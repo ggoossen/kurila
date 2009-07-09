@@ -22,11 +22,11 @@ my $Have_IPC_Open3  = $Class->can_use_ipc_open3
 $IPC::Cmd::VERBOSE  = $IPC::Cmd::VERBOSE = $Verbose
 
 ### run tests in various configurations, based on what modules we have
-my @Prefs = @(
-    \@( $Have_IPC_Run, $Have_IPC_Open3 ),
-    \@( 0,             $Have_IPC_Open3 ),
-    \@( 0,             0 )
-    )
+my @Prefs = @: 
+    \(@:  $Have_IPC_Run, $Have_IPC_Open3 )
+    \(@:  0,             $Have_IPC_Open3 )
+    \@:  0,             0 
+    
 
 ### can_run tests
 do
@@ -36,11 +36,11 @@ do
 
 ### run tests that print only to stdout
 do   ### list of commands and regexes matching output ###
-    my $map = \@(
+    my $map = \@: 
         # command                                    # output regex
-        \@( "$^EXECUTABLE_NAME -v",                                  qr/gerard\s+goossen/i, ),
-        \@( \@($^EXECUTABLE_NAME, '-v'),                               qr/gerard\s+goossen/i, ),
-        )
+        \(@:  "$^EXECUTABLE_NAME -v",                                  qr/gerard\s+goossen/i, )
+        \(@:  \(@: $^EXECUTABLE_NAME, '-v'),                               qr/gerard\s+goossen/i, )
+        
 
     diag( "Running tests that print only to stdout" ) if $Verbose
     ### for each configuarion
@@ -111,11 +111,11 @@ do   ### list of commands and regexes matching output ###
 ### XXX lots of duplication from stdout tests, only difference
 ### is buffer inspection
 do   ### list of commands and regexes matching output ###
-    my $map = \@(
+    my $map = \@: 
         # command                                    # output regex
-        \@( "$^EXECUTABLE_NAME -e'warn 42'",                          qr/^42 /, ),
-        \@( \@($^EXECUTABLE_NAME, "-e'warn 42'"),                       qr/^42 /, ),
-        )
+        \(@:  "$^EXECUTABLE_NAME -e'warn 42'",                          qr/^42 /, )
+        \(@:  \(@: $^EXECUTABLE_NAME, "-e'warn 42'"),                       qr/^42 /, )
+        
 
     diag( "Running tests that print only to stderr" ) if $Verbose
     ### for each configuarion

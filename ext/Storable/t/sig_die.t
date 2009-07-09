@@ -11,7 +11,7 @@ use Config
 sub BEGIN
     if (env::var('PERL_CORE'))
         chdir('t') if -d 't'
-        $^INCLUDE_PATH = @('.', '../lib')
+        $^INCLUDE_PATH = @: '.', '../lib'
     else
         unshift $^INCLUDE_PATH, 't'
     
@@ -35,6 +35,6 @@ $^DIE_HOOK  = sub (@< @_) { require Carp; warn < Carp::longmess(); warn "Evil di
 
 require Storable
 
-Storable::dclone(\%(foo => "bar"))
+Storable::dclone(\(%: foo => "bar"))
 
 is(join("", @warns), "", "__DIE__ is not evil here")

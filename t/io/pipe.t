@@ -50,7 +50,7 @@ SKIP: do
 
     my $raw = "abc\nrst\rxyz\r\nfoo\n"
     if (open($pipe, "-|", "-"))
-        $_ = join '', @( ~< $pipe)
+        $_ = join '', @:  ~< $pipe
         (my $raw1 = $_) =~ s/not ok \d+ - //
         my @r  = map { ord }, split m//, $raw
         my @r1 = map { ord }, split m//, $raw1
@@ -73,7 +73,7 @@ SKIP: do
         printf $pipe, "not ok \%d - $raw", curr_test()
         close $pipe        # avoid zombies
     else
-        $_ = join '', @( ~< $^STDIN)
+        $_ = join '', @:  ~< $^STDIN
         (my $raw1 = $_) =~ s/not ok \d+ - //
         my @r  = map { ord }, split m//, $raw
         my @r1 = map { ord }, split m//, $raw1

@@ -32,7 +32,7 @@ See L<perlvar> for a complete list of these.
 
 =cut
 
-no warnings;
+no warnings
 
 my $globbed_match 
 

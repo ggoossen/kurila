@@ -4,47 +4,47 @@ use warnings
 use File::Spec
 our $VERSION = '1.06'
 
-use bytes ();		# for $bytes::hint_bits
+use bytes ()		# for $bytes::hint_bits
 
-use utf8;
+use utf8
 
-my %alias1 = %(
+my %alias1 = %: 
     # Icky 3.2 names with parentheses.
-    'LINE FEED'		=> 'LINE FEED (LF)',
-    'FORM FEED'		=> 'FORM FEED (FF)',
-    'CARRIAGE RETURN'	=> 'CARRIAGE RETURN (CR)',
-    'NEXT LINE'		=> 'NEXT LINE (NEL)',
+    'LINE FEED'		=> 'LINE FEED (LF)'
+    'FORM FEED'		=> 'FORM FEED (FF)'
+    'CARRIAGE RETURN'	=> 'CARRIAGE RETURN (CR)'
+    'NEXT LINE'		=> 'NEXT LINE (NEL)'
     # Convenience.
-    'LF'			=> 'LINE FEED (LF)',
-    'FF'			=> 'FORM FEED (FF)',
-    'CR'			=> 'CARRIAGE RETURN (CR)',
-    'NEL'			=> 'NEXT LINE (NEL)',
+    'LF'			=> 'LINE FEED (LF)'
+    'FF'			=> 'FORM FEED (FF)'
+    'CR'			=> 'CARRIAGE RETURN (CR)'
+    'NEL'			=> 'NEXT LINE (NEL)'
     # More convenience.  For futher convencience,
     # it is suggested some way using using the NamesList
     # aliases is implemented.
-    'ZWNJ'			=> 'ZERO WIDTH NON-JOINER',
-    'ZWJ'			=> 'ZERO WIDTH JOINER',
-    'BOM'			=> 'BYTE ORDER MARK',
-    )
+    'ZWNJ'			=> 'ZERO WIDTH NON-JOINER'
+    'ZWJ'			=> 'ZERO WIDTH JOINER'
+    'BOM'			=> 'BYTE ORDER MARK'
+    
 
-my %alias2 = %(
+my %alias2 = %: 
     # Pre-3.2 compatibility (only for the first 256 characters).
-    'HORIZONTAL TABULATION'	=> 'CHARACTER TABULATION',
-    'VERTICAL TABULATION'	=> 'LINE TABULATION',
-    'FILE SEPARATOR'	=> 'INFORMATION SEPARATOR FOUR',
-    'GROUP SEPARATOR'	=> 'INFORMATION SEPARATOR THREE',
-    'RECORD SEPARATOR'	=> 'INFORMATION SEPARATOR TWO',
-    'UNIT SEPARATOR'	=> 'INFORMATION SEPARATOR ONE',
-    'PARTIAL LINE DOWN'	=> 'PARTIAL LINE FORWARD',
-    'PARTIAL LINE UP'	=> 'PARTIAL LINE BACKWARD',
-    )
+    'HORIZONTAL TABULATION'	=> 'CHARACTER TABULATION'
+    'VERTICAL TABULATION'	=> 'LINE TABULATION'
+    'FILE SEPARATOR'	=> 'INFORMATION SEPARATOR FOUR'
+    'GROUP SEPARATOR'	=> 'INFORMATION SEPARATOR THREE'
+    'RECORD SEPARATOR'	=> 'INFORMATION SEPARATOR TWO'
+    'UNIT SEPARATOR'	=> 'INFORMATION SEPARATOR ONE'
+    'PARTIAL LINE DOWN'	=> 'PARTIAL LINE FORWARD'
+    'PARTIAL LINE UP'	=> 'PARTIAL LINE BACKWARD'
+    
 
 my %alias3 = $%
 my $txt
 
 sub alias(@< @_)
     (nelems @_) or return %alias3
-    my $alias = ref @_[0] ?? @_[0] !! \%( < @_ )
+    my $alias = ref @_[0] ?? @_[0] !! \%:  < @_ 
     %alias3{[keys $alias->%]} =  values $alias->%
  # alias
 
@@ -57,13 +57,13 @@ sub alias_file($arg)
     else
         die "Charnames alias files can only have identifier characters"
     
-    if (my @alias = @( evalfile $file ))
+    if (my @alias = (@:  evalfile $file ))
         (nelems @alias) == 1 && !defined @alias[0] and
             die "$file cannot be used as alias file for charnames"
         (nelems @alias) % 2 and
             die "$file did not return a (valid) list of alias pairs"
         alias (< @alias)
-        return  @(1)
+        return  @: 1
     
     0
  # alias_file
@@ -106,7 +106,7 @@ sub charnames
         ## The short name is like "greek:Sigma"
         unless (defined $hexstr)
             if ($^HINTS{?charnames_short} and $name =~ m/^(.+?):(.+)/s)
-                my @($script, $cname) = @($1, $2)
+                my (@: $script, $cname) = @: $1, $2
                 my $case = $cname =~ m/[[:upper:]]/ ?? "CAPITAL" !! "SMALL"
                 my $uc_cname = uc($cname)
                 my $uc_script = uc($script)
@@ -155,7 +155,7 @@ sub import
     ##
     ## fill %h keys with our @_ args.
     ##
-    my @($promote, %h, @args) = @(0, $%, $@)
+    my (@: $promote, %h, @args) = @: 0, $%, $@
     while (my $arg = shift)
         if ($arg eq ":alias")
             (nelems @_) or
@@ -182,8 +182,8 @@ sub import
         
         push @args, $arg
     
-    (nelems @args) == 0 && $promote and @args = @(":full")
-    %h{[ @args]} = @(1) x nelems @args
+    (nelems @args) == 0 && $promote and @args = @: ":full"
+    %h{[ @args]} = (@: 1) x nelems @args
 
     $^HINTS{+charnames_full} = delete %h{':full'}
     $^HINTS{+charnames_short} = delete %h{':short'}

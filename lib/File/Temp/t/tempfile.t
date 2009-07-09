@@ -32,7 +32,7 @@ END { foreach ( @dirs)  { ok( !(-d $_) )} }
 # the ones that File::Temp configures since END blocks are evaluated
 # in revers order and we need to check the files *after* File::Temp
 # removes them
-use File::Temp < qw/ tempfile tempdir/;
+use File::Temp < qw/ tempfile tempdir/
 
 # Now we start the tests properly
 ok(1)
@@ -40,7 +40,7 @@ ok(1)
 
 # Tempfile
 # Open tempfile in some directory, unlink at end
-my @($fh, $tempfile) =  tempfile(
+my (@: $fh, $tempfile) =  tempfile(
     UNLINK => 1,
     SUFFIX => '.txt',
     )
@@ -67,7 +67,7 @@ ok( (-d $tempdir) )
 push(@dirs, $tempdir)
 
 # Create file in the temp dir
-@($fh, $tempfile) =  tempfile(
+(@: $fh, $tempfile) =  tempfile(
     DIR => $tempdir,
     UNLINK => 1,
     SUFFIX => '.dat',
@@ -80,7 +80,7 @@ push(@files, $tempfile)
 
 # Test tempfile
 # ..and again
-@($fh, $tempfile) =  tempfile(
+(@: $fh, $tempfile) =  tempfile(
     DIR => $tempdir,
     )
 
@@ -90,7 +90,7 @@ push(@files, $tempfile)
 
 # Test tempfile
 # ..and another with changed permissions (read-only)
-@($fh, $tempfile) =  tempfile(
+(@: $fh, $tempfile) =  tempfile(
     DIR => $tempdir,
     )
 chmod 0444, $tempfile
@@ -102,7 +102,7 @@ print $^STDOUT, "# TEMPFILE: Created $tempfile\n"
 
 # and another (with template)
 
-@($fh, $tempfile) =  tempfile( 'helloXXXXXXX',
+(@: $fh, $tempfile) =  tempfile( 'helloXXXXXXX',
                                DIR => $tempdir,
                                UNLINK => 1,
                                SUFFIX => '.dat',
@@ -116,7 +116,7 @@ push(@files, $tempfile)
 
 # Create a temporary file that should stay around after
 # it has been closed
-@($fh, $tempfile) =  tempfile( 'permXXXXXXX', UNLINK => 0 )
+(@: $fh, $tempfile) =  tempfile( 'permXXXXXXX', UNLINK => 0 )
 print $^STDOUT, "# TEMPFILE: Created $tempfile\n"
 ok( -f $tempfile )
 ok( close( $fh ) )

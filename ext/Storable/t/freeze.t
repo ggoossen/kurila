@@ -9,7 +9,7 @@
 BEGIN 
     if (env::var('PERL_CORE'))
         chdir('t') if -d 't'
-        $^INCLUDE_PATH = @('.', '../lib', '../ext/Storable/t')
+        $^INCLUDE_PATH = @: '.', '../lib', '../ext/Storable/t'
     else 
         unshift $^INCLUDE_PATH, 't'
     
@@ -29,9 +29,9 @@ our $d = \$%
 our $e = \$@
 $d->{+'a'} = $e
 $e->[+0] = $d
-our %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$c)
-our @a = @('first', undef, 3, -4, -3.14159, 456, 4.5, $d, \$d, \$e, $e,
-           $b, \$a, $a, $c, \$c, \%a)
+our %a = %: 'key', 'value', 1, 0, $a, $b, 'cvar', \$c
+our @a = @: 'first', undef, 3, -4, -3.14159, 456, 4.5, $d, \$d, \$e, $e
+            $b, \$a, $a, $c, \$c, \%a
 
 ok defined (our $f1 = freeze(\@a))
 
@@ -54,7 +54,7 @@ sub make
     return $self
 ;
 
-package main;
+package main
 
 our $foo = FOO->make
 ok(our $f2 = $foo->freeze)
@@ -77,13 +77,13 @@ ok length($other) == length($f2)
 our $root2 = thaw($other)
 ok &dump($root2) eq &dump($root)
 
-our $VAR1 = \@(
- 'method',
- 1,
- 'prepare',
+our $VAR1 = \@: 
+ 'method'
+ 1
+ 'prepare'
  q|SELECT table_name, table_owner, num_rows FROM iitables
                   where table_owner != '$ingres' and table_owner != 'DBA'|
-    )
+    
 
 our $x = nfreeze($VAR1)
 our $VAR2 = thaw($x)
@@ -104,7 +104,7 @@ try {
 }
 ok $^EVAL_ERROR
 
-my %to_be_frozen = %(foo => 'bar')
+my %to_be_frozen = %: foo => 'bar'
 my $frozen
 try {
     $frozen = freeze \%to_be_frozen;
@@ -113,7 +113,7 @@ ok !$^EVAL_ERROR
 
 freeze \$%
 try { thaw $thaw_me }
-try { $frozen = freeze \%( foo => \$% ) }
+try { $frozen = freeze \(%:  foo => \$% ) }
 ok !$^EVAL_ERROR
 
 thaw $frozen			# used to segfault here

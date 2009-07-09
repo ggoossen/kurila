@@ -14,14 +14,14 @@ do
 do
     # OPf_ASSIGN_PART
     my $x
-    @($x) = qw|aap|
+    (@: $x) = qw|aap|
     is( $x, "aap" )
 
 
 do
     # OPf_OPTIONAL
     my $x = "aap"
-    @( ? $x ) = $@
+    (@:  ? $x ) = $@
     is( $x, undef )
 
 
@@ -29,7 +29,7 @@ do
     # check initialization to new value
     my @refs
     for (1..2)
-        my @($x) = qw|aap|
+        my (@: $x) = qw|aap|
         push @refs, \$x
     
     isnt( @refs[0], @refs[1] )

@@ -422,9 +422,9 @@ with re-writing this manpage.
 #############################################################################
 
 #use diagnostics;
-use Config;
-use Exporter;
-use File::Spec;
+use Config
+use Exporter
+use File::Spec
 
 our (@ISA, @EXPORT)
 @EXPORT = qw(&pod2usage)
@@ -447,12 +447,12 @@ sub pod2usage
     if ((nelems @_) +> 0)
         ## Too many arguments - assume that this is a hash and
         ## the user forgot to pass a reference to it.
-        %opts = %($_, < @_)
+        %opts = %: $_, < @_
     elsif (!defined $_)
         $_ = ""
     elsif (ref $_)
         ## User passed a ref to a hash
-        %opts = %( < $_->% )  if (ref($_) eq 'HASH')
+        %opts = (%:  < $_->% )  if (ref($_) eq 'HASH')
     elsif (m/^[-+]?\d+$/)
         ## User passed in the exit value to use
         %opts{+"exitval"} =  $_
@@ -494,12 +494,12 @@ sub pod2usage
 
     ## Look up input file in path if it doesnt exist.
     unless ((ref %opts{?"input"}) || (-e %opts{?"input"}))
-        my @($basename) = @(%opts{?"input"})
+        my (@: $basename) = @: %opts{?"input"}
         my $pathsep = ($^OS_NAME =~ m/^(?:dos|os2|MSWin32)$/) ?? ";"
             !! (($^OS_NAME eq 'MacOS' || $^OS_NAME eq 'VMS') ?? ',' !!  ":")
         my $pathspec = %opts{?"pathlist"} || env::var('PATH') || env::var('PERL5LIB')
 
-        my @paths = @( (ref $pathspec) ?? < $pathspec->@ !! < split($pathsep, $pathspec) )
+        my @paths = @:  (ref $pathspec) ?? < $pathspec->@ !! < split($pathsep, $pathspec) 
         for my $dirname ( @paths)
             local $_ = File::Spec->catfile($dirname, $basename) if length $dirname
             last if (-e $_) && (%opts{+"input"} = $_)
@@ -550,20 +550,20 @@ sub pod2usage
 sub new
     my $this = shift
     my $class = ref($this) || $this
-    my %params = %( < @_ )
-    my $self = \%(< %params)
+    my %params = %:  < @_ 
+    my $self = \%: < %params
     bless $self, $class
     if ($self->can('initialize'))
         $self->initialize()
     else
         $self = $self->SUPER::new()
-        $self->% = %(< $self->%, < %params)
+        $self->% = %: < $self->%, < %params
     
     return $self
 
 
 sub select
-    my @($self, @< @res) =  @_
+    my (@: $self, @< @res) =  @_
     if (@ISA[0]->can('select'))
         $self->SUPER::select(< @_)
     else

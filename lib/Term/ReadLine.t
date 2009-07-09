@@ -4,24 +4,24 @@
 BEGIN 
     if ( env::var('PERL_CORE') )
         chdir 't' if -d 't'
-        $^INCLUDE_PATH = @( '../lib' )
+        $^INCLUDE_PATH = @:  '../lib' 
     
 
 
 package Term::ReadLine::Mock
-our @ISA = @( 'Term::ReadLine::Stub' )
+our @ISA = @:  'Term::ReadLine::Stub' 
 sub ReadLine {'Term::ReadLine::Mock'};
 sub readline { "a line" }
 sub new      { bless \$% }
 
-package main;
+package main
 
-use Test::More tests => 14;
+use Test::More tests => 14
 
 BEGIN 
     env::var('PERL_RL' ) = 'Mock' # test against our instrumented class
 
-use Term::ReadLine;
+use Term::ReadLine
 
 my $t = Term::ReadLine->new( 'test term::readline')
 

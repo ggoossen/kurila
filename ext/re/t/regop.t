@@ -2,7 +2,7 @@
 
 BEGIN { require "./test.pl"; }
 our $NUM_SECTS
-my @strs = map { chomp ; $_ }, grep { !m/^\s*\#/ }, @( ~< $^DATA)
+my @strs = map { chomp ; $_ }, grep { !m/^\s*\#/ }, @:  ~< $^DATA
 my $out = runperl(progfile => "../ext/re/t/regop.pl", stderr => 1 )
 # VMS currently embeds linefeeds in the output.
 $out =~ s/\cJ//g if $^OS_NAME = 'VMS'
@@ -20,7 +20,7 @@ ok( defined $out, 'regop.pl returned something defined' )
 $out ||= ""
 my $test= 1
 foreach my $testout (  @tests )
-    my @( $pattern )= @: $testout=~m/Compiling REx "([^"]+)"/
+    my (@:  $pattern )= @: $testout=~m/Compiling REx "([^"]+)"/
     ok( $pattern, "Pattern for test " . ($test++) )
     my $diaged
 

@@ -23,7 +23,7 @@ test_test("test_fail first")
 
 # test_diag
 
-use Test::Builder;
+use Test::Builder
 my $test = Test::Builder->new()
 
 test_diag("this is a test string","so is this")

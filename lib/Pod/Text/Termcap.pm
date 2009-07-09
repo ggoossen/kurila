@@ -22,7 +22,7 @@ use POSIX ()
 use Term::Cap
 
 our (@ISA, $VERSION)
-use utf8;
+use utf8
 
 @ISA = qw(Pod::Text)
 
@@ -58,7 +58,7 @@ sub new($self, @< @args)
     
 
     # Fall back on the ANSI escape sequences if Term::Cap doesn't work.
-    $term = Term::Cap->Tgetent( \%( TERM => undef, OSPEED => $ospeed ))
+    $term = Term::Cap->Tgetent( \(%:  TERM => undef, OSPEED => $ospeed ))
     $self->{+BOLD} = $term->{?_md} || "\e[1m"
     $self->{+UNDL} = $term->{?_us} || "\e[4m"
     $self->{+NORM} = $term->{?_me} || "\e[m"

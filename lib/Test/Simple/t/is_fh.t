@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -21,7 +21,7 @@ END { close $file; 1 while unlink 'foo' }
 ok( Test::Builder->is_fh(\$file->*) )
 ok( Test::Builder->is_fh(\$file->*) )
 
-package Lying::isa;
+package Lying::isa
 
 sub isa
     my $self = shift

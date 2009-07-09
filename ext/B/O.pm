@@ -2,13 +2,13 @@ package O
 
 our $VERSION = '1.00'
 
-use B < qw(minus_c save_BEGINs);
-use Carp;
+use B < qw(minus_c save_BEGINs)
+use Carp
 
 my $saveout
 
 sub import($class, @< @options)
-    my @($quiet, $veryquiet) = @(0, 0)
+    my (@: $quiet, $veryquiet) = @: 0, 0
     if (@options[0] eq '-q' || @options[0] eq '-qq')
         $quiet = 1
         open ($saveout, ">&", $^STDOUT)

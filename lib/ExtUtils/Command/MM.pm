@@ -87,7 +87,7 @@ If no arguments are given to pod2man it will read from @ARGV.
 =cut
 
 sub pod2man
-    local @ARGV = @( (nelems @_) ?? < @_ !! < @ARGV )
+    local @ARGV = @:  (nelems @_) ?? < @_ !! < @ARGV 
 
     require Pod::Man
     require Getopt::Long
@@ -116,8 +116,8 @@ sub pod2man
     delete %options{lax}
 
     do  # so 'next' works
-        my @($pod, $man) = @: splice(@ARGV, 0, 2)
-
+        my (@: $pod, $man) = @: splice(@ARGV, 0, 2)
+                              
         next if ((-e $man) &&
                  (-M $man +< -M $pod) &&
                  (-M $man +< -M "Makefile"))
@@ -187,12 +187,12 @@ Key/value pairs are extra information about the module.  Fields include:
 =cut
 
 sub perllocal_install
-    my@($type, $name) = @: splice(@ARGV, 0, 2)
+    my(@: $type, $name) = @: splice(@ARGV, 0, 2)
 
-    # VMS feeds args as a piped file on STDIN since it usually can't
-    # fit all the args on a single command line.
-    my @mod_info = @( $Is_VMS ?? < split m/\|/, ~< $^STDIN
-                      !! < @ARGV )
+                           # VMS feeds args as a piped file on STDIN since it usually can't
+                           # fit all the args on a single command line.
+    my @mod_info = @:  $Is_VMS ?? < split m/\|/, ~< $^STDIN
+                           !! < @ARGV 
 
     my $pod
     $pod = sprintf <<POD, scalar localtime
@@ -203,8 +203,8 @@ sub perllocal_install
 POD
 
     loop
-        my@($key, $val) = @: splice(@mod_info, 0, 2)
-
+        my(@: $key, $val) = @: splice(@mod_info, 0, 2)
+                             
         $pod .= <<POD
  =item *
  
@@ -232,7 +232,7 @@ uninstallation.
 =cut
 
 sub uninstall
-    my@($packlist) =@( shift @ARGV)
+    my(@: $packlist) =@:  shift @ARGV
 
     require ExtUtils::Install
 

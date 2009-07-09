@@ -2,9 +2,9 @@ package B::Terse
 
 our $VERSION = '1.05'
 
-use B < qw(class @specialsv_name);
-use B::Concise < qw(concise_subref set_style_standard);
-use Carp;
+use B < qw(class @specialsv_name)
+use B::Concise < qw(concise_subref set_style_standard)
+use Carp
 
 sub terse($order, ?$subref)
     set_style_standard("terse")
@@ -36,7 +36,7 @@ sub B::OP::terse
 
 
 sub B::SV::terse
-    my@($sv, $level) = @(< @_, 0)
+    my(@: $sv, $level) = @: < @_, 0
     my %info
     B::Concise::concise_sv($sv, \%info)
     my $s = indent($level)
@@ -47,13 +47,13 @@ sub B::SV::terse
 
 
 sub B::NULL::terse
-    my @($sv, $level) = @(< @_, 0)
+    my (@: $sv, $level) = @: < @_, 0
     my $s = indent($level) . sprintf '%s (0x%lx)', class($sv), $sv->$
     $s
 
 
 sub B::SPECIAL::terse
-    my @($sv, $level) = @(< @_, 0)
+    my (@: $sv, $level) = @: < @_, 0
     my $s = indent($level)
         . sprintf( '%s #%d %s', class($sv), $sv->$, @specialsv_name[$sv->$])
     $s

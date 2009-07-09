@@ -10,7 +10,7 @@ BEGIN
 			$n_name	    	@n_aliases
 			$n_addrtype 	$n_net
 		   )
-    %EXPORT_TAGS = %( FIELDS => @EXPORT_OK +@+ @EXPORT )
+    %EXPORT_TAGS = %:  FIELDS => @EXPORT_OK +@+ @EXPORT 
 
 our ($n_name, @n_aliases, $n_addrtype, $n_net)
 
@@ -20,19 +20,19 @@ sub import
     return Exporter::import(< @_)
 
 
-use Class::Struct < qw(struct);
-struct 'Net::netent' => \@(
-       name             => '$',
-       aliases  => '@',
-       addrtype => '$',
-       net              => '$',
-       )
+use Class::Struct < qw(struct)
+struct 'Net::netent' => \@: 
+       name             => '$'
+       aliases  => '@'
+       addrtype => '$'
+       net              => '$'
+       
 
 sub populate
     return unless (nelems @_)
     my $nob = new()
     $n_name      =    $nob->[0]              = @_[0]
-    @n_aliases   = @(  $nob->[1]->@ = split ' ', @_[1] )
+    @n_aliases   = @:   $nob->[1]->@ = split ' ', @_[1] 
     $n_addrtype  =    $nob->[2]              = @_[2]
     $n_net       =    $nob->[3]              = @_[3]
     return $nob

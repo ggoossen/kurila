@@ -4,7 +4,7 @@ package Pod::Perldoc::ToXml
 use warnings
 our ($VERSION)
 
-use base < qw( Pod::Simple::XMLOutStream );
+use base < qw( Pod::Simple::XMLOutStream )
 
 $VERSION   # so that ->VERSION is happy
     # stop CPAN from seeing this

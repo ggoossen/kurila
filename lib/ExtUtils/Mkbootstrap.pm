@@ -4,10 +4,10 @@ package ExtUtils::Mkbootstrap
 our $VERSION = '6.44'
 
 require Exporter
-our @ISA = @('Exporter')
-our @EXPORT = @('&Mkbootstrap')
+our @ISA = @: 'Exporter'
+our @EXPORT = @: '&Mkbootstrap'
 
-use Config;
+use Config
 
 our $Verbose = 0
 our @dl_resolve_using
@@ -30,8 +30,8 @@ sub Mkbootstrap($baseext, @< @bsloadlibs)
     if (-f "$($baseext)_BS")
         $_ = "$($baseext)_BS"
         package DynaLoader; # execute code as if in DynaLoader
-        local our @($osname, $dlsrc) = @(undef, undef) # avoid warnings
-        @($osname, $dlsrc) =  map { config_value($_) }, qw(osname dlsrc)
+        local our (@: $osname, $dlsrc) = @: undef, undef # avoid warnings
+        (@: $osname, $dlsrc) =  map { config_value($_) }, qw(osname dlsrc)
         our $bscode = ""
         unshift $^INCLUDE_PATH, "."
         require $_
@@ -43,7 +43,7 @@ sub Mkbootstrap($baseext, @< @bsloadlibs)
         push(@dl_resolve_using, < dl_findfile('-lc'))
     
 
-    my @all = @(< @bsloadlibs, < @DynaLoader::dl_resolve_using)
+    my @all = @: < @bsloadlibs, < @DynaLoader::dl_resolve_using
     my $method = ''
     if (@all)
         open my $bs, ">", "$baseext.bs"

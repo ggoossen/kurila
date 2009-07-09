@@ -10,8 +10,8 @@ my $file="../lib/unicore/CaseFolding.txt"
 open my $fh,"<",$file or die "Failed to read '$file': $^OS_ERROR"
 while (~< $fh)
     chomp
-    my @(?$line, ?$comment)=  split m/\s+#\s+/, $_
-    my @(?$cp, ?$type, @< @fc)= split m/[\s;]+/,$line||''
+    my (@: ?$line, ?$comment)=  split m/\s+#\s+/, $_
+    my (@: ?$cp, ?$type, @< @fc)= split m/[\s;]+/,$line||''
     next unless $type and ($type eq 'F' or $type eq 'C')
     for (@fc)
         $_="\\x\{$_\}"
@@ -30,6 +30,6 @@ while (~< $fh)
         $count++
     
 
-eval join ";\n", @("plan tests=>".($count-1),< @tests,"1")
+eval join ";\n", @: "plan tests=>".($count-1),< @tests,"1"
     or die $^EVAL_ERROR
 __DATA__

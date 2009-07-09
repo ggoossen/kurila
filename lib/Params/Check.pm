@@ -29,9 +29,9 @@ BEGIN
     $CALLER_DEPTH           = 0
 
 
-my %known_keys = %( < @+: map { @: $_ => 1 },
-    qw| required allow default strict_type no_override
-                        store defined | )
+my %known_keys = %:  < @+: map { @: $_ => 1 }
+                     qw| required allow default strict_type no_override
+                        store defined | 
 
 =pod
 
@@ -454,7 +454,7 @@ sub _clean_up_args
     ### don't even bother to loop, if there's nothing to clean up ###
     return @_[0] if $PRESERVE_CASE and !$STRIP_LEADING_DASHES
 
-    my %args = %( < @_[0]->% )
+    my %args = %:  < @_[0]->% 
 
     ### keys are note aliased ###
     for my $key (keys %args)
@@ -533,7 +533,7 @@ sub _safe_eq
 sub _who_was_it
     my $level = @_[?0] || 0
 
-    return @(caller(2 + $CALLER_DEPTH + $level))[?3] || 'ANON'
+    return (@: caller(2 + $CALLER_DEPTH + $level))[?3] || 'ANON'
 
 
 =head2 last_error()
@@ -552,7 +552,7 @@ do
     $_ERROR_STRING = ''
 
     sub _store_error
-        my@($err, $verbose, $offset) =  @_[[0..2]]
+        my(@: $err, $verbose, $offset) =  @_[[0..2]]
         $verbose ||= 0
         $offset  ||= 0
         my $level   = 1 + $offset

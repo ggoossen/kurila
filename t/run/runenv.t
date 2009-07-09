@@ -32,7 +32,7 @@ env::var('PERL5OPT') = undef
 # supplied $stdout and $stderr argument strings exactly.
 # second element is an explanation of the failure
 sub runperl
-    my @($env, $args, $stdout, $stderr) =  @_
+    my (@: $env, $args, $stdout, $stderr) =  @_
 
     unshift $args->@, '-I../lib'
 
@@ -42,23 +42,23 @@ sub runperl
     local env::var('PERL5LIB') = undef
     local env::var('PERL5OPT') = undef
     my $pid = fork
-    return  @(0, "Couldn't fork: $^OS_ERROR") unless defined $pid   # failure
+    return  (@: 0, "Couldn't fork: $^OS_ERROR") unless defined $pid   # failure
     if ($pid)                   # parent
         my ($actual_stdout, $actual_stderr)
         wait
-        return  @(0, "Failure in child.\n") if ($^CHILD_ERROR>>8) == $FAILURE_CODE
+        return  (@: 0, "Failure in child.\n") if ($^CHILD_ERROR>>8) == $FAILURE_CODE
 
-        open my $f, "<", $STDOUT or return  @(0, "Couldn't read $STDOUT file")
+        open my $f, "<", $STDOUT or return  @: 0, "Couldn't read $STDOUT file"
         do { local $^INPUT_RECORD_SEPARATOR = undef; $actual_stdout = ~< $f }
-        open $f, "<", $STDERR or return  @(0, "Couldn't read $STDERR file")
+        open $f, "<", $STDERR or return  @: 0, "Couldn't read $STDERR file"
         do { local $^INPUT_RECORD_SEPARATOR = undef; $actual_stderr = ~< $f }
 
         if ($actual_stdout ne $stdout)
-            return  @(0, "Stdout mismatch: expected:\n[$stdout]\nsaw:\n[$actual_stdout]")
+            return  @: 0, "Stdout mismatch: expected:\n[$stdout]\nsaw:\n[$actual_stdout]"
         elsif ($actual_stderr ne $stderr)
-            return  @(0, "Stderr mismatch: expected:\n[$stderr]\nsaw:\n[$actual_stderr]")
+            return  @: 0, "Stderr mismatch: expected:\n[$stderr]\nsaw:\n[$actual_stderr]"
         else
-            return @(1, '')                 # success
+            return @: 1, ''                 # success
         
     else                      # child
         my $old = %+: map { %: $_ => env::var($_) }, keys $env->%
@@ -82,7 +82,7 @@ sub it_didnt_work
 
 
 sub tryrun
-    my @($success, $reason) =  runperl(< @_)
+    my (@: $success, $reason) =  runperl(< @_)
     ok( $success, $reason )
 
 
@@ -96,60 +96,60 @@ sub tryrun
 #                    -T, tainting will be enabled, and any
 #                    subsequent options ignored.
 
-tryrun(\%(PERL5OPT => '-w'), \@('-e', 'print $^STDOUT, $main::x'),
+tryrun(\(%: PERL5OPT => '-w'), \(@: '-e', 'print $^STDOUT, $main::x'),
        "",
        qq{Name "main::x" used only once: possible typo
 Use of uninitialized value \$main::x in print at -e line 1 character 1.
 })
 
-tryrun(\%(PERL5OPT => '-MExporter'), \@('-e0'),
+tryrun(\(%: PERL5OPT => '-MExporter'), \(@: '-e0'),
        "",
        "")
 
 # Fails in 5.6.0
-tryrun(\%(PERL5OPT => '-MExporter -MExporter'), \@('-e0'),
+tryrun(\(%: PERL5OPT => '-MExporter -MExporter'), \(@: '-e0'),
        "",
        "")
 
-tryrun(\%(PERL5OPT => '-Mwarnings'),
-       \@('-e', 'print $^STDOUT, "ok" if $^INCLUDED{"warnings.pm"}'),
+tryrun(\(%: PERL5OPT => '-Mwarnings'),
+       \(@: '-e', 'print $^STDOUT, "ok" if $^INCLUDED{"warnings.pm"}'),
        "ok",
        "")
 
-tryrun(\%(PERL5OPT => '-w -w'),
-       \@('-e', 'print $^STDOUT, env::var(q[PERL5OPT])'),
+tryrun(\(%: PERL5OPT => '-w -w'),
+       \(@: '-e', 'print $^STDOUT, env::var(q[PERL5OPT])'),
        '-w -w',
        '')
 
-tryrun(\%(PERLLIB => "foobar$(config_value('path_sep'))42"),
-       \@('-e', 'print $^STDOUT, < grep { $_ eq "foobar" }, $^INCLUDE_PATH'),
+tryrun(\(%: PERLLIB => "foobar$(config_value('path_sep'))42"),
+       \(@: '-e', 'print $^STDOUT, < grep { $_ eq "foobar" }, $^INCLUDE_PATH'),
        'foobar',
        '')
 
-tryrun(\%(PERLLIB => "foobar$(config_value('path_sep'))42"),
-       \@('-e', 'print $^STDOUT, < grep { $_ eq "42" }, $^INCLUDE_PATH'),
+tryrun(\(%: PERLLIB => "foobar$(config_value('path_sep'))42"),
+       \(@: '-e', 'print $^STDOUT, < grep { $_ eq "42" }, $^INCLUDE_PATH'),
        '42',
        '')
 
-tryrun(\%(PERL5LIB => "foobar$(config_value('path_sep'))42"),
-       \@('-e', 'print $^STDOUT, < grep { $_ eq "foobar" }, $^INCLUDE_PATH'),
+tryrun(\(%: PERL5LIB => "foobar$(config_value('path_sep'))42"),
+       \(@: '-e', 'print $^STDOUT, < grep { $_ eq "foobar" }, $^INCLUDE_PATH'),
        'foobar',
        '')
 
-tryrun(\%(PERL5LIB => "foobar$(config_value('path_sep'))42"),
-       \@('-e', 'print $^STDOUT, < grep { $_ eq "42" }, $^INCLUDE_PATH'),
+tryrun(\(%: PERL5LIB => "foobar$(config_value('path_sep'))42"),
+       \(@: '-e', 'print $^STDOUT, < grep { $_ eq "42" }, $^INCLUDE_PATH'),
        '42',
        '')
 
-tryrun(\%(PERL5LIB => "foo",
-       PERLLIB => "bar"),
-       \@('-e', 'print $^STDOUT, < grep { $_ eq "foo" }, $^INCLUDE_PATH'),
+tryrun(\(%: PERL5LIB => "foo"
+            PERLLIB => "bar"),
+       \(@: '-e', 'print $^STDOUT, < grep { $_ eq "foo" }, $^INCLUDE_PATH'),
        'foo',
        '')
 
-tryrun(\%(PERL5LIB => "foo",
-       PERLLIB => "bar"),
-       \@('-e', 'print $^STDOUT, < grep { $_ eq "bar" }, $^INCLUDE_PATH'),
+tryrun(\(%: PERL5LIB => "foo"
+            PERLLIB => "bar"),
+       \(@: '-e', 'print $^STDOUT, < grep { $_ eq "bar" }, $^INCLUDE_PATH'),
        '',
        '')
 

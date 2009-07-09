@@ -1,6 +1,6 @@
 use Perl6::Form
 
-my @files = @( ~< $^DATA )
+my @files = @:  ~< $^DATA 
 my $files = join "", @files
 
 print $^STDOUT, "Number of cols: "

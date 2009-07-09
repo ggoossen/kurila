@@ -11,7 +11,7 @@ plan tests => 37
 # 'A' 65	ASCII
 # 'A' 193	EBCDIC
 
-use utf8;
+use utf8
 
 ok(ord('A') == 65 || ord('A') == 193, "ord('A') is ".ord('A'))
 

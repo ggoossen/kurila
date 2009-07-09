@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't' if -d 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -20,8 +20,8 @@ unless( try { require Data::Dumper } )
 plan tests => 11
 
 
-use MakeMaker::Test::Utils;
-use MakeMaker::Test::Setup::BFD;
+use MakeMaker::Test::Utils
+use MakeMaker::Test::Setup::BFD
 
 # 'make disttest' sets a bunch of environment variables which interfere
 # with our testing.
@@ -55,7 +55,7 @@ do
     my $PREREQ_PM = undef  # shut up "used only once" warning.
     eval $prereq_out
     die if $^EVAL_ERROR
-    main::is_deeply( $PREREQ_PM, %( strict => 0 ), 'prereqs dumped' )
+    main::is_deeply( $PREREQ_PM, (%:  strict => 0 ), 'prereqs dumped' )
     main::is( $^EVAL_ERROR, '',                             '  without error' )
 
 

@@ -6,7 +6,7 @@ BEGIN
 
 plan tests => 1286
 
-use utf8;
+use utf8
 
 is(
     sprintf("\%.40g ",0.01),
@@ -20,7 +20,7 @@ is(
     )
 
 # cases of $i > 1 are against [perl #39126]
-for my $i (@(1, 5, 10, 20, 50, 100))
+for my $i ((@: 1, 5, 10, 20, 50, 100))
     chop(my $utf8_format = "\%-*s\x{100}")
     my $string = "\x[B4]"x$i        # latin1 ACUTE or ebcdic COPYRIGHT
     my $expect = $string."  "x$i  # followed by 2*$i spaces
@@ -29,7 +29,7 @@ for my $i (@(1, 5, 10, 20, 50, 100))
 
 
 # check simultaneous width & precision with wide characters
-for my $i (@(1, 3, 5, 10))
+for my $i ((@: 1, 3, 5, 10))
     my $string = "\x{0410}"x($i+10)   # cyrillic capital A
     my $expect = "\x{0410}"x$i        # cut down to exactly $i characters
     my $format = "\%$i.$($i)s"
@@ -41,12 +41,12 @@ for my $i (@(1, 3, 5, 10))
 fresh_perl_is(
     'print sprintf "xxx\%n\n"; print undef',
     'Modification of a read-only value attempted at - line 1 character 7.',
-    \%( switches => \@( '-w' ) ),
+    \(%:  switches => \(@:  '-w' ) ),
     q(%n should not be able to modify read-only constants),
     )
 
 # check overflows
-for (@(int(^~^0/2+1), ^~^0, "9999999999999999999"))
+for ((@: int(^~^0/2+1), ^~^0, "9999999999999999999"))
     dies_like( sub (@< @_) {sprintf "\%$($_)d", 0},
                qr/^Integer overflow in format string for sprintf/, "overflow in sprintf")
     dies_like( sub (@< @_) {printf $^STDOUT, "\%$($_)d\n", 0},
@@ -55,7 +55,7 @@ for (@(int(^~^0/2+1), ^~^0, "9999999999999999999"))
 
 # check %NNN$ for range bounds
 do
-    my @($warn, $bad) = @(0,0)
+    my (@: $warn, $bad) = @: 0,0
     local $^WARN_HOOK = sub (@< @_)
         if (@_[0]->{?description} =~ m/uninitialized/)
             $warn++
@@ -86,7 +86,7 @@ do
 
 
 sub mysprintf_int_flags
-    my @($fmt, $num) =  @_
+    my (@: $fmt, $num) =  @_
     die "wrong format $fmt" if $fmt !~ m/^%([-+ 0]+)([1-9][0-9]*)d\z/
     my $flag  = $1
     my $width = $2
@@ -107,11 +107,11 @@ sub mysprintf_int_flags
 # Whole tests for "%4d" with 2 to 4 flags;
 # total counts: 3 * (4**2 + 4**3 + 4**4) == 1008
 
-my @flags = @("-", "+", " ", "0")
-for my $num (@(0, -1, 1))
+my @flags = @: "-", "+", " ", "0"
+for my $num ((@: 0, -1, 1))
     for my $f1 ( @flags)
         for my $f2 ( @flags)
-            for my $f3 (@('', < @flags)) # '' for doubled flags
+            for my $f3 ((@: '', < @flags)) # '' for doubled flags
                 my $flag = $f1.$f2.$f3
                 my $width = 4
                 my $fmt   = '%'."$($flag)$($width)d"

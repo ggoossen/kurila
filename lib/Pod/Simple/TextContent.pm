@@ -8,7 +8,7 @@ use Carp ()
 use Pod::Simple ()
 our (@ISA, $VERSION)
 $VERSION = '2.02'
-@ISA = @('Pod::Simple')
+@ISA = @: 'Pod::Simple'
 
 sub new
     my $self = shift

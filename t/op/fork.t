@@ -41,7 +41,7 @@ for ( @prgs)
     if (s/^\s*(-\w.*)//)
         $switch = $1
     
-    my@($prog,$expected) =  split(m/\nEXPECT\n/, $_)
+    my(@: $prog,$expected) =  split(m/\nEXPECT\n/, $_)
     $expected =~ s/\n+$//
     # results can be in any order, so sort 'em
     my @expected = sort split m/\n/, $expected

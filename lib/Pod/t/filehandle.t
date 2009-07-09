@@ -8,21 +8,21 @@
 # This program is free software; you may redistribute it and/or modify it
 # under the same terms as Perl itself.
 
-use TestInit;
+use TestInit
 
-BEGIN {
-    $^OUTPUT_AUTOFLUSH = 1;
-    print $^STDOUT, "1..3\n";
-}
+BEGIN 
+    $^OUTPUT_AUTOFLUSH = 1
+    print $^STDOUT, "1..3\n"
 
-use Pod::Man;
-use Pod::Text;
 
-print $^STDOUT, "ok 1\n";
+use Pod::Man
+use Pod::Text
 
-my $man = Pod::Man->new or die "Cannot create parser\n";
-my $text = Pod::Text->new or die "Cannot create parser\n";
-my $n = 2;
+print $^STDOUT, "ok 1\n"
+
+my $man = Pod::Man->new or die "Cannot create parser\n"
+my $text = Pod::Text->new or die "Cannot create parser\n"
+my $n = 2
 while ( ~< $^DATA) {
     next until $_ eq "###\n";
     open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
@@ -39,10 +39,10 @@ while ( ~< $^DATA) {
     open ($out, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
     while ( ~< $out) { last if m/^\.nh/ }
     my $output;
-    do {
-        local $^INPUT_RECORD_SEPARATOR = undef;
-        $output = ~< $out;
-    };
+    do 
+        local $^INPUT_RECORD_SEPARATOR = undef
+        $output = ~< $out
+    ;
     close $out;
     my $expected = '';
     while ( ~< $^DATA) {
@@ -51,10 +51,10 @@ while ( ~< $^DATA) {
     }
     if ($output eq $expected) {
         print $^STDOUT, "ok $n\n";
-    } else {
-        print $^STDOUT, "not ok $n\n";
-        print $^STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n";
-    }
+    }else 
+        print $^STDOUT, "not ok $n\n"
+        print $^STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n"
+    
     $n++;
     open ($in, "<", 'tmp.pod') or die "Cannot open tmp.pod: $^OS_ERROR\n";
     open ($out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
@@ -62,10 +62,10 @@ while ( ~< $^DATA) {
     close $in;
     close $out;
     open ($out, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
-    do {
-        local $^INPUT_RECORD_SEPARATOR = undef;
-        $output = ~< $out;
-    };
+    do 
+        local $^INPUT_RECORD_SEPARATOR = undef
+        $output = ~< $out
+    ;
     close $out;
     unlink ('tmp.pod', 'out.tmp');
     $expected = '';
@@ -75,10 +75,10 @@ while ( ~< $^DATA) {
     }
     if ($output eq $expected) {
         print $^STDOUT, "ok $n\n";
-    } else {
-        print $^STDOUT, "not ok $n\n";
-        print $^STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n";
-    }
+    }else 
+        print $^STDOUT, "not ok $n\n"
+        print $^STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n"
+    
     $n++;
 }
 

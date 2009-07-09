@@ -3,7 +3,7 @@ use Test::Builder
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @( '../lib' )
+        $^INCLUDE_PATH = @:  '../lib' 
     
 
 

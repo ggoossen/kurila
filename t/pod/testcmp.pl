@@ -2,10 +2,10 @@ package TestCompare
 
 our (@ISA, @EXPORT, $MYPKG)
 #use diagnostics;
-use Exporter;
-use File::Basename;
-use File::Spec;
-use IO::File;
+use Exporter
+use File::Basename
+use File::Spec
+use IO::File
 
 @ISA = qw(Exporter)
 @EXPORT = qw(&testcmp)
@@ -44,9 +44,9 @@ otherwise.
 ##--------------------------------------------------------------------------
 
 sub testcmp
-    my %opts = %( ref(@_[0]) eq 'HASH' ?? < shift()->% !! () )
-    my @($file1, $file2) =  @_
-    my @($fh1, $fh2) = @($file1, $file2)
+    my %opts = %:  ref(@_[0]) eq 'HASH' ?? < shift()->% !! () 
+    my (@: $file1, $file2) =  @_
+    my (@: $fh1, $fh2) = @: $file1, $file2
     unless (ref $fh1)
         $fh1 = IO::File->new($file1, "r") or die "Can't open $file1: $^OS_ERROR"
     
@@ -55,8 +55,8 @@ sub testcmp
     
 
     my $cmplines = %opts{?'cmplines'} || undef
-    my @($f1text, $f2text) = @("", "")
-    my @($line, $diffs)    = @(0, 0)
+    my (@: $f1text, $f2text) = @: "", ""
+    my (@: $line, $diffs)    = @: 0, 0
 
     while ( defined($f1text) and defined($f2text) )
         defined($f1text = ~< $fh1)  and  chomp($f1text)

@@ -1,9 +1,9 @@
 package Time::Local
 
 require Exporter
-use Config;
+use Config
 
-use integer;
+use integer
 
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK)
 $VERSION   = '1.18_01'
@@ -12,10 +12,10 @@ $VERSION   = '1.18_01'
 @EXPORT    = qw( timegm timelocal )
 @EXPORT_OK = qw( timegm_nocheck timelocal_nocheck )
 
-my @MonthDays = @( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 )
+my @MonthDays = @:  31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 
 
 # Determine breakpoint for rolling century
-my $ThisYear    = @( localtime() )[5]
+my $ThisYear    = (@:  localtime() )[5]
 my $Breakpoint  = ( $ThisYear + 50 ) % 100
 my $NextCentury = $ThisYear - $ThisYear % 100
 $NextCentury += 100 if $Breakpoint +< 50
@@ -24,9 +24,9 @@ my $SecOff  = 0
 
 my ( %Options, %Cheat )
 
-use constant SECS_PER_MINUTE => 60;
-use constant SECS_PER_HOUR   => 3600;
-use constant SECS_PER_DAY    => 86400;
+use constant SECS_PER_MINUTE => 60
+use constant SECS_PER_HOUR   => 3600
+use constant SECS_PER_DAY    => 86400
 
 my $MaxInt = ( ( 1 << ( 8 * config_value('ivsize') - 2 ) ) - 1 ) * 2 + 1
 my $MaxDay = int( ( $MaxInt - ( SECS_PER_DAY / 2 ) ) / SECS_PER_DAY ) - 1
@@ -60,7 +60,7 @@ sub _daygm
     # This is written in such a byzantine way in order to avoid
     # lexical variables and sub calls, for speed
     return @_[3] + (
-        %Cheat{+pack( 'ss', < @_[[@( 4, 5) ]] ) } ||= do
+        %Cheat{+pack( 'ss', < @_[[(@:  4, 5) ]] ) } ||= do
             my $month = ( @_[4] + 10 ) % 12
             my $year  = @_[5] + 1900 - $month / 10
 
@@ -172,7 +172,7 @@ sub timelocal
 
     # If the original date was a non-extent gap in a forward DST jump,
     # we should now have the wrong answer - undo the DST adjustment
-    my @( $s, $m, $h, ... ) = @: localtime($loc_t)
+    my (@:  $s, $m, $h, ... ) = @: localtime($loc_t)
     $loc_t -= $dst_off if $s != @_[0] || $m != @_[1] || $h != @_[2]
 
     return $loc_t

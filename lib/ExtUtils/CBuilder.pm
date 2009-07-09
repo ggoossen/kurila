@@ -12,7 +12,7 @@ $VERSION = eval $VERSION
 # platform we're on.  I don't know of a systematic way.  These values
 # came from the latest (bleadperl) perlport.pod.
 
-my %OSTYPES = %( < qw(
+my %OSTYPES = %:  < qw(
 		 aix       Unix
 		 bsdos     Unix
 		 dgux      Unix
@@ -51,7 +51,7 @@ my %OSTYPES = %( < qw(
 		 riscos    RiscOS
 		 amigaos   Amiga
 		 mpeix     MPEiX
-		) )
+		) 
 
 # We only use this once - don't waste a symbol table entry on it.
 # More importantly, don't make it an inheritable method.
@@ -59,7 +59,7 @@ my $load = sub (@< @_)
     my $mod = shift
     eval "use $mod"
     die $^EVAL_ERROR if $^EVAL_ERROR
-    @ISA = @($mod)
+    @ISA = @: $mod
 
 
 do

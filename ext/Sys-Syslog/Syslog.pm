@@ -11,15 +11,15 @@ do
     our $VERSION = '0.24'
     our @ISA = qw(Exporter)
 
-    our %EXPORT_TAGS = %(
-        standard => qw(openlog syslog closelog setlogmask),
-        extended => qw(setlogsock),
-        macros => @(
+    our %EXPORT_TAGS = %: 
+        standard => qw(openlog syslog closelog setlogmask)
+        extended => qw(setlogsock)
+        macros => (@: 
             # levels
             < qw(
                 LOG_ALERT LOG_CRIT LOG_DEBUG LOG_EMERG LOG_ERR 
                 LOG_INFO LOG_NOTICE LOG_WARNING
-            ),
+            )
 
             # standard facilities
             < qw(
@@ -27,26 +27,26 @@ do
                 LOG_LOCAL0 LOG_LOCAL1 LOG_LOCAL2 LOG_LOCAL3 LOG_LOCAL4
                 LOG_LOCAL5 LOG_LOCAL6 LOG_LOCAL7 LOG_LPR LOG_MAIL LOG_NEWS
                 LOG_SYSLOG LOG_USER LOG_UUCP
-            ),
+            )
             # Mac OS X specific facilities
-            < qw( LOG_INSTALL LOG_LAUNCHD LOG_NETINFO LOG_RAS LOG_REMOTEAUTH ),
+            < qw( LOG_INSTALL LOG_LAUNCHD LOG_NETINFO LOG_RAS LOG_REMOTEAUTH )
             # modern BSD specific facilities
-            < qw( LOG_CONSOLE LOG_NTP LOG_SECURITY ),
+            < qw( LOG_CONSOLE LOG_NTP LOG_SECURITY )
             # IRIX specific facilities
-            < qw( LOG_AUDIT LOG_LFMT ),
+            < qw( LOG_AUDIT LOG_LFMT )
 
             # options
             < qw(
                 LOG_CONS LOG_PID LOG_NDELAY LOG_NOWAIT LOG_ODELAY LOG_PERROR 
-            ),
+            )
 
             # others macros
             < qw(
                 LOG_FACMASK LOG_NFACILITIES LOG_PRIMASK 
                 LOG_MASK LOG_UPTO
-            ),
-        ),
-        )
+            )
+            )
+        
 
     our @EXPORT = %EXPORT_TAGS{?standard}
 
@@ -86,12 +86,12 @@ my $maskpri = LOG_UPTO(LOG_DEBUG())     # current log mask
 
 my $syslogfh
 
-my %options = %(
-    ndelay  => 0,
-    nofatal => 0,
-    nowait  => 0,
-    pid     => 0,
-    )
+my %options = %: 
+    ndelay  => 0
+    nofatal => 0
+    nowait  => 0
+    pid     => 0
+    
 
 # Default is now to first use the native mechanism, so Perl programs
 # behave like other normal Unix programs, then try other mechanisms.
@@ -236,7 +236,7 @@ sub setlogsock
         
 
     elsif (lc $setsock eq 'inet')
-        @connectMethods = @( 'tcp', 'udp' )
+        @connectMethods = @:  'tcp', 'udp' 
 
     elsif (lc $setsock eq 'console')
         @connectMethods = qw(console)
@@ -420,7 +420,7 @@ sub _syslog_send_native($buf, $numpri, ...)
 # private function to translate names to numeric values
 #
 sub xlate
-    my@($name) =  @_
+    my(@: $name) =  @_
     return $name+0 if $name =~ m/^\s*\d+\s*$/
     $name = uc $name
     $name = "LOG_$name" unless $name =~ m/^LOG_/
@@ -461,7 +461,7 @@ sub connect_log
         iohandle::output_autoflush($syslogfh, 1)
     else
         @fallbackMethods = $@
-        $err_sub->(join "\n\t- ", @( "no connection to syslog available", < @errs))
+        $err_sub->(join "\n\t- ", (@:  "no connection to syslog available", < @errs))
         return undef
     
 

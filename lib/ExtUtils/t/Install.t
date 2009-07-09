@@ -4,20 +4,20 @@
 
 BEGIN 
     if( env::var('PERL_CORE') )
-        $^INCLUDE_PATH = @('../../lib', '../lib', 'lib')
+        $^INCLUDE_PATH = @: '../../lib', '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
 
 chdir 't'
 
-use File::Path;
-use File::Spec;
+use File::Path
+use File::Spec
 
-use Test::More tests => 51;
+use Test::More tests => 51
 
-use MakeMaker::Test::Setup::BFD;
-use env;
+use MakeMaker::Test::Setup::BFD
+use env
 
 BEGIN { use_ok('ExtUtils::Install') }
 # ensure the env doesnt pollute our tests
@@ -41,7 +41,7 @@ chdir 'Big-Dummy'
 my $stdout = ''
 close $^STDOUT
 open $^STDOUT, '>>', \$stdout or die
-pm_to_blib( \%( 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
+pm_to_blib( \(%:  'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
             'blib/lib/auto'
             )
 END { rmtree 'blib' }
@@ -52,7 +52,7 @@ ok( -r 'blib/lib/auto',         '  created autosplit dir' )
 is( $stdout, "symlink lib/Big/Dummy.pm blib/lib/Big/Dummy.pm\n" )
 $stdout = ''
 
-pm_to_blib( \%( 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
+pm_to_blib( \(%:  'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
             'blib/lib/auto'
             )
 ok( -d 'blib/lib',              'second run, blib dir still there' )
@@ -61,9 +61,9 @@ ok( -r 'blib/lib/auto',         '  autosplit still there' )
 is( $stdout, "Skip blib/lib/Big/Dummy.pm (unchanged)\n" )
 $stdout = ''
 
-install( \%( 'blib/lib' => 'install-test/lib/perl',
-         read   => 'install-test/packlist',
-         write  => 'install-test/packlist'
+install( \(%:  'blib/lib' => 'install-test/lib/perl'
+               read   => 'install-test/packlist'
+               write  => 'install-test/packlist'
          ),
          0, 1)
 ok( ! -d 'install-test/lib/perl',        'install made dir (dry run)')
@@ -71,9 +71,9 @@ ok( ! -r 'install-test/lib/perl/Big/Dummy.pm',
     '  .pm file installed (dry run)')
 ok( ! -r 'install-test/packlist',        '  packlist exists (dry run)')
 
-install( \%( 'blib/lib' => 'install-test/lib/perl',
-         read   => 'install-test/packlist',
-         write  => 'install-test/packlist'
+install( \(%:  'blib/lib' => 'install-test/lib/perl'
+               read   => 'install-test/packlist'
+               write  => 'install-test/packlist'
          ) )
 ok( -d 'install-test/lib/perl',                 'install made dir' )
 ok( -r 'install-test/lib/perl/Big/Dummy.pm',    '  .pm file installed' )
@@ -81,7 +81,7 @@ ok(!-r 'install-test/lib/perl/Big/Dummy.SKIP',  '  ignored .SKIP file' )
 ok( -r 'install-test/packlist',                 '  packlist exists' )
 
 open(my $packlist, "<", 'install-test/packlist' )
-my %packlist = %( < @+: map { chomp;  @($_ => 1) }, @( ~< $packlist->*) )
+my %packlist = %:  < @+: map { chomp;  (@: $_ => 1) }, (@:  ~< $packlist->*) 
 close $packlist
 
 # On case-insensitive filesystems (ie. VMS), the keys of the packlist might
@@ -92,9 +92,9 @@ is( lc((keys %packlist)[0]), lc $native_dummy, 'packlist written' )
 
 
 # Test UNINST=1 preserving same versions in other dirs.
-install( \%( 'blib/lib' => 'install-test/other_lib/perl',
-         read   => 'install-test/packlist',
-         write  => 'install-test/packlist'
+install( \(%:  'blib/lib' => 'install-test/other_lib/perl'
+               read   => 'install-test/packlist'
+               write  => 'install-test/packlist'
          ),
          0, 0, 1)
 ok( -d 'install-test/other_lib/perl',        'install made other dir' )
@@ -113,11 +113,11 @@ close $dummy
 do
     ok( -r 'install-test/lib/perl/Big/Dummy.pm', 'different install exists' )
 
-    local $^INCLUDE_PATH = @('install-test/lib/perl')
+    local $^INCLUDE_PATH = @: 'install-test/lib/perl'
     local env::var('PERL5LIB' ) = ''
-    install( \%( 'blib/lib' => 'install-test/other_lib/perl',
-             read   => 'install-test/packlist',
-             write  => 'install-test/packlist'
+    install( \(%:  'blib/lib' => 'install-test/other_lib/perl'
+                   read   => 'install-test/packlist'
+                   write  => 'install-test/packlist'
              ),
              0, 0, 0)
     ok( -d 'install-test/other_lib/perl',        'install made other dir' )
@@ -131,14 +131,14 @@ do
 do
     my $tfile='install-test/lib/perl/Big/Dummy.pm'
     local $ExtUtils::Install::Testing = $tfile
-    local $^INCLUDE_PATH = @('install-test/other_lib/perl','install-test/lib/perl')
+    local $^INCLUDE_PATH = @: 'install-test/other_lib/perl','install-test/lib/perl'
     local env::var('PERL5LIB' ) = ''
     ok( -r $tfile, 'different install exists' )
     my @warn
     local $^WARN_HOOK =sub (@< @_) { push @warn, @_[0]->message; return }
-    install( \%( 'blib/lib' => 'install-test/other_lib/perl',
-             read   => 'install-test/packlist',
-             write  => 'install-test/packlist'
+    install( \(%:  'blib/lib' => 'install-test/other_lib/perl'
+                   read   => 'install-test/packlist'
+                   write  => 'install-test/packlist'
              ),
              0, 0, 1)
     ok(0+nelems @warn,"  we did warn")
@@ -153,15 +153,15 @@ do
 do
     my $tfile='install-test/lib/perl/Big/Dummy.pm'
     local $ExtUtils::Install::Testing = $tfile
-    local $^INCLUDE_PATH = @('install-test/lib/perl','install-test/other_lib/perl')
+    local $^INCLUDE_PATH = @: 'install-test/lib/perl','install-test/other_lib/perl'
     local env::var('PERL5LIB' ) = ''
     ok( -r $tfile, 'different install exists' )
     my @warn
     local $^WARN_HOOK =sub (@< @_) { push @warn, <@_[0]->message; return }
     my $ok=try {
-        install( \%( 'blib/lib' => 'install-test/other_lib/perl',
-                     read   => 'install-test/packlist',
-                     write  => 'install-test/packlist'
+        install( \(%:  'blib/lib' => 'install-test/other_lib/perl'
+                       read   => 'install-test/packlist'
+                       write  => 'install-test/packlist'
                      ),
                      0, 0, 1);
         1
@@ -176,11 +176,11 @@ do
 
 # Test UNINST=1 removing other versions in other dirs.
 do
-    local $^INCLUDE_PATH = @('install-test/lib/perl')
+    local $^INCLUDE_PATH = @: 'install-test/lib/perl'
     local env::var('PERL5LIB' ) = ''
-    install( \%( 'blib/lib' => 'install-test/other_lib/perl',
-             read   => 'install-test/packlist',
-             write  => 'install-test/packlist'
+    install( \(%:  'blib/lib' => 'install-test/other_lib/perl'
+                   read   => 'install-test/packlist'
+                   write  => 'install-test/packlist'
              ),
              0, 0, 1)
     ok( -d 'install-test/other_lib/perl',        'install made other dir' )

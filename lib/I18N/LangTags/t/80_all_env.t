@@ -19,7 +19,7 @@ env::var('SWUZ') = undef
 sub j { "[" . join(' ', map { "\"$_\"" }, @_) . "]" ;}
 
 sub show
-    print $^STDOUT, "#  (Seeing \{", join(' ', map( {dump::view($_) }, @_)), "\} at line ", @(caller)[2], ")\n"
+    print $^STDOUT, "#  (Seeing \{", join(' ', map( {dump::view($_) }, @_)), "\} at line ", (@: caller)[2], ")\n"
     printenv()
     return @_[0] || ''
 

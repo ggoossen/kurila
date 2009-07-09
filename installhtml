@@ -152,7 +152,7 @@ my (@libpods, @podpath, $podroot, $htmldir, $htmlroot, $recurse, @splithead,
     @splititem, $splitpod, $verbose, $pod2html, @ignore)
 
 @libpods = $@
-@podpath = @( "." )     # colon-separated list of directories containing .pod
+@podpath = @:  "."      # colon-separated list of directories containing .pod
 # and .pm files to be converted.
 $podroot = "."          # assume the pods we want are here
 $htmldir = ""           # nothing for now...
@@ -309,7 +309,7 @@ sub create_index($html, $dir)
     # get the list of .html files in this directory
     opendir(my $dirhandle, $dir) ||
         die "$^PROGRAM_NAME: error opening directory $dir for reading: $^OS_ERROR\n"
-    @files = sort( grep { m/\.html?$/ }, @( readdir($dirhandle)))
+    @files = sort( grep { m/\.html?$/ }, (@:  readdir($dirhandle)))
     closedir($dirhandle)
 
     open(my $html_fh, ">", "$html") ||
@@ -323,15 +323,15 @@ sub create_index($html, $dir)
 
         open(my $in_fh, "<", "$dir/$file") ||
             die "$^PROGRAM_NAME: error opening $dir/$file for input: $^OS_ERROR\n"
-        @filedata = @( ~< $in_fh->* )
+        @filedata = @:  ~< $in_fh->* 
         close($in_fh)
 
         # pull out the NAME section
         my $name
         ($name) = < grep( { m/name="name"/i }, @filedata)
-        @($lcp1,$lcp2) = @($name =~ m,/H1>\s(\S+)\s[\s-]*(.*?)\s*$,smi)
+        (@: $lcp1,$lcp2) = @: $name =~ m,/H1>\s(\S+)\s[\s-]*(.*?)\s*$,smi
         if (defined $lcp1 and $lcp1 =~ m,^<P>$,i) # Uninteresting.  Try again.
-            @($lcp1,$lcp2) = @($name =~ m,/H1>\s<P>\s*(\S+)\s[\s-]*(.*?)\s*$,smi)
+            (@: $lcp1,$lcp2) = @: $name =~ m,/H1>\s<P>\s*(\S+)\s[\s-]*(.*?)\s*$,smi
 
         my $url= "$pod/$file"
         if ( ! defined %Options{?htmlroot} || %Options{?htmlroot} eq '' )
@@ -430,7 +430,7 @@ sub splitpod($pod, $poddir, $htmldir, $splitdirs)
     $^INPUT_RECORD_SEPARATOR = ""
     open(my $splitin_fh, "<", "$pod") ||
         die "$^PROGRAM_NAME: error opening $pod for input: $^OS_ERROR\n"
-    @filedata = @( ~< $splitin_fh->* )
+    @filedata = @:  ~< $splitin_fh->* 
     close($splitin_fh) ||
         die "$^PROGRAM_NAME: error closing $pod: $^OS_ERROR\n"
 
@@ -522,17 +522,17 @@ sub installdir($dir, $recurse, $podroot, $splitdirs, $ignore)
 
     # find the directories to recurse on
     @dirlist = map { if ($^OS_NAME eq 'VMS') {m/^(.*)\.dir$/i; "$dir/$1";} else {"$dir/$_";}},
-        grep( { -d "$podroot/$dir/$_" && !m/^\.{1,2}/ }, @( readdir($dirhandle))) if $recurse
+        grep( { -d "$podroot/$dir/$_" && !m/^\.{1,2}/ }, (@:  readdir($dirhandle))) if $recurse
     rewinddir($dirhandle)
 
     # find all the .pod files within the directory
     @podlist = map { m/^(.*)\.pod$/; "$dir/$1" },
-        grep( { ! -d "$podroot/$dir/$_" && m/\.pod$/ }, @( readdir($dirhandle)))
+        grep( { ! -d "$podroot/$dir/$_" && m/\.pod$/ }, (@:  readdir($dirhandle)))
     rewinddir($dirhandle)
 
     # find all the .pm files within the directory
     @pmlist = map { m/^(.*)\.pm$/; "$dir/$1" },
-        grep( { ! -d "$podroot/$dir/$_" && m/\.pm$/ }, @( readdir($dirhandle)))
+        grep( { ! -d "$podroot/$dir/$_" && m/\.pm$/ }, (@:  readdir($dirhandle)))
 
     closedir($dirhandle)
 

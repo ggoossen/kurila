@@ -53,7 +53,7 @@ $^OUTPUT_AUTOFLUSH = 1
 my $numtests = scalar(nelems @tests) / 2
 print $^STDOUT, "1..$numtests\n"
 
-use Text::Wrap;
+use Text::Wrap
 
 
 my $rerun = env::var('PERL_DL_NONLAZY') ?? 0 !! 1
@@ -73,7 +73,7 @@ while ((nelems @tests))
         my $oi = $in
         write_file("#o", $back)
         write_file("#e", $out)
-        foreach (@($in, $back, $out))
+        foreach ((@: $in, $back, $out))
             s/\t/^I\t/gs
             s/\n/\$\n/gs
         

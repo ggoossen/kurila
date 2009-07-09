@@ -5,7 +5,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -36,7 +36,7 @@ do
 pass("Changing output() of new TB doesn't interfere with singleton")
 
 ok open my $file, "<", "some_file"
-is join("", @( ~< $file->*)), <<OUT
+is join("", (@:  ~< $file->*)), <<OUT
 1..1
 ok 1
 OUT

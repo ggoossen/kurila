@@ -10,7 +10,7 @@ BEGIN
 use warnings
 our $uc
 BEGIN { $uc = 1; }
-use Test::More tests => $uc ?? 103 !! 83;
+use Test::More tests => $uc ?? 103 !! 83
 
 # Doing this longhand cut&paste makes it clear
 # BEGIN and INIT are FIFO, CHECK and END are LIFO

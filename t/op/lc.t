@@ -32,7 +32,7 @@ is(lcfirst($b)    , "hello\.\* WORLD",      'lcfirst')
 is(uc($b)         , "HELLO\.\* WORLD",      'uc')
 is(lc($b)         , "hello\.\* world",      'lc')
 
-use utf8;
+use utf8
 
 my ($x100, $x101)
 do
@@ -170,7 +170,7 @@ is($c , "\x{3a3}foo.Bar", "Using s///e to change case.")
 
 # #18931: perl5.8.0 bug in \U..\E processing
 # Test case from Nicholas Clark.
-for my $a (@(0,1))
+for my $a ((@: 0,1))
     $_ = 'abcdefgh'
     $_ .= chr 256
     chop
@@ -179,7 +179,7 @@ for my $a (@(0,1))
 
 
 do
-    foreach (@(0, 1))
+    foreach ((@: 0, 1))
         local our $TODO = "fix lc"
         $a = "\x{a}"."\x{101}"
         chop $a
@@ -191,13 +191,13 @@ do
 
 # [perl #38619] Bug in lc and uc (interaction between UTF-8, substr, and lc/uc)
 
-for (@("a\x{100}", "xyz\x{100}"))
+for ((@: "a\x{100}", "xyz\x{100}"))
     is(substr(uc($_), 0), uc($_), "[perl #38619] uc")
 
-for (@("A\x{100}", "XYZ\x{100}"))
+for ((@: "A\x{100}", "XYZ\x{100}"))
     is(substr(lc($_), 0), lc($_), "[perl #38619] lc")
 
-for (@("a\x{100}", "ßyz\x{100}")) # ß to Ss (different length)
+for ((@: "a\x{100}", "ßyz\x{100}")) # ß to Ss (different length)
     is(substr(ucfirst($_), 0), ucfirst($_), "[perl #38619] ucfirst")
 
 
@@ -205,25 +205,25 @@ for (@("a\x{100}", "ßyz\x{100}")) # ß to Ss (different length)
 # the original report concerns PERL_MAGIC_utf8.
 # these cases concern PERL_MAGIC_regex_global.
 
-for ( map { $_ }, @( "a\x{100}", "abc\x{100}", "\x{100}"))
+for ( map { $_ }, (@:  "a\x{100}", "abc\x{100}", "\x{100}"))
     chop # get ("a", "abc", "") in utf8
     my $return =  uc($_) =~ m/\G(.?)/g
     my $result = $return ?? $1 !! "not"
-    my $expect = @(uc($_) =~ m/(.?)/g)[0]
+    my $expect = (@: uc($_) =~ m/(.?)/g)[0]
     is($return, 1,       "[perl #38619]")
     is($result, $expect, "[perl #38619]")
 
 
-for ( map { $_ }, @( "A\x{100}", "ABC\x{100}", "\x{100}"))
+for ( map { $_ }, (@:  "A\x{100}", "ABC\x{100}", "\x{100}"))
     chop # get ("A", "ABC", "") in utf8
     my $return =  lc($_) =~ m/\G(.?)/g
     my $result = $return ?? $1 !! "not"
-    my $expect = @(lc($_) =~ m/(.?)/g)[0]
+    my $expect = (@: lc($_) =~ m/(.?)/g)[0]
     is($return, 1,       "[perl #38619]")
     is($result, $expect, "[perl #38619]")
 
 
-for (@(1, 4, 9, 16, 25))
+for ((@: 1, 4, 9, 16, 25))
     local our $TODO ="growth"
     is(uc "\x{03B0}" x $_, "\x{3a5}\x{308}\x{301}" x $_,
        'uc U+03B0 grows threefold')
@@ -233,7 +233,7 @@ for (@(1, 4, 9, 16, 25))
 
 # bug #43207
 my $temp = "Hello"
-for (@("$temp"))
+for ((@: "$temp"))
     lc $_
     is($_, "Hello")
 

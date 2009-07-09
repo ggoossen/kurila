@@ -20,7 +20,7 @@ sub foo
     chop
 
 
-@foo = @("hi \n","there\n","!\n")
+@foo = @: "hi \n","there\n","!\n"
 @bar = @foo
 chop(@bar)
 is (join('', @bar), 'hi there!')
@@ -131,8 +131,8 @@ is (ref($_), "ARRAY", "chomp ref (no modify)")
 
 $^INPUT_RECORD_SEPARATOR = "\n"
 
-%chomp = %("One" => "One", "Two\n" => "Two", "" => "")
-%chop = %("One" => "On", "Two\n" => "Two", "" => "")
+%chomp = %: "One" => "One", "Two\n" => "Two", "" => ""
+%chop = %: "One" => "On", "Two\n" => "Two", "" => ""
 
 foreach (keys %chomp)
     my $key = $_
@@ -209,9 +209,9 @@ do
     # Change 26011: Re: A surprising segfault
     # to make sure only that these obfuscated sentences will not crash.
 
-    map { chop() }, @( ('')x68)
+    map { chop() }, @:  ('')x68
     ok(1, "extend sp in pp_chop")
 
-    map { chomp() }, @( ('')x68)
+    map { chomp() }, @:  ('')x68
     ok(1, "extend sp in pp_chomp")
 

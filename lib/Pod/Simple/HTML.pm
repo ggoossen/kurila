@@ -8,10 +8,10 @@ our (
     $Title_Prefix, $Title_Postfix, $HTML_EXTENSION, %ToIndex,
     $Doctype_decl,  $Content_decl,
     )
-@ISA = @('Pod::Simple::PullParser')
+@ISA = @: 'Pod::Simple::PullParser'
 $VERSION = '3.03'
 
-use UNIVERSAL ();
+use UNIVERSAL ()
 BEGIN 
     if(defined &DEBUG) { } # no-op
     elsif( defined &Pod::Simple::DEBUG ) { *DEBUG = \&Pod::Simple::DEBUG }
@@ -38,7 +38,7 @@ $Perldoc_URL_Postfix = ''
 
 $Title_Prefix  = '' unless defined $Title_Prefix
 $Title_Postfix = '' unless defined $Title_Postfix
-%ToIndex = %( < @+: map { @: $_ => 1 }, qw(head1 head2 head3 head4 ) ) # item-text
+%ToIndex = %:  < @+: map { @: $_ => 1 }, qw(head1 head2 head3 head4 )  # item-text
 # 'item-text' stuff in the index doesn't quite work, and may
 # not be a good idea anyhow.
 
@@ -78,35 +78,35 @@ __PACKAGE__->_accessorize(
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 my @_to_accept
 
-%Tagmap = %(
-    'Verbatim'  => "\n<pre$Computerese>",
-    '/Verbatim' => "</pre>\n",
-    'VerbatimFormatted'  => "\n<pre$Computerese>",
-    '/VerbatimFormatted' => "</pre>\n",
-    'VerbatimB'  => "<b>",
-    '/VerbatimB' => "</b>",
-    'VerbatimI'  => "<i>",
-    '/VerbatimI' => "</i>",
-    'VerbatimBI'  => "<b><i>",
-    '/VerbatimBI' => "</i></b>",
+%Tagmap = %: 
+    'Verbatim'  => "\n<pre$Computerese>"
+    '/Verbatim' => "</pre>\n"
+    'VerbatimFormatted'  => "\n<pre$Computerese>"
+    '/VerbatimFormatted' => "</pre>\n"
+    'VerbatimB'  => "<b>"
+    '/VerbatimB' => "</b>"
+    'VerbatimI'  => "<i>"
+    '/VerbatimI' => "</i>"
+    'VerbatimBI'  => "<b><i>"
+    '/VerbatimBI' => "</i></b>"
 
 
-    'Data'  => "\n",
-    '/Data' => "\n",
+    'Data'  => "\n"
+    '/Data' => "\n"
 
-    'head1' => "\n<h1>",  # And also stick in an <a name="...">
-    'head2' => "\n<h2>",  #  ''
-    'head3' => "\n<h3>",  #  ''
-    'head4' => "\n<h4>",  #  ''
-    '/head1' => "</a></h1>\n",
-    '/head2' => "</a></h2>\n",
-    '/head3' => "</a></h3>\n",
-    '/head4' => "</a></h4>\n",
+    'head1' => "\n<h1>"  # And also stick in an <a name="...">
+    'head2' => "\n<h2>"  #  ''
+    'head3' => "\n<h3>"  #  ''
+    'head4' => "\n<h4>"  #  ''
+    '/head1' => "</a></h1>\n"
+    '/head2' => "</a></h2>\n"
+    '/head3' => "</a></h3>\n"
+    '/head4' => "</a></h4>\n"
 
-    'X'  => "<!--\n\tINDEX: ",
+    'X'  => "<!--\n\tINDEX: "
     '/X' => "\n-->", <
 
-    changes( <qw(
+        changes( <qw(
     Para=p
     B=b I=i
     over-bullet=ul
@@ -117,8 +117,8 @@ my @_to_accept
     item-number=li
     item-text=dt
   )), <
-    changes2(
-    < map {; m/^([-a-z]+)/s && push @_to_accept, $1; $_ },
+        changes2(
+        < map {; m/^([-a-z]+)/s && push @_to_accept, $1; $_ }
     qw[
       sample=samp
       definition=dfn
@@ -134,31 +134,31 @@ my @_to_accept
       underline=u
       strikethrough=s
     ]  # no point in providing a way to get <q>...</q>, I think
-    ),
+        )
 
-    '/item-bullet' => "</li>$LamePad\n",
-    '/item-number' => "</li>$LamePad\n",
-    '/item-text'   => "</a></dt>$LamePad\n",
-    'item-body'    => "\n<dd>",
-    '/item-body'   => "</dd>\n",
+    '/item-bullet' => "</li>$LamePad\n"
+    '/item-number' => "</li>$LamePad\n"
+    '/item-text'   => "</a></dt>$LamePad\n"
+    'item-body'    => "\n<dd>"
+    '/item-body'   => "</dd>\n"
 
 
-    'B'      =>  "<b>",                  '/B'     =>  "</b>",
-    'I'      =>  "<i>",                  '/I'     =>  "</i>",
-    'F'      =>  "<em$Computerese>",     '/F'     =>  "</em>",
-    'C'      =>  "<code$Computerese>",   '/C'     =>  "</code>",
-    'L'  =>  "<a href='YOU_SHOULD_NEVER_SEE_THIS'>", # ideally never used!
-    '/L' =>  "</a>",
-    )
+    'B'      =>  "<b>",                  '/B'     =>  "</b>"
+    'I'      =>  "<i>",                  '/I'     =>  "</i>"
+    'F'      =>  "<em$Computerese>",     '/F'     =>  "</em>"
+    'C'      =>  "<code$Computerese>",   '/C'     =>  "</code>"
+    'L'  =>  "<a href='YOU_SHOULD_NEVER_SEE_THIS'>" # ideally never used!
+    '/L' =>  "</a>"
+    
 
 sub changes
     return @+: map { m/^([-_:0-9a-zA-Z]+)=([-_:0-9a-zA-Z]+)$/s
-                       ?? @( $1, => "\n<$2>", "/$1", => "</$2>\n" ) !! die "Funky $_"
+                       ?? (@:  $1, => "\n<$2>", "/$1", => "</$2>\n" ) !! die "Funky $_"
                    }, @_
 
 sub changes2
     return @+: map { m/^([-_:0-9a-zA-Z]+)=([-_:0-9a-zA-Z]+)$/s
-                        ?? @( $1, => "<$2>", "/$1", => "</$2>" ) !! die "Funky $_"
+                        ?? (@:  $1, => "<$2>", "/$1", => "</$2>" ) !! die "Funky $_"
                    }, @_
 
 
@@ -185,16 +185,16 @@ sub new($self, @< @_)
     $new->html_header_before_title(
         qq[$Doctype_decl<html><head><title>]
         )
-    $new->html_header_after_title( join "\n", @(
-        "</title>",
-        $Content_decl,
-        "</head>\n<body class='pod'>",
-        $new->version_tag_comment,
-        "<!-- start doc -->\n",)
+    $new->html_header_after_title( join "\n", @: 
+        "</title>"
+        $Content_decl
+        "</head>\n<body class='pod'>"
+        $new->version_tag_comment
+        "<!-- start doc -->\n",
         )
     $new->html_footer( qq[\n<!-- end doc -->\n\n</body></html>\n] )
 
-    $new->{+'Tagmap'} = \%(< %Tagmap)
+    $new->{+'Tagmap'} = \%: < %Tagmap
     return $new
 
 
@@ -288,8 +288,8 @@ sub version_tag_comment
     return sprintf
         "<!--\n  generated by \%s v\%s,\n  using \%s v\%s,\n  under Perl v\%s at \%s GMT.\n\n \%s\n\n-->\n",
         (< map { esc($_) },
-         @(    ref($self), $self->VERSION(), @ISA[0], @ISA[0]->VERSION(),
-              $^PERL_VERSION, scalar(gmtime),)
+         @:     ref($self), $self->VERSION(), @ISA[0], @ISA[0]->VERSION()
+                $^PERL_VERSION, scalar(gmtime),
          ), $self->_modnote(),
     
 
@@ -375,12 +375,12 @@ sub index_as_html
     (nelems $points) +> 1 or return qq[<div class='indexgroupEmpty'></div>\n]
     # There's no point in having a 0-item or 1-item index, I dare say.
 
-    my@(@out) =@( @( qq{\n<div class='indexgroup'>} ))
+    my(@: @out) =@:  (@:  qq{\n<div class='indexgroup'>} )
     my $level = 0
 
     my( $target_level, $previous_tagname, $tagname, $text, $anchorname, $indent)
     foreach my $p ( $points +@+ @: @: 'head0', '(end)' )
-        @($tagname, $text) =  $p
+        (@: $tagname, $text) =  $p
         $anchorname = $self->section_escape($text)
         if( $tagname =~ m{^head(\d+)$} )
             $target_level = 0 + $1
@@ -464,7 +464,7 @@ sub _do_middle_main_loop
                     print $fh, qq[name="$esc"]
                     DEBUG and print $^STDOUT, "Linearized ", scalar(nelems @to_unget),
                         " tokens as \"$name\".\n"
-                    push  $self->{+'PSHTML_index_points'}, @($tagname, $name)
+                    push  $self->{+'PSHTML_index_points'}, @: $tagname, $name
                         if %ToIndex{?$tagname }
                 # Obviously, this discards all formatting codes (saving
                 #  just their content), but ahwell.
@@ -642,7 +642,7 @@ sub pagepath_url_escape($self, @< @_) { $self->general_url_escape(< @_) }
 sub general_url_escape($self, $string)
 
     $string =~ s/([^\x[00]-\x[FF]])/$(
-    join '', map { sprintf('%%%02X',$_) }, @( unpack 'C*', $1)
+    join '', map { sprintf('%%%02X',$_) }, (@:  unpack 'C*', $1)
     )/g
     # express Unicode things as urlencode(utf(orig)).
 
@@ -716,7 +716,7 @@ sub resolve_pod_link_by_table
 
     return unless @_[0]->{?'podhtml_LOT'}  # An optimizy shortcut
 
-    my@($self, $to, $section) =  @_
+    my(@: $self, $to, $section) =  @_
 
     # TODO: add a method that actually populates podhtml_LOT from a file?
 

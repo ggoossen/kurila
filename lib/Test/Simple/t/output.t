@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -28,7 +28,7 @@ sub ok($test, ?$name)
     return $test
 
 
-use Test::Builder;
+use Test::Builder
 my $Test = Test::Builder->new()
 
 my $result
@@ -54,7 +54,7 @@ print $out, "Hello!\n"
 close $out
 undef $out
 open($in, "<", $tmpfile) or die $^OS_ERROR
-my @lines = @( ~< $in->* )
+my @lines = @:  ~< $in->* 
 close $in
 
 ok(@lines[0] =~ m/hi!/)

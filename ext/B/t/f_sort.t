@@ -18,7 +18,7 @@ BEGIN
 print $^STDOUT, "1..0 # Skip -- TODO for kurila\n"
 exit 0
 
-use OptreeCheck;
+use OptreeCheck
 plan tests => 20
 
 =head1 f_sort.t
@@ -667,7 +667,7 @@ use sort 'stable';
 
 =cut
 
-my @($expect, $expect_nt) = @(<<'EOT_EOT', <<'EONT_EONT')
+my (@: $expect, $expect_nt) = @: <<'EOT_EOT', <<'EONT_EONT'
 # 1  <;> nextstate(main 656 (eval 40):1) v:%,{
 # 2  <0> pushmark s
 # 3  <0> pushmark s

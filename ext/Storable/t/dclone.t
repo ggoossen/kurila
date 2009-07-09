@@ -22,9 +22,9 @@ $a = 'toto'
 $b = \$a
 our $c = bless \$%, 'CLASS'
 $c->{+attribute} = 'attrval'
-our %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$c)
-our @a = @('first', undef, 3, -4, -3.14159, 456, 4.5,
-           $b, \$a, $a, $c, \$c, \%a)
+our %a = %: 'key', 'value', 1, 0, $a, $b, 'cvar', \$c
+our @a = @: 'first', undef, 3, -4, -3.14159, 456, 4.5
+            $b, \$a, $a, $c, \$c, \%a
 
 print $^STDOUT, "not " unless defined (our $aref = dclone(\@a))
 print $^STDOUT, "ok 1\n"
@@ -46,7 +46,7 @@ sub make
     return $self
 ;
 
-package main;
+package main
 
 our $foo = FOO->make
 print $^STDOUT, "not " unless defined(our $r = $foo->dclone)
@@ -70,11 +70,11 @@ print $^STDOUT, "not " unless $cloned->{''}[0] \== \$cloned->{+a}
 print $^STDOUT, "ok 9\n"
 
 # [ID 20020221.007] SEGV in Storable with empty string scalar object
-package TestString;
+package TestString
 sub new($type, $string)
     return bless(\$string, $type)
 
-package main;
+package main
 my $empty_string_obj = TestString->new('')
 my $clone = dclone($empty_string_obj)
 # If still here after the dclone the fix (#17543) worked.

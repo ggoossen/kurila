@@ -9,11 +9,11 @@ BEGIN
     $File = __FILE__
 
 
-use Test::More;
+use Test::More
 
 BEGIN { plan tests => 12 }
 
-use IO::File;
+use IO::File
 
 sub lineno($f)
     my $l

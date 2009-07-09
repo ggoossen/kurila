@@ -66,11 +66,11 @@ else
 
 # Test the array ref form.
 $Term::ANSIColor::EACHLINE = "\n"
-if (colored (\@('bold', 'on_green'), "test\n", "\n", "test")
+if (colored (\(@: 'bold', 'on_green'), "test\n", "\n", "test")
     eq "\e[1;42mtest\e[0m\n\n\e[1;42mtest\e[0m")
     print $^STDOUT, "ok 8\n"
 else
-    print $^STDOUT, < colored (\@('bold', 'on_green'), "test\n", "\n", "test")
+    print $^STDOUT, < colored (\(@: 'bold', 'on_green'), "test\n", "\n", "test")
     print $^STDOUT, "not ok 8\n"
 
 

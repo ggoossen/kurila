@@ -3,7 +3,7 @@ package ExtUtils::Liblist
 
 our $VERSION = '6.44'
 
-use File::Spec;
+use File::Spec
 require ExtUtils::Liblist::Kid
 
 our @ISA = qw(ExtUtils::Liblist::Kid File::Spec)

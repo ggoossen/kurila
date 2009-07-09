@@ -6,7 +6,7 @@ our $VERSION = '6.44'
 require ExtUtils::MM_Win32
 our @ISA = qw(ExtUtils::MM_Win32)
 
-use ExtUtils::MakeMaker::Config;
+use ExtUtils::MakeMaker::Config
 
 
 =head1 NAME
@@ -37,7 +37,7 @@ The && problem.
 =cut
 
 sub xs_c
-    my@($self) =@( shift)
+    my(@: $self) =@:  shift
     return '' unless $self->needs_linking()
     '
 .xs.c:
@@ -53,7 +53,7 @@ The && problem
 =cut
 
 sub xs_cpp
-    my@($self) =@( shift)
+    my(@: $self) =@:  shift
     return '' unless $self->needs_linking()
     '
 .xs.cpp:
@@ -68,7 +68,7 @@ The && problem.
 =cut
 
 sub xs_o
-    my@($self) =@( shift)
+    my(@: $self) =@:  shift
     return '' unless $self->needs_linking()
     '
 .xs$(OBJ_EXT):
@@ -100,7 +100,7 @@ Win95 and Win98 and WinME are collectively Win9x and Win32
 
 sub os_flavor
     my $self = shift
-    return  @($self->SUPER::os_flavor, 'Win9x')
+    return  @: $self->SUPER::os_flavor, 'Win9x'
 
 
 

@@ -1,7 +1,7 @@
 BEGIN 
     if(env::var('PERL_CORE')) {
         chdir 't';
-        $^INCLUDE_PATH = @( '../lib' );
+        $^INCLUDE_PATH = (@:  '../lib' );
     }
 
 
@@ -13,8 +13,8 @@ my $d
 
 ok 1
 
-use Pod::Simple::DumpAsXML;
-use Pod::Simple::XMLOutStream;
+use Pod::Simple::DumpAsXML
+use Pod::Simple::XMLOutStream
 print $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n"
 sub e     ($x, $y) { Pod::Simple::XMLOutStream->_duo(\&nowhine, $x, $y) }
 

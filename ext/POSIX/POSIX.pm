@@ -6,12 +6,12 @@ our(@ISA, %EXPORT_TAGS, @EXPORT_OK, @EXPORT)
 
 our $VERSION = "1.13"
 
-use XSLoader ();
+use XSLoader ()
 
 use Fcntl < qw(FD_CLOEXEC F_DUPFD F_GETFD F_GETFL F_GETLK F_RDLCK F_SETFD
              F_SETFL F_SETLK F_SETLKW F_UNLCK F_WRLCK O_ACCMODE O_APPEND
              O_CREAT O_EXCL O_NOCTTY O_NONBLOCK O_RDONLY O_RDWR O_TRUNC
-             O_WRONLY);
+             O_WRONLY)
 
 # Grandfather old foo_h form to new :foo_h form
 my $loaded
@@ -26,9 +26,9 @@ sub import
 
 XSLoader::load 'POSIX', $VERSION
 
-my %NON_CONSTS = %(< @+: map {@($_,1)},
-    qw(S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG WEXITSTATUS
-                     WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG))
+my %NON_CONSTS = %: < @+: map {(@: $_,1)}
+                    qw(S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG WEXITSTATUS
+                     WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG)
 
 for my $name (keys %NON_CONSTS)
     Symbol::fetch_glob($name)->* = sub (@< @_) { int_macro_int($name, @_[?0]) }
@@ -536,7 +536,7 @@ sub chmod
 sub fstat
     usage "fstat(fd)" if (nelems @_) != 1
     CORE::open(my $tmp, "<&", @_[0])            # Gross.
-    my @l = @( CORE::stat($tmp) )
+    my @l = @:  CORE::stat($tmp) 
     CORE::close($tmp)
     @l
 
@@ -710,14 +710,14 @@ sub utime
 
 
 sub load_imports
-    %EXPORT_TAGS = %(
+    %EXPORT_TAGS = %: 
 
-        assert_h =>     qw(assert),
+        assert_h =>     qw(assert)
 
         ctype_h =>      qw(isalnum isalpha iscntrl isdigit isgraph islower
-                isprint ispunct isspace isupper isxdigit tolower toupper),
+                isprint ispunct isspace isupper isxdigit tolower toupper)
 
-        dirent_h =>     $@,
+        dirent_h =>     $@
 
         errno_h =>      qw(E2BIG EACCES EADDRINUSE EADDRNOTAVAIL EAFNOSUPPORT
                 EAGAIN EALREADY EBADF EBUSY ECHILD ECONNABORTED
@@ -731,7 +731,7 @@ sub load_imports
                 EPFNOSUPPORT EPIPE EPROCLIM EPROTONOSUPPORT EPROTOTYPE
                 ERANGE EREMOTE ERESTART EROFS ESHUTDOWN ESOCKTNOSUPPORT
                 ESPIPE ESRCH ESTALE ETIMEDOUT ETOOMANYREFS ETXTBSY
-                EUSERS EWOULDBLOCK EXDEV errno),
+                EUSERS EWOULDBLOCK EXDEV errno)
 
         fcntl_h =>      qw(FD_CLOEXEC F_DUPFD F_GETFD F_GETFL F_GETLK F_RDLCK
                 F_SETFD F_SETFL F_SETLK F_SETLKW F_UNLCK F_WRLCK
@@ -741,7 +741,7 @@ sub load_imports
                 SEEK_CUR SEEK_END SEEK_SET
                 S_IRGRP S_IROTH S_IRUSR S_IRWXG S_IRWXO S_IRWXU
                 S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISGID S_ISREG S_ISUID
-                S_IWGRP S_IWOTH S_IWUSR),
+                S_IWGRP S_IWOTH S_IWUSR)
 
         float_h =>      qw(DBL_DIG DBL_EPSILON DBL_MANT_DIG
                 DBL_MAX DBL_MAX_10_EXP DBL_MAX_EXP
@@ -752,9 +752,9 @@ sub load_imports
                 FLT_RADIX FLT_ROUNDS
                 LDBL_DIG LDBL_EPSILON LDBL_MANT_DIG
                 LDBL_MAX LDBL_MAX_10_EXP LDBL_MAX_EXP
-                LDBL_MIN LDBL_MIN_10_EXP LDBL_MIN_EXP),
+                LDBL_MIN LDBL_MIN_10_EXP LDBL_MIN_EXP)
 
-        grp_h =>        $@,
+        grp_h =>        $@
 
         limits_h =>     qw( ARG_MAX CHAR_BIT CHAR_MAX CHAR_MIN CHILD_MAX
                 INT_MAX INT_MIN LINK_MAX LONG_MAX LONG_MIN MAX_CANON
@@ -765,18 +765,18 @@ sub load_imports
                 _POSIX_LINK_MAX _POSIX_MAX_CANON _POSIX_MAX_INPUT
                 _POSIX_NAME_MAX _POSIX_NGROUPS_MAX _POSIX_OPEN_MAX
                 _POSIX_PATH_MAX _POSIX_PIPE_BUF _POSIX_SSIZE_MAX
-                _POSIX_STREAM_MAX _POSIX_TZNAME_MAX),
+                _POSIX_STREAM_MAX _POSIX_TZNAME_MAX)
 
         locale_h =>     qw(LC_ALL LC_COLLATE LC_CTYPE LC_MESSAGES
                     LC_MONETARY LC_NUMERIC LC_TIME NULL
-                    localeconv setlocale),
+                    localeconv setlocale)
 
         math_h =>       qw(HUGE_VAL acos asin atan ceil cosh fabs floor fmod
-                frexp ldexp log10 modf pow sinh tan tanh),
+                frexp ldexp log10 modf pow sinh tan tanh)
 
-        pwd_h =>        $@,
+        pwd_h =>        $@
 
-        setjmp_h =>     qw(longjmp setjmp siglongjmp sigsetjmp),
+        setjmp_h =>     qw(longjmp setjmp siglongjmp sigsetjmp)
 
         signal_h =>     qw(SA_NOCLDSTOP SA_NOCLDWAIT SA_NODEFER SA_ONSTACK
                 SA_RESETHAND SA_RESTART SA_SIGINFO SIGABRT SIGALRM
@@ -784,11 +784,11 @@ sub load_imports
                 SIGPIPE SIGRTMIN SIGRTMAX SIGQUIT SIGSEGV SIGSTOP
                 SIGTERM SIGTSTP SIGTTIN SIGTTOU SIGUSR1 SIGUSR2
                 SIG_BLOCK SIG_DFL SIG_ERR SIG_IGN SIG_SETMASK SIG_UNBLOCK
-                raise sigaction sigpending sigprocmask sigsuspend),
+                raise sigaction sigpending sigprocmask sigsuspend)
 
-        stdarg_h =>     $@,
+        stdarg_h =>     $@
 
-        stddef_h =>     qw(NULL offsetof),
+        stddef_h =>     qw(NULL offsetof)
 
         stdio_h =>      qw(BUFSIZ EOF FILENAME_MAX L_ctermid L_cuserid
                 L_tmpname NULL SEEK_CUR SEEK_END SEEK_SET
@@ -798,31 +798,31 @@ sub load_imports
                 fscanf fseek fsetpos ftell fwrite getchar gets
                 perror putc putchar puts remove rewind
                 scanf setbuf setvbuf sscanf tmpfile tmpnam
-                ungetc vfprintf vprintf vsprintf),
+                ungetc vfprintf vprintf vsprintf)
 
         stdlib_h =>     qw(EXIT_FAILURE EXIT_SUCCESS MB_CUR_MAX NULL RAND_MAX
                 abort atexit atof atoi atol bsearch calloc div
                 free getenv labs ldiv malloc mblen mbstowcs mbtowc
-                qsort realloc strtod strtol strtoul wcstombs wctomb),
+                qsort realloc strtod strtol strtoul wcstombs wctomb)
 
         string_h =>     qw(NULL memchr memcmp memcpy memmove memset strcat
                 strchr strcmp strcoll strcpy strcspn strerror strlen
                 strncat strncmp strncpy strpbrk strrchr strspn strstr
-                strtok strxfrm),
+                strtok strxfrm)
 
         sys_stat_h => qw(S_IRGRP S_IROTH S_IRUSR S_IRWXG S_IRWXO S_IRWXU
                 S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISGID S_ISREG
                 S_ISUID S_IWGRP S_IWOTH S_IWUSR S_IXGRP S_IXOTH S_IXUSR
-                fstat mkfifo),
+                fstat mkfifo)
 
-        sys_times_h => $@,
+        sys_times_h => $@
 
-        sys_types_h => $@,
+        sys_types_h => $@
 
-        sys_utsname_h => qw(uname),
+        sys_utsname_h => qw(uname)
 
         sys_wait_h => qw(WEXITSTATUS WIFEXITED WIFSIGNALED WIFSTOPPED
-                WNOHANG WSTOPSIG WTERMSIG WUNTRACED),
+                WNOHANG WSTOPSIG WTERMSIG WUNTRACED)
 
         termios_h => qw( B0 B110 B1200 B134 B150 B1800 B19200 B200 B2400
                 B300 B38400 B4800 B50 B600 B75 B9600 BRKINT CLOCAL
@@ -834,10 +834,10 @@ sub load_imports
                 TOSTOP VEOF VEOL VERASE VINTR VKILL VMIN VQUIT VSTART
                 VSTOP VSUSP VTIME
                 tcdrain
-                tcflow tcflush tcsendbreak ),
+                tcflow tcflush tcsendbreak )
 
         time_h =>       qw(CLK_TCK CLOCKS_PER_SEC NULL asctime clock ctime
-                difftime mktime strftime tzset tzname),
+                difftime mktime strftime tzset tzname)
 
         unistd_h =>     qw(F_OK NULL R_OK SEEK_CUR SEEK_END SEEK_SET
                 STDERR_FILENO STDIN_FILENO STDOUT_FILENO W_OK X_OK
@@ -853,11 +853,11 @@ sub load_imports
                 dup2 dup execl execle execlp execv execve execvp
                 fpathconf fsync getcwd getegid geteuid getgid getgroups
                 getpid getuid isatty lseek pathconf pause setgid setpgid
-                setsid setuid sysconf tcgetpgrp tcsetpgrp ttyname),
+                setsid setuid sysconf tcgetpgrp tcsetpgrp ttyname)
 
-        utime_h =>      $@,
+        utime_h =>      $@
 
-        )
+        
 
     # Exporter::export_tags();
     do
@@ -933,7 +933,7 @@ sub load_imports
 
 package POSIX::SigAction
 
-sub new { bless \%(HANDLER => @_[?1], MASK => @_[?2], FLAGS => @_[?3] || 0, SAFE => 0), @_[0] }
+sub new { bless \(%: HANDLER => @_[?1], MASK => @_[?2], FLAGS => @_[?3] || 0, SAFE => 0), @_[0] }
 sub handler { @_[0]->{+HANDLER} = @_[1] if (nelems @_) +> 1; @_[0]->{?HANDLER} };
 sub mask    { @_[0]->{+MASK}    = @_[1] if (nelems @_) +> 1; @_[0]->{?MASK} };
 sub flags   { @_[0]->{+FLAGS}   = @_[1] if (nelems @_) +> 1; @_[0]->{?FLAGS} };

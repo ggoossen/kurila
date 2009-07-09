@@ -4,9 +4,9 @@ my $child
 my $can_fork
 my $has_perlio
 
-use Config;
-use Errno < qw|EPIPE ESHUTDOWN|;
-use signals;
+use Config
+use Errno < qw|EPIPE ESHUTDOWN|
+use signals
 
 BEGIN 
     $can_fork = config_value('d_fork') || config_value('d_pseudofork')
@@ -43,10 +43,10 @@ EOF
 
 
 use Socket
-use Test::More;
+use Test::More
 
-use warnings;
-use Errno;
+use warnings
+use Errno
 
 my $skip_reason
 
@@ -82,8 +82,8 @@ if ($has_perlio)
     binmode($right, ":bytes")
 
 
-my @left = @("hello ", "world\n")
-my @right = @("perl ", "rules!") # Not like I'm trying to bias any survey here.
+my @left = @: "hello ", "world\n"
+my @right = @: "perl ", "rules!" # Not like I'm trying to bias any survey here.
 
 foreach ( @left)
     # is (syswrite ($left, $_), length $_, "write " . _qq ($_) . " to left");
@@ -143,7 +143,7 @@ do
         or printf $^STDOUT, "\$\!=\%d(\%s)\n", $err, $err
 
 
-my @gripping = @(chr 255, chr 127)
+my @gripping = @: chr 255, chr 127
 foreach ( @gripping)
     is (syswrite ($right, $_), length $_, "syswrite to right")
 

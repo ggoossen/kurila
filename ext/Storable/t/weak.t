@@ -6,12 +6,12 @@
 #  in the README file that comes with the distribution.
 #
 
-use Config;
+use Config
 
 BEGIN
     if (env::var('PERL_CORE'))
         chdir('t') if -d 't'
-        $^INCLUDE_PATH = @('.', '../lib', '../ext/Storable/t')
+        $^INCLUDE_PATH = @: '.', '../lib', '../ext/Storable/t'
     else
         # This lets us distribute Test::More in t/
         unshift $^INCLUDE_PATH, 't'
@@ -27,7 +27,7 @@ our $file
 
 
 sub tester
-    my @($contents, $sub, $testersub, $what) = @_
+    my (@: $contents, $sub, $testersub, $what) = @_
     # Test that if we re-write it, everything still works:
     my $clone = &$sub ($contents)
     is ($^EVAL_ERROR, "", "There should be no error extracting for $what")
@@ -35,56 +35,56 @@ sub tester
 
 
 my $r = \$%
-my $s1 = \@($r, $r)
+my $s1 = \@: $r, $r
 weaken $s1->[1]
 ok (isweak($s1->[1]), "element 1 is a weak reference")
 
-my $s0 = \@($r, $r)
+my $s0 = \@: $r, $r
 weaken $s0->[0]
 ok (isweak($s0->[0]), "element 0 is a weak reference")
 
-my $w = \@($r)
+my $w = \@: $r
 weaken $w->[0]
 ok (isweak($w->[0]), "element 0 is a weak reference")
 
 package main
 
-my @tests = @(
-    \@($s1,
-       sub ($clone, $what)
+my @tests = @: 
+    \(@: $s1
+         sub ($clone, $what)
            isa_ok($clone,'ARRAY')
-           isa_ok($clone->[0],'HASH')
-           isa_ok($clone->[1],'HASH')
-           ok(!isweak($clone->[0]), "Element 0 isn't weak")
-           ok(isweak($clone->[1]), "Element 1 is weak")
-    ),
+             isa_ok($clone->[0],'HASH')
+             isa_ok($clone->[1],'HASH')
+             ok(!isweak($clone->[0]), "Element 0 isn't weak")
+             ok(isweak($clone->[1]), "Element 1 is weak")
+        )
     # The weak reference needs to hang around long enough for other stuff to
     # be able to make references to it. So try it second.
-    \@($s0,
-       sub ($clone, $what)
+    \(@: $s0
+         sub ($clone, $what)
            isa_ok($clone,'ARRAY')
-           isa_ok($clone->[0],'HASH')
-           isa_ok($clone->[1],'HASH')
-           ok(isweak($clone->[0]), "Element 0 is weak")
-           ok(!isweak($clone->[1]), "Element 1 isn't weak")
-
-    ),
-    \@($w,
-       sub ($clone, $what)
+             isa_ok($clone->[0],'HASH')
+             isa_ok($clone->[1],'HASH')
+             ok(isweak($clone->[0]), "Element 0 is weak")
+             ok(!isweak($clone->[1]), "Element 1 isn't weak")
+             
+        )
+    \(@: $w
+         sub ($clone, $what)
            isa_ok($clone,'ARRAY')
-           if ($what eq 'nothing') {
-               # We're the original, so we're still a weakref to a hash
-               isa_ok($clone->[0],'HASH');
-               ok(isweak($clone->[0]), "Element 0 is weak");
-           }else
+             if ($what eq 'nothing') {
+                 # We're the original, so we're still a weakref to a hash
+                 isa_ok($clone->[0],'HASH');
+                 ok(isweak($clone->[0]), "Element 0 is weak");
+             }else
                is($clone->[0],undef)
 
-
-    ),
-    )
+             
+        )
+    
 
 foreach (@tests) {
-    my @($input, $testsub) = $_->@;
+    my (@: $input, $testsub) = $_->@;
 
     tester($input, sub {return shift}, $testsub, 'nothing');
 

@@ -40,7 +40,7 @@ ok grep { $_ eq 'it' }, panic_languages('es')
 
 print $^STDOUT, "# Now the ::List tests...\n"
 
-use I18N::LangTags::List;
+use I18N::LangTags::List
 foreach my $lt (qw(
  en
  en-us

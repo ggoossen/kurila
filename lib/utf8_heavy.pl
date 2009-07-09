@@ -15,10 +15,10 @@ our (%PropertyAlias, %PA_reverse, %PropValueAlias, %PVA_reverse, %PVA_abbr_map)
 ## It's a data structure that encodes a set of Unicode characters.
 ##
 
-use bytes;
+use bytes
 
 sub SWASHNEW_real
-    my @($class, $type, $list, $minbits, $none) =  @_
+    my (@: $class, $type, $list, $minbits, $none) =  @_
     local $^DEBUGGING = 0 if $^DEBUGGING
 
     print $^STDERR, "SWASHNEW $(join ' ',@_)\n" if DEBUG
@@ -93,7 +93,7 @@ sub SWASHNEW_real
             ##
             require "unicore/PVA.pl"
             if ($type =~ m/^([\w\s]+)[:=]\s*(.*)/)
-                my @($enum, $val) = @(lc $1, lc $2)
+                my (@: $enum, $val) = @: lc $1, lc $2
                 $enum =~ s/[ _-]//g
                 $val =~ s/[ _-]//g
 
@@ -208,7 +208,7 @@ sub SWASHNEW_real
         $extras = join '', grep { m/^[^0-9a-fA-F]/ }, @tmp
         $list = join '', map  { $_->[1] },
             sort { $a->[0] <+> $b->[0] },
-            map  { m/^([0-9a-fA-F]+)/; \@( CORE::hex($1), $_ ) },
+            map  { m/^([0-9a-fA-F]+)/; \(@:  CORE::hex($1), $_ ) },
             grep { m/^([0-9a-fA-F]+)/ and not %seen{+$1}++ }, @tmp # XXX doesn't do ranges right
     
 
@@ -240,7 +240,7 @@ sub SWASHNEW_real
             my $name = $2
             print $^STDERR, "$1 => $2\n" if DEBUG
             if ($char =~ m/[-+!&]/)
-                my @($c,?$t) =  split(m/::/, $name, 2)	# bogus use of ::, really
+                my (@: $c,?$t) =  split(m/::/, $name, 2)	# bogus use of ::, really
                 my $subobj
                 if ($c eq 'utf8')
                     $subobj = SWASHNEW_real('utf8', $t, "", $minbits, 0)
@@ -258,13 +258,13 @@ sub SWASHNEW_real
 
     print $^STDERR, "CLASS = $class, TYPE => $type, BITS => $bits, NONE => $none\nEXTRAS =>\n$extras\nLIST =>\n$list\n" if DEBUG
 
-    my $SWASH = bless \%(
-        TYPE => $type,
-        BITS => $bits,
-        EXTRAS => $extras,
-        LIST => $list,
-        NONE => $none,
-        < @extras,
+    my $SWASH = bless \(%: 
+        TYPE => $type
+        BITS => $bits
+        EXTRAS => $extras
+        LIST => $list
+        NONE => $none
+        < @extras
         ) => $class
 
     if ($file)

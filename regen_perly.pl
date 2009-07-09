@@ -82,7 +82,7 @@ die "failed to read $tmpc_file: length mismatch\n"
     unless length $clines == -s $tmpc_file
 close $ctmpfile
 
-my @($actlines, $tablines) =  extract($clines)
+my (@: $actlines, $tablines) =  extract($clines)
 
 $tablines .= make_type_tab($y_file, $tablines)
 
@@ -181,7 +181,7 @@ sub extract
     $actlines =~ s/yyvsp\[(.*?)\]/ps[$1].val/g
         or die "Can't convert value stack name\n"
 
-    return @($actlines. "\n", $tablines. "\n")
+    return @: $actlines. "\n", $tablines. "\n"
 
 
 # Generate a table, yy_type_tab[], that specifies for each token, what

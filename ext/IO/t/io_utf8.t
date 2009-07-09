@@ -9,7 +9,7 @@ BEGIN
 
 require(env::var('PERL_CORE') ?? "./test.pl" !! "./t/test.pl")
 
-use utf8;
+use utf8
 
 plan(tests => 5)
 

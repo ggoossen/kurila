@@ -14,7 +14,7 @@ umask 0
 $xref = \ ""
 $runme = $^EXECUTABLE_NAME
 @a =1..5
-%h = %( <1..6)
+%h = %:  <1..6
 $aref = \@a
 $href = \%h
 open my $op_fh, '-|', qq{$runme -le "print \\\$^STDOUT, 'aaa Ok ok' for 1..100"}
@@ -26,7 +26,7 @@ pos($posstr = 3)
 $nn = $n = 2
 sub subb {"in s"}
 
-@INPUT = @( ~< $^DATA )
+@INPUT = @:  ~< $^DATA 
 @simple_input = grep { m/^\s*\w+\s*\$\w+\s*[#\n]/ }, @INPUT
 
 plan 6 + (nelems @INPUT) + nelems @simple_input
@@ -66,12 +66,12 @@ ok( ($zzz1 == 13 and $zzz2 == 13 and $l1 == 13),
 
 for ( @INPUT)
     SKIP: do
-        @($op, _, $comment) = @: m/^([^\#]+)(\#\s+(.*))?/
+        (@: $op, _, $comment) = @: m/^([^\#]+)(\#\s+(.*))?/
         $comment = $op unless defined $comment
         chomp
         $op = "$op==$op" unless $op =~ m/==/
-        @($op, $expectop) = @: $op =~ m/(.*)==(.*)/
-
+        (@: $op, $expectop) = @: $op =~ m/(.*)==(.*)/
+                               
         if ($op =~ m/^'\?\?\?'/ or $comment =~ m/skip\(.*\Q$^OS_NAME\E.*\)/i)
             skip("$comment", 1)
         
@@ -99,10 +99,10 @@ EOE
 for ( @simple_input)
     SKIP:
         do
-        @($op, _, $comment) = @: m/^([^\#]+)(\#\s+(.*))?/
+        (@: $op, _, $comment) = @: m/^([^\#]+)(\#\s+(.*))?/
         $comment = $op unless defined $comment
         chomp
-        @($operator, $variable) = @: m/^\s*(\w+)\s*\$(\w+)/
+        (@: $operator, $variable) = @: m/^\s*(\w+)\s*\$(\w+)/
             or warn "misprocessed '$_'\n"
         eval <<EOE
   local \$^WARN_HOOK = \\&wrn;

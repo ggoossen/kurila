@@ -11,18 +11,18 @@ my $tests_per_platform = 10
 
 plan tests => 1 + (nelems @platforms) * $tests_per_platform
 
-my %volumes = %(
-    Mac => 'Macintosh HD',
-    OS2 => 'A:',
-    Win32 => 'A:',
-    VMS => 'v',
-    )
-my %other_vols = %(
-    Mac => 'Mounted Volume',
-    OS2 => 'B:',
-    Win32 => 'B:',
-    VMS => 'w',
-    )
+my %volumes = %: 
+    Mac => 'Macintosh HD'
+    OS2 => 'A:'
+    Win32 => 'A:'
+    VMS => 'v'
+    
+my %other_vols = %: 
+    Mac => 'Mounted Volume'
+    OS2 => 'B:'
+    Win32 => 'B:'
+    VMS => 'w'
+    
 
 ok 1, "Loaded"
 
@@ -102,7 +102,7 @@ foreach my $platform ( @platforms)
 
 
 sub volumes_differ($module, $one, $two)
-    my @($one_v, ...) =  $module->splitpath( $module->rel2abs($one) )
-    my @($two_v, ...) =  $module->splitpath( $module->rel2abs($two) )
+    my (@: $one_v, ...) =  $module->splitpath( $module->rel2abs($one) )
+    my (@: $two_v, ...) =  $module->splitpath( $module->rel2abs($two) )
     return $one_v ne $two_v
 

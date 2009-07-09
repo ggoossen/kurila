@@ -21,7 +21,7 @@ use Pod::Text ()
 use Term::ANSIColor < qw(colored)
 
 our (@ISA, $VERSION)
-use utf8;
+use utf8
 
 @ISA = qw(Pod::Text)
 

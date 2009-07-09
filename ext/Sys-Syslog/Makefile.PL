@@ -2,16 +2,16 @@
 use Config
 use ExtUtils::MakeMaker
 eval 'use ExtUtils::MakeMaker::Coverage'
-use File::Copy;
-use File::Path;
-use File::Spec;
+use File::Copy
+use File::Path
+use File::Spec
 
 
 # create a lib/ dir in order to avoid warnings in Test::Distribution
 mkdir "lib", 0755
 
 # virtual paths given to EU::MM
-my %virtual_path = %( 'Syslog.pm' => '$(INST_LIBDIR)/Syslog.pm' )
+my %virtual_path = %:  'Syslog.pm' => '$(INST_LIBDIR)/Syslog.pm' 
 
 # detect when to use Win32::EvenLog
 my (@extra_params, @extra_prereqs)
@@ -65,14 +65,14 @@ WriteMakefile(
     INSTALLDIRS     => 'perl',
     XSPROTOARG      => '-noprototypes',
     PM              => %virtual_path,
-    PREREQ_PM       => %(
-    'Test::More' => 0,
-    'XSLoader'   => 0,
-    < @extra_prereqs,
+    PREREQ_PM       => (%: 
+    'Test::More' => 0
+    'XSLoader'   => 0
+    < @extra_prereqs
     ),
-    dist            => %( COMPRESS => 'gzip -9f', SUFFIX => 'gz', ),
-    clean           => %( FILES => 'Sys-Syslog-*' ),
-    realclean       => %( FILES => 'lib const-c.inc const-xs.inc macros.all PerlLog.h *.bak *.bin *.rc' ),
+    dist            => (%:  COMPRESS => 'gzip -9f', SUFFIX => 'gz', ),
+    clean           => (%:  FILES => 'Sys-Syslog-*' ),
+    realclean       => (%:  FILES => 'lib const-c.inc const-xs.inc macros.all PerlLog.h *.bak *.bin *.rc' ),
     < @extra_params
     )
 
@@ -108,52 +108,52 @@ if(try {require ExtUtils::Constant; 1})
         LOG_INFO LOG_NOTICE LOG_WARNING
     )
 
-    my @facilities = @( <
-                        # standard facilities
-                        qw(
+    my @facilities = @:  <
+                             # standard facilities
+                             qw(
             LOG_AUTH LOG_AUTHPRIV LOG_CRON LOG_DAEMON LOG_FTP LOG_KERN
             LOG_LOCAL0 LOG_LOCAL1 LOG_LOCAL2 LOG_LOCAL3 LOG_LOCAL4
             LOG_LOCAL5 LOG_LOCAL6 LOG_LOCAL7 LOG_LPR LOG_MAIL LOG_NEWS
             LOG_SYSLOG LOG_USER LOG_UUCP
-        ),
-                        # Mac OS X specific facilities
-                        \%( name => "LOG_INSTALL",    type => "IV", default => \@( "IV", "LOG_USER"  ) ),
-                        \%( name => "LOG_LAUNCHD",    type => "IV", default => \@( "IV", "LOG_DAEMON") ),
-                        \%( name => "LOG_NETINFO",    type => "IV", default => \@( "IV", "LOG_DAEMON") ),
-                        \%( name => "LOG_RAS",        type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
-                        \%( name => "LOG_REMOTEAUTH", type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
-                        # modern BSD specific facilities
-                        \%( name => "LOG_CONSOLE",    type => "IV", default => \@( "IV", "LOG_USER"  ) ),
-                        \%( name => "LOG_NTP",        type => "IV", default => \@( "IV", "LOG_DAEMON") ),
-                        \%( name => "LOG_SECURITY",   type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
-                        # IRIX specific facilities
-                        \%( name => "LOG_AUDIT",      type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
-                        \%( name => "LOG_LFMT",       type => "IV", default => \@( "IV", "LOG_USER"  ) ),
         )
+                         # Mac OS X specific facilities
+                         \(%:  name => "LOG_INSTALL",    type => "IV", default => \(@:  "IV", "LOG_USER"  ) )
+                         \(%:  name => "LOG_LAUNCHD",    type => "IV", default => \(@:  "IV", "LOG_DAEMON") )
+                         \(%:  name => "LOG_NETINFO",    type => "IV", default => \(@:  "IV", "LOG_DAEMON") )
+                         \(%:  name => "LOG_RAS",        type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) )
+                         \(%:  name => "LOG_REMOTEAUTH", type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) )
+                         # modern BSD specific facilities
+                         \(%:  name => "LOG_CONSOLE",    type => "IV", default => \(@:  "IV", "LOG_USER"  ) )
+                         \(%:  name => "LOG_NTP",        type => "IV", default => \(@:  "IV", "LOG_DAEMON") )
+                         \(%:  name => "LOG_SECURITY",   type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) )
+                         # IRIX specific facilities
+                         \(%:  name => "LOG_AUDIT",      type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) )
+                         \(%:  name => "LOG_LFMT",       type => "IV", default => \(@:  "IV", "LOG_USER"  ) )
+        
 
     my @options = qw(
         LOG_CONS LOG_PID LOG_NDELAY LOG_NOWAIT LOG_ODELAY LOG_PERROR 
     )
 
-    my @others_macros = @( <
-                           qw(LOG_FACMASK),
-                           \%( name => "_PATH_LOG", type => "PV", default => \@( "PV", qq("$_PATH_LOG") ) ),
-                           \%( name => "LOG_PRIMASK",     type => "IV", default => \@( "IV", 7) ),
-                           \%( name => "LOG_NFACILITIES", type => "IV", default => \@( "IV", scalar nelems @facilities) ),
-        )
+    my @others_macros = @:  <
+                                qw(LOG_FACMASK)
+                            \(%:  name => "_PATH_LOG", type => "PV", default => \(@:  "PV", qq("$_PATH_LOG") ) )
+                            \(%:  name => "LOG_PRIMASK",     type => "IV", default => \(@:  "IV", 7) )
+                            \(%:  name => "LOG_NFACILITIES", type => "IV", default => \(@:  "IV", scalar nelems @facilities) )
+        
 
     ExtUtils::Constant::WriteConstants(
         PROXYSUBS => 1,
         NAME => 'Sys::Syslog',
-        NAMES => \@( < @levels, < @facilities, < @options, < @others_macros ),
+        NAMES => \(@:  < @levels, < @facilities, < @options, < @others_macros ),
         )
 
-    my @names = map { ref $_ ?? $_->{?name} !! $_ }, @( < @levels, < @facilities, < @options)
+    my @names = map { ref $_ ?? $_->{?name} !! $_ }, @:  < @levels, < @facilities, < @options
     open(my $macros, ">", 'macros.all') or warn "warning: Can't write 'macros.all': $^OS_ERROR\n"
     print $macros, join $^INPUT_RECORD_SEPARATOR, @names
     close($macros)
 else
-    foreach my $file (@('const-c.inc', 'const-xs.inc'))
+    foreach my $file ((@: 'const-c.inc', 'const-xs.inc'))
         my $fallback = File::Spec->catfile('fallback', $file)
         copy($fallback, $file) or die "fatal: Can't copy $fallback to $file: $^OS_ERROR"
     

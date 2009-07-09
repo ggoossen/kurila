@@ -6,19 +6,19 @@ use warnings
 our $VERSION     = "0.09"
 our @ISA         = qw(Exporter)
 my @XS_FUNCTIONS = qw(regmust)
-my %XS_FUNCTIONS = %( < @+: map { @: $_ => 1 }, @XS_FUNCTIONS )
-our @EXPORT_OK   = @(< @XS_FUNCTIONS, <
-                     qw(is_regexp regexp_pattern
-                       regname regnames regnames_count))
-our %EXPORT_OK = %( < @+: map { @: $_ => 1 }, @EXPORT_OK )
+my %XS_FUNCTIONS = %:  < @+: map { @: $_ => 1 }, @XS_FUNCTIONS 
+our @EXPORT_OK   = @: < @XS_FUNCTIONS, <
+                          qw(is_regexp regexp_pattern
+                       regname regnames regnames_count)
+our %EXPORT_OK = %:  < @+: map { @: $_ => 1 }, @EXPORT_OK 
 
 # *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING ***
 #
 # If you modify these values see comment below!
 
-my %bitmask = %(
-    eval    => 0x00200000, # HINT_RE_EVAL
-    )
+my %bitmask = %: 
+    eval    => 0x00200000 # HINT_RE_EVAL
+    
 
 # - ExtUtils::ParseXS uses a hardcoded
 # BEGIN { $^H |= 0x00200000 }
@@ -31,7 +31,7 @@ sub setcolor
     try {				# Ignore errors
         require Term::Cap;
 
-        my $terminal = Term::Cap->Tgetent(\%(OSPEED => 9600)); # Avoid warning.
+        my $terminal = Term::Cap->Tgetent(\(%: OSPEED => 9600)); # Avoid warning.
         my $props = env::var('PERL_RE_TC') || 'md,me,so,se,us,ue';
         my @props = split m/,/, $props;
         my $colors = join "\t", map {$terminal->Tputs($_,1)}, @props;
@@ -45,28 +45,28 @@ sub setcolor
 
 
 
-our %flags = %(
-    COMPILE         => 0x0000FF,
-    PARSE           => 0x000001,
-    OPTIMISE        => 0x000002,
-    TRIEC           => 0x000004,
-    DUMP            => 0x000008,
-    FLAGS           => 0x000010,
+our %flags = %: 
+    COMPILE         => 0x0000FF
+    PARSE           => 0x000001
+    OPTIMISE        => 0x000002
+    TRIEC           => 0x000004
+    DUMP            => 0x000008
+    FLAGS           => 0x000010
 
-    EXECUTE         => 0x00FF00,
-    INTUIT          => 0x000100,
-    MATCH           => 0x000200,
-    TRIEE           => 0x000400,
+    EXECUTE         => 0x00FF00
+    INTUIT          => 0x000100
+    MATCH           => 0x000200
+    TRIEE           => 0x000400
 
-    EXTRA           => 0xFF0000,
-    TRIEM           => 0x010000,
-    OFFSETS         => 0x020000,
-    OFFSETSDBG      => 0x040000,
-    STATE           => 0x080000,
-    OPTIMISEM       => 0x100000,
-    STACK           => 0x280000,
-    BUFFERS         => 0x400000,
-    )
+    EXTRA           => 0xFF0000
+    TRIEM           => 0x010000
+    OFFSETS         => 0x020000
+    OFFSETSDBG      => 0x040000
+    STATE           => 0x080000
+    OPTIMISEM       => 0x100000
+    STACK           => 0x280000
+    BUFFERS         => 0x400000
+    
 %flags{+ALL} = -1 ^&^ ^~^(%flags{?OFFSETS}^|^%flags{?OFFSETSDBG}^|^%flags{?BUFFERS})
 %flags{+All} = (%flags{+all} = %flags{?DUMP} ^|^ %flags{?EXECUTE})
 %flags{+Extra} = %flags{?EXECUTE} ^|^ %flags{?COMPILE}
@@ -149,7 +149,7 @@ sub bits
             re->export_to_level(2, 're', $s)
         else
             warn("Unknown \"re\" subpragma '$s' (known ones are: "
-                . join(', ', map {qq('$_')}, @( 'debug', 'debugcolor', < sort keys %bitmask))
+                . join(', ', map {qq('$_')}, (@:  'debug', 'debugcolor', < sort keys %bitmask))
                 . ")")
         
     

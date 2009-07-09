@@ -41,7 +41,7 @@ unlink($PATH) or $^OS_NAME eq 'os2' or die "Can't unlink $PATH: $^OS_ERROR"
 $^OUTPUT_AUTOFLUSH = 1
 print $^STDOUT, "1..5\n"
 
-use IO::Socket::UNIX;
+use IO::Socket::UNIX
 
 my $listen = IO::Socket::UNIX->new(Local => $PATH, Listen => 0)
 

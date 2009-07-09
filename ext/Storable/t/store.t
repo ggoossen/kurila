@@ -16,9 +16,9 @@ $a = 'toto'
 $b = \$a
 my $c = bless \$%, 'CLASS'
 $c->{+attribute} = 'attrval'
-my %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$c)
-my @a = @('first', undef, 3, -4, -3.14159, 456, 4.5,
-          $b, \$a, $a, $c, \$c, \%a)
+my %a = %: 'key', 'value', 1, 0, $a, $b, 'cvar', \$c
+my @a = @: 'first', undef, 3, -4, -3.14159, 456, 4.5
+           $b, \$a, $a, $c, \$c, \%a
 
 ok(defined store(\@a, 'store'))
 
@@ -37,7 +37,7 @@ sub make
     return $self
 ;
 
-package main;
+package main
 
 my $foo = FOO->make
 ok($foo->store('store'))

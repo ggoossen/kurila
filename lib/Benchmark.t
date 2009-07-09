@@ -3,9 +3,9 @@
 use warnings
 
 our ($foo, $bar, $baz, $ballast)
-use Test::More tests => 182;
+use Test::More tests => 182
 
-use Benchmark < qw(:all);
+use Benchmark < qw(:all)
 
 my $delta = 0.4
 
@@ -106,8 +106,8 @@ do
     like ($all, $All_Pattern, 'timestr ($diff, "all")')
     print $^STDOUT, "# $all\n"
 
-    my @($wallclock, $usr, $sys, $cusr, $csys, $cpu) = @: $all =~ $All_Pattern
-
+    my (@: $wallclock, $usr, $sys, $cusr, $csys, $cpu) = @: $all =~ $All_Pattern
+                                                          
     is (timestr ($diff, 'none'), '', "none supresses output")
 
     my $noc = timestr ($diff, 'noc')
@@ -202,8 +202,8 @@ do
 
 $foo = $bar = $baz = 0
 $out = ""
-$got = do_with_out({ timethese($iterations, \%( Foo => sub (@< @_) {++$foo}, Bar => '++$main::bar',
-                               Baz => sub (@< @_) {++$baz} )) })
+$got = do_with_out({ timethese($iterations, \(%:  Foo => sub (@< @_) {++$foo}, Bar => '++$main::bar'
+                                                  Baz => sub (@< @_) {++$baz} )) })
 is(ref ($got), 'HASH', "timethese should return a hashref")
 isa_ok($got->{?Foo}, 'Benchmark', "Foo value")
 isa_ok($got->{?Bar}, 'Benchmark', "Bar value")
@@ -225,8 +225,8 @@ like ($got, qr/\bBar\b.*\bBaz\b.*\bFoo\b/s, 'check output is in sorted order')
 like ($got, $Default_Pattern, 'should find default format somewhere')
 
 
-my $code_to_test =  \%( Foo => sub (@< @_) {$foo+=fib($ballast-2)},
-    Bar => sub (@< @_) {$bar+=fib($ballast)})
+my $code_to_test =  \%:  Foo => sub (@< @_) {$foo+=fib($ballast-2)}
+                         Bar => sub (@< @_) {$bar+=fib($ballast)}
 # Keep these for later.
 my $results
 do
@@ -318,18 +318,18 @@ sub check_graph_consistency(    $ratetext, $slowc, $fastc,
 
 
 sub check_graph_vs_output($chart, $got)
-    my @(       $ratetext, $slowc, $fastc,
-          $slowr, $slowratet, $slowslow, $slowfastt,
-          $fastr, $fastratet, $fastslowt, $fastfast)
+    my @:        $ratetext, $slowc, $fastc
+                 $slowr, $slowratet, $slowslow, $slowfastt
+                 $fastr, $fastratet, $fastslowt, $fastfast
         = @: $got =~ $graph_dissassembly
     my $all_passed
         = check_graph_consistency (        $ratetext, $slowc, $fastc,
                                            $slowr, $slowratet, $slowslow, $slowfastt,
                                            $fastr, $fastratet, $fastslowt, $fastfast)
     $all_passed
-        &&= is_deeply ($chart, \@(\@('', $ratetext, $slowc, $fastc),
-                                  \@($slowr, $slowratet, $slowslow, $slowfastt),
-                                  \@($fastr, $fastratet, $fastslowt, $fastfast)),
+        &&= is_deeply ($chart, \(@: \(@: '', $ratetext, $slowc, $fastc)
+                                    \(@: $slowr, $slowratet, $slowslow, $slowfastt)
+                                    \(@: $fastr, $fastratet, $fastslowt, $fastfast)),
                        "check the chart layout matches the formatted output")
     unless ($all_passed)
         print $^STDERR, "# Something went wrong there. I got this chart:\n"
@@ -347,7 +347,7 @@ sub check_graph($title, $row1, $row2)
 do
     $out = ""
     my $start = times
-    my $chart = do_with_out({ cmpthese( -0.1, \%( a => "++ our \$i", b => "our \$i; \$i = sqrt( \$i++)" ), "auto" )  })
+    my $chart = do_with_out({ cmpthese( -0.1, \(%:  a => "++ our \$i", b => "our \$i; \$i = sqrt( \$i++)" ), "auto" )  })
     my $end = times
     ok (($end - $start) +> 0.05, "benchmarked code ran for over 0.05 seconds")
 
@@ -368,7 +368,7 @@ do
 do
     $out = ""
     my $start = times
-    my $chart = do_with_out({ cmpthese( -0.1, \%( a => "++ our \$i", b => "our \$i; \$i = sqrt(\$i++)" ) )  })
+    my $chart = do_with_out({ cmpthese( -0.1, \(%:  a => "++ our \$i", b => "our \$i; \$i = sqrt(\$i++)" ) )  })
     my $end = times
     ok (($end - $start) +> 0.05, "benchmarked code ran for over 0.05 seconds")
 
@@ -515,20 +515,20 @@ do   # Check usage error messages
 
     my @takes_no_args =qw(clearallcache disablecache enablecache)
 
-    my %cmpthese = %('forgot {}' => 'cmpthese( 42, foo => sub { 1 } )',
-        'not result' => 'cmpthese(42)',
-        'array ref'  => 'cmpthese( 42, \@( foo => sub { 1 } ) )',
-        )
-    while( my@(?$name, ?$code) =@( each %cmpthese) )
+    my %cmpthese = %: 'forgot {}' => 'cmpthese( 42, foo => sub { 1 } )'
+                      'not result' => 'cmpthese(42)'
+                      'array ref'  => 'cmpthese( 42, \@( foo => sub { 1 } ) )'
+        
+    while( my(@: ?$name, ?$code) =(@:  each %cmpthese) )
         eval $code
         is( $^EVAL_ERROR->{?description}, %usage{?cmpthese}, "cmpthese usage: $name" )
     
 
-    my %timethese = %('forgot {}'  => 'timethese( 42, foo => sub { 1 } )',
-        'array ref'  => 'timethese( 42, \@( foo => sub { 1 } ) )',
-        )
+    my %timethese = %: 'forgot {}'  => 'timethese( 42, foo => sub { 1 } )'
+                       'array ref'  => 'timethese( 42, \@( foo => sub { 1 } ) )'
+        
 
-    while( my@(?$name, ?$code) =@( each %timethese) )
+    while( my(@: ?$name, ?$code) =(@:  each %timethese) )
         eval $code
         is( $^EVAL_ERROR->{?description}, %usage{?timethese}, "timethese usage: $name" )
     

@@ -19,7 +19,7 @@ our $VERSION = 1.01
 
 BEGIN 
     chdir 't' if -d 't'
-    $^INCLUDE_PATH = @('../lib')
+    $^INCLUDE_PATH = @: '../lib'
 
 
 env::var('PERL_CORE' ) = 1

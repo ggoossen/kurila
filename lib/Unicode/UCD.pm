@@ -4,7 +4,7 @@ use warnings
 
 our $VERSION = '0.25'
 
-use Storable < qw(dclone);
+use Storable < qw(dclone)
 
 require Exporter
 
@@ -20,7 +20,7 @@ our @EXPORT_OK = qw(charinfo
 		    namedseq)
 
 use Carp
-use utf8;
+use utf8
 
 =head1 NAME
 
@@ -173,30 +173,30 @@ sub han_charname # internal: called from charinfo
     return sprintf("CJK UNIFIED IDEOGRAPH-\%04X", shift)
 
 
-my @CharinfoRanges = @(
+my @CharinfoRanges = @: 
   # block name
   # [ first, last, coderef to name, coderef to decompose ],
   # CJK Ideographs Extension A
-  \@( 0x3400,   0x4DB5,   \&han_charname,   undef  ),
+  \(@:  0x3400,   0x4DB5,   \&han_charname,   undef  )
   # CJK Ideographs
-  \@( 0x4E00,   0x9FA5,   \&han_charname,   undef  ),
+  \(@:  0x4E00,   0x9FA5,   \&han_charname,   undef  )
   # Hangul Syllables
-  \@( 0xAC00,   0xD7A3,   $hasHangulUtil ?? \&getHangulName !! \&hangul_charname,  \&hangul_decomp ),
+  \(@:  0xAC00,   0xD7A3,   $hasHangulUtil ?? \&getHangulName !! \&hangul_charname,  \&hangul_decomp )
   # Non-Private Use High Surrogates
-  \@( 0xD800,   0xDB7F,   undef,   undef  ),
+  \(@:  0xD800,   0xDB7F,   undef,   undef  )
   # Private Use High Surrogates
-  \@( 0xDB80,   0xDBFF,   undef,   undef  ),
+  \(@:  0xDB80,   0xDBFF,   undef,   undef  )
   # Low Surrogates
-  \@( 0xDC00,   0xDFFF,   undef,   undef  ),
+  \(@:  0xDC00,   0xDFFF,   undef,   undef  )
   # The Private Use Area
-  \@( 0xE000,   0xF8FF,   undef,   undef  ),
+  \(@:  0xE000,   0xF8FF,   undef,   undef  )
   # CJK Ideographs Extension B
-  \@( 0x20000,  0x2A6D6,  \&han_charname,   undef  ),
+  \(@:  0x20000,  0x2A6D6,  \&han_charname,   undef  )
   # Plane 15 Private Use Area
-  \@( 0xF0000,  0xFFFFD,  undef,   undef  ),
+  \(@:  0xF0000,  0xFFFFD,  undef,   undef  )
   # Plane 16 Private Use Area
-  \@( 0x100000, 0x10FFFD, undef,   undef  ),
-    )
+  \(@:  0x100000, 0x10FFFD, undef,   undef  )
+    
 
 sub charinfo($arg)
     my $code = _getcode($arg)
@@ -218,7 +218,7 @@ sub charinfo($arg)
     openunicode(\$UNICODEFH, "UnicodeData.txt")
     if (defined $UNICODEFH)
         use Search::Dict v1.02
-        if (look($UNICODEFH, "$hexk;", \%( xfrm => sub ($v) { $v =~ m/^([^;]+);(.+)/; sprintf "\%06X;$2", hex($1) } ) ) +>= 0)
+        if (look($UNICODEFH, "$hexk;", \(%:  xfrm => sub ($v) { $v =~ m/^([^;]+);(.+)/; sprintf "\%06X;$2", hex($1) } ) ) +>= 0)
             my $line = ~< $UNICODEFH
             return unless defined $line
             chomp $line
@@ -308,8 +308,8 @@ sub _charblocks
             local $_ = undef
             while ( ~< $BLOCKSFH)
                 if (m/^([0-9A-F]+)\.\.([0-9A-F]+);\s+(.+)/)
-                    my @($lo, $hi) = @(hex($1), hex($2))
-                    my $subrange = @( $lo, $hi, $3 )
+                    my (@: $lo, $hi) = @: hex($1), hex($2)
+                    my $subrange = @:  $lo, $hi, $3 
                     push @BLOCKS, $subrange
                     push %BLOCKS{+$3}, $subrange
                 
@@ -370,10 +370,10 @@ sub _charscripts
             local $_ = undef
             while ( ~< $SCRIPTSFH)
                 if (m/^([0-9A-F]+)(?:\.\.([0-9A-F]+))?\s+;\s+(\w+)/)
-                    my @($lo, $hi) = @(hex($1), $2 ?? hex($2) !! hex($1))
+                    my (@: $lo, $hi) = @: hex($1), $2 ?? hex($2) !! hex($1)
                     my $script = lc($3)
                     $script =~ s/\b(\w)/$(uc($1))/g
-                    my $subrange = @( $lo, $hi, $script )
+                    my $subrange = @:  $lo, $hi, $script 
                     push @SCRIPTS, $subrange
                     push %SCRIPTS{+$script}, $subrange
                 
@@ -490,46 +490,46 @@ by L</charblocks> and L</charscripts> by using charinrange():
 =cut
 
 my %GENERAL_CATEGORIES =
-    %(
-    'L'  =>         'Letter',
-    'LC' =>         'CasedLetter',
-    'Lu' =>         'UppercaseLetter',
-    'Ll' =>         'LowercaseLetter',
-    'Lt' =>         'TitlecaseLetter',
-    'Lm' =>         'ModifierLetter',
-    'Lo' =>         'OtherLetter',
-    'M'  =>         'Mark',
-    'Mn' =>         'NonspacingMark',
-    'Mc' =>         'SpacingMark',
-    'Me' =>         'EnclosingMark',
-    'N'  =>         'Number',
-    'Nd' =>         'DecimalNumber',
-    'Nl' =>         'LetterNumber',
-    'No' =>         'OtherNumber',
-    'P'  =>         'Punctuation',
-    'Pc' =>         'ConnectorPunctuation',
-    'Pd' =>         'DashPunctuation',
-    'Ps' =>         'OpenPunctuation',
-    'Pe' =>         'ClosePunctuation',
-    'Pi' =>         'InitialPunctuation',
-    'Pf' =>         'FinalPunctuation',
-    'Po' =>         'OtherPunctuation',
-    'S'  =>         'Symbol',
-    'Sm' =>         'MathSymbol',
-    'Sc' =>         'CurrencySymbol',
-    'Sk' =>         'ModifierSymbol',
-    'So' =>         'OtherSymbol',
-    'Z'  =>         'Separator',
-    'Zs' =>         'SpaceSeparator',
-    'Zl' =>         'LineSeparator',
-    'Zp' =>         'ParagraphSeparator',
-    'C'  =>         'Other',
-    'Cc' =>         'Control',
-    'Cf' =>         'Format',
-    'Cs' =>         'Surrogate',
-    'Co' =>         'PrivateUse',
-    'Cn' =>         'Unassigned',
-    )
+    %: 
+    'L'  =>         'Letter'
+    'LC' =>         'CasedLetter'
+    'Lu' =>         'UppercaseLetter'
+    'Ll' =>         'LowercaseLetter'
+    'Lt' =>         'TitlecaseLetter'
+    'Lm' =>         'ModifierLetter'
+    'Lo' =>         'OtherLetter'
+    'M'  =>         'Mark'
+    'Mn' =>         'NonspacingMark'
+    'Mc' =>         'SpacingMark'
+    'Me' =>         'EnclosingMark'
+    'N'  =>         'Number'
+    'Nd' =>         'DecimalNumber'
+    'Nl' =>         'LetterNumber'
+    'No' =>         'OtherNumber'
+    'P'  =>         'Punctuation'
+    'Pc' =>         'ConnectorPunctuation'
+    'Pd' =>         'DashPunctuation'
+    'Ps' =>         'OpenPunctuation'
+    'Pe' =>         'ClosePunctuation'
+    'Pi' =>         'InitialPunctuation'
+    'Pf' =>         'FinalPunctuation'
+    'Po' =>         'OtherPunctuation'
+    'S'  =>         'Symbol'
+    'Sm' =>         'MathSymbol'
+    'Sc' =>         'CurrencySymbol'
+    'Sk' =>         'ModifierSymbol'
+    'So' =>         'OtherSymbol'
+    'Z'  =>         'Separator'
+    'Zs' =>         'SpaceSeparator'
+    'Zl' =>         'LineSeparator'
+    'Zp' =>         'ParagraphSeparator'
+    'C'  =>         'Other'
+    'Cc' =>         'Control'
+    'Cf' =>         'Format'
+    'Cs' =>         'Surrogate'
+    'Co' =>         'PrivateUse'
+    'Cn' =>         'Unassigned'
+    
 
 sub general_categories
     return %GENERAL_CATEGORIES
@@ -551,27 +551,27 @@ one returned from charinfo() under the C<category> key.
 =cut
 
 my %BIDI_TYPES =
-    %(
-    'L'   => 'Left-to-Right',
-    'LRE' => 'Left-to-Right Embedding',
-    'LRO' => 'Left-to-Right Override',
-    'R'   => 'Right-to-Left',
-    'AL'  => 'Right-to-Left Arabic',
-    'RLE' => 'Right-to-Left Embedding',
-    'RLO' => 'Right-to-Left Override',
-    'PDF' => 'Pop Directional Format',
-    'EN'  => 'European Number',
-    'ES'  => 'European Number Separator',
-    'ET'  => 'European Number Terminator',
-    'AN'  => 'Arabic Number',
-    'CS'  => 'Common Number Separator',
-    'NSM' => 'Non-Spacing Mark',
-    'BN'  => 'Boundary Neutral',
-    'B'   => 'Paragraph Separator',
-    'S'   => 'Segment Separator',
-    'WS'  => 'Whitespace',
-    'ON'  => 'Other Neutrals',
-    )
+    %: 
+    'L'   => 'Left-to-Right'
+    'LRE' => 'Left-to-Right Embedding'
+    'LRO' => 'Left-to-Right Override'
+    'R'   => 'Right-to-Left'
+    'AL'  => 'Right-to-Left Arabic'
+    'RLE' => 'Right-to-Left Embedding'
+    'RLO' => 'Right-to-Left Override'
+    'PDF' => 'Pop Directional Format'
+    'EN'  => 'European Number'
+    'ES'  => 'European Number Separator'
+    'ET'  => 'European Number Terminator'
+    'AN'  => 'Arabic Number'
+    'CS'  => 'Common Number Separator'
+    'NSM' => 'Non-Spacing Mark'
+    'BN'  => 'Boundary Neutral'
+    'B'   => 'Paragraph Separator'
+    'S'   => 'Segment Separator'
+    'WS'  => 'Whitespace'
+    'ON'  => 'Other Neutrals'
+    
 
 sub bidi_types
     return %BIDI_TYPES
@@ -690,9 +690,9 @@ sub _casefold
             while ( ~< $CASEFOLDFH)
                 if (m/^([0-9A-F]+); ([CFSI]); ([0-9A-F]+(?: [0-9A-F]+)*);/)
                     my $code = hex($1)
-                    %CASEFOLD{+$code} = %( code    => $1,
-                        status  => $2,
-                        mapping => $3 )
+                    %CASEFOLD{+$code} = %:  code    => $1
+                                            status  => $2
+                                            mapping => $3 
                 
             
             close($CASEFOLDFH)
@@ -770,46 +770,46 @@ sub _casespec
             local $_ = undef
             while ( ~< $CASESPECFH)
                 if (m/^([0-9A-F]+); ([0-9A-F]+(?: [0-9A-F]+)*)?; ([0-9A-F]+(?: [0-9A-F]+)*)?; ([0-9A-F]+(?: [0-9A-F]+)*)?; (\w+(?: \w+)*)?/)
-                    my @($hexcode, $lower, $title, $upper, $condition) =
-                        @($1, $2, $3, $4, $5)
+                    my (@: $hexcode, $lower, $title, $upper, $condition) =
+                        @: $1, $2, $3, $4, $5
                     my $code = hex($hexcode)
                     if (exists %CASESPEC{$code})
                         if (exists %CASESPEC{$code}{code})
-                            my @($oldlower,
-                                 $oldtitle,
-                                 $oldupper,
-                                 $oldcondition) =
+                            my (@: $oldlower
+                                   $oldtitle
+                                   $oldupper
+                                   $oldcondition) =
                                 %CASESPEC{$code}{[qw(lower
                                                         title
                                                         upper
                                                         condition)]}
                             if (defined $oldcondition)
-                                my @($oldlocale) =
-                                    @($oldcondition =~ m/^([a-z][a-z](?:_\S+)?)/)
+                                my (@: $oldlocale) =
+                                    @: $oldcondition =~ m/^([a-z][a-z](?:_\S+)?)/
                                 delete %CASESPEC{$code}
                                 %CASESPEC{+$code}{+$oldlocale} =
-                                    %( code      => $hexcode,
-                                    lower     => $oldlower,
-                                    title     => $oldtitle,
-                                    upper     => $oldupper,
-                                    condition => $oldcondition )
+                                    %:  code      => $hexcode
+                                        lower     => $oldlower
+                                        title     => $oldtitle
+                                        upper     => $oldupper
+                                        condition => $oldcondition 
                             
                         
-                        my @($locale) =
-                            @($condition =~ m/^([a-z][a-z](?:_\S+)?)/)
+                        my (@: $locale) =
+                            @: $condition =~ m/^([a-z][a-z](?:_\S+)?)/
                         %CASESPEC{$code}{+$locale} =
-                            %( code      => $hexcode,
-                            lower     => $lower,
-                            title     => $title,
-                            upper     => $upper,
-                            condition => $condition )
+                            %:  code      => $hexcode
+                                lower     => $lower
+                                title     => $title
+                                upper     => $upper
+                                condition => $condition 
                     else
                         %CASESPEC{+$code} =
-                            %( code      => $hexcode,
-                            lower     => $lower,
-                            title     => $title,
-                            upper     => $upper,
-                            condition => $condition )
+                            %:  code      => $hexcode
+                                lower     => $lower
+                                title     => $title
+                                upper     => $upper
+                                condition => $condition 
                     
                 
             
@@ -857,7 +857,7 @@ sub _namedseq
         if (openunicode(\$NAMEDSEQFH, "NamedSequences.txt"))
             while ( defined(my $line = ~< $NAMEDSEQFH) )
                 if ($line =~ m/^(.+)\s*;\s*([0-9A-F]+(?: [0-9A-F]+)*)$/)
-                    my @($n, $s) = @($1, $2)
+                    my (@: $n, $s) = @: $1, $2
                     my @s = map { chr(hex($_)) }, split(' ', $s)
                     %NAMEDSEQ{+$n} = join("", @s)
                 

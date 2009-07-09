@@ -92,7 +92,7 @@ output the string to $FH if specified.
 # in $Term::Cap::VMS_TERMCAP before Tgetent is called.
 
 if ( $^OS_NAME eq 'VMS' )
-    chomp( my @entry = @( ~< $^DATA ) )
+    chomp( my @entry = (@:  ~< $^DATA ) )
     $VMS_TERMCAP = join '', @entry
 
 
@@ -183,7 +183,7 @@ It calls C<die> on failure.
 
 sub Tgetent($class, $self)    ## public -- static method
 
-    $self = \%() unless defined $self
+    $self = \(%: ) unless defined $self
     bless $self, $class
 
     my ( $term, $cap, $search, $max, $tmp_term, $TERMCAP )
@@ -200,10 +200,10 @@ sub Tgetent($class, $self)    ## public -- static method
     if ( $self->{?OSPEED} +< 16 )
 
         # delays for old style speeds
-        my @pad = @(
-            0,    200, 133.3, 90.9, 74.3, 66.7, 50, 33.3,
+        my @pad = @: 
+            0,    200, 133.3, 90.9, 74.3, 66.7, 50, 33.3
             16.7, 8.3, 5.5,   4.1,  2,    1,    .5, .2
-            )
+            
         $self->{+PADDING} = @pad[ $self->{?OSPEED} ]
     else
         $self->{+PADDING} = 10000 / $self->{?OSPEED}
@@ -237,7 +237,7 @@ sub Tgetent($class, $self)    ## public -- static method
         $entry = $foo
     
 
-    my @termcap_path = @( termcap_path() )
+    my @termcap_path = @:  termcap_path() 
 
     unless ( (nelems @termcap_path) || $entry )
 
@@ -540,7 +540,7 @@ sub Tgoto( $self, $cap, $code, $tmp, $FH)    ## public
     my $result = ''
     my $after  = ''
     my $online = 0
-    my @tmp    = @( $tmp, $code )
+    my @tmp    = @:  $tmp, $code 
     my $cnt    = $code
 
     while ($string =~ m/^([^%]*)%(.)(.*)/)
@@ -565,11 +565,11 @@ sub Tgoto( $self, $cap, $code, $tmp, $FH)    ## public
             $string = substr($string,1,99)
             $online = !$online
         elsif ($code eq 'r')
-            @($code,$tmp) =  @tmp
-            @tmp = @($tmp,$code)
+            (@: $code,$tmp) =  @tmp
+            @tmp = @: $tmp,$code
             $online = !$online
         elsif ($code eq '>')
-            @($code,$tmp,$string) = unpack@("CCa99",$string)
+            (@: $code,$tmp,$string) = unpack@: "CCa99",$string
             if (@tmp[0] +> $code)
                 @tmp[0] += $tmp
             
@@ -580,8 +580,8 @@ sub Tgoto( $self, $cap, $code, $tmp, $FH)    ## public
             $result .= sprintf("\%03d",shift(@tmp))
             $online = !$online
         elsif ($code eq 'i')
-            @($code,$tmp) =  @tmp
-            @tmp = @($code+1,$tmp+1)
+            (@: $code,$tmp) =  @tmp
+            @tmp = @: $code+1,$tmp+1
         else
             return "OOPS"
         

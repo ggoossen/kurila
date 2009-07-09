@@ -8,7 +8,7 @@ our $VERSION = '0.06'
 
 # Make sure the encoding/decoding stuff is available
 
-use MIME::QuotedPrint (); # no need to pollute this namespace
+use MIME::QuotedPrint () # no need to pollute this namespace
 
 # Satisfy -require-
 

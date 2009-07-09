@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -24,8 +24,8 @@ is $tb->_try(sub (@< @_) { return '' }), ''
 
 is $tb->_try(sub (@< @_) { die; }), undef
 
-is_deeply \@($tb->_try(sub (@< @_) { die "Foo\n" })),
-          \@(undef)
+is_deeply \(@: $tb->_try(sub (@< @_) { die "Foo\n" })),
+          \@: undef
 
 is $^EVAL_ERROR, 42
 cmp_ok $^OS_ERROR, '==', 23

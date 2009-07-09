@@ -67,7 +67,7 @@ sub canonpath($self,?$path)
 
 
 sub splitpath($self,$path, ?$nofile)
-    my @($volume,$directory,$file) = @('','','')
+    my (@: $volume,$directory,$file) = @: '','',''
     if ( $nofile )
         $path =~
             m{^( (?:[a-zA-Z]:|(?:\\\\|//)[^\\/]+[\\/][^\\/]+)? ) 
@@ -89,7 +89,7 @@ sub splitpath($self,$path, ?$nofile)
         $file      = $3
     
 
-    return  @($volume,$directory,$file)
+    return  @: $volume,$directory,$file
 
 
 
@@ -145,8 +145,8 @@ sub abs2rel($self,$path,$base)
     
 
     # Split up paths
-    my @( $path_volume, $path_directories, $path_file ) =  $self->splitpath( $path, 1 ) 
-    my @( $base_volume, $base_directories, _ ) =  $self->splitpath( $base, 1 ) 
+    my (@:  $path_volume, $path_directories, $path_file ) =  $self->splitpath( $path, 1 ) 
+    my (@:  $base_volume, $base_directories, _ ) =  $self->splitpath( $base, 1 ) 
     return $path unless $path_volume eq $base_volume
 
     # Now, remove all leading components that are the same
@@ -200,10 +200,10 @@ sub rel2abs($self,$path,?$base)
             $base = $self->canonpath( $base ) 
         
 
-        my @( $path_directories, $path_file ) =
+        my (@:  $path_directories, $path_file ) =
             ($self->splitpath( $path, 1 ))[[1..2]] 
 
-        my @( $base_volume, $base_directories ) =
+        my (@:  $base_volume, $base_directories ) =
             $self->splitpath( $base, 1 ) 
 
         $path = $self->catpath(

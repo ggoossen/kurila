@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -11,13 +11,13 @@ BEGIN
 
 
 require Test::Simple::Catch
-use env;
-my@($out, $err) =  Test::Simple::Catch::caught()
+use env
+my(@: $out, $err) =  Test::Simple::Catch::caught()
 local env::var('HARNESS_ACTIVE' ) = 0
 
 
 # Can't use Test.pm, that's a 5.005 thing.
-package My::Test;
+package My::Test
 
 # This has to be a require or else the END block below runs before
 # Test::Builder's own and the ending diagnostics don't come out right.

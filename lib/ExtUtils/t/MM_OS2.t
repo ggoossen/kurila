@@ -3,14 +3,14 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't' if -d 't'
-        $^INCLUDE_PATH = @( '../lib' )
+        $^INCLUDE_PATH = @:  '../lib' 
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
 
 chdir 't'
 
-use Test::More;
+use Test::More
 if ($^OS_NAME =~ m/os2/i)
     plan( tests => 32 )
 else
@@ -30,11 +30,11 @@ ok( grep( 'ExtUtils::MM_OS2', @MM::ISA),
     'ExtUtils::MM_OS2 should be parent of MM' )
 
 # dlsyms
-my $mm = bless(\%(
-    SKIPHASH => \%(
-    dynamic => 1
-    ),
-    NAME => 'foo:bar::',
+my $mm = bless(\(%: 
+    SKIPHASH => \(%: 
+        dynamic => 1
+    )
+    NAME => 'foo:bar::'
     ), 'ExtUtils::MM_OS2')
 
 is( $mm->dlsyms(), '',
@@ -63,7 +63,7 @@ do
 SKIP: do
     skip("Cannot write test files: $^OS_ERROR", 7) unless $can_write
 
-    $mm->{+IMPORTS} = \%( foo => 'bar' )
+    $mm->{+IMPORTS} = \%:  foo => 'bar' 
 
     local $^EVAL_ERROR->{description}
     try { $mm->dlsyms() }
@@ -74,9 +74,9 @@ SKIP: do
     try { $mm->dlsyms() }
     like( $^EVAL_ERROR->{?description}, qr/Malformed IMPORT/, 'should die from malformed import symbols')
 
-    $mm->{+IMPORTS} = \%( foo => 'bar.baz' )
+    $mm->{+IMPORTS} = \%:  foo => 'bar.baz' 
 
-    my @sysfail = @( 1, 0, 1 )
+    my @sysfail = @:  1, 0, 1 
     my ($sysargs, $unlinked)
 
     *ExtUtils::MM_OS2::system = 1
@@ -103,7 +103,7 @@ SKIP: do
           '... should die if other syscall fails' )
 
     # make both syscalls succeed
-    @sysfail = @(0, 0)
+    @sysfail = @: 0, 0
     local $^EVAL_ERROR->{description}
     try { $mm->dlsyms() }
     is( $^EVAL_ERROR, '', '... should not die if both syscalls succeed' )
@@ -120,7 +120,7 @@ do
         return "\n\ncalled static_lib\n\nline2\nline3\n\nline4"
     
 
-    my $args = bless(\%( IMPORTS => \$%, ), 'MM')
+    my $args = bless(\(%:  IMPORTS => \$%, ), 'MM')
 
     # without IMPORTS as a populated hash, there will be no extra data
     my $ret = ExtUtils::MM_OS2::static_lib( $args )
@@ -128,7 +128,7 @@ do
     like( $ret, qr/^called static_lib/m,
           '... should return parent data unless IMPORTS exists' )
 
-    $args->{+IMPORTS} = \%( foo => 1)
+    $args->{+IMPORTS} = \%:  foo => 1
     $ret = ExtUtils::MM_OS2::static_lib( $args )
     is( $called, 2, '... should call parent method if extra imports passed' )
     like( $ret, qr/^called static_lib\n\t\$\(AR\) \$\(AR_STATIC_ARGS\)/m,
@@ -148,7 +148,7 @@ do
     my ($dir, $noext, $exe, $cmd)
     my $found = 0
 
-    my @($curdir, $updir) = @( <File::Spec->curdir, < File::Spec->updir)
+    my (@: $curdir, $updir) = @:  <File::Spec->curdir, < File::Spec->updir
 
     # we need:
     #	1) a directory

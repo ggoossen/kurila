@@ -22,12 +22,12 @@ our @EXPORT_OK = qw(
     FCD checkFCD FCC checkFCC composeContiguous
     splitOnLastStarter
 )
-our %EXPORT_TAGS = %(
-    all       => @EXPORT +@+ @EXPORT_OK,
-    normalize => @EXPORT +@+ qw/normalize decompose reorder compose/,
-    check     => qw/checkNFD checkNFKD checkNFC checkNFKC check/,
-    fast      => qw/FCD checkFCD FCC checkFCC composeContiguous/,
-    )
+our %EXPORT_TAGS = %: 
+    all       => @EXPORT +@+ @EXPORT_OK
+    normalize => @EXPORT +@+ qw/normalize decompose reorder compose/
+    check     => qw/checkNFD checkNFKD checkNFC checkNFKC check/
+    fast      => qw/FCD checkFCD FCC checkFCC composeContiguous/
+    
 
 ######
 
@@ -44,7 +44,7 @@ sub pack_U
 
 
 sub unpack_U
-    return @( unpack('U*', shift(@_).pack('U*')) )
+    return @:  unpack('U*', shift(@_).pack('U*')) 
 
 
 
@@ -56,13 +56,13 @@ sub FCD ($str)
     return checkFCD($str) ?? $str !! NFD($str)
 
 
-our %formNorm = %(
-    NFC  => \&NFC,	C  => \&NFC,
-    NFD  => \&NFD,	D  => \&NFD,
-    NFKC => \&NFKC,	KC => \&NFKC,
-    NFKD => \&NFKD,	KD => \&NFKD,
-    FCD  => \&FCD,	FCC => \&FCC,
-    )
+our %formNorm = %: 
+    NFC  => \&NFC,	C  => \&NFC
+    NFD  => \&NFD,	D  => \&NFD
+    NFKC => \&NFKC,	KC => \&NFKC
+    NFKD => \&NFKD,	KD => \&NFKD
+    FCD  => \&FCD,	FCC => \&FCC
+    
 
 sub normalize($form, $str)
     if (exists %formNorm{$form})
@@ -76,13 +76,13 @@ sub normalize($form, $str)
 ## quick check
 ##
 
-our %formCheck = %(
-    NFC  => \&checkNFC, 	C  => \&checkNFC,
-    NFD  => \&checkNFD, 	D  => \&checkNFD,
-    NFKC => \&checkNFKC,	KC => \&checkNFKC,
-    NFKD => \&checkNFKD,	KD => \&checkNFKD,
-    FCD  => \&checkFCD, 	FCC => \&checkFCC,
-    )
+our %formCheck = %: 
+    NFC  => \&checkNFC, 	C  => \&checkNFC
+    NFD  => \&checkNFD, 	D  => \&checkNFD
+    NFKC => \&checkNFKC,	KC => \&checkNFKC
+    NFKD => \&checkNFKD,	KD => \&checkNFKD
+    FCD  => \&checkFCD, 	FCC => \&checkFCC
+    
 
 sub check($form, $str)
     if (exists %formCheck{$form})

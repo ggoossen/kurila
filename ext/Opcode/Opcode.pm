@@ -6,9 +6,9 @@ our($VERSION, @ISA, @EXPORT_OK)
 
 $VERSION = "1.13"
 
-use Carp;
-use Exporter ();
-use XSLoader ();
+use Carp
+use Exporter ()
+use XSLoader ()
 
 BEGIN 
     @ISA = qw(Exporter)

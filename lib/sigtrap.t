@@ -7,7 +7,7 @@ use Test::More tests => 9
 
 use_ok( 'sigtrap' )
 
-package main;
+package main
 
 # use a version of sigtrap.pm somewhat too high
 try{ sigtrap->import(99999) }

@@ -1,6 +1,6 @@
 use Perl6::Form
 
-print $^STDOUT, < form \%(layout=>'down'),
+print $^STDOUT, < form \(%: layout=>'down'),
                        "                     \{<<<<<<<<<<<\}",
                        "baz" . "bar "x100,
                        "\{[[[[[[[[[[[[\}       \{VVVVVVVVVVV\}",

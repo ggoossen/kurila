@@ -25,7 +25,7 @@ while( ~< $^DATA )
     unless( $returned eq $expected )
         print $^STDOUT, < map { s/^/\#/mg; $_; },
             map { $: $_ },               # to avoid readonly values
-            @(                   "EXPECTED:\n", $expected, "GOT:\n", $returned)
+            @:                    "EXPECTED:\n", $expected, "GOT:\n", $returned
         print $^STDOUT, "not "
     
     printf $^STDOUT, "ok \%d\n", ++$test

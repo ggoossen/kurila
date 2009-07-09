@@ -3,7 +3,7 @@
 our (%Config, $where)
 
 BEGIN 
-    try {my @n = @( getpwuid 0 ); setpwent()}
+    try {my @n = (@:  getpwuid 0 ); setpwent()}
     if ($^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/(The \w+ function is unimplemented)/)
         print $^STDOUT, "1..0 # Skip: $1\n"
         exit 0
@@ -94,9 +94,9 @@ while ( ~< *PW)
     my ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s)
     (my $v) = %Config{?osvers} =~ m/^(\d+)/
     if ($^OS_NAME eq 'darwin' && $v +< 9)
-        @($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) =  @s[[@(0,1,2,3,7,8,9)]]
+        (@: $name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) =  @s[[(@: 0,1,2,3,7,8,9)]]
     else
-        @($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) =  @s
+        (@: $name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) =  @s
     
     next if m/^\+/ # ignore NIS includes
     if ((nelems @s))
@@ -113,14 +113,14 @@ while ( ~< *PW)
     # In principle we could whine if @s != 7 but do we know enough
     # of passwd file formats everywhere?
     if ((nelems @s) == 7 || ($^OS_NAME eq 'darwin' && (nelems @s) == 10))
-        my @n = @( getpwuid($uid_s) )
+        my @n = @:  getpwuid($uid_s) 
         # 'nobody' et al.
         next unless (nelems @n)
-        my @($name,$passwd,$uid,$gid,$quota,$comment,$gcos,$home,$shell) =  @n
+        my (@: $name,$passwd,$uid,$gid,$quota,$comment,$gcos,$home,$shell) =  @n
         # Protect against one-to-many and many-to-one mappings.
         if ($name_s ne $name)
-            @n = @( getpwnam($name_s) )
-            @($name,$passwd,$uid,$gid,$quota,$comment,$gcos,$home,$shell) =  @n
+            @n = @:  getpwnam($name_s) 
+            (@: $name,$passwd,$uid,$gid,$quota,$comment,$gcos,$home,$shell) =  @n
             next if $name_s ne $name
         
         %perfect{+$name_s}++
@@ -181,7 +181,7 @@ my @pw2
 
 setpwent()
 for (1..$max)
-    my @($pw, ...) = @(getpwent())
+    my (@: $pw, ...) = @: getpwent()
     last unless defined $pw
     push @pw2, $pw
 

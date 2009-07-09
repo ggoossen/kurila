@@ -4,7 +4,7 @@ $^OUTPUT_AUTOFLUSH = 1
 # Note that because fork loses test count we do not use Test::More
 
 
-use Config;
+use Config
 BEGIN 
     my $can_fork = config_value('d_fork') ||
         (($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare') and
@@ -19,7 +19,7 @@ BEGIN
     
 
 
-use File::Temp;
+use File::Temp
 
 # OO interface
 
@@ -59,7 +59,7 @@ myok( 4, -f $file->filename(), "OO File exists in parent" )
 
 # non-OO interface
 
-my @($fh, $filename) =  File::Temp::tempfile()
+my (@: $fh, $filename) =  File::Temp::tempfile()
 
 myok( 5, -f $filename, "non-OO File exists" )
 

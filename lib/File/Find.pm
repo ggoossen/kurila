@@ -520,8 +520,8 @@ sub PathCombine($Base,$Name)
 sub Follow_SymLink($AbsName)
 
     my ($NewName,$DEV, $INO)
-    @($DEV, $INO, ...) = @: lstat $AbsName
-
+    (@: $DEV, $INO, ...) = @: lstat $AbsName
+                            
     while (-l _)
         if (%SLnkSeen{+ $DEV . "," . $INO}++)
             if ($follow_skip +< 2)
@@ -540,7 +540,7 @@ sub Follow_SymLink($AbsName)
         else
             $AbsName= $NewName
         
-        @(?$DEV, ?$INO, ...) = @: lstat($AbsName)
+        (@: ?$DEV, ?$INO, ...) = @: lstat($AbsName)
         return undef unless defined $DEV  #  dangling symbolic link
     
 
@@ -614,8 +614,8 @@ sub _find_opt
         foreach my $TOP ( @_)
         my $top_item = $TOP
 
-        @(?$topdev,?$topino,?$topmode,?$topnlink, ...) = @: $follow ?? stat $top_item !! lstat $top_item
-
+        (@: ?$topdev,?$topino,?$topmode,?$topnlink, ...) = @: $follow ?? stat $top_item !! lstat $top_item
+                                                            
         if ($Is_MacOS)
             $top_item = ":$top_item"
                 if ( (-d _) && ( $top_item !~ m/:/ ) )
@@ -685,17 +685,17 @@ sub _find_opt
         
 
         unless ($Is_Dir)
-            unless (@(?$_,?$dir, _) = File::Basename::fileparse($abs_dir))
+            unless ((@: ?$_,?$dir, _) = File::Basename::fileparse($abs_dir))
                 if ($Is_MacOS)
-                    @($dir,$_) = @(':', $top_item) # $File::Find::dir, $_
+                    (@: $dir,$_) = @: ':', $top_item # $File::Find::dir, $_
                 else
-                    @($dir,$_) = @('./', $top_item)
+                    (@: $dir,$_) = @: './', $top_item
                 
             
 
             $abs_dir = $dir
             if (( $untaint ) && (is_tainted($dir) ))
-                @( $abs_dir ) = @: $dir =~ m|$untaint_pat|
+                (@:  $abs_dir ) = @: $dir =~ m|$untaint_pat|
                 unless (defined $abs_dir)
                     if ($untaint_skip == 0)
                         die "directory $dir is still tainted"
@@ -719,7 +719,7 @@ sub _find_opt
 
         unless ( $no_chdir )
             if ( ($check_t_cwd) && (($untaint) && (is_tainted($cwd) )) )
-                @( ?$cwd_untainted ) = @: $cwd =~ m|$untaint_pat|
+                (@:  ?$cwd_untainted ) = @: $cwd =~ m|$untaint_pat|
                 unless (defined $cwd_untainted)
                     die "insecure cwd in find(depth)"
                 
@@ -740,7 +740,7 @@ sub _find_opt
 #  chdir (if not no_chdir) to dir
 
 sub _find_dir($wanted, $p_dir, $nlink)
-    my @($CdLvl,$Level) = @(0,0)
+    my (@: $CdLvl,$Level) = @: 0,0
     my @Stack
     my @filenames
     my ($subcount,$sub_nlink)
@@ -774,7 +774,7 @@ sub _find_dir($wanted, $p_dir, $nlink)
     unless ( $no_chdir || ($p_dir eq $File::Find::current_dir))
         my $udir = $p_dir
         if (( $untaint ) && (is_tainted($p_dir) ))
-            @( ?$udir ) = @: $p_dir =~ m|$untaint_pat|
+            (@:  ?$udir ) = @: $p_dir =~ m|$untaint_pat|
             unless (defined $udir)
                 if ($untaint_skip == 0)
                     die "directory $p_dir is still tainted"
@@ -790,7 +790,7 @@ sub _find_dir($wanted, $p_dir, $nlink)
     
 
     # push the starting directory
-    push @Stack,\@($CdLvl,$p_dir,$dir_rel,-1)  if  $bydepth
+    push @Stack,\(@: $CdLvl,$p_dir,$dir_rel,-1)  if  $bydepth
 
     if ($Is_MacOS)
         $p_dir = $dir_pref  # ensure trailing ':'
@@ -811,7 +811,7 @@ sub _find_dir($wanted, $p_dir, $nlink)
         unless ($no_chdir || ($dir_rel eq $File::Find::current_dir))
             my $udir= $dir_rel
             if ( ($untaint) && (($tainted) || ($tainted = is_tainted($dir_rel) )) )
-                @( ?$udir ) = @: $dir_rel =~ m|$untaint_pat|
+                (@:  ?$udir ) = @: $dir_rel =~ m|$untaint_pat|
                 unless (defined $udir)
                     if ($untaint_skip == 0)
                         if ($Is_MacOS)
@@ -848,10 +848,10 @@ sub _find_dir($wanted, $p_dir, $nlink)
             warnings::warnif "Can't opendir($dir_name): $^OS_ERROR\n"
             next
         
-        @filenames = @( readdir $dir )
+        @filenames = @:  readdir $dir 
         closedir($dir)
         @filenames = $pre_process->(< @filenames) if $pre_process
-        push @Stack,\@($CdLvl,$dir_name,"",-2)   if $post_process
+        push @Stack,\(@: $CdLvl,$dir_name,"",-2)   if $post_process
 
         # default: use whatever was specifid
         # (if $nlink >= 2, and $avoid_nlink == 0, this will switch back)
@@ -892,7 +892,7 @@ sub _find_dir($wanted, $p_dir, $nlink)
                     # Seen all the subdirs?
                     # check for directoriness.
                     # stat is faster for a file in the current directory
-                    $sub_nlink = @(lstat ($no_chdir ?? $dir_pref . $FN !! $FN))[3]
+                    $sub_nlink = (@: lstat ($no_chdir ?? $dir_pref . $FN !! $FN))[3]
 
                     if (-d _)
                         --$subcount
@@ -900,7 +900,7 @@ sub _find_dir($wanted, $p_dir, $nlink)
                         # HACK: replace push to preserve dir traversal order
                         #push @Stack,[$CdLvl,$dir_name,$FN,$sub_nlink];
                         splice @Stack, $stack_top, 0,
-                            \@($CdLvl,$dir_name,$FN,$sub_nlink)
+                            \@: $CdLvl,$dir_name,$FN,$sub_nlink
                     else
                         $name = $dir_pref . $FN # $File::Find::name
                         $_= ($no_chdir ?? $name !! $FN) # $_
@@ -915,7 +915,7 @@ sub _find_dir($wanted, $p_dir, $nlink)
         
     continue
         while ( defined ($SE = pop @Stack) )
-            @($Level, $p_dir, $dir_rel, $nlink) = $SE->@
+            (@: $Level, $p_dir, $dir_rel, $nlink) = $SE->@
             if ($CdLvl +> $Level && !$no_chdir)
                 my $tmp
                 if ($Is_MacOS)
@@ -923,7 +923,7 @@ sub _find_dir($wanted, $p_dir, $nlink)
                 elsif ($Is_VMS)
                     $tmp = '[' . ('-' x ($CdLvl-$Level)) . ']'
                 else
-                    $tmp = join('/', @('..') x ($CdLvl-$Level))
+                    $tmp = join('/', (@: '..') x ($CdLvl-$Level))
                 
                 die "Can't cd to $tmp from $dir_name"
                     unless chdir ($tmp)
@@ -977,7 +977,7 @@ sub _find_dir($wanted, $p_dir, $nlink)
                 
                 do { $wanted_callback->() }; # protect against wild "next"
             else
-                push @Stack,\@($CdLvl,$p_dir,$dir_rel,-1)  if  $bydepth
+                push @Stack,\(@: $CdLvl,$p_dir,$dir_rel,-1)  if  $bydepth
                 last
             
         
@@ -1019,11 +1019,11 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
     unless ($no_chdir)
         # untaint the topdir
         if (( $untaint ) && (is_tainted($dir_loc) ))
-            @( ?$updir_loc ) =
+            (@:  ?$updir_loc ) =
                 @: $dir_loc =~ m|$untaint_pat| # parent dir, now untainted
-            # once untainted, $updir_loc is pushed on the stack (as parent directory);
-            # hence, we don't need to untaint the parent directory every time we chdir
-            # to it later
+                   # once untainted, $updir_loc is pushed on the stack (as parent directory);
+                   # hence, we don't need to untaint the parent directory every time we chdir
+                   # to it later
             unless (defined $updir_loc)
                 if ($untaint_skip == 0)
                     die "directory $dir_loc is still tainted"
@@ -1039,7 +1039,7 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
         
     
 
-    push @Stack,\@($dir_loc,$updir_loc,$p_dir,$dir_rel,-1)  if  $bydepth
+    push @Stack,\(@: $dir_loc,$updir_loc,$p_dir,$dir_rel,-1)  if  $bydepth
 
     if ($Is_MacOS)
         $p_dir = $dir_pref # ensure trailing ':'
@@ -1071,7 +1071,7 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
             $updir_loc = $dir_loc
             if ( ($untaint) && (($tainted) || ($tainted = is_tainted($dir_loc) )) )
                 # untaint $dir_loc, what will be pushed on the stack as (untainted) parent dir
-                @( $updir_loc ) = @: $dir_loc =~ m|$untaint_pat|
+                (@:  $updir_loc ) = @: $dir_loc =~ m|$untaint_pat|
                 unless (defined $updir_loc)
                     if ($untaint_skip == 0)
                         die "directory $dir_loc is still tainted"
@@ -1098,7 +1098,7 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
             warnings::warnif "Can't opendir($dir_loc): $^OS_ERROR\n"
             next
         
-        @filenames = @( readdir $dir )
+        @filenames = @:  readdir $dir 
         closedir($dir)
 
         for my $FN ( @filenames)
@@ -1139,7 +1139,7 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
                     $new_loc =~ s/\.dir\z//i
                     $new_loc =~ s#\.$## if ($new_loc ne '.')
                 
-                push @Stack,\@($new_loc,$updir_loc,$dir_name,$FN,1)
+                push @Stack,\@: $new_loc,$updir_loc,$dir_name,$FN,1
             else
                 $fullname = $new_loc # $File::Find::fullname
                 $name = $dir_pref . $FN # $File::Find::name
@@ -1150,7 +1150,7 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
 
     continue
         while (defined($SE = pop @Stack))
-            @($dir_loc, $updir_loc, $p_dir, $dir_rel, $byd_flag) = $SE->@
+            (@: $dir_loc, $updir_loc, $p_dir, $dir_rel, $byd_flag) = $SE->@
             if ($Is_MacOS)
                 # $p_dir always has a trailing ':', except for the starting dir,
                 # where $dir_rel eq ':'
@@ -1192,7 +1192,7 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
                 lstat($_) # make sure file tests with '_' work
                 do { $wanted_callback->() }; # protect against wild "next"
             else
-                push @Stack,\@($dir_loc, $updir_loc, $p_dir, $dir_rel,-1)  if  $bydepth
+                push @Stack,\(@: $dir_loc, $updir_loc, $p_dir, $dir_rel,-1)  if  $bydepth
                 last
             
         
@@ -1213,7 +1213,7 @@ sub wrap_wanted
         
         return $wanted
     else
-        return \%( wanted => $wanted )
+        return \%:  wanted => $wanted 
     
 
 
