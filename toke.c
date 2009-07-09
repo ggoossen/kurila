@@ -1031,11 +1031,11 @@ S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
     if (PL_madskills) {
 	if (!PL_skipwhite) {
 	    PL_skipwhite = newSVpvs("");
-	    curoff = s - SvPVX_mutable(PL_linestr);
-	    if (curoff - startoff)
-		sv_catpvn(PL_skipwhite, SvPVX_mutable(PL_linestr) + startoff,
-		    curoff - startoff);
 	}
+	curoff = s - SvPVX_mutable(PL_linestr);
+	if (curoff - startoff)
+	    sv_catpvn(PL_skipwhite, SvPVX_mutable(PL_linestr) + startoff,
+		curoff - startoff);
     }
 #endif
     assert(!isSPACE_notab(*s));
@@ -2701,7 +2701,7 @@ Perl_madlex(pTHX)
 
 	if (PL_thisclose) {
 	    /* add terminating quote as madprop Q */
-	    CURMAD('Q', PL_thisclose, NULL);
+	    CURMAD('Q', PL_thisclose, S_curlocation(PL_bufptr));
 	}
     }
 
@@ -2811,15 +2811,14 @@ static int S_process_layout(char* s) {
     }
     is_layout_list = ( PL_lex_brackstack[PL_lex_brackets-1].type == LB_LAYOUT_LIST );
 
+    if (!PL_thistoken)
+	PL_thistoken = newSVpvs("");
+
     d = S_skip_pod(s);
+    DEBUG_T( { PerlIO_printf(Perl_debug_log,
+		"### Tokener got space2 '%s'\n", PL_thiswhite ? SvPVX_const(PL_thiswhite) : NULL ); });
     if (d) {
 	s = d;
-#ifdef PERL_MAD			
-	if (PL_madskills) {
-	    sv_catsv(PL_skipwhite, PL_thiswhite);
-	    PL_thiswhite = NULL;
-	}
-#endif
 	if (is_layout_list) {
 	    OPERATOR(',');
 	} else {
@@ -2830,7 +2829,7 @@ static int S_process_layout(char* s) {
 	S_stop_statement_indent();
 #ifdef PERL_MAD
 	if (PL_madskills)
-	    SvCUR_set(PL_skipwhite, SvCUR(PL_skipwhite) - (s - PL_linestart + 1));
+	    SvCUR_set(PL_thiswhite, SvCUR(PL_thiswhite) - (s - PL_linestart + 1));
 #endif
 	s = PL_linestart - 1;
 	assert(*s == '\n' || *s == '\0');
@@ -3375,89 +3374,20 @@ Perl_yylex(pTHX)
 	bool is_continuation;
 	s = skipspace(s, &is_continuation);
 	assert(!isSPACE_notab(*s));
-	if (!is_continuation) {
-	    assert(PL_parser->statement_indent != -1);
-	    assert((s - PL_linestart) <= PL_parser->statement_indent);
-	    return S_process_layout(s);
-	}
 #ifdef PERL_MAD
 	if (PL_madskills) {
 	    if (!PL_thiswhite)
 		PL_thiswhite = newSVpvs("");
 	    sv_catsv(PL_thiswhite, PL_skipwhite);
+	    PL_skipwhite = NULL;
 	}
 #endif
-	goto retry;
-
-#ifdef PERL_MAD
-	PL_realtokenstart = -1;
-	if (PL_madskills)
-	    PL_faketokens = 0;
-#endif
-	if (PL_lex_state != LEX_NORMAL || (PL_in_eval && !PL_rsfp)) {
-	    if (*s == '#' && s == PL_linestart && PL_in_eval && !PL_rsfp) {
-		/* handle eval qq[#line 1 "foo"\n ...] */
-		PL_parser->lex_line_number--;
-		incline(s);
-	    }
-	    if (PL_madskills && !PL_in_eval) {
-		s = SKIPSPACE0(s);
-		if (!PL_in_eval || PL_rsfp)
-		    incline(s);
-	    }
-	    else {
-		d = s;
-		while (d < PL_bufend && *d != '\n')
-		    d++;
-		if (d < PL_bufend)
-		    d++;
-		else if (d > PL_bufend) /* Found by Ilya: feed random input to Perl. */
-		  Perl_croak(aTHX_ "panic: input overflow");
-#ifdef PERL_MAD
-		if (PL_madskills)
-		    PL_thiswhite = newSVpvn(s, d - s);
-#endif
-		s = d;
-		incline(s);
-	    }
-	}
-	else {
-#ifdef PERL_MAD
-	    if (PL_madskills && PL_parser->lex_line_number >= 1) {
-		if (PL_parser->lex_line_number == 1 && s[0] == '#' && s[1] == '!') {
-		    PL_faketokens = 0;
-		    s = SKIPSPACE0(s);
-		    TOKEN(PEG);	/* make sure any #! line is accessible */
-		}
-		s = SKIPSPACE0(s);
-	    }
-	    else {
-/*		if (PL_madskills && PL_lex_formbrack) { */
-		    d = s;
-		    while (d < PL_bufend && *d != '\n')
-			d++;
-		    if (d < PL_bufend)
-			d++;
-		    else if (d > PL_bufend) /* Found by Ilya: feed random input to Perl. */
-		      Perl_croak(aTHX_ "panic: input overflow");
-		    if (PL_madskills && PL_parser->lex_line_number >= 1) {
-			if (!PL_thiswhite)
-			    PL_thiswhite = newSVpvs("");
-			if (PL_parser->lex_line_number == 1) {
-			    sv_setpvn(PL_thiswhite, "", 0);
-			    PL_faketokens = 0;
-			}
-			sv_catpvn(PL_thiswhite, s, d - s);
-		    }
-		    s = d;
-/*		}
-		*s = '\0';
-		PL_bufend = s; */
-	    }
-#else
-	    *s = '\0';
-	    PL_bufend = s;
-#endif
+	DEBUG_T( { PerlIO_printf(Perl_debug_log,
+		    "### Tokener got space '%s'\n", PL_thiswhite ? SvPVX_const(PL_thiswhite) : NULL ); });
+	if (!is_continuation) {
+	    assert(PL_parser->statement_indent != -1);
+	    assert((s - PL_linestart) <= PL_parser->statement_indent);
+	    return S_process_layout(s);
 	}
 	goto retry;
     }

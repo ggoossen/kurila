@@ -1886,6 +1886,14 @@ sub check { 'ck_fun' }
 sub flags { 'ms@' }
 sub args { 'L' }
 
+package PLXML::op_emptyarray;
+
+our @ISA = ('PLXML::baseop');
+
+package PLXML::op_emptyhash;
+
+our @ISA = ('PLXML::baseop');
+
 package PLXML::op_anonarray;
 
 our @ISA = ('PLXML::op_anonlist');

@@ -11,6 +11,8 @@ use XML::Twig::XPath;
 use Getopt::Long;
 use Carp::Assert;
 use List::Util qw(min max);
+use List::MoreUtils qw(first_value);
+use Carp qw(confess);
 
 sub fst(@) {
     return $_[0];
@@ -190,7 +192,7 @@ sub rename_madprop {
 
 sub madprops {
     my ($op) = @_;
-    assert($op);
+    assert($op and ref $op);
     my (@madsv) = $op->findnodes(qq|madprops/*|);
     my (@keys) = map { $_->tag =~ m/^mad_(.*)/; $1 } @madsv;
     return @keys;
@@ -1368,58 +1370,68 @@ sub env_sub {
     }
 }
 
-my %first_token_cache;
-
 sub first_token {
     my ($linenr, $charoffset);
-    for my $op (@_) {
-        my ($this_linenr, $this_charoffset) = first_token_one_op($op);
-
-        next if not $this_linenr;
-        if ( (not $linenr)
-               or ($this_linenr < $linenr)
-                 or ($this_linenr == $linenr and $this_charoffset < $charoffset) ) {
-            $linenr = $this_linenr;
-            $charoffset = $this_charoffset;
-        }
-    }
-    return ($linenr, $charoffset);
+    return @{ token_pos_items(@_)->[0] || [] }
 }
 
-sub first_token_one_op {
-    my ($op) = @_;
+sub last_token {
+    my ($linenr, $charoffset);
+    return @{ token_pos_items(@_)->[-1] || [] }
+}
 
-    if ($first_token_cache{$op}) {
-        return @{ $first_token_cache{$op} };
+sub first_token_after {
+    my ($after_linenr, $after_charoffset, @ops) = @_;
+
+    local $a;
+    local $b = [$after_linenr, $after_charoffset];
+    return @{ (first_value { $a = $_; pos_cmp() > 0 } @{ token_pos_items(@ops) }) || [] };
+}
+
+sub pos_cmp {
+    return ($a->[0] <=> $b->[0]) || ($a->[1] <=> $b->[1]);
+}
+
+sub token_pos_items {
+
+    if (@_ == 1) {
+        return token_pos_items_one_op($_[0]);
     }
 
-    my ($linenr, $charoffset);
+    my @items;
+    for my $op (@_) {
+        push @items, @{ token_pos_items_one_op($op) };
+    }
+    return [ sort pos_cmp @items ];
+}
+
+my %prop_token_pos;
+
+sub token_pos_items_one_op {
+    my ($op) = @_;
+
+    if ($prop_token_pos{$op}) {
+        return $prop_token_pos{$op}
+    }
+    my @items;
     for my $mk (madprops($op)) {
+        my $value = get_madprop($op, $mk);
+        next if ! defined $value or $value =~ m/^( |&#xA;)*$/; # ignore whitespace only properties.
         my $this_linenr = get_madprop($op, $mk, "linenr");
         my $this_charoffset = get_madprop($op, $mk, "charoffset");
         next if not $this_linenr;
-        if ( (not $linenr)
-               or ($this_linenr < $linenr)
-                 or ($this_linenr == $linenr and $this_charoffset < $charoffset) ) {
-            $linenr = $this_linenr;
-            $charoffset = $this_charoffset;
-        }
+        push @items, [$this_linenr, $this_charoffset];
     }
 
     for my $child ($op->children) {
-        my ($this_linenr, $this_charoffset) = first_token($child);
-        next if not $this_linenr;
-        if ( (not $linenr)
-               or ($this_linenr < $linenr)
-                 or ($this_linenr == $linenr and $this_charoffset < $charoffset) ) {
-            $linenr = $this_linenr;
-            $charoffset = $this_charoffset;
-        }
+        push @items, @{ token_pos_items_one_op($child) };
     }
 
-    $first_token_cache{$op} = [$linenr, $charoffset];
+    @items = sort pos_cmp @items;
 
-    return $linenr, $charoffset;
+    $prop_token_pos{$op} = \@items;
+
+    return \@items;
 }
 
 sub scope_deref {
@@ -1676,8 +1688,9 @@ sub indent {
               or $null_type eq "use" or $null_type eq "package"
                 or $is_subdef) {
             if ($use_layout) {
+                my ($prev_indent_line, undef) = last_token($op->prev_siblings);
                 my ($next_indent_line, undef) = first_token($op->next_siblings);
-                if ($next_indent_line and (not $first_indent_line or $next_indent_line > $first_indent_line) ) {
+                if ($next_indent_line and (not $prev_indent_line or $next_indent_line > $prev_indent_line) ) {
                     my $semicolon = get_madprop($op, 'semicolon');
                     if ($semicolon and $semicolon eq ';') {
                         set_madprop($op, 'semicolon', '');
@@ -1726,6 +1739,11 @@ sub indent {
                 $old_cont = $cont;
                 $cont = max(0, $charoffset - $indent_level - 1);
             }
+        }
+
+        if ($op->tag eq "op_anonhash") {
+            $old_change_layout = $change_layout;
+            $change_layout = 0;
         }
 
         if ($is_entersub) {
@@ -1780,25 +1798,52 @@ sub indent {
 
         if ($change_layout and $use_list_layout) {
             if (get_madprop($op, 'comma')) {
-                my ($next_linenr) = first_token($op->following_elts);
                 my $this_linenr = get_madprop($op, 'comma', 'linenr');
-                if ($next_linenr and $next_linenr > $this_linenr) {
+                my $this_char_offset = get_madprop($op, 'comma', 'charoffset');
+                my ($next_linenr) = first_token_after($this_linenr, $this_char_offset,
+                                                      $xml->root);
+                if ($next_linenr and $next_linenr > $this_linenr
+                      and get_madprop($op, "comma") eq ",") {
                     set_madprop($op, 'comma', '');
                 }
+                $first_indent_line = $next_linenr;
             }
         }
 
-        if ( $op->tag eq "op_anonarray") {
-            if ( get_madprop($op, "square_open") =~ m/\@:/ ) {
+        if ( $op->tag eq "op_anonarray" or $op->tag eq "op_anonhash") {
+            my $is_hash = $op->tag eq "op_anonhash";
+            my $paren_name = $is_hash ? "curly" : "square";
+            my $typechar = $is_hash ? "\%" : "\@";
+            my $replace_offset = 0;
+            if ( get_madprop($op, $paren_name . "_open") =~ m/\Q$typechar\E:/ ) {
                 $change_layout = 1;
                 $use_list_layout = 1;
             }
+            else {
+                my ($last_line_nr, $last_charoffset) = last_token($op);
+                my ($next_line_nr, $next_charoffset) = first_token_after($last_line_nr, $last_charoffset, $xml->root);
+                my $parens = ($next_line_nr && ($last_line_nr >= $next_line_nr));
+                set_madprop($op, $paren_name . "_open", ($parens ? "(" : "" ) . "${typechar}: ");
+                set_madprop($op, $paren_name . "_close", $parens ? ")" : "");
+                $change_layout = 1;
+                $use_list_layout = 1;
+                $replace_offset += 1;
+                if ($parens) {
+                    $replace_offset += 1;
+                }
+            }
 
             if ($op->child(2)) {
-                my ($linenr, $charoffset) = first_token($op->child(2));
-                if ($linenr) {
-                    $old_cont = $cont;
-                    $cont = max(0, $charoffset - $indent_level - 1);
+                my ($next_linenr, $next_charoffset) = first_token($op->children);
+                if ($next_linenr) {
+                    if ($next_linenr == get_madprop($op, $paren_name . "_open", "linenr")) {
+                        $next_charoffset += $replace_offset;
+                    }
+                    $first_indent_line = $next_linenr;
+                    $new_indent_level = max(0, $next_charoffset - 1);
+                    if ($new_indent_level <= $indent_level) {
+                        $new_indent_level = $indent_level + 4;
+                    }
                 }
             }
         }
@@ -1992,11 +2037,11 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.19') {
 }
 
 if ($to->{v} >= qv '1.20') {
-    # indent($twig);
+    indent($twig);
 }
 
 #array_simplify($twig);
-empty_array($twig);
+#empty_array($twig);
 
 #future: add_call_parens($twig);
 

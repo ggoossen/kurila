@@ -39,10 +39,10 @@ sub p5convert {
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_empty_array();
-die "END";
-t_array_simplify();
 t_indent2();
+die "END";
+t_empty_array();
+t_array_simplify();
 t_indent();
 t_defargs();
 t_dofile_to_evalfile();
@@ -1747,12 +1747,6 @@ END
 
 sub t_indent2 {
     p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
-3 + @: "aap",
- "noot"
-----
-3 + @: "aap"
-       "noot"
-====
 3 + @: "aap", "noot"
 ----
 3 + @: "aap", "noot"
@@ -1790,6 +1784,74 @@ FOO
 warn <<'FOO'; $a
 bla
 FOO
+====
+@("aap", "noot")
+----
+@: "aap", "noot"
+====
+@("aap", "noot"), "mies"
+----
+(@: "aap", "noot"), "mies"
+====
+my@($k, $v) = @($1, $2)
+----
+my(@: $k, $v) = @: $1, $2
+====
+@("aap",
+    "noot")
+----
+@: "aap"
+   "noot"
+====
+@("aap"
+   . "noot",
+  "mies")
+----
+@: "aap"
+       . "noot"
+   "mies"
+====
+my $obj = bless \@( "aap", "noot"), "Mies"
+----
+my $obj = bless \(@:  "aap", "noot"), "Mies"
+====
+@: "aap"
+   "noot"
+----
+@: "aap"
+   "noot"
+====
+my $x = @( @("aap", "noot"),
+           "mies",
+           "wim")
+----
+my $x = @:  (@: "aap", "noot")
+            "mies"
+            "wim"
+====
+@( $a,
+   $b) = qw[aap noot]
+----
+(@:  $a
+     $b) = qw[aap noot]
+====
+@( %( aap => "noot",
+      Mies => "Wim"),
+   "Teun")
+----
+@:  (%:  aap => "noot"
+        Mies => "Wim")
+    "Teun"
+====
+%: aap => "noot"
+----
+%: aap => "noot"
+====
+@( %(
+   aap => "noot"))
+----
+@:  (%: 
+        aap => "noot")
 END
 }
 

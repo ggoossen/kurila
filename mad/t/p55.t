@@ -416,3 +416,20 @@ sub foo
 ########
 my @cmds;
 map { $_ }, $a
+########
+$@
+########
+(@: 2 )
+########
+sub bar
+    return "foo"
+
+=pod
+bla
+=cut
+########
+our ($VERSION)
+$VERSION = 1.1   ## comment
+=head1
+pod
+=cut

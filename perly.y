@@ -789,6 +789,7 @@ listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
                         {
                             $$ = newANONARRAY($2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
+                            TOKEN_GETMAD($3,$$,']');
 			}
         |       ANONARYL listexpr /* @: ... and */
                         {
@@ -1420,6 +1421,7 @@ scalar  :	PRIVATEVAR
         |       EMPTYAH
 			{ 
                             $$ = newOP(IVAL($1), 0, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'o');
                         }
 	;
 
