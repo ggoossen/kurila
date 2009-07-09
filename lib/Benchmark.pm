@@ -924,7 +924,6 @@ sub cmpthese
         ''
         $display_as_rate ?? 'Rate' !! 's/iter'
         < map { $_->[0] }, @vals
-        
 
     push @rows, \@top_row
     @col_widths = map { length( $_ ) }, @top_row

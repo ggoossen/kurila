@@ -1034,7 +1034,7 @@ sub run_tests
             'm/(.*?)\{(.*?)\}/cg'
             'm/(.*?)\{(.*?)\}/sg'
             'm/(.*?)\{(.*?)\}/g'
-            'm/(.+?)\{(.+?)\}/csg',
+            'm/(.+?)\{(.+?)\}/csg'
             )
             my($input, $i)
 
@@ -1838,7 +1838,7 @@ EOT
         my $c = "\x{100}"
         my $subst
         for my $re (@: 
-            "xx.*$c", "x.*$c$c", "$c.*xx", "$c$c.*x", "xx.*(?=$c)", "(?=$c).*xx",
+            "xx.*$c", "x.*$c$c", "$c.*xx", "$c$c.*x", "xx.*(?=$c)", "(?=$c).*xx"
             )
             ok( not "xxx" =~ m/$re/ )
             ok( not( ($subst = "xxx") =~ s/$re// ))
@@ -3021,7 +3021,7 @@ EOFTEST
                        qw|[abc] abc def|
                        qw|[^abc] def abc|
                        qw|[[:word:]] abc #@!|
-                       qw|[[:^word:]] #@! abc|,
+                       qw|[[:^word:]] #@! abc|
             )
             my $m = shift $p
             my (@: $s, $f) =  map { \split m/ */ }, $p

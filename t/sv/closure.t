@@ -202,7 +202,6 @@ do
         'sub_scalar'	=> 7001
         'sub_array'	=> 8101
         'sub_hash'	=> 9004
-        
 
     # Our innermost sub is either named or anonymous
     for my $inner_type (qw!anon!)

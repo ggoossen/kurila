@@ -3,7 +3,7 @@
 use warnings
 
 use feature ":5.10"
-use Test::More tests => 49
+use Test::More tests => 48
 
 use B::Deparse
 my $deparse = B::Deparse->new()
@@ -25,7 +25,7 @@ while ( ~< $^DATA)
     my ($num, $testname, $todo)
     if (s/#\s*(.*)$//mg)
         (@: $num, $todo, $testname) = @: $1 =~ m/(\d*)\s*(TODO)?\s*(.*)/
-                                       
+
     my ($input, $expected)
     if (m/(.*)\n>>>>\n(.*)/s)
         (@: $input, $expected) = @: $1, $2
@@ -35,7 +35,7 @@ while ( ~< $^DATA)
 
     local our $TODO = $todo
 
-    my $coderef = eval "sub \{$input\}"
+    my $coderef = eval "sub \{$input\n\}"
 
     if ($^EVAL_ERROR and $^EVAL_ERROR->{?description})
         diag("$num deparsed: $($^EVAL_ERROR->message)")
@@ -154,9 +154,6 @@ my $test;
 >>>>
 my $test;
 $test /= 2 if ++$test;
-####
-# 5
--((1, 2) x 2);
 ####
 # 6
 1;

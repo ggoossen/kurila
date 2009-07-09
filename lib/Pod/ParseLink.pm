@@ -59,7 +59,7 @@ sub _parse_section($link)
     else
         $page = undef unless $page
         $section = undef unless $section
-    
+
     return  @: $page, $section
 
 
@@ -92,8 +92,6 @@ sub parselink($link)
         my $inferred = $text || _infer_text ($name, $section)
         my $type = ($name && $name =~ m/\(\S*\)/) ?? 'man' !! 'pod'
         return  @: $text, $inferred, $name, $section, $type
-    
-
 
 
 ##############################################################################

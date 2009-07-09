@@ -41,7 +41,6 @@ do {   ok( allow( 42, qr/^\d+$/ ), "Allow based on regex" );
 do
     my $tmpl =  \%: 
         foo => %:  default => 1 
-        
 
     ### empty args first ###
     do {   my $args = check( $tmpl, \$% );
@@ -223,10 +222,8 @@ do   ### check if the subs for allow get what you expect ###
     for my $thing ((@: 1,'foo',\(@: 1)))
         my $tmpl = \%: 
             foo => %:  allow =>
-                       sub (@< @_) { is_deeply(shift,$thing
-                           "   Allow coderef gets proper args") }
-            
-            
+                           sub ($v) { is_deeply($v,$thing,
+                                         "   Allow coderef gets proper args") }
 
         my $rv = check( $tmpl, \(%:  foo => $thing ) )
         ok( $rv,                    "check() call using allow key" )
@@ -287,27 +284,22 @@ do
     my $lastname
 
     ### the template to check against ###
-    my $tmpl = \%: 
-        firstname   => (%:  required   => 1, defined => 1 )
-        lastname    => (%:  required   => 1, store => \$lastname )
-        gender      => (%:  required   => 1
+    my $tmpl = \ %: 
+        firstname   =>  %:  required   => 1, defined => 1
+        lastname    =>  %:  required   => 1, store => \$lastname
+        gender      =>  %:  required   => 1
                             allow      => \(@: qr/M/i, qr/F/i)
-        )
-        married     => (%:  allow      => \(@: 0,1) )
-        age         => (%:  default    => 21
+        married     =>  %:  allow      => \(@: 0,1)
+        age         =>  %:  default    => 21
                             allow      => qr/^\d+$/
-        )
-        id_list     => (%:  default        => \$@
+        id_list     =>  %:  default        => \$@
                             strict_type    => 1
-        )
-        phone       => (%:  allow          => sub (@< @_) { 1 if shift } )
-        bureau      => (%:  default        => 'NSA'
+        phone       =>  %:  allow          => sub (@< @_) { 1 if shift }
+        bureau      =>  %:  default        => 'NSA'
                             no_override    => 1
-        )
-        
 
     ### the args to send ###
-    my $try = \%: 
+    my $try = \ %: 
         firstname   => 'joe'
         lastname    => 'jackson'
         gender      => 'M'
@@ -315,7 +307,6 @@ do
         age         => 21
         id_list     => \(1..3)
         phone       => '555-8844'
-        
 
     ### the rv we expect ###
     my $get = \%:  < $try->%, bureau => 'NSA' 

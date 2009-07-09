@@ -46,7 +46,6 @@ do
                 LOG_MASK LOG_UPTO
             )
             )
-        
 
     our @EXPORT = %EXPORT_TAGS{?standard}
 
@@ -91,7 +90,6 @@ my %options = %:
     nofatal => 0
     nowait  => 0
     pid     => 0
-    
 
 # Default is now to first use the native mechanism, so Perl programs
 # behave like other normal Unix programs, then try other mechanisms.

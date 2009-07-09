@@ -52,7 +52,7 @@ do
                   "" . "\x{263a}"
 
                   $smiley    . ""
-                  "\x{263a}" . "",
+                  "\x{263a}" . ""
         )
         my $length_chars = length($s)
         my $length_bytes
@@ -72,7 +72,7 @@ do
                   "$smiley$smiley"
 
                   "\x{263a}" x 2
-                  $smiley    x 2,
+                  $smiley    x 2
         )
         my $length_chars = length($s)
         my $length_bytes

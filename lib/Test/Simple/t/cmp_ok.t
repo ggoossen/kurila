@@ -53,7 +53,6 @@ my @Tests = @:
     \(@: "a", "eq", "a")
     \(@: 1, "+", 1)
     \(@: 1, "-", 1)
-    
 
 # These don't work yet.
 if( 0 )

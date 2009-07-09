@@ -392,7 +392,7 @@ sub initialize
     # print Dumper($self);
 
     # Internals
-    $self->{+_Lists} = \@:              # For nested lists
+    $self->{+_Lists} = \$@            # For nested lists
     $self->{+_suppress_all_para}  = 0 # For =begin blocks
     $self->{+_dont_modify_any_para}=0 # For =begin blocks
     $self->{+_CURRENT_HEAD1}   = ''   # Name of current HEAD1 section
@@ -897,10 +897,9 @@ __TEX_COMMENT__
 
             # Code to initialise index making
             # Use an array so that we can prepend comment if required
-            my @makeidx = @: 
-                '\usepackage{makeidx}'
-                '\makeindex'
-                
+            my @makeidx = @:
+                '\usepackage{makeidx}',
+                '\makeindex',
 
             unless ($self->MakeIndex)
                 foreach ( @makeidx)
@@ -1069,7 +1068,7 @@ sub command($self, $command, $paragraph, $line_num, $parobj)
 
         # The first line contains the format and the rest is the
         # raw code.
-        my (@: $format, $chunk) =  split(m/\n/, $rawpara, 2)
+        my @: $format, $chunk = split(m/\n/, $rawpara, 2)
 
         # If we have got some latex code print it out immediately
         # unmodified. Else do nothing.
@@ -1175,7 +1174,7 @@ sub textblock($self, $paragraph, $line_num, $parobj)
         $paragraph =~ s/\s$//
 
         # Split the string into 2 parts
-        my (@: $name, $purpose) =  split(m/\s+-\s+/, $expansion,2)
+        my @: $name, $purpose = split(m/\s+-\s+/, $expansion,2)
 
         # Now prevent this from triggering until a new head1 NAME is set
         $self->{+_CURRENT_HEAD1} = '_NAME'
@@ -1229,7 +1228,7 @@ sub interior_sequence($self, $seq_command, $seq_argument, $pod_seq)
             return %HTML_Escapes{?$seq_argument}
 
         else
-            my (@: $file, $line) =  $pod_seq->file_line()
+            my @: $file, $line = $pod_seq->file_line()
             warn "Escape sequence $seq_argument not recognised at line $line of file $file\n"
             return
         
@@ -1278,7 +1277,7 @@ sub interior_sequence($self, $seq_command, $seq_argument, $pod_seq)
             # Use default markup for external references
             # (although Starlink would use \xlabel)
             my $markup = $link->markup
-            my (@: $file, $line) =  $pod_seq->file_line()
+            my @: $file, $line = $pod_seq->file_line()
 
             return $self->interpolate( $link->markup, $line)
         
@@ -1438,7 +1437,7 @@ sub add_item
         # If the string is longer than 40 characters we split
         # it into a real item header and some bold text.
         my $maxlen = 40
-        my (@: $hunk1, $hunk2) =  $self->_split_delimited( $paragraph, $maxlen )
+        my @: $hunk1, $hunk2 = $self->_split_delimited( $paragraph, $maxlen )
 
         # Print the first hunk
         $self->_output("\n\\item[\{$hunk1\}] ")
@@ -1774,7 +1773,7 @@ sub _split_delimited
     my $limit = shift
 
     # Return immediately if already small
-    return  (@: $input, '') if length($input) +< $limit
+    return  @: $input, '' if length($input) +< $limit
 
     my @output
     my $s = ''
@@ -1793,22 +1792,17 @@ sub _split_delimited
         elsif ( m/ / and $depth == 0)
             push @output, $token if ( $token and $token ne ' ' )
             $token = ''
-        
-    
 
     foreach  ( @output)
         if (length($s) +< $limit)
             $s .= $_
         else
             $t .= $_
-        
-    
 
     # Tidy up
     $s =~ s/\s+$//
     $t =~ s/\s+$//
-    return  @: $s,$t
-
+    return @: $s,$t
 
 =back
 

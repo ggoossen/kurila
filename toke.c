@@ -266,7 +266,6 @@ static struct debug_tokens {
     { ANDOP,		TOKENTYPE_NONE,		"ANDOP" },
     { ANONSUB,		TOKENTYPE_IVAL,		"ANONSUB" },
     { BLOCKSUB,		TOKENTYPE_IVAL,		"BLOCKSUB" },
-    { ANONARY,		TOKENTYPE_IVAL,		"ANONARY" },
     { ARROW,		TOKENTYPE_NONE,		"ARROW" },
     { ASSIGNOP,		TOKENTYPE_OPNUM,	"ASSIGNOP" },
     { BITANDOP,		TOKENTYPE_OPNUM,	"BITANDOP" },
@@ -2842,6 +2841,16 @@ static int S_process_layout(char* s) {
     }
 }
 
+static bool S_close_layout_lists() {
+    if (PL_lex_brackets > 0 
+	&& PL_lex_brackstack[PL_lex_brackets -1].type == LB_LAYOUT_LIST) {
+	--PL_lex_brackets;
+	PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
+	return 1;
+    }
+    return 0;
+}
+
 /* S_closing_bracket
    should be called with the next token, returns the next token.
    After calling PL_lex_brackstack[PL_lex_brackets] should be checked
@@ -3207,6 +3216,9 @@ Perl_yylex(pTHX)
 	if (!PL_rsfp) {
 	    PL_last_uni = 0;
 	    PL_last_lop = 0;
+
+	    if (S_close_layout_lists())
+		TOKEN(LAYOUTLISTEND);
 
 	    if (PL_parser->statement_indent > 0) {
 		S_stop_statement_indent();
@@ -3701,6 +3713,9 @@ Perl_yylex(pTHX)
 	if (s[1] == ':' && s[2] != ':') {
 	    /* hash constructor '%:' */
 	    s += 2;
+	    s = skipspace(s, NULL);
+	    S_start_list_indent(s);
+
 	    OPERATOR(ANONHSHL);
 	}
 	if (s[1] == '+' && s[2] == ':') {
@@ -4150,24 +4165,13 @@ Perl_yylex(pTHX)
 	if (PL_expect == XOPERATOR)
 	    no_op("Array", s);
 
-	if (s[1] == '(') {
-	    /* array constructor  @( */
-	    if (PL_lex_brackets > 100)
-		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
-	    PL_lex_brackstack[PL_lex_brackets].type = LB_PAREN;
-	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
-	    ++PL_lex_brackets;
-
-	    s += 2;
-	    OPERATOR(ANONARY);
-	}
 	if (s[1] == '+' && s[2] == ':') {
-	    /* arrayjoin  */
+	    /* arrayjoin '@+:' */
 	    s += 3;
 	    LOP(OP_ARRAYJOIN, XTERM);
 	}
 	if (s[1] == ':' && s[2] != ':') {
-	    /* array constructor */
+	    /* array constructor '@:' */
 	    s += 2;
 	    s = skipspace(s, NULL);
 	    S_start_list_indent(s);
@@ -4175,7 +4179,7 @@ Perl_yylex(pTHX)
 	    TOKEN(ANONARYL);
 	}
 	if (s[1] == '<') {
-	    /* array expand */
+	    /* array expand '@<' */
 	    s += 2;
 	    OPERATOR(ARRAYEXPAND);
 	}
@@ -4199,7 +4203,8 @@ Perl_yylex(pTHX)
 	}
 
 	s++;
-	Perl_croak(aTHX_ "Unknown operator '@'");
+	yyerror(aTHX_ "Unknown operator '@'");
+	goto retry;
     }
 
     case '/':			/* may be division, defined-or */

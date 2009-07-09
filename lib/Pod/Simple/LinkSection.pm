@@ -29,7 +29,6 @@ sub new($class, @< @_)
         
     else # misc stuff
         $new = \@:  '', \$%, < @_ 
-    
 
     # By now it's a treelet:  [ 'foo', {}, ... ]
     foreach my $x ( $new->@)
@@ -37,9 +36,8 @@ sub new($class, @< @_)
             $x = $class->new($x) # recurse
         elsif(ref($x || '') eq 'HASH')
             $x = \%:  < $x->% 
-        
+
     # otherwise leave it.
-    
 
     return bless $new, $class
 

@@ -601,7 +601,7 @@ sub getWt
     elsif (_isUIdeo($u, $self->{?UCA_Version}))
         my $cjk  = $self->{?overrideCJK}
         return map { _varCE($vbl, $_) },
-            @: 	   $cjk
+                @: $cjk
                    ?? < map( {pack(VCE_TEMPLATE, NON_VAR, < $_->@) }, &$cjk($u))
                        !! defined $cjk && $self->{?UCA_Version} +<= 8 && $u +< 0x10000
                        ?? _uideoCE_8($u)
@@ -903,15 +903,11 @@ sub index($self, $str, $substr, ?$pos, ?$grob)
                 $to_be_pushed = FALSE if $last_is_variable
             else
                 $last_is_variable = FALSE
-            
-        
 
         if ((nelems @subWt) && !$var && !@wt[0])
             push  @subWt[-1]->@, \@wt if $to_be_pushed
         else
-            push @subWt, \@:  \@wt 
-        
-    
+            push @subWt, \@:  \@wt
 
     my $count = 0
     my $end = (nelems $strE->@) - 1

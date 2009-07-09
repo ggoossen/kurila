@@ -355,8 +355,7 @@ sub pod_where
     my %options = %: 
         'inc' => 0
         'verbose' => 0
-        'dirs' => \(@:  File::Spec->curdir )
-        
+        'dirs' => \ @:  File::Spec->curdir
 
     # Check for an options hash as first argument
     if (defined @_[0] && ref(@_[0]) eq 'HASH')
@@ -364,7 +363,6 @@ sub pod_where
 
         # Merge default options with supplied options
         %options = %: < %options, < $opt->%
-    
 
     # Check usage
     warn 'Usage: pod_where({options}, $pod)' unless (scalar(nelems @_))
@@ -429,7 +427,7 @@ sub pod_where
                 if %options{'verbose'}
 
             # Loop over possible extensions
-            foreach my $ext ((@: '', '.pod', '.pm', '.pl'))
+            foreach my $ext (@: '', '.pod', '.pm', '.pl')
                 my $fullext = $fullname . $ext
                 if (-f $fullext &&
                     contains_pod($fullext, %options{'verbose'}) )

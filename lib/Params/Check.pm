@@ -29,9 +29,9 @@ BEGIN
     $CALLER_DEPTH           = 0
 
 
-my %known_keys = %:  < @+: map { @: $_ => 1 }
-                     qw| required allow default strict_type no_override
-                        store defined | 
+my %known_keys = %+: map { %: $_ => 1 },
+                       qw| required allow default strict_type no_override
+                          store defined |
 
 =pod
 
@@ -454,7 +454,7 @@ sub _clean_up_args
     ### don't even bother to loop, if there's nothing to clean up ###
     return @_[0] if $PRESERVE_CASE and !$STRIP_LEADING_DASHES
 
-    my %args = %:  < @_[0]->% 
+    my %args = @_[0]->%
 
     ### keys are note aliased ###
     for my $key (keys %args)

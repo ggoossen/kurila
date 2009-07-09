@@ -19,7 +19,7 @@ is( $pkg_ref, $exp_ref, '%Pod::Functions::Type exported' )
 is( $pkg_ref, $exp_ref, '%Pod::Functions::Flavor exported' )
 
 (@:  $pkg_ref, $exp_ref ) = @:  \%Pod::Functions::Type_Description
-                              \%Type_Description 
+                                \%Type_Description 
 is( $pkg_ref, $exp_ref, '%Pod::Functions::Type_Description exported' )
 
 (@:  $pkg_ref, $exp_ref ) = @:  \@Pod::Functions::Type_Order, \@Type_Order 

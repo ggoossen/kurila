@@ -742,11 +742,9 @@ sub parse_text
         ## If 'interior_sequence' is the method to use, we have to pass
         ## more than just the sequence object, we also need to pass the
         ## sequence name and text.
-        $xseq_sub = sub (@< @_)
-            my (@: $self, $iseq) =  @_
+        $xseq_sub = sub ($self, $iseq)
             my $args = join("", $iseq->parse_tree->children)
             return  $self->interior_sequence( $iseq->name, $args, $iseq)
-        
     
     ref $xseq_sub    or  $xseq_sub   = sub (@< @_) { shift()->?$expand_seq(< @_) }
     ref $xtext_sub   or  $xtext_sub  = sub (@< @_) { shift()->?$expand_text(< @_) }
@@ -763,7 +761,7 @@ sub parse_text
     ##
     my $seq       = Pod::ParseTree->new()
     my @seq_stack = @: $seq
-    my (@: $ldelim, $rdelim) = @: '', ''
+    my @: $ldelim, $rdelim = @: '', ''
 
     ## Iterate over all sequence starts text (NOTE: split with
     ## capturing parens keeps the delimiters)
@@ -775,7 +773,7 @@ sub parse_text
         if ( m/^([A-Z])(<(?:<+\s)?)$/ )
             ## Push a new sequence onto the stack of those "in-progress"
             my $ldelim_orig
-            (@: $cmd, $ldelim_orig) = @: $1, $2
+            @: $cmd, $ldelim_orig = @: $1, $2
             ($ldelim = $ldelim_orig) =~ s/\s+$//
             ($rdelim = $ldelim) =~ s/</>/g
             $seq = Pod::InteriorSequence->new(
@@ -787,16 +785,16 @@ sub parse_text
             push @seq_stack, $seq
         elsif ( (nelems @seq_stack) +> 1 )
             ## Make sure we match the right kind of closing delimiter
-            my (@: $seq_end, $post_seq) = @: "", ""
+            my @: $seq_end, $post_seq = @: "", ""
             if ( ($ldelim eq '<'   and  m/\A(.*?)(>)/s)
                    or  m/\A(.*?)(\s+$rdelim)/s )
                 ## Found end-of-sequence, capture the interior and the
                 ## closing the delimiter, and put the rest back on the
                 ## token-list
                 $post_seq = substr($_, length($1) + length($2))
-                (@: $_, $seq_end) = @: $1, $2
+                @: $_, $seq_end = @: $1, $2
                 (length $post_seq)  and  unshift @tokens, $post_seq
-            
+
             if (length)
                 ## In the middle of a sequence, append this text to it, and
                 ## dont forget to "expand" it if that's what the caller wanted
@@ -834,7 +832,7 @@ sub parse_text
     ## Handle unterminated sequences
     my $errorsub = ((nelems @seq_stack) +> 1) ?? $self->errorsub() !! undef
     while ((nelems @seq_stack) +> 1)
-        (@: $cmd, $file, $line) = @:  $seq->name, < $seq->file_line
+        @: $cmd, $file, $line = @: $seq->name, < $seq->file_line
         $ldelim  = $seq->ldelim
         ($rdelim = $ldelim) =~ s/</>/g
         $rdelim  =~ s/^(\S+)(\s*)$/$2$1/
@@ -925,8 +923,7 @@ sub parse_paragraph($self, $text, $line_num)
 
     ## Ignore this block if it isnt in one of the selected sections
     if (exists $self->%{_SELECTED_SECTIONS})
-        $self->is_selected($text)  or  return  @: $self->%{+_CUTTING} = 1
-    
+        $self->is_selected($text)  or  return @: ($self->%{+_CUTTING} = 1)
 
     ## If we havent already, perform any desired preprocessing and
     ## then re-check the "cutting" state
@@ -937,7 +934,7 @@ sub parse_paragraph($self, $text, $line_num)
     
 
     ## Look for one of the three types of paragraphs
-    my (@: $pfx, $cmd, $arg, $sep) = @: '', '', '', ''
+    my @: $pfx, $cmd, $arg, $sep = @: '', '', '', ''
     my $pod_para = undef
     if ($text =~ m/^(={1,2})(?=\S)/)
         ## Looks like a command paragraph. Capture the command prefix used

@@ -275,12 +275,11 @@ sub _dump
             else
                 # store our name
                 $s->{seen}->{+$id} = \@:  (($name =~ m/^[@%]/)     ?? ('\' . $name ) !!
-                                              ($realtype eq 'CODE' and
-                                           $name =~ m/^[*](.*)$/) ?? ('\&' . $1 )   !!
-                                              $name          )
+                                           ($realtype eq 'CODE' and
+                                               $name =~ m/^[*](.*)$/) ?? ('\&' . $1 )   !!
+                                           $name          )
                                           $val 
-            
-        
+
         my $no_bless = 0
         my $is_regex = 0
         if ( $realpack and re::is_regexp($val) )
@@ -584,7 +583,6 @@ my %esc = %:
     "\f" => "\\f"
     "\r" => "\\r"
     "\e" => "\\e"
-    
 
 # put a string value in double quotes
 sub qquote

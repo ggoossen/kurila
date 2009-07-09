@@ -150,8 +150,7 @@ sub init_fonts($self)
 # special handling, both to parse the user parameter if given and to make sure
 # that the quotes will be safe against *roff.  Sets the internal hash keys
 # LQUOTE and RQUOTE.
-sub init_quotes
-    my (@: $self) = @: < @_
+sub init_quotes($self)
 
     $self->{+quotes} ||= '"'
     if ($self->{?quotes} eq 'none')
@@ -682,7 +681,6 @@ sub outindex($self, ?$section, ?$index)
         $index =~ s/\\-/-/g
         $index =~ s/\\(?:s-?\d|.\(..|.)//g
         push @output, \@:  $section, $index 
-    
 
     # Print out the .IX commands.
     for ( @output)
@@ -786,14 +784,14 @@ sub devise_title($self)
             shift @dirs if (@dirs[0] =~ m/^(site|vendor)(_perl)?$/)
             shift @dirs if (@dirs[0] =~ m/^[\d.]+$/)
             shift @dirs if (@dirs[0] =~ m/^(.*-$^OS_NAME|$^OS_NAME-.*|$^OS_NAME)$/)
-        
+
         shift @dirs if @dirs[?0] eq 'lib'
         splice (@dirs, 0, 2) if (@dirs[?0] eq 'blib' && @dirs[?1] eq 'lib')
 
         # Remove empty directories when building the module name; they
         # occur too easily on Unix by doubling slashes.
         $name = join ('::', (@:  (< grep { $_ ?? $_ !! () }, @dirs), $file))
-    
+
     return  @: $name, $section
 
 

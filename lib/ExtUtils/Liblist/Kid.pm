@@ -397,9 +397,9 @@ sub _vms_ext($self, $potential_libs, $verbose, $give_libs)
     my(%found,@fndlibs,$ldlib)
     my $cwd = cwd()
     my(@: $so,$lib_ext,$obj_ext) =  map { config_value($_) }, @: 'so','lib_ext','obj_ext'
-                                                               # List of common Unix library names and their VMS equivalents
-                                                               # (VMS equivalent of '' indicates that the library is automatically
-                                                               # searched by the linker, and should be skipped here.)
+    # List of common Unix library names and their VMS equivalents
+    # (VMS equivalent of '' indicates that the library is automatically
+    # searched by the linker, and should be skipped here.)
     my(@flibs, %libs_seen)
     my %libmap = %:  'm' => '', 'f77' => '', 'F77' => '', 'V77' => '', 'c' => ''
                      'malloc' => '', 'crypt' => '', 'resolv' => '', 'c_s' => ''

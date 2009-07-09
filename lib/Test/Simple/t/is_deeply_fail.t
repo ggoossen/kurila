@@ -198,7 +198,6 @@ my $foo = \%:
 my $bar = \%: 
     this => \(1..10)
     that => \(%:  up => "down", left => "right", foo => 42 )
-    
 
 #line 198
 ok !is_deeply( $foo, $bar, 'deep structures' )

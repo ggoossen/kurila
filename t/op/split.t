@@ -20,7 +20,7 @@ is(join(';', (@: $a,$b,$c)), 'a;b;c')
 is(join("$_", @ary), 'aa:b:cc')
 
 $_ = "abc\n"
-my @xyz = @: @ary = split(m//)
+@ary = split(m//)
 is(join(".", @ary), "a.b.c.\n")
 
 $_ = "a:b:c::::"

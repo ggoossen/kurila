@@ -30,31 +30,31 @@ use B < qw(class ppname main_start main_root main_cv cstring svref_2object
          CVf_ANON PAD_FAKELEX_ANON PAD_FAKELEX_MULTI SVf_ROK)
 
 my %style =
-    %: "terse" =>
-       \(@: "(?(#label =>\n)?)(*(    )*)#class (#addr) #name (?([#targ])?) "
-             . "#svclass~(?((#svaddr))?)~#svval~(?(label \"#coplabel\")?)\n"
-         "(*(    )*)goto #class (#addr)\n"
-         "#class pp_#name")
-       "concise" =>
-       \(@: "#hyphseq2 (*(   (x( ;)x))*)<#classsym> #exname#arg(?([#targarglife])?)"
-             . "~#flags(?(/#private)?)(?(:#hints)?)(x(;~->#next)x)\n"
-             , "  (*(    )*)     goto #seq\n"
-         "(?(<#seq>)?)#exname#arg(?([#targarglife])?)")
-       "linenoise" =>
-       \(@: "(x(;(*( )*))x)#noise#arg(?([#targarg])?)(x( ;\n)x)"
-         "gt_#seq "
-         "(?(#seq)?)#noise#arg(?([#targarg])?)")
-       "debug" =>
-       \(@: "#class (#addr)\n\top_next\t\t#nextaddr\n\top_sibling\t#sibaddr\n\t"
-             . "op_ppaddr\tPL_ppaddr[OP_#NAME]\n\top_type\t\t#typenum\n"
-             . "\top_flags\t#flagval\n\top_private\t#privval\t#hintsval\n"
-             . "(?(\top_first\t#firstaddr\n)?)(?(\top_last\t\t#lastaddr\n)?)"
-             . "(?(\top_sv\t\t#svaddr\n)?)"
-         "    GOTO #addr\n"
-         "#addr")
-       "env" => \(@: env::var('B_CONCISE_FORMAT'), env::var('B_CONCISE_GOTO_FORMAT')
-                  env::var('B_CONCISE_TREE_FORMAT'))
-    
+    (%: "terse" =>
+            \(@: "(?(#label =>\n)?)(*(    )*)#class (#addr) #name (?([#targ])?) "
+                     . "#svclass~(?((#svaddr))?)~#svval~(?(label \"#coplabel\")?)\n"
+                 "(*(    )*)goto #class (#addr)\n"
+                 "#class pp_#name")
+        "concise" =>
+        \(@: "#hyphseq2 (*(   (x( ;)x))*)<#classsym> #exname#arg(?([#targarglife])?)"
+                 . "~#flags(?(/#private)?)(?(:#hints)?)(x(;~->#next)x)\n"
+                 , "  (*(    )*)     goto #seq\n"
+             "(?(<#seq>)?)#exname#arg(?([#targarglife])?)")
+        "linenoise" =>
+        \(@: "(x(;(*( )*))x)#noise#arg(?([#targarg])?)(x( ;\n)x)"
+             "gt_#seq "
+             "(?(#seq)?)#noise#arg(?([#targarg])?)")
+        "debug" =>
+        \(@: "#class (#addr)\n\top_next\t\t#nextaddr\n\top_sibling\t#sibaddr\n\t"
+                 . "op_ppaddr\tPL_ppaddr[OP_#NAME]\n\top_type\t\t#typenum\n"
+                 . "\top_flags\t#flagval\n\top_private\t#privval\t#hintsval\n"
+                 . "(?(\top_first\t#firstaddr\n)?)(?(\top_last\t\t#lastaddr\n)?)"
+                 . "(?(\top_sv\t\t#svaddr\n)?)"
+             "    GOTO #addr\n"
+             "#addr")
+        "env" => \(@: env::var('B_CONCISE_FORMAT'), env::var('B_CONCISE_GOTO_FORMAT')
+                      env::var('B_CONCISE_TREE_FORMAT'))
+    )
 
 # Renderings, ie how Concise prints, is controlled by these vars
 # primary:
@@ -562,7 +562,7 @@ for (@: "leave", "leavesub", "leavesublv", "leavewrite")
 for (@: "match", "subst", "substcont", "qr")
     %priv{+$_}{+64} = "RTIME"
 %priv{+"trans"}{[+(@: 1,2,4,8,16,64)]} = @: "<UTF", ">UTF", "IDENT", "SQUASH", "DEL"
-                                          "COMPL", "GROWS"
+                                            "COMPL", "GROWS"
 %priv{+"repeat"}{+64} = "DOLIST"
 %priv{+"leaveloop"}{+64} = "CONT"
 for (qw(rv2gv rv2sv padsv aelem helem))
@@ -590,8 +590,9 @@ for (@: (< @+: map( {(@: $_,"s$_") }, (@: "chop", "chomp")) )
         "link", "symlink", "mkdir", "rmdir", "wait", "waitpid", "system"
         "exec", "kill", "getppid", "getpgrp", "setpgrp", "getpriority"
         "setpriority", "time", "sleep"
-        )
+      )
     %priv{+$_}{+16} = "TARGMY"
+
 for (@: "enteriter", "iter")
     %priv{+$_}{+4} = "REVERSED"
 %priv{+"const"}{[+(@: 4,8,16,32,64,128)]} = @: "SHORT","STRICT","ENTERED",'$[',"BARE","WARN"
@@ -925,7 +926,7 @@ sub tree
         @lines[$i] = $kids . @lines[$i]
     else
         @lines[0] = $single . @lines[0]
-    
+
     return @: "$name$lead" . shift @lines
               < map( {" " x (length($name)+$size) . $_ }, @lines)
 

@@ -112,7 +112,6 @@ sub new
                    $self->{':private:'}{Config}{?sitearchexp}
                    < split(m/\Q$(config_value("path_sep"))\E/, $perl5lib)
                    < $self->{':private:'}{?EXTRA}
-        
 
     # File::Find does not know how to deal with VMS filepaths.
     if( $Is_VMS )

@@ -698,7 +698,7 @@ sub parse_args($self, @< @args)
         my(@: $armaybe) = $self->{?ARMAYBE}
         print $^STDOUT, "ARMAYBE => '$armaybe' should be changed to:\n",
             "\t'dynamic_lib' => \{ARMAYBE => '$armaybe'\}\n"
-        my(@: %dl) =@:  (%:  < ($self->{?dynamic_lib} || \$%)->% )
+        my %dl = ($self->{?dynamic_lib} || \$%)->%
         $self->{+dynamic_lib} = \%:  < %dl, ARMAYBE => $armaybe
         delete $self->{ARMAYBE}
     

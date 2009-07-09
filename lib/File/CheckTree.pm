@@ -105,7 +105,6 @@ sub validate
         else
             # put in placeholder Z for stand-alone test
             @testlist = @: 'Z'
-        
 
         # will compare these two later to stop on 1st warning w/in a bundle
         $oldwarnings = $Warnings

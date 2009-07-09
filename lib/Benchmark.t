@@ -107,7 +107,7 @@ do
     print $^STDOUT, "# $all\n"
 
     my (@: $wallclock, $usr, $sys, $cusr, $csys, $cpu) = @: $all =~ $All_Pattern
-                                                          
+
     is (timestr ($diff, 'none'), '', "none supresses output")
 
     my $noc = timestr ($diff, 'noc')

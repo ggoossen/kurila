@@ -102,8 +102,6 @@ sub os_flavor
     my $self = shift
     return  @: $self->SUPER::os_flavor, 'Win9x'
 
-
-
 =back
 
 

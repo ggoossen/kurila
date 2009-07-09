@@ -15,7 +15,7 @@ use File::Spec
 my $cwd
 BEGIN 
     (@: $cwd) = @: getcwd() =~ m/(.*)/
-                 
+
 use lib < map { File::Spec->rel2abs($_, $cwd) }, qw(blib/arch blib/lib)
 1
 __END__

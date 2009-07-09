@@ -59,8 +59,7 @@ Add Netware macros initialized above to the Makefile.
 
 =cut
 
-sub init_platform
-    my(@: $self) =@:  shift
+sub init_platform($self)
 
     # To get Win32's setup.
     $self->SUPER::init_platform
@@ -76,7 +75,6 @@ sub init_platform
     # Additional import file specified from Makefile.pl
     if($self->{?'base_import'})
         $self->{+'BASE_IMPORT'} .= ', ' . $self->{?'base_import'}
-    
 
     $self->{+'NLM_VERSION'} = %Config{?'nlm_version'}
     $self->{+'MPKTOOL'}	= %Config{?'mpktool'}
@@ -89,7 +87,6 @@ sub init_platform
     # truncate it here.
     if(length($self->{?'BASEEXT'}) +> 8)
         $self->{+'NLM_SHORT_NAME'} = substr($self->{?'BASEEXT'},0,8)
-    
 
     # Get the include path and replace the spaces with ;
     # Copy this to makefile as INCLUDE = d:\...;d:\;

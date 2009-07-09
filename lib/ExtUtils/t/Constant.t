@@ -378,11 +378,10 @@ my $pound
 $pound = "pound" . chr(163) # A pound sign. (Currency)
 
 my @common_items = @: 
-                    \(%: name=>"perl", type=>"PV",)
-                    \(%: name=>"*/", type=>"PV", value=>'"CLOSE"', macro=>1)
-                    \(%: name=>"/*", type=>"PV", value=>'"OPEN"', macro=>1)
-                    \(%: name=>$pound, type=>"PV", value=>'"Sterling"', macro=>1)
-    
+                    \%: name=>"perl", type=>"PV",
+                    \%: name=>"*/", type=>"PV", value=>'"CLOSE"', macro=>1
+                    \%: name=>"/*", type=>"PV", value=>'"OPEN"', macro=>1
+                    \%: name=>$pound, type=>"PV", value=>'"Sterling"', macro=>1
 
 my @args = @:  undef 
 foreach my $args ( @args)
@@ -414,26 +413,25 @@ EOT
         $header .= "#define $point $bearing\n"
 
 
-    my @items = @: "FIVE", \(%: name=>"OK6", type=>"PV",)
-                   \(%: name=>"OK7", type=>"PVN"
-                       value=>\(@: '"not ok 7\n\0ok 7\n"', 15))
-                   \(%: name => "FARTHING", type=>"NV")
-                   \(%: name => "NOT_ZERO", type=>"UV", value=>"~(UV)0")
-                   \(%: name => "OPEN", type=>"PV", value=>'"/*"', macro=>1)
-                   \(%: name => "CLOSE", type=>"PV", value=>'"*/"'
-                       macro=>\(@: "#if 1\n", "#endif\n"))
+    my @items = @: "FIVE", \%: name=>"OK6", type=>"PV",
+                   \%: name=>"OK7", type=>"PVN"
+                       value=>\(@: '"not ok 7\n\0ok 7\n"', 15)
+                   \%: name => "FARTHING", type=>"NV"
+                   \%: name => "NOT_ZERO", type=>"UV", value=>"~(UV)0"
+                   \%: name => "OPEN", type=>"PV", value=>'"/*"', macro=>1
+                   \%: name => "CLOSE", type=>"PV", value=>'"*/"'
+                       macro=>\(@: "#if 1\n", "#endif\n")
                    \(%: name => "ANSWER", default=>\(@: "UV", 42)), "NOTDEF"
-                   \(%: name => "Yes", type=>"YES")
-                   \(%: name => "No", type=>"NO")
+                   \%: name => "Yes", type=>"YES"
+                   \%: name => "No", type=>"NO"
                    \(%: name => "Undef", type=>"UNDEF")
                    # OK. It wasn't really designed to allow the creation of dual valued
                    # constants.
                    # It was more for INADDR_ANY INADDR_BROADCAST INADDR_LOOPBACK INADDR_NONE
-                   \(%: name=>"RFC1149", type=>"SV", value=>"sv_2mortal(temp_sv)"
+                   \%: name=>"RFC1149", type=>"SV", value=>"sv_2mortal(temp_sv)"
                        pre=>"SV *temp_sv = newSVpv(RFC1149, 0); "
                            . "(void) SvUPGRADE(temp_sv,SVt_PVIV); SvIOK_on(temp_sv); "
-                           . "SvIV_set(temp_sv, 1149);")
-        
+                           . "SvIV_set(temp_sv, 1149);"
 
     foreach (keys %compass)
         push @items, $_

@@ -494,17 +494,15 @@ sub pod2usage
 
     ## Look up input file in path if it doesnt exist.
     unless ((ref %opts{?"input"}) || (-e %opts{?"input"}))
-        my (@: $basename) = @: %opts{?"input"}
+        my $basename = %opts{?"input"}
         my $pathsep = ($^OS_NAME =~ m/^(?:dos|os2|MSWin32)$/) ?? ";"
             !! (($^OS_NAME eq 'MacOS' || $^OS_NAME eq 'VMS') ?? ',' !!  ":")
         my $pathspec = %opts{?"pathlist"} || env::var('PATH') || env::var('PERL5LIB')
 
-        my @paths = @:  (ref $pathspec) ?? < $pathspec->@ !! < split($pathsep, $pathspec) 
+        my @paths = (ref $pathspec) ?? $pathspec->@ !! split($pathsep, $pathspec)
         for my $dirname ( @paths)
             local $_ = File::Spec->catfile($dirname, $basename) if length $dirname
             last if (-e $_) && (%opts{+"input"} = $_)
-        
-    
 
     ## Now create a pod reader and constrain it to the desired sections.
     my $parser = Pod::Usage->new(USAGE_OPTIONS => \%opts)
@@ -562,14 +560,11 @@ sub new
     return $self
 
 
-sub select
-    my (@: $self, @< @res) =  @_
+sub select($self, @< @res)
     if (@ISA[0]->can('select'))
-        $self->SUPER::select(< @_)
+        $self->SUPER::select(@res)
     else
         $self->{+USAGE_SELECT} = \@res
-    
-
 
 # Override Pod::Text->seq_i to return just "arg", not "*arg*".
 sub seq_i { return @_[1] }

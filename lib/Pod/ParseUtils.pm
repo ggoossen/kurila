@@ -72,7 +72,7 @@ sub initialize
     $self->{+file} ||= 'unknown'
     $self->{+start} ||= 'unknown'
     $self->{+indent} ||= 4 # perlpod: "should be the default"
-    $self->{+_items} = \@: 
+    $self->{+_items} = \$@
     $self->{+type} ||= ''
 
 
@@ -86,8 +86,7 @@ method or by calling the B<file()> method with a scalar argument.
 
 # The POD file name the list appears in
 sub file
-    return ((nelems @_) +> 1) ??  (@: @_[0]->{file} = @_[1]) !! @_[0]->{file}
-
+    return ((nelems @_) +> 1) ??  @: (@_[0]->{file} = @_[1]) !! @_[0]->{file}
 
 =item $list-E<gt>start()
 

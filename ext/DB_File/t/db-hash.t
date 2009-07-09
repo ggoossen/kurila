@@ -96,7 +96,7 @@ ok( %h)
 
 my (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
        $blksize,$blocks) = @: stat($Dfile)
-                            
+
 my %noMode = %:  < @+: map { @: $_, 1 }, qw( amigaos MSWin32 NetWare cygwin )  
 
 ok( ($mode ^&^ 0777) == (($^OS_NAME eq 'os2' || $^OS_NAME eq 'MacOS') ?? 0666 !! 0640) ||
@@ -192,7 +192,7 @@ ok( $size +> 0 )
 # Check NOOVERWRITE will make put fail when attempting to overwrite
 # an existing record.
 
-my $status = %h->put( 'x', 'newvalue', R_NOOVERWRITE) 
+my $status = %h->put( 'x', 'newvalue', R_NOOVERWRITE())
 ok( $status == 1 )
 
 # check that the value of the key 'x' has not been changed by the

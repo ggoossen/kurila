@@ -518,7 +518,6 @@ sub os_flavor
     return @: 'Win32'
 
 
-
 =item cflags
 
 Defines the PERLDLL symbol if we are configured for static building since all

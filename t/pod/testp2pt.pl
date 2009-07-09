@@ -45,7 +45,6 @@ my @PODINCDIRS = @: catfile($INSTDIR, 'lib', 'Pod')
                     catfile($INSTDIR, 'scripts')
                     catfile($INSTDIR, 'pod')
                     catfile($INSTDIR, 't', 'pod')
-    
 
 ## Find the path to the file to =include
 sub findinclude

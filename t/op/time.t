@@ -9,7 +9,7 @@ BEGIN
 plan tests => 8
 
 our (@: $beguser,$begsys, ...) = @: times
-                                  
+
 our $beg = time
 
 our $now
@@ -63,7 +63,7 @@ SKIP: do
 
     (@: $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = @: gmtime($beg)
     (@: $xsec,$foo, ...) = @: localtime($now)
-                            
+
     ok($sec != $xsec && $mday && $year,             'gmtime() list context')
 
     my $day_diff = $localyday - $yday

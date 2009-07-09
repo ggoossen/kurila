@@ -53,7 +53,6 @@ my @years =
      \(@:  1996 => 1 )
      \(@:  2000 => 1 )
      \(@:  2100 => 0 )
-    
 
 # Use 3 days before the start of the epoch because with Borland on
 # Win32 it will work for -3600 _if_ your time zone is +01:00 (or
@@ -91,7 +90,7 @@ for ( (@:  < @time, < @neg_time) )
             my $time = timelocal($sec,$min,$hour,$mday,$mon,$year_in)
 
             my(@: $s,$m,$h,$D,$M,$Y, ...) = @: localtime($time)
-                                             
+
             is($s, $sec, "timelocal second for $(join ' ',$_->@)")
             is($m, $min, "timelocal minute for $(join ' ',$_->@)")
             is($h, $hour, "timelocal hour for $(join ' ',$_->@)")
@@ -105,7 +104,7 @@ for ( (@:  < @time, < @neg_time) )
             my $time = timegm($sec,$min,$hour,$mday,$mon,$year_in)
 
             my(@: $s,$m,$h,$D,$M,$Y, ...) = @: gmtime($time)
-                                             
+
             is($s, $sec, "timegm second for $(join ' ',$_->@)")
             is($m, $min, "timegm minute for $(join ' ',$_->@)")
             is($h, $hour, "timegm hour for $(join ' ',$_->@)")

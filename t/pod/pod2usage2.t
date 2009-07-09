@@ -27,7 +27,7 @@ sub getoutput
             s/^/#/
         print $^STDOUT, "#EXIT=$exit OUTPUT=+++#$(join '',@out)#+++\n"
         return @: $exit, join("", @out)
-    
+
     # child
     open($^STDERR, ">&", $^STDOUT)
     &$code( < @_ )

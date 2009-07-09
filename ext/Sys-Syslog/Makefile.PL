@@ -117,19 +117,18 @@ if(try {require ExtUtils::Constant; 1})
             LOG_SYSLOG LOG_USER LOG_UUCP
         )
                          # Mac OS X specific facilities
-                         \(%:  name => "LOG_INSTALL",    type => "IV", default => \(@:  "IV", "LOG_USER"  ) )
-                         \(%:  name => "LOG_LAUNCHD",    type => "IV", default => \(@:  "IV", "LOG_DAEMON") )
-                         \(%:  name => "LOG_NETINFO",    type => "IV", default => \(@:  "IV", "LOG_DAEMON") )
-                         \(%:  name => "LOG_RAS",        type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) )
+                         \%:  name => "LOG_INSTALL",    type => "IV", default => \(@:  "IV", "LOG_USER"  ) 
+                         \%:  name => "LOG_LAUNCHD",    type => "IV", default => \(@:  "IV", "LOG_DAEMON") 
+                         \%:  name => "LOG_NETINFO",    type => "IV", default => \(@:  "IV", "LOG_DAEMON") 
+                         \%:  name => "LOG_RAS",        type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) 
                          \(%:  name => "LOG_REMOTEAUTH", type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) )
                          # modern BSD specific facilities
-                         \(%:  name => "LOG_CONSOLE",    type => "IV", default => \(@:  "IV", "LOG_USER"  ) )
-                         \(%:  name => "LOG_NTP",        type => "IV", default => \(@:  "IV", "LOG_DAEMON") )
+                         \%:  name => "LOG_CONSOLE",    type => "IV", default => \(@:  "IV", "LOG_USER"  ) 
+                         \%:  name => "LOG_NTP",        type => "IV", default => \(@:  "IV", "LOG_DAEMON") 
                          \(%:  name => "LOG_SECURITY",   type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) )
                          # IRIX specific facilities
-                         \(%:  name => "LOG_AUDIT",      type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) )
-                         \(%:  name => "LOG_LFMT",       type => "IV", default => \(@:  "IV", "LOG_USER"  ) )
-        
+                         \%:  name => "LOG_AUDIT",      type => "IV", default => \(@:  "IV", "LOG_AUTH"  ) 
+                         \%:  name => "LOG_LFMT",       type => "IV", default => \(@:  "IV", "LOG_USER"  ) 
 
     my @options = qw(
         LOG_CONS LOG_PID LOG_NDELAY LOG_NOWAIT LOG_ODELAY LOG_PERROR 
@@ -137,10 +136,9 @@ if(try {require ExtUtils::Constant; 1})
 
     my @others_macros = @:  <
                                 qw(LOG_FACMASK)
-                            \(%:  name => "_PATH_LOG", type => "PV", default => \(@:  "PV", qq("$_PATH_LOG") ) )
-                            \(%:  name => "LOG_PRIMASK",     type => "IV", default => \(@:  "IV", 7) )
-                            \(%:  name => "LOG_NFACILITIES", type => "IV", default => \(@:  "IV", scalar nelems @facilities) )
-        
+                            \%:  name => "_PATH_LOG", type => "PV", default => \(@:  "PV", qq("$_PATH_LOG") ) 
+                            \%:  name => "LOG_PRIMASK",     type => "IV", default => \(@:  "IV", 7) 
+                            \%:  name => "LOG_NFACILITIES", type => "IV", default => \(@:  "IV", scalar nelems @facilities) 
 
     ExtUtils::Constant::WriteConstants(
         PROXYSUBS => 1,

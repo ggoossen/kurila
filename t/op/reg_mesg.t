@@ -86,7 +86,6 @@ my @death =
  'm/\p/' => 'Empty \p{} in regex; marked by {#} in m/\p{#}/'
 
  'm/\P{}/' => 'Empty \P{} in regex; marked by {#} in m/\P{{#}}/'
-    
 
 ##
 ## Key-value pairs of code/error of code that should have non-fatal warnings.

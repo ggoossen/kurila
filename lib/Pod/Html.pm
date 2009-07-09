@@ -431,16 +431,11 @@ sub pod2html
                         last TITLE_SEARCH
                             if (@: ?$Title) = @: $para =~ m/(\S+\s+-+.*\S)/s
 
-
-
-
-
-                                               
     if (!$Title and $Podfile =~ m/\.pod\z/)
         # probably a split pod so take first =head[12] as title
         for my $i (0 .. nelems(@poddata) -1)
             last if (@: $Title) = @: @poddata[$i] =~ m/^=head[12]\s*(.*)/
-                                   
+
         warn "adopted '$Title' as title for $Podfile\n"
             if $Verbose and $Title
     
@@ -1603,7 +1598,7 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing)
                 (@:  $page, $ident ) = @:  $1, $2 
             else
                 (@:  $page, $section ) = @:  $1, $2 
-            
+
         ### print STDERR "--> L<$par> to page $page, ident $ident\n";
 
         elsif( $par =~ m{^(.*?)/"?(.*?)"?$} ) # [name]/"section"
@@ -1618,7 +1613,6 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing)
         else
             (@:  $page, $section ) = @:  $par, '' 
         ### print STDERR "--> L<$par> to page $par, void section\n";
-        
 
         # now, either $section or $ident is defined. the convoluted logic
         # below tries to resolve L<> according to what the user specified.
@@ -1977,11 +1971,10 @@ sub coderef( $page, $item)
             
         else
             $url = "#" . anchorify($fid)
-        
 
         confess "url has space: $url" if $url =~ m/"[^"]*\s[^"]*"/
-    
-    return @:  $url, $fid 
+
+    return @:  $url, $fid
 
 
 

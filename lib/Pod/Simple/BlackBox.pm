@@ -65,7 +65,7 @@ sub parse_lines             # Usage: $parser->parse_lines(@lines)
         unless( defined $source_line )
             DEBUG +> 4 and print $^STDOUT, "# Undef-line seen.\n"
 
-            push $paras->@, \@: '~end', \(%: 'start_line' => $self->{?'line_count'})
+            push $paras->@, \@: '~end', \%: 'start_line' => $self->{?'line_count'}
             push $paras->@, $paras->[-1], $paras->[-1]
             # So that it definitely fills the buffer.
             $self->{+'source_dead'} = 1
@@ -203,7 +203,7 @@ sub parse_lines             # Usage: $parser->parse_lines(@lines)
 
             if($line =~ m/^(=[a-zA-Z][a-zA-Z0-9]*)(?:\s+|$)(.*)/s)
                 # THIS IS THE ONE PLACE WHERE WE CONSTRUCT NEW DIRECTIVE OBJECTS
-                my $new = \@: $1, \(%: 'start_line' => $self->{?'line_count'}), $2
+                my $new = \(@: $1, \(%: 'start_line' => $self->{?'line_count'}), $2)
                 # Note that in "=head1 foo", the WS is lost.
                 # Example: ['=head1', {'start_line' => 123}, ' foo']
 
@@ -385,30 +385,24 @@ do
                     #]
                     ) }, $self->{'errata'}{$line}
                 )
-            
-        
 
         # TODO: report of unknown entities? unrenderable characters?
 
         unshift @out,
             \(@: '=head1', \(%: 'start_line' => $m, 'errata' => 1), 'POD ERRORS'),
-            \(@: '~Para', \(%: 'start_line' => $m, '~cooked' => 1, 'errata' => 1)
+            \(@: '~Para', \%: 'start_line' => $m, '~cooked' => 1, 'errata' => 1
                  "Hey! "
                  \@: 'B', \$%
-                   'The above document had some coding errors, which are explained below:'
-                     
+                     'The above document had some coding errors, which are explained below:'
             ),
-            \(@: '=over',  \(%: 'start_line' => $m, 'errata' => 1), ''),
-        
+            \ @: '=over',  \(%: 'start_line' => $m, 'errata' => 1), '',
 
         push @out,
             \(@: '=back',  \(%: 'start_line' => $m, 'errata' => 1), ''),
-        
 
         DEBUG and print $^STDOUT, "\n<<\n", < pretty(\@out), "\n>>\n\n"
 
         return @out
-    
 
 
 
@@ -856,15 +850,14 @@ sub _ponder_for($self,$para,$curr_open,$paras)
 
     unshift $paras->@,
         \(@: '=begin'
-             \(%: 'start_line' => $para->[1]->{?'start_line'}, '~really' => '=for')
+             \%: 'start_line' => $para->[1]->{?'start_line'}, '~really' => '=for'
              $target
         ),
         $para,
         \(@: '=end'
-             \(%: 'start_line' => $para->[1]->{?'start_line'}, '~really' => '=for')
+             \%: 'start_line' => $para->[1]->{?'start_line'}, '~really' => '=for'
              $target
         ),
-    
 
     return 1
 
@@ -1518,10 +1511,9 @@ sub _verbatim_format($it, $p)
                         $5 ?? 'VerbatimBI' !! die("Should never get called")
                         ), \$%
                     substr($p->[$i-1], pos($formatting)-length($1), length($1))
-                    
+
             #print "Formatting <$new_line[-1][-1]> as $new_line[-1][0]\n";
-            
-        
+
         my @nixed = @: 
             splice $p->@, $i-1, 2, < @new_line  # replace myself and the next line
         DEBUG +> 10 and print $^STDOUT, "Nixed count: ", scalar(nelems @nixed), "\n"
@@ -1571,7 +1563,7 @@ sub _verbatim_format($it, $p)
 
 sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space)
 
-    my $treelet = \@: '~Top', \(%: 'start_line' => $start_line),
+    my $treelet = \@: '~Top', \(%: 'start_line' => $start_line)
 
     unless ($preserve_space || $self->{?'preserve_whitespace'})
         use utf8
@@ -1652,7 +1644,7 @@ sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space)
             else
                 DEBUG +> 3 and print $^STDOUT, "Found simple start-text code \"$1\"\n"
                 push @stack, 0  # signal that we're looking for simple
-            
+
             push @lineage, \@:  substr($1,0,1), \$%,   # new node object
             push  @lineage[-2]->@, @lineage[-1]
 

@@ -153,7 +153,7 @@ is( (nelems $ei->modules), 3,    'modules() in scalar context' )
 
 # files
 $ei->{+goodmod} = \%: 
-    packlist => \(%: 
+    packlist => \ %: 
         (config_value("man1direxp") ??
             (File::Spec->catdir(config_value("man1direxp"), 'foo') => 1) !!
             ())
@@ -162,8 +162,6 @@ $ei->{+goodmod} = \%:
             ())
         File::Spec->catdir($prefix, 'foobar') => 1
         foobaz  => 1
-    )
-    
 
 dies_like( sub (@< @_) { $ei->files('badmod') },
            qr/badmod is not installed/,'files() should croak given bad modname')
@@ -191,7 +189,7 @@ is( scalar nelems @files, 1, '... should find doc file in correct dir' )
 like( @files[0], qr/foobar[>\]]?$/, '... checking file name' )
 @files = $ei->files('goodmod')
 is( scalar nelems @files, 2 + $mandirs, '... should find all files with no type specified' )
-my %dirnames = %:  < @+: map { @: lc($_) => dirname($_) }, @files 
+my %dirnames = %+: map { %: lc($_) => dirname($_) }, @files 
 
 # directories
 my @dirs = $ei->directories('goodmod', 'prog', 'fake')
@@ -226,7 +224,6 @@ my $fakepak = Fakepak->new(102)
 $ei->{+yesmod} = \%: 
     version         => 101
     packlist        => $fakepak
-    
 
 # these should all croak
 foreach my $sub (qw( validate packlist version ))

@@ -561,11 +561,11 @@ sub initialize
     # set the error handling subroutine
     $self->errorsub($self->{?quiet} ?? sub (@< @_) { 1; } !! 'poderror')
     $self->{+_commands} = 0 # total number of POD commands encountered
-    $self->{+_list_stack} = \@:  # stack for nested lists
+    $self->{+_list_stack} = \$@ # stack for nested lists
     $self->{+_have_begin} = '' # stores =begin
-    $self->{+_links} = \@:  # stack for internal hyperlinks
-    $self->{+_nodes} = \@:  # stack for =head/=item nodes
-    $self->{+_index} = \@:  # text in X<>
+    $self->{+_links} = \$@ # stack for internal hyperlinks
+    $self->{+_nodes} = \$@ # stack for =head/=item nodes
+    $self->{+_index} = \$@ # text in X<>
     # print warnings?
     $self->{+warnings} = 1 unless(defined $self->{?warnings})
     $self->{+_current_head1} = '' # the current =head1 block
@@ -636,7 +636,7 @@ Set (if argument specified) and retrieve the number of errors found.
 =cut
 
 sub num_errors
-    return ((nelems @_) +> 1) ??  (@: @_[0]->{+_NUM_ERRORS} = @_[1]) !! @_[0]->{?_NUM_ERRORS}
+    return ((nelems @_) +> 1) ??  @: (@_[0]->{+_NUM_ERRORS} = @_[1]) !! @_[0]->{?_NUM_ERRORS}
 
 
 ##################################
@@ -648,7 +648,7 @@ Set (if argument specified) and retrieve the number of warnings found.
 =cut
 
 sub num_warnings
-    return ((nelems @_) +> 1) ??  (@: @_[0]->{+_NUM_WARNINGS} = @_[1]) !! @_[0]->{?_NUM_WARNINGS}
+    return ((nelems @_) +> 1) ??  @: (@_[0]->{+_NUM_WARNINGS} = @_[1]) !! @_[0]->{?_NUM_WARNINGS}
 
 
 ##################################
@@ -662,7 +662,7 @@ found in the C<=head1 NAME> section.
 
 sub name
     return ((nelems @_) +> 1 && @_[1]) ??
-        (@: @_[0]->{+name} = @_[1]) !! @_[0]->{?name}
+        @: (@_[0]->{+name} = @_[1]) !! @_[0]->{?name}
 
 
 ##################################
@@ -768,7 +768,7 @@ sub end_pod
         %nodes{+$_} = 3 # index node
     
     foreach( $self->hyperlink())
-        my (@: $line,$link) =  $_->@
+        my @: $line,$link =  $_->@
         # _TODO_ what if there is a link to the page itself by the name,
         # e.g. in Tk::Pod : L<Tk::Pod/"DESCRIPTION">
         if($link->node() && !$link->page() && $link->type() ne 'hyperlink')
@@ -799,7 +799,7 @@ sub end_pod
 
 # check a POD command directive
 sub command($self, $cmd, $paragraph, $line_num, $pod_para)
-    my (@: $file, $line) =  $pod_para->file_line
+    my @: $file, $line =  $pod_para->file_line
     ## Check the command syntax
     my $arg # this will hold the command argument
     if (! %VALID_COMMANDS{?$cmd})
@@ -1064,7 +1064,7 @@ sub _check_ptree($self,$ptree,$line,$file,$nestlist)
         # have an interior sequence
         my $cmd = $_->cmd_name()
         my $contents = $_->parse_tree()
-        (@: $file,$line) =  $_->file_line()
+        @: $file,$line = $_->file_line()
         # check for valid tag
         if (! %VALID_SEQUENCES{?$cmd})
             $self->poderror(\(%:  line => $line, file => $file
@@ -1139,7 +1139,7 @@ sub _check_ptree($self,$ptree,$line,$file,$nestlist)
             $text .= $self->_check_ptree( $self->parse_text( $link->text(),
                 $line), $line, $file, "$nestlist$cmd")
             # remember link
-            $self->hyperlink(\(@: $line,$link))
+            $self->hyperlink(\@: $line,$link)
         elsif($cmd =~ m/[BCFIS]/)
             # add the guts
             $text .= $self->_check_ptree($contents, $line, $file, "$nestlist$cmd")
@@ -1177,12 +1177,11 @@ sub verbatim($self, $paragraph, $line_num, $pod_para)
         $self->poderror(\(%:  line => $line, file => $file
                               severity => 'WARNING'
                               msg => 'Verbatim paragraph in NAME section' ))
-    
 
 
 # process a block of regular text
 sub textblock($self, $paragraph, $line_num, $pod_para)
-    my (@: $file, $line) =  $pod_para->file_line
+    my @: $file, $line = $pod_para->file_line
 
     $self->_preproc_par($paragraph)
 

@@ -31,16 +31,15 @@ do
 local *FOO
 
 @obj =
-    @: \(@: \&code                   # code reference
-           sub (@< @_) { 6*7 }
+    @: \@: \&code                   # code reference
+           sub() { 6*7 }
            $blessed_code            # blessed code reference
            \&Another::Package::foo  # code in another package
-           sub ($x, $y) { 0 }         # prototypes
-           sub (@< @_) { print $^STDOUT, "test\n" }
+           sub($x, $y) { 0 }         # prototypes
+           sub() { print $^STDOUT, "test\n" }
            \&Test::ok               # large scalar
-           )
 
-       \(%: "a" => sub (@< @_) { "srt" }, "b" => \&code)
+       \%: "a" => sub (@< @_) { "srt" }, "b" => \&code
 
        sub (@< @_) { ord("a")-ord("7") }
 

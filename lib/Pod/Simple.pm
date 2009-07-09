@@ -366,8 +366,7 @@ sub _init_fh_source($self, $source)
 #:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
 #
 
-sub parse_file
-    my(@: $self, $source) = @: < @_
+sub parse_file($self, $source)
 
     if(!defined $source)
         die("Can't use empty-string as a source for parse_file")
@@ -695,12 +694,11 @@ sub _remap_sequences
                     DEBUG +> 4 and printf $^STDOUT,
                         "    Grafting a new \%s node between \%s and \%s\n",
                         @dynasty[-1], $treelet->[0], $treelet->[$i]->[0],
-                    
 
                     #$nugget = ;
                     splice $treelet->@, $i, 1, \@: pop(@dynasty), \$%, $treelet->[$i]
                 # relace node with a new parent
-                
+
             elsif($is eq '0')
                 splice($treelet->@, $i, 1) # just nix this node (and its descendants)
                 --$i  # back-update the counter

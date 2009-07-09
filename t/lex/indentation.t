@@ -57,7 +57,7 @@ is($y, "old")
 # @: with layout
 $x = @: "aap"
         "noot"
-            
+
 is(join("*", $x), q[aap*noot])
 
 # empty @:
@@ -84,7 +84,7 @@ do
 =head1 TEST
 =cut
     is $tmpvar, "aap"
-    
+
 eval_dies_like(<<'EOE', qr/syntax error .* near "elsif/)
 if ($a)
     1

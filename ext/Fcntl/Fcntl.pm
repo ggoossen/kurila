@@ -207,7 +207,6 @@ BEGIN
 		     S_ISWHT S_ISENFMT		
 		     S_IFMT S_IMODE
                   )
-    
 
 # Force the constants to become inlined
 BEGIN 

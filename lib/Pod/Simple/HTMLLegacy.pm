@@ -46,10 +46,10 @@ sub pod2html
         warn sprintf
             " Verbose: \%s\n Index: \%s\n Infile: \%s\n Outfile: \%s\n Title: \%s\n",
             < map { defined($_) ?? $_ !! "(nil)" }, @: 
-            $verbose,     $index,     $infile,     $outfile,     $title,
-        
+            $verbose,     $index,     $infile,     $outfile,     $title
+
         *Pod::Simple::HTML::DEBUG = sub(){1}
-    
+
     require Pod::Simple::HTML
     Pod::Simple::HTML->VERSION(3)
 

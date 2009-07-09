@@ -187,8 +187,7 @@ sub load_loc
 
     return @: %Loc{?$pkg}, sub (@< @_)
                  $lh = $pkg->get_handle(< @_)
-                  $lh = $pkg->get_handle(< @_)
-             
+                 $lh = $pkg->get_handle(< @_)
 
 
 sub default_loc

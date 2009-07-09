@@ -1,8 +1,8 @@
 package ExtUtils::Constant::Base
 
 our ($VERSION)
-use Text::Wrap
-use ExtUtils::Constant::Utils < qw(C_stringify perl_stringify)
+use Text::Wrap;
+use ExtUtils::Constant::Utils < qw(C_stringify perl_stringify);
 $VERSION = '0.04'
 
 =head1 NAME
@@ -108,7 +108,7 @@ the front of I<name>).
 =cut
 
 sub memEQ_clause($self, $args)
-    my (@: $name, $checked_at, $indent) =  $args->{[qw(name checked_at indent)]}
+    my @: $name, $checked_at, $indent =  $args->{[qw(name checked_at indent)]}
     $indent = ' ' x ($indent || 4)
     my $front_chop
     if (ref $checked_at)
@@ -209,7 +209,7 @@ sub dump_names($self, $args, @< @items)
             $type = $_->{?type} || $default_type
             die "No more utf8 flag" if ($_->{?utf8})
         else
-            $_ = \%: name=>$_
+            $_ = \%(name=>$_)
             $type = $default_type
         
         %used_types{+$type}++
@@ -306,7 +306,7 @@ sub assign
         unless $self->valid_type($type)
 
     $clause .= join '', map {"$indent$_\n"},
-        @:     $self->assignment_clause_for_type(\(%: type=>$type,item=>$item), < @_)
+        @: $self->assignment_clause_for_type(\%(type=>$type,item=>$item), < @_)
     chomp $post
     if (length $post)
         $clause .= "$post"
@@ -346,8 +346,8 @@ sub return_clause($self, $args, $item)
     #      *iv_return = thingy;
     #      return PERL_constant_ISIV;
     $clause
-        .= $self->assign (\(%: indent=>$indent, type=>$type, pre=>$pre, post=>$post
-                               item=>$item), ref $value ?? < $value->@ !! $value)
+        .= $self->assign (\%(indent=>$indent, type=>$type, pre=>$pre, post=>$post,
+        item=>$item), ref $value ?? < $value->@ !! $value)
 
     if (defined $macro && $macro ne "" && $macro ne "1")
         ##else
@@ -358,10 +358,10 @@ sub return_clause($self, $args, $item)
             my $notdef = $self->return_statement_for_notdef()
             $clause .= "$indent$notdef\n" if defined $notdef
         else
-            my @default = @:  ref $default ?? < $default->@ !! $default 
+            my @default = ref $default ?? $default->@ !! @: $default
             $type = shift @default
-            $clause .= $self->assign (\(%: indent=>$indent, type=>$type, pre=>$pre
-                                           post=>$post, item=>$item), < @default)
+            $clause .= $self->assign (\%(indent=>$indent, type=>$type, pre=>$pre,
+                post=>$post, item=>$item), < @default)
         
     
     ##endif
@@ -371,7 +371,7 @@ sub return_clause($self, $args, $item)
 
 
 sub match_clause($self, $args, $item)
-    my (@: ?$offset, ?$indent) =  $args{[?qw(checked_at indent)]}
+    my @:?$offset, ?$indent = $args{[?qw(checked_at indent)]}
     $indent = ' ' x ($indent || 4)
     my $body = ''
     my ($no, $yes, $either, $name, $inner_indent)
@@ -382,8 +382,8 @@ sub match_clause($self, $args, $item)
         $inner_indent = $indent
     
 
-    $body .= $self->memEQ_clause (\(%: name => $name, checked_at => $offset
-                                       indent => length $indent))
+    $body .= $self->memEQ_clause (\%(name => $name, checked_at => $offset,
+        indent => length $indent))
     # If we've been presented with an arrayref for $item, then the user string
     # contains in the range 128-255, and we need to check whether it was utf8
     # (or not).
@@ -392,10 +392,10 @@ sub match_clause($self, $args, $item)
     # encoded in (say) ISO-8859-1.
     # In this case, $yes and $no both have item hashrefs.
     if ($either)
-        $body .= $self->return_clause (\(%: indent=>4 + length $indent), $either)
+        $body .= $self->return_clause (\%(indent=>4 + length $indent), $either)
         $body .= $indent . "  \}\n"
     else
-        $body .= $self->return_clause (\(%: indent=>2 + length $indent), $item)
+        $body .= $self->return_clause (\%(indent=>2 + length $indent), $item)
     
     $body .= $indent . "\}\n"
 
@@ -415,7 +415,7 @@ each call).
 =cut
 
 sub switch_clause($self, $args, $namelen, $items, @< @items)
-    my (@: $indent, $comment) =  $args->{[qw(indent comment)]}
+    my @: $indent, $comment = $args->{[qw(indent comment)]}
     $indent = ' ' x ($indent || 2)
 
     local $Text::Wrap::huge = 'overflow'
@@ -447,8 +447,8 @@ sub switch_clause($self, $args, $namelen, $items, @< @items)
     my @best = @: 1e38, ^~^0
     # Prefer the last character over the others. (As it lets us shorten the
     # memEQ clause at no cost).
-    foreach my $i ((@: $namelen - 1, < 0 .. ($namelen - 2)))
-        my (@: $min, $max) = @: ^~^0, 0
+    foreach my $i (@: $namelen - 1, < 0 .. ($namelen - 2))
+        my @: $min, $max = @: ^~^0, 0
         my %spread
         foreach ( @names)
             my $char = substr $_, $i, 1
@@ -479,12 +479,11 @@ sub switch_clause($self, $args, $namelen, $items, @< @items)
         my $rms = sqrt ($ss / keys %spread)
         if ($rms +< @best[0] || ($rms == @best[0] && ($max - $min) +< @best[1]))
             @best = @: $rms, $max - $min, $i, \%spread
-        
     
     die "Internal error. Failed to pick a switch point for $(join ' ',@names)"
         unless defined @best[2]
     # use Data::Dumper; print Dumper (@best);
-    my (@: $offset, $best) =  @best[[(@: 2,3)]]
+    my @: $offset, $best = @best[[2..3]]
     $body .= $indent . "/* Offset $offset gives the best switch position.  */\n"
 
     my $do_front_chop = $offset == 0 && $namelen +> 2
@@ -512,11 +511,11 @@ sub switch_clause($self, $args, $namelen, $items, @< @items)
             $items->{[ $best->{?$char}->@]})
             # warn "You are here";
             if ($do_front_chop)
-                $body .= $self->match_clause (\(%: indent => 2 + length $indent
-                                                   checked_at => \$char), $thisone)
+                $body .= $self->match_clause (\%(indent => 2 + length $indent,
+                    checked_at => \$char), $thisone)
             else
-                $body .= $self->match_clause (\(%: indent => 2 + length $indent
-                                                   checked_at => $offset), $thisone)
+                $body .= $self->match_clause (\%(indent => 2 + length $indent,
+                    checked_at => $offset), $thisone)
             
         
         $body .= $indent . "  break;\n"
@@ -607,10 +606,10 @@ sub normalise_items
         if (ref $orig)
             # Make a copy which is a normalised version of the ref passed in.
             $name = $orig->{?name}
-            my (@: $type, $macro, $value) =  $orig->%{[qw (type macro value)]}
+            my @: $type, $macro, $value = $orig->%{[qw (type macro value)]}
             $type ||= $default_type
             $what->{+$type} = 1
-            $item = \%: name=>$name, type=>$type
+            $item = \%(name=>$name, type=>$type)
             $item->{+macro} = $macro if defined $macro and (ref $macro or $macro ne $name)
             $item->{+value} = $value if defined $value and (ref $value or $value ne $name)
             foreach my $key (qw(default pre post def_pre def_post weight
@@ -621,7 +620,7 @@ sub normalise_items
             
         else
             $name = $orig
-            $item = \%: name=>$name, type=>$default_type
+            $item = \%(name=>$name, type=>$default_type)
             $what->{+$default_type} = 1
         
         warn( (ref ($self) || $self)
@@ -749,7 +748,7 @@ example C<constant_5> for names 5 characters long.  The default I<breakout> is
 # scalar reference.
 
 sub C_constant($self, $args, @< @items)
-    my (@: $package, $subname, $default_type, $what, $indent, $breakout) =
+    my @: $package, $subname, $default_type, $what, $indent, $breakout =
         $args->{[qw(package subname default_type types indent breakout)]}
     $package ||= 'Foo'
     $subname ||= 'constant'
@@ -761,18 +760,18 @@ sub C_constant($self, $args, @< @items)
     if (ref $breakout)
         # We are called recursively. We trust @items to be normalised, $what to
         # be a hashref, and pinch %$items from our parent to save recalculation.
-        (@: $namelen, $items) =  $breakout->@
+        @: $namelen, $items = $breakout->@
     else
-        $items = \%: 
+        $items = \%()
         $breakout ||= 3
         $default_type ||= $self->default_type()
         if (!ref $what)
             # Convert line of the form IV,UV,NV to hash
-            $what = \%: < @+: map {@: $_ => 1}, split m/,\s*/, ($what || '')
+            $what = \%(< @+: map {@: $_ => 1}, split m/,\s*/, ($what || ''))
         # Figure out what types we're dealing with, and assign all unknowns to the
         # default type
         
-        @items = $self->normalise_items (\(%: ), $default_type, $what, $items, < @items)
+        @items = $self->normalise_items (\%(), $default_type, $what, $items, < @items)
     # use Data::Dumper; print Dumper @items;
     
     my $params = $self->params ($what)
@@ -795,14 +794,14 @@ sub C_constant($self, $args, @< @items)
         my $comment = 'When generated this function returned values for the list'
             . ' of names given here.  However, subsequent manual editing may have'
             . ' added or removed some.'
-        $body .= $self->switch_clause (\(%: indent=>2, comment=>$comment),
+        $body .= $self->switch_clause (\%(indent=>2, comment=>$comment),
             $namelen, $items, < @items)
     else
         # We are the top level.
         $body .= "  /* Initially switch on the length of the name.  */\n"
-        $body .= $self->dogfood (\(%: package => $package, subname => $subname
-                                      default_type => $default_type, what => $what
-                                      indent => $indent, breakout => $breakout),
+        $body .= $self->dogfood (\%(package => $package, subname => $subname,
+            default_type => $default_type, what => $what,
+            indent => $indent, breakout => $breakout),
             < @items)
         $body .= '  switch ('.$self->namelen_param().") \{\n"
         # Need to group names of the same length
@@ -818,31 +817,31 @@ sub C_constant($self, $args, @< @items)
                 if ($only_thing->{?utf8})
                     if ($only_thing->{?utf8} eq 'yes')
                         # With utf8 on flag item is passed in element 0
-                        $body .= $self->match_clause (undef, \(@: $only_thing))
+                        $body .= $self->match_clause (undef, \@: $only_thing)
                     else
                         # With utf8 off flag item is passed in element 1
-                        $body .= $self->match_clause (undef, \(@: undef, $only_thing))
+                        $body .= $self->match_clause (undef, \@: undef, $only_thing)
                     
                 else
                     $body .= $self->match_clause (undef, $only_thing)
                 
             elsif ((nelems @by_length[$i]) +< $breakout)
-                $body .= $self->switch_clause (\(%: indent=>4),
+                $body .= $self->switch_clause (\%(indent=>4),
                     $i, $items, < @by_length[$i])
             else
                 # Only use the minimal set of parameters actually needed by the types
                 # of the names of this length.
-                my $what = \%: 
+                my $what = \%()
                 foreach ( @by_length[$i])
                     $what->{+$_->{?type}} = 1
                     $what->{+''} = 1 if $_->{?utf8}
                 
                 $params = $self->params ($what)
-                push @subs, < $self->C_constant (\(%: package=>$package
-                                                      subname=>"$($subname)_$i"
-                                                      default_type => $default_type
-                                                      types => $what, indent => $indent
-                                                      breakout => \(@: $i, $items)),
+                push @subs, < $self->C_constant (\%(package=>$package,
+                    subname=>"$($subname)_$i",
+                    default_type => $default_type,
+                    types => $what, indent => $indent,
+                    breakout => \@: $i, $items),
                     < @by_length[$i])
                 $body .= "    return $($subname)_$i ("
                     # Eg "aTHX_ "
@@ -860,7 +859,6 @@ sub C_constant($self, $args, @< @items)
     $body .= "  $notfound\n" if $notfound
     $body .= "\}\n"
     return  @: @subs, $body
-
 
 1
 __END__

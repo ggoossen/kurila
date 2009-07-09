@@ -107,7 +107,6 @@ $VERSION = '2.02'
 
     "lchevron"  =>    "\x{AB}"   # left chevron (double less than)
     "rchevron"  =>    "\x{BB}"   # right chevron (double greater than)
-    
 
 
 ############################################################################

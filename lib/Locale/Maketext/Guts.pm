@@ -22,7 +22,7 @@ sub _compile
     my $target = ref(@_[0]) || @_[0]
 
     my(@code)
-    my(@: @c) =@:  (@: '') # "chunks" -- scratch.
+    my @c = @: '' # "chunks" -- scratch.
     my $call_count = 0
     my $big_pile = ''
     do

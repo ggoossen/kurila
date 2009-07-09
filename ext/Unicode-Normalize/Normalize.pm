@@ -27,7 +27,6 @@ our %EXPORT_TAGS = %:
     normalize => @EXPORT +@+ qw/normalize decompose reorder compose/
     check     => qw/checkNFD checkNFKD checkNFC checkNFKC check/
     fast      => qw/FCD checkFCD FCC checkFCC composeContiguous/
-    
 
 ######
 
@@ -45,7 +44,6 @@ sub pack_U
 
 sub unpack_U
     return @:  unpack('U*', shift(@_).pack('U*')) 
-
 
 
 ##

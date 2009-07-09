@@ -24,7 +24,6 @@ push @Expected_Details, \%:  'ok'      => 1
                              name      => 'no tests yet, no summary'
                              type      => ''
                              reason    => ''
-    
 
 # Inline TODO tests will confuse pre 1.20 Test::Harness, so we
 # should just avoid the problem and not print it out.

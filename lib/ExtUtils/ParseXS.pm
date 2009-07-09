@@ -88,7 +88,7 @@ sub process_file
         output => $^STDOUT
         csuffix => '.c'
         < %args
-        
+
 
     # Global Constants
 
@@ -97,8 +97,8 @@ sub process_file
         # will later add the 'XS_' prefix.
         require ExtUtils::XSSymSet
         $SymSet = ExtUtils::XSSymSet->new( 28)
-    
-    @XSStack = @: \(%: type => 'none')
+
+    @XSStack = @: \%: type => 'none'
     (@: $XSS_work_idx, $cpp_next_tmp) = @: 0, "XSubPPtmpAAAA"
     @InitFileCode = $@
     $FH = Symbol::gensym()
@@ -1040,14 +1040,14 @@ sub standard_typemap_locations
     my @tm = qw(typemap)
 
     my $updir = File::Spec->updir
-    foreach my $dir ((@: File::Spec->catdir(< $: (@: $updir) x 1)
-                                   File::Spec->catdir(< $: (@: $updir) x 2)
-                                   File::Spec->catdir(< $: (@: $updir) x 3)
-                                   File::Spec->catdir(< $: (@: $updir) x 4)))
+    foreach my $dir (@: File::Spec->catdir(< $: (@: $updir) x 1)
+                        File::Spec->catdir(< $: (@: $updir) x 2)
+                        File::Spec->catdir(< $: (@: $updir) x 3)
+                        File::Spec->catdir(< $: (@: $updir) x 4))
 
         unshift @tm, File::Spec->catfile($dir, 'typemap')
         unshift @tm, File::Spec->catfile($dir, lib => ExtUtils => 'typemap')
-    
+
     foreach my $dir ( $^INCLUDE_PATH)
         my $file = File::Spec->catfile($dir, ExtUtils => 'typemap')
         unshift @tm, $file if -e $file
@@ -1340,7 +1340,6 @@ sub FALLBACK_handler()
         TRUE => "&PL_sv_yes", 1 => "&PL_sv_yes"
         FALSE => "&PL_sv_no", 0 => "&PL_sv_no"
         UNDEF => "&PL_sv_undef"
-         
 
     # check for valid FALLBACK value
     death ("Error: FALLBACK: TRUE/FALSE/UNDEF") unless exists %map{uc $_} 

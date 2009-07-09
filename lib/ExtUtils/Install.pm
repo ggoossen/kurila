@@ -407,7 +407,7 @@ sub _can_write_dir
             return @: 1,$dir,@make
         else
             return @: 0,$dir,@make
-        
+
     continue
         pop @dirs
     
@@ -669,7 +669,7 @@ sub install #XXX OS-SPECIFIC
         || 0
         unless defined $always_copy
 
-    my(@: %from_to) =@:  (%:  < $from_to->% )
+    my %from_to = $from_to->%
     my(%pack, $dir, %warned)
     my $packlist = ExtUtils::Packlist->new()
 
@@ -751,7 +751,6 @@ sub install #XXX OS-SPECIFIC
                           $mode, $size, $atime, $mtime
                           $targetdir, $targetfile, $sourcedir, $sourcefile
 
-                     
                  #restore the original directory we were in when File::Find
                  #called us so that it doesnt get horribly confused.
                  _chdir($save_cwd)

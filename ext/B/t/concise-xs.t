@@ -116,11 +116,11 @@ my %matchers =
         noSTART     => qr/coderef .* has no START/
     
 
-my $testpkgs = \%: 
+my $testpkgs = \ %: 
     # packages to test, with expected types for named funcs
 
     'Data::Dumper' => (%:  dflt => 'perl' )
-    B => (%: 
+    B => %: 
         dflt => 'constant'         # all but 47/297
         skip => (@:  'regex_padav' ) # threaded only
         perl => qw(
@@ -137,9 +137,8 @@ my $testpkgs = \%:
                   cstring comppadlist check_av cchar cast_I32 bootstrap
                   sub_generation address
                   fudge unitcheck_av)
-    )
 
-    'B::Deparse' => (%:  dflt => 'perl'  # 235 functions
+    'B::Deparse' =>  %:  dflt => 'perl'  # 235 functions
 
                          XS => qw( svref_2object perlstring opnumber main_start
                    main_root main_cv )
@@ -158,9 +157,8 @@ my $testpkgs = \%:
                      SVf_FAKE SVf_IOK SVf_NOK SVf_POK SVf_ROK
                      SVpad_OUR SVs_RMG SVs_SMG
                      RXf_SKIPWHITE/
-    )
 
-    POSIX => (%:  dflt => 'constant'                     # all but 252/589
+    POSIX =>  %:  dflt => 'constant'                     # all but 252/589
                   skip => qw/ _POSIX_JOB_CONTROL /   # platform varying
                   perl => qw/ import load_imports
                             usage redef unimpl assert tolower toupper closedir
@@ -202,9 +200,8 @@ my $testpkgs = \%:
                       bootstrap atan asin asctime acos access abort
                       _exit
                       /
-    )
 
-    'IO::Socket' => (%:  dflt => 'constant'              # 157/190
+    'IO::Socket' =>  %:  dflt => 'constant'              # 157/190
 
                          perl => qw/ timeout socktype sockopt sockname
                              socketpair socket sockdomain
@@ -220,8 +217,6 @@ my $testpkgs = \%:
                            sockatmark sockaddr_family pack_sockaddr_un
                            pack_sockaddr_in inet_ntoa inet_aton
                            /
-    )
-    
 
 ############
 

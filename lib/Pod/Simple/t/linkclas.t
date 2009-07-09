@@ -12,11 +12,10 @@ use Pod::Simple::LinkSection
 use Pod::Simple::BlackBox # for its pretty()
 
 my $bare_treelet =
-    \@: 'B', \(%: 'pie' => 'no')
+    \@: 'B', \%: 'pie' => 'no'
         'a'
-        \(@: 'C', \(%: 'bzrok' => 'plip')
-            'b'
-            )
+        \ @: 'C', \%: 'bzrok' => 'plip'
+             'b'
         'c'
     
 

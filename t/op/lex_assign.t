@@ -71,7 +71,7 @@ for ( @INPUT)
         chomp
         $op = "$op==$op" unless $op =~ m/==/
         (@: $op, $expectop) = @: $op =~ m/(.*)==(.*)/
-                               
+
         if ($op =~ m/^'\?\?\?'/ or $comment =~ m/skip\(.*\Q$^OS_NAME\E.*\)/i)
             skip("$comment", 1)
         

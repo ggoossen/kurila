@@ -533,8 +533,6 @@ sub Table::Merge
         else
             ## arg is a codepoint, make a range
             push @Records, \@:  $Arg, $Arg 
-        
-    
 
     ## sort by range start, with longer ranges coming first.
     my (@: $first, @< @Rest) =  sort {
@@ -1793,8 +1791,8 @@ sub WriteAllMappings()
                    "## List of built-in \\p\{...\}/\\P\{...\} properties.\n"
                    "##\n"
                    "## '*' means name may be 'fuzzy'\n"
-                   "##\n\n", <
-                       sort { substr($a,2) cmp substr($b, 2) }, @:  < @MAP,
+                   "##\n\n"
+                   < sort { substr($a,2) cmp substr($b, 2) }, @MAP
             
         WriteIfChanged('Properties', @OUT)
     
@@ -2045,7 +2043,6 @@ EOFHEADER
                              s!^\./!!
                              print $ofh, "$_\n"
                              $count++
-                             
                                       
                      ),".")
 

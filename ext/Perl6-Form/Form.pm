@@ -458,7 +458,7 @@ sub litval(?= $newlitval)
 
 
 my ($fld, $udnum)
-sub fldvals
+sub fldvals( @< @_ )
     (@: $fld, $udnum) =  @_ if (nelems @_)
     return  @: $fld, $udnum
 
@@ -1183,12 +1183,10 @@ sub make_page($section, $sect_opts, $bodylen)
                                last=>$last, pos=>$f->{?pos},
                                stretch=>$f->{?stretch}, width=>$f->{?width},
                                )
-            
-        
+
         for my $row (0..$maxheight-1)
             push @text, join "", map { @parts[$_][$row] },0..(nelems @parts)-1
-        
-    
+
     return  @: \@text, $more
 
 
@@ -1308,13 +1306,9 @@ sub break_at
                         substr($res,-$hylen, undef, $hyphen)
                     elsif ($res =~ s/(\S+)$//)
                         pos($_, pos($_) - length($1))
-                    
-                
-            
+
             my $rem = substr($str->$, pos $str->$)
             return  @: $res, $rem=~m/\S/??1!!0, $rem =~ m/^\s*(?:\z|\n|\r)/
-        
-    
 
 
 # sub import {

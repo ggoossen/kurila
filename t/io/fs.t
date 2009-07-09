@@ -94,7 +94,7 @@ SKIP: do
 
     (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
         $blksize,$blocks) = @: stat('c')
-                             
+
     SKIP: do
         skip "no nlink", 1 if config_value('dont_use_nlink')
 
@@ -124,7 +124,7 @@ SKIP: do
 
     (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
         $blksize,$blocks) = @: stat('c')
-                             
+
     SKIP: do
         skip "no mode checks", 1 if $skip_mode_checks
 
@@ -139,7 +139,7 @@ SKIP: do
 
     (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
         $blksize,$blocks) = @: stat('c')
-                             
+
     SKIP: do
         skip "no mode checks", 1 if $skip_mode_checks
 
@@ -148,7 +148,7 @@ SKIP: do
 
     (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
         $blksize,$blocks) = @: stat('x')
-                             
+
     SKIP: do
         skip "no mode checks", 1 if $skip_mode_checks
 
@@ -159,12 +159,12 @@ SKIP: do
 
     (@: ?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime
         ?$blksize,?$blocks) = @: stat('b')
-                               
+
     is($ino, undef, "ino of removed file b should be undef")
 
     (@: ?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime
         ?$blksize,?$blocks) = @: stat('x')
-                               
+
     is($ino, undef, "ino of removed file x should be undef")
 
 
@@ -209,7 +209,7 @@ is(rename('a','b'), 1, "rename a b")
 
 (@: ?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime
     ?$blksize,?$blocks) = @: stat('a')
-                           
+
 is($ino, undef, "ino of renamed file a should be undef")
 
 $delta = $accurate_timestamps ?? 1 !! 2	# Granularity of time on the filesystem
@@ -234,10 +234,10 @@ SKIP: do
 
 
 
-sub check_utime_result
+sub check_utime_result()
     (@: $dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime
         $blksize,$blocks) = @: stat('b')
-                             
+
     SKIP: do
         skip "bogus inode num", 1 if ($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare')
 

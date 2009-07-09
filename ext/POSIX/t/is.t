@@ -48,7 +48,6 @@ my %classes =
     # An empty string. Always true (al least in old days) [bug #24554]
     ''     => \ qw(print graph alnum alpha lower upper digit xdigit
                   punct cntrl space)
-    
 
 
 # Pass 1: convert the above arrays to hashes.  While doing so, obtain
@@ -56,12 +55,12 @@ my %classes =
 # listed above.
 my %functions
 foreach my $s (keys %classes)
-    %classes{+$s} = \%:  < @+: map
-                             sub ($_)
-            %functions{+"is$_"}++	# Keep track of all the 'is<xxx>' functions
-                             @: "is$_" => 1		# Our return value: is<xxx>($s) should pass.
-                             , %classes{$s}->@ 
-
+    %classes{+$s} = 
+        \%+: map
+                sub ($_)
+                  %functions{+"is$_"}++	# Keep track of all the 'is<xxx>' functions
+                  %: "is$_" => 1		# Our return value: is<xxx>($s) should pass.
+                , %classes{$s}->@
 
 # Expected number of tests is one each for every combination of a
 # known is<xxx> function and string listed above.

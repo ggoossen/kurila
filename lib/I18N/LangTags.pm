@@ -138,12 +138,11 @@ sub extract_language_tags
 
     ## Changes in the language tagging standards may have to be reflected here.
 
-    my(@: $text) =
+    my $text =
         @_[0] =~ m/(.+)/  # to make for an untainted result
         ?? $1 !! ''
-    
 
-    return grep( {!m/^[ixIX]$/s }, @:  # 'i' and 'x' aren't good tags
+    return grep( {!m/^[ixIX]$/s }, @: # 'i' and 'x' aren't good tags
         $text =~
             m/
       \b
@@ -155,8 +154,7 @@ sub extract_language_tags
          [a-zA-Z0-9]{1,8}  # subtag  
       )*
       \b
-    /xsg
-        )
+    /xsg)
 
 
 ###########################################################################
@@ -354,7 +352,7 @@ sub super_languages
 
     # NB: (i-sil-...)?
 
-    my @supers = @:  () 
+    my @supers = $@
     foreach my $bit ( @l1_subtags)
         push @supers,
             scalar(nelems @supers) ?? (@supers[-1] . '-' . $bit) !! $bit
@@ -689,14 +687,10 @@ do
         
     my($k,$v)
     while((nelems @panic))
-        (@: $k,$v) = @: splice(@panic,0,2)
-        foreach my $k ((@: ref($k) ?? < $k->@ !! $k))
-            foreach my $v ((@: ref($v) ?? < $v->@ !! $v))
-                push((%Panic{+$k} //= (@: )), $v) unless $k eq $v
-            
-        
-    
-
+        @: $k,$v = @: splice(@panic,0,2)
+        foreach my $k (ref($k) ?? $k->@ !! @: $k))
+            foreach my $v (ref($v) ?? $v->@ !! @: $v)
+                push((%Panic{+$k} //= $@), $v) unless $k eq $v
 
 =item * the function @langs = panic_languages(@accept_languages)
 
@@ -737,8 +731,8 @@ sub panic_languages
         next if %seen{+$t}++ # so we don't return it or hit it again
         # push @out, super_languages($t); # nah, keep that separate
         push @out, < %Panic{?lc $t}
-    
-    return grep { !%seen{+$_}++ }, @:   < @out, 'en'
+
+    return grep { !%seen{+$_}++ }, @: < @out, 'en'
 
 
 #---------------------------------------------------------------------------

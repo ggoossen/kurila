@@ -68,9 +68,8 @@ sub opts
         # --opt=smth
         (< map {m/^--([\-_\w]+)=(.*)$/}, @ARGV)
         # --opt --no-opt --noopt
-        (< @+: map {m/^no-?(.*)$/i??(@: $1=>0)!!(@: $_=>1)}
-        map {m/^--([\-_\w]+)$/}, @ARGV)
-        
+        (< @+: map {m/^no-?(.*)$/i??(@: $1=>0)!!(@: $_=>1)},
+                   map {m/^--([\-_\w]+)$/}, @ARGV)
 
     my %opts = %: < %Allowed_Opts, < %given_opts
 
@@ -223,8 +222,7 @@ do
 my $fetch_string = <<'EOT'
 
 # Search for it in the big string
-sub fetch_string {
-    my @($self, $key) = @_;
+sub fetch_string($self, $key) {
 
 EOT
 
@@ -311,9 +309,9 @@ if ($s == 4 || $s == 8)
     $byteorder_code = <<"EOT"
 
 my \$i = 0;
-foreach my \$c (\@($list)) \{ \$i ^|^= ord(\$c); \$i <<= 8 \}
+foreach my \$c (\@:$list) \{ \$i ^|^= ord(\$c); \$i <<= 8 \}
 \$i ^|^= ord(1);
-our \$byteorder = join('', @(unpack('$format', pack('$f', \$i))));
+our \$byteorder = join('', \@: unpack('$format', pack('$f', \$i)));
 EOT
 else
     $byteorder_code = "our \$byteorder = '?'x$s;\n"
@@ -526,8 +524,7 @@ $heavy_txt .= $fetch_string
 
 $config_txt .= <<'ENDOFEND'
 
-sub FETCH {
-    my @($self, $key) = @_;
+sub FETCH($self, $key) {
 
     # check for cached value (which may be undef so we use exists not defined)
     return $self->{$key} if exists $self->{$key};
@@ -580,7 +577,7 @@ sub config_vars
     # implements -V:cfgvar option (see perlrun -V:)
     foreach my $cfgvar (@_)
         # find optional leading, trailing colons; and query-spec
-        my @($notag,$qry,$lncont) = @: $cfgvar =~ m/^(:)?(.*?)(:)?$/   # flags fore and aft, 
+        my @:$notag,$qry,$lncont = @: $cfgvar =~ m/^(:)?(.*?)(:)?$/   # flags fore and aft, 
         # map colon-flags to print decorations
         my $prfx = $notag ?? '' !! "$qry="             # tag-prefix for print
         my $lnend = $lncont ?? ' ' !! ";\n"            # line ending for print
@@ -588,8 +585,8 @@ sub config_vars
         # all config-vars are by definition \w only, any \W means regex
         if ($qry =~ m/\W/)
             my @matches = config_re($qry)
-            print $^STDOUT, < map { "$_$lnend" }, @matches || @("$qry: not found")              if !$notag
-            print $^STDOUT, < map { s/\w+=//; "$_$lnend" }, @matches || @("$qry: not found")    if  $notag
+            print $^STDOUT, < map { "$_$lnend" }, @matches || @:"$qry: not found"              if !$notag
+            print $^STDOUT, < map { s/\w+=//; "$_$lnend" }, @matches || @:"$qry: not found"    if  $notag
         else
             my $v = config_value($qry);
             $v = 'undef' unless defined $v

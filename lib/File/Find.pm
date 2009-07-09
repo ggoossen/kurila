@@ -521,7 +521,7 @@ sub Follow_SymLink($AbsName)
 
     my ($NewName,$DEV, $INO)
     (@: $DEV, $INO, ...) = @: lstat $AbsName
-                            
+
     while (-l _)
         if (%SLnkSeen{+ $DEV . "," . $INO}++)
             if ($follow_skip +< 2)
@@ -615,7 +615,7 @@ sub _find_opt
         my $top_item = $TOP
 
         (@: ?$topdev,?$topino,?$topmode,?$topnlink, ...) = @: $follow ?? stat $top_item !! lstat $top_item
-                                                            
+
         if ($Is_MacOS)
             $top_item = ":$top_item"
                 if ( (-d _) && ( $top_item !~ m/:/ ) )
@@ -681,8 +681,6 @@ sub _find_opt
                 $Is_Dir= 1
             else
                 $abs_dir= $top_item
-            
-        
 
         unless ($Is_Dir)
             unless ((@: ?$_,?$dir, _) = File::Basename::fileparse($abs_dir))
@@ -690,8 +688,6 @@ sub _find_opt
                     (@: $dir,$_) = @: ':', $top_item # $File::Find::dir, $_
                 else
                     (@: $dir,$_) = @: './', $top_item
-                
-            
 
             $abs_dir = $dir
             if (( $untaint ) && (is_tainted($dir) ))
@@ -701,35 +697,25 @@ sub _find_opt
                         die "directory $dir is still tainted"
                     else
                         next Proc_Top_Item
-                    
-                
-            
 
             unless ($no_chdir || chdir $abs_dir)
                 warnings::warnif "Couldn't chdir $abs_dir: $^OS_ERROR\n"
                 next Proc_Top_Item
-            
 
             $name = $abs_dir . $_ # $File::Find::name
             $_ = $name if $no_chdir
 
             do { $wanted_callback->() } # protect against wild "next"
 
-        
-
         unless ( $no_chdir )
             if ( ($check_t_cwd) && (($untaint) && (is_tainted($cwd) )) )
                 (@:  ?$cwd_untainted ) = @: $cwd =~ m|$untaint_pat|
                 unless (defined $cwd_untainted)
                     die "insecure cwd in find(depth)"
-                
                 $check_t_cwd = 0
             
             unless (chdir $cwd_untainted)
                 die "Can't cd to $cwd: $^OS_ERROR\n"
-            
-        
-    
 
 
 # API:

@@ -156,7 +156,7 @@ sub WriteConstants
     my $ARGS = \%: < @_
 
     my @: $c_fh, $xs_fh, $c_subname, $xs_subname, $default_type, $package
-        =  $ARGS->{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]}
+        = $ARGS->{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]}
 
     my $options = $ARGS->{?PROXYSUBS}
     $options = \$% unless ref $options

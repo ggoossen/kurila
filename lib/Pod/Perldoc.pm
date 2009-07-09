@@ -116,8 +116,8 @@ sub opt_V # report version and exit
 
         (chr(65) eq 'A') ?? () !! " (non-ASCII)"
 
-        "\n",
-    
+        "\n"
+
     exit
 
 
@@ -209,16 +209,16 @@ sub aside  # If we're in -v or DEBUG mode, say this.
     if( DEBUG or $self->opt_v )
         my $out = join( '', @: 
                        DEBUG ?? do
-                     my $callsub = (caller(1))[[3]]
-                           my $package = quotemeta(__PACKAGE__ . '::')
-                           $callsub =~ s/^$package/'/os
-                           # the o is justified, as $package really won't change.
-                           $callsub . ": "
-                           !! ''
-                       < @_,
+                               my $callsub = (caller(1))[[3]]
+                               my $package = quotemeta(__PACKAGE__ . '::')
+                               $callsub =~ s/^$package/'/os
+                               # the o is justified, as $package really won't change.
+                               $callsub . ": "
+                                 !! ''
+                       < @_
             )
         if(DEBUG) { print $^STDOUT, $out } else { print $^STDERR, $out }
-    
+
     return
 
 
@@ -1021,8 +1021,6 @@ sub render_findings($self, $found_things)
             $formatter->if_zero_length( $file, $out, $out_fh )
         else
             warn "Got a 0-length file from $found_things->@[0] via $formatter_class!?\n"
-        
-    
 
     DEBUG and print $^STDOUT, "Finished writing to $out.\n"
     return @: $out, $formatter
