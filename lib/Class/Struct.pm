@@ -76,7 +76,7 @@ sub struct
     my $out = ''
 
     $out = "do \{\n  package $class;\n  sub new \{\n"
-    $out .= "    my \@(?\$class, \%< \%init) = \@_;\n"
+    $out .= "    my \@: ?\$class, \%< \%init = \@_;\n"
     $out .= "    \$class = __PACKAGE__ unless \@_;\n"
 
     my $cnt = 0
@@ -87,7 +87,7 @@ sub struct
         $out .= '    my($r) = \%();'."\n"
         $cmt = ''
     elsif( $base_type eq 'ARRAY' )
-        $out .= '    my($r) = \@();'."\n"
+        $out .= '    my($r) = \$@;'."\n"
     
     while( $idx +< nelems @decls )
         $name = @decls[$idx]
@@ -108,7 +108,7 @@ sub struct
         if( $type eq '@' )
             $out .= "    die 'Initializer for $name must be array reference'\n"
             $out .= "        if defined(\%init\{?'$name'\}) && ref(\%init\{'$name'\}) ne 'ARRAY';\n"
-            $out .= "    \$r->$elem = $init \\\@();$cmt\n"
+            $out .= "    \$r->$elem = $init \\\$\@;$cmt\n"
             %arrays{+$name}++
         elsif( $type eq '%' )
             $out .= "    die 'Initializer for $name must be hash reference'\n"

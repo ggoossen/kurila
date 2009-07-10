@@ -53,7 +53,7 @@ sub do_module($)($module) {
         print($^STDOUT, "$module cmd? ");
 
         my $reply = ~< $^STDIN; chomp($reply);
-        my@($cmd) = $reply =~ m/^(\w)\b/;
+        my @: $cmd = $reply =~ m/^(\w)\b/;
 
         last if $cmd eq 'q';
 
@@ -113,7 +113,7 @@ sub create_archive($reply, $module) {
         Archive::Tar->create_archive($file, 0, < $Inst->files($module));
     }
     else {
-        my@($first, @< @rest) =  $Inst->files($module);
+        my @: $first, @< @rest =  $Inst->files($module);
         system('tar', 'cvf', $file, $first);
         for my $f ( @rest) {
             system('tar', 'rvf', $file, $f);

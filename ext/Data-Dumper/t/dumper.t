@@ -64,7 +64,7 @@ plan tests => $TMAX
 
 is Data::Dumper->Dump(\(@: '123xyz{$@%'), \qw(a)), '#$a = "123xyz\{\$\@\%";' . "\n"
 is Data::Dumper->Dump(\(@: (@: 'abc', 'def')), \(@: 'a')), <<'====' 
-#$a = @(
+#$a = @(:
 #     "abc",
 #     "def"
 #     );
@@ -99,12 +99,12 @@ $b->{+c} = $a->[2]
 ############# 1
 ##
 $WANT = <<'EOT'
-#$a = \@(
+#$a = \@(:
 #       1,
 #       \%(
 #         "a" => $a,
 #         "b" => $a->[1],
-#         "c" => \@(
+#         "c" => \@(:
 #                  "c"
 #                )
 #       ),
@@ -114,4 +114,4 @@ $WANT = <<'EOT'
 #$6 = $a->[1]->{"c"};
 EOT
 
-TEST q(Data::Dumper->Dump(\@($a,$b,$c), \@(<qw(a b), 6)))
+TEST q(Data::Dumper->Dump(\(@: $a,$b,$c), \(@: <qw(a b), 6)))

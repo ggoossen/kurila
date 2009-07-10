@@ -19,7 +19,7 @@ sub lexless_anon_sub
     # Uses a closure (on $__ExPr__) to pass in the code to be executed.
     # (eval on one line to keep line numbers as expected by caller)
     eval sprintf
-        'package %s; sub { @_= @(); eval q[my $__ExPr__;] . $__ExPr__; }',
+        'package %s; sub { @_= $@; eval q[my $__ExPr__;] . $__ExPr__; }',
         @_[0]
 
 

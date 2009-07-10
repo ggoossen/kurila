@@ -1641,7 +1641,7 @@ sub padval
 
 
 sub anon_hash_or_list($self, $op, $cx)
-    my(@: $pre, $post) =  (%: "anonarray" => \(@: '@(',')')
+    my(@: $pre, $post) =  (%: "anonarray" => \(@: '@(: ',')')
                               "anonhash" => \(@: '%(',')')){?$op->name}->@
     my($expr, @exprs)
     $op = $op->first->sibling # skip pushmark

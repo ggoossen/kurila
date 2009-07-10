@@ -20,9 +20,9 @@ use Test::More
 
 # these names are hardcoded in Term::Cap
 my $files = join '', grep { -f $_ },
-    @: 	( $(env::var('HOME')) . '/.termcap' # we assume pretty UNIXy system anyway
+    @:  $(env::var('HOME')) . '/.termcap' # we assume pretty UNIXy system anyway
         '/etc/termcap'
-        '/usr/share/misc/termcap' )
+        '/usr/share/misc/termcap'
 unless( $files || $^OS_NAME eq 'VMS' )
     plan skip_all => 'no termcap available to test'
 else

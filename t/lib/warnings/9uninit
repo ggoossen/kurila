@@ -86,19 +86,19 @@ Use of uninitialized value in addition (+) at - line 9 character 15.
 Use of uninitialized value in addition (+) at - line 10 character 16.
 Use of uninitialized value in addition (+) at - line 10 character 16.
 ########
-use warnings 'uninitialized';
-my ($v);
-our @gau = @(undef) x 258 ;
-our %ghu = %('foo', undef, 'bar', undef);
+use warnings 'uninitialized'
+my ($v)
+our @gau = (@: undef) x 258
+our %ghu = %: 'foo', undef, 'bar', undef
 
-$v = @gau[8] + 46;
-$v = @gau[-8] + 47;
-$v = 57 + @gau[9];
-$v = 57 + @gau[-9];
-$v = @gau[10] + @gau[11];
-$v = @gau[256] + @gau[257];
-$v = @gau[-1] + @gau[-2];
-$v = %ghu{foo} + %ghu{bar};
+$v = @gau[8] + 46
+$v = @gau[-8] + 47
+$v = 57 + @gau[9]
+$v = 57 + @gau[-9]
+$v = @gau[10] + @gau[11]
+$v = @gau[256] + @gau[257]
+$v = @gau[-1] + @gau[-2]
+$v = %ghu{foo} + %ghu{bar}
 EXPECT
 Use of uninitialized value @main::gau[8] in addition (+) at - line 6 character 14.
 Use of uninitialized value @main::gau[-8] in addition (+) at - line 7 character 15.
@@ -113,25 +113,25 @@ Use of uninitialized value @main::gau[-1] in addition (+) at - line 12 character
 Use of uninitialized value %main::ghu{"bar"} in addition (+) at - line 13 character 16.
 Use of uninitialized value %main::ghu{"foo"} in addition (+) at - line 13 character 16.
 ########
-use warnings 'uninitialized';
-my ($v);
-our @gau = @(undef) x 258 ;
-our %ghu = %('foo', undef, 'bar', undef);
-my @mau = @(undef) x 258 ;
-my %mhu = %('foo', undef, 'bar', undef);
+use warnings 'uninitialized'
+my ($v)
+our @gau = (@: undef) x 258 
+our %ghu = %: 'foo', undef, 'bar', undef
+my @mau = (@: undef) x 258 
+my %mhu = %: 'foo', undef, 'bar', undef
 
-my $i1 = 10;
-my $i2 = 20;
-my $i3 = 2000;
-my $k1 = 'foo';
-my $k2 = 'bar';
-my $k3 = 'baz';
-$v = @mau[$i1] + @mau[$i2];
-$v = @gau[$i1] + @gau[$i2];
-$v = @gau[$i1] + @gau[?$i3];
-$v = %mhu{$k1} + %mhu{$k2};
-$v = %ghu{$k1} + %ghu{$k2};
-$v = %ghu{$k1} + %ghu{?$k3};
+my $i1 = 10
+my $i2 = 20
+my $i3 = 2000
+my $k1 = 'foo'
+my $k2 = 'bar'
+my $k3 = 'baz'
+$v = @mau[$i1] + @mau[$i2]
+$v = @gau[$i1] + @gau[$i2]
+$v = @gau[$i1] + @gau[?$i3]
+$v = %mhu{$k1} + %mhu{$k2}
+$v = %ghu{$k1} + %ghu{$k2}
+$v = %ghu{$k1} + %ghu{?$k3}
 EXPECT
 Use of uninitialized value @mau[20] in addition (+) at - line 14 character 16.
 Use of uninitialized value @mau[10] in addition (+) at - line 14 character 16.
@@ -284,9 +284,9 @@ my ($m1, @ma, %mh);
 our ($g1);
 
 delete @ma[$m1];
-delete @ma[[@($m1, $g1)]];
+delete @ma[[@: $m1, $g1]];
 delete %mh{$m1};
-delete %mh{[@($m1, $g1)]};
+delete %mh{[@: $m1, $g1]};
 EXPECT
 Use of uninitialized value $m1 in delete at - line 5 character 1.
 Use of uninitialized value in delete at - line 6 character 1.

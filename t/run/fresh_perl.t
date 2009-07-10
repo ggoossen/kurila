@@ -90,7 +90,7 @@ our $file;
 chop($file = ~< *DATA);
 ########
 package N;
-sub new {my @($obj,$n)=@_; bless \$n}  
+sub new($obj,$n) { bless \$n }
 our $aa=N->new(1);
 $aa=12345;
 print $^STDOUT, $aa;
@@ -161,7 +161,7 @@ inner peace
 ########
 our $s = 0;
 map {#this newline here tickles the bug
-     $s += $_}, @(1,2,4);
+     $s += $_}, @: 1,2,4;
 print $^STDOUT, "eat flaming death\n" unless ($s == 7);
 ########
 BEGIN { @ARGV = qw(a b c d e) }
@@ -188,7 +188,7 @@ destroyed
 ########
 # TODO
 package X;
-sub anarray { bless \@() }
+sub anarray { bless \$@ }
 sub DESTROY { print $^STDOUT, "destroyed\n" };
 package main;
 *a = X->anarray();
@@ -230,7 +230,7 @@ bar at - line 5 character 5.
 ########
 re();
 sub re {
-    my $re = join '', @( eval 'qr/(??{ $obj->method })/' );
+    my $re = join '', @: eval 'qr/(??{ $obj->method })/' ;
     $re;
 }
 EXPECT

@@ -245,7 +245,7 @@ ok !is_deeply(\(@: $a), \(@: dump::view($a).'')),   "  even deep inside"
 
 #line 265
 # [rt.cpan.org 7030]
-ok !is_deeply( \$%, \(%: key => \$@) ),  '\@() could match non-existent values'
+ok !is_deeply( \$%, \(%: key => \$@) ),  '\$@ could match non-existent values'
 ok !is_deeply( \$@, \(@: \$@) )
 
 

@@ -28,8 +28,8 @@ sub arg_defines($self, %< %args)
 
     return  @: '/define=('
                    . join(',', @config_defines
-                   +@+ map { "\"$_" . ( length(%args{?$_}) ?? "=%args{?$_}" !! '') . "\"" }
-               keys %args)
+                           +@+ map { "\"$_" . ( length(%args{?$_}) ?? "=%args{?$_}" !! '') . "\"" },
+                                 keys %args)
                    . ')'
 
 

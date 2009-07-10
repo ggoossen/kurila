@@ -578,9 +578,9 @@ for (@: "gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv"
         "enteriter")
     %priv{+$_}{+16} = "OURINTR" 
 for (@: (< @+: map( {(@: $_,"s$_") }, (@: "chop", "chomp")) )
-        (< @+: map( {(@: $_,"i_$_") }
-        @: "postinc", "postdec", "multiply", "divide", "modulo"
-                    "add", "subtract", "negate"))
+        (< @+: map( {(@: $_,"i_$_") },
+                @: "postinc", "postdec", "multiply", "divide", "modulo"
+                   "add", "subtract", "negate"))
         "pow", "concat", "stringify"
         "left_shift", "right_shift", "bit_and", "bit_xor", "bit_or"
         "complement", "atan2", "sin", "cos", "rand", "exp", "log", "sqrt"

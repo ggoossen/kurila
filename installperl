@@ -777,12 +777,9 @@ sub installlib {
     # .exists files, .PL files, and test files.
     return if $name =~ m{\.orig$|\.rej$|~$|^#.+#$|,v$|^\.exists|\.PL$|\.plc$|\.t$|^test\.pl$|^dbm_filter_util.pl$} ||
               $dir  =~ m{/t(?:/|$)};
-    # ignore the cpan script in lib/CPAN/bin, the instmodsh and xsubpp
-    # scripts in lib/ExtUtils, the prove script in lib/Test/Harness,
-    # the corelist script from lib/Module/CoreList/bin and ptar* in
-    # lib/Archive/Tar/bin, the config_data script in lib/Module/Build/scripts
+    # ignore the instmodsh script in lib/ExtUtils
     # (they're installed later with other utils)
-    return if $name =~ m/^(?:cpan|instmodsh|prove|corelist|cpan2dist|config_data)\z/;
+    return if $name =~ m/^(?:instmodsh)\z/;
     # ignore the Makefiles
     return if $name =~ m/^makefile$/i;
     # ignore the test extensions

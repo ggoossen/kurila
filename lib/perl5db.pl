@@ -656,7 +656,7 @@ sub eval {
         # $usercontext built in DB::DB near the comment
         # "set up the context for DB::eval ..."
         # Evaluate and save any results.
-        @res = @( eval "$usercontext $evalarg;\n" );  # '\n' for nice recursive debug
+        @res = @: eval "$usercontext $evalarg;\n" ;  # '\n' for nice recursive debug
 
         # Restore those old values.
         $trace  = $otrace;
@@ -1066,13 +1066,12 @@ warn(               # Do not ;-)
   )
   if 0;
 
-foreach my $k (keys ($^INCLUDED)) {
-	&share(\%main::{'_<'.$filename});
-};
+foreach my $k (keys ($^INCLUDED))
+	&share(\%main::{'_<'.$filename})
 
 # Command-line + PERLLIB:
 # Save the contents of @INC before they are modified elsewhere.
-@ini_INC = @( < $^INCLUDE_PATH );
+@ini_INC = @: < $^INCLUDE_PATH
 
 # This was an attempt to clear out the previous values of various
 # trapped errors. Apparently it didn't help. XXX More info needed!
@@ -1100,7 +1099,7 @@ are to be accepted.
 
 =cut
 
-@options = @( qw(
+@options = qw(
   CommandSet   HistFile      HistSize
   hashDepth    arrayDepth    dumpDepth
   DumpDBFiles  DumpPackages  DumpReused
@@ -1115,9 +1114,9 @@ are to be accepted.
   inhibit_exit ImmediateStop bareStringify
   CreateTTY    RemotePort    windowSize
   DollarCaretP
-) );
+)
 
-@RememberOnROptions = @( qw(DollarCaretP) );
+@RememberOnROptions = qw(DollarCaretP)
 
 =pod
 
@@ -1231,9 +1230,9 @@ $rl          = 1     unless defined $rl;
 $warnLevel   = 1     unless defined $warnLevel;
 $dieLevel    = 1     unless defined $dieLevel;
 $signalLevel = 1     unless defined $signalLevel;
-$pre         = \@()    unless defined $pre;
-$post        = \@()    unless defined $post;
-$pretype     = \@()    unless defined $pretype;
+$pre         = \$@    unless defined $pre;
+$post        = \$@    unless defined $post;
+$pretype     = \$@    unless defined $pretype;
 $CreateTTY   = 3     unless defined $CreateTTY;
 $CommandSet  = '580' unless defined $CommandSet;
 
@@ -1532,46 +1531,44 @@ back into the appropriate spots in the debugger.
 
 =cut
 
-if ( exists %ENV{PERLDB_RESTART} ) {
+if ( exists %ENV{PERLDB_RESTART} )
 
     # We're restarting, so we don't need the flag that says to restart anymore.
-    delete %ENV{PERLDB_RESTART};
+    delete %ENV{PERLDB_RESTART}
 
-    # $restart = 1;
-    @hist          = @( < get_list('PERLDB_HIST') );
-    %break_on_load = %( < get_list("PERLDB_ON_LOAD") );
-    %postponed     = %( < get_list("PERLDB_POSTPONE") );
+    # $restart = 1
+    @hist          = get_list('PERLDB_HIST')
+    %break_on_load = %:< get_list("PERLDB_ON_LOAD")
+    %postponed     = %:< get_list("PERLDB_POSTPONE")
 
-	share((nelems @hist));
-	share((nelems @truehist));
-	share(%break_on_load);
-	share(%postponed);
+    share((nelems @hist))
+    share((nelems @truehist))
+    share(%break_on_load)
+    share(%postponed)
 
     # restore breakpoints/actions
-    my @had_breakpoints = @( < get_list("PERLDB_VISITED") );
-    for ( 0 .. (nelems @had_breakpoints)-1 ) {
-        my %pf = %( < get_list("PERLDB_FILE_$_") );
-        %postponed_file{ @had_breakpoints[$_] } = \%pf if %pf;
-    }
+    my @had_breakpoints = get_list("PERLDB_VISITED")
+    for ( 0 .. (nelems @had_breakpoints)-1 )
+        my %pf = %( < get_list("PERLDB_FILE_$_") )
+        %postponed_file{ @had_breakpoints[$_] } = \%pf if %pf
 
     # restore options
-    my %opt = %( < get_list("PERLDB_OPT") );
-    my ( $opt, $val );
-    while ( ( $opt, $val ) = each %opt ) {
-        $val =~ s/[\\\']/\\$1/g;
-        parse_options("$opt'$val'");
-    }
+    my %opt = %:< get_list("PERLDB_OPT")
+    my ( $opt, $val )
+    while ( ( $opt, $val ) = each %opt )
+        $val =~ s/[\\\']/\\$1/g
+        parse_options("$opt'$val'")
 
     # restore original $^INCLUDE_PATH
-    $^INCLUDE_PATH     = @( < get_list("PERLDB_INC") );
-    @ini_INC = @( < $^INCLUDE_PATH );
+    $^INCLUDE_PATH     = get_list("PERLDB_INC")
+    @ini_INC = $^INCLUDE_PATH
 
     # return pre/postprompt actions and typeahead buffer
-    $pretype   = \@( < get_list("PERLDB_PRETYPE") );
-    $pre       = \@( < get_list("PERLDB_PRE") );
-    $post      = \@( < get_list("PERLDB_POST") );
-    @typeahead = @( < get_list( "PERLDB_TYPEAHEAD", < @typeahead ) );
-} ## end if (exists $ENV{PERLDB_RESTART...
+    $pretype   = \ get_list("PERLDB_PRETYPE")
+    $pre       = \ get_list("PERLDB_PRE")
+    $post      = \ get_list("PERLDB_POST")
+    @typeahead = get_list( "PERLDB_TYPEAHEAD" +@+ @typeahead
+; ## end if (exists $ENV{PERLDB_RESTART...
 
 =head2 SETTING UP THE TERMINAL
 
@@ -1831,8 +1828,8 @@ and then call the C<afterinit()> subroutine if there is one.
 
 # XXX This looks like a bug to me.
 # Why copy to @ARGS and then futz with @args?
-@ARGS = @( < @ARGV );
-for (< @args) {
+@ARGS = @ARGV
+for (@args) {
     # Make sure backslashes before single quotes are stripped out, and
     # keep args unless they are numeric (XXX why?)
     # s/\'/\\\'/g;                      # removed while not justified understandably
@@ -2193,7 +2190,7 @@ If there are any preprompt actions, execute those as well.
         $incr  = -1;      # for backward motion.
 
         # Tack preprompt debugger actions ahead of any actual input.
-        @typeahead = @( < @$pretype, < @typeahead );
+        @typeahead = @$pretype +@+ @typeahead
 
 =head2 WHERE ARE WE?
 
@@ -2428,7 +2425,7 @@ Uses C<dumpvar.pl> to dump out the current values for selected variables.
 
                     # Grab package name and variables to dump.
                     $packname = $1;
-                    @vars     = @( split( ' ', $2 ) );
+                    @vars     = @: split( ' ', $2 );
 
                     # If main::dumpvar isn't here, get it.
                     do 'dumpvar.pl' || die $@ unless defined &main::dumpvar;
@@ -2636,7 +2633,7 @@ above the current one and then displays then using C<dumpvar.pl>.
                       and next CMD;
 
                     # Got all the modules we need. Find them and print them.
-                    my @vars = @( split( ' ', $2 || '' ) );
+                    my @vars = @: split( ' ', $2 || '' );
 
                     # Find the pad.
                     my $h = try { PadWalker::peek_my( ( $1 || 0 ) + 1 ) };
@@ -3137,7 +3134,7 @@ Prints the contents of C<@hist> (if any).
 =cut
 
                 $cmd =~ m/^H\b\s*\*/ && do {
-                    @hist = @( @truehist = @( () ) );
+                    @hist = @truehist = $@
                     print $OUT "History cleansed\n";
                     next CMD;
                 };
@@ -3200,7 +3197,7 @@ Manipulates C<%alias> to add or list command aliases.
                     if ( length $cmd == 0 ) {
 
                         # No args, get current aliases.
-                        @keys = @( sort keys %alias );
+                        @keys = sort keys %alias
                     }
                     elsif ( my ( $k, $v ) = ( $cmd =~ m/^(\S+)\s+(\S.*)/ ) ) {
 
@@ -3233,12 +3230,12 @@ Manipulates C<%alias> to add or list command aliases.
                         }
 
                         # We'll only list the new one.
-                        @keys = @($k);
+                        @keys = @: $k;
                     } ## end elsif (my ($k, $v) = ($cmd...
 
                     # The argument is the alias to list.
                     else {
-                        @keys = @($cmd);
+                        @keys = @: $cmd;
                     }
 
                     # List aliases.
@@ -3303,9 +3300,9 @@ Note that all C<^(save|source)>'s are commented out with a view to minimise recu
                     if ( open my $fh, ">", " $file" ) {
 
                        # chomp to remove extraneous newlines from source'd files
-                        chomp( my @truelist = @(
-                              map { m/^\s*(save|source)/ ? "#$_" : $_ }
-                              < @truehist ) );
+                        chomp( my @truelist = @:
+                              map { m/^\s*(save|source)/ ? "#$_" : $_ },
+                                   @truehist );
                         print $fh join( "\n", < @truelist );
                         print "commands saved in $file\n";
                     }
@@ -3328,7 +3325,7 @@ Return to any given position in the B<true>-history list
                 # R - restart execution.
                 # rerun - controlled restart execution.
                 $cmd =~ m/^(R|rerun\s*(.*))$/ && do {
-                    my @args = @($1 eq 'R' ? < restart() : < rerun($2));
+                    my @args = $1 eq 'R' ? restart() : rerun($2);
 
                     # Close all non-system fds for a clean restart.  A more
                     # correct method would be to close all fds that were not
@@ -3667,7 +3664,7 @@ sub sub {
     local $stack_depth = $stack_depth + 1;    # Protect from non-local exits
 
     # Expand @stack.
-    @stack = @( $stack_depth+1 );
+    @stack = @: $stack_depth+1;
 
     # Save current single-step setting.
     @stack[-1] = $single;
@@ -3703,7 +3700,7 @@ sub sub {
         # Called in array context. call sub and capture output.
         # DB::DB will recursively get control again if appropriate; we'll come
         # back here when the sub is finished.
-	@ret = @( < &{$sub} );
+	@ret = @: < &{$sub} ;
 
         # Pop the single-step value back off the stack.
         $single ^|^= @stack[ $stack_depth-- ];

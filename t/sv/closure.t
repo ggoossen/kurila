@@ -260,18 +260,18 @@ do \{
     sub test (\$sub) \{
       my \$ok = \$sub->();
       print \$^STDOUT, \$ok ?? "ok \$test\n" !! "not ok \$test\n";
-      printf \$^STDOUT, "# Failed at line \\\%d\n", @(caller)[2] unless \$ok;
+      printf \$^STDOUT, "# Failed at line \\\%d\n", (\@: caller)[2] unless \$ok;
       \$test++;
     \}
 \};
 
 # some of the variables which the closure will access
 our \$global_scalar = 1000;
-our \@global_array = \@(2000, 2100, 2200, 2300);
+our \@global_array = \@: 2000, 2100, 2200, 2300;
 our \%global_hash = \%( < 3000..3009);
 
 my \$fs_scalar = 4000;
-my \@fs_array = \@(5000, 5100, 5200, 5300);
+my \@fs_array = \@: 5000, 5100, 5200, 5300;
 my \%fs_hash = \%( < 6000..6009);
 
 END_MARK_THREE
@@ -282,7 +282,7 @@ END_MARK_THREE
                     $code .= <<'END'
 sub outer {
   my $sub_scalar = 7000;
-  my @sub_array = @(8000, 8100, 8200, 8300);
+  my @sub_array = @: 8000, 8100, 8200, 8300;
   my %sub_hash = %(<9000..9009);
 END
                 # }
@@ -290,7 +290,7 @@ END
                     $code .= <<'END'
 our $outer = sub {
   my $sub_scalar = 7000;
-  my @sub_array = @(8000, 8100, 8200, 8300);
+  my @sub_array = @: 8000, 8100, 8200, 8300;
   my %sub_hash = %(<9000..9009);
 END
                 # }
@@ -300,7 +300,7 @@ END
 
                 if ($within eq 'foreach')
                     $code .= '
-      my @list = @(10000, 10010);
+      my @list = @: 10000, 10010;
       foreach my $foreach (@list) {
     ' # }
                 elsif ($within eq 'other_sub')

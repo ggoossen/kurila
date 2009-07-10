@@ -256,7 +256,7 @@ sub run_tests
     # default value for $reg_infty from Config.pm, but have not.
 
     undef $^EVAL_ERROR
-    ok( eval q(@('aaa' =~ m/(a{1,$reg_infty_m})/)[0] eq 'aaa') ); die if $^EVAL_ERROR
+    ok( eval q((@: 'aaa' =~ m/(a{1,$reg_infty_m})/)[0] eq 'aaa') ); die if $^EVAL_ERROR
 
     undef $^EVAL_ERROR
     ok( not eval q(('a' x $reg_infty_m) !~ m/a{$reg_infty_m}/) ); die if $^EVAL_ERROR
@@ -2927,7 +2927,7 @@ EOFTEST
     do
         # From Message-ID: <877ixs6oa6.fsf@k75.linux.bogus>
         my $dow_name= "nada"
-        my $parser = "use utf8; \@(\$dow_name) = \@: \$time_string =~ m/(D\x{e9}\\ C\x{e9}adaoin|D\x{e9}\\ Sathairn|\\w+|\x{100})/"
+        my $parser = "use utf8; \@: \$dow_name = \@: \$time_string =~ m/(D\x{e9}\\ C\x{e9}adaoin|D\x{e9}\\ Sathairn|\\w+|\x{100})/"
         my $time_string = "D\x{e9} C\x{e9}adaoin"
         eval $parser; die if $^EVAL_ERROR
         ok(!$^EVAL_ERROR,"Test Eval worked")

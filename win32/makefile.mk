@@ -743,7 +743,6 @@ UTILS		=			\
 		..\utils\enc2xs		\
 		..\utils\piconv		\
 		..\utils\config_data	\
-		..\utils\corelist	\
 		..\utils\cpan		\
 		..\utils\xsubpp		\
 		..\utils\prove		\
@@ -1530,7 +1529,7 @@ distclean: realclean
 	    podchecker podselect
 	-cd ..\utils && del /f h2ph perlbug pl2pm h2xs \
 	    perldoc perlivp dprofpp enc2xs piconv cpan *.bat \
-	    xsubpp instmodsh prove ptar ptardiff cpanp-run-perl cpanp cpan2dist shasum corelist config_data
+	    xsubpp instmodsh prove ptar ptardiff cpanp-run-perl cpanp cpan2dist shasum config_data
 	-cd ..\x2p && del /f find2perl s2p psed *.bat
 	-del /f ..\config.sh ..\splittree.pl perlmain.c dlutils.c config.h.new \
 	    perlmainst.c

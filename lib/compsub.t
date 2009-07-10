@@ -24,7 +24,7 @@ BEGIN { is $foo_called, undef; }
 sub bar { foo(); }
 BEGIN { is $foo_called, 1; }
 
-is( (join '*', @(foo 1, 2)), "1*2");
+is( (join '*', (@: foo 1, 2)), "1*2");
 
 BEGIN { is $foo_called, 2; }
 
@@ -48,7 +48,7 @@ fst(($a="newa"), ($b="notset"));
 is("$a-$b", "newa-oldb");
 
 do {
-    BEGIN { compsub::define( nothing => sub { @_[?0] and @_[0]->free; return B::OP->new('null', 0, @("myop", 33, 66)) } ); }
+    BEGIN { compsub::define( nothing => sub { @_[?0] and @_[0]->free; return B::OP->new('null', 0, (@: "myop", 33, 66)) } ); }
     nothing;
 
     eval "nothing";
@@ -65,9 +65,9 @@ do {
 
     BEGIN { compsub::define( compfunc1 => 
                                sub { my $op = shift;
-                                     my $cvop = B::SVOP->new('const', 0, \&func1, @('myop', 1, 1));
-                                     $op = B::LISTOP->new('list', 0, ($op ?? ($op, $cvop) !! ($cvop, undef)), @());
-                                     return B::UNOP->new('entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op, @('compfunc1'));
+                                     my $cvop = B::SVOP->new('const', 0, \&func1, (@: 'myop', 1, 1));
+                                     $op = B::LISTOP->new('list', 0, ($op ?? ($op, $cvop) !! ($cvop, undef)), $@);
+                                     return B::UNOP->new('entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op, (@: 'compfunc1'));
                                  } ); }
 
     is( (compfunc1), "func1 called. args: ");

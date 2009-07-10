@@ -31,11 +31,10 @@ ok( grep( 'ExtUtils::MM_OS2', @MM::ISA),
 
 # dlsyms
 my $mm = bless(\(%: 
-    SKIPHASH => \(%: 
+    SKIPHASH => \ %: 
         dynamic => 1
-    )
     NAME => 'foo:bar::'
-    ), 'ExtUtils::MM_OS2')
+   ), 'ExtUtils::MM_OS2')
 
 is( $mm->dlsyms(), '',
     'dlsyms() should return nothing with dynamic flag set' )

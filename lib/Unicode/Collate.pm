@@ -601,11 +601,10 @@ sub getWt
     elsif (_isUIdeo($u, $self->{?UCA_Version}))
         my $cjk  = $self->{?overrideCJK}
         return map { _varCE($vbl, $_) },
-                @: $cjk
-                   ?? < map( {pack(VCE_TEMPLATE, NON_VAR, < $_->@) }, &$cjk($u))
+                  $cjk ?? map( {pack(VCE_TEMPLATE, NON_VAR, < $_->@) }, $cjk->($u))
                        !! defined $cjk && $self->{?UCA_Version} +<= 8 && $u +< 0x10000
-                       ?? _uideoCE_8($u)
-                       !! < $der->($u)
+                       ?? @: _uideoCE_8($u)
+                       !! $der->($u)
     else
         return map { _varCE($vbl, $_) }, $der->($u)
     

@@ -112,9 +112,7 @@ sub opt_V # report version and exit
         "Perldoc v$VERSION, under perl $^PERL_VERSION for $^OS_NAME"
 
         (defined(&Win32::BuildNumber) and defined &Win32::BuildNumber())
-        ?? (" (win32 build ", < &Win32::BuildNumber(), ")") !! ()
-
-        (chr(65) eq 'A') ?? () !! " (non-ASCII)"
+            ?? (" (win32 build ", < &Win32::BuildNumber(), ")") !! ()
 
         "\n"
 
@@ -214,7 +212,7 @@ sub aside  # If we're in -v or DEBUG mode, say this.
                                $callsub =~ s/^$package/'/os
                                # the o is justified, as $package really won't change.
                                $callsub . ": "
-                                 !! ''
+                             !! ''
                        < @_
             )
         if(DEBUG) { print $^STDOUT, $out } else { print $^STDERR, $out }

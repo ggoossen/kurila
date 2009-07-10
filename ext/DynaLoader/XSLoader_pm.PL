@@ -72,7 +72,7 @@ EOT
 
 print $out, <<'EOT'
     my $modpname = join('/', @modparts);
-    my $modlibname = @(caller())[1];
+    my $modlibname = (@: caller())[1];
     my $c = nelems @modparts;
     $modlibname =~ s,[\\/][^\\/]+$,, while $c--;	# Q&D basename
     my $file = "$modlibname/auto/$modpname/$modfname.$dl_dlext";
@@ -90,7 +90,7 @@ print $out, <<'EOT'
 
     my $bootname = "boot_$module";
     $bootname =~ s/\W/_/g;
-    @DynaLoader::dl_require_symbols = @($bootname);
+    @DynaLoader::dl_require_symbols = @: $bootname;
 
     my $boot_symbol_ref;
 

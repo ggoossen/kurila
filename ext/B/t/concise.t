@@ -39,9 +39,9 @@ like($out, qr/print/, "'-exec' option output has print opcode")
 
 ######## API tests v.60
 
-use Config	# used for perlio check
+use Config      # used for perlio check
 B::Concise->import( <qw( set_style set_style_standard add_callback 
-		       add_style walk_output reset_sequence ))
+                       add_style walk_output reset_sequence ))
 
 ## walk_output argument checking
 

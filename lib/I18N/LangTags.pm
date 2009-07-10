@@ -688,7 +688,7 @@ do
     my($k,$v)
     while((nelems @panic))
         @: $k,$v = @: splice(@panic,0,2)
-        foreach my $k (ref($k) ?? $k->@ !! @: $k))
+        foreach my $k (ref($k) ?? $k->@ !! @: $k)
             foreach my $v (ref($v) ?? $v->@ !! @: $v)
                 push((%Panic{+$k} //= $@), $v) unless $k eq $v
 

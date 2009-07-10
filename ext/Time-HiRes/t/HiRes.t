@@ -363,13 +363,11 @@ SKIP: do
 
     $msg = "$td went by while sleeping $sleep, ratio $ratio.\n"
 
-  SKIP:
-    do 
+    SKIP: do 
         if ( not $td +< $sleep * (1 + $limit)) {
             skip 1, $msg;
         }
         ok($a +< $limit, $msg)
-    
 
     $t0 = time()
     $a = abs(usleep($sleep * 1E6) / ($sleep * 1E6) - 1.0)
@@ -378,14 +376,11 @@ SKIP: do
 
     $msg = "$td went by while sleeping $sleep, ratio $ratio.\n"
 
-  SKIP:
-    do 
+    SKIP: do 
         if ( not $td +< $sleep * (1 + $limit)) {
             skip 1, $msg;
         }
         ok $a +< $limit, $msg
-    
-
 
 
 SKIP: do 
@@ -438,18 +433,17 @@ if ($have_nanosleep) {
 # Find the loop size N (a for() loop 0..N-1)
 # that will take more than T seconds.
 
-if ($have_ualarm) {
+if ($have_ualarm)
     # http://groups.google.com/group/perl.perl5.porters/browse_thread/thread/adaffaaf939b042e/20dafc298df737f0%2320dafc298df737f0?sa=X&oi=groupsr&start=0&num=3
     # Perl changes [18765] and [18770], perl bug [perl #20920]
 
     info "Finding delay loop...";
 
-    my $T = 0.01;
-    use Time::HiRes < qw(time);
-    my $DelayN = 1024;
-    my $i;
-  N: do
-        loop
+    my $T = 0.01
+    use Time::HiRes < qw(time)
+    my $DelayN = 1024
+    my $i
+    N: while(1)
             my $t0 = time()
             my $i = 0
             while ($i +< $DelayN) { $i++ }
@@ -458,12 +452,10 @@ if ($have_ualarm) {
             info "N = $DelayN, t1 = $t1, t0 = $t0, dt = $dt"
             last N if $dt +> $T
             $DelayN *= 2
-        while (1)
-    ;
 
     # The time-burner which takes at least T (default 1) seconds.
-    my $Delay = sub 
-            my $c = (nelems @_) ?? shift !! 1
+    my $Delay = sub(?$v)
+            my $c = $v // 1
             my $n = $c * $DelayN
             my $i = 0
             while ($i +< $n) { $i++ }
@@ -497,42 +489,38 @@ if ($have_ualarm) {
     $Delay->(10); # Try burning CPU at least for 10T seconds.
 
     ok 1; # Not core dumping by now is considered to be the success.
-}else 
+else
     skip 29
 
 
 if ($have_clock_gettime &&
     # All implementations of clock_gettime() 
     # are SUPPOSED TO support CLOCK_REALTIME.
-    has_symbol('CLOCK_REALTIME')) {
+    has_symbol('CLOCK_REALTIME'))
     my $ok = 0;
-  TRY: do 
-        for my $try (1..3) {
-            info "CLOCK_REALTIME: try = $try";
-            my $t0 = clock_gettime(&CLOCK_REALTIME( < @_ ));
-            use Time::HiRes < qw(sleep);
-            my $T = 1.5;
-            sleep($T);
-            my $t1 = clock_gettime(&CLOCK_REALTIME( < @_ ));
-            if ($t0 +> 0 && $t1 +> $t0) {
-                info "t1 = $t1, t0 = $t0";
-                my $dt = $t1 - $t0;
-                my $rt = abs(1 - $dt / $T);
-                info "dt = $dt, rt = $rt";
-                if ($rt +<= 2 * $limit) {
-                    $ok = 1;
-                    last TRY;
-                }
-            }else 
+    TRY: for my $try (1..3)
+            info "CLOCK_REALTIME: try = $try"
+            my $t0 = clock_gettime(&CLOCK_REALTIME( < @_ ))
+            use Time::HiRes < qw(sleep)
+            my $T = 1.5
+            sleep($T)
+            my $t1 = clock_gettime(&CLOCK_REALTIME( < @_ ))
+            if ($t0 +> 0 && $t1 +> $t0)
+                info "t1 = $t1, t0 = $t0"
+                my $dt = $t1 - $t0
+                my $rt = abs(1 - $dt / $T)
+                info "dt = $dt, rt = $rt"
+                if ($rt +<= 2 * $limit)
+                    $ok = 1
+                    last TRY
+            else 
                 diag "Error: t0 = $t0, t1 = $t1"
-            
-            my $r = rand() + rand();
-            info sprintf "# Sleeping for \%.6f seconds...\n", $r;
-            sleep($r);
-        }
-    ;
-    ok $ok;
-}else 
+
+            my $r = rand() + rand()
+            info sprintf "# Sleeping for \%.6f seconds...\n", $r
+            sleep($r)
+    ok $ok
+else
     info "# No clock_gettime\n"
     skip 30
 

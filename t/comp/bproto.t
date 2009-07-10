@@ -33,6 +33,6 @@ for (split m/\n/,
     q[ defined &foo, &foo, &foo;
    undef &foo, $bar;
 	uc $bar,$bar;
-	grep( { not($bar) }, @($bar));
+	grep( { not($bar) }, @: $bar);
 ])
     test_no_error($_)

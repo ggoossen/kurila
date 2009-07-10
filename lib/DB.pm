@@ -19,42 +19,41 @@ my $ineval = \%();
 #
 ####
 
-BEGIN {
+BEGIN
 
   # these are hardcoded in perl source (some are magical)
 
-  $DB::sub = '';        # name of current subroutine
-  %DB::sub = %( () );        # "filename:fromline-toline" for every known sub
-  $DB::single = 0;      # single-step flag (set it to 1 to enable stops in BEGIN/use)
-  $DB::signal = 0;      # signal flag (will cause a stop at the next line)
-  $DB::trace = 0;       # are we tracing through subroutine calls?
-  @DB::args = @( () );       # arguments of current subroutine or @ARGV array
-  @DB::dbline = @( () );     # list of lines in currently loaded file
-  %DB::dbline = %( () );     # actions in current file (keyed by line number)
-  @DB::ret = @( () );        # return value of last sub executed in list context
-  $DB::ret = '';        # return value of last sub executed in scalar context
+  $DB::sub = ''        # name of current subroutine
+  %DB::sub = $%        # "filename:fromline-toline" for every known sub
+  $DB::single = 0      # single-step flag (set it to 1 to enable stops in BEGIN/use)
+  $DB::signal = 0      # signal flag (will cause a stop at the next line)
+  $DB::trace = 0       # are we tracing through subroutine calls?
+  @DB::args = $@       # arguments of current subroutine or @ARGV array
+  @DB::dbline = $@     # list of lines in currently loaded file
+  %DB::dbline = $%     # actions in current file (keyed by line number)
+  @DB::ret = $@        # return value of last sub executed in list context
+  $DB::ret = ''        # return value of last sub executed in scalar context
 
   # other "public" globals  
 
-  $DB::package = '';    # current package space
-  $DB::filename = '';   # current filename
-  $DB::subname = '';    # currently executing sub (fullly qualified name)
-  $DB::lineno = '';     # current line number
+  $DB::package = ''    # current package space
+  $DB::filename = ''   # current filename
+  $DB::subname = ''    # currently executing sub (fullly qualified name)
+  $DB::lineno = ''     # current line number
 
-  $DB::VERSION = $DB::VERSION = '1.01';
+  $DB::VERSION = $DB::VERSION = '1.01'
 
   # initialize private globals to avoid warnings
 
-  $running = 1;         # are we running, or are we stopped?
-  @stack = @(0);
-  @clients = @( () );
-  $deep = 100;
-  $ready = 0;
-  @saved = @( () );
-  @skippkg = @( () );
-  $usrctxt = '';
-  $evalarg = '';
-}
+  $running = 1         # are we running, or are we stopped?
+  @stack = @: 0
+  @clients = $@
+  $deep = 100
+  $ready = 0
+  @saved = $@
+  @skippkg = $@
+  $usrctxt = ''
+  $evalarg = ''
 
 ####
 # entry point for all subroutine calls
@@ -78,27 +77,26 @@ sub sub {
 ####
 # this is called by perl for every statement
 #
-sub DB {
-  return unless $ready;
-  &save;
-  ($DB::package, $DB::filename, $DB::lineno) = caller;
+sub DB
+  return unless $ready
+  &save
+  @: $DB::package, $DB::filename, $DB::lineno = @: caller
 
-  return if (nelems @skippkg) and grep { $_ eq $DB::package } @skippkg;
+  return if @skippkg and grep { $_ eq $DB::package }, @skippkg
 
-  $usrctxt = "package $DB::package;";		# this won't let them modify, alas
-  local(*DB::dbline) = "::_<$DB::filename";
+  $usrctxt = "package $DB::package;"		# this won't let them modify, alas
+  local(*DB::dbline) = "::_<$DB::filename"
 
   # we need to check for pseudofiles on Mac OS (these are files
   # not attached to a filename, but instead stored in Dev:Pseudo)
   # since this is done late, $DB::filename will be "wrong" after
   # skippkg
-  if ($^O eq 'MacOS' &&( (nelems @DB::dbline)-1) +< 0) {
-    $DB::filename = 'Dev:Pseudo';
-    *DB::dbline = "::_<$DB::filename";
-  }
+  if ($^OS_NAME eq 'MacOS' &&( (nelems @DB::dbline)-1) +< 0)
+    $DB::filename = 'Dev:Pseudo'
+    *DB::dbline = "::_<$DB::filename"
 
-  my ($stop, $action);
-  if (($stop,$action) = < split(m/\0/,%DB::dbline{$DB::lineno})) {
+  my ($stop, $action)
+  if (@: $stop,$action = split(m/\0/,%DB::dbline{$DB::lineno})) {
     if ($stop eq '1') {
       $DB::signal ^|^= 1;
     }
@@ -109,7 +107,7 @@ sub DB {
     }
   }
   if ($DB::single || $DB::trace || $DB::signal) {
-    $DB::subname = ($DB::sub =~ m/\'|::/) ? $DB::sub : "{$DB::package}::$DB::sub"; #';
+    $DB::subname = ($DB::sub =~ m/\'|::/) ?? $DB::sub !! "$($DB::package)::$DB::sub"; #';
     DB->loadfile($DB::filename, $DB::lineno);
   }
   $evalarg = $action, &eval if $action;
@@ -139,7 +137,7 @@ sub DB {
     }
     &eval if ($evalarg = DB->poststop);
   }
-  ($@, $!, $,, $/, $\, $^W) = < @saved;
+  ($^EVAL_ERROR, $^CHILD_ERROR, $^OUTPUT_FIELD_SEPARATOR, $^INPUT_RECORD_SEPARATOR, $^WARNING_BITS) = < @saved;
   ();
 }
   
@@ -147,7 +145,7 @@ sub DB {
 # this takes its argument via $evalarg to preserve current @_
 #    
 sub eval {
-  ($@, $!, $,, $/, $\, $^W) = < @saved;
+  ($^EVAL_ERROR, $^CHILD_ERROR, $^OUTPUT_FIELD_SEPARATOR, $^INPUT_RECORD_SEPARATOR, $^WARNING_BITS) = < @saved;
   eval "$usrctxt $evalarg; &DB::save";
   _outputall($@) if $@;
 }
@@ -158,10 +156,9 @@ sub eval {
 
 use strict;                # this can run only after DB() and sub() are defined
 
-sub save {
-  @saved = @($@, $!, $,, $/, $\, $^W);
-  $, = ""; $/ = "\n"; $\ = ""; $^W = 0;
-}
+sub save
+  @saved = @: $@, $!, $,, $/, $\, $^W
+  $, = ""; $/ = "\n"; $\ = ""; $^W = 0
 
 sub catch {
   for ( @clients) { $_->awaken; }
@@ -289,10 +286,10 @@ sub trace_toggle {
 sub subs {
   my $s = shift;
   if ((nelems @_)) {
-    my(@ret) = @( () );
-    while ((nelems @_)) {
+    my @ret = $@;
+    while (@_) {
       my $name = shift;
-      push @ret, \@(%DB::sub{$name} =~ m/^(.*)\:(\d+)-(\d+)$/) 
+      push @ret, \(@: %DB::sub{$name} =~ m/^(.*)\:(\d+)-(\d+)$/) 
 	if exists %DB::sub{$name};
     }
     return @ret;
@@ -364,7 +361,7 @@ sub lineevents {
   $fname = $DB::filename unless $fname;
   local(*DB::dbline) = "::_<$fname";
   for ($i = 1; $i +<=( (nelems @DB::dbline)-1); $i++) {
-    %ret{$i} = \@(@DB::dbline[$i], < split(m/\0/, %DB::dbline{$i})) 
+    %ret{$i} = \@: @DB::dbline[$i], < split(m/\0/, %DB::dbline{$i})
       if defined %DB::dbline{$i};
   }
   return %ret;

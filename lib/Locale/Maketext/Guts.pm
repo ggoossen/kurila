@@ -220,9 +220,6 @@ sub _compile
                 # It's a "~X" where X is not a special character.
                 # Consider it a literal ~ and X.
                 @c[-1] .= $1
-            
-        
-    
 
     if($call_count)
         undef $big_pile # Well, nevermind that.
@@ -230,7 +227,6 @@ sub _compile
         # It's all literals!  Ahwell, that can happen.
         # So don't bother with the eval.  Return a SCALAR reference.
         return \$big_pile
-    
 
     die "Last chunk isn't null??" if (nelems @c) and length @c[-1] # sanity
     print $^STDOUT, scalar(nelems @c), " chunks under closure\n" if DEBUG
@@ -238,8 +234,8 @@ sub _compile
         print $^STDOUT, "Empty code\n" if DEBUG
         return \''
     elsif((nelems @code) +> 1) # most cases, presumably!
-        unshift @code, "join '',@(\n"
-    
+        unshift @code, "join '',@(:\n"
+
     unshift @code, "sub \{\n"
     push @code, ")\}\n"
 

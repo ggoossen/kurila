@@ -288,7 +288,7 @@ sub note_for_contents_file($self, $namelets, $infile, $outfile)
             \@:  join("::", $namelets->@), $infile, $outfile, $namelets 
         #            0               1         2         3
         
-        DEBUG +> 3 and print $^STDOUT, "Noting  <$c->@[[@(-1)]]\n"
+        DEBUG +> 3 and print $^STDOUT, "Noting  $c->[-1]\n"
     
     return
 

@@ -7,7 +7,7 @@ use version
 
 my %versions = %: q[$VERSION = '1.00']        => '1.00'
                   q[*VERSION = \'1.01']       => '1.01'
-                  q[@($VERSION) = @: q$Revision: 32208 $ =~ m/(\d+)/g] => 32208
+                  q[@: $VERSION = @: q$Revision: 32208 $ =~ m/(\d+)/g] => 32208
                   q[$FOO::VERSION = '1.10';]  => '1.10'
                   q[*FOO::VERSION = \'1.11';] => '1.11'
                   '$VERSION = 0.02'   => 0.02

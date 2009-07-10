@@ -12,6 +12,6 @@ BEGIN { use_ok('XS::APItest') };
 ok(sv_setsv_cow_hashkey_core,
    "With PERL_CORE sv_setsv does COW for shared hash key scalars")
 
-    ok(!sv_setsv_cow_hashkey_notcore,
+ok(!sv_setsv_cow_hashkey_notcore,
    "Without PERL_CORE sv_setsv doesn't COW for shared hash key scalars")
     

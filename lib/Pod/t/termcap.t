@@ -26,38 +26,35 @@ print $^STDOUT, "ok 1\n"
 
 my $parser = Pod::Text::Termcap->new or die "Cannot create parser\n"
 my $n = 2
-while ( ~< $^DATA) {
-    next until $_ eq "###\n";
-    open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
-    while ( ~< $^DATA) {
-        last if $_ eq "###\n";
-        print $tmp, $_;
-    }
-    close $tmp;
-    open (my $out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
-    $parser->parse_from_file ('tmp.pod', $out);
-    close $out;
-    open ($tmp, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
-    my $output;
+while ( ~< $^DATA)
+    next until $_ eq "###\n"
+    open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n"
+    while ( ~< $^DATA)
+        last if $_ eq "###\n"
+        print $tmp, $_
+    close $tmp
+    open (my $out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n"
+    $parser->parse_from_file ('tmp.pod', $out)
+    close $out
+    open ($tmp, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n"
+    my $output
     do 
         local $^INPUT_RECORD_SEPARATOR = undef
         $output = ~< $tmp
-    ;
-    close $tmp;
-    unlink ('tmp.pod', 'out.tmp');
-    my $expected = '';
-    while ( ~< $^DATA) {
-        last if $_ eq "###\n";
-        $expected .= $_;
-    }
-    if ($output eq $expected) {
-        print $^STDOUT, "ok $n\n";
-    }else 
+    close $tmp
+    unlink ('tmp.pod', 'out.tmp')
+    my $expected = ''
+    while ( ~< $^DATA)
+        last if $_ eq "###\n"
+        $expected .= $_
+
+    if ($output eq $expected)
+        print $^STDOUT, "ok $n\n"
+    else
         print $^STDOUT, "not ok $n\n"
         print $^STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n"
     
-    $n++;
-}
+    $n++
 
 # Below the marker are bits of POD and corresponding expected output.  This is
 # used to test specific features or problems with Pod::Text::Termcap.  The

@@ -1,9 +1,3 @@
-BEGIN 
-    if(env::var('PERL_CORE')) {
-        chdir 't';
-        $^INCLUDE_PATH = @( '../lib' );
-    }
-
 
 use Test::More
 BEGIN { plan tests => 8 };
@@ -17,22 +11,20 @@ use Pod::Simple::XMLOutStream;
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::DumpAsText;
 
-my @from = @(
+my @from = @:
  'Pod::Simple::XMLOutStream'
- => '<Document><head1>I LIKE PIE</head1></Document>',
+   => '<Document><head1>I LIKE PIE</head1></Document>'
 
  'Pod::Simple::DumpAsXML'
- => "<Document>\n  <head1>\n    I LIKE PIE\n  </head1>\n</Document>\n",
+   => "<Document>\n  <head1>\n    I LIKE PIE\n  </head1>\n</Document>\n"
 
  'Pod::Simple::DumpAsText'
- => "++Document\n  ++head1\n    * \"I LIKE PIE\"\n  --head1\n--Document\n",
-
-    )
+   => "++Document\n  ++head1\n    * \"I LIKE PIE\"\n  --head1\n--Document\n"
 
 
 # Might as well test all the classes...
 while(nelems @from)
-    my @($x => $expected) = @: splice(@from, 0,2)
+    my @: $x => $expected = @: splice(@from, 0,2)
     my $more = ''
     print $^STDOUT, "#Testing via class $x, version ", $x->VERSION(), "\n"
     my $p = $x->new
@@ -42,16 +34,16 @@ while(nelems @from)
        sub 
            @_[0]->code_handler(sub { $more .= @_[1] . ":" . @_[0] . "\n"       } )
            @_[0]->cut_handler( sub { $more .= "~" . @_[1] . ":" .  @_[0]. "\n" } )
-        => join "\n", @(
-        "",
-        "\t# This is handy...",
-        "=head1 I  LIKE   PIE",
-        "",
-        "=cut",
-        "use Test::Harness;",
-        "runtests(sort glob 't/*.t');",
-        "",
-        "",)
+        => join "\n", @:
+                ""
+                "\t# This is handy..."
+                "=head1 I  LIKE   PIE"
+                ""
+                "=cut"
+                "use Test::Harness;"
+                "runtests(sort glob 't/*.t');"
+                "",
+                ""
        ))
        => scalar($exp = $expected);
         ;
@@ -59,14 +51,14 @@ while(nelems @from)
         print $^STDOUT, '# Got vs exp:\n# ', < Pod::Simple::BlackBox::pretty($got),
             "\n# ", <Pod::Simple::BlackBox::pretty($exp), "\n"
 
-    ok scalar($got = $more), scalar($exp = join "\n", @(
-        "1:",
-        "2:\t# This is handy...",
-        "~5:=cut",
-        "6:use Test::Harness;",
-        "7:runtests(sort glob 't/*.t');",
-        "8:",
-        "",)
+    ok scalar($got = $more), scalar($exp = join "\n", @:
+        "1:"
+        "2:\t# This is handy..."
+        "~5:=cut"
+        "6:use Test::Harness;"
+        "7:runtests(sort glob 't/*.t');"
+        "8:"
+        ""
        )
     unless($got eq $exp)
         print $^STDOUT, '# Got vs exp:\n# ', < Pod::Simple::BlackBox::pretty($got),

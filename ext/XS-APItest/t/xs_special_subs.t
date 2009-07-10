@@ -32,7 +32,7 @@ BEGIN
     is($XS::APItest::END_called_PP, undef, "END not yet called")
 
 
-    CHECK 
+CHECK
     diag "First CHECK"
     is($XS::APItest::BEGIN_called, 1, "BEGIN called")
     is($XS::APItest::BEGIN_called_PP, 1, "BEGIN called")
@@ -46,7 +46,7 @@ BEGIN
     is($XS::APItest::END_called_PP, undef, "END not yet called")
 
 
-    INIT 
+INIT 
     diag "First INIT"
     is($XS::APItest::BEGIN_called, 1, "BEGIN called")
     is($XS::APItest::BEGIN_called_PP, 1, "BEGIN called")
@@ -60,7 +60,7 @@ BEGIN
     is($XS::APItest::END_called_PP, undef, "END not yet called")
 
 
-    END 
+END 
     diag "First END"
     is($XS::APItest::BEGIN_called, 1, "BEGIN called")
     is($XS::APItest::BEGIN_called_PP, 1, "BEGIN called")
@@ -74,7 +74,7 @@ BEGIN
     is($XS::APItest::END_called_PP, 1, "END called")
 
 
-    diag "First body"
+diag "First body"
 is($XS::APItest::BEGIN_called, 1, "BEGIN called")
 is($XS::APItest::BEGIN_called_PP, 1, "BEGIN called")
 is($XS::APItest::UNITCHECK_called, 1, "UNITCHECK called") if $uc
@@ -114,7 +114,7 @@ BEGIN
     is($XS::APItest::END_called_PP, undef, "END not yet called")
 
 
-    CHECK 
+CHECK 
     diag "Second CHECK"
     is($XS::APItest::BEGIN_called, 1, "BEGIN called")
     is($XS::APItest::BEGIN_called_PP, 1, "BEGIN called")
@@ -128,7 +128,7 @@ BEGIN
     is($XS::APItest::END_called_PP, undef, "END not yet called")
 
 
-    INIT 
+INIT 
     diag "Second INIT"
     is($XS::APItest::BEGIN_called, 1, "BEGIN called")
     is($XS::APItest::BEGIN_called_PP, 1, "BEGIN called")
@@ -142,7 +142,7 @@ BEGIN
     is($XS::APItest::END_called_PP, undef, "END not yet called")
 
 
-    END 
+END 
     diag "Second END"
     is($XS::APItest::BEGIN_called, 1, "BEGIN called")
     is($XS::APItest::BEGIN_called_PP, 1, "BEGIN called")
@@ -154,5 +154,3 @@ BEGIN
     is($XS::APItest::INIT_called_PP, 1, "INIT called")
     is($XS::APItest::END_called, undef, "END not yet called")
     is($XS::APItest::END_called_PP, undef, "END not yet called")
-
-    

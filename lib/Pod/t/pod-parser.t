@@ -14,8 +14,7 @@ BEGIN
     $^OUTPUT_AUTOFLUSH = 1
     print $^STDOUT, "1..3\n"
 
-
-    use Pod::Man
+use Pod::Man
 use Pod::Text
 
 print $^STDOUT, "ok 1\n"
@@ -35,15 +34,15 @@ do
     $output = ~< $out
 
     close $out
-if ($output eq "Some random \\fBtext\\fR.\n") {
+if ($output eq "Some random \\fBtext\\fR.\n")
     print $^STDOUT, "ok 2\n";
-}else 
+else
     print $^STDOUT, "not ok 2\n"
     print $^STDOUT, "Expected\n========\nSome random \\fBtext\\fR.\n\n"
     print $^STDOUT, "Output\n======\n$output\n"
 
 
-    $parser = Pod::Text->new or die "Cannot create parser\n"
+$parser = Pod::Text->new or die "Cannot create parser\n"
 open ($out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n"
 $parser->parse_from_file (\(%:  cutting => 0 ), 'tmp.pod', $out)
 close $out
@@ -52,7 +51,7 @@ do
     local $^INPUT_RECORD_SEPARATOR = undef
     $output = ~< $out
 
-    close $out
+close $out
 if ($output eq "    Some random text.\n\n") {
     print $^STDOUT, "ok 3\n";
 }else 
@@ -60,6 +59,5 @@ if ($output eq "    Some random text.\n\n") {
     print $^STDOUT, "Expected\n========\n    Some random text.\n\n\n"
     print $^STDOUT, "Output\n======\n$output\n"
 
-
-    unlink ('tmp.pod', 'out.tmp')
+unlink ('tmp.pod', 'out.tmp')
 exit 0

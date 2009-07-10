@@ -309,7 +309,7 @@ EXPECT
 unicore/e_ACUTE_alias.pl cannot be used as alias file for charnames at
 ########
 # alias with arrayref
-use charnames ":short", ":alias" => \@( e_ACUTE => "LATIN:e WITH ACUTE" );
+use charnames ":short", ":alias" => \@: e_ACUTE => "LATIN:e WITH ACUTE" ;
 "Here: \N{e_ACUTE}!\n";
 EXPECT
 Only HASH reference supported as argument to :alias at

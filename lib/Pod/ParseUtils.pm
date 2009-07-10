@@ -128,7 +128,7 @@ with a scalar argument.
 
 # The type of the list (UL, OL, ...)
 sub type
-    return ((nelems @_) +> 1) ??  (@: @_[0]->{type} = @_[1]) !! @_[0]->{type}
+    return ((nelems @_) +> 1) ??  @: (@_[0]->{type} = @_[1]) !! @_[0]->{type}
 
 
 =item $list-E<gt>rx()
@@ -257,8 +257,7 @@ sub initialize
     $self->{+node} ||= ''
     $self->{+alttext} ||= ''
     $self->{+type} ||= 'undef'
-    $self->{+_warnings} = \@: 
-
+    $self->{+_warnings} = \$@
 
 =item $link-E<gt>parse($string)
 
@@ -470,12 +469,12 @@ the link was encountered in. Has to be filled in manually.
 
 # The line in the file the link appears
 sub line
-    return ((nelems @_) +> 1) ??  (@: @_[0]->{+line} = @_[1]) !! @_[0]->{?line}
+    return ((nelems @_) +> 1) ?? @: (@_[0]->{+line} = @_[1]) !! @_[0]->{?line}
 
 
 # The POD file name the link appears in
 sub file
-    return ((nelems @_) +> 1) ??  (@: @_[0]->{+file} = @_[1]) !! @_[0]->{?file}
+    return ((nelems @_) +> 1) ?? @: (@_[0]->{+file} = @_[1]) !! @_[0]->{?file}
 
 
 =item $link-E<gt>page()

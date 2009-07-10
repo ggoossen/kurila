@@ -101,8 +101,8 @@ else
 my $searchpod = 'Stuff'
 print $^STDOUT, "### searching for $searchpod.pod\n"
 $result = pod_where(
-  \(%:  dirs => \(@:  'File::Spec'->catdir(
-                      env::var('PERL_CORE') ?? () !! < qw(t), 'pod', 'testpods', 'lib', 'Pod') )
+  \(%:  dirs => \(@: 'File::Spec'->catdir(
+                        env::var('PERL_CORE') ?? () !! < qw(t), 'pod', 'testpods', 'lib', 'Pod') )
         verbose => $VERBOSE ), $searchpod)
     || "undef - $searchpod.pod not found!"
 print $^STDOUT, "### found $result\n"

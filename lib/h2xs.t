@@ -49,8 +49,8 @@ my $thisversion = $kurila::VERSION->stringify;
 # If this test has failed previously a copy may be left.
 rmtree($name);
 
-my @tests = @(
-"-f -n $name", $^V, <<"EOXSFILES",
+my @tests = @:
+    "-f -n $name", $^V, <<"EOXSFILES",
 Writing $name/ppport.h
 Writing $name/lib/$name.pm
 Writing $name/$name.xs
@@ -63,7 +63,7 @@ Writing $name/Changes
 Writing $name/MANIFEST
 EOXSFILES
 
-"\"-X\" -f -n $name", $^V, <<"EONOXSFILES",
+    "\"-X\" -f -n $name", $^V, <<"EONOXSFILES",
 Writing $name/lib/$name.pm
 Writing $name/Makefile.PL
 Writing $name/README
@@ -72,7 +72,7 @@ Writing $name/Changes
 Writing $name/MANIFEST
 EONOXSFILES
 
-"-f -n $name -b $thisversion $header", $^V, <<"EOXSFILES",
+    "-f -n $name -b $thisversion $header", $^V, <<"EOXSFILES",
 Writing $name/ppport.h
 Writing $name/lib/$name.pm
 Writing $name/$name.xs
@@ -84,7 +84,6 @@ Writing $name/t/$name.t
 Writing $name/Changes
 Writing $name/MANIFEST
 EOXSFILES
-);
 
 my $total_tests = 3; # opening, closing and deleting the header file.
 my $i = nelems(@tests) - 1;
@@ -150,8 +149,8 @@ while (my ($args, $version, $expectation) = splice @tests, 0, 3) {
   # seems the least evil thing to do:
   push $^INCLUDE_PATH, "../../lib";
   my ($missing, $extra) = ExtUtils::Manifest::fullcheck();
-  is_deeply ($missing, \@(), "No files in the MANIFEST should be missing");
-  is_deeply ($extra, \@(),   "and all files present should be in the MANIFEST");
+  is_deeply ($missing, \$@, "No files in the MANIFEST should be missing");
+  is_deeply ($extra, \$@,   "and all files present should be in the MANIFEST");
   pop $^INCLUDE_PATH;
   chdir ($up) or die "chdir $up failed: $!";
  

@@ -595,7 +595,7 @@ EOT
   );
 
 my $fail;
-while (my @(?$point, ?$bearing) = @: each %compass) {
+while (my @: ?$point, ?$bearing = @: each %compass) {
   my $val = eval $point;
   if ($^EVAL_ERROR) {
     print $^STDOUT, "# $point: \$^EVAL_ERROR='$^EVAL_ERROR'\n";
@@ -656,7 +656,7 @@ sub explict_call_constant($string, $expect)
     # This does assume simple strings suitable for ''
     my $test_body = <<"EOT"
 do \{
-  my \@(?\$error, ?\$got) = (\@: $($package)::constant ('$string'));\n;
+  my \@: ?\$error, ?\$got = (\@: $($package)::constant ('$string'));\n;
 EOT
 
     if (defined $expect)
