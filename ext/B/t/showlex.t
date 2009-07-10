@@ -6,10 +6,10 @@ BEGIN
 
 
 $^OUTPUT_AUTOFLUSH = 1
-use warnings;
+use warnings
 
-use Config;
-use B::Showlex ();
+use Config
+use B::Showlex ()
 
 plan tests => 14
 
@@ -31,15 +31,15 @@ my ($na,$nb,$nc)	# holds regex-strs
 my ($out)	# output, option-flag
 
 sub padrep
-    my @($varname,$newlex) =  @_
+    my (@: $varname,$newlex) =  @_
     return ($newlex)
         ?? 'PVNV \(0x[0-9a-fA-F]+\) "\'.$varname.'" = '
         !! "PVNV \\\(0x[0-9a-fA-F]+\\\) \\$varname\n"
 
 
-for my $newlex (@('', '-newlex'))
+for my $newlex ((@: '', '-newlex'))
 
-    $out = runperl ( switches => \@("-MO=Showlex,$newlex"),
+    $out = runperl ( switches => \(@: "-MO=Showlex,$newlex"),
                      prog => 'my ($a,$b)', stderr => 1 )
     $na = padrep('$a',$newlex)
     $nb = padrep('$b',$newlex)
@@ -82,10 +82,10 @@ for my $newlex (@('', '-newlex'))
 
         # fibonacci function under test
         my $asub = sub (@< @_)
-            my @($self,%< %props)= @_
+            my (@: $self,%< %props)= @_
             my $total
             do # inner block vars
-                my @(@fib)=@(@(1,2))
+                my (@: @fib)=@: (@: 1,2)
                 for my $i (2..9)
                     @fib[$i] = @fib[$i-2] + @fib[$i-1]
                 

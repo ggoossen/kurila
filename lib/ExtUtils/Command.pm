@@ -84,9 +84,9 @@ Sets modified time of destination to that of source.
 =cut
 
 sub eqtime
-    my @($src,$dst) =  @ARGV
-    local @ARGV = @($dst);  touch()  # in case $dst doesn't exist
-    utime(< @(stat($src))[[8..9]],$dst)
+    my (@: $src,$dst) =  @ARGV
+    local @ARGV = (@: $dst);  touch()  # in case $dst doesn't exist
+    utime(< (@: stat($src))[[8..9]],$dst)
 
 
 =item rm_rf
@@ -235,7 +235,7 @@ sub chmod
         
     
 
-    chmod(oct $mode,< @ARGV) || die "Cannot chmod ".join(' ', @($mode,< @ARGV)).":$^OS_ERROR"
+    chmod(oct $mode,< @ARGV) || die "Cannot chmod ".join(' ', (@: $mode,< @ARGV)).":$^OS_ERROR"
 
 
 =item mkpath

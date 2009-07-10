@@ -75,12 +75,12 @@ if ($FileList)
     open my $fh,"<",$FileList or die "Failed to read '$FileList':$^OS_ERROR"
     my @input
     my @output
-    for my $list (@( \@input, \@output) )
+    for my $list ((@:  \@input, \@output) )
         while ( ~< $fh)
             s/^ \s+ | \s+ $//xg
             next if m/^ \s* (?: \# .* )? $/x
             last if m/^ =+ $/x
-            my @( $file ) =  split m/\t/, $_
+            my (@:  $file ) =  split m/\t/, $_
             push $list->@, $file
         
         my %dupe
@@ -141,9 +141,9 @@ else
     
 
 
-foreach my $lib (@('To', 'lib',
-                   < map { File::Spec->catdir("lib",$_)},
-                   qw(gc_sc dt bc hst ea jt lb nt ccc)))
+foreach my $lib ((@: 'To', 'lib'
+                     < map { File::Spec->catdir("lib",$_)}
+                     qw(gc_sc dt bc hst ea jt lb nt ccc)))
     next if -d $lib
     mkdir $lib, 0755 or die "mkdir '$lib': $^OS_ERROR"
 
@@ -247,11 +247,11 @@ sub Build_Aliases()
 
     # Placate the warnings about used only once. (They are used again, but
     # via a typeglob lookup)
-    %utf8::PropertyAlias = %( () )
-    %utf8::PA_reverse = %( () )
-    %utf8::PropValueAlias = %( () )
-    %utf8::PVA_reverse = %( () )
-    %utf8::PVA_abbr_map = %( () )
+    %utf8::PropertyAlias = $%
+    %utf8::PA_reverse = $%
+    %utf8::PropValueAlias = $%
+    %utf8::PVA_reverse = $%
+    %utf8::PVA_abbr_map = $%
 
     open my $pa, "<", "PropertyAliases.txt"
         or die "Can't open PropertyAliases.txt: $^OS_ERROR"
@@ -260,7 +260,7 @@ sub Build_Aliases()
         s/\s+$//
         next if m/^$/
 
-        my @($abbrev, $name, ...) = split m/\s*;\s*/
+        my (@: $abbrev, $name, ...) = split m/\s*;\s*/
         next if $abbrev eq "n/a"
         %PropertyAlias{+$abbrev} = $name
         %PA_reverse{+$name} = $abbrev
@@ -281,11 +281,11 @@ sub Build_Aliases()
         s/\s+$//
         next if m/^$/
 
-        my @($prop, @< @data) =  split m/\s*;\s*/
+        my (@: $prop, @< @data) =  split m/\s*;\s*/
 
         if ($prop eq 'ccc')
-            %PropValueAlias{+$prop}{+@data[1]} = \ @data[[@(0,2)]]
-            %PVA_reverse{+$prop}{+@data[2]} = \ @data[[@(0,1)]]
+            %PropValueAlias{+$prop}{+@data[1]} = \ @data[[(@: 0,2)]]
+            %PVA_reverse{+$prop}{+@data[2]} = \ @data[[(@: 0,1)]]
         else
             next if @data[0] eq "n/a"
             %PropValueAlias{+$prop}{+@data[0]} = @data[1]
@@ -358,14 +358,14 @@ sub New_Prop($Type, $Name, $Table, %< %Args)
 ##
 sub Table::New
     my $class = shift
-    my %Args = %( < @_ )
+    my %Args = %:  < @_ 
 
-    my $Table = bless \@(), $class
+    my $Table = bless \$@, $class
 
     my $Fuzzy = delete %Args{Fuzzy}
     my $Desc  = delete %Args{Desc}
 
-    for my $Type (@('Is', 'In'))
+    for my $Type ((@: 'Is', 'In'))
         if (my $Name = delete %Args{$Type})
             New_Prop($Type => $Name, $Table, Desc => $Desc, Fuzzy => $Fuzzy)
         
@@ -440,9 +440,9 @@ sub Table::RawAppendRange
     my $name  = shift
     $name = "" if not defined $name ## warning: $name can be "0"
 
-    push $Table->@, \@( $start,    # RANGE_START
-                        $end,      # RANGE_END
-                        $name   ) # RANGE_NAME
+    push $Table->@, \(@:  $start    # RANGE_START
+                          $end      # RANGE_END
+                          $name   ) # RANGE_NAME
 
 
 ##
@@ -532,12 +532,12 @@ sub Table::Merge
             push @Records, < $Arg->@
         else
             ## arg is a codepoint, make a range
-            push @Records, \@( $Arg, $Arg )
+            push @Records, \(@:  $Arg, $Arg )
         
     
 
     ## sort by range start, with longer ranges coming first.
-    my @($first, @< @Rest) =  sort {
+    my (@: $first, @< @Rest) =  sort {
         ($a->[RANGE_START] <+> $b->[RANGE_START])
             or
             ($b->[RANGE_END]   <+> $b->[RANGE_END])
@@ -573,7 +573,7 @@ sub Table::Write
     my $filename = shift
     my $comment  = shift
 
-    my @OUT = @( $HEADER )
+    my @OUT = @:  $HEADER 
     if (defined $comment)
         $comment =~ s/\s+\Z//
         $comment =~ s/^/# /gm
@@ -873,21 +873,21 @@ sub UnicodeData_Txt()
         next unless m/^[0-9A-Fa-f]+;/
         s/\s+$//
 
-        my @($hexcode,   ## code point in hex (e.g. "0041")
-             $name,      ## character name (e.g. "LATIN CAPITAL LETTER A")
-             $cat,       ## category (e.g. "Lu")
-             $comb,      ## Canonical combining class (e.t. "230")
-             $bidi,      ## directional category (e.g. "L")
-             $deco,      ## decomposition mapping
-             $decimal,   ## decimal digit value
-             $digit,     ## digit value
-             $number,    ## numeric value
-             $mirrored,  ## mirrored
-             ?$unicode10, ## name in Unicode 1.0
-             ?$comment,   ## comment field
-             ?$upper,     ## uppercase mapping
-             ?$lower,     ## lowercase mapping
-             ?$title,     ## titlecase mapping
+        my (@: $hexcode   ## code point in hex (e.g. "0041")
+               $name      ## character name (e.g. "LATIN CAPITAL LETTER A")
+               $cat       ## category (e.g. "Lu")
+               $comb      ## Canonical combining class (e.t. "230")
+               $bidi      ## directional category (e.g. "L")
+               $deco      ## decomposition mapping
+               $decimal   ## decimal digit value
+               $digit     ## digit value
+               $number    ## numeric value
+               $mirrored  ## mirrored
+               ?$unicode10 ## name in Unicode 1.0
+               ?$comment   ## comment field
+               ?$upper     ## uppercase mapping
+               ?$lower     ## lowercase mapping
+               ?$title     ## titlecase mapping
             ) =  split(m/\s*;\s*/)
 
         # Note that in Unicode 3.2 there will be names like
@@ -1044,7 +1044,7 @@ sub UnicodeData_Txt()
     $Name->Write("Name.pl")
 
     do
-        my @PVA = @( $HEADER )
+        my @PVA = @:  $HEADER 
         push @PVA, "do \{\n";
         foreach my $name (qw (PropertyAlias PA_reverse PropValueAlias
                               PVA_reverse PVA_abbr_map))
@@ -1061,17 +1061,17 @@ sub UnicodeData_Txt()
     # $Bidi->Write("Bidirectional.pl");
     for (keys %Bidi)
         %Bidi{?$_}->Write(
-            \@("lib","bc","$_.pl"),
+            \(@: "lib","bc","$_.pl"),
             "BidiClass category '%PropValueAlias{bc}{?$_}'"
             )
     
 
     $Comb->Write("CombiningClass.pl")
     for (keys  %PropValueAlias{?ccc})
-        my @($code, $name) =   %PropValueAlias{ccc}{?$_}->@
+        my (@: $code, $name) =   %PropValueAlias{ccc}{?$_}->@
         (my $c = Table->New())->Append($code)
         $c->Write(
-            \@("lib","ccc","$_.pl"),
+            \(@: "lib","ccc","$_.pl"),
             "CombiningClass category '$name'"
             )
     
@@ -1079,7 +1079,7 @@ sub UnicodeData_Txt()
     $Deco->Write("Decomposition.pl")
     for (keys %DC)
         %DC{?$_}->Write(
-            \@("lib","dt","$_.pl"),
+            \(@: "lib","dt","$_.pl"),
             "DecompositionType category '%PropValueAlias{dt}{?$_}'"
             )
     
@@ -1087,7 +1087,7 @@ sub UnicodeData_Txt()
     # $Number->Write("Number.pl");
     for (keys %Number)
         %Number{?$_}->Write(
-            \@("lib","nt","$_.pl"),
+            \(@: "lib","nt","$_.pl"),
             "NumericType category '%PropValueAlias{nt}{?$_}'"
             )
     
@@ -1095,7 +1095,7 @@ sub UnicodeData_Txt()
     # $General->Write("Category.pl");
 
     for my $to (sort keys %To)
-        %To{?$to}->Write(\@("To","$to.pl"))
+        %To{?$to}->Write(\(@: "To","$to.pl"))
     
 
     for (keys  %PropValueAlias{?gc})
@@ -1118,7 +1118,7 @@ sub LineBreak_Txt()
     while ( ~< $in)
         next unless m/^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(\w+)/
 
-        my @($first, $last, $lbrk) = @(hex($1), hex($2||""), $3)
+        my (@: $first, $last, $lbrk) = @: hex($1), hex($2||""), $3
 
         $Lbrk->Append($first, $lbrk)
 
@@ -1137,7 +1137,7 @@ sub LineBreak_Txt()
 
     for (keys %Lbrk)
         %Lbrk{?$_}->Write(
-            \@("lib","lb","$_.pl"),
+            \(@: "lib","lb","$_.pl"),
             "Linebreak category '%PropValueAlias{lb}{?$_}'"
             )
     
@@ -1161,7 +1161,7 @@ sub ArabicShaping_txt()
         next unless m/^[0-9A-Fa-f]+;/
         s/\s+$//
 
-        my @($hexcode, $name, $link, $linkgroup) =  split(m/\s*;\s*/)
+        my (@: $hexcode, $name, $link, $linkgroup) =  split(m/\s*;\s*/)
         my $code = hex($hexcode)
         $ArabLink->Append($code, $link)
         $ArabLinkGroup->Append($code, $linkgroup)
@@ -1177,7 +1177,7 @@ sub ArabicShaping_txt()
 
     for (keys %JoinType)
         %JoinType{?$_}->Write(
-            \@("lib","jt","$_.pl"),
+            \(@: "lib","jt","$_.pl"),
             "JoiningType category '%PropValueAlias{jt}{?$_}'"
             )
     
@@ -1199,9 +1199,9 @@ sub EastAsianWidth_txt()
         s/#.*//
         s/\s+$//
 
-        my @($hexcodes, $pv) =  split(m/\s*;\s*/)
+        my (@: $hexcodes, $pv) =  split(m/\s*;\s*/)
         %EAW{+$pv} ||= Table->New(Is => "EastAsianWidth$pv")
-        my @($start, ?$end) =  split(m/\.\./, $hexcodes)
+        my (@: $start, ?$end) =  split(m/\.\./, $hexcodes)
         if (defined $end)
             %EAW{?$pv}->AppendRange(hex($start), hex($end))
         else
@@ -1213,7 +1213,7 @@ sub EastAsianWidth_txt()
 
     for (keys %EAW)
         %EAW{?$_}->Write(
-            \@("lib","ea","$_.pl"),
+            \(@: "lib","ea","$_.pl"),
             "EastAsianWidth category '%PropValueAlias{ea}{?$_}'"
             )
     
@@ -1232,7 +1232,7 @@ sub HangulSyllableType_txt()
 
     while ( ~< $in->*)
         next unless m/^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(\w+)/
-        my @($first, $last, $pv) = @(hex($1), hex($2||""), $3)
+        my (@: $first, $last, $pv) = @: hex($1), hex($2||""), $3
 
         %HST{+$pv} ||= Table->New(Is => "HangulSyllableType$pv")
         %HST{?$pv}->Append($first)
@@ -1243,7 +1243,7 @@ sub HangulSyllableType_txt()
 
     for (keys %HST)
         %HST{?$_}->Write(
-            \@("lib","hst","$_.pl"),
+            \(@: "lib","hst","$_.pl"),
             "HangulSyllableType category '%PropValueAlias{hst}{?$_}'"
             )
     
@@ -1261,7 +1261,7 @@ sub Jamo_txt()
 
     while ( ~< $in->*)
         next unless m/^([0-9A-Fa-f]+)\s*;\s*(\w*)/
-        my @($code, $short) = @(hex($1), $2)
+        my (@: $code, $short) = @: hex($1), $2
 
         $Short->Append($code, $short)
     
@@ -1284,7 +1284,7 @@ sub Scripts_txt()
 
         # Wait until all the scripts have been read since
         # they are not listed in numeric order.
-        push @ScriptInfo, \@( hex($1), hex($2||""), $3 )
+        push @ScriptInfo, \@:  hex($1), hex($2||""), $3 
     
     close $in
 
@@ -1294,7 +1294,7 @@ sub Scripts_txt()
     my $Scripts = Table->New()
 
     for my $script (sort { $a->[0] <+> $b->[0] }, @ScriptInfo)
-        my @($first, $last, $name) =  $script->@
+        my (@: $first, $last, $name) =  $script->@
         $Scripts->Append($first, $name)
 
         %Script{+$name} ||= Table->New(Is    => $name,
@@ -1350,7 +1350,7 @@ sub Blocks_txt()
         #next if not /Private Use$/;
         next if not m/^([0-9A-Fa-f]+)\.\.([0-9A-Fa-f]+)\s*;\s*(.+?)\s*$/
 
-        my @($first, $last, $name) = @(hex($1), hex($2), $3)
+        my (@: $first, $last, $name) = @: hex($1), hex($2), $3
 
         $Blocks->Append($first, $name)
 
@@ -1389,7 +1389,7 @@ sub PropList_txt()
 
         # Wait until all the extended properties have been read since
         # they are not listed in numeric order.
-        push @PropInfo, \@( hex($1), hex($2||""), $3 )
+        push @PropInfo, \@:  hex($1), hex($2||""), $3 
     
     close $in
 
@@ -1398,7 +1398,7 @@ sub PropList_txt()
     my %Prop
 
     for my $prop (sort { $a->[0] <+> $b->[0] }, @PropInfo)
-        my @($first, $last, $name) =  $prop->@
+        my (@: $first, $last, $name) =  $prop->@
         $Props->Append($first, $name)
 
         %Prop{+$name} ||= Table->New(Is    => $name,
@@ -1417,7 +1417,7 @@ sub PropList_txt()
         # XXX I'm assuming that the names from %Prop don't suffer 8.3 clashes.
         %BaseNames{+lc $file}++
         %Prop{?$_}->Write(
-            \@("lib","gc_sc","$file.pl"),
+            \(@: "lib","gc_sc","$file.pl"),
             "Binary property '$_'"
             )
     
@@ -1515,18 +1515,18 @@ sub ExpectError($FH, $prop)
 
 
 ## This used only for making the test script
-my @GoodSeps = @(
-                " ",
-                "-",
-                " \t ",
-                "",
-                "",
-                "_",
-    )
-my @BadSeps = @(
-               "--",
-               "__",
-               " _",
+my @GoodSeps = @: 
+                " "
+                "-"
+                " \t "
+                ""
+                ""
+                "_"
+    
+my @BadSeps = (@: 
+               "--"
+               "__"
+               " _"
                "/"
     )
 
@@ -1575,20 +1575,20 @@ sub MakePropTestScript()
     
     print $out, ~< $^DATA
 
-    while (my @($Name, $Table) =@( each %ExactNameToTest))
+    while (my (@: $Name, $Table) =(@:  each %ExactNameToTest))
         GenTests(*OUT, $Name, $Table->ValidCode, $Table->InvalidCode)
         ExpectError(*OUT, uc $Name) if uc $Name ne $Name
         ExpectError(*OUT, lc $Name) if lc $Name ne $Name
     
 
 
-    while (my @($Name, $Table) =@( each %FuzzyNameToTest))
+    while (my (@: $Name, $Table) =(@:  each %FuzzyNameToTest))
         my $Orig  = %CanonicalToOrig{?$Name}
-        my %Names = %(
-            $Name => 1,
+        my %Names = %: 
+            $Name => 1
             $Orig => 1, <
-            RandomlyFuzzifyName($Orig) => 1
-            )
+                RandomlyFuzzifyName($Orig) => 1
+            
 
         for my $N (keys %Names)
             GenTests(*OUT, $N, $Table->ValidCode, $Table->InvalidCode)
@@ -1661,7 +1661,7 @@ sub WriteAllMappings()
     my @MAP
 
     ## 'Is' *MUST* come first, so its names have precidence over 'In's
-    for my $Type (@('Is', 'In'))
+    for my $Type ((@: 'Is', 'In'))
         my %RawNameToFile ## a per-$Type cache
 
         for my $Name (sort {length $a <+> length $b}, keys %TableInfo{?$Type})
@@ -1712,9 +1712,9 @@ sub WriteAllMappings()
             do
                 my $Desc = %TableDesc{$Type}{?$Name} || ""
                 ## get list of names this table is reference by
-                my @Supported = @( $Name )
+                my @Supported = @:  $Name 
                 if (%AliasInfo{?$Type})
-                    while (my @(?$Orig, ?$Alias) = @( each( %AliasInfo{$Type} )))
+                    while (my (@: ?$Orig, ?$Alias) = (@:  each( %AliasInfo{$Type} )))
                         if ($Orig eq $Name)
                             push @Supported, $Alias
                         
@@ -1747,7 +1747,7 @@ sub WriteAllMappings()
             ##
             ## Okay, write the file...
             ##
-            $Table->Write(\@("lib","gc_sc","$filename.pl"), $Comment)
+            $Table->Write(\(@: "lib","gc_sc","$filename.pl"), $Comment)
 
             ## and register it
             %RawNameToFile{+$Name} = $filename
@@ -1764,7 +1764,7 @@ sub WriteAllMappings()
         
 
         ## Register aliase info
-        for my $Name (sort {length $a <+> length $b}, keys(%AliasInfo{?$Type} || %()))
+        for my $Name (sort {length $a <+> length $b}, keys(%AliasInfo{?$Type} || $%))
             my $Alias    = %AliasInfo{$Type}{?$Name}
             my $IsFuzzy  = %FuzzyNames{$Type}{?$Alias}
             my $filename = %RawNameToFile{?$Name}
@@ -1787,15 +1787,15 @@ sub WriteAllMappings()
     ## Write out the property list
     ##
     do
-        my @OUT = @(
-                   "##\n",
-                   "## This file created by $^PROGRAM_NAME\n",
-                   "## List of built-in \\p\{...\}/\\P\{...\} properties.\n",
-                   "##\n",
-                   "## '*' means name may be 'fuzzy'\n",
+        my @OUT = @: 
+                   "##\n"
+                   "## This file created by $^PROGRAM_NAME\n"
+                   "## List of built-in \\p\{...\}/\\P\{...\} properties.\n"
+                   "##\n"
+                   "## '*' means name may be 'fuzzy'\n"
                    "##\n\n", <
-                   sort { substr($a,2) cmp substr($b, 2) }, @( < @MAP,)
-            )
+                       sort { substr($a,2) cmp substr($b, 2) }, @:  < @MAP,
+            
         WriteIfChanged('Properties', @OUT)
     
 
@@ -1803,15 +1803,15 @@ sub WriteAllMappings()
 
     ## Write Exact.pl
     do
-        my @OUT = @(
-                   $HEADER,
-                   "##\n",
-                   "## Data in this file used by ../utf8_heavy.pl\n",
-                   "##\n\n",
-                   "## Mapping from name to filename in ./lib/gc_sc\n",
-                   "do \{\n",
-                   "\%utf8::Exact = \%(\n",
-            )
+        my @OUT = @: 
+                   $HEADER
+                   "##\n"
+                   "## Data in this file used by ../utf8_heavy.pl\n"
+                   "##\n\n"
+                   "## Mapping from name to filename in ./lib/gc_sc\n"
+                   "do \{\n"
+                   "\%utf8::Exact = \%(\n"
+            
 
         %Exact{+InGreek} = 'InGreekA'  # this is evil kludge
         for my $Name (sort keys %Exact)
@@ -1827,15 +1827,15 @@ sub WriteAllMappings()
 
     ## Write Canonical.pl
     do
-        my @OUT = @(
-                   $HEADER,
-                   "##\n",
-                   "## Data in this file used by ../utf8_heavy.pl\n",
-                   "##\n\n",
-                   "## Mapping from lc(canonical name) to filename in ./lib\n",
-                   "do \{\n",
-                   "\%utf8::Canonical = \%(\n",
-            )
+        my @OUT = @: 
+                   $HEADER
+                   "##\n"
+                   "## Data in this file used by ../utf8_heavy.pl\n"
+                   "##\n\n"
+                   "## Mapping from lc(canonical name) to filename in ./lib\n"
+                   "do \{\n"
+                   "\%utf8::Canonical = \%(\n"
+            
         my $Trail = "" ## used just to keep the spacing pretty
         for my $Name (sort keys %Canonical)
             my $File = %Canonical{?$Name}
@@ -1874,7 +1874,7 @@ sub SpecialCasing_txt()
         s/\#.*//
         s/\s+$//
 
-        my @($code, $lower, $title, $upper, ? $condition) =  split(m/\s*;\s*/)
+        my (@: $code, $lower, $title, $upper, ? $condition) =  split(m/\s*;\s*/)
 
         if ($condition) # not implemented yet
             print $^STDOUT, "# SKIPPING $_\n" if $Verbose
@@ -1884,11 +1884,11 @@ sub SpecialCasing_txt()
         # Wait until all the special cases have been read since
         # they are not listed in numeric order.
         my $ix = hex($code)
-        push %CaseInfo{+Lower}, \@( $ix, $code, $lower )
+        push %CaseInfo{+Lower}, \@:  $ix, $code, $lower 
             unless $code eq $lower
-        push %CaseInfo{+Title}, \@( $ix, $code, $title )
+        push %CaseInfo{+Title}, \@:  $ix, $code, $title 
             unless $code eq $title
-        push %CaseInfo{+Upper}, \@( $ix, $code, $upper )
+        push %CaseInfo{+Upper}, \@:  $ix, $code, $upper 
             unless $code eq $upper
     
     close $in
@@ -1900,18 +1900,18 @@ sub SpecialCasing_txt()
         my $NormalCase = evalfile "To/$case.pl" || die "$^PROGRAM_NAME: $^EVAL_ERROR\n"
 
         my @OUT =
-            @(
-              $HEADER, "\n",
-              "# The key UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
-              "do \{\n",
-              "\%utf8::ToSpec$case =\n\%(\n",
-            )
+            @: 
+              $HEADER, "\n"
+              "# The key UTF-8 _bytes_, the value UTF-8 (speed hack)\n"
+              "do \{\n"
+              "\%utf8::ToSpec$case =\n\%(\n"
+            
 
         for my $prop (sort { $a->[0] <+> $b->[0] }, %CaseInfo{?$case})
-            my @($ix, $code, $to) =  $prop->@
+            my (@: $ix, $code, $to) =  $prop->@
             my $tostr =
                 join "", map { sprintf "\\x\{\%s\}", $_ }, split ' ', $to
-            push @OUT, sprintf qq["\%s" => "$tostr",\n], join("", map { sprintf "\\x[\%02X]", $_ }, @( unpack("U0C*", pack("U", $ix))))
+            push @OUT, sprintf qq["\%s" => "$tostr",\n], join("", map { sprintf "\\x[\%02X]", $_ }, (@:  unpack("U0C*", pack("U", $ix))))
             # Remove any single-character mappings for
             # the same character since we are going for
             # the special casing rules.
@@ -1923,7 +1923,7 @@ sub SpecialCasing_txt()
                     $NormalCase,
                     "END\n"
                     )
-        WriteIfChanged(\@("To","$case.pl"), @OUT)
+        WriteIfChanged(\(@: "To","$case.pl"), @OUT)
     
 
 
@@ -1945,7 +1945,7 @@ sub CaseFolding_txt()
         # Skip status 'S', simple case folding
         next unless m/^([0-9A-Fa-f]+)\s*;\s*([CFI])\s*;\s*([0-9A-Fa-f]+(?: [0-9A-Fa-f]+)*)\s*;/
 
-        my @($code, $status, $fold) = @(hex($1), $2, $3)
+        my (@: $code, $status, $fold) = @: hex($1), $2, $3
 
         if ($status eq 'C') # Common: one-to-one folding
             # No append() since several codes may fold into one.
@@ -1964,16 +1964,16 @@ sub CaseFolding_txt()
     my $CommonFold = evalfile "To/Fold.pl" || die "$^PROGRAM_NAME: To/Fold.pl: $^OS_ERROR\n"
 
     my @OUT =
-        @(
-        $HEADER, "\n",
-        "#  The ke UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
-        "do \{\n",
-        "\%utf8::ToSpecFold =\n\%(\n",
-        )
+        @: 
+        $HEADER, "\n"
+        "#  The ke UTF-8 _bytes_, the value UTF-8 (speed hack)\n"
+        "do \{\n"
+        "\%utf8::ToSpecFold =\n\%(\n"
+        
     for my $code (sort { $a <+> $b }, keys %Fold)
         my $foldstr =
             join "", map { sprintf "\\x\{\%s\}", $_ }, split ' ', %Fold{?$code}
-        push @OUT, sprintf qq["\%s" => "$foldstr",\n], join("", map { sprintf "\\x[\%02X]", $_ }, @( unpack("U0C*", pack("U", $code))))
+        push @OUT, sprintf qq["\%s" => "$foldstr",\n], join("", map { sprintf "\\x[\%02X]", $_ }, (@:  unpack("U0C*", pack("U", $code))))
     
     push @OUT, (
                 ");\n\};\n",
@@ -1982,7 +1982,7 @@ sub CaseFolding_txt()
                 "END\n",
                 )
 
-    WriteIfChanged(\@("To","Fold.pl"), @OUT)
+    WriteIfChanged(\(@: "To","Fold.pl"), @OUT)
 
 
 ## Do it....
@@ -2028,7 +2028,7 @@ if ( $FileList and $MakeList )
 # Input files:
 
 EOFHEADER
-    my @input=@("version",glob( <'*.txt'))
+    my @input=@: "version",glob( <'*.txt')
     for (@input
          +@+ @:"\n=================================\n"
                "# Output files:\n"
@@ -2038,15 +2038,15 @@ EOFHEADER
 
     require File::Find
     my $count=0
-    File::Find::find(\%(
-                     no_chdir=>1,
+    File::Find::find(\(%: 
+                     no_chdir=>1
                      wanted=>sub (@< @_)
                          if (m/\.pl$/)
                              s!^\./!!
                              print $ofh, "$_\n"
                              $count++
                          
-                     ,
+                                      
                      ),".")
 
     print $ofh, "\n# ",scalar(nelems @input)," input files\n",

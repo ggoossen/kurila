@@ -11,7 +11,7 @@ ok(1)
 
 # TMPNAM list context
 # Not strict posix behaviour
-my@($fh, $tmpnam) =  tmpnam()
+my(@: $fh, $tmpnam) =  tmpnam()
 
 print $^STDOUT, "# TMPNAM: in list context: $(dump::view($fh)) $tmpnam\n"
 

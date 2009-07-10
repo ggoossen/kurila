@@ -6,7 +6,7 @@ BEGIN { require "./test.pl"; }
 plan(tests => 66)
 
 use POSIX < qw(fcntl_h signal_h limits_h _exit getcwd open read strftime write
-	     errno);
+	     errno)
 
 
 $^OUTPUT_AUTOFLUSH = 1
@@ -133,7 +133,7 @@ SKIP: do
     my $lc = &POSIX::setlocale(&POSIX::LC_NUMERIC( < @_ ), 'C') if config_value('d_setlocale')
 
     # we're just checking that strtod works, not how accurate it is
-    my @($n, $x) =  &POSIX::strtod('3.14159_OR_SO')
+    my (@: $n, $x) =  &POSIX::strtod('3.14159_OR_SO')
     ok((abs("3.14159" - $n) +< 1e-6) && ($x == 6), 'strtod works')
 
     &POSIX::setlocale(&POSIX::LC_NUMERIC( < @_ ), $lc) if config_value('d_setlocale')
@@ -142,7 +142,7 @@ SKIP: do
 SKIP: do
     skip("strtol() not present", 2) unless config_value('d_strtol')
 
-    my @($n, $x) =  &POSIX::strtol('21_PENGUINS')
+    my (@: $n, $x) =  &POSIX::strtol('21_PENGUINS')
     is($n, 21, 'strtol() number')
     is($x, 9,  '         unparsed chars')
 
@@ -150,7 +150,7 @@ SKIP: do
 SKIP: do
     skip("strtoul() not present", 2) unless config_value('d_strtoul')
 
-    my @($n, $x) =  &POSIX::strtoul('88_TEARS')
+    my (@: $n, $x) =  &POSIX::strtoul('88_TEARS')
     is($n, 88, 'strtoul() number')
     is($x, 6,  '          unparsed chars')
 
@@ -193,7 +193,7 @@ try_strftime("Fri Mar 31 00:00:00 2000 091", 0,0,0, 31,2,100)
 &POSIX::setlocale(&POSIX::LC_TIME( < @_ ), $lc) if config_value("d_setlocale")
 
 do
-    for my $test (@(0, 1))
+    for my $test ((@: 0, 1))
         $^OS_ERROR = 0
         # POSIX::errno is autoloaded.
         # Autoloading requires many system calls.

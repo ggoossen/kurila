@@ -7,13 +7,13 @@ our @stat
 
 BEGIN 
     our $hasst
-    try { my @n = @(stat "TEST") }
+    try { my @n = (@: stat "TEST") }
     $hasst = 1 unless $^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/unimplemented/
     unless ($hasst) { plan skip_all => "no stat"; exit 0 }
     use Config
     $hasst = 0 unless config_value('i_sysstat') eq 'define'
     unless ($hasst) { plan skip_all => "no sys/stat.h"; exit 0 }
-    @stat = @(stat "TEST") # This is the function stat.
+    @stat = (@: stat "TEST") # This is the function stat.
     unless (@stat) { plan skip_all => "1..0 # Skip: no file TEST"; exit 0 }
 
 

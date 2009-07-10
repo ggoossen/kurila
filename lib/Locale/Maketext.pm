@@ -6,7 +6,7 @@ package Locale::Maketext
 our (@ISA, $VERSION, $MATCH_SUPERS, $USING_LANGUAGE_TAGS,
     $USE_LITERALS, $MATCH_SUPERS_TIGHTLY)
 use Carp ()
-use I18N::LangTags v0.30 ();
+use I18N::LangTags v0.30 ()
 
 #--------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ $USING_LANGUAGE_TAGS  = 1
 $USE_LITERALS = 1 unless defined $USE_LITERALS
 # a hint for compiling bracket-notation things.
 
-my %isa_scan = %( () )
+my %isa_scan = $%
 
 ###########################################################################
 
@@ -48,7 +48,7 @@ sub numerate($handle, $num, @< @forms)
 
     return '' unless (nelems @forms)
     if((nelems @forms) == 1) # only the headword form specified
-        return $s ?? @forms[0] !!  @(@forms[0] . 's') # very cheap hack.
+        return $s ?? @forms[0] !!  (@: @forms[0] . 's') # very cheap hack.
     else # sing and plural were specified
         return $s ?? @forms[0] !! @forms[1]
 
@@ -57,7 +57,7 @@ sub numerate($handle, $num, @< @forms)
 #--------------------------------------------------------------------------
 
 sub numf
-    my@($handle, $num) =  @_[[@(0,1)]]
+    my(@: $handle, $num) =  @_[[(@: 0,1)]]
     if($num +< 10_000_000_000 and $num +> -10_000_000_000 and $num == int($num))
         $num += 0  # Just use normal integer stringification.
     # Specifically, don't let %G turn ten million into 1E+007
@@ -96,15 +96,15 @@ sub language_tag
 
 sub encoding
     my $it = @_[0]
-    return @(
+    return (@: 
         (ref($it) && $it->{?'encoding'})
-        || "iso-8859-1"   # Latin-1
+            || "iso-8859-1"   # Latin-1
         )
 
 
 #--------------------------------------------------------------------------
 
-sub fallback_languages { return @('i-default', 'en', 'en-US') }
+sub fallback_languages { return (@: 'i-default', 'en', 'en-US') }
 
 sub fallback_language_classes { return () }
 
@@ -122,8 +122,8 @@ sub failure_handler_auto
     # Meant to be used like:
     #  $handle->fail_with('failure_handler_auto')
 
-    my@($handle, $phrase, @< @params) =  @_
-    $handle->{+'failure_lex'} ||= \%()
+    my(@: $handle, $phrase, @< @params) =  @_
+    $handle->{+'failure_lex'} ||= \$%
     my $lex = $handle->{?'failure_lex'}
 
     my $value
@@ -154,7 +154,7 @@ sub failure_handler_auto
 sub new
     # Nothing fancy!
     my $class = ref(@_[0]) || @_[0]
-    my $handle = bless \%(), $class
+    my $handle = bless \$%, $class
     $handle->init
     return $handle
 
@@ -167,7 +167,7 @@ sub maketext
     # Remember, this can fail.  Failure is controllable many ways.
     Carp::croak "maketext requires at least one parameter" unless (nelems @_) +> 1
 
-    my@($handle, $phrase) = @: splice(@_,0,2)
+    my(@: $handle, $phrase) = @: splice(@_,0,2)
 
     # Don't interefere with $@ in case that's being interpolated into the msg.
     local $^EVAL_ERROR
@@ -360,7 +360,7 @@ use Locale::Maketext::GutsLoader;
 
 ###########################################################################
 
-my %tried = %( () )
+my %tried = $%
 # memoization of whether we've used this module, or found it unusable.
 
 sub _try_use   # Basically a wrapper around "require Modulename"
@@ -396,7 +396,7 @@ sub _lex_refs  # report the lexicon references for this handle's class
     return %isa_scan{?$class} if exists %isa_scan{$class}  # memoization!
 
     my @lex_refs
-    my $seen_r = ref(@_[?1]) ?? @_[1] !! \%()
+    my $seen_r = ref(@_[?1]) ?? @_[1] !! \$%
 
     if( defined( Symbol::fetch_glob($class . '::Lexicon')->*{'HASH'} ))
         push @lex_refs, Symbol::fetch_glob($class . '::Lexicon')->*{'HASH'}
@@ -416,7 +416,7 @@ sub _lex_refs  # report the lexicon references for this handle's class
     return \@lex_refs
 
 
-sub clear_isa_scan { %isa_scan = %( () ); return; } # end on a note of simplicity!
+sub clear_isa_scan { %isa_scan = $%; return; } # end on a note of simplicity!
 
 ###########################################################################
 1

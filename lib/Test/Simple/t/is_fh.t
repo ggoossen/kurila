@@ -30,4 +30,4 @@ sub isa
     return 1 if $parent eq 'IO::Handle'
 
 
-main::ok( Test::Builder->is_fh(bless \%(), "Lying::isa"))
+main::ok( Test::Builder->is_fh(bless \$%, "Lying::isa"))

@@ -8,17 +8,16 @@ plan tests => 6
 
 ok 1
 
-use Pod::Simple::LinkSection;
-use Pod::Simple::BlackBox; # for its pretty()
+use Pod::Simple::LinkSection
+use Pod::Simple::BlackBox # for its pretty()
 
 my $bare_treelet =
-    \@('B', \%('pie' => 'no'),
-       'a',
-       \@('C', \%('bzrok' => 'plip'),
-        'b'
-       ),
-       'c'
-    )
+    \@: 'B', \(%: 'pie' => 'no')
+        'a'
+        \ @: 'C', \(%: 'bzrok' => 'plip')
+             'b'
+        'c'
+    
 
 my $treelet = Pod::Simple::LinkSection->new($bare_treelet)
 
@@ -34,7 +33,7 @@ is $treelet->stringify, 'abc'  # explicit
 
 print $^STDOUT, "# Testing non-coreferentiality...\n"
 do
-    my @stack = @($bare_treelet)
+    my @stack = @: $bare_treelet
     my $this
     while((nelems @stack))
         $this = shift @stack
@@ -45,7 +44,7 @@ do
             push @stack, splice $this->@
             push $this->@, ("BAD!") x 3
         elsif(ref($this || '') eq 'HASH')
-            $this->% = %( () )
+            $this->% = $%
         
     
     # These will fail if $treelet and $bare_treelet are coreferential,

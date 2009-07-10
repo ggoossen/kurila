@@ -33,18 +33,18 @@ $x = \*aa
 do { local $x->*->@;     @aa = qw/m n/; is("$(join ' ',@aa)","m n"); undef $x; is("$(join ' ',@aa)","m n"); }
 is("$(join ' ',@aa)","a b")
 
-%aa = %( < qw/a b/ )
-do { local %aa;     %aa = %( < qw/c d/ ); is(%aa{?c},"d"); }
+%aa = %:  < qw/a b/ 
+do { local %aa;     %aa = (%:  < qw/c d/ ); is(%aa{?c},"d"); }
 is(%aa{?a},"b")
-do { local %aa;   %aa = %( < qw/e f/ ); is(%aa{?e},"f"); }
+do { local %aa;   %aa = (%:  < qw/e f/ ); is(%aa{?e},"f"); }
 is(%aa{?a},"b")
-do { local Symbol::fetch_glob("aa")->*->%; %aa = %( < qw/g h/ ); is(%aa{?g},"h"); }
-is(%aa{?a},"b")
-$x = \*aa
-do { local $x->*->%;   %aa = %( < qw/i j/ ); is(%aa{?i},"j"); undef $x; is(%aa{?i},"j"); }
+do { local Symbol::fetch_glob("aa")->*->%; %aa = (%:  < qw/g h/ ); is(%aa{?g},"h"); }
 is(%aa{?a},"b")
 $x = \*aa
-do { local $x->*->%;     %aa = %( < qw/m n/ ); is(%aa{?m},"n"); undef $x; is(%aa{?m},"n"); }
+do { local $x->*->%;   %aa = (%:  < qw/i j/ ); is(%aa{?i},"j"); undef $x; is(%aa{?i},"j"); }
+is(%aa{?a},"b")
+$x = \*aa
+do { local $x->*->%;     %aa = (%:  < qw/m n/ ); is(%aa{?m},"n"); undef $x; is(%aa{?m},"n"); }
 is(%aa{?a},"b")
 
 sub test_err_localref ()
@@ -84,7 +84,7 @@ try { local $x->%; };    test_err_localref
 try { local $y->%; };      test_err_localref
 try { local $y->%; };    test_err_localref
 try { local (\%aa)->%; };  test_err_localref
-try { local (\%(a=>1))->%; };test_err_localref
+try { local (\%: a=>1)->%; };test_err_localref
 
 
 do
@@ -94,7 +94,7 @@ do
     $x = 0
     sub X::DESTROY { $ok = !ref($x); }
     do
-        local $x = \ bless \%(), 'X'
+        local $x = \ bless \$%, 'X'
         1
     
     ok($ok,'old value not visible during restore')

@@ -2,7 +2,7 @@
 
 BEGIN 
     chdir 't' if -d 't'
-    $^INCLUDE_PATH = @( '../lib' )
+    $^INCLUDE_PATH = @:  '../lib' 
 
 
 my $perl = $^EXECUTABLE_NAME
@@ -134,13 +134,13 @@ SKIP: do
             use vmsish < qw(time);
 
             $vmstime   = time
-            @vmslocal  = @( localtime($vmstime) )
-            @vmsgmtime = @( gmtime($vmstime) )
+            @vmslocal  = @:  localtime($vmstime) 
+            @vmsgmtime = @:  gmtime($vmstime) 
             $vmsmtime  = (stat $file)[[9]]
         
         $utctime   = time
-        @utclocal  = @( localtime($vmstime) )
-        @utcgmtime = @( gmtime($vmstime) )
+        @utclocal  = @:  localtime($vmstime) 
+        @utcgmtime = @:  gmtime($vmstime) 
         $utcmtime  = (stat $file)[[9]]
 
         $offset = env::var('SYS$TIMEZONE_DIFFERENTIAL')

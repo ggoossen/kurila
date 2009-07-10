@@ -30,7 +30,7 @@ crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf crlf
 __EOF__
 close($pod)
 
-use Pod::Html;
+use Pod::Html
 
 # --- CR ---
 

@@ -7,8 +7,8 @@
 package IO::Socket::UNIX
 
 our(@ISA, $VERSION)
-use IO::Socket;
-use Carp;
+use IO::Socket
+use Carp
 
 @ISA = qw(IO::Socket)
 $VERSION = "1.23"

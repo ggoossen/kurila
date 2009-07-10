@@ -1,14 +1,14 @@
 #!./perl
 
 $^OUTPUT_AUTOFLUSH  = 1
-use warnings;
+use warnings
 
-use Test::More tests => 54;
+use Test::More tests => 54
 
 BEGIN { use_ok( 'B' ); }
 
 
-package Testing::Symtable;
+package Testing::Symtable
 our ($This, @That, %wibble, $moo, %moo)
 my $not_a_sym = 'moo'
 
@@ -16,15 +16,15 @@ sub moo { 42 }
 sub car { 23 }
 
 
-package Testing::Symtable::Foo;
+package Testing::Symtable::Foo
 sub yarrow { "Hock" }
 
-package Testing::Symtable::Bar;
+package Testing::Symtable::Bar
 sub hock { "yarrow" }
 
-package main;
+package main
 our (%Subs)
-local %Subs = %( () )
+local %Subs = $%
 B::walksymtable(\%Testing::Symtable::, 'find_syms', sub (@< @_) { @_[0] =~ m/Foo/ },
                 'Testing::Symtable::')
 
@@ -139,7 +139,7 @@ is(B::cstring("wibble"), '"wibble"', "Testing B::cstring()")
 is(B::perlstring("wibble"), '"wibble"', "Testing B::perlstring()")
 is(B::perlstring("\n"), '"\n"', "Testing B::perlstring()")
 is(B::perlstring("\""), '"\""', "Testing B::perlstring()")
-is(B::class(bless \%(), "Wibble::Bibble"), "Bibble", "Testing B::class()")
+is(B::class(bless \$%, "Wibble::Bibble"), "Bibble", "Testing B::class()")
 is(B::cast_I32(3.14), 3, "Testing B::cast_I32()")
 is(B::opnumber("chop"), 35, "Testing opnumber with opname (chop)")
 

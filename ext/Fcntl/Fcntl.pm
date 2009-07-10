@@ -58,7 +58,7 @@ See L<perlfunc/stat> about the S_I* constants.
 our($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS)
 
 require Exporter
-use XSLoader ();
+use XSLoader ()
 @ISA = qw(Exporter)
 BEGIN 
     $VERSION = "1.06"
@@ -190,11 +190,11 @@ BEGIN
 	&S_ISWHT &S_ISENFMT &S_IFMT &S_IMODE
 )
 # Named groups of exports
-%EXPORT_TAGS = %(
-    'flock'   => qw(LOCK_SH LOCK_EX LOCK_NB LOCK_UN),
+%EXPORT_TAGS = (%: 
+    'flock'   => qw(LOCK_SH LOCK_EX LOCK_NB LOCK_UN)
     'Fcompat' => qw(FAPPEND FASYNC FCREAT FDEFER FDSYNC FEXCL FLARGEFILE
-		     FNDELAY FNONBLOCK FRSYNC FSYNC FTRUNC),
-    'seek'    => qw(SEEK_SET SEEK_CUR SEEK_END),
+		     FNDELAY FNONBLOCK FRSYNC FSYNC FTRUNC)
+    'seek'    => qw(SEEK_SET SEEK_CUR SEEK_END)
     'mode'    => qw(S_ISUID S_ISGID S_ISVTX S_ISTXT
 		     _S_IFMT S_IFREG S_IFDIR S_IFLNK
 		     S_IFSOCK S_IFBLK S_IFCHR S_IFIFO S_IFWHT S_ENFMT
@@ -206,7 +206,7 @@ BEGIN
 		     S_ISBLK S_ISCHR S_ISFIFO
 		     S_ISWHT S_ISENFMT		
 		     S_IFMT S_IMODE
-                  ),
+                  )
     )
 
 # Force the constants to become inlined
@@ -214,7 +214,7 @@ BEGIN
     XSLoader::load 'Fcntl', $VERSION
 
 
-sub S_IFMT  { (nelems @_) ??  @( @_[0] ^&^ _S_IFMT() ) !! _S_IFMT()  }
+sub S_IFMT  { (nelems @_) ??  (@:  @_[0] ^&^ _S_IFMT() ) !! _S_IFMT()  }
 sub S_IMODE { @_[0] ^&^ 07777 }
 
 sub S_ISREG    { ( @_[0] ^&^ _S_IFMT() ) == S_IFREG()   }

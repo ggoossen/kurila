@@ -2,12 +2,12 @@
 
 BEGIN 
     chdir 't' if -d 't'
-    $^INCLUDE_PATH = @( '../lib' )
+    $^INCLUDE_PATH = @:  '../lib' 
 
 
 BEGIN 
-    our @TEST = @( stat "TEST" )
-    our @README = @( stat "README" )
+    our @TEST = @:  stat "TEST" 
+    our @README = @:  stat "README" 
     unless ((nelems @TEST) && nelems @README)
         print $^STDOUT, "1..0 # Skip: no file TEST or README\n"
         exit 0
@@ -16,7 +16,7 @@ BEGIN
 
 print $^STDOUT, "1..13\n"
 
-use File::Compare < qw(compare compare_text);
+use File::Compare < qw(compare compare_text)
 
 print $^STDOUT, "ok 1\n"
 
@@ -77,7 +77,7 @@ try {
     require File::Temp; File::Temp->import( < qw/ :mktemp unlink0 /);
 
     my $template = File::Spec->catfile(File::Spec->tmpdir, 'fcmpXXXX');
-    my@($tfh,$filename) =  mkstemp($template);
+    my(@: $tfh,$filename) =  mkstemp($template);
     # NB. The trailing space is intentional (see [perl #37716])
     open my $tfhSP, ">", "$filename "
         or die "Could not open '$filename ' for writing: $^OS_ERROR";

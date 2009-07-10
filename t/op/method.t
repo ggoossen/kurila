@@ -10,15 +10,15 @@ BEGIN
 
 plan tests => 50
 
-@A::ISA = @( 'B' )
-@B::ISA = @( 'C' )
+@A::ISA = @:  'B' 
+@B::ISA = @:  'C' 
 
 sub C::d {"C::d"}
 sub D::d {"D::d"}
 
 # First, some basic checks of method-calling syntax:
 my $obj = bless \$@, "Pack"
-sub Pack::method { shift; join(",", @( "method", < @_)) }
+sub Pack::method { shift; join(",", (@:  "method", < @_)) }
 my $mname = "method"
 
 is(Pack->method("a","b","c"), "method,a,b,c")
@@ -40,7 +40,7 @@ is($obj->?$mname(), "method")
 is($obj->method, "method")
 is($obj->?$mname, "method")
 
-dies_like( sub (@< @_) { @(1, 2)->method() },
+dies_like( sub (@< @_) { (@: 1, 2)->method() },
            qr/Can't call method "method" on ARRAY/ )
 
 is( A->d, "C::d")		# Update hash table;
@@ -51,7 +51,7 @@ is(A->d, "D::d")		# Update hash table;
 do
     local @A::ISA = qw(C)	# Update hash table with split() assignment
     is(A->d, "C::d")
-    @A::ISA = @( 0 )
+    @A::ISA = @:  0 
     is(try { A->d } || "fail", "fail")
 
 is(A->d, "D::d")
@@ -85,7 +85,7 @@ do
     package A1
     sub foo { "foo" }
     package A2
-    our @ISA = @( 'A1' )
+    our @ISA = @:  'A1' 
     package main;
     is(A2->foo(), "foo")
     is(do { eval 'A2::foo()'; $^EVAL_ERROR ?? 1 !! 0}, 1)
@@ -117,7 +117,7 @@ is(do { eval 'UNIVERSAL->E::D::foo()';
 is(do { eval 'my $e = bless \%(), "UNIVERSAL"; $e->E::E::foo()';
        $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::E" (perhaps / ?? 1 !! $^EVAL_ERROR}, 1)
 
-my $e = bless \%(), "E::F"  # force package to exist
+my $e = bless \$%, "E::F"  # force package to exist
 is(do { eval 'UNIVERSAL->E::F::foo()';
        $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::F"/ ?? 1 !! $^EVAL_ERROR}, 1)
 is(do { eval '$e = bless \%(), "UNIVERSAL"; $e->E::F::foo()';
@@ -158,9 +158,9 @@ package Amajor
 sub test
     push @main::X, 'Amajor', < @_
 
-package Bminor;
-use base < qw(Amajor);
-package main;
+package Bminor
+use base < qw(Amajor)
+package main
 sub Bminor::test
     @_[0]->Bminor::SUPER::test('x', 'y')
     push @main::X, 'Bminor', < @_

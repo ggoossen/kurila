@@ -58,22 +58,21 @@ is($y, "old")
 $x = @: "aap"
         "noot"
 
-is(join("*", $x), q[aap*noot]);
+is(join("*", $x), q[aap*noot])
 
 # empty @:
-$x = @:
-
-is(join("*", $x), q[]);
+$x = $@
+is(join("*", $x), q[])
 
 # @: terminated by an "and"
-$x = @: or
-        $y = 1
+$x = $@or
+    $y = 1
 
 is(join("*", $x), q[])
 is($y, 1)
 
 # s/// seperared by statement end
-eval_dies_like(<<'EOE', qr/statement end found where string delimeter expected/);
+eval_dies_like(<<'EOE', qr/statement end found where string delimeter expected/)
 do
     s(foo)
     {bar}g
@@ -86,13 +85,13 @@ do
 =cut
     is $tmpvar, "aap"
 
-eval_dies_like(<<'EOE', qr/syntax error .* near "elsif/);
+eval_dies_like(<<'EOE', qr/syntax error .* near "elsif/)
 if ($a)
     1
     elsif { 2 }
 EOE
 
-eval_dies_like(<<'EOE', qr/wrong matching parens .* at end of line/);
+eval_dies_like(<<'EOE', qr/wrong matching parens .* at end of line/)
 if ($a)
     1
     $a[

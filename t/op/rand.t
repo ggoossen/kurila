@@ -31,7 +31,7 @@ sub bits($b)
     my $total
     my $bits = sprintf '%o', $b
     while (length $bits)
-        $total += @(0,1,1,2,1,2,2,3)[chop $bits]	# Oct to bits
+        $total += (@: 0,1,1,2,1,2,2,3)[chop $bits]	# Oct to bits
     
     $total
 

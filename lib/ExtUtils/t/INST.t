@@ -46,7 +46,7 @@ open $^STDOUT, '>>', \$stdout or die
 my $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
-    PREREQ_PM     => %(),
+    PREREQ_PM     => $%,
     PERL_CORE     => env::var('PERL_CORE'),
     )
 like( $stdout, qr{

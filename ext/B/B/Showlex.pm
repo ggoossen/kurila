@@ -2,9 +2,9 @@ package B::Showlex
 
 our $VERSION = '1.02'
 
-use B < qw(svref_2object comppadlist class);
-use B::Terse ();
-use B::Concise ();
+use B < qw(svref_2object comppadlist class)
+use B::Terse ()
+use B::Concise ()
 
 #
 # Invoke as

@@ -8,9 +8,9 @@ use Test::More
 # Since Perl 5.8.1 because otherwise hash ordering is really random.
 local $Data::Dumper::Sortkeys = 1
 
-use Data::Dumper;
-use Config;
-use utf8;
+use Data::Dumper
+use Config
+use utf8
 
 $Data::Dumper::Pad = "#"
 my $TMAX
@@ -62,23 +62,23 @@ $TMAX = 8; $XS = 0
 
 plan tests => $TMAX
 
-is Data::Dumper->Dump(\@('123xyz{$@%'), \qw(a)), '#$a = "123xyz\{\$\@\%";' . "\n"
-is Data::Dumper->Dump(\@(@('abc', 'def')), \@('a')), <<'====' 
+is Data::Dumper->Dump(\(@: '123xyz{$@%'), \qw(a)), '#$a = "123xyz\{\$\@\%";' . "\n"
+is Data::Dumper->Dump(\(@: (@: 'abc', 'def')), \(@: 'a')), <<'====' 
 #$a = @(
 #     "abc",
 #     "def"
 #     );
 ====
 
-is Data::Dumper->Dump(\@(undef), \@('a')), '#$a = undef;' . "\n" 
+is Data::Dumper->Dump(\(@: undef), \(@: 'a')), '#$a = undef;' . "\n" 
 
-is Data::Dumper->Dump(\@( bless \%( aap => 'noot' ), 'version' ), \@('a')), <<'===='
+is Data::Dumper->Dump(\(@:  bless \(%:  aap => 'noot' ), 'version' ), \(@: 'a')), <<'===='
 #$a = bless( \%(
 #              "aap" => "noot"
 #            ), "version" );
 ====
 
-is Data::Dumper->Dump(\@(%( aap => 'noot' )), \@('*mies')), <<'===='
+is Data::Dumper->Dump(\(@: (%:  aap => 'noot' )), \(@: '*mies')), <<'===='
 #%mies = %(
 #        "aap" => "noot"
 #        );
@@ -88,10 +88,10 @@ is Data::Dumper->Dump(\@(%( aap => 'noot' )), \@('*mies')), <<'===='
 #############
 #############
 
-@c = @("c")
+@c = @: "c"
 $c = \@c
-$b = \%()
-$a = \@(1, $b, $c)
+$b = \$%
+$a = \@: 1, $b, $c
 $b->{+a} = $a
 $b->{+b} = $a->[1]
 $b->{+c} = $a->[2]

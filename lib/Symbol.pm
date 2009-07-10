@@ -156,7 +156,7 @@ sub delete_package($pkg)
         $pkg .= '::'            unless  $pkg =~ m/::$/
     
 
-    my@($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/
+    my(@: $stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/
     my $stem_symtab = Symbol::stash($stem)
     return unless defined $stem_symtab and exists $stem_symtab->{$leaf}
 
@@ -170,7 +170,7 @@ sub delete_package($pkg)
 
     # delete the symbol table
 
-    $leaf_symtab->% = %( () )
+    $leaf_symtab->% = $%
     delete $stem_symtab->{$leaf}
 
 

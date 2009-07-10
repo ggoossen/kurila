@@ -62,7 +62,7 @@ like( $mpl_out, qr/^Current package is: main$/m,
 ok( -e $makefile,       'Makefile exists' )
 
 # -M is flakey on VMS
-my $mtime = @(stat($makefile))[9]
+my $mtime = (@: stat($makefile))[9]
 cmp_ok( $Touch_Time, '+<=', $mtime,  '  its been touched' )
 
 END { unlink makefile_name(), makefile_backup() }
@@ -133,7 +133,7 @@ like( $install_out, qr/^Installing /m )
 like( $install_out, qr/^Writing /m )
 
 ok( -r '../dummy-install',     '  install dir created' )
-my %files = %( () )
+my %files = $%
 find( sub (@< @_)
           # do it case-insensitive for non-case preserving OSs
           my $file = lc $_
@@ -159,7 +159,7 @@ SKIP: do
     like( $install_out, qr/^Writing /m )
 
     ok( -r 'elsewhere',     '  install dir created' )
-    %files = %( () )
+    %files = $%
     find( sub (@< @_) { %files{+$_} = $File::Find::name; }, 'elsewhere' )
     ok( %files{?'Dummy.pm'},     '  Dummy.pm installed' )
     ok( %files{?'Liar.pm'},      '  Liar.pm installed'  )
@@ -180,7 +180,7 @@ SKIP: do
     like( $install_out, qr/^Writing /m )
 
     ok( -d 'other',  '  destdir created' )
-    %files = %( () )
+    %files = $%
     my $perllocal
     find( sub (@< @_)
               %files{+$_} = $File::Find::name
@@ -222,7 +222,7 @@ SKIP: do
 
     ok( !-d 'elsewhere',       '  install dir not created' )
     ok( -d 'other/elsewhere',  '  destdir created' )
-    %files = %( () )
+    %files = $%
     find( sub (@< @_) { %files{+$_} = $File::Find::name; }, 'other/elsewhere' )
     ok( %files{?'Dummy.pm'},     '  Dummy.pm installed' )
     ok( %files{?'Liar.pm'},      '  Liar.pm installed'  )
@@ -257,7 +257,7 @@ ok( -f $meta_yml,    'META.yml written to dist dir' )
 ok( !-e "META_new.yml", 'temp META.yml file not left around' )
 
 ok open my $metafh, "<", $meta_yml or diag $^OS_ERROR
-my $meta = join '', @( ~< \$metafh->*)
+my $meta = join '', @:  ~< \$metafh->*
 ok close $metafh
 
 is $meta, <<"END"
@@ -318,7 +318,7 @@ close $saverr
 sub _normalize
     my $hash = shift
 
-    while(my@(?$k,?$v) =@( each $hash->%))
+    while(my(@: ?$k,?$v) =(@:  each $hash->%))
         delete $hash->{$k}
         $hash->{+lc $k} = $v
     

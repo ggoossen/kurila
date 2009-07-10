@@ -22,8 +22,8 @@ $VERSION      = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/)
 #-----------------------------------------------------------------------
 #	Private Global Variables
 #-----------------------------------------------------------------------
-my %CODES      = %( () )
-my %CURRENCIES = %( () )
+my %CODES      = $%
+my %CURRENCIES = $%
 
 
 #=======================================================================
@@ -102,7 +102,7 @@ do
     while ( ~< $^DATA)
         next unless m/\S/
         chop
-        @($code, $currency) =  split(m/:/, $_, 2)
+        (@: $code, $currency) =  split(m/:/, $_, 2)
         %CODES{+$code} = $currency
         %CURRENCIES{+lc "$currency"} = $code
     

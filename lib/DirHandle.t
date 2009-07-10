@@ -23,7 +23,7 @@ my $first
 loop { $first = $dot->readdir } while defined($first) && $first =~ m/^\./
 ok(grep { $_ eq $first }, @a)
 
-my @b = sort( @($first, (< grep {m/^[^.]/}, $dot->readdirs)))
+my @b = sort( (@: $first, (< grep {m/^[^.]/}, $dot->readdirs)))
 is(join("\0", @a), join("\0", @b))
 
 $dot->rewind

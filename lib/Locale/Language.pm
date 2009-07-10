@@ -21,8 +21,8 @@ $VERSION      = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/)
 #-----------------------------------------------------------------------
 #	Private Global Variables
 #-----------------------------------------------------------------------
-my %CODES     = %( () )
-my %LANGUAGES = %( () )
+my %CODES     = $%
+my %LANGUAGES = $%
 
 
 #=======================================================================
@@ -101,7 +101,7 @@ do
     while ( ~< $^DATA)
         next unless m/\S/
         chop
-        @($code, $language) =  split(m/:/, $_, 2)
+        (@: $code, $language) =  split(m/:/, $_, 2)
         %CODES{+$code} = $language
         %LANGUAGES{+lc "$language"} = $code
     

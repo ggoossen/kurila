@@ -15,13 +15,13 @@ sub PROTECTED  () { 2**3  }
 my $Fattr = \%fields::attr
 
 sub has_fields
-    my@($base) =@( shift)
+    my(@: $base) =@:  shift
     my $fglob = Symbol::fetch_glob("$base\::FIELDS")
     return ($fglob && 'GLOB' eq ref($fglob) && $fglob->*{HASH}) ?? 1 !! 0
 
 
 sub has_version
-    my@($base) =@( shift)
+    my(@: $base) =@:  shift
     my $vglob = Symbol::fetch_glob($base.'::VERSION')
     return ($vglob && $vglob->*{SCALAR}) ?? 1 !! 0
 
@@ -33,7 +33,7 @@ sub has_attr
 
 
 sub get_attr
-    $Fattr->{+@_[0]} = \@(1) unless $Fattr->{?@_[0]}
+    $Fattr->{+@_[0]} = \(@: 1) unless $Fattr->{?@_[0]}
     return $Fattr->{?@_[0]}
 
 
@@ -63,7 +63,7 @@ sub import_into
             warn "Class '$inheritor' tried to inherit from itself\n"
         
 
-        next if grep { $_->isa($base) }, @( ($inheritor, < @bases))
+        next if grep { $_->isa($base) }, @:  ($inheritor, < @bases)
 
         do
             eval "require $base"
@@ -121,7 +121,7 @@ END
     # ones to the derived class.  Hang on to the original attribute
     # (Public, Private, etc...) and add Inherited.
     # This is all too complicated to do efficiently with add_fields().
-    while (my@(?$k,?$v) =@( each $bfields->%))
+    while (my(@: ?$k,?$v) =(@:  each $bfields->%))
         my $fno
         if ($fno = $dfields->{?$k} and $fno != $v)
             die("Inherited fields can't override existing fields")

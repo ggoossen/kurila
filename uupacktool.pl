@@ -22,7 +22,7 @@ sub handle_file
     my $file    = shift or die "Need file\n". usage()
     my $outfile = shift || ''
     $file = vms_check_name($file) if $^OS_NAME eq 'VMS'
-    my $mode    = @(stat($file))[2] ^&^ 07777
+    my $mode    = (@: stat($file))[2] ^&^ 07777
 
     open my $fh, "<", $file
         or do { warn "Could not open input file $file: $^OS_ERROR"; exit 0 }
@@ -35,7 +35,7 @@ sub handle_file
             $outfile = $file
             $outfile =~ s/\.packed\z//
         
-        my @($head, $body) =  split m/__UU__\n/, $str
+        my (@: $head, $body) =  split m/__UU__\n/, $str
         die "Can't unpack malformed data in '$file'\n"
             if !$head
         $outstr = unpack 'u', $body
@@ -99,7 +99,7 @@ sub bulk_process
     my $lines = 0
     while( my $line = ~< $fh )
         chomp $line
-        my @($file, ...) =  split m/\s+/, $line
+        my (@: $file, ...) =  split m/\s+/, $line
 
         $lines++
 
@@ -113,7 +113,7 @@ sub bulk_process
 
         ### unpack
         if( !$opts->{?'c'} )
-            @( $out, $file ) = @( $file, $out ) if $opts->{?'p'}
+            (@:  $out, $file ) = (@:  $file, $out ) if $opts->{?'p'}
             if (-e $out)
                 my $changed = -M _
                 if ($changed +< $LastUpdate and $changed +< -M $file)
@@ -181,7 +181,7 @@ sub vms_check_name
     $file = VMS::Filespec::vmsify($file)
     return $file if -e $file
 
-    my @($vol,$dirs,$base) =  File::Spec->splitpath($file)
+    my (@: $vol,$dirs,$base) =  File::Spec->splitpath($file)
     my $tmp = $base
     1 while $tmp =~ s/([^\.]+)\.(.+\..+)/$1_$2/
     my $try = File::Spec->catpath($vol, $dirs, $tmp)
@@ -195,7 +195,7 @@ sub vms_check_name
     return $file
 
 
-my $opts = \%()
+my $opts = \$%
 GetOptions($opts,'u','p','c', 'D', 'm:s','s','d=s','v','h')
 
 die "Can't pack and unpack at the same time!\n", < usage()

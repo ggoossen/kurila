@@ -24,7 +24,7 @@ is( $object, $object2, 'Class is a singleton' )
 ############
 # Main Tests
 
-my $struct = \@( 1, $object, 3 )
+my $struct = \(@:  1, $object, 3 )
 
 # Freeze the struct
 my $frozen = Storable::freeze( $struct )
@@ -52,14 +52,14 @@ my $SINGLETON = undef
 
 sub new
     $SINGLETON or
-        $SINGLETON = bless \%( value => 'Hello World!' ), @_[0]
+        $SINGLETON = bless \(%:  value => 'Hello World!' ), @_[0]
 
 
 sub STORABLE_freeze($self, ...)
 
     # We don't actually need to return anything, but provide a null string
     # to avoid the null-list-return behaviour.
-    return  @('foo')
+    return  @: 'foo'
 
 
 sub STORABLE_attach($class, $clone, $string)

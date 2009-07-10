@@ -29,9 +29,9 @@ package Pod::Man
 use utf8
 our (@ISA, %ESCAPES, $PREAMBLE, $VERSION)
 
-use Carp < qw(croak);
-use Pod::Simple ();
-use POSIX < qw(strftime);
+use Carp < qw(croak)
+use Pod::Simple ()
+use POSIX < qw(strftime)
 
 @ISA = qw(Pod::Simple)
 
@@ -92,7 +92,7 @@ sub new
     # to put them in our object as hash keys and values.  This could cause
     # problems if we ever clash with Pod::Simple's own internal class
     # variables.
-    $self->% = %(< $self->%, < @_)
+    $self->% = (%: < $self->%, < @_)
 
     # Initialize various other internal constants based on our arguments.
     $self->init_fonts
@@ -138,12 +138,12 @@ sub init_fonts($self)
 
     # Set up a table of font escapes.  First number is fixed-width, second is
     # bold, third is italic.
-    $self->{+FONTS} = \%( '000' => '\fR', '001' => '\fI',
-        '010' => '\fB', '011' => '\f(BI',
-        '100' => toescape ($self->{?fixed}),
-        '101' => toescape ($self->{?fixeditalic}),
-        '110' => toescape ($self->{?fixedbold}),
-        '111' => toescape ($self->{?fixedbolditalic}) )
+    $self->{+FONTS} = \(%:  '000' => '\fR', '001' => '\fI'
+                            '010' => '\fB', '011' => '\f(BI'
+                            '100' => toescape ($self->{?fixed})
+                            '101' => toescape ($self->{?fixeditalic})
+                            '110' => toescape ($self->{?fixedbold})
+                            '111' => toescape ($self->{?fixedbolditalic}) )
 
 
 # Initialize the quotes that we'll be using for C<> text.  This requires some
@@ -151,7 +151,7 @@ sub init_fonts($self)
 # that the quotes will be safe against *roff.  Sets the internal hash keys
 # LQUOTE and RQUOTE.
 sub init_quotes
-    my @($self) = @(< @_)
+    my (@: $self) = @: < @_
 
     $self->{+quotes} ||= '"'
     if ($self->{?quotes} eq 'none')
@@ -251,7 +251,7 @@ sub _handle_element_start($self, $element, $attrs)
         # on, so this can be strictly inherited.
         my $formatting = $self->{PENDING}->[-1]->[?1]
         $formatting = $self->formatting ($formatting, $element)
-        push ( $self->{PENDING}->@, \@( $attrs, $formatting, '' ))
+        push ( $self->{PENDING}->@, \(@:  $attrs, $formatting, '' ))
         DEBUG +> 4 and print $^STDOUT, "Pending: [", < pretty ($self->{?PENDING}), "]\n"
     elsif ($self->can ("start_$method"))
         my $method = 'start_' . $method
@@ -305,9 +305,9 @@ sub _handle_element_end($self, $element)
 sub formatting($self, $current, $element)
     my %options
     if ($current)
-        %options = %( < $current->% )
+        %options = %:  < $current->% 
     else
-        %options = %(guesswork => 1, cleanup => 1, convert => 1)
+        %options = %: guesswork => 1, cleanup => 1, convert => 1
     
     if ($element eq 'Data')
         %options{+guesswork} = 0
@@ -429,7 +429,7 @@ sub guesswork
         ( [a-zA-Z\']+ ) (?= [\)\".?!,;:]* (?:\s|\Z|\\\ ) )
         \b
     } {$( do {
-        my @($prefix, $hyphen, $main, $suffix) = @($1, $2, $3, $4);
+        my (@: $prefix, $hyphen, $main, $suffix) = (@: $1, $2, $3, $4);
         $hyphen ||= '';
         $main =~ s/\\-/-/g;
         $prefix . $hyphen . $main . $suffix;
@@ -547,8 +547,8 @@ sub guesswork
 # outside font is always the "previous" font and end with \fP instead of \fR.
 # Idea from Zack Weinberg.
 sub mapfonts($self, $text)
-    my @($fixed, $bold, $italic) = @(0, 0, 0)
-    my %magic = %(F => \$fixed, B => \$bold, I => \$italic)
+    my (@: $fixed, $bold, $italic) = @: 0, 0, 0
+    my %magic = %: F => \$fixed, B => \$bold, I => \$italic
     my $last = '\fR'
     $text =~ s#
         \\f\((.)(.)
@@ -575,8 +575,8 @@ sub mapfonts($self, $text)
 # around this, use a separate textmapfonts for text blocks where the default
 # font is always R and only use the smart mapfonts for headings.
 sub textmapfonts($self, $text)
-    my @($fixed, $bold, $italic) = @(0, 0, 0)
-    my %magic = %(F => \$fixed, B => \$bold, I => \$italic)
+    my (@: $fixed, $bold, $italic) = @: 0, 0, 0
+    my %magic = %: F => \$fixed, B => \$bold, I => \$italic
     $text =~ s#
         \\f\((.)(.)
     #$( do {
@@ -602,7 +602,7 @@ sub switchquotes($self, $command, $text, ?$extra)
     # Also separate troff from nroff if there are any fixed-width fonts in use
     # to work around problems with Solaris nroff.
     my $c_is_quote = ($self->{?LQUOTE} =~ m/\"/) || ($self->{?RQUOTE} =~ m/\"/)
-    my $fixedpat = join '|',  $self->{FONTS}->{[@('100', '101', '110', '111')]}
+    my $fixedpat = join '|',  $self->{FONTS}->{[(@: '100', '101', '110', '111')]}
     $fixedpat =~ s/\\/\\\\/g
     $fixedpat =~ s/\(/\\\(/g
     if ($text =~ m/\"/ || $text =~ m/$fixedpat/)
@@ -676,17 +676,17 @@ sub outindex($self, ?$section, ?$index)
     # pass in their own section.  Undo some *roff formatting on headings.
     my @output
     if ((nelems @entries))
-        push @output, \@( 'Xref', join (' ', @entries) )
+        push @output, \@:  'Xref', join (' ', @entries) 
     
     if ($section)
         $index =~ s/\\-/-/g
         $index =~ s/\\(?:s-?\d|.\(..|.)//g
-        push @output, \@( $section, $index )
+        push @output, \(@:  $section, $index )
     
 
     # Print out the .IX commands.
     for ( @output)
-        my @($type, $entry) =  $_->@
+        my (@: $type, $entry) =  $_->@
         $entry =~ s/\"/\"\"/g
         $self->output (".IX $type " . '"' . $entry . '"' . "\n")
     
@@ -716,7 +716,7 @@ sub start_document($self, $attrs, _)
         $name = $self->{?name}
         $section = $self->{?section} || 1
     else
-        @($name, $section) =  $self->devise_title
+        (@: $name, $section) =  $self->devise_title
     
     my $date = $self->{?date} || $self->devise_date
     $self->preamble ($name, $section, $date)
@@ -731,7 +731,7 @@ sub start_document($self, $attrs, _)
     $self->{+ITEMTYPES} = \$@     # Stack of =item types, one per list.
     $self->{+SHIFTWAIT} = 0      # Whether there is a shift waiting.
     $self->{+SHIFTS}    = \$@     # Stack of .RS shifts.
-    $self->{+PENDING}   = \@(\$@)   # Pending output.
+    $self->{+PENDING}   = \(@: \$@)   # Pending output.
 
 
 # Handle the end of the document.  This does nothing but print out a final
@@ -771,7 +771,7 @@ sub devise_title($self)
         $name = uc File::Basename::basename ($name)
     else
         require File::Spec
-        my @($volume, $dirs, $file) =  File::Spec->splitpath ($name)
+        my (@: $volume, $dirs, $file) =  File::Spec->splitpath ($name)
         my @dirs = File::Spec->splitdir ($dirs)
         my $cut = 0
         for my $i (0 .. nelems(@dirs) -1)
@@ -792,9 +792,9 @@ sub devise_title($self)
 
         # Remove empty directories when building the module name; they
         # occur too easily on Unix by doubling slashes.
-        $name = join ('::', @( (< grep { $_ ?? $_ !! () }, @dirs), $file))
+        $name = join ('::', (@:  (< grep { $_ ?? $_ !! () }, @dirs), $file))
     
-    return  @($name, $section)
+    return  (@: $name, $section)
 
 
 # Determine the modification date and return that, properly formatted in ISO
@@ -806,7 +806,7 @@ sub devise_date($self)
     my $input = $self->source_filename
     my $time
     if ($input)
-        $time = @(stat $input)[?9] || time
+        $time = (@: stat $input)[?9] || time
     else
         $time = time
     
@@ -830,7 +830,7 @@ sub preamble($self, $name, $section, $date)
 
     # If name or section contain spaces, quote them (section really never
     # should, but we may as well be cautious).
-    for (@($name, $section))
+    for ((@: $name, $section))
         if (m/\s/)
             s/\"/\"\"/g
             $_ = '"' . $_ . '"'
@@ -1230,24 +1230,24 @@ sub parse_from_filehandle
 #
 # This only works in an ASCII world.  What to do in a non-ASCII world is very
 # unclear.
-%ESCAPES{[0xA0 .. 0xFF]} = @(
-    "\\ ", undef, undef, undef,            undef, undef, undef, undef,
-    undef, undef, undef, undef,            undef, "\\\%", undef, undef,
+%ESCAPES{[0xA0 .. 0xFF]} = (@: 
+    "\\ ", undef, undef, undef,            undef, undef, undef, undef
+    undef, undef, undef, undef,            undef, "\\\%", undef, undef
 
-    undef, undef, undef, undef,            undef, undef, undef, undef,
-    undef, undef, undef, undef,            undef, undef, undef, undef,
+    undef, undef, undef, undef,            undef, undef, undef, undef
+    undef, undef, undef, undef,            undef, undef, undef, undef
 
-    "A\\*`",  "A\\*'", "A\\*^", "A\\*~",   "A\\*:", "A\\*o", "\\*(AE", "C\\*,",
-    "E\\*`",  "E\\*'", "E\\*^", "E\\*:",   "I\\*`", "I\\*'", "I\\*^",  "I\\*:",
+    "A\\*`",  "A\\*'", "A\\*^", "A\\*~",   "A\\*:", "A\\*o", "\\*(AE", "C\\*,"
+    "E\\*`",  "E\\*'", "E\\*^", "E\\*:",   "I\\*`", "I\\*'", "I\\*^",  "I\\*:"
 
-    "\\*(D-", "N\\*~", "O\\*`", "O\\*'",   "O\\*^", "O\\*~", "O\\*:",  undef,
-    "O\\*/",  "U\\*`", "U\\*'", "U\\*^",   "U\\*:", "Y\\*'", "\\*(Th", "\\*8",
+    "\\*(D-", "N\\*~", "O\\*`", "O\\*'",   "O\\*^", "O\\*~", "O\\*:",  undef
+    "O\\*/",  "U\\*`", "U\\*'", "U\\*^",   "U\\*:", "Y\\*'", "\\*(Th", "\\*8"
 
-    "a\\*`",  "a\\*'", "a\\*^", "a\\*~",   "a\\*:", "a\\*o", "\\*(ae", "c\\*,",
-    "e\\*`",  "e\\*'", "e\\*^", "e\\*:",   "i\\*`", "i\\*'", "i\\*^",  "i\\*:",
+    "a\\*`",  "a\\*'", "a\\*^", "a\\*~",   "a\\*:", "a\\*o", "\\*(ae", "c\\*,"
+    "e\\*`",  "e\\*'", "e\\*^", "e\\*:",   "i\\*`", "i\\*'", "i\\*^",  "i\\*:"
 
-    "\\*(d-", "n\\*~", "o\\*`", "o\\*'",   "o\\*^", "o\\*~", "o\\*:",  undef,
-    "o\\*/" , "u\\*`", "u\\*'", "u\\*^",   "u\\*:", "y\\*'", "\\*(th", "y\\*:",
+    "\\*(d-", "n\\*~", "o\\*`", "o\\*'",   "o\\*^", "o\\*~", "o\\*:",  undef
+    "o\\*/" , "u\\*`", "u\\*'", "u\\*^",   "u\\*:", "y\\*'", "\\*(th", "y\\*:"
     ) if ASCII
 
 # Make sure that at least this works even outside of ASCII.

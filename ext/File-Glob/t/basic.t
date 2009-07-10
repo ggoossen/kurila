@@ -12,7 +12,7 @@ for (qw(BASH_ENV CDPATH ENV IFS))
     env::var($_) = undef
 my @correct = $@
 if (opendir(my $d, $^OS_NAME eq "MacOS" ?? ":" !! "."))
-    @correct = grep { !m/^\./ }, sort @( readdir($d))
+    @correct = grep { !m/^\./ }, sort @:  readdir($d)
     closedir $d
 
 my @a = File::Glob::bsd_glob("*", 0)
@@ -30,7 +30,7 @@ SKIP: do
     skip $^OS_NAME, 1 if $^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'VMS'
       || $^OS_NAME eq 'os2' || $^OS_NAME eq 'beos'
     skip "Can't find user for $^EUID: $^EVAL_ERROR", 1 unless try {
-        @($name, $home) =  @(getpwuid($^EUID))[[@:0,7]];
+        (@: $name, $home) =  (@: getpwuid($^EUID))[[@:0,7]];
         1;
     }
     skip "$^EUID has no home directory", 1
@@ -41,7 +41,7 @@ SKIP: do
     if (GLOB_ERROR)
         fail(GLOB_ERROR)
     else
-        is_deeply (\@a, \@($home))
+        is_deeply (\@a, \(@: $home))
     
 
 
@@ -51,7 +51,7 @@ SKIP: do
 if (GLOB_ERROR)
     fail(GLOB_ERROR)
 else
-    is_deeply(\@a, \@('TEST'))
+    is_deeply(\@a, \(@: 'TEST'))
 
 
 # check nonexistent checks
@@ -83,7 +83,7 @@ SKIP: do
 
 # check for csh style globbing
 @a = bsd_glob('{a,b}', GLOB_BRACE ^|^ GLOB_NOMAGIC)
-is_deeply(\@a, \@('a', 'b'))
+is_deeply(\@a, \(@: 'a', 'b'))
 
 @a = bsd_glob(
     '{TES?,doesntexist*,a,b}',
@@ -97,14 +97,14 @@ is_deeply(\@a, \@('a', 'b'))
 
 print $^STDOUT, "# $(join ' ',@a)\n"
 
-is_deeply(\@a, \@(($^OS_NAME eq 'VMS'?? 'test.' !! 'TEST'), 'a', 'b'))
+is_deeply(\@a, \(@: ($^OS_NAME eq 'VMS'?? 'test.' !! 'TEST'), 'a', 'b'))
 
 # "~" should expand to $ENV{HOME}
 env::var('HOME' ) = "sweet home"
 @a = bsd_glob('~', GLOB_TILDE ^|^ GLOB_NOMAGIC)
 SKIP: do
     skip $^OS_NAME, 1 if $^OS_NAME eq "MacOS"
-    is_deeply(\@a, \@(env::var('HOME')))
+    is_deeply(\@a, \(@: env::var('HOME')))
 
 
 # GLOB_ALPHASORT (default) should sort alphabetically regardless of case
@@ -159,7 +159,7 @@ do
         or die "Could not chdir to $dir: $^OS_ERROR"
     my @glob_files = glob('a*{d[e]}j')
     local $TODO = "home-made glob doesn't do regexes" if $^OS_NAME eq 'VMS'
-    is_deeply(\@glob_files, \@('a_dej'))
+    is_deeply(\@glob_files, \(@: 'a_dej'))
     chdir $cwd
         or die "Could not chdir back to $cwd: $^OS_ERROR"
 

@@ -30,9 +30,9 @@ sub import
     return unless (nelems @_)
     my $package = caller(0)
     # avoid possible typo warnings
-    Symbol::fetch_glob("$package\::FIELDS")->*->% = %( () ) unless Symbol::fetch_glob("$package\::FIELDS")->*->%
+    Symbol::fetch_glob("$package\::FIELDS")->*->% = $% unless Symbol::fetch_glob("$package\::FIELDS")->*->%
     my $fields = \Symbol::fetch_glob("$package\::FIELDS")->*->%
-    my $fattr = (%attr{+$package} ||= \@(1))
+    my $fattr = (%attr{+$package} ||= \(@: 1))
     my $next = (nelems $fattr->@)
 
     # Quiet pseudo-hash deprecation warning for uses of fields::new.
@@ -104,7 +104,7 @@ sub new
     my $class = shift
     $class = ref $class if ref $class
     require Hash::Util
-    my $self = bless \%(), $class
+    my $self = bless \$%, $class
 
     # The lock_keys() prototype won't work since we require Hash::Util :(
     &Hash::Util::lock_keys(\$self->%, < _accessible_keys($class))
@@ -112,10 +112,10 @@ sub new
 
 
 sub _accessible_keys($class)
-    return  @( <
-               keys Symbol::fetch_glob($class.'::FIELDS')->*->%,
-               < @+: map( { _accessible_keys($_) }, Symbol::fetch_glob($class.'::ISA')->*->@),
-        )
+    return  @:  <
+                    keys Symbol::fetch_glob($class.'::FIELDS')->*->%
+                < @+: map( { _accessible_keys($_) }, Symbol::fetch_glob($class.'::ISA')->*->@)
+        
 
 
 sub phash

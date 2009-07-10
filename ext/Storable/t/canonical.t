@@ -40,8 +40,8 @@ if ($debugging)
     our $gotdd  = !$^EVAL_ERROR
 
 
-our @fixed_strings = @("January", "February", "March", "April", "May", "June",
-                       "July", "August", "September", "October", "November", "December" )
+our @fixed_strings = (@: "January", "February", "March", "April", "May", "June"
+                         "July", "August", "September", "October", "November", "December" )
 
 # Build some arbitrarily complex data structure starting with a top level hash
 # (deeper levels contain scalars, references to hashes or references to arrays);
@@ -50,12 +50,12 @@ our (%a1, %a2)
 for my $i (0 .. $hashsize -1)
     my $k = int(rand(1_000_000))
     $k = MD5->hexhash($k) if $gotmd5 and int(rand(2))
-    %a1{+$k} = \%( key => "$k", "value" => $i )
+    %a1{+$k} = \(%:  key => "$k", "value" => $i )
 
     # A third of the elements are references to further hashes
 
     if (int(rand(1.5)))
-        my $hash2 = \%()
+        my $hash2 = \$%
         my $hash2size = int(rand($maxhash2size))
         while ($hash2size--)
             my $k2 = $k . $i . int(rand(100))
@@ -79,7 +79,7 @@ print $^STDERR, < Data::Dumper::Dumper(\%a1) if ($verbose and $gotdd)
 # Copy the hash, element by element in order of the keys
 
 foreach my $k (sort keys %a1)
-    %a2{+$k} = \%( key => "$k", "value" => %a1{$k}->{?value} )
+    %a2{+$k} = \(%:  key => "$k", "value" => %a1{$k}->{?value} )
 
 
 # Deep clone the hash
@@ -122,7 +122,7 @@ ok 5, ($x1 ne $x2) || ($x1 ne $x3)
 # Ensure refs to "undef" values are properly shared
 # Same test as in t/dclone.t to ensure the "canonical" code is also correct
 
-my $hash = \%:
+my $hash = \$%
 push $hash->%{+''}, \$hash->%{+a}
 ok 6, $hash->%{''}[0] \== \$hash->%{+a}
 

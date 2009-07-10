@@ -49,7 +49,7 @@ open $^STDOUT, '>>', \$stdout or die
 my $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
-    PREREQ_PM     => %(),
+    PREREQ_PM     => $%,
     PERL_CORE     => env::var('PERL_CORE'),
     )
 
@@ -78,7 +78,7 @@ my $PREFIX = File::Spec->catdir('foo', 'bar')
 $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
-    PREREQ_PM     => %(),
+    PREREQ_PM     => $%,
     PERL_CORE     => env::var('PERL_CORE'),
     PREFIX        => $PREFIX,
     )
@@ -154,7 +154,7 @@ do
     my $mm = WriteMakefile(
         NAME          => 'Big::Dummy',
         VERSION_FROM  => 'lib/Big/Dummy.pm',
-        PREREQ_PM     => %(),
+        PREREQ_PM     => $%,
         PERL_CORE     => env::var('PERL_CORE'),
         PREFIX        => $PREFIX,
         INSTALLMAN1DIR=> $wibble,
@@ -175,7 +175,7 @@ do
     my $mm = WriteMakefile(
         NAME          => 'Big::Dummy',
         VERSION_FROM  => 'lib/Big/Dummy.pm',
-        PREREQ_PM     => %(),
+        PREREQ_PM     => $%,
         PERL_CORE     => env::var('PERL_CORE'),
 
         # In case the local installation doesn't have man pages.

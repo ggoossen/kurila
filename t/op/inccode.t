@@ -80,7 +80,7 @@ sub fooinc2($self, $filename)
     
 
 
-my $arrayref = \@( \&fooinc2, 'Bar' )
+my $arrayref = \@:  \&fooinc2, 'Bar' 
 push $^INCLUDE_PATH, $arrayref
 
 $evalret = try { require Foo; 1; }
@@ -116,7 +116,7 @@ sub FooLoader::INC($self, $filename)
     
 
 
-my $href = bless( \%(), 'FooLoader' )
+my $href = bless( \$%, 'FooLoader' )
 push $^INCLUDE_PATH, $href
 
 $evalret = try { require Quux; 1 }
@@ -156,7 +156,7 @@ cmp_ok( $^INCLUDED{?'Quux2.pm'}, '\==', $sref,       '  val Quux2.pm is correct 
 pop $^INCLUDE_PATH
 
 push $^INCLUDE_PATH, sub (@< @_)
-    my @($self, $filename) =  @_
+    my (@: $self, $filename) =  @_
     if (substr($filename,0,4) eq 'Toto')
         $^INCLUDED{+$filename} = 'xyz'
         return get_temp_fh($filename)
@@ -175,7 +175,7 @@ is( $^INCLUDED{?'Toto.pm'}, 'xyz',	   '  val Toto.pm is correct in $^INCLUDED' )
 pop $^INCLUDE_PATH
 
 push $^INCLUDE_PATH, sub (@< @_)
-    my @($self, $filename) =  @_
+    my (@: $self, $filename) =  @_
     if ($filename eq 'abc.pl')
         return get_temp_fh($filename, qq(return "abc";\n))
     else
@@ -191,7 +191,7 @@ do
     my $filename = $^OS_NAME eq 'MacOS' ?? ':Foo:Foo.pm' !! './Foo.pm'
     #local $^INCLUDE_PATH; # local fails on tied @INC
     my @old_INC = $^INCLUDE_PATH # because local doesn't work on tied arrays
-    $^INCLUDE_PATH = @( sub (@< @_) { $filename = 'seen'; return undef; } )
+    $^INCLUDE_PATH = @:  sub (@< @_) { $filename = 'seen'; return undef; } 
     try { require $filename; }
     is( $filename, 'seen', 'the coderef sees fully-qualified pathnames' )
     $^INCLUDE_PATH = @old_INC
@@ -204,7 +204,7 @@ SKIP: do
     pop $^INCLUDE_PATH
 
     push $^INCLUDE_PATH, sub (@< @_)
-        my @($cr, $filename) =  @_
+        my (@: $cr, $filename) =  @_
         my $module = $filename; $module =~ s,/,::,g; $module =~ s/\.pm$//
         open my $fh, '<',
             \"package $module; sub complain \{ warn q(barf) \}; \$main::file = __FILE__;"

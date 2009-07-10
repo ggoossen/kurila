@@ -436,7 +436,7 @@ our(@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION)
 @EXPORT=qw(timeit timethis timethese timediff timestr)
 @EXPORT_OK=qw(timesum cmpthese countit
 	      clearcache clearallcache disablecache enablecache)
-%EXPORT_TAGS=%( all => @EXPORT +@+ @EXPORT_OK ) 
+%EXPORT_TAGS=%:  all => @EXPORT +@+ @EXPORT_OK  
 
 $VERSION = 1.10
 
@@ -484,7 +484,7 @@ sub init
 sub debug { $Debug = (@_[1] != 0); }
 
 sub usage
-    my $calling_sub = @(caller(1))[3]
+    my $calling_sub = (@: caller(1))[3]
     $calling_sub =~ s/^Benchmark:://
     return %_Usage{?$calling_sub} || ''
 
@@ -507,7 +507,7 @@ USAGE
 
 sub clearallcache
     die usage if (nelems @_)
-    %Cache = %( () )
+    %Cache = $%
 
 
 %_Usage{+enablecache} = <<'USAGE'
@@ -531,14 +531,14 @@ sub disablecache
 
 # --- Functions to process the 'time' data type
 
-sub new { my @t = @( mytime, times, (nelems @_) == 2 ?? @_[1] !! 0);
+sub new { my @t = (@:  mytime, times, (nelems @_) == 2 ?? @_[1] !! 0);
     print $^STDERR, "new=$(join ' ',@t)\n" if $Debug;
     bless \@t; }
 
-sub cpu_p { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $pu+$ps         ; }
-sub cpu_c { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@;         $cu+$cs ; }
-sub cpu_a { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $pu+$ps+$cu+$cs ; }
-sub real  { my@($r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $r              ; }
+sub cpu_p { my(@: $r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $pu+$ps         ; }
+sub cpu_c { my(@: $r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@;         $cu+$cs ; }
+sub cpu_a { my(@: $r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $pu+$ps+$cu+$cs ; }
+sub real  { my(@: $r,$pu,$ps,$cu,$cs, ...) =  @_[0]->@; $r              ; }
 sub iters { @_[0]->[5] ; }
 
 
@@ -585,8 +585,8 @@ sub timestr($tr, ?$style, ?$f)
 
     my @t = $tr->@
     warn "bad time value ($(join ' ',@t))" unless (nelems @t)==6
-    my@($r, $pu, $ps, $cu, $cs, $n) =  @t
-    my@($pt, $ct, $tt) = @( $tr->cpu_p, $tr->cpu_c, $tr->cpu_a)
+    my(@: $r, $pu, $ps, $cu, $cs, $n) =  @t
+    my(@: $pt, $ct, $tt) = @:  $tr->cpu_p, $tr->cpu_c, $tr->cpu_a
     $f = $Default_Format unless defined $f
     # format a time in the required style, other formats may be added here
     $style ||= $Default_Style
@@ -627,7 +627,7 @@ sub runloop($n, $c)
     my($t0, $t1, $td) # before, after, difference
 
     # find package of caller so we can execute code there
-    my @($curpack, ...) = @: caller(0)
+    my (@: $curpack, ...) = @: caller(0)
     my $i = 0
     my $pack
     while (($pack) = caller(++$i))
@@ -704,7 +704,7 @@ usage: $result = countit($time, 'code' );        or
 USAGE
 
 sub countit
-    my @( $tmax, $code ) =  @_
+    my (@:  $tmax, $code ) =  @_
 
     die usage unless (nelems @_)
 
@@ -788,7 +788,7 @@ sub countit
         $n = $nmin if $n +< $nmin
     
 
-    return bless \@( $rtot, $utot, $stot, $cutot, $cstot, $ntot )
+    return bless \(@:  $rtot, $utot, $stot, $cutot, $cstot, $ntot )
 
 
 # --- Functions implementing high-level time-then-print utilities
@@ -884,9 +884,9 @@ sub cmpthese
 
     # $count can be a blessed object.
     if ( ref @_[0] eq 'HASH' )
-        @($results, ?$style) =  @_
+        (@: $results, ?$style) =  @_
     else
-        my@($count, $code) =  @_[[@(0,1)]]
+        my(@: $count, $code) =  @_[[(@: 0,1)]]
         $style = @_[2] if defined @_[?2]
 
         die usage unless ref $code eq 'HASH'
@@ -897,7 +897,7 @@ sub cmpthese
     $style = "" unless defined $style
 
     # Flatten in to an array of arrays with the name as the first field
-    my @vals = map{ \@( $_, < $results->{?$_}->@ ) }, keys $results->%
+    my @vals = map{ \(@:  $_, < $results->{?$_}->@ ) }, keys $results->%
 
     for ( @vals)
         # The epsilon fudge here is to prevent div by 0.  Since clock
@@ -920,11 +920,11 @@ sub cmpthese
     my @rows
     my @col_widths
 
-    my @top_row = @(
-        '',
-        $display_as_rate ?? 'Rate' !! 's/iter',
+    my @top_row = @: 
+        ''
+        $display_as_rate ?? 'Rate' !! 's/iter'
         < map { $_->[0] }, @vals
-        )
+        
 
     push @rows, \@top_row
     @col_widths = map { length( $_ ) }, @top_row

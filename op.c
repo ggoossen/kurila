@@ -3497,7 +3497,7 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
     if (SvTYPE(gv) != SVt_PVGV) {	/* Maybe prototype now, and had at
 					   maximum a prototype before. */
 	if (SvTYPE(gv) > SVt_NULL) {
-	    if (!SvPOK((SV*)gv) && !(SvIOK((SV*)gv) && SvIVX((SV*)gv) == -1)
+	    if (!SvPOK((SV*)gv) && !(SvIOK((SV*)gv) && I_SvIV((SV*)gv) == -1)
 		&& ckWARN_d(WARN_PROTOTYPE))
 	    {
 		Perl_warner(aTHX_ packWARN(WARN_PROTOTYPE), "Runaway prototype");
@@ -5001,20 +5001,6 @@ Perl_ck_open(pTHX_ OP *o)
 	      last->op_private &= ~OPpCONST_STRICT;
     }
     return ck_fun(o);
-}
-
-OP *
-Perl_ck_repeat(pTHX_ OP *o)
-{
-    PERL_ARGS_ASSERT_CK_REPEAT;
-
-    if (cBINOPo->op_first->op_flags & OPf_PARENS) {
-	o->op_private |= OPpREPEAT_DOLIST;
-	cBINOPo->op_first = force_list(cBINOPo->op_first);
-    }
-    else
-	scalar(o);
-    return o;
 }
 
 OP *

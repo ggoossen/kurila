@@ -36,77 +36,77 @@ $VERSION = '2.02'
 # This table is taken near verbatim from Pod::PlainText in Pod::Parser,
 # which got it near verbatim from the original Pod::Text.  It is therefore
 # credited to Tom Christiansen, and I'm glad I didn't have to write it.  :)
-%ESCAPES = %(
-    'amp'       =>    '&',      # ampersand
-    'lt'        =>    '<',      # left chevron, less-than
-    'gt'        =>    '>',      # right chevron, greater-than
-    'quot'      =>    '"',      # double quote
+%ESCAPES = (%: 
+    'amp'       =>    '&'      # ampersand
+    'lt'        =>    '<'      # left chevron, less-than
+    'gt'        =>    '>'      # right chevron, greater-than
+    'quot'      =>    '"'      # double quote
 
-    "Aacute"    =>    "\x{C1}",   # capital A, acute accent
-    "aacute"    =>    "\x{E1}",   # small a, acute accent
-    "Acirc"     =>    "\x{C2}",   # capital A, circumflex accent
-    "acirc"     =>    "\x{E2}",   # small a, circumflex accent
-    "AElig"     =>    "\x{C6}",   # capital AE diphthong (ligature)
-    "aelig"     =>    "\x{E6}",   # small ae diphthong (ligature)
-    "Agrave"    =>    "\x{C0}",   # capital A, grave accent
-    "agrave"    =>    "\x{E0}",   # small a, grave accent
-    "Aring"     =>    "\x{C5}",   # capital A, ring
-    "aring"     =>    "\x{E5}",   # small a, ring
-    "Atilde"    =>    "\x{C3}",   # capital A, tilde
-    "atilde"    =>    "\x{E3}",   # small a, tilde
-    "Auml"      =>    "\x{C4}",   # capital A, dieresis or umlaut mark
-    "auml"      =>    "\x{E4}",   # small a, dieresis or umlaut mark
-    "Ccedil"    =>    "\x{C7}",   # capital C, cedilla
-    "ccedil"    =>    "\x{E7}",   # small c, cedilla
-    "Eacute"    =>    "\x{C9}",   # capital E, acute accent
-    "eacute"    =>    "\x{E9}",   # small e, acute accent
-    "Ecirc"     =>    "\x{CA}",   # capital E, circumflex accent
-    "ecirc"     =>    "\x{EA}",   # small e, circumflex accent
-    "Egrave"    =>    "\x{C8}",   # capital E, grave accent
-    "egrave"    =>    "\x{E8}",   # small e, grave accent
-    "ETH"       =>    "\x{D0}",   # capital Eth, Icelandic
-    "eth"       =>    "\x{F0}",   # small eth, Icelandic
-    "Euml"      =>    "\x{CB}",   # capital E, dieresis or umlaut mark
-    "euml"      =>    "\x{EB}",   # small e, dieresis or umlaut mark
-    "Iacute"    =>    "\x{CD}",   # capital I, acute accent
-    "iacute"    =>    "\x{ED}",   # small i, acute accent
-    "Icirc"     =>    "\x{CE}",   # capital I, circumflex accent
-    "icirc"     =>    "\x{EE}",   # small i, circumflex accent
-    "Igrave"    =>    "\x{CD}",   # capital I, grave accent
-    "igrave"    =>    "\x{ED}",   # small i, grave accent
-    "Iuml"      =>    "\x{CF}",   # capital I, dieresis or umlaut mark
-    "iuml"      =>    "\x{EF}",   # small i, dieresis or umlaut mark
-    "Ntilde"    =>    "\x{D1}",   # capital N, tilde
-    "ntilde"    =>    "\x{F1}",   # small n, tilde
-    "Oacute"    =>    "\x{D3}",   # capital O, acute accent
-    "oacute"    =>    "\x{F3}",   # small o, acute accent
-    "Ocirc"     =>    "\x{D4}",   # capital O, circumflex accent
-    "ocirc"     =>    "\x{F4}",   # small o, circumflex accent
-    "Ograve"    =>    "\x{D2}",   # capital O, grave accent
-    "ograve"    =>    "\x{F2}",   # small o, grave accent
-    "Oslash"    =>    "\x{D8}",   # capital O, slash
-    "oslash"    =>    "\x{F8}",   # small o, slash
-    "Otilde"    =>    "\x{D5}",   # capital O, tilde
-    "otilde"    =>    "\x{F5}",   # small o, tilde
-    "Ouml"      =>    "\x{D6}",   # capital O, dieresis or umlaut mark
-    "ouml"      =>    "\x{F6}",   # small o, dieresis or umlaut mark
-    "szlig"     =>    "\x{DF}",   # small sharp s, German (sz ligature)
-    "THORN"     =>    "\x{DE}",   # capital THORN, Icelandic
-    "thorn"     =>    "\x{FE}",   # small thorn, Icelandic
-    "Uacute"    =>    "\x{DA}",   # capital U, acute accent
-    "uacute"    =>    "\x{FA}",   # small u, acute accent
-    "Ucirc"     =>    "\x{DB}",   # capital U, circumflex accent
-    "ucirc"     =>    "\x{FB}",   # small u, circumflex accent
-    "Ugrave"    =>    "\x{D9}",   # capital U, grave accent
-    "ugrave"    =>    "\x{F9}",   # small u, grave accent
-    "Uuml"      =>    "\x{DC}",   # capital U, dieresis or umlaut mark
-    "uuml"      =>    "\x{FC}",   # small u, dieresis or umlaut mark
-    "Yacute"    =>    "\x{DD}",   # capital Y, acute accent
-    "yacute"    =>    "\x{FD}",   # small y, acute accent
-    "yuml"      =>    "\x{FF}",   # small y, dieresis or umlaut mark
+    "Aacute"    =>    "\x{C1}"   # capital A, acute accent
+    "aacute"    =>    "\x{E1}"   # small a, acute accent
+    "Acirc"     =>    "\x{C2}"   # capital A, circumflex accent
+    "acirc"     =>    "\x{E2}"   # small a, circumflex accent
+    "AElig"     =>    "\x{C6}"   # capital AE diphthong (ligature)
+    "aelig"     =>    "\x{E6}"   # small ae diphthong (ligature)
+    "Agrave"    =>    "\x{C0}"   # capital A, grave accent
+    "agrave"    =>    "\x{E0}"   # small a, grave accent
+    "Aring"     =>    "\x{C5}"   # capital A, ring
+    "aring"     =>    "\x{E5}"   # small a, ring
+    "Atilde"    =>    "\x{C3}"   # capital A, tilde
+    "atilde"    =>    "\x{E3}"   # small a, tilde
+    "Auml"      =>    "\x{C4}"   # capital A, dieresis or umlaut mark
+    "auml"      =>    "\x{E4}"   # small a, dieresis or umlaut mark
+    "Ccedil"    =>    "\x{C7}"   # capital C, cedilla
+    "ccedil"    =>    "\x{E7}"   # small c, cedilla
+    "Eacute"    =>    "\x{C9}"   # capital E, acute accent
+    "eacute"    =>    "\x{E9}"   # small e, acute accent
+    "Ecirc"     =>    "\x{CA}"   # capital E, circumflex accent
+    "ecirc"     =>    "\x{EA}"   # small e, circumflex accent
+    "Egrave"    =>    "\x{C8}"   # capital E, grave accent
+    "egrave"    =>    "\x{E8}"   # small e, grave accent
+    "ETH"       =>    "\x{D0}"   # capital Eth, Icelandic
+    "eth"       =>    "\x{F0}"   # small eth, Icelandic
+    "Euml"      =>    "\x{CB}"   # capital E, dieresis or umlaut mark
+    "euml"      =>    "\x{EB}"   # small e, dieresis or umlaut mark
+    "Iacute"    =>    "\x{CD}"   # capital I, acute accent
+    "iacute"    =>    "\x{ED}"   # small i, acute accent
+    "Icirc"     =>    "\x{CE}"   # capital I, circumflex accent
+    "icirc"     =>    "\x{EE}"   # small i, circumflex accent
+    "Igrave"    =>    "\x{CD}"   # capital I, grave accent
+    "igrave"    =>    "\x{ED}"   # small i, grave accent
+    "Iuml"      =>    "\x{CF}"   # capital I, dieresis or umlaut mark
+    "iuml"      =>    "\x{EF}"   # small i, dieresis or umlaut mark
+    "Ntilde"    =>    "\x{D1}"   # capital N, tilde
+    "ntilde"    =>    "\x{F1}"   # small n, tilde
+    "Oacute"    =>    "\x{D3}"   # capital O, acute accent
+    "oacute"    =>    "\x{F3}"   # small o, acute accent
+    "Ocirc"     =>    "\x{D4}"   # capital O, circumflex accent
+    "ocirc"     =>    "\x{F4}"   # small o, circumflex accent
+    "Ograve"    =>    "\x{D2}"   # capital O, grave accent
+    "ograve"    =>    "\x{F2}"   # small o, grave accent
+    "Oslash"    =>    "\x{D8}"   # capital O, slash
+    "oslash"    =>    "\x{F8}"   # small o, slash
+    "Otilde"    =>    "\x{D5}"   # capital O, tilde
+    "otilde"    =>    "\x{F5}"   # small o, tilde
+    "Ouml"      =>    "\x{D6}"   # capital O, dieresis or umlaut mark
+    "ouml"      =>    "\x{F6}"   # small o, dieresis or umlaut mark
+    "szlig"     =>    "\x{DF}"   # small sharp s, German (sz ligature)
+    "THORN"     =>    "\x{DE}"   # capital THORN, Icelandic
+    "thorn"     =>    "\x{FE}"   # small thorn, Icelandic
+    "Uacute"    =>    "\x{DA}"   # capital U, acute accent
+    "uacute"    =>    "\x{FA}"   # small u, acute accent
+    "Ucirc"     =>    "\x{DB}"   # capital U, circumflex accent
+    "ucirc"     =>    "\x{FB}"   # small u, circumflex accent
+    "Ugrave"    =>    "\x{D9}"   # capital U, grave accent
+    "ugrave"    =>    "\x{F9}"   # small u, grave accent
+    "Uuml"      =>    "\x{DC}"   # capital U, dieresis or umlaut mark
+    "uuml"      =>    "\x{FC}"   # small u, dieresis or umlaut mark
+    "Yacute"    =>    "\x{DD}"   # capital Y, acute accent
+    "yacute"    =>    "\x{FD}"   # small y, acute accent
+    "yuml"      =>    "\x{FF}"   # small y, dieresis or umlaut mark
 
-    "lchevron"  =>    "\x{AB}",   # left chevron (double less than)
-    "rchevron"  =>    "\x{BB}",   # right chevron (double greater than)
+    "lchevron"  =>    "\x{AB}"   # left chevron (double less than)
+    "rchevron"  =>    "\x{BB}"   # right chevron (double greater than)
     )
 
 
@@ -344,7 +344,7 @@ sub cmd_item
 sub cmd_begin
     my $self = shift
     local $_ = shift
-    my @($kind) = @: m/^(\S+)/
+    my (@: $kind) = @: m/^(\S+)/
         or return
     if ($kind eq 'text')
         $self->%{+VERBATIM} = 1
@@ -403,16 +403,16 @@ sub seq_l
     # name.  Note that L<manpage/> forces a manpage interpretation, as does
     # something looking like L<manpage(section)>.  The latter is an
     # enhancement over the original Pod::Text.
-    my @($manpage, $section) = @('', $_)
+    my (@: $manpage, $section) = @: '', $_
     if (m/^(?:https?|ftp|news):/)
         # a URL
         return $_
     elsif (m/^"\s*(.*?)\s*"$/)
         $section = '"' . $1 . '"'
     elsif (m/^[-:.\w]+(?:\(\S+\))?$/)
-        @($manpage, $section) = @($_, '')
+        (@: $manpage, $section) = @: $_, ''
     elsif (m%/%)
-        @($manpage, $section) =  split (m/\s*\/\s*/, $_, 2)
+        (@: $manpage, $section) =  split (m/\s*\/\s*/, $_, 2)
     
 
     my $text = ''

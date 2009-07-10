@@ -1,12 +1,12 @@
 
 package Pod::Simple::DumpAsXML
 our $VERSION = '2.02'
-use Pod::Simple ();
-BEGIN {our @ISA = @('Pod::Simple')}
+use Pod::Simple ()
+BEGIN {our @ISA = (@: 'Pod::Simple')}
 
-use utf8;
+use utf8
 
-use Carp ();
+use Carp ()
 
 BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
 

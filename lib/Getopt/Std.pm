@@ -95,7 +95,7 @@ sub getopt($argumentative, ?$hash)
     local @EXPORT
 
     while ((nelems @ARGV) && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/)
-        @($first,$rest) = @($1,$2)
+        (@: $first,$rest) = @: $1,$2
         if (m/^--$/)    # early exit if --
             shift @ARGV
             last
@@ -171,9 +171,9 @@ sub help_mess
     if ((nelems @_) and defined &main::HELP_MESSAGE)
         main::HELP_MESSAGE($h, __PACKAGE__, $VERSION, $args)
     else
-        my @witharg = @($args =~ m/(\S)\s*:/g)
-        my @rest = @($args =~ m/([^\s:])(?!\s*:)/g)
-        my @($help, $arg) = @('', '')
+        my @witharg = @: $args =~ m/(\S)\s*:/g
+        my @rest = @: $args =~ m/([^\s:])(?!\s*:)/g
+        my (@: $help, $arg) = @: '', ''
         if ((nelems @witharg))
             $help .= "\n\tWith arguments: -" . join " -", @witharg
             $arg = "\nSpace is not required between options and their arguments."
@@ -181,7 +181,7 @@ sub help_mess
         if ((nelems @rest))
             $help .= "\n\tBoolean (without arguments): -" . join " -", @rest
         
-        my @($scr) = @($^PROGRAM_NAME =~ m,([^/\\]+)$,)
+        my (@: $scr) = @: $^PROGRAM_NAME =~ m,([^/\\]+)$,
         print $h, <<EOH if (nelems @_)                  # Let the script override this
 
 Usage: $scr [-OPTIONS [-MORE_OPTIONS]] [--] [PROGRAM_ARG1 ...]
@@ -219,7 +219,7 @@ sub getopts($argumentative, ?$hash)
 
     @args = split( m/ */, $argumentative )
     while((nelems @ARGV) && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/s)
-        @($first,$rest) = @($1,$2)
+        (@: $first,$rest) = @: $1,$2
         if (m/^--$/)    # early exit if --
             shift @ARGV
             last

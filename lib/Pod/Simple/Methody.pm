@@ -4,7 +4,7 @@ package Pod::Simple::Methody
 use Pod::Simple ()
 our (@ISA, $VERSION)
 $VERSION = '2.02'
-@ISA = @('Pod::Simple')
+@ISA = (@: 'Pod::Simple')
 
 # Yes, we could use named variables, but I want this to be impose
 # as little an additional performance hit as possible.

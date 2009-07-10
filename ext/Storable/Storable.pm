@@ -7,9 +7,9 @@
 
 require DynaLoader
 require Exporter
-package Storable;
+package Storable
 
-use IO::File;
+use IO::File
 
 our @ISA = qw(Exporter DynaLoader)
 
@@ -233,7 +233,7 @@ sub lock_nstore
 sub _store
     my $xsptr = shift
     my $self = shift
-    my @($file, $use_locking) =  @_
+    my (@: $file, $use_locking) =  @_
     logcroak "not a reference" unless ref($self)
     logcroak "wrong argument number" unless (nelems @_) == 2	# No @foo in arglist
     my $fh
@@ -278,7 +278,7 @@ sub store_fd
 # Same as store_fd, but in network order.
 #
 sub nstore_fd
-    my @($self, $file) =  @_
+    my (@: $self, $file) =  @_
     return _store_fd(\&net_pstore, < @_)
 
 
@@ -286,7 +286,7 @@ sub nstore_fd
 sub _store_fd
     my $xsptr = shift
     my $self = shift
-    my @($file) =  @_
+    my (@: $file) =  @_
     logcroak "not a reference" unless ref($self)
     logcroak "too many arguments" unless (nelems @_) == 1       # No @foo in arglist
     my $fd = fileno($file)
@@ -356,7 +356,7 @@ sub lock_retrieve
 
 # Internal retrieve routine
 sub _retrieve
-    my @($file, $use_locking) =  @_
+    my (@: $file, $use_locking) =  @_
     my $fh
     open($fh, "<", $file) || logcroak "can't open $file: $^OS_ERROR"
     binmode $fh                                                 # Archaic systems...

@@ -787,7 +787,7 @@ PP(pp_pow)
 		if (SvUOK(svr)) {
 		    power = SvUVX(svr);
 		} else {
-		    const IV iv = SvIVX(svr);
+		    const IV iv = I_SvIV(svr);
 		    if (iv >= 0) {
 			power = iv;
 		    } else {
@@ -799,7 +799,7 @@ PP(pp_pow)
 		if (baseuok) {
 		    baseuv = SvUVX(svl);
 		} else {
-		    const IV iv = SvIVX(svl);
+		    const IV iv = I_SvIV(svl);
 		    if (iv >= 0) {
 			baseuv = iv;
 			baseuok = TRUE; /* effectively it's a UV now */
@@ -954,7 +954,7 @@ PP(pp_multiply)
 	    if (auvok) {
 		alow = SvUVX(svl);
 	    } else {
-		const IV aiv = SvIVX(svl);
+		const IV aiv = I_SvIV(svl);
 		if (aiv >= 0) {
 		    alow = aiv;
 		    auvok = TRUE; /* effectively it's a UV now */
@@ -965,7 +965,7 @@ PP(pp_multiply)
 	    if (buvok) {
 		blow = SvUVX(svr);
 	    } else {
-		const IV biv = SvIVX(svr);
+		const IV biv = I_SvIV(svr);
 		if (biv >= 0) {
 		    blow = biv;
 		    buvok = TRUE; /* effectively it's a UV now */
@@ -1089,7 +1089,7 @@ PP(pp_divide)
                 right = SvUVX(svr);
             }
 	    else {
-		const IV biv = SvIVX(svr);
+		const IV biv = I_SvIV(svr);
                 if (biv >= 0) {
                     right = biv;
                     right_non_neg = TRUE; /* effectively it's a UV now */
@@ -1110,7 +1110,7 @@ PP(pp_divide)
                 left = SvUVX(svl);
             }
 	    else {
-		const IV aiv = SvIVX(svl);
+		const IV aiv = I_SvIV(svl);
                 if (aiv >= 0) {
                     left = aiv;
                     left_non_neg = TRUE; /* effectively it's a UV now */
@@ -1370,15 +1370,6 @@ PP(pp_repeat)
 	}
 	(void)SvPOK_only(TARG);
 
-	if (PL_op->op_private & OPpREPEAT_DOLIST) {
-	    /* The parser saw this as a list repeat, and there
-	       are probably several items on the stack. But we're
-	       in scalar context, and there's no pp_list to save us
-	       now. So drop the rest of the items -- robin@kitsite.com
-	     */
-	    dMARK;
-	    SP = MARK;
-	}
 	PUSHTARG;
     }
     RETURN;

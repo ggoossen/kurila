@@ -20,11 +20,11 @@ print $^STDOUT, "1..10\n"
 
 $a = 'toto'
 $b = \$a
-our $c = bless \%(), 'CLASS'
+our $c = bless \$%, 'CLASS'
 $c->{+attribute} = 'attrval'
-our %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$c)
-our @a = @('first', undef, 3, -4, -3.14159, 456, 4.5,
-           $b, \$a, $a, $c, \$c, \%a)
+our %a = %: 'key', 'value', 1, 0, $a, $b, 'cvar', \$c
+our @a = @: 'first', undef, 3, -4, -3.14159, 456, 4.5
+            $b, \$a, $a, $c, \$c, \%a
 
 print $^STDOUT, "not " unless defined (our $aref = dclone(\@a))
 print $^STDOUT, "ok 1\n"
@@ -41,12 +41,12 @@ print $^STDOUT, "ok 4\n";
 package FOO; our @ISA = qw(Storable)
 
 sub make
-    my $self = bless \%()
+    my $self = bless \$%
     $self->{+key} = \%main::a
     return $self
 ;
 
-package main;
+package main
 
 our $foo = FOO->make
 print $^STDOUT, "not " unless defined(our $r = $foo->dclone)
@@ -56,7 +56,7 @@ print $^STDOUT, "not " unless &dump($foo) eq &dump($r)
 print $^STDOUT, "ok 6\n"
 
 # Ensure refs to "undef" values are properly shared during cloning
-my $hash = \%:
+my $hash = \$%
 push $hash->{+''}, \$hash->{+a}
 print $^STDOUT, "not " unless $hash->{''}[0] \== \$hash->{+a}
 print $^STDOUT, "ok 7\n"

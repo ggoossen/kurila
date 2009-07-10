@@ -36,18 +36,18 @@ exit(0)
 # though.) --jhi
 
 my %want =
-    %(
-    ABDAY_1     => "Sun",
-    DAY_1       => "Sunday",
-    ABMON_1     => "Jan",
-    MON_1       => "January",
-    RADIXCHAR   => ".",
-    AM_STR      => qr{^(?:am|a\.m\.)$}i,
-    THOUSEP     => "",
-    D_T_FMT     => qr{^\%a \%b \%[de] \%H:\%M:\%S \%Y$},
-    D_FMT       => qr{^\%m/\%d/\%y$},
-    T_FMT       => qr{^\%H:\%M:\%S$},
-    )
+    %: 
+    ABDAY_1     => "Sun"
+    DAY_1       => "Sunday"
+    ABMON_1     => "Jan"
+    MON_1       => "January"
+    RADIXCHAR   => "."
+    AM_STR      => qr{^(?:am|a\.m\.)$}i
+    THOUSEP     => ""
+    D_T_FMT     => qr{^\%a \%b \%[de] \%H:\%M:\%S \%Y$}
+    D_FMT       => qr{^\%m/\%d/\%y$}
+    T_FMT       => qr{^\%H:\%M:\%S$}
+    
 
 
 my @want = sort keys %want

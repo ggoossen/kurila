@@ -9,6 +9,6 @@ plan tests => 6
 is defined('aap'), 1, 'simple string is defined'
 is defined(undef), '', "undef is not defined"
 is defined( $@ ), 1, "empty array is defined"
-is defined( %() ), 1, "empty hash is defined"
+is defined( $% ), 1, "empty hash is defined"
 is defined( &noot ), 1, "subroutine is defined"
 is defined( &mies ), '', "non-existing subroutine is not defined"

@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 
 our ($Is_W32, $Is_OS2, $Is_Cygwin, $Is_NetWare, $Needs_Write)
-use Config; # Remember, this is running using an existing perl
-use File::Compare;
-use Symbol;
+use Config # Remember, this is running using an existing perl
+use File::Compare
+use Symbol
 
 # Common functions needed by the regen scripts
 

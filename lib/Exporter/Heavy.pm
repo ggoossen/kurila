@@ -22,24 +22,24 @@ No user-serviceable parts inside.
 sub _rebuild_cache($pkg, $exports, $cache)
     for ($exports->@)
         s/^&//
-    $cache->{[ $exports->@]} = @(1) x nelems $exports->@
+    $cache->{[ $exports->@]} = (@: 1) x nelems $exports->@
     my $ok = \Symbol::fetch_glob("$($pkg)::EXPORT_OK")->*->@
     if (nelems $ok->@)
         for ($ok->@)
             s/^&//
-        $cache->{[$ok->@]} = @(1) x nelems $ok->@
+        $cache->{[$ok->@]} = (@: 1) x nelems $ok->@
 
 
 sub export($pkg, $callpkg, @< @imports)
     my ($type, $cache_is_current, $oops)
-    my @($exports, $export_cache) = @(\Symbol::fetch_glob("$($pkg)::EXPORT")->*->@,
-                                      (%Exporter::Cache{+$pkg} ||= \%()))
+    my (@: $exports, $export_cache) = @: \Symbol::fetch_glob("$($pkg)::EXPORT")->*->@
+                                         (%Exporter::Cache{+$pkg} ||= \$%)
 
     if ((nelems @imports))
         if (!$export_cache->%)
             _rebuild_cache ($pkg, $exports, $export_cache)
             $cache_is_current = 1
-        
+
 
         if (grep { m{^[/!:]} }, @imports)
             my $tagsref = \Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")->*->%
@@ -60,14 +60,14 @@ sub export($pkg, $callpkg, @< @imports)
                         warn qq["$spec" is not defined in \%$($pkg)::EXPORT_TAGS]
                         ++$oops
                         next
-                    
+
                 elsif ($spec =~ m:^/(.*)/$:)
                     my $patn = $1
                     @allexports = keys $export_cache->% unless (nelems @allexports) # only do keys once
                     @names = grep( {m/$patn/ }, @allexports) # not anchored by default
                 else
-                    @names = @($spec) # is a normal symbol name
-                
+                    @names = (@: $spec) # is a normal symbol name
+
 
                 warn "Import ".($remove ?? "del"!!"add").": $(join ' ',@names) "
                     if $Exporter::Verbose
@@ -75,11 +75,11 @@ sub export($pkg, $callpkg, @< @imports)
                 if ($remove)
                     foreach my $sym ( @names) { delete %imports{$sym} }
                 else
-                    %imports{[@names]} = @(1) x nelems @names
-                
-            
+                    %imports{[@names]} = (@: 1) x nelems @names
+
+
             @imports = keys %imports
-        
+
 
         my @carp
         foreach my $sym ( @imports)
@@ -91,51 +91,45 @@ sub export($pkg, $callpkg, @< @imports)
                     if ((nelems @imports) == 1)
                         @imports = $exports->@
                         last
-                    
+
                     # We need a way to emulate 'use Foo ()' but still
                     # allow an easy version check: "use Foo 1.23, ''";
                     if ((nelems @imports) == 2 and !@imports[1])
                         @imports = $@
                         last
-                    
+
                 elsif ($sym !~ s/^&// || !$export_cache->{?$sym})
                     # Last chance - see if they've updated EXPORT_OK since we
                     # cached it.
 
                     unless ($cache_is_current)
-                        $export_cache->% = %( () )
+                        $export_cache->% = $%
                         _rebuild_cache ($pkg, $exports, $export_cache)
                         $cache_is_current = 1
-                    
 
                     if (!$export_cache->{?$sym})
                         # accumulate the non-exports
                         push @carp,
                             qq["$sym" is not exported by the $pkg module\n]
                         $oops++
-                    
-                
-            
-        
+
         if ($oops)
             die("$(join ' ', @carp)Can't continue after import errors")
-        
     else
         @imports = $exports->@
-    
 
-    my @($fail, $fail_cache) = @(\Symbol::fetch_glob("$($pkg)::EXPORT_FAIL")->*->@,
-                                 (%Exporter::FailCache{+$pkg} ||= \%()))
+    my (@: $fail, $fail_cache) = @: \Symbol::fetch_glob("$($pkg)::EXPORT_FAIL")->*->@
+                                    (%Exporter::FailCache{+$pkg} ||= \$%)
 
     if ((nelems $fail->@))
         if (!$fail_cache->%)
             # Build cache of symbols. Optimise the lookup by adding
             # barewords twice... both with and without a leading &.
             # (Technique could be applied to $export_cache at cost of memory)
-            my @expanded = @+: map { m/^\w/ ?? @($_, '&'.$_) !! @($_) }, $fail->@
+            my @expanded = @+: map { m/^\w/ ?? (@: $_, '&'.$_) !! (@: $_) }, $fail->@
             warn "$($pkg)::EXPORT_FAIL cached: $(join ' ',@expanded)" if $Exporter::Verbose
             $fail_cache->{[ @expanded]} = (1) x nelems @expanded
-        
+
         my @failed
         foreach my $sym ( @imports) { push(@failed, $sym) if $fail_cache->{?$sym} }
         if ((nelems @failed))
@@ -161,7 +155,7 @@ sub export($pkg, $callpkg, @< @imports)
             $type eq '@' ?? \Symbol::fetch_glob("$($pkg)::$sym")->*->@ !!
             $type eq '%' ?? \Symbol::fetch_glob("$($pkg)::$sym")->*->% !!
             warn("Can't export symbol: $type$sym")
-    
+
 
 
 sub export_to_level($pkg, $level, _, @< @args)
@@ -176,12 +170,12 @@ sub _push_tags($pkg, $var, $syms)
     my $export_tags = \Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")->*->%
     push(Symbol::fetch_glob("$($pkg)::$var")->*->@,
         < @+: map { exists $export_tags->{$_} ?? $export_tags->{?$_}
-        !! do { push(@nontag,$_); @($_) } },
+        !! do { push(@nontag,$_); (@: $_) } },
         (nelems $syms->@) ?? $syms->@ !! keys $export_tags->%)
     if ((nelems @nontag) and $^WARNING)
         # This may change to a die one day
         warn(join(", ", @nontag)." are not tags of $pkg")
-    
+
 
 
 sub require_version($self, $wanted)
@@ -190,11 +184,11 @@ sub require_version($self, $wanted)
 
 
 sub export_tags
-    _push_tags(@(caller)[0], "EXPORT",    \@_)
+    _push_tags((@: caller)[0], "EXPORT",    \@_)
 
 
 sub export_ok_tags
-    _push_tags(@(caller)[0], "EXPORT_OK", \@_)
+    _push_tags((@: caller)[0], "EXPORT_OK", \@_)
 
 
 1

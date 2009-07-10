@@ -1,12 +1,12 @@
 package Config::Extensions
 
 our (%Extensions, $VERSION, @ISA, @EXPORT_OK)
-use Config;
+use Config
 require Exporter
 
 $VERSION = '0.01'
-@ISA = @( 'Exporter' )
-@EXPORT_OK = @( '%Extensions' )
+@ISA = @:  'Exporter' 
+@EXPORT_OK = @:  '%Extensions' 
 
 foreach my $type (qw(static dynamic nonxs))
     foreach (split m/\s+/, config_value($type . '_ext'))

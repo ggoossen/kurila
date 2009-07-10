@@ -3,7 +3,7 @@
 require "./test.pl"
 plan( tests => 4 )
 
-use warnings;
+use warnings
 
 my $start = time
 my $sleep_says = sleep 3

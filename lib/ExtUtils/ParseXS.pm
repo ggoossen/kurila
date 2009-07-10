@@ -68,26 +68,26 @@ our $SymSet
 sub process_file
 
     # Allow for $package->process_file(%hash) in the future
-    my @($pkg, %< %args) = (nelems @_) % 2 ?? @_ !! @(__PACKAGE__, < @_)
+    my (@: $pkg, %< %args) = (nelems @_) % 2 ?? @_ !! @: __PACKAGE__, < @_
 
     $ProtoUsed = exists %args{prototypes}
 
     # Set defaults.
-    %args = %(
+    %args = (%: 
         # 'C++' => 0, # Doesn't seem to *do* anything...
-        hiertype => 0,
-        except => 0,
-        prototypes => 0,
-        versioncheck => 1,
-        linenumbers => 1,
-        optimize => 1,
-        prototypes => 0,
-        inout => 1,
-        argtypes => 1,
-        typemap => \$@,
-        output => $^STDOUT,
-        csuffix => '.c',
-        < %args,
+        hiertype => 0
+        except => 0
+        prototypes => 0
+        versioncheck => 1
+        linenumbers => 1
+        optimize => 1
+        prototypes => 0
+        inout => 1
+        argtypes => 1
+        typemap => \$@
+        output => $^STDOUT
+        csuffix => '.c'
+        < %args
         )
 
     # Global Constants
@@ -98,8 +98,8 @@ sub process_file
         require ExtUtils::XSSymSet
         $SymSet = ExtUtils::XSSymSet->new( 28)
     
-    @XSStack = @(\%(type => 'none'))
-    @($XSS_work_idx, $cpp_next_tmp) = @(0, "XSubPPtmpAAAA")
+    @XSStack = @: \(%: type => 'none')
+    (@: $XSS_work_idx, $cpp_next_tmp) = @: 0, "XSubPPtmpAAAA"
     @InitFileCode = $@
     $FH = Symbol::gensym()
     $proto_re = "[" . quotemeta('\$%&*@;[]') . "]" 
@@ -120,12 +120,12 @@ sub process_file
     $WantOptimize = %args{?optimize}
     $process_inout = %args{?inout}
     $process_argtypes = %args{?argtypes}
-    @tm = @( ref %args{?typemap} ?? < %args{?typemap}->@ !! (%args{?typemap}) )
+    @tm = @:  ref %args{?typemap} ?? < %args{?typemap}->@ !! (%args{?typemap}) 
 
-    for (@(%args{?filename}))
+    for ((@: %args{?filename}))
         die "Missing required parameter 'filename'" unless $_
         $filepathname = $_
-        @($dir, $filename) = @( dirname($_), basename($_))
+        (@: $dir, $filename) = @:  dirname($_), basename($_)
         $filepathname =~ s/\\/\\\\/g
         %IncludedFiles{+$_}++
     
@@ -197,7 +197,7 @@ sub process_file
                 $_ = TrimWhitespace($_) 
                 # skip blank lines and comment lines
                 next if m/^$/ or m/^#/ 
-                my @($type,$kind, $proto) = @: m/^\s*(.*?\S)\s+(\S+)\s*($proto_re*)\s*$/ 
+                my (@: $type,$kind, $proto) = @: m/^\s*(.*?\S)\s+(\S+)\s*($proto_re*)\s*$/ 
                     or warn("Warning: File '$typemap' Line $($line_no-1) '$line' TYPEMAP entry needs 2 or 3 columns\n"), next
                 $type = TidyType($type) 
                 %type_kind{+$type} = $kind 
@@ -241,15 +241,15 @@ sub process_file
     foreach my $key (keys %output_expr)
         BEGIN { $^HINT_BITS ^|^= 0x00200000 }; # Equivalent to: use re 'eval', but hardcoded so we can compile re.xs
 
-        my @(?$t, ?$with_size, ?$arg, ?$sarg) =
-            @(%output_expr{?$key} =~
-              m[^ \s+ sv_set ( [iunp] ) v (n)?	# Type, is_setpvn
+        my (@: ?$t, ?$with_size, ?$arg, ?$sarg) =
+            @: %output_expr{?$key} =~
+                   m[^ \s+ sv_set ( [iunp] ) v (n)?	# Type, is_setpvn
 	 \s* \( \s* $cast \$arg \s* ,
 	 \s* ( (??{ $bal }) )	# Set from
 	 ( (??{ $size }) )?	# Possible sizeof set-from
 	 \) \s* ; \s* $
-	]x)
-        %targetable{+$key} = \@($t, $with_size, $arg, $sarg) if $t
+	]x
+        %targetable{+$key} = \(@: $t, $with_size, $arg, $sarg) if $t
     
 
     # Match an XS keyword
@@ -313,7 +313,7 @@ EOM
             die ("Error: Unterminated pod in $filename, line $podstartline\n")
                 unless $lastline
         
-        last if @(?$Package, ?$Prefix) =
+        last if (@: ?$Package, ?$Prefix) =
           @: m/^MODULE\s*=\s*[\w:]+(?:\s+PACKAGE\s*=\s*([\w:]+))?(?:\s+PREFIX\s*=\s*(\S+))?\s*$/
 
         print $output_fh, $_
@@ -449,7 +449,7 @@ EOF
 
 
 sub process_para
-    my %args = %( < @_ )
+    my %args = (%:  < @_ )
 
     # Print initial preprocessor statements and blank lines
     while ((nelems @line) && @line[0] !~ m/^[^\#]/)
@@ -459,7 +459,7 @@ sub process_para
         my $statement = $1
         if ($statement =~ m/^if/)
             $XSS_work_idx = (nelems @XSStack)
-            push(@XSStack, \%(type => 'if'))
+            push(@XSStack, \(%: type => 'if'))
         else
             death ("Error: `$statement' with no matching `if'")
                 if @XSStack[-1]->{?type} ne 'if'
@@ -468,18 +468,18 @@ sub process_para
                 push(@BootCode,     "#endif")
             
 
-            my @fns = keys(@XSStack[-1]->{?functions} || %())
+            my @fns = keys(@XSStack[-1]->{?functions} || $%)
             if ($statement ne 'endif')
                 # Hide the functions defined in other #if branches, and reset.
-                @XSStack[-1]->{+other_functions}{[+@fns]} = @(1) x nelems @fns
-                @XSStack[-1]->{[qw(varname functions)]} = @('', %())
+                @XSStack[-1]->{+other_functions}{[+@fns]} = (@: 1) x nelems @fns
+                @XSStack[-1]->{[qw(varname functions)]} = @: '', $%
             else
                 my $tmp = pop(@XSStack)
                 0 while (--$XSS_work_idx
                          && @XSStack[$XSS_work_idx]->{?type} ne 'if')
                 # Keep all new defined functions
-                push(@fns, < keys($tmp->{?other_functions} || %()))
-                @XSStack[$XSS_work_idx]->{+functions}{[+@fns]} = @(1) x nelems @fns
+                push(@fns, < keys($tmp->{?other_functions} || $%))
+                @XSStack[$XSS_work_idx]->{+functions}{[+@fns]} = (@: 1) x nelems @fns
             
         
     
@@ -561,7 +561,7 @@ sub process_para
     blurt ("Error: Cannot parse function definition from '$func_header'"), next PARAGRAPH
         unless $func_header =~ m/^(?:([\w:]*)::)?(\w+)\s*\(\s*(.*?)\s*\)\s*(const)?\s*(;\s*)?$/s
 
-    @($class, $func_name, $orig_args) =  @($1, $2, $3) 
+    (@: $class, $func_name, $orig_args) =  @: $1, $2, $3 
     $class = "$4 $class" if $4
     ($pname = $func_name) =~ s/^($Prefix)?/$Packprefix/
     (my $clean_func_name = $func_name) =~ s/^$Prefix//
@@ -578,7 +578,7 @@ sub process_para
     
     @XSStack[$XSS_work_idx]->{+functions}{+$Full_func_name} ++ 
     @Attributes = $@
-    %XsubAliases = %XsubAliasValues =  %Interfaces = %()
+    %XsubAliases = %XsubAliasValues =  %Interfaces = $%
     $DoSetMagic = 1
 
     $orig_args =~ s/\\\s*/ /g   # process line continuations
@@ -588,14 +588,14 @@ sub process_para
     if ($process_argtypes and $orig_args =~ m/\S/)
         my $args = "$orig_args ,"
         if ($args =~ m/^( (??{ $C_arg }) , )* $ /x)
-            @args = @($args =~ m/\G ( (??{ $C_arg }) ) , /xg)
+            @args = @: $args =~ m/\G ( (??{ $C_arg }) ) , /xg
             for ( @args )
                 s/^\s+//
                 s/\s+$//
-                my @($arg, $default) = @: m/ ( [^=]* ) ( (?: = .* )? ) /x
-                my @(?$pre, ?$name) = @($arg =~ m/(.*?) \s*
+                my (@: $arg, $default) = @: m/ ( [^=]* ) ( (?: = .* )? ) /x
+                my (@: ?$pre, ?$name) = @: $arg =~ m/(.*?) \s*
 					     \b ( \w+ | length\( \s*\w+\s* \) )
-					     \s* $ /x)
+					     \s* $ /x
                 next unless defined($pre) && length($pre)
                 my $out_type = ''
                 my $inout_var
@@ -780,7 +780,7 @@ EOF
         $thisdone = 0
         $retvaldone = 0
         $deferred = ""
-        %arg_list = %( () ) 
+        %arg_list = $% 
         $gotRETVAL = 0
 
         INPUT_handler() 
@@ -867,7 +867,7 @@ EOF
         $gotRETVAL = 0          # 1 if RETVAL seen in OUTPUT section;
         undef $RETVAL_code      # code to set RETVAL (from OUTPUT section);
         # $wantRETVAL set if 'RETVAL =' autogenerated
-        @($wantRETVAL, $ret_type) = @(0, 'void') if $RETVAL_no_return
+        (@: $wantRETVAL, $ret_type) = (@: 0, 'void') if $RETVAL_no_return
         undef %outargs 
         process_keyword("POSTCALL|OUTPUT|ALIAS|ATTRS|PROTOTYPE")
 
@@ -994,7 +994,7 @@ EOF
     if (%XsubAliases)
         %XsubAliases{+$pname} = 0
             unless defined %XsubAliases{?$pname} 
-        while ( @(?$name, ?$value) =@( each %XsubAliases))
+        while ( (@: ?$name, ?$value) =(@:  each %XsubAliases))
             push(@InitFileCode, Q(<<"EOF"))
 #        cv = newXS(\"$name\", XS_$Full_func_name, file);
 #        XSANY.any_i32 = $value ;
@@ -1009,7 +1009,7 @@ EOF
 #        apply_attrs_string("$Package", cv, "$(join ' ',@Attributes)", 0);
 EOF
     elsif ($interface)
-        while ( @($name, $value) =@( each %Interfaces))
+        while ( (@: $name, $value) =(@:  each %Interfaces))
             $name = "$Package\::$name" unless $name =~ m/::/
             push(@InitFileCode, Q(<<"EOF"))
 #        cv = newXS(\"$name\", XS_$Full_func_name, file);
@@ -1040,10 +1040,10 @@ sub standard_typemap_locations
     my @tm = qw(typemap)
 
     my $updir = File::Spec->updir
-    foreach my $dir (@(File::Spec->catdir(< $: @($updir) x 1),
-                                 File::Spec->catdir(< $: @($updir) x 2),
-                                 File::Spec->catdir(< $: @($updir) x 3),
-                                 File::Spec->catdir(< $: @($updir) x 4)))
+    foreach my $dir (@: File::Spec->catdir(< $: (@: $updir) x 1)
+                        File::Spec->catdir(< $: (@: $updir) x 2)
+                        File::Spec->catdir(< $: (@: $updir) x 3)
+                        File::Spec->catdir(< $: (@: $updir) x 4))
 
         unshift @tm, File::Spec->catfile($dir, 'typemap')
         unshift @tm, File::Spec->catfile($dir, lib => ExtUtils => 'typemap')
@@ -1154,7 +1154,7 @@ sub INPUT_handler
         $var_init =~ s/"/\\"/g
 
         s/\s+/ /g
-        my @($var_type, $var_addr, $var_name) = @: m/^(.*?[^&\s])\s*(\&?)\s*\b(\w+)$/s
+        my (@: $var_type, $var_addr, $var_name) = @: m/^(.*?[^&\s])\s*(\&?)\s*\b(\w+)$/s
             or blurt("Error: invalid argument declaration '$line'"), next
 
         # Check for duplicate definitions
@@ -1209,7 +1209,7 @@ sub OUTPUT_handler
             $DoSetMagic = ($1 eq "ENABLE" ?? 1 !! 0)
             next
         
-        my @($outarg, $outcode) = @: m/^\s*(\S+)\s*(.*?)\s*$/s 
+        my (@: $outarg, $outcode) = @: m/^\s*(\S+)\s*(.*?)\s*$/s 
         blurt ("Error: duplicate OUTPUT argument '$outarg' ignored"), next
             if %outargs{+$outarg} ++ 
         if (!$gotRETVAL and $outarg eq 'RETVAL')
@@ -1247,7 +1247,7 @@ sub INTERFACE_MACRO_handler()
 
     $in = TrimWhitespace($in)
     if ($in =~ m/\s/)           # two
-        @($interface_macro, $interface_macro_set) =  split ' ', $in
+        (@: $interface_macro, $interface_macro_set) =  split ' ', $in
     else
         $interface_macro = $in
         $interface_macro_set = 'UNKNOWN_CVT' # catch later
@@ -1336,10 +1336,10 @@ sub FALLBACK_handler()
     # FALSE or UNDEF
 
     $_ = TrimWhitespace($_) 
-    my %map = %(
-        TRUE => "&PL_sv_yes", 1 => "&PL_sv_yes",
-        FALSE => "&PL_sv_no", 0 => "&PL_sv_no",
-        UNDEF => "&PL_sv_undef",
+    my %map = (%: 
+        TRUE => "&PL_sv_yes", 1 => "&PL_sv_yes"
+        FALSE => "&PL_sv_no", 0 => "&PL_sv_no"
+        UNDEF => "&PL_sv_undef"
         ) 
 
     # check for valid FALLBACK value
@@ -1465,15 +1465,15 @@ sub INCLUDE_handler ()
     ++ %IncludedFiles{+$_} unless m/\|\s*$/ 
 
     # Save the current file context.
-    push(@XSStack, \%(
-        type            => 'file',
-        LastLine        => $lastline,
-        LastLineNo      => $lastline_no,
-        Line            => \@line,
-        LineNo          => \@line_no,
-        Filename        => $filename,
-        Filepathname    => $filepathname,
-        Handle          => $FH,
+    push(@XSStack, \(%: 
+        type            => 'file'
+        LastLine        => $lastline
+        LastLineNo      => $lastline_no
+        Line            => \@line
+        LineNo          => \@line_no
+        Filename        => $filename
+        Filepathname    => $filepathname
+        Handle          => $FH
         )) 
 
     $FH = Symbol::gensym()
@@ -1651,7 +1651,7 @@ sub fetch_para
 
 sub output_init
     local ($type, $num, $var, $init, $name_printed)
-    @($type, $num, $var, $init, $name_printed) = @_
+    (@: $type, $num, $var, $init, $name_printed) = @_
 
     local ($arg) = "ST(" . ($num - 1) . ")"
 
@@ -1704,7 +1704,7 @@ sub evalqq
 
 
 sub generate_init
-    local@($type, $num, $var, ...) = @_
+    local(@: $type, $num, $var, ...) = @_
     local($arg) = "ST(" . ($num - 1) . ")"
     local($argoff) = $num - 1
     local($ntype)
@@ -1780,7 +1780,7 @@ sub generate_init
 
 
 sub generate_output
-    local@($type, $num, $var, $do_setmagic, ?$do_push) = @_
+    local(@: $type, $num, $var, $do_setmagic, ?$do_push) = @_
     local($arg) = "ST(" . ($num - ($num != 0)) . ")"
     local($argoff) = $num - 1
     local($ntype)
@@ -1870,7 +1870,7 @@ sub map_type($type, ?$varname)
 
 #########################################################
 package
-    ExtUtils::ParseXS::CountLines;
+    ExtUtils::ParseXS::CountLines
 
 our ($SECTION_END_MARKER)
 
@@ -1881,9 +1881,9 @@ sub PUSHED($class, $mode, $fh)
     $mcfile =~ s/\\/\\\\/g
     $SECTION_END_MARKER = qq{#line --- "$mcfile"}
 
-    return bless \%(buffer => '',
-        fh => $fh,
-        line_no => 1,
+    return bless \(%: buffer => ''
+                      fh => $fh
+                      line_no => 1
         ), $class
 
 

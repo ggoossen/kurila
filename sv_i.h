@@ -60,7 +60,7 @@ Perl_SvNV(pTHX_ SV *sv) {
     return SvNOK(sv) ? SvNVX(sv) : sv_2nv(sv);
 }
 
-#define SvIV_nomg(sv) (SvIOK(sv) ? SvIVX(sv) : sv_2iv(sv))
+#define SvIV_nomg(sv) (SvIOK(sv) ? I_SvIV(sv) : sv_2iv(sv))
 #define SvUV_nomg(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv))
 
 STRLEN

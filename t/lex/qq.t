@@ -12,7 +12,7 @@ sub is($left, $right, ?$msg)
 ', $test++
         return 1
     
-    foreach (@($left, $right)) {
+    foreach ((@: $left, $right)) {
     # Comment out these regexps to map non-printables to ord if the perl under
     # test is so broken that it's not helping
     #       s/([^-+A-Za-z_0-9])/sprintf q{'.chr(%d).'}, ord $1/ge;
@@ -79,7 +79,7 @@ do
 
 # variable interpolation
 do
-    our @($a, $b, ?$c, ?$dx) =  qw(foo bar)
+    our (@: $a, $b, ?$c, ?$dx) =  qw(foo bar)
     my $da = \$a
 
     is("$a", "foo",    "verifying assign")

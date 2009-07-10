@@ -13,14 +13,13 @@ isa_ok( $pl, 'ExtUtils::Packlist' )
 SKIP: do
 
     # and some test data to be read
-    $pl->{+data} = %(
-        single => 1,
-        hash => \%(
-        foo => 'bar',
-        baz => 'bup',
-        ),
-        '/./abc' => '',
-        )
+    $pl->{+data} = %: 
+        single => 1
+        hash => \ %: 
+            foo => 'bar'
+            baz => 'bup'
+        '/./abc' => ''
+
     ExtUtils::Packlist::write($pl, 'eplist')
     is( $pl->{packfile}, 'eplist', 'write() should set packfile name' )
 
@@ -48,12 +47,12 @@ SKIP: do
     ok( exists $pl->{data}{'/abc'}, 'read() should resolve /./ to / in keys' )
 
     # give validate a valid and an invalid file to find
-    $pl->{+data} = %(
-        eplist => 1,
-        fake => undef,
-        )
+    $pl->{+data} = %: 
+        eplist => 1
+        fake => undef
+        
 
-    is( nelems @(ExtUtils::Packlist::validate($pl)), 1,
+    is( nelems (@: ExtUtils::Packlist::validate($pl)), 1,
         'validate() should find missing files' )
     ExtUtils::Packlist::validate($pl, 1)
     ok( !exists $pl->{data}{fake},
@@ -65,7 +64,7 @@ SKIP: do
 
 
 # packlist_file, $pl should be set from write test
-is( ExtUtils::Packlist::packlist_file(\%( packfile => 'pl' ))[0], 'pl',
+is( ExtUtils::Packlist::packlist_file(\(%:  packfile => 'pl' ))[0], 'pl',
     'packlist_file() should fetch packlist from passed hash' )
 is( ExtUtils::Packlist::packlist_file($pl)[0], 'eplist',
     'packlist_file() should fetch packlist from ExtUtils::Packlist object' )

@@ -18,11 +18,11 @@ do
 
 m/fip/ and $count++
 
-no re 'debug';
+no re 'debug'
 
 m/fop/ and $count++
 
-use re 'debug';
+use re 'debug'
 my $var='zoo|liz|zap'
 m/($var)/ or $count++
 

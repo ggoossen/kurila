@@ -38,7 +38,7 @@ sub extra_clean_files
         s/.c$/.err/
     
 
-    return @( @errfiles, 'perlmain.err' )
+    return (@:  @errfiles, 'perlmain.err' )
 
 
 

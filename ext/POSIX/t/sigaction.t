@@ -107,7 +107,7 @@ try {
 ok(!$^EVAL_ERROR, "zero for new action")
 
 try {
-    sigaction(SIGHUP, bless(\%(),'Class'), $oldaction);
+    sigaction(SIGHUP, bless(\$%,'Class'), $oldaction);
 }
 ok($^EVAL_ERROR, "any object not good as new action")
 

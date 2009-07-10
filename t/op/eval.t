@@ -160,11 +160,8 @@ do
 
 $x++
 
-# does scalar eval"" pop stack correctly?
-do
-    my $c = eval "(1,2)x10"
-    print $^STDOUT, $c eq '2222222222' ?? "ok $x\n" !! "# $c\nnot ok $x\n"
-    $x++
+print $^STDOUT, "ok $x\n"
+$x++
 
 
 # return from try {} should clear $^EVAL_ERROR correctly
@@ -243,7 +240,7 @@ sub do_sort
     my $zzz = 2
     my @a = sort
         { print $^STDOUT, eval('$zzz') == 2 ?? 'ok' !! 'not ok', " 51\n"; $a <+> $b },
-        @(               2, 1)
+        @:                2, 1
 
 do_sort()
 
@@ -300,7 +297,7 @@ sub fred4
 # [perl #9728] used to dump core
 do
     my $eval = eval 'sub { eval q|sub { %S }| }'
-    $eval->(\%())
+    $eval->(\$%)
     print $^STDOUT, "ok $test\n"
     $test++
 

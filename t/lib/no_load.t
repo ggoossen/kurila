@@ -11,9 +11,9 @@ require "./test.pl"
 #
 # Format: [Module-that-should-not-be-loaded => modules to test]
 #
-my @TESTS = @(
-    \@(Carp  => < qw [warnings Exporter]),
-    )
+my @TESTS = @: 
+    \(@: Carp  => < qw [warnings Exporter])
+    
 
 my $count = 0
 for (@TESTS)
@@ -22,7 +22,7 @@ for (@TESTS)
 print $^STDOUT, "1..$count\n"
 
 foreach my $test ( @TESTS)
-    my @($exclude, @< @modules) =  $test->@
+    my (@: $exclude, @< @modules) =  $test->@
 
     foreach my $module ( @modules)
         my $prog = <<"        --"

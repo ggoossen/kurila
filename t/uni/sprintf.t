@@ -8,7 +8,7 @@ BEGIN
 
 plan tests => 52
 
-use utf8;
+use utf8
 
 $a = "B\x{fc}f"
 $b = "G\x{100}r"
@@ -140,7 +140,7 @@ do
     is(substr($sprintf,0,2), $w, "utf8 echo echo")
 
 
-my @values =@(chr 110, chr 255, chr 256)
+my @values =@: chr 110, chr 255, chr 256
 
 foreach my $prefix ( @values)
     foreach my $vector ( map {$_ . $_}, @values)
@@ -150,7 +150,7 @@ foreach my $prefix ( @values)
         foreach my $dot ( @values)
             my $result = sprintf $format, $dot, $vector
             is (length $result, 8)
-                or print $^STDOUT, "# ", join (',', map {ord $_}, @( $prefix, $dot, $vector)),
+                or print $^STDOUT, "# ", join (',', map {ord $_}, (@:  $prefix, $dot, $vector)),
                 "\n"
         
     

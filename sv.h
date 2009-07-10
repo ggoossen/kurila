@@ -869,15 +869,6 @@ in gv.h: */
 
 #  if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 /* These get expanded inside other macros that already use a variable _sv  */
-#    define SvIVX(sv)							\
-	(*({ SV *const _svi = (SV *) (sv);				\
-	    assert(SvTYPE(_svi) == SVt_IV || SvTYPE(_svi) >= SVt_PVIV);	\
-	    assert(SvTYPE(_svi) != SVt_PVAV);				\
-	    assert(SvTYPE(_svi) != SVt_PVHV);				\
-	    assert(SvTYPE(_svi) != SVt_PVCV);				\
-	    assert(!isGV_with_GP(_svi));				\
-	    &(((XPVIV*) SvANY(_svi))->xiv_iv);				\
-	 }))
 #    define SvUVX(sv)							\
 	(*({ SV *const _svi = (SV *) (sv);				\
 	    assert(SvTYPE(_svi) == SVt_IV || SvTYPE(_svi) >= SVt_PVIV);	\

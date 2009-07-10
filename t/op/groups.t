@@ -140,9 +140,9 @@ else
 
 
 if (config_value("myuname") =~ m/^cygwin_nt/i)  # basegroup on CYGWIN_NT has id = 0.
-    %basegroup{[@($pwgid,$pwgnam)]} = @(0,0)
+    %basegroup{[(@: $pwgid,$pwgnam)]} = @: 0,0
 else
-    %basegroup{[@($pwgid,$pwgnam)]} = @(1,1)
+    %basegroup{[(@: $pwgid,$pwgnam)]} = @: 1,1
 
 $gr2 = join(' ', grep( {!%basegroup{+$_}++ }, sort split(' ',$groups)))
 
@@ -152,7 +152,7 @@ if ($gr1 eq $gr2 || ($gr1 eq '' && $gr2 eq $pwgid))
     $ok1++
 elsif (config_value("myuname") =~ m/^cygwin_nt/i) # basegroup on CYGWIN_NT has id = 0.
     # Retry in default unix mode
-    %basegroup = %( $pwgid => 1, $pwgnam => 1 )
+    %basegroup = %:  $pwgid => 1, $pwgnam => 1 
     $gr2 = join(' ', grep( {!%basegroup{+$_}++ }, sort split(' ',$groups)))
     if ($gr1 eq $gr2 || ($gr1 eq '' && $gr2 eq $pwgid))
         print $^STDOUT, "ok 1 # This Cygwin behaves like Unix (Win2k?)\n"

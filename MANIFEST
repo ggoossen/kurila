@@ -690,7 +690,6 @@ intrpvar.h			Variables held in each interpreter instance
 iperlsys.h			Perl's interface to the system
 keywords.h			The keyword numbers
 keywords.pl			Program to write keywords.h
-lib/attributes.pm		For "sub foo : attrlist"
 lib/base/Changes		base.pm changelog
 lib/base.pm			Establish IS-A relationship at compile time
 lib/base/t/base.t		See if base works

@@ -31,7 +31,7 @@ is( (join ' ',@ARGV), 'file',		'options removed from @ARGV (3)' )
 ok( $opt_i && $opt_f eq 'oi',	'options -i and -f correctly set' )
 ok( !defined $opt_o,		'option -o not set' )
 
-%opt = %(); $opt_i = undef
+%opt = $%; $opt_i = undef
 @ARGV = qw(-hij -k -- -l m)
 
 ok( getopts('hi:kl', \%opt),	'getopts succeeded (2)' )

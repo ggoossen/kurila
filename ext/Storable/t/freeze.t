@@ -23,9 +23,9 @@ plan tests => 20
 
 $a = 'toto'
 $b = \$a
-our $c = bless \%(), 'CLASS'
+our $c = bless \$%, 'CLASS'
 $c->{+attribute} = $b
-our $d = \%()
+our $d = \$%
 our $e = \$@
 $d->{+'a'} = $e
 $e->[+0] = $d
@@ -49,7 +49,7 @@ ok $got eq $dumped;
 package FOO; our @ISA = qw(Storable)
 
 sub make
-    my $self = bless \%()
+    my $self = bless \$%
     $self->{+key} = \%main::a
     return $self
 ;
@@ -111,9 +111,9 @@ try {
 }
 ok !$^EVAL_ERROR
 
-freeze \%()
+freeze \$%
 try { thaw $thaw_me }
-try { $frozen = freeze \%( foo => \%() ) }
+try { $frozen = freeze \%( foo => \$% ) }
 ok !$^EVAL_ERROR
 
 thaw $frozen			# used to segfault here

@@ -47,7 +47,7 @@ sub _is_win95
         !! ! defined env::var('SYSTEMROOT')
 
 
-my %Is = %( () )
+my %Is = $%
 %Is{+VMS}    = $^OS_NAME eq 'VMS'
 %Is{+OS2}    = $^OS_NAME eq 'os2'
 %Is{+MacOS}  = $^OS_NAME eq 'MacOS'
@@ -72,7 +72,7 @@ if( %Is{?NW5} )
 
 map { delete %Is{$_} unless %Is{?$_} }, keys %Is
 _assert( nelems(%Is) == 2 )
-my@($OS) =  keys %Is
+my(@: $OS) =  keys %Is
 
 
 my $class = "ExtUtils::MM_$OS"
@@ -83,6 +83,6 @@ unshift @ISA, $class
 
 sub _assert
     my $sanity = shift
-    die sprintf "Assert failed at \%s line \%d\n", < @(caller)[[1..2]] unless $sanity
+    die sprintf "Assert failed at \%s line \%d\n", < (@: caller)[[1..2]] unless $sanity
     return
 

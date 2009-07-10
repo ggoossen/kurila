@@ -27,7 +27,7 @@ my $Is_Ultrix_VAX = $^OS_NAME eq 'ultrix' && `uname -m` =~ m/^VAX$/
 
 while ( ~< $^DATA)
     s/^\s*>//; s/<\s*$//
-    @($template, $data, $result, ?$comment) =  split(m/<\s*>/, $_, 4)
+    (@: $template, $data, $result, ?$comment) =  split(m/<\s*>/, $_, 4)
     if ($^OS_NAME eq 'os390' || $^OS_NAME eq 's390') # non-IEEE (s390 is UTS)
         $data   =~ s/([eE])96$/$163/      # smaller exponents
         $result =~ s/([eE]\+)102$/$169/   #  "       "
@@ -46,8 +46,8 @@ while ( ~< $^DATA)
 
     $evalData = eval $data
     die if $^EVAL_ERROR
-    $evalData = ref $evalData ?? $evalData !! \@($evalData)
-    push @tests, \@($template, $evalData, $result, $comment, $data)
+    $evalData = ref $evalData ?? $evalData !! \@: $evalData
+    push @tests, \@: $template, $evalData, $result, $comment, $data
 
 
 print $^STDOUT, '1..', scalar nelems @tests, "\n"
@@ -63,7 +63,7 @@ $^WARN_HOOK = sub (@< @_)
 
 
 for my  $i (1 .. nelems(@tests))
-    @($template, $evalData, $result, $comment, $data) =  (shift @tests)->@
+    (@: $template, $evalData, $result, $comment, $data) =  (shift @tests)->@
     $w = undef
     $x = sprintf(">$template<", < $evalData->@)
     substr($x, -1, 0, $w) if $w

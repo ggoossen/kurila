@@ -18,7 +18,7 @@ else
     print $^STDOUT, "not ok 1\n"
 
 
-@ary = @(1, 2)
+@ary = @: 1, 2
 
 for ( @ary)
     s/(.*)/ok $1\n/
@@ -37,7 +37,7 @@ for (split(' ','a b c d e'))
 
 if ($foo eq '3210abcde') {print $^STDOUT, "ok 5\n";} else {print $^STDOUT, "not ok 5 $foo\n";}
 
-foreach my $foo (@(("ok 6\n","ok 7\n")))
+foreach my $foo ((@: ("ok 6\n","ok 7\n")))
     print $^STDOUT, $foo
 
 
@@ -52,7 +52,7 @@ print $^STDOUT, foo(2) == 2 ?? "ok" !! "not ok", " 9\n"
 print $^STDOUT, foo(5) == 5 ?? "ok" !! "not ok", " 10\n"
 
 sub bar
-    return  @(1, 2, 4)
+    return  @: 1, 2, 4
 
 
 our $a = 0
@@ -108,13 +108,13 @@ sub is($got, $expected, $name)
     return 0
 
 
-@array = @('A', 'B', 'C')
+@array = @: 'A', 'B', 'C'
 for ( @array)
     $r .= $_
 
 is ($r, 'ABC', 'Forwards for array')
 $r = ''
-for (@(1,2,3))
+for ((@: 1,2,3))
     $r .= $_
 
 is ($r, '123', 'Forwards for list')
@@ -124,7 +124,7 @@ for ( map {$_}, @array)
 
 is ($r, 'ABC', 'Forwards for array via map')
 $r = ''
-for ( map {$_}, @( 1,2,3))
+for ( map {$_}, (@:  1,2,3))
     $r .= $_
 
 is ($r, '123', 'Forwards for list via map')
@@ -143,7 +143,7 @@ for (reverse @array)
 
 is ($r, 'CBA', 'Reverse for array')
 $r = ''
-for (reverse @(1,2,3))
+for (reverse (@: 1,2,3))
     $r .= $_
 
 is ($r, '321', 'Reverse for list')
@@ -153,7 +153,7 @@ for (reverse map {$_}, @array)
 
 is ($r, 'CBA', 'Reverse for array via map')
 $r = ''
-for (reverse map {$_}, @(1,2,3))
+for (reverse map {$_}, (@: 1,2,3))
     $r .= $_
 
 is ($r, '321', 'Reverse for list via map')
@@ -173,7 +173,7 @@ for my $i ( @array)
 
 is ($r, 'ABC', 'Forwards for array with var')
 $r = ''
-for my $i (@(1,2,3))
+for my $i ((@: 1,2,3))
     $r .= $i
 
 is ($r, '123', 'Forwards for list with var')
@@ -183,7 +183,7 @@ for my $i ( map {$_}, @array)
 
 is ($r, 'ABC', 'Forwards for array via map with var')
 $r = ''
-for my $i ( map {$_}, @( 1,2,3))
+for my $i ( map {$_}, (@:  1,2,3))
     $r .= $i
 
 is ($r, '123', 'Forwards for list via map with var')
@@ -199,7 +199,7 @@ for my $i (reverse @array)
 
 is ($r, 'CBA', 'Reverse for array with var')
 $r = ''
-for my $i (reverse @(1,2,3))
+for my $i (reverse (@: 1,2,3))
     $r .= $i
 
 is ($r, '321', 'Reverse for list with var')
@@ -207,7 +207,7 @@ is ($r, '321', 'Reverse for list with var')
 TODO: do
     $test++
     local $TODO = "RT #1085: what should be output of perl -we 'print do \{ foreach (1, 2) \{ 1; \} \}'"
-    if (do {17; foreach (@(1, 2)) { 1; } } != 17)
+    if (do {17; foreach ((@: 1, 2)) { 1; } } != 17)
         print $^STDOUT, "not "
     
     print $^STDOUT, "ok $test # TODO $TODO\n"
@@ -217,7 +217,7 @@ do
     $test++
     no warnings 'reserved';
     my %h
-    foreach (%h{[@('a', 'b')]}) {}
+    foreach (%h{[(@: 'a', 'b')]}) {}
     if(%h)
         print $^STDOUT, "not "
     

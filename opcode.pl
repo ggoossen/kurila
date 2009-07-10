@@ -21,7 +21,7 @@ while ( ~< $^DATA)
     chop
     next unless $_
     next if m/^#/
-    my @($key, $desc, $check, $flags, ? $args) =  split(m/\t+/, $_, 5)
+    my (@: $key, $desc, $check, $flags, ? $args) =  split(m/\t+/, $_, 5)
     $args = '' unless defined $args
 
     warn qq[Description "$desc" duplicates %seen{?$desc}\n] if %seen{?$desc}
@@ -43,54 +43,54 @@ while ( ~< $^DATA)
 my %alias
 
 # Format is "this function" => "does these op names"
-my @raw_alias = @(
-    Perl_do_kv => \qw( keys values ),
-    Perl_unimplemented_op => \qw(mapstart custom root),
+my @raw_alias = @: 
+    Perl_do_kv => \qw( keys values )
+    Perl_unimplemented_op => \qw(mapstart custom root)
     # All the ops with a body of { return NORMAL; }
-    Perl_pp_null => \qw(scalar regcmaybe lineseq scope),
+    Perl_pp_null => \qw(scalar regcmaybe lineseq scope)
 
-    Perl_pp_require => \@('evalfile'),
-    Perl_pp_sysread => \qw(read recv),
-    Perl_pp_sysseek => \@('seek'),
-    Perl_pp_ioctl => \@('fcntl'),
-    Perl_pp_ssockopt => \@('gsockopt'),
-    Perl_pp_getpeername => \@('getsockname'),
-    Perl_pp_stat => \@('lstat'),
+    Perl_pp_require => \(@: 'evalfile')
+    Perl_pp_sysread => \qw(read recv)
+    Perl_pp_sysseek => \(@: 'seek')
+    Perl_pp_ioctl => \(@: 'fcntl')
+    Perl_pp_ssockopt => \(@: 'gsockopt')
+    Perl_pp_getpeername => \(@: 'getsockname')
+    Perl_pp_stat => \(@: 'lstat')
     Perl_pp_ftrowned => \qw(fteowned ftzero ftsock ftchr ftblk
 					 ftfile ftdir ftpipe ftsuid ftsgid
- 					 ftsvtx),
-    Perl_pp_fttext => \@('ftbinary'),
-    Perl_pp_gmtime => \@('localtime'),
-    Perl_pp_semget => \qw(shmget msgget),
-    Perl_pp_semctl => \qw(shmctl msgctl),
-    Perl_pp_ghostent => \qw(ghbyname ghbyaddr),
-    Perl_pp_gnetent => \qw(gnbyname gnbyaddr),
-    Perl_pp_gprotoent => \qw(gpbyname gpbynumber),
-    Perl_pp_gservent => \qw(gsbyname gsbyport),
-    Perl_pp_gpwent => \qw(gpwnam gpwuid),
-    Perl_pp_ggrent => \qw(ggrnam ggrgid),
-    Perl_pp_ftis => \qw(ftsize ftmtime ftatime ftctime),
-    Perl_pp_chown => \qw(unlink chmod utime kill),
-    Perl_pp_link => \@('symlink'),
+ 					 ftsvtx)
+    Perl_pp_fttext => \(@: 'ftbinary')
+    Perl_pp_gmtime => \(@: 'localtime')
+    Perl_pp_semget => \qw(shmget msgget)
+    Perl_pp_semctl => \qw(shmctl msgctl)
+    Perl_pp_ghostent => \qw(ghbyname ghbyaddr)
+    Perl_pp_gnetent => \qw(gnbyname gnbyaddr)
+    Perl_pp_gprotoent => \qw(gpbyname gpbynumber)
+    Perl_pp_gservent => \qw(gsbyname gsbyport)
+    Perl_pp_gpwent => \qw(gpwnam gpwuid)
+    Perl_pp_ggrent => \qw(ggrnam ggrgid)
+    Perl_pp_ftis => \qw(ftsize ftmtime ftatime ftctime)
+    Perl_pp_chown => \qw(unlink chmod utime kill)
+    Perl_pp_link => \(@: 'symlink')
     Perl_pp_ftrread => \qw(ftrwrite ftrexec fteread ftewrite
- 					fteexec),
-    Perl_pp_shmwrite => \qw(shmread msgsnd msgrcv semop),
-    Perl_pp_send => \@('syswrite'),
-    Perl_pp_defined => \qw(dor dorassign),
-    Perl_pp_and => \@('andassign'),
-    Perl_pp_or => \@('orassign'),
-    Perl_pp_ucfirst => \@('lcfirst'),
-    Perl_pp_sle => \qw(slt sgt sge),
-    Perl_pp_index => \@('rindex'),
-    Perl_pp_oct => \@('hex'),
-    Perl_pp_shift => \@('pop'),
-    Perl_pp_sin => \qw(cos exp log sqrt),
-    Perl_pp_bit_or => \@('bit_xor'),
-    Perl_pp_rv2sv => \@('rv2av rv2hv'),
-    )
+ 					fteexec)
+    Perl_pp_shmwrite => \qw(shmread msgsnd msgrcv semop)
+    Perl_pp_send => \(@: 'syswrite')
+    Perl_pp_defined => \qw(dor dorassign)
+    Perl_pp_and => \(@: 'andassign')
+    Perl_pp_or => \(@: 'orassign')
+    Perl_pp_ucfirst => \(@: 'lcfirst')
+    Perl_pp_sle => \qw(slt sgt sge)
+    Perl_pp_index => \(@: 'rindex')
+    Perl_pp_oct => \(@: 'hex')
+    Perl_pp_shift => \(@: 'pop')
+    Perl_pp_sin => \qw(cos exp log sqrt)
+    Perl_pp_bit_or => \(@: 'bit_xor')
+    Perl_pp_rv2sv => \(@: 'rv2av rv2hv')
+    
 
 while (@raw_alias)
-    my @($func, $names) = @: splice @raw_alias, 0, 2
+    my (@: $func, $names) = @: splice @raw_alias, 0, 2
     for ($names->@)
         %alias{+$_} = $func
 
@@ -300,44 +300,44 @@ EXTCONST U32 PL_opargs[];
 EXTCONST U32 PL_opargs[] = \{
 END
 
-my %argnum = %(
-    'S',  1,		# scalar
-    'L',  2,		# list
-    'A',  3,		# array value
-    'H',  4,		# hash value
-    'C',  5,		# code value
-    'F',  6,		# file value
-    'R',  7,		# scalar reference
-    )
+my %argnum = %: 
+    'S',  1		# scalar
+    'L',  2		# list
+    'A',  3		# array value
+    'H',  4		# hash value
+    'C',  5		# code value
+    'F',  6		# file value
+    'R',  7		# scalar reference
+    
 
-my %opclass = %(
-    '0',  0,		# baseop
-    '1',  1,		# unop
-    '2',  2,		# binop
-    '|',  3,		# logop
-    '@',  4,		# listop
-    '/',  5,		# pmop
-    '$',  6,		# svop_or_padop
-    '#',  7,		# padop
-    '{',  9,		# loop
-    ';',  10,		# cop
-    '%',  11,		# baseop_or_unop
-    '-',  12,		# filestatop
-    '}',  13,		# loopexop
-    '!',  14,		# rootop
-    )
+my %opclass = %: 
+    '0',  0		# baseop
+    '1',  1		# unop
+    '2',  2		# binop
+    '|',  3		# logop
+    '@',  4		# listop
+    '/',  5		# pmop
+    '$',  6		# svop_or_padop
+    '#',  7		# padop
+    '{',  9		# loop
+    ';',  10		# cop
+    '%',  11		# baseop_or_unop
+    '-',  12		# filestatop
+    '}',  13		# loopexop
+    '!',  14		# rootop
+    
 
-my %opflags = %(
-    'm' =>   1,		# needs stack mark
-    'f' =>   2,		# fold constants
-    's' =>   4,		# always produces scalar
-    't' =>   8,		# needs target scalar
-    'T' =>   8 ^|^ 256,	# ... which may be lexical
-    'i' =>  16,		# always produces integer
-    'I' =>  32,		# has corresponding int op
-    'd' =>  64,		# danger, unknown side effects
-    'u' => 128,		# defaults to $_
-    )
+my %opflags = %: 
+    'm' =>   1		# needs stack mark
+    'f' =>   2		# fold constants
+    's' =>   4		# always produces scalar
+    't' =>   8		# needs target scalar
+    'T' =>   8 ^|^ 256	# ... which may be lexical
+    'i' =>  16		# always produces integer
+    'I' =>  32		# has corresponding int op
+    'd' =>  64		# danger, unknown side effects
+    'u' => 128		# defaults to $_
+    
 
 my %OP_IS_SOCKET
 my %OP_IS_FILETEST
@@ -408,7 +408,7 @@ sub gen_op_is_macro($op_is, $macname)
     if ($op_is->%)
 
         # get opnames whose numbers are lowest and highest
-        my @($first, @< @rest) =  sort {
+        my (@: $first, @< @rest) =  sort {
                 $op_is->{?$a} <+> $op_is->{?$b}
             }, keys $op_is->%
 
@@ -490,7 +490,7 @@ rename_if_different $pp_proto_new, 'pp_proto.h'
 rename_if_different $pp_sym_new, 'pp.sym'
 
 END 
-    foreach (@('opcode.h', 'opnames.h', 'pp_proto.h', 'pp.sym'))
+    foreach ((@: 'opcode.h', 'opnames.h', 'pp_proto.h', 'pp.sym'))
         1 while unlink "$_-old"
     
 
@@ -613,7 +613,7 @@ gvsv		scalar variable		ck_null		ds$
 gv		glob value		ck_null		ds$	
 gelem		glob elem		ck_null		d2	S S
 padsv		private variable	ck_null		ds0
-magicsv		magic variable	ck_null		ds0
+magicsv		magic variable	ck_null		ds$
 
 pushre		push regexp		ck_null		d/
 
@@ -680,7 +680,7 @@ divide		division (/)		ck_null		IfsT2	S S
 i_divide	integer division (/)	ck_null		ifsT2	S S
 modulo		modulus (%)		ck_null		IifsT2	S S
 i_modulo	integer modulus (%)	ck_null		ifsT2	S S
-repeat		repeat (x)		ck_repeat	mt2	L S
+repeat		repeat (x)		ck_null	mt2	L S
 
 add		addition (+)		ck_null		IfsT2	S S
 i_add		integer addition (+)	ck_null		ifsT2	S S

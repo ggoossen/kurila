@@ -22,8 +22,8 @@ my $UncompressClass = getInverse($CompressClass)
 my $Error           = getErrorRef($CompressClass)
 my $UnError         = getErrorRef($UncompressClass)
 
-use Compress::Raw::Zlib;
-use IO::Handle < qw(SEEK_SET SEEK_CUR SEEK_END);
+use Compress::Raw::Zlib
+use IO::Handle < qw(SEEK_SET SEEK_CUR SEEK_END)
 
 sub myGZreadFile
     my $filename = shift 

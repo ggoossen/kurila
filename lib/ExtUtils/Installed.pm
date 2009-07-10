@@ -75,22 +75,22 @@ sub new
     my $class = shift(@_)
     $class = ref($class) || $class
 
-    my %args = %( < @_ )
+    my %args = %:  < @_ 
 
-    my $self = \%( ':private:' => %(),
-        'Perl' => %(),
-        )
+    my $self = \%:  ':private:' => $%
+                    'Perl' => $%
+        
 
     if (%args{?config_override})
         $self->{':private:'}{+Config} = %args{?config_override}
     else
         $self->{':private:'}{+Config} = %+:
-            map { %($_ => config_value($_)) }, config_keys()
+            map { (%: $_ => config_value($_)) }, config_keys()
     
 
-    for my $tuple (@: @(inc_override => INC => $($^INCLUDE_PATH) ),
-                      @( extra_libs => EXTRA => $@ ))
-        my @($arg,$key,$val)= $tuple
+    for my $tuple (@: (@: inc_override => INC => $($^INCLUDE_PATH) )
+                      (@:  extra_libs => EXTRA => $@ ))
+        my (@: $arg,$key,$val)= $tuple
         if ( %args{?$arg} )
             try {
                 $self->{':private:'}{+$key} = %args{$arg}->@;
@@ -108,10 +108,10 @@ sub new
     
     my $perl5lib = defined env::var('PERL5LIB') ?? env::var('PERL5LIB') !! ""
 
-    my @dirs = @( $self->{':private:'}{Config}{?archlibexp},
-                  $self->{':private:'}{Config}{?sitearchexp},
-                  < split(m/\Q$(config_value("path_sep"))\E/, $perl5lib),
-                  < $self->{':private:'}{?EXTRA},
+    my @dirs = (@:  $self->{':private:'}{Config}{?archlibexp}
+                    $self->{':private:'}{Config}{?sitearchexp}
+                    < split(m/\Q$(config_value("path_sep"))\E/, $perl5lib)
+                    < $self->{':private:'}{?EXTRA}
         )
 
     # File::Find does not know how to deal with VMS filepaths.
@@ -238,7 +238,7 @@ sub directory_tree($self, $module, $type, @< @under)
     my (%dirs)
     foreach my $dir ( $self->directories($module, $type, < @under))
         %dirs{+$dir}++
-        my @($last) = @("")
+        my (@: $last) = @: ""
         while ($last ne $dir)
             $last = $dir
             $dir = dirname($dir)

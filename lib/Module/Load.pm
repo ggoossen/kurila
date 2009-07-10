@@ -2,7 +2,7 @@ package Module::Load
 
 our $VERSION = '0.12'
 
-use File::Spec ();
+use File::Spec ()
 
 sub import
     my $who = _who()
@@ -64,7 +64,7 @@ sub _to_file
     return $file
 
 
-sub _who { @(caller(1))[0] }
+sub _who { (@: caller(1))[0] }
 
 sub _is_file
     local $_ = shift

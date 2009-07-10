@@ -6,8 +6,8 @@ BEGIN { plan tests => 4 };
 
 ok 1
 
-use Pod::Simple::DumpAsXML;
-use Pod::Simple::XMLOutStream;
+use Pod::Simple::DumpAsXML
+use Pod::Simple::XMLOutStream
 print $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n"
 
 do

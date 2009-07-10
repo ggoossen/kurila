@@ -29,7 +29,7 @@ my $x = chr(1234)
 is $x, (thaw freeze \$x)->$
 
 # Long scalar
-$x = join '', map {chr $_}, @( ( <0..1023))
+$x = join '', map {chr $_}, @:  ( <0..1023)
 is $x, (thaw freeze \$x)->$
 
 # Char in the range 127-255 (probably) in utf8

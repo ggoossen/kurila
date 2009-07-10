@@ -10,11 +10,11 @@ BEGIN
     
 
 
-use Config;
+use Config
 
 print $^STDOUT, "1..13\n"
 
-use IO::File;
+use IO::File
 
 my $tst = IO::File->new("$tell_file","r") || die("Can't open $tell_file")
 binmode $tst # its a nop unless it matters. Was only if ($^O eq 'MSWin32' or $^O eq 'dos');

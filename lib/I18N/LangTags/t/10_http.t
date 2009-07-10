@@ -61,23 +61,22 @@ my @in = grep { m/\S/ }, split m/\n/, q{
 
 foreach my $in ( @in)
     $in =~ s/^\s*\[([^\]]+)\]\s*//s or die "Bad input: $in"
-    my @should = @( do { my $x = $1; $x =~ m/(\S+)/g } )
+    my @should = @:  do { my $x = $1; $x =~ m/(\S+)/g } 
 
-    if($in eq 'NIX') { $in = ''; @should = @( () ); }
+    if($in eq 'NIX') { $in = ''; @should = $@; }
 
     local env::var('HTTP_ACCEPT_LANGUAGE') = undef
 
-    foreach my $modus (@(
-        sub (@< @_)
-            print $^STDOUT, "# Testing with arg...\n"
-            env::var('HTTP_ACCEPT_LANGUAGE' ) = 'PLORK'
-            return @(@_[0])
-        ,
-        sub (@< @_)
-            print $^STDOUT, "# Testing wath HTTP_ACCEPT_LANGUAGE...\n"
-            env::var('HTTP_ACCEPT_LANGUAGE' ) = @_[0]
-            return()
-        ,)
+    foreach my $modus (@: 
+            sub (@< @_)
+                print $^STDOUT, "# Testing with arg...\n"
+                env::var('HTTP_ACCEPT_LANGUAGE' ) = 'PLORK'
+                return @: @_[0]
+            
+            sub (@< @_)
+                print $^STDOUT, "# Testing wath HTTP_ACCEPT_LANGUAGE...\n"
+                env::var('HTTP_ACCEPT_LANGUAGE' ) = @_[0]
+                return()
         )
         my @args = &$modus($in)
 

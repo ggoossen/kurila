@@ -120,7 +120,7 @@ do
         return "\n\ncalled static_lib\n\nline2\nline3\n\nline4"
     
 
-    my $args = bless(\%( IMPORTS => \%(), ), 'MM')
+    my $args = bless(\%( IMPORTS => \$%, ), 'MM')
 
     # without IMPORTS as a populated hash, there will be no extra data
     my $ret = ExtUtils::MM_OS2::static_lib( $args )

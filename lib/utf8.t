@@ -4,7 +4,7 @@ my $has_perlio
 
 BEGIN 
     chdir 't' if -d 't'
-    $^INCLUDE_PATH = @( '../lib' )
+    $^INCLUDE_PATH = @:  '../lib' 
     require './test.pl'
     unless ($has_perlio = PerlIO::Layer->find( 'perlio'))
         print $^STDOUT, <<EOF
@@ -13,7 +13,7 @@ EOF
     
 
 
-no utf8; # Ironic, no?
+no utf8 # Ironic, no?
 
 # NOTE!
 #
@@ -45,19 +45,19 @@ do
 
     my $smiley = "\x{263a}"
 
-    for my $s (@("\x{263a}",
-                 $smiley,
+    for my $s (@: "\x{263a}"
+                  $smiley
 
-                 "" . $smiley,
-                 "" . "\x{263a}",
+                  "" . $smiley
+                  "" . "\x{263a}"
 
-                 $smiley    . "",
-                 "\x{263a}" . "",)
+                  $smiley    . ""
+                  "\x{263a}" . "",
         )
         my $length_chars = length($s)
         my $length_bytes
         do { use bytes; $length_bytes = length($s) }
-        my @regex_chars = @( $s =~ m/(.)/g )
+        my @regex_chars = @:  $s =~ m/(.)/g 
         my $regex_chars = (nelems @regex_chars)
         my @split_chars = split m//, $s
         my $split_chars = (nelems @split_chars)
@@ -65,19 +65,19 @@ do
            "1/1/1/3")
     
 
-    for my $s (@("\x{263a}" . "\x{263a}",
-                 $smiley    . $smiley,
+    for my $s (@: "\x{263a}" . "\x{263a}"
+                  $smiley    . $smiley
 
-                 "\x{263a}\x{263a}",
-                 "$smiley$smiley",
+                  "\x{263a}\x{263a}"
+                  "$smiley$smiley"
 
-                 "\x{263a}" x 2,
-                 $smiley    x 2,)
+                  "\x{263a}" x 2
+                  $smiley    x 2,
         )
         my $length_chars = length($s)
         my $length_bytes
         do { use bytes; $length_bytes = length($s) }
-        my @regex_chars = @( $s =~ m/(.)/g )
+        my @regex_chars = @:  $s =~ m/(.)/g 
         my $regex_chars = (nelems @regex_chars)
         my @split_chars = split m//, $s
         my $split_chars = (nelems @split_chars)
@@ -207,7 +207,7 @@ do
 
 do
     fresh_perl_like ('use utf8; utf8::moo()',
-                     qr/Undefined subroutine &utf8::moo/, \%(stderr=>1),
+                     qr/Undefined subroutine &utf8::moo/, \(%: stderr=>1),
                      "Check Carp is loaded for AUTOLOADing errors")
 
 

@@ -10,7 +10,7 @@ use IPC::SysV < qw(GETNCNT GETZCNT GETVAL SETVAL GETPID GETALL SETALL
 		 IPC_STAT IPC_SET IPC_RMID)
 
 our ($VERSION)
-use Carp;
+use Carp
 
 $VERSION = "1.02"
 $VERSION = eval $VERSION
@@ -20,16 +20,16 @@ do
 
     use Class::Struct < qw(struct)
 
-    struct 'IPC::Semaphore::stat' => \@(
-           uid  => '$',
-           gid  => '$',
-           cuid => '$',
-           cgid => '$',
-           mode => '$',
-           ctime        => '$',
-           otime        => '$',
-           nsems        => '$',
-           )
+    struct 'IPC::Semaphore::stat' => \@: 
+           uid  => '$'
+           gid  => '$'
+           cuid => '$'
+           cgid => '$'
+           mode => '$'
+           ctime        => '$'
+           otime        => '$'
+           nsems        => '$'
+           
 
 
 sub new($class, $key, $nsems, $flags)
@@ -47,7 +47,7 @@ sub id
 
 sub remove
     my $self = shift
-    @(semctl($self->$,0,IPC_RMID,0), undef $self->$)[0]
+    (@: semctl($self->$,0,IPC_RMID,0), undef $self->$)[0]
 
 
 sub getncnt($self, $sem)
@@ -93,12 +93,12 @@ sub set
         $ds = shift
     else
         croak 'Bad arg count' if (nelems @_) % 2
-        my %arg = %( < @_ )
+        my %arg = %:  < @_ 
         $ds = $self->stat
             or return undef
         my($key,$val)
         $ds->?$key($val)
-            while(@($key,$val) =@( each %arg))
+            while((@: $key,$val) =(@:  each %arg))
     
 
     my $v = semctl($self->$,0,IPC_SET,$ds->pack)
@@ -110,7 +110,7 @@ sub getall
     my $data = ""
     semctl($self->$,0,GETALL,$data)
         or return ()
-    @(unpack("s!*",$data))
+    @: unpack("s!*",$data)
 
 
 sub setall

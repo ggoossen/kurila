@@ -3,9 +3,9 @@ package ExtUtils::MakeMaker
 
 
 require Exporter
-use ExtUtils::MakeMaker::Config;
-use File::Path;
-use Config 'config_value';
+use ExtUtils::MakeMaker::Config
+use File::Path
+use Config 'config_value'
 
 our $Verbose = 0       # exported
 our @Parent            # needs to be localized
@@ -16,7 +16,7 @@ my @Prepend_parent
 my %Recognized_Att_Keys
 
 our $VERSION = '6.44'
-our @($Revision, ...) = @: q$Revision: 54639 $ =~ m/Revision:\s+(\S+)/
+our (@: $Revision, ...) = @: q$Revision: 54639 $ =~ m/Revision:\s+(\S+)/
 our $Filename = __FILE__   # referenced outside MakeMaker
 
 our @ISA = qw(Exporter)
@@ -43,7 +43,7 @@ sub WriteMakefile
     die "WriteMakefile: Need even number of args" if (nelems @_) % 2
 
     require ExtUtils::MY
-    my %att = %( < @_ )
+    my %att = %:  < @_ 
 
     _verify_att(\%att)
 
@@ -58,58 +58,58 @@ sub WriteMakefile
 # reference type.  Empty value indicate it takes a non-reference
 # scalar.
 my %Att_Sigs
-my %Special_Sigs = %(
-    C                  => 'ARRAY',
-    CONFIG             => 'ARRAY',
-    CONFIGURE          => 'CODE',
-    DIR                => 'ARRAY',
-    DL_FUNCS           => 'HASH',
-    DL_VARS            => 'ARRAY',
-    EXCLUDE_EXT        => 'ARRAY',
-    EXE_FILES          => 'ARRAY',
-    FUNCLIST           => 'ARRAY',
-    H                  => 'ARRAY',
-    IMPORTS            => 'HASH',
-    INCLUDE_EXT        => 'ARRAY',
-    LIBS               => @('ARRAY','PLAINVALUE'),
-    MAN1PODS           => 'HASH',
-    MAN3PODS           => 'HASH',
-    PL_FILES           => 'HASH',
-    PM                 => 'HASH',
-    PMLIBDIRS          => 'ARRAY',
-    PMLIBPARENTDIRS    => 'ARRAY',
-    PREREQ_PM          => 'HASH',
-    SKIP               => 'ARRAY',
-    TYPEMAPS           => 'ARRAY',
-    XS                 => 'HASH',
-    VERSION            => @('version','PLAINVALUE'),
-    _KEEP_AFTER_FLUSH  => 'PLAINVALUE',
+my %Special_Sigs = %: 
+    C                  => 'ARRAY'
+    CONFIG             => 'ARRAY'
+    CONFIGURE          => 'CODE'
+    DIR                => 'ARRAY'
+    DL_FUNCS           => 'HASH'
+    DL_VARS            => 'ARRAY'
+    EXCLUDE_EXT        => 'ARRAY'
+    EXE_FILES          => 'ARRAY'
+    FUNCLIST           => 'ARRAY'
+    H                  => 'ARRAY'
+    IMPORTS            => 'HASH'
+    INCLUDE_EXT        => 'ARRAY'
+    LIBS               => (@: 'ARRAY','PLAINVALUE')
+    MAN1PODS           => 'HASH'
+    MAN3PODS           => 'HASH'
+    PL_FILES           => 'HASH'
+    PM                 => 'HASH'
+    PMLIBDIRS          => 'ARRAY'
+    PMLIBPARENTDIRS    => 'ARRAY'
+    PREREQ_PM          => 'HASH'
+    SKIP               => 'ARRAY'
+    TYPEMAPS           => 'ARRAY'
+    XS                 => 'HASH'
+    VERSION            => (@: 'version','PLAINVALUE')
+    _KEEP_AFTER_FLUSH  => 'PLAINVALUE'
 
-    clean      => 'HASH',
-    depend     => 'HASH',
-    dist       => 'HASH',
-    dynamic_lib=> 'HASH',
-    linkext    => 'HASH',
-    macro      => 'HASH',
-    postamble  => 'HASH',
-    realclean  => 'HASH',
-    test       => 'HASH',
-    )
+    clean      => 'HASH'
+    depend     => 'HASH'
+    dist       => 'HASH'
+    dynamic_lib=> 'HASH'
+    linkext    => 'HASH'
+    macro      => 'HASH'
+    postamble  => 'HASH'
+    realclean  => 'HASH'
+    test       => 'HASH'
+    
 
-%Att_Sigs{[keys %Recognized_Att_Keys]} = @('PLAINVALUE') x (nelems(%Recognized_Att_Keys)/2)
+%Att_Sigs{[keys %Recognized_Att_Keys]} = (@: 'PLAINVALUE') x (nelems(%Recognized_Att_Keys)/2)
 %Att_Sigs{[keys %Special_Sigs]} = values %Special_Sigs
 
 
 sub _verify_att($att)
 
-    while( my @(?$key, ?$val) = @( each $att->%) )
+    while( my (@: ?$key, ?$val) = (@:  each $att->%) )
         my $sig = %Att_Sigs{?$key}
         unless( defined $sig )
             warn "WARNING: $key is not a known parameter.\n"
             next
         
 
-        my @sigs   = ref::svtype($sig) eq 'ARRAY' ?? $sig !! @( $sig )
+        my @sigs   = ref::svtype($sig) eq 'ARRAY' ?? $sig !! @:  $sig 
         my $given  = ref::svtype($val)
         unless( grep { $given eq $_ || ($_ && try{$val->isa($_)}) || ($_ eq 'CODE' && ref($val) eq 'CODE') }, @sigs )
             my $takes = join " or ", map { _format_att($_) }, @sigs
@@ -290,7 +290,7 @@ sub full_setup
     push @Overridable, "postamble"
 
     # All sections are valid keys.
-    %Recognized_Att_Keys{[ @MM_Sections]} = @(1) x nelems @MM_Sections
+    %Recognized_Att_Keys{[ @MM_Sections]} = (@: 1) x nelems @MM_Sections
 
     # we will use all these variables in the Makefile
     @Get_from_Config =
@@ -345,7 +345,7 @@ END
 
 
 sub new
-    my@($class,$self) =  @_
+    my(@: $class,$self) =  @_
     my($key)
 
     # Store the original args passed to WriteMakefile()
@@ -355,7 +355,7 @@ sub new
 
     if ("$(join ' ',@ARGV)" =~ m/\bPREREQ_PRINT\b/)
         require Data::Dumper
-        print $^STDOUT, Data::Dumper->Dump(\@($self->{?PREREQ_PM}), \qw(PREREQ_PM))
+        print $^STDOUT, Data::Dumper->Dump(\(@: $self->{?PREREQ_PM}), \qw(PREREQ_PM))
         exit 0
     
 
@@ -371,15 +371,15 @@ sub new
         check_manifest()
     
 
-    $self = \%() unless (defined $self)
+    $self = \$% unless (defined $self)
 
     check_hints($self)
 
     my %configure_att         # record &{$self->{CONFIGURE}} attributes
     my %initial_att  = $self->% # record initial attributes
 
-    my %unsatisfied = %()
-    foreach my $prereq (sort keys($self->{?PREREQ_PM} || %()))
+    my %unsatisfied = $%
+    foreach my $prereq (sort keys($self->{?PREREQ_PM} || $%))
         # 5.8.0 has a bug with require Foo::Bar alone in an eval, so an
         # extra statement is a workaround.
         my $file = "$prereq.pm"
@@ -419,8 +419,8 @@ END
 
     if (defined $self->{?CONFIGURE})
         if (ref $self->{?CONFIGURE} eq 'CODE')
-            %configure_att = %( <  $self->{?CONFIGURE}->( < @_ )->% )
-            $self = \%( < $self->%, < %configure_att )
+            %configure_att = %:  <  $self->{?CONFIGURE}->( < @_ )->% 
+            $self = \%:  < $self->%, < %configure_att 
         else
             die "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n"
         
@@ -434,7 +434,7 @@ END
         bless $self, $newclass
         push @Parent, $self
         require ExtUtils::MY
-        Symbol::fetch_glob("$newclass\:\:ISA")->*->@ = @( 'MM' )
+        Symbol::fetch_glob("$newclass\:\:ISA")->*->@ = @:  'MM' 
     
 
     if (defined @Parent[?-2])
@@ -603,7 +603,7 @@ END
         if ($skipit)
             push $self->{RESULT}, "\n# --- MakeMaker $section section $skipit."
         else
-            my %a = $self->{?$section} || %()
+            my %a = $self->{?$section} || $%
             push $self->{RESULT}, "\n# --- MakeMaker $section section:"
             push $self->{RESULT}, "# " . join ", ", %a if $Verbose && %a
             push $self->{RESULT}, $self->maketext_filter(
@@ -620,7 +620,7 @@ END
 sub WriteEmptyMakefile
     die "WriteEmptyMakefile: Need an even number of args" if (nelems @_) % 2
 
-    my %att = %( < @_ )
+    my %att = %:  < @_ 
     my $self = MM->new(\%att)
 
     my $new = $self->{?MAKEFILE}
@@ -669,7 +669,7 @@ sub parse_args($self, @< @args)
             ++$Verbose if m/^verb/
             next
         
-        my@($name, $value) = @($1, $2)
+        my(@: $name, $value) = @: $1, $2
         if ($value =~ m/^~(\w+)?/) # tilde with optional username
             $value =~ s [^~(\w*)]
                 [$($1 ??
@@ -684,22 +684,22 @@ sub parse_args($self, @< @args)
 
     # catch old-style 'potential_libs' and inform user how to 'upgrade'
     if (defined $self->{?potential_libs})
-        my@($msg)="'potential_libs' => '$self->{?potential_libs}' should be"
+        my(@: $msg)="'potential_libs' => '$self->{?potential_libs}' should be"
         if ($self->{?potential_libs})
             print $^STDOUT, "$msg changed to:\n\t'LIBS' => ['$self->{?potential_libs}']\n"
         else
             print $^STDOUT, "$msg deleted.\n"
         
-        $self->{+LIBS} = @($self->{?potential_libs})
+        $self->{+LIBS} = @: $self->{?potential_libs}
         delete $self->{potential_libs}
     
     # catch old-style 'ARMAYBE' and inform user how to 'upgrade'
     if (defined $self->{?ARMAYBE})
-        my@($armaybe) = $self->{?ARMAYBE}
+        my(@: $armaybe) = $self->{?ARMAYBE}
         print $^STDOUT, "ARMAYBE => '$armaybe' should be changed to:\n",
             "\t'dynamic_lib' => \{ARMAYBE => '$armaybe'\}\n"
-        my@(%dl) =@( %( < ($self->{?dynamic_lib} || \%())->% ))
-        $self->{+dynamic_lib} = \%( < %dl, ARMAYBE => $armaybe)
+        my(@: %dl) =@:  (%:  < ($self->{?dynamic_lib} || \$%)->% )
+        $self->{+dynamic_lib} = \%:  < %dl, ARMAYBE => $armaybe
         delete $self->{ARMAYBE}
     
     if (defined $self->{?LDTARGET})
@@ -763,14 +763,14 @@ sub check_hints($self)
 sub _run_hintfile
     our $self
     local($self) = shift       # make $self available to the hint file.
-    my@($hint_file) =@( shift)
+    my(@: $hint_file) =@:  shift
 
     local($^EVAL_ERROR, $^OS_ERROR)
     print $^STDERR, "Processing hints file $hint_file\n"
 
     # Just in case the ./ isn't on the hint file, which File::Spec can
     # often strip off, we bung the curdir into $^INCLUDE_PATH
-    local $^INCLUDE_PATH = @( File::Spec->curdir, < $^INCLUDE_PATH)
+    local $^INCLUDE_PATH = @:  File::Spec->curdir, < $^INCLUDE_PATH
     my $ret = evalfile $hint_file
     if( !defined $ret )
         my $error = $^EVAL_ERROR && $^EVAL_ERROR->message || $^OS_ERROR
@@ -779,7 +779,7 @@ sub _run_hintfile
 
 
 sub mv_all_methods
-    my@($from,$to) =  @_
+    my(@: $from,$to) =  @_
 
     # Here you see the *current* list of methods that are overridable
     # from Makefile.PL via MY:: subroutines. As of VERSION 5.07 I'm
@@ -882,7 +882,7 @@ sub flush
         warn "rename MakeMaker.tmp => $finalname: $^OS_ERROR"
     chmod 0644, $finalname unless $Is_VMS
 
-    my %keep = %( < @+: map { @($_ => 1) }, qw(NEEDS_LINKING HAS_LINK_CODE) )
+    my %keep = %:  < @+: map { (@: $_ => 1) }, qw(NEEDS_LINKING HAS_LINK_CODE) 
 
     if ($self->{?PARENT} && !$self->{?_KEEP_AFTER_FLUSH})
         foreach (keys $self->%) # safe memory
@@ -941,7 +941,7 @@ sub selfdocument($self)
         push @m, "\n# Full list of MakeMaker attribute values:"
         foreach my $key (sort keys $self->%)
             next if $key eq 'RESULT' || $key =~ m/^[A-Z][a-z]/
-            my@($v) =  neatvalue($self->{?$key})
+            my(@: $v) =  neatvalue($self->{?$key})
             $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/
             $v =~ s/\n+/ /g
             push @m, "# $key => $v"

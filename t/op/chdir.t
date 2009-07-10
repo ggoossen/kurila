@@ -28,7 +28,7 @@ my $Cwd = abs_path
 
 # Let's get to a known position
 SKIP: do
-    my @($vol,$dir, ...) =  splitpath(abs_path,1)
+    my (@: $vol,$dir, ...) =  splitpath(abs_path,1)
     my $test_dir = $IsVMS ?? 'T' !! 't'
     skip("Already in t/", 2) if (splitdir($dir))[-1] eq $test_dir
 
@@ -105,7 +105,7 @@ SKIP: do
 my @magic_envs = qw(HOME LOGDIR SYS$LOGIN)
 
 sub check_env
-    my@($key) =  @_
+    my(@: $key) =  @_
 
     # Make sure $ENV{'SYS$LOGIN'} is only honored on VMS.
     if( $key eq 'SYS$LOGIN' && !$IsVMS && !$IsMacOS )
@@ -145,7 +145,7 @@ WARNING
     
 
 
-my %Saved_Env = %( () )
+my %Saved_Env = $%
 sub clean_env
     foreach my $env ( @magic_envs)
         %Saved_Env{+$env} = env::var($env)

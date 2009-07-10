@@ -177,8 +177,8 @@ sub self_and_super_path
 
     my @out = $@
 
-    my @in_stack = @(@_[0])
-    my %seen = %(@_[0] => 1)
+    my @in_stack = @: @_[0]
+    my %seen = %: @_[0] => 1
 
     my $current
     while((nelems @in_stack))

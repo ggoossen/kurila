@@ -23,7 +23,7 @@ do
     use ExtUtils::MM_Win32
     our @ISA = qw(ExtUtils::MM_Win32)
 
-    my $mm = bless \%(), 'Test::MM_Win32'
+    my $mm = bless \$%, 'Test::MM_Win32'
 
     do
         local *make = sub (@< @_) { "nmake" }

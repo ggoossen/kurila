@@ -17,14 +17,13 @@ sub import
     if ($pkg eq "Exporter" and nelems @_ and @_[0] eq "import")
         Symbol::fetch_glob($callpkg."::import")->* = \&import
         return
-    
 
     # We *need* to treat @{"$pkg\::EXPORT_FAIL"} since Carp uses it :-(
-    my @($exports, $fail) = @(\Symbol::fetch_glob("$pkg\::EXPORT")->*->@,
-                              \Symbol::fetch_glob("$pkg\::EXPORT_FAIL")->*->@)
+    my (@: $exports, $fail) = @: \Symbol::fetch_glob("$pkg\::EXPORT")->*->@
+                                 \Symbol::fetch_glob("$pkg\::EXPORT_FAIL")->*->@
     return export $pkg, $callpkg, < @_
         if $Verbose or $Debug or (nelems $fail->@) +> 1
-    my $export_cache = (%Cache{+$pkg} ||= \%())
+    my $export_cache = (%Cache{+$pkg} ||= \$%)
     my $args = (nelems @_) or @_ = $exports->@
 
     local $_ = undef
@@ -32,8 +31,7 @@ sub import
         foreach ($exports->@ +@+  Symbol::fetch_glob("$pkg\::EXPORT_OK")->*->@)
             s/^&//
             $export_cache->{+$_} = 1
-        
-    
+
     my $heavy
     # Try very hard not to use {} and hence have to  enter scope on the foreach
     # We bomb out of the loop with last as soon as heavy is set.
@@ -247,9 +245,9 @@ import function:
 	$A::b = 1;     # not a very useful import method
     }
 
-and you want to Export symbol $A::b back to the module that called 
-package A. Since Exporter relies on the import method to work, via 
-inheritance, as it stands Exporter::import() will never get called. 
+and you want to Export symbol $A::b back to the module that called
+package A. Since Exporter relies on the import method to work, via
+inheritance, as it stands Exporter::import() will never get called.
 Instead, say the following:
 
     package A;
@@ -262,8 +260,8 @@ Instead, say the following:
 	A->export_to_level(1, @_);
     }
 
-This will export the symbols one level 'above' the current package - ie: to 
-the program or module that used package A. 
+This will export the symbols one level 'above' the current package - ie: to
+the program or module that used package A.
 
 Note: Be careful not to modify C<@_> at all before you call export_to_level
 - or people using your package will get very unexplained results!
@@ -435,7 +433,7 @@ C<base> code to just establish the IS-A relationship.
 For more details, see the documentation and code of
 L<base> and L<parent>.
 
-Another thorough remedy to that runtime vs. 
+Another thorough remedy to that runtime vs.
 compile-time trap is to use L<Exporter::Easy>,
 which is a wrapper of Exporter that allows all
 boilerplate code at a single gulp in the

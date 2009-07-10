@@ -47,7 +47,7 @@ sub plan
             undef $n
             $noplan = 1
     else
-        my %plan = %( < @_ )
+        my %plan = %:  < @_ 
         $n = %plan{?tests}
     _print "1..$n\n" unless $noplan
     $planned = $n
@@ -93,7 +93,7 @@ sub skip_all
 
 
 sub _ok
-    my @($pass, $where, ?$name, @< @mess) =  @_
+    my (@: $pass, $where, ?$name, @< @mess) =  @_
     # Do not try to microoptimize by factoring out the "not ".
     # VMS will avenge.
     my $out
@@ -121,7 +121,7 @@ sub _ok
 
 
 sub _where
-    my @caller = @( caller($Level) )
+    my @caller = @:  caller($Level) 
     return "at @caller[1] line @caller[2]"
 
 
@@ -312,7 +312,7 @@ sub todo_skip
 
 
 sub eq_array
-    my @($ra, $rb) =  @_
+    my (@: $ra, $rb) =  @_
     return 0 unless (nelems $ra->@) == nelems($rb->@)
     for my $i (0..(nelems $ra->@)-1)
         next     if !defined $ra->[$i] && !defined $rb->[$i]
@@ -324,9 +324,9 @@ sub eq_array
 
 
 sub eq_hash
-    my @($orig, $suspect) =  @_
+    my (@: $orig, $suspect) =  @_
     my $fail
-    while (my @(?$key, ?$value) =@( each $suspect->%))
+    while (my (@: ?$key, ?$value) =(@:  each $suspect->%))
         # Force a hash recompute if this perl's internals can cache the hash key.
         $key = "" . $key
         if (exists $orig->{$key})
@@ -384,7 +384,7 @@ my $is_vms      = $^OS_NAME eq 'VMS'
 my $is_cygwin   = $^OS_NAME eq 'cygwin'
 
 sub _quote_args
-    my @($runperl, $args) =  @_
+    my (@: $runperl, $args) =  @_
 
     foreach ($args->@)
         # In VMS protect with doublequotes because otherwise
@@ -393,7 +393,7 @@ sub _quote_args
         $runperl->$ .= ' ' . $_
 
 sub _create_runperl # Create the string to qx in runperl().
-    my %args = %( < @_ )
+    my %args = %:  < @_ 
     my $runperl = $^EXECUTABLE_NAME =~ m/\s/ ?? qq{"$^EXECUTABLE_NAME"} !! $^EXECUTABLE_NAME
     #- this allows, for example, to set PERL_RUNPERL_DEBUG=/usr/bin/valgrind
     if (env::var('PERL_RUNPERL_DEBUG'))
@@ -416,7 +416,7 @@ sub _create_runperl # Create the string to qx in runperl().
     if (defined %args{?prog})
         die "test.pl:runperl(): both 'prog' and 'progs' cannot be used " . _where()
             if defined %args{?progs}
-        %args{+progs} = \@(%args{?prog})
+        %args{+progs} = \@: %args{?prog}
     
     if (defined %args{?progs})
         die "test.pl:runperl(): 'progs' must be an ARRAYREF " . _where()
@@ -560,9 +560,9 @@ END { unlink_all $tmpfile }
 #
 
 sub _fresh_perl
-    my@($prog, $resolve, $runperl_args, $name) =  @_
+    my(@: $prog, $resolve, $runperl_args, $name) =  @_
 
-    $runperl_args ||= \%()
+    $runperl_args ||= \$%
     $runperl_args->{+progfile} = $tmpfile
     $runperl_args->{+stderr} = 1
 
@@ -611,7 +611,7 @@ sub _fresh_perl
     # Use the first line of the program as a name if none was given
     unless( $name )
         my $first_line
-        @($first_line, $name) = @: $prog =~ m/^((.{1,50}).*)/
+        (@: $first_line, $name) = @: $prog =~ m/^((.{1,50}).*)/
         $name .= '...' if length $first_line +> length $name
     
 
@@ -625,7 +625,7 @@ sub _fresh_perl
 #
 
 sub fresh_perl_is
-    my@($prog, $expected, ?$runperl_args, ?$name) =  @_
+    my(@: $prog, $expected, ?$runperl_args, ?$name) =  @_
     local $Level = 2
     $expected =~ s/\n+$// # is also removed from program output
     _fresh_perl($prog,
@@ -640,7 +640,7 @@ sub fresh_perl_is
 #
 
 sub fresh_perl_like
-    my@($prog, $expected, $runperl_args, $name) =  @_
+    my(@: $prog, $expected, $runperl_args, $name) =  @_
     local $Level = 2
     _fresh_perl($prog,
                 sub (@< @_) { (nelems @_) ??

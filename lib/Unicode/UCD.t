@@ -159,7 +159,7 @@ is($charinfo{?title},          '')
 is($charinfo{?block},          'Mathematical Alphanumeric Symbols')
 is($charinfo{?script},         'Common')
 
-use Unicode::UCD < qw(charblock charscript);
+use Unicode::UCD < qw(charblock charscript)
 
 # 0x0590 is in the Hebrew block but unused.
 
@@ -186,7 +186,7 @@ is($charinfo{?title},          '')
 is($charinfo{?block},          'Latin-1 Supplement')
 is($charinfo{?script},         'Common')
 
-use Unicode::UCD < qw(charblocks charscripts);
+use Unicode::UCD < qw(charblocks charscripts)
 
 my $charblocks = charblocks()
 
@@ -217,7 +217,7 @@ $ranges = charscript('Ogham')
 is($ranges[1][0], hex('1681'), 'Ogham charscript')
 is($ranges[1][1], hex('169a'))
 
-use Unicode::UCD < qw(charinrange);
+use Unicode::UCD < qw(charinrange)
 
 $ranges = charscript('Cherokee')
 ok(!charinrange($ranges, "139f"), 'Cherokee charscript')
@@ -225,7 +225,7 @@ ok( charinrange($ranges, "13a0"))
 ok( charinrange($ranges, "13f4"))
 ok(!charinrange($ranges, "13f5"))
 
-use Unicode::UCD < qw(general_categories);
+use Unicode::UCD < qw(general_categories)
 
 my $gc = general_categories()
 
@@ -233,7 +233,7 @@ ok(exists $gc{L}, 'has L')
 is($gc{?L}, 'Letter', 'L is Letter')
 is($gc{?Lu}, 'UppercaseLetter', 'Lu is UppercaseLetter')
 
-use Unicode::UCD < qw(bidi_types);
+use Unicode::UCD < qw(bidi_types)
 
 my $bt = bidi_types()
 
@@ -243,12 +243,12 @@ is($bt{?AL}, 'Right-to-Left Arabic', 'AL is Right-to-Left Arabic')
 
 is(Unicode::UCD::UnicodeVersion, '5.0.0', 'UnicodeVersion')
 
-use Unicode::UCD < qw(compexcl);
+use Unicode::UCD < qw(compexcl)
 
 ok(!compexcl(0x0100), 'compexcl')
 ok( compexcl(0x0958))
 
-use Unicode::UCD < qw(casefold);
+use Unicode::UCD < qw(casefold)
 
 my $casefold
 
@@ -266,7 +266,7 @@ ok($casefold{?code} eq '00DF' &&
 
 ok(!casefold(0x20))
 
-use Unicode::UCD < qw(casespec);
+use Unicode::UCD < qw(casespec)
 
 my $casespec
 
@@ -291,9 +291,9 @@ ok($casespec{az}{?code} eq '0307' &&
 
 # perl #7305 UnicodeCD::compexcl is weird
 
-for (@(1)) {my $a=compexcl $_}
+for ((@: 1)) {my $a=compexcl $_}
 ok(1, 'compexcl read-only $_: perl #7305')
-map {compexcl $_}, @( (1=>2))
+map {compexcl $_}, @:  (1=>2)
 ok(1, 'compexcl read-only hash: perl #7305')
 
 is(Unicode::UCD::_getcode('123'),     123, "_getcode(123)")

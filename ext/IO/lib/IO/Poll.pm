@@ -35,7 +35,7 @@ $VERSION = "0.07"
 sub new
     my $class = shift
 
-    my $self = bless \@(%(),%(),%()), $class
+    my $self = bless \(@: $%,$%,$%), $class
 
     $self
 
@@ -70,12 +70,12 @@ sub mask
 
 sub poll($self,$timeout)
 
-    $self->[1] = %()
+    $self->[1] = $%
 
     my($fd,$mask,$iom)
     my @poll = $@
 
-    while(@(?$fd,?$iom) =@( each $self->[0]))
+    while((@: ?$fd,?$iom) =(@:  each $self->[0]))
         $mask   = 0
         for (values($iom))
             $mask  ^|^= $_
@@ -87,7 +87,7 @@ sub poll($self,$timeout)
         unless $ret +> 0
 
     while((nelems @poll))
-        my @($fd,$got) = @: splice(@poll,0,2)
+        my (@: $fd,$got) = @: splice(@poll,0,2)
         $self->[1]{+$fd} = $got if $got
     
 
@@ -118,8 +118,8 @@ sub handles
     my($fd,$ev,$io,$mask)
     my @handles = $@
 
-    while(@($fd,$ev) =@( each $self->[1]))
-        while (@($io,$mask) =@( each $self->[0]{$fd}))
+    while((@: $fd,$ev) =(@:  each $self->[1]))
+        while ((@: $io,$mask) =(@:  each $self->[0]{$fd}))
             $mask ^|^= POLLHUP^|^POLLERR^|^POLLNVAL  # must allow these
             push @handles,$self->[2]{?$io} if ($ev ^&^ $mask) ^&^ $events
         

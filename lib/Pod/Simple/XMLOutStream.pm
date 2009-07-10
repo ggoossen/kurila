@@ -7,7 +7,7 @@ use Pod::Simple ()
 our ($ATTR_PAD, @ISA, $VERSION, $SORT_ATTRS)
 $VERSION = '2.02'
 BEGIN 
-    @ISA = @('Pod::Simple')
+    @ISA = @: 'Pod::Simple'
     *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG
 
 

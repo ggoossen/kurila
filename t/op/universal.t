@@ -10,20 +10,20 @@ BEGIN
 
 plan tests => 88
 
-$a = \%()
+$a = \$%
 bless $a, "Bob"
 ok $a->isa("Bob")
 
-package Human;
+package Human
 sub eat {}
 
 package Female
 our @ISA=qw(Human)
 
-package Alice;
+package Alice
 our @ISA=qw(Bob Female)
 sub drink { return "drinking " . @_[1]  }
-sub new { bless \%() }
+sub new { bless \$% }
 
 $Alice::VERSION = 2.718
 
@@ -87,7 +87,7 @@ ok (!Cedric->isa('Programmer'))
 
 my $b = 'abc'
 my @refs = qw(SCALAR SCALAR     GLOB ARRAY HASH CODE)
-my @vals = @(  \$b,   \3.14, \*b,  \$@,  \%(), sub {} )
+my @vals = @:   \$b,   \3.14, \*b,  \$@,  \$%, sub {} 
 for my $p (0 .. nelems(@refs) -1)
     for my $q (0 .. nelems(@vals) -1)
         is UNIVERSAL::isa(@vals[$p], @refs[$q]), ($p==$q or $p+$q==1)
@@ -118,7 +118,7 @@ ok $a->isa("UNIVERSAL")
 
 ok ! UNIVERSAL::isa(\$@, "UNIVERSAL")
 
-ok ! UNIVERSAL::can(\%(), "can")
+ok ! UNIVERSAL::can(\$%, "can")
 
 ok UNIVERSAL::isa(Alice => "UNIVERSAL")
 
@@ -155,7 +155,7 @@ do
 # a second call to isa('UNIVERSAL') when @ISA is null failed due to caching
 
 @X::ISA= $@
-my $x = \%(); bless $x, 'X'
+my $x = \$%; bless $x, 'X'
 ok $x->isa('UNIVERSAL')
 ok $x->isa('UNIVERSAL')
 
@@ -169,31 +169,31 @@ is $^EVAL_ERROR, ''
 # This segfaulted in a blead.
 fresh_perl_is('package Foo; Foo->VERSION;  print $^STDOUT, "ok"', 'ok')
 
-package Foo;
+package Foo
 
 sub DOES { 1 }
 
-package Bar;
+package Bar
 
-@Bar::ISA = @( 'Foo' )
+@Bar::ISA = @:  'Foo' 
 
-package Baz;
+package Baz
 
-package main;
+package main
 ok( Foo->DOES( 'bar' ), 'DOES() should call DOES() on class' )
 ok( Bar->DOES( 'Bar' ), '... and should fall back to isa()' )
 ok( Bar->DOES( 'Foo' ), '... even when inherited' )
 ok( Baz->DOES( 'Baz' ), '... even without inheriting any other DOES()' )
 ok( ! Baz->DOES( 'Foo' ), '... returning true or false appropriately' )
 
-package Pig;
-package Bodine;
+package Pig
+package Bodine
 Bodine->isa('Pig')
 *isa = \&UNIVERSAL::isa
-try { isa(\%(), 'HASH') }
+try { isa(\$%, 'HASH') }
 main::is($^EVAL_ERROR, '', "*isa correctly found")
 
-package main;
+package main
 main::dies_like( sub (@< @_) { UNIVERSAL::DOES(\$@, "foo") },
                  qr/Can't call method "DOES" on unblessed reference/,
                  'DOES call error message says DOES, not isa' )

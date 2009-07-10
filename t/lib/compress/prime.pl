@@ -35,14 +35,14 @@ EOM
 
     print $^STDOUT, "#\n# Testing $UncompressClass\n#\n"
 
-    my @($info, $compressed) =  mkComplete($CompressClass, $hello)
+    my (@: $info, $compressed) =  mkComplete($CompressClass, $hello)
     my $cc = $compressed 
 
     plan tests => (length($compressed) * 6 * 7) + 1 + $extra 
 
     is anyUncompress(\$cc), $hello 
 
-    for my $blocksize (@(1, 2, 13))
+    for my $blocksize ((@: 1, 2, 13))
         for my $i (0 .. length($compressed) - 1)
             for my $useBuf (0 .. 1)
                 print $^STDOUT, "#\n# BlockSize $blocksize, Length $i, Buffer $useBuf\n#\n" 

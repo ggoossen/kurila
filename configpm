@@ -52,27 +52,26 @@ while ($how_many_common--)
 
 
 # names of things which may need to have slashes changed to double-colons
-my %Extensions = %+: map {%($_,$_)},
+my %Extensions = %+: map {(%: $_,$_)},
     qw(dynamic_ext static_ext extensions known_extensions)
 
 # allowed opts as well as specifies default and initial values
-my %Allowed_Opts = %(
-    'cross'    => '', # --cross=PLATFORM - crosscompiling for PLATFORM
-    'glossary' => 1,  # --no-glossary  - no glossary file inclusion,
+my %Allowed_Opts = %: 
+    'cross'    => '' # --cross=PLATFORM - crosscompiling for PLATFORM
+    'glossary' => 1  # --no-glossary  - no glossary file inclusion,
     #                  for compactness
-    )
+    
 
 sub opts
     # user specified options
-    my %given_opts = %(
+    my %given_opts = %: 
         # --opt=smth
-        (< map {m/^--([\-_\w]+)=(.*)$/}, @ARGV),
+        (< map {m/^--([\-_\w]+)=(.*)$/}, @ARGV)
         # --opt --no-opt --noopt
-        (< @+: map {m/^no-?(.*)$/i??@($1=>0)!!@($_=>1)},
-                 map {m/^--([\-_\w]+)$/}, @ARGV),
-        )
+        (< @+: map {m/^no-?(.*)$/i??(@: $1=>0)!!(@: $_=>1)},
+                   map {m/^--([\-_\w]+)$/}, @ARGV)
 
-    my %opts = %(< %Allowed_Opts, < %given_opts)
+    my %opts = %: < %Allowed_Opts, < %given_opts
 
     for my $opt ( grep {!exists %Allowed_Opts{$_}}, keys %given_opts)
         warn "option '$opt' is not recognized"
@@ -84,7 +83,7 @@ sub opts
 
 
 
-my %Opts = %( < opts() )
+my %Opts = %:  < opts() 
 
 my ($Config_SH, $Config_PM, $Config_heavy, $Config_POD)
 my $Glossary = 'Porting/Glossary'
@@ -126,7 +125,7 @@ ENDOFBEG
 
 my $myver = $^PERL_VERSION
 
-$config_txt .= sprintf <<'ENDOFBEG', < @($myver) x 3
+$config_txt .= sprintf <<'ENDOFBEG', < (@: $myver) x 3
 # This file was created by configpm when Perl was built. Any changes
 # made to this file will be lost the next time perl is built.
 
@@ -167,7 +166,7 @@ ENDOFBEG
 my @non_v    = $@
 my @v_others = $@
 my $in_v     = 0
-my %Data     = %()
+my %Data     = $%
 
 
 my %seen_quotes
@@ -179,7 +178,7 @@ do
 
         # Catch PERL_CONFIG_SH=true and PERL_VERSION=n line from Configure.
         s/^(\w+)=(true|\d+)\s*$/$1='$2'\n/ or m/^(\w+)='(.*)'$/
-        my@($k, $v) = @($1, $2)
+        my(@: $k, $v) = (@: $1, $2)
 
         # grandfather PATCHLEVEL and SUBVERSION and CONFIG
         if ($k)
@@ -201,7 +200,7 @@ do
         if ($in_v)
             $val .= $_
         else
-            @($name,$val) = @($1,$3)
+            (@: $name,$val) = @: $1,$3
         
         $in_v = $val !~ m/$quote\n/
         next if $in_v
@@ -292,10 +291,10 @@ die if $^EVAL_ERROR
 
 # Calculation for the keys for byteorder
 # This is somewhat grim, but I need to run fetch_string here.
-$Config_SH_expanded = join "\n", @( '', < @v_others)
+$Config_SH_expanded = join "\n", @:  '', < @v_others
 
-my $t = fetch_string (\%(), 'ivtype')
-my $s = fetch_string (\%(), 'ivsize')
+my $t = fetch_string (\$%, 'ivtype')
+my $s = fetch_string (\$%, 'ivsize')
 
 # byteorder does exist on its own but we overlay a virtual
 # dynamically recomputed value.
@@ -321,7 +320,7 @@ else
 
 my @need_relocation
 
-if (fetch_string(\%(),'userelocatableinc'))
+if (fetch_string(\$%,'userelocatableinc'))
     foreach my $what (qw(prefixexp
 
                          archlibexp
@@ -378,7 +377,7 @@ if (fetch_string(\%(),'userelocatableinc'))
                          installvendorman3dir
                          installvendorscript
                          ))
-        push @need_relocation, $what if fetch_string(\%(), $what) =~ m!^\.\.\./!
+        push @need_relocation, $what if fetch_string(\$%, $what) =~ m!^\.\.\./!
     
 
 
@@ -386,7 +385,7 @@ my %need_relocation
 %need_relocation{[ @need_relocation]} =  @need_relocation
 
 # This can have .../ anywhere:
-if (fetch_string(\%(), 'otherlibdirs') =~ m!\.\.\./!)
+if (fetch_string(\$%, 'otherlibdirs') =~ m!\.\.\./!)
     %need_relocation{+otherlibdirs} = 'otherlibdirs'
 
 
@@ -489,8 +488,8 @@ our $Config_SH_expanded = "\n$_" . << 'EOVIRTUAL';
 EOT
 
 foreach my $prefix (qw(ccflags ldflags))
-    my $value = fetch_string (\%(), $prefix)
-    my $withlargefiles = fetch_string (\%(), $prefix . "_uselargefiles")
+    my $value = fetch_string (\$%, $prefix)
+    my $withlargefiles = fetch_string (\$%, $prefix . "_uselargefiles")
     if (defined $withlargefiles)
         $value =~ s/\Q$withlargefiles\E\b//
         $heavy_txt .= "$($prefix)_nolargefiles='$value'\n"
@@ -498,22 +497,22 @@ foreach my $prefix (qw(ccflags ldflags))
 
 
 foreach my $prefix (qw(libs libswanted))
-    my $value = fetch_string (\%(), $prefix)
-    my $withlf = fetch_string (\%(), 'libswanted_uselargefiles')
+    my $value = fetch_string (\$%, $prefix)
+    my $withlf = fetch_string (\$%, 'libswanted_uselargefiles')
     next unless defined $withlf
     my @lflibswanted
-        = split(' ', fetch_string (\%(), 'libswanted_uselargefiles'))
+        = split(' ', fetch_string (\$%, 'libswanted_uselargefiles'))
     if ((nelems @lflibswanted))
         my %lflibswanted
         %lflibswanted{[ @lflibswanted]} = $@
         if ($prefix eq 'libs')
             my @libs = grep { m/^-l(.+)/ &&
                     not exists %lflibswanted{$1} },
-                split(' ', fetch_string (\%(), 'libs'))
+                split(' ', fetch_string (\$%, 'libs'))
             $value = join(' ', @libs)
         else
             my @libswanted = grep { not exists %lflibswanted{$_} },
-                split(' ', fetch_string (\%(), 'libswanted'))
+                split(' ', fetch_string (\$%, 'libswanted'))
             $value = join(' ', @libswanted)
         
     
@@ -612,7 +611,7 @@ if ($OS2::is_aout) {
 sub TIEHASH { bless {%preconfig} }
 ENDOFSET
     # Extract the name of the DLL from the makefile to avoid duplication
-    my @($f) =  grep { -r }, qw(GNUMakefile Makefile)
+    my (@: $f) =  grep { -r }, qw(GNUMakefile Makefile)
     my $dll
     if (open my $fh, '<', $f)
         while ( ~< $fh)
@@ -633,7 +632,7 @@ ENDOFSET
 
 
 foreach my $key (keys %Common)
-    my $value = fetch_string (\%(), $key)
+    my $value = fetch_string (\$%, $key)
     # Is it safe on the LHS of => ?
     my $qkey = $key =~ m/^[A-Za-z_][A-Za-z0-9_]*$/ ?? $key !! "'$key'"
     if (defined $value)
@@ -820,7 +819,7 @@ ENDOFTAIL
 if (%Opts{?glossary})
     open(*GLOS, "<", "$Glossary") or die "Can't open $Glossary: $^OS_ERROR"
 
-my %seen = %( () )
+my %seen = $%
 my $text = 0
 $^INPUT_RECORD_SEPARATOR = ''
 

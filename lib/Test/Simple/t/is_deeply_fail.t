@@ -70,7 +70,7 @@ ERR
 
 
 #line 78
-ok !is_deeply(\%(), \$@, 'different types')
+ok !is_deeply(\$%, \$@, 'different types')
 is( $out, "not ok 2 - different types\n",   'different types' )
 is( $err, <<ERRHEAD . <<'ERR',                          '   right diagnostic' )
 #   Failed test 'different types'
@@ -130,7 +130,7 @@ is( $err, <<ERR,                            '    right diagnostic' )
 ERR
 
 #line 131
-ok !is_deeply(\%( foo => undef ), \%(),    'hashes of undefs' )
+ok !is_deeply(\%( foo => undef ), \$%,    'hashes of undefs' )
 is( $out, "not ok 7 - hashes of undefs\n",  'hashes of undefs' )
 is( $err, <<ERR,                            '    right diagnostic' )
 #   Failed test 'hashes of undefs'
@@ -246,7 +246,7 @@ ok !is_deeply(\@($a), \@(dump::view($a).'')),   "  even deep inside"
 
 #line 265
 # [rt.cpan.org 7030]
-ok !is_deeply( \%(), \%(key => \$@) ),  '\@() could match non-existent values'
+ok !is_deeply( \$%, \%(key => \$@) ),  '\@() could match non-existent values'
 ok !is_deeply( \$@, \@(\$@) )
 
 
@@ -297,7 +297,7 @@ ERR
 # rt.cpan.org 8865
 do
     my $array = \$@
-    my $hash  = \%()
+    my $hash  = \$%
 
     local our $TODO = "Fix line numbers";
 

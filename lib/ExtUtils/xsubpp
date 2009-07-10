@@ -3,7 +3,7 @@
 use ExtUtils::ParseXS < qw(process_file)
 use Getopt::Long
 
-my %args = %( () )
+my %args = $%
 
 my $usage = "Usage: xsubpp [-v] [-csuffix csuffix] [-except] [-prototypes] [-noversioncheck] [-nolinenumbers] [-nooptimize] [-noinout] [-noargtypes] [-s pattern] [-typemap typemap]... file.xs\n"
 

@@ -39,7 +39,7 @@ unlike((nelems @foo), '/foo/')
 
 can_ok('Test::More', < qw(require_ok use_ok ok is isnt like skip can_ok
                         pass fail eq_array eq_hash eq_set))
-can_ok(bless(\%(), "Test::More"), < qw(require_ok use_ok ok is isnt like skip 
+can_ok(bless(\$%, "Test::More"), < qw(require_ok use_ok ok is isnt like skip 
                                    can_ok pass fail eq_array eq_hash eq_set))
 
 
@@ -150,7 +150,7 @@ do
     sub isa($self, $class)
         return 1 if $class eq 'Wibblemeister'
     
-    sub new { bless \%() }
+    sub new { bless \$% }
 
 isa_ok( Wibble->new, 'Wibblemeister' )
 

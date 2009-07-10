@@ -74,7 +74,7 @@ do
 
     do
         package DESTROY_MRO_Baseline
-        sub new { bless \%() => shift }
+        sub new { bless \$% => shift }
         sub DESTROY { $x++ }
 
         package DESTROY_MRO_Baseline_Child
@@ -97,7 +97,7 @@ do
 
     do
         package DESTROY_MRO_Dynamic
-        sub new { bless \%() => shift }
+        sub new { bless \$% => shift }
 
         package DESTROY_MRO_Dynamic_Child
         our @ISA = qw/DESTROY_MRO_Dynamic/
@@ -160,12 +160,12 @@ do
 # Check that recursion bails out "cleanly" in a variety of cases
 # (as opposed to say, bombing the interpreter or something)
 do
-    my @recurse_codes = @(
-        '@MRO_R1::ISA = @("MRO_R2"); @MRO_R2::ISA = @("MRO_R1");',
-        '@MRO_R3::ISA = @("MRO_R4"); push(@MRO_R4::ISA, "MRO_R3");',
-        '@MRO_R5::ISA = @("MRO_R6"); @MRO_R6::ISA = qw/XX MRO_R5 YY/;',
-        '@MRO_R7::ISA = @("MRO_R8"); push(@MRO_R8::ISA, < qw/XX MRO_R7 YY/)',
-        )
+    my @recurse_codes = @: 
+        '@MRO_R1::ISA = @("MRO_R2"); @MRO_R2::ISA = @("MRO_R1");'
+        '@MRO_R3::ISA = @("MRO_R4"); push(@MRO_R4::ISA, "MRO_R3");'
+        '@MRO_R5::ISA = @("MRO_R6"); @MRO_R6::ISA = qw/XX MRO_R5 YY/;'
+        '@MRO_R7::ISA = @("MRO_R8"); push(@MRO_R8::ISA, < qw/XX MRO_R7 YY/)'
+        
     foreach my $code ( @recurse_codes)
         eval $code
         ok($^EVAL_ERROR->{?description} =~ m/Recursive inheritance detected/)
@@ -176,14 +176,14 @@ do
 do
     do
         package SUPERTEST
-        sub new { bless \%() => shift }
+        sub new { bless \$% => shift }
         sub foo { @_[1]+1 }
 
         package SUPERTEST::MID
-        our @ISA = @( 'SUPERTEST' )
+        our @ISA = @:  'SUPERTEST' 
 
         package SUPERTEST::KID;
-        our @ISA = @( 'SUPERTEST::MID' )
+        our @ISA = @:  'SUPERTEST::MID' 
         sub foo { my $s = shift; $s->SUPER::foo(< @_) }
 
         package SUPERTEST::REBASE
@@ -196,7 +196,7 @@ do
         *SUPERTEST::foo = sub (@< @_) { @_[1]+2 };
     }
     is($stk_obj->foo(2), 4)
-    @SUPERTEST::MID::ISA = @( 'SUPERTEST::REBASE' )
+    @SUPERTEST::MID::ISA = @:  'SUPERTEST::REBASE' 
     is($stk_obj->foo(3), 6)
 
 

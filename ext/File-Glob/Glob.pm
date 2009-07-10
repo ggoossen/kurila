@@ -31,7 +31,7 @@ use XSLoader ()
     GLOB_TILDE
 )
 
-%EXPORT_TAGS = %(
+%EXPORT_TAGS = %: 
     'glob' => qw(
                         GLOB_ABEND
 	GLOB_ALPHASORT
@@ -50,8 +50,8 @@ use XSLoader ()
         GLOB_QUOTE
         GLOB_TILDE
         bsd_glob
-    ),
     )
+    
 
 $VERSION = '1.06'
 
@@ -93,7 +93,7 @@ if ($^OS_NAME =~ m/^(?:MSWin32|VMS|os2|dos|riscos|MacOS)$/)
 
 
 sub bsd_glob
-    my @($pat,?$flags) =  @_
+    my (@: $pat,?$flags) =  @_
     $flags = $DEFAULT_FLAGS if (nelems @_) +< 2
     return doglob($pat,$flags)
 

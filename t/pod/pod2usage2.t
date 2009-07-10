@@ -13,20 +13,20 @@ BEGIN
 use Pod::Usage
 
 sub getoutput
-    my @($code) =  @_
+    my (@: $code) =  @_
     my $pid = open(my $in, "-|", "-")
     unless(defined $pid)
         die "Cannot fork: $^OS_ERROR"
     
     if($pid)
         # parent
-        my @out = @( ~< $in )
+        my @out = @:  ~< $in 
         close($in)
         my $exit = $^CHILD_ERROR>>8
         for (@out)
             s/^/#/
         print $^STDOUT, "#EXIT=$exit OUTPUT=+++#$(join '',@out)#+++\n"
-        return @($exit, join("", @out))
+        return (@: $exit, join("", @out))
     
     # child
     open($^STDERR, ">&", $^STDOUT)
@@ -43,7 +43,7 @@ sub compare($left,$right)
     return $left eq $right
 
 
-my @($exit, $text) =  getoutput( sub (@< @_) { pod2usage() } )
+my (@: $exit, $text) =  getoutput( sub (@< @_) { pod2usage() } )
 is ($exit, 2,                 "Exit status pod2usage ()")
 ok (compare ($text, <<'EOT'), "Output test pod2usage ()")
 #Usage:
@@ -51,7 +51,7 @@ ok (compare ($text, <<'EOT'), "Output test pod2usage ()")
 #
 EOT
 
-@($exit, $text) =  getoutput( sub (@< @_) { pod2usage(
+(@: $exit, $text) =  getoutput( sub (@< @_) { pod2usage(
                                       message => 'You naughty person, what did you say?',
                                       verbose => 1 ) })
 is ($exit, 1,                 "Exit status pod2usage (message => '...', verbose => 1)")
@@ -72,7 +72,7 @@ ok (compare ($text, <<'EOT'), "Output test pod2usage (message => '...', verbose 
 # 
 EOT
 
-@($exit, $text) =  getoutput( sub (@< @_) { pod2usage(
+(@: $exit, $text) =  getoutput( sub (@< @_) { pod2usage(
   "-verbose" => 2, "-exit" => 42 ) } )
 is ($exit, 42,                "Exit status pod2usage (verbose => 2, exit => 42)")
 ok (compare ($text, <<'EOT'), "Output test pod2usage (verbose => 2, exit => 42)")
@@ -97,7 +97,7 @@ ok (compare ($text, <<'EOT'), "Output test pod2usage (verbose => 2, exit => 42)"
 #
 EOT
 
-@($exit, $text) =  getoutput( sub (@< @_) { pod2usage(0) } )
+(@: $exit, $text) =  getoutput( sub (@< @_) { pod2usage(0) } )
 is ($exit, 0,                 "Exit status pod2usage (0)")
 ok (compare ($text, <<'EOT'), "Output test pod2usage (0)")
 #Usage:
@@ -115,7 +115,7 @@ ok (compare ($text, <<'EOT'), "Output test pod2usage (0)")
 #
 EOT
 
-@($exit, $text) =  getoutput( sub (@< @_) { pod2usage(42) } )
+(@: $exit, $text) =  getoutput( sub (@< @_) { pod2usage(42) } )
 is ($exit, 42,                "Exit status pod2usage (42)")
 ok (compare ($text, <<'EOT'), "Output test pod2usage (42)")
 #Usage:
@@ -123,7 +123,7 @@ ok (compare ($text, <<'EOT'), "Output test pod2usage (42)")
 #
 EOT
 
-@($exit, $text) =  getoutput( sub (@< @_) { pod2usage(verbose => 0, exit => 'NOEXIT') } )
+(@: $exit, $text) =  getoutput( sub (@< @_) { pod2usage(verbose => 0, exit => 'NOEXIT') } )
 is ($exit, 0,                 "Exit status pod2usage (verbose => 0, exit => 'NOEXIT')")
 ok (compare ($text, <<'EOT'), "Output test pod2usage (verbose => 0, exit => 'NOEXIT')")
 #Usage:
@@ -132,7 +132,7 @@ ok (compare ($text, <<'EOT'), "Output test pod2usage (verbose => 0, exit => 'NOE
 # --NORMAL-RETURN--
 EOT
 
-@($exit, $text) =  getoutput( sub (@< @_) { pod2usage(verbose => 99, sections => 'DESCRIPTION') } )
+(@: $exit, $text) =  getoutput( sub (@< @_) { pod2usage(verbose => 99, sections => 'DESCRIPTION') } )
 is ($exit, 1,                 "Exit status pod2usage (verbose => 99, sections => 'DESCRIPTION')")
 ok (compare ($text, <<'EOT'), "Output test pod2usage (verbose => 99, sections => 'DESCRIPTION')")
 #Description:

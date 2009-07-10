@@ -4,8 +4,8 @@ use Config
 
 our $VERSION = "1.10"
 
-my %err = %( () )
-my %wsa = %( () )
+my %err = $%
+my %wsa = $%
 
 # Symbian cross-compiling environment.
 my $IsSymbian = defined env::var("SDK") && -d "$(env::var('SDK'))\\epoc32"
@@ -111,7 +111,7 @@ sub default_cpp
 
 
 sub get_files
-    my %file = %( () )
+    my %file = $%
     # VMS keeps its include files in system libraries (well, except for Gcc)
     if ($^OS_NAME eq 'VMS')
         if ($(config_value('vms_cc_type')) eq 'decc')
@@ -265,11 +265,11 @@ sub write_errno_pm
                 or die "Cannot exec $cpp"
         
 
-        %err = %( () )
+        %err = $%
 
         while( ~< $cppo)
             my($name,$expr)
-            next unless @(?$name, ?$expr) = @: m/"(.*?)"\s*\[\s*\[\s*(.*?)\s*\]\s*\]/
+            next unless (@: ?$name, ?$expr) = @: m/"(.*?)"\s*\[\s*\[\s*(.*?)\s*\]\s*\]/
             next if $name eq $expr
             $expr =~ s/\(?\([a-z_]\w*\)([^\)]*)\)?/$1/i # ((type)0xcafebabe) at alia
             $expr =~ s/((?:0x)?[0-9a-fA-F]+)[LU]+\b/$1/g # 2147483647L et alia

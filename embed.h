@@ -1161,7 +1161,6 @@
 #define ck_null			Perl_ck_null
 #define ck_open			Perl_ck_open
 #define ck_readline		Perl_ck_readline
-#define ck_repeat		Perl_ck_repeat
 #define ck_require		Perl_ck_require
 #define ck_rfun			Perl_ck_rfun
 #define ck_rvconst		Perl_ck_rvconst
@@ -1929,6 +1928,8 @@
 #define pp_each			Perl_pp_each
 #define pp_egrent		Perl_pp_egrent
 #define pp_ehostent		Perl_pp_ehostent
+#define pp_emptyarray		Perl_pp_emptyarray
+#define pp_emptyhash		Perl_pp_emptyhash
 #define pp_enetent		Perl_pp_enetent
 #define pp_enter		Perl_pp_enter
 #define pp_enter_anonarray_assign	Perl_pp_enter_anonarray_assign
@@ -3333,7 +3334,6 @@
 #define ck_null(a)		Perl_ck_null(aTHX_ a)
 #define ck_open(a)		Perl_ck_open(aTHX_ a)
 #define ck_readline(a)		Perl_ck_readline(aTHX_ a)
-#define ck_repeat(a)		Perl_ck_repeat(aTHX_ a)
 #define ck_require(a)		Perl_ck_require(aTHX_ a)
 #define ck_rfun(a)		Perl_ck_rfun(aTHX_ a)
 #define ck_rvconst(a)		Perl_ck_rvconst(aTHX_ a)
@@ -4116,6 +4116,8 @@
 #define pp_each()		Perl_pp_each(aTHX)
 #define pp_egrent()		Perl_pp_egrent(aTHX)
 #define pp_ehostent()		Perl_pp_ehostent(aTHX)
+#define pp_emptyarray()		Perl_pp_emptyarray(aTHX)
+#define pp_emptyhash()		Perl_pp_emptyhash(aTHX)
 #define pp_enetent()		Perl_pp_enetent(aTHX)
 #define pp_enter()		Perl_pp_enter(aTHX)
 #define pp_enter_anonarray_assign()	Perl_pp_enter_anonarray_assign(aTHX)

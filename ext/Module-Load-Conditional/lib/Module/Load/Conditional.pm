@@ -144,11 +144,11 @@ true, since C<check_install> had no way to verify clearly.
 ### if the installed version is higher or equal to the one we want, it will return
 ### a hashref with he module name and version in it.. so 'true' as well.
 sub check_install(%< %hash)
-    my $tmpl = \%(
-        version => %( default    => '0.0'    ),
-        module  => %( required   => 1        ),
-        verbose => %( default    => $VERBOSE ),
-        )
+    my $tmpl = \%: 
+        version => (%:  default    => '0.0'    )
+        module  => (%:  required   => 1        )
+        verbose => (%:  default    => $VERBOSE )
+        
 
     my $args
     unless( $args = check( $tmpl, \%hash, $VERBOSE ) )
@@ -162,11 +162,11 @@ sub check_install(%< %hash)
         ) . '.pm'
 
     ### where we store the return value ###
-    my $href = %(
-        file        => undef,
-        version     => undef,
-        uptodate    => undef,
-        )
+    my $href = %: 
+        file        => undef
+        version     => undef
+        uptodate    => undef
+        
 
     my $filename
 
@@ -379,13 +379,13 @@ cache, but you can override that by setting C<nocache> to true.
 =cut
 
 sub can_load
-    my %hash = %( < @_ )
+    my %hash = %:  < @_ 
 
-    my $tmpl = \%(
-        modules     => %( default => \%(), strict_type => 1 ),
-        verbose     => %( default => $VERBOSE ),
-        nocache     => %( default => 0 ),
-        )
+    my $tmpl = \%: 
+        modules     => (%:  default => \$%, strict_type => 1 )
+        verbose     => (%:  default => $VERBOSE )
+        nocache     => (%:  default => 0 )
+        
 
     my $args
 
@@ -404,7 +404,7 @@ sub can_load
     ###     },
     ### };
 
-    $CACHE ||= \%() # in case it was undef'd
+    $CACHE ||= \$% # in case it was undef'd
 
     my $error
     BLOCK: do
@@ -512,7 +512,7 @@ sub requires
     return  sort grep { !m/^$who$/  },
         map  { chomp; s|/|::|g; $_ },
         grep { s|\.pm$||i; },
-        @(            `$cmd`)
+        @:             `$cmd`
 
 
 1

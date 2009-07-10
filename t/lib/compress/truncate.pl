@@ -23,7 +23,7 @@ EOM
     my $blocksize = 10 
 
 
-    my @($info, $compressed) =  mkComplete($CompressClass, $hello)
+    my (@: $info, $compressed) =  mkComplete($CompressClass, $hello)
 
     my $header_size  = $info->{?HeaderLength}
     my $trailer_size = $info->{?TrailerLength}
@@ -109,7 +109,7 @@ EOM
 
         title "Compressed Trailer Truncation"
         foreach my $i (length($compressed) - $trailer_size .. length($compressed) -1 )
-            foreach my $lax (@(0, 1))
+            foreach my $lax ((@: 0, 1))
                 my $lex = LexFile->new( my $name) 
 
                 ok 1, "Compressed Trailer Truncation - Length $i, Lax $lax, Transparent $trans" 

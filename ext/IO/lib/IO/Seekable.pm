@@ -95,10 +95,10 @@ Derived from FileHandle.pm by Graham Barr E<lt>gbarr@pobox.comE<gt>
 =cut
 
 our($VERSION, @EXPORT, @ISA)
-use IO::Handle ();
+use IO::Handle ()
 # XXX we can't get these from IO::Handle or we'll get prototype
 # mismatch warnings on C<use POSIX; use IO::File;> :-(
-use Fcntl < qw(SEEK_SET SEEK_CUR SEEK_END);
+use Fcntl < qw(SEEK_SET SEEK_CUR SEEK_END)
 require Exporter
 
 @EXPORT = qw(SEEK_SET SEEK_CUR SEEK_END)

@@ -18,7 +18,7 @@ BEGIN
     $PERLIO = defined env::var('PERLIO') ?? env::var('PERLIO') !! "(undef)"
 
 
-use Config;
+use Config
 
 my $DOSISH    = $^OS_NAME =~ m/^(?:MSWin32|os2|dos|NetWare|mint)$/ ?? 1 !! 0
 $DOSISH    = 1 if !$DOSISH and $^OS_NAME =~ m/^uwin/
@@ -58,7 +58,7 @@ SKIP: do
     skip("miniperl does not have Encode", $NTEST) if env::var('PERL_CORE_MINITEST')
 
     sub check
-        my @($result, $expected, $id) =  @_
+        my (@: $result, $expected, $id) =  @_
         # An interesting dance follows where we try to make the following
         # IO layer stack setups to compare equal:
         #
@@ -113,7 +113,7 @@ SKIP: do
     
 
     check(PerlIO::get_layers($^STDIN),
-          $UTF8_STDIN ?? @( "stdio", "utf8" ) !! @( "stdio" ),
+          $UTF8_STDIN ?? (@:  "stdio", "utf8" ) !! (@:  "stdio" ),
           "STDIN")
 
     open(my $f, ">:crlf", "afile")
@@ -131,7 +131,7 @@ SKIP: do
     binmode($f, ":raw") or die "$^OS_ERROR"
 
     check(PerlIO::get_layers($f),
-          @("stdio"),
+          (@: "stdio"),
           ":raw")
 
     binmode($f, ":utf8")
@@ -143,7 +143,7 @@ SKIP: do
     binmode($f, ":bytes")
 
     check(PerlIO::get_layers($f),
-          @( "stdio" ),
+          (@:  "stdio" ),
           ":bytes")
 
     binmode($f, ":raw :crlf")
@@ -162,15 +162,15 @@ SKIP: do
         splice(@results, 1, 2) if $NONSTDIO
 
         check(@results,
-              @("stdio",    undef,        sub (@< @_) { @_[0] +> 0 },
-         "encoding", "iso-8859-1", sub (@< @_) { @_[0] ^&^ PerlIO::F_UTF8() } ),
+              (@: "stdio",    undef,        sub (@< @_) { @_[0] +> 0 }
+                  "encoding", "iso-8859-1", sub (@< @_) { @_[0] ^&^ PerlIO::F_UTF8() } ),
               ":raw:encoding(latin1)")
     
 
     binmode($f)
 
     check(PerlIO::get_layers($f),
-          @("stdio"),
+          (@: "stdio"),
           "binmode")
 
     close $f

@@ -14,14 +14,14 @@ $list_assignment_supported = 0 if ($^OS_NAME eq 'VMS')
 
 
 sub foo
-    local@($a, $b) =  @_
+    local(@: $a, $b) =  @_
     local($c, $d)
     $c = "c 3"
     $d = "d 4"
-    do { local @($a,$c) = @("a 9", "c 10"); @($x, $y) = @($a, $c); }
+    do { local (@: $a,$c) = (@: "a 9", "c 10"); (@: $x, $y) = (@: $a, $c); }
     is($a, "a 1")
     is($b, "b 2")
-    return @($c, $d)
+    return @: $c, $d
 
 
 $a = "a 5"
@@ -44,19 +44,19 @@ is($y, "c 10")
 # same thing, only with arrays and associative arrays
 
 sub foo2
-    local@($a, @b) = @(shift, @_)
+    local(@: $a, @b) = @: shift, @_
     local(@c, %d)
-    @c = @( "c 3" )
+    @c = @:  "c 3" 
     %d{+''} = "d 4"
-    do { local@($a, @c) = @("a 19", @("c 20")); @($x, $y) = @($a, < @c); }
+    do { local(@: $a, @c) = (@: "a 19", (@: "c 20")); (@: $x, $y) = (@: $a, < @c); }
     is($a, "a 1")
     is("$(join ' ',@b)", "b 2")
-    return @(@c[0], %d{?''})
+    return @: @c[0], %d{?''}
 
 
 $a = "a 5"
-@b = @( "b 6" )
-@c = @( "c 7" )
+@b = @:  "b 6" 
+@c = @:  "c 7" 
 %d{+''} = "d 8"
 
 @res = &foo2("a 1","b 2")
@@ -85,7 +85,7 @@ do
 
 # Array and hash elements
 
-@a = @('a', 'b', 'c')
+@a = @: 'a', 'b', 'c'
 do
     local(@a[1]) = 'foo'
     local(@a[2]) = @a[2]
@@ -97,7 +97,7 @@ is(@a[1], 'b')
 is(@a[2], 'c')
 ok(!defined @a[0])
 
-@a = @('a', 'b', 'c')
+@a = @: 'a', 'b', 'c'
 do
     local(@a[1]) = "X"
     shift @a
@@ -109,7 +109,7 @@ do
     is("$(join ' ',@a)", $d)
 
 
-%h = %('a' => 1, 'b' => 2, 'c' => 3)
+%h = %: 'a' => 1, 'b' => 2, 'c' => 3
 do
     local(%h{+'a'}) = 'foo'
     local(%h{+'b'}) = %h{?'b'}
@@ -122,7 +122,7 @@ is(%h{?'a'}, 1)
 is(%h{?'b'}, 2)
 do
     my $d = join("\n", map { "$_=>%h{?$_}" }, sort keys %h)
-    local %h = %( < %h )
+    local %h = %:  < %h 
     is(join("\n", map { "$_=>%h{?$_}" }, sort keys %h), $d)
 
 is(%h{?'c'}, 3)
@@ -134,17 +134,17 @@ is($a, 'outer')
 
 do
     package TH
-    sub TIEHASH { bless \%(), @_[0] }
+    sub TIEHASH { bless \$%, @_[0] }
     sub STORE { print $^STDOUT, "# STORE [$(dump::view(\@_))]\n"; @_[0]->{+@_[1]} = @_[2] }
     sub FETCH { my $v = @_[0]->{?@_[1]}; print $^STDOUT, "# FETCH [$(dump::view(\@_))=$v]\n"; $v }
     sub EXISTS { print $^STDOUT, "# EXISTS [$(dump::view(\@_))]\n"; exists @_[0]->{@_[1]}; }
     sub DELETE { print $^STDOUT, "# DELETE [$(dump::view(\@_))]\n"; delete @_[0]->{@_[1]}; }
-    sub CLEAR { print $^STDOUT, "# CLEAR [$(dump::view(< @_))]\n"; @_[0]->% = %( () ); }
+    sub CLEAR { print $^STDOUT, "# CLEAR [$(dump::view(< @_))]\n"; @_[0]->% = $%; }
     sub FIRSTKEY { print $^STDOUT, "# FIRSTKEY [$(join ' ',@_)]\n"; keys @_[0]->%; each @_[0]->% }
     sub NEXTKEY { print $^STDOUT, "# NEXTKEY [$(join ' ',@_)]\n"; each @_[0]->% }
 
 
-@a = @('a', 'b', 'c')
+@a = @: 'a', 'b', 'c'
 do
     local(@a[1]) = "X"
     shift @a
@@ -167,7 +167,7 @@ do
     %x{+a} = 1
     do { local %x{+b} = 1; }
     ok(! exists %x{b})
-    do { local %x{[@('c','d','e')]} =$@; }
+    do { local %x{[(@: 'c','d','e')]} =$@; }
     ok(! exists %x{c})
 
 
@@ -233,7 +233,7 @@ do
         my $unicode = chr 256
         my $ambigous = "\240" . $unicode
         chop $ambigous
-        local %h{[@($unicode, $ambigous)]} = @(256, 160)
+        local %h{[(@: $unicode, $ambigous)]} = @: 256, 160
 
         is(nkeys %h, 4)
         is(%h{?"\243"}, "pound")
@@ -260,7 +260,7 @@ do
 # when localising a hash element, the key should be copied, not referenced
 
 do
-    my %h=%('k1' => 111)
+    my %h=%: 'k1' => 111
     my $k='k1'
     do
         local %h{+$k}=222
@@ -272,7 +272,7 @@ do
     is(%h{?'k1'},111)
 
 do
-    my %h=%('k1' => 111)
+    my %h=%: 'k1' => 111
     our $k = 'k1'  # try dynamic too
     do
         local %h{+$k}=222

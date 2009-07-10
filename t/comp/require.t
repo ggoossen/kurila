@@ -16,7 +16,7 @@ my $total_tests = 26
 print $^STDOUT, "1..$total_tests\n"
 
 sub do_require
-    $^INCLUDED = %( () )
+    $^INCLUDED = $%
     write_file('bleah.pm',< @_)
     try { require "bleah.pm" }
     my @a # magic guard for scope violations (must be first lexical in file)
@@ -47,7 +47,7 @@ print $^STDOUT, "ok ",$i++,"\n"
 
 my $flag_file = 'bleah.flg'
 # run-time error in require
-for my $expected_compile (@(1,0))
+for my $expected_compile ((@: 1,0))
     write_file($flag_file, 1)
     print $^STDOUT, "not " unless -e $flag_file
     print $^STDOUT, "ok ",$i++,"\n"

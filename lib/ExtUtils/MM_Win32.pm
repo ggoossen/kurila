@@ -44,10 +44,10 @@ my $GCC     = %Config{?'cc'} =~ m/^gcc/i ?? 1 !! 0
 
 sub dlsyms($self,%< %attribs)
 
-    my@($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \%()
-    my@($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \$@
-    my@($funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \$@
-    my@($imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \%()
+    my(@: $funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \$%
+    my(@: $vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \$@
+    my(@: $funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \$@
+    my(@: $imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \$%
     my(@m)
 
     if (not $self->{SKIPHASH}->{?'dynamic'})
@@ -119,7 +119,7 @@ Using \ for Windows.
 =cut
 
 sub init_DIRFILESEP
-    my@($self) =@( shift)
+    my(@: $self) =@:  shift
 
     my $make = $self->make
 
@@ -146,7 +146,7 @@ Adjustments are made for Borland's quirks needing -L to come first.
 sub init_others($self)
 
     # Used in favor of echo because echo won't strip quotes. :(
-    $self->{+ECHO}     ||= $self->oneliner('print qq{@ARGV}', \@('-l'))
+    $self->{+ECHO}     ||= $self->oneliner('print qq{@ARGV}', \(@: '-l'))
     $self->{+ECHO_N}   ||= $self->oneliner('print qq{@ARGV}')
 
     $self->{+TOUCH}    ||= '$(ABSPERLRUN) -MExtUtils::Command -e touch'
@@ -198,13 +198,13 @@ Add MM_Win32_VERSION.
 =cut
 
 sub init_platform
-    my@($self) =@( shift)
+    my(@: $self) =@:  shift
 
     $self->{+MM_Win32_VERSION} = $VERSION
 
 
 sub platform_constants
-    my@($self) =@( shift)
+    my(@: $self) =@:  shift
     my $make_frag = ''
 
     foreach my $macro (qw(MM_Win32_VERSION))
@@ -286,9 +286,9 @@ sub dynamic_lib($self, %< %attribs)
 
     return '' unless $self->has_link_code
 
-    my@($otherldflags) = %attribs{?OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '')
-    my@($inst_dynamic_dep) = %attribs{?INST_DYNAMIC_DEP} || ""
-    my@($ldfrom) = '$(LDFROM)'
+    my(@: $otherldflags) = %attribs{?OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '')
+    my(@: $inst_dynamic_dep) = %attribs{?INST_DYNAMIC_DEP} || ""
+    my(@: $ldfrom) = '$(LDFROM)'
     my(@m)
 
     # one thing for GCC/Mingw32:
@@ -354,7 +354,7 @@ gcc.  Otherwise, take out all *.pdb files.
 sub extra_clean_files
     my $self = shift
 
-    return $GCC ??  @(qw(dll.base dll.exp)) !!  @('*.pdb')
+    return $GCC ??  (@: qw(dll.base dll.exp)) !!  (@: '*.pdb')
 
 
 =item init_linker
@@ -404,7 +404,7 @@ banner.
 =cut
 
 sub pasthru
-    my@($self) =@( shift)
+    my(@: $self) =@:  shift
     return "PASTHRU = " . ($self->make eq 'nmake' ?? "-nologo" !! "")
 
 
@@ -515,7 +515,7 @@ Windows is Win32.
 =cut
 
 sub os_flavor
-    return @('Win32')
+    return (@: 'Win32')
 
 
 

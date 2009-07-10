@@ -74,11 +74,11 @@ END
 chdir $dir or die $^OS_ERROR
 push $^INCLUDE_PATH, '../../lib', '../../../lib'
 
-package main;
+package main
 
 sub check_for_bonus_files
     my $dir = shift
-    my %expect = %( < @+: map { @: ($^OS_NAME eq 'VMS' ?? lc($_) !! $_), 1}, @_ )
+    my %expect = %:  < @+: map { @: ($^OS_NAME eq 'VMS' ?? lc($_) !! $_), 1}, @_ 
 
     my $fail
     opendir my $dh, $dir or die "opendir '$dir': $^OS_ERROR"
@@ -95,7 +95,7 @@ sub check_for_bonus_files
 
 sub build_and_run($tests, $files)
     my $core = env::var('PERL_CORE') ?? ' PERL_CORE=1' !! ''
-    my @perlout = @( `$runperl Makefile.PL $core` )
+    my @perlout = @:  `$runperl Makefile.PL $core` 
     if ($^CHILD_ERROR)
         fail("$runperl Makefile.PL failed: $^CHILD_ERROR")
         foreach (@perlout)
@@ -137,7 +137,7 @@ sub build_and_run($tests, $files)
         sleep $timewarp
 
     diag "make = '$make'"
-    @makeout = @( `$make` )
+    @makeout = @:  `$make` 
     if ($^CHILD_ERROR)
         fail("$make failed: $^CHILD_ERROR")
         foreach (@makeout)
@@ -153,7 +153,7 @@ sub build_and_run($tests, $files)
     my $maketest = "$make test"
     diag "make = '$maketest'"
 
-    @makeout = @( `$maketest` )
+    @makeout = @:  `$maketest` 
 
     if (open my $outputfh, "<", "$output")
         local $^INPUT_RECORD_SEPARATOR = undef # Slurp it - faster.
@@ -176,7 +176,7 @@ sub build_and_run($tests, $files)
 
     my $makeclean = "$make clean"
     diag "make = '$makeclean'"
-    @makeout = @( `$makeclean` )
+    @makeout = @:  `$makeclean` 
     if ($^CHILD_ERROR)
         fail("$make failed: $^CHILD_ERROR")
         foreach (@makeout)
@@ -195,7 +195,7 @@ sub build_and_run($tests, $files)
     # Need to make distclean to remove ../../lib/ExtTest.pm
     my $makedistclean = "$make distclean"
     diag "make = '$makedistclean'"
-    @makeout = @( `$makedistclean` )
+    @makeout = @:  `$makedistclean` 
     if ($^CHILD_ERROR)
         fail("$make failed: $^CHILD_ERROR")
         foreach (@makeout)
@@ -367,34 +367,34 @@ sub start_tests
     $here = $dummytest
 
 sub end_tests($name, $items, $export_names, $header, $testfile, ?$args)
-    push @tests, @($name, $items, $export_names, $package, $header, $testfile,
-                   $dummytest - $here, $args)
+    push @tests, @: $name, $items, $export_names, $package, $header, $testfile
+                    $dummytest - $here, $args
     $dummytest += $after_tests
 
 
-use utf8;
+use utf8
 
 my $pound
 $pound = "pound" . chr(163) # A pound sign. (Currency)
 
-my @common_items = @(
-                    \%(name=>"perl", type=>"PV",),
-                    \%(name=>"*/", type=>"PV", value=>'"CLOSE"', macro=>1),
-                    \%(name=>"/*", type=>"PV", value=>'"OPEN"', macro=>1),
-                    \%(name=>$pound, type=>"PV", value=>'"Sterling"', macro=>1),
-    )
+my @common_items = @: 
+                    \(%: name=>"perl", type=>"PV",)
+                    \(%: name=>"*/", type=>"PV", value=>'"CLOSE"', macro=>1)
+                    \(%: name=>"/*", type=>"PV", value=>'"OPEN"', macro=>1)
+                    \(%: name=>$pound, type=>"PV", value=>'"Sterling"', macro=>1)
+    
 
-my @args = @( undef )
+my @args = @:  undef 
 foreach my $args ( @args)
     # Simple tests
     start_tests()
     my $parent_rfc1149 =
         'A Standard for the Transmission of IP Datagrams on Avian Carriers'
     # Test the code that generates 1 and 2 letter name comparisons.
-    my %compass = %(
-        N => 0, 'NE' => 45, E => 90, SE => 135,
+    my %compass = %: 
+        N => 0, 'NE' => 45, E => 90, SE => 135
         S => 180, SW => 225, W => 270, NW => 315
-        )
+        
 
     my $header = << "EOT"
 #define FIVE 5
@@ -410,30 +410,29 @@ foreach my $args ( @args)
 #define perl "rules"
 EOT
 
-    while (my @(?$point, ?$bearing) =@( each %compass))
+    while (my (@: ?$point, ?$bearing) =(@:  each %compass))
         $header .= "#define $point $bearing\n"
 
 
-    my @items = @("FIVE", \%(name=>"OK6", type=>"PV",),
-                  \%(name=>"OK7", type=>"PVN",
-                  value=>\@('"not ok 7\n\0ok 7\n"', 15)),
-                  \%(name => "FARTHING", type=>"NV"),
-                  \%(name => "NOT_ZERO", type=>"UV", value=>"~(UV)0"),
-                  \%(name => "OPEN", type=>"PV", value=>'"/*"', macro=>1),
-                  \%(name => "CLOSE", type=>"PV", value=>'"*/"',
-                  macro=>\@("#if 1\n", "#endif\n")),
-                  \%(name => "ANSWER", default=>\@("UV", 42)), "NOTDEF",
-                  \%(name => "Yes", type=>"YES"),
-                  \%(name => "No", type=>"NO"),
-                  \%(name => "Undef", type=>"UNDEF"),
-                  # OK. It wasn't really designed to allow the creation of dual valued
-                  # constants.
-                  # It was more for INADDR_ANY INADDR_BROADCAST INADDR_LOOPBACK INADDR_NONE
-                  \%(name=>"RFC1149", type=>"SV", value=>"sv_2mortal(temp_sv)",
-                  pre=>"SV *temp_sv = newSVpv(RFC1149, 0); "
-                  . "(void) SvUPGRADE(temp_sv,SVt_PVIV); SvIOK_on(temp_sv); "
-                  . "SvIV_set(temp_sv, 1149);"),
-        )
+    my @items = @: "FIVE", \(%: name=>"OK6", type=>"PV",)
+                   \(%: name=>"OK7", type=>"PVN"
+                        value=>\(@: '"not ok 7\n\0ok 7\n"', 15))
+                   \(%: name => "FARTHING", type=>"NV")
+                   \(%: name => "NOT_ZERO", type=>"UV", value=>"~(UV)0")
+                   \(%: name => "OPEN", type=>"PV", value=>'"/*"', macro=>1)
+                   \(%: name => "CLOSE", type=>"PV", value=>'"*/"'
+                        macro=>\(@: "#if 1\n", "#endif\n"))
+                   \(%: name => "ANSWER", default=>\(@: "UV", 42)), "NOTDEF"
+                   \(%: name => "Yes", type=>"YES")
+                   \(%: name => "No", type=>"NO")
+                   \(%: name => "Undef", type=>"UNDEF")
+                   # OK. It wasn't really designed to allow the creation of dual valued
+                   # constants.
+                   # It was more for INADDR_ANY INADDR_BROADCAST INADDR_LOOPBACK INADDR_NONE
+                   \(%: name=>"RFC1149", type=>"SV", value=>"sv_2mortal(temp_sv)"
+                        pre=>"SV *temp_sv = newSVpv(RFC1149, 0); "
+                           . "(void) SvUPGRADE(temp_sv,SVt_PVIV); SvIOK_on(temp_sv); "
+                           . "SvIV_set(temp_sv, 1149);")
 
     foreach (keys %compass)
         push @items, $_
@@ -590,7 +589,7 @@ $test++;
 my %compass = %(
 EOT
 
-    while (my @(?$point, ?$bearing) =@( each %compass))
+    while (my (@: ?$point, ?$bearing) =(@:  each %compass))
         $test_body .= "    '$point' => $bearing, "
 
     $test_body .= <<'EOT'
@@ -691,7 +690,7 @@ EOT
 sub simple
     start_tests()
     # Deliberately leave $name in @_, so that it is indexed from 1.
-    my @($name, @< @items) =  @_
+    my (@: $name, @< @items) =  @_
     my $test_header
     my $test_body = "my \$value;\n"
     foreach my $counter (1 .. ((nelems @_)-1))

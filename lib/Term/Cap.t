@@ -95,7 +95,7 @@ local $^WARN_HOOK = sub (@< @_)
 
 # test the first few features by forcing Tgetent() to croak (line 156)
 env::var('TERM') = undef
-my $vals = \%()
+my $vals = \$%
 try { local $^WARNING = 1; $t = Term::Cap->Tgetent($vals) }
 like( $^EVAL_ERROR->{?description}, qr/TERM not set/, 'Tgetent() should croaks without TERM' )
 like( $warn, qr/OSPEED was not set/, 'Tgetent() should set default OSPEED' )

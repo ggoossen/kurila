@@ -125,9 +125,9 @@ Derived from FileHandle.pm by Graham Barr E<lt>F<gbarr@pobox.com>E<gt>.
 =cut
 
 our($VERSION, @EXPORT, @EXPORT_OK, @ISA)
-use Symbol;
-use IO::Seekable;
-use File::Spec;
+use Symbol
+use IO::Seekable
+use File::Spec
 
 require Exporter
 
@@ -168,9 +168,9 @@ sub new
 
 sub open(@< @_)
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $fh->open(FILENAME [,MODE [,PERMS]])'
-    my @($fh, $file, ...) =  @_
+    my (@: $fh, $file, ...) =  @_
     if ((nelems @_) +> 2)
-        my @($mode, $perms) =  @_[[@(2, 3)]]
+        my (@: $mode, $perms) =  @_[[(@: 2, 3)]]
         if ($mode =~ m/^\d+$/)
             defined $perms or $perms = 0666
             return sysopen($fh, $file, $mode, $perms)

@@ -71,7 +71,7 @@ sub readdir($dh)
 
 
 sub readdirs($dh)
-    return @( CORE::readdir($dh) ) # Force list context.
+    return (@:  CORE::readdir($dh) ) # Force list context.
 
 
 sub rewind($dh)

@@ -109,7 +109,7 @@ sub import($class, %< %args)
     %args{+Export}   ||= 'loc'
     %args{+Subclass} ||= 'I18N'
 
-    my @(?$loc, ?$loc_lang) =  $class->load_loc(< %args) || $@
+    my (@: ?$loc, ?$loc_lang) =  $class->load_loc(< %args) || $@
     $loc ||= $class->default_loc(< %args)
 
     Symbol::fetch_glob(caller(0) . "::%args{?Export}")->* = $loc if %args{?Export}
@@ -118,12 +118,12 @@ sub import($class, %< %args)
 
 my %Loc
 
-sub reload_loc { %Loc = %( () ) }
+sub reload_loc { %Loc = $% }
 
 sub load_loc
-    my @($class, %< %args) =  @_
+    my (@: $class, %< %args) =  @_
 
-    my $pkg = join('::', grep { defined and length }, @( %args{?Class}, %args{?Subclass}))
+    my $pkg = join('::', grep { defined and length }, (@:  %args{?Class}, %args{?Subclass}))
     return %Loc{?$pkg} if exists %Loc{$pkg}
 
     try { require Locale::Maketext::Lexicon; 1 }   or return
@@ -185,14 +185,14 @@ sub load_loc
         die "Unknown Style: $style"
     
 
-    return @(%Loc{?$pkg}, sub (@< @_)
+    return @: %Loc{?$pkg}, sub (@< @_)
                  $lh = $pkg->get_handle(< @_)
                  $lh = $pkg->get_handle(< @_)
-             )
+             
 
 
 sub default_loc
-    my @($self, %< %args) =  @_
+    my (@: $self, %< %args) =  @_
     my $style = lc(%args{?Style})
     if ($style eq 'maketext')
         return sub (@< @_)

@@ -30,7 +30,7 @@ use Storable ()
 
 # Good Case - should not die
 do
-    my $goodfreeze = bless \%(), 'My::GoodFreeze'
+    my $goodfreeze = bless \$%, 'My::GoodFreeze'
     my $frozen = undef
     try {
         $frozen = Storable::freeze( $goodfreeze );
@@ -43,11 +43,11 @@ do
     sub STORABLE_freeze($self, $clone)
 
         # Illegally include a reference in this return
-        return  @('')
+        return  @: ''
     
 
     sub STORABLE_attach($class, $clone, $string)
-        return bless \%( ), 'My::GoodFreeze'
+        return bless \$%, 'My::GoodFreeze'
     
 
 
@@ -55,7 +55,7 @@ do
 
 # Error Case - should die on freeze
 do
-    my $badfreeze = bless \%(), 'My::BadFreeze'
+    my $badfreeze = bless \$%, 'My::BadFreeze'
     try {
         Storable::freeze( $badfreeze );
     }
@@ -68,11 +68,11 @@ do
     sub STORABLE_freeze($self, $clone)
 
         # Illegally include a reference in this return
-        return  @('', \$@)
+        return  @: '', \$@
     
 
     sub STORABLE_attach($class, $clone, $string)
-        return bless \%( ), 'My::BadFreeze'
+        return bless \$%, 'My::BadFreeze'
     
 
 
@@ -90,7 +90,7 @@ do
 
 # Good Case - should not die
 do
-    my $goodthaw = bless \%(), 'My::GoodThaw'
+    my $goodthaw = bless \$%, 'My::GoodThaw'
     my $frozen = undef
     try {
         $frozen = Storable::freeze( $goodthaw );
@@ -106,11 +106,11 @@ do
 
     sub STORABLE_freeze($self, $clone)
 
-        return  @('')
+        return  @: ''
     
 
     sub STORABLE_attach($class, $clone, $string)
-        return bless \%( 'foo' => 'bar' ), 'My::GoodThaw'
+        return bless \(%:  'foo' => 'bar' ), 'My::GoodThaw'
     
 
 
@@ -119,7 +119,7 @@ do
 # Bad Case - should die on thaw
 do
     # Create the frozen string normally
-    my $badthaw = bless \%( ), 'My::BadThaw'
+    my $badthaw = bless \$%, 'My::BadThaw'
     my $frozen = undef
     try {
         $frozen = Storable::freeze( $badthaw );
@@ -145,13 +145,13 @@ do
 
     sub STORABLE_freeze($self, $clone)
 
-        return  @('', \$@)
+        return  (@: '', \$@)
     
 
     # Start with no STORABLE_attach method so we can get a
     # frozen object-containing-a-reference into the freeze string.
     sub STORABLE_thaw($class, $clone, $string)
-        return bless \%( 'foo' => 'bar' ), 'My::BadThaw'
+        return bless \(%:  'foo' => 'bar' ), 'My::BadThaw'
     
 
 
@@ -167,7 +167,7 @@ do
 
 # Good Case - should not die
 do
-    my $goodattach = bless \%( ), 'My::GoodAttach'
+    my $goodattach = bless \$%, 'My::GoodAttach'
     my $frozen = Storable::freeze( $goodattach )
     ok( $frozen, 'My::GoodAttach return as expected' )
     my $thawed = try {
@@ -180,18 +180,18 @@ do
     package My::GoodAttach
 
     sub STORABLE_freeze($self, $cloning)
-        return  @('')
+        return  @: ''
     
 
     sub STORABLE_attach($class, $cloning, $string)
 
-        return bless \%( ), 'My::GoodAttach::Subclass'
+        return bless \$%, 'My::GoodAttach::Subclass'
     
 
     package My::GoodAttach::Subclass
 
     BEGIN 
-        our @ISA = @( 'My::GoodAttach' )
+        our @ISA = (@:  'My::GoodAttach' )
     
 
 
@@ -202,21 +202,21 @@ do
     my $returnvalue = undef
 
     # Create and freeze the object
-    my $badattach = bless \%( ), 'My::BadAttach'
+    my $badattach = bless \$%, 'My::BadAttach'
     my $frozen = Storable::freeze( $badattach )
     ok( $frozen, 'BadAttach freezes as expected' )
 
     # Try a number of different return values, all of which
     # should cause Storable to die.
-    my @badthings = @(
-        undef,
-        '',
-        1,
-        \$@,
-        \%(),
-        \"foo",
-        (bless \%( ), 'Foo'),
-        )
+    my @badthings = @: 
+        undef
+        ''
+        1
+        \$@
+        \$%
+        \"foo"
+        (bless \$%, 'Foo')
+        
     foreach (  @badthings )
         $returnvalue = $_
 
@@ -233,7 +233,7 @@ do
     package My::BadAttach
 
     sub STORABLE_freeze($self, $cloning)
-        return  @('')
+        return  @: ''
     
 
     sub STORABLE_attach($class, $cloning, $string)

@@ -3,25 +3,25 @@ use File::Spec
 require "./test.pl"
 
 require bytes
-use utf8;
+use utf8
 
 
 sub unidump
-    join " ", map { sprintf "\%04X", $_ }, @( unpack "U*", @_[0])
+    join " ", map { sprintf "\%04X", $_ }, @:  unpack "U*", @_[0]
 
 
 sub casetest
-    my @($base, $spec, @< @funcs) =  @_
+    my (@: $base, $spec, @< @funcs) =  @_
     # For each provided function run it, and run a version with some extra
     # characters afterwards. Use a recycling symbol, as it doesn't change case.
     my $ballast = chr (0x2672) x 3
     @funcs = @+: map {my $f = $_;
-        @($f,
-                  sub (@< @_) {my $r = $f->(@_[0] . $ballast); # Add it before
-                      $r =~ s/$ballast\z//so # Remove it afterwards
-                          or die "'@_[0]' to '$r' mangled";
-                      $r; # Result with $ballast removed.
-                  },
+        (@: $f
+            sub (@< @_) {my $r = $f->(@_[0] . $ballast); # Add it before
+                $r =~ s/$ballast\z//so # Remove it afterwards
+                    or die "'@_[0]' to '$r' mangled";
+                $r; # Result with $ballast removed.
+            }
             )}, @funcs
 
     my $file = 'File::Spec'->catfile('File::Spec'->catdir('File::Spec'->updir,
@@ -30,7 +30,7 @@ sub casetest
     my $simple = evalfile $file or die $^EVAL_ERROR
     my %simple
     for my $i (split(m/\n/, $simple))
-        my @($k, $v) =  split(' ', $i)
+        my (@: $k, $v) =  split(' ', $i)
         %simple{+$k} = $v
     
     my %seen

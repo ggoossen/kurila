@@ -3,20 +3,20 @@ package ExtUtils::Install
 
 our (@ISA, @EXPORT, $VERSION, $MUST_REBOOT)
 
-use Config < qw(config_value);
-use Cwd < qw(cwd);
-use Exporter;
-use ExtUtils::Packlist;
-use File::Basename < qw(dirname);
-use File::Compare < qw(compare);
-use File::Copy;
-use File::Find < qw(find);
-use File::Path;
-use File::Spec;
+use Config < qw(config_value)
+use Cwd < qw(cwd)
+use Exporter
+use ExtUtils::Packlist
+use File::Basename < qw(dirname)
+use File::Compare < qw(compare)
+use File::Copy
+use File::Find < qw(find)
+use File::Path
+use File::Spec
 
 
-@ISA = @('Exporter')
-@EXPORT = @('install','uninstall','pm_to_blib', 'install_default')
+@ISA = @: 'Exporter'
+@EXPORT = (@: 'install','uninstall','pm_to_blib', 'install_default')
 
 =pod
 
@@ -112,7 +112,7 @@ my $Curdir = File::Spec->curdir
 my $Updir  = File::Spec->updir
 
 sub _estr(@< @mess)
-    return join "\n", @('!' x 72,< @mess,'!' x 72,'')
+    return join "\n", @: '!' x 72,< @mess,'!' x 72,''
 
 
 do {my %warned;
@@ -172,12 +172,12 @@ sub _move_file_at_boot( $file, $target, ?$moan)
 
     if ( ! $Has_Win32API_File )
 
-        my @msg=@(
-            "Cannot schedule $descr at reboot.",
-            "Try installing Win32API::File to allow operations on locked files",
-            "to be scheduled during reboot. Or try to perform the operation by",
+        my @msg=@: 
+            "Cannot schedule $descr at reboot."
+            "Try installing Win32API::File to allow operations on locked files"
+            "to be scheduled during reboot. Or try to perform the operation by"
             "hand yourself. (You may need to close other perl processes first)"
-            )
+            
         if ( $moan ) { _warnonce(< @msg) } else { _choke(< @msg) }
         return 0
     
@@ -192,11 +192,11 @@ sub _move_file_at_boot( $file, $target, ?$moan)
         $MUST_REBOOT ||= ref $target ?? 0 !! 1
         return 1
     else
-        my @msg=@(
-            "MoveFileEx $descr at reboot failed: $^EXTENDED_OS_ERROR",
-            "You may try to perform the operation by hand yourself. ",
-            "(You may need to close other perl processes first).",
-            )
+        my @msg=@: 
+            "MoveFileEx $descr at reboot failed: $^EXTENDED_OS_ERROR"
+            "You may try to perform the operation by hand yourself. "
+            "(You may need to close other perl processes first)."
+            
         if ( $moan ) { _warnonce(< @msg) } else { _choke(< @msg) }
     
     return 0
@@ -298,7 +298,7 @@ sub _get_install_skip( $skip, $verbose)
     if ( ! defined $skip )
         print $^STDOUT, "Looking for install skip list\n"
             if $verbose+>2
-        for my $file (@( 'INSTALL.SKIP', env::var('EU_INSTALL_SITE_SKIPFILE')) )
+        for my $file ((@:  'INSTALL.SKIP', env::var('EU_INSTALL_SITE_SKIPFILE')) )
             next unless $file
             print $^STDOUT, "\tChecking for $file\n"
                 if $verbose+>2
@@ -387,7 +387,7 @@ sub _can_write_dir
     return
         unless defined $dir and length $dir
 
-    my @($vol, $dirs, $file) =  File::Spec->splitpath($dir,1)
+    my (@: $vol, $dirs, $file) =  File::Spec->splitpath($dir,1)
     my @dirs = File::Spec->splitdir($dirs)
     unshift @dirs, File::Spec->curdir
         unless File::Spec->file_name_is_absolute($dir)
@@ -404,9 +404,9 @@ sub _can_write_dir
             next
         
         if ( _have_write_access($dir) )
-            return @(1,$dir,@make)
+            return @: 1,$dir,@make
         else
-            return @(0,$dir,@make)
+            return @: 0,$dir,@make
         
     continue
         pop @dirs
@@ -443,13 +443,13 @@ sub _mkpath($dir,$show,$mode,?$verbose,?$dry_run)
         
 
     
-    my @($can,$root,@< @make)= _can_write_dir($dir)
+    my (@: $can,$root,@< @make)= _can_write_dir($dir)
     if (!$can)
-        my @msg=@(
-            "Can't create '$dir'",
+        my @msg=@: 
+            "Can't create '$dir'"
             $root ?? "Do not have write permissions on '$root'"
-            !! "Unknown Error"
-            )
+                !! "Unknown Error"
+            
         if ($dry_run)
             _warnonce < @msg
         else
@@ -646,9 +646,9 @@ provided then the returned hashref will be the passed in hashref.
 =cut
 
 sub install #XXX OS-SPECIFIC
-    my@($from_to,?$verbose,?$dry_run,?$uninstall_shadows,?$skip,?$always_copy,?$result) =  @_
+    my(@: $from_to,?$verbose,?$dry_run,?$uninstall_shadows,?$skip,?$always_copy,?$result) =  @_
     if ((nelems @_)==1 and try { 1+nelems $from_to->@ })
-        my %opts        = %( < $from_to->@ )
+        my %opts        = %:  < $from_to->@ 
         $from_to        = %opts{?from_to}
             or Carp::confess("from_to is a mandatory parameter")
         $verbose        = %opts{?verbose}
@@ -659,7 +659,7 @@ sub install #XXX OS-SPECIFIC
         $result         = %opts{?result}
     
 
-    $result ||= \%()
+    $result ||= \$%
     $verbose ||= 0
     $dry_run  ||= 0
 
@@ -669,7 +669,7 @@ sub install #XXX OS-SPECIFIC
         || 0
         unless defined $always_copy
 
-    my@(%from_to) =@( %( < $from_to->% ))
+    my(@: %from_to) =@:  (%:  < $from_to->% )
     my(%pack, $dir, %warned)
     my $packlist = ExtUtils::Packlist->new()
 
@@ -713,7 +713,7 @@ sub install #XXX OS-SPECIFIC
         # File::Find seems to always be Unixy except on MacPerl :(
         my $current_directory= $Is_MacPerl ?? $Curdir !! '.'
         find(sub (@< @_)
-                 my @($mode,$size,$atime,$mtime) =  @(stat)[[@:2,7,8,9]]
+                 my (@: $mode,$size,$atime,$mtime) =  (@: stat)[[@:2,7,8,9]]
 
                  return if !-f _
                  my $origfile = $_
@@ -747,9 +747,9 @@ sub install #XXX OS-SPECIFIC
                      unless -w $targetfile
 
                  push @found_files,
-                     \@( $diff, $File::Find::dir, $origfile,
-                         $mode, $size, $atime, $mtime,
-                         $targetdir, $targetfile, $sourcedir, $sourcefile,
+                     \(@:  $diff, $File::Find::dir, $origfile
+                           $mode, $size, $atime, $mtime
+                           $targetdir, $targetfile, $sourcedir, $sourcefile
 
                      )
                  #restore the original directory we were in when File::Find
@@ -762,8 +762,8 @@ sub install #XXX OS-SPECIFIC
         _mkpath( $targetdir, 0, 0755, $verbose, $dry_run )
     
     foreach my $found ( @found_files)
-        my @($diff, $ffd, $origfile, $mode, $size, $atime, $mtime,
-             $targetdir, $targetfile, $sourcedir, $sourcefile)=  $found->@
+        my (@: $diff, $ffd, $origfile, $mode, $size, $atime, $mtime
+               $targetdir, $targetfile, $sourcedir, $sourcefile)=  $found->@
 
         my $realtarget= $targetfile
         if ($diff)
@@ -949,17 +949,17 @@ sub install_default(@< @_)
     my $INST_SCRIPT = File::Spec->catdir($Curdir,'blib','script')
     my $INST_MAN1DIR = File::Spec->catdir($Curdir,'blib','man1')
     my $INST_MAN3DIR = File::Spec->catdir($Curdir,'blib','man3')
-    install(\%(
-            read => config_value("sitearchexp") . "/auto/$FULLEXT/.packlist",
-            write => config_value("installsitearch") . "/auto/$FULLEXT/.packlist",
+    install(\(%: 
+            read => config_value("sitearchexp") . "/auto/$FULLEXT/.packlist"
+            write => config_value("installsitearch") . "/auto/$FULLEXT/.packlist"
             $INST_LIB => (directory_not_empty($INST_ARCHLIB)) ??
-            config_value("installsitearch") !!
-            config_value("installsitelib"),
-            $INST_ARCHLIB => config_value("installsitearch"),
-            $INST_BIN => config_value("installbin") ,
-            $INST_SCRIPT => config_value("installscript"),
-            $INST_MAN1DIR => config_value("installman1dir"),
-            $INST_MAN3DIR => config_value("installman3dir"),
+                    config_value("installsitearch") !!
+                    config_value("installsitelib")
+            $INST_ARCHLIB => config_value("installsitearch")
+            $INST_BIN => config_value("installbin") 
+            $INST_SCRIPT => config_value("installscript")
+            $INST_MAN1DIR => config_value("installman1dir")
+            $INST_MAN3DIR => config_value("installman3dir")
             ),1,0,0)
 
 
@@ -1020,14 +1020,14 @@ removed and values of the source files they would shadow.
 sub inc_uninstall($filepath,$libdir,$verbose,$dry_run,$ignore,$results)
     $ignore||=""
     my $file = (File::Spec->splitpath($filepath))[2]
-    my %seen_dir = %( () )
+    my %seen_dir = $%
 
     my @PERL_ENV_LIB = split config_value("path_sep"), defined env::var('PERL5LIB')
         ?? env::var('PERL5LIB') !! env::var('PERLLIB') || ''
 
-    my @dirs=@( < @PERL_ENV_LIB,
-                < $^INCLUDE_PATH,
-                < map { config_value($_) }, qw(archlibexp
+    my @dirs=(@:  < @PERL_ENV_LIB
+                  < $^INCLUDE_PATH
+                  < map { config_value($_) }, qw(archlibexp
                           privlibexp
                           sitearchexp
                           sitelibexp))
@@ -1135,7 +1135,7 @@ be prepended as a directory to each installed file (and directory).
 sub pm_to_blib($fromto,$autodir, ?$pm_filter)
 
     _mkpath($autodir,0,0755)
-    while(my@(?$from, ?$to) =@( each $fromto->%))
+    while(my(@: ?$from, ?$to) =(@:  each $fromto->%))
         if( -f $to && -s $from == -s $to && -M $to +< -M $from )
             print $^STDOUT, "Skip $to (unchanged)\n"
             next
@@ -1172,9 +1172,9 @@ sub pm_to_blib($fromto,$autodir, ?$pm_filter)
     
 
 
-package ExtUtils::Install::Warn;
+package ExtUtils::Install::Warn
 
-sub new { bless \%(), shift }
+sub new { bless \$%, shift }
 
 sub add($self,$file,$targetfile)
     push $self->{$file}->@, $targetfile
