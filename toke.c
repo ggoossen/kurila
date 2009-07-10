@@ -324,6 +324,7 @@ static struct debug_tokens {
     { TERNARY_ELSE,	TOKENTYPE_IVAL,		"TERNARY_ELSE" },
     { WORD,		TOKENTYPE_OPVAL,	"WORD" },
     { LAYOUTLISTEND,	TOKENTYPE_IVAL,	        "LAYOUTLISTEND" },
+    { ANONARYL,	        TOKENTYPE_NONE,	        "ANONARYL" },
     { 0,		TOKENTYPE_NONE,		NULL }
 };
 
@@ -4169,6 +4170,25 @@ Perl_yylex(pTHX)
 	    /* arrayjoin '@+:' */
 	    s += 3;
 	    LOP(OP_ARRAYJOIN, XTERM);
+	}
+	if (s[1] == '(' && s[2] == ':') {
+	    /* array constructor '@(:' */
+	    s += 3;
+
+	    if (PL_lex_brackets > 100)
+		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+	    PL_lex_brackstack[PL_lex_brackets].type = LB_PAREN;
+	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
+	    PL_lex_brackstack[PL_lex_brackets].prev_statement_indent = PL_parser->statement_indent;
+	    ++PL_lex_brackets;
+
+	    S_start_list_indent(s);
+
+	    PL_parser->statement_indent = -1;
+
+	    force_next(ANONARYL);
+
+	    TOKEN('(');
 	}
 	if (s[1] == ':' && s[2] != ':') {
 	    /* array constructor '@:' */
