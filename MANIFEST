@@ -999,10 +999,6 @@ lib/Locale/Script.pm		Locale::Codes
 lib/Locale/Script.pod		Locale::Codes documentation
 lib/Math/Trig.pm		A simple interface to complex trigonometry
 lib/Math/Trig.t			See if Math::Trig works
-lib/Module/CoreList/bin/corelist	Module::CoreList
-lib/Module/CoreList.pm			Module::CoreList
-lib/Module/CoreList/t/corelist.t	Module::CoreList
-lib/Module/CoreList/t/find_modules.t	Module::CoreList
 lib/Module/Loaded.pm	Module::Loaded
 lib/Module/Loaded/t/01_Module-Loaded.t	Module::Loaded tests
 lib/Module/Load.pm	Module::Load
