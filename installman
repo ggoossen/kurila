@@ -1,5 +1,5 @@
 #!./perl -w
-BEGIN { $^INCLUDE_PATH = @('lib') }
+BEGIN $^INCLUDE_PATH = @: 'lib'
 
 BEGIN {
     use Config;
@@ -43,7 +43,7 @@ env::var("SHELL") = 'sh' if $^OS_NAME eq 'os2';
 
 my $ver = config_value("version");     # Not used presently.
 $^PERL_VERSION =~ m/kurila-(\d+).(\d+)/ or die "Invalid \$^PERL_VERSION";
-my @($release, $patchlevel) = @($1, $2);
+my @: $release, $patchlevel = @: $1, $2
 warn "Patchlevel of perl ($patchlevel)" .
     "and patchlevel of config.sh ($(config_value('KURILA_VERSION'))) don't match\n"
         if $patchlevel != config_value('KURILA_VERSION');
@@ -109,10 +109,10 @@ while (~< *$utilsfh)
     next if m/^#/
     chomp
     $_ = $1 if m/#.*pod\s*=\s*(\S+)/
-    my @($where, $what) = @: m|^(\S*)/(\S+)|
+    my @: $where, $what = @: m|^(\S*)/(\S+)|
     pod2man($where, %opts{man1dir}, %opts{man1ext}, $what)
     if ($has_man1dir)
-        if (my @(?$where2, ?$what2) = @: m|#.*link\s*=\s*(\S+)/(\S+)|)
+        if (my @: ?$where2, ?$what2 = @: m|#.*link\s*=\s*(\S+)/(\S+)|)
             my $old = "%opts{man1dir}/$what.%opts{man1ext}"
             my $new = "%opts{man1dir}/$what2.%opts{man1ext}"
             unlink($new)
@@ -157,36 +157,30 @@ sub pod2man($poddir, $mandir, $manext, @<@script)
                             }),
                          $poddir);
     my @to_process
-    foreach my $mod (sort keys %modpods) {
-        my $manpage = %modpods{$mod};
-        my $tmp;
+    foreach my $mod (sort keys %modpods)
+        my $manpage = %modpods{$mod}
+        my $tmp
         # Skip .pm files that have corresponding .pod files, and Functions.pm.
-        next if (($tmp = $mod) =~ s/\.pm$/.pod/ && -f $tmp);
-        next if $mod =~ m:/t/:; # no pods from test directories 
-        next if ($manpage eq 'Pod/Functions.pm'); #### Used only by pod itself
+        next if (($tmp = $mod) =~ s/\.pm$/.pod/ && -f $tmp)
+        next if $mod =~ m:/t/: # no pods from test directories 
+        next if ($manpage eq 'Pod/Functions.pm') #### Used only by pod itself
 
         # Skip files without pod docs
-        my $has_pod;
+        my $has_pod
         if (open my $t, "<", $mod)
-        {
-            local $_;
+            local $_
             while (~< *$t)
-            {
-                ++$has_pod and last if m/^=(?:head\d+|item|pod)\b/;
-            }
+                ++$has_pod and last if m/^=(?:head\d+|item|pod)\b/
 
-            close $t;
-        }
+            close $t
 
         unless ($has_pod)
-        {
-            warn "no documentation in $mod\n";
-            next;
-        }
+            warn "no documentation in $mod\n"
+            next
 
         # Convert name from  File/Basename.pm to File::Basename.3 format,
         # if necessary.
-        $manpage =~ s#\.p(m|od)$##;
+        $manpage =~ s#\.p(m|od)$##
         if ($^OS_NAME eq 'os2' || $^OS_NAME eq 'amigaos' || $^OS_NAME eq 'uwin' || $^OS_NAME eq 'cygwin') {
           $manpage =~ s#/#.#g;
         }
@@ -195,11 +189,10 @@ sub pod2man($poddir, $mandir, $manext, @<@script)
         }
         $tmp = "$($mandir)/$($manpage).tmp";
         $manpage = "$($mandir)/$($manpage).$($manext)";
-        push @to_process, \@($mod, $tmp, $manpage);
-    }
+        push @to_process, \@: $mod, $tmp, $manpage
 
     foreach my $page (@to_process) {
-        my @($pod, $tmp, $manpage) = $page->@;
+        my @: $pod, $tmp, $manpage = $page->@;
 
         my $parser = Pod::Man->new( section => $manext,
                                     official=> 1,
@@ -241,31 +234,28 @@ sub unlink {
     return $cnt;
 }
 
-sub link {
-    my @($from,$to) = @_;
-    my($success) = 0;
+sub link($from,$to)
+    my($success) = 0
 
-    print $^STDOUT, "  ln $from $to\n" if %opts{verbose};
-    try {
+    print $^STDOUT, "  ln $from $to\n" if %opts{verbose}
+    try
         CORE::link($from, $to)
             ?? $success++
             !! ($from =~ m#^/afs/# || $to =~ m#^/afs/#)
               ?? die "AFS"  # okay inside try {}
               !! warn "Couldn't link $from to $to: $^OS_ERROR\n"
           unless %opts{notify};
-    };
-    if ($^EVAL_ERROR) {
+
+    if ($^EVAL_ERROR)
         File::Copy::copy($from, $to)
             ?? $success++
             !! warn "Couldn't copy $from to $to: $^OS_ERROR\n"
-          unless %opts{notify};
-    }
-    $success;
-}
+          unless %opts{notify}
 
-sub rename {
-    my @($from,$to) = @_;
-    if (-f $to and not &unlink($to)) {
+    $success
+
+sub rename($from,$to)
+    if (-f $to and not &unlink($to))
         my $i = 1;
         while ($i +< 50) {
             last if CORE::rename($to, "$to.$i");
@@ -273,25 +263,21 @@ sub rename {
         }
         warn("Cannot rename to `$to.$i': $^OS_ERROR"), return 0 
             if $i +>= 50;       # Give up!
-    }
-    &link($from,$to) || return 0;
-    &unlink($from);
-}
 
-sub chmod {
-    my @($mode,$name) = @_;
+    &link($from,$to) || return 0
+    &unlink($from)
 
-    printf $^STDOUT, "  chmod \%o \%s\n", $mode, $name if %opts{verbose};
+sub chmod($mode,$name)
+    printf $^STDOUT, "  chmod \%o \%s\n", $mode, $name if %opts{verbose}
     CORE::chmod($mode,$name) || warn sprintf("Couldn't chmod \%o \%s: $^OS_ERROR\n",$mode,$name)
-        unless %opts{notify};
-}
+        unless %opts{notify}
 
 sub samepath($p1, $p2)
-    my($dev1, $ino1, $dev2, $ino2);
+    my($dev1, $ino1, $dev2, $ino2)
 
     if ($p1 ne $p2)
-        @($dev1, $ino1, ...) = @: stat($p1)
-        @($dev2, $ino2, ...) = @: stat($p2)
+        @: $dev1, $ino1, ... = @: stat($p1)
+        @: $dev2, $ino2, ... = @: stat($p2)
         ($dev1 == $dev2 && $ino1 == $ino2)
     else
         1
