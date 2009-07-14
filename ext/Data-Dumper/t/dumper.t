@@ -73,13 +73,13 @@ is Data::Dumper->Dump(\(@: (@: 'abc', 'def')), \(@: 'a')), <<'===='
 is Data::Dumper->Dump(\(@: undef), \(@: 'a')), '#$a = undef;' . "\n" 
 
 is Data::Dumper->Dump(\(@:  bless \(%:  aap => 'noot' ), 'version' ), \(@: 'a')), <<'===='
-#$a = bless( \%(
+#$a = bless( \%(:
 #              "aap" => "noot"
 #            ), "version" );
 ====
 
 is Data::Dumper->Dump(\(@: (%:  aap => 'noot' )), \(@: '*mies')), <<'===='
-#%mies = %(
+#%mies = %(:
 #        "aap" => "noot"
 #        );
 ====
@@ -101,7 +101,7 @@ $b->{+c} = $a->[2]
 $WANT = <<'EOT'
 #$a = \@(:
 #       1,
-#       \%(
+#       \%(:
 #         "a" => $a,
 #         "b" => $a->[1],
 #         "c" => \@(:
