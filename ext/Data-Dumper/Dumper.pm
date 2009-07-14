@@ -407,7 +407,7 @@ sub _dump
         $out .= ')'
     elsif ($realtype eq 'HASH')
         my($k, $v, $pad, $lpad, $mname, $pair)
-        $out .= '%('
+        $out .= '%(:'
         $pad = $s->{?sep} . $s->{?pad} . $s->{?apad}
         $lpad = $s->{?apad}
         $pair = $s->{?pair}
