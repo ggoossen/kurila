@@ -12,7 +12,7 @@ is( (join '*', sort @: < (%:  aap => 'noot', Mies => 'Wim' )), 'Mies*Wim*aap*noo
 is((%: aap => 'noot', Mies => 'Wim'){aap}, 'noot', "using helem directy on anon hash")
 is( (%: aap => 'noot'){aap}, 'noot', "using \%: hash constructor")
 
-is( %( aap => 'noot'){aap}, 'noot', "using \%(: hash constructor")
+is( %(: aap => 'noot'){aap}, 'noot', "using \%(: hash constructor")
 
 my $x = \ $%
 is Internals::SvREFCNT($x), 1, "there is only one reference"

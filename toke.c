@@ -3700,25 +3700,6 @@ Perl_yylex(pTHX)
 	    Mop(OP_MODULO);
 	}
 
-	if (s[1] == '(') {
-	    /* anonymous hash constructor '%(' */
-	    if (PL_lex_brackets > 100)
-		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
-	    PL_lex_brackstack[PL_lex_brackets].type = LB_PAREN;
-	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
-	    ++PL_lex_brackets;
-
-	    s += 2;
-	    OPERATOR(ANONHSH);
-	}
-	if (s[1] == ':' && s[2] != ':') {
-	    /* hash constructor '%:' */
-	    s += 2;
-	    s = skipspace(s, NULL);
-	    S_start_list_indent(s);
-
-	    OPERATOR(ANONHSHL);
-	}
 	if (s[1] == '(' && s[2] == ':') {
 	    /* hash constructor '%(:' */
 	    s += 3;
@@ -3737,6 +3718,25 @@ Perl_yylex(pTHX)
 	    force_next(ANONHSHL);
 
 	    TOKEN('(');
+	}
+	if (s[1] == '(') {
+	    /* anonymous hash constructor '%(' */
+	    if (PL_lex_brackets > 100)
+		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+	    PL_lex_brackstack[PL_lex_brackets].type = LB_PAREN;
+	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
+	    ++PL_lex_brackets;
+
+	    s += 2;
+	    OPERATOR(ANONHSH);
+	}
+	if (s[1] == ':' && s[2] != ':') {
+	    /* hash constructor '%:' */
+	    s += 2;
+	    s = skipspace(s, NULL);
+	    S_start_list_indent(s);
+
+	    OPERATOR(ANONHSHL);
 	}
 	if (s[1] == '+' && s[2] == ':') {
 	    /* hashjoin '%+:' */
