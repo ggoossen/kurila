@@ -2800,6 +2800,16 @@ S_tokenize_use(pTHX_ int is_use, char *s) {
       if we already built the token before, use it.
 */
 
+static bool S_close_layout_lists() {
+    if (PL_lex_brackets > 0 
+	&& PL_lex_brackstack[PL_lex_brackets -1].type == LB_LAYOUT_LIST) {
+	--PL_lex_brackets;
+	PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
+	return 1;
+    }
+    return 0;
+}
+
 
 static int S_process_layout(char* s) {
     char* d;
@@ -2820,11 +2830,10 @@ static int S_process_layout(char* s) {
 	    PL_thiswhite = NULL;
 	}
 #endif
-	if (is_layout_list) {
-	    OPERATOR(',');
-	} else {
-	    TOKEN(';');
-	}
+	if (S_close_layout_lists())
+	    TOKEN(LAYOUTLISTEND);
+	assert(!is_layout_list);
+	TOKEN(';');
     }
     if ((s - PL_linestart) < PL_parser->statement_indent) {
 	S_stop_statement_indent();
@@ -2840,16 +2849,6 @@ static int S_process_layout(char* s) {
     } else {
 	TOKEN(';');
     }
-}
-
-static bool S_close_layout_lists() {
-    if (PL_lex_brackets > 0 
-	&& PL_lex_brackstack[PL_lex_brackets -1].type == LB_LAYOUT_LIST) {
-	--PL_lex_brackets;
-	PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
-	return 1;
-    }
-    return 0;
 }
 
 /* S_closing_bracket
@@ -3357,7 +3356,7 @@ Perl_yylex(pTHX)
 	    sv_catsv(PL_thiswhite, PL_skipwhite);
 #endif
 	}
-	goto retry;
+	goto process_indentation;
     case '\r':
 #ifdef PERL_STRICT_CR
 	Perl_warn(aTHX_ "Illegal character \\%03o (carriage return)", '\r');
@@ -3386,6 +3385,7 @@ Perl_yylex(pTHX)
     case '\n': {
 	/* might be non continuous line */
 	bool is_continuation;
+      process_indentation:
 	s = skipspace(s, &is_continuation);
 	assert(!isSPACE_notab(*s));
 	if (!is_continuation) {

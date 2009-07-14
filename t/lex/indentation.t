@@ -3,7 +3,7 @@
 BEGIN
     require './test.pl'
 
-plan tests => 19
+plan tests => 20
 
 our ($x, $y)
 
@@ -61,7 +61,13 @@ $x = @: "aap"
 is(join("*", $x), q[aap*noot])
 
 # empty @:
-$x = $@
+$x = @:
+is(join("*", $x), q[])
+
+# empty @: with pod
+$x = @:
+=pod
+=cut
 is(join("*", $x), q[])
 
 # @: terminated by an "and"
