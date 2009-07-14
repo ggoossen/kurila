@@ -3719,6 +3719,25 @@ Perl_yylex(pTHX)
 
 	    OPERATOR(ANONHSHL);
 	}
+	if (s[1] == '(' && s[2] == ':') {
+	    /* hash constructor '%(:' */
+	    s += 3;
+
+	    if (PL_lex_brackets > 100)
+		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+	    PL_lex_brackstack[PL_lex_brackets].type = LB_PAREN;
+	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
+	    PL_lex_brackstack[PL_lex_brackets].prev_statement_indent = PL_parser->statement_indent;
+	    ++PL_lex_brackets;
+
+	    S_start_list_indent(s);
+
+	    PL_parser->statement_indent = -1;
+
+	    force_next(ANONHSHL);
+
+	    TOKEN('(');
+	}
 	if (s[1] == '+' && s[2] == ':') {
 	    /* hashjoin '%+:' */
 	    s += 3;
