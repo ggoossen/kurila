@@ -1359,7 +1359,7 @@ sub astnull {
     my $self = shift;
     my @newkids;
     return unless $$self{mp};
-    push @newkids, $self->madness('q = Q X h : f O ( )');
+    push @newkids, $self->madness('optional_assign q = Q X h : f O ( )');
     return P5AST::op_const->new(Kids => [@newkids]);
 }
 
@@ -1393,7 +1393,7 @@ sub ast {
 	if (not $$self{mp}{O}) {
 	    push @before, $self->madness('o');	# was unary
 	}
-	my @X = $self->madness(': X h');
+	my @X = $self->madness('optional_assign : X h');
 	if (exists $$self{private} and $$self{private} =~ /BARE/) {
 	    return $self->newtype->new(Kids => [@X]);
 	}
@@ -2953,7 +2953,7 @@ sub ast {
     }
 
     local $::curstate;
-    push @retval, $self->madness('L o {');
+    push @retval, $self->madness('L o I {');
 
     my @newkids = $self->PLXML::op_lineseq::lineseq(@_);
     push @retval, @newkids;
@@ -2988,7 +2988,7 @@ sub ast {
     local $::curstate;
 
     my @newkids;
-    push @newkids, $self->madness('L o {');
+    push @newkids, $self->madness('L o I {');
     push @newkids, $self->PLXML::op_lineseq::lineseq(@_);
     push @newkids, $self->madness('} fake_semicolon extra_semicolon');
 

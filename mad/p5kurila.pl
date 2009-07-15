@@ -1555,11 +1555,12 @@ sub indent {
 
         $done{$op}++;
 
-        my $old_indent_level;
         my $new_indent_level;
         my $old_cont;
         my $old_use_layout = $use_layout;
+        my $old_use_list_layout = $use_list_layout;
         my $old_change_layout = $change_layout;
+        my $old_indent_level = $indent_level;
 
         my $new_block = (defined(get_madprop($op, 'curly_open')) 
                            and not $op->tag =~ m/ op_helem | op_gelem | op_hslice | op_anonhash | op_listfirst /x
@@ -1577,12 +1578,9 @@ sub indent {
             }
         }
 
-
         if ($new_block) {
-            $old_indent_level = $indent_level;
             $new_indent_level = $indent_level + 4;
             my ($new_first_indent_line, undef) = first_token($op->children);
-            $indent_level = $indent_level;
 
             if ($op->ancestors > 3 and ($op->ancestors)[2]->tag eq "op_anoncode") {
                 if ($first_indent_line < get_madprop(($op->ancestors)[3], 'operator', 'linenr')) {
@@ -1594,11 +1592,13 @@ sub indent {
             $old_cont = $cont;
             $cont = 0;
 
-
             $use_layout = 0;
 
             my $curly_open = get_madprop($op, 'curly_open');
-            if ($curly_open and $curly_open eq '{' and $null_type ne 'uniop') {
+            if (not $curly_open) {
+                $indent_level = $new_indent_level;
+            }
+            elsif ($curly_open and $curly_open eq '{' and $null_type ne 'uniop') {
                 # Possibly convert to "use_layout"
                 my $open_indent_line = get_madprop($op, 'curly_open', 'linenr');
                 if ($first_indent_line and $open_indent_line < $first_indent_line ) {
@@ -1650,12 +1650,17 @@ sub indent {
                 return if $done_mad{$madv};
                 $done_mad{$madv} = 1;
                 my $linenr = $madv->att('linenr');
+                my $charoffset = $madv->att('charoffset');
+                my $madv_tag = $madv->tag;
                 for my $wsname (qw[wsbefore wsafter]) {
                     my $ws = $madv->att($wsname);
                     if ($ws and $ws =~ m/&#xA;/) {
                         my $ws_indent = $indent_level;
-                        if ($first_indent_line and $first_indent_line < $linenr
-                              and not ($new_block and $madv->tag eq "mad_curly_close")
+                        if ($madv_tag eq "mad_extra_semicolon" or $madv_tag eq "mad_if") {
+                            $ws_indent = $old_indent_level;
+                        }
+                        elsif ($first_indent_line and $first_indent_line < $linenr
+                              and not ($new_block and $madv_tag eq "mad_curly_close")
                           ) {
                             $ws_indent += $cont || 4;
                         }
@@ -1669,12 +1674,15 @@ sub indent {
                                 $i++;
                                 next;
                             }
-                            $lines[$i] =~ s/^(\s|&#x9;)*/ ' ' x $ws_indent /ge;
                             $i++;
                         }
-                        # warn "ws - $ws_indent - $cont - $first_indent_line - $linenr - " . $madv->tag;
+                        $lines[-1] =~ s/^(\s|&#x9;)*/ ' ' x $ws_indent /ge;
+                        ##warn "ws - $ws_indent - $indent_level - $cont - $first_indent_line - $linenr - " . $madv->tag;
                         $ws = join '&#xA;', @lines;
                         $ws =~ s/(\s|&#x9;)+&#xA;/&#xA;/g;
+                        if ($charoffset == 0) {
+                            $ws =~ s/(\s|&#x9;)+$//g;
+                        }
                         $madv->set_att($wsname, $ws);
                     }
                 }
@@ -1775,6 +1783,20 @@ sub indent {
             $opsub->($op->child(-1));
         }
 
+        if ($use_list_layout) {
+            if (defined get_madprop($op, 'comma')) {
+                my $this_linenr = get_madprop($op, 'comma', 'linenr');
+                my $this_char_offset = get_madprop($op, 'comma', 'charoffset');
+                my ($next_linenr) = first_token_after($this_linenr, $this_char_offset,
+                                                      $xml->root);
+                if ($next_linenr and $next_linenr > $this_linenr
+                      and get_madprop($op, "comma") eq ",") {
+                    set_madprop($op, 'comma', '');
+                }
+                $first_indent_line = $next_linenr;
+            }
+        }
+
         # replace items of op mad properties.
         if ($change_layout) {
             my $madprop = $op->child(0);
@@ -1796,19 +1818,7 @@ sub indent {
             }
         }
 
-        if ($change_layout and $use_list_layout) {
-            if (get_madprop($op, 'comma')) {
-                my $this_linenr = get_madprop($op, 'comma', 'linenr');
-                my $this_char_offset = get_madprop($op, 'comma', 'charoffset');
-                my ($next_linenr) = first_token_after($this_linenr, $this_char_offset,
-                                                      $xml->root);
-                if ($next_linenr and $next_linenr > $this_linenr
-                      and get_madprop($op, "comma") eq ",") {
-                    set_madprop($op, 'comma', '');
-                }
-                $first_indent_line = $next_linenr;
-            }
-        }
+        $use_list_layout = 0;
 
         if ( $op->tag eq "op_anonarray" or $op->tag eq "op_anonhash") {
             my $is_hash = $op->tag eq "op_anonhash";
@@ -1849,7 +1859,6 @@ sub indent {
         }
 
         if ($new_indent_level) {
-            $old_indent_level //= $indent_level;
             $indent_level = $new_indent_level;
         }
 
@@ -1867,6 +1876,7 @@ sub indent {
         }
         $use_layout = $old_use_layout;
         $change_layout = $old_change_layout;
+        $use_list_layout = $old_use_list_layout;
 
         return;
     };

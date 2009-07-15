@@ -122,6 +122,8 @@ our %failing = map { $_, 1 } qw|
 my @files;
 find( sub { push @files, $File::Find::name if m/[.]t$/ }, '../t/');
 
+@files = ('../t/pod/oneline_cmds.t');
+    
 $ENV{PERL_CORE} = 1;
 
 for my $file (@files) {
@@ -433,3 +435,14 @@ $VERSION = 1.1   ## comment
 =head1
 pod
 =cut
+########
+(%:  switches => \(@:  '-w' ) )
+########
+my (%opts);
+%opts = %+: map {
+                my @($key, $val) = @(lc $_, %opts{?$_});
+                %: $key => $val;
+              }, keys %opts
+########
+sub foo(%< %: ?bar => $bar)
+    "noot"

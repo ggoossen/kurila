@@ -317,7 +317,7 @@ else	:	/* NULL */
 			{ $$ = (OP*)NULL; }
 	|	ELSE mblock
 			{ ($2)->op_flags |= OPf_PARENS; $$ = scope($2);
-			  TOKEN_GETMAD($1,$$,'o');
+			  TOKEN_GETMAD($1,$$,'I');
 			}
 	|	ELSIF '(' mexpr ')' mblock optional_semicolon else
 			{ 
@@ -779,29 +779,6 @@ listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
                             $$ = convert(IVAL($1), 0, $2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'o');
                             APPEND_MADPROPS_PV("listop", $$, '>');
-			}
-        |       ANONHSHL listexpr  /* %: ... */
-                        {
-                            $$ = newANONHASH($2, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'{');
-			}
-        |       ANONARYL listexpr LAYOUTLISTEND  /* @: ... */
-                        {
-                            $$ = newANONARRAY($2, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'[');
-                            TOKEN_GETMAD($3,$$,']');
-			}
-        |       ANONARYL listexpr /* @: ... and */
-                        {
-                            $$ = newANONARRAY($2, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'[');
-                            --PL_parser->lex_brackets;
-                            PL_parser->statement_indent = PL_parser->lex_brackstack[PL_parser->lex_brackets].prev_statement_indent;
-			}
-        |       ANONARYL ',' LAYOUTLISTEND  /* @: ... */
-                        {
-                            $$ = newANONARRAY(NULL, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'[');
 			}
         |       ANONSCALARL listexpr  /* $: ... */
                         {
@@ -1421,6 +1398,7 @@ scalar  :	PRIVATEVAR
                         {
                             $$ = newANONHASH($2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'{');
+                            TOKEN_GETMAD($3,$$,'}');
 			}
         |       ANONHSHL listexpr /* %: ... */
                         {
@@ -1433,11 +1411,13 @@ scalar  :	PRIVATEVAR
                         {
                             $$ = newANONHASH(NULL, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'{');
+                            TOKEN_GETMAD($3,$$,'}');
 			}
         |       ANONARYL listexpr LAYOUTLISTEND  /* @: ... */
                         {
                             $$ = newANONARRAY($2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
+                            TOKEN_GETMAD($3,$$,']');
 			}
         |       ANONARYL listexpr /* @: ... and */
                         {
@@ -1450,6 +1430,7 @@ scalar  :	PRIVATEVAR
                         {
                             $$ = newANONARRAY(NULL, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
+                            TOKEN_GETMAD($3,$$,']');
 			}
         |       EMPTYAH
 			{ 

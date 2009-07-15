@@ -2815,6 +2815,13 @@ static int S_process_layout(char* s) {
 	PL_thistoken = newSVpvs("");
 
     d = S_skip_pod(s);
+#ifdef PERL_MAD
+    if (PL_madskills && PL_thiswhite) {
+	sv_catsv(PL_nextwhite, PL_thiswhite);
+	PL_thiswhite = NULL;
+    }
+#endif /* PERL_MAD */
+	
     DEBUG_T( { PerlIO_printf(Perl_debug_log,
 		"### Tokener got space2 '%s'\n", PL_thiswhite ? SvPVX_const(PL_thiswhite) : NULL ); });
     if (d) {
@@ -2826,11 +2833,11 @@ static int S_process_layout(char* s) {
 	}
     }
     if ((s - PL_linestart) < PL_parser->statement_indent) {
-	S_stop_statement_indent();
 #ifdef PERL_MAD
 	if (PL_madskills)
-	    SvCUR_set(PL_thiswhite, SvCUR(PL_thiswhite) - (s - PL_linestart + 1));
+	    SvCUR_set(PL_nextwhite, SvCUR(PL_nextwhite) - (s - PL_linestart + 1));
 #endif
+	S_stop_statement_indent();
 	s = PL_linestart - 1;
 	assert(*s == '\n' || *s == '\0');
     }
@@ -3183,6 +3190,15 @@ Perl_yylex(pTHX)
 	    s = d;
 	    goto retry;
 	}
+#ifdef PERL_MAD
+	if (PL_madskills) {
+	    if (!PL_thiswhite)
+		PL_thiswhite = newSVpvs("");
+	    sv_catsv(PL_thiswhite, PL_skipwhite);
+	    PL_skipwhite = NULL;
+	}
+	PL_realtokenstart = s - SvPVX_mutable(PL_linestr);
+#endif
 	if (is_continuation) {
 	    if (*s != '{') {
 		S_start_statement_indent(s);
@@ -3398,6 +3414,8 @@ Perl_yylex(pTHX)
 	DEBUG_T( { PerlIO_printf(Perl_debug_log,
 		    "### Tokener got space '%s'\n", PL_thiswhite ? SvPVX_const(PL_thiswhite) : NULL ); });
 	if (!is_continuation) {
+	    PL_nextwhite = PL_thiswhite;
+	    PL_thiswhite = NULL;
 	    assert(PL_parser->statement_indent != -1);
 	    assert((s - PL_linestart) <= PL_parser->statement_indent);
 	    return S_process_layout(s);
@@ -4519,7 +4537,7 @@ Perl_yylex(pTHX)
 		if (PL_madskills && !PL_thistoken) {
 		    char *start = SvPVX_mutable(PL_linestr) + PL_realtokenstart;
 		    PL_thistoken = newSVpvn(start,s - start);
-		    PL_realtokenstart = s - SvPVX_mutable(PL_linestr);
+		    PL_realtokenstart = (s - len) - SvPVX_mutable(PL_linestr);
 		}
 #endif
 

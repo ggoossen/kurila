@@ -36,6 +36,8 @@ sub p5convert {
                                  );
     #$output =~ s/\s+$//;
     #$expected =~ s/\s+$//;
+    $output =~ s/\n/\\n\n/g;
+    $expected =~ s/\n/\\n\n/g;
     is($output, $expected) or $TODO or die "failed test";
 }
 
@@ -1852,6 +1854,146 @@ my $x = @:  (@: "aap", "noot")
 ----
 @:  (%: 
         aap => "noot")
+====
+@: @: "aap"
+      "noot"
+   "mies"
+----
+@: @: "aap"
+      "noot"
+   "mies"
+====
+@: map { $_ },
+     qw[aap]
+----
+@: map { $_ },
+       qw[aap]
+====
+sub bar()
+    @: "aap"
+
+    "noot"
+----
+sub bar()
+    @: "aap"
+
+    "noot"
+====
+foo(
+    @( "aap", sub ()
+              return "noot"
+              return "mies"
+       ,
+       "wim", sub ()
+              return "zus"
+   ))
+----
+foo(
+    (@:  "aap", sub ()
+             return "noot"
+             return "mies"
+         
+         "wim", sub ()
+             return "zus"
+   ))
+====
+my (@tests, $arg, $recurse, $self)
+push @tests, <
+      sort @( -d $arg
+            ?? $recurse
+            ?? < $self->_expand_dir_recursive($arg)
+            !! < glob( File::Spec->catfile( $arg, '*.t' ) )
+            !! $arg)
+
+return @tests
+----
+my (@tests, $arg, $recurse, $self)
+push @tests, <
+      sort @:  -d $arg
+                   ?? $recurse
+                   ?? < $self->_expand_dir_recursive($arg)
+                   !! < glob( File::Spec->catfile( $arg, '*.t' ) )
+                   !! $arg
+
+return @tests
+====
+@: sub ()
+    my ($plan);
+    if ( $plan )
+        "aap"
+
+    "noot"
+----
+@: sub ()
+       my ($plan);
+       if ( $plan )
+           "aap"
+
+       "noot"
+====
+our @isa = @: "aap"
+
+=head1 Foo
+
+bar
+
+=cut
+
+our $version = 1
+----
+our @isa = @: "aap"
+
+=head1 Foo
+
+bar
+
+=cut
+
+our $version = 1
+====
+@: foo => undef
+   bar => 2
+----
+@: foo => undef
+   bar => 2
+====
+@:
+      TAP::Parser->new(
+          %: source => catfile(
+                             ))
+      \@:    '1..5'
+             'ok 1'
+----
+@:
+      TAP::Parser->new(
+          %: source => catfile(
+                       ))
+      \@:    '1..5'
+             'ok 1'
+====
+@: sub ()
+    if ($a)
+      "aap"
+    elsif ($a)
+      "noot"
+    else
+      "mies"
+----
+@: sub ()
+       if ($a)
+           "aap"
+       elsif ($a)
+           "noot"
+       else
+           "mies"
+====
+use Symbol 'gensym'
+@: gensym, gensym, gensym
+   gensym
+----
+use Symbol 'gensym'
+@: gensym, gensym, gensym
+   gensym
 END
 }
 

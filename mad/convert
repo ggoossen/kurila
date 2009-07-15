@@ -56,7 +56,7 @@ use Fatal qw|open close|;
                                          from => "$ENV{madfrom}",
                                          to => "$ENV{madto}",
                                          dumpcommand => "$ENV{madperl}",
-                                         switches => join ' ', map { "-I $_" } @lib ) };
+                                         switches => " -MPPI::Token " . join ' ', map { "-I $_" } @lib ) };
     if ($output) {
         if ($input ne $output) {
             open my $fh, '>', "$filename.p5k" or die;
