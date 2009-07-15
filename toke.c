@@ -2821,8 +2821,10 @@ static int S_process_layout(char* s) {
     }
     is_layout_list = ( PL_lex_brackstack[PL_lex_brackets-1].type == LB_LAYOUT_LIST );
 
+#ifdef PERL_MAD
     if (!PL_thistoken)
 	PL_thistoken = newSVpvs("");
+#endif
 
     d = S_skip_pod(s);
 #ifdef PERL_MAD
@@ -2832,8 +2834,6 @@ static int S_process_layout(char* s) {
     }
 #endif /* PERL_MAD */
 	
-    DEBUG_T( { PerlIO_printf(Perl_debug_log,
-		"### Tokener got space2 '%s'\n", PL_thiswhite ? SvPVX_const(PL_thiswhite) : NULL ); });
     if (d) {
 	s = d;
 #ifdef PERL_MAD			
@@ -3417,11 +3417,11 @@ Perl_yylex(pTHX)
 	    PL_skipwhite = NULL;
 	}
 #endif
-	DEBUG_T( { PerlIO_printf(Perl_debug_log,
-		    "### Tokener got space '%s'\n", PL_thiswhite ? SvPVX_const(PL_thiswhite) : NULL ); });
 	if (!is_continuation) {
+#ifdef PERL_MAD
 	    PL_nextwhite = PL_thiswhite;
 	    PL_thiswhite = NULL;
+#endif
 	    assert(PL_parser->statement_indent != -1);
 	    assert((s - PL_linestart) <= PL_parser->statement_indent);
 	    return S_process_layout(s);
