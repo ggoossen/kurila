@@ -776,17 +776,15 @@ sub _ncftp_fetch
         my $cmd = \@: 
             $ncftp
             '-V'                   # do not be verbose
-            '-p', $FROM_EMAIL, <      # email as password
-                $self->host, <            # hostname
-                dirname($to)           # local dir for the file
+            '-p', $FROM_EMAIL      # email as password
+            < $self->host          # hostname
+            < dirname($to)         # local dir for the file
             # remote path to the file
             ### DO NOT quote things for IPC::Run, it breaks stuff.
             $IPC::Cmd::USE_IPC_RUN
-            ?? < File::Spec::Unix->catdir( < $self->path, < $self->file )
-            !! QUOTE. File::Spec::Unix->catdir( <
-                $self->path, < $self->file ) .QUOTE
-
-            
+                ?? < File::Spec::Unix->catdir( < $self->path, < $self->file )
+                !! QUOTE. File::Spec::Unix->catdir(
+                        < $self->path, < $self->file ) .QUOTE
 
         ### shell out ###
         my $captured
@@ -795,7 +793,6 @@ sub _ncftp_fetch
                     verbose => $DEBUG )
             )
             return $self->_error( <loc("Command failed: \%1", $captured || ''))
-        
 
         return $to
 

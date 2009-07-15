@@ -3789,8 +3789,10 @@ Perl_yylex(pTHX)
 	TOKEN('(');
     case ';':
 	{
-	    const char tmp = *s++;
-	    OPERATOR(tmp);
+	    if (S_close_layout_lists())
+		TOKEN(LAYOUTLISTEND);
+	    s++;
+	    OPERATOR(';');
 	}
     case ')':
 	{
@@ -4000,6 +4002,10 @@ Perl_yylex(pTHX)
 		    goto retry;
 		}
 	    }
+	}
+	if (S_close_layout_lists()) {
+	    --s;
+	    TOKEN(LAYOUTLISTEND);
 	}
 	pl_yylval.i_tkval.ival = 0;
 	OPERATOR(ASSIGNOP);
@@ -4879,6 +4885,8 @@ Perl_yylex(pTHX)
 	    LOP(OP_ACCEPT,XTERM);
 
 	case KEY_and:
+	    if (S_close_layout_lists())
+		return REPORT(LAYOUTLISTEND);
 	    OPERATOR(ANDOP);
 
 	case KEY_atan2:
@@ -5141,6 +5149,8 @@ Perl_yylex(pTHX)
 	    UNI(OP_HEX);
 
 	case KEY_if:
+	    if (S_close_layout_lists())
+		return REPORT(LAYOUTLISTEND);
 	    OPERATOR(IF);
 
 	case KEY_index:
@@ -5275,6 +5285,8 @@ Perl_yylex(pTHX)
 	    LOP(OP_OPEN,XTERM);
 
 	case KEY_or:
+	    if (S_close_layout_lists())
+		return REPORT(LAYOUTLISTEND);
 	    pl_yylval.i_tkval.ival = OP_OR;
 	    OPERATOR(OROP);
 
@@ -5713,6 +5725,8 @@ Perl_yylex(pTHX)
 	    OPERATOR(UNTIL);
 
 	case KEY_unless:
+	    if (S_close_layout_lists())
+		return REPORT(LAYOUTLISTEND);
 	    OPERATOR(UNLESS);
 
 	case KEY_unlink:

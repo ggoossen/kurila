@@ -1247,7 +1247,7 @@ is used to issue error messages (this is the default behavior).
 =cut
 
 sub errorsub
-    return ((nelems @_) +> 1) ??  @: (@_[0]->{+_ERRORSUB} = @_[1]) !! @_[0]->{?_ERRORSUB}
+    return ((nelems @_) +> 1) ?? (@: (@_[0]->{+_ERRORSUB} = @_[1])) !! @_[0]->{?_ERRORSUB}
 
 
 ##---------------------------------------------------------------------------
@@ -1268,7 +1268,7 @@ result.
 =cut
 
 sub cutting
-    return ((nelems @_) +> 1) ??  @: (@_[0]->{+_CUTTING} = @_[1]) !! @_[0]->{?_CUTTING}
+    return ((nelems @_) +> 1) ?? (@: (@_[0]->{+_CUTTING} = @_[1])) !! @_[0]->{?_CUTTING}
 
 
 ##---------------------------------------------------------------------------

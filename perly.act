@@ -1652,24 +1652,14 @@ case 2:
   case 192:
 #line 1392 "perly.y"
     {
-                            (yyval.opval) = newANONHASH((ps[(2) - (2)].val.opval), LOCATION((ps[(1) - (2)].val.i_tkval)));
-                            TOKEN_GETMAD((ps[(1) - (2)].val.i_tkval),(yyval.opval),'{');
-                            --PL_parser->lex_brackets;
-                            PL_parser->statement_indent = PL_parser->lex_brackstack[PL_parser->lex_brackets].prev_statement_indent;
-			;}
-    break;
-
-  case 193:
-#line 1399 "perly.y"
-    {
                             (yyval.opval) = newANONHASH(NULL, LOCATION((ps[(1) - (3)].val.i_tkval)));
                             TOKEN_GETMAD((ps[(1) - (3)].val.i_tkval),(yyval.opval),'{');
                             TOKEN_GETMAD((ps[(3) - (3)].val.i_tkval),(yyval.opval),'}');
 			;}
     break;
 
-  case 194:
-#line 1405 "perly.y"
+  case 193:
+#line 1398 "perly.y"
     {
                             (yyval.opval) = newANONARRAY((ps[(2) - (3)].val.opval), LOCATION((ps[(1) - (3)].val.i_tkval)));
                             TOKEN_GETMAD((ps[(1) - (3)].val.i_tkval),(yyval.opval),'[');
@@ -1677,18 +1667,8 @@ case 2:
 			;}
     break;
 
-  case 195:
-#line 1411 "perly.y"
-    {
-                            (yyval.opval) = newANONARRAY((ps[(2) - (2)].val.opval), LOCATION((ps[(1) - (2)].val.i_tkval)));
-                            TOKEN_GETMAD((ps[(1) - (2)].val.i_tkval),(yyval.opval),'[');
-                            --PL_parser->lex_brackets;
-                            PL_parser->statement_indent = PL_parser->lex_brackstack[PL_parser->lex_brackets].prev_statement_indent;
-			;}
-    break;
-
-  case 196:
-#line 1418 "perly.y"
+  case 194:
+#line 1404 "perly.y"
     {
                             (yyval.opval) = newANONARRAY(NULL, LOCATION((ps[(1) - (3)].val.i_tkval)));
                             TOKEN_GETMAD((ps[(1) - (3)].val.i_tkval),(yyval.opval),'[');
@@ -1696,42 +1676,42 @@ case 2:
 			;}
     break;
 
-  case 197:
-#line 1424 "perly.y"
+  case 195:
+#line 1410 "perly.y"
     { 
                             (yyval.opval) = newOP(IVAL((ps[(1) - (1)].val.i_tkval)), 0, LOCATION((ps[(1) - (1)].val.i_tkval)));
                             TOKEN_GETMAD((ps[(1) - (1)].val.i_tkval),(yyval.opval),'o');
                         ;}
     break;
 
-  case 198:
-#line 1431 "perly.y"
+  case 196:
+#line 1417 "perly.y"
     {
                             (yyval.opval) = newGVREF(0,(ps[(2) - (2)].val.opval), LOCATION((ps[(1) - (2)].val.i_tkval)));
                             TOKEN_GETMAD((ps[(1) - (2)].val.i_tkval),(yyval.opval),'*');
 			;}
     break;
 
-  case 199:
-#line 1436 "perly.y"
+  case 197:
+#line 1422 "perly.y"
     {
                             (yyval.opval) = newGVREF(0, (ps[(1) - (2)].val.opval), LOCATION((ps[(2) - (2)].val.i_tkval)));
                             TOKEN_GETMAD((ps[(2) - (2)].val.i_tkval),(yyval.opval),'a');
                         ;}
     break;
 
+  case 198:
+#line 1430 "perly.y"
+    { (yyval.opval) = scalar((ps[(1) - (1)].val.opval)); ;}
+    break;
+
+  case 199:
+#line 1432 "perly.y"
+    { (yyval.opval) = scalar((ps[(1) - (1)].val.opval)); ;}
+    break;
+
   case 200:
-#line 1444 "perly.y"
-    { (yyval.opval) = scalar((ps[(1) - (1)].val.opval)); ;}
-    break;
-
-  case 201:
-#line 1446 "perly.y"
-    { (yyval.opval) = scalar((ps[(1) - (1)].val.opval)); ;}
-    break;
-
-  case 202:
-#line 1448 "perly.y"
+#line 1434 "perly.y"
     { (yyval.opval) = scope((ps[(1) - (1)].val.opval)); ;}
     break;
 
