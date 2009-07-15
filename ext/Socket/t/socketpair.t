@@ -83,7 +83,7 @@ if ($has_perlio)
 
 
 my @left = @: "hello ", "world\n"
-my @right = (@: "perl ", "rules!") # Not like I'm trying to bias any survey here.
+my @right = @: "perl ", "rules!" # Not like I'm trying to bias any survey here.
 
 foreach ( @left)
     # is (syswrite ($left, $_), length $_, "write " . _qq ($_) . " to left");

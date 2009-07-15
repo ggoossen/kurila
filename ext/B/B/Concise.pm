@@ -19,10 +19,10 @@ our @EXPORT_OK = qw( set_style set_style_standard add_callback
                      concise_subref concise_cv concise_main
                      add_style walk_output compile reset_sequence )
 our %EXPORT_TAGS =
-    (%:  io       => qw( walk_output compile reset_sequence )
-         style       => qw( add_style set_style_standard )
-         cb  => qw( add_callback )
-         mech        => qw( concise_subref concise_cv concise_main ),  )
+    %:  io       => qw( walk_output compile reset_sequence )
+        style       => qw( add_style set_style_standard )
+        cb  => qw( add_callback )
+        mech        => qw( concise_subref concise_cv concise_main ),  
 
 # use #6
 use B < qw(class ppname main_start main_root main_cv cstring svref_2object
@@ -579,8 +579,8 @@ for (@: "gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv"
     %priv{+$_}{+16} = "OURINTR" 
 for (@: (< @+: map( {(@: $_,"s$_") }, (@: "chop", "chomp")) )
         (< @+: map( {(@: $_,"i_$_") },
-                 @: "postinc", "postdec", "multiply", "divide", "modulo"
-                    "add", "subtract", "negate"))
+                @: "postinc", "postdec", "multiply", "divide", "modulo"
+                   "add", "subtract", "negate"))
         "pow", "concat", "stringify"
         "left_shift", "right_shift", "bit_and", "bit_xor", "bit_or"
         "complement", "atan2", "sin", "cos", "rand", "exp", "log", "sqrt"
@@ -624,15 +624,15 @@ do
 our %hints # used to display each COP's op_hints values
 
 # strict refs, subs, vars
-%hints{[(@: 2,512,1024)]} = (@: '$', '&', '*')
+%hints{[(@: 2,512,1024)]} = @: '$', '&', '*'
 # integers, locale, bytes
-%hints{[(@: 1,4,8,16)]} = (@: 'i', 'l', 'b')
+%hints{[(@: 1,4,8,16)]} = @: 'i', 'l', 'b'
 # block scope, localise %^H, $^OPEN (in), $^OPEN (out)
-%hints{[(@: 256,131072,262144,524288)]} = (@: '{','%','<','>')
+%hints{[(@: 256,131072,262144,524288)]} = @: '{','%','<','>'
 # overload new integer, float, binary, string, re
-%hints{[(@: 4096,8192,16384,32768,65536)]} = (@: 'I', 'F', 'B', 'S', 'R')
+%hints{[(@: 4096,8192,16384,32768,65536)]} = @: 'I', 'F', 'B', 'S', 'R'
 # taint and eval
-%hints{[(@: 1048576,2097152)]} = (@: 'T', 'E')
+%hints{[(@: 1048576,2097152)]} = @: 'T', 'E'
 # filetest access, UTF-8
 %hints{[(@: 4194304,8388608)]} = @: 'X', 'U'
 
@@ -926,9 +926,9 @@ sub tree
         @lines[$i] = $kids . @lines[$i]
     else
         @lines[0] = $single . @lines[0]
-    
-    return (@: "$name$lead" . shift @lines
-               < map( {" " x (length($name)+$size) . $_ }, @lines))
+
+    return @: "$name$lead" . shift @lines
+              < map( {" " x (length($name)+$size) . $_ }, @lines)
 
 
 # *** Warning: fragile kludge ahead ***

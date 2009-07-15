@@ -165,8 +165,8 @@ have AF_UNIX in the right place.
 
 =cut
 
-use Carp;
-use warnings::register;
+use Carp
+use warnings::register
 
 require Exporter
 use XSLoader ()

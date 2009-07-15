@@ -12,7 +12,7 @@ $VERSION   = '1.18_01'
 @EXPORT    = qw( timegm timelocal )
 @EXPORT_OK = qw( timegm_nocheck timelocal_nocheck )
 
-my @MonthDays = (@:  31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 )
+my @MonthDays = @:  31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 
 
 # Determine breakpoint for rolling century
 my $ThisYear    = (@:  localtime() )[5]

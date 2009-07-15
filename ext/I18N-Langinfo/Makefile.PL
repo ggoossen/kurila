@@ -18,7 +18,7 @@ WriteMakefile(
 if (try {require ExtUtils::Constant; 1})
     # Some older versions of glibc use only enums, no defines, hence all this
     # hassle (so old glibc that the define is GNU_LIBRARY, not GLIBC):
-    my @names = (@:  'CODESET' ) # CODESET isn't an enum in old glibc's langinfo.h
+    my @names = @:  'CODESET'  # CODESET isn't an enum in old glibc's langinfo.h
     foreach (qw (ABDAY_1 ABDAY_2 ABDAY_3 ABDAY_4 ABDAY_5 ABDAY_6 ABDAY_7
                  ABMON_1 ABMON_10 ABMON_11 ABMON_12 ABMON_2 ABMON_3 ABMON_4
                  ABMON_5 ABMON_6 ABMON_7 ABMON_8 ABMON_9 ALT_DIGITS AM_STR

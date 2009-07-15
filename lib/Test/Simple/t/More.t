@@ -53,7 +53,7 @@ isa_ok(\42, 'SCALAR')
 do
     *Foo::can = sub (@< @_) { @_[0]->[0] }
     *Foo::isa = sub (@< @_) { @_[0]->[0] }
-    my $foo = bless(\@(0), 'Foo')
+    my $foo = bless(\(@: 0), 'Foo')
     ok( ! $foo->can('bar') )
     ok( ! $foo->isa('bar') )
     $foo->[0] = 1
@@ -68,7 +68,7 @@ ok( eq_array(\qw(this that whatever), \qw(this that whatever)),
     'eq_array with simple arrays' )
 is( (nelems @Test::More::Data_Stack), 0, '@Data_Stack not holding onto things')
 
-ok( eq_hash(\%( foo => 42, bar => 23 ), \%(bar => 23, foo => 42)),
+ok( eq_hash(\(%:  foo => 42, bar => 23 ), \(%: bar => 23, foo => 42)),
     'eq_hash with simple hashes' )
 is( (nelems @Test::More::Data_Stack), 0)
 
@@ -76,20 +76,20 @@ ok( eq_set(\qw(this that whatever), \qw(that whatever this)),
     'eq_set with simple sets' )
 is( (nelems @Test::More::Data_Stack), 0)
 
-my @complex_array1 = @(
-                      qw(this that whatever),
-                      %(foo => 23, bar => 42),
-                      "moo",
-                      "yarrow",
-                      qw(498 10 29),
-    )
-my @complex_array2 = @(
-                      qw(this that whatever),
-                      %(foo => 23, bar => 42),
-                      "moo",
-                      "yarrow",
-                      qw(498 10 29),
-    )
+my @complex_array1 = @: 
+                      qw(this that whatever)
+                      (%: foo => 23, bar => 42)
+                      "moo"
+                      "yarrow"
+                      qw(498 10 29)
+    
+my @complex_array2 = @: 
+                      qw(this that whatever)
+                      (%: foo => 23, bar => 42)
+                      "moo"
+                      "yarrow"
+                      qw(498 10 29)
+    
 
 is_deeply( \@complex_array1, \@complex_array2,    'is_deeply with arrays' )
 ok( eq_array(\@complex_array1, \@complex_array2),
@@ -97,10 +97,10 @@ ok( eq_array(\@complex_array1, \@complex_array2),
 ok( eq_set(\@complex_array1, \@complex_array2),
     'eq_set with complicated arrays' )
 
-my @array1 = @( <qw(this that whatever),
-                \%(foo => 23, bar => 42) )
-my @array2 = @( <qw(this that whatever),
-                \%(foo => 24, bar => 42) )
+my @array1 = @:  <qw(this that whatever)
+                 \(%: foo => 23, bar => 42) 
+my @array2 = @:  <qw(this that whatever)
+                 \(%: foo => 24, bar => 42) 
 
 ok( !eq_array(\@array1, \@array2),
     'eq_array with slightly different complicated arrays' )
@@ -110,26 +110,26 @@ ok( !eq_set(\@array1, \@array2),
     'eq_set with slightly different complicated arrays' )
 is( (nelems @Test::More::Data_Stack), 0)
 
-my %hash1 = %( foo => 23,
-    bar => \qw(this that whatever),
-    har => \%( foo => 24, bar => 42 ),
-    )
-my %hash2 = %( foo => 23,
-    bar => \qw(this that whatever),
-    har => \%( foo => 24, bar => 42 ),
-    )
+my %hash1 = %:  foo => 23
+                bar => \qw(this that whatever)
+                har => \(%:  foo => 24, bar => 42 )
+    
+my %hash2 = %:  foo => 23
+                bar => \qw(this that whatever)
+                har => \(%:  foo => 24, bar => 42 )
+    
 
 is_deeply( \%hash1, \%hash2,    'is_deeply with complicated hashes' )
 ok( eq_hash(\%hash1, \%hash2),  'eq_hash with complicated hashes')
 
-%hash1 = %( foo => 23,
-    bar => \qw(this that whatever),
-    har => \%( foo => 24, bar => 42 ),
-    )
-%hash2 = %( foo => 23,
-    bar => \qw(this tha whatever),
-    har => \%( foo => 24, bar => 42 ),
-    )
+%hash1 = %:  foo => 23
+             bar => \qw(this that whatever)
+             har => \(%:  foo => 24, bar => 42 )
+    
+%hash2 = %:  foo => 23
+             bar => \qw(this tha whatever)
+             har => \(%:  foo => 24, bar => 42 )
+    
 
 ok( !eq_hash(\%hash1, \%hash2),
     'eq_hash with slightly different complicated hashes' )
@@ -157,10 +157,10 @@ isa_ok( Wibble->new, 'Wibblemeister' )
 my $sub = sub {}
 is_deeply( $sub, $sub, 'the same function ref' )
 
-use Symbol;
+use Symbol
 my $glob = gensym
 is_deeply( $glob, $glob, 'the same glob' )
 
-is_deeply( \%( foo => $sub, bar => \@(1, $glob) ),
-           \%( foo => $sub, bar => \@(1, $glob) )
+is_deeply( \(%:  foo => $sub, bar => \(@: 1, $glob) ),
+           \%:  foo => $sub, bar => \(@: 1, $glob) 
            )

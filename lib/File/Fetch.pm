@@ -35,12 +35,12 @@ $DEBUG          = 0
 $WARN           = 1
 
 ### methods available to fetch the file depending on the scheme
-$METHODS = \(%: 
+$METHODS = \%: 
     http    => \ qw|lwp wget curl lynx|
     ftp     => \ qw|lwp netftp wget curl ncftp ftp|
     file    => \ qw|lwp file|
     rsync   => \ qw|rsync|
-    )
+    
 
 ### silly warnings ###
 local $Params::Check::VERBOSE                = 1
@@ -49,11 +49,11 @@ local $Module::Load::Conditional::VERBOSE    = 0
 local $Module::Load::Conditional::VERBOSE    = 0
 
 ### see what OS we are on, important for file:// uris ###
-use constant ON_WIN         => ($^OS_NAME eq 'MSWin32');
-use constant ON_VMS         => ($^OS_NAME eq 'VMS');
-use constant ON_UNIX        => (!ON_WIN and !ON_VMS);
-use constant HAS_VOL        => (ON_WIN or ON_VMS);
-use constant HAS_SHARE      => (ON_WIN);
+use constant ON_WIN         => ($^OS_NAME eq 'MSWin32')
+use constant ON_VMS         => ($^OS_NAME eq 'VMS')
+use constant ON_UNIX        => (!ON_WIN and !ON_VMS)
+use constant HAS_VOL        => (ON_WIN or ON_VMS)
+use constant HAS_SHARE      => (ON_WIN)
 =pod
 
 =head1 NAME
@@ -321,7 +321,7 @@ sub _parse_uri
     my $self = shift
     my $uri  = shift or return
 
-    my $href = \(%:  uri => $uri )
+    my $href = \%:  uri => $uri 
 
     ### find the scheme ###
     $uri            =~ s|^(\w+)://||
@@ -374,9 +374,9 @@ sub _parse_uri
         ### using anything but qw() in hash slices may produce warnings
         ### in older perls :-(
         $href->{[qw(host path) ]} = @: $uri =~ m|([^/]*)(/.*)$|s
-    
 
-    ### split the path into file + dir ###
+
+                                       ### split the path into file + dir ###
     do {   my @parts = File::Spec::Unix->splitpath( delete $href->{path} );
         $href->{+path} = @parts[1];
         $href->{+file} = @parts[2];
@@ -607,7 +607,7 @@ sub _wget_fetch
     if( my $wget = can_run('wget') )
 
         ### no verboseness, thanks ###
-        my $cmd = \(@:  $wget, '--quiet' )
+        my $cmd = \@:  $wget, '--quiet' 
 
         ### if a timeout is set, add it ###
         push($cmd->@, '--timeout=' . $TIMEOUT) if $TIMEOUT
@@ -773,7 +773,7 @@ sub _ncftp_fetch
     ### see if we have a ncftp binary ###
     if( my $ncftp = can_run('ncftp') )
 
-        my $cmd = \(@: 
+        my $cmd = \@: 
             $ncftp
             '-V'                   # do not be verbose
             '-p', $FROM_EMAIL, <      # email as password
@@ -786,7 +786,7 @@ sub _ncftp_fetch
             !! QUOTE. File::Spec::Unix->catdir( <
                 $self->path, < $self->file ) .QUOTE
 
-            )
+            
 
         ### shell out ###
         my $captured
@@ -937,7 +937,7 @@ sub _rsync_fetch
 
     if (my $rsync = can_run('rsync'))
 
-        my $cmd = \(@:  $rsync )
+        my $cmd = \@:  $rsync 
 
         ### XXX: rsync has no I/O timeouts at all, by default
         push($cmd->@, '--timeout=' . $TIMEOUT) if $TIMEOUT

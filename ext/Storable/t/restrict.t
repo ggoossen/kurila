@@ -6,26 +6,23 @@
 #  in the README file that comes with the distribution.
 #
 
-BEGIN {
-    print $^STDOUT, "1..0 # Skip: Fix restricted hash\n";
-    exit;
+BEGIN
+    print $^STDOUT, "1..0 # Skip: Fix restricted hash\n"
+    exit
 
-    chdir('t') if -d 't';
-    if (env::var('PERL_CORE')){
-        $^INCLUDE_PATH = @('.', '../lib', '../ext/Storable/t');
-    } else {
-        if (!eval "require Hash::Util") {
-            if ($^EVAL_ERROR->{description} =~ m/Can\'t locate Hash\/Util\.pm in \$^INCLUDE_PATH/s) {
-                print \*STDOUT, "1..0 # Skip: No Hash::Util:\n";
-                exit 0;
-            } else {
-                die;
-            }
-        }
-        unshift $^INCLUDE_PATH, 't';
-    }
+    chdir('t') if -d 't'
+    if (env::var('PERL_CORE'))
+        $^INCLUDE_PATH = @: '.', '../lib', '../ext/Storable/t'
+    else
+        if (!eval "require Hash::Util")
+            if ($^EVAL_ERROR->{description} =~ m/Can\'t locate Hash\/Util\.pm in \$^INCLUDE_PATH/s)
+                print \*STDOUT, "1..0 # Skip: No Hash::Util:\n"
+                exit 0
+            else
+                die
+        unshift $^INCLUDE_PATH, 't'
+
     require 'st-dump.pl';
-}
 
 
 use Storable < qw(dclone freeze thaw);

@@ -64,7 +64,7 @@ singleton, use C<create>.
 
 my $Test = Test::Builder->new
 sub new
-    my@($class) =@( shift)
+    my(@: $class) =@:  shift
     $Test ||= $class->create
     return $Test
 
@@ -87,7 +87,7 @@ this method.  Also, the method name may change in the future.
 sub create
     my $class = shift
 
-    my $self = bless \%(), $class
+    my $self = bless \(%: ), $class
     $self->reset
 
     return $self
@@ -117,7 +117,7 @@ sub reset($self)
 
     share($self->{?Curr_Test})
     $self->{+Curr_Test}    = 0
-    $self->{+Test_Results} = &share(\@())
+    $self->{+Test_Results} = &share(\(@: ))
 
     $self->{+Exported_To}    = undef
     $self->{+Expected_Tests} = 0
@@ -180,7 +180,7 @@ sub plan($self, $cmd, ?$arg)
             die("You said to run 0 tests")
         
     else
-        my @args = grep { defined }, @( ($cmd, $arg))
+        my @args = grep { defined }, @:  ($cmd, $arg)
         die("plan() doesn't understand $(join ' ',@args)")
     
 
@@ -199,7 +199,7 @@ the appropriate headers.
 
 sub expected_tests
     my $self = shift
-    my @(?$max) =  @_
+    my (@: ?$max) =  @_
 
     if( (nelems @_) )
         die("Number of tests must be a positive integer.  You gave it '$max'")
@@ -333,13 +333,13 @@ ERR
     local $self->{+TODO} = $todo
 
     my $out
-    my $result = &share(\%())
+    my $result = &share(\(%: ))
 
     unless( $test )
         $out .= "not "
-        $result->%{[@('ok', 'actual_ok') ]} = @( ( $todo ?? 1 !! 0 ), 0 )
+        $result->%{[(@: 'ok', 'actual_ok') ]} = @:  ( $todo ?? 1 !! 0 ), 0 
     else
-        $result->%{[@('ok', 'actual_ok') ]} = @( 1, $test )
+        $result->%{[(@: 'ok', 'actual_ok') ]} = @:  1, $test 
     
 
     $out .= "ok"
@@ -371,7 +371,7 @@ ERR
         my $msg = $todo ?? "Failed (TODO)" !! "Failed"
         $self->_print_diag("\n") if env::var('HARNESS_ACTIVE')
 
-        my@(_, $file, $line, ...) =  $self->caller
+        my(@: _, $file, $line, ...) =  $self->caller
         if( defined $name )
             $self->diag(qq[  $msg test '$name'\n])
             $self->diag(qq[  at $file line $line.\n])
@@ -561,8 +561,8 @@ Works just like Test::More's cmp_ok().
 =cut
 
 
-my %numeric_cmps = %( < @+: map { @($_, 1) },
-    @(                       ("<",  "<=", ">",  ">=", "==", "!=", "<=>")) )
+my %numeric_cmps = %:  < @+: map { (@: $_, 1) }
+                       (@:                        ("<",  "<=", ">",  ">=", "==", "!=", "<=>")) 
 
 sub cmp_ok($self, $got, $type, $expect, ?$name)
 
@@ -609,7 +609,7 @@ DIAGNOSTIC
 sub _caller_context
     my $self = shift
 
-    my @(?$pack, ?$file, ?$line, ...) =  $self->caller(1)
+    my (@: ?$pack, ?$file, ?$line, ...) =  $self->caller(1)
 
     my $code = ''
     $code .= "#line $line $file\n" if defined $file and defined $line
@@ -670,12 +670,12 @@ sub skip($self, $why)
     lock($self->{?Curr_Test})
     $self->{+Curr_Test}++
 
-    $self->{Test_Results}->[+$self->{?Curr_Test}-1] = &share(\%(
-                                                             'ok'      => 1,
-                                                             actual_ok => 1,
-                                                             name      => '',
-                                                             type      => 'skip',
-                                                             reason    => $why,
+    $self->{Test_Results}->[+$self->{?Curr_Test}-1] = &share(\(%: 
+                                                             'ok'      => 1
+                                                             actual_ok => 1
+                                                             name      => ''
+                                                             type      => 'skip'
+                                                             reason    => $why
                                                              ))
 
     my $out = "ok"
@@ -710,12 +710,12 @@ sub todo_skip($self, $why)
     lock($self->{?Curr_Test})
     $self->{+Curr_Test}++
 
-    $self->{Test_Results}->[+$self->{?Curr_Test}-1] = &share(\%(
-                                                             'ok'      => 1,
-                                                             actual_ok => 0,
-                                                             name      => '',
-                                                             type      => 'todo_skip',
-                                                             reason    => $why,
+    $self->{Test_Results}->[+$self->{?Curr_Test}-1] = &share(\(%: 
+                                                             'ok'      => 1
+                                                             actual_ok => 0
+                                                             name      => ''
+                                                             type      => 'todo_skip'
+                                                             reason    => $why
                                                              ))
 
     my $out = "not ok"
@@ -790,8 +790,8 @@ sub maybe_regex($self, $regex)
     # Check for qr/foo/
     if (re::is_regexp($regex))
         $usable_regex = $regex
-    elsif( @(?$re, ?$opts)        = @($regex =~ m{^ /(.*)/ (\w*) $ }sx)           or
-        @(?_, ?$re, ?$opts) = @: $regex =~ m,^ m([^\w\s]) (.+) \1 (\w*) $,sx
+    elsif( (@: ?$re, ?$opts)        = (@: $regex =~ m{^ /(.*)/ (\w*) $ }sx)           or
+        (@: ?_, ?$re, ?$opts) = @: $regex =~ m,^ m([^\w\s]) (.+) \1 (\w*) $,sx
         )
         $usable_regex = length $opts ?? "(?$opts)$re" !! $re
     
@@ -994,7 +994,7 @@ foreach my $attribute (qw(No_Header No_Ending No_Diag))
     my $method = lc $attribute
 
     my $code = sub (@< @_)
-        my@($self, ?$no) =  @_
+        my(@: $self, ?$no) =  @_
 
         if( defined $no )
             $self->{+$attribute} = $no
@@ -1208,7 +1208,7 @@ sub todo_output($self, ?$fh)
 
 sub _new_fh
     my $self = shift
-    my@($file_or_fh) =@( shift)
+    my(@: $file_or_fh) =@:  shift
 
     my $fh
     if( $self->is_fh($file_or_fh) )
@@ -1318,11 +1318,11 @@ sub current_test($self ?= $num)
         if( $num +> nelems $test_results->@ )
             my $start = (nelems $test_results->@) ?? (nelems $test_results->@) !! 0
             for ($start..$num-1)
-                $test_results->[+$_] = &share(\%(
-                                              'ok'      => 1,
-                                              actual_ok => undef,
-                                              reason    => 'incrementing test number',
-                                              type      => 'unknown',
+                $test_results->[+$_] = &share(\(%: 
+                                              'ok'      => 1
+                                              actual_ok => undef
+                                              reason    => 'incrementing test number'
+                                              type      => 'unknown'
                                               name      => undef
                                               ))
             
@@ -1346,7 +1346,7 @@ Of course, test #1 is $tests[0], etc...
 =cut
 
 sub summary
-    my@($self) =@( shift)
+    my(@: $self) =@:  shift
 
     return map { $_->{?'ok'} },  $self->{Test_Results}->@
 
@@ -1452,7 +1452,7 @@ C<$height> will be added to the level().
 sub caller($self, ?$height)
     $height ||= 0
 
-    my @caller = @( CORE::caller($self->level + $height + 1) )
+    my @caller = @:  CORE::caller($self->level + $height + 1) 
     return @caller
 
 
@@ -1564,7 +1564,7 @@ sub _ending
         # Auto-extended arrays and elements which aren't explicitly
         # filled in with a shared reference will puke under 5.8.0
         # ithreads.  So we have to fill them in by hand. :(
-        my $empty_result = &share(\%())
+        my $empty_result = &share(\(%: ))
         for my $idx ( 0..$self->{?Expected_Tests}-1 )
             $test_results->[+$idx] = $empty_result
                 unless defined $test_results->[?$idx]

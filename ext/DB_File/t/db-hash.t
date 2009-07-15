@@ -419,7 +419,7 @@ do
     ok nkeys %remember == 0 
 
     print $^STDOUT, "# missing -- $key=>$value\n" while (@: ?$key, ?$value) =@:  each %remember
-    print $^STDOUT, "# bad     -- $key=>$value\n" while (@: ?$key, ?$value) =(@:  each %bad)
+    print $^STDOUT, "# bad     -- $key=>$value\n" while (@: ?$key, ?$value) =@:  each %bad
 
     # Make sure this fix does not break code to handle an undef key
     # Berkeley DB undef key is broken between versions 2.3.16 and 3.1

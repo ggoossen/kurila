@@ -10,15 +10,14 @@ my %XS_FUNCTIONS = %:  < @+: map { @: $_ => 1 }, @XS_FUNCTIONS
 our @EXPORT_OK   = @: < @XS_FUNCTIONS, <
                           qw(is_regexp regexp_pattern
                        regname regnames regnames_count)
-our %EXPORT_OK = (%:  < @+: map { @: $_ => 1 }, @EXPORT_OK )
+our %EXPORT_OK = %+: map { %: $_ => 1 }, @EXPORT_OK 
 
 # *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING ***
 #
 # If you modify these values see comment below!
 
-my %bitmask = (%: 
+my %bitmask = %: 
     eval    => 0x00200000 # HINT_RE_EVAL
-    )
 
 # - ExtUtils::ParseXS uses a hardcoded
 # BEGIN { $^H |= 0x00200000 }

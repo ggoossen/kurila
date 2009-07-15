@@ -3,8 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't' if -d 't'
-        $^INCLUDE_PATH = (@:  '../lib' )
-    
+        $^INCLUDE_PATH = @:  '../lib'
 
 
 # Can't use Test::Simple/More, they depend on Exporter.

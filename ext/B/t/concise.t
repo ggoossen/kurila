@@ -39,9 +39,9 @@ like($out, qr/print/, "'-exec' option output has print opcode")
 
 ######## API tests v.60
 
-use Config;	# used for perlio check
+use Config      # used for perlio check
 B::Concise->import( <qw( set_style set_style_standard add_callback 
-		       add_style walk_output reset_sequence ))
+                       add_style walk_output reset_sequence ))
 
 ## walk_output argument checking
 
@@ -92,7 +92,7 @@ try { add_style ('junk_B' => < @stylespec) }
 like ($^EVAL_ERROR->{?description}, 'expecting 3 style-format args',
       "add_style rejects insufficient args")
 
-@stylespec = (@: 0,0,0) # right length, invalid values
+@stylespec = @: 0,0,0 # right length, invalid values
 $^EVAL_ERROR=''
 try { add_style ('junk' => < @stylespec) }
 is ($^EVAL_ERROR, '', "add_style accepts: stylename => 3-arg-array")
@@ -311,7 +311,7 @@ SKIP: do
 
 
     #now do double crosschecks: commutativity across stick / nostick
-    %combos = (%: < %combos, < %save)
+    %combos = %: < %combos, < %save
 
     # test commutativity of flags, ie that AB == BA
     for my $mode ( @modes)

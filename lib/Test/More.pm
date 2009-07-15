@@ -5,7 +5,7 @@ our ($VERSION, @ISA, @EXPORT, %EXPORT_TAGS, $TODO)
 $VERSION = '0.78'
 $VERSION = eval $VERSION    # make the alpha version come out as a number
 
-use Test::Builder::Module;
+use Test::Builder::Module
 @ISA    = qw(Test::Builder::Module)
 @EXPORT = qw(ok use_ok require_ok
              is isnt like unlike is_deeply dies_like
@@ -653,7 +653,7 @@ sub _eval
     my $eval_result = eval $code
     my $eval_error  = $^EVAL_ERROR
 
-    return (@: $eval_result, $eval_error)
+    return @: $eval_result, $eval_error
 
 
 =item B<dies_like>

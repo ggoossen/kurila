@@ -113,7 +113,7 @@ while ( ~< *PW)
     # In principle we could whine if @s != 7 but do we know enough
     # of passwd file formats everywhere?
     if ((nelems @s) == 7 || ($^OS_NAME eq 'darwin' && (nelems @s) == 10))
-        my @n = (@:  getpwuid($uid_s) )
+        my @n = @:  getpwuid($uid_s) 
         # 'nobody' et al.
         next unless (nelems @n)
         my (@: $name,$passwd,$uid,$gid,$quota,$comment,$gcos,$home,$shell) =  @n

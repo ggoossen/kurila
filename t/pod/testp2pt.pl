@@ -10,7 +10,7 @@ BEGIN
     require "testcmp.pl"
     TestCompare->import()
     my $PARENTDIR = dirname $THISDIR
-    push $^INCLUDE_PATH, < map { 'File::Spec'->catfile($_, 'lib') }, (@:  ($PARENTDIR, $THISDIR))
+    push $^INCLUDE_PATH, < map { 'File::Spec'->catfile($_, 'lib') }, @:  ($PARENTDIR, $THISDIR)
 
 
 #use diagnostics;
@@ -41,11 +41,10 @@ $INSTDIR =~ s#:$## if $^OS_NAME eq 'MacOS'
 $INSTDIR = (dirname $INSTDIR) if (basename($INSTDIR) eq 'pod')
 $INSTDIR =~ s#:$## if $^OS_NAME eq 'MacOS'
 $INSTDIR = (dirname $INSTDIR) if (basename($INSTDIR) eq 't')
-my @PODINCDIRS = (@: catfile($INSTDIR, 'lib', 'Pod')
-                     catfile($INSTDIR, 'scripts')
-                     catfile($INSTDIR, 'pod')
-                     catfile($INSTDIR, 't', 'pod')
-    )
+my @PODINCDIRS = @: catfile($INSTDIR, 'lib', 'Pod')
+                    catfile($INSTDIR, 'scripts')
+                    catfile($INSTDIR, 'pod')
+                    catfile($INSTDIR, 't', 'pod')
 
 ## Find the path to the file to =include
 sub findinclude

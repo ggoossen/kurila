@@ -6,12 +6,12 @@
 #  in the README file that comes with the distribution.
 #
 
-use Config;
+use Config
 
 BEGIN 
     if (env::var('PERL_CORE'))
         chdir('t') if -d 't'
-        $^INCLUDE_PATH = @('.', '../lib', '../ext/Storable/t')
+        $^INCLUDE_PATH = @: '.', '../lib', '../ext/Storable/t'
     else 
         unshift $^INCLUDE_PATH, 't'
     
@@ -29,7 +29,7 @@ unless (Storable::CAN_FLOCK()) {
 use Test::More
 plan tests => 5
 
-my @a = @('first', undef, 3, -4, -3.14159, 456, 4.5)
+my @a = @: 'first', undef, 3, -4, -3.14159, 456, 4.5
 
 #
 # We're just ensuring things work, we're not validating locking.

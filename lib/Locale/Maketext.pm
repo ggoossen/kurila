@@ -48,7 +48,7 @@ sub numerate($handle, $num, @< @forms)
 
     return '' unless (nelems @forms)
     if((nelems @forms) == 1) # only the headword form specified
-        return $s ?? @forms[0] !!  (@: @forms[0] . 's') # very cheap hack.
+        return $s ?? @forms[0] !!  @: @forms[0] . 's' # very cheap hack.
     else # sing and plural were specified
         return $s ?? @forms[0] !! @forms[1]
 
@@ -84,7 +84,7 @@ sub sprintf($handle, $format, @< @params)
 
 #=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#
 
-use integer; # vroom vroom... applies to the whole rest of the module
+use integer # vroom vroom... applies to the whole rest of the module
 
 sub language_tag
     my $it = ref(@_[0]) || @_[0]
@@ -96,10 +96,9 @@ sub language_tag
 
 sub encoding
     my $it = @_[0]
-    return (@: 
+    return @: 
         (ref($it) && $it->{?'encoding'})
             || "iso-8859-1"   # Latin-1
-        )
 
 
 #--------------------------------------------------------------------------
@@ -169,7 +168,7 @@ sub maketext
 
     my(@: $handle, $phrase) = @: splice(@_,0,2)
 
-    # Don't interefere with $@ in case that's being interpolated into the msg.
+                               # Don't interefere with $@ in case that's being interpolated into the msg.
     local $^EVAL_ERROR
 
     # Look up the value:
@@ -356,7 +355,7 @@ sub _add_supers($base_class, @< @languages)
 #
 ###########################################################################
 
-use Locale::Maketext::GutsLoader;
+use Locale::Maketext::GutsLoader
 
 ###########################################################################
 

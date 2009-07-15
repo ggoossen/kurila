@@ -11,13 +11,13 @@ BEGIN
 chdir 't'
 
 
-use Test::More tests => 66;
-use Cwd;
+use Test::More tests => 66
+use Cwd
 
-use File::Spec;
-use File::Path;
-use File::Find;
-use Config;
+use File::Spec
+use File::Path
+use File::Find
+use Config
 
 my $Is_VMS = $^OS_NAME eq 'VMS'
 
@@ -28,7 +28,7 @@ $^INCLUDE_PATH = map { File::Spec->rel2abs($_) }, $^INCLUDE_PATH
 # keep track of everything added so it can all be deleted
 my %Files
 sub add_file
-    my @($file, ?$data) =  @_
+    my (@: $file, ?$data) =  @_
     $data ||= 'foo'
     1 while unlink $file  # or else we'll get multiple versions on VMS
     open( my $t, ">", ''.$file) or return
@@ -39,7 +39,7 @@ sub add_file
 
 sub read_manifest
     open( my $m, "<", 'MANIFEST' ) or return
-    chomp( my @files = @( ~< $m->* ) )
+    chomp( my @files = (@:  ~< $m->* ) )
     close $m
     return @files
 
@@ -47,7 +47,7 @@ sub read_manifest
 sub catch_warning
     my $warn = ''
     local $^WARN_HOOK = sub (@< @_) { $warn .= @_[0]->{?description} }
-    return @( @_[0]->(), $warn )
+    return @:  @_[0]->(), $warn 
 
 
 sub remove_dir
@@ -78,7 +78,7 @@ ok( add_file('foo'), 'add a temporary file' )
 chmod( 0744, 'foo') if config_value('chmod')
 
 # there shouldn't be a MANIFEST there
-my @($res, $warn) =  catch_warning( \&mkmanifest )
+my (@: $res, $warn) =  catch_warning( \&mkmanifest )
 # Canonize the order.
 $warn = join("", map { "$_|" },
     sort { lc($a) cmp lc($b) }, split m/\r?\n/, $warn)
@@ -97,13 +97,13 @@ ok( add_file( 'bar' ), 'add another file' )
 ok( ! manicheck(), 'MANIFEST now out of sync' )
 
 # it reports that bar has been added and throws a warning
-@($res, $warn) =  catch_warning( \&filecheck )
+(@: $res, $warn) =  catch_warning( \&filecheck )
 
 like( $warn, qr/^Not in MANIFEST: bar/, 'warning that bar has been added' )
-is_deeply( $res, @('bar'), 'bar reported as new' )
+is_deeply( $res, (@: 'bar'), 'bar reported as new' )
 
 # now quiet the warning that bar was added and test again
-@($res, $warn) = do { local $ExtUtils::Manifest::Quiet = 1;
+(@: $res, $warn) = do { local $ExtUtils::Manifest::Quiet = 1;
     catch_warning( \&skipcheck )
 }
 is( $warn, '', 'disabled warnings' )
@@ -112,7 +112,7 @@ is( $warn, '', 'disabled warnings' )
 add_file( 'MANIFEST.SKIP', "baz\n.SKIP" )
 
 # this'll skip the new file
-@($res, $warn) =  catch_warning( \&skipcheck )
+(@: $res, $warn) =  catch_warning( \&skipcheck )
 like( $warn, qr/^Skipping MANIFEST\.SKIP/i, 'got skipping warning' )
 
 my @skipped
@@ -169,7 +169,7 @@ is( ExtUtils::Manifest::maniread()->{?none}, '#none',
 
 ok( mkdir( 'copy', 0777 ), 'made copy directory' )
 $files = maniread()
-try { @(_, $warn) =  catch_warning( sub (@< @_) { manicopy( $files, 'copy', 'cp' ) } )
+try { (@: _, $warn) =  catch_warning( sub (@< @_) { manicopy( $files, 'copy', 'cp' ) } )
 }
 like( $^EVAL_ERROR->{?description}, qr/^Can't read none: /, 'croaked about none' )
 
@@ -182,7 +182,7 @@ like($warn, qr/^Skipping MANIFEST.SKIP/i, 'warned about MANIFEST.SKIP' )
 # tell ExtUtils::Manifest to use a different file
 do
     local $ExtUtils::Manifest::MANIFEST = 'albatross'
-    @($res, $warn) =  catch_warning( \&mkmanifest )
+    (@: $res, $warn) =  catch_warning( \&mkmanifest )
     like( $warn, qr/Added to albatross: /, 'using a new manifest file' )
 
     # add the new file to the list of files to be deleted
@@ -194,7 +194,7 @@ do
 add_file( 'MANIFEST.SKIP' => "^moretest/q\n" )
 
 # This'll skip moretest/quux
-@($res, $warn) =  catch_warning( \&skipcheck )
+(@: $res, $warn) =  catch_warning( \&skipcheck )
 like( $warn, qr{^Skipping moretest/quux$}i, 'got skipping warning again' )
 
 
@@ -203,14 +203,14 @@ like( $warn, qr{^Skipping moretest/quux$}i, 'got skipping warning again' )
 add_file( 'MANIFEST.SKIP' => 'foo' )
 add_file( 'MANIFEST'      => "foobar\n"   )
 add_file( 'foobar'        => '123' )
-@($res, $warn) =  catch_warning( \&manicheck )
+(@: $res, $warn) =  catch_warning( \&manicheck )
 is_deeply( $res,  $@,      'MANIFEST overrides MANIFEST.SKIP' )
 is( $warn, '',   'MANIFEST overrides MANIFEST.SKIP, no warnings' )
 
 $files = maniread
 ok( !$files->{?wibble},     'MANIFEST in good state' )
-maniadd(\%( wibble => undef ))
-maniadd(\%( yarrow => "hock" ))
+maniadd(\(%:  wibble => undef ))
+maniadd(\(%:  yarrow => "hock" ))
 $files = maniread
 is( $files->{?wibble}, '',    'maniadd() with undef comment' )
 is( $files->{?yarrow}, 'hock','          with comment' )
@@ -218,8 +218,8 @@ is( $files->{?foobar}, '',    '          preserved old entries' )
 
 # test including an external manifest.skip file in MANIFEST.SKIP
 do
-    maniadd(\%( foo => undef , albatross => undef,
-            'mymanifest.skip' => undef, 'mydefault.skip' => undef))
+    maniadd(\(%:  foo => undef , albatross => undef
+                  'mymanifest.skip' => undef, 'mydefault.skip' => undef))
     add_file('mymanifest.skip' => "^foo\n")
     add_file('mydefault.skip'  => "^my\n")
     $ExtUtils::Manifest::DEFAULT_MSKIP =
@@ -227,12 +227,12 @@ do
     my $skip = File::Spec->catfile($cwd, < qw(mantest mymanifest.skip))
     add_file('MANIFEST.SKIP' =>
              "albatross\n#!include $skip\n#!include_default")
-    my @($res, $warn) =  catch_warning( \&skipcheck )
+    my (@: $res, $warn) =  catch_warning( \&skipcheck )
     for (qw(albatross foo foobar mymanifest.skip mydefault.skip))
         like( $warn, qr/Skipping \b$_\b/,
               "Skipping $_" )
     
-    @($res, $warn) =  catch_warning( \&mkmanifest )
+    (@: $res, $warn) =  catch_warning( \&mkmanifest )
     for (qw(albatross foo foobar mymanifest.skip mydefault.skip))
         like( $warn, qr/Removed from MANIFEST: \b$_\b/,
               "Removed $_ from MANIFEST" )
@@ -253,13 +253,13 @@ do
 
 
 add_file('MANIFEST'   => 'Makefile.PL')
-maniadd(\%( foo  => 'bar' ))
+maniadd(\(%:  foo  => 'bar' ))
 $files = maniread
 # VMS downcases the MANIFEST.  We normalize it here to match.
-$files->% = %( < @+: map { @(lc $_ => $files->{?$_}) }, keys $files->% )
-my %expect = %( 'makefile.pl' => '',
-    'foo'    => 'bar'
-    )
+$files->% = %:  < @+: map { (@: lc $_ => $files->{?$_}) }, keys $files->% 
+my %expect = %:  'makefile.pl' => ''
+                 'foo'    => 'bar'
+    
 is_deeply( $files, \%expect, 'maniadd() vs MANIFEST without trailing newline')
 
 #add_file('MANIFEST'   => 'Makefile.PL');
@@ -270,12 +270,12 @@ SKIP: do
     skip "Can't make MANIFEST read-only", 2 if -w 'MANIFEST'
 
     try {
-        maniadd(\%( 'foo' => 'bar' ));
+        maniadd(\(%:  'foo' => 'bar' ));
     }
     is( $^EVAL_ERROR, '',  "maniadd() won't open MANIFEST if it doesn't need to" )
 
     try {
-        maniadd(\%( 'grrrwoof' => 'yippie' ));
+        maniadd(\(%:  'grrrwoof' => 'yippie' ));
     }
     like( $^EVAL_ERROR->{?description}, qr/^\Qmaniadd() could not open MANIFEST:\E/,
           "maniadd() dies if it can't open the MANIFEST" )

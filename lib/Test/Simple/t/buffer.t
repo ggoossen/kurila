@@ -3,8 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @( '../lib' )
-    
+        $^INCLUDE_PATH = @:  '../lib' 
 
 
 # Ensure that intermixed prints to STDOUT and tests come out in the

@@ -8,7 +8,7 @@ ok 1
 print $^STDOUT, "# Locale::Maketext version $Locale::Maketext::VERSION\n"
 
 #sub Locale::Maketext::DEBUG () {10};
-use Locale::Maketext ();
+use Locale::Maketext ()
 do { package  Whunk::L10N;
     our @ISA = (@:   'Locale::Maketext' );
     our %Lexicon = (%: "hello" => "SROBLR!");

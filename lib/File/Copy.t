@@ -12,8 +12,8 @@ plan tests => 60
 BEGIN { *CORE::GLOBAL::rename = sub (@< @_) { CORE::rename(@_[0], @_[1]) }; }
 
 
-use File::Copy;
-use Config;
+use File::Copy
+use Config
 
 
 foreach my $code (@: "copy()", "copy('arg')", "copy('arg', 'arg', 'arg', 'arg')"

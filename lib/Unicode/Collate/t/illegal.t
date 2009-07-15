@@ -7,7 +7,7 @@ BEGIN
     }
     if (env::var('PERL_CORE')) {
         chdir('t') if -d 't';
-        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
+        $^INCLUDE_PATH = (@:  $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
 
 
@@ -23,9 +23,9 @@ ok(1)
 
 #########################
 
-use utf8;
+use utf8
 
-no warnings 'utf8';
+no warnings 'utf8'
 
 # NULL is tailorable but illegal code points are not.
 # illegal code points should be always ingored

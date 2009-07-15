@@ -11,7 +11,7 @@ $c->permit( <qw(require caller))
 
 my $r = $c->reval(q!
     sub UNIVERSAL::isa { "pwned" }
-    (bless \@(),"Foo")->isa("Foo");
+    (bless \$@,"Foo")->isa("Foo");
 !)
 
 is( $r, "pwned", "isa overriden in compartment" )
@@ -21,7 +21,7 @@ sub Foo::foo {}
 
 $r = $c->reval(q!
     sub UNIVERSAL::can { "pwned" }
-    (bless \@(),"Foo")->can("foo");
+    (bless \$@,"Foo")->can("foo");
 !)
 
 is( $r, "pwned", "can overriden in compartment" )

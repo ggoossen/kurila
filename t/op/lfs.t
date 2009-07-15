@@ -73,7 +73,7 @@ if ($^OS_NAME eq 'unicos')
 
 # Let's not depend on Fcntl or any other extension.
 
-my (@: $SEEK_SET, $SEEK_CUR, $SEEK_END) = (@: 0, 1, 2)
+my (@: $SEEK_SET, $SEEK_CUR, $SEEK_END) = @: 0, 1, 2
 
 # We'll start off by creating a one megabyte file which has
 # only three "true" bytes.  If we have sparseness, we should

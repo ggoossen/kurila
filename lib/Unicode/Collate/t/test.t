@@ -7,7 +7,7 @@ BEGIN
     }
     if (env::var('PERL_CORE')) {
         chdir('t') if -d 't';
-        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
+        $^INCLUDE_PATH = (@:  $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
 
 
@@ -58,7 +58,7 @@ is($Collator->cmp("A$acute", $A_acute), 0) # @version 3.1.1 (prev: -1)
 is($Collator->cmp($a_acute, $A_acute), -1)
 ok($Collator->eq("A\cA$acute", $A_acute)) # UCA v9. \cA is invariant.
 
-my %old_level = %( < $Collator->change(level => 1) )
+my %old_level = %:  < $Collator->change(level => 1) 
 ok($Collator->eq("A$acute", $A_acute))
 ok($Collator->eq("A", $A_acute))
 
@@ -254,7 +254,7 @@ is($Collator->cmp("the pen", "a pencil"), 1)
 my $backLevel1 = Unicode::Collate->new(
     table => undef,
     normalization => undef,
-    backwards => \@( 1 ),
+    backwards => \(@:  1 ),
     )
 
 # all strings are reversed at level 1.
@@ -321,7 +321,7 @@ is($O_str   ->cmp("\x{200B}", "A"), 1)
 
 ##### 97..107
 
-my %origVer = %( < $Collator->change(UCA_Version => 8) )
+my %origVer = %:  < $Collator->change(UCA_Version => 8) 
 
 $Collator->change(level => 3)
 

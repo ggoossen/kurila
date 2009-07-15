@@ -33,7 +33,7 @@ Unless otherwise stated, it works just like ExtUtils::MM_Unix
 =cut
 
 sub os_flavor
-    return (@: 'DOS')
+    return @: 'DOS'
 
 
 =item B<replace_manpage_separator>

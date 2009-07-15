@@ -25,7 +25,7 @@ while ( ~< $^DATA)
     my ($num, $testname, $todo)
     if (s/#\s*(.*)$//mg)
         (@: $num, $todo, $testname) = @: $1 =~ m/(\d*)\s*(TODO)?\s*(.*)/
-    
+
     my ($input, $expected)
     if (m/(.*)\n>>>>\n(.*)/s)
         (@: $input, $expected) = @: $1, $2
@@ -171,9 +171,9 @@ my %x;
 %x{warn()};
 ####
 # 0
-@(my $x, my $y) = @('xx', 'yy');
+@(: my $x, my $y) = @(: 'xx', 'yy');
 ####
-my @x = @(1 .. 10);
+my @x = @(: 1 .. 10);
 ####
 # 13
 my $foo;
@@ -201,7 +201,7 @@ my $i;
 while ($i) { my $z = 1; } continue { $i = 99; }
 ####
 # 23 with my
-foreach my $i (@(1, 2)) {
+foreach my $i (@(: 1, 2)) {
     my $z = 1;
 }
 ####
@@ -236,7 +236,7 @@ foreach (reverse 2 .. 5)
     print $^STDOUT, $_
 ####
 # 34  (bug #38684)
-@main::ary = @(split(' ', 'foo', 0));
+@main::ary = @(: split(' ', 'foo', 0));
 ####
 # 35 (bug #40055)
 do { () }; 
@@ -248,7 +248,7 @@ do { my $x = 1; $x; };
 ####
 # 37 <20061012113037.GJ25805@c4.convolution.nl>
 my $f = sub {
-    \%(\@());
+    \%(\@(: ));
 } ;
 ####
 # 38 (bug #43010)
@@ -281,16 +281,16 @@ do {
 # 51 Anonymous arrays and hashes, and references to them
 my $a = \%();
 my $b = \(\%());
-my $c = \@();
-my $d = \(\@());
+my $c = \@(: );
+my $d = \(\@(: ));
 ####
 # array slice
 my @array;
-@array[[@(1, 2)]];
+@array[[@(: 1, 2)]];
 ####
 # hash slice
 my %hash;
-%hash{[@('foo', 'bar')]};
+%hash{[@(: 'foo', 'bar')]};
 ####
 testsub();
 ####

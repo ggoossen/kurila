@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @( '../lib' )
+        $^INCLUDE_PATH = @:  '../lib' 
     
 
 
@@ -22,7 +22,7 @@ sub ok($test, $name)
 
 
 
-use Test::Builder;
+use Test::Builder
 my $Test = Test::Builder->new
 
 print $^STDOUT, "1..2\n"

@@ -18,7 +18,7 @@ BEGIN
 print $^STDOUT, "1..0 # Skip -- TODO for kurila\n"
 exit 0
 
-use OptreeCheck;
+use OptreeCheck
 plan tests => 7
 
 

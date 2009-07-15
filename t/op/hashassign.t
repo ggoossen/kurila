@@ -6,7 +6,7 @@ BEGIN
 
 plan tests => 56
 
-my @comma = (@: "key", "value")
+my @comma = @: "key", "value"
 
 # The peephole optimiser already knows that it should convert the string in
 # $foo{string} into a shared hash key scalar. It might be worth making the

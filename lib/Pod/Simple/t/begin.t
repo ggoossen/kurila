@@ -1,7 +1,7 @@
 BEGIN 
     if(env::var('PERL_CORE')) {
         chdir 't';
-        $^INCLUDE_PATH = @( '../lib' );
+        $^INCLUDE_PATH = (@:  '../lib' );
     }
 
 
@@ -14,8 +14,8 @@ my $d
 
 ok 1
 
-use Pod::Simple::DumpAsXML;
-use Pod::Simple::XMLOutStream;
+use Pod::Simple::DumpAsXML
+use Pod::Simple::XMLOutStream
 print $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n"
 sub e ($x, $y) { Pod::Simple::DumpAsXML->_duo($x, $y) }
 
@@ -239,12 +239,12 @@ print $^STDOUT, "#   now with accept_target_as_text\n"
 is( $x->_out( \&mojtext, "=pod\n\nI like pie.\n\n=begin mojojojo\n\nI<stuff>\nTrala!\n\n   Hm, B<things>!\nTrala.\n\n=end mojojojo\n\nYup.\n"),
     qq{<Document><Para>I like pie.</Para><for target="mojojojo" target_matching="mojojojo"><Para><I>stuff</I> Trala!</Para><Verbatim xml:space="preserve">   Hm, B&#60;things&#62;!\nTrala.</Verbatim></for><Para>Yup.</Para></Document>}
     )
-is( $x->_out( \&mojtext,  join "\n\n", @(
-  "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk",
-  "I<stuff>\nTrala!",
-  "   Hm, B<things>!\nTrala.",
-  "=end psketti,mojojojo,crunk",
-  "Yup.\n")
+is( $x->_out( \&mojtext,  join "\n\n", @: 
+  "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk"
+  "I<stuff>\nTrala!"
+  "   Hm, B<things>!\nTrala."
+  "=end psketti,mojojojo,crunk"
+  "Yup.\n"
     ),
     qq{<Document><Para>I like pie.</Para>}.
     qq{<for target="psketti,mojojojo,crunk" target_matching="mojojojo">}.
@@ -255,15 +255,15 @@ is( $x->_out( \&mojtext,  join "\n\n", @(
 
 print $^STDOUT, "# Now with five paragraphs (p,v,v,p,p) and accept_target_as_text\n"
 
-is( $x->_out( \&mojtext,  join "\n\n", @(
-  "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk",
-  "I<stuff>\nTrala!",
-  "   Hm, B<things>!\nTrala.",
-  "    Oh, F<< dodads >>!\nHurf.",
-  "Boing C<spr-\t\n\t\t\toink>\n Blorg!",
-  "Woohah S<thwack\nwoohah>squim!",
-  "=end psketti,mojojojo,crunk",
-  "Yup.\n")
+is( $x->_out( \&mojtext,  join "\n\n", @: 
+  "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk"
+  "I<stuff>\nTrala!"
+  "   Hm, B<things>!\nTrala."
+  "    Oh, F<< dodads >>!\nHurf."
+  "Boing C<spr-\t\n\t\t\toink>\n Blorg!"
+  "Woohah S<thwack\nwoohah>squim!"
+  "=end psketti,mojojojo,crunk"
+  "Yup.\n"
     ),
     qq{<Document><Para>I like pie.</Para>}.
     qq{<for target="psketti,mojojojo,crunk" target_matching="mojojojo">}.
@@ -281,19 +281,19 @@ print $^STDOUT, "#\n# Now nested begin...end regions...\n"
 
 sub mojprok { shift->accept_targets( <qw{mojojojo prok}) }
 
-is( $x->_out( \&mojprok,  join "\n\n", @(
-  "=pod\n\nI like pie.",
-  "=begin :psketti,mojojojo,crunk",
-  "I<stuff>\nTrala!",
-  "   Hm, B<things>!\nTrala.",
-  "    Oh, F<< dodads >>!\nHurf.",
-  "Boing C<spr-\t\n\t\t\toink>\n Blorg!",
-  "=begin :prok",
-  "Woohah S<thwack\nwoohah>squim!",
-  "=end :prok",
-  "ZubZ<>aaz.",
-  "=end :psketti,mojojojo,crunk",
-  "Yup.\n")
+is( $x->_out( \&mojprok,  join "\n\n", @: 
+  "=pod\n\nI like pie."
+  "=begin :psketti,mojojojo,crunk"
+  "I<stuff>\nTrala!"
+  "   Hm, B<things>!\nTrala."
+  "    Oh, F<< dodads >>!\nHurf."
+  "Boing C<spr-\t\n\t\t\toink>\n Blorg!"
+  "=begin :prok"
+  "Woohah S<thwack\nwoohah>squim!"
+  "=end :prok"
+  "ZubZ<>aaz."
+  "=end :psketti,mojojojo,crunk"
+  "Yup.\n"
     ),
     qq{<Document><Para>I like pie.</Para>}.
     qq{<for target=":psketti,mojojojo,crunk" target_matching="mojojojo">}.
@@ -312,21 +312,21 @@ is( $x->_out( \&mojprok,  join "\n\n", @(
 
 print $^STDOUT, "# a little more complex this time...\n"
 
-is( $x->_out( \&mojprok,  join "\n\n", @(
-  "=pod\n\nI like pie.",
-  "=begin :psketti,mojojojo,crunk",
-  "I<stuff>\nTrala!",
-  "   Hm, B<things>!\nTrala.",
-  "    Oh, F<< dodads >>!\nHurf.",
-  "Boing C<spr-\t\n\t\t\toink>\n Blorg!",
-  "=begin :prok",
-  "   Blorp, B<things>!\nTrala.",
-  "    Khh, F<< dodads >>!\nHurf.",
-  "Woohah S<thwack\nwoohah>squim!",
-  "=end :prok",
-  "ZubZ<>aaz.",
-  "=end :psketti,mojojojo,crunk",
-  "Yup.\n")
+is( $x->_out( \&mojprok,  join "\n\n", @: 
+  "=pod\n\nI like pie."
+  "=begin :psketti,mojojojo,crunk"
+  "I<stuff>\nTrala!"
+  "   Hm, B<things>!\nTrala."
+  "    Oh, F<< dodads >>!\nHurf."
+  "Boing C<spr-\t\n\t\t\toink>\n Blorg!"
+  "=begin :prok"
+  "   Blorp, B<things>!\nTrala."
+  "    Khh, F<< dodads >>!\nHurf."
+  "Woohah S<thwack\nwoohah>squim!"
+  "=end :prok"
+  "ZubZ<>aaz."
+  "=end :psketti,mojojojo,crunk"
+  "Yup.\n"
     ),
     qq{<Document><Para>I like pie.</Para>}.
     qq{<for target=":psketti,mojojojo,crunk" target_matching="mojojojo">}.
@@ -348,21 +348,21 @@ is( $x->_out( \&mojprok,  join "\n\n", @(
 $d = 10
 print $^STDOUT, "# Now with nesting where inner region is non-resolving...\n"
 
-is( $x->_out( \&mojprok,  join "\n\n", @(
-  "=pod\n\nI like pie.",
-  "=begin :psketti,mojojojo,crunk",
-  "I<stuff>\nTrala!",
-  "   Hm, B<things>!\nTrala.",
-  "    Oh, F<< dodads >>!\nHurf.",
-  "Boing C<spr-\t\n\t\t\toink>\n Blorg!",
-  "=begin prok",
-  "   Blorp, B<things>!\nTrala.",
-  "    Khh, F<< dodads >>!\nHurf.",
-  "Woohah S<thwack\nwoohah>squim!",
-  "=end prok",
-  "ZubZ<>aaz.",
-  "=end :psketti,mojojojo,crunk",
-  "Yup.\n")
+is( $x->_out( \&mojprok,  join "\n\n", @: 
+  "=pod\n\nI like pie."
+  "=begin :psketti,mojojojo,crunk"
+  "I<stuff>\nTrala!"
+  "   Hm, B<things>!\nTrala."
+  "    Oh, F<< dodads >>!\nHurf."
+  "Boing C<spr-\t\n\t\t\toink>\n Blorg!"
+  "=begin prok"
+  "   Blorp, B<things>!\nTrala."
+  "    Khh, F<< dodads >>!\nHurf."
+  "Woohah S<thwack\nwoohah>squim!"
+  "=end prok"
+  "ZubZ<>aaz."
+  "=end :psketti,mojojojo,crunk"
+  "Yup.\n"
     ),
     qq{<Document><Para>I like pie.</Para>}.
     qq{<for target=":psketti,mojojojo,crunk" target_matching="mojojojo">}.
@@ -384,18 +384,18 @@ is( $x->_out( \&mojprok,  join "\n\n", @(
 
 print $^STDOUT, "# Now a begin...end with a non-resolving for inside\n"
 
-is( $x->_out( \&mojprok,  join "\n\n", @(
-  "=pod\n\nI like pie.",
-  "=begin :psketti,mojojojo,crunk",
-  "I<stuff>\nTrala!",
-  "   Hm, B<things>!\nTrala.",
-  "    Oh, F<< dodads >>!\nHurf.",
-  "Boing C<spr-\t\n\t\t\toink>\n Blorg!",
+is( $x->_out( \&mojprok,  join "\n\n", @: 
+  "=pod\n\nI like pie."
+  "=begin :psketti,mojojojo,crunk"
+  "I<stuff>\nTrala!"
+  "   Hm, B<things>!\nTrala."
+  "    Oh, F<< dodads >>!\nHurf."
+  "Boing C<spr-\t\n\t\t\toink>\n Blorg!"
   "=for prok"
-  . "   Blorp, B<things>!\nTrala.\n    Khh, F<< dodads >>!\nHurf.",
-  "ZubZ<>aaz.",
-  "=end :psketti,mojojojo,crunk",
-  "Yup.\n")
+      . "   Blorp, B<things>!\nTrala.\n    Khh, F<< dodads >>!\nHurf."
+  "ZubZ<>aaz."
+  "=end :psketti,mojojojo,crunk"
+  "Yup.\n"
     ),
     qq{<Document><Para>I like pie.</Para>}.
     qq{<for target=":psketti,mojojojo,crunk" target_matching="mojojojo">}.
@@ -417,18 +417,18 @@ is( $x->_out( \&mojprok,  join "\n\n", @(
 
 print $^STDOUT, "# Now a begin...end with a resolving for inside\n"
 
-is( $x->_out( \&mojprok,  join "\n\n", @(
-  "=pod\n\nI like pie.",
-  "=begin :psketti,mojojojo,crunk",
-  "I<stuff>\nTrala!",
-  "   Hm, B<things>!\nTrala.",
-  "    Oh, F<< dodads >>!\nHurf.",
-  "Boing C<spr-\t\n\t\t\toink>\n Blorg!",
+is( $x->_out( \&mojprok,  join "\n\n", @: 
+  "=pod\n\nI like pie."
+  "=begin :psketti,mojojojo,crunk"
+  "I<stuff>\nTrala!"
+  "   Hm, B<things>!\nTrala."
+  "    Oh, F<< dodads >>!\nHurf."
+  "Boing C<spr-\t\n\t\t\toink>\n Blorg!"
   "=for :prok"
-  . "   Blorp, B<things>!\nTrala.\n    Khh, F<< dodads >>!\nHurf.",
-  "ZubZ<>aaz.",
-  "=end :psketti,mojojojo,crunk",
-  "Yup.\n")
+      . "   Blorp, B<things>!\nTrala.\n    Khh, F<< dodads >>!\nHurf."
+  "ZubZ<>aaz."
+  "=end :psketti,mojojojo,crunk"
+  "Yup.\n"
     ),
     qq{<Document><Para>I like pie.</Para>}.
     qq{<for target=":psketti,mojojojo,crunk" target_matching="mojojojo">}.

@@ -10,7 +10,7 @@ BEGIN
     $BigEnough = 10**$BigWidth                  # Largest array we'll attempt
     $RootWidth = int(($BigWidth+1)/2)           # Digits in sqrt($BigEnough-1)
     $ItemFormat = "\%0$($RootWidth)d\%0$($BigWidth)d"   # Array item format
-    @TestSizes = (@: 0, 1, 2)                     # Small special cases
+    @TestSizes = @: 0, 1, 2                     # Small special cases
     # Testing all the way up to $BigEnough takes too long
     # for casual testing.  There are some cutoffs (~256)
     # in pp_sort that should be tested, but 10_000 is ample.

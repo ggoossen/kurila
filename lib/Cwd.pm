@@ -270,7 +270,6 @@ my %METHOD_MAP =
         fastgetcwd          => 'cwd'
         fastcwd             => 'cwd'
         abs_path            => 'fast_abs_path'
-    
 
 %METHOD_MAP{+NT} = %METHOD_MAP{?MSWin32}
 %METHOD_MAP{+nto} = %METHOD_MAP{?qnx}

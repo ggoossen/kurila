@@ -8,7 +8,7 @@
 # This program is free software; you may redistribute it and/or modify it
 # under the same terms as Perl itself.
 
-use TestInit;
+use TestInit
 
 BEGIN
     $^OUTPUT_AUTOFLUSH = 1
@@ -25,7 +25,7 @@ while ( ~< $^DATA)
     next until $_ eq "###\n"
     while ( ~< $^DATA)
         last if $_ eq "###\n"
-        my @($option, $value) =  split
+        my (@: $option, $value) =  split
         %options{+$option} = $value
     open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n"
     while ( ~< $^DATA)

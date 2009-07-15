@@ -185,7 +185,7 @@ good working examples.
 
 =cut
 
-use warnings::register;
+use warnings::register
 
 sub new
     my $pkg = shift
@@ -227,7 +227,7 @@ sub CLEAR
 # It exists to act as a base class for classes which only wish to
 # alter some parts of their behaviour.
 
-package Tie::StdHash;
+package Tie::StdHash
 # @ISA = qw(Tie::Hash);		# would inherit new() only
 
 sub TIEHASH  { bless \$%, @_[0] }
@@ -240,7 +240,7 @@ sub DELETE   { delete @_[0]->{@_[1]} }
 sub CLEAR    { @_[0]->% = $% }
 sub SCALAR   { scalar @_[0]->% }
 
-package Tie::ExtraHash;
+package Tie::ExtraHash
 
 sub TIEHASH  { my $p = shift; bless \(@: \$%, < @_), $p }
 sub STORE    { @_[0]->[0]->{+@_[1]} = @_[2] }

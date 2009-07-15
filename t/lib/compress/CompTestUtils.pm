@@ -272,9 +272,9 @@ my %TopFuncMap = %:   'IO::Compress::Gzip'          => 'IO::Compress::Gzip::gzip
                       'IO::Uncompress::DummyUncomp' => 'IO::Uncompress::DummyUncomp::dummyuncomp'
     
 
-%TopFuncMap = (%:  < @+: map { (@: $_              => %TopFuncMap{?$_}
-                                 %TopFuncMap{?$_} => %TopFuncMap{?$_}) }
-                   keys %TopFuncMap ) 
+%TopFuncMap = %+: map { %: $_              => %TopFuncMap{?$_}
+                           %TopFuncMap{?$_} => %TopFuncMap{?$_} }
+                  keys %TopFuncMap  
 
 #%TopFuncMap = map { ($_              => \&{ $TopFuncMap{$_} ) }
 #keys %TopFuncMap ;

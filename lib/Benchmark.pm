@@ -788,7 +788,7 @@ sub countit
         $n = $nmin if $n +< $nmin
     
 
-    return bless \(@:  $rtot, $utot, $stot, $cutot, $cstot, $ntot )
+    return bless \@:  $rtot, $utot, $stot, $cutot, $cstot, $ntot 
 
 
 # --- Functions implementing high-level time-then-print utilities
@@ -924,7 +924,6 @@ sub cmpthese
         ''
         $display_as_rate ?? 'Rate' !! 's/iter'
         < map { $_->[0] }, @vals
-        
 
     push @rows, \@top_row
     @col_widths = map { length( $_ ) }, @top_row

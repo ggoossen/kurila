@@ -209,11 +209,6 @@ for more information.
 F<prove> is a command-line interface to the test-running functionality of
 of F<Test::Harness>.  It's an alternative to C<make test>.
 
-=item L<corelist>
-
-A command-line front-end to C<Module::CoreList>, to query what modules
-were shipped with given versions of perl.
-
 =back
 
 =head2 General tools

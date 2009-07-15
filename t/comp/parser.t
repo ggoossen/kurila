@@ -19,7 +19,7 @@ like( $^EVAL_ERROR->{?description}, qr/^Missing braces on \\N/,
     'syntax error in string with incomplete \N' );
 
 # Bug 20010831.001
-eval '@($a, "b") = @(1, 2);';
+eval '@: $a, "b" = @: 1, 2';
 like( $^EVAL_ERROR->{?description}, qr/^Can't assign to constant item/,
     'bareword in list assignment' );
 
@@ -61,7 +61,7 @@ do {
     my $a="A";
     is("$($a)\{", "A\{", "interpolation, qq//");
     is("$($a)[", "A[", "interpolation, qq//");
-    my @b=@("B");
+    my @b=@:"B";
     is("$(join ' ', @b)\{", "B\{", "interpolation, qq//");
     is(''.qr/$a(?:)\{/, '(?-uxism:A(?:)\{)', "interpolation, qr//");
     my $c = "A\{";
@@ -189,7 +189,7 @@ like($^EVAL_ERROR->stacktrace, qr/BEGIN/, 'BEGIN 7' );
 # with sane line reporting for any other test failures
 
 sub check($file, $line, $name) {
-    my @(_, $got_file, $got_line) =@( caller);
+    my @: _, $got_file, $got_line =@: caller;
     like ($got_file, $file, "file of $name");
     is ($got_line, $line, "line of $name");
 }
@@ -258,10 +258,10 @@ check(qr/^Great hail!.*no more\.$/, 61, "Overflow both small buffer checks");
 EOSTANZA
 
 do {
-    my @x = @( 'string' );
+    my @x = @: 'string' ;
     is(eval q{ "@x[0]->strung" }, 'string->strung',
         'literal -> after an array subscript within ""');
-    @x = @( \@('string') );
+    @x = @: \@:'string';
     # this used to give "string"
     dies_like( sub { "@x[0]-> [0]" }, qr/reference as string/ );
 };

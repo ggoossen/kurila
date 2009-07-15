@@ -27,7 +27,7 @@ sub import
     return Exporter::import(< @_)
 
 
-use Class::Struct < qw(struct);
+use Class::Struct < qw(struct)
 struct 'File::stat' => \ @+: map { @: $_ => '$' }, qw{
 	 dev ino mode nlink uid gid rdev size
 	 atime mtime ctime blksize blocks

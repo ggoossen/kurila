@@ -16,7 +16,7 @@ require Exporter
                 implicate_supers
                 implicate_supers_strictly
                )
-%EXPORT_TAGS = %('ALL' => @EXPORT_OK)
+%EXPORT_TAGS = %: 'ALL' => @EXPORT_OK
 
 $VERSION = "0.35"
 
@@ -138,14 +138,13 @@ sub extract_language_tags
 
     ## Changes in the language tagging standards may have to be reflected here.
 
-    my@($text) =
+    my $text =
         @_[0] =~ m/(.+)/  # to make for an untainted result
         ?? $1 !! ''
-    
 
-    return grep( {!m/^[ixIX]$/s }, @( # 'i' and 'x' aren't good tags
+    return grep( {!m/^[ixIX]$/s }, @: # 'i' and 'x' aren't good tags
         $text =~
-        m/
+            m/
       \b
       (?:  # First subtag
          [iIxX] | [a-zA-Z]{2,3}
@@ -156,7 +155,6 @@ sub extract_language_tags
       )*
       \b
     /xsg)
-        )
 
 
 ###########################################################################
@@ -354,7 +352,7 @@ sub super_languages
 
     # NB: (i-sil-...)?
 
-    my @supers = @( () )
+    my @supers = $@
     foreach my $bit ( @l1_subtags)
         push @supers,
             scalar(nelems @supers) ?? (@supers[-1] . '-' . $bit) !! $bit
@@ -594,7 +592,7 @@ valid language tag.
 
 =cut
 
-my %alt = %( < qw( i x   x i   I X   X I ) )
+my %alt = %:  < qw( i x   x i   I X   X I ) 
 sub alternate_language_tags
     my $tag = @_[0]
     return() unless &is_language_tag($tag)
@@ -638,7 +636,7 @@ sub alternate_language_tags
 do
     # Init %Panic...
 
-    my @panic = @(  # MUST all be lowercase!
+    my @panic = @:   # MUST all be lowercase!
         # Only large ("national") languages make it in this list.
         #  If you, as a user, are so bizarre that the /only/ language
         #  you claim to accept is Galician, then no, we won't do you
@@ -647,56 +645,52 @@ do
         #  here, I'll just go crazy.
 
         # Scandinavian lgs.  All based on opinion and hearsay.
-        'sv' => \qw(nb no da nn),
-        'da' => \qw(nb no sv nn), # I guess
-        \qw(no nn nb), \qw(no nn nb sv da),
-        'is' => \qw(da sv no nb nn),
-        'fo' => \qw(da is no nb nn sv), # I guess
+        'sv' => \qw(nb no da nn)
+        'da' => \qw(nb no sv nn) # I guess
+        \qw(no nn nb), \qw(no nn nb sv da)
+        'is' => \qw(da sv no nb nn)
+        'fo' => \qw(da is no nb nn sv) # I guess
 
         # I think this is about the extent of tolerable intelligibility
         #  among large modern Romance languages.
-        'pt' => \qw(es ca it fr), # Portuguese, Spanish, Catalan, Italian, French
-        'ca' => \qw(es pt it fr),
-        'es' => \qw(ca it fr pt),
-        'it' => \qw(es fr ca pt),
-        'fr' => \qw(es it ca pt),
+        'pt' => \qw(es ca it fr) # Portuguese, Spanish, Catalan, Italian, French
+        'ca' => \qw(es pt it fr)
+        'es' => \qw(ca it fr pt)
+        'it' => \qw(es fr ca pt)
+        'fr' => \qw(es it ca pt)
 
         # Also assume that speakers of the main Indian languages prefer
         #  to read/hear Hindi over English
         \qw(
      as bn gu kn ks kok ml mni mr ne or pa sa sd te ta ur
-   ) => 'hi',
+   ) => 'hi'
         # Assamese, Bengali, Gujarati, [Hindi,] Kannada (Kanarese), Kashmiri,
         # Konkani, Malayalam, Meithei (Manipuri), Marathi, Nepali, Oriya,
         # Punjabi, Sanskrit, Sindhi, Telugu, Tamil, and Urdu.
-        'hi' => \qw(bn pa as or),
+        'hi' => \qw(bn pa as or)
         # I welcome finer data for the other Indian languages.
         #  E.g., what should Oriya's list be, besides just Hindi?
 
         # And the panic languages for English is, of course, nil!
 
         # My guesses at Slavic intelligibility:
-        < (@(\qw(ru be uk)) x 2),  # Russian, Belarusian, Ukranian
-        'sr' => 'hr', 'hr' => 'sr', # Serb + Croat
-        'cs' => 'sk', 'sk' => 'cs', # Czech + Slovak
+        < ((@: \qw(ru be uk)) x 2)  # Russian, Belarusian, Ukranian
+        'sr' => 'hr', 'hr' => 'sr' # Serb + Croat
+        'cs' => 'sk', 'sk' => 'cs' # Czech + Slovak
 
-        'ms' => 'id', 'id' => 'ms', # Malay + Indonesian
+        'ms' => 'id', 'id' => 'ms' # Malay + Indonesian
 
-        'et' => 'fi', 'fi' => 'et', # Estonian + Finnish
+        'et' => 'fi', 'fi' => 'et' # Estonian + Finnish
 
         #?? 'lo' => 'th', 'th' => 'lo', # Lao + Thai
 
-        )
+        
     my($k,$v)
     while((nelems @panic))
-        @($k,$v) = @: splice(@panic,0,2)
-        foreach my $k (@(ref($k) ?? < $k->@ !! $k))
-            foreach my $v (@(ref($v) ?? < $v->@ !! $v))
-                push((%Panic{+$k} //= @()), $v) unless $k eq $v
-            
-        
-    
-
+        @: $k,$v = @: splice(@panic,0,2)
+        foreach my $k (ref($k) ?? $k->@ !! @: $k)
+            foreach my $v (ref($v) ?? $v->@ !! @: $v)
+                push((%Panic{+$k} //= $@), $v) unless $k eq $v
 
 =item * the function @langs = panic_languages(@accept_languages)
 
@@ -737,8 +731,8 @@ sub panic_languages
         next if %seen{+$t}++ # so we don't return it or hit it again
         # push @out, super_languages($t); # nah, keep that separate
         push @out, < %Panic{?lc $t}
-    
-    return grep { !%seen{+$_}++ }, @(  < @out, 'en')
+
+    return grep { !%seen{+$_}++ }, @: < @out, 'en'
 
 
 #---------------------------------------------------------------------------

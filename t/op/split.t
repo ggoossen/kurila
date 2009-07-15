@@ -127,7 +127,7 @@ is($_, "r:m :b")
 
 # unicode splittage
 
-use utf8;
+use utf8
 
 @ary = split(m/\x{FE}/, "\x{FF}\x{FE}\x{FD}") # bug id 20010105.016
 ok((nelems @ary) == 2 &&
@@ -290,7 +290,7 @@ do
     # Copyright (c) 1991-2006 Unicode, Inc.
     # For terms of use, see http://www.unicode.org/terms_of_use.html
     # For documentation, see UCD.html
-    my @spaces=(@: 
+    my @spaces=@: 
         ord("\t")      # Cc       <control-0009>
         ord("\n")      # Cc       <control-000A>
         # not PerlSpace # Cc       <control-000B>
@@ -308,7 +308,7 @@ do
         0x202F         # Zs       NARROW NO-BREAK SPACE
         0x205F         # Zs       MEDIUM MATHEMATICAL SPACE
         0x3000          # Zs       IDEOGRAPHIC SPACE
-        )
+        
     #diag "Have @{[0+@spaces]} to test\n";
     foreach my $cp ( @spaces)
         my $msg = sprintf "Space: U+\%04x", $cp

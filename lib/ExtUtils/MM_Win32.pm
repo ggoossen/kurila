@@ -354,7 +354,7 @@ gcc.  Otherwise, take out all *.pdb files.
 sub extra_clean_files
     my $self = shift
 
-    return $GCC ??  (@: qw(dll.base dll.exp)) !!  (@: '*.pdb')
+    return $GCC ??  (@: qw(dll.base dll.exp)) !!  @: '*.pdb'
 
 
 =item init_linker
@@ -515,8 +515,7 @@ Windows is Win32.
 =cut
 
 sub os_flavor
-    return (@: 'Win32')
-
+    return @: 'Win32'
 
 
 =item cflags

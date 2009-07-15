@@ -33,9 +33,7 @@ sub new { return bless \%(), ref(@_[0]) || @_[0] }
 
 use File::Spec::Functions < qw(catfile);
 
-sub parse_from_file {
-    my $self = shift;
-    my@($file, $outfh) =  @_;
+sub parse_from_file($self, $file, $outfh)
 
     my $render = $self->{?'__nroffer'} || die "no nroffer set!?";
 
@@ -62,7 +60,7 @@ sub parse_from_file {
 
     # Thanks to Brendan O'Dea for contributing the following block
     if('Pod::Perldoc::IS_Linux' and -t $^STDOUT
-        and my @($cols) = `stty -a` =~ m/\bcolumns\s+(\d+)/
+        and my @: $cols = `stty -a` =~ m/\bcolumns\s+(\d+)/
     ) {
             my $c = $cols * 39 / 40;
             $cols = $c +> $cols - 2 ?? $c !! $cols -2;

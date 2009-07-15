@@ -7,7 +7,7 @@ BEGIN
     
     if (env::var('PERL_CORE'))
         chdir('t') if -d 't'
-        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) )
+        $^INCLUDE_PATH = @:  $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) 
     
 
 
@@ -48,7 +48,7 @@ ok(1)
 # 1D165 0021;	# ! MS. Cm. STEM	[0251 | 0020 | 0002 |]
 #
 
-no warnings 'utf8';
+no warnings 'utf8'
 
 is("\x{206F}!" cmp "\x{D800}!", -1)
 is(pack('U*', 0x206F, 0x21) cmp pack('U*', 0xD800, 0x21), -1)

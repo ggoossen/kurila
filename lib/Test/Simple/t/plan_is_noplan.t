@@ -25,7 +25,7 @@ sub ok($test, ?$name)
 
 
 
-package main;
+package main
 
 require Test::Simple
 

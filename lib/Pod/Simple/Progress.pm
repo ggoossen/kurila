@@ -36,12 +36,12 @@ sub reach($self, $point, $note)
             ($self->{?'quiet_until'} == 1) ?? () !! '... '
             (defined $point) ?? (
                 '#',
-                ($goal = $self->{?'goal'}) ?? (
-                        ' ' x (length($goal) - length($point)),
-                        $point, '/', $goal
-                    ) !! $point,
-                $note ?? ': ' !! ()
-                ) !! ()
+                ( ($goal = $self->{?'goal'}) ?? (
+                    ' ' x (length($goal) - length($point)),
+                    $point, '/', $goal
+                  ) !! $point ),
+                ( $note ?? ': ' !! () ),
+              ) !! ()
             $note || ''
             "\n"
             )

@@ -3,8 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = (@:  '../lib' )
-    
+        $^INCLUDE_PATH = @:  '../lib' 
 
 
 # Can't use Test.pm, that's a 5.005 thing.

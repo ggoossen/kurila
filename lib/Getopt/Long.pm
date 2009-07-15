@@ -123,7 +123,7 @@ ConfigDefaults()
 
 ################ OO Interface ################
 
-package Getopt::Long::Parser;
+package Getopt::Long::Parser
 
 # Store a copy of the default configuration. Since ConfigDefaults has
 # just been called, what we get from Configure is the default.
@@ -132,7 +132,7 @@ my $default_config = &Getopt::Long::Configure ()
 sub new
     my $that = shift
     my $class = ref($that) || $that
-    my %atts = (%:  < @_ )
+    my %atts = %:  < @_ 
 
     # Register the callers package.
     my $self = \%:  caller_pkg => (@: caller)[0] 
@@ -157,7 +157,7 @@ sub new
 
 
 sub configure
-    my (@: $self) =(@:  shift)
+    my (@: $self) =@:  shift
 
     # Restore settings, merge new settings in.
     my $save = Getopt::Long::Configure ($self->{?settings}, < @_)
@@ -167,7 +167,7 @@ sub configure
 
 
 sub getoptions
-    my (@: $self) =(@:  shift)
+    my $self = shift
 
     # Restore config settings.
     my $save = Getopt::Long::Configure ($self->{?settings})
@@ -668,15 +668,12 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
                 print $^STDERR, ("=> saving \"$tryopt\" ",
                                  "(not an option, may permute)\n") if $debug
                 push (@ret, $tryopt)
-            
+
             next
         else
             # Push this one back and exit.
             unshift ($argv->@, $tryopt)
-            return  (@: $error == 0)
-        
-
-    
+            return  @: $error == 0
 
     # Finish.
     if ( (nelems @ret) && $order == $PERMUTE )
@@ -684,9 +681,8 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
         print $^STDERR, ("=> restoring \"", join('" "', @ret), "\"\n")
             if $debug
         unshift ($argv->@, < @ret)
-    
 
-    return  (@: $error == 0)
+    return  @: $error == 0
 
 
 # A readable representation of what's in an optbl.
@@ -790,8 +786,7 @@ sub ParseOptionSpec($opt, $opctl)
             if defined($ma) && $ma +< $mi
 
         # Fields are hard-wired here.
-        $entry = \(@: $type,$orig,undef,$dest,$mi,$ma||-1)
-    
+        $entry = \@: $type,$orig,undef,$dest,$mi,$ma||-1
 
     # Process all names. First is canonical, the rest are aliases.
     my $dups = ''
@@ -817,9 +812,8 @@ sub ParseOptionSpec($opt, $opctl)
     if ( $dups && $^WARNING )
         foreach ( split(m/\n+/, $dups) )
             warn($_."\n")
-        
     
-    return (@: @names[0], $orig)
+    return @: @names[0], $orig
 
 
 # Option lookup.
@@ -937,7 +931,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl)
         
         warn ("Unknown option: " . $opt . "\n")
         $error++
-        return  (@: 1, undef)
+        return  @: 1, undef
     
     # Apparently valid.
     $opt = $tryopt
@@ -964,17 +958,15 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl)
             $arg = 0            # supply explicit value
         
         unshift ($argv->@, $starter.$rest) if defined $rest
-        return  (@: 1, $opt, $ctl, $arg)
-    
+        return  @: 1, $opt, $ctl, $arg
 
     # Get mandatory status and type info.
     my $mand = $ctl->[CTL_AMIN]
 
     # Check if there is an option argument available.
     if ( $gnu_compat && defined $optarg && $optarg eq '' )
-        return  (@: 1, $opt, $ctl, $type eq 's' ?? '' !! 0) #unless $mand;
+        return  @: 1, $opt, $ctl, $type eq 's' ?? '' !! 0 #unless $mand;
         $optarg = 0 unless $type eq 's'
-    
 
     # Check if there is an option argument available.
     if ( defined $optarg
@@ -993,11 +985,10 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl)
             my @c = $ctl->@
             @c[CTL_TYPE] = '+'
             return  @: 1, $opt, \@c, 1
-        
-        return  (@: 1, $opt, $ctl
-                    defined($ctl->[CTL_DEFAULT]) ?? $ctl->[CTL_DEFAULT] !!
-                        $type eq 's' ?? '' !! 0)
-    
+
+        return  @: 1, $opt, $ctl
+                   defined($ctl->[CTL_DEFAULT]) ?? $ctl->[CTL_DEFAULT] !!
+                       $type eq 's' ?? '' !! 0
 
     # Get (possibly optional) argument.
     $arg = (defined $rest ?? $rest
@@ -1015,9 +1006,7 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl)
             $error++
             # Push back.
             unshift ($argv->@, $starter.$rest) if defined $rest
-            return  (@: 1, undef)
-        
-    
+            return  @: 1, undef
 
     #### Check if the argument is valid for this option ####
 
@@ -1081,8 +1070,8 @@ sub FindOption($argv, $prefix, $argend, $opt, $opctl)
                     # Fake incremental type.
                     my @c = $ctl->@
                     @c[CTL_TYPE] = '+'
-                    return  (@: 1, $opt, \@c, 1)
-                
+                    return  @: 1, $opt, \@c, 1
+
                 # Supply default value.
                 $arg = defined($ctl->[CTL_DEFAULT]) ?? $ctl->[CTL_DEFAULT] !! 0
             
@@ -1327,8 +1316,7 @@ sub setup_pa_args($tag, @args)
     elsif ( $pa =~ m/^-?\d+$/ )
         $pa = \%:  "-exitval" => $pa 
     else
-        $pa = \(%:  "-message" => $pa )
-    
+        $pa = \%:  "-message" => $pa 
 
     # These are _our_ defaults.
     $pa->{+verbose} = 0 unless exists($pa->{"-verbose"})

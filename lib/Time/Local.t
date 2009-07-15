@@ -39,21 +39,20 @@ my @bad_time =
     
 
 my @neg_time =
-    (@: 
+    @: 
      # test negative epochs for systems that handle it
      \(@:  1969, 12, 31, 16, 59, 59 )
      \(@:  1950, 04, 12, 9, 30, 31 )
-    )
+    
 
 # Leap year tests
 my @years =
-    (@: 
+    @: 
      \(@:  1900 => 0 )
      \(@:  1947 => 0 )
      \(@:  1996 => 1 )
      \(@:  2000 => 1 )
      \(@:  2100 => 0 )
-    )
 
 # Use 3 days before the start of the epoch because with Borland on
 # Win32 it will work for -3600 _if_ your time zone is +01:00 (or

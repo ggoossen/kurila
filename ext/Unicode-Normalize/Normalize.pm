@@ -22,12 +22,11 @@ our @EXPORT_OK = qw(
     FCD checkFCD FCC checkFCC composeContiguous
     splitOnLastStarter
 )
-our %EXPORT_TAGS = (%: 
+our %EXPORT_TAGS = %: 
     all       => @EXPORT +@+ @EXPORT_OK
     normalize => @EXPORT +@+ qw/normalize decompose reorder compose/
     check     => qw/checkNFD checkNFKD checkNFC checkNFKC check/
     fast      => qw/FCD checkFCD FCC checkFCC composeContiguous/
-    )
 
 ######
 
@@ -44,8 +43,7 @@ sub pack_U
 
 
 sub unpack_U
-    return (@:  unpack('U*', shift(@_).pack('U*')) )
-
+    return @:  unpack('U*', shift(@_).pack('U*')) 
 
 
 ##

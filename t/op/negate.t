@@ -8,7 +8,7 @@ plan tests => 14
 
 # Some of these will cause warnings if left on.  Here we're checking the
 # functionality, not the warnings.
-no warnings "numeric";
+no warnings "numeric"
 
 # test cases based on [perl #36675] -'-10' eq '+10'
 is(- 10, -10, "Simple numeric negation to negative")

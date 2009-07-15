@@ -108,11 +108,10 @@ sub new
     
     my $perl5lib = defined env::var('PERL5LIB') ?? env::var('PERL5LIB') !! ""
 
-    my @dirs = (@:  $self->{':private:'}{Config}{?archlibexp}
-                    $self->{':private:'}{Config}{?sitearchexp}
-                    < split(m/\Q$(config_value("path_sep"))\E/, $perl5lib)
-                    < $self->{':private:'}{?EXTRA}
-        )
+    my @dirs = @:  $self->{':private:'}{Config}{?archlibexp}
+                   $self->{':private:'}{Config}{?sitearchexp}
+                   < split(m/\Q$(config_value("path_sep"))\E/, $perl5lib)
+                   < $self->{':private:'}{?EXTRA}
 
     # File::Find does not know how to deal with VMS filepaths.
     if( $Is_VMS )

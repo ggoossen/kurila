@@ -212,14 +212,14 @@ ok ref($bar2->{b}->[1]) eq 'Foo'
 # at retrieve time.
 #
 
-package CLASS_1;
+package CLASS_1
 
 sub make
     my $self = bless \$%, shift
     return $self
 
 
-package CLASS_2;
+package CLASS_2
 
 sub make($class, $o)
     my $self = bless \$%, $class
@@ -244,7 +244,7 @@ sub STORABLE_thaw($self, $clonning, $frozen, $c1, $c3, $o)
     $self->{+c3} = $c3
 
 
-package CLASS_OTHER;
+package CLASS_OTHER
 
 sub make
     my $self = bless \$%, shift
@@ -257,7 +257,7 @@ sub set_c2 { @_[0]->{+c2} = @_[1] }
 # Is the reference count of the extra references returned from a
 # STORABLE_freeze hook correct? [ID 20020601.005]
 #
-package Foo2;
+package Foo2
 
 sub new
     my $self = bless \$%, @_[0]
@@ -270,7 +270,7 @@ sub DESTROY
     $main::refcount_ok = 1 unless dump::view($self) eq $self->{?freezed}
 
 
-package Foo3;
+package Foo3
 
 sub new
     bless \$%, @_[0]

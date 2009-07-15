@@ -112,7 +112,7 @@ ok 1
 
 my $curr_test = $TB->current_test
 use constant CSCALAR    => \"ok 37\n"
-use constant CHASH      => \(%:  foo => "ok 38\n" )
+use constant CHASH      => \%:  foo => "ok 38\n" 
 use constant CARRAY     => \(@:  undef, "ok 39\n" )
 use constant CCODE      => sub (@< @_) { "ok @_[0]\n" }
 
@@ -129,7 +129,7 @@ like($^EVAL_ERROR->{?description}, qr/^Expected a HASH reference but got a CODE 
 
 
 # Allow leading underscore
-use constant _PRIVATE => 47;
+use constant _PRIVATE => 47
 is _PRIVATE, 47
 
 # Disallow doubled leading underscore
@@ -188,7 +188,7 @@ eval q{
 }
 
 my @Expected_Warnings =
-    (@: 
+    @: 
    qr/^Constant name 'BEGIN' is a Perl keyword/
    qr/^Constant name 'INIT' is a Perl keyword/
    qr/^Constant name 'CHECK' is a Perl keyword/
@@ -203,7 +203,6 @@ my @Expected_Warnings =
    qr/^Constant name 'ENV' is forced into package main::/
    qr/^Constant name 'INC' is forced into package main::/
    qr/^Constant name 'SIG' is forced into package main::/
-    )
 
 # when run under "make test"
 if (0+nelems @warnings == 0+nelems @Expected_Warnings)
@@ -228,13 +227,12 @@ for my $idx (0..((nelems @warnings)-1))
 @warnings = $@
 
 
-use constant \(%: 
+use constant \%: 
     THREE  => 3
     FAMILY => \ qw( John Jane Sally )
     AGES   => \(%:  John => 33, Jane => 28, Sally => 3 )
     RFAM   => \(@:  \ qw( John Jane Sally ) )
     SPIT   => sub (@< @_) { shift }
-    )
 
 is nelems($:FAMILY->@), THREE
 is nelems($:FAMILY->@), nelems RFAM->[0]->@

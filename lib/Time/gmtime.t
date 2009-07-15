@@ -16,7 +16,7 @@ BEGIN
 our @gmtime
 
 BEGIN 
-    @gmtime = (@:  gmtime 0 ) # This is the function gmtime.
+    @gmtime = @:  gmtime 0  # This is the function gmtime.
     unless (nelems @gmtime) { print $^STDOUT, "1..0 # Skip: gmtime failed\n"; exit 0 }
 
 

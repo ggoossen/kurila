@@ -256,7 +256,7 @@ sub run_tests
     # default value for $reg_infty from Config.pm, but have not.
 
     undef $^EVAL_ERROR
-    ok( eval q(@('aaa' =~ m/(a{1,$reg_infty_m})/)[0] eq 'aaa') ); die if $^EVAL_ERROR
+    ok( eval q((@: 'aaa' =~ m/(a{1,$reg_infty_m})/)[0] eq 'aaa') ); die if $^EVAL_ERROR
 
     undef $^EVAL_ERROR
     ok( not eval q(('a' x $reg_infty_m) !~ m/a{$reg_infty_m}/) ); die if $^EVAL_ERROR
@@ -363,7 +363,7 @@ sub run_tests
 
     ok( "$(join ' ',@ans)" eq $expect )
 
-    @ans = (@: 'a/b' =~ m%(.*/)?(.*)%)	# Stack may be bad
+    @ans = @: 'a/b' =~ m%(.*/)?(.*)%	# Stack may be bad
     ok( "$(join ' ',@ans)" eq 'a/ b' )
 
     my $code = '{$blah = 45}'
@@ -1034,7 +1034,7 @@ sub run_tests
             'm/(.*?)\{(.*?)\}/cg'
             'm/(.*?)\{(.*?)\}/sg'
             'm/(.*?)\{(.*?)\}/g'
-            'm/(.+?)\{(.+?)\}/csg',
+            'm/(.+?)\{(.+?)\}/csg'
             )
             my($input, $i)
 
@@ -1838,7 +1838,7 @@ EOT
         my $c = "\x{100}"
         my $subst
         for my $re (@: 
-            "xx.*$c", "x.*$c$c", "$c.*xx", "$c$c.*x", "xx.*(?=$c)", "(?=$c).*xx",
+            "xx.*$c", "x.*$c$c", "$c.*xx", "$c$c.*x", "xx.*(?=$c)", "(?=$c).*xx"
             )
             ok( not "xxx" =~ m/$re/ )
             ok( not( ($subst = "xxx") =~ s/$re// ))
@@ -2927,7 +2927,7 @@ EOFTEST
     do
         # From Message-ID: <877ixs6oa6.fsf@k75.linux.bogus>
         my $dow_name= "nada"
-        my $parser = "use utf8; \@(\$dow_name) = \@: \$time_string =~ m/(D\x{e9}\\ C\x{e9}adaoin|D\x{e9}\\ Sathairn|\\w+|\x{100})/"
+        my $parser = "use utf8; \@: \$dow_name = \@: \$time_string =~ m/(D\x{e9}\\ C\x{e9}adaoin|D\x{e9}\\ Sathairn|\\w+|\x{100})/"
         my $time_string = "D\x{e9} C\x{e9}adaoin"
         eval $parser; die if $^EVAL_ERROR
         ok(!$^EVAL_ERROR,"Test Eval worked")
@@ -3021,7 +3021,7 @@ EOFTEST
                        qw|[abc] abc def|
                        qw|[^abc] def abc|
                        qw|[[:word:]] abc #@!|
-                       qw|[[:^word:]] #@! abc|,
+                       qw|[[:^word:]] #@! abc|
             )
             my $m = shift $p
             my (@: $s, $f) =  map { \split m/ */ }, $p

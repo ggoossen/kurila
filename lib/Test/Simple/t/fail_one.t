@@ -17,7 +17,7 @@ local env::var('HARNESS_ACTIVE' ) = 0
 
 
 # Can't use Test.pm, that's a 5.005 thing.
-package My::Test;
+package My::Test
 
 print $^STDOUT, "1..2\n"
 
@@ -36,7 +36,7 @@ sub ok($test, ?$name)
 
 
 
-package main;
+package main
 
 require Test::Simple
 Test::Simple->import(tests => 1)

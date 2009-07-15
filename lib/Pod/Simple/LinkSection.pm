@@ -28,18 +28,16 @@ sub new($class, @< @_)
             Carp::croak( "$class new() doesn't know to clone $new" )
         
     else # misc stuff
-        $new = \(@:  '', \$%, < @_ )
-    
+        $new = \@:  '', \$%, < @_ 
 
     # By now it's a treelet:  [ 'foo', {}, ... ]
     foreach my $x ( $new->@)
         if(ref($x || '') eq 'ARRAY')
             $x = $class->new($x) # recurse
         elsif(ref($x || '') eq 'HASH')
-            $x = \(%:  < $x->% )
-        
+            $x = \%:  < $x->% 
+
     # otherwise leave it.
-    
 
     return bless $new, $class
 

@@ -152,7 +152,7 @@ is( main::Foo->boogie(), "yes, sir!")
 
 # [ID 20020305.025] PACKAGE::SUPER doesn't work anymore
 
-package main;
+package main
 our @X
 package Amajor
 sub test

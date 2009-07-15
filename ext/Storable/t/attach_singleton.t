@@ -24,7 +24,7 @@ is( $object, $object2, 'Class is a singleton' )
 ############
 # Main Tests
 
-my $struct = \(@:  1, $object, 3 )
+my $struct = \@:  1, $object, 3 
 
 # Freeze the struct
 my $frozen = Storable::freeze( $struct )
@@ -46,7 +46,7 @@ is_deeply( $struct, $thawed, 'Empiric testing corfirms correct behaviour' )
 # End Tests
 ###########
 
-package My::Singleton;
+package My::Singleton
 
 my $SINGLETON = undef
 

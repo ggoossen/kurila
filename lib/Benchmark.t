@@ -225,8 +225,8 @@ like ($got, qr/\bBar\b.*\bBaz\b.*\bFoo\b/s, 'check output is in sorted order')
 like ($got, $Default_Pattern, 'should find default format somewhere')
 
 
-my $code_to_test =  \(%:  Foo => sub (@< @_) {$foo+=fib($ballast-2)}
-                          Bar => sub (@< @_) {$bar+=fib($ballast)})
+my $code_to_test =  \%:  Foo => sub (@< @_) {$foo+=fib($ballast-2)}
+                         Bar => sub (@< @_) {$bar+=fib($ballast)}
 # Keep these for later.
 my $results
 do
@@ -517,21 +517,18 @@ do   # Check usage error messages
 
     my %cmpthese = %: 'forgot {}' => 'cmpthese( 42, foo => sub { 1 } )'
                       'not result' => 'cmpthese(42)'
-                      'array ref'  => 'cmpthese( 42, \@( foo => sub { 1 } ) )'
+                      'array ref'  => 'cmpthese( 42, \@: foo => sub { 1 } )'
         
     while( my(@: ?$name, ?$code) =(@:  each %cmpthese) )
         eval $code
         is( $^EVAL_ERROR->{?description}, %usage{?cmpthese}, "cmpthese usage: $name" )
-    
 
     my %timethese = %: 'forgot {}'  => 'timethese( 42, foo => sub { 1 } )'
-                       'array ref'  => 'timethese( 42, \@( foo => sub { 1 } ) )'
-        
+                       'array ref'  => 'timethese( 42, \@: foo => sub { 1 } )'
 
     while( my(@: ?$name, ?$code) =(@:  each %timethese) )
         eval $code
         is( $^EVAL_ERROR->{?description}, %usage{?timethese}, "timethese usage: $name" )
-    
 
 
     foreach my $func ( @takes_no_args)

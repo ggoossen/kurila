@@ -135,8 +135,7 @@ sub validate($self, ?$remove)
         if (! -e $key)
             push(@missing, $key)
             delete($self->{data}{$key}) if ($remove)
-        
-    
+
     return @: @missing
 
 

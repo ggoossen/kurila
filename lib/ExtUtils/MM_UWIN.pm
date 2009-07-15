@@ -33,7 +33,7 @@ In addition to being Unix, we're U/WIN.
 =cut
 
 sub os_flavor
-    return (@: 'Unix', 'U/WIN')
+    return @: 'Unix', 'U/WIN'
 
 
 

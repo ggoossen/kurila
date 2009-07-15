@@ -1,9 +1,9 @@
 #!./perl
 
-BEGIN 
+BEGIN
     require './test.pl'
 
-plan tests => 18
+plan tests => 20
 
 our ($x, $y)
 
@@ -40,7 +40,7 @@ do
     do
         local $x = "new"
     local $y = "new"
-
+    
 is($x, "old")
 is($y, "old")
 
@@ -50,7 +50,7 @@ do
     local $y = "new"
     do
         local $x = "new"
-
+    
 is($x, "old")
 is($y, "old")
 
@@ -61,15 +61,26 @@ $x = @: "aap"
 is(join("*", $x), q[aap*noot])
 
 # empty @:
-$x = $@
+$x = @:
+is(join("*", $x), q[])
+
+# empty @: with pod
+$x = @:
+=pod
+=cut
 is(join("*", $x), q[])
 
 # @: terminated by an "and"
-$x = $@or
+$x = @: 'aap' and
     $y = 1
 
-is(join("*", $x), q[])
+is(join("*", $x), q[aap])
 is($y, 1)
+
+# @(:
+$x = @(: 'aap',
+'noot' )
+is( join("*", $x), "aap*noot")
 
 # s/// seperared by statement end
 eval_dies_like(<<'EOE', qr/statement end found where string delimeter expected/)

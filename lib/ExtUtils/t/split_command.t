@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't' if -d 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -11,16 +11,16 @@ BEGIN
 
 chdir 't'
 
-use ExtUtils::MM;
-use MakeMaker::Test::Utils;
+use ExtUtils::MM
+use MakeMaker::Test::Utils
 
 my $Is_VMS   = $^OS_NAME eq 'VMS'
 my $Is_Win32 = $^OS_NAME eq 'MSWin32'
 
-use Test::More tests => 7;
+use Test::More tests => 7
 
 my $perl = which_perl
-my $mm = bless \%( NAME => "Foo" ), "MM"
+my $mm = bless \(%:  NAME => "Foo" ), "MM"
 
 # I don't expect anything to have a length shorter than 256 chars.
 cmp_ok( $mm->max_exec_len, '+>=', 256,   'max_exec_len' )
@@ -39,7 +39,7 @@ my @results = _run(< @cmds)
 is( join('', @results), join('', @test_args))
 
 
-my %test_args = %( foo => 42, bar => 23, car => 'har' )
+my %test_args = %:  foo => 42, bar => 23, car => 'har' 
 my $even_args = $mm->oneliner(q{print $^STDOUT, !((nelems @ARGV) % 2)})
 @cmds = $mm->split_command($even_args, < %test_args)
 isnt( (nelems @cmds), 0 )

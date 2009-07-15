@@ -87,7 +87,7 @@ my $updir = 'File::Spec'->updir
 
 *utf8::PropertyAlias = *utf8::PropertyAlias # thwart a warning
 
-no warnings 'utf8'; # we do not want warnings about surrogates etc
+no warnings 'utf8' # we do not want warnings about surrogates etc
 
 sub char_range
     my (@: $h1, $h2) = @_

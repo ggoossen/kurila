@@ -70,11 +70,11 @@ print $^STDOUT, "not " unless $cloned->{''}[0] \== \$cloned->{+a}
 print $^STDOUT, "ok 9\n"
 
 # [ID 20020221.007] SEGV in Storable with empty string scalar object
-package TestString;
+package TestString
 sub new($type, $string)
     return bless(\$string, $type)
 
-package main;
+package main
 my $empty_string_obj = TestString->new('')
 my $clone = dclone($empty_string_obj)
 # If still here after the dclone the fix (#17543) worked.

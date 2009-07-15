@@ -43,7 +43,7 @@ if( $File::Fetch::DEBUG )
 
 ### _parse_uri tests
 ### these go on all platforms
-my @map = (@: 
+my @map = @: 
     \ %:    uri     => 'ftp://cpan.org/pub/mirror/index.txt'
             scheme  => 'ftp'
             host    => 'cpan.org'
@@ -63,7 +63,6 @@ my @map = (@:
     ### only test host part, the rest is OS dependant
     \ %:    uri     => 'file://localhost/tmp/index.txt'
             host    => ''                  # host should be empty on 'file://'
-  )
 
 ### these only if we're not on win32/vms
 push @map, (

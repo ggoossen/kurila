@@ -7,7 +7,7 @@ BEGIN
 our $TODO
 
 # supress VMS whinging about bad execs.
-use vmsish qw(hushed);
+use vmsish qw(hushed)
 
 $^OUTPUT_AUTOFLUSH = 1				# flush stdout
 

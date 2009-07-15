@@ -13,7 +13,7 @@ BEGIN
 our @netent
 
 BEGIN 
-    @netent = (@:  getnetbyname "loopback" ) # This is the function getnetbyname.
+    @netent = @:  getnetbyname "loopback"  # This is the function getnetbyname.
     unless (nelems @netent) { print $^STDOUT, "1..0 # Skip: no loopback net\n"; exit 0 }
 
 

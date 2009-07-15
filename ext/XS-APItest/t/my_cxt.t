@@ -4,12 +4,12 @@
 # DAPM Dec 2005
 
 my $threads
-use TestInit;
-use Config;
+use TestInit
+use Config
 
-use warnings;
+use warnings
 
-use Test::More tests => 16;
+use Test::More tests => 16
 
 BEGIN 
     use_ok('XS::APItest')

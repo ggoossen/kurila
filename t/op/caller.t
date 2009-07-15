@@ -124,7 +124,7 @@ do
 # fixed.
 
 my $debugger_test =  q<
-    my @stackinfo = @(caller(0));
+    my @stackinfo = @: caller(0);
     return nelems @stackinfo;
 >
 

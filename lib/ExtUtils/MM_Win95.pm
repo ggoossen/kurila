@@ -100,9 +100,7 @@ Win95 and Win98 and WinME are collectively Win9x and Win32
 
 sub os_flavor
     my $self = shift
-    return  (@: $self->SUPER::os_flavor, 'Win9x')
-
-
+    return  @: $self->SUPER::os_flavor, 'Win9x'
 
 =back
 

@@ -326,7 +326,7 @@ package Term::ReadLine::TermCap
 
 # Prompt-start, prompt-end, command-line-start, command-line-end
 #     -- zero-width beautifies to emit around prompt and the command line.
-our @rl_term_set = (@: "","","","")
+our @rl_term_set = @: "","","",""
 # string encoded:
 our $rl_term_set = ',,,'
 

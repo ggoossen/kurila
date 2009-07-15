@@ -36,12 +36,11 @@ my $tmp_base = catdir(
     )
 
 # invent some names
-my @dir = (@: 
+my @dir = @: 
     catdir($tmp_base, < qw(a b))
     catdir($tmp_base, < qw(a c))
     catdir($tmp_base, < qw(z b))
     catdir($tmp_base, < qw(z c))
-    )
 
 # create them
 my @created = mkpath(< @dir)

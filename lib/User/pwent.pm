@@ -42,8 +42,8 @@ sub import
     return Exporter::import(< @_)
 
 
-use Class::Struct < qw(struct);
-struct 'User::pwent' => \(@: 
+use Class::Struct < qw(struct)
+struct 'User::pwent' => \@: 
        name    => '$'         # pwent[0]
        passwd  => '$'         # pwent[1]
        uid     => '$'         # pwent[2]
@@ -67,7 +67,7 @@ struct 'User::pwent' => \(@:
        # you might not have this one
        expire  => '$'         # pwent[9]
 
-       )
+       
 
 
 # init our groks hash to be true if the built platform knew how

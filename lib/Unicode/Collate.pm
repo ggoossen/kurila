@@ -13,9 +13,9 @@ my @Path = qw(Unicode Collate)
 my $KeyFile = "allkeys.txt"
 
 # Perl's boolean
-use constant TRUE  => 1;
-use constant FALSE => "";
-use constant NOMATCHPOS => -1;
+use constant TRUE  => 1
+use constant FALSE => ""
+use constant NOMATCHPOS => -1
 
 # A coderef to get combining class imported from Unicode::Normalize
 # (i.e. \&Unicode::Normalize::getCombinClass).
@@ -23,30 +23,30 @@ use constant NOMATCHPOS => -1;
 my $CVgetCombinClass
 
 # Supported Levels
-use constant MinLevel => 1;
-use constant MaxLevel => 4;
+use constant MinLevel => 1
+use constant MaxLevel => 4
 
 # Minimum weights at level 2 and 3, respectively
-use constant Min2Wt => 0x20;
-use constant Min3Wt => 0x02;
+use constant Min2Wt => 0x20
+use constant Min3Wt => 0x02
 
 # Shifted weight at 4th level
-use constant Shift4Wt => 0xFFFF;
+use constant Shift4Wt => 0xFFFF
 
 # A boolean for Variable and 16-bit weights at 4 levels of Collation Element
 # PROBLEM: The Default Unicode Collation Element Table
 # has weights over 0xFFFF at the 4th level.
 # The tie-breaking in the variable weights
 # other than "shift" (as well as "shift-trimmed") is unreliable.
-use constant VCE_TEMPLATE => 'Cn4';
+use constant VCE_TEMPLATE => 'Cn4'
 
 # A sort key: 16-bit weights
 # See also the PROBLEM on VCE_TEMPLATE above.
-use constant KEY_TEMPLATE => 'n*';
+use constant KEY_TEMPLATE => 'n*'
 
 # Level separator in a sort key:
 # i.e. pack(KEY_TEMPLATE, 0)
-use constant LEVEL_SEP => "\0\0";
+use constant LEVEL_SEP => "\0\0"
 
 # As Unicode code point separator for hash keys.
 # A joined code point string (denoted by JCPS below)
@@ -56,36 +56,36 @@ use constant LEVEL_SEP => "\0\0";
 # on EBCDIC platform.
 # This character must not be included in any stringified
 # representation of an integer.
-use constant CODE_SEP => ';';
+use constant CODE_SEP => ';'
 
 # boolean values of variable weights
-use constant NON_VAR => 0; # Non-Variable character
-use constant VAR     => 1; # Variable character
+use constant NON_VAR => 0 # Non-Variable character
+use constant VAR     => 1 # Variable character
 
 # specific code points
-use constant Hangul_LBase  => 0x1100;
-use constant Hangul_LIni   => 0x1100;
-use constant Hangul_LFin   => 0x1159;
-use constant Hangul_LFill  => 0x115F;
-use constant Hangul_VBase  => 0x1161;
-use constant Hangul_VIni   => 0x1160; # from Vowel Filler
-use constant Hangul_VFin   => 0x11A2;
-use constant Hangul_TBase  => 0x11A7; # from "no-final" codepoint
-use constant Hangul_TIni   => 0x11A8;
-use constant Hangul_TFin   => 0x11F9;
-use constant Hangul_TCount => 28;
-use constant Hangul_NCount => 588;
-use constant Hangul_SBase  => 0xAC00;
-use constant Hangul_SIni   => 0xAC00;
-use constant Hangul_SFin   => 0xD7A3;
-use constant CJK_UidIni    => 0x4E00;
-use constant CJK_UidFin    => 0x9FA5;
-use constant CJK_UidF41    => 0x9FBB;
-use constant CJK_ExtAIni   => 0x3400;
-use constant CJK_ExtAFin   => 0x4DB5;
-use constant CJK_ExtBIni   => 0x20000;
-use constant CJK_ExtBFin   => 0x2A6D6;
-use constant BMP_Max       => 0xFFFF;
+use constant Hangul_LBase  => 0x1100
+use constant Hangul_LIni   => 0x1100
+use constant Hangul_LFin   => 0x1159
+use constant Hangul_LFill  => 0x115F
+use constant Hangul_VBase  => 0x1161
+use constant Hangul_VIni   => 0x1160 # from Vowel Filler
+use constant Hangul_VFin   => 0x11A2
+use constant Hangul_TBase  => 0x11A7 # from "no-final" codepoint
+use constant Hangul_TIni   => 0x11A8
+use constant Hangul_TFin   => 0x11F9
+use constant Hangul_TCount => 28
+use constant Hangul_NCount => 588
+use constant Hangul_SBase  => 0xAC00
+use constant Hangul_SIni   => 0xAC00
+use constant Hangul_SFin   => 0xD7A3
+use constant CJK_UidIni    => 0x4E00
+use constant CJK_UidFin    => 0x9FA5
+use constant CJK_UidF41    => 0x9FBB
+use constant CJK_ExtAIni   => 0x3400
+use constant CJK_ExtAFin   => 0x4DB5
+use constant CJK_ExtBIni   => 0x20000
+use constant CJK_ExtBFin   => 0x2A6D6
+use constant BMP_Max       => 0xFFFF
 
 # Logical_Order_Exception in PropList.txt
 my $DefaultRearrange = \@:  < 0x0E40..0x0E44, < 0x0EC0..0x0EC4 
@@ -101,7 +101,7 @@ sub pack_U
 
 
 sub unpack_U
-    return (@:  unpack('U*', shift(@_).pack('U*') ) )
+    return @:  unpack('U*', shift(@_).pack('U*') ) 
 
 
 ######
@@ -584,7 +584,7 @@ sub getWt
                         @decH = @: $contract
                     else
                         $contract = join(CODE_SEP, @decH[[(@: 0,1)]])
-                        $map{?$contract} and @decH = (@: $contract, @decH[2])
+                        $map{?$contract} and @decH = @: $contract, @decH[2]
 
                 # even if V's ignorable, LT contraction is not supported.
                 # If such a situatution were required, NFD should be used.
@@ -601,11 +601,10 @@ sub getWt
     elsif (_isUIdeo($u, $self->{?UCA_Version}))
         my $cjk  = $self->{?overrideCJK}
         return map { _varCE($vbl, $_) },
-                @: $cjk
-                       ?? < map( {pack(VCE_TEMPLATE, NON_VAR, < $_->@) }, &$cjk($u))
+                  $cjk ?? map( {pack(VCE_TEMPLATE, NON_VAR, < $_->@) }, $cjk->($u))
                        !! defined $cjk && $self->{?UCA_Version} +<= 8 && $u +< 0x10000
-                       ?? _uideoCE_8($u)
-                       !! < $der->($u)
+                       ?? @: _uideoCE_8($u)
+                       !! $der->($u)
     else
         return map { _varCE($vbl, $_) }, $der->($u)
     
@@ -657,7 +656,7 @@ sub getSortKey
     foreach my $vwt ( @buf)
         my(@: $var, @< @wt) = @: unpack(VCE_TEMPLATE, $vwt)
 
-        # "Ignorable (L1, L2) after Variable" since track. v. 9
+                               # "Ignorable (L1, L2) after Variable" since track. v. 9
         if ($v2i)
             if ($var)
                 $last_is_variable = TRUE
@@ -903,15 +902,11 @@ sub index($self, $str, $substr, ?$pos, ?$grob)
                 $to_be_pushed = FALSE if $last_is_variable
             else
                 $last_is_variable = FALSE
-            
-        
 
         if ((nelems @subWt) && !$var && !@wt[0])
             push  @subWt[-1]->@, \@wt if $to_be_pushed
         else
-            push @subWt, \@:  \@wt 
-        
-    
+            push @subWt, \@:  \@wt
 
     my $count = 0
     my $end = (nelems $strE->@) - 1

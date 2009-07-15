@@ -36,7 +36,7 @@ foreach my $file (@:
   "junk2.pod"
   "perlcyg.pod"
   "perlfaq.pod"
-  "perlvar.pod",
+  "perlvar.pod"
     )
 
     unless(-e source_path($file))

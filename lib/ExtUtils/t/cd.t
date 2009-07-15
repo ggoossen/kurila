@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib/')
+        $^INCLUDE_PATH = @: '../lib', 'lib/'
     else
         unshift $^INCLUDE_PATH, 't/lib/'
     
@@ -12,11 +12,11 @@ chdir 't'
 
 my $Is_VMS = $^OS_NAME eq 'VMS'
 
-use File::Spec;
+use File::Spec
 
-use Test::More tests => 4;
+use Test::More tests => 4
 
-my @cd_args = @("some/dir", "command1", "command2")
+my @cd_args = @: "some/dir", "command1", "command2"
 
 do
     package Test::MM_Win32
@@ -28,7 +28,7 @@ do
     do
         local *make = sub (@< @_) { "nmake" }
 
-        my @dirs = @(File::Spec->updir) x 2 
+        my @dirs = (@: File::Spec->updir) x 2 
         my $expected_updir = File::Spec->catdir(< @dirs)
 
         main::is $mm->cd(< @cd_args),

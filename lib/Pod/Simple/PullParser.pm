@@ -204,7 +204,7 @@ sub get_token
     return shift $self->{'token_buffer'}->@ # that's an undef if empty
 
 
-use UNIVERSAL ();
+use UNIVERSAL ()
 sub unget_token
     my $self = shift
     DEBUG and print $^STDOUT, "Ungetting ", scalar(nelems @_), " tokens: ",

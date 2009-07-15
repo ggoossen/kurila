@@ -26,7 +26,7 @@ sub ok($test, ?$name)
 
 
 
-package main;
+package main
 require Test::More
 
 require Test::Simple::Catch

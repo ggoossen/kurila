@@ -30,7 +30,7 @@ sub Mkbootstrap($baseext, @< @bsloadlibs)
     if (-f "$($baseext)_BS")
         $_ = "$($baseext)_BS"
         package DynaLoader; # execute code as if in DynaLoader
-        local our (@: $osname, $dlsrc) = (@: undef, undef) # avoid warnings
+        local our (@: $osname, $dlsrc) = @: undef, undef # avoid warnings
         (@: $osname, $dlsrc) =  map { config_value($_) }, qw(osname dlsrc)
         our $bscode = ""
         unshift $^INCLUDE_PATH, "."

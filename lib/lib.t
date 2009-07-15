@@ -20,7 +20,7 @@ BEGIN
     # lib.pm is documented to only work with Unix filepaths.
     @lib_dir  =qw(stuff moo)
     $Lib_Dir  = join "/",@lib_dir
-    $Arch_Dir = join "/", (@:  <@lib_dir, config_value("archname"))
+    $Arch_Dir = join "/", @:  <@lib_dir, config_value("archname")
 
     # create the auto/ directory and a module
     $Auto_Dir = File::Spec->catdir(<@lib_dir, config_value("archname"),'auto')

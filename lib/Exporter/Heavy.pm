@@ -66,8 +66,7 @@ sub export($pkg, $callpkg, @< @imports)
                     @allexports = keys $export_cache->% unless (nelems @allexports) # only do keys once
                     @names = grep( {m/$patn/ }, @allexports) # not anchored by default
                 else
-                    @names = (@: $spec) # is a normal symbol name
-
+                    @names = @: $spec # is a normal symbol name
 
                 warn "Import ".($remove ?? "del"!!"add").": $(join ' ',@names) "
                     if $Exporter::Verbose
@@ -76,7 +75,6 @@ sub export($pkg, $callpkg, @< @imports)
                     foreach my $sym ( @names) { delete %imports{$sym} }
                 else
                     %imports{[@names]} = (@: 1) x nelems @names
-
 
             @imports = keys %imports
 

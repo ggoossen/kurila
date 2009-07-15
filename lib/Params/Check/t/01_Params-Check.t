@@ -9,8 +9,8 @@ $Params::Check::VERBOSE = $Params::Check::VERBOSE = @ARGV[?0] ?? 1 !! 0
 
 ### basic things first, allow function ###
 
-use constant FALSE  => sub (@< @_) { 0 };
-use constant TRUE   => sub (@< @_) { 1 };
+use constant FALSE  => sub (@< @_) { 0 }
+use constant TRUE   => sub (@< @_) { 1 }
 
 ### allow tests ###
 do {   ok( allow( 42, qr/^\d+$/ ), "Allow based on regex" );
@@ -39,9 +39,8 @@ do {   ok( allow( 42, qr/^\d+$/ ), "Allow based on regex" );
 }
 ### default tests ###
 do
-    my $tmpl =  \(%: 
+    my $tmpl =  \%: 
         foo => %:  default => 1 
-        )
 
     ### empty args first ###
     do {   my $args = check( $tmpl, \$% );

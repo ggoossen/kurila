@@ -201,8 +201,8 @@ for the setting and unsetting of parse-options.
 our (@ISA)
 
 #use diagnostics;
-use Pod::InputObjects;
-use Exporter;
+use Pod::InputObjects
+use Exporter
 @ISA = qw(Exporter)
 
 ## These "variables" are used as local "glob aliases" for performance
@@ -437,8 +437,8 @@ sub new
     my $class = ref($this) || $this
     ## Any remaining arguments are treated as initial values for the
     ## hash that is used to represent this object.
-    my %params = %( < @_ )
-    my $self = \%( < %params )
+    my %params = %:  < @_ 
+    my $self = \%:  < %params 
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class
     $self->initialize()
@@ -724,7 +724,7 @@ sub parse_text
     local $_ = ''
 
     ## Get options and set any defaults
-    my %opts = %( (ref @_[0]) ?? <  shift()->% !! () )
+    my %opts = %:  (ref @_[0]) ?? <  shift()->% !! () 
     my $expand_seq   = %opts{?'expand_seq'}   || undef
     my $expand_text  = %opts{?'expand_text'}  || undef
     my $expand_ptree = %opts{?'expand_ptree'} || undef
@@ -742,11 +742,9 @@ sub parse_text
         ## If 'interior_sequence' is the method to use, we have to pass
         ## more than just the sequence object, we also need to pass the
         ## sequence name and text.
-        $xseq_sub = sub (@< @_)
-            my @($self, $iseq) =  @_
+        $xseq_sub = sub ($self, $iseq)
             my $args = join("", $iseq->parse_tree->children)
             return  $self->interior_sequence( $iseq->name, $args, $iseq)
-        
     
     ref $xseq_sub    or  $xseq_sub   = sub (@< @_) { shift()->?$expand_seq(< @_) }
     ref $xtext_sub   or  $xtext_sub  = sub (@< @_) { shift()->?$expand_text(< @_) }
@@ -762,8 +760,8 @@ sub parse_text
     ## the only thing left on our stack and all we have to do is return it!
     ##
     my $seq       = Pod::ParseTree->new()
-    my @seq_stack = @($seq)
-    my @($ldelim, $rdelim) = @('', '')
+    my @seq_stack = @: $seq
+    my @: $ldelim, $rdelim = @: '', ''
 
     ## Iterate over all sequence starts text (NOTE: split with
     ## capturing parens keeps the delimiters)
@@ -775,7 +773,7 @@ sub parse_text
         if ( m/^([A-Z])(<(?:<+\s)?)$/ )
             ## Push a new sequence onto the stack of those "in-progress"
             my $ldelim_orig
-            @($cmd, $ldelim_orig) = @($1, $2)
+            @: $cmd, $ldelim_orig = @: $1, $2
             ($ldelim = $ldelim_orig) =~ s/\s+$//
             ($rdelim = $ldelim) =~ s/</>/g
             $seq = Pod::InteriorSequence->new(
@@ -787,16 +785,16 @@ sub parse_text
             push @seq_stack, $seq
         elsif ( (nelems @seq_stack) +> 1 )
             ## Make sure we match the right kind of closing delimiter
-            my @($seq_end, $post_seq) = @("", "")
+            my @: $seq_end, $post_seq = @: "", ""
             if ( ($ldelim eq '<'   and  m/\A(.*?)(>)/s)
                    or  m/\A(.*?)(\s+$rdelim)/s )
                 ## Found end-of-sequence, capture the interior and the
                 ## closing the delimiter, and put the rest back on the
                 ## token-list
                 $post_seq = substr($_, length($1) + length($2))
-                @($_, $seq_end) = @($1, $2)
+                @: $_, $seq_end = @: $1, $2
                 (length $post_seq)  and  unshift @tokens, $post_seq
-            
+
             if (length)
                 ## In the middle of a sequence, append this text to it, and
                 ## dont forget to "expand" it if that's what the caller wanted
@@ -834,7 +832,7 @@ sub parse_text
     ## Handle unterminated sequences
     my $errorsub = ((nelems @seq_stack) +> 1) ?? $self->errorsub() !! undef
     while ((nelems @seq_stack) +> 1)
-        @($cmd, $file, $line) = @( $seq->name, < $seq->file_line)
+        @: $cmd, $file, $line = @: $seq->name, < $seq->file_line
         $ldelim  = $seq->ldelim
         ($rdelim = $ldelim) =~ s/</>/g
         $rdelim  =~ s/^(\S+)(\s*)$/$2$1/
@@ -872,7 +870,7 @@ some alternate order, use B<parse_text> instead.
 =cut
 
 sub interpolate($self, $text, ?$line_num)
-    my %parse_opts = %( expand_seq => 'interior_sequence' )
+    my %parse_opts = %:  expand_seq => 'interior_sequence' 
     my $ptree = $self->parse_text( \%parse_opts, $text, $line_num )
     return  join "", $ptree->children()
 
@@ -897,7 +895,7 @@ dynamic lookup; Hence subclasses may I<not> override it!
 =cut
 
 sub parse_paragraph($self, $text, $line_num)
-    my %myOpts = $self->%{+_PARSEOPTS} || %()  ## get parse-options
+    my %myOpts = $self->%{+_PARSEOPTS} || %:   ## get parse-options
     local $_ = undef
 
     ## See if we want to preprocess nonPOD paragraphs as well as POD ones.
@@ -925,8 +923,7 @@ sub parse_paragraph($self, $text, $line_num)
 
     ## Ignore this block if it isnt in one of the selected sections
     if (exists $self->%{_SELECTED_SECTIONS})
-        $self->is_selected($text)  or  return  @($self->%{+_CUTTING} = 1)
-    
+        $self->is_selected($text)  or  return @: ($self->%{+_CUTTING} = 1)
 
     ## If we havent already, perform any desired preprocessing and
     ## then re-check the "cutting" state
@@ -937,7 +934,7 @@ sub parse_paragraph($self, $text, $line_num)
     
 
     ## Look for one of the three types of paragraphs
-    my @($pfx, $cmd, $arg, $sep) = @('', '', '', '')
+    my @: $pfx, $cmd, $arg, $sep = @: '', '', '', ''
     my $pod_para = undef
     if ($text =~ m/^(={1,2})(?=\S)/)
         ## Looks like a command paragraph. Capture the command prefix used
@@ -945,7 +942,7 @@ sub parse_paragraph($self, $text, $line_num)
         ## and whatever sequence of characters was used to separate them
         $pfx = $1
         $_ = substr($text, length $pfx)
-        @($cmd, $sep, $text) =  split m/(\s+)/, $_, 2
+        (@: $cmd, $sep, $text) =  split m/(\s+)/, $_, 2
         ## If this is a "cut" directive then we dont need to do anything
         ## except return to "cutting" mode.
         if ($cmd eq 'cut')
@@ -1018,10 +1015,10 @@ This method does I<not> usually need to be overridden by subclasses.
 
 sub parse_from_filehandle
     my $self = shift
-    my %opts = %( (ref @_[0] eq 'HASH') ?? <  shift()->% !! () )
-    my @($in_fh, ?$out_fh) =  @_
+    my %opts = %:  (ref @_[0] eq 'HASH') ?? <  shift()->% !! () 
+    my (@: $in_fh, ?$out_fh) =  @_
     $in_fh = $^STDIN  unless ($in_fh)
-    my %myOpts = $self->%{+_PARSEOPTS} || %()  ## get parse-options
+    my %myOpts = $self->%{+_PARSEOPTS} || %:   ## get parse-options
     local $_ = undef
 
     ## Put this stream at the top of the stack and do beginning-of-input
@@ -1030,8 +1027,8 @@ sub parse_from_filehandle
     (exists %opts{cutting})  and  $self->cutting( %opts{cutting} )
 
     ## Initialize line/paragraph
-    my @($textline, $paragraph) = @('', '')
-    my @($nlines, $plines) = @(0, 0)
+    my (@: $textline, $paragraph) = @: '', ''
+    my (@: $nlines, $plines) = @: 0, 0
 
     ## Use <$fh> instead of $fh->getline where possible (for speed)
     $_ = ref $in_fh
@@ -1129,10 +1126,10 @@ This method does I<not> usually need to be overridden by subclasses.
 
 sub parse_from_file
     my $self = shift
-    my %opts = %( (ref @_[0] eq 'HASH') ?? <  shift()->% !! () )
-    my @($infile, ?$outfile) =  @_
+    my %opts = %:  (ref @_[0] eq 'HASH') ?? <  shift()->% !! () 
+    my (@: $infile, ?$outfile) =  @_
     my ($in_fh,  $out_fh)
-    my @($close_input, $close_output) = @(0, 0)
+    my (@: $close_input, $close_output) = @: 0, 0
 
     ## Is $infile a filename or a (possibly implied) filehandle
     if (defined $infile && ref $infile)
@@ -1250,7 +1247,7 @@ is used to issue error messages (this is the default behavior).
 =cut
 
 sub errorsub
-    return ((nelems @_) +> 1) ??  @(@_[0]->{+_ERRORSUB} = @_[1]) !! @_[0]->{?_ERRORSUB}
+    return ((nelems @_) +> 1) ??  @: (@_[0]->{+_ERRORSUB} = @_[1]) !! @_[0]->{?_ERRORSUB}
 
 
 ##---------------------------------------------------------------------------
@@ -1271,7 +1268,7 @@ result.
 =cut
 
 sub cutting
-    return ((nelems @_) +> 1) ??  @(@_[0]->{+_CUTTING} = @_[1]) !! @_[0]->{?_CUTTING}
+    return ((nelems @_) +> 1) ??  @: (@_[0]->{+_CUTTING} = @_[1]) !! @_[0]->{?_CUTTING}
 
 
 ##---------------------------------------------------------------------------
@@ -1316,7 +1313,7 @@ parse-option currently recognized.
 
 sub parseopts
     my $self = shift
-    my %myOpts = $self->%{+_PARSEOPTS} || %()
+    my %myOpts = $self->%{+_PARSEOPTS} || %: 
     return %myOpts  if ((nelems @_) == 0)
     if ((nelems @_) == 1)
         my $_ = shift
@@ -1494,7 +1491,7 @@ sub _push_input_stream($self, $in_fh, $out_fh)
     unless (defined  $self->%{?_TOP_STREAM})
         $out_fh  = $^STDOUT  unless (defined $out_fh)
         $self->%{+_CUTTING}       = 1   ## current "cutting" state
-        $self->%{+_INPUT_STREAMS} = \@()  ## stack of all input streams
+        $self->%{+_INPUT_STREAMS} = \@:   ## stack of all input streams
     
 
     ## Initialize input indicators

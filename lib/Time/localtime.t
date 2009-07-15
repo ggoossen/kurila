@@ -15,7 +15,7 @@ BEGIN
 
 our @localtime
 BEGIN 
-    @localtime = (@:  localtime 0 ) # This is the function localtime.
+    @localtime = @:  localtime 0  # This is the function localtime.
     unless (nelems @localtime) { print $^STDOUT, "1..0 # Skip: localtime failed\n"; exit 0 }
 
 

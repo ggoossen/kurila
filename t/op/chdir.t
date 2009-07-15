@@ -12,7 +12,7 @@ my $has_fchdir = (config_value("d_fchdir") || "") eq "define"
 
 # Might be a little early in the testing process to start using these,
 # but I can't think of a way to write this test without them.
-use File::Spec::Functions < qw(:DEFAULT splitdir rel2abs splitpath);
+use File::Spec::Functions < qw(:DEFAULT splitdir rel2abs splitpath)
 
 # Can't use Cwd::abs_path() because it has different ideas about
 # path separators than File::Spec.

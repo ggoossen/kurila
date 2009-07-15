@@ -5,7 +5,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -13,17 +13,17 @@ BEGIN
 
 use Test::More tests => 10
 
-my $a1 = \@( 1, 2, 3 )
+my $a1 = \@:  1, 2, 3 
 push $a1->@, $a1
-my $a2 = \@( 1, 2, 3 )
+my $a2 = \@:  1, 2, 3 
 push $a2->@, $a2
 
 is_deeply $a1, $a2
 ok( eq_array ($a1, $a2) )
 
-my $h1 = \%( 1=>1, 2=>2, 3=>3 )
+my $h1 = \%:  1=>1, 2=>2, 3=>3 
 $h1->{+4} = $h1
-my $h2 = \%( 1=>1, 2=>2, 3=>3 )
+my $h2 = \%:  1=>1, 2=>2, 3=>3 
 $h2->{+4} = $h2
 
 is_deeply $h1, $h2
@@ -34,7 +34,7 @@ my ($r, $s)
 $r = \$r
 $s = \$s
 
-ok( eq_array (\@($s), \@($r)) )
+ok( eq_array (\(@: $s), \(@: $r)) )
 
 
 do
@@ -62,7 +62,7 @@ do
     my $b = \$%
     my $c = \$%
 
-    is_deeply( \@($a, $a), \@($b, $c) )
-    is_deeply( \%( foo => $a, bar => $a ), \%( foo => $b, bar => $c ) )
-    is_deeply( \@(\$a, \$a), \@(\$b, \$c) )
+    is_deeply( \(@: $a, $a), \(@: $b, $c) )
+    is_deeply( \(%:  foo => $a, bar => $a ), \(%:  foo => $b, bar => $c ) )
+    is_deeply( \(@: \$a, \$a), \(@: \$b, \$c) )
 

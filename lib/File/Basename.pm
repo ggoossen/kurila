@@ -152,7 +152,7 @@ sub fileparse($fullname, @< @suffices)
 
     # Ensure taint is propgated from the path to its pieces.
     $tail .= $taint
-    return (@: ($basename .= $taint), ($dirpath .= $taint), $tail)
+    return @: ($basename .= $taint), ($dirpath .= $taint), $tail
 
 
 

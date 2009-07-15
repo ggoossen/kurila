@@ -7,7 +7,7 @@ BEGIN
     chdir 't' if -d 't'
 
     if ( env::var('PERL_CORE') )
-        $^INCLUDE_PATH = @( '../lib' )
+        $^INCLUDE_PATH = @:  '../lib' 
     
 
 
@@ -16,13 +16,13 @@ END
     1 while unlink('tcout')
 
 
-use Test::More;
+use Test::More
 
 # these names are hardcoded in Term::Cap
 my $files = join '', grep { -f $_ },
-    @(	( $(env::var('HOME')) . '/.termcap', # we assume pretty UNIXy system anyway
-         '/etc/termcap',
-         '/usr/share/misc/termcap' ))
+    @:  $(env::var('HOME')) . '/.termcap' # we assume pretty UNIXy system anyway
+        '/etc/termcap'
+        '/usr/share/misc/termcap'
 unless( $files || $^OS_NAME eq 'VMS' )
     plan skip_all => 'no termcap available to test'
 else
@@ -61,10 +61,10 @@ SKIP: do
 
 
 # make a Term::Cap "object"
-my $t = \%(
-    PADDING => 1,
-    _pc => 'pc',
-    )
+my $t = \%: 
+    PADDING => 1
+    _pc => 'pc'
+    
 bless($t, 'Term::Cap' )
 
 # see if Tpad() works
@@ -136,7 +136,7 @@ SKIP: do
 
     # it shouldn't try to read one file more than 32(!) times
     # see __END__ for a really awful termcap example
-    env::var('TERMPATH' ) = join(' ', @( ('tcout') x 33))
+    env::var('TERMPATH' ) = join(' ', (@:  ('tcout') x 33))
     $vals->{+TERM} = 'bar'
     try { $t = Term::Cap->Tgetent($vals) }
     like( $^EVAL_ERROR->{?description}, qr/failed termcap loop/, 'Tgetent() should catch deep recursion')

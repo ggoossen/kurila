@@ -135,7 +135,7 @@ OS/2 is OS/2
 =cut
 
 sub os_flavor
-    return (@: 'OS/2')
+    return @: 'OS/2'
 
 
 =back

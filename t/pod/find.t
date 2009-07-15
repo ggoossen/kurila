@@ -13,15 +13,15 @@ BEGIN
 
 $^OUTPUT_AUTOFLUSH = 1
 
-use Test::More;
+use Test::More
 
 BEGIN 
     plan tests => 4
     use File::Spec
 
 
-use Pod::Find < qw(pod_find pod_where);
-use File::Spec;
+use Pod::Find < qw(pod_find pod_where)
+use File::Spec
 
 # load successful
 ok(1)
@@ -42,7 +42,7 @@ if ($^OS_NAME eq 'VMS')
 
 
 print $^STDOUT, "### searching $lib_dir\n"
-my %pods = %( < pod_find($lib_dir) )
+my %pods = %:  < pod_find($lib_dir) 
 my $result = join(',', sort values %pods)
 print $^STDOUT, "### found $result\n"
 my $compare = env::var('PERL_CORE') ??
@@ -80,7 +80,7 @@ else
 
 
 print $^STDOUT, "### searching for File::Find\n"
-$result = pod_where(\%( inc => 1, verbose => $VERBOSE ), 'File::Find')
+$result = pod_where(\(%:  inc => 1, verbose => $VERBOSE ), 'File::Find')
     || 'undef - pod not found!'
 print $^STDOUT, "### found $result\n"
 
@@ -101,9 +101,9 @@ else
 my $searchpod = 'Stuff'
 print $^STDOUT, "### searching for $searchpod.pod\n"
 $result = pod_where(
-  \%( dirs => \@( 'File::Spec'->catdir(
-                  env::var('PERL_CORE') ?? () !! < qw(t), 'pod', 'testpods', 'lib', 'Pod') ),
-  verbose => $VERBOSE ), $searchpod)
+  \(%:  dirs => \(@: 'File::Spec'->catdir(
+                        env::var('PERL_CORE') ?? () !! < qw(t), 'pod', 'testpods', 'lib', 'Pod') )
+        verbose => $VERBOSE ), $searchpod)
     || "undef - $searchpod.pod not found!"
 print $^STDOUT, "### found $result\n"
 
@@ -114,7 +114,7 @@ is(_canon($result),_canon($compare))
 
 # make the path as generic as possible
 sub _canon
-    my @($path) =  @_
+    my (@: $path) =  @_
     $path = 'File::Spec'->canonpath($path)
     my @comp = 'File::Spec'->splitpath($path)
     my @dir = 'File::Spec'->splitdir(@comp[1])

@@ -160,11 +160,11 @@ is( $obj1->{?b1},  28 )
 
 
 # Break multiple inheritance with a field name clash.
-package E1;
-use fields < qw(yo this _lah meep 42);
+package E1
+use fields < qw(yo this _lah meep 42)
 
-package E2;
-use fields < qw(_yo ahhh this);
+package E2
+use fields < qw(_yo ahhh this)
 
 try {
     package Broken;
@@ -179,15 +179,15 @@ main::like( $^EVAL_ERROR->{?description}, qr/Can't multiply inherit fields/i, 'A
 # Test that a package with no fields can inherit from a package with
 # fields, and that pseudohash messages don't show up
 
-package B9;
-use fields < qw(b1);
+package B9
+use fields < qw(b1)
 
 sub _mk_obj { fields::new(@_[0])->{?'b1'} };
 
-package D9;
-use base < qw(B9);
+package D9
+use base < qw(B9)
 
-package main;
+package main
 
 do
     my $w = 0

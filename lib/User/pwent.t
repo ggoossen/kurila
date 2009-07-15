@@ -19,7 +19,7 @@ BEGIN
     # It is better to use the $< uid for testing on VMS instead.
     if ( $^OS_NAME eq 'VMS' ) { $uid = $^UID ; }
     if ( $^OS_NAME eq 'cygwin' ) { $uid = 500 ; }
-    our @pwent = (@:  getpwuid $uid ) # This is the function getpwuid.
+    our @pwent = @:  getpwuid $uid  # This is the function getpwuid.
     unless (@pwent) { print $^STDOUT, "1..0 # Skip: no uid $uid\n"; exit 0 }
 
 

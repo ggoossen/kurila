@@ -92,7 +92,7 @@ sub import {
         }
         # Put a corresponding archlib directory in front of $path if it
         # looks like $path has an archlib directory below it.
-        my @($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir)
+        my @: $arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir
             = _get_dirs($path);
         unshift($^INCLUDE_PATH, $arch_dir)         if -d $arch_auto_dir;
         unshift($^INCLUDE_PATH, $version_dir)      if -d $version_dir;
@@ -112,7 +112,7 @@ sub unimport {
     foreach (@_) {
         my $path = _nativize($_);
 
-        my @($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir)
+        my @: $arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir
             = _get_dirs($path);
         ++%names{+$path};
         ++%names{+$arch_dir}         if -d $arch_auto_dir;
@@ -125,38 +125,33 @@ sub unimport {
     return;
 }
 
-sub _get_dirs {
-    my @($dir) = @_;
-    my($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir);
+sub _get_dirs($dir)
+    my($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir)
 
     # we could use this for all platforms in the future, but leave it
     # Mac-only for now, until there is more time for testing it.
-    if ($Is_MacOS) {
-        $arch_auto_dir    = File::Spec->catdir( $dir, $archname, 'auto' );
-        $arch_dir         = File::Spec->catdir( $dir, $archname, );
-        $version_dir      = File::Spec->catdir( $dir, $version );
-        $version_arch_dir = File::Spec->catdir( $dir, $version, $archname );
-    } else {
-        $arch_auto_dir    = "$dir/$archname/auto";
-        $arch_dir         = "$dir/$archname";
-        $version_dir      = "$dir/$version";
-        $version_arch_dir = "$dir/$version/$archname";
-    }
-    return @($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir);
-}
+    if ($Is_MacOS)
+        $arch_auto_dir    = File::Spec->catdir( $dir, $archname, 'auto' )
+        $arch_dir         = File::Spec->catdir( $dir, $archname, )
+        $version_dir      = File::Spec->catdir( $dir, $version )
+        $version_arch_dir = File::Spec->catdir( $dir, $version, $archname )
+    else
+        $arch_auto_dir    = "$dir/$archname/auto"
+        $arch_dir         = "$dir/$archname"
+        $version_dir      = "$dir/$version"
+        $version_arch_dir = "$dir/$version/$archname"
 
-sub _nativize {
-    my @($dir) = @_;
+    return @: $arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir
 
-    if ($Is_MacOS && $Mac_FS && ! -d $dir) {
-        $dir = Mac::FileSpec::Unixish::nativize($dir);
-        $dir .= ":" unless $dir =~ m/:$/;
-    }
+sub _nativize($dir)
 
-    return $dir;
-}
+    if ($Is_MacOS && $Mac_FS && ! -d $dir)
+        $dir = Mac::FileSpec::Unixish::nativize($dir)
+        $dir .= ":" unless $dir =~ m/:$/
 
-1;
+    return $dir
+
+1
 __END__
 
 =head1 NAME

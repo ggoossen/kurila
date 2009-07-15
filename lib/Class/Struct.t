@@ -24,15 +24,15 @@ struct( s => '$', a => '@', h => '%', c => 'aClass' )
 # The second Class::Struct objects:
 # test the 'compile-time without package name' feature.
 #
-package MyOther;
-use Class::Struct s => '$', a => '@', h => '%', c => 'aClass';
+package MyOther
+use Class::Struct s => '$', a => '@', h => '%', c => 'aClass'
 
 #
 # back to main...
 #
-package main;
+package main
 
-use Test::More tests => 24;
+use Test::More tests => 24
 
 my $obj = MyObj->new
 isa_ok $obj, 'MyObj'

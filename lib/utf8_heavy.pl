@@ -15,7 +15,7 @@ our (%PropertyAlias, %PA_reverse, %PropValueAlias, %PVA_reverse, %PVA_abbr_map)
 ## It's a data structure that encodes a set of Unicode characters.
 ##
 
-use bytes;
+use bytes
 
 sub SWASHNEW_real
     my (@: $class, $type, $list, $minbits, $none) =  @_

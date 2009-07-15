@@ -20,7 +20,7 @@ our %Config
 my $inf_m1 = (%Config{?reg_infty} || 32767) - 1
 my $inf_p1 = $inf_m1 + 2
 my @death =
-    (@: 
+    @: 
  'm/[[=foo=]]/' => 'POSIX syntax [= =] is reserved for future extensions in regex; marked by {#} in m/[[=foo=]{#}]/'
 
  'm/(?<= .*)/' =>  'Variable length lookbehind not implemented in regex m/(?<= .*)/'
@@ -86,7 +86,6 @@ my @death =
  'm/\p/' => 'Empty \p{} in regex; marked by {#} in m/\p{#}/'
 
  'm/\P{}/' => 'Empty \P{} in regex; marked by {#} in m/\P{{#}}/'
-    )
 
 ##
 ## Key-value pairs of code/error of code that should have non-fatal warnings.

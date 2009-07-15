@@ -3,7 +3,7 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib')
+        $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
@@ -49,19 +49,19 @@ isnt( undef, 0,             'undef isnt zero' );
 like( undef, '/.*/',        'undef is like anything' )
 warnings_like(qr/Use of uninitialized value.*/)
 
-eq_array( \@(undef, undef), \@(undef, 23) )
+eq_array( \(@: undef, undef), \(@: undef, 23) )
 no_warnings
 
-eq_hash ( \%( foo => undef, bar => undef ),
-          \%( foo => undef, bar => 23 ) )
+eq_hash ( \(%:  foo => undef, bar => undef ),
+          \(%:  foo => undef, bar => 23 ) )
 no_warnings
 
-eq_set  ( \@(undef, undef, 12), \@(29, undef, undef) )
+eq_set  ( \(@: undef, undef, 12), \(@: 29, undef, undef) )
 no_warnings
 
 
-eq_hash ( \%( foo => undef, bar => \%( baz => undef, moo => 23 ) ),
-          \%( foo => undef, bar => \%( baz => undef, moo => 23 ) ) )
+eq_hash ( \(%:  foo => undef, bar => \(%:  baz => undef, moo => 23 ) ),
+          \(%:  foo => undef, bar => \(%:  baz => undef, moo => 23 ) ) )
 no_warnings
 
 

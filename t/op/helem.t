@@ -19,7 +19,7 @@ is( %a{+"monkey"}, undef, "undef returned with '?'")
 is( exists %a{"monkey"}, 1, "key created with '+'")
 
 do
-    my %b = (%:  aap => "muis" )
+    my %b = %:  aap => "muis" 
     # localization
     do
         local %b{"aap"} = "vis"

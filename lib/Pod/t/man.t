@@ -8,21 +8,21 @@
 # This program is free software; you may redistribute it and/or modify it
 # under the same terms as Perl itself.
 
-use TestInit;
+use TestInit
 
-BEGIN {
-    $^OUTPUT_AUTOFLUSH = 1;
-    print $^STDOUT, "1..43\n";
-}
+BEGIN 
+    $^OUTPUT_AUTOFLUSH = 1
+    print $^STDOUT, "1..43\n"
 
-use Pod::Man;
-use charnames ':full';
-use utf8;
 
-print $^STDOUT, "ok 1\n";
+use Pod::Man
+use charnames ':full'
+use utf8
 
-my $parser = Pod::Man->new or die "Cannot create parser\n";
-my $n = 2;
+print $^STDOUT, "ok 1\n"
+
+my $parser = Pod::Man->new or die "Cannot create parser\n"
+my $n = 2
 while ( ~< $^DATA) {
     next until $_ eq "###\n";
 
@@ -60,28 +60,28 @@ while ( ~< $^DATA) {
     unlink('tmp.pod');
 }
 
-sub test_outtmp {
-    my $expected = shift;
-    my $msg = shift;
-    open (my $out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
-    $parser->parse_from_file ('tmp.pod', $out);
-    close $out;
-    open ($out, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
+sub test_outtmp
+    my $expected = shift
+    my $msg = shift
+    open (my $out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n"
+    $parser->parse_from_file ('tmp.pod', $out)
+    close $out
+    open ($out, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n"
     while ( ~< $out) { last if m/^\.nh/ }
-    my $output;
-    do {
-        local $^INPUT_RECORD_SEPARATOR = undef;
-        $output = ~< $out;
-    };
-    close $out;
+    my $output
+    do 
+        local $^INPUT_RECORD_SEPARATOR = undef
+        $output = ~< $out
+    
+    close $out
     if ($output eq $expected) {
         print $^STDOUT, "ok $n\n";
-    } else {
-        print $^STDOUT, "not ok $n\n";
-        print $^STDOUT, "$msg\nEXPECTED:\n$expected\nOUTPUT:\n$output\n";
-    }
-    $n++;
-}
+    }else 
+        print $^STDOUT, "not ok $n\n"
+        print $^STDOUT, "$msg\nEXPECTED:\n$expected\nOUTPUT:\n$output\n"
+    
+    $n++
+
 
 # Below the marker are bits of POD and corresponding expected nroff output.
 # This is used to test specific features or problems with Pod::Man.  The input

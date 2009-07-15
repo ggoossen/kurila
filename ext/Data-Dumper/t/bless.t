@@ -22,7 +22,7 @@ foreach my $use ((@: 0, 1))
         my $t = bless( \$%, q{a'b} )
         my $dt = Dumper($t)
         my $o = <<'PERL'
-$VAR1 = bless( \%(), "a'b" );
+$VAR1 = bless( \%(:), "a'b" );
 PERL
 
         is($dt, $o, "package name in bless is escaped if needed (useperl=$Data::Dumper::Useperl)")
@@ -33,7 +33,7 @@ PERL
         my $t = bless( \$%, q{a\} )
         my $dt = Dumper($t)
         my $o = <<'PERL'
-$VAR1 = bless( \%(), "a\\" );
+$VAR1 = bless( \%(:), "a\\" );
 PERL
 
         is($dt, $o, "package name in bless is escaped if needed")

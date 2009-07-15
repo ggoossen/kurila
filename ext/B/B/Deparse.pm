@@ -348,7 +348,7 @@ sub next_todo
 sub begin_is_use($self, $cv)
     my $root = $cv->ROOT
     local $self->{[qw'curcv curcvlex']}
-    $self->{[qw'curcv curcvlex']} = (@: $cv)
+    $self->{[qw'curcv curcvlex']} = @: $cv
     #require B::Debug;
     #B::walkoptree($cv->ROOT, "debug");
     my $lineseq = $root->first
@@ -1175,7 +1175,7 @@ sub populate_curcvlex
                 !! @: @ns[$i]->COP_SEQ_RANGE_LOW, @ns[$i]->COP_SEQ_RANGE_HIGH
 
             push $self->{+'curcvlex'}{+$name}, \@: $seq_st, $seq_en
-        
+
     continue
         $padlist = $parentpadlist
     
@@ -1209,10 +1209,8 @@ sub find_scope($self, $op, ?$scope_st, ?$scope_en)
             ;
 
             $o=$o->sibling
-        
-    
 
-    return  (@: $scope_st, $scope_en)
+    return  @: $scope_st, $scope_en
 
 
 # Returns a list of subs which should be inserted before the COP
@@ -1643,7 +1641,7 @@ sub padval
 
 
 sub anon_hash_or_list($self, $op, $cx)
-    my(@: $pre, $post) =  (%: "anonarray" => \(@: '@(',')')
+    my(@: $pre, $post) =  (%: "anonarray" => \(@: '@(: ',')')
                               "anonhash" => \(@: '%(',')')){?$op->name}->@
     my($expr, @exprs)
     $op = $op->first->sibling # skip pushmark
@@ -2876,11 +2874,9 @@ sub _method($self, $op, $cx)
             # As of 5.005_58, this case is probably obsoleted by the
             # method_named case above
             $meth = $self->const_sv($meth)->PV # needs to be bare
-        
-    
 
-    return \(%:  method => $meth, variable_method => ref($meth)
-                 object => $obj, args => \@exprs  )
+    return \%:  method => $meth, variable_method => ref($meth)
+                object => $obj, args => \@exprs  
 
 
 # compat function only
@@ -2971,10 +2967,7 @@ sub check_proto($self, $proto, @< @args)
                     push @reals, $self->deparse($real, 6)
                 else
                     return "&"
-                
-            
-        
-    
+
     return "&" if $proto and !$doneok # too few args and no `;'
     return "&" if (nelems @args)               # too many args
     return  @: "", join ", ", @reals
@@ -3159,7 +3152,7 @@ do
 
 
 my %unctrl = # portable to to EBCDIC
-    (%: 
+    %: 
     "\c@" => '\c@'	# unused
     "\cA" => '\cA'
     "\cB" => '\cB'
@@ -3191,7 +3184,6 @@ my %unctrl = # portable to to EBCDIC
     "\c\\" => '\c\'	# unused
     "\c]" => '\c]'	# unused
     "\c_" => '\c_'	# unused
-    )
 
 # character escapes, but not delimiters that might need to be escaped
 sub escape_str($str)
@@ -3658,7 +3650,7 @@ sub regcomp($self, $op, $cx, $extended)
 
 
 sub pp_regcomp($self, $op, $cx)
-    return  (@: ( <$self->regcomp($op, $cx, 0))[[0]])
+    return  @: ( <$self->regcomp($op, $cx, 0))[[0]]
 
 
 # osmic acid -- see osmium tetroxide

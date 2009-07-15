@@ -464,7 +464,7 @@ sub write_linker_script($self, %< %spec)
 
     print $ld_libs_fh, join( " +\n", @:
      (delete %spec{libperl}  || '')
-     < (delete %spec{perllibs} || \$@)->@,
+     < (delete %spec{perllibs} || \$@)->@
         )
 
     close $ld_libs_fh
@@ -600,7 +600,7 @@ sub write_linker_script($self, %< %spec)
 
     print $scriptfh, 'INPUT(' . join( ' ', @:
      (delete %spec{libperl}  || '')
-     < (delete %spec{perllibs} || \$@)->@,
+     < (delete %spec{perllibs} || \$@)->@
         ) . ")\n"
 
     close $scriptfh

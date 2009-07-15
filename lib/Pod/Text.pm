@@ -84,7 +84,7 @@ sub new
     # variables.
     my %opts = %:  < @_ 
     my @opts = @+: map { (@: "opt_$_", %opts{?$_}) }, keys %opts
-    $self->% = (%: < $self->%, < @opts)
+    $self->% = %: < $self->%, < @opts
 
     # Initialize various things from our parameters.
     $self->%{+opt_alt}      = 0  unless defined $self->%{?opt_alt}
@@ -258,7 +258,7 @@ sub start_document($self, ...)
     # Initialize a few per-document variables.
     $self->%{+INDENTS} = \$@       # Stack of indentations.
     $self->%{+MARGIN}  = $margin  # Default left margin.
-    $self->%{+PENDING} = \(@: \$@)     # Pending output.
+    $self->%{+PENDING} = \@: \$@     # Pending output.
 
     return ''
 

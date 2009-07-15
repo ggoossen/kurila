@@ -190,7 +190,7 @@ BEGIN
 	&S_ISWHT &S_ISENFMT &S_IFMT &S_IMODE
 )
 # Named groups of exports
-%EXPORT_TAGS = (%: 
+%EXPORT_TAGS = %: 
     'flock'   => qw(LOCK_SH LOCK_EX LOCK_NB LOCK_UN)
     'Fcompat' => qw(FAPPEND FASYNC FCREAT FDEFER FDSYNC FEXCL FLARGEFILE
 		     FNDELAY FNONBLOCK FRSYNC FSYNC FTRUNC)
@@ -207,7 +207,6 @@ BEGIN
 		     S_ISWHT S_ISENFMT		
 		     S_IFMT S_IMODE
                   )
-    )
 
 # Force the constants to become inlined
 BEGIN 

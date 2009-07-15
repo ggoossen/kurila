@@ -35,7 +35,7 @@ BeOS is BeOS.
 =cut
 
 sub os_flavor
-    return (@: 'BeOS')
+    return @: 'BeOS'
 
 
 =item init_linker

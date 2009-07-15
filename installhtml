@@ -152,7 +152,7 @@ my (@libpods, @podpath, $podroot, $htmldir, $htmlroot, $recurse, @splithead,
     @splititem, $splitpod, $verbose, $pod2html, @ignore)
 
 @libpods = $@
-@podpath = (@:  "." )     # colon-separated list of directories containing .pod
+@podpath = @:  "."      # colon-separated list of directories containing .pod
 # and .pm files to be converted.
 $podroot = "."          # assume the pods we want are here
 $htmldir = ""           # nothing for now...

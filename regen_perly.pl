@@ -181,7 +181,7 @@ sub extract
     $actlines =~ s/yyvsp\[(.*?)\]/ps[$1].val/g
         or die "Can't convert value stack name\n"
 
-    return (@: $actlines. "\n", $tablines. "\n")
+    return @: $actlines. "\n", $tablines. "\n"
 
 
 # Generate a table, yy_type_tab[], that specifies for each token, what

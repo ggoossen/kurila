@@ -14,7 +14,7 @@ do
     package MCTest::Derived
     our @ISA = qw/MCTest::Base/;
 
-    package Foo; our @FOO = (@:  qw// )
+    package Foo; our @FOO = @:  qw// 
 
 
 # These are various ways of re-defining MCTest::Base::foo and checking whether the method is cached when it shouldn't be

@@ -255,8 +255,8 @@ sub _dump
             if (exists $s->{seen}->{$id})
                 #       if ($s->{expdepth} < $s->{level}) {
                 if ($s->{?purity} and $s->{?level} +> 0)
-                    $out = ($realtype eq 'HASH')  ?? '\%()' !!
-                        ($realtype eq 'ARRAY') ?? '\@()' !!
+                    $out = ($realtype eq 'HASH')  ?? '\$%' !!
+                        ($realtype eq 'ARRAY') ?? '\$@' !!
                         'do{my $o}' 
                     push @post, $name . " = " . $s->{seen}->{$id}->[0]
                 else
@@ -267,20 +267,17 @@ sub _dump
                             $out = substr($out, 1)
                         else
                             $out = $start . '{' . $out . '}'
-                        
-                    
                 
                 return $out
             #        }
             else
                 # store our name
                 $s->{seen}->{+$id} = \@:  (($name =~ m/^[@%]/)     ?? ('\' . $name ) !!
-                                              ($realtype eq 'CODE' and
-                                           $name =~ m/^[*](.*)$/) ?? ('\&' . $1 )   !!
-                                              $name          )
+                                           ($realtype eq 'CODE' and
+                                               $name =~ m/^[*](.*)$/) ?? ('\&' . $1 )   !!
+                                           $name          )
                                           $val 
-            
-        
+
         my $no_bless = 0
         my $is_regex = 0
         if ( $realpack and re::is_regexp($val) )
@@ -392,12 +389,11 @@ sub _dump
                 delete($s->{seen}->{$id})
             elsif ($name)
                 $s->{seen}->{$id}->[2] = 1
-            
         
     elsif ($realtype eq 'ARRAY')
         my($pad, $mname)
         my $i = 0
-        $out .= '@('
+        $out .= '@(:'
         $pad = $s->{?sep} . $s->{?pad} . $s->{?apad}
         $mname = $name . '->'
         $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/
@@ -411,7 +407,7 @@ sub _dump
         $out .= ')'
     elsif ($realtype eq 'HASH')
         my($k, $v, $pad, $lpad, $mname, $pair)
-        $out .= '%('
+        $out .= '%(:'
         $pad = $s->{?sep} . $s->{?pad} . $s->{?apad}
         $lpad = $s->{?apad}
         $pair = $s->{?pair}
@@ -576,7 +572,7 @@ sub Deparse($s, $v)
 
 
 # used by qquote below
-my %esc = (%: 
+my %esc = %: 
     "\a" => "\\a"
     "\b" => "\\b"
     "\t" => "\\t"
@@ -584,7 +580,6 @@ my %esc = (%:
     "\f" => "\\f"
     "\r" => "\\r"
     "\e" => "\\e"
-    )
 
 # put a string value in double quotes
 sub qquote

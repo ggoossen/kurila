@@ -1,9 +1,3 @@
-BEGIN 
-    if(env::var('PERL_CORE')) {
-        chdir 't' if -d 't';
-        $^INCLUDE_PATH = @( '../lib' );
-    }
-
 
 # Time-stamp: "2004-05-07 15:43:11 ADT"
 
@@ -13,7 +7,7 @@ use utf8
 my @them
 BEGIN { plan('tests' => 63) };
 
-use Pod::Escapes < qw(:ALL);
+use Pod::Escapes < qw(:ALL)
 ok 1
 
 eval " binmode(STDOUT, ':utf8') "

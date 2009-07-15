@@ -192,7 +192,7 @@ sub can_run
         for my $dir (@:
             < split(m/\Q$(Config::config_value('path_sep'))\E/, env::var('PATH'))
             File::Spec->curdir
-            )
+                )
             my $abs = File::Spec->catfile($dir, $command)
             return $abs if $abs = MM->maybe_command($abs)
         
@@ -287,7 +287,7 @@ what modules or function calls to use when issuing a command.
 =cut
 
 sub run
-    my %hash = (%:  < @_ )
+    my %hash = %:  < @_ 
 
     ### if the user didn't provide a buffer, we'll store it here.
     my $def_buf = ''
@@ -572,11 +572,10 @@ sub _system_run
 do  use File::Spec
     use Symbol
 
-    my %Map = (%: 
+    my %Map = %: 
         STDOUT => \(@:  <qw|>&|, $^STDOUT, Symbol::gensym() )
         STDERR => \(@:  <qw|>&|, $^STDERR, Symbol::gensym() )
         STDIN  => \(@:  <qw|<&|, $^STDIN,  Symbol::gensym() )
-        )
 
     ### dups FDs and stores them in a cache
     sub __dup_fds

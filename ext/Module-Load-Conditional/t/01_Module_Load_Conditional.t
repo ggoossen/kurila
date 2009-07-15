@@ -40,7 +40,7 @@ do
 
         my(@: $vol, $path, $file) =  $class->splitpath( $rv{'file'} )
 
-        my @path = (@: $vol, < $class->splitdir( $path ), $file )
+        my @path = @: $vol, < $class->splitdir( $path ), $file 
 
         ### First element could be blank for some system types like VMS
         shift @path if $vol eq ''

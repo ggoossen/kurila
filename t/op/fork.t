@@ -209,7 +209,7 @@ child 3
 -1- -2- -3-
 ########
 $^OUTPUT_AUTOFLUSH = 1;
-foreach my $c (@(1,2,3)) {
+foreach my $c (@: 1,2,3) {
     if (fork) {
         print $^STDOUT, "parent $c\n";
     }
@@ -465,7 +465,7 @@ EXPECT
 1
 ########
 # [perl #39145] Perl_dounwind() crashing with Win32's fork() emulation
-sub { @_ = @(3); fork ?? die "1" !! die "1" }->(2);
+sub { @_ = @: 3; fork ?? die "1" !! die "1" }->(2);
 EXPECT
 1 at - line 2 character 37.
     main::__ANON__ called at - line 2 character 46.

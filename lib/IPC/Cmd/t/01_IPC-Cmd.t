@@ -22,11 +22,11 @@ my $Have_IPC_Open3  = $Class->can_use_ipc_open3
 $IPC::Cmd::VERBOSE  = $IPC::Cmd::VERBOSE = $Verbose
 
 ### run tests in various configurations, based on what modules we have
-my @Prefs = (@: 
+my @Prefs = @: 
     \(@:  $Have_IPC_Run, $Have_IPC_Open3 )
     \(@:  0,             $Have_IPC_Open3 )
     \@:  0,             0 
-    )
+    
 
 ### can_run tests
 do

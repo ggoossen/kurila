@@ -14,7 +14,7 @@ BEGIN
 our @servent
 
 BEGIN 
-    @servent = (@:  getservbyname "echo", "tcp" ) # This is the function getservbyname.
+    @servent = @:  getservbyname "echo", "tcp"  # This is the function getservbyname.
     unless (nelems @servent) { print $^STDOUT, "1..0 # Skip: no echo service\n"; exit 0 }
 
 

@@ -104,8 +104,7 @@ sub validate
             @testlist = split(m//, $testlist)
         else
             # put in placeholder Z for stand-alone test
-            @testlist = (@: 'Z')
-        
+            @testlist = @: 'Z'
 
         # will compare these two later to stop on 1st warning w/in a bundle
         $oldwarnings = $Warnings

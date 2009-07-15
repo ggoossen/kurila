@@ -32,13 +32,13 @@ BEGIN
 @B::NULL::ISA = @:  'B::SV' 
 @B::PV::ISA = @:  'B::SV' 
 @B::IV::ISA = @:  'B::SV' 
-@B::NV::ISA = (@:  'B::SV' )
+@B::NV::ISA = @:  'B::SV' 
 # RV is eliminated with 5.11.0, but effectively is a specialisation of IV now.
 @B::RV::ISA = @:  'B::IV' 
 @B::PVIV::ISA = qw(B::PV B::IV)
 @B::PVNV::ISA = qw(B::PVIV B::NV)
 @B::PVMG::ISA = @:  'B::PVNV' 
-@B::REGEXP::ISA = (@:  'B::PVMG' )
+@B::REGEXP::ISA = @:  'B::PVMG' 
 # Change in the inheritance hierarchy post 5.9.0
 @B::PVLV::ISA = @:  'B::GV' 
 @B::BM::ISA = @:  'B::PVMG' 
@@ -49,7 +49,7 @@ BEGIN
 @B::IO::ISA = @:  'B::PVMG' 
 @B::FM::ISA = @:  'B::CV' 
 
-@B::SPECIAL::ISA = (@:  'B::OBJECT' )
+@B::SPECIAL::ISA = @:  'B::OBJECT' 
 
 # bytecode.pl contained the following comment:
 # Nullsv *must* come first in the following so that the condition

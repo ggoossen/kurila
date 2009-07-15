@@ -266,7 +266,6 @@ static struct debug_tokens {
     { ANDOP,		TOKENTYPE_NONE,		"ANDOP" },
     { ANONSUB,		TOKENTYPE_IVAL,		"ANONSUB" },
     { BLOCKSUB,		TOKENTYPE_IVAL,		"BLOCKSUB" },
-    { ANONARY,		TOKENTYPE_IVAL,		"ANONARY" },
     { ARROW,		TOKENTYPE_NONE,		"ARROW" },
     { ASSIGNOP,		TOKENTYPE_OPNUM,	"ASSIGNOP" },
     { BITANDOP,		TOKENTYPE_OPNUM,	"BITANDOP" },
@@ -325,6 +324,7 @@ static struct debug_tokens {
     { TERNARY_ELSE,	TOKENTYPE_IVAL,		"TERNARY_ELSE" },
     { WORD,		TOKENTYPE_OPVAL,	"WORD" },
     { LAYOUTLISTEND,	TOKENTYPE_IVAL,	        "LAYOUTLISTEND" },
+    { ANONARYL,	        TOKENTYPE_NONE,	        "ANONARYL" },
     { 0,		TOKENTYPE_NONE,		NULL }
 };
 
@@ -2800,6 +2800,16 @@ S_tokenize_use(pTHX_ int is_use, char *s) {
       if we already built the token before, use it.
 */
 
+static bool S_close_layout_lists() {
+    if (PL_lex_brackets > 0 
+	&& PL_lex_brackstack[PL_lex_brackets -1].type == LB_LAYOUT_LIST) {
+	--PL_lex_brackets;
+	PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
+	return 1;
+    }
+    return 0;
+}
+
 
 static int S_process_layout(char* s) {
     char* d;
@@ -2826,11 +2836,16 @@ static int S_process_layout(char* s) {
 		"### Tokener got space2 '%s'\n", PL_thiswhite ? SvPVX_const(PL_thiswhite) : NULL ); });
     if (d) {
 	s = d;
-	if (is_layout_list) {
-	    OPERATOR(',');
-	} else {
-	    TOKEN(';');
+#ifdef PERL_MAD			
+	if (PL_madskills) {
+	    sv_catsv(PL_skipwhite, PL_thiswhite);
+	    PL_thiswhite = NULL;
 	}
+#endif
+	if (S_close_layout_lists())
+	    TOKEN(LAYOUTLISTEND);
+	assert(!is_layout_list);
+	TOKEN(';');
     }
     if ((s - PL_linestart) < PL_parser->statement_indent) {
 #ifdef PERL_MAD
@@ -2846,16 +2861,6 @@ static int S_process_layout(char* s) {
     } else {
 	TOKEN(';');
     }
-}
-
-static bool S_close_layout_lists() {
-    if (PL_lex_brackets > 0 
-	&& PL_lex_brackstack[PL_lex_brackets -1].type == LB_LAYOUT_LIST) {
-	--PL_lex_brackets;
-	PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
-	return 1;
-    }
-    return 0;
 }
 
 /* S_closing_bracket
@@ -3372,7 +3377,7 @@ Perl_yylex(pTHX)
 	    sv_catsv(PL_thiswhite, PL_skipwhite);
 #endif
 	}
-	goto retry;
+	goto process_indentation;
     case '\r':
 #ifdef PERL_STRICT_CR
 	Perl_warn(aTHX_ "Illegal character \\%03o (carriage return)", '\r');
@@ -3401,6 +3406,7 @@ Perl_yylex(pTHX)
     case '\n': {
 	/* might be non continuous line */
 	bool is_continuation;
+      process_indentation:
 	s = skipspace(s, &is_continuation);
 	assert(!isSPACE_notab(*s));
 #ifdef PERL_MAD
@@ -3648,6 +3654,25 @@ Perl_yylex(pTHX)
 	    Mop(OP_MODULO);
 	}
 
+	if (s[1] == '(' && s[2] == ':') {
+	    /* hash constructor '%(:' */
+	    s += 3;
+
+	    if (PL_lex_brackets > 100)
+		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+	    PL_lex_brackstack[PL_lex_brackets].type = LB_PAREN;
+	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
+	    PL_lex_brackstack[PL_lex_brackets].prev_statement_indent = PL_parser->statement_indent;
+	    ++PL_lex_brackets;
+
+	    S_start_list_indent(s);
+
+	    PL_parser->statement_indent = -1;
+
+	    force_next(ANONHSHL);
+
+	    TOKEN('(');
+	}
 	if (s[1] == '(') {
 	    /* anonymous hash constructor '%(' */
 	    if (PL_lex_brackets > 100)
@@ -4114,21 +4139,29 @@ Perl_yylex(pTHX)
 	if (PL_expect == XOPERATOR)
 	    no_op("Array", s);
 
-	if (s[1] == '(') {
-	    /* array constructor  @( */
-	    if (PL_lex_brackets > 100)
-		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
-	    PL_lex_brackstack[PL_lex_brackets].type = LB_PAREN;
-	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
-	    ++PL_lex_brackets;
-
-	    s += 2;
-	    OPERATOR(ANONARY);
-	}
 	if (s[1] == '+' && s[2] == ':') {
 	    /* arrayjoin '@+:' */
 	    s += 3;
 	    LOP(OP_ARRAYJOIN, XTERM);
+	}
+	if (s[1] == '(' && s[2] == ':') {
+	    /* array constructor '@(:' */
+	    s += 3;
+
+	    if (PL_lex_brackets > 100)
+		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
+	    PL_lex_brackstack[PL_lex_brackets].type = LB_PAREN;
+	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
+	    PL_lex_brackstack[PL_lex_brackets].prev_statement_indent = PL_parser->statement_indent;
+	    ++PL_lex_brackets;
+
+	    S_start_list_indent(s);
+
+	    PL_parser->statement_indent = -1;
+
+	    force_next(ANONARYL);
+
+	    TOKEN('(');
 	}
 	if (s[1] == ':' && s[2] != ':') {
 	    /* array constructor '@:' */
@@ -4163,7 +4196,8 @@ Perl_yylex(pTHX)
 	}
 
 	s++;
-	Perl_croak(aTHX_ "Unknown operator '@'");
+	yyerror(aTHX_ "Unknown operator '@'");
+	goto retry;
     }
 
     case '/':			/* may be division, defined-or */

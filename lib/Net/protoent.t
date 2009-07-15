@@ -14,7 +14,7 @@ BEGIN
 our @protoent
 
 BEGIN 
-    @protoent = (@:  getprotobyname "tcp" ) # This is the function getprotobyname.
+    @protoent = @:  getprotobyname "tcp"  # This is the function getprotobyname.
     unless (nelems @protoent) { print $^STDOUT, "1..0 # Skip: no tcp protocol\n"; exit 0 }
 
 

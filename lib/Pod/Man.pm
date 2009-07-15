@@ -92,7 +92,7 @@ sub new
     # to put them in our object as hash keys and values.  This could cause
     # problems if we ever clash with Pod::Simple's own internal class
     # variables.
-    $self->% = (%: < $self->%, < @_)
+    $self->% = %: < $self->%, < @_
 
     # Initialize various other internal constants based on our arguments.
     $self->init_fonts
@@ -138,20 +138,19 @@ sub init_fonts($self)
 
     # Set up a table of font escapes.  First number is fixed-width, second is
     # bold, third is italic.
-    $self->{+FONTS} = \(%:  '000' => '\fR', '001' => '\fI'
-                            '010' => '\fB', '011' => '\f(BI'
-                            '100' => toescape ($self->{?fixed})
-                            '101' => toescape ($self->{?fixeditalic})
-                            '110' => toescape ($self->{?fixedbold})
-                            '111' => toescape ($self->{?fixedbolditalic}) )
+    $self->{+FONTS} = \%:  '000' => '\fR', '001' => '\fI'
+                           '010' => '\fB', '011' => '\f(BI'
+                           '100' => toescape ($self->{?fixed})
+                           '101' => toescape ($self->{?fixeditalic})
+                           '110' => toescape ($self->{?fixedbold})
+                           '111' => toescape ($self->{?fixedbolditalic}) 
 
 
 # Initialize the quotes that we'll be using for C<> text.  This requires some
 # special handling, both to parse the user parameter if given and to make sure
 # that the quotes will be safe against *roff.  Sets the internal hash keys
 # LQUOTE and RQUOTE.
-sub init_quotes
-    my (@: $self) = @: < @_
+sub init_quotes($self)
 
     $self->{+quotes} ||= '"'
     if ($self->{?quotes} eq 'none')
@@ -681,8 +680,7 @@ sub outindex($self, ?$section, ?$index)
     if ($section)
         $index =~ s/\\-/-/g
         $index =~ s/\\(?:s-?\d|.\(..|.)//g
-        push @output, \(@:  $section, $index )
-    
+        push @output, \@:  $section, $index 
 
     # Print out the .IX commands.
     for ( @output)
@@ -731,7 +729,7 @@ sub start_document($self, $attrs, _)
     $self->{+ITEMTYPES} = \$@     # Stack of =item types, one per list.
     $self->{+SHIFTWAIT} = 0      # Whether there is a shift waiting.
     $self->{+SHIFTS}    = \$@     # Stack of .RS shifts.
-    $self->{+PENDING}   = \(@: \$@)   # Pending output.
+    $self->{+PENDING}   = \@: \$@   # Pending output.
 
 
 # Handle the end of the document.  This does nothing but print out a final
@@ -786,15 +784,15 @@ sub devise_title($self)
             shift @dirs if (@dirs[0] =~ m/^(site|vendor)(_perl)?$/)
             shift @dirs if (@dirs[0] =~ m/^[\d.]+$/)
             shift @dirs if (@dirs[0] =~ m/^(.*-$^OS_NAME|$^OS_NAME-.*|$^OS_NAME)$/)
-        
+
         shift @dirs if @dirs[?0] eq 'lib'
         splice (@dirs, 0, 2) if (@dirs[?0] eq 'blib' && @dirs[?1] eq 'lib')
 
         # Remove empty directories when building the module name; they
         # occur too easily on Unix by doubling slashes.
         $name = join ('::', (@:  (< grep { $_ ?? $_ !! () }, @dirs), $file))
-    
-    return  (@: $name, $section)
+
+    return  @: $name, $section
 
 
 # Determine the modification date and return that, properly formatted in ISO

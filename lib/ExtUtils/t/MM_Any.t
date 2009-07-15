@@ -3,14 +3,14 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't' if -d 't'
-        $^INCLUDE_PATH = @( '../lib' )
+        $^INCLUDE_PATH = @:  '../lib' 
     else
         unshift $^INCLUDE_PATH, 't/lib'
     
 
 chdir 't'
 
-use Test::More tests => 7;
+use Test::More tests => 7
 BEGIN { use_ok('ExtUtils::MM') }
 
 

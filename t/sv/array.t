@@ -104,7 +104,7 @@ is($foo, '')
 $foo = join('', (@: < @foo,< @bar)[[0..5]])
 is($foo, 'acebdf')
 
-@foo = (@:  'foo', 'bar', 'burbl', 'blah')
+@foo = @:  'foo', 'bar', 'burbl', 'blah'
 
 # various AASSIGN_COMMON checks (see newASSIGNOP() in op.c)
 

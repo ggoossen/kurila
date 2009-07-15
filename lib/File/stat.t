@@ -13,7 +13,7 @@ BEGIN
     use Config
     $hasst = 0 unless config_value('i_sysstat') eq 'define'
     unless ($hasst) { plan skip_all => "no sys/stat.h"; exit 0 }
-    @stat = (@: stat "TEST") # This is the function stat.
+    @stat = @: stat "TEST" # This is the function stat.
     unless (@stat) { plan skip_all => "1..0 # Skip: no file TEST"; exit 0 }
 
 

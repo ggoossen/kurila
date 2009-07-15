@@ -92,7 +92,7 @@ sub case_tolerant(?$drive)
     my $osFsType = "\0"x256
     my $osVolName = "\0"x256
     my $ouFsFlags = 0
-    Win32API::File::GetVolumeInformation($drive, $osVolName, 256, \@(), \@(), $ouFsFlags, $osFsType, 256 )
+    Win32API::File::GetVolumeInformation($drive, $osVolName, 256, \(@: ), \(@: ), $ouFsFlags, $osFsType, 256 )
     if ($ouFsFlags ^&^ Win32API::File::FS_CASE_SENSITIVE()) { return 0; }
     else { return 1; }
 
@@ -203,7 +203,7 @@ The results can be passed to L</catpath> to get back a path equivalent to
 =cut
 
 sub splitpath($self,$path, ?$nofile)
-    my @($volume,$directory,$file) = @('','','')
+    my (@: $volume,$directory,$file) = @: '','',''
     if ( $nofile )
         $path =~
             m{^ ( $VOL_RX ? ) (.*) }sox
@@ -220,7 +220,7 @@ sub splitpath($self,$path, ?$nofile)
         $file      = $3
     
 
-    return  @($volume,$directory,$file)
+    return  @: $volume,$directory,$file
 
 
 
@@ -329,10 +329,10 @@ sub rel2abs($self,$path,?$base)
         $base = $self->canonpath( $base ) 
     
 
-    my @( $path_directories, $path_file ) =
+    my (@:  $path_directories, $path_file ) =
         ($self->splitpath( $path, 1 ))[[1..2]] 
 
-    my @( $base_volume, $base_directories, _ ) =
+    my (@:  $base_volume, $base_directories, _ ) =
         $self->splitpath( $base, 1 ) 
 
     $path = $self->catpath(
@@ -376,7 +376,7 @@ sub _canon_cat
         !! $first =~ s{ \A [\\/] }{}x			# root dir
         ?? "\\"
         !! ""
-    my $path   = join "\\", @( $first, < @_)
+    my $path   = join "\\", @:  $first, < @_
 
     $path =~ s#[\\/]+#\\#g		# xx/yy --> xx\yy & xx\\yy --> xx\yy
 

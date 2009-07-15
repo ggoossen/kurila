@@ -71,7 +71,7 @@ import_extra().
 =cut
 
 sub import
-    my@($class) =@( shift)
+    my(@: $class) =@:  shift
 
     # Don't run all this when loading ourself.
     return 1 if $class eq 'Test::Builder::Module'
@@ -97,8 +97,8 @@ sub _strip_imports
     my $class = shift
     my $list  = shift
 
-    my @imports = @( () )
-    my @other   = @( () )
+    my @imports = @:  () 
+    my @other   = @:  () 
     my $idx = 0
     while( $idx +<= (nelems $list->@) -1 )
         my $item = $list->[$idx]

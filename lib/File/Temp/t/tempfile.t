@@ -32,7 +32,7 @@ END { foreach ( @dirs)  { ok( !(-d $_) )} }
 # the ones that File::Temp configures since END blocks are evaluated
 # in revers order and we need to check the files *after* File::Temp
 # removes them
-use File::Temp < qw/ tempfile tempdir/;
+use File::Temp < qw/ tempfile tempdir/
 
 # Now we start the tests properly
 ok(1)

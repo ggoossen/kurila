@@ -710,7 +710,7 @@ sub utime
 
 
 sub load_imports
-    %EXPORT_TAGS = (%: 
+    %EXPORT_TAGS = %: 
 
         assert_h =>     qw(assert)
 
@@ -857,7 +857,7 @@ sub load_imports
 
         utime_h =>      $@
 
-        )
+        
 
     # Exporter::export_tags();
     do

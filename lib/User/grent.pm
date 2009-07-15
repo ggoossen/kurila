@@ -18,7 +18,7 @@ sub import
     return Exporter::import(< @_)
 
 
-use Class::Struct < qw(struct);
+use Class::Struct < qw(struct)
 struct 'User::grent' => \@: 
        name    => '$'
        passwd  => '$'

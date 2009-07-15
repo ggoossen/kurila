@@ -145,8 +145,7 @@ do
 
     sub STORABLE_freeze($self, $clone)
 
-        return  (@: '', \$@)
-    
+        return  @: '', \$@
 
     # Start with no STORABLE_attach method so we can get a
     # frozen object-containing-a-reference into the freeze string.
@@ -191,10 +190,7 @@ do
     package My::GoodAttach::Subclass
 
     BEGIN 
-        our @ISA = (@:  'My::GoodAttach' )
-    
-
-
+        our @ISA = @:  'My::GoodAttach' 
 
 
 # Bad Cases - die on thaw

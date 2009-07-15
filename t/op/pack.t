@@ -499,7 +499,7 @@ foreach (@:
     \(@: 'p', 'Z11', "foo\0bar\0 ", "foo\0bar\0 \0\0")
     \(@: 'p', 'Z3',  "foo",         "fo\0")
     \(@: 'u', 'Z*',  "foo\0bar \0", "foo")
-    \(@: 'u', 'Z8',  "foo\0bar \0", "foo"),
+    \(@: 'u', 'Z8',  "foo\0bar \0", "foo")
     )
     my (@: $what, $template, $in, $out) =  $_->@
     my $got = $what eq 'u' ?? (unpack $template, $in) !! (pack $template, $in)
@@ -852,7 +852,7 @@ do
     foreach (@: 
            \(@: 'a/a*/a*', '212ab345678901234567','ab3456789012')
            \(@: 'a/a*/a*', '3012ab345678901234567', 'ab3456789012')
-           \(@: 'a/a*/b*', '212ab', '100001100100'),
+           \(@: 'a/a*/b*', '212ab', '100001100100')
         )
         my (@: $pat, $in, $expect) =  $_->@
         undef $x
@@ -994,7 +994,7 @@ foreach (@:
          \(@: 'a5Xa5', "cameL", "llama", "camellama")
          \(@: '@4', 'N', "\0"x4)
          \(@: 'a*@8a*', 'Camel', 'Dromedary', "Camel\0\0\0Dromedary")
-         \(@: 'a*@4a', 'Perl rules', '!', 'Perl!'),
+         \(@: 'a*@4a', 'Perl rules', '!', 'Perl!')
     )
     my (@: $template, @< @in) =  $_->@
     my $out = pop @in
@@ -1013,7 +1013,7 @@ foreach (@:
          \(@: 'a5Xa5', "camellama", "camel", "llama")
          \(@: '@3', "ice")
          \(@: '@2a2', "water", "te")
-         \(@: 'a*@1a3', "steam", "steam", "tea"),
+         \(@: 'a*@1a3', "steam", "steam", "tea")
     )
     my (@: $template, $in, @< @out) =  $_->@
     my @got = @:  try {unpack $template, $in} 
@@ -1395,7 +1395,7 @@ do # struct {char c1; double d; char cc[2];}
     my @a = @: 173, 1.283476517e-45, 42, 215
     my $p = pack $t, < @a
     ok( length $p)
-    my @b = (@:  unpack "$t X[$t] $t", $p )	# Extract, step back, extract again
+    my @b = @:  unpack "$t X[$t] $t", $p 	# Extract, step back, extract again
     is(scalar nelems @b, 2 * scalar nelems @a)
     $b = "$(join ' ',@b)"
     $b =~ s/(?:17000+|16999+)\d+(e-45) /17$1 /gi # stringification is gamble
@@ -1433,7 +1433,7 @@ SKIP: do
 
 # Maybe this knowledge needs to be "global" for all of pack.t
 # Or a "can checksum" which would effectively be all the number types"
-my %cant_checksum = (%:  < @+: map { @: $_=> 1 }, qw(A Z u w) )
+my %cant_checksum = %+: map { %: $_=> 1 }, qw(A Z u w) 
 # not a b B h H
 foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w))
     SKIP: do

@@ -2,10 +2,10 @@ package TestCompare
 
 our (@ISA, @EXPORT, $MYPKG)
 #use diagnostics;
-use Exporter;
-use File::Basename;
-use File::Spec;
-use IO::File;
+use Exporter
+use File::Basename
+use File::Spec
+use IO::File
 
 @ISA = qw(Exporter)
 @EXPORT = qw(&testcmp)

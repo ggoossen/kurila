@@ -21,7 +21,7 @@ do {my $const = "a constant"; sub a_const () {$const}}
 
 my @nums =1..10
 
-my %hash = (%: foo => 17, bar => 23)
+my %hash = %: foo => 17, bar => 23
 
 # Load and run the tests
 my @tests = map { \(@: chomp and < split m/\t+/, $_, 3) }, grep { !m/^#/ && m/\S/ }, @:  ~< $^DATA

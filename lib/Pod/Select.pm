@@ -236,7 +236,7 @@ C</=item mine/../=(item|back)/>
 #############################################################################
 
 #use diagnostics;
-use Pod::Parser v1.04;
+use Pod::Parser v1.04
 our (@ISA, @EXPORT, $MAX_HEADING_LEVEL)
 
 @ISA = qw(Pod::Parser)
@@ -273,11 +273,9 @@ sub _init_headings
 
     ## Initialize current section heading titles if necessary
     unless (defined $self->%{?_SECTION_HEADINGS})
-        my $section_headings = $self->%{+_SECTION_HEADINGS} = \@()
+        my $section_headings = $self->%{+_SECTION_HEADINGS} = \$@
         for my $i (0..$MAX_HEADING_LEVEL-1)
             $section_headings->@[+$i] = ''
-        
-    
 
 
 ##---------------------------------------------------------------------------
@@ -357,7 +355,7 @@ sub select
         delete $self->%{_SELECTED_SECTIONS}  unless ($add)
         return
     
-    $self->%{+_SELECTED_SECTIONS} = \@()
+    $self->%{+_SELECTED_SECTIONS} = \@: 
         unless ($add  &&  exists $self->%{_SELECTED_SECTIONS})
     my $selected_sections = $self->%{?_SELECTED_SECTIONS}
 
@@ -497,7 +495,7 @@ sub is_selected($self, $paragraph)
     $_ = $paragraph
     if (m/^=((?:sub)*)(?:head(?:ing)?|sec(?:tion)?)(\d*)\s+(.*?)\s*$/)
         ## This is a section heading command
-        my @($level, $heading) = @($2, $3)
+        my (@: $level, $heading) = @: $2, $3
         $level = 1 + (length($1) / 3)  if ((! length $level) || (length $1))
         ## Reset the current section heading at this level
         $self->%{_SECTION_HEADINGS}->[$level - 1] = $heading
@@ -570,7 +568,7 @@ filenames are given).
 =cut
 
 sub podselect(@argv)
-    my %defaults = %( () )
+    my %defaults = %:  () 
     my $pod_parser = Pod::Select->new(< %defaults)
     my $num_inputs = 0
     my $output = ">&STDOUT"
@@ -579,7 +577,7 @@ sub podselect(@argv)
     for ( @argv)
         if (ref($_))
             next unless (ref($_) eq 'HASH')
-            %opts = %(< %defaults, < $_->%)
+            %opts = %: < %defaults, < $_->%
 
             ##-------------------------------------------------------------
             ## Need this for backward compatibility since we formerly used
@@ -588,7 +586,7 @@ sub podselect(@argv)
             ## to be uppercase keywords)
             ##-------------------------------------------------------------
             %opts = %+: map {
-                            my @($key, $val) = @(lc $_, %opts{?$_});
+                            my @: $key, $val = @: lc $_, %opts{?$_};
                             $key =~ s/^(?=\w)/-/;
                             $key =~ m/^-se[cl]/  and  $key  = '-sections';
                             #! $key eq '-range'    and  $key .= 's';

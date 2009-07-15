@@ -22,10 +22,10 @@ $VERSION   = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/)
 #       Constants
 #-----------------------------------------------------------------------
 use constant LOCALE_CODE_ALPHA_2 => 1
-use constant LOCALE_CODE_ALPHA_3 => 2;
-use constant LOCALE_CODE_NUMERIC => 3;
+use constant LOCALE_CODE_ALPHA_3 => 2
+use constant LOCALE_CODE_NUMERIC => 3
 
-use constant LOCALE_CODE_DEFAULT => LOCALE_CODE_ALPHA_2;
+use constant LOCALE_CODE_DEFAULT => LOCALE_CODE_ALPHA_2
 
 1
 

@@ -18,7 +18,7 @@ $^OUTPUT_AUTOFLUSH = 1
 # this string belongs.  This is a *complete* list: any classes not
 # listed, are expected to return '0' for the given string.
 my %classes =
-    (%: 
+    %: 
     'a'    => \ qw(print graph alnum alpha lower xdigit)
     'A'    => \ qw(print graph alnum alpha upper xdigit)
     'z'    => \ qw(print graph alnum alpha lower)
@@ -48,7 +48,6 @@ my %classes =
     # An empty string. Always true (al least in old days) [bug #24554]
     ''     => \ qw(print graph alnum alpha lower upper digit xdigit
                   punct cntrl space)
-    )
 
 
 # Pass 1: convert the above arrays to hashes.  While doing so, obtain
@@ -62,7 +61,6 @@ foreach my $s (keys %classes)
                   %functions{+"is$_"}++	# Keep track of all the 'is<xxx>' functions
                   %: "is$_" => 1		# Our return value: is<xxx>($s) should pass.
                 , %classes{$s}->@
-
 
 # Expected number of tests is one each for every combination of a
 # known is<xxx> function and string listed above.

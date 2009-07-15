@@ -4,7 +4,7 @@ use TestInit;
 
 our @Methods;
 BEGIN {
-    @Methods = @(qw(wraplist
+    @Methods = @: qw(wraplist
                    rootdir
                    ext
                    guess_name
@@ -47,7 +47,7 @@ BEGIN {
                    test_via_harness
                    test_via_script
                    makeaperl
-                  ));
+                  );
 }
 
 BEGIN {

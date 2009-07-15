@@ -19,11 +19,11 @@ sub lexless_anon_sub
     # Uses a closure (on $__ExPr__) to pass in the code to be executed.
     # (eval on one line to keep line numbers as expected by caller)
     eval sprintf
-        'package %s; sub { @_= @(); eval q[my $__ExPr__;] . $__ExPr__; }',
+        'package %s; sub { @_= $@; eval q[my $__ExPr__;] . $__ExPr__; }',
         @_[0]
 
 
-use Carp;
+use Carp
 BEGIN { eval q{
     use Carp::Heavy;
 } }
@@ -32,7 +32,7 @@ use Opcode v1.01 < qw(
     opset opset_to_ops opmask_add
     empty_opset full_opset invert_opset verify_opset
     opdesc opcodes opmask define_optag opset_to_hex
-);
+)
 
 *ops_to_opset = \&opset   # Temporary alias for old Penguins
 
@@ -121,8 +121,8 @@ sub erase($obj, $action)
     $pkg = "$($pkg)::"	# expand to full symbol table name
     (@: $stem, $leaf) = @: $pkg =~ m/(.*)::(\w+::)$/
 
-    # The 'my $foo' is needed! Without it you get an
-    # 'Attempt to free unreferenced scalar' warning!
+                         # The 'my $foo' is needed! Without it you get an
+                         # 'Attempt to free unreferenced scalar' warning!
     my $stem_symtab = Symbol::stash($stem)
 
     #warn "erase($pkg) stem=$stem, leaf=$leaf";

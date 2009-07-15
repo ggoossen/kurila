@@ -40,7 +40,7 @@ my @greatcircle = qw(
 
 my @pi = qw(pi pi2 pi4 pip2 pip4)
 
-@EXPORT_OK = (@: < @rdlcnv, < @greatcircle, < @pi, 'tan' )
+@EXPORT_OK = @: < @rdlcnv, < @greatcircle, < @pi, 'tan' 
 
 # See e.g. the following pages:
 # http://www.movable-type.co.uk/scripts/LatLong.html

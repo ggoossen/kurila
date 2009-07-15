@@ -28,7 +28,7 @@ if (not defined $where) # Try NIS.
 
             # Check to make sure we're really using NIS.
             if( open(my $nssw, "<", "/etc/nsswitch.conf" ) )
-                my(@: $group) =  grep { m/^\s*group:/ }, (@:  ~< $nssw)
+                my(@: $group) =  grep { m/^\s*group:/ }, @:  ~< $nssw
 
                 # If there's no group line, assume it default to compat.
                 if( !$group || $group !~ m/(nis|compat)/ )
@@ -110,7 +110,7 @@ while ( ~< *GR)
         $members_s =~ s/\s*,\s*/,/g
         $members_s =~ s/\s+$//
         $members_s =~ s/^\s+//
-        my @n = (@:  getgrgid($gid_s) )
+        my @n = @:  getgrgid($gid_s) 
         # 'nogroup' et al.
         next unless (nelems @n)
         my (@: $name,$passwd,$gid,$members) =  @n

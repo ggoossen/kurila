@@ -32,7 +32,7 @@ We're Unix and Cygwin.
 =cut
 
 sub os_flavor
-    return (@: 'Unix', 'Cygwin')
+    return @: 'Unix', 'Cygwin'
 
 
 =item cflags

@@ -10,7 +10,7 @@ BEGIN
 
 $DOWARN = 1 # enable run-time warnings now
 
-use Config;
+use Config
 
 require "./test.pl"
 plan( tests => 7 )

@@ -65,7 +65,7 @@ sub parse_lines             # Usage: $parser->parse_lines(@lines)
         unless( defined $source_line )
             DEBUG +> 4 and print $^STDOUT, "# Undef-line seen.\n"
 
-            push $paras->@, \@: '~end', \(%: 'start_line' => $self->{?'line_count'})
+            push $paras->@, \@: '~end', \%: 'start_line' => $self->{?'line_count'}
             push $paras->@, $paras->[-1], $paras->[-1]
             # So that it definitely fills the buffer.
             $self->{+'source_dead'} = 1
@@ -390,7 +390,7 @@ do
 
         unshift @out,
             \(@: '=head1', \(%: 'start_line' => $m, 'errata' => 1), 'POD ERRORS'),
-            \(@: '~Para', \(%: 'start_line' => $m, '~cooked' => 1, 'errata' => 1)
+            \(@: '~Para', \%: 'start_line' => $m, '~cooked' => 1, 'errata' => 1
                  "Hey! "
                  \@: 'B', \$%
                      'The above document had some coding errors, which are explained below:'
@@ -850,15 +850,14 @@ sub _ponder_for($self,$para,$curr_open,$paras)
 
     unshift $paras->@,
         \(@: '=begin'
-             \(%: 'start_line' => $para->[1]->{?'start_line'}, '~really' => '=for')
+             \%: 'start_line' => $para->[1]->{?'start_line'}, '~really' => '=for'
              $target
         ),
         $para,
         \(@: '=end'
-             \(%: 'start_line' => $para->[1]->{?'start_line'}, '~really' => '=for')
+             \%: 'start_line' => $para->[1]->{?'start_line'}, '~really' => '=for'
              $target
         ),
-    
 
     return 1
 
@@ -1400,7 +1399,7 @@ sub _closers_for_all_curr_open($self)
     my @closers
     foreach my $still_open ( (  $self->{?'curr_open'} || return  )->@)
         my @copy = $still_open->@
-        @copy[1] = \(%: <  @copy[1]->%)
+        @copy[1] = \%: <  @copy[1]->%
         #$copy[1]{'start_line'} = -1;
         if(@copy[0] eq '=for')
             @copy[0] = '=end'
@@ -1505,19 +1504,18 @@ sub _verbatim_format($it, $p)
                     substr($p->[$i-1], pos($formatting)-length($1), length($1))
             else
                 #print "SNARING $+\n";
-                push @new_line, \(@: 
+                push @new_line, \@: 
                     (
                         $3 ?? 'VerbatimB'  !!
                         $4 ?? 'VerbatimI'  !!
                         $5 ?? 'VerbatimBI' !! die("Should never get called")
                         ), \$%
                     substr($p->[$i-1], pos($formatting)-length($1), length($1))
-                    )
+
             #print "Formatting <$new_line[-1][-1]> as $new_line[-1][0]\n";
-            
-        
-        my @nixed = (@: 
-            splice $p->@, $i-1, 2, < @new_line ) # replace myself and the next line
+
+        my @nixed = @: 
+            splice $p->@, $i-1, 2, < @new_line  # replace myself and the next line
         DEBUG +> 10 and print $^STDOUT, "Nixed count: ", scalar(nelems @nixed), "\n"
 
         DEBUG +> 6 and print $^STDOUT, "New version of the above line is these tokens (",
@@ -1565,7 +1563,7 @@ sub _verbatim_format($it, $p)
 
 sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space)
 
-    my $treelet = \@: '~Top', \(%: 'start_line' => $start_line),
+    my $treelet = \@: '~Top', \(%: 'start_line' => $start_line)
 
     unless ($preserve_space || $self->{?'preserve_whitespace'})
         use utf8
@@ -1646,8 +1644,8 @@ sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space)
             else
                 DEBUG +> 3 and print $^STDOUT, "Found simple start-text code \"$1\"\n"
                 push @stack, 0  # signal that we're looking for simple
-            
-            push @lineage, \(@:  substr($1,0,1), \$%, )  # new node object
+
+            push @lineage, \@:  substr($1,0,1), \$%,   # new node object
             push  @lineage[-2]->@, @lineage[-1]
 
         elsif(defined $4)

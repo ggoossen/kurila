@@ -154,7 +154,7 @@ require VMS::Stdio if $^OS_NAME eq 'VMS'
 require Carp::Heavy
 
 ### For the OO interface
-use base < qw/ IO::Handle IO::Seekable /;
+use base < qw/ IO::Handle IO::Seekable /
 
 # use 'our' on v5.6.0
 our ($VERSION, @EXPORT_OK, %EXPORT_TAGS, $DEBUG, $KEEP_ALL)
@@ -164,7 +164,7 @@ $KEEP_ALL = 0
 
 # We are exporting functions
 
-use base < qw/Exporter/;
+use base < qw/Exporter/
 
 # Export list - to allow fine tuning of export table
 
@@ -186,11 +186,11 @@ use base < qw/Exporter/;
 
 # Groups of functions for export
 
-%EXPORT_TAGS = %(
-    'POSIX' => qw/ tmpnam tmpfile /,
-    'mktemp' => qw/ mktemp mkstemp mkstemps mkdtemp/,
-    'seekable' => qw/ SEEK_SET SEEK_CUR SEEK_END /,
-    )
+%EXPORT_TAGS = %: 
+    'POSIX' => qw/ tmpnam tmpfile /
+    'mktemp' => qw/ mktemp mkstemp mkstemps mkdtemp/
+    'seekable' => qw/ SEEK_SET SEEK_CUR SEEK_END /
+    
 
 # add contents of these tags to @EXPORT
 Exporter::export_tags('POSIX','mktemp','seekable')
@@ -211,17 +211,17 @@ my @CHARS =qw/ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 use constant MAX_TRIES => 1000
 
 # Minimum number of X characters that should be in a template
-use constant MINX => 4;
+use constant MINX => 4
 
 # Default template when no template supplied
 
-use constant TEMPXXX => 'X' x 10;
+use constant TEMPXXX => 'X' x 10
 
 # Constants for the security level
 
-use constant STANDARD => 0;
-use constant MEDIUM   => 1;
-use constant HIGH     => 2;
+use constant STANDARD => 0
+use constant MEDIUM   => 1
+use constant HIGH     => 2
 
 # OPENFLAGS. If we defined the flag to use with Sysopen here this gives
 # us an optimisation when many temporary files are requested
@@ -231,7 +231,7 @@ my $LOCKFLAG
 
 unless ($^OS_NAME eq 'MacOS')
     for my $oflag (qw/ NOFOLLOW BINARY LARGEFILE NOINHERIT /)
-        my @($bit, $func) = @(0, "Fcntl::O_" . $oflag)
+        my (@: $bit, $func) = @: 0, "Fcntl::O_" . $oflag
         $OPENFLAGS ^|^= $bit if try {
               # Make sure that redefined die handlers do not cause problems
               # e.g. CGI::Carp
@@ -258,7 +258,7 @@ unless ($^OS_NAME eq 'MacOS')
 my $OPENTEMPFLAGS = $OPENFLAGS
 unless ($^OS_NAME eq 'MacOS')
     for my $oflag (qw/ TEMPORARY /)
-        my @($bit, $func) = @(0, "Fcntl::O_" . $oflag)
+        my (@: $bit, $func) = @: 0, "Fcntl::O_" . $oflag
         local($^EVAL_ERROR)
         $OPENTEMPFLAGS ^|^= $bit if try {
               # Make sure that redefined die handlers do not cause problems
@@ -329,14 +329,14 @@ sub _gettemp
     my $tempErrStr
 
     # Default options
-    my %options = %(
-        "open" => 0,
-        "mkdir" => 0,
-        "suffixlen" => 0,
-        "unlink_on_close" => 0,
-        "use_exlock" => 1,
-        "ErrStr" => \$tempErrStr,
-        )
+    my %options = %: 
+        "open" => 0
+        "mkdir" => 0
+        "suffixlen" => 0
+        "unlink_on_close" => 0
+        "use_exlock" => 1
+        "ErrStr" => \$tempErrStr
+        
 
     # Read the template
     my $template = shift
@@ -354,7 +354,7 @@ sub _gettemp
     
 
     # Read the options and merge with defaults
-    %options = %(< %options, < @_)  if (nelems @_)
+    %options = (%: < %options, < @_)  if (nelems @_)
 
     # Make sure the error string is set to undef
     %options{ErrStr}->$ = undef
@@ -399,7 +399,7 @@ sub _gettemp
     my $parent # parent directory
     if (%options{?"mkdir"})
         # There is no filename at the end
-        @($volume, $directories, $file) =  File::Spec->splitpath( $path, 1)
+        (@: $volume, $directories, $file) =  File::Spec->splitpath( $path, 1)
 
         # The parent is then $directories without the last directory
         # Split the directory and put it back together again
@@ -428,7 +428,7 @@ sub _gettemp
     else
 
         # Get rid of the last filename (use File::Basename for this?)
-        @($volume, $directories, $file) =  File::Spec->splitpath( $path )
+        (@: $volume, $directories, $file) =  File::Spec->splitpath( $path )
 
         # Join up without the file part
         $parent = File::Spec->catpath($volume,$directories,'')
@@ -513,7 +513,7 @@ sub _gettemp
                 chmod(0600, $path)
 
                 # Opened successfully - return file handle and name
-                return  @($fh, $path)
+                return  @: $fh, $path
 
             else
 
@@ -534,7 +534,7 @@ sub _gettemp
                 # in case of odd umask
                 chmod(0700, $path)
 
-                return @(undef, $path)
+                return @: undef, $path
             else
 
                 # Abort with error if the reason for failure was anything
@@ -553,7 +553,7 @@ sub _gettemp
             # Return true if the file can not be found
             # Directory has been checked previously
 
-            return  @(undef, $path) unless -e $path
+            return  (@: undef, $path) unless -e $path
 
         # Try again until MAX_TRIES
 
@@ -613,7 +613,7 @@ sub _replace_XX
     croak 'Usage: _replace_XX($template, $ignore)'
         unless scalar(nelems @_) == 2
 
-    my @($path, $ignore) =  @_
+    my (@: $path, $ignore) =  @_
 
     # Do it as an if, since the suffix adjusts which section to replace
     # and suffixlen=0 returns nothing if used in the substr directly
@@ -662,7 +662,7 @@ sub _is_safe
     my $err_ref = shift
 
     # Stat path
-    my @info = @( stat($path) )
+    my @info = @:  stat($path) 
     unless (scalar(nelems @info))
         $err_ref->$ = "stat(path) returned no values"
         return 0
@@ -753,7 +753,7 @@ sub _is_verysafe
     
 
     # Split directory into components - assume no file
-    my @($volume, $directories, _) =  File::Spec->splitpath( $path, 1)
+    my (@: $volume, $directories, _) =  File::Spec->splitpath( $path, 1)
 
     # Slightly less efficient than having a function in File::Spec
     # to chop off the end of a directory or even a function that
@@ -868,8 +868,8 @@ do
     sub cleanup
         if (!$KEEP_ALL)
             # Files
-            my @files = @(exists %files_to_unlink{$^PID} ??
-                          <  %files_to_unlink{?$^PID}->@ !! () )
+            my @files = @: exists %files_to_unlink{$^PID} ??
+                               <  %files_to_unlink{?$^PID}->@ !! () 
             foreach my $file ( @files)
                 # close the filehandle without checking its state
                 # in order to make real sure that this is closed
@@ -883,8 +883,8 @@ do
                 
             
             # Dirs
-            my @dirs = @(exists %dirs_to_unlink{$^PID} ??
-                         <  %dirs_to_unlink{?$^PID}->@ !! () )
+            my @dirs = @: exists %dirs_to_unlink{$^PID} ??
+                              <  %dirs_to_unlink{?$^PID}->@ !! () 
             foreach my $dir ( @dirs)
                 if (-d $dir)
                     rmtree($dir, $DEBUG, 0)
@@ -892,9 +892,9 @@ do
             
 
             # clear the arrays
-            %files_to_unlink{$^PID}->@ = @( () )
+            %files_to_unlink{$^PID}->@ = @:  () 
                 if exists %files_to_unlink{$^PID}
-            %dirs_to_unlink{$^PID}->@ = @( () )
+            %dirs_to_unlink{$^PID}->@ = @:  () 
                 if exists %dirs_to_unlink{$^PID}
         
     
@@ -910,7 +910,7 @@ do
         croak 'Usage:  _deferred_unlink($fh, $fname, $isdir)'
             unless scalar(nelems @_) == 3
 
-        my @($fh, $fname, $isdir) =  @_
+        my (@: $fh, $fname, $isdir) =  @_
 
         warn "Setting up deferred removal of $fname\n"
             if $DEBUG
@@ -923,7 +923,7 @@ do
                 # Directory exists so store it
                 # first on VMS turn []foo into [.foo] for rmtree
                 $fname = VMS::Filespec::vmspath($fname) if $^OS_NAME eq 'VMS'
-                %dirs_to_unlink{+$^PID} = \@()
+                %dirs_to_unlink{+$^PID} = \@: 
                     unless exists %dirs_to_unlink{$^PID}
                 push ( %dirs_to_unlink{$^PID}->@, $fname)
 
@@ -936,9 +936,9 @@ do
             if (-f $fname)
 
                 # file exists so store handle and name for later removal
-                %files_to_unlink{+$^PID} = \@()
+                %files_to_unlink{+$^PID} = \@: 
                     unless exists %files_to_unlink{$^PID}
-                push( %files_to_unlink{$^PID}->@, \@($fh, $fname))
+                push( %files_to_unlink{$^PID}->@, \(@: $fh, $fname))
 
             else
                 carp "Request to remove file $fname could not be completed since it is not there!\n" if $^WARNING
@@ -998,8 +998,8 @@ sub new
     my $class = ref($proto) || $proto
 
     # read arguments and convert keys to upper case
-    my %args = %( < @_ )
-    %args = %( < @+: map { @: uc($_), %args{?$_} }, keys %args )
+    my %args = %:  < @_ 
+    %args = %:  < @+: map { @: uc($_), %args{?$_} }, keys %args 
 
     # see if they are unlinking (defaulting to yes)
     my $unlink = (exists %args{UNLINK} ?? %args{?UNLINK} !! 1 )
@@ -1007,14 +1007,14 @@ sub new
 
     # template (store it in an error so that it will
     # disappear from the arg list of tempfile
-    my @template = @( exists %args{TEMPLATE} ?? %args{?TEMPLATE} !! () )
+    my @template = @:  exists %args{TEMPLATE} ?? %args{?TEMPLATE} !! () 
     delete %args{TEMPLATE}
 
     # Protect OPEN
     delete %args{OPEN}
 
     # Open the file and retain file handle and file name
-    my @($fh, $path) =  tempfile( < @template, < %args )
+    my (@: $fh, $path) =  tempfile( < @template, < %args )
 
     print $^STDOUT, "Tmp: $fh - $path\n" if $DEBUG
 
@@ -1025,7 +1025,7 @@ sub new
     %FILES_CREATED_BY_OBJECT{+$^PID}{+$path} = 1
 
     # Store unlink information in hash slot (plus other constructor info)
-    $fh->*->% = %( < %args )
+    $fh->*->% = %:  < %args 
 
     # create the object
     bless $fh, $class
@@ -1057,7 +1057,7 @@ sub newdir
     # need to handle args as in tempdir because we have to force CLEANUP
     # default without passing CLEANUP to tempdir
     my $template = (scalar(nelems @_) % 2 == 1 ?? shift(@_) !! undef )
-    my %options = %( < @_ )
+    my %options = %:  < @_ 
     my $cleanup = (exists %options{CLEANUP} ?? %options{?CLEANUP} !! 1 )
 
     delete %options{CLEANUP}
@@ -1068,9 +1068,9 @@ sub newdir
     else
         $tempdir = tempdir( < %options )
     
-    return bless \%( DIRNAME => $tempdir,
-        CLEANUP => $cleanup,
-        LAUNCHPID => $^PID,
+    return bless \(%:  DIRNAME => $tempdir
+                       CLEANUP => $cleanup
+                       LAUNCHPID => $^PID
         ), "File::Temp::Dir"
 
 
@@ -1273,20 +1273,20 @@ sub tempfile
     # number of args
 
     # Default options
-    my %options = %(
-        "DIR"    => undef,  # Directory prefix
-        "SUFFIX" => '',     # Template suffix
-        "UNLINK" => 0,      # Do not unlink file on exit
-        "OPEN"   => 1,      # Open file
-        "TMPDIR" => 0,     # Place tempfile in tempdir if template specified
-        "EXLOCK" => 1,      # Open file with O_EXLOCK
-        )
+    my %options = %: 
+        "DIR"    => undef  # Directory prefix
+        "SUFFIX" => ''     # Template suffix
+        "UNLINK" => 0      # Do not unlink file on exit
+        "OPEN"   => 1      # Open file
+        "TMPDIR" => 0     # Place tempfile in tempdir if template specified
+        "EXLOCK" => 1      # Open file with O_EXLOCK
+        
 
     # Check to see whether we have an odd or even number of arguments
     my $template = (scalar(nelems @_) % 2 == 1 ?? shift(@_) !! undef)
 
     # Read the options and merge with defaults
-    %options = %(< %options, < @_)  if (nelems @_)
+    %options = (%: < %options, < @_)  if (nelems @_)
 
     # First decision is whether or not to open the file
     if (! %options{?"OPEN"})
@@ -1354,7 +1354,7 @@ sub tempfile
     # Create the file
     my ($fh, $path, $errstr)
     croak "Error in tempfile() using $template: $errstr"
-        unless (@($fh, $path) =  _gettemp($template,
+        unless ((@: $fh, $path) =  _gettemp($template,
                                           "open" => %options{?'OPEN'},
                                           "mkdir"=> 0 ,
                                           "unlink_on_close" => $unlink_on_close,
@@ -1373,9 +1373,9 @@ sub tempfile
 
     # Return
     if (%options{?'OPEN'})
-        return  @($fh, $path)
+        return  @: $fh, $path
     else
-        return  @(undef, $path)
+        return  @: undef, $path
     
 
 
@@ -1450,17 +1450,17 @@ sub tempdir
     # number of args
 
     # Default options
-    my %options = %(
-        "CLEANUP"    => 0,  # Remove directory on exit
-        "DIR"        => '', # Root directory
-        "TMPDIR"     => 0,  # Use tempdir with template
-        )
+    my %options = %: 
+        "CLEANUP"    => 0  # Remove directory on exit
+        "DIR"        => '' # Root directory
+        "TMPDIR"     => 0  # Use tempdir with template
+        
 
     # Check to see whether we have an odd or even number of arguments
     my $template = (scalar(nelems @_) % 2 == 1 ?? shift(@_) !! undef )
 
     # Read the options and merge with defaults
-    %options = %(< %options, < @_)  if (nelems @_)
+    %options = (%: < %options, < @_)  if (nelems @_)
 
     # Modify or generate the template
 
@@ -1474,7 +1474,7 @@ sub tempdir
             #
             # There is no filename at the end
             $template = VMS::Filespec::vmspath($template) if $^OS_NAME eq 'VMS'
-            my @($volume, $directories, _) =  File::Spec->splitpath( $template, 1)
+            my (@: $volume, $directories, _) =  File::Spec->splitpath( $template, 1)
 
             # Last directory is then our template
             $template = File::Spec->splitdir($directories)[-1]
@@ -1521,7 +1521,7 @@ sub tempdir
 
     my $errstr
     croak "Error in tempdir() using $template: $errstr"
-        unless (@(_, $tempdir) =  _gettemp($template,
+        unless ((@: _, $tempdir) =  _gettemp($template,
                                            "open" => 0,
                                            "mkdir"=> 1 ,
                                            "suffixlen" => $suffixlen,
@@ -1575,14 +1575,14 @@ sub mkstemp
 
     my ($fh, $path, $errstr)
     croak "Error in mkstemp using $template: $errstr"
-        unless (@($fh, $path) =  _gettemp($template,
+        unless ((@: $fh, $path) =  _gettemp($template,
                                           "open" => 1,
                                           "mkdir"=> 0 ,
                                           "suffixlen" => 0,
                                           "ErrStr" => \$errstr,
                                           ) )
 
-    return  @($fh, $path)
+    return  @: $fh, $path
 
 
 
@@ -1615,14 +1615,14 @@ sub mkstemps
 
     my ($fh, $path, $errstr)
     croak "Error in mkstemps using $template: $errstr"
-        unless (@($fh, $path) =  _gettemp($template,
+        unless ((@: $fh, $path) =  _gettemp($template,
                                           "open" => 1,
                                           "mkdir"=> 0 ,
                                           "suffixlen" => length($suffix),
                                           "ErrStr" => \$errstr,
                                           ) )
 
-    return  @($fh, $path)
+    return  @: $fh, $path
 
 
 =item B<mkdtemp>
@@ -1659,7 +1659,7 @@ sub mkdtemp
     
     my ($junk, $tmpdir, $errstr)
     croak "Error creating temp directory from template $template\: $errstr"
-        unless (@($junk, $tmpdir) =  _gettemp($template,
+        unless ((@: $junk, $tmpdir) =  _gettemp($template,
                                               "open" => 0,
                                               "mkdir"=> 1 ,
                                               "suffixlen" => $suffixlen,
@@ -1692,7 +1692,7 @@ sub mktemp
 
     my ($tmpname, $junk, $errstr)
     croak "Error getting name to temp file from template $template: $errstr"
-        unless (@($junk, $tmpname) =  _gettemp($template,
+        unless ((@: $junk, $tmpname) =  _gettemp($template,
                                                "open" => 0,
                                                "mkdir"=> 0 ,
                                                "suffixlen" => 0,
@@ -1779,7 +1779,7 @@ Will croak() if there is an error.
 sub tmpfile
 
     # Simply call tmpnam() in a list context
-    my @($fh, $file) =  tmpnam()
+    my (@: $fh, $file) =  tmpnam()
 
     # Make sure file is removed when filehandle is closed
     # This will fail on NFS
@@ -1825,7 +1825,7 @@ sub tempnam
 
     croak 'Usage tempnam($dir, $prefix)' unless scalar(nelems @_) == 2
 
-    my @($dir, $prefix) =  @_
+    my (@: $dir, $prefix) =  @_
 
     # Add a string to the prefix
     $prefix .= 'XXXXXXXX'
@@ -1899,7 +1899,7 @@ sub unlink0
         unless scalar(nelems @_) == 2
 
     # Read args
-    my @($fh, $path) =  @_
+    my (@: $fh, $path) =  @_
 
     cmpstat($fh, $path) or return 0
 
@@ -1915,7 +1915,7 @@ sub unlink0
         unlink($path) or return 0
 
         # Stat the filehandle
-        my @fh = @( stat $fh )
+        my @fh = @:  stat $fh 
 
         print $^STDOUT, "Link count = @fh[3] \n" if $DEBUG
 
@@ -1924,7 +1924,7 @@ sub unlink0
         #   on Win9x the link count remains 1
         # On NFS the link count may still be 1 but we cant know that
         # we are on NFS
-        return  @( @fh[3] == 0 or $^OS_NAME eq 'cygwin' ?? 1 !! 0)
+        return  @:  @fh[3] == 0 or $^OS_NAME eq 'cygwin' ?? 1 !! 0
 
     else
         _deferred_unlink($fh, $path, 0)
@@ -1964,7 +1964,7 @@ sub cmpstat
         unless scalar(nelems @_) == 2
 
     # Read args
-    my @($fh, $path) =  @_
+    my (@: $fh, $path) =  @_
 
     warn "Comparing stat\n"
         if $DEBUG
@@ -1975,7 +1975,7 @@ sub cmpstat
     my @fh
     do
         local ($^WARNING) = 0
-        @fh = @( stat $fh )
+        @fh = @:  stat $fh 
     
     return unless (nelems @fh)
 
@@ -1984,7 +1984,7 @@ sub cmpstat
     
 
     # Stat the path
-    my @path = @( stat $path )
+    my @path = @:  stat $path 
 
     unless (nelems @path)
         carp "unlink0: $path is gone already" if $^WARNING
@@ -2003,15 +2003,15 @@ sub cmpstat
     # Select the ones we can use
     my @okstat =0..((nelems @fh)-1)  # Use all by default
     if ($^OS_NAME eq 'MSWin32')
-        @okstat = @(1,2,3,4,5,7,8,9,10)
+        @okstat = @: 1,2,3,4,5,7,8,9,10
     elsif ($^OS_NAME eq 'os2')
-        @okstat = @(0, < 2..((nelems @fh)-1))
+        @okstat = @: 0, < 2..((nelems @fh)-1)
     elsif ($^OS_NAME eq 'VMS') # device and file ID are sufficient
-        @okstat = @(0, 1)
+        @okstat = @: 0, 1
     elsif ($^OS_NAME eq 'dos')
-        @okstat = @(0, <2..7, <11..((nelems @fh)-1))
+        @okstat = @: 0, <2..7, <11..((nelems @fh)-1)
     elsif ($^OS_NAME eq 'mpeix')
-        @okstat = @( <0..4, <8..10)
+        @okstat = @:  <0..4, <8..10
     
 
     # Now compare each entry explicitly by number
@@ -2056,7 +2056,7 @@ sub unlink1
         unless scalar(nelems @_) == 2
 
     # Read args
-    my @($fh, $path) =  @_
+    my (@: $fh, $path) =  @_
 
     cmpstat($fh, $path) or return 0
 
@@ -2337,7 +2337,7 @@ security enhancements.
 
 package File::Temp::Dir
 
-use File::Path < qw/ rmtree /;
+use File::Path < qw/ rmtree /
 
 
 # private class specifically to support tempdir objects

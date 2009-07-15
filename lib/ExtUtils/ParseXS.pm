@@ -73,7 +73,7 @@ sub process_file
     $ProtoUsed = exists %args{prototypes}
 
     # Set defaults.
-    %args = (%: 
+    %args = %: 
         # 'C++' => 0, # Doesn't seem to *do* anything...
         hiertype => 0
         except => 0
@@ -88,7 +88,7 @@ sub process_file
         output => $^STDOUT
         csuffix => '.c'
         < %args
-        )
+
 
     # Global Constants
 
@@ -97,8 +97,8 @@ sub process_file
         # will later add the 'XS_' prefix.
         require ExtUtils::XSSymSet
         $SymSet = ExtUtils::XSSymSet->new( 28)
-    
-    @XSStack = @: \(%: type => 'none')
+
+    @XSStack = @: \%: type => 'none'
     (@: $XSS_work_idx, $cpp_next_tmp) = @: 0, "XSubPPtmpAAAA"
     @InitFileCode = $@
     $FH = Symbol::gensym()
@@ -315,7 +315,7 @@ EOM
         
         last if (@: ?$Package, ?$Prefix) =
           @: m/^MODULE\s*=\s*[\w:]+(?:\s+PACKAGE\s*=\s*([\w:]+))?(?:\s+PREFIX\s*=\s*(\S+))?\s*$/
-
+             
         print $output_fh, $_
     
     unless (defined $line)
@@ -449,7 +449,7 @@ EOF
 
 
 sub process_para
-    my %args = (%:  < @_ )
+    my %args = %:  < @_ 
 
     # Print initial preprocessor statements and blank lines
     while ((nelems @line) && @line[0] !~ m/^[^\#]/)
@@ -1047,7 +1047,7 @@ sub standard_typemap_locations
 
         unshift @tm, File::Spec->catfile($dir, 'typemap')
         unshift @tm, File::Spec->catfile($dir, lib => ExtUtils => 'typemap')
-    
+
     foreach my $dir ( $^INCLUDE_PATH)
         my $file = File::Spec->catfile($dir, ExtUtils => 'typemap')
         unshift @tm, $file if -e $file
@@ -1336,11 +1336,10 @@ sub FALLBACK_handler()
     # FALSE or UNDEF
 
     $_ = TrimWhitespace($_) 
-    my %map = (%: 
+    my %map = %: 
         TRUE => "&PL_sv_yes", 1 => "&PL_sv_yes"
         FALSE => "&PL_sv_no", 0 => "&PL_sv_no"
         UNDEF => "&PL_sv_undef"
-        ) 
 
     # check for valid FALLBACK value
     death ("Error: FALLBACK: TRUE/FALSE/UNDEF") unless exists %map{uc $_} 

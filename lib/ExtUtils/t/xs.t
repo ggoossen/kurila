@@ -3,19 +3,19 @@
 BEGIN 
     if( env::var('PERL_CORE') )
         chdir 't'
-        $^INCLUDE_PATH = @('../lib', 'lib/')
+        $^INCLUDE_PATH = @: '../lib', 'lib/'
     else
         unshift $^INCLUDE_PATH, 't/lib/'
     
 
 chdir 't'
 
-use Test::More;
-use MakeMaker::Test::Utils;
-use MakeMaker::Test::Setup::XS;
-use File::Find;
-use File::Spec;
-use File::Path;
+use Test::More
+use MakeMaker::Test::Utils
+use MakeMaker::Test::Setup::XS
+use File::Find
+use File::Spec
+use File::Path
 
 if( have_compiler() )
     plan tests => 5

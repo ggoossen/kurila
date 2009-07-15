@@ -61,7 +61,7 @@ sub unctrl {
 
 sub uniescape {
     join("", map { $_ +> 255 ? sprintf("\\x\{\%04X\}", $_) : chr($_) }
- @(	     unpack("U*", @_[0])));
+           @: unpack("U*", @_[0]));
 }
 
 sub stringify {
@@ -258,7 +258,7 @@ sub unwrap {
 	if ($compactDump && !grep(ref $_, @{$v})) {
 	  if ((nelems @$v)) {
 	    $short = $sp . "0..$(join ' ',@$($v))-1  " . 
-	      join(" ", map {exists $v->[$_] ? < stringify $v->[$_] : "empty"} @( ( <0..$tArrayDepth))
+	      join(" ", map {exists $v->[$_] ? < stringify $v->[$_] : "empty"} 0..$tArrayDepth
 		  ) . "$shortmore";
 	  } else {
 	    $short = $sp . "empty array";

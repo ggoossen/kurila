@@ -38,7 +38,7 @@ sub doglob
             substr($pat,0,2, $1 . "./")
         
         if ($pat =~ m|^(.*)([\\/])([^\\/]*)\z|s)
-            (@: $head, $sepchr, $tail) = (@: $1,$2,$3)
+            (@: $head, $sepchr, $tail) = @: $1,$2,$3
             #print "div: |$head|$sepchr|$tail|\n";
             push (@retval, $pat), next OUTER if $tail eq ''
             if ($head =~ m/[*?]/)
@@ -125,7 +125,7 @@ sub doglob_Mac
 
         if (m|^(.*?)(:+)([^:]*)\z|s) # note: $1 is not greedy
             my $tail
-            (@: $head, $sepchr, $tail) = (@: $1,$2,$3)
+            (@: $head, $sepchr, $tail) = @: $1,$2,$3
             #print "div: |$head|$sepchr|$tail|\n";
             push (@retval, $_), next OUTER if $tail eq ''
             #
@@ -328,7 +328,7 @@ sub glob($pat,$cxix)
         for ( @pat)
             # There must be a "," I.E. abc{efg} is not what we want.
             while ( m/^(.*)(?<!\\)\{(.*?)(?<!\\)\,.*?(?<!\\)\}(.*)$/ )
-                my (@: $start, $match, $end) = (@: $1, $2, $3)
+                my (@: $start, $match, $end) = @: $1, $2, $3
                 #print "Got: \n\t$start\n\t$match\n\t$end\n";
                 my $tmp = "$start$match$end"
                 while ( $tmp =~ s/^(.*?)(?<!\\)\{(?:.*(?<!\\)\,)?(.*\Q$match\E.*?)(?:(?<!\\)\,.*)?(?<!\\)\}(.*)$/$1$2$3/ ) {

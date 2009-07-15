@@ -16,7 +16,7 @@ our @EXPORT = qw( checkOptree plan skip skip_all pass is like unlike
 # The approach taken is to put the hints-with-open in the golden results, and
 # flag that they need to be taken out if $^OPEN is set.
 
-if ((@(caller 0)[10]||\%())->{?'open<'})
+if (((@: caller 0)[10]||\(%: ))->{?'open<'})
     $using_open = 1
 
 
@@ -308,31 +308,31 @@ sub import($pkg)
 # is done by getCmdLine(), via import
 
 our %gOpts = 	# values are replaced at runtime !!
-    %(
+    %: 
     # scalar values are help string
-    retry       => 'retry failures after turning on re debug',
-    debug       => 'turn on re debug for those retries',
-    selftest    => 'self-tests mkCheckRex vs the reference rendering',
+    retry       => 'retry failures after turning on re debug'
+    debug       => 'turn on re debug for those retries'
+    selftest    => 'self-tests mkCheckRex vs the reference rendering'
 
-    fail        => 'force all test to fail, print to stdout',
-    dump        => 'dump cmdline arg prcessing',
-    noanchors   => 'dont anchor match rex',
+    fail        => 'force all test to fail, print to stdout'
+    dump        => 'dump cmdline arg prcessing'
+    noanchors   => 'dont anchor match rex'
 
     # array values are one-of selections, with 1st value as default
     #  array: 2nd value is used as help-str, 1st val (still) default
-    help        => \@(0, 'provides help and exits', 0),
-    testmode    => \qw/ native cross both /,
+    help        => \(@: 0, 'provides help and exits', 0)
+    testmode    => \qw/ native cross both /
 
     # reporting mode for rendering errs
-    report      => \qw/ diag fail print /,
-    errcont     => \@(1, 'if 1, tests match even if report is fail', 0),
+    report      => \qw/ diag fail print /
+    errcont     => \(@: 1, 'if 1, tests match even if report is fail', 0)
 
     # fixup for VMS, cygwin, which dont have stderr b4 stdout
-    rxnoorder   => \@(1, 'if 1, dont req match on -e lines, and -banner',0),
-    strip       => \@(1, 'if 1, catch errs and remove from renderings',0),
-    stripv      => 'if strip&&1, be verbose about it',
-    errs        => 'expected compile errs, array if several',
-    )
+    rxnoorder   => \(@: 1, 'if 1, dont req match on -e lines, and -banner',0)
+    strip       => \(@: 1, 'if 1, catch errs and remove from renderings',0)
+    stripv      => 'if strip&&1, be verbose about it'
+    errs        => 'expected compile errs, array if several'
+    
 
 
 # Not sure if this is too much cheating. Officially we say that
@@ -351,23 +351,23 @@ our %gOpts = 	# values are replaced at runtime !!
 our $platform = "plain"
 our $thrstat = "nonthreaded"
 
-our %modes = %(
-    both        => \@( 'expect', 'expect_nt'),
-    native      => \@( 'expect_nt'),
-    cross       => \@( !'expect_nt'),
-    expect      => \@( 'expect' ),
-    expect_nt   => \@( 'expect_nt' ),
-    )
+our %modes = %: 
+    both        => \(@:  'expect', 'expect_nt')
+    native      => \(@:  'expect_nt')
+    cross       => \(@:  !'expect_nt')
+    expect      => \(@:  'expect' )
+    expect_nt   => \(@:  'expect_nt' )
+    
 
 our %msgs # announce cross-testing.
-    = %(
+    = %: 
     # cross-platform
-    'expect_nt-threaded' => " (nT on T) ",
-    'expect-nonthreaded' => " (T on nT) ",
+    'expect_nt-threaded' => " (nT on T) "
+    'expect-nonthreaded' => " (T on nT) "
     # native - nothing to say (must stay empty - used for $crosstesting)
-    'expect_nt-nonthreaded'     => '',
-    'expect-threaded'   => '',
-    )
+    'expect_nt-nonthreaded'     => ''
+    'expect-threaded'   => ''
+    
 
 #######
 sub getCmdLine  # import assistant
@@ -450,7 +450,7 @@ sub checkOptree
 
 sub newTestCases
     # make test objects (currently 1) from args (passed to checkOptree)
-    my $tc = bless \%(< @_), __PACKAGE__
+    my $tc = bless \(%: < @_), __PACKAGE__
         or die "test cases are hashes"
 
     $tc->label()
@@ -464,10 +464,10 @@ sub newTestCases
     # transform errs to self-hash for efficient set-math
     if ($tc->{?errs})
         if (not ref $tc->{?errs})
-            $tc->{+errs} = \%( $tc->{?errs} => 1)
+            $tc->{+errs} = \%:  $tc->{?errs} => 1
         elsif (ref $tc->{?errs} eq 'ARRAY')
             my %errs
-            %errs{[ $tc->{?errs}->@]} = @(1) x nelems $tc->{?errs}->@
+            %errs{[ $tc->{?errs}->@]} = (@: 1) x nelems $tc->{?errs}->@
             $tc->{+errs} = \%errs
         elsif (ref $tc->{?errs} eq 'Regexp')
             warn "regexp err matching not yet implemented"
@@ -501,11 +501,11 @@ sub getRendering
     my @errs            # collect errs via
 
     if ($tc->{?Dx})
-        $rendering = runperl( switches => \@('-w',join(',', @("-Dx",< @opts))),
+        $rendering = runperl( switches => \(@: '-w',join(',', (@: "-Dx",< @opts))),
                               prog => $tc->{?Dx}, stderr => 1,
                               ) # verbose => 1);
     elsif ($tc->{?prog})
-        $rendering = runperl( switches => \@('-w',join(',', @("-MO=Concise",< @opts))),
+        $rendering = runperl( switches => \(@: '-w',join(',', (@: "-MO=Concise",< @opts))),
                               prog => $tc->{?prog}, stderr => 1,
                               ) # verbose => 1);
     elsif ($tc->{?code})
@@ -550,16 +550,16 @@ sub getRendering
     
     $tc->{+got}    = $rendering
     $tc->{+goterrs} = \@errs if (nelems @errs)
-    return @($rendering, @errs)
+    return @: $rendering, @errs
 
 
 sub get_bcopts
     # collect concise passthru-options if any
-    my @($tc) =@( shift)
-    my @opts = @( () )
+    my (@: $tc) =@:  shift
+    my @opts = @:  () 
     if ($tc->{?bcopts})
-        @opts = @( (ref $tc->{?bcopts} eq 'ARRAY')
-                   ?? < $tc->{?bcopts}->@ !! ($tc->{?bcopts}) )
+        @opts = @:  (ref $tc->{?bcopts} eq 'ARRAY')
+                        ?? < $tc->{?bcopts}->@ !! ($tc->{?bcopts}) 
     
     return @opts
 
@@ -570,10 +570,10 @@ sub checkErrs
 
     # check for agreement, by hash (order less important)
     my (%goterrs, @got)
-    $tc->{+goterrs} ||= \@()
-    %goterrs{[ $tc->{?goterrs}->@]} = @(1) x nelems $tc->{?goterrs}->@
+    $tc->{+goterrs} ||= \@: 
+    %goterrs{[ $tc->{?goterrs}->@]} = (@: 1) x nelems $tc->{?goterrs}->@
 
-    foreach my $k (keys(($tc->{+errs} ||= \%())->%))
+    foreach my $k (keys(($tc->{+errs} ||= \(%: ))->%))
         if (@got = grep { m/^$k$/ }, keys %goterrs)
             delete $tc->{errs}->{$k}
             for (@got)
@@ -582,7 +582,7 @@ sub checkErrs
     $tc->{+goterrs} = \%goterrs
 
     # relook at altered
-    if ($tc->{?errs}->% or ($tc->{+goterrs} ||= \%())->%)
+    if ($tc->{?errs}->% or ($tc->{+goterrs} ||= \(%: ))->%)
         $tc->diag_or_fail()
     
     fail("FORCED: $tc->{?name}:\n") if %gOpts{?fail} # silly ?
@@ -646,7 +646,7 @@ The regex is anchored by default, but can be suppressed with
 =cut
 
 # needless complexity due to 'too much info' from B::Concise v.60
-my $announce = 'B::Concise::compile\(CODE\(0x[0-9a-f]+\)\)';
+my $announce = 'B::Concise::compile\(CODE\(0x[0-9a-f]+\)\)'
 
 sub mkCheckRex($tc, $want)
     eval "no re 'debug'"
@@ -954,7 +954,7 @@ EONT_EONT
 
 
 sub OptreeCheck::gentest($code, ?$opts)
-    my $rendering = getRendering(\%(code => $code))
+    my $rendering = getRendering(\(%: code => $code))
     my $testcode = OptreeCheck::wrap($code)
     return unless $testcode
 
@@ -988,7 +988,7 @@ sub OptreeCheck::processExamples
     foreach my $file ( @files)
         open (my $fh, "<", $file) or die "cant open $file: $^OS_ERROR\n"
         $^INPUT_RECORD_SEPARATOR = ""
-        my @chunks = @( ~< $fh )
+        my @chunks = @:  ~< $fh 
         print $^STDOUT, < preamble (scalar nelems @chunks)
         foreach my $t ( @chunks)
             print $^STDOUT, "\n\n=for gentest\n\n# chunk: $t=cut\n\n"

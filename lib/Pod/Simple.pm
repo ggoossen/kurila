@@ -366,8 +366,7 @@ sub _init_fh_source($self, $source)
 #:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
 #
 
-sub parse_file
-    my(@: $self, $source) = @: < @_
+sub parse_file($self, $source)
 
     if(!defined $source)
         die("Can't use empty-string as a source for parse_file")
@@ -695,12 +694,11 @@ sub _remap_sequences
                     DEBUG +> 4 and printf $^STDOUT,
                         "    Grafting a new \%s node between \%s and \%s\n",
                         @dynasty[-1], $treelet->[0], $treelet->[$i]->[0],
-                    
 
                     #$nugget = ;
-                    splice $treelet->@, $i, 1, \(@: pop(@dynasty), \$%, $treelet->[$i])
+                    splice $treelet->@, $i, 1, \@: pop(@dynasty), \$%, $treelet->[$i]
                 # relace node with a new parent
-                
+
             elsif($is eq '0')
                 splice($treelet->@, $i, 1) # just nix this node (and its descendants)
                 --$i  # back-update the counter
@@ -1070,7 +1068,7 @@ sub _treat_Ls($self,@< @stack)
                     print $^STDOUT, "    Peering at L-content text bit \"@ell_content[$j]\" for a '|'.\n"
 
                 if(@ell_content[$j] =~ m/^([^\|]*)\|(.*)$/s)
-                    my @link_text = (@: $1)   # might be 0-length
+                    my @link_text = @: $1   # might be 0-length
                     @ell_content[$j] = $2  # might be 0-length
 
                     DEBUG +> 3 and
@@ -1099,7 +1097,7 @@ sub _treat_Ls($self,@< @stack)
                     print $^STDOUT, "    Peering at L-content text bit \"@ell_content[$j]\" for a '/'.\n"
 
                 if(@ell_content[$j] =~ m/^([^\/]*)\/(.*)$/s)
-                    my @section_name = (@: $2) # might be 0-length
+                    my @section_name = @: $2 # might be 0-length
                     @ell_content[$j] =  $1  # might be 0-length
 
                     DEBUG +> 3 and
@@ -1153,7 +1151,7 @@ sub _treat_Ls($self,@< @stack)
             if(!$section_name and !$link_text and nelems @ell_content
                  and grep { !ref($_) && m/ /s }, @ell_content
                 )
-                $section_name = \(@: splice @ell_content)
+                $section_name = \@: splice @ell_content
             # That's support for the now-deprecated syntax.
             # (Maybe generate a warning eventually?)
             # Note that it deliberately won't work on L<...|Foo Bar>

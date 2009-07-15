@@ -57,8 +57,8 @@ sub extra_link_args_after_prelink($self, %< %args)
     die "No .def file created by `prelink' stage"
         unless (nelems @DEF) or not nelems %args{?prelink_res}->@
 
-    my @after_libs = (@: $OS2::is_aout ?? ()
-                             !! $self->perl_inc() . "/libperl_override$self->{config}->{?lib_ext}")
+    my @after_libs = @: $OS2::is_aout ?? ()
+                            !! $self->perl_inc() . "/libperl_override$self->{config}->{?lib_ext}"
     # , "-L", "-lperl"
     return @: @after_libs, @DEF
 

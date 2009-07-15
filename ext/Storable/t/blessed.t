@@ -50,17 +50,17 @@ package main
 my $name = "LONG_NAME_" . 'xxxxxxxxxxxxx::' x 14 . "final"
 
 eval <<EOC
-package $name;
+package $name
 
-our \@ISA = \@("SHORT_NAME");
+our \@ISA = \@: "SHORT_NAME"
 EOC
 die $^EVAL_ERROR if $^EVAL_ERROR
 ok $^EVAL_ERROR eq ''
 
 eval <<EOC
-package $($name)_WITH_HOOK;
+package $($name)_WITH_HOOK
 
-our \@ISA = \@("SHORT_NAME_WITH_HOOK");
+our \@ISA = \@: "SHORT_NAME_WITH_HOOK"
 EOC
 ok ! $^EVAL_ERROR 
 

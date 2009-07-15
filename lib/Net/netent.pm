@@ -20,7 +20,7 @@ sub import
     return Exporter::import(< @_)
 
 
-use Class::Struct < qw(struct);
+use Class::Struct < qw(struct)
 struct 'Net::netent' => \@: 
        name             => '$'
        aliases  => '@'

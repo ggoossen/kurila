@@ -169,7 +169,7 @@ $x = join('', sort { $a <+> $b }, (@:  3, 1, 2))
 cmp_ok($x,'eq','123',q(optimized-away comparison block doesn't take any other arguments away with it))
 
 # test sorting in non-main package
-package Foo;
+package Foo
 @a = @:  5, 19, 1996, 255, 90 
 @b = sort { $b <+> $a }, @a
 main::cmp_ok("$(join ' ',@b)",'eq','1996 255 90 19 5','not in main:: 1')

@@ -6,7 +6,7 @@ BEGIN
     }
     if (env::var('PERL_CORE')) {
         chdir('t') if -d 't';
-        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
+        $^INCLUDE_PATH = (@:  $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
 
 
@@ -149,7 +149,7 @@ my $overCJK = Unicode::Collate->new(
 ENTRIES
     overrideCJK => sub ($v)
         my $u = 0xFFFF - $v # reversed
-        @(\@($u, 0x20, 0x2, $u))
+        @: \(@: $u, 0x20, 0x2, $u)
     ,
     )
 

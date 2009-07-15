@@ -60,7 +60,7 @@ foreach my $in ( @in)
 
         my(@: $i,$s) = @: $1, $2
         @in     = @: $i =~ m/(\S+)/g
-        @should = (@: $s =~ m/(\S+)/g)
+        @should = @: $s =~ m/(\S+)/g
     #print "{@in}{@should}\n";
     
     my @out = implicate_supers(

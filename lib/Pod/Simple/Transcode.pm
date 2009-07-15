@@ -13,7 +13,7 @@ BEGIN
 foreach my $class (@: 
   'Pod::Simple::TranscodeSmart'
   'Pod::Simple::TranscodeDumb'
-  '',
+  ''
     )
     $class or die "Couldn't load any encoding classes"
     DEBUG and print $^STDOUT, "About to try loading $class...\n"

@@ -24,7 +24,7 @@ BEGIN   # Make a DEBUG constant very first thing...
     
 
 
-use Pod::Perldoc::GetOptsOO; # uses the DEBUG.
+use Pod::Perldoc::GetOptsOO # uses the DEBUG.
 
 #..........................................................................
 
@@ -114,9 +114,7 @@ sub opt_V # report version and exit
         (defined(&Win32::BuildNumber) and defined &Win32::BuildNumber())
             ?? (" (win32 build ", < &Win32::BuildNumber(), ")") !! ()
 
-        (chr(65) eq 'A') ?? () !! " (non-ASCII)"
-
-        "\n",
+        "\n"
 
     exit
 
@@ -214,11 +212,11 @@ sub aside  # If we're in -v or DEBUG mode, say this.
                                $callsub =~ s/^$package/'/os
                                # the o is justified, as $package really won't change.
                                $callsub . ": "
-                           !! ''
-                       < @_,
+                             !! ''
+                       < @_
             )
         if(DEBUG) { print $^STDOUT, $out } else { print $^STDERR, $out }
-    
+
     return
 
 
@@ -777,7 +775,7 @@ sub maybe_generate_dynamic_pod($self, $found_things)
 
         close $buffd        or die "Can't close $buffer: $^OS_ERROR"
 
-        $found_things->@ = (@:  $buffer )
+        $found_things->@ = @:  $buffer 
         # Yes, so found_things never has more than one thing in
         #  it, by time we leave here
 
@@ -1021,11 +1019,9 @@ sub render_findings($self, $found_things)
             $formatter->if_zero_length( $file, $out, $out_fh )
         else
             warn "Got a 0-length file from $found_things->@[0] via $formatter_class!?\n"
-        
-    
 
     DEBUG and print $^STDOUT, "Finished writing to $out.\n"
-    return (@: $out, $formatter)
+    return @: $out, $formatter
 
 
 #..........................................................................
@@ -1437,7 +1433,7 @@ sub new_output_file
 
     DEBUG +> 3 and print $^STDOUT, "Successfully opened $outspec\n"
     binmode($fh) if $self->{?'output_is_binary'}
-    return (@: $fh, $outspec)
+    return @: $fh, $outspec
 
 
 #..........................................................................

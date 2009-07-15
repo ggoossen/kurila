@@ -681,17 +681,13 @@ sub _find_opt
                 $Is_Dir= 1
             else
                 $abs_dir= $top_item
-            
-        
 
         unless ($Is_Dir)
             unless ((@: ?$_,?$dir, _) = File::Basename::fileparse($abs_dir))
                 if ($Is_MacOS)
-                    (@: $dir,$_) = (@: ':', $top_item) # $File::Find::dir, $_
+                    (@: $dir,$_) = @: ':', $top_item # $File::Find::dir, $_
                 else
                     (@: $dir,$_) = @: './', $top_item
-                
-            
 
             $abs_dir = $dir
             if (( $untaint ) && (is_tainted($dir) ))
@@ -701,35 +697,25 @@ sub _find_opt
                         die "directory $dir is still tainted"
                     else
                         next Proc_Top_Item
-                    
-                
-            
 
             unless ($no_chdir || chdir $abs_dir)
                 warnings::warnif "Couldn't chdir $abs_dir: $^OS_ERROR\n"
                 next Proc_Top_Item
-            
 
             $name = $abs_dir . $_ # $File::Find::name
             $_ = $name if $no_chdir
 
             do { $wanted_callback->() } # protect against wild "next"
 
-        
-
         unless ( $no_chdir )
             if ( ($check_t_cwd) && (($untaint) && (is_tainted($cwd) )) )
                 (@:  ?$cwd_untainted ) = @: $cwd =~ m|$untaint_pat|
                 unless (defined $cwd_untainted)
                     die "insecure cwd in find(depth)"
-                
                 $check_t_cwd = 0
             
             unless (chdir $cwd_untainted)
                 die "Can't cd to $cwd: $^OS_ERROR\n"
-            
-        
-    
 
 
 # API:
@@ -1021,9 +1007,9 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
         if (( $untaint ) && (is_tainted($dir_loc) ))
             (@:  ?$updir_loc ) =
                 @: $dir_loc =~ m|$untaint_pat| # parent dir, now untainted
-            # once untainted, $updir_loc is pushed on the stack (as parent directory);
-            # hence, we don't need to untaint the parent directory every time we chdir
-            # to it later
+                   # once untainted, $updir_loc is pushed on the stack (as parent directory);
+                   # hence, we don't need to untaint the parent directory every time we chdir
+                   # to it later
             unless (defined $updir_loc)
                 if ($untaint_skip == 0)
                     die "directory $dir_loc is still tainted"
