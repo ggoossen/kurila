@@ -147,12 +147,13 @@ sub pod2man($poddir, $mandir, $manext, @<@script)
         %modpods = %+: map { %: "$poddir/$_", $_ }, @script
     else
         File::Find::find(\%: no_chdir=>1
-                             wanted => sub
+                             wanted => sub ()
                                   # $_ is $File::Find::name when using no_chdir
                                   if (-f $_ and m/\.p(?:m|od)$/)
                                       my $fullname = $_
                                       s!^\Q$poddir\E/!!
                                       %modpods{+$fullname} = $_
+                         ,
                          $poddir);
     my @to_process
     foreach my $mod (sort keys %modpods)
@@ -179,14 +180,13 @@ sub pod2man($poddir, $mandir, $manext, @<@script)
         # Convert name from  File/Basename.pm to File::Basename.3 format,
         # if necessary.
         $manpage =~ s#\.p(m|od)$##
-        if ($^OS_NAME eq 'os2' || $^OS_NAME eq 'amigaos' || $^OS_NAME eq 'uwin' || $^OS_NAME eq 'cygwin') {
-          $manpage =~ s#/#.#g;
-        }
-        else {
-          $manpage =~ s#/#::#g;
-        }
-        $tmp = "$($mandir)/$($manpage).tmp";
-        $manpage = "$($mandir)/$($manpage).$($manext)";
+        if ($^OS_NAME eq 'os2' || $^OS_NAME eq 'amigaos' || $^OS_NAME eq 'uwin' || $^OS_NAME eq 'cygwin')
+          $manpage =~ s#/#.#g
+        else
+          $manpage =~ s#/#::#g
+
+        $tmp = "$($mandir)/$($manpage).tmp"
+        $manpage = "$($mandir)/$($manpage).$($manext)"
         push @to_process, \@: $mod, $tmp, $manpage
 
     foreach my $page (@to_process) {
