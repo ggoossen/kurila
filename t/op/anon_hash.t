@@ -17,7 +17,7 @@ is( %(: aap => 'noot'){aap}, 'noot', "using \%(: hash constructor")
 my $x = \ $%
 is Internals::SvREFCNT($x), 1, "there is only one reference"
 
-eval_dies_like( q| %( aap => 'noot', Mies => 'Wim' )->{aap}; |,
+eval_dies_like( q| %(: aap => 'noot', Mies => 'Wim' )->{aap}; |,
                 qr/Hash may not be used as a reference/,
                 "anon hash as reference" )
 
@@ -37,11 +37,11 @@ do
     (%:  aap => $aap, @< $rest ) = $h
     is( join("*", $rest), "Mies*Wim")
 
-    eval_dies_like( q|my ($rest, $aap, $h); %( @< $rest, aap => $aap ) = $h|,
-                    qr/\Qarray expand must be the last item in anonymous hash (%()) assignment\E/ )
+    eval_dies_like( q|my ($rest, $aap, $h); %(: @< $rest, aap => $aap ) = $h|,
+                    qr/\Qarray expand must be the last item in anonymous hash (\E[%]\Q:) assignment\E/ )
 
     dies_like( sub (@< @_) { (%:  aap => $aap ) = $h; },
-               qr/\QGot extra value(s) in anonymous hash (%()) assignment\E/ )
+               qr/\QGot extra value(s) in anonymous hash (\E[%]\Q:) assignment\E/ )
 
     # OPf_ASSIGN & OPf_ASSIGN_PART
     my (@: (%:  aap => $aap, Mies => $mies)) = @: $h

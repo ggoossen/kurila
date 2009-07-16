@@ -368,11 +368,11 @@ sub constants($self)
               MAN1EXT      MAN3EXT
               INSTALLDIRS INSTALL_BASE DESTDIR PREFIX
               PERLPREFIX      SITEPREFIX      VENDORPREFIX
-                   ),
+                   )
                       (<@+: map { @: "INSTALL".$_
                                      "DESTINSTALL".$_
-                       }, $self->installvars),
-                          < qw(
+                          }, $self->installvars)
+                      < qw(
               PERL_LIB
               PERL_ARCHLIB
               LIBPERL_A MYEXTLIB
@@ -1744,7 +1744,7 @@ sub init_others($self) # --- Initialize Other Attributes
     $self->{+VERBINST}   ||= 0
     $self->{+MOD_INSTALL} ||=
         $self->oneliner(<<'CODE', \@: '-MExtUtils::Install')
-install(\%(<@ARGV), '$(VERBINST)', 0, '$(UNINST)');
+install(\(%:<@ARGV), '$(VERBINST)', 0, '$(UNINST)');
 CODE
     $self->{+DOC_INSTALL}        ||=
         '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e perllocal_install'
@@ -1792,7 +1792,7 @@ sub init_lib2arch($self)
     # the found one.
     for my $libpair (@: \(%: l=>"privlib",   a=>"archlib")
                         \(%: l=>"sitelib",   a=>"sitearch")
-                        \(%: l=>"vendorlib", a=>"vendorarch"),
+                        \(%: l=>"vendorlib", a=>"vendorarch")
         )
         my $lib = "install$libpair->{?l}"
         my $Lib = uc $lib
@@ -2792,7 +2792,7 @@ pm_to_blib : $(TO_INST_PM)
 }
 
     my $pm_to_blib = $self->oneliner(<<CODE, \@: '-MExtUtils::Install')
-pm_to_blib(\\\%( < \@ARGV ), '$autodir', '\$(PM_FILTER)')
+pm_to_blib(\\(\%: < \@ARGV ), '$autodir', '\$(PM_FILTER)')
 CODE
 
     my @cmds = $self->split_command($pm_to_blib, < $self->{PM})
@@ -2867,7 +2867,7 @@ PPD_HTML
     foreach my $prereq (sort keys($self->{?PREREQ_PM} || (%: )))
         my $pre_req = $prereq
         $pre_req =~ s/::/-/g
-        my $dep_ver = join ",", (@: <split (m/\./, $self->{PREREQ_PM}{?$prereq}),
+        my $dep_ver = join ",", (@: <split (m/\./, $self->{PREREQ_PM}{?$prereq})
                                     <((@: 0) x 4))[[0 .. 3]]
         $ppd_xml .= sprintf <<'PPD_OUT', $pre_req, $dep_ver
         <DEPENDENCY NAME="%s" VERSION="%s" />
@@ -3207,9 +3207,9 @@ sub staticmake($self, %< %attribs)
     # but only if it has some C code (or XS code, which implies C code)
     if (nelems $self->{?C})
         @static = @: $self->catfile($self->{?INST_ARCHLIB},
-                             "auto",
-                             $self->{?FULLEXT},
-                             "$self->{?BASEEXT}$self->{LIB_EXT}")
+                         "auto",
+                         $self->{?FULLEXT},
+                         "$self->{?BASEEXT}$self->{LIB_EXT}")
 
     # Either we determine now, which libraries we will produce in the
     # subdirectories or we do it at runtime of the make.

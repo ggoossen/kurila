@@ -28,7 +28,7 @@ foreach my $func ( @Exported_Funcs) {
     can_ok __PACKAGE__, $func;
 }
 
-my %hash = %(foo => 42, bar => 23, locked => 'yep');
+my %hash = %: foo => 42, bar => 23, locked => 'yep'
 lock_keys(%hash);
 try { %hash{+baz} = 99; };
 like( $^EVAL_ERROR->{?description}, qr/^Attempt to access disallowed key 'baz' in a restricted hash/,
@@ -83,157 +83,148 @@ unlock_value(%hash, 'locked');
 is( %hash{?locked}, 42,  'unlock_value' );
 
 
-do {
-    my %hash = %( foo => 42, locked => 23 );
+do
+    my %hash = %: foo => 42, locked => 23
 
-    lock_keys(%hash);
-    try { %hash = %( wubble => 42 ) };  # we know this will bomb
-    local $TODO = 1;
+    lock_keys(%hash)
+    try { %hash = %: wubble => 42 }  # we know this will bomb
+    local $TODO = 1
     like( $^EVAL_ERROR && $^EVAL_ERROR->{?description},
-          qr/^Attempt to access disallowed key 'wubble'/,'Disallowed 3' );
-    unlock_keys(%hash);
-};
+          qr/^Attempt to access disallowed key 'wubble'/,'Disallowed 3' )
+    unlock_keys(%hash)
 
-do {
-    my %hash = %(KEY => 'val', RO => 'val');
-    lock_keys(%hash);
-    lock_value(%hash, 'RO');
+do
+    my %hash = %: KEY => 'val', RO => 'val'
+    lock_keys(%hash)
+    lock_value(%hash, 'RO')
 
-    try { %hash = %(KEY => 1) };
-    local $TODO = 1;
+    try { %hash = %: KEY => 1 }
+    local $TODO = 1
     like( $^EVAL_ERROR && $^EVAL_ERROR->{?description},
-          qr/^Attempt to delete readonly key 'RO' from a restricted hash/ );
-};
+          qr/^Attempt to delete readonly key 'RO' from a restricted hash/ )
 
-do {
-    my %hash = %(KEY => 1, RO => 2);
-    lock_keys(%hash);
-    try { %hash = %(KEY => 1, RO => 2) };
-    local $TODO = 1;
-    is( $^EVAL_ERROR, '');
-};
+do
+    my %hash = %: KEY => 1, RO => 2
+    lock_keys(%hash)
+    try { %hash = %: KEY => 1, RO => 2) }
+    local $TODO = 1
+    is( $^EVAL_ERROR, '')
 
 
-
-do {
-    my %hash = %( () );
-    lock_keys(%hash, < qw(foo bar));
-    is( nkeys %hash, 0,  'lock_keys() w/keyset shouldnt add new keys' );
-    %hash{+foo} = 42;
-    is( nkeys %hash, 1 );
-    try { %hash{+wibble} = 42 };
+do
+    my %hash = $%
+    lock_keys(%hash, < qw(foo bar))
+    is( nkeys %hash, 0,  'lock_keys() w/keyset shouldnt add new keys' )
+    %hash{+foo} = 42
+    is( nkeys %hash, 1 )
+    try { %hash{+wibble} = 42 }
     like( $^EVAL_ERROR->{?description}, qr/^Attempt to access disallowed key 'wibble' in a restricted hash/,
-                        'write threw error (locked)');
+                        'write threw error (locked)')
 
-    unlock_keys(%hash);
-    try { %hash{+wibble} = 23; };
-    is( $^EVAL_ERROR, '', 'unlock_keys' );
-};
+    unlock_keys(%hash)
+    try { %hash{+wibble} = 23 }
+    is( $^EVAL_ERROR, '', 'unlock_keys' )
 
 
-do {
-    my %hash = %(foo => 42, bar => undef, baz => 0);
-    lock_keys(%hash, < qw(foo bar baz up down));
-    is( nkeys %hash, 3,   'lock_keys() w/keyset didnt add new keys' );
-    is_deeply( \%hash, \%( foo => 42, bar => undef, baz => 0 ),'is_deeply' );
+do
+    my %hash = %: foo => 42, bar => undef, baz => 0
+    lock_keys(%hash, < qw(foo bar baz up down))
+    is( nkeys %hash, 3,   'lock_keys() w/keyset didnt add new keys' )
+    is_deeply( \%hash, \(%: foo => 42, bar => undef, baz => 0 ),'is_deeply' )
 
-    try { %hash{+up} = 42; };
-    is( $^EVAL_ERROR, '','No error 1' );
+    try { %hash{+up} = 42 }
+    is( $^EVAL_ERROR, '','No error 1' )
 
-    try { %hash{+wibble} = 23 };
+    try { %hash{+wibble} = 23 }
     like( $^EVAL_ERROR->{?description}, qr/^Attempt to access disallowed key 'wibble' in a restricted hash/,
-          'locked "wibble"' );
-};
+          'locked "wibble"' )
 
 
-do {
-    my %hash = %(foo => 42, bar => undef);
-    try { lock_keys(%hash, < qw(foo baz)); };
+do
+    my %hash = %: foo => 42, bar => undef
+    try { lock_keys(%hash, < qw(foo baz)) }
     is( $^EVAL_ERROR->{?description}, sprintf("Hash has key 'bar' which is not in the new key set"),
-                    'carp test' );
-};
+                    'carp test' )
 
 
 do {
-    my %hash = %(foo => 42, bar => 23);
-    lock_hash( %hash );
+    my %hash = %: foo => 42, bar => 23
+    lock_hash( %hash )
 
-    ok( Internals::SvREADONLY(%hash),'Was locked %hash' );
-    ok( Internals::SvREADONLY(%hash{?foo}),'Was locked $hash{foo}' );
-    ok( Internals::SvREADONLY(%hash{?bar}),'Was locked $hash{bar}' );
+    ok( Internals::SvREADONLY(%hash),'Was locked %hash' )
+    ok( Internals::SvREADONLY(%hash{?foo}),'Was locked $hash{foo}' )
+    ok( Internals::SvREADONLY(%hash{?bar}),'Was locked $hash{bar}' )
 
-    unlock_hash ( %hash );
+    unlock_hash ( %hash )
 
-    ok( !Internals::SvREADONLY(%hash),'Was unlocked %hash' );
-    ok( !Internals::SvREADONLY(%hash{?foo}),'Was unlocked $hash{foo}' );
-    ok( !Internals::SvREADONLY(%hash{?bar}),'Was unlocked $hash{bar}' );
-};
+    ok( !Internals::SvREADONLY(%hash),'Was unlocked %hash' )
+    ok( !Internals::SvREADONLY(%hash{?foo}),'Was unlocked $hash{foo}' )
+    ok( !Internals::SvREADONLY(%hash{?bar}),'Was unlocked $hash{bar}' )
 
 
 do {
-    my %hash;
+    my %hash
 
-    lock_keys(%hash, 'first');
+    lock_keys(%hash, 'first')
 
-    is (nkeys %hash, 0, "place holder isn't a key");
-    %hash{+first} = 1;
-    is (nkeys %hash, 1, "we now have a key");
-    delete %hash{first};
-    is (nkeys %hash, 0, "now no key");
+    is (nkeys %hash, 0, "place holder isn't a key")
+    %hash{+first} = 1
+    is (nkeys %hash, 1, "we now have a key")
+    delete %hash{first}
+    is (nkeys %hash, 0, "now no key")
 
-    unlock_keys(%hash);
+    unlock_keys(%hash)
 
-    %hash{+interregnum} = 1.5;
-    is (nkeys %hash, 1, "key again");
-    delete %hash{interregnum};
-    is (nkeys %hash, 0, "no key again");
+    %hash{+interregnum} = 1.5
+    is (nkeys %hash, 1, "key again")
+    delete %hash{interregnum}
+    is (nkeys %hash, 0, "no key again")
 
-    lock_keys(%hash, 'second');
+    lock_keys(%hash, 'second')
 
-    is (nkeys %hash, 0, "place holder isn't a key");
+    is (nkeys %hash, 0, "place holder isn't a key")
 
-    try {%hash{+zeroeth} = 0};
+    try {%hash{+zeroeth} = 0}
     like ($^EVAL_ERROR->{?description},
           qr/^Attempt to access disallowed key 'zeroeth' in a restricted hash/,
-          'locked key never mentioned before should fail');
-    try {%hash{+first} = -1};
+          'locked key never mentioned before should fail')
+    try {%hash{+first} = -1}
     like ($^EVAL_ERROR->{?description},
           qr/^Attempt to access disallowed key 'first' in a restricted hash/,
-          'previously locked place holders should also fail');
-    is (nkeys %hash, 0, "and therefore there are no keys");
-    %hash{+second} = 1;
-    is (nkeys %hash, 1, "we now have just one key");
-    delete %hash{second};
-    is (nkeys %hash, 0, "back to zero");
+          'previously locked place holders should also fail')
+    is (nkeys %hash, 0, "and therefore there are no keys")
+    %hash{+second} = 1
+    is (nkeys %hash, 1, "we now have just one key")
+    delete %hash{second}
+    is (nkeys %hash, 0, "back to zero")
 
-    unlock_keys(%hash); # We have deliberately left a placeholder.
+    unlock_keys(%hash) # We have deliberately left a placeholder.
 
-    %hash{+void} = undef;
-    %hash{+nowt} = undef;
+    %hash{+void} = undef
+    %hash{+nowt} = undef
 
-    is (nkeys %hash, 2, "two keys, values both undef");
+    is (nkeys %hash, 2, "two keys, values both undef")
 
-    lock_keys(%hash);
+    lock_keys(%hash)
 
-    is (nkeys %hash, 2, "still two keys after locking");
+    is (nkeys %hash, 2, "still two keys after locking")
 
-    try {%hash{+second} = -1};
+    try {%hash{+second} = -1}
     like ($^EVAL_ERROR->{?description},
           qr/^Attempt to access disallowed key 'second' in a restricted hash/,
-          'previously locked place holders should fail');
+          'previously locked place holders should fail')
 
     is (%hash{?void}, undef,
-        "undef values should not be misunderstood as placeholders");
+        "undef values should not be misunderstood as placeholders")
     is (%hash{?nowt}, undef,
-        "undef values should not be misunderstood as placeholders (again)");
-};
+        "undef values should not be misunderstood as placeholders (again)")
 
 do {
   # perl #18651 - tim@consultix-inc.com found a rather nasty data dependant
   # bug whereby hash iterators could lose hash keys (and values, as the code
   # is common) for restricted hashes.
 
-  my @keys = qw(small medium large);
+  my @keys = qw(small medium large)
 
   # There should be no difference whether it is restricted or not
   foreach my $lock (@(0, 1)) {
@@ -243,7 +234,7 @@ do {
       for my $bits (@(0,1,2)) {
 	push @usekeys, @keys[$bits] if $usekeys ^&^ (1 << $bits);
       }
-      my %clean = %( < map {$_ => length $_} @usekeys );
+      my %clean = %+: map { %: $_ => length $_} @usekeys
       my %target;
       lock_keys ( %target, < @keys ) if $lock;
 

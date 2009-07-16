@@ -48,7 +48,6 @@ while ( ~< $^DATA)
         $regex =~ s/\s+/ \\s+ /g
         $regex = '^ \{ \s* ' . $regex . ' \s* \} $'
         like($deparsed, qr/$regex/x, $testname)
-    
 
 
 use constant 'c', 'stuff'
@@ -248,7 +247,7 @@ do { my $x = 1; $x; };
 ####
 # 37 <20061012113037.GJ25805@c4.convolution.nl>
 my $f = sub {
-    \%(\@(: ));
+    \%(: \@(: ));
 } ;
 ####
 # 38 (bug #43010)
@@ -279,8 +278,8 @@ do {
 };
 ####
 # 51 Anonymous arrays and hashes, and references to them
-my $a = \%();
-my $b = \(\%());
+my $a = \%(: );
+my $b = \(\%(: ));
 my $c = \@(: );
 my $d = \(\@(: ));
 ####

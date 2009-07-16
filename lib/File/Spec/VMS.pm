@@ -414,7 +414,7 @@ sub rel2abs($self, $path, $base )
 # patch the ones in ExtUtils::MM_VMS instead.
 sub eliminate_macros($self,$path)
     return '' unless (defined $path) && ($path ne '')
-    $self = \%() unless ref $self
+    $self = \$% unless ref $self
 
     if ($path =~ m/\s/)
       return join ' ', map { $self->eliminate_macros($_) }, split m/\s+/, $path
@@ -448,7 +448,7 @@ sub eliminate_macros($self,$path)
 # Deprecated.  See the note above for eliminate_macros().
 sub fixpath($self,$path,$force_path)
     return '' unless $path
-    $self = bless \%() unless ref $self
+    $self = bless \$% unless ref $self
     my($fixedpath,$prefix,$name)
 
     if ($path =~ m/\s/)

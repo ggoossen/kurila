@@ -84,7 +84,7 @@ sub struct
     my( $cmt, $name, $type, $elem )
 
     if( $base_type eq 'HASH' )
-        $out .= '    my($r) = \%();'."\n"
+        $out .= '    my($r) = \$%;'."\n"
         $cmt = ''
     elsif( $base_type eq 'ARRAY' )
         $out .= '    my($r) = \$@;'."\n"
@@ -113,7 +113,7 @@ sub struct
         elsif( $type eq '%' )
             $out .= "    die 'Initializer for $name must be hash reference'\n"
             $out .= "        if defined(\%init\{?'$name'\}) && ref(\%init\{'$name'\}) ne 'HASH';\n"
-            $out .= "    \$r->$elem = $init \\\%();$cmt\n"
+            $out .= "    \$r->$elem = $init \\\$\%;$cmt\n"
             %hashes{+$name}++
         elsif ( $type eq '$')
             $out .= "    \$r->$elem = $init undef;$cmt\n"

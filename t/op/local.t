@@ -76,10 +76,10 @@ do
     eval 'local($$e)'
     like($^EVAL_ERROR && $^EVAL_ERROR->{?description}, qr/Can't localize through a reference/)
 
-    eval '$e = \@(); local(@$e)'
+    eval '$e = \$@; local(@$e)'
     like($^EVAL_ERROR && $^EVAL_ERROR->{?description}, qr/Can't localize through a reference/)
 
-    eval '$e = \%(); local(%$e)'
+    eval '$e = \$%; local(%$e)'
     like($^EVAL_ERROR && $^EVAL_ERROR->{?description}, qr/Can't localize through a reference/)
 
 

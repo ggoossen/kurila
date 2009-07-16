@@ -38,13 +38,12 @@ Available commands are:
    q                  - Quit the module
 EOF
 
-my %Module_Commands = %(
-                       f => \&list_installed,
-                       d => \&list_directories,
-                       v => \&validate_packlist,
-                       t => \&create_archive,
-                       h => \&module_help,
-                      );
+my %Module_Commands = %:
+                       f => \&list_installed
+                       d => \&list_directories
+                       v => \&validate_packlist
+                       t => \&create_archive
+                       h => \&module_help
 
 sub do_module($)($module) {
 

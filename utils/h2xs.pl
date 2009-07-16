@@ -550,38 +550,37 @@ my ($opt_A,
 Getopt::Long::Configure('bundling');
 Getopt::Long::Configure('pass_through');
 
-my %options = %(
-                'beta-version|B'     => \$opt_B,
-                'omit-changes|C'     => \$opt_C,
-                'cpp-flags|F=s'      => \$opt_F,
-                'func-mask|M=s'      => \$opt_M,
-                'overwrite_ok|O'     => \$opt_O,
-                'omit-pod|P'         => \$opt_P,
-                'omit-XS|X'          => \$opt_X,
-                'gen-accessors|a'    => \$opt_a,
-                'compat-version|b=s' => \$opt_b,
-                'omit-constant|c'    => \$opt_c,
-                'debugging|d'        => \$opt_d,
-                'omit-enums|e:s'     => \$opt_e,
-                'force|f'            => \$opt_f,
-                'global|g'           => \$opt_g,
-                'help|h|?'           => \$opt_h,
-                'omit-const-func|k'  => \$opt_k,
-                'gen-tied-var|m'     => \$opt_m,
-                'name|n=s'           => \$opt_n,
-                'opaque-re|o=s'      => \$opt_o,
-                'remove-prefix|p=s'  => \$opt_p,
-                'const-subs|s=s'     => \$opt_s,
-                'default-type|t=s'   => \$opt_t,
-                'version|v=s'        => \$opt_v,
-                'autogen-xsubs|x'    => \$opt_x,
-                'use-new-tests'      => \$new_test,
-                'use-old-tests'      => \$old_test,
-                'skip-exporter'      => \$skip_exporter,
-                'skip-ppport'        => \$skip_ppport,
-                'skip-warnings'      => \$skip_warnings,
-                'use-xsloader'       => \$use_xsloader,
-              );
+my %options = %:
+                'beta-version|B'     => \$opt_B
+                'omit-changes|C'     => \$opt_C
+                'cpp-flags|F=s'      => \$opt_F
+                'func-mask|M=s'      => \$opt_M
+                'overwrite_ok|O'     => \$opt_O
+                'omit-pod|P'         => \$opt_P
+                'omit-XS|X'          => \$opt_X
+                'gen-accessors|a'    => \$opt_a
+                'compat-version|b=s' => \$opt_b
+                'omit-constant|c'    => \$opt_c
+                'debugging|d'        => \$opt_d
+                'omit-enums|e:s'     => \$opt_e
+                'force|f'            => \$opt_f
+                'global|g'           => \$opt_g
+                'help|h|?'           => \$opt_h
+                'omit-const-func|k'  => \$opt_k
+                'gen-tied-var|m'     => \$opt_m
+                'name|n=s'           => \$opt_n
+                'opaque-re|o=s'      => \$opt_o
+                'remove-prefix|p=s'  => \$opt_p
+                'const-subs|s=s'     => \$opt_s
+                'default-type|t=s'   => \$opt_t
+                'version|v=s'        => \$opt_v
+                'autogen-xsubs|x'    => \$opt_x
+                'use-new-tests'      => \$new_test
+                'use-old-tests'      => \$old_test
+                'skip-exporter'      => \$skip_exporter
+                'skip-ppport'        => \$skip_ppport
+                'skip-warnings'      => \$skip_warnings
+                'use-xsloader'       => \$use_xsloader
 
 GetOptions(%options) || usage;
 

@@ -69,8 +69,8 @@ __DATA__
 	1		sub{shift}
 !	0		sub{shift}
 	1		sub{scalar @_}
-	\@()		\&bar
-	\%()		\&bar
+	\$@		\&bar
+	\$%		\&bar
 	qr//		\&bar
 
 # - null-prototyped subs

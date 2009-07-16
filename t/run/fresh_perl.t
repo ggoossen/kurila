@@ -197,7 +197,7 @@ destroyed
 ########
 # TODO
 package X;
-sub ahash { bless \%() }
+sub ahash { bless \$% }
 sub DESTROY { print $^STDOUT, "destroyed\n" };
 package main;
 *h = X->ahash();
@@ -381,4 +381,4 @@ EXPECT
 ok 1
 ######## [ID 20020623.009] nested eval/sub segfaults
 our $eval = eval 'sub { eval q|sub { %S }| }';
-$eval->(\%());
+$eval->(\$%);

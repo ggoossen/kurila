@@ -121,7 +121,7 @@ while (~< *$utilsfh)
             $xold =~ s/^\Q%opts{'destdir'}\E// if %opts{'destdir'}
             my $xnew = $new
             $xnew =~ s/^\Q%opts{'destdir'}\E// if %opts{'destdir'}
-            $packlist->{data}{+$xnew} = \%( from => $xold, type => 'link' )
+            $packlist->{data}{+$xnew} = \%: from => $xold, type => 'link'
 
 sub pod2man($poddir, $mandir, $manext, @<@script)
     # @script is scripts names if we are installing manpages embedded 
@@ -144,17 +144,15 @@ sub pod2man($poddir, $mandir, $manext, @<@script)
     # dir ('.'), values are names relative to $poddir.
     my %modpods
     if (@script)
-        %modpods = %( < @+: map { @: "$poddir/$_", $_ }, @script)
+        %modpods = %+: map { %: "$poddir/$_", $_ }, @script
     else
-        File::Find::find(\%(no_chdir=>1,
-                            wanted => sub {
-                                # $_ is $File::Find::name when using no_chdir
-                                if (-f $_ and m/\.p(?:m|od)$/) {
-                                    my $fullname = $_;
-                                    s!^\Q$poddir\E/!!;
-                                    %modpods{+$fullname} = $_;
-                                }
-                            }),
+        File::Find::find(\%: no_chdir=>1
+                             wanted => sub
+                                  # $_ is $File::Find::name when using no_chdir
+                                  if (-f $_ and m/\.p(?:m|od)$/)
+                                      my $fullname = $_
+                                      s!^\Q$poddir\E/!!
+                                      %modpods{+$fullname} = $_
                          $poddir);
     my @to_process
     foreach my $mod (sort keys %modpods)
@@ -202,13 +200,11 @@ sub pod2man($poddir, $mandir, $manext, @<@script)
         $xmanpage =~ s/^\Q%opts{'destdir'}\E// if %opts{'destdir'};
         print $^STDOUT, "  $xmanpage\n";
         if (!%opts{notify} && $parser->parse_from_file($pod, $tmp)) {
-            if (-s $tmp) {
-                if (rename($tmp, $manpage)) {
-                    $packlist->{data}{+$xmanpage} = \%( type => 'file' );
-                    next;
-                }
-            }
-            unlink($tmp);
+            if (-s $tmp)
+                if (rename($tmp, $manpage))
+                    $packlist->{data}{+$xmanpage} = \%: type => 'file'
+                    next
+            unlink($tmp)
         }
     }
 

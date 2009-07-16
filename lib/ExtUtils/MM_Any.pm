@@ -2,13 +2,13 @@ package ExtUtils::MM_Any
 
 our $VERSION = '6.44'
 
-use File::Spec;
+use File::Spec
 BEGIN { our @ISA = qw(File::Spec); }
 
 # We need $Verbose
-use ExtUtils::MakeMaker < qw($Verbose);
+use ExtUtils::MakeMaker < qw($Verbose)
 
-use ExtUtils::MakeMaker::Config;
+use ExtUtils::MakeMaker::Config
 
 
 # So we don't have to keep calling the methods over and over again,
@@ -669,7 +669,7 @@ sub manifypods_target($self)
     my $dependencies  = ''
 
     # populate manXpods & dependencies:
-    foreach my $name (keys($self->{?MAN1PODS} || %()) +@+ keys($self->{?MAN3PODS} || %()))
+    foreach my $name (keys($self->{?MAN1PODS} || $%) +@+ keys($self->{?MAN3PODS} || $%))
         $dependencies .= " \\\n\t$name"
 
 
@@ -712,7 +712,7 @@ metafile :
 MAKE_FRAG
 
     my $prereq_pm = ''
-    foreach my $mod ( sort { lc $a cmp lc $b }, keys($self->{?PREREQ_PM} || %()) )
+    foreach my $mod ( sort { lc $a cmp lc $b }, keys($self->{?PREREQ_PM} || $%) )
         my $ver = $self->{PREREQ_PM}{?$mod}
         $prereq_pm .= sprintf "\n    \%-30s \%s", "$mod:", $ver
 
@@ -729,7 +729,7 @@ MAKE_FRAG
         license      => $self->{?LICENSE}
         author       => $author_value
         generated_by =>
-            "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION"
+        "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION"
         distribution_type => $self->{?PM} ?? 'module' !! 'script'
 
     my $meta = "--- #YAML:1.0\n"
@@ -775,7 +775,7 @@ sub distmeta_target
     my $self = shift
 
     my $add_meta = $self->oneliner(<<'CODE', \@: '-MExtUtils::Manifest=maniadd')
-try { maniadd(\%(q{META.yml} => q{Module meta-data (added by MakeMaker)})) }
+try { maniadd(\%: q{META.yml} => q{Module meta-data (added by MakeMaker)}) }
     or print $$^STDOUT, "Could not add META.yml to MANIFEST: $($^EVAL_ERROR->message)\n"
 CODE
 
@@ -912,7 +912,7 @@ sub distsignature_target
     my $self = shift
 
     my $add_sign = $self->oneliner(<<'CODE', \@: '-MExtUtils::Manifest=maniadd')
-try { maniadd(\%(q{SIGNATURE} => q{Public-key signature (added by MakeMaker)})) }
+try { maniadd(\%: q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}) }
     or print $$^STDOUT, "Could not add SIGNATURE to MANIFEST: $($^EVAL_ERROR->message)\n"
 CODE
 
@@ -1150,84 +1150,82 @@ sub init_INSTALL_from_PREFIX
 
 
     my %bin_layouts =
-        %(
-        bin         => \%( s => $iprefix,
-        t => 'perl',
-        d => 'bin' ),
-        vendorbin   => \%( s => $vprefix,
-        t => 'vendor',
-        d => 'bin' ),
-        sitebin     => \%( s => $sprefix,
-        t => 'site',
-        d => 'bin' ),
-        script      => \%( s => $iprefix,
-        t => 'perl',
-        d => 'bin' ),
-        vendorscript=> \%( s => $vprefix,
-        t => 'vendor',
-        d => 'bin' ),
-        sitescript  => \%( s => $sprefix,
-        t => 'site',
-        d => 'bin' ),
-        )
+        %:
+            bin         => \%: s => $iprefix
+                               t => 'perl'
+                               d => 'bin'
+            vendorbin   => \%: s => $vprefix
+                               t => 'vendor'
+                               d => 'bin'
+            sitebin     => \%: s => $sprefix
+                               t => 'site'
+                               d => 'bin'
+            script      => \%: s => $iprefix
+                               t => 'perl'
+                               d => 'bin'
+            vendorscript=> \%: s => $vprefix
+                               t => 'vendor'
+                               d => 'bin'
+            sitescript  => \%: s => $sprefix
+                               t => 'site'
+                               d => 'bin'
 
     my %man_layouts =
-        %(
-        man1dir         => \%( s => $iprefix,
-        t => 'perl',
-        d => 'man/man1',
-        style => $manstyle, ),
-        siteman1dir     => \%( s => $sprefix,
-        t => 'site',
-        d => 'man/man1',
-        style => $manstyle, ),
-        vendorman1dir   => \%( s => $vprefix,
-        t => 'vendor',
-        d => 'man/man1',
-        style => $manstyle, ),
+        %:
+        man1dir         => \%: s => $iprefix
+                               t => 'perl'
+                               d => 'man/man1'
+                               style => $manstyle
+        siteman1dir     => \%: s => $sprefix
+                               t => 'site'
+                               d => 'man/man1'
+                               style => $manstyle
+        vendorman1dir   => \%: s => $vprefix
+                               t => 'vendor'
+                               d => 'man/man1'
+                               style => $manstyle
 
-        man3dir         => \%( s => $iprefix,
-        t => 'perl',
-        d => 'man/man3',
-        style => $manstyle, ),
-        siteman3dir     => \%( s => $sprefix,
-        t => 'site',
-        d => 'man/man3',
-        style => $manstyle, ),
-        vendorman3dir   => \%( s => $vprefix,
-        t => 'vendor',
-        d => 'man/man3',
-        style => $manstyle, ),
-        )
+        man3dir         => \%: s => $iprefix
+                               t => 'perl'
+                               d => 'man/man3'
+                               style => $manstyle
+        siteman3dir     => \%: s => $sprefix
+                               t => 'site'
+                               d => 'man/man3'
+                               style => $manstyle
+        vendorman3dir   => \%: s => $vprefix
+                               t => 'vendor'
+                               d => 'man/man3'
+                               style => $manstyle
 
     my %lib_layouts =
-        %(
-        privlib     => \%( s => $iprefix,
-        t => 'perl',
-        d => '',
-        style => $libstyle, ),
-        vendorlib   => \%( s => $vprefix,
-        t => 'vendor',
-        d => '',
-        style => $libstyle, ),
-        sitelib     => \%( s => $sprefix,
-        t => 'site',
-        d => 'site_perl',
-        style => $libstyle, ),
+        %: 
+        privlib     => \(%:  s => $iprefix
+                             t => 'perl'
+                             d => ''
+                             style => $libstyle, )
+        vendorlib   => \(%:  s => $vprefix
+                             t => 'vendor'
+                             d => ''
+                             style => $libstyle, )
+        sitelib     => \(%:  s => $sprefix
+                             t => 'site'
+                             d => 'site_perl'
+                             style => $libstyle, )
 
-        archlib     => \%( s => $iprefix,
-        t => 'perl',
-        d => "$version/$arch",
-        style => $libstyle ),
-        vendorarch  => \%( s => $vprefix,
-        t => 'vendor',
-        d => "$version/$arch",
-        style => $libstyle ),
-        sitearch    => \%( s => $sprefix,
-        t => 'site',
-        d => "site_perl/$version/$arch",
-        style => $libstyle ),
-        )
+        archlib     => \(%:  s => $iprefix
+                             t => 'perl'
+                             d => "$version/$arch"
+                             style => $libstyle )
+        vendorarch  => \(%:  s => $vprefix
+                             t => 'vendor'
+                             d => "$version/$arch"
+                             style => $libstyle )
+        sitearch    => \(%:  s => $sprefix
+                             t => 'site'
+                             d => "site_perl/$version/$arch"
+                             style => $libstyle )
+        
 
 
     # Special case for LIB.
@@ -1244,12 +1242,12 @@ sub init_INSTALL_from_PREFIX
 
 
 
-    my %type2prefix = %( perl    => 'PERLPREFIX',
-        site    => 'SITEPREFIX',
-        vendor  => 'VENDORPREFIX'
-        )
+    my %type2prefix = %:  perl    => 'PERLPREFIX'
+                          site    => 'SITEPREFIX'
+                          vendor  => 'VENDORPREFIX'
+        
 
-    my %layouts = %(< %bin_layouts, < %man_layouts, < %lib_layouts)
+    my %layouts = %: < %bin_layouts, < %man_layouts, < %lib_layouts
     while( my @: ?$var, ?$layout = @: each(%layouts) )
         my @: $s, $t, $d, $style =  $layout->{[qw(s t d style)]}
         my $r = '$('.%type2prefix{?$t}.')'

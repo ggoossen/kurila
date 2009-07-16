@@ -1014,7 +1014,7 @@ distribution for more examples.)
 
     @c = ('c');
     $c = \@c;
-    $b = \%();
+    $b = \$%;
     $a = [1, $b, $c];
     $b->{a} = $a;
     $b->{b} = $a->[1];

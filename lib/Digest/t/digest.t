@@ -13,7 +13,7 @@ do {
     sub new {
         my $class = shift;
         my $d = shift || "ooo";
-        bless \%( d => $d ), $class;
+        bless \(%: d => $d ), $class;
     }
     sub add(...) {}
     sub digest($self) { $self->{?d} }

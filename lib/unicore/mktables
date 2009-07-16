@@ -1806,18 +1806,18 @@ sub WriteAllMappings()
                    "## Data in this file used by ../utf8_heavy.pl\n"
                    "##\n\n"
                    "## Mapping from name to filename in ./lib/gc_sc\n"
-                   "do \{\n"
-                   "\%utf8::Exact = \%(\n"
+                   "\n"
+                   "\%utf8::Exact = \%:\n"
 
 
         %Exact{+InGreek} = 'InGreekA'  # this is evil kludge
         for my $Name (sort keys %Exact)
             my $File = %Exact{?$Name}
             $Name = $Name =~ m/\W/ ?? qq/'$Name'/ !! " $Name "
-            my $Text = sprintf("\%-15s => \%s,\n", $Name, qq/'$File'/)
+            my $Text = sprintf("\%-15s => \%s\n", $Name, qq/'$File'/)
             push @OUT, $Text
 
-        push @OUT, ");\n\};\n\n1;\n"
+        push @OUT, "\n\n1\n"
 
         WriteIfChanged('Exact.pl', @OUT)
 
@@ -1830,8 +1830,8 @@ sub WriteAllMappings()
                    "## Data in this file used by ../utf8_heavy.pl\n"
                    "##\n\n"
                    "## Mapping from lc(canonical name) to filename in ./lib\n"
-                   "do \{\n"
-                   "\%utf8::Canonical = \%(\n"
+                   "\n"
+                   "\%utf8::Canonical = \%:\n"
 
         my $Trail = "" ## used just to keep the spacing pretty
         for my $Name (sort keys %Canonical)
@@ -1844,10 +1844,10 @@ sub WriteAllMappings()
                 $Trail = ""
 
             $Name = $Name =~ m/\W/ ?? qq/'$Name'/ !! " $Name "
-            my $Text = sprintf("  \%-41s => \%s,\n$Trail", $Name, qq/'$File'/)
+            my $Text = sprintf("  \%-41s => \%s\n$Trail", $Name, qq/'$File'/)
             push @OUT, $Text
 
-        push @OUT, ");\n\};\n1\n"
+        push @OUT, "\n\n1\n"
         WriteIfChanged('Canonical.pl', @OUT)
 
 
@@ -1900,23 +1900,23 @@ sub SpecialCasing_txt()
             @:
               $HEADER, "\n"
               "# The key UTF-8 _bytes_, the value UTF-8 (speed hack)\n"
-              "do \{\n"
-              "\%utf8::ToSpec$case =\n\%(\n"
+              "\n"
+              "\%utf8::ToSpec$case = \%:\n"
 
 
         for my $prop (sort { $a->[0] <+> $b->[0] }, %CaseInfo{?$case})
             my (@: $ix, $code, $to) =  $prop->@
             my $tostr =
                 join "", map { sprintf "\\x\{\%s\}", $_ }, split ' ', $to
-            push @OUT, sprintf qq["\%s" => "$tostr",\n], join("", map { sprintf "\\x[\%02X]", $_ }, (@:  unpack("U0C*", pack("U", $ix))))
+            push @OUT, " " x 4 . sprintf qq["\%s" => "$tostr"\n], join("", map { sprintf "\\x[\%02X]", $_ }, (@:  unpack("U0C*", pack("U", $ix))))
             # Remove any single-character mappings for
             # the same character since we are going for
             # the special casing rules.
             $NormalCase =~ s/^$code\t\t\w+\n//m
 
         push @OUT, (
-                    ");\n\};\n\n",
-                    "return <<'END';\n",
+                    "\n\n",
+                    "return <<'END'\n",
                     $NormalCase,
                     "END\n"
                     )
@@ -1964,17 +1964,17 @@ sub CaseFolding_txt()
         @:
         $HEADER, "\n"
         "#  The ke UTF-8 _bytes_, the value UTF-8 (speed hack)\n"
-        "do \{\n"
-        "\%utf8::ToSpecFold =\n\%(\n"
+        "\n"
+        "\%utf8::ToSpecFold = \%:\n"
 
     for my $code (sort { $a <+> $b }, keys %Fold)
         my $foldstr =
             join "", map { sprintf "\\x\{\%s\}", $_ }, split ' ', %Fold{?$code}
-        push @OUT, sprintf qq["\%s" => "$foldstr",\n], join("", map { sprintf "\\x[\%02X]", $_ }, (@:  unpack("U0C*", pack("U", $code))))
+        push @OUT, " " x 4 . sprintf qq["\%s" => "$foldstr"\n], join("", map { sprintf "\\x[\%02X]", $_ }, (@:  unpack("U0C*", pack("U", $code))))
 
     push @OUT, (
-                ");\n\};\n",
-                "return <<'END';\n",
+                "\n\n",
+                "return <<'END'\n",
                 $CommonFold,
                 "END\n",
                 )

@@ -790,10 +790,10 @@ join		join or string		ck_fun		mst@	S L
 
 list		list			ck_null		m@	L
 lslice		list slice		ck_null		2	H L L
-enter_anonarray_assign	anonymous array assignment (@())	ck_null	0	
-enter_anonhash_assign	anonymous hash assignment (%())	ck_null	0	
-anonarray	anonymous array (@())	ck_anonarray	ms@	L
-anonhash	anonymous hash (%())	ck_fun		ms@	L
+enter_anonarray_assign	anonymous array assignment (@:)	ck_null	0	
+enter_anonhash_assign	anonymous hash assignment (%:)	ck_null	0	
+anonarray	anonymous array (@:)	ck_anonarray	ms@	L
+anonhash	anonymous hash (%:)	ck_fun		ms@	L
 listlast	listlast		ck_null		ms@	L
 listfirst	listfirst		ck_null		ms@	L
 

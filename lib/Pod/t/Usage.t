@@ -57,7 +57,7 @@ SKIP: do # Test exit status from pod2usage()
                || $^OS_NAME eq 'VMS') ?? '"'
               !! "")
     my @params = @:  "$($cq)-I../lib$cq",  "$($cq)-MPod::Usage$cq", '-e' 
-    my $prg = qq[$($cq)pod2usage(\\\%( $args ))$cq]
+    my $prg = qq[$($cq)pod2usage(\\\%: $args )$cq]
     my @cmd = @:  $^EXECUTABLE_NAME, < @params, $prg 
 
     print $^STDOUT, "# cmd = $(join ' ',@cmd)\n"

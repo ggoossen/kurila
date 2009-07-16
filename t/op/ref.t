@@ -273,7 +273,7 @@ is (runperl (
 
 # bug #22719
 
-runperl(prog => 'sub f { my $x = shift; *z = $x; } f(\%()); f();')
+runperl(prog => 'sub f { my $x = shift; *z = $x; } f(\$%); f();')
 is ($^CHILD_ERROR, 0, 'coredump on typeglob = (SvRV && !SvROK)')
 
 # bug #27268: freeing self-referential typeglobs could trigger

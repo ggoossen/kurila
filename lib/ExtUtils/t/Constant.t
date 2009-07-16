@@ -378,7 +378,7 @@ my $pound
 $pound = "pound" . chr(163) # A pound sign. (Currency)
 
 my @common_items = @: 
-                    \%: name=>"perl", type=>"PV",
+                    \%: name=>"perl", type=>"PV"
                     \%: name=>"*/", type=>"PV", value=>'"CLOSE"', macro=>1
                     \%: name=>"/*", type=>"PV", value=>'"OPEN"', macro=>1
                     \%: name=>$pound, type=>"PV", value=>'"Sterling"', macro=>1
@@ -413,7 +413,7 @@ EOT
         $header .= "#define $point $bearing\n"
 
 
-    my @items = @: "FIVE", \%: name=>"OK6", type=>"PV",
+    my @items = @: "FIVE", \%: name=>"OK6", type=>"PV"
                    \%: name=>"OK7", type=>"PVN"
                        value=>\(@: '"not ok 7\n\0ok 7\n"', 15)
                    \%: name => "FARTHING", type=>"NV"
@@ -585,7 +585,7 @@ if (defined $notdef) {
 }
 $test++;
 
-my %compass = %(
+my %compass = %(:
 EOT
 
     while (my (@: ?$point, ?$bearing) =(@:  each %compass))

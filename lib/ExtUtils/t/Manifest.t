@@ -263,7 +263,7 @@ my %expect = %:  'makefile.pl' => ''
 is_deeply( $files, \%expect, 'maniadd() vs MANIFEST without trailing newline')
 
 #add_file('MANIFEST'   => 'Makefile.PL');
-#maniadd(\%( foo => 'bar' ));
+#maniadd(\%: foo => 'bar' );
 
 SKIP: do
     chmod( 0400, 'MANIFEST' )

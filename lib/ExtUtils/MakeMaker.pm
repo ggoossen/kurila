@@ -2056,11 +2056,10 @@ Bool.  If this parameter is true, the prerequisites will be printed to
 stdout and MakeMaker will exit.  The output format is an evalable hash
 ref.
 
-$PREREQ_PM = \%(
-               'A::B' => Vers1,
-               'C::D' => Vers2,
+$PREREQ_PM = \%:
+               'A::B' => Vers1
+               'C::D' => Vers2
                ...
-             );
 
 =item PRINT_PREREQ
 

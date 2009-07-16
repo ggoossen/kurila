@@ -64,17 +64,17 @@ sub compile($self, %< %args)
         output      => File::Spec->catfile($srcdir, $basename) . $cf->{?obj_ext}
         cc          => $cf->{?cc}
         cflags      => \(@:  <
-                                 $self->split_like_shell($cf->{ccflags}), <
-                                 $self->split_like_shell($cf->{cccdlflags}), <
-                                 $self->split_like_shell(%args{extra_compiler_flags})
-            )
+                                              $self->split_like_shell($cf->{ccflags}), <
+                                              $self->split_like_shell($cf->{cccdlflags}), <
+                                              $self->split_like_shell(%args{extra_compiler_flags})
+                         )
         optimize    => \ $self->split_like_shell($cf->{optimize})
         defines     => \@defines
         includes    => \ (%args{?include_dirs} || \$@)->@
         perlinc     => \(@:  <
-                                 $self->perl_inc(), <
-                                 $self->split_like_shell($cf->{incpath})
-            )
+                                              $self->perl_inc(), <
+                                              $self->split_like_shell($cf->{incpath})
+                         )
         use_scripts => 1 # XXX provide user option to change this???
         
 
@@ -236,7 +236,7 @@ commandlines under some shells.
 =cut
 
 ########################################################################
-package ExtUtils::CBuilder::Platform::Windows::MSVC;
+package ExtUtils::CBuilder::Platform::Windows::MSVC
 
 sub format_compiler_cmd($self, %< %spec)
 
@@ -355,7 +355,7 @@ sub write_linker_script($self, %< %spec)
 1
 
 ########################################################################
-package ExtUtils::CBuilder::Platform::Windows::BCC;
+package ExtUtils::CBuilder::Platform::Windows::BCC
 
 sub format_compiler_cmd($self, %< %spec)
 
@@ -478,7 +478,7 @@ sub write_linker_script($self, %< %spec)
 1
 
 ########################################################################
-package ExtUtils::CBuilder::Platform::Windows::GCC;
+package ExtUtils::CBuilder::Platform::Windows::GCC
 
 sub format_compiler_cmd($self, %< %spec)
 

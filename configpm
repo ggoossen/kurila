@@ -138,7 +138,7 @@ package Config;
 # Need to stub all the functions to make code such as print Config::config_sh
 # keep working
 
-my %%Export_Cache = %%+: map {%%($_ => 1)}, @Config::EXPORT +@+ @Config::EXPORT_OK;
+my %%Export_Cache = %%+: map { %%: $_ => 1 }, @Config::EXPORT +@+ @Config::EXPORT_OK;
 
 # Define our own import method to avoid pulling in the full Exporter:
 sub import {
@@ -668,8 +668,8 @@ for my $name (@heavy_subs) {
 }
 
 # tie returns the object, so the value returned to require will be true.
-my %%Config = %%(
-%s  );
+my %%Config = %%:
+%s
 
 sub config_value {
     my $key = shift;

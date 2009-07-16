@@ -8,9 +8,9 @@ package DB;
 
 my ($running, $ready, $deep, $usrctxt, $evalarg, 
     @stack, @saved, @skippkg, @clients);
-my $preeval = \%();
-my $posteval = \%();
-my $ineval = \%();
+my $preeval = \$%
+my $posteval = \$%
+my $ineval = \$%
 
 ####
 #
@@ -356,7 +356,7 @@ sub loadfile {
 sub lineevents {
   my $s = shift;
   my $fname = shift;
-  my(%ret) = %( () );
+  my %ret = $%;
   my $i;
   $fname = $DB::filename unless $fname;
   local(*DB::dbline) = "::_<$fname";

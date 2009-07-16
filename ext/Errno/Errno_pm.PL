@@ -327,10 +327,10 @@ EOF
 # This file is auto-generated. ***ANY*** changes here will be lost
 #
 
-package Errno;
-our (\@EXPORT_OK,\%EXPORT_TAGS,\@ISA,\$VERSION,\%errno);
-use Exporter ();
-use Config;
+package Errno
+our (\@EXPORT_OK,\%EXPORT_TAGS,\@ISA,\$VERSION,\%errno)
+use Exporter ()
+use Config
 
 "\$(config_value('archname'))-\$(config_value('osvers'))" eq
     "$(config_value('archname'))-$(config_value('osvers'))" or
@@ -351,7 +351,7 @@ EDQ
     print $out, $j,"\n"
 
     print $out, <<'ESQ'
-%EXPORT_TAGS = %(
+%EXPORT_TAGS = %:
     POSIX => \qw(
 ESQ
 
@@ -371,23 +371,17 @@ ESQ
         EUSERS EWOULDBLOCK EXDEV))
 
     $k =~ s/(.{50,70})\s/$1\n\t/g
-    print $out, "\t",$k,"\n    )\n    )\n\n"
+    print $out, "\t",$k,"\n    )\n\n\n"
 
     foreach my $err ( @err)
         printf $out, "sub \%s () \{ \%d \}\n",$err,%err{?$err}
-    
 
     print $out, <<'ESQ'
-my %name2no = %(
+my %name2no = %:
 ESQ
 
     foreach my $err ( @err)
-        printf $out, "    \%s => \%d,\n",$err,%err{?$err}
-    
-
-    print $out, <<'ESQ'
-    );
-ESQ
+        printf $out, "    \%s => \%d\n",$err,%err{?$err}
 
     print $out, <<'ESQ'
 

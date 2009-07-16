@@ -38,14 +38,14 @@ use FindExt;
 use Config;
 
 # @ARGV with '!' at first position are exclusions
-my %excl = %( < map {$_=>1} map {m/^!(.*)$/} @ARGV );
+my %excl = %+: map { %: $_=>1 } map {m/^!(.*)$/} @ARGV
 @ARGV = grep {!m/^!/} @ARGV;
 # @ARGV with '+' at first position are inclusions
-my %incl = %( < map {$_=>1} map {m/^\+(.*)$/} @ARGV );
+my %incl = %+: map { %: $_=>1 } map {m/^\+(.*)$/} @ARGV
 @ARGV = grep {!m/^\+/} @ARGV;
 
 # --static/--dynamic
-my %opts = %( < map {$_=>1} map {m/^--([\w\-]+)$/} @ARGV );
+my %opts = %+: map { %: $_=>1 } map {m/^--([\w\-]+)$/} @ARGV
 @ARGV = grep {!m/^--([\w\-]+)$/} @ARGV;
 my ($static,$dynamic) = ((exists %opts{static}?1:0),(exists %opts{dynamic}?1:0));
 if ("$static,$dynamic" eq "0,0") {
