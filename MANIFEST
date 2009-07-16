@@ -2049,17 +2049,6 @@ t/lib/Cname.pm			Test charnames in regexes (op/pat.t)
 t/lib/common.pl			Helper for lib/{warnings,feature}.t
 t/lib/commonsense.t		See if configuration meets basic needs
 t/lib/compmod.pl		Helper for 1_compile.t
-t/lib/compress/any.pl		Compress::Zlib
-t/lib/compress/CompTestUtils.pm	Compress::Zlib
-t/lib/compress/destroy.pl	Compress::Zlib
-t/lib/compress/generic.pl	Compress::Zlib
-t/lib/compress/multi.pl		Compress::Zlib
-t/lib/compress/newtied.pl	Compress::Zlib
-t/lib/compress/oneshot.pl	Compress::Zlib
-t/lib/compress/prime.pl		Compress::Zlib
-t/lib/compress/tied.pl		Compress::Zlib
-t/lib/compress/truncate.pl	Compress::Zlib
-t/lib/compress/zlib-generic.pl	Compress::Zlib
 t/lib/contains_pod.xr		Pod-Parser test file
 t/lib/cygwin.t			Builtin cygwin function tests
 t/lib/Devel/switchd.pm		Module for t/run/switchd.t
