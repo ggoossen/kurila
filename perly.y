@@ -80,7 +80,7 @@
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
 %token <i_tkval> DO LOOPDO NOAMP
-%token <i_tkval> ANONHSH ANONSCALAR
+%token <i_tkval> ANONSCALAR
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
 %token <i_tkval> SPECIALBLOCK
@@ -143,7 +143,7 @@
 %left <i_tkval> ARROW DEREFSCL DEREFARY DEREFHSH DEREFSTAR DEREFAMP HSLICE ASLICE
 %nonassoc <i_tkval> ')'
 %left <i_tkval> '('
-%left '[' '{' ANONHSH ANONSCALAR
+%left '[' '{' ANONSCALAR
 
 %token <i_tkval> PEG
 
@@ -1369,18 +1369,6 @@ scalar  :	PRIVATEVAR
                                 if ( PL_parser->lex_brackets == 0 )
                                     PL_parser->lex_state = LEX_INTERPEND;
                             }
-			}
-	|       ANONHSH expr ')'	%prec '(' /* %( foo => "Bar" ) */
-			{ 
-                            $$ = newANONHASH($2, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'{');
-                            TOKEN_GETMAD($3,$$,'}');
-			}
-	|	ANONHSH ')'	%prec '(' /* %() */
-			{ 
-                            $$ = newANONHASH((OP*)NULL, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'{');
-                            TOKEN_GETMAD($2,$$,'}');
 			}
         |       ANONHSHL listexpr LAYOUTLISTEND /* %: ... */
                         {
