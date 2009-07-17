@@ -1,24 +1,10 @@
 =head1 NAME
 
-perltodo - Perl TO-DO List
+kurilatodo - Perl Kurila TO-DO List
 
 =head1 DESCRIPTION
 
-This is a list of wishes for Perl. The tasks we think are smaller or easier
-are listed first. Anyone is welcome to work on any of these, but it's a good
-idea to first contact I<perl5-porters@perl.org> to avoid duplication of
-effort. By all means contact a pumpking privately first if you prefer.
-
-Whilst patches to make the list shorter are most welcome, ideas to add to
-the list are also encouraged. Check the perl5-porters archives for past
-ideas, and any discussion about them. One set of archives may be found at:
-
-    http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/
-
-What can we offer you in return? Fame, fortune, and everlasting glory? Maybe
-not, but if your patch is incorporated, then we'll add your name to the
-F<AUTHORS> file, which ships in the official distribution. How many other
-programming languages offer you 1 line of immortality?
+This is a list of wishes for Perl Kurila. The items are listed by importance.
 
 =head1 Tasks that only need Perl knowledge
 
@@ -63,75 +49,6 @@ implements a very basic check for pod files, but the errors it discovers
 aren't found by podchecker. Add this check to podchecker, get rid of
 checkpods and have C<make check> use podchecker.
 
-=head2 Parallel testing
-
-(This probably impacts much more than the core: also the Test::Harness
-and TAP::* modules on CPAN.)
-
-The core regression test suite is getting ever more comprehensive, which has
-the side effect that it takes longer to run. This isn't so good. Investigate
-whether it would be feasible to give the harness script the B<option> of
-running sets of tests in parallel. This would be useful for tests in
-F<t/op/*.t> and F<t/uni/*.t> and maybe some sets of tests in F<lib/>.
-
-Questions to answer
-
-=over 4
-
-=item 1
-
-How does screen layout work when you're running more than one test?
-
-=item 2
-
-How does the caller of test specify how many tests to run in parallel?
-
-=item 3
-
-How do setup/teardown tests identify themselves?
-
-=back
-
-Pugs already does parallel testing - can their approach be re-used?
-
-=head2 Make Schwern poorer
-
-We should have tests for everything. When all the core's modules are tested,
-Schwern has promised to donate to $500 to TPF. We may need volunteers to
-hold him upside down and shake vigorously in order to actually extract the
-cash.
-
-=head2 Improve the coverage of the core tests
-
-Use Devel::Cover to ascertain the core modules's test coverage, then add
-tests that are currently missing.
-
-=head2 test B
-
-A full test suite for the B module would be nice.
-
-=head2 Deparse inlined constants
-
-Code such as this
-
-    use constant PI => 4;
-    warn PI
-
-will currently deparse as
-
-    use constant ('PI', 4);
-    warn 4;
-
-because the tokenizer inlines the value of the constant subroutine C<PI>.
-This allows various compile time optimisations, such as constant folding
-and dead code elimination. Where these haven't happened (such as the example
-above) it ought be possible to make B::Deparse work out the name of the
-original constant, because just enough information survives in the symbol
-table to do this. Specifically, the same scalar is used for the constant in
-the optree as is used for the constant subroutine, so by iterating over all
-symbol tables and generating a mapping of SV address to constant name, it
-would be possible to provide B::Deparse with this functionality.
-
 =head2 A decent benchmark
 
 C<perlbench> seems impervious to any recent changes made to the perl core. It
@@ -140,68 +57,6 @@ represented what current perl programs do, and measurably reported whether
 tweaks to the core improve, degrade or don't really affect performance, to
 guide people attempting to optimise the guts of perl. Gisle would welcome
 new tests for perlbench.
-
-=head2 fix tainting bugs
-
-Fix the bugs revealed by running the test suite with the C<-t> switch (via
-C<make test.taintwarn>).
-
-=head2 Dual life everything
-
-As part of the "dists" plan, anything that doesn't belong in the smallest perl
-distribution needs to be dual lifed. Anything else can be too. Figure out what
-changes would be needed to package that module and its tests up for CPAN, and
-do so. Test it with older perl releases, and fix the problems you find.
-
-To make a minimal perl distribution, it's useful to look at
-F<t/lib/commonsense.t>.
-
-=head2 Improving C<threads::shared>
-
-Investigate whether C<threads::shared> could share aggregates properly with
-only Perl level changes to shared.pm
-
-=head2 POSIX memory footprint
-
-Ilya observed that use POSIX; eats memory like there's no tomorrow, and at
-various times worked to cut it down. There is probably still fat to cut out -
-for example POSIX passes Exporter some very memory hungry data structures.
-
-=head2 embed.pl/makedef.pl
-
-There is a script F<embed.pl> that generates several header files to prefix
-all of Perl's symbols in a consistent way, to provide some semblance of
-namespace support in C<C>. Functions are declared in F<embed.fnc>, variables
-in F<interpvar.h>. Quite a few of the functions and variables
-are conditionally declared there, using C<#ifdef>. However, F<embed.pl>
-doesn't understand the C macros, so the rules about which symbols are present
-when is duplicated in F<makedef.pl>. Writing things twice is bad, m'kay.
-It would be good to teach C<embed.pl> to understand the conditional
-compilation, and hence remove the duplication, and the mistakes it has caused.
-
-=head2 use strict; and AutoLoad
-
-Currently if you write
-
-    package Whack;
-    use AutoLoader 'AUTOLOAD';
-    use strict;
-    1;
-    __END__
-    sub bloop {
-        print join (' ', No, strict, here), "!\n";
-    }
-
-then C<use strict;> isn't in force within the autoloaded subroutines. It would
-be more consistent (and less surprising) to arrange for all lexical pragmas
-in force at the __END__ block to be in force within each autoloaded subroutine.
-
-There's a similar problem with SelfLoader.
-
-=head1 Tasks that need a little sysadmin-type knowledge
-
-Or if you prefer, tasks that you would learn from, and broaden your skills
-base...
 
 =head2 make HTML install work
 
@@ -354,11 +209,6 @@ file/directory copying back and forth.
 
 Make F<pod/roffitall> be updated by F<pod/buildtoc>.
 
-=head1 Tasks that need a little C knowledge
-
-These tasks would need a little C knowledge, but don't need any specific
-background or experience with XS, or how the Perl interpreter works
-
 =head2 Weed out needless PERL_UNUSED_ARG
 
 The C code uses the macro C<PERL_UNUSED_ARG> to stop compilers warning about
@@ -366,19 +216,6 @@ unused arguments. Often the arguments can't be removed, as there is an
 external constraint that determines the prototype of the function, so this
 approach is valid. However, there are some cases where C<PERL_UNUSED_ARG>
 could be removed. Specifically
-
-=over 4
-
-=item *
-
-The prototypes of (nearly all) static functions can be changed
-
-=item *
-
-Unused arguments generated by short cut macros are wasteful - the short cut
-macro used can be changed.
-
-=back
 
 =head2 Modernize the order of directories in @INC
 
@@ -509,74 +346,6 @@ probably aren't allocated/deallocated often enough for a speed saving. Whereas
 C<MAGIC> is allocated/deallocated more often, but in turn, is also something
 more externally visible, so changing the rules here may bite external code.
 
-
-=head1 Tasks that need a knowledge of XS
-
-These tasks would need C knowledge, and roughly the level of knowledge of
-the perl API that comes from writing modules that use XS to interface to
-C.
-
-=head2 autovivification
-
-Make all autovivification consistent w.r.t LVALUE/RVALUE and strict/no strict;
-
-This task is incremental - even a little bit of work on it will help.
-
-=head2 Unicode in Filenames
-
-chdir, chmod, chown, chroot, exec, glob, link, lstat, mkdir, open,
-opendir, qx, readdir, readlink, rename, rmdir, stat, symlink, sysopen,
-system, truncate, unlink, utime, -X.  All these could potentially accept
-Unicode filenames either as input or output (and in the case of system
-and qx Unicode in general, as input or output to/from the shell).
-Whether a filesystem - an operating system pair understands Unicode in
-filenames varies.
-
-Known combinations that have some level of understanding include
-Microsoft NTFS, Apple HFS+ (In Mac OS 9 and X) and Apple UFS (in Mac
-OS X), NFS v4 is rumored to be Unicode, and of course Plan 9.  How to
-create Unicode filenames, what forms of Unicode are accepted and used
-(UCS-2, UTF-16, UTF-8), what (if any) is the normalization form used,
-and so on, varies.  Finding the right level of interfacing to Perl
-requires some thought.  Remember that an OS does not implicate a
-filesystem.
-
-(The Windows -C command flag "wide API support" has been at least
-temporarily retired in 5.8.1, and the -C has been repurposed, see
-L<perlrun>.)
-
-Most probably the right way to do this would be this:
-L</"Virtualize operating system access">.
-
-=head2 Unicode in %ENV
-
-Currently the %ENV entries are always byte strings.
-See L</"Virtualize operating system access">.
-
-=head2 Unicode and glob()
-
-Currently glob patterns and filenames returned from File::Glob::glob()
-are always byte strings.  See L</"Virtualize operating system access">.
-
-=head2 use less 'memory'
-
-Investigate trade offs to switch out perl's choices on memory usage.
-Particularly perl should be able to give memory back.
-
-This task is incremental - even a little bit of work on it will help.
-
-=head2 Re-implement C<:unique> in a way that is actually thread-safe
-
-The old implementation made bad assumptions on several levels. A good 90%
-solution might be just to make C<:unique> work to share the string buffer
-of SvPVs. That way large constant strings can be shared between ithreads,
-such as the configuration information in F<Config>.
-
-=head2 Make tainting consistent
-
-Tainting would be easier to use if it didn't take documented shortcuts and
-allow taint to "leak" everywhere within an expression.
-
 =head2 readpipe(LIST)
 
 system() accepts a LIST syntax (and a PROGRAM LIST syntax) to avoid
@@ -618,39 +387,12 @@ readlink().
 
 See also L</"Virtualize operating system access">.
 
-=head2 -C on the #! line
-
-It should be possible to make -C work correctly if found on the #! line,
-given that all perl command line options are strict ASCII, and -C changes
-only the interpretation of non-ASCII characters, and not for the script file
-handle. To make it work needs some investigation of the ordering of function
-calls during startup, and (by implication) a bit of tweaking of that order.
-
 =head2 Propagate const outwards from Perl_moreswitches()
 
 Change 32057 changed the parameter and return value of C<Perl_moreswitches()>
 from <char *> to <const char *>. It should now be possible to propagate
 const-correctness outwards to C<S_parse_body()>, C<Perl_moreswitches()>
 and C<Perl_yylex()>.
-
-=head2 Duplicate logic in S_method_common() and Perl_gv_fetchmethod_autoload()
-
-A comment in C<S_method_common> notes
-
-	/* This code tries to figure out just what went wrong with
-	   gv_fetchmethod.  It therefore needs to duplicate a lot of
-	   the internals of that function.  We can't move it inside
-	   Perl_gv_fetchmethod_autoload(), however, since that would
-	   cause UNIVERSAL->can("NoSuchPackage::foo") to croak, and we
-	   don't want that.
-	*/
-
-If C<Perl_gv_fetchmethod_autoload> gets rewritten to take (more) flag bits,
-then it ought to be possible to move the logic from C<S_method_common> to
-the "right" place. When making this change it would probably be good to also
-pass in at least the method name length, if not also pre-computed hash values
-when known. (I'm contemplating a plan to pre-compute hash values for common
-fixed strings such as C<ISA> and pass them in to functions.)
 
 =head2 Organize error messages
 
@@ -677,11 +419,6 @@ have catgets().
 
 For the really pure at heart, consider extending this item to cover
 also the warning messages (see L<perllexwarn>, C<warnings.pl>).
-
-=head1 Tasks that need a knowledge of the interpreter
-
-These tasks would need C knowledge, and knowledge of how the interpreter works,
-or a willingness to learn.
 
 =head2 lexicals used only once
 
@@ -714,24 +451,6 @@ set. The pad API only takes a C<char *> pointer, so that's all bytes too. The
 tokeniser ignores the UTF-8-ness of C<PL_rsfp>, or any SVs returned from
 source filters.  All this could be fixed.
 
-=head2 state variable initialization in list context
-
-Currently this is illegal:
-
-    state ($a, $b) = foo(); 
-
-In Perl 6, C<state ($a) = foo();> and C<(state $a) = foo();> have different
-semantics, which is tricky to implement in Perl 5 as currently they produce
-the same opcode trees. The Perl 6 design is firm, so it would be good to
-implement the necessary code in Perl 5. There are comments in
-C<Perl_newASSIGNOP()> that show the code paths taken by various assignment
-constructions involving state variables.
-
-=head2 Implement $value ~~ 0 .. $range
-
-It would be nice to extend the syntax of the C<~~> operator to also
-understand numeric (and maybe alphanumeric) ranges.
-
 =head2 A does() built-in
 
 Like ref(), only useful. It would call the C<DOES> method on objects; it
@@ -739,33 +458,12 @@ would also tell whether something can be dereferenced as an
 array/hash/etc., or used as a regexp, etc.
 L<http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-03/msg00481.html>
 
-=head2 Tied filehandles and write() don't mix
-
-There is no method on tied filehandles to allow them to be called back by
-formats.
-
 =head2 Attach/detach debugger from running program
 
 The old perltodo notes "With C<gdb>, you can attach the debugger to a running
 program if you pass the process ID. It would be good to do this with the Perl
 debugger on a running Perl program, although I'm not sure how it would be
 done." ssh and screen do this with named pipes in /tmp. Maybe we can too.
-
-=head2 Optimize away empty destructors
-
-Defining an empty DESTROY method might be useful (notably in
-AUTOLOAD-enabled classes), but it's still a bit expensive to call. That
-could probably be optimized.
-
-=head2 LVALUE functions for lists
-
-The old perltodo notes that lvalue functions don't work for list or hash
-slices. This would be good to fix.
-
-=head2 LVALUE functions in the debugger
-
-The old perltodo notes that lvalue functions don't work in the debugger. This
-would be good to fix.
 
 =head2 regexp optimiser optional
 

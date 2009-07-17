@@ -122,7 +122,7 @@ h Miscellaneous
 
   perlbook		Perl book information
   perlcommunity		Perl community information
-  perltodo		Perl things to do
+  kurilatodo		Perl Kurila things to do
 
   perldoc		Look up Perl documentation in Pod format
 
