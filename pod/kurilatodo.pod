@@ -6,7 +6,25 @@ kurilatodo - Perl Kurila TO-DO List
 
 This is a list of wishes for Perl Kurila. The items are listed by importance.
 
-=head1 Tasks that only need Perl knowledge
+=head1 Items
+
+=head2 Check all sub references at the end
+
+Resolve all sub routine references, and throw an error if the
+subroutine isn't found, such the unknown subroutine calls can be found
+at compile time.
+
+=head3 Tasks
+=over
+=item Save the subroutine references
+=item Resolve the saved references at CHECK time
+=back
+
+=head2 Use C<$method> for sub calls without arguments
+
+=head2 Use C<:> with layout syntax for sub calls.
+
+=head2 Lexical scoped subroutines imports
 
 =head2 Remove duplication of test setup.
 
