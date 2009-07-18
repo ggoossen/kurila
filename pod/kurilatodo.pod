@@ -24,6 +24,11 @@ at compile time.
 
 =head2 Use C<:> with layout syntax for sub calls.
 
+=head2 Make formal sub arguments obligatory
+
+All subs must have formal arguments, with exception of blocks, which
+have an implicit C<$_>
+
 =head2 Lexical scoped subroutines imports
 
 =head2 Remove duplication of test setup.
