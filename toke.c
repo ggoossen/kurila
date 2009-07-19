@@ -3519,6 +3519,7 @@ Perl_yylex(pTHX)
 		    OPERATOR(ARROW);
 		}
 		else if (*s == '@') {
+		    /* '->@' operator */
 		    s++;
 		    pl_yylval.i_tkval.ival=0;
 		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
@@ -3528,6 +3529,7 @@ Perl_yylex(pTHX)
 		    TERM(DEREFARY);
 		}
 		else if (*s == '$') {
+		    /* '->$' operator */
 		    s++;
 		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
 			/* ->$ closes the interpoltion and creates a join */
@@ -3536,6 +3538,7 @@ Perl_yylex(pTHX)
 		    TERM(DEREFSCL);
 		}
 		else if (*s == '%') {
+		    /* '->%' operator */
 		    s++;
 		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
 			/* ->$ closes the interpoltion and creates a join */
@@ -3544,6 +3547,7 @@ Perl_yylex(pTHX)
 		    TERM(DEREFHSH);
 		} 
 		else if (*s == '*') {
+		    /* '->*' operator */
 		    s++;
 		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
 			/* ->$ closes the interpoltion and creates a join */
@@ -3552,6 +3556,7 @@ Perl_yylex(pTHX)
 		    TERM(DEREFSTAR);
 		} 
 		else if (*s == '&') {
+		    /* '->&' operator */
 		    s++;
 		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
 			/* ->$ closes the interpoltion and creates a join */
@@ -3954,13 +3959,11 @@ Perl_yylex(pTHX)
 	}
 
 	s = scan_ident(s - 1, PL_bufend, PL_tokenbuf, sizeof PL_tokenbuf, TRUE);
-	if (*PL_tokenbuf) {
-	    PL_expect = XOPERATOR;
-	    force_ident(PL_tokenbuf, '&');
+	if (! *PL_tokenbuf) {
+	    yyerror(aTHX_ "Indentified expected after '&'");
 	}
-	else
-	    PREREF('&');
-	pl_yylval.i_tkval.ival = (OPpENTERSUB_AMPER<<8);
+	PL_expect = XOPERATOR;
+	force_ident(PL_tokenbuf, '&');
 	TERM('&');
 
     case '|':
@@ -4674,7 +4677,8 @@ Perl_yylex(pTHX)
 #endif
 		    force_next(WORD);
 		    pl_yylval.i_tkval.ival = 0;
-		    TOKEN('&');
+		    force_next('&');
+		    TOKEN(NOAMP);
 		}
 
 		/* Not a method, so call it a subroutine (if defined) */

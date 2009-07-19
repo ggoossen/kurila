@@ -1158,24 +1158,24 @@ term	:	'?' term
                             $$ = $1;
                             $$->op_flags |= OPf_SPECIAL;
                         }
-	|	amper '(' ')'                        /* &foo() */
+	|	NOAMP amper '(' ')'                        /* &foo() */
 			{
-                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar($1), $1->op_location);
-			  TOKEN_GETMAD($2,$$,'(');
-			  TOKEN_GETMAD($3,$$,')');
+                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar($2), $2->op_location);
+			  TOKEN_GETMAD($3,$$,'(');
+			  TOKEN_GETMAD($4,$$,')');
                           APPEND_MADPROPS_PV("amper", $$, '>');
 			}
-	|	amper '(' expr ')'                   /* &foo(@args) */
+	|	NOAMP amper '(' expr ')'                   /* &foo(@args) */
 			{
 			  $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
-				append_elem(OP_LIST, $3, scalar($1)), $1->op_location);
+				append_elem(OP_LIST, $4, scalar($2)), $2->op_location);
 			  DO_MAD({
 			      OP* op = $$;
 			      if (op->op_type == OP_CONST) { /* defeat const fold */
 				op = (OP*)op->op_madprop->mad_val;
 			      }
-			      TOKEN_GETMAD($2,op,'(');
-			      TOKEN_GETMAD($4,op,')');
+			      TOKEN_GETMAD($3,op,'(');
+			      TOKEN_GETMAD($5,op,')');
                               APPEND_MADPROPS_PV("amper", $$, '>');
 			  })
 			}

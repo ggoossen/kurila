@@ -46,7 +46,7 @@ sub import
     return export $pkg, $callpkg, ($args ?? < @_ !! ()) if $heavy
     # shortcut for the common case of no type character
     for (@_)
-        Symbol::fetch_glob("$callpkg\::$_")->* = \&{Symbol::fetch_glob("$pkg\::$_")->*}
+        Symbol::fetch_glob("$callpkg\::$_")->* = \Symbol::fetch_glob("$pkg\::$_")->*->&
 
 # Default methods
 

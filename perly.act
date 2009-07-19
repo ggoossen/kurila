@@ -1322,9 +1322,9 @@ case 2:
   case 152:
 #line 1162 "perly.y"
     {
-                            (yyval.opval) = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar((ps[(1) - (3)].val.opval)), (ps[(1) - (3)].val.opval)->op_location);
-			  TOKEN_GETMAD((ps[(2) - (3)].val.i_tkval),(yyval.opval),'(');
-			  TOKEN_GETMAD((ps[(3) - (3)].val.i_tkval),(yyval.opval),')');
+                            (yyval.opval) = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar((ps[(2) - (4)].val.opval)), (ps[(2) - (4)].val.opval)->op_location);
+			  TOKEN_GETMAD((ps[(3) - (4)].val.i_tkval),(yyval.opval),'(');
+			  TOKEN_GETMAD((ps[(4) - (4)].val.i_tkval),(yyval.opval),')');
                           APPEND_MADPROPS_PV("amper", (yyval.opval), '>');
 			;}
     break;
@@ -1333,14 +1333,14 @@ case 2:
 #line 1169 "perly.y"
     {
 			  (yyval.opval) = newUNOP(OP_ENTERSUB, OPf_STACKED,
-				append_elem(OP_LIST, (ps[(3) - (4)].val.opval), scalar((ps[(1) - (4)].val.opval))), (ps[(1) - (4)].val.opval)->op_location);
+				append_elem(OP_LIST, (ps[(4) - (5)].val.opval), scalar((ps[(2) - (5)].val.opval))), (ps[(2) - (5)].val.opval)->op_location);
 			  DO_MAD({
 			      OP* op = (yyval.opval);
 			      if (op->op_type == OP_CONST) { /* defeat const fold */
 				op = (OP*)op->op_madprop->mad_val;
 			      }
-			      TOKEN_GETMAD((ps[(2) - (4)].val.i_tkval),op,'(');
-			      TOKEN_GETMAD((ps[(4) - (4)].val.i_tkval),op,')');
+			      TOKEN_GETMAD((ps[(3) - (5)].val.i_tkval),op,'(');
+			      TOKEN_GETMAD((ps[(5) - (5)].val.i_tkval),op,')');
                               APPEND_MADPROPS_PV("amper", (yyval.opval), '>');
 			  })
 			;}
