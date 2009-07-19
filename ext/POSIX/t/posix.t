@@ -64,9 +64,9 @@ SKIP: do
 
         my $sigint_called = 0
 
-        my $mask   = POSIX::SigSet->new( &SIGINT( < @_ ))
+        my $mask   = POSIX::SigSet->new( SIGINT( < @_ ))
         my $action = POSIX::SigAction->new( \&main::SigHUP, $mask, 0)
-        sigaction(&SIGHUP( < @_ ), $action)
+        sigaction(SIGHUP( < @_ ), $action)
         signals::handler('INT') = \&SigINT
 
         # At least OpenBSD/i386 3.3 is okay, as is NetBSD 1.5.
@@ -109,9 +109,9 @@ SKIP: do
 
 SKIP: do
     skip("_POSIX_OPEN_MAX is inaccurate on MPE", 1) if $Is_MPE
-    skip('_POSIX_OPEN_MAX undefined (@fds[1])',  1) unless &_POSIX_OPEN_MAX( < @_ )
+    skip('_POSIX_OPEN_MAX undefined (@fds[1])',  1) unless _POSIX_OPEN_MAX( < @_ )
 
-    ok( &_POSIX_OPEN_MAX( < @_ ) +>= 16, "The minimum allowed values according to susv2" )
+    ok( _POSIX_OPEN_MAX( < @_ ) +>= 16, "The minimum allowed values according to susv2" )
 
 
 
@@ -130,19 +130,19 @@ like( getcwd(), qr/$pat/, 'getcwd' )
 SKIP: do
     skip("strtod() not present", 1) unless config_value('d_strtod')
 
-    my $lc = &POSIX::setlocale(&POSIX::LC_NUMERIC( < @_ ), 'C') if config_value('d_setlocale')
+    my $lc = POSIX::setlocale(POSIX::LC_NUMERIC( < @_ ), 'C') if config_value('d_setlocale')
 
     # we're just checking that strtod works, not how accurate it is
-    my (@: $n, $x) =  &POSIX::strtod('3.14159_OR_SO')
+    my (@: $n, $x) =  POSIX::strtod('3.14159_OR_SO')
     ok((abs("3.14159" - $n) +< 1e-6) && ($x == 6), 'strtod works')
 
-    &POSIX::setlocale(&POSIX::LC_NUMERIC( < @_ ), $lc) if config_value('d_setlocale')
+    POSIX::setlocale(POSIX::LC_NUMERIC( < @_ ), $lc) if config_value('d_setlocale')
 
 
 SKIP: do
     skip("strtol() not present", 2) unless config_value('d_strtol')
 
-    my (@: $n, $x) =  &POSIX::strtol('21_PENGUINS')
+    my (@: $n, $x) =  POSIX::strtol('21_PENGUINS')
     is($n, 21, 'strtol() number')
     is($x, 9,  '         unparsed chars')
 
@@ -150,13 +150,13 @@ SKIP: do
 SKIP: do
     skip("strtoul() not present", 2) unless config_value('d_strtoul')
 
-    my (@: $n, $x) =  &POSIX::strtoul('88_TEARS')
+    my (@: $n, $x) =  POSIX::strtoul('88_TEARS')
     is($n, 88, 'strtoul() number')
     is($x, 6,  '          unparsed chars')
 
 
 # Pick up whether we're really able to dynamically load everything.
-ok( &POSIX::acos(1.0) == 0.0,   'dynamic loading' )
+ok( POSIX::acos(1.0) == 0.0,   'dynamic loading' )
 
 # This can coredump if struct tm has a timezone field and we
 # didn't detect it.  If this fails, try adding
@@ -173,7 +173,7 @@ sub try_strftime
     is($got, $expect, "validating mini_mktime() and strftime(): $expect")
 
 
-my $lc = &POSIX::setlocale(&POSIX::LC_TIME( < @_ ), 'C') if config_value('d_setlocale')
+my $lc = POSIX::setlocale(POSIX::LC_TIME( < @_ ), 'C') if config_value('d_setlocale')
 try_strftime("Wed Feb 28 00:00:00 1996 059", 0,0,0, 28,1,96)
 SKIP: do
     skip("VC++ 8 and Vista's CRTs regard 60 seconds as an invalid parameter", 1)
@@ -190,7 +190,7 @@ try_strftime("Mon Feb 28 00:00:00 2000 059", 0,0,0, 28,1,100)
 try_strftime("Tue Feb 29 00:00:00 2000 060", 0,0,0, 0,2,100)
 try_strftime("Wed Mar 01 00:00:00 2000 061", 0,0,0, 1,2,100)
 try_strftime("Fri Mar 31 00:00:00 2000 091", 0,0,0, 31,2,100)
-&POSIX::setlocale(&POSIX::LC_TIME( < @_ ), $lc) if config_value("d_setlocale")
+POSIX::setlocale(POSIX::LC_TIME( < @_ ), $lc) if config_value("d_setlocale")
 
 do
     for my $test ((@: 0, 1))

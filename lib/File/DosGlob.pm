@@ -77,7 +77,7 @@ sub doglob
             for my $e ( @leaves)
             next INNER if $e eq '.' or $e eq '..'
             next INNER if $cond eq 'd' and ! -d "$head$e"
-            push(@matched, "$head$e"), next INNER if &$matchsub($e)
+            push(@matched, "$head$e"), next INNER if $matchsub->($e)
             #
             # [DOS compatibility special case]
             # Failed, add a trailing dot and try again, but only
@@ -86,7 +86,7 @@ sub doglob
             #
             if (index($e,'.') == -1 and length($e) +< 9
                   and index($pat,'\.') != -1)
-                push(@matched, "$head$e"), next INNER if &$matchsub("$e.")
+                push(@matched, "$head$e"), next INNER if $matchsub->("$e.")
             
         
         push @retval, < @matched if (nelems @matched)
@@ -188,7 +188,7 @@ sub doglob_Mac
             next INNER if $e eq '.' or $e eq '..'
             next INNER if $cond eq 'd' and ! -d "$not_esc_head$e"
 
-            if (&$matchsub($e))
+            if ($matchsub->($e))
                 my $leave = (($not_esc_head eq ':') && (-f "$not_esc_head$e")) ??
                     "$e" !! "$not_esc_head$e"
                 #
@@ -393,7 +393,7 @@ do
         return unless (nelems @_)
         my $sym = shift
         my $callpkg = ($sym =~ s/^GLOBAL_//s ?? 'CORE::GLOBAL' !! caller(0))
-        Symbol::fetch_glob($callpkg.'::'.$sym)->* = \&{Symbol::fetch_glob($pkg.'::'.$sym)->*} if $sym eq 'glob'
+        Symbol::fetch_glob($callpkg.'::'.$sym)->* = \Symbol::fetch_glob($pkg.'::'.$sym)->*->& if $sym eq 'glob'
     
 
 1

@@ -106,7 +106,7 @@ cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','reverse then sort')
 
 
 
-sub twoface { no warnings 'redefine'; *twoface = sub (@< @_) { $a <+> $b }; &twoface( < @_ ) }
+sub twoface { no warnings 'redefine'; *twoface = sub (@< @_) { $a <+> $b }; twoface( < @_ ) }
 try { @b = sort \&twoface, (@: 4,1,3,2) }; die if $^EVAL_ERROR
 cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','redefine sort sub inside the sort sub')
 
@@ -314,9 +314,9 @@ sub min
 
 # Sorting shouldn't increase the refcount of a sub
 sub foo {(1+$a) <+> (1+$b)}
-my $refcnt = &Internals::SvREFCNT(\&foo)
+my $refcnt = Internals::SvREFCNT(\&foo)
 @output = sort @:  foo 3,7,9
-main::is($refcnt, &Internals::SvREFCNT(\&foo), "sort sub refcnt")
+main::is($refcnt, Internals::SvREFCNT(\&foo), "sort sub refcnt")
 my $fail_msg = q(Modification of a read-only value attempted)
 # Sorting a read-only array in-place shouldn't be allowed
 my @readonly =1..10

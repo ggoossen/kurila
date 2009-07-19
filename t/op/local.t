@@ -30,7 +30,7 @@ $c = "c 7"
 $d = "d 8"
 
 my @res
-@res =  &foo("a 1","b 2")
+@res =  foo("a 1","b 2")
 is(@res[0], "c 3")
 is(@res[1], "d 4")
 
@@ -59,7 +59,7 @@ $a = "a 5"
 @c = @:  "c 7" 
 %d{+''} = "d 8"
 
-@res = &foo2("a 1","b 2")
+@res = foo2("a 1","b 2")
 is(@res[0], "c 3")
 is(@res[1], "d 4")
 

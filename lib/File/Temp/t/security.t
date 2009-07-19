@@ -39,7 +39,7 @@ File::Temp->safe_level( File::Temp::STANDARD )
 
 print $^STDOUT, "# Testing with STANDARD security...\n"
 
-&test_security(0)
+test_security(0)
 
 # Try medium
 
@@ -49,7 +49,7 @@ File::Temp->safe_level( File::Temp::MEDIUM )
 print $^STDOUT, "# Testing with MEDIUM security...\n"
 
 # Now we need to start skipping tests
-&test_security($skip)
+test_security($skip)
 
 # Try HIGH
 
@@ -58,7 +58,7 @@ File::Temp->safe_level( File::Temp::HIGH )
 
 print $^STDOUT, "# Testing with HIGH security...\n"
 
-&test_security($skip)
+test_security($skip)
 
 exit
 

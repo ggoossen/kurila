@@ -236,7 +236,7 @@ unless ($^OS_NAME eq 'MacOS')
               # Make sure that redefined die handlers do not cause problems
               # e.g. CGI::Carp
               local $^WARN_HOOK = sub {};
-              $bit = &$func();
+              $bit = $func->();
               1;
           }
     
@@ -244,7 +244,7 @@ unless ($^OS_NAME eq 'MacOS')
     $LOCKFLAG = try {
         local $^DIE_HOOK = sub {};
         local $^WARN_HOOK = sub {};
-        &Fcntl::O_EXLOCK();
+        Fcntl::O_EXLOCK();
     }
 
 
@@ -264,7 +264,7 @@ unless ($^OS_NAME eq 'MacOS')
               # Make sure that redefined die handlers do not cause problems
               # e.g. CGI::Carp
               local $^WARN_HOOK = sub {};
-              $bit = &$func();
+              $bit = $func->();
               1;
           }
     
@@ -687,8 +687,8 @@ sub _is_safe
     # use 022 to check writability
     # Do it with S_IWOTH and S_IWGRP for portability (maybe)
     # mode is in info[2]
-    if ((@info[2] ^&^ &Fcntl::S_IWGRP( < @_ )) ||   # Is group writable?
-        (@info[2] ^&^ &Fcntl::S_IWOTH( < @_ )) )  # Is world writable?
+    if ((@info[2] ^&^ Fcntl::S_IWGRP( < @_ )) ||   # Is group writable?
+        (@info[2] ^&^ Fcntl::S_IWOTH( < @_ )) )  # Is world writable?
         # Must be a directory
         unless (-d $path)
             $err_ref->$ = "Path ($path) is not a directory"
@@ -731,8 +731,8 @@ sub _is_verysafe
     # and If it is not there do the extensive test
     local($^EVAL_ERROR)
     my $chown_restricted
-    $chown_restricted = &POSIX::_PC_CHOWN_RESTRICTED()
-        if try { &POSIX::_PC_CHOWN_RESTRICTED(); 1}
+    $chown_restricted = POSIX::_PC_CHOWN_RESTRICTED()
+        if try { POSIX::_PC_CHOWN_RESTRICTED(); 1}
 
     # If chown_resticted is set to some value we should test it
     if (defined $chown_restricted)

@@ -196,7 +196,7 @@ sub new
 
 sub TIEHASH
     my $pkg = shift
-    if (defined &{Symbol::fetch_glob("$($pkg)::new")})
+    if (defined Symbol::fetch_glob("$($pkg)::new")->&)
         warnings::warnif("WARNING: calling $($pkg)->new since $($pkg)->TIEHASH is missing")
         $pkg->new(< @_)
     else

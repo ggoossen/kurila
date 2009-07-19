@@ -806,6 +806,6 @@ EOM
     
 
 
-&main( < @_ )
+main( < @_ )
 
 # EOF

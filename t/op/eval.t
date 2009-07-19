@@ -71,7 +71,7 @@ my $X = sub (@< @_)
     my $b = "right"
     print $^STDOUT, eval('"$b"') eq $b ?? "ok 24\n" !! "not ok 24\n"
 
-&$X()
+$X->()
 
 
 # check navigation of multiple eval boundaries to find lexicals

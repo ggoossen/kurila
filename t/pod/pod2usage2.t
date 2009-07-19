@@ -30,7 +30,7 @@ sub getoutput
 
     # child
     open($^STDERR, ">&", $^STDOUT)
-    &$code( < @_ )
+    $code->( < @_ )
     print $^STDOUT, "--NORMAL-RETURN--\n"
     exit 0
 

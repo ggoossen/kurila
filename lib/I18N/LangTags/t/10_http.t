@@ -78,7 +78,7 @@ foreach my $in ( @in)
                 env::var('HTTP_ACCEPT_LANGUAGE' ) = @_[0]
                 return()
         )
-        my @args = &$modus($in)
+        my @args = $modus->($in)
 
         # ////////////////////////////////////////////////////
         my @out = I18N::LangTags::Detect->http_accept_langs(< @args)

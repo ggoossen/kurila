@@ -440,9 +440,9 @@ EOF
     close $f
     # need to eliminate any other qv()'s
     undef *main::qv
-    ok(!defined(&{Symbol::fetch_glob("main\::qv")}), "make sure we cleared qv() properly")
+    ok(!defined(Symbol::fetch_glob("main\::qv")->&), "make sure we cleared qv() properly")
     eval "use lib '.'; use vvv;"
-    ok(defined(&{Symbol::fetch_glob("main\::qv")}), "make sure we exported qv() properly")
+    ok(defined(Symbol::fetch_glob("main\::qv")->&), "make sure we exported qv() properly")
     isa_ok( qv(1.2), "vvv")
     unlink 'vvv.pm'
 
@@ -471,7 +471,7 @@ EOF
         my $loc
         while ( ~< $^DATA)
             chomp
-            $loc = POSIX::setlocale(&POSIX::LC_ALL( < @_ ), $_)
+            $loc = POSIX::setlocale(POSIX::LC_ALL( < @_ ), $_)
             last if POSIX::localeconv()->{?decimal_point} eq ','
         
         skip 'Cannot test locale handling without a comma locale', 3

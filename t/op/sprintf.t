@@ -108,7 +108,7 @@ for my  $i (1 .. nelems(@tests))
         # Suppress tests with modulo of exponent >= 100 on platforms
         # which can't handle such magnitudes (or where we can't tell).
         ((!try {require POSIX}) || # Costly: only do this if we must!
-         (length(&POSIX::DBL_MAX( < @_ )) - rindex(&POSIX::DBL_MAX( < @_ ), '+')) == 3))
+         (length(POSIX::DBL_MAX( < @_ )) - rindex(POSIX::DBL_MAX( < @_ ), '+')) == 3))
         print($^STDOUT, "ok $i # >$template< >$data< >$result<",
             " Suppressed: exponent out of range?\n")
     else

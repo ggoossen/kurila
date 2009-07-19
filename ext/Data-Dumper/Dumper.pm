@@ -146,7 +146,7 @@ sub Names($s, $n)
 
 
 sub Dump
-    return &Dumpperl( < @_ )
+    return Dumpperl( < @_ )
 
 
 #

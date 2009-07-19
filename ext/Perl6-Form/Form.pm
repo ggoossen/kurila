@@ -298,7 +298,7 @@ sub jfull
         1 while $rem+>0 && $str =~ s/( +)/$(($rem--+>0??" "!!"").$1)/g
         @_[0] = join '', reverse split m//, $str
     
-    &jleft( < @_ )
+    jleft( < @_ )
 
 
 sub jsingle

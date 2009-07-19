@@ -98,7 +98,7 @@ do
 
     main::ok( defined &lifejacket,      'simple import' )
 
-    my $got = try {&lifejacket( < @_ )}
+    my $got = try {lifejacket( < @_ )}
     main::ok ( $^EVAL_ERROR eq "", 'check we can call the imported subroutine')
         or print $^STDERR, "# \$\@ is $^EVAL_ERROR\n"
     main::ok ( $got eq 'lifejacket', 'and that it gave the correct result')

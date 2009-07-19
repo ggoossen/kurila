@@ -95,7 +95,7 @@ do { my $failed = 0;
 SKIP: do
     skip("No Internals::SvREFCNT", 1) if !defined &Internals::SvREFCNT
     sub mult {$a*$b}
-    my $refcnt = &Internals::SvREFCNT(\&mult)
+    my $refcnt = Internals::SvREFCNT(\&mult)
     $v = reduce \&mult, < 1..6
-    is(&Internals::SvREFCNT(\&mult), $refcnt, "Refcount unchanged")
+    is(Internals::SvREFCNT(\&mult), $refcnt, "Refcount unchanged")
 

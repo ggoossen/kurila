@@ -232,7 +232,7 @@ sub skipcheck(?$p)
 
     my @skipped = $@
     foreach my $file ( _sort < keys $found->%)
-        if (&$matches($file))
+        if ($matches->($file))
             warn "Skipping $file\n"
             push @skipped, $file
             next

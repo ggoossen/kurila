@@ -30,7 +30,7 @@ while ( ~< $^DATA)
     next unless $_
     next if m/^#/
     my (@: $keyword) =  split
-    print $kw, &tab(5, "#define KEY_$keyword"), $keynum++, "\n"
+    print $kw, tab(5, "#define KEY_$keyword"), $keynum++, "\n"
 
 
 print $kw, "\n/* ex: set ro: */\n"

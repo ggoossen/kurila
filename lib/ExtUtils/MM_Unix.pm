@@ -1496,7 +1496,7 @@ sub init_main($self)
     # mod2fname returns appropriate file base name (typically truncated)
     # It may also edit @modparts if required.
     if (defined &DynaLoader::mod2fname)
-        $modfname = &DynaLoader::mod2fname(\@modparts)
+        $modfname = DynaLoader::mod2fname(\@modparts)
 
     @: $self->{+PARENT_NAME}, $self->{+BASEEXT} = @: $self->{?NAME} =~ m!(?:([\w:]+)::)?(\w+)\z!
     $self->{+PARENT_NAME} ||= ''
@@ -3120,7 +3120,7 @@ sub max_exec_len
     my $self = shift
 
     if (!defined $self->{?_MAX_EXEC_LEN})
-        if (my $arg_max = try { require POSIX;  &POSIX::ARG_MAX( < @_ ) })
+        if (my $arg_max = try { require POSIX;  POSIX::ARG_MAX( < @_ ) })
             $self->{+_MAX_EXEC_LEN} = $arg_max
         else      # POSIX minimum exec size
             $self->{+_MAX_EXEC_LEN} = 4096

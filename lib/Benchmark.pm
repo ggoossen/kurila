@@ -655,7 +655,7 @@ sub runloop($n, $c)
     while ( ( $t0 = Benchmark->new(0) )->[1] == $tbase ) {} ;
     $subref->()
     $t1 = Benchmark->new($n)
-    $td = &timediff($t1, $t0)
+    $td = timediff($t1, $t0)
     timedebug("runloop:",$td)
     $td
 

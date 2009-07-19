@@ -352,7 +352,7 @@ if ($^OS_NAME eq 'cygwin')
     # got an arg-less prototype and will die if args are present.
     local $^WARNING = 0
     my $orig_cwd = \&cwd
-    *cwd = sub (@< @_) { &$orig_cwd() }
+    *cwd = sub (@< @_) { $orig_cwd->() }
 
 
 
@@ -726,7 +726,7 @@ if (exists %METHOD_MAP{$^OS_NAME})
     my %map = %METHOD_MAP{?$^OS_NAME}
     foreach my $name (keys %map)
         local $^WARNING = 0  # assignments trigger 'subroutine redefined' warning
-        Symbol::fetch_glob($name)->* = \&{%map{?$name}}
+        Symbol::fetch_glob($name)->* = \%map{?$name}->&
     
 
 

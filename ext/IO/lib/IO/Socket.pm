@@ -105,7 +105,7 @@ sub connect($sock, $addr)
 
             undef $^OS_ERROR
             if (!$sel->can_write($timeout))
-                $err = $^OS_ERROR || (exists &Errno::ETIMEDOUT ?? &Errno::ETIMEDOUT( < @_ ) !! 1)
+                $err = $^OS_ERROR || (exists &Errno::ETIMEDOUT ?? Errno::ETIMEDOUT( < @_ ) !! 1)
                 $^EVAL_ERROR = "connect: timeout"
             elsif (!connect($sock,$addr) &&
                 not ($^OS_ERROR == EISCONN || ($^OS_ERROR == 10022 && $^OS_NAME eq 'MSWin32'))
@@ -203,7 +203,7 @@ sub accept($sock, ?$pkg)
 
         unless ( (@:  $sel->can_read($timeout) ) )
             $^EVAL_ERROR = 'accept: timeout'
-            $^OS_ERROR = (exists &Errno::ETIMEDOUT ?? &Errno::ETIMEDOUT( < @_ ) !! 1)
+            $^OS_ERROR = (exists &Errno::ETIMEDOUT ?? Errno::ETIMEDOUT( < @_ ) !! 1)
             return
         
     

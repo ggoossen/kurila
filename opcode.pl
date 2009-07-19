@@ -147,9 +147,9 @@ END
 my $i = 0
 for ( @ops)
     # print $on, "\t", &tab(3,"OP_\U$_,"), "/* ", $i++, " */\n";
-    print $on, "\t", &tab(3,"OP_\U$_"), " = ", $i++, ",\n"
+    print $on, "\t", tab(3,"OP_\U$_"), " = ", $i++, ",\n"
 
-print $on, "\t", &tab(3,"OP_max"), "\n"
+print $on, "\t", tab(3,"OP_max"), "\n"
 print $on, "\} opcode;\n"
 print $on, "\n#define MAXO ", scalar nelems @ops, "\n"
 print $on, "#define OP_phoney_INPUT_ONLY -1\n"

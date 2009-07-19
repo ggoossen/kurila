@@ -3029,7 +3029,7 @@ sub pp_entersub($self, $op, $cx)
           && !exists(
             ($self->{?'subs_deparsed'}||\$%)->{$self->{?'curstash'}."::".$kid})
             && defined prototype(
-            \&{Symbol::fetch_glob($self->{?'curstash'}."::".$kid)->*})
+            \Symbol::fetch_glob($self->{?'curstash'}."::".$kid)->*->&)
             )
         if (!$declared && defined($proto))
             # Avoid "too early to check prototype" warning

@@ -118,7 +118,7 @@ open($tst, ">>","$written")  || die "Cannot open $written:$^OS_ERROR"
 # This test makes a questionable assumption that the file pointer will
 # be at eof after opening a file but before seeking, reading, or writing.
 # Only known failure is on cygwin.
-my $todo = $^OS_NAME eq "cygwin" && &PerlIO::get_layers($tst) eq 'stdio'
+my $todo = $^OS_NAME eq "cygwin" && PerlIO::get_layers($tst) eq 'stdio'
     && ' # TODO: file pointer not at eof'
 
 if (tell($tst) == 6)

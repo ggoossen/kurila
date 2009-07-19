@@ -56,9 +56,9 @@ sub gethostbyaddr ($addr, ?$addrtype)
 sub gethost($name_addr)
     if ($name_addr =~ m/^\d+(?:\.\d+(?:\.\d+(?:\.\d+)?)?)?$/)
         require Socket
-        &gethostbyaddr( <Socket::inet_aton($name_addr))
+        gethostbyaddr( <Socket::inet_aton($name_addr))
     else
-        &gethostbyname( $name_addr )
+        gethostbyname( $name_addr )
     
 
 

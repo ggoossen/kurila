@@ -71,8 +71,8 @@ sub SWASHNEW_real
 
             if (defined $caller1 && $type =~ m/^(?:\w+)$/)
                 my $prop = Symbol::fetch_glob("$($caller1)::$type")
-                if (exists &{$prop->*})
-                    $list = &{$prop->*}( < @_ )
+                if (exists $prop->*->&)
+                    $list = $prop->*->( < @_ )
                     last GETFILE
                 
             
@@ -149,8 +149,8 @@ sub SWASHNEW_real
             if (defined $caller0 && $type =~ m/^To(?:\w+)$/)
                 my $map = $caller0 . "::" . $type
 
-                if (exists &{Symbol::fetch_glob($map)->*})
-                    $list = &{Symbol::fetch_glob($map)->*}( < @_ )
+                if (exists Symbol::fetch_glob($map)->*->&)
+                    $list = Symbol::fetch_glob($map)->*->( < @_ )
                     last GETFILE
                 
             
@@ -244,7 +244,7 @@ sub SWASHNEW_real
                 my $subobj
                 if ($c eq 'utf8')
                     $subobj = SWASHNEW_real('utf8', $t, "", $minbits, 0)
-                elsif (exists &{Symbol::fetch_glob($name)->*})
+                elsif (exists Symbol::fetch_glob($name)->*->&)
                     $subobj = SWASHNEW_real('utf8', $name, "", $minbits, 0)
                 elsif ($c =~ m/^([0-9a-fA-F]+)/)
                     $subobj = SWASHNEW_real('utf8', "", $c, $minbits, 0)

@@ -327,11 +327,11 @@ sub compile
                 else
                     $objname = "main::" . $objname unless $objname =~ m/::/
                     print $walkHandle, "$objname:\n"
-                    unless (exists &{Symbol::fetch_glob($objname)->*})
+                    unless (exists Symbol::fetch_glob($objname)->*->&)
                         print $walkHandle, "err: unknown function ($objname)\n"
                         return
                     
-                    $objref = \&{Symbol::fetch_glob($objname)->*}
+                    $objref = \Symbol::fetch_glob($objname)->*->&
                 
                 concise_subref($order, $objref, $objname)
             

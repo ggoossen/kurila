@@ -67,12 +67,12 @@ sub xsinit
     push(@mods, < static_ext()) if defined $std
     @mods = grep( {!%seen{+$_}++ }, @mods)
 
-    print $fh, < &xsi_header()
+    print $fh, < xsi_header()
     print $fh, "EXTERN_C void xs_init ($xsinit_proto);\n\n"
-    print $fh, < &xsi_protos(< @mods)
+    print $fh, < xsi_protos(< @mods)
 
     print $fh, "\nEXTERN_C void\nxs_init($xsinit_proto)\n\{\n"
-    print $fh, < &xsi_body(< @mods)
+    print $fh, < xsi_body(< @mods)
     print $fh, "\}\n"
 
 

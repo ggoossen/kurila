@@ -17,8 +17,8 @@ is( < e "\n", "", )
 
 
 
-&ok( < e "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz" )
-&ok( < e "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz\n" )
+ok( < e "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz" )
+ok( < e "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz\n" )
 
 
 ok( Pod::Simple::XMLOutStream->_out("\n=pod\n\n foo bar baz\n"),
@@ -91,7 +91,7 @@ do
 
 print $^STDOUT, "# Testing tab expansion...\n"
 
-&ok( < e
+ok( < e
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               q{=pod
 
  here we go now
@@ -156,7 +156,7 @@ a
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-&ok( < e
+ok( < e
                                                                                            q{=pod
 
  here we go now
@@ -221,7 +221,7 @@ a
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-&ok( < e
+ok( < e
                                                                                            q{=pod
 
  here we go now
@@ -287,7 +287,7 @@ a
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-&ok( < e
+ok( < e
                                                                                             q{=pod
 
  here we go now

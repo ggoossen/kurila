@@ -757,7 +757,7 @@ sub _rmtree($arg, $paths)
 
             if ($arg{?depth} or !$arg{?keep_root})
                 if ($arg{?safe} &&
-                    ($Is_VMS ?? !&VMS::Filespec::candelete($root) !! !-w $root))
+                    ($Is_VMS ?? !VMS::Filespec::candelete($root) !! !-w $root))
                     print $^STDOUT, "skipped $root\n" if $arg{?verbose}
                     next ROOT_DIR
                 
@@ -785,7 +785,7 @@ sub _rmtree($arg, $paths)
                 if $Is_VMS && !File::Spec->file_name_is_absolute($root)
 
             if ($arg{?safe} &&
-                ($Is_VMS ?? !&VMS::Filespec::candelete($root)
+                ($Is_VMS ?? !VMS::Filespec::candelete($root)
                  !! !(-l $root || -w $root)))
                 print $^STDOUT, "skipped $root\n" if $arg{?verbose}
                 next ROOT_DIR

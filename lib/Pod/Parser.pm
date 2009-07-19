@@ -798,7 +798,7 @@ sub parse_text
             if (length)
                 ## In the middle of a sequence, append this text to it, and
                 ## dont forget to "expand" it if that's what the caller wanted
-                $seq->append($expand_text ?? &$xtext_sub($self,$_,$seq) !! $_)
+                $seq->append($expand_text ?? $xtext_sub->($self,$_,$seq) !! $_)
                 $_ .= $seq_end
             
             if (length $seq_end)
@@ -807,7 +807,7 @@ sub parse_text
                 ## Pop it off the stack of "in progress" sequences
                 pop @seq_stack
                 ## Append result to its parent in current parse tree
-                @seq_stack[-1]->append($expand_seq ?? &$xseq_sub($self,$seq)
+                @seq_stack[-1]->append($expand_seq ?? $xseq_sub->($self,$seq)
                     !! $seq)
                 ## Remember the current cmd-name and left-delimiter
                 if((nelems @seq_stack) +> 1)
@@ -821,7 +821,7 @@ sub parse_text
         elsif (length)
             ## In the middle of a sequence, append this text to it, and
             ## dont forget to "expand" it if that's what the caller wanted
-            $seq->append($expand_text ?? &$xtext_sub($self,$_,$seq) !! $_)
+            $seq->append($expand_text ?? $xtext_sub->($self,$_,$seq) !! $_)
         
         ## Keep track of line count
         $line += s/\r*\n//
@@ -839,16 +839,16 @@ sub parse_text
         pop @seq_stack
         my $errmsg = "*** ERROR: unterminated $($cmd)$($ldelim)...$($rdelim)".
             " at line $line in file $file\n"
-        (ref $errorsub) and &{$errorsub}($errmsg)
+        (ref $errorsub) and $errorsub->($errmsg)
             or (defined $errorsub) and $self->?$errorsub($errmsg)
             or  warn($errmsg)
-        @seq_stack[-1]->append($expand_seq ?? < &$xseq_sub($self,$seq) !! $seq)
+        @seq_stack[-1]->append($expand_seq ?? < $xseq_sub->($self,$seq) !! $seq)
         $seq = @seq_stack[-1]
     
 
     ## Return the resulting parse-tree
     my $ptree = (pop @seq_stack)->parse_tree
-    return  $expand_ptree ?? &$xptree_sub($self, $ptree) !! $ptree
+    return  $expand_ptree ?? $xptree_sub->($self, $ptree) !! $ptree
 
 
 ##---------------------------------------------------------------------------
@@ -1061,7 +1061,7 @@ sub parse_from_filehandle
             my $file = $self->input_file()
             my $errmsg = "*** WARNING: line containing nothing but whitespace".
                 " in paragraph at line $nlines in file $file\n"
-            (ref $errorsub) and &{$errorsub}($errmsg)
+            (ref $errorsub) and $errorsub->($errmsg)
                 or (defined $errorsub) and $self->?$errorsub($errmsg)
                 or  warn($errmsg)
         

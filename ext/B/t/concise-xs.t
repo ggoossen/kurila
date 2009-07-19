@@ -269,7 +269,7 @@ sub test_pkg($pkg, ?$fntypes)
     # build %stash: keys are func-names, vals filled in below
     my %stash = %+: map
         { %: $_ => 0 },
-        grep { exists &{Symbol::fetch_glob("$pkg\::$_")->*}     # grab CODE symbols
+        grep { exists Symbol::fetch_glob("$pkg\::$_")->*->&     # grab CODE symbols
              },
         grep { !m/__ANON__/ }, keys Symbol::fetch_glob($pkg.'::')->*->%         # from symbol table
 

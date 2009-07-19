@@ -113,7 +113,7 @@ foreach ( @processes)
         # as $number is an alias into @numbers, we don't want any side effects of
         # conversion macros affecting later runs, so pass a copy to Storable:
         my $copy1 = my $copy2 = my $copy0 = $number
-        my $copy_s = &$sub (\$copy0)
+        my $copy_s = $sub ->(\$copy0)
         if (is (ref $copy_s, "SCALAR", "got back a scalar ref?"))
             # Test inside use integer to see if the bit pattern is identical
             # and outside to see if the sign is right.

@@ -58,7 +58,7 @@ for my $i (1..nelems @want)
     my $try = @want[$i-1]
     try { I18N::Langinfo->import($try) }
     unless ($^EVAL_ERROR)
-        my $got = langinfo( <&$try( < @_ ))
+        my $got = langinfo( <$try->( < @_ ))
         if (ref %want{?$try} && $got =~ %want{?$try} || $got eq %want{?$try})
             print $^STDOUT, qq[ok $i - $try is "$got"\n]
         else

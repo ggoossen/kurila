@@ -54,7 +54,7 @@ sub ambient_langprefs # always returns things untainted
 
     if(env::var('IGNORE_WIN32_LOCALE')) {
     # no-op
-    }elsif(&_try_use('Win32::Locale'))
+    }elsif(_try_use('Win32::Locale'))
         # If we have that module installed...
         push @languages, Win32::Locale::get_language() || ''
             if defined &Win32::Locale::get_language

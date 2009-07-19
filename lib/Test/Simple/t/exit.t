@@ -48,7 +48,7 @@ my %Tests = %:
 
 $TB->plan( tests => nkeys(%Tests) )
 
-try { require POSIX; &POSIX::WEXITSTATUS(0) }
+try { require POSIX; POSIX::WEXITSTATUS(0) }
 if( $^EVAL_ERROR )
     *exitstatus = sub (@< @_) { @_[0] >> 8 }
 else

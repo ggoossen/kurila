@@ -133,7 +133,7 @@ sub wanted_File_Dir
 
 
 sub wanted_File_Dir_prune
-    &wanted_File_Dir( < @_ )
+    wanted_File_Dir( < @_ )
     $File::Find::prune=1 if  $_ eq 'faba'
 
 

@@ -66,7 +66,7 @@ sub testcmp
         # kill any extra line endings
         $f1text =~ s/[\r\n]+$//s
         $f2text =~ s/[\r\n]+$//s
-        $diffs = (ref $cmplines) ?? &$cmplines($f1text, $f2text)
+        $diffs = (ref $cmplines) ?? $cmplines->($f1text, $f2text)
             !! ($f1text ne $f2text)
         last if $diffs
     

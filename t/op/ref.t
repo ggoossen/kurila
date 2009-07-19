@@ -82,7 +82,7 @@ do
     my $called
     sub mysub { $called++; }
     $subref = \&mysub
-    &$subref( < @_ )
+    $subref->( < @_ )
     is ($called, 1)
 
 
@@ -130,7 +130,7 @@ main::is (ref $object2,	'MYHASH')
 
 # Test ordinary call on object method.
 
-&mymethod($object,"argument")
+mymethod($object,"argument")
 
 sub mymethod
     local($THIS) = shift
@@ -357,8 +357,8 @@ TODO: do
     Symbol::fetch_glob($name1)->* = sub (@< @_) {"One"}
     Symbol::fetch_glob($name2)->* = sub (@< @_) {"Two"}
 
-    is (&{Symbol::fetch_glob($name1)->*}( < @_ ), "One")
-    is (&{Symbol::fetch_glob($name2)->*}( < @_ ), "Two")
+    is (Symbol::fetch_glob($name1)->*->( < @_ ), "One")
+    is (Symbol::fetch_glob($name2)->*->( < @_ ), "Two")
 
 
 # test dereferencing errors

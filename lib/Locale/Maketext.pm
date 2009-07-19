@@ -130,7 +130,7 @@ sub failure_handler_auto
 
     # Dumbly copied from sub maketext:
     do
-        try { $value = &$value($handle, < @_) }
+        try { $value = $value->($handle, < @_) }
 
     # If we make it here, there was an exception thrown in the
     #  call to $value, and so scream:
@@ -203,7 +203,7 @@ sub maketext
             print $^STDOUT, "WARNING0: maketext fails looking for <$phrase>\n" if DEBUG
             my $fail
             if(ref($fail = $handle->{?'fail'}) eq 'CODE') # it's a sub reference
-                return &{$fail}($handle, $phrase, < @_)
+                return $fail->($handle, $phrase, < @_)
             # If it ever returns, it should return a good value.
             else # It's a method name
                 return $handle->?$fail($phrase, < @_)
@@ -219,7 +219,7 @@ sub maketext
     return $value unless ref($value) eq 'CODE'
 
     do
-        try { $value = &$value($handle, < @_) }
+        try { $value = $value->($handle, < @_) }
 
     # If we make it here, there was an exception thrown in the
     #  call to $value, and so scream:
@@ -408,7 +408,7 @@ sub _lex_refs  # report the lexicon references for this handle's class
     foreach my $superclass ( Symbol::fetch_glob($class . "::ISA")->*->@)
         print $^STDOUT, " Super-class search into $superclass\n" if DEBUG
         next if $seen_r->{+$superclass}++
-        push @lex_refs, < &_lex_refs($superclass, $seen_r)->@  # call myself
+        push @lex_refs, < _lex_refs($superclass, $seen_r)->@  # call myself
 
 
     %isa_scan{+$class} = \@lex_refs # save for next time

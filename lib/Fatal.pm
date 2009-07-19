@@ -10,7 +10,7 @@ sub import
     my $self = shift(@_)
     my $pkg = (@: caller)[0]
     foreach my $sym (@_)
-        &_make_fatal($sym, $pkg)
+        _make_fatal($sym, $pkg)
     
 ;
 

@@ -30,7 +30,7 @@ sub methimpl
 
 
 sub method
-    &methimpl( < @_ )
+    methimpl( < @_ )
 
 
 sub trymethod
