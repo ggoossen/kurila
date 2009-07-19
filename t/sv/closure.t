@@ -372,11 +372,9 @@ END
                 $code .= "&inner_sub(< @_);\n" if $call_inner
                 if ($call_outer)
                     if ($where_declared eq 'in_named')
-                        $code .= "&outer(< \@_);\n\n"
+                        $code .= "outer(< \@_);\n\n"
                     elsif ($where_declared eq 'in_anon')
-                        $code .= "&\$outer(< \@_);\n\n"
-                    
-                
+                        $code .= "\$outer->(< \@_);\n\n"
 
                 # Now, we can actually prep to run the tests.
                 for my $inner_sub_test ( @inners)
@@ -406,18 +404,13 @@ END
                                 $expected = 12001
                             else
                                 $expected = 1
-                            
-                        
-                    
 
                     # Here's the test:
                     if ($inner_type eq 'anon')
-                        $code .= "test \{ our \$anon_$test; &\$anon_$test() == $expected \};\n"
+                        $code .= "test \{ our \$anon_$test; \$anon_$test\->() == $expected \};\n"
                     else
                         $code .= "test \{ &named_$test() == $expected \};\n"
-                    
                     $test++
-                
 
                 if (config_value('d_fork') and $^OS_NAME ne 'VMS' and $^OS_NAME ne 'MSWin32' and $^OS_NAME ne 'NetWare')
                     # Fork off a new perl to run the tests.

@@ -28,7 +28,7 @@ ok( defined @c[4], "hasargs defined with anon sub" )
 # Bug 20020517.003, used to dump core
 sub foo { @c = (@:  caller(0) ) }
 my $fooref = \(delete %main::{foo})
-$fooref->* -> ()
+$fooref->*->()
 is( @c[3], "main::foo", "unknown subroutine name" )
 ok( defined @c[4], "args true with unknown sub" )
 
@@ -70,14 +70,12 @@ sub show_bits
     
     return $out
 
-
 sub check_bits
     local our $Level = $Level + 2
     my (@: $got, $exp, $desc) =  @_
     if (! ok($got eq $exp, $desc))
         diag('     got: ' . show_bits($got))
         diag('expected: ' . show_bits($exp))
-    
 
 
 sub testwarn

@@ -293,7 +293,7 @@ sub bootstrap {
     # Some systems have restrictions on files names for DLL's etc.
     # mod2fname returns appropriate file base name (typically truncated)
     # It may also edit @modparts if required.
-    $modfname = &mod2fname(\@modparts) if defined &mod2fname;
+    $modfname = mod2fname(\@modparts) if defined &mod2fname;
 
     <<$^O-eq-NetWare>>
     # Truncate the module name to 8.3 format for NetWare
@@ -363,7 +363,7 @@ sub bootstrap {
         my $xs = dl_install_xsub("$($module)::bootstrap", $boot_symbol_ref, $file);
         # See comment block above
         push(@dl_shared_objects, $file); # record files loaded
-        return &$xs(<@args);
+        return $xs->(<@args);
     }
     <</$^O-eq-darwin>>
 
@@ -395,7 +395,7 @@ sub bootstrap {
     # See comment block above
     push(@dl_shared_objects, $file); # record files loaded
 
-    &$xs(<@args);
+    return $xs->(<@args);
 }
 
 

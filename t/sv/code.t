@@ -17,4 +17,4 @@ my $xssub = &Symbol::glob_name
 is( ref::svtype($xssub), 'CODE' )
 is( (\$xssub)->(*BAR), 'main::BAR' )
 
-eval_dies_like( '&foo()', qr/foobar/ )
+eval_dies_like( '&foo()', qr/syntax error/ )

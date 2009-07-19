@@ -43,8 +43,6 @@ foreach my $prog ( @prgs)
         if (eval $1)
             ok(1, "Skip: $1")
             next
-        
-    
 
     $expected =~ s/\n+$//
 
@@ -375,7 +373,7 @@ our $x;
 our $code = eval q[
   sub { eval '$x = "ok 1\n"'; }
 ];
-&{$code}();
+$code->();
 print $^STDOUT, $x;
 EXPECT
 ok 1
