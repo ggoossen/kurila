@@ -110,19 +110,20 @@
      SREFGEN = 325,
      UMINUS = 326,
      POWOP = 327,
-     POSTDEC = 328,
-     POSTINC = 329,
-     PREDEC = 330,
-     PREINC = 331,
-     ASLICE = 332,
-     HSLICE = 333,
-     DEREFAMP = 334,
-     DEREFSTAR = 335,
-     DEREFHSH = 336,
-     DEREFARY = 337,
-     DEREFSCL = 338,
-     ARROW = 339,
-     PEG = 340
+     CALLOP = 328,
+     POSTDEC = 329,
+     POSTINC = 330,
+     PREDEC = 331,
+     PREINC = 332,
+     ASLICE = 333,
+     HSLICE = 334,
+     DEREFAMP = 335,
+     DEREFSTAR = 336,
+     DEREFHSH = 337,
+     DEREFARY = 338,
+     DEREFSCL = 339,
+     ARROW = 340,
+     PEG = 341
    };
 #endif
 

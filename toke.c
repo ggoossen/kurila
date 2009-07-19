@@ -325,6 +325,7 @@ static struct debug_tokens {
     { WORD,		TOKENTYPE_OPVAL,	"WORD" },
     { LAYOUTLISTEND,	TOKENTYPE_IVAL,	        "LAYOUTLISTEND" },
     { ANONARYL,	        TOKENTYPE_NONE,	        "ANONARYL" },
+    { CALLOP,	        TOKENTYPE_NONE,	        "CALLOP" },
     { 0,		TOKENTYPE_NONE,		NULL }
 };
 
@@ -3678,7 +3679,6 @@ Perl_yylex(pTHX)
 	    s += 2;
 	    s = skipspace(s, NULL);
 	    S_start_list_indent(s);
-
 	    OPERATOR(ANONHSHL);
 	}
 	if (s[1] == '+' && s[2] == ':') {
@@ -4054,11 +4054,21 @@ Perl_yylex(pTHX)
 	{
 	    char tmp = *++s;
 	    if (tmp == '<') {
+		/*  '<<' operator */
 		s++;
 		SHop(OP_LEFT_SHIFT);
 	    }
 
+	    if (tmp == ':') {
+		/* '<:' operator */
+		s++;
+		s = skipspace(s, NULL);
+		S_start_list_indent(s);
+		TOKEN(CALLOP);
+	    }
+
 	    if ((tmp == '+') && (s[1] == '>')) {
+		/* '<+>' operator */
 		s += 2;
 		Eop(OP_NCMP);
 	    }
@@ -4161,6 +4171,7 @@ Perl_yylex(pTHX)
 	if (s[1] == ':' && s[2] != ':') {
 	    /* array constructor '@:' */
 	    s += 2;
+
 	    s = skipspace(s, NULL);
 	    S_start_list_indent(s);
 

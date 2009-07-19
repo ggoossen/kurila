@@ -103,7 +103,7 @@
 %type <opval> expr term subscripted scalar star amper sideff
 %type <opval> assignexpr
 %type <opval> argexpr texpr iexpr mexpr miexpr
-%type <opval> listexpr listexprcom indirob listop method
+%type <opval> listexpr listexprcom indirob listop method layoutlistexpr
 %type <opval> subname protoassign proto subbody cont my_scalar
 %type <opval> myattrterm myterm
 %type <opval> termbinop termunop anonymous termdo
@@ -139,6 +139,7 @@
 %left <i_tkval> MATCHOP
 %right <i_tkval> '!' '~' UMINUS SREFGEN '?'
 %right <i_tkval> POWOP
+%nonassoc CALLOP
 %nonassoc <i_tkval> PREINC PREDEC POSTINC POSTDEC
 %left <i_tkval> ARROW DEREFSCL DEREFARY DEREFHSH DEREFSTAR DEREFAMP HSLICE ASLICE
 %nonassoc <i_tkval> ')'
@@ -1100,6 +1101,11 @@ term	:	'?' term
                             TOKEN_GETMAD($1,$$,'H');
                             $$->op_flags |= OPf_OPTIONAL;
                         }
+        |       term CALLOP layoutlistexpr
+			{ 
+                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
+				append_elem(OP_LIST, $3, scalar($1)), $1->op_location);
+                        }
         |       termbinop
 			{ $$ = $1; }
 	|	termunop
@@ -1354,6 +1360,16 @@ amper	:	'&' indirob
 	;
 
 
+layoutlistexpr :    listexpr LAYOUTLISTEND
+			{ 
+                            $$ = $1
+                        }
+        |       ',' LAYOUTLISTEND
+			{ 
+                            $$ = NULL;
+                        }
+        ;
+    
 scalar  :	PRIVATEVAR
 			{ 
                             $$ = newPRIVATEVAROP(PL_parser->tokenbuf, LOCATION($1));
