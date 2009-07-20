@@ -251,7 +251,7 @@ sub link($from,$to)
     $success
 
 sub rename($from,$to)
-    if (-f $to and not &unlink($to))
+    if (-f $to and not (&unlink <: $to))
         my $i = 1;
         while ($i +< 50) {
             last if CORE::rename($to, "$to.$i");
@@ -260,8 +260,8 @@ sub rename($from,$to)
         warn("Cannot rename to `$to.$i': $^OS_ERROR"), return 0 
             if $i +>= 50;       # Give up!
 
-    &link($from,$to) || return 0
-    &unlink($from)
+    (&link <: $from,$to) || return 0
+    &unlink <: $from
 
 sub chmod($mode,$name)
     printf $^STDOUT, "  chmod \%o \%s\n", $mode, $name if %opts{verbose}
