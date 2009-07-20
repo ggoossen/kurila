@@ -4676,9 +4676,7 @@ Perl_yylex(pTHX)
 		    }
 #endif
 		    force_next(WORD);
-		    pl_yylval.i_tkval.ival = 0;
-		    force_next('&');
-		    TOKEN(NOAMP);
+		    TOKEN(NOAMPCALL);
 		}
 
 		/* Not a method, so call it a subroutine (if defined) */

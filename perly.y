@@ -79,7 +79,7 @@
 %token <i_tkval> LOOPEX DOTDOT
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
-%token <i_tkval> DO LOOPDO NOAMP
+%token <i_tkval> DO LOOPDO NOAMP NOAMPCALL
 %token <i_tkval> ANONSCALAR
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
@@ -100,7 +100,7 @@
 %type <opval> mydef
 
 %type <opval> block dblock mblock lineseq line loop cond else
-%type <opval> expr term subscripted scalar star amper sideff
+%type <opval> expr term subscripted scalar star sideff
 %type <opval> assignexpr
 %type <opval> argexpr texpr iexpr mexpr miexpr
 %type <opval> listexpr listexprcom indirob listop method layoutlistexpr
@@ -1153,22 +1153,25 @@ term	:	'?' term
 			{ $$ = $1; }
 	|	THING	%prec '('
 			{ $$ = $1; }
-	|	amper                                /* &foo; */
+	|	'&' indirob                                /* &foo; */
                         {
-                            $$ = $1;
+                            $$ = newCVREF(0,$2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'&');
                             $$->op_flags |= OPf_SPECIAL;
                         }
-	|	NOAMP amper '(' ')'                        /* &foo() */
+	|	NOAMPCALL indirob '(' ')'                        /* &foo() */
 			{
-                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar($2), $2->op_location);
-			  TOKEN_GETMAD($3,$$,'(');
-			  TOKEN_GETMAD($4,$$,')');
-                          APPEND_MADPROPS_PV("amper", $$, '>');
+                            OP* cv = newCVREF(0, $2, LOCATION($1));
+                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar(cv), $2->op_location);
+                            TOKEN_GETMAD($3,$$,'(');
+                            TOKEN_GETMAD($4,$$,')');
+                            APPEND_MADPROPS_PV("amper", $$, '>');
 			}
-	|	NOAMP amper '(' expr ')'                   /* &foo(@args) */
+	|	NOAMPCALL indirob '(' expr ')'                   /* &foo(@args) */
 			{
-			  $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
-				append_elem(OP_LIST, $4, scalar($2)), $2->op_location);
+                            OP* cv = newCVREF(0, $2, LOCATION($1));
+                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
+				append_elem(OP_LIST, $4, scalar(cv)), $2->op_location);
 			  DO_MAD({
 			      OP* op = $$;
 			      if (op->op_type == OP_CONST) { /* defeat const fold */
@@ -1351,14 +1354,6 @@ listexprcom:	/* NULL */
 my_scalar:	scalar
 			{ PL_parser->in_my = 0; $$ = my($1); }
 	;
-
-amper	:	'&' indirob
-			{ 
-                            $$ = newCVREF(IVAL($1),$2, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'&');
-			}
-	;
-
 
 layoutlistexpr :    listexpr LAYOUTLISTEND
 			{ 
