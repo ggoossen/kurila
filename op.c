@@ -5341,7 +5341,6 @@ Perl_ck_subr(pTHX_ OP *o)
     CV *cv = NULL;
     I32 arg = 0;
     bool variable_args = 0;
-    bool delete_op = 0;
     SV** namesv;
 
     PERL_ARGS_ASSERT_CK_SUBR;
@@ -5398,15 +5397,6 @@ Perl_ck_subr(pTHX_ OP *o)
     if (arg < n_minargs && ! variable_args) {
 	return too_few_arguments(o, 
 	    namesv ? SvPVX_const(*namesv) : "subroutine");
-    }
-    if(delete_op) {
-#ifdef PERL_MAD
-	OP * const oldo = o;
-#else
-	op_free(o);
-#endif
-	o=newSVOP(OP_CONST, 0, newSViv(0), o->op_location);
-	op_getmad(oldo,o,'O');
     }
     return o;
 }
