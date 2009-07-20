@@ -41,10 +41,10 @@ do {
     use warnings 'uninitialized' ;
     $a = sub { my $b ; chop $b ; }
 };
-&$a() ;
+$a->() ;
 EXPECT
 Use of uninitialized value $b in chop at - line 6 character 24.
-    main::__ANON__ called at - line 8 character 1.
+    main::__ANON__ called at - line 8 character 3.
 ########
 -w
 no warnings 'reserved' ;

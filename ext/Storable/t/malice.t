@@ -92,7 +92,7 @@ sub test_truncated
         my $short = substr $data, 0, $i;
 
         # local $Storable::DEBUGME = 1;
-        my $clone = &$sub($short);
+        my $clone = $sub->($short);
         is (defined ($clone), '', "truncated $what to $i should fail");
         if ($i +< $magic_len) {
             like ($^EVAL_ERROR && $^EVAL_ERROR->{description}, "/^Magic number checking on storable $what failed/",
@@ -106,7 +106,7 @@ sub test_truncated
 sub test_corrupt
     my (@: $data, $sub, $what, $name) = @_
 
-    my $clone = &$sub($data)
+    my $clone = $sub->($data)
     is (defined ($clone), '', "$name $what should fail")
     like ($^EVAL_ERROR->{description}, $what, $name)
 
@@ -120,7 +120,7 @@ sub test_things
     test_header ($header, $isfile, $isnetwork)
 
     # Test that if we re-write it, everything still works:
-    my $clone = &$sub ($contents)
+    my $clone = $sub ->($contents)
 
     is ($^EVAL_ERROR, "", "There should be no error")
 
@@ -153,7 +153,7 @@ sub test_things
     substr ($copy, $file_magic + 1, 1, chr $minor4)
     do 
         # Now by default newer minor version numbers are not a pain.
-        $clone = &$sub($copy)
+        $clone = $sub->($copy)
         is ($^EVAL_ERROR, "", "by default no error on higher minor")
         test_hash ($clone)
 

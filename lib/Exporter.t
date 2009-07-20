@@ -109,8 +109,8 @@ do
     # Testing->import is called.
     main::ok( eval "defined &is",
               "Import a subroutine where exporter must create the typeglob" )
-    $got = eval "&is()"
-    main::ok ( $^EVAL_ERROR eq "", 'check we can call the imported autoloaded subroutine')
+    $got = eval "&is <: "
+    main::ok ( ! $^EVAL_ERROR, 'check we can call the imported autoloaded subroutine')
         or chomp ($^EVAL_ERROR), print $^STDERR, "# \$\@ is $^EVAL_ERROR\n"
     main::ok ( $got eq 'Is', 'and that it gave the correct result')
         or print $^STDERR, "# expected 'Is', got " .

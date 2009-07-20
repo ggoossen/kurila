@@ -12,15 +12,15 @@ use Time::HiRes v1.9704 < qw(tv_interval);
 ok 1
 
 
-my $have_gettimeofday    = &Time::HiRes::d_gettimeofday( < @_ )
-my $have_usleep          = &Time::HiRes::d_usleep( < @_ )
-my $have_nanosleep       = &Time::HiRes::d_nanosleep( < @_ )
-my $have_ualarm          = &Time::HiRes::d_ualarm( < @_ )
-my $have_clock_gettime   = &Time::HiRes::d_clock_gettime( < @_ )
-my $have_clock_getres    = &Time::HiRes::d_clock_getres( < @_ )
-my $have_clock_nanosleep = &Time::HiRes::d_clock_nanosleep( < @_ )
-my $have_clock           = &Time::HiRes::d_clock( < @_ )
-my $have_hires_stat      = &Time::HiRes::d_hires_stat( < @_ )
+my $have_gettimeofday    = Time::HiRes::d_gettimeofday( < @_ )
+my $have_usleep          = Time::HiRes::d_usleep( < @_ )
+my $have_nanosleep       = Time::HiRes::d_nanosleep( < @_ )
+my $have_ualarm          = Time::HiRes::d_ualarm( < @_ )
+my $have_clock_gettime   = Time::HiRes::d_clock_gettime( < @_ )
+my $have_clock_getres    = Time::HiRes::d_clock_getres( < @_ )
+my $have_clock_nanosleep = Time::HiRes::d_clock_nanosleep( < @_ )
+my $have_clock           = Time::HiRes::d_clock( < @_ )
+my $have_hires_stat      = Time::HiRes::d_hires_stat( < @_ )
 
 sub has_symbol
     my $symbol = shift
@@ -220,7 +220,7 @@ unless (   defined &Time::HiRes::gettimeofday
     use Time::HiRes < qw(time alarm sleep)
     try { require POSIX }
     my $use_sigaction =
-        !$^EVAL_ERROR && defined &POSIX::sigaction && &POSIX::SIGALRM( < @_ ) +> 0
+        !$^EVAL_ERROR && defined &POSIX::sigaction && POSIX::SIGALRM() +> 0
 
     my ($f, $r, $i, $not, $ok)
 
@@ -238,12 +238,12 @@ unless (   defined &Time::HiRes::gettimeofday
     my $oldaction
     if ($use_sigaction) {
         $oldaction = POSIX::SigAction->new();
-        diag sprintf "# sigaction tick, ALRM = \%d\n", &POSIX::SIGALRM( < @_ );
+        diag sprintf "# sigaction tick, ALRM = \%d\n", POSIX::SIGALRM();
 
         # Perl's deferred signals may be too wimpy to break through
         # a restartable select(), so use POSIX::sigaction if available.
 
-        POSIX::sigaction(&POSIX::SIGALRM( < @_ ),
+        POSIX::sigaction(POSIX::SIGALRM(),
                   POSIX::SigAction->new(\&tick),
                   $oldaction)
             or die "Error setting SIGALRM handler with sigaction: $^OS_ERROR\n";
@@ -297,7 +297,7 @@ unless (   defined &Time::HiRes::gettimeofday
     
 
     if ($use_sigaction) {
-        POSIX::sigaction(&POSIX::SIGALRM( < @_ ), $oldaction);
+        POSIX::sigaction(POSIX::SIGALRM(), $oldaction);
     }else 
         alarm(0) # can't cancel usig %SIG
     
@@ -320,24 +320,23 @@ SKIP: do
     my $r = \Time::HiRes::gettimeofday()
 
     signals::handler("VTALRM") = sub 
-            $i ?? $i-- !! setitimer(&ITIMER_VIRTUAL( < @_ ), 0)
+            $i ?? $i-- !! setitimer(ITIMER_VIRTUAL(), 0)
             info "Tick! $i " . Time::HiRes::tv_interval($r)
-        
 
     info "setitimer: ", join(" ", setitimer(ITIMER_VIRTUAL, 0.5, 0.4))
 
     # Assume interval timer granularity of $limit * 0.5 seconds.  Too bold?
-    my $virt = getitimer(&ITIMER_VIRTUAL( < @_ ))
+    my $virt = getitimer(ITIMER_VIRTUAL( < @_ ))
     ok( defined $virt && abs($virt[0] / 0.5) - 1 +< $limit )
 
     info "getitimer: ", join(" ", getitimer(ITIMER_VIRTUAL))
 
-    while (getitimer(&ITIMER_VIRTUAL( < @_ ))) {
+    while (getitimer(ITIMER_VIRTUAL( < @_ ))) {
         my $j;
         for (1..1000) { $j++ } # Can't be unbreakable, must test getitimer().
     }
 
-    $virt = getitimer(&ITIMER_VIRTUAL( < @_ ))
+    $virt = getitimer(ITIMER_VIRTUAL( < @_ ))
     ok( not defined $virt )
 
     signals::handler("VTALRM") = 'DEFAULT'
@@ -500,11 +499,11 @@ if ($have_clock_gettime &&
     my $ok = 0;
     TRY: for my $try (1..3)
             info "CLOCK_REALTIME: try = $try"
-            my $t0 = clock_gettime(&CLOCK_REALTIME( < @_ ))
+            my $t0 = clock_gettime(CLOCK_REALTIME( < @_ ))
             use Time::HiRes < qw(sleep)
             my $T = 1.5
             sleep($T)
-            my $t1 = clock_gettime(&CLOCK_REALTIME( < @_ ))
+            my $t1 = clock_gettime(CLOCK_REALTIME( < @_ ))
             if ($t0 +> 0 && $t1 +> $t0)
                 info "t1 = $t1, t0 = $t0"
                 my $dt = $t1 - $t0
@@ -536,7 +535,7 @@ if ($have_clock_getres) {
 if ($have_clock_nanosleep &&
     has_symbol('CLOCK_REALTIME')) {
     my $s = 1.5e9;
-    my $t = clock_nanosleep(&CLOCK_REALTIME( < @_ ), $s);
+    my $t = clock_nanosleep(CLOCK_REALTIME( < @_ ), $s);
     my $r = abs(1 - $t / $s);
     ok($r +< 2 * $limit);
 }else 

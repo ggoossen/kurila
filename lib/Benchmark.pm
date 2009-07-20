@@ -636,7 +636,7 @@ sub runloop($n, $c)
 
     my ($subcode, $subref)
     if (ref $c eq 'CODE')
-        $subcode = "sub \{ for (1 .. $n) \{ package $pack; &\$c(); \} \}"
+        $subcode = "sub \{ for (1 .. $n) \{ package $pack; \$c->(); \} \}"
         $subref  = eval $subcode
     else
         $subcode = "sub \{ for (1 .. $n) \{ package $pack; $c;\} \}"

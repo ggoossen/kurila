@@ -36,12 +36,12 @@ my @a = @: 'first', undef, 3, -4, -3.14159, 456, 4.5
 #
 
 ok defined lock_store(\@a, 'store')
-ok(my $dumped = &dump(\@a))
+ok(my $dumped = dump(\@a))
 
 my $root = lock_retrieve('store')
 ok ref $root eq 'ARRAY'
 ok nelems(@a) == nelems($root->@)
-ok &dump($root) eq $dumped 
+ok dump($root) eq $dumped 
 
 unlink 't/store'
 

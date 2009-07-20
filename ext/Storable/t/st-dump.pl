@@ -79,7 +79,6 @@ sub recursive_dump($object, $link)
         my $num = %object{?$addr}
         $dumped .= "OBJECT #$num seen\n"
         return
-    
 
     my $objcount = $count++
     %object{+$addr} = $objcount
@@ -91,7 +90,7 @@ sub recursive_dump($object, $link)
     croak "Unknown simple type '$ref'" unless defined %dump{?$ref}
 
     Symbol::fetch_glob(%dump{?$ref})->*->($object)     # Dump object
-    bless($bless) if $bless    # Mark it as blessed, if necessary
+    &bless <: $bless if $bless    # Mark it as blessed, if necessary
 
     $dumped .= "OBJECT $objcount\n"
 

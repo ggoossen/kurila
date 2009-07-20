@@ -104,11 +104,8 @@ sub compile
                 print $walkHandle, "$objname:\n"
                 die "err: unknown function ($objname)\n"
                     unless $objname->*{CODE}
-                $objref = \&$objname
-            
+                $objref = \$objname->&
             showlex_obj($objname, $objref)
-        
-    
 
 
 1

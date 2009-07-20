@@ -15,7 +15,8 @@ BEGIN
 
 use Test::More tests => 7
 
-BEGIN { use_ok 'Net::hostent' }
+BEGIN
+    use_ok 'Net::hostent'
 
 # Remind me to add this to Test::More.
 sub DIE

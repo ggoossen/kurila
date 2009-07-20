@@ -968,7 +968,7 @@ sub tree
 # Remember, this needs to stay the last things in the module.
 
 # Why is this different for MacOS?  Does it matter?
-my $cop_seq_mnum = $^OS_NAME eq 'MacOS' ?? 11 !! 10
+my $cop_seq_mnum = 8
 $cop_seq_base = svref_2object(eval 'sub{0;}')->START->cop_seq + $cop_seq_mnum
 
 1
