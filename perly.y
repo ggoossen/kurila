@@ -1103,6 +1103,7 @@ term	:	'?' term
                         }
         |       term CALLOP layoutlistexpr
 			{ 
+                            $1->op_private |= OPpENTERSUB_AMPER;
                             $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
 				append_elem(OP_LIST, $3, scalar($1)), $1->op_location);
                         }
