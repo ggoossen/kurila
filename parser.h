@@ -117,6 +117,7 @@ typedef struct yy_parser {
     AV		*rsfp_filters;	/* holds chain of active source filters */
     I32         statement_indent; /* the indentation level of the current statement scope */
     bool        doextract;       /* indicates pod extracting */
+    bool        do_start_newline; /* indicates a new line is started */
 
 #ifdef PERL_MAD
     SV		*endwhite;

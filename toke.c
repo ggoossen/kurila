@@ -220,10 +220,10 @@ static const char* const lex_state_names[] = {
 	PL_bufptr = s; \
 	PL_last_uni = PL_oldbufptr; \
 	PL_last_lop_op = f; \
-	if (*s == '(') \
+	if (*s == '(' && ! PL_parser->do_start_newline )	\
 	    return REPORT( (int)FUNC1 ); \
 	s = PEEKSPACE(s); \
-	return REPORT( *s=='(' ? (int)FUNC1 : (int)UNIOP ); \
+	return REPORT( (*s=='(' && ! PL_parser->do_start_newline) ? (int)FUNC1 : (int)UNIOP ); \
 	}
 #define UNI(f)    UNI2(f,XTERM)
 #define UNIDOR(f) UNI2(f,XTERMORDORDOR)
@@ -233,10 +233,10 @@ static const char* const lex_state_names[] = {
 	pl_yylval.i_tkval.location = S_curlocation(PL_bufptr);	\
 	PL_bufptr = s; \
 	PL_last_uni = PL_oldbufptr; \
-	if (*s == '(') \
+	if (*s == '(' && ! PL_parser->do_start_newline )	\
 	    return REPORT( (int)FUNC1 ); \
 	s = PEEKSPACE(s); \
-	return REPORT( (*s == '(') ? (int)FUNC1 : (int)UNIOP ); \
+	return REPORT( (*s == '(' && ! PL_parser->do_start_newline) ? (int)FUNC1 : (int)UNIOP ); \
 	}
 
 /* grandfather return to old style */
@@ -325,6 +325,7 @@ static struct debug_tokens {
     { WORD,		TOKENTYPE_OPVAL,	"WORD" },
     { LAYOUTLISTEND,	TOKENTYPE_IVAL,	        "LAYOUTLISTEND" },
     { ANONARYL,	        TOKENTYPE_NONE,	        "ANONARYL" },
+    { ANONHSHL,	        TOKENTYPE_NONE,	        "ANONHSHL" },
     { 0,		TOKENTYPE_NONE,		NULL }
 };
 
@@ -643,6 +644,7 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
     parser->nexttoke = 0;
 #endif
     parser->doextract = FALSE;
+    parser->do_start_newline = FALSE;
     parser->error_count = oparser ? oparser->error_count : 0;
     parser->lex_state = LEX_NORMAL;
     parser->expect = XSTATE;
@@ -905,7 +907,8 @@ S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
     }
 
     if ( s < PL_bufend && *s != '#' && *s != '\n' && *s != '\t' )
-	goto done;
+	if (! PL_parser->do_start_newline)
+	    goto done;
 
     for (;;) {
 	STRLEN prevlen;
@@ -1000,6 +1003,7 @@ S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
     }
 
     /* reset if this isn't a continuation of the original line */
+    PL_parser->do_start_newline = FALSE;
     if (PL_parser->statement_indent != -1
         && (s - PL_linestart) <= PL_parser->statement_indent
         ) {
@@ -1009,7 +1013,8 @@ S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
         else {
 	    if (PL_linestart != PL_bufend) {
 		assert(PL_linestart[-1] == '\n');
-		PL_bufptr = PL_linestart - 1;
+		PL_bufptr = PL_linestart;
+		PL_parser->do_start_newline = TRUE;
 	    }
 #ifdef PERL_MAD
 	    if (PL_madskills) {
@@ -1048,7 +1053,7 @@ S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
 STATIC char *
 S_skip_pod(pTHX_ register char *s)
 {
-    if (s[0] == '=' && isALPHA(s[1]) 
+    if (s[0] == '=' && isALPHA(s[1])
 	&& (s == PL_linestart || s[-1] == '\n') ) {
 	if (PL_in_eval && !PL_rsfp) {
 	    char* d;
@@ -1655,7 +1660,7 @@ S_sublex_done(pTHX)
     }
 }
 
-/* 
+/*
   start_statement_indent
 
   starts a new statement indentation level at the given character.
@@ -1684,7 +1689,7 @@ S_start_statement_indent(pTHX_ char* s)
     PL_expect = XSTATE;
 }
 
-/* 
+/*
   stop_statement_indent
 
   stops the current statement indentation level
@@ -1715,7 +1720,7 @@ S_stop_statement_indent(pTHX)
     force_next( is_layout_list ? LAYOUTLISTEND : '}' );
 }
 
-/* 
+/*
   start_list_indent
 
   starts a new layout for a lists at the indentation level of the given character.
@@ -1732,13 +1737,15 @@ S_start_list_indent(pTHX_ char* s)
     PL_lex_brackstack[PL_lex_brackets].state = 0;
     PL_lex_brackstack[PL_lex_brackets].prev_statement_indent = PL_parser->statement_indent;
     ++PL_lex_brackets;
-    if (s < PL_linestart) {
-	/* the next line isn't a continuation 
+    if (PL_parser->do_start_newline) {
+	/* the next line isn't a continuation
 	   Incrementing the statement_indent will make it close */
 	PL_parser->statement_indent += 1;
     }
-    else
+    else {
+	assert( s >= PL_linestart );
 	PL_parser->statement_indent = s - PL_linestart;
+    }
     DEBUG_T({ PerlIO_printf(Perl_debug_log,
                 "### New statement indent level, %d.\n",
                 (int)PL_parser->statement_indent); });
@@ -1857,7 +1864,7 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
          * There will always enough room in sv since such
          * escapes will be longer than any UTF-8 sequence
          * they can end up as. */
-        
+
         /* We need to map to chars to ASCII before doing the tests
            to cover EBCDIC
                 */
@@ -1871,7 +1878,7 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
             *l = 1;
         }
         return s;
-        
+
         /* \N{LATIN SMALL LETTER A} is a named character */
     case 'N':
         ++s;
@@ -1880,7 +1887,7 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
             SV *res;
             STRLEN len;
             const char *str;
-            
+
             if (!e || (e >= send)) {
                 Perl_croak(aTHX_ "Missing right brace on \\N{}");
             }
@@ -2023,7 +2030,7 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
               } (end switch)
           } (end if backslash)
     } (end while character to read)
-                
+
 */
 
 
@@ -2611,7 +2618,7 @@ S_process_shebang(pTHX_ char* s) {
     return s;
 }
 
-#ifdef PERL_MAD 
+#ifdef PERL_MAD
  /*
  * Perl_madlex
  * The intent of this yylex wrapper is to minimize the changes to the
@@ -2801,7 +2808,7 @@ S_tokenize_use(pTHX_ int is_use, char *s) {
 */
 
 static bool S_close_layout_lists() {
-    if (PL_lex_brackets > 0 
+    if (PL_lex_brackets > 0
 	&& PL_lex_brackstack[PL_lex_brackets -1].type == LB_LAYOUT_LIST) {
 	--PL_lex_brackets;
 	PL_parser->statement_indent = PL_lex_brackstack[PL_lex_brackets].prev_statement_indent;
@@ -2827,17 +2834,21 @@ static int S_process_layout(char* s) {
     d = S_skip_pod(s);
 #ifdef PERL_MAD
     if (PL_madskills && PL_thiswhite) {
+	if (!PL_nextwhite)
+	    PL_nextwhite = newSVpvs("");
 	sv_catsv(PL_nextwhite, PL_thiswhite);
 	PL_thiswhite = NULL;
     }
 #endif /* PERL_MAD */
-	
+
     DEBUG_T( { PerlIO_printf(Perl_debug_log,
 		"### Tokener got space2 '%s'\n", PL_thiswhite ? SvPVX_const(PL_thiswhite) : NULL ); });
     if (d) {
 	s = d;
-#ifdef PERL_MAD			
+#ifdef PERL_MAD
 	if (PL_madskills) {
+	    if (!PL_skipwhite)
+		PL_skipwhite = newSVpvs("");
 	    sv_catsv(PL_skipwhite, PL_thiswhite);
 	    PL_thiswhite = NULL;
 	}
@@ -2850,11 +2861,11 @@ static int S_process_layout(char* s) {
     if ((s - PL_linestart) < PL_parser->statement_indent) {
 #ifdef PERL_MAD
 	if (PL_madskills)
-	    SvCUR_set(PL_nextwhite, SvCUR(PL_nextwhite) - (s - PL_linestart + 1));
+	    SvCUR_set(PL_nextwhite, SvCUR(PL_nextwhite) - (s - PL_linestart));
 #endif
 	S_stop_statement_indent();
-	s = PL_linestart - 1;
-	assert(*s == '\n' || *s == '\0');
+	PL_parser->do_start_newline = TRUE;
+	s = PL_linestart;
     }
     if (is_layout_list) {
 	OPERATOR(',');
@@ -3218,6 +3229,9 @@ Perl_yylex(pTHX)
 	}
     }
 
+    if (PL_parser->do_start_newline)
+	goto process_indentation;
+
     assert(s <= PL_bufend);
     pl_yylval.i_tkval.location = S_curlocation(PL_bufptr);
     switch (*s) {
@@ -3541,7 +3555,7 @@ Perl_yylex(pTHX)
 			PL_lex_state = LEX_INTERPEND;
 		    }
 		    TERM(DEREFHSH);
-		} 
+		}
 		else if (*s == '*') {
 		    s++;
 		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
@@ -3549,7 +3563,7 @@ Perl_yylex(pTHX)
 			PL_lex_state = LEX_INTERPEND;
 		    }
 		    TERM(DEREFSTAR);
-		} 
+		}
 		else if (*s == '&') {
 		    s++;
 		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
@@ -3557,7 +3571,7 @@ Perl_yylex(pTHX)
 			PL_lex_state = LEX_INTERPEND;
 		    }
 		    TERM(DEREFAMP);
-		} 
+		}
 		s = SKIPSPACE1(s);
 		if (isIDFIRST_lazy_if(s,UTF)) {
 		    s = force_word(s,METHOD,FALSE,TRUE,FALSE);
@@ -3725,7 +3739,7 @@ Perl_yylex(pTHX)
 	case '&': BAop(OP_BIT_AND);
 	case '|': BOop(OP_BIT_OR);
 	case '~': OPERATOR('~');
-	default: 
+	default:
 	    yyerror(Perl_form(aTHX_ "Expected ^,&,| or ~ after a ^, but found '%c'", *s));
 	}
     case '~':
@@ -3924,7 +3938,7 @@ Perl_yylex(pTHX)
 
 	s++;
 
-	if (PL_lex_brackstack[PL_lex_brackets].type != LB_BLOCK 
+	if (PL_lex_brackstack[PL_lex_brackets].type != LB_BLOCK
 	    && PL_lex_brackstack[PL_lex_brackets].type != LB_HELEM) {
 	    yyerror("Unmatched right curly bracket");
 	}
@@ -3935,7 +3949,7 @@ Perl_yylex(pTHX)
 	}
 
 	if (PL_lex_state == LEX_INTERPBLOCK) {
-	    if (PL_lex_brackets == 0) 
+	    if (PL_lex_brackets == 0)
 		PL_lex_state = LEX_INTERPEND;
 	}
 	if (PL_lex_state == LEX_INTERPNORMAL) {
@@ -4079,7 +4093,7 @@ Perl_yylex(pTHX)
 	s++;
 	if (*s++ == '>')
 	    SHop(OP_RIGHT_SHIFT);
-	
+
 	Perl_croak(aTHX_ "'>' is reserved for hashes");
 
     case '$': {
@@ -4259,7 +4273,7 @@ Perl_yylex(pTHX)
 	if (PL_expect == XOPERATOR) {
 	    no_op("String",s);
 	}
-	
+
 	if (!s)
 	    missingterminator(NULL);
 	DEBUG_T( { printbuf("### Saw string before %s\n", s); } );
@@ -4537,7 +4551,7 @@ Perl_yylex(pTHX)
 			return REPORT( (int)COMPSUB );
 		    }
 		}
- 
+
 
 		/* Look for a subroutine with this name in current package,
 		   unless name is "Foo::" which isn't allowed. */
@@ -4730,7 +4744,7 @@ Perl_yylex(pTHX)
 		if ( ! ( s[0] == '-' && s[1] == '>') ) {
 		    yyerror(Perl_form("Unknown bare word %s", PL_tokenbuf));
 		}
-		
+
 		if ((lastchar == '*' || lastchar == '%' || lastchar == '&')
 		    && ckWARN_d(WARN_AMBIGUOUS)) {
 		    Perl_warner(aTHX_ packWARN(WARN_AMBIGUOUS),
@@ -4968,7 +4982,7 @@ Perl_yylex(pTHX)
 
 	case KEY_exists:
 	    UNI(OP_EXISTS);
-	
+
 	case KEY_exit:
 	    UNI(OP_EXIT);
 
@@ -5164,7 +5178,7 @@ Perl_yylex(pTHX)
 	case KEY_last:
 	    s = force_word(s,WORD,TRUE,FALSE,FALSE);
 	    LOOPX(OP_LAST);
-	
+
 	case KEY_lc:
 	    UNI(OP_LC);
 
@@ -5306,7 +5320,7 @@ Perl_yylex(pTHX)
 
 	case KEY_pos:
 	    LOP(OP_POS,XTERM);
-	
+
 	case KEY_pack:
 	    LOP(OP_PACK,XTERM);
 
@@ -5413,7 +5427,7 @@ Perl_yylex(pTHX)
 		orig_keyword = 0;
 		pl_yylval.i_tkval.ival = 1;
 	    }
-	    else 
+	    else
 		pl_yylval.i_tkval.ival = 0;
 	    pl_yylval.i_tkval.location = S_curlocation(PL_bufptr);
 	    av_push((AV*)pl_yylval.i_tkval.location, newSVpv("(require)", 0));
@@ -5476,7 +5490,7 @@ Perl_yylex(pTHX)
 
 	case KEY_chomp:
 	    UNI(OP_CHOMP);
-	
+
 	case KEY_scalar:
 	    UNI(OP_SCALAR);
 
@@ -5641,7 +5655,7 @@ Perl_yylex(pTHX)
 #endif
 		start_force(0);
 		CURMAD('_', tmpwhite, NULL);
-                NEXTVAL_NEXTTOKE.opval = (OP*)newSVOP(OP_CONST,0, newSVpvn(PL_oldbufptr + tboffset, tblen), 
+                NEXTVAL_NEXTTOKE.opval = (OP*)newSVOP(OP_CONST,0, newSVpvn(PL_oldbufptr + tboffset, tblen),
                     S_curlocation(PL_oldbufptr + tboffset));
                 NEXTVAL_NEXTTOKE.opval->op_private |= OPpCONST_BARE;
 #ifdef PERL_MAD
@@ -8053,9 +8067,9 @@ Perl_keyword (pTHX_ const char *name, I32 len)
 		    {                                   /* continue   */
 			return -KEY_continue;
 		    }
-		
+
 		goto unknown;
- 
+
             default:
               goto unknown;
           }
@@ -9077,7 +9091,7 @@ S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRLEN keylen,
 
     if (!table || !(PL_hints & HINT_LOCALIZE_HH)) {
 	SV *msg;
-	
+
 	why2 = (const char *)
 	    (strEQ(key,"charnames")
 	     ? "(possibly a missing \"use charnames ...\")"
@@ -9345,7 +9359,7 @@ S_scan_pat(pTHX_ char *start, I32 type)
     if ((pm->op_pmflags & PMf_CONTINUE) && !(pm->op_pmflags & PMf_GLOBAL)
 	    && ckWARN(WARN_REGEXP))
     {
-        Perl_warner(aTHX_ packWARN(WARN_REGEXP), 
+        Perl_warner(aTHX_ packWARN(WARN_REGEXP),
             "Use of /c modifier is meaningless without /g" );
     }
 
@@ -9452,7 +9466,7 @@ S_scan_heredoc(pTHX_ register char *s)
 #ifdef PERL_MAD
     I32 stuffstart = s - SvPVX_mutable(PL_linestr);
     char *tstart;
- 
+
     PL_realtokenstart = -1;
 #endif
 
@@ -9682,7 +9696,7 @@ S_scan_heredoc(pTHX_ register char *s)
 	s///		regexp substitute	s/this/that/
 	($*@)		sub prototypes		sub foo ($)
 	(stuff)		sub attr parameters	sub foo : attr(stuff)
-	
+
    In most of these cases (all but <>, patterns and transliterate)
    yylex() calls scan_str().  m// makes yylex() call scan_pat() which
    calls scan_str().  s/// makes yylex() call scan_subst() which calls
@@ -9802,7 +9816,7 @@ S_scan_str(pTHX_ char *start, int escape, int keep_delims, yy_str_info *str_info
 		*to = *s;
 	    }
 	}
-	
+
 	/* if the terminator isn't the same as the start character (e.g.,
 	   matched brackets), we have to allow more in the quoting, and
 	   be prepared for nested brackets.
@@ -9851,7 +9865,7 @@ S_scan_str(pTHX_ char *start, int escape, int keep_delims, yy_str_info *str_info
 	else if (to - SvPVX_const(sv) == 1 && to[-1] == '\r')
 	    to[-1] = '\n';
 #endif
-	
+
 	/* if we're out of file, or a read fails, bail and reset the current
 	   line marker so we can report where the unterminated string began
 	*/
@@ -10341,8 +10355,8 @@ Perl_start_subparse(pTHX_ U32 flags)
     PL_subline = PL_parser->lex_line_number;
     CvPADLIST(PL_compcv) = pad_new(padnew_SAVE|padnew_SAVESUB
 	|(flags & CVf_ANON ? padnew_LATE : 0),
-	outsidecv ? PADLIST_PADNAMES(CvPADLIST(outsidecv)) : NULL, 
-	outsidecv ? PADLIST_BASEPAD(CvPADLIST(outsidecv)) : NULL, 
+	outsidecv ? PADLIST_PADNAMES(CvPADLIST(outsidecv)) : NULL,
+	outsidecv ? PADLIST_BASEPAD(CvPADLIST(outsidecv)) : NULL,
 	PL_cop_seqmax);
     if (flags & CVf_BLOCK) {
 	pad_add_name("$_", NULL, FALSE);
