@@ -1321,6 +1321,8 @@ S_force_word(pTHX_ register char *start, int token, int check_keyword, int allow
 
     start = SKIPSPACE1(start);
     s = start;
+    if (PL_parser->do_start_newline)
+	return s;
     if (isIDFIRST_lazy_if(s,UTF) ||
         (allow_pack && *s == ':') ||
         (allow_initial_tick && *s == '\'') )
@@ -5632,6 +5634,7 @@ Perl_yylex(pTHX)
 			sv_setpvs(PL_subname, "__ANON__");
 		    else
 			sv_setpvs(PL_subname, "__ANON__::__ANON__");
+		    PL_nextwhite = tmpwhite;
 		    TOKEN(ANONSUB);
 		}
 
