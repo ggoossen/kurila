@@ -3,7 +3,7 @@
 BEGIN
     require './test.pl'
 
-plan tests => 20
+plan tests => 21
 
 our ($x, $y)
 
@@ -106,4 +106,12 @@ eval_dies_like(<<'EOE', qr/wrong matching parens .* at end of line/)
 if ($a)
     1
     $a[
+EOE
+
+
+# detection of newlines with something that has lookahead
+
+eval_dies_like(<<'EOE', qr/Not enough arguments for bless/)
+bless
+(1, 2)
 EOE

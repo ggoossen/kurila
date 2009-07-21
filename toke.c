@@ -1161,7 +1161,7 @@ S_lop(pTHX_ I32 f, int x, char *s)
     if (*s == '(')
         return REPORT(FUNC);
     s = PEEKSPACE(s);
-    if (*s == '(')
+    if (*s == '(' && ! PL_parser->do_start_newline)
         return REPORT(FUNC);
     else
         return REPORT(LSTOP);
@@ -5037,31 +5037,6 @@ Perl_yylex(pTHX)
 
 	case KEY_for:
 	case KEY_foreach:
-	    s = SKIPSPACE1(s);
-	    if (PL_expect == XSTATE && isIDFIRST_lazy_if(s,UTF)) {
-		char *p = s;
-#ifdef PERL_MAD
-		int soff = s - SvPVX_mutable(PL_linestr); /* for skipspace realloc */
-#endif
-
-		if ((PL_bufend - p) >= 3 &&
-		    strnEQ(p, "my", 2) && isSPACE(*(p + 2)))
-		    p += 2;
-		else if ((PL_bufend - p) >= 4 &&
-		    strnEQ(p, "our", 3) && isSPACE(*(p + 3)))
-		    p += 3;
-		p = PEEKSPACE(p);
-		if (isIDFIRST_lazy_if(p,UTF)) {
-		    p = scan_ident(p, PL_bufend,
-			PL_tokenbuf, sizeof PL_tokenbuf, TRUE);
-		    p = PEEKSPACE(p);
-		}
-		if (*p != '$')
-		    Perl_croak(aTHX_ "Missing $ on loop variable");
-#ifdef PERL_MAD
-		s = SvPVX_mutable(PL_linestr) + soff;
-#endif
-	    }
 	    OPERATOR(FOR);
 
 	case KEY_fork:
@@ -5648,7 +5623,9 @@ Perl_yylex(pTHX)
 			sv_setpvs(PL_subname, "__ANON__");
 		    else
 			sv_setpvs(PL_subname, "__ANON__::__ANON__");
+#ifdef PERL_MAD
 		    PL_nextwhite = tmpwhite;
+#endif
 		    TOKEN(ANONSUB);
 		}
 
@@ -9244,8 +9221,6 @@ S_scan_ident(pTHX_ register char *s, register const char *send, char *dest, STRL
     /* skip sigil */
     s++;
 
-    if (isSPACE(*s))
-	s = PEEKSPACE(s);
     if (isDIGIT(*s)) {
 	while (isDIGIT(*s)) {
 	    if (d >= e)
@@ -9756,7 +9731,7 @@ S_scan_str(pTHX_ char *start, int escape, int keep_delims, yy_str_info *str_info
     /* skip space before the delimiter */
     if (isSPACE(*s)) {
 	s = PEEKSPACE(s);
-	if (isSPACE(*s)) {
+	if (isSPACE(*s) || PL_parser->do_start_newline) {
 	    yyerror("statement end found where string delimeter expected");
 	    str_info->str_sv = newSVpvs("");
 	    return s;
