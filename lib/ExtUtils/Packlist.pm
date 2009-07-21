@@ -161,8 +161,8 @@ ExtUtils::Packlist - manage .packlist files
 
    $pl->{'/some/file/name'}++;
       or
-   $pl->{'/some/other/file/name'} = \%( type => 'file',
-                                        from => '/some/file' );
+   $pl->{'/some/other/file/name'} = \%: type => 'file'
+                                        from => '/some/file'
 
 =head1 DESCRIPTION
 

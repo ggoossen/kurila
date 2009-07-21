@@ -424,7 +424,7 @@ sub xlate
     $name = "LOG_$name" unless $name =~ m/^LOG_/
     $name = "Sys::Syslog::$name"
     # Can't have just try { &$name } || -1 because some LOG_XXX may be zero.
-    my $value = try { &{Symbol::fetch_glob($name)->*} ( < @_ )}
+    my $value = try { Symbol::fetch_glob($name)->* ->( < @_ )}
     defined $value ?? $value !! -1
 
 
@@ -449,7 +449,7 @@ sub connect_log
 
     while ($proto = shift @fallbackMethods)
         my $fn = "connect_$proto"
-        $connected = &{Symbol::fetch_glob($fn)->*}(\@errs) if defined &{Symbol::fetch_glob($fn)->*}
+        $connected = Symbol::fetch_glob($fn)->*->(\@errs) if defined Symbol::fetch_glob($fn)->*->&
         last if $connected
     
 

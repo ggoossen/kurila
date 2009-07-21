@@ -104,7 +104,7 @@ do
 
 
 do
-    local &{*CORE::GLOBAL::require}
+    local *CORE::GLOBAL::require->&
     *CORE::GLOBAL::require = sub (@< @_)
         CORE::require(@_[0])
             

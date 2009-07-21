@@ -1383,7 +1383,7 @@ sub _traverse_treelet_bit($self, $name, @< @_)  # for use only by the routine ab
 
     foreach my $x ( @_)
         if(ref($x))
-            &_traverse_treelet_bit($self, < $x->@)
+            _traverse_treelet_bit($self, < $x->@)
         else
             $self->_handle_text($x)
         

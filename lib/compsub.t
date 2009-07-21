@@ -128,7 +128,7 @@ do {
 
     do {
         sub foobar {
-            params 'foo', 'bar', \%( < @_ );
+            params 'foo', 'bar', \%: < @_;
             is $foo, 'foo-value', '$foo declared and initialized';
             is $bar, 'bar-value';
         }

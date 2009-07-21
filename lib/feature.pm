@@ -3,16 +3,14 @@ package feature;
 our $VERSION = '1.13';
 
 # (feature name) => (internal name, used in %^H)
-my %feature = %(
-    switch => 'feature_switch',
-    );
+my %feature = %:
+    switch => 'feature_switch'
 
 # NB. the latest bundle must be loaded by the -E switch (see toke.c)
 
-my %feature_bundle = %(
-    "5.10" => \qw(switch),
-    "5.11" => \qw(switch),
-    );
+my %feature_bundle = %:
+    "5.10" => \qw(switch)
+    "5.11" => \qw(switch)
 
 # special case
 %feature_bundle{+"5.9.5"} = %feature_bundle{?"5.10"};

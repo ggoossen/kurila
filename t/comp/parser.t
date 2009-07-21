@@ -46,7 +46,7 @@ is( "\Q\Q\Q\Q\Q\Q\Q\Q\Q\Q\Q\Q\Qa", "a", "PL_lex_casestack" );
 try {
 do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {
 do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {
-do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {\%(
+do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {\%(:
 )};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};
 };};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};
 };};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};
@@ -79,7 +79,7 @@ $($a)\{ $($a)[ $(join ' ', @b)\{
 # Bug #21575
 # ensure that the second print statement works, by playing a bit
 # with the test output.
-my %data = %( foo => "\n" );
+my %data = %: foo => "\n"
 print $^STDOUT, "#";
 print($^STDOUT, %data{?foo});
 pass();

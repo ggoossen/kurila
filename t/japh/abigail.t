@@ -73,8 +73,8 @@ plan tests => 99;
     my @primes     = @(2,  3,  7, 13, 53, 101,  557, 1429);
     my @composites = @(4, 10, 25, 32, 75, 143, 1333, 1728);
 
-    my %primeness  = %((map {$_ => 1} < @primes),
-                      (map {$_ => 0} < @composites));
+    my %primeness  = %: (map { %: $_ => 1} @primes),
+                        (map { %: $_ => 0} @composites)
 
     while (my ($num, $is_prime) = each %primeness) {
         my $comment = "$num is " . ($is_prime ? "prime." : "composite.");

@@ -42,13 +42,13 @@ sub import($class, @< @options)
                 croak "use of backend $backend failed: $($^EVAL_ERROR->message)";
             }
 
-            my $compilesub = &{*{Symbol::fetch_glob("B::$($backend)::compile")}}( < @options);
+            my $compilesub = Symbol::fetch_glob("B::$($backend)::compile")->*->& <: < @options;
             if (ref($compilesub) ne "CODE") {
                 die $compilesub;
             }
 
             local $^OUTPUT_FIELD_SEPARATOR = '';
-            &$compilesub();
+            $compilesub->();
 
             close $^STDERR if $veryquiet;
         }

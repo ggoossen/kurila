@@ -155,11 +155,11 @@ is( (nelems $ei->modules), 3,    'modules() in scalar context' )
 $ei->{+goodmod} = \%: 
     packlist => \ %: 
         (config_value("man1direxp") ??
-            (File::Spec->catdir(config_value("man1direxp"), 'foo') => 1) !!
-            ())
+         (File::Spec->catdir(config_value("man1direxp"), 'foo') => 1) !!
+         ())
         (config_value("man3direxp") ??
-            (File::Spec->catdir(config_value("man3direxp"), 'bar') => 1) !!
-            ())
+         (File::Spec->catdir(config_value("man3direxp"), 'bar') => 1) !!
+         ())
         File::Spec->catdir($prefix, 'foobar') => 1
         foobaz  => 1
 

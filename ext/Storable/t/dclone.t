@@ -29,10 +29,10 @@ our @a = @: 'first', undef, 3, -4, -3.14159, 456, 4.5
 print $^STDOUT, "not " unless defined (our $aref = dclone(\@a))
 print $^STDOUT, "ok 1\n"
 
-our $dumped = &dump(\@a)
+our $dumped = dump(\@a)
 print $^STDOUT, "ok 2\n"
 
-our $got = &dump($aref)
+our $got = dump($aref)
 print $^STDOUT, "ok 3\n"
 
 print $^STDOUT, "not " unless $got eq $dumped
@@ -52,7 +52,7 @@ our $foo = FOO->make
 print $^STDOUT, "not " unless defined(our $r = $foo->dclone)
 print $^STDOUT, "ok 5\n"
 
-print $^STDOUT, "not " unless &dump($foo) eq &dump($r)
+print $^STDOUT, "not " unless dump($foo) eq dump($r)
 print $^STDOUT, "ok 6\n"
 
 # Ensure refs to "undef" values are properly shared during cloning

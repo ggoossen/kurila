@@ -53,7 +53,7 @@ ExtUtils::Manifest - utilities to write and check a MANIFEST file
 
     manicopy($read,$target);
 
-    maniadd(\%($file => $comment, ...));
+    maniadd(\%: $file => $comment, ...);
 
 
 =head1 DESCRIPTION
@@ -232,7 +232,7 @@ sub skipcheck(?$p)
 
     my @skipped = $@
     foreach my $file ( _sort < keys $found->%)
-        if (&$matches($file))
+        if ($matches->($file))
             warn "Skipping $file\n"
             push @skipped, $file
             next
@@ -592,7 +592,7 @@ sub _unmacify($file)
 
 =item maniadd
 
-  maniadd(\%( $file => $comment, ...));
+  maniadd(\%: $file => $comment, ...);
 
 Adds an entry to an existing F<MANIFEST> unless its already there.
 

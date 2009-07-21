@@ -526,14 +526,14 @@ sub process_para
 
     $_ = shift(@line)
     while (my $kwd = check_keyword("REQUIRE|PROTOTYPES|FALLBACK|VERSIONCHECK|INCLUDE"))
-        &{Symbol::fetch_glob("$($kwd)_handler")->*}() 
+        Symbol::fetch_glob("$($kwd)_handler")->*->() 
         next PARAGRAPH unless (nelems @line) 
         $_ = shift(@line)
     
 
     my $begin_lineno = @line_no[(nelems @line_no) - nelems @line]
     if (check_keyword("BOOT"))
-        &check_cpp( < @_ )
+        check_cpp( < @_ )
         push (@BootCode, "#line $begin_lineno \"$filepathname\"\n")
             if $WantLineNumbers && @line[0] !~ m/^\s*#\s*line\b/
         push (@BootCode, < @line, "") 
@@ -769,9 +769,9 @@ EOF
     push(@line, "$END:")
     push(@line_no, @line_no[-1])
     $_ = ''
-    &check_cpp( < @_ )
+    check_cpp( < @_ )
     while ((nelems @line))
-        &CASE_handler( < @_ ) if check_keyword("CASE")
+        CASE_handler( < @_ ) if check_keyword("CASE")
         print $output_fh, Q(<<"EOF")
 #   $except [[
 EOF
@@ -795,11 +795,11 @@ EOF
             if (defined($static) or $func_name eq 'new')
                 print $output_fh, "\tchar *"
                 %var_types{+"CLASS"} = "char *"
-                &generate_init("char *", 1, "CLASS")
+                generate_init("char *", 1, "CLASS")
             else
                 print $output_fh, "\t$class *"
                 %var_types{+"THIS"} = "$class *"
-                &generate_init("$class *", 1, "THIS")
+                generate_init("$class *", 1, "THIS")
             
         
 
@@ -809,7 +809,7 @@ EOF
             $_ = '' 
         else
             if ($ret_type ne "void")
-                print $output_fh, "\t" . &map_type($ret_type, 'RETVAL') . ";\n"
+                print $output_fh, "\t" . map_type($ret_type, 'RETVAL') . ";\n"
                     if !$retvaldone
                 %args_match{+"RETVAL"} = 0
                 %var_types{+"RETVAL"} = $ret_type
@@ -902,7 +902,7 @@ EOF
                 $prepush_done = 1
             else
                 # RETVAL almost never needs SvSETMAGIC()
-                &generate_output($ret_type, 0, 'RETVAL', 0)
+                generate_output($ret_type, 0, 'RETVAL', 0)
             
         
 
@@ -1115,7 +1115,7 @@ sub merge_section
 sub process_keyword($pattern)
     my $kwd 
 
-    &{Symbol::fetch_glob("$($kwd)_handler")->*}()
+    Symbol::fetch_glob("$($kwd)_handler")->*->()
         while $kwd = check_keyword($pattern) 
 
 
@@ -1170,10 +1170,10 @@ sub INPUT_handler
         # one can use 2-args map_type() unconditionally.
         if ($var_type =~ m/ \( \s* \* \s* \) /x)
             # Function pointers are not yet supported with &output_init!
-            print $output_fh, "\t" . &map_type($var_type, $var_name)
+            print $output_fh, "\t" . map_type($var_type, $var_name)
             $name_printed = 1
         else
-            print $output_fh, "\t" . &map_type($var_type)
+            print $output_fh, "\t" . map_type($var_type)
             $name_printed = 0
         
         $var_num = %args_match{?$var_name}
@@ -1190,10 +1190,10 @@ sub INPUT_handler
                 print $output_fh, "\t$var_name;\n"
             
         elsif ($var_init =~ m/\S/)
-            &output_init($var_type, $var_num, $var_name, $var_init, $name_printed)
+            output_init($var_type, $var_num, $var_name, $var_init, $name_printed)
         elsif ($var_num)
             # generate initialization code
-            &generate_init($var_type, $var_num, $var_name, $name_printed)
+            generate_init($var_type, $var_num, $var_name, $name_printed)
         else
             print $output_fh, ";\n"
         
@@ -1227,7 +1227,7 @@ sub OUTPUT_handler
             print $output_fh, "\t$outcode\n"
             print $output_fh, "\tSvSETMAGIC(ST(" , $var_num-1 , "));\n" if $DoSetMagic
         else
-            &generate_output(%var_types{?$outarg}, $var_num, $outarg, $DoSetMagic)
+            generate_output(%var_types{?$outarg}, $var_num, $outarg, $DoSetMagic)
         
         delete %in_out{$outarg}         # No need to auto-OUTPUT
             if exists %in_out{$outarg} and %in_out{?$outarg} =~ m/OUT$/
@@ -1664,7 +1664,7 @@ sub output_init
         
     else
         if (  $init =~ s/^\+//  &&  $num  )
-            &generate_init($type, $num, $var, $name_printed)
+            generate_init($type, $num, $var, $name_printed)
         elsif ($name_printed)
             print $output_fh, ";\n"
             $init =~ s/^;//

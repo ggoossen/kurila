@@ -56,7 +56,7 @@ sub CLONE
 
 
 # Can't Autoload cleanly as this clashes 8.3 with &retrieve
-sub retrieve_fd { &fd_retrieve( < @_ ) }		# Backward compatibility
+sub retrieve_fd { fd_retrieve( < @_ ) }		# Backward compatibility
 
 # By default restricted hashes are downgraded on earlier perls.
 
@@ -239,7 +239,7 @@ sub _store
     my $fh
     if ($use_locking)
         open($fh, ">>", "$file") || logcroak "can't write into $file: $^OS_ERROR"
-        unless (&CAN_FLOCK( < @_ ))
+        unless (CAN_FLOCK( < @_ ))
             logcarp "Storable::lock_store: fcntl/flock emulation broken on $^OS_NAME"
             return undef
         
@@ -254,7 +254,7 @@ sub _store
     my $da = $^EVAL_ERROR                               # Don't mess if called from exception handler
     my $ret
     # Call C routine nstore or pstore, depending on network order
-    try { $ret = &$xsptr($fh, $self) }
+    try { $ret = $xsptr->($fh, $self) }
     close($fh) or $ret = undef
     unlink($file) or warn "Can't unlink $file: $^OS_ERROR\n" if $^EVAL_ERROR || !defined $ret
     logcroak $^EVAL_ERROR if $^EVAL_ERROR
@@ -294,7 +294,7 @@ sub _store_fd
     my $da = $^EVAL_ERROR                               # Don't mess if called from exception handler
     my $ret
     # Call C routine nstore or pstore, depending on network order
-    try { $ret = &$xsptr($file, $self) }
+    try { $ret = $xsptr->($file, $self) }
     logcroak $^EVAL_ERROR if $^EVAL_ERROR
     $file->print('')    # Autoflush the file if wanted
     $^EVAL_ERROR = $da
@@ -363,7 +363,7 @@ sub _retrieve
     my $self
     my $da = $^EVAL_ERROR                                                       # Could be from exception handler
     if ($use_locking)
-        unless (&CAN_FLOCK( < @_ ))
+        unless (CAN_FLOCK( < @_ ))
             logcarp "Storable::lock_store: fcntl/flock emulation broken on $^OS_NAME"
             return undef
         

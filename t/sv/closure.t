@@ -30,13 +30,13 @@ test { foo == 2 },
 # closure: lexical outside sub
 my $foo = sub (@< @_) {$i = shift if (nelems @_); $i }
 my $bar = sub (@< @_) {$i = shift if (nelems @_); $i }
-test {&$foo() == 2 },
-&$foo(3)
-test {&$foo() == 3 },
+test {$foo->() == 2 },
+$foo->(3)
+test {$foo->() == 3 },
 # did the lexical change?
 test { foo == 3 and $i == 3},
 # did the second closure notice?
-test {&$bar() == 3 },
+test {$bar->() == 3 },
 
 # closure: lexical inside sub
 sub bar
@@ -46,10 +46,10 @@ sub bar
 
 $foo = bar(4)
 $bar = bar(5)
-test {&$foo() == 4 },
-&$foo(6)
-test {&$foo() == 6 },
-test {&$bar() == 5 },
+test {$foo->() == 4 },
+$foo->(6)
+test {$foo->() == 6 },
+test {$bar->() == 5 },
 
 # nested closures
 sub bizz
@@ -64,14 +64,14 @@ sub bizz
 
 $foo = bizz()
 $bar = bizz()
-test {&$foo() == 7 },
-&$foo(8)
-test {&$foo() == 8 },
-test {&$bar() == 7 },
+test {$foo->() == 7 },
+$foo->(8)
+test {$foo->() == 8 },
+test {$bar->() == 7 },
 
 $foo = bizz(9)
 $bar = bizz(10)
-test {&$foo(11)-1 == &$bar()},
+test {$foo->(11)-1 == $bar->()},
 
 my @foo
 for (qw(0 1 2 3 4))
@@ -80,23 +80,23 @@ for (qw(0 1 2 3 4))
 
 
 test {
-         &{@foo[0]}() == 0 and
-             &{@foo[1]}() == 1 and
-             &{@foo[2]}() == 2 and
-             &{@foo[3]}() == 3 and
-             &{@foo[4]}() == 4
+         @foo[0]->() == 0 and
+             @foo[1]->() == 1 and
+             @foo[2]->() == 2 and
+             @foo[3]->() == 3 and
+             @foo[4]->() == 4
      },
 
 for (0 .. 4)
-    &{@foo[$_]}(4-$_)
+    @foo[$_]->(4-$_)
 
 
 test {
-         &{@foo[0]}() == 4 and
-             &{@foo[1]}() == 3 and
-             &{@foo[2]}() == 2 and
-             &{@foo[3]}() == 1 and
-             &{@foo[4]}() == 0
+         @foo[0]->() == 4 and
+             @foo[1]->() == 3 and
+             @foo[2]->() == 2 and
+             @foo[3]->() == 1 and
+             @foo[4]->() == 0
      },
 
 sub barf
@@ -110,23 +110,23 @@ sub barf
 
 @foo = barf()
 test {
-         &{@foo[0]}() == 0 and
-             &{@foo[1]}() == 1 and
-             &{@foo[2]}() == 2 and
-             &{@foo[3]}() == 3 and
-             &{@foo[4]}() == 4
+         @foo[0]->() == 0 and
+             @foo[1]->() == 1 and
+             @foo[2]->() == 2 and
+             @foo[3]->() == 3 and
+             @foo[4]->() == 4
      },
 
 for (0 .. 4)
-    &{@foo[$_]}(4-$_)
+    @foo[$_]->(4-$_)
 
 
 test {
-         &{@foo[0]}() == 4 and
-             &{@foo[1]}() == 3 and
-             &{@foo[2]}() == 2 and
-             &{@foo[3]}() == 1 and
-             &{@foo[4]}() == 0
+         @foo[0]->() == 4 and
+             @foo[1]->() == 3 and
+             @foo[2]->() == 2 and
+             @foo[3]->() == 1 and
+             @foo[4]->() == 0
      },
 
 # test if closures get created in optimized for loops
@@ -137,11 +137,11 @@ for my $n (qw[A B C D E])
 
 
 test {
-         &{%foo{?A}}('A') and
-             &{%foo{?B}}('B') and
-             &{%foo{?C}}('C') and
-             &{%foo{?D}}('D') and
-             &{%foo{?E}}('E')
+         %foo{?A}->('A') and
+             %foo{?B}->('B') and
+             %foo{?C}->('C') and
+             %foo{?D}->('D') and
+             %foo{?E}->('E')
      },
 
 for my $n (0..4)
@@ -149,11 +149,11 @@ for my $n (0..4)
 
 
 test {
-         &{@foo[0]}(0) and
-             &{@foo[1]}(1) and
-             &{@foo[2]}(2) and
-             &{@foo[3]}(3) and
-             &{@foo[4]}(4)
+         @foo[0]->(0) and
+             @foo[1]->(1) and
+             @foo[2]->(2) and
+             @foo[3]->(3) and
+             @foo[4]->(4)
      },
 
 for my $n (0..4)
@@ -268,11 +268,11 @@ do \{
 # some of the variables which the closure will access
 our \$global_scalar = 1000;
 our \@global_array = \@: 2000, 2100, 2200, 2300;
-our \%global_hash = \%( < 3000..3009);
+our \%global_hash = \%: < 3000..3009;
 
 my \$fs_scalar = 4000;
 my \@fs_array = \@: 5000, 5100, 5200, 5300;
-my \%fs_hash = \%( < 6000..6009);
+my \%fs_hash = \%: < 6000..6009;
 
 END_MARK_THREE
 
@@ -283,7 +283,7 @@ END_MARK_THREE
 sub outer {
   my $sub_scalar = 7000;
   my @sub_array = @: 8000, 8100, 8200, 8300;
-  my %sub_hash = %(<9000..9009);
+  my %sub_hash = %:<9000..9009;
 END
                 # }
                 elsif ($where_declared eq 'in_anon')
@@ -291,7 +291,7 @@ END
 our $outer = sub {
   my $sub_scalar = 7000;
   my @sub_array = @: 8000, 8100, 8200, 8300;
-  my %sub_hash = %(<9000..9009);
+  my %sub_hash = %:<9000..9009;
 END
                 # }
                 else
@@ -372,11 +372,9 @@ END
                 $code .= "&inner_sub(< @_);\n" if $call_inner
                 if ($call_outer)
                     if ($where_declared eq 'in_named')
-                        $code .= "&outer(< \@_);\n\n"
+                        $code .= "outer(< \@_);\n\n"
                     elsif ($where_declared eq 'in_anon')
-                        $code .= "&\$outer(< \@_);\n\n"
-                    
-                
+                        $code .= "\$outer->(< \@_);\n\n"
 
                 # Now, we can actually prep to run the tests.
                 for my $inner_sub_test ( @inners)
@@ -406,18 +404,13 @@ END
                                 $expected = 12001
                             else
                                 $expected = 1
-                            
-                        
-                    
 
                     # Here's the test:
                     if ($inner_type eq 'anon')
-                        $code .= "test \{ our \$anon_$test; &\$anon_$test() == $expected \};\n"
+                        $code .= "test \{ our \$anon_$test; \$anon_$test\->() == $expected \};\n"
                     else
                         $code .= "test \{ &named_$test() == $expected \};\n"
-                    
                     $test++
-                
 
                 if (config_value('d_fork') and $^OS_NAME ne 'VMS' and $^OS_NAME ne 'MSWin32' and $^OS_NAME ne 'NetWare')
                     # Fork off a new perl to run the tests.

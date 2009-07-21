@@ -49,7 +49,7 @@ print $^STDOUT, defined %ary ?? "ok 18\n" !! "not ok 18\n"
 
 sub foo { print $^STDOUT, "ok 19\n"; }
 
-&foo( < @_ ) || print $^STDOUT, "not ok 19\n"
+foo( < @_ ) || print $^STDOUT, "not ok 19\n"
 
 print $^STDOUT, defined &foo ?? "ok 20\n" !! "not ok 20\n"
 undef &foo

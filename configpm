@@ -138,27 +138,22 @@ package Config;
 # Need to stub all the functions to make code such as print Config::config_sh
 # keep working
 
-my %%Export_Cache = %%+: map {%%($_ => 1)}, @Config::EXPORT +@+ @Config::EXPORT_OK;
+my %%Export_Cache = %%+: map { %%: $_ => 1 }, @Config::EXPORT +@+ @Config::EXPORT_OK;
 
 # Define our own import method to avoid pulling in the full Exporter:
-sub import {
-    my $pkg = shift;
-    @_ = @Config::EXPORT unless @_;
+sub import($pkg, @< @funcs)
+    @funcs ||= @Config::EXPORT
 
-    my @funcs = @_;
-
-    my $callpkg = caller(0);
-    foreach my $func (@funcs) {
+    my $callpkg = caller(0)
+    foreach my $func (@funcs)
         die qq{"$func" is not exported by the $(__PACKAGE__) module\n}
-             unless %%Export_Cache{$func};
-        *{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{*{Symbol::fetch_glob($func)}};
-    }
+             unless %%Export_Cache{$func}
+        Symbol::fetch_glob($callpkg.'::'.$func)->* = \Symbol::fetch_glob($func)->*->&
 
-    return;
-}
+    return
 
 $^PERL_VERSION eq '%s'
-    or die "Perl lib version (%s) doesn't match executable version (" . $^PERL_VERSION . ")";
+    or die "Perl lib version (%s) doesn't match executable version (" . $^PERL_VERSION . ")"
 
 ENDOFBEG
 
@@ -668,8 +663,8 @@ for my $name (@heavy_subs) {
 }
 
 # tie returns the object, so the value returned to require will be true.
-my %%Config = %%(
-%s  );
+my %%Config = %%:
+%s
 
 sub config_value {
     my $key = shift;

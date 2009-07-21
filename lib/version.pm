@@ -14,7 +14,7 @@ sub import($class, ...)
 
     Symbol::fetch_glob($callpkg."::qv")->* =
         sub (@< @_) {return bless version::qv(shift), $class }
-        unless defined (&{Symbol::fetch_glob("$callpkg\::qv")})
+        unless defined (Symbol::fetch_glob("$callpkg\::qv")->&)
 
 
 

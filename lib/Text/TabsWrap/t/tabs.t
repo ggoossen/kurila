@@ -108,7 +108,7 @@ while (@tests) {
                 $fn = 'unexpand';
         }
 
-        my $back = &$f($in);
+        my $back = $f->($in);
 
         is($back, $out);
 }

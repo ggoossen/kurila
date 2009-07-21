@@ -1,7 +1,6 @@
 package base
 
-our ($VERSION)
-$VERSION = '2.13'
+our $VERSION = '2.13'
 
 # constant.pm is slow
 sub SUCCESS () { 1 }

@@ -111,8 +111,8 @@ sub opt_V # report version and exit
     print $^STDOUT, join '', @: 
         "Perldoc v$VERSION, under perl $^PERL_VERSION for $^OS_NAME"
 
-        (defined(&Win32::BuildNumber) and defined &Win32::BuildNumber())
-            ?? (" (win32 build ", < &Win32::BuildNumber(), ")") !! ()
+        (defined(&Win32::BuildNumber) and defined Win32::BuildNumber())
+            ?? (" (win32 build ", < Win32::BuildNumber(), ")") !! ()
 
         "\n"
 

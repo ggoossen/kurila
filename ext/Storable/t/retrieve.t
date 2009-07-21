@@ -46,9 +46,9 @@ my $nroot = retrieve('nstore')
 ok defined $nroot
 ok Storable::last_op_in_netorder()
 
-my $d1 = &dump($root)
+my $d1 = dump($root)
 ok 1
-my $d2 = &dump($nroot)
+my $d2 = dump($nroot)
 ok 1
 
 ok $d1 eq $d2 

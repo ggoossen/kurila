@@ -19,19 +19,17 @@ $masterpodfile = File::Spec->catdir($Up, "pod.lst")
 # --build-foo updates foo as follows
 # --showfiles shows the files to be changed
 
-%Targets
-    = %(
-    toc => "kurilatoc.pod",
-    manifest => File::Spec->catdir($Up, "MANIFEST"),
-    perlpod => "perl.pod",
-    vms => File::Spec->catdir($Up, "vms", "descrip_mms.template"),
-    nmake => File::Spec->catdir($Up, "win32", "Makefile"),
-    dmake => File::Spec->catdir($Up, "win32", "makefile.mk"),
-    podmak => File::Spec->catdir($Up, "win32", "pod.mak"),
-    # plan9 =>  File::Spec->catdir($Up, "plan9", "mkfile"),
-    unix => File::Spec->catdir($Up, "Makefile.SH"),
+%Targets = %:
+    toc => "kurilatoc.pod"
+    manifest => File::Spec->catdir($Up, "MANIFEST")
+    perlpod => "perl.pod"
+    vms => File::Spec->catdir($Up, "vms", "descrip_mms.template")
+    nmake => File::Spec->catdir($Up, "win32", "Makefile")
+    dmake => File::Spec->catdir($Up, "win32", "makefile.mk")
+    podmak => File::Spec->catdir($Up, "win32", "pod.mak")
+    # plan9 =>  File::Spec->catdir($Up, "plan9", "mkfile")
+    unix => File::Spec->catdir($Up, "Makefile.SH")
     # TODO: add roffitall
-    )
 
 do
     my @files = keys %Targets
@@ -65,11 +63,9 @@ __USAGE__
 
 
 # Don't copy these top level READMEs
-%Ignore
-    = %(
-    micro => 1,
+%Ignore = %:
+    micro => 1
     #     vms => 1,
-    )
 
 if ($Verbose)
     print "I'm building $_\n" foreach grep {%Build{$_}}, keys %Build
@@ -88,7 +84,7 @@ foreach (@( ~< $master->*))
     if (m/^(\S+)\s(.*)/ && (my $flags = $1) =~ m/h/)
         # it's a heading
         $flags =~ s/h//g
-        my %flags = %(header => 1)
+        my %flags = %: header => 1
         %flags{+toc_omit} = 1 if $flags =~ s/o//g
         %flags{+aux} = 1 if $flags =~ s/a//g
         die "$^PROGRAM_NAME: Unknown flag found in heading line: $_" if length $flags
@@ -98,7 +94,7 @@ foreach (@( ~< $master->*))
         # it's a section
         my @($flags, $filename, $desc) = @($1, $2, $3)
 
-        my %flags = %(indent => 0)
+        my %flags = %: indent => 0
         %flags{indent} = $1 if $flags =~ s/(\d+)//
         %flags{+toc_omit} = 1 if $flags =~ s/o//g
         %flags{+aux} = 1 if $flags =~ s/a//g

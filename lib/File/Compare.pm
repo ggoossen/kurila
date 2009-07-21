@@ -84,7 +84,7 @@ sub compare
             return $fail_inner->() unless defined($tline = ~< $to_fh)
             if (ref $size)
                 # $size contains ref to comparison function
-                return $fail_inner->() if &$size($fline, $tline)
+                return $fail_inner->() if $size->($fline, $tline)
             else
                 return $fail_inner->() if $fline ne $tline
             

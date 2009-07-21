@@ -636,7 +636,7 @@ sub runloop($n, $c)
 
     my ($subcode, $subref)
     if (ref $c eq 'CODE')
-        $subcode = "sub \{ for (1 .. $n) \{ package $pack; &\$c(); \} \}"
+        $subcode = "sub \{ for (1 .. $n) \{ package $pack; \$c->(); \} \}"
         $subref  = eval $subcode
     else
         $subcode = "sub \{ for (1 .. $n) \{ package $pack; $c;\} \}"
@@ -655,7 +655,7 @@ sub runloop($n, $c)
     while ( ( $t0 = Benchmark->new(0) )->[1] == $tbase ) {} ;
     $subref->()
     $t1 = Benchmark->new($n)
-    $td = &timediff($t1, $t0)
+    $td = timediff($t1, $t0)
     timedebug("runloop:",$td)
     $td
 

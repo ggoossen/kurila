@@ -46,7 +46,7 @@ sub main::dump($object)
     local %object
     local $count = 0
     local $dumped = ''
-    &recursive_dump($object, 1)
+    recursive_dump($object, 1)
     return $dumped
 
 
@@ -79,7 +79,6 @@ sub recursive_dump($object, $link)
         my $num = %object{?$addr}
         $dumped .= "OBJECT #$num seen\n"
         return
-    
 
     my $objcount = $count++
     %object{+$addr} = $objcount
@@ -90,8 +89,8 @@ sub recursive_dump($object, $link)
 
     croak "Unknown simple type '$ref'" unless defined %dump{?$ref}
 
-    &{Symbol::fetch_glob(%dump{?$ref})->*}($object)     # Dump object
-    &bless($bless) if $bless    # Mark it as blessed, if necessary
+    Symbol::fetch_glob(%dump{?$ref})->*->($object)     # Dump object
+    &bless <: $bless if $bless    # Mark it as blessed, if necessary
 
     $dumped .= "OBJECT $objcount\n"
 
@@ -122,7 +121,7 @@ sub dump_array($aref)
             next
         
         $dumped .= 'ITEM '
-        &recursive_dump(\$item, 1)
+        recursive_dump(\$item, 1)
     
 
 
@@ -132,13 +131,13 @@ sub dump_hash($href)
     $dumped .= "HASH items=$items\n"
     foreach my $key (sort keys $href->%)
         $dumped .= 'KEY '
-        &recursive_dump(\$key, undef)
+        recursive_dump(\$key, undef)
         unless (defined $href->{?$key})
             $dumped .= 'VALUE_UNDEF' . "\n"
             next
         
         $dumped .= 'VALUE '
-        &recursive_dump(\$href->{+$key}, 1)
+        recursive_dump(\$href->{+$key}, 1)
     
 
 
@@ -146,7 +145,7 @@ sub dump_hash($href)
 sub dump_ref($rref)
     my $deref = $rref->$                                # Follow reference to reference
     $dumped .= 'REF '
-    &recursive_dump($deref, 1)          # $dref is a reference
+    recursive_dump($deref, 1)          # $dref is a reference
 
 
 1

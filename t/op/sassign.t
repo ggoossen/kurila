@@ -19,6 +19,6 @@ do
     is( $y, "Wim" )
 
     dies_like( { (@: $x, $y) = qw|zus Jet Teun| },
-               qr/\QGot extra value(s) in anonymous array (@()) assignment\E/, "assignment with one extra item" )
+               qr/\QGot extra value(s) in anonymous array (\E[@]\Q:) assignment\E/, "assignment with one extra item" )
     dies_like( { (@: $x, $y) = qw|zus|; },
                qr/Missing required assignment value/, "assignment with one missing item" )

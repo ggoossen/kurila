@@ -127,7 +127,7 @@ package Getopt::Long::Parser
 
 # Store a copy of the default configuration. Since ConfigDefaults has
 # just been called, what we get from Configure is the default.
-my $default_config = &Getopt::Long::Configure ()
+my $default_config = Getopt::Long::Configure ()
 
 sub new
     my $that = shift
@@ -547,8 +547,8 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
                         my $eval_error = do
                             local $^EVAL_ERROR = undef
                             try {
-                                &{%linkage{?$opt}}
-                                                    (Getopt::Long::CallBack->new
+                                %linkage{?$opt}
+                                                    ->(Getopt::Long::CallBack->new
                                                     (name    => $opt,
                                                     ctl     => $ctl,
                                                     opctl   => \%opctl,
@@ -651,7 +651,7 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
                     if $debug
                 my $eval_error = do
                     local $^EVAL_ERROR = undef
-                    try { &$cb ($tryopt) }
+                    try { $cb ->($tryopt) }
                     $^EVAL_ERROR
                 
                 print $^STDERR, ("=> die($eval_error)\n")

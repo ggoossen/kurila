@@ -42,7 +42,7 @@ sub load {
 
     # work with static linking too
     my $b = Symbol::fetch_glob("$module\::bootstrap");
-    return $b->*->(< @_) if defined &{*{$b}};
+    return $b->*->(< @_) if defined $b->*->&;
 
     unless ($module and defined &dl_load_file) {
         my $bootstrap_inherit = DynaLoader->can('bootstrap_inherit') || 
@@ -59,7 +59,7 @@ print $out, <<'EOT' if defined &DynaLoader::mod2fname
     # Some systems have restrictions on files names for DLL's etc.
     # mod2fname returns appropriate file base name (typically truncated)
     # It may also edit @modparts if required.
-    $modfname = &mod2fname(\@modparts) if defined &mod2fname;
+    $modfname = mod2fname(\@modparts) if defined &mod2fname;
 
 EOT
 
@@ -130,7 +130,7 @@ print $out, <<'EOT'
 
     # See comment block above
     push(@DynaLoader::dl_shared_objects, $file); # record files loaded
-    return &$xs(<@_);
+    return $xs->(<@_);
 }
 
 sub bootstrap_inherit {

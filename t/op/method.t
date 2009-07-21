@@ -105,22 +105,22 @@ do
 
 
 # test error messages if method loading fails
-is(do { eval 'my $e = bless \%(), "E::A"; E::A->foo()';
+is(do { eval 'my $e = bless \$%, "E::A"; E::A->foo()';
        $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::A"/ ?? 1 !! $^EVAL_ERROR->message}, 1)
-is(do { eval 'my $e = bless \%(), "E::B"; $e->foo()';
+is(do { eval 'my $e = bless \$%, "E::B"; $e->foo()';
        $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::B"/ ?? 1 !! $^EVAL_ERROR}, 1)
 is(do { eval 'E::C->foo()';
        $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::C" (perhaps / ?? 1 !! $^EVAL_ERROR}, 1)
 
 is(do { eval 'UNIVERSAL->E::D::foo()';
        $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::D" (perhaps / ?? 1 !! $^EVAL_ERROR}, 1)
-is(do { eval 'my $e = bless \%(), "UNIVERSAL"; $e->E::E::foo()';
+is(do { eval 'my $e = bless \$%, "UNIVERSAL"; $e->E::E::foo()';
        $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::E" (perhaps / ?? 1 !! $^EVAL_ERROR}, 1)
 
 my $e = bless \$%, "E::F"  # force package to exist
 is(do { eval 'UNIVERSAL->E::F::foo()';
        $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::F"/ ?? 1 !! $^EVAL_ERROR}, 1)
-is(do { eval '$e = bless \%(), "UNIVERSAL"; $e->E::F::foo()';
+is(do { eval '$e = bless \$%, "UNIVERSAL"; $e->E::F::foo()';
        $^EVAL_ERROR->message =~ m/^\QCan't locate object method "foo" via package "E::F"/ ?? 1 !! $^EVAL_ERROR}, 1)
 
 # TODO: we need some tests for the SUPER:: pseudoclass

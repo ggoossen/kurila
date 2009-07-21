@@ -326,6 +326,7 @@ static struct debug_tokens {
     { LAYOUTLISTEND,	TOKENTYPE_IVAL,	        "LAYOUTLISTEND" },
     { ANONARYL,	        TOKENTYPE_NONE,	        "ANONARYL" },
     { ANONHSHL,	        TOKENTYPE_NONE,	        "ANONHSHL" },
+    { CALLOP,	        TOKENTYPE_NONE,	        "CALLOP" },
     { 0,		TOKENTYPE_NONE,		NULL }
 };
 
@@ -2830,8 +2831,10 @@ static int S_process_layout(char* s) {
     }
     is_layout_list = ( PL_lex_brackstack[PL_lex_brackets-1].type == LB_LAYOUT_LIST );
 
+#ifdef PERL_MAD
     if (!PL_thistoken)
 	PL_thistoken = newSVpvs("");
+#endif
 
     d = S_skip_pod(s);
 #ifdef PERL_MAD
@@ -2842,9 +2845,7 @@ static int S_process_layout(char* s) {
 	PL_thiswhite = NULL;
     }
 #endif /* PERL_MAD */
-
-    DEBUG_T( { PerlIO_printf(Perl_debug_log,
-		"### Tokener got space2 '%s'\n", PL_thiswhite ? SvPVX_const(PL_thiswhite) : NULL ); });
+	
     if (d) {
 	s = d;
 #ifdef PERL_MAD
@@ -3433,11 +3434,11 @@ Perl_yylex(pTHX)
 	    PL_skipwhite = NULL;
 	}
 #endif
-	DEBUG_T( { PerlIO_printf(Perl_debug_log,
-		    "### Tokener got space '%s'\n", PL_thiswhite ? SvPVX_const(PL_thiswhite) : NULL ); });
 	if (!is_continuation) {
+#ifdef PERL_MAD
 	    PL_nextwhite = PL_thiswhite;
 	    PL_thiswhite = NULL;
+#endif
 	    assert(PL_parser->statement_indent != -1);
 	    assert((s - PL_linestart) <= PL_parser->statement_indent);
 	    return S_process_layout(s);
@@ -3534,6 +3535,7 @@ Perl_yylex(pTHX)
 		    OPERATOR(ARROW);
 		}
 		else if (*s == '@') {
+		    /* '->@' operator */
 		    s++;
 		    pl_yylval.i_tkval.ival=0;
 		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
@@ -3543,6 +3545,7 @@ Perl_yylex(pTHX)
 		    TERM(DEREFARY);
 		}
 		else if (*s == '$') {
+		    /* '->$' operator */
 		    s++;
 		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
 			/* ->$ closes the interpoltion and creates a join */
@@ -3551,6 +3554,7 @@ Perl_yylex(pTHX)
 		    TERM(DEREFSCL);
 		}
 		else if (*s == '%') {
+		    /* '->%' operator */
 		    s++;
 		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
 			/* ->$ closes the interpoltion and creates a join */
@@ -3559,6 +3563,7 @@ Perl_yylex(pTHX)
 		    TERM(DEREFHSH);
 		}
 		else if (*s == '*') {
+		    /* '->*' operator */
 		    s++;
 		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
 			/* ->$ closes the interpoltion and creates a join */
@@ -3567,6 +3572,7 @@ Perl_yylex(pTHX)
 		    TERM(DEREFSTAR);
 		}
 		else if (*s == '&') {
+		    /* '->&' operator */
 		    s++;
 		    if (PL_lex_state == LEX_INTERPNORMAL && PL_lex_brackets == 0 ) {
 			/* ->$ closes the interpoltion and creates a join */
@@ -3689,23 +3695,11 @@ Perl_yylex(pTHX)
 
 	    TOKEN('(');
 	}
-	if (s[1] == '(') {
-	    /* anonymous hash constructor '%(' */
-	    if (PL_lex_brackets > 100)
-		Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
-	    PL_lex_brackstack[PL_lex_brackets].type = LB_PAREN;
-	    PL_lex_brackstack[PL_lex_brackets].state = XOPERATOR;
-	    ++PL_lex_brackets;
-
-	    s += 2;
-	    OPERATOR(ANONHSH);
-	}
 	if (s[1] == ':' && s[2] != ':') {
 	    /* hash constructor '%:' */
 	    s += 2;
 	    s = skipspace(s, NULL);
 	    S_start_list_indent(s);
-
 	    OPERATOR(ANONHSHL);
 	}
 	if (s[1] == '+' && s[2] == ':') {
@@ -3805,8 +3799,10 @@ Perl_yylex(pTHX)
 	TOKEN('(');
     case ';':
 	{
-	    const char tmp = *s++;
-	    OPERATOR(tmp);
+	    if (S_close_layout_lists())
+		TOKEN(LAYOUTLISTEND);
+	    s++;
+	    OPERATOR(';');
 	}
     case ')':
 	{
@@ -3979,13 +3975,11 @@ Perl_yylex(pTHX)
 	}
 
 	s = scan_ident(s - 1, PL_bufend, PL_tokenbuf, sizeof PL_tokenbuf, TRUE);
-	if (*PL_tokenbuf) {
-	    PL_expect = XOPERATOR;
-	    force_ident(PL_tokenbuf, '&');
+	if (! *PL_tokenbuf) {
+	    yyerror(aTHX_ "Indentified expected after '&'");
 	}
-	else
-	    PREREF('&');
-	pl_yylval.i_tkval.ival = (OPpENTERSUB_AMPER<<8);
+	PL_expect = XOPERATOR;
+	force_ident(PL_tokenbuf, '&');
 	TERM('&');
 
     case '|':
@@ -4016,6 +4010,10 @@ Perl_yylex(pTHX)
 		    goto retry;
 		}
 	    }
+	}
+	if (S_close_layout_lists()) {
+	    --s;
+	    TOKEN(LAYOUTLISTEND);
 	}
 	pl_yylval.i_tkval.ival = 0;
 	OPERATOR(ASSIGNOP);
@@ -4075,11 +4073,21 @@ Perl_yylex(pTHX)
 	{
 	    char tmp = *++s;
 	    if (tmp == '<') {
+		/*  '<<' operator */
 		s++;
 		SHop(OP_LEFT_SHIFT);
 	    }
 
+	    if (tmp == ':') {
+		/* '<:' operator */
+		s++;
+		s = skipspace(s, NULL);
+		S_start_list_indent(s);
+		TOKEN(CALLOP);
+	    }
+
 	    if ((tmp == '+') && (s[1] == '>')) {
+		/* '<+>' operator */
 		s += 2;
 		Eop(OP_NCMP);
 	    }
@@ -4182,6 +4190,7 @@ Perl_yylex(pTHX)
 	if (s[1] == ':' && s[2] != ':') {
 	    /* array constructor '@:' */
 	    s += 2;
+
 	    s = skipspace(s, NULL);
 	    S_start_list_indent(s);
 
@@ -4683,8 +4692,7 @@ Perl_yylex(pTHX)
 		    }
 #endif
 		    force_next(WORD);
-		    pl_yylval.i_tkval.ival = 0;
-		    TOKEN('&');
+		    TOKEN(NOAMPCALL);
 		}
 
 		/* Not a method, so call it a subroutine (if defined) */
@@ -4895,6 +4903,8 @@ Perl_yylex(pTHX)
 	    LOP(OP_ACCEPT,XTERM);
 
 	case KEY_and:
+	    if (S_close_layout_lists())
+		return REPORT(LAYOUTLISTEND);
 	    OPERATOR(ANDOP);
 
 	case KEY_atan2:
@@ -5157,6 +5167,8 @@ Perl_yylex(pTHX)
 	    UNI(OP_HEX);
 
 	case KEY_if:
+	    if (S_close_layout_lists())
+		return REPORT(LAYOUTLISTEND);
 	    OPERATOR(IF);
 
 	case KEY_index:
@@ -5291,6 +5303,8 @@ Perl_yylex(pTHX)
 	    LOP(OP_OPEN,XTERM);
 
 	case KEY_or:
+	    if (S_close_layout_lists())
+		return REPORT(LAYOUTLISTEND);
 	    pl_yylval.i_tkval.ival = OP_OR;
 	    OPERATOR(OROP);
 
@@ -5730,6 +5744,8 @@ Perl_yylex(pTHX)
 	    OPERATOR(UNTIL);
 
 	case KEY_unless:
+	    if (S_close_layout_lists())
+		return REPORT(LAYOUTLISTEND);
 	    OPERATOR(UNLESS);
 
 	case KEY_unlink:

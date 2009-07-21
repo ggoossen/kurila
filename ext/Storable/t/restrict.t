@@ -30,7 +30,7 @@ use Hash::Util < qw(lock_hash unlock_value);
 
 print "1..100\n";
 
-my %hash = %(question => '?', answer => 42, extra => 'junk', undef => undef);
+my %hash = %: question => '?', answer => 42, extra => 'junk', undef => undef
 lock_hash %hash;
 unlock_value %hash, 'answer';
 unlock_value %hash, 'extra';

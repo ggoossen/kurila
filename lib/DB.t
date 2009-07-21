@@ -137,24 +137,23 @@ sub three { two(<@_) }
 }
 
 # test DB::subs()
-{
-        local %DB::sub;
-        my $subs = DB->subs;
-        is( $subs, undef, 'DB::subs() should return keys of %DB::subs' );
-        %DB::sub = %( foo => 'foo:23-45' , bar => 'ba:r:7-890' );
-        $subs = DB->subs;
-        is( nelems($subs), 2, '... same song, different key' );
-        my @subs = DB->subs( 'foo', 'boo', 'bar' );
-        is( (nelems @subs), 2, '... should report only for requested subs' );
-        my @expected = @: \(@: 'foo', 23, 45 ), \(@: 'ba:r', 7, 890 );
-        is_deeply( @subs, @expected, '... find file, start, end for subs' );
-}
+do
+        local %DB::sub
+        my $subs = DB->subs
+        is( $subs, undef, 'DB::subs() should return keys of %DB::subs' )
+        %DB::sub = %: foo => 'foo:23-45' , bar => 'ba:r:7-890'
+        $subs = DB->subs
+        is( nelems($subs), 2, '... same song, different key' )
+        my @subs = DB->subs( 'foo', 'boo', 'bar' )
+        is( (nelems @subs), 2, '... should report only for requested subs' )
+        my @expected = @: \(@: 'foo', 23, 45 ), \(@: 'ba:r', 7, 890 )
+        is_deeply( @subs, @expected, '... find file, start, end for subs' )
 
 # test DB::filesubs()
 {
         local ($DB::filename, %DB::sub);
         $DB::filename = 'baz';
-        %DB::sub = %( map { $_ => $_ } qw( bazbar bazboo boobar booboo boobaz ) );
+        %DB::sub = %: map { $_ => $_ } qw( bazbar bazboo boobar booboo boobaz ) );
         my @ret = DB->filesubs();
         is( (nelems @ret), 2, 'DB::filesubs() should use $DB::filename with no args');
         @ret = grep { m/^baz/ } @ret;

@@ -143,12 +143,12 @@ sub export($pkg, $callpkg, @< @imports)
 
     foreach my $sym ( @imports)
         # shortcut for the common case of no type character
-        (Symbol::fetch_glob("$($callpkg)::$sym")->* = \&{Symbol::fetch_glob("$($pkg)::$sym")->*} and next)
+        (Symbol::fetch_glob("$($callpkg)::$sym")->* = \Symbol::fetch_glob("$($pkg)::$sym")->*->& and next)
             unless $sym =~ s/^(\W)//
         $type = $1
         no warnings 'once';
         Symbol::fetch_glob("$($callpkg)::$sym")->* =
-            $type eq '&' ?? \&{Symbol::fetch_glob("$($pkg)::$sym")->*} !!
+            $type eq '&' ?? \Symbol::fetch_glob("$($pkg)::$sym")->*->& !!
             $type eq '$' ?? \Symbol::fetch_glob("$($pkg)::$sym")->*->$ !!
             $type eq '@' ?? \Symbol::fetch_glob("$($pkg)::$sym")->*->@ !!
             $type eq '%' ?? \Symbol::fetch_glob("$($pkg)::$sym")->*->% !!

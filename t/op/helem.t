@@ -29,7 +29,7 @@ do
 
 
 do
-    is( (%:  'aap', 'noot' ){"aap"}, "noot", "direct helem from \%(..)")
+    is( (%:  'aap', 'noot' ){"aap"}, "noot", "direct helem from \%:..")
 
 
 do

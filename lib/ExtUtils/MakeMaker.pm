@@ -800,10 +800,10 @@ sub mv_all_methods
         # standard, we try to enable the next line again. It was
         # commented out until MM 5.23
 
-        next unless defined &{Symbol::fetch_glob("$($from)::$method")}
+        next unless defined Symbol::fetch_glob("$($from)::$method")->&
 
         do
-            Symbol::fetch_glob("$($to)::$method")->* = \&{Symbol::fetch_glob("$($from)::$method")}
+            Symbol::fetch_glob("$($to)::$method")->* = \Symbol::fetch_glob("$($from)::$method")->&
 
             # If we delete a method, then it will be undefined and cannot
             # be called.  But as long as we have Makefile.PLs that rely on
@@ -2056,11 +2056,10 @@ Bool.  If this parameter is true, the prerequisites will be printed to
 stdout and MakeMaker will exit.  The output format is an evalable hash
 ref.
 
-$PREREQ_PM = \%(
-               'A::B' => Vers1,
-               'C::D' => Vers2,
+$PREREQ_PM = \%:
+               'A::B' => Vers1
+               'C::D' => Vers2
                ...
-             );
 
 =item PRINT_PREREQ
 

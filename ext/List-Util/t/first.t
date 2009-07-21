@@ -53,7 +53,7 @@ is($^EVAL_ERROR, '', 'redefine self')
 SKIP: do
     skip("No Internals::SvREFCNT", 1) if !defined &Internals::SvREFCNT
     sub huge {$_+>1E6}
-    my $refcnt = &Internals::SvREFCNT(\&huge)
+    my $refcnt = Internals::SvREFCNT(\&huge)
     $v = first \&huge, < 1..6
-    is(&Internals::SvREFCNT(\&huge), $refcnt, "Refcount unchanged")
+    is(Internals::SvREFCNT(\&huge), $refcnt, "Refcount unchanged")
 

@@ -94,7 +94,7 @@ sub errno
 
 sub creat
     usage "creat(filename, mode)" if (nelems @_) != 2
-    &open(@_[0], &O_WRONLY( < @_ ) ^|^ &O_CREAT( < @_ ) ^|^ &O_TRUNC( < @_ ), @_[1])
+    open(@_[0], O_WRONLY( < @_ ) ^|^ O_CREAT( < @_ ) ^|^ O_TRUNC( < @_ ), @_[1])
 
 
 sub fcntl

@@ -107,7 +107,7 @@ sub new
     my $self = bless \$%, $class
 
     # The lock_keys() prototype won't work since we require Hash::Util :(
-    &Hash::Util::lock_keys(\$self->%, < _accessible_keys($class))
+    Hash::Util::lock_keys(\$self->%, < _accessible_keys($class))
     return $self
 
 

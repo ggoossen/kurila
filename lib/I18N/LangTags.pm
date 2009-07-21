@@ -185,13 +185,13 @@ reasons.)
 =cut
 
 sub same_language_tag
-    my $el1 = &encode_language_tag(@_[0])
+    my $el1 = encode_language_tag(@_[0])
     return 0 unless defined $el1
     # this avoids the problem of
     # encode_language_tag($lang1) eq and encode_language_tag($lang2)
     # being true if $lang1 and $lang2 are both undef
 
-    return $el1 eq &encode_language_tag(@_[1]) ?? 1 !! 0
+    return $el1 eq encode_language_tag(@_[1]) ?? 1 !! 0
 
 
 ###########################################################################
@@ -227,8 +227,8 @@ without regard to case and to x/i- alternation.
 =cut
 
 sub similarity_language_tag
-    my $lang1 = &encode_language_tag(@_[0])
-    my $lang2 = &encode_language_tag(@_[1])
+    my $lang1 = encode_language_tag(@_[0])
+    my $lang2 = encode_language_tag(@_[1])
     # And encode_language_tag takes care of the whole
     #  no-nyn==nn, i-hakka==zh-hakka, etc, things
 
@@ -288,8 +288,8 @@ B<Get the order right!  It doesn't work the other way around!>
 
 sub is_dialect_of
 
-    my $lang1 = &encode_language_tag(@_[0])
-    my $lang2 = &encode_language_tag(@_[1])
+    my $lang1 = encode_language_tag(@_[0])
+    my $lang2 = encode_language_tag(@_[1])
 
     return undef if !defined($lang1) and !defined($lang2)
     return 0 if !defined($lang1) or !defined($lang2)
@@ -338,7 +338,7 @@ carefully.
 
 sub super_languages
     my $lang1 = @_[0]
-    return() unless defined($lang1) && &is_language_tag($lang1)
+    return() unless defined($lang1) && is_language_tag($lang1)
 
     # a hack for those annoying new (2001) tags:
     $lang1 =~ s/^nb\b/no-bok/i # yes, backwards
@@ -397,13 +397,13 @@ sub locale2language_tag
         ?? $1 !! ''
     
 
-    return $lang if &is_language_tag($lang) # like "en"
+    return $lang if is_language_tag($lang) # like "en"
 
     $lang =~ s<_><->g  # "en_US" -> en-US
     $lang =~ s<(?:[\.\@][-_a-zA-Z0-9]+)+$><>s  # "en_US.ISO8859-1" -> en-US
     # it_IT.utf8@euro => it-IT
 
-    return $lang if &is_language_tag($lang)
+    return $lang if is_language_tag($lang)
 
     return
 
@@ -525,7 +525,7 @@ sub encode_language_tag
     ## Changes in the language tagging standards may have to be reflected here.
 
     my $tag = @_[0] || return undef
-    return undef unless &is_language_tag($tag)
+    return undef unless is_language_tag($tag)
 
     # For the moment, these legacy variances are few enough that
     #  we can just handle them here with regexps.
@@ -595,7 +595,7 @@ valid language tag.
 my %alt = %:  < qw( i x   x i   I X   X I ) 
 sub alternate_language_tags
     my $tag = @_[0]
-    return() unless &is_language_tag($tag)
+    return() unless is_language_tag($tag)
 
     my @em # push 'em real goood!
 

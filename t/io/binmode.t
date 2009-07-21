@@ -36,5 +36,5 @@ SKIP: do
     no warnings 'io', 'once';
     $^OS_ERROR = 0
     binmode(\*B)
-    ok($^OS_ERROR == &Errno::EBADF( < @_ ))
+    ok($^OS_ERROR == Errno::EBADF( < @_ ))
 

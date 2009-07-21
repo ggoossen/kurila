@@ -636,7 +636,8 @@ Set (if argument specified) and retrieve the number of errors found.
 =cut
 
 sub num_errors
-    return ((nelems @_) +> 1) ??  @: (@_[0]->{+_NUM_ERRORS} = @_[1]) !! @_[0]->{?_NUM_ERRORS}
+    return ((nelems @_) +> 1) ?? @: (@_[0]->{+_NUM_ERRORS} = @_[1])
+                              !! @_[0]->{?_NUM_ERRORS}
 
 
 ##################################
@@ -648,7 +649,8 @@ Set (if argument specified) and retrieve the number of warnings found.
 =cut
 
 sub num_warnings
-    return ((nelems @_) +> 1) ??  @: (@_[0]->{+_NUM_WARNINGS} = @_[1]) !! @_[0]->{?_NUM_WARNINGS}
+    return ((nelems @_) +> 1) ?? @: (@_[0]->{+_NUM_WARNINGS} = @_[1])
+                              !! @_[0]->{?_NUM_WARNINGS}
 
 
 ##################################
@@ -661,8 +663,8 @@ found in the C<=head1 NAME> section.
 =cut
 
 sub name
-    return ((nelems @_) +> 1 && @_[1]) ??
-        @: (@_[0]->{+name} = @_[1]) !! @_[0]->{?name}
+    return ((nelems @_) +> 1 && @_[1]) ?? @: (@_[0]->{+name} = @_[1])
+                                       !! @_[0]->{?name}
 
 
 ##################################

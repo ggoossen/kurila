@@ -567,7 +567,7 @@ sub getWt
         my $hang = $self->{?overrideHangul}
         my @hangulCE
         if ($hang)
-            @hangulCE = map( {pack(VCE_TEMPLATE, < NON_VAR, < $_->@) }, &$hang($u))
+            @hangulCE = map( {pack(VCE_TEMPLATE, < NON_VAR, < $_->@) }, $hang->($u))
         elsif (!defined $hang)
             @hangulCE = $der->($u)
         else

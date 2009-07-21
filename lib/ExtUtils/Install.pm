@@ -32,7 +32,7 @@ ExtUtils::Install - install files from here to there
 
   uninstall($packlist);
 
-  pm_to_blib(\%( 'lib/Foo/Bar.pm' => 'blib/lib/Foo/Bar.pm' ));
+  pm_to_blib(\%: 'lib/Foo/Bar.pm' => 'blib/lib/Foo/Bar.pm' );
 
 =head1 VERSION
 

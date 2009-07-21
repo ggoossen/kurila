@@ -137,7 +137,7 @@ sub erase($obj, $action)
     my $leaf_globref   = \($stem_symtab->{+$leaf})
     my $leaf_symtab = $leaf_globref->*{HASH}
     #    warn " leaf_symtab ", join(', ', %$leaf_symtab),"\n";
-    # FIXME this does not clear properly yet: %$leaf_symtab = %( () );
+    # FIXME this does not clear properly yet: %$leaf_symtab = $%
     for (keys $leaf_symtab->%)
         delete $leaf_symtab->{$_}
     
@@ -225,8 +225,8 @@ sub share_from
         my ($var, $type)
         $type = $1 if ($var = $arg) =~ s/^(\W)//
         # warn "share_from $pkg $type $var";
-        Symbol::fetch_glob($root."::$var")->* = (!$type)       ?? \&{Symbol::fetch_glob($pkg."::$var")->*}
-            !! ($type eq '&') ?? \&{Symbol::fetch_glob($pkg."::$var")->*}
+        Symbol::fetch_glob($root."::$var")->* = (!$type)       ?? \Symbol::fetch_glob($pkg."::$var")->*->&
+            !! ($type eq '&') ?? \Symbol::fetch_glob($pkg."::$var")->*->&
             !! ($type eq '$') ?? \Symbol::fetch_glob($pkg."::$var")->*->$
             !! ($type eq '@') ?? \Symbol::fetch_glob($pkg."::$var")->*->@
             !! ($type eq '%') ?? \Symbol::fetch_glob($pkg."::$var")->*->%

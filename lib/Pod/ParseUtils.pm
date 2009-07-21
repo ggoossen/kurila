@@ -86,7 +86,8 @@ method or by calling the B<file()> method with a scalar argument.
 
 # The POD file name the list appears in
 sub file
-    return ((nelems @_) +> 1) ??  @: (@_[0]->{file} = @_[1]) !! @_[0]->{file}
+    return ((nelems @_) +> 1) ?? @: (@_[0]->{file} = @_[1])
+                              !! @_[0]->{file}
 
 =item $list-E<gt>start()
 
@@ -128,7 +129,8 @@ with a scalar argument.
 
 # The type of the list (UL, OL, ...)
 sub type
-    return ((nelems @_) +> 1) ??  @: (@_[0]->{type} = @_[1]) !! @_[0]->{type}
+    return ((nelems @_) +> 1) ?? @: (@_[0]->{type} = @_[1])
+                              !! @_[0]->{type}
 
 
 =item $list-E<gt>rx()
@@ -469,12 +471,14 @@ the link was encountered in. Has to be filled in manually.
 
 # The line in the file the link appears
 sub line
-    return ((nelems @_) +> 1) ?? @: (@_[0]->{+line} = @_[1]) !! @_[0]->{?line}
+    return ((nelems @_) +> 1) ?? @: (@_[0]->{+line} = @_[1])
+                              !! @_[0]->{?line}
 
 
 # The POD file name the link appears in
 sub file
-    return ((nelems @_) +> 1) ?? @: (@_[0]->{+file} = @_[1]) !! @_[0]->{?file}
+    return ((nelems @_) +> 1) ?? @: (@_[0]->{+file} = @_[1])
+                              !! @_[0]->{?file}
 
 
 =item $link-E<gt>page()

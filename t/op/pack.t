@@ -365,7 +365,7 @@ do
         local $^WARN_HOOK = sub (@< @_)
             $warning = @_[0]->message
         
-        my $junk = pack("p", &foo( < @_ ))
+        my $junk = pack("p", foo( < @_ ))
     
 
     like($warning, qr/temporary val/)
@@ -589,7 +589,7 @@ sub numbers_with_total
 
                 my $calc_sum
                 if (ref $total)
-                    $calc_sum = &$total($len)
+                    $calc_sum = $total->($len)
                 else
                     $calc_sum = $total
                     # Shift into range by some multiple of the total
@@ -618,7 +618,7 @@ sub numbers_with_total
                         && ($calc_sum +<= $sum * $delta && $calc_sum +>= $sum / $delta))
                         pass ("unpack '\%$_$format' gave $sum, expected $calc_sum")
                     else
-                        my $text = ref $total ?? &$total($len) !! $total
+                        my $text = ref $total ?? $total->($len) !! $total
                         fail
                         info "For list (" . join (", ", @_) . ") (total $text)"
                              . " packed with $format unpack '\%$_$format' gave $sum,"

@@ -163,7 +163,7 @@ sub self_and_super_versions { @+: map {
 
 ###########################################################################
 sub super_path
-    my @ret = &self_and_super_path(< @_)
+    my @ret = self_and_super_path(< @_)
     shift @ret if (nelems @ret)
     return @ret
 

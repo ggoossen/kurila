@@ -167,7 +167,7 @@ sub _populate
 sub getpwent () { _populate(CORE::getpwent()) }
 sub getpwnam ($v) { _populate(CORE::getpwnam($v)) }
 sub getpwuid ($v) { _populate(CORE::getpwuid($v)) }
-sub getpw    ($v) { ($v =~ m/^\d+\z/s) ?? &getpwuid($v) !! &getpwnam($v) }
+sub getpw    ($v) { ($v =~ m/^\d+\z/s) ?? getpwuid($v) !! getpwnam($v) }
 
 _feature_init()
 

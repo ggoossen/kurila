@@ -93,7 +93,7 @@ while ((@: ?$key, ?$value) = @: each(%h))
 
 is ($i, 5)
 
-our @tests = @: &next_test( < @_ ), &next_test( < @_ ), &next_test( < @_ )
+our @tests = @: next_test( < @_ ), next_test( < @_ ), next_test( < @_ )
 do
     package Obj
     sub DESTROY { print $^STDOUT, "ok @::tests[?1] # DESTROY called\n"; }

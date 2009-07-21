@@ -79,7 +79,7 @@ sub _timegm
     my $sec =
         $SecOff + @_[0] + ( SECS_PER_MINUTE * @_[1] ) + ( SECS_PER_HOUR * @_[2] )
 
-    return $sec + ( SECS_PER_DAY * &_daygm( < @_ ) )
+    return $sec + ( SECS_PER_DAY * _daygm( < @_ ) )
 
 
 sub timegm( $sec, $min, $hour, $mday, $month, $year, ...)
@@ -140,11 +140,11 @@ sub _is_leap_year
 
 sub timegm_nocheck
     local %Options{+no_range_check} = 1
-    return &timegm( < @_ )
+    return timegm( < @_ )
 
 
 sub timelocal
-    my $ref_t = &timegm( < @_ )
+    my $ref_t = timegm( < @_ )
     my $loc_for_ref_t = _timegm( localtime($ref_t) )
 
     my $zone_off = $loc_for_ref_t - $ref_t
@@ -180,7 +180,7 @@ sub timelocal
 
 sub timelocal_nocheck
     local %Options{+no_range_check} = 1
-    return &timelocal( < @_ )
+    return timelocal( < @_ )
 
 
 1

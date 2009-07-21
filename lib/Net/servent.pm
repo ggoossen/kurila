@@ -40,7 +40,7 @@ sub getservbyname ($name, ?$proto) { populate(CORE::getservbyname($name,$proto||
 sub getservbyport ($port, ?$proto) { populate(CORE::getservbyport($port,$proto||'tcp')) }
 
 sub getserv ($serv, ?$proto)
-    return &{'getservby' . ($serv=~m/^\d+$/ ?? 'port' !! 'name')}($serv, $proto)
+    return {'getservby' . ($serv=~m/^\d+$/ ?? 'port' !! 'name')}->($serv, $proto)
 
 
 1

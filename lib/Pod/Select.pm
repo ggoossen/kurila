@@ -361,7 +361,7 @@ sub select
 
     ## Compile each spec
     for my $spec ( @sections)
-        if ( defined($_ = &_compile_section_spec($spec)) )
+        if ( defined($_ = _compile_section_spec($spec)) )
             ## Store them in our sections array
             push($selected_sections->@, $_)
         else

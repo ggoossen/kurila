@@ -15,9 +15,9 @@ use File::Basename
 use File::Spec
 
 sub ext
-    if   ($^OS_NAME eq 'VMS')     { return &_vms_ext( < @_ );      }
-        elsif($^OS_NAME eq 'MSWin32') { return &_win32_ext( < @_ );    }
-    else                    { return &_unix_os2_ext( < @_ ); }
+    if   ($^OS_NAME eq 'VMS')     { return _vms_ext( < @_ );      }
+        elsif($^OS_NAME eq 'MSWin32') { return _win32_ext( < @_ );    }
+    else                    { return _unix_os2_ext( < @_ ); }
 
 
 sub _unix_os2_ext($self,$potential_libs, ?$verbose, ?$give_libs)

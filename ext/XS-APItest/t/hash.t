@@ -23,17 +23,16 @@ main_tests (\@keys, \@testkeys, '');
 
 main_tests (\@keys, \@testkeys, ' [utf8 hash]');
 
-do {
-  my %h = %(a=>'cheat');
-  tie %h, 'Tie::StdHash';
+do
+  my %h = %: a=>'cheat'
+  tie %h, 'Tie::StdHash'
   # is bug 36327 fixed?
-  my $result = undef;
+  my $result = undef
 
-  is (XS::APItest::Hash::store(\%h, chr 258,  1), $result);
-    
+  is (XS::APItest::Hash::store(\%h, chr 258,  1), $result)
+
   ok (exists %h{$utf8_for_258},
-      "hv_store does insert a key with the raw utf8 on a tied hash");
-};
+      "hv_store does insert a key with the raw utf8 on a tied hash")
 
 do {
     my $strtab = strtab();
@@ -75,13 +74,13 @@ foreach my $in ("", "N", "a\0b") {
     is ($got, $in, "test_share_unshare_pvn");
 }
 
-do {
+do
     foreach (\@(\&XS::APItest::Hash::rot13_hash, \&rot13, "rot 13"),
 	     \@(\&XS::APItest::Hash::bitflip_hash, \&bitflip, "bitflip"),
 	    ) {
 	my ($setup, $mapping, $name) = < @$_;
 	my %hash;
-	my %placebo = %(a => 1, p => 2, i => 4, e => 8);
+	my %placebo = %: a => 1, p => 2, i => 4, e => 8
 	$setup->(\%hash);
 	%hash{a}++; %hash{[qw(p i e)]} = (2, 4, 8);
 

@@ -18,7 +18,7 @@ sub foo {}
 my $sub
 try{ $sub = B::Terse::compile('', 'foo') }
 is( $^EVAL_ERROR, '', 'compile()' )
-ok( defined &$sub, 'valid subref back from compile()' )
+ok( defined $sub->&, 'valid subref back from compile()' )
 
 # and point it at a real sub and hope the returned ops look alright
 my $out = ""

@@ -233,7 +233,7 @@ my $got = runperl (
     prog => q{
                     our @a;
 		    sub X::DESTROY { @a = () }
-		    @a = @(bless \%(), "X");
+		    @a = @(bless \$%, "X");
 		    @a = ();
 		},
     stderr => 1

@@ -130,7 +130,7 @@ sub boottime_iterator($self, $type, $iterator, $hash, $subname)
 
     my $athx = $self->C_constant_prefix_param()
 
-    return sprintf <<"EOBOOT", &$generator( < &$extractor($iterator))
+    return sprintf <<"EOBOOT", $generator->( < $extractor->($iterator))
         while ($iterator->name) \{
 	    $subname($athx $hash, $iterator->name,
 				$iterator->namelen, \%s);
@@ -321,7 +321,7 @@ EOBOOT
                 print $xs_fh, "#else\n"
             
             print $xs_fh, "        \{ ", join (', ', (@:  "\"$name\"", $namelen
-                                                          < &$type_to_value($value))), " \},\n",
+                                                          < $type_to_value->($value))), " \},\n",
                 $self->macro_to_endif($macro)
         
 
@@ -427,11 +427,11 @@ EOBOOT
         # And because the code in pre might be both declarations and
         # statements, we can't declare and assign to the temporaries in one.
         $counter = 0
-        foreach (&$type_to_value($value))
+        foreach ($type_to_value->($value))
             printf $xs_fh, "            temp\%d = \%s;\n", $counter++, $_
 
         my @tempvarnames = map {sprintf 'temp%d', $_}, 0 .. $counter - 1
-        printf $xs_fh, <<"EOBOOT", $name, &$generator(<@tempvarnames)
+        printf $xs_fh, <<"EOBOOT", $name, $generator->(<@tempvarnames)
 	    $($c_subname)_add_symbol($athx symbol_table, "\%s",
 				    $namelen, \%s);
 EOBOOT

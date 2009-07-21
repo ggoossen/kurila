@@ -121,7 +121,7 @@ while (~< *$utilsfh)
             $xold =~ s/^\Q%opts{'destdir'}\E// if %opts{'destdir'}
             my $xnew = $new
             $xnew =~ s/^\Q%opts{'destdir'}\E// if %opts{'destdir'}
-            $packlist->{data}{+$xnew} = \%( from => $xold, type => 'link' )
+            $packlist->{data}{+$xnew} = \%: from => $xold, type => 'link'
 
 sub pod2man($poddir, $mandir, $manext, @<@script)
     # @script is scripts names if we are installing manpages embedded 
@@ -144,17 +144,16 @@ sub pod2man($poddir, $mandir, $manext, @<@script)
     # dir ('.'), values are names relative to $poddir.
     my %modpods
     if (@script)
-        %modpods = %( < @+: map { @: "$poddir/$_", $_ }, @script)
+        %modpods = %+: map { %: "$poddir/$_", $_ }, @script
     else
-        File::Find::find(\%(no_chdir=>1,
-                            wanted => sub {
-                                # $_ is $File::Find::name when using no_chdir
-                                if (-f $_ and m/\.p(?:m|od)$/) {
-                                    my $fullname = $_;
-                                    s!^\Q$poddir\E/!!;
-                                    %modpods{+$fullname} = $_;
-                                }
-                            }),
+        File::Find::find(\%: no_chdir=>1
+                             wanted => sub ()
+                                  # $_ is $File::Find::name when using no_chdir
+                                  if (-f $_ and m/\.p(?:m|od)$/)
+                                      my $fullname = $_
+                                      s!^\Q$poddir\E/!!
+                                      %modpods{+$fullname} = $_
+                         ,
                          $poddir);
     my @to_process
     foreach my $mod (sort keys %modpods)
@@ -181,14 +180,13 @@ sub pod2man($poddir, $mandir, $manext, @<@script)
         # Convert name from  File/Basename.pm to File::Basename.3 format,
         # if necessary.
         $manpage =~ s#\.p(m|od)$##
-        if ($^OS_NAME eq 'os2' || $^OS_NAME eq 'amigaos' || $^OS_NAME eq 'uwin' || $^OS_NAME eq 'cygwin') {
-          $manpage =~ s#/#.#g;
-        }
-        else {
-          $manpage =~ s#/#::#g;
-        }
-        $tmp = "$($mandir)/$($manpage).tmp";
-        $manpage = "$($mandir)/$($manpage).$($manext)";
+        if ($^OS_NAME eq 'os2' || $^OS_NAME eq 'amigaos' || $^OS_NAME eq 'uwin' || $^OS_NAME eq 'cygwin')
+          $manpage =~ s#/#.#g
+        else
+          $manpage =~ s#/#::#g
+
+        $tmp = "$($mandir)/$($manpage).tmp"
+        $manpage = "$($mandir)/$($manpage).$($manext)"
         push @to_process, \@: $mod, $tmp, $manpage
 
     foreach my $page (@to_process) {
@@ -202,13 +200,11 @@ sub pod2man($poddir, $mandir, $manext, @<@script)
         $xmanpage =~ s/^\Q%opts{'destdir'}\E// if %opts{'destdir'};
         print $^STDOUT, "  $xmanpage\n";
         if (!%opts{notify} && $parser->parse_from_file($pod, $tmp)) {
-            if (-s $tmp) {
-                if (rename($tmp, $manpage)) {
-                    $packlist->{data}{+$xmanpage} = \%( type => 'file' );
-                    next;
-                }
-            }
-            unlink($tmp);
+            if (-s $tmp)
+                if (rename($tmp, $manpage))
+                    $packlist->{data}{+$xmanpage} = \%: type => 'file'
+                    next
+            unlink($tmp)
         }
     }
 
@@ -255,7 +251,7 @@ sub link($from,$to)
     $success
 
 sub rename($from,$to)
-    if (-f $to and not &unlink($to))
+    if (-f $to and not (&unlink <: $to))
         my $i = 1;
         while ($i +< 50) {
             last if CORE::rename($to, "$to.$i");
@@ -264,8 +260,8 @@ sub rename($from,$to)
         warn("Cannot rename to `$to.$i': $^OS_ERROR"), return 0 
             if $i +>= 50;       # Give up!
 
-    &link($from,$to) || return 0
-    &unlink($from)
+    (&link <: $from,$to) || return 0
+    &unlink <: $from
 
 sub chmod($mode,$name)
     printf $^STDOUT, "  chmod \%o \%s\n", $mode, $name if %opts{verbose}

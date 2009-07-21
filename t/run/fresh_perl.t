@@ -43,8 +43,6 @@ foreach my $prog ( @prgs)
         if (eval $1)
             ok(1, "Skip: $1")
             next
-        
-    
 
     $expected =~ s/\n+$//
 
@@ -197,7 +195,7 @@ destroyed
 ########
 # TODO
 package X;
-sub ahash { bless \%() }
+sub ahash { bless \$% }
 sub DESTROY { print $^STDOUT, "destroyed\n" };
 package main;
 *h = X->ahash();
@@ -375,10 +373,10 @@ our $x;
 our $code = eval q[
   sub { eval '$x = "ok 1\n"'; }
 ];
-&{$code}();
+$code->();
 print $^STDOUT, $x;
 EXPECT
 ok 1
 ######## [ID 20020623.009] nested eval/sub segfaults
 our $eval = eval 'sub { eval q|sub { %S }| }';
-$eval->(\%());
+$eval->(\$%);

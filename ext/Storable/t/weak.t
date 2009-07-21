@@ -29,9 +29,9 @@ our $file
 sub tester
     my (@: $contents, $sub, $testersub, $what) = @_
     # Test that if we re-write it, everything still works:
-    my $clone = &$sub ($contents)
+    my $clone = $sub ->($contents)
     is ($^EVAL_ERROR, "", "There should be no error extracting for $what")
-    &$testersub ($clone, $what)
+    $testersub ->($clone, $what)
 
 
 my $r = \$%

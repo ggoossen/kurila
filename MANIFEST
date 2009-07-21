@@ -9,16 +9,6 @@ beos/beosish.h		BeOS port
 beos/nm.c		BeOS port
 cc_runtime.h		Macros need by runtime of compiler-generated code
 cflags.SH		A script that emits C compilation flags per file
-Changes			Differences from previous version
-Changes5.000		Differences between 4.x and 5.000
-Changes5.001		Differences between 5.000 and 5.001
-Changes5.002		Differences between 5.001 and 5.002
-Changes5.003		Differences between 5.002 and 5.003
-Changes5.004		Differences between 5.003 and 5.004
-Changes5.005		Differences between 5.004 and 5.005
-Changes5.10		Differences between 5.8.0 and 5.10.0 (and maint-5.8)
-Changes5.6		Differences between 5.005 and 5.6
-Changes5.8		Differences between 5.6.0 and 5.8.0 (and maint-5.6)
 config_h.SH		Produces config.h
 configpm		Produces lib/Config.pm
 Configure		Portability tool
@@ -1786,7 +1776,7 @@ pod/perlstyle.pod		Perl style guide
 pod/perlsub.pod			Perl subroutines
 pod/kurilasyn.pod			Perl Kurila syntax
 pod/perlthrtut.pod		Perl threads tutorial
-pod/perltodo.pod		Perl things to do
+pod/kurilatodo.pod		Perl Kurila things to do
 pod/perltooc.pod		Perl OO tutorial, part 2
 pod/perltoot.pod		Perl OO tutorial, part 1
 pod/perltrap.pod		Perl traps for the unwary
@@ -2039,9 +2029,10 @@ t/lex/use.t			See if use works
 t/lex/ver.t			See if v-strings and the %v format flag work
 t/lex/location.t		See if locations are correctly saved
 t/lex/indentation.t		See if indentation works
-t/op/anon_array.t		See if @( ... ) work
+t/op/call.t			See if <: work
+t/op/anon_array.t		See if @: ... work
 t/op/hashconcat.t		See if +%+ works
-t/op/anon_hash.t		See if %( ... ) work
+t/op/anon_hash.t		See if %: ... work
 t/op/aslice.t		See if [[...]] work
 t/op/hashjoin.t		See if %+: work
 t/op/shift.t		See if shift work
@@ -2049,17 +2040,6 @@ t/lib/Cname.pm			Test charnames in regexes (op/pat.t)
 t/lib/common.pl			Helper for lib/{warnings,feature}.t
 t/lib/commonsense.t		See if configuration meets basic needs
 t/lib/compmod.pl		Helper for 1_compile.t
-t/lib/compress/any.pl		Compress::Zlib
-t/lib/compress/CompTestUtils.pm	Compress::Zlib
-t/lib/compress/destroy.pl	Compress::Zlib
-t/lib/compress/generic.pl	Compress::Zlib
-t/lib/compress/multi.pl		Compress::Zlib
-t/lib/compress/newtied.pl	Compress::Zlib
-t/lib/compress/oneshot.pl	Compress::Zlib
-t/lib/compress/prime.pl		Compress::Zlib
-t/lib/compress/tied.pl		Compress::Zlib
-t/lib/compress/truncate.pl	Compress::Zlib
-t/lib/compress/zlib-generic.pl	Compress::Zlib
 t/lib/contains_pod.xr		Pod-Parser test file
 t/lib/cygwin.t			Builtin cygwin function tests
 t/lib/Devel/switchd.pm		Module for t/run/switchd.t
@@ -2254,7 +2234,6 @@ t/op/reverse.t			See if reverse operator works
 t/op/runlevel.t			See if die() works from perl_call_*()
 t/op/rxcode.t			See if /(?{ code })/ works
 t/op/sleep.t			See if sleep works
-t/op/smartmatch.t		See if the ~~ operator works
 t/op/sort.t			See if sort works
 t/op/splice.t			See if splice works
 t/op/split.t			See if split works

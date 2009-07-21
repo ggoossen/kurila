@@ -35,13 +35,13 @@ our @a = @: 'first', undef, 3, -4, -3.14159, 456, 4.5, $d, \$d, \$e, $e
 
 ok defined (our $f1 = freeze(\@a))
 
-our $dumped = &dump(\@a)
+our $dumped = dump(\@a)
 ok 1
 
 our $root = thaw($f1)
 ok defined $root
 
-our $got = &dump($root)
+our $got = dump($root)
 ok 1
 
 ok $got eq $dumped;
@@ -64,18 +64,18 @@ ok(our $f3 = $foo->nfreeze)
 our $root3 = thaw($f3)
 ok defined $root3
 
-ok &dump($foo) eq &dump($root3)
+ok dump($foo) eq dump($root3)
 
 $root = thaw($f2)
-ok &dump($foo) eq &dump($root)
+ok dump($foo) eq dump($root)
 
-ok &dump($root3) eq &dump($root)
+ok dump($root3) eq dump($root)
 
 our $other = freeze($root)
 ok length($other) == length($f2)
 
 our $root2 = thaw($other)
-ok &dump($root2) eq &dump($root)
+ok dump($root2) eq dump($root)
 
 our $VAR1 = \@: 
  'method'

@@ -20,7 +20,7 @@ $b = "ok 6\n"
 $c = "ok 7\n"
 $d = "ok 8\n"
 
-print $^STDOUT, &foo("ok 1\n","ok 2\n")
+print $^STDOUT, foo("ok 1\n","ok 2\n")
 
 print $^STDOUT, $a,$b,$c,$d,$x,$y
 
@@ -40,7 +40,7 @@ $a = "ok 15\n"
 @c = @:  "ok 17\n" 
 %d{+''} = "ok 18\n"
 
-print $^STDOUT, &foo2("ok 11\n","ok 12\n")
+print $^STDOUT, foo2("ok 11\n","ok 12\n")
 
 print $^STDOUT, $a,< @b,< @c,< %d,$x,$y
 

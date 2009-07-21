@@ -32,5 +32,5 @@ SKIP: do
     $^OS_ERROR = 0
     no warnings 'unopened';
     read(\*B,$b,1)
-    ok($^OS_ERROR == &Errno::EBADF( < @_ ))
+    ok($^OS_ERROR == Errno::EBADF( < @_ ))
 

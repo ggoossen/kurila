@@ -1125,29 +1125,28 @@ state.
 
 =cut
 
-%optionVars = %(
-    hashDepth     => \$dumpvar::hashDepth,
-    arrayDepth    => \$dumpvar::arrayDepth,
-    CommandSet    => \$CommandSet,
-    DumpDBFiles   => \$dumpvar::dumpDBFiles,
-    DumpPackages  => \$dumpvar::dumpPackages,
-    DumpReused    => \$dumpvar::dumpReused,
-    HighBit       => \$dumpvar::quoteHighBit,
-    undefPrint    => \$dumpvar::printUndef,
-    globPrint     => \$dumpvar::globPrint,
-    UsageOnly     => \$dumpvar::usageOnly,
-    CreateTTY     => \$CreateTTY,
-    bareStringify => \$dumpvar::bareStringify,
-    frame         => \$frame,
-    AutoTrace     => \$trace,
-    inhibit_exit  => \$inhibit_exit,
-    maxTraceLen   => \$maxtrace,
-    ImmediateStop => \$ImmediateStop,
-    RemotePort    => \$remoteport,
-    windowSize    => \$window,
-    HistFile      => \$histfile,
-    HistSize      => \$histsize,
-);
+%optionVars = %:
+    hashDepth     => \$dumpvar::hashDepth
+    arrayDepth    => \$dumpvar::arrayDepth
+    CommandSet    => \$CommandSet
+    DumpDBFiles   => \$dumpvar::dumpDBFiles
+    DumpPackages  => \$dumpvar::dumpPackages
+    DumpReused    => \$dumpvar::dumpReused
+    HighBit       => \$dumpvar::quoteHighBit
+    undefPrint    => \$dumpvar::printUndef
+    globPrint     => \$dumpvar::globPrint
+    UsageOnly     => \$dumpvar::usageOnly
+    CreateTTY     => \$CreateTTY
+    bareStringify => \$dumpvar::bareStringify
+    frame         => \$frame
+    AutoTrace     => \$trace
+    inhibit_exit  => \$inhibit_exit
+    maxTraceLen   => \$maxtrace
+    ImmediateStop => \$ImmediateStop
+    RemotePort    => \$remoteport
+    windowSize    => \$window
+    HistFile      => \$histfile
+    HistSize      => \$histsize
 
 =pod
 
@@ -1156,26 +1155,25 @@ option.
 
 =cut 
 
-%optionAction = %(
-    compactDump   => \&dumpvar::compactDump,
-    veryCompact   => \&dumpvar::veryCompact,
-    quote         => \&dumpvar::quote,
-    TTY           => \&TTY,
-    noTTY         => \&noTTY,
-    ReadLine      => \&ReadLine,
-    NonStop       => \&NonStop,
-    LineInfo      => \&LineInfo,
-    recallCommand => \&recallCommand,
-    ShellBang     => \&shellBang,
-    pager         => \&pager,
-    signalLevel   => \&signalLevel,
-    warnLevel     => \&warnLevel,
-    dieLevel      => \&dieLevel,
-    tkRunning     => \&tkRunning,
-    ornaments     => \&ornaments,
-    RemotePort    => \&RemotePort,
-    DollarCaretP  => \&DollarCaretP,
-);
+%optionAction = %:
+    compactDump   => \&dumpvar::compactDump
+    veryCompact   => \&dumpvar::veryCompact
+    quote         => \&dumpvar::quote
+    TTY           => \&TTY
+    noTTY         => \&noTTY
+    ReadLine      => \&ReadLine
+    NonStop       => \&NonStop
+    LineInfo      => \&LineInfo
+    recallCommand => \&recallCommand
+    ShellBang     => \&shellBang
+    pager         => \&pager
+    signalLevel   => \&signalLevel
+    warnLevel     => \&warnLevel
+    dieLevel      => \&dieLevel
+    tkRunning     => \&tkRunning
+    ornaments     => \&ornaments
+    RemotePort    => \&RemotePort
+    DollarCaretP  => \&DollarCaretP
 
 =pod
 
@@ -1189,11 +1187,10 @@ option is used.
 # not in the table. A subsequent patch will correct this problem; for
 # the moment, we're just recommenting, and we are NOT going to change
 # function.
-%optionRequire = %(
-    compactDump => 'dumpvar.pl',
-    veryCompact => 'dumpvar.pl',
-    quote       => 'dumpvar.pl',
-);
+%optionRequire = %:
+    compactDump => 'dumpvar.pl'
+    veryCompact => 'dumpvar.pl'
+    quote       => 'dumpvar.pl'
 
 =pod
 
@@ -1549,7 +1546,7 @@ if ( exists %ENV{PERLDB_RESTART} )
     # restore breakpoints/actions
     my @had_breakpoints = get_list("PERLDB_VISITED")
     for ( 0 .. (nelems @had_breakpoints)-1 )
-        my %pf = %( < get_list("PERLDB_FILE_$_") )
+        my %pf = %: < get_list("PERLDB_FILE_$_")
         %postponed_file{ @had_breakpoints[$_] } = \%pf if %pf
 
     # restore options
@@ -3820,16 +3817,14 @@ Note that trying to set the CommandSet to C<foobar> simply results in the
 
 ### The API section
 
-my %set = %(    #
-    'pre590' => \%(
-        '<'  => 'pre590_prepost',
-        '<<' => 'pre590_prepost',
-        '>'  => 'pre590_prepost',
-        '>>' => 'pre590_prepost',
-        '{'  => 'pre590_prepost',
-        '{{' => 'pre590_prepost',
-    ),
-);
+my %set = %:    #
+    'pre590' => \%:
+        '<'  => 'pre590_prepost'
+        '<<' => 'pre590_prepost'
+        '>'  => 'pre590_prepost'
+        '>>' => 'pre590_prepost'
+        '{'  => 'pre590_prepost'
+        '{{' => 'pre590_prepost'
 
 =head2 C<cmd_wrapper()> (API)
 
@@ -5789,13 +5784,12 @@ sub dump_trace {
         # Stick the collected information into @sub as an anonymous hash.
         push(
             @sub,
-            \%(
-                context => $context,
-                sub     => $sub,
-                args    => $args,
-                file    => $file,
+            \%:
+                context => $context
+                sub     => $sub
+                args    => $args
+                file    => $file
                 line    => $line
-            )
         );
 
         # Stop processing frames if the user hit control-C.
@@ -6101,8 +6095,8 @@ my $c_pipe = 0;
 sub os2_get_fork_TTY { # A simplification of the following (and works without):
     local $\  = '';
     ( my $name = $0 ) =~ s,^.*[/\\],,s;
-    my %opt = %(	title => "Daughter Perl debugger $pids $name",
-		($rl ? (read_by_key => 1) : ()) );
+    my %opt = %: title => "Daughter Perl debugger $pids $name"
+		 ($rl ? (read_by_key => 1) : ())
     require OS2::Process;
     my ($in, $out, $pid) = try { < OS2::Process::io_term(related => 0, < %opt) }
       or return;
@@ -6503,10 +6497,10 @@ sub parse_options {
     local $\ = '';
 
     # These options need a value. Don't allow them to be clobbered by accident.
-    my %opt_needs_val = %( map { ( $_ => 1 ) } qw{
+    my %opt_needs_val = %: map { ( $_ => 1 ) } qw{
       dumpDepth arrayDepth hashDepth LineInfo maxTraceLen ornaments windowSize
       pager quote ReadLine recallCommand RemotePort ShellBang TTY CommandSet
-    } );
+    }
 
     while (length) {
         my $val_defaulted;

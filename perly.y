@@ -79,8 +79,8 @@
 %token <i_tkval> LOOPEX DOTDOT
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
-%token <i_tkval> DO LOOPDO NOAMP
-%token <i_tkval> ANONHSH ANONSCALAR
+%token <i_tkval> DO LOOPDO NOAMP NOAMPCALL
+%token <i_tkval> ANONSCALAR
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
 %token <i_tkval> SPECIALBLOCK
@@ -100,10 +100,10 @@
 %type <opval> mydef
 
 %type <opval> block dblock mblock lineseq line loop cond else
-%type <opval> expr term subscripted scalar star amper sideff
+%type <opval> expr term subscripted scalar star sideff
 %type <opval> assignexpr
 %type <opval> argexpr texpr iexpr mexpr miexpr
-%type <opval> listexpr listexprcom indirob listop method
+%type <opval> listexpr listexprcom indirob listop method layoutlistexpr
 %type <opval> subname protoassign proto subbody cont my_scalar
 %type <opval> myattrterm myterm
 %type <opval> termbinop termunop anonymous termdo
@@ -139,11 +139,12 @@
 %left <i_tkval> MATCHOP
 %right <i_tkval> '!' '~' UMINUS SREFGEN '?'
 %right <i_tkval> POWOP
+%nonassoc CALLOP
 %nonassoc <i_tkval> PREINC PREDEC POSTINC POSTDEC
 %left <i_tkval> ARROW DEREFSCL DEREFARY DEREFHSH DEREFSTAR DEREFAMP HSLICE ASLICE
 %nonassoc <i_tkval> ')'
 %left <i_tkval> '('
-%left '[' '{' ANONHSH ANONSCALAR
+%left '[' '{' ANONSCALAR
 
 %token <i_tkval> PEG
 
@@ -1100,6 +1101,12 @@ term	:	'?' term
                             TOKEN_GETMAD($1,$$,'H');
                             $$->op_flags |= OPf_OPTIONAL;
                         }
+        |       term CALLOP layoutlistexpr
+			{ 
+                            $1->op_private |= OPpENTERSUB_AMPER;
+                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
+				append_elem(OP_LIST, $3, scalar($1)), $1->op_location);
+                        }
         |       termbinop
 			{ $$ = $1; }
 	|	termunop
@@ -1147,29 +1154,32 @@ term	:	'?' term
 			{ $$ = $1; }
 	|	THING	%prec '('
 			{ $$ = $1; }
-	|	amper                                /* &foo; */
+	|	'&' indirob                                /* &foo; */
                         {
-                            $$ = $1;
+                            $$ = newCVREF(0,$2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'&');
                             $$->op_flags |= OPf_SPECIAL;
                         }
-	|	amper '(' ')'                        /* &foo() */
+	|	NOAMPCALL indirob '(' ')'                        /* &foo() */
 			{
-                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar($1), $1->op_location);
-			  TOKEN_GETMAD($2,$$,'(');
-			  TOKEN_GETMAD($3,$$,')');
-                          APPEND_MADPROPS_PV("amper", $$, '>');
+                            OP* cv = newCVREF(0, $2, LOCATION($1));
+                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar(cv), $2->op_location);
+                            TOKEN_GETMAD($3,$$,'(');
+                            TOKEN_GETMAD($4,$$,')');
+                            APPEND_MADPROPS_PV("amper", $$, '>');
 			}
-	|	amper '(' expr ')'                   /* &foo(@args) */
+	|	NOAMPCALL indirob '(' expr ')'                   /* &foo(@args) */
 			{
-			  $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
-				append_elem(OP_LIST, $3, scalar($1)), $1->op_location);
+                            OP* cv = newCVREF(0, $2, LOCATION($1));
+                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
+				append_elem(OP_LIST, $4, scalar(cv)), $2->op_location);
 			  DO_MAD({
 			      OP* op = $$;
 			      if (op->op_type == OP_CONST) { /* defeat const fold */
 				op = (OP*)op->op_madprop->mad_val;
 			      }
-			      TOKEN_GETMAD($2,op,'(');
-			      TOKEN_GETMAD($4,op,')');
+			      TOKEN_GETMAD($3,op,'(');
+			      TOKEN_GETMAD($5,op,')');
                               APPEND_MADPROPS_PV("amper", $$, '>');
 			  })
 			}
@@ -1346,14 +1356,16 @@ my_scalar:	scalar
 			{ PL_parser->in_my = 0; $$ = my($1); }
 	;
 
-amper	:	'&' indirob
+layoutlistexpr :    listexpr LAYOUTLISTEND
 			{ 
-                            $$ = newCVREF(IVAL($1),$2, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'&');
-			}
-	;
-
-
+                            $$ = $1
+                        }
+        |       ',' LAYOUTLISTEND
+			{ 
+                            $$ = NULL;
+                        }
+        ;
+    
 scalar  :	PRIVATEVAR
 			{ 
                             $$ = newPRIVATEVAROP(PL_parser->tokenbuf, LOCATION($1));
@@ -1370,30 +1382,11 @@ scalar  :	PRIVATEVAR
                                     PL_parser->lex_state = LEX_INTERPEND;
                             }
 			}
-	|       ANONHSH expr ')'	%prec '(' /* %( foo => "Bar" ) */
-			{ 
-                            $$ = newANONHASH($2, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'{');
-                            TOKEN_GETMAD($3,$$,'}');
-			}
-	|	ANONHSH ')'	%prec '(' /* %() */
-			{ 
-                            $$ = newANONHASH((OP*)NULL, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'{');
-                            TOKEN_GETMAD($2,$$,'}');
-			}
         |       ANONHSHL listexpr LAYOUTLISTEND /* %: ... */
                         {
                             $$ = newANONHASH($2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'{');
                             TOKEN_GETMAD($3,$$,'}');
-			}
-        |       ANONHSHL listexpr /* %: ... */
-                        {
-                            $$ = newANONHASH($2, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'{');
-                            --PL_parser->lex_brackets;
-                            PL_parser->statement_indent = PL_parser->lex_brackstack[PL_parser->lex_brackets].prev_statement_indent;
 			}
         |       ANONHSHL ',' LAYOUTLISTEND /* %: ... */
                         {
@@ -1406,13 +1399,6 @@ scalar  :	PRIVATEVAR
                             $$ = newANONARRAY($2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
                             TOKEN_GETMAD($3,$$,']');
-			}
-        |       ANONARYL listexpr /* @: ... and */
-                        {
-                            $$ = newANONARRAY($2, LOCATION($1));
-                            TOKEN_GETMAD($1,$$,'[');
-                            --PL_parser->lex_brackets;
-                            PL_parser->statement_indent = PL_parser->lex_brackstack[PL_parser->lex_brackets].prev_statement_indent;
 			}
         |       ANONARYL ',' LAYOUTLISTEND  /* @: ... */
                         {
