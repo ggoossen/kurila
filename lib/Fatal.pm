@@ -56,7 +56,7 @@ EOC
 
 
 sub one_invocation($core, $call, $name, @< @argv)
-    return qq{$call($(join ', ', @argv)) || die "Can't $name(\$(join ', ', map \{ dump::view(\$_) \}, \@_))} .
+    return qq{($call $(join ', ', @argv)) || die "Can't $name(\$(join ', ', map \{ dump::view(\$_) \}, \@_))} .
         ($core ?? ': $^OS_ERROR' !! ', \$^OS_ERROR is \"$^OS_ERROR\"') . '"'
 
 
@@ -68,7 +68,7 @@ sub _make_fatal($sub, $pkg)
     $name = $sub
     $name =~ s/.*::// or $name =~ s/^&//
     $sub = Symbol::fetch_glob($sub)
-    print $^STDOUT, "# _make_fatal: sub=$sub pkg=$pkg name=$name\n" if $Debug
+    print $^STDOUT, "# _make_fatal: pkg=$pkg name=$name\n" if $Debug
     die "Bad subroutine name for Fatal: $name" unless $name =~ m/^\w+$/
     if (defined($sub->&)) # user subroutine
         $sref = \$sub->&
