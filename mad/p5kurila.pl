@@ -1917,6 +1917,37 @@ sub empty_array {
     return;
 }
 
+sub sub_deref {
+    my ($xml) = @_;
+    for my $op (find_ops($xml, "rv2cv")) {
+        next unless get_madprop($op, "ampersand");
+        if (($op->ancestors)[1]
+          and (get_madprop(($op->ancestors)[1], "null_type")||'') eq "amper") {
+            my $amp_v = get_madprop($op, "ampersand");
+            if ($amp_v ne "&amp;") {
+                $amp_v =~ s/^&amp;//;
+                set_madprop($op, "ampersand", $amp_v);
+            }
+            else {
+                set_madprop($op, "ampersand", "");
+                set_madprop(($op->ancestors)[1], "round_open", "->(");
+                my $scopeop = $op->child(1);
+                next unless $scopeop and $scopeop->tag eq "op_scope";
+                set_madprop($scopeop, "curly_open", "");
+                set_madprop($scopeop, "curly_close", "");
+            }
+        }
+        else {
+            my $scopeop = $op->child(1);
+            next unless $scopeop and $scopeop->tag eq "op_scope";
+            set_madprop($scopeop, "curly_open", "");
+            set_madprop($scopeop, "curly_close", "->&amp;");
+            set_madprop($op, "ampersand", "");
+        }
+    }
+    return;
+}
+
 my $from; # floating point number with starting version of kurila.
 my $to;
 GetOptions("from=s" => \$from, "to=s" => \$to);
@@ -2046,12 +2077,14 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.19') {
     sub_defargs($twig);
 }
 
-if ($to->{v} >= qv '1.20') {
+if ($from->{branch} ne "kurila" or $from->{v} < qv '1.20') {
     indent($twig);
+    empty_array($twig);
 }
 
+sub_deref($twig);
+
 #array_simplify($twig);
-#empty_array($twig);
 
 #future: add_call_parens($twig);
 

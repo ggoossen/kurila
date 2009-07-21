@@ -122,8 +122,6 @@ our %failing = map { $_, 1 } qw|
 my @files;
 find( sub { push @files, $File::Find::name if m/[.]t$/ }, '../t/');
 
-@files = ('../t/pod/oneline_cmds.t');
-    
 $ENV{PERL_CORE} = 1;
 
 for my $file (@files) {
@@ -177,7 +175,7 @@ __END__
 DATA
 ########
 # split with PUSHRE
-my @prgs = @( split "\n########\n", ~< *DATA );
+my @prgs = @: split "\n########\n", ~< *DATA
 ########
 if ($a) { $b }
 33
@@ -217,7 +215,7 @@ job system, though it's not on CPAN at the time of writing this.
 
 =cut
 ########
-$^INCLUDE_PATH = @( qw(foo bar) );
+$^INCLUDE_PATH = qw(foo bar)
 ########
 if (int(1.23) == 1) { print \*STDOUT, "1"; } else { print \*STDOUT, "2"; }
 ########
@@ -302,10 +300,10 @@ pos($a);
 LABEL: for (@: 1) { warn "arg" }
 ########
 # optional assignment
-my @( ? $x) = qw();
+my @: ? $x = qw();
 ########
 # dotdotdot operator
-my @($pw, ...) = qw(aap noot mies);
+my @: $pw, ... = qw(aap noot mies);
 ########
 # or assignment.
 my $a;
@@ -316,7 +314,7 @@ $a{?key};
 ########
 # optional assignment with our
 our $d;
-@( ? $d) = qw();
+@: ? $d = qw();
 ########
 # dynascope
 dynascope;
@@ -332,10 +330,10 @@ for my $x ($a) {
     do { 1 };;
 }
 ########
-# @( ... , ) assignment
-@( $a, ) = $b;
+# @: ... , assignment
+@: $a, = $b;
 ########
-@( ? $a->{x} ) = qw();
+@: ? $a->{x} = qw();
 ########
 *F{IO} ;
 ########
@@ -347,11 +345,11 @@ for our $_ ($a) {
 ########
 foo(1, , 2);
 ########
-my %( 1 => $v, ...) = $a;
+my %: 1 => $v, ...= $a;
 ########
-%() +%+ @();
+$% +%+ $@;
 ########
-%+: @: %();
+%+: @: $%;
 ########
 sub ok($ok, ?$name) { return "$ok - $name"; }
 ########
@@ -440,9 +438,15 @@ pod
 ########
 my (%opts);
 %opts = %+: map {
-                my @($key, $val) = @(lc $_, %opts{?$_});
+                my @: $key, $val = @: lc $_, %opts{?$_};
                 %: $key => $val;
               }, keys %opts
 ########
 sub foo(%< %: ?bar => $bar)
     "noot"
+########
+# TODO 
+sub (...) "res"
+########
+sub
+    $a++

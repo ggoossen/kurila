@@ -695,7 +695,6 @@ do
         redo if $i == 2
         cmp_ok($x,'==',1,"until/redo lexical life")
         last
-    
 
 
 TODO: do

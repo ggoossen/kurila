@@ -1272,9 +1272,6 @@ sub init_MANPODS
             $self->?$init_method()
 
 
-
-
-
 sub _has_pod($self, $file)
 
     my $ispod=0
@@ -1283,13 +1280,10 @@ sub _has_pod($self, $file)
             if (m/^=(?:head\d+|item|pod)\b/)
                 $ispod=1
                 last
-
-
         close $fh
     else
         # If it doesn't exist yet, we assume, it has pods in it
         $ispod = 1
-
 
     return $ispod
 

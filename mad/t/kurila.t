@@ -41,8 +41,9 @@ sub p5convert {
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_indent2();
+t_sub_deref();
 die "END";
+t_indent2();
 t_empty_array();
 t_array_simplify();
 t_indent();
@@ -2713,5 +2714,29 @@ $@
 %()
 ----
 $%
+END
+}
+
+sub t_sub_deref {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+&{$a}
+----
+$a->&
+====
+\&foo
+----
+\&foo
+====
+&$a()
+----
+$a->()
+====
+&foo()
+----
+foo()
+====
+&{$a}()
+----
+$a->()
 END
 }
