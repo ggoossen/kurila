@@ -10,4 +10,5 @@ do
     is( ($sub <: "aap"), "aap" )
 
 do
-    dies_like( { "foo" <: "aap" }, qr/Can't use string [(]"foo"[)] as a subroutine ref/)
+    my $x = "foo"
+    dies_like( { $x <: "aap" }, qr/Can't use string [(]"foo"[)] as a subroutine ref/)
