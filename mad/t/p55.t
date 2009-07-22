@@ -30,7 +30,7 @@ use IO::Handle;
 
 use Nomad;
 
-my $version = "kurila-1.15";
+my $version = "kurila-1.20";
 
 sub p55 {
     my ($input, $msg) = @_;
@@ -257,14 +257,14 @@ $( 3 );
 sub () { 1 }
 ########
 # assignment to hash
-my %h;
-%h = %(1, 2);
+my %h
+%h = %: 1, 2
 ########
-my %hash = %(1,2);
+my %hash = %: 1,2
 ########
 # hash expand assignment
-my %h;
-%( %< %h ) = %h;
+my %h
+%: %< %h = %h
 ########
 do {
    # comment
@@ -355,7 +355,7 @@ sub ok($ok, ?$name) { return "$ok - $name"; }
 ########
 my $sub = sub ($x) { ++$x; };
 ########
-my %(aap => $aap, noot => $noot) = %();
+my %: aap => $aap, noot => $noot = $%
 ########
 sub (_) { 1 };
 ########
@@ -372,7 +372,7 @@ local foo == 44;
 sub foo($x, $y = $z) { }
 foo(33, 55) == 44;
 ########
-local &{"foo"};
+local "foo"->&;
 ########
 BEGIN { unless(defined &DEBUG) { *DEBUG = sub () {0} } }
 BEGIN { my $x = DEBUG(); }
@@ -450,3 +450,7 @@ sub (...) "res"
 ########
 sub
     $a++
+########
+$a <: "bar"
+########
+do { $a <: "bar" }

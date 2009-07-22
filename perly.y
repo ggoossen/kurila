@@ -139,7 +139,7 @@
 %left <i_tkval> MATCHOP
 %right <i_tkval> '!' '~' UMINUS SREFGEN '?'
 %right <i_tkval> POWOP
-%nonassoc CALLOP
+%nonassoc <i_tkval> CALLOP
 %nonassoc <i_tkval> PREINC PREDEC POSTINC POSTDEC
 %left <i_tkval> ARROW DEREFSCL DEREFARY DEREFHSH DEREFSTAR DEREFAMP HSLICE ASLICE
 %nonassoc <i_tkval> ')'
@@ -1106,6 +1106,7 @@ term	:	'?' term
                             $1->op_private |= OPpENTERSUB_AMPER;
                             $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
 				append_elem(OP_LIST, $3, scalar($1)), $1->op_location);
+                            TOKEN_GETMAD($2,$$,'o');
                         }
         |       termbinop
 			{ $$ = $1; }
@@ -1358,11 +1359,20 @@ my_scalar:	scalar
 
 layoutlistexpr :    listexpr LAYOUTLISTEND
 			{ 
+#ifdef PERL_MAD
+                            $$ = convert(OP_LIST, 0, $1, $1->op_location);
+#else
                             $$ = $1
+#endif
+                            TOKEN_GETMAD($2,$$,')');
                         }
         |       ',' LAYOUTLISTEND
 			{ 
                             $$ = NULL;
+#ifdef PERL_MAD
+                            $$ = newOP(OP_NULL,0, NULL);
+#endif
+                            TOKEN_GETMAD($2,$$,')');
                         }
         ;
     

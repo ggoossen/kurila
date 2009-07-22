@@ -775,7 +775,8 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	    Perl_dump_indent(aTHX_ level, file, "PRIVATE = (%s)\n", SvPVX_const(tmpsv) + 1);
     }
 #ifdef PERL_MAD
-    dump_op_mad(aTHX_ level, file, o->op_madprop);
+    if (o->op_madprop)
+	dump_op_mad(aTHX_ level, file, o->op_madprop);
 #endif
     S_dump_op_rest(aTHX_ level, file, o);
 }

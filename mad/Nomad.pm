@@ -2686,8 +2686,10 @@ sub ast {
     push @retval, $self->madness('wrap_open');
 
     my @newkids;
+    my $null_kid;
     my @kids = @{$$self{Kids}};
     if (@kids == 1 and ref $kids[0] eq 'PLXML::op_null' and $kids[0]{was} =~ /list/) {
+        $null_kid = $kids[0];
 	@kids = @{$kids[0]{Kids}};
     }
     my $dest = pop @kids;
@@ -2700,13 +2702,15 @@ sub ast {
 	push @retval, @dest;
 	push @retval, @invocant;
     }
-    elsif (exists $$self{mp}{o} and $$self{mp}{o} eq 'do') {
-	push @retval, $self->madness('o');
-	push @retval, @dest;
-    }
     else {
-	push @retval, $self->madness('o');
-	push @retval, @dest;
+        if ( $::version->{branch} eq 'kurila' and $::version->{'v'} > v1.19 ) {
+            push @retval, @dest;
+            push @retval, $self->madness('o');
+        }
+        else {
+            push @retval, $self->madness('o');
+            push @retval, @dest;
+        }
     }
     while (@kids) {
 	my $kid = shift(@kids);
@@ -2715,6 +2719,7 @@ sub ast {
 
     push @retval, $self->madness('(');
     push @retval, @newkids;
+    push @retval, $null_kid->madness(')') if $null_kid;
     push @retval, $self->madness(')');
     return $self->newtype->new(Kids => [@retval]);
 }
