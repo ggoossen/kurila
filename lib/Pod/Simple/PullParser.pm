@@ -11,7 +11,7 @@ use Pod::Simple::PullParserStartToken
 use Pod::Simple::PullParserEndToken
 use Pod::Simple::PullParserTextToken
 
-BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
+BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless exists &DEBUG }
 
 __PACKAGE__->_accessorize(
     'source_fh',         # the filehandle we're reading from

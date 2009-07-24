@@ -109,7 +109,7 @@ dies_like( sub (@< @_) { $a->VERSION(2.719) },
 ok (try { $a->VERSION(2.718) })
 is $^EVAL_ERROR, ''
 
-my $subs = join ' ', sort grep { defined Symbol::fetch_glob("UNIVERSAL::$_")->& }, keys %UNIVERSAL::
+my $subs = join ' ', sort grep { exists Symbol::fetch_glob("UNIVERSAL::$_")->& }, keys %UNIVERSAL::
 ## The test for import here is *not* because we want to ensure that UNIVERSAL
 ## can always import; it is an historical accident that UNIVERSAL can import.
 is $subs, "DOES VERSION can import isa"
@@ -129,7 +129,7 @@ eval "use UNIVERSAL"
 
 ok $a->isa("UNIVERSAL")
 
-my $sub2 = join ' ', sort grep { defined Symbol::fetch_glob("UNIVERSAL::$_")->& }, keys %UNIVERSAL::
+my $sub2 = join ' ', sort grep { exists Symbol::fetch_glob("UNIVERSAL::$_")->& }, keys %UNIVERSAL::
 # XXX import being here is really a bug
 is $sub2, "DOES VERSION can import isa"
 

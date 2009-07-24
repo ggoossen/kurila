@@ -93,7 +93,7 @@ do { my $failed = 0;
 
 # Calling a sub from reduce should leave its refcount unchanged.
 SKIP: do
-    skip("No Internals::SvREFCNT", 1) if !defined &Internals::SvREFCNT
+    skip("No Internals::SvREFCNT", 1) if !exists &Internals::SvREFCNT
     sub mult {$a*$b}
     my $refcnt = Internals::SvREFCNT(\&mult)
     $v = reduce \&mult, < 1..6

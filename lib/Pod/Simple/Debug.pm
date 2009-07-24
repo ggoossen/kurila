@@ -26,7 +26,7 @@ sub import
                     . "\n use Pod::Simple::Debug (\\\$var, STARTNUMVAL)\nAborting")
     
 
-    if( defined &Pod::Simple::DEBUG )
+    if( exists &Pod::Simple::DEBUG )
         require Carp
         Carp::croak("It's too late to call Pod::Simple::Debug -- "
                     . "Pod::Simple has already loaded\nAborting")

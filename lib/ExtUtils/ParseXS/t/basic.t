@@ -54,7 +54,7 @@ if ($b->have_compiler)
 
     # Win32 needs to close the DLL before it can unlink it, but unfortunately
     # dl_unload_file was missing on Win32 prior to perl change #24679!
-    if ($^OS_NAME eq 'MSWin32' and defined &DynaLoader::dl_unload_file)
+    if ($^OS_NAME eq 'MSWin32' and exists &DynaLoader::dl_unload_file)
         for my $i (0 .. nelems(@DynaLoader::dl_modules) -1)
             if (@DynaLoader::dl_modules[$i] eq $module)
                 DynaLoader::dl_unload_file(@DynaLoader::dl_librefs[$i])

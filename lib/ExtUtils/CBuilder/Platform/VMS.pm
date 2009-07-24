@@ -103,7 +103,7 @@ sub lib_file($self, $dl_file)
     $dl_file = $dl_file .= '.' . $self->{config}->{?dlext}
 
     # Need to create with the same name as DynaLoader will load with.
-    if (defined &DynaLoader::mod2fname)
+    if (exists &DynaLoader::mod2fname)
         my (@: $dev,$dir,$file) =  File::Spec->splitpath($dl_file)
         $file = DynaLoader::mod2fname(\(@: $file))
         $dl_file = File::Spec->catpath($dev,$dir,$file)

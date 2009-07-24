@@ -22,7 +22,7 @@ package Pod::Simple::BlackBox
 use integer # vroom!
 
 BEGIN 
-    *DEBUG = sub (@< @_){0} unless defined &DEBUG
+    *DEBUG = sub (@< @_){0} unless exists &DEBUG
 
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

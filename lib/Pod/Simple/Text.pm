@@ -9,7 +9,7 @@ use Pod::Simple ()
 our (@ISA, $VERSION, $FREAKYMODE)
 $VERSION = '2.02'
 @ISA = @: 'Pod::Simple::Methody'
-BEGIN { *DEBUG = defined(&Pod::Simple::DEBUG)
+BEGIN { *DEBUG = exists(&Pod::Simple::DEBUG)
     ?? \&Pod::Simple::DEBUG
     !! sub() {0}
 }

@@ -1,6 +1,6 @@
 
 package Locale::Maketext::Guts
-BEGIN { *zorp = sub (@< @_) { return scalar nelems @_ } unless defined &zorp; }
+BEGIN { *zorp = sub (@< @_) { return scalar nelems @_ } unless exists &zorp; }
 # Just so we're nice and define SOMETHING in "our" package.
 
 package Locale::Maketext
@@ -9,7 +9,7 @@ our ($USE_LITERALS, $GUTSPATH)
 
 BEGIN 
     $GUTSPATH = __FILE__
-    *DEBUG = sub () {0} unless defined &DEBUG
+    *DEBUG = sub () {0} unless exists &DEBUG
 
 
 use utf8

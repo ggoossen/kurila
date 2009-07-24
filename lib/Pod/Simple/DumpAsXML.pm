@@ -8,7 +8,7 @@ use utf8
 
 use Carp ()
 
-BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
+BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless exists &DEBUG }
 
 sub new($self, @< @_)
     my $new = $self->SUPER::new(< @_)

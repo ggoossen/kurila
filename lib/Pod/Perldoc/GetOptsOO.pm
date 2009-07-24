@@ -19,7 +19,7 @@ package Pod::Perldoc::GetOptsOO
 ## sburke@cpan.org 2002-10-31
 
 BEGIN  # Make a DEBUG constant ASAP
-    *DEBUG = defined( &Pod::Perldoc::DEBUG )
+    *DEBUG = exists( &Pod::Perldoc::DEBUG )
         ?? \&Pod::Perldoc::DEBUG
         !! sub(){10}
 

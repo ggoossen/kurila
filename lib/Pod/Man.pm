@@ -44,8 +44,8 @@ $VERSION = '2.16'
 # class already, use that.  Otherwise, use any Pod::Simple debug function
 # that's defined, and failing that, define a debug level of 10.
 BEGIN 
-    my $parent = defined (&Pod::Simple::DEBUG) ?? \&Pod::Simple::DEBUG !! undef
-    unless (defined &DEBUG)
+    my $parent = exists (&Pod::Simple::DEBUG) ?? \&Pod::Simple::DEBUG !! undef
+    unless (exists &DEBUG)
         *DEBUG = $parent || sub () { 10 }
     
 

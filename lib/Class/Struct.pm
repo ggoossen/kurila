@@ -65,7 +65,7 @@ sub struct
     # Create constructor.
 
     die "function 'new' already defined in package $class"
-        if do { defined Symbol::fetch_glob($class . "::new")->& }
+        if do { exists Symbol::fetch_glob($class . "::new")->& }
 
     my @methods = $@
     my %refs = $%
@@ -139,7 +139,7 @@ sub struct
     my( $pre, $pst, $sel )
     $cnt = 0
     foreach my $name ( @methods)
-        if ( defined Symbol::fetch_glob($class . "::$name")->& )
+        if ( exists Symbol::fetch_glob($class . "::$name")->& )
             warnings::warnif("function '$name' already defined, overrides struct accessor method")
         else
             $pre = $pst = $cmt = $sel = ''

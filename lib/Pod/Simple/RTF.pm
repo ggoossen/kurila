@@ -11,7 +11,7 @@ use Pod::Simple::PullParser ()
 BEGIN {@ISA = (@: 'Pod::Simple::PullParser')}
 
 use Carp ()
-BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
+BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless exists &DEBUG }
 
 $WRAP = 1 unless defined $WRAP
 

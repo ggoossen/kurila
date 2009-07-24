@@ -6,7 +6,7 @@ use List::Util < qw(max)
 
 my $v
 
-ok(defined &max, 'defined')
+ok(exists &max, 'defined')
 
 $v = max(1)
 is($v, 1, 'single arg')

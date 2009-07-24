@@ -1,7 +1,7 @@
 
 package Pod::Simple
 
-BEGIN           { *DEBUG = sub () {0} unless defined &DEBUG }
+BEGIN           { *DEBUG = sub () {0} unless exists &DEBUG }
 use integer
 use Pod::Escapes v1.03 ()
 use Pod::Simple::LinkSection ()
@@ -28,16 +28,16 @@ $NL = $^INPUT_RECORD_SEPARATOR unless defined $NL
 # Set up some constants:
 
 BEGIN
-    if(defined &ASCII)    { }
+    if(exists &ASCII)    { }
     elsif(chr(65) eq 'A') { *ASCII = sub () {1}  }
     else                  { *ASCII = sub () {''} }
 
-    unless(defined &MANY_LINES) { *MANY_LINES = sub () {20} }
+    unless(exists &MANY_LINES) { *MANY_LINES = sub () {20} }
     DEBUG +> 4 and print $^STDOUT, "MANY_LINES is ", MANY_LINES(), "\n"
     unless(MANY_LINES() +>= 1)
         die "MANY_LINES is too small (" . MANY_LINES() . ")!\nAborting"
     
-    if(defined &UNICODE) { }
+    if(exists &UNICODE) { }
     else                 { *UNICODE = sub() {1} }
 
 if(DEBUG +> 2)

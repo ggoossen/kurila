@@ -8,7 +8,7 @@ use Pod::Simple::TextContent
 use Pod::Simple::Text
 
 BEGIN 
-    *mytime = defined(&Win32::GetTickCount)
+    *mytime = exists(&Win32::GetTickCount)
         ?? sub () {Win32::GetTickCount() / 1000}
         !! sub () {time()}
 

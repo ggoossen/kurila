@@ -19,8 +19,8 @@ use Pod::Simple::Search
 $SEARCH_CLASS ||= 'Pod::Simple::Search'
 
 BEGIN 
-    if(defined &DEBUG) { } # no-op
-    elsif( defined &Pod::Simple::DEBUG ) { *DEBUG = \&Pod::Simple::DEBUG }
+    if(exists &DEBUG) { } # no-op
+    elsif( exists &Pod::Simple::DEBUG ) { *DEBUG = \&Pod::Simple::DEBUG }
     else { *DEBUG = sub () {0}; }
 
 

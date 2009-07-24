@@ -13,8 +13,8 @@ $VERSION = '3.03'
 
 use UNIVERSAL ()
 BEGIN 
-    if(defined &DEBUG) { } # no-op
-    elsif( defined &Pod::Simple::DEBUG ) { *DEBUG = \&Pod::Simple::DEBUG }
+    if(exists &DEBUG) { } # no-op
+    elsif( exists &Pod::Simple::DEBUG ) { *DEBUG = \&Pod::Simple::DEBUG }
     else { *DEBUG = sub () {0}; }
 
 

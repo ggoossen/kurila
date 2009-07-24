@@ -450,7 +450,7 @@ sub ioctl($io, $op, $value)
 # any new code should just chech defined(&CONSTANT_NAME)
 
 sub constant($name)
-    (($name =~ m/^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && defined Symbol::fetch_glob($name)->*->&)
+    (($name =~ m/^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && exists Symbol::fetch_glob($name)->*->&)
         ?? Symbol::fetch_glob($name)->*->() !! undef
 
 

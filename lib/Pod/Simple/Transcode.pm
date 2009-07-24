@@ -5,8 +5,8 @@ package Pod::Simple::Transcode
 our @ISA
 
 BEGIN 
-    if(defined &DEBUG) {;} # Okay
-        elsif( defined &Pod::Simple::DEBUG ) { *DEBUG = \&Pod::Simple::DEBUG; }
+    if(exists &DEBUG) {;} # Okay
+        elsif( exists &Pod::Simple::DEBUG ) { *DEBUG = \&Pod::Simple::DEBUG; }
     else { *DEBUG = sub () {0}; }
 
 

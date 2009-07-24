@@ -7,7 +7,7 @@ BEGIN {our @ISA = (@: 'Pod::Simple')}
 
 use Carp ()
 
-BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
+BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless exists &DEBUG }
 
 sub new
     my $self = shift

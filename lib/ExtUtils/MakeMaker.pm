@@ -800,7 +800,7 @@ sub mv_all_methods
         # standard, we try to enable the next line again. It was
         # commented out until MM 5.23
 
-        next unless defined Symbol::fetch_glob("$($from)::$method")->&
+        next unless exists Symbol::fetch_glob("$($from)::$method")->&
 
         do
             Symbol::fetch_glob("$($to)::$method")->* = \Symbol::fetch_glob("$($from)::$method")->&

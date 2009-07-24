@@ -70,7 +70,7 @@ sub _make_fatal($sub, $pkg)
     $sub = Symbol::fetch_glob($sub)
     print $^STDOUT, "# _make_fatal: pkg=$pkg name=$name\n" if $Debug
     die "Bad subroutine name for Fatal: $name" unless $name =~ m/^\w+$/
-    if (defined($sub->&)) # user subroutine
+    if (exists($sub->&)) # user subroutine
         $sref = \$sub->&
         $proto = prototype $sref
         $call = '$sref->& <: '

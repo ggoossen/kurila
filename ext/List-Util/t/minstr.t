@@ -6,7 +6,7 @@ use List::Util < qw(minstr)
 
 my $v
 
-ok(defined &minstr, 'defined')
+ok(exists &minstr, 'defined')
 
 $v = minstr('a')
 is($v, 'a', 'single arg')

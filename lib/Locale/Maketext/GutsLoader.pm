@@ -6,7 +6,7 @@ sub zorp { return scalar nelems @_ }
 BEGIN 
     $Locale::Maketext::GutsLoader::GUTSPATH = __FILE__
     *Locale::Maketext::DEBUG = sub () {0}
-        unless defined &Locale::Maketext::DEBUG
+        unless exists &Locale::Maketext::DEBUG
 
 
 $Locale::Maketext::GUTSPATH = ''

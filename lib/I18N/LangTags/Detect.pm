@@ -7,7 +7,7 @@ package I18N::LangTags::Detect
 our (@ISA, $VERSION, $MATCH_SUPERS, $USING_LANGUAGE_TAGS,
     $USE_LITERALS, $MATCH_SUPERS_TIGHTLY)
 
-BEGIN { unless(defined &DEBUG) { *DEBUG = sub () {0} } }
+BEGIN { unless(exists &DEBUG) { *DEBUG = sub () {0} } }
 # define the constant 'DEBUG' at compile-time
 
 $VERSION = "1.03"
@@ -57,7 +57,7 @@ sub ambient_langprefs # always returns things untainted
     }elsif(_try_use('Win32::Locale'))
         # If we have that module installed...
         push @languages, Win32::Locale::get_language() || ''
-            if defined &Win32::Locale::get_language
+            if exists &Win32::Locale::get_language
     
     return _normalize < @languages
 

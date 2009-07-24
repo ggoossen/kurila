@@ -27,9 +27,9 @@ my $IsMacOS = $^OS_NAME eq 'MacOS'
 
 # check imports
 can_ok('main', < qw(cwd getcwd fastcwd fastgetcwd))
-ok( !defined(&chdir),           'chdir() not exported by default' )
-ok( !defined(&abs_path),        '  nor abs_path()' )
-ok( !defined(&fast_abs_path),   '  nor fast_abs_path()')
+ok( !exists(&chdir),           'chdir() not exported by default' )
+ok( !exists(&abs_path),        '  nor abs_path()' )
+ok( !exists(&fast_abs_path),   '  nor fast_abs_path()')
 
 do
     my @fields = qw(PATH IFS CDPATH ENV BASH_ENV)

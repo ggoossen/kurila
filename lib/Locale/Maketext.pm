@@ -10,7 +10,7 @@ use I18N::LangTags v0.30 ()
 
 #--------------------------------------------------------------------------
 
-BEGIN { unless(defined &DEBUG) { *DEBUG = sub () {0} } }
+BEGIN { unless(exists &DEBUG) { *DEBUG = sub () {0} } }
 # define the constant 'DEBUG' at compile-time
 
 $VERSION = "1.10_01"

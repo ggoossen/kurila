@@ -449,7 +449,7 @@ sub connect_log
 
     while ($proto = shift @fallbackMethods)
         my $fn = "connect_$proto"
-        $connected = Symbol::fetch_glob($fn)->*->(\@errs) if defined Symbol::fetch_glob($fn)->*->&
+        $connected = Symbol::fetch_glob($fn)->*->(\@errs) if exists Symbol::fetch_glob($fn)->*->&
         last if $connected
     
 

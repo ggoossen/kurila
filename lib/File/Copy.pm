@@ -34,7 +34,7 @@ if ($^OS_NAME eq 'MacOS')
 
 
 sub _catname($from, $to)
-    if (not defined &basename)
+    if (not exists &basename)
         require File::Basename
         File::Basename->import('basename')
     
@@ -97,7 +97,7 @@ sub copy
         $to = _catname($from, $to)
     
 
-    if (defined &syscopy && !$Syscopy_is_copy
+    if (exists &syscopy && !$Syscopy_is_copy
           && !$to_a_handle
           && !($from_a_handle && $^OS_NAME eq 'os2' )   # OS/2 cannot handle handles
           && !($from_a_handle && $^OS_NAME eq 'mpeix')  # and neither can MPE/iX.
@@ -285,7 +285,7 @@ else
 
 
 # &syscopy is an XSUB under OS/2
-unless (defined &syscopy)
+unless (exists &syscopy)
     if ($^OS_NAME eq 'VMS')
         *syscopy = \&rmscopy
     elsif ($^OS_NAME eq 'mpeix')
@@ -295,7 +295,7 @@ unless (defined &syscopy)
             # preserve MPE file attributes.
             return system('/bin/cp', '-f', @_[0], @_[1]) == 0
         
-    elsif ($^OS_NAME eq 'MSWin32' && defined &DynaLoader::boot_DynaLoader)
+    elsif ($^OS_NAME eq 'MSWin32' && exists &DynaLoader::boot_DynaLoader)
         # Win32::CopyFile() fill only work if we can load Win32.xs
         *syscopy = sub (@< @_)
             return 0 unless (nelems @_) == 2

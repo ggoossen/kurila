@@ -110,7 +110,7 @@ Default: 1
 
 sub case_tolerant(?$drive)
     return 1 unless $^OS_NAME eq 'cygwin'
-        and defined &Cygwin::mount_flags
+        and exists &Cygwin::mount_flags
 
     if (! $drive)
         my @flags = split(m/,/, Cygwin::mount_flags('/cygwin'))

@@ -321,7 +321,7 @@ sub rel2abs($self,$path,?$base)
 
     if ( !defined( $base ) || $base eq '' )
         require Cwd 
-        $base = Cwd::getdcwd( $self->splitpath( $path )[0] ) if defined &Cwd::getdcwd 
+        $base = Cwd::getdcwd( $self->splitpath( $path )[0] ) if exists &Cwd::getdcwd 
         $base = $self->_cwd() unless defined $base 
     elsif ( ! $self->file_name_is_absolute( $base ) )
         $base = $self->rel2abs( $base ) 

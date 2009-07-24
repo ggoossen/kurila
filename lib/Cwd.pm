@@ -187,12 +187,12 @@ push @EXPORT, < qw(getdcwd) if $^OS_NAME eq 'MSWin32'
 if ($^OS_NAME eq 'os2')
     local $^WARNING = 0
 
-    *cwd                = defined &sys_cwd ?? \&sys_cwd !! \&_os2_cwd
+    *cwd                = exists &sys_cwd ?? \&sys_cwd !! \&_os2_cwd
     *getcwd             = \&cwd
     *fastgetcwd         = \&cwd
     *fastcwd            = \&cwd
 
-    *fast_abs_path      = \&sys_abspath if defined &sys_abspath
+    *fast_abs_path      = \&sys_abspath if exists &sys_abspath
     *abs_path           = \&fast_abs_path
     *realpath           = \&fast_abs_path
     *fast_realpath      = \&fast_abs_path
@@ -626,7 +626,7 @@ sub _vms_abs_path
         return _vms_abs_path($link_target)
     
 
-    if (defined &VMS::Filespec::vms_realpath)
+    if (exists &VMS::Filespec::vms_realpath)
         my $path = @_[0]
         if ($path =~ m#(?<=\^)/# )
             # Unix format
@@ -661,7 +661,7 @@ sub _os2_cwd
 
 
 sub _win32_cwd
-    if (defined &DynaLoader::boot_DynaLoader)
+    if (exists &DynaLoader::boot_DynaLoader)
         env::var('PWD' ) = Win32::GetCwd()
     else # miniperl
         my $pwd = `cd`
@@ -674,10 +674,10 @@ sub _win32_cwd
     return env::var('PWD')
 
 
-*_NT_cwd = defined &Win32::GetCwd ?? \&_win32_cwd !! \&_os2_cwd
+*_NT_cwd = exists &Win32::GetCwd ?? \&_win32_cwd !! \&_os2_cwd
 
 sub _dos_cwd
-    if (!defined &Dos::GetCwd)
+    if (!exists &Dos::GetCwd)
         my $pwd = `command /c cd`
         chomp $pwd
         $pwd =~ s:\\:/:g 
@@ -731,8 +731,8 @@ if (exists %METHOD_MAP{$^OS_NAME})
 
 
 # In case the XS version doesn't load.
-*abs_path = \&_perl_abs_path unless defined &abs_path
-*getcwd = \&_perl_getcwd unless defined &getcwd
+*abs_path = \&_perl_abs_path unless exists &abs_path
+*getcwd = \&_perl_getcwd unless exists &getcwd
 
 # added function alias for those of us more
 # used to the libc function.  --tchrist 27-Jan-00

@@ -30,7 +30,7 @@ my $accurate_timestamps =
       $Is_MacOS
       )
 
-if (defined &Win32::IsWinNT && Win32::IsWinNT())
+if (exists &Win32::IsWinNT && Win32::IsWinNT())
     if (Win32::FsType() eq 'NTFS')
         $has_link            = 1
         $accurate_timestamps = 1
@@ -42,7 +42,7 @@ my $needs_fh_reopen =
     # Not needed on HPFS, but needed on HPFS386 ?!
     || $^OS_NAME eq 'os2'
 
-$needs_fh_reopen = 1 if (defined &Win32::IsWin95 && Win32::IsWin95())
+$needs_fh_reopen = 1 if (exists &Win32::IsWin95 && Win32::IsWin95())
 
 my $skip_mode_checks =
       $^OS_NAME eq 'cygwin' && env::var('CYGWIN') !~ m/ntsec/

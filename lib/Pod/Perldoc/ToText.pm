@@ -28,7 +28,7 @@ sub parse_from_file
         keys $self->%
     
 
-    defined(&Pod::Perldoc::DEBUG)
+    exists(&Pod::Perldoc::DEBUG)
           and Pod::Perldoc::DEBUG()
         and print $^STDOUT, "About to call new Pod::Text ",
         $Pod::Text::VERSION ?? "(v$Pod::Text::VERSION) " !! '',

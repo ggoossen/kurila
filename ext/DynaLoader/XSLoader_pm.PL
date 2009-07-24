@@ -55,7 +55,7 @@ sub load {
 
 EOT
 
-print $out, <<'EOT' if defined &DynaLoader::mod2fname
+print $out, <<'EOT' if exists &DynaLoader::mod2fname
     # Some systems have restrictions on files names for DLL's etc.
     # mod2fname returns appropriate file base name (typically truncated)
     # It may also edit @modparts if required.
