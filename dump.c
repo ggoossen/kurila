@@ -851,6 +851,8 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 		sv_catpv(tmpsv, ",HASTARG");
 	    if (o->op_private & OPpENTERSUB_INARGS)
 		sv_catpv(tmpsv, ",INARGS");
+	    if (o->op_flags & OPf_ENTERSUB_EARLY_CV)
+		sv_catpv(tmpsv, ",EARLY_CV");
 	}
 	else {
 	    switch (o->op_private & OPpDEREF) {
@@ -887,10 +889,6 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
     else if (optype == OP_RV2CV) {
 	if (o->op_private & OPpLVAL_INTRO)
 	    sv_catpv(tmpsv, ",LVAL_INTRO");
-    }
-    else if (optype == OP_GV) {
-	if (o->op_private & OPpEARLY_CV)
-	    sv_catpv(tmpsv, ",EARLY_CV");
     }
     else if (optype == OP_LIST) {
 	if (o->op_private & OPpLIST_GUESSED)

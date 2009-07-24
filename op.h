@@ -144,6 +144,7 @@ Deprecated.  Use C<GIMME_V> instead.
 				  */
 #define OPf_TARGET_MY	0x800	/* Target is PADMY. (for ops with TARGLEX */
 
+#define OPf_ENTERSUB_EARLY_CV		0x1000	/* sub is a subroutine name which still needs to be resolved */
 
 /* old names; don't use in new code, but don't break them, either */
 #define OPf_LIST	OPf_WANT_LIST
@@ -182,8 +183,6 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpENTERSUB_TARGARGS    64      /* Use the save argument in targ */
 #define OPpENTERSUB_SAVE_DISCARD  2   /* Discard the value returned */
 
-  /* OP_GV only */
-#define OPpEARLY_CV		32	/* foo() called before sub foo was parsed */
 /* Private for OP_HELEM and OP_AELEM */
 #define OPpELEM_ADD            8       /* Add key if it doesn't exist */
 #define OPpELEM_OPTIONAL       4       /* Ignore if the key does not exist */

@@ -516,6 +516,12 @@ PERL_CALLCONV void	Perl_cv_setcv(pTHX_ CV* dst, CV* src)
 #define PERL_ARGS_ASSERT_CV_SETCV	\
 	assert(dst); assert(src)
 
+PERL_CALLCONV void	Perl_cv_clone_anon(pTHX_ CV* dst, CV* src)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_CV_CLONE_ANON	\
+	assert(dst); assert(src)
+
 PERL_CALLCONV SV*	Perl_cv_const_sv(pTHX_ CV* cv)
 			__attribute__warn_unused_result__;
 

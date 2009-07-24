@@ -296,7 +296,7 @@ PP(pp_rv2cv)
 	cv = (CV*)gv;
     }    
     else
-	cv = (CV*)&PL_sv_undef;
+	DIE(aTHX_ "Glob does not have a sub");
     SETs((SV*)cv);
     RETURN;
 }
@@ -382,11 +382,11 @@ PP(pp_anoncode)
     dVAR; dSP;
     CV* cv = (CV*)PAD_SV(PL_op->op_targ);
     if ( CvPADLIST(cv) && 
-       ( SvIV(PADLIST_NAMESV(CvPADLIST(cv), PAD_FLAGS_INDEX)) & PADf_CLONE ) ) {
-       SV* clone = sv_2mortal(newSV(0));
-       sv_upgrade(clone, SVt_PVCV);
-       cv_clone_anon(svTcv(clone), cv);
-       cv = svTcv(clone);
+	( SvIV(PADLIST_NAMESV(CvPADLIST(cv), PAD_FLAGS_INDEX)) & PADf_CLONE ) ) {
+	SV* clone = sv_2mortal(newSV(0));
+	sv_upgrade(clone, SVt_PVCV);
+	cv_clone_anon(svTcv(clone), cv);
+	cv = svTcv(clone);
     }
     EXTEND(SP,1);
     PUSHs((SV*)cv);
@@ -3425,8 +3425,9 @@ PP(pp_exists)
     SV *sv;
 
     if (PL_op->op_private & OPpEXISTS_SUB) {
-	SV * const cvsv = POPs;
-	if (cvsv && SvOK(cvsv))
+	GV *gv;
+	CV *cv = sv_2cv(TOPs, &gv, 0);
+	if (cv && SvOK(cv))
 	    RETPUSHYES;
 	RETPUSHNO;
     }

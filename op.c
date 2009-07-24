@@ -2084,8 +2084,8 @@ Perl_newUNOP(pTHX_ I32 type, OPFLAGS flags, OP *first, SV* location)
     unop->op_type = (OPCODE)type;
     unop->op_ppaddr = PL_ppaddr[type];
     unop->op_first = first;
-    unop->op_flags = (U8)(flags | OPf_KIDS);
-    unop->op_private = (U8)(1 | (flags >> 8));
+    unop->op_flags = (flags | OPf_KIDS);
+    unop->op_private = 1;
     unop->op_location = SvREFCNT_inc(location);
     unop = (UNOP*) CHECKOP(type, unop);
     if (unop->op_next)
@@ -4202,9 +4202,7 @@ Perl_ck_exists(pTHX_ OP *o)
     if (o->op_flags & OPf_KIDS) {
 	OP * const kid = cUNOPo->op_first;
 	if (kid->op_type == OP_RV2CV) {
-	    cUNOPo->op_first = ref(kid, o->op_type);
 	    o->op_private |= OPpEXISTS_SUB;
-	    return o;
 	}
 	else if (kid->op_type == OP_AELEM)
 	    o->op_flags |= OPf_SPECIAL;
@@ -5347,20 +5345,16 @@ Perl_ck_subr(pTHX_ OP *o)
 
     o->op_private |= OPpENTERSUB_HASTARG;
     for (cvop = o2; cvop->op_sibling; cvop = cvop->op_sibling) ;
-    if (cvop->op_type == OP_RV2CV) {
-	SVOP* tmpop;
+    if (cvop->op_type == OP_CONST) {
 	o->op_private |= (cvop->op_private & OPpENTERSUB_AMPER);
-	op_null(cvop);		/* disable rv2cv */
-	tmpop = (SVOP*)((UNOP*)cvop)->op_first;
-	if (tmpop->op_type == OP_GV && !(o->op_private & OPpENTERSUB_AMPER)) {
-	    GV *gv = cGVOPx_gv(tmpop);
-	    cv = GvCVu(gv);
-	    if (!cv)
-		tmpop->op_private |= OPpEARLY_CV;
-	    else {
-		n_minargs = CvN_MINARGS(cv);
-		n_maxargs = CvN_MAXARGS(cv);
-	    }
+	if ( ! ( o->op_flags & OPpENTERSUB_AMPER ) ) {
+	    SV* sv = cSVOPx(cvop)->op_sv;
+	    if (SvTYPE(sv) == SVt_PVCV)
+		cv = svTcv(sv);
+	}
+	if (cv) {
+	    n_minargs = CvN_MINARGS(cv);
+	    n_maxargs = CvN_MAXARGS(cv);
 	}
     }
     else if (cvop->op_type == OP_METHOD || cvop->op_type == OP_METHOD_NAMED) {

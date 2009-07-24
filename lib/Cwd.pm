@@ -323,7 +323,7 @@ sub _backtick_pwd
 # Since some ports may predefine cwd internally (e.g., NT)
 # we take care not to override an existing definition for cwd().
 
-unless (%METHOD_MAP{?$^OS_NAME}{?cwd} or defined &cwd)
+unless (%METHOD_MAP{?$^OS_NAME}{?cwd} or exists &cwd)
     # The pwd command is not available in some chroot(2)'ed environments
     require Config
     my $sep = Config::config_value("path_sep") || ':'
@@ -410,7 +410,7 @@ sub fastcwd_
         if $cdev != $orig_cdev || $cino != $orig_cino
     $path
 
-if (not defined &fastcwd) { *fastcwd = \&fastcwd_ }
+if (not exists &fastcwd) { *fastcwd = \&fastcwd_ }
 
 
 # Keeps track of current working directory in PWD environment var

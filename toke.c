@@ -327,6 +327,7 @@ static struct debug_tokens {
     { ANONARYL,	        TOKENTYPE_NONE,	        "ANONARYL" },
     { ANONHSHL,	        TOKENTYPE_NONE,	        "ANONHSHL" },
     { CALLOP,	        TOKENTYPE_NONE,	        "CALLOP" },
+    { NOAMPCALL,	TOKENTYPE_IVAL,	        "NOAMPCALL" },
     { 0,		TOKENTYPE_NONE,		NULL }
 };
 
@@ -4682,7 +4683,21 @@ Perl_yylex(pTHX)
 		    }
 		    start_force(PL_curforce);
 #endif
-		    NEXTVAL_NEXTTOKE.opval = pl_yylval.opval;
+		    if (cv) {
+			op_free(pl_yylval.opval);
+			NEXTVAL_NEXTTOKE.opval = (OP*)newSVOP(OP_CONST, 0, newSVsv(cvTsv(cv)), S_curlocation(PL_bufptr));
+			pl_yylval.i_tkval.ival = 0;
+		    }
+		    else if (gv) {
+			op_free(pl_yylval.opval);
+			NEXTVAL_NEXTTOKE.opval = (OP*)newGVOP(OP_GV, 0, gv, S_curlocation(PL_bufptr));
+			pl_yylval.i_tkval.ival = 0;
+		    }
+		    else {
+			NEXTVAL_NEXTTOKE.opval = pl_yylval.opval;
+			pl_yylval.i_tkval.ival = OPf_ENTERSUB_EARLY_CV;
+		    }
+
 		    PL_expect = XOPERATOR;
 #ifdef PERL_MAD
 		    if (PL_madskills) {
@@ -4711,17 +4726,9 @@ Perl_yylex(pTHX)
 			TOKEN(WORD);
 		    }
 
-		    /* Resolve to GV now. */
-		    if (SvTYPE(gv) != SVt_PVGV) {
-			gv = gv_fetchpv(PL_tokenbuf, 0, SVt_PVCV);
-			assert (SvTYPE(gv) == SVt_PVGV);
-			/* cv must have been some sort of placeholder, so
-			   now needs replacing with a real code reference.  */
-			cv = GvCV(gv);
-		    }
-
 		    op_free(pl_yylval.opval);
-		    pl_yylval.opval = newCVREF(0, newGVOP(OP_GV, 0, gv, S_curlocation(PL_bufptr)), S_curlocation(PL_bufptr));
+		    pl_yylval.opval = (OP*)newSVOP(OP_CONST, 0, newSVsv(cvTsv(cv)), S_curlocation(PL_bufptr));
+
 		    PL_last_lop = PL_oldbufptr;
 		    PL_last_lop_op = OP_ENTERSUB;
 		    /* Is there a prototype? */

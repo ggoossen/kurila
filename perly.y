@@ -1163,17 +1163,15 @@ term	:	'?' term
                         }
 	|	NOAMPCALL indirob '(' ')'                        /* &foo() */
 			{
-                            OP* cv = newCVREF(0, $2, LOCATION($1));
-                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar(cv), $2->op_location);
+                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED | IVAL($1), $2, $2->op_location);
                             TOKEN_GETMAD($3,$$,'(');
                             TOKEN_GETMAD($4,$$,')');
                             APPEND_MADPROPS_PV("amper", $$, '>');
 			}
 	|	NOAMPCALL indirob '(' expr ')'                   /* &foo(@args) */
 			{
-                            OP* cv = newCVREF(0, $2, LOCATION($1));
-                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
-				append_elem(OP_LIST, $4, scalar(cv)), $2->op_location);
+                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED | IVAL($1),
+				append_elem(OP_LIST, $4, $2), $2->op_location);
 			  DO_MAD({
 			      OP* op = $$;
 			      if (op->op_type == OP_CONST) { /* defeat const fold */

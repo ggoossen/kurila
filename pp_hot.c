@@ -1334,46 +1334,55 @@ PP(pp_entersub)
 	av_push(args, SvREFCNT_inc(sv));
     }
 
-    if (!sv)
-	DIE(aTHX_ "Expected a CODE reference but got nothing");
-    switch (SvTYPE(sv)) {
-	/* This is overwhelming the most common case:  */
-    case SVt_PVGV:
-	if (!(cv = GvCVu((GV*)sv))) {
-	    cv = sv_2cv(sv, &gv, 0);
-	}
-	if (!cv) {
-	    SV* sub_name = sv_newmortal();
-	    gv_efullname3(sub_name, (GV*)sv, NULL);
-	    DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sub_name));
-	}
-	break;
-    default:
-	if (sv == &PL_sv_yes && PL_op->op_flags & OPf_SPECIAL) {	/* unfound import, ignore */
-	    SP = PL_stack_base + POPMARK;
-	    if ( gimme != G_VOID )
-		XPUSHs(&PL_sv_undef);
-	    RETURN;
-	}
-	if (!SvROK(sv)) {
-	    const char *sym;
-	    STRLEN len;
-	    sym = SvPV_const(sv, len);
-	    if (!sym)
-		DIE(aTHX_ PL_no_usym, "a subroutine");
-	    DIE(aTHX_ PL_no_symref, sym, "a subroutine");
-	}
-	cv = (CV*)SvRV(sv);
-	if (SvTYPE(cv) == SVt_PVCV)
+    if (op_flags & OPf_ENTERSUB_EARLY_CV) {
+	GV* gv = gv_fetchsv(sv, GV_NOADD_NOINIT, SVt_PVCV);
+	if (! gv)
+	    DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sv));
+	if (! (cv = GvCVu(gv)))
+	    DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sv));
+    }
+    else {
+	if (!sv)
+	    DIE(aTHX_ "Expected a CODE reference but got nothing");
+	switch (SvTYPE(sv)) {
+	    /* This is overwhelming the most common case:  */
+	case SVt_PVGV:
+	    if (!(cv = GvCVu((GV*)sv))) {
+		cv = sv_2cv(sv, &gv, 0);
+	    }
+	    if (!cv) {
+		SV* sub_name = sv_newmortal();
+		gv_efullname3(sub_name, (GV*)sv, NULL);
+		DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sub_name));
+	    }
 	    break;
-	DIE(aTHX_ "Expected a CODE reference but got a %s reference", Ddesc(SvRV(sv)));
-    case SVt_PVHV:
-    case SVt_PVAV:
-	DIE(aTHX_ "Expected a CODE reference but got a %s", Ddesc(sv));
-	/* This is the second most common case:  */
-    case SVt_PVCV:
-	cv = (CV*)sv;
-	break;
+	default:
+	    if (sv == &PL_sv_yes && PL_op->op_flags & OPf_SPECIAL) {	/* unfound import, ignore */
+		SP = PL_stack_base + POPMARK;
+		if ( gimme != G_VOID )
+		    XPUSHs(&PL_sv_undef);
+		RETURN;
+	    }
+	    if (!SvROK(sv)) {
+		const char *sym;
+		STRLEN len;
+		sym = SvPV_const(sv, len);
+		if (!sym)
+		    DIE(aTHX_ PL_no_usym, "a subroutine");
+		DIE(aTHX_ PL_no_symref, sym, "a subroutine");
+	    }
+	    cv = (CV*)SvRV(sv);
+	    if (SvTYPE(cv) == SVt_PVCV)
+		break;
+	    DIE(aTHX_ "Expected a CODE reference but got a %s reference", Ddesc(SvRV(sv)));
+	case SVt_PVHV:
+	case SVt_PVAV:
+	    DIE(aTHX_ "Expected a CODE reference but got a %s", Ddesc(sv));
+	    /* This is the second most common case:  */
+	case SVt_PVCV:
+	    cv = (CV*)sv;
+	    break;
+	}
     }
 
     ENTER;
