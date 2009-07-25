@@ -243,13 +243,13 @@ EOT
 print $out, expand_os_specific(<<'EOT')
 # No prizes for guessing why we don't say 'bootstrap DynaLoader;' here.
 # NOTE: All dl_*.xs (including dl_none.xs) define a dl_error() XSUB
-boot_DynaLoader('DynaLoader') if defined(&boot_DynaLoader) &&
-                                !defined(&dl_error);
+boot_DynaLoader('DynaLoader') if exists(&boot_DynaLoader) &&
+                                !exists(&dl_error);
 
 if ($dl_debug) {
     print $^STDERR, "DynaLoader.pm loaded ($^INCLUDE_PATH, @dl_library_path)\n";
     print $^STDERR, "DynaLoader not linked into this perl\n"
-            unless defined(&boot_DynaLoader);
+            unless exists(&boot_DynaLoader);
 }
 
 our (@isa, @args, $module, @dirs, $file, $dl_debug, $dlsrc, @dl_library_path,
@@ -279,7 +279,7 @@ sub bootstrap {
     die("Can't load module $module, dynamic loading not available in this perl.\n".
         "  (You may need to build a new perl executable which either supports\n".
         "  dynamic loading or has the $module module statically linked into it.)\n")
-        unless defined(&dl_load_file);
+        unless exists(&dl_load_file);
 
 
     <<$^O-eq-os2>>
@@ -293,7 +293,7 @@ sub bootstrap {
     # Some systems have restrictions on files names for DLL's etc.
     # mod2fname returns appropriate file base name (typically truncated)
     # It may also edit @modparts if required.
-    $modfname = mod2fname(\@modparts) if defined &mod2fname;
+    $modfname = mod2fname(\@modparts) if exists &mod2fname;
 
     <<$^O-eq-NetWare>>
     # Truncate the module name to 8.3 format for NetWare

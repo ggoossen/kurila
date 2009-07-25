@@ -29,8 +29,8 @@ package DynaLoader;
 
 # No prizes for guessing why we don't say 'bootstrap DynaLoader;' here.
 # NOTE: All dl_*.xs (including dl_none.xs) define a dl_error() XSUB
-boot_DynaLoader('DynaLoader') if defined(&boot_DynaLoader) &&
-                                !defined(&dl_error);
+boot_DynaLoader('DynaLoader') if exists(&boot_DynaLoader) &&
+                                !exists(&dl_error);
 package XSLoader;
 
 sub load {
@@ -42,9 +42,9 @@ sub load {
 
     # work with static linking too
     my $b = Symbol::fetch_glob("$module\::bootstrap");
-    return $b->*->(< @_) if defined $b->*->&;
+    return $b->*->(< @_) if exists $b->*->&;
 
-    unless ($module and defined &dl_load_file) {
+    unless ($module and exists &dl_load_file) {
         my $bootstrap_inherit = DynaLoader->can('bootstrap_inherit') || 
                                 XSLoader->can('bootstrap_inherit');
         return $bootstrap_inherit->(< @_);
@@ -59,7 +59,7 @@ print $out, <<'EOT' if exists &DynaLoader::mod2fname
     # Some systems have restrictions on files names for DLL's etc.
     # mod2fname returns appropriate file base name (typically truncated)
     # It may also edit @modparts if required.
-    $modfname = mod2fname(\@modparts) if defined &mod2fname;
+    $modfname = mod2fname(\@modparts) if exists &mod2fname;
 
 EOT
 
