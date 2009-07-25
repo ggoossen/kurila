@@ -6317,39 +6317,29 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
 
     PERL_ARGS_ASSERT_SV_2CV;
 
-    if (!sv) {
-	*gvp = NULL;
-	return NULL;
-    }
-
     switch (SvTYPE(sv)) {
     case SVt_PVCV:
-	*gvp = NULL;
-	return (CV*)sv;
     case SVt_PVHV:
     case SVt_PVAV:
-	*gvp = NULL;
-	return NULL;
+	Perl_croak(aTHX_ "Expected a CODE reference but got a %s", Ddesc(sv));
     case SVt_PVGV:
 	gv = (GV*)sv;
 	*gvp = gv;
 	goto fix_gv;
 
     default:
-	if (SvROK(sv)) {
-	    sv = SvRV(sv);
-	    if (SvTYPE(sv) == SVt_PVCV) {
-		cv = (CV*)sv;
-		*gvp = NULL;
-		return cv;
-	    }
-	    else if(isGV(sv))
-		gv = (GV*)sv;
-	    else
-		Perl_croak(aTHX_ "Not a subroutine reference");
-	}
-	else
+	if (! SvROK(sv))
 	    Perl_croak(aTHX_ "Not a subroutine reference");
+	sv = SvRV(sv);
+	if (SvTYPE(sv) == SVt_PVCV) {
+	    cv = (CV*)sv;
+	    *gvp = NULL;
+	    return cv;
+	}
+	else if(isGV(sv))
+	    gv = (GV*)sv;
+	else
+	    Perl_croak(aTHX_ "Expected a CODE reference but got a %s reference", Ddesc(sv));
     fix_gv:
 	if (lref && !GvCVu(gv)) {
 	    SV* tmpsv = sv_2mortal(newSV(0));
@@ -6357,6 +6347,7 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
 	    Perl_croak(aTHX_ "Unknown named sub \"%"SVf"\"",
 		       SVfARG(tmpsv));
 	}
+	*gvp = gv;
 	return GvCVu(gv);
     }
 }

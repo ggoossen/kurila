@@ -245,7 +245,7 @@ sub skipcheck(?$p)
 
 sub _check_files
     my $p = shift
-    my $dosnames=(defined(&Dos::UseLFN) && Dos::UseLFN()==0)
+    my $dosnames=(exists(&Dos::UseLFN) && Dos::UseLFN()==0)
     my $read = maniread() || \%: 
     my $found = manifind($p)
 

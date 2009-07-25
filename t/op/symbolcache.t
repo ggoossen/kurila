@@ -27,7 +27,7 @@ sub removed2() 24
 sub bound2()   &removed2 <:
 undef %main::{+removed2}
 dies_like( sub () { bound2() },
-           qr/Undefined subroutine &main::removed2 called/,
+           qr/Undefined subroutine &main::removed2/,
            'function not bound' )
 ok( !main->can('removed2'), 'function not available as method' )
 

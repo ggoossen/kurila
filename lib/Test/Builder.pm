@@ -805,7 +805,7 @@ sub _is_qr
 
     # is_regexp() checks for regexes in a robust manner, say if they're
     # blessed.
-    return re::is_regexp($regex) if defined &re::is_regexp
+    return re::is_regexp($regex) if exists &re::is_regexp
     return ref $regex eq 'Regexp'
 
 

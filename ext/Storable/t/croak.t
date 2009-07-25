@@ -9,7 +9,7 @@
 
 BEGIN 
     die "Oi! No! Don't change this test so that Carp is used before Storable"
-        if defined &Carp::carp
+        if exists &Carp::carp
 
 use Storable < qw(freeze thaw)
 
@@ -22,5 +22,3 @@ for my $test ((@: 1,2))
     else
         chomp $^EVAL_ERROR
         print $^STDOUT, "not ok $test # Expected a meaningful croak. Got '$^EVAL_ERROR'\n"
-    
-

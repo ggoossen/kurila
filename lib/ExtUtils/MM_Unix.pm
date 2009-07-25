@@ -1489,13 +1489,13 @@ sub init_main($self)
     # Some systems have restrictions on files names for DLL's etc.
     # mod2fname returns appropriate file base name (typically truncated)
     # It may also edit @modparts if required.
-    if (defined &DynaLoader::mod2fname)
+    if (exists &DynaLoader::mod2fname)
         $modfname = DynaLoader::mod2fname(\@modparts)
 
     @: $self->{+PARENT_NAME}, $self->{+BASEEXT} = @: $self->{?NAME} =~ m!(?:([\w:]+)::)?(\w+)\z!
     $self->{+PARENT_NAME} ||= ''
 
-    if (defined &DynaLoader::mod2fname)
+    if (exists &DynaLoader::mod2fname)
         # As of 5.001m, dl_os2 appends '_'
         $self->{+DLBASE} = $modfname
     else
@@ -2424,7 +2424,7 @@ $tmp/perlmain.c: $makefilename}, q{
 
 }
     push @m, "\t", q{$(NOECHO) $(PERL) $(INSTALLSCRIPT)/fixpmain
-} if (defined (&Dos::UseLFN) && Dos::UseLFN()==0)
+} if (exists (&Dos::UseLFN) && Dos::UseLFN()==0)
 
 
     push @m, q{

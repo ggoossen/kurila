@@ -73,7 +73,7 @@ padany		SKIP (not implemented)
 pushre		SKIP split m/foo/
 rv2gv		*x
 rv2sv		$x
-rv2cv		f()
+rv2cv		&f
 anoncode	sub { }
 prototype	prototype 'foo'
 refgen		\($x,$y)

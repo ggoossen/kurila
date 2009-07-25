@@ -3919,7 +3919,7 @@ S_init_predump_symbols(pTHX)
 
     PL_stdinio = newIO();
     io = PL_stdinio;
-    SVcpREPLACE(SvLOCATION(io), avTsv(newAV()));
+    SVcpSTEAL(SvLOCATION(io), avTsv(newAV()));
     av_store(svTav(SvLOCATION(io)),
 	LOC_NAME_INDEX, newSVpv("STDIN", 0));
     IoTYPE(io) = IoTYPE_RDONLY;
@@ -3927,7 +3927,7 @@ S_init_predump_symbols(pTHX)
 
     PL_stdoutio = newIO();
     io = PL_stdoutio;
-    SVcpREPLACE(SvLOCATION(io), avTsv(newAV()));
+    SVcpSTEAL(SvLOCATION(io), avTsv(newAV()));
     av_store(svTav(SvLOCATION(io)),
 	LOC_NAME_INDEX, newSVpv("STDOUT", 0));
     IoTYPE(io) = IoTYPE_WRONLY;

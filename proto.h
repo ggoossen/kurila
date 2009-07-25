@@ -2813,9 +2813,10 @@ PERL_CALLCONV bool	Perl_sv_2bool(pTHX_ SV *const sv)
 	assert(sv)
 
 PERL_CALLCONV CV*	Perl_sv_2cv(pTHX_ SV* sv, GV **const gvp, const I32 lref)
+			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_SV_2CV	\
-	assert(gvp)
+	assert(sv); assert(gvp)
 
 PERL_CALLCONV IO*	Perl_sv_2io(pTHX_ SV *const sv)
 			__attribute__nonnull__(pTHX_1);

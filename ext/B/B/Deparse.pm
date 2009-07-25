@@ -2995,6 +2995,9 @@ sub pp_entersub($self, $op, $cx)
     if (is_scope($kid))
         $amper = "&"
         $kid = "\{" . $self->deparse($kid, 0) . "\}"
+    elsif ($kid->name eq "const")
+        $kid = $kid->sv->LOCATION[3]
+        $kid =~ s/^\Q$self->{?'curstash'}\E::(\w+)$/$1/
     elsif ($kid->first->name eq "gv")
         my $gv = $self->gv_or_padgv($kid->first)
         if (class($gv->CV) ne "SPECIAL")
@@ -3008,7 +3011,6 @@ sub pp_entersub($self, $op, $cx)
             elsif ($kid !~ m/^(?:\w|::)(?:[\w\d]|::(?!\z))*\z/)
                 $kid = single_delim("q", "'", $kid) . '->'
 
-
     elsif (is_scalar ($kid->first) && $kid->first->name ne 'rv2cv')
         $amper = "&"
         $kid = $self->deparse($kid, 24)
@@ -3016,7 +3018,6 @@ sub pp_entersub($self, $op, $cx)
         $prefix = ""
         my $arrow = is_subscriptable($kid->first) ?? "" !! "->"
         $kid = $self->deparse($kid, 24) . $arrow
-
 
     # Doesn't matter how many prototypes there are, if
     # they haven't happened yet!
@@ -3034,8 +3035,6 @@ sub pp_entersub($self, $op, $cx)
         if (!$declared && defined($proto))
             # Avoid "too early to check prototype" warning
             (@: $amper, $proto) = @: '&'
-
-
 
     my $args
     if ($declared and defined $proto and not $amper)
@@ -3310,8 +3309,6 @@ sub const($self, $sv, $cx)
             return $mg->PTR if $mg->TYPE eq 'V'
             $mg = $mg->MOREMAGIC
 
-
-
     if ($sv->FLAGS ^&^ SVf_IOK)
         my $str = $sv->int_value
         $str = $self->maybe_parens($str, $cx, 21) if $str +< 0
@@ -3385,8 +3382,6 @@ sub const($self, $sv, $cx)
                     return single_delim("qr", "", $re)
 
                 $mg = $mg->MOREMAGIC
-
-
 
         return $self->maybe_parens("\\" . $self->const($ref, 20), $cx, 20)
     elsif ($sv->FLAGS ^&^ SVf_POK)

@@ -280,6 +280,7 @@ PP(pp_pos)
 PP(pp_rv2cv)
 {
     dVAR; dSP;
+    SV *ref;
     GV *gv;
     const I32 flags = (PL_op->op_flags & OPf_SPECIAL)
 	? 0
@@ -295,8 +296,12 @@ PP(pp_rv2cv)
     else if ((flags == (GV_ADD|GV_NOEXPAND)) && gv && SvROK(gv)) {
 	cv = (CV*)gv;
     }    
-    else
-	DIE(aTHX_ "Glob does not have a sub");
+    else {
+	assert(gv);
+	SV* sub_name = sv_newmortal();
+	gv_efullname3(sub_name, (GV*)gv, NULL);
+	DIE(aTHX_ "Undefined subroutine &%"SVf"", SVfARG(sub_name));
+    }
     SETs((SV*)cv);
     RETURN;
 }
@@ -3426,7 +3431,7 @@ PP(pp_exists)
 
     if (PL_op->op_private & OPpEXISTS_SUB) {
 	GV *gv;
-	CV *cv = sv_2cv(TOPs, &gv, 0);
+	CV *cv = sv_2cv(POPs, &gv, 0);
 	if (cv && SvOK(cv))
 	    RETPUSHYES;
 	RETPUSHNO;

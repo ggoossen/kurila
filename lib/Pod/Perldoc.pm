@@ -14,14 +14,12 @@ $VERSION = '3.14_02'
 #..........................................................................
 
 BEGIN   # Make a DEBUG constant very first thing...
-    unless(defined &DEBUG)
+    unless(exists &DEBUG)
         if((env::var('PERLDOCDEBUG') || '') =~ m/^(\d+)/) # untaint
             eval("sub DEBUG () \{$1\}")
             die "WHAT? Couldn't eval-up a DEBUG constant!? $^EVAL_ERROR" if $^EVAL_ERROR
         else
             *DEBUG = sub () {0}
-        
-    
 
 
 use Pod::Perldoc::GetOptsOO # uses the DEBUG.
@@ -32,13 +30,13 @@ sub TRUE  () {1}
 sub FALSE () {return}
 
 BEGIN 
-    *IS_VMS     = $^OS_NAME eq 'VMS'     ?? \&TRUE !! \&FALSE unless defined &IS_VMS
-    *IS_MSWin32 = $^OS_NAME eq 'MSWin32' ?? \&TRUE !! \&FALSE unless defined &IS_MSWin32
-    *IS_Dos     = $^OS_NAME eq 'dos'     ?? \&TRUE !! \&FALSE unless defined &IS_Dos
-    *IS_OS2     = $^OS_NAME eq 'os2'     ?? \&TRUE !! \&FALSE unless defined &IS_OS2
-    *IS_Cygwin  = $^OS_NAME eq 'cygwin'  ?? \&TRUE !! \&FALSE unless defined &IS_Cygwin
-    *IS_Linux   = $^OS_NAME eq 'linux'   ?? \&TRUE !! \&FALSE unless defined &IS_Linux
-    *IS_HPUX    = $^OS_NAME =~ m/hpux/   ?? \&TRUE !! \&FALSE unless defined &IS_HPUX
+    *IS_VMS     = $^OS_NAME eq 'VMS'     ?? \&TRUE !! \&FALSE unless exists &IS_VMS
+    *IS_MSWin32 = $^OS_NAME eq 'MSWin32' ?? \&TRUE !! \&FALSE unless exists &IS_MSWin32
+    *IS_Dos     = $^OS_NAME eq 'dos'     ?? \&TRUE !! \&FALSE unless exists &IS_Dos
+    *IS_OS2     = $^OS_NAME eq 'os2'     ?? \&TRUE !! \&FALSE unless exists &IS_OS2
+    *IS_Cygwin  = $^OS_NAME eq 'cygwin'  ?? \&TRUE !! \&FALSE unless exists &IS_Cygwin
+    *IS_Linux   = $^OS_NAME eq 'linux'   ?? \&TRUE !! \&FALSE unless exists &IS_Linux
+    *IS_HPUX    = $^OS_NAME =~ m/hpux/   ?? \&TRUE !! \&FALSE unless exists &IS_HPUX
 
 
 $Temp_File_Lifetime ||= 60 * 60 * 24 * 5
@@ -111,7 +109,7 @@ sub opt_V # report version and exit
     print $^STDOUT, join '', @: 
         "Perldoc v$VERSION, under perl $^PERL_VERSION for $^OS_NAME"
 
-        (defined(&Win32::BuildNumber) and defined Win32::BuildNumber())
+        (exists(&Win32::BuildNumber) and defined Win32::BuildNumber())
             ?? (" (win32 build ", < Win32::BuildNumber(), ")") !! ()
 
         "\n"
@@ -1107,7 +1105,7 @@ sub MSWin_perldoc_tempfile($self, $suffix, $infix)
             $infix || 'x',
             time(),
             $^PID,
-            defined( &Win32::GetTickCount )
+            exists( &Win32::GetTickCount )
             ?? (Win32::GetTickCount() ^&^ 0xff)
             !! int(rand 256)
             # Under MSWin, $$ values get reused quickly!  So if we ran

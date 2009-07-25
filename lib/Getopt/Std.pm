@@ -150,7 +150,7 @@ EOM
 
 sub version_mess ($args, ?$mess)
     my $h = output_h
-    if ($mess and defined &main::VERSION_MESSAGE)
+    if ($mess and exists &main::VERSION_MESSAGE)
         main::VERSION_MESSAGE($h, __PACKAGE__, $VERSION, $args)
     else
         my $v = $main::VERSION
@@ -168,7 +168,7 @@ EOH
 sub help_mess
     my $args = shift
     my $h = output_h
-    if ((nelems @_) and defined &main::HELP_MESSAGE)
+    if ((nelems @_) and exists &main::HELP_MESSAGE)
         main::HELP_MESSAGE($h, __PACKAGE__, $VERSION, $args)
     else
         my @witharg = @: $args =~ m/(\S)\s*:/g

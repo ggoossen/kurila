@@ -19,11 +19,12 @@ BaseTests("version")
 
 diag "Tests with empty derived class" unless env::var('PERL_CORE')
 
-package version::Empty
-use base 'version'
-our $VERSION = 0.01
-no warnings 'redefine'
-*main::qv = sub (@< @_) { return bless version::qv(shift), __PACKAGE__; }
+BEGIN
+    package version::Empty
+    use base 'version'
+    our $VERSION = 0.01
+    no warnings 'redefine'
+    *main::qv = sub ($v) { return bless version::qv($v), __PACKAGE__; }
 
 package version::Bad
 use base 'version'
@@ -237,7 +238,6 @@ sub BaseTests
             $version = qv(1.2)
             is ( $version->stringify, "v1.2", 'qv(1.2) == "1.2.0"' )
             isa_ok( qv('5.008'), $CLASS )
-        
 
         # test creation from existing version object
         diag "create new from existing version" if $Verbose
@@ -245,7 +245,7 @@ sub BaseTests
             "new from existing object")
         is ($new_version->vcmp($version), 0, "class->new(\$version) identical")
         $new_version = $version->new()
-        isa_ok ($new_version, $CLASS )
+        isa_ok ( $new_version, $CLASS )
         is ($new_version->stringify, "0", "version->new() doesn't clone")
         $new_version = $version->new("1.2.3")
         is ($new_version->stringify, "1.2.3" , '$version->new("1.2.3") works too')
@@ -440,10 +440,11 @@ EOF
     close $f
     # need to eliminate any other qv()'s
     undef *main::qv
-    ok(!defined(Symbol::fetch_glob("main\::qv")->&), "make sure we cleared qv() properly")
+    ok(!exists(Symbol::fetch_glob("main\::qv")->&), "make sure we cleared qv() properly")
     eval "use lib '.'; use vvv;"
-    ok(defined(Symbol::fetch_glob("main\::qv")->&), "make sure we exported qv() properly")
-    isa_ok( qv(1.2), "vvv")
+    die if $^EVAL_ERROR
+    ok(exists(Symbol::fetch_glob("main\::qv")->&), "make sure we exported qv() properly")
+    isa_ok( eval'qv(1.2)', "vvv")
     unlink 'vvv.pm'
 
     SKIP: do

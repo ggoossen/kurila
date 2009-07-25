@@ -5,7 +5,9 @@ package Pod::Simple::Search
 our ($VERSION, $MAX_VERSION_WITHIN, $SLEEPY)
 $VERSION = 3.04   ## Current version of this package
 
-BEGIN { *DEBUG = sub () {0} unless defined &DEBUG; }   # set DEBUG level
+BEGIN
+    *DEBUG = sub () {0} unless exists &DEBUG   # set DEBUG level
+
 use Carp ()
 
 $SLEEPY = 1 if !defined $SLEEPY and $^OS_NAME =~ m/mswin|mac/i
@@ -173,14 +175,12 @@ sub _make_search_callback($self)
         if($limit_re and $name !~ m/$limit_re/i)
             $verbose and print $^STDOUT, "Shunning $name as not matching $limit_re\n"
             return
-        
 
         if( !$shadows and $name2path->{?$name} )
             $verbose and print $^STDOUT, "Not worth considering $file ",
                 "-- already saw $name as ",
                 join(' ', grep( {$path2name->{?$_} eq $name }, keys $path2name->%)), "\n"
             return
-        
 
         # Put off until as late as possible the expense of
         #  actually reading the file:

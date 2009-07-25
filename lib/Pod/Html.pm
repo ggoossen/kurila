@@ -348,7 +348,7 @@ sub pod2html
 
     init_globals()
 
-    $Is83 = 0 if (defined (&Dos::UseLFN) && Dos::UseLFN())
+    $Is83 = 0 if exists(&Dos::UseLFN) && Dos::UseLFN()
 
     # cache of %Pages and %Items from last time we ran pod2html
 
