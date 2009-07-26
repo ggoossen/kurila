@@ -3874,9 +3874,7 @@ Perl_newANONSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	sv_catpvf(namesv, "::__ANON__");
 	av_store(svTav(SvLOCATION(sub)), 3, namesv);
     }
-    return newUNOP(OP_SREFGEN, 0,
-	newSVOP(OP_ANONCODE, 0, sub, location),
-	location);
+    return newSVOP(OP_ANONCODE, 0, sub, location);
 }
 
 OP *

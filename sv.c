@@ -2429,7 +2429,7 @@ copy-ish functions and macros use this underneath.
 static void
 S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
 {
-    SV * const sref = SvREFCNT_inc(SvRV(sstr));
+    SV * const sref = SvROK(sstr) ? SvREFCNT_inc(SvRV(sstr)) : SvREFCNT_inc(sstr);
     SV *dref = NULL;
     const int intro = GvINTRO(dstr);
     SV **location;
@@ -2559,6 +2559,34 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     stype = SvTYPE(sstr);
     dtype = SvTYPE(dstr);
 
+    /* glob assignment */
+    if (dtype == SVt_PVGV) {
+	if (SvROK(sstr)) {
+	    if (isGV_with_GP(dstr) && dtype == SVt_PVGV
+		&& SvTYPE(SvRV(sstr)) == SVt_PVGV) {
+		sstr = SvRV(sstr);
+		if (sstr == dstr) {
+		    if (GvIMPORTED(dstr) != GVf_IMPORTED
+			&& CopSTASH_ne(PL_curcop, GvSTASH(dstr)))
+			{
+			    GvIMPORTED_on(dstr);
+			}
+		    GvMULTI_on(dstr);
+		    return;
+		}
+		Perl_croak(aTHX_ "glob to glob assignment have been removed");
+		return;
+	    }
+	}
+
+	if (dtype == SVt_PVGV && isGV_with_GP(dstr)) {
+	    glob_assign_ref(dstr, sstr);
+	    return;
+	}
+
+	return;
+    }
+
     /* clear the destination sv if it will be upgraded to a hash or an array */
     if ( ( dtype == SVt_PVHV || dtype == SVt_PVAV  || dtype == SVt_PVCV
 	    || stype == SVt_PVAV || stype == SVt_PVHV || stype == SVt_PVCV )
@@ -2586,11 +2614,8 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     switch (stype) {
     case SVt_NULL:
       undef_sstr:
-	if (dtype != SVt_PVGV) {
-	    (void)SvOK_off(dstr);
-	    return;
-	}
-	break;
+	(void)SvOK_off(dstr);
+	return;
     case SVt_IV:
 	if (SvIOK(sstr)) {
 	    switch (dtype) {
@@ -2689,8 +2714,6 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     sflags = SvFLAGS(sstr);
 
     if (dtype == SVt_PVCV) {
-	sv_clear_body(dstr);
-	sv_upgrade(dstr, SVt_PVCV);
 	cv_setcv(svTcv(dstr), svTcv(sstr));
     } else if (dtype == SVt_PVAV) {
 	int i;
@@ -2730,27 +2753,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	SvANY(dstr) = SvANY(sstr);
     }
     else if (sflags & SVf_ROK) {
-	if (isGV_with_GP(dstr) && dtype == SVt_PVGV
-	    && SvTYPE(SvRV(sstr)) == SVt_PVGV) {
-	    sstr = SvRV(sstr);
-	    if (sstr == dstr) {
-		if (GvIMPORTED(dstr) != GVf_IMPORTED
-		    && CopSTASH_ne(PL_curcop, GvSTASH(dstr)))
-		{
-		    GvIMPORTED_on(dstr);
-		}
-		GvMULTI_on(dstr);
-		return;
-	    }
-	    Perl_croak(aTHX_ "glob to glob assignment have been removed");
-	    return;
-	}
-
 	if (dtype >= SVt_PV) {
-	    if (dtype == SVt_PVGV && isGV_with_GP(dstr)) {
-		glob_assign_ref(dstr, sstr);
-		return;
-	    }
 	    if (SvPVX_const(dstr)) {
 		SvPV_free(dstr);
 		SvLEN_set(dstr, 0);
@@ -2766,19 +2769,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	assert(!(sflags & SVf_IOK));
     }
     else if (dtype == SVt_PVGV && isGV_with_GP(dstr)) {
-	if (!(sflags & SVf_OK)) {
-	    if (ckWARN(WARN_MISC))
-		Perl_warner(aTHX_ packWARN(WARN_MISC),
-			    "Undefined value assigned to typeglob");
-	}
-	else {
-	    GV *gv = gv_fetchsv(sstr, GV_ADD, SVt_PVGV);
-	    if (dstr != (SV*)gv) {
-		if (GvGP(dstr))
-		    gp_free((GV*)dstr);
-		GvGP(dstr) = gp_ref(GvGP(gv));
-	    }
-	}
+	Perl_croak(aTHX_ "non-ref value assigned to glob");
     }
     else if (sflags & SVp_POK) {
         bool isSwipe = 0;
@@ -4208,6 +4199,7 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
     if (type == SVt_PVCV) {
 	if ( CvN_ADD_REFS(sv) ) {
 	    --CvN_ADD_REFS(sv);
+	    SvFLAGS(sv) = SVt_NULL;
 	    return;
 	}
     }

@@ -280,29 +280,38 @@ PP(pp_pos)
 PP(pp_rv2cv)
 {
     dVAR; dSP;
-    SV *ref;
     GV *gv;
-    const I32 flags = (PL_op->op_flags & OPf_SPECIAL)
+    const OPFLAGS op_flags = PL_op->op_flags;
+    const I32 flags = (op_flags & OPf_SPECIAL)
 	? 0
 	: GV_ADD;
     /* We usually try to add a non-existent subroutine in case of AUTOLOAD. */
     /* (But not in defined().) */
 
-    CV *cv = sv_2cv(TOPs, &gv, flags);
-    if (cv) {
-	if (CvCLONE(cv))
-	    cv = svTcv(sv_mortalcopy(cvTsv(cv)));
-    }
-    else if ((flags == (GV_ADD|GV_NOEXPAND)) && gv && SvROK(gv)) {
-	cv = (CV*)gv;
-    }    
-    else {
+    CV *cv = sv_2cv(POPs, &gv, flags);
+    if (!cv) {
 	assert(gv);
 	SV* sub_name = sv_newmortal();
 	gv_efullname3(sub_name, (GV*)gv, NULL);
 	DIE(aTHX_ "Undefined subroutine &%"SVf"", SVfARG(sub_name));
     }
-    SETs((SV*)cv);
+
+    if (op_flags & OPf_ASSIGN) {
+	if (op_flags & OPf_ASSIGN_PART) {
+	    SV* src;
+	    if (PL_stack_base + TOPMARK >= SP) {
+		if ( ! (op_flags & OPf_OPTIONAL) )
+		    Perl_croak(aTHX_ "Missing required assignment value");
+		src = &PL_sv_undef;
+	    } 
+	    else
+		src = POPs;
+	    sv_setsv_mg(cvTsv(cv), src);
+	    RETURN;
+	}
+	sv_setsv_mg(cvTsv(cv), POPs);
+    }
+    PUSHs((SV*)cv);
     RETURN;
 }
 

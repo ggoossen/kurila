@@ -600,7 +600,7 @@ sub _fresh_perl
         $results =~ s/\n\n/\n/g
     
 
-    my $pass = $resolve->($results)
+    my $pass = $resolve <: $results
     unless ($pass)
         _diag "# PROG: \n$prog\n"
         _diag "# EXPECTED:\n", $resolve->(), "\n"
