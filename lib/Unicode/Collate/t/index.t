@@ -326,7 +326,7 @@ is($ret, 2)
 is($str, "Camel and Camel.")
 
 $str = "P\cBe\x{300}\cBrl and PERL."
-$ret = $Collator->gsubst(\$str, "perl", \&strreverse)
+$ret = $Collator->gsubst(\$str, "perl", &strreverse)
 is($ret, 2)
 is($str, "lr\cB\x{300}e\cBP and LREP.")
 

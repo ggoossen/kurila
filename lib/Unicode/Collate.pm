@@ -251,8 +251,6 @@ sub new
         while ($self->{?entry} =~ m/([^\n]+)/g)
             $self->parseEntry($1)
 
-
-
     $self->{+level} ||= MaxLevel
     $self->{+UCA_Version} ||= UCA_Version()
 
@@ -442,8 +440,8 @@ sub splitEnt
         $str = @_[0]
     else
         $str = @_[0]
-        $str = $code->($str) if ref $code
-        $str = $norm->($str) if ref $norm
+        $str = $code->($str) if $code
+        $str = $norm->($str) if $norm
 
 
     # get array of Unicode code point of string.
@@ -478,9 +476,7 @@ sub splitEnt
         if (! defined $jcps)
             if ($wLen && nelems @buf)
                 @buf[-1]->[2] = $i + 1
-
             next
-
 
         my $i_orig = $i
 
@@ -498,8 +494,6 @@ sub splitEnt
                 if ($map{?$temp_jcps})
                     $jcps = $temp_jcps
                     $i = $p
-
-
 
             # not-contiguous contraction with Combining Char (cf. UTS#10, S2.1).
             # This process requires Unicode::Normalize.
@@ -522,10 +516,6 @@ sub splitEnt
                         @src[$p] = undef
                     else
                         $preCC = $curCC
-
-
-
-
 
         # skip completely ignorable
         if ($map{?$jcps} && (nelems  $map{?$jcps}->@) == 0)
@@ -1022,7 +1012,7 @@ sub subst($self, $strref, $substr, $replace)
 ## int count = gsubst(string, substring, replace)
 ##
 sub gsubst($self, $strref, $substr, $replace)
-    my $code = ref $replace eq 'CODE' ?? $replace !! FALSE
+    my $code = ref::svtype($replace) eq 'CODE' ?? $replace !! FALSE
     my $cnt = 0
 
     # Replacement is carried out from the end, then use reverse.
