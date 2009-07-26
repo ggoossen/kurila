@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan(8)
+plan(9)
 
 sub foo
     my $x = nelems(@_)
