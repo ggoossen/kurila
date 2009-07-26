@@ -53,7 +53,7 @@ foo( < @_ ) || print $^STDOUT, "not ok 19\n"
 
 print $^STDOUT, exists &foo ?? "ok 20\n" !! "not ok 20\n"
 undef &foo
-print $^STDOUT, exists(&foo) ?? "not ok 21\n" !! "ok 21\n"
+print $^STDOUT, defined(&foo) ?? "not ok 21\n" !! "ok 21\n"
 
 try { undef $1 }
 print $^STDOUT, $^EVAL_ERROR->{?description} =~ m/^Modification of a read/ ?? "ok 22\n" !! "not ok 22\n"
