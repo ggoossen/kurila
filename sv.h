@@ -84,6 +84,7 @@ typedef enum {
     Dt_CODE,
     Dt_IO,
     Dt_GLOB,
+    Dt_REGEXP,
     Dt_COMPLEX
 } datatype;
 

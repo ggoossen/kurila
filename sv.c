@@ -2199,6 +2199,7 @@ Perl_sv_2pv_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags
 	    *lp = 0;
 	return (char *)"";
     }
+
     if (SvTHINKFIRST(sv)) {
 	if (SvROK(sv)) {
 	    {
@@ -2231,6 +2232,11 @@ Perl_sv_2pv_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags
 	    return (char *)"";
 	}
     }
+
+    if (SvOK(sv) && ! SvPVOK(sv)) {
+	Perl_croak(aTHX_ "%s can not be used as a string", Ddesc(sv));
+    }
+
     if (SvIOK(sv) || ((SvIOKp(sv) && !SvNOKp(sv)))) {
 	/* I'm assuming that if both IV and NV are equally valid then
 	   converting the IV is going to be more efficient */
@@ -2579,7 +2585,10 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	    }
 	}
 
-	if (dtype == SVt_PVGV && isGV_with_GP(dstr)) {
+	if (! SvOK(sstr))
+	    Perl_croak(aTHX_ "Undefined value assigned to glob");
+
+	if (isGV_with_GP(dstr)) {
 	    glob_assign_ref(dstr, sstr);
 	    return;
 	}

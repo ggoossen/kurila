@@ -260,8 +260,7 @@ sub like_yn ($flip, $got, $expected, ?$name, @< @mess)
     $pass = $got !~ m/$expected/ if $flip
     unless ($pass)
         unshift(@mess, "#      got '$got'\n",
-            $flip
-            ?? "# expected !~ m/$expected/\n" !! "# expected m/$expected/\n")
+            $flip ?? "# expected !~ m/$expected/\n" !! "# expected m/$expected/\n")
     
     local $Level = $Level + 1
     _ok($pass, _where(), $name, < @mess)

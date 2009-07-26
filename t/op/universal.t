@@ -87,7 +87,7 @@ ok (!Cedric->isa('Programmer'))
 
 my $b = 'abc'
 my @refs = qw(SCALAR SCALAR     GLOB ARRAY HASH CODE)
-my @vals = @:   \$b,   \3.14, \*b,  \$@,  \$%, sub {} 
+my @vals = @:   \$b,   \3.14, \*b,  \$@,  \$%, \ sub {} 
 for my $p (0 .. nelems(@refs) -1)
     for my $q (0 .. nelems(@vals) -1)
         is UNIVERSAL::isa(@vals[$p], @refs[$q]), ($p==$q or $p+$q==1)

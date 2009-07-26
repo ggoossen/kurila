@@ -157,7 +157,7 @@ PP(pp_rv2sv)
 	gv = (GV*)sv;
 
 	if (SvTYPE(gv) != SVt_PVGV) {
-	    Perl_croak(aTHX_ "Can't use %s as %s REF", Ddesc(sv), is_pp_rv2sv ? a_scalar : is_pp_rv2av ? an_array : a_hash);
+	    Perl_croak(aTHX_ "Expected %s REF but got a %s", is_pp_rv2sv ? a_scalar : is_pp_rv2av ? an_array : a_hash, Ddesc(sv));
 	}
 
 	sv = is_pp_rv2sv ? GvSVn(gv) : is_pp_rv2av ? (SV*)GvAVn(gv) : (SV*)GvHVn(gv);

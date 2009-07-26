@@ -22,6 +22,7 @@ is( (\$xssub)->(*BAR), 'main::BAR' )
 
 do
     my $x = &foo
+    ok( $x )
     is( ($x <: "a"), 'foo1')
     my $y = $x
     is( ($y <: "a"), 'foo1')

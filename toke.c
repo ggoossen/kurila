@@ -4553,7 +4553,7 @@ Perl_yylex(pTHX)
 		if (compsubtable && SvROK(*compsubtable) && SvTYPE(SvRV(*compsubtable)) == SVt_PVHV) {
 		    SV **compsub = hv_fetch((HV *)SvRV(*compsubtable), PL_tokenbuf, len, FALSE);
 		    if (compsub) {
-			pl_yylval.opval = (OP*)newSVOP(OP_CONST, 0, SvREFCNT_inc_NN(SvRV(*compsub)), S_curlocation(PL_bufptr));
+			pl_yylval.opval = (OP*)newSVOP(OP_CONST, 0, SvREFCNT_inc_NN(*compsub), S_curlocation(PL_bufptr));
 			pl_yylval.opval->op_private = OPpCONST_BARE;
 			PL_expect = XTERM;
 			s = SKIPSPACE0(s);

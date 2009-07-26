@@ -9,7 +9,6 @@ BEGIN
         skip_all("fork required to pipe")
     else
         plan(tests => 24)
-    
 
 
 my $Perl = which_perl()
@@ -34,7 +33,7 @@ SKIP: do
         while( ~< $pipe)
             s/^not //
             print $^STDOUT, $_
-        
+
         close $pipe        # avoid zombies
     else
         printf $^STDOUT, "not ok \%d - open -|\n", curr_test()
@@ -42,7 +41,6 @@ SKIP: do
         my $tnum = curr_test
         next_test()
         exec $Perl, '-e', "print \$^STDOUT, q\{not ok $tnum -     again\n\}"
-    
 
     # This has to be *outside* the fork
     for (1..2)
@@ -84,7 +82,6 @@ SKIP: do
         
         print $^STDOUT, $_
         exec $Perl, '-e0'	# Do not run END()...
-    
 
     # This has to be *outside* the fork
     next_test()
@@ -125,12 +122,11 @@ wait                            # Collect from $pid
 pipe(my $reader, my $writer) || die "Can't open pipe"
 close $reader
 
-signals::handler('PIPE') = \&broken_pipe
+signals::handler('PIPE') = &broken_pipe
 
 sub broken_pipe
     signals::handler('PIPE') = 'IGNORE'       # loop preventer
     printf $^STDOUT, "ok \%d - SIGPIPE\n", curr_test
-
 
 printf $writer, "not ok \%d - SIGPIPE\n", curr_test
 close $writer
@@ -163,8 +159,6 @@ SKIP: do
             ok( !close $nil,     'close error on broken pipe' )
         else
             ok(close $nil,       'print failed on broken pipe')
-        
-    
 
     SKIP: do
         skip "Don't work yet", 9 if $^OS_NAME eq 'vmesa'
@@ -196,8 +190,6 @@ SKIP: do
             is( $^CHILD_ERROR, 37*256,     'status correct after wait' )
             is( $wait, $zombie, '       wait pid' )
             is( $^OS_ERROR, '',         '       errno')
-        
-    
 
 
 # Test new semantics for missing command in piped open
@@ -226,7 +218,7 @@ SKIP: do
 
     my $child = 0
     try {
-        local signals::handler("ALRM") = sub (@< @_) { die; };
+        local signals::handler("ALRM") = sub () { die; };
         alarm 2;
         $child = wait;
         alarm 0;

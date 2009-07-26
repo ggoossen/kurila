@@ -33,7 +33,7 @@ $c1 = bless \$("test"), "C"
 expected($c1, "C", "SCALAR")
 our $test = "foo"; $d1 = bless \*test, "D"
 expected($d1, "D", "GLOB")
-$e1 = bless sub (@< @_) { 1 }, "E"
+$e1 = bless \ sub () { 1 }, "E"
 expected($e1, "E", "CODE")
 $f1 = bless \\$@, "F"
 expected($f1, "F", "REF")

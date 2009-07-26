@@ -746,9 +746,9 @@ sub parse_text
             my $args = join("", $iseq->parse_tree->children)
             return  $self->interior_sequence( $iseq->name, $args, $iseq)
     
-    ref $xseq_sub    or  $xseq_sub   = sub (@< @_) { shift()->?$expand_seq(< @_) }
-    ref $xtext_sub   or  $xtext_sub  = sub (@< @_) { shift()->?$expand_text(< @_) }
-    ref $xptree_sub  or  $xptree_sub = sub (@< @_) { shift()->?$expand_ptree(< @_) }
+    defined $xseq_sub    or  $xseq_sub   = sub ($self, @< @args) { $self->?$expand_seq(< @args) }
+    defined $xtext_sub   or  $xtext_sub  = sub ($self, @< @args) { $self->?$expand_text(< @args) }
+    defined $xptree_sub  or  $xptree_sub = sub ($self, @< @args) { $self->?$expand_ptree(< @args) }
 
     ## Keep track of the "current" interior sequence, and maintain a stack
     ## of "in progress" sequences.

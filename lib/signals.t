@@ -6,8 +6,8 @@ use signals
 sub foo { }
 
 ok( ! defined(signals::handler("INT")) )
-signals::handler("INT") = \&foo
-is( signals::handler("INT"), \&foo )
+signals::handler("INT") = &foo
+is( signals::handler("INT"), &foo )
 
 do
     my $called = 0

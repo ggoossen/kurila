@@ -1586,19 +1586,24 @@ PP(pp_require)
 	    for (i = 0; i <= AvFILL(ar); i++) {
 		SV * const dirsv = *av_fetch(ar, i, TRUE);
 
-		if (SvROK(dirsv)) {
+		if (SvROK(dirsv) || SvTYPE(dirsv) == SVt_PVCV) {
 		    SV **svp;
 		    SV *loader = dirsv;
 		    SV *arg;
 
-		    if (SvTYPE(SvRV(loader)) == SVt_PVAV
-			&& !sv_isobject(loader))
-		    {
-			loader = *av_fetch((AV *)SvRV(loader), 0, TRUE);
+		    if (SvTYPE(loader) == SVt_PVCV) {
+			Perl_sv_setpvf(aTHX_ namesv, "/loader/0x%"UVxf"/%s",
+			    PTR2UV(dirsv), name);
 		    }
+		    else {
+			if (SvTYPE(SvRV(loader)) == SVt_PVAV
+			    && !sv_isobject(loader)) {
+			    loader = *av_fetch((AV *)SvRV(loader), 0, TRUE);
+			}
 
-		    Perl_sv_setpvf(aTHX_ namesv, "/loader/0x%"UVxf"/%s",
-				   PTR2UV(SvRV(dirsv)), name);
+			Perl_sv_setpvf(aTHX_ namesv, "/loader/0x%"UVxf"/%s",
+			    PTR2UV(SvRV(dirsv)), name);
+		    }
 		    tryname = SvPVX_const(namesv);
 		    tryrsfp = NULL;
 

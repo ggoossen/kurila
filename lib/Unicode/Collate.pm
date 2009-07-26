@@ -88,7 +88,7 @@ use constant CJK_ExtBFin   => 0x2A6D6
 use constant BMP_Max       => 0xFFFF
 
 # Logical_Order_Exception in PropList.txt
-my $DefaultRearrange = \@:  < 0x0E40..0x0E44, < 0x0EC0..0x0EC4 
+my $DefaultRearrange = \@:  < 0x0E40..0x0E44, < 0x0EC0..0x0EC4
 
 sub UCA_Version { "14" }
 
@@ -101,7 +101,7 @@ sub pack_U
 
 
 sub unpack_U
-    return @:  unpack('U*', shift(@_).pack('U*') ) 
+    return @:  unpack('U*', shift(@_).pack('U*') )
 
 
 ######
@@ -142,22 +142,22 @@ my (%ChangeOK, %ChangeNG)
 
 sub change
     my $self = shift
-    my %hash = %:  < @_ 
+    my %hash = %:  < @_
     my %old
     if (exists %hash{variable} && exists %hash{alternate})
         delete %hash{alternate}
     elsif (!exists %hash{variable} && exists %hash{alternate})
         %hash{+variable} = %hash{?alternate}
-    
+
     foreach my $k (keys %hash)
         if (exists %ChangeOK{$k})
             %old{+$k} = $self->{?$k}
             $self->{+$k} = %hash{?$k}
         elsif (exists %ChangeNG{$k})
             die "change of $k via change() is not allowed!"
-        
+
     # else => ignored
-    
+
     $self->checkCollator()
     return %old
 
@@ -173,12 +173,12 @@ sub _checkLevel
         $level, $key, < MaxLevel
 
 
-my %DerivCode = %: 
+my %DerivCode = %:
     8 => \&_derivCE_8
     9 => \&_derivCE_9
     11 => \&_derivCE_9 # 11 == 9
     14 => \&_derivCE_14
-    
+
 
 sub checkCollator
     my $self = shift
@@ -204,11 +204,9 @@ sub checkCollator
         for my $b (  $self->{backwards}->@)
             _checkLevel($b, "backwards")
             %level{+$b} = 1
-        
+
         for my $v (sort keys %level)
             $self->{+backwardsFlag} += 1 << $v
-        
-    
 
     defined $self->{?rearrange} or $self->{+rearrange} = \$@
     ref $self->{?rearrange}
@@ -219,7 +217,6 @@ sub checkCollator
 
     if ((nelems  $self->{?rearrange}->@))
         $self->{rearrangeHash}->{[  $self->{?rearrange}->@ ]} = $@
-    
 
     $self->{+normCode} = undef
 
@@ -235,11 +232,10 @@ sub checkCollator
             my $norm = $self->{?normalization}
             $self->{+normCode} = sub ($v)
                 Unicode::Normalize::normalize($norm, $v)
-            
-            try { $self->{?normCode}->("") } # try
+
+            try { $self->{normCode}->("") } # try
             $^EVAL_ERROR and die "$PACKAGE unknown normalization form name: $norm"
-        
-    
+
     return
 
 
@@ -254,8 +250,8 @@ sub new
     if ($self->{?entry})
         while ($self->{?entry} =~ m/([^\n]+)/g)
             $self->parseEntry($1)
-        
-    
+
+
 
     $self->{+level} ||= MaxLevel
     $self->{+UCA_Version} ||= UCA_Version()
@@ -285,18 +281,18 @@ sub read_table
         $f = File::Spec->catfile($d, < @Path, $self->{table})
         last if open($fh, "<", $f)
         $f = undef
-    
+
     if (!defined $f)
         $f = File::Spec->catfile(< @Path, $self->{table})
         die("$PACKAGE: Can't locate $f in \$^INCLUDE_PATH (\@INC contains: $(join ' ',$^INCLUDE_PATH))")
-    
+
 
     while (my $line = ~< $fh)
         next if $line =~ m/^\s*#/
         unless ($line =~ s/^\s*\@//)
             $self->parseEntry($line)
             next
-        
+
 
         # matched ^\s*\@
         if ($line =~ m/^version\s*(\S*)/)
@@ -311,8 +307,8 @@ sub read_table
             push  $self->{forwardsTable}->@, $1
         elsif ($line =~ m/^rearrange\s+(.*)/) # (\S*) is NG
             push  $self->{rearrangeTable}->@, < _getHexArray($1)
-        
-    
+
+
     close $fh
 
 
@@ -352,7 +348,7 @@ sub parseEntry
         # replaced as completely ignorable
         $k = '[.0000.0000.0000.0000]'
             if defined $self->{?ignoreChar} && $ele =~ m/$self->{?ignoreChar}/
-    
+
 
     # replaced as completely ignorable
     $k = '[.0000.0000.0000.0000]'
@@ -370,14 +366,14 @@ sub parseEntry
     # is completely ignorable.
     # For expansion, an entry $is_L3_ignorable
     # if and only if "all" CEs are [.0000.0000.0000].
-    
+
 
     $self->{+mapping}{+$entry} = $is_L3_ignorable ?? \$@ !! \@key
 
     if ((nelems @uv) +> 1)
         (!$self->{?maxlength}{?@uv[0]} || $self->{maxlength}{?@uv[0]} +< nelems @uv)
             and $self->{+maxlength}{+@uv[0]} = (nelems @uv)
-    
+
 
 
 
@@ -389,7 +385,7 @@ sub _varCE
     my $vce = shift
     if ($vbl eq 'non-ignorable')
         return $vce
-    
+
     my (@: $var, @< @wt) =@:  unpack VCE_TEMPLATE, $vce
 
     if ($var)
@@ -400,7 +396,7 @@ sub _varCE
     else
         return pack(VCE_TEMPLATE, $var, < @wt[[0..2]],
               $vbl eq 'shifted' && @wt[0]+@wt[1]+@wt[2] ?? Shift4Wt !! 0)
-    
+
 
 
 sub viewSortKey
@@ -416,7 +412,7 @@ sub visualizeSortKey
         $view =~ s/ ?0000 ?/|/g
     else
         $view =~ s/\b0000\b/|/g
-    
+
     return "[$view]"
 
 
@@ -448,7 +444,7 @@ sub splitEnt
         $str = @_[0]
         $str = $code->($str) if ref $code
         $str = $norm->($str) if ref $norm
-    
+
 
     # get array of Unicode code point of string.
     my @src = unpack_U($str)
@@ -462,17 +458,17 @@ sub splitEnt
             if (exists $reH->{ @src[$i] } && $i + 1 +< nelems @src)
                 (@: @src[$i], @src[$i+1]) = @: @src[$i+1], @src[$i]
                 $i++
-            
+
             $i++
-        
-    
+
+
 
     # remove a code point marked as a completely ignorable.
     for my $i (0 .. nelems(@src) -1)
         @src[$i] = undef
             if _isIllegal(@src[$i]) || ($ver9 &&
                                         $map{?@src[$i] } && (nelems  $map{?@src[$i] }->@) == 0)
-    
+
 
     my $i = 0
     while ($i +< nelems @src)
@@ -482,9 +478,9 @@ sub splitEnt
         if (! defined $jcps)
             if ($wLen && nelems @buf)
                 @buf[-1]->[2] = $i + 1
-            
+
             next
-        
+
 
         my $i_orig = $i
 
@@ -502,8 +498,8 @@ sub splitEnt
                 if ($map{?$temp_jcps})
                     $jcps = $temp_jcps
                     $i = $p
-                
-            
+
+
 
             # not-contiguous contraction with Combining Char (cf. UTS#10, S2.1).
             # This process requires Unicode::Normalize.
@@ -526,24 +522,24 @@ sub splitEnt
                         @src[$p] = undef
                     else
                         $preCC = $curCC
-                    
-                
-            
-        
+
+
+
+
 
         # skip completely ignorable
         if ($map{?$jcps} && (nelems  $map{?$jcps}->@) == 0)
             if ($wLen && nelems @buf)
                 @buf[-1]->[2] = $i + 1
-            
+
             next
-        
+
 
         push @buf, $wLen ?? \(@: $jcps, $i_orig, $i + 1) !! $jcps
 
     continue
         $i++
-    
+
     return \@buf
 
 
@@ -607,7 +603,7 @@ sub getWt
                        !! $der->($u)
     else
         return map { _varCE($vbl, $_) }, $der->($u)
-    
+
 
 
 
@@ -629,25 +625,25 @@ sub getSortKey
             my $curHST = ''
             foreach my $u (split m/;/, $jcps)
                 $curHST .= getHST($u)
-            
+
             if ($preHST && !$curHST || # hangul before non-hangul
                 $preHST =~ m/L\z/ && $curHST =~ m/^T/ ||
                 $preHST =~ m/V\z/ && $curHST =~ m/^L/ ||
                 $preHST =~ m/T\z/ && $curHST =~ m/^[LV]/)
 
                 push @buf, $self->getWtHangulTerm()
-            
+
             $preHST = $curHST
 
             push @buf, < $self->getWt($jcps)
-        
+
         $preHST # end at hangul
             and push @buf, $self->getWtHangulTerm()
     else
         foreach my $jcps ( $rEnt->@)
             push @buf, < $self->getWt($jcps)
-        
-    
+
+
 
     # make sort key
     my @ret = @: \$@,\$@,\$@,\$@
@@ -664,12 +660,12 @@ sub getSortKey
                 next if $last_is_variable
             else
                 $last_is_variable = FALSE
-            
-        
+
+
         foreach my $v (0..$lev-1)
             0 +< @wt[$v] and push  @ret[$v]->@, @wt[$v]
-        
-    
+
+
 
     # modification of tertiary weights
     if ($self->{?upper_before_lower})
@@ -678,22 +674,22 @@ sub getSortKey
                 elsif (0x2 +<= $w && $w +<= 0x6) { $w += 6 } # upper
                 elsif ($w == 0x1C)             { $w += 1 } # square upper
                 elsif ($w == 0x1D)             { $w -= 1 } # square lower
-        
-    
+
+
     if ($self->{?katakana_before_hiragana})
         foreach my $w (  @ret[2]->@)
             if    (0x0F +<= $w && $w +<= 0x13) { $w -= 2 } # katakana
                 elsif (0x0D +<= $w && $w +<= 0x0E) { $w += 5 } # hiragana
-        
-    
+
+
 
     if ($self->{?backwardsFlag})
         for my $v (MinLevel .. MaxLevel)
             if ($self->{?backwardsFlag} ^&^ (1 << $v))
                 @ret[$v-1]->@ = reverse  @ret[$v-1]->@
-            
-        
-    
+
+
+
 
     return join LEVEL_SEP, map { pack(KEY_TEMPLATE, < $_->@) }, @ret
 
@@ -731,7 +727,7 @@ sub _derivCE_14
     my $bbbb = ($u ^&^ 0x7FFF) ^|^ 0x8000
     return
         @:  pack(VCE_TEMPLATE, NON_VAR, $aaaa, Min2Wt, Min3Wt, $u)
-            pack(VCE_TEMPLATE, NON_VAR, $bbbb,      0,      0, $u) 
+            pack(VCE_TEMPLATE, NON_VAR, $bbbb,      0,      0, $u)
 
 
 sub _derivCE_9
@@ -748,7 +744,7 @@ sub _derivCE_9
     my $bbbb = ($u ^&^ 0x7FFF) ^|^ 0x8000
     return
         @:  pack(VCE_TEMPLATE, NON_VAR, $aaaa, Min2Wt, Min3Wt, $u)
-            pack(VCE_TEMPLATE, NON_VAR, $bbbb,      0,      0, $u) 
+            pack(VCE_TEMPLATE, NON_VAR, $bbbb,      0,      0, $u)
 
 
 sub _derivCE_8
@@ -757,7 +753,7 @@ sub _derivCE_8
     my $bbbb = ($code ^&^ 0x7FFF) ^|^ 0x8000
     return
         @:  pack(VCE_TEMPLATE, NON_VAR, $aaaa, 2, 1, $code)
-            pack(VCE_TEMPLATE, NON_VAR, $bbbb, 0, 0, $code) 
+            pack(VCE_TEMPLATE, NON_VAR, $bbbb, 0, 0, $code)
 
 
 sub _uideoCE_8
@@ -799,11 +795,11 @@ sub _decompHangul
     my $li = int( $si / Hangul_NCount)
     my $vi = int(($si % Hangul_NCount) / Hangul_TCount)
     my $ti =      $si % Hangul_TCount
-    return  @: 
+    return  @:
                                        Hangul_LBase + $li
                                        Hangul_VBase + $vi
                                        $ti ?? (Hangul_TBase + $ti) !! ()
-        
+
 
 
 sub _isIllegal
@@ -813,7 +809,7 @@ sub _isIllegal
         || (($code ^&^ 0xFFFE) == 0xFFFE)         # ??FFF[EF] (cf. utf8.c)
         || (0xD800 +<= $code && $code +<= 0xDFFF) # unpaired surrogates
         || (0xFDD0 +<= $code && $code +<= 0xFDEF) # other non-characters
-    
+
 
 
 # Hangul Syllable Type
@@ -852,9 +848,9 @@ sub _eqArray($source, $substr, $lev)
         for my $w (0..(nelems  $substr->[$g]->@)-1)
             for my $v (0..$lev-1)
                 return if $source->[$g]->[$w]->[$v] != $substr->[$g]->[$w]->[$v]
-            
-        
-    
+
+
+
     return 1
 
 
@@ -880,7 +876,7 @@ sub index($self, $str, $substr, ?$pos, ?$grob)
         return $grob
             ?? map( {\(@: $_, 0) }, $temp..$len)
             !! @: $temp,0
-    
+
     $len +< $pos
         and return $@
     my $strE = $self->splitEnt($pos ?? substr($str, $pos) !! $str, TRUE)
@@ -930,23 +926,23 @@ sub index($self, $str, $substr, ?$pos, ?$grob)
                         $to_be_pushed = FALSE if $last_is_variable
                     else
                         $last_is_variable = FALSE
-                    
-                
+
+
 
                 if ((nelems @strWt) && !$var && !@wt[0])
                     push  @strWt[-1]->@, \@wt if $to_be_pushed
                     @finPos[-1] = $strE->[$i]->[2]
                 elsif ($to_be_pushed)
-                    push @strWt, \@:  \@wt 
+                    push @strWt, \@:  \@wt
                     push @iniPos, $found_base ?? NOMATCHPOS !! $strE->[$i]->[1]
                     @finPos[-1] = NOMATCHPOS if $found_base
                     push @finPos, $strE->[$i]->[2]
                     $found_base++
-                
+
             # else ===> no-op
-            
+
             $i++
-        
+
 
         # try to match
         while ( nelems(@strWt) +> nelems(@subWt)
@@ -964,13 +960,13 @@ sub index($self, $str, $substr, ?$pos, ?$grob)
                     splice @finPos, 0, ((nelems @subWt)-1)
                 else
                     return @: $temp, @finPos[((nelems @subWt)-1)] - @iniPos[0]
-                
-            
+
+
             shift @strWt
             shift @iniPos
             shift @finPos
-        
-    
+
+
 
     return $grob
         ?? @g_ret
@@ -989,7 +985,7 @@ sub match
     # since its value is affected by modification of its referent.
     else
         return
-    
+
 
 
 ##
@@ -1015,11 +1011,11 @@ sub subst($self, $strref, $substr, $replace)
             substr($strref->$, $pos, $len, $code->($mat))
         else
             substr($strref->$, $pos, $len, $replace)
-        
+
         return TRUE
     else
         return FALSE
-    
+
 
 
 ##
@@ -1036,9 +1032,9 @@ sub gsubst($self, $strref, $substr, $replace)
             substr($strref->$, $pos_len->[0], $pos_len->[1], $code->($mat))
         else
             substr($strref->$, $pos_len->[0], $pos_len->[1], $replace)
-        
+
         $cnt++
-    
+
     return $cnt
 
 
