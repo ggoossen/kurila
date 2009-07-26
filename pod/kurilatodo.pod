@@ -31,6 +31,8 @@ have an implicit C<$_>
 
 =head2 Lexical scoped subroutines imports
 
+=head2 Lexical scoped $^EVAL_ERROR
+
 =head2 Remove duplication of test setup.
 
 Schwern notes, that there's duplication of code - lots and lots of tests have
