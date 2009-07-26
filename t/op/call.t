@@ -2,7 +2,7 @@
 BEGIN
     require "./test.pl"
 
-plan(tests => 4)
+plan(tests => 5)
 
 do
     my $subref = sub ($x) $x
@@ -17,7 +17,9 @@ sub foo()
     return "original foo"
 
 *foo = sub() return "new foo"
+is( foo(), "original foo" )
 
+*foo->& = sub () return "new foo with ->&"
 is( foo(), "original foo" )
 
 eval_dies_like('non_existing_sub()', qr/Undefined subroutine &non_existing_sub called/);

@@ -4685,7 +4685,7 @@ Perl_yylex(pTHX)
 #endif
 		    if (cv) {
 			op_free(pl_yylval.opval);
-			NEXTVAL_NEXTTOKE.opval = (OP*)newSVOP(OP_CONST, 0, newSVsv(cvTsv(cv)), S_curlocation(PL_bufptr));
+			NEXTVAL_NEXTTOKE.opval = (OP*)newSVOP(OP_CONST, 0, SvREFCNT_inc_NN(cvTsv(cv)), S_curlocation(PL_bufptr));
 			pl_yylval.i_tkval.ival = 0;
 		    }
 		    else if (gv) {

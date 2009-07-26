@@ -1446,6 +1446,7 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
     case OP_RV2AV:
     case OP_RV2HV:
     case OP_RV2GV:
+    case OP_RV2CV:
     case OP_PADSV:
     case OP_MAGICSV:
     case OP_PLACEHOLDER:
