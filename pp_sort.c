@@ -1604,13 +1604,7 @@ PP(pp_sort)
 			pad_push(padlist, CvDEPTH(cv));
 		    }
 		    SAVECOMPPAD();
-		    PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
-
-		    if (hasargs) {
-			/* This is mostly copied from pp_entersub */
-			CX_CURPAD_SAVE(cx->blk_sub);
-		    }
-
+		    pad_set_cur_nosave(padlist, CvDEPTH(cv));
 		}
 	    }
 	    cx->cx_type |= CXp_MULTICALL;

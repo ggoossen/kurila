@@ -5,8 +5,7 @@ BEGIN
 plan(tests => 5)
 
 do
-    my $subref = sub ($x) $x
-    my $sub = $subref->$
+    my $sub = sub ($x) $x
     is( ($sub <: "aap"), "aap" )
 
 do
@@ -16,14 +15,10 @@ do
 sub foo()
     return "original foo"
 
-warn "xx" . dump::view(\(*foo->&))
 *foo = sub() return "new foo"
-warn "xx" . dump::view(\(*foo->&))
 is( foo(), "original foo" )
 
-warn "xx" . dump::view(\(*foo->&))
 *foo->& = sub () return "new foo with ->&"
-warn "xx" . dump::view(\(*foo->&))
 is( (*foo->& <: ), "new foo with ->&" )
 
 eval_dies_like('non_existing_sub()', qr/Undefined subroutine &non_existing_sub called/);

@@ -40,6 +40,7 @@ EXTCONST char* const PL_op_name[] = {
 	"pushmark",
 	"logassign_assign",
 	"const",
+	"var",
 	"gvsv",
 	"gv",
 	"gelem",
@@ -402,6 +403,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"pushmark",
 	"assignment part of a logical assignment",
 	"constant item",
+	"variable item",
 	"scalar variable",
 	"glob value",
 	"glob elem",
@@ -776,6 +778,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_pushmark),
 	MEMBER_TO_FPTR(Perl_pp_logassign_assign),
 	MEMBER_TO_FPTR(Perl_pp_const),
+	MEMBER_TO_FPTR(Perl_pp_const),	/* Perl_pp_var */
 	MEMBER_TO_FPTR(Perl_pp_gvsv),
 	MEMBER_TO_FPTR(Perl_pp_gv),
 	MEMBER_TO_FPTR(Perl_pp_gelem),
@@ -1147,6 +1150,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* pushmark */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* logassign_assign */
 	MEMBER_TO_FPTR(Perl_ck_svconst),	/* const */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* var */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* gvsv */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* gv */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* gelem */
@@ -1512,6 +1516,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000004,	/* pushmark */
 	0x00000000,	/* logassign_assign */
 	0x00000c04,	/* const */
+	0x00000c04,	/* var */
 	0x00000c44,	/* gvsv */
 	0x00000c44,	/* gv */
 	0x00022440,	/* gelem */

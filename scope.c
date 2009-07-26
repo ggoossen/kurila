@@ -946,7 +946,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    assert(PL_hinthv);
 	    break;
 	case SAVEt_COMPPAD:
-	    PL_comppad = (PAD*)SSPOPPTR;
+	    AVcpSTEAL(PL_comppad, (PAD*)SSPOPPTR);
 	    if (PL_comppad)
 		PL_curpad = AvARRAY(PL_comppad);
 	    else

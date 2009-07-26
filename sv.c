@@ -4236,10 +4236,6 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 	hv_undef((HV*)sv);
 	break;
     case SVt_PVAV:
-	if (PL_comppad == (AV*)sv) {
-	    PL_comppad = NULL;
-	    PL_curpad = NULL;
-	}
 	av_undef((AV*)sv);
 	break;
     case SVt_PVGV:
@@ -6311,6 +6307,8 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
 
     switch (SvTYPE(sv)) {
     case SVt_PVCV:
+	*gvp = NULL;
+	return sv;
     case SVt_PVHV:
     case SVt_PVAV:
 	Perl_croak(aTHX_ "Expected a CODE reference but got a %s", Ddesc(sv));
@@ -9045,6 +9043,7 @@ Perl_refcnt_check(pTHX)
     SvTMPREFCNT_inc(PL_subname);
     GvTMPREFCNT_inc(PL_defgv);
     CvTMPREFCNT_inc(PL_compcv);
+    AvTMPREFCNT_inc(PL_comppad);
     AvTMPREFCNT_inc(PL_comppad_name);
     SvTMPREFCNT_inc(PL_diehook);
     SvTMPREFCNT_inc(PL_warnhook);

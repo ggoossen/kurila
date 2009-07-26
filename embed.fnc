@@ -94,12 +94,12 @@ Aip	|SV**	|cvpTsvp	|NULLOK CV **cvp
 Aip	|SV**	|gvpTsvp	|NULLOK GV **gvp
 Aip	|SV**	|iopTsvp	|NULLOK struct io **iop
 Aip	|SV**	|repTsvp	|NULLOK REGEXP **rep
-Aip	|AV*	|svTav	|NN SV *sv
-Aip	|HV*	|svThv	|NN SV *sv
-Aip	|CV*	|svTcv	|NN SV *sv
-Aip	|GV*	|svTgv	|NN SV *sv
-Aip	|IO*	|svTio	|NN SV *sv
-Aip	|REGEXP*	|svTre	|NN SV *sv
+Aip	|AV*	|svTav	|NULLOK SV *sv
+Aip	|HV*	|svThv	|NULLOK SV *sv
+Aip	|CV*	|svTcv	|NULLOK SV *sv
+Aip	|GV*	|svTgv	|NULLOK SV *sv
+Aip	|IO*	|svTio	|NULLOK SV *sv
+Aip	|REGEXP*	|svTre	|NULLOK SV *sv
 
 Aip	|const char*	|SvPVX_const	|NN SV *sv
 Aip	|char*	|SvPVX_mutable	|NN SV *sv
@@ -615,6 +615,7 @@ pd	|PADOFFSET|pad_alloc	|I32 optype|U32 tmptype
 p	|PADOFFSET|allocmy	|NN const char *const name
 pdR	|PADOFFSET|pad_findmy	|NN const char* name
 Ap	|PADOFFSET|find_rundefsvoffset	|
+pi	|void	|pad_set_cur_nosave	|NN AV* padlist|I32 nth
 pd	|void	|pad_leavemy
 Apd	|SV*	|pad_sv		|PADOFFSET po
 pd	|void	|pad_free	|PADOFFSET po

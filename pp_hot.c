@@ -1433,7 +1433,7 @@ PP(pp_entersub)
 	    pad_push(padlist, CvDEPTH(cv));
 	}
 	SAVECOMPPAD();
-	PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
+	pad_set_cur_nosave(padlist, CvDEPTH(cv));
 
 	if ( ! cv_optassignarg_flag(cv) 
 	    && ( is_assignment != cv_assignarg_flag(cv) ) ) {
@@ -1447,7 +1447,6 @@ PP(pp_entersub)
 
 	if (CvFLAGS(cv) & CVf_BLOCK) {
 	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
-	    CX_CURPAD_SAVE(cx->blk_sub);
 	    ++MARK;
 
 	    if (items > 1)
@@ -1471,7 +1470,6 @@ PP(pp_entersub)
 		Perl_croak_at(aTHX_ SvLOCATION(cv),
 		    "Not enough arguments for %s",
 		    SvPVX_const(loc_name(SvLOCATION(cv))));
-	    CX_CURPAD_SAVE(cx->blk_sub);
 
 	    ++MARK;
 	    PUSHMARK(MARK-1);
@@ -1517,7 +1515,6 @@ PP(pp_entersub)
 	    av = svTav(avsv);
 	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
 	    AvREAL_on(av);
-	    CX_CURPAD_SAVE(cx->blk_sub);
 	    ++MARK;
 
 	    if (items > AvMAX(av) + 1) {

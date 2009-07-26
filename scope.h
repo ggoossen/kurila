@@ -158,7 +158,7 @@ Closing bracket on a callback.  See C<ENTER> and L<perlcall>.
 #define SAVECOMPPAD() \
     STMT_START {						\
 	SSCHECK(2);						\
-	SSPUSHPTR((SV*)PL_comppad);				\
+	SSPUSHPTR((SV*)AvREFCNT_inc(PL_comppad));		\
 	SSPUSHINT(SAVEt_COMPPAD);				\
     } STMT_END
 

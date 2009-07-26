@@ -49,6 +49,8 @@ my @raw_alias = @:
     # All the ops with a body of { return NORMAL; }
     Perl_pp_null => \qw(scalar regcmaybe lineseq scope)
 
+    Perl_pp_const => \qw(var)
+
     Perl_pp_require => \(@: 'evalfile')
     Perl_pp_sysread => \qw(read recv)
     Perl_pp_sysseek => \(@: 'seek')
@@ -608,6 +610,7 @@ pushmark	pushmark		ck_null		s0
 logassign_assign		assignment part of a logical assignment	ck_null		0	
 
 const		constant item		ck_svconst	s$	
+var		variable item		ck_null	s$	
 
 gvsv		scalar variable		ck_null		ds$	
 gv		glob value		ck_null		ds$	

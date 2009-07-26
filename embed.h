@@ -644,6 +644,7 @@
 #endif
 #define find_rundefsvoffset	Perl_find_rundefsvoffset
 #ifdef PERL_CORE
+#define pad_set_cur_nosave	Perl_pad_set_cur_nosave
 #define pad_leavemy		Perl_pad_leavemy
 #endif
 #define pad_sv			Perl_pad_sv
@@ -2218,6 +2219,7 @@
 #define pp_unstack		Perl_pp_unstack
 #define pp_utime		Perl_pp_utime
 #define pp_values		Perl_pp_values
+#define pp_var			Perl_pp_var
 #define pp_vec			Perl_pp_vec
 #define pp_wait			Perl_pp_wait
 #define pp_waitpid		Perl_pp_waitpid
@@ -2825,6 +2827,7 @@
 #endif
 #define find_rundefsvoffset()	Perl_find_rundefsvoffset(aTHX)
 #ifdef PERL_CORE
+#define pad_set_cur_nosave(a,b)	Perl_pad_set_cur_nosave(aTHX_ a,b)
 #define pad_leavemy()		Perl_pad_leavemy(aTHX)
 #endif
 #define pad_sv(a)		Perl_pad_sv(aTHX_ a)
@@ -4407,6 +4410,7 @@
 #define pp_unstack()		Perl_pp_unstack(aTHX)
 #define pp_utime()		Perl_pp_utime(aTHX)
 #define pp_values()		Perl_pp_values(aTHX)
+#define pp_var()		Perl_pp_var(aTHX)
 #define pp_vec()		Perl_pp_vec(aTHX)
 #define pp_wait()		Perl_pp_wait(aTHX)
 #define pp_waitpid()		Perl_pp_waitpid(aTHX)

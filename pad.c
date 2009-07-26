@@ -207,7 +207,7 @@ Perl_pad_new(pTHX_ int flags, PAD* parent_padnames, PAD* parent_pad, IV parent_s
     /* ... then update state variables */
 
     AVcpREPLACE(PL_comppad_name, (AV*)(*av_fetch(padlist, 0, FALSE)));
-    PL_comppad		= (AV*)(*av_fetch(padlist, 1, FALSE));
+    AVcpREPLACE(PL_comppad,      (AV*)(*av_fetch(padlist, 1, FALSE)));
     PL_curpad		= AvARRAY(PL_comppad);
 
     if (! (flags & padnew_CLONE)) {
@@ -272,7 +272,7 @@ Perl_pad_undef(pTHX_ CV* cv)
 	    if (sv == (SV*)PL_comppad_name)
 		AVcpNULL(PL_comppad_name)
 	    else if (sv == (SV*)PL_comppad) {
-		PL_comppad = NULL;
+		AVcpNULL(PL_comppad);
 		PL_curpad = NULL;
 	    }
 	}

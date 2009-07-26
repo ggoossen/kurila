@@ -113,36 +113,12 @@ PERL_INLINE_CALLCONV SV**	Perl_cvpTsvp(pTHX_ CV **cvp);
 PERL_INLINE_CALLCONV SV**	Perl_gvpTsvp(pTHX_ GV **gvp);
 PERL_INLINE_CALLCONV SV**	Perl_iopTsvp(pTHX_ struct io **iop);
 PERL_INLINE_CALLCONV SV**	Perl_repTsvp(pTHX_ REGEXP **rep);
-PERL_INLINE_CALLCONV AV*	Perl_svTav(pTHX_ SV *sv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SVTAV	\
-	assert(sv)
-
-PERL_INLINE_CALLCONV HV*	Perl_svThv(pTHX_ SV *sv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SVTHV	\
-	assert(sv)
-
-PERL_INLINE_CALLCONV CV*	Perl_svTcv(pTHX_ SV *sv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SVTCV	\
-	assert(sv)
-
-PERL_INLINE_CALLCONV GV*	Perl_svTgv(pTHX_ SV *sv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SVTGV	\
-	assert(sv)
-
-PERL_INLINE_CALLCONV IO*	Perl_svTio(pTHX_ SV *sv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SVTIO	\
-	assert(sv)
-
-PERL_INLINE_CALLCONV REGEXP*	Perl_svTre(pTHX_ SV *sv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SVTRE	\
-	assert(sv)
-
+PERL_INLINE_CALLCONV AV*	Perl_svTav(pTHX_ SV *sv);
+PERL_INLINE_CALLCONV HV*	Perl_svThv(pTHX_ SV *sv);
+PERL_INLINE_CALLCONV CV*	Perl_svTcv(pTHX_ SV *sv);
+PERL_INLINE_CALLCONV GV*	Perl_svTgv(pTHX_ SV *sv);
+PERL_INLINE_CALLCONV IO*	Perl_svTio(pTHX_ SV *sv);
+PERL_INLINE_CALLCONV REGEXP*	Perl_svTre(pTHX_ SV *sv);
 
 PERL_INLINE_CALLCONV const char*	Perl_SvPVX_const(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
@@ -2196,6 +2172,11 @@ PERL_CALLCONV PADOFFSET	Perl_pad_findmy(pTHX_ const char* name)
 	assert(name)
 
 PERL_CALLCONV PADOFFSET	Perl_find_rundefsvoffset(pTHX);
+PERL_INLINE_CALLCONV void	Perl_pad_set_cur_nosave(pTHX_ AV* padlist, I32 nth)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_PAD_SET_CUR_NOSAVE	\
+	assert(padlist)
+
 PERL_CALLCONV void	Perl_pad_leavemy(pTHX);
 PERL_CALLCONV SV*	Perl_pad_sv(pTHX_ PADOFFSET po);
 PERL_CALLCONV void	Perl_pad_free(pTHX_ PADOFFSET po);

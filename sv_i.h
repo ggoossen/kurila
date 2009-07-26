@@ -142,38 +142,32 @@ SV** Perl_repTsvp(pTHX_ REGEXP **rep) { return (SV**)rep; }
 SV** Perl_iopTsvp(pTHX_ struct io **iop) { return (SV**)iop; }
 
 AV* Perl_svTav(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVTAV;
-    assert(SvAVOK(sv));
+    assert(! sv || SvAVOK(sv));
     return (AV*)sv;
 }
 
 HV* Perl_svThv(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVTHV;
-    assert(SvHVOK(sv));
+    assert(!sv || SvHVOK(sv));
     return (HV*)sv;
 }
 
 CV* Perl_svTcv(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVTCV;
-    assert(SvCVOK(sv));
+    assert(!sv || SvCVOK(sv));
     return (CV*)sv;
 }
 
 GV* Perl_svTgv(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVTGV;
-    assert(SvTYPE(sv) == SVt_PVGV);
+    assert(!sv || SvTYPE(sv) == SVt_PVGV);
     return (GV*)sv;
 }
 
 IO* Perl_svTio(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVTIO;
-    assert(SvIOOK(sv));
+    assert(!sv || SvIOOK(sv));
     return (IO*)sv;
 }
 
 REGEXP* Perl_svTre(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVTRE;
-    assert(SvTYPE(sv) == SVt_REGEXP);
+    assert(!sv || SvTYPE(sv) == SVt_REGEXP);
     return (REGEXP*)sv;
 }
 

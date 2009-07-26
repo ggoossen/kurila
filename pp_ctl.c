@@ -686,7 +686,7 @@ PP(pp_dbstate)
 	    cx->blk_sub.retop = PL_op->op_next;
 	    CvDEPTH(cv)++;
 	    SAVECOMPPAD();
-	    PAD_SET_CUR_NOSAVE(CvPADLIST(cv), 1);
+	    pad_set_cur_nosave(CvPADLIST(cv), 1);
 	    RETURNOP(CvSTART(cv));
 	}
     }
