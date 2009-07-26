@@ -527,7 +527,6 @@ Perl_sv_uv
 Perl_sv_nv
 Perl_sv_pvn
 Perl_sv_pvutf8n
-Perl_sv_true
 Perl_sv_backoff
 Perl_sv_bless
 Perl_sv_catpvf

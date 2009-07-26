@@ -2861,7 +2861,6 @@ PERL_CALLCONV char*	Perl_sv_pvutf8n(pTHX_ SV *sv, STRLEN *lp)
 #define PERL_ARGS_ASSERT_SV_PVUTF8N	\
 	assert(sv); assert(lp)
 
-PERL_CALLCONV I32	Perl_sv_true(pTHX_ SV *const sv);
 PERL_CALLCONV void	Perl_sv_add_arena(pTHX_ char *const ptr, const U32 size, const U32 flags)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SV_ADD_ARENA	\

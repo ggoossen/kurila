@@ -808,7 +808,6 @@ Apd	|UV	|sv_uv		|NN SV* sv
 Apd	|NV	|sv_nv		|NN SV* sv
 Apd	|char*	|sv_pvn		|NN SV *sv|NN STRLEN *lp
 Apd	|char*	|sv_pvutf8n	|NN SV *sv|NN STRLEN *lp
-Apd	|I32	|sv_true	|NULLOK SV *const sv
 pd	|void	|sv_add_arena	|NN char *const ptr|const U32 size|const U32 flags
 Apd	|int	|sv_backoff	|NN SV *const sv
 Apd	|SV*	|sv_bless	|NN SV *const sv|NN HV *const stash

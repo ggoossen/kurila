@@ -6352,42 +6352,6 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
 }
 
 /*
-=for apidoc sv_true
-
-Returns true if the SV has a true value by Perl's rules.
-Use the C<SvTRUE> macro instead, which may call C<sv_true()> or may
-instead use an in-line version.
-
-=cut
-*/
-
-I32
-Perl_sv_true(pTHX_ register SV *const sv)
-{
-    if (!sv)
-	return 0;
-    if (SvPOK(sv)) {
-	register const XPV* const tXpv = (XPV*)SvANY(sv);
-	if (tXpv &&
-		(tXpv->xpv_cur > 1 ||
-		(tXpv->xpv_cur && *sv->sv_u.svu_pv != '0')))
-	    return 1;
-	else
-	    return 0;
-    }
-    else {
-	if (SvIOK(sv))
-	    return I_SvIV(sv) != 0;
-	else {
-	    if (SvNOK(sv))
-		return SvNVX(sv) != 0.0;
-	    else
-		return sv_2bool(sv);
-	}
-    }
-}
-
-/*
 =for apidoc sv_pvn_force
 
 Get a sensible string out of the SV somehow.

@@ -871,7 +871,6 @@
 #define sv_nv			Perl_sv_nv
 #define sv_pvn			Perl_sv_pvn
 #define sv_pvutf8n		Perl_sv_pvutf8n
-#define sv_true			Perl_sv_true
 #ifdef PERL_CORE
 #define sv_add_arena		Perl_sv_add_arena
 #endif
@@ -3053,7 +3052,6 @@
 #define sv_nv(a)		Perl_sv_nv(aTHX_ a)
 #define sv_pvn(a,b)		Perl_sv_pvn(aTHX_ a,b)
 #define sv_pvutf8n(a,b)		Perl_sv_pvutf8n(aTHX_ a,b)
-#define sv_true(a)		Perl_sv_true(aTHX_ a)
 #ifdef PERL_CORE
 #define sv_add_arena(a,b,c)	Perl_sv_add_arena(aTHX_ a,b,c)
 #endif
