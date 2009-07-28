@@ -135,7 +135,6 @@ sub get_token
                 # do horribly magic things
 
                 $i--
-            
 
             if(DEBUG +> 8)
                 print $^STDOUT, "* I've gotten ", scalar(nelems @lines), " lines:\n"

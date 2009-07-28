@@ -4749,6 +4749,34 @@ PP(pp_ref_eq)
     RETURN;
 }
 
+PP(pp_code_eq)
+{
+    dSP;
+
+    if (! SvCVOK(TOPs))
+	DIE(aTHX_ "Expected a CODE but got a %s", Ddesc(TOPs));
+    if (! SvCVOK(TOPm1s))
+	DIE(aTHX_ "Expected a CODE but got a %s", Ddesc(TOPm1s));
+
+    SP--;
+    SETs(boolSV(SvANY(TOPs) == SvANY(TOPp1s)));
+    RETURN;
+}
+
+PP(pp_code_ne)
+{
+    dSP;
+
+    if (! SvCVOK(TOPs))
+	DIE(aTHX_ "Expected a CODE but got a %s", Ddesc(TOPs));
+    if (! SvCVOK(TOPm1s))
+	DIE(aTHX_ "Expected a CODE but got a %s", Ddesc(TOPm1s));
+
+    SP--;
+    SETs(boolSV(SvANY(TOPs) != SvANY(TOPp1s)));
+    RETURN;
+}
+
 PP(pp_ref_ne)
 {
     dSP;

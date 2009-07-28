@@ -3972,6 +3972,16 @@ Perl_yylex(pTHX)
 	    AOPERATOR(ANDAND);
 	s--;
 	if (PL_expect == XOPERATOR) {
+	    if (*s == '=' && s[1] == '=') {
+		/* '&==' operator */
+		s += 2;
+		Eop(OP_CODE_EQ);
+	    }
+	    if (*s == '!' && s[1] == '=') {
+		/* '&!=' operator */
+		s += 2;
+		Eop(OP_CODE_NE);
+	    }
 	    no_op("'&'", s);
 	}
 
@@ -4326,10 +4336,12 @@ Perl_yylex(pTHX)
 	s++;
 	if (PL_expect == XOPERATOR) {
 	    if (*s == '=' && s[1] == '=') {
+		/* '\==' operator */
 		s += 2;
 		Eop(OP_REF_EQ);
 	    }
 	    if (*s == '!' && s[1] == '=') {
+		/* '\!=' operator */
 		s += 2;
 		Eop(OP_REF_NE);
 	    }

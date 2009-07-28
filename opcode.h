@@ -116,6 +116,8 @@ EXTCONST char* const PL_op_name[] = {
 	"i_ncmp",
 	"ref_eq",
 	"ref_ne",
+	"code_eq",
+	"code_ne",
 	"seq",
 	"sne",
 	"scmp",
@@ -479,6 +481,8 @@ EXTCONST char* const PL_op_desc[] = {
 	"integer comparison (<+>)",
 	"ref eq",
 	"ref ne",
+	"code eq",
+	"code ne",
 	"string eq",
 	"string ne",
 	"string comparison (cmp)",
@@ -854,6 +858,8 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_i_ncmp),
 	MEMBER_TO_FPTR(Perl_pp_ref_eq),
 	MEMBER_TO_FPTR(Perl_pp_ref_ne),
+	MEMBER_TO_FPTR(Perl_pp_code_eq),
+	MEMBER_TO_FPTR(Perl_pp_code_ne),
 	MEMBER_TO_FPTR(Perl_pp_seq),
 	MEMBER_TO_FPTR(Perl_pp_sne),
 	MEMBER_TO_FPTR(Perl_pp_scmp),
@@ -1226,6 +1232,8 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* i_ncmp */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* ref_eq */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* ref_ne */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* code_eq */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* code_ne */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* seq */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* sne */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* scmp */
@@ -1592,6 +1600,8 @@ EXTCONST U32 PL_opargs[] = {
 	0x0002241e,	/* i_ncmp */
 	0x00022414,	/* ref_eq */
 	0x00022414,	/* ref_ne */
+	0x00022414,	/* code_eq */
+	0x00022414,	/* code_ne */
 	0x00022416,	/* seq */
 	0x00022416,	/* sne */
 	0x0002241e,	/* scmp */

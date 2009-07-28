@@ -713,6 +713,9 @@ i_ncmp		integer comparison (<+>)	ck_null		ifst2	S S
 ref_eq		ref eq		ck_null		is2	S S
 ref_ne		ref ne		ck_null		is2	S S
 
+code_eq		code eq		ck_null		is2	S S
+code_ne		code ne		ck_null		is2	S S
+
 seq		string eq		ck_null		ifs2	S S
 sne		string ne		ck_null		ifs2	S S
 scmp		string comparison (cmp)	ck_null		ifst2	S S

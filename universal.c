@@ -791,6 +791,11 @@ S_cat_view_pv(SV* retsv, SV* sv, int indent)
 	return;
     }
 
+    if ( SvCVOK(sv) ) {
+	sv_catpv(retsv, "CODE");
+	return;
+    }
+	
     if (SvPOKp(sv)) {
 	/* mostly stoken from Data::Dumper/Dumper.xs */
 	char *r, *rstart;
