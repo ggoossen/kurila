@@ -998,15 +998,6 @@ Perl_leave_scope(pTHX_ I32 base)
 	    LEAVE;
 	    break;
 	}
-	case SAVEt_SAVESWITCHSTACK:
-	    {
-		dSP;
-		AV* const t = (AV*)SSPOPPTR;
-		AV* const f = (AV*)SSPOPPTR;
-		SWITCHSTACK(t,f);
-		PL_curstackinfo->si_stack = f;
-	    }
-	    break;
 	case SAVEt_SET_SVFLAGS:
 	    {
 		const U32 val  = (U32)SSPOPINT;
@@ -1261,11 +1252,6 @@ Perl_scope_tmprefcnt(pTHX)
 	case SAVEt_SET_MAGICSV: {
 	    SvTMPREFCNT_inc((SV*)SSPOPPTR);
 	    SvTMPREFCNT_inc((SV*)SSPOPPTR);
-	    break;
-	}
-	case SAVEt_SAVESWITCHSTACK: {
-	    (void)SSPOPPTR;
-	    (void)SSPOPPTR;
 	    break;
 	}
 	case SAVEt_SET_SVFLAGS: {
