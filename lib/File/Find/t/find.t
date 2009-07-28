@@ -12,9 +12,9 @@ use Carp::Heavy () # make sure Carp::Heavy is already loaded, because $^INCLUDE_
 BEGIN 
     $^WARN_HOOK = sub (@< @_) { $warn_msg = @_[0]; print $^STDERR, "# " . @_[0]->message; }
 
+use Test::More
 
-if ( $symlink_exists ) { print $^STDOUT, "1..193\n"; }
-else                   { print $^STDOUT, "1..85\n";  }
+plan tests => ( $symlink_exists ?? 193 !! 85 )
 
 # Uncomment this to see where File::Find is chdir'ing to.  Helpful for
 # debugging its little jaunts around the filesystem.
@@ -51,22 +51,14 @@ cleanup()
 $::count_commonsense = 0
 find(\(%: wanted => sub (@< @_) { ++$::count_commonsense if $_ eq 'commonsense.t'; } ),
      File::Spec->curdir)
-if ($::count_commonsense == 1)
-    print $^STDOUT, "ok 1\n"
-else
-    print $^STDOUT, "not ok 1 # found $::count_commonsense files named 'commonsense.t'\n"
-
+is($::count_commonsense, 1)
 
 $::count_commonsense = 0
 finddepth(\(%: wanted => sub (@< @_) { ++$::count_commonsense if $_ eq 'commonsense.t'; } ),
           File::Spec->curdir)
-if ($::count_commonsense == 1)
-    print $^STDOUT, "ok 2\n"
-else
-    print $^STDOUT, "not ok 2 # found $::count_commonsense files named 'commonsense.t'\n"
+is($::count_commonsense, 1)
 
 
-my $case = 2
 my $FastFileTests_OK = 0
 
 sub cleanup
@@ -99,15 +91,11 @@ END
 
 
 sub Check($ok)
-    $case++
-    if ($ok) { print $^STDOUT, "ok $case\n"; }
-    else       { print $^STDOUT, "not ok $case\n"; }
+    ok($ok)
 
 
 sub CheckDie($ok)
-    $case++
-    if ($ok) { print $^STDOUT, "ok $case\n"; }
-    else { print $^STDOUT, "not ok $case\n $^OS_ERROR\n"; exit 0; }
+    ok($ok) or die "OS_ERROR: $^OS_ERROR"
 
 
 sub touch
@@ -297,7 +285,6 @@ sub file_path_name
     my $path = file_path(< @_)
     $path = ":$path" if (($^OS_NAME eq 'MacOS') && ($path !~ m/:/))
     return $path
-
 
 
 MkDir( dir_path('for_find'), 0770 )

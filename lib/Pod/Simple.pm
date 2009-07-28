@@ -1392,7 +1392,7 @@ sub _out
 
     my $class = shift(@_)
 
-    my $mutor = shift(@_) if (nelems @_) and ref(@_[0] || '') eq 'CODE'
+    my $mutor = shift(@_) if @_ and ref::svtype(@_[0]) eq 'CODE'
 
     DEBUG and print $^STDOUT, "\n\n", '#' x 76,
         "\nAbout to parse source: \{\{\n@_[0]\n\}\}\n\n"
@@ -1420,7 +1420,7 @@ sub _duo
 
     my $class = shift(@_)
 
-    my $mutor = shift(@_) if (nelems @_) and ref(@_[0] || '') eq 'CODE'
+    my $mutor = shift(@_) if @_ and ref::svtype(@_[0]) eq 'CODE'
 
     die "But $class->_duo takes two parameters, not: $(join ' ',@_)"
         unless (nelems @_) == 2

@@ -36,7 +36,6 @@ do
     my $warnings = ''
     local $^WARN_HOOK = sub (@< @_)
         $warnings .= @_[0]->description
-    
 
     my $mm
 
@@ -47,7 +46,7 @@ do
             VERSION_FROM    => 'lib/Big/Dummy.pm',
             AUTHOR          => sub {},
             );
-              }, qr|AUTHOR takes a PLAINVALUE not a REF.|
+              }, qr|AUTHOR takes a PLAINVALUE not a CODE.|
 
     # LIBS accepts *both* a string or an array ref.  The first cut of
     # our verification did not take this into account.

@@ -64,7 +64,7 @@ ok( $^EVAL_ERROR )
 
 # T_CVREF - reference to perl subroutine
 diag "# T_CVREF\n"
-my $sub = sub { 1 }
+my $sub = \ sub { 1 }
 is( T_CVREF($sub), $sub )
 
 # Now test that a non code ref is rejected

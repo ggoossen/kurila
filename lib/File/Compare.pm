@@ -17,7 +17,7 @@ sub compare
         unless((nelems @_) == 2 || (nelems @_) == 3)
 
     my (@: $from,$to,?$size) =  @_
-    my $text_mode = defined($size) && (ref($size) eq 'CODE' || $size +< 0)
+    my $text_mode = defined($size) && (ref::svtype($size) eq 'CODE' || $size +< 0)
 
     my ($fromsize,$closefrom,$closeto)
 
@@ -120,7 +120,7 @@ sub compare_text
     die("Usage: compare_text( file1, file2 [, cmp-function])")
         unless (nelems @_) == 2 || (nelems @_) == 3
     die("Third arg to compare_text() function must be a code reference")
-        if (nelems @_) == 3 && ref($cmp) ne 'CODE'
+        if (nelems @_) == 3 && ref::svtype($cmp) ne 'CODE'
 
     # Using a negative buffer size puts compare into text_mode too
     $cmp = -1 unless defined $cmp

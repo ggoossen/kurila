@@ -331,13 +331,13 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
 
         if ( $opt eq '<>' )
             if ( (defined $userlinkage)
-                   && !((nelems @optionlist) +> 0 && ref(@optionlist[0]))
+                   && !(@optionlist && ref::svtype(@optionlist[0]) ne 'PLAINVALUE')
                    && (exists $userlinkage->{$opt})
                    && ref($userlinkage->{?$opt}) )
                 unshift (@optionlist, $userlinkage->{?$opt})
             
             unless ( (nelems @optionlist) +> 0
-                       && ref(@optionlist[0]) && ref(@optionlist[0]) eq 'CODE' )
+                       && ref::svtype(@optionlist[0]) eq 'CODE' )
                 $error .= "Option spec <> requires a reference to a subroutine\n"
                 # Kill the linkage (to avoid another error).
                 shift (@optionlist)
@@ -377,7 +377,7 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
         
 
         # Copy the linkage. If omitted, link to global variable.
-        if ( (nelems @optionlist) +> 0 && ref(@optionlist[0]) )
+        if ( @optionlist && ref::svtype(@optionlist[0]) ne 'PLAINVALUE' )
             print $^STDERR, ("=> link \"$orig\" to $(dump::view(@optionlist[0]))\n")
                 if $debug
             my $rl = ref(%linkage{+$orig} = shift (@optionlist))
@@ -397,7 +397,7 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
             #		else {
             # Ok.
             #		}
-            }elsif ( $rl eq "CODE" ) {
+            }elsif ( ref::svtype(%linkage{$orig}) eq "CODE" ) {
             # Ok.
             }else
                 $error .= "Invalid option linkage for \"$opt\"\n"
@@ -422,9 +422,6 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
                     if $debug
                 eval ("\%linkage\{+\$orig\} = \\\$".$pkg."::opt_$ov;")
                 die if $^EVAL_ERROR
-            
-        
-    
 
     # Bail out if errors found.
     die ($error) if $error
@@ -539,7 +536,7 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
                         print $^STDERR, ("=> \$\$L\{$opt\}->\{$key\} = \"$arg\"\n")
                             if $debug
                         %linkage{$opt}->{+$key} = $arg
-                    elsif ( ref(%linkage{?$opt}) eq 'CODE' )
+                    elsif ( ref::svtype(%linkage{?$opt}) eq 'CODE' )
                         print $^STDERR, ("=> &L\{$opt\}(\"$opt\"",
                                          $ctl->[CTL_DEST] == CTL_DEST_HASH ?? ", \"$key\"" !! "",
                                          ", \"$arg\")\n")
@@ -566,17 +563,13 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
                             if ( $eval_error->message =~ m/^!/ )
                                 if ( $eval_error->message =~ m/^!FINISH\b/ )
                                     $goon = 0
-                                
                             else
                                 warn ($eval_error)
                                 $error++
-                            
-                        
                     else
                         print $^STDERR, ("Invalid REF type \"", ref(%linkage{?$opt}),
                                          "\" in linkage\n")
                         die("Getopt::Long -- internal error!\n")
-                    
                 elsif ( $ctl->[CTL_DEST] == CTL_DEST_ARRAY )
                     if ( defined $userlinkage->{?$opt} )
                         print $^STDERR, ("=> push(\@\{\$L\{$opt\}\}, \"$arg\")\n")
@@ -586,7 +579,6 @@ sub GetOptionsFromArray($argv, @< @optionlist)  # local copy of the option descr
                         print $^STDERR, ("=>\$L\{$opt\} = [\"$arg\"]\n")
                             if $debug
                         $userlinkage->{+$opt} = \@: $arg
-                    
                 elsif ( $ctl->[CTL_DEST] == CTL_DEST_HASH )
                     if ( defined $userlinkage->{?$opt} )
                         print $^STDERR, ("=> \$L\{$opt\}->\{$key\} = \"$arg\"\n")

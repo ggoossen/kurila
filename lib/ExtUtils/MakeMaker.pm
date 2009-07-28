@@ -107,18 +107,14 @@ sub _verify_att($att)
         unless( defined $sig )
             warn "WARNING: $key is not a known parameter.\n"
             next
-        
 
         my @sigs   = ref::svtype($sig) eq 'ARRAY' ?? $sig !! @:  $sig 
         my $given  = ref::svtype($val)
-        unless( grep { $given eq $_ || ($_ && try{$val->isa($_)}) || ($_ eq 'CODE' && ref($val) eq 'CODE') }, @sigs )
+        unless( grep { $given eq $_ || ($_ && try{$val->isa($_)}) || ($_ eq 'CODE' && ref::svtype($val) eq 'CODE') }, @sigs )
             my $takes = join " or ", map { _format_att($_) }, @sigs
 
             my $has = _format_att($given)
             die "$key takes a $takes not a $has."
-        
-    
-
 
 
 sub _format_att

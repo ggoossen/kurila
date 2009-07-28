@@ -249,8 +249,7 @@ unless (   exists &Time::HiRes::gettimeofday
             or die "Error setting SIGALRM handler with sigaction: $^OS_ERROR\n";
     }else 
         diag "# SIG tick\n"
-        signals::handler("ALRM") = "tick"
-    
+        signals::handler("ALRM") = &tick
 
     # On VMS timers can not interrupt select.
     if ($^OS_NAME eq 'VMS') {

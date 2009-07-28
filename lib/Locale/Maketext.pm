@@ -202,7 +202,7 @@ sub maketext
         if(ref($handle) and $handle->{?'fail'})
             print $^STDOUT, "WARNING0: maketext fails looking for <$phrase>\n" if DEBUG
             my $fail
-            if(ref($fail = $handle->{?'fail'}) eq 'CODE') # it's a sub reference
+            if(ref::svtype($fail = $handle->{?'fail'}) eq 'CODE') # it's a sub reference
                 return $fail->($handle, $phrase, < @_)
             # If it ever returns, it should return a good value.
             else # It's a method name
@@ -216,7 +216,7 @@ sub maketext
 
 
     return $value->$ if ref($value) eq 'SCALAR'
-    return $value unless ref($value) eq 'CODE'
+    return $value unless ref::svtype($value) eq 'CODE'
 
     do
         try { $value = $value->($handle, < @_) }

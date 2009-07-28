@@ -423,7 +423,7 @@ sub allow
         return if @_[0] !~ m/@_[1]/
 
     ### it's a sub ###
-    elsif ( ref @_[1] eq 'CODE' )
+    elsif ( ref::svtype(@_[1]) eq 'CODE' )
         return unless @_[1]->( @_[0] )
 
     ### it's an array ###

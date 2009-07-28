@@ -47,6 +47,8 @@ S_signals_set_handler(SV* handlersv, SV* namesv)
 #endif
 
     if ( SvTYPE(handlersv) != SVt_PVCV ) {
+        if (!SvPVOK(handlersv))
+            Perl_croak(aTHX_  "signal handler should be a CODE or 'DEFAULT or 'IGNORE'");
         const char *s = SvOK(handlersv) ? SvPV_const(handlersv, len) : "DEFAULT";
         if ( strEQ(s,"IGNORE") )
 	    set_to_ignore = TRUE;

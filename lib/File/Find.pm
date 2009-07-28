@@ -639,9 +639,6 @@ sub _find_opt
                     unless (defined $abs_dir)
                         warnings::warnif "Can't determine absolute path for $top_item (No such file or directory)\n"
                         next Proc_Top_Item
-                    
-                
-
             else
                 if (substr($top_item,0,1) eq '/')
                     $abs_dir = $top_item
@@ -650,19 +647,15 @@ sub _find_opt
                 else  # care about any  ../
                     $top_item =~ s/\.dir\z//i if $Is_VMS
                     $abs_dir = contract_name("$cwd/",$top_item)
-                
-            
+
             $abs_dir= Follow_SymLink($abs_dir)
             unless (defined $abs_dir)
                 if ($dangling_symlinks)
-                    if (ref $dangling_symlinks eq 'CODE')
+                    if (ref::svtype($dangling_symlinks) eq 'CODE')
                         $dangling_symlinks->($top_item, $cwd)
                     else
                         warnings::warnif "$top_item is a dangling symbolic link\n"
-                    
-                
                 next Proc_Top_Item
-            
 
             if (-d _)
                 $top_item =~ s/\.dir\z//i if $Is_VMS
@@ -807,8 +800,6 @@ sub _find_dir($wanted, $p_dir, $nlink)
                         
                     else # $untaint_skip == 1
                         next
-                    
-                
             
             unless (chdir ($Is_VMS && $udir !~ m/[\/\[<]+/ ?? "./$udir" !! $udir))
                 if ($Is_MacOS)
@@ -816,11 +807,9 @@ sub _find_dir($wanted, $p_dir, $nlink)
                 else
                     warnings::warnif "Can't cd to (" .
                                      ($p_dir ne '/' ?? $p_dir !! '') . "/) $udir: $^OS_ERROR\n"
-                
                 next
             
             $CdLvl++
-        
 
         if ($Is_MacOS)
             $dir_name = "$dir_name:" unless ($dir_name =~ m/:$/)
@@ -1104,12 +1093,10 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) # $dir_loc is the absolute direc
             # ignore if invalid symlink
             unless (defined $new_loc)
                 if (!defined -l _ && $dangling_symlinks)
-                    if (ref $dangling_symlinks eq 'CODE')
+                    if (ref::svtype($dangling_symlinks) eq 'CODE')
                         $dangling_symlinks->($FN, $dir_pref)
                     else
                         warnings::warnif "$dir_pref$FN is a dangling symbolic link\n"
-                    
-                
 
                 $fullname = undef
                 $name = $dir_pref . $FN
