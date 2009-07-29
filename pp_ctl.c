@@ -190,6 +190,7 @@ static const char * const context_name[] = {
     "subroutine",
     "eval",
     "substitution",
+    "XS-subroutine",
 };
 
 STATIC I32
@@ -205,6 +206,7 @@ S_dopoptolabel(pTHX_ const char *label)
 	switch (CxTYPE(cx)) {
 	case CXt_SUBST:
 	case CXt_SUB:
+	case CXt_XSSUB:
 	case CXt_EVAL:
 	case CXt_NULL:
 	    if (ckWARN(WARN_EXITING))
@@ -275,6 +277,7 @@ Perl_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
 	    continue;
 	case CXt_EVAL:
 	case CXt_SUB:
+	case CXt_XSSUB:
 	    DEBUG_l( Perl_deb(aTHX_ "(Found sub #%ld)\n", (long)i));
 	    return i;
 	}
@@ -310,6 +313,7 @@ S_dopoptoloop(pTHX_ I32 startingblock)
 	switch (CxTYPE(cx)) {
 	case CXt_SUBST:
 	case CXt_SUB:
+	case CXt_XSSUB:
 	case CXt_EVAL:
 	case CXt_NULL:
 	    if (ckWARN(WARN_EXITING))
@@ -360,6 +364,8 @@ Perl_dounwind(pTHX_ I32 cxix)
 	    POPLOOP(cx);
 	    break;
 	case CXt_NULL:
+	    break;
+	case CXt_XSSUB:
 	    break;
 	}
     }

@@ -1565,9 +1565,15 @@ PP(pp_entersub)
 	    PL_curcop = PL_curcopdb;
 	    PL_curcopdb = NULL;
 	}
-	/* Do we need to open block here? XXXX */
+
+	PUSHBLOCK(cx, CXt_XSSUB, PL_stack_base + markix );
+	cx->blk_sub.cv = CvREFCNT_inc(cv);				\
+
 	if (CvXSUB(cv)) /* XXX this is supposed to be true */
 	    (void)(*CvXSUB(cv))(aTHX_ cv);
+
+	CvREFCNT_dec(cv);
+	--cxstack_ix;
 
 	/* Enforce some sanity in scalar context. */
 	if (gimme == G_SCALAR && ++markix != PL_stack_sp - PL_stack_base ) {

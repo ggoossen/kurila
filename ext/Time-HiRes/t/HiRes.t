@@ -171,7 +171,7 @@ else
 unless ($have_ualarm && $have_alarm) {
     skip 12..13;
 }
-else 
+else
     my $tick = 0
     local signals::handler("ALRM") = sub { $tick++ }
 

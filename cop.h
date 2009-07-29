@@ -439,6 +439,7 @@ struct context {
 #define CXt_SUB		7
 #define CXt_EVAL        8
 #define CXt_SUBST       9
+#define CXt_XSSUB     0xa
 /* SUBST doesn't feature in all switch statements.  */
 
 /* private flags for CXt_SUB and CXt_NULL

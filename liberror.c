@@ -30,29 +30,31 @@ Perl_boot_core_error(pTHX)
 STATIC
 AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
     AV* av = av_2mortal(newAV());
+
     const char *stashname;
-    
     stashname = CopSTASHPV(cx->blk_oldcop);
 
     if (!stashname)
-	av_push(av, &PL_sv_undef);
+        av_push(av, &PL_sv_undef);
     else
-	av_push(av, newSVpv(stashname, 0));
+        av_push(av, newSVpv(stashname, 0));
     if (cx->blk_oldop->op_location) {
-	sv_setsv(avTsv(av), cx->blk_oldop->op_location);
+        sv_setsv(avTsv(av), cx->blk_oldop->op_location);
     } else {
-	av_push(av, newSVpv("unknown location", 0));
+        av_push(av, newSVpv("unknown location", 0));
     }
 
-    if (CxTYPE(cx) == CXt_SUB) {
+    if (CxTYPE(cx) == CXt_SUB || CxTYPE(cx) == CXt_XSSUB) {
 	/* So is ccstack[dbcxix]. */
 	CV* cv = cx->blk_sub.cv;
 	SV** name = NULL;
 	if (SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
 	    name = av_fetch(svTav(SvLOCATION(cv)), 3, FALSE);
-	av_push(av, name ? newSVsv(*name) : &PL_sv_undef );
+	av_push(av, name ? newSVsv(*name) : 
+            newSVpvs(CxTYPE(cx) == CXt_XSSUB ? "(xsub)" : "(sub)") );
     }
     else {
+        assert(CxTYPE(cx) == CXt_EVAL);
 	av_push(av, newSVpvs("(eval)"));
     }
     
@@ -85,6 +87,7 @@ STATIC AV* S_error_backtrace(pTHX)
     const PERL_SI *top_si = PL_curstackinfo;
 
     AV* trace;
+    int index = 0;
 
     trace = av_2mortal(newAV());
 
@@ -105,8 +108,11 @@ STATIC AV* S_error_backtrace(pTHX)
 /* 	    continue; */
 /* 	} */
 
+
 	/* make stack entry */
-	av_push(trace, SvREFCNT_inc((SV*)S_context_info(aTHX_ &ccstack[cxix]) ));
+        ++index;
+        if (index > 1)
+            av_push(trace, SvREFCNT_inc((SV*)S_context_info(aTHX_ &ccstack[cxix]) ));
 
 	/* stop after BEGIN/CHECK/.../END blocks */
 	if ((CxTYPE(&ccstack[cxix]) == CXt_SUB) &&
