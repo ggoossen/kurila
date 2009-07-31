@@ -84,10 +84,10 @@ ok( $dbh->{?cachesize} == 65 )
 
 my $some_sub = sub {} 
 $dbh->{+hash} = $some_sub
-ok( $dbh->{?hash} \== $some_sub )
+ok( $dbh->{hash} &== $some_sub )
 
 $dbh->{+lorder} = 1234 
-ok( $dbh->{?lorder} == 1234 )
+ok( $dbh->{lorder} == 1234 )
 
 
 # Now check the interface to HASH

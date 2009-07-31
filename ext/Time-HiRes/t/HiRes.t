@@ -244,7 +244,7 @@ unless (   exists &Time::HiRes::gettimeofday
         # a restartable select(), so use POSIX::sigaction if available.
 
         POSIX::sigaction(POSIX::SIGALRM(),
-                  POSIX::SigAction->new(\&tick),
+                  POSIX::SigAction->new(&tick),
                   $oldaction)
             or die "Error setting SIGALRM handler with sigaction: $^OS_ERROR\n";
     }else 
@@ -601,13 +601,13 @@ if ($^OS_NAME =~ m/^(cygwin|MSWin)/) {
         open(my $x, ">", "$^PID");
         print $x, $^PID;
         close($x);
-        @stat = (@:  Time::HiRes::stat($^PID) );
+        @stat = (@: Time::HiRes::stat("$^PID") );
         push @mtime, @stat[?9];
         Time::HiRes::sleep(rand(0.1) + 0.1);
         open($x, "<", "$^PID");
         ~< $x->*;
         close($x);
-        @stat = (@:  Time::HiRes::stat($^PID) );
+        @stat = (@: Time::HiRes::stat($^PID) );
         push @atime, @stat[?8];
     }
     1 while unlink $^PID;

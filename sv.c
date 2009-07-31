@@ -984,9 +984,9 @@ Perl_sv_upgrade(pTHX_ register SV *const sv, svtype new_type)
     dVAR;
     void*	old_body;
     void*	new_body;
-    const svtype old_type = SvTYPE(sv);
+    svtype old_type = SvTYPE(sv);
     const struct body_details *new_type_details;
-    const struct body_details *old_type_details
+    struct body_details *old_type_details
 	= bodies_by_type + old_type;
     SV *referant = NULL;
 
@@ -1070,20 +1070,31 @@ Perl_sv_upgrade(pTHX_ register SV *const sv, svtype new_type)
     case SVt_PVNV:
 	break;
     case SVt_PVMG:
-	/* Because the XPVMG of PL_mess_sv isn't allocated from the arena,
-	   there's no way that it can be safely upgraded, because perl.c
-	   expects to Safefree(SvANY(PL_mess_sv))  */
-	assert(sv != PL_mess_sv);
+	break;
+    case SVt_PVAV:
+    case SVt_PVHV:
+    case SVt_PVCV:
+	if (new_type == SVt_PVMG)
+	    return;
+	Perl_sv_clear_body(aTHX_ sv);
+	old_type = SvTYPE(sv);
+	old_type_details = bodies_by_type + old_type;
 	break;
     default:
+	if (old_type > new_type)
+	    return;
 	if (old_type_details->cant_upgrade)
 	    Perl_croak(aTHX_ "Can't upgrade %s (%" UVuf ") to %" UVuf,
 		       sv_reftype(sv, 0), (UV) old_type, (UV) new_type);
     }
 
     if (old_type > new_type)
-	Perl_croak(aTHX_ "sv_upgrade from type %d down to type %d",
-		(int)old_type, (int)new_type);
+	return;
+
+    /* Because the XPVMG of PL_mess_sv isn't allocated from the arena,
+       there's no way that it can be safely upgraded, because perl.c
+       expects to Safefree(SvANY(PL_mess_sv))  */
+    assert(sv != PL_mess_sv);
 
     new_type_details = bodies_by_type + new_type;
 
@@ -8918,6 +8929,8 @@ static void
 do_reset_tmprefcnt(pTHX_ SV *const sv)
 {
     SvTMPREFCNT(sv) = 0;
+    if (SvTYPE(sv) == SVt_PVCV)
+	CvFLAGS(svTcv(sv)) &= ~CVf_TMPREFCNT;
 }
 
 static void

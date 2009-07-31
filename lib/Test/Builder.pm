@@ -434,6 +434,12 @@ sub is_eq($self, $got, $expect, ?$name)
         $self->_is_diag($got, '\==', $expect) unless $test
         return $test
     
+    if (ref::svtype($got) eq 'CODE' and ref::svtype($expect) eq 'CODE')
+        my $test = $got &== $expect
+
+        $self->ok($test, $name)
+        $self->_is_diag($got, '&==', $expect) unless $test
+        return $test
 
     return $self->cmp_ok($got, 'eq', $expect, $name)
 

@@ -3,7 +3,7 @@ package Perl6::Form
 our $VERSION = '0.04'
 
 use Scalar::Util < qw( readonly )
-use List::Util <   qw( max min first )
+use List::Util < qw( max min first )
 use charnames ':full'
 
 use Exporter
@@ -668,12 +668,10 @@ sub segment($format, $args, $opts, $fldcnt, $argcache)
                 
                         !! (readonly $_ || !%form{?trackpos}) ?? \(my$s=$_)
                         !! \$_
-            
 
             %form{+break} ||= %fldopts{?break} || $opts->{?break}
 
             push @formatters, \%form
-        
     
     splice $args->@, 0, $args_req
     @_[-1] = $fldcnt    # remember field count

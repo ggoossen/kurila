@@ -510,7 +510,7 @@ sub getRendering
                               ) # verbose => 1);
     elsif ($tc->{?code})
         my $code = $tc->{?code}
-        unless (ref $code eq 'CODE')
+        unless (type::is_code($code))
             # treat as source, and wrap into subref
             #  in caller's package ( to test arg-fixup, comment next line)
             my $pkg = '{ package '.caller(1) .';'
@@ -525,7 +525,7 @@ sub getRendering
         walk_output(\$rendering)
 
         my $opwalker = B::Concise::compile(< @opts, $code)
-        die "bad BC::compile retval" unless ref $opwalker eq 'CODE'
+        die "bad BC::compile retval" unless type::is_code($opwalker)
 
         B::Concise::reset_sequence()
         $opwalker->()

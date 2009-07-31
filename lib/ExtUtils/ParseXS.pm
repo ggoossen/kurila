@@ -999,10 +999,7 @@ EOF
 #        cv = newXS(\"$name\", XS_$Full_func_name, file);
 #        XSANY.any_i32 = $value ;
 EOF
-            push(@InitFileCode, Q(<<"EOF")) if $proto
-#        sv_setpv((SV*)cv$proto) ;
-EOF
-        
+
     elsif ((nelems @Attributes))
         push(@InitFileCode, Q(<<"EOF"))
 #        cv = newXS(\"$pname\", XS_$Full_func_name, file);
@@ -1015,9 +1012,6 @@ EOF
 #        cv = newXS(\"$name\", XS_$Full_func_name, file);
 #        $interface_macro_set(cv,$value) ;
 EOF
-            push(@InitFileCode, Q(<<"EOF")) if $proto
-#        sv_setpv((SV*)cv$proto) ;
-EOF
         
     else
         push(@InitFileCode,
@@ -1029,8 +1023,6 @@ EOF
                 "        CvREFCNT_inc(CV_$Full_func_name);\n"
             push @InitFileCode,
                 "        process_special_block(Perl_keyword(aTHX_ STR_WITH_LEN(\"$keyword\")), CV_$Full_func_name);\n"
-        
-    
 
 
 sub errors { $errors }

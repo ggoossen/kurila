@@ -625,13 +625,11 @@ sub compile
 
 
 
-sub coderef2text
-    my $self = shift
-    my $sub = shift
-    die "Usage: ->coderef2text(CODEREF)" unless UNIVERSAL::isa($sub, "CODE")
+sub coderef2text($self, $sub)
+    die "Usage: ->coderef2text(CODEREF)" unless type::is_code($sub)
 
     $self->init()
-    return $self->indent($self->deparse_sub(svref_2object($sub)))
+    return $self->indent($self->deparse_sub(svref_2object(\$sub)))
 
 
 sub ambient_pragmas
@@ -1669,9 +1667,7 @@ sub pp_srefgen($self, $op, $cx)
     if ($kid->name eq "null")
         $kid = $kid->first
 
-    if ($kid->name eq "anoncode")
-        return $self->e_anoncode((%:  code => $self->padval($kid->targ) ))
-    elsif ($kid->name eq "pushmark")
+    if ($kid->name eq "pushmark")
         my $sib_name = $kid->sibling->name
         if ($sib_name =~ m/^(pad|rv2)[ah]v$/
             and not $kid->sibling->flags ^&^ OPf_REF)
@@ -1689,8 +1685,8 @@ sub pp_srefgen($self, $op, $cx)
     $self->pfixop($op, $cx, "\\", 20)
 
 
-sub e_anoncode($self, %info)
-    my $text = $self->deparse_sub(%info{code})
+sub pp_anoncode($self, $op, $cx)
+    my $text = $self->deparse_sub($self->padval($op->targ))
     return "sub " . $text
 
 
@@ -2995,7 +2991,7 @@ sub pp_entersub($self, $op, $cx)
     if (is_scope($kid))
         $amper = "&"
         $kid = "\{" . $self->deparse($kid, 0) . "\}"
-    elsif ($kid->name eq "const")
+    elsif ($kid->name eq "var")
         $kid = $kid->sv->LOCATION[3]
         $kid =~ s/^\Q$self->{?'curstash'}\E::(\w+)$/$1/
     elsif ($kid->first->name eq "gv")

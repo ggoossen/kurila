@@ -193,6 +193,8 @@ XS(XS_dump_view);
 XS(XS_ref_address);
 XS(XS_ref_reftype);
 XS(XS_ref_svtype);
+XS(XS_type_is_plainvalue);
+XS(XS_type_is_code);
 XS(XS_iohandle_input_line_number);
 XS(XS_iohandle_output_autoflush);
 
@@ -223,6 +225,8 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("ref::address", XS_ref_address, file);
     newXS("ref::reftype", XS_ref_reftype, file);
     newXS("ref::svtype", XS_ref_svtype, file);
+    newXSproto("type::is_plainvalue", XS_type_is_plainvalue, file, "$");
+    newXSproto("type::is_code", XS_type_is_code, file, "$");
 
     newXSproto("iohandle::input_line_number",
 	XS_iohandle_input_line_number, file, "$;$");
@@ -1045,6 +1049,38 @@ XS(XS_ref_svtype)
 	type = Ddesc(sv);
 	SP -= items;
 	mPUSHp(type, strlen(type));
+	XSRETURN(1);
+    }
+}
+
+XS(XS_type_is_plainvalue)
+{
+    dVAR;
+    dXSARGS;
+    PERL_UNUSED_VAR(cv);
+
+    assert(items == 1);
+
+    {
+	SV* sv = ST(0);
+	SP -= items;
+	PUSHs( SvPVOK(sv) ? &PL_sv_yes : &PL_sv_no );
+	XSRETURN(1);
+    }
+}
+
+XS(XS_type_is_code)
+{
+    dVAR;
+    dXSARGS;
+    PERL_UNUSED_VAR(cv);
+
+    assert(items == 1);
+
+    {
+	SV* sv = ST(0);
+	SP -= items;
+	PUSHs( SvCVOK(sv) ? &PL_sv_yes : &PL_sv_no );
 	XSRETURN(1);
     }
 }

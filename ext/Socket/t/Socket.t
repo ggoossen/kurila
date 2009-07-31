@@ -18,7 +18,7 @@ my $has_echo = $^OS_NAME ne 'MSWin32'
 my $alarmed = 0
 sub arm      { $alarmed = 0; alarm(shift) if $has_alarm }
 sub alarmed  { $alarmed = 1 }
-signals::handler("ALRM") = \&alarmed                    if $has_alarm
+signals::handler("ALRM") = &alarmed                    if $has_alarm
 
 if (socket(my $t, PF_INET, SOCK_STREAM, IPPROTO_TCP))
 

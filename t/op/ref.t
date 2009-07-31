@@ -2,7 +2,7 @@
 
 require './test.pl'
 
-plan(95)
+plan(94)
 
 our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
     @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
@@ -270,11 +270,6 @@ curr_test($test+4)
 is (runperl (
     prog=> 'print $^STDOUT, 1, qq[\n]; print $^STDOUT, qq-*$^INPUT_RECORD_SEPARATOR*-, qq[\n];print $^STDOUT, 1, qq[\n];'),
     "1\n*\n*\n1\n")
-
-# bug #22719
-
-runperl(prog => 'sub f { my $x = shift; *z = $x; } f(\$%); f();')
-is ($^CHILD_ERROR, 0, 'coredump on typeglob = (SvRV && !SvROK)')
 
 # bug #27268: freeing self-referential typeglobs could trigger
 # "Attempt to free unreferenced scalar" warnings

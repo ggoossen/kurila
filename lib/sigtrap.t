@@ -26,7 +26,7 @@ for (@normal)
 
 sigtrap->import('normal-signals')
 for (@normal)
-    ok( ref signals::handler($_),
+    is( ref::svtype(signals::handler($_)), 'CODE',
         'check normal-signals set' )
 
 

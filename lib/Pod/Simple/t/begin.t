@@ -36,10 +36,10 @@ do
         =~ m/POD ERRORS/
         ) or print $^STDOUT, "# Didn't contain POD ERRORS:\n#  $out\n"
 
-    ok( ($out = $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin :mojojojo\n\nStuff\n\n=end :blorp\n\nYup.\n"))
+    ok( ($out = $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin :mojojojo\n\nStuff\n\n=end :blorp\n\nYup.\n"))
         =~ m/POD ERRORS/
         ) or print $^STDOUT, "# Didn't contain POD ERRORS:\n#  $out\n"
-    ok( ($out = $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin :mojojojo\n\n=begin :zaz\n\nStuff\n\n=end :blorp\n\nYup.\n"))
+    ok( ($out = $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin :mojojojo\n\n=begin :zaz\n\nStuff\n\n=end :blorp\n\nYup.\n"))
         =~ m/POD ERRORS/
         ) or print $^STDOUT, "# Didn't contain POD ERRORS:\n#  $out\n"
 
@@ -119,7 +119,7 @@ print $^STDOUT, "# Testing matching because of negated non-acceptance...\n"
 is( $x->_out( "=pod\n\nI like pie.\n\n=begin !crunk\n\nstuff\n\n=end !crunk\n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target="!crunk" target_matching="!"><Data xml:space="preserve">stuff</Data></for><Para>Yup.</Para></Document>'
     )
-is( $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin !crunk\n\nstuff\n\n=end !crunk\n\nYup.\n"),
+is( $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin !crunk\n\nstuff\n\n=end !crunk\n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target="!crunk" target_matching="!"><Data xml:space="preserve">stuff</Data></for><Para>Yup.</Para></Document>'
     )
 is( $x->_out( "=pod\n\nI like pie.\n\n=begin !mojojojo\n\nstuff\n\n=end !mojojojo\n\nYup.\n"),
@@ -138,13 +138,13 @@ is( $x->_out( "=pod\n\nI like pie.\n\n=begin    :!mojojojo  \n\nI<stuff>\n\n=end
 is( $x->_out( "=pod\n\nI like pie.\n\n=begin !crunk,zaz\n\nstuff\n\n=end !crunk,zaz\n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target="!crunk,zaz" target_matching="!"><Data xml:space="preserve">stuff</Data></for><Para>Yup.</Para></Document>'
     )
-is( $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin !crunk\n\nstuff\n\n=end !crunk\n\nYup.\n"),
+is( $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin !crunk\n\nstuff\n\n=end !crunk\n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target="!crunk" target_matching="!"><Data xml:space="preserve">stuff</Data></for><Para>Yup.</Para></Document>'
     )
-is( $x->_out( \&mojtext, "=pod\n\nI like pie.\n\n=begin !crunk\n\nstuff\n\n=end !crunk\n\nYup.\n"),
+is( $x->_out( &mojtext, "=pod\n\nI like pie.\n\n=begin !crunk\n\nstuff\n\n=end !crunk\n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target="!crunk" target_matching="!"><Data xml:space="preserve">stuff</Data></for><Para>Yup.</Para></Document>'
     )
-is( $x->_out( \&any, "=pod\n\nI like pie.\n\n=begin !crunk\n\nstuff\n\n=end !crunk\n\nYup.\n"),
+is( $x->_out( &any, "=pod\n\nI like pie.\n\n=begin !crunk\n\nstuff\n\n=end !crunk\n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target="!crunk" target_matching="!"><Data xml:space="preserve">stuff</Data></for><Para>Yup.</Para></Document>'
     )
 
@@ -165,44 +165,44 @@ is( $x->_out( "=pod\n\nI like pie.\n\n=begin !:psketti,mojojojo,crunk\n\nI<stuff
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 print $^STDOUT, "# Testing accept_target + simple ...\n"
-is( $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin mojojojo\n\nI<stuff>\n\n=end mojojojo \n\nYup.\n"),
+is( $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin mojojojo\n\nI<stuff>\n\n=end mojojojo \n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target="mojojojo" target_matching="mojojojo"><Data xml:space="preserve">I&#60;stuff&#62;</Data></for><Para>Yup.</Para></Document>'
     )
-is( $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk\n\nI<stuff>\n\n=end psketti,mojojojo,crunk \n\nYup.\n"),
+is( $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk\n\nI<stuff>\n\n=end psketti,mojojojo,crunk \n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target="psketti,mojojojo,crunk" target_matching="mojojojo"><Data xml:space="preserve">I&#60;stuff&#62;</Data></for><Para>Yup.</Para></Document>'
     )
 
 print $^STDOUT, "# Testing accept_target_as_text + simple ...\n"
-is( $x->_out( \&mojtext, "=pod\n\nI like pie.\n\n=begin mojojojo\n\nI<stuff>\n\n=end  mojojojo \n\nYup.\n"),
+is( $x->_out( &mojtext, "=pod\n\nI like pie.\n\n=begin mojojojo\n\nI<stuff>\n\n=end  mojojojo \n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target="mojojojo" target_matching="mojojojo"><Para><I>stuff</I></Para></for><Para>Yup.</Para></Document>'
     )
-is( $x->_out( \&mojtext, "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk\n\nI<stuff>\n\n=end  psketti,mojojojo,crunk \n\nYup.\n"),
+is( $x->_out( &mojtext, "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk\n\nI<stuff>\n\n=end  psketti,mojojojo,crunk \n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target="psketti,mojojojo,crunk" target_matching="mojojojo"><Para><I>stuff</I></Para></for><Para>Yup.</Para></Document>'
     )
 
 print $^STDOUT, "# Testing accept_target + two simples ...\n"
 #$d = 10;
-is( $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin mojojojo\n\nI<stuff>\n\nHm, B<things>!\n\n=end mojojojo\n\n\nYup.\n"),
+is( $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin mojojojo\n\nI<stuff>\n\nHm, B<things>!\n\n=end mojojojo\n\n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target="mojojojo" target_matching="mojojojo"><Data xml:space="preserve">I&#60;stuff&#62;</Data><Data xml:space="preserve">Hm, B&#60;things&#62;!</Data></for><Para>Yup.</Para></Document>'
     )
 
-is( $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk\n\nI<stuff>\n\nHm, B<things>!\n\n=end psketti,mojojojo,crunk\n\nYup.\n"),
+is( $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk\n\nI<stuff>\n\nHm, B<things>!\n\n=end psketti,mojojojo,crunk\n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target="psketti,mojojojo,crunk" target_matching="mojojojo"><Data xml:space="preserve">I&#60;stuff&#62;</Data><Data xml:space="preserve">Hm, B&#60;things&#62;!</Data></for><Para>Yup.</Para></Document>'
     )
 
-is( $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin :mojojojo\n\nI<stuff>\n\nHm, B<things>!\n\n=end :mojojojo\n\nYup.\n"),
+is( $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin :mojojojo\n\nI<stuff>\n\nHm, B<things>!\n\n=end :mojojojo\n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target=":mojojojo" target_matching="mojojojo"><Para><I>stuff</I></Para><Para>Hm, <B>things</B>!</Para></for><Para>Yup.</Para></Document>'
     )
-is( $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin :psketti,mojojojo,crunk\n\nI<stuff>\n\nHm, B<things>!\n\n=end :psketti,mojojojo,crunk\n\nYup.\n"),
+is( $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin :psketti,mojojojo,crunk\n\nI<stuff>\n\nHm, B<things>!\n\n=end :psketti,mojojojo,crunk\n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target=":psketti,mojojojo,crunk" target_matching="mojojojo"><Para><I>stuff</I></Para><Para>Hm, <B>things</B>!</Para></for><Para>Yup.</Para></Document>'
     )
 
 print $^STDOUT, "# Testing accept_target_as_text + two simples ...\n"
 
-is( $x->_out( \&mojtext, "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk\n\nI<stuff>\n\nHm, B<things>!\n\n=end psketti,mojojojo,crunk\n\nYup.\n"),
+is( $x->_out( &mojtext, "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk\n\nI<stuff>\n\nHm, B<things>!\n\n=end psketti,mojojojo,crunk\n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target="psketti,mojojojo,crunk" target_matching="mojojojo"><Para><I>stuff</I></Para><Para>Hm, <B>things</B>!</Para></for><Para>Yup.</Para></Document>'
     )
-is( $x->_out( \&mojtext, "=pod\n\nI like pie.\n\n=begin :psketti,mojojojo,crunk\n\nI<stuff>\n\nHm, B<things>!\n\n=end :psketti,mojojojo,crunk\n\nYup.\n"),
+is( $x->_out( &mojtext, "=pod\n\nI like pie.\n\n=begin :psketti,mojojojo,crunk\n\nI<stuff>\n\nHm, B<things>!\n\n=end :psketti,mojojojo,crunk\n\nYup.\n"),
     '<Document><Para>I like pie.</Para><for target=":psketti,mojojojo,crunk" target_matching="mojojojo"><Para><I>stuff</I></Para><Para>Hm, <B>things</B>!</Para></for><Para>Yup.</Para></Document>'
     )
 
@@ -211,35 +211,35 @@ is( $x->_out( \&mojtext, "=pod\n\nI like pie.\n\n=begin :psketti,mojojojo,crunk\
 print $^STDOUT, "# Testing accept_target + two simples, latter with leading whitespace ...\n"
 #$d = 10;
 
-is( $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin mojojojo\n\nI<stuff>\n\n   Hm, B<things>!\nTrala.\n\n=end mojojojo\n\n\nYup.\n"),
+is( $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin mojojojo\n\nI<stuff>\n\n   Hm, B<things>!\nTrala.\n\n=end mojojojo\n\n\nYup.\n"),
     qq{<Document><Para>I like pie.</Para><for target="mojojojo" target_matching="mojojojo"><Data xml:space="preserve">I&#60;stuff&#62;</Data><Data xml:space="preserve">   Hm, B&#60;things&#62;!\nTrala.\n</Data></for><Para>Yup.</Para></Document>}
     )
-is( $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk\n\nI<stuff>\n\n   Hm, B<things>!\nTrala.\n\n=end psketti,mojojojo,crunk\n\nYup.\n"),
+is( $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk\n\nI<stuff>\n\n   Hm, B<things>!\nTrala.\n\n=end psketti,mojojojo,crunk\n\nYup.\n"),
     qq{<Document><Para>I like pie.</Para><for target="psketti,mojojojo,crunk" target_matching="mojojojo"><Data xml:space="preserve">I&#60;stuff&#62;</Data><Data xml:space="preserve">   Hm, B&#60;things&#62;!\nTrala.\n</Data></for><Para>Yup.</Para></Document>}
     )
 
-is( $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin mojojojo\n\nI<stuff>\n\n   Hm, B<things>!\nTrala.\n\n\n=end mojojojo\n\n\nYup.\n"),
+is( $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin mojojojo\n\nI<stuff>\n\n   Hm, B<things>!\nTrala.\n\n\n=end mojojojo\n\n\nYup.\n"),
     qq{<Document><Para>I like pie.</Para><for target="mojojojo" target_matching="mojojojo"><Data xml:space="preserve">I&#60;stuff&#62;</Data><Data xml:space="preserve">   Hm, B&#60;things&#62;!\nTrala.\n\n</Data></for><Para>Yup.</Para></Document>}
     )
-is( $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk\n\nI<stuff>\n\n   Hm, B<things>!\nTrala.\n\n\n=end psketti,mojojojo,crunk\n\nYup.\n"),
+is( $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk\n\nI<stuff>\n\n   Hm, B<things>!\nTrala.\n\n\n=end psketti,mojojojo,crunk\n\nYup.\n"),
     qq{<Document><Para>I like pie.</Para><for target="psketti,mojojojo,crunk" target_matching="mojojojo"><Data xml:space="preserve">I&#60;stuff&#62;</Data><Data xml:space="preserve">   Hm, B&#60;things&#62;!\nTrala.\n\n</Data></for><Para>Yup.</Para></Document>}
     )
 
 
 print $^STDOUT, "# Testing :-target and accept_target + two simples, latter with leading whitespace ...\n"
 
-is( $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin :mojojojo\n\nI<stuff>\nTrala!\n\n   Hm, B<things>!\nTrala.\n\n=end :mojojojo\n\nYup.\n"),
+is( $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin :mojojojo\n\nI<stuff>\nTrala!\n\n   Hm, B<things>!\nTrala.\n\n=end :mojojojo\n\nYup.\n"),
     qq{<Document><Para>I like pie.</Para><for target=":mojojojo" target_matching="mojojojo"><Para><I>stuff</I> Trala!</Para><Verbatim xml:space="preserve">   Hm, B&#60;things&#62;!\nTrala.</Verbatim></for><Para>Yup.</Para></Document>}
     )
-is( $x->_out( \&moj, "=pod\n\nI like pie.\n\n=begin :psketti,mojojojo,crunk\n\nI<stuff>\nTrala!\n\n   Hm, B<things>!\nTrala.\n\n=end :psketti,mojojojo,crunk\n\nYup.\n"),
+is( $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin :psketti,mojojojo,crunk\n\nI<stuff>\nTrala!\n\n   Hm, B<things>!\nTrala.\n\n=end :psketti,mojojojo,crunk\n\nYup.\n"),
     qq{<Document><Para>I like pie.</Para><for target=":psketti,mojojojo,crunk" target_matching="mojojojo"><Para><I>stuff</I> Trala!</Para><Verbatim xml:space="preserve">   Hm, B&#60;things&#62;!\nTrala.</Verbatim></for><Para>Yup.</Para></Document>}
     )
 
 print $^STDOUT, "#   now with accept_target_as_text\n"
-is( $x->_out( \&mojtext, "=pod\n\nI like pie.\n\n=begin mojojojo\n\nI<stuff>\nTrala!\n\n   Hm, B<things>!\nTrala.\n\n=end mojojojo\n\nYup.\n"),
+is( $x->_out( &mojtext, "=pod\n\nI like pie.\n\n=begin mojojojo\n\nI<stuff>\nTrala!\n\n   Hm, B<things>!\nTrala.\n\n=end mojojojo\n\nYup.\n"),
     qq{<Document><Para>I like pie.</Para><for target="mojojojo" target_matching="mojojojo"><Para><I>stuff</I> Trala!</Para><Verbatim xml:space="preserve">   Hm, B&#60;things&#62;!\nTrala.</Verbatim></for><Para>Yup.</Para></Document>}
     )
-is( $x->_out( \&mojtext,  join "\n\n", @: 
+is( $x->_out( &mojtext,  join "\n\n", @: 
   "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk"
   "I<stuff>\nTrala!"
   "   Hm, B<things>!\nTrala."
@@ -255,7 +255,7 @@ is( $x->_out( \&mojtext,  join "\n\n", @:
 
 print $^STDOUT, "# Now with five paragraphs (p,v,v,p,p) and accept_target_as_text\n"
 
-is( $x->_out( \&mojtext,  join "\n\n", @: 
+is( $x->_out( &mojtext,  join "\n\n", @: 
   "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk"
   "I<stuff>\nTrala!"
   "   Hm, B<things>!\nTrala."
@@ -281,7 +281,7 @@ print $^STDOUT, "#\n# Now nested begin...end regions...\n"
 
 sub mojprok { shift->accept_targets( <qw{mojojojo prok}) }
 
-is( $x->_out( \&mojprok,  join "\n\n", @: 
+is( $x->_out( &mojprok,  join "\n\n", @: 
   "=pod\n\nI like pie."
   "=begin :psketti,mojojojo,crunk"
   "I<stuff>\nTrala!"
@@ -312,7 +312,7 @@ is( $x->_out( \&mojprok,  join "\n\n", @:
 
 print $^STDOUT, "# a little more complex this time...\n"
 
-is( $x->_out( \&mojprok,  join "\n\n", @: 
+is( $x->_out( &mojprok,  join "\n\n", @: 
   "=pod\n\nI like pie."
   "=begin :psketti,mojojojo,crunk"
   "I<stuff>\nTrala!"
@@ -348,7 +348,7 @@ is( $x->_out( \&mojprok,  join "\n\n", @:
 $d = 10
 print $^STDOUT, "# Now with nesting where inner region is non-resolving...\n"
 
-is( $x->_out( \&mojprok,  join "\n\n", @: 
+is( $x->_out( &mojprok,  join "\n\n", @: 
   "=pod\n\nI like pie."
   "=begin :psketti,mojojojo,crunk"
   "I<stuff>\nTrala!"
@@ -384,7 +384,7 @@ is( $x->_out( \&mojprok,  join "\n\n", @:
 
 print $^STDOUT, "# Now a begin...end with a non-resolving for inside\n"
 
-is( $x->_out( \&mojprok,  join "\n\n", @: 
+is( $x->_out( &mojprok,  join "\n\n", @: 
   "=pod\n\nI like pie."
   "=begin :psketti,mojojojo,crunk"
   "I<stuff>\nTrala!"
@@ -417,7 +417,7 @@ is( $x->_out( \&mojprok,  join "\n\n", @:
 
 print $^STDOUT, "# Now a begin...end with a resolving for inside\n"
 
-is( $x->_out( \&mojprok,  join "\n\n", @: 
+is( $x->_out( &mojprok,  join "\n\n", @: 
   "=pod\n\nI like pie."
   "=begin :psketti,mojojojo,crunk"
   "I<stuff>\nTrala!"

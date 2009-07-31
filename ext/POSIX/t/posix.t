@@ -64,10 +64,10 @@ SKIP: do
 
         my $sigint_called = 0
 
-        my $mask   = POSIX::SigSet->new( SIGINT( < @_ ))
-        my $action = POSIX::SigAction->new( \&main::SigHUP, $mask, 0)
-        sigaction(SIGHUP( < @_ ), $action)
-        signals::handler('INT') = \&SigINT
+        my $mask   = POSIX::SigSet->new( SIGINT() )
+        my $action = POSIX::SigAction->new( &main::SigHUP, $mask, 0)
+        sigaction(SIGHUP(), $action)
+        signals::handler('INT') = &SigINT
 
         # At least OpenBSD/i386 3.3 is okay, as is NetBSD 1.5.
         # But not NetBSD 1.6 & 1.6.1: the test makes perl crash.

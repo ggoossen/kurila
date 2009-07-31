@@ -181,9 +181,9 @@ PP(pp_range)
 
 static const char * const context_name[] = {
     "pseudo-block",
-    "when",
+    "(not used)",
     NULL, /* CXt_BLOCK never actually needs "block" */
-    "given",
+    "(not used)",
     NULL, /* CXt_LOOP_FOR never actually needs "loop" */
     NULL, /* CXt_LOOP_PLAIN never actually needs "loop" */
     NULL, /* CXt_LOOP_LAZYIV never actually needs "loop" */

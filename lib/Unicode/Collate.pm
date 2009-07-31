@@ -18,7 +18,7 @@ use constant FALSE => ""
 use constant NOMATCHPOS => -1
 
 # A coderef to get combining class imported from Unicode::Normalize
-# (i.e. \&Unicode::Normalize::getCombinClass).
+# (i.e. &Unicode::Normalize::getCombinClass).
 # This is also used as a HAS_UNICODE_NORMALIZE flag.
 my $CVgetCombinClass
 
@@ -174,10 +174,10 @@ sub _checkLevel
 
 
 my %DerivCode = %:
-    8 => \&_derivCE_8
-    9 => \&_derivCE_9
-    11 => \&_derivCE_9 # 11 == 9
-    14 => \&_derivCE_14
+    8 => &_derivCE_8
+    9 => &_derivCE_9
+    11 => &_derivCE_9 # 11 == 9
+    14 => &_derivCE_14
 
 
 sub checkCollator
@@ -224,16 +224,16 @@ sub checkCollator
         try { require Unicode::Normalize }
         $^EVAL_ERROR and die "Unicode::Normalize is required to normalize strings"
 
-        $CVgetCombinClass ||= \&Unicode::Normalize::getCombinClass
+        $CVgetCombinClass ||= &Unicode::Normalize::getCombinClass
 
         if ($self->{?normalization} =~ m/^(?:NF)D\z/) # tweak for default
-            $self->{+normCode} = \&Unicode::Normalize::NFD
+            $self->{+normCode} = &Unicode::Normalize::NFD
         elsif ($self->{?normalization} ne 'prenormalized')
             my $norm = $self->{?normalization}
             $self->{+normCode} = sub ($v)
                 Unicode::Normalize::normalize($norm, $v)
 
-            try { $self->{normCode}->("") } # try
+            try { $self->{normCode} <: "" } # try
             $^EVAL_ERROR and die "$PACKAGE unknown normalization form name: $norm"
 
     return
@@ -1071,9 +1071,9 @@ The C<new> method returns a collator object.
       katakana_before_hiragana => $bool,
       level => $collationLevel,
       normalization  => $normalization_form,
-      overrideCJK => \&overrideCJK,
-      overrideHangul => \&overrideHangul,
-      preprocess => \&preprocess,
+      overrideCJK => &overrideCJK,
+      overrideHangul => &overrideHangul,
+      preprocess => &preprocess,
       rearrange => \@charList,
       table => $filename,
       undefName => qr/$undefName/,

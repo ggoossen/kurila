@@ -48,7 +48,7 @@ SKIP: do
 
 @args[1] = '-MO=success,fail'
 @lines = get_lines( < @args )
-like( @lines[1], qr/fail at .eval/,
+like( @lines[1], qr/Compilesub isn't CODE/,
       'O.pm should die if backend compile() does not return a subref' )
 
 sub get_lines { split(m/[\r\n]+/, runperl( args => \ @_, stderr => 1 ));

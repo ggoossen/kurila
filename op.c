@@ -3409,6 +3409,10 @@ Perl_cv_tmprefcnt(pTHX_ CV *cv)
 
     PERL_ARGS_ASSERT_CV_TMPREFCNT;
 
+    if (CvFLAGS(cv) & CVf_TMPREFCNT)
+	return;
+    CvFLAGS(cv) |= CVf_TMPREFCNT;
+	    
     pad_tmprefcnt(cv);
 
     if (CvCONST(cv)) {
@@ -5346,7 +5350,7 @@ Perl_ck_subr(pTHX_ OP *o)
 
     o->op_private |= OPpENTERSUB_HASTARG;
     for (cvop = o2; cvop->op_sibling; cvop = cvop->op_sibling) ;
-    if (cvop->op_type == OP_CONST) {
+    if (cvop->op_type == OP_VAR) {
 	o->op_private |= (cvop->op_private & OPpENTERSUB_AMPER);
 	if ( ! ( o->op_flags & OPpENTERSUB_AMPER ) ) {
 	    SV* sv = cSVOPx(cvop)->op_sv;

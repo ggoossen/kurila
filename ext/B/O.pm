@@ -43,8 +43,8 @@ sub import($class, @< @options)
             }
 
             my $compilesub = Symbol::fetch_glob("B::$($backend)::compile")->*->& <: < @options;
-            if (ref($compilesub) ne "CODE") {
-                die $compilesub;
+            if (ref::svtype($compilesub) ne "CODE") {
+                die "Compilesub isn't CODE. compilesub: $(dump::view($compilesub))";
             }
 
             local $^OUTPUT_FIELD_SEPARATOR = '';

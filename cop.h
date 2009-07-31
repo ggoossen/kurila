@@ -193,7 +193,7 @@ struct block_sub {
 		CopFILE((COP*)CvSTART(cv)),				\
 		CopLINE((COP*)CvSTART(cv)));				\
 									\
-	cx->blk_sub.cv = CvREFCNT_inc(cv);				\
+	cx->blk_sub.cv = newSVsv(cv);				\
 	cx->blk_sub.olddepth = CvDEPTH(cv);				\
 	cx->cx_type |= (hasargs) ? CXp_HASARGS : 0;			\
 	cx->blk_sub.retop = NULL;

@@ -4739,7 +4739,7 @@ Perl_yylex(pTHX)
 		    }
 
 		    op_free(pl_yylval.opval);
-		    pl_yylval.opval = (OP*)newSVOP(OP_CONST, 0, newSVsv(cvTsv(cv)), S_curlocation(PL_bufptr));
+		    pl_yylval.opval = (OP*)newSVOP(OP_VAR, 0, newSVsv(cvTsv(cv)), S_curlocation(PL_bufptr));
 
 		    PL_last_lop = PL_oldbufptr;
 		    PL_last_lop_op = OP_ENTERSUB;

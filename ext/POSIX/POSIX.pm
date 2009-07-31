@@ -934,9 +934,9 @@ sub load_imports
 package POSIX::SigAction
 
 sub new { bless \(%: HANDLER => @_[?1], MASK => @_[?2], FLAGS => @_[?3] || 0, SAFE => 0), @_[0] }
-sub handler { @_[0]->{+HANDLER} = @_[1] if (nelems @_) +> 1; @_[0]->{?HANDLER} };
-sub mask    { @_[0]->{+MASK}    = @_[1] if (nelems @_) +> 1; @_[0]->{?MASK} };
-sub flags   { @_[0]->{+FLAGS}   = @_[1] if (nelems @_) +> 1; @_[0]->{?FLAGS} };
-sub safe    { @_[0]->{+SAFE}    = @_[1] if (nelems @_) +> 1; @_[0]->{?SAFE} };
+sub handler { @_[0]->{HANDLER} = @_[1] if (nelems @_) +> 1; @_[0]->{HANDLER} };
+sub mask    { @_[0]->{MASK}    = @_[1] if (nelems @_) +> 1; @_[0]->{MASK} };
+sub flags   { @_[0]->{FLAGS}   = @_[1] if (nelems @_) +> 1; @_[0]->{FLAGS} };
+sub safe    { @_[0]->{SAFE}    = @_[1] if (nelems @_) +> 1; @_[0]->{SAFE} };
 
 1

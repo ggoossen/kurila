@@ -4246,10 +4246,10 @@ EXTCONST char* const PL_block_type[] = {
 	"LOOP_FOR",
 	"LOOP_PLAIN",
 	"LOOP_LAZYSV",
-	"LOOP_LAZYIV",
 	"SUB",
 	"EVAL",
-	"SUBST"
+	"SUBST",
+	"XSSUB"
 };
 #else
 EXTCONST char* PL_block_type[];

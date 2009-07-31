@@ -8,6 +8,18 @@ This is a list of wishes for Perl Kurila. The items are listed by importance.
 
 =head1 Items
 
+=head2 Rename execute to kurila
+
+Rename execute to kurila, and use it in scripts
+
+=head3 Tasks
+=over
+=item Rename executable
+=item Extend p5kurila to change shebangs
+=item Change shebangs
+=item Change emacs mode detection
+=back
+
 =head2 Check all sub references at the end
 
 Resolve all sub routine references, and throw an error if the
@@ -28,6 +40,8 @@ at compile time.
 
 All subs must have formal arguments, with exception of blocks, which
 have an implicit C<$_>
+
+=head2 Remove prototypes from XS
 
 =head2 Lexical scoped subroutines imports
 

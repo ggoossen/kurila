@@ -582,7 +582,6 @@ sub linger
         $x
         my $y
         sub (@< @_) { $y; }
-    
 
 do
     my $watch = '1'

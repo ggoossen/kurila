@@ -8,7 +8,7 @@
  *
  */
 
-typedef U16 cv_flags_t;
+typedef U32 cv_flags_t;
 
 #define _XPVCV_COMMON								\
     union {									\
@@ -86,6 +86,7 @@ Null CV pointer.
 #define CVf_DEFARGS	0x2000	/* arguments are passed to @_ */
 #define CVf_ASSIGNARG	0x4000	/* last argument should be the rhs of an assignment (only used in combination with CVf_PROTO */
 #define CVf_OPTASSIGNARG	0x8000	/* last argument should be the rhs of an assignment (only used in combination with CVf_PROTO */
+#define CVf_TMPREFCNT	0x10000	/* already counted for refcounting checking */
 
 #define CvCLONE(cv)		(CvFLAGS(cv) & CVf_CLONE)
 #define CvCLONE_on(cv)		(CvFLAGS(cv) |= CVf_CLONE)

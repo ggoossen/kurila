@@ -746,8 +746,8 @@ sub parse_text
             my $args = join("", $iseq->parse_tree->children)
             return  $self->interior_sequence( $iseq->name, $args, $iseq)
     
-    defined $xseq_sub    or  $xseq_sub   = sub ($self, @< @args) { $self->?$expand_seq(< @args) }
-    defined $xtext_sub   or  $xtext_sub  = sub ($self, @< @args) { $self->?$expand_text(< @args) }
+    ref::svtype($xseq_sub) eq 'CODE'    or  $xseq_sub   = sub ($self, @< @args) { $self->?$expand_seq(< @args) }
+    ref::svtype($xtext_sub) eq 'CODE'   or  $xtext_sub  = sub ($self, @< @args) { $self->?$expand_text(< @args) }
     defined $xptree_sub  or  $xptree_sub = sub ($self, @< @args) { $self->?$expand_ptree(< @args) }
 
     ## Keep track of the "current" interior sequence, and maintain a stack

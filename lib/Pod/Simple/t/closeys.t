@@ -17,7 +17,7 @@ ok 1
 use Pod::Simple::DumpAsXML
 use Pod::Simple::XMLOutStream
 print $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n"
-sub e     ($x, $y) { Pod::Simple::XMLOutStream->_duo(\&nowhine, $x, $y) }
+sub e     ($x, $y) { Pod::Simple::XMLOutStream->_duo(&nowhine, $x, $y) }
 
 sub nowhine
     #  $_[0]->{'no_whining'} = 1;

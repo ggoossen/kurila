@@ -1573,7 +1573,8 @@ PP(pp_entersub)
 	    (void)(*CvXSUB(cv))(aTHX_ cv);
 
 	CvREFCNT_dec(cv);
-	--cxstack_ix;
+	PopBlock();
+	POPMARK;
 
 	/* Enforce some sanity in scalar context. */
 	if (gimme == G_SCALAR && ++markix != PL_stack_sp - PL_stack_base ) {

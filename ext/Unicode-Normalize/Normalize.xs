@@ -10,22 +10,7 @@
 #include "unfcmp.h"
 #include "unfexc.h"
 
-/* Perl 5.6.1 ? */
-#ifndef uvuni_to_utf8
-#define uvuni_to_utf8   uv_to_utf8
-#endif /* uvuni_to_utf8 */
-
-/* Perl 5.6.1 ? */
-#ifndef utf8n_to_uvuni
-#define utf8n_to_uvuni  utf8_to_uv
-#endif /* utf8n_to_uvuni */
-
-/* UTF8_ALLOW_BOM is used before Perl 5.8.0 */
-#ifdef UTF8_ALLOW_BOM
-#define AllowAnyUTF (UTF8_ALLOW_SURROGATE|UTF8_ALLOW_BOM|UTF8_ALLOW_FFFF)
-#else
 #define AllowAnyUTF (UTF8_ALLOW_SURROGATE|UTF8_ALLOW_FFFF)
-#endif
 
 /* if utf8n_to_uvuni() sets retlen to 0 (?) */
 #define ErrRetlenIsZero "panic (Unicode::Normalize %s): zero-length character"
