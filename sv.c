@@ -826,7 +826,7 @@ static const struct body_details bodies_by_type[] = {
 	     - bodies_by_type[sv_type].offset)
 
 void Perl_del_body_allocated(pTHX_ char* p, svtype sv_type) {
-    del_body(p + bodies_by_type[sv_type].offset, &PL_body_roots[sv_type]);
+    del_body((void*)(p + bodies_by_type[sv_type].offset), &PL_body_roots[sv_type]);
 }
 
 #define my_safemalloc(s)	(void*)safemalloc(s)
@@ -1238,8 +1238,14 @@ Perl_sv_upgrade(pTHX_ register SV *const sv, svtype new_type)
 	   Note that there is an assumption that all bodies of types that
 	   can be upgraded came from arenas. Only the more complex non-
 	   upgradable types are allowed to be directly malloc()ed.  */
-	del_body((void*)((char*)old_body + old_type_details->offset),
-		 &PL_body_roots[old_type]);
+	if (old_type == SVt_PVCV) {
+	    if ( ((XPVCV*)old_body)->xcv_n_add_refs)
+		((XPVCV*)old_body)->xcv_n_add_refs -= 1;
+	    else
+		Perl_del_body_allocated(old_body, old_type);
+	}
+	else
+	    Perl_del_body_allocated(old_body, old_type);
     }
     else if (old_type_details->body_size) {
 	if (old_type > SVt_IV)
@@ -4197,6 +4203,13 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 	}
 	SvFLAGS(sv) = SVt_NULL;
 	return;
+    }
+
+    if (type == SVt_PVCV) {
+	if ( CvN_ADD_REFS(sv) ) {
+	    --CvN_ADD_REFS(sv);
+	    return;
+	}
     }
 
     if (type >= SVt_PVMG) {

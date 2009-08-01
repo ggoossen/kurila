@@ -183,6 +183,7 @@
 #endif
 #ifdef PERL_CORE
 #define cv_setcv		Perl_cv_setcv
+#define cv_clone_anon		Perl_cv_clone_anon
 #endif
 #define cv_const_sv		Perl_cv_const_sv
 #define cv_assignarg_flag	Perl_cv_assignarg_flag
@@ -2363,6 +2364,7 @@
 #endif
 #ifdef PERL_CORE
 #define cv_setcv(a,b)		Perl_cv_setcv(aTHX_ a,b)
+#define cv_clone_anon(a,b)	Perl_cv_clone_anon(aTHX_ a,b)
 #endif
 #define cv_const_sv(a)		Perl_cv_const_sv(aTHX_ a)
 #define cv_assignarg_flag(a)	Perl_cv_assignarg_flag(aTHX_ a)

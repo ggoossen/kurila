@@ -382,8 +382,12 @@ PP(pp_anoncode)
     dVAR; dSP;
     CV* cv = (CV*)PAD_SV(PL_op->op_targ);
     if ( CvPADLIST(cv) && 
-	( SvIV(PADLIST_NAMESV(CvPADLIST(cv), PAD_FLAGS_INDEX)) & PADf_CLONE ) )
-	cv = svTcv(sv_mortalcopy(cvTsv(cv)));
+       ( SvIV(PADLIST_NAMESV(CvPADLIST(cv), PAD_FLAGS_INDEX)) & PADf_CLONE ) ) {
+       SV* clone = sv_2mortal(newSV(0));
+       sv_upgrade(clone, SVt_PVCV);
+       cv_clone_anon(svTcv(clone), cv);
+       cv = svTcv(clone);
+    }
     EXTEND(SP,1);
     PUSHs((SV*)cv);
     RETURN;

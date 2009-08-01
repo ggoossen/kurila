@@ -194,6 +194,7 @@ Afnp	|int	|fprintf_nocontext|NN PerlIO *stream|NN const char *format|...
 Afnp	|int	|printf_nocontext|NN const char *format|...
 #endif
 pd	|void	|cv_setcv	|NN CV* dst|NN CV* src
+pd	|void	|cv_clone_anon	|NN CV* dst|NN CV* src
 ApdR	|SV*	|cv_const_sv	|NULLOK CV* cv
 Api	|bool	|cv_assignarg_flag	|NN CV* cv
 Api	|bool	|cv_optassignarg_flag	|NN CV* cv
