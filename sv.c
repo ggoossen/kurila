@@ -825,9 +825,9 @@ static const struct body_details bodies_by_type[] = {
     (void *)((char *)S_new_body(aTHX_ sv_type)	\
 	     - bodies_by_type[sv_type].offset)
 
-#define del_body_allocated(p, sv_type)		\
-    del_body(p + bodies_by_type[sv_type].offset, &PL_body_roots[sv_type])
-
+void Perl_del_body_allocated(pTHX_ char* p, svtype sv_type) {
+    del_body(p + bodies_by_type[sv_type].offset, &PL_body_roots[sv_type]);
+}
 
 #define my_safemalloc(s)	(void*)safemalloc(s)
 #define my_safecalloc(s)	(void*)safecalloc(s, 1)

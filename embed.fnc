@@ -106,6 +106,7 @@ Aip	|char*	|SvPVX_mutable	|NN SV *sv
 AipS	|void	|SvREFCNT_dec	|NULLOK XV *sv
 AipS	|SV*	|SvREFCNT_inc	|NULLOK XV *sv
 AipS	|void	|SvTMPREFCNT_inc	|NULLOK XV *sv
+Ap	|void	|del_body_allocated	|NN char* p|svtype sv_type
 AipS	|void	|sv_cp_replace	|NN XV **sv_d|NULLOK XV *sv_s
 Aip	|IV	|SvIV	|NN SV *sv
 Aip	|UV	|SvUV	|NN SV *sv

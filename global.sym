@@ -52,6 +52,7 @@ Perl_SvPVX_mutable
 Perl_SvREFCNT_dec
 Perl_SvREFCNT_inc
 Perl_SvTMPREFCNT_inc
+Perl_del_body_allocated
 Perl_sv_cp_replace
 Perl_SvIV
 Perl_SvUV

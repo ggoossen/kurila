@@ -157,6 +157,11 @@ PERL_INLINE_CALLCONV char*	Perl_SvPVX_mutable(pTHX_ SV *sv)
 PERL_INLINE_CALLCONV void	Perl_SvREFCNT_dec(pTHX_ SV *sv);
 PERL_INLINE_CALLCONV SV*	Perl_SvREFCNT_inc(pTHX_ SV *sv);
 PERL_INLINE_CALLCONV void	Perl_SvTMPREFCNT_inc(pTHX_ SV *sv);
+PERL_CALLCONV void	Perl_del_body_allocated(pTHX_ char* p, svtype sv_type)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_DEL_BODY_ALLOCATED	\
+	assert(p)
+
 PERL_INLINE_CALLCONV void	Perl_sv_cp_replace(pTHX_ SV **sv_d, SV *sv_s)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SV_CP_REPLACE	\

@@ -80,6 +80,7 @@
 #define IoTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ ioTsv(a))
 #define ReTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ reTsv(a))
 #define SvTMPREFCNT_inc		Perl_SvTMPREFCNT_inc
+#define del_body_allocated	Perl_del_body_allocated
 #define av_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ avpTsvp(a),avTsv(b))
 #define hv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ hvpTsvp(a),hvTsv(b))
 #define cv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ cvpTsvp(a),cvTsv(b))
@@ -1860,7 +1861,6 @@
 #define ck_null			Perl_ck_null
 #define ck_open			Perl_ck_open
 #define ck_readline		Perl_ck_readline
-#define ck_repeat		Perl_ck_repeat
 #define ck_require		Perl_ck_require
 #define ck_rfun			Perl_ck_rfun
 #define ck_rvconst		Perl_ck_rvconst
@@ -2277,6 +2277,7 @@
 #define IoTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ ioTsv(a))
 #define ReTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ reTsv(a))
 #define SvTMPREFCNT_inc(a)	Perl_SvTMPREFCNT_inc(aTHX_ a)
+#define del_body_allocated(a,b)	Perl_del_body_allocated(aTHX_ a,b)
 #define av_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ avpTsvp(a),avTsv(b))
 #define hv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ hvpTsvp(a),hvTsv(b))
 #define cv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ cvpTsvp(a),cvTsv(b))
@@ -4048,7 +4049,6 @@
 #define ck_null(a)		Perl_ck_null(aTHX_ a)
 #define ck_open(a)		Perl_ck_open(aTHX_ a)
 #define ck_readline(a)		Perl_ck_readline(aTHX_ a)
-#define ck_repeat(a)		Perl_ck_repeat(aTHX_ a)
 #define ck_require(a)		Perl_ck_require(aTHX_ a)
 #define ck_rfun(a)		Perl_ck_rfun(aTHX_ a)
 #define ck_rvconst(a)		Perl_ck_rvconst(aTHX_ a)
