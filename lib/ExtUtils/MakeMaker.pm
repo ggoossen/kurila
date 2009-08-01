@@ -414,13 +414,10 @@ END
     
 
     if (defined $self->{?CONFIGURE})
-        if (ref $self->{?CONFIGURE} eq 'CODE')
-            %configure_att = %:  <  $self->{?CONFIGURE}->( < @_ )->% 
-            $self = \%:  < $self->%, < %configure_att 
-        else
-            die "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n"
-        
-    
+        if (!type::is_code($self->{?CONFIGURE}))
+            die "Attribute 'CONFIGURE' to WriteMakefile() not a code\n"
+        %configure_att = %:  <  $self->{?CONFIGURE}->( < @_ )->% 
+        $self = \%:  < $self->%, < %configure_att
 
     my $newclass = ++$PACKNAME
     local @Parent = @Parent    # Protect against non-local exits
