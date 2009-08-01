@@ -87,6 +87,7 @@ Null CV pointer.
 #define CVf_ASSIGNARG	0x4000	/* last argument should be the rhs of an assignment (only used in combination with CVf_PROTO */
 #define CVf_OPTASSIGNARG	0x8000	/* last argument should be the rhs of an assignment (only used in combination with CVf_PROTO */
 #define CVf_TMPREFCNT	0x10000	/* already counted for refcounting checking */
+#define CVf_SPECIAL	0x20000	/* BEGIN/END/UNIT block */
 
 #define CvCLONE(cv)		(CvFLAGS(cv) & CVf_CLONE)
 #define CvCLONE_on(cv)		(CvFLAGS(cv) |= CVf_CLONE)
@@ -113,10 +114,9 @@ Null CV pointer.
 #define CvEVAL_off(cv)		CvUNIQUE_off(cv)
 
 /* BEGIN|CHECK|INIT|UNITCHECK|END */
-static __inline__ U32 CvSPECIAL(CV *cv) { return CvUNIQUE(cv) && SvFAKE(cv); }
-
-#define CvSPECIAL_on(cv)	(CvUNIQUE_on(cv),SvFAKE_on(cv))
-#define CvSPECIAL_off(cv)	(CvUNIQUE_off(cv),SvFAKE_off(cv))
+#define CvSPECIAL(cv)		(CvFLAGS(cv) & CVf_SPECIAL)
+#define CvSPECIAL_on(cv)		(CvFLAGS(cv) |= CVf_SPECIAL)
+#define CvSPECIAL_off(cv)		(CvFLAGS(cv) &= ~CVf_SPECIAL)
 
 #define CvCONST(cv)		(CvFLAGS(cv) & CVf_CONST)
 #define CvCONST_on(cv)		(CvFLAGS(cv) |= CVf_CONST)
