@@ -47,6 +47,8 @@ have an implicit C<$_>
 
 =head2 Lexical scoped $^EVAL_ERROR
 
+=head2 Replace hash iteration with something like C<for (pairs $h)>
+
 =head2 Remove duplication of test setup.
 
 Schwern notes, that there's duplication of code - lots and lots of tests have
