@@ -1260,7 +1260,7 @@ void Perl_cv_clone_anon(pTHX_ CV *dst, CV* src)
     PAD* parent_pad = PL_comppad;
     SV** outpad;
  
-    PERL_ARGS_ASSERT_CV_SETCV;
+    PERL_ARGS_ASSERT_CV_CLONE_ANON;
  
     assert(!CvUNIQUE(src));
 
