@@ -2610,9 +2610,11 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     }
 
     /* clear the destination sv if it will be upgraded to a hash or an array */
-    if ( ( dtype == SVt_PVHV || dtype == SVt_PVAV  || dtype == SVt_PVCV
-	    || stype == SVt_PVAV || stype == SVt_PVHV || stype == SVt_PVCV )
-        && dtype != stype ) {
+    if ( ( ( dtype == SVt_PVHV || dtype == SVt_PVAV
+		|| stype == SVt_PVAV || stype == SVt_PVHV )
+	    && dtype != stype ) 
+	|| (dtype == SVt_PVCV || stype == SVt_PVCV)  /* always free the old body with a PVCV */
+	) {
 
 	/* Make sure the sstr stays alive during the assignment */
 	SvREFCNT_inc(sstr);
@@ -2702,9 +2704,10 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	break;
     case SVt_PVAV:
     case SVt_PVHV:
-    case SVt_PVCV:
 	if (dtype != stype)
 	    sv_upgrade(dstr, stype);
+	break;
+    case SVt_PVCV:
 	break;
 
     default:
@@ -2735,8 +2738,16 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     dtype = SvTYPE(dstr);
     sflags = SvFLAGS(sstr);
 
-    if (dtype == SVt_PVCV) {
-	cv_setcv(svTcv(dstr), svTcv(sstr));
+    if (stype == SVt_PVCV) {
+	assert(dtype == SVt_NULL);
+	SvFLAGS(dstr) &= ~SVTYPEMASK;
+	SvFLAGS(dstr) |= SVt_PVCV;
+
+	SVcpSTEAL(SvLOCATION(dstr), newSVsv(SvLOCATION(sstr)));
+
+	SvANY(dstr) = SvANY(sstr);
+	++CvN_ADD_REFS(dstr);
+
     } else if (dtype == SVt_PVAV) {
 	int i;
 	int len = av_len( (AV*)sstr);

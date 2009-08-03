@@ -182,7 +182,6 @@
 #define printf_nocontext	Perl_printf_nocontext
 #endif
 #ifdef PERL_CORE
-#define cv_setcv		Perl_cv_setcv
 #define cv_clone_anon		Perl_cv_clone_anon
 #endif
 #define cv_const_sv		Perl_cv_const_sv
@@ -1909,6 +1908,8 @@
 #define pp_chroot		Perl_pp_chroot
 #define pp_close		Perl_pp_close
 #define pp_closedir		Perl_pp_closedir
+#define pp_code_eq		Perl_pp_code_eq
+#define pp_code_ne		Perl_pp_code_ne
 #define pp_complement		Perl_pp_complement
 #define pp_compsub		Perl_pp_compsub
 #define pp_concat		Perl_pp_concat
@@ -2364,7 +2365,6 @@
 #if defined(PERL_IMPLICIT_CONTEXT)
 #endif
 #ifdef PERL_CORE
-#define cv_setcv(a,b)		Perl_cv_setcv(aTHX_ a,b)
 #define cv_clone_anon(a,b)	Perl_cv_clone_anon(aTHX_ a,b)
 #endif
 #define cv_const_sv(a)		Perl_cv_const_sv(aTHX_ a)
@@ -4099,6 +4099,8 @@
 #define pp_chroot()		Perl_pp_chroot(aTHX)
 #define pp_close()		Perl_pp_close(aTHX)
 #define pp_closedir()		Perl_pp_closedir(aTHX)
+#define pp_code_eq()		Perl_pp_code_eq(aTHX)
+#define pp_code_ne()		Perl_pp_code_ne(aTHX)
 #define pp_complement()		Perl_pp_complement(aTHX)
 #define pp_compsub()		Perl_pp_compsub(aTHX)
 #define pp_concat()		Perl_pp_concat(aTHX)

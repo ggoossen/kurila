@@ -1367,26 +1367,6 @@ void Perl_cv_clone_anon(pTHX_ CV *dst, CV* src)
     }
 }
 
-void Perl_cv_setcv(pTHX_ CV *dst, CV* src)
-{
-    dVAR;
-
-    PERL_ARGS_ASSERT_CV_SETCV;
-
-    SVcpSTEAL(SvLOCATION(dst), newSVsv(SvLOCATION(src)));
-
-    /* free current body of dst */
-    if ( CvN_ADD_REFS(dst) )
-	--CvN_ADD_REFS(dst);
-    else
-	Perl_del_body_allocated(SvANY(dst), SVt_PVCV);
-
-    SvANY(dst) = SvANY(src);
-    ++CvN_ADD_REFS(dst);
-
-    return;
-}
-
 /*
 =for apidoc pad_push
 

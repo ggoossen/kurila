@@ -486,12 +486,6 @@ PERL_CALLCONV int	Perl_printf_nocontext(const char *format, ...)
 	assert(format)
 
 #endif
-PERL_CALLCONV void	Perl_cv_setcv(pTHX_ CV* dst, CV* src)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_CV_SETCV	\
-	assert(dst); assert(src)
-
 PERL_CALLCONV void	Perl_cv_clone_anon(pTHX_ CV* dst, CV* src)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
