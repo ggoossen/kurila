@@ -91,20 +91,21 @@ things, Changing old design decisions, Readable, modifiable perl source
 
 =item SEE ALSO
 
-L<kurila120delta> What is new for Perl Kurila 1.20, L<kurila119delta> What
-is new for Perl Kurila 1.19, L<kurila118delta> What is new for Perl Kurila
-1.18, L<kurila117delta> What is new for Perl Kurila 1.17, L<kurila116delta>
-What is new for Perl Kurila 1.16, L<kurila115delta> What is new for Perl
-Kurila 1.15, L<kurila114delta> What is new for Perl Kurila 1.14,
-L<kurila113delta> What is new for Perl Kurila 1.13, L<kurila112delta> What
-is new for Perl Kurila 1.12, L<kurila111delta> What is new for Perl Kurila
-1.11, L<kurila110delta> What is new for Perl Kurila 1.10, L<kurila19delta>
-What is new for Perl Kurila 1.9, L<kurila18delta> What is new for Perl
-Kurila 1.8, L<kurila17delta> What is new for Perl Kurila 1.7,
-L<kurila16delta> What is new for Perl Kurila 1.6, L<kurila15delta> What is
-new for Perl Kurila 1.5, L<kurila14delta> What is new for Perl Kurila 1.4,
-L<kurila13delta> What is new for Perl Kurila 1.3, L<kurila02delta> What is
-new for Perl Kurila 0.2, L<kurila01delta> What is new for Perl Kurila 0.1
+L<kurila121delta> What is new for Perl Kurila 1.21, L<kurila120delta> What
+is new for Perl Kurila 1.20, L<kurila119delta> What is new for Perl Kurila
+1.19, L<kurila118delta> What is new for Perl Kurila 1.18, L<kurila117delta>
+What is new for Perl Kurila 1.17, L<kurila116delta> What is new for Perl
+Kurila 1.16, L<kurila115delta> What is new for Perl Kurila 1.15,
+L<kurila114delta> What is new for Perl Kurila 1.14, L<kurila113delta> What
+is new for Perl Kurila 1.13, L<kurila112delta> What is new for Perl Kurila
+1.12, L<kurila111delta> What is new for Perl Kurila 1.11, L<kurila110delta>
+What is new for Perl Kurila 1.10, L<kurila19delta> What is new for Perl
+Kurila 1.9, L<kurila18delta> What is new for Perl Kurila 1.8,
+L<kurila17delta> What is new for Perl Kurila 1.7, L<kurila16delta> What is
+new for Perl Kurila 1.6, L<kurila15delta> What is new for Perl Kurila 1.5,
+L<kurila14delta> What is new for Perl Kurila 1.4, L<kurila13delta> What is
+new for Perl Kurila 1.3, L<kurila02delta> What is new for Perl Kurila 0.2,
+L<kurila01delta> What is new for Perl Kurila 0.1
 
 =item AUTHOR
 
@@ -4133,9 +4134,9 @@ X<CLONE> X<CLONE_SKIP> X<thread> X<threads> X<ithread>
 
 =item Pragmatic Modules
 
-attributes, base, blib, bytes, charnames, compsub, constant, error,
-feature, fields, filetest, integer, kurila, less, lib, mro, open, ops, re,
-sigtrap, sort, utf8, version, vmsish, warnings, warnings::register
+base, blib, bytes, charnames, compsub, constant, error, feature, fields,
+filetest, integer, kurila, less, lib, mro, open, ops, re, sigtrap, sort,
+utf8, version, vmsish, warnings, warnings::register
 
 =item Standard Modules
 
@@ -4169,33 +4170,32 @@ IPC::SysV, IPC::SysV::Msg, IPC::SysV::Semaphore, List::Util,
 Locale::Constants, Locale::Country, Locale::Currency, Locale::Language,
 Locale::Maketext, Locale::Maketext::Simple, Locale::Maketext::TPJ13,
 Locale::Script, MIME::Base64, MIME::Base64::QuotedPrint, Math::Trig,
-Module::CoreList, Module::Load, Module::Load::Conditional, Module::Loaded,
-Net::hostent, Net::netent, Net::protoent, Net::servent, O, Opcode, POSIX,
-Params::Check, Perl6::Form, PerlIO, PerlIO::scalar, PerlIO::via,
-PerlIO::via::QuotedPrint, Pod::Checker, Pod::Escapes, Pod::Find,
-Pod::Functions, Pod::Html, Pod::InputObjects, Pod::LaTeX, Pod::Man,
-Pod::ParseLink, Pod::ParseUtils, Pod::Parser, Pod::Perldoc::ToChecker,
-Pod::Perldoc::ToMan, Pod::Perldoc::ToNroff, Pod::Perldoc::ToPod,
-Pod::Perldoc::ToRtf, Pod::Perldoc::ToText, Pod::Perldoc::ToTk,
-Pod::Perldoc::ToXml, Pod::PlainText, Pod::Plainer, Pod::Select,
-Pod::Simple, Pod::Simple::Checker, Pod::Simple::Debug,
-Pod::Simple::DumpAsText, Pod::Simple::DumpAsXML, Pod::Simple::HTML,
-Pod::Simple::HTMLBatch, Pod::Simple::LinkSection, Pod::Simple::Methody,
-Pod::Simple::PullParser, Pod::Simple::PullParserEndToken,
-Pod::Simple::PullParserStartToken, Pod::Simple::PullParserTextToken,
-Pod::Simple::PullParserToken, Pod::Simple::RTF, Pod::Simple::Search,
-Pod::Simple::SimpleTree, Pod::Simple::Subclassing, Pod::Simple::Text,
-Pod::Simple::TextContent, Pod::Simple::XMLOutStream, Pod::Text,
-Pod::Text::Color, Pod::Text::Overstrike, Pod::Text::Termcap, Pod::Usage,
-Safe, Scalar::Util, Search::Dict, Socket, Storable, Symbol, Sys::Hostname,
-Sys::Syslog, Sys::Syslog::win32::Win32, Term::ANSIColor, Term::Cap,
-Term::ReadLine, Test::Builder, Test::Builder::Module,
-Test::Builder::Tester, Test::Builder::Tester::Color, Test::More,
-Test::Simple, Test::Tutorial, Text::Abbrev, Text::ParseWords, Text::Tabs,
-Text::Wrap, Tie::Hash, Time::HiRes, Time::Local, Time::gmtime,
-Time::localtime, Time::tm, UNIVERSAL, Unicode::Collate, Unicode::Normalize,
-Unicode::UCD, User::grent, User::pwent, Win32, Win32CORE, XS::APItest,
-XS::Typemap, XSLoader
+Module::Load, Module::Load::Conditional, Module::Loaded, Net::hostent,
+Net::netent, Net::protoent, Net::servent, O, Opcode, POSIX, Params::Check,
+Perl6::Form, PerlIO, PerlIO::scalar, PerlIO::via, PerlIO::via::QuotedPrint,
+Pod::Checker, Pod::Escapes, Pod::Find, Pod::Functions, Pod::Html,
+Pod::InputObjects, Pod::LaTeX, Pod::Man, Pod::ParseLink, Pod::ParseUtils,
+Pod::Parser, Pod::Perldoc::ToChecker, Pod::Perldoc::ToMan,
+Pod::Perldoc::ToNroff, Pod::Perldoc::ToPod, Pod::Perldoc::ToRtf,
+Pod::Perldoc::ToText, Pod::Perldoc::ToTk, Pod::Perldoc::ToXml,
+Pod::PlainText, Pod::Plainer, Pod::Select, Pod::Simple,
+Pod::Simple::Checker, Pod::Simple::Debug, Pod::Simple::DumpAsText,
+Pod::Simple::DumpAsXML, Pod::Simple::HTML, Pod::Simple::HTMLBatch,
+Pod::Simple::LinkSection, Pod::Simple::Methody, Pod::Simple::PullParser,
+Pod::Simple::PullParserEndToken, Pod::Simple::PullParserStartToken,
+Pod::Simple::PullParserTextToken, Pod::Simple::PullParserToken,
+Pod::Simple::RTF, Pod::Simple::Search, Pod::Simple::SimpleTree,
+Pod::Simple::Subclassing, Pod::Simple::Text, Pod::Simple::TextContent,
+Pod::Simple::XMLOutStream, Pod::Text, Pod::Text::Color,
+Pod::Text::Overstrike, Pod::Text::Termcap, Pod::Usage, Safe, Scalar::Util,
+Search::Dict, Socket, Storable, Symbol, Sys::Hostname, Sys::Syslog,
+Sys::Syslog::win32::Win32, Term::ANSIColor, Term::Cap, Term::ReadLine,
+Test::Builder, Test::Builder::Module, Test::Builder::Tester,
+Test::Builder::Tester::Color, Test::More, Test::Simple, Test::Tutorial,
+Text::Abbrev, Text::ParseWords, Text::Tabs, Text::Wrap, Tie::Hash,
+Time::HiRes, Time::Local, Time::gmtime, Time::localtime, Time::tm,
+UNIVERSAL, Unicode::Collate, Unicode::Normalize, Unicode::UCD, User::grent,
+User::pwent, Win32, Win32CORE, XS::APItest, XS::Typemap, XSLoader
 
 =item Extension Modules
 
@@ -4466,7 +4466,7 @@ L<config_data|config_data>, L<libnetcfg|libnetcfg>, L<perlivp>
 =item Development
 
 L<perlbug|perlbug>, L<perlthanks|perlthanks>, L<h2ph|h2ph>, L<h2xs|h2xs>,
-L<enc2xs>, L<xsubpp>, L<dprofpp|dprofpp>, L<prove>, L<corelist>
+L<enc2xs>, L<xsubpp>, L<dprofpp|dprofpp>, L<prove>
 
 =item General tools
 
@@ -6148,15 +6148,33 @@ L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
 
 =back
 
-=head2 perltodo - Perl TO-DO List
+=head2 kurilatodo - Perl Kurila TO-DO List
 
 =over 4
 
 =item DESCRIPTION
 
-=item Tasks that only need Perl knowledge
+=item Items
 
 =over 4
+
+=item Rename execute to kurila
+
+=item Check all sub references at the end
+
+=item Use C<$method> for sub calls without arguments
+
+=item Use C<:> with layout syntax for sub calls.
+
+=item Make formal sub arguments obligatory
+
+=item Remove prototypes from XS
+
+=item Lexical scoped subroutines imports
+
+=item Lexical scoped $^EVAL_ERROR
+
+=item Replace hash iteration with something like C<for (pairs $h)>
 
 =item Remove duplication of test setup.
 
@@ -6168,35 +6186,7 @@ L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
 
 =item merge checkpods and podchecker
 
-=item Parallel testing
-
-=item Make Schwern poorer
-
-=item Improve the coverage of the core tests
-
-=item test B
-
-=item Deparse inlined constants
-
 =item A decent benchmark
-
-=item fix tainting bugs
-
-=item Dual life everything
-
-=item Improving C<threads::shared>
-
-=item POSIX memory footprint
-
-=item embed.pl/makedef.pl
-
-=item use strict; and AutoLoad
-
-=back
-
-=item Tasks that need a little sysadmin-type knowledge
-
-=over 4
 
 =item make HTML install work
 
@@ -6211,12 +6201,6 @@ L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
 =item Cross-compile support
 
 =item roffitall
-
-=back
-
-=item Tasks that need a little C knowledge
-
-=over 4
 
 =item Weed out needless PERL_UNUSED_ARG
 
@@ -6240,46 +6224,15 @@ L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
 
 =item Arenas for GPs? For MAGIC?
 
-=back
-
-=item Tasks that need a knowledge of XS
-
-=over 4
-
-=item autovivification
-
-=item Unicode in Filenames
-
-=item Unicode in %ENV
-
-=item Unicode and glob()
-
-=item use less 'memory'
-
-=item Re-implement C<:unique> in a way that is actually thread-safe
-
-=item Make tainting consistent
-
 =item readpipe(LIST)
 
 =item Audit the code for destruction ordering assumptions
 
 =item Extend PerlIO and PerlIO::Scalar
 
-=item -C on the #! line
-
 =item Propagate const outwards from Perl_moreswitches()
 
-=item Duplicate logic in S_method_common() and
-Perl_gv_fetchmethod_autoload()
-
 =item Organize error messages
-
-=back
-
-=item Tasks that need a knowledge of the interpreter
-
-=over 4
 
 =item lexicals used only once
 
@@ -6287,21 +6240,9 @@ Perl_gv_fetchmethod_autoload()
 
 =item Properly Unicode safe tokeniser and pads.
 
-=item state variable initialization in list context
-
-=item Implement $value ~~ 0 .. $range
-
 =item A does() built-in
 
-=item Tied filehandles and write() don't mix
-
 =item Attach/detach debugger from running program
-
-=item Optimize away empty destructors
-
-=item LVALUE functions for lists
-
-=item LVALUE functions in the debugger
 
 =item regexp optimiser optional
 
@@ -6369,6 +6310,47 @@ B<-V>
 =item ENVIRONMENT
 
 =item AUTHOR
+
+=back
+
+=head2 kurila121delta - what is new for Perl Kurila 1.21
+
+=over 4
+
+=item DESCRIPTION
+
+=item Highlights In Perl Kurila 1.21
+
+=item Core Enhancements
+
+=over 4
+
+=item Layout based syntax for arrays and hashes using the C<@:> and C<%:>
+operators
+
+=item C<&foo> returns a CODE
+
+=item Defined on a subroutine dereference reference must exist 
+
+=item Subroutine references saved at compile time
+
+=item Operator to call subs C<< <: >>
+
+=back
+
+=item KNOWN BUGS
+
+=over 4
+
+=item Documentation
+
+=item Limited platform support
+
+=back
+
+=item SEE ALSO
+
+=item HISTORY
 
 =back
 
@@ -12241,50 +12223,6 @@ regnames($all), regnames_count()
 
 =back
 
-=head2 attributes - get/set subroutine or variable attributes
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item Built-in Attributes
-
-locked, method, lvalue
-
-=item Available Subroutines
-
-get, reftype
-
-=item Package-specific Attribute Handling
-
-FETCH_I<type>_ATTRIBUTES, MODIFY_I<type>_ATTRIBUTES
-
-=item Syntax of Attribute Lists
-
-=back
-
-=item EXPORTS
-
-=over 4
-
-=item Default exports
-
-=item Available exports
-
-=item Export tags defined
-
-=back
-
-=item EXAMPLES
-
-=item SEE ALSO
-
-=back
-
 =head2 base - Establish an ISA relationship with base classes at compile
 time
 
@@ -17974,26 +17912,6 @@ asin_real, acos_real
 =item AUTHORS
 
 =item LICENSE
-
-=back
-
-=head2 Module::CoreList - what modules shipped with versions of perl
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item CAVEATS
-
-=item HISTORY
-
-=item AUTHOR
-
-=item COPYRIGHT
-
-=item SEE ALSO
 
 =back
 

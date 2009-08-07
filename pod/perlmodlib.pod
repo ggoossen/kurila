@@ -47,10 +47,6 @@ The following pragmas are defined (and have their own documentation).
 
 =over 12
 
-=item attributes
-
-Get/set subroutine or variable attributes
-
 =item base
 
 Establish an ISA relationship with base classes at compile time
@@ -668,10 +664,6 @@ Encoding and decoding of quoted-printable strings
 =item Math::Trig
 
 Trigonometric functions
-
-=item Module::CoreList
-
-What modules shipped with versions of perl
 
 =item Module::Load
 
