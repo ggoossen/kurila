@@ -1,42 +1,40 @@
 =head1 NAME
 
-kurila121delta - what is new for Perl Kurila 1.20
+kurila121delta - what is new for Perl Kurila 1.21
 
 =head1 DESCRIPTION
 
-This document describes differences between Perl Kurila 1.19 and Perl Kurila 1.20
+This document describes differences between Perl Kurila 1.20 and Perl Kurila 1.21
 
 =head1 Highlights In Perl Kurila 1.21
 
-=head2 Layout based syntax for arrays and hashes.
-
-=head2 Subroutines are first order types.
+Layout based syntax for arrays and hashes. CODE as first order data type.
 
 =head1 Core Enhancements
 
-=head2 Layout for arrays and hashes
+=head2 Layout based syntax for arrays and hashes using the C<@:> and C<%:> operators
 
-Layout can be used to make arrays and hasesh.
+Layout can be used to make arrays and hashes.
 See L<kurilasyn/"Layout"> for a description of how it works.
 
 =head3 Rationale
 
 Clean and easy to read (complex) data structures.
 
-=head2 CODE is a first order data type
+=head2 C<&foo> returns a CODE
 
 C<&foo> returns the sub foo, i.e. its type is CODE.
-Codes can be copied, and modified.
+Values with CODEs can be copied, and modified.
 
 =head2 Defined on a subroutine dereference reference must exist 
 
 When doing something like C<< defined *foo->& >> the reference should
 exist. To check that a reference is subrefed. Something like *foo->&.
 
-=head2 Subcalls save to sub to be called at compile time
+=head2 Subroutine references saved at compile time
 
 Implies that to change the sub to be called after code is compile the sub
-shuold be modified, for example by C<< *foo->& = sub { "new" } >>.
+should be modified, for example by C<< *foo->& = sub { "new" } >>.
 
 =head3 Rationale
 
@@ -50,14 +48,6 @@ New operator to call subroutines, using C<< <: >> uses layout syntax.
 
 Call operator with layout syntax. Should replace to call
 operator C<< ->( >>.
-
-=head2 Annonymous arrays and hashes constructors are C< @: > and C< %: >
-
-@: and %: which use the layout based syntax.
-
-=head3 Rationale
-
-Move everything towards layout based syntax.
 
 =head1 KNOWN BUGS
 

@@ -27,11 +27,23 @@ Both can be installed at the same time.
 
 =head2 Major changes compared to Perl 5
 
-=over 4
+=over 3
 
 =item *
 
-Layout based blocks and statements
+Layout based blocks, statements and lists
+
+=item *
+
+Formal parameters
+
+=item *
+
+Pattern assignments
+
+=item *
+
+Assign subroutines
 
 =item *
 
@@ -39,7 +51,7 @@ Sigil invariant of value
 
 =item *
 
-Renaming numeric comparison operators
+Renaming operators
 
 =item *
 
@@ -49,25 +61,13 @@ Easier quoting rules
 
 Error objects, with default backtrace
 
-=item * 
+=item *
 
 Added compilations subroutines, see L<compsub>.
 
-=item * 
+=item *
 
 Lexical scoped byte vs codepoint semantics
-
-=item *
-
-Bit &, |, ^, ~ operator renamed to ^&^, ^|^, ^^^, ^~^
-
-=item *
-
-Strings are internally always encoded using UTF-8
-
-=item *
-
-String dereference will always result in an error
 
 =item *
 
