@@ -4,8 +4,6 @@ use warnings
 
 our $VERSION = '0.25'
 
-use Storable < qw(dclone)
-
 require Exporter
 
 our @ISA = qw(Exporter)
