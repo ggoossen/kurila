@@ -1100,6 +1100,7 @@ Perl_fold_constants(pTHX_ register OP *o)
     OP *old_next;
     SV * const oldwarnhook = PL_warnhook;
     SV * const olddiehook  = PL_diehook;
+    U32 olddebug = PL_debug;
     COP not_compiling;
     dJMPENV;
 
@@ -1154,6 +1155,7 @@ Perl_fold_constants(pTHX_ register OP *o)
     assert(IN_PERL_RUNTIME);
     PL_warnhook = PERL_WARNHOOK_FATAL;
     PL_diehook  = PERL_DIEHOOK_IGNORE;
+    PL_debug &= ~DEBUG_R_FLAG;
     JMPENV_PUSH(ret);
 
     switch (ret) {
@@ -1185,6 +1187,7 @@ Perl_fold_constants(pTHX_ register OP *o)
     JMPENV_POP;
     PL_warnhook = oldwarnhook;
     PL_diehook  = olddiehook;
+    PL_debug = olddebug;
     PL_curcop = &PL_compiling;
 
     if (PL_scopestack_ix > oldscope)
