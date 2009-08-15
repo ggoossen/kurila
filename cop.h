@@ -555,6 +555,9 @@ struct stackinfo {
     I32			si_markoff;	/* offset where markstack begins for us.
 					 * currently used only with DEBUGGING,
 					 * but not #ifdef-ed for bincompat */
+#ifdef DEBUGGING
+    U32                 olddebug;       /* previous value of PL_debug */           
+#endif
 };
 
 typedef struct stackinfo PERL_SI;
@@ -580,6 +583,8 @@ typedef struct stackinfo PERL_SI;
 	}								\
 	next->si_type = type;						\
 	next->si_cxix = -1;						\
+	next->olddebug = PL_debug;					\
+	PL_debug &= ~DEBUG_R_FLAG;					\
 	AvFILLp(next->si_stack) = 0;					\
 	SWITCHSTACK(PL_curstack,next->si_stack);			\
 	PL_curstackinfo = next;						\
@@ -599,6 +604,7 @@ typedef struct stackinfo PERL_SI;
 	    my_exit(1);							\
 	}								\
 	SWITCHSTACK(PL_curstack,prev->si_stack);			\
+	PL_debug = PL_curstackinfo->olddebug;				\
 	/* don't free prev here, free them all at the END{} */		\
 	PL_curstackinfo = prev;						\
     } STMT_END
