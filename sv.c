@@ -3907,9 +3907,7 @@ Perl_sv_add_backref(pTHX_ SV *const tsv, SV *const sv)
 	    av = newAV();
 	    AvREAL_off(av);
 	    sv_magic(tsv, (SV*)av, PERL_MAGIC_backref, NULL, 0);
-	    /* av now has a refcnt of 2, which avoids it getting freed
-	     * before us during global cleanup. The extra ref is removed
-	     * by magic_killbackrefs() when tsv is being freed */
+	    SvREFCNT_dec(av);
 	}
     }
     if (AvFILLp(av) >= AvMAX(av)) {
@@ -4012,7 +4010,6 @@ Perl_sv_kill_backrefs(pTHX_ SV *const sv, AV *const av)
 	    svp++;
 	}
     }
-    AvREFCNT_dec(av); /* remove extra count added by sv_add_backref() */
     return 0;
 }
 
