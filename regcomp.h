@@ -447,6 +447,7 @@ EXTCONST regexp_engine PL_core_reg_engine = {
         Perl_re_intuit_start,
         Perl_re_intuit_string, 
         Perl_regfree_internal,
+        Perl_reg_tmprefcnt_internal,
         Perl_reg_numbered_buff_fetch,
         Perl_reg_numbered_buff_store,
         Perl_reg_numbered_buff_length,

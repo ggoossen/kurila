@@ -221,6 +221,9 @@
 #define CALLREGFREE_PVT(prog) \
     if(prog) CALL_FPTR(RX_ENGINE(prog)->free)(aTHX_ (prog))
 
+#define CALLREGTMPREFCNT_PVT(prog) \
+    if(prog) CALL_FPTR(RX_ENGINE(prog)->tmprefcnt)(aTHX_ (prog))
+
 #define CALLREG_NUMBUF_FETCH(rx,paren,usesv)                                \
     CALL_FPTR(RX_ENGINE(rx)->numbered_buff_FETCH)(aTHX_ (rx),(paren),(usesv))
 

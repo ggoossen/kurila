@@ -670,6 +670,7 @@ Ap	|void	|pregfree2	|NN REGEXP *rx
 Ap	|void	|preg_tmprefcnt	|NN REGEXP *rx
 EXp	|REGEXP*|reg_temp_copy	|NN REGEXP* r
 Ap	|void	|regfree_internal|NN REGEXP *const rx
+Ap	|void	|reg_tmprefcnt_internal|NN REGEXP *const rx
 Ap	|REGEXP*|pregcomp	|NN const SV * const pattern|const U32 flags
 Ap	|REGEXP*|re_compile	|NN const SV * const pattern|U32 flags
 Ap	|char*	|re_intuit_start|NN REGEXP * const rx|NULLOK SV* sv|NN char* strpos \

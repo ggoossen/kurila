@@ -2338,6 +2338,11 @@ PERL_CALLCONV void	Perl_regfree_internal(pTHX_ REGEXP *const rx)
 #define PERL_ARGS_ASSERT_REGFREE_INTERNAL	\
 	assert(rx)
 
+PERL_CALLCONV void	Perl_reg_tmprefcnt_internal(pTHX_ REGEXP *const rx)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_REG_TMPREFCNT_INTERNAL	\
+	assert(rx)
+
 PERL_CALLCONV REGEXP*	Perl_pregcomp(pTHX_ const SV * const pattern, const U32 flags)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_PREGCOMP	\

@@ -708,6 +708,7 @@
 #define reg_temp_copy		Perl_reg_temp_copy
 #endif
 #define regfree_internal	Perl_regfree_internal
+#define reg_tmprefcnt_internal	Perl_reg_tmprefcnt_internal
 #define pregcomp		Perl_pregcomp
 #define re_compile		Perl_re_compile
 #define re_intuit_start		Perl_re_intuit_start
@@ -2890,6 +2891,7 @@
 #define reg_temp_copy(a)	Perl_reg_temp_copy(aTHX_ a)
 #endif
 #define regfree_internal(a)	Perl_regfree_internal(aTHX_ a)
+#define reg_tmprefcnt_internal(a)	Perl_reg_tmprefcnt_internal(aTHX_ a)
 #define pregcomp(a,b)		Perl_pregcomp(aTHX_ a,b)
 #define re_compile(a,b)		Perl_re_compile(aTHX_ a,b)
 #define re_intuit_start(a,b,c,d,e,f)	Perl_re_intuit_start(aTHX_ a,b,c,d,e,f)

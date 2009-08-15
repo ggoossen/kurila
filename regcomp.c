@@ -8798,6 +8798,7 @@ Perl_preg_tmprefcnt(pTHX_ REGEXP *rx)
     if (r->mother_re) {
         ReTMPREFCNT_inc(r->mother_re);
     } else {
+	CALLREGTMPREFCNT_PVT(rx); /* tmprefcnt check private data */
         if (RXp_PAREN_NAMES(r))
             HvTMPREFCNT_inc(RXp_PAREN_NAMES(r));
     }        
@@ -8811,35 +8812,6 @@ Perl_preg_tmprefcnt(pTHX_ REGEXP *rx)
     if (r->saved_copy)
         SvTMPREFCNT_inc(r->saved_copy);
 #endif
-
-    if (ri->data) {
-	int n = ri->data->count;
-
-	while (--n >= 0) {
-          /* If you add a ->what type here, update the comment in regcomp.h */
-	    switch (ri->data->what[n]) {
-	    case 's':
-	    case 'S':
-	    case 'u':
-		SvTMPREFCNT_inc((SV*)ri->data->data[n]);
-		break;
-	    case 'f':
-		break;
-	    case 'p':
-		break;
-	    case 'o':
-		break;
-	    case 'n':
-	        break;
-            case 'T':	        
-                break;
-	    case 't':
-		break;
-	    default:
-		Perl_croak(aTHX_ "panic: regfree data code '%c'", ri->data->what[n]);
-	    }
-	}
-    }
 }
 
 /*  reg_temp_copy()
@@ -9024,6 +8996,48 @@ Perl_regfree_internal(pTHX_ REGEXP * const rx)
     }
 
     Safefree(ri);
+}
+
+void
+Perl_reg_tmprefcnt_internal(pTHX_ REGEXP * const rx)
+{
+    dVAR;
+    struct regexp *const r = (struct regexp *)SvANY(rx);
+    RXi_GET_DECL(r,ri);
+    GET_RE_DEBUG_FLAGS_DECL;
+
+    PERL_ARGS_ASSERT_REG_TMPREFCNT_INTERNAL;
+
+    if (ri->data) {
+	int n = ri->data->count;
+
+	while (--n >= 0) {
+          /* If you add a ->what type here, update the comment in regcomp.h */
+	    switch (ri->data->what[n]) {
+	    case 's':
+	    case 'S':
+	    case 'u':
+		SvTMPREFCNT_inc((SV*)ri->data->data[n]);
+		break;
+	    case 'f':
+		break;
+	    case 'p':
+		SvTMPREFCNT_inc((AV*)ri->data->data[n]);
+		break;
+	    case 'o':
+		/* rootop_tmprefcnt_inc((ROOTOP*)ri->data->data[n]);  */
+		break;
+	    case 'n':
+	        break;
+            case 'T':	        
+                break;
+	    case 't':
+		break;
+	    default:
+		Perl_croak(aTHX_ "panic: reg_tmprefcnt data code '%c'", ri->data->what[n]);
+	    }
+	}
+    }
 }
 
 #define sv_dup_inc(s,t)	SvREFCNT_inc(sv_dup(s,t))

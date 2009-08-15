@@ -433,6 +433,7 @@ Perl_pregfree2
 Perl_preg_tmprefcnt
 Perl_reg_temp_copy
 Perl_regfree_internal
+Perl_reg_tmprefcnt_internal
 Perl_pregcomp
 Perl_re_compile
 Perl_re_intuit_start

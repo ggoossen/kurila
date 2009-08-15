@@ -138,6 +138,7 @@ typedef struct regexp_engine {
                        re_scream_pos_data *data);
     SV*     (*checkstr) (pTHX_ REGEXP * const rx);
     void    (*free) (pTHX_ REGEXP * const rx);
+    void    (*tmprefcnt) (pTHX_ REGEXP * const rx);
     void    (*numbered_buff_FETCH) (pTHX_ REGEXP * const rx, const I32 paren,
                                     SV * const sv);
     void    (*numbered_buff_STORE) (pTHX_ REGEXP * const rx, const I32 paren,
