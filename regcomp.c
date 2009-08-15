@@ -7762,6 +7762,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
         *STRING(ret)= (char)value;
         STR_LEN(ret)= 1;
         RExC_emit += STR_SZ(1);
+	SvREFCNT_dec(listsv);
         return ret;
     }
 
