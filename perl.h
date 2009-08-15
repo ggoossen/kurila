@@ -3519,6 +3519,7 @@ Gid_t getegid (void);
 #  define DEBUG_q_TEST_ (PL_debug & DEBUG_q_FLAG)
 #  define DEBUG_Xv_TEST_ (DEBUG_X_TEST_ && DEBUG_v_TEST_)
 #  define DEBUG_Uv_TEST_ (DEBUG_U_TEST_ && DEBUG_v_TEST_)
+#  define DEBUG_Rv_TEST_ (DEBUG_R_TEST_ && DEBUG_v_TEST_)
 
 #ifdef DEBUGGING
 
@@ -3547,6 +3548,7 @@ Gid_t getegid (void);
 #  define DEBUG_q_TEST DEBUG_q_TEST_
 #  define DEBUG_Xv_TEST DEBUG_Xv_TEST_
 #  define DEBUG_Uv_TEST DEBUG_Uv_TEST_
+#  define DEBUG_Rv_TEST DEBUG_Rv_TEST_
 
 #  define PERL_DEB(a)                  a
 #  define PERL_DEBUG(a) if (PL_debug)  a
@@ -3584,6 +3586,7 @@ Gid_t getegid (void);
 #  define DEBUG_D(a) DEBUG__(DEBUG_D_TEST, a)
 #  define DEBUG_Xv(a) DEBUG__(DEBUG_Xv_TEST, a)
 #  define DEBUG_Uv(a) DEBUG__(DEBUG_Uv_TEST, a)
+#  define DEBUG_Rv(a) DEBUG__(DEBUG_Rv_TEST, a)
 
 #  define DEBUG_T(a) DEBUG__(DEBUG_T_TEST, a)
 #  define DEBUG_R(a) DEBUG__(DEBUG_R_TEST, a)
@@ -3619,6 +3622,7 @@ Gid_t getegid (void);
 #  define DEBUG_q_TEST (0)
 #  define DEBUG_Xv_TEST (0)
 #  define DEBUG_Uv_TEST (0)
+#  define DEBUG_Rv_TEST (0)
 
 #  define PERL_DEB(a)
 #  define PERL_DEBUG(a)
@@ -3646,6 +3650,7 @@ Gid_t getegid (void);
 #  define DEBUG_q(a)
 #  define DEBUG_Xv(a)
 #  define DEBUG_Uv(a)
+#  define DEBUG_Rv(a)
 #endif /* DEBUGGING */
 
 
