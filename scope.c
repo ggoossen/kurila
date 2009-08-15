@@ -1235,7 +1235,7 @@ Perl_scope_tmprefcnt(pTHX)
 	    break;
 	}
 	case SAVEt_COMPPAD:
-	    (void)SSPOPPTR;
+	    SvTMPREFCNT_inc(SSPOPPTR);
 	    break;
 	case SAVEt_PADSV_AND_MORTALIZE: {
 	    const PADOFFSET off = (PADOFFSET)SSPOPLONG;
