@@ -23,6 +23,8 @@ extern SV*	my_re_intuit_string (pTHX_ REGEXP * const prog);
 
 extern void	my_regfree (pTHX_ REGEXP * const r);
 
+extern void	my_reg_tmprefcnt (pTHX_ REGEXP * const r);
+
 extern void	my_reg_numbered_buff_fetch(pTHX_ REGEXP * const rx, const I32 paren,
 					   SV * const usesv);
 extern void	my_reg_numbered_buff_store(pTHX_ REGEXP * const rx, const I32 paren,
@@ -47,6 +49,7 @@ const struct regexp_engine my_reg_engine = {
         my_re_intuit_start, 
         my_re_intuit_string, 
         my_regfree, 
+        my_reg_tmprefcnt, 
         my_reg_numbered_buff_fetch,
         my_reg_numbered_buff_store,
         my_reg_numbered_buff_length,
