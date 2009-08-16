@@ -1349,6 +1349,7 @@ Perl_cx_dump(pTHX_ PERL_CONTEXT *cx)
 		PTR2UV(cx->blk_sub.retop));
 	break;
     case CXt_EVAL:
+    case CXt_TRY:
 	PerlIO_printf(Perl_debug_log, "BLK_EVAL.OLD_IN_EVAL = %ld\n",
 		(long)CxOLD_IN_EVAL(cx));
 	PerlIO_printf(Perl_debug_log, "BLK_EVAL.OLD_OP_TYPE = %s (%s)\n",
@@ -1433,6 +1434,7 @@ Perl_cx_tmprefcnt(pTHX_ PERL_CONTEXT *cx)
 	CvTMPREFCNT_inc(cx->blk_sub.cv);
 	break;
     case CXt_EVAL:
+    case CXt_TRY:
 	SvTMPREFCNT_inc(cx->blk_dynascope);
 	SvTMPREFCNT_inc(cx->blk_eval.old_namesv);
 	break;

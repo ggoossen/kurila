@@ -308,7 +308,7 @@ Perl_deb_stack_all(pTHX)
 		deb_stack_n(AvARRAY(si->si_stack),
 			stack_min, stack_max, mark_min, mark_max);
 
-		if (CxTYPE(cx) == CXt_EVAL || CxTYPE(cx) == CXt_SUB)
+		if (CxTYPE(cx) == CXt_EVAL || CxTYPE(cx) == CXt_TRY || CxTYPE(cx) == CXt_SUB)
 		{
 		    const OP * const retop = cx->blk_sub.retop;
 

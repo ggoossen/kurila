@@ -440,6 +440,7 @@ struct context {
 #define CXt_EVAL        8
 #define CXt_SUBST       9
 #define CXt_XSSUB     0xa
+#define CXt_TRY       0xb
 /* SUBST doesn't feature in all switch statements.  */
 
 /* private flags for CXt_SUB and CXt_NULL
@@ -452,10 +453,6 @@ struct context {
 /* private flags for CXt_SUB */
 #define CXp_HASARGS	0x20
 
-/* private flags for CXt_EVAL */
-#define CXp_REAL	0x20	/* truly eval'', not a lookalike */
-#define CXp_TRYBLOCK	0x40	/* eval{}, not eval'' or similar */
-
 /* private flags for CXt_LOOP */
 #define CXp_FOR_DEF	0x10	/* foreach using $_ */
 
@@ -466,10 +463,6 @@ struct context {
 #define CxTYPE_is_LOOP(c)	(((c)->cx_type & 0xC) == 0x4)
 #define CxMULTICALL(c)	(((c)->cx_type & CXp_MULTICALL)			\
 			 == CXp_MULTICALL)
-#define CxREALEVAL(c)	(((c)->cx_type & (CXTYPEMASK|CXp_REAL))		\
-			 == (CXt_EVAL|CXp_REAL))
-#define CxTRYBLOCK(c)	(((c)->cx_type & (CXTYPEMASK|CXp_TRYBLOCK))	\
-			 == (CXt_EVAL|CXp_TRYBLOCK))
 #define CxFOREACH(c)	(CxTYPE_is_LOOP(c) && CxTYPE(c) != CXt_LOOP_PLAIN)
 #define CxFOREACHDEF(c)	((CxTYPE_is_LOOP(c) && CxTYPE(c) != CXt_LOOP_PLAIN) \
 			 && ((c)->cx_type & CXp_FOR_DEF))

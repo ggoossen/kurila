@@ -191,6 +191,7 @@ static const char * const context_name[] = {
     "eval",
     "substitution",
     "XS-subroutine",
+    "try",
 };
 
 STATIC I32
@@ -208,6 +209,7 @@ S_dopoptolabel(pTHX_ const char *label)
 	case CXt_SUB:
 	case CXt_XSSUB:
 	case CXt_EVAL:
+	case CXt_TRY:
 	case CXt_NULL:
 	    if (ckWARN(WARN_EXITING))
 		Perl_warner(aTHX_ packWARN(WARN_EXITING), "Exiting %s via %s",
@@ -276,6 +278,7 @@ Perl_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
 	default:
 	    continue;
 	case CXt_EVAL:
+	case CXt_TRY:
 	case CXt_SUB:
 	case CXt_XSSUB:
 	    DEBUG_l( Perl_deb(aTHX_ "(Found sub #%ld)\n", (long)i));
@@ -296,6 +299,7 @@ S_dopoptoeval(pTHX_ I32 startingblock)
 	default:
 	    continue;
 	case CXt_EVAL:
+	case CXt_TRY:
 	    DEBUG_l( Perl_deb(aTHX_ "(Found eval #%ld)\n", (long)i));
 	    return i;
 	}
@@ -315,6 +319,7 @@ S_dopoptoloop(pTHX_ I32 startingblock)
 	case CXt_SUB:
 	case CXt_XSSUB:
 	case CXt_EVAL:
+	case CXt_TRY:
 	case CXt_NULL:
 	    if (ckWARN(WARN_EXITING))
 		Perl_warner(aTHX_ packWARN(WARN_EXITING), "Exiting %s via %s",
@@ -355,6 +360,7 @@ Perl_dounwind(pTHX_ I32 cxix)
 	    POPSUB(cx,sv);
 	    break;
 	case CXt_EVAL:
+	case CXt_TRY:
 	    LEAVE;
 	    POPEVAL(cx);
 	    break;
@@ -422,7 +428,7 @@ Perl_die_where(pTHX_ SV *msv)
 		dounwind(cxix);
 
 	    POPBLOCK(cx,PL_curpm);
-	    if (CxTYPE(cx) != CXt_EVAL) {
+	    if (CxTYPE(cx) != CXt_EVAL && CxTYPE(cx) != CXt_TRY) {
 		PerlIO_write(Perl_error_log, (const char *)"panic: die ", 11);
 		PerlIO_write(Perl_error_log, message, msglen);
 		my_exit(1);
@@ -448,7 +454,7 @@ Perl_die_where(pTHX_ SV *msv)
                                &PL_sv_undef, 0);
 		die_where(ERRSV);
 	    }
-	    assert(CxTYPE(cx) == CXt_EVAL);
+	    assert(CxTYPE(cx) == CXt_EVAL || CxTYPE(cx) == CXt_TRY);
 
 	    PL_restartop = cx->blk_eval.retop;
 	    JMPENV_JUMP(3);
@@ -586,7 +592,7 @@ PP(pp_caller)
 	PUSHs(&PL_sv_undef);
     else
 	PUSHs(boolSV((gimme & G_WANT) == G_ARRAY));
-    if (CxTYPE(cx) == CXt_EVAL) {
+    if (CxTYPE(cx) == CXt_EVAL || CxTYPE(cx) == CXt_TRY) {
 	/* eval STRING */
 	if (CxOLD_OP_TYPE(cx) == OP_ENTEREVAL) {
 	    PUSHs(cx->blk_eval.cur_text);
@@ -926,11 +932,12 @@ PP(pp_return)
 	POPSUB(cx,sv);
 	break;
     case CXt_EVAL:
+    case CXt_TRY:
 	if (!(PL_in_eval & EVAL_KEEPERR))
 	    clear_errsv = TRUE;
 	POPEVAL(cx);
 	retop = cx->blk_eval.retop;
-	if (CxTRYBLOCK(cx))
+	if (CxTYPE(cx) == CXt_TRY)
 	    break;
 	lex_end();
 	break;
@@ -1120,7 +1127,8 @@ S_docatch(pTHX_ OP *o)
     switch (ret) {
     case 0:
 	assert(cxstack_ix >= 0);
-	assert(CxTYPE(&cxstack[cxstack_ix]) == CXt_EVAL);
+	assert(CxTYPE(&cxstack[cxstack_ix]) == CXt_EVAL
+	    || CxTYPE(&cxstack[cxstack_ix]) == CXt_TRY);
 	cxstack[cxstack_ix].blk_eval.cur_top_env = PL_top_env;
  redo_body:
 	CALLRUNOPS(aTHX);
@@ -1133,7 +1141,8 @@ S_docatch(pTHX_ OP *o)
 	 * assumption is valid. In theory The cur_top_env value should be
 	 * returned in another global, the way retop (aka PL_restartop)
 	 * is. */
-	assert(CxTYPE(&cxstack[cxstack_ix+1]) == CXt_EVAL);
+	assert(CxTYPE(&cxstack[cxstack_ix+1]) == CXt_EVAL
+	    || CxTYPE(&cxstack[cxstack_ix+1]) == CXt_TRY);
 
 	if (PL_restartop
 	    && cxstack[cxstack_ix+1].blk_eval.cur_top_env == PL_top_env)
@@ -1212,7 +1221,7 @@ Perl_sv_compile_2op(pTHX_ SV *sv, ROOTOP** rootopp, const char *code, PAD** padp
     PL_op->op_type = OP_ENTEREVAL;
     PL_op->op_flags = 0;			/* Avoid uninit warning. */
     PL_op->op_location = SvLOCATION(sv);
-    PUSHBLOCK(cx, CXt_EVAL|(IN_PERL_COMPILETIME ? 0 : CXp_REAL), SP);
+    PUSHBLOCK(cx, CXt_EVAL, SP);
     PUSHEVAL(cx, 0);
 
     if (runtime)
@@ -1272,7 +1281,7 @@ Perl_find_runcv(pTHX_ U32 *db_seqp)
 		CV * const cv = cx->blk_sub.cv;
 		return cv;
 	    }
-	    else if (CxTYPE(cx) == CXt_EVAL && !CxTRYBLOCK(cx))
+	    else if (CxTYPE(cx) == CXt_EVAL)
 		return PL_compcv;
 	}
     }
@@ -1925,7 +1934,7 @@ PP(pp_entereval)
      * to do the dirty work for us */
     runcv = find_runcv(&seq);
 
-    PUSHBLOCK(cx, (CXt_EVAL|CXp_REAL), SP);
+    PUSHBLOCK(cx, CXt_EVAL, SP);
     PUSHEVAL(cx, 0);
     cx->blk_eval.retop = PL_op->op_next;
 
@@ -2029,7 +2038,7 @@ Perl_create_eval_scope(pTHX_ U32 flags)
     ENTER;
     SAVETMPS;
 
-    PUSHBLOCK(cx, (CXt_EVAL|CXp_TRYBLOCK), PL_stack_sp);
+    PUSHBLOCK(cx, CXt_TRY, PL_stack_sp);
     PUSHEVAL(cx, 0);
 
     PL_in_eval = EVAL_INEVAL;

@@ -46,7 +46,7 @@ do
     is $^EVAL_ERROR->description, "foobar"
     is $^EVAL_ERROR->stacktrace, <<MSG
  at ../lib/error.t line $line2 character 28.
-    (eval) called at ../lib/error.t line $line1 character 5.
+    (try) called at ../lib/error.t line $line1 character 5.
 MSG
 
 
@@ -63,8 +63,8 @@ do
     is $err->description, "my die"
     is $err->stacktrace, <<MSG
  at ../lib/error.t line $line1 character 15.
-    (eval) called at ../lib/error.t line $line1 character 9.
-    (eval) called at ../lib/error.t line $line2 character 5.
+    (try) called at ../lib/error.t line $line1 character 9.
+    (try) called at ../lib/error.t line $line2 character 5.
 MSG
 
 
@@ -79,8 +79,8 @@ do
     is $^EVAL_ERROR->description, "reuse die"
     is $^EVAL_ERROR->stacktrace, <<MSG
  at ../lib/error.t line $line1 character 15.
-    (eval) called at ../lib/error.t line $line1 character 9.
-    (eval) called at ../lib/error.t line $line2 character 5.
+    (try) called at ../lib/error.t line $line1 character 9.
+    (try) called at ../lib/error.t line $line2 character 5.
 reraised at ../lib/error.t line $($line1+1) character 9.
 MSG
 
@@ -94,7 +94,7 @@ do
     is $^EVAL_ERROR->description, "Expected a SCALAR REF but got a PLAINVALUE"
     is $^EVAL_ERROR->stacktrace, <<MSG
  at ../lib/error.t line $line1 character 31.
-    (eval) called at ../lib/error.t line $line1 character 5.
+    (try) called at ../lib/error.t line $line1 character 5.
 MSG
 
 

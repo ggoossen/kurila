@@ -1847,7 +1847,7 @@ S_deb_curcv(pTHX_ const I32 ix)
     const PERL_CONTEXT * const cx = &cxstack[ix];
     if (CxTYPE(cx) == CXt_SUB)
         return cx->blk_sub.cv;
-    else if (CxTYPE(cx) == CXt_EVAL && !CxTRYBLOCK(cx))
+    else if (CxTYPE(cx) == CXt_EVAL)
         return PL_compcv;
     else if (ix == 0 && PL_curstackinfo->si_type == PERLSI_MAIN)
         return PL_main_cv;

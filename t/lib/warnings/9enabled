@@ -406,7 +406,7 @@ EXPECT
 hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 3 character 13.
     abc::check called at - line 4 character 5.
-    (eval) called at - line 3 character 1.
+    (try) called at - line 3 character 1.
 [[]]
 ########
 
@@ -699,7 +699,7 @@ EXPECT
 hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 3 character 13.
     abc::check called at - line 4 character 5.
-    (eval) called at - line 3 character 1.
+    (try) called at - line 3 character 1.
 [[]]
 ########
 

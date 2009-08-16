@@ -342,9 +342,9 @@ else {
 }
 EXPECT
 parent died at - line 2 character 11.
-    (eval) called at - line 2 character 5.
+    (try) called at - line 2 character 5.
 child died at - line 6 character 20.
-    (eval) called at - line 6 character 14.
+    (try) called at - line 6 character 14.
 ########
 my $pid;
 if (eval q{$pid = fork}) {

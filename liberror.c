@@ -53,6 +53,9 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
 	av_push(av, name ? newSVsv(*name) : 
             newSVpvs(CxTYPE(cx) == CXt_XSSUB ? "(xsub)" : "(sub)") );
     }
+    else if (CxTYPE(cx) == CXt_TRY) {
+	av_push(av, newSVpvs("(try)"));
+    }
     else {
         assert(CxTYPE(cx) == CXt_EVAL);
 	av_push(av, newSVpvs("(eval)"));
@@ -64,12 +67,9 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
 	    av_push(av, newSVsv(cx->blk_eval.cur_text));
 	}
 	/* require */
-	else if (cx->blk_eval.old_namesv) {
+	else { 
+            assert(cx->blk_eval.old_namesv);
 	    av_push(av, newSVsv(cx->blk_eval.old_namesv));
-	}
-	/* eval BLOCK (try blocks have old_namesv == 0) */
-	else {
-	    av_push(av, &PL_sv_undef);
 	}
     }
     else {
