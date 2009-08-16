@@ -1619,6 +1619,10 @@ PP(pp_sort)
 		    CvDEPTH(cv)--;
 	    }
 	    POPBLOCK(cx,PL_curpm);
+	    if (!(flags & OPf_SPECIAL)) {
+		SV* sv;
+		POPSUB(cx,sv);
+	    }
 	    PL_stack_sp = newsp;
 	    POPSTACK;
 	    CATCH_SET(oldcatch);
