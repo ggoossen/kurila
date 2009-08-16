@@ -1259,7 +1259,7 @@
 #if defined(PERL_IN_PP_CTL_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define docatch			S_docatch
-#define dopoptoeval		S_dopoptoeval
+#define dopoptotry		S_dopoptotry
 #define dopoptolabel		S_dopoptolabel
 #define dopoptoloop		S_dopoptoloop
 #define doeval			S_doeval
@@ -3444,7 +3444,7 @@
 #if defined(PERL_IN_PP_CTL_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define docatch(a)		S_docatch(aTHX_ a)
-#define dopoptoeval(a)		S_dopoptoeval(aTHX_ a)
+#define dopoptotry(a)		S_dopoptotry(aTHX_ a)
 #define dopoptolabel(a)		S_dopoptolabel(aTHX_ a)
 #define dopoptoloop(a)		S_dopoptoloop(aTHX_ a)
 #define doeval(a,b,c,d)		S_doeval(aTHX_ a,b,c,d)

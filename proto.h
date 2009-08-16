@@ -4347,7 +4347,7 @@ PERL_CALLCONV I32	Perl_dopoptosub_at(pTHX_ const PERL_CONTEXT* cxstk, I32 starti
 STATIC OP*	S_docatch(pTHX_ OP *o)
 			__attribute__warn_unused_result__;
 
-STATIC I32	S_dopoptoeval(pTHX_ I32 startingblock)
+STATIC I32	S_dopoptotry(pTHX_ I32 startingblock)
 			__attribute__warn_unused_result__;
 
 STATIC I32	S_dopoptolabel(pTHX_ const char *label)

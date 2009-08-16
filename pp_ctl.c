@@ -289,7 +289,7 @@ Perl_dopoptosub_at(pTHX_ const PERL_CONTEXT *cxstk, I32 startingblock)
 }
 
 STATIC I32
-S_dopoptoeval(pTHX_ I32 startingblock)
+S_dopoptotry(pTHX_ I32 startingblock)
 {
     dVAR;
     I32 i;
@@ -412,7 +412,7 @@ Perl_die_where(pTHX_ SV *msv)
 	I32 cxix;
 	I32 gimme;
 
-	while ((cxix = dopoptoeval(cxstack_ix)) < 0
+	while ((cxix = dopoptotry(cxstack_ix)) < 0
 	       && PL_curstackinfo->si_prev)
 	{
 	    dounwind(-1);
