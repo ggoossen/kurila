@@ -109,6 +109,18 @@ Closing bracket on a callback.  See C<ENTER> and L<perlcall>.
 	DEBUG_SCOPE("LEAVE")					\
 	pop_scope();						\
     } STMT_END
+#define ENTER_named(name)						\
+    STMT_START {							\
+	push_scope();							\
+	PL_scopestack_name[PL_scopestack_ix-1] = name;			\
+	DEBUG_SCOPE("ENTER \"" name "\"")				\
+    } STMT_END
+#define LEAVE_named(name)						\
+    STMT_START {							\
+	DEBUG_SCOPE("LEAVE \"" name "\"")				\
+	assert(strEQ(PL_scopestack_name[PL_scopestack_ix-1], name));	\
+	pop_scope();							\
+    } STMT_END
 #else
 #define ENTER push_scope()
 #define LEAVE pop_scope()

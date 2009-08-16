@@ -1791,7 +1791,7 @@ PP(pp_require)
 			   unixname, unixlen, &PL_sv_no, 0 );
     }
 
-    ENTER;
+    ENTER_named("eval");
     SAVETMPS;
     lex_start(NULL, tryrsfp, TRUE);
     SVcpREPLACE(PL_parser->lex_filename, filename);
@@ -1881,7 +1881,7 @@ PP(pp_entereval)
     }
     sv = POPs;
 
-    ENTER;
+    ENTER_named("eval");
     lex_start(sv, NULL, FALSE);
     SAVETMPS;
 
@@ -1991,7 +1991,7 @@ PP(pp_leaveeval)
     CvDEPTH(PL_compcv) = 0;
     lex_end();
 
-    LEAVE;
+    LEAVE_named("eval");
     if (!(save_flags & OPf_SPECIAL))
 	sv_setpvn(ERRSV,"",0);
 
