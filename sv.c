@@ -4352,7 +4352,7 @@ Perl_call_destructors() {
     while (av_len(destroyav) != -1) {
 	dSP;
 
-	ENTER;
+	ENTER_named("call_destructor");
 	SAVETMPS;
 
 	{
@@ -4379,7 +4379,7 @@ Perl_call_destructors() {
 	}
 
 	FREETMPS;
-	LEAVE;
+	LEAVE_named("call_destructor");
     }
 }
 
@@ -8439,7 +8439,7 @@ Perl_sv_recode_to_utf8(pTHX_ SV *sv, SV *encoding)
 	STRLEN len;
 	const char *s;
 	dSP;
-	ENTER;
+	ENTER_named("call_decode");
 	SAVETMPS;
 	save_re_context();
 	PUSHMARK(sp);
@@ -8466,7 +8466,7 @@ Perl_sv_recode_to_utf8(pTHX_ SV *sv, SV *encoding)
 	    SvCUR_set(sv, len);
 	}
 	FREETMPS;
-	LEAVE;
+	LEAVE_named("call_decode");
 	return SvPVX_mutable(sv);
     }
     return SvPOKp(sv) ? SvPVX_mutable(sv) : NULL;

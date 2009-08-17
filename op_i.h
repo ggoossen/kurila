@@ -13,12 +13,12 @@ Perl_rootop_refcnt_dec(pTHX_ ROOTOP* o) {
     PADOFFSET refcnt = OpREFCNT_dec(o);
     PERL_ARGS_ASSERT_ROOTOP_REFCNT_DEC;
     if (refcnt == 0) {
-	ENTER;
+	ENTER_named("op_free");
 	PAD_SAVE_SETNULLPAD();
 
         op_free(RootopOp(o));
         
-        LEAVE;
+        LEAVE_named("op_free");
     }
 }
 

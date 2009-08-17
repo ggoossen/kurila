@@ -141,7 +141,7 @@ Perl_sv_does(pTHX_ SV *sv, const char *const name)
 
     PERL_ARGS_ASSERT_SV_DOES;
 
-    ENTER;
+    ENTER_named("sv_does");
     SAVETMPS;
 
     if (!SvOK(sv) || !(SvROK(sv) || (SvPOK(sv) && SvCUR(sv))))
@@ -170,7 +170,7 @@ Perl_sv_does(pTHX_ SV *sv, const char *const name)
     does_it = SvTRUE( call_sv(methodname, G_SCALAR | G_METHOD) );
     SPAGAIN;
     FREETMPS;
-    LEAVE;
+    LEAVE_named("sv_does");
 
     return does_it;
 }

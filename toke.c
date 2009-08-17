@@ -1545,7 +1545,7 @@ STATIC I32
 S_sublex_push(pTHX)
 {
     dVAR;
-    ENTER;
+    ENTER_named("sublex");
 
     PL_lex_state = PL_sublex_info.super_state;
     SAVEI32(PL_lex_brackets);
@@ -1655,7 +1655,7 @@ S_sublex_done(pTHX)
                 PL_realtokenstart = -1;
         }
 #endif
-        LEAVE;
+        LEAVE_named("sublex");
         PL_bufend = SvPVX_mutable(PL_linestr);
         PL_bufend += SvCUR(PL_linestr);
         PL_expect = XOPERATOR;

@@ -124,6 +124,8 @@ Closing bracket on a callback.  See C<ENTER> and L<perlcall>.
 #else
 #define ENTER push_scope()
 #define LEAVE pop_scope()
+#define ENTER_named(name) push_scope()
+#define LEAVE_named(name) pop_scope()
 #endif
 #define LEAVE_SCOPE(old) if (PL_savestack_ix > old) leave_scope(old)
 

@@ -72,7 +72,7 @@ S_signals_set_handler(SV* handlersv, SV* namesv)
     sigemptyset(&set);
     sigaddset(&set,i);
     sigprocmask(SIG_BLOCK, &set, &save);
-    ENTER;
+    ENTER_named("signals_set_handler");
     save_sv = newSVpvn((char *)(&save), sizeof(sigset_t));
     SAVEFREESV(save_sv);
     SAVEDESTRUCTOR_X(restore_sigmask, save_sv);
@@ -97,7 +97,7 @@ S_signals_set_handler(SV* handlersv, SV* namesv)
 	PL_psig_ptr[i] = newSVsv(handlersv);
 	(void)rsignal(i, PL_csighandlerp);
 #ifdef HAS_SIGPROCMASK
-	LEAVE;
+	LEAVE_named("signals_set_handler");
 #endif
         if(to_dec)
             SvREFCNT_dec(to_dec);
@@ -121,7 +121,7 @@ S_signals_set_handler(SV* handlersv, SV* namesv)
     }
 #ifdef HAS_SIGPROCMASK
     if(i)
-        LEAVE;
+        LEAVE_named("signals_set_handler");
 #endif
     if(to_dec)
         SvREFCNT_dec(to_dec);

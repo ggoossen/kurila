@@ -1267,7 +1267,7 @@ void Perl_cv_clone_anon(pTHX_ CV *dst, CV* src)
     outpad = AvARRAY(parent_pad);
     assert(outpad == PL_curpad);
 
-    ENTER;
+    ENTER_named("cv_clone_anon");
     SAVESPTR(PL_compcv);
 
     CVcpREPLACE(PL_compcv, dst);
@@ -1355,7 +1355,7 @@ void Perl_cv_clone_anon(pTHX_ CV *dst, CV* src)
        cv_dump(dst,     "To");
     );
 
-    LEAVE;
+    LEAVE_named("cv_clone_anon");
  
     if (CvCONST(dst)) {
        /* Constant sub () { $x } closing over $x - see lib/constant.pm:

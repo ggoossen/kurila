@@ -425,7 +425,7 @@ perl_construct(pTHXx)
     PL_compiling.cop_hints_hash = newHV();
     PL_dynamicscope = hvTsv(newHV());
 
-    ENTER;
+    ENTER_named("perl");
 }
 
 /*
@@ -489,7 +489,7 @@ perl_destruct(pTHXx)
             call_list(PL_scopestack_ix, PL_endav);
         JMPENV_POP;
     }
-    LEAVE;
+    LEAVE_named("perl");
     FREETMPS;
 
     /* Need to flush since END blocks can produce output */
@@ -1800,7 +1800,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	gv_check(PL_defstash);
     }
 
-    LEAVE;
+    LEAVE_named("perl");
     FREETMPS;
 
 #ifdef MYMALLOC
@@ -1811,7 +1811,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     }
 #endif
 
-    ENTER;
+    ENTER_named("perl");
     PL_restartop = 0;
     return NULL;
 }
@@ -2160,7 +2160,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	    
     assert( (flags & G_WANT) == G_SCALAR || (flags & G_DISCARD) );
     if (flags & G_DISCARD) {
-	ENTER;
+	ENTER_named("call_sv");
 	SAVETMPS;
 	flags |= G_VOID;
     }
@@ -2258,7 +2258,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	assert(PL_stack_sp == (PL_stack_base + oldmark + stack_offset));
 	retval = NULL;
 	FREETMPS;
-	LEAVE;
+	LEAVE_named("call_sv");
     }
     PL_op = oldop;
     return (SV*)retval;
@@ -2291,7 +2291,7 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
     PERL_ARGS_ASSERT_EVAL_SV;
 
     if (flags & G_DISCARD) {
-	ENTER;
+	ENTER_named("eval_sv");
 	SAVETMPS;
     }
 
@@ -2352,7 +2352,7 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
 	PL_stack_sp = PL_stack_base + oldmark;
 	retval = 0;
 	FREETMPS;
-	LEAVE;
+	LEAVE_named("eval_sv");
     }
     PL_op = oldop;
     return retval;

@@ -1249,7 +1249,7 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
     if (cv && !CvDEPTH(cv) && (CvROOT(cv) || CvXSUB(cv))) {
 	dSP;
 
-	ENTER;
+	ENTER_named("call_diehook");
 	save_re_context();
 	SAVESPTR(*hook);
 	SVcpREPLACE(*hook, PERL_DIEHOOK_FATAL);
@@ -1260,7 +1260,7 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
 	PUTBACK;
 	call_sv((SV*)cv, G_DISCARD);
 	POPSTACK;
-	LEAVE;
+	LEAVE_named("call_diehook");
 	return TRUE;
     }
     return FALSE;
@@ -1284,7 +1284,7 @@ S_vdie_croak_common(pTHX_ SV* location, const char* pat, va_list* args)
 	}
 
 	if (PL_errorcreatehook) { 
-	    ENTER;
+	    ENTER_named("call_errorcreatehook");
 	    PUSHSTACKi(PERLSI_DIEHOOK);
 	    PUSHMARK(SP);
 
@@ -1296,7 +1296,7 @@ S_vdie_croak_common(pTHX_ SV* location, const char* pat, va_list* args)
 	    SPAGAIN;
 	    PUTBACK;
 	    POPSTACK;
-	    LEAVE;
+	    LEAVE_named("call_errorcreatehook");
 	}
     }
 
@@ -1425,7 +1425,7 @@ Perl_vwarn_at(pTHX_ SV* location, const char* pat, va_list *args)
 	}
 
 	if (PL_errorcreatehook) {
-	    ENTER;
+	    ENTER_named("call_errorcreatehook");
 	    PUSHSTACKi(PERLSI_WARNHOOK);
 	    PUSHMARK(SP);
 
@@ -1437,7 +1437,7 @@ Perl_vwarn_at(pTHX_ SV* location, const char* pat, va_list *args)
 	    SPAGAIN;
 	    PUTBACK;
 	    POPSTACK;
-	    LEAVE;
+	    LEAVE_named("call_errorcreatehook");
 	}
     }
 

@@ -324,13 +324,13 @@ PP(pp_backtick)
 		NOOP;
 	}
 	else if (gimme == G_SCALAR) {
-	    ENTER;
+	    ENTER_named("backtick");
 	    SAVESPTR(PL_rs);
 	    SVcpREPLACE(PL_rs, &PL_sv_undef);
 	    sv_setpvn(TARG, "", 0);	/* note that this preserves previous buffer */
 	    while (sv_gets(TARG, fp, SvCUR(TARG)) != NULL)
 		NOOP;
-	    LEAVE;
+	    LEAVE_named("backtick");
 	    XPUSHs(TARG);
 	}
 	else {
@@ -367,7 +367,7 @@ PP(pp_glob)
      * without at the same time croaking, for some reason, or if
      * perl was built with PERL_EXTERNAL_GLOB */
 
-    ENTER;
+    ENTER_named("glob");
 
     gv = (GV*)*PL_stack_sp--;
 
@@ -380,7 +380,7 @@ PP(pp_glob)
 #endif	/* !DOSISH */
 
     result = do_readline( gv );
-    LEAVE;
+    LEAVE_named("glob");
     return result;
 }
 
@@ -398,14 +398,14 @@ PP(pp_warn)
     /* TODO: protection against recursion */
 
     if (SP - MARK >= 1) {
-	ENTER;
+	ENTER_named("call_errorcreatehook");
 	PUSHMARK(MARK);
 	XPUSHs(PL_op->op_location);
 	PUTBACK;
 	tmpsv = call_sv(PL_errorcreatehook, G_SCALAR);
 	SPAGAIN;
 	PUTBACK;
-	LEAVE;
+	LEAVE_named("call_errorcreatehook");
     }
     else {
 	SV * const error = ERRSV;
@@ -416,7 +416,7 @@ PP(pp_warn)
     }
     SP = MARK + 1;
     if ( ! tmpsv ) {
-	ENTER;
+	ENTER_named("call_errorcreatehook");
 	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(newSVpvs("Warning: something's wrong")));
 	XPUSHs(PL_op->op_location);
@@ -424,7 +424,7 @@ PP(pp_warn)
 	tmpsv = call_sv(PL_errorcreatehook, G_SCALAR);
 	SPAGAIN;
 	PUTBACK;
-	LEAVE;
+	LEAVE_named("call_errorcreatehook");
     }
 
     Perl_vdie_common(aTHX_ tmpsv, TRUE);
@@ -440,14 +440,14 @@ PP(pp_die)
     /* TODO: protection against recursion */
 
     if (SP - MARK >= 1) {
-	ENTER;
+	ENTER_named("call_errorcreatehook");
 	PUSHMARK(MARK);
 	XPUSHs(PL_op->op_location);
 	PUTBACK;
 	tmpsv = call_sv(PL_errorcreatehook, G_SCALAR);
 	SPAGAIN;
 	PUTBACK;
-	LEAVE;
+	LEAVE_named("call_errorcreatehook");
     }
     else {
 	SV * const error = ERRSV;
@@ -464,7 +464,7 @@ PP(pp_die)
 	}
     }
     if ( ! tmpsv ) {
-	ENTER;
+	ENTER_named("call_errorcreatehook");
 	PUSHMARK(SP);
 	XPUSHs(newSVpvs_flags("Died", SVs_TEMP));
 	XPUSHs(PL_op->op_location);
@@ -472,7 +472,7 @@ PP(pp_die)
 	tmpsv = call_sv(PL_errorcreatehook, G_SCALAR);
 	SPAGAIN;
 	PUTBACK;
-	LEAVE;
+	LEAVE_named("call_errorcreatehook");
     }
 
     Perl_vdie_common(aTHX_ tmpsv, FALSE);

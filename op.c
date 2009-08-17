@@ -2604,7 +2604,7 @@ Perl_vload_module(pTHX_ U32 flags, SV *name, SV *ver, va_list *args)
      * new parser with lex_start(). This won't actually be used for much,
      * since pp_require() will create another parser for the real work. */
 
-    ENTER;
+    ENTER_named("vload_module");
     SAVEVPTR(PL_curcop);
     lex_start(NULL, NULL, FALSE);
     SVcpREPLACE(PL_parser->lex_filename, newSVpv("fake begin block", 0));
@@ -2619,7 +2619,7 @@ Perl_vload_module(pTHX_ U32 flags, SV *name, SV *ver, va_list *args)
 	veop, modname, imop);
 #endif
     process_special_block(KEY_BEGIN, cv);
-    LEAVE;
+    LEAVE_named("vload_module");
 }
 
 OP *
@@ -3657,7 +3657,7 @@ Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
     {
 	AV* call_av;
 	const I32 oldscope = PL_scopestack_ix;
-	ENTER;
+	ENTER_named("BEGIN-block");
 
 	if ( ! SvLOCATION(cvTsv(cv)) )
 	    SvLOCATION(cvTsv(cv)) = avTsv(newAV());
@@ -3673,7 +3673,7 @@ Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
 
 	PL_curcop = &PL_compiling;
 	CopHINTS_set(&PL_compiling, PL_hints);
-	LEAVE;
+	LEAVE_named("BEGIN-block");
         break;
     }
     case KEY_END:
@@ -3719,7 +3719,7 @@ Perl_newCONSTSUB(pTHX_ const char *name, SV *sv)
     const char *const temp_p = temp_sv ? SvPV_const(temp_sv, len) : NULL;
     char *const file = savepvn(temp_p, temp_p ? len : 0);
 
-    ENTER;
+    ENTER_named("newCONSTSUB");
 
     if (IN_PERL_RUNTIME) {
 	/* at runtime, it's not safe to manipulate PL_curcop: it may be
@@ -3741,7 +3741,7 @@ Perl_newCONSTSUB(pTHX_ const char *name, SV *sv)
     CvCONST_on(cv);
     Safefree(file);
 
-    LEAVE;
+    LEAVE_named("newCONSTSUB");
 
     return cv;
 }
@@ -4618,7 +4618,7 @@ Perl_ck_glob(pTHX_ OP *o)
     /* XXX this can be tightened up and made more failsafe. */
     if (!(gv && GvCVu(gv) && GvIMPORTED_CV(gv))) {
 	GV *glob_gv;
-	ENTER;
+	ENTER_named("load_glob");
 	Perl_load_module(aTHX_ PERL_LOADMOD_NOIMPORT,
 		newSVpvs("File::Glob"), NULL, NULL, NULL);
 	gv = gv_fetchpvs("CORE::GLOBAL::glob", 0, SVt_PVCV);
@@ -4626,13 +4626,13 @@ Perl_ck_glob(pTHX_ OP *o)
 	GvCV(gv) = GvCV(glob_gv);
 	SvREFCNT_inc_void((SV*)GvCV(gv));
 	GvIMPORTED_CV_on(gv);
-	LEAVE;
+	LEAVE_named("load_glob");
     }
 #endif /* PERL_EXTERNAL_GLOB */
 
     if (!(gv && GvCVu(gv) && GvIMPORTED_CV(gv))) {
 	GV *glob_gv;
-	ENTER;
+	ENTER_named("load_PP_glob");
 	Perl_load_module(aTHX_ PERL_LOADMOD_NOIMPORT,
 		newSVpvs("File::GlobPP"), NULL, NULL, NULL);
 	gv = gv_fetchpvs("CORE::GLOBAL::glob", 1, SVt_PVCV);
@@ -4642,7 +4642,7 @@ Perl_ck_glob(pTHX_ OP *o)
 	GvCV(gv) = GvCV(glob_gv);
 	SvREFCNT_inc_void((SV*)GvCV(gv));
 	GvIMPORTED_CV_on(gv);
-	LEAVE;
+	LEAVE_named("load_PP_glob");
     }
 
     if ( ! (gv && GvCVu(gv) && GvIMPORTED_CV(gv)) ) {
@@ -4815,7 +4815,7 @@ Perl_ck_compsub(pTHX_ OP *o)
 
     SV* args_b = NULL;
 
-    ENTER;
+    ENTER_named("ck_compsub");
     PUSHMARK(SP);
     if (first->op_sibling) {
 	args_b = newSV(0);
@@ -4836,7 +4836,7 @@ Perl_ck_compsub(pTHX_ OP *o)
 	Perl_die(aTHX_ "reference to B::OP argument kept");
     SvREFCNT_dec(args_b);
 
-    LEAVE;
+    LEAVE_named("ck_compsub");
 
     cBINOPo->op_first->op_sibling = NULL;
     op_free(o);
@@ -5493,7 +5493,7 @@ Perl_peep(pTHX_ register OP *o)
 
     if (!o || o->op_opt)
 	return;
-    ENTER;
+    ENTER_named("peep");
     SAVEOP();
     SAVEVPTR(PL_curcop);
     for (; o; o = o->op_next) {
@@ -5853,7 +5853,7 @@ Perl_peep(pTHX_ register OP *o)
 	}
 	oldop = o;
     }
-    LEAVE;
+    LEAVE_named("peep");
 }
 
 const char*

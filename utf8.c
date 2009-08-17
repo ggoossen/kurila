@@ -1661,12 +1661,12 @@ Perl_swash_init(pTHX_ const char* pkg, const char* name, SV *listsv, I32 minbits
     PERL_ARGS_ASSERT_SWASH_INIT;
 
     PUSHSTACKi(PERLSI_MAGIC);
-    ENTER;
+    ENTER_named("call_SWASHNEW");
     SAVEI32(PL_hints);
     PL_hints = 0;
     save_re_context();
     if (!gv_fetchmeth(stash, "SWASHNEW", 8, -1)) {	/* demand load utf8 */
-	ENTER;
+	ENTER_named("load-SWASHNEW");
 	errsv_save = newSVsv(ERRSV);
 	/* It is assumed that callers of this routine are not passing in any
 	   user derived data.  */
@@ -1675,7 +1675,7 @@ Perl_swash_init(pTHX_ const char* pkg, const char* name, SV *listsv, I32 minbits
 	if (!SvTRUE(ERRSV))
 	    sv_setsv(ERRSV, errsv_save);
 	SvREFCNT_dec(errsv_save);
-	LEAVE;
+	LEAVE_named("load-SWASHNEW");
     }
     SPAGAIN;
     PUSHMARK(SP);
@@ -1692,7 +1692,7 @@ Perl_swash_init(pTHX_ const char* pkg, const char* name, SV *listsv, I32 minbits
     if (!SvTRUE(ERRSV))
 	sv_setsv(ERRSV, errsv_save);
     SvREFCNT_dec(errsv_save);
-    LEAVE;
+    LEAVE_named("call_SWASHNEW");
     POPSTACK;
     if (IN_PERL_COMPILETIME) {
 	CopHINTS_set(PL_curcop, PL_hints);

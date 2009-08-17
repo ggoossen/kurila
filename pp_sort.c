@@ -1499,7 +1499,7 @@ PP(pp_sort)
 	RETPUSHUNDEF;
     }
 
-    ENTER;
+    ENTER_named("sort");
     SAVEVPTR(PL_sortcop);
     if (SP - MARK > 1) {
 	cv = sv_2cv(*++MARK, &gv, 0);
@@ -1648,7 +1648,7 @@ PP(pp_sort)
 	}
     }
     
-    LEAVE;
+    LEAVE_named("sort");
     PL_stack_sp = ORIGMARK;
     *++PL_stack_sp = avTsv(av);
     return nextop;

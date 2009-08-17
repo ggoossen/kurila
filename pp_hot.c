@@ -912,7 +912,7 @@ PP(pp_enter)
 	    gimme = G_SCALAR;
     }
 
-    ENTER;
+    ENTER_named("block");
 
     SAVETMPS;
     PUSHBLOCK(cx, CXt_BLOCK, SP);
@@ -1055,7 +1055,7 @@ PP(pp_leave)
     }
     PL_curpm = newpm;	/* Don't pop $1 et al till now */
 
-    LEAVE;
+    LEAVE_named("block");
 
     RETURN;
 }
@@ -1180,7 +1180,7 @@ PP(pp_grepwhile)
     if ( av_len(src) == -1 ) {
 
 	FREETMPS;
-	LEAVE;					/* exit outer scope */
+	LEAVE_named("map/grep");					/* exit outer scope */
 	(void)POPMARK;				/* pop dst */
 	SP = PL_stack_base + POPMARK;		/* pop original mark */
 	if (gimme != G_VOID) {
@@ -1264,7 +1264,7 @@ PP(pp_leavesub)
     }
     PUTBACK;
 
-    LEAVE;
+    LEAVE_named("sub");
     cxstack_ix--;
     POPSUB(cx,sv);	/* Stack values are safe: release CV and @_ ... */
     PL_curpm = newpm;	/* ... and pop $1 et al */
@@ -1385,7 +1385,7 @@ PP(pp_entersub)
 	}
     }
 
-    ENTER;
+    ENTER_named("sub");
     SAVETMPS;
 
     if (!CvROOT(cv) && !CvXSUB(cv)) {
@@ -1415,7 +1415,7 @@ PP(pp_entersub)
 	    XPUSHs(cv_const_sv(cv));
 	    PUTBACK;
 
-	    LEAVE;
+	    LEAVE_named("sub");
 	    return NORMAL;
 	}
 	padlist = CvPADLIST(cv);
@@ -1584,7 +1584,7 @@ PP(pp_entersub)
 		*(PL_stack_base + markix) = *PL_stack_sp;
 	    PL_stack_sp = PL_stack_base + markix;
 	}
-	LEAVE;
+	LEAVE_named("sub");
 	return NORMAL;
     }
 }

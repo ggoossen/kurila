@@ -994,11 +994,11 @@ static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
 	if ( ! PL_op->op_flags & OPf_SPECIAL) { /* not lexical */
 	    if (cSVOPo->op_sv) {
 		SV * const tmpsv = sv_2mortal(newSV(0));
-		ENTER;
+		ENTER_named("dump_fullname");
 		gv_fullname3(tmpsv, (GV*)cSVOPo->op_sv, NULL);
 		Perl_dump_indent(aTHX_ level, file, "GV = %s\n",
 				 SvPV_nolen_const(tmpsv));
-		LEAVE;
+		LEAVE_named("dump_fullname");
 	    }
 	    else
 		Perl_dump_indent(aTHX_ level, file, "GV = NULL\n");
@@ -2474,14 +2474,14 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	    SV * const tmpsv2 = newSVpvn("", 0);
 	    char *s;
 	    STRLEN len;
-	    ENTER;
+	    ENTER_named("dump_fullname");
 	    SAVEFREESV(tmpsv1);
 	    SAVEFREESV(tmpsv2);
 	    gv_fullname3(tmpsv1, (GV*)cSVOPo->op_sv, NULL);
 	    s = SvPV(tmpsv1,len);
 	    sv_catxmlpvn(tmpsv2, s, len);
 	    S_xmldump_attr(aTHX_ level, file, "gv=\"%s\"", SvPV(tmpsv2, len));
-	    LEAVE;
+	    LEAVE_named("dump_fullname");
 	}
 	else
 	    S_xmldump_attr(aTHX_ level, file, "gv=\"NULL\"");

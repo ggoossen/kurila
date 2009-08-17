@@ -248,20 +248,20 @@ XS(XS_error_message)
     if (items < 1)
 	Perl_croak(aTHX_ "Usage: $error->message()");
     error = POPs;
-    ENTER;
+    ENTER_named("call_description");
     PUSHMARK(SP);
     PUSHs(error);
     PUTBACK;
     msg = call_method("description", G_SCALAR);
     SPAGAIN;
-    LEAVE;
-    ENTER;
+    LEAVE_named("call_description");
+    ENTER_named("call_stacktrace");
     PUSHMARK(SP);
     XPUSHs(error);
     PUTBACK;
     sv_catsv(msg, call_method("stacktrace", G_SCALAR) );
     SPAGAIN;
-    LEAVE;
+    LEAVE_named("call_stacktrace");
     XPUSHs(msg);
     XSRETURN(1);
 }
@@ -346,7 +346,7 @@ XS(XS_error_write_to_stderr) {
     if (items != 1)
 	Perl_croak(aTHX_ "Usage: $error->write_to_stderr()");
 
-    ENTER;
+    ENTER_named("call_message");
     PUSHMARK(SP);
     PUSHs(ST(0));
     PUTBACK;
@@ -355,7 +355,7 @@ XS(XS_error_write_to_stderr) {
     SPAGAIN;
     message = SvPV_const(tmpsv, msglen);
 
-    LEAVE;
+    LEAVE_named("call_message");
 
     write_to_stderr(message, msglen);
 }

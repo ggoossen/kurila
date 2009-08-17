@@ -75,7 +75,7 @@ PP(pp_grepstart)
 
     dst = sv_2mortal(avTsv(newAV()));
 
-    ENTER;					/* enter outer scope */
+    ENTER_named("map/grep");					/* enter outer scope */
     SAVETMPS;
 
     src = sv_mortalcopy(src);
@@ -117,7 +117,7 @@ PP(pp_mapwhile)
     if ( av_len(src) == -1 ) {
 
 	FREETMPS;
-	LEAVE;					/* exit outer scope */
+	LEAVE_named("map/grep");					/* exit outer scope */
 	(void)POPMARK;				/* pop dst */
 	SP = PL_stack_base + POPMARK;		/* pop original mark */
 	if (gimme != G_VOID) {
@@ -714,7 +714,7 @@ PP(pp_enteriter)
     SV **svp;
     U8 cxtype = CXt_LOOP_FOR;
 
-    ENTER;
+    ENTER_named("loop1");
     SAVETMPS;
 
     if (PL_op->op_targ) {
@@ -736,7 +736,7 @@ PP(pp_enteriter)
     if (PL_op->op_private & OPpITER_DEF)
 	cxtype |= CXp_FOR_DEF;
 
-    ENTER;
+    ENTER_named("loop2");
 
     PUSHBLOCK(cx, cxtype, SP);
     PUSHLOOP_FOR(cx, svp, SP-1, 0);
@@ -806,9 +806,9 @@ PP(pp_enterloop)
     register PERL_CONTEXT *cx;
     const I32 gimme = GIMME_V;
 
-    ENTER;
+    ENTER_named("loop1");
     SAVETMPS;
-    ENTER;
+    ENTER_named("loop2");
 
     PUSHBLOCK(cx, CXt_LOOP_PLAIN, SP);
     PUSHLOOP_PLAIN(cx, SP);
@@ -849,8 +849,8 @@ PP(pp_leaveloop)
     POPLOOP(cx);	/* Stack values are safe: release loop vars ... */
     PL_curpm = newpm;	/* ... and pop $1 et al */
 
-    LEAVE;
-    LEAVE;
+    LEAVE_named("loop2");
+    LEAVE_named("loop1");
 
     return NORMAL;
 }
@@ -999,11 +999,11 @@ PP(pp_last)
     SP = newsp;
     PUTBACK;
 
-    LEAVE;
+    LEAVE_named("loop2");
     cxstack_ix--;
     /* Stack values are safe: */
     POPLOOP(cx);	/* release loop vars ... */
-    LEAVE;
+    LEAVE_named("loop1");
     PL_curpm = newpm;	/* ... and pop $1 et al */
 
     PERL_UNUSED_VAR(optype);
@@ -1066,7 +1066,7 @@ PP(pp_redo)
     if (redo_op->op_type == OP_ENTER) {
 	/* pop one less context to avoid $x being freed in while (my $x..) */
 	I32 gimme = cxstack[cxstack_ix+1].blk_gimme;
-	ENTER;
+	ENTER_named("block");
 	PUSHBLOCK(cx, CXt_BLOCK, PL_stack_sp);
 
 	assert(CxTYPE(&cxstack[cxstack_ix]) == CXt_BLOCK);
@@ -1186,7 +1186,7 @@ Perl_sv_compile_2op(pTHX_ SV *sv, ROOTOP** rootopp, const char *code, PAD** padp
 
     PERL_ARGS_ASSERT_SV_COMPILE_2OP;
 
-    ENTER;
+    ENTER_named("compile_2op");
     lex_start(sv, NULL, FALSE);
     SAVETMPS;
     /* switch to eval mode */
@@ -1240,7 +1240,7 @@ Perl_sv_compile_2op(pTHX_ SV *sv, ROOTOP** rootopp, const char *code, PAD** padp
     lex_end();
     /* XXX DAPM do this properly one year */
     *padp = AvREFCNT_inc(PL_comppad);
-    LEAVE;
+    LEAVE_named("compile_2op");
     if (IN_PERL_COMPILETIME)
 	CopHINTS_set(&PL_compiling, PL_hints);
 #ifdef OP_IN_REGISTER
@@ -1374,7 +1374,6 @@ S_doeval(pTHX_ int gimme, ROOTOP** rootopp, CV* outside, U32 seq)
 	    POPEVAL(cx);
 	}
 	lex_end();
-	LEAVE;
 
 	msg = SvPVx_nolen_const(ERRSV);
 	if (optype == OP_REQUIRE) {
@@ -1390,11 +1389,13 @@ S_doeval(pTHX_ int gimme, ROOTOP** rootopp, CV* outside, U32 seq)
 	    Perl_croak(aTHX_ "%sCompilation failed in regexp",
 		       (*msg ? msg : "Unknown error\n"));
 	}
-	else {
-	    dSP;
-	    ENTER;
-	    PUSHSTACKi(PERLSI_DIEHOOK);
+	LEAVE_named("eval");
 
+	{
+	    dSP;
+	    ENTER_named("call_errorcreatehook");
+	    PUSHSTACKi(PERLSI_DIEHOOK);
+	
 	    PUSHMARK(SP);
 	    XPUSHs(ERRSV);
 	    XPUSHs(PL_op->op_location);
@@ -1404,8 +1405,9 @@ S_doeval(pTHX_ int gimme, ROOTOP** rootopp, CV* outside, U32 seq)
 	    PUTBACK;
 
 	    POPSTACK;
-	    LEAVE;
+	    LEAVE_named("call_errorcreatehook");
 	}
+
 	PERL_UNUSED_VAR(newsp);
 	PUSHs(&PL_sv_undef);
 	PUTBACK;
@@ -1622,7 +1624,7 @@ PP(pp_require)
 		    tryname = SvPVX_const(namesv);
 		    tryrsfp = NULL;
 
-		    ENTER;
+		    ENTER_named("require_INC");
 		    SAVETMPS;
 		    EXTEND(SP, 2);
 
@@ -1678,7 +1680,7 @@ PP(pp_require)
 		    }
 
 		    FREETMPS;
-		    LEAVE;
+		    LEAVE_named("require_INC");
 
 		    if (tryrsfp) {
 			hook_sv = dirsv;
@@ -2021,7 +2023,7 @@ Perl_delete_eval_scope(pTHX)
     POPBLOCK(cx,newpm);
     POPEVAL(cx);
     PL_curpm = newpm;
-    LEAVE;
+    LEAVE_named("eval_scope");
     PERL_UNUSED_VAR(newsp);
     PERL_UNUSED_VAR(gimme);
     PERL_UNUSED_VAR(optype);
@@ -2035,7 +2037,7 @@ Perl_create_eval_scope(pTHX_ U32 flags)
     PERL_CONTEXT *cx;
     const I32 gimme = GIMME_V;
 	
-    ENTER;
+    ENTER_named("eval_scope");
     SAVETMPS;
 
     PUSHBLOCK(cx, CXt_TRY, PL_stack_sp);
@@ -2102,7 +2104,7 @@ PP(pp_leavetry)
     }
     PL_curpm = newpm;	/* Don't pop $1 et al till now */
 
-    LEAVE;
+    LEAVE_named("eval_scope");
     sv_setpvn(ERRSV,"",0);
     RETURN;
 }
@@ -2144,7 +2146,7 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 	dSP;
 	SV* out;
 
-	ENTER;
+	ENTER_named("call_filter");
 	SAVE_DEFSV;
 	SAVETMPS;
 	EXTEND(SP, 2);
@@ -2165,7 +2167,7 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 
 	PUTBACK;
 	FREETMPS;
-	LEAVE;
+	LEAVE_named("call_filter");
     }
 
     if(SvOK(upstream)) {

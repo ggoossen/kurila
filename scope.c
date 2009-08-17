@@ -987,7 +987,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    const I32 maxarg = av_len(args);
 	    SV* cv = AvARRAY(args)[maxarg];
 	    
-	    ENTER;
+	    ENTER_named("saved_call_sv");
 	    PUSHSTACK;
 	    PL_localizing = 2;
 	    XPUSHs(new_value);
@@ -1001,7 +1001,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    call_sv(cv, G_DISCARD | G_ASSIGNMENT );
 	    PL_localizing = 0;
 	    POPSTACK;
-	    LEAVE;
+	    LEAVE_named("saved_call_sv");
 	    break;
 	}
 	case SAVEt_SET_SVFLAGS:

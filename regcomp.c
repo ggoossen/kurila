@@ -5337,10 +5337,10 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 		    ROOTOP *rop;
 		    SV * const sv = newSVpvn(s, RExC_parse - 1 - s);
 
-		    ENTER;
+		    ENTER_named("compile_re");
 		    Perl_save_re_context(aTHX);
 		    sop = sv_compile_2op(sv, &rop, "re", &pad);
-		    LEAVE;
+		    LEAVE_named("compile_re");
 
 		    n = add_data(pRExC_state, 3, "nop");
 		    RExC_rxi->data->data[n] = (void*)rop;

@@ -112,7 +112,7 @@
 
 #define LOAD_UTF8_CHARCLASS(class,str) STMT_START { \
     if (!CAT2(PL_utf8_,class)) { \
-       bool ok; ENTER; save_re_context(); ok=CAT2(is_utf8_,class)((const char*)str); assert(ok); LEAVE; \
+	bool ok; ENTER_named("utf8_charclass"); save_re_context(); ok=CAT2(is_utf8_,class)((const char*)str); assert(ok); LEAVE_named("utf8_charclass"); \
     } } STMT_END
 #define LOAD_UTF8_CHARCLASS_ALNUM() LOAD_UTF8_CHARCLASS(alnum,"a")
 #define LOAD_UTF8_CHARCLASS_DIGIT() LOAD_UTF8_CHARCLASS(digit,"0")
@@ -1217,7 +1217,7 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
                 /* We can't just allocate points here. We need to wrap it in
                  * an SV so it gets freed properly if there is a croak while
                  * running the match */
-                ENTER;
+                ENTER_named("ahocorasick");
 	        SAVETMPS;
                 sv_points=newSV(maxlen * sizeof(char *));
                 SvCUR_set(sv_points,
@@ -1377,7 +1377,7 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
                         });
                         if (!reginfo || regtry(reginfo, &s)) {
                             FREETMPS;
-		            LEAVE;
+		            LEAVE_named("ahocorasick");
                             goto got_it;
                         }
                         s = HOP(s,1);
@@ -1391,7 +1391,7 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
                     }
                 }
                 FREETMPS;
-                LEAVE;
+                LEAVE_named("ahocorasick");
 	    }
 	    break;
 	default:
@@ -2638,7 +2638,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 
 		    if ( got_wordnum ) {
 			if ( ! ST.accepted ) {
-			    ENTER;
+			    ENTER_named("trie");
 			    /* SAVETMPS; */ /* XXX is this necessary? dmq */
 			    bufflen = TRIE_INITAL_ACCEPT_BUFFLEN;
 			    sv_accept_buff=newSV(bufflen *
@@ -2768,7 +2768,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
     		    scan = ST.me + ST.jump[ST.accept_buff[0].wordnum];
 		if (!has_cutgroup) {
 		    FREETMPS;
-		    LEAVE;
+		    LEAVE_named("trie");
                 } else {
                     ST.accepted--;
                     PUSH_YES_STATE_GOTO(TRIE_next, scan);
@@ -2786,7 +2786,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 			PL_colors[5] );
 		});
 		FREETMPS;
-		LEAVE;
+		LEAVE_named("trie");
 		sayNO_SILENT;
 		/*NOTREACHED*/
 	    } 
@@ -2860,7 +2860,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 	    /* NOTREACHED */
         case TRIE_next:
             FREETMPS;
-	    LEAVE;
+	    LEAVE_named("trie");
 	    sayYES;
 #undef  ST
 

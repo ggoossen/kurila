@@ -239,7 +239,7 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
     if (multi || doproto)              /* doproto means it _was_ mentioned */
 	GvMULTI_on(gv);
     if (doproto) {			/* Replicate part of newSUB here. */
-	ENTER;
+	ENTER_named("gv_init");
 	SAVESPTR(PL_curstash);
 	HVcpREPLACE(PL_curstash, stash);
 	if (has_constant) {
@@ -255,7 +255,7 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
 	    (void) start_subparse(0);	/* Create empty CV in compcv. */
 	    GvCV(gv) = (CV*)SvREFCNT_inc((SV*)PL_compcv);
 	}
-	LEAVE;
+	LEAVE_named("gv_init");
 
         mro_method_changed_in(GvSTASH(gv)); /* sub Foo::bar($) { (shift) } sub ASDF::baz($); *ASDF::baz = \&Foo::bar */
 	assert(SvTYPE(GvCV(gv)) == SVt_PVCV);

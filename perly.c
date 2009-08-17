@@ -342,7 +342,7 @@ Perl_yyparse (pTHX)
     parser = PL_parser;
     ps = parser->ps;
 
-    ENTER;  /* force parser stack cleanup before we return */
+    ENTER_named("yyparse");  /* force parser stack cleanup before we return */
     SAVEDESTRUCTOR_X(S_clear_yystack, parser);
 
 /*------------------------------------------------------------.
@@ -678,6 +678,8 @@ Perl_yyparse (pTHX)
     goto yyreturn;
 
   yyreturn:
+    /* FIXME should be LEAVE_named("yyparse"), but if an error occured
+       during compilation there could be "sublex" scopes */
     LEAVE;	/* force parser stack cleanup before we return */
     return yyresult;
 }
