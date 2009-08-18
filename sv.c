@@ -4260,7 +4260,7 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 	goto freescalar;
     case SVt_PVCV:
 	cv_undef((CV*)sv);
-	goto freescalar;
+	break;
     case SVt_PVHV:
 	Perl_hv_kill_backrefs(aTHX_ (HV*)sv);
 	hv_undef((HV*)sv);
