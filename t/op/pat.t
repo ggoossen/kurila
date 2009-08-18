@@ -2302,7 +2302,7 @@ END
         $re=qr/\b$re\b/
 
         foreach ( @nums)
-            ok($_=~m/$re/,"Trie nums")
+            ok($_=~m/$re/,"Trie nums") or diag("Failed trie re of $_ with $re")
         
         $_=join " ", @nums
         @got= $@
