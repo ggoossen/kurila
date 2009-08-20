@@ -1532,6 +1532,7 @@ PP(pp_require)
     SV *hook_sv = NULL;
     OP *op;
     SV *filename;
+    bool eval_ok;
 
     sv = POPs;
     name = SvPV_const(sv, len);
@@ -1757,7 +1758,7 @@ PP(pp_require)
 	    }
 	}
     }
-    filename = newSVpv( tryrsfp ? tryname : name, 0); /* temporary reference leak */
+    filename = sv_2mortal(newSVpv( tryrsfp ? tryname : name, 0)); /* temporary reference leak */
     if (!tryrsfp) {
 	if (PL_op->op_type == OP_REQUIRE) {
 	    const char *msgstr = name;
@@ -1835,10 +1836,7 @@ PP(pp_require)
 
     PUTBACK;
 
-    if (doeval(gimme, NULL, NULL, PL_curcop->cop_seq))
-	op = DOCATCH(PL_eval_start);
-    else
-	op = PL_op->op_next;
+    eval_ok = doeval(gimme, NULL, NULL, PL_curcop->cop_seq);
 
     /* mark require as finished */
     if (!hook_sv) {
@@ -1851,7 +1849,10 @@ PP(pp_require)
 		unixname, unixlen, SvREFCNT_inc(hook_sv), 0 );
     }
 
-    SvREFCNT_dec(filename);
+    if (eval_ok)
+	op = DOCATCH(PL_eval_start);
+    else
+	op = PL_op->op_next;
 
     return op;
 }
