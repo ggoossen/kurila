@@ -58,8 +58,7 @@ Perl_vdeb(pTHX_ const char *pat, va_list *args)
 {
 #ifdef DEBUGGING
     dVAR;
-    const char* file = "<fixme>";
-    const char* const display_file = file ? file : "<free>";
+    const char* file = "<\?\?\?>";
     long line = 0;
 
     if (PL_op) {
@@ -77,9 +76,9 @@ Perl_vdeb(pTHX_ const char *pat, va_list *args)
 
     if (DEBUG_v_TEST)
 	PerlIO_printf(Perl_debug_log, "(%ld:%s:%ld)\t",
-		      (long)PerlProc_getpid(), display_file, line);
+		      (long)PerlProc_getpid(), file, line);
     else
-	PerlIO_printf(Perl_debug_log, "(%s:%ld)\t", display_file, line);
+	PerlIO_printf(Perl_debug_log, "(%s:%ld)\t", file, line);
     (void) PerlIO_vprintf(Perl_debug_log, pat, *args);
 #else
     PERL_UNUSED_CONTEXT;
