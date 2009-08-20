@@ -9073,6 +9073,7 @@ Perl_refcnt_check(pTHX)
     IoTMPREFCNT_inc(PL_stdinio);
     IoTMPREFCNT_inc(PL_stdoutio);
     IoTMPREFCNT_inc(PL_stderrio);
+    SvTMPREFCNT_inc(PL_ofs_sv);
 
     rootop_ll_tmprefcnt(aTHX);
 
