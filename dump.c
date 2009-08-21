@@ -1649,7 +1649,10 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 		SV * const elt = hv_iterval(hv, he);
 
 		Perl_dump_indent(aTHX_ level+1, file, "Elt %s ", pv_display(d, keypv, len, 0, pvlim));
-		PerlIO_printf(file, "[UTF8 \"%s\"] ", sv_uni_display(d, keysv, 8 * sv_len_utf8(keysv), UNI_DISPLAY_QQ));
+		if (is_utf8_string(keypv, len))
+		    PerlIO_printf(file, "[UTF8 \"%s\"] ", sv_uni_display(d, keysv, 8 * sv_len_utf8(keysv), UNI_DISPLAY_QQ));
+		else
+		    PerlIO_printf(file, "[INVALID UTF8] ");
 		if (HeKREHASH(he))
 		    PerlIO_printf(file, "[REHASH] ");
 		PerlIO_printf(file, "HASH = 0x%"UVxf"\n", (UV)hash);
