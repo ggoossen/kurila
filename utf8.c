@@ -25,12 +25,10 @@
 #define PERL_IN_UTF8_C
 #include "perl.h"
 
-#ifndef EBCDIC
 /* Separate prototypes needed because in ASCII systems these
  * usually macros but they still are compiled as code, too. */
 PERL_CALLCONV UV	Perl_utf8n_to_uvchr(pTHX_ const char *s, STRLEN curlen, STRLEN *retlen, U32 flags);
 PERL_CALLCONV char*	Perl_uvchr_to_utf8(pTHX_ char *d, UV uv);
-#endif
 
 static const char unees[] =
     "Malformed UTF-8 character (unexpected end of string)";
@@ -96,18 +94,6 @@ Perl_uvuni_to_utf8_flags(pTHX_ char *ds, UV uv, UV flags)
 	*d++ = UTF_TO_NATIVE(uv);
 	return (char*)d;
     }
-#if defined(EBCDIC)
-    else {
-	STRLEN len  = UNISKIP(uv);
-	char *p = d+len-1;
-	while (p > d) {
-	    *p-- = UTF_TO_NATIVE((uv & UTF_CONTINUATION_MASK) | UTF_CONTINUATION_MARK);
-	    uv >>= UTF_ACCUMULATION_SHIFT;
-	}
-	*p = UTF_TO_NATIVE((uv & UTF_START_MASK(len)) | UTF_START_MARK(len));
-	return d+len;
-    }
-#else /* Non loop style */
     if (uv < 0x800) {
 	*d++ = (U8)(( uv >>  6)         | 0xc0);
 	*d++ = (U8)(( uv        & 0x3f) | 0x80);
@@ -174,7 +160,6 @@ Perl_uvuni_to_utf8_flags(pTHX_ char *ds, UV uv, UV flags)
 	return (char*)d;
     }
 #endif
-#endif /* Loop style */
 }
 
 /*
@@ -215,9 +200,6 @@ S_is_utf8_char_slow(const char *s, const STRLEN len)
 
     slen = len - 1;
     s++;
-#ifdef EBCDIC
-    u = NATIVE_TO_UTF(u);
-#endif
     u &= UTF_START_MASK(len);
     uv  = u;
     ouv = uv;
@@ -457,28 +439,19 @@ Perl_utf8n_to_uvuni(pTHX_ const char *s, STRLEN curlen, STRLEN *retlen, U32 flag
 	goto malformed;
     }
 
-#ifdef EBCDIC
-    uv = NATIVE_TO_UTF(uv);
-#else
     if ((uv == 0xfe || uv == 0xff) &&
 	!(flags & UTF8_ALLOW_FE_FF)) {
 	warning = UTF8_WARN_FE_FF;
 	goto malformed;
     }
-#endif
 
     if      (!(uv & 0x20))	{ len =  2; uv &= 0x1f; }
     else if (!(uv & 0x10))	{ len =  3; uv &= 0x0f; }
     else if (!(uv & 0x08))	{ len =  4; uv &= 0x07; }
     else if (!(uv & 0x04))	{ len =  5; uv &= 0x03; }
-#ifdef EBCDIC
-    else if (!(uv & 0x02))	{ len =  6; uv &= 0x01; }
-    else			{ len =  7; uv &= 0x01; }
-#else
     else if (!(uv & 0x02))	{ len =  6; uv &= 0x01; }
     else if (!(uv & 0x01))	{ len =  7; uv = 0; }
     else			{ len = 13; uv = 0; } /* whoa! */
-#endif
 
     if (retlen)
 	*retlen = len;
@@ -932,11 +905,7 @@ Perl_utf16_to_utf8(pTHX_ const char* p, char* d, I32 bytelen, I32 *newlen)
 	UV uv = (p[0] << 8) + p[1]; /* UTF-16BE */
 	p += 2;
 	if (uv < 0x80) {
-#ifdef EBCDIC
-	    *d++ = UNI_TO_NATIVE(uv);
-#else
 	    *d++ = (char)uv;
-#endif
 	    continue;
 	}
 	if (uv < 0x800) {
@@ -1498,29 +1467,7 @@ Perl_to_utf8_case(pTHX_ const char *p, char* ustrp, STRLEN *lenp,
 	      if (len == 1)
 		   len = uvuni_to_utf8(ustrp, NATIVE_TO_UNI(*s)) - ustrp;
 	      else {
-#ifdef EBCDIC
-		   /* If we have EBCDIC we need to remap the characters
-		    * since any characters in the low 256 are Unicode
-		    * code points, not EBCDIC. */
-		   char *t = s, *tend = t + len, *d;
-		
-		   d = tmpbuf;
-		   STRLEN tlen = 0;
-			
-		   while (t < tend) {
-		       const UV c = utf8_to_uvchr(t, &tlen);
-		       if (tlen > 0) {
-			   d = uvchr_to_utf8(d, UNI_TO_NATIVE(c));
-			   t += tlen;
-		       }
-		       else
-			   break;
-		   }
-		   len = d - tmpbuf;
-		   Copy(tmpbuf, ustrp, len, char);
-#else
 		   Copy(s, ustrp, len, char);
-#endif
 	      }
 	 }
     }

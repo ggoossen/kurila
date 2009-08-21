@@ -16,14 +16,6 @@
 #define uvuni_to_utf8(d, uv)		uvuni_to_utf8_flags(d, uv, 0)
 #define is_utf8_string_loc(s, len, ep)	is_utf8_string_loclen(s, len, ep, 0)
 
-#ifdef EBCDIC
-/* The equivalent of these macros but implementing UTF-EBCDIC
-   are in the following header file:
- */
-
-#include "utfebcdic.h"
-
-#else
 START_EXTERN_C
 
 #ifdef DOINIT
@@ -160,8 +152,6 @@ static __inline__ bool UTF8_IS_CONTINUED(const char c) {
 				: isALNUM_utf8(p))
 
 
-#endif /* EBCDIC vs ASCII */
-
 /* Rest of these are attributes of Unicode and perl's internals rather than the encoding */
 
 #define isIDFIRST_lazy(p)	isIDFIRST_lazy_if(p,1)
@@ -246,28 +236,15 @@ static __inline__ bool UTF8_IS_CONTINUED(const char c) {
 #define UNI_DISPLAY_QQ		(UNI_DISPLAY_ISPRINT|UNI_DISPLAY_BACKSLASH)
 #define UNI_DISPLAY_REGEX	(UNI_DISPLAY_ISPRINT|UNI_DISPLAY_BACKSLASH)
 
-#ifdef EBCDIC
-#   define ANYOF_FOLD_SHARP_S(node, input, end)	\
-	(ANYOF_BITMAP_TEST(node, EBCDIC_LATIN_SMALL_LETTER_SHARP_S) && \
-	 (ANYOF_FLAGS(node) & ANYOF_UNICODE) && \
-	 (ANYOF_FLAGS(node) & ANYOF_FOLD) && \
-	 ((end) > (input) + 1) && \
-	 toLOWER((input)[0]) == 's' && \
-	 toLOWER((input)[1]) == 's')
-#else
-#   define ANYOF_FOLD_SHARP_S(node, input, end)	\
+#define ANYOF_FOLD_SHARP_S(node, input, end)	\
 	(ANYOF_BITMAP_TEST(node, UNICODE_LATIN_SMALL_LETTER_SHARP_S) && \
 	 (ANYOF_FLAGS(node) & ANYOF_UNICODE) && \
 	 (ANYOF_FLAGS(node) & ANYOF_FOLD) && \
 	 ((end) > (input) + 1) && \
 	 toLOWER((input)[0]) == 's' && \
 	 toLOWER((input)[1]) == 's')
-#endif
 #define SHARP_S_SKIP 2
 
-#ifdef EBCDIC
-/* IS_UTF8_CHAR() is not ported to EBCDIC */
-#else
 #define IS_UTF8_CHAR_1(p)	\
 	((p)[0] <= 0x7F)
 #define IS_UTF8_CHAR_2(p)	\
@@ -339,8 +316,6 @@ static __inline__ int IS_UTF8_CHAR(const char* p, int n) {
 }
 
 #define IS_UTF8_CHAR_FAST(n) ((n) <= 4)
-
-#endif /* IS_UTF8_CHAR() for UTF-8 */
 
 /*
  * Local variables:
