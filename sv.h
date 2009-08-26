@@ -1289,6 +1289,20 @@ mg.c:1024: warning: left-hand operand of comma expression has no effect
 				    sv_force_normal_flags(sv, 0)
 
 
+/* all these 'functions' are now just macros */
+
+#define sv_pv(sv) SvPV_nolen(sv)
+
+#define sv_pvn_force_nomg(sv, lp) sv_pvn_force_flags(sv, lp, 0)
+#define sv_catpvn_nomg(dsv, sstr, slen) sv_catpvn_flags(dsv, sstr, slen, 0)
+#define sv_setsv_nomg(dsv, ssv) sv_setsv_flags(dsv, ssv, SV_DO_COW_SVSETSV)
+#define sv_catsv_nomg(dsv, ssv) sv_catsv_flags(dsv, ssv, 0)
+#define sv_2pv_nolen(sv) sv_2pv(sv, 0)
+#define sv_2pv_nomg(sv, lp) sv_2pv_flags(sv, lp, 0)
+#define sv_insert(bigstr, offset, len, little, littlelen)		\
+	Perl_sv_insert_flags(aTHX_ (bigstr),(offset), (len), (little),	\
+			     (littlelen), 0)
+
 /*
 =for apidoc Am|SV*|newRV_inc|SV* sv
 

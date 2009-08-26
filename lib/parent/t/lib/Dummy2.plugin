@@ -1,0 +1,5 @@
+package Dummy2
+sub exclaim { "I CAN FROM " . __PACKAGE__ }
+
+package Dummy2::InlineChild
+sub exclaim { "I CAN FROM " . __PACKAGE__ }

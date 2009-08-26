@@ -15,6 +15,7 @@ our (@ISA, @EXPORT_OK);
 @EXPORT_OK = qw(%Modules %Maintainers
 		get_module_files get_module_pat
 		show_results process_options);
+$VERSION = 0.02;
 require Exporter;
 
 use File::Find;
@@ -103,9 +104,12 @@ sub process_options {
     my @Files;
    
     if ($Opened) {
-	my @raw = @( `p4 opened` );
+	@Files = @( `p4 opened` );
 	die if $^CHILD_ERROR;
-	@Files = map {s!#.*!!s; s!^//depot/.*?/perl/!!; $_} @raw;
+	foreach (@Files) {
+	    s!#.*!!s;
+	    s!^//depot/(?:perl|.*?/perl)/!!;
+	}
     } else {
 	@Files = @ARGV;
     }

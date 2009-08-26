@@ -12,6 +12,7 @@ use kurila
 my $perl = $^EXECUTABLE_NAME
 
 require 'regen_lib.pl'
+
 # keep warnings.pl in sync with the CPAN distribution by not requiring core
 # changes.  Um, what ?
 # safer_unlink ("warnings.h", "lib/warnings.pm");

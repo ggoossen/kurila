@@ -328,6 +328,7 @@ a[-]?c	ac	y	$^MATCH	ac
 '(abc)\1'i	ABCABC	y	$1	ABC
 '([a-c]*)\1'i	ABCABC	y	$1	ABC
 a(?!b).	abad	y	$^MATCH	ad
+(?=)a	a	y	$^MATCH	a
 a(?=d).	abad	y	$^MATCH	ad
 a(?=c|d).	abad	y	$^MATCH	ad
 a(?:b|c|d)(.)	ace	y	$1	e

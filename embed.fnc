@@ -836,8 +836,11 @@ pd	|void	|sv_free_arenas
 Apd	|char*	|sv_gets	|NN SV *const sv|NN PerlIO *const fp|I32 append
 Apd	|char*	|sv_grow	|NN SV *const sv|STRLEN newlen
 Apd	|void	|sv_inc		|NULLOK SV *const sv
-Apd	|void	|sv_insert	|NN SV *const bigstr|const STRLEN offset|const STRLEN len \
-				|NN const char *const little|const STRLEN littlelen
+Amdb	|void	|sv_insert	|NN SV *const bigstr|const STRLEN offset \
+				|const STRLEN len|NN const char *const little \
+				|const STRLEN littlelen
+Apd	|void	|sv_insert_flags|NN SV *const bigstr|const STRLEN offset|const STRLEN len \
+				|NN const char *const little|const STRLEN littlelen|const U32 flags
 Apd	|int	|sv_isa		|NULLOK SV* sv|NN const char *const name
 Apd	|int	|sv_isobject	|NULLOK SV* sv
 Apd	|STRLEN	|sv_len		|NULLOK SV *const sv
@@ -1046,11 +1049,12 @@ Apr	|void	|newMYSUB	|I32 floor|NULLOK OP *o|NULLOK OP *proto|NULLOK OP *attrs|NU
 #endif
 p	|void	|boot_core_xsutils
 Apa	|PTR_TBL_t*|ptr_table_new
-ApR	|void*	|ptr_table_fetch|NN PTR_TBL_t *tbl|NULLOK const void *sv
-Ap	|void	|ptr_table_store|NN PTR_TBL_t *tbl|NULLOK const void *oldsv|NN void *newsv
-Ap	|void	|ptr_table_split|NN PTR_TBL_t *tbl
-Ap	|void	|ptr_table_clear|NULLOK PTR_TBL_t *tbl
-Ap	|void	|ptr_table_free|NULLOK PTR_TBL_t *tbl
+ApR	|void*	|ptr_table_fetch|NN PTR_TBL_t *const tbl|NULLOK const void *const sv
+Ap	|void	|ptr_table_store|NN PTR_TBL_t *const tbl|NULLOK const void *const oldsv \
+				|NN void *const newsv
+Ap	|void	|ptr_table_split|NN PTR_TBL_t *const tbl
+Ap	|void	|ptr_table_clear|NULLOK PTR_TBL_t *const tbl
+Ap	|void	|ptr_table_free|NULLOK PTR_TBL_t *const tbl
 #if defined(HAVE_INTERP_INTERN)
 Ap	|void	|sys_intern_clear
 Ap	|void	|sys_intern_init
@@ -1419,7 +1423,7 @@ sM	|void	|sv_release_COW	|NN SV *sv|NN const char *pvx|NN SV *after
 s	|SV *	|more_sv
 s	|void *	|more_bodies	|const svtype sv_type
 s	|void	|glob_assign_ref|NN SV *const dstr|NN SV *const sstr
-sRn	|PTR_TBL_ENT_t *|ptr_table_find|NN PTR_TBL_t *tbl|NULLOK const void *sv
+sRn	|PTR_TBL_ENT_t *|ptr_table_find|NN PTR_TBL_t *const tbl|NULLOK const void *const sv
 #endif
 
 #if defined(PERL_IN_TOKE_C) || defined(PERL_DECL_PROT)

@@ -156,10 +156,10 @@ struct cop {
    /* cop_stash is not refcounted */
 #  define CopSTASHPV_set(c,pv)	CopSTASH_set((c), gv_stashpv(pv,GV_ADD))
 #  define CopSTASH_eq(c,hv)	(CopSTASH(c) == (hv))
-#  define CopLABEL_alloc(pv)	((pv)?savepv(pv):NULL)
-#  define CopLABEL_set(c,pv)	(CopLABEL(c) = (pv))
 #  define CopSTASH_free(c)	
 #  define CopFILE_free(c)	(SvREFCNT_dec(CopFILEGV(c)),(CopFILEGV(c) = NULL))
+#  define CopLABEL_alloc(pv)	((pv)?savepv(pv):NULL)
+#  define CopLABEL_set(c,pv)	(CopLABEL(c) = (pv))
 #  define CopLABEL_free(c)	(Safefree(CopLABEL(c)),(CopLABEL(c) = NULL))
 
 #define CopSTASH_ne(c,hv)	(!CopSTASH_eq(c,hv))

@@ -488,7 +488,8 @@ function, or use the familiar relation:
 
     sub tan { sin($_[0]) / cos($_[0])  }
 
-Note that atan2(0, 0) is not well-defined.
+The return value for C<atan2(0,0)> is implementation-defined; consult
+your atan2(3) manpage for more information.
 
 =item bind SOCKET,NAME
 X<bind>
@@ -1560,6 +1561,22 @@ compile-time instead of at run-time.)  Case 5 is a place where
 normally you I<would> like to use double quotes, except that in this
 particular situation, you can just use symbolic references instead, as
 in case 6.
+
+The assignment to C<$@> occurs before restoration of localised variables,
+which means a temporary is required if you want to mask some but not all
+errors:
+
+    # alter $@ on nefarious repugnancy only
+    {
+       my $e;
+       {
+          local $@; # protect existing $@
+          eval { test_repugnancy() };
+          # $@ =~ /nefarious/ and die $@; # DOES NOT WORK
+          $@ =~ /nefarious/ and $e = $@;
+       }
+       die $e if defined $e
+    }
 
 C<eval BLOCK> does I<not> count as a loop, so the loop control statements
 C<next>, C<last>, or C<redo> cannot be used to leave or restart the block.
@@ -4869,6 +4886,10 @@ side you're done writing but not done reading, or vice versa.
 It's also a more insistent form of close because it also
 disables the file descriptor in any forked copies in other
 processes.
+
+Returns C<1> for success. In the case of error, returns C<undef> if
+the first argument is not a valid filehandle, or returns C<0> and sets
+C<$!> for any other failure.
 
 =item sin EXPR
 X<sin> X<sine> X<asin> X<arcsine>

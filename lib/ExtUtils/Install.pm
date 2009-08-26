@@ -36,7 +36,7 @@ ExtUtils::Install - install files from here to there
 
 =head1 VERSION
 
-1.50
+1.51
 
 =cut
 
@@ -1069,7 +1069,7 @@ sub inc_uninstall($filepath,$libdir,$verbose,$dry_run,$ignore,$results)
             try {
                 die "Fake die for testing"
                     if $ExtUtils::Install::Testing and
-                  File::Spec->canonpath($ExtUtils::Install::Testing) eq $targetfile;
+                       ucase(File::Spec->canonpath($ExtUtils::Install::Testing)) eq ucase($targetfile);
                 forceunlink($targetfile,'tryhard');
                 $results->{+uninstall}{+$targetfile} = $filepath;
                 1;

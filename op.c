@@ -287,7 +287,7 @@ ROOTOP*
 Perl_newROOTOP(pTHX_ OP *main, SV* location)
 {
     ROOTOP* o;
-    optype type = OP_ROOT;
+    Optype type = OP_ROOT;
 
     PERL_ARGS_ASSERT_NEWROOTOP;
 
@@ -555,7 +555,7 @@ Perl_op_clear(pTHX_ OP *o)
     switch (o->op_type) {
     case OP_NULL:	/* Was holding old type, if any. */
 	if (PL_madskills && o->op_targ != OP_NULL) {
-	    o->op_type = (optype)o->op_targ;
+	    o->op_type = (Optype)o->op_targ;
 	    o->op_targ = 0;
 	    goto retry;
 	}

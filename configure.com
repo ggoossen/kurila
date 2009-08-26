@@ -3948,6 +3948,12 @@ $ tmp = "sys/mode.h"
 $ GOSUB inhdr
 $ i_sysmode = tmp
 $!
+$! Check for poll.h
+$!
+$ tmp = "sys/poll.h"
+$ gosub inhdr
+$ i_syspoll = tmp
+$!
 $! Check for sys/access.h
 $!
 $ tmp = "sys/access.h"
@@ -5479,53 +5485,35 @@ $ echo "(IV will be ""''ivtype'"", ''ivsize' bytes)"
 $ echo "(UV will be ""''uvtype'"", ''uvsize' bytes)"
 $ echo "(NV will be ""''nvtype'"", ''nvsize' bytes)"
 $!
-$ echo4 "Checking whether your NVs can preserve your UVs..."
+$ d_nv_preserves_uv = "undef"
+$ echo4 "Checking how many bits of your UVs your NVs can preserve..."
 $ OS
 $ WS "#if defined(__DECC) || defined(__DECCXX)"
 $ WS "#include <stdlib.h>"
 $ WS "#endif"
 $ WS "#include <stdio.h>"
 $ WS "int main() {"
-$ WS "    ''uvtype' k = (''uvtype')~0, l;"
-$ WS "    ''nvtype' d;"
-$ WS "    l = k;"
-$ WS "    d = (''nvtype')l;"
-$ WS "    l = (''uvtype')d;"
-$ WS "    if (l == k)"
-$ WS "       printf(""preserve\n"");"
+$ WS "    ''uvtype' u = 0;"
+$ WS "    int     n = 8 * ''uvsize';"
+$ WS "    int     i;"
+$ WS "    for (i = 0; i < n; i++) {"
+$ WS "      u = u << 1 | (''uvtype')1;"
+$ WS "      if ((''uvtype')(''nvtype')u != u)"
+$ WS "        break;"
+$ WS "    }"
+$ WS "    printf(""%d\n"", i);"
 $ WS "    exit(0);"
 $ WS "}"
 $ CS
 $ GOSUB compile
-$ IF tmp .EQS. "preserve"
-$ THEN 
+$ nv_preserves_uv_bits = tmp
+$ IF F$INTEGER(nv_preserves_uv_bits) .GE. (F$INTEGER(uvsize) * 8)
+$ THEN
 $   d_nv_preserves_uv = "define"
-$   echo "Yes, they can." 
-$   nv_preserves_uv_bits = F$STRING(F$INTEGER(uvsize) * 8)
+$   echo "Your NVs can preserve all ''nv_preserves_uv_bits' bits of your UVs."
 $ ELSE
-$   d_nv_preserves_uv = "undef"
-$   echo "No, they can't."
-$   echo4 "Checking how many bits of your UVs your NVs can preserve..."
-$   OS
-$   WS "#if defined(__DECC) || defined(__DECCXX)"
-$   WS "#include <stdlib.h>"
-$   WS "#endif"
-$   WS "#include <stdio.h>"
-$   WS "int main() {"
-$   WS "    ''uvtype' u = 0;"
-$   WS "    int     n = 8 * ''uvsize';"
-$   WS "    int     i;"
-$   WS "    for (i = 0; i < n; i++) {"
-$   WS "      u = u << 1 | (''uvtype')1;"
-$   WS "      if ((''uvtype')(''nvtype')u != u)"
-$   WS "        break;"
-$   WS "    }"
-$   WS "    printf(""%d\n"", i);"
-$   WS "    exit(0);"
-$   WS "}"
-$   CS
-$   GOSUB compile
-$   nv_preserves_uv_bits = tmp
+$   d_nv_preserves_uv = "undef""
+$   echo "Your NVs can preserve only ''nv_preserves_uv_bits' bits of your UVs."	
 $ ENDIF
 $!
 $ nv_overflows_integers_at = "0"
@@ -6253,6 +6241,7 @@ $ WC "i_limits='define'"
 $ WC "i_locale='" + i_locale + "'"
 $ WC "i_machcthr='undef'"
 $ WC "i_machcthreads='undef'"
+$ WC "i_mallocmalloc='undef'"
 $ WC "i_math='define'"
 $ WC "i_memory='undef'"
 $ WC "i_mntent='undef'"
@@ -6285,6 +6274,7 @@ $ WC "i_sysmode='" + i_sysmode + "'"
 $ WC "i_sysmount='undef'"
 $ WC "i_sysndir='undef'"
 $ WC "i_sysparam='undef'"
+$ WC "i_syspoll='" + i_syspoll + "'"
 $ WC "i_sysresrc='undef'"
 $ WC "i_syssecrt='" + i_syssecrt + "'"
 $ WC "i_sysselct='undef'"

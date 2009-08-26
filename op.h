@@ -46,7 +46,7 @@
 #  define MADPROP_IN_BASEOP
 #endif
 
-typedef PERL_BITFIELD16 optype;
+typedef PERL_BITFIELD16 Optype;
 
 #ifdef BASEOP_DEFINITION
 #define BASEOP BASEOP_DEFINITION

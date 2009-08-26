@@ -1343,7 +1343,7 @@ Perl_sv_grow(pTHX_ register SV *const sv, register STRLEN newlen)
 	s = SvPVX_mutable(sv);
 
     if (newlen > SvLEN(sv)) {		/* need more room? */
-#ifndef MYMALLOC
+#ifndef Perl_safesysmalloc_size
 	newlen = PERL_STRLEN_ROUNDUP(newlen);
 #endif
 	if (SvLEN(sv) && s) {
@@ -4017,14 +4017,17 @@ Perl_sv_kill_backrefs(pTHX_ SV *const sv, AV *const av)
 =for apidoc sv_insert
 
 Inserts a string at the specified offset/length within the SV. Similar to
-the Perl substr() function.
+the Perl substr() function. Handles get magic.
+
+=for apidoc sv_insert_flags
+
+Same as C<sv_insert>, but the extra C<flags> are passed the C<SvPV_force_flags> that applies to C<bigstr>.
 
 =cut
 */
 
 void
-Perl_sv_insert(pTHX_ SV *const bigstr, const STRLEN offset, const STRLEN len, 
-              const char *const little, const STRLEN littlelen)
+Perl_sv_insert_flags(pTHX_ SV *const bigstr, const STRLEN offset, const STRLEN len, const char *const little, const STRLEN littlelen, const U32 flags)
 {
     dVAR;
     register char *big;
@@ -4034,11 +4037,11 @@ Perl_sv_insert(pTHX_ SV *const bigstr, const STRLEN offset, const STRLEN len,
     register I32 i;
     STRLEN curlen;
 
-    PERL_ARGS_ASSERT_SV_INSERT;
+    PERL_ARGS_ASSERT_SV_INSERT_FLAGS;
 
     if (!bigstr)
 	Perl_croak(aTHX_ "Can't modify non-existent substring");
-    SvPV_force(bigstr, curlen);
+    SvPV_force_flags(bigstr, curlen, flags);
     (void)SvPOK_only(bigstr);
     if (offset + len > curlen) {
 	SvGROW(bigstr, offset+len+1);
@@ -4742,7 +4745,8 @@ S_sv_pos_u2b_cached(pTHX_ SV *const sv, MAGIC **const mgp, const char *const sta
 	boffset = real_boffset;
     }
 
-    S_utf8_mg_pos_cache_update(aTHX_ sv, mgp, boffset, uoffset, send - start);
+    if (PL_utf8cache)
+	utf8_mg_pos_cache_update(sv, mgp, boffset, uoffset, send - start);
     return boffset;
 }
 
@@ -5097,7 +5101,8 @@ Perl_sv_pos_b2u(pTHX_ register SV *const sv, I32 *const offsetp)
     }
     *offsetp = len;
 
-    S_utf8_mg_pos_cache_update(aTHX_ sv, &mg, byte, len, blen);
+    if (PL_utf8cache)
+	utf8_mg_pos_cache_update(sv, &mg, byte, len, blen);
 }
 
 /*
@@ -6356,8 +6361,9 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
 	    *gvp = NULL;
 	    return cv;
 	}
-	else if(isGV(sv))
+	else if(isGV(sv)) {
 	    gv = (GV*)sv;
+	}
 	else
 	    Perl_croak(aTHX_ "Expected a CODE reference but got a %s reference", Ddesc(sv));
     fix_gv:
@@ -8588,8 +8594,10 @@ S_varname(pTHX_ GV *gv, const char gvtype, PADOFFSET targ,
     else if (subscript_type == FUV_SUBSCRIPT_ARRAY) {
 	Perl_sv_catpvf(aTHX_ name, "[%"IVdf"]", (IV)aindex);
     }
-    else if (subscript_type == FUV_SUBSCRIPT_WITHIN)
-	Perl_sv_insert(aTHX_ name, 0, 0,  STR_WITH_LEN("within "));
+    else if (subscript_type == FUV_SUBSCRIPT_WITHIN) {
+	/* We know that name has no magic, so can use 0 instead of SV_GMAGIC */
+	Perl_sv_insert_flags(aTHX_ name, 0, 0,  STR_WITH_LEN("within "), 0);
+    }
 
     return name;
 }

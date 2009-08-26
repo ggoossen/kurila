@@ -2416,27 +2416,22 @@ PP(pp_atan2)
 PP(pp_sin)
 {
     dVAR; dSP; dTARGET;
-    int amg_type = sin_amg;
     const char *neg_report = NULL;
     NV (*func)(NV) = Perl_sin;
     const int op_type = PL_op->op_type;
 
     switch (op_type) {
     case OP_COS:
-	amg_type = cos_amg;
 	func = Perl_cos;
 	break;
     case OP_EXP:
-	amg_type = exp_amg;
 	func = Perl_exp;
 	break;
     case OP_LOG:
-	amg_type = log_amg;
 	func = Perl_log;
 	neg_report = "log";
 	break;
     case OP_SQRT:
-	amg_type = sqrt_amg;
 	func = Perl_sqrt;
 	neg_report = "sqrt";
 	break;
@@ -2717,11 +2712,9 @@ PP(pp_substr)
 
 	sv_setpvn(TARG, tmps, rem);
 	if (repl) {
-	    SV* repl_sv_copy = NULL;
-
-	    sv_insert(sv, pos, rem, repl, repl_len);
-	    if (repl_sv_copy)
-		SvREFCNT_dec(repl_sv_copy);
+	    if (!SvOK(sv))
+		sv_setpvs(sv, "");
+	    sv_insert_flags(sv, pos, rem, repl, repl_len, 0);
 	}
     }
     SPAGAIN;

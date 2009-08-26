@@ -156,6 +156,9 @@ base - Establish an ISA relationship with base classes at compile time
 
 =head1 DESCRIPTION
 
+Unless you are using the C<fields> pragma, consider this module discouraged
+in favor of the lighter-weight C<parent>.
+
 Allows you to both load one or more modules, while setting up inheritance from
 those modules at the same time.  Roughly similar in effect to
 

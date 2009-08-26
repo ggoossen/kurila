@@ -17,6 +17,7 @@ package Maintainers;
 	'arandal'       => 'Allison Randal <allison@perl.org>',
 	'audreyt'	=> 'Audrey Tang <cpan@audreyt.org>',
 	'avar'		=> 'Ævar Arnfjörð Bjarmason <avar@cpan.org>',
+	'corion'	=> 'Max Maischein <corion@corion.net>',
 	'craig'		=> 'Craig Berry <craigberry@mac.com>',
 	'dankogai'	=> 'Dan Kogai <dankogai@cpan.org>',
 	'dconway'	=> 'Damian Conway <dconway@cpan.org>',
@@ -642,6 +643,13 @@ package Maintainers;
 		'FILES'		=> q[ext/Perl6-Form],
 		'CPAN'		=> 1,
 		),
+
+	'parent' =>
+		{
+		'MAINTAINER'	=> 'corion',
+		'FILES'		=> q[lib/parent lib/parent.pm],
+		'CPAN'		=> 1,
+		},
 
 	'perlebcdic' =>
 		\%(

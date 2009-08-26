@@ -4,9 +4,8 @@ BEGIN
     require Config; Config->import
 
 
-
 require './test.pl'
-plan( tests => 117 )
+plan( tests => 120 )
 
 our ($x, $snum, $foo, $t, $r, $s)
 
@@ -473,3 +472,9 @@ do # [perl #27940] perlbug: [\x00-\x1f] works, [\c@-\c_] does not
     ($c = "\x20\x00\x30\x01\x40\x1A\x50\x1F\x60") =~ s/[\x00-\x1f]//g
     is($c, "\x20\x30\x40\x50\x60", "s/[\\x00-\\x1f]//g")
 
+do
+    my @tests = @: 'ABC', "\x[A3A4A5]", "\x{410}\x{411}\x{412}"
+    foreach (@tests)
+        my $id = ord $_
+        s/./$(pos)/g
+        is($_, "012", "RT#52104: $id")

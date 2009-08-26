@@ -47,7 +47,9 @@ doop.c			Support code for various operations
 dosish.h		Some defines for MS/DOSish machines
 dump.c			Debugging output
 emacs/e2ctags.pl	etags to ctags converter
-emacs/kurila-mode.el	An alternate perl-mode
+emacs/kurila-mode.el	An kurila-mode
+emacs/kurila-indent.el	An indent code for the kurila-mode
+emacs/kurila-indent.etest	Tests for kurila-indent.el
 emacs/ptags		Creates smart TAGS file
 embed.fnc		Database used by embed.pl
 embed.h			Maps symbols to safer names
@@ -955,6 +957,14 @@ lib/open.pm			Pragma to specify default I/O layers
 lib/open.t			See if the open pragma works
 lib/Params/Check.pm	Params::Check
 lib/Params/Check/t/01_Params-Check.t	Params::Check tests
+lib/parent.pm	Establish an ISA relationship with base classes at compile time
+lib/parent/t/compile-time-file.t	tests for parent.pm
+lib/parent/t/compile-time.t	tests for parent.pm
+lib/parent/t/lib/Dummy2.plugin	test files for parent.pm
+lib/parent/t/lib/Dummy.pm	test files for parent.pm
+lib/parent/t/parent-classfromclassfile.t	tests for parent.pm
+lib/parent/t/parent-classfromfile.t	tests for parent.pm
+lib/parent/t/parent.t	tests for parent.pm
 lib/perl5db.pl			Perl debugging routines
 lib/perl5db.t			Tests for the Perl debugger
 lib/perl5db/t/eval-line-bug	Tests for the Perl debugger
@@ -1527,11 +1537,9 @@ os2/OS2/typemap			Common typemap for OS/2 types
 os2/perl2cmd.pl			Corrects installed binaries under OS/2
 os2/perlrexx.c			Support perl interpreter embedded in REXX
 os2/perlrexx.cmd		Test perl interpreter embedded in REXX
-overload.c			generated overload enum (public)
-overload.h			generated overload name table (implementation)
-overload.pl			generate overload.h
 pad.c				Scratchpad functions
 pad.h				Scratchpad headers
+pad_i.h				Scratchpad inline function
 parser.h			parser object header
 patchlevel.h			The current patch level of perl
 perlapi.c			Perl API functions
@@ -1946,6 +1954,7 @@ t/io/utf8.t			See if file seeking works
 t/japh/abigail.t		Obscure tests
 t/lex/chars.t			See if character escapes work
 t/lex/qq.t			See if qq works
+t/lex/pod.t			See if pod works
 t/lex/qr.t			See if qr work
 t/lex/use.t			See if use works
 t/lex/ver.t			See if v-strings and the %v format flag work
@@ -2077,6 +2086,8 @@ t/op/each.t			See if hash iterators work
 t/op/eval.t			See if eval operator works
 t/op/exec.t			See if exec, system and qx work
 t/op/exp.t			See if math functions work
+t/op/emptyarray.t			See if $@ work
+t/op/emptyhash.t			See if $% work
 t/op/filetest.t			See if file tests work
 t/op/fork.t			See if fork works
 t/op/getppid.t			See if getppid works

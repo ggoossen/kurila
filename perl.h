@@ -3937,20 +3937,33 @@ struct perl_memory_debug_header {
 #  define INIT_TRACK_MEMPOOL(header, interp)
 #endif
 
+#ifdef I_MALLOCMALLOC
+/* Needed for malloc_size(), malloc_good_size() on some systems */
+#  include <malloc/malloc.h>
+#endif
+
 #ifdef MYMALLOC
 #  define Perl_safesysmalloc_size(where)	Perl_malloced_size(where)
 #else
-#   ifdef HAS_MALLOC_SIZE
+#  ifdef HAS_MALLOC_SIZE
+#    ifdef PERL_TRACK_MEMPOOL
 #	define Perl_safesysmalloc_size(where)			\
 	    (malloc_size(((char *)(where)) - sTHX) - sTHX)
-#   endif
-#   ifdef HAS_MALLOC_GOOD_SIZE
+#    else
+#	define Perl_safesysmalloc_size(where) malloc_size(where)
+#    endif
+#  endif
+#  ifdef HAS_MALLOC_GOOD_SIZE
+#    ifdef PERL_TRACK_MEMPOOL
 #	define Perl_malloc_good_size(how_much)			\
 	    (malloc_good_size((how_much) + sTHX) - sTHX)
-#   else
+#    else
+#	define Perl_malloc_good_size(how_much) malloc_good_size(how_much)
+#    endif
+#  else
 /* Having this as the identity operation makes some code simpler.  */
 #	define Perl_malloc_good_size(how_much)	(how_much)
-#   endif
+#  endif
 #endif
 
 typedef int (CPERLscope(*runops_proc_t)) (pTHX);
@@ -4797,28 +4810,7 @@ MGVTBL_SET(
     0
 );
 
-#include "overload.h"
-
 END_EXTERN_C
-
-struct am_table {
-  U32 flags;
-  U32 was_ok_sub;
-  long was_ok_am;
-  long fallback;
-  CV* table[NofAMmeth];
-};
-struct am_table_short {
-  U32 flags;
-  U32 was_ok_sub;
-  long was_ok_am;
-};
-typedef struct am_table AMT;
-typedef struct am_table_short AMTS;
-
-#define AMGfallNEVER	1
-#define AMGfallNO	2
-#define AMGfallYES	3
 
 #define StashHANDLER(stash,meth)	gv_handler((stash),CAT2(meth,_amg))
 

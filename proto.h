@@ -2975,10 +2975,16 @@ PERL_CALLCONV char*	Perl_sv_grow(pTHX_ SV *const sv, STRLEN newlen)
 	assert(sv)
 
 PERL_CALLCONV void	Perl_sv_inc(pTHX_ SV *const sv);
-PERL_CALLCONV void	Perl_sv_insert(pTHX_ SV *const bigstr, const STRLEN offset, const STRLEN len, const char *const little, const STRLEN littlelen)
+/* PERL_CALLCONV void	Perl_sv_insert(pTHX_ SV *const bigstr, const STRLEN offset, const STRLEN len, const char *const little, const STRLEN littlelen)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_4); */
+#define PERL_ARGS_ASSERT_SV_INSERT	\
+	assert(bigstr); assert(little)
+
+PERL_CALLCONV void	Perl_sv_insert_flags(pTHX_ SV *const bigstr, const STRLEN offset, const STRLEN len, const char *const little, const STRLEN littlelen, const U32 flags)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_4);
-#define PERL_ARGS_ASSERT_SV_INSERT	\
+#define PERL_ARGS_ASSERT_SV_INSERT_FLAGS	\
 	assert(bigstr); assert(little)
 
 PERL_CALLCONV int	Perl_sv_isa(pTHX_ SV* sv, const char *const name)
@@ -3744,25 +3750,25 @@ PERL_CALLCONV PTR_TBL_t*	Perl_ptr_table_new(pTHX)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV void*	Perl_ptr_table_fetch(pTHX_ PTR_TBL_t *tbl, const void *sv)
+PERL_CALLCONV void*	Perl_ptr_table_fetch(pTHX_ PTR_TBL_t *const tbl, const void *const sv)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_PTR_TABLE_FETCH	\
 	assert(tbl)
 
-PERL_CALLCONV void	Perl_ptr_table_store(pTHX_ PTR_TBL_t *tbl, const void *oldsv, void *newsv)
+PERL_CALLCONV void	Perl_ptr_table_store(pTHX_ PTR_TBL_t *const tbl, const void *const oldsv, void *const newsv)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_3);
 #define PERL_ARGS_ASSERT_PTR_TABLE_STORE	\
 	assert(tbl); assert(newsv)
 
-PERL_CALLCONV void	Perl_ptr_table_split(pTHX_ PTR_TBL_t *tbl)
+PERL_CALLCONV void	Perl_ptr_table_split(pTHX_ PTR_TBL_t *const tbl)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_PTR_TABLE_SPLIT	\
 	assert(tbl)
 
-PERL_CALLCONV void	Perl_ptr_table_clear(pTHX_ PTR_TBL_t *tbl);
-PERL_CALLCONV void	Perl_ptr_table_free(pTHX_ PTR_TBL_t *tbl);
+PERL_CALLCONV void	Perl_ptr_table_clear(pTHX_ PTR_TBL_t *const tbl);
+PERL_CALLCONV void	Perl_ptr_table_free(pTHX_ PTR_TBL_t *const tbl);
 #if defined(HAVE_INTERP_INTERN)
 PERL_CALLCONV void	Perl_sys_intern_clear(pTHX);
 PERL_CALLCONV void	Perl_sys_intern_init(pTHX);
@@ -4947,7 +4953,7 @@ STATIC void	S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
 #define PERL_ARGS_ASSERT_GLOB_ASSIGN_REF	\
 	assert(dstr); assert(sstr)
 
-STATIC PTR_TBL_ENT_t *	S_ptr_table_find(PTR_TBL_t *tbl, const void *sv)
+STATIC PTR_TBL_ENT_t *	S_ptr_table_find(PTR_TBL_t *const tbl, const void *const sv)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(1);
 #define PERL_ARGS_ASSERT_PTR_TABLE_FIND	\
