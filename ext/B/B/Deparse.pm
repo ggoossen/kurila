@@ -2994,8 +2994,8 @@ sub pp_entersub($self, $op, $cx)
     elsif ($kid->name eq "var")
         $kid = $kid->sv->LOCATION[3]
         $kid =~ s/^\Q$self->{?'curstash'}\E::(\w+)$/$1/
-    elsif ($kid->first->name eq "gv")
-        my $gv = $self->gv_or_padgv($kid->first)
+    elsif ($kid->name eq "gv")
+        my $gv = $self->gv_or_padgv($kid)
         if (class($gv->CV) ne "SPECIAL")
             $proto = $gv->CV->PV if $gv->CV->FLAGS ^&^ SVf_POK
 
@@ -3025,8 +3025,6 @@ sub pp_entersub($self, $op, $cx)
           defined Symbol::stash($self->{?'curstash'})->{?$kid}
           && !exists(
             ($self->{?'subs_deparsed'}||\$%)->{$self->{?'curstash'}."::".$kid})
-            && defined prototype(
-            \Symbol::fetch_glob($self->{?'curstash'}."::".$kid)->*->&)
             )
         if (!$declared && defined($proto))
             # Avoid "too early to check prototype" warning

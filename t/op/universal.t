@@ -7,8 +7,7 @@ BEGIN
     $^OUTPUT_AUTOFLUSH = 1
     require "./test.pl"
 
-
-plan tests => 88
+plan tests => 89
 
 $a = \$%
 bless $a, "Bob"
@@ -197,3 +196,8 @@ package main
 main::dies_like( sub (@< @_) { UNIVERSAL::DOES(\$@, "foo") },
                  qr/Can't call method "DOES" on unblessed reference/,
                  'DOES call error message says DOES, not isa' )
+# Tests for can seem to be split between here and method.t
+# Add the verbatim perl code mentioned in the comments of
+# http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2001-05/msg01710.html
+# but never actually tested.
+is(UNIVERSAL->can("NoSuchPackage::foo"), undef);

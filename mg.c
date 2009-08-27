@@ -358,6 +358,7 @@ Perl_mg_free(pTHX_ SV *sv)
 	SvMAGIC_set(sv, moremagic);
     }
     SvMAGIC_set(sv, NULL);
+    SvMAGICAL_off(sv);
     return 0;
 }
 
@@ -906,35 +907,6 @@ Perl_magic_getuvar(pTHX_ SV *sv, MAGIC *mg)
     return 0;
 }
 
-/*
- * The signal handling nomenclature has gotten a bit confusing since the advent of
- * safe signals.  S_raise_signal only raises signals by analogy with what the 
- * underlying system's signal mechanism does.  It might be more proper to say that
- * it defers signals that have already been raised and caught.  
- *
- * PL_sig_pending and PL_psig_pend likewise do not track signals that are pending 
- * in the sense of being on the system's signal queue in between raising and delivery.  
- * They are only pending on Perl's deferral list, i.e., they track deferred signals 
- * awaiting delivery after the current Perl opcode completes and say nothing about
- * signals raised but not yet caught in the underlying signal implementation.
- */
-
-#ifndef SIG_PENDING_DIE_COUNT
-#  define SIG_PENDING_DIE_COUNT 120
-#endif
-
-static void
-S_raise_signal(pTHX_ int sig)
-{
-    dVAR;
-    /* Set a flag to say this signal is pending */
-    PL_psig_pend[sig]++;
-    /* And one to say _a_ signal is pending */
-    if (++PL_sig_pending >= SIG_PENDING_DIE_COUNT)
-        Perl_croak(aTHX_ "Maximal count of pending signals (%lu) exceeded",
-                (unsigned long)SIG_PENDING_DIE_COUNT);
-}
-
 Signal_t
 #if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
 Perl_csighandler(int sig, siginfo_t *sip PERL_UNUSED_DECL, void *uap PERL_UNUSED_DECL)
@@ -946,8 +918,6 @@ Perl_csighandler(int sig)
     dTHXa(PERL_GET_SIG_CONTEXT);
 #else
     dTHX;
-#endif
-#if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
 #endif
 #ifdef FAKE_PERSISTENT_SIGNAL_HANDLERS
     (void) rsignal(sig, PL_csighandlerp);
@@ -961,9 +931,7 @@ Perl_csighandler(int sig)
             exit(1);
 #endif
 #endif
-#if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
-#endif
-   if (
+    if (
 #ifdef SIGILL
            sig == SIGILL ||
 #endif
@@ -981,8 +949,19 @@ Perl_csighandler(int sig)
 #else
         (*PL_sighandlerp)(sig);
 #endif
-   else
-        S_raise_signal(aTHX_ sig);
+    else {
+	/* Set a flag to say this signal is pending, that is awaiting delivery after
+	 * the current Perl opcode completes */
+	PL_psig_pend[sig]++;
+
+#ifndef SIG_PENDING_DIE_COUNT
+#  define SIG_PENDING_DIE_COUNT 120
+#endif
+	/* And one to say _a_ signal is pending */
+	if (++PL_sig_pending >= SIG_PENDING_DIE_COUNT)
+	    Perl_croak(aTHX_ "Maximal count of pending signals (%lu) exceeded",
+		       (unsigned long)SIG_PENDING_DIE_COUNT);
+    }
 }
 
 #if defined(FAKE_PERSISTENT_SIGNAL_HANDLERS) || defined(FAKE_DEFAULT_SIGNAL_HANDLERS)

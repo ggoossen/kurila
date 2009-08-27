@@ -198,6 +198,7 @@ INLINE1(AV*, GvAVn, GV *gv) {
 #define GV_NOEXPAND	0x40	/* Don't expand SvOK() entries to PVGV */
 #define GV_NOTQUAL	0x80	/* A plain symbol name, not qualified with a
 				   package (so skip checks for :: and ')  */
+#define GV_CROAK	0x200	/* gv_fetchmethod_flags() should croak  */
 
 #define GV_NOADD_MASK	(GV_NOADD_NOINIT|GV_NOEXPAND|GV_NOTQUAL)
 /* The bit flags that don't cause gv_fetchpv() to add a symbol if not found */

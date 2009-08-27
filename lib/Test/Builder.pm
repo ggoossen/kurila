@@ -796,14 +796,13 @@ sub maybe_regex($self, $regex)
     # Check for qr/foo/
     if (re::is_regexp($regex))
         $usable_regex = $regex
+    # Check for '/foo/' or 'm,foo,'
     elsif( (@: ?$re, ?$opts)        = (@: $regex =~ m{^ /(.*)/ (\w*) $ }sx)           or
         (@: ?_, ?$re, ?$opts) = @: $regex =~ m,^ m([^\w\s]) (.+) \1 (\w*) $,sx
         )
         $usable_regex = length $opts ?? "(?$opts)$re" !! $re
-    
 
     return $usable_regex
-
 
 
 sub _is_qr
@@ -1251,7 +1250,6 @@ sub _dup_stdhandles
     $self->output        ($Testout)
     $self->failure_output($Testerr)
     $self->todo_output   ($Testout)
-
 
 
 my $Opened_Testhandles = 0

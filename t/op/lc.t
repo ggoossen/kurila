@@ -89,7 +89,6 @@ do
     is(uc($b)         , "$($x101)$($x100)AA",  'uc')
     is(lc($b)         , "$($x101)$($x100)aa",  'lc')
 
-
 # \x{DF} is LATIN SMALL LETTER SHARP S, its uppercase is SS or \x{53}\x{53};
 # \x{149} is LATIN SMALL LETTER N PRECEDED BY APOSTROPHE, its uppercase is
 # \x{2BC}\x{E4} or MODIFIER LETTER APOSTROPHE and N.

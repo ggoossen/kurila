@@ -455,7 +455,7 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
         GvCVGEN(topgv) = topgen_cmp;
     }
 
-    return NULL;
+    return 0;
 }
 
 /*
@@ -504,25 +504,25 @@ S_gv_get_super_pkg(pTHX_ const char* name, I32 namelen)
     return stash;
 }
 
-/* FIXME. If changing this function note the comment in pp_hot's
-   S_method_common:
-
-   This code tries to figure out just what went wrong with
-   gv_fetchmethod.  It therefore needs to duplicate a lot of
-   the internals of that function. ...
-
-   I'd guess that with one more flag bit that could all be moved inside
-   here.
-*/
-
 CV *
 Perl_gv_fetchmethod(pTHX_ HV *stash, const char *name)
+{
+    return gv_fetchmethod_flags(stash, name, 0);
+}
+
+/* Don't merge this yet, as it's likely to get a len parameter, and possibly
+   even a U32 hash */
+CV *
+Perl_gv_fetchmethod_flags(pTHX_ HV *stash, const char *name, U32 flags)
 {
     dVAR;
     register const char *nend;
     const char *nsplit = NULL;
     CV* cv;
     HV* ostash = stash;
+    const char * const origname = name;
+    SV *const error_report = stash;
+    const U32 do_croak = flags & GV_CROAK;
 
     PERL_ARGS_ASSERT_GV_FETCHMETHOD;
 
@@ -564,6 +564,32 @@ Perl_gv_fetchmethod(pTHX_ HV *stash, const char *name)
     if (!cv) {
 	if (strEQ(name,"import") || strEQ(name,"unimport"))
 	    cv = (CV*)&PL_sv_yes;
+
+	if (!cv && do_croak) {
+	    /* Right now this is exclusively for the benefit of S_method_common
+	       in pp_hot.c  */
+	    if (stash) {
+		Perl_croak(aTHX_
+			   "Can't locate object method \"%s\" via package \"%.*s\"",
+			   name, (int)HvNAMELEN_get(stash), HvNAME_get(stash));
+	    }
+	    else {
+		STRLEN packlen;
+		const char *packname;
+
+		if (nsplit) {
+		    packlen = nsplit - origname;
+		    packname = origname;
+		} else {
+		    packname = SvPV_const(error_report, packlen);
+		}
+
+		Perl_croak(aTHX_
+			   "Can't locate object method \"%s\" via package \"%.*s\""
+			   " (perhaps you forgot to load \"%.*s\"?)",
+			   name, (int)packlen, packname, (int)packlen, packname);
+	    }
+	}
     }
 
     return cv;

@@ -342,6 +342,13 @@ ok
 print $^STDOUT, "ok" if 'X' =~ m/\X/;
 EXPECT
 ok
+######## segfault in 5.6.1 within peep()
+my (@a, @b, @c, @d)
+@a = 1..9
+@b = sort { nelems( @c = sort { @d = sort { 0 }, @a; nelems(@d); }, @a ); }, @a;
+print $^STDOUT, join '', @a, "\n";
+EXPECT
+123456789
 ######## example from Camel 5, ch. 15, pp.406 (with my)
 # SKIP: ord "A" == 193 # EBCDIC
 use utf8;

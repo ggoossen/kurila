@@ -3,7 +3,7 @@
 use warnings
 
 use feature ":5.10"
-use Test::More tests => 48
+use Test::More tests => 50
 
 use B::Deparse
 my $deparse = B::Deparse->new()
@@ -250,7 +250,7 @@ my $f = sub {
     \%(: \@(: ));
 } ;
 ####
-# 38 (bug #43010)
+# TODO (bug #43010)
 '!@$%'->();
 ####
 #
@@ -300,5 +300,17 @@ if ($x) {
     $y * $y;
 }
 ####
+# ||
 my($x, $y, $z);
 $x = $y || $y;
+####
+# TODO calling non-existing sub
+x()
+####
+# TODO 53 conditions in elsifs (regression in change #33710 which fixed bug #37302)
+my ($x, $y);
+if ($x) { testsub(); }
+elsif ($y) { testsub(); }
+elsif ($x and $y) { testsub(); }
+elsif ($x or $y) { testsub(); }
+else { testsub(); }

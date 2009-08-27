@@ -318,6 +318,8 @@ Ap	|GV*	|gv_fetchfile_flags|NN const char *const name|const STRLEN len\
 				|const U32 flags
 Apd	|CV*	|gv_fetchmeth	|NULLOK HV* stash|NN const char* name|STRLEN len|I32 level
 Apd	|CV*	|gv_fetchmethod	|NULLOK HV* stash|NN const char* name
+ApdM	|CV*	|gv_fetchmethod_flags|NN HV* stash|NN const char* name \
+				|U32 flags
 Ap	|GV*	|gv_fetchpv	|NN const char* nambeg|I32 add|const svtype sv_type
 Ap	|void	|gv_fullname3	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix
 pMox	|GP *	|newGP		|NN GV *const gv
@@ -485,7 +487,7 @@ Ap	|void	|mini_mktime	|NN struct tm *ptm
 EXp	|OP*	|mod		|NULLOK OP* o|I32 type
 p	|OP*	|assign		|NN OP* o|bool partial|NN I32 *min_modcount|NN I32 *max_modcount
 p	|OP*	|op_assign		|NN OP** po|I32 optype
-p	|int	|mode_from_discipline|NULLOK SV* discp
+p	|int	|mode_from_discipline|NULLOK const char* s|STRLEN len
 Ap	|const char*	|moreswitches	|NN const char* s
 p	|OP*	|my		|NN OP* o
 Ap	|NV	|my_atof	|NN const char *s

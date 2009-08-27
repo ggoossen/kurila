@@ -68,7 +68,7 @@ for (sort keys %find)
 
 
 for (sort keys %mani)
-    push @miss, $_ unless %find{$_}
+    push @miss, $_ unless %find{?$_}
 
 
 my $separator = $l ?? "\n" !! " "

@@ -263,8 +263,10 @@ ok( POSIX::isalnum(undef),'isalnum undef' )
 dies_like( sub (@< @_) { POSIX::isalpha(\$@) }, qr/reference as string/,   'isalpha []' )
 dies_like( sub (@< @_) { POSIX::isprint(\$@) }, qr/reference as string/,   'isalpha []' )
 
-try {  POSIX->import("S_ISBLK"); my $x = S_ISBLK }
-unlike( $^EVAL_ERROR, qr/Can't use string .* as a symbol ref/, "Can import autoloaded constants" )
+do
+    POSIX->import("S_ISBLK")
+    my $x = &S_ISBLK
+    ok(1, "Can import autoloaded constants" )
 
 # Check that output is not flushed by _exit. This test should be last
 # in the file, and is not counted in the total number of tests.

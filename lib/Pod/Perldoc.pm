@@ -1396,8 +1396,8 @@ sub maybe_diddle_INC
     my $self = shift
 
     # Does this look like a module or extension directory?
-
-    if (-f "Makefile.PL")
+  
+    if (-f "Makefile.PL" || -f "Build.PL")
 
         # Add "." and "lib" to $^INCLUDE_PATH (if they exist)
         eval q{ use lib qw(. lib); 1; } or die
@@ -1406,8 +1406,6 @@ sub maybe_diddle_INC
         if ($^UID && $^EUID && -f "blib")   # don't be looking too hard now!
             eval q{ use blib; 1 }
             warn $^EVAL_ERROR if $^EVAL_ERROR && $self->opt_v
-        
-    
 
     return
 

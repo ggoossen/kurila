@@ -3244,8 +3244,5 @@ EOFTEST
         use utf8;
         my $s="[a]a\{2\}"
         ok("aaa" =~ m/$s/, "#45337")
-    
 
- # end of sub pat_tests
-
-"Truth"
+# end of sub pat_tests

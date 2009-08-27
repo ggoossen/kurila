@@ -2,10 +2,7 @@
 
 BEGIN 
     if( env::var('PERL_CORE') )
-        chdir 't' if -d 't'
-        $^INCLUDE_PATH = qw(../lib ../t/lib)
-    
-
+        push $^INCLUDE_PATH, "../lib/base/t/lib"
 
 
 use Test::More tests => 1

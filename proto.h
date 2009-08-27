@@ -953,6 +953,12 @@ PERL_CALLCONV CV*	Perl_gv_fetchmethod(pTHX_ HV* stash, const char* name)
 #define PERL_ARGS_ASSERT_GV_FETCHMETHOD	\
 	assert(name)
 
+PERL_CALLCONV CV*	Perl_gv_fetchmethod_flags(pTHX_ HV* stash, const char* name, U32 flags)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_GV_FETCHMETHOD_FLAGS	\
+	assert(stash); assert(name)
+
 PERL_CALLCONV GV*	Perl_gv_fetchpv(pTHX_ const char* nambeg, I32 add, const svtype sv_type)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_GV_FETCHPV	\
@@ -1685,7 +1691,7 @@ PERL_CALLCONV OP*	Perl_op_assign(pTHX_ OP** po, I32 optype)
 #define PERL_ARGS_ASSERT_OP_ASSIGN	\
 	assert(po)
 
-PERL_CALLCONV int	Perl_mode_from_discipline(pTHX_ SV* discp);
+PERL_CALLCONV int	Perl_mode_from_discipline(pTHX_ const char* s, STRLEN len);
 PERL_CALLCONV const char*	Perl_moreswitches(pTHX_ const char* s)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_MORESWITCHES	\

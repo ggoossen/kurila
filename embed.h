@@ -331,6 +331,7 @@
 #define gv_fetchfile_flags	Perl_gv_fetchfile_flags
 #define gv_fetchmeth		Perl_gv_fetchmeth
 #define gv_fetchmethod		Perl_gv_fetchmethod
+#define gv_fetchmethod_flags	Perl_gv_fetchmethod_flags
 #define gv_fetchpv		Perl_gv_fetchpv
 #define gv_fullname3		Perl_gv_fullname3
 #define gv_init			Perl_gv_init
@@ -2516,6 +2517,7 @@
 #define gv_fetchfile_flags(a,b,c)	Perl_gv_fetchfile_flags(aTHX_ a,b,c)
 #define gv_fetchmeth(a,b,c,d)	Perl_gv_fetchmeth(aTHX_ a,b,c,d)
 #define gv_fetchmethod(a,b)	Perl_gv_fetchmethod(aTHX_ a,b)
+#define gv_fetchmethod_flags(a,b,c)	Perl_gv_fetchmethod_flags(aTHX_ a,b,c)
 #define gv_fetchpv(a,b,c)	Perl_gv_fetchpv(aTHX_ a,b,c)
 #define gv_fullname3(a,b,c)	Perl_gv_fullname3(aTHX_ a,b,c)
 #ifdef PERL_CORE
@@ -2693,7 +2695,7 @@
 #ifdef PERL_CORE
 #define assign(a,b,c,d)		Perl_assign(aTHX_ a,b,c,d)
 #define op_assign(a,b)		Perl_op_assign(aTHX_ a,b)
-#define mode_from_discipline(a)	Perl_mode_from_discipline(aTHX_ a)
+#define mode_from_discipline(a,b)	Perl_mode_from_discipline(aTHX_ a,b)
 #endif
 #define moreswitches(a)		Perl_moreswitches(aTHX_ a)
 #ifdef PERL_CORE

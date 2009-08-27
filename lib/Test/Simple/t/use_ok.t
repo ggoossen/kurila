@@ -2,11 +2,7 @@
 
 BEGIN 
     if( env::var('PERL_CORE') )
-        chdir 't'
-        $^INCLUDE_PATH = @: '../lib', 'lib'
-    else
-        unshift $^INCLUDE_PATH, 't/lib'
-    
+        unshift $^INCLUDE_PATH, "../lib/Test/Simple/t/lib"
 
 
 use Test::More tests => 13

@@ -62,6 +62,11 @@ sub copy
     my $from = shift
     my $to = shift
 
+    my $size
+    if (@_)
+        $size = shift(@_) + 0
+        croak("Bad buffer size for copy: $size\n") unless $size +> 0
+
     my $from_a_handle = (ref($from)
                          ?? (ref($from) eq 'GLOB'
                              || UNIVERSAL::isa($from, 'GLOB')
@@ -123,15 +128,12 @@ sub copy
 
                 # Get rid of the old versions to be like UNIX
                 1 while unlink $copy_to
-            
-        
 
         return syscopy($from, $copy_to)
-    
 
     my $closefrom = 0
     my $closeto = 0
-    my ($size, $status, $r, $buf)
+    my ($status, $r, $buf)
 
     my $from_h
     my $to_h
@@ -278,12 +280,6 @@ sub move
 *mv = \&move
 
 
-if ($^OS_NAME eq 'MacOS')
-    *_protect = sub (@< @_) { MacPerl::MakeFSSpec(@_[0]) }
-else
-    *_protect = sub (@< @_) { "./@_[0]" }
-
-
 # &syscopy is an XSUB under OS/2
 unless (exists &syscopy)
     if ($^OS_NAME eq 'VMS')
@@ -380,6 +376,9 @@ upon the file, but will generally be the whole file (up to 2MB), or
 
 You may use the syntax C<use File::Copy "cp"> to get at the
 "cp" alias for this function. The syntax is I<exactly> the same.
+
+As of version 2.13, on UNIX systems, "copy" will preserve permission
+bits like the shell utility C<cp> would do.
 
 =item move
 X<move> X<mv> X<rename>

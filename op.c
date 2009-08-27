@@ -443,8 +443,6 @@ Perl_op_free(pTHX_ OP *o)
 	    op_free(kid);
 	}
     }
-    if (type == OP_NULL)
-	type = (OPCODE)o->op_targ;
 
 #ifdef PERL_DEBUG_READONLY_OPS
     Slab_to_rw(o);
@@ -452,9 +450,15 @@ Perl_op_free(pTHX_ OP *o)
 
     /* COP* is not cleared by op_clear() so that we may track line
      * numbers etc even after null() */
-    if (type == OP_NEXTSTATE || type == OP_DBSTATE) {
+    if (type == OP_NEXTSTATE || type == OP_DBSTATE
+	    || (type == OP_NULL /* the COP might have been null'ed */
+		&& ((OPCODE)o->op_targ == OP_NEXTSTATE
+		    || (OPCODE)o->op_targ == OP_DBSTATE))) {
 	cop_free((COP*)o);
     }
+
+    if (type == OP_NULL)
+	type = (OPCODE)o->op_targ;
 
     op_clear(o);
     FreeOp(o);
@@ -2722,6 +2726,8 @@ Perl_newSTATEOP(pTHX_ OPFLAGS flags, char *label, OP *o, SV *location)
 
     CopSTASH_set(cop, PL_curstash);
 
+    if (flags & OPf_SPECIAL)
+	op_null((OP*)cop);
     return prepend_elem(OP_LINESEQ, (OP*)cop, o);
 }
 
@@ -4958,7 +4964,9 @@ Perl_ck_open(pTHX_ OP *o)
     if (table) {
 	SV **svp = hv_fetchs(table, "open_IN", FALSE);
 	if (svp && *svp) {
-	    const I32 mode = mode_from_discipline(*svp);
+	    STRLEN len = 0;
+	    const char *d = SvPV_const(*svp, len);
+	    const I32 mode = mode_from_discipline(d, len);
 	    if (mode & O_BINARY)
 		o->op_private |= OPpOPEN_IN_RAW;
 	    else if (mode & O_TEXT)
@@ -4967,7 +4975,9 @@ Perl_ck_open(pTHX_ OP *o)
 
 	svp = hv_fetchs(table, "open_OUT", FALSE);
 	if (svp && *svp) {
-	    const I32 mode = mode_from_discipline(*svp);
+	    STRLEN len = 0;
+	    const char *d = SvPV_const(*svp, len);
+	    const I32 mode = mode_from_discipline(d, len);
 	    if (mode & O_BINARY)
 		o->op_private |= OPpOPEN_OUT_RAW;
 	    else if (mode & O_TEXT)

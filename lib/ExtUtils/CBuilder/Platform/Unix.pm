@@ -31,6 +31,3 @@ sub link
     
 
     return $self->SUPER::link(< @_)
-
-
-1

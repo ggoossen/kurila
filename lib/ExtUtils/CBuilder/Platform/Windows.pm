@@ -609,9 +609,6 @@ sub write_linker_script($self, %< %spec)
 
     return %spec
 
-
-1
-
 __END__
 
 =head1 NAME
