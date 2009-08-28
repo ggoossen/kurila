@@ -4687,7 +4687,7 @@ STATIC void	S_make_trie_failtable(pTHX_ struct RExC_state_t *pRExC_state, regnod
 #define PERL_ARGS_ASSERT_MAKE_TRIE_FAILTABLE	\
 	assert(pRExC_state); assert(source); assert(stclass)
 
-#  ifdef DEBUGGING
+#  ifdef RE_DEBUGGING
 STATIC void	S_regdump_extflags(pTHX_ const char *lead, const U32 flags);
 STATIC const regnode*	S_dumpuntil(pTHX_ const regexp *r, const regnode *start, const regnode *node, const regnode *last, const regnode *plast, SV* sv, I32 indent, U32 depth)
 			__attribute__nonnull__(pTHX_1)
@@ -4815,7 +4815,7 @@ STATIC I32	S_reg_check_named_buff_matched(pTHX_ const regexp *rex, const regnode
 #define PERL_ARGS_ASSERT_REG_CHECK_NAMED_BUFF_MATCHED	\
 	assert(rex); assert(scan)
 
-#  ifdef DEBUGGING
+#  ifdef RE_DEBUGGING
 STATIC void	S_dump_exec_pos(pTHX_ const char *locinput, const regnode *scan, const char *loc_regeol, const char *loc_bostr, const char *loc_reg_starttry, const bool do_utf8)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)

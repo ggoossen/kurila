@@ -392,7 +392,7 @@ Perl_re_intuit_start(pTHX_ REGEXP * const rx, SV *sv, char *strpos,
     char *check_at = NULL;		/* check substr found at this pos */
     const I32 multiline = prog->extflags & RXf_PMf_MULTILINE;
     RXi_GET_DECL(prog,progi);
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     const char * const i_strpos = strpos;
 #endif
     GET_RE_DEBUG_FLAGS_DECL;
@@ -490,7 +490,7 @@ Perl_re_intuit_start(pTHX_ REGEXP * const rx, SV *sv, char *strpos,
 	/* end shift should be non negative here */
     }
 
-#ifdef DEBUGGING	/* 7/99: reports of failure (with the older version) */
+#ifdef RE_DEBUGGING	/* 7/99: reports of failure (with the older version) */
     if (end_shift < 0)
 	Perl_croak(aTHX_ "panic: negative end_shift: %"IVdf"\n",
 		   (IV)end_shift);
@@ -882,7 +882,7 @@ Perl_re_intuit_start(pTHX_ REGEXP * const rx, SV *sv, char *strpos,
 	t = s;
         s = find_byclass(prog, progi->regstclass, s, endpos, NULL);
 	if (!s) {
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 	    const char *what = NULL;
 #endif
 	    if (endpos == strend) {
@@ -1199,7 +1199,7 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 		    = (reg_trie_data*)progi->data->data[ aho->trie ];
 
 		const char *last_start = strend - trie->minlen;
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 		const char *real_start = s;
 #endif
 		STRLEN maxlen = trie->maxlen;
@@ -1257,7 +1257,7 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
                     U8 uvc = 0;
                     STRLEN len = 0;
                     char *leftmost = NULL;
-#ifdef DEBUGGING                    
+#ifdef RE_DEBUGGING                    
                     U32 accepted_word= 0;
 #endif
                     U32 pointpos = 0;
@@ -1308,7 +1308,7 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
                         });
 
                         do {
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
                             word = aho->states[ state ].wordnum;
 #endif
                             base = aho->states[ state ].trans.base;
@@ -1606,7 +1606,7 @@ Perl_regexec_flags(pTHX_ REGEXP * const rx, char *stringarg, register char *stre
 	/* we have /x+whatever/ */
 	/* it must be a one character string (XXXX Except UTF?) */
 	char ch;
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 	int did_match = 0;
 #endif
 	ch = SvPVX_const(prog->anchored_substr)[0];
@@ -1646,7 +1646,7 @@ Perl_regexec_flags(pTHX_ REGEXP * const rx, char *stringarg, register char *stre
 	I32 back_min;
 	char *last;
 	char *last1;		/* Last position checked before */
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 	int did_match = 0;
 #endif
 	if (prog->anchored_substr) {
@@ -2214,7 +2214,7 @@ regmatch(), slabs allocated since entry are freed.
 
 #define REG_NODE_NUM(x) ((x) ? (int)((x)-prog) : -1)
 
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 
 STATIC void
 S_debug_start_match(pTHX_ REGEXP *prog, const bool do_utf8, 
@@ -2425,7 +2425,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 			        false: plain (?=foo)
 				true:  used as a condition: (?(?=foo))
 			    */
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     GET_RE_DEBUG_FLAGS_DECL;
 #endif
 
@@ -4560,7 +4560,7 @@ yes:
 	/* we have successfully completed a subexpression, but we must now
 	 * pop to the state marked by yes_state and continue from there */
 	assert(st != yes_state);
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 	while (st != yes_state) {
 	    st--;
 	    if (st < SLAB_FIRST(PL_regmatch_slab)) {
@@ -4682,7 +4682,7 @@ S_regrepeat(pTHX_ const regexp *prog, const regnode *p, I32 max, int depth)
     register char *loceol = PL_regeol;
     register I32 hardcount = 0;
     register const bool do_utf8 = (prog->extflags & RXf_PMf_UTF8) != 0;
-#ifndef DEBUGGING
+#ifndef RE_DEBUGGING
     PERL_UNUSED_ARG(depth);
 #endif
 

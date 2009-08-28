@@ -1338,7 +1338,7 @@ Es	|I32	|make_trie	|NN struct RExC_state_t *pRExC_state \
 Es	|void	|make_trie_failtable	|NN struct RExC_state_t *pRExC_state \
                                 |NN regnode *source|NN regnode *stclass \
 				|U32 depth
-#  ifdef DEBUGGING
+#  ifdef RE_DEBUGGING
 Es	|void	|regdump_extflags|NULLOK const char *lead| const U32 flags
 Es	|const regnode*|dumpuntil|NN const regexp *r|NN const regnode *start \
 				|NN const regnode *node \
@@ -1375,7 +1375,7 @@ ERs	|char*	|find_byclass	|NN regexp * prog|NN const regnode *c|NN char *s|NN con
 Es	|void	|swap_match_buff|NN regexp * prog
 ERs	|I32	|reg_check_named_buff_matched	|NN const regexp *rex \
 						|NN const regnode *scan
-#  ifdef DEBUGGING
+#  ifdef RE_DEBUGGING
 Es	|void	|dump_exec_pos	|NN const char *locinput|NN const regnode *scan|NN const char *loc_regeol\
 				|NN const char *loc_bostr|NN const char *loc_reg_starttry|const bool do_utf8
 Es	|void	|debug_start_match|NN REGEXP *prog|const bool do_utf8|NN const char *start|NN const char *end|NN const char *blurb

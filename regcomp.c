@@ -138,7 +138,7 @@ typedef struct RExC_state_t {
     char 	*starttry;		/* -Dr: where regtry was called. */
 #define RExC_starttry	(pRExC_state->starttry)
 #endif
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     const char  *lastparse;
     I32         lastnum;
     AV          *paren_name_list;       /* idx -> name */
@@ -784,7 +784,7 @@ S_cl_or(const RExC_state_t *pRExC_state, struct regnode_charclass_class *cl, con
 #define TRIE_LIST_USED(idx)  ( trie->states[state].trans.list ? (TRIE_LIST_CUR( idx ) - 1) : 0 )
 
 
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 /*
    dump_trie(trie,revcharmap)
    dump_trie_interim_list(trie,revcharmap,next_alloc)
@@ -1230,7 +1230,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
     regnode *nextbranch = NULL;
     regnode *convert = NULL;
 
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     const U32 data_slot = add_data( pRExC_state, 4, "tuuu" );
     AV *trie_words = NULL;
     /* along with revcharmap, this only used during construction but both are
@@ -1244,7 +1244,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
     GET_RE_DEBUG_FLAGS_DECL;
 
     PERL_ARGS_ASSERT_MAKE_TRIE;
-#ifndef DEBUGGING
+#ifndef RE_DEBUGGING
     PERL_UNUSED_ARG(depth);
 #endif
 
@@ -1764,7 +1764,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
         U8 nodetype =(U8)(flags & 0xFF);
         char *str=NULL;
         
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
         regnode *optimize = NULL;
         U32 mjd_offset = 0;
         U32 mjd_nodelen = 0;
@@ -1875,7 +1875,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
                     while (len--)
                         *str++ = *ch++;
 		} else {
-#ifdef DEBUGGING	    
+#ifdef RE_DEBUGGING	    
 		    if (state>1)
 			DEBUG_OPTIMISE_r(PerlIO_printf( Perl_debug_log,"]\n"));
 #endif
@@ -1888,7 +1888,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
                 trie->startstate = state;
                 trie->minlen -= (state - 1);
                 trie->maxlen -= (state - 1);
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
                /* At least the UNICOS C compiler choked on this
                 * being argument to DEBUG_r(), so let's just have
                 * it right here. */
@@ -1980,7 +1980,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
 #endif
     } /* end node insert */
     RExC_rxi->data->data[ data_slot + 1 ] = NULL;
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     RExC_rxi->data->data[ data_slot + TRIE_WORDS_OFFSET ] = (void*)trie_words;
     RExC_rxi->data->data[ data_slot + 3 ] = (void*)revcharmap;
 #else
@@ -2030,7 +2030,7 @@ S_make_trie_failtable(pTHX_ RExC_state_t *pRExC_state, regnode *source,  regnode
     GET_RE_DEBUG_FLAGS_DECL;
 
     PERL_ARGS_ASSERT_MAKE_TRIE_FAILTABLE;
-#ifndef DEBUGGING
+#ifndef RE_DEBUGGING
     PERL_UNUSED_ARG(depth);
 #endif
 
@@ -2145,7 +2145,7 @@ S_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan, I32 *min, U32 flags
     regnode *next = scan + NODE_SZ_STR(scan);
     U32 merged = 0;
     U32 stopnow = 0;
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     regnode *stop = scan;
     GET_RE_DEBUG_FLAGS_DECL;
 #else
@@ -2172,7 +2172,7 @@ S_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan, I32 *min, U32 flags
             DEBUG_PEEP("skip:",n,depth);
             NEXT_OFF(scan) += NEXT_OFF(n);
             next = n + NODE_STEP_REGNODE;
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
             if (stringok)
                 stop = n;
 #endif
@@ -2192,7 +2192,7 @@ S_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan, I32 *min, U32 flags
             next = n + NODE_SZ_STR(n);
             /* Now we can overwrite *n : */
             Move(STRING(n), STRING(scan) + oldl, STR_LEN(n), char);
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
             stop = next - 1;
 #endif
             n = nnext;
@@ -2213,7 +2213,7 @@ S_join_exact(pTHX_ RExC_state_t *pRExC_state, regnode *scan, I32 *min, U32 flags
 #endif
     }
     
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     /* Allow dumping */
     n = scan + NODE_SZ_STR(scan);
     while (n <= stop) {
@@ -2286,7 +2286,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 
     PERL_ARGS_ASSERT_STUDY_CHUNK;
 
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     StructCopy(&zero_scan_data, &data_fake, scan_data_t);
 #endif
 
@@ -2495,7 +2495,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
                         U8 optype = 0;
                         U32 count=0;
 
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
                         SV * const mysv = sv_newmortal();       /* for dumping */
 #endif
                         /* var tail is used because there may be a TAIL
@@ -2549,7 +2549,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
                         /* dont use tail as the end marker for this traverse */
                         for ( cur = startbranch ; cur != scan ; cur = regnext( cur ) ) {
                             regnode * const noper = NEXTOPER( cur );
-#if defined(DEBUGGING) || defined(NOJUMPTRIE)
+#if defined(RE_DEBUGGING) || defined(NOJUMPTRIE)
                             regnode * const noper_next = regnext( noper );
 #endif
 
@@ -2909,7 +2909,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		    /* Try to optimize to CURLYN.  */
 		    regnode *nxt = NEXTOPER(oscan) + EXTRA_STEP_2ARGS;
 		    regnode * const nxt1 = nxt;
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 		    regnode *nxt2;
 #endif
 
@@ -2919,7 +2919,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 			&& !(PL_regkind[OP(nxt)] == EXACT
 			     && STR_LEN(nxt) == 1))
 			goto nogo;
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 		    nxt2 = nxt;
 #endif
 		    nxt = regnext(nxt);
@@ -2934,7 +2934,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		    OP(oscan) = CURLYN;
 		    OP(nxt1) = NOTHING;	/* was OPEN. */
 
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 		    OP(nxt1 + 1) = OPTIMIZED; /* was count. */
 		    NEXT_OFF(nxt1+ 1) = 0; /* just for consistancy. */
 		    NEXT_OFF(nxt2) = 0;	/* just for consistancy with CURLY. */
@@ -2977,7 +2977,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 			OP(nxt1) = OPTIMIZED;	/* was OPEN. */
 			OP(nxt) = OPTIMIZED;	/* was CLOSE. */
 
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 			OP(nxt1 + 1) = OPTIMIZED; /* was count. */
 			OP(nxt + 1) = OPTIMIZED; /* was count. */
 			NEXT_OFF(nxt1 + 1) = 0; /* just for consistancy. */
@@ -3797,7 +3797,7 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
     RExC_close_parens = NULL;
     RExC_opend = NULL;
     RExC_paren_names = NULL;
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     RExC_paren_name_list = NULL;
 #endif
     RExC_recurse = NULL;
@@ -3842,7 +3842,7 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
 	 char, regexp_internal);
     if ( r == NULL || ri == NULL )
 	FAIL("Regexp out of space");
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     /* avoid reading uninitialized memory in DEBUGGING code in study_chunk() */
     Zero(ri, sizeof(regexp_internal) + (unsigned)RExC_size * sizeof(regnode), char);
 #else 
@@ -4385,7 +4385,7 @@ reStudy:
     }
 #endif
 
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     if (RExC_paren_names) {
         ri->name_list_idx = add_data( pRExC_state, 1, "p" );
         ri->data->data[ri->name_list_idx] = (void*)AvREFCNT_inc(RExC_paren_name_list);
@@ -4895,7 +4895,7 @@ S_reg_scan_name(pTHX_ RExC_state_t *pRExC_state, U32 flags)
  * follows makes it hard to avoid.
  */
 #define REGTAIL(x,y,z) regtail((x),(y),(z),depth+1)
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 #define REGTAIL_STUDY(x,y,z) regtail_study((x),(y),(z),depth+1)
 #else
 #define REGTAIL_STUDY(x,y,z) regtail((x),(y),(z),depth+1)
@@ -5123,7 +5123,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                         if (!RExC_paren_names) {
                             RExC_paren_names= newHV();
                             sv_2mortal((SV*)RExC_paren_names);
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
                             RExC_paren_name_list= newAV();
                             sv_2mortal((SV*)RExC_paren_name_list);
 #endif
@@ -5162,7 +5162,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                             SvIOK_on(sv_dat);
                             SvIV_set(sv_dat, 1);
                         }
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
                         if (!av_store(RExC_paren_name_list, RExC_npar, SvREFCNT_inc(svname)))
                             SvREFCNT_dec(svname);
 #endif
@@ -7330,7 +7330,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
     GET_RE_DEBUG_FLAGS_DECL;
 
     PERL_ARGS_ASSERT_REGCLASS;
-#ifndef DEBUGGING
+#ifndef RE_DEBUGGING
     PERL_UNUSED_ARG(depth);
 #endif
 
@@ -8211,7 +8211,7 @@ S_regtail(pTHX_ RExC_state_t *pRExC_state, regnode *p, const regnode *val,U32 de
     GET_RE_DEBUG_FLAGS_DECL;
 
     PERL_ARGS_ASSERT_REGTAIL;
-#ifndef DEBUGGING
+#ifndef RE_DEBUGGING
     PERL_UNUSED_ARG(depth);
 #endif
 
@@ -8245,7 +8245,7 @@ S_regtail(pTHX_ RExC_state_t *pRExC_state, regnode *p, const regnode *val,U32 de
     }
 }
 
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 /*
 - regtail_study - set the next-pointer at the end of a node chain of p to val.
 - Look for optimizable sequences at the same time.
@@ -8363,7 +8363,7 @@ S_regcurly(register const char *s)
 /*
  - regdump - dump a regexp onto Perl_debug_log in vaguely comprehensible form
  */
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 void 
 S_regdump_extflags(pTHX_ const char *lead, const U32 flags)
 {
@@ -8389,7 +8389,7 @@ S_regdump_extflags(pTHX_ const char *lead, const U32 flags)
 void
 Perl_regdump(pTHX_ const regexp *r)
 {
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     dVAR;
     SV * const sv = sv_newmortal();
     SV *dsv= sv_newmortal();
@@ -8460,7 +8460,7 @@ Perl_regdump(pTHX_ const regexp *r)
     PERL_ARGS_ASSERT_REGDUMP;
     PERL_UNUSED_CONTEXT;
     PERL_UNUSED_ARG(r);
-#endif	/* DEBUGGING */
+#endif	/* RE_DEBUGGING */
 }
 
 /*
@@ -8469,7 +8469,7 @@ Perl_regdump(pTHX_ const regexp *r)
 void
 Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
 {
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     dVAR;
     register int k;
     RXi_GET_DECL(prog,progi);
@@ -8706,7 +8706,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
     PERL_UNUSED_ARG(sv);
     PERL_UNUSED_ARG(o);
     PERL_UNUSED_ARG(prog);
-#endif	/* DEBUGGING */
+#endif	/* RE_DEBUGGING */
 }
 
 SV *
@@ -9166,7 +9166,7 @@ clear_re(pTHX_ void *r)
     ReREFCNT_dec((REGEXP *)r);
 }
 
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 
 STATIC void
 S_put_byte(pTHX_ SV *sv, int c)
@@ -9281,7 +9281,7 @@ S_dumpuntil(pTHX_ const regexp *r, const regnode *start, const regnode *node,
                NULL;
 	    const reg_trie_data * const trie =
 	        (reg_trie_data*)ri->data->data[op<AHOCORASICK ? n : ac->trie];
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 	    AV *const trie_words = (AV *) ri->data->data[n + TRIE_WORDS_OFFSET];
 #endif
 	    const regnode *nextbranch= NULL;
@@ -9356,7 +9356,7 @@ S_dumpuntil(pTHX_ const regexp *r, const regnode *start, const regnode *node,
     return node;
 }
 
-#endif	/* DEBUGGING */
+#endif	/* RE_DEBUGGING */
 
 /*
  * Local variables:

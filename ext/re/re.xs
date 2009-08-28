@@ -1,6 +1,5 @@
-#if defined(PERL_EXT_RE_DEBUG) && !defined(DEBUGGING)
-#  define DEBUGGING
-#endif
+
+#define RE_DEBUGGING
 
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"

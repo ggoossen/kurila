@@ -1345,7 +1345,7 @@
 #define make_trie		S_make_trie
 #define make_trie_failtable	S_make_trie_failtable
 #endif
-#  ifdef DEBUGGING
+#  ifdef RE_DEBUGGING
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define regdump_extflags	S_regdump_extflags
 #define dumpuntil		S_dumpuntil
@@ -1373,7 +1373,7 @@
 #define swap_match_buff		S_swap_match_buff
 #define reg_check_named_buff_matched	S_reg_check_named_buff_matched
 #endif
-#  ifdef DEBUGGING
+#  ifdef RE_DEBUGGING
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define dump_exec_pos		S_dump_exec_pos
 #define debug_start_match	S_debug_start_match
@@ -3533,7 +3533,7 @@
 #define make_trie(a,b,c,d,e,f,g,h)	S_make_trie(aTHX_ a,b,c,d,e,f,g,h)
 #define make_trie_failtable(a,b,c,d)	S_make_trie_failtable(aTHX_ a,b,c,d)
 #endif
-#  ifdef DEBUGGING
+#  ifdef RE_DEBUGGING
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define regdump_extflags(a,b)	S_regdump_extflags(aTHX_ a,b)
 #define dumpuntil(a,b,c,d,e,f,g,h)	S_dumpuntil(aTHX_ a,b,c,d,e,f,g,h)
@@ -3561,7 +3561,7 @@
 #define swap_match_buff(a)	S_swap_match_buff(aTHX_ a)
 #define reg_check_named_buff_matched(a,b)	S_reg_check_named_buff_matched(aTHX_ a,b)
 #endif
-#  ifdef DEBUGGING
+#  ifdef RE_DEBUGGING
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define dump_exec_pos(a,b,c,d,e,f)	S_dump_exec_pos(aTHX_ a,b,c,d,e,f)
 #define debug_start_match(a,b,c,d,e)	S_debug_start_match(aTHX_ a,b,c,d,e)

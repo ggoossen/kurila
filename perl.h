@@ -3227,6 +3227,10 @@ typedef        struct crypt_data {     /* straight from /usr/include/crypt.h */
 #define FAKE_BIT_BUCKET
 #endif
 
+#if defined(DEBUGGING) || defined(PERL_EXT_RE_BUILD)
+#  define RE_DEBUGGING
+#endif
+
 /* [perl #22371] Algorimic Complexity Attack on Perl 5.6.1, 5.8.0.
  * Note that the USE_HASH_SEED and USE_HASH_SEED_EXPLICIT are *NOT*
  * defined by Configure, despite their names being similar to the
@@ -3469,7 +3473,6 @@ Gid_t getegid (void);
 				 : PerlIO_stderr())
 #endif
 
-
 #define DEBUG_p_FLAG		0x00000001 /*      1 */
 #define DEBUG_s_FLAG		0x00000002 /*      2 */
 #define DEBUG_l_FLAG		0x00000004 /*      4 */
@@ -3642,7 +3645,11 @@ Gid_t getegid (void);
 #  define DEBUG_P(a)
 #  define DEBUG_m(a)
 #  define DEBUG_f(a)
+#ifndef PERL_EXT_RE_BUILD
 #  define DEBUG_r(a)
+#else
+#  define DEBUG_r(a) STMT_START {a;} STMT_END
+#endif /* PERL_EXT_RE_BUILD */
 #  define DEBUG_x(a)
 #  define DEBUG_u(a)
 #  define DEBUG_U(a)

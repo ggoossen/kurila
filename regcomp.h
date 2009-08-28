@@ -11,7 +11,6 @@
 
 typedef OP OP_4tree;			/* Will be redefined later. */
 
-
 /* Convert branch sequences to more efficient trie ops? */
 #define PERL_ENABLE_TRIE_OPTIMISATION 1
 
@@ -567,7 +566,7 @@ struct _reg_trie_data {
     U32             statecount;      /* Build only - number of states in the states array 
                                         (including the unused zero state) */
     U32             wordcount;       /* Build only */
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     STRLEN          charcount;       /* Build only */
 #endif
 };
@@ -575,7 +574,7 @@ struct _reg_trie_data {
    structure, but are held outside as they need duplication on thread cloning,
    whereas the rest of the structure can be read only:
     HV              *widecharmap;    code points > 255 to charid
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     AV              *words;          Array of words contained in trie, for dumping
     AV              *revcharmap;     Map of each charid back to its character representation
 #endif
@@ -617,7 +616,7 @@ typedef struct _reg_ac_data reg_ac_data;
 #define SAFE_TRIE_NODENUM(state) ((state) ? (((state)-1)/(trie->uniquecharcount)+1) : (state))
 #define TRIE_NODEIDX(state) ((state) ? (((state)-1)*(trie->uniquecharcount)+1) : (state))
 
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 #define TRIE_CHARCOUNT(trie) ((trie)->charcount)
 #else
 #define TRIE_CHARCOUNT(trie) (trie_charcount)
@@ -746,7 +745,7 @@ re.pm, especially to the documentation.
         re_debug_flags=SvIV(re_debug_flags_sv); \
 })
 
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 
 #define GET_RE_DEBUG_FLAGS_DECL IV re_debug_flags = 0; GET_RE_DEBUG_FLAGS;
 

@@ -1,10 +1,8 @@
+#define RE_DEBUGGING
+
 /* need to replace pregcomp et al, so enable that */
 #ifndef PERL_IN_XSUB_RE
 #  define PERL_IN_XSUB_RE
-#endif
-/* need access to debugger hooks */
-#if defined(PERL_EXT_RE_DEBUG) && !defined(DEBUGGING)
-#  define DEBUGGING
 #endif
 
 /* We *really* need to overwrite these symbols: */
