@@ -5,23 +5,22 @@ BEGIN
     # This needs to be at BEGIN time, before any use of Config
     require './install_lib.pl'
 
-use strict
-
 use Getopt::Long
 use File::Find
 use File::Copy
 use File::Path < qw(mkpath)
 use ExtUtils::Packlist
 use Pod::Man
-use vars qw($Is_VMS $Is_W32 $Is_OS2 $Is_Cygwin $Is_Darwin $Is_NetWare
-	    %opts $packlist);
+our ($Is_VMS, $Is_W32, $Is_OS2, $Is_Cygwin, $Is_Darwin, $Is_NetWare,
+     %opts, $packlist)
 
 env::var("SHELL") = 'sh' if $^OS_NAME eq 'os2';
 
-my $patchlevel = substr($],3,2)
+$^PERL_VERSION =~ m/kurila-(\d+).(\d+)/ or die "Invalid \$^PERL_VERSION"
+my @: $release, $patchlevel = @: $1, $2
 die "Patchlevel of perl ($patchlevel)",
-    "and patchlevel of config.sh ($(config_value('PERL_VERSION'))) don't match\n"
-	if $patchlevel != config_value('PERL_VERSION')
+    "and patchlevel of config.sh ($(config_value('KURILA_SUBVERSION'))) don't match\n"
+        if $patchlevel != config_value('KURILA_SUBVERSION')
 
 my $usage =
   "Usage:  installman --man1dir=/usr/wherever --man1ext=1
@@ -40,17 +39,17 @@ my $usage =
 GetOptions( \%opts,
             < qw( man1dir=s man1ext=s man3dir=s man3ext=s batchlimit=i
                 destdir:s notify n help silent S verbose V)) 
-	|| die $usage;
-die $usage if %opts{help};
+        || die $usage;
+die $usage if %opts{?help};
 %opts{destdir} //= '';
 
 foreach my $pre (qw(man1 man3))
-    %opts{"${pre}dir"} //= %opts{destdir} . config_value("install${pre}dir")
-    %opts{"${pre}ext"} //= config_value("${pre}ext")
+    %opts{+"$($pre)dir"} //= %opts{destdir} . config_value("install$($pre)dir")
+    %opts{+"$($pre)ext"} //= config_value("$($pre)ext")
 
-%opts{silent} ||= %opts{S};
-%opts{notify} ||= %opts{n};
-%opts{verbose} ||= %opts{V} || %opts{notify};
+%opts{+silent} ||= %opts{?S};
+%opts{+notify} ||= %opts{?n};
+%opts{+verbose} ||= %opts{?V} || %opts{?notify};
 
 #Sanity checks
 
@@ -185,11 +184,11 @@ exit 0;
 
 sub rename($from,$to)
     if (-f $to and not unlink($to))
-	my($i)
-	for ($i = 1; $i < 50; $i++)
-	    last if CORE::rename($to, "$to.$i")
-	warn("Cannot rename to `$to.$i': $!"), return 0 
-	    if $i >= 50	# Give up!
+        for my $i (1..50)
+            last if CORE::rename($to, "$to.$i")
+            if ($i +>= 50) # Give up!
+                warn("Cannot rename to `$to.$i': $^OS_ERROR")
+                return 0 
 
     link($from,$to) || return 0
     unlink($from)

@@ -332,7 +332,7 @@ sub format_text($self, $options, $text)
     # Normally we do character translation, but we won't even do that in
     # <Data> blocks or if UTF-8 output is desired.
     if ($convert && !$self->{?utf8} && ASCII)
-        $text =~ s/([^\x00-\x7F])/$( %ESCAPES{ord ($1)} || "X" )/g
+        $text =~ s/([^\x00-\x7F])/$( %ESCAPES{? ord($1) } || "X" )/g
 
     # Ensure that *roff doesn't convert literal quotes to UTF-8 single quotes,
     # but don't mess up our accept escapes.
