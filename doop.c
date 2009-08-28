@@ -360,7 +360,7 @@ Perl_do_chop(pTHX_ register SV *astr, register SV *sv)
 
     s = SvPV(sv, len);
     if (len && !SvPOK(sv))
-	s = SvPV_force(sv, len);
+	s = SvPV_force_nomg(sv, len);
     if (IN_CODEPOINTS) {
 	if (s && len) {
 	    char * const send = s + len;

@@ -189,10 +189,7 @@ EOFCODE
                     print $^STDOUT, "not ok $test ($study) $input => `$got', match=$match\n$s\n$g\n$code\n"
                 
                 next TEST
-            
-        
     
     print $^STDOUT, "ok $test\n"
-
 
 1

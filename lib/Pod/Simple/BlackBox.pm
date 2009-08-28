@@ -71,8 +71,6 @@ sub parse_lines             # Usage: $parser->parse_lines(@lines)
             $self->{+'source_dead'} = 1
             $self->_ponder_paragraph_buffer
             next
-        
-
 
         if( $self->{+'line_count'}++ )
             ($line = $source_line) =~ s/[\n\r]//g
@@ -809,8 +807,6 @@ sub _ponder_paragraph_buffer($self)
             # traverse the treelet (which might well be just one string scalar)
             $self->{+'content_seen'} ||= 1
             $self->_traverse_treelet_bit(< $para->@)
-        
-    
 
     return
 
@@ -1386,8 +1382,6 @@ sub _traverse_treelet_bit($self, $name, @< @_)  # for use only by the routine ab
             _traverse_treelet_bit($self, < $x->@)
         else
             $self->_handle_text($x)
-        
-    
 
     $self->_handle_element_end($scratch=$name)
     return
@@ -1627,8 +1621,11 @@ sub _treelet_from_formatting_codes($self, $para, $start_line, ?$preserve_space)
               [A-Z](?!<)
             )
             |
+            # whitespace is ok, but we don't want to eat the whitespace before
+            # a multiple-bracket end code.
+            # NOTE: we may still have problems with e.g. S<<    >>
             (?:
-              \s(?!\s*>)
+              \s(?!\s*>{2,})
             )
           )+
         )

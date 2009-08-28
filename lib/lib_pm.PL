@@ -13,8 +13,9 @@ my $Config_archname
 my $Config_version
 my $Config_inc_version_list
 
-# Expand the variables only if explicitly requested because
-# otherwise relocating Perl becomes much harder.
+# Expand the variables only if explicitly requested
+# or if a previously installed lib.pm does this, too
+# because otherwise relocating Perl becomes much harder.
 
 if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS'))
     $useConfig = ''
@@ -237,13 +238,39 @@ paths, as it does now for Mac OS (where Unix-style or Mac-style paths
 work, and Unix-style paths are converted properly to Mac-style paths
 before being added to $^INCLUDE_PATH).
 
+If you try to add a file to @INC as follows:
+
+  use lib 'this_is_a_file.txt';
+
+C<lib> will warn about this. The sole exceptions are files with the
+C<.par> extension which are intended to be used as libraries.
+
 =head1 SEE ALSO
 
 FindBin - optional module which deals with paths relative to the source file.
 
+PAR - optional module which can treat C<.par> files as Perl libraries.
+
 =head1 AUTHOR
 
 Tim Bunce, 2nd June 1995.
+
+C<lib> is maintained by the perl5-porters. Please direct
+any questions to the canonical mailing list. Anything that
+is applicable to the CPAN release can be sent to its maintainer,
+though.
+
+Maintainer: The Perl5-Porters <perl5-porters@perl.org>
+
+Maintainer of the CPAN release: Steffen Mueller <smueller@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This package has been part of the perl core since perl 5.001.
+It has been released separately to CPAN so older installations
+can benefit from bug fixes.
+
+This package has the same copyright and license as the perl core.
 
 =cut
 !NO!SUBS!

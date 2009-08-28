@@ -3,7 +3,7 @@
 use warnings
 
 use feature ":5.10"
-use Test::More tests => 50
+use Test::More tests => 51
 
 use B::Deparse
 my $deparse = B::Deparse->new()
@@ -314,3 +314,7 @@ elsif ($y) { testsub(); }
 elsif ($x and $y) { testsub(); }
 elsif ($x or $y) { testsub(); }
 else { testsub(); }
+####
+# TODO 54 interpolation in regexps
+my($y, $t)
+m/x$($y)z$t/

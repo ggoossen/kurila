@@ -204,15 +204,15 @@ Perl_boot_core_UNIVERSAL(pTHX)
     dVAR;
     static const char file[] = __FILE__;
 
-    newXS("UNIVERSAL::isa",             XS_UNIVERSAL_isa,         file);
-    newXS("UNIVERSAL::can",             XS_UNIVERSAL_can,         file);
+    newXSproto("UNIVERSAL::isa",             XS_UNIVERSAL_isa,         file, "$$");
+    newXSproto("UNIVERSAL::can",             XS_UNIVERSAL_can,         file, "$$");
     newXS("UNIVERSAL::DOES",            XS_UNIVERSAL_DOES,        file);
     newXS("UNIVERSAL::VERSION", 	XS_UNIVERSAL_VERSION, 	  file);
     newXSproto("PerlIO::get_layers",
                XS_PerlIO_get_layers, file, "*;@");
     newXS("Regexp::DESTROY", XS_Regexp_DESTROY, file);
     newXSproto("re::is_regexp", XS_re_is_regexp, file, "$");
-    newXSproto("re::regname", XS_re_regname, file, ";$$");
+    newXSproto("re::regname", XS_re_regname, file, "$;$");
     newXSproto("re::regnames", XS_re_regnames, file, ";$");
     newXSproto("re::regnames_count", XS_re_regnames_count, file, "");
     newXSproto("re::regexp_pattern", XS_re_regexp_pattern, file, "$");
@@ -241,27 +241,22 @@ Perl_boot_core_UNIVERSAL(pTHX)
     boot_core_env();
 }
 
-
 XS(XS_UNIVERSAL_isa)
 {
     dVAR;
     dXSARGS;
-    PERL_UNUSED_ARG(cv);
+    SV * const sv = ST(0);
+    const char *name;
 
-    if (items != 2)
-	Perl_croak(aTHX_ "Usage: UNIVERSAL::isa(reference, kind)");
-    else {
-	SV * const sv = ST(0);
-	const char *name;
+    assert(items == 2);
 
-	if (!SvOK(sv) || !(SvROK(sv) || (SvPOK(sv) && SvCUR(sv))))
-	    XSRETURN_UNDEF;
+    if (!SvOK(sv) || !(SvROK(sv) || (SvPOK(sv) && SvCUR(sv))))
+	XSRETURN_UNDEF;
 
-	name = SvPV_nolen_const(ST(1));
+    name = SvPV_nolen_const(ST(1));
 
-	ST(0) = boolSV(sv_derived_from(sv, name));
-	XSRETURN(1);
-    }
+    ST(0) = boolSV(sv_derived_from(sv, name));
+    XSRETURN(1);
 }
 
 XS(XS_UNIVERSAL_can)
@@ -272,10 +267,8 @@ XS(XS_UNIVERSAL_can)
     const char *name;
     SV   *rv;
     HV   *pkg = NULL;
-    PERL_UNUSED_ARG(cv);
 
-    if (items != 2)
-	Perl_croak(aTHX_ "Usage: UNIVERSAL::can(object-ref, method)");
+    assert(items == 2);
 
     sv = ST(0);
 
@@ -416,7 +409,6 @@ XS(XS_PerlIO_get_layers)
 {
     dVAR;
     dXSARGS;
-    PERL_UNUSED_ARG(cv);
     if (items < 1 || items % 2 == 0)
 	Perl_croak(aTHX_ "Usage: PerlIO_get_layers(filehandle[,args])");
 #ifdef USE_PERLIO
@@ -548,8 +540,7 @@ XS(XS_re_is_regexp)
     dXSARGS;
     PERL_UNUSED_VAR(cv);
 
-    if (items != 1)
-       Perl_croak(aTHX_ "Usage: %s(%s)", "re::is_regexp", "sv");
+    assert(items == 1);
 
     SP -= items;
 
@@ -566,10 +557,8 @@ XS(XS_re_regnames_count)
     SV * ret;
     dVAR; 
     dXSARGS;
-    PERL_UNUSED_ARG(cv);
 
-    if (items != 0)
-       Perl_croak(aTHX_ "Usage: %s(%s)", "re::regnames_count", "");
+    assert(items == 0);
 
     SP -= items;
 
@@ -596,10 +585,8 @@ XS(XS_re_regname)
     REGEXP * rx;
     U32 flags;
     SV * ret;
-    PERL_UNUSED_ARG(cv);
 
-    if (items < 1 || items > 2)
-        Perl_croak(aTHX_ "Usage: %s(%s)", "re::regname", "name[, all ]");
+    assert(items >= 1 && items <= 2);
 
     SP -= items;
 
@@ -635,8 +622,7 @@ XS(XS_re_regnames)
     SV *ret;
     PERL_UNUSED_ARG(cv);
 
-    if (items > 1)
-        Perl_croak(aTHX_ "Usage: %s(%s)", "re::regnames", "[all]");
+    assert(items <= 1);
 
     rx = PL_curpm ? PM_GETRE(PL_curpm) : NULL;
 
@@ -671,10 +657,8 @@ XS(XS_re_regexp_pattern)
     dVAR;
     dXSARGS;
     REGEXP *re;
-    PERL_UNUSED_ARG(cv);
 
-    if (items != 1)
-       Perl_croak(aTHX_ "Usage: %s(%s)", "re::regexp_pattern", "sv");
+    assert(items == 1);
 
     SP -= items;
 

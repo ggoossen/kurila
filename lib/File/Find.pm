@@ -954,11 +954,6 @@ sub _find_dir($wanted, $p_dir, $nlink)
             else
                 push @Stack,\(@: $CdLvl,$p_dir,$dir_rel,-1)  if  $bydepth
                 last
-            
-        
-    
-
-
 
 # API:
 #  $wanted

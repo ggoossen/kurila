@@ -5,8 +5,7 @@ BEGIN
     }
 
 
-use Test::More
-BEGIN { plan tests => 61 };
+use Test::More tests => 63
 
 my $d
 #use Pod::Simple::Debug (\$d, 0);
@@ -110,7 +109,6 @@ is( $x->_out( "=pod\n\nI like pie.\n\n=begin psketti,mojojojo,crunk\n\n\nI<Stuff
 is( $x->_out( "=pod\n\nI like pie.\n\n=begin :psketti,mojojojo,crunk\n\n\nI<Stuff>\n\n=end :psketti,mojojojo,crunk\n\nYup.\n"),
     '<Document><Para>I like pie.</Para><Para>Yup.</Para></Document>'
     )
-
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -447,6 +445,19 @@ is( $x->_out( &mojprok,  join "\n\n", @:
 
 
 
+
+print $^STDOUT, "# Wrapping up... one for the road...\n"
+ok 1
+print $^STDOUT, "# --- Done with ", __FILE__, " --- \n"
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+print $^STDOUT, "# Testing matching of begin block titles\n"
+ok( $x->_out( &moj, "=pod\n\nI like pie.\n\n=begin mojojojo Title\n\nstuff\n\n=end mojojojo \n\nYup.\n"),
+  '<Document><Para>I like pie.</Para><for target="mojojojo" target_matching="mojojojo" title="Title"><Data xml:space="preserve">stuff</Data></for><Para>Yup.</Para></Document>'
+  )
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 print $^STDOUT, "# Wrapping up... one for the road...\n"
 ok 1

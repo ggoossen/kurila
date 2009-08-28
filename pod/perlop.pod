@@ -728,6 +728,39 @@ between keys and values in hashes, and other paired elements in lists.
         %hash = ( $key => $value );
         login( $username => $password );
 
+=head2 Yada Yada Operators
+X<...> X<... operator> X<!!!> X<!!! operator> X<???> X<??? operator>
+X<yada yada operator>
+
+The yada yada operators are placeholders for code.  They parse without error,
+but when executed either throw an exception or a warning.
+
+The C<...> operator takes no arguments.  When executed, it throws an exception
+with the text C<Unimplemented>:
+
+    sub foo { ... }
+    foo();
+
+    Unimplemented at <file> line <line number>.
+
+The C<!!!> operator is similar, but it takes one argument, a string to use as
+the text of the exception:
+
+    sub bar { !!! "Don't call me, Ishmael!" }
+    bar();
+
+    Don't call me, Ishmael! at <file> line <line number>.
+
+The C<???> operator also takes one argument, but it emits a warning instead of
+throwing an exception:
+
+    sub baz { ??? "Who are you?  What do you want?" }
+    baz();
+    say "Why are you here?";
+
+    Who are you?  What do you want? at <file> line <line number>.
+    Why are you here?
+
 =head2 List Operators (Rightward)
 X<operator, list, rightward> X<list operator>
 
@@ -1055,12 +1088,16 @@ the life of the script.  However, mentioning C</o> constitutes a promise
 that you won't change the variables in the pattern.  If you change them,
 Perl won't even notice.  See also L<"qr/STRING/msixpo">.
 
+=item The empty pattern //
+
 If the PATTERN evaluates to the empty string, the last
 I<successfully> matched regular expression is used instead. In this
 case, only the C<g> and C<c> flags on the empty pattern is honoured -
 the other flags are taken from the original pattern. If no match has
 previously succeeded, this will (silently) act instead as a genuine
 empty pattern (which will always match).
+
+=item Matching in list context
 
 If the C</g> option is not used, C<m//> in list context returns a
 list consisting of the subexpressions matched by the parentheses in the
@@ -1107,6 +1144,8 @@ function; see L<perlfunc/pos>.   A failed match normally resets the
 search position to the beginning of the string, but you can avoid that
 by adding the C</c> modifier (e.g. C<m//gc>).  Modifying the target
 string also resets the search position.
+
+=item \G assertion
 
 You can intermix C<m//g> matches with C<m/\G.../g>, where C<\G> is a
 zero-width assertion that matches the exact position where the previous

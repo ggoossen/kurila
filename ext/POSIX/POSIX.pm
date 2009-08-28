@@ -29,14 +29,6 @@ sub import
 
 XSLoader::load 'POSIX', $VERSION
 
-my %NON_CONSTS = %: < @+: map {(@: $_,1)}
-                    qw(WEXITSTATUS
-                     WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG)
-
-for my $name (keys %NON_CONSTS)
-    Symbol::fetch_glob($name)->* = sub (@< @_) { int_macro_int($name, @_[?0]) }
-
-
 sub usage($mess)
     die "Usage: POSIX::$mess"
 

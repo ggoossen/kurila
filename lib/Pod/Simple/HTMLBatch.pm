@@ -593,7 +593,6 @@ sub _spray_css($self, $outdir)
             or warn "Couldn't print to $outfile: $^OS_ERROR\nAbort writing to $outfile at all"
         close($Cssout)
         DEBUG +> 5 and print $^STDOUT, "Wrote $outfile\n"
-    
 
     return
 
@@ -753,7 +752,6 @@ sub _spray_javascript($self, $outdir)
         close($Jsout)
         DEBUG +> 5 and print $^STDOUT, "Wrote $outfile\n"
     
-
     return
 
 

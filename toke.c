@@ -1252,7 +1252,7 @@ S_force_next(pTHX_ I32 type)
 #ifdef DEBUGGING
     if (DEBUG_T_TEST) {
         PerlIO_printf(Perl_debug_log, "### forced token:\n");
-        tokereport(type, &NEXTVAL_NEXTTOKE);
+	tokereport(type, &NEXTVAL_NEXTTOKE);
     }
 #endif
 #ifdef PERL_MAD
@@ -4029,6 +4029,10 @@ Perl_yylex(pTHX)
 	pl_yylval.i_tkval.ival = 0;
 	OPERATOR(ASSIGNOP);
     case '!':
+	if (PL_expect == XSTATE && s[1] == '!' && s[2] == '!') {
+	    s += 3;
+	    LOP(OP_DIE,XTERM);
+	}
 	s++;
 	{
 	    const char tmp = *s++;

@@ -1,25 +1,24 @@
 #!/usr/bin/perl -w
-# $Id: man.t,v 1.12 2007-11-29 01:35:54 eagle Exp $
 #
 # man.t -- Additional specialized tests for Pod::Man.
 #
-# Copyright 2002, 2003, 2004, 2006, 2007 by Russ Allbery <rra@stanford.edu>
+# Copyright 2002, 2003, 2004, 2006, 2007, 2008
+#     Russ Allbery <rra@stanford.edu>
 #
 # This program is free software; you may redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 use TestInit
 
-BEGIN 
-    $^OUTPUT_AUTOFLUSH = 1
-    print $^STDOUT, "1..43\n"
+use Test::More
 
+plan tests => 47
 
 use Pod::Man
 use charnames ':full'
 use utf8
 
-print $^STDOUT, "ok 1\n"
+ok 1
 
 my $parser = Pod::Man->new or die "Cannot create parser\n"
 my $n = 2
@@ -74,11 +73,8 @@ sub test_outtmp
         $output = ~< $out
     
     close $out
-    if ($output eq $expected) {
-        print $^STDOUT, "ok $n\n";
-    }else 
-        print $^STDOUT, "not ok $n\n"
-        print $^STDOUT, "$msg\nEXPECTED:\n$expected\nOUTPUT:\n$output\n"
+    ok($output eq $expected) 
+        or diag "$msg\nEXPECTED:\n$expected\nOUTPUT:\n$output\n"
     
     $n++
 
@@ -440,4 +436,21 @@ Don't escape `this' but do escape C<`this'> (and don't surround it in quotes).
 .SH "Quote escaping"
 .IX Header "Quote escaping"
 Don't escape `this' but do escape \f(CW\`this\*(Aq\fR (and don't surround it in quotes).
+###
+
+###
+=pod
+
+E<eth>
+###
+.PP
+\&\*(d-
+###
+
+###
+=head1 C<one> and C<two>
+###
+.ie n .SH """one"" and ""two"""
+.el .SH "\f(CWone\fP and \f(CWtwo\fP"
+.IX Header "one and two"
 ###

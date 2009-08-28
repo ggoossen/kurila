@@ -28,7 +28,7 @@ sub new($class, @< @_)
             Carp::croak( "$class new() doesn't know to clone $new" )
         
     else # misc stuff
-        $new = \@:  '', \$%, < @_ 
+        $new = \@:  '', \$%, < @_
 
     # By now it's a treelet:  [ 'foo', {}, ... ]
     foreach my $x ( $new->@)
@@ -41,12 +41,9 @@ sub new($class, @< @_)
 
     return bless $new, $class
 
-
 # Not much in this class is likely to be link-section specific --
 # but it just so happens that link-sections are about the only treelets
 # that are exposed to the user.
-
-1
 
 __END__
 

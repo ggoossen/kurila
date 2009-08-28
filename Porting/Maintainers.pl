@@ -107,14 +107,6 @@ package Maintainers;
 		'CPAN'		=> 1,
 	),
 
-	'Attribute::Handlers' =>
-		\%(
-		'MAINTAINER'	=> 'abergman',
-		'FILES'		=> q[lib/Attribute/Handlers.pm
-				     lib/Attribute/Handlers],
-		'CPAN'		=> 1,
-		),
-
 	'B::Concise' =>
 		\%(
 		'MAINTAINER'	=> 'smccam',
@@ -482,7 +474,7 @@ package Maintainers;
 
 	'Locale::Maketext' =>
 		\%(
-		'MAINTAINER'	=> 'petdance',
+		'MAINTAINER'	=> 'ferreira',
 		'FILES'		=> q[lib/Locale/Maketext.pm lib/Locale/Maketext.pod lib/Locale/Maketext/ChangeLog lib/Locale/Maketext/{Guts,GutsLoader}.pm lib/Locale/Maketext/README lib/Locale/Maketext/TPJ13.pod lib/Locale/Maketext/t],
 		'CPAN'		=> 1,
 		),

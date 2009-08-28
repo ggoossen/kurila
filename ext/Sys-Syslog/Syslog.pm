@@ -202,7 +202,6 @@ sub setlogsock
         if (not $syslog_path)
             warnings::warnif "pipe passed to setlogsock, but path not available"
             return undef
-        
 
         @connectMethods = qw(pipe)
 
@@ -231,7 +230,6 @@ sub setlogsock
         else
             warnings::warnif "udp passed to setlogsock, but udp service unavailable"
             return undef
-        
 
     elsif (lc $setsock eq 'inet')
         @connectMethods = @:  'tcp', 'udp' 
@@ -428,7 +426,6 @@ sub xlate
     defined $value ?? $value !! -1
 
 
-
 # connect_log()
 # -----------
 # This function acts as a kind of front-end: it tries to connect to
@@ -544,7 +541,6 @@ sub connect_udp($errs)
     if (!connect($syslogfh, $addr))
         push $errs->@, "udp connect: $^OS_ERROR"
         return 0
-    
 
     # We want to check that the UDP connect worked. However the only
     # way to do that is to send a message and see if an ICMP is returned
@@ -593,7 +589,6 @@ sub connect_pipe($errs)
 
     return 1
 
-
 sub connect_unix($errs)
 
     $syslog_path ||= _PATH_LOG() if length _PATH_LOG()
@@ -601,7 +596,6 @@ sub connect_unix($errs)
     if (not defined $syslog_path)
         push $errs->@, "_PATH_LOG not available in syslog.h and no user-supplied socket path"
         return 0
-    
 
     if (! -S $syslog_path)
         push $errs->@, "$syslog_path is not a socket"
@@ -703,8 +697,6 @@ sub disconnect_log
     return close $syslogfh
 
 
-1
-
 __END__
 
 =head1 NAME
@@ -713,7 +705,7 @@ Sys::Syslog - Perl interface to the UNIX syslog(3) calls
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =head1 SYNOPSIS
 
@@ -902,6 +894,8 @@ Log all messages up to debug:
 
 =item B<setlogsock($sock_type, $stream_location)> (added in Perl 5.004_02)
 
+=item B<setlogsock($sock_type, $stream_location, $sock_timeout)> (added in 0.25)
+
 Sets the socket type to be used for the next call to
 C<openlog()> or C<syslog()> and returns true on success,
 C<undef> on failure. The available mechanisms are: 
@@ -921,15 +915,18 @@ added in C<Sys::Syslog> 0.19).
 =item *
 
 C<"tcp"> - connect to a TCP socket, on the C<syslog/tcp> or C<syslogng/tcp> 
-service. 
+service. If defined, the second parameter is used as a hostname to connect to.
 
 =item *
 
 C<"udp"> - connect to a UDP socket, on the C<syslog/udp> service.
+If defined, the second parameter is used as a hostname to connect to, 
+and the third parameter as the timeout used to check for UDP response. 
 
 =item *
 
-C<"inet"> - connect to an INET socket, either TCP or UDP, tried in that order. 
+C<"inet"> - connect to an INET socket, either TCP or UDP, tried in that 
+order.  If defined, the second parameter is used as a hostname to connect to.
 
 =item *
 
@@ -1050,8 +1047,7 @@ Example of use of C<%m>:
 
 Log to UDP port on C<$remotehost> instead of logging locally:
 
-    setlogsock('udp');
-    $Sys::Syslog::host = $remotehost;
+    setlogsock("udp", $remotehost);
     openlog($program, 'ndelay', 'user');
     syslog('info', 'something happened over here');
 
@@ -1279,16 +1275,19 @@ GNU C Library documentation on syslog,
 L<http://www.gnu.org/software/libc/manual/html_node/Syslog.html>
 
 Solaris 10 documentation on syslog, 
-L<http://docs.sun.com/app/docs/doc/816-5168/6mbb3hruo?a=view>
+L<http://docs.sun.com/app/docs/doc/816-5168/syslog-3c?a=view>
 
-IRIX 6.4 documentation on syslog,
-L<http://techpubs.sgi.com/library/tpl/cgi-bin/getdoc.cgi?coll=0640&db=man&fname=3c+syslog>
+Mac OS X documentation on syslog,
+L<http://developer.apple.com/documentation/Darwin/Reference/ManPages/man3/syslog.3.html>
+
+IRIX 6.5 documentation on syslog,
+L<http://techpubs.sgi.com/library/tpl/cgi-bin/getdoc.cgi?coll=0650&db=man&fname=3c+syslog>
 
 AIX 5L 5.3 documentation on syslog, 
 L<http://publib.boulder.ibm.com/infocenter/pseries/v5r3/index.jsp?topic=/com.ibm.aix.basetechref/doc/basetrf2/syslog.htm>
 
 HP-UX 11i documentation on syslog, 
-L<http://docs.hp.com/en/B9106-90010/syslog.3C.html>
+L<http://docs.hp.com/en/B2355-60130/syslog.3C.html>
 
 Tru64 5.1 documentation on syslog, 
 L<http://h30097.www3.hp.com/docs/base_doc/DOCUMENTATION/V51_HTML/MAN/MAN3/0193____.HTM>
@@ -1390,6 +1389,11 @@ L<http://perldoc.perl.org/Sys/Syslog.html>
 =back
 
 
+=head1 COPYRIGHT
+
+Copyright (C) 1990-2008 by Larry Wall and others.
+
+
 =head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify it
@@ -1450,6 +1454,9 @@ of a bug in Sys::Syslog back then?
 
 Links
 -----
+Linux Fast-STREAMS
+- L<http://www.openss7.org/streams.html>
+
 II12021: SYSLOGD HOWTO TCPIPINFO (z/OS, OS/390, MVS)
 - L<http://www-1.ibm.com/support/docview.wss?uid=isg1II12021>
 

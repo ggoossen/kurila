@@ -49,21 +49,14 @@ have an implicit C<$_>
 
 =head2 Replace hash iteration with something like C<for (pairs $h)>
 
+=head2 Complain about assigning to optional element (i.e. $foo{?'bar'} = 'baz')
+
 =head2 Remove duplication of test setup.
 
 Schwern notes, that there's duplication of code - lots and lots of tests have
 some variation on the big block of C<$Is_Foo> checks.  We can safely put this
 into a file, change it to build an C<%Is> hash and require it.  Maybe just put
 it into F<test.pl>. Throw in the handy tainting subroutines.
-
-=head2 merge common code in installperl and installman
-
-There are some common subroutines and a common C<BEGIN> block in F<installperl>
-and F<installman>. These should probably be merged. It would also be good to
-check for duplication in all the utility scripts supplied in the source
-tarball. It might be good to move them all to a subdirectory, but this would
-require careful checking to find all places that call them, and change those
-correctly.
 
 =head2 common test code for timed bail out
 
@@ -313,6 +306,8 @@ Except that it's not clear if these really are the most commonly used ops. So
 as part of exercising your skills with coverage and profiling tools you might
 want to determine what ops I<really> are the most commonly used. And in turn
 suggest evictions and promotions to achieve a better F<pp_hot.c>.
+
+One piece of Perl code that might make a good testbed is F<installman>.
 
 =head2 Allocate OPs from arenas
 
@@ -579,16 +574,6 @@ reinstated.
 =head2 Optimize away @_
 
 The old perltodo notes "Look at the "reification" code in C<av.c>".
-
-=head2 The yada yada yada operators
-
-Perl 6's Synopsis 3 says:
-
-I<The ... operator is the "yada, yada, yada" list operator, which is used as
-the body in function prototypes. It complains bitterly (by calling fail)
-if it is ever executed. Variant ??? calls warn, and !!! calls die.>
-
-Those would be nice to add to Perl 5. That could be done without new ops.
 
 =head2 Virtualize operating system access
 

@@ -526,10 +526,7 @@ XS(XS_mro_get_linear_isa) {
     HV* class_stash;
     SV* classname;
 
-    PERL_UNUSED_ARG(cv);
-
-    if(items < 1 || items > 2)
-       Perl_croak(aTHX_ "Usage: mro::get_linear_isa(classname [, type ])");
+    assert(items >= 1 && items <= 2);
 
     classname = ST(0);
     class_stash = gv_stashsv(classname, 0);
@@ -559,10 +556,7 @@ XS(XS_mro_get_isarev)
     HV* isarev;
     AV* ret_array;
 
-    PERL_UNUSED_ARG(cv);
-
-    if (items != 1)
-       Perl_croak(aTHX_ "Usage: mro::get_isarev(classname)");
+    assert(items == 1);
 
     classname = ST(0);
 
@@ -595,10 +589,7 @@ XS(XS_mro_is_universal)
     STRLEN classname_len;
     HE* he;
 
-    PERL_UNUSED_ARG(cv);
-
-    if (items != 1)
-       Perl_croak(aTHX_ "Usage: mro::is_universal(classname)");
+    assert(items == 1);
 
     classname = ST(0);
 
@@ -619,10 +610,7 @@ XS(XS_mro_invalidate_method_caches)
     dVAR;
     dXSARGS;
 
-    PERL_UNUSED_ARG(cv);
-
-    if (items != 0)
-        Perl_croak(aTHX_ "Usage: mro::invalidate_all_method_caches()");
+    assert(items == 0);
 
     PL_sub_generation++;
 
@@ -636,10 +624,7 @@ XS(XS_mro_method_changed_in)
     SV* classname;
     HV* class_stash;
 
-    PERL_UNUSED_ARG(cv);
-
-    if(items != 1)
-        Perl_croak(aTHX_ "Usage: mro::method_changed_in(classname)");
+    assert(items == 1);
     
     classname = ST(0);
 
@@ -658,10 +643,7 @@ XS(XS_mro_get_pkg_gen)
     SV* classname;
     HV* class_stash;
 
-    PERL_UNUSED_ARG(cv);
-
-    if(items != 1)
-        Perl_croak(aTHX_ "Usage: mro::get_pkg_gen(classname)");
+    assert(items == 1);
     
     classname = ST(0);
 

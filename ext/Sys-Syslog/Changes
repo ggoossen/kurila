@@ -22,6 +22,8 @@ Revision history for Sys-Syslog
         via syslog().
         [BUGFIX] Rewrote the constants generation code in order to provide 
         fallback value for non-standard macros.
+        [BUGFIX] Mark Blackman and Edmund von der Burg identified and fixed the
+        random failures appearing on OSX, caused by a UDP timeout.
         [FEATURE] Added Win32 event log support thanks to Yves Orton.
         [FEATURE] Added new macros from modern BSD and IRIX.
         [FEATURE] Each non-standard macro now fall backs to a standard macro.

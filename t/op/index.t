@@ -114,6 +114,3 @@ sub run_tests
 
         local $^UTF8CACHE = -1
         is(index($t, 'xyz'), 4, "0xfffffffd and utf8cache")
-    
-
-

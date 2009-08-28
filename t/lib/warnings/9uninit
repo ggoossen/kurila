@@ -465,4 +465,3 @@ my $b
 EXPECT
 Use of uninitialized value $undef in addition (+) at - line 4.
 Use of uninitialized value $undef in addition (+) at - line 7.
->>>>>>> perl.org/blead~2236:t/lib/warnings/9uninit

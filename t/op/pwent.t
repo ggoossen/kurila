@@ -67,8 +67,6 @@ BEGIN
     if ($reason)        # Give up.
         print $^STDOUT, "1..0 # Skip: $reason\n"
         exit 0
-    
-
 
 # By now the PW filehandle should be open and full of juicy password entries.
 

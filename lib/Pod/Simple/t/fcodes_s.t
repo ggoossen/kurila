@@ -6,7 +6,8 @@ BEGIN
 
 
 use Test::More
-BEGIN { plan tests => 13 };
+BEGIN
+    plan tests => 14
 
 #use Pod::Simple::Debug (6);
 
@@ -73,7 +74,30 @@ is(
   qq{=pod\n\nI like L<StuffE<160>I<likeE<160>that>|"bric-a-brac a gogo">.\n},
   ))
 
+use Pod::Simple::Text;
+$x = Pod::Simple::Text->new;
+$x->preserve_whitespace(1);
+# RT#25679
+ok(
+  $x->_out(<<END
+=head1 The Tk::mega manpage showed me how C<< SE<lt> E<gt> foo >> is being rendered
 
+Both pod2text and pod2man S<    > lose the rest of the line
+
+=head1 Do they always S<    > lose the rest of the line?
+
+=cut
+END
+  ),
+  <<END
+The Tk::mega manpage showed me how S< > foo is being rendered
+
+    Both pod2text and pod2man      lose the rest of the line
+
+Do they always      lose the rest of the line?
+
+END
+  )
 
 print $^STDOUT, "# Wrapping up... one for the road...\n"
 ok 1

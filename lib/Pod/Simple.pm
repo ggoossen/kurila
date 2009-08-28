@@ -959,71 +959,82 @@ sub _treat_Ls($self,@< @stack)
             unless($treelet->[$i]->[0] eq 'L')
                 unshift @stack, $treelet->[$i] # recurse
                 next
-            
-
 
             # By here, $treelet->[$i] is definitely an L node
-            DEBUG +> 1 and print $^STDOUT, "Ogling L node $treelet->[$i]\n"
+            my $ell = $treelet->[$i]
+            DEBUG +> 1 and print $^STDOUT, "Ogling L node $ell\n"
 
             # bitch if it's empty
-            if(  (nelems $treelet->[$i]->@) == 2
-              or ((nelems $treelet->[$i]->@) == 3 and not ref $treelet->[$i]->[2] and $treelet->[$i]->[2] eq '')
+            if(  (nelems $ell->@) == 2
+              or ((nelems $ell->@) == 3 and not ref $ell->[2] and $ell->[2] eq '')
                 )
                 $self->whine( $start_line, "An empty L<>" )
                 $treelet->[$i] = 'L<>'  # just make it a text node
                 next  # and move on
-            
 
             # Catch URLs:
-            # URLs can, alas, contain E<...> sequences, so we can't /assume/
-            #  that this is one text node.  But it has to START with one text
-            #  node...
-            if(! ref $treelet->[$i]->[2] and
-                $treelet->[$i]->[2] =~ m/^\w+:[^:\s]\S*$/s
-                )
-                $treelet->[$i]->[1]->{+'type'} = 'url'
-                $treelet->[$i]->[1]->{+'content-implicit'} = 'yes'
 
-                # TODO: deal with rel: URLs here?
+            # there are a number of possible cases:
+            # 1) text node containing url: http://foo.com
+            #   -> [ 'http://foo.com' ]
+            # 2) text node containing url and text: foo|http://foo.com
+            #   -> [ 'foo|http://foo.com' ]
+            # 3) text node containing url start: mailto:xE<at>foo.com
+            #   -> [ 'mailto:x', [ E ... ], 'foo.com' ]
+            # 4) text node containing url start and text: foo|mailto:xE<at>foo.com
+            #   -> [ 'foo|mailto:x', [ E ... ], 'foo.com' ]
+            # 5) other nodes containing text and url start: OE<39>Malley|http://foo.com
+            #   -> [ 'O', [ E ... ], 'Malley', '|http://foo.com' ]
+            # ... etc.
 
-                if( 3 == nelems $treelet->[$i]->@ )
-                    # But if it IS just one text node (most common case)
-                    DEBUG +> 1 and printf $^STDOUT, qq{Catching "\%s as " as ho-hum L<URL> link.\n},
-                        $treelet->[$i]->[2]
-                    
-                    $treelet->[$i]->[1]->{+'to'} = Pod::Simple::LinkSection->new(
-                        $treelet->[$i]->[2]
-                        )                   # its own treelet
-                else
-                    # It's a URL but complex (like "L<foo:bazE<123>bar>").  Feh.
-                    #$treelet->[$i][1]{'to'} = [ $treelet->[$i]->@ ];
-                    #splice @{ $treelet->[$i][1]{'to'} }, 0,2;
-                    #DEBUG > 1 and printf qq{Catching "%s as " as complex L<URL> link.\n},
-                    #  join '~', @{$treelet->[$i][1]{'to'  }};
+            # anything before the url is part of the text.
+            # anything after it is part of the url.
+            # the url text node itself may contain parts of both.
 
-                    $treelet->[$i]->[1]->{+'to'} = Pod::Simple::LinkSection->new(
-                        $treelet->[$i]  # yes, clone the whole content as a treelet
-                        )
-                    $treelet->[$i]->[1]->{'to'}->[0] = '' # set the copy's tagname to nil
-                    die "SANITY FAILURE" if $treelet->[0] eq '' # should never happen!
-                    DEBUG +> 1 and print $^STDOUT,
-                        qq{Catching "$treelet->[$i]->[1]->{?'to'}" as a complex L<URL> link.\n}
-                
+            if (my @: ?$url_index, ?$text_part, ?$url_part =
+                # grep is no good here; we want to bail out immediately so that we can
+                # use $1, $2, etc. without having to do the match twice.
+                sub {
+                    for (2..nelems($ell->@)-1)
+                         next if ref $ell->[$_]
+                         next unless $ell->[$_] =~ m/^(?:([^|]*)\|)?(\w+:[^:\s]\S*)$/s
+                         return @: $_, $1, $2
+                    return $@
+                }->()
 
-                next # and move on
-            
+              )
+                $ell->[1]->{+'type'} = 'url'
 
+                my @text = $ell->[[2..$url_index-1]]
+                push @text, $text_part if defined $text_part
+
+                my @url  = $ell->[[$url_index+1..nelems($ell->@)-1]]
+                unshift @url, $url_part
+
+                unless (@text)
+                    $ell->[1]->{+'content-implicit'} = 'yes'
+                    @text = @url
+ 
+                $ell->[1]->{+to} = Pod::Simple::LinkSection->new(
+                    nelems(@url) == 1
+                        ?? @url[0]
+                        !! \@: '', $%, < @url
+                    )
+
+                splice $ell->@, 2, nelems($ell->@)-1, < @text;
+
+                next;
 
             # Catch some very simple and/or common cases
-            if((nelems $treelet->[$i]->@) == 3 and ! ref $treelet->[$i]->[2])
-                my $it = $treelet->[$i]->[2]
+            if((nelems $ell->@) == 3 and ! ref $ell->[2])
+                my $it = $ell->[2]
                 if($it =~ m/^[-a-zA-Z0-9]+\([-a-zA-Z0-9]+\)$/s) # man sections
                     # Hopefully neither too broad nor too restrictive a RE
                     DEBUG +> 1 and print $^STDOUT, "Catching \"$it\" as manpage link.\n"
-                    $treelet->[$i]->[1]->{+'type'} = 'man'
+                    $ell->[1]->{+'type'} = 'man'
                     # This's the only place where man links can get made.
-                    $treelet->[$i]->[1]->{+'content-implicit'} = 'yes'
-                    $treelet->[$i]->[1]->{+'to'  } =
+                    $ell->[1]->{+'content-implicit'} = 'yes'
+                    $ell->[1]->{+'to'  } =
                         Pod::Simple::LinkSection->new( $it ) # treelet!
 
                     next
@@ -1032,31 +1043,25 @@ sub _treat_Ls($self,@< @stack)
                     # Extremely forgiving idea of what constitutes a bare
                     #  modulename link like L<Foo::Bar> or even L<Thing::1.0::Docs::Tralala>
                     DEBUG +> 1 and print $^STDOUT, "Catching \"$it\" as ho-hum L<Modulename> link.\n"
-                    $treelet->[$i]->[1]->{+'type'} = 'pod'
-                    $treelet->[$i]->[1]->{+'content-implicit'} = 'yes'
-                    $treelet->[$i]->[1]->{+'to'  } =
+                    $ell->[1]->{+'type'} = 'pod'
+                    $ell->[1]->{+'content-implicit'} = 'yes'
+                    $ell->[1]->{+'to'  } =
                         Pod::Simple::LinkSection->new( $it ) # treelet!
                     next
                 
             # else fall thru...
-            
-
-
 
             # ...Uhoh, here's the real L<...> parsing stuff...
             # "With the ill behavior, with the ill behavior, with the ill behavior..."
 
             DEBUG +> 1 and print $^STDOUT, "Running a real parse on this non-trivial L\n"
 
-
             my $link_text # set to an arrayref if found
-            my $ell = $treelet->[$i]
             my @ell_content = $ell->@
             splice @ell_content,0,2 # Knock off the 'L' and {} bits
 
             DEBUG +> 3 and print $^STDOUT, " Ell content to start: ", <
                 pretty(< @ell_content), "\n"
-
 
             # Look for the "|" -- only in CHILDREN (not all underlings!)
             # Like L<I like the strictness|strict>
@@ -1082,9 +1087,6 @@ sub _treat_Ls($self,@< @stack)
                         "  So link text is \%s\n  and remaining ell content is \%s\n", <
                         pretty($link_text), < pretty(< @ell_content)
                     last
-                
-            
-
 
             # Now look for the "/" -- only in CHILDREN (not all underlings!)
             # And afterward, anything left in @ell_content will be the raw name
@@ -1126,12 +1128,9 @@ sub _treat_Ls($self,@< @stack)
                     else
                         DEBUG +> 3 and
                             print $^STDOUT, "     No need to remove quotes in ", < pretty(< @section_name), "\n"
-                    
 
                     $section_name = \@section_name
                     last
-                
-            
 
             # Turn L<"Foo Bar"> into L</Foo Bar>
             if(!$section_name and nelems @ell_content
@@ -1155,8 +1154,6 @@ sub _treat_Ls($self,@< @stack)
             # That's support for the now-deprecated syntax.
             # (Maybe generate a warning eventually?)
             # Note that it deliberately won't work on L<...|Foo Bar>
-            
-
 
             # Now make up the link_text
             # L<Foo>     -> L<Foo|Foo>
@@ -1170,9 +1167,6 @@ sub _treat_Ls($self,@< @stack)
                 if((nelems @ell_content))
                     $link_text->[-1] .= ' in ' if $section_name
                     push $link_text->@, < @ell_content
-                
-            
-
 
             # And the E resolver will have to deal with all our treeletty things:
 
@@ -1185,20 +1179,17 @@ sub _treat_Ls($self,@< @stack)
                 $ell->[1]->{+'type'}    = 'pod'
                 DEBUG +> 3 and print $^STDOUT, "Considering this a pod link (not man or url).\n"
             
-
             if( defined $section_name )
                 $ell->[1]->{+'section'} = Pod::Simple::LinkSection->new(
                     \@: '', \$%, < $section_name->@
                     )
                 DEBUG +> 3 and print $^STDOUT, "L-section content: ", < pretty($ell->[1]->{?'section'}), "\n"
-            
 
             if( (nelems @ell_content) )
                 $ell->[1]->{+'to'} = Pod::Simple::LinkSection->new(
                     \@: '', \$%, < @ell_content
                     )
                 DEBUG +> 3 and print $^STDOUT, "L-to content: ", < pretty($ell->[1]->{?'to'}), "\n"
-            
 
             # And update children to be the link-text:
             $ell->@ = @:  <$ell->[[(@: 0,1)]], defined($link_text) ?? splice($link_text->@) !! ''
@@ -1392,7 +1383,7 @@ sub _out
 
     my $class = shift(@_)
 
-    my $mutor = shift(@_) if @_ and ref::svtype(@_[0]) eq 'CODE'
+    my $mutor = shift(@_) if @_ and type::is_code(@_[0])
 
     DEBUG and print $^STDOUT, "\n\n", '#' x 76,
         "\nAbout to parse source: \{\{\n@_[0]\n\}\}\n\n"
@@ -1410,7 +1401,6 @@ sub _out
     $parser->parse_string_document( @_[0] )
     # use Data::Dumper; print Dumper($parser), "\n";
     return $out
-
 
 
 sub _duo

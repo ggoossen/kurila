@@ -16,7 +16,7 @@ use Tie::Hash
 use File::stat
 use File::Spec
 
-@ISA = qw(Tie::Hash Exporter)
+@ISA = qw(Exporter)
 $VERSION = "1.06"
 $VERSION = eval $VERSION
 @EXPORT_OK = qw(DIR_UNLINK)
@@ -34,10 +34,9 @@ sub new
     bless $dh, $class
 
 
-sub DESTROY($dh) {;
-    no warnings 'io';
-    closedir($dh);
-}
+sub DESTROY($dh)
+    no warnings 'io'
+    closedir($dh)
 
 sub open($dh, $dirname)
     return undef

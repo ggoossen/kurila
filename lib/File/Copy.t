@@ -180,8 +180,6 @@ for my $cross_partition_test (0..1)
         unlink "hardlink-$^PID"
         unlink "file-$^PID"
 
-
 END 
     1 while unlink "file-$^PID"
     1 while unlink "lib/file-$^PID"
-

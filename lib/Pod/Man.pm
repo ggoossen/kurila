@@ -1,7 +1,6 @@
 # Pod::Man -- Convert POD data to formatted *roff input.
-# $Id: Man.pm,v 2.16 2007-11-29 01:35:53 eagle Exp $
 #
-# Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007
+# Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
 #     Russ Allbery <rra@stanford.edu>
 # Substantial contributions by Sean Burke <sburke@cpan.org>
 #
@@ -25,7 +24,6 @@
 
 package Pod::Man
 
-
 use utf8
 our (@ISA, %ESCAPES, $PREAMBLE, $VERSION)
 
@@ -47,8 +45,6 @@ BEGIN
     my $parent = exists (&Pod::Simple::DEBUG) ?? \&Pod::Simple::DEBUG !! undef
     unless (exists &DEBUG)
         *DEBUG = $parent || sub () { 10 }
-    
-
 
 # Import the ASCII constant from Pod::Simple.  This is true iff we're in an
 # ASCII-based universe (including such things as ISO 8859-1 and UTF-8), and is
@@ -67,8 +63,7 @@ BEGIN { *pretty = \&Pod::Simple::pretty }
 # set up defaults if none were given.  Note that all internal object keys are
 # in all-caps, reserving all lower-case object keys for Pod::Simple and user
 # arguments.
-sub new
-    my $class = shift
+sub new($class, @< @args)
     my $self = $class->SUPER::new
 
     # Tell Pod::Simple to handle S<> by automatically inserting &nbsp;.
@@ -79,7 +74,6 @@ sub new
         $self->preserve_whitespace (1)
     else
         $self->fullstop_space_harden (1)
-    
 
     # The =for and =begin targets that we accept.
     $self->accept_targets ( <qw/man MAN roff ROFF/)
@@ -92,7 +86,7 @@ sub new
     # to put them in our object as hash keys and values.  This could cause
     # problems if we ever clash with Pod::Simple's own internal class
     # variables.
-    $self->% = %: < $self->%, < @_
+    $self->% = %: < $self->%, < @args
 
     # Initialize various other internal constants based on our arguments.
     $self->init_fonts
@@ -125,8 +119,6 @@ sub init_fonts($self)
         my $font = $self->{?$_}
         if (defined ($font) && (length ($font) +< 1 || length ($font) +> 2))
             croak qq(roff font should be 1 or 2 chars, not "$font")
-        
-    
 
     # Set the default fonts.  We can't be sure portably across different
     # implementations what fixed bold-italic may be called (if it's even
@@ -257,7 +249,6 @@ sub _handle_element_start($self, $element, $attrs)
         $self->?$method ($attrs, '')
     else
         DEBUG +> 2 and print $^STDOUT, "No $method start method, skipping\n"
-    
 
 
 # Handle the end of an element.  If we had a cmd_ method for this element,
@@ -281,14 +272,12 @@ sub _handle_element_end($self, $element)
                 $self->{PENDING}->[-1]->[2] .= $text
             else
                 $self->output ($text)
-            
         
     elsif ($self->can ("end_$method"))
         my $method = 'end_' . $method
         $self->?$method ()
     else
         DEBUG +> 2 and print $^STDOUT, "No $method end method, skipping\n"
-    
 
 
 ##############################################################################
@@ -331,36 +320,31 @@ sub format_text($self, $options, $text)
     my $convert = $options->{?convert}
     my $literal = $options->{?literal}
 
-    # Normally we do character translation, but we won't even do that in
-    # <Data> blocks.
-    if ($convert)
-        if (ASCII)
-            $text =~ s/(\\|[^\x{00}-\x{7F}])/$(%ESCAPES{?ord ($1)} || "X")/g
-        else
-            $text =~ s/(\\)/$(%ESCAPES{?ord ($1)} || "X")/g
-        
-    
-
     # Cleanup just tidies up a few things, telling *roff that the hyphens are
-    # hard and putting a bit of space between consecutive underscores.
+    # hard, putting a bit of space between consecutive underscores, and
+    # escaping backslashes.  Be careful not to mangle our character
+    # translations by doing this before processing character translation.
     if ($cleanup)
+        $text =~ s/\\/\\e/g
         $text =~ s/-/\\-/g
         $text =~ s/_(?=_)/_\\|/g
-    
+
+    # Normally we do character translation, but we won't even do that in
+    # <Data> blocks or if UTF-8 output is desired.
+    if ($convert && !$self->{?utf8} && ASCII)
+        $text =~ s/([^\x00-\x7F])/$( %ESCAPES{ord ($1)} || "X" )/g
 
     # Ensure that *roff doesn't convert literal quotes to UTF-8 single quotes,
     # but don't mess up our accept escapes.
     if ($literal)
         $text =~ s/(?<!\\\*)\'/\\*\(Aq/g
         $text =~ s/(?<!\\\*)\`/\\\`/g
-    
 
     # If guesswork is asked for, do that.  This involves more substantial
     # formatting based on various heuristics that may only be appropriate for
     # particular documents.
     if ($guesswork)
         $text = $self->guesswork ($text)
-    
 
     return $text
 
@@ -440,7 +424,6 @@ sub guesswork
     if ($self->{?MAGIC_EMDASH})
         s{          (\s) \\-\\- (\s)                } {$( $1 . '\*(--' . $2 )}gx
         s{ (\b[a-zA-Z]+) \\-\\- (\s|\Z|[a-zA-Z]+\b) } {$( $1 . '\*(--' . $2 )}gx
-    
 
     # Make words in all-caps a little bit smaller; they look better that way.
     # However, we don't want to change Perl code (like @ARGV), nor do we want
@@ -459,7 +442,6 @@ sub guesswork
         } {$(
             $1 . '\s-1' . $2 . '\s0'
             )}gx
-    
 
     # Note that from this point forward, we have to adjust for \s-1 and \s-0
     # strings inserted around things that we've made small-caps if later
@@ -476,7 +458,6 @@ sub guesswork
         } {$(
             $1 . '\f(IS' . $2 . '\f(IE'
             )}gx
-    
 
     # Change references to manual pages to put the page name in italics but
     # the number in the regular font, with a thin space between the name and
@@ -493,7 +474,6 @@ sub guesswork
         } {$(
             $1 . '\f(IS' . $2 . '\f(IE\|' . $3
             )}gx
-    
 
     # Convert simple Perl variable references to a fixed-width font.  Be
     # careful not to convert functions, though; there are too many subtleties
@@ -506,7 +486,6 @@ sub guesswork
         } {$(
             $1 . '\f(FS' . $2 . '\f(FE'
             )}gx
-    
 
     # Fix up double quotes.  Unfortunately, we miss this transformation if the
     # quoted text contains any code with formatting codes and there's not much
@@ -517,7 +496,6 @@ sub guesswork
     # Make C++ into \*(C+, which is a squinched version.
     if ($self->{?MAGIC_CPP})
         s{ \b C\+\+ } {\\*\(C+}gx
-    
 
     # Done.
     DEBUG +> 5 and print $^STDOUT, "   Guesswork returning [$_]\n"
@@ -621,10 +599,10 @@ sub switchquotes($self, $command, $text, ?$extra)
         # to Roman rather than the actual previous font when used in headings.
         # troff output may still be broken, but at least we can fix nroff by
         # just switching the font changes to the non-fixed versions.
-        $nroff =~ s/\Q$self->{FONTS}->{?100}\E(.*)\\f[PR]/$1/g
-        $nroff =~ s/\Q$self->{FONTS}->{?101}\E(.*)\\f([PR])/\\fI$1\\f$2/g
-        $nroff =~ s/\Q$self->{FONTS}->{?110}\E(.*)\\f([PR])/\\fB$1\\f$2/g
-        $nroff =~ s/\Q$self->{FONTS}->{?111}\E(.*)\\f([PR])/\\f\(BI$1\\f$2/g
+        $nroff =~ s/\Q$self->{FONTS}->{?100}\E(.*?)\\f[PR]/$1/g
+        $nroff =~ s/\Q$self->{FONTS}->{?101}\E(.*?)\\f([PR])/\\fI$1\\f$2/g
+        $nroff =~ s/\Q$self->{FONTS}->{?110}\E(.*?)\\f([PR])/\\fB$1\\f$2/g
+        $nroff =~ s/\Q$self->{FONTS}->{?111}\E(.*?)\\f([PR])/\\f\(BI$1\\f$2/g
 
         # Now finally output the command.  Bother with .ie only if the nroff
         # and troff output aren't the same.
@@ -636,7 +614,6 @@ sub switchquotes($self, $command, $text, ?$extra)
     else
         $text = qq("$text") . ($extra ?? " $extra" !! '')
         return "$command $text\n"
-    
 
 
 # Protect leading quotes and periods against interpretation as commands.  Also
@@ -706,7 +683,6 @@ sub start_document($self, $attrs, _)
         DEBUG and print $^STDOUT, "Document is contentless\n"
         $self->{+CONTENTLESS} = 1
         return
-    
 
     # Determine information for the preamble and then output it.
     my ($name, $section)
@@ -777,7 +753,6 @@ sub devise_title($self)
                 $cut = $i + 1
                 $cut++ if (@dirs[$i + 1] && @dirs[$i + 1] eq 'lib')
                 last
-            
         
         if ($cut +> 0)
             splice (@dirs, 0, $cut)
@@ -832,8 +807,6 @@ sub preamble($self, $name, $section, $date)
         if (m/\s/)
             s/\"/\"\"/g
             $_ = '"' . $_ . '"'
-        
-    
 
     # Double quotes in date, since it will be quoted.
     $date =~ s/\"/\"\"/g
@@ -1191,8 +1164,6 @@ sub parse_from_file
         if (defined ($opts->{?cutting}) && !$opts->{?cutting})
             $self->{+in_pod} = 1
             $self->{+last_was_blank} = 1
-        
-    
 
     # Do the work.
     my $retval = $self->SUPER::parse_from_file (< @_)
@@ -1248,9 +1219,6 @@ sub parse_from_filehandle
     "o\\*/" , "u\\*`", "u\\*'", "u\\*^",   "u\\*:", "y\\*'", "\\*(th", "y\\*:"
     ) if ASCII
 
-# Make sure that at least this works even outside of ASCII.
-%ESCAPES{+ord("\\")} = "\\e"
-
 ##############################################################################
 # Premable
 ##############################################################################
@@ -1266,7 +1234,7 @@ sub preamble_template
 .if t .Sp
 .ne 5
 .PP
-\fB\\$1\fR
+\fB\&\\$1\fR
 .PP
 ..
 .de Sp \" Vertical space (when we can't use .PP)
@@ -1536,6 +1504,22 @@ that are reliably consistent are 1, 2, and 3.
 By default, section 1 will be used unless the file ends in .pm in which case
 section 3 will be selected.
 
+=item utf8
+
+By default, Pod::Man produces the most conservative possible *roff output
+to try to ensure that it will work with as many different *roff
+implementations as possible.  Many *roff implementations cannot handle
+non-ASCII characters, so this means all non-ASCII characters are converted
+either to a *roff escape sequence that tries to create a properly accented
+character (at least for troff output) or to C<X>.
+
+If this option is set, Pod::Man will instead output UTF-8.  If your *roff
+implementation can handle it, this is the best output format to use and
+avoids corruption of documents containing non-ASCII characters.  However,
+be warned that *roff source with literal UTF-8 characters is not supported
+by many implementations and may even result in segfaults and other bad
+behavior.
+
 =back
 
 The standard Pod::Simple method parse_file() takes one argument naming the
@@ -1570,15 +1554,6 @@ invalid.  A quote specification must be one, two, or four characters long.
 =back
 
 =head1 BUGS
-
-Eight-bit input data isn't handled at all well at present.  The correct
-approach would be to map EE<lt>E<gt> escapes to the appropriate UTF-8
-characters and then do a translation pass on the output according to the
-user-specified output character set.  Unfortunately, we can't send eight-bit
-data directly to the output unless the user says this is okay, since some
-vendor *roff implementations can't handle eight-bit data.  If the *roff
-implementation can, however, that's far superior to the current hacked
-characters that only work under troff.
 
 There is currently no way to turn off the guesswork that tries to format
 unmarked text appropriately, and sometimes it isn't wanted (particularly

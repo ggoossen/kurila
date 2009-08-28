@@ -370,14 +370,14 @@ C<SV*>.
     (hv_common_key_len((urkk), (zamm), (clunk), HV_FETCH_ISEXISTS, NULL, 0) \
      ? TRUE : FALSE)
 
-#define hv_fetch(urkk, zamm, clunk, pam)				\
-    ((SV**) hv_common_key_len((urkk), (zamm), (clunk), (pam)		\
+#define hv_fetch(hv, key, klen, lval)					\
+    ((SV**) hv_common_key_len((hv), (key), (klen), (lval)		\
 			      ? (HV_FETCH_JUST_SV | HV_FETCH_LVALUE)	\
 			      : HV_FETCH_JUST_SV, NULL, 0))
 
-#define hv_delete(urkk, zamm, clunk, pam)				\
-    ((SV*) hv_common_key_len((urkk), (zamm), (clunk),			\
-			     (pam) | HV_DELETE, NULL, 0))
+#define hv_delete(hv, key, klen, flags)					\
+    ((SV*) hv_common_key_len((hv), (key), (klen),			\
+			     (flags) | HV_DELETE, NULL, 0))
 
 #    define HINTS_REFCNT_LOCK          NOOP
 #    define HINTS_REFCNT_UNLOCK                NOOP
