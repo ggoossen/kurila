@@ -349,10 +349,10 @@ struct block {
 #define blk_eval	cx_u.cx_blk.blk_u.blku_eval
 #define blk_loop	cx_u.cx_blk.blk_u.blku_loop
 
-#define PUSHBLOCK(cx,t,sp) cx = PushBlock(t,sp,gimme)
+#define PUSHBLOCK(cx,t,sp) cx = push_block(t,sp,gimme)
 
 /* Exit a block (RETURN and LAST). */
-#define POPBLOCK(cx,pm) cx = PopBlock();	\
+#define POPBLOCK(cx,pm) cx = pop_block();	\
    newsp		 = PL_stack_base + cx->blk_oldsp; \
    pm		         = cx->blk_oldpm; \
    gimme		 = cx->blk_gimme; \
@@ -566,41 +566,12 @@ typedef struct stackinfo PERL_SI;
 #  define	SET_MARK_OFFSET NOOP
 #endif
 
-#define PUSHSTACKi(type) \
-    STMT_START {							\
-	PERL_SI *next = PL_curstackinfo->si_next;			\
-	if (!next) {							\
-	    next = new_stackinfo(32, 2048/sizeof(PERL_CONTEXT) - 1);	\
-	    next->si_prev = PL_curstackinfo;				\
-	    PL_curstackinfo->si_next = next;				\
-	}								\
-	next->si_type = type;						\
-	next->si_cxix = -1;						\
-	next->olddebug = PL_debug;					\
-	PL_debug &= ~DEBUG_R_FLAG;					\
-	AvFILLp(next->si_stack) = 0;					\
-	SWITCHSTACK(PL_curstack,next->si_stack);			\
-	PL_curstackinfo = next;						\
-	SET_MARK_OFFSET;						\
-    } STMT_END
-
+#define PUSHSTACKi(type) push_stack(type, &sp)
 #define PUSHSTACK PUSHSTACKi(PERLSI_UNKNOWN)
 
 /* POPSTACK works with PL_stack_sp, so it may need to be bracketed by
  * PUTBACK/SPAGAIN to flush/refresh any local SP that may be active */
-#define POPSTACK \
-    STMT_START {							\
-	dSP;								\
-	PERL_SI * const prev = PL_curstackinfo->si_prev;		\
-	if (!prev) {							\
-	    PerlIO_printf(Perl_error_log, "panic: POPSTACK\n");		\
-	    my_exit(1);							\
-	}								\
-	SWITCHSTACK(PL_curstack,prev->si_stack);			\
-	PL_debug = PL_curstackinfo->olddebug;				\
-	/* don't free prev here, free them all at the END{} */		\
-	PL_curstackinfo = prev;						\
-    } STMT_END
+#define POPSTACK pop_stack()
 
 #define POPSTACK_TO(s) \
     STMT_START {							\

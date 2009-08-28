@@ -1,9 +1,10 @@
 
 /* Enter a block. */
-PERL_CONTEXT * Perl_PushBlock(U8 t, SV** sp, U8 gimme) {
+PERL_CONTEXT * 
+Perl_push_block(U8 t, SV** sp, U8 gimme) {
     PERL_CONTEXT *cx;
     HV *new_dynascope;
-    PERL_ARGS_ASSERT_PUSHBLOCK;
+    PERL_ARGS_ASSERT_PUSH_BLOCK;
     CXINC;
     cx = &cxstack[cxstack_ix];
     cx->cx_type		= t;
@@ -27,7 +28,8 @@ PERL_CONTEXT * Perl_PushBlock(U8 t, SV** sp, U8 gimme) {
     return cx;
 }
 
-PERL_CONTEXT * Perl_PopBlock() {
+PERL_CONTEXT * 
+Perl_pop_block() {
     PERL_CONTEXT * cx;
     SV** onleave_ref = hv_fetchs(svThv(PL_dynamicscope), "onleave", 0);
     if (onleave_ref && SvAVOK(*onleave_ref)) {
@@ -57,4 +59,43 @@ void Perl_cx_free_eval(PERL_CONTEXT* cx) {
     PL_eval_root = cx->blk_eval.old_eval_root;
     if (cx->blk_eval.old_namesv)
         sv_2mortal(cx->blk_eval.old_namesv);
+}
+
+void Perl_push_stack(I32 type, SV*** spp)
+{
+    SV** sp;
+    PERL_SI *next = PL_curstackinfo->si_next;
+    if (!next) {
+        next = new_stackinfo(32, 2048/sizeof(PERL_CONTEXT) - 1);	
+        next->si_prev = PL_curstackinfo;			
+        PL_curstackinfo->si_next = next;		
+    }                                           
+    next->si_type = type;			
+    next->si_cxix = -1;                 
+#ifdef DEBUGGING
+    next->olddebug = PL_debug;         
+    PL_debug &= ~DEBUG_R_FLAG;        
+#endif /* DEBUGGING */
+    AvFILLp(next->si_stack) = 0;		
+    sp = *spp;
+    SWITCHSTACK(PL_curstack,next->si_stack);
+    *spp = sp;
+    PL_curstackinfo = next;                
+    SET_MARK_OFFSET;		
+}
+
+void Perl_pop_stack()
+{
+    dSP;								
+    PERL_SI * const prev = PL_curstackinfo->si_prev;            
+    if (!prev) {						
+        PerlIO_printf(Perl_error_log, "panic: POPSTACK\n");	
+        my_exit(1);						
+    }						
+    SWITCHSTACK(PL_curstack,prev->si_stack);
+#ifdef DEBUGGING
+    PL_debug = PL_curstackinfo->olddebug;	
+#endif /* DEBUGGING */
+    /* don't free prev here, free them all at the END{} */	
+    PL_curstackinfo = prev;					
 }

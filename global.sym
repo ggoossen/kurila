@@ -67,8 +67,10 @@ Perl_loc_desc
 Perl_loc_name
 Perl_SvNAME
 Perl_LocationFilename
-Perl_PushBlock
-Perl_PopBlock
+Perl_push_block
+Perl_pop_block
+Perl_push_stack
+Perl_pop_stack
 Perl_cx_free_eval
 Perl_av_clear
 Perl_av_delete

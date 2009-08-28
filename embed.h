@@ -101,8 +101,10 @@
 #define loc_name		Perl_loc_name
 #define SvNAME			Perl_SvNAME
 #define LocationFilename	Perl_LocationFilename
-#define PushBlock		Perl_PushBlock
-#define PopBlock		Perl_PopBlock
+#define push_block		Perl_push_block
+#define pop_block		Perl_pop_block
+#define push_stack		Perl_push_stack
+#define pop_stack		Perl_pop_stack
 #define cx_free_eval		Perl_cx_free_eval
 #ifdef PERL_CORE
 #define append_elem		Perl_append_elem
@@ -2304,8 +2306,10 @@
 #define loc_name(a)		Perl_loc_name(aTHX_ a)
 #define SvNAME(a)		Perl_SvNAME(aTHX_ a)
 #define LocationFilename(a)	Perl_LocationFilename(aTHX_ a)
-#define PushBlock(a,b,c)	Perl_PushBlock(aTHX_ a,b,c)
-#define PopBlock()		Perl_PopBlock(aTHX)
+#define push_block(a,b,c)	Perl_push_block(aTHX_ a,b,c)
+#define pop_block()		Perl_pop_block(aTHX)
+#define push_stack(a,b)		Perl_push_stack(aTHX_ a,b)
+#define pop_stack()		Perl_pop_stack(aTHX)
 #define cx_free_eval(a)		Perl_cx_free_eval(aTHX_ a)
 #ifdef PERL_CORE
 #define append_elem(a,b,c)	Perl_append_elem(aTHX_ a,b,c)

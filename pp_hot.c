@@ -1573,7 +1573,7 @@ PP(pp_entersub)
 	    (void)(*CvXSUB(cv))(aTHX_ cv);
 
 	CvREFCNT_dec(cv);
-	PopBlock();
+	pop_block();
 	POPMARK;
 
 	/* Enforce some sanity in scalar context. */

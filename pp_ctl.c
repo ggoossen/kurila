@@ -352,7 +352,7 @@ Perl_dounwind(pTHX_ I32 cxix)
 	    POPSUBST(cx);
 	    continue;
 	}
-	cx = PopBlock();
+	cx = pop_block();
 	/* Note: we don't need to restore the base context info till the end. */
 	switch (CxTYPE(cx)) {
 	case CXt_SUB:

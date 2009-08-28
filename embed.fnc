@@ -122,8 +122,10 @@ Aip	|SV*	|loc_name	|NULLOK SV *loc
 Aip	|SV*	|SvNAME	|NN SV *sv
 Aip	|SV*	|LocationFilename	|NULLOK SV *location
 
-Aip     |PERL_CONTEXT* |PushBlock  |U8 t|NN SV** sp|U8 gimme
-Aip     |PERL_CONTEXT* |PopBlock
+Aip     |PERL_CONTEXT* |push_block  |U8 t|NN SV** sp|U8 gimme
+Aip     |PERL_CONTEXT* |pop_block
+Aip     |void |push_stack  |I32 type|NN SV*** spp
+Aip     |void |pop_stack
 Aip     |void |cx_free_eval		|NN PERL_CONTEXT* cx
 
 #  include "pp_proto.h"

@@ -197,12 +197,18 @@ PERL_INLINE_CALLCONV SV*	Perl_SvNAME(pTHX_ SV *sv)
 
 PERL_INLINE_CALLCONV SV*	Perl_LocationFilename(pTHX_ SV *location);
 
-PERL_INLINE_CALLCONV PERL_CONTEXT*	Perl_PushBlock(pTHX_ U8 t, SV** sp, U8 gimme)
+PERL_INLINE_CALLCONV PERL_CONTEXT*	Perl_push_block(pTHX_ U8 t, SV** sp, U8 gimme)
 			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_PUSHBLOCK	\
+#define PERL_ARGS_ASSERT_PUSH_BLOCK	\
 	assert(sp)
 
-PERL_INLINE_CALLCONV PERL_CONTEXT*	Perl_PopBlock(pTHX);
+PERL_INLINE_CALLCONV PERL_CONTEXT*	Perl_pop_block(pTHX);
+PERL_INLINE_CALLCONV void	Perl_push_stack(pTHX_ I32 type, SV*** spp)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_PUSH_STACK	\
+	assert(spp)
+
+PERL_INLINE_CALLCONV void	Perl_pop_stack(pTHX);
 PERL_INLINE_CALLCONV void	Perl_cx_free_eval(pTHX_ PERL_CONTEXT* cx)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_CX_FREE_EVAL	\
