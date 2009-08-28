@@ -1314,9 +1314,8 @@ locincpth="$locincpth /opt/gnu/include /usr/GNU/include /opt/GNU/include"
 : no include file wanted by default
 inclwanted=''
 
-: Enable -DEBUGGING and -DDEBUGGING from the command line
-EBUGGING=''
-DEBUGGING=old
+: Enable -DDEBUGGING from the command line
+DEBUGGING=$undef
 
 ccname=''
 ccversion=''
@@ -1678,7 +1677,7 @@ Usage: $me [-dehrsEKOSV] [-f config.sh] [-D symbol] [-D symbol=value]
          -Duse64bitall            use 64bit integers and pointers
          -Dusethreads             use thread support
          -Dinc_version_list=none  do not include older perl trees in $^INCLUDE_PATH
-         -DEBUGGING=none          DEBUGGING options
+         -DDEBUGGING              DEBUGGING options
          -Dcc=gcc                 choose your compiler
          -Dprefix=/opt/perl5      choose your destination
   -E : stop at the end of questions, after having produced config.sh.
@@ -4964,34 +4963,19 @@ case "$optimize" in
 esac
 
 : Check what DEBUGGING is required from the command line
-: -DEBUGGING      or -DDEBUGGING or
-: -DEBUGGING=both			= -g + -DDEBUGGING
-: -DEBUGGING=-g   or -Doptimize=-g	= -g
-: -DEBUGGING=none or -UDEBUGGING	=
-: -DEBUGGING=old  or -DEBUGGING=default	= ? $optimize
-case "$EBUGGING" in
-'')	;;
-*)	DEBUGGING=$EBUGGING ;;
-esac
-
+: -DDEBUGGING or
+: -UDEBUGGING	=
 case "$DEBUGGING" in
--g|both|$define)
+$define)
     case "$optimize" in
 	*-g*) ;;
 	*)    optimize="$optimize -g" ;;
-    esac ;;
-none|$undef)
-    case "$optimize" in
-	*-g*)	set `echo "X $optimize " | sed 's/ -g / /'`
-		shift
-		optimize="$*"
-		;;
     esac ;;
 esac
 
 dflt=''
 case "$DEBUGGING" in
-both|$define) dflt='-DDEBUGGING'
+$define) dflt='-DDEBUGGING'
 esac
 
 : argument order is deliberate, as the flag will start with - which set could
@@ -5026,9 +5010,6 @@ case "$hint" in
 default|recommended)
 	case "$gccversion" in
 	1*) dflt="$dflt -fpcc-struct-return" ;;
-	esac
-	case "$optimize:$DEBUGGING" in
-	*-g*:old) dflt="$dflt -DDEBUGGING";;
 	esac
 	case "$gccversion" in
 	2*) if $test -d /etc/conf/kconfig.d &&
