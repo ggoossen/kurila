@@ -912,6 +912,10 @@ EXTERN_C int usleep(unsigned int);
 
 #endif /* PERL_CORE */
 
+#if defined(DEBUGGING) || defined(PERL_EXT_RE_BUILD)
+#  define RE_DEBUGGING
+#endif
+
 /* We no longer default to creating a new SV for GvSV.
    Do this before embed.  */
 #ifndef PERL_CREATE_GVSV
@@ -3227,10 +3231,6 @@ typedef        struct crypt_data {     /* straight from /usr/include/crypt.h */
 #define FAKE_BIT_BUCKET
 #endif
 
-#if defined(DEBUGGING) || defined(PERL_EXT_RE_BUILD)
-#  define RE_DEBUGGING
-#endif
-
 /* [perl #22371] Algorimic Complexity Attack on Perl 5.6.1, 5.8.0.
  * Note that the USE_HASH_SEED and USE_HASH_SEED_EXPLICIT are *NOT*
  * defined by Configure, despite their names being similar to the
@@ -5527,6 +5527,8 @@ extern void moncontrol(int);
 */
 
 #endif /* Include guard */
+
+#define CLEAR_ERRSV() STMT_START { sv_setpvn(ERRSV,"",0); if (SvMAGICAL(ERRSV)) { mg_free(ERRSV); } SvPOK_only(ERRSV); } STMT_END
 
 /*
  * Local variables:

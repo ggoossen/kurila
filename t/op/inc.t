@@ -1,6 +1,6 @@
 #!./perl -w
 
-print $^STDOUT, "1..51\n"
+print $^STDOUT, "1..55\n"
 
 my $test = 1
 
@@ -256,3 +256,14 @@ for my $n (47..113)
     last
 
 die "Could not find a value which overflows the mantissa" unless $found
+
+# these will segfault if they fail
+
+sub PVBM () { 'foo' }
+do
+    my $dummy = index 'foo', PVBM
+
+ok (scalar try { my $pvbm = PVBM; $pvbm++ });
+ok (scalar try { my $pvbm = PVBM; $pvbm-- });
+ok (scalar try { my $pvbm = PVBM; ++$pvbm });
+ok (scalar try { my $pvbm = PVBM; --$pvbm });

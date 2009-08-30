@@ -228,7 +228,7 @@ Given the following module, PerlIO::via::Hex :
     1;
 
 The following code opens up an output handle that will convert any
-output to a hexadecimal dump of the output bytes: for example "A" will
+output to hexadecimal dump of the output bytes: for example "A" will
 be converted to "41" (on ASCII-based machines, on EBCDIC platforms
 the "A" will become "c1")
 

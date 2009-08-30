@@ -524,4 +524,3 @@ eval q/if ($a) { } elseif ($b) { }/;
 EXPECT
 elseif should be elsif at (eval 1) line 1 character 13.
     (eval) called at - line 3 character 1.
-########

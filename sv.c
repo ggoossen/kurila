@@ -1434,6 +1434,8 @@ Perl_sv_setiv(pTHX_ register SV *const sv, const IV i)
 	break;
 
     case SVt_PVGV:
+	if (!isGV_with_GP(sv))
+	    break;
     case SVt_PVAV:
     case SVt_PVHV:
     case SVt_PVCV:
@@ -1539,6 +1541,8 @@ Perl_sv_setnv(pTHX_ register SV *const sv, const NV num)
 	break;
 
     case SVt_PVGV:
+	if (!isGV_with_GP(sv))
+	    break;
     case SVt_PVAV:
     case SVt_PVHV:
     case SVt_PVCV:
@@ -3428,6 +3432,10 @@ Perl_sv_chop(pTHX_ register SV *const sv, register const char *const ptr)
     }
     assert(ptr > SvPVX_const(sv));
     SV_CHECK_THINKFIRST(sv);
+    if (SvLEN(sv))
+	assert(delta <= SvLEN(sv));
+    else
+	assert(delta <= SvCUR(sv));
 
     if (!SvOOK(sv)) {
 	if (!SvLEN(sv)) { /* make copy of shared string */
@@ -6320,11 +6328,14 @@ Perl_sv_2io(pTHX_ SV *const sv)
 	io = (IO*)sv;
 	break;
     case SVt_PVGV:
-	gv = (GV*)sv;
-	io = GvIO(gv);
-	if (!io)
-	    Perl_croak(aTHX_ "Bad filehandle: %s", GvNAME(gv));
-	break;
+	if (isGV_with_GP(sv)) {
+	    gv = (GV*)sv;
+	    io = GvIO(gv);
+	    if (!io)
+		Perl_croak(aTHX_ "Bad filehandle: %s", GvNAME(gv));
+	    break;
+	}
+	/* FALL THROUGH */
     default:
 	if (!SvOK(sv))
 	    Perl_croak(aTHX_ PL_no_usym, "filehandle");
@@ -6505,7 +6516,8 @@ Perl_sv_reftype(pTHX_ const SV *const sv, const int ob)
 	case SVt_PVAV:		return "ARRAY";
 	case SVt_PVHV:		return "HASH";
 	case SVt_PVCV:		return "CODE";
-	case SVt_PVGV:		return "GLOB";
+	case SVt_PVGV:		return (char *) (isGV_with_GP(sv)
+				    ? "GLOB" : "SCALAR");
 	case SVt_PVIO:		return "IO";
 	case SVt_BIND:		return "BIND";
 	case SVt_REGEXP:	return "REGEXP"; 
@@ -8859,6 +8871,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 
     case OP_PRTF:
     case OP_PRINT:
+	match = 1; /* print etc can return undef on defined args */
 	/* skip filehandle as it can't produce 'undef' warning  */
 	o = cUNOPx(obase)->op_first;
 	if (o->op_type == OP_PUSHMARK)
@@ -8868,8 +8881,76 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 
     case OP_ENTEREVAL: /* could be eval $undef or $x='$undef'; eval $x */
     case OP_RV2SV:
-    case OP_CUSTOM:
-	match = 1; /* XS or custom code could trigger random warnings */
+    case OP_CUSTOM: /* XS or custom code could trigger random warnings */
+
+	/* the following ops are capable of returning PL_sv_undef even for
+	 * defined arg(s) */
+
+    case OP_BACKTICK:
+    case OP_PIPE_OP:
+    case OP_FILENO:
+    case OP_BINMODE:
+    case OP_GETC:
+    case OP_SYSREAD:
+    case OP_SEND:
+    case OP_IOCTL:
+    case OP_SOCKET:
+    case OP_SOCKPAIR:
+    case OP_BIND:
+    case OP_CONNECT:
+    case OP_LISTEN:
+    case OP_ACCEPT:
+    case OP_SHUTDOWN:
+    case OP_SSOCKOPT:
+    case OP_GETPEERNAME:
+    case OP_FTRREAD:
+    case OP_FTRWRITE:
+    case OP_FTREXEC:
+    case OP_FTROWNED:
+    case OP_FTEREAD:
+    case OP_FTEWRITE:
+    case OP_FTEEXEC:
+    case OP_FTEOWNED:
+    case OP_FTIS:
+    case OP_FTZERO:
+    case OP_FTSIZE:
+    case OP_FTFILE:
+    case OP_FTDIR:
+    case OP_FTLINK:
+    case OP_FTPIPE:
+    case OP_FTSOCK:
+    case OP_FTBLK:
+    case OP_FTCHR:
+    case OP_FTTTY:
+    case OP_FTSUID:
+    case OP_FTSGID:
+    case OP_FTSVTX:
+    case OP_FTTEXT:
+    case OP_FTBINARY:
+    case OP_FTMTIME:
+    case OP_FTATIME:
+    case OP_FTCTIME:
+    case OP_READLINK:
+    case OP_OPEN_DIR:
+    case OP_READDIR:
+    case OP_TELLDIR:
+    case OP_SEEKDIR:
+    case OP_REWINDDIR:
+    case OP_CLOSEDIR:
+    case OP_GMTIME:
+    case OP_ALARM:
+    case OP_SEMGET:
+    case OP_GETLOGIN:
+    case OP_UNDEF:
+    case OP_SUBSTR:
+    case OP_SORT:
+    case OP_CALLER:
+    case OP_PROTOTYPE:
+    case OP_NCMP:
+    case OP_UNPACK:
+    case OP_SYSOPEN:
+    case OP_SYSSEEK:
+	match = 1;
 	goto do_op;
 
     case OP_ENTERSUB:
@@ -8879,6 +8960,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 	  don't try to determine the value under those circumstances.
 	  Need a better fix at dome point. DAPM 11/2007 */
 	break;
+
 
     case OP_POS:
 	/* def-ness of rval pos() is independent of the def-ness of its arg */

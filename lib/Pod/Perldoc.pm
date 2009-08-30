@@ -28,6 +28,7 @@ use Pod::Perldoc::GetOptsOO # uses the DEBUG.
 
 sub TRUE  () {1}
 sub FALSE () {return}
+sub BE_LENIENT () {1}
 
 BEGIN 
     *IS_VMS     = $^OS_NAME eq 'VMS'     ?? \&TRUE !! \&FALSE unless exists &IS_VMS
@@ -92,9 +93,7 @@ sub opt_M_with($self, $classes)
             push @classes_to_add, $1 # untaint
         else
             warn "\"$classname\" isn't a valid classname.  Ignoring.\n"
-        
     
-
     unshift  $self->{'formatter_classes'}->@, < @classes_to_add
 
     DEBUG +> 3 and print($^STDOUT,
@@ -231,6 +230,7 @@ sub usage
 perldoc [options] PageName|ModuleName|ProgramName...
 perldoc [options] -f BuiltinFunction
 perldoc [options] -q FAQRegex
+perldoc [options] -v PerlVariable
 
 Options:
     -h   Display this help message
@@ -244,7 +244,7 @@ Options:
     -n   Specify replacement for nroff
     -l   Display the module's file name
     -F   Arguments are file names, not modules
-    -v   Verbosely describe what's going on
+    -D   Verbosely describe what's going on
     -T   Send output to STDOUT without any pager
     -d output_filename_to_send_to
     -o output_format_name
@@ -253,6 +253,8 @@ Options:
     -L translation_code   Choose doc translation (if any)
     -X   use index if present (looks for pod.idx at $(config_value('archlib')))
     -q   Search the text of questions (not answers) in perlfaq[1-9]
+    -f   Search Perl built-in functions
+    -v   Search predefined Perl variables
 
 PageName|ModuleName...
          is the name of a piece of documentation that you want to look at. You
@@ -287,6 +289,7 @@ sub usage_brief
 Usage: $me [-h] [-V] [-r] [-i] [-v] [-t] [-u] [-m] [-n nroffer_program] [-l] [-T] [-d output_filename] [-o output_format] [-M FormatterModuleNameToUse] [-w formatter_option:option_value] [-L translation_code] [-F] [-X] PageName|ModuleName|ProgramName
        $me -f PerlFunc
        $me -q FAQKeywords
+       $me -A PerlVar
 
 The -h option prints more help.  Also try "perldoc perldoc" to get
 acquainted with the system.                        [Perldoc v$VERSION]
@@ -404,12 +407,11 @@ sub process
 
     my @pages
     $self->{+'pages'} = \@pages
-    if(    $self->opt_f) { @pages = (@: "perlfunc")               }
-        elsif( $self->opt_q) { @pages ="perlfaq1" .. "perlfaq9" }
-    else                 { @pages = $self->{?'args'}->@;
-    # @pages = __FILE__
-    #  if @pages == 1 and $pages[0] eq 'perldoc';
-    }
+    if(    $self->opt_f) @pages = (@: "perlfunc")              
+    elsif( $self->opt_q) @pages ="perlfaq1" .. "perlfaq9"
+    else                 @pages = $self->{?'args'}->@
+                         # @pages = __FILE__
+                         #  if @pages == 1 and $pages[0] eq 'perldoc';
 
     return $self->usage_brief  unless  (nelems @pages)
 
@@ -1668,7 +1670,45 @@ sub drop_privs_maybe
 
 __END__
 
-# See "perldoc perldoc" for basic details.
+=head1 NAME
+
+Pod::Perldoc - Look up Perl documentation in Pod format.
+
+=head1 SYNOPSIS
+
+    use Pod::Perldoc ();
+
+    Pod::Perldoc->run();
+
+=head1 DESCRIPTION
+
+The guts of L<perldoc> utility.
+
+=head1 SEE ALSO
+
+L<perldoc>
+
+=head1 COPYRIGHT AND DISCLAIMERS
+
+Copyright (c) 2002-2007 Sean M. Burke.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=head1 AUTHOR
+
+Current maintainer: Adriano R. Ferreira <ferreira@cpan.org>
+
+Past contributions from:
+Sean M. Burke <sburke@cpan.org>
+
+=cut
+
+# 
 #
 # Perldoc -- look up a piece of documentation in .pod format that
 # is embedded in the perl installation tree.

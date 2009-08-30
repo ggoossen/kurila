@@ -1741,7 +1741,9 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 
     /* if we got here, ob should be a reference or a glob */
     if (!ob || !(SvOBJECT(ob)
-		 || (SvTYPE(ob) == SVt_PVGV && (ob = (SV*)GvIO((GV*)ob))
+		 || (SvTYPE(ob) == SVt_PVGV 
+		     && isGV_with_GP(ob)
+		     && (ob = (SV*)GvIO((GV*)ob))
 		     && SvOBJECT(ob))))
     {
 	Perl_croak(aTHX_ "Can't call method \"%s\" on unblessed reference",

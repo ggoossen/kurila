@@ -201,6 +201,7 @@ Use of uninitialized value within @ma in sin at - line 11 character 6.
 Use of uninitialized value within %main::gh in sin at - line 12 character 6.
 Use of uninitialized value within %mh in sin at - line 13 character 6.
 ########
+# TODO warnings inside print
 use warnings 'uninitialized';
 my ($m1, $m2);
 our ($g1, @ga);

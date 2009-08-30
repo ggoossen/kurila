@@ -377,5 +377,3 @@ do
     eval undef
     print $^STDOUT, "not " unless $^EVAL_ERROR eq ""
     print $^STDOUT, "ok $test # eval undef \n"; $test++
-
-

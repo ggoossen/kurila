@@ -551,7 +551,7 @@ PP(pp_pipe_op)
     if (!rgv || !wgv)
 	goto badexit;
 
-    if (SvTYPE(rgv) != SVt_PVGV || SvTYPE(wgv) != SVt_PVGV)
+    if (!isGV_with_GP(rgv) || !isGV_with_GP(wgv))
 	DIE(aTHX_ PL_no_usym, "filehandle");
     rstio = GvIOn(rgv);
     wstio = GvIOn(wgv);
@@ -1462,11 +1462,11 @@ PP(pp_truncate)
 	    SV * const sv = POPs;
 	    const char *name;
 
-	    if (SvTYPE(sv) == SVt_PVGV) {
+	    if (isGV_with_GP(sv)) {
 	        tmpgv = (GV*)sv;		/* *main::FRED for example */
 		goto do_ftruncate_gv;
 	    }
-	    else if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVGV) {
+	    else if (SvROK(sv) && isGV_with_GP(SvRV(sv))) {
 	        tmpgv = (GV*) SvRV(sv);	/* \*main::FRED for example */
 		goto do_ftruncate_gv;
 	    }
@@ -2650,10 +2650,10 @@ PP(pp_chdir)
 	if (PL_op->op_flags & OPf_SPECIAL) {
 	    gv = gv_fetchsv(sv, 0, SVt_PVIO);
 	}
-        else if (SvTYPE(sv) == SVt_PVGV) {
+        else if (isGV_with_GP(sv)) {
 	    gv = (GV*)sv;
         }
-	else if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVGV) {
+	else if (SvROK(sv) && isGV_with_GP(SvRV(sv))) {
             gv = (GV*)SvRV(sv);
         }
         else {

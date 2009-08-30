@@ -193,7 +193,6 @@ do
           '-v looks okay' )
 
 
-
 # Tests for -h
 
 do
@@ -202,7 +201,6 @@ do
     like( runperl( switches => \(@: '-h') ),
           qr/Usage: .+(?i:perl(?:$(config_value('_exe')))?).+switches.+programfile.+arguments/,
           '-h looks okay' )
-
 
 
 # Tests for switches which do not exist
@@ -214,5 +212,4 @@ foreach my $switch (split m//, "ABbGgHJjKkLNOoPQqRrYyZz123456789_")
                    prog => 'die "oops"' ),
           qr/\QUnrecognized switch: -$switch  (-h will show valid options)/,
           "-$switch correctly unknown" )
-
 

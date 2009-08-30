@@ -78,7 +78,7 @@ if (-e $patch_file) {
 %opt{+VERSION} = "%opt{?PERL_REVISION}.%opt{?PERL_VERSION}.%opt{?PERL_SUBVERSION}";
 %opt{+INST_VER} =~ s|~VERSION~|%opt{?VERSION}|g;
 %opt{+'version_patchlevel_string'} = "version %opt{?PERL_VERSION} subversion %opt{?PERL_SUBVERSION}";
-%opt{+'version_patchlevel_string'} .= " patchlevel %opt{?PERL_PATCHLEVEL}" if exists %opt{PERL_PATCHLEVEL};
+%opt{+'version_patchlevel_string'} .= " patch %opt{?PERL_PATCHLEVEL}" if exists %opt{PERL_PATCHLEVEL};
 
 my $ver = `ver 2>nul`;
 if ($ver =~ m/Version (\d+\.\d+)/) {
@@ -128,6 +128,20 @@ if (%opt{?uselargefiles} eq 'define' and %opt{?cc} ne 'bcc32') {
     }
     elsif (%opt{?cc} eq 'gcc') {
 	%opt{+lseektype} = 'long long';
+    }
+}
+
+# change the sGMTIME_min and sGMTIME_max for VS2005 (aka VC 8) and
+# VS2008 (aka VC 9) or higher (presuming that later versions will have
+# at least the range of that).
+if ($opt{cc} eq 'cl' and $opt{ccversion} =~ /^(\d+)/) {
+    my $ccversion = $1;
+    if ($ccversion == 14) {
+	$opt{sGMTIME_max} = 32535244799;
+    }
+    elsif ($ccversion >= 15) {
+	$opt{sGMTIME_min} = -43200;
+	$opt{sGMTIME_max} = 32535291599;
     }
 }
 
