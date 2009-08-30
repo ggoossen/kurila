@@ -16,7 +16,6 @@ if ($^OS_NAME eq 'mpeix')
     print $^STDOUT, "1..0 # Skip: fork/status problems on MPE/iX\n"
     exit 0
 
-
 $^OUTPUT_AUTOFLUSH=1
 
 our (@prgs, $tmpfile, $CAT, $status, $i)

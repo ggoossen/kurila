@@ -64,9 +64,8 @@ for (17..23)
 # something else.  ftell() on pipes, fifos, and sockets is defined to
 # return -1.
 
-my $written = "tell_write.txt"
-
-END { 1 while unlink($written) }
+require './test.pl'
+my $written = tempfile()
 
 close($TST)
 open(my $tst, ">","$written")  || die "Cannot open $written:$^OS_ERROR"

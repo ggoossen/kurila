@@ -1604,6 +1604,7 @@ Perl_hv_kill_backrefs(pTHX_ HV *hv) {
     if (av) {
 	HvAUX(hv)->xhv_backreferences = 0;
 	Perl_sv_kill_backrefs(aTHX_ (SV*) hv, av);
+	SvREFCNT_dec(av);
     }
 }
 

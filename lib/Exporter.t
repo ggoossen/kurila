@@ -20,14 +20,11 @@ sub ok($ok, $name)
     return $ok
 
 
-
 BEGIN 
     $test = 1
-    print $^STDOUT, "1..26\n"
+    print $^STDOUT, "1..25\n"
     require Exporter
     ok( 1, 'Exporter compiled' )
-
-
 
 our @Exporter_Methods
 
@@ -38,8 +35,6 @@ BEGIN
                            require_version
                            export_fail
                           )
-
-
 
 do
     package Testing
@@ -192,11 +187,4 @@ main::ok(\&import \== \&Exporter::import, "imported the import routine")
 
 our @EXPORT = qw( wibble )
 sub wibble {return "wobble"};
-
-package Use::The::Import
-
-The::Import->import
-
-my $val = try { wibble() }
-main::ok($val eq "wobble", "exported importer worked")
 

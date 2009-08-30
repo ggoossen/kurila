@@ -68,7 +68,8 @@ true)
 			     -install_name \$(shrpdir)/\$@"
 		;;
 	cygwin*)
-		linklibperl="-lperl"
+		shrpldflags="$shrpldflags -Wl,--out-implib=libperl.dll.a -Wl,--image-base,0x52000000"
+		linklibperl="-L. -lperl"
 		;;
 	sunos*)
 		linklibperl="-lperl"
@@ -164,7 +165,7 @@ for f in $dynamic_ext; do
 
     : Parallel makes reveal that we have some interdependencies
     case $f in
-	Math/BigInt/FastCalc) extra_dep="$extra_dep
+	Math/BigInt/FastCalc|Devel/NYTProf) extra_dep="$extra_dep
 $this_target: lib/auto/List/Util/Util.$dlext" ;;
 	Unicode/Normalize) extra_dep="$extra_dep
 $this_target: uni.data" ;;
@@ -513,19 +514,9 @@ miniperlmain$(OBJ_EXT): miniperlmain.c patchlevel.h
 perlmain.c: miniperlmain.c config.sh $(FIRSTMAKEFILE)
 	sh writemain $(DYNALOADER) $(static_ext) > perlmain.c
 
-!NO!SUBS!
-case "$osname" in
-cygwin)
-	;; # Let cygwin/Makefile.SHs do its work.
-*)
-	$spitshell >>Makefile <<'!NO!SUBS!'
 perlmain$(OBJ_EXT): perlmain.c
 	$(CCCMD) $(PLDLFLAGS) $*.c
 
-!NO!SUBS!
-	;;
-esac
-$spitshell >>Makefile <<'!NO!SUBS!'
 # The file ext.libs is a list of libraries that must be linked in
 # for static extensions, e.g. -lm -lgdbm, etc.  The individual
 # static extension Makefile's add to it.
@@ -598,9 +589,22 @@ perl5.def: $(MINIPERLEXP) makedef.pl config.sh $(SYM) $(SYMH) miniperl.map
 
 !NO!SUBS!
 	;;
+cygwin)
+	$spitshell >>Makefile <<'!NO!SUBS!'
+cygwin.c: cygwin/cygwin.c
+	$(LNS) cygwin/cygwin.c
+
+LIBPERL_NONSHR		= libperl$(LIB_EXT)
+
+$(LIBPERL_NONSHR): $(obj)
+	$(RMS) $(LIBPERL_NONSHR)
+	$(AR) rcu $(LIBPERL_NONSHR) $(obj)
+
+!NO!SUBS!
+	;;
 esac
 
-if test -r $Makefile_s ; then
+if test -s $Makefile_s ; then
 	. $Makefile_s
 	$spitshell >>Makefile <<!GROK!THIS!
 
@@ -1064,6 +1068,7 @@ realclean:	cleanup_unpacked_files _realcleaner _mopup
 
 _clobber:
 	-@rm -f Cross/run-* Cross/to-* Cross/from-*
+	rm -f t/test_state
 	rm -f config.sh cppstdin Policy.sh extras.lst
 
 clobber:	cleanup_unpacked_files _realcleaner _mopup _clobber
@@ -1133,7 +1138,6 @@ _cleaner2:
 	-rmdir lib/Filter/Util lib/IO/Socket
 	-rmdir lib/List lib/MIME lib/Scalar lib/Sys
 	-rmdir lib/XS
-	-rm -f cygcrypt-0.dll cygwin1.dll
 	-rm -f lib/ExtUtils/CBuilder/t/libcompilet.dll.a
 	-rm -f lib/ExtUtils/ParseXS/t/libXSTest.dll.a
 

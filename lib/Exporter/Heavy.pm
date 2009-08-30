@@ -1,4 +1,12 @@
-package Exporter
+package Exporter::Heavy;
+
+# On one line so MakeMaker will see it.
+our $VERSION = $Exporter::VERSION;
+
+package Exporter;
+
+# Carp 1.05+ does this now for us, but we may be running with an old Carp
+%Carp::Internal{+'Exporter::Heavy'}++;
 
 =head1 NAME
 
@@ -153,12 +161,6 @@ sub export($pkg, $callpkg, @< @imports)
             $type eq '@' ?? \Symbol::fetch_glob("$($pkg)::$sym")->*->@ !!
             $type eq '%' ?? \Symbol::fetch_glob("$($pkg)::$sym")->*->% !!
             warn("Can't export symbol: $type$sym")
-
-
-
-sub export_to_level($pkg, $level, _, @< @args)
-    my $callpkg = caller($level)
-    $pkg->export($callpkg, < @args)
 
 
 # Utility functions

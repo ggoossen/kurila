@@ -7,7 +7,7 @@
 # This program is free software; you may redistribute it and/or modify it
 # under the same terms as Perl itself.
 
-use Test::More tests => 1
+use Test::More tests => 3
 
 use Pod::Man
 
@@ -20,6 +20,7 @@ while (~< $^DATA)
         my @: $option, $value = split
         %options{+$option} = $value
 
+    local $TODO = delete %options{?TODO}
     open (my $tmpfh, '>', 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n"
     while (~< $^DATA)
         last if $_ eq "###\n"
@@ -44,7 +45,8 @@ while (~< $^DATA)
         $expected .= $_
 
     ok($output eq $expected)
-        or diag "Expected\n========\n$expected\nOutput\n======\n$output\n"
+        or diag "Expected\n========\n$(dump::view($expected))\n"
+            . "Output\n======\n$(dump::view($output))\n"
     $n++
 
 # Below the marker are bits of POD and corresponding expected text output.
@@ -77,4 +79,32 @@ Beyoncé!  Beyoncé!  Beyoncé!!
 .Ve
 .PP
 Older versions did not convert Beyoncé in verbatim.
+###
+
+###
+utf8 1
+TODO 1
+###
+=head1 SE<lt>E<gt> output with UTF-8
+
+This is S<non-breaking output>.
+###
+.SH "S<> output with UTF\-8"
+.IX Header "S<> output with UTF-8"
+This is non\-breaking output.
+###
+
+###
+fixed CR
+fixedbold CY
+fixeditalic CW
+fixedbolditalic CX
+###
+=head1 FIXED FONTS
+
+C<foo B<bar I<baz>> I<bay>>
+###
+.SH "FIXED FONTS"
+.IX Header "FIXED FONTS"
+\&\f(CR\*(C`foo \f(CYbar \f(CXbaz\f(CY\f(CR \f(CWbay\f(CR\*(C'\fR
 ###

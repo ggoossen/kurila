@@ -74,7 +74,7 @@ sub test_outtmp
     
     close $out
     ok($output eq $expected) 
-        or diag "$msg\nEXPECTED:\n$expected\nOUTPUT:\n$output\n"
+        or diag "$msg\nEXPECTED:\n$(dump::view($expected))\nOUTPUT:\n$(dump::view($output))\n"
     
     $n++
 
@@ -350,7 +350,7 @@ Oboy, is this C++ "fun" yet! (guesswork)
 ###
 .SH "NAME"
 "Stuff" (no guesswork)
-.Sh "\s-1THINGS\s0"
+.SS "\s-1THINGS\s0"
 .IX Subsection "THINGS"
 Oboy, is this \*(C+ \*(L"fun\*(R" yet! (guesswork)
 ###

@@ -34,7 +34,6 @@ Cross/warp		Cross-compilation
 cv.h			Code value header
 cv_i.h			Code value inline functions
 cygwin/cygwin.c		Additional code for Cygwin port
-cygwin/Makefile.SHs	Shared library generation for Cygwin port
 deb.c			Debugging routines
 djgpp/config.over	DOS/DJGPP port
 djgpp/configure.bat	DOS/DJGPP port
@@ -1208,6 +1207,8 @@ lib/Pod/t/parselink.t		podlators test
 lib/Pod/t/pod2html-lib.pl	pod2html testing library
 lib/Pod/t/pod2latex.t		See if Pod::LaTeX works
 lib/Pod/t/pod-parser.t		podlators test
+lib/Pod/t/pod-spelling.t	podlators test
+lib/Pod/t/pod.t			podlators test
 lib/Pod/t/Select.t		See if Pod::Select works
 lib/Pod/t/termcap.t		podlators test
 lib/Pod/t/text-options.t		podlators test
@@ -1983,7 +1984,7 @@ t/lib/compmod.pl		Helper for 1_compile.t
 t/lib/contains_pod.xr		Pod-Parser test file
 t/lib/cygwin.t			Builtin cygwin function tests
 t/lib/Devel/switchd.pm		Module for t/run/switchd.t
-t/lib/Dev/Null.pm		Module for testing Test::Harness
+t/lib/Dev/Null.pm		Test::More test module
 t/lib/feature/bundle		Tests for feature bundles
 t/lib/feature/nonesuch		Tests for enabling/disabling nonexistent feature
 t/lib/Filter/Simple/ExportTest.pm	Helper file for Filter::Simple tests

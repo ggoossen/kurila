@@ -170,6 +170,13 @@ Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
 #  define POSION_SV_HEAD(sv)
 #endif
 
+/* Mark an SV head as unused, and add to free list.
+ *
+ * If SVf_BREAK is set, skip adding it to the free list, as this SV had
+ * its refcount artificially decremented during global destruction, so
+ * there may be dangling pointers to it. The last thing we want in that
+ * case is for it to be reused. */
+
 #define plant_SV(p) \
     STMT_START {					\
 	POSION_SV_HEAD(p);				\
@@ -3420,6 +3427,7 @@ Perl_sv_chop(pTHX_ register SV *const sv, register const char *const ptr)
 #ifdef DEBUGGING
     const U8 *real_start;
 #endif
+    STRLEN max_delta;
 
     PERL_ARGS_ASSERT_SV_CHOP;
 
@@ -3430,12 +3438,17 @@ Perl_sv_chop(pTHX_ register SV *const sv, register const char *const ptr)
 	/* Nothing to do.  */
 	return;
     }
-    assert(ptr > SvPVX_const(sv));
+    /* SvPVX(sv) may move in SV_CHECK_THINKFIRST(sv), but after this line,
+       nothing uses the value of ptr any more.  */
+    max_delta = SvLEN(sv) ? SvLEN(sv) : SvCUR(sv);
+    if (ptr <= SvPVX_const(sv))
+	Perl_croak(aTHX_ "panic: sv_chop ptr=%p, start=%p, end=%p",
+		   ptr, SvPVX_const(sv), SvPVX_const(sv) + max_delta);
     SV_CHECK_THINKFIRST(sv);
-    if (SvLEN(sv))
-	assert(delta <= SvLEN(sv));
-    else
-	assert(delta <= SvCUR(sv));
+    if (delta > max_delta)
+	Perl_croak(aTHX_ "panic: sv_chop ptr=%p (was %p), start=%p, end=%p",
+		   SvPVX_const(sv) + delta, ptr, SvPVX_const(sv),
+		   SvPVX_const(sv) + max_delta);
 
     if (!SvOOK(sv)) {
 	if (!SvLEN(sv)) { /* make copy of shared string */
@@ -3901,6 +3914,24 @@ Perl_sv_rvweaken(pTHX_ SV *const sv)
  * back-reference to sv onto the array associated with the backref magic.
  */
 
+/* A discussion about the backreferences array and its refcount:
+ *
+ * The AV holding the backreferences is pointed to either as the mg_obj of
+ * PERL_MAGIC_backref, or in the specific case of a HV that has the hv_aux
+ * structure, from the xhv_backreferences field. (A HV without hv_aux will
+ * have the standard magic instead.) The array is created with a refcount
+ * of 2. This means that if during global destruction the array gets
+ * picked on first to have its refcount decremented by the random zapper,
+ * it won't actually be freed, meaning it's still theere for when its
+ * parent gets freed.
+ * When the parent SV is freed, in the case of magic, the magic is freed,
+ * Perl_magic_killbackrefs is called which decrements one refcount, then
+ * mg_obj is freed which kills the second count.
+ * In the vase of a HV being freed, one ref is removed by
+ * Perl_hv_kill_backrefs, the other by Perl_sv_kill_backrefs, which it
+ * calls.
+ */
+
 void
 Perl_sv_add_backref(pTHX_ SV *const tsv, SV *const sv)
 {
@@ -3963,14 +3994,11 @@ S_sv_del_backref(pTHX_ SV *const tsv, SV *const sv)
 	if (mg)
 	    av = (AV *)mg->mg_obj;
     }
-    if (!av) {
-	if (PL_in_clean_all)
-	    return;
-	Perl_croak(aTHX_ "panic: del_backref");
-    }
 
-    if (SvIS_FREED(av))
-	return;
+    if (!av)
+	Perl_croak(aTHX_ "panic: del_backref");
+
+    assert(!SvIS_FREED(av));
 
     svp = AvARRAY(av);
     /* We shouldn't be in here more than once, but for paranoia reasons lets
@@ -4000,9 +4028,8 @@ Perl_sv_kill_backrefs(pTHX_ SV *const sv, AV *const av)
     PERL_ARGS_ASSERT_SV_KILL_BACKREFS;
     PERL_UNUSED_ARG(sv);
 
-    /* Not sure why the av can get freed ahead of its sv, but somehow it does
-       in ext/B/t/bytecode.t test 15 (involving print <DATA>)  */
-    if (svp && !SvIS_FREED(av)) {
+    assert(!svp || !SvIS_FREED(av));
+    if (svp) {
 	SV *const *const last = svp + AvFILLp(av);
 
 	while (svp <= last) {
@@ -6086,6 +6113,8 @@ Perl_newSVpvn_share(pTHX_ const char *src, I32 len, U32 hash)
     if (!hash)
 	PERL_HASH(hash, src, len);
     new_SV(sv);
+    /* The logic for this is inlined in S_mro_get_linear_isa_dfs(), so if it
+       changes here, update it there too.  */
     sv_upgrade(sv, SVt_PV);
     SvPV_set(sv, sharepvn(src, len, hash));
     SvLEN_set(sv, 0);

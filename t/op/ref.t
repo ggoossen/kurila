@@ -2,7 +2,7 @@
 
 require './test.pl'
 
-plan(137)
+plan(140)
 
 our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
     @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
@@ -425,6 +425,11 @@ ok (!try { $pvbm->@ }, 'PVBM is not an ARRAY ref');
 ok (!try { $pvbm->% }, 'PVBM is not a HASH ref');
 ok (!try { $pvbm->() }, 'PVBM is not a CODE ref');
 ok (!try { $rpvbm->foo }, 'PVBM is not an object');
+
+# bug 24254
+is( runperl(stderr => 1, prog => 'try { for (@: 1) { map { die }, @: 2 } };'), "");
+is( runperl(stderr => 1, prog => 'for (@: 125) { map { exit }, @: 213}'), "");
+like( runperl(stderr => 1, prog => 'for my $a (@: 3) {my @b=sort {die}, @: 4,5}'), qr/Died at -e line 1/);
 
 # Bit of a hack to make test.pl happy. There are 3 more tests after it leaves.
 $test = curr_test()

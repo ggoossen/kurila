@@ -15,7 +15,7 @@ our ($VERSION, @ISA, @EXPORT_OK,
 $VERSION = '1.51_01'
 @ISA= @: 'Exporter'
 @EXPORT_OK = qw(mkmanifest
-                manicheck  filecheck  fullcheck  skipcheck
+                maniskip manicheck  filecheck  fullcheck  skipcheck
                 manifind   maniread   manicopy   maniadd
                )
 
@@ -70,16 +70,14 @@ exported on request
     mkmanifest();
 
 Writes all files in and below the current directory to your F<MANIFEST>.
-It works similar to
+It works similar to the result of the Unix command
 
     find . > MANIFEST
 
 All files that match any regular expression in a file F<MANIFEST.SKIP>
 (if it exists) are ignored.
 
-Any existing F<MANIFEST> file will be saved as F<MANIFEST.bak>.  Lines
-from the old F<MANIFEST> file is preserved, including any comments
-that are found in the existing F<MANIFEST> file in the new one.
+Any existing F<MANIFEST> file will be saved as F<MANIFEST.bak>.
 
 =cut
 
@@ -95,7 +93,7 @@ sub mkmanifest
     $bakbase =~ s/\./_/g if $Is_VMS # avoid double dots
     rename $MANIFEST, "$bakbase.bak" unless $manimiss
     open my $m, ">", "$MANIFEST" or die "Could not open $MANIFEST: $^OS_ERROR"
-    my $skip = _maniskip()
+    my $skip = maniskip()
     my $found = manifind()
     my($key,$val,%all)
     %all = $found->% +%+ $read->%
@@ -116,6 +114,9 @@ sub mkmanifest
         my $tabs = (5 - (length($file)+1)/8)
         $tabs = 1 if $tabs +< 1
         $tabs = 0 unless $text
+        if ($file =~ m/\s/)
+            $file =~ s/([\\'])/\\$1/g
+            $file = "'$file'"
         print $m ,$file, "\t" x $tabs, $text, "\n"
     
     close $m
@@ -228,7 +229,7 @@ file.
 
 sub skipcheck(?$p)
     my $found = manifind()
-    my $matches = _maniskip()
+    my $matches = maniskip()
 
     my @skipped = $@
     foreach my $file ( _sort < keys $found->%)
@@ -270,7 +271,7 @@ sub _check_files
 sub _check_manifest(?$p)
     my $read = maniread() || \%: 
     my $found = manifind($p)
-    my $skip  = _maniskip()
+    my $skip  = maniskip()
 
     my @missentry = $@
     foreach my $file ( _sort < keys $found->%)
@@ -284,7 +285,6 @@ sub _check_manifest(?$p)
     
 
     return @missentry
-
 
 
 =item maniread
@@ -312,7 +312,14 @@ sub maniread(?$mfile)
         chomp
         next if m/^\s*#/
 
-        my @: ?$file, ?$comment = @: m/^(\S+)\s*(.*)/
+        my($file, $comment);
+
+        # filename may contain spaces if enclosed in ''
+        # (in which case, \\ and \' are escapes)
+        if (@: ?$file, ?$comment = @: m/^'(\\[\\']|.+)+'\s*(.*)/)
+            $file =~ s/\\([\\'])/$1/g
+        else
+            @: ?$file, ?$comment = @: m/^(\S+)\s*(.*)/
         next unless $file
 
         if ($Is_MacOS)
@@ -337,8 +344,21 @@ sub maniread(?$mfile)
     $read
 
 
+=item maniskip
+
+    my $skipchk = maniskip();
+    my $skipchk = maniskip($manifest_skip_file);
+
+    if ($skipchk->($file)) { .. }
+
+reads a named C<MANIFEST.SKIP> file (defaults to C<MANIFEST.SKIP> in
+the current directory) and returns a CODE reference that tests whether
+a given filename should be skipped.
+
+=cut
+
 # returns an anonymous sub that decides if an argument matches
-sub _maniskip
+sub maniskip
     my @skip 
     my $mfile = "$MANIFEST.SKIP"
     _check_mskip_directives($mfile) if -f $mfile
@@ -607,19 +627,21 @@ sub maniadd($additions)
 
     my $manifest = maniread()
     my @needed = grep { !exists $manifest->{$_} }, keys $additions->%
-    return 1 unless (nelems @needed)
+    return 1 unless @needed
 
     open(my $manifest_fh, ">>", "$MANIFEST") or
         die "maniadd() could not open $MANIFEST: $^OS_ERROR"
 
     foreach my $file ( _sort < @needed)
         my $comment = $additions->{?$file} || ''
+        if ($file =~ m/\s/)
+            $file =~ s/([\\'])/\\$1/g
+            $file = "'$file'"
         printf $manifest_fh ,"\%-40s \%s\n", $file, $comment
     
     close $manifest_fh or die "Error closing $MANIFEST: $^OS_ERROR"
 
     return 1
-
 
 
 # Sometimes MANIFESTs are missing a trailing newline.  Fix this.
@@ -657,11 +679,14 @@ means F<foo/bar> style not F<foo\bar>.
 
 Anything between white space and an end of line within a C<MANIFEST>
 file is considered to be a comment.  Any line beginning with # is also
-a comment.
+a comment. Beginning with ExtUtils::Manifest 1.52, a filename may
+contain whitespace characters if it is enclosed in single quotes; single
+quotes or backslashes in that filename must be backslash-escaped.
 
     # this a comment
     some/file
     some/other/file            comment about some/file
+    'some/third file'          comment
 
 
 =head2 MANIFEST.SKIP

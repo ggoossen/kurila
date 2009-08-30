@@ -208,7 +208,6 @@ SKIP: do
             or die $^OS_ERROR
         $^INCLUDED{+$filename} = "/custom/path/to/$filename"
         return $fh
-    
 
     require Publius::Vergilius::Maro
     is( $^INCLUDED{?'Publius/Vergilius/Maro.pm'},

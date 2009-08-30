@@ -748,7 +748,7 @@ package Maintainers;
 	'podlators' =>
 		\%(
 		'MAINTAINER'	=> 'rra',
-		'FILES'		=> q[lib/Pod/{Man,ParseLink,Text,Text/{Color,Overstrike,Termcap}}.pm pod/pod2man.PL pod/pod2text.PL lib/Pod/t/{basic.*,{man,parselink,text*}.t}],
+		'FILES'		=> q[lib/Pod/{Man,ParseLink,Text,Text/{Color,Overstrike,Termcap}}.pm pod/pod2man.PL pod/pod2text.PL lib/Pod/t/{basic.*,{color,filehandle,man*,parselink,pod-parser,pod-spelling,pod,termcap,text*}.t}],
 		'CPAN'		=> 1,
 		),
 
@@ -847,13 +847,7 @@ package Maintainers;
 	'Test::Harness' =>
 		\%(
 		'MAINTAINER'	=> 'andya',
-		'FILES'		=> q[lib/App/Prove.pm lib/App/Prove/State.pm
-				     lib/Test/Harness.pm lib/Test/Harness
-				     lib/TAP
-				     t/lib/data t/lib/sample-tests 
-				     t/lib/source_tests t/lib/Dev/Null.pm
-				     t/lib/App/Prove/Plugin/Dummy.pm
-				     t/lib/IO/c55Capture.pm t/lib/NoFork.pm],
+		'FILES'		=> q[ext/Test/Harness],
 		'CPAN'		=> 1,
 		),
 
@@ -863,7 +857,7 @@ package Maintainers;
 		'FILES'		=> q[lib/Test/Simple.pm lib/Test/Simple
 				     lib/Test/Builder.pm lib/Test/Builder
 				     lib/Test/More.pm
-				     t/lib/Test/Simple],
+				     t/lib/Test/Simple t/lib/Dev/Null.pm],
 		'CPAN'		=> 1,
 		),
 

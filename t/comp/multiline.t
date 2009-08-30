@@ -33,7 +33,6 @@ while ( ~< $try->*)
     $z .= $_
     $count = $count + 1
 
-
 is($z, $y,  'basic multiline reading')
 
 is($count, 7,   '    line count')

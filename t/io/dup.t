@@ -149,4 +149,3 @@ SKIP: do
     close $utfin
 
     END { 1 while unlink "dup$^PID" }
-

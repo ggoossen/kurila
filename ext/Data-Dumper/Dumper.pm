@@ -89,7 +89,6 @@ do
     *format_refaddr  = sub (@< @_)
         require Scalar::Util
         pack "J", Scalar::Util::refaddr(shift)
-    
 
 
 #

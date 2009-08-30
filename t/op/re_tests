@@ -1137,7 +1137,10 @@ foo(\R+)bar	foo\r\n\x{85}\r\n\nbar	y	$1	\r\n\x{85}\r\n\n
 .*?(?:(\w)|(\w))x	abx	y	$1-$2	b-
 
 0{50}	000000000000000000000000000000000000000000000000000	y	-	-
-# Bug #56690
-^a?(?=b)b	ab	B	$&	ab
-^a*(?=b)b	ab	B	$&	ab
-
+^a?(?=b)b	ab	B	$^MATCH	ab	# Bug #56690
+^a*(?=b)b	ab	B	$^MATCH	ab	# Bug #56690
+/>\d+$ \n/ix	>10\n	y	$^MATCH	>10
+/>\d+$ \n/ix	>1\n	y	$^MATCH	>1
+/\d+$ \n/ix	>10\n	y	$^MATCH	10
+/>\d\d$ \n/ix	>10\n	y	$^MATCH	>10
+/>\d+$ \n/x	>10\n	y	$^MATCH	>10

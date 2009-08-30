@@ -108,9 +108,6 @@ SKIP: do
                 is($result[$i], $j,
                    sprintf("$id - $i is \%s",
                    defined $j ?? $j !! "undef"))
-            
-        
-    
 
     check(PerlIO::get_layers($^STDIN),
           $UTF8_STDIN ?? (@:  "stdio", "utf8" ) !! (@:  "stdio" ),
@@ -165,7 +162,6 @@ SKIP: do
               (@: "stdio",    undef,        sub (@< @_) { @_[0] +> 0 }
                   "encoding", "iso-8859-1", sub (@< @_) { @_[0] ^&^ PerlIO::F_UTF8() } ),
               ":raw:encoding(latin1)")
-    
 
     binmode($f)
 
@@ -191,7 +187,5 @@ SKIP: do
 
         close $f
         close $g
-    
 
     1 while unlink "afile"
-

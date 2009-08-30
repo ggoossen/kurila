@@ -1,17 +1,6 @@
 #!/usr/bin/perl -w
 
-BEGIN 
-    if( env::var('PERL_CORE') )
-        chdir 't' if -d 't'
-        unshift $^INCLUDE_PATH, '../lib'
-    else
-        unshift $^INCLUDE_PATH, 't/lib'
-    
-
-chdir 't'
-
-
-use Test::More tests => 66
+use Test::More tests => 71
 use Cwd
 
 use File::Spec
@@ -36,7 +25,6 @@ sub add_file
     ++%Files{+$file}
     close $t
 
-
 sub read_manifest
     open( my $m, "<", 'MANIFEST' ) or return
     chomp( my @files = (@:  ~< $m->* ) )
@@ -59,8 +47,7 @@ sub remove_dir
 BEGIN 
     use_ok( 'ExtUtils::Manifest', <
             qw( mkmanifest manicheck filecheck fullcheck 
-                maniread manicopy skipcheck maniadd) )
-
+                maniread manicopy skipcheck maniadd maniskip) )
 
 my $cwd = Cwd::getcwd()
 
@@ -216,6 +203,52 @@ is( $files->{?wibble}, '',    'maniadd() with undef comment' )
 is( $files->{?yarrow}, 'hock','          with comment' )
 is( $files->{?foobar}, '',    '          preserved old entries' )
 
+my %funky_files;
+# test including a filename with a space
+SKIP: do
+    add_file( 'foo bar' => "space" )
+        or skip "couldn't create spaced test file", 2
+    local $ExtUtils::Manifest::MANIFEST = "albatross"
+    maniadd( \%: 'foo bar' => "contains space" )
+    is( maniread()->{'foo bar'}, "contains space",
+        'spaced manifest filename' )
+    add_file( 'albatross.bak', '' )
+    @: $res, $warn = catch_warning( \&mkmanifest )
+    like( $warn, qr/\A(Added to.*\n)+\z/m,
+          'no warnings about funky filename' )
+    %funky_files{+'space'} = 'foo bar'
+
+# test including a filename with a space and a quote
+SKIP: do
+    add_file( "foo\' baz\'quux" => "quote" )
+        or skip "couldn't create quoted test file", 1
+    local $ExtUtils::Manifest::MANIFEST = "albatross"
+    maniadd( \%: "foo\' baz\'quux" => "contains quote" )
+    is( maniread()->{"foo\' baz\'quux"}, "contains quote",
+        'quoted manifest filename' )
+    %funky_files{+'space_quote'} = "foo\' baz\'quux"
+
+# test including a filename with a space and a backslash
+SKIP: do
+    add_file( 'foo bar\\baz' => "backslash" )
+        or skip "couldn't create backslash test file", 1
+    local $ExtUtils::Manifest::MANIFEST = "albatross"
+    maniadd( \%: "foo bar\\baz" => "contains backslash" )
+    is( maniread()->{'foo bar\baz'}, "contains backslash",
+        'backslashed manifest filename' )
+    %funky_files{+'space_backslash'} = "foo bar\\baz"
+
+# test including a filename with a space, quote, and a backslash
+SKIP: do
+    add_file( "foo bar\\baz\'quux" => "backslash/quote" )
+        or skip "couldn't create backslash/quote test file", 1
+    local $ExtUtils::Manifest::MANIFEST = "albatross"
+    maniadd( \%: "foo bar\\baz\'quux" => "backslash and quote" )
+    is( maniread()->{"foo bar\\baz\'quux"}, "backslash and quote",
+        'backslashed and quoted manifest filename' )
+    %funky_files{+'space_quote_backslash'} = "foo bar\\baz\'quux"
+
+my @funky_keys = qw(space space_quote space_backslash space_quote_backslash)
 # test including an external manifest.skip file in MANIFEST.SKIP
 do
     maniadd(\(%:  foo => undef , albatross => undef

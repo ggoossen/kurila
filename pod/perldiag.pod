@@ -3182,6 +3182,11 @@ then discovered it wasn't a subroutine or eval context.
 
 (P) scan_num() got called on something that wasn't a number.
 
+=item panic: sv_chop %s
+
+(P) The sv_chop() routine was passed a position that is not within the
+scalar's string buffer.
+
 =item panic: sv_insert
 
 (P) The sv_insert() routine was told to remove more string than there
@@ -3406,6 +3411,20 @@ parentheses explicitly and write C<$x & ($y == 0)>).
 but there was no array C<@foo> in scope at the time. If you wanted a
 literal @foo, then write it as \@foo; otherwise find out what happened
 to the array you apparently lost track of.
+
+=item Possible unintended interpolation of $\ in regex
+
+(W ambiguous) You said something like C<m/$\/> in a regex.
+The regex C<m/foo$\s+bar/m> translates to: match the word 'foo', the output
+record separartor (see L<perlvar/$\>) and the letter 's' (one time or more)
+followed by the word 'bar'.
+
+If this is what you intended then you can silence the warning by using 
+C<m/${\}/> (for example: C<m/foo${\}s+bar/>).
+
+If instead you intended to match the word 'foo' at the end of the line
+followed by whitespace and the word 'bar' on the next line then you can use
+C<m/$(?)\/> (for example: C<m/foo$(?)\s+bar/>).
 
 =item pragma "attrs" is deprecated, use "sub NAME : ATTRS" instead
 

@@ -130,7 +130,6 @@ for (qw(system qx popen))
     push @delete, $f
     ++$t
 
-
 my $cmd = _create_runperl(
     prog =>
     sprintf('for (%d..%d) { print $^STDOUT, qq[ok $_\n] }', $t, $t+2))

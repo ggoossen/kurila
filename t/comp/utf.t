@@ -33,7 +33,7 @@ sub test {
     print UTF_PL "$tag\n";
     print UTF_PL $BOM if $bom;
     close(UTF_PL);
-    my $got = do "./utf.pl";
+    my $got = do "./utf$$.pl";
     is($got, $tag);
   }
 }
@@ -59,5 +59,5 @@ test("utf8",       1234,  0);
 test("utf8",       12345, 0);
 
 END {
-    1 while unlink "utf.pl";
+    1 while unlink "utf$$.pl";
 }

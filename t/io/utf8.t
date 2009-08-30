@@ -113,7 +113,6 @@ do
         print $f, $a
         ok( (!$^EVAL_ERROR))
         ok( ! $w, , "No 'Wide character in print' warning" )
-    
 
 
 # Hm. Time to get more evil.
@@ -226,7 +225,6 @@ do
     is( ord($a), 0x100, '23428 syswrite should not downgrade scalar' )
     like( $a, qr/^\w+/, '23428 syswrite should not downgrade scalar' )
 
-
 # sysread() and syswrite() tested in lib/open.t since Fcntl is used
 
 do
@@ -257,4 +255,3 @@ do
 END 
     1 while unlink "a"
     1 while unlink "b"
-

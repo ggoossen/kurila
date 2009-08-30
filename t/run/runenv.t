@@ -11,7 +11,6 @@ BEGIN
     unless (config_value('d_fork'))
         print $^STDOUT, "1..0 # Skip: no fork\n"
         exit 0
-    
 
 
 BEGIN { require './test.pl'; }

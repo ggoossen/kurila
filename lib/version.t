@@ -496,9 +496,13 @@ EOF
         try { my $v = $CLASS->new(^~^0); }
         unlike($^EVAL_ERROR, qr/Integer overflow in version/, "Too large version")
         like($warning->{?description}, qr/Integer overflow in version/, "Too large version")
-    
 
-
+    do
+        # http://rt.perl.org/rt3/Ticket/Display.html?id=56606
+        my $badv = bless((\%: version => \@: 1,2,3 ), "version")
+        is $badv->stringify, '1.002003', "Deal with badly serialized versions from YAML"
+        my $badv2 = bless((\%: qv => 1, version => \@: 1,2,3 ), "version")
+        is $badv2->stringify, 'v1.2.3', "Deal with badly serialized versions from YAML "
 
 1
 

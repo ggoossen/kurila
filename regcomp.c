@@ -4504,10 +4504,10 @@ Perl_reg_named_buff_fetch(pTHX_ REGEXP * const r, SV * const namesv,
                 if (retarray) {
                     SvREFCNT_inc_void(ret);
                     av_push(retarray, ret);
-                }
+		}
             }
             if (retarray)
-                return newRV((SV*)retarray);
+                return newRV_noinc((SV*)retarray);
         }
     }
     return NULL;
@@ -4604,6 +4604,7 @@ Perl_reg_named_buff_scalar(pTHX_ REGEXP * const r, const U32 flags)
             ret = CALLREG_NAMED_BUFF_ALL(r, (flags | RXapif_REGNAMES));
             av = (AV*)SvRV(ret);
             length = av_len(av);
+	    SvREFCNT_dec(ret);
             return newSViv(length + 1);
         } else {
             Perl_croak(aTHX_ "panic: Unknown flags %d in named_buff_scalar", (int)flags);
@@ -4645,7 +4646,7 @@ Perl_reg_named_buff_all(pTHX_ REGEXP * const r, const U32 flags)
         }
     }
 
-    return newRV((SV*)av);
+    return newRV_noinc((SV*)av);
 }
 
 void

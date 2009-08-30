@@ -14,8 +14,7 @@ plan(tests => 6)
 
 my $r
 
-my @tmpfiles = $@
-END { unlink < @tmpfiles }
+my $tmpfile = tempfile();
 
 my $b = pack("C*", unpack("U0C*", pack("U",256)))
 
@@ -44,7 +43,6 @@ like( $r, qr/^$b at -e line 1 character \d+.$/s, '-CE: UTF-8 stderr' )
 $r = runperl( switches => \(@:  '-Co', '-w' ),
               prog     => 'use utf8; open(my $f, q(>), q(out)) or die $^OS_ERROR; print $f, chr(256); close $f', stderr   => 1 )
 like( $r, qr/^$/s, '-Co: auto-UTF-8 open for output' )
-push @tmpfiles, "out"
 
 $r = runperl( switches => \(@:  '-Ci', '-w' ),
               prog     => 'use utf8; open(my $f, q(<), q(out)); print $^STDOUT, ord(~< $f); close $f',
