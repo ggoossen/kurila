@@ -83,7 +83,6 @@ print $out, <<'EOT'
     $bs =~ s/(\.\w+)?(;\d*)?$/\.bs/; # look for .bs 'beside' the library
 
     if (-s $bs) # only read file if it's not empty
-        print $^STDERR, "BS: $bs ($^O, $dlsrc)\n" if $dl_debug
         try { evalfile $bs; }
         warn if $^EVAL_ERROR
 

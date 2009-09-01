@@ -27,6 +27,7 @@ chdir @ARGV[0] or die "$^PROGRAM_NAME: chdir '@ARGV[0]' failed: $^OS_ERROR\n"
 my %skip
 %skip{[@: './lib/Exporter/Heavy.pm'
           './lib/Carp/Heavy.pm'
+          './win32/FindExt.pm'
        ]} = $@
 
 my @wanted
