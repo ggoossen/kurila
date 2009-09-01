@@ -790,10 +790,11 @@ sub watchdog($timeout)
                 local $^WARN_HOOK = sub($err)
                     _diag("Watchdog warning: $($err->message)")
 
+                my $sig = $^OS_NAME eq 'VMS' ?? 'TERM' !! 'KILL'
                 $watchdog = system(1, which_perl(), '-e',
                                                     "sleep($timeout);" .
                                                     "warn('# $timeout_msg\n');" .
-                                                    "kill('KILL', $pid_to_kill);")
+                                                    "kill($sig, $pid_to_kill);")
 
             if ($^EVAL_ERROR || ($watchdog +<= 0))
                 _diag('Failed to start watchdog')
@@ -850,4 +851,5 @@ sub watchdog($timeout)
         signals::handler('ALRM') = sub()
             _diag($timeout_msg)
             POSIX::_exit(1) if (defined(&POSIX::_exit))
-            kill('KILL', $pid_to_kill)
+            my $sig = $^OS_NAME eq 'VMS' ?? 'TERM' !! 'KILL'
+            kill($sig, $pid_to_kill)
