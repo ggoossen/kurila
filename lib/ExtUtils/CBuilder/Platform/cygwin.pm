@@ -24,5 +24,3 @@ sub link($self, %< %args)
 
     return $self->SUPER::link(< %args)
 
-
-1

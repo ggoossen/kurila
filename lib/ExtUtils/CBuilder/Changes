@@ -1,5 +1,7 @@
 Revision history for Perl extension ExtUtils::CBuilder.
 
+ - Added 'gnu' and 'gnukfreebsd' as Unix variants. [Niko Tyni]
+
  - When building as part of the perl core (so this is irrelevant for
    people downloading from CPAN) we now try a little harder to find
    the perl sources. [Jos Boumans]
