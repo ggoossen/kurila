@@ -170,18 +170,18 @@ ok not grep { m/you asked for U+110000/ }, @WARN
 
 # ---- Alias extensions
 
-my $tmpfile = tempfile()
 my $alifile = File::Spec->catfile(File::Spec->updir, < qw(lib unicore xyzzy_alias.pl))
 
 my @prgs
-do {   local $^INPUT_RECORD_SEPARATOR = undef;
-    @prgs = split "\n########\n", ~< $^DATA;
-}
+do 
+    local $^INPUT_RECORD_SEPARATOR = undef
+    @prgs = split "\n########\n", ~< $^DATA
 
 for ( @prgs)
     my (@: $code, $exp, ...) = @: ( <split m/\nEXPECT\n/), '$'
     my (@: $prog, $fil, ...) = @: ( <split m/\nFILE\n/, $code), ""
     $prog = "use utf8; " . $prog
+    my $tmpfile = tempfile()
     open my $tmp, ">", "$tmpfile" or die "Could not open $tmpfile: $^OS_ERROR"
     print $tmp, $prog, "\n"
     close $tmp or die "Could not close $tmpfile: $^OS_ERROR"
@@ -217,7 +217,6 @@ for ( @prgs)
         print $^STDOUT, "not "
     
     ok 1
-    1 while unlink $tmpfile
     $fil or next
     1 while unlink $alifile
 
