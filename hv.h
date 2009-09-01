@@ -46,6 +46,7 @@ struct mro_meta {
     HV      *mro_nextmethod; /* next::method caching */
     U32     cache_gen;       /* Bumping this invalidates our method cache */
     U32     pkg_gen;         /* Bumps when local methods/@ISA change */
+    HV      *isa;            /* Everything this class @ISA */
 };
 
 /* Subject to change.

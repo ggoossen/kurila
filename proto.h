@@ -5877,6 +5877,12 @@ STATIC void	S_dump_op_rest(pTHX_ I32 level, PerlIO *file, const OP *o)
 
 #endif /* PERL_IN_DUMP_C */
 
+PERL_CALLCONV HV *	Perl_get_isa_hash(pTHX_ HV *const stash)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_GET_ISA_HASH	\
+	assert(stash)
+
+
 END_EXTERN_C
 /*
  * ex: set ts=8 sts=4 sw=4 noet:

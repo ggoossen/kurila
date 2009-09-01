@@ -4036,6 +4036,8 @@
 #define dump_op_rest(a,b,c)	S_dump_op_rest(aTHX_ a,b,c)
 #endif
 #endif /* PERL_IN_DUMP_C */
+#ifdef PERL_CORE
+#endif
 #define ck_anonarray(a)		Perl_ck_anonarray(aTHX_ a)
 #define ck_anoncode(a)		Perl_ck_anoncode(aTHX_ a)
 #define ck_bitop(a)		Perl_ck_bitop(aTHX_ a)

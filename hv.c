@@ -1246,6 +1246,7 @@ S_hfreeentries(pTHX_ HV *hv)
             if((meta = iter->xhv_mro_meta)) {
                 if(meta->mro_linear_c3)  AvREFCNT_dec(meta->mro_linear_c3);
                 if(meta->mro_nextmethod) HvREFCNT_dec(meta->mro_nextmethod);
+                SvREFCNT_dec(meta->isa);
                 Safefree(meta);
                 iter->xhv_mro_meta = NULL;
             }

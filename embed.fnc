@@ -1808,6 +1808,8 @@ s	|SV*	|dump_op_flags_private	|NN const OP* o
 s	|void	|dump_op_rest	|I32 level|NN PerlIO *file|NN const OP *o
 #endif /* PERL_IN_DUMP_C */
 
+poM	|HV *	|get_isa_hash	|NN HV *const stash
+
 END_EXTERN_C
 /*
  * ex: set ts=8 sts=4 sw=4 noet:

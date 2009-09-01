@@ -40,6 +40,20 @@ Perl_mro_meta_init(pTHX_ HV* stash)
     return newmeta;
 }
 
+HV *
+Perl_get_isa_hash(pTHX_ HV *const stash)
+{
+    dVAR;
+    struct mro_meta *const meta = HvMROMETA(stash);
+
+    PERL_ARGS_ASSERT_GET_ISA_HASH;
+
+    if (!meta->isa)
+	mro_get_linear_isa_c3(stash, 0);
+    assert(meta->isa);
+    return meta->isa;
+}
+
 /*
 =for apidoc mro_get_linear_isa_c3
 
