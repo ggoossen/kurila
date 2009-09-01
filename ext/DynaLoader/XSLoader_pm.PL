@@ -41,8 +41,8 @@ sub load {
     my($module) = @_[0];
 
     # work with static linking too
-    my $b = Symbol::fetch_glob("$module\::bootstrap");
-    return $b->*->(< @_) if exists $b->*->&;
+    my $boots = Symbol::fetch_glob("$module\::bootstrap");
+    return $boots->*->(< @_) if exists $boots->*->&;
 
     unless ($module and exists &dl_load_file) {
         my $bootstrap_inherit = DynaLoader->can('bootstrap_inherit') || 
@@ -81,6 +81,11 @@ print $out, <<'EOT'
 
     my $bs = $file;
     $bs =~ s/(\.\w+)?(;\d*)?$/\.bs/; # look for .bs 'beside' the library
+
+    if (-s $bs) # only read file if it's not empty
+        print $^STDERR, "BS: $bs ($^O, $dlsrc)\n" if $dl_debug
+        try { evalfile $bs; }
+        warn if $^EVAL_ERROR
 
     if (not -f $file or -s $bs) {
         my $bootstrap_inherit = DynaLoader->can('bootstrap_inherit') || 
@@ -126,7 +131,7 @@ print $out, <<'EOT'
 
     push(@DynaLoader::dl_modules, $module); # record loaded module
 
-    my $xs = dl_install_xsub("$($module)::bootstrap", $boot_symbol_ref, $file);
+    my $xs = dl_install_xsub($boots, $boot_symbol_ref, $file);
 
     # See comment block above
     push(@DynaLoader::dl_shared_objects, $file); # record files loaded
@@ -149,7 +154,7 @@ XSLoader - Dynamically load C libraries into Perl code
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 SYNOPSIS
 
@@ -367,7 +372,9 @@ E<lt>sebastien@aperghis.netE<gt>.
 Previous maintainer was Michael G Schwern <schwern@pobox.com>.
 
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT & LICENSE
+
+Copyright (C) 1990-2007 by Larry Wall and others.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
