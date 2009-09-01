@@ -24,8 +24,11 @@ chdir @ARGV[0] or die "$^PROGRAM_NAME: chdir '@ARGV[0]' failed: $^OS_ERROR\n"
 
 # Files to skip from the check for one reason or another,
 # usually because they pull in their version from some other file.
+<<<<<<< HEAD:Porting/cmpVERSION.pl
 my %skip
-%skip{[@('./lib/Exporter/Heavy.pm')]} = $@
+%skip{[@: './lib/Exporter/Heavy.pm'
+          './lib/Carp/Heavy.pm'
+       ]} = $@
 
 my @wanted
 find(
