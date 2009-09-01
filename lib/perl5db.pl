@@ -7489,15 +7489,13 @@ being debugged in place.
 =cut
 
 sub warnLevel {
-    if ((nelems @_)) {
-        $prevwarn = $^WARN_HOOK unless $warnLevel;
-        $warnLevel = shift;
-        if ($warnLevel) {
-            $^WARN_HOOK = \&DB::dbwarn;
-        }
-        elsif ($prevwarn) {
-            $^WARN_HOOK = $prevwarn;
-        }
+    if ((nelems @_))
+        $prevwarn = $^WARN_HOOK unless $warnLevel
+        $warnLevel = shift
+        if ($warnLevel)
+            $^WARN_HOOK = \&DB::dbwarn
+        else
+            $^WARN_HOOK = $prevwarn
     } ## end if (@_)
     $warnLevel;
 } ## end sub warnLevel
@@ -7538,6 +7536,9 @@ sub dieLevel {
         elsif ($prevdie) {
             $^DIE_HOOK = $prevdie;
             print $OUT "Default die handler restored.\n";
+        } else {
+            undef $SIG{__DIE__};
+            print $OUT "Die handler removed.\n";
         }
     } ## end if (@_)
     $dieLevel;
