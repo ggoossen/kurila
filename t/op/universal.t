@@ -7,7 +7,7 @@ BEGIN
     $^OUTPUT_AUTOFLUSH = 1
     require "./test.pl"
 
-plan tests => 89
+plan tests => 93
 
 $a = \$%
 bless $a, "Bob"
@@ -201,3 +201,14 @@ main::dies_like( sub (@< @_) { UNIVERSAL::DOES(\$@, "foo") },
 # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2001-05/msg01710.html
 # but never actually tested.
 is(UNIVERSAL->can("NoSuchPackage::foo"), undef);
+
+@splatt::ISA = @: 'zlopp'
+ok (splatt->isa('zlopp'))
+ok (!splatt->isa('plop'))
+
+# This should reset the ->isa lookup cache
+@splatt::ISA = @: 'plop'
+# And here is the new truth.
+ok (!splatt->isa('zlopp'))
+ok (splatt->isa('plop'))
+
