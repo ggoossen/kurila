@@ -170,10 +170,8 @@ ok not grep { m/you asked for U+110000/ }, @WARN
 
 # ---- Alias extensions
 
-my $tmpfile = "tmp0000"
+my $tmpfile = tempfile()
 my $alifile = File::Spec->catfile(File::Spec->updir, < qw(lib unicore xyzzy_alias.pl))
-1 while -e ++$tmpfile
-END { if ($tmpfile) { 1 while unlink $tmpfile; } }
 
 my @prgs
 do {   local $^INPUT_RECORD_SEPARATOR = undef;
