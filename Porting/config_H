@@ -13,9 +13,15 @@
 /*
  * Package name      : kurila
  * Source directory  : .
+<<<<<<< HEAD:Porting/config_H
  * Configuration time: Wed Apr 25 18:21:06 CEST 2007
  * Configured by     : gerard
  * Target system     : linux ostwald 2.6.20.1 #1 smp tue feb 20 16:45:50 cet 2007 x86_64 gnulinux 
+=======
+ * Configuration time: Fri Oct  3 17:54:26 CEST 2008
+ * Configured by     : merijn
+ * Target system     : linux nb09 2.6.22.18-0.2-default #1 smp 2008-06-09 13:53:20 +0200 i686 i686 i386 gnulinux 
+>>>>>>> 6553334e8c2f2fe2a588acb2ad466b15ae762e55:Porting/config_H
  */
 
 #ifndef _config_h_
@@ -2926,6 +2932,7 @@
  */
 #define Sock_size_t		socklen_t /**/
 
+<<<<<<< HEAD:Porting/config_H
 /* SSize_t:
  *	This symbol holds the type used by functions that return
  *	a count of bytes or an error condition.  It must be a signed type.
@@ -2943,6 +2950,8 @@
  */
 #define STARTPERL "#!/opt/perl/bin/perl5.11.0"		/**/
 
+=======
+>>>>>>> 6553334e8c2f2fe2a588acb2ad466b15ae762e55:Porting/config_H
 /* STDCHAR:
  *	This symbol is defined to be the type of char used in stdio.h.
  *	It has the values "unsigned char" or "char".
@@ -4150,6 +4159,46 @@
  */
 #define	HAS_TELLDIR_PROTO	/**/
 
+<<<<<<< HEAD:Porting/config_H
+=======
+/* HAS_CTIME64:
+ *	This symbol, if defined, indicates that the ctime64 () routine is
+ *	available to do the 64bit variant of ctime ()
+ */
+/* HAS_LOCALTIME64:
+ *	This symbol, if defined, indicates that the localtime64 () routine is
+ *	available to do the 64bit variant of localtime ()
+ */
+/* HAS_GMTIME64:
+ *	This symbol, if defined, indicates that the gmtime64 () routine is
+ *	available to do the 64bit variant of gmtime ()
+ */
+/* HAS_MKTIME64:
+ *	This symbol, if defined, indicates that the mktime64 () routine is
+ *	available to do the 64bit variant of mktime ()
+ */
+/* HAS_DIFFTIME64:
+ *	This symbol, if defined, indicates that the difftime64 () routine is
+ *	available to do the 64bit variant of difftime ()
+ */
+/* HAS_ASCTIME64:
+ *	This symbol, if defined, indicates that the asctime64 () routine is
+ *	available to do the 64bit variant of asctime ()
+ */
+/*#define	HAS_CTIME64		/ **/
+/*#define	HAS_LOCALTIME64		/ **/
+/*#define	HAS_GMTIME64		/ **/
+/*#define	HAS_MKTIME64		/ **/
+/*#define	HAS_DIFFTIME64		/ **/
+/*#define	HAS_ASCTIME64		/ **/
+
+/* HAS_TIMEGM:
+ *	This symbol, if defined, indicates that the timegm routine is
+ *	available to do the opposite of gmtime ()
+ */
+#define HAS_TIMEGM		/**/
+
+>>>>>>> 6553334e8c2f2fe2a588acb2ad466b15ae762e55:Porting/config_H
 /* U32_ALIGNMENT_REQUIRED:
  *	This symbol, if defined, indicates that you must access
  *	character data through U32-aligned pointers.
@@ -4611,6 +4660,31 @@
  */
 /*#define	HAS_STDIO_STREAM_ARRAY	/ **/
 #define STDIO_STREAM_ARRAY	
+<<<<<<< HEAD:Porting/config_H
+=======
+#endif
+
+/* GMTIME_MAX:
+ *	This symbol contains the maximum value for the time_t offset that
+ *	the system function gmtime () accepts, and defaults to 0
+ */
+/* GMTIME_MIN:
+ *	This symbol contains the minimum value for the time_t offset that
+ *	the system function gmtime () accepts, and defaults to 0
+ */
+/* LOCALTIME_MAX:
+ *	This symbol contains the maximum value for the time_t offset that
+ *	the system function localtime () accepts, and defaults to 0
+ */
+/* LOCALTIME_MIN:
+ *	This symbol contains the minimum value for the time_t offset that
+ *	the system function localtime () accepts, and defaults to 0
+ */
+#define GMTIME_MAX		2147483647	/**/
+#define GMTIME_MIN		-2147483648	/**/
+#define LOCALTIME_MAX	2147483647	/**/
+#define LOCALTIME_MIN	-2147483648	/**/
+>>>>>>> 6553334e8c2f2fe2a588acb2ad466b15ae762e55:Porting/config_H
 
 /* USE_64_BIT_INT:
  *	This symbol, if defined, indicates that 64-bit integers should
