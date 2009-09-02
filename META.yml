@@ -8,6 +8,7 @@ resources:
   bugtracker: http://rt.perl.org/perlbug/
   license: http://dev.perl.org/licenses/
 distribution_type: core
+generated_by: Porting/makemeta
 no_index:
   directory:
     - ext/Compress/Raw

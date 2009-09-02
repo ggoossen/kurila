@@ -48,6 +48,7 @@ resources:
   bugtracker: http://rt.perl.org/perlbug/
   license: http://dev.perl.org/licenses/
 distribution_type: core
+generated_by: $^PROGRAM_NAME
 no_index:
   directory:
 $dirs
