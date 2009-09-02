@@ -801,7 +801,7 @@ DPeek (sv)
     SV   *sv
 
   PPCODE:
-    ST (0) = newSVpv (Perl_sv_peek (sv), 0);
+    ST (0) = newSVpv (Perl_sv_peek (aTHX_ sv), 0);
     XSRETURN (1);
 
 void
