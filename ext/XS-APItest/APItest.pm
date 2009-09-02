@@ -21,6 +21,7 @@ our @EXPORT = qw( print_double print_int print_long
 		  my_cxt_getint my_cxt_getsv my_cxt_setint my_cxt_setsv
 		  sv_setsv_cow_hashkey_core sv_setsv_cow_hashkey_notcore
 		  rmagical_cast rmagical_flags
+		  DPeek
 )
 
 our $VERSION = '0.14'
