@@ -344,7 +344,7 @@ C<SV*>.
 #define HV_ITERNEXT_WANTPLACEHOLDERS	0x01	/* Don't skip placeholders.  */
 
 #define hv_iternext(hv)	hv_iternext_flags(hv, 0)
-#define hv_magic(hv, gv, how) sv_magic((SV*)(hv), (SV*)(gv), how, NULL, 0)
+#define hv_magic(hv, gv, how) sv_magic(MUTABLE_SV(hv), MUTABLE_SV(gv), how, NULL, 0)
 
 /* available as a function in hv.c */
 #define Perl_sharepvn(sv, len, hash) HEK_KEY(share_hek(sv, len, hash))
@@ -377,8 +377,8 @@ C<SV*>.
 			      : HV_FETCH_JUST_SV, NULL, 0))
 
 #define hv_delete(hv, key, klen, flags)					\
-    ((SV*) hv_common_key_len((hv), (key), (klen),			\
-			     (flags) | HV_DELETE, NULL, 0))
+    (MUTABLE_SV(hv_common_key_len((hv), (key), (klen),			\
+				  (flags) | HV_DELETE, NULL, 0)))
 
 #    define HINTS_REFCNT_LOCK          NOOP
 #    define HINTS_REFCNT_UNLOCK                NOOP

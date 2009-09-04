@@ -224,21 +224,21 @@ perform the upgrade if necessary.  See C<svtype>.
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 #  define SvREFCNT_inc_NN(sv)		\
     ({					\
-	SV * const _sv = (SV*)(sv);	\
+	SV * const _sv = MUTABLE_SV(sv);	\
 	SvREFCNT(_sv)++;		\
 	_sv;				\
     })
 #  define SvREFCNT_inc_void(sv)		\
     ({					\
-	SV * const _sv = (SV*)(sv);	\
+	SV * const _sv = MUTABLE_SV(sv);	\
 	if (_sv)			\
 	    (void)(SvREFCNT(_sv)++);	\
     })
 #else
 #  define SvREFCNT_inc_NN(sv) \
-	(PL_Sv=(SV*)(sv),++(SvREFCNT(PL_Sv)),PL_Sv)
+	(PL_Sv=MUTABLE_SV(sv),++(SvREFCNT(PL_Sv)),PL_Sv)
 #  define SvREFCNT_inc_void(sv) \
-	(void)((PL_Sv=(SV*)(sv)) ? ++(SvREFCNT(PL_Sv)) : 0)
+	(void)((PL_Sv=MUTABLE_SV(sv)) ? ++(SvREFCNT(PL_Sv)) : 0)
 #endif
 
 /* These guys don't need the curly blocks */
@@ -792,21 +792,21 @@ in gv.h: */
 #define SvCOMPILED_off(sv)	(SvFLAGS(sv) &= ~SVpfm_COMPILED)
 
 #if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
-#  define SvVALID(sv)		({ SV *const _svvalid = (SV *) (sv);	\
+#  define SvVALID(sv)		({ SV *const _svvalid = MUTABLE_SV(sv);	\
 				   if (SvFLAGS(_svvalid) & SVpbm_VALID)	\
 				       assert(!isGV_with_GP(_svvalid));	\
 				   (SvFLAGS(_svvalid) & SVpbm_VALID);	\
 				})
-#  define SvVALID_on(sv)	({ SV *const _svvalid = (SV *) (sv);	\
+#  define SvVALID_on(sv)	({ SV *const _svvalid = MUTABLE_SV(sv);	\
 				   assert(!isGV_with_GP(_svvalid));	\
 				   (SvFLAGS(_svvalid) |= SVpbm_VALID);	\
 				})
-#  define SvVALID_off(sv)	({ SV *const _svvalid = (SV *) (sv);	\
+#  define SvVALID_off(sv)	({ SV *const _svvalid = MUTABLE_SV(sv);	\
 				   assert(!isGV_with_GP(_svvalid));	\
 				   (SvFLAGS(_svvalid) &= ~SVpbm_VALID);	\
 				})
 
-#  define SvTAIL(sv)	({ SV *const _svtail = (SV *) (sv);		\
+#  define SvTAIL(sv)	({ SV *const _svtail = MUTABLE_SV(sv);		\
 			    assert(SvTYPE(_svtail) != SVt_PVAV);		\
 			    assert(SvTYPE(_svtail) != SVt_PVHV);		\
 			    (SvFLAGS(sv) & (SVpbm_TAIL|SVpbm_VALID))	\
@@ -832,7 +832,7 @@ in gv.h: */
 
 #if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 #define SvPAD_OUR_on(sv)	({					\
-	    SV *const _svpad = (SV *) (sv);				\
+	    SV *const _svpad = MUTABLE_SV(sv);				\
 	    assert(SvTYPE(_svpad) == SVt_PVMG);				\
 	    (SvFLAGS(_svpad) |= SVpad_NAME|SVpad_OUR);			\
 	})
@@ -879,27 +879,27 @@ in gv.h: */
 #  if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 /* These get expanded inside other macros that already use a variable _sv  */
 #    define SvUVX(sv)							\
-	(*({ SV *const _svuvx = (SV *) (sv);				\
+	(*({ const SV *const _svuvx = (const SV *)(sv);			\
 	    assert(SvTYPE(_svuvx) == SVt_IV || SvTYPE(_svuvx) >= SVt_PVIV); \
 	    assert(SvTYPE(_svuvx) != SVt_PVAV);				\
 	    assert(SvTYPE(_svuvx) != SVt_PVHV);				\
 	    assert(SvTYPE(_svuvx) != SVt_PVCV);				\
 	    assert(SvTYPE(_svuvx) != SVt_PVIO);				\
 	    assert(!isGV_with_GP(_svuvx));				\
-	    &(((XPVUV*) SvANY(_svuvx))->xuv_uv);			\
+	    &(((XPVUV*) MUTABLE_PTR(SvANY(_svuvx)))->xuv_uv);		\
 	 }))
 #    define SvNVX(sv)							\
-	(*({ SV *const _svnvx = (SV *) (sv);				\
+	(*({ const SV *const _svnvx = (const SV *)(sv);			\
 	    assert(SvTYPE(_svnvx) == SVt_NV || SvTYPE(_svnvx) >= SVt_PVNV); \
 	    assert(SvTYPE(_svnvx) != SVt_PVAV);				\
 	    assert(SvTYPE(_svnvx) != SVt_PVHV);				\
 	    assert(SvTYPE(_svnvx) != SVt_PVCV);				\
 	    assert(SvTYPE(_svnvx) != SVt_PVIO);				\
 	    assert(!isGV_with_GP(_svnvx));				\
-	   &(((XPVNV*) SvANY(_svnvx))->xnv_u.xnv_nv);			\
+	    &(((XPVNV*) MUTABLE_PTR(SvANY(_svnvx)))->xnv_u.xnv_nv);	\
 	 }))
 #    define SvRV(sv)							\
-	(*({ SV *const _svrv = (SV *) (sv);				\
+	(*({ const SV *const _svrv = (const SV *)(sv);			\
 	    assert(SvTYPE(_svrv) >= SVt_PV || SvTYPE(_svrv) == SVt_IV);	\
 	    assert(SvTYPE(_svrv) != SVt_PVAV);				\
 	    assert(SvTYPE(_svrv) != SVt_PVHV);				\
@@ -908,16 +908,16 @@ in gv.h: */
 	    &((_svrv)->sv_u.svu_rv);					\
 	 }))
 #    define SvMAGIC(sv)							\
-	(*({ SV *const _svmagic = (SV *) (sv);				\
+	(*({ const SV *const _svmagic = (const SV *)(sv);		\
 	    assert(SvTYPE(_svmagic) >= SVt_PVMG);			\
 	    if(SvTYPE(_svmagic) == SVt_PVMG)				\
 		assert(!SvPAD_OUR(_svmagic));				\
-	    &(((XPVMG*) SvANY(_svmagic))->xmg_u.xmg_magic);		\
+	    &(((XPVMG*) MUTABLE_PTR(SvANY(_svmagic)))->xmg_u.xmg_magic); \
 	  }))
 #    define SvSTASH(sv)							\
-	(*({ SV *const _svstash = (SV *) (sv);				\
+	(*({ const SV *const _svstash = (const SV *)(sv);		\
 	    assert(SvTYPE(_svstash) >= SVt_PVMG);			\
-	    &(((XPVMG*) SvANY(_svstash))->xmg_stash);			\
+	    &(((XPVMG*) MUTABLE_PTR(SvANY(_svstash)))->xmg_stash);	\
 	  }))
 #  else
 #    define SvUVX(sv) ((XPVUV*) SvANY(sv))->xuv_uv

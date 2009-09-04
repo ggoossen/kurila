@@ -43,13 +43,13 @@ struct magic {
 #define MGf_LOCAL   0x20	/* has an svt_local MGVTBL entry */
 
 #define MgPV(mg,lp)		((((int)(lp = (mg)->mg_len)) == HEf_SVKEY) ?   \
-				 SvPV((SV*)((mg)->mg_ptr),lp) :		\
+				 SvPV(MUTABLE_SV((mg)->mg_ptr),lp) :	\
 				 (mg)->mg_ptr)
 #define MgPV_const(mg,lp)	((((int)(lp = (mg)->mg_len)) == HEf_SVKEY) ? \
-				 SvPV_const((SV*)((mg)->mg_ptr),lp) :        \
+				 SvPV_const(MUTABLE_SV((mg)->mg_ptr),lp) :   \
 				 (const char*)(mg)->mg_ptr)
-#define MgPV_nolen_const(mg)	(((((int)(mg)->mg_len)) == HEf_SVKEY) ?   \
-				 SvPV_nolen_const((SV*)((mg)->mg_ptr)) :  \
+#define MgPV_nolen_const(mg)	(((((int)(mg)->mg_len)) == HEf_SVKEY) ?	\
+				 SvPV_nolen_const(MUTABLE_SV((mg)->mg_ptr)) : \
 				 (const char*)(mg)->mg_ptr)
 
 /*
