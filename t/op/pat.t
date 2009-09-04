@@ -43,7 +43,7 @@ BEGIN
     require "./test.pl"
 
 
-plan 1638
+plan 1640
 
 our ($x, %XXX, @XXX, $foo, @x, $null, @words)
 our ($TODO)
@@ -3207,7 +3207,15 @@ EOFTEST
         is $_, "ZYX"
     
 
-
+    # [perl #60034]
+    do
+        my $a = "xyzt" x 8192
+        local $TODO = "#60034"
+        ok($a =~ m/\A(?>[a-z])*\z/, '(?>) does not cause wrongness on long string')
+        use utf8
+        $TODO = "#60034"
+        ok($b =~ m/\A(?>[a-z])*\z/,
+           '(?>) does not cause wrongness on long string with UTF-8')
 
 
     # Test counter is at bottom of file. Put new tests above here.
