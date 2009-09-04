@@ -5174,6 +5174,15 @@ STATIC SV*	S_vdie_croak_common(pTHX_ SV* location, const char *pat, va_list *arg
 STATIC char *	S_write_no_mem(pTHX)
 			__attribute__noreturn__;
 
+#if defined(PERL_MEM_LOG) && defined(PERL_MEM_LOG_STDERR)
+STATIC void	S_mem_log_common(enum mem_log_type mlt, const UV n, const UV typesize, const char *typename, const SV *sv, Malloc_t oldalloc, Malloc_t newalloc, const char *filename, const int linenumber, const char *funcname)
+			__attribute__nonnull__(4)
+			__attribute__nonnull__(8)
+			__attribute__nonnull__(10);
+#define PERL_ARGS_ASSERT_MEM_LOG_COMMON	\
+	assert(typename); assert(filename); assert(funcname)
+
+#endif
 #endif
 
 PERL_CALLCONV bool	Perl_vdie_common(pTHX_ SV *msv, bool warn)

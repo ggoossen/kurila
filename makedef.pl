@@ -787,6 +787,12 @@ unless ($define{'PERL_NEED_TIMESBASE'}) {
 		    )];
 }
 
+unless ($define{'DEBUG_LEAKING_SCALARS'}) {
+    skip_symbols [qw(
+		    PL_sv_serial
+		    )];
+}
+
 unless ($define{'PERL_DONT_CREATE_GVSV'}) {
     skip_symbols [qw(
 		     Perl_gv_SVadd

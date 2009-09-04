@@ -621,8 +621,12 @@ PERLVARI(Islab_count, U32, 0)	/* Size of the array */
 
 PERLVARI(Iisarev, HV*, NULL) /* Reverse map of @ISA dependencies */
 
-/* If you are adding a U8 or U16, see the 'Space' comments above on where
- * there are gaps which currently will be structure padding.  */
+#ifdef DEBUG_LEAKING_SCALARS
+PERLVARI(Isv_serial, U32, 0) /* SV serial number, used in sv.c */
+#endif
+
+/* If you are adding a U8 or U16, check to see if there are 'Space' comments
+ * above on where there are gaps which currently will be structure padding.  */
 
 /* Within a stable branch, new variables must be added to the very end, before
  * this comment, for binary compatibility (the offsets of the old members must

@@ -157,6 +157,14 @@ Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
     }
 }
 
+#ifdef DEBUG_LEAKING_SCALARS
+#  define DEBUG_SV_SERIAL(sv)						    \
+    DEBUG_m(PerlIO_printf(Perl_debug_log, "0x%"UVxf": (%05ld) del_SV\n",    \
+	    PTR2UV(sv), (long)(sv)->sv_debug_serial))
+#else
+#  define DEBUG_SV_SERIAL(sv)	NOOP
+#endif
+
 #ifdef PERL_POISON
 #  define SvARENA_CHAIN(sv)	((sv)->sv_u.svu_rv)
 /* Whilst I'd love to do this, it seems that things like to check on
@@ -179,6 +187,7 @@ Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
 
 #define plant_SV(p) \
     STMT_START {					\
+	DEBUG_SV_SERIAL(p);				\
 	POSION_SV_HEAD(p);				\
 	SvARENA_CHAIN(p) = (void *)PL_sv_root;		\
 	SvFLAGS(p) = SVTYPEMASK;			\
@@ -227,7 +236,7 @@ S_more_sv(pTHX)
 
 /* provide a real function for a debugger to play with */
 STATIC SV*
-S_new_SV(pTHX)
+S_new_SV(pTHX_ const char *file, int line, const char *func)
 {
     SV* sv;
 
@@ -251,11 +260,14 @@ S_new_SV(pTHX)
     sv->sv_debug_inpad = 0;
     sv->sv_debug_cloned = 0;
     sv->sv_debug_file = PL_curcop ? savepv(CopFILE(PL_curcop)): NULL;
-#endif /* DEBUG_LEAKING_SCALARS */
     
+    sv->sv_debug_serial = PL_sv_serial++;
+
+#endif /* DEBUG_LEAKING_SCALARS */
+
     return sv;
 }
-#  define new_SV(p) (p)=S_new_SV(aTHX)
+#  define new_SV(p) (p)=S_new_SV(aTHX_ __FILE__, __LINE__, FUNCTION__)
 
 
 /* del_SV(): return an empty SV head to the free list */

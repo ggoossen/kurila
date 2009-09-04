@@ -1495,6 +1495,13 @@ s	|char*	|stdize_locale	|NN char* locs
 s	|SV*	|mess_alloc
 s	|SV*    |vdie_croak_common|NULLOK SV* location|NULLOK const char *pat|NULLOK va_list *args
 sr	|char *	|write_no_mem
+#if defined(PERL_MEM_LOG) && defined(PERL_MEM_LOG_STDERR)
+sn	|void	|mem_log_common	|enum mem_log_type mlt|const UV n|const UV typesize \
+				|NN const char *typename|NULLOK const SV *sv \
+				|Malloc_t oldalloc|Malloc_t newalloc \
+				|NN const char *filename|const int linenumber \
+				|NN const char *funcname
+#endif
 #endif
 
 p	|bool	|vdie_common	|NN SV *msv|bool warn

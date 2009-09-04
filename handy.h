@@ -770,11 +770,26 @@ Malloc_t Perl_mem_log_realloc(const UV n, const UV typesize, const char *typenam
 
 Malloc_t Perl_mem_log_free(Malloc_t oldalloc, const char *filename, const int linenumber, const char *funcname);
 
+# ifdef PERL_CORE
+#  ifdef PERL_MEM_LOG_STDERR
+enum mem_log_type {
+  MLT_ALLOC,
+  MLT_REALLOC,
+  MLT_FREE,
+  MLT_NEW_SV,
+  MLT_DEL_SV
+};
+#  endif
+/* those are only used in sv.c */
+void Perl_mem_log_new_sv(const SV *sv, const char *filename, const int linenumber, const char *funcname);
+void Perl_mem_log_del_sv(const SV *sv, const char *filename, const int linenumber, const char *funcname);
+# endif
+
 #endif
 
 #ifdef PERL_MEM_LOG
-#define MEM_LOG_ALLOC(n,t,a)     Perl_mem_log_alloc(n,sizeof(t),STRINGIFY(t),a,__FILE__,__LINE__,FUNCTION__)
-#define MEM_LOG_REALLOC(n,t,v,a) Perl_mem_log_realloc(n,sizeof(t),STRINGIFY(t),v,a,__FILE__,__LINE__,FUNCTION__)
+#define MEM_LOG_ALLOC(n,t,a)     (t*)Perl_mem_log_alloc(n,sizeof(t),STRINGIFY(t),a,__FILE__,__LINE__,FUNCTION__)
+#define MEM_LOG_REALLOC(n,t,v,a) (t*)Perl_mem_log_realloc(n,sizeof(t),STRINGIFY(t),v,a,__FILE__,__LINE__,FUNCTION__)
 #define MEM_LOG_FREE(a)          Perl_mem_log_free(a,__FILE__,__LINE__,FUNCTION__)
 #endif
 
