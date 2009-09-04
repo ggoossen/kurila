@@ -59,12 +59,12 @@ Null CV pointer.
 #define CvXSUB(sv)	((XPVCV*)SvANY(sv))->xcv_root_u.xcv_xsub
 #define CvXSUBANY(sv)	((XPVCV*)SvANY(sv))->xcv_start_u.xcv_xsubany
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
-#  define CvDEPTH(sv) (*({const CV *_cvdepth = (CV *)sv;         \
+#  define CvDEPTH(sv) (*({const CV *const _cvdepth = (const CV *)sv; \
 			  assert(SvTYPE(_cvdepth) == SVt_PVCV);	 \
 			  &((XPVCV*)SvANY(_cvdepth))->xiv_u.xivu_i32; \
 			}))
 #else
-#  define CvDEPTH(sv)	((XPVCV*)SvANY(sv))->xiv_u.xivu_i32
+#  define CvDEPTH(sv)	((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xiv_u.xivu_i32
 #endif
 #define CvPADLIST(sv)	((XPVCV*)SvANY(sv))->xcv_padlist
 #define CvFLAGS(sv)	((XPVCV*)SvANY(sv))->xcv_flags

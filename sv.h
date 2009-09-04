@@ -792,7 +792,7 @@ in gv.h: */
 #define SvCOMPILED_off(sv)	(SvFLAGS(sv) &= ~SVpfm_COMPILED)
 
 #if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
-#  define SvVALID(sv)		({ SV *const _svvalid = MUTABLE_SV(sv);	\
+#  define SvVALID(sv)		({ const SV *const _svvalid = (const SV*)(sv); \
 				   if (SvFLAGS(_svvalid) & SVpbm_VALID)	\
 				       assert(!isGV_with_GP(_svvalid));	\
 				   (SvFLAGS(_svvalid) & SVpbm_VALID);	\
@@ -806,7 +806,7 @@ in gv.h: */
 				   (SvFLAGS(_svvalid) &= ~SVpbm_VALID);	\
 				})
 
-#  define SvTAIL(sv)	({ SV *const _svtail = MUTABLE_SV(sv);		\
+#  define SvTAIL(sv)	({ const SV *const _svtail = (const SV *)(sv);	\
 			    assert(SvTYPE(_svtail) != SVt_PVAV);		\
 			    assert(SvTYPE(_svtail) != SVt_PVHV);		\
 			    (SvFLAGS(sv) & (SVpbm_TAIL|SVpbm_VALID))	\
