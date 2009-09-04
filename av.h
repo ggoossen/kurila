@@ -94,7 +94,7 @@ Creates a new AV.  The reference count is set to 1.
 =cut
 */
 
-#define newAV()	((AV *)newSV_type(SVt_PVAV))
+#define newAV()	MUTABLE_AV(newSV_type(SVt_PVAV))
 
 
 /*
