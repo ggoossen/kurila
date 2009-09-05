@@ -1911,7 +1911,7 @@ S_regtry(pTHX_ regmatch_info *reginfo, char **startpos)
 	    /* Make $_ available to executed code. */
 	    if (reginfo->sv != DEFSV) {
 		SAVE_DEFSV;
-		SVcpREPLACE(DEFSV, reginfo->sv);
+		DEFSV_set(reginfo->sv);
 	    }
 	
 	    if (!(SvTYPE(reginfo->sv) >= SVt_PVMG && SvMAGIC(reginfo->sv)

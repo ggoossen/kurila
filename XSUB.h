@@ -365,10 +365,10 @@ Rethrows a previously caught exception.  See L<perlguts/"Exception Handling">.
 	    SAVETMPS ;						\
 	    SAVEINT(db->filtering) ;				\
 	    db->filtering = TRUE ;				\
-	    SAVESPTR(DEFSV) ;					\
+	    SAVE_DEFSV ;					\
             if (name[7] == 's')                                 \
                 arg = newSVsv(arg);                             \
-	    SVcpREPLACE(DEFSV, arg);				\
+	    DEFSV_set(arg) ;					\
 	    SvTEMP_off(arg) ;					\
 	    PUSHMARK(SP) ;					\
 	    PUTBACK ;						\

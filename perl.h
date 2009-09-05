@@ -1278,8 +1278,12 @@ EXTERN_C char *crypt(const char *, const char *);
 #endif
 
 #define ERRSV PL_errsv
-/* FIXME? Change the assignments to PL_defgv to instantiate GvSV?  */
-#define DEFSV GvSVn(PL_defgv)
+#ifdef PERL_CORE
+# define DEFSV (0 + GvSVn(PL_defgv))
+#else
+# define DEFSV GvSVn(PL_defgv)
+#endif
+#define DEFSV_set(sv) (SVcpREPLACE(GvSV(PL_defgv), (sv)))
 #define SAVE_DEFSV SAVESPTR(GvSV(PL_defgv))
 
 #ifndef errno

@@ -2154,7 +2154,7 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 	SAVETMPS;
 	EXTEND(SP, 2);
 
-	SVcpREPLACE(DEFSV, upstream);
+	DEFSV_set(upstream);
 	PUSHMARK(SP);
 	mPUSHi(0);
 	if (filter_state) {
