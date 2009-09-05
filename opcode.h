@@ -1682,9 +1682,9 @@ EXTCONST U32 PL_opargs[] = {
 	0x0002280c,	/* hashconcat */
 	0x00000004,	/* emptyarray */
 	0x00000004,	/* emptyhash */
-	0x0004a845,	/* grepstart */
+	0x0002a845,	/* grepstart */
 	0x00000648,	/* grepwhile */
-	0x0004a845,	/* mapstart */
+	0x0002a845,	/* mapstart */
 	0x00000648,	/* mapwhile */
 	0x00022400,	/* range */
 	0x00000600,	/* and */

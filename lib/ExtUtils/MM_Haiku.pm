@@ -1,7 +1,5 @@
 
-package ExtUtils::MM_Haiku;
-
-use strict;
+package ExtUtils::MM_Haiku
 
 =head1 NAME
 
@@ -21,14 +19,12 @@ the semantics.
 
 =cut
 
-use ExtUtils::MakeMaker::Config;
-use File::Spec;
-require ExtUtils::MM_Any;
-require ExtUtils::MM_Unix;
+use ExtUtils::MakeMaker::Config
+use File::Spec
+require ExtUtils::MM_Unix
 
-use vars qw(@ISA $VERSION);
-@ISA = qw( ExtUtils::MM_Any ExtUtils::MM_Unix );
-$VERSION = '6.42';
+our @ISA = qw( ExtUtils::MM_Unix )
+our $VERSION = '6.42'
 
 
 =item os_flavor
@@ -37,9 +33,8 @@ Haiku is Haiku.
 
 =cut
 
-sub os_flavor {
-    return('Haiku');
-}
+sub os_flavor
+    return('Haiku')
 
 =item init_linker
 
@@ -47,14 +42,11 @@ libperl.a equivalent to be linked to dynamic extensions.
 
 =cut
 
-sub init_linker {
-    my($self) = shift;
-
+sub init_linker($self)
     $self->{PERL_ARCHIVE} ||=
-      File::Spec->catdir('$(PERL_INC)',$Config{libperl});
-    $self->{PERL_ARCHIVE_AFTER} ||= '';
-    $self->{EXPORT_LIST}  ||= '';
-}
+      File::Spec->catdir('$(PERL_INC)', config_value('libperl'))
+    $self->{PERL_ARCHIVE_AFTER} ||= ''
+    $self->{EXPORT_LIST}  ||= ''
 
 =back
 

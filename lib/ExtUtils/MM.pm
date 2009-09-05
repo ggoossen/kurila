@@ -67,7 +67,7 @@ if( %Is{?NW5} )
 %Is{+QNX}    = $^OS_NAME eq 'qnx'
 %Is{+AIX}    = $^OS_NAME eq 'aix'
 %Is{+Darwin} = $^OS_NAME eq 'darwin'
-$Is{+Haiku}  = $^O eq 'haiku';
+%Is{+Haiku}  = $^OS_NAME eq 'haiku';
 
 %Is{+Unix}   = !grep { $_ }, values %Is
 

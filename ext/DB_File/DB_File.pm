@@ -47,8 +47,8 @@ use warnings
 sub TIEHASH
     my $pkg = shift 
 
-    bless \(%:  VALID => \ %+: map { %: $_, 1},
-                                  qw( bval cachesize psize flags lorder reclen bfname )
+    bless \(%:  VALID => \ ( %+: map { %: $_, 1 },
+                                  qw( bval cachesize psize flags lorder reclen bfname ) )
                 GOT   => \$%
         ), $pkg 
 

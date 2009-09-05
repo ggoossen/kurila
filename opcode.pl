@@ -824,10 +824,10 @@ hashconcat	hash concat (+%+)	ck_null		ts@	S S
 emptyarray	new empty anonymous array ($@)	ck_null		s0	
 emptyhash	new empty anonymous hash ($%)	ck_null		s0	
 
-grepstart	grep			ck_grep		dms@	C L
+grepstart	grep			ck_grep		dms@	C S
 grepwhile	grep iterator		ck_null		dt|	
 
-mapstart	map			ck_grep		dms@	C L
+mapstart	map			ck_grep		dms@	C S
 mapwhile	map iterator		ck_null		dt|
 
 # Range stuff.
