@@ -762,7 +762,6 @@ sub UnicodeData_Txt()
 
     ## Initialize Broken Perl-generated categories
     ## (Categories from UnicodeData.txt are auto-initialized in gencat)
-<<<<<<< HEAD:lib/unicore/mktables
     %Cat{+Alnum}  =
         Table->New(Is => 'Alnum',  Desc => "[[:Alnum:]]",  Fuzzy => 0)
     %Cat{+Alpha}  =
@@ -835,7 +834,6 @@ sub UnicodeData_Txt()
         (%General{+$name} ||= Table->New)->?$op($code, $name)
 
         # 005F: SPACING UNDERSCORE
-<<<<<<< HEAD:lib/unicore/mktables
         %Cat{?Word}->?$op($code)  if $cat =~ m/^[LMN]|Pc/
         %Cat{?Alnum}->?$op($code) if $cat =~ m/^[LM]|Nd/
         %Cat{?Alpha}->?$op($code) if $cat =~ m/^[LM]/
