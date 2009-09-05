@@ -7310,6 +7310,22 @@ case ANYOF_N##NAME:                                     \
     what = WORD;                                        \
     break
 
+/* 
+   We dont use PERL_LEGACY_UNICODE_CHARCLASS_MAPPINGS as the direct test
+   so that it is possible to override the option here without having to 
+   rebuild the entire core. as we are required to do if we change regcomp.h
+   which is where PERL_LEGACY_UNICODE_CHARCLASS_MAPPINGS is defined.
+*/
+#if PERL_LEGACY_UNICODE_CHARCLASS_MAPPINGS
+#define BROKEN_UNICODE_CHARCLASS_MAPPINGS
+#endif
+
+#ifdef BROKEN_UNICODE_CHARCLASS_MAPPINGS
+#define POSIX_CC_UNI_NAME(CCNAME) CCNAME
+#else
+#define POSIX_CC_UNI_NAME(CCNAME) "Posix" CCNAME
+#endif
+
 /*
    parse a class specification and produce either an ANYOF node that
    matches the pattern or if the pattern matches a single char only and
@@ -7549,18 +7565,23 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
 		 * --jhi */
 
 		switch ((I32)namedclass) {
-		case _C_C_T_(ALNUM, isALNUM_LC(value), "Word");
-		case _C_C_T_(ALNUMC, isALNUMC(value), "Alnum");
-		case _C_C_T_(ALPHA, isALPHA(value), "Alpha");
-		case _C_C_T_(BLANK, isBLANK(value), "Blank");
-		case _C_C_T_(CNTRL, isCNTRL(value), "Cntrl");
-		case _C_C_T_(GRAPH, isGRAPH(value), "Graph");
-		case _C_C_T_(LOWER, isLOWER(value), "Lower");
-		case _C_C_T_(PRINT, isPRINT(value), "Print");
-		case _C_C_T_(PSXSPC, isPSXSPC(value), "Space");
-		case _C_C_T_(PUNCT, isPUNCT(value), "Punct");
+		case _C_C_T_(ALNUMC, isALNUMC(value), POSIX_CC_UNI_NAME("Alnum"));
+		case _C_C_T_(ALPHA, isALPHA(value), POSIX_CC_UNI_NAME("Alpha"));
+		case _C_C_T_(BLANK, isBLANK(value), POSIX_CC_UNI_NAME("Blank"));
+		case _C_C_T_(CNTRL, isCNTRL(value), POSIX_CC_UNI_NAME("Cntrl"));
+		case _C_C_T_(GRAPH, isGRAPH(value), POSIX_CC_UNI_NAME("Graph"));
+		case _C_C_T_(LOWER, isLOWER(value), POSIX_CC_UNI_NAME("Lower"));
+		case _C_C_T_(PRINT, isPRINT(value), POSIX_CC_UNI_NAME("Print"));
+		case _C_C_T_(PSXSPC, isPSXSPC(value), POSIX_CC_UNI_NAME("Space"));
+		case _C_C_T_(PUNCT, isPUNCT(value), POSIX_CC_UNI_NAME("Punct"));
+		case _C_C_T_(UPPER, isUPPER(value), POSIX_CC_UNI_NAME("Upper"));
+#ifdef BROKEN_UNICODE_CHARCLASS_MAPPINGS
+		case _C_C_T_(ALNUM, isALNUM(value), "Word");
 		case _C_C_T_(SPACE, isSPACE(value), "SpacePerl");
-		case _C_C_T_(UPPER, isUPPER(value), "Upper");
+#else
+		case _C_C_T_(SPACE, isSPACE(value), "PerlSpace");
+		case _C_C_T_(ALNUM, isALNUM(value), "PerlWord");
+#endif		
 		case _C_C_T_(XDIGIT, isXDIGIT(value), "XDigit");
 		case ANYOF_ASCII:
 #ifndef EBCDIC
@@ -7593,7 +7614,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
 			for (value = '0'; value <= '9'; value++)
 			    ANYOF_BITMAP_SET(ret, value);
 		    yesno = '+';
-		    what = "Digit";
+		    what = POSIX_CC_UNI_NAME("Digit");
 		    break;
 		case ANYOF_NDIGIT:
 			/* consecutive digits assumed */
@@ -7602,7 +7623,7 @@ S_regclass(pTHX_ RExC_state_t *pRExC_state, U32 depth)
 			for (value = '9' + 1; value < 256; value++)
 			    ANYOF_BITMAP_SET(ret, value);
 		    yesno = '!';
-		    what = "Digit";
+		    what = POSIX_CC_UNI_NAME("Digit");
 		    break;		
 		case ANYOF_MAX:
 		    /* this is to handle \p and \P */
@@ -8480,6 +8501,17 @@ Perl_regdump(pTHX_ const regexp *r)
 /*
 - regprop - printable representation of opcode
 */
+#define EMIT_ANYOF_TEST_SEPARATOR(do_sep,sv,flags) \
+STMT_START { \
+        if (do_sep) {                           \
+            Perl_sv_catpvf(aTHX_ sv,"%s][%s",PL_colors[1],PL_colors[0]); \
+            if (flags & ANYOF_INVERT)           \
+                /*make sure the invert info is in each */ \
+                sv_catpvs(sv, "^");             \
+            do_sep = 0;                         \
+        }                                       \
+} STMT_END
+
 void
 Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
 {
@@ -8610,6 +8642,8 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
 	Perl_sv_catpvf(aTHX_ sv, "[%s", PL_colors[0]);
 	if (flags & ANYOF_INVERT)
 	    sv_catpvs(sv, "^");
+	
+	/* output what the standard cp 0-255 bitmap matches */
 	for (i = 0; i <= 256; i++) {
 	    if (i < 256 && ANYOF_BITMAP_TEST(o,i)) {
 		if (rangestart == -1)

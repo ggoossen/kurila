@@ -2171,6 +2171,7 @@ t/op/ref.t			See if refs and objects work
 t/op/rv2cv.t			See if ->& work
 t/op/reftype.t			See if ref::reftype works
 t/op/reg_email.t		See if regex recursion works by parsing email addresses
+t/op/reg_posixcc.t		See if posix characterclasses behave consistantly
 t/op/regexp_noamp.t		See if regular expressions work with optimizations
 t/op/regexp_notrie.t		See if regular expressions work without trie optimisation
 t/op/regexp_qr_embed.t		See if regular expressions work with embedded qr//
