@@ -2685,14 +2685,9 @@ PerlIOUnix_tell(pTHX_ PerlIO *f)
     return PerlLIO_lseek(PerlIOSelf(f, PerlIOUnix)->fd, 0, SEEK_CUR);
 }
 
-IV
-PerlIOUnix_close(pTHX_ PerlIO *f)
-{
-	return PerlIOBase_noop_ok(aTHX_ f);
-}
 
 IV
-PerlIOUnix_popped(pTHX_ PerlIO *f)
+PerlIOUnix_close(pTHX_ PerlIO *f)
 {
     dVAR;
     const int fd = PerlIOSelf(f, PerlIOUnix)->fd;
@@ -2726,7 +2721,7 @@ PERLIO_FUNCS_DECL(PerlIO_unix) = {
     sizeof(PerlIOUnix),
     PERLIO_K_RAW,
     PerlIOUnix_pushed,
-    PerlIOUnix_popped,
+    PerlIOBase_popped,
     PerlIOUnix_open,
     PerlIOBase_binmode,         /* binmode */
     NULL,
@@ -3075,12 +3070,6 @@ PerlIOStdio_invalidate_fileno(pTHX_ FILE *f)
 
 IV
 PerlIOStdio_close(pTHX_ PerlIO *f)
-{
-	return PerlIOBase_noop_ok(aTHX_ f);
-}
-
-IV
-PerlIOStdio_popped(pTHX_ PerlIO *f)
 {
     FILE * const stdio = PerlIOSelf(f, PerlIOStdio)->stdio;
     if (!stdio) {
@@ -3487,7 +3476,7 @@ PERLIO_FUNCS_DECL(PerlIO_stdio) = {
     sizeof(PerlIOStdio),
     PERLIO_K_BUFFERED|PERLIO_K_RAW,
     PerlIOStdio_pushed,
-    PerlIOStdio_popped,
+    PerlIOBase_popped,
     PerlIOStdio_open,
     PerlIOBase_binmode,         /* binmode */
     NULL,
