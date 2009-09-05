@@ -4,7 +4,7 @@ BEGIN
     require './test.pl'
 
 
-plan tests => 1289
+plan tests => 1313
 
 use utf8
 
@@ -61,8 +61,6 @@ do
             $warn++
         else
             $bad++
-        
-    
 
     my $fmt = join('', map( {"\%$_\$s\%" . ((1 << 31)-$_) . '$s' }, 1..20))
     my $result = sprintf $fmt, < qw(a b c d)
@@ -78,11 +76,9 @@ do
             if (@_[0]->{?description} !~ m/^Invalid conversion in sprintf/)
                 warn @_[0]
                 $bad++
-            
         
         my $r = try {sprintf '%v' . chr $ord}
         is ($bad, 0, "pattern '\%v' . chr $ord")
-    
 
 
 sub mysprintf_int_flags
@@ -127,14 +123,32 @@ for my $num ((@: 0, -1, 1))
                     my $result = sprintf($fmt, $num)
                     my $expect = mysprintf_int_flags($fmt, $num)
                     is($result, $expect, qq/sprintf("$fmt",$num)/)
-                
-            
-        
-    
 
 
 # test that %f doesn't panic with +Inf, -Inf, NaN [perl #45383]
-foreach my $n (@: 2**1e100, -2**1e100, 2**1e100/2**1e100) { # +Inf, -Inf, NaN
-    try { my $f = sprintf('%f', $n); };
-    is $^EVAL_ERROR, "", q[sprintf('%f', $n)];
-}
+foreach my $n (@: 2**1e100, -2**1e100, 2**1e100/2**1e100) # +Inf, -Inf, NaN
+    try { my $f = sprintf('%f', $n); }
+    is $^EVAL_ERROR, "", q[sprintf('%f', $n)]
+
+# test %ll formats with and without HAS_QUAD
+try { my $q = pack "q", 0 }
+my $Q = not $^EVAL_ERROR
+
+my @tests = @:
+  @: '%lld' => qw( 4294967296 -100000000000000 )
+  @: '%lli' => qw( 4294967296 -100000000000000 )
+  @: '%llu' => qw( 4294967296  100000000000000 )
+  @: '%Ld'  => qw( 4294967296 -100000000000000 )
+  @: '%Li'  => qw( 4294967296 -100000000000000 )
+  @: '%Lu'  => qw( 4294967296  100000000000000 )
+
+for my $t (@tests)
+  my @: $fmt, $nums = $t
+  for my $num ($nums)
+    my $w
+    local $^WARN_HOOK = sub($e) { $w = $e->message }
+    is(sprintf($fmt, $num), $Q ?? $num !! $fmt, "quad: $fmt -> $num")
+    do
+      local our $TODO = $Q ?? "" !! "warning doesn't contain length modifiers"
+      like($w, $Q ?? '' !! qr/Invalid conversion in sprintf: "$fmt"/, "warning: $fmt")
+

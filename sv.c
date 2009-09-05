@@ -7846,8 +7846,11 @@ Perl_sv_vcatpvfn(pTHX_ SV *const sv, const char *const pat, const STRLEN patlen,
 		case 'l':	iv = va_arg(*args, long); break;
 		case 'V':	iv = va_arg(*args, IV); break;
 		default:	iv = va_arg(*args, int); break;
+		case 'q':
 #ifdef HAS_QUAD
-		case 'q':	iv = va_arg(*args, Quad_t); break;
+				iv = va_arg(*args, Quad_t); break;
+#else
+				goto unknown;
 #endif
 		}
 	    }
@@ -7858,8 +7861,11 @@ Perl_sv_vcatpvfn(pTHX_ SV *const sv, const char *const pat, const STRLEN patlen,
 		case 'l':	iv = (long)tiv; break;
 		case 'V':
 		default:	iv = tiv; break;
+		case 'q':
 #ifdef HAS_QUAD
-		case 'q':	iv = (Quad_t)tiv; break;
+				iv = (Quad_t)tiv; break;
+#else
+				goto unknown;
 #endif
 		}
 	    }
@@ -7931,8 +7937,11 @@ Perl_sv_vcatpvfn(pTHX_ SV *const sv, const char *const pat, const STRLEN patlen,
 		case 'l':  uv = va_arg(*args, unsigned long); break;
 		case 'V':  uv = va_arg(*args, UV); break;
 		default:   uv = va_arg(*args, unsigned); break;
+		case 'q':
 #ifdef HAS_QUAD
-		case 'q':  uv = va_arg(*args, Uquad_t); break;
+			   uv = va_arg(*args, Uquad_t); break;
+#else
+			   goto unknown;
 #endif
 		}
 	    }
@@ -7943,8 +7952,11 @@ Perl_sv_vcatpvfn(pTHX_ SV *const sv, const char *const pat, const STRLEN patlen,
 		case 'l':	uv = (unsigned long)tuv; break;
 		case 'V':
 		default:	uv = tuv; break;
+		case 'q':
 #ifdef HAS_QUAD
-		case 'q':	uv = (Uquad_t)tuv; break;
+				uv = (Uquad_t)tuv; break;
+#else
+				goto unknown;
 #endif
 		}
 	    }
@@ -8230,8 +8242,11 @@ Perl_sv_vcatpvfn(pTHX_ SV *const sv, const char *const pat, const STRLEN patlen,
 		default:	*(va_arg(*args, int*)) = i; break;
 		case 'l':	*(va_arg(*args, long*)) = i; break;
 		case 'V':	*(va_arg(*args, IV*)) = i; break;
+		case 'q':
 #ifdef HAS_QUAD
-		case 'q':	*(va_arg(*args, Quad_t*)) = i; break;
+				*(va_arg(*args, Quad_t*)) = i; break;
+#else
+				goto unknown;
 #endif
 		}
 	    }
