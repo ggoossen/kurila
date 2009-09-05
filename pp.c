@@ -683,7 +683,7 @@ PP(pp_undef)
 	av_undef((AV*)sv);
 	break;
     case SVt_PVHV:
-	hv_undef((HV*)sv);
+	hv_undef(MUTABLE_HV(sv));
 	break;
     case SVt_PVCV:
 	cv_undef((CV*)sv);
@@ -3317,7 +3317,7 @@ PP(pp_each)
 {
     dVAR;
     dSP;
-    HV * hash = (HV*)POPs;
+    HV * hash = MUTABLE_HV(POPs);
     HE *entry;
     const I32 gimme = GIMME_V;
 
@@ -3402,7 +3402,7 @@ PP(pp_delete)
     }
     else {
 	SV *keysv = POPs;
-	HV * const hv = (HV*)POPs;
+	HV * const hv = MUTABLE_HV(POPs);
 	SV *sv;
 	if (SvTYPE(hv) == SVt_PVHV)
 	    sv = hv_delete_ent(hv, keysv, discard, 0);

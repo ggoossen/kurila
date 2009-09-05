@@ -733,7 +733,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    AvREFCNT_dec(av);
 	    break;
 	case SAVEt_HV:				/* hash reference */
-	    hv = (HV*)SSPOPPTR;
+	    hv = MUTABLE_HV(SSPOPPTR);
 	    gv = (GV*)SSPOPPTR;
 	    PL_localizing = 2;
 	    sv_setsv(hvTsv(GvHV(gv)), hvTsv(hv));
@@ -832,7 +832,7 @@ Perl_leave_scope(pTHX_ I32 base)
 		    av_clear((AV*)sv);
 		    break;
 		case SVt_PVHV:
-		    hv_clear((HV*)sv);
+		    hv_clear(MUTABLE_HV(sv));
 		    break;
 		case SVt_PVCV:
 		    SvREFCNT_dec(sv);
@@ -859,7 +859,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    break;
 	case SAVEt_DELETE:
 	    ptr = SSPOPPTR;
-	    hv = (HV*)ptr;
+	    hv = MUTABLE_HV(ptr);
 	    ptr = SSPOPPTR;
 	    (void)hv_delete(hv, (char*)ptr, (I32)SSPOPINT, G_DISCARD);
 	    HvREFCNT_dec(hv);
@@ -901,7 +901,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	case SAVEt_HELEM:		/* hash element */
 	    value = (SV*)SSPOPPTR;
 	    sv = (SV*)SSPOPPTR;
-	    hv = (HV*)SSPOPPTR;
+	    hv = MUTABLE_HV(SSPOPPTR);
 	    ptr = hv_fetch_ent(hv, sv, 1, 0);
 	    if (ptr) {
 		const SV * const oval = HeVAL((HE*)ptr);

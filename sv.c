@@ -3955,7 +3955,7 @@ Perl_sv_add_backref(pTHX_ SV *const tsv, SV *const sv)
     PERL_ARGS_ASSERT_SV_ADD_BACKREF;
 
     if (SvTYPE(tsv) == SVt_PVHV) {
-	AV **const avp = Perl_hv_backreferences_p(aTHX_ (HV*)tsv);
+	AV **const avp = Perl_hv_backreferences_p(aTHX_ MUTABLE_HV(tsv));
 
 	av = *avp;
 	if (!av) {
@@ -3996,7 +3996,7 @@ S_sv_del_backref(pTHX_ SV *const tsv, SV *const sv)
     PERL_ARGS_ASSERT_SV_DEL_BACKREF;
 
     if (SvTYPE(tsv) == SVt_PVHV && SvOOK(tsv)) {
-	av = *Perl_hv_backreferences_p(aTHX_ (HV*)tsv);
+	av = *Perl_hv_backreferences_p(aTHX_ MUTABLE_HV(tsv));
 	/* We mustn't attempt to "fix up" the hash here by moving the
 	   backreference array back to the hv_aux structure, as that is stored
 	   in the main HvARRAY(), and hfreentries assumes that no-one
@@ -4058,7 +4058,7 @@ Perl_sv_kill_backrefs(pTHX_ SV *const sv, AV *const av)
 		} else if (SvTYPE(referrer) == SVt_PVGV) {
 		    /* You lookin' at me?  */
 		    assert(GvSTASH(referrer));
-		    assert(GvSTASH(referrer) == (HV*)sv);
+		    assert(GvSTASH(referrer) == (const HV *)sv);
 		    GvSTASH(referrer) = 0;
 		} else {
 		    Perl_croak(aTHX_
@@ -4326,8 +4326,8 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 	cv_undef((CV*)sv);
 	break;
     case SVt_PVHV:
-	Perl_hv_kill_backrefs(aTHX_ (HV*)sv);
-	hv_undef((HV*)sv);
+	Perl_hv_kill_backrefs(aTHX_ MUTABLE_HV(sv));
+	hv_undef(MUTABLE_HV(sv));
 	break;
     case SVt_PVAV:
 	av_undef((AV*)sv);
@@ -7591,7 +7591,7 @@ Perl_sv_vcatpvfn(pTHX_ SV *const sv, const char *const pat, const STRLEN patlen,
 		 */
 		if (sv_derived_from(vecsv, "version")) {
 		    char *version = savesvpv(vecsv);
-		    if ( hv_exists((HV*)SvRV(vecsv), "alpha", 5 ) ) {
+		    if ( hv_exists(MUTABLE_HV(SvRV(vecsv)), "alpha", 5 ) ) {
 			Perl_warner(aTHX_ packWARN(WARN_INTERNAL),
 			"vector argument not supported with alpha versions");
 			goto unknown;
@@ -8568,7 +8568,7 @@ Perl_sv_recode_to_utf8(pTHX_ SV *sv, SV *encoding)
  * If so, return a mortal copy of the key. */
 
 STATIC SV*
-S_find_hash_subscript(pTHX_ HV *hv, SV* val)
+S_find_hash_subscript(pTHX_ const HV *const hv, const SV *const val)
 {
     dVAR;
     register HE **array;
@@ -8604,7 +8604,7 @@ S_find_hash_subscript(pTHX_ HV *hv, SV* val)
  * If so, return the index, otherwise return -1. */
 
 STATIC I32
-S_find_array_subscript(pTHX_ AV *av, SV* val)
+S_find_array_subscript(pTHX_ const AV *const av, const SV *const val)
 {
     dVAR;
 
@@ -8637,8 +8637,8 @@ S_find_array_subscript(pTHX_ AV *av, SV* val)
 #define FUV_SUBSCRIPT_WITHIN	4	/* "within @foo"   */
 
 STATIC SV*
-S_varname(pTHX_ GV *gv, const char gvtype, PADOFFSET targ,
-	SV* keyname, I32 aindex, int subscript_type)
+S_varname(pTHX_ const GV *const gv, const char gvtype, PADOFFSET targ,
+	const SV *const keyname, I32 aindex, int subscript_type)
 {
 
     SV * const name = sv_newmortal();
@@ -8700,13 +8700,13 @@ PL_comppad/PL_curpad points to the currently executing pad.
 */
 
 STATIC SV *
-S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
+S_find_uninit_var(pTHX_ const OP *const obase, const SV *const uninit_sv,
+		  bool match)
 {
     dVAR;
     SV *sv;
-    AV *av;
-    GV *gv;
-    OP *o, *o2, *kid;
+    const GV *gv;
+    const OP *o, *o2, *kid;
 
     if (!obase || (match && (!uninit_sv || uninit_sv == &PL_sv_undef ||
 			    uninit_sv == &PL_sv_placeholder)))
@@ -8735,7 +8735,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 
 	/* attempt to find a match within the aggregate */
 	if (hash) {
-	    keysv = find_hash_subscript((HV*)sv, uninit_sv);
+	    keysv = find_hash_subscript((const HV*)sv, uninit_sv);
 	    if (keysv)
 		subscript_type = FUV_SUBSCRIPT_HASH;
 	}
@@ -8768,7 +8768,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 	if (obase->op_flags & OPf_SPECIAL) { /* lexical array */
 	    if (match) {
 		SV **svp;
-		av = (AV*)PAD_SV(obase->op_targ);
+		AV *av = (AV*)PAD_SV(obase->op_targ);
 		if (!av || SvRMAGICAL(av))
 		    break;
 		svp = av_fetch(av, (I32)obase->op_private, FALSE);
@@ -8784,7 +8784,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 		break;
 	    if (match) {
 		SV **svp;
-		av = GvAV(gv);
+		AV *const av = GvAV(gv);
 		if (!av || SvRMAGICAL(av))
 		    break;
 		svp = av_fetch(av, (I32)obase->op_private, FALSE);
@@ -8835,7 +8835,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 		if (SvMAGICAL(sv))
 		    break;
 		if (obase->op_type == OP_HELEM) {
-		    HE* he = hv_fetch_ent((HV*)sv, cSVOPx_sv(kid), 0, 0);
+		    HE* he = hv_fetch_ent(MUTABLE_HV(sv), cSVOPx_sv(kid), 0, 0);
 		    if (!he || HeVAL(he) != uninit_sv)
 			break;
 		}
@@ -8856,7 +8856,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 	    /* index is an expression;
 	     * attempt to find a match within the aggregate */
 	    if (obase->op_type == OP_HELEM) {
-		SV * const keysv = find_hash_subscript((HV*)sv, uninit_sv);
+		SV * const keysv = find_hash_subscript((const HV*)sv, uninit_sv);
 		if (keysv)
 		    return varname(gv, '%', o->op_targ,
 						keysv, 0, FUV_SUBSCRIPT_HASH);

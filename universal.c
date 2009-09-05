@@ -360,7 +360,7 @@ XS(XS_UNIVERSAL_VERSION)
 	}
 
 	if ( vcmp( req, sv ) > 0 ) {
-	    if ( hv_exists((HV*)SvRV(req), "qv", 2 ) ) {
+	    if ( hv_exists(MUTABLE_HV(SvRV(req)), "qv", 2 ) ) {
 		Perl_croak(aTHX_ "%s version %"SVf" required--"
 		       "this is only version %"SVf"", HvNAME_get(pkg),
 		       SVfARG(vnormal(req)),

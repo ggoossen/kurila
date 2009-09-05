@@ -139,7 +139,7 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
     if(isa && AvFILLp(isa) >= 0) {
         SV** seqs_ptr;
         I32 seqs_items;
-        HV* const tails = (HV*)sv_2mortal((SV*)newHV());
+        HV* const tails = MUTABLE_HV(sv_2mortal((SV*)newHV()));
         AV* const seqs = (AV*)sv_2mortal((SV*)newAV());
         I32* heads;
 
@@ -378,7 +378,7 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
        is UNIVERSAL or one of its parents */
 
     svp = hv_fetch(PL_isarev, stashname, stashname_len, 0);
-    isarev = svp ? (HV*)*svp : NULL;
+    isarev = svp ? MUTABLE_HV(*svp) : NULL;
 
     if((stashname_len == 9 && strEQ(stashname, "UNIVERSAL"))
         || (isarev && hv_exists(isarev, "UNIVERSAL", 9))) {
@@ -435,7 +435,7 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
 	   us, then will need to upgrade it to an HV (which sv_upgrade() can
 	   now do for us. */
 
-        mroisarev = (HV*)HeVAL(he);
+        mroisarev = MUTABLE_HV(HeVAL(he));
 
 	SvUPGRADE((SV*)mroisarev, SVt_PVHV);
 
@@ -494,7 +494,7 @@ Perl_mro_method_changed_in(pTHX_ HV *stash)
     const STRLEN stashname_len = HvNAMELEN_get(stash);
 
     SV ** const svp = hv_fetch(PL_isarev, stashname, stashname_len, 0);
-    HV * const isarev = svp ? (HV*)*svp : NULL;
+    HV * const isarev = svp ? MUTABLE_HV(*svp) : NULL;
 
     PERL_ARGS_ASSERT_MRO_METHOD_CHANGED_IN;
 
@@ -604,7 +604,7 @@ XS(XS_mro_get_isarev)
 
     
     he = hv_fetch_ent(PL_isarev, classname, 0, 0);
-    isarev = he ? (HV*)HeVAL(he) : NULL;
+    isarev = he ? MUTABLE_HV(HeVAL(he)) : NULL;
 
     ret_array = newAV();
     if(isarev) {
@@ -636,7 +636,7 @@ XS(XS_mro_is_universal)
     classname_pv = SvPV(classname,classname_len);
 
     he = hv_fetch_ent(PL_isarev, classname, 0, 0);
-    isarev = he ? (HV*)HeVAL(he) : NULL;
+    isarev = he ? MUTABLE_HV(HeVAL(he)) : NULL;
 
     if((classname_len == 9 && strEQ(classname_pv, "UNIVERSAL"))
         || (isarev && hv_exists(isarev, "UNIVERSAL", 9)))

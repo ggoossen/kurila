@@ -342,7 +342,7 @@ Perl_do_chop(pTHX_ register SV *astr, register SV *sv)
         return;
     }
     else if (SvTYPE(sv) == SVt_PVHV) {
-	HV* const hv = (HV*)sv;
+	HV* const hv = MUTABLE_HV(sv);
 	HE* entry;
         (void)hv_iterinit(hv);
         while ((entry = hv_iternext(hv)))
@@ -420,7 +420,7 @@ Perl_do_chomp(pTHX_ register SV *sv)
         return count;
     }
     else if (SvTYPE(sv) == SVt_PVHV) {
-	HV* const hv = (HV*)sv;
+	HV* const hv = MUTABLE_HV(sv);
 	HE* entry;
         (void)hv_iterinit(hv);
         while ((entry = hv_iternext(hv)))
@@ -613,7 +613,7 @@ Perl_do_kv(pTHX)
 {
     dVAR;
     dSP;
-    HV * const hv = (HV*)POPs;
+    HV * const hv = MUTABLE_HV(POPs);
     HV *keys;
     register HE *entry;
     const I32 gimme = GIMME_V;
