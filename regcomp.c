@@ -6220,7 +6220,6 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
             | PERL_SCAN_DISALLOW_PREFIX
             | (SIZE_ONLY ? PERL_SCAN_SILENT_ILLDIGIT : 0);
         UV cp;
-	char string;
         len = (STRLEN)(endbrace - name - 2);
         cp = grok_hex(name + 2, &len, &fl, NULL);
         if ( len != (STRLEN)(endbrace - name - 2) ) {
@@ -6230,8 +6229,19 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
             *valuep = cp;
             return NULL;
         }
-	string = (char)cp;
-        sv_str= newSVpvn(&string, 1);
+
+	/* Need to convert to utf8 if either: won't fit into a byte, or the re
+	 * is going to be in utf8 and the representation changes under utf8. */
+	if ( cp > 0xff || ! UNI_IS_INVARIANT(cp) ) {
+	    U8 string[UTF8_MAXBYTES+1];
+	    U8 *tmps;
+	    tmps = uvuni_to_utf8(string, cp);
+	    sv_str = newSVpvn((char*)string, tmps - string);
+	} else {    /* Otherwise, no need for utf8, can skip that step */
+	    char string;
+	    string = (char)cp;
+	    sv_str= newSVpvn(&string, 1);
+	}
     } else {
         /* fetch the charnames handler for this scope */
         HV * const table = PL_hinthv;
@@ -6397,13 +6407,13 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
 	    if (SIZE_ONLY) {
 		RExC_size += STR_SZ(len);
 	    } else {
-		STR_LEN(ret) = len;
-		RExC_emit += STR_SZ(len);
-	    }
-	    Set_Node_Cur_Length(ret); /* MJD */
-	    RExC_parse--; 
-	    nextchar(pRExC_state);
-	}
+                STR_LEN(ret) = len;
+                RExC_emit += STR_SZ(len);
+            }
+            Set_Node_Cur_Length(ret); /* MJD */
+            RExC_parse--; 
+            nextchar(pRExC_state);
+        }
     } else {
         ret = reg_node(pRExC_state,NOTHING);
     }
@@ -8643,7 +8653,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
 	    if (lv) {
 		if (sw) {
 		    char s[UTF8_MAXBYTES_CASE+1];
-		
+
 		    for (i = 0; i <= 256; i++) { /* just the first 256 */
 			uvchr_to_utf8(s, i);
 			

@@ -51,7 +51,7 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
 	if (SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
 	    name = av_fetch(svTav(SvLOCATION(cv)), 3, FALSE);
 	av_push(av, name ? newSVsv(*name) : 
-            newSVpvs(CxTYPE(cx) == CXt_XSSUB ? "(xsub)" : "(sub)") );
+            newSVpvn(CxTYPE(cx) == CXt_XSSUB ? "(xsub)" : "(sub)", 0));
     }
     else if (CxTYPE(cx) == CXt_TRY) {
 	av_push(av, newSVpvs("(try)"));

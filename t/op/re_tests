@@ -1153,3 +1153,5 @@ foo(\R+)bar	foo\r\n\x{85}\r\n\nbar	y	$1	\r\n\x{85}\r\n\n
 /(.*?)a(?!(a+)b\2c)/	baaabaac	y	$^MATCH-$1	baa-ba
 # [perl #60344] Regex lookbehind failure after an (if)then|else in perl 5.10
 /\A(?(?=db2)db2|\D+)(?<!processed)\.csv\z/xms	sql_processed.csv	n	-	-
+/\N{U+0100}/	\x{100}	y	$^MATCH	\x{100}	# Bug #59328
+[\s][\S]	\x{a0}\x{a0}	nT	-	-	# TODO Unicode complements should not match same character

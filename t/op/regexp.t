@@ -13,6 +13,7 @@
 # 	y	expect a match
 # 	n	expect no match
 # 	c	expect an error
+#	T	the test is a TODO (can be combined with y/n/c)
 #	B	test exposes a known bug in Perl, should be skipped
 #	b	test exposes a known bug in Perl, should be skipped if noamp
 #	t	test exposes a bug with threading, TODO if qr_embed_thr
