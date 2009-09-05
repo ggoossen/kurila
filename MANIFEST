@@ -359,8 +359,10 @@ ext/PerlIO-scalar/Makefile.PL	PerlIO layer for scalars
 ext/PerlIO-scalar/scalar.pm	PerlIO layer for scalars
 ext/PerlIO-scalar/scalar.xs	PerlIO layer for scalars
 ext/PerlIO-scalar/t/scalar.t		See if PerlIO::scalar works
+ext/PerlIO-scalar/t/scalar_ungetc.t	Tests for PerlIO layer for scalars
 lib/PerlIO/t/fail.t		See if bad layers fail
 lib/PerlIO/t/fallback.t		See if PerlIO fallbacks work
+ext/PerlIO/t/ioleaks.t		See if PerlIO layers are leaking
 lib/PerlIO/t/open.t		See if PerlIO certain special opens work
 lib/PerlIO/t/PerlIO.t		See if PerlIO works
 ext/PerlIO-via/t/via.t		See if PerlIO::via works

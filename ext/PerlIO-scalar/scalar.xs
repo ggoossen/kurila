@@ -124,17 +124,6 @@ PerlIOScalar_tell(pTHX_ PerlIO * f)
 }
 
 SSize_t
-PerlIOScalar_unread(pTHX_ PerlIO * f, const void *vbuf, Size_t count)
-{
-    PerlIOScalar *s = PerlIOSelf(f, PerlIOScalar);
-    char *dst = SvGROW(s->var, (STRLEN)s->posn + count);
-    s->posn -= count;
-    Move(vbuf, dst + s->posn, count, char);
-    SvPOK_on(s->var);
-    return count;
-}
-
-SSize_t
 PerlIOScalar_write(pTHX_ PerlIO * f, const void *vbuf, Size_t count)
 {
     if (PerlIOBase(f)->flags & PERLIO_F_CANWRITE) {
@@ -290,7 +279,7 @@ PERLIO_FUNCS_DECL(PerlIO_scalar) = {
     PerlIOScalar_fileno,
     PerlIOScalar_dup,
     PerlIOBase_read,
-    PerlIOScalar_unread,
+    NULL, /* unread */
     PerlIOScalar_write,
     PerlIOScalar_seek,
     PerlIOScalar_tell,
