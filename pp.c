@@ -75,7 +75,7 @@ PP(pp_rv2gv)
       wasref:
 	sv = SvRV(sv);
 	if (SvTYPE(sv) == SVt_PVIO) {
-	    GV * const gv = (GV*) sv_newmortal();
+	    GV * const gv = MUTABLE_GV(sv_newmortal());
 	    gv_init(gv, 0, "", 0, 0);
 	    GvIOp(gv) = MUTABLE_IO(sv);
 	    SvREFCNT_inc_void_NN(sv);
@@ -98,7 +98,7 @@ PP(pp_rv2gv)
 			STRLEN len;
 			SV * const namesv = PAD_SV(cUNOP->op_targ);
 			const char * const name = SvPV(namesv, len);
-			gv = (GV*)newSV(0);
+			gv = MUTABLE_GV(newSV(0));
 			gv_init(gv, CopSTASH(PL_curcop), name, len, 0);
 		    }
 		    else {
@@ -154,7 +154,7 @@ PP(pp_rv2sv)
 	sv = SvRV(sv);
     }
     else {
-	gv = (GV*)sv;
+	gv = MUTABLE_GV(sv);
 
 	if (SvTYPE(gv) != SVt_PVGV) {
 	    Perl_croak(aTHX_ "Expected %s REF but got a %s", is_pp_rv2sv ? a_scalar : is_pp_rv2av ? an_array : a_hash, Ddesc(sv));
@@ -503,7 +503,7 @@ PP(pp_gelem)
 
     SV *sv = POPs;
     const char * const elem = SvPV_nolen_const(sv);
-    GV * const gv = (GV*)POPs;
+    GV * const gv = MUTABLE_GV(POPs);
     SV * tmpRef = NULL;
 
     sv = NULL;
@@ -698,17 +698,18 @@ PP(pp_undef)
             HV *stash;
 
             /* undef *Foo:: */
-            if((stash = GvHV((GV*)sv)) && HvNAME_get(stash))
+            if((stash = GvHV((const GV *)sv)) && HvNAME_get(stash))
                 mro_isa_changed_in(stash);
             /* undef *Pkg::meth_name ... */
-            else if(GvCVu((GV*)sv) && (stash = GvSTASH((GV*)sv)) && HvNAME_get(stash))
+            else if(GvCVu((const GV *)sv) && (stash = GvSTASH((const GV *)sv))
+		    && HvNAME_get(stash))
                 mro_method_changed_in(stash);
 
-	    gp_free((GV*)sv);
+	    gp_free(MUTABLE_GV(sv));
 	    Newxz(gp, 1, GP);
 	    GvGP(sv) = gp_ref(gp);
 	    GvSV(sv) = newSV(0);
-	    GvEGV(sv) = (GV*)sv;
+	    GvEGV(sv) = MUTABLE_GV(sv);
 	    GvMULTI_on(sv);
 	    break;
 	}

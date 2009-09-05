@@ -1743,7 +1743,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
     if (!ob || !(SvOBJECT(ob)
 		 || (SvTYPE(ob) == SVt_PVGV 
 		     && isGV_with_GP(ob)
-		     && (ob = MUTABLE_SV(GvIO((GV*)ob)))
+		     && (ob = MUTABLE_SV(GvIO((const GV *)ob)))
 		     && SvOBJECT(ob))))
     {
 	Perl_croak(aTHX_ "Can't call method \"%s\" on unblessed reference",
@@ -1761,7 +1761,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
     if (hashp) {
 	const HE* const he = hv_fetch_ent(stash, meth, 0, *hashp);
 	if (he) {
-	    GV* gv = (GV*)HeVAL(he);
+	    GV* gv = MUTABLE_GV(HeVAL(he));
 	    if (isGV(gv) && GvCV(gv) &&
 		(!GvCVGEN(gv) || GvCVGEN(gv)
                   == (PL_sub_generation + HvMROMETA(stash)->cache_gen)))

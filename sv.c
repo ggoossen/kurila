@@ -2541,7 +2541,7 @@ S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
 	if (stype == SVt_PVCV && (*location != sref || GvCVGEN(dstr))) {
 	    CV* const cv = MUTABLE_CV(*location);
 	    if (cv) {
-		if (!GvCVGEN((GV*)dstr) &&
+		if (!GvCVGEN((const GV *)dstr) &&
 		    (CvROOT(cv) || CvXSUB(cv)))
 		    {
 			/* Redefining a sub - warning is mandatory if
@@ -2568,8 +2568,8 @@ S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
 					(CvCONST(cv)
 					 ? "Constant subroutine %s::%s redefined"
 					 : "Subroutine %s::%s redefined"),
-					HvNAME_get(GvSTASH((GV*)dstr)),
-					GvENAME((GV*)dstr));
+					HvNAME_get(GvSTASH((const GV *)dstr)),
+					GvENAME(MUTABLE_GV(dstr)));
 			}
 		    }
 	    }
@@ -4336,9 +4336,10 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 	break;
     case SVt_PVGV:
 	if (isGV_with_GP(sv)) {
-            if(GvCVu((GV*)sv) && (stash = GvSTASH((GV*)sv)) && HvNAME_get(stash))
+            if(GvCVu((const GV *)sv) && (stash = GvSTASH(MUTABLE_GV(sv)))
+	       && HvNAME_get(stash))
                 mro_method_changed_in(stash);
-	    gp_free((GV*)sv);
+	    gp_free(MUTABLE_GV(sv));
 	    if (GvNAME_HEK(sv))
 		unshare_hek(GvNAME_HEK(sv));
 	    /* If we're in a stash, we don't own a reference to it. However it does
@@ -6374,7 +6375,7 @@ Perl_sv_2io(pTHX_ SV *const sv)
 	break;
     case SVt_PVGV:
 	if (isGV_with_GP(sv)) {
-	    gv = (GV*)sv;
+	    gv = MUTABLE_GV(sv);
 	    io = GvIO(gv);
 	    if (!io)
 		Perl_croak(aTHX_ "Bad filehandle: %s", GvNAME(gv));
@@ -6857,12 +6858,13 @@ S_sv_unglob(pTHX_ SV *const sv)
 
     assert(SvTYPE(sv) == SVt_PVGV);
     SvFAKE_off(sv);
-    gv_efullname3(temp, (GV *) sv, "*");
+    gv_efullname3(temp, MUTABLE_GV(sv), "*");
 
     if (GvGP(sv)) {
-        if(GvCVu((GV*)sv) && (stash = GvSTASH((GV*)sv)) && HvNAME_get(stash))
+        if(GvCVu((const GV *)sv) && (stash = GvSTASH(MUTABLE_GV(sv)))
+	   && HvNAME_get(stash))
             mro_method_changed_in(stash);
-	gp_free((GV*)sv);
+	gp_free(MUTABLE_GV(sv));
     }
     if (GvSTASH(sv)) {
 	sv_del_backref(MUTABLE_SV(GvSTASH(sv)), sv);

@@ -106,7 +106,7 @@ Perl_dump_packsubs(pTHX_ const HV *stash)
     for (i = 0; i <= (I32) HvMAX(stash); i++) {
         const HE *entry;
 	for (entry = HvARRAY(stash)[i]; entry; entry = HeNEXT(entry)) {
-	    const GV * const gv = (GV*)HeVAL(entry);
+	    const GV * const gv = (const GV *)HeVAL(entry);
 	    if (SvTYPE(gv) != SVt_PVGV || !GvGP(gv))
 		continue;
 	    if (GvCVu(gv))
@@ -1967,7 +1967,7 @@ Perl_xmldump_packsubs(pTHX_ const HV *stash)
 	return;
     for (i = 0; i <= (I32) HvMAX(stash); i++) {
 	for (entry = HvARRAY(stash)[i]; entry; entry = HeNEXT(entry)) {
-	    GV *gv = (GV*)HeVAL(entry);
+	    GV *gv = MUTABLE_GV(HeVAL(entry));
 	    HV *hv;
 	    if (SvTYPE(gv) != SVt_PVGV || !GvGP(gv))
 		continue;
@@ -2484,7 +2484,7 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	    ENTER_named("dump_fullname");
 	    SAVEFREESV(tmpsv1);
 	    SAVEFREESV(tmpsv2);
-	    gv_fullname3(tmpsv1, (GV*)cSVOPo->op_sv, NULL);
+	    gv_fullname3(tmpsv1, MUTABLE_GV(cSVOPo->op_sv), NULL);
 	    s = SvPV(tmpsv1,len);
 	    sv_catxmlpvn(tmpsv2, s, len);
 	    S_xmldump_attr(aTHX_ level, file, "gv=\"%s\"", SvPV(tmpsv2, len));

@@ -1048,11 +1048,11 @@ Perl_my_stat(pTHX)
 	STRLEN len;
 	PUTBACK;
 	if (isGV_with_GP(sv)) {
-	    gv = (GV*)sv;
+	    gv = MUTABLE_GV(sv);
 	    goto do_fstat;
 	}
 	else if (SvROK(sv) && isGV_with_GP(SvRV(sv))) {
-	    gv = (GV*)SvRV(sv);
+	    gv = MUTABLE_GV(SvRV(sv));
 	    goto do_fstat;
 	}
         else if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVIO) {
@@ -1098,7 +1098,7 @@ Perl_my_lstat(pTHX)
     PUTBACK;
     if (SvROK(sv) && isGV_with_GP(SvRV(sv)) && ckWARN(WARN_IO)) {
 	Perl_warner(aTHX_ packWARN(WARN_IO), "Use of -l on filehandle %s",
-		GvENAME((GV*) SvRV(sv)));
+		GvENAME((const GV *)SvRV(sv)));
 	return (PL_laststatval = -1);
     }
     file = SvPV_nolen_const(sv);
@@ -1335,7 +1335,7 @@ Perl_apply(pTHX_ I32 type, register SV **mark, register SV **sp)
 	    while (++mark <= sp) {
                 GV* gv;
                 if (isGV_with_GP(*mark)) {
-                    gv = (GV*)*mark;
+                    gv = MUTABLE_GV(*mark);
 		do_fchmod:
 		    if (GvIO(gv) && IoIFP(GvIOp(gv))) {
 #ifdef HAS_FCHMOD
@@ -1350,7 +1350,7 @@ Perl_apply(pTHX_ I32 type, register SV **mark, register SV **sp)
 		    }
 		}
 		else if (SvROK(*mark) && isGV_with_GP(SvRV(*mark))) {
-		    gv = (GV*)SvRV(*mark);
+		    gv = MUTABLE_GV(SvRV(*mark));
 		    goto do_fchmod;
 		}
 		else {
@@ -1371,7 +1371,7 @@ Perl_apply(pTHX_ I32 type, register SV **mark, register SV **sp)
 	    while (++mark <= sp) {
                 GV* gv;
                 if (isGV_with_GP(*mark)) {
-                    gv = (GV*)*mark;
+                    gv = MUTABLE_GV(*mark);
 		do_fchown:
 		    if (GvIO(gv) && IoIFP(GvIOp(gv))) {
 #ifdef HAS_FCHOWN
@@ -1386,7 +1386,7 @@ Perl_apply(pTHX_ I32 type, register SV **mark, register SV **sp)
 		    }
 		}
 		else if (SvROK(*mark) && isGV_with_GP(SvRV(*mark))) {
-		    gv = (GV*)SvRV(*mark);
+		    gv = MUTABLE_GV(SvRV(*mark));
 		    goto do_fchown;
 		}
 		else {
@@ -1532,7 +1532,7 @@ nothing in the core.
 	    while (++mark <= sp) {
                 GV* gv;
                 if (isGV_with_GP(*mark)) {
-                    gv = (GV*)*mark;
+                    gv = MUTABLE_GV(*mark);
 		do_futimes:
 		    if (GvIO(gv) && IoIFP(GvIOp(gv))) {
 #ifdef HAS_FUTIMES
@@ -1548,7 +1548,7 @@ nothing in the core.
 		    }
 		}
 		else if (SvROK(*mark) && isGV_with_GP(SvRV(*mark))) {
-		    gv = (GV*)SvRV(*mark);
+		    gv = MUTABLE_GV(SvRV(*mark));
 		    goto do_futimes;
 		}
 		else {
