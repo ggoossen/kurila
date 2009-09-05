@@ -386,7 +386,7 @@ Perl_hv_magic(pTHX_ HV *hv, GV *gv, int how)
 {
     PERL_ARGS_ASSERT_HV_MAGIC;
 
-    sv_magic((SV*)hv, (SV*)gv, how, NULL, 0);
+    sv_magic(MUTABLE_SV(hv), MUTABLE_SV(gv), how, NULL, 0);
 }
 
 AV *
@@ -1076,8 +1076,8 @@ Perl_hv_delete_ent(pTHX_ HV *hv, SV *keysv, I32 flags, U32 hash)
 {
     PERL_ARGS_ASSERT_HV_DELETE_ENT;
 
-    return (SV *) hv_common(hv, keysv, NULL, 0, 0, flags | HV_DELETE, NULL,
-			    hash);
+    return MUTABLE_SV(hv_common(hv, keysv, NULL, 0, 0, flags | HV_DELETE, NULL,
+				hash));
 }
 
 bool

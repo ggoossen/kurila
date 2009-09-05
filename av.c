@@ -287,7 +287,7 @@ Perl_av_store(pTHX_ register AV *av, I32 key, SV *val)
 	if (PL_delaymagic && mg->mg_type == PERL_MAGIC_isa)
 	    PL_delaymagic |= DM_ARRAY;
 	else
-	   mg_set((SV*)av);
+	   mg_set(MUTABLE_SV(av));
     }
     return &ary[key];
 }
@@ -360,7 +360,7 @@ Perl_av_clear(pTHX_ register AV *av)
 	if (PL_delaymagic && mg && mg->mg_type == PERL_MAGIC_isa)
 	    PL_delaymagic |= DM_ARRAY;
         else
-	    mg_clear((SV*)av); 
+	    mg_clear(MUTABLE_SV(av)); 
     }
 
     if (AvMAX(av) < 0)
@@ -411,7 +411,7 @@ Perl_av_undef(pTHX_ register AV *av)
     AvARRAY(av) = NULL;
     AvMAX(av) = AvFILLp(av) = -1;
 
-    if(SvRMAGICAL(av)) mg_clear((SV*)av);
+    if(SvRMAGICAL(av)) mg_clear(MUTABLE_SV(av));
 }
 
 void
@@ -494,7 +494,7 @@ Perl_av_pop(pTHX_ register AV *av)
     retval = AvARRAY(av)[AvFILLp(av)];
     AvARRAY(av)[AvFILLp(av)--] = &PL_sv_undef;
     if (SvSMAGICAL(av))
-	mg_set((SV*)av);
+	mg_set(MUTABLE_SV(av));
     return retval;
 }
 
@@ -605,7 +605,7 @@ Perl_av_shift(pTHX_ register AV *av)
     AvMAX(av)--;
     AvFILLp(av)--;
     if (SvSMAGICAL(av))
-	mg_set((SV*)av);
+	mg_set(MUTABLE_SV(av));
     return retval;
 }
 
@@ -668,7 +668,7 @@ Perl_av_fill(pTHX_ register AV *av, I32 fill)
 	    
 	AvFILLp(av) = fill;
 	if (SvSMAGICAL(av))
-	    mg_set((SV*)av);
+	    mg_set(MUTABLE_SV(av));
     }
     else
 	(void)av_store(av,fill,&PL_sv_undef);
@@ -716,7 +716,7 @@ Perl_av_delete(pTHX_ AV *av, I32 key, I32 flags)
 	else
 	    AvARRAY(av)[key] = &PL_sv_undef;
 	if (SvSMAGICAL(av))
-	    mg_set((SV*)av);
+	    mg_set(MUTABLE_SV(av));
     }
     if (flags & G_DISCARD) {
 	SvREFCNT_dec(sv);

@@ -678,7 +678,7 @@ Ap	|void	|preg_tmprefcnt	|NN REGEXP *rx
 EXp	|REGEXP*|reg_temp_copy	|NN REGEXP* r
 Ap	|void	|regfree_internal|NN REGEXP *const rx
 Ap	|void	|reg_tmprefcnt_internal|NN REGEXP *const rx
-Ap	|REGEXP*|pregcomp	|NN const SV * const pattern|const U32 flags
+Ap	|REGEXP*|pregcomp	|NN SV * const pattern|const U32 flags
 Ap	|REGEXP*|re_compile	|NN const SV * const pattern|U32 flags
 Ap	|char*	|re_intuit_start|NN REGEXP * const rx|NULLOK SV* sv|NN char* strpos \
 				|NN char* strend|const U32 flags \
@@ -959,7 +959,7 @@ p	|U32	|parse_unicode_opts|NN const char **popt
 Ap	|U32	|seed
 pR	|UV	|get_hash_seed
 p	|void	|report_evil_fh	|NULLOK IO *io|I32 op
-XEpd	|void	|report_uninit	|NULLOK SV* uninit_sv
+XEpd	|void	|report_uninit	|NULLOK const SV *uninit_sv
 Afpd	|void	|warn		|NN const char* pat|...
 Afp	|void	|warner		|U32 err|NN const char* pat|...
 Afp	|void	|warner_at	|NULLOK SV* location|U32 err|NN const char* pat|...

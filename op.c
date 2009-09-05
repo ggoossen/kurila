@@ -1067,7 +1067,7 @@ Perl_newPROG(pTHX_ OP *o)
 		PUSHMARK(SP);
 		XPUSHs(PL_parser->lex_filename);
 		PUTBACK;
-		call_sv((SV*)cv, G_DISCARD);
+		call_sv(MUTABLE_SV(cv), G_DISCARD);
 	    }
 	}
     }
@@ -1997,7 +1997,7 @@ Perl_mad_free(pTHX_ MADPROP* mp)
 	    op_free((OP*)mp->mad_val);
 	break;
     case MAD_SV:
-	sv_free((SV*)mp->mad_val);
+	sv_free(MUTABLE_SV(mp->mad_val));
 	break;
     default:
 	PerlIO_printf(PerlIO_stderr(), "Unrecognized mad\n");
@@ -3396,12 +3396,12 @@ Perl_cv_undef(pTHX_ CV *cv)
 	ROOTOPcpNULL(CvROOT(cv));
 	CvSTART(cv) = NULL;
     }
-    SvPOK_off((SV*)cv);		/* forget prototype */
+    SvPOK_off(MUTABLE_SV(cv));		/* forget prototype */
 
     pad_undef(cv);
 
     if (CvCONST(cv)) {
-	SvREFCNT_dec((SV*)CvXSUBANY(cv).any_ptr);
+	SvREFCNT_dec(MUTABLE_SV(CvXSUBANY(cv).any_ptr));
 	CvCONST_off(cv);
     }
     if (CvISXSUB(cv) && CvXSUB(cv)) {
@@ -3453,7 +3453,7 @@ Perl_cv_const_sv(pTHX_ const CV *const cv)
 	return NULL;
     if (!(SvTYPE(cv) == SVt_PVCV))
 	return NULL;
-    return CvCONST(cv) ? (SV*)CvXSUBANY(cv).any_ptr : NULL;
+    return CvCONST(cv) ? MUTABLE_SV(CvXSUBANY(cv).any_ptr) : NULL;
 }
 
 #ifdef PERL_MAD
@@ -4630,7 +4630,7 @@ Perl_ck_glob(pTHX_ OP *o)
 	gv = gv_fetchpvs("CORE::GLOBAL::glob", 0, SVt_PVCV);
 	glob_gv = gv_fetchpvs("File::Glob::csh_glob", 0, SVt_PVCV);
 	GvCV(gv) = GvCV(glob_gv);
-	SvREFCNT_inc_void((SV*)GvCV(gv));
+	SvREFCNT_inc_void(MUTABLE_SV(GvCV(gv)));
 	GvIMPORTED_CV_on(gv);
 	LEAVE_named("load_glob");
     }
@@ -5922,7 +5922,7 @@ const_sv_xsub(pTHX_ CV* cv)
 	NOOP;
     }
     EXTEND(sp, 1);
-    ST(0) = (SV*)XSANY.any_ptr;
+    ST(0) = MUTABLE_SV(XSANY.any_ptr);
     XSRETURN(1);
 }
 

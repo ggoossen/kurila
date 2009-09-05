@@ -675,15 +675,15 @@ Perl_leave_scope(pTHX_ I32 base)
     while (PL_savestack_ix > base) {
 	switch (SSPOPINT) {
 	case SAVEt_ITEM:			/* normal string */
-	    value = (SV*)SSPOPPTR;
-	    sv = (SV*)SSPOPPTR;
+	    value = MUTABLE_SV(SSPOPPTR);
+	    sv = MUTABLE_SV(SSPOPPTR);
 	    sv_replace(sv,value);
 	    PL_localizing = 2;
 	    SvSETMAGIC(sv);
 	    PL_localizing = 0;
 	    break;
 	case SAVEt_SV:				/* scalar reference */
-	    value = (SV*)SSPOPPTR;
+	    value = MUTABLE_SV(SSPOPPTR);
 	    gv = (GV*)SSPOPPTR;
 	    ptr = &GvSV(gv);
 	    av = MUTABLE_AV(gv); /* what to refcnt_dec */
@@ -717,7 +717,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    }
 	    break;
 	case SAVEt_GENERIC_SVREF:		/* generic sv */
-	    value = (SV*)SSPOPPTR;
+	    value = MUTABLE_SV(SSPOPPTR);
 	    ptr = SSPOPPTR;
 	    sv = *(SV**)ptr;
 	    *(SV**)ptr = value;
@@ -784,11 +784,11 @@ Perl_leave_scope(pTHX_ I32 base)
 	    break;
 	case SAVEt_FREESV:
 	    ptr = SSPOPPTR;
-	    SvREFCNT_dec((SV*)ptr);
+	    SvREFCNT_dec(MUTABLE_SV(ptr));
 	    break;
 	case SAVEt_MORTALIZESV:
 	    ptr = SSPOPPTR;
-	    sv_2mortal((SV*)ptr);
+	    sv_2mortal(MUTABLE_SV(ptr));
 	    break;
 	case SAVEt_FREEOP:
 	    ptr = SSPOPPTR;
@@ -847,8 +847,8 @@ Perl_leave_scope(pTHX_ I32 base)
 	    else {	/* Someone has a claim on this, so abandon it. */
 		const U32 padflags = SvFLAGS(sv) & (SVs_PADMY|SVs_PADTMP);
 		switch (SvTYPE(sv)) {	/* Console ourselves with a new value */
-		case SVt_PVAV:	*(SV**)ptr = (SV*)newAV();	break;
-		case SVt_PVHV:	*(SV**)ptr = (SV*)newHV();	break;
+		case SVt_PVAV:	*(SV**)ptr = MUTABLE_SV(newAV());	break;
+		case SVt_PVHV:	*(SV**)ptr = MUTABLE_SV(newHV());	break;
 		default:	*(SV**)ptr = newSV(0);		break;
 		}
 		SvREFCNT_dec(sv);	/* Cast current value to the winds. */
@@ -883,7 +883,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    cxstack[i].blk_oldsp = SSPOPINT;
 	    break;
 	case SAVEt_AELEM:		/* array element */
-	    value = (SV*)SSPOPPTR;
+	    value = MUTABLE_SV(SSPOPPTR);
 	    i = SSPOPINT;
 	    av = MUTABLE_AV(SSPOPPTR);
 	    ptr = av_fetch(av,i,1);
@@ -899,8 +899,8 @@ Perl_leave_scope(pTHX_ I32 base)
 	    SvREFCNT_dec(value);
 	    break;
 	case SAVEt_HELEM:		/* hash element */
-	    value = (SV*)SSPOPPTR;
-	    sv = (SV*)SSPOPPTR;
+	    value = MUTABLE_SV(SSPOPPTR);
+	    sv = MUTABLE_SV(SSPOPPTR);
 	    hv = MUTABLE_HV(SSPOPPTR);
 	    ptr = hv_fetch_ent(hv, sv, 1, 0);
 	    if (ptr) {
@@ -969,7 +969,7 @@ Perl_leave_scope(pTHX_ I32 base)
 		   But as we have all the information here, we can do it here,
 		   save even having to have itersave in the struct.  */
 		sv_2mortal(*svp);
-		*svp = (SV*)SSPOPPTR;
+		*svp = MUTABLE_SV(SSPOPPTR);
 	    }
 	    break;
 	case SAVEt_SET_MAGICSV: {
@@ -1008,7 +1008,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    {
 		const U32 val  = (U32)SSPOPINT;
 		const U32 mask = (U32)SSPOPINT;
-		sv = (SV*)SSPOPPTR;
+		sv = MUTABLE_SV(SSPOPPTR);
 		SvFLAGS(sv) &= ~mask;
 		SvFLAGS(sv) |= val;
 	    }
@@ -1017,7 +1017,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    /* This would be a mathom, but Perl_save_svref() calls a static
 	       function, S_save_scalar_at(), so has to stay in this file.  */
 	case SAVEt_SVREF:			/* scalar reference */
-	    value = (SV*)SSPOPPTR;
+	    value = MUTABLE_SV(SSPOPPTR);
 	    ptr = SSPOPPTR;
 	    av = NULL; /* what to refcnt_dec */
 	    goto restore_sv;
@@ -1025,7 +1025,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    /* These are only saved in mathoms.c */
 	case SAVEt_NSTAB:
 	    gv = (GV*)SSPOPPTR;
-	    (void)sv_clear((SV*)gv);
+	    (void)sv_clear(MUTABLE_SV(gv));
 	    break;
 	case SAVEt_LONG:			/* long reference */
 	    ptr = SSPOPPTR;

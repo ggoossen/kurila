@@ -79,7 +79,7 @@ PP(pp_rv2gv)
 	    gv_init(gv, 0, "", 0, 0);
 	    GvIOp(gv) = MUTABLE_IO(sv);
 	    SvREFCNT_inc_void_NN(sv);
-	    sv = (SV*) gv;
+	    sv = MUTABLE_SV(gv);
 	}
 	else if (!isGV_with_GP(sv))
 	    DIE(aTHX_ "Not a GLOB reference");
@@ -106,7 +106,7 @@ PP(pp_rv2gv)
 			gv = GvREFCNT_inc(newGVgen(name));
 		    }
 		    prepare_SV_for_RV(sv);
-		    SvRV_set(sv, (SV*)gv);
+		    SvRV_set(sv, MUTABLE_SV(gv));
 		    SvROK_on(sv);
 		    SvSETMAGIC(sv);
 		    goto wasref;
@@ -403,7 +403,7 @@ PP(pp_anoncode)
 	cv = svTcv(clone);
     }
     EXTEND(SP,1);
-    PUSHs((SV*)cv);
+    PUSHs(MUTABLE_SV(cv));
     RETURN;
 }
 
@@ -513,30 +513,30 @@ PP(pp_gelem)
 	switch (*elem) {
 	case 'A':
 	    if (strEQ(second_letter, "RRAY"))
-		tmpRef = (SV*)GvAV(gv);
+		tmpRef = MUTABLE_SV(GvAV(gv));
 	    break;
 	case 'C':
 	    if (strEQ(second_letter, "ODE"))
-		tmpRef = (SV*)GvCVu(gv);
+		tmpRef = MUTABLE_SV(GvCVu(gv));
 	    break;
 	case 'F':
 	    if (strEQ(second_letter, "ILEHANDLE")) {
 		/* finally deprecated in 5.8.0 */
 		deprecate("*glob{FILEHANDLE}");
-		tmpRef = (SV*)GvIOp(gv);
+		tmpRef = MUTABLE_SV(GvIOp(gv));
 	    }
 	    break;
 	case 'G':
 	    if (strEQ(second_letter, "LOB"))
-		tmpRef = (SV*)gv;
+		tmpRef = MUTABLE_SV(gv);
 	    break;
 	case 'H':
 	    if (strEQ(second_letter, "ASH"))
-		tmpRef = (SV*)GvHV(gv);
+		tmpRef = MUTABLE_SV(GvHV(gv));
 	    break;
 	case 'I':
 	    if (*second_letter == 'O' && !elem[2])
-		tmpRef = (SV*)GvIOp(gv);
+		tmpRef = MUTABLE_SV(GvIOp(gv));
 	    break;
 	case 'N':
 	    if (strEQ(second_letter, "AME"))
@@ -4286,7 +4286,7 @@ PP(pp_push)
 	    av_store(ary, AvFILLp(ary)+1, sv);
 	}
 	if (PL_delaymagic & DM_ARRAY)
-	    mg_set((SV*)ary);
+	    mg_set(MUTABLE_SV(ary));
 
 	PL_delaymagic = 0;
 	SP = ORIGMARK;

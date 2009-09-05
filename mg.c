@@ -350,7 +350,7 @@ Perl_mg_free(pTHX_ SV *sv)
 	    if (mg->mg_len > 0 || mg->mg_type == PERL_MAGIC_utf8)
 		Safefree(mg->mg_ptr);
 	    else if (mg->mg_len == HEf_SVKEY)
-		SvREFCNT_dec((SV*)mg->mg_ptr);
+		SvREFCNT_dec(MUTABLE_SV(mg->mg_ptr));
 	}
 	if (mg->mg_flags & MGf_REFCOUNTED)
 	    SvREFCNT_dec(mg->mg_obj);
@@ -2072,7 +2072,7 @@ Perl_sighandler(int sig)
 		   hv_stores(sih, "band",       newSViv(sip->si_band));
 #endif
 		   EXTEND(SP, 2);
-		   PUSHs((SV*)rv);
+		   PUSHs(rv);
 		   mPUSHp((char *)sip, sizeof(*sip));
 	      }
 
@@ -2081,7 +2081,7 @@ Perl_sighandler(int sig)
 #endif
     PUTBACK;
 
-    call_sv((SV*)cv, G_DISCARD|G_EVAL);
+    call_sv(MUTABLE_SV(cv), G_DISCARD|G_EVAL);
 
     POPSTACK;
     if (SvTRUE(ERRSV)) {

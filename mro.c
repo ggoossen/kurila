@@ -139,8 +139,8 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
     if(isa && AvFILLp(isa) >= 0) {
         SV** seqs_ptr;
         I32 seqs_items;
-        HV* const tails = MUTABLE_HV(sv_2mortal((SV*)newHV()));
-        AV *const seqs = MUTABLE_AV(sv_2mortal((SV*)newAV()));
+        HV* const tails = MUTABLE_HV(sv_2mortal(MUTABLE_SV(newHV())));
+        AV *const seqs = MUTABLE_AV(sv_2mortal(MUTABLE_SV(newAV())));
         I32* heads;
 
         /* This builds @seqs, which is an array of arrays.
@@ -364,7 +364,7 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
 
     /* wipe out the cached linearizations for this stash */
     meta = HvMROMETA(stash);
-    SvREFCNT_dec((SV*)meta->mro_linear_c3);
+    SvREFCNT_dec(MUTABLE_SV(meta->mro_linear_c3));
     meta->mro_linear_c3 = NULL;
     if (meta->isa) {
 	HvREFCNT_dec(meta->isa);
@@ -405,7 +405,7 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
 
             if(!revstash) continue;
             revmeta = HvMROMETA(revstash);
-            SvREFCNT_dec((SV*)revmeta->mro_linear_c3);
+            SvREFCNT_dec(MUTABLE_SV(revmeta->mro_linear_c3));
             revmeta->mro_linear_c3 = NULL;
             if(!is_universal)
                 revmeta->cache_gen++;
@@ -437,7 +437,7 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
 
         mroisarev = MUTABLE_HV(HeVAL(he));
 
-	SvUPGRADE((SV*)mroisarev, SVt_PVHV);
+	SvUPGRADE(MUTABLE_SV(mroisarev), SVt_PVHV);
 
 	/* This hash only ever contains PL_sv_yes. Storing it over itself is
 	   almost as cheap as calling hv_exists, so on aggregate we expect to
@@ -575,14 +575,14 @@ XS(XS_mro_get_linear_isa) {
         /* No stash exists yet, give them just the classname */
         AV* isalin = newAV();
         av_push(isalin, newSVsv(classname));
-        ST(0) = sv_2mortal(newRV_noinc((SV*)isalin));
+        ST(0) = sv_2mortal(newRV_noinc(MUTABLE_SV(isalin)));
         XSRETURN(1);
     }
     else {
         RETVAL = mro_get_linear_isa(class_stash);
     }
 
-    ST(0) = newRV_inc((SV*)RETVAL);
+    ST(0) = newRV_inc(MUTABLE_SV(RETVAL));
     sv_2mortal(ST(0));
     XSRETURN(1);
 }
@@ -613,7 +613,7 @@ XS(XS_mro_get_isarev)
         while((iter = hv_iternext(isarev)))
             av_push(ret_array, newSVsv(hv_iterkeysv(iter)));
     }
-    mXPUSHs(newRV_noinc((SV*)ret_array));
+    mXPUSHs(newRV_noinc(MUTABLE_SV(ret_array)));
 
     PUTBACK;
     return;

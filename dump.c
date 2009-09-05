@@ -392,7 +392,7 @@ Perl_sv_peek(pTHX_ SV *sv)
 	sv_catpv(t, "VOID");
 	goto finish;
     }
-    else if (sv == (SV*)0x55555555 || SvTYPE(sv) == 'U') {
+    else if (sv == (const SV *)0x55555555 || SvTYPE(sv) == 'U') {
 	sv_catpv(t, "WILD");
 	goto finish;
     }
@@ -463,7 +463,7 @@ Perl_sv_peek(pTHX_ SV *sv)
 	    sv_catpv(t, "...");
 	    goto finish;
 	}
-	sv = (SV*)SvRV(sv);
+	sv = SvRV(sv);
 	goto retry;
     }
     type = SvTYPE(sv);
@@ -1213,7 +1213,8 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
             }
 	    else if (mg->mg_len == HEf_SVKEY) {
 		PerlIO_puts(file, " => HEf_SVKEY\n");
-		do_sv_dump(level+2, file, (SV*)((mg)->mg_ptr), nest+1, maxnest, dumpops, pvlim); /* MG is already +1 */
+		do_sv_dump(level+2, file, MUTABLE_SV(((mg)->mg_ptr)), nest+1,
+			   maxnest, dumpops, pvlim); /* MG is already +1 */
 		continue;
 	    }
 	    else
@@ -1621,12 +1622,12 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 		Perl_dump_indent(aTHX_ level, file, "  NAME = \"%s\"\n", hvname);
 	}
 	if (SvOOK(sv)) {
-	    const AV * const backrefs
+	    AV * const backrefs
 		= *Perl_hv_backreferences_p(aTHX_ MUTABLE_HV(sv));
 	    if (backrefs) {
 		Perl_dump_indent(aTHX_ level, file, "  BACKREFS = 0x%"UVxf"\n",
 				 PTR2UV(backrefs));
-		do_sv_dump(level+1, file, (SV*)backrefs, nest+1, maxnest,
+		do_sv_dump(level+1, file, MUTABLE_SV(backrefs), nest+1, maxnest,
 			   dumpops, pvlim);
 	    }
 	}
@@ -2143,7 +2144,7 @@ Perl_sv_xmlpeek(pTHX_ SV *sv)
 	sv_catpv(t, "VOID=\"\"");
 	goto finish;
     }
-    else if (sv == (SV*)0x55555555 || SvTYPE(sv) == 'U') {
+    else if (sv == (const SV *)0x55555555 || SvTYPE(sv) == 'U') {
 	sv_catpv(t, "WILD=\"\"");
 	goto finish;
     }

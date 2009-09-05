@@ -76,7 +76,7 @@ Perl_gv_IOadd(pTHX_ register GV *gv)
 
     PERL_ARGS_ASSERT_GV_IOADD;
 
-    if (!gv || SvTYPE((SV*)gv) != SVt_PVGV) {
+    if (!gv || SvTYPE((const SV *)gv) != SVt_PVGV) {
 
         /*
          * if it walks like a dirhandle, then let's assume that
@@ -233,7 +233,7 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
     GvGP(gv) = Perl_newGP(aTHX_ gv);
     GvSTASH(gv) = stash;
     if (stash)
-	Perl_sv_add_backref(aTHX_ (SV*)stash, (SV*)gv);
+	Perl_sv_add_backref(aTHX_ MUTABLE_SV(stash), MUTABLE_SV(gv));
     gv_name_set(gv, name, len, GV_ADD);
     if (multi || doproto)              /* doproto means it _was_ mentioned */
 	GvMULTI_on(gv);
@@ -260,7 +260,7 @@ Perl_gv_init(pTHX_ GV *gv, HV *stash, const char *name, STRLEN len, int multi)
 	assert(SvTYPE(GvCV(gv)) == SVt_PVCV);
 	SVcpREPLACE(SvLOCATION(GvCV(gv)), PL_curcop->op_location);
 	if (proto) {
-	    sv_usepvn_flags((SV*)GvCV(gv), proto, protolen,
+	    sv_usepvn_flags(MUTABLE_SV(GvCV(gv)), proto, protolen,
 			    SV_HAS_TRAILING_NUL);
 	}
     }
@@ -926,7 +926,8 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		if (strEQ(name2, "SA")) {
 		    AV* const av = GvAVn(gv);
 		    GvMULTI_on(gv);
-		    sv_magic((SV*)av, (SV*)gv, PERL_MAGIC_isa, NULL, 0);
+		    sv_magic(MUTABLE_SV(av), MUTABLE_SV(gv), PERL_MAGIC_isa,
+			     NULL, 0);
 		    /* NOTE: No support for tied ISA */
 		}
 		break;

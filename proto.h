@@ -2363,7 +2363,7 @@ PERL_CALLCONV void	Perl_reg_tmprefcnt_internal(pTHX_ REGEXP *const rx)
 #define PERL_ARGS_ASSERT_REG_TMPREFCNT_INTERNAL	\
 	assert(rx)
 
-PERL_CALLCONV REGEXP*	Perl_pregcomp(pTHX_ const SV * const pattern, const U32 flags)
+PERL_CALLCONV REGEXP*	Perl_pregcomp(pTHX_ SV * const pattern, const U32 flags)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_PREGCOMP	\
 	assert(pattern)
@@ -3428,7 +3428,7 @@ PERL_CALLCONV UV	Perl_get_hash_seed(pTHX)
 			__attribute__warn_unused_result__;
 
 PERL_CALLCONV void	Perl_report_evil_fh(pTHX_ IO *io, I32 op);
-PERL_CALLCONV void	Perl_report_uninit(pTHX_ SV* uninit_sv);
+PERL_CALLCONV void	Perl_report_uninit(pTHX_ const SV *uninit_sv);
 PERL_CALLCONV void	Perl_warn(pTHX_ const char* pat, ...)
 			__attribute__format__(__printf__,pTHX_1,pTHX_2)
 			__attribute__nonnull__(pTHX_1);

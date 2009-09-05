@@ -1258,7 +1258,7 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
 	PUSHMARK(SP);
 	XPUSHs(msv);
 	PUTBACK;
-	call_sv((SV*)cv, G_DISCARD);
+	call_sv(MUTABLE_SV(cv), G_DISCARD);
 	POPSTACK;
 	LEAVE_named("call_diehook");
 	return TRUE;
@@ -4243,7 +4243,7 @@ Perl_scan_version(pTHX_ const char *s, SV *rv, bool qv)
     }
 
     /* And finally, store the AV in the hash */
-    (void)hv_stores(MUTABLE_HV(hv), "version", newRV_noinc((SV *)av));
+    (void)hv_stores(MUTABLE_HV(hv), "version", newRV_noinc(MUTABLE_SV(av)));
 
     /* fix RT#19517 - special case 'undef' as string */
     if ( *s == 'u' && strEQ(s,"undef") ) {
@@ -4311,7 +4311,7 @@ Perl_new_version(pTHX_ SV *ver)
 	    av_push(av, newSViv(rev));
 	}
 
-	(void)hv_stores(MUTABLE_HV(hv), "version", newRV_noinc((SV *)av));
+	(void)hv_stores(MUTABLE_HV(hv), "version", newRV_noinc(MUTABLE_SV(av)));
 	return rv;
     }
     sv_setsv(rv,ver); /* make a duplicate */
@@ -5750,7 +5750,7 @@ Perl_get_re_arg(pTHX_ SV *sv) {
 
     if (sv) {
         if (SvROK(sv) &&
-            (tmpsv = (SV*)SvRV(sv)) &&            /* assign deliberate */
+            (tmpsv = MUTABLE_SV(SvRV(sv))) &&            /* assign deliberate */
             SvTYPE(tmpsv) == SVt_REGEXP)
         {
             return (REGEXP*) tmpsv;

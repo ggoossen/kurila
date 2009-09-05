@@ -105,7 +105,7 @@ PP(pp_stringify)
 PP(pp_gv)
 {
     dVAR; dSP;
-    XPUSHs((SV*)cGVOP_gv);
+    XPUSHs(MUTABLE_SV(cGVOP_gv));
     RETURN;
 }
 
@@ -1714,7 +1714,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 	Perl_croak(aTHX_ "Can't call method \"%s\" on an undefined value", name);
 
     if (SvROK(sv))
-	ob = (SV*)SvRV(sv);
+	ob = MUTABLE_SV(SvRV(sv));
     else {
 	if ( ! SvPVOK(sv) )
 	    Perl_croak(aTHX_ "Can't call method \"%s\" on %s", name, Ddesc(sv));
@@ -1743,7 +1743,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
     if (!ob || !(SvOBJECT(ob)
 		 || (SvTYPE(ob) == SVt_PVGV 
 		     && isGV_with_GP(ob)
-		     && (ob = (SV*)GvIO((GV*)ob))
+		     && (ob = MUTABLE_SV(GvIO((GV*)ob)))
 		     && SvOBJECT(ob))))
     {
 	Perl_croak(aTHX_ "Can't call method \"%s\" on unblessed reference",
@@ -1765,7 +1765,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 	    if (isGV(gv) && GvCV(gv) &&
 		(!GvCVGEN(gv) || GvCVGEN(gv)
                   == (PL_sub_generation + HvMROMETA(stash)->cache_gen)))
-		return (SV*)GvCV(gv);
+		return MUTABLE_SV(GvCV(gv));
 	}
     }
 

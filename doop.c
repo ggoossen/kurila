@@ -335,7 +335,7 @@ Perl_do_chop(pTHX_ register SV *astr, register SV *sv)
 	const I32 max = AvFILL(av);
 
 	for (i = 0; i <= max; i++) {
-	    sv = (SV*)av_fetch(av, i, FALSE);
+	    sv = MUTABLE_SV(av_fetch(av, i, FALSE));
 	    if (sv && ((sv = *(SV**)sv), sv != &PL_sv_undef))
 		do_chop(astr, sv);
 	}
@@ -413,7 +413,7 @@ Perl_do_chomp(pTHX_ register SV *sv)
 	const I32 max = AvFILL(av);
 
 	for (i = 0; i <= max; i++) {
-	    sv = (SV*)av_fetch(av, i, FALSE);
+	    sv = MUTABLE_SV(av_fetch(av, i, FALSE));
 	    if (sv && ((sv = *(SV**)sv), sv != &PL_sv_undef))
 		count += do_chomp(sv);
 	}

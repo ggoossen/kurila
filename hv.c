@@ -1095,7 +1095,7 @@ Perl_hv_clear(pTHX_ HV *hv)
 	Zero(HvARRAY(hv), xhv->xhv_max+1 /* HvMAX(hv)+1 */, HE*);
 
     if (SvRMAGICAL(hv))
-	mg_clear((SV*)hv);
+	mg_clear(MUTABLE_SV(hv));
 
     HvREHASH_off(hv);
     reset:
@@ -1351,7 +1351,7 @@ Perl_hv_undef(pTHX_ HV *hv)
     HvPLACEHOLDERS_set(hv, 0);
 
     if (SvRMAGICAL(hv))
-	mg_clear((SV*)hv);
+	mg_clear(MUTABLE_SV(hv));
 }
 
 void
@@ -1604,7 +1604,7 @@ Perl_hv_kill_backrefs(pTHX_ HV *hv) {
 
     if (av) {
 	HvAUX(hv)->xhv_backreferences = 0;
-	Perl_sv_kill_backrefs(aTHX_ (SV*) hv, av);
+	Perl_sv_kill_backrefs(aTHX_ MUTABLE_SV(hv), av);
 	SvREFCNT_dec(av);
     }
 }
@@ -2021,12 +2021,12 @@ I32 *
 Perl_hv_placeholders_p(pTHX_ HV *hv)
 {
     dVAR;
-    MAGIC *mg = mg_find((SV*)hv, PERL_MAGIC_rhash);
+    MAGIC *mg = mg_find((const SV *)hv, PERL_MAGIC_rhash);
 
     PERL_ARGS_ASSERT_HV_PLACEHOLDERS_P;
 
     if (!mg) {
-	mg = sv_magicext((SV*)hv, 0, PERL_MAGIC_rhash, 0, 0, 0);
+	mg = sv_magicext(MUTABLE_SV(hv), 0, PERL_MAGIC_rhash, 0, 0, 0);
 
 	if (!mg) {
 	    Perl_croak(aTHX_ "panic: hv_placeholders_p");
@@ -2051,7 +2051,7 @@ void
 Perl_hv_placeholders_set(pTHX_ HV *hv, I32 ph)
 {
     dVAR;
-    MAGIC * const mg = mg_find((SV*)hv, PERL_MAGIC_rhash);
+    MAGIC * const mg = mg_find((const SV *)hv, PERL_MAGIC_rhash);
 
     PERL_ARGS_ASSERT_HV_PLACEHOLDERS_SET;
 
@@ -2101,7 +2101,7 @@ Perl_hv_assert(pTHX_ HV *hv)
 	} 
     }
     if (bad) {
-	sv_dump((SV *)hv);
+	sv_dump(MUTABLE_SV(hv));
     }
     HvRITER_set(hv, riter);		/* Restore hash iterator state */
     HvEITER_set(hv, eiter);

@@ -167,7 +167,7 @@ Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
 
 #ifdef PERL_POISON
 #  define SvARENA_CHAIN(sv)	((sv)->sv_u.svu_rv)
-#  define SvARENA_CHAIN_SET(sv,val)	(sv)->sv_u.svu_rv = (SV *)(val)
+#  define SvARENA_CHAIN_SET(sv,val)	(sv)->sv_u.svu_rv = MUTABLE_SV((val))
 /* Whilst I'd love to do this, it seems that things like to check on
    unreferenced scalars
 #  define POSION_SV_HEAD(sv)	PoisonNew(sv, 1, struct STRUCT_SV)
@@ -294,7 +294,7 @@ S_del_sv(pTHX_ SV *p)
     if (DEBUG_D_TEST) {
 	SV* sva;
 	bool ok = 0;
-	for (sva = PL_sv_arenaroot; sva; sva = (SV *) SvANY(sva)) {
+	for (sva = PL_sv_arenaroot; sva; sva = MUTABLE_SV(SvANY(sva))) {
 	    const SV * const sv = sva + 1;
 	    const SV * const svend = &sva[SvREFCNT(sva)];
 	    if (p >= sv && p < svend) {
@@ -335,7 +335,7 @@ void
 Perl_sv_add_arena(pTHX_ char *const ptr, const U32 size, const U32 flags)
 {
     dVAR;
-    SV* const sva = (SV*)ptr;
+    SV *const sva = MUTABLE_SV(ptr);
     register SV* sv;
     register SV* svend;
 
@@ -380,7 +380,7 @@ S_visit(pTHX_ SVFUNC_t f, const U32 flags, const U32 mask)
 
     PERL_ARGS_ASSERT_VISIT;
 
-    for (sva = PL_sv_arenaroot; sva; sva = (SV*)SvANY(sva)) {
+    for (sva = PL_sv_arenaroot; sva; sva = MUTABLE_SV(SvANY(sva))) {
 	register const SV * const svend = &sva[SvREFCNT(sva)];
 	register SV* sv;
 	for (sv = sva + 1; sv < svend; ++sv) {
@@ -485,9 +485,9 @@ Perl_sv_free_arenas(pTHX)
        contiguity of the fake ones with the corresponding real ones.) */
 
     for (sva = PL_sv_arenaroot; sva; sva = svanext) {
-	svanext = (SV*) SvANY(sva);
+	svanext = MUTABLE_SV(SvANY(sva));
 	while (svanext && SvFAKE(svanext))
-	    svanext = (SV*) SvANY(svanext);
+	    svanext = MUTABLE_SV(SvANY(svanext));
 
 	if (!SvFAKE(sva)) {
 	    Safefree(sva);
@@ -766,7 +766,7 @@ struct xpv {
 
 #define copy_length(type, last_member) \
 	STRUCT_OFFSET(type, last_member) \
-	+ sizeof (((type*)SvANY((SV*)0))->last_member)
+	+ sizeof (((type*)SvANY((const SV *)0))->last_member)
 
 static const struct body_details bodies_by_type[] = {
     { sizeof(HE), 0, 0, SVt_NULL,
@@ -3871,7 +3871,7 @@ Perl_sv_unmagic(pTHX_ SV *const sv, const int type)
 		if (mg->mg_len > 0)
 		    Safefree(mg->mg_ptr);
 		else if (mg->mg_len == HEf_SVKEY)
-		    SvREFCNT_dec((SV*)mg->mg_ptr);
+		    SvREFCNT_dec(MUTABLE_SV(mg->mg_ptr));
 		else if (mg->mg_type == PERL_MAGIC_utf8)
 		    Safefree(mg->mg_ptr);
             }
@@ -4344,7 +4344,7 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 	    /* If we're in a stash, we don't own a reference to it. However it does
 	       have a back reference to us, which needs to be cleared.  */
 	    if (!SvVALID(sv) && (stash = GvSTASH(sv)))
-		    sv_del_backref((SV*)stash, sv);
+		    sv_del_backref(MUTABLE_SV(stash), sv);
 	}
     case SVt_PVMG:
     case SVt_PVNV:
@@ -6588,7 +6588,7 @@ Perl_sv_isobject(pTHX_ SV *sv)
 	return 0;
     if (!SvROK(sv))
 	return 0;
-    sv = (SV*)SvRV(sv);
+    sv = SvRV(sv);
     if (!SvOBJECT(sv))
 	return 0;
     return 1;
@@ -6615,7 +6615,7 @@ Perl_sv_isa(pTHX_ SV *sv, const char *const name)
 	return 0;
     if (!SvROK(sv))
 	return 0;
-    sv = (SV*)SvRV(sv);
+    sv = SvRV(sv);
     if (!SvOBJECT(sv))
 	return 0;
     hvname = HvNAME_get(SvSTASH(sv));
@@ -6865,7 +6865,7 @@ S_sv_unglob(pTHX_ SV *const sv)
 	gp_free((GV*)sv);
     }
     if (GvSTASH(sv)) {
-	sv_del_backref((SV*)GvSTASH(sv), sv);
+	sv_del_backref(MUTABLE_SV(GvSTASH(sv)), sv);
 	GvSTASH(sv) = NULL;
     }
     GvMULTI_off(sv);
@@ -7336,7 +7336,7 @@ Perl_sv_vcatpvfn(pTHX_ SV *const sv, const char *const pat, const STRLEN patlen,
     }
     if (args && patlen == 3 && pat[0] == '%' &&
 		pat[1] == '-' && pat[2] == 'p') {
-	argsv = (SV*)va_arg(*args, void*);
+	argsv = MUTABLE_SV(va_arg(*args, void*));
 	sv_catsv(sv, argsv);
 	return;
     }
@@ -7486,7 +7486,7 @@ Perl_sv_vcatpvfn(pTHX_ SV *const sv, const char *const pat, const STRLEN patlen,
 			precis = n;
 			has_precis = TRUE;
 		    }
-		    argsv = (SV*)va_arg(*args, void*);
+		    argsv = MUTABLE_SV(va_arg(*args, void*));
 		    eptr = SvPV_const(argsv, elen);
 		    goto string;
 		}
@@ -8729,7 +8729,7 @@ S_find_uninit_var(pTHX_ const OP *const obase, const SV *const uninit_sv,
 		gv = cGVOPx_gv(cUNOPx(obase)->op_first);
 		if (!gv)
 		    break;
-		sv = hash ? (SV*)GvHV(gv): (SV*)GvAV(gv);
+		sv = hash ? MUTABLE_SV(GvHV(gv)): MUTABLE_SV(GvAV(gv));
 	    }
 	    else /* @{expr}, %{expr} */
 		return find_uninit_var(cUNOPx(obase)->op_first,
@@ -8826,7 +8826,8 @@ S_find_uninit_var(pTHX_ const OP *const obase, const SV *const uninit_sv,
 	    gv = cGVOPx_gv(cUNOPo->op_first);
 	    if (!gv)
 		break;
-	    sv = o->op_type == OP_RV2HV ? (SV*)GvHV(gv) : (SV*)GvAV(gv);
+	    sv = o->op_type
+		== OP_RV2HV ? MUTABLE_SV(GvHV(gv)) : MUTABLE_SV(GvAV(gv));
 	}
 	if (!sv)
 	    break;
@@ -9071,7 +9072,7 @@ Print appropriate "Use of uninitialized variable" warning
 */
 
 void
-Perl_report_uninit(pTHX_ SV* uninit_sv)
+Perl_report_uninit(pTHX_ const SV *uninit_sv)
 {
     dVAR;
     if (PL_op) {

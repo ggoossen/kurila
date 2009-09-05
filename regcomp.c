@@ -3713,7 +3713,7 @@ extern const struct regexp_engine my_reg_engine;
 
 #ifndef PERL_IN_XSUB_RE 
 REGEXP *
-Perl_pregcomp(pTHX_ const SV * const pattern, const U32 flags)
+Perl_pregcomp(pTHX_ SV * const pattern, const U32 flags)
 {
     dVAR;
     HV * const table = PL_hinthv;
@@ -3746,7 +3746,7 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
     struct regexp *r;
     register regexp_internal *ri;
     STRLEN plen;
-    char*  exp = SvPV((SV*)pattern, plen);
+    char  *exp = SvPV(pattern, plen);
     char* xend = exp + plen;
     regnode *scan;
     I32 flags;
@@ -3867,7 +3867,7 @@ Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
             + (sizeof(STD_PAT_MODS) - 1)
             + (sizeof("(?:)") - 1);
 
-	p = sv_grow((SV *)rx, wraplen + 1);
+	p = sv_grow(MUTABLE_SV(rx), wraplen + 1);
 	SvCUR_set(reTsv(rx), wraplen);
 	SvPOK_on(rx);
         *p++='('; *p++='?';
@@ -4508,7 +4508,7 @@ Perl_reg_named_buff_fetch(pTHX_ REGEXP * const r, SV * const namesv,
 		}
             }
             if (retarray)
-                return newRV_noinc((SV*)retarray);
+                return newRV_noinc(MUTABLE_SV(retarray));
         }
     }
     return NULL;
@@ -4647,7 +4647,7 @@ Perl_reg_named_buff_all(pTHX_ REGEXP * const r, const U32 flags)
         }
     }
 
-    return newRV_noinc((SV*)av);
+    return newRV_noinc(MUTABLE_SV(av));
 }
 
 void
@@ -4756,7 +4756,7 @@ Perl_reg_numbered_buff_length(pTHX_ REGEXP * const r, const SV * const sv,
             goto getlen;
         } else {
             if (ckWARN(WARN_UNINITIALIZED))
-                report_uninit((SV*)sv);
+                report_uninit((const SV *)sv);
             return 0;
         }
     }
@@ -5124,10 +5124,10 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                                 "panic: reg_scan_name returned NULL");
                         if (!RExC_paren_names) {
                             RExC_paren_names= newHV();
-                            sv_2mortal((SV*)RExC_paren_names);
+                            sv_2mortal(MUTABLE_SV(RExC_paren_names));
 #ifdef RE_DEBUGGING
                             RExC_paren_name_list= newAV();
-                            sv_2mortal((SV*)RExC_paren_name_list);
+                            sv_2mortal(MUTABLE_SV(RExC_paren_name_list));
 #endif
                         }
                         he_str = hv_fetch_ent( RExC_paren_names, svname, 1, 0 );
@@ -6256,7 +6256,7 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
         if (!RExC_charnames) {
             /* make sure our cache is allocated */
             RExC_charnames = newHV();
-            sv_2mortal((SV*)RExC_charnames);
+            sv_2mortal(MUTABLE_SV(RExC_charnames));
         } 
             /* see if we have looked this one up before */
         he_str = hv_fetch_ent( RExC_charnames, sv_name, 0, 0 );
@@ -7894,8 +7894,8 @@ S_anyof_get_swash(pTHX_ RExC_state_t *pRExC_state, regnode* ret, SV* listsv, AV*
 	 * used later (regexec.c:S_reginclass()). */
 	av_store(av, 0, listsv);
 	av_store(av, 1, NULL);
-	av_store(av, 2, (SV*)unicode_alternate);
-	rv = newRV_noinc((SV*)av);
+	av_store(av, 2, MUTABLE_SV(unicode_alternate));
+	rv = newRV_noinc(MUTABLE_SV(av));
 
 	if (UTF) {
 	    SV **const ary = AvARRAY(av);
@@ -8567,7 +8567,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
             }	    
             else {
                 AV *list= MUTABLE_AV(progi->data->data[ progi->name_list_idx ]);
-                SV *sv_dat=(SV*)progi->data->data[ ARG( o ) ];
+                SV *sv_dat= MUTABLE_SV(progi->data->data[ ARG( o ) ]);
                 I32 *nums=(I32*)SvPVX_mutable(sv_dat);
                 SV **name= av_fetch(list, nums[0], 0 );
                 I32 n;
@@ -8585,7 +8585,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
     else if (k == VERB) {
         if (!o->flags) 
             Perl_sv_catpvf(aTHX_ sv, ":%"SVf, 
-                SVfARG((SV*)progi->data->data[ ARG( o ) ]));
+			   SVfARG((MUTABLE_SV(progi->data->data[ ARG( o ) ]))));
     } else if (k == LOGICAL)
 	Perl_sv_catpvf(aTHX_ sv, "[%d]", o->flags);	/* 2: embedded, otherwise 1 */
     else if (k == FOLDCHAR)
@@ -8927,7 +8927,7 @@ Perl_regfree_internal(pTHX_ REGEXP * const rx)
 	    case 's':
 	    case 'S':
 	    case 'u':
-		SvREFCNT_dec((SV*)ri->data->data[n]);
+		SvREFCNT_dec(MUTABLE_SV(ri->data->data[n]));
 		break;
 	    case 'f':
 		Safefree(ri->data->data[n]);
@@ -8945,7 +8945,7 @@ Perl_regfree_internal(pTHX_ REGEXP * const rx)
 		rootop_refcnt_dec((ROOTOP*)ri->data->data[n]); 
 
 		PAD_RESTORE_LOCAL(old_comppad);
-		SvREFCNT_dec((SV*)new_comppad);
+		SvREFCNT_dec(MUTABLE_SV(new_comppad));
 		new_comppad = NULL;
 		break;
 	    case 'n':

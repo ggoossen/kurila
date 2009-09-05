@@ -3178,7 +3178,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 			    /* This isn't a first class regexp. Instead, it's
 			       caching a regexp onto an existing, Perl visible
 			       scalar.  */
-			    sv_magic(ret, (SV*) rx, PERL_MAGIC_qr, 0, 0);
+			    sv_magic(ret, MUTABLE_SV(rx), PERL_MAGIC_qr, 0, 0);
 			}
 			PL_regsize = osize;
 		    }
@@ -3724,7 +3724,7 @@ NULL
         case CUTGROUP:
             PL_reginput = locinput;
             sv_yes_mark = st->u.mark.mark_name = scan->flags ? NULL :
-                (SV*)rexi->data->data[ ARG( scan ) ];
+                MUTABLE_SV(rexi->data->data[ ARG( scan ) ]);
             PUSH_STATE_GOTO(CUTGROUP_next,next);
             /* NOTREACHED */
         case CUTGROUP_next_fail:
@@ -4394,7 +4394,7 @@ NULL
 	case PRUNE:
 	    PL_reginput = locinput;
 	    if (!scan->flags)
-	        sv_yes_mark = sv_commit = (SV*)rexi->data->data[ ARG( scan ) ];
+	        sv_yes_mark = sv_commit = MUTABLE_SV(rexi->data->data[ ARG( scan ) ]);
 	    PUSH_STATE_GOTO(COMMIT_next,next);
 	    /* NOTREACHED */
 	case COMMIT_next_fail:
@@ -4408,7 +4408,7 @@ NULL
         case MARKPOINT:
             ST.prev_mark = mark_state;
             ST.mark_name = sv_commit = sv_yes_mark 
-                = (SV*)rexi->data->data[ ARG( scan ) ];
+                = MUTABLE_SV(rexi->data->data[ ARG( scan ) ]);
             mark_state = st;
             ST.mark_loc = PL_reginput = locinput;
             PUSH_YES_STATE_GOTO(MARKPOINT_next,next);
@@ -4449,7 +4449,7 @@ NULL
                    otherwise do nothing.  Meaning we need to scan 
                  */
                 regmatch_state *cur = mark_state;
-                SV *find = (SV*)rexi->data->data[ ARG( scan ) ];
+                SV *find = MUTABLE_SV(rexi->data->data[ ARG( scan ) ]);
                 
                 while (cur) {
                     if ( sv_eq( cur->u.mark.mark_name, 

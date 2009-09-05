@@ -202,8 +202,8 @@ Perl_pad_new(pTHX_ int flags, PAD* parent_padnames, PAD* parent_pad, IV parent_s
     av_store(pad, PAD_ARGS_INDEX -1, &PL_sv_undef); /* make sure pad is filled to PAD_ARGS_INDEX */
 
     AvREAL_off(padlist);
-    av_store(padlist, 0, (SV*)padname);
-    av_store(padlist, 1, (SV*)pad);
+    av_store(padlist, 0, MUTABLE_SV(padname));
+    av_store(padlist, 1, MUTABLE_SV(pad));
 
     /* ... then update state variables */
 
@@ -279,7 +279,7 @@ Perl_pad_undef(pTHX_ CV* cv)
 	}
 	SvREFCNT_dec(sv);
     }
-    SvREFCNT_dec((SV*)CvPADLIST(cv));
+    SvREFCNT_dec(MUTABLE_SV(CvPADLIST(cv)));
     CvPADLIST(cv) = NULL;
 }
 
@@ -360,9 +360,9 @@ Perl_pad_add_name(pTHX_ const char *name, GV* ourgv, bool fake)
 	/* XXX DAPM since slot has been allocated, replace
 	 * av_store with PL_curpad[offset] ? */
 	if (*name == '@')
-	    av_store(PL_comppad, offset, (SV*)newAV());
+	    av_store(PL_comppad, offset, MUTABLE_SV(newAV()));
 	else if (*name == '%')
-	    av_store(PL_comppad, offset, (SV*)newHV());
+	    av_store(PL_comppad, offset, MUTABLE_SV(newHV()));
 	SvPADMY_on(PL_curpad[offset]);
 	DEBUG_Xv(PerlIO_printf(Perl_debug_log,
 	    "Pad addname: %ld \"%s\" new lex=0x%"UVxf"\n",
@@ -1081,7 +1081,7 @@ Perl_pad_tidy(pTHX_ padtidy_type type)
 	/* XXX DAPM this same bit of code keeps appearing !!! Rationalise? */
 	AV * const av = newAV();			/* Will be @_ */
 	av_extend(av, 0);
-	av_store(PL_comppad, 0, (SV*)av);
+	av_store(PL_comppad, 0, MUTABLE_SV(av));
 	AvREIFY_only(av);
     }
 
@@ -1407,9 +1407,9 @@ Perl_pad_push(pTHX_ PADLIST *padlist, int depth)
 		else {		/* our own lexical */
 		    SV *sv; 
 		    if (sigil == '@')
-			sv = (SV*)newAV();
+			sv = MUTABLE_SV(newAV());
 		    else if (sigil == '%')
-			sv = (SV*)newHV();
+			sv = MUTABLE_SV(newHV());
 		    else
 			sv = newSV(0);
 		    av_store(newpad, ix, sv);
@@ -1428,10 +1428,10 @@ Perl_pad_push(pTHX_ PADLIST *padlist, int depth)
 	}
 	av = newAV();
 	av_extend(av, 0);
-	av_store(newpad, 0, (SV*)av);
+	av_store(newpad, 0, MUTABLE_SV(av));
 	AvREIFY_only(av);
 
-	av_store(padlist, depth, (SV*)newpad);
+	av_store(padlist, depth, MUTABLE_SV(newpad));
 	AvFILLp(padlist) = depth;
     }
 }

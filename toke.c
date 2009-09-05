@@ -1223,7 +1223,7 @@ S_curmad(pTHX_ char slot, SV *sv, SV* location)
     /* keep a slot open for the head of the list? */
     if (slot != '_' && *where && (*where)->mad_key == '^') {
 	(*where)->mad_key = slot;
-	sv_free((SV*)((*where)->mad_val));
+	sv_free(MUTABLE_SV(((*where)->mad_val)));
 	(*where)->mad_val = (void*)sv;
 	(*where)->mad_linenr = linenr;
 	(*where)->mad_charoffset = charoffset;
@@ -2952,7 +2952,7 @@ Perl_yylex(pTHX)
 	    PL_thismad = PL_nexttoke[PL_lasttoke].next_mad;
 	    PL_nexttoke[PL_lasttoke].next_mad = 0;
 	    if (PL_thismad && PL_thismad->mad_key == '_') {
-		PL_thiswhite = (SV*)PL_thismad->mad_val;
+		PL_thiswhite = MUTABLE_SV(PL_thismad->mad_val);
 		PL_thismad->mad_val = 0;
 		mad_free(PL_thismad);
 		PL_thismad = 0;
@@ -3311,7 +3311,7 @@ Perl_yylex(pTHX)
 		    ++svp;
 		    sv_catpvs(PL_linestr, ";");
 		}
-		sv_free((SV*)PL_preambleav);
+		sv_free(MUTABLE_SV(PL_preambleav));
 		PL_preambleav = NULL;
 	    }
 	    PL_oldoldbufptr = PL_oldbufptr = s = PL_linestart = SvPVX_mutable(PL_linestr);

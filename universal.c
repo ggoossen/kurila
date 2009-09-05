@@ -264,7 +264,7 @@ XS(XS_UNIVERSAL_can)
     rv = &PL_sv_undef;
 
     if (SvROK(sv)) {
-        sv = (SV*)SvRV(sv);
+        sv = MUTABLE_SV(SvRV(sv));
         if (SvOBJECT(sv))
             pkg = SvSTASH(sv);
     }
@@ -314,7 +314,7 @@ XS(XS_UNIVERSAL_VERSION)
     PERL_UNUSED_ARG(cv);
 
     if (SvROK(ST(0))) {
-        sv = (SV*)SvRV(ST(0));
+        sv = MUTABLE_SV(SvRV(ST(0)));
         if (!SvOBJECT(sv))
             Perl_croak(aTHX_ "Cannot find version of an unblessed reference");
         pkg = SvSTASH(sv);
@@ -334,7 +334,7 @@ XS(XS_UNIVERSAL_VERSION)
         undef = NULL;
     }
     else {
-        sv = (SV*)&PL_sv_undef;
+        sv = &PL_sv_undef;
         undef = "(undef)";
     }
 
