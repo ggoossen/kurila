@@ -4633,7 +4633,7 @@ Perl_yylex(pTHX)
 		    /* Real typeglob, so get the real subroutine: */
 			   ? GvCVu(gv)
 		    /* A proxy for a subroutine in this package? */
-			   : SvOK(gv) ? (CV *) gv : NULL)
+			   : SvOK(gv) ? MUTABLE_CV(gv) : NULL)
 		    : NULL;
 
 		/* See if it's the indirect object for a list operator. */

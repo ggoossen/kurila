@@ -4430,7 +4430,7 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
     PERL_ARGS_ASSERT_CALL_LIST;
 
     while (av_len(paramList) >= 0) {
-	cv = (CV*)av_shift(paramList);
+	cv = MUTABLE_CV(av_shift(paramList));
 	if ( ! PL_savebegin ) {
 	    if (!PL_madskills)
 		SAVEFREESV(cv);

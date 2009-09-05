@@ -2527,7 +2527,7 @@ S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
     common:
 	if (intro) {
 	    if (stype == SVt_PVCV) {
-		/*if (GvCVGEN(dstr) && (GvCV(dstr) != (CV*)sref || GvCVGEN(dstr))) {*/
+		/*if (GvCVGEN(dstr) && (GvCV(dstr) != (const CV *)sref || GvCVGEN(dstr))) {*/
 		if (GvCVGEN(dstr)) {
 		    CvREFCNT_dec(GvCV(dstr));
 		    GvCV(dstr) = NULL;
@@ -2539,15 +2539,16 @@ S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
 	else
 	    dref = *location;
 	if (stype == SVt_PVCV && (*location != sref || GvCVGEN(dstr))) {
-	    CV* const cv = (CV*)*location;
+	    CV* const cv = MUTABLE_CV(*location);
 	    if (cv) {
 		if (!GvCVGEN((GV*)dstr) &&
 		    (CvROOT(cv) || CvXSUB(cv)))
 		    {
 			/* Redefining a sub - warning is mandatory if
 			   it was a const and its value changed. */
-			if (CvCONST(cv)	&& CvCONST((CV*)sref)
-			    && cv_const_sv(cv) == cv_const_sv((CV*)sref)) {
+			if (CvCONST(cv)	&& CvCONST((const CV *)sref)
+			    && cv_const_sv(cv)
+			    == cv_const_sv((const CV *)sref)) {
 			    NOOP;
 			    /* They are 2 constant subroutines generated from
 			       the same constant. This probably means that
@@ -2558,9 +2559,10 @@ S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
 			}
 			else if (ckWARN(WARN_REDEFINE)
 				 || (CvCONST(cv)
-				     && (!CvCONST((CV*)sref)
+				     && (!CvCONST((const CV *)sref)
 					 || sv_cmp(cv_const_sv(cv),
-						   cv_const_sv((CV*)sref))))) {
+						   cv_const_sv((const CV *)
+							       sref))))) {
 			    Perl_warner(aTHX_ packWARN(WARN_REDEFINE),
 					(const char *)
 					(CvCONST(cv)
@@ -4323,7 +4325,7 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 	pregfree2((REGEXP*) sv);
 	goto freescalar;
     case SVt_PVCV:
-	cv_undef((CV*)sv);
+	cv_undef(MUTABLE_CV(sv));
 	break;
     case SVt_PVHV:
 	Perl_hv_kill_backrefs(aTHX_ MUTABLE_HV(sv));
@@ -6418,7 +6420,7 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
     switch (SvTYPE(sv)) {
     case SVt_PVCV:
 	*gvp = NULL;
-	return sv;
+	return MUTABLE_CV(sv);
     case SVt_PVHV:
     case SVt_PVAV:
 	Perl_croak(aTHX_ "Expected a CODE reference but got a %s", Ddesc(sv));

@@ -506,7 +506,7 @@ PERL_CALLCONV void	Perl_cv_clone_anon(pTHX_ CV* dst, CV* src)
 #define PERL_ARGS_ASSERT_CV_CLONE_ANON	\
 	assert(dst); assert(src)
 
-PERL_CALLCONV SV*	Perl_cv_const_sv(pTHX_ CV* cv)
+PERL_CALLCONV SV*	Perl_cv_const_sv(pTHX_ const CV* const cv)
 			__attribute__warn_unused_result__;
 
 PERL_INLINE_CALLCONV bool	Perl_cv_assignarg_flag(pTHX_ CV* cv)
