@@ -67,6 +67,7 @@ if( %Is{?NW5} )
 %Is{+QNX}    = $^OS_NAME eq 'qnx'
 %Is{+AIX}    = $^OS_NAME eq 'aix'
 %Is{+Darwin} = $^OS_NAME eq 'darwin'
+$Is{+Haiku}  = $^O eq 'haiku';
 
 %Is{+Unix}   = !grep { $_ }, values %Is
 
@@ -85,4 +86,3 @@ sub _assert
     my $sanity = shift
     die sprintf "Assert failed at \%s line \%d\n", < (@: caller)[[1..2]] unless $sanity
     return
-

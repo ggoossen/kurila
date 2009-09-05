@@ -151,7 +151,7 @@ sub get_files
         # we might miss out on compiler-specific ones
         %file{+"$(env::var('GUSI'))include:sys:errno.h"} = 1
 
-    elsif ($^OS_NAME eq 'beos')
+    elsif ($^OS_NAME eq 'beos' || $^OS_NAME eq 'haiku')
         # hidden in a special place
         %file{+'/boot/develop/headers/posix/errno.h'} = 1
 
