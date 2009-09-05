@@ -355,7 +355,7 @@ Perl_do_chop(pTHX_ register SV *astr, register SV *sv)
 	    sv_force_normal_flags(sv, 0);
         }
         if (SvREADONLY(sv))
-            Perl_croak(aTHX_ PL_no_modify);
+            Perl_croak(aTHX_ "%s", PL_no_modify);
     }
 
     s = SvPV(sv, len);
@@ -433,7 +433,7 @@ Perl_do_chomp(pTHX_ register SV *sv)
 	    sv_force_normal_flags(sv, 0);
         }
         if (SvREADONLY(sv))
-            Perl_croak(aTHX_ PL_no_modify);
+            Perl_croak(aTHX_ "%s", PL_no_modify);
     }
 
     s = SvPV(sv, len);

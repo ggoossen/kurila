@@ -257,7 +257,7 @@ Perl_av_store(pTHX_ register AV *av, I32 key, SV *val)
     }
 
     if (SvREADONLY(av) && key >= AvFILL(av))
-	Perl_croak(aTHX_ PL_no_modify);
+	Perl_croak(aTHX_ "%s", PL_no_modify);
 
     if (!AvREAL(av) && AvREIFY(av))
 	av_reify(av);
@@ -353,7 +353,7 @@ Perl_av_clear(pTHX_ register AV *av)
 #endif
 
     if (SvREADONLY(av))
-	Perl_croak(aTHX_ PL_no_modify);
+	Perl_croak(aTHX_ "%s", PL_no_modify);
 
     /* Give any tie a chance to cleanup first */
     if (SvRMAGICAL(av)) {
@@ -465,7 +465,7 @@ Perl_av_push(pTHX_ register AV *av, SV *val)
     assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvREADONLY(av))
-	Perl_croak(aTHX_ PL_no_modify);
+	Perl_croak(aTHX_ "%s", PL_no_modify);
 
     av_store(av,AvFILLp(av)+1,val);
 }
@@ -489,7 +489,7 @@ Perl_av_pop(pTHX_ register AV *av)
     assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvREADONLY(av))
-	Perl_croak(aTHX_ PL_no_modify);
+	Perl_croak(aTHX_ "%s", PL_no_modify);
     if (AvFILL(av) < 0)
 	return &PL_sv_undef;
     retval = AvARRAY(av)[AvFILLp(av)];
@@ -541,7 +541,7 @@ Perl_av_unshift(pTHX_ register AV *av, register I32 num)
     assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvREADONLY(av))
-	Perl_croak(aTHX_ PL_no_modify);
+	Perl_croak(aTHX_ "%s", PL_no_modify);
 
     if (num <= 0)
       return;
@@ -596,7 +596,7 @@ Perl_av_shift(pTHX_ register AV *av)
     assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvREADONLY(av))
-	Perl_croak(aTHX_ PL_no_modify);
+	Perl_croak(aTHX_ "%s", PL_no_modify);
     if (AvFILL(av) < 0)
       return &PL_sv_undef;
     retval = *AvARRAY(av);
@@ -694,7 +694,7 @@ Perl_av_delete(pTHX_ AV *av, I32 key, I32 flags)
     assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvREADONLY(av))
-	Perl_croak(aTHX_ PL_no_modify);
+	Perl_croak(aTHX_ "%s", PL_no_modify);
 
     if (key < 0) {
 	key += AvFILL(av) + 1;
