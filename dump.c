@@ -208,7 +208,7 @@ Perl_pv_escape( pTHX_ SV *dsv, char const * const str,
 
     if (!(flags & PERL_PV_ESCAPE_NOCLEAR)) {
 	    /* This won't alter the UTF-8 flag */
-	    sv_setpvn(dsv, "", 0);
+	    sv_setpvs(dsv, "");
     }
     
     if ((flags & PERL_PV_ESCAPE_UNI_DETECT) && is_utf8_string(pv, count))
@@ -325,38 +325,35 @@ Perl_pv_pretty( pTHX_ SV *dsv, char const * const str, const STRLEN count,
    
     if (!(flags & PERL_PV_PRETTY_NOCLEAR)) {
 	    /* This won't alter the UTF-8 flag */
-	    sv_setpvn(dsv, "", 0);
+	    sv_setpvs(dsv, "");
     }
 
     if ( dq == '"' )
-        sv_catpvn(dsv, "\"", 1);
+        sv_catpvs(dsv, "\"");
     else if ( flags & PERL_PV_PRETTY_LTGT )
-        sv_catpvn(dsv, "<", 1);
+        sv_catpvs(dsv, "<");
         
     if ( start_color != NULL ) 
-        Perl_sv_catpv( aTHX_ dsv, start_color);
+        sv_catpv(dsv, start_color);
     
     pv_escape( dsv, str, count, max, &escaped, flags | PERL_PV_ESCAPE_NOCLEAR );    
     
     if ( end_color != NULL ) 
-        Perl_sv_catpv( aTHX_ dsv, end_color);
+        sv_catpv(dsv, end_color);
 
     if ( dq == '"' ) 
-	sv_catpvn( dsv, "\"", 1 );
+	sv_catpvs( dsv, "\"");
     else if ( flags & PERL_PV_PRETTY_LTGT )
-        sv_catpvn( dsv, ">", 1);         
+        sv_catpvs(dsv, ">");         
     
     if ( (flags & PERL_PV_PRETTY_ELLIPSES) && ( escaped < count ) )
-	    sv_catpvn( dsv, "...", 3 );
+	    sv_catpvs(dsv, "...");
  
     return SvPVX_const(dsv);
 }
 
 /*
 =for apidoc pv_display
-
-  char *pv_display(SV *dsv, const char *pv, STRLEN cur, STRLEN len,
-                   STRLEN pvlim, U32 flags)
 
 Similar to
 
@@ -377,7 +374,7 @@ Perl_pv_display(pTHX_ SV *dsv, const char *pv, STRLEN cur, STRLEN len, STRLEN pv
 
     pv_pretty( dsv, pv, cur, pvlim, NULL, NULL, PERL_PV_PRETTY_DUMP);
     if (len > cur && pv[cur] == '\0')
-            sv_catpvn( dsv, "\\0", 2 );
+            sv_catpvs( dsv, "\\0");
     return SvPVX_const(dsv);
 }
 
@@ -389,7 +386,7 @@ Perl_sv_peek(pTHX_ SV *sv)
     int unref = 0;
     U32 type;
 
-    sv_setpvn(t, "", 0);
+    sv_setpvs(t, "");
   retry:
     if (!sv) {
 	sv_catpv(t, "VOID");
@@ -950,7 +947,7 @@ void Perl_dump_op_mad (pTHX_ I32 level, PerlIO *file, const MADPROP *mp)
 	level++;
 	while (mp) {
 	    const char tmp = mp->mad_key;
-	    sv_setpvn(tmpsv,"'",1);
+	    sv_setpvs(tmpsv,"'");
 	    if (tmp)
 		sv_catpvn(tmpsv, &tmp, 1);
 	    sv_catpv(tmpsv, "'=");
@@ -1535,15 +1532,15 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	    PerlIO_putc(file, '\n');
 	Perl_dump_indent(aTHX_ level, file, "  FILL = %"IVdf"\n", (IV)AvFILLp(sv));
 	Perl_dump_indent(aTHX_ level, file, "  MAX = %"IVdf"\n", (IV)AvMAX(sv));
-	sv_setpvn(d, "", 0);
+	sv_setpvs(d, "");
 	if (AvREAL(sv))	sv_catpv(d, ",REAL");
 	if (AvREIFY(sv))	sv_catpv(d, ",REIFY");
 	Perl_dump_indent(aTHX_ level, file, "  FLAGS = (%s)\n",
 			 SvCUR(d) ? SvPVX_const(d) + 1 : "");
-	if (nest < maxnest && av_len((AV*)sv) >= 0) {
+	if (nest < maxnest && av_len(MUTABLE_AV(sv)) >= 0) {
 	    int count;
-	    for (count = 0; count <=  av_len((AV*)sv) && count < maxnest; count++) {
-		SV** const elt = av_fetch((AV*)sv,count,0);
+	    for (count = 0; count <=  av_len(MUTABLE_AV(sv)) && count < maxnest; count++) {
+		SV** const elt = av_fetch(MUTABLE_AV(sv),count,0);
 
 		Perl_dump_indent(aTHX_ level + 1, file, "Elt No. %"IVdf"\n", (IV)count);
 		if (elt)
@@ -1832,7 +1829,7 @@ Perl_debop(pTHX_ const OP *o)
 	SV *sv;
         if (cv) {
 	    AV * const padlist = CvPADLIST(cv);
-            AV * const comppad = (AV*)(*av_fetch(padlist, 0, FALSE));
+            AV * const comppad = MUTABLE_AV(*av_fetch(padlist, 0, FALSE));
             sv = *av_fetch(comppad, o->op_targ, FALSE);
         } else
             sv = NULL;
@@ -2023,7 +2020,7 @@ Perl_sv_catxmlpvn(pTHX_ SV *dsv, const char *pv, STRLEN len)
 
     PERL_ARGS_ASSERT_SV_CATXMLPVN;
 
-    sv_catpvn(dsv,"",0);
+    sv_catpvs(dsv,"");
 
   retry:
     while (pv < e) {
@@ -2140,7 +2137,7 @@ Perl_sv_xmlpeek(pTHX_ SV *sv)
 
     PERL_ARGS_ASSERT_SV_XMLPEEK;
 
-    sv_setpvn(t, "", 0);
+    sv_setpvs(t, "");
     /* retry: */
     if (!sv) {
 	sv_catpv(t, "VOID=\"\"");
@@ -2566,7 +2563,7 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	level++;
 	while (mp) {
 	    char tmp = mp->mad_key;
-	    sv_setpvn(tmpsv,"",0);
+	    sv_setpvs(tmpsv,"");
 	    if (tmp) {
 		if (slotname(tmp))
 		    sv_catpv(tmpsv, slotname(tmp));

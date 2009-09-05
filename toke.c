@@ -1215,7 +1215,7 @@ S_curmad(pTHX_ char slot, SV *sv, SV* location)
         where = &PL_nexttoke[PL_curforce].next_mad;
 
     if (PL_faketokens)
-        sv_setpvn(sv, "", 0);
+        sv_setpvs(sv, "");
 
     linenr = location ? SvIV(*av_fetch(svTav(location), 1, FALSE)) : 0;
     charoffset = location ? SvIV(*av_fetch(svTav(location), 2, FALSE)) : 0;
@@ -1650,7 +1650,7 @@ S_sublex_done(pTHX)
                 PL_thiswhite = 0;
             }
             if (PL_thistoken)
-                sv_setpvn(PL_thistoken,"",0);
+                sv_setpvs(PL_thistoken,"");
             else
                 PL_realtokenstart = -1;
         }
@@ -3336,7 +3336,7 @@ Perl_yylex(pTHX)
 		}
 		PL_oldoldbufptr = PL_oldbufptr = s = PL_linestart = SvPVX_mutable(PL_linestr);
 		PL_last_lop = PL_last_uni = NULL;
-		sv_setpvn(PL_linestr,"",0);
+		sv_setpvs(PL_linestr,"");
 		TOKEN(';');	/* not infinite loop because rsfp is NULL now */
 	    }
 	    /* If it looks like the start of a BOM or raw UTF-16,
@@ -3375,7 +3375,7 @@ Perl_yylex(pTHX)
 		}
 #endif
 		if (*s == '=' && strnEQ(s, "=cut", 4) && !isALPHA(s[4])) {
-		    sv_setpvn(PL_linestr, "", 0);
+		    sv_setpvs(PL_linestr, "");
 		    PL_oldoldbufptr = PL_oldbufptr = s = PL_linestart = SvPVX_mutable(PL_linestr);
 		    PL_bufend = SvPVX_mutable(PL_linestr) + SvCUR(PL_linestr);
 		    PL_last_lop = PL_last_uni = NULL;
@@ -9633,7 +9633,7 @@ S_scan_heredoc(pTHX_ register char *s)
 	PL_last_lop = PL_last_uni = NULL;
     }
     else
-	sv_setpvn(tmpstr,"",0);   /* avoid "uninitialized" warning */
+	sv_setpvs(tmpstr,"");   /* avoid "uninitialized" warning */
     while (s >= PL_bufend) {	/* multiple line string? */
 #ifdef PERL_MAD
 	if (PL_madskills) {

@@ -393,7 +393,7 @@ AV *
 Perl_av_fake(pTHX_ register I32 size, register SV **strp)
 {
     register SV** ary;
-    register AV * const av = (AV*)newSV_type(SVt_PVAV);
+    register AV * const av = MUTABLE_AV(newSV_type(SVt_PVAV));
 
     PERL_ARGS_ASSERT_AV_FAKE;
 
@@ -1141,7 +1141,7 @@ Perl_magic_setglob(pTHX_ SV *sv, MAGIC *mg)
 AV *
 Perl_newAV(pTHX)
 {
-    return (AV*)newSV_type(SVt_PVAV);
+    return MUTABLE_AV(newSV_type(SVt_PVAV));
     /* sv_upgrade does AvREAL_only():
     AvALLOC(av) = 0;
     AvARRAY(av) = NULL;

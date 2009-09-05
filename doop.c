@@ -63,7 +63,7 @@ Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV *av)
 	items = av_len(svTav(av)) + 1;
     }
 
-    sv_setpvn(sv, "", 0);
+    sv_setpvs(sv, "");
 
     if (items-- > 0) {
 	if (*mark)
@@ -331,7 +331,7 @@ Perl_do_chop(pTHX_ register SV *astr, register SV *sv)
 
     if (SvTYPE(sv) == SVt_PVAV) {
 	register I32 i;
-	AV* const av = (AV*)sv;
+	AV *const av = MUTABLE_AV(sv);
 	const I32 max = AvFILL(av);
 
 	for (i = 0; i <= max; i++) {
@@ -376,7 +376,7 @@ Perl_do_chop(pTHX_ register SV *astr, register SV *sv)
 	    }
 	}
 	else
-	    sv_setpvn(astr, "", 0);
+	    sv_setpvs(astr, "");
     }
     else if (s && len) {
 	s += --len;
@@ -386,7 +386,7 @@ Perl_do_chop(pTHX_ register SV *astr, register SV *sv)
 	SvNIOK_off(sv);
     }
     else
-	sv_setpvn(astr, "", 0);
+	sv_setpvs(astr, "");
     SvSETMAGIC(sv);
 }
 
@@ -409,7 +409,7 @@ Perl_do_chomp(pTHX_ register SV *sv)
     count = 0;
     if (SvTYPE(sv) == SVt_PVAV) {
 	register I32 i;
-	AV* const av = (AV*)sv;
+	AV *const av = MUTABLE_AV(sv);
 	const I32 max = AvFILL(av);
 
 	for (i = 0; i <= max; i++) {
@@ -510,7 +510,7 @@ Perl_do_vop(pTHX_ I32 optype, SV *sv, SV *left, SV *right)
     PERL_ARGS_ASSERT_DO_VOP;
 
     if (sv != left || (optype != OP_BIT_AND && !SvOK(sv)))
-	sv_setpvn(sv, "", 0);	/* avoid undef warning on |= and ^= */
+	sv_setpvs(sv, "");	/* avoid undef warning on |= and ^= */
     lsave = lc = SvPV_const(left, leftlen);
     rsave = rc = SvPV_const(right, rightlen);
 

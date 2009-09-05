@@ -3969,7 +3969,7 @@ Perl_sv_add_backref(pTHX_ SV *const tsv, SV *const sv)
 	const MAGIC *const mg
 	    = SvMAGICAL(tsv) ? mg_find(tsv, PERL_MAGIC_backref) : NULL;
 	if (mg)
-	    av = (AV*)mg->mg_obj;
+	    av = MUTABLE_AV(mg->mg_obj);
 	else {
 	    av = newAV();
 	    AvREAL_off(av);
@@ -4008,7 +4008,7 @@ S_sv_del_backref(pTHX_ SV *const tsv, SV *const sv)
 	const MAGIC *const mg
 	    = SvMAGICAL(tsv) ? mg_find(tsv, PERL_MAGIC_backref) : NULL;
 	if (mg)
-	    av = (AV *)mg->mg_obj;
+	    av = MUTABLE_AV(mg->mg_obj);
     }
 
     if (!av)
@@ -4314,7 +4314,7 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 	    IoIFP(sv) != PerlIO_stdout() &&
 	    IoIFP(sv) != PerlIO_stderr())
 	{
-	    io_close((IO*)sv, FALSE);
+	    io_close(MUTABLE_IO(sv), FALSE);
 	}
 	if (IoDIRP(sv) && !(IoFLAGS(sv) & IOf_FAKE_DIRP))
 	    PerlDir_close(IoDIRP(sv));
@@ -4332,7 +4332,7 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 	hv_undef(MUTABLE_HV(sv));
 	break;
     case SVt_PVAV:
-	av_undef((AV*)sv);
+	av_undef(MUTABLE_AV(sv));
 	break;
     case SVt_PVGV:
 	if (isGV_with_GP(sv)) {
@@ -6370,7 +6370,7 @@ Perl_sv_2io(pTHX_ SV *const sv)
 
     switch (SvTYPE(sv)) {
     case SVt_PVIO:
-	io = (IO*)sv;
+	io = MUTABLE_IO(sv);
 	break;
     case SVt_PVGV:
 	if (isGV_with_GP(sv)) {
@@ -7220,7 +7220,7 @@ Perl_sv_vsetpvfn(pTHX_ SV *const sv, const char *const pat, const STRLEN patlen,
 {
     PERL_ARGS_ASSERT_SV_VSETPVFN;
 
-    sv_setpvn(sv, "", 0);
+    sv_setpvs(sv, "");
     sv_vcatpvfn(sv, pat, patlen, args, svargs, svmax, maybe_tainted);
 }
 
@@ -8658,7 +8658,7 @@ S_varname(pTHX_ const GV *const gv, const char gvtype, PADOFFSET targ,
 
 	if (!cv || !CvPADLIST(cv))
 	    return NULL;
-	av = (AV*)(*av_fetch(CvPADLIST(cv), 0, FALSE));
+	av = MUTABLE_AV((*av_fetch(CvPADLIST(cv), 0, FALSE)));
 	sv = *av_fetch(av, targ, FALSE);
 	sv_setpvn(name, SvPV_nolen_const(sv), SvCUR(sv));
     }
@@ -8742,7 +8742,7 @@ S_find_uninit_var(pTHX_ const OP *const obase, const SV *const uninit_sv,
 		subscript_type = FUV_SUBSCRIPT_HASH;
 	}
 	else {
-	    index = find_array_subscript((AV*)sv, uninit_sv);
+	    index = find_array_subscript((const AV *)sv, uninit_sv);
 	    if (index >= 0)
 		subscript_type = FUV_SUBSCRIPT_ARRAY;
 	}
@@ -8770,7 +8770,7 @@ S_find_uninit_var(pTHX_ const OP *const obase, const SV *const uninit_sv,
 	if (obase->op_flags & OPf_SPECIAL) { /* lexical array */
 	    if (match) {
 		SV **svp;
-		AV *av = (AV*)PAD_SV(obase->op_targ);
+		AV *av = MUTABLE_AV(PAD_SV(obase->op_targ));
 		if (!av || SvRMAGICAL(av))
 		    break;
 		svp = av_fetch(av, (I32)obase->op_private, FALSE);
@@ -8842,7 +8842,7 @@ S_find_uninit_var(pTHX_ const OP *const obase, const SV *const uninit_sv,
 			break;
 		}
 		else {
-		    SV * const * const svp = av_fetch((AV*)sv, SvIV(cSVOPx_sv(kid)), FALSE);
+		    SV * const * const svp = av_fetch(MUTABLE_AV(sv), SvIV(cSVOPx_sv(kid)), FALSE);
 		    if (!svp || *svp != uninit_sv)
 			break;
 		}
@@ -8864,7 +8864,8 @@ S_find_uninit_var(pTHX_ const OP *const obase, const SV *const uninit_sv,
 						keysv, 0, FUV_SUBSCRIPT_HASH);
 	    }
 	    else {
-		const I32 index = find_array_subscript((AV*)sv, uninit_sv);
+		const I32 index
+		    = find_array_subscript((const AV *)sv, uninit_sv);
 		if (index >= 0)
 		    return varname(gv, '@', o->op_targ,
 					NULL, index, FUV_SUBSCRIPT_ARRAY);
@@ -8908,7 +8909,7 @@ S_find_uninit_var(pTHX_ const OP *const obase, const SV *const uninit_sv,
 				 : DEFSV))
 	    {
 		sv = sv_newmortal();
-		sv_setpvn(sv, "$_", 2);
+		sv_setpvs(sv, "$_");
 		return sv;
 	    }
 	}

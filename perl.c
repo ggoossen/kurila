@@ -335,9 +335,9 @@ perl_construct(pTHXx)
     PL_fdpid = newAV();			/* for remembering popen pids by fd */
     PL_modglobal = newHV();		/* pointers to per-interpreter module globals */
     PL_errors = newSVpvs("");
-    sv_setpvn(PERL_DEBUG_PAD(0), "", 0);	/* For regex debugging. */
-    sv_setpvn(PERL_DEBUG_PAD(1), "", 0);	/* ext/re needs these */
-    sv_setpvn(PERL_DEBUG_PAD(2), "", 0);	/* even without DEBUGGING. */
+    sv_setpvs(PERL_DEBUG_PAD(0), "");	/* For regex debugging. */
+    sv_setpvs(PERL_DEBUG_PAD(1), "");	/* ext/re needs these */
+    sv_setpvs(PERL_DEBUG_PAD(2), "");	/* even without DEBUGGING. */
 #ifdef USE_REENTRANT_API
     Perl_reentrant_init(aTHX);
 #endif
@@ -1296,7 +1296,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     bool add_read_e_script = FALSE;
 
     SvGROW(linestr_sv, 80);
-    sv_setpvn(linestr_sv,"",0);
+    sv_setpvs(linestr_sv,"");
 
     PL_cop_seqmax = 1;
 
@@ -1711,12 +1711,12 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 		U32 out = PL_unicode & PERL_UNICODE_OUT_FLAG;
 		if (in) {
 		    if (out)
-			sv_setpvn(sv, ":utf8\0:utf8", 11);
+			sv_setpvs(sv, ":utf8\0:utf8");
 		    else
-			sv_setpvn(sv, ":utf8\0", 6);
+			sv_setpvs(sv, ":utf8\0");
 		}
 		else if (out)
-		    sv_setpvn(sv, "\0:utf8", 6);
+		    sv_setpvs(sv, "\0:utf8");
 		SvSETMAGIC(sv);
 	    }
 	}
@@ -3935,7 +3935,7 @@ S_init_predump_symbols(pTHX)
     io = PL_stdinio;
     SVcpSTEAL(SvLOCATION(io), avTsv(newAV()));
     av_store(svTav(SvLOCATION(io)),
-	LOC_NAME_INDEX, newSVpv("STDIN", 0));
+	LOC_NAME_INDEX, newSVpvs("STDIN"));
     IoTYPE(io) = IoTYPE_RDONLY;
     IoIFP(io) = PerlIO_stdin();
 
@@ -3943,7 +3943,7 @@ S_init_predump_symbols(pTHX)
     io = PL_stdoutio;
     SVcpSTEAL(SvLOCATION(io), avTsv(newAV()));
     av_store(svTav(SvLOCATION(io)),
-	LOC_NAME_INDEX, newSVpv("STDOUT", 0));
+	LOC_NAME_INDEX, newSVpvs("STDOUT"));
     IoTYPE(io) = IoTYPE_WRONLY;
     IoOFP(io) = IoIFP(io) = PerlIO_stdout();
 

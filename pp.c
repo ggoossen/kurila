@@ -77,7 +77,7 @@ PP(pp_rv2gv)
 	if (SvTYPE(sv) == SVt_PVIO) {
 	    GV * const gv = (GV*) sv_newmortal();
 	    gv_init(gv, 0, "", 0, 0);
-	    GvIOp(gv) = (IO *)sv;
+	    GvIOp(gv) = MUTABLE_IO(sv);
 	    SvREFCNT_inc_void_NN(sv);
 	    sv = (SV*) gv;
 	}
@@ -680,7 +680,7 @@ PP(pp_undef)
     case SVt_NULL:
 	break;
     case SVt_PVAV:
-	av_undef((AV*)sv);
+	av_undef(MUTABLE_AV(sv));
 	break;
     case SVt_PVHV:
 	hv_undef(MUTABLE_HV(sv));
@@ -3408,7 +3408,7 @@ PP(pp_delete)
 	    sv = hv_delete_ent(hv, keysv, discard, 0);
 	else if (SvTYPE(hv) == SVt_PVAV) {
 	    if (PL_op->op_flags & OPf_SPECIAL)
-		sv = av_delete((AV*)hv, SvIV(keysv), discard);
+		sv = av_delete(MUTABLE_AV(hv), SvIV(keysv), discard);
 	    else
 		DIE(aTHX_ "panic: avhv_delete no longer supported");
 	}
@@ -4262,7 +4262,7 @@ PP(pp_splice)
 PP(pp_push)
 {
     dVAR; dSP; dMARK; dORIGMARK;
-    register AV * const ary = (AV*)*++MARK;
+    register AV * const ary = MUTABLE_AV(*++MARK);
 
     do_arg_check(MARK);
 
@@ -4319,7 +4319,7 @@ PP(pp_shift)
 PP(pp_unshift)
 {
     dVAR; dSP; dMARK; dORIGMARK;
-    register AV *ary = (AV*)*++MARK;
+    register AV *ary = MUTABLE_AV(*++MARK);
 
     if ( ! SvAVOK(ary) ) {
 	if ( SvOK(ary) )

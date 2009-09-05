@@ -327,7 +327,7 @@ PP(pp_backtick)
 	    ENTER_named("backtick");
 	    SAVESPTR(PL_rs);
 	    SVcpREPLACE(PL_rs, &PL_sv_undef);
-	    sv_setpvn(TARG, "", 0);	/* note that this preserves previous buffer */
+	    sv_setpvs(TARG, "");	/* note that this preserves previous buffer */
 	    while (sv_gets(TARG, fp, SvCUR(TARG)) != NULL)
 		NOOP;
 	    LEAVE_named("backtick");
@@ -887,7 +887,7 @@ PP(pp_getc)
 	SETERRNO(EBADF,RMS_IFI);
 	RETPUSHUNDEF;
     }
-    sv_setpvn(TARG, " ", 1);
+    sv_setpvs(TARG, " ");
     *SvPVX_mutable(TARG) = PerlIO_getc(IoIFP(GvIOp(gv))); /* should never be EOF */
     if (PerlIO_isutf8(IoIFP(GvIOp(gv)))) {
 	/* Find out how many bytes the char needs */
@@ -998,7 +998,7 @@ PP(pp_sysread)
 	goto say_undef;
     bufsv = *++MARK;
     if (! SvOK(bufsv))
-	sv_setpvn(bufsv, "", 0);
+	sv_setpvs(bufsv, "");
     length = SvIV(*++MARK);
     SETERRNO(0,0);
     if (MARK < SP)
@@ -1338,10 +1338,10 @@ PP(pp_eof)
 		    IoFLAGS(io) &= ~IOf_START;
 		    do_open(GvIOp(gv), "-", 1, FALSE, O_RDONLY, 0, NULL);
 		    if ( GvSV(gv) ) {
-			sv_setpvn(GvSV(gv), "-", 1);
+			sv_setpvs(GvSV(gv), "-");
 		    }
 		    else {
-			GvSV(gv) = newSVpvn("-", 1);
+			GvSV(gv) = newSVpvs("-");
 		    }
 		    SvSETMAGIC(GvSV(gv));
 		}
@@ -1471,7 +1471,7 @@ PP(pp_truncate)
 		goto do_ftruncate_gv;
 	    }
 	    else if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVIO) {
-		io = (IO*) SvRV(sv); /* *main::FRED{IO} for example */
+		io = MUTABLE_IO(SvRV(sv)); /* *main::FRED{IO} for example */
 		goto do_ftruncate_io;
 	    }
 
@@ -2078,7 +2078,7 @@ PP(pp_stat)
 
 	    PL_laststype = OP_STAT;
 	    IOcpREPLACE(PL_statio, io);
-	    sv_setpvn(PL_statname, "", 0);
+	    sv_setpvs(PL_statname, "");
 	    if (io) {
 		if (IoIFP(io)) {
 		    PL_laststatval = 
@@ -2191,7 +2191,7 @@ PP(pp_stat)
  * Else, discard it from the stack and continue. --rgs
  */
 #define STACKED_FTEST_CHECK if (PL_op->op_private & OPpFT_STACKED) { \
-	if (TOPs == &PL_sv_no || TOPs == &PL_sv_undef) { RETURN; } \
+	if (!SvTRUE(TOPs)) { RETURN; } \
 	else { (void)POPs; PUTBACK; } \
     }
 
@@ -2525,7 +2525,7 @@ PP(pp_fttext)
 	EXTEND(SP, 1);
 	PL_laststatval = -1;
 	IOcpREPLACE(PL_statio, io);
-	sv_setpvn(PL_statname, "", 0);
+	sv_setpvs(PL_statname, "");
 	if (io && IoIFP(io)) {
 	    if (! PerlIO_has_base(IoIFP(io)))
 		DIE(aTHX_ "-T and -B not implemented on filehandles");

@@ -173,7 +173,7 @@ PP(pp_concat)
 	if (!SvOK(TARG)) {
 	    if (left == right && ckWARN(WARN_UNINITIALIZED))
 		report_uninit(right);
-	    sv_setpvn(left, "", 0);
+	    sv_setpvs(left, "");
 	}
 	(void)SvPV_const(left, llen);    /* Needed to set UTF8 flag */
     }

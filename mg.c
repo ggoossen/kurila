@@ -1057,7 +1057,7 @@ Perl_magic_clearisa(pTHX_ SV *sv, MAGIC *mg)
     /* Bail out if destruction is going on */
     if(PL_dirty) return 0;
 
-    av_clear((AV*)sv);
+    av_clear(MUTABLE_AV(sv));
 
     /* XXX see comments in magic_setisa */
     stash = GvSTASH(

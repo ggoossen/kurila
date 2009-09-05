@@ -459,7 +459,7 @@ Perl_pad_add_anon(pTHX_ SV* sv, OPCODE op_type)
     PERL_ARGS_ASSERT_PAD_ADD_ANON;
 
     pad_peg("add_anon");
-    sv_setpvn(name, "&", 1);
+    sv_setpvs(name, "&");
     /* Are these two actually ever read? */
     COP_SEQ_RANGE_HIGH_set(name, ~0);
     COP_SEQ_RANGE_LOW_set(name, 1);
@@ -562,7 +562,7 @@ Perl_pad_findmy(pTHX_ const char *name)
      *    our $foo = 0 unless defined $foo;
      * to not give a warning. (Yes, this is a hack) */
 
-    nameav = (AV*)AvARRAY(CvPADLIST(PL_compcv))[0];
+    nameav = MUTABLE_AV(AvARRAY(CvPADLIST(PL_compcv))[0]);
     name_svp = AvARRAY(nameav);
     for (offset = AvFILLp(nameav); offset >= PAD_NAME_START_INDEX; offset--) {
         SV * const namesv = name_svp[offset];
@@ -1158,8 +1158,8 @@ Perl_do_dump_pad(pTHX_ I32 level, PerlIO *file, PADLIST *padlist, int full)
     if (!padlist) {
 	return;
     }
-    pad_name = (AV*)*av_fetch((AV*)padlist, 0, FALSE);
-    pad = (AV*)*av_fetch((AV*)padlist, 1, FALSE);
+    pad_name = MUTABLE_AV(*av_fetch(MUTABLE_AV(padlist), 0, FALSE));
+    pad = MUTABLE_AV(*av_fetch(MUTABLE_AV(padlist), 1, FALSE));
     pname = AvARRAY(pad_name);
     ppad = AvARRAY(pad);
     Perl_dump_indent(aTHX_ level, file,
@@ -1389,8 +1389,8 @@ Perl_pad_push(pTHX_ PADLIST *padlist, int depth)
 	SV** const svp = AvARRAY(padlist);
 	AV* const newpad = newAV();
 	SV** const oldpad = AvARRAY(svp[depth-1]);
-	I32 ix = AvFILLp((AV*)svp[1]);
-        const I32 names_fill = AvFILLp((AV*)svp[0]);
+	I32 ix = AvFILLp((const AV *)svp[1]);
+        const I32 names_fill = AvFILLp((const AV *)svp[0]);
 	SV** const names = AvARRAY(svp[0]);
 	AV *av;
 

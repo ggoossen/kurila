@@ -4548,7 +4548,7 @@ Perl_ck_fun(pTHX_ OP *o)
 				namesv = PAD_SVl(targ);
 				SvUPGRADE(namesv, SVt_PV);
 				if (*name != '$')
-				    sv_setpvn(namesv, "$", 1);
+				    sv_setpvs(namesv, "$");
 				sv_catpvn(namesv, name, len);
 			    }
 			}

@@ -1022,7 +1022,7 @@ Perl_my_stat(pTHX)
 	io = GvIO(gv);
         do_fstat_have_io:
         PL_laststype = OP_STAT;
-        sv_setpvn(PL_statname, "", 0);
+        sv_setpvs(PL_statname, "");
         if(io) {
 	    if (IoIFP(io)) {
 	        return (PL_laststatval = PerlLIO_fstat(PerlIO_fileno(IoIFP(io)), &PL_statcache));
@@ -1056,7 +1056,7 @@ Perl_my_stat(pTHX)
 	    goto do_fstat;
 	}
         else if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVIO) {
-            io = (IO*)SvRV(sv);
+            io = MUTABLE_IO(SvRV(sv));
 	    gv = NULL;
             goto do_fstat_have_io;
         }
@@ -1870,7 +1870,7 @@ Perl_do_msgrcv(pTHX_ SV **mark, SV **sp)
 
     /* suppress warning when reading into undef var --jhi */
     if (! SvOK(mstr))
-	sv_setpvn(mstr, "", 0);
+	sv_setpvs(mstr, "");
     msize = SvIV(*++mark);
     mtype = (long)SvIV(*++mark);
     flags = SvIV(*++mark);
@@ -1975,7 +1975,7 @@ Perl_do_shmio(pTHX_ I32 optype, SV **mark, SV **sp)
 	char *mbuf;
 	/* suppress warning when reading into undef var (tchrist 3/Mar/00) */
 	if (! SvOK(mstr))
-	    sv_setpvn(mstr, "", 0);
+	    sv_setpvs(mstr, "");
 	SvPV_force_nolen(mstr);
 	mbuf = SvGROW(mstr, (STRLEN)msize+1);
 

@@ -686,7 +686,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    value = (SV*)SSPOPPTR;
 	    gv = (GV*)SSPOPPTR;
 	    ptr = &GvSV(gv);
-	    av = (AV*)gv; /* what to refcnt_dec */
+	    av = MUTABLE_AV(gv); /* what to refcnt_dec */
 	restore_sv:
 	    sv = *(SV**)ptr;
 	    PL_localizing = 2;
@@ -725,7 +725,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    SvREFCNT_dec(value);
 	    break;
 	case SAVEt_AV:				/* array reference */
-	    av = (AV*)SSPOPPTR;
+	    av = MUTABLE_AV(SSPOPPTR);
 	    gv = (GV*)SSPOPPTR;
 	    PL_localizing = 2;
 	    sv_setsv(avTsv(GvAV(gv)), avTsv(av));
@@ -829,7 +829,7 @@ Perl_leave_scope(pTHX_ I32 base)
 		case SVt_NULL:
 		    break;
 		case SVt_PVAV:
-		    av_clear((AV*)sv);
+		    av_clear(MUTABLE_AV(sv));
 		    break;
 		case SVt_PVHV:
 		    hv_clear(MUTABLE_HV(sv));
@@ -885,7 +885,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	case SAVEt_AELEM:		/* array element */
 	    value = (SV*)SSPOPPTR;
 	    i = SSPOPINT;
-	    av = (AV*)SSPOPPTR;
+	    av = MUTABLE_AV(SSPOPPTR);
 	    ptr = av_fetch(av,i,1);
 	    if (!AvREAL(av) && AvREIFY(av)) /* undo reify guard */
 		SvREFCNT_dec(value);
@@ -908,7 +908,7 @@ Perl_leave_scope(pTHX_ I32 base)
 		if (oval && oval != &PL_sv_undef) {
 		    ptr = &HeVAL((HE*)ptr);
 		    SvREFCNT_dec(sv);
-		    av = (AV*)hv; /* what to refcnt_dec */
+		    av = MUTABLE_AV(hv); /* what to refcnt_dec */
 		    goto restore_sv;
 		}
 	    }

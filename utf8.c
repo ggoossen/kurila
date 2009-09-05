@@ -2170,7 +2170,7 @@ Perl_pv_uni_display(pTHX_ SV *dsv, const char *spv, STRLEN len, STRLEN pvlim, UV
 
     PERL_ARGS_ASSERT_PV_UNI_DISPLAY;
 
-    sv_setpvn(dsv, "", 0);
+    sv_setpvs(dsv, "");
     for (s = (const char *)spv, e = s + len; s < e; s += UTF8SKIP(s)) {
 	 UV u;
 	  /* This serves double duty as a flag and a character to print after
@@ -2203,7 +2203,7 @@ Perl_pv_uni_display(pTHX_ SV *dsv, const char *spv, STRLEN len, STRLEN pvlim, UV
 		 }
 		 if (ok) {
 		     const char string = ok;
-		     sv_catpvn(dsv, "\\",    1);
+		     sv_catpvs(dsv, "\\");
 		     sv_catpvn(dsv, &string, 1);
 		 }
 	     }
