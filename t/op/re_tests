@@ -532,6 +532,7 @@ x(~~)*(?:(?:F)?)?	x~~	y	-	-
 ((?>[^()]+)|\([^()]*\))+	((abc(ade)ufh()()x	y	$^MATCH	abc(ade)ufh()()x
 (?<=x+)y	-	c	-	Variable length lookbehind not implemented
 a{37,17}	-	c	-	Can't do \{n,m\} with n > m
+a{37,0}	-	c	-	Can't do \{n,m\} with n > m
 a\Z	a\nb\n	n	-	-
 a\z	a\nb\n	n	-	-
 a$	a\nb\n	n	-	-
