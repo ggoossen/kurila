@@ -40,6 +40,7 @@ if (! defined($_))
 my @patches
 while ( ~< $patch_level)
     last if m/^\s*}/
+    next if m/^\s*#/  # preprocessor stuff
     chomp
     s/^\s+,?\s*"?//
     s/"?\s*,?$//
