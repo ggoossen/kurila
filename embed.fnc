@@ -227,7 +227,7 @@ pM	|void	|delete_eval_scope
 p	|void	|deprecate	|NN const char *const s
 p	|void	|deprecate_old	|NN const char *const s
 Afp	|OP*	|die		|NULLOK const char* pat|...
-pr	|void	|vdie		|NULLOK const char* pat|NULLOK va_list* args
+sr	|void	|vdie		|NULLOK const char* pat|NULLOK va_list* args
 pr	|void	|die_where	|NN SV *msv
 Ap	|void	|dounwind	|I32 cxix
 pmb	|bool	|do_aexec	|NULLOK SV* really|NN SV* const * mark|NN SV* const * sp

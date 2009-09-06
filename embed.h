@@ -221,7 +221,7 @@
 #endif
 #define die			Perl_die
 #ifdef PERL_CORE
-#define vdie			Perl_vdie
+#define vdie			S_vdie
 #define die_where		Perl_die_where
 #endif
 #define dounwind		Perl_dounwind
@@ -2412,7 +2412,7 @@
 #define deprecate_old(a)	Perl_deprecate_old(aTHX_ a)
 #endif
 #ifdef PERL_CORE
-#define vdie(a,b)		Perl_vdie(aTHX_ a,b)
+#define vdie(a,b)		S_vdie(aTHX_ a,b)
 #define die_where(a)		Perl_die_where(aTHX_ a)
 #endif
 #define dounwind(a)		Perl_dounwind(aTHX_ a)

@@ -178,8 +178,6 @@ END_EXTERN_C
 #define PL_body_arenas		(*Perl_Ibody_arenas_ptr(aTHX))
 #undef  PL_body_roots
 #define PL_body_roots		(*Perl_Ibody_roots_ptr(aTHX))
-#undef  PL_breakable_sub_gen
-#define PL_breakable_sub_gen	(*Perl_Ibreakable_sub_gen_ptr(aTHX))
 #undef  PL_checkav
 #define PL_checkav		(*Perl_Icheckav_ptr(aTHX))
 #undef  PL_clocktick

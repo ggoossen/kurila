@@ -1306,8 +1306,8 @@ S_vdie_croak_common(pTHX_ SV* location, const char* pat, va_list* args)
     return msv;
 }
 
-void
-Perl_vdie(pTHX_ const char* pat, va_list *args)
+STATIC void
+S_vdie(pTHX_ const char* pat, va_list *args)
 {
     dVAR;
     SV* msv;
