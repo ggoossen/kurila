@@ -35,6 +35,10 @@ my @pats= @:
             "[:blank:]"
             "[:^blank:]"
 
+if (not env::var('REAL_POSIX_CC')) {
+    $TODO = "Only works under PERL_LEGACY_UNICODE_CHARCLASS_MAPPINGS = 0";
+}
+
 sub rangify($ary, ?$fmt, ?$sep, ?$rng)
     $fmt ||= '%d'
     $sep ||= ' '
@@ -101,7 +105,6 @@ while (@pats)
             $description .= "\n"
     
 TODO: do
-    local $TODO = "Only works under PERL_LEGACY_UNICODE_CHARCLASS_MAPPINGS = 0"
     is( $description, "", "POSIX and perl charclasses should not depend on string type")
 
 __DATA__
