@@ -483,6 +483,8 @@ PERLVAR(Iutf8_tofold,	SV *)
 PERLVARI(Icryptseen,	bool,	FALSE)	/* has fast crypt() been initialized? */
 #endif
 
+/* Space for a U8 */
+
 PERLVARI(Iglob_index,	int,	0)
 
 

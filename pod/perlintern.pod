@@ -716,9 +716,9 @@ Found in file intrpvar.h
 =item PL_ofs_sv
 X<PL_ofs_sv>
 
-The output field separator - C<$,> in Perl space.
+The glob containing the output field separator - C<*,> in Perl space.
 
-	SV*	PL_ofs_sv
+	GV*	PL_ofsgv
 
 =for hackers
 Found in file intrpvar.h

@@ -134,13 +134,13 @@ static I32 read_e_script(pTHX_ int idx, SV *buf_sv, int maxlen);
 
 #define CALL_BODY_EVAL(myop) \
     if (PL_op == (myop)) \
-	PL_op = Perl_pp_entereval(aTHX); \
+	PL_op = PL_ppaddr[OP_ENTEREVAL](aTHX); \
     if (PL_op) \
 	CALLRUNOPS(aTHX);
 
 #define CALL_BODY_SUB(myop) \
     if (PL_op == (myop)) \
-	PL_op = Perl_pp_entersub(aTHX); \
+	PL_op = PL_ppaddr[OP_ENTERSUB](aTHX); \
     if (PL_op) \
 	CALLRUNOPS(aTHX);
 
@@ -4157,7 +4157,8 @@ S_init_perllib(pTHX)
 #  endif
 #endif
 
-#ifdef PERL_VENDORLIB_STEM /* Search for version-specific dirs below here */
+#if defined(PERL_VENDORLIB_STEM) && defined(PERL_INC_VERSION_LIST)
+    /* Search for version-specific dirs below here */
     incpush(PERL_VENDORLIB_STEM, FALSE, TRUE, TRUE, TRUE);
 #endif
 
