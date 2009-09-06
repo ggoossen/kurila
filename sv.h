@@ -861,6 +861,7 @@ in gv.h: */
 #  define SvUVX(sv) (0 + ((XPVUV*) SvANY(sv))->xuv_uv)
 #  define SvNVX(sv) (-0.0 + ((XPVNV*) SvANY(sv))->xnv_u.xnv_nv)
 #  define SvRV(sv) (0 + (sv)->sv_u.svu_rv)
+#  define SvRV_const(sv) (0 + (sv)->sv_u.svu_rv)
 /* Don't test the core XS code yet.  */
 #  define SvLEN(sv) (0 + ((XPV*) SvANY(sv))->xpv_len)
 #  define SvEND(sv) ((sv)->sv_u.svu_pv + ((XPV*)SvANY(sv))->xpv_cur)
@@ -899,7 +900,7 @@ in gv.h: */
 	    &(((XPVNV*) MUTABLE_PTR(SvANY(_svnvx)))->xnv_u.xnv_nv);	\
 	 }))
 #    define SvRV(sv)							\
-	(*({ const SV *const _svrv = (const SV *)(sv);			\
+	(*({ SV *const _svrv = MUTABLE_SV(sv);				\
 	    assert(SvTYPE(_svrv) >= SVt_PV || SvTYPE(_svrv) == SVt_IV);	\
 	    assert(SvTYPE(_svrv) != SVt_PVAV);				\
 	    assert(SvTYPE(_svrv) != SVt_PVHV);				\
@@ -907,6 +908,16 @@ in gv.h: */
 	    assert(!isGV_with_GP(_svrv));				\
 	    &((_svrv)->sv_u.svu_rv);					\
 	 }))
+#    define SvRV_const(sv)						\
+	({ const SV *const _svrv = (const SV *)(sv);			\
+	    assert(SvTYPE(_svrv) >= SVt_PV || SvTYPE(_svrv) == SVt_IV);	\
+	    assert(SvTYPE(_svrv) != SVt_PVAV);				\
+	    assert(SvTYPE(_svrv) != SVt_PVHV);				\
+	    assert(SvTYPE(_svrv) != SVt_PVCV);				\
+	    assert(SvTYPE(_svrv) != SVt_PVFM);				\
+	    assert(!isGV_with_GP(_svrv));				\
+	    (_svrv)->sv_u.svu_rv;					\
+	 })
 #    define SvMAGIC(sv)							\
 	(*({ const SV *const _svmagic = (const SV *)(sv);		\
 	    assert(SvTYPE(_svmagic) >= SVt_PVMG);			\
@@ -923,6 +934,7 @@ in gv.h: */
 #    define SvUVX(sv) ((XPVUV*) SvANY(sv))->xuv_uv
 #    define SvNVX(sv) ((XPVNV*) SvANY(sv))->xnv_u.xnv_nv
 #    define SvRV(sv) ((sv)->sv_u.svu_rv)
+#    define SvRV_const(sv) (0 + (sv)->sv_u.svu_rv)
 #    define SvMAGIC(sv)	((XPVMG*)  SvANY(sv))->xmg_u.xmg_magic
 #    define SvSTASH(sv)	((XPVMG*)  SvANY(sv))->xmg_stash
 #  endif

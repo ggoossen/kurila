@@ -106,7 +106,7 @@ package Maintainers;
 		'MAINTAINER'	=> 'smueller',
 		'FILES'		=> q[lib/AutoLoader.pm lib/AutoSplit.pm lib/AutoLoader],
 		'CPAN'		=> 1,
-	),
+	        ),
 
 	'B::Concise' =>
 		\%(
@@ -397,6 +397,13 @@ package Maintainers;
 		'CPAN'		=> 1,
 		),
 
+	'Filter::Simple' =>
+		{
+		'MAINTAINER'	=> 'smueller',
+		'FILES'		=> q[lib/Filter/Simple.pm lib/Filter/Simple],
+		'CPAN'		=> 1,
+		},
+
 	'Filter::Util::Call' =>
 		\%(
 		'MAINTAINER'	=> 'pmqs',
@@ -460,6 +467,14 @@ package Maintainers;
 		'FILES'		=> q[lib/IPC/Cmd lib/IPC/Cmd.pm],
 		'CPAN'		=> 1,
 		),
+
+	'lib' =>
+		{
+		'MAINTAINER'	=> 'smueller',
+		'FILES'		=>
+			q[lib/lib_pm.PL lib/lib.t],
+		'CPAN'		=> 1,
+		},
 
 	'libnet' =>
 		\%(
