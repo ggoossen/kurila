@@ -2177,8 +2177,7 @@ PP(pp_complement)
 #endif
 	for ( ; anum > 0; anum--, tmps++)
 	    *tmps = ~*tmps;
-
-	SETs(TARG);
+	SETTARG;
       }
       RETURN;
     }
@@ -2893,7 +2892,7 @@ PP(pp_crypt)
 #   else
     sv_setpv(TARG, PerlProc_crypt(tmps, SvPV_nolen_const(right)));
 #   endif
-    SETs(TARG);
+    SETTARG;
     RETURN;
 #else
     DIE(aTHX_
@@ -3229,9 +3228,7 @@ PP(pp_quotemeta)
     }
     else
 	sv_setpvn(TARG, s, len);
-    SETs(TARG);
-    if (SvSMAGICAL(TARG))
-	mg_set(TARG);
+    SETTARG;
     RETURN;
 }
 
