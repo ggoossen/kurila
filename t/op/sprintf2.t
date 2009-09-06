@@ -148,7 +148,4 @@ for my $t (@tests)
     my $w
     local $^WARN_HOOK = sub($e) { $w = $e->message }
     is(sprintf($fmt, $num), $Q ?? $num !! $fmt, "quad: $fmt -> $num")
-    do
-      local our $TODO = $Q ?? "" !! "warning doesn't contain length modifiers"
-      like($w, $Q ?? '' !! qr/Invalid conversion in sprintf: "$fmt"/, "warning: $fmt")
-
+    like($w, $Q ?? '' !! qr/Invalid conversion in sprintf: "$fmt"/, "warning: $fmt")
