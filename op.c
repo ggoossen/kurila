@@ -679,7 +679,7 @@ Perl_op_refcnt_unlock(pTHX)
 #define LINKLIST(o) ((o)->op_next ? (o)->op_next : linklist((OP*)o))
 
 OP *
-Perl_linklist(pTHX_ OP *o)
+S_linklist(pTHX_ OP *o)
 {
     OP *first;
 
