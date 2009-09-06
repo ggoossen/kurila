@@ -814,7 +814,7 @@ splice		splice			ck_fun		m@	A S? S? L
 push		push			ck_lfun		ims@	S L
 pop		pop			ck_shift	s%	S?
 shift		shift			ck_shift	s%	S?
-unshift		unshift			ck_lfun		ims@	S L
+unshift		unshift			ck_lfun		imst@	S L
 sort		sort			ck_sort		dm@	C? L
 reverse		reverse			ck_fun		ts@	S
 arrayjoin	array join (@+:)	ck_fun		ts@	S

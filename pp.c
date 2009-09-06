@@ -4319,7 +4319,7 @@ PP(pp_shift)
 
 PP(pp_unshift)
 {
-    dVAR; dSP; dMARK; dORIGMARK; dTARG;
+    dVAR; dSP; dMARK; dORIGMARK;
     register AV *ary = MUTABLE_AV(*++MARK);
 
     if ( ! SvAVOK(ary) ) {
@@ -4339,9 +4339,7 @@ PP(pp_unshift)
 	}
     }
     SP = ORIGMARK;
-    if (GIMME_V != G_VOID) {
-	PUSHi( AvFILL(ary) + 1 );
-    }
+    mPUSHi( AvFILL(ary) + 1 );
     RETURN;
 }
 

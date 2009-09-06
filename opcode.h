@@ -1673,7 +1673,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00042815,	/* push */
 	0x00013604,	/* pop */
 	0x00013604,	/* shift */
-	0x00042815,	/* unshift */
+	0x0004281d,	/* unshift */
 	0x0005a841,	/* sort */
 	0x0000280c,	/* reverse */
 	0x0000280c,	/* arrayjoin */
