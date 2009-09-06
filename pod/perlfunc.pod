@@ -2750,7 +2750,7 @@ If EXPR is omitted, stats C<$_>.
 
 =item m//
 
-The match operator.  See L<perlop>.
+The match operator.  See L<perlop/"Regexp Quote-Like Operators">.
 
 =item map BLOCK LIST
 X<map>
@@ -4563,7 +4563,7 @@ the C<rmtree> function of the L<File::Path> module.
 
 =item s///
 
-The substitution operator.  See L<perlop>.
+The substitution operator.  See L<perlop/"Regexp Quote-Like Operators">.
 
 =item scalar EXPR
 X<scalar> X<context>
@@ -5294,7 +5294,7 @@ produces the list value
 If you had the entire header of a normal Unix email message in $header,
 you could split it up into fields and their values this way:
 
-    $header =~ s/\n\s+/ /g;  # fix continuation lines
+    $header =~ s/\n(?=\s)//g;  # fix continuation lines
     %hdrs   =  (UNIX_FROM => split /^(\S*?):\s*/m, $header);
 
 The pattern C</PATTERN/> may be replaced with an expression to specify
