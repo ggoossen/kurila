@@ -312,7 +312,6 @@
 #define form			Perl_form
 #define vform			Perl_vform
 #define free_tmps		Perl_free_tmps
-#define tmps_tmprefcnt		Perl_tmps_tmprefcnt
 #ifdef PERL_CORE
 #define gen_constant_list	Perl_gen_constant_list
 #endif
@@ -362,8 +361,12 @@
 #define ibcmp			Perl_ibcmp
 #define ibcmp_locale		Perl_ibcmp_locale
 #define ibcmp_utf8		Perl_ibcmp_utf8
+#if defined(PERL_IN_DOIO_C)
 #ifdef PERL_CORE
-#define ingroup			Perl_ingroup
+#define ingroup			S_ingroup
+#endif
+#endif
+#ifdef PERL_CORE
 #define init_argv_symbols	Perl_init_argv_symbols
 #define init_debugger		Perl_init_debugger
 #endif
@@ -2504,7 +2507,6 @@
 #endif
 #define vform(a,b)		Perl_vform(aTHX_ a,b)
 #define free_tmps()		Perl_free_tmps(aTHX)
-#define tmps_tmprefcnt()	Perl_tmps_tmprefcnt(aTHX)
 #ifdef PERL_CORE
 #define gen_constant_list(a)	Perl_gen_constant_list(aTHX_ a)
 #endif
@@ -2558,8 +2560,12 @@
 #define ibcmp(a,b,c)		Perl_ibcmp(aTHX_ a,b,c)
 #define ibcmp_locale(a,b,c)	Perl_ibcmp_locale(aTHX_ a,b,c)
 #define ibcmp_utf8(a,b,c,d,e,f)	Perl_ibcmp_utf8(aTHX_ a,b,c,d,e,f)
+#if defined(PERL_IN_DOIO_C)
 #ifdef PERL_CORE
-#define ingroup(a,b)		Perl_ingroup(aTHX_ a,b)
+#define ingroup(a,b)		S_ingroup(aTHX_ a,b)
+#endif
+#endif
+#ifdef PERL_CORE
 #define init_argv_symbols(a,b)	Perl_init_argv_symbols(aTHX_ a,b)
 #define init_debugger()		Perl_init_debugger(aTHX)
 #endif

@@ -162,7 +162,6 @@ Perl_fbm_instr
 Perl_form
 Perl_vform
 Perl_free_tmps
-Perl_tmps_tmprefcnt
 Perl_gp_free
 Perl_gp_tmprefcnt
 Perl_gp_ref
