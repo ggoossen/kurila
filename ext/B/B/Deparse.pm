@@ -525,6 +525,7 @@ sub new
     $self->{+'ambient_warnings'} = undef # Assume no lexical warnings
     $self->{+'ambient_hints'} = 0
     $self->{+'ambient_hinthash'} = undef
+    $self->{+'inlined_constants'} = $self->scan_for_constants
     $self->init()
 
     while (my $arg = shift @_)
@@ -560,6 +561,24 @@ do
         return $WARN_MASK
 
 
+sub scan_for_constants {
+    my ($self) = @_;
+    my %ret;
+
+    B::walksymtable(Symbol::stash('%main'), sub {
+        my ($gv) = @_;
+
+        my $cv = $gv->CV;
+        return if !$cv || class($cv) ne 'CV';
+
+        my $const = $cv->const_sv;
+        return if !$const || class($const) eq 'SPECIAL';
+
+        %ret{ dump::view( $const->object_2svref ) } = $gv->NAME;
+    }, sub { 1 });
+
+    return %ret;
+}
 
 # Initialise the contextual information, either from
 # defaults provided with the ambient_pragmas method,
@@ -2992,7 +3011,7 @@ sub pp_entersub($self, $op, $cx)
         $amper = "&"
         $kid = "\{" . $self->deparse($kid, 0) . "\}"
     elsif ($kid->name eq "var")
-        $kid = $kid->sv->LOCATION[3]
+        $kid = ($kid->sv->LOCATION || $@)[?3]
         $kid =~ s/^\Q$self->{?'curstash'}\E::(\w+)$/$1/
     elsif ($kid->name eq "gv")
         my $gv = $self->gv_or_padgv($kid)
@@ -3275,7 +3294,6 @@ sub split_float($f)
         while ($f % 2 == 0)
             $f /= 2
             $exponent++
-
     else
         while ($f != int($f))
             $f *= 2
@@ -3295,6 +3313,8 @@ sub const($self, $sv, $cx)
         return (@: 'undef', '1', < $self->maybe_parens("!1", $cx, 21))[$sv->$-1]
     elsif (class($sv) eq "NULL")
         return 'undef'
+    elsif (my $const = $self->{?'inlined_constants'}{? dump::view( $sv->object_2svref ) })
+        return $const
 
     # convert a version object into the "v1.2.3" string in its V magic
     if ($sv->FLAGS ^&^ SVs_RMG)

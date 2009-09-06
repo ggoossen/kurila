@@ -205,18 +205,15 @@ sub walkoptree_exec($op, $method, $level)
                 print $^STDOUT, $prefix, "SUBST => \{\n"
                 walkoptree_exec($replstart, $method, $level + 1)
                 print $^STDOUT, $prefix, "\}\n"
-            
-        
 
         $op = $op->next
-    
 
 
-sub walksymtable($symref, $method, $recurse, $prefix)
+sub walksymtable($symref, $method, $recurse, ?$prefix)
     my $sym
     my $ref
     my $fullname
-    $prefix = '' unless defined $prefix
+    $prefix //= ''
     for my $sym (keys $symref->%)
         my $ref = $symref->{?$_}
         $fullname = "*".$prefix.$sym
@@ -227,8 +224,6 @@ sub walksymtable($symref, $method, $recurse, $prefix)
             
         else
             svref_2object(\Symbol::fetch_glob($fullname)->*)->?$method()
-        
-    
 
 
 do

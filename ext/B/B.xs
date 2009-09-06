@@ -447,6 +447,8 @@ SvLOCATION(sv)
 	B::SV	sv
     CODE:
         RETVAL = SvREFCNT_inc(SvLOCATION(sv));
+        if (! RETVAL)
+            RETVAL = &PL_sv_undef;
     OUTPUT:
         RETVAL
 

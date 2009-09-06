@@ -3,7 +3,7 @@
 use warnings
 
 use feature ":5.10"
-use Test::More tests => 51
+use Test::More tests => 56
 
 use B::Deparse
 my $deparse = B::Deparse->new()
@@ -31,7 +31,6 @@ while ( ~< $^DATA)
         (@: $input, $expected) = @: $1, $2
     else
         (@: $input, $expected) = @: $_, $_
-    
 
     local our $TODO = $todo
 
@@ -115,6 +114,9 @@ sub getcode
 
 
 package main
+
+use constant PI => 3.14
+use Fcntl < qw/O_TRUNC O_APPEND O_EXCL/
 
 use warnings
 sub test
@@ -318,3 +320,20 @@ else { testsub(); }
 # TODO 54 interpolation in regexps
 my($y, $t)
 m/x$($y)z$t/
+####
+# TODO tests for deparsing constants
+warn PI;
+####
+# TODO tests for deparsing imported constants
+warn O_TRUNC;
+####
+# TODO tests for deparsing re-exported constants
+warn O_CREAT;
+####
+# TODO tests for deparsing imported constants that got deleted from the original namespace
+warn O_APPEND;
+####
+# TODO tests for deparsing constants which got turned into full typeglobs
+warn O_EXCL;
+eval '@Fcntl::O_EXCL = qw/affe tiger/;';
+warn O_EXCL;
