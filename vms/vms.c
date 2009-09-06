@@ -353,6 +353,7 @@ static int vms_process_case_tolerant = 1;
 int vms_vtf7_filenames = 0;
 int gnv_unix_shell = 0;
 static int vms_unlink_all_versions = 0;
+static int vms_posix_exit = 0;
 
 /* bug workarounds if needed */
 int decc_bug_readdir_efs1 = 0;
@@ -13029,9 +13030,7 @@ Perl_sys_intern_init(pTHX)
 
     VMSISH_HUSHED = 0;
 
-    /* fix me later to track running under GNV */
-    /* this allows some limited testing */
-    MY_POSIX_EXIT = decc_filename_unix_report;
+    MY_POSIX_EXIT = vms_posix_exit;
 
     x = (float)ix;
     MY_INV_RAND_MAX = 1./x;
@@ -13505,7 +13504,6 @@ static int set_features
     gnv_unix_shell = 0;
     status = sys_trnlnm("GNV$UNIX_SHELL", val_str, sizeof(val_str));
     if ($VMS_STATUS_SUCCESS(status)) {
-       if ((val_str[0] == 'E') || (val_str[0] == '1') || (val_str[0] == 'T')) {
 	 gnv_unix_shell = 1;
 	 set_feature_default("DECC$EFS_CASE_PRESERVE", 1);
 	 set_feature_default("DECC$EFS_CHARSET", 1);
@@ -13514,9 +13512,7 @@ static int set_features
 	 set_feature_default("DECC$READDIR_DROPDOTNOTYPE", 1);
 	 set_feature_default("DECC$DISABLE_POSIX_ROOT", 0);
 	 vms_unlink_all_versions = 1;
-       }
-       else
-	 gnv_unix_shell = 0;
+	 vms_posix_exit = 1;
     }
 #endif
 
@@ -13587,8 +13583,10 @@ static int set_features
     s = decc$feature_get_index("DECC$FILENAME_UNIX_REPORT");
     if (s >= 0) {
 	decc_filename_unix_report = decc$feature_get_value(s, 1);
-	if (decc_filename_unix_report > 0)
+	if (decc_filename_unix_report > 0) {
 	    decc_filename_unix_report = 1;
+	    vms_posix_exit = 1;
+	}
 	else
 	    decc_filename_unix_report = 0;
     }
@@ -13715,6 +13713,17 @@ static int set_features
 	vms_process_case_tolerant = 0;
 
 #endif
+
+    /* USE POSIX/DCL Exit codes - Recommended, but needs to default to  */
+    /* for strict backward compatibilty */
+    status = sys_trnlnm
+	("PERL_VMS_POSIX_EXIT", val_str, sizeof(val_str));
+    if ($VMS_STATUS_SUCCESS(status)) {
+       if ((val_str[0] == 'E') || (val_str[0] == '1') || (val_str[0] == 'T'))
+	 vms_posix_exit = 1;
+       else
+	 vms_posix_exit = 0;
+    }
 
 
     /* CRTL can be initialized past this point, but not before. */
