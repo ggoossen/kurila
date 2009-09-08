@@ -2481,10 +2481,6 @@ If the C<flags> parameter has the
 C<NOSTEAL> bit set then the buffers of temps will not be stolen. <sv_setsv>
 and C<sv_setsv_nomg> are implemented in terms of this function.
 
-You probably want to use one of the assortment of wrappers, such as
-C<SvSetSV>, C<SvSetSV_nosteal>, C<SvSetMagicSV> and
-C<SvSetMagicSV_nosteal>.
-
 This is the primary function for copying scalars, and most other
 copy-ish functions and macros use this underneath.
 
