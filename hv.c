@@ -283,7 +283,11 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	if (flags & HVhek_FREEKEY)
 	    Safefree(key);
 	key = SvPV_const(keysv, klen);
-	flags = 0;
+	if (SvIsCOW_shared_hash(keysv)) {
+	    flags = HVhek_KEYCANONICAL;
+	} else {
+	    flags = 0;
+	}
     }
 
     if (action & HV_DELETE) {

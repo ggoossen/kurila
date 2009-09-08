@@ -321,6 +321,9 @@ C<SV*>.
 #define HVhek_FREEKEY	0x100 /* Internal flag to say key is malloc()ed.  */
 #define HVhek_PLACEHOLD	0x200 /* Internal flag to create placeholder.
                                * (may change, but Storable is a core module) */
+#define HVhek_KEYCANONICAL 0x400 /* Internal flag - key is in canonical form.
+				    If the string is UTF-8, it cannot be
+				    converted to bytes. */
 #define HVhek_MASK	0xFF
 
 #define HEK_REHASH(hek)		(HEK_FLAGS(hek) & HVhek_REHASH)
