@@ -884,9 +884,6 @@ Apd     |const char*  |parse_escape   |NN const char *s|NN char *d|NN STRLEN *l|
 p	|OP*	|scope		|NULLOK OP* o
 Ap	|char*	|screaminstr	|NN SV *bigstr|NN SV *littlestr|I32 start_shift \
 				|I32 end_shift|NN I32 *old_posp|I32 last
-#if !defined(VMS) && defined(PERL_IN_UTIL_C)
-s	|I32	|setenv_getix	|NN const char* nam
-#endif
 Ap	|HEK*	|share_hek	|NN const char* str|I32 len|U32 hash
 #if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
 : Used in perl.c
