@@ -10,9 +10,10 @@ the revisions from Perforce, the version control system we were using
 previously. This repository is accessible in different ways.
 
 The full repository takes up about 80MB of disk space. A check out of
-blead takes up about 160MB of disk space (including the repository). A
-build of blead takes up about 200MB (including the repository and the
-check out).
+the blead branch (that is, the master branch, which contains bleadperl,
+the development version of perl 5) takes up about 160MB of disk space
+(including the repository). A build of bleadperl takes up about 200MB
+(including the repository and the check out).
 
 =head1 GETTING ACCESS TO THE REPOSITORY
 
@@ -53,7 +54,7 @@ This clones the repository and makes a local copy in the 'perl-ssh'
 directory.
 
 If you clone using git, which is faster than ssh, then you will need to
-modify your config in order to enable pushing. Edit .git/config where
+modify your config in order to enable pushing. Edit F<.git/config> where
 you will see something like:
 
   [remote "origin"]
@@ -70,7 +71,15 @@ NOTE: there are symlinks set up so that the /gitroot is actually optional.
 
 Once you have changed into the repository directory, you can inspect it.
 
-The repository contains a few branches:
+
+After a clone the repository will contain a single local branch, which
+will be the current branch as well, as indicated by the asterix.
+
+  % git branch
+  * blead
+
+Using the -a switch to branch will also show the remote tracking branches in the
+repository:
 
   % git branch -a
   * blead
@@ -78,13 +87,42 @@ The repository contains a few branches:
     origin/blead
   ...
 
+The branches that begin with "origin" correspond to the "git remote" that
+you cloned from (which is named "origin"). Each branch on the remote will
+be exactly tracked by theses branches. You should NEVER do work on these
+remote tracking branches. You only ever do work in a local branch. Local
+branches can be configured to automerge (on pull) from a designated remote
+tracking branch. This is the case with the default branch C<blead> which
+will be configured to merge from the remote tracking branch
+C<origin/blead>.
+
 You can see recent commits:
 
   % git log
 
-And pull new changes from the repository:
+And pull new changes from the repository, and update your local repository
+(must be clean first)
 
   % git pull
+
+Assuming we are on the branch C<blead> immediately after a pull, this command
+would be more or less equivalent to:
+
+  % git fetch
+  % git merge origin/blead
+
+In fact if you want to update your local repository without touching your working
+directory you do:
+
+  % git fetch
+
+And if you want to update your remote-tracking branches for all defined remotes
+simultaneously you can do
+
+  % git remote update
+
+Neither of these last two commands will update your working directory, however
+both will update the remote-tracking branches in your repository.
 
 To switch to another branch:
 
@@ -93,6 +131,67 @@ To switch to another branch:
 To switch back to blead:
 
   % git checkout blead
+
+=head2 FINDING OUT YOUR STATUS
+
+The most common git command you will use will probably be
+
+  % git status
+
+This command will produce as output a description of the current state of the
+repository, including modified files and unignored untracked files, and in addition
+it will show things like what files have been staged for the next commit,
+and usually some useful information about how to change things. For instance the
+following:
+
+  $ git status
+  # On branch blead
+  # Your branch is ahead of 'origin/blead' by 1 commit.
+  #
+  # Changes to be committed:
+  #   (use "git reset HEAD <file>..." to unstage)
+  #
+  #       modified:   pod/perlrepository.pod
+  #
+  # Changed but not updated:
+  #   (use "git add <file>..." to update what will be committed)
+  #
+  #       modified:   pod/perlrepository.pod
+  #
+  # Untracked files:
+  #   (use "git add <file>..." to include in what will be committed)
+  #
+  #       deliberate.untracked
+
+This shows that there were changes to this document staged for commit, and
+that there were further changes in the working directory not yet staged. It
+also shows that there was an untracked file in the working directory, and as
+you can see shows how to change all of this. It also shows that there
+is one commit on the  working branch C<blead> which has not been pushed to the
+C<origin> remote yet. B<NOTE>: that this output is also what you see as a
+template if you do not provide a message to C<git commit>.
+
+Assuming we commit all the mentioned changes above:
+
+  % git commit -a -m'explain git status and stuff about remotes'
+  Created commit daf8e63: explain git status and stuff about remotes
+   1 files changed, 83 insertions(+), 3 deletions(-)
+
+We can re-run git status and see something like this:
+
+  % git status
+  # On branch blead
+  # Your branch is ahead of 'origin/blead' by 2 commits.
+  #
+  # Untracked files:
+  #   (use "git add <file>..." to include in what will be committed)
+  #
+  #       deliberate.untracked
+  nothing added to commit but untracked files present (use "git add" to track)
+
+
+When in doubt, before you do anything else, check your status and read it
+carefully, many questions are answered directly by the git status output.
 
 =head1 SUBMITTING A PATCH
 
@@ -106,7 +205,7 @@ Then change into the directory:
   % cd perl-git
 
 Alternatively, if you already have a Perl repository, you should
-ensure that you're on the I<blead> branch, and your repostiroy
+ensure that you're on the I<blead> branch, and your repository
 is up to date:
 
   % git checkout blead
@@ -114,6 +213,10 @@ is up to date:
 
 Now that we have everything up to date, we need to create a temporary new
 branch for these changes and switch into it:
+
+  % git checkout -b orange
+
+which is the short form of
 
   % git branch orange
   % git checkout orange
@@ -183,8 +286,7 @@ you should try out the patch.
 First we need to create a temporary new branch for these changes and
 switch into it:
 
-  % git branch experimental
-  % git checkout experimental
+  % git checkout -b experimental
 
 Now we should apply the patch:
 
@@ -220,7 +322,7 @@ If you are a committer to Perl and you think the patch is good, you can
 then merge it into blead then push it out to the main repository:
 
   % git checkout blead
-  % git pull . experimental
+  % git merge experimental
   % git push
 
 If you want to delete your temporary branch, you may do so with:
