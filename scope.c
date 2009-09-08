@@ -895,9 +895,8 @@ Perl_leave_scope(pTHX_ I32 base)
 	    if ((PL_hints & HINT_LOCALIZE_HH) && PL_hinthv) {
 		HVcpNULL(PL_hinthv);
 	    }
+ 	    HVcpSTEAL(PL_compiling.cop_hints_hash, (HV*) SSPOPPTR);
 	    *(I32*)&PL_hints = (I32)SSPOPINT;
-	    HvREFCNT_dec(PL_compiling.cop_hints_hash);
- 	    PL_compiling.cop_hints_hash = (HV*) SSPOPPTR;
 	    if (PL_hints & HINT_LOCALIZE_HH) {
 		HvREFCNT_dec(PL_hinthv);
 		PL_hinthv = (HV*)SSPOPPTR;

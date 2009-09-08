@@ -7,7 +7,7 @@ Perl_save_hints() {
         PL_hinthv = newHVhv(PL_hinthv);
     }
     HvREFCNT_inc(PL_compiling.cop_hints_hash);
-    SSPUSHPTR(PL_compiling.cop_hints_hash);
     SSPUSHINT(PL_hints);
+    SSPUSHPTR(PL_compiling.cop_hints_hash);
     SSPUSHINT(SAVEt_HINTS);
 }
