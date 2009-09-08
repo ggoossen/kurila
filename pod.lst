@@ -117,6 +117,7 @@ h Internals and C Language Interface
   perlapio		Perl internal IO abstraction interface
 
   perlhack		Perl hackers guide
+  perlrepository		Perl source repository
 
 h Miscellaneous
 
@@ -198,6 +199,7 @@ r perldgux		Perl notes for DG/UX
 r perldos		Perl notes for DOS
 r perlepoc		Perl notes for EPOC
 r perlfreebsd		Perl notes for FreeBSD
+r perlhaiku		Perl notes for Haiku
 r perlhpux		Perl notes for HP-UX
 r perlhurd		Perl notes for Hurd
 r perlirix		Perl notes for Irix

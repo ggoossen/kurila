@@ -134,6 +134,7 @@ For ease of access, the Perl manual has been split up into several sections.
     perlapio		Perl internal IO abstraction interface
 
     perlhack		Perl hackers guide
+    perlrepository	Perl source repository
 
 =head2 Miscellaneous
 
@@ -214,6 +215,7 @@ For ease of access, the Perl manual has been split up into several sections.
     perldos		Perl notes for DOS
     perlepoc		Perl notes for EPOC
     perlfreebsd 	Perl notes for FreeBSD
+    perlhaiku		Perl notes for Haiku
     perlhpux		Perl notes for HP-UX
     perlhurd		Perl notes for Hurd
     perlirix		Perl notes for Irix

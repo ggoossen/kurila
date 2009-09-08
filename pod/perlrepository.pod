@@ -1,0 +1,225 @@
+=head1 NAME
+
+perlrepository - Using the Perl source repository
+
+=head1 SYNOPSIS
+
+All of Perl's source code is kept centrally in a Git repository. The
+repository contains many Perl revisions from Perl 1 onwards and all
+the revisions from Perforce, the version control system we were using
+previously. This repository is accessible in different ways.
+
+The full repository takes up about 80MB of disk space. A check out of
+blead takes up about 160MB of disk space (including the repository). A
+build of blead takes up about 200MB (including the repository and the
+check out).
+
+=head1 GETTING ACCESS TO THE REPOSITORY
+
+=head2 READ ACCESS VIA THE WEB
+
+You may access this over the web. This allows you to browse the tree,
+see recent commits, search for particular commits and more. You may
+access it at:
+
+  http://perl5.git.perl.org/perl.git
+
+=head2 READ ACCESS VIA GIT
+
+You will need a copy of Git for your computer. You can fetch a copy of
+the repository using the Git protocol (which uses port 9418):
+
+  git clone git://perl5.git.perl.org/perl.git perl-git
+
+This clones the repository and makes a local copy in the 'perl-git'
+directory.
+
+If your local network does not allow you to use port 9418, then you can
+fetch a copy of the repository over HTTP (this is slower):
+
+  git clone http://perl5.git.perl.org/perl.git perl-http
+
+This clones the repository and makes a local copy in the 'perl-http'
+directory.
+
+=head2 WRITE ACCESS TO THE REPOSITORY
+
+If you are a committer, then you can fetch a copy of the repository that
+you can push back on with:
+
+  git clone ssh://perl5.git.perl.org/gitroot/perl.git perl-ssh
+
+This clones the repository and makes a local copy in the 'perl-ssh'
+directory.
+
+If you clone using git, which is faster than ssh, then you will need to
+modify your config in order to enable pushing. Edit .git/config where
+you will see something like:
+
+  [remote "origin"]
+  url = git://perl5.git.perl.org/perl.git
+
+change that to something like this:
+
+  [remote "origin"]
+  url = ssh://perl5.git.perl.org/gitroot/perl.git
+
+NOTE: there are symlinks set up so that the /gitroot is actually optional.
+
+=head1 OVERVIEW OF THE REPOSITORY
+
+Once you have changed into the repository directory, you can inspect it.
+
+The repository contains a few branches:
+
+  % git branch -a
+  * blead
+    origin/HEAD
+    origin/blead
+  ...
+
+You can see recent commits:
+
+  % git log
+
+And pull new changes from the repository:
+
+  % git pull
+
+To switch to another branch:
+
+  % git checkout origin/maint-5.8-dor
+
+To switch back to blead:
+
+  % git checkout blead
+
+=head1 SUBMITTING A PATCH
+
+If you have a patch in mind for Perl, you should first get a copy of
+the repository:
+
+  % git clone git://perl5.git.perl.org/perl.git perl-git
+
+Then change into the directory:
+
+  % cd perl-git
+
+First we need to create a temporary new branch for these changes and
+switch into it:
+
+  % git branch orange
+  % git checkout orange
+
+Then make your changes. For example, if Leon Brocard changes his name
+to Orange Brocard, we should change his name in the AUTHORS file:
+
+  % perl -pi -e 's{Leon Brocard}{Orange Brocard}' AUTHORS
+
+You can see what files are changed:
+
+  % git status
+  # On branch blead
+  # Changes to be committed:
+  #   (use "git reset HEAD <file>..." to unstage)
+  #
+  #	modified:   AUTHORS
+  #
+
+And you can see the changes:
+
+  % git diff
+  diff --git a/AUTHORS b/AUTHORS
+  index 293dd70..722c93e 100644
+  --- a/AUTHORS
+  +++ b/AUTHORS
+  @@ -541,7 +541,7 @@    Lars Hecking                   <lhecking@nmrc.ucc.ie>
+   Laszlo Molnar                  <laszlo.molnar@eth.ericsson.se>
+   Leif Huhn                      <leif@hale.dkstat.com>
+   Len Johnson                    <lenjay@ibm.net>
+  -Leon Brocard                   <acme@astray.com>
+  +Orange Brocard                 <acme@astray.com>
+   Les Peters                     <lpeters@aol.net>
+   Lesley Binks                   <lesley.binks@gmail.com>
+   Lincoln D. Stein               <lstein@cshl.org>
+
+Now commit your change locally:
+
+  % git add AUTHORS
+  % git commit -m 'Rename Leon Brocard to Orange Brocard'
+  Created commit 6196c1d: Rename Leon Brocard to Orange Brocard
+   1 files changed, 1 insertions(+), 1 deletions(-)
+
+Now you should create a patch file for all your local changes:
+
+  % git-format-patch origin
+  0001-Rename-Leon-Brocard-to-Orange-Brocard.patch
+
+You should now send an email to perl5-porters@perl.org with a
+description of your changes, and attach this patch file as an
+attachment.
+
+If you want to delete your temporary branch, you may do so with:
+
+  % git checkout blead
+  % git branch -d orange
+  error: The branch 'orange' is not an ancestor of your current HEAD.
+  If you are sure you want to delete it, run 'git branch -D orange'.
+  % git branch -D orange
+  Deleted branch orange.
+
+=head1 ACCEPTING A PATCH
+
+If you have received a patch file generated using the above section,
+you should try out the patch.
+
+First we need to create a temporary new branch for these changes and
+switch into it:
+
+  % git branch experimental
+  % git checkout experimental
+
+Now we should apply the patch:
+
+  % git-am 0001-Rename-Leon-Brocard-to-Orange-Brocard.patch
+  Applying Rename Leon Brocard to Orange Brocard
+
+Now we can inspect the change:
+
+  % git log
+  commit b1b3dab48344cff6de4087efca3dbd63548ab5e2
+  Author: Leon Brocard <acme@astray.com>
+  Date:   Fri Dec 19 17:02:59 2008 +0000
+
+    Rename Leon Brocard to Orange Brocard
+  ...
+
+  % git diff blead
+  diff --git a/AUTHORS b/AUTHORS
+  index 293dd70..722c93e 100644
+  --- a/AUTHORS
+  +++ b/AUTHORS
+  @@ -541,7 +541,7 @@ Lars Hecking                        <lhecking@nmrc.ucc.ie>
+   Laszlo Molnar                  <laszlo.molnar@eth.ericsson.se>
+   Leif Huhn                      <leif@hale.dkstat.com>
+   Len Johnson                    <lenjay@ibm.net>
+  -Leon Brocard                   <acme@astray.com>
+  +Orange Brocard                 <acme@astray.com>
+   Les Peters                     <lpeters@aol.net>
+   Lesley Binks                   <lesley.binks@gmail.com>
+   Lincoln D. Stein               <lstein@cshl.org>
+
+If you are a committer to Perl and you think the patch is good, you can
+then merge it into blead:
+
+  % git checkout blead
+  % git pull . experimental
+
+If you want to delete your temporary branch, you may do so with:
+
+  % git checkout blead
+  % git branch -d experimental
+  error: The branch 'experimental' is not an ancestor of your current HEAD.
+  If you are sure you want to delete it, run 'git branch -D experimental'.
+  % git branch -D experimental
+  Deleted branch experimental.
