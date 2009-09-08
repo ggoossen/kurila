@@ -859,17 +859,16 @@ Perl_leave_scope(pTHX_ I32 base)
 	    sv = MUTABLE_SV(SSPOPPTR);
 	    hv = MUTABLE_HV(SSPOPPTR);
 	    ptr = hv_fetch_ent(hv, sv, 1, 0);
+	    SvREFCNT_dec(sv);
 	    if (ptr) {
 		const SV * const oval = HeVAL((HE*)ptr);
 		if (oval && oval != &PL_sv_undef) {
 		    ptr = &HeVAL((HE*)ptr);
-		    SvREFCNT_dec(sv);
 		    av = MUTABLE_AV(hv); /* what to refcnt_dec */
 		    goto restore_sv;
 		}
 	    }
 	    HvREFCNT_dec(hv);
-	    SvREFCNT_dec(sv);
 	    SvREFCNT_dec(value);
 	    break;
 	case SAVEt_OP:
