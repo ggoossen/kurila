@@ -46,9 +46,9 @@ doop.c			Support code for various operations
 dosish.h		Some defines for MS/DOSish machines
 dump.c			Debugging output
 emacs/e2ctags.pl	etags to ctags converter
-emacs/kurila-mode.el	An kurila-mode
 emacs/kurila-indent.el	An indent code for the kurila-mode
 emacs/kurila-indent.etest	Tests for kurila-indent.el
+emacs/kurila-mode.el	An kurila-mode
 emacs/ptags		Creates smart TAGS file
 embed.fnc		Database used by embed.pl
 embed.h			Maps symbols to safer names
@@ -201,7 +201,6 @@ ext/IO/Makefile.PL		IO extension makefile writer
 ext/IO/poll.c			IO poll() emulation using select()
 ext/IO/poll.h			IO poll() emulation using select()
 ext/IO/README			IO extension maintenance notice
-ext/IO/t/io-socket.t	See if basic IO::Sockets methods work
 ext/IO/t/io_const.t	See if constants from IO work
 ext/IO/t/io_dir.t	See if directory-related methods from IO work
 ext/IO/t/io_dup.t	See if dup()-related methods from IO work
@@ -210,6 +209,7 @@ ext/IO/t/io_linenum.t	See if I/O line numbers are tracked correctly
 ext/IO/t/io_multihomed.t	See if INET sockets work with multi-homed hosts
 ext/IO/t/io_poll.t	See if poll()-related methods from IO work
 ext/IO/t/io_sel.t	See if select()-related methods from IO work
+ext/IO/t/io-socket.t	See if basic IO::Sockets methods work
 ext/IO/t/io_sock.t	See if INET socket-related methods from IO work
 ext/IO/t/IO.t	See if IO works
 ext/IO/t/io_tell.t	See if seek()/tell()-related methods from IO work
@@ -284,6 +284,12 @@ ext/Opcode/ops.pm		"Pragma" form of Opcode extension Perl module
 ext/Opcode/Safe.pm		Safe extension Perl module
 ext/Opcode/t/Opcode.t		See if Opcode works
 ext/Opcode/t/ops.t		See if Opcode works
+ext/Opcode/t/safe1.t		See if Safe works
+ext/Opcode/t/safe2.t		See if Safe works
+ext/Opcode/t/safe3.t		See if Safe works
+ext/Opcode/t/safeload.t		Tests that some modules can be loaded by Safe
+ext/Opcode/t/safeops.t		Tests that all ops can be trapped by Safe
+ext/Opcode/t/safeuniversal.t	Tests Safe with functions from universal.c
 ext/Perl6-Form/Changes	Perl6-Form
 ext/Perl6-Form/demo/demo_advert.pl	Perl6-Form
 ext/Perl6-Form/demo/demo_after.pl	Perl6-Form
@@ -360,14 +366,10 @@ ext/PerlIO-scalar/scalar.pm	PerlIO layer for scalars
 ext/PerlIO-scalar/scalar.xs	PerlIO layer for scalars
 ext/PerlIO-scalar/t/scalar.t		See if PerlIO::scalar works
 ext/PerlIO-scalar/t/scalar_ungetc.t	Tests for PerlIO layer for scalars
-lib/PerlIO/t/fail.t		See if bad layers fail
-lib/PerlIO/t/fallback.t		See if PerlIO fallbacks work
 ext/PerlIO/t/ioleaks.t		See if PerlIO layers are leaking
-lib/PerlIO/t/open.t		See if PerlIO certain special opens work
-lib/PerlIO/t/PerlIO.t		See if PerlIO works
-ext/PerlIO-via/t/via.t		See if PerlIO::via works
 ext/PerlIO-via/hints/aix.pl	Hint for PerlIO::via for named architecture
 ext/PerlIO-via/Makefile.PL	PerlIO layer for layers in perl
+ext/PerlIO-via/t/via.t		See if PerlIO::via works
 ext/PerlIO-via/via.pm		PerlIO layer for layers in perl
 ext/PerlIO-via/via.xs		PerlIO layer for layers in perl
 ext/POSIX/hints/bsdos.pl	Hint for POSIX for named architecture
@@ -409,12 +411,6 @@ ext/re/t/re_funcs.t		See if exportable 're' funcs in re.xs work
 ext/re/t/regop.pl		generate debug output for various patterns
 ext/re/t/regop.t		test RE optimizations by scraping debug output
 ext/re/t/re.t			see if re pragma works
-ext/Opcode/t/safe1.t		See if Safe works
-ext/Opcode/t/safe2.t		See if Safe works
-ext/Opcode/t/safe3.t		See if Safe works
-ext/Opcode/t/safeload.t		Tests that some modules can be loaded by Safe
-ext/Opcode/t/safeops.t		Tests that all ops can be trapped by Safe
-ext/Opcode/t/safeuniversal.t	Tests Safe with functions from universal.c
 ext/Socket/Makefile.PL		Socket extension makefile writer
 ext/Socket/Socket.pm		Socket extension Perl module
 ext/Socket/Socket.xs		Socket extension external subroutines
@@ -519,9 +515,9 @@ globvar.sym			Global variables that need hiding when embedded
 gv.c				Glob value code
 gv.h				Glob value header
 gv_i.h				Glob value inline functions
-haiku/haikuish.h		Header for the Haiku port
 haiku/Haiku/Haiku.pm		Haiku extension Perl module
 haiku/Haiku/Haiku.xs		Haiku extension external subroutines
+haiku/haikuish.h		Header for the Haiku port
 haiku/Haiku/Makefile.PL		Haiku extension makefile writer
 handy.h				Handy definitions
 hints/3b1cc			Hints for named architecture
@@ -648,6 +644,8 @@ lib/base/t/version.t		See if base works with versions
 lib/base/t/warnings.t		See if base works with warnings
 lib/Benchmark.pm		Measure execution time
 lib/Benchmark.t			See if Benchmark works
+lib/blib.pm			blib module
+lib/blib.t			For "use blib" testing
 lib/bytes.pm			Pragma to enable byte operations
 lib/bytes.t			bytes.pm test
 lib/Carp/Heavy.pm		Error message workhorse
@@ -684,8 +682,10 @@ lib/dumpvar.pl			A variable dumper
 lib/dumpvar.t			A variable dumper tester
 lib/English.pm			Readable aliases for short variables
 lib/English.t			See if English works
+libenv.c			The env package methods
 lib/env.pm                      Environemnt package
 lib/env.t                       Environemnt package tests
+liberror.c			The error package methods
 lib/error.pm                    Error Objects
 lib/error.pod                   Error Objects documentation
 lib/error.t                     See if error works
@@ -888,6 +888,7 @@ lib/I18N/LangTags/t/55_supers_strict.t	See whether I18N::LangTags works
 lib/I18N/LangTags/t/80_all_env.t	See whether I18N::LangTags works
 lib/integer.pm			For "use integer"
 lib/integer.t			For "use integer" testing
+libinternals.c			The Internals package methods
 lib/Internals.t			For Internals::* testing
 lib/iohandle.t                  iohandle::* testing
 lib/IPC/Cmd.pm			IPC::Cmd
@@ -904,8 +905,6 @@ lib/less.pm			For "use less"
 lib/less.t			See if less support works
 lib/lib_pm.PL			For "use lib", produces lib/lib.pm
 lib/lib.t			For "use lib" testing
-lib/blib.t			For "use blib" testing
-lib/blib.pm			blib module
 lib/Locale/Codes/ChangeLog	Locale::Codes
 lib/Locale/Codes/README		Locale::Codes
 lib/Locale/Codes/t/all.t	See if Locale::Codes work
@@ -980,6 +979,10 @@ lib/perl5db.pl			Perl debugging routines
 lib/perl5db.t			Tests for the Perl debugger
 lib/perl5db/t/eval-line-bug	Tests for the Perl debugger
 lib/PerlIO.pm			PerlIO support module
+lib/PerlIO/t/fail.t		See if bad layers fail
+lib/PerlIO/t/fallback.t		See if PerlIO fallbacks work
+lib/PerlIO/t/open.t		See if PerlIO certain special opens work
+lib/PerlIO/t/PerlIO.t		See if PerlIO works
 lib/PerlIO/via/QuotedPrint.pm	PerlIO::via::QuotedPrint
 lib/PerlIO/via/t/QuotedPrint.t	PerlIO::via::QuotedPrint
 lib/Pod/Checker.pm		Pod-Parser - check POD documents for syntax errors
@@ -1229,6 +1232,7 @@ lib/Pod/t/utils.t		Test for Pod::ParseUtils
 lib/Pod/Usage.pm		Pod-Parser - print usage messages
 lib/Search/Dict.pm		Perform binary search on dictionaries
 lib/Search/Dict.t		See if Search::Dict works
+libsignals.c			The signals package methods
 lib/signals.pm			For handling signals
 lib/signals.t			See if signals works
 lib/sigtrap.pm			For trapping an abort and giving traceback
@@ -1379,9 +1383,11 @@ lib/User/grent.pm		By-name interface to Perl's builtin getgr*
 lib/User/grent.t		See if User::grwent works
 lib/User/pwent.pm		By-name interface to Perl's builtin getpw*
 lib/User/pwent.t		See if User::pwent works
+libutf8.c			The utf8 package methods
 lib/utf8_heavy.pl		Support routines for utf8 pragma
 lib/utf8.pm			Pragma to control Unicode support
 lib/utf8.t			See if utf8 operations work
+libversion.c			The version package methods
 lib/version.pm			Support for version objects
 lib/version.pod			Documentation of the version module
 lib/version.t			Tests for version objects
@@ -1490,9 +1496,9 @@ NetWare/win32ish.h		NetWare port
 nostdio.h			Cause compile error on stdio calls
 numeric.c			Miscellaneous numeric conversion routines
 op.c				Opcode syntax tree code
-op_context.c			Opcode context propagation code
 opcode.h			Automatically generated opcode header
 opcode.pl			Opcode header generator
+op_context.c			Opcode context propagation code
 op.h				Opcode syntax tree header
 op_i.h				Opcode syntax tree inline functions
 opnames.h			Automatically generated opcode header
@@ -1598,6 +1604,7 @@ pod/buildtoc			Update files based on pod.lst
 pod/checkpods.pl		Tool to check for common errors in pods
 pod/kurila01delta.pod	What is new for Perl Kurila 0.1
 pod/kurila02delta.pod	What is new for Perl Kurila 0.2
+pod/kurila110delta.pod	What is new for Perl Kurila 1.10
 pod/kurila111delta.pod	What is new for Perl Kurila 1.11
 pod/kurila112delta.pod	What is new for Perl Kurila 1.12
 pod/kurila113delta.pod	What is new for Perl Kurila 1.13
@@ -1607,9 +1614,8 @@ pod/kurila116delta.pod	What is new for Perl Kurila 1.16
 pod/kurila117delta.pod	What is new for Perl Kurila 1.17
 pod/kurila118delta.pod	What is new for Perl Kurila 1.18
 pod/kurila119delta.pod	What is new for Perl Kurila 1.19
-pod/kurila110delta.pod	What is new for Perl Kurila 1.10
-pod/kurila121delta.pod	What is new for Perl Kurila 1.21
 pod/kurila120delta.pod	What is new for Perl Kurila 1.20
+pod/kurila121delta.pod	What is new for Perl Kurila 1.21
 pod/kurila13delta.pod	What is new for Perl Kurila 1.3
 pod/kurila14delta.pod	What is new for Perl Kurila 1.4
 pod/kurila15delta.pod	What is new for Perl Kurila 1.5
@@ -1618,7 +1624,9 @@ pod/kurila17delta.pod	What is new for Perl Kurila 1.7
 pod/kurila18delta.pod	What is new for Perl Kurila 1.8
 pod/kurila19delta.pod	What is new for Perl Kurila 1.9
 pod/kurilaintro.pod	Description of Perl Kurila
+pod/kurilasyn.pod			Perl Kurila syntax
 pod/kurilatoc.pod		Perl Kurila documentation table of contents
+pod/kurilatodo.pod		Perl Kurila things to do
 pod.lst				List the pods and their roles
 pod/Makefile.SH			generate Makefile which makes pods into something else
 pod/perl5004delta.pod		Perl changes in version 5.004
@@ -1722,9 +1730,7 @@ pod/perlrun.pod			Perl execution and options
 pod/perlsec.pod			Perl security
 pod/perlstyle.pod		Perl style guide
 pod/perlsub.pod			Perl subroutines
-pod/kurilasyn.pod			Perl Kurila syntax
 pod/perlthrtut.pod		Perl threads tutorial
-pod/kurilatodo.pod		Perl Kurila things to do
 pod/perltooc.pod		Perl OO tutorial, part 2
 pod/perltoot.pod		Perl OO tutorial, part 1
 pod/perltrap.pod		Perl traps for the unwary
@@ -1788,16 +1794,16 @@ Porting/repository.pod	How to use the Perl repository
 Porting/sort_perldiag.pl	Keep our diagnostics orderly
 Porting/testall.atom		Cumulative profile with Third Degree
 Porting/thirdclean		Cleanup Third Degree reports
-Porting/timecheck.c		Test program for the 2038 fix
 Porting/timecheck2.c		Test program for the 2038 fix
+Porting/timecheck.c		Test program for the 2038 fix
 Porting/valgrindpp.pl		Summarize valgrind reports
 pp.c				Push/Pop code
 pp_ctl.c			Push/Pop code for control flow
 pp.h				Push/Pop code defs
 pp_hot.c			Push/Pop code for heavily used opcodes
-pp_re.c			Push/Pop code for regex related opcodes
 pp_pack.c			Push/Pop code for pack/unpack
 pp_proto.h			C++ definitions for Push/Pop code
+pp_re.c			Push/Pop code for regex related opcodes
 pp_sort.c			Push/Pop code for sort
 pp.sym				Push/Pop code symbols
 pp_sys.c			Push/Pop code for system interaction
@@ -1933,16 +1939,14 @@ t/cmd/mod.t			See if statement modifiers work
 t/cmd/subval.t			See if subroutine values work
 t/cmd/switch.t			See if switch optimizations work
 t/cmd/while.t			See if while loops work
-t/comp/assignment.t			See if assignments work
-t/comp/return.t			See if return opcode works
 t/comp/arguments.t			See if passing arguments to subs work
+t/comp/assignment.t			See if assignments work
 t/comp/blocks.t			See if BEGIN and friends work
-t/comp/scope.t			See if scoping works
 t/comp/bproto.t			See if builtins conform to their prototypes
 t/comp/cmdopt.t			See if command optimization works
 t/comp/colon.t			See if colons are parsed correctly
-t/comp/dynascope.t		See if dynascope work
 t/comp/decl.t			See if declarations work
+t/comp/dynascope.t		See if dynascope work
 t/comp/fold.t			See if constant folding works
 t/comp/hints.t			See if %^H works
 t/comp/multiline.t		See if multiline strings work
@@ -1952,6 +1956,8 @@ t/comp/package.t		See if packages work
 t/comp/parser.t			See if the parser works in edge cases
 t/comp/redef.t			See if we get correct warnings on redefined subs
 t/comp/require.t		See if require works
+t/comp/return.t			See if return opcode works
+t/comp/scope.t			See if scoping works
 t/comp/script.t			See if script invocation works
 t/comp/term.t			See if more terms work
 t/comp/use.t			See if pragmata work
@@ -1976,21 +1982,13 @@ t/io/through.t			See if pipe passes data intact
 t/io/utf8.t			See if file seeking works
 t/japh/abigail.t		Obscure tests
 t/lex/chars.t			See if character escapes work
-t/lex/qq.t			See if qq works
+t/lex/indentation.t		See if indentation works
+t/lex/location.t		See if locations are correctly saved
 t/lex/pod.t			See if pod works
+t/lex/qq.t			See if qq works
 t/lex/qr.t			See if qr work
 t/lex/use.t			See if use works
 t/lex/ver.t			See if v-strings and the %v format flag work
-t/lex/location.t		See if locations are correctly saved
-t/lex/indentation.t		See if indentation works
-t/op/call.t			See if <: work
-t/op/code_eq.t			See if &== and &!= work
-t/op/anon_array.t		See if @: ... work
-t/op/hashconcat.t		See if +%+ works
-t/op/anon_hash.t		See if %: ... work
-t/op/aslice.t		See if [[...]] work
-t/op/hashjoin.t		See if %+: work
-t/op/shift.t		See if shift work
 t/lib/Cname.pm			Test charnames in regexes (op/pat.t)
 t/lib/common.pl			Helper for lib/{warnings,feature}.t
 t/lib/commonsense.t		See if configuration meets basic needs
@@ -2078,37 +2076,41 @@ t/mro/recursion_c3.t		mro tests
 t/mro/vulcan_c3.t		mro tests
 Todo.micro			The Wishlist for microperl
 toke.c				The tokener
+t/op/anon_array.t		See if @: ... work
+t/op/anon_hash.t		See if %: ... work
 t/op/arith.t			See if arithmetic works
-t/op/arrayexpand.t			See if the array expand operator works
 t/op/arrayconcat.t			See if the array concat operator works
-t/op/hashexpand.t			See if the hash expand operator works
+t/op/arrayexpand.t			See if the array expand operator works
+t/op/aslice.t		See if [[...]] work
 t/op/assignwarn.t		See if OP= operators warn correctly for undef targets
 t/op/auto.t			See if autoincrement et all work
 t/op/bless.t			See if bless works
 t/op/bop.t			See if bitops work
 t/op/caller.pl			Tests shared between caller.t and XS op.t
 t/op/caller.t			See if caller() works
+t/op/call.t			See if <: work
 t/op/chdir.t			See if chdir works
 t/op/chop.t			See if chop works
 t/op/chr.t			See if chr works
 t/op/cmp.t			See if the various string and numeric compare work
+t/op/code_eq.t			See if &== and &!= work
 t/op/concat.t			See if . works
 t/op/cond.t			See if conditional expressions work
 t/op/cproto.t			Check builtin prototypes
 t/op/crypt.t			See if crypt works
-t/op/defins.t			See if auto-insert of defined() works
 t/op/defined.t			See if defined() works
+t/op/defins.t			See if auto-insert of defined() works
 t/op/delete.t			See if delete works
 t/op/die_exit.t			See if die and exit status interaction works
 t/op/die.t			See if die works
 t/op/dor.t			See if defined-or (//) works
 t/op/do.t			See if subroutines work
 t/op/each.t			See if hash iterators work
+t/op/emptyarray.t			See if $@ work
+t/op/emptyhash.t			See if $% work
 t/op/eval.t			See if eval operator works
 t/op/exec.t			See if exec, system and qx work
 t/op/exp.t			See if math functions work
-t/op/emptyarray.t			See if $@ work
-t/op/emptyhash.t			See if $% work
 t/op/filetest.t			See if file tests work
 t/op/fork.t			See if fork works
 t/op/getppid.t			See if getppid works
@@ -2116,16 +2118,19 @@ t/op/glob.t			See if <*> works
 t/op/grent.t			See if getgr*() functions work
 t/op/grep.t			See if grep() and map() work
 t/op/groups.t			See if $( works
-t/op/helem.t		See if hash element operator work
 t/op/hashassign.t		See if hash assignments work
+t/op/hashconcat.t		See if +%+ works
+t/op/hashexpand.t			See if the hash expand operator works
+t/op/hashjoin.t		See if %+: work
 t/op/hashwarn.t			See if warnings for bad hash assignments work
+t/op/helem.t		See if hash element operator work
 t/op/inccode.t			See if coderefs work in $^INCLUDE_PATH
 t/op/inc.t			See if inc/dec of integers near 32 bit limit work
 t/op/index.t			See if index works
 t/op/int.t			See if int works
 t/op/join.t			See if join works
-t/op/kill0.t			See if kill(0, $pid) works
 t/op/keys.t			See if keys works
+t/op/kill0.t			See if kill(0, $pid) works
 t/op/lc.t			See if lc, uc, lcfirst, ucfirst, quotemeta work
 t/op/lc_user.t			See if user-defined lc et alia work
 t/op/length.t			See if length works
@@ -2145,8 +2150,6 @@ t/op/negate.t			See if unary minus works
 t/op/nelems.t			See if nelems works
 t/op/not.t			See if not works
 t/op/numconvert.t		See if accessing fields does not change numeric values
-t/op/sassign.t			See if assignment operator works
-t/op/try.t			See if try operator works
 t/op/oct.t			See if oct and hex work
 t/op/ord.t			See if ord works
 t/op/or.t			See if || works in weird situations
@@ -2170,27 +2173,29 @@ t/op/recurse.t			See if deep recursion works
 t/op/ref_address.t			See if ref::address works
 t/op/ref_eq.t			See if \== and \!= work
 t/op/ref.t			See if refs and objects work
-t/op/rv2cv.t			See if ->& work
 t/op/reftype.t			See if ref::reftype works
 t/op/reg_email.t		See if regex recursion works by parsing email addresses
-t/op/reg_posixcc.t		See if posix characterclasses behave consistantly
 t/op/regexp_noamp.t		See if regular expressions work with optimizations
 t/op/regexp_notrie.t		See if regular expressions work without trie optimisation
 t/op/regexp_qr_embed.t		See if regular expressions work with embedded qr//
 t/op/regexp_qr.t		See if regular expressions work as qr//
-t/op/regexp_unicode_prop.t	See if unicode properties work in regular expressions as expected
 t/op/regexp.t			See if regular expressions work
 t/op/regexp_trielist.t		See if regular expressions work with trie optimisation
+t/op/regexp_unicode_prop.t	See if unicode properties work in regular expressions as expected
 t/op/reg_fold.t			See if case folding works properly
 t/op/reg_mesg.t			See if one can get regular expression errors
 t/op/reg_pmod.t			See if regexp /p modifier works as expected
+t/op/reg_posixcc.t		See if posix characterclasses behave consistantly
 t/op/reg_unsafe.t		Check for unsafe match vars
 t/op/repeat.t			See if x operator works
 t/op/re.t			See if re core functions works
 t/op/re_tests			Regular expressions for regexp.t
 t/op/reverse.t			See if reverse operator works
 t/op/runlevel.t			See if die() works from perl_call_*()
+t/op/rv2cv.t			See if ->& work
 t/op/rxcode.t			See if /(?{ code })/ works
+t/op/sassign.t			See if assignment operator works
+t/op/shift.t		See if shift work
 t/op/sleep.t			See if sleep works
 t/op/sort.t			See if sort works
 t/op/splice.t			See if splice works
@@ -2207,6 +2212,7 @@ t/op/sub.t			See if subroutines work
 t/op/symbolcache.t		See if undef/delete works on stashes with functions
 t/op/sysio.t			See if sysread and syswrite work
 t/op/time.t			See if time functions work
+t/op/try.t			See if try operator works
 t/op/undef.t			See if undef works
 t/op/universal.t		See if UNIVERSAL class works
 t/op/unshift.t			See if unshift works
@@ -2268,15 +2274,15 @@ t/run/switchx.aux		Data for switchx.t
 t/run/switchx.t			Test the -x switch
 t/sv/alarm.t			See if alarm works
 t/sv/anonsub.t			See if anonymous subroutines work
-t/sv/blocksub.t			See if anonymous block subroutines work
-t/sv/code.t			See if code copying works
 t/sv/args.t			See if operations on @_ work
 t/sv/array.t			See if array operations work
-t/sv/object.t			See if objects work
+t/sv/blocksub.t			See if anonymous block subroutines work
 t/sv/closure.t			See if closures work
+t/sv/code.t			See if code copying works
 t/sv/fh.t			See if filehandles work
 t/sv/hash.t			See if the complexity attackers are repelled
 t/sv/magic.t			See if magic variables work
+t/sv/object.t			See if objects work
 t/sv/sv_2pv.t			See if stringification (sv_2pv) works
 t/TEST				The regression tester
 t/TestInit.pm			Preamble library for core tests
@@ -2294,12 +2300,6 @@ t/win32/system_tests		Test runner for system.t
 uconfig.h			Configuration header for microperl
 uconfig.sh			Configuration script for microperl
 universal.c			The default UNIVERSAL package methods
-libenv.c			The env package methods
-liberror.c			The error package methods
-libinternals.c			The Internals package methods
-libutf8.c			The utf8 package methods
-libversion.c			The version package methods
-libsignals.c			The signals package methods
 unixish.h			Defines that are assumed on Unix
 utf8.c				Unicode routines
 utf8.h				Unicode header
