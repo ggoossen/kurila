@@ -3120,6 +3120,8 @@ PerlIOStdio_close(pTHX_ PerlIO *f)
 	    if (!invalidate) {
 		dupfd = PerlLIO_dup(fd);
 	    }
+	} else {
+	    SAVE_ERRNO;   /* This is here only to silence compiler warnings */
 	}
         result = PerlSIO_fclose(stdio);
 	/* We treat error from stdio as success if we invalidated
