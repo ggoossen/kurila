@@ -1950,7 +1950,7 @@ XEMop	|REGEXP *|get_re_arg|NULLOK SV *sv
 p	|struct mro_meta*	|mro_meta_init	|NN HV* stash
 Apd	|AV*	|mro_get_linear_isa|NN HV* stash
 #if defined(PERL_IN_MRO_C) || defined(PERL_DECL_PROT)
-sd	|AV*	|mro_get_linear_isa_c3|NN HV* stash|I32 level
+sd	|AV*	|mro_get_linear_isa_c3|NN HV* stash|U32 level
 #endif
 : Used in hv.c, mg.c, pp.c, sv.c
 pd	|void   |mro_isa_changed_in|NN HV* stash

@@ -96,7 +96,7 @@ invalidated).
 */
 
 static AV*
-S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
+S_mro_get_linear_isa_c3(pTHX_ HV* stash, U32 level)
 {
     AV* retval;
     GV** gvp;
