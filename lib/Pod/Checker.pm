@@ -859,7 +859,7 @@ sub command($self, $cmd, $paragraph, $line_num, $pod_para)
                     $type = 'bullet'
                     $self->{+_list_item_contents} = $1 ?? 1 !! 0
                     $arg = $1
-                elsif($arg =~ m/^\d+\.?\s*(\S*)/)
+                elsif($arg =~ m/^\d+\.?\s+(\S*)/)
                     $type = 'number'
                     $self->{+_list_item_contents} = $1 ?? 1 !! 0
                     $arg = $1
