@@ -227,7 +227,9 @@ pM	|void	|delete_eval_scope
 p	|void	|deprecate	|NN const char *const s
 p	|void	|deprecate_old	|NN const char *const s
 Afp	|OP*	|die		|NULLOK const char* pat|...
+#if defined(PERL_IN_UTIL_C)
 sr	|void	|vdie		|NULLOK const char* pat|NULLOK va_list* args
+#endif
 pr	|void	|die_where	|NN SV *msv
 Ap	|void	|dounwind	|I32 cxix
 pmb	|bool	|do_aexec	|NULLOK SV* really|NN SV* const * mark|NN SV* const * sp
@@ -626,7 +628,9 @@ pi	|void	|pad_set_cur_nosave	|NN AV* padlist|I32 nth
 pd	|void	|pad_leavemy
 Apd	|SV*	|pad_sv		|PADOFFSET po
 pd	|void	|pad_free	|PADOFFSET po
-pd	|void	|pad_reset
+#if defined(PERL_IN_PAD_C)
+sd	|void	|pad_reset
+#endif
 pd	|void	|pad_swipe	|PADOFFSET po|bool refadjust
 p	|void	|peep		|NULLOK OP* o
 #if defined(USE_REENTRANT_API)

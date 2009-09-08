@@ -181,7 +181,7 @@ Perl_pad_new(pTHX_ int flags, PAD* parent_padnames, PAD* parent_pad, IV parent_s
 	    SAVEI32(PL_max_intro_pending);
 	    SAVEBOOL(PL_cv_has_eval);
 	    if (flags & padnew_SAVESUB) {
-		SAVEI32(PL_pad_reset_pending);
+		SAVEBOOL(PL_pad_reset_pending);
 	    }
 	}
     }
@@ -985,7 +985,7 @@ Mark all the current temporaries for reuse
  * We avoid doing this until we can think of a Better Way.
  * GSAR 97-10-29 */
 void
-Perl_pad_reset(pTHX)
+S_pad_reset(pTHX)
 {
     dVAR;
 #ifdef USE_BROKEN_PAD_RESET

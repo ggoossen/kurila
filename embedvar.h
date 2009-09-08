@@ -71,6 +71,7 @@
 #define PL_bitcount		(vTHX->Ibitcount)
 #define PL_body_arenas		(vTHX->Ibody_arenas)
 #define PL_body_roots		(vTHX->Ibody_roots)
+#define PL_breakable_sub_gen	(vTHX->Ibreakable_sub_gen)
 #define PL_checkav		(vTHX->Icheckav)
 #define PL_clocktick		(vTHX->Iclocktick)
 #define PL_colors		(vTHX->Icolors)
@@ -349,6 +350,7 @@
 #define PL_Ibitcount		PL_bitcount
 #define PL_Ibody_arenas		PL_body_arenas
 #define PL_Ibody_roots		PL_body_roots
+#define PL_Ibreakable_sub_gen	PL_breakable_sub_gen
 #define PL_Icheckav		PL_checkav
 #define PL_Iclocktick		PL_clocktick
 #define PL_Icolors		PL_colors

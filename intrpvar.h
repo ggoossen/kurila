@@ -434,12 +434,13 @@ PERLVAR(Imax_intro_pending,	I32)	/* end of vars to introduce */
 PERLVAR(Ipadix,		I32)		/* max used index in current "register" pad */
 
 PERLVAR(Ipadix_floor,	I32)		/* how low may inner block reset padix */
-PERLVAR(Ipad_reset_pending,	I32)	/* reset pad on next attempted alloc */
 
 PERLVAR(Ihints,		U32)		/* pragma-tic compile-time flags */
 
 PERLVAR(Idebug,		VOL U32)	/* flags given to -D switch */
 
+/* Perl_Ibreakable_sub_generation_ptr was too long for VMS, hence "gen"  */
+PERLVARI(Ibreakable_sub_gen, U32, 0)
 
 #if defined (PERL_UTF8_CACHE_ASSERT) || defined (DEBUGGING)
 #  define PERL___I -1
@@ -483,7 +484,7 @@ PERLVAR(Iutf8_tofold,	SV *)
 PERLVARI(Icryptseen,	bool,	FALSE)	/* has fast crypt() been initialized? */
 #endif
 
-/* Space for a U8 */
+PERLVAR(Ipad_reset_pending,	bool)	/* reset pad on next attempted alloc */
 
 PERLVARI(Iglob_index,	int,	0)
 

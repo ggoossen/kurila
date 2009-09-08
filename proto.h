@@ -616,9 +616,11 @@ PERL_CALLCONV void	Perl_deprecate_old(pTHX_ const char *const s)
 PERL_CALLCONV OP*	Perl_die(pTHX_ const char* pat, ...)
 			__attribute__format__null_ok__(__printf__,pTHX_1,pTHX_2);
 
+#if defined(PERL_IN_UTIL_C)
 STATIC void	S_vdie(pTHX_ const char* pat, va_list* args)
 			__attribute__noreturn__;
 
+#endif
 PERL_CALLCONV void	Perl_die_where(pTHX_ SV *msv)
 			__attribute__noreturn__
 			__attribute__nonnull__(pTHX_1);
@@ -2195,7 +2197,9 @@ PERL_INLINE_CALLCONV void	Perl_pad_set_cur_nosave(pTHX_ AV* padlist, I32 nth)
 PERL_CALLCONV void	Perl_pad_leavemy(pTHX);
 PERL_CALLCONV SV*	Perl_pad_sv(pTHX_ PADOFFSET po);
 PERL_CALLCONV void	Perl_pad_free(pTHX_ PADOFFSET po);
-PERL_CALLCONV void	Perl_pad_reset(pTHX);
+#if defined(PERL_IN_PAD_C)
+STATIC void	S_pad_reset(pTHX);
+#endif
 PERL_CALLCONV void	Perl_pad_swipe(pTHX_ PADOFFSET po, bool refadjust);
 PERL_CALLCONV void	Perl_peep(pTHX_ OP* o);
 #if defined(USE_REENTRANT_API)
