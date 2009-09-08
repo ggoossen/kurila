@@ -6517,6 +6517,7 @@ $ WC "usecasesensitive='" + be_case_sensitive + "'"    ! VMS-specific
 $ WC "usedebugging_perl='"+use_debugging_perl+"'"
 $ WC "usedefaulttypes='" + usedefaulttypes + "'"    ! VMS-specific
 $ WC "usecrosscompile='undef'"
+$ WC "usedevel='" + usedevel + "'"
 $ WC "usedl='" + usedl + "'"
 $ WC "usedtrace='undef'"
 $ WC "usefaststdio='" + usefaststdio + "'"
