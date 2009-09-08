@@ -129,9 +129,9 @@ Aip     |void |pop_stack
 Aip     |void |cx_free_eval		|NN PERL_CONTEXT* cx
 
 #  include "pp_proto.h"
-: This is used in perly.y
+: Used in perly.y
 p	|OP*	|append_elem	|I32 optype|NULLOK OP* first|NULLOK OP* last
-: This is used in perly.y
+: Used in perly.y
 p	|OP*	|append_list	|I32 optype|NULLOK LISTOP* first|NULLOK LISTOP* last
 : FIXME - this is only called by pp_chown. They should be merged.
 p	|I32	|apply		|I32 type|NN SV** mark|NN SV** sp
@@ -139,7 +139,6 @@ Apd	|void	|av_clear	|NN AV *av
 Apd	|SV*	|av_delete	|NN AV *av|I32 key|I32 flags
 ApdR	|bool	|av_exists	|NN AV *av|I32 key
 Apd	|void	|av_extend	|NN AV *av|I32 key
-pR	|AV*	|av_fake	|I32 size|NN SV **strp
 ApdR	|SV**	|av_fetch	|NN AV *av|I32 key|I32 lval
 Apd	|void	|av_fill	|NN AV *av|I32 fill
 ApdR	|I32	|av_len		|NN AV *av
@@ -147,6 +146,7 @@ ApdR	|AV*	|av_make	|I32 size|NN SV **strp
 Apd	|SV*	|av_pop		|NN AV *av
 ApdoxM	|void	|av_create_and_push|NN AV **const avp|NN SV *const val
 Apd	|void	|av_push	|NN AV *av|NN SV *val
+: Used in scope.c, and by Data::Alias
 EXp	|void	|av_reify	|NN AV *av
 ApdR	|SV*	|av_shift	|NN AV *av
 Apd	|SV**	|av_store	|NN AV *av|I32 key|NULLOK SV *val
@@ -154,14 +154,14 @@ Apd	|void	|av_undef	|NN AV *av
 Apd	|void	|av_tmprefcnt	|NN AV *av
 ApdoxM	|SV**	|av_create_and_unshift_one|NN AV **const avp|NN SV *const val
 Apd	|void	|av_unshift	|NN AV *av|I32 num
-: This is used in perly.y
+: Used in perly.y
 pR	|OP*	|bind_match	|I32 type|NN OP *left|NN OP *right
-: This is used in perly.y
+: Used in perly.y
 pR	|OP*	|block_end	|I32 floor|NULLOK OP* seq
 ApR	|I32	|block_gimme
-: This is used in perly.y
+: Used in perly.y
 pR	|int	|block_start	|int full
-: This is used in perl.c
+: Used in perl.c
 p	|void	|boot_core_UNIVERSAL
 p	|void	|boot_core_error
 p	|void	|boot_core_version
@@ -169,10 +169,10 @@ p	|void	|boot_core_utf8
 p	|void	|boot_core_Internals
 p	|void	|boot_core_signals
 p	|void	|boot_core_env
-: This is used in perl.c
+: Used in perl.c
 p	|void	|boot_core_PerlIO
 Ap	|void	|call_list	|I32 oldscope|NN AV *paramList
-: This is used in serveral source files
+: Used in serveral source files
 pR	|bool	|cando		|Mode_t mode|bool effective|NN const Stat_t* statbufp
 ApR	|U32	|cast_ulong	|NV f
 ApR	|I32	|cast_i32	|NV f
@@ -181,9 +181,9 @@ ApR	|UV	|cast_uv	|NV f
 #if !defined(HAS_TRUNCATE) && !defined(HAS_CHSIZE) && defined(F_FREESP)
 ApR	|I32	|my_chsize	|int fd|Off_t length
 #endif
-: This is used in perly.y
+: Used in perly.y
 pR	|OP*	|convert	|I32 optype|OPFLAGS flags|NULLOK OP* o|NULLOK SV* location
-: This is used in op.c and perl.c
+: Used in op.c and perl.c
 pM	|PERL_CONTEXT*	|create_eval_scope|U32 flags
 : croak()'s first parm can be NULL.  Otherwise, mod_perl breaks.
 Afprd	|void	|croak		|NULLOK const char* pat|...
@@ -229,6 +229,7 @@ pPR	|const char*	|get_no_modify
 : FIXME discussion on p5p
 pPR	|U32*	|get_opargs
 ApPR	|PPADDR_t*|get_ppaddr
+: Used by CXINC, which appears to be in widespread use
 EXpR	|I32	|cxinc
 Afp	|void	|deb		|NN const char* pat|...
 Ap	|void	|vdeb		|NN const char* pat|NULLOK va_list* args
@@ -238,6 +239,7 @@ Ap	|I32	|debstack
 Ap	|I32	|debstackptrs
 Ap	|char*	|delimcpy	|NN char* to|NN const char* toend|NN const char* from \
 				|NN const char* fromend|int delim|NN I32* retlen
+: Used in op.c, perl.c
 pM	|void	|delete_eval_scope
 : Used in various files
 p	|void	|deprecate	|NN const char *const s
@@ -340,6 +342,7 @@ ApdR	|char*	|fbm_instr	|NN char* big|NN char* bigend \
 p	|char*	|find_script	|NN const char *scriptname|bool dosearch \
 				|NULLOK const char *const *const search_ext|I32 flags
 p	|OP*	|force_list	|NULLOK OP* arg
+: FIXME
 p	|OP*	|fold_constants	|NN OP *o
 Afpd	|char*	|form		|NN const char* pat|...
 Ap	|char*	|vform		|NN const char* pat|NULLOK va_list* args
@@ -370,6 +373,7 @@ ApdM	|CV*	|gv_fetchmethod_flags|NN HV* stash|NN const char* name \
 				|U32 flags
 Ap	|GV*	|gv_fetchpv	|NN const char* nambeg|I32 add|const svtype sv_type
 Ap	|void	|gv_fullname3	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix
+: Used in scope.c
 pMox	|GP *	|newGP		|NN GV *const gv
 Ap	|void	|gv_init	|NN GV* gv|NULLOK HV* stash|NN const char* name|STRLEN len|int multi
 Ap	|void	|gv_name_set	|NN GV* gv|NN const char *name|U32 len|U32 flags
@@ -489,11 +493,12 @@ ApR	|bool	|is_utf8_mark	|NN const char *p
 pP	|I32	|keyword	|NN const char* name|I32 len
 Ap	|void	|leave_scope	|I32 base
 Ap	|void	|scope_tmprefcnt
-: Used in pp_ctl.c
+: Used in pp_ctl.c, and by Data::Alias
 EXp	|void	|lex_end
 : Used in various files
 p	|void	|lex_start	|NULLOK SV* line|NULLOK PerlIO *rsfp|bool new_filter
 Ap	|void	|op_null	|NN OP* o
+: FIXME. Used by Data::Alias
 EXp	|void	|op_clear	|NN OP* o
 Ap	|void	|op_refcnt_lock
 Ap	|void	|op_refcnt_unlock
@@ -532,6 +537,8 @@ p	|int	|magic_setutf8	|NN SV* sv|NN MAGIC* mg
 Ap	|void	|markstack_grow
 Afp	|SV*	|mess		|NN const char* pat|...
 Ap	|SV*	|vmess		|NN const char* pat|NULLOK va_list* args
+: FIXME - either make it public, or stop exporting it. (Data::Alias uses this)
+: Used in gv.c, op.c, toke.c
 EXp	|void	|qerror		|NN SV* err
 Apd	|void	|sortsv		|NULLOK SV** array|size_t num_elts|NN SVCOMPARE_t cmp
 Apd	|void	|sortsv_flags	|NULLOK SV** array|size_t num_elts|NN SVCOMPARE_t cmp|U32 flags
@@ -546,6 +553,7 @@ Apd	|void	|mg_tmprefcnt	|NN SV* sv
 Apd	|void	|mg_magical	|NN SV* sv
 Apd	|int	|mg_set		|NN SV* sv
 Ap	|void	|mini_mktime	|NN struct tm *ptm
+: Used by MOD(), which Data::Alias uses
 EXp	|OP*	|mod		|NULLOK OP* o|I32 type
 p	|OP*	|assign		|NN OP* o|bool partial|NN I32 *min_modcount|NN I32 *max_modcount
 p	|OP*	|op_assign		|NN OP** po|I32 optype
@@ -746,6 +754,7 @@ Ap	|I32	|pregexec	|NN REGEXP * const prog|NN char* stringarg \
 Ap	|void	|pregfree	|NULLOK REGEXP* r
 Ap	|void	|pregfree2	|NN REGEXP *rx
 Ap	|void	|preg_tmprefcnt	|NN REGEXP *rx
+: FIXME - is anything in re using this now?
 EXp	|REGEXP*|reg_temp_copy	|NN REGEXP* r
 Ap	|void	|regfree_internal|NN REGEXP *const rx
 Ap	|void	|reg_tmprefcnt_internal|NN REGEXP *const rx
@@ -771,10 +780,14 @@ Ap |SV*|reg_named_buff_nextkey  |NN REGEXP * const rx|const U32 flags
 Ap |SV*|reg_named_buff_scalar   |NN REGEXP * const rx|const U32 flags
 Ap |SV*|reg_named_buff_all      |NN REGEXP * const rx|const U32 flags
 
+: FIXME - is anything in re using this now?
 EXp	|void|reg_numbered_buff_fetch|NN REGEXP * const rx|const I32 paren|NULLOK SV * const sv
+: FIXME - is anything in re using this now?
 EXp	|void|reg_numbered_buff_store|NN REGEXP * const rx|const I32 paren|NULLOK SV const * const value
+: FIXME - is anything in re using this now?
 EXp	|I32|reg_numbered_buff_length|NN REGEXP * const rx|NN const SV * const sv|const I32 paren
 
+: FIXME - is anything in re using this now?
 EXp	|SV*|reg_qr_package|NN REGEXP * const rx
 
 : FIXME - why the E?
@@ -869,7 +882,7 @@ s	|I32	|setenv_getix	|NN const char* nam
 #endif
 Ap	|HEK*	|share_hek	|NN const char* str|I32 len|U32 hash
 #if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
-: This is used in perl.c
+: Used in perl.c
 np	|Signal_t |sighandler	|int sig|NULLOK siginfo_t *info|NULLOK void *uap
 Anp	|Signal_t |csighandler	|int sig|NULLOK siginfo_t *info|NULLOK void *uap
 #else
@@ -1070,7 +1083,7 @@ p	|void	|write_to_stderr|NN const char* message|int msglen
 : Used in op.c
 p	|int	|yyerror	|NN const char *const s
 p	|void	|yyerror_at	|NN SV* location|NN const char *const s
-: Used in perly.y
+: Used in perly.y, and by Data::Alias
 EXp	|int	|yylex
 : Used in perl.c, pp_ctl.c
 p	|int	|yyparse
@@ -1827,6 +1840,8 @@ np	|long	|my_htobel	|long n
 np	|long	|my_betohl	|long n
 #endif
 
+: I think that these are only used by the above, which are macros, and in turn
+: currently they are only used in pp_pack.c, but this is in util.c
 np	|void	|my_swabn	|NN void* ptr|int n
 
 Ap	|GV*	|gv_fetchpvn_flags|NN const char* name|STRLEN len|I32 flags|const svtype sv_type
@@ -1837,6 +1852,7 @@ Ap	|GV*	|gv_SVadd	|NN GV* gv
 #endif
 Apo	|bool	|ckwarn		|U32 w
 Apo	|bool	|ckwarn_d	|U32 w
+: FIXME - exported for ByteLoader - public or private?
 XEopMa	|STRLEN *|new_warnings_bitfield|NULLOK STRLEN *buffer \
 				|NN const char *const bits|STRLEN size
 
@@ -1925,7 +1941,9 @@ Mp	|int	|madparse
 AMdnoP	|int	|Perl_signbit	|NV f
 #endif
 
+: Used by B
 XEMop	|void	|emulate_cop_io	|NN const COP *const c|NN SV *const sv
+: Used by SvRX and SvRXOK
 XEMop	|REGEXP *|get_re_arg|NULLOK SV *sv
 
 : Used in HvMROMETA() in gv.c, pp_hot.c, universal.c
