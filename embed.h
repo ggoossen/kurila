@@ -217,7 +217,7 @@
 #define deprecate_old		Perl_deprecate_old
 #endif
 #define die			Perl_die
-#if defined(PERL_IN_UTIL_C)
+#if defined(PERL_IN_UTIL_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define vdie			S_vdie
 #endif
@@ -256,7 +256,7 @@
 #ifdef PERL_CORE
 #define do_execfree		Perl_do_execfree
 #endif
-#ifdef PERL_IN_DOIO_C
+#if defined(PERL_IN_DOIO_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define exec_failed		S_exec_failed
 #endif
@@ -363,7 +363,7 @@
 #define ibcmp			Perl_ibcmp
 #define ibcmp_locale		Perl_ibcmp_locale
 #define ibcmp_utf8		Perl_ibcmp_utf8
-#if defined(PERL_IN_DOIO_C)
+#if defined(PERL_IN_DOIO_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define ingroup			S_ingroup
 #endif
@@ -453,7 +453,7 @@
 #endif
 #define op_refcnt_lock		Perl_op_refcnt_lock
 #define op_refcnt_unlock	Perl_op_refcnt_unlock
-#if defined(PERL_IN_OP_C)
+#if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define linklist		S_linklist
 #endif
@@ -660,7 +660,7 @@
 #ifdef PERL_CORE
 #define pad_free		Perl_pad_free
 #endif
-#if defined(PERL_IN_PAD_C)
+#if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define pad_reset		S_pad_reset
 #endif
@@ -886,7 +886,7 @@
 #define sv_nv			Perl_sv_nv
 #define sv_pvn			Perl_sv_pvn
 #define sv_pvutf8n		Perl_sv_pvutf8n
-#if defined (PERL_IN_SV_C)
+#if defined(PERL_IN_SV_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define sv_add_arena		S_sv_add_arena
 #endif
@@ -1570,7 +1570,7 @@
 #ifdef PERL_CORE
 #define deb_stack_all		Perl_deb_stack_all
 #endif
-#ifdef PERL_IN_DEB_C
+#if defined(PERL_IN_DEB_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define deb_stack_n		S_deb_stack_n
 #endif
@@ -2421,7 +2421,7 @@
 #define deprecate(a)		Perl_deprecate(aTHX_ a)
 #define deprecate_old(a)	Perl_deprecate_old(aTHX_ a)
 #endif
-#if defined(PERL_IN_UTIL_C)
+#if defined(PERL_IN_UTIL_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define vdie(a,b)		S_vdie(aTHX_ a,b)
 #endif
@@ -2462,7 +2462,7 @@
 #ifdef PERL_CORE
 #define do_execfree()		Perl_do_execfree(aTHX)
 #endif
-#ifdef PERL_IN_DOIO_C
+#if defined(PERL_IN_DOIO_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define exec_failed(a,b,c)	S_exec_failed(aTHX_ a,b,c)
 #endif
@@ -2572,7 +2572,7 @@
 #define ibcmp(a,b,c)		Perl_ibcmp(aTHX_ a,b,c)
 #define ibcmp_locale(a,b,c)	Perl_ibcmp_locale(aTHX_ a,b,c)
 #define ibcmp_utf8(a,b,c,d,e,f)	Perl_ibcmp_utf8(aTHX_ a,b,c,d,e,f)
-#if defined(PERL_IN_DOIO_C)
+#if defined(PERL_IN_DOIO_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define ingroup(a,b)		S_ingroup(aTHX_ a,b)
 #endif
@@ -2662,7 +2662,7 @@
 #endif
 #define op_refcnt_lock()	Perl_op_refcnt_lock(aTHX)
 #define op_refcnt_unlock()	Perl_op_refcnt_unlock(aTHX)
-#if defined(PERL_IN_OP_C)
+#if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define linklist(a)		S_linklist(aTHX_ a)
 #endif
@@ -2866,7 +2866,7 @@
 #ifdef PERL_CORE
 #define pad_free(a)		Perl_pad_free(aTHX_ a)
 #endif
-#if defined(PERL_IN_PAD_C)
+#if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define pad_reset()		S_pad_reset(aTHX)
 #endif
@@ -3091,7 +3091,7 @@
 #define sv_nv(a)		Perl_sv_nv(aTHX_ a)
 #define sv_pvn(a,b)		Perl_sv_pvn(aTHX_ a,b)
 #define sv_pvutf8n(a,b)		Perl_sv_pvutf8n(aTHX_ a,b)
-#if defined (PERL_IN_SV_C)
+#if defined(PERL_IN_SV_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define sv_add_arena(a,b,c)	S_sv_add_arena(aTHX_ a,b,c)
 #endif
@@ -3778,7 +3778,7 @@
 #ifdef PERL_CORE
 #define deb_stack_all()		Perl_deb_stack_all(aTHX)
 #endif
-#ifdef PERL_IN_DEB_C
+#if defined(PERL_IN_DEB_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define deb_stack_n(a,b,c,d,e)	S_deb_stack_n(aTHX_ a,b,c,d,e)
 #endif

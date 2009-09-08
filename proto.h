@@ -610,7 +610,7 @@ PERL_CALLCONV void	Perl_deprecate_old(pTHX_ const char *const s)
 PERL_CALLCONV OP*	Perl_die(pTHX_ const char* pat, ...)
 			__attribute__format__null_ok__(__printf__,pTHX_1,pTHX_2);
 
-#if defined(PERL_IN_UTIL_C)
+#if defined(PERL_IN_UTIL_C) || defined(PERL_DECL_PROT)
 STATIC void	S_vdie(pTHX_ const char* pat, va_list* args)
 			__attribute__noreturn__;
 
@@ -696,7 +696,7 @@ PERL_CALLCONV bool	Perl_do_exec3(pTHX_ const char *incmd, int fd, int do_report)
 
 #endif
 PERL_CALLCONV void	Perl_do_execfree(pTHX);
-#ifdef PERL_IN_DOIO_C
+#if defined(PERL_IN_DOIO_C) || defined(PERL_DECL_PROT)
 STATIC void	S_exec_failed(pTHX_ const char *cmd, int fd, int do_report)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_EXEC_FAILED	\
@@ -1145,7 +1145,7 @@ PERL_CALLCONV I32	Perl_ibcmp_utf8(pTHX_ const char* s1, char **pe1, UV l1, const
 #define PERL_ARGS_ASSERT_IBCMP_UTF8	\
 	assert(s1); assert(s2)
 
-#if defined(PERL_IN_DOIO_C)
+#if defined(PERL_IN_DOIO_C) || defined(PERL_DECL_PROT)
 STATIC bool	S_ingroup(pTHX_ Gid_t testgid, bool effective)
 			__attribute__warn_unused_result__;
 
@@ -1465,7 +1465,7 @@ PERL_CALLCONV void	Perl_op_clear(pTHX_ OP* o)
 
 PERL_CALLCONV void	Perl_op_refcnt_lock(pTHX);
 PERL_CALLCONV void	Perl_op_refcnt_unlock(pTHX);
-#if defined(PERL_IN_OP_C)
+#if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 STATIC OP*	S_linklist(pTHX_ OP *o)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_LINKLIST	\
@@ -2188,7 +2188,7 @@ PERL_INLINE_CALLCONV void	Perl_pad_set_cur_nosave(pTHX_ AV* padlist, I32 nth)
 PERL_CALLCONV void	Perl_pad_leavemy(pTHX);
 PERL_CALLCONV SV*	Perl_pad_sv(pTHX_ PADOFFSET po);
 PERL_CALLCONV void	Perl_pad_free(pTHX_ PADOFFSET po);
-#if defined(PERL_IN_PAD_C)
+#if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
 STATIC void	S_pad_reset(pTHX);
 #endif
 PERL_CALLCONV void	Perl_pad_swipe(pTHX_ PADOFFSET po, bool refadjust);
@@ -2873,7 +2873,7 @@ PERL_CALLCONV char*	Perl_sv_pvutf8n(pTHX_ SV *sv, STRLEN *lp)
 #define PERL_ARGS_ASSERT_SV_PVUTF8N	\
 	assert(sv); assert(lp)
 
-#if defined (PERL_IN_SV_C)
+#if defined(PERL_IN_SV_C) || defined(PERL_DECL_PROT)
 STATIC void	S_sv_add_arena(pTHX_ char *const ptr, const U32 size, const U32 flags)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SV_ADD_ARENA	\
@@ -5311,7 +5311,7 @@ PERL_CALLCONV PerlIO *	Perl_PerlIO_stderr(pTHX)
 #endif /* PERLIO_LAYERS */
 
 PERL_CALLCONV void	Perl_deb_stack_all(pTHX);
-#ifdef PERL_IN_DEB_C
+#if defined(PERL_IN_DEB_C) || defined(PERL_DECL_PROT)
 STATIC void	S_deb_stack_n(pTHX_ SV** stack_base, I32 stack_min, I32 stack_max, I32 mark_min, I32 mark_max)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_DEB_STACK_N	\

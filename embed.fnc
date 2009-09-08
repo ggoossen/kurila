@@ -246,7 +246,7 @@ p	|void	|deprecate	|NN const char *const s
 : Used in various files
 p	|void	|deprecate_old	|NN const char *const s
 Afp	|OP*	|die		|NULLOK const char* pat|...
-#if defined(PERL_IN_UTIL_C)
+#if defined(PERL_IN_UTIL_C) || defined(PERL_DECL_PROT)
 sr	|void	|vdie		|NULLOK const char* pat|NULLOK va_list* args
 #endif
 : Used in util.c
@@ -278,7 +278,7 @@ Ap	|int	|do_spawn_nowait|NN char* cmd
 p	|bool	|do_exec3	|NN const char *incmd|int fd|int do_report
 #endif
 p	|void	|do_execfree
-#ifdef PERL_IN_DOIO_C
+#if defined(PERL_IN_DOIO_C) || defined(PERL_DECL_PROT)
 s	|void	|exec_failed	|NN const char *cmd|int fd|int do_report
 #endif
 #if defined(HAS_MSG) || defined(HAS_SEM) || defined(HAS_SHM)
@@ -418,7 +418,7 @@ ApP	|I32	|ibcmp		|NN const char* a|NN const char* b|I32 len
 ApP	|I32	|ibcmp_locale	|NN const char* a|NN const char* b|I32 len
 Apd	|I32	|ibcmp_utf8	|NN const char* s1|NULLOK char **pe1|UV l1 \
 				|NN const char* s2|NULLOK char **pe2|UV l2
-#if defined(PERL_IN_DOIO_C)
+#if defined(PERL_IN_DOIO_C) || defined(PERL_DECL_PROT)
 sR	|bool	|ingroup	|Gid_t testgid|bool effective
 #endif
 : Used in toke.c
@@ -502,7 +502,7 @@ Ap	|void	|op_null	|NN OP* o
 EXp	|void	|op_clear	|NN OP* o
 Ap	|void	|op_refcnt_lock
 Ap	|void	|op_refcnt_unlock
-#if defined(PERL_IN_OP_C)
+#if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 s	|OP*	|linklist	|NN OP *o
 #endif
 p	|OP*	|list		|NULLOK OP* o
@@ -698,7 +698,7 @@ pd	|void	|pad_leavemy
 Apd	|SV*	|pad_sv		|PADOFFSET po
 : Defined in pad.c, used only in op.c
 pd	|void	|pad_free	|PADOFFSET po
-#if defined(PERL_IN_PAD_C)
+#if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
 sd	|void	|pad_reset
 #endif
 : Used in op.c
@@ -803,6 +803,7 @@ p	|int	|rsignal_save	|int i|Sighandler_t t1|NN Sigsave_t* save
 Ap	|Sighandler_t|rsignal_state|int i
 p	|void	|rxres_free	|NN void** rsp
 p	|void	|rxres_restore	|NN void **rsp|NN REGEXP *rx
+: Used in pp_hot.c
 p	|void	|rxres_save	|NN void **rsp|NN REGEXP *rx
 #if !defined(HAS_RENAME)
 : Used in pp_sys.c
@@ -916,7 +917,7 @@ Apd	|UV	|sv_uv		|NN SV* sv
 Apd	|NV	|sv_nv		|NN SV* sv
 Apd	|char*	|sv_pvn		|NN SV *sv|NN STRLEN *lp
 Apd	|char*	|sv_pvutf8n	|NN SV *sv|NN STRLEN *lp
-#if defined (PERL_IN_SV_C)
+#if defined(PERL_IN_SV_C) || defined(PERL_DECL_PROT)
 sd	|void	|sv_add_arena	|NN char *const ptr|const U32 size \
 				|const U32 flags
 #endif
@@ -1697,7 +1698,7 @@ ApR	|PerlIO *|PerlIO_stderr
 
 : Only used in dump.c
 p	|void	|deb_stack_all
-#ifdef PERL_IN_DEB_C
+#if defined(PERL_IN_DEB_C) || defined(PERL_DECL_PROT)
 s	|void	|deb_stack_n	|NN SV** stack_base|I32 stack_min \
 				|I32 stack_max|I32 mark_min|I32 mark_max
 #endif
