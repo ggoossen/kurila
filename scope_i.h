@@ -1,7 +1,6 @@
 
 void
 Perl_save_hints() {
-    SSCHECK(4);
     HvREFCNT_inc(PL_compiling.cop_hints_hash);
     if (PL_hints & HINT_LOCALIZE_HH) {
         save_pushptri32ptr(PL_hinthv, PL_hints, PL_compiling.cop_hints_hash, SAVEt_HINTS);
