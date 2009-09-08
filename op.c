@@ -678,7 +678,7 @@ Perl_op_refcnt_unlock(pTHX)
 
 #define LINKLIST(o) ((o)->op_next ? (o)->op_next : linklist((OP*)o))
 
-OP *
+static OP *
 S_linklist(pTHX_ OP *o)
 {
     OP *first;
@@ -710,7 +710,7 @@ S_linklist(pTHX_ OP *o)
     return o->op_next;
 }
 
-STATIC bool
+static bool
 S_is_handle_constructor(const OP *o, I32 numargs)
 {
     PERL_ARGS_ASSERT_IS_HANDLE_CONSTRUCTOR;

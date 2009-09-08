@@ -1306,7 +1306,7 @@ S_vdie_croak_common(pTHX_ SV* location, const char* pat, va_list* args)
     return msv;
 }
 
-STATIC void
+static void
 S_vdie(pTHX_ const char* pat, va_list *args)
 {
     dVAR;
@@ -2923,7 +2923,7 @@ Perl_wait4pid(pTHX_ Pid_t pid, int *statusp, int flags)
 
 #ifdef PERL_USES_PL_PIDSTATUS
 void
-Perl_pidgone(pTHX_ Pid_t pid, int status)
+S_pidgone(pTHX_ Pid_t pid, int status)
 {
     register SV *sv;
 
