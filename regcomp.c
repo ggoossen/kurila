@@ -3741,7 +3741,7 @@ Perl_pregcomp(pTHX_ SV * const pattern, const U32 flags)
 #endif
 
 REGEXP *
-Perl_re_compile(pTHX_ const SV * const pattern, const U32 pm_flags)
+Perl_re_compile(pTHX_ SV * const pattern, const U32 pm_flags)
 {
     dVAR;
     REGEXP *rx;
@@ -6233,10 +6233,10 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
 	/* Need to convert to utf8 if either: won't fit into a byte, or the re
 	 * is going to be in utf8 and the representation changes under utf8. */
 	if ( cp > 0xff || ! UNI_IS_INVARIANT(cp) ) {
-	    U8 string[UTF8_MAXBYTES+1];
-	    U8 *tmps;
+	    char string[UTF8_MAXBYTES+1];
+	    char *tmps;
 	    tmps = uvuni_to_utf8(string, cp);
-	    sv_str = newSVpvn((char*)string, tmps - string);
+	    sv_str = newSVpvn(string, tmps - string);
 	} else {    /* Otherwise, no need for utf8, can skip that step */
 	    char string;
 	    string = (char)cp;
@@ -8841,7 +8841,6 @@ Perl_preg_tmprefcnt(pTHX_ REGEXP *rx)
 {
     dVAR;
     struct regexp *const r = (struct regexp *)SvANY(rx);
-    RXi_GET_DECL(r,ri);
     PERL_ARGS_ASSERT_PREG_TMPREFCNT;
 
     PERL_ARGS_ASSERT_PREGFREE2;
@@ -9073,7 +9072,7 @@ Perl_reg_tmprefcnt_internal(pTHX_ REGEXP * const rx)
 	    case 'f':
 		break;
 	    case 'p':
-		SvTMPREFCNT_inc((AV*)ri->data->data[n]);
+		AvTMPREFCNT_inc((AV*)ri->data->data[n]);
 		break;
 	    case 'o':
 		/* rootop_tmprefcnt_inc((ROOTOP*)ri->data->data[n]);  */

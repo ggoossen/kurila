@@ -293,8 +293,8 @@ PP(pp_rv2cv)
 
     CV *cv = sv_2cv(POPs, &gv, flags);
     if (!cv) {
-	assert(gv);
 	SV* sub_name = sv_newmortal();
+	assert(gv);
 	gv_efullname3(sub_name, (GV*)gv, NULL);
 	DIE(aTHX_ "Undefined subroutine &%"SVf"", SVfARG(sub_name));
     }
@@ -388,7 +388,7 @@ PP(pp_prototype)
     }
     cv = sv_2cv(TOPs, &gv, 0);
     if (cv && SvPOK(cv))
-	ret = newSVpvn_flags(SvPVX_const((SV*)cv), SvCUR(cv), SVs_TEMP);
+	ret = newSVpvn_flags(SvPVX_const(cvTsv(cv)), SvCUR(cvTsv(cv)), SVs_TEMP);
   set:
     SETs(ret);
     RETURN;

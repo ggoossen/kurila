@@ -247,7 +247,7 @@ S_more_sv(pTHX)
 
 /* provide a real function for a debugger to play with */
 STATIC SV*
-S_new_SV(pTHX_ const char *file, int line, const char *func)
+S_new_SV(pTHX)
 {
     SV* sv;
 
@@ -278,7 +278,7 @@ S_new_SV(pTHX_ const char *file, int line, const char *func)
 
     return sv;
 }
-#  define new_SV(p) (p)=S_new_SV(aTHX_ __FILE__, __LINE__, FUNCTION__)
+#  define new_SV(p) (p)=S_new_SV(aTHX)
 
 
 /* del_SV(): return an empty SV head to the free list */
@@ -867,8 +867,8 @@ static const struct body_details bodies_by_type[] = {
     (void *)((char *)S_new_body(aTHX_ sv_type)	\
 	     - bodies_by_type[sv_type].offset)
 
-void Perl_del_body_allocated(pTHX_ char* p, svtype sv_type) {
-    del_body((void*)(p + bodies_by_type[sv_type].offset), &PL_body_roots[sv_type]);
+void Perl_del_body_allocated(pTHX_ void* p, svtype sv_type) {
+    del_body((void*)((char *)p + bodies_by_type[sv_type].offset), &PL_body_roots[sv_type]);
 }
 
 #define my_safemalloc(s)	(void*)safemalloc(s)
@@ -1028,7 +1028,7 @@ Perl_sv_upgrade(pTHX_ register SV *const sv, svtype new_type)
     void*	new_body;
     svtype old_type = SvTYPE(sv);
     const struct body_details *new_type_details;
-    struct body_details *old_type_details
+    const struct body_details *old_type_details
 	= bodies_by_type + old_type;
     SV *referant = NULL;
 
@@ -3983,7 +3983,7 @@ Perl_sv_add_backref(pTHX_ SV *const tsv, SV *const sv)
 	    av = newAV();
 	    AvREAL_off(av);
 	    sv_magic(tsv, (SV*)av, PERL_MAGIC_backref, NULL, 0);
-	    SvREFCNT_dec(av);
+	    AvREFCNT_dec(av);
 	}
     }
     if (AvFILLp(av) >= AvMAX(av)) {

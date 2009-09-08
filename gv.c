@@ -523,7 +523,7 @@ Perl_gv_fetchmethod_flags(pTHX_ HV *stash, const char *name, U32 flags)
     CV* cv;
     HV* ostash = stash;
     const char * const origname = name;
-    SV *const error_report = stash;
+    SV *const error_report = hvTsv(stash);
     const U32 do_croak = flags & GV_CROAK;
 
     PERL_ARGS_ASSERT_GV_FETCHMETHOD;

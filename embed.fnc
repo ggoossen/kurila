@@ -101,17 +101,17 @@ Aip	|GV*	|svTgv	|NULLOK SV *sv
 Aip	|IO*	|svTio	|NULLOK SV *sv
 Aip	|REGEXP*	|svTre	|NULLOK SV *sv
 
-Aip	|const char*	|SvPVX_const	|NN SV *sv
+Aip	|const char*	|SvPVX_const	|NN const SV *sv
 Aip	|char*	|SvPVX_mutable	|NN SV *sv
 AipS	|void	|SvREFCNT_dec	|NULLOK XV *sv
 AipS	|SV*	|SvREFCNT_inc	|NULLOK XV *sv
 AipS	|void	|SvTMPREFCNT_inc	|NULLOK XV *sv
-Ap	|void	|del_body_allocated	|NN char* p|svtype sv_type
+Ap	|void	|del_body_allocated	|NN void* p|svtype sv_type
 AipS	|void	|sv_cp_replace	|NN XV **sv_d|NULLOK XV *sv_s
 Aip	|IV	|SvIV	|NN SV *sv
 Aip	|UV	|SvUV	|NN SV *sv
 Aip	|NV	|SvNV	|NN SV *sv
-Aip	|STRLEN	|SvCUR	|NN SV *sv
+Aip	|STRLEN	|SvCUR	|NN const SV *sv
 Aip	|void	|SvCUR_set	|NN SV *sv|STRLEN len
 Aip	|char *	|SvPVx_nolen	|NN SV *sv
 Aip	|const char *	|SvPVx_nolen_const	|NN SV *sv
@@ -305,6 +305,7 @@ p	|OP*	|fold_constants	|NN OP *o
 Afpd	|char*	|form		|NN const char* pat|...
 Ap	|char*	|vform		|NN const char* pat|NULLOK va_list* args
 Ap	|void	|free_tmps
+p	|void	|tmps_tmprefcnt
 p	|OP*	|gen_constant_list|NULLOK OP* o
 #if !defined(HAS_GETENV_LEN)
 p	|char*	|getenv_len	|NN const char *env_elem|NN unsigned long *len
@@ -447,7 +448,9 @@ Ap	|void	|op_null	|NN OP* o
 EXp	|void	|op_clear	|NN OP* o
 Ap	|void	|op_refcnt_lock
 Ap	|void	|op_refcnt_unlock
+#if defined(PERL_IN_OP_C)
 s	|OP*	|linklist	|NN OP *o
+#endif
 p	|OP*	|list		|NULLOK OP* o
 p	|OP*	|listkids	|NULLOK OP* o
 Apd	|void	|load_module|U32 flags|NN SV* name|NULLOK SV* ver|...
@@ -684,7 +687,7 @@ EXp	|REGEXP*|reg_temp_copy	|NN REGEXP* r
 Ap	|void	|regfree_internal|NN REGEXP *const rx
 Ap	|void	|reg_tmprefcnt_internal|NN REGEXP *const rx
 Ap	|REGEXP*|pregcomp	|NN SV * const pattern|const U32 flags
-Ap	|REGEXP*|re_compile	|NN const SV * const pattern|U32 flags
+Ap	|REGEXP*|re_compile	|NN SV * const pattern|U32 flags
 Ap	|char*	|re_intuit_start|NN REGEXP * const rx|NULLOK SV* sv|NN char* strpos \
 				|NN char* strend|const U32 flags \
 				|NULLOK re_scream_pos_data *data

@@ -1580,7 +1580,7 @@ PP(pp_entersub)
 
 	CvREFCNT_dec(cv);
 	pop_block();
-	POPMARK;
+	(void)POPMARK;
 
 	/* Enforce some sanity in scalar context. */
 	if (gimme == G_SCALAR && ++markix != PL_stack_sp - PL_stack_base ) {

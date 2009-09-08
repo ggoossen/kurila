@@ -317,6 +317,7 @@
 #define vform			Perl_vform
 #define free_tmps		Perl_free_tmps
 #ifdef PERL_CORE
+#define tmps_tmprefcnt		Perl_tmps_tmprefcnt
 #define gen_constant_list	Perl_gen_constant_list
 #endif
 #if !defined(HAS_GETENV_LEN)
@@ -455,8 +456,12 @@
 #endif
 #define op_refcnt_lock		Perl_op_refcnt_lock
 #define op_refcnt_unlock	Perl_op_refcnt_unlock
+#if defined(PERL_IN_OP_C)
 #ifdef PERL_CORE
 #define linklist		S_linklist
+#endif
+#endif
+#ifdef PERL_CORE
 #define list			Perl_list
 #define listkids		Perl_listkids
 #endif
@@ -2522,6 +2527,7 @@
 #define vform(a,b)		Perl_vform(aTHX_ a,b)
 #define free_tmps()		Perl_free_tmps(aTHX)
 #ifdef PERL_CORE
+#define tmps_tmprefcnt()	Perl_tmps_tmprefcnt(aTHX)
 #define gen_constant_list(a)	Perl_gen_constant_list(aTHX_ a)
 #endif
 #if !defined(HAS_GETENV_LEN)
@@ -2664,8 +2670,12 @@
 #endif
 #define op_refcnt_lock()	Perl_op_refcnt_lock(aTHX)
 #define op_refcnt_unlock()	Perl_op_refcnt_unlock(aTHX)
+#if defined(PERL_IN_OP_C)
 #ifdef PERL_CORE
 #define linklist(a)		S_linklist(aTHX_ a)
+#endif
+#endif
+#ifdef PERL_CORE
 #define list(a)			Perl_list(aTHX_ a)
 #define listkids(a)		Perl_listkids(aTHX_ a)
 #endif

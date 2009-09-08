@@ -120,7 +120,7 @@ PERL_INLINE_CALLCONV GV*	Perl_svTgv(pTHX_ SV *sv);
 PERL_INLINE_CALLCONV IO*	Perl_svTio(pTHX_ SV *sv);
 PERL_INLINE_CALLCONV REGEXP*	Perl_svTre(pTHX_ SV *sv);
 
-PERL_INLINE_CALLCONV const char*	Perl_SvPVX_const(pTHX_ SV *sv)
+PERL_INLINE_CALLCONV const char*	Perl_SvPVX_const(pTHX_ const SV *sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SVPVX_CONST	\
 	assert(sv)
@@ -133,7 +133,7 @@ PERL_INLINE_CALLCONV char*	Perl_SvPVX_mutable(pTHX_ SV *sv)
 PERL_INLINE_CALLCONV void	Perl_SvREFCNT_dec(pTHX_ SV *sv);
 PERL_INLINE_CALLCONV SV*	Perl_SvREFCNT_inc(pTHX_ SV *sv);
 PERL_INLINE_CALLCONV void	Perl_SvTMPREFCNT_inc(pTHX_ SV *sv);
-PERL_CALLCONV void	Perl_del_body_allocated(pTHX_ char* p, svtype sv_type)
+PERL_CALLCONV void	Perl_del_body_allocated(pTHX_ void* p, svtype sv_type)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_DEL_BODY_ALLOCATED	\
 	assert(p)
@@ -158,7 +158,7 @@ PERL_INLINE_CALLCONV NV	Perl_SvNV(pTHX_ SV *sv)
 #define PERL_ARGS_ASSERT_SVNV	\
 	assert(sv)
 
-PERL_INLINE_CALLCONV STRLEN	Perl_SvCUR(pTHX_ SV *sv)
+PERL_INLINE_CALLCONV STRLEN	Perl_SvCUR(pTHX_ const SV *sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SVCUR	\
 	assert(sv)
@@ -895,6 +895,7 @@ PERL_CALLCONV char*	Perl_vform(pTHX_ const char* pat, va_list* args)
 	assert(pat)
 
 PERL_CALLCONV void	Perl_free_tmps(pTHX);
+PERL_CALLCONV void	Perl_tmps_tmprefcnt(pTHX);
 PERL_CALLCONV OP*	Perl_gen_constant_list(pTHX_ OP* o);
 #if !defined(HAS_GETENV_LEN)
 PERL_CALLCONV char*	Perl_getenv_len(pTHX_ const char *env_elem, unsigned long *len)
@@ -1470,11 +1471,13 @@ PERL_CALLCONV void	Perl_op_clear(pTHX_ OP* o)
 
 PERL_CALLCONV void	Perl_op_refcnt_lock(pTHX);
 PERL_CALLCONV void	Perl_op_refcnt_unlock(pTHX);
+#if defined(PERL_IN_OP_C)
 STATIC OP*	S_linklist(pTHX_ OP *o)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_LINKLIST	\
 	assert(o)
 
+#endif
 PERL_CALLCONV OP*	Perl_list(pTHX_ OP* o);
 PERL_CALLCONV OP*	Perl_listkids(pTHX_ OP* o);
 PERL_CALLCONV void	Perl_load_module(pTHX_ U32 flags, SV* name, SV* ver, ...)
@@ -2373,7 +2376,7 @@ PERL_CALLCONV REGEXP*	Perl_pregcomp(pTHX_ SV * const pattern, const U32 flags)
 #define PERL_ARGS_ASSERT_PREGCOMP	\
 	assert(pattern)
 
-PERL_CALLCONV REGEXP*	Perl_re_compile(pTHX_ const SV * const pattern, U32 flags)
+PERL_CALLCONV REGEXP*	Perl_re_compile(pTHX_ SV * const pattern, U32 flags)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_RE_COMPILE	\
 	assert(pattern)

@@ -353,7 +353,7 @@ and check for NULL.
    has exactly one character at the end, a ')'. Will that always be true?  */
 #define RX_PRELEN(prog)		(RX_WRAPLEN(prog) - ((struct regexp *)SvANY(prog))->pre_prefix - 1)
 #define RX_WRAPPED(prog)	SvPVX_mutable(reTsv(prog))
-#define RX_WRAPPED_const(prog)	SvPVX_const(prog)
+#define RX_WRAPPED_const(prog)	SvPVX_const(reTsv(prog))
 #define RX_WRAPLEN(prog)	SvCUR(reTsv(prog))
 #define RX_CHECK_SUBSTR(prog)	(((struct regexp *)SvANY(prog))->check_substr)
 #define RX_REFCNT(prog)		SvREFCNT(prog)

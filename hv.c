@@ -1250,7 +1250,7 @@ S_hfreeentries(pTHX_ HV *hv)
             if((meta = iter->xhv_mro_meta)) {
                 if(meta->mro_linear_c3)  AvREFCNT_dec(meta->mro_linear_c3);
                 if(meta->mro_nextmethod) HvREFCNT_dec(meta->mro_nextmethod);
-                SvREFCNT_dec(meta->isa);
+                HvREFCNT_dec(meta->isa);
                 Safefree(meta);
                 iter->xhv_mro_meta = NULL;
             }
@@ -1609,7 +1609,7 @@ Perl_hv_kill_backrefs(pTHX_ HV *hv) {
     if (av) {
 	HvAUX(hv)->xhv_backreferences = 0;
 	Perl_sv_kill_backrefs(aTHX_ MUTABLE_SV(hv), av);
-	SvREFCNT_dec(av);
+	AvREFCNT_dec(av);
     }
 }
 

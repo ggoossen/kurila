@@ -63,7 +63,7 @@ Perl_SvNV(pTHX_ SV *sv) {
 #define SvUV_nomg(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv))
 
 STRLEN
-Perl_SvCUR(pTHX_ SV* sv) {
+Perl_SvCUR(pTHX_ const SV* sv) {
     assert(SvTYPE(sv) >= SVt_PV);
     assert(SvTYPE(sv) != SVt_PVAV);
     assert(SvTYPE(sv) != SVt_PVHV);
@@ -257,7 +257,7 @@ Perl_SvNAME(pTHX_ SV *sv) {
     return loc_name(SvLOCATION(sv));
 }
 
-const char* Perl_SvPVX_const(pTHX_ SV *sv) {
+const char* Perl_SvPVX_const(pTHX_ const SV *sv) {
     PERL_ARGS_ASSERT_SVPVX_CONST;
     assert(SvTYPE(sv) >= SVt_PV);
     assert(SvTYPE(sv) != SVt_PVAV);
