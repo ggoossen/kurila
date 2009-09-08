@@ -513,16 +513,16 @@ splintflags = \
 
 splintfiles = $(c1)
 
-.c$(OBJ_EXT):
+.c$(OBJ_EXT): 
 	$(CCCMD) $(PLDLFLAGS) $*.c
 
-.c.i:
+.c.i: 
 	$(CCCMDSRC) -E $*.c > $*.i
 
 .c.s:
 	$(CCCMDSRC) -S $*.c
 
-all: $(FIRSTMAKEFILE) miniperl$(EXE_EXT) extra.pods $(private) $(unidatafiles) $(public) $(dynamic_ext) $(nonxs_ext) extras.make
+all: $(FIRSTMAKEFILE) make_patchnum miniperl$(EXE_EXT) extra.pods $(private) $(unidatafiles) $(public) $(dynamic_ext) $(nonxs_ext) extras.make
 	@echo " ";
 	@echo "	Everything is up to date. Type '$(MAKE) test' to run test suite."
 
@@ -535,7 +535,12 @@ sperl$(OBJ_EXT): perl.c $(h)
 sperl.i: perl.c $(h)
 	$(CCCMDSRC) -DIAMSUID -E perl.c > sperl.i
 
-.PHONY: all utilities
+.PHONY: all translators utilities make_patchnum
+
+make_patchnum:
+	sh $(shellflags) make_patchnum.sh
+
+perl$(OBJ_EXT): .patchnum .sha1
 
 utilities:	miniperl$(EXE_EXT) $(CONFIGPM) $(plfixlocal) lib/lib.pm FORCE
 	@echo " "; echo "	Making utilities"; cd utils; $(LDLIBPTH) $(MAKE) all
@@ -1179,6 +1184,8 @@ _mopup:
 _tidy:
 	-cd pod; $(LDLIBPTH) $(MAKE) clean
 	-cd utils; $(LDLIBPTH) $(MAKE) clean
+	-rm .patchnum
+	-rm .sha1
 	-@for x in $(DYNALOADER) $(dynamic_ext) $(static_ext) $(nonxs_ext) ; do \
 	$(LDLIBPTH) sh ext/util/make_ext clean $$x MAKE=$(MAKE) ; \
 	done
@@ -1281,7 +1288,7 @@ _test_prep: unpack_files
 
 test_prep_pre: preplibrary utilities $(nonxs_ext)
 
-test_prep: test_prep_pre miniperl$(EXE_EXT) $(unidatafiles) perl$(EXE_EXT) $(dynamic_ext) $(TEST_PERL_DLL)
+test_prep: make_patchnum test_prep_pre miniperl$(EXE_EXT) $(unidatafiles) perl$(EXE_EXT) $(dynamic_ext) $(TEST_PERL_DLL)
 	PERL=./perl $(MAKE) _test_prep
 
 _test_tty:

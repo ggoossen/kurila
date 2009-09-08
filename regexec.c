@@ -2644,7 +2644,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		    if ( got_wordnum ) {
 			if ( ! ST.accepted ) {
 			    ENTER_named("trie");
-			    /* SAVETMPS; */ /* XXX is this necessary? dmq */
+			    SAVETMPS; /* XXX is this necessary? dmq */
 			    bufflen = TRIE_INITAL_ACCEPT_BUFFLEN;
 			    sv_accept_buff=newSV(bufflen *
 					    sizeof(reg_trie_accepted) - 1);
