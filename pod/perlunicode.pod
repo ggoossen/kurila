@@ -1371,7 +1371,8 @@ This can lead to unexpected results in which a string's semantics suddenly
 change if a code point above 255 is appended to or removed from it,
 which changes the string's semantics from byte to character or vice versa.
 This behavior is scheduled to change in version 5.12, but in the meantime,
-a workaround is to always call utf8::upgrade($string).
+a workaround is to always call utf8::upgrade($string), or to use the
+standard modules L<Encode> or L<charnames>.
 
 =head2 Interaction with Extensions
 
