@@ -355,8 +355,10 @@ case "$cc" in
   ;;
 esac
 
-if test -e .git; then
-  ccflags="-DKURILA_PATCHNUM=`git rev-list --max-count=1 HEAD` $ccflags"
+if test -d .git; then
+  ccflags="-DPERL_PATCHNUM=`git describe` $ccflags"
+elif test -f .patch; then
+  ccflags="-DPERL_PATCHNUM=`awk '{print $4}' .patch` $ccflags"
 fi
 
     : Can we perhaps use $ansi2knr here

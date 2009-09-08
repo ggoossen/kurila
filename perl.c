@@ -2749,13 +2749,13 @@ Perl_moreswitches(pTHX_ const char *s)
 	    upg_version(PL_patchlevel, TRUE);
 #if !defined(DGUX)
 	PerlIO_printf(PerlIO_stdout(),
-		Perl_form(aTHX_ "\nThis is kurila, v%d.%d"
-#ifdef KURILA_PATCHNUM
-			  " DEVEL" STRINGIFY(KURILA_PATCHNUM)
+		"\nThis is kurila, v%d.%d"
+#ifdef PERL_PATCHNUM
+		" DEVEL:" STRINGIFY(PERL_PATCHNUM)
 #endif
 			  " built for %s",
 			  KURILA_VERSION, KURILA_SUBVERSION,
-			  ARCHNAME));
+			  ARCHNAME);
 #else /* DGUX */
 /* Adjust verbose output as in the perl that ships with the DG/UX OS from EMC */
 	PerlIO_printf(PerlIO_stdout(),

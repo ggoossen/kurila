@@ -185,7 +185,7 @@ do
     my (@: _, $v) =  split m/-/, $^PERL_VERSION
     my $archname = config_value('archname')
     like( runperl( switches => \(@: '-v') ),
-          qr/This[ ]is[ ]kurila,[  ]v$v [ ] (?:DEVEL\w+[ ])? built[ ]for[ ]
+          qr/This[ ]is[ ]kurila,[  ]v$v [ ] (?:DEVEL:\S+[ ])? built[ ]for[ ]
              \Q$archname\E .+
              Copyright .+
              Gerard[ ]Goossen.+Artistic[ ]License .+
