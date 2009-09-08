@@ -343,16 +343,6 @@ Perl_save_bool(pTHX_ bool *boolp)
     SSPUSHINT(SAVEt_BOOL);
 }
 
-static void
-S_save_pushi32ptr(pTHX_ const I32 i, void *const ptr, const int type)
-{
-    dVAR;
-    SSCHECK(3);
-    SSPUSHINT(i);
-    SSPUSHPTR(ptr);
-    SSPUSHINT(type);
-}
-
 void
 Perl_save_int(pTHX_ int *intp)
 {
@@ -530,11 +520,7 @@ Perl_save_delete(pTHX_ HV *hv, char *key, I32 klen)
 
     PERL_ARGS_ASSERT_SAVE_DELETE;
 
-    SSCHECK(4);
-    SSPUSHINT(klen);
-    SSPUSHPTR(key);
-    SSPUSHPTR(HvREFCNT_inc(hv));
-    SSPUSHINT(SAVEt_DELETE);
+    save_pushptri32ptr(key, klen, HvREFCNT_inc(hv), SAVEt_DELETE);
 }
 
 void
@@ -568,11 +554,8 @@ Perl_save_aelem(pTHX_ AV *av, I32 idx, SV **sptr)
 
     PERL_ARGS_ASSERT_SAVE_AELEM;
 
-    SSCHECK(4);
-    SSPUSHPTR(AvREFCNT_inc(av));
-    SSPUSHINT(idx);
-    SSPUSHPTR(newSVsv(*sptr));
-    SSPUSHINT(SAVEt_AELEM);
+    save_pushptri32ptr(AvREFCNT_inc(av), idx, newSVsv(*sptr),
+		       SAVEt_AELEM);
     /* if it gets reified later, the restore will have the wrong refcnt */
     if (!AvREAL(av) && AvREIFY(av))
 	SvREFCNT_inc_void(*sptr);
@@ -832,8 +815,9 @@ Perl_leave_scope(pTHX_ I32 base)
 	case SAVEt_DELETE:
 	    ptr = SSPOPPTR;
 	    hv = MUTABLE_HV(ptr);
+	    i = SSPOPINT;
 	    ptr = SSPOPPTR;
-	    (void)hv_delete(hv, (char*)ptr, (I32)SSPOPINT, G_DISCARD);
+	    (void)hv_delete(hv, (char*)ptr, i, G_DISCARD);
 	    HvREFCNT_dec(hv);
 	    Safefree(ptr);
 	    break;

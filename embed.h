@@ -822,13 +822,10 @@
 #define save_sptr		Perl_save_sptr
 #define save_svref		Perl_save_svref
 #define save_pushptr		Perl_save_pushptr
-#if defined(PERL_IN_SCOPE_C)
 #ifdef PERL_CORE
-#define save_pushi32ptr		S_save_pushi32ptr
-#endif
-#endif
-#ifdef PERL_CORE
+#define save_pushi32ptr		Perl_save_pushi32ptr
 #define save_pushptrptr		Perl_save_pushptrptr
+#define save_pushptri32ptr	Perl_save_pushptri32ptr
 #define sawparens		Perl_sawparens
 #define scalar			Perl_scalar
 #define scalarboolean		Perl_scalarboolean
@@ -3035,13 +3032,10 @@
 #define save_sptr(a)		Perl_save_sptr(aTHX_ a)
 #define save_svref(a)		Perl_save_svref(aTHX_ a)
 #define save_pushptr(a,b)	Perl_save_pushptr(aTHX_ a,b)
-#if defined(PERL_IN_SCOPE_C)
 #ifdef PERL_CORE
-#define save_pushi32ptr(a,b,c)	S_save_pushi32ptr(aTHX_ a,b,c)
-#endif
-#endif
-#ifdef PERL_CORE
+#define save_pushi32ptr(a,b,c)	Perl_save_pushi32ptr(aTHX_ a,b,c)
 #define save_pushptrptr(a,b,c)	Perl_save_pushptrptr(aTHX_ a,b,c)
+#define save_pushptri32ptr(a,b,c,d)	Perl_save_pushptri32ptr(aTHX_ a,b,c,d)
 #define sawparens(a)		Perl_sawparens(aTHX_ a)
 #define scalar(a)		Perl_scalar(aTHX_ a)
 #define scalarboolean(a)	Perl_scalarboolean(aTHX_ a)
