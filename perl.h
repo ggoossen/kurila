@@ -4871,7 +4871,7 @@ END_EXTERN_C
 				 PERLDBf_NOOPT	| PERLDBf_INTER	|	\
 				 PERLDBf_SUBLINE| PERLDBf_SINGLE|	\
 				 PERLDBf_NAMEANON )
-					/* No _NONAME, _GOTO, _ASSERTION */
+					/* No _NONAME, _GOTO */
 #define PERLDBf_SUB		0x01	/* Debug sub enter/exit */
 #define PERLDBf_LINE		0x02	/* Keep line # */
 #define PERLDBf_NOOPT		0x04	/* Switch off optimizations */
@@ -4892,7 +4892,6 @@ END_EXTERN_C
 #define PERLDB_SUB_NN	(PL_perldb && (PL_perldb & (PERLDBf_NONAME)))
 #define PERLDB_GOTO	(PL_perldb && (PL_perldb & PERLDBf_GOTO))
 #define PERLDB_NAMEANON	(PL_perldb && (PL_perldb & PERLDBf_NAMEANON))
-#define PERLDB_ASSERTION (PL_perldb && (PL_perldb & PERLDBf_ASSERTION))
 
 #ifdef USE_LOCALE_NUMERIC
 
