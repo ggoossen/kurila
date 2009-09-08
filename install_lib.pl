@@ -26,6 +26,7 @@ OS
         # it will reload with the revised $^X
         delete $^INCLUDED{"Config.pm"}
         delete $^INCLUDED{"Config_heavy.pl"}
+        delete $^INCLUDED{"Config_git.pl"}
         # You never saw us. We weren't here.
 
         require Config

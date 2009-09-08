@@ -439,7 +439,19 @@ my $summary_expanded;
 sub myconfig {
     return $summary_expanded if $summary_expanded;
     ($summary_expanded = $summary) =~ s{\$(\w+)}
-              {$( do { my $c = config_value($1); defined($c) ?? $c !! 'undef' } )}g;
+                 {$( do {
+                        my $c;
+                        if ($1 eq 'git_ancestor_line') {
+                                if (config_value('git_ancestor')) {
+                                        $c= "\n  Ancestor: $(config_value('git_ancestor'))";
+                                } else {
+                                        $c= ""
+                                }
+                        } else {
+                                $c = config_value($1)
+                        }
+                        $c // 'undef';
+                } )}g;
     $summary_expanded;
 }
 
@@ -508,12 +520,16 @@ foreach my $prefix (qw(libs libswanted))
             my @libswanted = grep { not exists %lflibswanted{$_} },
                 split(' ', fetch_string (\$%, 'libswanted'))
             $value = join(' ', @libswanted)
-        
     
     $heavy_txt .= "$($prefix)_nolargefiles='$value'\n"
 
 
 $heavy_txt .= "EOVIRTUAL\n"
+
+$heavy_txt .= <<'ENDOFGIT'
+require 'Config_git.pl'
+$Config_SH_expanded .= $Config::Git_Data
+ENDOFGIT
 
 $heavy_txt .= $fetch_string
 
