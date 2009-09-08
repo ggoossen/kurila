@@ -2015,7 +2015,7 @@ C<Linux::Pid>.
 X<getpriority> X<priority> X<nice>
 
 Returns the current priority for a process, a process group, or a user.
-(See L<getpriority(2)>.)  Will raise a fatal exception if used on a
+(See C<getpriority(2)>.)  Will raise a fatal exception if used on a
 machine that doesn't implement getpriority(2).
 
 =item getpwnam NAME
@@ -3177,7 +3177,7 @@ C<STDERR> using various methods:
 
 If you specify C<< '<&=', 'X' >>, where C<X> is a file descriptor number
 or a filehandle, then Perl will do an equivalent of C's C<fdopen> of
-that file descriptor (and not call L<dup(2)>); this is more
+that file descriptor (and not call C<dup(2)>); this is more
 parsimonious of file descriptors.  For example:
 
     # open for input, reusing the fileno of $fd
@@ -3248,7 +3248,7 @@ Closing any piped filehandle causes the parent process to wait for the
 child to finish, and returns the status value in C<$?> and
 C<$^CHILD_ERROR_NATIVE>.
 
-If you want a "real" C C<open> (see L<open(2)> on your system), then you
+If you want a "real" C C<open> (see C<open(2)> on your system), then you
 should use the C<sysopen> function, which involves no such magic (but
 may use subtly different filemodes than Perl open(), which is mapped
 to C fopen()).  This is
@@ -5334,7 +5334,7 @@ X<sprintf>
 
 Returns a string formatted by the usual C<printf> conventions of the C
 library function C<sprintf>.  See below for more details
-and see L<sprintf(3)> or L<printf(3)> on your system for an explanation of
+and see C<sprintf(3)> or C<printf(3)> on your system for an explanation of
 the general principles.
 
 For example:

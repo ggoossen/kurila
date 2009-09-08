@@ -1601,7 +1601,6 @@ plan9/plan9ish.h		Plan9 port: Plan9-specific C header file
 plan9/setup.rc			Plan9 port: script for easy build+install
 plan9/versnum			Plan9 port: script to print version number
 pod/buildtoc			Update files based on pod.lst
-pod/checkpods.pl		Tool to check for common errors in pods
 pod/kurila01delta.pod	What is new for Perl Kurila 0.1
 pod/kurila02delta.pod	What is new for Perl Kurila 0.2
 pod/kurila110delta.pod	What is new for Perl Kurila 1.10

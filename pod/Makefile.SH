@@ -56,7 +56,7 @@ CPS = $cp
 ## In the following dollars and backticks do not need the extra backslash.
 $spitshell >>Makefile <<'!NO!SUBS!'
 
-CONVERTERS = pod2html pod2latex pod2man pod2text checkpods \
+CONVERTERS = pod2html pod2latex pod2man pod2text \
 		pod2usage podchecker podselect
 
 HTMLROOT = /	# Change this to fix cross-references in HTML
@@ -130,9 +130,9 @@ distclean:	realclean
 veryclean:	distclean
 	-rm -f *~ *.orig
 
-check:	checkpods
+check:	podchecker
 	@echo "checking..."; \
-	$(PERL) -I../lib checkpods $(POD)
+	$(PERL) -I../lib podchecker $(POD)
 
 # Dependencies.
 pod2html:	pod2html.pl ../config.sh
@@ -148,10 +148,6 @@ pod2man:	pod2man.pl ../config.sh
 	$(LDLIBPTH) $(PERL) $(FIXIN) $@
 
 pod2text:	pod2text.pl ../config.sh
-	$(CPS) $@.pl $@
-	$(LDLIBPTH) $(PERL) $(FIXIN) $@
-
-checkpods:	checkpods.pl ../config.sh
 	$(CPS) $@.pl $@
 	$(LDLIBPTH) $(PERL) $(FIXIN) $@
 
