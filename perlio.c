@@ -3080,8 +3080,8 @@ PerlIOStdio_close(pTHX_ PerlIO *f)
         const int fd = fileno(stdio);
 	int invalidate = 0;
 	IV result = 0;
-	int saveerr = 0;
 	int dupfd = -1;
+	dSAVEDERRNO;
 #ifdef USE_ITHREADS
 	dVAR;
 #endif
@@ -3115,7 +3115,7 @@ PerlIOStdio_close(pTHX_ PerlIO *f)
 	       fileno slot of the FILE *
 	    */
 	    result = PerlIO_flush(f);
-	    saveerr = errno;
+	    SAVE_ERRNO;
 	    invalidate = PerlIOStdio_invalidate_fileno(aTHX_ stdio);
 	    if (!invalidate) {
 		dupfd = PerlLIO_dup(fd);
@@ -3126,7 +3126,7 @@ PerlIOStdio_close(pTHX_ PerlIO *f)
 	   errno may NOT be expected EBADF
 	 */
 	if (invalidate && result != 0) {
-	    errno = saveerr;
+	    RESTORE_ERRNO;
 	    result = 0;
 	}
 #ifdef SOCKS5_VERSION_NAME
@@ -3285,9 +3285,9 @@ PerlIOStdio_flush(pTHX_ PerlIO *f)
 	/*
 	 * Not writeable - sync by attempting a seek
 	 */
-	const int err = errno;
+	dSAVE_ERRNO;
 	if (PerlSIO_fseek(stdio, (Off_t) 0, SEEK_CUR) != 0)
-	    errno = err;
+	    RESTORE_ERRNO;
 #endif
     }
     return 0;
