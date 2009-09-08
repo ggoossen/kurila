@@ -2140,12 +2140,6 @@ PERL_CALLCONV char*	Perl_ninstr(pTHX_ const char* big, const char* bigend, const
 #define PERL_ARGS_ASSERT_NINSTR	\
 	assert(big); assert(bigend); assert(little); assert(lend)
 
-PERL_CALLCONV OP*	Perl_oopsCV(pTHX_ OP* o)
-			__attribute__noreturn__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_OOPSCV	\
-	assert(o)
-
 PERL_CALLCONV ROOTOP*	Perl_newROOTOP(pTHX_ OP* main, SV* location)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_NEWROOTOP	\

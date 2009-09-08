@@ -632,9 +632,6 @@
 #define nextargv		Perl_nextargv
 #endif
 #define ninstr			Perl_ninstr
-#ifdef PERL_CORE
-#define oopsCV			Perl_oopsCV
-#endif
 #define newROOTOP		Perl_newROOTOP
 #define rootop_ll_tmprefcnt	Perl_rootop_ll_tmprefcnt
 #define op_free			Perl_op_free
@@ -2843,9 +2840,6 @@
 #define nextargv(a)		Perl_nextargv(aTHX_ a)
 #endif
 #define ninstr(a,b,c,d)		Perl_ninstr(aTHX_ a,b,c,d)
-#ifdef PERL_CORE
-#define oopsCV(a)		Perl_oopsCV(aTHX_ a)
-#endif
 #define newROOTOP(a,b)		Perl_newROOTOP(aTHX_ a,b)
 #define rootop_ll_tmprefcnt()	Perl_rootop_ll_tmprefcnt(aTHX)
 #define op_free(a)		Perl_op_free(aTHX_ a)

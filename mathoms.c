@@ -461,17 +461,6 @@ Perl_do_exec(pTHX_ const char *cmd)
 }
 #endif
 
-OP *
-Perl_oopsCV(pTHX_ OP *o)
-{
-    PERL_ARGS_ASSERT_OOPSCV;
-
-    Perl_croak(aTHX_ "NOT IMPL LINE %d",__LINE__);
-    /* STUB */
-    PERL_UNUSED_ARG(o);
-    NORETURN_FUNCTION_END;
-}
-
 PP(pp_mapstart)
 {
     DIE(aTHX_ "panic: mapstart");	/* uses grepstart */
