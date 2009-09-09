@@ -1,33 +1,29 @@
 #!./perl -w
 
-BEGIN {
-    chdir 't' if -d 't';
-    @INC = '../lib';
-    require './test.pl';
-}
+BEGIN
+    require './test.pl'
 
-plan tests => 2;
+plan tests => 2
 
-$TODO = "leaking since 32751";
+our $TODO = "leaking since 32751"
 
-my $destroyed;
-{
-    no warnings 'redefine';
-    sub Regexp::DESTROY { $destroyed++ }
-}
+my $destroyed
 
-{
-    my $rx = qr//;
-}
+do
+    no warnings 'redefine'
+    sub Regexp::DESTROY($self)
+        $destroyed++
 
-is( $destroyed, 1, "destroyed regexp" );
+do
+    my $rx = qr//
 
-undef $destroyed;
+is( $destroyed, 1, "destroyed regexp" )
 
-{
-    my $var = bless {}, "Foo";
-    my $rx = qr/(?{ $var })/;
-}
+undef $destroyed
 
-is( $destroyed, 1, "destroyed regexp with closure capture" );
+do
+    my $var = bless \$%, "Foo"
+    my $rx = qr/(?{ $var })/
+
+is( $destroyed, 1, "destroyed regexp with closure capture" )
 
