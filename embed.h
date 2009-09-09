@@ -1859,6 +1859,8 @@
 #define dump_op_rest		S_dump_op_rest
 #endif
 #endif /* PERL_IN_DUMP_C */
+#if defined(PERL_IN_UNIVERSLA_C) || defined(PERL_DECL_PROT)
+#endif
 #define ck_anonarray		Perl_ck_anonarray
 #define ck_anoncode		Perl_ck_anoncode
 #define ck_bitop		Perl_ck_bitop
@@ -4074,7 +4076,9 @@
 #define dump_op_rest(a,b,c)	S_dump_op_rest(aTHX_ a,b,c)
 #endif
 #endif /* PERL_IN_DUMP_C */
+#if defined(PERL_IN_UNIVERSLA_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
+#endif
 #endif
 #define ck_anonarray(a)		Perl_ck_anonarray(aTHX_ a)
 #define ck_anoncode(a)		Perl_ck_anoncode(aTHX_ a)

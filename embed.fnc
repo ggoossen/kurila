@@ -1976,8 +1976,9 @@ s	|SV*	|dump_op_flags_private	|NN const OP* o
 s	|void	|dump_op_rest	|I32 level|NN PerlIO *file|NN const OP *o
 #endif /* PERL_IN_DUMP_C */
 
-: Only used in univeral.c
-poM	|HV *	|get_isa_hash	|NN HV *const stash
+#if defined(PERL_IN_UNIVERSLA_C) || defined(PERL_DECL_PROT)
+so	|HV *	|get_isa_hash	|NN HV *const stash
+#endif
 
 END_EXTERN_C
 /*

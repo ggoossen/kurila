@@ -33,6 +33,39 @@
 #include "perliol.h" /* For the PERLIO_F_XXX */
 #endif
 
+static HV *
+S_get_isa_hash(pTHX_ HV *const stash)
+{
+    dVAR;
+    struct mro_meta *const meta = HvMROMETA(stash);
+
+    if (!meta->isa) {
+	AV *const isa = mro_get_linear_isa(stash);
+	if (!meta->isa) {
+	    HV *const isa_hash = newHV();
+	    /* Linearisation didn't build it for us, so do it here.  */
+	    SV *const *svp = AvARRAY(isa);
+	    SV *const *const svp_end = svp + AvFILLp(isa) + 1;
+	    const HEK *const canon_name = HvNAME_HEK(stash);
+
+	    while (svp < svp_end) {
+		(void) hv_store_ent(isa_hash, *svp++, &PL_sv_undef, 0);
+	    }
+
+	    (void) hv_common(isa_hash, NULL, HEK_KEY(canon_name),
+			     HEK_LEN(canon_name), HEK_FLAGS(canon_name),
+			     HV_FETCH_ISSTORE, &PL_sv_undef,
+			     HEK_HASH(canon_name));
+	    (void) hv_store(isa_hash, "UNIVERSAL", 9, &PL_sv_undef, 0);
+
+	    SvREADONLY_on(isa_hash);
+
+	    meta->isa = isa_hash;
+	}
+    }
+    return meta->isa;
+}
+
 /*
  * Contributed by Graham Barr  <Graham.Barr@tiuk.ti.com>
  * The main guts of traverse_isa was actually copied from gv_fetchmeth
@@ -43,7 +76,7 @@ S_isa_lookup(pTHX_ HV *stash, const char * const name)
 {
     dVAR;
     const struct mro_meta *const meta = HvMROMETA(stash);
-    HV *const isa = meta->isa ? meta->isa : Perl_get_isa_hash(aTHX_ stash);
+    HV *const isa = meta->isa ? meta->isa : S_get_isa_hash(aTHX_ stash);
     STRLEN len = strlen(name);
     const HV *our_stash;
 
