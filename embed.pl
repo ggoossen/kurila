@@ -22,7 +22,7 @@ my $SPLINT = 0 # Turn true for experimental splint support http://www.splint.org
 #
 
 sub do_not_edit($file)
-    my $years = '1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008';
+    my $years = '1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009';
 
     $years =~ s/1999,/1999,\n  / if length $years +> 40
 
