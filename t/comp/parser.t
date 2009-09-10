@@ -4,7 +4,7 @@
 # (including weird syntax errors)
 
 BEGIN { require "./test.pl"; }
-plan( tests => 75 );
+plan( tests => 77 );
 
 # Bug 20010528.007
 eval q/"\x{"/;
@@ -235,6 +235,9 @@ check(qr/^"BBFRPRAFPGHPP$/, 43, "actually missing a quote is still valid");
 
 #line 47 bang eth
 check(qr/^"BBFRPRAFPGHPP$/, 46, "but spaces aren't allowed without quotes");
+
+#line 77sevenseven
+check(qr/^"BBFRPRAFPGHPP$/, 49, "need a space after the line number");
 
 eval <<'EOSTANZA'; die $^EVAL_ERROR if $^EVAL_ERROR;
 #line 51 "With wonderful deathless ditties|We build up the world's great cities,|And out of a fabulous story|We fashion an empire's glory:|One man with a dream, at pleasure,|Shall go forth and conquer a crown;|And three with a new song's measure|Can trample a kingdom down."
