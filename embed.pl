@@ -152,6 +152,7 @@ sub write_protos
         my $has_context = ( $flags !~ m/n/ )
         my $never_returns = ( $flags =~ m/r/ )
         my $commented_out = ( $flags =~ m/m/ )
+        my $binarycompat = ( $flags =~ m/b/ )
         my $is_malloc = ( $flags =~ m/a/ )
         my $can_ignore = ( $flags !~ m/R/ ) && !$is_malloc
         my @names_of_nn
@@ -162,8 +163,6 @@ sub write_protos
             $splint_flags .= '/*@noreturn@*/ ' if $never_returns
             if ($can_ignore && ($retval ne 'void') && ($retval !~ m/\*/))
                 $retval .= " /*\@alt void\@*/"
-            
-        
 
         if ($flags =~ m/s/)
             $retval = "STATIC $splint_flags$retval"
@@ -175,7 +174,6 @@ sub write_protos
                 $func = "Perl_$plain_func"
             else
                 $func = $plain_func
-            
         
         my $xv_macros = $func =~ m/Xv/
         if ($xv_macros)
@@ -184,7 +182,6 @@ sub write_protos
         if ($flags =~ m/S/)
             for (@args)
                 s/\bXV\b/SV/
-            
         
         $ret .= "$retval\t$func("
         if ( $has_context )
@@ -216,9 +213,8 @@ sub write_protos
                 if ( $SPLINT && $nullok && !$commented_out )
                     $arg = '/*@null@*/ ' . $arg
                 
-                if (defined $1 && $nn)
+                if (defined $1 && $nn && !($commented_out && !$binarycompat))
                     push @names_of_nn, $1
-                
             
             $ret .= join ", ", @args
         else
