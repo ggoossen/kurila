@@ -1414,8 +1414,8 @@ makedepend.SH			Precursor to makedepend
 makedir.SH			Precursor to makedir
 Makefile.micro			microperl Makefile
 Makefile.SH			A script that generates Makefile
-make_patchnum.com		DCL script to generate .patchnum file on VMS
-make_patchnum.sh		Script to generate .patchnum file
+make_patchnum.com		DCL script to generate .patchnum file on VMS (should be replaced by make_patchnum.pl)
+make_patchnum.pl		Script to generate git_version.h and lib/Config_git.pl files for all OS'es
 malloc.c			A version of malloc you might not want
 malloc_ctl.h			A version of malloc you might not want
 MANIFEST			This list of files
@@ -1876,6 +1876,7 @@ run.c				The interpreter loop
 scope.c				Scope entry and exit code
 scope.h				Scope entry and exit header
 scope_i.h			Scope entry and exit inline functions
+stock_git_version.h		Empty git_version.h used when there is no miniperl around
 sv.c				Scalar value code
 sv.h				Scalar value header
 sv_i.h				Scalar value inline functions

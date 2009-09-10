@@ -117,7 +117,7 @@ my @virtual = qw(byteorder ccflags_nolargefiles ldflags_nolargefiles
 # Also test that the first entry in config.sh is found correctly. There was
 # special casing code for this
 
-foreach my $pain ((@: $first, < @virtual))
+foreach my $pain (@: $first, < @virtual)
     # No config var is named with anything that is a regexp metachar
     ok(defined config_value($pain), "\$config('$pain') exists")
 

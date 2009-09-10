@@ -406,7 +406,7 @@ esac
 ## In the following dollars and backticks do not need the extra backslash.
 $spitshell >>$Makefile <<'!NO!SUBS!'
 
-private = preplibrary $(CONFIGPM) $(CONFIGPOD) lib/ExtUtils/Miniperl.pm
+private = preplibrary $(CONFIGPM) $(CONFIGPOD) make_patchnum lib/ExtUtils/Miniperl.pm
 
 # Files to be built with variable substitution before miniperl
 # is available.
@@ -525,7 +525,7 @@ splintfiles = $(c1)
 .c.s:
 	$(CCCMDSRC) -S $*.c
 
-all: $(FIRSTMAKEFILE) make_patchnum miniperl$(EXE_EXT) extra.pods $(private) $(unidatafiles) $(public) $(dynamic_ext) $(nonxs_ext) extras.make
+all: $(FIRSTMAKEFILE) miniperl$(EXE_EXT) miniperl extra.pods $(private) $(unidatafiles) $(public) $(dynamic_ext) $(nonxs_ext) extras.make
 	@echo " ";
 	@echo "	Everything is up to date. Type '$(MAKE) test' to run test suite."
 
@@ -541,10 +541,13 @@ sperl.i: perl.c $(h)
 .PHONY: all translators utilities make_patchnum
 
 make_patchnum:
-	sh $(shellflags) make_patchnum.sh
+	$(LDLIBPTH) $(RUN) ./miniperl -Ilib make_patchnum.pl || $(MAKE) miniperl
 
-# make sure that we recompile perl.c if .patchnum changes
-perl$(OBJ_EXT): .patchnum unpushed.h
+git_version.h: stock_git_version.h
+	cp stock_git_version.h git_version.h
+
+# make sure that we recompile perl.c if the git version changes
+perl$(OBJ_EXT): git_version.h
 
 utilities:	miniperl$(EXE_EXT) $(CONFIGPM) $(plfixlocal) lib/lib.pm FORCE
 	@echo " "; echo "	Making utilities"; cd utils; $(LDLIBPTH) $(MAKE) all
@@ -588,7 +591,7 @@ miniperlmain$(OBJ_EXT): miniperlmain.c patchlevel.h
 perlmain.c: miniperlmain.c config.sh $(FIRSTMAKEFILE)
 	sh writemain $(DYNALOADER) $(static_ext) > perlmain.c
 
-perlmain$(OBJ_EXT): perlmain.c
+perlmain$(OBJ_EXT): perlmain.c git_version.h
 	$(CCCMD) $(PLDLFLAGS) $*.c
 
 # The file ext.libs is a list of libraries that must be linked in
@@ -1188,9 +1191,8 @@ _mopup:
 _tidy:
 	-cd pod; $(LDLIBPTH) $(MAKE) clean
 	-cd utils; $(LDLIBPTH) $(MAKE) clean
-	-rm .patchnum
 	-rm lib/Config_git.pl
-	-rm unpushed.h
+	-rm git_version.h
 	-@for x in $(DYNALOADER) $(dynamic_ext) $(static_ext) $(nonxs_ext) ; do \
 	$(LDLIBPTH) sh ext/util/make_ext clean $$x MAKE=$(MAKE) ; \
 	done
@@ -1293,7 +1295,7 @@ _test_prep: unpack_files
 
 test_prep_pre: preplibrary utilities $(nonxs_ext)
 
-test_prep: make_patchnum test_prep_pre miniperl$(EXE_EXT) $(unidatafiles) perl$(EXE_EXT) $(dynamic_ext) $(TEST_PERL_DLL)
+test_prep: test_prep_pre miniperl$(EXE_EXT) $(unidatafiles) perl$(EXE_EXT) $(dynamic_ext) $(TEST_PERL_DLL)
 	PERL=./perl $(MAKE) _test_prep
 
 _test_tty:

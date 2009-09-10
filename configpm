@@ -499,8 +499,6 @@ foreach my $prefix (qw(ccflags ldflags))
     if (defined $withlargefiles)
         $value =~ s/\Q$withlargefiles\E\b//
         $heavy_txt .= "$($prefix)_nolargefiles='$value'\n"
-    
-
 
 foreach my $prefix (qw(libs libswanted))
     my $value = fetch_string (\$%, $prefix)
@@ -520,15 +518,18 @@ foreach my $prefix (qw(libs libswanted))
             my @libswanted = grep { not exists %lflibswanted{$_} },
                 split(' ', fetch_string (\$%, 'libswanted'))
             $value = join(' ', @libswanted)
-    
     $heavy_txt .= "$($prefix)_nolargefiles='$value'\n"
 
 
 $heavy_txt .= "EOVIRTUAL\n"
 
 $heavy_txt .= <<'ENDOFGIT'
-require 'Config_git.pl'
-$Config_SH_expanded .= $Config::Git_Data
+try
+        # do not have hairy conniptions if this isnt available
+        require 'Config_git.pl'
+        $Config_SH_expanded .= $Config::Git_Data
+        1
+    or warn "Warning: failed to load Config_git.pl, something strange about this perl...\n"
 ENDOFGIT
 
 $heavy_txt .= $fetch_string
