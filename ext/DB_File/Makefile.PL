@@ -10,7 +10,8 @@ my $OS2 = "-DOS2" if config_value('osname') eq 'os2'
 
 my $LIB = "-ldb" 
 # so is win32
-$LIB = "-llibdb" if $^OS_NAME eq 'MSWin32' 
+if ( $^OS_NAME eq 'MSWin32' )
+    $LIB = config_value('cc') =~ m/gcc/ ?? "-ldb" !! "-llibdb"
 
 WriteMakefile(
     NAME                => 'DB_File',
@@ -62,7 +63,7 @@ my @names = qw(
 	)
 
 # Check the constants above all appear in @EXPORT in DB_File.pm
-my %names = %:  < @+: map { @: $_, 1}, @names 
+my %names = %+: map { %: $_, 1}, @names 
 open my $f, "<", "DB_File.pm" or die "Cannot open DB_File.pm: $^OS_ERROR\n"
 while ( ~< $f)
     last if m/^\s*\@EXPORT\s+=\s+ qw\(/x 
