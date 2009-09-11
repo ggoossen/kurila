@@ -1945,21 +1945,22 @@ S_run_body(pTHX_ I32 oldscope)
 
 =for apidoc p||get_sv
 
-Returns the SV of the specified Perl scalar.  If C<create> is set and the
-Perl variable does not exist then it will be created.  If C<create> is not
-set and the variable does not exist then NULL is returned.
+Returns the SV of the specified Perl scalar.  C<flags> are passed to
+C<gv_fetchpv>. If C<GV_ADD> is set and the
+Perl variable does not exist then it will be created.  If C<flags> is zero
+and the variable does not exist then NULL is returned.
 
 =cut
 */
 
 SV*
-Perl_get_sv(pTHX_ const char *name, I32 create)
+Perl_get_sv(pTHX_ const char *name, I32 flags)
 {
     GV *gv;
 
     PERL_ARGS_ASSERT_GET_SV;
 
-    gv = gv_fetchpv(name, create, SVt_PV);
+    gv = gv_fetchpv(name, flags, SVt_PV);
     if (gv)
 	return GvSV(gv);
     return NULL;
@@ -1970,21 +1971,22 @@ Perl_get_sv(pTHX_ const char *name, I32 create)
 
 =for apidoc p||get_av
 
-Returns the AV of the specified Perl array.  If C<create> is set and the
-Perl variable does not exist then it will be created.  If C<create> is not
-set and the variable does not exist then NULL is returned.
+Returns the AV of the specified Perl array.  C<flags> are passed to
+C<gv_fetchpv>. If C<GV_ADD> is set and the
+Perl variable does not exist then it will be created.  If C<flags> is zero
+and the variable does not exist then NULL is returned.
 
 =cut
 */
 
 AV*
-Perl_get_av(pTHX_ const char *name, I32 create)
+Perl_get_av(pTHX_ const char *name, I32 flags)
 {
-    GV* const gv = gv_fetchpv(name, create, SVt_PVAV);
+    GV* const gv = gv_fetchpv(name, flags, SVt_PVAV);
 
     PERL_ARGS_ASSERT_GET_AV;
 
-    if (create)
+    if (flags)
     	return GvAVn(gv);
     if (gv)
 	return GvAV(gv);
