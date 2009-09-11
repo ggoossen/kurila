@@ -769,7 +769,7 @@ S_incline(pTHX_ char *s)
     n = s;
     while (isDIGIT(*s))
 	s++;
-    if (!SPACE_OR_TAB(*s) && *s != '\n' && *s != '\0')
+    if (!SPACE_OR_TAB(*s) && *s != '\r' && *s != '\n' && *s != '\0')
 	return;
     while (SPACE_OR_TAB(*s))
 	s++;
