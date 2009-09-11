@@ -83,3 +83,7 @@ lib/Test/Harness.pm
 t/rantests
 t/tmp*
 t/perl
+
+# make_ext.pl cleanup scripts
+realclean.sh
+veryclean.sh
