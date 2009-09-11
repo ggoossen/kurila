@@ -3027,7 +3027,7 @@ S_open_script(pTHX_ const char *scriptname, bool dosearch,
     PERL_ARGS_ASSERT_OPEN_SCRIPT;
 
     if (PL_e_script) {
-	PL_origfilename = savepvs("-e");
+	PL_origfilename = (PL_minus_E ? savepvs("-E") : savepvs( "-e" ));
     }
     else {
 	/* if find_script() returns, it returns a malloc()-ed value */
@@ -3089,7 +3089,7 @@ S_open_script(pTHX_ const char *scriptname, bool dosearch,
  * perl with that fd as it has always done.
  */
     }
-    if (*suidscript) {
+    if (!*suidscript) {
 	Perl_croak(aTHX_ "suidperl needs (suid) fd script\n");
     }
 #else /* IAMSUID */
