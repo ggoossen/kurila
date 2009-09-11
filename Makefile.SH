@@ -395,7 +395,7 @@ CONFIGH = xconfig.h
 
 xconfig.h: config_h.SH Cross/config-\$(CROSS_NAME).sh
 	CONFIG_SH=Cross/config-\$(CROSS_NAME).sh CONFIG_H=xconfig.h \$(SHELL) config_h.SH
-	#TODO \$(LDLIBPTH) ./miniperl -Ilib -MCross=\$(CROSS_NAME) config_h.PL "INST_VER=\$(INST_VER)" "CORE_DIR=\$(CROSS_LIB)" "CONFIG_H=xconfig.h"
+	#TODO \$(LDLIBPTH) ./miniperl$(EXE_EXT) -Ilib -MCross=\$(CROSS_NAME) config_h.PL "INST_VER=\$(INST_VER)" "CORE_DIR=\$(CROSS_LIB)" "CONFIG_H=xconfig.h"
 	cp xconfig.h \$(CROSS_LIB)/
 	cp xconfig.h \$(CROSS_LIB)/config.h
 
@@ -540,8 +540,8 @@ sperl.i: perl.c $(h)
 
 .PHONY: all translators utilities make_patchnum
 
-make_patchnum:
-	$(LDLIBPTH) $(RUN) ./miniperl -Ilib make_patchnum.pl || $(MAKE) miniperl
+make_patchnum: miniperl$(EXE_EXT)
+	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_patchnum.pl || $(MAKE) miniperl
 
 git_version.h: stock_git_version.h
 	cp stock_git_version.h git_version.h
@@ -803,7 +803,7 @@ miniperl$(EXE_EXT): $& miniperlmain$(OBJ_EXT) $(obj) opmini$(OBJ_EXT)
 
 	$spitshell >>$Makefile <<'!NO!SUBS!'
 
-perl$(EXE_EXT): $& perlmain$(OBJ_EXT) $(LIBPERL) $(static_ext) ext.libs $(PERLEXPORT)
+perl$(EXE_EXT): $& perlmain$(OBJ_EXT) $(LIBPERL) $(static_ext) ext.libs $(PERLEXPORT) make_patchnum
 	-@rm -f miniperl.xok
 	$(SHRPENV) $(LDLIBPTH) $(CC) -o perl$(PERL_SUFFIX) $(PERL_PROFILE_LDFLAGS) $(CLDFLAGS) $(CCDLFLAGS) perlmain$(OBJ_EXT) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)
 
@@ -946,12 +946,12 @@ preplibrary: miniperl$(EXE_EXT) $(CONFIGPM) lib/lib.pm $(PREPLIBRARY_LIBPERL)
 	$(MAKE) lib/re.pm
 
 $(CONFIGPOD): config.sh miniperl$(EXE_EXT) configpm Porting/Glossary
-	$(LDLIBPTH) $(RUN) ./miniperl -Ilib configpm
+	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib configpm
 
 $(CONFIGPM): $(CONFIGPOD)
 
 lib/ExtUtils/Miniperl.pm: miniperlmain.c miniperl$(EXE_EXT) minimod.pl $(CONFIGPM)
-	$(LDLIBPTH) $(RUN) ./miniperl minimod.pl > lib/ExtUtils/Miniperl.pm
+	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) minimod.pl > lib/ExtUtils/Miniperl.pm
 
 lib/re.pm: ext/re/re.pm
 	@-rm -f $@
@@ -959,16 +959,16 @@ lib/re.pm: ext/re/re.pm
 
 $(plfixlocal): $(CONFIGPM)
 	$(CPS) $@.pl $@
-	$(LDLIBPTH) $(RUN) ./miniperl -Ilib "-MExtUtils::MY" -e "MY->fixin(shift @ARGV)" $@
+	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -I`pwd`/lib "-MExtUtils::MY" -e "MY->fixin(shift @ARGV)" $@
 
 lib/lib.pm:	miniperl$(EXE_EXT) $(CONFIGPM)
 	@-rm -f $@
-	$(LDLIBPTH) $(RUN) ./miniperl -Ilib lib/lib_pm.PL
+	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib lib/lib_pm.PL
 
 unidatafiles $(unidatafiles): uni.data
 
 uni.data: miniperl$(EXE_EXT) $(CONFIGPM) lib/unicore/mktables
-	cd lib/unicore && $(LDLIBPTH) $(RUN) ../../miniperl -I../../lib mktables -w
+	cd lib/unicore && $(LDLIBPTH) $(RUN) ../../miniperl$(EXE_EXT) -I../../lib mktables -w
 	touch uni.data
 
 extra.pods: miniperl$(EXE_EXT)
@@ -997,7 +997,7 @@ extras.install: perl$(EXE_EXT)
 	no-install install.perl install.man install.html
 
 META.yml:	Porting/makemeta Porting/Maintainers.pl Porting/Maintainers.pm
-	$(LDLIBPTH) $(RUN) ./miniperl -Ilib Porting/makemeta
+	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib Porting/makemeta
 
 install-strip:
 	$(MAKE) STRIPFLAGS=-s install DESTDIR="$(DESTDIR)"
@@ -1203,7 +1203,7 @@ _cleaner1:
 	-@for x in $(DYNALOADER) $(dynamic_ext) $(static_ext) $(nonxs_ext) ; do \
 	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib ext/util/make_ext.pl $(CLEAN) $$x MAKE=$(MAKE) ; \
 	done
-	-@test ! -f $(RUN) ./miniperl$(EXE_EXT) || $(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib mkppport --clean
+	-@test ! -f ./miniperl$(EXE_EXT) || $(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib mkppport --clean
 
 # Some systems do not support "?", so keep these files separate.
 _cleaner2:
@@ -1307,7 +1307,7 @@ unpack_files:
 	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib uupacktool.pl -u -m
 
 cleanup_unpacked_files:
-	-@test ! -f $(RUN) ./miniperl$(EXE_EXT) || $(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib uupacktool.pl -c
+	-@test ! -f ./miniperl$(EXE_EXT) || $(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib uupacktool.pl -c
 
 # The second branch is for testing without a tty or controlling terminal,
 # see t/op/stat.t
