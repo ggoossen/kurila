@@ -518,34 +518,32 @@ if (!$versiononly && $otherperls)
             my $dir = unixpath(env::var('DCL$PATH' . $i));  $dir =~ s-/$--
             push(@path,$dir)
 
-    my @otherperls;
-    my %otherperls;
-    for (@path) {
-        next unless m,^/,;
+    my @otherperls
+    my %otherperls
+    for (@path)
+        next unless m,^/,
         # Use &samepath here because some systems have other dirs linked
         # to $mainperldir (like SunOS)
         next unless -d
-        next if samepath($_, $binexp);
-        next if samepath($_, cwd());
-        next if ($mainperl_is_instperl && samepath($_, $mainperldir));
-        my $otherperl = "$_/$perl$exe_ext";
-        next if %otherperls{$otherperl}++;
+        next if samepath($_, $binexp)
+        next if samepath($_, cwd())
+        next if ($mainperl_is_instperl && samepath($_, $mainperldir))
+        my $otherperl = "$_/$perl$exe_ext"
+        next if %otherperls{$otherperl}++
         push(@otherperls, $otherperl)
-            if (-x $otherperl && ! -d $otherperl);
-    }
-    if (@otherperls) {
+            if (-x $otherperl && ! -d $otherperl)
+
+    if (@otherperls)
         warn "\nWarning: $perl appears in your path in the following " .
-            "locations beyond where\nwe just installed it:\n";
-        for (@otherperls) {
-            warn "    $_\n";
-        }
-        warn "\n";
-    }
+            "locations beyond where\nwe just installed it:\n"
+        for (@otherperls)
+            warn "    $_\n"
+        warn "\n"
 
-$packlist->write() unless %opts{notify};
-print $^STDOUT, "  Installation complete\n" if %opts{verbose};
+$packlist->write() unless %opts{notify}
+print $^STDOUT, "  Installation complete\n" if %opts{verbose}
 
-exit 0;
+exit 0
 
 ###############################################################################
 
@@ -657,7 +655,7 @@ sub installlib {
     if ($dir =~ m/^auto/ ||
           ($name =~ m/^(.*)\.(?:pm|pod)$/ && %archpms{?$1}) ||
           ($name =~ m/^(.*)\.(?:h|lib)$/i && ($Is_W32 || $Is_NetWare)) ||
-	  $name =~ m/^Config_(heavy\|git)\.pl\z/
+          $name =~ m/^Config_(heavy\|git)\.pl\z/
        ) {
         $installlib = $installarchlib;
         return unless $do_installarchlib;
