@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-# These two should go upon release to make the script Perl 5.005 compatible
-use strict;
-use warnings;
+
+use kurila
+use warnings
 
 =head1 NAME
 
@@ -40,117 +40,106 @@ Same terms as Perl itself.
 
 =cut
 
-BEGIN {
-    my $root=".";
-    while (!-e "$root/perl.c" and length($root)<100) {
-        if ($root eq '.') {
-            $root="..";
-        } else {
-            $root.="/..";
-        }
-    }
-    die "Can't find toplevel" if !-e "$root/perl.c";
-    sub path_to { "$root/$_[0]" } # use $_[0] if this'd be placed in toplevel.
-}
+BEGIN
+    my $root="."
+    while (!-e "$root/perl.c" and length($root) +< 100)
+        if ($root eq '.')
+            $root=".."
+        else
+            $root.="/.."
 
-sub read_file {
-    my $file = path_to(@_);
-    return "" unless -e $file;
+    die "Can't find toplevel" if !-e "$root/perl.c"
+    sub path_to($v) { "$root/$v" } # use $v if this'd be placed in toplevel.
+
+sub read_file($filename)
+    my $file = path_to($filename)
+    return "" unless -e $file
     open my $fh, '<', $file
-        or die "Failed to open for read '$file':$!";
-    return do { local $/; <$fh> };
-}
+        or die "Failed to open for read '$file':$^OS_ERROR"
+    return do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $fh }
 
-sub write_file {
-    my ($file, $content) = @_;
-    $file= path_to($file);
+
+sub write_file($file, $content)
+    $file= path_to($file)
     open my $fh, '>', $file
-        or die "Failed to open for write '$file':$!";
-    print $fh $content;
-    close $fh;
-}
+        or die "Failed to open for write '$file':$^OS_ERROR"
+    print $fh, $content
+    close $fh
 
-sub backtick {
-    my $command = shift;
-    if (wantarray) {
-        my @result= `$command`;
-        chomp @result;
-        return @result;
-    } else {
-        my $result= `$command`;
-        $result="" if ! defined $result;
-        chomp $result;
-        return $result;
-    }
-}
 
-sub write_files {
-    my %content= map { /WARNING: '([^']+)'/ || die "Bad mojo!"; $1 => $_ } @_;
-    my @files= sort keys %content;
-    my $files= join " and ", map { "'$_'" } @files;
-    foreach my $file (@files) {
-        if (read_file($file) ne $content{$file}) {
-            print "Updating $files\n";
-            write_file($_,$content{$_}) for @files;
-            return 1;
-        }
-    }
-    print "Reusing $files\n";
-    return 0;
-}
+sub backtick($command)
+    my $result= `$command`
+    $result="" if ! defined $result
+    chomp $result
+    return $result
 
-my $unpushed_commits = '/*no-op*/';
-my ($read, $branch, $snapshot_created, $commit_id, $describe)= ("") x 5;
-my ($changed, $extra_info, $commit_title, $new_patchnum, $status)= ("") x 5;
-if (my $patch_file= read_file(".patch")) {
-    ($branch, $snapshot_created, $commit_id, $describe) = split /\s+/, $patch_file;
-    $extra_info = "git_snapshot_date='$snapshot_created'";
-    $commit_title = "Snapshot of:";
-}
-elsif (-d path_to('.git')) {
-    # git branch | awk 'BEGIN{ORS=""} /\*/ { print $2 }'
-    ($branch) = map { /\* ([^(]\S*)/ ? $1 : () } backtick('git branch');
-    my ($remote,$merge);
-    if (length $branch) {
-        $merge= backtick("git config branch.$branch.merge");
-        $merge =~ s!^refs/heads/!!;
-        $remote= backtick("git config branch.$branch.remote");
-    }
-    $commit_id = backtick("git rev-parse HEAD");
-    $describe = backtick("git describe");
-    my $commit_created = backtick(qq{git log -1 --pretty="format:%ci"});
-    $new_patchnum = "describe: $describe";
-    $extra_info = "git_commit_date='$commit_created'";
-    if (length $branch && length $remote) {
+
+sub write_files(@< @args)
+    my %content= %+: map { m/WARNING: '([^']+)'/ || die "Bad mojo!"; %: $1 => $_ }, @args
+    my @files= sort keys %content
+    my $files= join " and ", map { "'$_'" }, @files
+    foreach my $file (@files)
+        if (read_file($file) ne %content{$file})
+            print $^STDOUT, "Updating $files\n"
+            for (@files)
+                write_file($_,%content{$_})
+            return 1
+
+    print $^STDOUT, "Reusing $files\n"
+    return 0
+
+
+my $unpushed_commits = '/*no-op*/'
+my @: $read, $branch, $snapshot_created, $commit_id, $describe = (@: "") x 5
+my @: $changed, $extra_info, $commit_title, $new_patchnum, $status = (@: "") x 5
+if (my $patch_file= read_file(".patch"))
+    @: $branch, $snapshot_created, $commit_id, $describe = split m/\s+/, $patch_file
+    $extra_info = "git_snapshot_date='$snapshot_created'"
+    $commit_title = "Snapshot of:"
+elsif (-d path_to('.git'))
+    # git branch | awk 'BEGIN{ORS=""} /\*/ { print $^STDOUT, $2 }'
+    @: $branch = grep { defined }, map { m/\* ([^(]\S*)/ ?? $1 !! undef },
+        split m/\n/, backtick('git branch')
+    my ($remote,$merge)
+    if (length $branch)
+        $merge= backtick("git config branch.$branch.merge")
+        $merge =~ s!^refs/heads/!!
+        $remote= backtick("git config branch.$branch.remote")
+
+    $commit_id = backtick("git rev-parse HEAD")
+    $describe = backtick("git describe")
+    my $commit_created = backtick(q{git log -1 --pretty="format:%ci"})
+    $new_patchnum = "describe: $describe"
+    $extra_info = "git_commit_date='$commit_created'"
+    if (length $branch && length $remote)
         # git cherry $remote/$branch | awk 'BEGIN{ORS=","} /\+/ {print $2}' | sed -e 's/,$//'
         my $unpushed_commit_list =
-            join ",", map { (split /\s/, $_)[1] }
-            grep {/\+/} backtick("git cherry $remote/$merge");
+            join ",", map { (split m/\s/, $_)[1] },
+            grep {m/\+/}, split m/\n/, backtick("git cherry $remote/$merge")
         # git cherry $remote/$branch | awk 'BEGIN{ORS="\t\\\\\n"} /\+/ {print ",\"" $2 "\""}'
         $unpushed_commits =
-            join "", map { ',"'.(split /\s/, $_)[1]."\"\t\\\n" }
-            grep {/\+/} backtick("git cherry $remote/$merge");
-        if (length $unpushed_commits) {
-            $commit_title = "Local Commit:";
-            my $ancestor = backtick("git rev-parse $remote/$merge");
+            join "", map { ',"'.(split m/\s/, $_)[1]."\"\t\\\n" },
+            grep {m/\+/}, split m/\n/, backtick("git cherry $remote/$merge")
+        if (length $unpushed_commits)
+            $commit_title = "Local Commit:"
+            my $ancestor = backtick("git rev-parse $remote/$merge")
             $extra_info = "$extra_info
 git_ancestor='$ancestor'
 git_remote_branch='$remote/$merge'
-git_unpushed='$unpushed_commit_list'";
-        }
-    }
-    if ($changed) {
-        $changed = 'true';
-        $commit_title =  "Derived from:";
+git_unpushed='$unpushed_commit_list'"
+
+    if ($changed)
+        $changed = 'true'
+        $commit_title =  "Derived from:"
         $status='"uncommitted-changes"'
-    } else {
+    else
         $status='/*clean-working-directory*/'
-    }
-    $commit_title ||= "Commit id:";
-}
+
+    $commit_title ||= "Commit id:"
+
 
 # we extract the filename out of the warning header, so dont mess with that
-exit(write_files(<<"EOF_HEADER", <<"EOF_CONFIG"));
+exit(write_files(<<"EOF_HEADER", <<"EOF_CONFIG"))
 /**************************************************************************
 * WARNING: 'git_version.h' is automatically generated by make_patchnum.pl
 *          DO NOT EDIT DIRECTLY - edit make_patchnum.pl instead
@@ -164,7 +153,7 @@ EOF_HEADER
 # WARNING: 'lib/Config_git.pl' is generated by make_patchnum.pl
 #          DO NOT EDIT DIRECTLY - edit make_patchnum.pl instead
 ######################################################################
-\$Config::Git_Data=<<'ENDOFGIT';
+\$Config::Git_Data=<<'ENDOFGIT'
 git_commit_id='$commit_id'
 git_describe='$describe'
 git_branch='$branch'
