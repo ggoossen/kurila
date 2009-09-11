@@ -148,6 +148,7 @@ for file in `$cat .clist`; do
         $sed \
     	    -e '/^#.*<stdin>/d' \
 	    -e '/^#.*"-"/d' \
+	    -e '/^#.*git_version\.h/d' \
 	    -e 's#\.[0-9][0-9]*\.c#'"$file.c#" \
 	    -e 's/^[	 ]*#[	 ]*line/#/' \
 	    -e '/^# *[0-9][0-9]* *[".\/]/!d' \
@@ -168,6 +169,7 @@ for file in `$cat .clist`; do
 	    -e '/^#.*"-"/d' \
 	    -e '/^#.*"\/.*\/"/d' \
 	    -e '/: file path prefix .* never used$/d' \
+	    -e '/^#.*git_version\.h/d' \
 	    -e 's#\.[0-9][0-9]*\.c#'"$file.c#" \
 	    -e 's/^[	 ]*#[	 ]*line/#/' \
 	    -e '/^# *[0-9][0-9]* *[".\/]/!d' \
