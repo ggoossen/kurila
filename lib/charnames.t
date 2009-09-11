@@ -13,7 +13,7 @@ require File::Spec
 
 $^OUTPUT_AUTOFLUSH = 1
 
-plan tests => 75
+plan tests => 76
 
 use utf8
 
@@ -243,6 +243,10 @@ do # as on ASCII or UTF-8 machines
 my $evaltry = eval q[ "Eval: \N{LEFT-POINTING DOUBLE ANGLE QUOTATION MARK}" ]
 ok not $^EVAL_ERROR
 ok $evaltry eq "Eval: \N{LEFT-POINTING DOUBLE ANGLE QUOTATION MARK}"
+
+# Verify that db includes the normative NameAliases.txt names
+is("\N{BYZANTINE MUSICAL SYMBOL FTHORA SKLIRON CHROMA VASIS}", "\N{U+1D0C5}")
+
 
 __END__
 # unsupported pragma
