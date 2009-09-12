@@ -189,7 +189,6 @@ if ($nwinstall)
     $installarchlib = config_value("installnwlib")
     $installsitelib = config_value("installnwlib")
 
-my $d_dosuid = config_value("d_dosuid")
 my $binexp = config_value("binexp")
 
 if ($Is_VMS)   # Hang in there until File::Spec hits the big time
@@ -199,8 +198,6 @@ if ($Is_VMS)   # Hang in there until File::Spec hits the big time
         $_->$ = unixify($_->$);  $_->$ =~ s:/$::
 
 # Do some quick sanity checks.
-
-if (!%opts{notify} && $d_dosuid && $^EUID) { die "You must run as root to install suidperl\n" }
 
    $installbin          || die "No installbin directory in config.sh\n"
 -d $installbin          || mkpath($installbin, %opts{verbose}, 0777)
@@ -301,9 +298,6 @@ else
     copy("perl.exe", "$installbin/$perl.exe")
 
 safe_unlink("$installbin/s$perl_verbase$ver$exe_ext")
-if ($d_dosuid)
-    copy("suidperl$exe_ext", "$installbin/s$perl_verbase$ver$exe_ext")
-    chmod(04711, "$installbin/s$perl_verbase$ver$exe_ext")
 
 # Install library files.
 
@@ -375,10 +369,6 @@ if (! $versiononly && ! samepath($installbin, '.') && ($^OS_NAME ne 'dos') && ! 
     else
         link("$installbin/$perl_verbase$ver$exe_ext",
                 "$installbin/$perl$exe_ext")
-
-    link("$installbin/$perl_verbase$ver$exe_ext",
-            "$installbin/suid$perl$exe_ext")
-      if $d_dosuid
 
 # For development purposes it can be very useful to have multiple perls
 # build for different "architectures" (eg threading or not) simultaneously.

@@ -41,24 +41,6 @@
 #   endif
 #endif
 
-/* This logic needs to come after reading config.h, but before including
-   proto.h  */
-#ifdef IAMSUID
-#  ifndef DOSUID
-#    define DOSUID
-#  endif
-#endif
-
-#ifdef SETUID_SCRIPTS_ARE_SECURE_NOW
-#  ifdef DOSUID
-#    undef DOSUID
-#  endif
-#  ifdef IAMSUID
-#    undef IAMSUID
-#    define SETUID_SCRIPTS_ARE_SECURE_NOW_AND_IAMSUID
-#  endif
-#endif
-
 /* See L<perlguts/"The Perl API"> for detailed notes on
  * PERL_IMPLICIT_CONTEXT and PERL_IMPLICIT_SYS */
 
@@ -133,10 +115,23 @@
 #   endif
 #endif
 
+#undef START_EXTERN_C
+#undef END_EXTERN_C
+#undef EXTERN_C
+#ifdef __cplusplus
+#  define START_EXTERN_C extern "C" {
+#  define END_EXTERN_C }
+#  define EXTERN_C extern "C"
+#else
+#  define START_EXTERN_C
+#  define END_EXTERN_C
+#  define EXTERN_C extern
+#endif
+
 #ifdef PERL_GLOBAL_STRUCT
 #  ifndef PERL_GET_VARS
 #    ifdef PERL_GLOBAL_STRUCT_PRIVATE
-       extern struct perl_vars* Perl_GetVarsPrivate();
+       EXTERN_C struct perl_vars* Perl_GetVarsPrivate();
 #      define PERL_GET_VARS() Perl_GetVarsPrivate() /* see miniperlmain.c */
 #      ifndef PERLIO_FUNCS_CONST
 #        define PERLIO_FUNCS_CONST /* Can't have these lying around. */
@@ -380,19 +375,6 @@
 #  else
 #    define dTHXs		dNOOP
 #  endif
-#endif
-
-#undef START_EXTERN_C
-#undef END_EXTERN_C
-#undef EXTERN_C
-#ifdef __cplusplus
-#  define START_EXTERN_C extern "C" {
-#  define END_EXTERN_C }
-#  define EXTERN_C extern "C"
-#else
-#  define START_EXTERN_C
-#  define END_EXTERN_C
-#  define EXTERN_C extern
 #endif
 
 /* Some platforms require marking function declarations
@@ -5259,64 +5241,6 @@ int flock(int fd, int op);
 #      define PERLIO_USING_CRLF 1
 #   endif
 #endif
-
-#ifdef IAMSUID
-
-#ifdef I_SYS_STATVFS
-#   if defined(PERL_SCO) && !defined(_SVID3)
-#       define _SVID3
-#   endif
-#   include <sys/statvfs.h>     /* for f?statvfs() */
-#endif
-#ifdef I_SYS_MOUNT
-#   include <sys/mount.h>       /* for *BSD f?statfs() */
-#endif
-#ifdef I_MNTENT
-#   include <mntent.h>          /* for getmntent() */
-#endif
-#ifdef I_SYS_STATFS
-#   include <sys/statfs.h>      /* for some statfs() */
-#endif
-#ifdef I_SYS_VFS
-#  ifdef __sgi
-#    define sv IRIX_sv		/* kludge: IRIX has an sv of its own */
-#  endif
-#    include <sys/vfs.h>	/* for some statfs() */
-#  ifdef __sgi
-#    undef IRIX_sv
-#  endif
-#endif
-#ifdef I_USTAT
-#   include <ustat.h>           /* for ustat() */
-#endif
-
-#if !defined(PERL_MOUNT_NOSUID) && defined(MOUNT_NOSUID)
-#    define PERL_MOUNT_NOSUID MOUNT_NOSUID
-#endif
-#if !defined(PERL_MOUNT_NOSUID) && defined(MNT_NOSUID)
-#    define PERL_MOUNT_NOSUID MNT_NOSUID
-#endif
-#if !defined(PERL_MOUNT_NOSUID) && defined(MS_NOSUID)
-#   define PERL_MOUNT_NOSUID MS_NOSUID
-#endif
-#if !defined(PERL_MOUNT_NOSUID) && defined(M_NOSUID)
-#   define PERL_MOUNT_NOSUID M_NOSUID
-#endif
-
-#if !defined(PERL_MOUNT_NOEXEC) && defined(MOUNT_NOEXEC)
-#    define PERL_MOUNT_NOEXEC MOUNT_NOEXEC
-#endif
-#if !defined(PERL_MOUNT_NOEXEC) && defined(MNT_NOEXEC)
-#    define PERL_MOUNT_NOEXEC MNT_NOEXEC
-#endif
-#if !defined(PERL_MOUNT_NOEXEC) && defined(MS_NOEXEC)
-#   define PERL_MOUNT_NOEXEC MS_NOEXEC
-#endif
-#if !defined(PERL_MOUNT_NOEXEC) && defined(M_NOEXEC)
-#   define PERL_MOUNT_NOEXEC M_NOEXEC
-#endif
-
-#endif /* IAMSUID */
 
 #ifdef I_LIBUTIL
 #   include <libutil.h>		/* setproctitle() in some FreeBSDs */

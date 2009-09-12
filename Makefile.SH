@@ -41,11 +41,6 @@ case "$0" in
 */*) cd `expr X$0 : 'X\(.*\)/'` ;;
 esac
 
-case "$d_dosuid" in
-*define*) suidperl='suidperl' ;;
-*) suidperl='';;
-esac
-
 linklibperl='$(LIBPERL)'
 linklibperl_nonshr=''
 shrpldflags='$(LDDLFLAGS)'
@@ -304,7 +299,7 @@ DYNALOADER = DynaLoader\$(OBJ_EXT)
 
 libs = $perllibs $cryptlib
 
-public = perl\$(EXE_EXT) $suidperl utilities
+public = perl\$(EXE_EXT) utilities
 
 shellflags = $shellflags
 
@@ -531,15 +526,6 @@ splintfiles = $(c1)
 all: $(FIRSTMAKEFILE) miniperl$(EXE_EXT) miniperl extra.pods $(private) $(unidatafiles) $(public) $(dynamic_ext) $(nonxs_ext) extras.make
 	@echo " ";
 	@echo "	Everything is up to date. Type '$(MAKE) test' to run test suite."
-
-sperl$(OBJ_EXT): perl.c $(h)
-	$(RMS) sperl.c
-	$(LNS) perl.c sperl.c
-	$(CCCMD) -DIAMSUID sperl.c
-	$(RMS) sperl.c
-
-sperl.i: perl.c $(h)
-	$(CCCMDSRC) -DIAMSUID -E perl.c > sperl.i
 
 .PHONY: all translators utilities
 
@@ -915,29 +901,7 @@ perl.gcov: perl.config.gcov
 microperl:
 	$(MAKE) -f Makefile.micro
 
-# This version, if specified in Configure, does ONLY those scripts which need
-# set-id emulation.  Suidperl must be setuid root.  It contains the "taint"
-# checks as well as the special code to validate that the script in question
-# has been invoked correctly.
-
 !NO!SUBS!
-
-case "${osname}" in
-aix*)
-$spitshell >>Makefile <<'!NO!SUBS!'
-suidperl$(EXE_EXT): $& sperl$(OBJ_EXT) perlmain$(OBJ_EXT) $(LIBPERL) $(static_ext) ext.libs $(PERLEXPORT)
-	$(SHRPENV) $(LDLIBPTH) $(CC) -o suidperl $(CLDFLAGS) $(CCDLFLAGS) perlmain$(OBJ_EXT) sperl$(OBJ_EXT) $(static_ext) $(LLIBPERL_NONSHR) $(LLIBPERL) `cat ext.libs` $(libs)
-
-!NO!SUBS!
-;;
-*)
-$spitshell >>Makefile <<'!NO!SUBS!'
-suidperl$(EXE_EXT): $& sperl$(OBJ_EXT) perlmain$(OBJ_EXT) $(LIBPERL) $(static_ext) ext.libs $(PERLEXPORT)
-	$(SHRPENV) $(LDLIBPTH) $(CC) -o suidperl $(CLDFLAGS) $(CCDLFLAGS) perlmain$(OBJ_EXT) sperl$(OBJ_EXT) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)
-
-!NO!SUBS!
-;;
-esac
 
 fi
 
@@ -1190,7 +1154,7 @@ _mopup:
 	-rm -f perl.pixie lib*.so.perl.pixie lib*.so.Addrs
 	-rm -f perl.Addrs perl.Counts t/perl.Addrs t/perl.Counts *perl.xok
 	-rm -f cygwin.c libperl*.def libperl*.dll cygperl*.dll *.exe.stackdump
-	-rm -f perl$(EXE_EXT) suidperl$(EXE_EXT) miniperl$(EXE_EXT) $(LIBPERL) libperl.* microperl
+	-rm -f perl$(EXE_EXT) miniperl$(EXE_EXT) $(LIBPERL) libperl.* microperl
 	-rm -f opcode.h-old opnames.h-old pp.sym-old pp_proto.h-old
 	-rm -f config.arch config.over $(DTRACE_H)
 
