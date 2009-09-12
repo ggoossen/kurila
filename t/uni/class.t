@@ -1,7 +1,7 @@
 BEGIN 
     require "./test.pl"
 
-plan tests => 4876
+plan tests => 5092
 
 use utf8
 
