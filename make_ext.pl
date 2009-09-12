@@ -11,10 +11,22 @@ use warnings
 # It may be deleted in a later release of perl so try to
 # avoid using it for other purposes.
 
-my $target   = shift(@ARGV)
-my $extspec  = shift(@ARGV)
-my $makecmd  = shift(@ARGV) # Should be something like MAKE=make
-my $passthru = join(' ', @ARGV) # allow extra macro=value to be passed through
+my (%excl, %incl, %opts, @argv)
+
+foreach (@ARGV)
+    if (m/^!(.*)$/)
+        %excl{$1} = 1
+    elsif (m/^\+(.*)$/)
+        %incl{$1} = 1
+    elsif (m/^--([\w\-]+)$/)
+        %opts{$1} = 1
+    else
+        push @argv, $_
+
+my $target   = shift @argv
+my $extspec  = shift @argv
+my $makecmd  = shift @argv # Should be something like MAKE=make
+my $passthru = join ' ', @argv # allow extra macro=value to be passed through
 print $^STDOUT, "\n"
 
 # Previously, $make was taken from config.sh.  However, the user might
@@ -132,7 +144,8 @@ else
 
 if (not -f $makefile)
         if (-f "Makefile.PL")
-                system("$($run)../$depth/miniperl -I../$depth/lib Makefile.PL INSTALLDIRS=perl INSTALLMAN3DIR=none PERL_CORE=1 $passthru")
+                my $cross = %opts{?cross} ?? ' -MCross' !! ''
+                system("$($run)../$depth/miniperl -I../$depth/lib$cross Makefile.PL INSTALLDIRS=perl INSTALLMAN3DIR=none PERL_CORE=1 $passthru")
         # Right. The reason for this little hack is that we're sitting inside
         # a program run by ./miniperl, but there are tasks we need to perform
         # when the 'realclean', 'distclean' or 'veryclean' targets are run.

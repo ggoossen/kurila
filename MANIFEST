@@ -453,8 +453,6 @@ ext/Time-HiRes/HiRes.xs		Time::HiRes extension
 ext/Time-HiRes/Makefile.PL	Time::HiRes extension
 ext/Time-HiRes/t/HiRes.t	Test for Time::HiRes
 ext/Time-HiRes/typemap		Time::HiRes extension
-ext/util/make_ext.pl		Used by Makefile to execute extension Makefiles
-ext/util/make_ext_cross		Cross-compilation
 ext/Win32/Changes		Changes for Win32 extension module
 ext/Win32CORE/Makefile.PL	Win32CORE extension
 ext/Win32CORE/t/win32core.t	Win32CORE extension
@@ -1418,6 +1416,7 @@ Makefile.SH			A script that generates Makefile
 make_patchnum.pl		Script to generate git_version.h and lib/Config_git.pl files for all OS'es
 malloc.c			A version of malloc you might not want
 malloc_ctl.h			A version of malloc you might not want
+make_ext.pl			Used by Makefile to execute extension Makefiles
 MANIFEST			This list of files
 mathoms.c			A home for binary-compatible code artifacts
 META.yml			Distribution meta-data in YAML
