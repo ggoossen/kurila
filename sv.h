@@ -840,11 +840,6 @@ in gv.h: */
 #  define SvPAD_OUR_on(sv)	(SvFLAGS(sv) |= SVpad_NAME|SVpad_OUR)
 #endif
 
-#define SvOURGV(sv) \
-    ({ assert(SvPAD_OUR(sv));		       \
-	((XPVMG*) SvANY(sv))->xmg_u.xmg_ourgv; \
-     })
-
 #define SvOURGV_set(sv, st)                                 \
         STMT_START {                                           \
            assert(SvTYPE(sv) == SVt_PVMG);                     \

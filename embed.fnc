@@ -113,6 +113,7 @@ Aip	|UV	|SvUV	|NN SV *sv
 Aip	|NV	|SvNV	|NN SV *sv
 Aip	|STRLEN	|SvCUR	|NN const SV *sv
 Aip	|void	|SvCUR_set	|NN SV *sv|STRLEN len
+Aip	|GV*	|SvOURGV	|NN SV *sv
 Aip	|char *	|SvPVx_nolen	|NN SV *sv
 Aip	|const char *	|SvPVx_nolen_const	|NN SV *sv
 Aip	|bool	|SvTRUE	|NN SV *sv

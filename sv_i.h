@@ -58,6 +58,12 @@ Perl_SvNV(pTHX_ SV *sv) {
     return SvNOK(sv) ? SvNVX(sv) : sv_2nv(sv);
 }
 
+GV*
+Perl_SvOURGV(pTHX_ SV* sv) {
+    assert(SvPAD_OUR(sv));
+    return ((XPVMG*) SvANY(sv))->xmg_u.xmg_ourgv;
+}
+
 #define SvIV_nomg(sv) (SvIOK(sv) ? I_SvIV(sv) : sv_2iv(sv))
 #define SvUV_nomg(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv))
 

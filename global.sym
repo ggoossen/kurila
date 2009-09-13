@@ -59,6 +59,7 @@ Perl_SvUV
 Perl_SvNV
 Perl_SvCUR
 Perl_SvCUR_set
+Perl_SvOURGV
 Perl_SvPVx_nolen
 Perl_SvPVx_nolen_const
 Perl_SvTRUE
