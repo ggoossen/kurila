@@ -1625,6 +1625,9 @@ p	|bool	|vdie_common	|NN SV *msv|bool warn
 sn	|NV|mulexp10	|NV value|I32 exponent
 #endif
 
+ip	|bool	|UTF8_IS_CONTINUATION|const char c
+ip	|bool	|UTF8_IS_CONTINUED|const char c
+
 #if defined(PERL_IN_UTF8_C) || defined(PERL_DECL_PROT)
 sRn	|STRLEN	|is_utf8_char_slow|NN const char *s|const STRLEN len
 sR	|bool	|is_utf8_common	|NN const char *const p|NN SV **swash|NN const char * const swashname

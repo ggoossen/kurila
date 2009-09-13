@@ -1513,6 +1513,10 @@
 #define mulexp10		S_mulexp10
 #endif
 #endif
+#ifdef PERL_CORE
+#define UTF8_IS_CONTINUATION	Perl_UTF8_IS_CONTINUATION
+#define UTF8_IS_CONTINUED	Perl_UTF8_IS_CONTINUED
+#endif
 #if defined(PERL_IN_UTF8_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define is_utf8_char_slow	S_is_utf8_char_slow
@@ -3708,6 +3712,10 @@
 #ifdef PERL_CORE
 #define mulexp10		S_mulexp10
 #endif
+#endif
+#ifdef PERL_CORE
+#define UTF8_IS_CONTINUATION(a)	Perl_UTF8_IS_CONTINUATION(aTHX_ a)
+#define UTF8_IS_CONTINUED(a)	Perl_UTF8_IS_CONTINUED(aTHX_ a)
 #endif
 #if defined(PERL_IN_UTF8_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE

@@ -5171,6 +5171,9 @@ PERL_CALLCONV bool	Perl_vdie_common(pTHX_ SV *msv, bool warn)
 STATIC NV	S_mulexp10(NV value, I32 exponent);
 #endif
 
+PERL_INLINE_CALLCONV bool	Perl_UTF8_IS_CONTINUATION(pTHX_ const char c);
+PERL_INLINE_CALLCONV bool	Perl_UTF8_IS_CONTINUED(pTHX_ const char c);
+
 #if defined(PERL_IN_UTF8_C) || defined(PERL_DECL_PROT)
 STATIC STRLEN	S_is_utf8_char_slow(const char *s, const STRLEN len)
 			__attribute__warn_unused_result__
