@@ -2,19 +2,50 @@
 
 use warnings
 use Config
+use Cwd
 
 # This script acts as a simple interface for building extensions.
-# It primarily used by the perl Makefile:
+
+# It's actually a cut and shut of the Unix version ext/utils/makeext and the
+# Windows version win32/build_ext.pl hence the two invocation styles.
+
+# On Unix, it primarily used by the perl Makefile one extention at a time:
 #
 # d_dummy $(dynamic_ext): miniperl preplibrary FORCE
 #       @$(RUN) ./miniperl make_ext.pl --target=dynamic $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL)
 #
+# On Windows,
+# If '--static' is specified, static extensions will be built.
+# If '--dynamic' is specified, dynamic (and nonxs) extensions will be built.
+# If '--all' is specified, all extensions will be built.
+#
+#    make_ext.pl "MAKE=make [-make_opts]" --dir=directory [--target=target] [--static|--dynamic|--all] +ext2 !ext1
+#
+# E.g.
+# 
+#     make_ext.pl "MAKE=nmake -nologo" --dir=..\ext
+# 
+#     make_ext.pl "MAKE=nmake -nologo" --dir=..\ext --target=clean
+# 
+#     make_ext.pl MAKE=dmake --dir=..\ext
+# 
+#     make_ext.pl MAKE=dmake --dir=..\ext --target=clean
+# 
+# Will skip building extensions which are marked with an '!' char.
+# Mostly because they still not ported to specified platform.
+# 
+# If any extensions are listed with a '+' char then only those
+# extensions will be built, but only if they arent countermanded
+# by an '!ext' and are appropriate to the type of building being done.
+
 # It may be deleted in a later release of perl so try to
 # avoid using it for other purposes.
 
 my $is_Win32 = $^OS_NAME eq 'MSWin32'
 my $is_VMS = $^OS_NAME eq 'VMS'
 my $is_Unix = !$is_Win32 && !$is_VMS
+
+require FindExt if $is_Win32
 
 my (%excl, %incl, %opts, @extspec, @pass_through)
 
@@ -33,6 +64,9 @@ foreach (@ARGV)
         push @pass_through, $_
     else
         push @extspec, $_
+
+my $static = %opts{?static} || %opts{?all}
+my $dynamic = %opts{?dynamic} || %opts{?all}
 
 # The Perl Makefile.SH will expand all extensions to
 #       lib/auto/X/X.a  (or lib/auto/X/Y/Y.a if nested)
@@ -59,6 +93,7 @@ foreach (@extspec)
 my $makecmd  = shift @pass_through # Should be something like MAKE=make
 unshift @pass_through, 'PERL_CORE=1'
 
+my $dir  = %opts{?dir} || 'ext';
 my $target   = %opts{?target} // 'all'
 
 # Previously, $make was taken from config.sh.  However, the user might
@@ -79,14 +114,55 @@ my @make = split ' ', $1 || config_value('make') || env::var('MAKE')
 my @run = @: config_value('run')
 @run = () if not defined @run[?0] or @run[0] eq '';
 
-if (!@extspec) 
-    die "$^PROGRAM_NAME: no extension specified\n"
 
 if ($target eq '')
     die "make_ext: no make target specified (eg all or clean)\n"
 elsif ($target !~ m/(?:^all|clean)$/)
     # for the time being we are strict about what make_ext is used for
     die "$^PROGRAM_NAME: unknown make target '$target'\n"
+
+if (!@extspec and !$static and !$dynamic)
+    die "$^PROGRAM_NAME: no extension specified\n"
+
+my $perl
+my %extra_passthrough
+
+if ($is_Win32)
+    (my $here = getcwd()) =~ s{/}{\\}g
+    $perl = $^EXECUTABLE_NAME
+    if ($perl =~ m#^\.\.#)
+        $perl = "$here\\$perl"
+    (my $topdir = $perl) =~ s/\\[^\\]+$//
+    # miniperl needs to find perlglob and pl2bat
+    env::var('PATH') = "$topdir;$topdir\\win32\\bin;$(env::var('PATH'))"
+    my $pl2bat = "$topdir\\win32\\bin\\pl2bat"
+    unless (-f "$pl2bat.bat")
+        my @args = @: $perl, (@: "$pl2bat.pl") x 2
+        print "@args\n"
+        system(< @args) unless defined $::Cross::platform
+
+    print $^STDOUT, "In ", getcwd()
+    chdir($dir) || die "Cannot cd to $dir\n"
+    (my $ext = getcwd()) =~ s{/}{\\}g
+    FindExt::scan_ext($ext)
+    FindExt::set_static_extensions(split ' ', config_value('static_ext'))
+
+    my @ext
+    push @ext, FindExt::static_ext() if $static
+    push @ext, FindExt::dynamic_ext(), FindExt::nonxs_ext() if $dynamic
+
+    foreach (sort @ext)
+        if (%incl and !exists %incl{$_})
+            #warn "Skipping extension $ext\\$_, not in inclusion list\n";
+            next
+        if (exists %excl{$_})
+            warn "Skipping extension $ext\\$_, not ported to current platform"
+            next
+        push @extspec, $_
+        if(FindExt::is_static($_))
+            push %extra_passthrough{$_}, 'LINKTYPE=static'
+
+    chdir '..' # now in the Perl build directory
 
 foreach my $pname (@extspec) 
     my $mname = $pname
@@ -103,8 +179,9 @@ foreach my $pname (@extspec)
 
     print $^STDOUT, "\tMaking $mname ($target)\n"
 
-    build_extension('ext', "ext/$pname", $up, $perl, "$up/lib",
-                    \@pass_through)
+    build_extension('ext', "ext/$pname", $up, $perl || "$up/miniperl",
+                    "$up/lib",
+                    @pass_through +@+ (%extra_passthrough{?$pname} || $@))
 
 sub build_extension($ext, $ext_dir, $return_dir, $perl, $lib_dir, $pass_through)
     unless (chdir "$ext_dir")
@@ -125,7 +202,7 @@ sub build_extension($ext, $ext_dir, $return_dir, $perl, $lib_dir, $pass_through)
             
         my @perl = @: @run, $perl, "-I$lib_dir", @cross, 'Makefile.PL',
                       'INSTALLDIRS=perl', 'INSTALLMAN3DIR=none',
-                      < $pass_through->@
+                      < $pass_through
         print $^STDOUT, join(' ', @perl), "\n";
         my $code = system @perl
         warn "$code from $ext_dir\'s Makefile.PL" if $code
@@ -170,10 +247,10 @@ EOS
     if (!$target or $target !~ m/clean$/)
         # Give makefile an opportunity to rewrite itself.
         # reassure users that life goes on...
-        my @config = @: < @run, < @make, 'config', < $pass_through->@
+        my @config = @: < @run, < @make, 'config', < $pass_through
         system < @config and print $^STDOUT, "$(join ' ', @config) failed, continuing anyway...\n"
 
-    my @targ = @: < @run, < @make, $target, < $pass_through->@
+    my @targ = @: < @run, < @make, $target, < $pass_through
     print $^STDOUT, "Making $target in $ext_dir\n$(join ' ', @targ)\n"
     my $code = system < @targ
     die "Unsuccessful make($ext_dir): code=$code" if $code != 0
