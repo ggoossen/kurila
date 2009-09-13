@@ -589,7 +589,6 @@ MICROCORE_SRC	=		\
 		..\run.c	\
 		..\scope.c	\
 		..\sv.c		\
-		..\taint.c	\
 		..\toke.c	\
 		..\universal.c	\
 		..\utf8.c	\
@@ -813,7 +812,6 @@ $(DLLDIR)\regexec.obj \
 $(DLLDIR)\run.obj \
 $(DLLDIR)\scope.obj \
 $(DLLDIR)\sv.obj \
-$(DLLDIR)\taint.obj \
 $(DLLDIR)\toke.obj \
 $(DLLDIR)\universal.obj \
 $(DLLDIR)\utf8.obj \
