@@ -469,7 +469,7 @@ ApPR	|bool	|is_uni_lower_lc|UV c
 ApPR	|bool	|is_uni_print_lc|UV c
 ApPR	|bool	|is_uni_punct_lc|UV c
 ApPR	|bool	|is_uni_xdigit_lc|UV c
-Apd	|STRLEN	|is_utf8_char	|NN const char *s
+Apid	|STRLEN	|is_utf8_char	|NN const char *s
 Apd	|bool	|is_utf8_string	|NN const char *s|STRLEN len
 Apdmb	|bool	|is_utf8_string_loc|NN const char *s|STRLEN len|NULLOK const char **p
 Apd	|bool	|is_utf8_string_loclen|NN const char *s|STRLEN len|NULLOK const char **ep|NULLOK STRLEN *el
@@ -1627,9 +1627,9 @@ sn	|NV|mulexp10	|NV value|I32 exponent
 
 ip	|bool	|UTF8_IS_CONTINUATION|const char c
 ip	|bool	|UTF8_IS_CONTINUED|const char c
+ipRn	|STRLEN	|is_utf8_char_slow|NN const char *s|const STRLEN len
 
 #if defined(PERL_IN_UTF8_C) || defined(PERL_DECL_PROT)
-sRn	|STRLEN	|is_utf8_char_slow|NN const char *s|const STRLEN len
 sR	|bool	|is_utf8_common	|NN const char *const p|NN SV **swash|NN const char * const swashname
 sR	|SV*	|swash_get	|NN SV* swash|UV start|UV span
 #endif

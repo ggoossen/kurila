@@ -1327,7 +1327,7 @@ PERL_CALLCONV bool	Perl_is_uni_xdigit_lc(pTHX_ UV c)
 			__attribute__warn_unused_result__
 			__attribute__pure__;
 
-PERL_CALLCONV STRLEN	Perl_is_utf8_char(pTHX_ const char *s)
+PERL_INLINE_CALLCONV STRLEN	Perl_is_utf8_char(pTHX_ const char *s)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_IS_UTF8_CHAR	\
 	assert(s)
@@ -5173,14 +5173,14 @@ STATIC NV	S_mulexp10(NV value, I32 exponent);
 
 PERL_INLINE_CALLCONV bool	Perl_UTF8_IS_CONTINUATION(pTHX_ const char c);
 PERL_INLINE_CALLCONV bool	Perl_UTF8_IS_CONTINUED(pTHX_ const char c);
-
-#if defined(PERL_IN_UTF8_C) || defined(PERL_DECL_PROT)
-STATIC STRLEN	S_is_utf8_char_slow(const char *s, const STRLEN len)
+PERL_INLINE_CALLCONV STRLEN	Perl_is_utf8_char_slow(const char *s, const STRLEN len)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(1);
 #define PERL_ARGS_ASSERT_IS_UTF8_CHAR_SLOW	\
 	assert(s)
 
+
+#if defined(PERL_IN_UTF8_C) || defined(PERL_DECL_PROT)
 STATIC bool	S_is_utf8_common(pTHX_ const char *const p, SV **swash, const char * const swashname)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1)

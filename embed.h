@@ -1516,10 +1516,10 @@
 #ifdef PERL_CORE
 #define UTF8_IS_CONTINUATION	Perl_UTF8_IS_CONTINUATION
 #define UTF8_IS_CONTINUED	Perl_UTF8_IS_CONTINUED
+#define is_utf8_char_slow	Perl_is_utf8_char_slow
 #endif
 #if defined(PERL_IN_UTF8_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
-#define is_utf8_char_slow	S_is_utf8_char_slow
 #define is_utf8_common		S_is_utf8_common
 #define swash_get		S_swash_get
 #endif
@@ -3716,10 +3716,10 @@
 #ifdef PERL_CORE
 #define UTF8_IS_CONTINUATION(a)	Perl_UTF8_IS_CONTINUATION(aTHX_ a)
 #define UTF8_IS_CONTINUED(a)	Perl_UTF8_IS_CONTINUED(aTHX_ a)
+#define is_utf8_char_slow	Perl_is_utf8_char_slow
 #endif
 #if defined(PERL_IN_UTF8_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
-#define is_utf8_char_slow	S_is_utf8_char_slow
 #define is_utf8_common(a,b,c)	S_is_utf8_common(aTHX_ a,b,c)
 #define swash_get(a,b,c)	S_swash_get(aTHX_ a,b,c)
 #endif

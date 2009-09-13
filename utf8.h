@@ -296,18 +296,6 @@ encoded character.
 	 IS_UTF8_CHAR_4b(p) || \
 	 IS_UTF8_CHAR_4c(p))
 
-/* IS_UTF8_CHAR(p) is strictly speaking wrong (not UTF-8) because it
- * (1) allows UTF-8 encoded UTF-16 surrogates
- * (2) it allows code points past U+10FFFF.
- * The Perl_is_utf8_char() full "slow" code will handle the Perl
- * "extended UTF-8". */
-static __inline__ int IS_UTF8_CHAR(const char* p, int n) {
-    return ((n) == 1 ? IS_UTF8_CHAR_1((U8*)p) :
-            (n) == 2 ? IS_UTF8_CHAR_2((U8*)p) :
-            (n) == 3 ? IS_UTF8_CHAR_3((U8*)p) :
-            (n) == 4 ? IS_UTF8_CHAR_4((U8*)p) : 0);
-}
-
 #define IS_UTF8_CHAR_FAST(n) ((n) <= 4)
 
 /*
