@@ -9,16 +9,7 @@ my $no = join('|',qw(GDBM_File ODBM_File NDBM_File DB_File
 $no = qr/^(?:$no)$/i
 
 my %ext
-my $ext
 my %static
-
-sub getcwd
-    $_ = `cd`
-    chomp
-    s:\\:/:g 
-    env::var('PWD') = $_
-    return $_
-
 
 sub set_static_extensions
     # adjust results of scan_ext, and also save
@@ -37,15 +28,9 @@ sub set_static_extensions
     
 
 
-sub scan_ext
-    my $here = getcwd()
-    my $dir  = shift
-    chdir($dir) || die "Cannot cd to $dir\n"
-    ($ext = getcwd()) =~ s,/,\\,g
-    find_ext('')
-    chdir($here) || die "Cannot cd to $here\n"
-    my @ext = extensions()
-
+sub scan_ext($dir)
+    find_ext("$dir/", '')
+    extensions()
 
 sub dynamic_ext
     return sort grep { %ext{?$_} eq 'dynamic' },keys %ext
@@ -74,39 +59,30 @@ sub is_static
 
 # Function to recursively find available extensions, ignoring DynaLoader
 # NOTE: recursion limit of 10 to prevent runaway in case of symlink madness
-sub find_ext
-    opendir my $dh, '.'
-    my @items = grep { !m/^\.\.?$/ }, @:  readdir $dh
-    closedir $dh
-    for my $xxx ( @items)
+sub find_ext($prefix, $dir)
+    opendir my $dh, "$prefix$dir"
+    while (defined (my $xxx = readdir $dh))
+	next if $xxx =~ m/^\.\.?$/
         if ($xxx ne "DynaLoader")
-            if (-f "$xxx/$xxx.xs" || -f "$xxx/$xxx.c" )
-                %ext{+"@_[0]$xxx"} = %static{?"@_[0]$xxx"} ?? 'static' !! 'dynamic'
-            elsif (-f "$xxx/Makefile.PL")
-                %ext{+"@_[0]$xxx"} = 'nonxs'
+            if (-f "$prefix$dir$xxx/$xxx.xs" || -f "$prefix$dir$xxx/$xxx.c" )
+                %ext{"$dir$xxx"} = %static{"$dir$xxx"} ?? 'static' !! 'dynamic';
+            elsif (-f "$prefix$dir$xxx/Makefile.PL")
+                %ext{"$dir$xxx"} = 'nonxs'
             else
-                if (-d $xxx && (nelems @_) +< 10)
-                    chdir $xxx
-                    find_ext("@_[0]$xxx/", < @_)
-                    chdir ".."
-                
-            
-            %ext{+"@_[0]$xxx"} = 'known' if %ext{?"@_[0]$xxx"} && $xxx =~ $no
-        
-    
+                if (-d "$prefix$dir$xxx" && $dir =~ tr#/## < 10)
+                    find_ext($prefix, "$dir$xxx/")
 
-    # Special case:  Add in modules that nest beyond the first level.
-    # Currently threads/shared and Hash/Util/FieldHash, since they are
-    # not picked up by the recursive find above (and adding in general
-    # recursive finding breaks SDBM_File/sdbm).
-    # A.D. 20011025 (SDBM), ajgough 20071008 (FieldHash)
+            %ext{"$dir$xxx"} = 'known' if %ext{"$dir$xxx"} && $xxx =~ $no
 
-    if (!@_[0] && -d "threads/shared")
-        %ext{+"threads/shared"} = 'dynamic'
-    
-    if (!@_[0] && -d "Hash/Util/FieldHash")
-        %ext{+"Hash/Util/FieldHash"} = 'dynamic'
-    
+# Special case:  Add in modules that nest beyond the first level.
+# Currently threads/shared and Hash/Util/FieldHash, since they are
+# not picked up by the recursive find above (and adding in general
+# recursive finding breaks SDBM_File/sdbm).
+# A.D. 20011025 (SDBM), ajgough 20071008 (FieldHash)
 
+    if (!$dir && -d "${prefix}threads/shared")
+        $ext{"threads/shared"} = 'dynamic'
+    if (!$dir && -d "${prefix}Hash/Util/FieldHash")
+        $ext{"Hash/Util/FieldHash"} = 'dynamic'
 
 1
