@@ -110,7 +110,7 @@ unless(defined $makecmd and $makecmd =~ m/^MAKE=(.*)$/)
 my @make = split ' ', $1 || config_value('make') || env::var('MAKE')
 # Using an array of 0 or 1 elements makes the subsequent code simpler.
 my @run = @: config_value('run')
-@run = () if not defined @run[?0] or @run[0] eq '';
+@run = $@ if not defined @run[?0] or @run[0] eq '';
 
 
 if ($target eq '')
@@ -230,7 +230,7 @@ sub build_extension($ext, $ext_dir, $return_dir, $perl, $lib_dir, $pass_through)
             push @args, 'INSTALLDIRS=perl', 'INSTALLMAN3DIR=none'
         push @args, < $pass_through
         _quote_args(\@args) if $is_VMS
-        print join(' ', @: < @run, $perl, < @args), "\n"
+        print $^STDOUT, join(' ', @: < @run, $perl, < @args), "\n"
         my $code = system < @run, $perl, < @args
         warn "$code from $ext_dir\'s Makefile.PL" if $code
 
@@ -280,7 +280,7 @@ EOS
         # reassure users that life goes on...
         my @args = @: 'config', < $pass_through
         _quote_args(\@args) if $is_VMS
-        system(< @run, < @make, < @args) and print $^STDOUT, "@run @make @args failed, continuing anyway...\n"
+        system(< @run, < @make, < @args) and print $^STDOUT, "$(join ' ', @run +@+ @make +@+ @args) failed, continuing anyway...\n"
 
     my @targ = @: $target, < $pass_through
     _quote_args(\@targ) if $is_VMS
