@@ -75,20 +75,19 @@ my $dynamic = %opts{?dynamic} || %opts{?all}
 
 # canonise into X/Y form (pname)
 
+<<<<<<< HEAD:make_ext.pl
 foreach (@extspec)
-    if (m/^lib/)
-        # Remove lib/auto prefix and /*.* suffix
-        s{^lib/auto/}{}
-        s{/[^/]+\.[^/]+$}{}
-    elsif (m/^ext/)
-        # Remove ext/ prefix and /pm_to_blib suffix
-        s{^ext/}{}
-        s{/pm_to_blib$}{}
-    elsif (m/::/)
-        # Convert :: to /
-        s{::}{\/}g
-    elsif (m/\..*o$/)
-        s/\..*o//
+    if (s{^lib/auto/}{})
+	# Remove lib/auto prefix and /*.* suffix
+	s{/[^/]+\.[^/]+$}{}
+    elsif (s{^ext/}{})
+	# Remove ext/ prefix and /pm_to_blib suffix
+	s{/pm_to_blib$}{}
+    elsif (s{::}{\/}g)
+	# Convert :: to /
+        1
+    else
+	s/\..*o//
 
 my $makecmd  = shift @pass_through # Should be something like MAKE=make
 unshift @pass_through, 'PERL_CORE=1'
