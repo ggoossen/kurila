@@ -197,6 +197,17 @@ PERL_INLINE_CALLCONV SV*	Perl_SvNAME(pTHX_ SV *sv)
 
 PERL_INLINE_CALLCONV SV*	Perl_LocationFilename(pTHX_ SV *location);
 
+PERL_INLINE_CALLCONV datatype	Perl_Dtype(pTHX_ SV *sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_DTYPE	\
+	assert(sv)
+
+PERL_INLINE_CALLCONV const char*	Perl_Ddesc(pTHX_ SV *sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_DDESC	\
+	assert(sv)
+
+
 PERL_INLINE_CALLCONV PERL_CONTEXT*	Perl_push_block(pTHX_ U8 t, SV** sp, U8 gimme)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_PUSH_BLOCK	\

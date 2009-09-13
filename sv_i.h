@@ -1,6 +1,6 @@
 
-#define Dtype(sv) inlineDtype(aTHX_ sv)
-static __inline__ datatype inlineDtype(pTHX_ SV *sv) {
+datatype
+Perl_Dtype(pTHX_ SV *sv) {
     if(!SvOK(sv))
         return Dt_UNDEF;
     else if (SvAVOK(sv))
@@ -23,9 +23,8 @@ static __inline__ datatype inlineDtype(pTHX_ SV *sv) {
         return Dt_COMPLEX;
 }
 
-
-#define Ddesc(sv) inlineDdesc(aTHX_ sv)
-static __inline__ const char* inlineDdesc(pTHX_ SV *sv) {
+const char*
+Perl_Ddesc(pTHX_ SV *sv) {
     switch (Dtype(sv)) {
     case Dt_UNDEF: return "UNDEF";
     case Dt_ARRAY: return "ARRAY";
