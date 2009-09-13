@@ -164,14 +164,12 @@ if ($is_Win32)
 
     chdir '..' # now in the Perl build directory
 
-foreach my $pname (@extspec) 
-    my $mname = $pname
+foreach my $spec (@extspec) 
+    my $mname = $spec
     $mname =~ s!/!::!g
-    my $depth = $pname
-    $depth =~ s![^/]+!..!g
-    # Always need one more .. for ext/
-    my $up = "../$depth"
-    my $perl = "$up/miniperl"
+    my $ext_pathname = "ext/$spec"
+    my $up = $ext_pathname
+    $up =~ s![^/]+!..!g
 
     if (config_value('osname') eq 'catamount')
         # Snowball's chance of building extensions.
@@ -179,15 +177,15 @@ foreach my $pname (@extspec)
 
     print $^STDOUT, "\tMaking $mname ($target)\n"
 
-    build_extension('ext', "ext/$pname", $up, $perl || "$up/miniperl",
+    build_extension('ext', $ext_pathname, $up, $perl || "$up/miniperl",
                     "$up/lib",
-                    @pass_through +@+ (%extra_passthrough{?$pname} || $@))
+                    @pass_through +@+ (%extra_passthrough{?$spec} || $@))
 
-sub build_extension($ext, $ext_dir, $return_dir, $perl, $lib_dir, $pass_through)
+sub build_extension($ext, $ext_dir, $return_dir, $perl, $lib_dir, $pass_through) 
     unless (chdir "$ext_dir")
         warn "Cannot cd to $ext_dir: $^OS_ERROR"
         return
-    
+
     if (!-f 'Makefile')
         print $^STDOUT, "\nRunning Makefile.PL in $ext_dir\n"
 
