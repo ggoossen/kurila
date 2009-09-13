@@ -1399,7 +1399,7 @@ Extensions_clean :
 	-if exist $(MINIPERL) $(MINIPERL) -I..\lib buildext.pl "MAKE=$(MAKE)" --dir=$(EXTDIR) --all --target=clean
 
 Extensions_realclean :
-	-if exist $(MINIPERL) $(MINIPERL) -I..\lib buildext.pl "MAKE=$(MAKE)" --dir=$(EXTDIR) --target=realclean
+	-if exist $(MINIPERL) $(MINIPERL) -I..\lib buildext.pl "MAKE=$(MAKE)" --dir=$(EXTDIR) --all --target=realclean
 
 #-------------------------------------------------------------------------------
 
