@@ -315,12 +315,9 @@ sub format_linker_cmd($self, %< %spec)
                                                  %spec{?implib}
                                                  %spec{?output}
 
-    # Embed the manifest file for VC 2005 (aka VC 8) or higher, but not for the 64-bit Platform SDK compiler
-    if ($cf->{?ivsize} == 4 && $cf->{?cc} eq 'cl' and $cf->{?ccversion} =~ m/^(\d+)/ and $1 +>= 14)
-        push @cmds, \@:
-            'mt', '-nologo', %spec{?manifest}, '-outputresource:' . "$output;2"
-
-
+   # Embed the manifest file if it exists
+   push @cmds, 
+     \@: 'if', 'exist', %spec{manifest}, 'mt', '-nologo', %spec{manifest}, '-outputresource:' . "$output;2"
 
     return @cmds
 

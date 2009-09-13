@@ -315,6 +315,7 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
             q{	dlltool --def $(EXPORT_LIST) --output-exp dll.exp
 	$(LD) -o $@ -Wl,--base-file -Wl,dll.base $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) $(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) dll.exp
 	dlltool --def $(EXPORT_LIST) --base-file dll.base --output-exp dll.exp
+<<<<<<< HEAD:lib/ExtUtils/MM_Win32.pm
 	$(LD) -o $@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) $(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) dll.exp })
     elsif ($BORLAND)
         push(@m,
@@ -330,13 +331,11 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
             q{	$(LD) -out:$@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) }
             .q{$(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) -def:$(EXPORT_LIST)})
 
-        # VS2005 (aka VC 8) or higher, but not for 64-bit compiler from Platform SDK
-        if (%Config{?ivsize} == 4 && %Config{?cc} eq 'cl' and %Config{?ccversion} =~ m/^(\d+)/ and $1 +>= 14)
-            push(@m,
-                q{
-	mt -nologo -manifest $@.manifest -outputresource:$@;2 && del $@.manifest})
-        
-    
+        # Embed the manifest file if it exists
+        push(@m, q{
+	  if exist $@.manifest mt -nologo -manifest $@.manifest -outputresource:$@;2
+	  if exist $@.manifest del $@.manifest})
+
     push @m, '
 	$(CHMOD) $(PERM_RWX) $@
 '
