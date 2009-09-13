@@ -165,7 +165,15 @@ if ($is_Win32)
 foreach my $spec (@extspec) 
     my $mname = $spec
     $mname =~ s!/!::!g
-    my $ext_pathname = "ext/$spec"
+    my $ext_pathname;
+    if (-d "ext/$spec")
+        # Old style ext/Data/Dumper/
+        $ext_pathname = "ext/$spec"
+    else
+        # New style ext/Data-Dumper/
+        my $copy = $spec
+        $copy =~ s!/!-!g
+        $ext_pathname = "ext/$copy"
     my $up = $ext_pathname
     $up =~ s![^/]+!..!g
 
