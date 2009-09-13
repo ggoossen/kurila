@@ -19,7 +19,7 @@ sub set_static_extensions
     %static = $%
     my @list = @_
     if (@_[0] eq '*')
-        my %excl = %:  < map {$_=>1}, map {m/^!(.*)$/}, @_[[1 .. ((nelems @_)-1)]] 
+        my %excl = %+: map { %: $_=>1 }, map {m/^!(.*)$/}, @_[[1 .. ((nelems @_)-1)]] 
         @list = grep {!exists %excl{$_}}, keys %ext
     
     for ( @list)
@@ -59,30 +59,32 @@ sub is_static
 
 # Function to recursively find available extensions, ignoring DynaLoader
 # NOTE: recursion limit of 10 to prevent runaway in case of symlink madness
-sub find_ext($prefix, $dir)
-    opendir my $dh, "$prefix$dir"
-    while (defined (my $xxx = readdir $dh))
-	next if $xxx =~ m/^\.\.?$/
-        if ($xxx ne "DynaLoader")
-            if (-f "$prefix$dir$xxx/$xxx.xs" || -f "$prefix$dir$xxx/$xxx.c" )
-                %ext{"$dir$xxx"} = %static{"$dir$xxx"} ?? 'static' !! 'dynamic';
-            elsif (-f "$prefix$dir$xxx/Makefile.PL")
-                %ext{"$dir$xxx"} = 'nonxs'
-            else
-                if (-d "$prefix$dir$xxx" && $dir =~ tr#/## < 10)
-                    find_ext($prefix, "$dir$xxx/")
+sub find_ext($ext_dir, $prefix)
+    opendir my $dh, "$ext_dir$prefix"
+    while (defined (my $item = readdir $dh))
+        next if $item =~ m/^\.\.?$/;
+        next if $item eq "DynaLoader"
+        my $this_ext = my $this_ext_dir = "$prefix$item"
+        my $leaf = $item
 
-            %ext{"$dir$xxx"} = 'known' if %ext{"$dir$xxx"} && $xxx =~ $no
+        $this_ext =~ s!-!/!g
+        $leaf =~ s/.*-//
 
-# Special case:  Add in modules that nest beyond the first level.
-# Currently threads/shared and Hash/Util/FieldHash, since they are
-# not picked up by the recursive find above (and adding in general
-# recursive finding breaks SDBM_File/sdbm).
-# A.D. 20011025 (SDBM), ajgough 20071008 (FieldHash)
+        if (-f "$ext_dir$this_ext_dir/$leaf.xs" || -f "$ext_dir$this_ext_dir/$leaf.c" )
+            %ext{+$this_ext} = %static{?$this_ext} ?? 'static' !! 'dynamic'
+        elsif (-f "$ext_dir$this_ext_dir/Makefile.PL")
+            %ext{+$this_ext} = 'nonxs'
+        else
+            # It's not actually an extension. So recurse into it.
+            if (-d "$ext_dir$this_ext_dir" && nelems(@: $prefix =~ m#/#) +< 10)
+                find_ext($ext_dir, "$this_ext_dir/")
 
-    if (!$dir && -d "${prefix}threads/shared")
-        $ext{"threads/shared"} = 'dynamic'
-    if (!$dir && -d "${prefix}Hash/Util/FieldHash")
-        $ext{"Hash/Util/FieldHash"} = 'dynamic'
+        %ext{$this_ext} = 'known' if %ext{?$this_ext} && $item =~ $no
 
 1
+# Local variables:
+# cperl-indent-level: 4
+# indent-tabs-mode: nil
+# End:
+#
+# ex: set ts=8 sts=4 sw=4 et:
