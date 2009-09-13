@@ -4695,6 +4695,7 @@ START_EXTERN_C
 #include "pad_i.h"
 #include "op_i.h"
 #include "utf8_i.h"
+#include "regcomp_i.h"
 
 /* PERL_GLOBAL_STRUCT_PRIVATE wants to keep global data like the
  * magic vtables const, but this is incompatible with SWIG which

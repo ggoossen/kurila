@@ -4470,6 +4470,12 @@ STATIC SV *	S_space_join_names_mortal(pTHX_ char *const *array)
 
 #endif
 
+PERL_INLINE_CALLCONV UV	Perl_UCHARAT(pTHX_ const char*)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_UCHARAT	\
+	assert(char)
+
+
 #if defined(PERL_IN_REGCOMP_C) || defined(PERL_DECL_PROT)
 STATIC regnode*	S_regclassfold(pTHX_ struct RExC_state_t *pRExC_state, U32 depth)
 			__attribute__nonnull__(pTHX_1);

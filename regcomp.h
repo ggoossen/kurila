@@ -405,7 +405,6 @@ struct regnode_charclass_class {	/* has [[:blah:]] classes */
 /*
  * Utility definitions.
  */
-static __inline__ UV UCHARAT(const char *p) {	return *(U8*)p; }
 
 #define EXTRA_SIZE(guy) ((sizeof(guy)-1)/sizeof(struct regnode))
 

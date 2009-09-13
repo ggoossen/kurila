@@ -1387,6 +1387,8 @@ sR	|int	|dooneliner	|NN const char *cmd|NN const char *filename
 s	|SV *	|space_join_names_mortal|NN char *const *array
 #endif
 
+ip	|UV	|UCHARAT|NN const char*
+
 #if defined(PERL_IN_REGCOMP_C) || defined(PERL_DECL_PROT)
 Es	|regnode*|regclassfold	|NN struct RExC_state_t *pRExC_state|U32 depth
 Es	|regnode*|regclassfold_value	|NN struct RExC_state_t *pRExC_state|UV value
