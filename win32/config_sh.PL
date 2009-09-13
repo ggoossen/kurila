@@ -43,7 +43,6 @@ while ((nelems @{$optref}) && $optref->[0] =~ m/^([\w_]+)=(.*)$/) {
 }
 
 FindExt::scan_ext("../ext");
-FindExt::scan_ext("ext") if -d 'ext';  # also look in win32/ext/ if it exists
 FindExt::set_static_extensions( <split ' ', %opt{?'static_ext'});
 
 %opt{+'nonxs_ext'}        = join(' ',FindExt::nonxs_ext()) || ' ';
