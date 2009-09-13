@@ -911,6 +911,11 @@ PERL_CALLCONV void	Perl_gp_tmprefcnt(pTHX_ GP* gp)
 	assert(gp)
 
 PERL_CALLCONV GP*	Perl_gp_ref(pTHX_ GP* gp);
+PERL_INLINE_CALLCONV AV*	Perl_GvAVn(pTHX_ GV* gv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_GVAVN	\
+	assert(gv)
+
 PERL_CALLCONV GV*	Perl_gv_AVadd(pTHX_ GV* gv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_GV_AVADD	\

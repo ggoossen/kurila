@@ -325,6 +325,9 @@
 #define gp_free			Perl_gp_free
 #define gp_tmprefcnt		Perl_gp_tmprefcnt
 #define gp_ref			Perl_gp_ref
+#ifdef PERL_CORE
+#define GvAVn			Perl_GvAVn
+#endif
 #define gv_AVadd		Perl_gv_AVadd
 #define gv_HVadd		Perl_gv_HVadd
 #define gv_IOadd		Perl_gv_IOadd
@@ -2528,6 +2531,9 @@
 #define gp_free(a)		Perl_gp_free(aTHX_ a)
 #define gp_tmprefcnt(a)		Perl_gp_tmprefcnt(aTHX_ a)
 #define gp_ref(a)		Perl_gp_ref(aTHX_ a)
+#ifdef PERL_CORE
+#define GvAVn(a)		Perl_GvAVn(aTHX_ a)
+#endif
 #define gv_AVadd(a)		Perl_gv_AVadd(aTHX_ a)
 #define gv_HVadd(a)		Perl_gv_HVadd(aTHX_ a)
 #define gv_IOadd(a)		Perl_gv_IOadd(aTHX_ a)
