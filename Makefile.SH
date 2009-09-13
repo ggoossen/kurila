@@ -59,7 +59,7 @@ true)
 	esac
 
 	pldlflags="$cccdlflags"
-	static_target='static_pic'
+	static_ldflags=''
 	case "${osname}${osvers}" in
 	next4*)
 		ld=libtool
@@ -175,7 +175,7 @@ EOT
 	;;
 
 *)	pldlflags=''
-	static_target='static'
+	static_ldflags='CCCDLFLAGS='
 	;;
 esac
 
@@ -272,8 +272,8 @@ SHRPENV = $shrpenv
 # if building a shared libperl.so that might later be linked into
 # another application, then it might be appropriate to also build static
 # extensions (usually just DynaLoader) with relocatable code (e.g. -fPIC
-# for GNU cc).  This is handled by make_ext.pl.
-STATIC = $static_target
+# for GNU cc).
+STATIC_LDFLAGS = $static_ldflags
 
 # The following is used to include the current directory in
 # the dynamic loader path you are building a shared libperl.
@@ -367,10 +367,8 @@ CCCMD    = `sh $(shellflags) cflags "optimize='$(OPTIMIZE)'" $@`
 
 CCCMDSRC = `sh $(shellflags) cflags "optimize='$(OPTIMIZE)'" $<`
 
-# we dont include lib/Config_git.pl here, as it causes circular dependencies
-CONFIGPM = lib/Config.pm lib/Config_heavy.pl
-# so we add it here:
-CONFIGPM_EXTRA = $(CONFIGPM) lib/Config_git.pl
+CONFIGPM_FROM_CONFIG_SH = lib/Config.pm lib/Config_heavy.pl
+CONFIGPM = $(CONFIGPM_FROM_CONFIG_SH) lib/Config_git.pl
 
 CONFIGPOD = lib/Config.pod
 
@@ -529,7 +527,7 @@ all: $(FIRSTMAKEFILE) miniperl$(EXE_EXT) miniperl extra.pods $(private) $(unidat
 
 .PHONY: all translators utilities
 
-git_version.h: miniperl$(EXE_EXT) make_patchnum.pl
+lib/Config_git.pl git_version.h: miniperl$(EXE_EXT) make_patchnum.pl
 	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_patchnum.pl
 
 # make sure that we recompile perl.c if the git version changes
@@ -916,10 +914,8 @@ preplibrary: miniperl$(EXE_EXT) $(CONFIGPM) lib/lib.pm $(PREPLIBRARY_LIBPERL)
 	@sh ./makedir lib/auto
 	$(MAKE) lib/re.pm
 
-$(CONFIGPOD): config.sh miniperl$(EXE_EXT) configpm Porting/Glossary
+$(CONFIGPM_FROM_CONFIG_SH) $(CONFIGPOD): config.sh miniperl$(EXE_EXT) configpm Porting/Glossary
 	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib configpm
-
-$(CONFIGPM): $(CONFIGPOD)
 
 lib/ExtUtils/Miniperl.pm: miniperlmain.c miniperl$(EXE_EXT) minimod.pl $(CONFIGPM)
 	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) minimod.pl > lib/ExtUtils/Miniperl.pm
@@ -1096,16 +1092,16 @@ manicheck:	FORCE
 # DynaLoader may be needed for extensions that use Makefile.PL.
 
 $(DYNALOADER):	miniperl$(EXE_EXT) preplibrary FORCE
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_ext.pl --target=$(STATIC) $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL)
+	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_ext.pl $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL) LINKTYPE=static $(STATIC_LDFLAGS)
 
 d_dummy $(dynamic_ext):	miniperl$(EXE_EXT) preplibrary $(DYNALOADER) FORCE
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_ext.pl --target=dynamic $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL)
+	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_ext.pl $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL) LINKTYPE=dynamic
 
 s_dummy $(static_ext):	miniperl$(EXE_EXT) preplibrary $(DYNALOADER) FORCE
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_ext.pl --target=$(STATIC) $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL)
+	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_ext.pl $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL) LINKTYPE=static $(STATIC_LDFLAGS)
 
 n_dummy $(nonxs_ext):	miniperl$(EXE_EXT) preplibrary FORCE
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_ext.pl --target=nonxs $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL)
+	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_ext.pl $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL)
 !NO!SUBS!
 
 $spitshell >>$Makefile <<EOF
