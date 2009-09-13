@@ -5,7 +5,7 @@ our $VERSION = '1.02'
 use warnings
 
 my $no = join('|',qw(GDBM_File ODBM_File NDBM_File DB_File
-		     VMS Syslog IPC-SysV Langinfo))
+		     VMS Sys-Syslog IPC-SysV I18N-Langinfo))
 $no = qr/^(?:$no)$/i
 
 my %ext
