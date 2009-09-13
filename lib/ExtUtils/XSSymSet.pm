@@ -1,127 +1,109 @@
-package ExtUtils::XSSymSet;
+package ExtUtils::XSSymSet
 
-our (, $VERSION, );
-$VERSION = '1.1';
+our $VERSION = '1.1'
 
-
-sub new { 
-  my@($pkg,$maxlen,$silent) =  @_;
-  $maxlen ||= 31;
-  $silent ||= 0;
-  my@($obj) = \%( '__M@xLen' => $maxlen, '__S!lent' => $silent );
-  bless $obj, $pkg;
-}
+sub new($pkg,$maxlen,$silent)
+  $maxlen ||= 31
+  $silent ||= 0
+  my $obj = \%: '__M@xLen' => $maxlen, '__S!lent' => $silent
+  return bless $obj, $pkg
 
 
-sub trimsym {
-  my@($self,$name,$maxlen,$silent) =  @_;
+sub trimsym($self,$name,$maxlen,$silent)
 
-  unless (defined $maxlen) {
-    if (ref $self) { $maxlen ||= $self->{?'__M@xLen'}; }
-    $maxlen ||= 31;
-  }
-  unless (defined $silent) {
-    if (ref $self) { $silent ||= $self->{?'__S!lent'}; }
-    $silent ||= 0;
-  }
-  return $name if (length $name +<= $maxlen);
+  unless (defined $maxlen)
+    if (ref $self)
+        $maxlen ||= $self->{?'__M@xLen'}
+    $maxlen ||= 31
+  unless (defined $silent)
+    if (ref $self) 
+        $silent ||= $self->{?'__S!lent'}
+    $silent ||= 0
 
-  my $trimmed = $name;
+  return $name if (length $name +<= $maxlen)
+
+  my $trimmed = $name
   # First, just try to remove duplicated delimiters
-  $trimmed =~ s/__/_/g;
-  if (length $trimmed +> $maxlen) {
+  $trimmed =~ s/__/_/g
+  if (length $trimmed +> $maxlen)
     # Next, all duplicated chars
-    $trimmed =~ s/(.)\1+/$1/g;
-    if (length $trimmed +> $maxlen) {
-      my $squeezed = $trimmed;
-      my@($xs,$prefix,$func) = $trimmed =~ m/^(XS_)?(.*)_([^_]*)$/;
-      $xs ||= '';
-      my $frac = 3; # replaces broken length-based calculations but w/same result
-      my $pat = '([^_])';
-      if (length $func +<= 12) {  # Try to preserve short function names
-        if ($frac +> 1) { $pat .= '[^A-Z_]{' . ($frac - 1) . '}'; }
-        $prefix =~ s/$pat/$1/g;
-        $squeezed = "$xs$prefix" . "_$func";
-        if (length $squeezed +> $maxlen) {
-          $pat =~ s/A-Z//;
-          $prefix =~ s/$pat/$1/g;
-          $squeezed = "$xs$prefix" . "_$func";
-        }
-      }
-      else { 
-        if ($frac +> 1) { $pat .= '[^A-Z_]{' . ($frac - 1) . '}'; }
-        $squeezed = "$prefix$func";
-        $squeezed =~ s/$pat/$1/g;
-        if (length "$xs$squeezed" +> $maxlen) {
-          $pat =~ s/A-Z//;
-          $squeezed =~ s/$pat/$1/g;
-        }
-        $squeezed = "$xs$squeezed";
-      }
-      if (length $squeezed +<= $maxlen) { $trimmed = $squeezed; }
-      else {
-        my $frac = int((length $trimmed - $maxlen) / length $trimmed + 0.5);
-        my $pat = '(.).{$frac}';
-        $trimmed =~ s/$pat/$1/g;
-      }
-    }
-  }
-  warn "Warning: long symbol $name\n\ttrimmed to $trimmed\n\t" unless $silent;
-  return $trimmed;
-}
+    $trimmed =~ s/(.)\1+/$1/g
+    if (length $trimmed +> $maxlen)
+      my $squeezed = $trimmed
+      my @: $xs,$prefix,$func = @: $trimmed =~ m/^(XS_)?(.*)_([^_]*)$/
+      $xs ||= ''
+      my $frac = 3 # replaces broken length-based calculations but w/same result
+      my $pat = '([^_])'
+      if (length $func +<= 12)  # Try to preserve short function names
+        if ($frac +> 1) $pat .= '[^A-Z_]{' . ($frac - 1) . '}'
+        $prefix =~ s/$pat/$1/g
+        $squeezed = "$xs$prefix" . "_$func"
+        if (length $squeezed +> $maxlen)
+          $pat =~ s/A-Z//
+          $prefix =~ s/$pat/$1/g
+          $squeezed = "$xs$prefix" . "_$func"
+      else
+        if ($frac +> 1) $pat .= '[^A-Z_]{' . ($frac - 1) . '}'
+        $squeezed = "$prefix$func"
+        $squeezed =~ s/$pat/$1/g
+        if (length "$xs$squeezed" +> $maxlen)
+          $pat =~ s/A-Z//
+          $squeezed =~ s/$pat/$1/g
+        $squeezed = "$xs$squeezed"
+
+      if (length $squeezed +<= $maxlen)
+          $trimmed = $squeezed
+      else
+        my $frac = int((length $trimmed - $maxlen) / length $trimmed + 0.5)
+        my $pat = '(.).{$frac}'
+        $trimmed =~ s/$pat/$1/g
+
+  warn "Warning: long symbol $name\n\ttrimmed to $trimmed\n\t" unless $silent
+  return $trimmed
 
 
-sub addsym {
-  my@($self,$sym,$maxlen,$silent) =  @_;
-  my $trimmed = $self->get_trimmed($sym);
+sub addsym($self,$sym,$maxlen,$silent)
+  my $trimmed = $self->get_trimmed($sym)
 
-  return $trimmed if defined $trimmed;
+  return $trimmed if defined $trimmed
 
-  $maxlen ||= $self->{?'__M@xLen'} || 31;
-  $silent ||= $self->{?'__S!lent'} || 0;    
-  $trimmed = $self->trimsym($sym,$maxlen,1);
-  if (exists $self->{$trimmed}) {
-    my@($i) = "00";
-    $trimmed = $self->trimsym($sym,$maxlen-3,$silent);
-    while (exists $self->{"$($trimmed)_$i"}) { $i++; }
+  $maxlen ||= $self->{?'__M@xLen'} || 31
+  $silent ||= $self->{?'__S!lent'} || 0    
+  $trimmed = $self->trimsym($sym,$maxlen,1)
+  if (exists $self->{$trimmed})
+    my $i = "00"
+    $trimmed = $self->trimsym($sym,$maxlen-3,$silent)
+    while (exists $self->{"$($trimmed)_$i"}) 
+        $i++
     warn "Warning: duplicate symbol $trimmed\n\tchanged to $($trimmed)_$i\n\t(original was $sym)\n\t"
-      unless $silent;
-    $trimmed .= "_$i";
-  }
-  elsif (not $silent and $trimmed ne $sym) {
-    warn "Warning: long symbol $sym\n\ttrimmed to $trimmed\n\t";
-  }
-  $self->{+$trimmed} = $sym;
-  $self->{'__N+Map'}->{+$sym} = $trimmed;
-  $trimmed;
-}
+      unless $silent
+    $trimmed .= "_$i"
+  elsif (not $silent and $trimmed ne $sym)
+    warn "Warning: long symbol $sym\n\ttrimmed to $trimmed\n\t"
+
+  $self->{+$trimmed} = $sym
+  $self->{'__N+Map'}->{+$sym} = $trimmed
+  $trimmed
 
 
-sub delsym {
-  my@($self,$sym) =  @_;
-  my $trimmed = $self->{'__N+Map'}->{?$sym};
-  if (defined $trimmed) {
-    delete $self->{'__N+Map'}->{$sym};
-    delete $self->{$trimmed};
-  }
-  $trimmed;
-}
+sub delsym($self,$sym)
+  my $trimmed = $self->{'__N+Map'}->{?$sym}
+  if (defined $trimmed)
+    delete $self->{'__N+Map'}->{$sym}
+    delete $self->{$trimmed}
+  $trimmed
 
 
-sub get_trimmed {
-  my@($self,$sym) =  @_;
-  $self->{'__N+Map'}->{?$sym};
-}
+sub get_trimmed($self,$sym)
+  $self->{'__N+Map'}->{?$sym}
 
 
-sub get_orig {
-  my@($self,$trimmed) =  @_;
-  $self->{?$trimmed};
-}
+sub get_orig($self,$trimmed)
+  $self->{?$trimmed}
 
 
-sub all_orig { (keys %{@_[0]->{?'__N+Map'}}); }
-sub all_trimmed { (grep { m/^\w+$/ } keys %{@_[0]}); }
+sub all_orig($self) keys $self->{?'__N+Map'}->%
+sub all_trimmed($self) grep { m/^\w+$/ }, keys $self->%
 
 __END__
 
