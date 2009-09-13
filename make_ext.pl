@@ -79,7 +79,7 @@ foreach (@extspec)
     if (m/^lib/)
         # Remove lib/auto prefix and /*.* suffix
         s{^lib/auto/}{}
-        s{[^/]*\.[^/]*$}{}
+        s{/[^/]+\.[^/]+$}{}
     elsif (m/^ext/)
         # Remove ext/ prefix and /pm_to_blib suffix
         s{^ext/}{}
