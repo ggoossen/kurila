@@ -815,7 +815,7 @@ package Maintainers;
 	'Sys::Syslog' =>
 		\%(
 		'MAINTAINER'	=> 'saper',
-		'FILES'		=> q[ext/Sys/Syslog],
+		'FILES'		=> q[ext/Sys-Syslog],
 		'CPAN'		=> 1,
 		),
 
