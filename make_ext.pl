@@ -204,11 +204,11 @@ sub build_extension($ext, $ext_dir, $return_dir, $perl, $lib_dir, $pass_through)
             # Inherited from make_ext.pl
             @cross = '-MCross'
             
-        my @perl = @: @run, $perl, "-I$lib_dir", @cross, 'Makefile.PL',
+        my @perl = @: < @run, $perl, "-I$lib_dir", < @cross, 'Makefile.PL',
                       'INSTALLDIRS=perl', 'INSTALLMAN3DIR=none',
                       < $pass_through
         print $^STDOUT, join(' ', @perl), "\n";
-        my $code = system @perl
+        my $code = system < @perl
         warn "$code from $ext_dir\'s Makefile.PL" if $code
 
         # Right. The reason for this little hack is that we're sitting inside
@@ -234,12 +234,12 @@ sub build_extension($ext, $ext_dir, $return_dir, $perl, $lib_dir, $pass_through)
 cd $ext_dir
 if test ! -f Makefile -a -f Makefile.old; then
     echo "Note: Using Makefile.old"
-    make -f Makefile.old $clean_target MAKE='@make' @pass_through
+    make -f Makefile.old $clean_target MAKE='$(join ' ', @make)' $(join ' ', @pass_through)
 else
     if test ! -f Makefile ; then
         echo "Warning: No Makefile!"
     fi
-    make $clean_target MAKE='@make' @pass_through
+    make $clean_target MAKE='$(join ' ', @make)' $(join ' ', @pass_through)
 fi
 cd $return_dir
 EOS
