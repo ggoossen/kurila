@@ -108,6 +108,9 @@ open my $tmph_fh, "<", $tmph_file or die "Can't open $tmph_file: $^OS_ERROR\n"
 chmod 0644, $h_file
 open my $h_fh, ">", "$h_file" or die "Can't open $h_file: $^OS_ERROR\n"
 my $endcore_done = 0
+# Token macros need to be generated manually on bison 2.4
+my $gather_tokens = ($version =~ m/\b2\.4\b/ ?? undef !! 0)
+my $tokens
 while ( ~< $tmph_fh->*)
     print $h_fh, "#ifdef PERL_CORE\n" if iohandle::input_line_number($tmph_fh) == 1
     if (!$endcore_done and m/YYSTYPE_IS_DECLARED/)
@@ -115,6 +118,16 @@ while ( ~< $tmph_fh->*)
         $endcore_done = 1
 
     next if m/^#line \d+ ".*"/
+    if (not defined $gather_tokens)
+        $gather_tokens = 1 if m/^\s* enum \s* yytokentype \s* \{/x
+    elsif ($gather_tokens)
+       if (m/^\# \s* endif/x) # The #endif just after the end of the token enum
+           $gather_tokens = 0
+           $_ .= "\n/* Tokens.  */\n$tokens"
+       else
+           my @: ?$tok, ?$val = @: m/(\w+) \s* = \s* (\d+)/x
+           $tokens .= "#define $tok $val\n" if $tok
+
     print $h_fh, $_
 
 close $tmph_fh
