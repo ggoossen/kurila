@@ -285,9 +285,9 @@ get_regstr_from(HKEY hkey, const char *valuename, SV **svp)
 		*svp = sv_2mortal(newSVpvn("",0));
 	    SvGROW(*svp, datalen);
 	    retval = RegQueryValueEx(handle, valuename, 0, NULL,
-				     (PBYTE)SvPVX(*svp), &datalen);
+				     (PBYTE)SvPVX_mutable(*svp), &datalen);
 	    if (retval == ERROR_SUCCESS) {
-		str = SvPVX(*svp);
+		str = SvPVX_mutable(*svp);
 		SvCUR_set(*svp,datalen-1);
 	    }
 	}
@@ -362,10 +362,10 @@ get_emd_part(SV **prev_pathp, char *trailing_path, ...)
 	dTHX;
 	if (!*prev_pathp)
 	    *prev_pathp = sv_2mortal(newSVpvn("",0));
-	else if (SvPVX(*prev_pathp))
+	else if (SvPVX_const(*prev_pathp))
 	    sv_catpvn(*prev_pathp, ";", 1);
 	sv_catpv(*prev_pathp, mod_name);
-	return SvPVX(*prev_pathp);
+	return SvPVX_mutable(*prev_pathp);
     }
 
     return NULL;
@@ -417,14 +417,14 @@ win32_get_xlib(const char *pl, const char *xlib, const char *libname)
     if (!sv1 && !sv2)
 	return NULL;
     if (!sv1)
-	return SvPVX(sv2);
+	return SvPVX_mutable(sv2);
     if (!sv2)
-	return SvPVX(sv1);
+	return SvPVX_mutable(sv1);
 
     sv_catpvn(sv1, ";", 1);
     sv_catsv(sv1, sv2);
 
-    return SvPVX(sv1);
+    return SvPVX_mutable(sv1);
 }
 
 char *
@@ -1726,7 +1726,7 @@ win32_getenv(const char *name)
 	curitem = sv_2mortal(newSVpvn("", 0));
         do {
             SvGROW(curitem, needlen+1);
-            needlen = GetEnvironmentVariableA(name,SvPVX(curitem),
+            needlen = GetEnvironmentVariableA(name,SvPVX_mutable(curitem),
                                               needlen);
         } while (needlen >= SvLEN(curitem));
         SvCUR_set(curitem, needlen);
@@ -1738,7 +1738,7 @@ win32_getenv(const char *name)
 	    (void)get_regstr(name, &curitem);
     }
     if (curitem && SvCUR(curitem))
-	return SvPVX(curitem);
+	return SvPVX_mutable(curitem);
 
     return NULL;
 }
