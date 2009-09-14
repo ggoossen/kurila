@@ -752,7 +752,7 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 		else if (SvIOK(ary[i])) {
 		    PerlIO_printf(file, "%"IVdf, (IV)I_SvIV(ary[i]));
 		}
-		PerlIO_write(file, STR_WITH_LEN(" "));
+		PerlIO_write(file, " ", 1);
 	    }
 	}
 	PerlIO_printf(file, "\n");
@@ -1432,7 +1432,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 		else if (SvIOK(ary[i])) {
 		    PerlIO_printf(file, "%"IVdf, (IV)I_SvIV(ary[i]));
 		}
-		PerlIO_write(file, STR_WITH_LEN(" "));
+		PerlIO_write(file, " ", 1);
 	    }
 	}
 	PerlIO_printf(file, "\n");
