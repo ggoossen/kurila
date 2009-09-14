@@ -4618,7 +4618,7 @@ struct tempsym; /* defined in pp_pack.c */
 #  if defined(__GNUC__)
 #    define PERL_INLINE_CALLCONV static __inline__
 #  else 
-#    if defined(__VC32__)
+#    if defined(WIN32)
 #      define PERL_INLINE_CALLCONV __inline
 #    else
 #      error Unknown how to define inline calling convention
