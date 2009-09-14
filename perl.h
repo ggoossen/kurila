@@ -4615,8 +4615,17 @@ struct tempsym; /* defined in pp_pack.c */
 #  endif
 #endif
 #ifndef PERL_INLINE_CALLCONV
-#  define PERL_INLINE_CALLCONV static __inline__
+#  if defined(__GNUC__)
+#    define PERL_INLINE_CALLCONV static __inline__
+#  else 
+#    if defined(__VC32__)
+#      define PERL_INLINE_CALLCONV __inline
+#    else
+#      error Unknown how to define inline calling convention
+#    endif
+#  endif
 #endif
+
 #undef PERL_CKDEF
 #undef PERL_PPDEF
 #define PERL_CKDEF(s)	PERL_CALLCONV OP *s (pTHX_ OP *o);
