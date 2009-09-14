@@ -665,6 +665,7 @@ MICROCORE_SRC	=		\
 		..\mg.c		\
 		..\numeric.c	\
 		..\op.c		\
+		..\op_context.c	\
 		..\pad.c	\
 		..\perl.c	\
 		..\perlapi.c	\
@@ -674,6 +675,7 @@ MICROCORE_SRC	=		\
 		..\pp_hot.c	\
 		..\pp_pack.c	\
 		..\pp_sort.c	\
+		..\pp_re.c	\
 		..\pp_sys.c	\
 		..\reentr.c	\
 		..\regcomp.c	\
@@ -683,6 +685,12 @@ MICROCORE_SRC	=		\
 		..\sv.c		\
 		..\toke.c	\
 		..\universal.c	\
+		..\libenv.c	\
+		..\libsignals.c	\
+		..\libversion.c	\
+		..\liberror.c	\
+		..\libutf8.c	\
+		..\libinternals.c	\
 		..\utf8.c	\
 		..\util.c	\
 		..\xsutils.c
