@@ -21,7 +21,7 @@ while (@ARGV)
     if ($flag =~ s/^CC_FLAGS=/ /)
         for my $fflag ($flag =~ m/(?:^|\s)-D(\S+)/g)
             $fflag     .= '=1' unless $fflag =~ m/^(\w+)=/
-            %define{$1} = $2   if $fflag =~ m/^(\w+)=(.+)$/
+            %define{+$1} = $2   if $fflag =~ m/^(\w+)=(.+)$/
         next
 
     %define{+$1} = 1 if ($flag =~ m/^-D(\w+)$/)
@@ -35,8 +35,8 @@ my @PLATFORM = qw(aix win32 wince os2 MacOS netware)
 my %PLATFORM
 %PLATFORM{[@PLATFORM]} = $@
 
-defined $PLATFORM || die "PLATFORM undefined, must be one of: @PLATFORM\n"
-exists %PLATFORM{$PLATFORM} || die "PLATFORM must be one of: @PLATFORM\n"
+defined $PLATFORM || die "PLATFORM undefined, must be one of: $(join ' ', @PLATFORM)\n"
+exists %PLATFORM{$PLATFORM} || die "PLATFORM must be one of: $(join ' ', @PLATFORM)\n"
 
 if ($PLATFORM eq 'win32' or $PLATFORM eq 'wince' or $PLATFORM eq "aix")
         # Add the compile-time options that miniperl was built with to %define.
@@ -49,7 +49,7 @@ if ($PLATFORM eq 'win32' or $PLATFORM eq 'wince' or $PLATFORM eq "aix")
         # minimal configs that don't include any of those options.
         my $opts = ($PLATFORM eq 'wince' ?? '-MCross' !! '') # for wince need Cross.pm to get Config.pm
         my $config = `$^EXECUTABLE_NAME $opts -Ilib -V`
-        my @: $options = @: $config =~ m/^  Compile-time options: (.*?)\n^  \S/ms
+        my @: ?$options = @: $config =~ m/^  Compile-time options: (.*?)\n^  \S/ms
         $options =~ s/\s+/ /g
         print $^STDERR, "Options: ($options)\n"
         foreach (split m/\s+/, $options)
@@ -77,13 +77,13 @@ if ($PLATFORM eq 'aix')
     1 # Nothing for now.
 elsif ($PLATFORM =~ m/^win(?:32|ce)$/ || $PLATFORM eq 'netware')
     $CCTYPE = "MSVC" unless defined $CCTYPE
-    foreach (@: $intrpvar_h, $perlvars_h, $global_sym
-                $pp_sym, $globvar_sym, $perlio_sym)
-        s!^!..\\!
+    foreach (@: \$intrpvar_h, \$perlvars_h, \$global_sym
+                \$pp_sym, \$globvar_sym, \$perlio_sym)
+        $_->$ =~ s!^!..\\!
 elsif ($PLATFORM eq 'MacOS')
-    foreach (@: $intrpvar_h, $perlvars_h, $global_sym,
-                $pp_sym, $globvar_sym, $perlio_sym)
-        s!^!::!
+    foreach (@: \$intrpvar_h, \$perlvars_h, \$global_sym,
+                \$pp_sym, \$globvar_sym, \$perlio_sym)
+        $_->$ =~ s!^!::!
 
 unless ($PLATFORM eq 'win32' || $PLATFORM eq 'wince' || $PLATFORM eq 'MacOS' || $PLATFORM eq 'netware')
     open(my $cfg_fh, "<", $config_sh) || die "Cannot open $config_sh: $^OS_ERROR\n"
@@ -107,17 +107,17 @@ if ($PLATFORM eq 'win32' || $PLATFORM eq 'wince')
 
 open(my $cfg_fh, "<", $config_h) || die "Cannot open $config_h: $^OS_ERROR\n"
 while ( ~< $cfg_fh)
-    %define{$1} = 1 if m/^\s*#\s*define\s+(MYMALLOC)\b/
-    %define{$1} = 1 if m/^\s*#\s*define\s+(MULTIPLICITY)\b/
-    %define{$1} = 1 if m/^\s*#\s*define\s+(PERL_\w+)\b/
-    %define{$1} = 1 if m/^\s*#\s*define\s+(USE_\w+)\b/
-    %define{$1} = 1 if m/^\s*#\s*define\s+(HAS_\w+)\b/
+    %define{+$1} = 1 if m/^\s*#\s*define\s+(MYMALLOC)\b/
+    %define{+$1} = 1 if m/^\s*#\s*define\s+(MULTIPLICITY)\b/
+    %define{+$1} = 1 if m/^\s*#\s*define\s+(PERL_\w+)\b/
+    %define{+$1} = 1 if m/^\s*#\s*define\s+(USE_\w+)\b/
+    %define{+$1} = 1 if m/^\s*#\s*define\s+(HAS_\w+)\b/
 close($cfg_fh)
 
 # perl.h logic duplication begins
 
 if (%define{PERL_IMPLICIT_SYS})
-    %define{PL_OP_SLAB_ALLOC} = 1
+    %define{+PL_OP_SLAB_ALLOC} = 1
 
 %define{PERL_IMPLICIT_CONTEXT} ||=
     %define{USE_ITHREADS} ||
@@ -131,7 +131,7 @@ my $sym_ord = 0
 print $^STDERR, "Defines: (" . join(' ', sort keys %define) . ")\n"
 
 if ($PLATFORM =~ m/^win(?:32|ce)$/)
-    (my $dll = (%define{PERL_DLL} || "perl511")) =~ s/\.dll$//i
+    (my $dll = (%define{?PERL_DLL} || "perl511")) =~ s/\.dll$//i
     print $^STDOUT, "LIBRARY $dll\n"
     # The DESCRIPTION module definition file statement is not supported
     # by VC7 onwards.
@@ -190,13 +190,13 @@ my %export
 
 sub skip_symbols($list)
     foreach my $symbol ($list)
-        %skip{$symbol} = 1
+        %skip{+$symbol} = 1
 
 sub emit_symbols($list)
     foreach my $symbol ($list)
         my $skipsym = $symbol
         # XXX hack
-        if (%define{MULTIPLICITY})
+        if (%define{?MULTIPLICITY})
             $skipsym =~ s/^Perl_[GIT](\w+)_ptr$/PL_$1/
         emit_symbol($symbol) unless exists %skip{$skipsym}
 
@@ -521,7 +521,7 @@ elsif ($PLATFORM eq 'netware')
                         PerlIO_perlio
                         )
 
-unless (%define{'DEBUGGING'})
+unless (%define{?'DEBUGGING'})
     skip_symbols qw(
                     Perl_deb_growlevel
                     Perl_debop
@@ -536,12 +536,12 @@ unless (%define{'DEBUGGING'})
                     PL_watch_pvx
                     )
 
-if (%define{'PERL_IMPLICIT_CONTEXT'})
+if (%define{?'PERL_IMPLICIT_CONTEXT'})
     skip_symbols qw(
                     PL_sig_sv
                     )
 
-if (%define{'PERL_IMPLICIT_SYS'})
+if (%define{?'PERL_IMPLICIT_SYS'})
     skip_symbols qw(
                     Perl_getenv_len
                     Perl_my_popen
@@ -560,17 +560,17 @@ else
                     PL_Proc
                     )
 
-unless (%define{'PERL_OLD_COPY_ON_WRITE'})
+unless (%define{?'PERL_OLD_COPY_ON_WRITE'})
     skip_symbols qw(
                     Perl_sv_setsv_cow
                   )
 
-unless (%define{'USE_REENTRANT_API'})
+unless (%define{?'USE_REENTRANT_API'})
     skip_symbols qw(
                     PL_reentrant_buffer
                     )
 
-if (%define{'MYMALLOC'})
+if (%define{?'MYMALLOC'})
     emit_symbols qw(
                     Perl_dump_mstats
                     Perl_get_mstats
@@ -593,7 +593,7 @@ else
                     MallocCfgP_ptr
                     )
 
-if (%define{'PERL_USE_SAFE_PUTENV'})
+if (%define{?'PERL_USE_SAFE_PUTENV'})
     skip_symbols qw(
                    PL_use_safe_putenv
                   )
@@ -670,7 +670,7 @@ skip_symbols qw(
                     Perl_newPADOP
                     )
 
-unless (%define{'PERL_IMPLICIT_CONTEXT'})
+unless (%define{?'PERL_IMPLICIT_CONTEXT'})
     skip_symbols qw(
                     PL_my_ctx_mutex
                     PL_my_cxt_index
@@ -694,16 +694,16 @@ unless (%define{'PERL_IMPLICIT_CONTEXT'})
                     Perl_my_cxt_index
                     )
 
-unless (%define{'PERL_IMPLICIT_SYS'})
+unless (%define{?'PERL_IMPLICIT_SYS'})
     skip_symbols qw(
                     perl_alloc_using
                     perl_clone_using
                     )
 
-unless (%define{'FAKE_THREADS'})
+unless (%define{?'FAKE_THREADS'})
     skip_symbols qw(PL_curthr)
 
-unless (%define{'PL_OP_SLAB_ALLOC'})
+unless (%define{?'PL_OP_SLAB_ALLOC'})
     skip_symbols qw(
                      PL_OpPtr
                      PL_OpSlab
@@ -712,50 +712,50 @@ unless (%define{'PL_OP_SLAB_ALLOC'})
                      Perl_Slab_Free
                     )
 
-unless (%define{'PERL_DEBUG_READONLY_OPS'})
+unless (%define{?'PERL_DEBUG_READONLY_OPS'})
     skip_symbols qw(
                     PL_slab_count
                     PL_slabs
                   )
 
-unless (%define{'THREADS_HAVE_PIDS'})
+unless (%define{?'THREADS_HAVE_PIDS'})
     skip_symbols qw(PL_ppid)
 
-unless (%define{'PERL_NEED_APPCTX'})
+unless (%define{?'PERL_NEED_APPCTX'})
     skip_symbols qw(
                     PL_appctx
                     )
 
-unless (%define{'PERL_NEED_TIMESBASE'})
+unless (%define{?'PERL_NEED_TIMESBASE'})
     skip_symbols qw(
                     PL_timesbase
                     )
 
-unless (%define{'DEBUG_LEAKING_SCALARS'})
+unless (%define{?'DEBUG_LEAKING_SCALARS'})
     skip_symbols qw(
                     PL_sv_serial
                     )
 
-unless (%define{'PERL_DONT_CREATE_GVSV'})
+unless (%define{?'PERL_DONT_CREATE_GVSV'})
     skip_symbols qw(
                      Perl_gv_SVadd
                     )
-if (%define{'SPRINTF_RETURNS_STRLEN'})
+if (%define{?'SPRINTF_RETURNS_STRLEN'})
     skip_symbols qw(
                      Perl_my_sprintf
                     )
-unless (%define{'PERL_USES_PL_PIDSTATUS'})
+unless (%define{?'PERL_USES_PL_PIDSTATUS'})
     skip_symbols qw(
                      Perl_pidgone
                      PL_pidstatus
                     )
 
-unless (%define{'PERL_TRACK_MEMPOOL'})
+unless (%define{?'PERL_TRACK_MEMPOOL'})
     skip_symbols qw(
                      PL_memory_debug_header
                     )
 
-if (%define{'PERL_MAD'})
+if (%define{?'PERL_MAD'})
     skip_symbols qw(
                      PL_nextval
                      PL_nexttype
@@ -794,29 +794,29 @@ else
                     Perl_op_xmldump
                     )
 
-unless (%define{'MULTIPLICITY'})
+unless (%define{?'MULTIPLICITY'})
     skip_symbols qw(
                     PL_interp_size
                     PL_interp_size_5_10_0
                     )
 
-unless (%define{'PERL_GLOBAL_STRUCT'})
+unless (%define{?'PERL_GLOBAL_STRUCT'})
     skip_symbols qw(
                     PL_global_struct_size
                     )
 
-unless (%define{'PERL_GLOBAL_STRUCT_PRIVATE'})
+unless (%define{?'PERL_GLOBAL_STRUCT_PRIVATE'})
     skip_symbols qw(
                     PL_my_cxt_keys
                     Perl_my_cxt_index
                     )
 
-unless (%define{'d_mmap'})
+unless (%define{?'d_mmap'})
     skip_symbols qw(
                     PL_mmap_page_size
                     )
 
-if (%define{'d_sigaction'})
+if (%define{?'d_sigaction'})
     skip_symbols qw(
                     PL_sig_trapped
                     )
@@ -838,9 +838,9 @@ sub readvar
         # wrong.
         push(@syms, $proc->($1,$2,$3)) if m/\bPERLVAR(A?I?S?C?)\(([IGT])(\w+)/
     close($vars_fh);
-    return \@syms;
+    return @syms;
 
-if (%define{'PERL_GLOBAL_STRUCT'})
+if (%define{?'PERL_GLOBAL_STRUCT'})
     my $global = readvar($perlvars_h);
     skip_symbols $global;
     emit_symbol('Perl_GetVars');
@@ -936,7 +936,7 @@ if (%define{'USE_PERLIO'})
     push @syms, $perlio_sym;
 
     # This part is then dependent on how the abstraction is implemented
-    if (%define{'USE_SFIO'})
+    if (%define{?'USE_SFIO'})
         # Old legacy non-stdio "PerlIO"
         skip_symbols \@layer_syms;
         skip_symbols qw(perlsio_binmode)
@@ -1015,7 +1015,7 @@ if (%define{'USE_PERLIO'})
                          )
     else
         # PerlIO with layers - export implementation
-        emit_symbols \@layer_syms;
+        emit_symbols @layer_syms;
         emit_symbols qw(perlsio_binmode)
 
     skip_symbols qw(
@@ -1025,7 +1025,7 @@ else
         # -Uuseperlio
         # Skip the PerlIO layer symbols - although
         # nothing should have exported them anyway.
-        skip_symbols \@layer_syms;
+        skip_symbols @layer_syms;
         skip_symbols qw(
                         perlsio_binmode
                         PL_def_layerlist
@@ -1042,7 +1042,7 @@ else
         # are handled in <DATA>
 
 for my $syms (@syms)
-    open (my $global_fh, "<$syms") || die "failed to open $syms: $^OS_ERROR\n";
+    open (my $global_fh, "<", $syms) || die "failed to open $syms: $^OS_ERROR\n";
     while ( ~< $global_fh)
         next if ! m/^[A-Za-z]/
         # Functions have a Perl_ prefix
@@ -1055,7 +1055,7 @@ for my $syms (@syms)
 
 # variables
 
-if (%define{'MULTIPLICITY'})
+if (%define{?'MULTIPLICITY'})
     for my $f (@: $perlvars_h, $intrpvar_h)
         my $glob = readvar($f, sub { "Perl_" . @_[1] . @_[2] . "_ptr" });
         emit_symbols $glob;
@@ -1064,10 +1064,10 @@ if (%define{'MULTIPLICITY'})
         my $glob = readvar($perlvars_h);
         emit_symbols $glob;
 else
-    unless (%define{'PERL_GLOBAL_STRUCT'})
+    unless (%define{?'PERL_GLOBAL_STRUCT'})
         my $glob = readvar($perlvars_h);
         emit_symbols $glob;
-    unless (%define{'MULTIPLICITY'})
+    unless (%define{?'MULTIPLICITY'})
         my $glob = readvar($intrpvar_h);
         emit_symbols $glob;
 
@@ -1439,7 +1439,7 @@ EOP
 sub emit_symbol
     my $symbol = shift;
     chomp($symbol);
-    %export{$symbol} = 1;
+    %export{+$symbol} = 1;
 
 sub output_symbol
     my $symbol = shift;
