@@ -2756,8 +2756,9 @@ PERL_CALLCONV OP*	Perl_scalarvoid(pTHX_ OP* o)
 #define PERL_ARGS_ASSERT_SCALARVOID	\
 	assert(o)
 
-PERL_CALLCONV OP*	Perl_op_mod_assign(pTHX_ OP* operator, OP** operandp, I32 type);
-
+PERL_CALLCONV OP*	Perl_op_mod_assign(pTHX_ OP* operator, OP** operandp, I32 type)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_OP_MOD_ASSIGN	\
 	assert(operator); assert(operandp)
 
@@ -4984,6 +4985,34 @@ STATIC PTR_TBL_ENT_t *	S_ptr_table_find(PTR_TBL_t *const tbl, const void *const 
 #endif
 
 #if defined(PERL_IN_TOKE_C) || defined(PERL_DECL_PROT)
+STATIC bool	S_closing_bracket(pTHX);
+STATIC void	S_start_list_indent(pTHX_ char *s)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_START_LIST_INDENT	\
+	assert(s)
+
+STATIC void	S_start_statement_indent(pTHX_ char *s)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_START_STATEMENT_INDENT	\
+	assert(s)
+
+STATIC void	S_stop_statement_indent(pTHX);
+STATIC bool	S_close_layout_lists(pTHX);
+STATIC int	S_process_layout(pTHX_ char *s)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_PROCESS_LAYOUT	\
+	assert(s)
+
+STATIC char *	S_process_shebang(pTHX_ char *s)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_PROCESS_SHEBANG	\
+	assert(s)
+
+STATIC char *	S_skip_pod(pTHX_ char *s)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SKIP_POD	\
+	assert(s)
+
 STATIC void	S_check_uni(pTHX);
 STATIC void	S_force_next(pTHX_ I32 type);
 STATIC char*	S_force_version(pTHX_ char *s)

@@ -1447,6 +1447,14 @@
 #endif
 #if defined(PERL_IN_TOKE_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
+#define closing_bracket		S_closing_bracket
+#define start_list_indent	S_start_list_indent
+#define start_statement_indent	S_start_statement_indent
+#define stop_statement_indent	S_stop_statement_indent
+#define close_layout_lists	S_close_layout_lists
+#define process_layout		S_process_layout
+#define process_shebang		S_process_shebang
+#define skip_pod		S_skip_pod
 #define check_uni		S_check_uni
 #define force_next		S_force_next
 #define force_version		S_force_version
@@ -3660,6 +3668,14 @@
 #endif
 #if defined(PERL_IN_TOKE_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
+#define closing_bracket()	S_closing_bracket(aTHX)
+#define start_list_indent(a)	S_start_list_indent(aTHX_ a)
+#define start_statement_indent(a)	S_start_statement_indent(aTHX_ a)
+#define stop_statement_indent()	S_stop_statement_indent(aTHX)
+#define close_layout_lists()	S_close_layout_lists(aTHX)
+#define process_layout(a)	S_process_layout(aTHX_ a)
+#define process_shebang(a)	S_process_shebang(aTHX_ a)
+#define skip_pod(a)		S_skip_pod(aTHX_ a)
 #define check_uni()		S_check_uni(aTHX)
 #define force_next(a)		S_force_next(aTHX_ a)
 #define force_version(a)	S_force_version(aTHX_ a)

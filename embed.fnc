@@ -1556,7 +1556,7 @@ sRn	|PTR_TBL_ENT_t *|ptr_table_find|NN PTR_TBL_t *const tbl|NULLOK const void *c
 #endif
 
 #if defined(PERL_IN_TOKE_C) || defined(PERL_DECL_PROT)
-s	|void	|closing_bracket
+s	|bool	|closing_bracket
 s	|void	|start_list_indent|NN char *s
 s	|void	|start_statement_indent|NN char *s
 s	|void	|stop_statement_indent
