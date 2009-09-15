@@ -228,7 +228,7 @@ PP(pp_magicsv)
     const OPFLAGS op_flags = PL_op->op_flags;
     const char* name = SvPVX_const(cSVOP_sv);
     if (PL_op->op_private & OPpLVAL_INTRO) {
-	Perl_save_set_magicsv(cSVOP_sv);
+	Perl_save_set_magicsv(aTHX_ cSVOP_sv);
     }
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {
@@ -1295,7 +1295,7 @@ PP(pp_entersub_targargs)
     SV* cv;
     SV* args = PAD_SVl(PL_op->op_targ);
     if ( ! SvAVOK(args) )
-	DIE("interneal error: args is expected to be an array");
+	Perl_croak(aTHX_ "interneal error: args is expected to be an array");
     PUSHMARK(SP);
     {
 	AV *const av = svTav(args);

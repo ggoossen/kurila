@@ -1267,7 +1267,7 @@ Perl_scope_tmprefcnt(pTHX)
 	    break;
 	case SAVEt_NSTAB:
 	    gv = (GV*)SSPOPPTR;
-	    Perl_sv_tmprefcnt((SV*)gv);
+	    sv_tmprefcnt_update((SV*)gv);
 	    break;
 	case SAVEt_DESTRUCTOR:
 	    ptr = SSPOPPTR;

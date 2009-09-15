@@ -80,12 +80,11 @@ character will be returned if it is valid, otherwise 0.
 
 =cut */
 STRLEN
-Perl_is_utf8_char(pTHX_ const char *s)
+Perl_is_utf8_char(const char *s)
 {
     const STRLEN len = UTF8SKIP(s);
 
     PERL_ARGS_ASSERT_IS_UTF8_CHAR;
-    PERL_UNUSED_CONTEXT;
     if (IS_UTF8_CHAR_FAST(len)) {
         return (
             len == 1 ? IS_UTF8_CHAR_1((U8*)s) :

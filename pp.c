@@ -3856,9 +3856,9 @@ PP(pp_expand)
 {
     dSP;
     if (SvHVOK(TOPs))
-	return Perl_pp_hashexpand();
+	return Perl_pp_hashexpand(aTHX);
     else
-	return Perl_pp_arrayexpand();
+	return Perl_pp_arrayexpand(aTHX);
 }
 
 PP(pp_enter_arrayexpand_assign)
@@ -4303,7 +4303,7 @@ PP(pp_shift)
     SV * const avsv = POPs;
 
     if( ! SvAVOK(avsv) )
-	Perl_croak(aTHX "shift expected an ARRAY not %s", Ddesc(avsv));
+	Perl_croak(aTHX_ "shift expected an ARRAY not %s", Ddesc(avsv));
 
     {
 	AV* const av = svTav(avsv);

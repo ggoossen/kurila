@@ -1,5 +1,5 @@
 
 UV
-Perl_UCHARAT(const char *p) {
+Perl_UCHARAT(pTHX_ const char *p) {
     return *(U8*)p;
 }

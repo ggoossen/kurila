@@ -1,7 +1,7 @@
 
 /* Enter a block. */
 PERL_CONTEXT * 
-Perl_push_block(U8 t, SV** sp, U8 gimme) {
+Perl_push_block(pTHX_ U8 t, SV** sp, U8 gimme) {
     PERL_CONTEXT *cx;
     HV *new_dynascope;
     PERL_ARGS_ASSERT_PUSH_BLOCK;
@@ -29,7 +29,7 @@ Perl_push_block(U8 t, SV** sp, U8 gimme) {
 }
 
 PERL_CONTEXT * 
-Perl_pop_block() {
+Perl_pop_block(pTHX) {
     PERL_CONTEXT * cx;
     SV** onleave_ref = hv_fetchs(svThv(PL_dynamicscope), "onleave", 0);
     if (onleave_ref && SvAVOK(*onleave_ref)) {
@@ -52,7 +52,7 @@ Perl_pop_block() {
     return cx;
 }
 
-void Perl_cx_free_eval(PERL_CONTEXT* cx) {
+void Perl_cx_free_eval(pTHX_ PERL_CONTEXT* cx) {
     PERL_ARGS_ASSERT_CX_FREE_EVAL;
     PL_in_eval = CxOLD_IN_EVAL(cx);
     ROOTOPcpNULL(PL_eval_root);
@@ -61,7 +61,7 @@ void Perl_cx_free_eval(PERL_CONTEXT* cx) {
         sv_2mortal(cx->blk_eval.old_namesv);
 }
 
-void Perl_push_stack(I32 type, SV*** spp)
+void Perl_push_stack(pTHX_ I32 type, SV*** spp)
 {
     SV** sp;
     PERL_SI *next = PL_curstackinfo->si_next;
@@ -84,7 +84,7 @@ void Perl_push_stack(I32 type, SV*** spp)
     SET_MARK_OFFSET;		
 }
 
-void Perl_pop_stack()
+void Perl_pop_stack(pTHX)
 {
     dSP;								
     PERL_SI * const prev = PL_curstackinfo->si_prev;            

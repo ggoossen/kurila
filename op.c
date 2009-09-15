@@ -4651,7 +4651,7 @@ Perl_ck_glob(pTHX_ OP *o)
     }
 
     if ( ! (gv && GvCVu(gv) && GvIMPORTED_CV(gv)) ) {
-	DIE("Failed loading glob routine");
+	Perl_croak(aTHX_ "Failed loading glob routine");
     }
 
     append_elem(OP_GLOB, o,
@@ -5926,7 +5926,7 @@ const_sv_xsub(pTHX_ CV* cv)
 }
 
 void
-Perl_rootop_ll_tmprefcnt() {
+Perl_rootop_ll_tmprefcnt(pTHX) {
     ROOTOP* rootop;
     rootop = PL_rootop_ll;
     while (rootop) {

@@ -2458,7 +2458,7 @@ PP(pp_fttty)
     else if (SvROK(TOPs) && SvIOOK(SvRV(TOPs)))
 	io = svTio(SvRV(POPs));
     else
-	Perl_croak(aTHX "%s expected a io not a %s",
+	Perl_croak(aTHX_ "%s expected a io not a %s",
 	    OP_DESC(PL_op), Ddesc(TOPs));
 
     if (io && IoIFP(io))
@@ -2525,7 +2525,7 @@ PP(pp_fttext)
 	sv_setpvs(PL_statname, "");
 	if (io && IoIFP(io)) {
 	    if (! PerlIO_has_base(IoIFP(io)))
-		DIE(aTHX_ "-T and -B not implemented on filehandles");
+		Perl_croak(aTHX_ "-T and -B not implemented on filehandles");
 	    PL_laststatval = PerlLIO_fstat(PerlIO_fileno(IoIFP(io)), &PL_statcache);
 	    if (PL_laststatval < 0)
 		RETPUSHUNDEF;

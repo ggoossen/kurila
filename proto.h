@@ -1348,8 +1348,8 @@ PERL_CALLCONV bool	Perl_is_uni_xdigit_lc(pTHX_ UV c)
 			__attribute__warn_unused_result__
 			__attribute__pure__;
 
-PERL_INLINE_CALLCONV STRLEN	Perl_is_utf8_char(pTHX_ const char *s)
-			__attribute__nonnull__(pTHX_1);
+PERL_INLINE_CALLCONV STRLEN	Perl_is_utf8_char(const char *s)
+			__attribute__nonnull__(1);
 #define PERL_ARGS_ASSERT_IS_UTF8_CHAR	\
 	assert(s)
 
@@ -2756,9 +2756,8 @@ PERL_CALLCONV OP*	Perl_scalarvoid(pTHX_ OP* o)
 #define PERL_ARGS_ASSERT_SCALARVOID	\
 	assert(o)
 
-PERL_CALLCONV OP*	Perl_op_mod_assign(pTHX_ OP* operator, OP** operandp, I32 type)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
+PERL_CALLCONV OP*	Perl_op_mod_assign(pTHX_ OP* operator, OP** operandp, I32 type);
+
 #define PERL_ARGS_ASSERT_OP_MOD_ASSIGN	\
 	assert(operator); assert(operandp)
 
@@ -5198,8 +5197,8 @@ PERL_CALLCONV bool	Perl_vdie_common(pTHX_ SV *msv, bool warn)
 STATIC NV	S_mulexp10(NV value, I32 exponent);
 #endif
 
-PERL_INLINE_CALLCONV bool	Perl_UTF8_IS_CONTINUATION(pTHX_ const char c);
-PERL_INLINE_CALLCONV bool	Perl_UTF8_IS_CONTINUED(pTHX_ const char c);
+PERL_INLINE_CALLCONV bool	Perl_UTF8_IS_CONTINUATION(const char c);
+PERL_INLINE_CALLCONV bool	Perl_UTF8_IS_CONTINUED(const char c);
 PERL_INLINE_CALLCONV STRLEN	Perl_is_utf8_char_slow(const char *s, const STRLEN len)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(1);
@@ -5623,9 +5622,9 @@ PERL_CALLCONV void	Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chun
 
 
 PERL_CALLCONV void	Perl_refcnt_check(pTHX);
-PERL_CALLCONV void	Perl_Perl_sv_tmprefcnt(pTHX_ SV* sv)
+PERL_CALLCONV void	Perl_sv_tmprefcnt_update(pTHX_ SV *const sv)
 			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_PERL_SV_TMPREFCNT	\
+#define PERL_ARGS_ASSERT_SV_TMPREFCNT_UPDATE	\
 	assert(sv)
 
 

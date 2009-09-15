@@ -1,6 +1,6 @@
 
 void 
-Perl_pad_set_cur_nosave(AV* padlist, I32 nth) {
+Perl_pad_set_cur_nosave(pTHX_ AV* padlist, I32 nth) {
     AVcpREPLACE(PL_comppad, (PAD*) (AvARRAY(padlist)[nth]));
     PL_curpad = AvARRAY(PL_comppad);           
     DEBUG_Xv(PerlIO_printf(Perl_debug_log,    

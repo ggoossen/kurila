@@ -1765,7 +1765,7 @@
 #endif
 #ifdef PERL_CORE
 #define refcnt_check		Perl_refcnt_check
-#define Perl_sv_tmprefcnt	Perl_Perl_sv_tmprefcnt
+#define sv_tmprefcnt_update	Perl_sv_tmprefcnt_update
 #endif
 #ifndef SPRINTF_RETURNS_STRLEN
 #endif
@@ -2641,7 +2641,7 @@
 #define is_uni_print_lc(a)	Perl_is_uni_print_lc(aTHX_ a)
 #define is_uni_punct_lc(a)	Perl_is_uni_punct_lc(aTHX_ a)
 #define is_uni_xdigit_lc(a)	Perl_is_uni_xdigit_lc(aTHX_ a)
-#define is_utf8_char(a)		Perl_is_utf8_char(aTHX_ a)
+#define is_utf8_char		Perl_is_utf8_char
 #define is_utf8_string(a,b)	Perl_is_utf8_string(aTHX_ a,b)
 #define is_utf8_string_loclen(a,b,c,d)	Perl_is_utf8_string_loclen(aTHX_ a,b,c,d)
 #define is_utf8_alnum(a)	Perl_is_utf8_alnum(aTHX_ a)
@@ -3736,8 +3736,8 @@
 #endif
 #endif
 #ifdef PERL_CORE
-#define UTF8_IS_CONTINUATION(a)	Perl_UTF8_IS_CONTINUATION(aTHX_ a)
-#define UTF8_IS_CONTINUED(a)	Perl_UTF8_IS_CONTINUED(aTHX_ a)
+#define UTF8_IS_CONTINUATION	Perl_UTF8_IS_CONTINUATION
+#define UTF8_IS_CONTINUED	Perl_UTF8_IS_CONTINUED
 #define is_utf8_char_slow	Perl_is_utf8_char_slow
 #endif
 #if defined(PERL_IN_UTF8_C) || defined(PERL_DECL_PROT)
@@ -3982,7 +3982,7 @@
 #endif
 #ifdef PERL_CORE
 #define refcnt_check()		Perl_refcnt_check(aTHX)
-#define Perl_sv_tmprefcnt(a)	Perl_Perl_sv_tmprefcnt(aTHX_ a)
+#define sv_tmprefcnt_update(a)	Perl_sv_tmprefcnt_update(aTHX_ a)
 #endif
 #ifndef SPRINTF_RETURNS_STRLEN
 #endif

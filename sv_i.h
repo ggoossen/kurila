@@ -175,7 +175,7 @@ REGEXP* Perl_svTre(pTHX_ SV *sv) {
     return (REGEXP*)sv;
 }
 
-SV* SvREFCNT_inc(pTHX_ SV* sv) {
+SV* Perl_SvREFCNT_inc(pTHX_ SV* sv) {
     if (sv) {
         assert(SvTYPE(sv) != SVTYPEMASK);
         (SvREFCNT(sv))++;

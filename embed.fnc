@@ -474,7 +474,7 @@ ApPR	|bool	|is_uni_lower_lc|UV c
 ApPR	|bool	|is_uni_print_lc|UV c
 ApPR	|bool	|is_uni_punct_lc|UV c
 ApPR	|bool	|is_uni_xdigit_lc|UV c
-Apid	|STRLEN	|is_utf8_char	|NN const char *s
+Apidn	|STRLEN	|is_utf8_char	|NN const char *s
 Apd	|bool	|is_utf8_string	|NN const char *s|STRLEN len
 Apdmb	|bool	|is_utf8_string_loc|NN const char *s|STRLEN len|NULLOK const char **p
 Apd	|bool	|is_utf8_string_loclen|NN const char *s|STRLEN len|NULLOK const char **ep|NULLOK STRLEN *el
@@ -1556,6 +1556,14 @@ sRn	|PTR_TBL_ENT_t *|ptr_table_find|NN PTR_TBL_t *const tbl|NULLOK const void *c
 #endif
 
 #if defined(PERL_IN_TOKE_C) || defined(PERL_DECL_PROT)
+s	|void	|closing_bracket
+s	|void	|start_list_indent|NN char *s
+s	|void	|start_statement_indent|NN char *s
+s	|void	|stop_statement_indent
+s	|bool	|close_layout_lists
+s	|int	|process_layout	|NN char *s
+s	|char *	|process_shebang|NN char *s
+s	|char *	|skip_pod	|NN char *s
 s	|void	|check_uni
 s	|void	|force_next	|I32 type
 s	|char*	|force_version	|NN char *s
@@ -1632,8 +1640,8 @@ p	|bool	|vdie_common	|NN SV *msv|bool warn
 sn	|NV|mulexp10	|NV value|I32 exponent
 #endif
 
-ip	|bool	|UTF8_IS_CONTINUATION|const char c
-ip	|bool	|UTF8_IS_CONTINUED|const char c
+ipn	|bool	|UTF8_IS_CONTINUATION|const char c
+ipn	|bool	|UTF8_IS_CONTINUED|const char c
 ipRn	|STRLEN	|is_utf8_char_slow|NN const char *s|const STRLEN len
 
 #if defined(PERL_IN_UTF8_C) || defined(PERL_DECL_PROT)
@@ -1859,7 +1867,7 @@ XEopMa	|STRLEN *|new_warnings_bitfield|NULLOK STRLEN *buffer \
 p	|void	|offer_nice_chunk	|NN void *const chunk|const U32 chunk_size
 
 p	|void	|refcnt_check
-p	|void	|Perl_sv_tmprefcnt	|NN SV* sv
+p	|void	|sv_tmprefcnt_update	|NN SV *const sv
 
 #ifndef SPRINTF_RETURNS_STRLEN
 Apnod	|int	|my_sprintf	|NN char *buffer|NN const char *pat|...

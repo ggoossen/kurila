@@ -772,7 +772,7 @@ XS(XS_Symbol_stash)
 }
 
 static void
-S_cat_view_pv(SV* retsv, SV* sv, int indent)
+S_cat_view_pv(pTHX_ SV* retsv, SV* sv, int indent)
 {
     if ( ! SvOK(sv) ) {
 	sv_catpv(retsv, "undef");
@@ -786,7 +786,7 @@ S_cat_view_pv(SV* retsv, SV* sv, int indent)
 	for (i=0; i<=av_len(svTav(sv)); i++) {
 	    if (i != 0)
 		sv_catpvf(retsv, "\n%*s", indent, "");
-	    S_cat_view_pv(retsv, *av_fetch(svTav(sv), i, 0), indent);
+	    S_cat_view_pv(aTHX_ retsv, *av_fetch(svTav(sv), i, 0), indent);
 	}
 	return;
     }
@@ -1010,7 +1010,7 @@ XS(XS_dump_view)
     if (items != 1)
        Perl_croak(aTHX_ "Usage: %s(%s)", "dump::view", "sv");
 
-    S_cat_view_pv(retsv, sv, 0);
+    S_cat_view_pv(aTHX_ retsv, sv, 0);
 
     XSRETURN(1);
 }

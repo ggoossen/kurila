@@ -29,7 +29,7 @@ restore_sigmask(pTHX_ SV *save_sv)
 #endif
 
 void
-S_signals_set_handler(SV* handlersv, SV* namesv)
+S_signals_set_handler(pTHX_ SV* handlersv, SV* namesv)
 {
     I32 i;
     /* Need to be careful with SvREFCNT_dec(), because that can have side
@@ -137,7 +137,7 @@ XS(XS_signals_handler)
 
     if (PL_op->op_flags & OPf_ASSIGN) {
         SV* handlersv = POPs;
-        S_signals_set_handler(handlersv, namesv);
+        S_signals_set_handler(aTHX_ handlersv, namesv);
     }
 
     {

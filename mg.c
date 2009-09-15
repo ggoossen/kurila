@@ -2029,7 +2029,7 @@ Perl_sighandler(int sig)
 
     if (!(cv = (CV*)PL_psig_ptr[sig])
         || SvTYPE(cv) != SVt_PVCV) {
-	Perl_croak(aTHX "SIG%s handler is not valid", PL_sig_name[sig]);
+	Perl_croak(aTHX_ "SIG%s handler is not valid", PL_sig_name[sig]);
     }
 
     if (!cv || !CvROOT(cv)) {

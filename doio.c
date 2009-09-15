@@ -124,7 +124,7 @@ Perl_do_openn(pTHX_ IO *io, register const char *oname, I32 len, int as_raw,
 	    result = PerlIO_close(IoIFP(io));
 	if (result == EOF && fd > PL_maxsysfd) {
 	    /* Why is this not Perl_warn*() call ? */
-	    Perl_warn("unable to close filehandle properly.");
+	    Perl_warn(aTHX_ "unable to close filehandle properly.");
 	}
 	IoOFP(io) = IoIFP(io) = NULL;
     }

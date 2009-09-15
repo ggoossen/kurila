@@ -1296,10 +1296,10 @@ Perl_sv_upgrade(pTHX_ register SV *const sv, svtype new_type)
 	    if ( ((XPVCV*)old_body)->xcv_n_add_refs)
 		((XPVCV*)old_body)->xcv_n_add_refs -= 1;
 	    else
-		Perl_del_body_allocated(old_body, old_type);
+		Perl_del_body_allocated(aTHX_ old_body, old_type);
 	}
 	else
-	    Perl_del_body_allocated(old_body, old_type);
+	    Perl_del_body_allocated(aTHX_ old_body, old_type);
     }
     else if (old_type_details->body_size) {
 	if (old_type > SVt_IV)
@@ -4418,7 +4418,7 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 }
 
 void
-Perl_call_destructors() {
+Perl_call_destructors(pTHX) {
     AV* destroyav = av_2mortal(PL_destroyav);
     PL_destroyav = NULL;
 
@@ -9134,15 +9134,15 @@ do_reset_tmprefcnt(pTHX_ SV *const sv)
 static void
 do_sv_tmprefcnt(pTHX_ SV *const sv)
 {
-    Perl_sv_tmprefcnt(aTHX_ sv);
+    Perl_sv_tmprefcnt_update(aTHX_ sv);
 }
 
 void
-Perl_sv_tmprefcnt(pTHX_ SV *const sv)
+Perl_sv_tmprefcnt_update(pTHX_ SV *const sv)
 {
     dVAR;
     const U32 type = SvTYPE(sv);
-    PERL_ARGS_ASSERT_PERL_SV_TMPREFCNT;
+    PERL_ARGS_ASSERT_SV_TMPREFCNT_UPDATE;
 
     if (sv == (SV*)PL_strtab)
 	return;
@@ -9268,7 +9268,7 @@ Perl_refcnt_check(pTHX)
     rootop_ll_tmprefcnt(aTHX);
 
     if (PL_parser)
-	Perl_parser_tmprefcnt(PL_parser);
+	Perl_parser_tmprefcnt(aTHX_ PL_parser);
 
     Perl_tmps_tmprefcnt(aTHX);
     Perl_scope_tmprefcnt(aTHX);
