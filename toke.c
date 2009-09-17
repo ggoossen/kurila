@@ -474,13 +474,13 @@ S_no_op(pTHX_ const char *const what, char *s)
 	    for (t = PL_oldoldbufptr; (isALNUM_lazy_if(t,UTF) || *t == ':'); t++)
 		NOOP;
 	    if (t < PL_bufptr && isSPACE(*t))
-		yywarn(Perl_form(
+		yywarn(Perl_form(aTHX_
 			"\t(Do you need to predeclare %.*s?)\n",
                             (int)(t - PL_oldoldbufptr), PL_oldoldbufptr));
 	}
 	else {
 	    assert(s >= oldbp);
-	    yywarn(Perl_form("\t(Missing operator before %.*s?)\n", (int)(s - oldbp), oldbp));
+	    yywarn(Perl_form(aTHX_ "\t(Missing operator before %.*s?)\n", (int)(s - oldbp), oldbp));
 	}
     }
     PL_bufptr = oldbp;
@@ -1145,7 +1145,7 @@ S_lop(pTHX_ I32 f, int x, char *s)
     PERL_ARGS_ASSERT_LOP;
 
     pl_yylval.i_tkval.ival = f;
-    pl_yylval.i_tkval.location = curlocation(aTHX_ PL_bufptr);
+    pl_yylval.i_tkval.location = curlocation(PL_bufptr);
     PL_expect = x;
     PL_bufptr = s;
     PL_last_lop = PL_oldbufptr;
@@ -3985,7 +3985,7 @@ Perl_yylex(pTHX)
 
 	s = scan_ident(s - 1, PL_bufend, PL_tokenbuf, sizeof PL_tokenbuf, TRUE);
 	if (! *PL_tokenbuf) {
-	    yyerror(aTHX_ "Indentified expected after '&'");
+	    yyerror("Indentified expected after '&'");
 	}
 	PL_expect = XOPERATOR;
 	force_ident(PL_tokenbuf, '&');
@@ -4234,7 +4234,7 @@ Perl_yylex(pTHX)
 	}
 
 	s++;
-	yyerror(aTHX_ "Unknown operator '@'");
+	yyerror("Unknown operator '@'");
 	goto retry;
     }
 
@@ -4773,7 +4773,7 @@ Perl_yylex(pTHX)
 		/* Call it a bare word */
 		pl_yylval.opval->op_private |= OPpCONST_STRICT;
 		if ( ! ( s[0] == '-' && s[1] == '>') ) {
-		    yyerror(Perl_form("Unknown bare word %s", PL_tokenbuf));
+		    yyerror(Perl_form(aTHX_ "Unknown bare word %s", PL_tokenbuf));
 		}
 
 		if ((lastchar == '*' || lastchar == '%' || lastchar == '&')

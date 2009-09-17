@@ -4695,16 +4695,6 @@ END_EXTERN_C
 START_EXTERN_C
 
 #include "gv.h"
-#include "gv_i.h"
-#include "cv_i.h"
-#include "sv_i.h"
-#include "hv_i.h"
-#include "cop_i.h"
-#include "scope_i.h"
-#include "pad_i.h"
-#include "op_i.h"
-#include "utf8_i.h"
-#include "regcomp_i.h"
 
 /* PERL_GLOBAL_STRUCT_PRIVATE wants to keep global data like the
  * magic vtables const, but this is incompatible with SWIG which
@@ -5446,6 +5436,17 @@ extern void moncontrol(int);
 /* used by pv_display in dump.c*/
 #define PERL_PV_PRETTY_DUMP  PERL_PV_PRETTY_ELLIPSES|PERL_PV_PRETTY_QUOTE
 #define PERL_PV_PRETTY_REGPROP PERL_PV_PRETTY_ELLIPSES|PERL_PV_PRETTY_LTGT|PERL_PV_ESCAPE_RE
+
+#include "gv_i.h"
+#include "cv_i.h"
+#include "sv_i.h"
+#include "hv_i.h"
+#include "cop_i.h"
+#include "scope_i.h"
+#include "pad_i.h"
+#include "op_i.h"
+#include "utf8_i.h"
+#include "regcomp_i.h"
 
 /*
 

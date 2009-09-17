@@ -380,7 +380,7 @@ EXPLODE
 			   "Couldn't add key '$($package_sprintf_safe)::\%s'",
 			   value_for_notfound->name);
 	    \}
-            CV* notfoundcv = gv_fetchmethod(aTHX_  symbol_table, "constant_not_found");
+            CV* notfoundcv = gv_fetchmethod(symbol_table, "constant_not_found");
             if (!notfoundcv) \{
 		Perl_croak(aTHX_ "'constant_not_found' could not be found");
             \}

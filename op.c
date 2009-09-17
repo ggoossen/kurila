@@ -1655,7 +1655,7 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 
     default:
     no_assign:
-	yyerror_at(aTHX_ o->op_location, Perl_form("Can't assign to %s", OP_DESC(o)));
+	yyerror_at(o->op_location, Perl_form(aTHX_ "Can't assign to %s", OP_DESC(o)));
     }
     return o;
 }

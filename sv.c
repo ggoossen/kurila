@@ -9265,7 +9265,7 @@ Perl_refcnt_check(pTHX)
     IoTMPREFCNT_inc(PL_stderrio);
     SvTMPREFCNT_inc(PL_ofs_sv);
 
-    rootop_ll_tmprefcnt(aTHX);
+    rootop_ll_tmprefcnt();
 
     if (PL_parser)
 	Perl_parser_tmprefcnt(aTHX_ PL_parser);

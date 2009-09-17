@@ -756,7 +756,7 @@ re.pm, especially to the documentation.
 /* initialization */
 #define GET_RE_DEBUG_FLAGS DEBUG_r({ \
 	SV * re_debug_flags_sv = sv_2mortal(newSV(0)); \
-        Perl_magic_get(RE_DEBUG_FLAGS, re_debug_flags_sv);	\
+        magic_get(RE_DEBUG_FLAGS, re_debug_flags_sv);	\
         if (!SvIOK(re_debug_flags_sv)) \
             sv_setuv(re_debug_flags_sv, RE_DEBUG_COMPILE_DUMP | RE_DEBUG_EXECUTE_MASK ); \
         re_debug_flags=SvIV(re_debug_flags_sv); \

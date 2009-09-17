@@ -45,7 +45,7 @@ Perl_is_utf8_char_slow(const char *s, const STRLEN len)
     if (!UTF8_IS_START(u))
 	return 0;
 
-    if (len < 2 || !Perl_UTF8_IS_CONTINUATION(aTHX_ s[1]))
+    if (len < 2 || !Perl_UTF8_IS_CONTINUATION(s[1]))
 	return 0;
 
     slen = len - 1;
@@ -54,7 +54,7 @@ Perl_is_utf8_char_slow(const char *s, const STRLEN len)
     uv  = u;
     ouv = uv;
     while (slen--) {
-	if (!Perl_UTF8_IS_CONTINUATION(aTHX_ *s))
+	if (!Perl_UTF8_IS_CONTINUATION(*s))
 	    return 0;
 	uv = UTF8_ACCUMULATE(uv, *s);
 	if (uv < ouv) 
@@ -93,6 +93,6 @@ Perl_is_utf8_char(const char *s)
             len == 4 ? ( IS_UTF8_CHAR_4((U8*)s) ? len : 0 ): 0
             );
     }
-    return Perl_is_utf8_char_slow(aTHX_ s, len);
+    return Perl_is_utf8_char_slow(s, len);
 }
 

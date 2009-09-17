@@ -4531,6 +4531,8 @@
 #  define perl_new_collate(a)           new_collate(a)
 #  define perl_new_numeric(a)           new_numeric(a)
 
+#endif /* !defined(PERL_CORE) && !defined(PERL_NOCOMPAT) */
+
 /* varargs functions can't be handled with CPP macros. :-(
    This provides a set of compatibility functions that don't take
    an extra argument but grab the context pointer using the macro
@@ -4551,8 +4553,6 @@
 #  define sv_catpvf_mg                  Perl_sv_catpvf_mg_nocontext
 #  define sv_setpvf_mg                  Perl_sv_setpvf_mg_nocontext
 #endif
-
-#endif /* !defined(PERL_CORE) && !defined(PERL_NOCOMPAT) */
 
 #if !defined(PERL_IMPLICIT_CONTEXT)
 /* undefined symbols, point them back at the usual ones */
