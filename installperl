@@ -199,7 +199,7 @@ if ($Is_VMS)   # Hang in there until File::Spec hits the big time
 
 # Do some quick sanity checks.
 
-   $installbin          || die "No installbin directory in config.sh\n"
+$installbin             || die "No installbin directory in config.sh\n"
 -d $installbin          || mkpath($installbin, %opts{verbose}, 0777)
 -d $installbin          || %opts{notify} || die "$installbin is not a directory\n"
 -w $installbin          || %opts{notify} || die "$installbin is not writable by you\n"
@@ -212,8 +212,6 @@ if (!$Is_NetWare)
         -x $ndbg . 'perl' . $exe_ext    || die "$($ndbg)perl$exe_ext isn't executable!\n"
         if ($dbg)
             -x $dbg . 'perl' . $exe_ext     || die "$($dbg)perl$exe_ext isn't executable!\n"
-
-    -x 'suidperl' . $exe_ext|| die "suidperl isn't executable!\n" if $d_dosuid
 
     -f 't/rantests'         || $Is_W32
         || warn "WARNING: You've never run 'make test' or some tests failed! (Installing anyway.)\n"
