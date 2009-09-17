@@ -1315,7 +1315,7 @@
 #define space_join_names_mortal	S_space_join_names_mortal
 #endif
 #endif
-#ifdef PERL_CORE
+#if defined(PERL_CORE) || defined(PERL_EXT)
 #define UCHARAT			Perl_UCHARAT
 #endif
 #if defined(PERL_IN_REGCOMP_C) || defined(PERL_DECL_PROT)
@@ -1532,7 +1532,7 @@
 #define mulexp10		S_mulexp10
 #endif
 #endif
-#ifdef PERL_CORE
+#if defined(PERL_CORE) || defined(PERL_EXT)
 #define UTF8_IS_CONTINUATION	Perl_UTF8_IS_CONTINUATION
 #define UTF8_IS_CONTINUED	Perl_UTF8_IS_CONTINUED
 #define is_utf8_char_slow	Perl_is_utf8_char_slow
@@ -3533,7 +3533,7 @@
 #define space_join_names_mortal(a)	S_space_join_names_mortal(aTHX_ a)
 #endif
 #endif
-#ifdef PERL_CORE
+#if defined(PERL_CORE) || defined(PERL_EXT)
 #define UCHARAT(a)		Perl_UCHARAT(aTHX_ a)
 #endif
 #if defined(PERL_IN_REGCOMP_C) || defined(PERL_DECL_PROT)
@@ -3751,7 +3751,7 @@
 #define mulexp10		S_mulexp10
 #endif
 #endif
-#ifdef PERL_CORE
+#if defined(PERL_CORE) || defined(PERL_EXT)
 #define UTF8_IS_CONTINUATION	Perl_UTF8_IS_CONTINUATION
 #define UTF8_IS_CONTINUED	Perl_UTF8_IS_CONTINUED
 #define is_utf8_char_slow	Perl_is_utf8_char_slow

@@ -33,13 +33,13 @@ if ('PerlIO::Layer'->find( 'perlio'))
         require PerlIO::scalar
         my $fcontents = join "", map {"$_\015\012"}, 10..100000
         open my $fh, "<:crlf", \$fcontents
-        local $^INPUT_RECORD_SEPARATOR = "xxx"
+        local $^INPUT_RECORD_SEPARATOR = "12345"
         local $_ = ~< $fh
-        my $pos = tell $fh # pos must be behind "xxx", before "\nxxy\n"
-        seek $fh, $pos, 0
+        my $pos = tell $fh # pos must be behind "12345", before "\n12346\n"
+        seek $fh, $pos, 0 or die "Failed seek"
         $^INPUT_RECORD_SEPARATOR = "\n"
         my $s = ( ~< $fh ) . ~< $fh
-        ok($s eq "\nxxy\n")
+        is($s, "\n12346\n")
     
 
     ok(close($foo))

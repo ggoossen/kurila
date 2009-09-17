@@ -1388,7 +1388,7 @@ sR	|int	|dooneliner	|NN const char *cmd|NN const char *filename
 s	|SV *	|space_join_names_mortal|NN char *const *array
 #endif
 
-ip	|UV	|UCHARAT|NN const char*
+Eip	|UV	|UCHARAT|NN const char*
 
 #if defined(PERL_IN_REGCOMP_C) || defined(PERL_DECL_PROT)
 Es	|regnode*|regclassfold	|NN struct RExC_state_t *pRExC_state|U32 depth
@@ -1640,9 +1640,9 @@ p	|bool	|vdie_common	|NN SV *msv|bool warn
 sn	|NV|mulexp10	|NV value|I32 exponent
 #endif
 
-ipn	|bool	|UTF8_IS_CONTINUATION|const char c
-ipn	|bool	|UTF8_IS_CONTINUED|const char c
-ipRn	|STRLEN	|is_utf8_char_slow|NN const char *s|const STRLEN len
+Eipn	|bool	|UTF8_IS_CONTINUATION|const char c
+Eipn	|bool	|UTF8_IS_CONTINUED|const char c
+EipRn	|STRLEN	|is_utf8_char_slow|NN const char *s|const STRLEN len
 
 #if defined(PERL_IN_UTF8_C) || defined(PERL_DECL_PROT)
 sR	|bool	|is_utf8_common	|NN const char *const p|NN SV **swash|NN const char * const swashname

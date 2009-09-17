@@ -25,7 +25,7 @@ Perl_Dtype(pTHX_ SV *sv) {
 
 const char*
 Perl_Ddesc(pTHX_ SV *sv) {
-    switch (Dtype(sv)) {
+    switch (Perl_Dtype(aTHX_ sv)) {
     case Dt_UNDEF: return "UNDEF";
     case Dt_ARRAY: return "ARRAY";
     case Dt_HASH: return "HASH";
