@@ -503,8 +503,6 @@ walk_table sub (@< @_)
                        if ($args and @args[$args-1] =~ m/\.\.\./)
                            # we're out of luck for varargs functions under CPP
                            $ret .= hide($func, $to_func)
-                           for my $i (0..10)
-                               $ret .= hide_func($func . $i, $to_func, $args + $i - 1)
                        elsif ($flags =~ m/n/)
                            $ret .= hide($func, $to_func)
                        else

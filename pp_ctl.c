@@ -790,7 +790,7 @@ PP(pp_enteriter)
 	    maybe_ary = sv_mortalcopy(maybe_ary);
 	}
 	if ( SvOK(maybe_ary) && ! SvAVOK(maybe_ary) )
-	    croak1("for loop expected an array but got %s", Ddesc(maybe_ary));
+	    croak(aTHX_ "for loop expected an array but got %s", Ddesc(maybe_ary));
 
 	cx->blk_loop.state_u.ary.ary = (AV*)SvREFCNT_inc(maybe_ary);
 	cx->blk_loop.state_u.ary.ix =

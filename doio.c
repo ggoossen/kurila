@@ -967,7 +967,7 @@ my_chsize(int fd, Off_t length)
     }
     return 0;
 #else
-    croak0("truncate not implemented");
+    croak(aTHX_ "truncate not implemented");
 #endif /* F_FREESP */
     return -1;
 }

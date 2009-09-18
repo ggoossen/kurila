@@ -89,7 +89,7 @@ Perl_safesysmalloc(MEM_SIZE size)
 #endif
 #ifdef DEBUGGING
     if ((long)size < 0)
-	croak0("panic: malloc");
+	croak(aTHX_ "panic: malloc");
 #endif
     ptr = (Malloc_t)PerlMem_malloc(size?size:1);	/* malloc(0) is NASTY on our system */
     PERL_ALLOC_CHECK(ptr);
@@ -159,7 +159,7 @@ Perl_safesysrealloc(Malloc_t where,MEM_SIZE size)
 	    = (struct perl_memory_debug_header *)where;
 
 	if (header->interpreter != aTHX) {
-	    croak0("panic: realloc from wrong pool");
+	    croak(aTHX_ "panic: realloc from wrong pool");
 	}
 	assert(header->next->prev == header);
 	assert(header->prev->next == header);
@@ -175,7 +175,7 @@ Perl_safesysrealloc(Malloc_t where,MEM_SIZE size)
 #endif
 #ifdef DEBUGGING
     if ((long)size < 0)
-	croak0("panic: realloc");
+	croak(aTHX_ "panic: realloc");
 #endif
     ptr = (Malloc_t)PerlMem_realloc(where,size);
     PERL_ALLOC_CHECK(ptr);
@@ -240,14 +240,14 @@ Perl_safesysfree(Malloc_t where)
 		= (struct perl_memory_debug_header *)where;
 
 	    if (header->interpreter != aTHX) {
-		croak0("panic: free from wrong pool");
+		croak(aTHX_ "panic: free from wrong pool");
 	    }
 	    if (!header->prev) {
-		croak0("panic: duplicate free");
+		croak(aTHX_ "panic: duplicate free");
 	    }
 	    if (!(header->next) || header->next->prev != header
 		|| header->prev->next != header) {
-		croak0("panic: bad free");
+		croak(aTHX_ "panic: bad free");
 	    }
 	    /* Unlink us from the chain.  */
 	    header->next->prev = header->prev;
@@ -276,12 +276,12 @@ Perl_safesyscalloc(MEM_SIZE count, MEM_SIZE size)
     if (size && (count <= MEM_SIZE_MAX / size))
 	total_size = size * count;
     else
-	croak1("%s", PL_memory_wrap);
+	croak(aTHX_ "%s", PL_memory_wrap);
 #ifdef PERL_TRACK_MEMPOOL
     if (sTHX <= MEM_SIZE_MAX - (MEM_SIZE)total_size)
 	total_size += sTHX;
     else
-	croak1("%s", PL_memory_wrap);
+	croak(aTHX_ "%s", PL_memory_wrap);
 #endif
 #ifdef HAS_64K_LIMIT
     if (total_size > 0xffff) {
@@ -292,7 +292,7 @@ Perl_safesyscalloc(MEM_SIZE count, MEM_SIZE size)
 #endif /* HAS_64K_LIMIT */
 #ifdef DEBUGGING
     if ((long)size < 0 || (long)count < 0)
-	croak0("panic: calloc");
+	croak(aTHX_ "panic: calloc");
 #endif
 #ifdef PERL_TRACK_MEMPOOL
     /* Have to use malloc() because we've added some space for our tracking

@@ -3529,7 +3529,7 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
 
     if (SvAVOK(SvLOCATION((SV*)cv))) {
 	SV* namesv = newSVpv(HvNAME_get(GvSTASH(gv)), 0);
-	sv_catpvf1(namesv, "::%s", GvNAME_get(gv));
+	sv_catpvf(aTHX_ namesv, "::%s", GvNAME_get(gv));
 	av_store(svTav(SvLOCATION((SV*)cv)), 3, namesv);
     }
 
@@ -3872,7 +3872,7 @@ Perl_newANONSUB(pTHX_ I32 floor, OP *proto, OP *block)
     SVcpREPLACE(SvLOCATION(sub), location);
     if (SvLOCATION(sub) && SvAVOK(SvLOCATION(sub))) {
 	SV* namesv = newSVpv(HvNAME_get(PL_curstash), 0);
-	sv_catpvf0(namesv, "::__ANON__");
+	sv_catpvf(aTHX_ namesv, "::__ANON__");
 	av_store(svTav(SvLOCATION(sub)), 3, namesv);
     }
     return newSVOP(OP_ANONCODE, 0, sub, location);

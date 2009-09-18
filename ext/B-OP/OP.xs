@@ -167,7 +167,7 @@ op_name_to_num(SV * name)
     }
 #endif
 
-    croak1("No such op \"%s\"", SvPV_nolen(name));
+    croak(aTHX_ "No such op \"%s\"", SvPV_nolen(name));
 
     return -1;
 }
@@ -309,7 +309,7 @@ SVtoO(SV* sv) {
     else {
         return 0;
     }
-        croak0("Argument is not a reference");
+        croak(aTHX_ "Argument is not a reference");
     return 0; /* Not reached */
 }
 
@@ -320,7 +320,7 @@ walkoptree(pTHX_ SV *opsv, const char *method)
     OP *o, *kid;
 
     if (!SvROK(opsv))
-	croak0("opsv is not a reference");
+	croak(aTHX_ "opsv is not a reference");
     opsv = sv_mortalcopy(opsv);
     o = INT2PTR(OP*,SvIV((SV*)SvRV(opsv)));
     if (walkoptree_debug) {

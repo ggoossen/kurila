@@ -324,7 +324,7 @@ svref_2object(sv)
 	SV *	sv
     CODE:
 	if (!SvROK(sv))
-	    croak0("argument is not a reference");
+	    croak(aTHX_ "argument is not a reference");
 	RETVAL = (SV*)SvRV(sv);
     OUTPUT:
 	RETVAL              

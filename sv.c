@@ -8202,13 +8202,13 @@ Perl_sv_vcatpvfn(pTHX_ SV *const sv, const char *const pat, const STRLEN patlen,
 
 	have = esignlen + zeros + elen;
 	if (have < zeros)
-	    croak1("%s", PL_memory_wrap);
+	    croak(aTHX_ "%s", PL_memory_wrap);
 
 	need = (have > width ? have : width);
 	gap = need - have;
 
 	if (need >= (((STRLEN)~0) - SvCUR(sv) - dotstrlen - 1))
-	    croak1("%s", PL_memory_wrap);
+	    croak(aTHX_ "%s", PL_memory_wrap);
 	SvGROW(sv, SvCUR(sv) + need + dotstrlen + 1);
 	p = SvEND(sv);
 	if (esignlen && fill == '0') {
