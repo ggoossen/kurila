@@ -324,7 +324,7 @@ svref_2object(sv)
 	SV *	sv
     CODE:
 	if (!SvROK(sv))
-	    croak("argument is not a reference");
+	    croak0("argument is not a reference");
 	RETVAL = (SV*)SvRV(sv);
     OUTPUT:
 	RETVAL              
@@ -506,7 +506,7 @@ RV(sv)
             RETVAL = SvRV(sv);
         }
         else {
-            croak( "argument is not SvROK" );
+            croak(aTHX_  "argument is not SvROK" );
         }
     OUTPUT:
         RETVAL
@@ -555,7 +555,7 @@ SvRV(sv)
             RETVAL = SvRV(sv);
         }
         else {
-            croak( "argument is not SvROK" );
+            croak(aTHX_  "argument is not SvROK" );
         }
     OUTPUT:
         RETVAL
@@ -662,7 +662,7 @@ MgREGEX(mg)
             RETVAL = MgREGEX(mg);
         }
         else {
-            croak( "REGEX is only meaningful on r-magic" );
+            croak(aTHX_  "REGEX is only meaningful on r-magic" );
         }
     OUTPUT:
         RETVAL
@@ -678,7 +678,7 @@ precomp(mg)
                 RETVAL = newSVpvn( RX_PRECOMP(rx), RX_PRELEN(rx) );
         }
         else {
-            croak( "precomp is only meaningful on r-magic" );
+            croak(aTHX_  "precomp is only meaningful on r-magic" );
         }
     OUTPUT:
         RETVAL
@@ -818,7 +818,7 @@ IsSTD(io,name)
 	    handle = PerlIO_stderr();
 	}
 	else {
-	    croak( "Invalid value '%s'", name );
+	    croak(aTHX_  "Invalid value '%s'", name );
 	}
 	RETVAL = handle == IoIFP(io);
     OUTPUT:

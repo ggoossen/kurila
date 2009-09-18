@@ -558,7 +558,7 @@ const DBT * key2 ;
 
     if (CurrentDB->in_compare) {
         tidyUp(CurrentDB);
-        croak ("DB_File btree_compare: recursion detected\n") ;
+        croak(aTHX_ "DB_File btree_compare: recursion detected\n") ;
     }
 
     data1 = (char *) key1->data ;
@@ -635,7 +635,7 @@ const DBT * key2 ;
     
     if (CurrentDB->in_prefix){
         tidyUp(CurrentDB);
-        croak ("DB_File btree_prefix: recursion detected\n") ;
+        croak(aTHX_ "DB_File btree_prefix: recursion detected\n") ;
     }
 
     data1 = (char *) key1->data ;
@@ -717,7 +717,7 @@ HASH_CB_SIZE_TYPE size ;
 
     if (CurrentDB->in_hash){
         tidyUp(CurrentDB);
-        croak ("DB_File hash callback: recursion detected\n") ;
+        croak(aTHX_ "DB_File hash callback: recursion detected\n") ;
     }
 
 #ifndef newSVpvn
@@ -765,7 +765,7 @@ db_errcall_cb(const char * db_errpfx, char * buffer)
     SV * sv = perl_get_sv(ERR_BUFF, FALSE) ;
     if (sv) {
         if (db_errpfx)
-            sv_setpvf(sv, "%s: %s", db_errpfx, buffer) ;
+            sv_setpvf(aTHX_ sv, "%s: %s", db_errpfx, buffer) ;
         else
             sv_setpv(sv, buffer) ;
     }
@@ -882,7 +882,7 @@ I32      value ;
 	/* check for attempt to write before start of array */
 	if (length + value + 1 <= 0) {
             tidyUp(db);
-	    croak("Modification of non-creatable array value attempted, subscript %ld", (long)value) ;
+	    croak(aTHX_ "Modification of non-creatable array value attempted, subscript %ld", (long)value) ;
 	}
 
 	value = length + value + 1 ;
@@ -1212,13 +1212,13 @@ SV *   sv ;
     if (sv)
     {
         if (! SvROK(sv) )
-            croak ("type parameter is not a reference") ;
+            croak(aTHX_ "type parameter is not a reference") ;
 
         svp  = hv_fetch( (HV*)SvRV(sv), "GOT", 3, FALSE) ;
         if (svp && SvOK(*svp))
             action  = (HV*) SvRV(*svp) ;
 	else
-	    croak("internal error") ;
+	    croak(aTHX_ "internal error") ;
 
         if (sv_isa(sv, "DB_File::HASHINFO"))
         {
@@ -1297,7 +1297,7 @@ SV *   sv ;
 	    int fixed = FALSE ;
 
 	    if (isHASH)
-	        croak("DB_File can only tie an array to a DB_RECNO database");
+	        croak(aTHX_ "DB_File can only tie an array to a DB_RECNO database");
 
             RETVAL->type = DB_RECNO ;
 
@@ -1374,7 +1374,7 @@ SV *   sv ;
             PrintRecno(info) ;
         }
         else
-            croak("type is not of type DB_File::HASHINFO, DB_File::BTREEINFO or DB_File::RECNOINFO");
+            croak(aTHX_ "type is not of type DB_File::HASHINFO, DB_File::BTREEINFO or DB_File::RECNOINFO");
     }
 
     {

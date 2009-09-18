@@ -967,7 +967,7 @@ my_chsize(int fd, Off_t length)
     }
     return 0;
 #else
-    Perl_croak_nocontext("truncate not implemented");
+    croak0("truncate not implemented");
 #endif /* F_FREESP */
     return -1;
 }

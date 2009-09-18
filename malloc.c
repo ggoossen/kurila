@@ -313,21 +313,8 @@
 #  include "EXTERN.h"
 #  define PERL_IN_MALLOC_C
 #  include "perl.h"
-#  if defined(PERL_IMPLICIT_CONTEXT)
-#    define croak	Perl_croak_nocontext
-#    define croak2	Perl_croak_nocontext
-#    define warn	Perl_warn_nocontext
-#    define warn2	Perl_warn_nocontext
-#  else
-#    define croak2	croak
-#    define warn2	warn
-#  endif
-#   define PERL_MAYBE_ALIVE	1
+#  define PERL_MAYBE_ALIVE	1
 #else
-#  ifdef PERL_FOR_X2P
-#    include "../EXTERN.h"
-#    include "../perl.h"
-#  else
 #    include <stdlib.h>
 #    include <stdio.h>
 #    include <memory.h>
@@ -380,19 +367,6 @@
 #    ifndef MEM_ALIGNBYTES
 #      define MEM_ALIGNBYTES		4
 #    endif
-#  endif
-#  ifndef croak				/* make depend */
-#    define croak(mess, arg) (warn((mess), (arg)), exit(1))
-#  endif 
-#  ifndef croak2			/* make depend */
-#    define croak2(mess, arg1, arg2) (warn2((mess), (arg1), (arg2)), exit(1))
-#  endif 
-#  ifndef warn
-#    define warn(mess, arg) fprintf(stderr, (mess), (arg))
-#  endif 
-#  ifndef warn2
-#    define warn2(mess, arg1, arg2) fprintf(stderr, (mess), (arg1), (arg2))
-#  endif 
 #  ifdef DEBUG_m
 #    undef DEBUG_m
 #  endif 
@@ -1460,7 +1434,7 @@ Perl_malloc(size_t nbytes)
 	BARK_64K_LIMIT("Allocation",nbytes,nbytes);
 #ifdef DEBUGGING
 	if ((long)nbytes < 0)
-	    croak("%s", "panic: malloc");
+	    croak(aTHX_ "%s", "panic: malloc");
 #endif
 
 	bucket = S_ajust_size_and_find_bucket(&nbytes);
@@ -1920,7 +1894,7 @@ morecore(register int bucket)
 #endif
 	if (bucket == sizeof(MEM_SIZE)*8*BUCKETS_PER_POW2) {
 	    MALLOC_UNLOCK;
-	    croak("%s", "Out of memory during ridiculously large request");
+	    croak(aTHX_ "%s", "Out of memory during ridiculously large request");
 	}
 	if (bucket > max_bucket)
 	    max_bucket = bucket;
@@ -2026,7 +2000,7 @@ Perl_mfree(Malloc_t where)
 		return;
 #ifdef DEBUGGING
 	if (PTR2UV(cp) & (MEM_ALIGNBYTES - 1))
-	    croak("%s", "wrong alignment in free()");
+	    croak(aTHX_ "%s", "wrong alignment in free()");
 #endif
 	ovp = (union overhead *)((caddr_t)cp 
 				- sizeof (union overhead) * CHUNK_SHIFT);
@@ -2129,7 +2103,7 @@ Perl_realloc(void *mp, size_t nbytes)
 	MEM_SIZE size = nbytes;
 
 	if ((long)nbytes < 0)
-	    croak("%s", "panic: realloc");
+	    croak(aTHX_ "%s", "panic: realloc");
 #endif
 
 	BARK_64K_LIMIT("Reallocation",nbytes,size);

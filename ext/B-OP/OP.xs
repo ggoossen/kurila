@@ -167,7 +167,7 @@ op_name_to_num(SV * name)
     }
 #endif
 
-    croak("No such op \"%s\"", SvPV_nolen(name));
+    croak1("No such op \"%s\"", SvPV_nolen(name));
 
     return -1;
 }
@@ -288,7 +288,7 @@ cc_opclass(pTHX_ const OP *o)
     case OA_ROOTOP:
         return OPc_ROOTOP;
     }
-    warn("can't determine class of operator %s, assuming BASEOP\n",
+    warn1("can't determine class of operator %s, assuming BASEOP\n",
 	 PL_op_name[o->op_type]);
     return OPc_BASEOP;
 }
@@ -309,7 +309,7 @@ SVtoO(SV* sv) {
     else {
         return 0;
     }
-        croak("Argument is not a reference");
+        croak0("Argument is not a reference");
     return 0; /* Not reached */
 }
 
@@ -320,7 +320,7 @@ walkoptree(pTHX_ SV *opsv, const char *method)
     OP *o, *kid;
 
     if (!SvROK(opsv))
-	croak("opsv is not a reference");
+	croak0("opsv is not a reference");
     opsv = sv_mortalcopy(opsv);
     o = INT2PTR(OP*,SvIV((SV*)SvRV(opsv)));
     if (walkoptree_debug) {

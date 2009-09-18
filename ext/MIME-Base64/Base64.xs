@@ -202,7 +202,7 @@ decode_base64(sv)
 		if (str == end) {
 		    if (i < 4) {
 			if (i && DOWARN)
-			    warn("Premature end of base64 data");
+			    warn(aTHX_ "Premature end of base64 data");
 			if (i < 2) goto thats_it;
 			if (i == 2) c[2] = EQ;
 			c[3] = EQ;
@@ -212,7 +212,7 @@ decode_base64(sv)
             } while (i < 4);
 	
 	    if (c[0] == EQ || c[1] == EQ) {
-		if (DOWARN) warn("Premature padding of base64 data");
+		if (DOWARN) warn(aTHX_ "Premature padding of base64 data");
 		break;
             }
 	    /* printf("c0=%d,c1=%d,c2=%d,c3=%d\n", c[0],c[1],c[2],c[3]);*/
@@ -336,7 +336,7 @@ encode_qp(sv,...)
 		    sv_catpvn(RETVAL, eol, eol_len);
 		    linelen = 0;
 		}
-	        sv_catpvf(RETVAL, "=%02X", (unsigned char)*p);
+	        sv_catpvf(aTHX_ RETVAL, "=%02X", (unsigned char)*p);
 	        p++;
 	        linelen += 3;
 	    }

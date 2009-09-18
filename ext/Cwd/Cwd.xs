@@ -459,7 +459,7 @@ PPCODE:
              isALPHA(SvPVX_mutable(ST(0))[0]))
         drive = toUPPER(SvPVX_mutable(ST(0))[0]) - 'A' + 1;
     else
-        croak("Usage: getdcwd(DRIVE)");
+        croak(aTHX_ "Usage: getdcwd(DRIVE)");
 
     New(0,dir,MAXPATHLEN,char);
     if (_getdcwd(drive, dir, MAXPATHLEN)) {

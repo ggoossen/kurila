@@ -20,11 +20,11 @@ all_keys(hash,keys,placeholder)
         HE *he;
     CODE:
 	if (!SvROK(hash) || SvTYPE(SvRV(hash)) != SVt_PVHV)
-	   croak("First argument to all_keys() must be an HASH reference");
+	   croak(aTHX_ "First argument to all_keys() must be an HASH reference");
 	if (!SvROK(keys) || SvTYPE(SvRV(keys)) != SVt_PVAV)
-	   croak("Second argument to all_keys() must be an ARRAY reference");
+	   croak(aTHX_ "Second argument to all_keys() must be an ARRAY reference");
         if (!SvROK(placeholder) || SvTYPE(SvRV(placeholder)) != SVt_PVAV)
-	   croak("Third argument to all_keys() must be an ARRAY reference");
+	   croak(aTHX_ "Third argument to all_keys() must be an ARRAY reference");
 
 	hv = (HV*)SvRV(hash);
 	av_k = (AV*)SvRV(keys);
@@ -57,7 +57,7 @@ hidden_ref_keys(hash)
         AV *res;
     PPCODE:
 	if (!SvROK(hash) || SvTYPE(SvRV(hash)) != SVt_PVHV)
-	   croak("First argument to hidden_keys() must be an HASH reference");
+	   croak(aTHX_ "First argument to hidden_keys() must be an HASH reference");
 
         res = newAV();
         mXPUSHs((SV*)res);
@@ -81,7 +81,7 @@ legal_ref_keys(hash)
         AV *res;
     PPCODE:
 	if (!SvROK(hash) || SvTYPE(SvRV(hash)) != SVt_PVHV)
-	   croak("First argument to legal_keys() must be an HASH reference");
+	   croak(aTHX_ "First argument to legal_keys() must be an HASH reference");
 
         res = newAV();
         mXPUSHs((SV*)res);
@@ -105,7 +105,7 @@ hv_store(hvref, key, val)
     CODE:
     {
 	if (!SvROK(hvref) || SvTYPE(SvRV(hvref)) != SVt_PVHV)
-	   croak("First argument to hv_store() must be a hash reference");
+	   croak(aTHX_ "First argument to hv_store() must be a hash reference");
 	hv = (HV*)SvRV(hvref);
         SvREFCNT_inc(val);
 	hv_store_ent(hv, key, val, 0);

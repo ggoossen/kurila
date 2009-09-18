@@ -57,11 +57,11 @@ typedef FILE * OutputStream;
 # define NORETURN_FUNCTION_END /* NOT REACHED */ return 0
 #endif
 
-static int not_here(const char *s) __attribute__noreturn__;
+static int not_here(pTHX_ const char *s) __attribute__noreturn__;
 static int
-not_here(const char *s)
+not_here(pTHX_ const char *s)
 {
-    croak("%s not implemented on this architecture", s);
+    croak(aTHX_ "%s not implemented on this architecture", s);
     NORETURN_FUNCTION_END;
 }
 
@@ -382,7 +382,7 @@ setbuf(handle, ...)
 	    setbuf(handle, buf);
 	}
 #else
-	    not_here("IO::Handle::setbuf");
+	    not_here(aTHX_ "IO::Handle::setbuf");
 #endif
 
 SysRet
@@ -413,7 +413,7 @@ setvbuf(...)
 	}
     }
 #else
-	RETVAL = (SysRet) not_here("IO::Handle::setvbuf");
+	RETVAL = (SysRet) not_here(aTHX_ "IO::Handle::setvbuf");
 #endif
     OUTPUT:
 	RETVAL

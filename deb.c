@@ -24,23 +24,6 @@
 #define PERL_IN_DEB_C
 #include "perl.h"
 
-#if defined(PERL_IMPLICIT_CONTEXT)
-void
-Perl_deb_nocontext(const char *pat, ...)
-{
-#ifdef DEBUGGING
-    dTHX;
-    va_list args;
-    PERL_ARGS_ASSERT_DEB_NOCONTEXT;
-    va_start(args, pat);
-    vdeb(pat, &args);
-    va_end(args);
-#else
-    PERL_UNUSED_ARG(pat);
-#endif /* DEBUGGING */
-}
-#endif
-
 void
 Perl_deb(pTHX_ const char *pat, ...)
 {

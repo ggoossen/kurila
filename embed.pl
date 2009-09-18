@@ -361,6 +361,16 @@ sub hide($from, $to)
     "#define $from" . "\t" x ($t +< 3 ?? 3 - $t !! 1) . "$to\n"
 
 
+sub hide_func($from, $to, $n_args)
+    my $alist = join(",", @az[[0..$n_args-1]])
+    my $ret = "#define $from($alist)"
+    my $t = int(length($ret) / 8)
+    $ret .=  "\t" x ($t +< 4 ?? 4 - $t !! 1)
+    $ret .= "$to(aTHX"
+    $ret .= "_ " if $alist
+    $ret .= $alist . ")\n"
+    return $ret
+
 sub bincompat_var($pfx, $sym)
     my $arg = ($pfx eq 'G' ?? 'NULL' !! 'aTHX')
     undefine("PL_$sym") . hide("PL_$sym", "(*Perl_$($pfx)$($sym)_ptr($arg))")
@@ -489,26 +499,16 @@ walk_table sub (@< @_)
                    my (@: $flags,$retval,$func,@< @args) =  @_
                    unless ($flags =~ m/[om]/)
                        my $args = scalar nelems @args
-                       if ($args and @args[$args-1] =~ m/\.\.\./) {
-                       # we're out of luck for varargs functions under CPP
-                       }elsif ($flags =~ m/n/)
-                           if ($flags =~ m/s/)
-                               $ret .= hide($func,"S_$func")
-                           elsif ($flags =~ m/p/)
-                               $ret .= hide($func,"Perl_$func")
-                           
+                       my $to_func = ($flags =~ m/s/ ?? "S_$func" !! "Perl_$func" )
+                       if ($args and @args[$args-1] =~ m/\.\.\./)
+                           # we're out of luck for varargs functions under CPP
+                           $ret .= hide($func, $to_func)
+                           for my $i (0..10)
+                               $ret .= hide_func($func . $i, $to_func, $args + $i - 1)
+                       elsif ($flags =~ m/n/)
+                           $ret .= hide($func, $to_func)
                        else
-                           my $alist = join(",", @az[[0..$args-1]])
-                           $ret = "#define $func($alist)"
-                           my $t = int(length($ret) / 8)
-                           $ret .=  "\t" x ($t +< 4 ?? 4 - $t !! 1)
-                           if ($flags =~ m/s/)
-                               $ret .= "S_$func(aTHX"
-                           elsif ($flags =~ m/p/)
-                               $ret .= "Perl_$func(aTHX"
-                           
-                           $ret .= "_ " if $alist
-                           $ret .= $alist . ")\n"
+                           $ret .= hide_func($func, $to_func, $args)
                        
                        if ($flags =~ m/S/)
                            write_xv_defines($retval, $func, @args)
@@ -603,38 +603,6 @@ print $em, <<'END'
    an extra argument but grab the context pointer using the macro
    dTHX.
  */
-#if defined(PERL_IMPLICIT_CONTEXT) && !defined(PERL_NO_SHORT_NAMES)
-#  define croak                         Perl_croak_nocontext
-#  define deb                           Perl_deb_nocontext
-#  define die                           Perl_die_nocontext
-#  define form                          Perl_form_nocontext
-#  define load_module                   Perl_load_module_nocontext
-#  define mess                          Perl_mess_nocontext
-#  define newSVpvf                      Perl_newSVpvf_nocontext
-#  define sv_catpvf                     Perl_sv_catpvf_nocontext
-#  define sv_setpvf                     Perl_sv_setpvf_nocontext
-#  define warn                          Perl_warn_nocontext
-#  define warner                        Perl_warner_nocontext
-#  define sv_catpvf_mg                  Perl_sv_catpvf_mg_nocontext
-#  define sv_setpvf_mg                  Perl_sv_setpvf_mg_nocontext
-#endif
-
-#if !defined(PERL_IMPLICIT_CONTEXT)
-/* undefined symbols, point them back at the usual ones */
-#  define Perl_croak_nocontext          Perl_croak
-#  define Perl_die_nocontext            Perl_die
-#  define Perl_deb_nocontext            Perl_deb
-#  define Perl_form_nocontext           Perl_form
-#  define Perl_load_module_nocontext    Perl_load_module
-#  define Perl_mess_nocontext           Perl_mess
-#  define Perl_newSVpvf_nocontext       Perl_newSVpvf
-#  define Perl_sv_catpvf_nocontext      Perl_sv_catpvf
-#  define Perl_sv_setpvf_nocontext      Perl_sv_setpvf
-#  define Perl_warn_nocontext           Perl_warn
-#  define Perl_warner_nocontext         Perl_warner
-#  define Perl_sv_catpvf_mg_nocontext   Perl_sv_catpvf_mg
-#  define Perl_sv_setpvf_mg_nocontext   Perl_sv_setpvf_mg
-#endif
 
 /* ex: set ro: */
 END

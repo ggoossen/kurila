@@ -2558,19 +2558,6 @@ Perl_load_module(pTHX_ U32 flags, SV *name, SV *ver, ...)
     va_end(args);
 }
 
-#ifdef PERL_IMPLICIT_CONTEXT
-void
-Perl_load_module_nocontext(U32 flags, SV *name, SV *ver, ...)
-{
-    dTHX;
-    va_list args;
-    PERL_ARGS_ASSERT_LOAD_MODULE_NOCONTEXT;
-    va_start(args, ver);
-    vload_module(flags, name, ver, &args);
-    va_end(args);
-}
-#endif
-
 void
 Perl_vload_module(pTHX_ U32 flags, SV *name, SV *ver, va_list *args)
 {
@@ -3542,7 +3529,7 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
 
     if (SvAVOK(SvLOCATION((SV*)cv))) {
 	SV* namesv = newSVpv(HvNAME_get(GvSTASH(gv)), 0);
-	sv_catpvf(namesv, "::%s", GvNAME_get(gv));
+	sv_catpvf1(namesv, "::%s", GvNAME_get(gv));
 	av_store(svTav(SvLOCATION((SV*)cv)), 3, namesv);
     }
 
@@ -3885,7 +3872,7 @@ Perl_newANONSUB(pTHX_ I32 floor, OP *proto, OP *block)
     SVcpREPLACE(SvLOCATION(sub), location);
     if (SvLOCATION(sub) && SvAVOK(SvLOCATION(sub))) {
 	SV* namesv = newSVpv(HvNAME_get(PL_curstash), 0);
-	sv_catpvf(namesv, "::__ANON__");
+	sv_catpvf0(namesv, "::__ANON__");
 	av_store(svTav(SvLOCATION(sub)), 3, namesv);
     }
     return newSVOP(OP_ANONCODE, 0, sub, location);

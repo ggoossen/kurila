@@ -3785,7 +3785,7 @@ PP(pp_enter_anonhash_assign)
 	SV *elem_value = hv_delete_ent(value, *key, FALSE, 0);
 	bool is_optional = (key[-1] == &PL_sv_yes);
 	if ( ! ( elem_value || is_optional ) ) {
-	    croak("required key '%s' is missing", SvPVX_const(*key));
+	    croak1("required key '%s' is missing", SvPVX_const(*key));
 	}
 	av_push(elem_values, elem_value ? elem_value : &PL_sv_undef);
     }

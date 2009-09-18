@@ -6151,29 +6151,6 @@ Perl_newSVpvn_share(pTHX_ const char *src, I32 len, U32 hash)
 }
 
 
-#if defined(PERL_IMPLICIT_CONTEXT)
-
-/* pTHX_ magic can't cope with varargs, so this is a no-context
- * version of the main function, (which may itself be aliased to us).
- * Don't access this version directly.
- */
-
-SV *
-Perl_newSVpvf_nocontext(const char *const pat, ...)
-{
-    dTHX;
-    register SV *sv;
-    va_list args;
-
-    PERL_ARGS_ASSERT_NEWSVPVF_NOCONTEXT;
-
-    va_start(args, pat);
-    sv = vnewSVpvf(pat, &args);
-    va_end(args);
-    return sv;
-}
-#endif
-
 /*
 =for apidoc newSVpvf
 
@@ -6197,7 +6174,7 @@ Perl_newSVpvf(pTHX_ const char *const pat, ...)
     return sv;
 }
 
-/* backend for newSVpvf() and newSVpvf_nocontext() */
+/* backend for newSVpvf() */
 
 SV *
 Perl_vnewSVpvf(pTHX_ const char *const pat, va_list *const args)
@@ -6971,45 +6948,6 @@ Perl_sv_setpviv_mg(pTHX_ SV *const sv, const IV iv)
     SvSETMAGIC(sv);
 }
 
-#if defined(PERL_IMPLICIT_CONTEXT)
-
-/* pTHX_ magic can't cope with varargs, so this is a no-context
- * version of the main function, (which may itself be aliased to us).
- * Don't access this version directly.
- */
-
-void
-Perl_sv_setpvf_nocontext(SV *const sv, const char *const pat, ...)
-{
-    dTHX;
-    va_list args;
-
-    PERL_ARGS_ASSERT_SV_SETPVF_NOCONTEXT;
-
-    va_start(args, pat);
-    sv_vsetpvf(sv, pat, &args);
-    va_end(args);
-}
-
-/* pTHX_ magic can't cope with varargs, so this is a no-context
- * version of the main function, (which may itself be aliased to us).
- * Don't access this version directly.
- */
-
-void
-Perl_sv_setpvf_mg_nocontext(SV *const sv, const char *const pat, ...)
-{
-    dTHX;
-    va_list args;
-
-    PERL_ARGS_ASSERT_SV_SETPVF_MG_NOCONTEXT;
-
-    va_start(args, pat);
-    sv_vsetpvf_mg(sv, pat, &args);
-    va_end(args);
-}
-#endif
-
 /*
 =for apidoc sv_setpvf
 
@@ -7088,45 +7026,6 @@ Perl_sv_vsetpvf_mg(pTHX_ SV *const sv, const char *const pat, va_list *const arg
     sv_vsetpvfn(sv, pat, strlen(pat), args, NULL, 0, NULL);
     SvSETMAGIC(sv);
 }
-
-#if defined(PERL_IMPLICIT_CONTEXT)
-
-/* pTHX_ magic can't cope with varargs, so this is a no-context
- * version of the main function, (which may itself be aliased to us).
- * Don't access this version directly.
- */
-
-void
-Perl_sv_catpvf_nocontext(SV *const sv, const char *const pat, ...)
-{
-    dTHX;
-    va_list args;
-
-    PERL_ARGS_ASSERT_SV_CATPVF_NOCONTEXT;
-
-    va_start(args, pat);
-    sv_vcatpvf(sv, pat, &args);
-    va_end(args);
-}
-
-/* pTHX_ magic can't cope with varargs, so this is a no-context
- * version of the main function, (which may itself be aliased to us).
- * Don't access this version directly.
- */
-
-void
-Perl_sv_catpvf_mg_nocontext(SV *const sv, const char *const pat, ...)
-{
-    dTHX;
-    va_list args;
-
-    PERL_ARGS_ASSERT_SV_CATPVF_MG_NOCONTEXT;
-
-    va_start(args, pat);
-    sv_vcatpvf_mg(sv, pat, &args);
-    va_end(args);
-}
-#endif
 
 /*
 =for apidoc sv_catpvf
@@ -8303,13 +8202,13 @@ Perl_sv_vcatpvfn(pTHX_ SV *const sv, const char *const pat, const STRLEN patlen,
 
 	have = esignlen + zeros + elen;
 	if (have < zeros)
-	    Perl_croak_nocontext("%s", PL_memory_wrap);
+	    croak1("%s", PL_memory_wrap);
 
 	need = (have > width ? have : width);
 	gap = need - have;
 
 	if (need >= (((STRLEN)~0) - SvCUR(sv) - dotstrlen - 1))
-	    Perl_croak_nocontext("%s", PL_memory_wrap);
+	    croak1("%s", PL_memory_wrap);
 	SvGROW(sv, SvCUR(sv) + need + dotstrlen + 1);
 	p = SvEND(sv);
 	if (esignlen && fill == '0') {

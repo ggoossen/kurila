@@ -461,7 +461,7 @@ $xs_subname(sv)
     INPUT:
 	SV *		sv;
     PPCODE:
-	sv = newSVpvf("Your vendor has not defined $package_sprintf_safe macro \%" SVf
+	sv = newSVpvf(aTHX_ "Your vendor has not defined $package_sprintf_safe macro \%" SVf
 			  ", used", sv);
         PUSHs(sv_2mortal(sv));
 EXPLODE
@@ -479,10 +479,10 @@ $xs_subname(sv)
 #else
 	HV *$($c_subname)_missing = get_missing_hash(aTHX);
 	if (hv_exists($($c_subname)_missing, s, (I32)len)) \{
-	    sv = newSVpvf("Your vendor has not defined $package_sprintf_safe macro \%" SVf
+	    sv = newSVpvf(aTHX_ "Your vendor has not defined $package_sprintf_safe macro \%" SVf
 			  ", used", sv);
 	\} else \{
-	    sv = newSVpvf("\%"SVf" is not a valid $package_sprintf_safe macro",
+	    sv = newSVpvf(aTHX_ "\%"SVf" is not a valid $package_sprintf_safe macro",
 			  sv);
 	\}
 #endif

@@ -396,9 +396,9 @@ unsigned long strtoul (const char *, char **, int);
 #endif
 
 static int
-not_here(const char *s)
+not_here(pTHX_ const char *s)
 {
-    croak("POSIX::%s not implemented on this architecture", s);
+    croak(aTHX_ "POSIX::%s not implemented on this architecture", s);
     return -1;
 }
 
@@ -574,7 +574,7 @@ getcc(termios_ref, ccix)
     CODE:
 #ifdef I_TERMIOS /* References a termios structure member so ifdef it out. */
 	if (ccix >= NCCS)
-	    croak("Bad getcc subscript");
+	    croak(aTHX_ "Bad getcc subscript");
 	RETVAL = termios_ref->c_cc[ccix];
 #else
      not_here("getcc");
@@ -645,7 +645,7 @@ setcc(termios_ref, ccix, cc)
     CODE:
 #ifdef I_TERMIOS /* References a termios structure member so ifdef it out. */
 	if (ccix >= NCCS)
-	    croak("Bad setcc subscript");
+	    croak(aTHX_ "Bad setcc subscript");
 	termios_ref->c_cc[ccix] = cc;
 #else
 	    not_here("setcc");
@@ -1129,7 +1129,7 @@ sigaction(sig, optaction, oldaction = 0)
 	    SV* sigsv;
 
             if (sig < 0) {
-                croak("Negative signals are not allowed");
+                croak(aTHX_ "Negative signals are not allowed");
             }
 
 	    if (sig == 0 && SvPOK(ST(0))) {
@@ -1167,7 +1167,7 @@ sigaction(sig, optaction, oldaction = 0)
 		if(sv_isa(optaction, "POSIX::SigAction"))
 			action = (HV*)SvRV(optaction);
 		else
-			croak("action is not of type POSIX::SigAction");
+			croak(aTHX_ "action is not of type POSIX::SigAction");
 	    }
 	    else {
 		action=0;
@@ -1194,7 +1194,7 @@ sigaction(sig, optaction, oldaction = 0)
 	    if (oldaction) {
 		svp = hv_fetchs(oldaction, "HANDLER", TRUE);
 		if(!svp)
-		    croak("Can't supply an oldaction without a HANDLER");
+		    croak(aTHX_ "Can't supply an oldaction without a HANDLER");
 		if(SvTRUE(sigsv)) { /* TBD: what if "0"? */
 			sv_setsv(*svp, sigsv);
 		}
@@ -1243,7 +1243,7 @@ sigaction(sig, optaction, oldaction = 0)
 		   (The core signal handlers read %SIG to dispatch.) */
 		svp = hv_fetchs(action, "HANDLER", FALSE);
 		if (!svp)
-		    croak("Can't supply an action without a HANDLER");
+		    croak(aTHX_ "Can't supply an action without a HANDLER");
 
                 ENTER;
                 XPUSHs(*svp);
@@ -1310,7 +1310,7 @@ INIT:
 	    IV tmp = SvIV((SV*)SvRV(ST(1)));
 	    sigset = INT2PTR(POSIX__SigSet,tmp);
 	} else {
-	    croak("sigset is not of type POSIX::SigSet");
+	    croak(aTHX_ "sigset is not of type POSIX::SigSet");
 	}
 
 	if (items < 3 || ! SvOK(ST(2))) {
@@ -1319,7 +1319,7 @@ INIT:
 	    IV tmp = SvIV((SV*)SvRV(ST(2)));
 	    oldsigset = INT2PTR(POSIX__SigSet,tmp);
 	} else {
-	    croak("oldsigset is not of type POSIX::SigSet");
+	    croak(aTHX_ "oldsigset is not of type POSIX::SigSet");
 	}
 
 SysRet

@@ -89,7 +89,7 @@ Perl_safesysmalloc(MEM_SIZE size)
 #endif
 #ifdef DEBUGGING
     if ((long)size < 0)
-	Perl_croak_nocontext("panic: malloc");
+	croak0("panic: malloc");
 #endif
     ptr = (Malloc_t)PerlMem_malloc(size?size:1);	/* malloc(0) is NASTY on our system */
     PERL_ALLOC_CHECK(ptr);
@@ -159,7 +159,7 @@ Perl_safesysrealloc(Malloc_t where,MEM_SIZE size)
 	    = (struct perl_memory_debug_header *)where;
 
 	if (header->interpreter != aTHX) {
-	    Perl_croak_nocontext("panic: realloc from wrong pool");
+	    croak0("panic: realloc from wrong pool");
 	}
 	assert(header->next->prev == header);
 	assert(header->prev->next == header);
@@ -175,7 +175,7 @@ Perl_safesysrealloc(Malloc_t where,MEM_SIZE size)
 #endif
 #ifdef DEBUGGING
     if ((long)size < 0)
-	Perl_croak_nocontext("panic: realloc");
+	croak0("panic: realloc");
 #endif
     ptr = (Malloc_t)PerlMem_realloc(where,size);
     PERL_ALLOC_CHECK(ptr);
@@ -240,14 +240,14 @@ Perl_safesysfree(Malloc_t where)
 		= (struct perl_memory_debug_header *)where;
 
 	    if (header->interpreter != aTHX) {
-		Perl_croak_nocontext("panic: free from wrong pool");
+		croak0("panic: free from wrong pool");
 	    }
 	    if (!header->prev) {
-		Perl_croak_nocontext("panic: duplicate free");
+		croak0("panic: duplicate free");
 	    }
 	    if (!(header->next) || header->next->prev != header
 		|| header->prev->next != header) {
-		Perl_croak_nocontext("panic: bad free");
+		croak0("panic: bad free");
 	    }
 	    /* Unlink us from the chain.  */
 	    header->next->prev = header->prev;
@@ -276,12 +276,12 @@ Perl_safesyscalloc(MEM_SIZE count, MEM_SIZE size)
     if (size && (count <= MEM_SIZE_MAX / size))
 	total_size = size * count;
     else
-	Perl_croak_nocontext("%s", PL_memory_wrap);
+	croak1("%s", PL_memory_wrap);
 #ifdef PERL_TRACK_MEMPOOL
     if (sTHX <= MEM_SIZE_MAX - (MEM_SIZE)total_size)
 	total_size += sTHX;
     else
-	Perl_croak_nocontext("%s", PL_memory_wrap);
+	croak1("%s", PL_memory_wrap);
 #endif
 #ifdef HAS_64K_LIMIT
     if (total_size > 0xffff) {
@@ -292,7 +292,7 @@ Perl_safesyscalloc(MEM_SIZE count, MEM_SIZE size)
 #endif /* HAS_64K_LIMIT */
 #ifdef DEBUGGING
     if ((long)size < 0 || (long)count < 0)
-	Perl_croak_nocontext("panic: calloc");
+	croak0("panic: calloc");
 #endif
 #ifdef PERL_TRACK_MEMPOOL
     /* Have to use malloc() because we've added some space for our tracking
@@ -1076,21 +1076,6 @@ S_mess_alloc(pTHX)
     return sv;
 }
 
-#if defined(PERL_IMPLICIT_CONTEXT)
-char *
-Perl_form_nocontext(const char* pat, ...)
-{
-    dTHX;
-    char *retval;
-    va_list args;
-    PERL_ARGS_ASSERT_FORM_NOCONTEXT;
-    va_start(args, pat);
-    retval = vform(pat, &args);
-    va_end(args);
-    return retval;
-}
-#endif /* PERL_IMPLICIT_CONTEXT */
-
 /*
 =head1 Miscellaneous Functions
 =for apidoc form
@@ -1131,21 +1116,6 @@ Perl_vform(pTHX_ const char *pat, va_list *args)
     sv_vsetpvfn(sv, pat, strlen(pat), args, NULL, 0, NULL);
     return SvPVX_mutable(sv);
 }
-
-#if defined(PERL_IMPLICIT_CONTEXT)
-SV *
-Perl_mess_nocontext(const char *pat, ...)
-{
-    dTHX;
-    SV *retval;
-    va_list args;
-    PERL_ARGS_ASSERT_MESS_NOCONTEXT;
-    va_start(args, pat);
-    retval = vmess(pat, &args);
-    va_end(args);
-    return retval;
-}
-#endif /* PERL_IMPLICIT_CONTEXT */
 
 SV *
 Perl_mess(pTHX_ const char *pat, ...)
@@ -1340,34 +1310,6 @@ Perl_die(pTHX_ const char* pat, ...)
     return NULL;
 }
 
-#if defined(PERL_IMPLICIT_CONTEXT)
-void
-Perl_die_nocontext(const char* pat, ...)
-{
-    dTHX;
-    va_list args;
-    PERL_ARGS_ASSERT_DIE_NOCONTEXT;
-    va_start(args, pat);
-    vdie(pat, &args);
-    /* NOTREACHED */
-    va_end(args);
-}
-#endif /* PERL_IMPLICIT_CONTEXT */
-
-#if defined(PERL_IMPLICIT_CONTEXT)
-void
-Perl_croak_nocontext(const char *pat, ...)
-{
-    dTHX;
-    va_list args;
-    PERL_ARGS_ASSERT_CROAK_NOCONTEXT;
-    va_start(args, pat);
-    vdie(pat, &args);
-    /* NOTREACHED */
-    va_end(args);
-}
-#endif /* PERL_IMPLICIT_CONTEXT */
-
 /*
 =head1 Warning and Dieing
 
@@ -1446,19 +1388,6 @@ Perl_vwarn_at(pTHX_ SV* location, const char* pat, va_list *args)
     vdie_common(msv, TRUE);
 }
 
-#if defined(PERL_IMPLICIT_CONTEXT)
-void
-Perl_warn_nocontext(const char *pat, ...)
-{
-    dTHX;
-    va_list args;
-    PERL_ARGS_ASSERT_WARN_NOCONTEXT;
-    va_start(args, pat);
-    vwarn(pat, &args);
-    va_end(args);
-}
-#endif /* PERL_IMPLICIT_CONTEXT */
-
 /*
 =for apidoc warn
 
@@ -1477,19 +1406,6 @@ Perl_warn(pTHX_ const char *pat, ...)
     vwarner(0, pat, &args);
     va_end(args);
 }
-
-#if defined(PERL_IMPLICIT_CONTEXT)
-void
-Perl_warner_nocontext(U32 err, const char *pat, ...)
-{
-    dTHX; 
-    va_list args;
-    PERL_ARGS_ASSERT_WARNER_NOCONTEXT;
-    va_start(args, pat);
-    vwarner(err, pat, &args);
-    va_end(args);
-}
-#endif /* PERL_IMPLICIT_CONTEXT */
 
 void
 Perl_warner(pTHX_ U32  err, const char* pat,...)

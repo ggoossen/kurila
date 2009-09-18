@@ -216,11 +216,11 @@ EOT
         switch (type) \{
         case PERL_constant_NOTFOUND:
           sv =
-	    sv_2mortal(newSVpvf("\%s is not a valid $package_sprintf_safe macro", s));
+	    sv_2mortal(newSVpvf(aTHX_ "\%s is not a valid $package_sprintf_safe macro", s));
           PUSHs(sv);
           break;
         case PERL_constant_NOTDEF:
-          sv = sv_2mortal(newSVpvf(
+          sv = sv_2mortal(newSVpvf(aTHX_
 	    "Your vendor has not defined $package_sprintf_safe macro \%s, used",
 				   s));
           PUSHs(sv);

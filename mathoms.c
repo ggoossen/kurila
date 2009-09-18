@@ -334,36 +334,6 @@ Perl_sv_pvn_force(pTHX_ SV *sv, STRLEN *lp)
     return sv_pvn_force_flags(sv, lp, 0);
 }
 
-int
-Perl_fprintf_nocontext(PerlIO *stream, const char *format, ...)
-{
-    dTHXs;
-    va_list(arglist);
-
-    /* Easier to special case this here than in embed.pl. (Look at what it
-       generates for proto.h) */
-#ifdef PERL_IMPLICIT_CONTEXT
-    PERL_ARGS_ASSERT_FPRINTF_NOCONTEXT;
-#endif
-
-    va_start(arglist, format);
-    return PerlIO_vprintf(stream, format, arglist);
-}
-
-int
-Perl_printf_nocontext(const char *format, ...)
-{
-    dTHX;
-    va_list(arglist);
-
-#ifdef PERL_IMPLICIT_CONTEXT
-    PERL_ARGS_ASSERT_PRINTF_NOCONTEXT;
-#endif
-
-    va_start(arglist, format);
-    return PerlIO_vprintf(PerlIO_stdout(), format, arglist);
-}
-
 #if defined(HUGE_VAL) || (defined(USE_LONG_DOUBLE) && defined(HUGE_VALL))
 /*
  * This hack is to force load of "huge" support from libm.a

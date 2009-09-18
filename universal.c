@@ -785,7 +785,7 @@ S_cat_view_pv(pTHX_ SV* retsv, SV* sv, int indent)
 	indent += 3;
 	for (i=0; i<=av_len(svTav(sv)); i++) {
 	    if (i != 0)
-		sv_catpvf(retsv, "\n%*s", indent, "");
+		sv_catpvf2(retsv, "\n%*s", indent, "");
 	    S_cat_view_pv(aTHX_ retsv, *av_fetch(svTav(sv), i, 0), indent);
 	}
 	return;
