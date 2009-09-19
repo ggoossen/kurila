@@ -4142,8 +4142,6 @@ Perl_ck_try(pTHX_ OP *o)
 	    /* establish postfix order */
 	    enter->op_next = (OP*)enter;
 
-	    CHECKOP(OP_ENTERTRY, enter);
-
 	    o = prepend_elem(OP_LINESEQ, (OP*)enter, (OP*)kid);
 	    o->op_type = OP_LEAVETRY;
 	    o->op_ppaddr = PL_ppaddr[OP_LEAVETRY];

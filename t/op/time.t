@@ -3,7 +3,7 @@
 BEGIN 
     require './test.pl'
 
-plan tests => 42;
+plan tests => 44;
 
 our (@: $beguser,$begsys, ...) = @: times
 
@@ -122,3 +122,14 @@ do
         ok( eq_array(\@time, \@expected),  "localtime($time) list context" )
           or diag("@time")
         like scalar localtime($time), $scalar,       "  scalar"
+
+# Test floating point args
+do
+    try
+        $^WARN_HOOK = sub { die @_; }
+        localtime(1.23)
+    is($^EVAL_ERROR, '', 'Ignore fractional time');
+    try
+        $^WARN_HOOK = sub { die @_; }
+        gmtime(1.23)
+    is($^EVAL_ERROR, '', 'Ignore fractional time');
