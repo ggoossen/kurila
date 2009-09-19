@@ -68,6 +68,8 @@ Perl_loc_desc
 Perl_loc_name
 Perl_SvNAME
 Perl_LocationFilename
+Perl_Dtype
+Perl_Ddesc
 Perl_push_block
 Perl_pop_block
 Perl_push_stack

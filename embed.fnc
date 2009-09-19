@@ -123,8 +123,8 @@ Aip	|SV*	|loc_name	|NULLOK SV *loc
 Aip	|SV*	|SvNAME	|NN SV *sv
 Aip	|SV*	|LocationFilename	|NULLOK SV *location
 
-ip	|datatype	|Dtype	|NN SV *sv
-ip	|const char*	|Ddesc	|NN SV *sv
+Aip	|datatype	|Dtype	|NN SV *sv
+Aip	|const char*	|Ddesc	|NN SV *sv
 
 Aip     |PERL_CONTEXT* |push_block  |U8 t|NN SV** sp|U8 gimme
 Aip     |PERL_CONTEXT* |pop_block

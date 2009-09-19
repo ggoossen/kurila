@@ -102,10 +102,8 @@
 #define loc_name		Perl_loc_name
 #define SvNAME			Perl_SvNAME
 #define LocationFilename	Perl_LocationFilename
-#ifdef PERL_CORE
 #define Dtype			Perl_Dtype
 #define Ddesc			Perl_Ddesc
-#endif
 #define push_block		Perl_push_block
 #define pop_block		Perl_pop_block
 #define push_stack		Perl_push_stack
@@ -2328,10 +2326,8 @@
 #define loc_name(a)		Perl_loc_name(aTHX_ a)
 #define SvNAME(a)		Perl_SvNAME(aTHX_ a)
 #define LocationFilename(a)	Perl_LocationFilename(aTHX_ a)
-#ifdef PERL_CORE
 #define Dtype(a)		Perl_Dtype(aTHX_ a)
 #define Ddesc(a)		Perl_Ddesc(aTHX_ a)
-#endif
 #define push_block(a,b,c)	Perl_push_block(aTHX_ a,b,c)
 #define pop_block()		Perl_pop_block(aTHX)
 #define push_stack(a,b)		Perl_push_stack(aTHX_ a,b)
