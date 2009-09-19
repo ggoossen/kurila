@@ -3629,7 +3629,7 @@ PP(pp_gmtime)
 	*/
 	double input = POPn;
 	when = (Time64_T)input;
-	if( when != input ) {
+	if (when != input && ckWARN(WARN_OVERFLOW)) {
 	    Perl_warner(aTHX_ packWARN(WARN_OVERFLOW),
 			"%s(%.0f) too large", opname, input);
 	}
@@ -3641,7 +3641,7 @@ PP(pp_gmtime)
 	err = gmtime64_r(&when, &tmbuf);
 #endif
 
-    if( err == NULL ) {
+    if (err == NULL && ckWARN(WARN_OVERFLOW)) {
 	/* XXX %lld broken for quads */
 	Perl_warner(aTHX_ packWARN(WARN_OVERFLOW),
 		    "%s(%.0f) failed", opname, (double)when);
