@@ -11,21 +11,19 @@ $no = qr/^(?:$no)$/i
 my %ext
 my %static
 
-sub set_static_extensions
+sub set_static_extensions(@list)
     # adjust results of scan_ext, and also save
     # statics in case scan_ext hasn't been called yet.
     # if '*' is passed then all XS extensions are static
     # (with possible exclusions)
     %static = $%
-    my @list = @_
-    if (@_[0] eq '*')
-        my %excl = %+: map { %: $_=>1 }, map {m/^!(.*)$/}, @_[[1 .. ((nelems @_)-1)]] 
+    if (@list[0] eq '*')
+        my %excl = %+: map { %: $_=>1 }, map {m/^!(.*)$/}, @list[[1 .. (nelems @list)-1]] 
         @list = grep {!exists %excl{$_}}, keys %ext
     
     for ( @list)
         %static{+$_} = 1
         %ext{+$_} = 'static' if %ext{?$_} && %ext{?$_} eq 'dynamic'
-    
 
 
 sub scan_ext($dir)

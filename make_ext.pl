@@ -135,8 +135,8 @@ if ($is_Win32)
     env::var('PATH') = "$topdir;$topdir\\win32\\bin;$(env::var('PATH'))"
     my $pl2bat = "$topdir\\win32\\bin\\pl2bat"
     unless (-f "$pl2bat.bat")
-        my @args = @: $perl, (@: "$pl2bat.pl") x 2
-        print "@args\n"
+        my @args = @: $perl, < (@: "$pl2bat.pl") x 2
+        print $^STDOUT, "$(join ' ', @args)\n"
         system(< @args) unless defined $::Cross::platform
 
     print $^STDOUT, "In ", getcwd()
@@ -146,8 +146,8 @@ if ($is_Win32)
     FindExt::set_static_extensions(split ' ', config_value('static_ext'))
 
     my @ext
-    push @ext, FindExt::static_ext() if $static
-    push @ext, FindExt::dynamic_ext(), FindExt::nonxs_ext() if $dynamic
+    push @ext, < FindExt::static_ext() if $static
+    push @ext, < FindExt::dynamic_ext(), < FindExt::nonxs_ext() if $dynamic
 
     foreach (sort @ext)
         if (%incl and !exists %incl{$_})
@@ -158,7 +158,7 @@ if ($is_Win32)
             next
         push @extspec, $_
         if(FindExt::is_static($_))
-            push %extra_passthrough{$_}, 'LINKTYPE=static'
+            push %extra_passthrough{+$_}, 'LINKTYPE=static'
 
     chdir '..' # now in the Perl build directory
 elsif ($is_VMS)

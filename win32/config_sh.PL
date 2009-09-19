@@ -35,7 +35,7 @@ while ($optref->@ && $optref->[0] =~ m/^([\w_]+)=(.*)$/)
     shift($optref->@)
 
 FindExt::scan_ext("../ext")
-FindExt::set_static_extensions( <split ' ', %opt{?'static_ext'})
+FindExt::set_static_extensions(split ' ', %opt{?'static_ext'})
 
 %opt{+'nonxs_ext'}        = join(' ',FindExt::nonxs_ext()) || ' '
 %opt{+'static_ext'}       = join(' ',FindExt::static_ext()) || ' '

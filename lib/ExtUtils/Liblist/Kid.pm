@@ -15,9 +15,9 @@ use File::Basename
 use File::Spec
 
 sub ext
-    if   ($^OS_NAME eq 'VMS')     { return _vms_ext( < @_ );      }
-        elsif($^OS_NAME eq 'MSWin32') { return _win32_ext( < @_ );    }
-    else                    { return _unix_os2_ext( < @_ ); }
+    if   ($^OS_NAME eq 'VMS')     return _vms_ext( < @_ )
+    elsif($^OS_NAME eq 'MSWin32') return _win32_ext( < @_ )
+    else                          return _unix_os2_ext( < @_ )
 
 
 sub _unix_os2_ext($self,$potential_libs, ?$verbose, ?$give_libs)
@@ -207,7 +207,7 @@ sub _unix_os2_ext($self,$potential_libs, ?$verbose, ?$give_libs)
                    join(":", @ld_run_path),  (@: $give_libs ?? \@libs !! ())
 
 
-sub _win32_ext($self, $potential_libs, $verbose, $give_libs)
+sub _win32_ext($self, $potential_libs, ?$verbose, ?$give_libs)
 
     require Text::ParseWords
 
@@ -424,7 +424,7 @@ sub _vms_ext($self, $potential_libs, $verbose, $give_libs)
     # Now make sure we've got VMS-syntax absolute directory specs
     # (We don't, however, check whether someone's hidden a relative
     # path in a logical name.)
-    foreach my $dir ( @dirs)
+    foreach my $dir (@dirs)
         unless (-d $dir)
             warn "Skipping nonexistent Directory $dir\n" if $verbose +> 1
             $dir = ''

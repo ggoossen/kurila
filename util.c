@@ -1978,9 +1978,9 @@ Perl_my_ntohl(pTHX_ long l)
 
 #define NOT_AVAIL(name,type)                                    \
         type                                                    \
-        name (register type n)                                  \
+        name (pTHX_ register type n)                                  \
         {                                                       \
-            Perl_croak_nocontext(#name "() not available");     \
+            croak(aTHX_ #name "() not available");     \
             return n; /* not reached */                         \
         }
 
@@ -2497,7 +2497,7 @@ Perl_my_fork(void)
     return pid;
 #else
     /* this "canna happen" since nothing should be calling here if !HAS_FORK */
-    Perl_croak_nocontext("fork() not available");
+    fatalcroak("fork() not available");
     return 0;
 #endif /* HAS_FORK */
 }

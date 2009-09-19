@@ -864,7 +864,7 @@ p	|OP*	|scalarkids	|NULLOK OP* o
 p	|OP*	|scalarseq	|NULLOK OP* o
 : Used in pp_ctl.c
 p	|OP*	|scalarvoid	|NN OP* o
-p	|OP*	|op_mod_assign	|NN OP* operator|NN OP** operandp|I32 type
+p	|OP*	|op_mod_assign	|NN OP* o|NN OP** op|I32 optype
 Apd	|NV	|scan_bin	|NN const char* start|STRLEN len|NN STRLEN* retlen
 Apd	|NV	|scan_hex	|NN const char* start|STRLEN len|NN STRLEN* retlen
 Ap	|char*	|scan_num	|NN const char* s|NN YYSTYPE *lvalp

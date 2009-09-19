@@ -860,7 +860,7 @@ the operator directly to the C<operand>.
 =cut
 */
 OP *
-Perl_op_mod_assign(pTHX_ OP *operator, OP **operandp, I32 optype)
+Perl_op_mod_assign(pTHX_ OP *otor, OP **oandp, I32 optype)
 {
     OP* finish_assign;
     OP* operator_sibling;
@@ -868,21 +868,21 @@ Perl_op_mod_assign(pTHX_ OP *operator, OP **operandp, I32 optype)
     PERL_ARGS_ASSERT_OP_MOD_ASSIGN;
 
     if (optype == OP_ENTERSUB) {
-	*operandp = mod(*operandp, optype);
-	return operator;
+	*oandp = mod(*oandp, optype);
+	return otor;
     }
 
-    if (!*operandp)
-	return operator;
+    if (!*oandp)
+	return otor;
 
-    finish_assign = op_assign(operandp, optype);
+    finish_assign = op_assign(oandp, optype);
 
     if (!finish_assign) {
-	return operator;
+	return otor;
     }
 
-    operator_sibling = operator->op_sibling;
-    o = append_elem(OP_LISTFIRST, scalar(operator), finish_assign);
+    operator_sibling = otor->op_sibling;
+    o = append_elem(OP_LISTFIRST, scalar(otor), finish_assign);
     o->op_sibling = operator_sibling;
     return o;
 }

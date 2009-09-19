@@ -111,7 +111,7 @@ sub file_name_is_absolute($self,$file)
         return  $vol =~ m{^$UNC_RX}o ?? 2
             !! $file =~ m{^$DRIVE_RX(?:[\\/])}o ?? 2
             !! 0
-    
+
     return $file =~  m{^[\\/]} ?? 1 !! 0
 
 
@@ -218,7 +218,7 @@ sub splitpath($self,$path, ?$nofile)
         $volume    = $1
         $directory = $2
         $file      = $3
-    
+
 
     return  @: $volume,$directory,$file
 
@@ -259,10 +259,10 @@ sub splitdir($self,$directories)
         # since there was a trailing separator, add a file name to the end,
         # then do the split, then replace it with ''.
         #
-        my @directories = split( m|[\\/]|, "$($directories)dummy" ) 
-        @directories[( (nelems @directories)-1) ]= '' 
-        return @directories 
-    
+        my @directories = split( m|[\\/]|, "$($directories)dummy" )
+        @directories[( (nelems @directories)-1) ]= ''
+        return @directories
+
 
 
 
@@ -282,9 +282,9 @@ sub catpath($self,$volume,$directory,$file)
     $volume .= $v
         if ( (($v) = $volume =~ m@^([\\/])[\\/][^\\/]+[\\/][^\\/]+\Z(?!\n)@s) &&
              $directory =~ m@^[^\\/]@s
-             ) 
+             )
 
-    $volume .= $directory 
+    $volume .= $directory
 
     # If the volume is not just A:, make sure the glue separator is
     # there, reusing whatever separator is first in the $volume if possible.
@@ -292,14 +292,14 @@ sub catpath($self,$volume,$directory,$file)
         $volume =~ m@[^\\/]\Z(?!\n)@      &&
         $file   =~ m@[^\\/]@
         )
-        $volume =~ m@([\\/])@ 
-        my $sep = $1 ?? $1 !! '\' 
-        $volume .= $sep 
-    
+        $volume =~ m@([\\/])@
+        my $sep = $1 ?? $1 !! '\'
+        $volume .= $sep
 
-    $volume .= $file 
 
-    return $volume 
+    $volume .= $file
+
+    return $volume
 
 
 sub _same
@@ -317,31 +317,31 @@ sub rel2abs($self,$path,?$base)
         # It's missing a volume, add one
         my $vol = $self->splitpath( $self->_cwd() )[0]
         return $self->canonpath( $vol . $path )
-    
+
 
     if ( !defined( $base ) || $base eq '' )
-        require Cwd 
-        $base = Cwd::getdcwd( $self->splitpath( $path )[0] ) if exists &Cwd::getdcwd 
-        $base = $self->_cwd() unless defined $base 
+        require Cwd
+        $base = Cwd::getdcwd( $self->splitpath( $path )[0] ) if exists &Cwd::getdcwd
+        $base = $self->_cwd() unless defined $base
     elsif ( ! $self->file_name_is_absolute( $base ) )
-        $base = $self->rel2abs( $base ) 
+        $base = $self->rel2abs( $base )
     else
-        $base = $self->canonpath( $base ) 
-    
+        $base = $self->canonpath( $base )
+
 
     my (@:  $path_directories, $path_file ) =
-        ($self->splitpath( $path, 1 ))[[1..2]] 
+        ($self->splitpath( $path, 1 ))[[1..2]]
 
     my (@:  $base_volume, $base_directories, _ ) =
-        $self->splitpath( $base, 1 ) 
+        $self->splitpath( $base, 1 )
 
     $path = $self->catpath(
         $base_volume,
         $self->catdir( $base_directories, $path_directories ),
         $path_file
-        ) 
+        )
 
-    return $self->canonpath( $path ) 
+    return $self->canonpath( $path )
 
 
 =back
@@ -423,7 +423,7 @@ sub _canon_cat
         return $1                       # \\HOST\SHARE\ --> \\HOST\SHARE
             if    $path eq ""
           and $volume =~ m#\A(\\\\.*)\\\z#s
-    
+
     return $path ne "" || $volume ?? $volume.$path !! "."
 
 

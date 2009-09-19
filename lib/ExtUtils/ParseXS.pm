@@ -160,8 +160,9 @@ sub process_file
             $cfile =~ s/\.xs$/$csuffix/i or $cfile .= $csuffix
         
         $ExtUtils::ParseXS::CountLines::cfile = $cfile
-        binmode $output_fh, ':via(ExtUtils::ParseXS::CountLines)'
-    
+        try
+            binmode $output_fh, ':via(ExtUtils::ParseXS::CountLines)'
+        warn if $^EVAL_ERROR
 
     foreach my $typemap ( @tm)
         die "Can't find $typemap in $pwd\n" unless -r $typemap

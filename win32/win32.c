@@ -2498,7 +2498,7 @@ win32_flock(int fd, int oper)
 
     if (!IsWinNT()) {
 	dTHX;
-	Perl_croak_nocontext("flock() unimplemented on this platform");
+	croak(aTHX_ "flock() unimplemented on this platform");
 	return -1;
     }
     fh = (HANDLE)_get_osfhandle(fd);

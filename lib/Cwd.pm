@@ -356,10 +356,6 @@ if ($^OS_NAME eq 'cygwin')
 
 
 
-# set a reasonable (and very safe) default for fastgetcwd, in case it
-# isn't redefined later (20001212 rspier)
-*fastgetcwd = \&cwd
-
 # A non-XS version of getcwd() - also used to bootstrap the perl build
 # process, when miniperl is running and no XS loading happens.
 sub _perl_getcwd
@@ -410,7 +406,11 @@ sub fastcwd_
         if $cdev != $orig_cdev || $cino != $orig_cino
     $path
 
-if (not exists &fastcwd) { *fastcwd = \&fastcwd_ }
+
+if (not exists &cwd) 
+    *fastcwd = \&fastcwd_
+else
+    *fastgetcwd = \&cwd
 
 
 # Keeps track of current working directory in PWD environment var
@@ -717,7 +717,8 @@ sub _epoc_cwd
     env::var('PWD' ) = EPOC::getcwd()
     return env::var('PWD')
 
-
+if ($^OS_NAME eq "MSWin32" and not exists &getdcwd)
+    @EXPORT = grep { not $_ eq "getdcwd" }, @EXPORT
 
 # Now that all the base-level functions are set up, alias the
 # user-level functions to the right places
@@ -726,7 +727,7 @@ if (exists %METHOD_MAP{$^OS_NAME})
     my %map = %METHOD_MAP{?$^OS_NAME}
     foreach my $name (keys %map)
         local $^WARNING = 0  # assignments trigger 'subroutine redefined' warning
-        Symbol::fetch_glob($name)->* = \%map{?$name}->&
+        Symbol::fetch_glob($name)->* = \(Symbol::fetch_glob(%map{?$name})->*->&)
     
 
 

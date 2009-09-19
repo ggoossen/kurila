@@ -98,7 +98,7 @@ if (my $patch_file= read_file(".patch"))
     $commit_title = "Snapshot of:"
 elsif (-d path_to('.git'))
     # git branch | awk 'BEGIN{ORS=""} /\*/ { print $^STDOUT, $2 }'
-    @: $branch = grep { defined }, map { m/\* ([^(]\S*)/ ?? $1 !! undef },
+    @: ?$branch = grep { defined }, map { m/\* ([^(]\S*)/ ?? $1 !! undef },
         split m/\n/, backtick('git branch')
     my ($remote,$merge)
     if (length $branch)
