@@ -1298,11 +1298,11 @@ s	|void	|find_beginning	|NN SV* linestr_sv|NN PerlIO *rsfp
 s	|void	|forbid_setid	|const char flag|const bool suidscript
 s	|void	|incpush	|NULLOK const char *const dir|STRLEN len \
 				|U32 flags
-s	|void	|incpush_use_sep|NULLOK const char *p|U32 flags
+s	|void	|incpush_use_sep|NN const char *p|U32 flags
 s	|void	|init_interp
 s	|void	|init_ids
 s	|void	|init_main_stash
-s	|void	|init_perllib
+s	|void	|init_perllib	|U32 old_vers
 s	|void	|init_postdump_symbols|int argc|NN char **argv|NULLOK char **env
 s	|void	|init_predump_symbols
 rs	|void	|my_exit_jump

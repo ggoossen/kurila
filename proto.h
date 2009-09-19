@@ -4144,11 +4144,15 @@ STATIC void	S_find_beginning(pTHX_ SV* linestr_sv, PerlIO *rsfp)
 
 STATIC void	S_forbid_setid(pTHX_ const char flag, const bool suidscript);
 STATIC void	S_incpush(pTHX_ const char *const dir, STRLEN len, U32 flags);
-STATIC void	S_incpush_use_sep(pTHX_ const char *p, U32 flags);
+STATIC void	S_incpush_use_sep(pTHX_ const char *p, U32 flags)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_INCPUSH_USE_SEP	\
+	assert(p)
+
 STATIC void	S_init_interp(pTHX);
 STATIC void	S_init_ids(pTHX);
 STATIC void	S_init_main_stash(pTHX);
-STATIC void	S_init_perllib(pTHX);
+STATIC void	S_init_perllib(pTHX_ U32 old_vers);
 STATIC void	S_init_postdump_symbols(pTHX_ int argc, char **argv, char **env)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_INIT_POSTDUMP_SYMBOLS	\
