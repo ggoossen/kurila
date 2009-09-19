@@ -56,7 +56,7 @@ while ( ~< *SH)
   s/\\\$/\$/g
   s#/[ *\*]*\*/#/**/#
   if (m/^\s*#define\s+(PRIVLIB|SITELIB|VENDORLIB)_EXP/)
-     $_ = "#define ". $1 . "_EXP (win32_get_". lc($1) . "($patchlevel))\t/**/\n"
+     $_ = "#define ". $1 . "_EXP (win32_get_". lc($1) . "(PERL_VERSION_STRING, NULL))\t/**/\n"
   # incpush() handles archlibs, so disable them
   elsif (m/^\s*#define\s+(ARCHLIB|SITEARCH|VENDORARCH)_EXP/)
      $_ = "/*#define ". $1 . "_EXP \"\"\t/**/\n"

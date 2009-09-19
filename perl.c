@@ -3420,6 +3420,10 @@ S_init_perllib(pTHX_ U32 old_vers)
 {
     dVAR;
     char *s;
+#ifdef WIN32
+    STRLEN len;
+#endif
+
     {
 #ifndef VMS
        s = PerlEnv_getenv("PERL5LIB");
@@ -3503,9 +3507,9 @@ S_init_perllib(pTHX_ U32 old_vers)
 #ifdef SITELIB_EXP
 #  if defined(WIN32)
     /* this picks up sitearch as well */
-	s = win32_get_sitelib(PERL_FS_VERSION);
+	s = win32_get_sitelib(PERL_FS_VERSION, &len);
 	if (s)
-	    incpush_use_sep(s, 0, INCPUSH_ADD_SUB_DIRS|INCPUSH_CAN_RELOCATE);
+	    incpush_use_sep(s, len, INCPUSH_ADD_SUB_DIRS|INCPUSH_CAN_RELOCATE);
 #  else
 	S_incpush_use_sep(aTHX_ STR_WITH_LEN(SITELIB_EXP), INCPUSH_CAN_RELOCATE);
 #  endif
@@ -3529,9 +3533,9 @@ S_init_perllib(pTHX_ U32 old_vers)
 #ifdef PERL_VENDORLIB_EXP
 #  if defined(WIN32)
     /* this picks up vendorarch as well */
-	s = win32_get_vendorlib(PERL_FS_VERSION);
+	s = win32_get_vendorlib(PERL_FS_VERSION, &len);
 	if (s)
-	    incpush_use_sep(s, 0, INCPUSH_ADD_SUB_DIRS|INCPUSH_CAN_RELOCATE);
+	    incpush_use_sep(s, len, INCPUSH_ADD_SUB_DIRS|INCPUSH_CAN_RELOCATE);
 #  else
 	S_incpush_use_sep(aTHX_ STR_WITH_LEN(PERL_VENDORLIB_EXP), INCPUSH_CAN_RELOCATE);
 #  endif
@@ -3553,9 +3557,9 @@ S_init_perllib(pTHX_ U32 old_vers)
 #endif
 
 #if defined(WIN32)
-	s = win32_get_privlib(PERL_FS_VERSION);
+	s = win32_get_privlib(PERL_FS_VERSION, &len);
 	if (s)
-	    incpush_use_sep(s, 0, INCPUSH_ADD_SUB_DIRS|INCPUSH_CAN_RELOCATE);
+	    incpush_use_sep(s, len, INCPUSH_ADD_SUB_DIRS|INCPUSH_CAN_RELOCATE);
 #else
 	S_incpush_use_sep(aTHX_ STR_WITH_LEN(PRIVLIB_EXP), INCPUSH_CAN_RELOCATE);
 #endif
