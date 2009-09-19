@@ -219,6 +219,17 @@ return 0;
 #  define RTL_USES_UTC 1
 #endif
 
+#if !defined(__VAX) && __CRTL_VER >= 80200000
+#ifdef lstat
+#undef lstat
+#endif
+#else
+#ifdef lstat
+#undef lstat
+#endif
+#define lstat(_x, _y) stat(_x, _y)
+#endif
+
 /* Routine to create a decterm for use with the Perl debugger */
 /* No headers, this information was found in the Programming Concepts Manual */
 
@@ -5596,6 +5607,8 @@ int_rmsexpand
           if ((opts & PERL_RMSEXPAND_M_VMS) == 0)
 #if !defined(__VAX) && defined(NAML$C_MAXRSS)
               opts |= PERL_RMSEXPAND_M_LONG;
+#else
+              NOOP;
 #endif
           else
               isunix = 0;
@@ -5721,6 +5734,7 @@ int_expanded:
    /* Is a long or a short name expected */
   /*------------------------------------*/
   spec_buf = NULL;
+#if !defined(__VAX) && defined(NAML$C_MAXRSS)
   if ((opts & PERL_RMSEXPAND_M_LONG) != 0) {
     if (rms_nam_rsll(mynam)) {
 	spec_buf = outbufl;
@@ -5732,6 +5746,7 @@ int_expanded:
     }
   }
   else {
+#endif
     if (rms_nam_rsl(mynam)) {
 	spec_buf = outbuf;
 	speclen = rms_nam_rsl(mynam);
@@ -5740,7 +5755,9 @@ int_expanded:
 	spec_buf = esa; /* Not esal */
 	speclen = rms_nam_esl(mynam);
     }
+#if !defined(__VAX) && defined(NAML$C_MAXRSS)
   }
+#endif
   spec_buf[speclen] = '\0';
 
   /* Trim off null fields added by $PARSE
@@ -6415,13 +6432,17 @@ int_fileify_dirspec(const char *dir, char *buf, int *utf8_fl)
       }
 
       /* Make sure we are using the right buffer */
+#if !defined(__VAX) && defined(NAML$C_MAXRSS)
       if (esal != NULL) {
 	my_esa = esal;
 	my_esa_len = rms_nam_esll(dirnam);
       } else {
+#endif
 	my_esa = esa;
         my_esa_len = rms_nam_esl(dirnam);
+#if !defined(__VAX) && defined(NAML$C_MAXRSS)
       }
+#endif
       my_esa[my_esa_len] = '\0';
       if (!rms_is_nam_fnb(dirnam, (NAM$M_EXP_DEV | NAM$M_EXP_DIR))) {
         cp1 = strchr(my_esa,']');
@@ -9757,6 +9778,7 @@ vms_image_init(int *argcp, char ***argvp)
     Perl_csighandler_init();
 #endif
 
+#if __CRTL_VER >= 70300000 && !defined(__VAX)
     /* This was moved from the pre-image init handler because on threaded */
     /* Perl it was always returning 0 for the default value. */
     status = simple_trnlnm("SYS$POSIX_ROOT", eqv, LNM$C_NAMLENGTH);
@@ -9786,7 +9808,7 @@ vms_image_init(int *argcp, char ***argvp)
 	    }
 	}
     }
-
+#endif
 
   _ckvmssts_noperl(sys$getjpiw(0,NULL,NULL,jpilist,iosb,NULL,NULL));
   _ckvmssts_noperl(iosb[0]);
@@ -12744,17 +12766,6 @@ Perl_flex_fstat(pTHX_ int fd, Stat_t *statbufp)
 
 }  /* end of flex_fstat() */
 /*}}}*/
-
-#if !defined(__VAX) && __CRTL_VER >= 80200000
-#ifdef lstat
-#undef lstat
-#endif
-#else
-#ifdef lstat
-#undef lstat
-#endif
-#define lstat(_x, _y) stat(_x, _y)
-#endif
 
 static int
 Perl_flex_stat_int(pTHX_ const char *fspec, Stat_t *statbufp, int lstat_flag)
