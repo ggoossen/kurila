@@ -4143,7 +4143,7 @@ STATIC void	S_find_beginning(pTHX_ SV* linestr_sv, PerlIO *rsfp)
 	assert(linestr_sv); assert(rsfp)
 
 STATIC void	S_forbid_setid(pTHX_ const char flag, const bool suidscript);
-STATIC void	S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep, bool canrelocate, bool unshift);
+STATIC void	S_incpush(pTHX_ const char *dir, U32 flags);
 STATIC void	S_init_interp(pTHX);
 STATIC void	S_init_ids(pTHX);
 STATIC void	S_init_main_stash(pTHX);
@@ -4182,10 +4182,11 @@ STATIC void*	S_parse_body(pTHX_ char **env, XSINIT_t xsinit);
 STATIC void	S_run_body(pTHX_ I32 oldscope)
 			__attribute__noreturn__;
 
-STATIC SV *	S_incpush_if_exists(pTHX_ SV *dir)
-			__attribute__nonnull__(pTHX_1);
+STATIC SV *	S_incpush_if_exists(pTHX_ AV *const av, SV *dir)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_INCPUSH_IF_EXISTS	\
-	assert(dir)
+	assert(av); assert(dir)
 
 #endif
 

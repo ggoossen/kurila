@@ -1296,7 +1296,7 @@ s	|void	|Slab_to_rw	|NN void *op
 #if defined(PERL_IN_PERL_C) || defined(PERL_DECL_PROT)
 s	|void	|find_beginning	|NN SV* linestr_sv|NN PerlIO *rsfp
 s	|void	|forbid_setid	|const char flag|const bool suidscript
-s	|void	|incpush	|NULLOK const char *dir|bool addsubdirs|bool addoldvers|bool usesep|bool canrelocate|bool unshift
+s	|void	|incpush	|NULLOK const char *dir|U32 flags
 s	|void	|init_interp
 s	|void	|init_ids
 s	|void	|init_main_stash
@@ -1314,7 +1314,7 @@ so	|void	|validate_suid	|NN PerlIO *rsfp
 
 s	|void*	|parse_body	|NULLOK char **env|XSINIT_t xsinit
 rs	|void	|run_body	|I32 oldscope
-s	|SV *	|incpush_if_exists|NN SV *dir
+s	|SV *	|incpush_if_exists|NN AV *const av|NN SV *dir
 #endif
 
 #if defined(PERL_IN_PP_C) || defined(PERL_DECL_PROT)
