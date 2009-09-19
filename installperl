@@ -135,8 +135,11 @@ if ($^OS_NAME eq 'dos')
 if ((-e "testcompile") && (defined(env::var('COMPILE'))))
     push(@scripts, < map("$_.exe", @scripts))
 
+<<<<<<< HEAD:installperl
 find(sub ()
-    if ("$File::Find::dir/$_" =~ m{^ext\b(.*)/([^/]+)\.pm$})
+    if (("$File::Find::dir/$_" =~ m{^ext\b(.*)/([^/]+)\.pm$})
+        ! grep { (my $dir = $_) =~ s/\//-/g;
+                 $File::Find::name =~ m/^ext\/$dir/ }, @nonxs)
         my @: $path, $modname = @: $1,$2
 
         # strip to optional "/lib", or remove trailing component
