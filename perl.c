@@ -3776,31 +3776,29 @@ S_incpush(pTHX_ const char *const dir, STRLEN len, U32 flags)
 #endif
 	    if (addsubdirs) {
 #ifdef MACOS_TRADITIONAL
-#define PERL_AV_SUFFIX_FMT	""
-#define PERL_ARCH_FMT 		"%s:"
-#define PERL_ARCH_FMT_PATH	PERL_FS_VER_FMT PERL_AV_SUFFIX_FMT
+#define PERL_ARCH_FMT_PREFIX	""
+#define PERL_ARCH_FMT_SUFFIX	":"
+#define PERL_ARCH_FMT_PATH	PERL_FS_VERSION ""
 #else
-#define PERL_AV_SUFFIX_FMT 	"/"
-#define PERL_ARCH_FMT 		"/%s"
-#define PERL_ARCH_FMT_PATH	PERL_AV_SUFFIX_FMT PERL_FS_VER_FMT
+#define PERL_ARCH_FMT_PREFIX	"/"
+#define PERL_ARCH_FMT_SUFFIX	""
+#define PERL_ARCH_FMT_PATH	"/" PERL_FS_VERSION
 #endif
 		/* .../version/archname if -d .../version/archname */
-		Perl_sv_setpvf(aTHX_ subdir, "%"SVf PERL_ARCH_FMT_PATH PERL_ARCH_FMT,
-			       SVfARG(libdir),
-			       (int)PERL_REVISION, (int)PERL_VERSION,
-			       (int)PERL_SUBVERSION, ARCHNAME);
+		sv_setsv(subdir, libdir);
+		sv_catpvs(subdir, PERL_ARCH_FMT_PATH \
+			  PERL_ARCH_FMT_PREFIX ARCHNAME PERL_ARCH_FMT_SUFFIX);
 		subdir = S_incpush_if_exists(aTHX_ av, subdir);
 
 		/* .../version if -d .../version */
-		Perl_sv_setpvf(aTHX_ subdir, "%"SVf PERL_ARCH_FMT_PATH,
-			       SVfARG(libdir),
-			       (int)PERL_REVISION, (int)PERL_VERSION,
-			       (int)PERL_SUBVERSION);
+		sv_setsv(subdir, libdir);
+		sv_catpvs(subdir, PERL_ARCH_FMT_PATH);
 		subdir = S_incpush_if_exists(aTHX_ av, subdir);
 
 		/* .../archname if -d .../archname */
-		Perl_sv_setpvf(aTHX_ subdir, "%"SVf PERL_ARCH_FMT,
-			       SVfARG(libdir), ARCHNAME);
+		sv_setsv(subdir, libdir);
+		sv_catpvs(subdir,
+			  PERL_ARCH_FMT_PREFIX ARCHNAME PERL_ARCH_FMT_SUFFIX);
 		subdir = S_incpush_if_exists(aTHX_ av, subdir);
 
 	    }
@@ -3809,7 +3807,8 @@ S_incpush(pTHX_ const char *const dir, STRLEN len, U32 flags)
 	    if (addoldvers) {
 		for (incver = incverlist; *incver; incver++) {
 		    /* .../xxx if -d .../xxx */
-		    Perl_sv_setpvf(aTHX_ subdir, "%"SVf PERL_ARCH_FMT,
+		    Perl_sv_setpvf(aTHX_ subdir, "%"SVf PERL_ARCH_FMT_PREFIX \
+				   "%s" PERL_ARCH_FMT_SUFFIX,
 				   SVfARG(libdir), *incver);
 		    subdir = S_incpush_if_exists(aTHX_ av, subdir);
 		}
