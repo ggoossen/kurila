@@ -288,7 +288,7 @@ cc_opclass(pTHX_ const OP *o)
     case OA_ROOTOP:
         return OPc_ROOTOP;
     }
-    warn1("can't determine class of operator %s, assuming BASEOP\n",
+    warn(aTHX_ "can't determine class of operator %s, assuming BASEOP\n",
 	 PL_op_name[o->op_type]);
     return OPc_BASEOP;
 }
