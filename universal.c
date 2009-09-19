@@ -519,7 +519,7 @@ XS(XS_PerlIO_get_layers)
 					       SvCUR(*argsvp),
 					       0)
 			      : &PL_sv_undef);
-		      av_push(retav, namok
+		      av_push(retav, flgok
 			      ? SvREFCNT_inc_NN(*flgsvp)
 			      : &PL_sv_undef);
 		  }
