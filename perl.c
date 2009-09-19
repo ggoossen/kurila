@@ -3543,7 +3543,7 @@ S_init_perllib(pTHX_ U32 old_vers)
     incpush_use_sep(PERL_VENDORLIB_STEM, old_vers|INCPUSH_CAN_RELOCATE);
 #endif
 
-    if (!old_vers)
+    if (!old_vers) {
 #ifdef ARCHLIB_EXP
 	incpush_use_sep(ARCHLIB_EXP, INCPUSH_CAN_RELOCATE);
 #endif
@@ -3557,6 +3557,7 @@ S_init_perllib(pTHX_ U32 old_vers)
 #else
 	incpush_use_sep(PRIVLIB_EXP, INCPUSH_CAN_RELOCATE);
 #endif
+    }
 
 #ifdef PERL_OTHERLIBDIRS
     if (!old_vers) {
