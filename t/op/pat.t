@@ -1048,8 +1048,6 @@ sub run_tests
         \}
 EOT
             ok( $i == 2 )
-        
-    
 
     do
         # from Robin Houston
@@ -1057,7 +1055,6 @@ EOT
         my $x = "\x{10FFFD}"
         $x =~ s/(.)/$1/g
         ok( ord($x) == 0x10FFFD && length($x) == 1 )
-    
 
     do
         my $x = "\x{7f}"
@@ -1069,7 +1066,6 @@ EOT
         ok( $x =~ m/\P{InLatin1Supplement}/ )
         ok( not $x =~ m/\p{InLatinExtendedA}/ )
         ok( $x =~ m/\P{InLatinExtendedA}/ )
-    
 
     do
         my $x = "\x{80}"
@@ -1081,7 +1077,6 @@ EOT
         ok( not$x =~ m/\P{InLatin1Supplement}/ )
         ok( not $x =~ m/\p{InLatinExtendedA}/ )
         ok( $x =~ m/\P{InLatinExtendedA}/ )
-    
 
     do
         my $x = "\x{ff}"
