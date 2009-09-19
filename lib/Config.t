@@ -22,9 +22,6 @@ print $^STDOUT, "# First entry is '$first'\n"
 my (@: $first_each, ...) =  config_keys
 is($first_each, $first, "First key from each is correct")
 
-is(config_value('PERL_REVISION'), undef, "No PERL_REVISION")
-is(config_value("KURILA_VERSION"), 1, "KURILA_REVISION 1")
-
 ok( defined config_value("cc"),      "has cc")
 
 ok( defined config_value("ccflags"), "has ccflags")

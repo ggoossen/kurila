@@ -5360,10 +5360,8 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 			/* No compiled RE interpolated, has runtime
 			   components ===> unsafe.  */
 			FAIL("Eval-group not allowed at runtime, use re 'eval'");
-#if PERL_VERSION > 8
 		    if (IN_PERL_COMPILETIME)
 			PL_cv_has_eval = 1;
-#endif
 		}
 
 		nextchar(pRExC_state);

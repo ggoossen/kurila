@@ -2037,9 +2037,6 @@ S_regtry(pTHX_ regmatch_info *reginfo, char **startpos)
 STATIC regmatch_state *
 S_push_slab(pTHX)
 {
-#if PERL_VERSION < 9 && !defined(PERL_CORE)
-    dMY_CXT;
-#endif
     regmatch_slab *s = PL_regmatch_slab->next;
     if (!s) {
 	Newx(s, 1, regmatch_slab);
@@ -2370,9 +2367,6 @@ S_clear_backtrack_stack(pTHX_ void *p)
 STATIC I32			/* 0 failure, 1 success */
 S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 {
-#if PERL_VERSION < 9 && !defined(PERL_CORE)
-    dMY_CXT;
-#endif
     dVAR;
     const U32 uniflags = UTF8_ALLOW_DEFAULT | UTF8_CHECK_ONLY;
 

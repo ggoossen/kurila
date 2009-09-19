@@ -299,20 +299,6 @@ cc_opclassname(pTHX_ OP *o)
     return opclassnames[cc_opclass(aTHX_ o)];
 }
 
-static OP * 
-SVtoO(SV* sv) {
-    dTHX;
-    if (SvROK(sv)) {
-        IV tmp = SvIV((SV*)SvRV(sv));
-        return INT2PTR(OP*,tmp);
-    }
-    else {
-        return 0;
-    }
-        croak(aTHX_ "Argument is not a reference");
-    return 0; /* Not reached */
-}
-
 static void
 walkoptree(pTHX_ SV *opsv, const char *method)
 {
@@ -343,11 +329,7 @@ walkoptree(pTHX_ SV *opsv, const char *method)
 	}
     }
     if (o && (cc_opclass(aTHX_ o) == OPc_PMOP) && o->op_type != OP_PUSHRE
-#if PERL_VERSION >= 9
 	    && (kid = cPMOPo->op_pmreplrootu.op_pmreplroot)
-#else
-	    && (kid = cPMOPo->op_pmreplroot)
-#endif
 	)
     {
 	sv_setiv(newSVrv(opsv, cc_opclassname(aTHX_ kid)), PTR2IV(kid));
@@ -360,25 +342,15 @@ oplist(pTHX_ OP *o, SV **SP)
 {
     for(; o; o = o->op_next) {
 	SV *opsv;
-#if PERL_VERSION >= 9
 	if (o->op_opt == 0)
 	    break;
 	o->op_opt = 0;
-#else
-	if (o->op_seq == 0)
-	    break;
-	o->op_seq = 0;
-#endif
 	opsv = sv_newmortal();
 	sv_setiv(newSVrv(opsv, cc_opclassname(aTHX_ (OP*)o)), PTR2IV(o));
 	XPUSHs(opsv);
         switch (o->op_type) {
 	case OP_SUBST:
-#if PERL_VERSION >= 9
             SP = oplist(aTHX_ cPMOPo->op_pmstashstartu.op_pmreplstart, SP);
-#else
-            SP = oplist(aTHX_ cPMOPo->op_pmreplstart, SP);
-#endif
             continue;
 	case OP_SORT:
 	    if (o->op_flags & OPf_STACKED && o->op_flags & OPf_SPECIAL) {
@@ -584,6 +556,7 @@ OP_new(class, type, flags, location)
     OP *saveop = NO_INIT
     I32 typenum = NO_INIT
     CODE:
+        PERL_UNUSED_ARG(class);
         sparepad = PL_curpad;
         saveop = PL_op;
         PL_curpad = AvARRAY(PL_comppad);
@@ -609,6 +582,7 @@ OP_newstate(class, flags, label, oldo, location)
     OP *o = NO_INIT
     OP *saveop = NO_INIT
     CODE:
+        PERL_UNUSED_ARG(class);
         sparepad = PL_curpad;
         saveop = PL_op;
         PL_curpad = AvARRAY(PL_comppad);
@@ -651,6 +625,7 @@ UNOP_new(class, type, flags, sv_first, location)
     OP *o = NO_INIT
     I32 typenum = NO_INIT
     CODE:
+        PERL_UNUSED_ARG(class);
         if (SvROK(sv_first)) {
             if (!sv_derived_from(sv_first, "B::OP"))
                 Perl_croak(aTHX_ "Reference 'first' was not a B::OP object");
@@ -664,8 +639,6 @@ UNOP_new(class, type, flags, sv_first, location)
         else
             first = Nullop;
         {
-        I32 padflag = 0;
-        SV**sparepad = PL_curpad;
         OP* saveop = PL_op; 
 
         PL_curpad = AvARRAY(PL_comppad);
@@ -707,6 +680,7 @@ BINOP_new(class, type, flags, sv_first, sv_last, location)
     OP *last = NO_INIT
     OP *o = NO_INIT
     CODE:
+        PERL_UNUSED_ARG(class);
         if (SvROK(sv_first)) {
             if (!sv_derived_from(sv_first, "B::OP"))
                 Perl_croak(aTHX_ "Reference 'first' was not a B::OP object");
@@ -770,6 +744,7 @@ LISTOP_new(class, type, flags, sv_first, sv_last, location)
     OP *last = NO_INIT
     OP *o = NO_INIT
     CODE:
+        PERL_UNUSED_ARG(class);
         if (SvROK(sv_first)) {
             if (!sv_derived_from(sv_first, "B::OP"))
                 Perl_croak(aTHX_ "Reference 'first' was not a B::OP object");
@@ -827,6 +802,7 @@ LOGOP_new(class, type, flags, sv_first, sv_last, location)
     OP *last = NO_INIT
     OP *o = NO_INIT
     CODE:
+        PERL_UNUSED_ARG(class);
         if (SvROK(sv_first)) {
             if (!sv_derived_from(sv_first, "B::OP"))
                 Perl_croak(aTHX_ "Reference 'first' was not a B::OP object");
@@ -882,6 +858,7 @@ LOGOP_newcond(class, flags, sv_first, sv_last, sv_else, location)
     OP *elseo = NO_INIT
     OP *o = NO_INIT
     CODE:
+        PERL_UNUSED_ARG(class);
         if (SvROK(sv_first)) {
             if (!sv_derived_from(sv_first, "B::OP"))
                 Perl_croak(aTHX_ "Reference 'first' was not a B::OP object");
@@ -965,6 +942,7 @@ SVOP_new(class, type, flags, sv, location)
     SV* param = NO_INIT
     I32 typenum = NO_INIT
     CODE:
+        PERL_UNUSED_ARG(class);
         sparepad = PL_curpad;
         PL_curpad = AvARRAY(PL_comppad);
         saveop = PL_op;
@@ -1031,6 +1009,7 @@ COP_new(class, flags, name, sv_first, location)
     OP *first = NO_INIT
     OP *o = NO_INIT
     CODE:
+        PERL_UNUSED_ARG(class);
         if (SvROK(sv_first)) {
             if (!sv_derived_from(sv_first, "B::OP"))
                 Perl_croak(aTHX_ "Reference 'first' was not a B::OP object");
@@ -1223,13 +1202,7 @@ LISTOP_children(o)
     OUTPUT:
         RETVAL
 
-#if PERL_VERSION >= 9
-#  define PMOP_pmreplstart(o)	o->op_pmstashstartu.op_pmreplstart
-#else
-#  define PMOP_pmreplstart(o)	o->op_pmreplstart
-#  define PMOP_pmpermflags(o)	o->op_pmpermflags
-#  define PMOP_pmdynflags(o)      o->op_pmdynflags
-#endif
+#define PMOP_pmreplstart(o)	o->op_pmstashstartu.op_pmreplstart
 #define PMOP_pmnext(o)		o->op_pmnext
 #define PMOP_pmflags(o)		o->op_pmflags
 
@@ -1260,18 +1233,6 @@ U32
 PMOP_pmflags(o)
 	B::PMOP		o
 
-#if PERL_VERSION < 9
-
-U32
-PMOP_pmpermflags(o)
-	B::PMOP		o
-
-U8
-PMOP_pmdynflags(o)
-        B::PMOP         o
-
-#endif
-
 void
 PMOP_precomp(o)
 	B::PMOP		o
@@ -1282,8 +1243,6 @@ PMOP_precomp(o)
 	if (rx)
 	    sv_setpvn(ST(0), RX_PRECOMP(rx), RX_PRELEN(rx));
 
-#if PERL_VERSION >= 9
-
 void
 PMOP_reflags(o)
 	B::PMOP		o
@@ -1293,8 +1252,6 @@ PMOP_reflags(o)
 	rx = PM_GETRE(o);
 	if (rx)
 	    sv_setuv(ST(0), RX_EXTFLAGS(rx));
-
-#endif
 
 #define SVOP_sv(o)     cSVOPo->op_sv
 #define SVOP_gv(o)     ((GV*)cSVOPo->op_sv)
@@ -1361,10 +1318,6 @@ LOOP_lastop(o)
 #define COP_stash(o)	CopSTASH(o)
 #define COP_cop_seq(o)	o->cop_seq
 #define COP_hints(o)	CopHINTS_get(o)
-#if PERL_VERSION < 9
-#  define COP_warnings(o)  o->cop_warnings
-#  define COP_io(o)	o->cop_io
-#endif
 
 MODULE = B::OP	PACKAGE = B::COP		PREFIX = COP_
 

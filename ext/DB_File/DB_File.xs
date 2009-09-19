@@ -147,8 +147,6 @@
 
 /* Wall starts with 5.7.x */
 
-#if PERL_REVISION > 5 || (PERL_REVISION == 5 && PERL_VERSION >= 7)
-
 /* Since we dropped the gccish definition of __attribute__ we will want
  * to redefine dNOOP, however (so that dTHX continues to work).  Yes,
  * all this means that we can't do attribute checking on the DB_File,
@@ -170,8 +168,6 @@
 /* avoid -Wall; DB_File xsubs never make use of `ix' setup for ALIASes */
 #  undef dXSI32
 #  define dXSI32 dNOOP
-
-#endif /* Perl >= 5.7 */
 
 #include <fcntl.h> 
 

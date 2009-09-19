@@ -309,8 +309,8 @@ perl_construct(pTHXx)
 
     PL_stashcache = newHV();
 
-    PL_patchlevel = Perl_newSVpvf(aTHX_ "%s-%d.%d", KURILA_REVISION,
-				  (int)KURILA_VERSION, (int)KURILA_SUBVERSION);
+    PL_patchlevel = Perl_newSVpvf(aTHX_ "%s-%d.%d", PERL_REVISION,
+				  (int)PERL_VERSION, (int)PERL_SUBVERSION);
     SvREADONLY_on(PL_patchlevel);
 
 #ifdef HAS_MMAP
@@ -2684,7 +2684,7 @@ Perl_moreswitches(pTHX_ const char *s)
 	    PerlIO_printf(PerlIO_stdout(),
 		"\nThis is kurila, v%d.%d"
 		" built for %s",
-		KURILA_VERSION, KURILA_SUBVERSION,
+		PERL_VERSION, PERL_SUBVERSION,
 		ARCHNAME);
 	    SvREFCNT_dec(level);
 	}

@@ -40,10 +40,6 @@ extern "C" {
 #    include <patchlevel.h>
 #endif
 
-#if PERL_VERSION <= 4 && !defined(PL_dowarn)
-   #define PL_dowarn dowarn
-#endif
-
 #ifdef G_WARN_ON
    #define DOWARN (PL_dowarn & G_WARN_ON)
 #else

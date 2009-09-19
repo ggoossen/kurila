@@ -37,13 +37,6 @@ extern "C" {
 }
 #endif
 
-/* At least ppport.h 3.13 gets this wrong: one really cannot
- * have NVgf as anything else than "g" under Perl 5.6.x. */
-#if PERL_REVISION == 5 && PERL_VERSION == 6
-# undef NVgf
-# define NVgf "g"
-#endif
-
 #define IV_1E6 1000000
 #define IV_1E7 10000000
 #define IV_1E9 1000000000

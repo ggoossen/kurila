@@ -133,21 +133,10 @@ fgetpos(handle)
     CODE:
 	if (handle) {
 #ifdef PerlIO
-#if PERL_VERSION < 8
-	    Fpos_t pos;
-	    ST(0) = sv_newmortal();
-	    if (PerlIO_getpos(handle, &pos) != 0) {
-		ST(0) = &PL_sv_undef;
-	    }
-	    else {
-		sv_setpvn(ST(0), (char *)&pos, sizeof(Fpos_t));
-	    }
-#else
 	    ST(0) = sv_newmortal();
 	    if (PerlIO_getpos(handle, ST(0)) != 0) {
 		ST(0) = &PL_sv_undef;
 	    }
-#endif
 #else
 	    Fpos_t pos;
 	    if (fgetpos(handle, &pos)) {
@@ -169,19 +158,7 @@ fsetpos(handle, pos)
     CODE:
 	if (handle) {
 #ifdef PerlIO
-#if PERL_VERSION < 8
-	    char *p;
-	    STRLEN len;
-	    if (SvOK(pos) && (p = SvPV(pos,len)) && len == sizeof(Fpos_t)) {
-		RETVAL = PerlIO_setpos(handle, (Fpos_t*)p);
-	    }
-	    else {
-		RETVAL = -1;
-		errno = EINVAL;
-	    }
-#else
 	    RETVAL = PerlIO_setpos(handle, pos);
-#endif
 #else
 	    char *p;
 	    STRLEN len;

@@ -13,14 +13,9 @@
 /* do not adjust the whitespace! Configure expects the numbers to be
  * exactly on the third column */
 
-#define KURILA_REVISION "kurila"
-#define KURILA_VERSION 1
-#define KURILA_SUBVERSION 21
-
-/* Fake Perl version 5.10.0 */
-#define PERL_REVISION	5		/* age */
-#define PERL_VERSION	11		/* epoch */
-#define PERL_SUBVERSION	0		/* generation */
+#define PERL_REVISION	"kurila"	/* age */
+#define PERL_VERSION	1		/* epoch */
+#define PERL_SUBVERSION	21		/* generation */
 
 /* The following numbers describe the earliest compatible version of
    Perl ("compatibility" here being defined as sufficient binary/API

@@ -3,22 +3,19 @@
 print $^STDOUT, "1..42\n"
 
 chdir('op') || die "sysio.t: cannot look for myself: $^OS_NAME"
-$^INCLUDE_PATH = 2: '../../lib'
-require '../test.pl';
-
-chdir('op') || chdir('t/op') || die "sysio.t: cannot look for myself: $^OS_ERROR"
-$^INCLUDE_PATH = @:  '../../lib' 
+$^INCLUDE_PATH = @: '../../lib'
+require '../test.pl'
 
 open(my $i_fh, "<", 'sysio.t') || die "sysio.t: cannot find myself: $^OS_ERROR"
 
-$reopen = ($^OS_NAME eq 'VMS' ||
+my $reopen = ($^OS_NAME eq 'VMS' ||
            $^OS_NAME eq 'os2' ||
            $^OS_NAME eq 'MSWin32' ||
            $^OS_NAME eq 'NetWare' ||
            $^OS_NAME eq 'dos' ||
            $^OS_NAME eq 'mpeix')
 
-$x = 'abc'
+my $x = 'abc'
 
 # should not be able to do negative lengths
 try { sysread($i_fh, $x, -1) }
@@ -64,7 +61,7 @@ print $^STDOUT, "ok 9\n"
 print $^STDOUT, 'not ' unless ($a eq "#!.\0\0erl")
 print $^STDOUT, "ok 10\n"
 
-$outfile = tempfile();
+my $outfile = tempfile()
 
 open(my $o_fh, ">", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR"
 

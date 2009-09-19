@@ -138,7 +138,7 @@ PERLVARI(Grunops_dbg,	runops_proc_t,	MEMBER_TO_FPTR(Perl_runops_debug))
    In future 5.10.x releases this will allow us in main() to sanity test the
    library we're linking against.  */
 
-PERLVARI(Grevision,	U8,	PERL_REVISION)
+PERLVARI(Grevision,	const char*,	PERL_REVISION)
 PERLVARI(Gversion,	U8,	PERL_VERSION)
 PERLVARI(Gsubversion,	U8,	PERL_SUBVERSION)
 
