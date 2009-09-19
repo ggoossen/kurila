@@ -22968,8 +22968,8 @@ $test -f UU/cmdline.opt && $cat UU/cmdline.opt >> config.sh
 
 : add special variables
 $test -f $src/patchlevel.h && \
-awk '/^#define[ 	]+KURILA_/ {printf "%s=%s\n",$2,$3}' $src/patchlevel.h >>config.sh
-echo "KURILA_PATCHLEVEL='$perl_patchlevel'" >>config.sh
+awk '/^#define[ 	]+PERL_.*[^\\]$/ {printf "%s=%s\n",$2,$3}' $src/patchlevel.h >>config.sh
+echo "PERL_PATCHLEVEL='$perl_patchlevel'" >>config.sh
 echo "PERL_CONFIG_SH=true" >>config.sh
 
 : propagate old symbols
