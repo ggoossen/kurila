@@ -2,7 +2,9 @@
 
 print $^STDOUT, "1..42\n"
 
-our ($reopen, $x, $outfile)
+chdir('op') || die "sysio.t: cannot look for myself: $^OS_NAME"
+$^INCLUDE_PATH = 2: '../../lib'
+require '../test.pl';
 
 chdir('op') || chdir('t/op') || die "sysio.t: cannot look for myself: $^OS_ERROR"
 $^INCLUDE_PATH = @:  '../../lib' 
@@ -62,7 +64,7 @@ print $^STDOUT, "ok 9\n"
 print $^STDOUT, 'not ' unless ($a eq "#!.\0\0erl")
 print $^STDOUT, "ok 10\n"
 
-$outfile = 'sysio.out'
+$outfile = tempfile();
 
 open(my $o_fh, ">", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR"
 
