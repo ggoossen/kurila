@@ -406,9 +406,11 @@ sub fastcwd_
         if $cdev != $orig_cdev || $cino != $orig_cino
     $path
 
+if (not exists &fastcwd)
+    *fastcwd = \&fastcwd_
 
 if (not exists &cwd) 
-    *fastcwd = \&fastcwd_
+    *fastgetcwd = \&fastcwd
 else
     *fastgetcwd = \&cwd
 

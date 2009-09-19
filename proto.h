@@ -2659,11 +2659,11 @@ PERL_CALLCONV OP*	Perl_scalarvoid(pTHX_ OP* o)
 #define PERL_ARGS_ASSERT_SCALARVOID	\
 	assert(o)
 
-PERL_CALLCONV OP*	Perl_op_mod_assign(pTHX_ OP* o, OP** op, I32 optype)
+PERL_CALLCONV OP*	Perl_op_mod_assign(pTHX_ OP* otor, OP** oandp, I32 optype)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_OP_MOD_ASSIGN	\
-	assert(o); assert(op)
+	assert(otor); assert(oandp)
 
 PERL_CALLCONV NV	Perl_scan_bin(pTHX_ const char* start, STRLEN len, STRLEN* retlen)
 			__attribute__nonnull__(pTHX_1)
