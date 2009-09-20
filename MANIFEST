@@ -106,7 +106,6 @@ ext/Cwd/t/cwd.t			See if Cwd works
 ext/Cwd/t/win32.t		See if Cwd works on Win32
 ext/Data-Dumper/Changes		Data pretty printer, changelog
 ext/Data-Dumper/Dumper.pm	Data pretty printer, module
-ext/Data-Dumper/Makefile.PL	Data pretty printer, makefile writer
 ext/Data-Dumper/t/bless.t	See if Data::Dumper works
 ext/Data-Dumper/t/bugs.t	See if Data::Dumper works
 ext/Data-Dumper/t/dumper.t	See if Data::Dumper works
@@ -263,20 +262,103 @@ ext/MIME-Base64/t/base64.t	See whether MIME::Base64 works
 ext/MIME-Base64/t/quoted-print.t	See whether MIME::QuotedPrint works
 ext/MIME-Base64/t/unicode.t	See whether MIME::Base64 works
 ext/MIME-Base64/t/warn.t	See whether MIME::Base64 works
-ext/Module-Load-Conditional/CHANGES	Module::Conditional
-ext/Module-Load-Conditional/lib/Module/Load/Conditional.pm	Module::Conditional
-ext/Module-Load-Conditional/Makefile.PL	Module::Conditional
-ext/Module-Load-Conditional/MANIFEST	Module::Conditional
-ext/Module-Load-Conditional/META.yml	Module::Conditional Module meta-data (added by MakeMaker)
-ext/Module-Load-Conditional/README	Module::Conditional
-ext/Module-Load-Conditional/t/01_Module_Load_Conditional.t	Module::Conditional tests
-ext/Module-Load-Conditional/t/02_Parse_Version.t	Module::Load::Conditional tests
-ext/Module-Load-Conditional/t/to_load/Commented.pm	Module::Conditional tests
-ext/Module-Load-Conditional/t/to_load/InPod.pm	Module::Load::Conditional tests
-ext/Module-Load-Conditional/t/to_load/LoadIt.pm	Module::Conditional tests
-ext/Module-Load-Conditional/t/to_load/LoadMe.pl	Module::Conditional tests
-ext/Module-Load-Conditional/t/to_load/Must/Be/Loaded.pm	Module::Conditional tests
-ext/Module-Load-Conditional/t/to_load/ToBeLoaded	Module::Conditional tests
+ext/Module-Pluggable/lib/Devel/InnerPackage.pm		Find inner packages
+ext/Module-Pluggable/lib/Module/Pluggable/Object.pm	Module::Pluggable
+ext/Module-Pluggable/lib/Module/Pluggable.pm		Module::Pluggable
+ext/Module-Pluggable/Makefile.PL			Module::Pluggable
+ext/Module-Pluggable/t/01use.t	Module::Pluggable tests
+ext/Module-Pluggable/t/02alsoworks.t	Module::Pluggable tests
+ext/Module-Pluggable/t/02works.t	Module::Pluggable tests
+ext/Module-Pluggable/t/02works_taint.t	Module::Pluggable tests
+ext/Module-Pluggable/t/03diffname.t	Module::Pluggable tests
+ext/Module-Pluggable/t/04acmedir_single.t	Module::Pluggable tests
+ext/Module-Pluggable/t/04acmedir.t	Module::Pluggable tests
+ext/Module-Pluggable/t/04acmepath_single.t	Module::Pluggable tests
+ext/Module-Pluggable/t/04acmepath.t	Module::Pluggable tests
+ext/Module-Pluggable/t/05postpath.t	Module::Pluggable tests
+ext/Module-Pluggable/t/06multipath.t	Module::Pluggable tests
+ext/Module-Pluggable/t/07instantiate.t	Module::Pluggable tests
+ext/Module-Pluggable/t/08nothing.t	Module::Pluggable tests
+ext/Module-Pluggable/t/09require.t	Module::Pluggable tests
+ext/Module-Pluggable/t/10innerpack_inner.t	Module::Pluggable tests
+ext/Module-Pluggable/t/10innerpack_noinner.t	Module::Pluggable tests
+ext/Module-Pluggable/t/10innerpack_onefile.t	Module::Pluggable tests
+ext/Module-Pluggable/t/10innerpack_override.t	Module::Pluggable tests
+ext/Module-Pluggable/t/10innerpack_super.t		Module::Pluggable tests
+ext/Module-Pluggable/t/10innerpack.t	Module::Pluggable tests
+ext/Module-Pluggable/t/11usetwice.t	Module::Pluggable tests
+ext/Module-Pluggable/t/12onlyarray.t	Module::Pluggable tests
+ext/Module-Pluggable/t/12onlyregex.t	Module::Pluggable tests
+ext/Module-Pluggable/t/12onlyrequire.t	Module::Pluggable tests
+ext/Module-Pluggable/t/12only.t	Module::Pluggable tests
+ext/Module-Pluggable/t/13exceptarray.t	Module::Pluggable tests
+ext/Module-Pluggable/t/13exceptregex.t	Module::Pluggable tests
+ext/Module-Pluggable/t/13except.t	Module::Pluggable tests
+ext/Module-Pluggable/t/14package.t	Module::Pluggable tests
+ext/Module-Pluggable/t/15topicsafe.t	Module::Pluggable tests
+ext/Module-Pluggable/t/16different_extension.t	Module::Pluggable tests
+ext/Module-Pluggable/t/17devel_inner_package.t	Module::Pluggable tests
+ext/Module-Pluggable/t/18skipped_package.t	Module::Pluggable tests
+ext/Module-Pluggable/t/19can_ok_clobber.t	Module::Pluggable tests
+ext/Module-Pluggable/t/20dodgy_files.t	Module::Pluggable tests
+ext/Module-Pluggable/t/21editor_junk.t			Module::Pluggable tests
+ext/Module-Pluggable/t/acme/Acme/MyTest/Plugin/Foo.pm	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/Acme/Foo-Bar.pm			Module::Pluggable tests
+ext/Module-Pluggable/t/lib/Acme/MyTest/Plugin/Foo.pm	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/EditorJunk/Plugin/Bar.pm		Module::Pluggable tests
+ext/Module-Pluggable/t/lib/EditorJunk/Plugin/Bar.pm~	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/EditorJunk/Plugin/Bar.pm.swo	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/EditorJunk/Plugin/Bar.pm.swp	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/EditorJunk/Plugin/Foo.pm		Module::Pluggable tests
+ext/Module-Pluggable/t/lib/ExtTest/Plugin/Bar.plugin	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/ExtTest/Plugin/Foo.plugin	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/ExtTest/Plugin/Quux/Foo.plugin	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/InnerTest/Plugin/Foo.pm	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/MyOtherTest/Plugin/Bar.pm	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/MyOtherTest/Plugin/Foo.pm	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/MyOtherTest/Plugin/Quux/Foo.pm	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/MyOtherTest/Plugin/Quux.pm	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/MyTest/Extend/Plugin/Bar.pm	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/MyTest/Plugin/Bar.pm	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/MyTest/Plugin/Foo.pm	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/MyTest/Plugin/Quux/Foo.pm	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/No/Middle.pm	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/OddTest/Plugin/Foo.pm	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/TA/C/A/I.pm	Module::Pluggable tests
+ext/Module-Pluggable/t/lib/Zot/.Zork.pm	Module::Pluggable tests
+ext/mro/Changes			mro extension
+ext/mro/mro.pm			mro extension
+ext/mro/mro.xs			mro extension
+ext/NDBM_File/hints/cygwin.pl	Hint for NDBM_File for named architecture
+ext/NDBM_File/hints/dec_osf.pl	Hint for NDBM_File for named architecture
+ext/NDBM_File/hints/dynixptx.pl	Hint for NDBM_File for named architecture
+ext/NDBM_File/hints/gnukfreebsd.pl	Hint for NDBM_File for named architecture
+ext/NDBM_File/hints/gnuknetbsd.pl	Hint for NDBM_File for named architecture
+ext/NDBM_File/hints/linux.pl	Hint for NDBM_File for named architecture
+ext/NDBM_File/hints/sco.pl	Hint for NDBM_File for named architecture
+ext/NDBM_File/hints/solaris.pl	Hint for NDBM_File for named architecture
+ext/NDBM_File/hints/svr4.pl	Hint for NDBM_File for named architecture
+ext/NDBM_File/Makefile.PL	NDBM extension makefile writer
+ext/NDBM_File/NDBM_File.pm	NDBM extension Perl module
+ext/NDBM_File/NDBM_File.xs	NDBM extension external subroutines
+ext/NDBM_File/t/ndbm.t		See if NDBM_File works
+ext/NDBM_File/typemap		NDBM extension interface types
+ext/ODBM_File/hints/cygwin.pl	Hint for ODBM_File for named architecture
+ext/ODBM_File/hints/dec_osf.pl	Hint for ODBM_File for named architecture
+ext/ODBM_File/hints/gnukfreebsd.pl	Hint for NDBM_File for named architecture
+ext/ODBM_File/hints/gnuknetbsd.pl	Hint for NDBM_File for named architecture
+ext/ODBM_File/hints/hpux.pl	Hint for ODBM_File for named architecture
+ext/ODBM_File/hints/linux.pl	Hint for NDBM_File for named architecture
+ext/ODBM_File/hints/sco.pl	Hint for ODBM_File for named architecture
+ext/ODBM_File/hints/solaris.pl	Hint for ODBM_File for named architecture
+ext/ODBM_File/hints/svr4.pl	Hint for ODBM_File for named architecture
+ext/ODBM_File/hints/ultrix.pl	Hint for ODBM_File for named architecture
+ext/ODBM_File/Makefile.PL	ODBM extension makefile writer
+ext/ODBM_File/ODBM_File.pm	ODBM extension Perl module
+ext/ODBM_File/ODBM_File.xs	ODBM extension external subroutines
+ext/ODBM_File/t/odbm.t		See if ODBM_File works
+ext/ODBM_File/typemap		ODBM extension interface types
+>>>>>>> f996b9a3326f3a64831270a0b810851382f8c129:MANIFEST
 ext/Opcode/Opcode.pm		Opcode extension Perl module
 ext/Opcode/Opcode.xs		Opcode extension external subroutines
 ext/Opcode/ops.pm		"Pragma" form of Opcode extension Perl module
@@ -414,7 +496,6 @@ ext/Socket/t/socketpair.t	See if socketpair works
 ext/Socket/t/Socket.t		See if Socket works
 ext/Sys-Hostname/Hostname.pm	Sys::Hostname extension Perl module
 ext/Sys-Hostname/Hostname.xs	Sys::Hostname extension external subroutines
-ext/Sys-Hostname/Makefile.PL	Sys::Hostname extension makefile writer
 ext/Sys-Hostname/t/Hostname.t	See if Sys::Hostname works
 ext/Sys-Syslog/Changes		Changlog for Sys::Syslog
 ext/Sys-Syslog/fallback/const-c.inc	Sys::Syslog constants fallback file
