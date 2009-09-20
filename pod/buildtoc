@@ -2,7 +2,7 @@
 
 our ($masterpodfile, %Build, %Targets, $Verbose, $Up, %Ignore
     ,    @Master, %Readmes, %Pods, %Aux, %Readmepods, %Pragmata, %Modules
-    ,    %Copies)
+    ,    %Copies, %Generated)
 use File::Spec
 use File::Find;
 use FindBin;
@@ -63,6 +63,7 @@ __USAGE__
 
 
 # Don't copy these top level READMEs
+<<<<<<< HEAD:pod/buildtoc
 %Ignore = %:
     micro => 1
     #     vms => 1,
@@ -107,7 +108,8 @@ foreach (@: ~< $master->*)
         if ($flags =~ s/d//g)
             %flags{+manifest_omit} = 1
             $delta_target = "$filename.pod"
-        
+
+        $Generated{+"$filename.pod"} = $flags =~ s/g//g
 
         if ($flags =~ s/r//g)
             my $readme = $filename
@@ -198,7 +200,7 @@ do
         warn "$^PROGRAM_NAME: $i exists but is unknown by buildtoc\n"
             unless %our_pods{?$i}
         warn "$^PROGRAM_NAME: $i exists but is unknown by ../MANIFEST\n"
-            if !%manipods{?$i} && !%manireadmes{?$i} && !%Copies{?$i}
+            if !%manipods{?$i} && !%manireadmes{?$i} && !%Copies{?$i} && !%Generated{$i}
         warn "$^PROGRAM_NAME: $i exists but is unknown by perl.pod\n"
             if !%perlpods{?$i} && !exists %sources{$i}
     
@@ -209,11 +211,12 @@ do
     foreach my $i (sort keys %manipods)
         warn "$^PROGRAM_NAME: $i is known by ../MANIFEST but does not exist\n"
             unless %disk_pods{$i}
+        warn "$^PROGRAM_NAME: $i is known by ../MANIFEST but is marked as generated\n"
+            if %Generated{$i}
     
     foreach my $i (sort keys %perlpods)
         warn "$^PROGRAM_NAME: $i is known by perl.pod but does not exist\n"
             unless %disk_pods{?$i}
-    
 
 
 # Find all the mdoules
@@ -515,7 +518,7 @@ sub generate_manifest
 
 sub generate_manifest_pod
     generate_manifest < map {\@: "pod/$_.pod", %Pods{$_}},
-                      grep {!%Copies{"$_.pod"}}, sort keys %Pods
+                      grep {!%Copies{"$_.pod"}}, grep {!%Generated{"$_.pod"}}, sort keys %Pods
 
 sub generate_manifest_readme
     generate_manifest < map {\@: "README.$_", %Readmes{$_}}, sort keys %Readmes
