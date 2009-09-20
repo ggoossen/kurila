@@ -272,7 +272,6 @@ my %METHOD_MAP =
         abs_path            => 'fast_abs_path'
 
 %METHOD_MAP{+NT} = %METHOD_MAP{?MSWin32}
-%METHOD_MAP{+nto} = %METHOD_MAP{?qnx}
 
 
 # Find the pwd command in the expected locations.  We assume these
