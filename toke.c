@@ -109,6 +109,9 @@ static I32 utf16rev_textfilter(pTHX_ int idx, SV *sv, int maxlen);
 
 #define UTF (!IN_BYTES)
 
+/* The maximum number of characters preceding the unrecognized one to display */
+#define UNRECOGNIZED_PRECEDE_COUNT 10
+
 /* In variables named $^X, these are the legal values for X.
  * 1999-02-27 mjd-perl-patch@plover.com */
 #define isCONTROLVAR(x) (isUPPER(x) || strchr("[\\]^_?", (x)))
@@ -3233,8 +3236,17 @@ Perl_yylex(pTHX)
     default:
 	if (isIDFIRST_lazy_if(s,UTF))
 	    goto keylookup;
-	len = UTF ? Perl_utf8_length(aTHX_ PL_linestart, s) : (STRLEN) (s - PL_linestart);
-	Perl_croak(aTHX_ "Unrecognized character \\x%02X in column %d", *s & 255, (int) len + 1);
+	{
+        unsigned char c = *s;
+        len = UTF ? Perl_utf8_length(aTHX_ PL_linestart, s) : (STRLEN) (s - PL_linestart);
+        if (len > UNRECOGNIZED_PRECEDE_COUNT) {
+            d = UTF ? Perl_utf8_hop(aTHX_ s, -UNRECOGNIZED_PRECEDE_COUNT) : s - UNRECOGNIZED_PRECEDE_COUNT;
+        } else {
+            d = PL_linestart;
+        }	
+        *s = '\0';
+        Perl_croak(aTHX_ "Unrecognized character \\x%02X; marked by <-- HERE after %s<-- HERE near column %d", c, d, (int) len + 1);
+    }
     case 4:
     case 26:
 	goto fake_eof;			/* emulate EOF on ^D or ^Z */
