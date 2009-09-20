@@ -549,6 +549,9 @@ sub generate_descrip_mms_2()
 SNIP
         sort @: < keys %Pods, < keys %Readmepods
 
+sub generate_descrip_mms_3()
+    map { qq{\t- If F\$Search("[.pod]$_").nes."" Then Delete/NoConfirm/Log [.pod]$_;*} },
+        sort keys %Generated, keys %Copies
 
 sub generate_nmake_1()
     map {sprintf "\tcopy ..\\README.\%-8s ..\\pod\\perl$_.pod\n", $_},
@@ -661,7 +664,17 @@ sub do_vms
     die "$^PROGRAM_NAME: $name contains $sections discontigous copy rules"
         if $sections +> 1
     $makefile =~ s/\0+/$(join "\n", @: '', < generate_descrip_mms_2( < @_ ))/s
-    $makefile
+
+    # Looking for rules like this:
+    #	- If F$Search("[.pod]perldelta.pod").nes."" Then Delete/NoConfirm/Log [.pod]perldelta.pod;*
+    $makefile =~ s!(?:\t- If F\$Search\("\[\.pod\]perl[a-z]+\Q.pod").nes."" Then Delete/NoConfirm/Log [.pod]perl\E[a-z]+\.pod;\*\n)+!\0!sg
+    $sections = () = $makefile =~ m/\0+/g
+    die "$^PROGRAM_NAME: $name contains no delete rules" if $sections +< 1
+    die "$^PROGRAM_NAME: $name contains $sections discontigous delete rules"
+        if $sections +> 1
+    $makefile =~ s/\0+/$(join "\n", &generate_descrip_mms_3, '')/s
+
+    return $makefile
 
 
 sub do_unix
@@ -682,7 +695,6 @@ sub do_unix
 
     $makefile_SH =~ s/\0+/$(join "\n", @: '', < @copy_rules, '')/s
     $makefile_SH
-
 
 
 # Do stuff
