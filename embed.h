@@ -1094,9 +1094,6 @@
 #else
 #define newMYSUB		Perl_newMYSUB
 #endif
-#ifdef PERL_CORE
-#define boot_core_xsutils	Perl_boot_core_xsutils
-#endif
 #define ptr_table_new		Perl_ptr_table_new
 #define ptr_table_fetch		Perl_ptr_table_fetch
 #define ptr_table_store		Perl_ptr_table_store
@@ -3323,9 +3320,6 @@
 #define newMYSUB(a,b,c,d,e)	Perl_newMYSUB(aTHX_ a,b,c,d,e)
 #else
 #define newMYSUB(a,b,c,d,e)	Perl_newMYSUB(aTHX_ a,b,c,d,e)
-#endif
-#ifdef PERL_CORE
-#define boot_core_xsutils()	Perl_boot_core_xsutils(aTHX)
 #endif
 #define ptr_table_new()		Perl_ptr_table_new(aTHX)
 #define ptr_table_fetch(a,b)	Perl_ptr_table_fetch(aTHX_ a,b)

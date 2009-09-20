@@ -3693,7 +3693,6 @@ PERL_CALLCONV void	Perl_newMYSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, O
 			__attribute__noreturn__;
 
 #endif
-PERL_CALLCONV void	Perl_boot_core_xsutils(pTHX);
 PERL_CALLCONV PTR_TBL_t*	Perl_ptr_table_new(pTHX)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;

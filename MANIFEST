@@ -2427,4 +2427,3 @@ win32/wince.h			WinCE port
 win32/wincesck.c		WinCE port
 writemain.SH			Generate perlmain.c from miniperlmain.c+extensions
 XSUB.h				Include file for extension subroutines
-xsutils.c			Additional bundled package methods not in UNIVERSAL::
