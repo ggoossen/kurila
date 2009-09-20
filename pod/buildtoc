@@ -108,7 +108,7 @@ foreach (@: ~< $master->*)
             %flags{+manifest_omit} = 1
             $delta_target = "$filename.pod"
 
-        $Generated{+"$filename.pod"} = $flags =~ s/g//g
+        %Generated{+"$filename.pod"} = $flags =~ s/g//g
 
         if ($flags =~ s/r//g)
             my $readme = $filename
@@ -626,7 +626,6 @@ sub do_perlpod
 		    |\s*\n		# blank line
 		   )+
 		  }
-<<<<<<< HEAD:pod/buildtoc
                   {$($1 . join "", generate_perlpod( < @_ ))}mx)
         die "$^PROGRAM_NAME: Failed to insert amendments in do_perlpod"
     
@@ -679,14 +678,25 @@ sub do_unix
     my $makefile_SH = join '', @_
     die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile_SH =~ m/\0/
 
-    $makefile_SH =~ s/\n\s+-\@test -f \S+ && cd pod && \$\(LNS\) \S+ \S+ && cd \.\. && echo "\S+" >> extra.pods \# See buildtoc\n/\0/gm
+    $makefile_SH =~ s{^(generated_pods = extra.pods).*}
+                     {$(join ' ', $1, map { "pod/$_" }, sort keys %Generated +@+ keys %Copies)}mg
+
+    # pod/perldelta.pod: pod/perl511delta.pod
+    # 	cd pod && $(LNS) perl511delta.pod perldelta.pod
+
+    $makefile_SH =~ s!(
+pod/perl[a-z0-9_]+\.pod: pod/perl[a-z0-9_]+\.pod
+\tcd pod && \$\(LNS\) perl[a-z0-9_]+\.pod perl[a-z0-9_]+\.pod
+)+!\0!gm
 
     verify_contiguous($name, $makefile_SH, 'copy rules')
 
-    my @copy_rules = map "\t-\@test -f pod/%Copies{$_} && cd pod && \$(LNS) %Copies{$_} $_ && cd .. && echo \"pod/$_\" >> extra.pods # See buildtoc",
-        keys %Copies
+    my @copy_rules = map { "
+pod/$_: pod/%Copies{$_}
+	cd pod && \$(LNS) %Copies{$_} $_
+" }, keys %Copies
 
-    $makefile_SH =~ s/\0+/$(join "\n", @: '', < @copy_rules, '')/s
+    $makefile_SH =~ s/\0+/$(join "", @copy_rules)/s
     $makefile_SH
 
 
