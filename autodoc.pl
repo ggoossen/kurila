@@ -107,6 +107,11 @@ _EOF_
     close $fh or die "Can't close $filename: $^OS_ERROR"
 
 
+if (@ARGV)
+    my $workdir = shift(@ARGV)
+    chdir $workdir
+        or die "Couldn't chdir to '$workdir': $^OS_ERROR"
+
 # glob() picks up docs from extra .c or .h files that may be in unclean
 # development trees.
 my $MANIFEST = do
