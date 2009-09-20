@@ -59,11 +59,9 @@ __USAGE__
             }, %Targets{[ grep { $_ ne 'all' && %Build{$_} }, keys %Build]}),
             "\n"
         exit(0)
-    
 
 
 # Don't copy these top level READMEs
-<<<<<<< HEAD:pod/buildtoc
 %Ignore = %:
     micro => 1
     #     vms => 1,
