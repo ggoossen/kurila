@@ -277,7 +277,6 @@ ext/Module-Load-Conditional/t/to_load/LoadIt.pm	Module::Conditional tests
 ext/Module-Load-Conditional/t/to_load/LoadMe.pl	Module::Conditional tests
 ext/Module-Load-Conditional/t/to_load/Must/Be/Loaded.pm	Module::Conditional tests
 ext/Module-Load-Conditional/t/to_load/ToBeLoaded	Module::Conditional tests
-ext/Opcode/Makefile.PL		Opcode extension makefile writer
 ext/Opcode/Opcode.pm		Opcode extension Perl module
 ext/Opcode/Opcode.xs		Opcode extension external subroutines
 ext/Opcode/ops.pm		"Pragma" form of Opcode extension Perl module
@@ -360,13 +359,11 @@ ext/Perl6-Form/Makefile.PL	Perl6-Form
 ext/Perl6-Form/MANIFEST	Perl6-Form
 ext/Perl6-Form/README	Perl6-Form
 ext/Perl6-Form/t/1.t	Perl6-Form
-ext/PerlIO-scalar/Makefile.PL	PerlIO layer for scalars
 ext/PerlIO-scalar/scalar.pm	PerlIO layer for scalars
 ext/PerlIO-scalar/scalar.xs	PerlIO layer for scalars
 ext/PerlIO-scalar/t/scalar.t		See if PerlIO::scalar works
 ext/PerlIO-scalar/t/scalar_ungetc.t	Tests for PerlIO layer for scalars
 ext/PerlIO-via/hints/aix.pl	Hint for PerlIO::via for named architecture
-ext/PerlIO-via/Makefile.PL	PerlIO layer for layers in perl
 ext/PerlIO-via/t/via.t		See if PerlIO::via works
 ext/PerlIO-via/via.pm		PerlIO layer for layers in perl
 ext/PerlIO-via/via.xs		PerlIO layer for layers in perl
