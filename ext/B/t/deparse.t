@@ -320,6 +320,88 @@ else { testsub(); }
 # TODO 54 interpolation in regexps
 my($y, $t)
 m/x$($y)z$t/
+my $c;
+x() unless $a;
+x() if $a;
+x() unless $a or $b;
+x() if $a or $b;
+x() unless $a and $b;
+x() if $a and $b;
+x() if not $a || $b and $c;
+x() unless not $a || $b and $c;
+x() if not $a && $b or $c;
+x() unless not $a && $b or $c;
+x() unless $a or $b or $c;
+x() if $a or $b or $c;
+x() unless $a and $b and $c;
+x() if $a and $b and $c;
+x() unless not $a && $b && $c;
+####
+# 60 tests that should be constant folded
+x() if 1;
+x() if GLIPP;
+x() if !GLIPP;
+x() if GLIPP && GLIPP;
+x() if !GLIPP || GLIPP;
+x() if do { GLIPP };
+x() if do { no warnings 'void'; 5; GLIPP };
+x() if do { !GLIPP };
+if (GLIPP) { x() } else { z() }
+if (!GLIPP) { x() } else { z() }
+if (GLIPP) { x() } elsif (GLIPP) { z() }
+if (!GLIPP) { x() } elsif (GLIPP) { z() }
+if (GLIPP) { x() } elsif (!GLIPP) { z() }
+if (!GLIPP) { x() } elsif (!GLIPP) { z() }
+if (!GLIPP) { x() } elsif (!GLIPP) { z() } elsif (GLIPP) { t() }
+if (!GLIPP) { x() } elsif (!GLIPP) { z() } elsif (!GLIPP) { t() }
+if (!GLIPP) { x() } elsif (!GLIPP) { z() } elsif (!GLIPP) { t() }
+>>>>
+x();
+x();
+'???';
+x();
+x();
+x();
+x();
+do {
+    '???'
+};
+do {
+    x()
+};
+do {
+    z()
+};
+do {
+    x()
+};
+do {
+    z()
+};
+do {
+    x()
+};
+'???';
+do {
+    t()
+};
+'???';
+!1;
+####
+# TODO ? $Config::Config{useithreads} && "doesn't work with threads"
+# 61 tests that shouldn't be constant folded
+# It might be fundamentally impossible to make this work on ithreads, in which
+# case the TODO should become a SKIP
+x() if $a;
+if ($a == 1) { x() } elsif ($b == 2) { z() }
+if (do { foo(); GLIPP }) { x() }
+if (do { $a++; GLIPP }) { x() }
+>>>>
+x() if $a;
+if ($a == 1) { x(); } elsif ($b == 2) { z(); }
+if (do { foo(); GLIPP }) { x(); }
+if (do { ++$a; GLIPP }) { x(); }
+>>>>>>> 4a4b8592c1ff4f27425d55dad0bff22cd56bbf4f:ext/B/t/deparse.t
 ####
 # TODO tests for deparsing constants
 warn PI;

@@ -189,7 +189,7 @@ for ( @prgs)
     
     print $out_file, $src, "\n########\n" if $got_files
 
-    our $TODO = %reason{?'todo'}
+    local our $TODO = %reason{?'todo'}
     print_err_line( $switch, $prog, $expected, $results, $TODO, $file ) unless $ok or $TODO
 
     ok($ok)
