@@ -98,7 +98,6 @@ POD = \
 	perlobj.pod	\
 	perlop.pod	\
 	perlopentut.pod	\
-	perlothrtut.pod	\
 	perlpacktut.pod	\
 	perlpod.pod	\
 	perlpodspec.pod	\
@@ -220,7 +219,6 @@ MAN = \
 	perlobj.man	\
 	perlop.man	\
 	perlopentut.man	\
-	perlothrtut.man	\
 	perlpacktut.man	\
 	perlpod.man	\
 	perlpodspec.man	\
@@ -342,7 +340,6 @@ HTML = \
 	perlobj.html	\
 	perlop.html	\
 	perlopentut.html	\
-	perlothrtut.html	\
 	perlpacktut.html	\
 	perlpod.html	\
 	perlpodspec.html	\
@@ -464,7 +461,6 @@ TEX = \
 	perlobj.tex	\
 	perlop.tex	\
 	perlopentut.tex	\
-	perlothrtut.tex	\
 	perlpacktut.tex	\
 	perlpod.tex	\
 	perlpodspec.tex	\
