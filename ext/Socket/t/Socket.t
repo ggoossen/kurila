@@ -12,7 +12,7 @@ BEGIN
 use Socket < qw(:all)
 use signals
 
-plan tests => 14
+plan tests => 17
 
 my $has_echo = $^OS_NAME ne 'MSWin32'
 my $alarmed = 0
@@ -134,3 +134,9 @@ is(sockaddr_family(pack_sockaddr_in(100,inet_aton("10.250.230.10"))), AF_INET)
 
 dies_like( sub (@< @_) { sockaddr_family("") },
            qr/^Bad arg length for Socket::sockaddr_family, length is 0, should be at least \d+/ )
+
+SKIP: do
+    skip 2, "no inetntop or inetaton" if not (config_value('d_inetntop') && config_value('d_inetaton'))
+    ok(inet_ntop(AF_INET, inet_pton(AF_INET, "10.20.30.40")) eq "10.20.30.40")
+    ok(inet_ntop(AF_INET, inet_aton("10.20.30.40")) eq "10.20.30.40")
+    ok(lc(inet_ntop(AF_INET6, inet_pton(AF_INET6, "2001:503:BA3E::2:30"))) eq "2001:503:ba3e::2:30")
