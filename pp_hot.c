@@ -1707,23 +1707,22 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
     SV* ob;
     CV* cv;
     HV* stash;
-    STRLEN namelen;
     const char* packname = NULL;
     SV *packsv = NULL;
     STRLEN packlen;
-    const char * const name = SvPV_const(meth, namelen);
     SV * const sv = *(PL_stack_base + TOPMARK + 1);
 
     PERL_ARGS_ASSERT_METHOD_COMMON;
 
     if (!sv)
-	Perl_croak(aTHX_ "Can't call method \"%s\" on an undefined value", name);
+	Perl_croak(aTHX_ "Can't call method \"%"SVf"\" on an undefined value",
+		   SVfARG(meth));
 
     if (SvROK(sv))
 	ob = MUTABLE_SV(SvRV(sv));
     else {
 	if ( ! SvPVOK(sv) )
-	    Perl_croak(aTHX_ "Can't call method \"%s\" on %s", name, Ddesc(sv));
+	    Perl_croak(aTHX_ "Can't call method \"%"SVf"\" on %s", SVfARG(meth), Ddesc(sv));
 
 	/* this isn't a reference */
         if(SvOK(sv) && (packname = SvPV_const(sv, packlen))) {
@@ -1752,6 +1751,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 		     && (ob = MUTABLE_SV(GvIO((const GV *)ob)))
 		     && SvOBJECT(ob))))
     {
+	const char * const name = SvPV_nolen_const(meth);
 	Perl_croak(aTHX_ "Can't call method \"%s\" on unblessed reference",
 		   (SvSCREAM(meth) && strEQ(name,"isa")) ? "DOES" :
 		   name);
@@ -1775,65 +1775,8 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 	}
     }
 
-    cv = gv_fetchmethod(stash ? stash : (HV*)packsv, name);
+    cv = gv_fetchmethod_flags(stash ? stash : (HV*)packsv, SvPV_nolen_const(meth), GV_CROAK);
 
-    if (!cv) {
-	/* This code tries to figure out just what went wrong with
-	   gv_fetchmethod.  It therefore needs to duplicate a lot of
-	   the internals of that function.  We can't move it inside
-	   Perl_gv_fetchmethod(), however, since that would
-	   cause UNIVERSAL->can("NoSuchPackage::foo") to croak, and we
-	   don't want that.
-	*/
-	const char* leaf = name;
-	const char* sep = NULL;
-	const char* p;
-
-	for (p = name; *p; p++) {
-	    if (*p == '\'')
-		sep = p, leaf = p + 1;
-	    else if (*p == ':' && *(p + 1) == ':')
-		sep = p, leaf = p + 2;
-	}
-	if (!sep || ((sep - name) == 5 && strnEQ(name, "SUPER", 5))) {
-	    /* the method name is unqualified or starts with SUPER:: */
-	    if (sep)
-		stash = CopSTASH(PL_curcop);
-	    if (stash) {
-		HEK * const packhek = HvNAME_HEK(stash);
-		if (packhek) {
-		    packname = HEK_KEY(packhek);
-		    packlen = HEK_LEN(packhek);
-		} else {
-		    goto croak;
-		}
-	    }
-
-	    if (!packname) {
-	    croak:
-		Perl_croak(aTHX_
-			   "Can't use anonymous symbol table for method lookup");
-	    }
-	}
-	else {
-	    /* the method name is qualified */
-	    packname = name;
-	    packlen = sep - name;
-	}
-	
-	/* we're relying on gv_fetchmethod not autovivifying the stash */
-	if (gv_stashpvn(packname, packlen, 0)) {
-	    Perl_croak(aTHX_
-		       "Can't locate object method \"%s\" via package \"%.*s\"",
-		       leaf, (int)packlen, packname);
-	}
-	else {
-	    Perl_croak(aTHX_
-		       "Can't locate object method \"%s\" via package \"%.*s\""
-		       " (perhaps you forgot to load \"%.*s\"?)",
-		       leaf, (int)packlen, packname, (int)packlen, packname);
-	}
-    }
     return cvTsv(cv);
 }
 
