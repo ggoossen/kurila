@@ -135,10 +135,13 @@ if ($^OS_NAME eq 'dos')
 if ((-e "testcompile") && (defined(env::var('COMPILE'))))
     push(@scripts, < map("$_.exe", @scripts))
 
+# Exclude nonxs extensions that are not architecture dependent
+my @nonxs = grep( { ! m/^Errno$/ }, split(' ', config_value('nonxs_ext')))
+
 find(sub ()
     if (("$File::Find::dir/$_" =~ m{^ext\b(.*)/([^/]+)\.pm$})
-        ! grep { (my $dir = $_) =~ s/\//-/g;
-                 $File::Find::name =~ m/^ext\/$dir/ }, @nonxs)
+        && ! grep { (my $dir = $_) =~ s/\//-/g;
+                    $File::Find::name =~ m/^ext\/$dir/ }, @nonxs)
         my @: $path, $modname = @: $1,$2
 
         # strip to optional "/lib", or remove trailing component
