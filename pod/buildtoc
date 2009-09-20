@@ -22,14 +22,14 @@ $masterpodfile = File::Spec->catdir($Up, "pod.lst")
 
 %Targets = %:
     toc => "kurilatoc.pod"
-    manifest => File::Spec->catdir($Up, "MANIFEST")
+    manifest => File::Spec->catfile($Up, "MANIFEST")
     perlpod => "perl.pod"
-    vms => File::Spec->catdir($Up, "vms", "descrip_mms.template")
-    nmake => File::Spec->catdir($Up, "win32", "Makefile")
-    dmake => File::Spec->catdir($Up, "win32", "makefile.mk")
-    podmak => File::Spec->catdir($Up, "win32", "pod.mak")
-    # plan9 =>  File::Spec->catdir($Up, "plan9", "mkfile")
-    unix => File::Spec->catdir($Up, "Makefile.SH")
+    vms => File::Spec->catfile($Up, "vms", "descrip_mms.template")
+    nmake => File::Spec->catfile($Up, "win32", "Makefile")
+    dmake => File::Spec->catfile($Up, "win32", "makefile.mk")
+    podmak => File::Spec->catfile($Up, "win32", "pod.mak")
+    # plan9 =>  File::Spec->catfile($Up, "plan9", "mkfile")
+    unix => File::Spec->catfile($Up, "Makefile.SH")
     # TODO: add roffitall
 
 do
@@ -217,7 +217,7 @@ do
             unless %disk_pods{?$i}
 
 
-# Find all the mdoules
+# Find all the modules
 do
     my @modpods
     find \&getpods => < qw(../lib ../ext)
@@ -244,11 +244,8 @@ do
                         push @modpods, $file
                         #warn "GOOD $file\n";
                         return
-                    
                 
                 warn "$^PROGRAM_NAME: $file: cannot find =head1 NAME\n"
-            
-        
     
 
     die "$^PROGRAM_NAME: no pods" unless (nelems @modpods)
@@ -265,8 +262,6 @@ do
                 next
             
             %Modules{+$name} = $_
-        
-    
 
 
 # OK. Now a lot of ancillary function definitions follow
@@ -371,6 +366,8 @@ sub podset
     local @ARGV = @_
     my $pod
 
+    return unless @ARGV
+
     while( ~< *ARGV)
         s/\015//g
         if (s/^=head1 (NAME)\s*/=head2 /)
@@ -468,8 +465,6 @@ sub output($str)
         elsif (m/\S/ && length)
             $LINE .= $_
             $NEWLINE = 0
-        
-    
 
 
 # End of original buildtoc. From here on are routines to generate new sections
