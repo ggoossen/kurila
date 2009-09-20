@@ -35,7 +35,8 @@ END
 open my $mini, "<", "miniperlmain.c"
 while ( ~< $mini)
     last if m/Do not delete this line--writemain depends on it/
-    print $^STDOUT,
+    print $^STDOUT, $_
+    m/#include "perl.h"/ and print $^STDOUT, qq/#include "XSUB.h"\n/
 
 
 print $^STDOUT, <<'END'
