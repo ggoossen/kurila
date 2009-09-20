@@ -83,16 +83,16 @@ for ( @prgs)
     
     my(@: $prog,$expected) =  split(m/\nEXPECT(?:\n|$)/, $_, 2)
 
-    my ($todo, $todo_reason)
-    $todo = $prog =~ s/^#\s*TODO\s*(.*)\n//m and $todo_reason = $1
-    # If the TODO reason starts ? then it's taken as a code snippet to evaluate
-    # This provides the flexibility to have conditional TODOs
-    if ($todo_reason && $todo_reason =~ s/^\?//)
-        my $temp = eval $todo_reason
-        if ($^EVAL_ERROR)
-            die "# In TODO code reason:\n# $todo_reason\n$($^EVAL_ERROR->message)"
-        
-        $todo_reason = $temp
+    my %reason;
+    foreach my $what (qw(skip todo))
+	$prog =~ s/^#\s*\U$what\E\s*(.*)\n//m and %reason{+$what} = $1
+	# If the SKIP reason starts ? then it's taken as a code snippet to
+	# evaluate. This provides the flexibility to have conditional SKIPs
+        if ($reason{?$what} && $reason{$what} =~ s/^\?//)
+	    my $temp = eval $reason{$what}
+	    if ($^EVAL_ERROR)
+		die "# In \U$what\E code reason:\n# %reason{$what}\n$($^EVAL_ERROR->message)"
+	    %reason{$what} = $temp
     
     if ( $prog =~ m/--FILE--/)
         my @files = split(m/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) 
@@ -115,7 +115,6 @@ for ( @prgs)
         shift @files 
         $prog = shift @files 
     
-
     # fix up some paths
     if ($Is_MacOS)
         $prog =~ s|require "./abc(d)?";|require ":abc$1";|g
@@ -161,6 +160,7 @@ for ( @prgs)
     $expected =~ s/\n+$//
     my $prefix = ($results =~ s#^PREFIX(\n|$)##) 
     # any special options? (OPTIONS foo bar zap)
+<<<<<<< HEAD:t/lib/common.pl
     my $option_regex = 0
     my $option_random = 0
     if ($expected =~ s/^OPTIONS? (.+)\n//)
@@ -204,6 +204,53 @@ for ( @prgs)
     foreach ( @temp_path)
         rmtree $_ if -d $_
 
+=======
+    my $option_regex = 0;
+    my $option_random = 0;
+    if ($expected =~ s/^OPTIONS? (.+)\n//) {
+	foreach my $option (split(' ', $1)) {
+	    if ($option eq 'regex') { # allow regular expressions
+		$option_regex = 1;
+	    }
+	    elsif ($option eq 'random') { # all lines match, but in any order
+		$option_random = 1;
+	    }
+	    else {
+		die "$0: Unknown OPTION '$option'\n";
+	    }
+	}
+    }
+    die "$0: can't have OPTION regex and random\n"
+        if $option_regex + $option_random > 1;
+    my $ok = 0;
+    if ($results =~ s/^SKIPPED\n//) {
+	print "$results\n" ;
+	$ok = 1;
+    }
+    elsif ($option_random) {
+        $ok = randomMatch($results, $expected);
+    }
+    elsif ($option_regex) {
+	$ok = $results =~ /^$expected/;
+    }
+    elsif ($prefix) {
+	$ok = $results =~ /^\Q$expected/;
+    }
+    else {
+	$ok = $results eq $expected;
+    }
+ 
+    our $TODO = $reason{todo};
+    print_err_line( $switch, $prog, $expected, $results, $TODO ) unless $ok;
+
+    ok($ok);
+
+    foreach (@temps)
+	{ unlink $_ if $_ }
+    foreach (@temp_path)
+	{ rmtree $_ if -d $_ }
+}
+>>>>>>> 6ee4ed10654cdc601734d15a3b6dda2ecdd44527:t/lib/common.pl
 
 sub randomMatch
     my $got = shift 
