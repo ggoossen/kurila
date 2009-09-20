@@ -99,7 +99,6 @@ PERL_CALLCONV void	Perl_set_context(void *t)
 
 END_EXTERN_C
 
-/* functions with flag 'n' should come before here */
 START_EXTERN_C
 PERL_INLINE_CALLCONV SV*	Perl_hvTsv(pTHX_ HV *hv);
 PERL_INLINE_CALLCONV SV*	Perl_avTsv(pTHX_ AV *av);
@@ -5845,7 +5844,4 @@ STATIC HV *	S_get_isa_hash(pTHX_ HV *const stash)
 #endif
 
 END_EXTERN_C
-/*
- * ex: set ts=8 sts=4 sw=4 noet:
- */
 /* ex: set ro: */
