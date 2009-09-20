@@ -151,12 +151,6 @@ Return the SV from the GV.
 #define GvIN_PAD_on(gv)		(GvFLAGS(gv) |= GVf_IN_PAD)
 #define GvIN_PAD_off(gv)	(GvFLAGS(gv) &= ~GVf_IN_PAD)
 
-#define GvUNIQUE(gv)            0
-#define GvUNIQUE_on(gv)         NOOP
-#define GvUNIQUE_off(gv)        NOOP
-
-#undef  GV_UNIQUE_CHECK
-
 #ifndef PERL_CORE
 #  define Nullgv Null(GV*)
 #endif
