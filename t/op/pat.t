@@ -1680,8 +1680,6 @@ EOT
             chop($regex)
             chop($string)
             ok($string =~ m/$regex/i)
-        
-    
 
     do
         print $^STDOUT, "# more SIGMAs\n"
