@@ -1745,7 +1745,11 @@ PERL_CALLCONV OP*	Perl_newCONDOP(pTHX_ OPFLAGS flags, OP* first, OP* trueop, OP*
 #define PERL_ARGS_ASSERT_NEWCONDOP	\
 	assert(first)
 
-PERL_CALLCONV CV*	Perl_newCONSTSUB(pTHX_ const char* name, SV* sv);
+PERL_CALLCONV CV*	Perl_newCONSTSUB(pTHX_ const char* name, SV* sv)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_NEWCONSTSUB	\
+	assert(sv)
+
 PERL_CALLCONV OP*	Perl_newFOROP(pTHX_ OPFLAGS flags, char* label, OP* sv, OP* expr, OP* block, OP* cont, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__

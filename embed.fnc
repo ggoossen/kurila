@@ -587,7 +587,7 @@ Apa	|OP*	|newANONHASH	|NULLOK OP* o|NULLOK SV* location
 Ap	|OP*	|newANONSUB	|I32 floor|NULLOK OP* proto|NULLOK OP* block
 Apa	|OP*	|newASSIGNOP	|OPFLAGS flags|NULLOK OP* left|I32 optype|NULLOK OP* right|NULLOK SV* location
 Apa	|OP*	|newCONDOP	|OPFLAGS flags|NN OP* first|NULLOK OP* trueop|NULLOK OP* falseop|NULLOK SV* location
-Apd	|CV*	|newCONSTSUB	|NULLOK const char* name|NULLOK SV* sv
+Apd	|CV*	|newCONSTSUB	|NULLOK const char* name|NN SV* sv
 Apa	|OP*	|newFOROP	|OPFLAGS flags|NULLOK char* label \
 				|NULLOK OP* sv|NN OP* expr|NULLOK OP* block|NULLOK OP* cont|NULLOK SV* location
 Apa	|OP*	|newLOGOP	|I32 optype|OPFLAGS flags|NN OP *first|NN OP *other|NULLOK SV* location
