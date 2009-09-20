@@ -9,6 +9,7 @@ use FindBin;
 use Text::Tabs;
 use Text::Wrap;
 use Getopt::Long;
+use Carp;
 
 $Up = File::Spec->updir
 $masterpodfile = File::Spec->catdir($Up, "pod.lst")
@@ -578,6 +579,12 @@ sub generate_pod_mak
     $line
 
 
+sub verify_contiguous($name, $content, $what)
+  my $sections = nelems(@: $content =~ m/\0+/g)
+  croak("$^PROGRAM_NAME: $name contains no $what") if $sections +< 1
+  croak("$^PROGRAM_NAME: $name contains discontiguous $what") if $sections +> 1
+
+
 sub do_manifest
     my $name = shift
     my @manifest = grep {! m!^pod/[^.]+\.pod.*\n!},
@@ -596,9 +603,7 @@ sub do_nmake
     my $makefile = join '', @_
     die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile =~ m/\0/
     $makefile =~ s/^\tcopy \.\.\\README.*\n/\0/gm
-    my $sections = @: $makefile =~ m/\0+/g
-    die "$^PROGRAM_NAME: $name contains no README copies" if $sections +< 1
-    die "$^PROGRAM_NAME: $name contains discontiguous README copies" if $sections +> 1
+    verify_contiguous($name, $makefile, 'README copies')
     # Now remove the other copies that follow
     1 while $makefile =~ s/\0\tcopy .*\n/\0/gm
     $makefile =~ s/\0+/$(join ("", generate_nmake_1( < @_ )))/s
@@ -621,6 +626,7 @@ sub do_perlpod
 		    |\s*\n		# blank line
 		   )+
 		  }
+<<<<<<< HEAD:pod/buildtoc
                   {$($1 . join "", generate_perlpod( < @_ ))}mx)
         die "$^PROGRAM_NAME: Failed to insert amendments in do_perlpod"
     
@@ -642,10 +648,7 @@ sub do_vms
     my $makefile = join '', @_
     die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile =~ m/\0/
     $makefile =~ s/\npod\d* =[^\n]*/\0/gs
-    my $sections = @: $makefile =~ m/\0+/g
-    die "$^PROGRAM_NAME: $name contains no pod assignments" if $sections +< 1
-    die "$^PROGRAM_NAME: $name contains $sections discontigous pod assignments"
-        if $sections +> 1
+    verify_contiguous($name, $makefile, 'pod assignments')
     $makefile =~ s/\0+/$(join "\n", @: '', < generate_descrip_mms_1( < @_ ))/s
 
     die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile =~ m/\0/
@@ -659,19 +662,13 @@ sub do_vms
                  [^\n]+\n       # Another line
                  [^\n]+\Q[.lib.pods]\E\n                # ends [.lib.pods]
                     /\0/gsx
-    $sections = @: $makefile =~ m/\0+/g
-    die "$^PROGRAM_NAME: $name contains no copy rules" if $sections +< 1
-    die "$^PROGRAM_NAME: $name contains $sections discontigous copy rules"
-        if $sections +> 1
+    verify_contiguous($name, $makefile, 'copy rules')
     $makefile =~ s/\0+/$(join "\n", @: '', < generate_descrip_mms_2( < @_ ))/s
 
     # Looking for rules like this:
     #	- If F$Search("[.pod]perldelta.pod").nes."" Then Delete/NoConfirm/Log [.pod]perldelta.pod;*
     $makefile =~ s!(?:\t- If F\$Search\("\[\.pod\]perl[a-z]+\Q.pod").nes."" Then Delete/NoConfirm/Log [.pod]perl\E[a-z]+\.pod;\*\n)+!\0!sg
-    $sections = () = $makefile =~ m/\0+/g
-    die "$^PROGRAM_NAME: $name contains no delete rules" if $sections +< 1
-    die "$^PROGRAM_NAME: $name contains $sections discontigous delete rules"
-        if $sections +> 1
+    verify_contiguous($name, $makefile, 'delete rules')
     $makefile =~ s/\0+/$(join "\n", &generate_descrip_mms_3, '')/s
 
     return $makefile
@@ -684,11 +681,7 @@ sub do_unix
 
     $makefile_SH =~ s/\n\s+-\@test -f \S+ && cd pod && \$\(LNS\) \S+ \S+ && cd \.\. && echo "\S+" >> extra.pods \# See buildtoc\n/\0/gm
 
-    my $sections = @: $makefile_SH =~ m/\0+/g
-
-    die "$^PROGRAM_NAME: $name contains no copy rules" if $sections +< 1
-    die "$^PROGRAM_NAME: $name contains $sections discontigous copy rules"
-        if $sections +> 1
+    verify_contiguous($name, $makefile_SH, 'copy rules')
 
     my @copy_rules = map "\t-\@test -f pod/%Copies{$_} && cd pod && \$(LNS) %Copies{$_} $_ && cd .. && echo \"pod/$_\" >> extra.pods # See buildtoc",
         keys %Copies
