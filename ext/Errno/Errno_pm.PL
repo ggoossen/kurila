@@ -37,6 +37,7 @@ else
 
 write_errno_pm()
 unlink "errno.c" if -f "errno.c"
+close $out or die "Error closing Errno.tmp: $^OS_ERROR"
 rename "Errno.tmp", "Errno.pm" or die "Cannot rename Errno.tmp to Errno.pm: $^OS_ERROR"
 
 sub process_file($file)
