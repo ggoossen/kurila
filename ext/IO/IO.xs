@@ -26,13 +26,6 @@
 #endif
 
 #ifdef PerlIO
-#if defined(MACOS_TRADITIONAL) && defined(USE_SFIO)
-#define PERLIO_IS_STDIO 1
-#undef setbuf
-#undef setvbuf
-#define setvbuf		_stdsetvbuf
-#define setbuf(f,b)	( __sf_setbuf(f,b) )
-#endif
 typedef int SysRet;
 typedef PerlIO * InputStream;
 typedef PerlIO * OutputStream;

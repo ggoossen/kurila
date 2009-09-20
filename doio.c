@@ -1131,7 +1131,7 @@ Perl_do_aexec5(pTHX_ SV *really, register SV * const *mark, register SV * const 
 {
     dVAR;
     PERL_ARGS_ASSERT_DO_AEXEC5;
-#if defined(MACOS_TRADITIONAL) || defined(__SYMBIAN32__) || defined(__LIBCATAMOUNT__)
+#if defined(__SYMBIAN32__) || defined(__LIBCATAMOUNT__)
     Perl_croak(aTHX_ "exec? I'm not *that* kind of operating system");
 #else
     if (sp > mark) {
@@ -1637,10 +1637,6 @@ Perl_cando(pTHX_ Mode_t mode, bool effective, register const Stat_t *statbufp)
 static bool
 S_ingroup(pTHX_ Gid_t testgid, bool effective)
 {
-#ifdef MACOS_TRADITIONAL
-    /* This is simply not correct for AppleShare, but fix it yerself. */
-    return TRUE;
-#else
     dVAR;
     if (testgid == (effective ? PL_egid : PL_gid))
 	return TRUE;
@@ -1664,7 +1660,6 @@ S_ingroup(pTHX_ Gid_t testgid, bool effective)
     }
 #else
     return FALSE;
-#endif
 #endif
 }
 

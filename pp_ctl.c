@@ -1582,17 +1582,6 @@ PP(pp_require)
 	tryname = name;
 	tryrsfp = doopen_pm(name, len);
     }
-#ifdef MACOS_TRADITIONAL
-    if (!tryrsfp) {
-	char newname[256];
-
-	MacPerl_CanonDir(name, newname, 1);
-	if (path_is_absolute(newname)) {
-	    tryname = newname;
-	    tryrsfp = doopen_pm(newname, strlen(newname));
-	}
-    }
-#endif
     if (!tryrsfp) {
 	AV * const ar = PL_includepathav;
 	I32 i;
@@ -1705,22 +1694,8 @@ PP(pp_require)
 		    }
 		}
 		else {
-		  if (!path_is_absolute(name)
-#ifdef MACOS_TRADITIONAL
-			/* We consider paths of the form :a:b ambiguous and interpret them first
-			   as global then as local
-			*/
-			|| (*name == ':' && name[1] != ':' && strchr(name+2, ':'))
-#endif
-		  ) {
+		  if (!path_is_absolute(name)) {
 		    const char *dir = SvOK(dirsv) ? SvPV_nolen_const(dirsv) : "";
-#ifdef MACOS_TRADITIONAL
-		    char buf1[256];
-		    char buf2[256];
-
-		    MacPerl_CanonDir(name, buf2, 1);
-		    Perl_sv_setpvf(aTHX_ namesv, "%s%s", MacPerl_CanonDir(dir, buf1, 0), buf2+(buf2[0] == ':'));
-#else
 #  ifdef VMS
 		    char *unixdir;
 		    if ((unixdir = tounixpath(dir, NULL)) == NULL)
@@ -1744,7 +1719,6 @@ PP(pp_require)
 		    Perl_sv_setpvf(aTHX_ namesv, "%s/%s", dir, name);
 #    endif
 #  endif
-#endif
 		    tryname = SvPVX_const(namesv);
 		    tryrsfp = doopen_pm(tryname, SvCUR(namesv));
 		    if (tryrsfp) {
@@ -2199,12 +2173,8 @@ S_path_is_absolute(const char *name)
     PERL_ARGS_ASSERT_PATH_IS_ABSOLUTE;
 
     if (PERL_FILE_IS_ABSOLUTE(name)
-#ifdef MACOS_TRADITIONAL
-	|| (*name == ':')
-#else
 	|| (*name == '.' && (name[1] == '/' ||
 			     (name[1] == '.' && name[2] == '/')))
-#endif
 	 )
     {
 	return TRUE;

@@ -961,45 +961,6 @@ alarm(seconds,interval=0)
 #endif /* #ifdef HAS_UALARM */
 
 #ifdef HAS_GETTIMEOFDAY
-#    ifdef MACOS_TRADITIONAL	/* fix epoch TZ and use unsigned time_t */
-void
-gettimeofday()
-        PREINIT:
-        struct timeval Tp;
-        struct timezone Tz;
-        PPCODE:
-        int status;
-        AV* res;
-        status = gettimeofday (&Tp, &Tz);
-
-        RESULT = sv2_mortal(newAV());
-	if (status == 0) {
-	     Tp.tv_sec += Tz.tz_minuteswest * 60;	/* adjust for TZ */
-             /* Mac OS (Classic) has unsigned time_t */
-             res = newAV();
-             mXPUSHs((SV*)res);
-             av_push(res, newSVuv(Tp.tv_sec));
-             av_push(res, newSViv(Tp.tv_usec));
-        }
-
-NV
-time()
-        PREINIT:
-        struct timeval Tp;
-        struct timezone Tz;
-        CODE:
-        int status;
-        status = gettimeofday (&Tp, &Tz);
-	if (status == 0) {
-            Tp.tv_sec += Tz.tz_minuteswest * 60;	/* adjust for TZ */
-	    RETVAL = Tp.tv_sec + (Tp.tv_usec / NV_1E6);
-        } else {
-	    RETVAL = -1.0;
-	}
-	OUTPUT:
-	RETVAL
-
-#    else	/* MACOS_TRADITIONAL */
 void
 gettimeofday()
         PREINIT:
@@ -1030,7 +991,6 @@ time()
 	OUTPUT:
 	RETVAL
 
-#    endif	/* MACOS_TRADITIONAL */
 #endif /* #ifdef HAS_GETTIMEOFDAY */
 
 #if defined(HAS_GETITIMER) && defined(HAS_SETITIMER)

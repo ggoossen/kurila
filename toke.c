@@ -113,12 +113,7 @@ static I32 utf16rev_textfilter(pTHX_ int idx, SV *sv, int maxlen);
  * 1999-02-27 mjd-perl-patch@plover.com */
 #define isCONTROLVAR(x) (isUPPER(x) || strchr("[\\]^_?", (x)))
 
-/* On MacOS, respect nonbreaking spaces */
-#ifdef MACOS_TRADITIONAL
-#define SPACE_OR_TAB(c) ((c)==' '||(c)=='\312'||(c)=='\t')
-#else
 #define SPACE_OR_TAB(c) ((c)==' '||(c)=='\t')
-#endif
 
 
 #ifdef DEBUGGING
@@ -2540,7 +2535,6 @@ S_process_shebang(pTHX_ char* s) {
 		*s = '#';	/* Don't try to parse shebang line */
 	}
 #endif /* ALTERNATE_SHEBANG */
-#ifndef MACOS_TRADITIONAL
 	if (!d &&
 	    *s == '#' &&
 	    ipathend > ipath &&
@@ -2571,7 +2565,6 @@ S_process_shebang(pTHX_ char* s) {
 		PERL_FPU_POST_EXEC
 		    Perl_croak(aTHX_ "Can't exec %s", ipath);
 	    }
-#endif
 	if (d) {
 	    while (*d && !isSPACE(*d))
 		d++;
@@ -3401,9 +3394,6 @@ Perl_yylex(pTHX)
       "\t(Maybe you didn't strip carriage returns after a network transfer?)\n");
 #endif
     case ' ': case '\t': case '\f': case 013:
-#ifdef MACOS_TRADITIONAL
-    case '\312':
-#endif
 #ifdef PERL_MAD
 	PL_realtokenstart = -1;
 	if (!PL_thiswhite)

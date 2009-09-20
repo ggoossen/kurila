@@ -604,14 +604,7 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 	    }
 
 	    if (strEQ(remaining, "EXTENDED_OS_ERROR")) {
-#if defined(MACOS_TRADITIONAL)
-		{
-		    char msg[256];
-
-		    sv_setnv(sv,(double)gMacPerl_OSErr);
-		    sv_setpv(sv, gMacPerl_OSErr ? GetSysErrText(gMacPerl_OSErr, msg) : "");
-		}
-#elif defined(VMS)
+#if defined(VMS)
 		{
 #	            include <descrip.h>
 #	            include <starlet.h>
@@ -1408,9 +1401,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 	    }
 
 	    if (strEQ(remaining, "EXTENDED_OS_ERROR")) {
-#ifdef MACOS_TRADITIONAL
-		gMacPerl_OSErr = SvIV(sv);
-#else
 #  ifdef VMS
 		set_vaxc_errno(SvIV(sv));
 #  else
@@ -1425,7 +1415,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 #      endif
 #    endif
 #  endif
-#endif
 		break;
 	    }
 	    if (strEQ(remaining, "EGID")) {  /* $^EGID */
@@ -1702,7 +1691,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		paren = RX_BUFF_IDX_POSTMATCH;
 		goto setparen;
 	    }
-#ifndef MACOS_TRADITIONAL
 	    if (strEQ(remaining, "PROGRAM_NAME")) {
 		LOCK_DOLLARZERO_MUTEX;
 #ifdef HAS_SETPROCTITLE
@@ -1769,7 +1757,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		UNLOCK_DOLLARZERO_MUTEX;
 		break;
 	    }
-#endif /* MACOS_TRADITIONAL */
 	    break;
 
 	case 'S':
