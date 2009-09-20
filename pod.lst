@@ -12,7 +12,7 @@ h Overview
   perl			Perl overview (this section)
   kurilaintro           Perl Kurila introduction
   perlintro		Perl introduction for beginners
-g kurilatoc		Perl Kurila documentation table of contents
+go kurilatoc		Perl Kurila documentation table of contents
 
 h Tutorials
 
