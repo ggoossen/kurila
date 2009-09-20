@@ -80,7 +80,7 @@ Anp	|void	|set_context	|NN void *t
 
 END_EXTERN_C
 
-/* functions with flag 'n' should come before here */
+: functions with flag 'n' should come before here 
 START_EXTERN_C
 Aip	|SV*	|hvTsv	|NULLOK HV *hv
 Aip	|SV*	|avTsv	|NULLOK AV *av
@@ -1965,6 +1965,3 @@ so	|HV *	|get_isa_hash	|NN HV *const stash
 #endif
 
 END_EXTERN_C
-/*
- * ex: set ts=8 sts=4 sw=4 noet:
- */

@@ -14,45 +14,6 @@ BEGIN
 # implicit interpreter context argument.
 #
 
-open my $in_fh, "<", "embed.fnc" or die $^OS_ERROR
-
-# walk table providing an array of components in each line to
-# subroutine, printing the result
-sub walk_table ($function, $filename, ?$leader, ?$trailer)
-    $filename ||= '-'
-    my $F
-    if (ref $filename)	# filehandle
-        $F = $filename
-    else
-        safer_unlink $filename
-        $F = safer_open($filename)
-        binmode $F
-    
-    print $F, $leader if $leader
-    seek $in_fh, 0, 0		# so we may restart
-    while ( ~< $in_fh)
-        chomp
-        next if m/^:/
-        while (s|\\\s*$||)
-            $_ .= ~< $in_fh
-            chomp
-        
-        s/\s+$//
-        my @args
-        if (m/^\s*(#|$)/)
-            @args = @( $_ )
-        else
-            @args = split m/\s*\|\s*/, $_
-        
-        s/\b(NN|NULLOK)\b\s+//g for  @args
-        print $F, $function->(< @args)
-    
-    print $F, $trailer if $trailer
-    unless (ref $filename)
-        close $F or die "Error closing $filename: $^OS_ERROR"
-    
-
-
 my %apidocs
 my %gutsdocs
 my %docfuncs
@@ -62,52 +23,43 @@ my $curheader = "Unknown section"
 
 sub autodoc($fh, $file) # parse a file and extract documentation info
     my($in, $doc, $line)
-    FUNC:
-        while (defined($in = ~< $fh))
+    FUNC: while (defined($in = ~<$fh))
         if ($in=~ m/^=head1 (.*)/)
             $curheader = $1
             next FUNC
-        
+
         $line++
         if ($in =~ m/^=for\s+apidoc\s+(.*?)\s*\n/)
             my $proto = $1
             $proto = "||$proto" unless $proto =~ m/\|/
-            my @($flags, $ret, $name, @< @args) = split m/\|/, $proto
+            my @: $flags, $ret, $name, @< @args = split m/\|/, $proto
             my $docs = ""
-            DOC:
-                while (defined($doc = ~< $fh))
+            DOC: while (defined($doc = ~<$fh))
                 $line++
                 last DOC if $doc =~ m/^=\w+/
                 if ($doc =~ m:^\*/$:)
-                    warn "=cut missing? $file:$line:$doc";
+                    warn "=cut missing? $file:$line:$doc"
                     last DOC
-                
                 $docs .= $doc
-            
+
             $docs = "\n$docs" if $docs and $docs !~ m/^\n/
             if ($flags =~ m/m/)
                 if ($flags =~ m/A/)
-                    %apidocs{+$curheader}{+$name} = \@($flags, $docs, $ret, $file, < @args)
+                    %apidocs{+$curheader}{+$name} = @: $flags, $docs, $ret, $file, @args
                 else
-                    %gutsdocs{+$curheader}{+$name} = \@($flags, $docs, $ret, $file, < @args)
-                
+                    %gutsdocs{+$curheader}{+$name} = @: $flags, $docs, $ret, $file, @args
             else
-                %docfuncs{+$name} = \@($flags, $docs, $ret, $file, $curheader, < @args)
-            
+                %docfuncs{+$name} = @: $flags, $docs, $ret, $file, $curheader, @args
+
             if (defined $doc)
                 if ($doc =~ m/^=(?:for|head)/)
                     $in = $doc
                     redo FUNC
-                
             else
                 warn "$file:$line:$in"
-            
-        
-    
 
-
-sub docout($fh, $name, $docref) # output the docs for one function
-    my @($flags, $docs, $ret, $file, @< @args) = $docref->@
+sub docout($fh, $name, $docref)  # output the docs for one function
+    my @: $flags, $docs, $ret, $file, @args = $docref
     $name =~ s/\s*$//
 
     $docs .= "NOTE: this function is experimental and may change or be
@@ -157,41 +109,52 @@ my $MANIFEST = do
     open my $fh, "<", "MANIFEST" or die "Can't open MANIFEST: $^OS_ERROR"
     ~< $fh
 
-
-for my $file (@(($MANIFEST =~ m/^(\S+\.c)\t/gm), ($MANIFEST =~ m/^(\S+\.h)\t/gm)))
+for my $file ( (@: $MANIFEST =~ m/^(\S+\.c)\t/gm) +@+ @: $MANIFEST =~ m/^(\S+\.h)\t/gm)
     open my $fh, "<", $file or die "Cannot open $file for docs: $^OS_ERROR\n"
     $curheader = "Functions in file $file\n"
-    autodoc($fh, $file)
+    autodoc($fh,$file)
     close $fh or die "Error closing $file: $^OS_ERROR\n"
-
 
 safer_unlink "pod/perlapi.pod"
 my $doc = safer_open("pod/perlapi.pod")
 
-walk_table sub (@< @_)	# load documented functions into appropriate hash
-               if ((nelems @_) +> 1)
-                   my @($flags, $retval, $func, @< @args) = @_
-                   return "" unless $flags =~ m/d/
-                   $func =~ s/\t//g; $flags =~ s/p// # clean up fields from embed.pl
-                   $retval =~ s/\t//
-                   my $docref = delete %docfuncs{$func}
-                   %seenfuncs{+$func} = 1
-                   if ($docref and nelems $docref->@)
-                       if ($flags =~ m/A/)
-                           $docref->[0].="x" if $flags =~ m/M/
-                           %apidocs{+$docref->[4]}{+$func} =
-                               \@($docref->[0] . 'A', $docref->[1], $retval, $docref->[3],
-                              < @args)
-                       else
-                           %gutsdocs{+$docref->[4]}{+$func} =
-                               \@($docref->[0], $docref->[1], $retval, $docref->[3], < @args)
-                       
-                   else
-                       warn "no docs for $func\n" unless %seenfuncs{$func}
-                   
-               
-               return ""
-           , $doc
+open my $in_fh, "<", "embed.fnc" or die $^OS_ERROR
+
+# walk table providing an array of components in each line to
+# subroutine, printing the result
+
+while (~< $in_fh)
+    chomp
+    next if m/^:/
+    while (s|\\\s*$||)
+        $_ .= ~< $in_fh
+        chomp
+    s/\s+$//
+    next if m/^\s*(#|START_EXTERN_C$|END_EXTERN_C$|$)/
+
+    my @: $flags, $retval, $func, @< @args = split m/\s*\|\s*/, $_
+
+    next unless $flags =~ m/d/
+    next unless $func
+
+    for (@args)
+        s/\b(NN|NULLOK)\b\s+//g
+    $func =~ s/\t//g # clean up fields from embed.pl
+    $retval =~ s/\t//
+
+    my $docref = delete %docfuncs{$func}
+    %seenfuncs{+$func} = 1
+    if ($docref)
+        if ($flags =~ m/A/)
+            $docref[0].="x" if $flags =~ m/M/
+            %apidocs{+$docref[4]}{+$func} =
+                @: $docref[0] . 'A', $docref[1], $retval, $docref[3],
+                   @args
+        else
+            %gutsdocs{+$docref[4]}{+$func} =
+                @: $docref[0], $docref[1], $retval, $docref[3], @args
+    else
+        warn "no docs for $func\n" unless %seenfuncs{$func}
 
 for (sort keys %docfuncs)
     # Have you used a full for apidoc or just a func name?
@@ -291,7 +254,7 @@ print $guts, <<'END'
 =head1 NAME
 
 perlintern - autogenerated documentation of purely B<internal>
-		 Perl functions
+                 Perl functions
 
 =head1 DESCRIPTION
 X<internal Perl functions> X<interpreter functions>

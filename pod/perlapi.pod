@@ -25,7 +25,7 @@ unadorned names, but this support may be disabled in a future release.
 Perl was originally written to handle US-ASCII only (that is characters
 whose ordinal numbers are in the range 0 - 127).
 And documentation and comments may still use the term ASCII, when
-sometimes in fact the entire range from 0 - 256 is meant.
+sometimes in fact the entire range from 0 - 255 is meant.
 
 Note that Perl can be compiled and run under EBCDIC (See L<perlebcdic>)
 or ASCII.  Most of the documentation (and even comments in the code)
@@ -293,7 +293,8 @@ Found in file av.c
 =item av_shift
 X<av_shift>
 
-Shifts an SV off the beginning of the array.
+Shifts an SV off the beginning of the array. Returns C<&PL_sv_undef> if the 
+array is empty.
 
 	SV*	av_shift(AV *av)
 
@@ -828,7 +829,7 @@ sequences, whereas '%' is not a particularly common character in patterns.
 
 Returns a pointer to the escaped text as held by dsv.
 
-	char*	pv_escape(SV *dsv, char const * const str, const STRLEN count, const STRLEN max, STRLEN * const escaped, const U32 flags)
+	const char*	pv_escape(SV *dsv, char const * const str, const STRLEN count, const STRLEN max, STRLEN * const escaped, const U32 flags)
 
 =for hackers
 Found in file dump.c
@@ -855,7 +856,7 @@ any quotes or ellipses.
 
 Returns a pointer to the prettified text as held by dsv.
            
-	char*	pv_pretty(SV *dsv, char const * const str, const STRLEN count, const STRLEN max, char const * const start_color, char const * const end_color, const U32 flags)
+	const char*	pv_pretty(SV *dsv, char const * const str, const STRLEN count, const STRLEN max, char const * const start_color, char const * const end_color, const U32 flags)
 
 =for hackers
 Found in file dump.c
@@ -1144,6 +1145,27 @@ Issue C<PUTBACK> before and C<SPAGAIN> after the call to this function.
 
 =for hackers
 Found in file pp_pack.c
+
+
+=back
+
+=head1 Functions in file utf8_i.h
+
+
+=over 8
+
+=item is_utf8_char
+X<is_utf8_char>
+
+Tests if some arbitrary number of bytes begins in a valid UTF-8
+character.  Note that an INVARIANT (i.e. ASCII on non-EBCDIC machines)
+character is a valid UTF-8 character.  The actual number of bytes in the UTF-8
+character will be returned if it is valid, otherwise 0.
+
+	STRLEN	is_utf8_char(const char *s)
+
+=for hackers
+Found in file utf8_i.h
 
 
 =back
@@ -2738,7 +2760,7 @@ value returned by the sub.  Otherwise, returns NULL.
 Constant subs can be created with C<newCONSTSUB> or as described in
 L<perlsub/"Constant Functions">.
 
-	SV*	cv_const_sv(const CV *const cv)
+	SV*	cv_const_sv(const CV* const cv)
 
 =for hackers
 Found in file op.c
@@ -3613,23 +3635,6 @@ Found in file sv.h
 
 =over 8
 
-=item croak_xs_usage
-X<croak_xs_usage>
-
-A specialised variant of C<croak()> for emitting the usage message for xsubs
-
-    croak_xs_usage(cv, "eee_yow");
-
-works out the package name and subroutine name from C<cv>, and then calls
-C<croak()>. Hence if C<cv> is C<&ouch::awk>, it would call C<croak> as:
-
-    Perl_croak(aTHX_ "Usage %s::%s(%s)", "ouch" "awk", "eee_yow");
-
-	void	croak_xs_usage(const CV *const cv, const char *const params)
-
-=for hackers
-Found in file universal.c
-
 =item get_sv
 X<get_sv>
 
@@ -3644,6 +3649,17 @@ NOTE: the perl_ form of this function is deprecated.
 
 =for hackers
 Found in file perl.c
+
+=item I_SvIV
+X<I_SvIV>
+
+Returns the raw value in the SV's IV slot, without checks or conversions.
+Only use when you are sure SvIOK is true. See also C<SvIV()>.
+
+	IV	I_SvIV(SV* sv)
+
+=for hackers
+Found in file sv.h
 
 =item newRV_inc
 X<newRV_inc>
@@ -3715,7 +3731,7 @@ Found in file sv.h
 X<SvIOKp>
 
 Returns a U32 value indicating whether the SV contains an integer.  Checks
-the B<private> setting.  Use C<SvIOK>.
+the B<private> setting.  Use C<SvIOK> instead.
 
 	U32	SvIOKp(SV* sv)
 
@@ -3815,17 +3831,6 @@ Coerces the given SV to an integer and returns it.
 =for hackers
 Found in file sv.h
 
-=item SvIVX
-X<SvIVX>
-
-Returns the raw value in the SV's IV slot, without checks or conversions.
-Only use when you are sure SvIOK is true. See also C<SvIV()>.
-
-	IV	SvIVX(SV* sv)
-
-=for hackers
-Found in file sv.h
-
 =item SvIV_nomg
 X<SvIV_nomg>
 
@@ -3839,10 +3844,7 @@ Found in file sv.h
 =item SvIV_set
 X<SvIV_set>
 
-Set the value of the IV pointer in sv to val.  It is possible to perform
-the same function of this macro with an lvalue assignment to C<SvIVX>.
-With future Perls, however, it will be more efficient to use 
-C<SvIV_set> instead of the lvalue assignment to C<SvIVX>.
+Set the value of the IV pointer in sv to val.
 
 	void	SvIV_set(SV* sv, IV val)
 
@@ -3895,7 +3897,7 @@ Found in file sv.h
 X<SvNIOKp>
 
 Returns a U32 value indicating whether the SV contains a number, integer or
-double.  Checks the B<private> setting.  Use C<SvNIOK>.
+double.  Checks the B<private> setting.  Use C<SvNIOK> instead.
 
 	U32	SvNIOKp(SV* sv)
 
@@ -3926,7 +3928,7 @@ Found in file sv.h
 X<SvNOKp>
 
 Returns a U32 value indicating whether the SV contains a double.  Checks the
-B<private> setting.  Use C<SvNOK>.
+B<private> setting.  Use C<SvNOK> instead.
 
 	U32	SvNOKp(SV* sv)
 
@@ -4012,7 +4014,7 @@ Returns a U32 indicating whether the pointer to the string buffer is offset.
 This hack is used internally to speed up removal of characters from the
 beginning of a SvPV.  When SvOOK is true, then the start of the
 allocated string buffer is actually C<SvOOK_offset()> bytes before SvPVX.
-This offset used to be stored in SvIVX, but is now stored within the spare
+This offset used to be stored in SvIV, but is now stored within the spare
 part of the buffer.
 
 	U32	SvOOK(SV* sv)
@@ -4049,7 +4051,7 @@ Found in file sv.h
 X<SvPOKp>
 
 Returns a U32 value indicating whether the SV contains a character string.
-Checks the B<private> setting.  Use C<SvPOK>.
+Checks the B<private> setting.  Use C<SvPOK> instead.
 
 	U32	SvPOKp(SV* sv)
 
@@ -5175,7 +5177,7 @@ The new SV is marked as mortal. It will be destroyed "soon", either by an
 explicit call to FREETMPS, or by an implicit call at places such as
 statement boundaries.  See also C<sv_newmortal> and C<sv_2mortal>.
 
-	SV*	sv_mortalcopy(SV *const oldsv)
+	SV*	sv_mortalcopy(XV *const oldsv)
 
 =for hackers
 Found in file sv.c
@@ -5541,10 +5543,6 @@ If the C<flags> parameter has the
 C<NOSTEAL> bit set then the buffers of temps will not be stolen. <sv_setsv>
 and C<sv_setsv_nomg> are implemented in terms of this function.
 
-You probably want to use one of the assortment of wrappers, such as
-C<SvSetSV>, C<SvSetSV_nosteal>, C<SvSetMagicSV> and
-C<SvSetMagicSV_nosteal>.
-
 This is the primary function for copying scalars, and most other
 copy-ish functions and macros use this underneath.
 
@@ -5580,18 +5578,6 @@ X<sv_setuv_mg>
 Like C<sv_setuv>, but also handles 'set' magic.
 
 	void	sv_setuv_mg(SV *const sv, const UV u)
-
-=for hackers
-Found in file sv.c
-
-=item sv_true
-X<sv_true>
-
-Returns true if the SV has a true value by Perl's rules.
-Use the C<SvTRUE> macro instead, which may call C<sv_true()> or may
-instead use an in-line version.
-
-	I32	sv_true(SV *const sv)
 
 =for hackers
 Found in file sv.c
@@ -5804,19 +5790,6 @@ instead of upper/lowercasing both the characters, see
 http://www.unicode.org/unicode/reports/tr21/ (Case Mappings).
 
 	I32	ibcmp_utf8(const char* s1, char **pe1, UV l1, const char* s2, char **pe2, UV l2)
-
-=for hackers
-Found in file utf8.c
-
-=item is_utf8_char
-X<is_utf8_char>
-
-Tests if some arbitrary number of bytes begins in a valid UTF-8
-character.  Note that an INVARIANT (i.e. ASCII on non-EBCDIC machines)
-character is a valid UTF-8 character.  The actual number of bytes in the UTF-8
-character will be returned if it is valid, otherwise 0.
-
-	STRLEN	is_utf8_char(const char *s)
 
 =for hackers
 Found in file utf8.c
