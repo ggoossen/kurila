@@ -1604,7 +1604,6 @@ pod/kurila18delta.pod	What is new for Perl Kurila 1.8
 pod/kurila19delta.pod	What is new for Perl Kurila 1.9
 pod/kurilaintro.pod	Description of Perl Kurila
 pod/kurilasyn.pod			Perl Kurila syntax
-pod/kurilatoc.pod		Perl Kurila documentation table of contents
 pod/kurilatodo.pod		Perl Kurila things to do
 pod.lst				List the pods and their roles
 pod/Makefile.SH			generate Makefile which makes pods into something else

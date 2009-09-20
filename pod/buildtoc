@@ -519,9 +519,9 @@ sub generate_manifest_pod
                       grep {!%Copies{"$_.pod"}}, grep {!%Generated{"$_.pod"}}, sort keys %Pods
 
 sub generate_manifest_readme
-    generate_manifest sort {$a->[0] cmp $b->[0]},
+    generate_manifest sort {$a[0] cmp $b[0]},
         @: "README.vms", "Notes about installing the VMS port",
-        +@+ map { @: "README.$_", $Readmes{$_} }, keys %Readmes
+        +@+ map { @: "README.$_", %Readmes{$_} }, keys %Readmes
 
 
 sub generate_roffitall
@@ -680,7 +680,8 @@ sub do_unix
     die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile_SH =~ m/\0/
 
     $makefile_SH =~ s{^(generated_pods = extra.pods).*}
-                     {$(join ' ', $1, map { "pod/$_" }, sort keys %Generated +@+ keys %Copies)}mg
+                     {$(join ' ', $1, map { "pod/$_" }, 
+                           sort keys %Copies +@+ grep { ! m/kurilatoc/ }, keys %Generated)}mg
 
     # pod/perldelta.pod: pod/perl511delta.pod
     # 	cd pod && $(LNS) perl511delta.pod perldelta.pod
