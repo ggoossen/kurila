@@ -101,3 +101,6 @@ veryclean.sh
 .package
 U
 MANIFEST.new
+
+# ignore vim swap files
+*.swp
