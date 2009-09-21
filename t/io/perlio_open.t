@@ -5,6 +5,8 @@ use warnings
 use Test::More
 
 BEGIN
+    if (env::var('PERL_CORE_MINITEST'))
+        plan(skip_all => "no Fcntl under miniperl")
     unless (PerlIO::Layer->find('perlio'))
         plan(skip_all => "not perlio")
 
