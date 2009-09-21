@@ -3,8 +3,7 @@
 BEGIN 
     require './test.pl'
 
-
-plan tests => 1313
+plan tests => 1362
 
 use utf8
 
@@ -149,3 +148,17 @@ for my $t (@tests)
     local $^WARN_HOOK = sub($e) { $w = $e->message }
     is(sprintf($fmt, $num), $Q ?? $num !! $fmt, "quad: $fmt -> $num")
     like($w, $Q ?? '' !! qr/Invalid conversion in sprintf: "$fmt"/, "warning: $fmt")
+
+# Check unicode vs byte length
+for my $width (@: 1,2,3,4,5,6,7)
+    for my $precis (@: 1,2,3,4,5,6,7)
+        my $v = "\x{20ac}\x{20ac}"
+        my $format = "\\\%" . $width . "." . $precis . "s"
+        my $chars = ($precis +> 2 ?? 2 !! $precis)
+        my $space = ($width +< 2 ?? 0 !! $width - $chars)
+        fresh_perl_is(
+            'my $v = "\x{20ac}\x{20ac}"; use utf8; my $x = sprintf "'.$format.'", $v; $x =~ m/^(\s*)(\S*)$/; for (map {length}, @: $1, $2) { print $^STDOUT, "$_" }',
+            "$space$chars",
+            \$%,
+            q(sprintf ").$format.q(", "\x{20ac}\x{20ac}"),
+            )
