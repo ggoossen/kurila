@@ -87,7 +87,10 @@ do
     close $oldout
 
 # in-memory open
-do
+SKIP: do
+    try { require PerlIO::scalar }
+    unless (PerlIO::Layer->find('scalar'))
+	skip("PerlIO::scalar not found", 8)
     my $var
     ok( open(my $x,"+<",\$var), 'magic in-memory file via 3 arg open with \\$var')
     ok( defined fileno($x),     '       fileno' )
