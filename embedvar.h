@@ -346,7 +346,6 @@
 #define PL_Iargvout_stack	PL_argvout_stack
 #define PL_Iargvoutgv		PL_argvoutgv
 #define PL_Ibasetime		PL_basetime
-#define PL_Ibitcount		PL_bitcount
 #define PL_Ibody_arenas		PL_body_arenas
 #define PL_Ibody_roots		PL_body_roots
 #define PL_Ibreakable_sub_gen	PL_breakable_sub_gen

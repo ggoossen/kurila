@@ -172,8 +172,6 @@ END_EXTERN_C
 #define PL_argvoutgv		(*Perl_Iargvoutgv_ptr(aTHX))
 #undef  PL_basetime
 #define PL_basetime		(*Perl_Ibasetime_ptr(aTHX))
-#undef  PL_bitcount
-#define PL_bitcount		(*Perl_Ibitcount_ptr(aTHX))
 #undef  PL_body_arenas
 #define PL_body_arenas		(*Perl_Ibody_arenas_ptr(aTHX))
 #undef  PL_body_roots

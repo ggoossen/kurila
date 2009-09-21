@@ -835,10 +835,6 @@ perl_destruct(pTHXx)
     PL_psig_ptr = (SV**)NULL;
     Safefree(PL_psig_name);
     PL_psig_name = (SV**)NULL;
-#ifdef MULTIPLICITY
-    Safefree(my_perl->Ibitcount);
-    my_perl->Ibitcount = NULL;
-#endif
     Safefree(PL_psig_pend);
     PL_psig_pend = (int*)NULL;
     PL_hints = 0;		/* Reset hints. Should hints be per-interpreter ? */
