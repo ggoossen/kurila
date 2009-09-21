@@ -992,11 +992,11 @@ Perl_despatch_signals(pTHX)
             PL_psig_pend[sig] = 0;
             PERL_BLOCKSIG_BLOCK(set);
 #if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
-            (*PL_sighandlerp)(sig, NULL, NULL);
+	    (*PL_sighandlerp)(sig, NULL, NULL);
 #else
-            (*PL_sighandlerp)(sig);
+	    (*PL_sighandlerp)(sig);
 #endif
-            PERL_BLOCKSIG_UNBLOCK(set);
+	    PERL_BLOCKSIG_UNBLOCK(set);
 	}
     }
 }
