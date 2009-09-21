@@ -3,8 +3,7 @@
 BEGIN 
     require './test.pl'
 
-
-plan tests => 131
+plan tests => 132
 
 our ($FS, $c, @ary, $x, $foo, $res, @list1, @list2, @a, $p, $n)
 
@@ -338,3 +337,7 @@ do
     is(@s[2]," XYZ")
     is(join(':', @s), join(':', @r))
 
+do
+    use constant BANG => {};
+    @: split m/,/, "", BANG;
+    ok(1);
