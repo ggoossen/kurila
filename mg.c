@@ -997,7 +997,7 @@ Perl_despatch_signals(pTHX)
             (*PL_sighandlerp)(sig);
 #endif
             PERL_BLOCKSIG_UNBLOCK(set);
-        }
+	}
     }
 }
 
