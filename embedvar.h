@@ -68,7 +68,6 @@
 #define PL_argvout_stack	(vTHX->Iargvout_stack)
 #define PL_argvoutgv		(vTHX->Iargvoutgv)
 #define PL_basetime		(vTHX->Ibasetime)
-#define PL_bitcount		(vTHX->Ibitcount)
 #define PL_body_arenas		(vTHX->Ibody_arenas)
 #define PL_body_roots		(vTHX->Ibody_roots)
 #define PL_breakable_sub_gen	(vTHX->Ibreakable_sub_gen)

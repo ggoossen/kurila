@@ -661,8 +661,8 @@ print $em, do_not_edit ("embedvar.h"), <<'END'
 END
 
 for my $sym (sort keys %intrp)
+    next if $sym eq 'bitcount'
     print $em, multon($sym,'I','vTHX->')
-
 
 print $em, <<'END'
 
