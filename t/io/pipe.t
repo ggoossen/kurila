@@ -177,6 +177,7 @@ SKIP: do
             # check that status for the correct process is collected
             my $zombie
             unless( $zombie = fork )
+                our $NO_ENDING = 1
                 exit 37
             
             my $pipe = open my $fh, "-|", "sleep 2;exit 13" or die "Open: $^OS_ERROR\n"

@@ -6,13 +6,14 @@ BEGIN
     unless (PerlIO::Layer->find('perlio'))
         plan skip_all => "PerlIO not used"
 
-plan tests => 35
+plan tests => 37
 
 use_ok('PerlIO')
 
 my $txt = "txt$^PID"
 my $bin = "bin$^PID"
 my $utf = "utf$^PID"
+my $nonexistent = "nex$^PID"
 
 my $txtfh
 my $binfh
@@ -86,6 +87,16 @@ do
     ok($status, '       re-open STDOUT')
     close $oldout
 
+    SKIP: do
+      skip("TMPDIR not honored on this platform", 2)
+        if ! config_value('d_mkstemp')
+           || $^OS_NAME eq 'VMS' || $^OS_NAME eq 'MSwin32' || $^OS_NAME eq 'os2'
+      local env::var('TMPDIR') = $nonexistent
+      ok( !open(my $x,"+<",undef), 'TMPDIR honored by magic temp file via 3 arg open with undef - fails if TMPDIR points to a non-existent dir')
+
+      mkdir env::var('TMPDIR')
+      ok(open(my $x,"+<",undef), 'TMPDIR honored by magic temp file via 3 arg open with undef - works if TMPDIR points to an existent dir')
+
 # in-memory open
 SKIP: do
     try { require PerlIO::scalar }
@@ -126,4 +137,5 @@ END
     1 while unlink $txt
     1 while unlink $bin
     1 while unlink $utf
+    1 while rmdir $nonexistent
 
