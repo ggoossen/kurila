@@ -2050,8 +2050,8 @@ algorithm.
     $kwds = 'copy compare list print';
     while( $command = <> ){
         $command =~ s/^\s+|\s+$//g;  # trim leading and trailing spaces
-        if( ( @matches = $kwds =~ m/\b$command\w*/g ) == 1 ){
-            print "command: '$matches'\n";
+        if( ( @matches = @: $kwds =~ m/\b$command\w*/g ) == 1 ){
+            print "command: '@matches'\n";
         } elsif( @matches == 0 ){
             print "no such command: '$command'\n";
         } else {
