@@ -5092,20 +5092,30 @@ PerlIO_tmpfile(void)
 	  f = PerlIO_fdopen(fd, "w+b");
 #else /* WIN32 */
 #    if defined(HAS_MKSTEMP) && ! defined(VMS) && ! defined(OS2)
+     int fd = -1;
+     char tempname[] = "/tmp/PerlIO_XXXXXX";
      const char * const tmpdir = PerlEnv_getenv("TMPDIR");
-     SV * const sv = newSVpv(tmpdir ? tmpdir : "/tmp", 0);
-     sv_catpv(sv, "/PerlIO_XXXXXX");
+     SV * const sv = tmpdir && *tmpdir ? newSVpv(tmpdir, 0) : NULL;
      /*
       * I have no idea how portable mkstemp() is ... NI-S
       */
-     const int fd = mkstemp(SvPVX_mutable(sv));
+     if (sv) {
+	 /* if TMPDIR is set and not empty, we try that first */
+	 sv_catpv(sv, tempname + 4);
+	 fd = mkstemp(SvPVX_mutable(sv));
+     }
+     if (fd < 0) {
+	 /* else we try /tmp */
+	 fd = mkstemp(tempname);
+     }
      if (fd >= 0) {
 	  f = PerlIO_fdopen(fd, "w+");
 	  if (f)
 	       PerlIOBase(f)->flags |= PERLIO_F_TEMP;
-	  PerlLIO_unlink(SvPVX_const(sv));
+	  PerlLIO_unlink(sv ? SvPVX_const(sv) : tempname);
      }
-     SvREFCNT_dec(sv);
+     if (sv)
+	 SvREFCNT_dec(sv);
 #    else	/* !HAS_MKSTEMP, fallback to stdio tmpfile(). */
      FILE * const stdio = PerlSIO_tmpfile();
 
