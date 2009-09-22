@@ -988,7 +988,7 @@ static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
     case OP_AELEMFAST:
     case OP_GVSV:
     case OP_GV:
-	if ( ! PL_op->op_flags & OPf_SPECIAL) { /* not lexical */
+	if ( ! (PL_op->op_flags & OPf_SPECIAL)) { /* not lexical */
 	    if (cSVOPo->op_sv) {
 		SV * const tmpsv = sv_2mortal(newSV(0));
 		ENTER_named("dump_fullname");
