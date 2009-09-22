@@ -937,7 +937,7 @@ lib/re.pm: ext/re/re.pm
 
 $(plfixlocal): $(CONFIGPM)
 	$(CPS) $@.pl $@
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -I`pwd`/lib "-MExtUtils::MY" -e "MY->fixin(shift @ARGV)" $@
+	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -I"`pwd`/lib" "-MExtUtils::MY" -e "MY->fixin(shift @ARGV)" $@
 
 lib/lib.pm:	miniperl$(EXE_EXT) $(CONFIGPM)
 	@-rm -f $@
