@@ -836,6 +836,13 @@ perl_destruct(pTHXx)
     PL_psig_ptr = (SV**)NULL;
     Safefree(PL_psig_pend);
     PL_psig_pend = (int*)NULL;
+    {
+	/* We need to NULL PL_psig_pend first, so that
+	   signal handlers know not to use it */
+	int *psig_save = PL_psig_pend;
+	PL_psig_pend = (int*)NULL;
+	Safefree(psig_save);
+    }
     PL_hints = 0;		/* Reset hints. Should hints be per-interpreter ? */
     PL_debug = 0;
 
