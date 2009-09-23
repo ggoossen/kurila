@@ -1,176 +1,162 @@
 #!/usr/bin/perl
-use warnings;
-use strict;
-use Test::More 'no_plan';
-$|=1;
 
-my $make_exceptions_list = ($ARGV[0]||'') eq '--make-exceptions-list';
+use warnings
+
+use Test::More 'no_plan'
+
+my $make_exceptions_list = (@ARGV[?0]||'') eq '--make-exceptions-list'
 
 open my $diagfh, "<:raw", "../pod/perldiag.pod"
-  or die "Can't open ../pod/perldiag.pod: $!";
+  or die "Can't open ../pod/perldiag.pod: $^OS_ERROR"
 
-my %entries;
-while (<DATA>) {
-  chomp;
-  $entries{$_}{todo}=1;
-}
+my %entries
+while (~< $^DATA)
+  chomp
+  %entries{+$_}{+todo}=1
 
-my $cur_entry;
-while (<$diagfh>) {
-  if (m/^=item (.*)/) {
-    $cur_entry = $1;
-  } elsif (m/^\((.)(?: ([a-z]+?))?\)/ and !$entries{$cur_entry}{severity}) {
+my $cur_entry
+while (~< $diagfh)
+  if (m/^=item (.*)/)
+    $cur_entry = $1
+  elsif (m/^\((.)(?: ([a-z]+?))?\)/ and !%entries{?$cur_entry}{?severity})
     # Make sure to init this here, so an actual entry in perldiag overwrites
     # one in DATA.
-    $entries{$cur_entry}{todo} = 0;
-    $entries{$cur_entry}{severity} = $1;
-    $entries{$cur_entry}{category} = $2;
-  }
-}
+    %entries{+$cur_entry}{+todo} = 0
+    %entries{$cur_entry}{+severity} = $1
+    %entries{$cur_entry}{+category} = $2
 
-my @todo = ('..');
-while (@todo) {
-  my $todo = shift @todo;
-  next if $todo ~~ ['../t', '../lib', '../ext'];
+my @todo = @: '..'
+while (@todo)
+  my $todo = shift @todo
+  next if grep { $todo eq $_ }, @: '../t', '../lib', '../ext'
   # opmini.c is just a copy of op.c, so there's no need to check again.
-  next if $todo eq '../opmini.c';
-  if (-d $todo) {
-    push @todo, glob "$todo/*";
-  } elsif ($todo =~ m/\.[ch]$/) {
-    check_file($todo);
-  }
-}
+  next if $todo eq '../opmini.c'
+  if (-d $todo)
+    push @todo, < glob "$todo/*"
+  elsif ($todo =~ m/\.[ch]$/)
+    check_file($todo)
 
-sub check_file {
-  my ($codefn) = @_;
+sub check_file($codefn)
 
-  print "# $codefn\n";
+  print $^STDOUT, "# $codefn\n"
 
   open my $codefh, "<:raw", $codefn
-    or die "Can't open $codefn: $!";
+    or die "Can't open $codefn: $^OS_ERROR"
 
-  my $listed_as;
-  my $listed_as_line;
-  my $sub = 'top of file';
-  while (<$codefh>) {
-    chomp;
+  my $listed_as
+  my $listed_as_line
+  my $sub = 'top of file'
+  while (~< $codefh)
+    chomp
     # Getting too much here isn't a problem; we only use this to skip
     # errors inside of XS modules, which should get documented in the
     # docs for the module.
-    if (m<^([^#\s].*)> and $1 !~ m/^[{}]*$/) {
-      $sub = $1;
-    }
-    next if $sub =~ m/^XS/;
-    if (m</\* diag_listed_as: (.*) \*/>) {
-      $listed_as = $1;
-      $listed_as_line = $.+1;
-    }
-    next if /^#/;
-    next if /^ * /;
-    while (m/\bDIE\b|Perl_(croak|die|warn(er)?)/ and not m/\);$/) {
-      my $nextline = <$codefh>;
+    if (m<^([^#\s].*)> and $1 !~ m/^[{}]*$/)
+      $sub = $1
+    next if $sub =~ m/^XS/
+    if (m</\* diag_listed_as: (.*) \*/>)
+      $listed_as = $1
+      $listed_as_line = iohandle::input_line_number($codefh) +1
+    next if m/^#/
+    next if m/^ * /
+    while (m/\bDIE\b|Perl_(croak|die|warn(er)?)/ and not m/\);$/)
+      my $nextline = ~< $codefh
       # Means we fell off the end of the file.  Not terribly surprising;
       # this code tries to merge a lot of things that aren't regular C
       # code (preprocessor stuff, long comments).  That's OK; we don't
       # need those anyway.
-      last if not defined $nextline;
-      chomp $nextline;
-      $nextline =~ s/^\s+//;
+      last if not defined $nextline
+      chomp $nextline
+      $nextline =~ s/^\s+//
       # Note that we only want to do this where *both* are true.
-      $_ =~ s/\\$//;
-      if ($_ =~ m/"$/ and $nextline =~ m/^"/) {
-        $_ =~ s/"$//;
-        $nextline =~ s/^"//;
-      }
-      $_ = "$_$nextline";
-    }
+      $_ =~ s/\\$//
+      if ($_ =~ m/"$/ and $nextline =~ m/^"/)
+        $_ =~ s/"$//
+        $nextline =~ s/^"//
+      $_ = "$_$nextline"
+
     # This should happen *after* unwrapping, or we don't reformat the things
     # in later lines.
     # List from perlguts.pod "Formatted Printing of IVs, UVs, and NVs"
-    my %specialformats = (IVdf => 'd',
-                          UVuf => 'd',
-                          UVof => 'o',
-                          UVxf => 'x',
-                          UVXf => 'X',
-                          NVef => 'f',
-                          NVff => 'f',
-                          NVgf => 'f',
-                          SVf  => 's');
-    for my $from (keys %specialformats) {
-      s/%"\s*$from\s*"/\%$specialformats{$from}/g;
-      s/%"\s*$from/\%$specialformats{$from}"/g;
-    }
+    my %specialformats = %: IVdf => 'd',
+                            UVuf => 'd',
+                            UVof => 'o',
+                            UVxf => 'x',
+                            UVXf => 'X',
+                            NVef => 'f',
+                            NVff => 'f',
+                            NVgf => 'f',
+                            SVf  => 's'
+    for my $from (keys %specialformats)
+      s/%"\s*$from\s*"/\%%specialformats{$from}/g
+      s/%"\s*$from/\%%specialformats{$from}"/g
+
     # The %"foo" thing needs to happen *before* this regex.
     if (m/(?:DIE|Perl_(croak|die|warn|warner))(?:_nocontext)? \s*
           \(aTHX_ \s*
           (?:packWARN\d*\((.*?)\),)? \s*
-          "((?:\\"|[^"])*?)"/x) {
+          "((?:\\"|[^"])*?)"/x)
       # diag($_);
       # DIE is just return Perl_die
-      my $severity = {croak => [qw/P F/],
-                      die   => [qw/P F/],
-                      warn  => [qw/W D S/],
-                     }->{$1||'die'};
-      my @categories;
-      if ($2) {
-        @categories = map {s/^WARN_//; lc $_} split /\s*[|,]\s*/, $2;
-      }
-      my $name;
-      if ($listed_as and $listed_as_line == $.) {
-        $name = $listed_as;
-      } else {
-        $name = $3;
+      my $severity = (%: croak => qw/P F/
+                         die   => qw/P F/
+                         warn  => qw/W D S/
+                     ){?$1||'die'}
+      my @categories
+      if ($2)
+        @categories = map {s/^WARN_//; lc $_}, split m/\s*[|,]\s*/, $2
+
+      my $name
+      if ($listed_as and $listed_as_line == iohandle::input_line_number($codefh))
+        $name = $listed_as
+      else
+        $name = $3
         # The form listed in perldiag ignores most sorts of fancy printf formatting,
         # or makes it more perlish.
-        $name =~ s/%%/\\%/g;
-        $name =~ s/%l[ud]/%d/g;
-        $name =~ s/%\.(\d+|\*)s/\%s/g;
-        $name =~ s/\\"/"/g;
-        $name =~ s/\\t/\t/g;
-        $name =~ s/\\n/ /g;
-        $name =~ s/\s+$//;
-      }
+        $name =~ s/%%/\\%/g
+        $name =~ s/\%l[ud]/\%d/g
+        $name =~ s/\%\.(\d+|\*)s/\%s/g
+        $name =~ s/\\"/"/g
+        $name =~ s/\\t/\t/g
+        $name =~ s/\\n/ /g
+        $name =~ s/\s+$//
 
       # Extra explanatory info on an already-listed error, doesn't
       # need it's own listing.
-      next if $name =~ m/^\t/;
+      next if $name =~ m/^\t/
 
       # Happens fairly often with PL_no_modify.
-      next if $name eq '%s';
+      next if $name eq '%s'
 
       # Special syntax for magic comment, allows ignoring the fact
       # that it isn't listed.  Only use in very special circumstances,
       # like this script failing to notice that the Perl_croak call is
       # inside an #if 0 block.
-      next if $name eq 'SKIPME';
+      next if $name eq 'SKIPME'
 
-      if (exists $entries{$name}) {
-        if ($entries{$name}{todo}) {
-        TODO: {
-            local $TODO = 'in DATA';
-            fail("Presence of '$name' from $codefn line $.");
-          }
-        } else {
-          ok("Presence of '$name' from $codefn line $.");
-        }
+      my $linenr = iohandle::input_line_number($codefh)
+      if (exists %entries{$name})
+        if (%entries{$name}{todo})
+          TODO: do
+            local $TODO = 'in DATA'
+            fail("Presence of '$name' from $codefn line $linenr")
+        else
+          ok("Presence of '$name' from $codefn line $linenr")
+
         # Later, should start checking that the severity is correct, too.
-      } elsif ($name =~ m/^panic: /) {
+      elsif ($name =~ m/^panic: /)
         # Just too many panic:s, they are hard to diagnose, and there
         # is a generic "panic: %s" entry.  Leave these for another
         # pass.
-        ok("Presence of '$name' from $codefn line $., covered by panic: %s entry");
-      } else {
-        if ($make_exceptions_list) {
-          print STDERR "$name\n";
-        } else {
-          fail("Presence of '$name' from $codefn line $.");
-        }
-      }
+        ok("Presence of '$name' from $codefn line $linenr, covered by panic: \%s entry")
+      else
+        if ($make_exceptions_list)
+          print $^STDERR, "$name\n"
+        else
+          fail("Presence of '$name' from $codefn line $linenr")
 
-      die if $name =~ /%$/;
-    }
-  }
-}
+      die if $name =~ m/\%\$/
+
 # Lists all missing things as of the inaguration of this script, so we
 # don't have to go from "meh" to perfect all at once.
 __DATA__
