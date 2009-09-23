@@ -76,6 +76,15 @@ if (open(GCC, "-|", "gcc -v 2>&1")) {
   die "$^PROGRAM_NAME: failed to run gcc: $^OS_ERROR\n";
 }
 
+# Configuration for S60 5th Edition SDK v0.9
+$SYMBIAN_VERSION = '9.4';
+$SDK_NAME = 'S60_5th_Edition_SDK';
+$WIN = 'winscw';
+$ENV{WIN} = $WIN;
+$SDK_VARIANT = 'S60';
+$SDK_VERSION = $ENV{S60SDK} = '5.0';
+$SYMBIAN_ROOT = '\\';
+
 die "$^PROGRAM_NAME: failed to locate the Symbian SDK\n" unless defined $SYMBIAN_ROOT;
 
 my $UARM = env::var('UARM') ?? env::var('UARM') !! "urel";
@@ -209,6 +218,10 @@ env::set_var('UARM' => $UARM);
 # set MSVC_LIB=%MSVC%\mfc\lib;%MSVC%\lib
 # set PATH=%EPOC_BIN%;%MWCW%\Bin;%MWCW%\Symbian_Tools\Command_Line_Tools;%MSVC_BIN%;C:\perl\bin;C:\winnt\system32;%PATH%
 # set USERDEFS=%USERDEFS% -D__UIQ_21__ -D__UIQ_MAJOR__=2 -D__UIQ_MINOR__=1 -D__UIQ_2X__
+#
+# Configuration for S60 5th Edition SDK v0.9
+#set EPOCROOT=\
+#set PATH=%EPOCROOT%epoc32\gcc\bin;%EPOCROOT%epoc32\tools;%PATH%
 #
 # EOF
 
