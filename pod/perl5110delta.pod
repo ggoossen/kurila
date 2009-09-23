@@ -104,10 +104,32 @@ to avoid relying on the object's underlying structure).
 
 =head1 Core Enhancements
 
-=head1 The C<overloading> pragma
+=head2 The C<overloading> pragma
 
 This pragma allows you to lexically disable or enable overloading
 for some or all operations. (Yuval Kogman)
+
+=head2 C<\N> regex escape
+
+A new regex escape has been added, C<\N>. It will match any character that
+is not a newline, independently from the presence or absence of the single
+line match modifier C</s>. (If C<\N> is followed by an opening brace and
+by a letter, perl will still assume that a Unicode character name is
+coming, so compatibility is preserved.) (Rafael Garcia-Suarez)
+
+=head2 Parallel tests
+
+The core distribution can now run its regression tests in parallel on
+Unix-like platforms. Instead of running C<make test>, set C<TEST_JOBS> in
+your environment to the number of tests to run in parallel, and run
+C<make test_harness>. On a Bourne-like shell, this can be done as
+
+    TEST_JOBS=3 make test_harness  # Run 3 tests in parallel
+
+An environment variable is used, rather than parallel make itself, because
+L<TAP::Harness> needs to be able to schedule individual non-conflicting test
+scripts itself, and there is no standard interface to C<make> utilities to
+interact with their job schedulers.
 
 =head1 Modules and Pragmata
 

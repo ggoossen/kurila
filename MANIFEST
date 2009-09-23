@@ -2171,7 +2171,7 @@ t/op/regexp_unicode_prop.t	See if unicode properties work in regular expressions
 t/op/reg_fold.t			See if case folding works properly
 t/op/reg_mesg.t			See if one can get regular expression errors
 t/op/reg_pmod.t			See if regexp /p modifier works as expected
-t/op/reg_posixcc.t		See if posix characterclasses behave consistantly
+t/op/reg_posixcc.t		See if posix character classes behave consistantly
 t/op/reg_unsafe.t		Check for unsafe match vars
 t/op/repeat.t			See if x operator works
 t/op/re.t			See if re core functions works
