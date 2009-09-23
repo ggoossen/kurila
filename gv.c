@@ -91,6 +91,7 @@ Perl_gv_IOadd(pTHX_ register GV *gv)
                          PL_op->op_type ==  OP_REWINDDIR ||
                          PL_op->op_type ==  OP_CLOSEDIR ?
                          "dirhandle" : "filehandle";
+	/* diag_listed_as: Bad symbol for filehandle */
         Perl_croak(aTHX_ "Bad symbol for %s", fh);
     }
 

@@ -2445,8 +2445,8 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 	if (PL_madskills)
 	    op_getmad(version,pegop,'V');
 
-	if (version->op_type != OP_CONST)
-	    Perl_croak(aTHX_ "Version number must be constant number");
+        if (version->op_type != OP_CONST)
+	    Perl_croak(aTHX_ "Version number must be a constant number");
 
 	/* Make copy of idop so we don't free it twice */
 	pack = newSVOP(OP_CONST, 0, newSVsv(((SVOP*)idop)->op_sv), idop->op_location);
