@@ -13,7 +13,7 @@ make_patchnum.pl - make patchnum
 
   perl make_patchnum.pl
 
-=head1 DESCRITPTION
+=head1 DESCRIPTION
 
 This program creates the files holding the information
 about locally applied patches to the source code. The created
@@ -23,7 +23,7 @@ files are  C<git_version.h> and C<lib/Config_git.pl>.
 
 Contains status information from git in a form meant to be processed
 by the tied hash logic of Config.pm. It is actually optional,
-although -V will look strange without it.
+although -V:git.\* will be uninformative without it.
 
 C<git_version.h> contains similar information in a C header file
 format, designed to be used by patchlevel.h. This file is obtained
@@ -40,8 +40,25 @@ Same terms as Perl itself.
 
 =cut
 
+# from a -Dmksymlink target dir, I need to cd to the git-src tree to
+# use git (like script does).  Presuming that's not unique, one fix is
+# to follow Configure's symlink-path to run git.  Maybe GIT_DIR or
+# path-args can solve it, if so we should advise here, I tried only
+# very briefly ('cd -' works too).
+
+my ($subcd, $srcdir)
+our $opt_v = nelems( grep { $_ eq '-v' }, @ARGV )
+
 BEGIN
     my $root="."
+    # test 1st to see if we're a -Dmksymlinks target dir
+    $subcd = ''
+    $srcdir = $root
+    if (-l "./Configure")
+        $srcdir = readlink("./Configure")
+        $srcdir =~ s/Configure//
+        $subcd = "cd $srcdir &&" # activate backtick fragment
+
     while (!-e "$root/perl.c" and length($root) +< 100)
         if ($root eq '.')
             $root=".."
@@ -68,8 +85,12 @@ sub write_file($file, $content)
 
 
 sub backtick($command)
-    my $result= `$command`
+    # only for git.  If we're in a -Dmksymlinks build-dir, we need to
+    # cd to src so git will work .  Probably a better way.
+    my $result= `$subcd $command`
     $result="" if ! defined $result
+    warn "$subcd $command: \$^CHILD_ERROR=$^CHILD_ERROR\n" if $^CHILD_ERROR
+    print $^STDOUT, "#> $subcd $command ->\n $result\n" if !$^CHILD_ERROR and $opt_v
     chomp $result
     return $result
 
@@ -96,10 +117,10 @@ if (my $patch_file= read_file(".patch"))
     @: $branch, $snapshot_created, $commit_id, $describe = split m/\s+/, $patch_file
     $extra_info = "git_snapshot_date='$snapshot_created'"
     $commit_title = "Snapshot of:"
-elsif (-d path_to('.git'))
+elsif (-d "$srcdir/.git")
     # git branch | awk 'BEGIN{ORS=""} /\*/ { print $^STDOUT, $2 }'
     @: ?$branch = grep { defined }, map { m/\* ([^(]\S*)/ ?? $1 !! undef },
-        split m/\n/, backtick('git branch')
+        split m/\n/, backtick("git branch")
     my ($remote,$merge)
     if (length $branch)
         $merge= backtick("git config branch.$branch.merge")
@@ -128,12 +149,12 @@ git_ancestor='$ancestor'
 git_remote_branch='$remote/$merge'
 git_unpushed='$unpushed_commit_list'"
 
-    if ($changed)
+    if ($changed) # not touched since init'd. never true.
         $changed = 'true'
         $commit_title =  "Derived from:"
         $status='"uncommitted-changes"'
     else
-        $status='/*clean-working-directory*/'
+        $status='/*clean-working-directory-maybe*/'
 
     $commit_title ||= "Commit id:"
 
