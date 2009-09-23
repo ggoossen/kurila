@@ -162,8 +162,8 @@ find(sub ()
 my $ver = config_value("version")
 $^PERL_VERSION =~ m/kurila-(\d+).(\d+)/ or die "Invalid \$^PERL_VERSION"
 my @: $release, $patchlevel = @: $1, $2
-warn "Patchlevel of perl ($patchlevel) and patchlevel of config.sh ($(config_value('KURILA_SUBVERSION'))) don't match\n"
-        if $patchlevel != config_value('KURILA_SUBVERSION')
+warn "Patchlevel of perl ($patchlevel) and patchlevel of config.sh ($(config_value('PERL_SUBVERSION'))) don't match\n"
+        if $patchlevel != config_value('PERL_SUBVERSION')
 
 # Fetch some frequently-used items from %Config
 my $installbin = "%opts{destdir}$(config_value('installbin'))"

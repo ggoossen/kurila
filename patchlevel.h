@@ -30,9 +30,9 @@
    PERL_INC_VERSION_LIST, which lists version libraries
    to include in $^INCLUDE_PATH.  See INSTALL for how this works.
 */
-#define PERL_API_REVISION	5	/* Adjust manually as needed.  */
-#define PERL_API_VERSION	11	/* Adjust manually as needed.  */
-#define PERL_API_SUBVERSION	0	/* Adjust manually as needed.  */
+#define PERL_API_REVISION	PERL_REVISION	/* Adjust manually as needed.  */
+#define PERL_API_VERSION	PERL_VERSION	/* Adjust manually as needed.  */
+#define PERL_API_SUBVERSION	PERL_SUBVERSION	/* Adjust manually as needed.  */
 /*
    XXX Note:  The selection of non-default Configure options, such
    as -Duselonglong may invalidate these settings.  Currently, Configure

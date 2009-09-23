@@ -18,9 +18,9 @@ env::var("SHELL") = 'sh' if $^OS_NAME eq 'os2';
 
 $^PERL_VERSION =~ m/kurila-(\d+).(\d+)/ or die "Invalid \$^PERL_VERSION"
 my @: $release, $patchlevel = @: $1, $2
-die "Patchlevel of perl ($patchlevel)",
-    "and patchlevel of config.sh ($(config_value('KURILA_SUBVERSION'))) don't match\n"
-        if $patchlevel != config_value('KURILA_SUBVERSION')
+die "Patchlevel of perl ($patchlevel)"
+    . "and patchlevel of config.sh ($(config_value('PERL_SUBVERSION'))) don't match\n"
+        if $patchlevel != config_value('PERL_SUBVERSION')
 
 my $usage =
   "Usage:  installman --man1dir=/usr/wherever --man1ext=1

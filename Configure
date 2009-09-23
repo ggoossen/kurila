@@ -2143,7 +2143,7 @@ You may safely delete it if you wish.
 EOF
 
 : See if we are using a devel version and want that
-xversion=`awk '/define[ 	]+KURILA_VERSION/ {print $3}' $rsrc/patchlevel.h`
+xversion=`awk '/define[ 	]+PERL_VERSION/ {print $3}' $rsrc/patchlevel.h`
 case "$usedevel" in
 $define|true|[yY]*)
     usedevel="$define" ;;
@@ -4121,11 +4121,11 @@ echo " "
 echo "Getting the current patchlevel..." >&4
 if $test -r $rsrc/patchlevel.h;then
 	revision="kurila"
-	patchlevel=`awk '/define[ 	]+KURILA_VERSION/ {print $3}' $rsrc/patchlevel.h`
-	subversion=`awk '/define[ 	]+KURILA_SUBVERSION/ {print $3}' $rsrc/patchlevel.h`
-	api_revision=`awk '/define[ 	]+KURILA_API_REVISION/ {print $3}' $rsrc/patchlevel.h`
-	api_version=`awk '/define[ 	]+KURILA_API_VERSION/ {print $3}' $rsrc/patchlevel.h`
-	api_subversion=`awk '/define[ 	]+KURILA_API_SUBVERSION/ {print $3}' $rsrc/patchlevel.h`
+	patchlevel=`awk '/define[ 	]+PERL_VERSION/ {print $3}' $rsrc/patchlevel.h`
+	subversion=`awk '/define[ 	]+PERL_SUBVERSION/ {print $3}' $rsrc/patchlevel.h`
+	api_revision=`awk '/define[ 	]+PERL_API_REVISION/ {print $3}' $rsrc/patchlevel.h`
+	api_version=`awk '/define[ 	]+PERL_API_VERSION/ {print $3}' $rsrc/patchlevel.h`
+	api_subversion=`awk '/define[ 	]+PERL_API_SUBVERSION/ {print $3}' $rsrc/patchlevel.h`
 	perl_patchlevel=`egrep ',"(MAINT|SMOKE)[0-9][0-9]*"' $rsrc/patchlevel.h|sed 's/[^0-9]//g'`
 else
 	revision=0
@@ -9006,7 +9006,7 @@ prefixvar=sitescript
 : Check if faststdio is requested and available
 case "$usefaststdio" in
 $define|true|[yY]*|'')
-	xversion=`awk '/define[ 	]+KURILA_VERSION/ {print $3}' $rsrc/patchlevel.h`
+	xversion=`awk '/define[ 	]+PERL_VERSION/ {print $3}' $rsrc/patchlevel.h`
 	case "$xversion" in
 	[68])	dflt='y' ;;
 	*)	dflt='n' ;;
