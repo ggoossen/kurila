@@ -201,10 +201,14 @@ do
             if !%manipods{?$i} && !%manireadmes{?$i} && !%Copies{?$i} && !%Generated{$i}
         warn "$^PROGRAM_NAME: $i exists but is unknown by perl.pod\n"
             if !%perlpods{?$i} && !exists %sources{$i}
-    
+
+    my @BuildTargets = grep {defined}, %Targets{[keys %Build]}
+    my %BuildFiles
+    %BuildFiles{[@BuildTargets]} = @BuildTargets;
+
     foreach my $i (sort keys %our_pods)
         warn "$^PROGRAM_NAME: $i is known by buildtoc but does not exist\n"
-            unless %disk_pods{?$i}
+            unless %disk_pods{?$i} or %BuildFiles{?$i};
     
     foreach my $i (sort keys %manipods)
         warn "$^PROGRAM_NAME: $i is known by ../MANIFEST but does not exist\n"
@@ -214,7 +218,7 @@ do
     
     foreach my $i (sort keys %perlpods)
         warn "$^PROGRAM_NAME: $i is known by perl.pod but does not exist\n"
-            unless %disk_pods{?$i}
+            unless %disk_pods{?$i} or %BuildFiles{?$i}
 
 
 # Find all the modules
