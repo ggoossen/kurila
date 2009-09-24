@@ -389,7 +389,7 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
             if(revmeta->mro_nextmethod)
                 hv_clear(revmeta->mro_nextmethod);
 	    if (revmeta->isa) {
-		SvREFCNT_dec(revmeta->isa);
+		HvREFCNT_dec(revmeta->isa);
 		revmeta->isa = NULL;
 	    }
         }
