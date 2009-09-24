@@ -13533,7 +13533,7 @@ rmscopy_fromperl(pTHX_ CV *cv)
   if (SvTYPE(mysv) == SVt_PVGV) {
     if (!(io = GvIOp(mysv)) || !PerlIO_getname(IoIFP(io),inspec)) {
       set_errno(EINVAL); set_vaxc_errno(LIB$_INVARG);
-      ST(0) = &PL_sv_no;
+      ST(0) = sv_2mortal(newSViv(0));
       Safefree(inspec);
       XSRETURN(1);
     }
@@ -13542,7 +13542,7 @@ rmscopy_fromperl(pTHX_ CV *cv)
   else {
     if (mysv != ST(0) || !(inp = SvPV(mysv,n_a)) || !*inp) {
       set_errno(EINVAL); set_vaxc_errno(LIB$_INVARG);
-      ST(0) = &PL_sv_no;
+      ST(0) = sv_2mortal(newSViv(0));
       Safefree(inspec);
       XSRETURN(1);
     }
@@ -13552,7 +13552,7 @@ rmscopy_fromperl(pTHX_ CV *cv)
   if (SvTYPE(mysv) == SVt_PVGV) {
     if (!(io = GvIOp(mysv)) || !PerlIO_getname(IoIFP(io),outspec)) {
       set_errno(EINVAL); set_vaxc_errno(LIB$_INVARG);
-      ST(0) = &PL_sv_no;
+      ST(0) = sv_2mortal(newSViv(0));
       Safefree(inspec);
       Safefree(outspec);
       XSRETURN(1);
@@ -13562,7 +13562,7 @@ rmscopy_fromperl(pTHX_ CV *cv)
   else {
     if (mysv != ST(1) || !(outp = SvPV(mysv,n_a)) || !*outp) {
       set_errno(EINVAL); set_vaxc_errno(LIB$_INVARG);
-      ST(0) = &PL_sv_no;
+      ST(0) = sv_2mortal(newSViv(0));
       Safefree(inspec);
       Safefree(outspec);
       XSRETURN(1);
@@ -13570,7 +13570,7 @@ rmscopy_fromperl(pTHX_ CV *cv)
   }
   date_flag = (items == 3) ? SvIV(ST(2)) : 0;
 
-  ST(0) = boolSV(rmscopy(inp,outp,date_flag));
+  ST(0) = sv_2mortal(newSViv(rmscopy(inp,outp,date_flag)));
   Safefree(inspec);
   Safefree(outspec);
   XSRETURN(1);
