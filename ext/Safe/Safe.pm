@@ -56,7 +56,6 @@ my $default_share = \qw[
     $version::VERSION
     $version::CLASS
     @version::ISA
-    &Regexp::DESTROY
     &re::is_regexp
     &re::regname
     &re::regnames
