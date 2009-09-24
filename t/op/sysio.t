@@ -1,6 +1,6 @@
 #!./perl
 
-print $^STDOUT, "1..42\n"
+print $^STDOUT, "1..44\n"
 
 chdir('op') || die "sysio.t: cannot look for myself: $^OS_NAME"
 $^INCLUDE_PATH = @: '../../lib'
@@ -179,8 +179,6 @@ if ($reopen)  # must close file to update EOF marker for stat
 print $^STDOUT, 'not ' unless (-s $outfile == 10)
 print $^STDOUT, "ok 31\n"
 
-close($o_fh)
-
 open($i_fh, "<", $outfile) || die "sysio.t: cannot read $outfile: $^OS_ERROR"
 
 $b = 'xyz'
@@ -238,6 +236,17 @@ close($i_fh)
 unlink $outfile
 
 chdir('..')
+
+# [perl #67912] syswrite prints garbage if called with empty scalar and non-zero offset
+try { my $buf = ''; syswrite(O, $buf, 1, 0) }
+print $^STDOUT, 'not ' unless ($^EVAL_ERROR->message =~ /^Offset outside string /)
+print $^STDOUT, "ok 43\n"
+
+eval { my $buf = 'x'; syswrite(O, $buf, 1, 1) }
+print $^STDOUT, 'not ' unless ($^EVAL_ERROR->message =~ /^Offset outside string /)
+print$^STDOUT,  "ok 44\n"
+
+close($o_fh)
 
 1
 
