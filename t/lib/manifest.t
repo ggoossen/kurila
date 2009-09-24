@@ -1,12 +1,9 @@
 #!./perl -w
 
-# Test the well formed-ness of the MANIFEST file.
-# For now, just test that it uses tabs not spaces after the name of the file.
+# Test the well-formed-ness of the MANIFEST file.
 
 use File::Spec
 require './test.pl'
-
-my $failed = 0
 
 plan('no_plan')
 
@@ -14,6 +11,7 @@ my $manifest = File::Spec->catfile(File::Spec->updir(), 'MANIFEST')
 
 open my $m, '<', $manifest or die "Can't open '$manifest': $^OS_ERROR"
 
+# Test that MANIFEST uses tabs - not spaces - after the name of the file.
 while (~< $m)
     chomp
     next unless m/\s/
@@ -33,4 +31,8 @@ while (~< $m)
 
 close $m or die $^OS_ERROR
 
-is($failed, 0, 'All lines are good')
+# Test that MANIFEST is properly sorted
+my $sorted = `LC_ALL=C sort -fdc $manifest 2>&1`
+is($sorted, '', 'MANIFEST properly sorted')
+
+# EOF

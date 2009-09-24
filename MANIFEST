@@ -1390,12 +1390,12 @@ makeaperl.SH			perl script that produces a new perl binary
 makedef.pl			Create symbol export lists for linking
 makedepend.SH			Precursor to makedepend
 makedir.SH			Precursor to makedir
+make_ext.pl			Used by Makefile to execute extension Makefiles
 Makefile.micro			microperl Makefile
 Makefile.SH			A script that generates Makefile
 make_patchnum.pl		Script to generate git_version.h and lib/Config_git.pl files for all OS'es
 malloc.c			A version of malloc you might not want
 malloc_ctl.h			A version of malloc you might not want
-make_ext.pl			Used by Makefile to execute extension Makefiles
 MANIFEST			This list of files
 mathoms.c			A home for binary-compatible code artifacts
 META.yml			Distribution meta-data in YAML
@@ -1760,9 +1760,9 @@ Porting/how_to_write_a_perldelta.pod	Bluffer's guide to writing a perldelta.
 Porting/Maintainers	Program to pretty print info in Maintainers.pl
 Porting/Maintainers.pl	Information about maintainers
 Porting/Maintainers.pm	Library to pretty print info in Maintainers.pl
+Porting/make_dot_patch.pl	Make a .patch file from a git WD
 Porting/makemeta	Create the top-level META.yml
 Porting/makerel		Release making utility
-Porting/make_dot_patch.pl	Make a .patch file from a git WD
 Porting/make_snapshot.pl	Make a tgz snapshot of our tree with a .patch file in it
 Porting/manicheck	Check against MANIFEST
 Porting/podtidy		Reformat pod using Pod::Tidy
@@ -1906,9 +1906,6 @@ symbian/uid.pl			Helper code for config.pl
 symbian/version.pl		Helper code for config.pl
 symbian/xsbuild.pl		Building extensions
 t/arch/64bitint.t			See if 64 bit integers work
-time64.c			64 bit clean time.h (code)
-time64.h			64 bit clean time.h (header)
-time64_config.h			64 bit clean time.h (configuration)
 t/base/cond.t			See if conditionals work
 t/base/if.t			See if if works
 t/base/lex.t			See if lexical items work
@@ -1946,6 +1943,9 @@ t/comp/term.t			See if more terms work
 t/comp/use.t			See if pragmata work
 t/comp/utf.t			See if UTFs work
 thread.h			Threading header
+time64.c			64 bit clean time.h (code)
+time64_config.h			64 bit clean time.h (configuration)
+time64.h			64 bit clean time.h (header)
 t/io/argv.t			See if ARGV stuff works
 t/io/binmode.t			See if binmode() works
 t/io/crlf.t			See if :crlf works
@@ -1957,10 +1957,10 @@ t/io/fs.t			See if directory manipulations work
 t/io/layers.t			See if PerlIO layers work
 t/io/openpid.t			See if open works for subprocesses
 t/io/open.t			See if open works
-t/io/perlio.t			See if PerlIO works
 t/io/perlio_fail.t		See if bad layers fail
 t/io/perlio_leaks.t		See if PerlIO layers are leaking
 t/io/perlio_open.t		See if PerlIO certain special opens work
+t/io/perlio.t			See if PerlIO works
 t/io/pipe.t			See if secure pipes work
 t/io/print.t			See if print commands work
 t/io/pvbm.t			See if PVBMs break IO commands
@@ -2150,9 +2150,9 @@ t/op/pos.t			See if pos works
 t/op/pow.t			See if ** works
 t/op/push.t			See if push and pop work
 t/op/pwent.t			See if getpw*() functions work
+t/op/qr_gc.t			See if qr doesn't leak
 t/op/qrstack.t			See if qr expands the stack properly
 t/op/qr.t			See if qr works
-t/op/qr_gc.t			See if qr doesn't leak
 t/op/quotemeta.t		See if quotemeta works
 t/op/rand.t			See if rand works
 t/op/range.t			See if .. works
@@ -2185,8 +2185,8 @@ t/op/runlevel.t			See if die() works from perl_call_*()
 t/op/rv2cv.t			See if ->& work
 t/op/rxcode.t			See if /(?{ code })/ works
 t/op/sassign.t			See if assignment operator works
-t/op/shift.t		See if shift work
 t/op/setpgrpstack.t		See if setpgrp works
+t/op/shift.t		See if shift work
 t/op/sleep.t			See if sleep works
 t/op/sort.t			See if sort works
 t/op/splice.t			See if splice works
