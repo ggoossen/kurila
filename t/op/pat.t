@@ -865,8 +865,6 @@ sub run_tests
             $latin =~ s/stra\x{DF}e/straße/ # \303\237 after the 2nd a
             use utf8; # needed for the raw UTF-8
             $latin =~ s!(s)tr(?:aß|s+e)!$1tr.! # \303\237 after the a
-        
-    
 
     SKIP: do
         use charnames ":full"
@@ -3198,7 +3196,6 @@ EOFTEST
         $_ = "CCCCBAA"
         s/(*:X)A+|(*:Y)B+|(*:Z)C+/$REGMARK/g
         is $_, "ZYX"
-    
 
     # [perl #60034]
     do
