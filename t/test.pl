@@ -648,14 +648,16 @@ sub _fresh_perl
 # Combination of run_perl() and is().
 #
 
-sub fresh_perl_is
-    my(@: $prog, $expected, ?$runperl_args, ?$name) =  @_
+sub fresh_perl_is($prog, $expected, ?$runperl_args, ?$name)
+
+    # _fresh_perl() is going to clip the trailing newlines off the result.
+    # This will make it so the test author doesn't have to know that.
+    $expected =~ s/\n+$//
+
     local $Level = 2
-    $expected =~ s/\n+$// # is also removed from program output
     _fresh_perl($prog,
                 sub (@< @_) { (nelems @_) ?? @_[0] eq $expected !! $expected },
                 $runperl_args, $name)
-
 
 #
 # fresh_perl_like
