@@ -3105,6 +3105,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		OP * const oop = PL_op;
 		COP * const ocurcop = PL_curcop;
 		PAD *old_comppad;
+		char *saved_regeol = PL_regeol;
 	    
 		n = ARG(scan);
 		PL_op = ((OP*)rexi->data->data[n])->op_next;
@@ -3130,6 +3131,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		PL_op = oop;
 		PAD_RESTORE_LOCAL(old_comppad);
 		PL_curcop = ocurcop;
+		PL_regeol = saved_regeol;
 		if (!logical) {
 		    /* /(?{...})/ */
 		    break;
