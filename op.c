@@ -3696,7 +3696,7 @@ Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
 	Perl_av_create_and_push(aTHX_ &PL_initav, SvREFCNT_inc(cvTsv(cv)));
 	break;
     default:
-	Perl_croak(aTHX_ "end");
+	Perl_croak(aTHX_ "panic: Unknown special block key");
     }
 }
 

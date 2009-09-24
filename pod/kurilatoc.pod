@@ -2494,6 +2494,8 @@ X<write>, write EXPR, write
 
 =item Counting Repetitions
 
+=item Intel HEX
+
 =back
 
 =item Packing and Unpacking C Structures
@@ -5529,8 +5531,9 @@ pad_sv X<pad_sv>
 
 =item Per-Interpreter Variables
 
-PL_modglobal X<PL_modglobal>, PL_na X<PL_na>, PL_sv_no X<PL_sv_no>,
-PL_sv_undef X<PL_sv_undef>, PL_sv_yes X<PL_sv_yes>
+PL_modglobal X<PL_modglobal>, PL_na X<PL_na>, PL_opfreehook
+X<PL_opfreehook>, PL_sv_no X<PL_sv_no>, PL_sv_undef X<PL_sv_undef>,
+PL_sv_yes X<PL_sv_yes>
 
 =item REGEXP Functions
 
@@ -7216,6 +7219,8 @@ flip-flop operators, defined-or operator
 
 =item C<\N> regex escape
 
+=item Implicit strictures
+
 =item Parallel tests
 
 =back
@@ -7227,6 +7232,8 @@ flip-flop operators, defined-or operator
 =item Pragmata Changes
 
 C<overloading>
+
+=item Selected Changes to Core Modules
 
 =back
 
@@ -7240,7 +7247,8 @@ C<overloading>
 
 =item Selected Bug Fixes
 
-C<-I> on shebang line now adds directories in front of @INC
+C<-I> on shebang line now adds directories in front of @INC, C<kill> is now
+fatal when called on non-numeric process identifiers
 
 =item New or Changed Diagnostics
 
@@ -7286,6 +7294,8 @@ flip-flop operators, defined-or operator
 
 =item C<\N> regex escape
 
+=item Implicit strictures
+
 =item Parallel tests
 
 =back
@@ -7297,6 +7307,8 @@ flip-flop operators, defined-or operator
 =item Pragmata Changes
 
 C<overloading>
+
+=item Selected Changes to Core Modules
 
 =back
 
@@ -7310,7 +7322,8 @@ C<overloading>
 
 =item Selected Bug Fixes
 
-C<-I> on shebang line now adds directories in front of @INC
+C<-I> on shebang line now adds directories in front of @INC, C<kill> is now
+fatal when called on non-numeric process identifiers
 
 =item New or Changed Diagnostics
 
@@ -10844,23 +10857,9 @@ a), b), c), d), a), b), c), d)
 
 =item Supported Compilers
 
-=item Perl 5.8.9 was successfully compiled and tested on:
+=item Incompatibility with AIX Toolbox lib gdbm
 
-    AIX Level		      | Compiler Level		| w th | w/o th
-    --------------------------+-------------------------+------+-------
-    5.1 TL9 32 bit	      | XL C/C++ V7		| OK   | OK
-    5.1 TL9 32 bit	      | gcc 3.2.2		| OK   | OK
-    5.1 TL9 64 bit	      | XL C/C++ V7		| OK   | OK
-    5.2 TL10 32 bit	      | XL C/C++ V8		| OK   | OK
-    5.2 TL10 64 bit	      | XL C/C++ V8		| OK   | OK
-    5.3 TL7 32 bit	      | XL C/C++ V9 + IZ35785	| OK   | OK
-    5.3 TL7 32 bit	      | gcc 4.2.4		| OK   | OK
-    5.3 TL7 64 bit	      | XL C/C++ V9 + IZ35785	| OK   | OK
-    6.1 TL1 32 bit	      | XL C/C++ V10		| OK   | OK
-    6.1 TL1 64 bit + IZ39077  | XL C/C++ V10		| OK   | OK
-
-    w th   = with thread
-    w/o th = without thread
+=item Perl 5.10 was successfully compiled and tested on:
 
 =item Building Dynamic Extensions on AIX
 

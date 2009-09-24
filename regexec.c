@@ -1189,7 +1189,7 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 		goto got_it;
 	    break;
 	case LNBREAK:
-	    Perl_croak(aTHX_ "foobar");
+	    Perl_croak(aTHX_ "panic: LNBREAK not expected");
 	    REXEC_FBC_CSCAN(
 		is_LNBREAK_utf8(s),
 		is_LNBREAK_latin1(s)

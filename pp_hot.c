@@ -1295,7 +1295,7 @@ PP(pp_entersub_targargs)
     SV* cv;
     SV* args = PAD_SVl(PL_op->op_targ);
     if ( ! SvAVOK(args) )
-	Perl_croak(aTHX_ "interneal error: args is expected to be an array");
+	Perl_croak(aTHX_ "panic: args is expected to be an array");
     PUSHMARK(SP);
     {
 	AV *const av = svTav(args);

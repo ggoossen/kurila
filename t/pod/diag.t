@@ -367,3 +367,136 @@ Wide character in %s
 Within []-length '%c' not allowed in %s
 Wrong syntax (suid) fd script name "%s"
 'X' outside of string in unpack
+unable to close filehandle properly.
+open() '-' is only allowed with 3rd argument.
+More than one argument to '>%c' open
+open() with supplied_fd with incompatible type '%s'
+open() with old-style 2-arg version '%s'
+More than one argument to '%c&' open
+Filehandle STD%s reopened only for input
+Filehandle STDIN reopened only for output
+%s expected an ARRAY but got %s
+keys expected a hash but got %s
+madprop error: Unknow slot '%c'.
+unknown MAD_type
+creating subroutine %s
+stash '%s' is not a hash but %s
+Unknown magic variable '%c%s'
+Unknown magic variable '$%s'
+%s must be a hash not an %s
+%s must be an ARRAY not a %s
+%s must be a HASH not a %s
+$^%s must be an IO ref not %s
+$^%s must be an IO ref not a %s ref
+Modification of the read-only magic variable $%s attempted
+SIG%s handler is not valid
+@ISA is not an array but %s
+@ISA element which is not an plain value
+unknown magical variable %s
+variable %s does not exist
+Possible precedence problem on bitwise ^%c^ operator
+Failed loading glob routine
+No opcode returned by the compsub
+reference to B::OP argument kept
+        (Maybe you meant system() when you said exec()?)
+Can't localize %s
+Missing required assignment value
+Expected %s REF but got a %s
+Expected an ARRAY reference but got a %s reference
+Expected a HASH reference but got a %s reference
+Undefined subroutine &%s
+Attempt to bless to ''
+increment (++) does not work on a %s
+decrement (--) does not work on a %s
+chr() ambiguous with highbit without use bytes or use utf8
+can't take an array slice from an %s
+array slice indices must be an ARRAY not %s
+source must be the ARRAY not %s
+slice expected an array as slice index, but got %s
+array slice expected an array but got a %s
+hash slice expected an array but got a %s
+%s expects a HASH not %s
+exists expected an ARRAY or a HASH but got a %s
+%s expects a HASH but got UNDEF
+Not a HASH
+Value of hash slice must be ARRAY not %s
+can't localize glob
+list may not be used in scalar context
+Got extra value(s) in %s assignment
+Expected ARRAY but got %s
+Array expansion assignment failed
+expand operator may not be used upon a %s
+expand operator may not be used in scalar context
+%s operator may not be used upon a %s
+nelems expected an array or hash but got %s
+nkeys expected a hash but got %s
+First argument to %s must be an ARRAY not %s
+shift expected an ARRAY not %s
+Can't %s a %s
+%s expected a HASH but got %s
+Not a reference
+Expected a CODE but got a %s
+%s must be part of an assignment
+%s must be used in void context
+%s expected an array but got %s
+Range must be numeric
+%s%s compilation aborted
+Circular dependency: %s is still being compiled
+$^INCLUDE_PATH must be an array not a %s
+Required array element %d does not exists
+First argument to %s must be a filehandle but a %s
+Expected a HASH not %s
+Can not use UNDEF as a HASH
+Missing hash key '%s'
+Expected a CODE reference but got nothing
+Expected a CODE reference but got a %s reference
+Expected a CODE reference but got a %s
+Undefined subroutine %s called
+constant subroutine does not expect any arguments
+%s can not be an assignee
+Too many arguments for block sub: %d
+Can't take an element from a %s
+Required array element %d could not be created
+Required array element %d does not exists
+Can't call method "%s" on %s
+%s expects a HASH but got %s
+%s%s compilation aborted.
+can't localize a glob
+%s must be an assignee
+substitute expected a plain value but got %s
+%s expected ARRAY but got %s
+tell called without handle
+flock without filehandle
+%s expected a io not a %s
+%s expected a filehandle but got %s
+Swash not found
+%s used as a number
+Array may not be used as a number
+Hash may not be used as a number
+Tried to use glob as number
+%s used as a number
+Reference can't be used as a number
+Array can't be used as a number
+Hash can't be used as a number
+Tried to use reference as string in %s
+%s can not be used as a string
+Tried to use glob as string in %s
+%s may not be used as a string in %s
+glob to glob assignment have been removed
+Undefined value assigned to glob
+non-ref value assigned to glob
+Can't coerce reference to number
+Can't coerce '%s' to a number
+character value > 255 without 'use codepoints'
+Can't update array or hash to ref
+use VERSION is not valid in Perl Kurila (this is probably Perl 5 code)
+Invalid identifier
+Unknown term '*'
+No operator expected, but found '<', '<=' or '<=>' operator
+'>' is reserved for hashes
+Unknown operator '$'
+Too many decimal points in number
+eof without arguments
+Unknown named sub "%s"
+        (Are you trying to call %s%s on dirhandle %s?)
+        (Are you trying to call %s%s on dirhandle?)
