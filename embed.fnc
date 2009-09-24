@@ -1474,7 +1474,6 @@ ERsn	|char*	|reghop3c	|NN char *s|I32 off|NN char *lim
 ERsn	|char*	|reghop4	|NN char *s|I32 off|NN char *llim|NN char *rlim
 ERsn	|char*	|reghopmaybe3	|NN char *s|I32 off|NN const char *lim
 ERs	|char*	|find_byclass	|NN regexp * prog|NN const regnode *c|NN char *s|NN const char *strend|NULLOK regmatch_info *reginfo
-Es	|void	|swap_match_buff|NN regexp * prog
 ERs	|I32	|reg_check_named_buff_matched	|NN const regexp *rex \
 						|NN const regnode *scan
 #  ifdef RE_DEBUGGING

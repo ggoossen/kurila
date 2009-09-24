@@ -1367,7 +1367,6 @@
 #define reghop4			S_reghop4
 #define reghopmaybe3		S_reghopmaybe3
 #define find_byclass		S_find_byclass
-#define swap_match_buff		S_swap_match_buff
 #define reg_check_named_buff_matched	S_reg_check_named_buff_matched
 #endif
 #  ifdef RE_DEBUGGING
@@ -3600,7 +3599,6 @@
 #define reghop4			S_reghop4
 #define reghopmaybe3		S_reghopmaybe3
 #define find_byclass(a,b,c,d,e)	S_find_byclass(aTHX_ a,b,c,d,e)
-#define swap_match_buff(a)	S_swap_match_buff(aTHX_ a)
 #define reg_check_named_buff_matched(a,b)	S_reg_check_named_buff_matched(aTHX_ a,b)
 #endif
 #  ifdef RE_DEBUGGING

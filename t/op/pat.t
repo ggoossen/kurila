@@ -814,7 +814,6 @@ sub run_tests
     else
         for (232..236)
             ok(0)
-        
     
     $_ = "\x{100}"
     if (m/(\C)/g)
@@ -3233,7 +3232,6 @@ EOFTEST
         $_="123"
         s/(?=\d+)|(?<=\d)/!Bang!/g
         is($_,"!Bang!1!Bang!2!Bang!3!Bang!")
-    
 
     # [perl #45337] utf8 + "[a]a{2}" + /$.../ = panic: sv_len_utf8 cache
 

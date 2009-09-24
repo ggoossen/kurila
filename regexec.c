@@ -1408,28 +1408,6 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 	return s;
 }
 
-static void 
-S_swap_match_buff (pTHX_ regexp *prog)
-{
-    regexp_paren_pair *t;
-
-    PERL_ARGS_ASSERT_SWAP_MATCH_BUFF;
-
-    if (!prog->swap) {
-    /* We have to be careful. If the previous successful match
-       was from this regex we don't want a subsequent paritally
-       successful match to clobber the old results. 
-       So when we detect this possibility we add a swap buffer
-       to the re, and switch the buffer each match. If we fail
-       we switch it back, otherwise we leave it swapped.
-    */
-        Newxz(prog->swap, (prog->nparens + 1), regexp_paren_pair);
-    }
-    t = prog->swap;
-    prog->swap = prog->offs;
-    prog->offs = t;
-}    
-
 
 /*
  - regexec_flags - match a regexp against a string
@@ -1459,7 +1437,7 @@ Perl_regexec_flags(pTHX_ REGEXP * const rx, char *stringarg, register char *stre
     I32 multiline;
     RXi_GET_DECL(prog,progi);
     regmatch_info reginfo;  /* create some info to pass to regtry etc */
-    bool swap_on_fail = 0;
+    regexp_paren_pair *swap = NULL;
     GET_RE_DEBUG_FLAGS_DECL;
 
     PERL_ARGS_ASSERT_REGEXEC_FLAGS;
@@ -1534,9 +1512,16 @@ Perl_regexec_flags(pTHX_ REGEXP * const rx, char *stringarg, register char *stre
 	    reginfo.ganch = strbeg;
     }
     if (PL_curpm && (PM_GETRE(PL_curpm) == rx)) {
-        swap_on_fail = 1;
-        swap_match_buff(prog); /* do we need a save destructor here for
-                                  eval dies? */
+        /* We have to be careful. If the previous successful match
+           was from this regex we don't want a subsequent partially
+           successful match to clobber the old results.
+           So when we detect this possibility we add a swap buffer
+           to the re, and switch the buffer each match. If we fail
+           we switch it back, otherwise we leave it swapped.
+        */
+        swap = prog->offs;
+        /* do we need a save destructor here for eval dies? */
+        Newxz(prog->offs, (prog->nparens + 1), regexp_paren_pair);
     }
     if (!(flags & REXEC_CHECKED) && (prog->check_substr != NULL)) {
 	re_scream_pos_data d;
@@ -1820,6 +1805,7 @@ Perl_regexec_flags(pTHX_ REGEXP * const rx, char *stringarg, register char *stre
     goto phooey;
 
 got_it:
+    Safefree(swap);
     if (PL_reg_eval_set)
 	restore_pos(aTHX_ prog);
     if (RXp_PAREN_NAMES(prog)) 
@@ -1863,10 +1849,12 @@ phooey:
 			  PL_colors[4], PL_colors[5]));
     if (PL_reg_eval_set)
 	restore_pos(aTHX_ prog);
-    if (swap_on_fail) 
+    if (swap) {
         /* we failed :-( roll it back */
-        swap_match_buff(prog);
-    
+        Safefree(prog->offs);
+        prog->offs = swap;
+    }
+
     return 0;
 }
 
