@@ -660,12 +660,12 @@ lib/DirHandle.t			See if DirHandle works
 lib/English.pm			Readable aliases for short variables
 lib/English.t			See if English works
 libenv.c			The env package methods
-lib/env.pm                      Environemnt package
-lib/env.t                       Environemnt package tests
+lib/env.pm			Environemnt package
+lib/env.t			Environemnt package tests
 liberror.c			The error package methods
-lib/error.pm                    Error Objects
-lib/error.pod                   Error Objects documentation
-lib/error.t                     See if error works
+lib/error.pm			Error Objects
+lib/error.pod			Error Objects documentation
+lib/error.t			See if error works
 lib/Exporter/Heavy.pm		Complicated routines for Exporter
 lib/Exporter.pm			Exporter base class
 lib/Exporter.t			See if Exporter works
@@ -867,7 +867,7 @@ lib/integer.pm			For "use integer"
 lib/integer.t			For "use integer" testing
 libinternals.c			The Internals package methods
 lib/Internals.t			For Internals::* testing
-lib/iohandle.t                  iohandle::* testing
+lib/iohandle.t			iohandle::* testing
 lib/IPC/Cmd.pm			IPC::Cmd
 lib/IPC/Cmd/t/01_IPC-Cmd.t	IPC::Cmd tests
 lib/IPC/Cmd/t/02_Interactive.t	IPC::Cmd tests
@@ -876,8 +876,8 @@ lib/IPC/Open2.pm		Open a two-ended pipe
 lib/IPC/Open2.t			See if IPC::Open2 works
 lib/IPC/Open3.pm		Open a three-ended pipe!
 lib/IPC/Open3.t			See if IPC::Open3 works
-lib/kurila.pm                   Package to identify kurila
-lib/kurila.t                    See if kurila.pm works
+lib/kurila.pm			Package to identify kurila
+lib/kurila.t			See if kurila.pm works
 lib/less.pm			For "use less"
 lib/less.t			See if less support works
 lib/lib_pm.PL			For "use lib", produces lib/lib.pm
@@ -1906,9 +1906,9 @@ symbian/uid.pl			Helper code for config.pl
 symbian/version.pl		Helper code for config.pl
 symbian/xsbuild.pl		Building extensions
 t/arch/64bitint.t			See if 64 bit integers work
-time64.c                        64 bit clean time.h (code)
-time64.h                        64 bit clean time.h (header)
-time64_config.h                 64 bit clean time.h (configuration)
+time64.c			64 bit clean time.h (code)
+time64.h			64 bit clean time.h (header)
+time64_config.h			64 bit clean time.h (configuration)
 t/base/cond.t			See if conditionals work
 t/base/if.t			See if if works
 t/base/lex.t			See if lexical items work
@@ -2001,6 +2001,7 @@ t/lib/MakeMaker/Test/Setup/Problem.pm	MakeMaker test utilities
 t/lib/MakeMaker/Test/Setup/Recurs.pm	MakeMaker test utilities
 t/lib/MakeMaker/Test/Setup/XS.pm	MakeMaker test utilities
 t/lib/MakeMaker/Test/Utils.pm	MakeMaker test utilities
+t/lib/manifest.t		Test that this MANIFEST file is well formed
 t/lib/mypragma.pm		An example user pragma
 t/lib/mypragma.t		Test the example user pragma
 t/lib/no_load.t			Test that some modules don't load others
@@ -2303,7 +2304,7 @@ utils.lst			Lists utilities bundled with Perl
 utils/Makefile			Pregenerated from utils/Makefile.SH
 utils/Makefile.SH		Extract the utility scripts
 utils/perlbug.PL		A simple tool to submit a bug report
-utils/perldoc.pl                A simple tool to find & display perl's documentation
+utils/perldoc.pl		A simple tool to find & display perl's documentation
 utils/perlivp.PL		installation verification procedure
 utils/pl2pm.pl			A pl to pm translator
 utils/xsubpp.PL			External subroutine preprocessor
