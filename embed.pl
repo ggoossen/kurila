@@ -246,7 +246,8 @@ sub write_protos
         my @attrs
         if ( $flags =~ m/r/ )
             push @attrs, "__attribute__noreturn__"
-        
+        if ( $flags =~ m/D/ )
+            push @attrs, "__attribute__deprecated__"
         if ( $is_malloc )
             push @attrs, "__attribute__malloc__"
         
@@ -283,7 +284,6 @@ sub write_protos
         $ret .= (nelems @attrs) ?? "\n\n" !! "\n"
     
     $ret
-
 
 # generates global.sym (API export list)
 do

@@ -13,6 +13,7 @@
 :       S               Has Cv, Hv, Av, Gv macros
 :       i               function is inline
 :	d		function has documentation with its source
+:	D		function is deprecated
 :	s		static function, should have an S_ prefix in
 :			source file; for macros (m), suffix the usage
 :			example with a semicolon
