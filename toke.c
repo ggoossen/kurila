@@ -4439,6 +4439,9 @@ Perl_yylex(pTHX)
 	if (!tmp && *s == ':' && s[1] == ':' && strNE(PL_tokenbuf, "CORE"))
 	    goto just_a_word;
 
+	/* Check for keywords */
+	tmp = keyword(PL_tokenbuf, len);
+
 	/* Is this a label? */
 	if (!tmp && PL_expect == XSTATE
 	      && s < PL_bufend && *s == ':' && *(s + 1) != ':') {
@@ -4446,9 +4449,6 @@ Perl_yylex(pTHX)
 	    pl_yylval.pval = CopLABEL_alloc(PL_tokenbuf);
 	    TOKEN(LABEL);
 	}
-
-	/* Check for keywords */
-	tmp = keyword(PL_tokenbuf, len);
 
 	d = s;
 	while (s < PL_bufend && isSPACE_notab(*s) && *s != '\n')
