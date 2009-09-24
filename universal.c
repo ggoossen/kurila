@@ -200,7 +200,6 @@ PERL_XS_EXPORT_C void XS_UNIVERSAL_can(pTHX_ CV *cv);
 PERL_XS_EXPORT_C void XS_UNIVERSAL_DOES(pTHX_ CV *cv);
 PERL_XS_EXPORT_C void XS_UNIVERSAL_VERSION(pTHX_ CV *cv);
 XS(XS_PerlIO_get_layers);
-XS(XS_Regexp_DESTROY);
 XS(XS_re_is_regexp); 
 XS(XS_re_regname);
 XS(XS_re_regnames);
@@ -230,7 +229,6 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("UNIVERSAL::VERSION", 	XS_UNIVERSAL_VERSION, 	  file);
     newXSproto("PerlIO::get_layers",
                XS_PerlIO_get_layers, file, "*;@");
-    newXS("Regexp::DESTROY", XS_Regexp_DESTROY, file);
     newXSproto("re::is_regexp", XS_re_is_regexp, file, "$");
     newXSproto("re::regname", XS_re_regname, file, "$;$");
     newXSproto("re::regnames", XS_re_regnames, file, ";$");
@@ -417,12 +415,6 @@ XS(XS_UNIVERSAL_VERSION)
     }
 
     XSRETURN(1);
-}
-
-XS(XS_Regexp_DESTROY)
-{
-    PERL_UNUSED_CONTEXT;
-    PERL_UNUSED_ARG(cv);
 }
 
 XS(XS_PerlIO_get_layers)
