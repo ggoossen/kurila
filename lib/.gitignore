@@ -49,6 +49,7 @@
 /List
 /MIME
 /Math/BigInt/FastCalc.pm
+/Module/Loaded.pm
 /Module/Pluggable.pm
 /Module/Pluggable
 /O.pm

@@ -296,6 +296,8 @@ ext/MIME-Base64/t/base64.t	See whether MIME::Base64 works
 ext/MIME-Base64/t/quoted-print.t	See whether MIME::QuotedPrint works
 ext/MIME-Base64/t/unicode.t	See whether MIME::Base64 works
 ext/MIME-Base64/t/warn.t	See whether MIME::Base64 works
+ext/Module-Loaded/lib/Module/Loaded.pm	Module::Loaded
+ext/Module-Loaded/t/01_Module-Loaded.t	Module::Loaded tests
 ext/Opcode/Opcode.pm		Opcode extension Perl module
 ext/Opcode/Opcode.xs		Opcode extension external subroutines
 ext/Opcode/ops.pm		"Pragma" form of Opcode extension Perl module
@@ -939,8 +941,6 @@ lib/Locale/Script.pm		Locale::Codes
 lib/Locale/Script.pod		Locale::Codes documentation
 lib/Math/Trig.pm		A simple interface to complex trigonometry
 lib/Math/Trig.t			See if Math::Trig works
-lib/Module/Loaded.pm	Module::Loaded
-lib/Module/Loaded/t/01_Module-Loaded.t	Module::Loaded tests
 lib/Module/Load.pm	Module::Load
 lib/Module/Load/t/01_Module-Load.t	Module::Load tests
 lib/Module/Load/t/to_load/config_file	Module::Load tests

@@ -17,6 +17,7 @@ Makefile
 /IPC-Open2/Makefile.PL
 /IPC-Open3/Makefile.PL
 /Math-BigInt-FastCalc/Makefile.PL
+/Module-Loaded/Makefile.PL
 /mro/Makefile.PL
 /Opcode/Makefile.PL
 /PerlIO-encoding/Makefile.PL
