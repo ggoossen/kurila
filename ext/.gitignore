@@ -21,6 +21,7 @@ Makefile
 /PerlIO-via/Makefile.PL
 /Sys-Hostname/Makefile.PL
 /Test-Harness/Makefile.PL
+/Text-ParseWords/Makefile.PL
 /Text-Soundex/Makefile.PL
 /Term-ANSIColor/Makefile.PL
 /base/Makefile.PL

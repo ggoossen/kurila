@@ -67,6 +67,8 @@
 /Socket.pm
 /Storable.pm
 /Sys
+/Term/ANSIColor.pm
+/Text/ParseWords.pm
 /Text/Soundex.pm
 /Time/HiRes.pm
 /Time/Piece.pm
