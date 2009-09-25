@@ -387,19 +387,10 @@ struct xpv {
     _XPV_HEAD;
 };
 
-typedef struct {
-    _XPV_ALLOCATED_HEAD;
-} xpv_allocated;
-
 struct xpviv {
     _XPV_HEAD;
     union _xivu xiv_u;
 };
-
-typedef struct {
-    _XPV_ALLOCATED_HEAD;
-    union _xivu xiv_u;
-} xpviv_allocated;
 
 #define xiv_iv xiv_u.xivu_iv
 
