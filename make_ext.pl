@@ -198,6 +198,7 @@ sub build_extension($ext_dir, $perl, $mname, $pass_through)
     $perl ||= "$up/miniperl"
     my $return_dir = $up
     my $lib_dir = "$up/lib"
+    env::var('PERL5LIB') = $lib_dir
 
     unless (chdir "$ext_dir")
         warn "Cannot cd to $ext_dir: $^OS_ERROR"
@@ -263,7 +264,7 @@ EOM
             # Inherited from make_ext.pl
             @cross = '-MCross'
             
-        my @args = @: "-I$lib_dir", < @cross, 'Makefile.PL'
+        my @args = @: < @cross, 'Makefile.PL'
         if ($is_VMS)
             my $libd = VMS::Filespec::vmspath($lib_dir)
             push @args, "INST_LIB=$libd", "INST_ARCHLIB=$libd"
