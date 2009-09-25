@@ -262,6 +262,7 @@ sub _testprogs($type, $args, @< @tests)
 	_find_tests('Module_Pluggable');
 	_find_tests('pod');
 	_find_tests('x2p');
+	_find_tests('porting');
 	_find_tests('japh') if $::torture;
     }
 }
