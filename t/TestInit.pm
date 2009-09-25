@@ -7,6 +7,9 @@
 #   $^INCLUDE_PATH = '../lib';
 # }
 #
+# Its primary purpose is to clear @INC so core tests don't pick up
+# modules from an installed Perl.
+#
 # t/TEST will use -MTestInit.  You may "use TestInit" in the test
 # programs but it is not required.
 #
