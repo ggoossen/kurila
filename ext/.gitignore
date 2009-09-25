@@ -19,6 +19,7 @@ Makefile
 /PerlIO-encoding/Makefile.PL
 /PerlIO-scalar/Makefile.PL
 /PerlIO-via/Makefile.PL
+/Pod-Plainer/Makefile.PL
 /Sys-Hostname/Makefile.PL
 /Test-Harness/Makefile.PL
 /Text-ParseWords/Makefile.PL

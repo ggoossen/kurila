@@ -32,7 +32,6 @@ while( ~< $^DATA )
     close $out
     close $in
 
-
 END 
     1 while unlink $input
     1 while unlink $output
