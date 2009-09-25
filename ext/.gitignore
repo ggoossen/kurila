@@ -13,6 +13,7 @@ Makefile
 /Data-Dumper/Makefile.PL
 /Filter-Util-Call/Makefile.PL
 /Hash-Util-FieldHash/Makefile.PL
+/IPC-Open2/Makefile.PL
 /Math-BigInt-FastCalc/Makefile.PL
 /mro/Makefile.PL
 /Opcode/Makefile.PL
