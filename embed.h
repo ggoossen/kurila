@@ -583,7 +583,6 @@
 #define newHVREF		Perl_newHVREF
 #define newHVhv			Perl_newHVhv
 #define hv_sethv		Perl_hv_sethv
-#define newIO			Perl_newIO
 #define newLISTOP		Perl_newLISTOP
 #define newPMOP			Perl_newPMOP
 #define newPVOP			Perl_newPVOP
@@ -2808,7 +2807,6 @@
 #define newHVREF(a,b)		Perl_newHVREF(aTHX_ a,b)
 #define newHVhv(a)		Perl_newHVhv(aTHX_ a)
 #define hv_sethv(a,b)		Perl_hv_sethv(aTHX_ a,b)
-#define newIO()			Perl_newIO(aTHX)
 #define newLISTOP(a,b,c,d,e)	Perl_newLISTOP(aTHX_ a,b,c,d,e)
 #define newPMOP(a,b,c)		Perl_newPMOP(aTHX_ a,b,c)
 #define newPVOP(a,b,c,d)	Perl_newPVOP(aTHX_ a,b,c,d)

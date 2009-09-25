@@ -67,6 +67,7 @@ PERL_CALLCONV int Perl_printf_nocontext(const char *format, ...);
 PERL_CALLCONV int Perl_magic_setglob(pTHX_ SV* sv, MAGIC* mg);
 PERL_CALLCONV AV * Perl_newAV(pTHX);
 PERL_CALLCONV HV * Perl_newHV(pTHX);
+PERL_CALLCONV IO * Perl_newIO(pTHX);
 
 /* ref() is now a macro using Perl_doref;
  * this version provided for binary compatibility only.
@@ -1133,6 +1134,12 @@ Perl_gv_HVadd(pTHX_ register GV *gv)
     PERL_ARGS_ASSERT_GV_HVADD;
 
     return gv_HVadd(gv);
+}
+
+IO *
+Perl_newIO(pTHX)
+{
+    return MUTABLE_IO(newSV_type(SVt_PVIO));
 }
 
 #endif /* NO_MATHOMS */

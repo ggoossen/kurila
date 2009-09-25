@@ -1883,9 +1883,9 @@ PERL_CALLCONV void	Perl_hv_sethv(pTHX_ HV *dstr, HV *sstr)
 #define PERL_ARGS_ASSERT_HV_SETHV	\
 	assert(dstr); assert(sstr)
 
-PERL_CALLCONV IO*	Perl_newIO(pTHX)
+/* PERL_CALLCONV IO*	Perl_newIO(pTHX)
 			__attribute__malloc__
-			__attribute__warn_unused_result__;
+			__attribute__warn_unused_result__; */
 
 PERL_CALLCONV OP*	Perl_newLISTOP(pTHX_ I32 type, OPFLAGS flags, OP* first, OP* last, SV* location)
 			__attribute__malloc__

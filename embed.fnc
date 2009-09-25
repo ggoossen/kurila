@@ -620,7 +620,7 @@ ApaR	|OP*	|newHVREF	|NN OP* o|NULLOK SV* location
 AmdbR	|HV*	|newHV
 ApaR	|HV*	|newHVhv	|NULLOK HV *hv
 Ap	|void	|hv_sethv	|NN HV *dstr|NN HV *sstr
-Apa	|IO*	|newIO
+Apabm	|IO*	|newIO
 Apa	|OP*	|newLISTOP	|I32 type|OPFLAGS flags|NULLOK OP* first|NULLOK OP* last|NULLOK SV* location
 Apa	|OP*	|newPMOP	|I32 type|OPFLAGS flags|NULLOK SV* location
 Apa	|OP*	|newPVOP	|I32 type|OPFLAGS flags|NULLOK char* pv|NULLOK SV* location

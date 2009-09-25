@@ -1275,6 +1275,18 @@ Perl_sv_upgrade(pTHX_ register SV *const sv, svtype new_type)
 	    SvNV_set(sv, 0);
 #endif
 
+	if (new_type == SVt_PVIO) {
+	    IO * const io = MUTABLE_IO(sv);
+	    GV *iogv;
+
+	    SvOBJECT_on(io);
+	    /* Clear the stashcache because a new IO could overrule a package
+	       name */
+	    hv_clear(PL_stashcache);
+
+	    iogv = gv_fetchpvs("IO::Handle::", GV_ADD, SVt_PVHV);
+	    SvSTASH_set(io, HvREFCNT_inc(GvHV(iogv)));
+	}
 	if (old_type < SVt_PV) {
 	    /* referant will be NULL unless the old type was SVt_IV emulating
 	       SVt_RV */
