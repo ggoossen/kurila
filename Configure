@@ -25,7 +25,7 @@
 
 # $Id: Head.U 6 2006-08-25 22:21:46Z rmanfredi $
 #
-# Generated on Wed Aug 12 09:30:48 CEST 2009 [metaconfig 3.5 PL0]
+# Generated on Tue Aug 18 19:22:01 CEST 2009 [metaconfig 3.5 PL0]
 # (with additional metaconfig patches by perlbug@perl.org)
 
 cat >c1$$ <<EOF
