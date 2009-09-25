@@ -491,8 +491,11 @@ Perl_sv_peek(pTHX_ SV *sv)
 	    const char* s = SvPV_const(sv, len);
 	    
 	    sv_catpv(t, "(");
-	    if (SvOOK(sv))
-		Perl_sv_catpvf(aTHX_ t, "[%s]", pv_display(tmp, SvPVX_const(sv)-I_SvIV(sv), I_SvIV(sv), 0, 127));
+	    if (SvOOK(sv)) {
+		STRLEN delta;
+		SvOOK_offset(sv, delta);
+		Perl_sv_catpvf(aTHX_ t, "[%s]", pv_display(tmp, SvPVX_const(sv)-delta, delta, 0, 127));
+	    }
 	    Perl_sv_catpvf(aTHX_ t, "%s)", pv_display(tmp, s, len, SvLEN(sv), 127));
 	    Perl_sv_catpvf(aTHX_ t, " [UTF8 \"%s\"]",
 			   sv_uni_display(tmp, sv, 8 * len,
