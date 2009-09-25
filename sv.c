@@ -5904,6 +5904,16 @@ Perl_sv_dec(pTHX_ register SV *const sv)
     sv_setnv(sv,Atof(SvPVX_const(sv)) - 1.0);	/* punt */
 }
 
+/* this define is used to eliminate a chunk of duplicated but shared logic
+ * it has the suffix __SV_C to signal that it isnt API, and isnt meant to be
+ * used anywhere but here - yves
+ */
+#define PUSH_EXTEND_MORTAL__SV_C(AnSv) \
+    STMT_START {      \
+	EXTEND_MORTAL(1); \
+	PL_tmps_stack[++PL_tmps_ix] = (AnSv); \
+    } STMT_END
+
 /*
 =for apidoc sv_mortalcopy
 
@@ -5928,8 +5938,7 @@ Perl_sv_mortalcopy(pTHX_ SV *const oldstr)
 
     new_SV(sv);
     sv_setsv(sv,oldstr);
-    EXTEND_MORTAL(1);
-    PL_tmps_stack[++PL_tmps_ix] = sv;
+    PUSH_EXTEND_MORTAL__SV_C(sv);
     SvTEMP_on(sv);
     return sv;
 }
@@ -5953,8 +5962,7 @@ Perl_sv_newmortal(pTHX)
 
     new_SV(sv);
     SvFLAGS(sv) = SVs_TEMP;
-    EXTEND_MORTAL(1);
-    PL_tmps_stack[++PL_tmps_ix] = sv;
+    PUSH_EXTEND_MORTAL__SV_C(sv);
     return sv;
 }
 
@@ -5984,7 +5992,22 @@ Perl_newSVpvn_flags(pTHX_ const char *const s, const STRLEN len, const U32 flags
     assert(!(flags & ~(SVs_TEMP)));
     new_SV(sv);
     sv_setpvn(sv,s,len);
-    return (flags & SVs_TEMP) ? sv_2mortal(sv) : sv;
+
+    /* This code used to a sv_2mortal(), however we now unroll the call to sv_2mortal()
+     * and do what it does outselves here.
+     * Since we have asserted that flags can only have the SVf_UTF8 and/or SVs_TEMP flags
+     * set above we can use it to enable the sv flags directly (bypassing SvTEMP_on), which
+     * in turn means we dont need to mask out the SVf_UTF8 flag below, which means that we
+     * eleminate quite a few steps than it looks - Yves (explaining patch by gfx)
+     */
+
+    SvFLAGS(sv) |= flags;
+
+    if(flags & SVs_TEMP){
+	PUSH_EXTEND_MORTAL__SV_C(sv);
+    }
+
+    return sv;
 }
 
 /*
@@ -6007,11 +6030,7 @@ Perl_sv_2mortal(pTHX_ register SV *const sv)
 	return NULL;
     if (SvREADONLY(sv) && SvIMMORTAL(sv))
 	return sv;
-    /* Note if you change this you must ALSO change
-     * newSVpvn_flags() which defined immediately above this routine
-     */
-    EXTEND_MORTAL(1);
-    PL_tmps_stack[++PL_tmps_ix] = sv;
+    PUSH_EXTEND_MORTAL__SV_C(sv);
     SvTEMP_on(sv);
     return sv;
 }
