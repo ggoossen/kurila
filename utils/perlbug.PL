@@ -41,6 +41,8 @@ my @patches
 while ( ~< $patch_level)
     last if m/^\s*}/
     next if m/^\s*#/  # preprocessor stuff
+    next if m/PERL_GIT_UNPUSHED_COMMITS/;    # XXX exapand instaed
+    next if m/PERL_GIT_UNCOMMITTED_CHANGES/; # XXX exapand instaed
     chomp
     s/^\s+,?\s*"?//
     s/"?\s*,?$//
