@@ -16,7 +16,7 @@ sub ok($ok, ?$name)
     return $ok
 
 
-print $^STDOUT, "1..9\n"
+print $^STDOUT, "1..13\n"
 
 $result = do { ok 1; 'value';}
 ok( $result eq 'value',  ":$result: eq :value:" )
@@ -50,4 +50,20 @@ ok(defined $x && nelems($x) == 3, 'do { return } receives caller scalar context'
 @a = @: 7, 8, 9, 10
 $x = sub { do { return do { 1; do { 2; @a } } }; 5 }->()
 ok(defined $x && nelems($x) == 4, 'return do { do { } } receives caller scalar context')
+
+# Do blocks created by constant folding
+# [perl #68108]
+$x = sub { if (1) { 20 } }->()
+ok($x == 20, 'if (1) { $x } receives caller scalar context')
+
+@a = (21 .. 23)
+$x = sub { if (1) { @a } }->()
+ok(nelems($x) == 3, 'if (1) { @a } receives caller scalar context')
+
+$x = sub { if (1) { 0; 20 } }->()
+ok($x == 20, 'if (1) { ...; $x } receives caller scalar context')
+
+@a = (24 .. 27)
+$x = sub { if (1) { 0; @a } }->()
+ok(nelems($x) == 4, 'if (1) { ...; @a } receives caller scalar context')
 
