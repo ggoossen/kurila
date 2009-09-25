@@ -6007,6 +6007,9 @@ Perl_sv_2mortal(pTHX_ register SV *const sv)
 	return NULL;
     if (SvREADONLY(sv) && SvIMMORTAL(sv))
 	return sv;
+    /* Note if you change this you must ALSO change
+     * newSVpvn_flags() which defined immediately above this routine
+     */
     EXTEND_MORTAL(1);
     PL_tmps_stack[++PL_tmps_ix] = sv;
     SvTEMP_on(sv);
