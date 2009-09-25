@@ -5728,7 +5728,7 @@ PERL_CALLCONV MADPROP*	Perl_newMADsv(pTHX_ char key, SV* sv, IV linenr, IV charo
 #define PERL_ARGS_ASSERT_NEWMADSV	\
 	assert(sv)
 
-PERL_CALLCONV MADPROP*	Perl_newMADPROP(pTHX_ char key, char type, const void* val, I32 vlen, IV linenr, IV charoffset);
+PERL_CALLCONV MADPROP*	Perl_newMADPROP(pTHX_ char key, char type, void* val, I32 vlen, IV linenr, IV charoffset);
 PERL_CALLCONV void	Perl_mad_free(pTHX_ MADPROP* mp);
 
 #  if defined(PERL_IN_TOKE_C) || defined(PERL_DECL_PROT)
