@@ -527,7 +527,6 @@ void
 Perl_save_hdelete(pTHX_ HV *hv, SV *keysv)
 {
     STRLEN len;
-    I32 klen;
     const char *key;
 
     PERL_ARGS_ASSERT_SAVE_HDELETE;

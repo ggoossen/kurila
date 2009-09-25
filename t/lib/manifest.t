@@ -32,7 +32,13 @@ while (~< $m)
 close $m or die $^OS_ERROR
 
 # Test that MANIFEST is properly sorted
-my $sorted = `LC_ALL=C sort -fdc $manifest 2>&1`
-is($sorted, '', 'MANIFEST properly sorted')
+SKIP: do
+    skip("'Porting/manisort' not found", 1) if (! -f '../Porting/manisort')
+
+    my $result = runperl('progfile' => '../Porting/manisort',
+                         'args'     => ( \ @: '-c', '../MANIFEST' ),
+                         'stderr'   => 1)
+
+    like($result, qr/is sorted properly/, 'MANIFEST sorted properly')
 
 # EOF
