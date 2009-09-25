@@ -3334,7 +3334,6 @@ struct nextmadtoken {
 #include "utf8.h"
 
 /* defined in sv.c, but also used in [ach]v.c */
-#undef _XPV_ALLOCATED_HEAD
 #undef _XPV_HEAD
 #undef _XPVMG_HEAD
 #undef _XPVCV_COMMON
