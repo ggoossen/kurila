@@ -454,9 +454,6 @@ ext/Term-ANSIColor/README		Term::ANSIColor
 ext/Term-ANSIColor/t/basic.t		Tests for Term::ANSIColor
 ext/Term-Cap/Cap.pm			Perl module supporting termcap usage
 ext/Term-Cap/test.pl			See if Term::Cap works
-ext/Text-ParseWords/ParseWords.pm	Perl module to split words on arbitrary delimiter
-ext/Text-ParseWords/t/ParseWords.t	See if Text::ParseWords works
-ext/Text-ParseWords/t/taint.t		See if Text::ParseWords works with tainting
 ext/Time-HiRes/Changes		Time::HiRes extension
 ext/Time-HiRes/fallback/const-c.inc	Time::HiRes extension
 ext/Time-HiRes/fallback/const-xs.inc	Time::HiRes extension
@@ -1308,6 +1305,8 @@ lib/Test/Simple/t/use_ok.t	Test::More test, use_ok()
 lib/Test/Tutorial.pod		A tutorial on writing tests
 lib/Text/Abbrev.pm		An abbreviation table builder
 lib/Text/Abbrev.t		Test Text::Abbrev
+lib/Text/ParseWords.pm		Perl module to split words on arbitrary delimiter
+lib/Text/ParseWords.t		See if Text::ParseWords works
 lib/Text/Tabs.pm		Do expand and unexpand
 lib/Text/TabsWrap/CHANGELOG	ChangeLog for Tabs+Wrap
 lib/Text/TabsWrap/t/37000.t	See if Text::Tabs is working
