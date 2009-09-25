@@ -3142,7 +3142,6 @@ EOFTEST
 
         is(0+nelems @a,3)
         is(join('=', @a),"$esc$hyp=$hyp=$esc$esc")
-    
 
     # length() on captures, the numbered ones end up in Perl_magic_len
     do
