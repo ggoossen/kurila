@@ -3599,9 +3599,7 @@ PP(pp_hslice)
 		    if (preeminent)
 			save_helem(hv, keysv, svp);
 		    else {
-			STRLEN keylen;
-			const char * const key = SvPV_const(keysv, keylen);
-			SAVEDELETE(hv, savepvn(key,keylen), (I32)keylen);
+			SAVEHDELETE(hv, keysv);
 		    }
 		}
             }

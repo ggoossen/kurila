@@ -983,9 +983,7 @@ PP(pp_helem)
 	    Perl_croak(aTHX_ "can't localize a glob");
 	else {
 	    if (!preeminent) {
-		STRLEN keylen;
-		const char * const key = SvPV_const(keysv, keylen);
-		SAVEDELETE(hv, savepvn(key,keylen), (I32)keylen);
+		SAVEHDELETE(hv, keysv);
 	    } else
 		save_helem(hv, keysv, svp);
 	}
