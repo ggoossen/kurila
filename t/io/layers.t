@@ -20,7 +20,7 @@ BEGIN
 
 use Config
 
-my $DOSISH    = $^OS_NAME =~ m/^(?:MSWin32|os2|dos|NetWare|mint)$/ ?? 1 !! 0
+my $DOSISH    = $^OS_NAME =~ m/^(?:MSWin32|os2|dos|NetWare)$/ ?? 1 !! 0
 $DOSISH    = 1 if !$DOSISH and $^OS_NAME =~ m/^uwin/
 my $NONSTDIO  = defined env::var('PERLIO') && env::var('PERLIO') ne 'stdio'     ?? 1 !! 0
 my $FASTSTDIO = config_value('d_faststdio') && config_value('usefaststdio') ?? 1 !! 0

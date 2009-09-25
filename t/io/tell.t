@@ -3,7 +3,7 @@
 print $^STDOUT, "1..28\n"
 
 my $Is_Dosish = ($^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'NetWare' or $^OS_NAME eq 'dos' or
-                 $^OS_NAME eq 'os2' or $^OS_NAME eq 'mint' or $^OS_NAME eq 'cygwin' or
+                 $^OS_NAME eq 'os2' or $^OS_NAME eq 'cygwin' or
                  $^OS_NAME =~ m/^uwin/)
 
 open(my $TST, "<", 'TEST') || (die "Can't open TEST")

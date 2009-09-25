@@ -25,7 +25,7 @@ my $has_link            = config_value('d_link')
 my $accurate_timestamps =
     !($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' ||
       $^OS_NAME eq 'dos'     || $^OS_NAME eq 'os2'     ||
-      $^OS_NAME eq 'mint'    || $^OS_NAME eq 'cygwin'  ||
+      $^OS_NAME eq 'cygwin'  ||
       $^OS_NAME eq 'amigaos' || $wd =~ m#$(config_value('afsroot'))/# ||
       $Is_MacOS
       )
@@ -34,7 +34,6 @@ if (exists &Win32::IsWinNT && Win32::IsWinNT())
     if (Win32::FsType() eq 'NTFS')
         $has_link            = 1
         $accurate_timestamps = 1
-    
 
 
 my $needs_fh_reopen =

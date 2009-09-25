@@ -7865,7 +7865,6 @@ my @pods = @( qw(
     machten
     macos
     macosx
-    mint
     modinstall
     modlib
     mod
