@@ -6,15 +6,9 @@ BEGIN
     $file = $^PROGRAM_NAME
     chdir 't' if -d 't'
 
-    if ( env::var('PERL_CORE') )
-        $^INCLUDE_PATH = @:  '../lib' 
-    
-
-
 END 
     # let VMS whack all versions
     1 while unlink('tcout')
-
 
 use Test::More
 
