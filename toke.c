@@ -4439,20 +4439,23 @@ Perl_yylex(pTHX)
 	if (!tmp && *s == ':' && s[1] == ':' && strNE(PL_tokenbuf, "CORE"))
 	    goto just_a_word;
 
-	/* Check for keywords */
-	tmp = keyword(PL_tokenbuf, len);
-
-	/* Is this a label? */
-	if (!tmp && PL_expect == XSTATE
-	      && s < PL_bufend && *s == ':' && *(s + 1) != ':') {
-	    s = s + 1;
-	    pl_yylval.pval = CopLABEL_alloc(PL_tokenbuf);
-	    TOKEN(LABEL);
-	}
-
 	d = s;
 	while (s < PL_bufend && isSPACE_notab(*s) && *s != '\n')
 	    ++s;
+
+	/* Is this a label? */
+	if (!tmp && PL_expect == XSTATE
+	      && d < PL_bufend && *d == ':' && *(d + 1) != ':') {
+	    tmp = keyword(PL_tokenbuf, len);
+	    if (tmp)
+		Perl_croak(aTHX_ "Can't use keyword '%s' as a label", PL_tokenbuf);
+	    s = d + 1;
+	    pl_yylval.pval = CopLABEL_alloc(PL_tokenbuf);
+	    TOKEN(LABEL);
+	}
+	else
+	    /* Check for keywords */
+	    tmp = keyword(PL_tokenbuf, len);
 
 	/* Is this a word before a => operator? */
 	if (s < PL_bufend && *s == '=' && s[1] == '>') {
