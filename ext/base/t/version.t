@@ -1,10 +1,5 @@
 #!/usr/bin/perl -w
 
-BEGIN 
-    if( env::var('PERL_CORE') )
-        push $^INCLUDE_PATH, "../lib/base/t/lib"
-
-
 use Test::More tests => 1
 
 # Here we emulate a bug with base.pm not finding the Exporter version

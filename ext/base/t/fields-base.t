@@ -9,9 +9,6 @@ BEGIN
             $W++
         else
             print $^STDERR, @_[0]->message
-        
-    
-
 
 use Test::More tests => 26
 

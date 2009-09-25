@@ -1,6 +1,5 @@
 #!/usr/bin/perl -w
 
-
 use Test::More tests => 15
 
 BEGIN { use_ok('fields'); }
