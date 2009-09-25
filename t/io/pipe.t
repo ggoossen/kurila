@@ -143,12 +143,11 @@ SKIP: do
 
     SKIP: do
         # Sfio doesn't report failure when closing a broken pipe
-        # that has pending output.  Go figure.  MachTen doesn't either,
-        # but won't write to broken pipes, so nothing's pending at close.
+        # that has pending output.  Go figure.
         # BeOS will not write to broken pipes, either.
         # Nor does POSIX-BC.
         skip "Won't report failure on broken pipe", 1
-            if config_value('d_sfio') || $^OS_NAME eq 'machten' || $^OS_NAME eq 'beos' ||
+            if config_value('d_sfio') || $^OS_NAME eq 'beos' ||
           $^OS_NAME eq 'posix-bc'
 
         local signals::handler("PIPE") = 'IGNORE'

@@ -7862,7 +7862,6 @@ my @pods = @( qw(
     lexwarn
     locale
     lol
-    machten
     macos
     macosx
     modinstall
