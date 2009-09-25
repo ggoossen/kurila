@@ -43,7 +43,7 @@ BEGIN
     require "./test.pl"
 
 
-plan 1640
+plan 1633
 
 our ($x, %XXX, @XXX, $foo, @x, $null, @words)
 our ($TODO)
@@ -1438,16 +1438,13 @@ EOT
         # L& and LC are the same
         ok( "a" =~ m/\p{LC}/ and "a" =~ m/\p{L&}/ )
         ok( not "1" =~ m/\p{LC}/ or "1" =~ m/\p{L&}/ )
-    
 
     do
         ok( "a" =~ m/\p{Lowercase Letter}/ )
         ok( not "A" =~ m/\p{lowercaseletter}/ )
-    
 
     do
         ok( "\x{AC00}" =~ m/\p{HangulSyllables}/ )
-    
 
     do
         # Script=, Block=, Category=
@@ -1455,20 +1452,6 @@ EOT
         ok( "\x{0100}" =~ m/\p{Script=Latin}/ )
         ok( "\x{0100}" =~ m/\p{Block=LatinExtendedA}/ )
         ok( "\x{0100}" =~ m/\p{Category=UppercaseLetter}/ )
-    
-
-    do
-        print $^STDOUT, "# the basic character classes and Unicode \n"
-
-        # 0100;LATIN CAPITAL LETTER A WITH MACRON;Lu;0;L;0041 0304;;;;N;LATIN CAPITAL LETTER A MACRON;;;0101;
-        ok( "\x{0100}" =~ m/\w/ )
-
-        # 0660;ARABIC-INDIC DIGIT ZERO;Nd;0;AN;;0;0;0;N;;;;;
-        ok( "\x{0660}" =~ m/\d/ )
-
-        # 1680;OGHAM SPACE MARK;Zs;0;WS;;;;;N;;;;;
-        ok( "\x{1680}" =~ m/\s/ )
-    
 
     do
         print $^STDOUT, "# folding matches and Unicode\n"
@@ -1493,7 +1476,6 @@ EOT
         ok( "\x{100}a" =~ m/[\x{100}]/i )
         ok( "\x{101}a" =~ m/[\x{101}]/i )
         ok( "\x{100}a" =~ m/[\x{101}]/i )
-    
 
     do
         use charnames ':full'
@@ -1715,16 +1697,6 @@ EOT
 
         ok($: "\N{LATIN SMALL LETTER SHARP S}" =~ m/ss/i)
         ok($: "\N{LATIN SMALL LETTER SHARP S}" =~ m/SS/i)
-    
-
-    do
-        print $^STDOUT, "# more whitespace: U+0085, U+2028, U+2029\n"
-
-        # U+0085 needs to be forced to be Unicode, the \x{100} does that.
-        ok( "<\x{100}\x{0085}>" =~ m/<\x{100}\s>/ )
-        ok( "<\x{2028}>" =~ m/<\s>/ )
-        ok( "<\x{2029}>" =~ m/<\s>/ )
-    
 
     do
         print $^STDOUT, "# . with /s should work on characters, as opposed to bytes\n"
@@ -1795,15 +1767,6 @@ EOT
                 "x";
             })}g
             ok( substr($x,0,1) eq substr($x,-1,1) )
-        
-    
-
-    do
-        print $^STDOUT, "# SEGV in s/// and UTF-8\n"
-        my $s = "s#\x{100}" x 4
-        $s =~ s/[^\w]/ /g
-        ok( $s eq "s \x{100}" x 4 )
-    
 
     do
         print $^STDOUT, "# UTF-8 bug (maybe alreayd known?)\n"

@@ -2924,9 +2924,9 @@ X<regex, preserve> X<regexp, preserve>, g and c X</g> X</c>
 
 =item Regular Expressions
 
-[1], [2], [3], [1], [2], [3], C<$>, C<+> C<< < >> C<=> C<< > >> C<|> C<~>,
-C<^> C<`>, cntrl X<cntrl>, graph X<graph>, print X<print>, punct X<punct>,
-xdigit X<xdigit>
+[1], [2], [3], C<$>, C<+> C<< < >> C<=> C<< > >> C<|> C<~>, C<^> C<`>,
+cntrl X<cntrl>, graph X<graph>, print X<print>, punct X<punct>, xdigit
+X<xdigit>
 
 =item Extended Patterns
 
@@ -4127,7 +4127,8 @@ Test::Builder::Tester, Test::Builder::Tester::Color, Test::More,
 Test::Simple, Test::Tutorial, Text::Abbrev, Text::ParseWords, Text::Tabs,
 Text::Wrap, Tie::Hash, Time::HiRes, Time::Local, Time::gmtime,
 Time::localtime, Time::tm, UNIVERSAL, Unicode::UCD, User::grent,
-User::pwent, Win32, Win32CORE, XS::APItest, XS::Typemap, XSLoader
+User::pwent, VMS::DCLsym, VMS::Stdio, Win32, Win32CORE, XS::APItest,
+XS::Typemap, XSLoader
 
 =item Extension Modules
 
@@ -7252,6 +7253,9 @@ locale, the locale pramga has been removed
 
 =over 4
 
+=item Unicode interpretation of \w, \d, \s, and the POSIX character classes
+redefined.
+
 =item In @INC, move ARCHLIB and PRIVLIB after the current version's
 site_perl and vendor_perl.
 
@@ -7634,6 +7638,9 @@ vestigial.
 =item Incompatible Changes
 
 =over 4
+
+=item Unicode interpretation of \w, \d, \s, and the POSIX character classes
+redefined.
 
 =item In @INC, move ARCHLIB and PRIVLIB after the current version's
 site_perl and vendor_perl.
@@ -13217,6 +13224,41 @@ Steve Hay E<lt>steve.hay@uk.radan.comE<gt>
 
 =head1 PRAGMA DOCUMENTATION
 
+=head2 base::libase, base - Establish an ISA relationship with base classes
+at compile time
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item DIAGNOSTICS
+
+Base class package "%s" is empty, Class 'Foo' tried to inherit from itself
+
+=item HISTORY
+
+=item CAVEATS
+
+=item SEE ALSO
+
+=back
+
+=head2 base::lib::fields, fields - compile-time class fields
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+new, phash
+
+=item SEE ALSO
+
+=back
+
 =head2 re - Perl pragma to alter regular expression behaviour
 
 =over 4
@@ -17675,6 +17717,224 @@ Sichuan Yi, {yi} : Yiddish, {yo} : Yoruba, [{ypk} : Yupik languages], {znd}
 
 =back
 
+=head2 I18N::LangTags::lib::I18N::LangTags, I18N::LangTags - functions for
+dealing with RFC3066-style language tags
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=back
+
+the function is_language_tag($lang1)
+
+the function extract_language_tags($whatever)
+
+the function same_language_tag($lang1, $lang2)
+
+the function similarity_language_tag($lang1, $lang2)
+
+the function is_dialect_of($lang1, $lang2)
+
+the function super_languages($lang1)
+
+the function locale2language_tag($locale_identifier)
+
+the function encode_language_tag($lang1)
+
+the function alternate_language_tags($lang1)
+
+the function @langs = panic_languages(@accept_languages)
+
+the function implicate_supers( ...languages... ), the function
+implicate_supers_strictly( ...languages... )
+
+=over 4
+
+=item ABOUT LOWERCASING
+
+=item ABOUT UNICODE PLAINTEXT LANGUAGE TAGS
+
+=item SEE ALSO
+
+=item COPYRIGHT
+
+=item AUTHOR
+
+=back
+
+=head2 I18N::LangTags::lib::I18N::LangTags::Detect, I18N::LangTags::Detect
+- detect the user's language preferences
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item FUNCTIONS
+
+=item ENVIRONMENT
+
+=item SEE ALSO
+
+=item COPYRIGHT
+
+=item AUTHOR
+
+=back
+
+=head2 I18N::LangTags::lib::I18N::LangTags::List, I18N::LangTags::List --
+tags and names for human languages
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item ABOUT LANGUAGE TAGS
+
+=item LIST OF LANGUAGES
+
+{ab} : Abkhazian, {ace} : Achinese, {ach} : Acoli, {ada} : Adangme, {ady} :
+Adyghe, {aa} : Afar, {afh} : Afrihili, {af} : Afrikaans, [{afa} :
+Afro-Asiatic (Other)], {ak} : Akan, {akk} : Akkadian, {sq} : Albanian,
+{ale} : Aleut, [{alg} : Algonquian languages], [{tut} : Altaic (Other)],
+{am} : Amharic, {i-ami} : Ami, [{apa} : Apache languages], {ar} : Arabic,
+{arc} : Aramaic, {arp} : Arapaho, {arn} : Araucanian, {arw} : Arawak, {hy}
+: Armenian, {an} : Aragonese, [{art} : Artificial (Other)], {ast} :
+Asturian, {as} : Assamese, [{ath} : Athapascan languages], [{aus} :
+Australian languages], [{map} : Austronesian (Other)], {av} : Avaric, {ae}
+: Avestan, {awa} : Awadhi, {ay} : Aymara, {az} : Azerbaijani, {ban} :
+Balinese, [{bat} : Baltic (Other)], {bal} : Baluchi, {bm} : Bambara, [{bai}
+: Bamileke languages], {bad} : Banda, [{bnt} : Bantu (Other)], {bas} :
+Basa, {ba} : Bashkir, {eu} : Basque, {btk} : Batak (Indonesia), {bej} :
+Beja, {be} : Belarusian, {bem} : Bemba, {bn} : Bengali, [{ber} : Berber
+(Other)], {bho} : Bhojpuri, {bh} : Bihari, {bik} : Bikol, {bin} : Bini,
+{bi} : Bislama, {bs} : Bosnian, {bra} : Braj, {br} : Breton, {bug} :
+Buginese, {bg} : Bulgarian, {i-bnn} : Bunun, {bua} : Buriat, {my} :
+Burmese, {cad} : Caddo, {car} : Carib, {ca} : Catalan, [{cau} : Caucasian
+(Other)], {ceb} : Cebuano, [{cel} : Celtic (Other)], [{cai} : Central
+American Indian (Other)], {chg} : Chagatai, [{cmc} : Chamic languages],
+{ch} : Chamorro, {ce} : Chechen, {chr} : Cherokee, {chy} : Cheyenne, {chb}
+: Chibcha, {ny} : Chichewa, {zh} : Chinese, {chn} : Chinook Jargon, {chp} :
+Chipewyan, {cho} : Choctaw, {cu} : Church Slavic, {chk} : Chuukese, {cv} :
+Chuvash, {cop} : Coptic, {kw} : Cornish, {co} : Corsican, {cr} : Cree,
+{mus} : Creek, [{cpe} : English-based Creoles and pidgins (Other)], [{cpf}
+: French-based Creoles and pidgins (Other)], [{cpp} : Portuguese-based
+Creoles and pidgins (Other)], [{crp} : Creoles and pidgins (Other)], {hr} :
+Croatian, [{cus} : Cushitic (Other)], {cs} : Czech, {dak} : Dakota, {da} :
+Danish, {dar} : Dargwa, {day} : Dayak, {i-default} : Default (Fallthru)
+Language, {del} : Delaware, {din} : Dinka, {dv} : Divehi, {doi} : Dogri,
+{dgr} : Dogrib, [{dra} : Dravidian (Other)], {dua} : Duala, {nl} : Dutch,
+{dum} : Middle Dutch (ca.1050-1350), {dyu} : Dyula, {dz} : Dzongkha, {efi}
+: Efik, {egy} : Ancient Egyptian, {eka} : Ekajuk, {elx} : Elamite, {en} :
+English, {enm} : Old English (1100-1500), {ang} : Old English
+(ca.450-1100), {i-enochian} : Enochian (Artificial), {myv} : Erzya, {eo} :
+Esperanto, {et} : Estonian, {ee} : Ewe, {ewo} : Ewondo, {fan} : Fang, {fat}
+: Fanti, {fo} : Faroese, {fj} : Fijian, {fi} : Finnish, [{fiu} :
+Finno-Ugrian (Other)], {fon} : Fon, {fr} : French, {frm} : Middle French
+(ca.1400-1600), {fro} : Old French (842-ca.1400), {fy} : Frisian, {fur} :
+Friulian, {ff} : Fulah, {gaa} : Ga, {gd} : Scots Gaelic, {gl} : Gallegan,
+{lg} : Ganda, {gay} : Gayo, {gba} : Gbaya, {gez} : Geez, {ka} : Georgian,
+{de} : German, {gmh} : Middle High German (ca.1050-1500), {goh} : Old High
+German (ca.750-1050), [{gem} : Germanic (Other)], {gil} : Gilbertese, {gon}
+: Gondi, {gor} : Gorontalo, {got} : Gothic, {grb} : Grebo, {grc} : Ancient
+Greek, {el} : Modern Greek, {gn} : Guarani, {gu} : Gujarati, {gwi} :
+Gwich'in, {hai} : Haida, {ht} : Haitian, {ha} : Hausa, {haw} : Hawaiian,
+{he} : Hebrew, {hz} : Herero, {hil} : Hiligaynon, {him} : Himachali, {hi} :
+Hindi, {ho} : Hiri Motu, {hit} : Hittite, {hmn} : Hmong, {hu} : Hungarian,
+{hup} : Hupa, {iba} : Iban, {is} : Icelandic, {io} : Ido, {ig} : Igbo,
+{ijo} : Ijo, {ilo} : Iloko, [{inc} : Indic (Other)], [{ine} : Indo-European
+(Other)], {id} : Indonesian, {inh} : Ingush, {ia} : Interlingua
+(International Auxiliary Language Association), {ie} : Interlingue, {iu} :
+Inuktitut, {ik} : Inupiaq, [{ira} : Iranian (Other)], {ga} : Irish, {mga} :
+Middle Irish (900-1200), {sga} : Old Irish (to 900), [{iro} : Iroquoian
+languages], {it} : Italian, {ja} : Japanese, {jv} : Javanese, {jrb} :
+Judeo-Arabic, {jpr} : Judeo-Persian, {kbd} : Kabardian, {kab} : Kabyle,
+{kac} : Kachin, {kl} : Kalaallisut, {xal} : Kalmyk, {kam} : Kamba, {kn} :
+Kannada, {kr} : Kanuri, {krc} : Karachay-Balkar, {kaa} : Kara-Kalpak, {kar}
+: Karen, {ks} : Kashmiri, {csb} : Kashubian, {kaw} : Kawi, {kk} : Kazakh,
+{kha} : Khasi, {km} : Khmer, [{khi} : Khoisan (Other)], {kho} : Khotanese,
+{ki} : Kikuyu, {kmb} : Kimbundu, {rw} : Kinyarwanda, {ky} : Kirghiz,
+{i-klingon} : Klingon, {kv} : Komi, {kg} : Kongo, {kok} : Konkani, {ko} :
+Korean, {kos} : Kosraean, {kpe} : Kpelle, {kro} : Kru, {kj} : Kuanyama,
+{kum} : Kumyk, {ku} : Kurdish, {kru} : Kurukh, {kut} : Kutenai, {lad} :
+Ladino, {lah} : Lahnda, {lam} : Lamba, {lo} : Lao, {la} : Latin, {lv} :
+Latvian, {lb} : Letzeburgesch, {lez} : Lezghian, {li} : Limburgish, {ln} :
+Lingala, {lt} : Lithuanian, {nds} : Low German, {art-lojban} : Lojban
+(Artificial), {loz} : Lozi, {lu} : Luba-Katanga, {lua} : Luba-Lulua, {lui}
+: Luiseno, {lun} : Lunda, {luo} : Luo (Kenya and Tanzania), {lus} : Lushai,
+{mk} : Macedonian, {mad} : Madurese, {mag} : Magahi, {mai} : Maithili,
+{mak} : Makasar, {mg} : Malagasy, {ms} : Malay, {ml} : Malayalam, {mt} :
+Maltese, {mnc} : Manchu, {mdr} : Mandar, {man} : Mandingo, {mni} :
+Manipuri, [{mno} : Manobo languages], {gv} : Manx, {mi} : Maori, {mr} :
+Marathi, {chm} : Mari, {mh} : Marshall, {mwr} : Marwari, {mas} : Masai,
+[{myn} : Mayan languages], {men} : Mende, {mic} : Micmac, {min} :
+Minangkabau, {i-mingo} : Mingo, [{mis} : Miscellaneous languages], {moh} :
+Mohawk, {mdf} : Moksha, {mo} : Moldavian, [{mkh} : Mon-Khmer (Other)],
+{lol} : Mongo, {mn} : Mongolian, {mos} : Mossi, [{mul} : Multiple
+languages], [{mun} : Munda languages], {nah} : Nahuatl, {nap} : Neapolitan,
+{na} : Nauru, {nv} : Navajo, {nd} : North Ndebele, {nr} : South Ndebele,
+{ng} : Ndonga, {ne} : Nepali, {new} : Newari, {nia} : Nias, [{nic} :
+Niger-Kordofanian (Other)], [{ssa} : Nilo-Saharan (Other)], {niu} : Niuean,
+{nog} : Nogai, {non} : Old Norse, [{nai} : North American Indian], {no} :
+Norwegian, {nb} : Norwegian Bokmal, {nn} : Norwegian Nynorsk, [{nub} :
+Nubian languages], {nym} : Nyamwezi, {nyn} : Nyankole, {nyo} : Nyoro, {nzi}
+: Nzima, {oc} : Occitan (post 1500), {oj} : Ojibwa, {or} : Oriya, {om} :
+Oromo, {osa} : Osage, {os} : Ossetian; Ossetic, [{oto} : Otomian
+languages], {pal} : Pahlavi, {i-pwn} : Paiwan, {pau} : Palauan, {pi} :
+Pali, {pam} : Pampanga, {pag} : Pangasinan, {pa} : Panjabi, {pap} :
+Papiamento, [{paa} : Papuan (Other)], {fa} : Persian, {peo} : Old Persian
+(ca.600-400 B.C.), [{phi} : Philippine (Other)], {phn} : Phoenician, {pon}
+: Pohnpeian, {pl} : Polish, {pt} : Portuguese, [{pra} : Prakrit languages],
+{pro} : Old Provencal (to 1500), {ps} : Pushto, {qu} : Quechua, {rm} :
+Raeto-Romance, {raj} : Rajasthani, {rap} : Rapanui, {rar} : Rarotongan,
+[{qaa - qtz} : Reserved for local use.], [{roa} : Romance (Other)], {ro} :
+Romanian, {rom} : Romany, {rn} : Rundi, {ru} : Russian, [{sal} : Salishan
+languages], {sam} : Samaritan Aramaic, {se} : Northern Sami, {sma} :
+Southern Sami, {smn} : Inari Sami, {smj} : Lule Sami, {sms} : Skolt Sami,
+[{smi} : Sami languages (Other)], {sm} : Samoan, {sad} : Sandawe, {sg} :
+Sango, {sa} : Sanskrit, {sat} : Santali, {sc} : Sardinian, {sas} : Sasak,
+{sco} : Scots, {sel} : Selkup, [{sem} : Semitic (Other)], {sr} : Serbian,
+{srr} : Serer, {shn} : Shan, {sn} : Shona, {sid} : Sidamo, {sgn-...} : Sign
+Languages, {bla} : Siksika, {sd} : Sindhi, {si} : Sinhalese, [{sit} :
+Sino-Tibetan (Other)], [{sio} : Siouan languages], {den} : Slave
+(Athapascan), [{sla} : Slavic (Other)], {sk} : Slovak, {sl} : Slovenian,
+{sog} : Sogdian, {so} : Somali, {son} : Songhai, {snk} : Soninke, {wen} :
+Sorbian languages, {nso} : Northern Sotho, {st} : Southern Sotho, [{sai} :
+South American Indian (Other)], {es} : Spanish, {suk} : Sukuma, {sux} :
+Sumerian, {su} : Sundanese, {sus} : Susu, {sw} : Swahili, {ss} : Swati,
+{sv} : Swedish, {syr} : Syriac, {tl} : Tagalog, {ty} : Tahitian, [{tai} :
+Tai (Other)], {tg} : Tajik, {tmh} : Tamashek, {ta} : Tamil, {i-tao} : Tao,
+{tt} : Tatar, {i-tay} : Tayal, {te} : Telugu, {ter} : Tereno, {tet} :
+Tetum, {th} : Thai, {bo} : Tibetan, {tig} : Tigre, {ti} : Tigrinya, {tem} :
+Timne, {tiv} : Tiv, {tli} : Tlingit, {tpi} : Tok Pisin, {tkl} : Tokelau,
+{tog} : Tonga (Nyasa), {to} : Tonga (Tonga Islands), {tsi} : Tsimshian,
+{ts} : Tsonga, {i-tsu} : Tsou, {tn} : Tswana, {tum} : Tumbuka, [{tup} :
+Tupi languages], {tr} : Turkish, {ota} : Ottoman Turkish (1500-1928), {crh}
+: Crimean Turkish, {tk} : Turkmen, {tvl} : Tuvalu, {tyv} : Tuvinian, {tw} :
+Twi, {udm} : Udmurt, {uga} : Ugaritic, {ug} : Uighur, {uk} : Ukrainian,
+{umb} : Umbundu, {und} : Undetermined, {ur} : Urdu, {uz} : Uzbek, {vai} :
+Vai, {ve} : Venda, {vi} : Vietnamese, {vo} : Volapuk, {vot} : Votic, [{wak}
+: Wakashan languages], {wa} : Walloon, {wal} : Walamo, {war} : Waray, {was}
+: Washo, {cy} : Welsh, {wo} : Wolof, {x-...} : Unregistered (Semi-Private
+Use), {xh} : Xhosa, {sah} : Yakut, {yao} : Yao, {yap} : Yapese, {ii} :
+Sichuan Yi, {yi} : Yiddish, {yo} : Yoruba, [{ypk} : Yupik languages], {znd}
+: Zande, [{zap} : Zapotec], {zen} : Zenaga, {za} : Zhuang, {zu} : Zulu,
+{zun} : Zuni
+
+=item SEE ALSO
+
+=item COPYRIGHT AND DISCLAIMER
+
+=item AUTHOR
+
+=back
+
 =head2 I18N::Langinfo - query locale information
 
 =over 4
@@ -18184,8 +18444,40 @@ FLAGS ] ), stat
 
 =back
 
+=head2 IPC::Open2::lib::IPC::Open2, IPC::Open2, open2 - open a process for
+both reading and writing
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item WARNING
+
+=item SEE ALSO
+
+=back
+
 =head2 IPC::Open3, open3 - open a process for reading, writing, and error
 handling
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item See Also
+
+L<IPC::Open2>, L<IPC::Run>
+
+=item WARNING
+
+=back
+
+=head2 IPC::Open3::lib::IPC::Open3, IPC::Open3, open3 - open a process for
+reading, writing, and error handling
 
 =over 4
 
@@ -22839,6 +23131,55 @@ functions
 =item HISTORY
 
 March 18th, 2000
+
+=back
+
+=head2 VMS::DCLsym - Perl extension to manipulate DCL symbols
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item Tied hash interface
+
+=item Object interface
+
+new, getsym, setsym, delsym, clearcache
+
+=back
+
+=item AUTHOR
+
+=item VERSION
+
+=item BUGS
+
+=back
+
+=head2 VMStdio::Stdio, VMS::Stdio - standard I/O functions via VMS
+extensions
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+binmode, flush, getname, remove, rewind, setdef, sync, tmpnam, vmsopen,
+alq=INTEGER, bls=INTEGER, ctx=STRING, bin, cvt, nocvt, rec, stm, xplct,
+deq=INTEGER, dna=FILESPEC, fop=STRING, ctg, cbt, dfw, dlt, tef, cif, sup,
+scf, spl, tmd, tmp, nef, rck, wck, mxv, rwo, pos, rwc, sqo, fsz=INTEGER,
+gbc=INTEGER, mbc=INTEGER, mbf=INTEGER, mrs=INTEGER, rat=STRING, cr, blk,
+ftn, none, prn, rfm=STRING, fix, stm, stmlf, stmcr, var, vfc, udf,
+rop=STRING, asy, cco, cvt, eof, nlk, pmt, pta, rea, rlk, rne, rnf, rrl,
+syncsts, tmo, tpt, ulk, wat, rah, wbh, rtv=INTEGER, shr=STRING, del, get,
+mse, nil, put, upd, upi, tmo=INTEGER, vmssysopen, waitfh, writeof
+
+=item REVISION
 
 =back
 

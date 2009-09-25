@@ -67,14 +67,10 @@ ext/base/lib/fields.pm		Set up object field names for pseudo-hash-using classes
 ext/base/MANIFEST		base.pm manifest
 ext/base/META.yml		base.pm META.yml file
 ext/base/t/base.t		See if base works
-ext/base/t/compile-time.t	See if base works
-ext/base/t/fields-5.6.0.t	See if fields work
-ext/base/t/fields-5.8.0.t	See if fields work
 ext/base/t/fields-base.t	See if fields work
 ext/base/t/fields.t		See if fields work
 ext/base/t/isa.t		See if base's behaviour doesn't change
 ext/base/t/lib/Dummy.pm		Test module for base.pm
-ext/base/t/lib/HasSigDie.pm	Module for testing base.pm
 ext/base/t/sigdie.t		See if base works with SIGDIE
 ext/base/t/version.t		See if base works with versions
 ext/base/t/warnings.t		See if base works with warnings

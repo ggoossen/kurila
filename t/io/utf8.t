@@ -223,7 +223,7 @@ do
     syswrite($f, ($a = chr(0x100)))
     close $f
     is( ord($a), 0x100, '23428 syswrite should not downgrade scalar' )
-    like( $a, qr/^\w+/, '23428 syswrite should not downgrade scalar' )
+    like( $a, qr/^\p{IsWord}+/, '23428 syswrite should not downgrade scalar' )
 
 # sysread() and syswrite() tested in lib/open.t since Fcntl is used
 
