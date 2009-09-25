@@ -538,9 +538,6 @@ EOT
                               m/(?:lost|reachable):\s+\d+ bytes in (\d+) blocks/)
                                 $leaks += $1
 
-
-
-
                 if ($errors or $leaks)
                     if (rename $valgrind_log, "$test.valgrind")
                         $valgrind++
