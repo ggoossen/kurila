@@ -3966,7 +3966,13 @@ chcp, dataset access, OS/390, z/OS iconv, locales
 
 =item DESCRIPTION
 
+=item SECURITY VULNERABILITY CONTACT INFORMATION
+
+=item SECURITY MECHANISMS AND CONCERNS
+
 =over 4
+
+=item Taint mode
 
 =item Laundering and Detecting Tainted Data
 
@@ -7209,6 +7215,8 @@ flip-flop operators, defined-or operator
 
 =item Smart match changes
 
+=item Labels can't be keywords
+
 =back
 
 =item Core Enhancements
@@ -7248,7 +7256,8 @@ C<overloading>
 =item Selected Bug Fixes
 
 C<-I> on shebang line now adds directories in front of @INC, C<kill> is now
-fatal when called on non-numeric process identifiers
+fatal when called on non-numeric process identifiers, C<-C> on the shebang
+line is once more permitted
 
 =item New or Changed Diagnostics
 
@@ -7284,6 +7293,8 @@ flip-flop operators, defined-or operator
 
 =item Smart match changes
 
+=item Labels can't be keywords
+
 =back
 
 =item Core Enhancements
@@ -7323,7 +7334,8 @@ C<overloading>
 =item Selected Bug Fixes
 
 C<-I> on shebang line now adds directories in front of @INC, C<kill> is now
-fatal when called on non-numeric process identifiers
+fatal when called on non-numeric process identifiers, C<-C> on the shebang
+line is once more permitted
 
 =item New or Changed Diagnostics
 

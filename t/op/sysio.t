@@ -238,12 +238,12 @@ unlink $outfile
 chdir('..')
 
 # [perl #67912] syswrite prints garbage if called with empty scalar and non-zero offset
-try { my $buf = ''; syswrite(O, $buf, 1, 0) }
-print $^STDOUT, 'not ' unless ($^EVAL_ERROR->message =~ /^Offset outside string /)
+try { my $buf = ''; syswrite($o_fh, $buf, 1, 0) }
+print $^STDOUT, 'not ' unless ($^EVAL_ERROR->message =~ m/^Offset outside string /)
 print $^STDOUT, "ok 43\n"
 
-eval { my $buf = 'x'; syswrite(O, $buf, 1, 1) }
-print $^STDOUT, 'not ' unless ($^EVAL_ERROR->message =~ /^Offset outside string /)
+try { my $buf = 'x'; syswrite($o_fh, $buf, 1, 1) }
+print $^STDOUT, 'not ' unless ($^EVAL_ERROR->message =~ m/^Offset outside string /)
 print$^STDOUT,  "ok 44\n"
 
 close($o_fh)
