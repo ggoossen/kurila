@@ -7242,7 +7242,7 @@ locale, the locale pramga has been removed
 
 =back
 
-=head2 perldelta - what is new for perl v5.11.0
+=head2 perldelta, perl5110delta - what is new for perl v5.11.0
 
 =over 4
 
@@ -7252,6 +7252,9 @@ locale, the locale pramga has been removed
 
 =over 4
 
+=item In @INC, move ARCHLIB and PRIVLIB after the current version's
+site_perl and vendor_perl.
+
 =item Switch statement changes
 
 flip-flop operators, defined-or operator
@@ -7260,11 +7263,17 @@ flip-flop operators, defined-or operator
 
 =item Labels can't be keywords
 
+=item Other incompatible changes
+
 =back
 
 =item Core Enhancements
 
 =over 4
+
+=item Unicode Character Database 5.1.0
+
+=item A proper interface for pluggable Method Resolution Orders
 
 =item The C<overloading> pragma
 
@@ -7274,45 +7283,144 @@ flip-flop operators, defined-or operator
 
 =item Parallel tests
 
+=item The C<...> operator
+
+=item DTrace support
+
+=item Support for C<configure_requires> in CPAN module metadata
+
+=item The C<each> function can now operate on arrays
+
+=item Perl's core time-related functions are now Y2038 compliand
+
+=item The variable C<$,> may now be tied
+
+=item // now behaves like || in when clauses
+
+=item You can now set C<-W> from the C<PERL5OPT> environment varialbe
+
 =back
 
 =item Modules and Pragmata
 
 =over 4
 
+=item New Modules and Pragmata
+
+C<autodie>, C<Compress::Raw::Bzip2>, C<parent>, C<Parse::CPAN::Meta>
+
 =item Pragmata Changes
 
-C<overloading>
+C<overloading>, C<attributes>, C<attrs>, C<base>, C<bigint>, C<bignum>,
+C<bigrat>, C<charnames>, C<constant>, C<feature>, C<fields>, C<lib>,
+C<open>, C<overload>, C<overloading>, C<version>
 
-=item Selected Changes to Core Modules
+=item Updated Modules
+
+C<Archive::Extract>, C<Archive::Tar>, C<Attribute::Handlers>,
+C<AutoLoader>, C<AutoSplit>, C<B>, C<B::Debug>, C<B::Deparse>, C<B::Lint>,
+C<B::Xref>, C<Benchmark>, C<Carp>, C<CGI>, C<Compress::Zlib>, C<CPAN>,
+C<CPANPLUS>, C<CPANPLUS::Dist::Build>, C<Cwd>, C<Data::Dumper>, C<DB>,
+C<DB_File>, C<Devel::PPPort>, C<Digest::MD5>, C<Digest::SHA>, C<DirHandle>,
+C<Dumpvalue>, C<DynaLoader>, C<Encode>, C<Errno>, C<Exporter>,
+C<ExtUtils::CBuilder>, C<ExtUtils::Command>, C<ExtUtils::Constant>,
+C<ExtUtils::Embed>, C<ExtUtils::Install>, C<ExtUtils::MakeMaker>,
+C<ExtUtils::Manifest>, C<ExtUtils::ParseXS>, C<Fatal>, C<File::Basename>,
+C<File::Compare>, C<File::Copy>, C<File::Fetch>, C<File::Find>,
+C<File::Path>, C<File::Spec>, C<File::stat>, C<File::Temp>, C<FileCache>,
+C<FileHandle>, C<Filter::Simple>, C<Filter::Util::Call>, C<FindBin>,
+C<GDBM_File>, C<Getopt::Long>, C<Hash::Util::FieldHash>, C<I18N::Collate>,
+C<IO>, C<IO::Compress::*>, C<IO::Dir>, C<IO::Handle>, C<IO::Socket>,
+C<IO::Zlib>, C<IPC::Cmd>, C<IPC::Open3>, C<IPC::SysV>, C<lib>,
+C<List::Util>, C<Locale::MakeText>, C<Log::Message>, C<Math::BigFloat>,
+C<Math::BigInt>, C<Math::BigInt::FastCalc>, C<Math::BigRat>,
+C<Math::Complex>, C<Math::Trig>, C<Memoize>, C<Module::Build>,
+C<Module::CoreList>, C<Module::Load>, C<Module::Load::Conditional>,
+C<Module::Loaded>, C<Module::Pluggable>, C<NDBM_File>, C<Net::Ping>,
+C<NEXT>, C<Object::Accessor>, C<OS2::REXX>, C<Package::Constants>,
+C<PerlIO>, C<PerlIO::via>, C<Pod::Man>, C<Pod::Parser>, Pod::Perldoc,
+C<Pod::Simple>, C<Pod::Text>, C<POSIX>, C<Safe>, C<Scalar::Util>,
+C<SelectSaver>, C<SelfLoader>, C<Socket>, C<Storable>, C<Switch>,
+C<Symbol>, C<Sys::Syslog>, C<Term::ANSIColor>, C<Term::ReadLine>,
+C<Term::UI>, C<Test::Harness>, C<Test::Simple>, C<Text::ParseWords>,
+C<Text::Tabs>, C<Text::Wrap>, C<Thread::Queue>, C<Thread::Semaphore>,
+C<threads>, C<threads::shared>, C<Tie::RefHash>, C<Tie::StdHandle>,
+C<Time::HiRes>, C<Time::Local>, C<Time::Piece>, C<Unicode::Normalize>,
+C<Unicode::UCD>, C<UNIVERSAL>, C<Win32>, C<Win32API::File>, C<XSLoader>
 
 =back
 
 =item Utility Changes
 
-=item Documentation
+F<h2ph>, F<h2xs>, F<perl5db.pl>, F<perlbug>, F<perlthanks>
+
+=item New Documentation
+
+L<perlhaiku>, L<perlmroapi>, L<perlperf>, L<perlrepository>, L<perlthanks>
+
+=item Changes to Existing Documentation
+
+=over 4
+
+=item Documented -X overloading.
+
+=item Documented that when() treats specially most of the filetest
+operators
+
+=item Documented when as a syntax modifier
+
+=item Eliminated "Old Perl threads tutorial", which describes 5005 threads.
+
+=item Correct previous documentation: v-strings are not deprecated
+
+=back
 
 =item Performance Enhancements
 
 =item Installation and Configuration Improvements
 
-=item Selected Bug Fixes
+=over 4
 
-C<-I> on shebang line now adds directories in front of @INC, C<kill> is now
-fatal when called on non-numeric process identifiers, C<-C> on the shebang
-line is once more permitted
+=item F<ext/> reorganisation
+
+=item Configuration improvements
+
+=item Compilation improvements
+
+=item Platform Specific Changes
+
+AIX, Cygwin, DomainOS, FreeBSD, Irix, Haiku, MiNT, MirOS BSD, NetBSD,
+Stratus VOS, Symbian, Win32, VMS
+
+=back
+
+=item Selected Bug Fixes
 
 =item New or Changed Diagnostics
 
+C<panic: sv_chop %s>, C<Can't locate package %s for the parents of %s>,
+C<v-string in use/require is non-portable>, C<Deep recursion on subroutine
+"%s">
+
 =item Changed Internals
+
+C<SVf_UTF8>, C<SVs_TEMP>
+
+=item New Tests
+
+t/comp/retainedlines.t, t/io/perlio_fail.t, t/io/perlio_leaks.t,
+t/io/perlio_open.t, t/io/perlio.t, t/io/pvbm.t, t/mro/package_aliases.t,
+t/op/dbm.t, t/op/index_thr.t, t/op/pat_thr.t, t/op/qr_gc.t,
+t/op/reg_email_thr.t, t/op/regexp_qr_embed_thr.t,
+t/op/regexp_unicode_prop.t, t/op/regexp_unicode_prop_thr.t,
+t/op/reg_nc_tie.t, t/op/reg_posixcc.t, t/op/re.t, t/op/setpgrpstack.t,
+t/op/substr_thr.t, t/op/upgrade.t, t/uni/lex_utf8.t, t/uni/tie.t
 
 =item Known Problems
 
-=over 4
+=item Deprecations
 
-=item Platform Specific Problems
-
-=back
+=item Acknowledgements
 
 =item Reporting Bugs
 
@@ -7320,7 +7428,587 @@ line is once more permitted
 
 =back
 
-=head2 perl5110delta, perldelta - what is new for perl v5.11.0
+=over 4
+
+=item TODO
+
+=item API
+
+=over 4
+
+=item Move the reg_stringify logic to Perl_sv_2pv_flags
+
+=item mg_copy ought to take an I32
+
+=item Perl_store_cop_label() isn't meant to be part of the public API.
+
+=item Perl_gv_fetchmethod{,_autoload,_flags} are actually never* called
+with a non-NULL stash. 
+So change the parameter to NN.
+
+=item Promote Perl_setdefout() to the public API.
+
+=item Add get_cvs() as a shortcut for STR_WITH_LEN() and
+Perl_get_cvn_flags()
+
+=item In Perl_newCONSTSUB(), sv should not be NULL.
+
+=item GvUNIQUE* have been defined as 0 since 2005/06/30 - high time to
+remove them.
+
+=item invert and rename PERL_MEM_LOG_STDERR to PERL_MEM_LOG_NOIMPL
+
+=item simplify PERL_MEM_LOG
+
+=item Add a parameter "destructing" to Gv_AMupdate()
+
+=item Modify the return value of Gv_AMupdate to indicate a compilation
+error
+
+=item local $SIG{FOO} = sub {...}; sets signal handler to SIG_DFL
+
+=item Respecting inc_version_list while processing PERL_VENDORLIB_STEM
+
+=item Change PL_debug behaviour 
+
+=item Tied filehandles now have an additional method EOF which provides the
+EOF type
+
+=item Perl is now smarter about adding a -I dir to the beginning or end of
+@INC
+
+=item On scope end, delete localized array elements that should not exist
+anymore, so that the array recovers its previous length. Honour EXISTS and
+DELETE for tied arrays.
+
+=item When a glob is deleted, mark its sub as ANON.
+
+=item Require a space or a newline after a "#line XXX" directive
+
+=item Forbid using "foreach" as an attribute
+
+=item Unregister signal handlers before destroying my_perl
+
+=item Perl_magic_clearsig() needs to remove magic, else delete $SIG{INT}
+returns undef
+
+=item [perl #66452] TMPDIR not honored when opening an anonymous temporary
+file
+
+=item The attached patch to perlio.c fixes the problem of errno getting
+set.
+
+=item Trim all trailing / from "." in @INC when filling %INC
+
+=item Don't enqueue pending signals during global destruction
+
+=item Eliminate struct regexp_allocated and xpvio_allocated.
+
+=back
+
+=item internals
+
+=over 4
+
+=item [perl #47047] Use of inherited AUTOLOAD for non-method is deprecated
+
+=item Remove the definitions of Null(), Nullch, Nullfp, Nullsv and PL_na
+when code is within the perl source tree
+
+=item Replace our assert-which-can-be-caught-by-eval with the real deal
+from the standard C library.
+
+=item Tweak Perl_sv_upgrade() so that references can upgrade to SVt_PV
+
+=item Eliminate prelen from struct regexp. 
+
+=item Change Perl_av_iter_p() to return IV* rather than I32* (which means
+
+=item Reorder the external regexp flags to get RXf_PMf_STD_PMMOD into the
+
+=item Re-implement the SvOOK() hack to store the offset as a BER encoded
+number in the part of the PVX that is being released. 
+(It will always
+fit, as chopping off 1 byte gives just enough space for recording a
+delta of up to 127). This allows SvOOK() to co-exist with SvIOK_on(),
+which means all the calls to SvOOK_off() [with the possibility of a
+call to sv_backoff()] in SvIOK_on() can be removed. This ought to make
+a lot of straight line code a little bit simpler.
+OOK()d scalars can now be SVt_PV, as the IVX isn't needed.
+
+=item Abolish wraplen from struct regexp. We're already storing it in
+SvCUR.
+
+=item Make Perl_pregcomp() use SvUTF8() of the pattern, rather than the
+flag bit in pmflags, to decide whether the pattern is UTF-8.
+
+=item Abolish RXf_UTF8. Store the UTF-8-ness of the pattern with SvUTF8().
+
+=item In struct regexp move the member paren_names to the IV union.
+
+=item Make REGEXP a type distinct from SV. (Much like AV, CV, GV, HV).
+
+=item Allow sv_setsv_flags() to copy SVt_REGEXP much like it copies
+SVt_FORMAT - the just string buffer.
+
+=item Correct a long-standing ithreads reference counting anonamly
+
+=item In PL_regexp_padav, store regexps via real references, rather than
+hiding them within IVs. 
+
+=item With regexps stored as real RVs, we can eliminate SvREPADTMP().
+
+=item REGEXPs are now stored directly in PL_regex_padav, rather than
+indirectly via RVs.
+
+=item Remove code that protected pp_qr against REGEXPs going away during
+global destruction whilst they were stored via true references in
+PL_regex_padav. 
+
+=item Remove PM_GETRE_SAFE and PM_SETRE_SAFE as nothing uses them.
+
+=item Note the U8 sized space created by removing -P, and check that it is
+now an illegal command line flag.
+
+=item Pack the recycled pad offsets into an SV at PL_regex_pad[0]. 
+
+=item Re-order so that the !SvOK() case is last (which should be rare)
+
+=item Extend PUSHFORMAT() to take a second parameter to set retop, to save
+NULLing it and then reassigning.
+
+=item Split struct block_sub into struct block_sub and struct block_format.
+
+=item Change the wantarray result from caller from IV to bool for the
+SCALAR/ARRAY case. 
+
+=item Give G_VOID, G_SCALAR and G_ARRAY the same numeric values as
+OPf_WANT_VOID, OPf_WANT_SCALAR and OPf_WANT_LIST.
+
+=item Squeeze the context type down to 4 bits, and move the private flags
+to fit within the next 4 bits.
+
+=item In struct block change blku_type from U8 to U16, and the "spare" U8
+to U16, with the lockstep changes in struct subst. 
+Eliminate lval from
+struct block_sub, and instead store it in the U16 in struct block.
+
+=item In struct block_eval, eliminate old_in_eval and old_op_type by
+storing the data in blk_u16.
+
+=item The layout for struct block_loop under ithreads can be simplified.
+
+=item In XS_PerlIO_get_layers() take advantage of the implementation of
+
+=item Micro-optimise the order of the context types. [Because I can :-)]
+
+=item [patch] optimize OP_IS_(FILETEST|SOCKET) macros
+
+=item Eliminate ck_lengthconst.
+
+=item Chainsaw DEBUG_S out, as suggested by Vincent Pit.
+
+=item Unsupported private API functions are now declared "static" to
+prevent leakage to the public API
+
+=item Perl_cv_ckproto() is not part of the public API, and not used
+anywhere. It has been removed
+
+=item Remove all the 5005threads specific mutex macros, which are now
+vestigial.
+
+=item Do not honor TMPDIR for anonymous temporary files when tainting
+
+=item Add a pluggable hook in op_free()
+
+=back
+
+=back
+
+=head2 perl5110delta - what is new for perl v5.11.0
+
+=over 4
+
+=item DESCRIPTION
+
+=item Incompatible Changes
+
+=over 4
+
+=item In @INC, move ARCHLIB and PRIVLIB after the current version's
+site_perl and vendor_perl.
+
+=item Switch statement changes
+
+flip-flop operators, defined-or operator
+
+=item Smart match changes
+
+=item Labels can't be keywords
+
+=item Other incompatible changes
+
+=back
+
+=item Core Enhancements
+
+=over 4
+
+=item Unicode Character Database 5.1.0
+
+=item A proper interface for pluggable Method Resolution Orders
+
+=item The C<overloading> pragma
+
+=item C<\N> regex escape
+
+=item Implicit strictures
+
+=item Parallel tests
+
+=item The C<...> operator
+
+=item DTrace support
+
+=item Support for C<configure_requires> in CPAN module metadata
+
+=item The C<each> function can now operate on arrays
+
+=item Perl's core time-related functions are now Y2038 compliand
+
+=item The variable C<$,> may now be tied
+
+=item // now behaves like || in when clauses
+
+=item You can now set C<-W> from the C<PERL5OPT> environment varialbe
+
+=back
+
+=item Modules and Pragmata
+
+=over 4
+
+=item New Modules and Pragmata
+
+C<autodie>, C<Compress::Raw::Bzip2>, C<parent>, C<Parse::CPAN::Meta>
+
+=item Pragmata Changes
+
+C<overloading>, C<attributes>, C<attrs>, C<base>, C<bigint>, C<bignum>,
+C<bigrat>, C<charnames>, C<constant>, C<feature>, C<fields>, C<lib>,
+C<open>, C<overload>, C<overloading>, C<version>
+
+=item Updated Modules
+
+C<Archive::Extract>, C<Archive::Tar>, C<Attribute::Handlers>,
+C<AutoLoader>, C<AutoSplit>, C<B>, C<B::Debug>, C<B::Deparse>, C<B::Lint>,
+C<B::Xref>, C<Benchmark>, C<Carp>, C<CGI>, C<Compress::Zlib>, C<CPAN>,
+C<CPANPLUS>, C<CPANPLUS::Dist::Build>, C<Cwd>, C<Data::Dumper>, C<DB>,
+C<DB_File>, C<Devel::PPPort>, C<Digest::MD5>, C<Digest::SHA>, C<DirHandle>,
+C<Dumpvalue>, C<DynaLoader>, C<Encode>, C<Errno>, C<Exporter>,
+C<ExtUtils::CBuilder>, C<ExtUtils::Command>, C<ExtUtils::Constant>,
+C<ExtUtils::Embed>, C<ExtUtils::Install>, C<ExtUtils::MakeMaker>,
+C<ExtUtils::Manifest>, C<ExtUtils::ParseXS>, C<Fatal>, C<File::Basename>,
+C<File::Compare>, C<File::Copy>, C<File::Fetch>, C<File::Find>,
+C<File::Path>, C<File::Spec>, C<File::stat>, C<File::Temp>, C<FileCache>,
+C<FileHandle>, C<Filter::Simple>, C<Filter::Util::Call>, C<FindBin>,
+C<GDBM_File>, C<Getopt::Long>, C<Hash::Util::FieldHash>, C<I18N::Collate>,
+C<IO>, C<IO::Compress::*>, C<IO::Dir>, C<IO::Handle>, C<IO::Socket>,
+C<IO::Zlib>, C<IPC::Cmd>, C<IPC::Open3>, C<IPC::SysV>, C<lib>,
+C<List::Util>, C<Locale::MakeText>, C<Log::Message>, C<Math::BigFloat>,
+C<Math::BigInt>, C<Math::BigInt::FastCalc>, C<Math::BigRat>,
+C<Math::Complex>, C<Math::Trig>, C<Memoize>, C<Module::Build>,
+C<Module::CoreList>, C<Module::Load>, C<Module::Load::Conditional>,
+C<Module::Loaded>, C<Module::Pluggable>, C<NDBM_File>, C<Net::Ping>,
+C<NEXT>, C<Object::Accessor>, C<OS2::REXX>, C<Package::Constants>,
+C<PerlIO>, C<PerlIO::via>, C<Pod::Man>, C<Pod::Parser>, Pod::Perldoc,
+C<Pod::Simple>, C<Pod::Text>, C<POSIX>, C<Safe>, C<Scalar::Util>,
+C<SelectSaver>, C<SelfLoader>, C<Socket>, C<Storable>, C<Switch>,
+C<Symbol>, C<Sys::Syslog>, C<Term::ANSIColor>, C<Term::ReadLine>,
+C<Term::UI>, C<Test::Harness>, C<Test::Simple>, C<Text::ParseWords>,
+C<Text::Tabs>, C<Text::Wrap>, C<Thread::Queue>, C<Thread::Semaphore>,
+C<threads>, C<threads::shared>, C<Tie::RefHash>, C<Tie::StdHandle>,
+C<Time::HiRes>, C<Time::Local>, C<Time::Piece>, C<Unicode::Normalize>,
+C<Unicode::UCD>, C<UNIVERSAL>, C<Win32>, C<Win32API::File>, C<XSLoader>
+
+=back
+
+=item Utility Changes
+
+F<h2ph>, F<h2xs>, F<perl5db.pl>, F<perlbug>, F<perlthanks>
+
+=item New Documentation
+
+L<perlhaiku>, L<perlmroapi>, L<perlperf>, L<perlrepository>, L<perlthanks>
+
+=item Changes to Existing Documentation
+
+=over 4
+
+=item Documented -X overloading.
+
+=item Documented that when() treats specially most of the filetest
+operators
+
+=item Documented when as a syntax modifier
+
+=item Eliminated "Old Perl threads tutorial", which describes 5005 threads.
+
+=item Correct previous documentation: v-strings are not deprecated
+
+=back
+
+=item Performance Enhancements
+
+=item Installation and Configuration Improvements
+
+=over 4
+
+=item F<ext/> reorganisation
+
+=item Configuration improvements
+
+=item Compilation improvements
+
+=item Platform Specific Changes
+
+AIX, Cygwin, DomainOS, FreeBSD, Irix, Haiku, MiNT, MirOS BSD, NetBSD,
+Stratus VOS, Symbian, Win32, VMS
+
+=back
+
+=item Selected Bug Fixes
+
+=item New or Changed Diagnostics
+
+C<panic: sv_chop %s>, C<Can't locate package %s for the parents of %s>,
+C<v-string in use/require is non-portable>, C<Deep recursion on subroutine
+"%s">
+
+=item Changed Internals
+
+C<SVf_UTF8>, C<SVs_TEMP>
+
+=item New Tests
+
+t/comp/retainedlines.t, t/io/perlio_fail.t, t/io/perlio_leaks.t,
+t/io/perlio_open.t, t/io/perlio.t, t/io/pvbm.t, t/mro/package_aliases.t,
+t/op/dbm.t, t/op/index_thr.t, t/op/pat_thr.t, t/op/qr_gc.t,
+t/op/reg_email_thr.t, t/op/regexp_qr_embed_thr.t,
+t/op/regexp_unicode_prop.t, t/op/regexp_unicode_prop_thr.t,
+t/op/reg_nc_tie.t, t/op/reg_posixcc.t, t/op/re.t, t/op/setpgrpstack.t,
+t/op/substr_thr.t, t/op/upgrade.t, t/uni/lex_utf8.t, t/uni/tie.t
+
+=item Known Problems
+
+=item Deprecations
+
+=item Acknowledgements
+
+=item Reporting Bugs
+
+=item SEE ALSO
+
+=back
+
+=over 4
+
+=item TODO
+
+=item API
+
+=over 4
+
+=item Move the reg_stringify logic to Perl_sv_2pv_flags
+
+=item mg_copy ought to take an I32
+
+=item Perl_store_cop_label() isn't meant to be part of the public API.
+
+=item Perl_gv_fetchmethod{,_autoload,_flags} are actually never* called
+with a non-NULL stash. 
+So change the parameter to NN.
+
+=item Promote Perl_setdefout() to the public API.
+
+=item Add get_cvs() as a shortcut for STR_WITH_LEN() and
+Perl_get_cvn_flags()
+
+=item In Perl_newCONSTSUB(), sv should not be NULL.
+
+=item GvUNIQUE* have been defined as 0 since 2005/06/30 - high time to
+remove them.
+
+=item invert and rename PERL_MEM_LOG_STDERR to PERL_MEM_LOG_NOIMPL
+
+=item simplify PERL_MEM_LOG
+
+=item Add a parameter "destructing" to Gv_AMupdate()
+
+=item Modify the return value of Gv_AMupdate to indicate a compilation
+error
+
+=item local $SIG{FOO} = sub {...}; sets signal handler to SIG_DFL
+
+=item Respecting inc_version_list while processing PERL_VENDORLIB_STEM
+
+=item Change PL_debug behaviour 
+
+=item Tied filehandles now have an additional method EOF which provides the
+EOF type
+
+=item Perl is now smarter about adding a -I dir to the beginning or end of
+@INC
+
+=item On scope end, delete localized array elements that should not exist
+anymore, so that the array recovers its previous length. Honour EXISTS and
+DELETE for tied arrays.
+
+=item When a glob is deleted, mark its sub as ANON.
+
+=item Require a space or a newline after a "#line XXX" directive
+
+=item Forbid using "foreach" as an attribute
+
+=item Unregister signal handlers before destroying my_perl
+
+=item Perl_magic_clearsig() needs to remove magic, else delete $SIG{INT}
+returns undef
+
+=item [perl #66452] TMPDIR not honored when opening an anonymous temporary
+file
+
+=item The attached patch to perlio.c fixes the problem of errno getting
+set.
+
+=item Trim all trailing / from "." in @INC when filling %INC
+
+=item Don't enqueue pending signals during global destruction
+
+=item Eliminate struct regexp_allocated and xpvio_allocated.
+
+=back
+
+=item internals
+
+=over 4
+
+=item [perl #47047] Use of inherited AUTOLOAD for non-method is deprecated
+
+=item Remove the definitions of Null(), Nullch, Nullfp, Nullsv and PL_na
+when code is within the perl source tree
+
+=item Replace our assert-which-can-be-caught-by-eval with the real deal
+from the standard C library.
+
+=item Tweak Perl_sv_upgrade() so that references can upgrade to SVt_PV
+
+=item Eliminate prelen from struct regexp. 
+
+=item Change Perl_av_iter_p() to return IV* rather than I32* (which means
+
+=item Reorder the external regexp flags to get RXf_PMf_STD_PMMOD into the
+
+=item Re-implement the SvOOK() hack to store the offset as a BER encoded
+number in the part of the PVX that is being released. 
+(It will always
+fit, as chopping off 1 byte gives just enough space for recording a
+delta of up to 127). This allows SvOOK() to co-exist with SvIOK_on(),
+which means all the calls to SvOOK_off() [with the possibility of a
+call to sv_backoff()] in SvIOK_on() can be removed. This ought to make
+a lot of straight line code a little bit simpler.
+OOK()d scalars can now be SVt_PV, as the IVX isn't needed.
+
+=item Abolish wraplen from struct regexp. We're already storing it in
+SvCUR.
+
+=item Make Perl_pregcomp() use SvUTF8() of the pattern, rather than the
+flag bit in pmflags, to decide whether the pattern is UTF-8.
+
+=item Abolish RXf_UTF8. Store the UTF-8-ness of the pattern with SvUTF8().
+
+=item In struct regexp move the member paren_names to the IV union.
+
+=item Make REGEXP a type distinct from SV. (Much like AV, CV, GV, HV).
+
+=item Allow sv_setsv_flags() to copy SVt_REGEXP much like it copies
+SVt_FORMAT - the just string buffer.
+
+=item Correct a long-standing ithreads reference counting anonamly
+
+=item In PL_regexp_padav, store regexps via real references, rather than
+hiding them within IVs. 
+
+=item With regexps stored as real RVs, we can eliminate SvREPADTMP().
+
+=item REGEXPs are now stored directly in PL_regex_padav, rather than
+indirectly via RVs.
+
+=item Remove code that protected pp_qr against REGEXPs going away during
+global destruction whilst they were stored via true references in
+PL_regex_padav. 
+
+=item Remove PM_GETRE_SAFE and PM_SETRE_SAFE as nothing uses them.
+
+=item Note the U8 sized space created by removing -P, and check that it is
+now an illegal command line flag.
+
+=item Pack the recycled pad offsets into an SV at PL_regex_pad[0]. 
+
+=item Re-order so that the !SvOK() case is last (which should be rare)
+
+=item Extend PUSHFORMAT() to take a second parameter to set retop, to save
+NULLing it and then reassigning.
+
+=item Split struct block_sub into struct block_sub and struct block_format.
+
+=item Change the wantarray result from caller from IV to bool for the
+SCALAR/ARRAY case. 
+
+=item Give G_VOID, G_SCALAR and G_ARRAY the same numeric values as
+OPf_WANT_VOID, OPf_WANT_SCALAR and OPf_WANT_LIST.
+
+=item Squeeze the context type down to 4 bits, and move the private flags
+to fit within the next 4 bits.
+
+=item In struct block change blku_type from U8 to U16, and the "spare" U8
+to U16, with the lockstep changes in struct subst. 
+Eliminate lval from
+struct block_sub, and instead store it in the U16 in struct block.
+
+=item In struct block_eval, eliminate old_in_eval and old_op_type by
+storing the data in blk_u16.
+
+=item The layout for struct block_loop under ithreads can be simplified.
+
+=item In XS_PerlIO_get_layers() take advantage of the implementation of
+
+=item Micro-optimise the order of the context types. [Because I can :-)]
+
+=item [patch] optimize OP_IS_(FILETEST|SOCKET) macros
+
+=item Eliminate ck_lengthconst.
+
+=item Chainsaw DEBUG_S out, as suggested by Vincent Pit.
+
+=item Unsupported private API functions are now declared "static" to
+prevent leakage to the public API
+
+=item Perl_cv_ckproto() is not part of the public API, and not used
+anywhere. It has been removed
+
+=item Remove all the 5005threads specific mutex macros, which are now
+vestigial.
+
+=item Do not honor TMPDIR for anonymous temporary files when tainting
+
+=item Add a pluggable hook in op_free()
+
+=back
+
+=back
+
+=head2 perl5101delta - what is new for perl v5.10.1
 
 =over 4
 
@@ -7336,7 +8024,7 @@ flip-flop operators, defined-or operator
 
 =item Smart match changes
 
-=item Labels can't be keywords
+=item Other incompatible changes
 
 =back
 
@@ -7344,13 +8032,17 @@ flip-flop operators, defined-or operator
 
 =over 4
 
+=item Unicode Character Database 5.1.0
+
+=item A proper interface for pluggable Method Resolution Orders
+
 =item The C<overloading> pragma
 
-=item C<\N> regex escape
-
-=item Implicit strictures
-
 =item Parallel tests
+
+=item DTrace support
+
+=item Support for C<configure_requires> in CPAN module metadata
 
 =back
 
@@ -7358,39 +8050,107 @@ flip-flop operators, defined-or operator
 
 =over 4
 
+=item New Modules and Pragmata
+
+C<autodie>, C<Compress::Raw::Bzip2>, C<parent>, C<Parse::CPAN::Meta>
+
 =item Pragmata Changes
 
-C<overloading>
+C<attributes>, C<attrs>, C<base>, C<bigint>, C<bignum>, C<bigrat>,
+C<charnames>, C<constant>, C<feature>, C<fields>, C<lib>, C<open>,
+C<overload>, C<overloading>, C<version>
 
-=item Selected Changes to Core Modules
+=item Updated Modules
+
+C<Archive::Extract>, C<Archive::Tar>, C<Attribute::Handlers>,
+C<AutoLoader>, C<AutoSplit>, C<B>, C<B::Debug>, C<B::Deparse>, C<B::Lint>,
+C<B::Xref>, C<Benchmark>, C<Carp>, C<CGI>, C<Compress::Zlib>, C<CPAN>,
+C<CPANPLUS>, C<CPANPLUS::Dist::Build>, C<Cwd>, C<Data::Dumper>, C<DB>,
+C<DB_File>, C<Devel::PPPort>, C<Digest::MD5>, C<Digest::SHA>, C<DirHandle>,
+C<Dumpvalue>, C<DynaLoader>, C<Encode>, C<Errno>, C<Exporter>,
+C<ExtUtils::CBuilder>, C<ExtUtils::Command>, C<ExtUtils::Constant>,
+C<ExtUtils::Embed>, C<ExtUtils::Install>, C<ExtUtils::MakeMaker>,
+C<ExtUtils::Manifest>, C<ExtUtils::ParseXS>, C<Fatal>, C<File::Basename>,
+C<File::Compare>, C<File::Copy>, C<File::Fetch>, C<File::Find>,
+C<File::Path>, C<File::Spec>, C<File::stat>, C<File::Temp>, C<FileCache>,
+C<FileHandle>, C<Filter::Simple>, C<Filter::Util::Call>, C<FindBin>,
+C<GDBM_File>, C<Getopt::Long>, C<Hash::Util::FieldHash>, C<I18N::Collate>,
+C<IO>, C<IO::Compress::*>, C<IO::Dir>, C<IO::Handle>, C<IO::Socket>,
+C<IO::Zlib>, C<IPC::Cmd>, C<IPC::Open3>, C<IPC::SysV>, C<lib>,
+C<List::Util>, C<Locale::MakeText>, C<Log::Message>, C<Math::BigFloat>,
+C<Math::BigInt>, C<Math::BigInt::FastCalc>, C<Math::BigRat>,
+C<Math::Complex>, C<Math::Trig>, C<Memoize>, C<Module::Build>,
+C<Module::CoreList>, C<Module::Load>, C<Module::Load::Conditional>,
+C<Module::Loaded>, C<Module::Pluggable>, C<NDBM_File>, C<Net::Ping>,
+C<NEXT>, C<Object::Accessor>, C<OS2::REXX>, C<Package::Constants>,
+C<PerlIO>, C<PerlIO::via>, C<Pod::Man>, C<Pod::Parser>, C<Pod::Simple>,
+C<Pod::Text>, C<POSIX>, C<Safe>, C<Scalar::Util>, C<SelectSaver>,
+C<SelfLoader>, C<Socket>, C<Storable>, C<Switch>, C<Symbol>,
+C<Sys::Syslog>, C<Term::ANSIColor>, C<Term::ReadLine>, C<Term::UI>,
+C<Test::Harness>, C<Test::Simple>, C<Text::ParseWords>, C<Text::Tabs>,
+C<Text::Wrap>, C<Thread::Queue>, C<Thread::Semaphore>, C<threads>,
+C<threads::shared>, C<Tie::RefHash>, C<Tie::StdHandle>, C<Time::HiRes>,
+C<Time::Local>, C<Time::Piece>, C<Unicode::Normalize>, C<Unicode::UCD>,
+C<UNIVERSAL>, C<Win32>, C<Win32API::File>, C<XSLoader>
 
 =back
 
 =item Utility Changes
 
-=item Documentation
+F<h2ph>, F<h2xs>, F<perl5db.pl>, F<perlthanks>
+
+=item New Documentation
+
+L<perlhaiku>, L<perlmroapi>, L<perlperf>, L<perlrepository>, L<perlthanks>
+
+=item Changes to Existing Documentation
 
 =item Performance Enhancements
 
 =item Installation and Configuration Improvements
 
-=item Selected Bug Fixes
+=over 4
 
-C<-I> on shebang line now adds directories in front of @INC, C<kill> is now
-fatal when called on non-numeric process identifiers, C<-C> on the shebang
-line is once more permitted
+=item F<ext/> reorganisation
+
+=item Configuration improvements
+
+=item Compilation improvements
+
+=item Platform Specific Changes
+
+AIX, Cygwin, FreeBSD, Irix, Haiku, MirOS BSD, NetBSD, Stratus VOS, Symbian,
+Win32, VMS
+
+=back
+
+=item Selected Bug Fixes
 
 =item New or Changed Diagnostics
 
+C<panic: sv_chop %s>, C<Can't locate package %s for the parents of %s>,
+C<v-string in use/require is non-portable>, C<Deep recursion on subroutine
+"%s">
+
 =item Changed Internals
+
+C<SVf_UTF8>, C<SVs_TEMP>
+
+=item New Tests
+
+t/comp/retainedlines.t, t/io/perlio_fail.t, t/io/perlio_leaks.t,
+t/io/perlio_open.t, t/io/perlio.t, t/io/pvbm.t, t/mro/package_aliases.t,
+t/op/dbm.t, t/op/index_thr.t, t/op/pat_thr.t, t/op/qr_gc.t,
+t/op/reg_email_thr.t, t/op/regexp_qr_embed_thr.t,
+t/op/regexp_unicode_prop.t, t/op/regexp_unicode_prop_thr.t,
+t/op/reg_nc_tie.t, t/op/reg_posixcc.t, t/op/re.t, t/op/setpgrpstack.t,
+t/op/substr_thr.t, t/op/upgrade.t, t/uni/lex_utf8.t, t/uni/tie.t
 
 =item Known Problems
 
-=over 4
+=item Deprecations
 
-=item Platform Specific Problems
-
-=back
+=item Acknowledgements
 
 =item Reporting Bugs
 
