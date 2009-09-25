@@ -278,7 +278,7 @@ Some support for DTrace has been added. See "DTrace support" in F<INSTALL>.
 =head2 Support for C<configure_requires> in CPAN module metadata
 
 Both C<CPAN> and C<CPANPLUS> now support the C<configure_requires> keyword
-in the C<META.yml> metadata file included in most recent CPAN distributions.
+in the F<META.yml> metadata file included in most recent CPAN distributions.
 This allows distribution authors to specify configuration prerequisites that
 must be installed before running F<Makefile.PL> or F<Build.PL>.
 
@@ -993,7 +993,7 @@ subroutine stubs.
 
 =item F<perlbug>
 
-F<perlbug> now uses %Module::CoreList::bug_tracker to print out upstream bug
+F<perlbug> now uses C<%Module::CoreList::bug_tracker> to print out upstream bug
 tracker URLs.
 
 Where the user names a module that their bug report is about, and we know the
@@ -1057,17 +1057,11 @@ generated at build time, rather than being shipped as part of the release.
 
 =head2 Documented that when() treats specially most of the filetest operators
 
-=head2 Documented that DESTROY is subject to AUTOLOAD, and the related optimisations.
-
 =head2 Documented when as a syntax modifier
 
 =head2 Eliminated "Old Perl threads tutorial", which describes 5005 threads.
 
 pod/perlthrtut.pod is the same material reworked for ithreads.
-
-=head2 Removed a link to the attrs pragma, which has now been removed.
-
-=head2 update PERL_MEM_LOG in perlhack.pod
 
 =head2 Correct previous documentation: v-strings are not deprecated
 
@@ -1246,9 +1240,9 @@ C<File::Copy> now detects Unix compatibility mode on VMS.
 
 =over 4
 
-=item 
+=item *
 
-=item C<-I> on shebang line now adds directories in front of @INC.
+C<-I> on shebang line now adds directories in front of @INC.
 as documented, and as does C<-I> when specified on the command-line.
 (Renée Bäcker)
 
@@ -1291,7 +1285,7 @@ arguments [RT #59998].
 
 =item *
 
-The C<-i.suffix> command-line switch now recreates the file using
+The C<-i>I<.suffix> command-line switch now recreates the file using
 restricted permissions, before changing its mode to match the original
 file. This eliminates a potential race condition [RT #60904].
 
@@ -1302,17 +1296,17 @@ On some UNIX systems, the value in C<$?> would not have the top bit set
 
 =item *
 
-Under some circumstances, $^R could incorrectly become undefined
+Under some circumstances, C<$^R> could incorrectly become undefined
 [RT #57042].
 
 =item *
 
-(XS) In various hash functions, passing a pre-computed hash to when the
-key is UTF-8 might result in an incorrect lookup.
+In the XS API, various hash functions, when passed a pre-computed hash where
+the key is UTF-8, might result in an incorrect lookup.
 
 =item *
 
-(XS) Including F<XSUB.h> before F<perl.h> gave a compile-time error
+XS code including F<XSUB.h> before F<perl.h> gave a compile-time error
 [RT #57176].
 
 =item *
