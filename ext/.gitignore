@@ -24,6 +24,7 @@ Makefile
 /Text-Soundex/Makefile.PL
 /Term-ANSIColor/Makefile.PL
 /base/Makefile.PL
+/I18N-LangTags/Makefile.PL
 
 # ignore all vim swap files but the one bundled in Module::Pluggable for testing
 *.swp
