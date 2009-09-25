@@ -153,6 +153,7 @@ Perl_free_tmps
 Perl_gp_free
 Perl_gp_tmprefcnt
 Perl_gp_ref
+Perl_gv_add_by_type
 Perl_gv_AVadd
 Perl_gv_HVadd
 Perl_gv_IOadd

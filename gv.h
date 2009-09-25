@@ -186,6 +186,10 @@ Return the SV from the GV.
 #define GV_NOADD_MASK	(GV_NOADD_NOINIT|GV_NOEXPAND|GV_NOTQUAL)
 /* The bit flags that don't cause gv_fetchpv() to add a symbol if not found */
 
+#define gv_AVadd(gv) gv_add_by_type((gv), SVt_PVAV)
+#define gv_HVadd(gv) gv_add_by_type((gv), SVt_PVHV)
+#define gv_SVadd(gv) gv_add_by_type((gv), SVt_NULL)
+
 /*
  * Local variables:
  * c-indentation-style: bsd

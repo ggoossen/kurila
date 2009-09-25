@@ -834,13 +834,18 @@ PERL_INLINE_CALLCONV AV*	Perl_GvAVn(pTHX_ GV* gv)
 #define PERL_ARGS_ASSERT_GVAVN	\
 	assert(gv)
 
-PERL_CALLCONV GV*	Perl_gv_AVadd(pTHX_ GV* gv)
+PERL_CALLCONV GV*	Perl_gv_add_by_type(pTHX_ GV *gv, svtype type)
 			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_GV_ADD_BY_TYPE	\
+	assert(gv)
+
+/* PERL_CALLCONV GV*	Perl_gv_AVadd(pTHX_ GV* gv)
+			__attribute__nonnull__(pTHX_1); */
 #define PERL_ARGS_ASSERT_GV_AVADD	\
 	assert(gv)
 
-PERL_CALLCONV GV*	Perl_gv_HVadd(pTHX_ GV* gv)
-			__attribute__nonnull__(pTHX_1);
+/* PERL_CALLCONV GV*	Perl_gv_HVadd(pTHX_ GV* gv)
+			__attribute__nonnull__(pTHX_1); */
 #define PERL_ARGS_ASSERT_GV_HVADD	\
 	assert(gv)
 
@@ -5544,8 +5549,8 @@ PERL_CALLCONV GV*	Perl_gv_fetchsv(pTHX_ SV *name, I32 flags, const svtype sv_typ
 
 
 #ifdef PERL_DONT_CREATE_GVSV
-PERL_CALLCONV GV*	Perl_gv_SVadd(pTHX_ GV* gv)
-			__attribute__nonnull__(pTHX_1);
+/* PERL_CALLCONV GV*	Perl_gv_SVadd(pTHX_ GV *gv)
+			__attribute__nonnull__(pTHX_1); */
 #define PERL_ARGS_ASSERT_GV_SVADD	\
 	assert(gv)
 

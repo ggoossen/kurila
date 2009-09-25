@@ -347,8 +347,9 @@ Ap	|void	|gp_free	|NULLOK GV* gv
 Ap	|void	|gp_tmprefcnt	|NN GP* gp
 Ap	|GP*	|gp_ref		|NULLOK GP* gp
 ip	|AV*	|GvAVn	|NN GV* gv
-Ap	|GV*	|gv_AVadd	|NN GV* gv
-Ap	|GV*	|gv_HVadd	|NN GV* gv
+Ap	|GV*	|gv_add_by_type	|NN GV *gv|svtype type
+Apmb	|GV*	|gv_AVadd	|NN GV* gv
+Apmb	|GV*	|gv_HVadd	|NN GV* gv
 Ap	|GV*	|gv_IOadd	|NN GV* gv
 ApPi	|IO*	|gv_io	|NN GV* gv
 Ap	|void	|gv_check	|NN const HV* stash
@@ -1839,7 +1840,7 @@ Ap	|GV*	|gv_fetchpvn_flags|NN const char* name|STRLEN len|I32 flags|const svtype
 Ap	|GV*	|gv_fetchsv|NN SV *name|I32 flags|const svtype sv_type
 
 #ifdef PERL_DONT_CREATE_GVSV
-Ap	|GV*	|gv_SVadd	|NN GV* gv
+Apbm	|GV*	|gv_SVadd	|NN GV *gv
 #endif
 Apo	|bool	|ckwarn		|U32 w
 Apo	|bool	|ckwarn_d	|U32 w

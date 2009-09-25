@@ -314,8 +314,7 @@
 #ifdef PERL_CORE
 #define GvAVn			Perl_GvAVn
 #endif
-#define gv_AVadd		Perl_gv_AVadd
-#define gv_HVadd		Perl_gv_HVadd
+#define gv_add_by_type		Perl_gv_add_by_type
 #define gv_IOadd		Perl_gv_IOadd
 #define gv_io			Perl_gv_io
 #define gv_check		Perl_gv_check
@@ -1749,7 +1748,6 @@
 #define gv_fetchpvn_flags	Perl_gv_fetchpvn_flags
 #define gv_fetchsv		Perl_gv_fetchsv
 #ifdef PERL_DONT_CREATE_GVSV
-#define gv_SVadd		Perl_gv_SVadd
 #endif
 #ifdef PERL_CORE
 #define offer_nice_chunk	Perl_offer_nice_chunk
@@ -2539,8 +2537,7 @@
 #ifdef PERL_CORE
 #define GvAVn(a)		Perl_GvAVn(aTHX_ a)
 #endif
-#define gv_AVadd(a)		Perl_gv_AVadd(aTHX_ a)
-#define gv_HVadd(a)		Perl_gv_HVadd(aTHX_ a)
+#define gv_add_by_type(a,b)	Perl_gv_add_by_type(aTHX_ a,b)
 #define gv_IOadd(a)		Perl_gv_IOadd(aTHX_ a)
 #define gv_io(a)		Perl_gv_io(aTHX_ a)
 #define gv_check(a)		Perl_gv_check(aTHX_ a)
@@ -3988,7 +3985,6 @@
 #define gv_fetchpvn_flags(a,b,c,d)	Perl_gv_fetchpvn_flags(aTHX_ a,b,c,d)
 #define gv_fetchsv(a,b,c)	Perl_gv_fetchsv(aTHX_ a,b,c)
 #ifdef PERL_DONT_CREATE_GVSV
-#define gv_SVadd(a)		Perl_gv_SVadd(aTHX_ a)
 #endif
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #endif

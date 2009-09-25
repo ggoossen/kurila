@@ -36,38 +36,26 @@ Perl stores its global variables.
 #define PERL_IN_GV_C
 #include "perl.h"
 
-#ifdef PERL_DONT_CREATE_GVSV
 GV *
-Perl_gv_SVadd(pTHX_ GV *gv)
+Perl_gv_add_by_type(pTHX_ GV *gv, svtype type)
 {
-    PERL_ARGS_ASSERT_GV_SVADD;
+    SV **where;
 
-    assert( SvTYPE((SV*)gv) == SVt_PVGV );
-    if (!GvSV(gv))
-	GvSV(gv) = newSV(0);
-    return gv;
-}
-#endif
+    PERL_ARGS_ASSERT_GV_ADD_BY_TYPE;
 
-GV *
-Perl_gv_AVadd(pTHX_ register GV *gv)
-{
-    PERL_ARGS_ASSERT_GV_AVADD;
+    if (!gv || SvTYPE((const SV *)gv) != SVt_PVGV)
+	Perl_croak(aTHX_ "Bad symbol for %s", type == SVt_PVAV ? "array" : type == SVt_PVHV ? "hash" : "scalar");
 
-    assert( SvTYPE((SV*)gv) == SVt_PVGV );
-    if (!GvAV(gv))
-	GvAV(gv) = newAV();
-    return gv;
-}
+    if (type == SVt_PVHV) {
+	where = (SV **)&GvHV(gv);
+    } else if (type == SVt_PVAV) {
+	where = (SV **)&GvAV(gv);
+    } else {
+	where = &GvSV(gv);
+    }
 
-GV *
-Perl_gv_HVadd(pTHX_ register GV *gv)
-{
-    PERL_ARGS_ASSERT_GV_HVADD;
-
-    assert( SvTYPE((SV*)gv) == SVt_PVGV );
-    if (!GvHV(gv))
-	GvHV(gv) = newHV();
+    if (!*where)
+	*where = newSV_type(type);
     return gv;
 }
 
