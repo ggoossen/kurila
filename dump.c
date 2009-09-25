@@ -88,15 +88,28 @@ Perl_dump_vindent(pTHX_ I32 level, PerlIO *file, const char* pat, va_list *args)
 void
 Perl_dump_all(pTHX)
 {
+    dump_all_perl(FALSE);
+}
+
+void
+Perl_dump_all_perl(pTHX_ bool justperl)
+{
+
     dVAR;
     PerlIO_setlinebuf(Perl_debug_log);
     if (PL_main_root)
 	op_dump(RootopOp(PL_main_root));
-/*     dump_packsubs(PL_defstash); */
+    dump_packsubs_perl(PL_defstash, justperl);
 }
 
 void
 Perl_dump_packsubs(pTHX_ const HV *stash)
+{
+    dump_packsubs_perl(stash, FALSE);
+}
+
+void
+Perl_dump_packsubs_perl(pTHX_ const HV *stash, bool justperl)
 {
     dVAR;
     I32	i;
@@ -112,11 +125,11 @@ Perl_dump_packsubs(pTHX_ const HV *stash)
 	    if (SvTYPE(gv) != SVt_PVGV || !GvGP(gv))
 		continue;
 	    if (GvCVu(gv))
-		dump_sub(gv);
+		dump_sub_perl(gv, justperl);
 	    if (HeKEY(entry)[HeKLEN(entry)-1] == ':') {
 		const HV * const hv = GvHV(gv);
 		if (hv && (hv != PL_defstash))
-		    dump_packsubs(hv);		/* nested package */
+		    dump_packsubs_perl(hv, justperl); /* nested package */
 	    }
 	}
     }
@@ -125,10 +138,20 @@ Perl_dump_packsubs(pTHX_ const HV *stash)
 void
 Perl_dump_sub(pTHX_ const GV *gv)
 {
-    SV * const sv = sv_newmortal();
+    dump_sub_perl(gv, FALSE);
+}
+
+void
+Perl_dump_sub_perl(pTHX_ const GV *gv, bool justperl)
+{
+    SV * sv;
 
     PERL_ARGS_ASSERT_DUMP_SUB;
 
+    if (justperl && (CvISXSUB(GvCV(gv)) || !CvROOT(GvCV(gv))))
+	return;
+
+    sv = sv_newmortal();
     gv_fullname3(sv, gv, NULL);
     Perl_dump_indent(aTHX_ 0, Perl_debug_log, "SUB %s = ", SvPVX_const(sv));
     if (CvISXSUB(GvCV(gv)))
@@ -1976,9 +1999,16 @@ Perl_xmldump_vindent(pTHX_ I32 level, PerlIO *file, const char* pat, va_list *ar
 void
 Perl_xmldump_all(pTHX)
 {
+    xmldump_all_perl(FALSE);
+}
+
+void
+Perl_xmldump_all_perl(pTHX_ bool justperl)
+{
     PerlIO_setlinebuf(PL_xmlfp);
     if (PL_main_root)
 	op_xmldump(PL_main_root);
+    xmldump_packsubs_perl(PL_defstash, justperl)
     if (PL_xmlfp != (PerlIO*)PerlIO_stdout())
 	PerlIO_close(PL_xmlfp);
     PL_xmlfp = 0;
@@ -2012,10 +2042,20 @@ Perl_xmldump_packsubs(pTHX_ const HV *stash)
 void
 Perl_xmldump_sub(pTHX_ const GV *gv)
 {
-    SV * const sv = sv_newmortal();
+    xmldump_sub_perl(gv, FALSE);
+}
+
+void
+Perl_xmldump_sub_perl(pTHX_ const GV *gv, bool justperl)
+{
+    SV * sv;
 
     PERL_ARGS_ASSERT_XMLDUMP_SUB;
 
+    if (justperl && (CvISXSUB(GvCV(gv)) || !CvROOT(GvCV(gv))))
+	return;
+
+    sv = sv_newmortal();
     gv_fullname3(sv, gv, NULL);
     Perl_xmldump_indent(aTHX_ 0, PL_xmlfp, "\nSUB %s = ", SvPVX_const(sv));
     if (CvXSUB(GvCV(gv)))
