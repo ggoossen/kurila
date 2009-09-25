@@ -5100,7 +5100,6 @@ Perl_ck_shift(pTHX_ OP *o)
     PERL_ARGS_ASSERT_CK_SHIFT;
 
     if (!(o->op_flags & OPf_KIDS)) {
-	/* FIXME - this can be refactored to reduce code in #ifdefs  */
 #ifdef PERL_MAD
 	OP * const oldo = o;
 #endif
