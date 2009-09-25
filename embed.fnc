@@ -350,7 +350,7 @@ ip	|AV*	|GvAVn	|NN GV* gv
 Ap	|GV*	|gv_add_by_type	|NN GV *gv|svtype type
 Apmb	|GV*	|gv_AVadd	|NN GV* gv
 Apmb	|GV*	|gv_HVadd	|NN GV* gv
-Ap	|GV*	|gv_IOadd	|NN GV* gv
+Apmb	|GV*	|gv_IOadd	|NN GV* gv
 ApPi	|IO*	|gv_io	|NN GV* gv
 Ap	|void	|gv_check	|NN const HV* stash
 Ap	|void	|gv_efullname3	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix
@@ -1840,7 +1840,7 @@ Ap	|GV*	|gv_fetchpvn_flags|NN const char* name|STRLEN len|I32 flags|const svtype
 Ap	|GV*	|gv_fetchsv|NN SV *name|I32 flags|const svtype sv_type
 
 #ifdef PERL_DONT_CREATE_GVSV
-Apbm	|GV*	|gv_SVadd	|NN GV *gv
+Apbm	|GV*	|gv_SVadd	|NULLOK GV *gv
 #endif
 Apo	|bool	|ckwarn		|U32 w
 Apo	|bool	|ckwarn_d	|U32 w
