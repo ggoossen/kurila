@@ -1072,10 +1072,10 @@ References, Tutorials, Task-Oriented, Special Topics
 
 =item Is there an IDE or Windows Perl Editor?
 
-Eclipse, Enginsite, Komodo, Open Perl IDE, OptiPerl, PerlBuilder,
+Eclipse, Enginsite, Komodo, Open Perl IDE, OptiPerl, Padre, PerlBuilder,
 visiPerl+, Visual Perl, Zeus, GNU Emacs, MicroEMACS, XEmacs, Jed, Elvis,
-Vile, Vim, Codewright, MultiEdit, SlickEdit, Bash, Ksh, Tcsh, Zsh, Affrus,
-Alpha, BBEdit and BBEdit Lite
+Vile, Vim, Codewright, MultiEdit, SlickEdit, ConTEXT, Bash, Ksh, Tcsh, Zsh,
+Affrus, Alpha, BBEdit and BBEdit Lite
 
 =item Where can I get Perl macros for vi?
 
@@ -1188,10 +1188,11 @@ from decimal to binary
 =item How can I find the Julian Day?
 
 =item How do I find yesterday's date?
+X<date> X<yesterday> X<DateTime> X<Date::Calc> X<Time::Local>
+X<daylight saving time> X<day> X<Today_and_Now> X<localtime>
+X<timelocal>
 
 =item Does Perl have a Year 2000 problem? Is Perl Y2K compliant?
-
-=item Does Perl have a Year 2038 problem?
 
 =back
 
@@ -1222,7 +1223,10 @@ from decimal to binary
 =item How can I count the number of occurrences of a substring within a
 string?
 
+=item Does Perl have a Year 2038 problem?
+
 =item How do I capitalize all the words on one line?
+X<Text::Autoformat> X<capitalize> X<case, title> X<case, sentence>
 
 =item How can I split a [character] delimited string except when inside
 [character]?
@@ -1270,6 +1274,8 @@ intersection of two arrays?
 =item How do I handle linked lists?
 
 =item How do I handle circular lists?
+X<circular> X<array> X<Tie::Cycle> X<Array::Iterator::Circular>
+X<cycle> X<modulus>
 
 =item How do I shuffle an array randomly?
 
@@ -1294,6 +1300,9 @@ X<The Art of Computer Programming> X<Fischer-Krause>
 =over 4
 
 =item How do I process an entire hash?
+
+=item How do I merge two hashes?
+X<hash> X<merge> X<slice, hash>
 
 =item What happens if I add or remove keys from a hash while iterating over
 it?
@@ -1377,7 +1386,7 @@ X<file, counting lines> X<lines> X<line>
 X<-i> X<in-place>
 
 =item How can I copy a file?
-X<copy> X<file, copy>
+X<copy> X<file, copy> X<File::Copy>
 
 =item How do I make a temporary file name?
 X<file, temporary>
@@ -1399,7 +1408,7 @@ X<footer>
 X<write, into a string>
 
 =item How can I open a filehandle to a string?
-X<string>, X<open>, X<IO::Scalar>, X<filehandle>
+X<string> X<open> X<IO::String> X<filehandle>
 
 =item How can I output my numbers with commas added?
 X<number, commify>
@@ -1484,9 +1493,13 @@ X<file, selecting a random line>
 
 =item Why do I get weird spaces when I print an array of lines?
 
-=back
+=item How do I traverse a directory tree?
 
-=item REVISION
+=item How do I delete a directory tree?
+
+=item How do I copy an entire directory?
+
+=back
 
 =item AUTHOR AND COPYRIGHT
 
@@ -1514,6 +1527,16 @@ X<regex, multiline> X<regexp, multiline> X<regular expression, multiline>
 different lines?
 X<..>
 
+=item How do I match XML, HTML, or other nasty, ugly things with a regex?
+X<regex, XML> X<regex, HTML> X<XML> X<HTML> X<pain> X<frustration>
+X<sucking out, will to live>
+
+Solve the balanced text problem from another question in L<perlfaq6>, Try
+the recursive regex features in Perl 5.10 and later. See L<perlre>, Try
+defining a grammar using Perl 5.10's C<(?DEFINE)> feature, Break the
+problem down into sub-problems instead of trying to use a single regex,
+Convince everyone not to use XML or HTML in the first place
+
 =item I put a regular expression into $/ but it didn't work. What's wrong?
 X<$/, regexes in> X<$INPUT_RECORD_SEPARATOR, regexes in>
 X<$RS, regexes in>
@@ -1540,7 +1563,8 @@ file?
 
 =item Can I use Perl regular expressions to match balanced text?
 X<regex, matching balanced test> X<regexp, matching balanced test>
-X<regular expression, matching balanced test>
+X<regular expression, matching balanced test> X<possessive> X<PARNO>
+X<Text::Balanced> X<Regexp::Common> X<backtracking> X<recursion>
 
 =item What does it mean that regexes are greedy?  How can I get around it?
 X<greedy> X<greediness>
@@ -1620,6 +1644,7 @@ commas?
 =item How do I adopt or take over a module already on CPAN?
 
 =item How do I create a class?
+X<class, creation> X<package>
 
 =item How can I tell if a variable is tainted?
 
@@ -1656,9 +1681,9 @@ methods?
 
 =item Why can't a method included in this same file be found?
 
-=item How can I find out my current package?
+=item How can I find out my current or calling package?
 
-=item How can I comment out a large block of perl code?
+=item How can I comment out a large block of Perl code?
 
 =item How do I clear a package?
 
@@ -1685,6 +1710,7 @@ methods?
 =item How do I find out which operating system I'm running under?
 
 =item How come exec() doesn't return?
+X<exec> X<system> X<fork> X<open> X<pipe>
 
 =item How do I do fancy stuff with the keyboard/screen/mouse?
 
@@ -1840,6 +1866,7 @@ file on another machine?
 =item How do I automate an HTML form submission?
 
 =item How do I decode or create those %-encodings on the web?
+X<URI> X<CGI.pm> X<CGI> X<URI::Escape> X<RFC 2396>
 
 =item How do I redirect to another page?
 
@@ -3185,6 +3212,8 @@ Long-running opcodes, Interrupting IO, Restartable system calls, Signals as
 
 =item Safe Pipe Opens
 
+=item Avoiding Pipe Deadlocks
+
 =item Bidirectional Communication with Another Process
 
 =item Bidirectional Communication with Yourself
@@ -3503,11 +3532,10 @@ gethostbyname, gethostent, getnetent, getprotoent, getservent, sethostent,
 setnetent, setprotoent, setservent, endpwent, endgrent, endhostent,
 endnetent, endprotoent, endservent, getsockopt SOCKET,LEVEL,OPTNAME, glob,
 gmtime, ioctl FILEHANDLE,FUNCTION,SCALAR, kill, link, localtime, lstat,
-msgctl, msgget, msgsnd, msgrcv, open, pipe, readlink, rename, select,
-semctl, semget, semop, setgrent, setpgrp, setpriority, setpwent,
-setsockopt, shmctl, shmget, shmread, shmwrite, sockatmark, socketpair,
-stat, symlink, syscall, sysopen, system, times, truncate, umask, utime,
-wait, waitpid
+msgctl, msgget, msgsnd, msgrcv, open, readlink, rename, select, semctl,
+semget, semop, setgrent, setpgrp, setpriority, setpwent, setsockopt,
+shmctl, shmget, shmread, shmwrite, sockatmark, socketpair, stat, symlink,
+syscall, sysopen, system, times, truncate, umask, utime, wait, waitpid
 
 =back
 
@@ -6250,6 +6278,21 @@ L<http://perl.com/>, L<http://use.perl.org/>, L<http://www.perlmonks.org/>
 =item A re-entrant regexp engine
 
 =item Add class set operations to regexp engine
+
+=back
+
+=item Tasks for microperl
+
+=over 4
+
+=item make creating uconfig.sh automatic 
+
+=item make creating Makefile.micro automatic
+
+=item do away with fork/exec/wait?
+
+=item some of the uconfig.sh really needs to be probed (using cc) in
+buildtime:
 
 =back
 
@@ -11470,33 +11513,6 @@ DJGPP, Pthreads
 
 =back
 
-=head2 perlmachten, README.machten - Perl version 5 on Power MachTen
-systems
-
-=over 4
-
-=item DESCRIPTION
-
-=over 4
-
-=item Perl version 5.8.x and greater not supported
-
-=item Compiling Perl 5.6.x on MachTen
-
-=item Failures during C<make test> on MachTen
-
-op/lexassign.t, pragma/warnings.t
-
-=item Building external modules on MachTen
-
-=back
-
-=item AUTHOR
-
-=item DATE
-
-=back
-
 =head2 perlmacos, README.macos - Perl under Mac OS (Classic)
 
 =over 4
@@ -11548,18 +11564,6 @@ op/lexassign.t, pragma/warnings.t
 =item AUTHOR
 
 =item DATE
-
-=back
-
-=head2 perlmint, README.mint - Perl version 5 on Atari MiNT
-
-=over 4
-
-=item DESCRIPTION
-
-=item Known problems with Perl on MiNT
-
-=item AUTHOR
 
 =back
 

@@ -989,8 +989,9 @@ Perl_newHVhv(pTHX_ HV *ohv)
 		const STRLEN len = HeKLEN(oent);
 		const int flags  = HeKFLAGS(oent);
 		HE * const ent   = new_HE();
+		SV *const val    = HeVAL(oent);
 
-		HeVAL(ent)     = newSVsv(HeVAL(oent));
+		HeVAL(ent) = SvIMMORTAL(val) ? val : newSVsv(val);
 		HeKEY_hek(ent)
                     = shared ? share_hek_flags(key, len, hash, flags)
                              :  save_hek_flags(key, len, hash, flags);
