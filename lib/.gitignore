@@ -24,6 +24,7 @@
 /ExtUtils/Installed.pm
 /ExtUtils/Install.pm
 /ExtUtils/Manifest.pm
+/ExtUtils/MANIFEST.SKIP
 /ExtUtils/Miniperl.pm
 /ExtUtils/Packlist.pm
 /ExtUtils/ParseXS.pm
