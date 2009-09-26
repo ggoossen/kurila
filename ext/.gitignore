@@ -10,6 +10,7 @@ Makefile
 !/XS-APItest/notcore.c
 !/XS-Typemap/stdio.c
 /attributes/Makefile.PL
+/constant/Makefile.PL
 /Data-Dumper/Makefile.PL
 /Filter-Util-Call/Makefile.PL
 /Hash-Util-FieldHash/Makefile.PL

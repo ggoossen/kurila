@@ -112,6 +112,8 @@ ext/B/t/pragma.t	See if user pragmas work.
 ext/B/t/showlex.t	See if B::ShowLex works
 ext/B/t/terse.t		See if B::Terse works
 ext/B/typemap			Compiler backend interface types
+ext/constant/lib/constant.pm	For "use constant"
+ext/constant/t/constant.t	See if compile-time constants work
 ext/Cwd/Changes			Cwd extension Changelog
 ext/Cwd/Cwd.xs			Cwd extension external subroutines
 ext/Cwd/Makefile.PL		Cwd extension makefile maker
@@ -691,8 +693,6 @@ lib/compsub.t			See if defining compilation subroutines works
 lib/Config/Extensions.pm	Convenient hash lookup for built extensions
 lib/Config/Extensions.t		See if Config::Extensions works
 lib/Config.t			See if Config works
-lib/constant.pm			For "use constant"
-lib/constant.t			See if compile-time constants work
 lib/CORE.pod			document the CORE namespace
 lib/Cwd.pm			Various cwd routines (getcwd, fastcwd, chdir)
 lib/DB.pm			Debugger API (draft)
