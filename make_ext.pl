@@ -168,6 +168,7 @@ elsif ($is_VMS)
     $perl = $^EXECUTABLE_NAME
     push @extspec, (< split ' ', config_value('static_ext')) if $static
     push @extspec, (< split ' ', config_value('dynamic_ext')) if $dynamic
+    push @extspec, (< split ' ', config_value('nonxs_ext')) if $dynamic
 
 foreach my $spec (@extspec) 
     my $mname = $spec
