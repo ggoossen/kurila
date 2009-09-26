@@ -199,11 +199,8 @@ ext/ExtUtils-ParseXS/Changes			ExtUtils::ParseXS change log
 ext/ExtUtils-ParseXS/lib/ExtUtils/ParseXS.pm	converts Perl XS code into C code
 ext/ExtUtils-ParseXS/lib/ExtUtils/xsubpp	External subroutine preprocessor
 ext/ExtUtils-ParseXS/t/basic.t			See if ExtUtils::ParseXS works
-ext/ExtUtils-ParseXS/t/usage.t			ExtUtils::ParseXS tests
 ext/ExtUtils-ParseXS/t/XSTest.pm		Test file for ExtUtils::ParseXS tests
 ext/ExtUtils-ParseXS/t/XSTest.xs		Test file for ExtUtils::ParseXS tests
-ext/ExtUtils-ParseXS/t/XSUsage.pm		ExtUtils::ParseXS tests
-ext/ExtUtils-ParseXS/t/XSUsage.xs		ExtUtils::ParseXS tests
 ext/Fcntl/Fcntl.pm	Fcntl extension Perl module
 ext/Fcntl/Fcntl.xs	Fcntl extension external subroutines
 ext/Fcntl/Makefile.PL	Fcntl extension makefile writer
