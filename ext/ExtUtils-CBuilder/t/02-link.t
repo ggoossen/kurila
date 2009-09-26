@@ -1,14 +1,5 @@
 #! perl -w
 
-BEGIN 
-    if (env::var('PERL_CORE'))
-        chdir 't' if -d 't'
-        chdir '../lib/ExtUtils/CBuilder'
-            or die "Can't chdir to lib/ExtUtils/CBuilder: $^OS_ERROR"
-        $^INCLUDE_PATH = qw(../..)
-    
-
-
 use Test::More
 BEGIN 
     if ($^OS_NAME eq 'MSWin32')
