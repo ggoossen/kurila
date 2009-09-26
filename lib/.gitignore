@@ -26,6 +26,7 @@
 /ExtUtils/Manifest.pm
 /ExtUtils/Miniperl.pm
 /ExtUtils/Packlist.pm
+/ExtUtils/ParseXS.pm
 /Fcntl.pm
 /File/Glob.pm
 /File/GlobMapper.pm

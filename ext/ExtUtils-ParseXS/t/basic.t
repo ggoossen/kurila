@@ -1,14 +1,5 @@
 #!/usr/bin/perl
 
-BEGIN 
-    if (env::var('PERL_CORE'))
-        chdir 't' if -d 't'
-        chdir '../lib/ExtUtils/ParseXS'
-            or die "Can't chdir to lib/ExtUtils/ParseXS: $^OS_ERROR"
-        $^INCLUDE_PATH = qw(../.. ../../.. .)
-    
-
-
 use Test::More
 BEGIN { plan tests => 9 };
 use DynaLoader
