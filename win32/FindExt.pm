@@ -50,6 +50,13 @@ sub is_static
     return %ext{?@_[0]} eq 'static'
 
 
+sub has_xs_or_c($dir)
+    opendir my $dh, $dir or die "opendir $dir: $^OS_ERROR"
+    while (defined (my $item = readdir $dh))
+        return 1 if $item =~ m/\.xs$/
+        return 1 if $item =~ m/\.c$/
+    return 0
+
 # Function to find available extensions, ignoring DynaLoader
 sub find_ext($ext_dir)
     opendir my $dh, "$ext_dir"
@@ -63,8 +70,7 @@ sub find_ext($ext_dir)
         $this_ext =~ s!-!/!g
         $leaf =~ s/.*-//
 
-        my @files = glob "$ext_dir$item/*.{xs,c}"
-        if (@files)
+        if (has_xs_or_c("$ext_dir$item")) {
             %ext{+$this_ext} = %static{?$this_ext} ?? 'static' !! 'dynamic'
         else
             %ext{+$this_ext} = 'nonxs'
