@@ -473,7 +473,7 @@ ext/Term-ANSIColor/README		Term::ANSIColor
 ext/Term-ANSIColor/t/basic.t		Tests for Term::ANSIColor
 ext/Term-Cap/Cap.pm			Perl module supporting termcap usage
 ext/Term-Cap/test.pl			See if Term::Cap works
-ext/Text-ParseWords/ParseWords.pm	Perl module to split words on arbitrary delimiter
+ext/Text-ParseWords/lib/Text/ParseWords.pm	Perl module to split words on arbitrary delimiter
 ext/Text-ParseWords/t/ParseWords.t	See if Text::ParseWords works
 ext/Text-Tabs/CHANGELOG			ChangeLog for Tabs+Wrap
 ext/Text-Tabs/lib/Text/Tabs.pm		Do expand and unexpand
