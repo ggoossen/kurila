@@ -30,9 +30,7 @@ Makefile
 /Sys-Hostname/Makefile.PL
 /Test-Harness/Makefile.PL
 /Text-Soundex/Makefile.PL
-/Term-ANSIColor/Makefile.PL
-/base/Makefile.PL
-/I18N-LangTags/Makefile.PL
+/Text-Tabs/Makefile.PL
 
 # ignore all vim swap files but the one bundled in Module::Pluggable for testing
 *.swp

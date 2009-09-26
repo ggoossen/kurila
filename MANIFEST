@@ -471,6 +471,22 @@ ext/Term-ANSIColor/README		Term::ANSIColor
 ext/Term-ANSIColor/t/basic.t		Tests for Term::ANSIColor
 ext/Term-Cap/Cap.pm			Perl module supporting termcap usage
 ext/Term-Cap/test.pl			See if Term::Cap works
+ext/Text-Tabs/CHANGELOG			ChangeLog for Tabs+Wrap
+ext/Text-Tabs/lib/Text/Tabs.pm		Do expand and unexpand
+ext/Text-Tabs/lib/Text/Wrap.pm		Paragraph formatter
+ext/Text-Tabs/t/37000.t			See if Text::Tabs is working
+ext/Text-Tabs/t/39548.t			See if Text::Tabs is working
+ext/Text-Tabs/t/belg4mit.t		See if Text::Tabs is working
+ext/Text-Tabs/t/dandv.t			See if Text::Tabs is working
+ext/Text-Tabs/t/fill.t			See if Text::Wrap::fill works
+ext/Text-Tabs/t/Jacobson2.t		See if Text::Tabs is working
+ext/Text-Tabs/t/Jacobson.t		See if Text::Tabs is working
+ext/Text-Tabs/t/Jochen.t		See if Text::Tabs is working
+ext/Text-Tabs/t/sep2.t			See if Text::Tabs is working
+ext/Text-Tabs/t/sep.t			See if Text::Tabs is working
+ext/Text-Tabs/t/tabs.t			See if Text::Tabs works
+ext/Text-Tabs/t/wrap_separator2.t	See if Text::Wrap::wrap works
+ext/Text-Tabs/t/wrap.t			See if Text::Wrap::wrap works
 ext/Time-HiRes/Changes		Time::HiRes extension
 ext/Time-HiRes/fallback/const-c.inc	Time::HiRes extension
 ext/Time-HiRes/fallback/const-xs.inc	Time::HiRes extension
@@ -1312,22 +1328,6 @@ lib/Test/Simple/t/use_ok.t	Test::More test, use_ok()
 lib/Test/Tutorial.pod		A tutorial on writing tests
 lib/Text/Abbrev.pm		An abbreviation table builder
 lib/Text/Abbrev.t		Test Text::Abbrev
-lib/Text/ParseWords.pm		Perl module to split words on arbitrary delimiter
-lib/Text/ParseWords.t		See if Text::ParseWords works
-lib/Text/Tabs.pm		Do expand and unexpand
-lib/Text/TabsWrap/CHANGELOG	ChangeLog for Tabs+Wrap
-lib/Text/TabsWrap/t/37000.t	See if Text::Tabs is working
-lib/Text/TabsWrap/t/39548.t	See if Text::Tabs is working
-lib/Text/TabsWrap/t/belg4mit.t	See if Text::Tabs is working
-lib/Text/TabsWrap/t/fill.t	See if Text::Wrap::fill works
-lib/Text/TabsWrap/t/Jacobson2.t	See if Text::Tabs is working
-lib/Text/TabsWrap/t/Jacobson.t	See if Text::Tabs is working
-lib/Text/TabsWrap/t/Jochen.t	See if Text::Tabs is working
-lib/Text/TabsWrap/t/sep2.t	See if Text::Tabs is working
-lib/Text/TabsWrap/t/sep.t	See if Text::Tabs is working
-lib/Text/TabsWrap/t/tabs.t	See if Text::Tabs works
-lib/Text/TabsWrap/t/wrap.t	See if Text::Wrap::wrap works
-lib/Text/Wrap.pm		Paragraph formatter
 lib/Tie/Hash.pm			Base class for tied hashes
 lib/Time/gmtime.pm		By-name interface to Perl's builtin gmtime
 lib/Time/gmtime.t		Test for Time::gmtime

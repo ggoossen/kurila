@@ -76,6 +76,8 @@
 /Sys
 /Term/ANSIColor.pm
 /Text/Soundex.pm
+/Text/Tabs.pm
+/Text/Wrap.pm
 /Time/HiRes.pm
 /Time/Piece.pm
 /Time/Seconds.pm
