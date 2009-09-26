@@ -300,6 +300,8 @@ ext/MIME-Base64/t/base64.t	See whether MIME::Base64 works
 ext/MIME-Base64/t/quoted-print.t	See whether MIME::QuotedPrint works
 ext/MIME-Base64/t/unicode.t	See whether MIME::Base64 works
 ext/MIME-Base64/t/warn.t	See whether MIME::Base64 works
+ext/Module-Loaded/lib/Module/Loaded.pm	Module::Loaded
+ext/Module-Loaded/t/01_Module-Loaded.t	Module::Loaded tests
 ext/Module-Load/lib/Module/Load.pm	Module::Load
 ext/Module-Load/t/01_Module-Load.t	Module::Load tests
 ext/Module-Load/t/to_load/config_file	Module::Load tests
@@ -308,8 +310,6 @@ ext/Module-Load/t/to_load/LoadMe.pl	Module::Load tests
 ext/Module-Load/t/to_load/Must/Be/Loaded.pm	Module::Load tests
 ext/Module-Load/t/to_load/TestModule.pm	Module::Load tests
 ext/Module-Load/t/to_load/ToBeLoaded	Module::Load tests
-ext/Module-Loaded/lib/Module/Loaded.pm	Module::Loaded
-ext/Module-Loaded/t/01_Module-Loaded.t	Module::Loaded tests
 ext/Opcode/Opcode.pm		Opcode extension Perl module
 ext/Opcode/Opcode.xs		Opcode extension external subroutines
 ext/Opcode/ops.pm		"Pragma" form of Opcode extension Perl module
@@ -479,7 +479,6 @@ ext/Text-Tabs/lib/Text/Wrap.pm		Paragraph formatter
 ext/Text-Tabs/t/37000.t			See if Text::Tabs is working
 ext/Text-Tabs/t/39548.t			See if Text::Tabs is working
 ext/Text-Tabs/t/belg4mit.t		See if Text::Tabs is working
-ext/Text-Tabs/t/dandv.t			See if Text::Tabs is working
 ext/Text-Tabs/t/fill.t			See if Text::Wrap::fill works
 ext/Text-Tabs/t/Jacobson2.t		See if Text::Tabs is working
 ext/Text-Tabs/t/Jacobson.t		See if Text::Tabs is working
@@ -487,7 +486,6 @@ ext/Text-Tabs/t/Jochen.t		See if Text::Tabs is working
 ext/Text-Tabs/t/sep2.t			See if Text::Tabs is working
 ext/Text-Tabs/t/sep.t			See if Text::Tabs is working
 ext/Text-Tabs/t/tabs.t			See if Text::Tabs works
-ext/Text-Tabs/t/wrap_separator2.t	See if Text::Wrap::wrap works
 ext/Text-Tabs/t/wrap.t			See if Text::Wrap::wrap works
 ext/Time-HiRes/Changes		Time::HiRes extension
 ext/Time-HiRes/fallback/const-c.inc	Time::HiRes extension
@@ -1330,7 +1328,6 @@ lib/Text/Abbrev.pm		An abbreviation table builder
 lib/Text/Abbrev.t		Test Text::Abbrev
 lib/Text/ParseWords.pm		Perl module to split words on arbitrary delimiter
 lib/Text/ParseWords.t		See if Text::ParseWords works
-lib/Text/ParseWords/taint.t	See if Text::ParseWords works with tainting
 lib/Tie/Hash.pm			Base class for tied hashes
 lib/Time/gmtime.pm		By-name interface to Perl's builtin gmtime
 lib/Time/gmtime.t		Test for Time::gmtime

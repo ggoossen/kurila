@@ -2665,7 +2665,7 @@ First:, Second:, Third:, Fourth:, Fifth:, Sixth:
 =item #! and quoting on non-Unix systems
 X<hashbang> X<#!>
 
-OS/2, MS-DOS, Win95/NT, Macintosh, VMS
+OS/2, MS-DOS, Win95/NT, VMS
 
 =item Location of Perl
 X<perl, location of interpreter>
@@ -13259,6 +13259,38 @@ new, phash
 
 =back
 
+=head2 constant::lib::constant, constant - Perl pragma to declare constants
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item NOTES
+
+=over 4
+
+=item List constants
+
+=item Defining multiple constants at once
+
+=item Magic constants
+
+=back
+
+=item TECHNICAL NOTES
+
+=item CAVEATS
+
+=item BUGS
+
+=item AUTHORS
+
+=item COPYRIGHT
+
+=back
+
 =head2 re - Perl pragma to alter regular expression behaviour
 
 =over 4
@@ -15211,6 +15243,55 @@ B<warn_if_old_packlist>
 B<perllocal_install>
 
 B<uninstall>
+
+=head2 ExtUtils::Command::lib::ExtUtils::Command, ExtUtils::Command -
+utilities to replace common UNIX commands in Makefiles etc.
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item FUNCTIONS
+
+=back
+
+=back
+
+cat
+
+eqtime
+
+rm_rf
+
+rm_f
+
+touch
+
+mv
+
+cp
+
+chmod
+
+mkpath
+
+test_f
+
+test_d
+
+dos2unix
+
+=over 4
+
+=item SEE ALSO
+
+=item AUTHOR
+
+=back
 
 =head2 ExtUtils::Constant - generate XS code to import C header constants
 
@@ -18430,7 +18511,8 @@ FLAGS ] ), stat
 
 =back
 
-=head2 IPC::Open2, open2 - open a process for both reading and writing
+=head2 IPC::Open2 - open a process for both reading and writing using
+open2()
 
 =over 4
 
@@ -18444,8 +18526,8 @@ FLAGS ] ), stat
 
 =back
 
-=head2 IPC::Open2::lib::IPC::Open2, IPC::Open2, open2 - open a process for
-both reading and writing
+=head2 IPC::Open2::lib::IPC::Open2, IPC::Open2 - open a process for both
+reading and writing using open2()
 
 =over 4
 
@@ -18459,8 +18541,8 @@ both reading and writing
 
 =back
 
-=head2 IPC::Open3, open3 - open a process for reading, writing, and error
-handling
+=head2 IPC::Open3 - open a process for reading, writing, and error handling
+using open3()
 
 =over 4
 
@@ -18476,8 +18558,8 @@ L<IPC::Open2>, L<IPC::Run>
 
 =back
 
-=head2 IPC::Open3::lib::IPC::Open3, IPC::Open3, open3 - open a process for
-reading, writing, and error handling
+=head2 IPC::Open3::lib::IPC::Open3, IPC::Open3 - open a process for
+reading, writing, and error handling using open3()
 
 =over 4
 
@@ -18645,6 +18727,93 @@ ftok( PATH, ID )
 =back
 
 =head2 IPCmd, IPC::Cmd - finding and running system commands made easy
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item CLASS METHODS
+
+=over 4
+
+=item $bool = IPC::Cmd->can_use_ipc_run( [VERBOSE] )
+
+=back
+
+=back
+
+=over 4
+
+=item $bool = IPC::Cmd->can_use_ipc_open3( [VERBOSE] )
+
+=back
+
+=over 4
+
+=item $bool = IPC::Cmd->can_capture_buffer
+
+=back
+
+=over 4
+
+=item FUNCTIONS
+
+=over 4
+
+=item $path = can_run( PROGRAM );
+
+=back
+
+=back
+
+=over 4
+
+=item $ok | ($ok, $err, $full_buf, $stdout_buff, $stderr_buff) = run(
+command => COMMAND, [verbose => BOOL, buffer => \$SCALAR] );
+
+command, verbose, buffer, success, errorcode, full_buffer, out_buffer,
+error_buffer
+
+=back
+
+=over 4
+
+=item HOW IT WORKS
+
+=item Global Variables
+
+=over 4
+
+=item $IPC::Cmd::VERBOSE
+
+=item $IPC::Cmd::USE_IPC_RUN
+
+=item $IPC::Cmd::USE_IPC_OPEN3
+
+=item $IPC::Cmd::WARN
+
+=back
+
+=item Caveats
+
+Whitespace, IO Redirect
+
+=item See Also
+
+=item ACKNOWLEDGEMENTS
+
+=item BUG REPORTS
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=back
+
+=head2 IPCmd::lib::IPC::Cmd, IPC::Cmd - finding and running system commands
+made easy
 
 =over 4
 
@@ -19388,7 +19557,69 @@ modules, verbose, nocache
 
 =back
 
+=head2 Module::Load::lib::Module::Load, Module::Load - runtime require of
+both modules and files
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item Rules
+
+=item Caveats
+
+=item ACKNOWLEDGEMENTS
+
+=item BUG REPORTS
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=back
+
 =head2 Module::Loaded - mark modules as loaded or unloaded
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item FUNCTIONS
+
+=over 4
+
+=item $bool = mark_as_loaded( PACKAGE );
+
+=back
+
+=back
+
+=over 4
+
+=item $bool = mark_as_unloaded( PACKAGE );
+
+=back
+
+=over 4
+
+=item $loc = is_loaded( PACKAGE );
+
+=back
+
+=over 4
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=back
+
+=head2 Module::Loaded::lib::Module::Loaded, Module::Loaded - mark modules
+as loaded or unloaded
 
 =over 4
 
@@ -22796,6 +23027,38 @@ unexpand(1)
 =item DESCRIPTION
 
 =item EXAMPLE
+
+=item LICENSE
+
+=back
+
+=head2 Text::Tabs::lib::Text::Tabs, Text::Tabs -- expand and unexpand tabs
+per the unix expand(1) and unexpand(1)
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item EXAMPLE
+
+=item LICENSE
+
+=back
+
+=head2 Text::Tabs::lib::Text::Wrap, Text::Wrap - line wrapping to form
+simple paragraphs
+
+=over 4
+
+=item SYNOPSIS 
+
+=item DESCRIPTION
+
+=item OVERRIDES
+
+=item EXAMPLES
 
 =item LICENSE
 
