@@ -172,6 +172,8 @@ ext/Errno/ChangeLog	Errno changes
 ext/Errno/Errno_pm.PL	Errno perl module create script
 ext/Errno/Makefile.PL	Errno extension makefile writer
 ext/Errno/t/Errno.t	See if Errno works
+ext/ExtUtils-Command/lib/ExtUtils/Command.pm	Utilities for Make on non-UNIX platforms
+ext/ExtUtils-Command/t/eu_command.t		See if ExtUtils::Command works
 ext/Fcntl/Fcntl.pm	Fcntl extension Perl module
 ext/Fcntl/Fcntl.xs	Fcntl extension external subroutines
 ext/Fcntl/Makefile.PL	Fcntl extension makefile writer
@@ -749,7 +751,6 @@ lib/ExtUtils/CBuilder/t/01-basic.t	tests for ExtUtils::CBuilder
 lib/ExtUtils/CBuilder/t/02-link.t	tests for ExtUtils::CBuilder
 lib/ExtUtils/Changes		MakeMaker change log
 lib/ExtUtils/Command/MM.pm	Calling MM functions from the cmd line
-lib/ExtUtils/Command.pm		Utilities for Make on non-UNIX platforms
 lib/ExtUtils/Constant/Base.pm	generate XS code to import C header constants
 lib/ExtUtils/Constant.pm	generate XS code to import C header constants
 lib/ExtUtils/Constant/ProxySubs.pm	generate XS code for proxy constants
@@ -809,7 +810,6 @@ lib/ExtUtils/t/Constant.t	See if ExtUtils::Constant works
 lib/ExtUtils/t/dir_target.t	Verify if dir_target() is supported
 lib/ExtUtils/t/Embed.t		See if ExtUtils::Embed and embedding works
 lib/ExtUtils/testlib.pm		Fixes up $^INCLUDE_PATH to use just-built extension
-lib/ExtUtils/t/eu_command.t	See if ExtUtils::Command works
 lib/ExtUtils/t/FIRST_MAKEFILE.t		See if FIRST_MAKEFILE works
 lib/ExtUtils/t/fixin.t		See if ExtUtils::MakeMaker works
 lib/ExtUtils/t/hints.t		See if hint files are honored.

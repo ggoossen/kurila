@@ -1,11 +1,7 @@
 #!/usr/bin/perl -w
 
-BEGIN 
-    if( env::var('PERL_CORE') )
-        chdir 't';
-        $^INCLUDE_PATH = @: '../lib', 'lib/'
-    else
-        unshift $^INCLUDE_PATH, 't/lib/'
+BEGIN
+    unshift $^INCLUDE_PATH, 't/lib/'
 
 chdir 't'
 
