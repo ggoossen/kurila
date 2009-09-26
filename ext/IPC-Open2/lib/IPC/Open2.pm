@@ -10,7 +10,7 @@ $VERSION        = 1.02
 
 =head1 NAME
 
-IPC::Open2, open2 - open a process for both reading and writing
+IPC::Open2 - open a process for both reading and writing using open2()
 
 =head1 SYNOPSIS
 

@@ -12,7 +12,7 @@ $VERSION        = 1.02
 
 =head1 NAME
 
-IPC::Open3, open3 - open a process for reading, writing, and error handling
+IPC::Open3 - open a process for reading, writing, and error handling using open3()
 
 =head1 SYNOPSIS
 
