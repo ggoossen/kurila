@@ -473,6 +473,8 @@ ext/Term-ANSIColor/README		Term::ANSIColor
 ext/Term-ANSIColor/t/basic.t		Tests for Term::ANSIColor
 ext/Term-Cap/Cap.pm			Perl module supporting termcap usage
 ext/Term-Cap/test.pl			See if Term::Cap works
+ext/Text-ParseWords/ParseWords.pm	Perl module to split words on arbitrary delimiter
+ext/Text-ParseWords/t/ParseWords.t	See if Text::ParseWords works
 ext/Text-Tabs/CHANGELOG			ChangeLog for Tabs+Wrap
 ext/Text-Tabs/lib/Text/Tabs.pm		Do expand and unexpand
 ext/Text-Tabs/lib/Text/Wrap.pm		Paragraph formatter
@@ -1326,8 +1328,6 @@ lib/Test/Simple/t/use_ok.t	Test::More test, use_ok()
 lib/Test/Tutorial.pod		A tutorial on writing tests
 lib/Text/Abbrev.pm		An abbreviation table builder
 lib/Text/Abbrev.t		Test Text::Abbrev
-lib/Text/ParseWords.pm		Perl module to split words on arbitrary delimiter
-lib/Text/ParseWords.t		See if Text::ParseWords works
 lib/Tie/Hash.pm			Base class for tied hashes
 lib/Time/gmtime.pm		By-name interface to Perl's builtin gmtime
 lib/Time/gmtime.t		Test for Time::gmtime

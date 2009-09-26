@@ -75,6 +75,7 @@
 /Storable.pm
 /Sys
 /Term/ANSIColor.pm
+/Text/ParseWords.pm
 /Text/Soundex.pm
 /Text/Tabs.pm
 /Text/Wrap.pm

@@ -29,6 +29,7 @@ Makefile
 /Pod-Plainer/Makefile.PL
 /Sys-Hostname/Makefile.PL
 /Test-Harness/Makefile.PL
+/Text-ParseWords/Makefile.PL
 /Text-Soundex/Makefile.PL
 /Text-Tabs/Makefile.PL
 
