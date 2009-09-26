@@ -1328,6 +1328,9 @@ lib/Test/Simple/t/use_ok.t	Test::More test, use_ok()
 lib/Test/Tutorial.pod		A tutorial on writing tests
 lib/Text/Abbrev.pm		An abbreviation table builder
 lib/Text/Abbrev.t		Test Text::Abbrev
+lib/Text/ParseWords.pm		Perl module to split words on arbitrary delimiter
+lib/Text/ParseWords.t		See if Text::ParseWords works
+lib/Text/ParseWords/taint.t	See if Text::ParseWords works with tainting
 lib/Tie/Hash.pm			Base class for tied hashes
 lib/Time/gmtime.pm		By-name interface to Perl's builtin gmtime
 lib/Time/gmtime.t		Test for Time::gmtime
