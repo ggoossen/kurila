@@ -1,6 +1,6 @@
 #!./perl
 
-# The tests are in a separate file 't/op/re_tests'.
+# The tests are in a separate file 't/re/re_tests'.
 # Each line in that file is a separate test.
 # There are five columns, separated by tabs.
 #
@@ -16,7 +16,6 @@
 #	T	the test is a TODO (can be combined with y/n/c)
 #	B	test exposes a known bug in Perl, should be skipped
 #	b	test exposes a known bug in Perl, should be skipped if noamp
-#	t	test exposes a bug with threading, TODO if qr_embed_thr
 #
 # Columns 4 and 5 are used only if column 3 contains C<y> or C<c>.
 #
@@ -59,12 +58,12 @@ BEGIN
 
 use warnings FATAL=>"all"
 our ($iters, $numtests, $bang, $ffff, $nulnul, $OP)
-our ($qr, $skip_amp, $qr_embed, $qr_embed_thr) # set by our callers
+our ($qr, $skip_amp, $qr_embed) # set by our callers
 
 
 if (!defined $file)
-    open($tests_fh, "<",'op/re_tests') || open($tests_fh, "<",'t/op/re_tests')
-        || open($tests_fh, "<",':op:re_tests') || die "Can't open re_tests"
+    open($tests_fh, "<",'re/re_tests') || open($tests_fh, "<",'t/re/re_tests')
+        || open($tests_fh, "<",':re:re_tests') || die "Can't open re_tests"
 
 
 my @tests = @:  ~< $tests_fh 
@@ -76,8 +75,6 @@ BEGIN
     if (1)
         $utf8 = "use utf8;\n"
         utf8->import()
-    
-
 
 $bang = sprintf "\\\%03o", ord "!" # \41 would not be portable.
 $ffff  = "\x[FF]\x[FF]"
@@ -85,7 +82,7 @@ $nulnul = "\0" x 2
 $OP = $qr ?? 'qr' !! 'm'
 
 $^OUTPUT_AUTOFLUSH = 1
-printf $^STDOUT, "1..\%d\n# $iters iterations\n", scalar nelems @tests
+printf $^STDOUT, "1..\%d\n# $iters iterations\n", nelems @tests
 
 my $test
 TEST:
@@ -111,7 +108,6 @@ TEST:
     my $keep = ($repl =~ m/\$\^MATCH/) ?? 'p' !! ''
     $subject = eval qq("$subject"); die "error in '$subject': $($^EVAL_ERROR->message)" if $^EVAL_ERROR
     $expect  = eval qq("$expect"); die "error in '$expect': $($^EVAL_ERROR->message)" if $^EVAL_ERROR
-    my $todo = $qr_embed_thr && ($result =~ s/t//)
     my $skip = ($skip_amp ?? ($result =~ s/B//i) !! ($result =~ s/B//))
     $reason = 'skipping $&' if $reason eq  '' && $skip_amp
     $result =~ s/B//i unless $skip
@@ -134,15 +130,6 @@ EOFCODE
             $code= <<EOFCODE
                 $utf8;
                 my \$RE = qr$pat;
-                $study;
-                \$match = (\$subject =~ m/(?:)\$RE(?:)/$($keep)) while \$c--;
-                \$got = "$repl";
-EOFCODE
-        elsif ($qr_embed_thr)
-            $code= <<EOFCODE
-		# Can't run the match in a subthread, but can do this and
-	 	# clone the pattern the other way.
-                my \$RE = threads->new(sub \{qr$pat\})->join();
                 $study;
                 \$match = (\$subject =~ m/(?:)\$RE(?:)/$($keep)) while \$c--;
                 \$got = "$repl";
@@ -171,9 +158,6 @@ EOFCODE
             last  # no need to study a syntax error
         elsif ( $skip )
             print $^STDOUT, "ok $test # skipped", length($reason) ?? " $reason" !! '', "\n"
-            next TEST
-        elsif ( $todo )
-            print $^STDOUT, "not ok $test # todo", length($reason) ?? " - $reason" !! '', "\n"
             next TEST
         elsif ($err)
             print $^STDOUT, "not ok $test $input => error: '$($^EVAL_ERROR->message)'\n$(dump::view($code))\n"; next TEST
