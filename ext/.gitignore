@@ -12,6 +12,7 @@ Makefile
 /attributes/Makefile.PL
 /constant/Makefile.PL
 /Data-Dumper/Makefile.PL
+/ExtUtils-Command/Makefile.PL
 /ExtUtils-Constant/Makefile.PL
 /ExtUtils-Install/Makefile.PL
 /Filter-Util-Call/Makefile.PL
