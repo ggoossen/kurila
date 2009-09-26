@@ -192,6 +192,9 @@ ext/ExtUtils-Install/t/lib/MakeMaker/Test/Setup/BFD.pm	MakeMaker test utilities
 ext/ExtUtils-Install/t/lib/MakeMaker/Test/Utils.pm	MakeMaker test utilities
 ext/ExtUtils-Install/t/lib/TieOut.pm			Testing library to capture prints
 ext/ExtUtils-Install/t/Packlist.t			See if Packlist works
+ext/ExtUtils-Manifest/lib/ExtUtils/Manifest.pm		Utilities to write MANIFEST files
+ext/ExtUtils-Manifest/lib/ExtUtils/MANIFEST.SKIP	The default MANIFEST.SKIP
+ext/ExtUtils-Manifest/t/Manifest.t			See if ExtUtils::Manifest works
 ext/Fcntl/Fcntl.pm	Fcntl extension Perl module
 ext/Fcntl/Fcntl.xs	Fcntl extension external subroutines
 ext/Fcntl/Makefile.PL	Fcntl extension makefile writer
@@ -778,9 +781,6 @@ lib/ExtUtils/MakeMaker/Config.pm	MakeMaker wrapper for Config
 lib/ExtUtils/MakeMaker/FAQ.pod	MakeMaker FAQ
 lib/ExtUtils/MakeMaker.pm	Write Makefiles for extensions
 lib/ExtUtils/MakeMaker/Tutorial.pod	Writing a module with MakeMaker
-lib/ExtUtils/MakeMaker/vmsish.pm	Platform agnostic vmsish.pm
-lib/ExtUtils/Manifest.pm	Utilities to write MANIFEST files
-lib/ExtUtils/MANIFEST.SKIP	The default MANIFEST.SKIP
 lib/ExtUtils/Mkbootstrap.pm	Writes a bootstrap file (see MakeMaker)
 lib/ExtUtils/Mksymlists.pm	Writes a linker options file for extensions
 lib/ExtUtils/MM_AIX.pm		MakeMaker methods for AIX
@@ -827,7 +827,6 @@ lib/ExtUtils/t/INST.t		Check MakeMaker INST_* macros
 lib/ExtUtils/t/Liblist.t	See if ExtUtils::Liblist works
 lib/ExtUtils/t/make.t		See if make detection works
 lib/ExtUtils/t/maketext_filter.t	See if maketext_filter works
-lib/ExtUtils/t/Manifest.t	See if ExtUtils::Manifest works
 lib/ExtUtils/t/Mkbootstrap.t	See if ExtUtils::Mkbootstrap works
 lib/ExtUtils/t/MM_Any.t		See if ExtUtils::MM_Any works
 lib/ExtUtils/t/MM_BeOS.t	See if ExtUtils::MM_BeOS works

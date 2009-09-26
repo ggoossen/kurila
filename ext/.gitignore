@@ -15,6 +15,7 @@ Makefile
 /ExtUtils-Command/Makefile.PL
 /ExtUtils-Constant/Makefile.PL
 /ExtUtils-Install/Makefile.PL
+/ExtUtils-Manifest/Makefile.PL
 /Filter-Util-Call/Makefile.PL
 /Hash-Util-FieldHash/Makefile.PL
 /IPC-Cmd/Makefile.PL
