@@ -4,7 +4,10 @@
 #
 # $PERL5OPT, $PERL5LIB, etc.
 
-use TestInit
+BEGIN
+    chdir 't' if -d 't'
+    $^INCLUDE_PATH = @: '../lib'
+
 use Config
 
 BEGIN 

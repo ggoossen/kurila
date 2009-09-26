@@ -142,9 +142,9 @@ for (1..nelems @test_dirs)
 rmtree(@test_dirs[0], 0, 0)
 
 do
-    my $check = ($IsVMS   ?? qr|\b((?i)t)\]$| !!
-                 $IsMacOS ?? qr|\bt:$| !!
-                 qr|\bt$| )
+    my $check = ($IsVMS   ?? qr|\b((?i)Cwd)\]$| !!
+                 $IsMacOS ?? qr|\bCwd:$| !!
+                 qr|\bCwd$| )
 
     like(env::var('PWD'), $check)
 
@@ -181,7 +181,7 @@ SKIP: do
 
 
 if (env::var('PERL_CORE'))
-    chdir '../ext/Cwd/t'
+    chdir 't'
     unshift $^INCLUDE_PATH, '../../../lib'
 
 

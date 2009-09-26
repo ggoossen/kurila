@@ -3,11 +3,7 @@
 our $tell_file
 
 BEGIN 
-    unless(grep { m/blib/ }, $^INCLUDE_PATH)
-        $tell_file = "TEST"
-    else
-        $tell_file = "Makefile"
-    
+    $tell_file = "Makefile"
 
 
 use Config

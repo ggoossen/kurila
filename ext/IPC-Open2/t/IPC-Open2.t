@@ -16,7 +16,7 @@ BEGIN
 use IO::Handle
 use IPC::Open2
 
-my $perl = './perl'
+my $perl = '../../t/perl'
 
 sub ok($n, $result, ?$info)
     if ($result)

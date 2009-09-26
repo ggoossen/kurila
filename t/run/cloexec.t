@@ -32,9 +32,12 @@
 # on Windows, they are not native OS handles, and so are not inherited
 # across an exec (though native Windows file handles are).
 
+BEGIN
+    chdir 't' if -d 't'
+    $^INCLUDE_PATH = @: '../lib'
+
 BEGIN 
     require './test.pl'
-
 
 BEGIN 
     use Config

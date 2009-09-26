@@ -4,6 +4,10 @@
 # -0, -c, -l, -s, -m, -M, -V, -v, -h, -i, -E and all unknown
 # Some switches have their own tests, see MANIFEST.
 
+BEGIN
+    chdir 't' if -d 't'
+    $^INCLUDE_PATH = @: '../lib'
+
 BEGIN { require "./test.pl"; }
 
 plan(tests => 55)

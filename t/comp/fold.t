@@ -1,8 +1,9 @@
 #!./perl
 
+use TestInit
+
 BEGIN 
     require './test.pl'
-
 
 use warnings
 

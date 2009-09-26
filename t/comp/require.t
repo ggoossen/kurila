@@ -1,5 +1,7 @@
 #!./perl
 
+use TestInit
+
 BEGIN 
     push $^INCLUDE_PATH, '.'
 

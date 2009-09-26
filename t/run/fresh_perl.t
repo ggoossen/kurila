@@ -9,9 +9,11 @@
 # use an eval().
 
 BEGIN
+    chdir 't' if -d 't'
+    $^INCLUDE_PATH = @: '../lib'
+
+BEGIN
     require './test.pl'	# for which_perl() etc
-
-
 
 my $Perl = which_perl()
 

@@ -22,7 +22,7 @@ while ( ~< $^DATA)
     %code{+$1} = $2
 
 
-open my $fh, '<', '../opcode.pl' or die "Can't open opcode.pl: $^OS_ERROR"
+open my $fh, '<', '../../opcode.pl' or die "Can't open opcode.pl: $^OS_ERROR"
 while ( ~< $fh)
     last if m/^__END__/
 

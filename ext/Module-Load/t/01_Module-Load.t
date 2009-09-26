@@ -1,6 +1,6 @@
 ### Module::Load test suite ###
 BEGIN 
-    push $^INCLUDE_PATH, "../ext/Module-Load/t/to_load"
+    push $^INCLUDE_PATH, "t/to_load"
 
 
 use Module::Load

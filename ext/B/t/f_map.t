@@ -1,12 +1,8 @@
 #!perl
 
 BEGIN 
-    if (env::var('PERL_CORE'))
-        push $^INCLUDE_PATH, '../ext/B/t'
-    else
-        unshift $^INCLUDE_PATH, 't'
-        push $^INCLUDE_PATH, "../../t"
-    
+    unshift $^INCLUDE_PATH, 't'
+
     require Config
     if (!Config::config_value("useperlio"))
         print $^STDOUT, "1..0 # Skip -- need perlio to walk the optree\n"

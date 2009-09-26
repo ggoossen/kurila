@@ -2,7 +2,7 @@
 
 use Config
 
-BEGIN { require "./test.pl"; }
+BEGIN { require "../../t/test.pl"; }
 plan(tests => 66)
 
 use POSIX < qw(fcntl_h signal_h limits_h _exit getcwd open read strftime write
@@ -20,7 +20,7 @@ my $Is_OS2     = $^OS_NAME eq 'os2'
 my $Is_UWin    = $^OS_NAME eq 'uwin'
 my $Is_OS390   = $^OS_NAME eq 'os390'
 
-ok( (my $testfd = open("TEST", O_RDONLY, 0)),        'O_RDONLY with open' )
+ok( (my $testfd = open("../../t/TEST", O_RDONLY, 0)),        'O_RDONLY with open' )
 read($testfd, my $buffer, 4) if $testfd +> 2
 is( $buffer, "#!./",                      '    with read' )
 
@@ -115,13 +115,7 @@ SKIP: do
 
 
 
-my $pat
-if ($Is_MacOS)
-    $pat = qr/:t:$/
-elsif ( $Is_VMS )
-    $pat = qr/\.T]/i
-else
-    $pat = qr#[\\/]t$#i
+my $pat = qr#[\\/]POSIX$#i
 
 like( getcwd(), qr/$pat/, 'getcwd' )
 

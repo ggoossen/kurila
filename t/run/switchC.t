@@ -2,6 +2,10 @@
 
 # Tests for the command-line switches
 
+BEGIN
+    chdir 't' if -d 't'
+    $^INCLUDE_PATH = @: '../lib'
+
 BEGIN { require "./test.pl"; }
 
 BEGIN 

@@ -1,11 +1,7 @@
 #!./perl -w
 
-BEGIN     ## no critic strict
-    if ( env::var('PERL_CORE') )
-        push $^INCLUDE_PATH, < qw(lib)
-    else
-        unshift $^INCLUDE_PATH, 't'
-    
+BEGIN
+    unshift $^INCLUDE_PATH, '../../t/lib'
 
 
 use warnings

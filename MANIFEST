@@ -1966,6 +1966,7 @@ t/comp/script.t			See if script invocation works
 t/comp/term.t			See if more terms work
 t/comp/use.t			See if pragmata work
 t/comp/utf.t			See if UTFs work
+TestInit.pm			Preamble library for core tests
 thread.h			Threading header
 time64.c			64 bit clean time.h (code)
 time64_config.h			64 bit clean time.h (configuration)
@@ -2300,7 +2301,6 @@ t/sv/magic.t			See if magic variables work
 t/sv/object.t			See if objects work
 t/sv/sv_2pv.t			See if stringification (sv_2pv) works
 t/TEST				The regression tester
-t/TestInit.pm			Preamble library for core tests
 t/test.pl			Simple testing library
 t/thread_it.pl			Run regression tests in a new thread
 t/uni/case.pl			See if Unicode casing works

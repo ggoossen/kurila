@@ -1,5 +1,9 @@
 #!./perl
 
+BEGIN
+    chdir 't' if -d 't'
+    $^INCLUDE_PATH = @: '../lib'
+
 require './test.pl'
 use File::Spec::Functions
 

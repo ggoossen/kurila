@@ -1,6 +1,10 @@
 #!./perl -w
 # Test -DDEBUGGING things (in dump.c)
 
+BEGIN
+    chdir 't' if -d 't'
+    $^INCLUDE_PATH = @: '../lib'
+
 BEGIN 
     require "./test.pl"
 

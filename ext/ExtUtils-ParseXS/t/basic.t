@@ -50,8 +50,6 @@ if ($b->have_compiler)
             if (@DynaLoader::dl_modules[$i] eq $module)
                 DynaLoader::dl_unload_file(@DynaLoader::dl_librefs[$i])
                 last
-            
-        
     
     1 while unlink $obj_file
     1 while unlink $lib_file

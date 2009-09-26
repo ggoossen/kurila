@@ -1,6 +1,6 @@
 BEGIN 
     require Config; Config->import
-    require './test.pl'
+    require '../../t/test.pl'
 
 
 if (config_value('d_sem') ne 'define')
