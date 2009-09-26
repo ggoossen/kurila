@@ -19,7 +19,10 @@
 /Errno.pm
 /ExtUtils/Constant.pm
 /ExtUtils/Constant
+/ExtUtils/Installed.pm
+/ExtUtils/Install.pm
 /ExtUtils/Miniperl.pm
+/ExtUtils/Packlist.pm
 /Fcntl.pm
 /File/Glob.pm
 /File/GlobMapper.pm
