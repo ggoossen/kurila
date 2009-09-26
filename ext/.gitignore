@@ -12,6 +12,7 @@ Makefile
 /attributes/Makefile.PL
 /constant/Makefile.PL
 /Data-Dumper/Makefile.PL
+/ExtUtils-Constant/Makefile.PL
 /Filter-Util-Call/Makefile.PL
 /Hash-Util-FieldHash/Makefile.PL
 /IPC-Cmd/Makefile.PL

@@ -17,6 +17,8 @@
 /Encode.pm
 /Encode
 /Errno.pm
+/ExtUtils/Constant.pm
+/ExtUtils/Constant
 /ExtUtils/Miniperl.pm
 /Fcntl.pm
 /File/Glob.pm

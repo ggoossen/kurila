@@ -7,7 +7,6 @@ BEGIN
     unless (config_value("usedl"))
         plan skip_all => "no usedl"
 
-
 plan "no_plan"
 
 # use warnings;
