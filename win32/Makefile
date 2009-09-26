@@ -1056,11 +1056,14 @@ $(EXTDIR)\DynaLoader\dl_win32.xs: dl_win32.xs
 	copy dl_win32.xs $(EXTDIR)\DynaLoader\dl_win32.xs
 
 #-------------------------------------------------------------------------------
-Extensions: ..\make_ext.pl $(PERLDEP) $(CONFIGPM)
+# The rule for $(DYNALOADER).c makes DynaLoader.pm, and that is needed for
+# ExtUtils::Mkbootstrap. There's no direct way to mark a dependency on
+# DynaLoader.pm, so this will have to do
+Extensions: ..\make_ext.pl $(PERLDEP) $(CONFIGPM) $(DYNALOADER).c
 	$(XCOPY) ..\*.h $(COREDIR)\*.*
 	$(MINIPERL) -I..\lib ..\make_ext.pl "MAKE=$(MAKE)" --dir=$(EXTDIR) --dynamic
 
-Extensions_reonly: ..\make_ext.pl $(PERLDEP) $(CONFIGPM)
+Extensions_reonly: ..\make_ext.pl $(PERLDEP) $(CONFIGPM) $(DYNALOADER).c
 	$(XCOPY) ..\*.h $(COREDIR)\*.*
 	$(MINIPERL) -I..\lib ..\make_ext.pl "MAKE=$(MAKE)" --dir=$(EXTDIR) --dynamic +re
 
