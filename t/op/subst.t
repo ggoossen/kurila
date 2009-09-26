@@ -3,9 +3,8 @@
 BEGIN 
     require Config; Config->import
 
-
 require './test.pl'
-plan( tests => 120 )
+plan( tests => 122 )
 
 our ($x, $snum, $foo, $t, $r, $s)
 
@@ -471,6 +470,12 @@ do # [perl #27940] perlbug: [\x00-\x1f] works, [\c@-\c_] does not
 
     ($c = "\x20\x00\x30\x01\x40\x1A\x50\x1F\x60") =~ s/[\x00-\x1f]//g
     is($c, "\x20\x30\x40\x50\x60", "s/[\\x00-\\x1f]//g")
+
+fresh_perl_is( '$_=q(foo);s/(.)\G//g; print $^STDOUT, $_' => 'foo', $%, '[perl #69056] positive GPOS regex segfault' );
+do
+    local our $TODO = 1
+    fresh_perl_is( '$_="abcef"; s/bc|(.)\G(.)/$( $1 ?? "[$1-$2]" !! "XX" )/g; print $^STDOUT, $_' => 'aXX[c-e][e-f]f', $%,
+                   'positive GPOS regex substitution failure' );
 
 do
     my @tests = @: 'ABC', "\x[A3A4A5]", "\x{410}\x{411}\x{412}"
