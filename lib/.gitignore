@@ -5,6 +5,7 @@
 /Config.pod
 /Config_heavy.pl
 /Config_git.pl
+/Cwd.pm
 /DB_File.pm
 /Data
 /Devel/DProf.pm

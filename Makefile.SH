@@ -465,6 +465,8 @@ obj = $(ndt_obj) $(DTRACE_O)
 perltoc_pod_prereqs = extra.pods pod/perlapi.pod pod/perldelta.pod pod/perlintern.pod pod/perlmodlib.pod
 generated_pods = pod/perltoc.pod $(perltoc_pod_prereqs)
 
+Icwd = -Iext/Cwd
+
 lintflags = \
     -b \
     -n \
@@ -544,7 +546,7 @@ lib/Config_git.pl git_version.h: miniperl$(EXE_EXT) make_patchnum.pl
 # make sure that we recompile perl.c if the git version changes
 perl$(OBJ_EXT): git_version.h
 
-utilities:	miniperl$(EXE_EXT) $(CONFIGPM) $(plfixlocal) lib/lib.pm FORCE
+utilities:	miniperl$(EXE_EXT) $(CONFIGPM) $(plextract) lib/lib.pm FORCE
 	@echo " "; echo "	Making utilities"; cd utils; $(LDLIBPTH) $(MAKE) all
 
 
@@ -935,7 +937,7 @@ $(plfixlocal): $(CONFIGPM)
 
 lib/lib.pm:	miniperl$(EXE_EXT) $(CONFIGPM)
 	@-rm -f $@
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib lib/lib_pm.PL
+	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib $(Icwd) lib/lib_pm.PL
 
 unidatafiles $(unidatafiles): uni.data
 
@@ -953,7 +955,7 @@ pod/perlapi.pod pod/perlintern.pod: miniperl$(EXE_EXT) autodoc.pl embed.fnc
 	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib autodoc.pl
 
 pod/perlmodlib.pod: miniperl$(EXE_EXT) pod/perlmodlib.PL MANIFEST
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib pod/perlmodlib.PL -q
+	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib $(Icwd) pod/perlmodlib.PL -q
 
 pod/perldelta.pod: pod/perl5110delta.pod
 	$(LNS) perl5110delta.pod pod/perldelta.pod

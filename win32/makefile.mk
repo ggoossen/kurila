@@ -1015,6 +1015,8 @@ ODBCCP32_DLL = $(SystemRoot)\system32\odbccp32.dll
 ODBCCP32_DLL = $(windir)\system\odbccp32.dll
 .ENDIF
 
+ICWD = -I..\ext\Cwd
+
 #
 # Top targets
 #
@@ -1278,7 +1280,7 @@ $(MINIMOD) : $(MINIPERL) ..\minimod.pl
 ..\x2p\walk$(o) : ..\x2p\walk.c
 	$(CC) -I..\x2p  $(CFLAGS) $(OBJOUT_FLAG)$@ -c ..\x2p\walk.c
 
-$(X2P) : $(MINIPERL) $(X2P_OBJ)
+$(X2P) : $(MINIPERL) $(X2P_OBJ) Extensions
 	$(MINIPERL) ..\x2p\find2perl.PL
 	$(MINIPERL) ..\x2p\s2p.PL
 .IF "$(CCTYPE)" == "BORLAND"
@@ -1371,11 +1373,11 @@ $(DYNALOADER).c: $(MINIPERL) $(EXTDIR)\DynaLoader\dl_win32.xs $(CONFIGPM) Extens
 $(EXTDIR)\DynaLoader\dl_win32.xs: dl_win32.xs
 	copy dl_win32.xs $(EXTDIR)\DynaLoader\dl_win32.xs
 
-MakePPPort: $(MINIPERL) $(CONFIGPM)
-	$(MINIPERL) -I..\lib ..\mkppport
+MakePPPort: $(MINIPERL) $(CONFIGPM) Extensions_nonxs
+	$(MINIPERL) -I..\lib $(ICWD) ..\mkppport
 
 MakePPPort_clean:
-	-if exist $(MINIPERL) $(MINIPERL) -I..\lib ..\mkppport --clean
+	-if exist $(MINIPERL) $(MINIPERL) -I..\lib $(ICWD) ..\mkppport --clean
 
 #-------------------------------------------------------------------------------
 # The rule for $(DYNALOADER).c makes DynaLoader.pm, and that is needed for
@@ -1456,10 +1458,10 @@ utils: $(PERLEXE) $(X2P)
 	copy ..\README.win32    ..\pod\perlwin32.pod
 	copy ..\pod\perl5110delta.pod ..\pod\perldelta.pod
 	cd ..\pod && $(MAKE) -f ..\win32\pod.mak converters
-	cd ..\lib && $(PERLEXE) lib_pm.PL
+	cd ..\lib && $(PERLEXE) $(ICWD) lib_pm.PL
 	$(PERLEXE) $(PL2BAT) $(UTILS)
-	$(PERLEXE) ..\autodoc.pl ..
-	$(PERLEXE) ..\pod\perlmodlib.pl -q
+	$(PERLEXE) $(ICWD) ..\autodoc.pl ..
+	$(PERLEXE) $(ICWD) ..\pod\perlmodlib.pl -q
 
 ..\pod\perltoc.pod: $(PERLEXE) Extensions Extensions_nonxs
 	$(PERLEXE) ..\pod\buildtoc --build-toc -q
