@@ -1407,7 +1407,7 @@ Extensions_realclean :
 #-------------------------------------------------------------------------------
 
 
-doc: $(PERLEXE)
+doc: $(PERLEXE) ..\pod\perltoc.pod
 	$(PERLEXE) -I..\lib ..\installhtml --podroot=.. --htmldir=$(HTMLDIR) \
 	    --podpath=pod:lib:ext:utils --htmlroot="file://$(INST_HTML:s,:,|,)"\
 	    --libpod=perlfunc:perlguts:perlvar:perlrun:perlop --recurse
@@ -1460,6 +1460,8 @@ utils: $(PERLEXE) $(X2P)
 	$(PERLEXE) $(PL2BAT) $(UTILS)
 	$(PERLEXE) ..\autodoc.pl ..
 	$(PERLEXE) ..\pod\perlmodlib.pl -q
+
+..\pod\perltoc.pod: $(PERLEXE) Extensions Extensions_nonxs
 	$(PERLEXE) ..\pod\buildtoc --build-toc -q
 
 # Note that the pod cleanup in this next section is parsed (and regenerated
@@ -1556,7 +1558,7 @@ distclean: realclean
 
 install : all installbare installhtml
 
-installbare : $(RIGHTMAKE) utils
+installbare : $(RIGHTMAKE) utils ..\pod\perltoc.pod
 	$(PERLEXE) ..\installperl
 	if exist $(WPERLEXE) $(XCOPY) $(WPERLEXE) $(INST_BIN)\*.*
 	if exist $(PERLEXESTATIC) $(XCOPY) $(PERLEXESTATIC) $(INST_BIN)\*.*
