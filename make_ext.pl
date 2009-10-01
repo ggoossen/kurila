@@ -3,7 +3,7 @@
 use warnings
 use Config
 BEGIN
-    unshift $^INCLUDE_PATH, 'ext/Cwd'
+    unshift $^INCLUDE_PATH, $^OS_NAME eq 'MSWin32' ?? '../ext/Cwd' !! 'ext/Cwd'
 use Cwd
 
 # To clarify, this isn't the entire suite of modules considered "toolchain"
