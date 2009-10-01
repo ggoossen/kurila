@@ -112,6 +112,9 @@ ext/B/t/pragma.t	See if user pragmas work.
 ext/B/t/showlex.t	See if B::ShowLex works
 ext/B/t/terse.t		See if B::Terse works
 ext/B/typemap			Compiler backend interface types
+ext/Class-ISA/ChangeLog		Changes for Class::ISA
+ext/Class-ISA/lib/Class/ISA.pm		Class::ISA
+ext/Class-ISA/t/01_old_junk.t	Tests for Class::ISA
 ext/constant/lib/constant.pm	For "use constant"
 ext/constant/t/constant.t	See if compile-time constants work
 ext/Cwd/Changes			Cwd extension Changelog
@@ -792,9 +795,6 @@ lib/Carp.pm			Error message base class
 lib/Carp.t			See if Carp works
 lib/charnames.pm		Character names
 lib/charnames.t			See if character names work
-lib/Class/ISA/ChangeLog		Changes for Class::ISA
-lib/Class/ISA.pm		Class::ISA
-lib/Class/ISA/t/01_old_junk.t	Tests for Class::ISA
 lib/Class/Struct.pm		Declare struct-like datatypes as Perl classes
 lib/Class/Struct.t		See if Class::Struct works
 lib/compsub.pm			Module for defining compilation subroutines

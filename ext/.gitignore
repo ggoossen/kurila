@@ -11,6 +11,7 @@ Makefile
 !/XS-Typemap/stdio.c
 /attributes/Makefile.PL
 /constant/Makefile.PL
+/Class-ISA/Makefile.PL
 /Data-Dumper/Makefile.PL
 /ExtUtils-Command/Makefile.PL
 /ExtUtils-Constant/Makefile.PL
