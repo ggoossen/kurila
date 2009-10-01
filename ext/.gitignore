@@ -22,6 +22,7 @@ Makefile
 /IPC-Cmd/Makefile.PL
 /IPC-Open2/Makefile.PL
 /IPC-Open3/Makefile.PL
+/Locale-Maketext/Makefile.PL
 /Locale-Maketext-Simple/Makefile.PL
 /Math-BigInt-FastCalc/Makefile.PL
 /Module-Load/Makefile.PL
