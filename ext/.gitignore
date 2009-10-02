@@ -48,6 +48,7 @@ Makefile
 /Text-ParseWords/Makefile.PL
 /Text-Soundex/Makefile.PL
 /Text-Tabs/Makefile.PL
+/Time-Local/Makefile.PL
 
 # ignore all vim swap files but the one bundled in Module::Pluggable for testing
 *.swp

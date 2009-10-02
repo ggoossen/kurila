@@ -1,7 +1,5 @@
 #!./perl
 
-
-
 use Test::More
 use Time::Local
 
