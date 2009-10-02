@@ -25,14 +25,7 @@ use Pod::Text::Termcap
 # these tests are run as part of Perl core.
 sub source_path
     my $file = shift
-    if (env::var('PERL_CORE')) {
-        require File::Spec;
-        my $updir = File::Spec->updir;
-        my $dir = File::Spec->catdir ($updir, 'lib', 'Pod', 't');
-        return File::Spec->catfile ($dir, $file);
-    }else 
-        return $file
-    
+    my $dir = File::Spec->catdir('t');
 
 
 print $^STDOUT, "ok 1\n"

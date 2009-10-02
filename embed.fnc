@@ -431,7 +431,6 @@ ApPR	|U32	|to_uni_upper_lc|U32 c
 ApPR	|U32	|to_uni_title_lc|U32 c
 ApPR	|U32	|to_uni_lower_lc|U32 c
 ApPR	|bool	|is_uni_alnum	|UV c
-ApPR	|bool	|is_uni_alnumc	|UV c
 ApPR	|bool	|is_uni_idfirst	|UV c
 ApPR	|bool	|is_uni_alpha	|UV c
 ApPR	|bool	|is_uni_ascii	|UV c
@@ -449,7 +448,6 @@ Ap	|UV	|to_uni_title	|UV c|NN char *p|NN STRLEN *lenp
 Ap	|UV	|to_uni_lower	|UV c|NN char *p|NN STRLEN *lenp
 Ap	|UV	|to_uni_fold	|UV c|NN char *p|NN STRLEN *lenp
 ApPR	|bool	|is_uni_alnum_lc|UV c
-ApPR	|bool	|is_uni_alnumc_lc|UV c
 ApPR	|bool	|is_uni_idfirst_lc|UV c
 ApPR	|bool	|is_uni_alpha_lc|UV c
 ApPR	|bool	|is_uni_ascii_lc|UV c
@@ -467,7 +465,6 @@ Apd	|bool	|is_utf8_string	|NN const char *s|STRLEN len
 Apdmb	|bool	|is_utf8_string_loc|NN const char *s|STRLEN len|NULLOK const char **p
 Apd	|bool	|is_utf8_string_loclen|NN const char *s|STRLEN len|NULLOK const char **ep|NULLOK STRLEN *el
 ApR	|bool	|is_utf8_alnum	|NN const char *p
-ApR	|bool	|is_utf8_alnumc	|NN const char *p
 ApR	|bool	|is_utf8_idfirst|NN const char *p
 ApR	|bool	|is_utf8_idcont	|NN const char *p
 ApR	|bool	|is_utf8_alpha	|NN const char *p
