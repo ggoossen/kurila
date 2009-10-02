@@ -34,6 +34,7 @@ sub usage { die <<EOF }
 usage: $^PROGRAM_NAME  [ options ]
     --cross=PLATFORM    cross-compile for a different platform
     --no-glossary       don't include Porting/Glossary in lib/Config.pod
+    --chdir=dir         change directory before writing files
 EOF
 
 
@@ -59,8 +60,8 @@ my %Extensions = %+: map {(%: $_,$_)},
 my %Allowed_Opts = %: 
     'cross'    => '' # --cross=PLATFORM - crosscompiling for PLATFORM
     'glossary' => 1  # --no-glossary  - no glossary file inclusion,
-    #                  for compactness
-    
+                     #                  for compactness
+    'chdir'    => '', # --chdir=dir    - change directory before writing files
 
 sub opts
     # user specified options
@@ -84,6 +85,9 @@ sub opts
 
 
 my %Opts = %:  < opts() 
+
+if (%Opts{?chdir})
+    chdir %Opts{chdir} or die "$^PROGRAM_NAME: could not chdir %Opts{chdir}: $^OS_ERROR"
 
 my ($Config_SH, $Config_PM, $Config_heavy, $Config_POD)
 my $Glossary = 'Porting/Glossary'
