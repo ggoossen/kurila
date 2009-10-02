@@ -58,6 +58,7 @@
 /IPC/Semaphore.pm
 /IPC/SharedMem.pm
 /IPC/SysV.pm
+/Getopt/Long.pm
 /List
 /MIME
 /Math/BigInt/FastCalc.pm
