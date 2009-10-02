@@ -156,7 +156,7 @@ if ($is_Win32)
     env::var('PATH') = "$topdir;$topdir\\win32\\bin;$(env::var('PATH'))"
     my $pl2bat = "$topdir\\win32\\bin\\pl2bat"
     unless (-f "$pl2bat.bat")
-        my @args = @: $perl, < (@: "$pl2bat.pl") x 2
+        my @args = @: $perl, "-I$topdir\\lib", < (@: "$pl2bat.pl") x 2
         print $^STDOUT, "$(join ' ', @args)\n"
         system(< @args) unless defined $::Cross::platform
 
