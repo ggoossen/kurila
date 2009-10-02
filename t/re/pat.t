@@ -2100,7 +2100,6 @@ END
         ok($x eq "b k", "Markus Kuhn 2003-02-26")
 
         ok("\x{2019}" =~ m/\S/, "Markus Kuhn 2003-02-26")
-    
 
     do
         my $i
@@ -2108,7 +2107,6 @@ END
            "[perl #21411] (??\{ .. \}) corrupts split's stack")
         ok('a|b|c' eq join ('|', split m/(?{'WOW'})/, 'abc'),
            "[perl #21411] (?\{ .. \}) version of the above")
-    
 
     do
         # XXX DAPM 13-Apr-06. Recursive split is still broken. It's only luck it
