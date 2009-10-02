@@ -1,5 +1,9 @@
 use ExtUtils::MakeMaker
 
+my $is_mswin    = $^OS_NAME eq 'MSWin32'
+my $is_netware  = $^OS_NAME eq 'NetWare'
+my $is_vms      = $^OS_NAME eq 'VMS'
+
 WriteMakefile(
     NAME => 'DynaLoader',
     LINKTYPE    => 'static',
@@ -17,10 +21,12 @@ WriteMakefile(
     )
 
 sub MY::postamble
-    q|
-DynaLoader.xs: $(DLSRC)
-	$(RM_F) $@
-	$(CP) $? $@
+    my $test_xs
+
+    if ($is_mswin || $is_netware || $is_vms)
+        $test_xs = ''
+    else
+        $test_xs = <<'EOT';
 
 # Perform very simple tests just to check for major gaffs.
 # We can't do much more for platforms we are not executing on.
@@ -28,15 +34,27 @@ test-xs:
 	for i in dl_*xs; \
 	    do $(PERL) -I$(PERL_ARCHLIB) -I$(PERL_LIB) $(XSUBPP) $(XSUBPPARGS) $$i > /dev/null; \
 	done
-|
+EOT
 
+    return '
+DynaLoader.xs: $(DLSRC)
+	$(RM_F) $@
+	$(CP) $? $@
+' . $test_xs;
 
 sub MY::static
-    '
-$(PERL_SRC)/$(OBJECT) : $(FIRST_MAKEFILE) $(OBJECT)
-	$(RM_RF) $(PERL_SRC)/$(OBJECT)
-	$(CP) $(OBJECT) $(PERL_SRC)/$(OBJECT)
+    my $object
+    if ($is_mswin || $is_netware)
+        $object = '$(PERL_SRC)\\$(OBJECT)'
+    elsif ($is_vms)
+        $object = '[$(PERL_SRC)].$(OBJECT)'
+    else
+        $object = '$(PERL_SRC)/$(OBJECT)'
 
-static :: $(PERL_SRC)/$(OBJECT)
-'
+    return "
+$object : \$(FIRST_MAKEFILE) \$(OBJECT)
+	\$(RM_RF) $object
+	\$(CP) \$(OBJECT) $object
 
+static :: $object
+"
