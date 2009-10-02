@@ -54,6 +54,14 @@ cpan/ExtUtils-ParseXS/t/XSTest.pm		Test file for ExtUtils::ParseXS tests
 cpan/ExtUtils-ParseXS/t/XSTest.xs		Test file for ExtUtils::ParseXS tests
 cpan/File-Path/lib/File/Path.pm		Do things like 'mkdir -p' and 'rm -r'
 cpan/File-Path/t/Path.t			See if File::Path works
+cpan/Getopt-Long/CHANGES		Getopt::Long changes
+cpan/Getopt-Long/lib/Getopt/Long.pm	Fetch command options (GetOptions)
+cpan/Getopt-Long/README			Getopt::Long README
+cpan/Getopt-Long/t/gol-basic.t		See if Getopt::Long works
+cpan/Getopt-Long/t/gol-linkage.t	See if Getopt::Long works
+cpan/Getopt-Long/t/gol-oo.t		See if Getopt::Long works
+cpan/Getopt-Long/t/gol-xargv.t		See if Getopt::Long works
+cpan/Getopt-Long/t/gol-xstring.t	See if Getopt::Long works
 cpan/IPC-SysV/Changes			IPC::SysV changes
 cpan/IPC-SysV/hints/cygwin.pl		Hint for IPC::SysV for named architecture
 cpan/IPC-SysV/hints/next_3.pl		Hint for IPC::SysV for named architecture
@@ -558,14 +566,6 @@ ext/File-Temp/t/posix.t		See if File::Temp works
 ext/File-Temp/t/security.t	See if File::Temp works
 ext/File-Temp/t/seekable.t	See if File::Temp works
 ext/File-Temp/t/tempfile.t	See if File::Temp works
-ext/Getopt-Long/CHANGES			Getopt::Long changes
-ext/Getopt-Long/lib/Getopt/Long.pm	Fetch command options (GetOptions)
-ext/Getopt-Long/README			Getopt::Long README
-ext/Getopt-Long/t/gol-basic.t		See if Getopt::Long works
-ext/Getopt-Long/t/gol-linkage.t		See if Getopt::Long works
-ext/Getopt-Long/t/gol-oo.t		See if Getopt::Long works
-ext/Getopt-Long/t/gol-xargv.t		See if Getopt::Long works
-ext/Getopt-Long/t/gol-xstring.t		See if Getopt::Long works
 ext/Hash-Util/Changes		Change history of Hash::Util
 ext/Hash-Util/lib/Hash/Util.pm	Hash::Util
 ext/Hash-Util/Makefile.PL	Makefile for Hash::Util
