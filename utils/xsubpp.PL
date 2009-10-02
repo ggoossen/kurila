@@ -33,16 +33,9 @@ print OUT <<"!GROK!THIS!";
 
 use File::Spec;
 
-<<<<<<< HEAD:utils/xsubpp.PL
 my $xsubpp = File::Spec->catfile( < File::Spec->catdir(< File::Spec->updir,
-						       < qw(ext ExtUtils-ParseXS
+						       < qw(cpan ExtUtils-ParseXS
 						            lib ExtUtils xsubpp)))
-=======
-my $xsubpp = File::Spec->catfile(File::Spec->catdir(File::Spec->updir,
-						    qw(cpan ExtUtils-ParseXS
-						       lib ExtUtils)),
-				 'xsubpp');
->>>>>>> 3e845af8e4986053d5f9f4e271a55d6feb803790:utils/xsubpp.PL
 
 if (open(XSUBPP, "<", $xsubpp)) {
     print OUT ~< *XSUBPP;
