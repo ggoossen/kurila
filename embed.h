@@ -1791,8 +1791,7 @@
 #define xmldump_packsubs	Perl_xmldump_packsubs
 #define xmldump_packsubs_perl	Perl_xmldump_packsubs_perl
 #define xmldump_sub		Perl_xmldump_sub
-#endif
-#ifdef PERL_CORE
+#define xmldump_sub_perl	Perl_xmldump_sub_perl
 #define xmldump_eval		Perl_xmldump_eval
 #define sv_catxmlsv		Perl_sv_catxmlsv
 #define sv_catxmlpvn		Perl_sv_catxmlpvn

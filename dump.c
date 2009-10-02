@@ -2008,7 +2008,7 @@ Perl_xmldump_all_perl(pTHX_ bool justperl)
     PerlIO_setlinebuf(PL_xmlfp);
     if (PL_main_root)
 	op_xmldump(PL_main_root);
-    xmldump_packsubs_perl(PL_defstash, justperl)
+    xmldump_packsubs_perl(PL_defstash, justperl);
     if (PL_xmlfp != (PerlIO*)PerlIO_stdout())
 	PerlIO_close(PL_xmlfp);
     PL_xmlfp = 0;
@@ -2016,6 +2016,12 @@ Perl_xmldump_all_perl(pTHX_ bool justperl)
 
 void
 Perl_xmldump_packsubs(pTHX_ const HV *stash)
+{
+    xmldump_packsubs_perl(stash, FALSE);
+}
+
+void
+Perl_xmldump_packsubs_perl(pTHX_ const HV *stash, bool justperl)
 {
     I32	i;
     HE	*entry;
@@ -2031,10 +2037,10 @@ Perl_xmldump_packsubs(pTHX_ const HV *stash)
 	    if (SvTYPE(gv) != SVt_PVGV || !GvGP(gv))
 		continue;
 	    if (GvCVu(gv))
-		xmldump_sub(gv);
+		xmldump_sub_perl(gv, justperl);
 	    if (HeKEY(entry)[HeKLEN(entry)-1] == ':'
 		&& (hv = GvHV(gv)) && hv != PL_defstash)
-		xmldump_packsubs(hv);		/* nested package */
+		xmldump_packsubs_perl(hv, justperl);	/* nested package */
 	}
     }
 }

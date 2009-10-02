@@ -1896,7 +1896,7 @@ p	|void	|xmldump_all_perl	|bool justperl
 Mp	|void	|xmldump_packsubs	|NN const HV* stash
 p	|void	|xmldump_packsubs_perl	|NN const HV* stash|bool justperl
 Mp	|void	|xmldump_sub	|NN const GV* gv
-M	|void	|xmldump_sub_perl	|NN const GV* gv|bool justperl
+Mp	|void	|xmldump_sub_perl	|NN const GV* gv|bool justperl
 Mp	|void	|xmldump_eval
 Mp	|const char*	|sv_catxmlsv	|NN SV *dsv|NN SV *ssv
 Mp	|const char*	|sv_catxmlpvn	|NN SV *dsv|NN const char *pv|STRLEN len
