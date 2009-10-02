@@ -228,6 +228,7 @@ sub build_extension($ext_dir, $perl, $mname, $pass_through)
     # another process has half-written.
     env::var('PERL5LIB')
         = join config_value('path_sep'), map {"$up/$_"}, @: < @toolchain, $lib_dir
+    env::var('PERL_CORE') = 1
 
     unless (chdir "$ext_dir")
         warn "Cannot cd to $ext_dir: $^OS_ERROR"
