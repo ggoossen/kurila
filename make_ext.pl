@@ -160,9 +160,10 @@ if ($is_Win32)
         print $^STDOUT, "$(join ' ', @args)\n"
         system(< @args) unless defined $::Cross::platform
 
-    print $^STDOUT, "In ", getcwd()
+    my $build = getcwd()
+    print $^STDOUT, "In $build"
     for my $dir ($dirs)
-        chdir($dir) || die "Cannot cd to $dir\n"
+        chdir($dir) or die "Cannot cd to $dir: $^OS_ERROR\n"
         (my $ext = getcwd()) =~ s{/}{\\}g
         FindExt::scan_ext($ext)
         FindExt::set_static_extensions(split ' ', config_value('static_ext'))
@@ -187,8 +188,10 @@ if ($is_Win32)
             elsif(FindExt::is_static($_))
                 push %extra_passthrough{+$_}, 'LINKTYPE=static'
 
-        chdir '..' # now in the Perl build directory
-
+        chdir $build
+            or die "Couldn't chdir to '$build': $^OS_ERROR"
+    chdir '..'
+        or die "Couldn't chdir to build directory: $^OS_ERROR"; # now in the Perl build directory
 elsif ($is_VMS)
     $perl = $^EXECUTABLE_NAME
     push @extspec, (< split ' ', config_value('static_ext')) if $static
