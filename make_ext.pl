@@ -100,7 +100,7 @@ foreach (@extspec)
         s{/pm_to_blib$}{}
         # Targets are given as files on disk, but the extension spec is still
         # written using /s for each ::
-        s!-!/!
+        s!-!/!g
     elsif (s{::}{\/}g)
         # Convert :: to /
         1
@@ -215,7 +215,7 @@ sub build_extension($ext_dir, $perl, $mname, $pass_through)
 
     $perl ||= "$up/miniperl"
     my $return_dir = $up
-    my $lib_dir = "$up/lib"
+    my $lib_dir = "lib"
     # $lib_dir must be last, as we're copying files into it, and in a parallel
     # make there's a race condition if one process tries to open a module that
     # another process has half-written.

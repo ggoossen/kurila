@@ -4,14 +4,8 @@ plan tests => 5
 
 sub source_path
     my $file = shift
-    if (env::var('PERL_CORE'))
-        require File::Spec
-        my $updir = File::Spec->updir
-        my $dir = File::Spec->catdir ($updir, 'lib', 'Pod', 'Simple', 't')
-        return File::Spec->catfile ($dir, $file)
-    else
-        return $file
-    
+    my $dir = File::Spec->catdir ('t')
+    return File::Spec->catfile ($dir, $file)
 
 
 use Pod::Simple::Text

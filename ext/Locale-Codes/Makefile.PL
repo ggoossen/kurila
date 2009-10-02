@@ -1,5 +1,5 @@
-use strict;
-use ExtUtils::MakeMaker;
+
+use ExtUtils::MakeMaker
 
 WriteMakefile (
     NAME      => 'Locale-Codes',
@@ -7,4 +7,4 @@ WriteMakefile (
     VERSION   => '2.07',
     AUTHOR    => 'Neil Bowers <neil@bowers.com>',
     ABSTRACT  => 'modules for ISO codes identifying countries, languages, currencies, and scripts',
-);
+    )

@@ -182,7 +182,6 @@ sub plan($self, $cmd, ?$arg)
     else
         my @args = grep { defined }, @:  ($cmd, $arg)
         die("plan() doesn't understand $(join ' ',@args)")
-    
 
     return 1
 

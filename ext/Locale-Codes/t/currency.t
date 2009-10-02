@@ -67,10 +67,11 @@ our @TESTS =
     'currency2code("Canadian Dollar") eq "cad"'       # last in DATA segment
     
 
-require "./test.pl"
+use Test::More
 
-plan(nelems @TESTS)
+plan(tests => nelems @TESTS)
 
 foreach my $test ( @TESTS)
-    dies_not( sub (@< @_) { eval "$test" } )
+    eval "$test"
+    ok( not $^EVAL_ERROR )
 

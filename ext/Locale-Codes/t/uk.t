@@ -52,10 +52,11 @@ our @TESTS =
     'country2code("Zimbabwe")       eq "zw"'    # last in DATA segment
     
 
-require "./test.pl"
+use Test::More
 
-plan(int(nelems @TESTS))
+plan( tests => nelems @TESTS )
 
 foreach my $test ( @TESTS)
-    dies_not( sub (@< @_) { eval "$test" } )
+    eval "$test"
+    ok( not $^EVAL_ERROR )
 
