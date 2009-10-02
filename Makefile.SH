@@ -298,6 +298,11 @@ LIB_EXT = $_a
 OBJ_EXT = $_o
 PATH_SEP = $p_
 
+# Macros to invoke a copy of miniperl during the build.  Targets which
+# are built using these macros should depend on \$(MINIPERL_EXE)
+MINIPERL_EXE = miniperl\$(EXE_EXT)
+MINIPERL = \$(LDLIBPTH) \$(RUN) ./miniperl\$(EXE_EXT) -Ilib
+
 #
 dynamic_ext = $dynamic_list
 static_ext = $static_list
@@ -533,14 +538,14 @@ splintfiles = $(c1)
 .c.s:
 	$(CCCMDSRC) -S $*.c
 
-all: $(FIRSTMAKEFILE) miniperl$(EXE_EXT) miniperl $(generated_pods) $(private) $(unidatafiles) $(public) $(dynamic_ext) $(nonxs_ext) extras.make
+all: $(FIRSTMAKEFILE) $(MINIPERL_EXE) miniperl $(generated_pods) $(private) $(unidatafiles) $(public) $(dynamic_ext) $(nonxs_ext) extras.make
 	@echo " ";
 	@echo "	Everything is up to date. Type '$(MAKE) test' to run test suite."
 
 .PHONY: all translators utilities
 
-lib/Config_git.pl git_version.h: miniperl$(EXE_EXT) make_patchnum.pl
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_patchnum.pl
+lib/Config_git.pl git_version.h: $(MINIPERL_EXE) make_patchnum.pl
+	$(MINIPERL) make_patchnum.pl
 
 # make sure that we recompile perl.c if the git version changes
 perl$(OBJ_EXT): git_version.h
@@ -647,7 +652,7 @@ LIBPERLEXPORT		= perl.exp
 		;;
 	*)	
 		$spitshell >>$Makefile <<'!NO!SUBS!'
-MINIPERLEXP		= miniperl$(EXE_EXT)
+MINIPERLEXP		= $(MINIPERL_EXE)
 
 PERLEXPORT		= perl.exp
 
@@ -755,8 +760,8 @@ $(LIBPERL): $& $(obj) $(DYNALOADER) $(LIBPERLEXPORT)
 	case "${osname}${osvers}" in
 	aix*|beos*)
 		$spitshell >>$Makefile <<'!NO!SUBS!'
-miniperl$(EXE_EXT): $& miniperlmain$(OBJ_EXT) $(mini_obj) opmini$(OBJ_EXT) perlmini$(OBJ_EXT)
-	$(CC) -o miniperl$(EXE_EXT) $(CLDFLAGS) \
+$(MINIPERL_EXE): $& miniperlmain$(OBJ_EXT) $(mini_obj) opmini$(OBJ_EXT) perlmini$(OBJ_EXT)
+	$(CC) -o $(MINIPERL_EXE) $(CLDFLAGS) \
 	    $(mini_obj) \
 	    miniperlmain$(OBJ_EXT) opmini$(OBJ_EXT) perlmini$(OBJ_EXT) $(libs)
 	$(LDLIBPTH) $(RUN) ./miniperl$(HOST_EXE_EXT) -w -Ilib -MExporter -e 'glob("?")' || $(MAKE) minitest
@@ -764,8 +769,8 @@ miniperl$(EXE_EXT): $& miniperlmain$(OBJ_EXT) $(mini_obj) opmini$(OBJ_EXT) perlm
 		;;
 	next4*)
 		$spitshell >>$Makefile <<'!NO!SUBS!'
-miniperl$(EXE_EXT): $& miniperlmain$(OBJ_EXT) $(mini_obj) perlmini$(OBJ_EXT) opmini$(OBJ_EXT)
-	$(CC) -o miniperl$(EXE_EXT) $(mini_obj) \
+$(MINIPERL_EXE): $& miniperlmain$(OBJ_EXT) $(mini_obj) perlmini$(OBJ_EXT) opmini$(OBJ_EXT)
+	$(CC) -o $(MINIPERL_EXE) $(mini_obj) \
 	    miniperlmain$(OBJ_EXT) opmini$(OBJ_EXT) perlmini$(OBJ_EXT) $(libs)
 	$(LDLIBPTH) $(RUN) ./miniperl$(HOST_EXE_EXT) -w -Ilib -MExporter -e 'glob("?")' || $(MAKE) minitest
 !NO!SUBS!
@@ -784,9 +789,9 @@ NAMESPACEFLAGS = -force_flat_namespace
 		    ;;
 		esac
 		$spitshell >>$Makefile <<'!NO!SUBS!'
-miniperl$(EXE_EXT): $& miniperlmain$(OBJ_EXT) $(mini_obj) opmini$(OBJ_EXT) perlmini$(OBJ_EXT)
+$(MINIPERL_EXE): $& miniperlmain$(OBJ_EXT) $(mini_obj) opmini$(OBJ_EXT) perlmini$(OBJ_EXT)
 	-@rm -f miniperl.xok
-	$(CC) $(CLDFLAGS) $(NAMESPACEFLAGS) -o miniperl$(EXE_EXT) \
+	$(CC) $(CLDFLAGS) $(NAMESPACEFLAGS) -o $(MINIPERL_EXE) \
 	    $(mini_obj) \
 	    miniperlmain$(OBJ_EXT) opmini$(OBJ_EXT) perlmini$(OBJ_EXT) $(libs)
 	$(LDLIBPTH) $(RUN) ./miniperl$(HOST_EXE_EXT) -w -Ilib -MExporter -e 'glob("?")' || $(MAKE) minitest
@@ -794,9 +799,9 @@ miniperl$(EXE_EXT): $& miniperlmain$(OBJ_EXT) $(mini_obj) opmini$(OBJ_EXT) perlm
 		;;
 	*)
 		$spitshell >>$Makefile <<'!NO!SUBS!'
-miniperl$(EXE_EXT): $& miniperlmain$(OBJ_EXT) $(mini_obj) opmini$(OBJ_EXT) perlmini$(OBJ_EXT)
+$(MINIPERL_EXE): $& miniperlmain$(OBJ_EXT) $(mini_obj) opmini$(OBJ_EXT) perlmini$(OBJ_EXT)
 	-@rm -f miniperl.xok
-	$(LDLIBPTH) $(CC) $(CLDFLAGS) -o miniperl$(EXE_EXT) \
+	$(LDLIBPTH) $(CC) $(CLDFLAGS) -o $(MINIPERL_EXE) \
 	    $(mini_obj) \
 	    miniperlmain$(OBJ_EXT) opmini$(OBJ_EXT) perlmini$(OBJ_EXT) $(libs)
 	$(LDLIBPTH) $(RUN) ./miniperl$(HOST_EXE_EXT) -w -Ilib -MExporter -e 'glob("?")' || $(MAKE) minitest
@@ -918,13 +923,13 @@ fi
 $spitshell >>$Makefile <<'!NO!SUBS!'
 
 .PHONY: preplibrary
-preplibrary: miniperl$(EXE_EXT) $(CONFIGPM) lib/re.pm $(PREPLIBRARY_LIBPERL)
+preplibrary: $(MINIPERL_EXE) $(CONFIGPM) lib/re.pm $(PREPLIBRARY_LIBPERL)
 
-$(CONFIGPM_FROM_CONFIG_SH) $(CONFIGPOD): config.sh miniperl$(EXE_EXT) configpm Porting/Glossary lib/Config_git.pl
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib configpm
+$(CONFIGPM_FROM_CONFIG_SH) $(CONFIGPOD): config.sh $(MINIPERL_EXE) configpm Porting/Glossary lib/Config_git.pl
+	$(MINIPERL) configpm
 
-lib/ExtUtils/Miniperl.pm: miniperlmain.c miniperl$(EXE_EXT) minimod.pl $(CONFIGPM)
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) minimod.pl > lib/ExtUtils/Miniperl.pm
+lib/ExtUtils/Miniperl.pm: miniperlmain.c $(MINIPERL_EXE) minimod.pl $(CONFIGPM)
+	$(MINIPERL) minimod.pl > lib/ExtUtils/Miniperl.pm
 
 lib/re.pm: ext/re/re.pm
 	@-rm -f $@
@@ -936,8 +941,8 @@ $(plfixlocal): $(CONFIGPM)
 
 unidatafiles $(unidatafiles): uni.data
 
-uni.data: miniperl$(EXE_EXT) $(CONFIGPM) lib/unicore/mktables $(nonxs_ext)
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib -Iext/Cwd/lib lib/unicore/mktables -C lib/unicore -w
+uni.data: $(MINIPERL_EXE) $(CONFIGPM) lib/unicore/mktables $(nonxs_ext)
+	$(MINIPERL) -Iext/Cwd/lib lib/unicore/mktables -C lib/unicore -w
 	touch uni.data
 
 # perl$(EXE_EXT) and ext because buildtoc uses Text::Wrap uses re
@@ -946,16 +951,16 @@ uni.data: miniperl$(EXE_EXT) $(CONFIGPM) lib/unicore/mktables $(nonxs_ext)
 pod/perltoc.pod: $(perltoc_pod_prereqs) perl$(EXE_EXT) $(ext) pod/buildtoc
 	$(LDLIBPTH) $(RUN) ./perl$(EXE_EXT) -f -Ilib pod/buildtoc --build-toc -q
 
-pod/perlapi.pod pod/perlintern.pod: miniperl$(EXE_EXT) autodoc.pl embed.fnc
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib autodoc.pl
+pod/perlapi.pod pod/perlintern.pod: $(MINIPERL_EXE) autodoc.pl embed.fnc
+	$(MINIPERL) autodoc.pl
 
-pod/perlmodlib.pod: miniperl$(EXE_EXT) pod/perlmodlib.PL MANIFEST
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib $(Icwd) pod/perlmodlib.PL -q
+pod/perlmodlib.pod: $(MINIPERL_EXE) pod/perlmodlib.PL MANIFEST
+	$(MINIPERL) $(Icwd) pod/perlmodlib.PL -q
 
 pod/perldelta.pod: pod/perl5110delta.pod
 	$(LNS) perl5110delta.pod pod/perldelta.pod
 
-extra.pods: miniperl$(EXE_EXT)
+extra.pods: $(MINIPERL_EXE)
 	-@test ! -f extra.pods || rm -f `cat extra.pods`
 	-@rm -f extra.pods
 	-@for x in `grep -l '^=[a-z]' README.* | grep -v README.vms` ; do \
@@ -977,7 +982,7 @@ extras.install: perl$(EXE_EXT)
 	no-install install.perl install.man install.html
 
 META.yml:	Porting/makemeta Porting/Maintainers.pl Porting/Maintainers.pm
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib Porting/makemeta
+	$(MINIPERL) Porting/makemeta
 
 install-strip:
 	$(MAKE) STRIPFLAGS=-s install DESTDIR="$(DESTDIR)"
@@ -1099,17 +1104,17 @@ manicheck:	FORCE
 #
 # DynaLoader may be needed for extensions that use Makefile.PL.
 
-$(DYNALOADER):	miniperl$(EXE_EXT) preplibrary FORCE $(nonxs_ext)
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_ext.pl $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL) LINKTYPE=static $(STATIC_LDFLAGS)
+$(DYNALOADER):	$(MINIPERL_EXE) preplibrary FORCE $(nonxs_ext)
+	$(MINIPERL) make_ext.pl $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL) LINKTYPE=static $(STATIC_LDFLAGS)
 
-d_dummy $(dynamic_ext):	miniperl$(EXE_EXT) preplibrary $(DYNALOADER) FORCE
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_ext.pl $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL) LINKTYPE=dynamic
+d_dummy $(dynamic_ext):	$(MINIPERL_EXE) preplibrary $(DYNALOADER) FORCE
+	$(MINIPERL) make_ext.pl $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL) LINKTYPE=dynamic
 
-s_dummy $(static_ext):	miniperl$(EXE_EXT) preplibrary $(DYNALOADER) FORCE
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_ext.pl $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL) LINKTYPE=static $(STATIC_LDFLAGS)
+s_dummy $(static_ext):	$(MINIPERL_EXE) preplibrary $(DYNALOADER) FORCE
+	$(MINIPERL) make_ext.pl $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL) LINKTYPE=static $(STATIC_LDFLAGS)
 
-n_dummy $(nonxs_ext):	miniperl$(EXE_EXT) preplibrary FORCE
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_ext.pl $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL)
+n_dummy $(nonxs_ext):	$(MINIPERL_EXE) preplibrary FORCE
+	$(MINIPERL) make_ext.pl $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL)
 !NO!SUBS!
 
 $spitshell >>$Makefile <<EOF
@@ -1157,7 +1162,7 @@ _mopup:
 	-rm -f perl.pixie lib*.so.perl.pixie lib*.so.Addrs
 	-rm -f perl.Addrs perl.Counts t/perl.Addrs t/perl.Counts *perl.xok
 	-rm -f cygwin.c libperl*.def libperl*.dll cygperl*.dll *.exe.stackdump
-	-rm -f perl$(EXE_EXT) miniperl$(EXE_EXT) $(LIBPERL) libperl.* microperl
+	-rm -f perl$(EXE_EXT) $(MINIPERL_EXE) $(LIBPERL) libperl.* microperl
 	-rm -f opcode.h-old opnames.h-old pp.sym-old pp_proto.h-old
 	-rm -f config.arch config.over $(DTRACE_H)
 
@@ -1167,21 +1172,22 @@ _tidy:
 	-cd utils; $(LDLIBPTH) $(MAKE) clean
 	-rm -f lib/Config_git.pl git_version.h
 	-@for x in $(DYNALOADER) $(dynamic_ext) $(static_ext) $(nonxs_ext) ; do \
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_ext.pl --target=clean $$x MAKE=$(MAKE) ; \
+	$(MINIPERL) make_ext.pl --target=clean $$x MAKE=$(MAKE) ; \
 	done
 
 _cleaner1:
 	-cd os2; rm -f Makefile
 	-cd pod; $(LDLIBPTH) $(MAKE) $(CLEAN)
 	-cd utils; $(LDLIBPTH) $(MAKE) $(CLEAN)
+	-@if test -f $(MINIPERL_EXE) ; then \
 	for x in $(DYNALOADER) $(dynamic_ext) $(static_ext) $(nonxs_ext) ; do \
-	$(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib make_ext.pl --target=$(CLEAN) $$x MAKE=$(MAKE) ; \
+	$(MINIPERL) make_ext.pl --target=$(CLEAN) $$x MAKE=$(MAKE) ; \
 	done ; \
 	else \
 	sh $(CLEAN).sh ; \
 	fi
 	rm -f realclean.sh veryclean.sh
-	-@test ! -f ./miniperl$(EXE_EXT) || $(LDLIBPTH) $(RUN) ./miniperl$(EXE_EXT) -Ilib mkppport --clean
+	-@test ! -f ./$(MINIPERL_EXE) || $(MINIPERL) mkppport --clean
 
 # Some systems do not support "?", so keep these files separate.
 _cleaner2:
@@ -1272,7 +1278,7 @@ _test_prep:
 
 test_prep_pre: preplibrary utilities $(nonxs_ext)
 
-test_prep: test_prep_pre miniperl$(EXE_EXT) $(unidatafiles) perl$(EXE_EXT) $(dynamic_ext) $(TEST_PERL_DLL)
+test_prep: test_prep_pre $(MINIPERL_EXE) $(unidatafiles) perl$(EXE_EXT) $(dynamic_ext) $(TEST_PERL_DLL)
 	PERL=./perl $(MAKE) _test_prep
 
 _test_tty:
@@ -1320,7 +1326,7 @@ test.torture torturetest:	test_prep
 # Targets for UTF16 testing:
 
 minitest.utf16: minitest.prep
-	- cd t && (rm -f perl$(EXE_EXT); $(LNS) ../miniperl$(EXE_EXT) perl$(EXE_EXT)) \
+	- cd t && (rm -f perl$(EXE_EXT); $(LNS) ../$(MINIPERL_EXE) perl$(EXE_EXT)) \
 		&& $(LDLIBPTH) $(RUN) ./perl TEST -minitest -utf16 base/*.t comp/*.t cmd/*.t run/*.t io/*.t op/*.t uni/*.t </dev/tty
 
 test.utf16 check.utf16: test_prep
@@ -1379,8 +1385,8 @@ minitest.prep:
 
 # Can't depend on lib/Config.pm because that might be where miniperl
 # is crashing.
-minitest: miniperl$(EXE_EXT) lib/re.pm minitest.prep
-	- cd t && (rm -f perl$(EXE_EXT); $(LNS) ../miniperl$(EXE_EXT) perl$(EXE_EXT)) \
+minitest: $(MINIPERL_EXE) lib/re.pm minitest.prep
+	- cd t && (rm -f perl$(EXE_EXT); $(LNS) ../$(MINIPERL_EXE) perl$(EXE_EXT)) \
 		&& $(LDLIBPTH) $(RUN) ./perl TEST -minitest base/*.t comp/*.t cmd/*.t run/*.t io/*.t re/*.t op/*.t uni/*.t </dev/tty
 
 # Test via harness
