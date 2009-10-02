@@ -46,6 +46,10 @@ my @PODINCDIRS = @: catfile($INSTDIR, 'lib', 'Pod')
                     catfile($INSTDIR, 'pod')
                     catfile($INSTDIR, 't', 'pod')
 
+# FIXME - we should make the core capable of finding utilities built in
+# locations in ext.
+push @PODINCDIRS, catfile(< (@: File::Spec->updir()) x 2, 'pod') if env::var('PERL_CORE')
+
 ## Find the path to the file to =include
 sub findinclude
     my $self    = shift

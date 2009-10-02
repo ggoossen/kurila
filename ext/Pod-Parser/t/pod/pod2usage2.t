@@ -141,7 +141,6 @@ ok (compare ($text, <<'EOT'), "Output test pod2usage (verbose => 99, sections =>
 EOT
 
 
-
 __END__
 
 =head1 NAME
