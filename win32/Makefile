@@ -647,7 +647,7 @@ DEL		= del
 #
 # filenames given to xsubpp must have forward slashes (since it puts
 # full pathnames in #line strings)
-XSUBPP		= ..\$(MINIPERL) -I..\..\lib -I..\Cwd ..\$(EXTUTILSDIR)\xsubpp \
+XSUBPP		= ..\$(MINIPERL) -I..\..\lib -I..\Cwd -I..\Cwd\lib ..\$(EXTUTILSDIR)\xsubpp \
 		-C++ -prototypes
 
 MICROCORE_SRC	=		\
@@ -833,7 +833,7 @@ CFG_VARS	=					\
 		"LINK_FLAGS=$(LINK_FLAGS:"=\")"		\
 		"optimize=$(OPTIMIZE:"=\")"
 
-ICWD = -I..\ext\Cwd
+ICWD = -I..\ext\Cwd -I..\ext\Cwd\lib
 
 #
 # Top targets

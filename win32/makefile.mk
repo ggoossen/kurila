@@ -806,7 +806,7 @@ NOOP		= @rem
 #
 # filenames given to xsubpp must have forward slashes (since it puts
 # full pathnames in #line strings)
-XSUBPP		= ..\$(MINIPERL) -I..\..\lib -I..\Cwd ..\$(EXTUTILSDIR)\xsubpp \
+XSUBPP		= ..\$(MINIPERL) -I..\..\lib -I..\Cwd -I..\Cwd\lib ..\$(EXTUTILSDIR)\xsubpp \
 		-C++ -prototypes
 
 MICROCORE_SRC	=		\
@@ -1013,7 +1013,7 @@ ODBCCP32_DLL = $(SystemRoot)\system32\odbccp32.dll
 ODBCCP32_DLL = $(windir)\system\odbccp32.dll
 .ENDIF
 
-ICWD = -I..\ext\Cwd
+ICWD = -I..\ext\Cwd -I..\ext\Cwd\lib
 
 #
 # Top targets
