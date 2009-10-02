@@ -18,7 +18,7 @@ my @toolchain = qw(ext/constant/lib ext/Cwd ext/Cwd/lib ext/ExtUtils-Command/lib
 		   ext/ExtUtils-Manifest/lib ext/Text-ParseWords/lib
                    ext/File-Path/lib ext/Getopt-Long/lib)
 
-my @ext_dirs = qw(ext cpan)
+my @ext_dirs = qw(cpan ext)
 my $ext_dirs_re = '(?:' . join('|', @ext_dirs) . ')'
 
 # This script acts as a simple interface for building extensions.
@@ -113,7 +113,7 @@ foreach (@extspec)
 my $makecmd  = shift @pass_through # Should be something like MAKE=make
 unshift @pass_through, 'PERL_CORE=1'
 
-my $dirs  = %opts{?dir} || @: 'ext', 'cpan'
+my $dirs  = %opts{?dir} || @: 'cpan', 'ext'
 my $target   = %opts{?target}[?0] // 'all'
 
 # Previously, $make was taken from config.sh.  However, the user might
