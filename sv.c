@@ -8291,7 +8291,6 @@ ptr_table_* functions.
 
 ============================================================================*/
 
-
 /* create a new pointer-mapping table */
 
 PTR_TBL_t *
