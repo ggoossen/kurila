@@ -1916,6 +1916,7 @@ regexec.c			Regular expression evaluator
 regexp.h			Public declarations for the above
 regnodes.h			Description of nodes of RE engine
 run.c				The interpreter loop
+runtests.SH			A script that generates runtests
 scope.c				Scope entry and exit code
 scope.h				Scope entry and exit header
 scope_i.h			Scope entry and exit inline functions
