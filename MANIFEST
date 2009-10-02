@@ -244,6 +244,14 @@ ext/File-Temp/t/posix.t		See if File::Temp works
 ext/File-Temp/t/security.t	See if File::Temp works
 ext/File-Temp/t/seekable.t	See if File::Temp works
 ext/File-Temp/t/tempfile.t	See if File::Temp works
+ext/Getopt-Long/CHANGES			Getopt::Long changes
+ext/Getopt-Long/lib/Getopt/Long.pm	Fetch command options (GetOptions)
+ext/Getopt-Long/README			Getopt::Long README
+ext/Getopt-Long/t/gol-basic.t		See if Getopt::Long works
+ext/Getopt-Long/t/gol-linkage.t		See if Getopt::Long works
+ext/Getopt-Long/t/gol-oo.t		See if Getopt::Long works
+ext/Getopt-Long/t/gol-xargv.t		See if Getopt::Long works
+ext/Getopt-Long/t/gol-xstring.t		See if Getopt::Long works
 ext/Hash-Util/Changes		Change history of Hash::Util
 ext/Hash-Util/lib/Hash/Util.pm	Hash::Util
 ext/Hash-Util/Makefile.PL	Makefile for Hash::Util
@@ -1211,14 +1219,6 @@ lib/filetest.pm			For "use filetest"
 lib/filetest.t			See if filetest works
 lib/FindBin.pm			Find name of currently executing program
 lib/FindBin.t			See if FindBin works
-lib/Getopt/Long/CHANGES		Getopt::Long changes
-lib/Getopt/Long.pm		Fetch command options (GetOptions)
-lib/Getopt/Long/README		Getopt::Long README
-lib/Getopt/Long/t/gol-basic.t	See if Getopt::Long works
-lib/Getopt/Long/t/gol-linkage.t	See if Getopt::Long works
-lib/Getopt/Long/t/gol-oo.t	See if Getopt::Long works
-lib/Getopt/Long/t/gol-xargv.t	See if Getopt::Long works
-lib/Getopt/Long/t/gol-xstring.t	See if Getopt::Long works
 lib/Getopt/Std.pm		Fetch command options (getopt, getopts)
 lib/Getopt/Std.t		See if Getopt::Std and Getopt::Long work
 lib/h2xs.t			See if h2xs produces expected lists of files
