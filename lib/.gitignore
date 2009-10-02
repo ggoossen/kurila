@@ -71,6 +71,7 @@
 /Opcode.pm
 /POSIX.pm
 /POSIX.pod
+/Pod/Escapes.pm
 /Pod/Perldoc.pm
 /Pod/Perldoc
 /Pod/Plainer.pm
