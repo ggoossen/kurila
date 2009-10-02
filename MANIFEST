@@ -46,6 +46,12 @@ cpan/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/Windows.pm	CBuilder method
 cpan/ExtUtils-CBuilder/lib/ExtUtils/CBuilder.pm			Compile and link C code for Perl modules
 cpan/ExtUtils-CBuilder/t/01-basic.t				tests for ExtUtils::CBuilder
 cpan/ExtUtils-CBuilder/t/02-link.t				tests for ExtUtils::CBuilder
+cpan/ExtUtils-ParseXS/Changes			ExtUtils::ParseXS change log
+cpan/ExtUtils-ParseXS/lib/ExtUtils/ParseXS.pm	converts Perl XS code into C code
+cpan/ExtUtils-ParseXS/lib/ExtUtils/xsubpp	External subroutine preprocessor
+cpan/ExtUtils-ParseXS/t/basic.t			See if ExtUtils::ParseXS works
+cpan/ExtUtils-ParseXS/t/XSTest.pm		Test file for ExtUtils::ParseXS tests
+cpan/ExtUtils-ParseXS/t/XSTest.xs		Test file for ExtUtils::ParseXS tests
 cpan/IPC-SysV/Changes			IPC::SysV changes
 cpan/IPC-SysV/hints/cygwin.pl		Hint for IPC::SysV for named architecture
 cpan/IPC-SysV/hints/next_3.pl		Hint for IPC::SysV for named architecture

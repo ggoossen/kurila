@@ -1472,7 +1472,7 @@ package Maintainers;
 	{
 	'MAINTAINER'	=> 'kwilliams',
 	'DISTRIBUTION'	=> 'DAGOLDEN/ExtUtils-ParseXS-2.2002.tar.gz',
-	'FILES'		=> q[ext/ExtUtils-ParseXS],
+	'FILES'		=> q[cpan/ExtUtils-ParseXS],
 	'CPAN'		=> 1,
 	'UPSTREAM'	=> 'cpan',
 	},
