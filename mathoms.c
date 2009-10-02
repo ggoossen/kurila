@@ -1121,18 +1121,21 @@ Perl_gv_SVadd(pTHX_ GV *gv)
 GV *
 Perl_gv_AVadd(pTHX_ GV *gv)
 {
+    PERL_ARGS_ASSERT_GV_AVADD;
     return gv_AVadd(gv);
 }
 
 GV *
 Perl_gv_HVadd(pTHX_ register GV *gv)
 {
+    PERL_ARGS_ASSERT_GV_HVADD;
     return gv_HVadd(gv);
 }
 
 GV *
 Perl_gv_IOadd(pTHX_ register GV *gv)
 {
+    PERL_ARGS_ASSERT_GV_IOADD;
     return gv_IOadd(gv);
 }
 

@@ -3720,6 +3720,7 @@ Perl_newCONSTSUB(pTHX_ const char *name, SV *sv)
     CV* cv;
     SV *const temp_sv = LocationFilename(PL_curcop->op_location);
     const char *const file = temp_sv ? SvPV_nolen_const(temp_sv) : NULL;
+    PERL_ARGS_ASSERT_NEWCONSTSUB;
 
     ENTER_named("newCONSTSUB");
 

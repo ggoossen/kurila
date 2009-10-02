@@ -194,8 +194,6 @@ pM	|PERL_CONTEXT*	|create_eval_scope|U32 flags
 Afprd	|void	|croak		|NULLOK const char* pat|...
 Afprd	|void	|croak_at	|NULLOK SV* location|NULLOK const char* pat|...
 Apr	|void	|vcroak		|NULLOK const char* pat|NULLOK va_list* args
-Aprd	|void	|croak_xs_usage	|NN const CV *const cv \
-				|NN const char *const params
 
 : Used in pp.c and pp_sys.c
 pd	|void	|cv_clone_anon	|NN CV* dst|NN CV* src
@@ -362,7 +360,7 @@ Ap	|GV*	|gv_fetchfile_flags|NN const char *const name|const STRLEN len\
 				|const U32 flags
 Apd	|CV*	|gv_fetchmeth	|NULLOK HV* stash|NN const char* name|STRLEN len|I32 level
 Apd	|CV*	|gv_fetchmethod	|NULLOK HV* stash|NN const char* name
-ApdM	|CV*	|gv_fetchmethod_flags|NN HV* stash|NN const char* name \
+ApdM	|CV*	|gv_fetchmethod_flags|NULLOK HV* stash|NN const char* name \
 				|U32 flags
 Ap	|GV*	|gv_fetchpv	|NN const char* nambeg|I32 add|const svtype sv_type
 Ap	|void	|gv_fullname3	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix
@@ -1374,7 +1372,7 @@ sR	|int	|dooneliner	|NN const char *cmd|NN const char *filename
 s	|SV *	|space_join_names_mortal|NN char *const *array
 #endif
 
-Eip	|UV	|UCHARAT|NN const char*
+Eip	|UV	|UCHARAT|NN const char *p
 
 #if defined(PERL_IN_REGCOMP_C) || defined(PERL_DECL_PROT)
 Es	|regnode*|regclassfold	|NN struct RExC_state_t *pRExC_state|U32 depth
@@ -1965,7 +1963,7 @@ s	|SV*	|dump_op_flags_private	|NN const OP* o
 s	|void	|dump_op_rest	|I32 level|NN PerlIO *file|NN const OP *o
 #endif /* PERL_IN_DUMP_C */
 
-#if defined(PERL_IN_UNIVERSLA_C) || defined(PERL_DECL_PROT)
+#if defined(PERL_IN_UNIVERSAL_C) || defined(PERL_DECL_PROT)
 so	|HV *	|get_isa_hash	|NN HV *const stash
 #endif
 

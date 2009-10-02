@@ -1797,7 +1797,6 @@ Policy_sh.SH		Hold site-wide preferences between Configure runs.
 Porting/bump-perl-version	bump the perl version in relevant files
 Porting/check83.pl	Check whether we are 8.3-friendly
 Porting/checkansi.pl	Check source code for ANSI-C violations
-Porting/checkARGS_ASSERT.pl	Check we use every PERL_ARGS_ASSERT* macro
 Porting/checkAUTHORS.pl	Check that the AUTHORS file is complete
 Porting/checkcfgvar.pl	Check that config scripts define all symbols
 Porting/checkURL.pl	Check whether we have working URLs
@@ -2041,6 +2040,7 @@ t/lex/qq.t			See if qq works
 t/lex/qr.t			See if qr work
 t/lex/use.t			See if use works
 t/lex/ver.t			See if v-strings and the %v format flag work
+t/lib/args_assert.t		Check that all PERL_ARGS_ASSERT* macros are used
 t/lib/Cname.pm			Test charnames in regexes (op/pat.t)
 t/lib/common.pl			Helper for lib/{warnings,feature}.t
 t/lib/commonsense.t		See if configuration meets basic needs

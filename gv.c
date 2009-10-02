@@ -40,6 +40,7 @@ GV *
 Perl_gv_add_by_type(pTHX_ GV *gv, svtype type)
 {
     SV **where;
+    PERL_ARGS_ASSERT_GV_ADD_BY_TYPE;
 
     if (!gv || SvTYPE((const SV *)gv) != SVt_PVGV) {
 	const char *what;
@@ -482,6 +483,8 @@ S_gv_get_super_pkg(pTHX_ const char* name, I32 namelen)
 CV *
 Perl_gv_fetchmethod(pTHX_ HV *stash, const char *name)
 {
+    PERL_ARGS_ASSERT_GV_FETCHMETHOD;
+
     return gv_fetchmethod_flags(stash, name, 0);
 }
 
@@ -499,7 +502,7 @@ Perl_gv_fetchmethod_flags(pTHX_ HV *stash, const char *name, U32 flags)
     SV *const error_report = hvTsv(stash);
     const U32 do_croak = flags & GV_CROAK;
 
-    PERL_ARGS_ASSERT_GV_FETCHMETHOD;
+    PERL_ARGS_ASSERT_GV_FETCHMETHOD_FLAGS;
 
     if (stash && SvTYPE(stash) < SVt_PVHV)
 	stash = NULL;

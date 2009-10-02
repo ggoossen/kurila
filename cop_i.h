@@ -65,6 +65,8 @@ void Perl_push_stack(pTHX_ I32 type, SV*** spp)
 {
     SV** sp;
     PERL_SI *next = PL_curstackinfo->si_next;
+    PERL_ARGS_ASSERT_PUSH_STACK;
+
     if (!next) {
         next = new_stackinfo(32, 2048/sizeof(PERL_CONTEXT) - 1);	
         next->si_prev = PL_curstackinfo;			

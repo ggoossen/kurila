@@ -1051,6 +1051,8 @@ S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
 STATIC char *
 S_skip_pod(pTHX_ register char *s)
 {
+    PERL_ARGS_ASSERT_SKIP_POD;
+
     if (s[0] == '=' && isALPHA(s[1])
 	&& (s == PL_linestart || s[-1] == '\n') ) {
 	if (PL_in_eval && !PL_rsfp) {
@@ -1670,6 +1672,8 @@ S_sublex_done(pTHX)
 STATIC void
 S_start_statement_indent(pTHX_ char* s)
 {
+    PERL_ARGS_ASSERT_START_STATEMENT_INDENT;
+
     if (PL_lex_brackets > 100) {
         Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
     }
@@ -1730,6 +1734,8 @@ S_stop_statement_indent(pTHX)
 STATIC void
 S_start_list_indent(pTHX_ char* s)
 {
+    PERL_ARGS_ASSERT_START_LIST_INDENT;
+
     if (PL_lex_brackets > 100) {
         Renew(PL_lex_brackstack, PL_lex_brackets + 10, yy_lex_brackstack_item);
     }
@@ -2439,6 +2445,8 @@ S_process_shebang(pTHX_ char* s) {
 #ifdef PERL_MAD
     char* starts = s;
 #endif
+    PERL_ARGS_ASSERT_PROCESS_SHEBANG;
+
     while (s < PL_bufend && isSPACE(*s))
 	s++;
     if (*s == ':' && s[1] != ':') /* for csh execing sh scripts */
@@ -2819,6 +2827,7 @@ static bool S_close_layout_lists(pTHX) {
 static int S_process_layout(pTHX_ char* s) {
     char* d;
     bool is_layout_list;
+    PERL_ARGS_ASSERT_PROCESS_LAYOUT;
 
     if (PL_lex_brackstack[PL_lex_brackets-1].type != LB_LAYOUT_LIST
 	&& PL_lex_brackstack[PL_lex_brackets-1].type != LB_LAYOUT_BLOCK ) {

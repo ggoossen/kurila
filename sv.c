@@ -859,6 +859,7 @@ static const struct body_details bodies_by_type[] = {
 	     - bodies_by_type[sv_type].offset)
 
 void Perl_del_body_allocated(pTHX_ void* p, svtype sv_type) {
+    PERL_ARGS_ASSERT_DEL_BODY_ALLOCATED;
     del_body((void*)((char *)p + bodies_by_type[sv_type].offset), &PL_body_roots[sv_type]);
 }
 

@@ -38,6 +38,7 @@ S_get_isa_hash(pTHX_ HV *const stash)
 {
     dVAR;
     struct mro_meta *const meta = HvMROMETA(stash);
+    PERL_ARGS_ASSERT_GET_ISA_HASH;
 
     if (!meta->isa) {
 	AV *const isa = mro_get_linear_isa(stash);

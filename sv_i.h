@@ -1,6 +1,7 @@
 
 datatype
 Perl_Dtype(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_DTYPE;
     if(!SvOK(sv))
         return Dt_UNDEF;
     else if (SvAVOK(sv))
@@ -25,6 +26,7 @@ Perl_Dtype(pTHX_ SV *sv) {
 
 const char*
 Perl_Ddesc(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_DDESC;
     switch (Perl_Dtype(aTHX_ sv)) {
     case Dt_UNDEF: return "UNDEF";
     case Dt_ARRAY: return "ARRAY";
@@ -60,6 +62,8 @@ Perl_SvNV(pTHX_ SV *sv) {
 
 GV*
 Perl_SvOURGV(pTHX_ SV* sv) {
+    PERL_ARGS_ASSERT_SVOURGV;
+
     assert(SvPAD_OUR(sv));
     return ((XPVMG*) SvANY(sv))->xmg_u.xmg_ourgv;
 }
@@ -69,6 +73,8 @@ Perl_SvOURGV(pTHX_ SV* sv) {
 
 STRLEN
 Perl_SvCUR(pTHX_ const SV* sv) {
+    PERL_ARGS_ASSERT_SVCUR;
+
     assert(SvTYPE(sv) >= SVt_PV);
     assert(SvTYPE(sv) != SVt_PVAV);
     assert(SvTYPE(sv) != SVt_PVHV);
@@ -78,6 +84,8 @@ Perl_SvCUR(pTHX_ const SV* sv) {
 
 void
 Perl_SvCUR_set(pTHX_ SV* sv, STRLEN len) {
+    PERL_ARGS_ASSERT_SVCUR_SET;
+
     assert(SvTYPE(sv) >= SVt_PV);
     assert(SvTYPE(sv) != SVt_PVAV);
     assert(SvTYPE(sv) != SVt_PVHV);

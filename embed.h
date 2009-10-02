@@ -166,7 +166,6 @@
 #define croak			Perl_croak
 #define croak_at		Perl_croak_at
 #define vcroak			Perl_vcroak
-#define croak_xs_usage		Perl_croak_xs_usage
 #ifdef PERL_CORE
 #define cv_clone_anon		Perl_cv_clone_anon
 #endif
@@ -1859,7 +1858,7 @@
 #define dump_op_rest		S_dump_op_rest
 #endif
 #endif /* PERL_IN_DUMP_C */
-#if defined(PERL_IN_UNIVERSLA_C) || defined(PERL_DECL_PROT)
+#if defined(PERL_IN_UNIVERSAL_C) || defined(PERL_DECL_PROT)
 #endif
 #define ck_anonarray		Perl_ck_anonarray
 #define ck_anoncode		Perl_ck_anoncode
@@ -2392,7 +2391,6 @@
 #define croak			Perl_croak
 #define croak_at		Perl_croak_at
 #define vcroak(a,b)		Perl_vcroak(aTHX_ a,b)
-#define croak_xs_usage(a,b)	Perl_croak_xs_usage(aTHX_ a,b)
 #ifdef PERL_CORE
 #define cv_clone_anon(a,b)	Perl_cv_clone_anon(aTHX_ a,b)
 #endif
@@ -4107,7 +4105,7 @@
 #define dump_op_rest(a,b,c)	S_dump_op_rest(aTHX_ a,b,c)
 #endif
 #endif /* PERL_IN_DUMP_C */
-#if defined(PERL_IN_UNIVERSLA_C) || defined(PERL_DECL_PROT)
+#if defined(PERL_IN_UNIVERSAL_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #endif
 #endif

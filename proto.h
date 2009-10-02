@@ -404,13 +404,6 @@ PERL_CALLCONV void	Perl_croak_at(pTHX_ SV* location, const char* pat, ...)
 PERL_CALLCONV void	Perl_vcroak(pTHX_ const char* pat, va_list* args)
 			__attribute__noreturn__;
 
-PERL_CALLCONV void	Perl_croak_xs_usage(pTHX_ const CV *const cv, const char *const params)
-			__attribute__noreturn__
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_CROAK_XS_USAGE	\
-	assert(cv); assert(params)
-
 
 PERL_CALLCONV void	Perl_cv_clone_anon(pTHX_ CV* dst, CV* src)
 			__attribute__nonnull__(pTHX_1)
@@ -903,10 +896,9 @@ PERL_CALLCONV CV*	Perl_gv_fetchmethod(pTHX_ HV* stash, const char* name)
 	assert(name)
 
 PERL_CALLCONV CV*	Perl_gv_fetchmethod_flags(pTHX_ HV* stash, const char* name, U32 flags)
-			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_GV_FETCHMETHOD_FLAGS	\
-	assert(stash); assert(name)
+	assert(name)
 
 PERL_CALLCONV GV*	Perl_gv_fetchpv(pTHX_ const char* nambeg, I32 add, const svtype sv_type)
 			__attribute__nonnull__(pTHX_1);
@@ -4399,10 +4391,10 @@ STATIC SV *	S_space_join_names_mortal(pTHX_ char *const *array)
 
 #endif
 
-PERL_INLINE_CALLCONV UV	Perl_UCHARAT(pTHX_ const char*)
+PERL_INLINE_CALLCONV UV	Perl_UCHARAT(pTHX_ const char *p)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_UCHARAT	\
-	assert(char)
+	assert(p)
 
 
 #if defined(PERL_IN_REGCOMP_C) || defined(PERL_DECL_PROT)
@@ -5845,7 +5837,7 @@ STATIC void	S_dump_op_rest(pTHX_ I32 level, PerlIO *file, const OP *o)
 
 #endif /* PERL_IN_DUMP_C */
 
-#if defined(PERL_IN_UNIVERSLA_C) || defined(PERL_DECL_PROT)
+#if defined(PERL_IN_UNIVERSAL_C) || defined(PERL_DECL_PROT)
 STATIC HV *	S_get_isa_hash(pTHX_ HV *const stash)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_GET_ISA_HASH	\

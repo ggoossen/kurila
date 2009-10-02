@@ -101,7 +101,6 @@ Perl_my_chsize
 Perl_croak
 Perl_croak_at
 Perl_vcroak
-Perl_croak_xs_usage
 Perl_cv_const_sv
 Perl_cv_assignarg_flag
 Perl_cv_optassignarg_flag
