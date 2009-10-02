@@ -329,6 +329,9 @@ ext/IPC-SysV/SysV.xs		IPC::SysV extension Perl module
 ext/IPC-SysV/t/ipcsysv.t		See if IPC::SysV works
 ext/IPC-SysV/t/msg.t		IPC::SysV extension Perl module
 ext/IPC-SysV/t/sem.t		IPC::SysV extension Perl module
+ext/lib/lib_pm.PL		For "use lib", produces lib/lib.pm
+ext/lib/Makefile.PL
+ext/lib/t/01lib.t		For "use lib" testing
 ext/List-Util/Changes		Util extension
 ext/List-Util/lib/List/Util.pm	List::Util
 ext/List-Util/lib/Scalar/Util.pm	Scalar::Util
@@ -1237,8 +1240,6 @@ lib/kurila.pm			Package to identify kurila
 lib/kurila.t			See if kurila.pm works
 lib/less.pm			For "use less"
 lib/less.t			See if less support works
-lib/lib_pm.PL			For "use lib", produces lib/lib.pm
-lib/lib.t			For "use lib" testing
 lib/Math/Trig.pm		A simple interface to complex trigonometry
 lib/Math/Trig.t			See if Math::Trig works
 lib/mro.pm			mro extension
