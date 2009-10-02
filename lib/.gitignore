@@ -71,6 +71,7 @@
 /Opcode.pm
 /POSIX.pm
 /POSIX.pod
+/PerlIO/via/QuotedPrint.pm
 /Pod/Checker.pm
 /Pod/Escapes.pm
 /Pod/Find.pm
