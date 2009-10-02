@@ -17,6 +17,9 @@ configure.gnu		Crude emulation of GNU configure
 cop.h			Control operator header
 cop_i.h			Control operator header
 Copying			The GNU General Public License
+cpan/Class-ISA/ChangeLog		Changes for Class::ISA
+cpan/Class-ISA/lib/Class/ISA.pm		Class::ISA
+cpan/Class-ISA/t/01_old_junk.t		Tests for Class::ISA
 cpan/DB_File/Changes		Berkeley DB extension change log
 cpan/DB_File/DB_File_BS		Berkeley DB extension mkbootstrap fodder
 cpan/DB_File/DB_File.pm		Berkeley DB extension Perl module
@@ -161,9 +164,6 @@ ext/B/t/pragma.t	See if user pragmas work.
 ext/B/t/showlex.t	See if B::ShowLex works
 ext/B/t/terse.t		See if B::Terse works
 ext/B/typemap			Compiler backend interface types
-ext/Class-ISA/ChangeLog		Changes for Class::ISA
-ext/Class-ISA/lib/Class/ISA.pm		Class::ISA
-ext/Class-ISA/t/01_old_junk.t	Tests for Class::ISA
 ext/constant/lib/constant.pm	For "use constant"
 ext/constant/t/constant.t	See if compile-time constants work
 ext/Cwd/Changes			Cwd extension Changelog
