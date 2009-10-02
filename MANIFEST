@@ -86,6 +86,8 @@ cpan/IPC-SysV/t/pod.t			IPC::SysV test file
 cpan/IPC-SysV/t/sem.t			IPC::SysV test file
 cpan/IPC-SysV/t/shm.t			IPC::SysV test file
 cpan/IPC-SysV/typemap			IPC::SysV typemap
+cpan/Module-Loaded/lib/Module/Loaded.pm	Module::Loaded
+cpan/Module-Loaded/t/01_Module-Loaded.t	Module::Loaded tests
 cpan/Module-Load/lib/Module/Load.pm		Module::Load
 cpan/Module-Load/t/01_Module-Load.t		Module::Load tests
 cpan/Module-Load/t/to_load/config_file		Module::Load tests
@@ -721,8 +723,6 @@ cpan/Module-Load-Conditional/t/to_load/LoadIt.pm		Module::Conditional tests
 cpan/Module-Load-Conditional/t/to_load/LoadMe.pl		Module::Conditional tests
 cpan/Module-Load-Conditional/t/to_load/MustBe/Loaded.pm		Module::Load::Conditional tests
 cpan/Module-Load-Conditional/t/to_load/ToBeLoaded		Module::Conditional tests
-ext/Module-Loaded/lib/Module/Loaded.pm	Module::Loaded
-ext/Module-Loaded/t/01_Module-Loaded.t	Module::Loaded tests
 ext/Opcode/Opcode.pm		Opcode extension Perl module
 ext/Opcode/Opcode.xs		Opcode extension external subroutines
 ext/Opcode/ops.pm		"Pragma" form of Opcode extension Perl module
