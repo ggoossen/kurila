@@ -33,6 +33,10 @@
 /Fcntl.pm
 /File/Glob.pm
 /File/GlobMapper.pm
+/File/Path.pm
+/File/Spec/
+/File/Spec.pm
+/File/Temp.pm
 /Filter/Util
 /GDBM_File.pm
 /Hash
