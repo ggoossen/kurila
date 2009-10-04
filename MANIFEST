@@ -152,6 +152,20 @@ cpan/Term-ANSIColor/ANSIColor.pm	Perl module supporting termcap usage
 cpan/Term-ANSIColor/ChangeLog		Term::ANSIColor
 cpan/Term-ANSIColor/README		Term::ANSIColor
 cpan/Term-ANSIColor/t/basic.t		Tests for Term::ANSIColor
+cpan/Text-Tabs/CHANGELOG		ChangeLog for Tabs+Wrap
+cpan/Text-Tabs/lib/Text/Tabs.pm		Do expand and unexpand
+cpan/Text-Tabs/lib/Text/Wrap.pm		Paragraph formatter
+cpan/Text-Tabs/t/37000.t		See if Text::Tabs is working
+cpan/Text-Tabs/t/39548.t		See if Text::Tabs is working
+cpan/Text-Tabs/t/belg4mit.t		See if Text::Tabs is working
+cpan/Text-Tabs/t/fill.t			See if Text::Wrap::fill works
+cpan/Text-Tabs/t/Jacobson2.t		See if Text::Tabs is working
+cpan/Text-Tabs/t/Jacobson.t		See if Text::Tabs is working
+cpan/Text-Tabs/t/Jochen.t		See if Text::Tabs is working
+cpan/Text-Tabs/t/sep2.t			See if Text::Tabs is working
+cpan/Text-Tabs/t/sep.t			See if Text::Tabs is working
+cpan/Text-Tabs/t/tabs.t			See if Text::Tabs works
+cpan/Text-Tabs/t/wrap.t			See if Text::Wrap::wrap works
 Cross/build-arm-n770-sh	Cross-compilation
 Cross/cflags-cross-arm	Cross-compilation
 Cross/config		Cross-compilation
@@ -879,20 +893,6 @@ ext/Term-Cap/Cap.pm			Perl module supporting termcap usage
 ext/Term-Cap/test.pl			See if Term::Cap works
 ext/Text-ParseWords/lib/Text/ParseWords.pm	Perl module to split words on arbitrary delimiter
 ext/Text-ParseWords/t/ParseWords.t	See if Text::ParseWords works
-ext/Text-Tabs/CHANGELOG			ChangeLog for Tabs+Wrap
-ext/Text-Tabs/lib/Text/Tabs.pm		Do expand and unexpand
-ext/Text-Tabs/lib/Text/Wrap.pm		Paragraph formatter
-ext/Text-Tabs/t/37000.t			See if Text::Tabs is working
-ext/Text-Tabs/t/39548.t			See if Text::Tabs is working
-ext/Text-Tabs/t/belg4mit.t		See if Text::Tabs is working
-ext/Text-Tabs/t/fill.t			See if Text::Wrap::fill works
-ext/Text-Tabs/t/Jacobson2.t		See if Text::Tabs is working
-ext/Text-Tabs/t/Jacobson.t		See if Text::Tabs is working
-ext/Text-Tabs/t/Jochen.t		See if Text::Tabs is working
-ext/Text-Tabs/t/sep2.t			See if Text::Tabs is working
-ext/Text-Tabs/t/sep.t			See if Text::Tabs is working
-ext/Text-Tabs/t/tabs.t			See if Text::Tabs works
-ext/Text-Tabs/t/wrap.t			See if Text::Wrap::wrap works
 ext/Time-HiRes/Changes		Time::HiRes extension
 ext/Time-HiRes/fallback/const-c.inc	Time::HiRes extension
 ext/Time-HiRes/fallback/const-xs.inc	Time::HiRes extension
