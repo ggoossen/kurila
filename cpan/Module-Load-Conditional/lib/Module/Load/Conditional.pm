@@ -424,7 +424,7 @@ sub can_load
             ### #29348: Version compare logic doesn't handle alphas?
             if (    !$args->{?nocache}
                       && defined $CACHE->{?$mod}{?usable}
-                      && (qv($CACHE->{$mod}{?version}||0)->vcmp(qv($href->{?$mod})) +>= 0)
+                      && (version->new($CACHE->{$mod}{?version}||0)->vcmp(qv($href->{?$mod})) +>= 0)
                 )
                 $error = loc( q[Already tried to use '%1', which was unsuccessful], $mod)
                 last BLOCK

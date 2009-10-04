@@ -81,11 +81,17 @@ cpan/IPC-SysV/SysV.xs			IPC::SysV extension Perl module
 cpan/IPC-SysV/t/ipcsysv.t		IPC::SysV test file
 cpan/IPC-SysV/t/msg.t			IPC::SysV test file
 cpan/IPC-SysV/TODO			IPC::SysV todo file
-cpan/IPC-SysV/t/podcov.t		IPC::SysV test file
-cpan/IPC-SysV/t/pod.t			IPC::SysV test file
 cpan/IPC-SysV/t/sem.t			IPC::SysV test file
-cpan/IPC-SysV/t/shm.t			IPC::SysV test file
 cpan/IPC-SysV/typemap			IPC::SysV typemap
+cpan/Module-Load-Conditional/lib/Module/Load/Conditional.pm	Module::Conditional
+cpan/Module-Load-Conditional/t/01_Module_Load_Conditional.t	Module::Conditional tests
+cpan/Module-Load-Conditional/t/02_Parse_Version.t		Module::Load::Conditional tests
+cpan/Module-Load-Conditional/t/to_load/Commented.pm		Module::Conditional tests
+cpan/Module-Load-Conditional/t/to_load/InPod.pm			Module::Load::Conditional tests
+cpan/Module-Load-Conditional/t/to_load/LoadIt.pm		Module::Conditional tests
+cpan/Module-Load-Conditional/t/to_load/LoadMe.pl		Module::Conditional tests
+cpan/Module-Load-Conditional/t/to_load/MustBe/Loaded.pm		Module::Load::Conditional tests
+cpan/Module-Load-Conditional/t/to_load/ToBeLoaded		Module::Conditional tests
 cpan/Module-Loaded/lib/Module/Loaded.pm	Module::Loaded
 cpan/Module-Loaded/t/01_Module-Loaded.t	Module::Loaded tests
 cpan/Module-Load/lib/Module/Load.pm		Module::Load
@@ -96,6 +102,8 @@ cpan/Module-Load/t/to_load/LoadMe.pl		Module::Load tests
 cpan/Module-Load/t/to_load/Must/Be/Loaded.pm	Module::Load tests
 cpan/Module-Load/t/to_load/TestModule.pm	Module::Load tests
 cpan/Module-Load/t/to_load/ToBeLoaded		Module::Load tests
+cpan/Params-Check/lib/Params/Check.pm	Params::Check
+cpan/Params-Check/t/01_Params-Check.t	Params::Check tests
 cpan/Sys-Syslog/Changes			Changlog for Sys::Syslog
 cpan/Sys-Syslog/fallback/const-c.inc	Sys::Syslog constants fallback file
 cpan/Sys-Syslog/fallback/const-xs.inc	Sys::Syslog constants fallback file
@@ -210,15 +218,12 @@ ext/B/t/terse.t		See if B::Terse works
 ext/B/typemap			Compiler backend interface types
 ext/constant/lib/constant.pm	For "use constant"
 ext/constant/t/constant.t	See if compile-time constants work
-ext/Cwd/Changes			Cwd extension Changelog
-ext/Cwd/Cwd.pm			Various cwd routines (getcwd, fastcwd, chdir)
-ext/Cwd/Cwd.xs			Cwd extension external subroutines
-ext/Cwd/Makefile.PL		Cwd extension makefile maker
-ext/Cwd/t/cwd.t			See if Cwd works
-ext/Cwd/t/win32.t		See if Cwd works on Win32
 ext/Cwd/Changes				Cwd extension Changelog
+ext/Cwd/Changes			Cwd extension Changelog
 ext/Cwd/Cwd.pm				Various cwd routines (getcwd, fastcwd, chdir)
+ext/Cwd/Cwd.pm			Various cwd routines (getcwd, fastcwd, chdir)
 ext/Cwd/Cwd.xs				Cwd extension external subroutines
+ext/Cwd/Cwd.xs			Cwd extension external subroutines
 ext/Cwd/lib/File/Spec/Cygwin.pm		portable operations on Cygwin file names
 ext/Cwd/lib/File/Spec/Epoc.pm		portable operations on EPOC file names
 ext/Cwd/lib/File/Spec/Functions.pm	Function interface to File::Spec object methods
@@ -228,11 +233,14 @@ ext/Cwd/lib/File/Spec.pm		portable operations on file names
 ext/Cwd/lib/File/Spec/Unix.pm		portable operations on Unix file names
 ext/Cwd/lib/File/Spec/VMS.pm		portable operations on VMS file names
 ext/Cwd/lib/File/Spec/Win32.pm		portable operations on Win32 and NetWare file names
+ext/Cwd/Makefile.PL		Cwd extension makefile maker
 ext/Cwd/t/crossplatform.t		See if File::Spec works crossplatform
+ext/Cwd/t/cwd.t			See if Cwd works
 ext/Cwd/t/Functions.t			See if File::Spec::Functions works
 ext/Cwd/t/rel2abs2rel.t			See if File::Spec->rel2abs/abs2rel works
 ext/Cwd/t/Spec.t			See if File::Spec works
 ext/Cwd/t/tmpdir.t			See if File::Spec->tmpdir() works
+ext/Cwd/t/win32.t		See if Cwd works on Win32
 ext/Data-Dumper/Changes		Data pretty printer, changelog
 ext/Data-Dumper/Dumper.pm	Data pretty printer, module
 ext/Data-Dumper/t/bless.t	See if Data::Dumper works
@@ -241,262 +249,6 @@ ext/Data-Dumper/t/dumper.t	See if Data::Dumper works
 ext/Data-Dumper/t/freezer.t	See if $Data::Dumper::Freezer works
 ext/Data-Dumper/Todo		Data pretty printer, futures
 ext/Data-Dumper/t/pair.t	See if Data::Dumper pair separator works
-ext/Devel-DProf/Changes		Perl code profiler changelog
-ext/Devel-DProf/DProf.pm	Perl code profiler
-ext/Devel-DProf/dprof/test1_t	Perl code profiler tests
-ext/Devel-DProf/dprof/test1_v	Perl code profiler tests
-ext/Devel-DProf/dprof/test2_t	Perl code profiler tests
-ext/Devel-DProf/dprof/test2_v	Perl code profiler tests
-ext/Devel-DProf/dprof/test3_t	Perl code profiler tests
-ext/Devel-DProf/dprof/test3_v	Perl code profiler tests
-ext/Devel-DProf/dprof/test4_t	Perl code profiler tests
-ext/Devel-DProf/dprof/test4_v	Perl code profiler tests
-ext/Devel-DProf/dprof/test5_t	Perl code profiler tests
-ext/Devel-DProf/dprof/test5_v	Perl code profiler tests
-ext/Devel-DProf/dprof/test6_t	Perl code profiler tests
-ext/Devel-DProf/dprof/test6_v	Perl code profiler tests
-ext/Devel-DProf/dprof/test7_t	Perl code profiler tests
-ext/Devel-DProf/dprof/test7_v	Perl code profiler tests
-ext/Devel-DProf/dprof/test8_t	Perl code profiler tests
-ext/Devel-DProf/dprof/test8_v	Perl code profiler tests
-ext/Devel-DProf/dprof/V.pm	Perl code profiler tests
-ext/Devel-DProf/DProf.xs	Perl code profiler
-ext/Devel-DProf/Makefile.PL	Perl code profiler makefile writer
-ext/Devel-DProf/t/DProf.t	Perl code profiler
-ext/Devel-DProf/Todo		Perl code profiler todo list
-ext/Devel-Peek/Changes		Data debugging tool, changelog
-ext/Devel-Peek/Makefile.PL	Data debugging tool, makefile writer
-ext/Devel-Peek/Peek.pm		Data debugging tool, module and pod
-ext/Devel-Peek/Peek.xs		Data debugging tool, externals
-ext/Devel-Peek/t/Peek.t		See if Devel::Peek works
-ext/Devel-PPPort/apicheck_c.PL	Devel::PPPort apicheck generator
-ext/Devel-PPPort/Changes	Devel::PPPort changes
-ext/Devel-PPPort/devel/buildperl.pl	Devel::PPPort perl version builder
-ext/Devel-PPPort/devel/devtools.pl	Devel::PPPort development utilities
-ext/Devel-PPPort/devel/mkapidoc.sh	Devel::PPPort apidoc collector
-ext/Devel-PPPort/devel/mktodo	Devel::PPPort baseline/todo generator
-ext/Devel-PPPort/devel/mktodo.pl	Devel::PPPort baseline/todo generator
-ext/Devel-PPPort/devel/regenerate	Devel::PPPort API re-generator
-ext/Devel-PPPort/devel/scanprov	Devel::PPPort provided API scanner
-ext/Devel-PPPort/HACKERS	Devel::PPPort hackers documentation
-ext/Devel-PPPort/Makefile.PL	Devel::PPPort makefile writer
-ext/Devel-PPPort/MANIFEST.SKIP	Devel::PPPort Manifest skip specs
-ext/Devel-PPPort/mktests.PL	Devel::PPPort test file writer
-ext/Devel-PPPort/module2.c	Devel::PPPort test file
-ext/Devel-PPPort/module3.c	Devel::PPPort test file
-ext/Devel-PPPort/parts/apicheck.pl	Devel::PPPort apicheck generator
-ext/Devel-PPPort/parts/apidoc.fnc	Devel::PPPort Perl API listing
-ext/Devel-PPPort/parts/base/5004000	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5004010	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5004020	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5004030	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5004040	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5004050	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5005000	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5005010	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5005020	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5005030	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5005040	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5006000	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5006001	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5006002	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5007000	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5007001	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5007002	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5007003	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5008000	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5008001	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5008002	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5008003	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5008004	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5008005	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5008006	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5008007	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5008008	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5009000	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5009001	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5009002	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5009003	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5009004	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5009005	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5010000	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/base/5011000	Devel::PPPort baseline todo file
-ext/Devel-PPPort/parts/embed.fnc	Devel::PPPort Perl API listing
-ext/Devel-PPPort/parts/inc/call	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/cop	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/exception	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/format	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/grok	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/gv	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/HvNAME	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/limits	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/magic	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/memory	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/misc	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/mPUSH	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/MY_CXT	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/newCONSTSUB	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/newRV	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/newSVpv	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/newSV_type	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/podtest	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/ppphbin	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/ppphdoc	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/ppphtest	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/pvs	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/pv_tools	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/shared_pv	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/snprintf	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/sprintf	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/strlfuncs	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/SvPV	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/SvREFCNT	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/Sv_set	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/sv_xpvf	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/threads	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/uv	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/variables	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/version	Devel::PPPort include
-ext/Devel-PPPort/parts/inc/warn	Devel::PPPort include
-ext/Devel-PPPort/parts/ppport.fnc	Devel::PPPort API listing
-ext/Devel-PPPort/parts/ppptools.pl	Devel::PPPort various utilities
-ext/Devel-PPPort/parts/todo/5004000	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5004010	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5004020	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5004030	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5004040	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5004050	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5005000	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5005010	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5005020	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5005030	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5005040	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5006000	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5006001	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5006002	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5007000	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5007001	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5007002	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5007003	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5008000	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5008001	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5008002	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5008003	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5008004	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5008005	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5008006	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5008007	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5008008	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5009000	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5009001	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5009002	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5009003	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5009004	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5009005	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5010000	Devel::PPPort todo file
-ext/Devel-PPPort/parts/todo/5011000	Devel::PPPort todo file
-ext/Devel-PPPort/ppport_h.PL	Devel::PPPort ppport.h writer
-ext/Devel-PPPort/PPPort_pm.PL	Devel::PPPort PPPort.pm writer
-ext/Devel-PPPort/PPPort.xs	Devel::PPPort dummy PPPort.xs
-ext/Devel-PPPort/PPPort_xs.PL	Devel::PPPort RealPPPort.xs writer
-ext/Devel-PPPort/README		Devel::PPPort Readme
-ext/Devel-PPPort/soak		Devel::PPPort Test Harness to run under various Perls
-ext/Devel-PPPort/t/call.t	Devel::PPPort test file
-ext/Devel-PPPort/t/cop.t	Devel::PPPort test file
-ext/Devel-PPPort/t/exception.t	Devel::PPPort test file
-ext/Devel-PPPort/t/format.t	Devel::PPPort test file
-ext/Devel-PPPort/t/grok.t	Devel::PPPort test file
-ext/Devel-PPPort/t/gv.t	Devel::PPPort test file
-ext/Devel-PPPort/t/HvNAME.t	Devel::PPPort test file
-ext/Devel-PPPort/t/limits.t	Devel::PPPort test file
-ext/Devel-PPPort/t/magic.t	Devel::PPPort test file
-ext/Devel-PPPort/t/memory.t	Devel::PPPort test file
-ext/Devel-PPPort/t/misc.t	Devel::PPPort test file
-ext/Devel-PPPort/t/mPUSH.t	Devel::PPPort test file
-ext/Devel-PPPort/t/MY_CXT.t	Devel::PPPort test file
-ext/Devel-PPPort/t/newCONSTSUB.t	Devel::PPPort test file
-ext/Devel-PPPort/t/newRV.t	Devel::PPPort test file
-ext/Devel-PPPort/t/newSVpv.t	Devel::PPPort test file
-ext/Devel-PPPort/t/newSV_type.t	Devel::PPPort test file
-ext/Devel-PPPort/TODO		Devel::PPPort Todo
-ext/Devel-PPPort/t/podtest.t	Devel::PPPort test file
-ext/Devel-PPPort/t/ppphtest.t	Devel::PPPort test file
-ext/Devel-PPPort/t/pvs.t	Devel::PPPort test file
-ext/Devel-PPPort/t/pv_tools.t	Devel::PPPort test file
-ext/Devel-PPPort/t/shared_pv.t	Devel::PPPort test file
-ext/Devel-PPPort/t/snprintf.t	Devel::PPPort test file
-ext/Devel-PPPort/t/sprintf.t	Devel::PPPort test file
-ext/Devel-PPPort/t/strlfuncs.t	Devel::PPPort test file
-ext/Devel-PPPort/t/SvPV.t	Devel::PPPort test file
-ext/Devel-PPPort/t/SvREFCNT.t	Devel::PPPort test file
-ext/Devel-PPPort/t/Sv_set.t	Devel::PPPort test file
-ext/Devel-PPPort/t/sv_xpvf.t	Devel::PPPort test file
-ext/Devel-PPPort/t/testutil.pl	Devel::PPPort test utilities
-ext/Devel-PPPort/t/threads.t	Devel::PPPort test file
-ext/Devel-PPPort/t/uv.t		Devel::PPPort test file
-ext/Devel-PPPort/t/variables.t	Devel::PPPort test file
-ext/Devel-PPPort/t/warn.t	Devel::PPPort test file
-ext/Devel-PPPort/typemap	Devel::PPPort Typemap
-ext/Devel-SelfStubber/lib/Devel/SelfStubber.pm	Generate stubs for SelfLoader.pm
-ext/Devel-SelfStubber/t/Devel-SelfStubber.t	See if Devel::SelfStubber works
-ext/Digest/Changes	Digest changelog
-ext/Digest/Digest/base.pm	Digest extensions
-ext/Digest/Digest/file.pm	Digest extensions
-ext/Digest/Digest.pm		Digest extensions
-ext/Digest-MD5/Changes		Digest::MD5 extension changes
-ext/Digest-MD5/hints/dec_osf.pl	Hints for named architecture
-ext/Digest-MD5/hints/irix_6.pl	Hints for named architecture
-ext/Digest-MD5/hints/MacOS.pl	Hints for named architecture
-ext/Digest-MD5/Makefile.PL	Digest::MD5 extension makefile writer
-ext/Digest-MD5/MD5.pm		Digest::MD5 extension
-ext/Digest-MD5/MD5.xs		Digest::MD5 extension
-ext/Digest-MD5/README		Digest::MD5 extension Readme
-ext/Digest-MD5/t/align.t	See if Digest::MD5 extension works
-ext/Digest-MD5/t/badfile.t	See if Digest::MD5 extension works
-ext/Digest-MD5/t/bits.t		See if Digest::MD5 extension works
-ext/Digest-MD5/t/clone.t	See if Digest::MD5 extension works
-ext/Digest-MD5/t/files.t	See if Digest::MD5 extension works
-ext/Digest-MD5/t/md5-aaa.t	See if Digest::MD5 extension works
-ext/Digest-MD5/t/utf8.t		See if Digest::MD5 extension works
-ext/Digest-MD5/typemap		Digest::MD5 extension
-ext/Digest-SHA/bin/shasum	shasum script
-ext/Digest-SHA/Changes		Digest::SHA changes
-ext/Digest-SHA/lib/Digest/SHA.pm	Digest::SHA extension
-ext/Digest-SHA/Makefile.PL	Digest::SHA Makefile.PL
-ext/Digest-SHA/README		Digest::SHA README
-ext/Digest-SHA/SHA.xs		Digest::SHA extension
-ext/Digest-SHA/src/hmac.c	Digest::SHA extension
-ext/Digest-SHA/src/hmac.h	Digest::SHA extension
-ext/Digest-SHA/src/hmacxtra.c	Digest::SHA extension
-ext/Digest-SHA/src/sha64bit.c	Digest::SHA extension
-ext/Digest-SHA/src/sha64bit.h	Digest::SHA extension
-ext/Digest-SHA/src/sha.c	Digest::SHA extension
-ext/Digest-SHA/src/sha.h	Digest::SHA extension
-ext/Digest-SHA/src/shaxtra.c	Digest::SHA extension
-ext/Digest-SHA/t/allfcns.t	See if Digest::SHA works
-ext/Digest-SHA/t/base64.t	See if Digest::SHA works
-ext/Digest-SHA/t/bitbuf.t	See if Digest::SHA works
-ext/Digest-SHA/t/dumpload.t	See if Digest::SHA works
-ext/Digest-SHA/t/fips198.t	See if Digest::SHA works
-ext/Digest-SHA/t/gglong.t	See if Digest::SHA works
-ext/Digest-SHA/t/gg.t		See if Digest::SHA works
-ext/Digest-SHA/t/hmacsha.t	See if Digest::SHA works
-ext/Digest-SHA/t/ireland.t	See if Digest::SHA works
-ext/Digest-SHA/t/methods.t	See if Digest::SHA works
-ext/Digest-SHA/t/nistbit.t	See if Digest::SHA works
-ext/Digest-SHA/t/nistbyte.t	See if Digest::SHA works
-ext/Digest-SHA/t/rfc2202.t	See if Digest::SHA works
-ext/Digest-SHA/t/sha1.t		See if Digest::SHA works
-ext/Digest-SHA/t/sha224.t	See if Digest::SHA works
-ext/Digest-SHA/t/sha256.t	See if Digest::SHA works
-ext/Digest-SHA/t/sha384.t	See if Digest::SHA works
-ext/Digest-SHA/t/sha512.t	See if Digest::SHA works
-ext/Digest-SHA/t/woodbury.t	See if Digest::SHA works
-ext/Digest-SHA/typemap		Typemap for Digest::SHA
-ext/Digest/t/base.t		See if Digest extensions work
-ext/Digest/t/digest.t		See if Digest extensions work
-ext/Digest/t/file.t		See if Digest extensions work
->>>>>>> 1299eb144ab48940fecb7865750908c77577bfd5:MANIFEST
 ext/DynaLoader/dl_aix.xs	AIX implementation
 ext/DynaLoader/dl_beos.xs	BeOS implementation
 ext/DynaLoader/dl_dld.xs	GNU dld style implementation
@@ -551,12 +303,6 @@ ext/ExtUtils-Install/t/Packlist.t			See if Packlist works
 ext/ExtUtils-Manifest/lib/ExtUtils/Manifest.pm		Utilities to write MANIFEST files
 ext/ExtUtils-Manifest/lib/ExtUtils/MANIFEST.SKIP	The default MANIFEST.SKIP
 ext/ExtUtils-Manifest/t/Manifest.t			See if ExtUtils::Manifest works
-ext/ExtUtils-ParseXS/Changes			ExtUtils::ParseXS change log
-ext/ExtUtils-ParseXS/lib/ExtUtils/ParseXS.pm	converts Perl XS code into C code
-ext/ExtUtils-ParseXS/lib/ExtUtils/xsubpp	External subroutine preprocessor
-ext/ExtUtils-ParseXS/t/basic.t			See if ExtUtils::ParseXS works
-ext/ExtUtils-ParseXS/t/XSTest.pm		Test file for ExtUtils::ParseXS tests
-ext/ExtUtils-ParseXS/t/XSTest.xs		Test file for ExtUtils::ParseXS tests
 ext/Fcntl/Fcntl.pm	Fcntl extension Perl module
 ext/Fcntl/Fcntl.xs	Fcntl extension external subroutines
 ext/Fcntl/Makefile.PL	Fcntl extension makefile writer
@@ -714,15 +460,6 @@ ext/MIME-Base64/t/base64.t	See whether MIME::Base64 works
 ext/MIME-Base64/t/quoted-print.t	See whether MIME::QuotedPrint works
 ext/MIME-Base64/t/unicode.t	See whether MIME::Base64 works
 ext/MIME-Base64/t/warn.t	See whether MIME::Base64 works
-cpan/Module-Load-Conditional/lib/Module/Load/Conditional.pm	Module::Conditional
-cpan/Module-Load-Conditional/t/01_Module_Load_Conditional.t	Module::Conditional tests
-cpan/Module-Load-Conditional/t/02_Parse_Version.t		Module::Load::Conditional tests
-cpan/Module-Load-Conditional/t/to_load/Commented.pm		Module::Conditional tests
-cpan/Module-Load-Conditional/t/to_load/InPod.pm			Module::Load::Conditional tests
-cpan/Module-Load-Conditional/t/to_load/LoadIt.pm		Module::Conditional tests
-cpan/Module-Load-Conditional/t/to_load/LoadMe.pl		Module::Conditional tests
-cpan/Module-Load-Conditional/t/to_load/MustBe/Loaded.pm		Module::Load::Conditional tests
-cpan/Module-Load-Conditional/t/to_load/ToBeLoaded		Module::Conditional tests
 ext/Opcode/Opcode.pm		Opcode extension Perl module
 ext/Opcode/Opcode.xs		Opcode extension external subroutines
 ext/Opcode/ops.pm		"Pragma" form of Opcode extension Perl module
@@ -1533,8 +1270,6 @@ lib/Net/servent.pm		By-name interface to Perl's builtin getserv*
 lib/Net/servent.t		See if Net::servtent works
 lib/open.pm			Pragma to specify default I/O layers
 lib/open.t			See if the open pragma works
-lib/Params/Check.pm	Params::Check
-lib/Params/Check/t/01_Params-Check.t	Params::Check tests
 lib/parent.pm	Establish an ISA relationship with base classes at compile time
 lib/parent/t/compile-time-file.t	tests for parent.pm
 lib/parent/t/compile-time.t	tests for parent.pm
