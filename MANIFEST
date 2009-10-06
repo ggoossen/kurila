@@ -146,6 +146,16 @@ cpan/Locale-Codes/t/language.t			See if Locale::Codes work
 cpan/Locale-Codes/t/rename.t			See if Locale::Codes work
 cpan/Locale-Codes/t/script.t			See if Locale::Codes work
 cpan/Locale-Codes/t/uk.t			See if Locale::Codes work
+cpan/MIME-Base64/Base64.pm		MIME::Base64 extension
+cpan/MIME-Base64/Base64.xs		MIME::Base64 extension
+cpan/MIME-Base64/Changes		MIME::Base64 extension
+cpan/MIME-Base64/Makefile.PL		MIME::Base64 extension
+cpan/MIME-Base64/QuotedPrint.pm		MIME::Base64 extension
+cpan/MIME-Base64/README			README for MIME::Base64
+cpan/MIME-Base64/t/base64.t		See whether MIME::Base64 works
+cpan/MIME-Base64/t/quoted-print.t	See whether MIME::QuotedPrint works
+cpan/MIME-Base64/t/unicode.t		See whether MIME::Base64 works
+cpan/MIME-Base64/t/warn.t		See whether MIME::Base64 works
 cpan/Module-Load-Conditional/lib/Module/Load/Conditional.pm	Module::Conditional
 cpan/Module-Load-Conditional/t/01_Module_Load_Conditional.t	Module::Conditional tests
 cpan/Module-Load-Conditional/t/02_Parse_Version.t		Module::Load::Conditional tests
@@ -518,16 +528,6 @@ ext/List-Util/t/reftype.t	Scalar::Util
 ext/List-Util/t/shuffle.t	List::Util
 ext/List-Util/t/sum.t		List::Util
 ext/List-Util/t/weak.t		Scalar::Util
-ext/MIME-Base64/Base64.pm	MIME::Base64 extension
-ext/MIME-Base64/Base64.xs	MIME::Base64 extension
-ext/MIME-Base64/Changes		MIME::Base64 extension
-ext/MIME-Base64/Makefile.PL	MIME::Base64 extension
-ext/MIME-Base64/QuotedPrint.pm	MIME::Base64 extension
-ext/MIME-Base64/README		README for MIME::Base64
-ext/MIME-Base64/t/base64.t	See whether MIME::Base64 works
-ext/MIME-Base64/t/quoted-print.t	See whether MIME::QuotedPrint works
-ext/MIME-Base64/t/unicode.t	See whether MIME::Base64 works
-ext/MIME-Base64/t/warn.t	See whether MIME::Base64 works
 ext/Opcode/Opcode.pm		Opcode extension Perl module
 ext/Opcode/Opcode.xs		Opcode extension external subroutines
 ext/Opcode/ops.pm		"Pragma" form of Opcode extension Perl module
