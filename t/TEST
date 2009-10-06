@@ -87,8 +87,8 @@ do
     @ARGV = @argv
 
 chdir 't' if -f 't/TEST'
-if (-f 'TEST' && -f 'harness' && -d '../lib')
-    $^INCLUDE_PATH = '../lib'
+if (-f 'TEST' && -d '../lib')
+    $^INCLUDE_PATH = @: '../lib'
 
 die "You need to run \"make test\" first to set things up.\n"
   unless -e 'perl' or -e 'perl.exe' or -e 'perl.pm'
@@ -358,7 +358,6 @@ unless (@ARGV)
     # something is that badly wrong.
     push @ARGV, < _tests_from_manifest($extensions, $known_extensions)
     unless ($::core)
-        _find_tests('pod')
         _find_tests('porting')
         _find_tests('japh') if $::torture
         _find_tests('t/benchmark') if $::benchmark or env::var('PERL_BENCHMARK')

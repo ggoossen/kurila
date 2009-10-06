@@ -2258,9 +2258,9 @@ t/op/utf8decode.t		See if UTF-8 decoding works
 t/op/vec.t			See if vectors work
 t/op/view.t			See if view function works
 t/perl.supp			Perl valgrind suppressions
-t/pod/diag.t			Test completeness of perldiag.pod
 t/porting/args_assert.t		Check that all PERL_ARGS_ASSERT* macros are used
 t/porting/checkcase.t	Check whether we are case-insensitive-fs-friendly
+t/porting/diag.t		Test completeness of perldiag.pod
 t/porting/manifest.t		Test that this MANIFEST file is well formed
 t/README			Instructions for regression tests
 t/re/pat.t			See if esoteric patterns work
