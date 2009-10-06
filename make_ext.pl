@@ -5,7 +5,6 @@ use Config
 BEGIN
     unshift $^INCLUDE_PATH, $^OS_NAME eq 'MSWin32' ?? ('../cpan/Cwd', '../cpan/Cwd/lib') !! 'cpan/Cwd'
 use Cwd
-use File::Spec::Functions < qw(rel2abs)
 
 # To clarify, this isn't the entire suite of modules considered "toolchain"
 # It's not even all modules needed to build ext/
@@ -244,9 +243,10 @@ sub build_extension($ext_dir, $perl, $mname, $pass_through)
     # $lib_dir must be last, as we're copying files into it, and in a parallel
     # make there's a race condition if one process tries to open a module that
     # another process has half-written.
-    my @new_inc = (map {"$up/$_"}, @toolchain) +@+ @: $lib_dir
+    my @new_inc = map {"$up/$_"}, @: < @toolchain, $lib_dir
     if ($is_Win32)
-        @new_inc = map {rel2abs($_)}, @new_inc
+        require File::Spec::Functions
+        @new_inc = map {File::Spec::Functions::rel2abs($_)}, @new_inc
     env::var('PERL5LIB')
         = join config_value('path_sep'), @new_inc
     env::var('PERL_CORE') = 1
