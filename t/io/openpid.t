@@ -14,9 +14,9 @@ BEGIN
 if ($^OS_NAME eq 'dos' || $^OS_NAME eq 'MacOS')
     skip_all("no multitasking")
 
-
 plan tests => 10
 
+watchdog(15)
 
 use Config
 use signals
