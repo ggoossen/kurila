@@ -218,6 +218,14 @@ dist/base/t/version.t		See if base works with versions
 dist/base/t/warnings.t		See if base works with warnings
 dist/constant/lib/constant.pm	For "use constant"
 dist/constant/t/constant.t	See if compile-time constants work
+dist/Data-Dumper/Changes	Data pretty printer, changelog
+dist/Data-Dumper/Dumper.pm	Data pretty printer, module
+dist/Data-Dumper/t/bless.t	See if Data::Dumper works
+dist/Data-Dumper/t/bugs.t	See if Data::Dumper works
+dist/Data-Dumper/t/dumper.t	See if Data::Dumper works
+dist/Data-Dumper/t/freezer.t	See if $Data::Dumper::Freezer works
+dist/Data-Dumper/Todo		Data pretty printer, futures
+dist/Data-Dumper/t/pair.t	See if Data::Dumper pair separator works
 djgpp/config.over	DOS/DJGPP port
 djgpp/configure.bat	DOS/DJGPP port
 djgpp/djgpp.c		DOS/DJGPP port
@@ -282,14 +290,6 @@ ext/B/t/pragma.t	See if user pragmas work.
 ext/B/t/showlex.t	See if B::ShowLex works
 ext/B/t/terse.t		See if B::Terse works
 ext/B/typemap			Compiler backend interface types
-ext/Data-Dumper/Changes		Data pretty printer, changelog
-ext/Data-Dumper/Dumper.pm	Data pretty printer, module
-ext/Data-Dumper/t/bless.t	See if Data::Dumper works
-ext/Data-Dumper/t/bugs.t	See if Data::Dumper works
-ext/Data-Dumper/t/dumper.t	See if Data::Dumper works
-ext/Data-Dumper/t/freezer.t	See if $Data::Dumper::Freezer works
-ext/Data-Dumper/Todo		Data pretty printer, futures
-ext/Data-Dumper/t/pair.t	See if Data::Dumper pair separator works
 ext/DynaLoader/dl_aix.xs	AIX implementation
 ext/DynaLoader/dl_beos.xs	BeOS implementation
 ext/DynaLoader/dl_dld.xs	GNU dld style implementation
