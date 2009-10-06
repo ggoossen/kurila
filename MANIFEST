@@ -286,6 +286,8 @@ dist/IO/t/io_xs.t		See if XSUB methods from IO work
 dist/lib/lib_pm.PL		For "use lib", produces lib/lib.pm
 dist/lib/Makefile.PL
 dist/lib/t/01lib.t		For "use lib" testing
+dist/Pod-Plainer/Plainer.pm	Pod migration utility module
+dist/Pod-Plainer/t/plainer.t	Test Pod::Plainer
 djgpp/config.over	DOS/DJGPP port
 djgpp/configure.bat	DOS/DJGPP port
 djgpp/djgpp.c		DOS/DJGPP port
@@ -663,8 +665,6 @@ ext/Pod-Perldoc/t/01_about_verbose.t		test Pod::Perldoc
 ext/Pod-Perldoc/t/checkerbasic.t		test Pod::Perldoc::ToChecker
 ext/Pod-Perldoc/t/perldocbasic.t		test Pod::Perldoc basic operation
 ext/Pod-Perldoc/t/textbasic.t			test Pod::Perldoc::ToText
-ext/Pod-Plainer/Plainer.pm	Pod migration utility module
-ext/Pod-Plainer/t/plainer.t	Test Pod::Plainer
 ext/Pod-Simple/ChangeLog				Pod::Simple ChangeLog
 ext/Pod-Simple/lib/Pod/Simple/BlackBox.pm		Pod::Simple::BlackBox
 ext/Pod-Simple/lib/Pod/Simple/Checker.pm		check the Pod syntax of a document
