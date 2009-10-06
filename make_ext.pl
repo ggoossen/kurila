@@ -23,7 +23,7 @@ my @toolchain = qw(ext/constant/lib
 		   cpan/Cwd cpan/Cwd/lib
 		   cpan/ExtUtils-Command/lib
 		   dist/ExtUtils-Install/lib
-		   ext/ExtUtils-Manifest/lib
+		   cpan/ExtUtils-Manifest/lib
 		   cpan/File-Path/lib
 		   )
 
