@@ -119,11 +119,47 @@ package Config;
 # use strict;
 # use warnings; Pulls in Carp
 
-BEGIN {
+BEGIN
    my @heavy_subs = qw|myconfig fetch_string FIRSTKEY NEXTKEY config_sh config_re
-                       config_vars|;
+                       config_vars _V|
    for (@heavy_subs) { undef Symbol::fetch_glob($_)->*; }
-}
+
+sub _V()
+    my @: $bincompat, $non_bincompat, $date, $osname, @patches = Internals::V()
+
+    my $opts = join ' ', sort split ' ', "$bincompat $non_bincompat"
+
+    # wrap at 76 columns.
+
+    $opts =~ s/(?=.{53})(.{1,53}) /$1\n                        /mg
+
+    print $^STDOUT, Config::myconfig()
+    if ($^OS_NAME eq 'VMS')
+        print $^STDOUT, "\nCharacteristics of this PERLSHR image: \n"
+    else
+        print $^STDOUT, "\nCharacteristics of this binary (from libperl): \n"
+
+    print $^STDOUT, "  Compile-time options: $opts\n"
+
+    if (@patches)
+        print $^STDOUT, "  Locally applied patches:\n"
+        for (@patches)
+            print $^STDOUT, "\t$_\n"
+
+    print $^STDOUT, "  Built under $osname\n"
+
+    print $^STDOUT, "  $date\n" if defined $date
+
+    my @env = map { "$_=\"$(env::var($_))\"" }, sort grep {m/^PERL/}, env::keys
+    push @env, "CYGWIN=\"$(env::var('CYGWIN'))\"" if $^OS_NAME eq 'cygwin'
+
+    if (@env)
+        print $^STDOUT, "  \%ENV:\n"
+        for (@env)
+            print $^STDOUT, "    $_\n"
+    print $^STDOUT, "  \$^INCLUDE_PATH:\n"
+    for ($^INCLUDE_PATH)
+        print $^STDOUT, "    $_\n"
 
 ENDOFBEG
 
@@ -679,7 +715,7 @@ my $fast_config = join '', map { "    $_,\n" }, sort values %Common
 $config_txt .= sprintf <<'ENDOFTIE', $fast_config
 
 my @heavy_subs = qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config_sh config_re
-                     config_vars|;
+                     config_vars _V|;
 for my $name (@heavy_subs) {
     Symbol::fetch_glob("Config::$name")->* =
        sub { require 'Config_heavy.pl';
