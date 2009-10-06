@@ -875,7 +875,7 @@ sub search_perlfunc($self, $found_things, $pod)
         if (m/^=over/)
             ++$inlist
         elsif (m/^=back/)
-            last if $found > 1 and not $inlist
+            last if $found +> 1 and not $inlist
             --$inlist
         
         push $pod->@, $_

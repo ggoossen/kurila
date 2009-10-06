@@ -216,6 +216,8 @@ dist/base/t/lib/Dummy.pm	Test module for base.pm
 dist/base/t/sigdie.t		See if base works with SIGDIE
 dist/base/t/version.t		See if base works with versions
 dist/base/t/warnings.t		See if base works with warnings
+dist/constant/lib/constant.pm	For "use constant"
+dist/constant/t/constant.t	See if compile-time constants work
 djgpp/config.over	DOS/DJGPP port
 djgpp/configure.bat	DOS/DJGPP port
 djgpp/djgpp.c		DOS/DJGPP port
@@ -280,8 +282,6 @@ ext/B/t/pragma.t	See if user pragmas work.
 ext/B/t/showlex.t	See if B::ShowLex works
 ext/B/t/terse.t		See if B::Terse works
 ext/B/typemap			Compiler backend interface types
-ext/constant/lib/constant.pm	For "use constant"
-ext/constant/t/constant.t	See if compile-time constants work
 ext/Data-Dumper/Changes		Data pretty printer, changelog
 ext/Data-Dumper/Dumper.pm	Data pretty printer, module
 ext/Data-Dumper/t/bless.t	See if Data::Dumper works
