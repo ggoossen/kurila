@@ -289,6 +289,21 @@ dist/lib/t/01lib.t		For "use lib" testing
 dist/Locale-Maketext-Simple/lib/Locale/Maketext/Simple.pm	Locale::Simple
 dist/Locale-Maketext-Simple/t/0-signature.t			Locale::Simple tests
 dist/Locale-Maketext-Simple/t/1-basic.t				Locale::Simple tests
+dist/Pod-Perldoc/lib/Pod/Perldoc/BaseTo.pm	utility module for perldoc
+dist/Pod-Perldoc/lib/Pod/Perldoc/GetOptsOO.pm	options parsing for perldoc
+dist/Pod-Perldoc/lib/Pod/Perldoc.pm		guts of the 'perldoc' utility
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToChecker.pm	let perldoc check POD for errors
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToMan.pm	render POD as man pages
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToNroff.pm	convert POD to nroff
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToPod.pm	convert POD to POD
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToRtf.pm	convert POD to RTF
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToText.pm	convert POD to plain text
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToTk.pm	convert POD via Tk::Pod
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToXml.pm	convert POD to XML
+dist/Pod-Perldoc/t/01_about_verbose.t		test Pod::Perldoc
+dist/Pod-Perldoc/t/checkerbasic.t		test Pod::Perldoc::ToChecker
+dist/Pod-Perldoc/t/perldocbasic.t		test Pod::Perldoc basic operation
+dist/Pod-Perldoc/t/textbasic.t			test Pod::Perldoc::ToText
 dist/Pod-Plainer/Plainer.pm	Pod migration utility module
 dist/Pod-Plainer/t/plainer.t	Test Pod::Plainer
 dist/XSLoader/Makefile.PL	Dynamic Loader makefile writer
@@ -653,21 +668,6 @@ ext/Pod-Parser/t/pod/testp2pt.pl		Module to test Pod::PlainText for a given file
 ext/Pod-Parser/t/pod/testpchk.pl		Module to test Pod::Checker for a given file
 ext/Pod-Parser/t/pod/testpods/lib/Pod/Stuff.pm	Sample data for t/pod/find.t
 ext/Pod-Parser/t/pod/twice.t			Test Pod::Parser
-ext/Pod-Perldoc/lib/Pod/Perldoc/BaseTo.pm	utility module for perldoc
-ext/Pod-Perldoc/lib/Pod/Perldoc/GetOptsOO.pm	options parsing for perldoc
-ext/Pod-Perldoc/lib/Pod/Perldoc.pm		guts of the 'perldoc' utility
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToChecker.pm	let perldoc check POD for errors
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToMan.pm	render POD as man pages
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToNroff.pm	convert POD to nroff
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToPod.pm	convert POD to POD
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToRtf.pm	convert POD to RTF
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToText.pm	convert POD to plain text
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToTk.pm		convert POD via Tk::Pod
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToXml.pm	convert POD to XML
-ext/Pod-Perldoc/t/01_about_verbose.t		test Pod::Perldoc
-ext/Pod-Perldoc/t/checkerbasic.t		test Pod::Perldoc::ToChecker
-ext/Pod-Perldoc/t/perldocbasic.t		test Pod::Perldoc basic operation
-ext/Pod-Perldoc/t/textbasic.t			test Pod::Perldoc::ToText
 ext/Pod-Simple/ChangeLog				Pod::Simple ChangeLog
 ext/Pod-Simple/lib/Pod/Simple/BlackBox.pm		Pod::Simple::BlackBox
 ext/Pod-Simple/lib/Pod/Simple/Checker.pm		check the Pod syntax of a document
