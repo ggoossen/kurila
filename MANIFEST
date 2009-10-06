@@ -286,6 +286,9 @@ dist/IO/t/io_xs.t		See if XSUB methods from IO work
 dist/lib/lib_pm.PL		For "use lib", produces lib/lib.pm
 dist/lib/Makefile.PL
 dist/lib/t/01lib.t		For "use lib" testing
+dist/Locale-Maketext-Simple/lib/Locale/Maketext/Simple.pm	Locale::Simple
+dist/Locale-Maketext-Simple/t/0-signature.t			Locale::Simple tests
+dist/Locale-Maketext-Simple/t/1-basic.t				Locale::Simple tests
 dist/Pod-Plainer/Plainer.pm	Pod migration utility module
 dist/Pod-Plainer/t/plainer.t	Test Pod::Plainer
 dist/XSLoader/Makefile.PL	Dynamic Loader makefile writer
@@ -486,9 +489,6 @@ ext/Locale-Maketext/lib/Locale/Maketext.pm		Locale::Maketext
 ext/Locale-Maketext/lib/Locale/Maketext.pod		Locale::Maketext documentation
 ext/Locale-Maketext/lib/Locale/Maketext/TPJ13.pod	Locale::Maketext documentation article
 ext/Locale-Maketext/README	Locale::Maketext
-ext/Locale-Maketext-Simple/lib/Locale/Maketext/Simple.pm	Locale::Simple
-ext/Locale-Maketext-Simple/t/0-signature.t	Locale::Simple tests
-ext/Locale-Maketext-Simple/t/1-basic.t	Locale::Simple tests
 ext/Locale-Maketext/t/10_make.t	See if Locale::Maketext works
 ext/Locale-Maketext/t/20_get.t	See if Locale::Maketext works
 ext/Locale-Maketext/t/30_local.t	See if Locale::Maketext works
