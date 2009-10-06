@@ -3,8 +3,9 @@
 use warnings
 use Config
 BEGIN
-    unshift $^INCLUDE_PATH, $^OS_NAME eq 'MSWin32' ?? '../cpan/Cwd' !! 'cpan/Cwd'
+    unshift $^INCLUDE_PATH, $^OS_NAME eq 'MSWin32' ?? ('../cpan/Cwd', '../cpan/Cwd/lib') !! 'cpan/Cwd'
 use Cwd
+use File::Spec::Functions < qw(rel2abs)
 
 # To clarify, this isn't the entire suite of modules considered "toolchain"
 # It's not even all modules needed to build ext/
@@ -14,9 +15,9 @@ use Cwd
 # allow miniperl to build everything else.
 
 my @toolchain = qw(ext/constant/lib cpan/Cwd cpan/Cwd/lib
-		   ext/ExtUtils-Command/lib
-		   dist/ExtUtils-Install/lib ext/ExtUtils-MakeMaker/lib
-		   ext/ExtUtils-Manifest/lib ext/Text-ParseWords/lib
+                   ext/ExtUtils-Command/lib
+                   dist/ExtUtils-Install/lib ext/ExtUtils-MakeMaker/lib
+                   ext/ExtUtils-Manifest/lib ext/Text-ParseWords/lib
                    cpan/File-Path/lib ext/Getopt-Long/lib)
 
 my @ext_dirs = qw(cpan dist ext)
@@ -169,29 +170,29 @@ if ($is_Win32)
         (my $ext = getcwd()) =~ s{/}{\\}g
         FindExt::scan_ext($ext)
         FindExt::set_static_extensions(split ' ', config_value('static_ext'))
-    
-        my @ext
-        push @ext, < FindExt::static_ext() if $static
-        push @ext, < FindExt::dynamic_ext() if $dynamic
-        push @ext, < FindExt::nonxs_ext() if $nonxs
-        push @ext, 'Dynaloader' if $dynaloader
-
-        foreach (sort @ext)
-            if (%incl and !exists %incl{$_})
-                #warn "Skipping extension $ext\\$_, not in inclusion list\n";
-                next
-            if (exists %excl{$_})
-                warn "Skipping extension $ext\\$_, not ported to current platform"
-                next
-            push @extspec, $_
-            if($_ eq 'DynaLoader')
-                # No, we don't know why nmake can't work out the dependency chain
-                push %extra_passthrough{+$_}, 'DynaLoader.c';
-            elsif(FindExt::is_static($_))
-                push %extra_passthrough{+$_}, 'LINKTYPE=static'
-
         chdir $build
-            or die "Couldn't chdir to '$build': $^OS_ERROR"
+            or die "Couldn't chdir to '$build': $^OS_ERROR"; # restore our start directory
+
+    my @ext
+    push @ext, < FindExt::static_ext() if $static
+    push @ext, < FindExt::dynamic_ext() if $dynamic
+    push @ext, < FindExt::nonxs_ext() if $nonxs
+    push @ext, 'Dynaloader' if $dynaloader
+
+    foreach (sort @ext)
+        if (%incl and !exists %incl{$_})
+            #warn "Skipping extension $_, not in inclusion list\n";
+            next
+        if (exists %excl{$_})
+            warn "Skipping extension $_, not ported to current platform"
+            next
+        push @extspec, $_
+        if($_ eq 'DynaLoader')
+            # No, we don't know why nmake can't work out the dependency chain
+            push %extra_passthrough{+$_}, 'DynaLoader.c';
+        elsif(FindExt::is_static($_))
+            push %extra_passthrough{+$_}, 'LINKTYPE=static'
+
     chdir '..'
         or die "Couldn't chdir to build directory: $^OS_ERROR"; # now in the Perl build directory
 elsif ($is_VMS)
@@ -233,19 +234,22 @@ sub build_extension($ext_dir, $perl, $mname, $pass_through)
     my $up = $ext_dir
     $up =~ s![^/]+!..!g
 
+    unless (chdir "$ext_dir")
+        warn "Cannot cd to $ext_dir: $^OS_ERROR"
+        return
+
     $perl ||= "$up/miniperl"
     my $return_dir = $up
     my $lib_dir = "lib"
     # $lib_dir must be last, as we're copying files into it, and in a parallel
     # make there's a race condition if one process tries to open a module that
     # another process has half-written.
+    my @new_inc = (map {"$up/$_"}, @toolchain) +@+ @: $lib_dir
+    if ($is_Win32)
+        @new_inc = map {rel2abs($_)}, @new_inc
     env::var('PERL5LIB')
-        = join config_value('path_sep'), map {"$up/$_"}, @: < @toolchain, $lib_dir
+        = join config_value('path_sep'), @new_inc
     env::var('PERL_CORE') = 1
-
-    unless (chdir "$ext_dir")
-        warn "Cannot cd to $ext_dir: $^OS_ERROR"
-        return
 
     my $makefile
     if ($is_VMS)
