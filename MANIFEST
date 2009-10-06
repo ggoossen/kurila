@@ -74,6 +74,8 @@ cpan/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/Windows.pm	CBuilder method
 cpan/ExtUtils-CBuilder/lib/ExtUtils/CBuilder.pm			Compile and link C code for Perl modules
 cpan/ExtUtils-CBuilder/t/01-basic.t				tests for ExtUtils::CBuilder
 cpan/ExtUtils-CBuilder/t/02-link.t				tests for ExtUtils::CBuilder
+cpan/ExtUtils-Command/lib/ExtUtils/Command.pm	Utilities for Make on non-UNIX platforms
+cpan/ExtUtils-Command/t/eu_command.t		See if ExtUtils::Command works
 cpan/ExtUtils-ParseXS/Changes			ExtUtils::ParseXS change log
 cpan/ExtUtils-ParseXS/lib/ExtUtils/ParseXS.pm	converts Perl XS code into C code
 cpan/ExtUtils-ParseXS/lib/ExtUtils/xsubpp	External subroutine preprocessor
@@ -425,8 +427,6 @@ ext/Errno/ChangeLog	Errno changes
 ext/Errno/Errno_pm.PL	Errno perl module create script
 ext/Errno/Makefile.PL	Errno extension makefile writer
 ext/Errno/t/Errno.t	See if Errno works
-ext/ExtUtils-Command/lib/ExtUtils/Command.pm	Utilities for Make on non-UNIX platforms
-ext/ExtUtils-Command/t/eu_command.t		See if ExtUtils::Command works
 ext/ExtUtils-Constant/lib/ExtUtils/Constant/Base.pm		generate XS code to import C header constants
 ext/ExtUtils-Constant/lib/ExtUtils/Constant.pm			generate XS code to import C header constants
 ext/ExtUtils-Constant/lib/ExtUtils/Constant/ProxySubs.pm	generate XS code for proxy constants
