@@ -238,6 +238,18 @@ dist/ExtUtils-Install/t/lib/MakeMaker/Test/Setup/BFD.pm	MakeMaker test utilities
 dist/ExtUtils-Install/t/lib/MakeMaker/Test/Utils.pm	MakeMaker test utilities
 dist/ExtUtils-Install/t/lib/TieOut.pm			Testing library to capture prints
 dist/ExtUtils-Install/t/Packlist.t			See if Packlist works
+dist/I18N-LangTags/ChangeLog			I18N::LangTags
+dist/I18N-LangTags/lib/I18N/LangTags/Detect.pm	Detect language preferences
+dist/I18N-LangTags/lib/I18N/LangTags/List.pm	List of tags for human languages
+dist/I18N-LangTags/lib/I18N/LangTags.pm		I18N::LangTags
+dist/I18N-LangTags/README			I18N::LangTags
+dist/I18N-LangTags/t/05_main.t			See whether I18N::LangTags works
+dist/I18N-LangTags/t/07_listy.t			See whether I18N::LangTags works
+dist/I18N-LangTags/t/10_http.t			See whether I18N::LangTags works
+dist/I18N-LangTags/t/20_locales.t		See whether I18N::LangTags works
+dist/I18N-LangTags/t/50_super.t			See whether I18N::LangTags works
+dist/I18N-LangTags/t/55_supers_strict.t		See whether I18N::LangTags works
+dist/I18N-LangTags/t/80_all_env.t		See whether I18N::LangTags works
 djgpp/config.over	DOS/DJGPP port
 djgpp/configure.bat	DOS/DJGPP port
 djgpp/djgpp.c		DOS/DJGPP port
@@ -379,18 +391,6 @@ ext/I18N-Langinfo/Langinfo.pm	I18N::Langinfo
 ext/I18N-Langinfo/Langinfo.xs	I18N::Langinfo
 ext/I18N-Langinfo/Makefile.PL	I18N::Langinfo
 ext/I18N-Langinfo/t/Langinfo.t	See whether I18N::Langinfo works
-ext/I18N-LangTags/ChangeLog			I18N::LangTags
-ext/I18N-LangTags/lib/I18N/LangTags/Detect.pm	Detect language preferences
-ext/I18N-LangTags/lib/I18N/LangTags/List.pm	List of tags for human languages
-ext/I18N-LangTags/lib/I18N/LangTags.pm		I18N::LangTags
-ext/I18N-LangTags/README			I18N::LangTags
-ext/I18N-LangTags/t/05_main.t			See whether I18N::LangTags works
-ext/I18N-LangTags/t/07_listy.t			See whether I18N::LangTags works
-ext/I18N-LangTags/t/10_http.t			See whether I18N::LangTags works
-ext/I18N-LangTags/t/20_locales.t		See whether I18N::LangTags works
-ext/I18N-LangTags/t/50_super.t			See whether I18N::LangTags works
-ext/I18N-LangTags/t/55_supers_strict.t		See whether I18N::LangTags works
-ext/I18N-LangTags/t/80_all_env.t		See whether I18N::LangTags works
 ext/IO/ChangeLog		IO perl module change log
 ext/IO/hints/sco.pl		Hint for IO for named architecture
 ext/IO/IO.pm			Top-level interface to IO::* classes
