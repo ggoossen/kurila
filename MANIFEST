@@ -54,6 +54,13 @@ cpan/DB_File/t/db-hash.t	See if DB_File works
 cpan/DB_File/t/db-recno.t	See if DB_File works
 cpan/DB_File/typemap		Berkeley DB extension interface types
 cpan/DB_File/version.c		Berkeley DB extension interface version check
+cpan/Digest/Changes		Digest changelog
+cpan/Digest/Digest/base.pm	Digest extensions
+cpan/Digest/Digest/file.pm	Digest extensions
+cpan/Digest/Digest.pm		Digest extensions
+cpan/Digest/t/base.t		See if Digest extensions work
+cpan/Digest/t/digest.t		See if Digest extensions work
+cpan/Digest/t/file.t		See if Digest extensions work
 cpan/ExtUtils-CBuilder/Changes					Changes for ExtUtils::CBuilder
 cpan/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Base.pm		Base class for ExtUtils::CBuilder methods
 cpan/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/aix.pm	CBuilder methods for AIX
@@ -1116,13 +1123,6 @@ lib/Config.t			See if Config works
 lib/CORE.pod			document the CORE namespace
 lib/DB.pm			Debugger API (draft)
 lib/DB.t			See if DB works
-lib/Digest/base.pm		Digest extensions
-lib/Digest/Changes		Digest changelog
-lib/Digest/file.pm		Digest extensions
-lib/Digest.pm			Digest extensions
-lib/Digest/t/base.t		See if Digest extensions work
-lib/Digest/t/digest.t		See if Digest extensions work
-lib/Digest/t/file.t		See if Digest extensions work
 lib/DirHandle.pm		like FileHandle only for directories
 lib/DirHandle.t			See if DirHandle works
 lib/English.pm			Readable aliases for short variables
