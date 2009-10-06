@@ -1,11 +1,6 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
-#ifndef NO_PPPORT_H
-#   define NEED_my_strlcpy
-#   define NEED_my_strlcat
-#   include "ppport.h"
-#endif
 
 #ifdef I_UNISTD
 #   include <unistd.h>
