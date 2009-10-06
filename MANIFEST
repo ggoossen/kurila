@@ -286,9 +286,23 @@ dist/IO/t/io_xs.t		See if XSUB methods from IO work
 dist/lib/lib_pm.PL		For "use lib", produces lib/lib.pm
 dist/lib/Makefile.PL
 dist/lib/t/01lib.t		For "use lib" testing
+dist/Locale-Maketext/ChangeLog				Locale::Maketext
+dist/Locale-Maketext/lib/Locale/Maketext/GutsLoader.pm	Locale::Maketext
+dist/Locale-Maketext/lib/Locale/Maketext/Guts.pm	Locale::Maketext
+dist/Locale-Maketext/lib/Locale/Maketext.pm		Locale::Maketext
+dist/Locale-Maketext/lib/Locale/Maketext.pod		Locale::Maketext documentation
+dist/Locale-Maketext/lib/Locale/Maketext/TPJ13.pod	Locale::Maketext documentation article
+dist/Locale-Maketext/README				Locale::Maketext
 dist/Locale-Maketext-Simple/lib/Locale/Maketext/Simple.pm	Locale::Simple
 dist/Locale-Maketext-Simple/t/0-signature.t			Locale::Simple tests
 dist/Locale-Maketext-Simple/t/1-basic.t				Locale::Simple tests
+dist/Locale-Maketext/t/10_make.t			See if Locale::Maketext works
+dist/Locale-Maketext/t/20_get.t				See if Locale::Maketext works
+dist/Locale-Maketext/t/30_local.t			See if Locale::Maketext works
+dist/Locale-Maketext/t/40_super.t			See if Locale::Maketext works
+dist/Locale-Maketext/t/50_super.t			See if Locale::Maketext works
+dist/Locale-Maketext/t/60_super.t			See if Locale::Maketext works
+dist/Locale-Maketext/t/90_utf8.t			See if Locale::Maketext works
 dist/Pod-Perldoc/lib/Pod/Perldoc/BaseTo.pm	utility module for perldoc
 dist/Pod-Perldoc/lib/Pod/Perldoc/GetOptsOO.pm	options parsing for perldoc
 dist/Pod-Perldoc/lib/Pod/Perldoc.pm		guts of the 'perldoc' utility
@@ -497,20 +511,6 @@ ext/Locale-Codes/t/language.t	See if Locale::Codes work
 ext/Locale-Codes/t/rename.t	See if Locale::Codes work
 ext/Locale-Codes/t/script.t	See if Locale::Codes work
 ext/Locale-Codes/t/uk.t		See if Locale::Codes work
-ext/Locale-Maketext/ChangeLog	Locale::Maketext
-ext/Locale-Maketext/lib/Locale/Maketext/GutsLoader.pm	Locale::Maketext
-ext/Locale-Maketext/lib/Locale/Maketext/Guts.pm	Locale::Maketext
-ext/Locale-Maketext/lib/Locale/Maketext.pm		Locale::Maketext
-ext/Locale-Maketext/lib/Locale/Maketext.pod		Locale::Maketext documentation
-ext/Locale-Maketext/lib/Locale/Maketext/TPJ13.pod	Locale::Maketext documentation article
-ext/Locale-Maketext/README	Locale::Maketext
-ext/Locale-Maketext/t/10_make.t	See if Locale::Maketext works
-ext/Locale-Maketext/t/20_get.t	See if Locale::Maketext works
-ext/Locale-Maketext/t/30_local.t	See if Locale::Maketext works
-ext/Locale-Maketext/t/40_super.t	See if Locale::Maketext works
-ext/Locale-Maketext/t/50_super.t	See if Locale::Maketext works
-ext/Locale-Maketext/t/60_super.t	See if Locale::Maketext works
-ext/Locale-Maketext/t/90_utf8.t	See if Locale::Maketext works
 ext/MIME-Base64/Base64.pm	MIME::Base64 extension
 ext/MIME-Base64/Base64.xs	MIME::Base64 extension
 ext/MIME-Base64/Changes		MIME::Base64 extension
