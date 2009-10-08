@@ -23,13 +23,10 @@ my %dir_to_switch = %:
 # I think in the end I'd like "not absolute" to be the default", as it saves
 # some fakery within TestInit which can peturb tests, and takes CPU.
 my %no_abs = %:
-     '../ext/Pod-Parser' => 1,
+     '../cpan/Pod-Parser' => 1,
               
 my %temp_no_core = %:
      '../cpan/B-Debug' => 1,
-     '../ext/Compress-Raw-Bzip2' => 1,
-     '../ext/Compress-Raw-Zlib' => 1,
-     '../ext/Devel-PPPort' => 1,
      '../cpan/Getopt-Long' => 1,
      '../cpan/MIME-Base64' => 1,
      '../ext/parent' => 1,
