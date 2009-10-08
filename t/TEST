@@ -31,11 +31,7 @@ my %temp_no_core = %:
      '../cpan/MIME-Base64' => 1,
      '../cpan/Pod-Simple' => 1,
      '../cpan/podlators' => 1,
-     '../ext/Test-Simple' => 1,
-     '../ext/Tie-RefHash' => 1,
-     '../ext/Time-HiRes' => 1,
-     '../ext/Unicode-Collate' => 1,
-     '../ext/Unicode-Normalize' => 1,
+     '../cpan/Time-HiRes' => 1,
 
 if ($::do_nothing)
     return 1
