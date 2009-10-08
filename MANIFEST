@@ -454,6 +454,8 @@ cpan/Term-ANSIColor/ANSIColor.pm	Perl module supporting termcap usage
 cpan/Term-ANSIColor/ChangeLog		Term::ANSIColor
 cpan/Term-ANSIColor/README		Term::ANSIColor
 cpan/Term-ANSIColor/t/basic.t		Tests for Term::ANSIColor
+cpan/Term-Cap/Cap.pm			Perl module supporting termcap usage
+cpan/Term-Cap/test.pl			See if Term::Cap works
 cpan/Text-Tabs/CHANGELOG		ChangeLog for Tabs+Wrap
 cpan/Text-Tabs/lib/Text/Tabs.pm		Do expand and unexpand
 cpan/Text-Tabs/lib/Text/Wrap.pm		Paragraph formatter
@@ -895,8 +897,6 @@ ext/Socket/t/Socket.t		See if Socket works
 ext/Sys-Hostname/Hostname.pm	Sys::Hostname extension Perl module
 ext/Sys-Hostname/Hostname.xs	Sys::Hostname extension external subroutines
 ext/Sys-Hostname/t/Hostname.t	See if Sys::Hostname works
-ext/Term-Cap/Cap.pm			Perl module supporting termcap usage
-ext/Term-Cap/test.pl			See if Term::Cap works
 ext/Text-ParseWords/lib/Text/ParseWords.pm	Perl module to split words on arbitrary delimiter
 ext/Text-ParseWords/t/ParseWords.t	See if Text::ParseWords works
 ext/Time-HiRes/Changes		Time::HiRes extension
