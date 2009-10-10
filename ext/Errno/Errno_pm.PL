@@ -13,7 +13,8 @@ my $IsSymbian = defined env::var("SDK") && -d "$(env::var('SDK'))\\epoc32"
 my $IsMSWin32 = $^OS_NAME eq 'MSWin32' && !$IsSymbian
 
 unlink "Errno.pm" if -f "Errno.pm"
-open my $out, ">", "Errno.pm" or die "Cannot open Errno.pm: $^OS_ERROR"
+unlink "Errno.tmp" if -f "Errno.tmp"
+open my $out, ">", "Errno.tmp" or die "Cannot open Errno.tmp: $^OS_ERROR"
 my @files = get_files()
 if (config_value("gccversion") ne '' && $^OS_NAME eq 'MSWin32')
     # MinGW complains "warning: #pragma system_header ignored outside include
@@ -36,6 +37,8 @@ else
 
 write_errno_pm()
 unlink "errno.c" if -f "errno.c"
+close $out or die "Error closing Errno.tmp: $^OS_ERROR"
+rename "Errno.tmp", "Errno.pm" or die "Cannot rename Errno.tmp to Errno.pm: $^OS_ERROR"
 
 sub process_file($file)
 
@@ -151,7 +154,7 @@ sub get_files
         # we might miss out on compiler-specific ones
         %file{+"$(env::var('GUSI'))include:sys:errno.h"} = 1
 
-    elsif ($^OS_NAME eq 'beos')
+    elsif ($^OS_NAME eq 'beos' || $^OS_NAME eq 'haiku')
         # hidden in a special place
         %file{+'/boot/develop/headers/posix/errno.h'} = 1
 

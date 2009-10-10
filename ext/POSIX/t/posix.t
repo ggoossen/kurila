@@ -2,7 +2,7 @@
 
 use Config
 
-BEGIN { require "./test.pl"; }
+BEGIN { require "../../t/test.pl"; }
 plan(tests => 66)
 
 use POSIX < qw(fcntl_h signal_h limits_h _exit getcwd open read strftime write
@@ -20,7 +20,7 @@ my $Is_OS2     = $^OS_NAME eq 'os2'
 my $Is_UWin    = $^OS_NAME eq 'uwin'
 my $Is_OS390   = $^OS_NAME eq 'os390'
 
-ok( (my $testfd = open("TEST", O_RDONLY, 0)),        'O_RDONLY with open' )
+ok( (my $testfd = open("../../t/TEST", O_RDONLY, 0)),        'O_RDONLY with open' )
 read($testfd, my $buffer, 4) if $testfd +> 2
 is( $buffer, "#!./",                      '    with read' )
 
@@ -64,10 +64,10 @@ SKIP: do
 
         my $sigint_called = 0
 
-        my $mask   = POSIX::SigSet->new( SIGINT( < @_ ))
-        my $action = POSIX::SigAction->new( \&main::SigHUP, $mask, 0)
-        sigaction(SIGHUP( < @_ ), $action)
-        signals::handler('INT') = \&SigINT
+        my $mask   = POSIX::SigSet->new( SIGINT() )
+        my $action = POSIX::SigAction->new( &main::SigHUP, $mask, 0)
+        sigaction(SIGHUP(), $action)
+        signals::handler('INT') = &SigINT
 
         # At least OpenBSD/i386 3.3 is okay, as is NetBSD 1.5.
         # But not NetBSD 1.6 & 1.6.1: the test makes perl crash.
@@ -115,13 +115,7 @@ SKIP: do
 
 
 
-my $pat
-if ($Is_MacOS)
-    $pat = qr/:t:$/
-elsif ( $Is_VMS )
-    $pat = qr/\.T]/i
-else
-    $pat = qr#[\\/]t$#i
+my $pat = qr#[\\/]POSIX$#i
 
 like( getcwd(), qr/$pat/, 'getcwd' )
 
@@ -263,8 +257,10 @@ ok( POSIX::isalnum(undef),'isalnum undef' )
 dies_like( sub (@< @_) { POSIX::isalpha(\$@) }, qr/reference as string/,   'isalpha []' )
 dies_like( sub (@< @_) { POSIX::isprint(\$@) }, qr/reference as string/,   'isalpha []' )
 
-try {  POSIX->import("S_ISBLK"); my $x = S_ISBLK }
-unlike( $^EVAL_ERROR, qr/Can't use string .* as a symbol ref/, "Can import autoloaded constants" )
+do
+    POSIX->import("S_ISBLK")
+    my $x = &S_ISBLK
+    ok(1, "Can import autoloaded constants" )
 
 # Check that output is not flushed by _exit. This test should be last
 # in the file, and is not counted in the total number of tests.

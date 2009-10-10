@@ -232,5 +232,5 @@ sub foo::::::bar { print $^STDOUT, "ok $test\n"; $test++ }
 foo::::::bar
 
 eval "\$x =\x[E2]foo"
-if ($^EVAL_ERROR->{?description} =~ m/Unrecognized character \\xE2 in column 5/) { print $^STDOUT, "ok $test\n"; } else { print $^STDOUT, "not ok $test\n"; }
+if ($^EVAL_ERROR->{description} =~ m/Unrecognized character \\xE2; marked by <-- HERE after \$x =<-- HERE near column 5/) { print $^STDOUT, "ok $test\n"; } else { print $^STDOUT, "not ok $test\n"; }
 $test++

@@ -1,7 +1,7 @@
 /*    op.h
  *
- *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006 by Larry Wall and others
+ *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+ *    2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -46,7 +46,7 @@
 #  define MADPROP_IN_BASEOP
 #endif
 
-typedef PERL_BITFIELD16 optype;
+typedef PERL_BITFIELD16 Optype;
 
 #ifdef BASEOP_DEFINITION
 #define BASEOP BASEOP_DEFINITION
@@ -144,6 +144,7 @@ Deprecated.  Use C<GIMME_V> instead.
 				  */
 #define OPf_TARGET_MY	0x800	/* Target is PADMY. (for ops with TARGLEX */
 
+#define OPf_ENTERSUB_EARLY_CV		0x1000	/* sub is a subroutine name which still needs to be resolved */
 
 /* old names; don't use in new code, but don't break them, either */
 #define OPf_LIST	OPf_WANT_LIST
@@ -182,8 +183,6 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpENTERSUB_TARGARGS    64      /* Use the save argument in targ */
 #define OPpENTERSUB_SAVE_DISCARD  2   /* Discard the value returned */
 
-  /* OP_GV only */
-#define OPpEARLY_CV		32	/* foo() called before sub foo was parsed */
 /* Private for OP_HELEM and OP_AELEM */
 #define OPpELEM_ADD            8       /* Add key if it doesn't exist */
 #define OPpELEM_OPTIONAL       4       /* Ignore if the key does not exist */
@@ -481,9 +480,9 @@ struct rootop {
 #endif
 
 /* flags used by Perl_load_module() */
-#define PERL_LOADMOD_DENY		0x1
-#define PERL_LOADMOD_NOIMPORT		0x2
-#define PERL_LOADMOD_IMPORT_OPS		0x4
+#define PERL_LOADMOD_DENY		0x1	/* no Module */
+#define PERL_LOADMOD_NOIMPORT		0x2	/* use Module () */
+#define PERL_LOADMOD_IMPORT_OPS		0x4	/* use Module (...) */
 
 #if defined(PERL_IN_PERLY_C) || defined(PERL_IN_OP_C)
 #define ref(o, type) doref(o, type, TRUE)
@@ -510,7 +509,7 @@ struct rootop {
 
 struct madprop {
     MADPROP* mad_next;
-    const void *mad_val;
+    void *mad_val;
     U32 mad_vlen;
 /*    short mad_count; */
     char mad_key;

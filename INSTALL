@@ -780,6 +780,21 @@ simply do:
 
 =back
 
+=head2 Relocatable @INC
+
+To create a relocatable perl tree, use the following command line:
+
+    sh Configure -Duserelocatableinc
+
+Then the paths in @INC (and everything else in %Config) can be
+optionally located via the path of the perl executable.
+
+That means that, if the string ".../" is found at the start of any
+path, it's substituted with the directory of $^X. So, the relocation
+can be configured on a per-directory basis, although the default with
+"-Duserelocatableinc" is that everything is relocated. The initial
+install is done to the original configured prefix.
+
 =head2 Site-wide Policy settings
 
 After Configure runs, it stores a number of common site-wide "policy"
@@ -898,6 +913,22 @@ Removes -g from optimize, and -DDEBUGGING from ccflags.
 If you are using a shared libperl, see the warnings about multiple
 versions of perl under L<Building a shared Perl library>.
 
+Note that a perl built with -DDEBUGGING will be bigger and will run more
+slowly than a standard perl.
+
+=head2 DTrace support
+
+On platforms where DTrace is available, it may be enabled by 
+using the -Dusedtrace option to Configure. DTrace probes are available for
+subroutine entry (sub-entry) and subroutine exit (sub-exit). Here's a
+simple D script that uses them:
+
+  perl$target:::sub-entry, perl$target:::sub-return {
+    printf("%s %s (%s:%d)\n", probename == "sub-entry" ? "->" : "<-",
+              copyinstr(arg0), copyinstr(arg1), arg2);
+  }
+
+
 =head2 Extensions
 
 Perl ships with a number of standard extensions.  These are contained
@@ -978,34 +1009,36 @@ Again, this should all happen automatically.  This should also work if
 you have gdbm installed in any of (/usr/local, /opt/local, /usr/gnu,
 /opt/gnu, /usr/GNU, or /opt/GNU).
 
-=item gdbm in /usr/you
+=item BerkeleyDB in /usr/local/BerkeleyDB
 
-Suppose you have gdbm installed in some place other than /usr/local,
-but you still want Configure to find it.  To be specific, assume you
-have /usr/you/include/gdbm.h and /usr/you/lib/libgdbm.a.  You
-still have to add -I/usr/you/include to cc flags, but you have to take
-an extra step to help Configure find libgdbm.a.  Specifically, when
-Configure prompts you for library directories, you have to add
-/usr/you/lib to the list.
+The version of BerkeleyDB distributed by sleepycat.com installs in a
+version-specific directory by default, typically something like
+/usr/local/BerkeleyDB.4.7.  To have Configure find that, you need to add
+-I/usr/local/BerkeleyDB.4.7/include to cc flags, as in the previous example,
+and you will also have to take extra steps to help Configure find -ldb.
+Specifically, when Configure prompts you for library directories,
+add /usr/local/BerkeleyDB.4.7/lib to the list.  Also, you will need to
+add appropriate linker flags to tell the runtime linker where to find the
+BerkeleyDB shared libraries.
 
-It is possible to specify this from the command line too (all on one
+It is possible to specify this from the command line (all on one
 line):
 
     sh Configure -de \
-        -Dlocincpth="/usr/you/include" \
-        -Dloclibpth="/usr/you/lib"
+        -Dlocincpth='/usr/local/BerkeleyDB.4.7/include /usr/local/include' \
+        -Dloclibpth='/usr/local/BerkeleyDB.4.7/lib /usr/local/lib' \
+        -Aldflags='-R/usr/local/BerkeleyDB.4.7/lib'
 
 locincpth is a space-separated list of include directories to search.
 Configure will automatically add the appropriate -I directives.
 
 loclibpth is a space-separated list of library directories to search.
-Configure will automatically add the appropriate -L directives.  If
-you have some libraries under /usr/local/ and others under
-/usr/you, then you have to include both, namely
+Configure will automatically add the appropriate -L directives.
 
-    sh Configure -de \
-        -Dlocincpth="/usr/you/include /usr/local/include" \
-        -Dloclibpth="/usr/you/lib /usr/local/lib"
+The addition to ldflags is so that the dynamic linker knows where to find
+the BerkeleyDB libraries.  For Linux and Solaris, the -R option does that.
+Other systems may use different flags.  Use the appropriate flag for your
+system.
 
 =back
 
@@ -1376,6 +1409,18 @@ The latter is especially useful if you see something like this
 
 at Perl startup.
 
+=item other environment variables
+
+Configure does not check for environment variables that can sometimes
+have a major influence on how perl is built or tested. For example,
+OBJECT_MODE on AIX determines the way the compiler and linker deal with
+their objects, but this is a variable that only influences build-time
+behaviour, and should not affect the perl scripts that are eventually
+executed by the perl binary. Other variables, like PERL_UNICODE,
+PERL5LIB, and PERL5OPT will influence the behaviour of the test suite.
+So if you are getting strange test failures, you may want to try
+retesting with the various PERL variables unset.
+
 =item varargs
 
 If you get varargs problems with gcc, be sure that gcc is installed
@@ -1542,11 +1587,9 @@ the extension passes its tests anyway (see L<"make test"> below),
 then don't worry about the warning message.  The extension
 Makefile.PL goes looking for various libraries needed on various
 systems; few systems will need all the possible libraries listed.
-For example, a system may have -lcposix or -lposix, but it's
-unlikely to have both, so most users will see warnings for the one
-they don't have.  The phrase 'probably harmless' is intended to
-reassure you that nothing unusual is happening, and the build
-process is continuing.
+Most users will see warnings for the ones they don't have.  The
+phrase 'probably harmless' is intended to reassure you that nothing
+unusual is happening, and the build process is continuing.
 
 On the other hand, if you are building GDBM_File and you get the
 message
@@ -1894,6 +1937,13 @@ test, it does not necessarily mean you have a broken perl.  This test
 tries to exercise the regular expression subsystem quite thoroughly,
 and may well be far more demanding than your normal usage.
 
+=item libgcc_s.so.1: cannot open shared object file
+
+This message has been reported on gcc-3.2.3 and earlier installed with
+a non-standard prefix.  Setting the LD_LIBRARY_PATH environment variable
+(or equivalent) to include gcc's lib/ directory with the libgcc_s.so.1
+shared library should fix the problem.
+
 =item Failures from lib/File/Temp/t/security saying "system possibly insecure"
 
 First, such warnings are not necessarily serious or indicative of a
@@ -1945,6 +1995,18 @@ See the documentation for the File::Temp module for more information
 about the various security aspects of temporary files.
 
 =back
+
+The core distribution can now run its regression tests in parallel on
+Unix-like platforms. Instead of running C<make test>, set C<TEST_JOBS> in
+your environment to the number of tests to run in parallel, and run
+C<make test_harness>. On a Bourne-like shell, this can be done as
+
+    TEST_JOBS=3 make test_harness  # Run 3 tests in parallel
+
+An environment variable is used, rather than parallel make itself, because
+L<TAP::Harness> needs to be able to schedule individual non-conflicting test
+scripts itself, and there is no standard interface to C<make> utilities to
+interact with their job schedulers.
 
 =head1 make install
 
@@ -2117,6 +2179,15 @@ appropriate context.  Plain text should usually be sufficient--fancy
 attachments or encodings may actually reduce the number of people who
 read your message.  Your message will get relayed to over 400
 subscribers around the world so please try to keep it brief but clear.
+
+If the bug you are reporting has security implications, which make it
+inappropriate to send to a publicly archived mailing list, then please send
+it to perl5-security-report@perl.org. This points to a closed subscription
+unarchived mailing list, which includes all the core committers, who be able
+to help assess the impact of issues, figure out a resolution, and help
+co-ordinate the release of patches to mitigate or fix the problem across all
+platforms on which Perl is supported. Please only use this address for security
+issues in the Perl core, not for modules independently distributed on CPAN.
 
 If you are unsure what makes a good bug report please read "How to
 report Bugs Effectively" by Simon Tatham:

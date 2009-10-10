@@ -22,7 +22,7 @@ while ( ~< $^DATA)
     %code{+$1} = $2
 
 
-open my $fh, '<', '../opcode.pl' or die "Can't open opcode.pl: $^OS_ERROR"
+open my $fh, '<', '../../opcode.pl' or die "Can't open opcode.pl: $^OS_ERROR"
 while ( ~< $fh)
     last if m/^__END__/
 
@@ -73,7 +73,7 @@ padany		SKIP (not implemented)
 pushre		SKIP split m/foo/
 rv2gv		*x
 rv2sv		$x
-rv2cv		f()
+rv2cv		&f
 anoncode	sub { }
 prototype	prototype 'foo'
 refgen		\($x,$y)

@@ -4,10 +4,10 @@
 #define NO_XSLOCKS
 #include "XSUB.h"
 
-static void throws_exception(int throw_e)
+static void throws_exception(pTHX_ int throw_e)
 {
   if (throw_e)
-    croak("boo\n");
+    croak(aTHX_ "boo\n");
 }
 
 /* Don't give this the same name as exection() in ext/Devel/PPPort/module3.c
@@ -21,7 +21,7 @@ int apitest_exception(int throw_e)
   SV *caught = get_sv("XS::APItest::exception_caught", 0);
 
   XCPT_TRY_START {
-    throws_exception(throw_e);
+    throws_exception(aTHX_ throw_e);
   } XCPT_TRY_END
 
   XCPT_CATCH

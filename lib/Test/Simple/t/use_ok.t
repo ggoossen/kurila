@@ -2,11 +2,7 @@
 
 BEGIN 
     if( env::var('PERL_CORE') )
-        chdir 't'
-        $^INCLUDE_PATH = @: '../lib', 'lib'
-    else
-        unshift $^INCLUDE_PATH, 't/lib'
-    
+        unshift $^INCLUDE_PATH, "../lib/Test/Simple/t/lib"
 
 
 use Test::More tests => 13
@@ -15,27 +11,27 @@ use Test::More tests => 13
 do
     package Foo::one
     main::use_ok("Symbol")
-    main::ok( defined &gensym,        'use_ok() no args exports defaults' )
+    main::ok( exists &gensym,        'use_ok() no args exports defaults' )
 
 
 do
     package Foo::two
     main::use_ok("Symbol", < qw(qualify))
-    main::ok( !defined &gensym,       '  one arg, defaults overriden' )
-    main::ok( defined &qualify,       '  right function exported' )
+    main::ok( !exists &gensym,       '  one arg, defaults overriden' )
+    main::ok( exists &qualify,       '  right function exported' )
 
 
 do
     package Foo::three
     main::use_ok("Symbol", < qw(gensym ungensym))
-    main::ok( defined &gensym && defined &ungensym,   '  multiple args' )
+    main::ok( exists &gensym && exists &ungensym,   '  multiple args' )
 
 
 do
     package Foo::four
     my $warn; local $^WARN_HOOK = sub (@< @_) { $warn .= shift; }
     main::use_ok("constant", < qw(foo bar))
-    main::ok( defined &foo, 'constant' )
+    main::ok( exists &foo, 'constant' )
     main::is( $warn, undef, 'no warning')
 
 

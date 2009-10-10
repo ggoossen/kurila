@@ -107,7 +107,7 @@ Perl ÓÊµİÂÛÌ³Ò»ÀÀ
 
 =over 4
 
-=item L<http://www.oreilly.com.cn/html/perl.html>
+=item L<http://www.oreilly.com.cn/indexcat.php?c=perl>
 
 ¼òÌåÖĞÎÄ°æµÄÅ·À³Àñ Perl Êé½å
 
@@ -145,6 +145,6 @@ L<Encode>, L<Encode::CN>, L<encoding>, L<perluniintro>, L<perlunicode>
 
 Jarkko Hietaniemi E<lt>jhi@iki.fiE<gt>
 
-Autrijus Tang (ÌÆ×Úºº) E<lt>autrijus@autrijus.orgE<gt>
+Audrey Tang (ÌÆ·ï) E<lt>audreyt@audreyt.orgE<gt>
 
 =cut

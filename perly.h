@@ -87,7 +87,7 @@
      LAYOUTLISTEND = 302,
      EMPTYAH = 303,
      PREC_LOW = 304,
-     RETURNOP = 305,
+     RETURNTOKEN = 305,
      DOROP = 306,
      OROP = 307,
      ANDOP = 308,
@@ -127,6 +127,93 @@
      PEG = 342
    };
 #endif
+
+/* Tokens.  */
+#define WORD 258
+#define METHOD 259
+#define THING 260
+#define PMFUNC 261
+#define PRIVATEVAR 262
+#define FUNC0SUB 263
+#define UNIOPSUB 264
+#define COMPSUB 265
+#define LABEL 266
+#define SUB 267
+#define ANONSUB 268
+#define BLOCKSUB 269
+#define PACKAGE 270
+#define USE 271
+#define WHILE 272
+#define UNTIL 273
+#define IF 274
+#define UNLESS 275
+#define ELSE 276
+#define ELSIF 277
+#define CONTINUE 278
+#define FOR 279
+#define LOOPEX 280
+#define DOTDOT 281
+#define FUNC0 282
+#define FUNC1 283
+#define FUNC 284
+#define UNIOP 285
+#define LSTOP 286
+#define RELOP 287
+#define EQOP 288
+#define MULOP 289
+#define ADDOP 290
+#define DO 291
+#define LOOPDO 292
+#define NOAMP 293
+#define NOAMPCALL 294
+#define ANONSCALAR 295
+#define LOCAL 296
+#define MY 297
+#define MYSUB 298
+#define REQUIRE 299
+#define COLONATTR 300
+#define SPECIALBLOCK 301
+#define LAYOUTLISTEND 302
+#define EMPTYAH 303
+#define PREC_LOW 304
+#define RETURNTOKEN 305
+#define DOROP 306
+#define OROP 307
+#define ANDOP 308
+#define NOTOP 309
+#define ASSIGNOP 310
+#define TERNARY_ELSE 311
+#define TERNARY_IF 312
+#define HASHEXPAND 313
+#define ARRAYEXPAND 314
+#define ANONSCALARL 315
+#define ANONARYL 316
+#define ANONHSHL 317
+#define AHOP 318
+#define DORDOR 319
+#define OROR 320
+#define ANDAND 321
+#define BITOROP 322
+#define BITANDOP 323
+#define SHIFTOP 324
+#define MATCHOP 325
+#define SREFGEN 326
+#define UMINUS 327
+#define POWOP 328
+#define CALLOP 329
+#define POSTDEC 330
+#define POSTINC 331
+#define PREDEC 332
+#define PREINC 333
+#define ASLICE 334
+#define HSLICE 335
+#define DEREFAMP 336
+#define DEREFSTAR 337
+#define DEREFHSH 338
+#define DEREFARY 339
+#define DEREFSCL 340
+#define ARROW 341
+#define PEG 342
 
 
 

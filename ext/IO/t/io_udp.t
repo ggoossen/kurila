@@ -11,8 +11,6 @@ BEGIN
     if ($reason)
         print $^STDOUT, "1..0 # Skip: $reason\n"
         exit 0
-    
-
 
 sub compare_addr
     no utf8
@@ -37,6 +35,9 @@ sub compare_addr
 
 $^OUTPUT_AUTOFLUSH = 1
 print $^STDOUT, "1..7\n"
+
+require '../../t/test.pl'
+watchdog(15);
 
 use Socket
 use IO::Socket < qw(AF_INET SOCK_DGRAM INADDR_ANY)

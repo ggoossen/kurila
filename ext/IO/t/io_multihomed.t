@@ -11,17 +11,15 @@ BEGIN
     if ($reason)
         print $^STDOUT, "1..0 # Skip: $reason\n"
         exit 0
-    
 
 
 $^OUTPUT_AUTOFLUSH = 1
 
 print $^STDOUT, "1..8\n"
 
-try {
-    signals::handler("ALRM") = sub (@< @_) { die; };
-    alarm 60;
-}
+require '../../t/test.pl'
+
+watchdog(15);
 
 package Multi
 require IO::Socket::INET

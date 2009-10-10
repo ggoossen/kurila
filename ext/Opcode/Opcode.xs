@@ -84,7 +84,7 @@ put_op_bitspec(pTHX_ const char *optag, STRLEN len, SV *mask)
 	len = strlen(optag);
     svp = hv_fetch(op_named_bits, optag, len, 1);
     if (SvOK(*svp))
-	croak("Opcode tag \"%s\" already defined", optag);
+	croak(aTHX_ "Opcode tag \"%s\" already defined", optag);
     sv_setsv(*svp, mask);
     SvREADONLY_on(*svp);
 }
@@ -109,12 +109,12 @@ get_op_bitspec(pTHX_ const char *opname, STRLEN len, int fatal)
 	if (!fatal)
 	    return Nullsv;
 	if (*opname == ':')
-	    croak("Unknown operator tag \"%s\"", opname);
+	    croak(aTHX_ "Unknown operator tag \"%s\"", opname);
 	if (*opname == '!')	/* XXX here later, or elsewhere? */
-	    croak("Can't negate operators here (\"%s\")", opname);
+	    croak(aTHX_ "Can't negate operators here (\"%s\")", opname);
 	if (isALPHA(*opname))
-	    croak("Unknown operator name \"%s\"", opname);
-	croak("Unknown operator prefix \"%s\"", opname);
+	    croak(aTHX_ "Unknown operator name \"%s\"", opname);
+	croak(aTHX_ "Unknown operator prefix \"%s\"", opname);
     }
     return *svp;
 }
@@ -152,7 +152,7 @@ verify_opset(pTHX_ SV *opset, int fatal)
     else if (!SvPOK(opset))             err = "wrong type";
     else if (SvCUR(opset) != (STRLEN)opset_len) err = "wrong size";
     if (err && fatal) {
-	croak("Invalid opset: %s", err);
+	croak(aTHX_ "Invalid opset: %s", err);
     }
     return !err;
 }
@@ -168,9 +168,9 @@ set_opset_bits(pTHX_ char *bitmap, SV *bitspec, int on, const char *opname)
 	const int offset = myopcode >> 3;
 	const int bit    = myopcode & 0x07;
 	if (myopcode >= PL_maxo || myopcode < 0)
-	    croak("panic: opcode \"%s\" value %d is invalid", opname, myopcode);
+	    croak(aTHX_ "panic: opcode \"%s\" value %d is invalid", opname, myopcode);
 	if (opcode_debug >= 2)
-	    warn("set_opset_bits bit %2d (off=%d, bit=%d) %s %s\n",
+	    warn(aTHX_ "set_opset_bits bit %2d (off=%d, bit=%d) %s %s\n",
 			myopcode, offset, bit, opname, (on)?"on":"off");
 	if (on)
 	    bitmap[offset] |= 1 << bit;
@@ -182,14 +182,14 @@ set_opset_bits(pTHX_ char *bitmap, SV *bitspec, int on, const char *opname)
 	STRLEN len;
 	const char * const specbits = SvPV(bitspec, len);
 	if (opcode_debug >= 2)
-	    warn("set_opset_bits opset %s %s\n", opname, (on)?"on":"off");
+	    warn(aTHX_ "set_opset_bits opset %s %s\n", opname, (on)?"on":"off");
 	if (on) 
 	    while(len-- > 0) bitmap[len] |=  specbits[len];
 	else
 	    while(len-- > 0) bitmap[len] &= ~specbits[len];
     }
     else
-	croak("panic: invalid bitspec for \"%s\" (type %u)",
+	croak(aTHX_ "panic: invalid bitspec for \"%s\" (type %u)",
 		opname, (unsigned)SvTYPE(bitspec));
 }
 
@@ -206,7 +206,7 @@ opmask_add(pTHX_ SV *opset)	/* THE ONLY FUNCTION TO EDIT PL_op_mask ITSELF	*/
     verify_opset(aTHX_ opset,1);		/* croaks on bad opset	*/
 
     if (!PL_op_mask)		/* caller must ensure PL_op_mask exists	*/
-	croak("Can't add to uninitialised PL_op_mask");
+	croak(aTHX_ "Can't add to uninitialised PL_op_mask");
 
     /* OPCODES ALREADY MASKED ARE NEVER UNMASKED. See opmask_addlocal()	*/
 
@@ -254,7 +254,7 @@ BOOT:
     assert(PL_maxo < OP_MASK_BUF_SIZE);
     opset_len = (PL_maxo + 7) / 8;
     if (opcode_debug >= 1)
-	warn("opset_len %ld\n", (long)opset_len);
+	warn(aTHX_ "opset_len %ld\n", (long)opset_len);
     op_names_init(aTHX);
 }
 
@@ -423,7 +423,7 @@ CODE:
     dMY_CXT;
 
     if (!SvROK(safe) || !SvOBJECT(SvRV(safe)) || SvTYPE(SvRV(safe))!=SVt_PVHV)
-	croak("Not a Safe object");
+	croak(aTHX_ "Not a Safe object");
     mask = *hv_fetch((HV*)SvRV(safe), "Mask",4, 1);
     if (ONLY_THESE)	/* *_only = new mask, else edit current	*/
 	sv_setsv(mask, sv_2mortal(new_opset(aTHX_ PERMITING ? opset_all : Nullsv)));
@@ -465,11 +465,11 @@ PPCODE:
     if (SvIOK(bitspec)) {
         const int myopcode = SvIV(bitspec);
         if (myopcode < 0 || myopcode >= PL_maxo)
-            croak("panic: opcode %d (%s) out of range",myopcode,opname);
+            croak(aTHX_ "panic: opcode %d (%s) out of range",myopcode,opname);
         mXPUSHs(newSVpv(op_desc[myopcode], 0));
     }
     else
-        croak("panic: invalid bitspec for \"%s\" (type %u)",
+        croak(aTHX_ "panic: invalid bitspec for \"%s\" (type %u)",
               opname, (unsigned)SvTYPE(bitspec));
 
 
@@ -509,7 +509,7 @@ void
 opcodes()
 PPCODE:
     if (GIMME == G_ARRAY) {
-	croak("opcodes in list context not yet implemented"); /* XXX */
+	croak(aTHX_ "opcodes in list context not yet implemented"); /* XXX */
     }
     else {
 	XPUSHs(sv_2mortal(newSViv(PL_maxo)));

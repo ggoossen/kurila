@@ -488,7 +488,8 @@ function, or use the familiar relation:
 
     sub tan { sin($_[0]) / cos($_[0])  }
 
-Note that atan2(0, 0) is not well-defined.
+The return value for C<atan2(0,0)> is implementation-defined; consult
+your atan2(3) manpage for more information.
 
 =item bind SOCKET,NAME
 X<bind>
@@ -520,7 +521,7 @@ like for example images.
 
 If LAYER is present it is a single string, but may contain multiple
 directives. The directives alter the behaviour of the file handle.
-When LAYER is present using binmode on text file makes sense.
+When LAYER is present using binmode on a text file makes sense.
 
 If LAYER is omitted or specified as C<:raw> the filehandle is made
 suitable for passing binary data. This includes turning off possible CRLF
@@ -972,7 +973,7 @@ X<decrypt> X<cryptography> X<passwd> X<encrypt>
 
 Creates a digest string exactly like the crypt(3) function in the C
 library (assuming that you actually have a version there that has not
-been extirpated as a potential munitions).
+been extirpated as a potential munition).
 
 crypt() is a one-way hash function.  The PLAINTEXT and SALT is turned
 into a short string, called a digest, which is returned.  The same
@@ -1002,7 +1003,7 @@ digest matter.
 
 Traditionally the result is a string of 13 bytes: two first bytes of
 the salt, followed by 11 bytes from the set C<[./0-9A-Za-z]>, and only
-the first eight bytes of the digest string mattered, but alternative
+the first eight bytes of PLAINTEXT mattered. But alternative
 hashing schemes (like MD5), higher level security schemes (like C2),
 and implementations on non-UNIX platforms may produce different
 strings.
@@ -1211,14 +1212,14 @@ produce, respectively
 
 See also exit(), warn(), and the Carp module.
 
-If LIST is empty and C<$@> already contains a value (typically from a
+If the output is empty and C<$@> already contains a value (typically from a
 previous eval) that value is reused after appending C<"\t...propagated">.
 This is useful for propagating exceptions:
 
     eval { ... };
     die unless $@ =~ /Expected exception/;
 
-If LIST is empty and C<$@> contains an object reference that has a
+If the output is empty and C<$@> contains an object reference that has a
 C<PROPAGATE> method, that method will be called with additional file
 and line number parameters.  The return value replaces the value in
 C<$@>.  i.e. as if C<< $@ = eval { $@->PROPAGATE(__FILE__, __LINE__) }; >>
@@ -1484,7 +1485,8 @@ itself.  See L</wantarray> for more on how the evaluation context can be
 determined.
 
 If there is a syntax error or runtime error, or a C<die> statement is
-executed, an undefined value is returned by C<eval>, and C<$@> is set to the
+executed, C<eval> returns an undefined value in scalar context
+or an empty list in list context, and C<$@> is set to the
 error message.  If there was no error, C<$@> is guaranteed to be a null
 string.  Beware that using C<eval> neither silences perl from printing
 warnings to STDERR, nor does it stuff the text of warning messages into C<$@>.
@@ -1496,6 +1498,10 @@ Note that, because C<eval> traps otherwise-fatal errors, it is useful for
 determining whether a particular feature (such as C<socket> or C<symlink>)
 is implemented.  It is also Perl's exception trapping mechanism, where
 the die operator is used to raise exceptions.
+
+If you want to trap errors when loading an XS module, some problems with
+the binary interface (such as Perl version skew) may be fatal even with
+C<eval> unless C<$ENV{PERL_DL_NONLAZY}> is set. See L<perlrun>.
 
 If the code to be executed doesn't vary, you may use the eval-BLOCK
 form to trap run-time errors without incurring the penalty of
@@ -1560,6 +1566,22 @@ compile-time instead of at run-time.)  Case 5 is a place where
 normally you I<would> like to use double quotes, except that in this
 particular situation, you can just use symbolic references instead, as
 in case 6.
+
+The assignment to C<$@> occurs before restoration of localised variables,
+which means a temporary is required if you want to mask some but not all
+errors:
+
+    # alter $@ on nefarious repugnancy only
+    {
+       my $e;
+       {
+          local $@; # protect existing $@
+          eval { test_repugnancy() };
+          # $@ =~ /nefarious/ and die $@; # DOES NOT WORK
+          $@ =~ /nefarious/ and $e = $@;
+       }
+       die $e if defined $e
+    }
 
 C<eval BLOCK> does I<not> count as a loop, so the loop control statements
 C<next>, C<last>, or C<redo> cannot be used to leave or restart the block.
@@ -1650,8 +1672,7 @@ X<exists> X<autovivification>
 
 Given an expression that specifies a hash element or array element,
 returns true if the specified element in the hash or array has ever
-been initialized, even if the corresponding value is undefined.  The
-element is not autovivified if it doesn't exist.
+been initialized, even if the corresponding value is undefined.
 
     print "Exists\n" 	if exists $hash{$key};
     print "Defined\n" 	if defined $hash{$key};
@@ -1851,25 +1872,27 @@ perl.
 
 Here's a mailbox appender for BSD systems.
 
-    use Fcntl ':flock'; # import LOCK_* constants
+    use Fcntl qw(:flock SEEK_END); # import LOCK_* and SEEK_END constants
 
     sub lock {
-	flock(MBOX,LOCK_EX);
-	# and, in case someone appended
-	# while we were waiting...
-	seek(MBOX, 0, 2);
+	my ($fh) = @_;
+	flock($fh, LOCK_EX) or die "Cannot lock mailbox - $!\n";
+
+	# and, in case someone appended while we were waiting...
+	seek($fh, 0, SEEK_END) or die "Cannot seek - $!\n";
     }
 
     sub unlock {
-	flock(MBOX,LOCK_UN);
+	my ($fh) = @_;
+	flock($fh, LOCK_UN) or die "Cannot unlock mailbox - $!\n";
     }
 
     open(my $mbox, ">>", "/usr/spool/mail/$ENV{'USER'}")
 	    or die "Can't open mailbox: $!";
 
-    lock();
+    lock($mbox);
     print $mbox $msg,"\n\n";
-    unlock();
+    unlock($mbox);
 
 On systems that support a real flock(), locks are inherited across fork()
 calls, whereas those that must resort to the more capricious fcntl()
@@ -1992,7 +2015,7 @@ C<Linux::Pid>.
 X<getpriority> X<priority> X<nice>
 
 Returns the current priority for a process, a process group, or a user.
-(See L<getpriority(2)>.)  Will raise a fatal exception if used on a
+(See C<getpriority(2)>.)  Will raise a fatal exception if used on a
 machine that doesn't implement getpriority(2).
 
 =item getpwnam NAME
@@ -2225,8 +2248,14 @@ implementing the C<< <*.c> >> operator, but you can use it directly. If
 EXPR is omitted, C<$_> is used.  The C<< <*.c> >> operator is discussed in
 more detail in L<perlop/"I/O Operators">.
 
+Note that C<glob> will split its arguments on whitespace, treating
+each segment as separate pattern.  As such, C<glob('*.c *.h')> would
+match all files with a F<.c> or F<.h> extension.  The expression
+C<glob('.* *')> would match all files in the current working directory.
+
 Beginning with v5.6.0, this operator is implemented using the standard
-C<File::Glob> extension.  See L<File::Glob> for details.
+C<File::Glob> extension.  See L<File::Glob> for details, including
+C<bsd_glob> which does not treat whitespace as a pattern separator.
 
 =item gmtime EXPR
 X<gmtime> X<UTC> X<Greenwich>
@@ -2497,11 +2526,13 @@ the super-user).  This is a useful way to check that a child process is
 alive (even if only as a zombie) and hasn't changed its UID.  See
 L<perlport> for notes on the portability of this construct.
 
-Unlike in the shell, if SIGNAL is negative, it kills
-process groups instead of processes.  (On System V, a negative I<PROCESS>
-number will also kill process groups, but that's not portable.)  That
-means you usually want to use positive not negative signals.  You may also
-use a signal name in quotes.
+Unlike in the shell, if SIGNAL is negative, it kills process groups instead
+of processes. That means you usually want to use positive not negative signals.
+You may also use a signal name in quotes.
+
+The behavior of kill when a I<PROCESS> number is zero or negative depends on
+the operating system.  For example, on POSIX-conforming systems, zero will
+signal the current process group and -1 will signal all processes.
 
 See L<perlipc/"Signals"> for more details.
 
@@ -2722,7 +2753,7 @@ If EXPR is omitted, stats C<$_>.
 
 =item m//
 
-The match operator.  See L<perlop>.
+The match operator.  See L<perlop/"Regexp Quote-Like Operators">.
 
 =item map BLOCK LIST
 X<map>
@@ -3148,7 +3179,7 @@ C<STDERR> using various methods:
 
 If you specify C<< '<&=', 'X' >>, where C<X> is a file descriptor number
 or a filehandle, then Perl will do an equivalent of C's C<fdopen> of
-that file descriptor (and not call L<dup(2)>); this is more
+that file descriptor (and not call C<dup(2)>); this is more
 parsimonious of file descriptors.  For example:
 
     # open for input, reusing the fileno of $fd
@@ -3219,7 +3250,7 @@ Closing any piped filehandle causes the parent process to wait for the
 child to finish, and returns the status value in C<$?> and
 C<$^CHILD_ERROR_NATIVE>.
 
-If you want a "real" C C<open> (see L<open(2)> on your system), then you
+If you want a "real" C C<open> (see C<open(2)> on your system), then you
 should use the C<sysopen> function, which involves no such magic (but
 may use subtly different filemodes than Perl open(), which is mapped
 to C fopen()).  This is
@@ -3874,8 +3905,6 @@ The same template may generally also be used in unpack().
 =item package NAMESPACE
 X<package> X<module> X<namespace>
 
-=item package
-
 Declares the compilation unit as being in the given namespace.  The scope
 of the package declaration is from the declaration itself through the end
 of the enclosing block, file, or eval (the same as the C<my> operator).
@@ -4024,13 +4053,15 @@ the completed C<push>.
 
 =item qq/STRING/
 
-=item qr/STRING/
-
 =item qx/STRING/
 
 =item qw/STRING/
 
-Generalized quotes.  See L<perlop/"Regexp Quote-Like Operators">.
+Generalized quotes.  See L<perlop/"Quote-Like Operators">.
+
+=item qr/STRING/
+
+Regexp-like quote.  See L<perlop/"Regexp Quote-Like Operators">.
 
 =item quotemeta EXPR
 X<quotemeta> X<metacharacter>
@@ -4123,12 +4154,12 @@ X<readline> X<gets> X<fgets>
 Reads from the filehandle whose typeglob is contained in EXPR (or from
 *ARGV if EXPR is not provided).  In scalar context, each call reads and
 returns the next line, until end-of-file is reached, whereupon the
-subsequent call returns undef.  In list context, reads until end-of-file
+subsequent call returns C<undef>.  In list context, reads until end-of-file
 is reached and returns a list of lines.  Note that the notion of "line"
 used here is however you may have defined it with C<$/> or
 C<$INPUT_RECORD_SEPARATOR>).  See L<perlvar/"$/">.
 
-When C<$/> is set to C<undef>, when readline() is in scalar
+When C<$/> is set to C<undef>, when C<readline> is in scalar
 context (i.e. file slurp mode), and when an empty file is read, it
 returns C<''> the first time, followed by C<undef> subsequently.
 
@@ -4139,19 +4170,29 @@ operator is discussed in more detail in L<perlop/"I/O Operators">.
     $line = <STDIN>;
     $line = readline($^STDIN);		# same thing
 
-If readline encounters an operating system error, C<$!> will be set with the
-corresponding error message.  It can be helpful to check C<$!> when you are
-reading from filehandles you don't trust, such as a tty or a socket.  The
-following example uses the operator form of C<readline>, and takes the necessary
-steps to ensure that C<readline> was successful.
+If C<readline> encounters an operating system error, C<$!> will be set
+with the corresponding error message.  It can be helpful to check
+C<$!> when you are reading from filehandles you don't trust, such as a
+tty or a socket.  The following example uses the operator form of
+C<readline> and dies if the result is not defined.
 
-    for (;;) {
-        undef $!;
-        unless (defined( $line = <> )) {
-            die $! if $!;
-            last; # reached EOF
+	while ( ! eof($fh) ) {
+		defined( $_ = <$fh> ) or die "readline failed: $!";
+	    ...
+	}
+
+Note that you have can't handle C<readline> errors that way with the
+C<ARGV> filehandle. In that case, you have to open each element of
+C<@ARGV> yourself since C<eof> handles C<ARGV> differently.
+
+    foreach my $arg (@ARGV) {
+        open(my $fh, $arg) or warn "Can't open $arg: $!";
+
+        while ( ! eof($fh) ) {
+            defined( $_ = <$fh> )
+                or die "readline failed for $arg: $!";
+            ...
         }
-        # ...
     }
 
 =item readlink EXPR
@@ -4401,7 +4442,7 @@ A reference to a subroutine. If there is no filehandle (previous item),
 then this subroutine is expected to generate one line of source code per
 call, writing the line into C<$_> and returning 1, then returning 0 at
 "end of file". If there is a filehandle, then the subroutine will be
-called to act a simple source filter, with the line as read in C<$_>.
+called to act as a simple source filter, with the line as read in C<$_>.
 Again, return 1 for each valid line, and 0 after all lines have been
 returned.
 
@@ -4455,7 +4496,7 @@ into package C<main>.)  Here is a typical code layout:
     }
 
     # In the main program
-    push $^INCLUDE_PATH, new Foo(...);
+    push $^INCLUDE_PATH, Foo->new(...);
 
 Note that these hooks are also permitted to set the $^INCLUDED entry
 corresponding to the files they have loaded. See L<perlvar/$^INCLUDED>.
@@ -4486,12 +4527,15 @@ of LIST in the opposite order.  In scalar context, concatenates the
 elements of LIST and returns a string value with all characters
 in the opposite order.
 
-    print reverse <>;		# line tac, last line first
+    print join(", ", reverse "world", "Hello"); # Hello, world
 
-    undef $/;			# for efficiency of <>
-    print scalar reverse <>;	# character tac, last line tsrif
+    print scalar reverse "dlrow ,", "olleH";    # Hello, world
 
 Used without arguments in scalar context, reverse() reverses C<$_>.
+
+    $_ = "dlrow ,olleH";
+    print reverse;                              # No output, list context
+    print scalar reverse;                       # Hello, world
 
 This operator is also handy for inverting a hash, although there are some
 caveats.  If a value is duplicated in the original hash, only one of those
@@ -4530,7 +4574,7 @@ the C<rmtree> function of the L<File::Path> module.
 
 =item s///
 
-The substitution operator.  See L<perlop>.
+The substitution operator.  See L<perlop/"Regexp Quote-Like Operators">.
 
 =item scalar EXPR
 X<scalar> X<context>
@@ -4870,6 +4914,10 @@ It's also a more insistent form of close because it also
 disables the file descriptor in any forked copies in other
 processes.
 
+Returns C<1> for success. In the case of error, returns C<undef> if
+the first argument is not a valid filehandle, or returns C<0> and sets
+C<$!> for any other failure.
+
 =item sin EXPR
 X<sin> X<sine> X<asin> X<arcsine>
 
@@ -4889,10 +4937,18 @@ X<sleep> X<pause>
 =item sleep
 
 Causes the script to sleep for EXPR seconds, or forever if no EXPR.
+Returns the number of seconds actually slept.  
+
 May be interrupted if the process receives a signal such as C<SIGALRM>.
-Returns the number of seconds actually slept.  You probably cannot
-mix C<alarm> and C<sleep> calls, because C<sleep> is often implemented
-using C<alarm>.
+
+    eval {
+        local $SIG{ALARM} = sub { die "Alarm!\n" };
+        sleep;
+    };
+    die $@ unless $@ eq "Alarm!\n";
+
+You probably cannot mix C<alarm> and C<sleep> calls, because C<sleep>
+is often implemented using C<alarm>.
 
 On some older systems, it may sleep up to a full second less than what
 you requested, depending on how it counts seconds.  Most modern systems
@@ -5001,7 +5057,7 @@ the original quicksort was faster.  5.8 has a sort pragma for
 limited control of the sort.  Its rather blunt control of the
 underlying algorithm may not persist into future Perls, but the
 ability to characterize the input or output in implementation
-independent ways quite probably will.  See L<sort>.
+independent ways quite probably will.  See L<the sort pragma|sort>.
 
 Examples:
 
@@ -5092,9 +5148,26 @@ Examples:
     use sort '_mergesort';  # note discouraging _
     @new = sort { substr($a, 3, 5) cmp substr($b, 3, 5) } @old;
 
+Warning: syntactical care is required when sorting the list returned from
+a function. If you want to sort the list returned by the function call
+C<find_records(@key)>, you can use:
+
+    @contact = sort { $a cmp $b } find_records @key;
+    @contact = sort +find_records(@key);
+    @contact = sort &find_records(@key);
+    @contact = sort(find_records(@key));
+
+If instead you want to sort the array @key with the comparison routine
+C<find_records()> then you can use:
+
+    @contact = sort { find_records() } @key;
+    @contact = sort find_records(@key);
+    @contact = sort(find_records @key);
+    @contact = sort(find_records (@key));
+
 If you're using strict, you I<must not> declare $a
 and $b as lexicals.  They are package globals.  That means
-if you're in the C<main> package and type
+that if you're in the C<main> package and type
 
     @articles = sort {$b <=> $a} @files;
 
@@ -5173,9 +5246,7 @@ Splits the string EXPR into a list of strings and returns that list.  By
 default, empty leading fields are preserved, and empty trailing ones are
 deleted.  (If all fields are empty, they are considered to be trailing.)
 
-In scalar context, returns the number of fields found and splits into
-the C<@_> array.  Use of split in scalar context is deprecated, however,
-because it clobbers your subroutine arguments.
+In scalar context, returns the number of fields found.
 
 If EXPR is omitted, splits the C<$_> string.  If PATTERN is also omitted,
 splits on whitespace (after skipping any leading whitespace).  Anything
@@ -5197,7 +5268,7 @@ a null pattern C<//>, which is just one member of the set of patterns
 matching a null string) will split the value of EXPR into separate
 characters at each point it matches that way.  For example:
 
-    print join(':', split(/ */, 'hi there'));
+    print join(':', split(/ */, 'hi there')), "\n";
 
 produces the output 'h:i:t:h:e:r:e'.
 
@@ -5206,7 +5277,7 @@ matches only the null string, and is not be confused with the regular use
 of C<//> to mean "the last successful pattern match".  So, for C<split>,
 the following:
 
-    print join(':', split(//, 'hi there'));
+    print join(':', split(//, 'hi there')), "\n";
 
 produces the output 'h:i: :t:h:e:r:e'.
 
@@ -5221,8 +5292,8 @@ hand, are produced when there is a match at the end of the string (and
 when LIMIT is given and is not 0), regardless of the length of the match.
 For example:
 
-   print join(':', split(//,   'hi there!', -1));
-   print join(':', split(/\W/, 'hi there!', -1));
+   print join(':', split(//,   'hi there!', -1)), "\n";
+   print join(':', split(/\W/, 'hi there!', -1)), "\n";
 
 produce the output 'h:i: :t:h:e:r:e:!:' and 'hi:there:', respectively,
 both with an empty trailing field.
@@ -5249,7 +5320,7 @@ produces the list value
 If you had the entire header of a normal Unix email message in $header,
 you could split it up into fields and their values this way:
 
-    $header =~ s/\n\s+/ /g;  # fix continuation lines
+    $header =~ s/\n(?=\s)//g;  # fix continuation lines
     %hdrs   =  (UNIX_FROM => split /^(\S*?):\s*/m, $header);
 
 The pattern C</PATTERN/> may be replaced with an expression to specify
@@ -5288,7 +5359,7 @@ X<sprintf>
 
 Returns a string formatted by the usual C<printf> conventions of the C
 library function C<sprintf>.  See below for more details
-and see L<sprintf(3)> or L<printf(3)> on your system for an explanation of
+and see C<sprintf(3)> or C<printf(3)> on your system for an explanation of
 the general principles.
 
 For example:
@@ -6174,6 +6245,9 @@ C<qx//>, as described in L<perlop/"`STRING`">.  Return value of -1
 indicates a failure to start the program or an error of the wait(2) system
 call (inspect $! for the reason).
 
+If you'd like to make C<system> (and many other bits of Perl) die on error,
+have a look at the L<autodie> pragma.
+
 Like C<exec>, C<system> allows you to lie to a program about its name if
 you use the C<system PROGRAM LIST> syntax.  Again, see L</exec>.
 
@@ -6186,8 +6260,8 @@ value.
     system(@args) == 0
 	 or die "system @args failed: $?"
 
-You can check all the failure possibilities by inspecting
-C<$?> like this:
+If you'd like to manually inspect C<system>'s failure, you can check all
+possible failure modes by inspecting C<$?> like this:
 
     if ($? == -1) {
 	print "failed to execute: $!\n";
@@ -6824,7 +6898,7 @@ X<wait>
 Behaves like the wait(2) system call on your system: it waits for a child
 process to terminate and returns the pid of the deceased process, or
 C<-1> if there are no child processes.  The status is returned in C<$?>
-and C<{^CHILD_ERROR_NATIVE}>.
+and C<${^CHILD_ERROR_NATIVE}>.
 Note that a return value of C<-1> could mean that child processes are
 being automatically reaped, as described in L<perlipc>.
 
@@ -6834,7 +6908,7 @@ X<waitpid>
 Waits for a particular child process to terminate and returns the pid of
 the deceased process, or C<-1> if there is no such child process.  On some
 systems, a value of 0 indicates that there are processes still running.
-The status is returned in C<$?> and C<{^CHILD_ERROR_NATIVE}>.  If you say
+The status is returned in C<$?> and C<${^CHILD_ERROR_NATIVE}>.  If you say
 
     use POSIX ":sys_wait_h";
     #...
@@ -6878,7 +6952,7 @@ Prints the value of LIST to STDERR.  If the last element of LIST does
 not end in a newline, it appends the same file/line number text as C<die>
 does.
 
-If LIST is empty and C<$@> already contains a value (typically from a
+If the output is empty and C<$@> already contains a value (typically from a
 previous eval) that value is used after appending C<"\t...caught">
 to C<$@>.  This is useful for staying almost, but not entirely similar to
 C<die>.

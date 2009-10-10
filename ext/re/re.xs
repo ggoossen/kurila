@@ -1,6 +1,5 @@
-#if defined(PERL_EXT_RE_DEBUG) && !defined(DEBUGGING)
-#  define DEBUGGING
-#endif
+
+#define RE_DEBUGGING
 
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
@@ -11,7 +10,7 @@
 
 START_EXTERN_C
 
-extern REGEXP*	my_re_compile (pTHX_ const SV * const pattern, const U32 pm_flags);
+extern REGEXP*	my_re_compile (pTHX_ SV * const pattern, const U32 pm_flags);
 extern I32	my_regexec (pTHX_ REGEXP * const prog, char* stringarg, char* strend,
 			    char* strbeg, I32 minend, SV* screamer,
 			    void* data, U32 flags);
@@ -22,6 +21,8 @@ extern char*	my_re_intuit_start (pTHX_ REGEXP * const prog, SV *sv, char *strpos
 extern SV*	my_re_intuit_string (pTHX_ REGEXP * const prog);
 
 extern void	my_regfree (pTHX_ REGEXP * const r);
+
+extern void	my_reg_tmprefcnt (pTHX_ REGEXP * const r);
 
 extern void	my_reg_numbered_buff_fetch(pTHX_ REGEXP * const rx, const I32 paren,
 					   SV * const usesv);
@@ -47,6 +48,7 @@ const struct regexp_engine my_reg_engine = {
         my_re_intuit_start, 
         my_re_intuit_string, 
         my_regfree, 
+        my_reg_tmprefcnt, 
         my_reg_numbered_buff_fetch,
         my_reg_numbered_buff_store,
         my_reg_numbered_buff_length,

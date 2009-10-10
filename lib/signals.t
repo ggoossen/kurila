@@ -6,8 +6,8 @@ use signals
 sub foo { }
 
 ok( ! defined(signals::handler("INT")) )
-signals::handler("INT") = \&foo
-is( signals::handler("INT"), \&foo )
+signals::handler("INT") = &foo
+is( signals::handler("INT"), &foo )
 
 do
     my $called = 0
@@ -23,15 +23,15 @@ do
 do
     is( signals::handler("INT"), "IGNORE" )
     do
-        local signals::handler("INT") = \&foo 
-        is( signals::handler("INT"), \&foo )
+        local signals::handler("INT") = &foo 
+        is( signals::handler("INT"), &foo )
     
     is( signals::handler("INT"), "IGNORE" )
 
 
 do
     dies_like( sub (@< @_) { signals::handler("TERM") = 'foo' },
-               qr/signal handler should be a code reference or .../ )
+               qr/signal handler should be a CODE or .../ )
 
 
 do

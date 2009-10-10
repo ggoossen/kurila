@@ -31,8 +31,8 @@ sub foo
 
 sub bar { }
 
-my $newaction=POSIX::SigAction->new(\&foo, POSIX::SigSet->new(SIGUSR1), 0)
-my $oldaction=POSIX::SigAction->new(\&bar, POSIX::SigSet->new(), 0)
+my $newaction=POSIX::SigAction->new(&foo, POSIX::SigSet->new(SIGUSR1), 0)
+my $oldaction=POSIX::SigAction->new(&bar, POSIX::SigSet->new(), 0)
 
 do
     my $bad
@@ -41,13 +41,13 @@ do
     ok(!$bad, "no warnings")
 
 
-ok($oldaction->{?HANDLER} eq 'DEFAULT' ||
-   $oldaction->{?HANDLER} eq 'IGNORE', $oldaction->{?HANDLER})
+ok($oldaction->{HANDLER} eq 'DEFAULT' ||
+   $oldaction->{HANDLER} eq 'IGNORE', $oldaction->{HANDLER})
 
-is(signals::handler("HUP"), \&foo)
+is(signals::handler("HUP"), &foo)
 
 sigaction(SIGHUP, $newaction, $oldaction)
-is($oldaction->{?HANDLER}, \&foo)
+is($oldaction->{?HANDLER}, &foo)
 
 ok($oldaction->{?MASK}->ismember(SIGUSR1), "SIGUSR1 ismember MASK")
 
@@ -74,12 +74,12 @@ do
 
 ok($ok10, "SIGHUP handler called")
 
-is(ref(signals::handler("HUP")), 'CODE')
+is(ref::svtype(signals::handler("HUP")), 'CODE')
 
-sigaction(SIGHUP, POSIX::SigAction->new(\&main::foo))
+sigaction(SIGHUP, POSIX::SigAction->new(&main::foo))
 # Make sure the signal mask gets restored after sigaction croak()s.
 try {
-    my $act=POSIX::SigAction->new(\&main::foo);
+    my $act=POSIX::SigAction->new(&main::foo);
     delete $act->{HANDLER};
     sigaction(SIGINT, $act);
 }
@@ -94,7 +94,7 @@ ok(!$x && $ok, "signal mask gets restored after early return")
 
 signals::handler("HUP") = sub {}
 sigaction(SIGHUP, $newaction, $oldaction)
-is(ref($oldaction->{?HANDLER}), 'CODE')
+is(ref::svtype($oldaction->{?HANDLER}), 'CODE')
 
 try {
     sigaction(SIGHUP, undef, $oldaction);
@@ -137,12 +137,12 @@ do
     sigaction("FOOBAR", $newaction)
     ok(1, "no coredump, still alive")
 
-    $newaction = POSIX::SigAction->new(\&hup20)
+    $newaction = POSIX::SigAction->new(&hup20)
     sigaction("SIGHUP", $newaction)
     kill "HUP", $^PID
     is($hup20, 1)
 
-    $newaction = POSIX::SigAction->new(\&hup21)
+    $newaction = POSIX::SigAction->new(&hup21)
     sigaction("HUP", $newaction)
     kill "HUP", $^PID
     is ($hup21, 1)
@@ -152,18 +152,18 @@ do
 # for this one, use the accessor instead of the attribute
 
 # standard signal handling via %SIG is safe
-signals::handler("HUP") = \&foo 
+signals::handler("HUP") = &foo 
 $oldaction = POSIX::SigAction->new
 sigaction(SIGHUP, undef, $oldaction)
 ok($oldaction->safe, "SIGHUP is safe")
 
 # SigAction handling is not safe ...
-sigaction(SIGHUP, POSIX::SigAction->new(\&foo))
+sigaction(SIGHUP, POSIX::SigAction->new(&foo))
 sigaction(SIGHUP, undef, $oldaction)
 ok(!$oldaction->safe, "SigAction not safe by default")
 
 # ... unless we say so!
-$newaction = POSIX::SigAction->new(\&foo)
+$newaction = POSIX::SigAction->new(&foo)
 $newaction->safe(1)
 sigaction(SIGHUP, $newaction)
 sigaction(SIGHUP, undef, $oldaction)

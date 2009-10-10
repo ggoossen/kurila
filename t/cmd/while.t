@@ -35,10 +35,10 @@ if (!$badcont) {print $^STDOUT, "ok 7\n";} else {print $^STDOUT, "not ok 7\n";}
 $bad = ''
 $badcont = ''
 open($fh, "<",'Cmd_while.tmp') || die "Can't open Cmd_while.tmp."
-loop: while ( ~< $fh->*)
+vtloop: while ( ~< $fh->*)
     if (s/vt100/VT100/g)
         s/VT100/Vt100/g
-        redo 'loop'
+        redo 'vtloop'
 
     $bad = 1 if m/vt100/
     $bad = 1 if m/VT100/

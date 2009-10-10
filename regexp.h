@@ -1,7 +1,7 @@
 /*    regexp.h
  *
  *    Copyright (C) 1993, 1994, 1996, 1997, 1999, 2000, 2001, 2003,
- *    2005, 2006 by Larry Wall and others
+ *    2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -88,7 +88,7 @@ typedef struct regexp_paren_pair {
 	/* during matching */						\
 	U32 lastparen;			/* last open paren matched */	\
 	U32 lastcloseparen;		/* last close paren matched */	\
-	regexp_paren_pair *swap;	/* Swap copy of *offs */	\
+	regexp_paren_pair *swap;	/* Unused: 5.10.1 and later */	\
 	/* Array of offsets for (@-) and (@+) */			\
 	regexp_paren_pair *offs;					\
 	/* saved or original string so \digit works forever. */		\
@@ -107,12 +107,6 @@ typedef struct regexp {
 	_REGEXP_COMMON;
 } regexp;
 
-struct regexp_allocated {
-	_XPV_ALLOCATED_HEAD;
-	_XPVMG_HEAD;
-	_REGEXP_COMMON;
-};
-
 /*        HV *paren_names;	 Optional hash of paren names
 	  now stored in the IV union */
 
@@ -129,7 +123,7 @@ typedef struct re_scream_pos_data_s
  * Any regex engine implementation must be able to build one of these.
  */
 typedef struct regexp_engine {
-    REGEXP* (*comp) (pTHX_ const SV * const pattern, U32 flags);
+    REGEXP* (*comp) (pTHX_ SV * const pattern, U32 flags);
     I32     (*exec) (pTHX_ REGEXP * const rx, char* stringarg, char* strend,
                      char* strbeg, I32 minend, SV* screamer,
                      void* data, U32 flags);
@@ -138,6 +132,7 @@ typedef struct regexp_engine {
                        re_scream_pos_data *data);
     SV*     (*checkstr) (pTHX_ REGEXP * const rx);
     void    (*free) (pTHX_ REGEXP * const rx);
+    void    (*tmprefcnt) (pTHX_ REGEXP * const rx);
     void    (*numbered_buff_FETCH) (pTHX_ REGEXP * const rx, const I32 paren,
                                     SV * const sv);
     void    (*numbered_buff_STORE) (pTHX_ REGEXP * const rx, const I32 paren,
@@ -184,7 +179,7 @@ typedef struct regexp_engine {
 /* Whether this is being called from a re:: function */
 #define RXapif_REGNAME         0x0400
 #define RXapif_REGNAMES        0x0800
-#define RXapif_REGNAMES_COUNT  0x1000 
+#define RXapif_REGNAMES_COUNT  0x1000
 
 /*
 =head1 REGEXP Functions
@@ -219,7 +214,7 @@ and check for NULL.
 #define SvRXOK(sv) (Perl_get_re_arg(aTHX_ sv) ? TRUE : FALSE)
 
 
-/* Flags stored in regexp->extflags 
+/* Flags stored in regexp->extflags
  * These are used by code external to the regexp engine
  *
  * Note that flags starting with RXf_PMf_ have exact equivalents
@@ -227,7 +222,7 @@ and check for NULL.
  * numerically here only for clarity.
  *
  * NOTE: if you modify any RXf flags you should run regen.pl or regcomp.pl
- * so that regnodes.h is updated with the changes. 
+ * so that regnodes.h is updated with the changes.
  *
  */
 
@@ -301,7 +296,7 @@ and check for NULL.
 
 /*
  * NOTE: if you modify any RXf flags you should run regen.pl or regcomp.pl
- * so that regnodes.h is updated with the changes. 
+ * so that regnodes.h is updated with the changes.
  *
  */
 
@@ -326,7 +321,7 @@ and check for NULL.
 
 /*
  * NOTE: if you modify any RXf flags you should run regen.pl or regcomp.pl
- * so that regnodes.h is updated with the changes. 
+ * so that regnodes.h is updated with the changes.
  *
  */
 
@@ -346,44 +341,46 @@ and check for NULL.
 
 /* For source compatibility. We used to store these explicitly.  */
 #define RX_PRECOMP(prog)	(RX_WRAPPED(prog) + ((struct regexp *)SvANY(prog))->pre_prefix)
+#define RX_PRECOMP_const(prog)	(RX_WRAPPED_const(prog) + ((struct regexp *)SvANY(prog))->pre_prefix)
 /* FIXME? Are we hardcoding too much here and constraining plugin extension
    writers? Specifically, the value 1 assumes that the wrapped version always
    has exactly one character at the end, a ')'. Will that always be true?  */
 #define RX_PRELEN(prog)		(RX_WRAPLEN(prog) - ((struct regexp *)SvANY(prog))->pre_prefix - 1)
 #define RX_WRAPPED(prog)	SvPVX_mutable(reTsv(prog))
+#define RX_WRAPPED_const(prog)	SvPVX_const(reTsv(prog))
 #define RX_WRAPLEN(prog)	SvCUR(reTsv(prog))
 #define RX_CHECK_SUBSTR(prog)	(((struct regexp *)SvANY(prog))->check_substr)
 #define RX_REFCNT(prog)		SvREFCNT(prog)
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 #  define RX_EXTFLAGS(prog)						\
     (*({								\
-	const REGEXP *const thwape = (prog);				\
-	assert(SvTYPE(thwape) == SVt_REGEXP);				\
-	&RXp_EXTFLAGS(SvANY(thwape));					\
+	const REGEXP *const _rx_extflags = (prog);			\
+	assert(SvTYPE(_rx_extflags) == SVt_REGEXP);			\
+	&RXp_EXTFLAGS(SvANY(_rx_extflags));				\
     }))
 #  define RX_ENGINE(prog)						\
     (*({								\
-	const REGEXP *const thwape = (prog);				\
-	assert(SvTYPE(thwape) == SVt_REGEXP);				\
-	&SvANY(thwape)->engine;						\
+	const REGEXP *const _rx_engine = (prog);			\
+	assert(SvTYPE(_rx_engine) == SVt_REGEXP);			\
+	&SvANY(_rx_engine)->engine;					\
     }))
 #  define RX_SUBBEG(prog)						\
     (*({								\
-	const REGEXP *const thwape = (prog);				\
-	assert(SvTYPE(thwape) == SVt_REGEXP);				\
-	&SvANY(thwape)->subbeg;						\
+	const REGEXP *const _rx_subbeg = (prog);			\
+	assert(SvTYPE(_rx_subbeg) == SVt_REGEXP);			\
+	&SvANY(_rx_subbeg)->subbeg;					\
     }))
 #  define RX_OFFS(prog)							\
     (*({								\
-	const REGEXP *const thwape = (prog);				\
-	assert(SvTYPE(thwape) == SVt_REGEXP);				\
-	&SvANY(thwape)->offs;						\
+	const REGEXP *const _rx_offs = (prog);				\
+	assert(SvTYPE(_rx_offs) == SVt_REGEXP);				\
+	&SvANY(_rx_offs)->offs;						\
     }))
 #  define RX_NPARENS(prog)						\
     (*({								\
-	const REGEXP *const thwape = (prog);				\
-	assert(SvTYPE(thwape) == SVt_REGEXP);				\
-	&SvANY(thwape)->nparens;					\
+	const REGEXP *const _rx_nparens = (prog);			\
+	assert(SvTYPE(_rx_nparens) == SVt_REGEXP);			\
+	&SvANY(_rx_nparens)->nparens;					\
     }))
 #else
 #  define RX_EXTFLAGS(prog)	RXp_EXTFLAGS((struct regexp *)SvANY(prog))
@@ -429,7 +426,7 @@ and check for NULL.
 #define RX_MATCH_UTF8_set(prog, t)	((t) \
 			? (RX_MATCH_UTF8_on(prog), (PL_reg_match_utf8 = 1)) \
 			: (RX_MATCH_UTF8_off(prog), (PL_reg_match_utf8 = 0)))
-    
+
 #define REXEC_COPY_STR	0x01		/* Need to copy the string. */
 #define REXEC_CHECKED	0x02		/* check_substr already checked. */
 #define REXEC_SCREAM	0x04		/* use scream table. */

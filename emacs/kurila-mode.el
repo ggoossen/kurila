@@ -496,9 +496,7 @@ Font for POD headers."
 ;;; Some double-evaluation happened with font-locks...  Needed with 21.2...
 (defvar kurila-singly-quote-face kurila-xemacs-p)
 
-(defcustom kurila-invalid-face		; Does not customize with '' on XEmacs
-  (if kurila-singly-quote-face
-      'underline ''underline) ; On older Emacsen was evaluated by `font-lock'
+(defcustom kurila-invalid-face nil		; Does not customize with '' on XEmacs
   (if kurila-singly-quote-face
       "*This face is used for highlighting trailing whitespace."
     "*The result of evaluation of this expression highlights trailing whitespace.")

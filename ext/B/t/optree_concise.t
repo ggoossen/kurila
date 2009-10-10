@@ -1,12 +1,7 @@
 #!perl
 
 BEGIN 
-    if (env::var('PERL_CORE'))
-        push $^INCLUDE_PATH, '../ext/B/t'
-    else
-        unshift $^INCLUDE_PATH, 't'
-        push $^INCLUDE_PATH, "../../t"
-    
+    unshift $^INCLUDE_PATH, 't'
     require Config
 # require 'test.pl'; # now done by OptreeCheck
 

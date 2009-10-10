@@ -1,7 +1,7 @@
 /* WIN32.C
  *
  * (c) 1995 Microsoft Corporation. All rights reserved.
- * 		Developed by hip communications inc., http://info.hip.com/info/
+ * 		Developed by hip communications inc.
  * Portions (c) 1993 Intergraph Corporation. All rights reserved.
  *
  *    You may distribute under the terms of either the GNU General Public
@@ -123,12 +123,13 @@ static int		do_spawn2(pTHX_ const char *cmd, int exectype);
 static BOOL		has_shell_metachars(const char *ptr);
 static long		filetime_to_clock(PFILETIME ft);
 static BOOL		filetime_from_time(PFILETIME ft, time_t t);
-static char *		get_emd_part(SV **leading, char *trailing, ...);
+static char *		get_emd_part(SV **leading, STRLEN *const len,
+				     char *trailing, ...);
 static void		remove_dead_process(long deceased);
 static long		find_pid(int pid);
 static char *		qualified_path(const char *cmd);
 static char *		win32_get_xlib(const char *pl, const char *xlib,
-				       const char *libname);
+				       const char *libname, STRLEN *const len);
 static LRESULT  win32_process_message(HWND hwnd, UINT msg,
                        WPARAM wParam, LPARAM lParam);
 
@@ -225,11 +226,23 @@ set_w32_module_name(void)
         WCHAR fullname[MAX_PATH];
         char *ansi;
 
+        DWORD (__stdcall *pfnGetLongPathNameW)(LPCWSTR, LPWSTR, DWORD) =
+            (DWORD (__stdcall *)(LPCWSTR, LPWSTR, DWORD))
+            GetProcAddress(GetModuleHandle("kernel32.dll"), "GetLongPathNameW");
+
         GetModuleFileNameW(module, modulename, sizeof(modulename)/sizeof(WCHAR));
 
         /* Make sure we get an absolute pathname in case the module was loaded
          * explicitly by LoadLibrary() with a relative path. */
         GetFullPathNameW(modulename, sizeof(fullname)/sizeof(WCHAR), fullname, NULL);
+
+        /* Make sure we start with the long path name of the module because we
+         * later scan for pathname components to match "5.xx" to locate
+         * compatible sitelib directories, and the short pathname might mangle
+         * this path segment (e.g. by removing the dot on NTFS to something
+         * like "5xx~1.yy") */
+        if (pfnGetLongPathNameW)
+            pfnGetLongPathNameW(fullname, fullname, sizeof(fullname)/sizeof(WCHAR));
 
         /* remove \\?\ prefix */
         if (memcmp(fullname, L"\\\\?\\", 4*sizeof(WCHAR)) == 0)
@@ -285,9 +298,9 @@ get_regstr_from(HKEY hkey, const char *valuename, SV **svp)
 		*svp = sv_2mortal(newSVpvn("",0));
 	    SvGROW(*svp, datalen);
 	    retval = RegQueryValueEx(handle, valuename, 0, NULL,
-				     (PBYTE)SvPVX(*svp), &datalen);
+				     (PBYTE)SvPVX_mutable(*svp), &datalen);
 	    if (retval == ERROR_SUCCESS) {
-		str = SvPVX(*svp);
+		str = SvPVX_mutable(*svp);
 		SvCUR_set(*svp,datalen-1);
 	    }
 	}
@@ -308,7 +321,7 @@ get_regstr(const char *valuename, SV **svp)
 
 /* *prev_pathp (if non-NULL) is expected to be POK (valid allocated SvPVX(sv)) */
 static char *
-get_emd_part(SV **prev_pathp, char *trailing_path, ...)
+get_emd_part(SV **prev_pathp, STRLEN *const len, char *trailing_path, ...)
 {
     char base[10];
     va_list ap;
@@ -362,17 +375,19 @@ get_emd_part(SV **prev_pathp, char *trailing_path, ...)
 	dTHX;
 	if (!*prev_pathp)
 	    *prev_pathp = sv_2mortal(newSVpvn("",0));
-	else if (SvPVX(*prev_pathp))
+	else if (SvPVX_const(*prev_pathp))
 	    sv_catpvn(*prev_pathp, ";", 1);
 	sv_catpv(*prev_pathp, mod_name);
-	return SvPVX(*prev_pathp);
+	if(len)
+	    *len = SvCUR(*prev_pathp);
+	return SvPVX_mutable(*prev_pathp);
     }
 
     return NULL;
 }
 
 char *
-win32_get_privlib(const char *pl)
+win32_get_privlib(const char *pl, STRLEN *const len)
 {
     dTHX;
     char *stdlib = "lib";
@@ -385,11 +400,12 @@ win32_get_privlib(const char *pl)
 	(void)get_regstr(stdlib, &sv);
 
     /* $stdlib .= ";$EMD/../../lib" */
-    return get_emd_part(&sv, stdlib, ARCHNAME, "bin", NULL);
+    return get_emd_part(&sv, len, stdlib, ARCHNAME, "bin", NULL);
 }
 
 static char *
-win32_get_xlib(const char *pl, const char *xlib, const char *libname)
+win32_get_xlib(const char *pl, const char *xlib, const char *libname,
+	       STRLEN *const len)
 {
     dTHX;
     char regstr[40];
@@ -404,7 +420,7 @@ win32_get_xlib(const char *pl, const char *xlib, const char *libname)
     /* $xlib .=
      * ";$EMD/" . ((-d $EMD/../../../$]) ? "../../.." : "../.."). "/$libname/$]/lib";  */
     sprintf(pathstr, "%s/%s/lib", libname, pl);
-    (void)get_emd_part(&sv1, pathstr, ARCHNAME, "bin", pl, NULL);
+    (void)get_emd_part(&sv1, NULL, pathstr, ARCHNAME, "bin", pl, NULL);
 
     /* $HKCU{$xlib} || $HKLM{$xlib} . ---; */
     (void)get_regstr(xlib, &sv2);
@@ -412,25 +428,26 @@ win32_get_xlib(const char *pl, const char *xlib, const char *libname)
     /* $xlib .=
      * ";$EMD/" . ((-d $EMD/../../../$]) ? "../../.." : "../.."). "/$libname/lib";  */
     sprintf(pathstr, "%s/lib", libname);
-    (void)get_emd_part(&sv2, pathstr, ARCHNAME, "bin", pl, NULL);
+    (void)get_emd_part(&sv2, NULL, pathstr, ARCHNAME, "bin", pl, NULL);
 
     if (!sv1 && !sv2)
 	return NULL;
-    if (!sv1)
-	return SvPVX(sv2);
-    if (!sv2)
-	return SvPVX(sv1);
+    if (!sv1) {
+	sv1 = sv2;
+    } else if (sv2) {
+	sv_catpvn(sv1, ";", 1);
+	sv_catsv(sv1, sv2);
+    }
 
-    sv_catpvn(sv1, ";", 1);
-    sv_catsv(sv1, sv2);
-
-    return SvPVX(sv1);
+    if (len)
+	*len = SvCUR(sv1);
+    return SvPVX_mutable(sv1);
 }
 
 char *
-win32_get_sitelib(const char *pl)
+win32_get_sitelib(const char *pl, STRLEN *const len)
 {
-    return win32_get_xlib(pl, "sitelib", "site");
+    return win32_get_xlib(pl, "sitelib", "site", len);
 }
 
 #ifndef PERL_VENDORLIB_NAME
@@ -438,9 +455,9 @@ win32_get_sitelib(const char *pl)
 #endif
 
 char *
-win32_get_vendorlib(const char *pl)
+win32_get_vendorlib(const char *pl, STRLEN *const len)
 {
-    return win32_get_xlib(pl, "vendorlib", PERL_VENDORLIB_NAME);
+    return win32_get_xlib(pl, "vendorlib", PERL_VENDORLIB_NAME, len);
 }
 
 static BOOL
@@ -665,8 +682,7 @@ Perl_do_aspawn(pTHX_ SV *really, SV **mark, SV **sp)
     }
 
     if (flag == P_NOWAIT) {
-	if (IsWin95())
-	    PL_statusvalue = -1;	/* >16bits hint for pp_system() */
+	PL_statusvalue = -1;	/* >16bits hint for pp_system() */
     }
     else {
 	if (status < 0) {
@@ -779,8 +795,7 @@ do_spawn2(pTHX_ const char *cmd, int exectype)
 	Safefree(argv);
     }
     if (exectype == EXECF_SPAWN_NOWAIT) {
-	if (IsWin95())
-	    PL_statusvalue = -1;	/* >16bits hint for pp_system() */
+	PL_statusvalue = -1;	/* >16bits hint for pp_system() */
     }
     else {
 	if (status < 0) {
@@ -1510,9 +1525,22 @@ win32_stat(const char *path, Stat_t *sbuf)
             errno = ENOTDIR;
             return -1;
         }
+	if (S_ISDIR(sbuf->st_mode)) {
+	    /* Ensure the "write" bit is switched off in the mode for
+	     * directories with the read-only attribute set. Borland (at least)
+	     * switches it on for directories, which is technically correct
+	     * (directories are indeed always writable unless denied by DACLs),
+	     * but we want stat() and -w to reflect the state of the read-only
+	     * attribute for symmetry with chmod(). */
+	    DWORD r = GetFileAttributesA(path);
+	    if (r != 0xffffffff && (r & FILE_ATTRIBUTE_READONLY)) {
+		sbuf->st_mode &= ~S_IWRITE;
+	    }
+	}
 #ifdef __BORLANDC__
-	if (S_ISDIR(sbuf->st_mode))
-	    sbuf->st_mode |= S_IWRITE | S_IEXEC;
+	if (S_ISDIR(sbuf->st_mode)) {
+	    sbuf->st_mode |= S_IEXEC;
+	}
 	else if (S_ISREG(sbuf->st_mode)) {
 	    int perms;
 	    if (l >= 4 && path[l-4] == '.') {
@@ -1715,7 +1743,7 @@ win32_getenv(const char *name)
 	curitem = sv_2mortal(newSVpvn("", 0));
         do {
             SvGROW(curitem, needlen+1);
-            needlen = GetEnvironmentVariableA(name,SvPVX(curitem),
+            needlen = GetEnvironmentVariableA(name,SvPVX_mutable(curitem),
                                               needlen);
         } while (needlen >= SvLEN(curitem));
         SvCUR_set(curitem, needlen);
@@ -1727,7 +1755,7 @@ win32_getenv(const char *name)
 	    (void)get_regstr(name, &curitem);
     }
     if (curitem && SvCUR(curitem))
-	return SvPVX(curitem);
+	return SvPVX_mutable(curitem);
 
     return NULL;
 }
@@ -1749,9 +1777,11 @@ win32_putenv(const char *name)
              * Has these advantages over putenv() & co.:
              *  * enables us to store a truly empty value in the
              *    environment (like in UNIX).
-             *  * we don't have to deal with RTL globals, bugs and leaks.
+             *  * we don't have to deal with RTL globals, bugs and leaks
+             *    (specifically, see http://support.microsoft.com/kb/235601).
              *  * Much faster.
-             * Why you may want to enable USE_WIN32_RTL_ENV:
+             * Why you may want to use the RTL environment handling
+             * (previously enabled by USE_WIN32_RTL_ENV):
              *  * environ[] and RTL functions will not reflect changes,
              *    which might be an issue if extensions want to access
              *    the env. via RTL.  This cuts both ways, since RTL will
@@ -2487,7 +2517,7 @@ win32_flock(int fd, int oper)
 
     if (!IsWinNT()) {
 	dTHX;
-	Perl_croak_nocontext("flock() unimplemented on this platform");
+	croak(aTHX_ "flock() unimplemented on this platform");
 	return -1;
     }
     fh = (HANDLE)_get_osfhandle(fd);
@@ -3057,9 +3087,7 @@ win32_popen(const char *command, const char *mode)
 	    lock_held = 0;
 	}
 
-	LOCK_FDPID_MUTEX;
 	sv_setiv(*av_fetch(w32_fdpid, p[parent], TRUE), childpid);
-	UNLOCK_FDPID_MUTEX;
 
 	/* set process id so that it can be returned by perl's open() */
 	PL_forkprocess = childpid;
@@ -3100,7 +3128,6 @@ win32_pclose(PerlIO *pf)
     int childpid, status;
     SV *sv;
 
-    LOCK_FDPID_MUTEX;
     sv = *av_fetch(w32_fdpid, PerlIO_fileno(pf), TRUE);
 
     if (SvIOK(sv))
@@ -3109,7 +3136,6 @@ win32_pclose(PerlIO *pf)
 	childpid = 0;
 
     if (!childpid) {
-        UNLOCK_FDPID_MUTEX;
 	errno = EBADF;
         return -1;
     }
@@ -3120,7 +3146,6 @@ win32_pclose(PerlIO *pf)
     fclose(pf);
 #endif
     SvIV_set(sv, 0);
-    UNLOCK_FDPID_MUTEX;
 
     if (win32_waitpid(childpid, &status, 0) == -1)
         return -1;

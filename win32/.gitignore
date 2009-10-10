@@ -1,0 +1,9 @@
+/config.h
+/config.w32
+/perl.base
+bin/*.bat
+Extensions_static
+dlutils.c
+perllibst.h
+perlmain.c
+!perlexe.ico

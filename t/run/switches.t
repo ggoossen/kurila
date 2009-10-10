@@ -4,6 +4,10 @@
 # -0, -c, -l, -s, -m, -M, -V, -v, -h, -i, -E and all unknown
 # Some switches have their own tests, see MANIFEST.
 
+BEGIN
+    chdir 't' if -d 't'
+    $^INCLUDE_PATH = @: '../lib'
+
 BEGIN { require "./test.pl"; }
 
 plan(tests => 55)
@@ -185,13 +189,12 @@ do
     my (@: _, $v) =  split m/-/, $^PERL_VERSION
     my $archname = config_value('archname')
     like( runperl( switches => \(@: '-v') ),
-          qr/This[ ]is[ ]kurila,[  ]v$v [ ] (?:DEVEL\w+[ ])? built[ ]for[ ]
+          qr/This[ ]is[ ]kurila,[  ]v$v [ ] (?:DEVEL:\S+[ ])? built[ ]for[ ]
              \Q$archname\E .+
              Copyright .+
              Gerard[ ]Goossen.+Artistic[ ]License .+
              GNU[ ]General[ ]Public[ ]License/xs,
           '-v looks okay' )
-
 
 
 # Tests for -h
@@ -204,7 +207,6 @@ do
           '-h looks okay' )
 
 
-
 # Tests for switches which do not exist
 
 foreach my $switch (split m//, "ABbGgHJjKkLNOoPQqRrYyZz123456789_")
@@ -214,5 +216,4 @@ foreach my $switch (split m//, "ABbGgHJjKkLNOoPQqRrYyZz123456789_")
                    prog => 'die "oops"' ),
           qr/\QUnrecognized switch: -$switch  (-h will show valid options)/,
           "-$switch correctly unknown" )
-
 

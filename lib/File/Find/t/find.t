@@ -8,13 +8,16 @@ my $symlink_exists = try { symlink("",""); 1 }
 my $warn_msg
 
 use Carp::Heavy () # make sure Carp::Heavy is already loaded, because $^INCLUDE_PATH is relative
+use Cwd
 
 BEGIN 
     $^WARN_HOOK = sub (@< @_) { $warn_msg = @_[0]; print $^STDERR, "# " . @_[0]->message; }
 
+use Test::More
 
-if ( $symlink_exists ) { print $^STDOUT, "1..193\n"; }
-else                   { print $^STDOUT, "1..85\n";  }
+plan tests => ( $symlink_exists ?? 193 !! 85 )
+
+my $orig_dir = cwd();
 
 # Uncomment this to see where File::Find is chdir'ing to.  Helpful for
 # debugging its little jaunts around the filesystem.
@@ -51,22 +54,14 @@ cleanup()
 $::count_commonsense = 0
 find(\(%: wanted => sub (@< @_) { ++$::count_commonsense if $_ eq 'commonsense.t'; } ),
      File::Spec->curdir)
-if ($::count_commonsense == 1)
-    print $^STDOUT, "ok 1\n"
-else
-    print $^STDOUT, "not ok 1 # found $::count_commonsense files named 'commonsense.t'\n"
-
+is($::count_commonsense, 1)
 
 $::count_commonsense = 0
 finddepth(\(%: wanted => sub (@< @_) { ++$::count_commonsense if $_ eq 'commonsense.t'; } ),
           File::Spec->curdir)
-if ($::count_commonsense == 1)
-    print $^STDOUT, "ok 2\n"
-else
-    print $^STDOUT, "not ok 2 # found $::count_commonsense files named 'commonsense.t'\n"
+is($::count_commonsense, 1)
 
 
-my $case = 2
 my $FastFileTests_OK = 0
 
 sub cleanup
@@ -99,15 +94,11 @@ END
 
 
 sub Check($ok)
-    $case++
-    if ($ok) { print $^STDOUT, "ok $case\n"; }
-    else       { print $^STDOUT, "not ok $case\n"; }
+    ok($ok)
 
 
 sub CheckDie($ok)
-    $case++
-    if ($ok) { print $^STDOUT, "ok $case\n"; }
-    else { print $^STDOUT, "not ok $case\n $^OS_ERROR\n"; exit 0; }
+    ok($ok) or die "OS_ERROR: $^OS_ERROR"
 
 
 sub touch
@@ -297,7 +288,6 @@ sub file_path_name
     my $path = file_path(< @_)
     $path = ":$path" if (($^OS_NAME eq 'MacOS') && ($path !~ m/:/))
     return $path
-
 
 
 MkDir( dir_path('for_find'), 0770 )
@@ -784,4 +774,54 @@ if ( $symlink_exists )
     Check (@names[0] eq file_path_name('fa', 'faa', 'faa_ord'))
     unlink file_path('fa', 'faa_sl')
 
+# Win32 checks  - [perl #41555]
+if ($^OS_NAME eq 'MSWin32')
+    require File::Spec::Win32
+    my ($volume) = File::Spec::Win32->splitpath($orig_dir, 1)
+    diag "VOLUME = $volume"
+    
+    # with chdir
+    %Expect_File = %: File::Spec->curdir => 1
+                      file_path('fsl') => 1
+                      file_path('fa_ord') => 1
+                      file_path('fab') => 1
+                      file_path('fab_ord') => 1
+                      file_path('faba') => 1
+                      file_path('faba_ord') => 1
+                      file_path('faa') => 1
+                      file_path('faa_ord') => 1
 
+    delete %Expect_File{ file_path('fsl') } unless $symlink_exists
+    %Expect_Name = $%
+
+    %Expect_Dir = %: dir_path('fa') => 1
+                     dir_path('faa') => 1
+                     dir_path('fab') => 1
+                     dir_path('faba') => 1
+                     dir_path('fb') => 1
+                     dir_path('fba') => 1
+    
+    File::Find::find( ( \%: wanted => &wanted_File_Dir ), topdir('fa'))
+    Check( nelems(keys %Expect_File) == 0 )    
+    
+    # no_chdir
+    %Expect_File = %: $volume . file_path_name('fa') => 1
+                      $volume . file_path_name('fa', 'fsl') => 1
+                      $volume . file_path_name('fa', 'fa_ord') => 1
+                      $volume . file_path_name('fa', 'fab') => 1
+                      $volume . file_path_name('fa', 'fab', 'fab_ord') => 1
+                      $volume . file_path_name('fa', 'fab', 'faba') => 1
+                      $volume . file_path_name('fa', 'fab', 'faba', 'faba_ord') => 1
+                      $volume . file_path_name('fa', 'faa') => 1
+                      $volume . file_path_name('fa', 'faa', 'faa_ord') => 1
+
+    delete %Expect_File{ $volume . file_path_name('fa', 'fsl') } unless $symlink_exists
+    %Expect_Name = ()
+
+    %Expect_Dir = %: $volume . dir_path('fa') => 1
+                     $volume . dir_path('fa', 'faa') => 1
+                     $volume . dir_path('fa', 'fab') => 1
+                     $volume . dir_path('fa', 'fab', 'faba') => 1
+                   
+    File::Find::find( ( \%: wanted => \&wanted_File_Dir, no_chdir => 1 ), $volume . topdir('fa'))
+    Check( nelems(keys %Expect_File) == 0 )

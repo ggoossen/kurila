@@ -107,18 +107,14 @@ sub _verify_att($att)
         unless( defined $sig )
             warn "WARNING: $key is not a known parameter.\n"
             next
-        
 
         my @sigs   = ref::svtype($sig) eq 'ARRAY' ?? $sig !! @:  $sig 
         my $given  = ref::svtype($val)
-        unless( grep { $given eq $_ || ($_ && try{$val->isa($_)}) || ($_ eq 'CODE' && ref($val) eq 'CODE') }, @sigs )
+        unless( grep { $given eq $_ || ($_ && try{$val->isa($_)}) || ($_ eq 'CODE' && ref::svtype($val) eq 'CODE') }, @sigs )
             my $takes = join " or ", map { _format_att($_) }, @sigs
 
             my $has = _format_att($given)
             die "$key takes a $takes not a $has."
-        
-    
-
 
 
 sub _format_att
@@ -418,13 +414,10 @@ END
     
 
     if (defined $self->{?CONFIGURE})
-        if (ref $self->{?CONFIGURE} eq 'CODE')
-            %configure_att = %:  <  $self->{?CONFIGURE}->( < @_ )->% 
-            $self = \%:  < $self->%, < %configure_att 
-        else
-            die "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n"
-        
-    
+        if (!type::is_code($self->{?CONFIGURE}))
+            die "Attribute 'CONFIGURE' to WriteMakefile() not a code\n"
+        %configure_att = %:  <  $self->{?CONFIGURE}->( < @_ )->% 
+        $self = \%:  < $self->%, < %configure_att
 
     my $newclass = ++$PACKNAME
     local @Parent = @Parent    # Protect against non-local exits
@@ -800,7 +793,7 @@ sub mv_all_methods
         # standard, we try to enable the next line again. It was
         # commented out until MM 5.23
 
-        next unless defined Symbol::fetch_glob("$($from)::$method")->&
+        next unless exists Symbol::fetch_glob("$($from)::$method")->&
 
         do
             Symbol::fetch_glob("$($to)::$method")->* = \Symbol::fetch_glob("$($from)::$method")->&

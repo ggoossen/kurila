@@ -7,6 +7,7 @@
 require Exporter
 package Math::Trig
 
+use Config 'config_value'
 
 our ($VERSION, $PACKAGE, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS)
 
@@ -40,7 +41,7 @@ my @greatcircle = qw(
 
 my @pi = qw(pi pi2 pi4 pip2 pip4)
 
-@EXPORT_OK = @: < @rdlcnv, < @greatcircle, < @pi, 'tan' 
+@EXPORT_OK = @: < @rdlcnv, < @greatcircle, < @pi, 'tan', 'Inf'
 
 # See e.g. the following pages:
 # http://www.movable-type.co.uk/scripts/LatLong.html
@@ -183,7 +184,6 @@ sub great_circle_direction
 
     return rad2rad($direction)
 
-
 *great_circle_bearing = \&great_circle_direction
 
 sub great_circle_waypoint( $theta0, $phi0, $theta1, $phi1, $point)
@@ -233,8 +233,60 @@ sub great_circle_destination( $theta0, $phi0, $dir0, $dst)
 
     return  @: $theta1, $phi1, $dir1
 
+my $Inf
 
-1
+BEGIN
+    my %DBL_MAX =
+        %:
+          4  => '1.70141183460469229e+38'
+          8  => '1.7976931348623157e+308'
+          # AFAICT the 10, 12, and 16-byte long doubles
+          # all have the same maximum.
+          10 => '1.1897314953572317650857593266280070162E+4932'
+          12 => '1.1897314953572317650857593266280070162E+4932'
+          16 => '1.1897314953572317650857593266280070162E+4932'
+
+    my $nvsize = config_value('nvsize') ||
+                (config_value('uselongdouble') && config_value('longdblsize')) ||
+                 config_value('doublesize');
+    die "Math::Complex: Could not figure out nvsize\n"
+        unless defined $nvsize
+    die "Math::Complex: Cannot not figure out max nv (nvsize = $nvsize)\n"
+        unless defined %DBL_MAX{$nvsize}
+    my $DBL_MAX = eval %DBL_MAX{$nvsize}
+    die "Math::Complex: Could not figure out max nv (nvsize = $nvsize)\n"
+        unless defined $DBL_MAX
+    my $BIGGER_THAN_THIS = 1e30  # Must find something bigger than this.
+    if ($^OS_NAME eq 'unicosmk')
+        $Inf = $DBL_MAX
+    else
+        local signals::handler('FPE') = { }
+        local $^OS_ERROR
+        # We do want an arithmetic overflow, Inf INF inf Infinity.
+        for my $t ( @:
+            'exp(99999)',  # Enough even with 128-bit long doubles.
+            'inf',
+            'Inf',
+            'INF',
+            'infinity',
+            'Infinity',
+            'INFINITY',
+            '1e99999',
+            )
+            local $^WARNING_BITS = 0
+            my $i = eval "$t+1.0"
+            if (defined $i && $i +> $BIGGER_THAN_THIS)
+                $Inf = $i
+                last
+
+        $Inf = $DBL_MAX unless defined $Inf  # Oh well, close enough.
+        die "Math::Complex: Could not get Infinity"
+            unless $Inf +> $BIGGER_THAN_THIS
+
+    # print "# On this machine, Inf = '$Inf'\n";
+
+sub Inf
+    return $Inf
 
 __END__
 =pod
@@ -309,12 +361,12 @@ and cotanh/coth are aliases)
 
 B<csch>, B<cosech>, B<sech>, B<coth>, B<cotanh>
 
-The arcus (also known as the inverse) functions of the hyperbolic
+The area (also known as the inverse) functions of the hyperbolic
 sine, cosine, and tangent
 
 B<asinh>, B<acosh>, B<atanh>
 
-The arcus cofunctions of the hyperbolic sine, cosine, and tangent
+The area cofunctions of the hyperbolic sine, cosine, and tangent
 (acsch/acosech and acoth/acotanh are aliases)
 
 B<acsch>, B<acosech>, B<asech>, B<acoth>, B<acotanh>
@@ -590,18 +642,22 @@ The result of great_circle_direction is in radians, zero indicating
 straight north, pi or -pi straight south, pi/2 straight west, and
 -pi/2 straight east.
 
+=head2 great_circle_destination
+
 You can inversely compute the destination if you know the
 starting point, direction, and distance:
 
-=head2 great_circle_destination
-
   use Math::Trig 'great_circle_destination';
 
-  # thetad and phid are the destination coordinates,
-  # dird is the final direction at the destination.
+  # $diro is the original direction,
+  # for example from great_circle_bearing().
+  # $distance is the angular distance in radians,
+  # for example from great_circle_distance().
+  # $thetad and $phid are the destination coordinates,
+  # $dird is the final direction at the destination.
 
   ($thetad, $phid, $dird) =
-    great_circle_destination($theta, $phi, $direction, $distance);
+    great_circle_destination($theta, $phi, $diro, $distance);
 
 or the midpoint if you know the end points:
 
@@ -669,7 +725,18 @@ The midpoint between London and Tokyo being
 
     my @M = great_circle_midpoint(@L, @T);
 
-or about 68.93N 89.16E, in the frozen wastes of Siberia.
+or about 69 N 89 E, in the frozen wastes of Siberia.
+
+B<NOTE>: you B<cannot> get from A to B like this:
+
+   Dist = great_circle_distance(A, B)
+   Dir  = great_circle_direction(A, B)
+   C    = great_circle_destination(A, Dist, Dir)
+
+and expect C to be B, because the bearing constantly changes when
+going from A to B (except in some special case like the meridians or
+the circles of latitudes) and in great_circle_destination() one gives
+a constant bearing to follow.
 
 =head2 CAVEAT FOR GREAT CIRCLE FORMULAS
 

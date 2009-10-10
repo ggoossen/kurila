@@ -240,7 +240,7 @@ use warnings 'misc' ;
 no warnings 'misc' ;
 *b = undef ;
 EXPECT
-Undefined value assigned to typeglob at - line 3 character 1.
+Undefined value assigned to glob at - line 3 character 1.
 ########
 # sv.c
 use warnings 'numeric' ;

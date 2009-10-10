@@ -22,9 +22,6 @@ print $^STDOUT, "# First entry is '$first'\n"
 my (@: $first_each, ...) =  config_keys
 is($first_each, $first, "First key from each is correct")
 
-is(config_value('PERL_REVISION'), undef, "No PERL_REVISION")
-is(config_value("KURILA_VERSION"), 1, "KURILA_REVISION 1")
-
 ok( defined config_value("cc"),      "has cc")
 
 ok( defined config_value("ccflags"), "has ccflags")
@@ -117,7 +114,7 @@ my @virtual = qw(byteorder ccflags_nolargefiles ldflags_nolargefiles
 # Also test that the first entry in config.sh is found correctly. There was
 # special casing code for this
 
-foreach my $pain ((@: $first, < @virtual))
+foreach my $pain (@: $first, < @virtual)
     # No config var is named with anything that is a regexp metachar
     ok(defined config_value($pain), "\$config('$pain') exists")
 

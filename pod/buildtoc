@@ -2,13 +2,14 @@
 
 our ($masterpodfile, %Build, %Targets, $Verbose, $Up, %Ignore
     ,    @Master, %Readmes, %Pods, %Aux, %Readmepods, %Pragmata, %Modules
-    ,    %Copies)
+    ,    %Copies, %Generated)
 use File::Spec
 use File::Find;
 use FindBin;
 use Text::Tabs;
 use Text::Wrap;
 use Getopt::Long;
+use Carp;
 
 $Up = File::Spec->updir
 $masterpodfile = File::Spec->catdir($Up, "pod.lst")
@@ -21,19 +22,19 @@ $masterpodfile = File::Spec->catdir($Up, "pod.lst")
 
 %Targets = %:
     toc => "kurilatoc.pod"
-    manifest => File::Spec->catdir($Up, "MANIFEST")
+    manifest => File::Spec->catfile($Up, "MANIFEST")
     perlpod => "perl.pod"
-    vms => File::Spec->catdir($Up, "vms", "descrip_mms.template")
-    nmake => File::Spec->catdir($Up, "win32", "Makefile")
-    dmake => File::Spec->catdir($Up, "win32", "makefile.mk")
-    podmak => File::Spec->catdir($Up, "win32", "pod.mak")
-    # plan9 =>  File::Spec->catdir($Up, "plan9", "mkfile")
-    unix => File::Spec->catdir($Up, "Makefile.SH")
+    vms => File::Spec->catfile($Up, "vms", "descrip_mms.template")
+    nmake => File::Spec->catfile($Up, "win32", "Makefile")
+    dmake => File::Spec->catfile($Up, "win32", "makefile.mk")
+    podmak => File::Spec->catfile($Up, "win32", "pod.mak")
+    # plan9 =>  File::Spec->catfile($Up, "plan9", "mkfile")
+    unix => File::Spec->catfile($Up, "Makefile.SH")
     # TODO: add roffitall
 
 do
     my @files = keys %Targets
-    my $filesopts = join(" | ", map { "--build-$_" }, @( "all", < sort @files))
+    my $filesopts = join(" | ", map { "--build-$_" }, @: "all", < sort @files)
     my $showfiles
     die <<__USAGE__
 $^PROGRAM_NAME: Usage: $^PROGRAM_NAME [--verbose] [--showfiles] $filesopts
@@ -41,7 +42,7 @@ __USAGE__
         unless (nelems @ARGV)
         && GetOptions (verbose => \$Verbose,
                        showfiles => \$showfiles,
-                       < @+: map { @: "build-$_", \%Build{+$_} }, @( < @files, 'all'))
+                       < @+: map { @: "build-$_", \%Build{+$_} }, @: < @files, 'all')
     # Set them all to true
     %Build{[@files]} = @files if (%Build{?all})
     if ($showfiles)
@@ -49,17 +50,16 @@ __USAGE__
             join(" ",
             sort { lc $a cmp lc $b },
             map {
-            my @($v, $d, $f) = File::Spec->splitpath($_);
-            my @d;
-            @d = defined $d ?? File::Spec->splitdir($d) !! $@;
-            shift @d if (nelems @d);
-            File::Spec->catfile((nelems @d)
-                ?? ((nelems @d) == 1 && @d[0] eq '' ?? () !! < @d)
-                !! "pod", $f);
-        }, %Targets{[ grep { $_ ne 'all' && %Build{$_} }, keys %Build]}),
+                my @: $v, $d, $f = File::Spec->splitpath($_);
+                my @d;
+                @d = defined $d ?? File::Spec->splitdir($d) !! $@;
+                shift @d if (nelems @d);
+                File::Spec->catfile((nelems @d)
+                    ?? ((nelems @d) == 1 && @d[0] eq '' ?? () !! < @d)
+                    !! "pod", $f);
+            }, %Targets{[ grep { $_ ne 'all' && %Build{$_} }, keys %Build]}),
             "\n"
         exit(0)
-    
 
 
 # Don't copy these top level READMEs
@@ -68,7 +68,8 @@ __USAGE__
     #     vms => 1,
 
 if ($Verbose)
-    print "I'm building $_\n" foreach grep {%Build{$_}}, keys %Build
+    foreach (grep {%Build{$_}}, keys %Build)
+        print "I'm building $_\n"
 
 
 chdir $FindBin::Bin or die "$^PROGRAM_NAME: Can't chdir $FindBin::Bin: $^OS_ERROR"
@@ -77,7 +78,7 @@ open my $master, "<", $masterpodfile or die "$^PROGRAM_NAME: Can't open $masterp
 
 my ($delta_source, $delta_target)
 
-foreach (@( ~< $master->*))
+foreach (@: ~< $master->*)
     next if m/^\#/
 
     # At least one upper case letter somewhere in the first group
@@ -88,11 +89,11 @@ foreach (@( ~< $master->*))
         %flags{+toc_omit} = 1 if $flags =~ s/o//g
         %flags{+aux} = 1 if $flags =~ s/a//g
         die "$^PROGRAM_NAME: Unknown flag found in heading line: $_" if length $flags
-        push @Master, \@(\%flags, $2)
+        push @Master, \@: \%flags, $2
 
     elsif (m/^(\S*)\s+(\S+)\s+(.*)/)
         # it's a section
-        my @($flags, $filename, $desc) = @($1, $2, $3)
+        my @: $flags, $filename, $desc = @: $1, $2, $3
 
         my %flags = %: indent => 0
         %flags{indent} = $1 if $flags =~ s/(\d+)//
@@ -106,7 +107,8 @@ foreach (@( ~< $master->*))
         if ($flags =~ s/d//g)
             %flags{+manifest_omit} = 1
             $delta_target = "$filename.pod"
-        
+
+        %Generated{+"$filename.pod"} = $flags =~ s/g//g
 
         if ($flags =~ s/r//g)
             my $readme = $filename
@@ -119,7 +121,7 @@ foreach (@( ~< $master->*))
             %Pods{+$filename} = $desc
         
         die "$^PROGRAM_NAME: Unknown flag found in section line: $_" if length $flags
-        push @Master, \@(\%flags, $filename, $desc)
+        push @Master, \@: \%flags, $filename, $desc
     elsif (m/^$/)
         push @Master, undef
     else
@@ -130,8 +132,7 @@ if (defined $delta_source)
     if (defined $delta_target)
         # This way round so that keys can act as a MANIFEST skip list
         # Targets will aways be in the pod directory. Currently we can only cope
-        # with sources being in the same directory. Fix this and do perlvms.pod
-        # with this?
+        # with sources being in the same directory.
         %Copies{+$delta_target} = $delta_source
     else
         die "$^PROGRAM_NAME: delta source defined but not target"
@@ -197,25 +198,30 @@ do
         warn "$^PROGRAM_NAME: $i exists but is unknown by buildtoc\n"
             unless %our_pods{?$i}
         warn "$^PROGRAM_NAME: $i exists but is unknown by ../MANIFEST\n"
-            if !%manipods{?$i} && !%manireadmes{?$i} && !%Copies{?$i}
+            if !%manipods{?$i} && !%manireadmes{?$i} && !%Copies{?$i} && !%Generated{$i}
         warn "$^PROGRAM_NAME: $i exists but is unknown by perl.pod\n"
             if !%perlpods{?$i} && !exists %sources{$i}
-    
+
+    my @BuildTargets = grep {defined}, %Targets{[keys %Build]}
+    my %BuildFiles
+    %BuildFiles{[@BuildTargets]} = @BuildTargets;
+
     foreach my $i (sort keys %our_pods)
         warn "$^PROGRAM_NAME: $i is known by buildtoc but does not exist\n"
-            unless %disk_pods{?$i}
+            unless %disk_pods{?$i} or %BuildFiles{?$i};
     
     foreach my $i (sort keys %manipods)
         warn "$^PROGRAM_NAME: $i is known by ../MANIFEST but does not exist\n"
             unless %disk_pods{$i}
+        warn "$^PROGRAM_NAME: $i is known by ../MANIFEST but is marked as generated\n"
+            if %Generated{$i}
     
     foreach my $i (sort keys %perlpods)
         warn "$^PROGRAM_NAME: $i is known by perl.pod but does not exist\n"
-            unless %disk_pods{?$i}
-    
+            unless %disk_pods{?$i} or %BuildFiles{?$i}
 
 
-# Find all the mdoules
+# Find all the modules
 do
     my @modpods
     find \&getpods => < qw(../lib ../ext)
@@ -242,11 +248,8 @@ do
                         push @modpods, $file
                         #warn "GOOD $file\n";
                         return
-                    
                 
                 warn "$^PROGRAM_NAME: $file: cannot find =head1 NAME\n"
-            
-        
     
 
     die "$^PROGRAM_NAME: no pods" unless (nelems @modpods)
@@ -263,8 +266,6 @@ do
                 next
             
             %Modules{+$name} = $_
-        
-    
 
 
 # OK. Now a lot of ancillary function definitions follow
@@ -281,7 +282,7 @@ sub path2modname
 
 my $out
 
-sub output_kurilatoc
+sub output_kurilatoc()
     open($out, ">", "kurilatoc.pod") || die "$^PROGRAM_NAME: creating kurilatoc.pod failed: $^OS_ERROR"
 
     local $^INPUT_RECORD_SEPARATOR = ''
@@ -368,6 +369,8 @@ my ($inhead1, $inhead2, $initem)
 sub podset
     local @ARGV = @_
     my $pod
+
+    return unless @ARGV
 
     while( ~< *ARGV)
         s/\015//g
@@ -466,8 +469,6 @@ sub output($str)
         elsif (m/\S/ && length)
             $LINE .= $_
             $NEWLINE = 0
-        
-    
 
 
 # End of original buildtoc. From here on are routines to generate new sections
@@ -488,7 +489,7 @@ sub generate_perlpod
             # Section
             my $start = " " x (4 + $flags->{indent}) . $_->[1]
             $maxlength = length $start if length ($start) +> $maxlength
-            push @output, \@($start, $_->[2])
+            push @output, \@: $start, $_->[2]
         elsif ((nelems $_->@) == 0)
             # blank line
             push @output, "\n"
@@ -513,25 +514,26 @@ sub generate_manifest
     map {s/ \t/\t\t/g; $_}, @temp
 
 sub generate_manifest_pod
-    generate_manifest < map {\@("pod/$_.pod", %Pods{$_})},
-                      grep {!%Copies{"$_.pod"}}, sort keys %Pods
+    generate_manifest < map {\@: "pod/$_.pod", %Pods{$_}},
+                      grep {!%Copies{"$_.pod"}}, grep {!%Generated{"$_.pod"}}, sort keys %Pods
 
 sub generate_manifest_readme
-    generate_manifest < map {\@("README.$_", %Readmes{$_})}, sort keys %Readmes
+    generate_manifest sort {$a[0] cmp $b[0]},
+        @: "README.vms", "Notes about installing the VMS port",
+        +@+ map { @: "README.$_", %Readmes{$_} }, keys %Readmes
 
 
 sub generate_roffitall
-    @(< map ({"\t\$maindir/$_.1\t\\"}, sort keys %Pods),
-          "\t\t\\",
-          < map ({"\t\$maindir/$_.1\t\\"}, sort keys %Aux),
-          "\t\t\\",
-          < map ({"\t\$libdir/$_.3\t\\"}, sort keys %Pragmata),
-          "\t\t\\",
-          < map ({"\t\$libdir/$_.3\t\\"}, sort keys %Modules),
-        )
+    @: < map ({"\t\$maindir/$_.1\t\\"}, sort keys %Pods)
+       "\t\t\\"
+       < map ({"\t\$maindir/$_.1\t\\"}, sort keys %Aux)
+       "\t\t\\"
+       < map ({"\t\$libdir/$_.3\t\\"}, sort keys %Pragmata)
+       "\t\t\\"
+       < map ({"\t\$libdir/$_.3\t\\"}, sort keys %Modules)
 
 
-sub generate_descrip_mms_1
+sub generate_descrip_mms_1()
     local $Text::Wrap::columns = 150
     my $count = 0
     my @lines = map {"pod" . $count++ . " = $_"},
@@ -540,26 +542,29 @@ sub generate_descrip_mms_1
     @lines, "pod = " . join ' ', map {"\$(pod$_)"}, 0 .. $count - 1
 
 
-sub generate_descrip_mms_2
-    map {sprintf <<'SNIP', $_, $_ eq 'perlvms' ?? 'vms' !! 'pod', $_},
-[.lib.pods]%s.pod : [.%s]%s.pod
-	@ If F$Search("[.lib]pods.dir").eqs."" Then Create/Directory [.lib.pods]
-	Copy/NoConfirm/Log $(MMS$SOURCE) [.lib.pods]
+sub generate_descrip_mms_2()
+    map {<<"SNIP"},
+[.lib.pods]$_.pod : [.pod]$_.pod
+\t\@ If F\$Search("[.lib]pods.dir").eqs."" Then Create/Directory [.lib.pods]
+\tCopy/NoConfirm/Log \$(MMS\$SOURCE) [.lib.pods]
 SNIP
-        sort @( < keys %Pods, < keys %Readmepods)
+        sort @: < keys %Pods, < keys %Readmepods
 
+sub generate_descrip_mms_3()
+    map { qq{\t- If F\$Search("[.pod]$_").nes."" Then Delete/NoConfirm/Log [.pod]$_;*} },
+        sort keys %Generated, keys %Copies
 
-sub generate_nmake_1 { map {sprintf "\tcopy ..\\README.\%-8s ..\\pod\\perl$_.pod\n", $_},
-        sort keys %Readmes, map {"\tcopy ..\\pod\\%Copies{$_} ..\\pod\\$_\n"}, sort keys %Copies;
-}
+sub generate_nmake_1()
+    map {sprintf "\tcopy ..\\README.\%-8s ..\\pod\\perl$_.pod\n", $_},
+        sort keys %Readmes, map {"\tcopy ..\\pod\\%Copies{$_} ..\\pod\\$_\n"}, sort keys %Copies
 
 # This doesn't have a trailing newline
-sub generate_nmake_2
+sub generate_nmake_2()
     # Spot the special case
     local $Text::Wrap::columns = 76
     my $line = wrap ("\t    ", "\t    ",
-                     join " ", sort @( < keys %Copies,
-                                     < map {"perl$_.pod"}, @( "vms", < keys %Readmes)))
+                     join " ", sort @: < keys %Copies, < keys %Generated
+                                       < map {"perl$_.pod"}, keys %Readmes )
     $line =~ s/$/ \\/mg
     $line
 
@@ -567,11 +572,17 @@ sub generate_nmake_2
 sub generate_pod_mak
     my $variable = shift
     my @lines
-    my $line = join "\\\n", @( "\U$variable = ",
-                               < map {"\t$_.$variable\t"}, sort keys %Pods)
+    my $line = join "\\\n", @: "\U$variable = "
+                               < map {"\t$_.$variable\t"}, sort keys %Pods
     # Special case
     $line =~ s/.*kurilatoc.html.*\n//m
     $line
+
+
+sub verify_contiguous($name, $content, $what)
+  my $sections = nelems(@: $content =~ m/\0+/g)
+  croak("$^PROGRAM_NAME: $name contains no $what") if $sections +< 1
+  croak("$^PROGRAM_NAME: $name contains discontiguous $what") if $sections +> 1
 
 
 sub do_manifest
@@ -581,10 +592,10 @@ sub do_manifest
     # Dictionary order - fold and handle non-word chars as nothing
     map  { $_->[0] },
         sort { $a->[1] cmp $b->[1] || $a->[0] cmp $b->[0] },
-        map  { my $f = lc $_; $f =~ s/[^a-z0-9\s]//g; \@( $_, $f ) },
-        @(    < @manifest, <
-              &generate_manifest_pod(), <
-              &generate_manifest_readme())
+        map  { my $f = lc $_; $f =~ s/[^a-z0-9\s]//g; \@: $_, $f },
+        @:    < @manifest
+              < generate_manifest_pod()
+              < generate_manifest_readme()
 
 
 sub do_nmake
@@ -592,15 +603,13 @@ sub do_nmake
     my $makefile = join '', @_
     die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile =~ m/\0/
     $makefile =~ s/^\tcopy \.\.\\README.*\n/\0/gm
-    my $sections = @: $makefile =~ m/\0+/g
-    die "$^PROGRAM_NAME: $name contains no README copies" if $sections +< 1
-    die "$^PROGRAM_NAME: $name contains discontiguous README copies" if $sections +> 1
+    verify_contiguous($name, $makefile, 'README copies')
     # Now remove the other copies that follow
     1 while $makefile =~ s/\0\tcopy .*\n/\0/gm
-    $makefile =~ s/\0+/$(join ("", &generate_nmake_1( < @_ )))/s
+    $makefile =~ s/\0+/$(join ("", generate_nmake_1( < @_ )))/s
 
-    $makefile =~ s{(del /f [^\n]+checkpods[^\n]+).*?(pod2html)}
-                  {$("$1\n" . &generate_nmake_2( < @_ )."\n\t    $2")}s
+    $makefile =~ s{(del /f [^\n]+podchecker[^\n]+).*?(pod2html)}
+                  {$("$1\n" . generate_nmake_2( < @_ )."\n\t    $2")}s
     $makefile
 
 
@@ -617,7 +626,7 @@ sub do_perlpod
 		    |\s*\n		# blank line
 		   )+
 		  }
-                  {$($1 . join "", &generate_perlpod( < @_ ))}mx)
+                  {$($1 . join "", generate_perlpod( < @_ ))}mx)
         die "$^PROGRAM_NAME: Failed to insert amendments in do_perlpod"
     
     $pod
@@ -638,11 +647,8 @@ sub do_vms
     my $makefile = join '', @_
     die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile =~ m/\0/
     $makefile =~ s/\npod\d* =[^\n]*/\0/gs
-    my $sections = @: $makefile =~ m/\0+/g
-    die "$^PROGRAM_NAME: $name contains no pod assignments" if $sections +< 1
-    die "$^PROGRAM_NAME: $name contains $sections discontigous pod assignments"
-        if $sections +> 1
-    $makefile =~ s/\0+/$(join "\n", @( '', < &generate_descrip_mms_1( < @_ )))/s
+    verify_contiguous($name, $makefile, 'pod assignments')
+    $makefile =~ s/\0+/$(join "\n", @: '', < generate_descrip_mms_1( < @_ ))/s
 
     die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile =~ m/\0/
 
@@ -655,12 +661,16 @@ sub do_vms
                  [^\n]+\n       # Another line
                  [^\n]+\Q[.lib.pods]\E\n                # ends [.lib.pods]
                     /\0/gsx
-    $sections = @: $makefile =~ m/\0+/g
-    die "$^PROGRAM_NAME: $name contains no copy rules" if $sections +< 1
-    die "$^PROGRAM_NAME: $name contains $sections discontigous copy rules"
-        if $sections +> 1
-    $makefile =~ s/\0+/$(join "\n", @( '', < &generate_descrip_mms_2( < @_ )))/s
-    $makefile
+    verify_contiguous($name, $makefile, 'copy rules')
+    $makefile =~ s/\0+/$(join "\n", @: '', < generate_descrip_mms_2( < @_ ))/s
+
+    # Looking for rules like this:
+    #	- If F$Search("[.pod]perldelta.pod").nes."" Then Delete/NoConfirm/Log [.pod]perldelta.pod;*
+    $makefile =~ s!(?:\t- If F\$Search\("\[\.pod\]perl[a-z]+\Q.pod").nes."" Then Delete/NoConfirm/Log [.pod]perl\E[a-z]+\.pod;\*\n)+!\0!sg
+    verify_contiguous($name, $makefile, 'delete rules')
+    $makefile =~ s/\0+/$(join "\n", &generate_descrip_mms_3, '')/s
+
+    return $makefile
 
 
 sub do_unix
@@ -668,40 +678,47 @@ sub do_unix
     my $makefile_SH = join '', @_
     die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile_SH =~ m/\0/
 
-    $makefile_SH =~ s/\n\s+-\@test -f \S+ && cd pod && \$\(LNS\) \S+ \S+ && cd \.\. && echo "\S+" >> extra.pods \# See buildtoc\n/\0/gm
+    $makefile_SH =~ s{^(generated_pods = extra.pods).*}
+                     {$(join ' ', $1, map { "pod/$_" }, 
+                           sort keys %Copies +@+ grep { ! m/kurilatoc/ }, keys %Generated)}mg
 
-    my $sections = @: $makefile_SH =~ m/\0+/g
+    # pod/perldelta.pod: pod/perl511delta.pod
+    # 	cd pod && $(LNS) perl511delta.pod perldelta.pod
 
-    die "$^PROGRAM_NAME: $name contains no copy rules" if $sections +< 1
-    die "$^PROGRAM_NAME: $name contains $sections discontigous copy rules"
-        if $sections +> 1
+    $makefile_SH =~ s!(
+pod/perl[a-z0-9_]+\.pod: pod/perl[a-z0-9_]+\.pod
+\t\$\(LNS\) perl[a-z0-9_]+\.pod pod/perl[a-z0-9_]+\.pod
+)+!\0!gm
 
-    my @copy_rules = map "\t-\@test -f pod/%Copies{$_} && cd pod && \$(LNS) %Copies{$_} $_ && cd .. && echo \"pod/$_\" >> extra.pods # See buildtoc",
-        keys %Copies
+    verify_contiguous($name, $makefile_SH, 'copy rules')
 
-    $makefile_SH =~ s/\0+/$(join "\n", @( '', < @copy_rules, ''))/s
+    my @copy_rules = map { "
+pod/$_: pod/%Copies{$_}
+\t\$(LNS) %Copies{$_} pod/$_
+" }, keys %Copies
+
+    $makefile_SH =~ s/\0+/$(join "", @copy_rules)/s
     $makefile_SH
-
 
 
 # Do stuff
 
 my $built
-while (my @(?$target, ?$name) = @: each %Targets)
+while (my @: ?$target, ?$name = @: each %Targets)
     next unless %Build{$target}
     $built++
     if ($target eq "toc")
         print$^STDOUT,  "Now processing $name\n" if $Verbose
-        &output_kurilatoc( < @_ )
+        output_kurilatoc()
         print $^STDOUT, "Finished\n" if $Verbose
         next
     
     print$^STDOUT,  "Now processing $name\n" if $Verbose
     open my $thing, "<", $name or die "Can't open $name: $^OS_ERROR"
-    my @orig = @( ~< $thing->* )
+    my @orig = @: ~< $thing->*
     my $orig = join '', @orig
     close $thing
-    my @new = &{"do_$target"}($target, < @orig)
+    my @new = Symbol::fetch_glob("do_$target")->*->& <: $target, < @orig
     my $new = join '', @new
     if ($new eq $orig)
         print $^STDOUT, "Was not modified\n" if $Verbose

@@ -201,6 +201,7 @@ Use of uninitialized value within @ma in sin at - line 11 character 6.
 Use of uninitialized value within %main::gh in sin at - line 12 character 6.
 Use of uninitialized value within %mh in sin at - line 13 character 6.
 ########
+# TODO warnings inside print
 use warnings 'uninitialized';
 my ($m1, $m2);
 our ($g1, @ga);
@@ -294,3 +295,174 @@ Use of uninitialized value in delete at - line 6 character 1.
 Use of uninitialized value $m1 in delete at - line 7 character 1.
 Use of uninitialized value in delete at - line 8 character 1.
 Use of uninitialized value in delete at - line 8 character 1.
+########
+use warnings 'uninitialized';
+my ($m1, $v);
+our ($g1);
+
+stat;
+lstat;
+stat $m1;
+lstat $g1;
+
+$v = -R $m1;
+$v = -W $m1;
+$v = -X $m1;
+$v = -r $m1;
+$v = -w $m1;
+$v = -x $m1;
+$v = -e $m1;
+$v = -o $m1;
+$v = -O $m1;
+$v = -z $m1;
+$v = -s $m1;
+$v = -M $m1;
+$v = -A $m1;
+$v = -C $m1;
+$v = -S $m1;
+$v = -c $m1;
+$v = -b $m1;
+$v = -f $m1;
+$v = -d $m1;
+$v = -p $m1;
+$v = -l $m1;
+$v = -u $m1;
+$v = -g $m1;
+# $v = -k $m1; # XXX this is a no-op under win32
+EXPECT
+Use of uninitialized value $::_ in stat at - line 5 character 1.
+Use of uninitialized value $::_ in lstat at - line 6 character 1.
+Use of uninitialized value $m1 in stat at - line 7 character 1.
+Use of uninitialized value $main::g1 in lstat at - line 8 character 1.
+Use of uninitialized value $m1 in -R at - line 10 character 6.
+Use of uninitialized value $m1 in -W at - line 11 character 6.
+Use of uninitialized value $m1 in -X at - line 12 character 6.
+Use of uninitialized value $m1 in -r at - line 13 character 6.
+Use of uninitialized value $m1 in -w at - line 14 character 6.
+Use of uninitialized value $m1 in -x at - line 15 character 6.
+Use of uninitialized value $m1 in -e at - line 16 character 6.
+Use of uninitialized value $m1 in -o at - line 17 character 6.
+Use of uninitialized value $m1 in -O at - line 18 character 6.
+Use of uninitialized value $m1 in -z at - line 19 character 6.
+Use of uninitialized value $m1 in -s at - line 20 character 6.
+Use of uninitialized value $m1 in -M at - line 21 character 6.
+Use of uninitialized value $m1 in -A at - line 22 character 6.
+Use of uninitialized value $m1 in -C at - line 23 character 6.
+Use of uninitialized value $m1 in -S at - line 24 character 6.
+Use of uninitialized value $m1 in -c at - line 25 character 6.
+Use of uninitialized value $m1 in -b at - line 26 character 6.
+Use of uninitialized value $m1 in -f at - line 27 character 6.
+Use of uninitialized value $m1 in -d at - line 28 character 6.
+Use of uninitialized value $m1 in -p at - line 29 character 6.
+Use of uninitialized value $m1 in -l at - line 30 character 6.
+Use of uninitialized value $m1 in -u at - line 31 character 6.
+Use of uninitialized value $m1 in -g at - line 32 character 6.
+########
+use warnings 'uninitialized';
+my ($m1, $v);
+our ($g1);
+
+$v = localtime $m1;
+$v = gmtime $g1;
+EXPECT
+Use of uninitialized value $m1 in localtime at - line 5 character 6.
+Use of uninitialized value $main::g1 in gmtime at - line 6 character 6.
+########
+use warnings 'uninitialized';
+my ($m1, $m2, $v);
+
+$v = eval;
+$v = eval $m1;
+$m2 = q($m1); $v = 1 + eval $m2;
+EXPECT
+Use of uninitialized value $::_ in eval "string"
+Use of uninitialized value $m1 in eval "string" at - line 5 character 6.
+Use of uninitialized value in addition (+) at - line 6 character 22.
+########
+use warnings 'uninitialized';
+my ($m1);
+
+exit $m1;
+EXPECT
+Use of uninitialized value $m1 in exit at - line 4 character 1.
+########
+use warnings 'uninitialized';
+my $undef;
+
+if ($undef == 3) {
+} elsif ($undef == 0) {
+}
+EXPECT
+Use of uninitialized value $undef in numeric eq (==) at - line 4 character 12.
+Use of uninitialized value $undef in numeric eq (==) at - line 5 character 17.
+########
+# TODO long standing bug - conditions of while loops
+use warnings;
+
+my $c;
+my $d = 1;
+while ($c == 0 && $d) {
+  # a
+  # few
+  # blank
+  # lines
+  undef $d;
+}
+EXPECT
+Use of uninitialized value $c in numeric eq (==) at - line 5.
+Use of uninitialized value $c in numeric eq (==) at - line 5.
+########
+# TODO long standing bug - conditions of until loops
+use warnings;
+
+my $c;
+my $d;
+until ($c == 1) {
+  # a
+  # few
+  # blank
+  # lines
+  $c = 1 if ++$d == 2;
+}
+EXPECT
+Use of uninitialized value $c in numeric eq (==) at - line 5.
+Use of uninitialized value $c in numeric eq (==) at - line 5.
+########
+# TODO long standing bug - conditions of for loops
+use warnings;
+
+my $c;
+my $d;
+for ($d = 1; $c == 0 && $d; ) {
+  # a
+  # few
+  # blank
+  # lines
+  undef $d;
+}
+
+my $e;
+for ($d = 2; $d > 0; $e = !($c == 0)) {
+  # a
+  # few
+  # blank
+  # lines
+  --$d;
+}
+EXPECT
+Use of uninitialized value $c in numeric eq (==) at - line 5.
+Use of uninitialized value $c in numeric eq (==) at - line 5.
+Use of uninitialized value $c in numeric eq (==) at - line 14.
+Use of uninitialized value $c in numeric eq (==) at - line 14.
+########
+# TODO long standing bug - more general variant of the above problem
+use warnings;
+my $undef;
+
+my $a = $undef + 1;
+my $b
+  = $undef
+  + 1;
+EXPECT
+Use of uninitialized value $undef in addition (+) at - line 4.
+Use of uninitialized value $undef in addition (+) at - line 7.

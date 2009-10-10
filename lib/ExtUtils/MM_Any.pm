@@ -271,7 +271,7 @@ makes it easier to embed in a make string.  For example.
 =head3 oneliner  I<Abstract>
 
   my $oneliner = $MM->oneliner($perl_code);
-  my $oneliner = $MM->oneliner($perl_code, \@switches);
+  my $oneliner = $MM->oneliner($perl_code, @switches);
 
 This will generate a perl one-liner safe for the particular platform
 you're on based on the given $perl_code and @switches (a -e is
@@ -774,9 +774,9 @@ distdir.
 sub distmeta_target
     my $self = shift
 
-    my $add_meta = $self->oneliner(<<'CODE', \@: '-MExtUtils::Manifest=maniadd')
+    my $add_meta = $self->oneliner(<<'CODE', @: '-MExtUtils::Manifest=maniadd')
 try { maniadd(\%: q{META.yml} => q{Module meta-data (added by MakeMaker)}) }
-    or print $$^STDOUT, "Could not add META.yml to MANIFEST: $($^EVAL_ERROR->message)\n"
+    or print $$^STDOUT, "Could not add META.yml to MANIFEST: $\($$^EVAL_ERROR->message)\n"
 CODE
 
     my $add_meta_to_distdir = $self->cd('$(DISTVNAME)', $add_meta)
@@ -911,9 +911,9 @@ distdir.
 sub distsignature_target
     my $self = shift
 
-    my $add_sign = $self->oneliner(<<'CODE', \@: '-MExtUtils::Manifest=maniadd')
+    my $add_sign = $self->oneliner(<<'CODE', @: '-MExtUtils::Manifest=maniadd')
 try { maniadd(\%: q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}) }
-    or print $$^STDOUT, "Could not add SIGNATURE to MANIFEST: $($^EVAL_ERROR->message)\n"
+    or print $$^STDOUT, "Could not add SIGNATURE to MANIFEST: $$\($$\^EVAL_ERROR->message)\n"
 CODE
 
     my $sign_dist        = $self->cd('$(DISTVNAME)' => 'cpansign -s')

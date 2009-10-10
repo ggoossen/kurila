@@ -76,9 +76,10 @@ Parsing of the #! switches starts wherever "perl" is mentioned in the line.
 The sequences "-*" and "- " are specifically ignored so that you could,
 if you were so inclined, say
 
-    #!/bin/sh -- # -*- perl -*- -p
-    eval 'exec perl -wS $0 ${1+"$@"}'
-        if $running_under_some_shell;
+    #!/bin/sh
+    #! -*-perl-*-
+    eval 'exec perl -x -wS $0 ${1+"$@"}'
+        if 0;
 
 to let Perl see the B<-p> switch.
 
@@ -137,13 +138,6 @@ the sources), you may have to modify the Registry yourself.  Note that
 this means you can no longer tell the difference between an executable
 Perl program and a Perl library file.
 
-=item Macintosh
-
-Under "Classic" MacOS, a perl program will have the appropriate Creator and
-Type, so that double-clicking them will invoke the MacPerl application.
-Under Mac OS X, clickable apps can be made from any C<#!> script using Wil
-Sanchez' DropScript utility: http://www.wsanchez.net/software/ .
-
 =item VMS
 
 Put
@@ -179,10 +173,6 @@ For example:
     # MS-DOS, etc.
     perl -e "print \"Hello world\n\""
 
-    # Macintosh
-    print "Hello world\n"
-     (then Run "Myscript" or Shift-Command-R)
-
     # VMS
     perl -e "print ""Hello world\n"""
 
@@ -195,11 +185,6 @@ the command shell, this would probably work better:
 B<CMD.EXE> in Windows NT slipped a lot of standard Unix functionality in
 when nobody was looking, but just try to find documentation for its
 quoting rules.
-
-Under the Macintosh, it depends which environment you are using.  The MacPerl
-shell, or MPW, is much like Unix shells in its support for several
-quoting variants, except that it makes free use of the Macintosh's non-ASCII
-characters as control characters.
 
 There is no general solution to all of this.  It's just a mess.
 
@@ -322,6 +307,11 @@ that enabled the use of Unicode-aware "wide system call" Win32 APIs.
 This feature was practically unused, however, and the command line
 switch was therefore "recycled".)
 
+B<Note:> Since perl 5.10.0, the -C option can no longer be used
+on the #! line. It wasn't working there anyway, since the standard streams
+are already set up at this point in the execution of the perl interpreter.
+You can use binmode() instead to get the desired behaviour.
+
 =item B<-c>
 X<-c>
 
@@ -376,7 +366,7 @@ B<-D14> is equivalent to B<-Dtls>):
        16  o  Method and overloading resolution
        32  c  String/numeric conversions
        64  P  Print profiling info, source file input state
-      128  m  Memory allocation
+      128  m  Memory and SV allocation
       256  f  Format processing
       512  r  Regular expression parsing and execution
      1024  x  Syntax tree dump
@@ -392,6 +382,7 @@ B<-D14> is equivalent to B<-Dtls>):
   2097152  C  Copy On Write
   4194304  A  Consistency checks on internal structures
   8388608  q  quiet - currently only suppresses the "EXECUTING" message
+ 33554432  B  dump suBroutine definitions, including special Blocks like BEGIN
 
 All these flags require B<-DDEBUGGING> when you compile the Perl
 executable (but see L<Devel::Peek>, L<re> which may change this).
@@ -671,6 +662,14 @@ tells Perl that the program is embedded in a larger chunk of unrelated
 ASCII text, such as in a mail message.  Leading garbage will be
 discarded until the first line that starts with #! and contains the
 string "perl".  Any meaningful switches on that line will be applied.
+
+All references to line numbers by the program (warnings, errors, ...)
+will treat the #! line as the first line.
+Thus a warning on the 2nd line of the program (which is on the 100th
+line in the file) will be reported as line 2, and not as line 100.
+This can be overridden by using the #line directive.
+(See L<perlsyn/"Plain-Old-Comments-(Not!)">)
+
 If a directory name is specified, Perl will switch to that directory
 before running the program.  The B<-x> switch controls only the
 disposal of leading garbage.  The program must be terminated with
@@ -857,6 +856,9 @@ compiler's numeric file descriptor routines. There is an experimental native
 C<win32> layer which is expected to be enhanced and should eventually be
 the default under Win32.
 
+The PERLIO environment variable is completely ignored when perl
+is run in taint mode.
+
 =item PERLIO_DEBUG
 X<PERLIO_DEBUG>
 
@@ -881,12 +883,18 @@ A list of directories in which to look for Perl library
 files before looking in the standard library and the current directory.
 If PERL5LIB is defined, PERLLIB is not used.
 
+The PERLLIB environment variable is completely ignored when perl
+is run in taint mode.
+
 =item PERL5DB
 X<PERL5DB>
 
 The command used to load the debugger code.  The default is:
 
 	BEGIN { require 'perl5db.pl' }
+
+The PERL5DB environment variable only used when perl is started with
+a bare B<-d> switch.
 
 =item PERL5DB_THREADED
 X<PERL5DB_THREADED>
@@ -909,6 +917,11 @@ portability concerns.  Besides, perl can use a shell that may not be
 fit for interactive use, and setting COMSPEC to such a shell may
 interfere with the proper functioning of other programs (which usually
 look in COMSPEC to find a shell fit for interactive use).
+
+Before Perl 5.10.0 and 5.8.8, PERL5SHELL was not taint checked
+when running external commands.  It is recommended that
+you explicitly set (or delete) C<$ENV{PERL5SHELL}> when running
+in taint mode under Windows.
 
 =item PERL_ALLOW_NON_IFS_LSP (specific to the Win32 port)
 X<PERL_ALLOW_NON_IFS_LSP>

@@ -1,8 +1,6 @@
 #!./perl -w
 
-BEGIN 
-    require './test.pl'
-
+use Test::More
 
 plan tests => 2
 

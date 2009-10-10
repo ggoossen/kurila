@@ -1,5 +1,3 @@
-package Dummy;
+package Dummy
 
-$VERSION = '0.01';
-
-1;
+our $VERSION = '5.562'

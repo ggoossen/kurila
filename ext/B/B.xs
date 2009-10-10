@@ -236,7 +236,7 @@ PROTOTYPES: DISABLE
 BOOT:
 {
     HV *stash = gv_stashpvn("B", 1, GV_ADD);
-    AV *export_ok = perl_get_av("B::EXPORT_OK",TRUE);
+    AV *export_ok = perl_get_av("B::EXPORT_OK", GV_ADD);
     MY_CXT_INIT;
     specialsv_list[0] = Nullsv;
     specialsv_list[1] = &PL_sv_undef;
@@ -324,7 +324,7 @@ svref_2object(sv)
 	SV *	sv
     CODE:
 	if (!SvROK(sv))
-	    croak("argument is not a reference");
+	    croak(aTHX_ "argument is not a reference");
 	RETVAL = (SV*)SvRV(sv);
     OUTPUT:
 	RETVAL              
@@ -447,6 +447,8 @@ SvLOCATION(sv)
 	B::SV	sv
     CODE:
         RETVAL = SvREFCNT_inc(SvLOCATION(sv));
+        if (! RETVAL)
+            RETVAL = &PL_sv_undef;
     OUTPUT:
         RETVAL
 
@@ -504,7 +506,7 @@ RV(sv)
             RETVAL = SvRV(sv);
         }
         else {
-            croak( "argument is not SvROK" );
+            croak(aTHX_  "argument is not SvROK" );
         }
     OUTPUT:
         RETVAL
@@ -553,7 +555,7 @@ SvRV(sv)
             RETVAL = SvRV(sv);
         }
         else {
-            croak( "argument is not SvROK" );
+            croak(aTHX_  "argument is not SvROK" );
         }
     OUTPUT:
         RETVAL
@@ -660,7 +662,7 @@ MgREGEX(mg)
             RETVAL = MgREGEX(mg);
         }
         else {
-            croak( "REGEX is only meaningful on r-magic" );
+            croak(aTHX_  "REGEX is only meaningful on r-magic" );
         }
     OUTPUT:
         RETVAL
@@ -676,7 +678,7 @@ precomp(mg)
                 RETVAL = newSVpvn( RX_PRECOMP(rx), RX_PRELEN(rx) );
         }
         else {
-            croak( "precomp is only meaningful on r-magic" );
+            croak(aTHX_  "precomp is only meaningful on r-magic" );
         }
     OUTPUT:
         RETVAL
@@ -816,7 +818,7 @@ IsSTD(io,name)
 	    handle = PerlIO_stderr();
 	}
 	else {
-	    croak( "Invalid value '%s'", name );
+	    croak(aTHX_  "Invalid value '%s'", name );
 	}
 	RETVAL = handle == IoIFP(io);
     OUTPUT:

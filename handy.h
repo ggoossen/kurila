@@ -1,7 +1,7 @@
 /*    handy.h
  *
- *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1999,
- *    2000, 2001, 2002, 2004, 2005, 2006, by Larry Wall and others
+ *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1999, 2000,
+ *    2001, 2002, 2004, 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -48,6 +48,27 @@ Null SV pointer. (No longer available when C<PERL_CORE> is defined.)
 #define TRUE (1)
 #define FALSE (0)
 
+/* The MUTABLE_*() macros cast pointers to the types shown, in such a way
+ * (compiler permitting) that casting away const-ness will give a warning;
+ * e.g.:
+ *
+ * const SV *sv = ...;
+ * AV *av1 = (AV*)sv;        <== BAD:  the const has been silently cast away
+ * AV *av2 = MUTABLE_AV(sv); <== GOOD: it may warn
+ */
+
+#if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
+#  define MUTABLE_PTR(p) ({ void *_p = (p); _p; })
+#else
+#  define MUTABLE_PTR(p) ((void *) (p))
+#endif
+
+#define MUTABLE_AV(p)	((AV *)MUTABLE_PTR(p))
+#define MUTABLE_CV(p)	((CV *)MUTABLE_PTR(p))
+#define MUTABLE_GV(p)	((GV *)MUTABLE_PTR(p))
+#define MUTABLE_HV(p)	((HV *)MUTABLE_PTR(p))
+#define MUTABLE_IO(p)	((IO *)MUTABLE_PTR(p))
+#define MUTABLE_SV(p)	((SV *)MUTABLE_PTR(p))
 
 /* XXX Configure ought to have a test for a boolean type, if I can
    just figure out all the headers such a test needs.
@@ -176,10 +197,15 @@ typedef U64TYPE U64;
 #   endif
 #endif
 
-/* HMB H.Merijn Brand - a placeholder for preparing Configure patches */
-#if defined(LOCALTIME_R_NEEDS_TZSET) && defined(HAS_PSEUDOFORK) && defined(USE_DTRACE)
-/* Not (yet) used at top level, but mention them for metaconfig */
-#endif
+/* HMB H.Merijn Brand - a placeholder for preparing Configure patches:
+ * 
+ * USE_DTRACE	HAS_PSEUDOFORK	HAS_TIMEGM	LOCALTIME_R_NEEDS_TZSET	
+ * GMTIME_MAX	GMTIME_MIN	LOCALTIME_MAX	LOCALTIME_MIN
+ * HAS_CTIME64	HAS_LOCALTIME64	HAS_GMTIME64	HAS_DIFFTIME64
+ * HAS_MKTIME64	HAS_ASCTIME64	HAS_GETADDRINFO	HAS_GETNAMEINFO
+ * HAS_INETNTOP	HAS_INETPTON
+ * Not (yet) used at top level, but mention them for metaconfig
+ */
 
 /* Mention I8SIZE, U8SIZE, I16SIZE, U16SIZE, I32SIZE, U32SIZE,
    I64SIZE, and U64SIZE here so that metaconfig pulls them in. */
@@ -281,7 +307,7 @@ and omits the hash parameter.
 */
 
 /* concatenating with "" ensures that only literal strings are accepted as argument */
-#define STR_WITH_LEN(s)  (s ""), (sizeof(s)-1)
+#define STR_WITH_LEN(s)  ("" s ""), (sizeof(s)-1)
 
 /* note that STR_WITH_LEN() can't be used as argument to macros or functions that
  * under some configurations might be macros, which means that it requires the full
@@ -307,6 +333,8 @@ and omits the hash parameter.
   ((SV **)Perl_hv_common(aTHX_ (hv), NULL, STR_WITH_LEN(key), 0,	\
 			 (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV), (val), 0))
 
+#define get_cvs(str, flags)					\
+	Perl_get_cvn_flags(aTHX_ STR_WITH_LEN(str), (flags))
 
 /*
 =head1 Miscellaneous Functions
@@ -392,33 +420,36 @@ C<strncmp>).
 =head1 Character classes
 
 =for apidoc Am|bool|isALNUM|char ch
-Returns a boolean indicating whether the C C<char> is an ASCII alphanumeric
-character (including underscore) or digit.
+Returns a boolean indicating whether the C C<char> is a US-ASCII (Basic Latin)
+alphanumeric character (including underscore) or digit.
 
 =for apidoc Am|bool|isALPHA|char ch
-Returns a boolean indicating whether the C C<char> is an ASCII alphabetic
-character.
+Returns a boolean indicating whether the C C<char> is a US-ASCII (Basic Latin) 
+alphabetic character.
 
 =for apidoc Am|bool|isSPACE|char ch
-Returns a boolean indicating whether the C C<char> is whitespace.
+Returns a boolean indicating whether the C C<char> is a US-ASCII (Basic Latin)
+whitespace.
 
 =for apidoc Am|bool|isDIGIT|char ch
-Returns a boolean indicating whether the C C<char> is an ASCII
+Returns a boolean indicating whether the C C<char> is a US-ASCII (Basic Latin)
 digit.
 
 =for apidoc Am|bool|isUPPER|char ch
-Returns a boolean indicating whether the C C<char> is an uppercase
-character.
+Returns a boolean indicating whether the C C<char> is a US-ASCII (Basic Latin)
+uppercase character.
 
 =for apidoc Am|bool|isLOWER|char ch
-Returns a boolean indicating whether the C C<char> is a lowercase
-character.
+Returns a boolean indicating whether the C C<char> is a US-ASCII (Basic Latin)
+lowercase character.
 
 =for apidoc Am|char|toUPPER|char ch
-Converts the specified character to uppercase.
+Converts the specified character to uppercase.  Characters outside the
+US-ASCII (Basic Latin) range are viewed as not having any case.
 
 =for apidoc Am|char|toLOWER|char ch
-Converts the specified character to lowercase.
+Converts the specified character to lowercase.  Characters outside the
+US-ASCII (Basic Latin) range are viewed as not having any case.
 
 =cut
 */
@@ -528,7 +559,6 @@ Converts the specified character to lowercase.
 #define isDIGIT_uni(c)		is_uni_digit(c)
 #define isUPPER_uni(c)		is_uni_upper(c)
 #define isLOWER_uni(c)		is_uni_lower(c)
-#define isALNUMC_uni(c)		is_uni_alnumc(c)
 #define isASCII_uni(c)		is_uni_ascii(c)
 #define isCNTRL_uni(c)		is_uni_cntrl(c)
 #define isGRAPH_uni(c)		is_uni_graph(c)
@@ -550,7 +580,6 @@ Converts the specified character to lowercase.
 #define isDIGIT_LC_uvchr(c)	(c < 256 ? isDIGIT_LC(c) : is_uni_digit_lc(c))
 #define isUPPER_LC_uvchr(c)	(c < 256 ? isUPPER_LC(c) : is_uni_upper_lc(c))
 #define isLOWER_LC_uvchr(c)	(c < 256 ? isLOWER_LC(c) : is_uni_lower_lc(c))
-#define isALNUMC_LC_uvchr(c)	(c < 256 ? isALNUMC_LC(c) : is_uni_alnumc_lc(c))
 #define isCNTRL_LC_uvchr(c)	(c < 256 ? isCNTRL_LC(c) : is_uni_cntrl_lc(c))
 #define isGRAPH_LC_uvchr(c)	(c < 256 ? isGRAPH_LC(c) : is_uni_graph_lc(c))
 #define isPRINT_LC_uvchr(c)	(c < 256 ? isPRINT_LC(c) : is_uni_print_lc(c))
@@ -569,7 +598,6 @@ Converts the specified character to lowercase.
 #define isDIGIT_utf8(p)		is_utf8_digit(p)
 #define isUPPER_utf8(p)		is_utf8_upper(p)
 #define isLOWER_utf8(p)		is_utf8_lower(p)
-#define isALNUMC_utf8(p)	is_utf8_alnumc(p)
 #define isASCII_utf8(p)		is_utf8_ascii(p)
 #define isCNTRL_utf8(p)		is_utf8_cntrl(p)
 #define isGRAPH_utf8(p)		is_utf8_graph(p)
@@ -703,16 +731,20 @@ PoisonWith(0xEF) for catching access to freed memory.
 
 #define MEM_SIZE_MAX ((MEM_SIZE)~0)
 
+#  ifndef fatalcroak				/* make depend */
+#    define fatalcroak(mess)	(write(2, (mess), strlen(mess)), exit(2))
+#  endif 
+
 /* The +0.0 in MEM_WRAP_CHECK_ is an attempt to foil
  * overly eager compilers that will bleat about e.g.
  * (U16)n > (size_t)~0/sizeof(U16) always being false. */
 #ifdef PERL_MALLOC_WRAP
 #define MEM_WRAP_CHECK(n,t) MEM_WRAP_CHECK_1(n,t,PL_memory_wrap)
 #define MEM_WRAP_CHECK_1(n,t,a) \
-	(void)(sizeof(t) > 1 && ((MEM_SIZE)(n)+0.0) > MEM_SIZE_MAX/sizeof(t) && (Perl_croak_nocontext(a),0))
+	(void)(sizeof(t) > 1 && ((MEM_SIZE)(n)+0.0) > MEM_SIZE_MAX/sizeof(t) && (fatalcroak(a),0))
 #define MEM_WRAP_CHECK_(n,t) MEM_WRAP_CHECK(n,t),
 
-#define PERL_STRLEN_ROUNDUP(n) ((void)(((n) > MEM_SIZE_MAX - 2 * PERL_STRLEN_ROUNDUP_QUANTUM) ? (Perl_croak_nocontext(PL_memory_wrap),0):0),((n-1+PERL_STRLEN_ROUNDUP_QUANTUM)&~((MEM_SIZE)PERL_STRLEN_ROUNDUP_QUANTUM-1)))
+#define PERL_STRLEN_ROUNDUP(n) ((void)(((n) > MEM_SIZE_MAX - 2 * PERL_STRLEN_ROUNDUP_QUANTUM) ? (fatalcroak(PL_memory_wrap),0):0),((n-1+PERL_STRLEN_ROUNDUP_QUANTUM)&~((MEM_SIZE)PERL_STRLEN_ROUNDUP_QUANTUM-1)))
 
 #else
 
@@ -732,7 +764,7 @@ PoisonWith(0xEF) for catching access to freed memory.
  * which more importantly get the immediate calling environment (file and
  * line number, and C function name if available) passed in.  This info can
  * then be used for logging the calls, for which one gets a sample
- * implementation if PERL_MEM_LOG_STDERR is defined.
+ * implementation unless -DPERL_MEM_LOG_NOIMPL is also defined.
  *
  * Known problems:
  * - all memory allocs do not get logged, only those
@@ -754,13 +786,31 @@ PoisonWith(0xEF) for catching access to freed memory.
  *   (keyed by the allocation address?), and maintain that
  *   through reallocs and frees, but how to do that without
  *   any News() happening...?
+ * - lots of -Ddefines to get useful/controllable output
+ * - lots of ENV reads
  */
 
-Malloc_t Perl_mem_log_alloc(const UV n, const UV typesize, const char *typename, Malloc_t newalloc, const char *filename, const int linenumber, const char *funcname);
+PERL_EXPORT_C Malloc_t Perl_mem_log_alloc(const UV n, const UV typesize, const char *type_name, Malloc_t newalloc, const char *filename, const int linenumber, const char *funcname);
 
-Malloc_t Perl_mem_log_realloc(const UV n, const UV typesize, const char *typename, Malloc_t oldalloc, Malloc_t newalloc, const char *filename, const int linenumber, const char *funcname);
+PERL_EXPORT_C Malloc_t Perl_mem_log_realloc(const UV n, const UV typesize, const char *type_name, Malloc_t oldalloc, Malloc_t newalloc, const char *filename, const int linenumber, const char *funcname);
 
-Malloc_t Perl_mem_log_free(Malloc_t oldalloc, const char *filename, const int linenumber, const char *funcname);
+PERL_EXPORT_C Malloc_t Perl_mem_log_free(Malloc_t oldalloc, const char *filename, const int linenumber, const char *funcname);
+
+# ifdef PERL_CORE
+#  ifndef PERL_MEM_LOG_NOIMPL
+enum mem_log_type {
+  MLT_ALLOC,
+  MLT_REALLOC,
+  MLT_FREE,
+  MLT_NEW_SV,
+  MLT_DEL_SV
+};
+#  endif
+#  if defined(PERL_IN_SV_C)  /* those are only used in sv.c */
+void Perl_mem_log_new_sv(const SV *sv, const char *filename, const int linenumber, const char *funcname);
+void Perl_mem_log_del_sv(const SV *sv, const char *filename, const int linenumber, const char *funcname);
+#  endif
+# endif
 
 #endif
 
@@ -780,9 +830,9 @@ Malloc_t Perl_mem_log_free(Malloc_t oldalloc, const char *filename, const int li
 #define MEM_LOG_FREE(a)          (a)
 #endif
 
-#define Newx(v,n,t)	(v = (MEM_WRAP_CHECK_(n,t) MEM_LOG_ALLOC(n,t,(t*)safemalloc((MEM_SIZE)((n)*sizeof(t))))))
-#define Newxc(v,n,t,c)	(v = (MEM_WRAP_CHECK_(n,t) MEM_LOG_ALLOC(n,t,(c*)safemalloc((MEM_SIZE)((n)*sizeof(t))))))
-#define Newxz(v,n,t)	(v = (MEM_WRAP_CHECK_(n,t) MEM_LOG_ALLOC(n,t,(t*)safecalloc((n),sizeof(t)))))
+#define Newx(v,n,t)	(v = (MEM_WRAP_CHECK_(n,t) (t*)MEM_LOG_ALLOC(n,t,safemalloc((MEM_SIZE)((n)*sizeof(t))))))
+#define Newxc(v,n,t,c)	(v = (MEM_WRAP_CHECK_(n,t) (c*)MEM_LOG_ALLOC(n,t,safemalloc((MEM_SIZE)((n)*sizeof(t))))))
+#define Newxz(v,n,t)	(v = (MEM_WRAP_CHECK_(n,t) (t*)MEM_LOG_ALLOC(n,t,safecalloc((n),sizeof(t)))))
 
 #ifndef PERL_CORE
 /* pre 5.9.x compatibility */
@@ -792,9 +842,9 @@ Malloc_t Perl_mem_log_free(Malloc_t oldalloc, const char *filename, const int li
 #endif
 
 #define Renew(v,n,t) \
-	  (v = (MEM_WRAP_CHECK_(n,t) MEM_LOG_REALLOC(n,t,v,(t*)saferealloc((Malloc_t)(v),(MEM_SIZE)((n)*sizeof(t))))))
+	  (v = (MEM_WRAP_CHECK_(n,t) (t*)MEM_LOG_REALLOC(n,t,v,saferealloc((Malloc_t)(v),(MEM_SIZE)((n)*sizeof(t))))))
 #define Renewc(v,n,t,c) \
-	  (v = (MEM_WRAP_CHECK_(n,t) MEM_LOG_REALLOC(n,t,v,(c*)saferealloc((Malloc_t)(v),(MEM_SIZE)((n)*sizeof(t))))))
+	  (v = (MEM_WRAP_CHECK_(n,t) (c*)MEM_LOG_REALLOC(n,t,v,saferealloc((Malloc_t)(v),(MEM_SIZE)((n)*sizeof(t))))))
 
 #ifdef PERL_POISON
 #define Safefree(d) \

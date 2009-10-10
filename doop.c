@@ -1,7 +1,7 @@
 /*    doop.c
  *
- *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
- *    2000, 2001, 2002, 2004, 2005, 2006, 2007, by Larry Wall and others
+ *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+ *    2001, 2002, 2004, 2005, 2006, 2007, 2008, 2009 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -9,7 +9,9 @@
  */
 
 /*
- * "'So that was the job I felt I had to do when I started,' thought Sam."
+ *  'So that was the job I felt I had to do when I started,' thought Sam.
+ *
+ *     [p.934 of _The Lord of the Rings_, VI/iii: "Mount Doom"]
  */
 
 /* This file contains some common functions needed to carry out certain
@@ -63,7 +65,7 @@ Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV *av)
 	items = av_len(svTav(av)) + 1;
     }
 
-    sv_setpvn(sv, "", 0);
+    sv_setpvs(sv, "");
 
     if (items-- > 0) {
 	if (*mark)
@@ -331,18 +333,18 @@ Perl_do_chop(pTHX_ register SV *astr, register SV *sv)
 
     if (SvTYPE(sv) == SVt_PVAV) {
 	register I32 i;
-	AV* const av = (AV*)sv;
+	AV *const av = MUTABLE_AV(sv);
 	const I32 max = AvFILL(av);
 
 	for (i = 0; i <= max; i++) {
-	    sv = (SV*)av_fetch(av, i, FALSE);
+	    sv = MUTABLE_SV(av_fetch(av, i, FALSE));
 	    if (sv && ((sv = *(SV**)sv), sv != &PL_sv_undef))
 		do_chop(astr, sv);
 	}
         return;
     }
     else if (SvTYPE(sv) == SVt_PVHV) {
-	HV* const hv = (HV*)sv;
+	HV* const hv = MUTABLE_HV(sv);
 	HE* entry;
         (void)hv_iterinit(hv);
         while ((entry = hv_iternext(hv)))
@@ -355,12 +357,12 @@ Perl_do_chop(pTHX_ register SV *astr, register SV *sv)
 	    sv_force_normal_flags(sv, 0);
         }
         if (SvREADONLY(sv))
-            Perl_croak(aTHX_ PL_no_modify);
+            Perl_croak(aTHX_ "%s", PL_no_modify);
     }
 
     s = SvPV(sv, len);
     if (len && !SvPOK(sv))
-	s = SvPV_force(sv, len);
+	s = SvPV_force_nomg(sv, len);
     if (IN_CODEPOINTS) {
 	if (s && len) {
 	    char * const send = s + len;
@@ -376,7 +378,7 @@ Perl_do_chop(pTHX_ register SV *astr, register SV *sv)
 	    }
 	}
 	else
-	    sv_setpvn(astr, "", 0);
+	    sv_setpvs(astr, "");
     }
     else if (s && len) {
 	s += --len;
@@ -386,7 +388,7 @@ Perl_do_chop(pTHX_ register SV *astr, register SV *sv)
 	SvNIOK_off(sv);
     }
     else
-	sv_setpvn(astr, "", 0);
+	sv_setpvs(astr, "");
     SvSETMAGIC(sv);
 }
 
@@ -409,18 +411,18 @@ Perl_do_chomp(pTHX_ register SV *sv)
     count = 0;
     if (SvTYPE(sv) == SVt_PVAV) {
 	register I32 i;
-	AV* const av = (AV*)sv;
+	AV *const av = MUTABLE_AV(sv);
 	const I32 max = AvFILL(av);
 
 	for (i = 0; i <= max; i++) {
-	    sv = (SV*)av_fetch(av, i, FALSE);
+	    sv = MUTABLE_SV(av_fetch(av, i, FALSE));
 	    if (sv && ((sv = *(SV**)sv), sv != &PL_sv_undef))
 		count += do_chomp(sv);
 	}
         return count;
     }
     else if (SvTYPE(sv) == SVt_PVHV) {
-	HV* const hv = (HV*)sv;
+	HV* const hv = MUTABLE_HV(sv);
 	HE* entry;
         (void)hv_iterinit(hv);
         while ((entry = hv_iternext(hv)))
@@ -433,7 +435,7 @@ Perl_do_chomp(pTHX_ register SV *sv)
 	    sv_force_normal_flags(sv, 0);
         }
         if (SvREADONLY(sv))
-            Perl_croak(aTHX_ PL_no_modify);
+            Perl_croak(aTHX_ "%s", PL_no_modify);
     }
 
     s = SvPV(sv, len);
@@ -510,7 +512,7 @@ Perl_do_vop(pTHX_ I32 optype, SV *sv, SV *left, SV *right)
     PERL_ARGS_ASSERT_DO_VOP;
 
     if (sv != left || (optype != OP_BIT_AND && !SvOK(sv)))
-	sv_setpvn(sv, "", 0);	/* avoid undef warning on |= and ^= */
+	sv_setpvs(sv, "");	/* avoid undef warning on |= and ^= */
     lsave = lc = SvPV_const(left, leftlen);
     rsave = rc = SvPV_const(right, rightlen);
 
@@ -613,7 +615,7 @@ Perl_do_kv(pTHX)
 {
     dVAR;
     dSP;
-    HV * const hv = (HV*)POPs;
+    HV * const hv = MUTABLE_HV(POPs);
     HV *keys;
     register HE *entry;
     const I32 gimme = GIMME_V;

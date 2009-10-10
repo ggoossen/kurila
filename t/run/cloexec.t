@@ -32,9 +32,12 @@
 # on Windows, they are not native OS handles, and so are not inherited
 # across an exec (though native Windows file handles are).
 
+BEGIN
+    chdir 't' if -d 't'
+    $^INCLUDE_PATH = @: '../lib'
+
 BEGIN 
     require './test.pl'
-
 
 BEGIN 
     use Config
@@ -165,4 +168,3 @@ END
     defined $tmperr   and unlink($tmperr)
     defined $tmpfile1 and unlink($tmpfile1)
     defined $tmpfile2 and unlink($tmpfile2)
-

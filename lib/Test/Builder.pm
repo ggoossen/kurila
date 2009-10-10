@@ -182,7 +182,6 @@ sub plan($self, $cmd, ?$arg)
     else
         my @args = grep { defined }, @:  ($cmd, $arg)
         die("plan() doesn't understand $(join ' ',@args)")
-    
 
     return 1
 
@@ -434,6 +433,12 @@ sub is_eq($self, $got, $expect, ?$name)
         $self->_is_diag($got, '\==', $expect) unless $test
         return $test
     
+    if (ref::svtype($got) eq 'CODE' and ref::svtype($expect) eq 'CODE')
+        my $test = $got &== $expect
+
+        $self->ok($test, $name)
+        $self->_is_diag($got, '&==', $expect) unless $test
+        return $test
 
     return $self->cmp_ok($got, 'eq', $expect, $name)
 
@@ -790,14 +795,13 @@ sub maybe_regex($self, $regex)
     # Check for qr/foo/
     if (re::is_regexp($regex))
         $usable_regex = $regex
+    # Check for '/foo/' or 'm,foo,'
     elsif( (@: ?$re, ?$opts)        = (@: $regex =~ m{^ /(.*)/ (\w*) $ }sx)           or
         (@: ?_, ?$re, ?$opts) = @: $regex =~ m,^ m([^\w\s]) (.+) \1 (\w*) $,sx
         )
         $usable_regex = length $opts ?? "(?$opts)$re" !! $re
-    
 
     return $usable_regex
-
 
 
 sub _is_qr
@@ -805,7 +809,7 @@ sub _is_qr
 
     # is_regexp() checks for regexes in a robust manner, say if they're
     # blessed.
-    return re::is_regexp($regex) if defined &re::is_regexp
+    return re::is_regexp($regex) if exists &re::is_regexp
     return ref $regex eq 'Regexp'
 
 
@@ -1245,7 +1249,6 @@ sub _dup_stdhandles
     $self->output        ($Testout)
     $self->failure_output($Testerr)
     $self->todo_output   ($Testout)
-
 
 
 my $Opened_Testhandles = 0

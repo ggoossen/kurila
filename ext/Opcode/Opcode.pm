@@ -296,7 +296,7 @@ invert_opset function.
 
 =item :base_core
 
-    root null stub scalar pushmark const defined undef
+    root null stub scalar pushmark const var defined undef
 
     rv2sv sassign logassign_assign dotdotdot placeholder
 
@@ -312,7 +312,7 @@ invert_opset function.
     not complement
 
     lt i_lt gt i_gt le i_le ge i_ge eq i_eq ne i_ne ncmp i_ncmp
-    seq sne scmp ref_eq ref_ne
+    seq sne scmp ref_eq ref_ne code_eq code_ne
 
     substr vec stringify study pos length index rindex ord chr
 

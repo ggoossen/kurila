@@ -1,4 +1,18 @@
 #!/usr/bin/perl -w
+# 
+# Regenerate (overwriting only if changed):
+#
+#    opcode.h
+#    opnames.h
+#    pp_proto.h
+#    pp.sym
+#
+# from information stored in the DATA section of this file, plus the
+# values hardcoded into this script in @raw_alias.
+#
+# Accepts the standard regen_lib -q and -v args.
+#
+# This script is normally invoked from regen.pl.
 
 use kurila
 
@@ -48,6 +62,8 @@ my @raw_alias = @:
     Perl_unimplemented_op => \qw(mapstart custom root)
     # All the ops with a body of { return NORMAL; }
     Perl_pp_null => \qw(scalar regcmaybe lineseq scope)
+
+    Perl_pp_const => \qw(var)
 
     Perl_pp_require => \(@: 'evalfile')
     Perl_pp_sysread => \qw(read recv)
@@ -130,7 +146,7 @@ print $on, <<"END"
  *    opnames.h
  *
  *    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
- *    2007 by Larry Wall and others
+ *    2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -608,6 +624,7 @@ pushmark	pushmark		ck_null		s0
 logassign_assign		assignment part of a logical assignment	ck_null		0	
 
 const		constant item		ck_svconst	s$	
+var		variable item		ck_null	s$	
 
 gvsv		scalar variable		ck_null		ds$	
 gv		glob value		ck_null		ds$	
@@ -710,6 +727,9 @@ i_ncmp		integer comparison (<+>)	ck_null		ifst2	S S
 ref_eq		ref eq		ck_null		is2	S S
 ref_ne		ref ne		ck_null		is2	S S
 
+code_eq		code eq		ck_null		is2	S S
+code_ne		code ne		ck_null		is2	S S
+
 seq		string eq		ck_null		ifs2	S S
 sne		string ne		ck_null		ifs2	S S
 scmp		string comparison (cmp)	ck_null		ifst2	S S
@@ -808,7 +828,7 @@ splice		splice			ck_fun		m@	A S? S? L
 push		push			ck_lfun		ims@	S L
 pop		pop			ck_shift	s%	S?
 shift		shift			ck_shift	s%	S?
-unshift		unshift			ck_lfun		ims@	S L
+unshift		unshift			ck_lfun		imst@	S L
 sort		sort			ck_sort		dm@	C? L
 reverse		reverse			ck_fun		ts@	S
 arrayjoin	array join (@+:)	ck_fun		ts@	S
@@ -818,10 +838,10 @@ hashconcat	hash concat (+%+)	ck_null		ts@	S S
 emptyarray	new empty anonymous array ($@)	ck_null		s0	
 emptyhash	new empty anonymous hash ($%)	ck_null		s0	
 
-grepstart	grep			ck_grep		dms@	C L
+grepstart	grep			ck_grep		dms@	C S
 grepwhile	grep iterator		ck_null		dt|	
 
-mapstart	map			ck_grep		dms@	C L
+mapstart	map			ck_grep		dms@	C S
 mapwhile	map iterator		ck_null		dt|
 
 # Range stuff.

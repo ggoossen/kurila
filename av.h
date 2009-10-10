@@ -1,33 +1,19 @@
 /*    av.h
  *
- *    Copyright (C) 1991, 1992, 1993, 1995, 1996, 1997, 1998, 1999,
- *    2000, 2001, 2002, 2005, 2006, 2007, by Larry Wall and others
+ *    Copyright (C) 1991, 1992, 1993, 1995, 1996, 1997, 1998, 1999, 2000,
+ *    2001, 2002, 2005, 2006, 2007, 2008, by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
  *
  */
 
-#define _XPVAV_ALLOCATED_HEAD						\
-    SSize_t	xav_fill;       /* Index of last element present */	\
-    SSize_t	xav_max         /* max index for which array has space */
-
-#define _XPVAV_HEAD	\
-    union _xnvu xnv_u;	\
-    _XPVAV_ALLOCATED_HEAD
-
 struct xpvav {
-    _XPVAV_HEAD;
+    union _xnvu xnv_u;
+    SSize_t	xav_fill;       /* Index of last element present */
+    SSize_t	xav_max;        /* max index for which array has space */
     _XPVMG_HEAD;
 };
-
-typedef struct {
-    _XPVAV_ALLOCATED_HEAD;
-    _XPVMG_HEAD;
-} xpvav_allocated;
-
-#undef _XPVAV_ALLOCATED_HEAD
-#undef _XPVAV_HEAD
 
 /* SV**	xav_alloc; */
 #define xav_alloc xiv_u.xivu_p1
@@ -94,7 +80,7 @@ Creates a new AV.  The reference count is set to 1.
 =cut
 */
 
-#define newAV()	((AV *)newSV_type(SVt_PVAV))
+#define newAV()	MUTABLE_AV(newSV_type(SVt_PVAV))
 
 
 /*

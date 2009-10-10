@@ -1,7 +1,7 @@
 /*    cop.h
  *
- *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006 by Larry Wall and others
+ *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+ *    2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -156,10 +156,10 @@ struct cop {
    /* cop_stash is not refcounted */
 #  define CopSTASHPV_set(c,pv)	CopSTASH_set((c), gv_stashpv(pv,GV_ADD))
 #  define CopSTASH_eq(c,hv)	(CopSTASH(c) == (hv))
-#  define CopLABEL_alloc(pv)	((pv)?savepv(pv):NULL)
-#  define CopLABEL_set(c,pv)	(CopLABEL(c) = (pv))
 #  define CopSTASH_free(c)	
 #  define CopFILE_free(c)	(SvREFCNT_dec(CopFILEGV(c)),(CopFILEGV(c) = NULL))
+#  define CopLABEL_alloc(pv)	((pv)?savepv(pv):NULL)
+#  define CopLABEL_set(c,pv)	(CopLABEL(c) = (pv))
 #  define CopLABEL_free(c)	(Safefree(CopLABEL(c)),(CopLABEL(c) = NULL))
 
 #define CopSTASH_ne(c,hv)	(!CopSTASH_eq(c,hv))
@@ -190,10 +190,10 @@ struct block_sub {
 
 #define PUSHSUB_BASE(cx)						\
 	ENTRY_PROBE(NULL,		       			\
-		CopFILE((COP*)CvSTART(cv)),				\
-		CopLINE((COP*)CvSTART(cv)));				\
+		CopFILE((const COP*)CvSTART(cv)),				\
+		CopLINE((const COP*)CvSTART(cv)));				\
 									\
-	cx->blk_sub.cv = CvREFCNT_inc(cv);				\
+	cx->blk_sub.cv = svTcv(newSVsv(cvTsv(cv)));			\
 	cx->blk_sub.olddepth = CvDEPTH(cv);				\
 	cx->cx_type |= (hasargs) ? CXp_HASARGS : 0;			\
 	cx->blk_sub.retop = NULL;
@@ -349,10 +349,10 @@ struct block {
 #define blk_eval	cx_u.cx_blk.blk_u.blku_eval
 #define blk_loop	cx_u.cx_blk.blk_u.blku_loop
 
-#define PUSHBLOCK(cx,t,sp) cx = PushBlock(t,sp,gimme)
+#define PUSHBLOCK(cx,t,sp) cx = push_block(t,sp,gimme)
 
 /* Exit a block (RETURN and LAST). */
-#define POPBLOCK(cx,pm) cx = PopBlock();	\
+#define POPBLOCK(cx,pm) cx = pop_block();	\
    newsp		 = PL_stack_base + cx->blk_oldsp; \
    pm		         = cx->blk_oldpm; \
    gimme		 = cx->blk_gimme; \
@@ -439,6 +439,8 @@ struct context {
 #define CXt_SUB		7
 #define CXt_EVAL        8
 #define CXt_SUBST       9
+#define CXt_XSSUB     0xa
+#define CXt_TRY       0xb
 /* SUBST doesn't feature in all switch statements.  */
 
 /* private flags for CXt_SUB and CXt_NULL
@@ -451,10 +453,6 @@ struct context {
 /* private flags for CXt_SUB */
 #define CXp_HASARGS	0x20
 
-/* private flags for CXt_EVAL */
-#define CXp_REAL	0x20	/* truly eval'', not a lookalike */
-#define CXp_TRYBLOCK	0x40	/* eval{}, not eval'' or similar */
-
 /* private flags for CXt_LOOP */
 #define CXp_FOR_DEF	0x10	/* foreach using $_ */
 
@@ -465,10 +463,6 @@ struct context {
 #define CxTYPE_is_LOOP(c)	(((c)->cx_type & 0xC) == 0x4)
 #define CxMULTICALL(c)	(((c)->cx_type & CXp_MULTICALL)			\
 			 == CXp_MULTICALL)
-#define CxREALEVAL(c)	(((c)->cx_type & (CXTYPEMASK|CXp_REAL))		\
-			 == (CXt_EVAL|CXp_REAL))
-#define CxTRYBLOCK(c)	(((c)->cx_type & (CXTYPEMASK|CXp_TRYBLOCK))	\
-			 == (CXt_EVAL|CXp_TRYBLOCK))
 #define CxFOREACH(c)	(CxTYPE_is_LOOP(c) && CxTYPE(c) != CXt_LOOP_PLAIN)
 #define CxFOREACHDEF(c)	((CxTYPE_is_LOOP(c) && CxTYPE(c) != CXt_LOOP_PLAIN) \
 			 && ((c)->cx_type & CXp_FOR_DEF))
@@ -554,6 +548,9 @@ struct stackinfo {
     I32			si_markoff;	/* offset where markstack begins for us.
 					 * currently used only with DEBUGGING,
 					 * but not #ifdef-ed for bincompat */
+#ifdef DEBUGGING
+    U32                 olddebug;       /* previous value of PL_debug */           
+#endif
 };
 
 typedef struct stackinfo PERL_SI;
@@ -569,38 +566,12 @@ typedef struct stackinfo PERL_SI;
 #  define	SET_MARK_OFFSET NOOP
 #endif
 
-#define PUSHSTACKi(type) \
-    STMT_START {							\
-	PERL_SI *next = PL_curstackinfo->si_next;			\
-	if (!next) {							\
-	    next = new_stackinfo(32, 2048/sizeof(PERL_CONTEXT) - 1);	\
-	    next->si_prev = PL_curstackinfo;				\
-	    PL_curstackinfo->si_next = next;				\
-	}								\
-	next->si_type = type;						\
-	next->si_cxix = -1;						\
-	AvFILLp(next->si_stack) = 0;					\
-	SWITCHSTACK(PL_curstack,next->si_stack);			\
-	PL_curstackinfo = next;						\
-	SET_MARK_OFFSET;						\
-    } STMT_END
-
+#define PUSHSTACKi(type) push_stack(type, &sp)
 #define PUSHSTACK PUSHSTACKi(PERLSI_UNKNOWN)
 
 /* POPSTACK works with PL_stack_sp, so it may need to be bracketed by
  * PUTBACK/SPAGAIN to flush/refresh any local SP that may be active */
-#define POPSTACK \
-    STMT_START {							\
-	dSP;								\
-	PERL_SI * const prev = PL_curstackinfo->si_prev;		\
-	if (!prev) {							\
-	    PerlIO_printf(Perl_error_log, "panic: POPSTACK\n");		\
-	    my_exit(1);							\
-	}								\
-	SWITCHSTACK(PL_curstack,prev->si_stack);			\
-	/* don't free prev here, free them all at the END{} */		\
-	PL_curstackinfo = prev;						\
-    } STMT_END
+#define POPSTACK pop_stack()
 
 #define POPSTACK_TO(s) \
     STMT_START {							\

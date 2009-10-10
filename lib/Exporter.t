@@ -20,14 +20,11 @@ sub ok($ok, $name)
     return $ok
 
 
-
 BEGIN 
     $test = 1
-    print $^STDOUT, "1..26\n"
+    print $^STDOUT, "1..25\n"
     require Exporter
     ok( 1, 'Exporter compiled' )
-
-
 
 our @Exporter_Methods
 
@@ -38,8 +35,6 @@ BEGIN
                            require_version
                            export_fail
                           )
-
-
 
 do
     package Testing
@@ -96,7 +91,7 @@ do
     package Foo
     Testing->import
 
-    main::ok( defined &lifejacket,      'simple import' )
+    main::ok( exists &lifejacket,      'simple import' )
 
     my $got = try {lifejacket( < @_ )}
     main::ok ( $^EVAL_ERROR eq "", 'check we can call the imported subroutine')
@@ -137,7 +132,7 @@ main::ok( (!grep { eval "!defined $_" }, map { m/^\w/ ?? "&$_" !! $_ },
 package Arrr
 Testing->import( <qw(!lifejacket))
 
-main::ok( !defined &lifejacket,     'deny import by !' )
+main::ok( !exists &lifejacket,     'deny import by !' )
 
 
 package Mars
@@ -154,7 +149,7 @@ Testing->import('!/e/')
 main::ok( (!grep { eval "defined $_" }, map { m/^\w/ ?? "&$_" !! $_ },
            grep { m/e/ }, (@:  < @Testing::EXPORT, < @Testing::EXPORT_OK)),
           'deny import by regex')
-main::ok( !defined &lifejacket, 'further denial' )
+main::ok( !exists &lifejacket, 'further denial' )
 
 
 do
@@ -192,11 +187,4 @@ main::ok(\&import \== \&Exporter::import, "imported the import routine")
 
 our @EXPORT = qw( wibble )
 sub wibble {return "wobble"};
-
-package Use::The::Import
-
-The::Import->import
-
-my $val = try { wibble() }
-main::ok($val eq "wobble", "exported importer worked")
 

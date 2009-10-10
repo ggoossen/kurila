@@ -158,9 +158,9 @@ sv_to_wstr(pTHX_ SV *sv)
     char *str = SvPV(sv, len);
     UINT cp = CP_UTF8;
 
-    wlen = MultiByteToWideChar(cp, 0, str, len+1, NULL, 0);
+    wlen = MultiByteToWideChar(cp, 0, str, (int)(len+1), NULL, 0);
     New(0, wstr, wlen, WCHAR);
-    MultiByteToWideChar(cp, 0, str, len+1, wstr, wlen);
+    MultiByteToWideChar(cp, 0, str, (int)(len+1), wstr, wlen);
 
     return wstr;
 }
@@ -171,7 +171,7 @@ sv_to_wstr(pTHX_ SV *sv)
 SV *
 wstr_to_sv(pTHX_ WCHAR *wstr)
 {
-    size_t wlen = wcslen(wstr)+1;
+    int wlen = (int)wcslen(wstr)+1;
     BOOL use_default = FALSE;
     int len = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, wstr, wlen, NULL, 0, NULL, NULL);
     SV *sv = sv_2mortal(newSV(len));
@@ -302,7 +302,7 @@ my_ansipath(const WCHAR *widename)
 {
     char *name;
     BOOL use_default = FALSE;
-    size_t widelen = wcslen(widename)+1;
+    int widelen = (int)wcslen(widename)+1;
     int len = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, widename, widelen,
                                   NULL, 0, NULL, NULL);
     New(0, name, len, char);
@@ -619,8 +619,8 @@ XS(w32_InitiateSystemShutdown)
     }
 
     message = SvPV_nolen(ST(1));
-    bRet = InitiateSystemShutdownA(machineName, message,
-                                   SvIV(ST(2)), SvIV(ST(3)), SvIV(ST(4)));
+    bRet = InitiateSystemShutdownA(machineName, message, (DWORD)SvIV(ST(2)),
+                                   (BOOL)SvIV(ST(3)), (BOOL)SvIV(ST(4)));
 
     /* Disable shutdown privilege. */
     tkp.Privileges[0].Attributes = 0; 
@@ -680,7 +680,7 @@ XS(w32_MsgBox)
 	croak("usage: Win32::MsgBox($message [, $flags [, $title]]);\n");
 
     if (items > 1)
-        flags = SvIV(ST(1));
+        flags = (DWORD)SvIV(ST(1));
 
     if (IsWin2000()) {
         WCHAR *title = NULL;
@@ -710,7 +710,11 @@ XS(w32_LoadLibrary)
     if (items != 1)
 	croak("usage: Win32::LoadLibrary($libname)\n");
     hHandle = LoadLibraryA(SvPV_nolen(ST(0)));
-    XSRETURN_IV((long)hHandle);
+#ifdef _WIN64
+    XSRETURN_IV((DWORD_PTR)hHandle);
+#else
+    XSRETURN_IV((DWORD)hHandle);
+#endif
 }
 
 XS(w32_FreeLibrary)
@@ -804,7 +808,7 @@ XS(w32_GuidGen)
     if (SUCCEEDED(hr)) {
 	LPOLESTR pStr = NULL;
 	if (SUCCEEDED(StringFromCLSID(&guid, &pStr))) {
-            WideCharToMultiByte(CP_ACP, 0, pStr, wcslen(pStr), szGUID,
+            WideCharToMultiByte(CP_ACP, 0, pStr, (int)wcslen(pStr), szGUID,
                                 sizeof(szGUID), NULL, NULL);
             CoTaskMemFree(pStr);
             XSRETURN_PV(szGUID);
@@ -825,7 +829,7 @@ XS(w32_GetFolderPath)
     if (items != 1 && items != 2)
 	croak("usage: Win32::GetFolderPath($csidl [, $create])\n");
 
-    folder = SvIV(ST(0));
+    folder = (int)SvIV(ST(0));
     if (items == 2)
         create = SvTRUE(ST(1)) ? CSIDL_FLAG_CREATE : 0;
 
@@ -1108,7 +1112,7 @@ XS(w32_SetLastError)
     dXSARGS;
     if (items != 1)
 	Perl_croak(aTHX_ "usage: Win32::SetLastError($error)");
-    SetLastError(SvIV(ST(0)));
+    SetLastError((DWORD)SvIV(ST(0)));
     XSRETURN_EMPTY;
 }
 
@@ -1241,17 +1245,17 @@ XS(w32_GetOSVersion)
     if (GIMME_V == G_SCALAR) {
         XSRETURN_IV(g_osver.dwPlatformId);
     }
-    mXPUSHp(g_osver.szCSDVersion, strlen(g_osver.szCSDVersion));
+    XPUSHs(sv_2mortal(newSVpvn(g_osver.szCSDVersion, strlen(g_osver.szCSDVersion))));
 
-    mXPUSHi(g_osver.dwMajorVersion);
-    mXPUSHi(g_osver.dwMinorVersion);
-    mXPUSHi(g_osver.dwBuildNumber);
-    mXPUSHi(g_osver.dwPlatformId);
+    XPUSHs(sv_2mortal(newSViv(g_osver.dwMajorVersion)));
+    XPUSHs(sv_2mortal(newSViv(g_osver.dwMinorVersion)));
+    XPUSHs(sv_2mortal(newSViv(g_osver.dwBuildNumber)));
+    XPUSHs(sv_2mortal(newSViv(g_osver.dwPlatformId)));
     if (g_osver_ex) {
-        mXPUSHi(g_osver.wServicePackMajor);
-        mXPUSHi(g_osver.wServicePackMinor);
-        mXPUSHi(g_osver.wSuiteMask);
-        mXPUSHi(g_osver.wProductType);
+        XPUSHs(sv_2mortal(newSViv(g_osver.wServicePackMajor)));
+        XPUSHs(sv_2mortal(newSViv(g_osver.wServicePackMinor)));
+        XPUSHs(sv_2mortal(newSViv(g_osver.wSuiteMask)));
+        XPUSHs(sv_2mortal(newSViv(g_osver.wProductType)));
     }
     PUTBACK;
 }
@@ -1280,7 +1284,7 @@ XS(w32_FormatMessage)
 	Perl_croak(aTHX_ "usage: Win32::FormatMessage($errno)");
 
     if (FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM,
-                       &source, SvIV(ST(0)), 0,
+                       &source, (DWORD)SvIV(ST(0)), 0,
                        msgbuf, sizeof(msgbuf)-1, NULL))
     {
         XSRETURN_PV(msgbuf);
@@ -1377,7 +1381,7 @@ XS(w32_GetShortPathName)
     do {
 	len = GetShortPathName(SvPVX(shortpath),
 			       SvPVX(shortpath),
-			       SvLEN(shortpath));
+			       (DWORD)SvLEN(shortpath));
     } while (len >= SvLEN(shortpath) && sv_grow(shortpath,len+1));
     if (len) {
 	SvCUR_set(shortpath,len);
@@ -1442,17 +1446,6 @@ XS(w32_GetFullPathName)
     else {
         fullname = PerlDir_mapA(SvPV_nolen(ST(0)));
     }
-#  if PERL_VERSION < 8
-    {
-        /* PerlDir_mapX() in Perl 5.6 used to return forward slashes */
-        char *str = fullname;
-        while (*str) {
-            if (*str == '/')
-                *str = '\\';
-            ++str;
-        }
-    }
-#  endif
 #endif
 
     /* GetFullPathName() on Windows NT drops trailing backslash */
@@ -1546,7 +1539,7 @@ XS(w32_Sleep)
     dXSARGS;
     if (items != 1)
 	Perl_croak(aTHX_ "usage: Win32::Sleep($milliseconds)");
-    Sleep(SvIV(ST(0)));
+    Sleep((DWORD)SvIV(ST(0)));
     XSRETURN_YES;
 }
 
@@ -1576,6 +1569,13 @@ XS(w32_OutputDebugString)
         Safefree(str);
 
     XSRETURN_EMPTY;
+}
+
+XS(w32_GetCurrentProcessId)
+{
+    dXSARGS;
+    EXTEND(SP,1);
+    XSRETURN_IV(GetCurrentProcessId());
 }
 
 XS(w32_GetCurrentThreadId)
@@ -1689,6 +1689,7 @@ BOOT:
     newXS("Win32::CopyFile", w32_CopyFile, file);
     newXS("Win32::Sleep", w32_Sleep, file);
     newXS("Win32::OutputDebugString", w32_OutputDebugString, file);
+    newXS("Win32::GetCurrentProcessId", w32_GetCurrentProcessId, file);
     newXS("Win32::GetCurrentThreadId", w32_GetCurrentThreadId, file);
     newXS("Win32::CreateDirectory", w32_CreateDirectory, file);
     newXS("Win32::CreateFile", w32_CreateFile, file);

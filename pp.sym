@@ -50,6 +50,7 @@ Perl_pp_scalar
 Perl_pp_pushmark
 Perl_pp_logassign_assign
 Perl_pp_const
+Perl_pp_var
 Perl_pp_gvsv
 Perl_pp_gv
 Perl_pp_gelem
@@ -121,6 +122,8 @@ Perl_pp_ncmp
 Perl_pp_i_ncmp
 Perl_pp_ref_eq
 Perl_pp_ref_ne
+Perl_pp_code_eq
+Perl_pp_code_ne
 Perl_pp_seq
 Perl_pp_sne
 Perl_pp_scmp

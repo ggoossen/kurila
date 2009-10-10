@@ -1,6 +1,6 @@
 /*    perly.c
  *
- *    Copyright (c) 2004, 2005, 2006, 2007, by Larry Wall and others
+ *    Copyright (c) 2004, 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -273,15 +273,13 @@ S_clear_yystack(pTHX_  const yy_parser *parser)
 
     for (i=0; i< parser->yylen; i++) {
 	LEAVE_SCOPE(ps[-i].savestack_ix);
-	if (yy_type_tab[yystos[ps[-i].state]] == toketype_opval
-	    && ps[-i].val.opval) {
-	    if ( ! (ps[-i].val.opval->op_attached
-		    && !ps[-i].val.opval->op_latefreed))
-	    {
-		if (ps[-i].comppad != PL_comppad) {
-		    PAD_RESTORE_LOCAL(ps[-i].comppad);
-		}
-		op_free(ps[-i].val.opval);
+	if (yy_type_tab[yystos[ps[-i].state]] == toketype_opval) {
+	    if( ps[-i].val.opval) {
+		if ( ! (ps[-i].val.opval->op_attached
+			&& !ps[-i].val.opval->op_latefreed))
+		    {
+			op_free(ps[-i].val.opval);
+		    }
 	    }
 	}
     }
@@ -291,14 +289,12 @@ S_clear_yystack(pTHX_  const yy_parser *parser)
 
     while (ps > parser->stack) {
 	LEAVE_SCOPE(ps->savestack_ix);
-	if (yy_type_tab[yystos[ps->state]] == toketype_opval
-	    && ps->val.opval)
-	{
-	    if (ps->comppad != PL_comppad) {
-		PAD_RESTORE_LOCAL(ps->comppad);
+	if (yy_type_tab[yystos[ps->state]] == toketype_opval) {
+	    PAD_RESTORE_LOCAL(ps->comppad);
+	    if (ps->val.opval) {
+		YYDPRINTF ((Perl_debug_log, "(freeing op)\n"));
+		op_free(ps->val.opval);
 	    }
-	    YYDPRINTF ((Perl_debug_log, "(freeing op)\n"));
-	    op_free(ps->val.opval);
 	}
 	ps--;
     }
@@ -346,7 +342,7 @@ Perl_yyparse (pTHX)
     parser = PL_parser;
     ps = parser->ps;
 
-    ENTER;  /* force parser stack cleanup before we return */
+    ENTER_named("yyparse");  /* force parser stack cleanup before we return */
     SAVEDESTRUCTOR_X(S_clear_yystack, parser);
 
 /*------------------------------------------------------------.
@@ -445,7 +441,8 @@ Perl_yyparse (pTHX)
     YYPUSHSTACK;
     ps->state   = yyn;
     ps->val     = parser->yylval;
-    ps->comppad = PL_comppad;
+    if (yy_type_tab[yystos[ps->state]] == toketype_opval)
+	ps->comppad = AvREFCNT_inc(PL_comppad);
     ps->savestack_ix = PL_savestack_ix;
 #ifdef DEBUGGING
     ps->name    = (const char *)(yytname[yytoken]);
@@ -532,6 +529,14 @@ Perl_yyparse (pTHX)
     }
 #endif
 
+    {
+	int i;
+	for (i=0; i< parser->yylen; i++) {
+	    if (yy_type_tab[yystos[ps[-i].state]] == toketype_opval)
+		AvREFCNT_dec(ps[-i].comppad);
+	}
+    }
+
     parser->ps = ps -= (parser->yylen-1);
 
     /* Now shift the result of the reduction.  Determine what state
@@ -539,7 +544,6 @@ Perl_yyparse (pTHX)
 	  number reduced by.  */
 
     ps->val     = yyval;
-    ps->comppad = PL_comppad;
     ps->savestack_ix = PL_savestack_ix;
 #ifdef DEBUGGING
     ps->name    = (const char *)(yytname [yyr1[yyn]]);
@@ -553,6 +557,8 @@ Perl_yyparse (pTHX)
     else
 	yystate = yydefgoto[yyn - YYNTOKENS];
     ps->state = yystate;
+    if (yy_type_tab[yystos[ps->state]] == toketype_opval)
+	ps->comppad = AvREFCNT_inc(PL_comppad);
 
     goto yynewstate;
 
@@ -579,14 +585,13 @@ Perl_yyparse (pTHX)
 	    while (ps > parser->stack) {
 		YYDSYMPRINTF ("Error: popping", yystos[ps->state], &ps->val);
 		LEAVE_SCOPE(ps->savestack_ix);
-		if (yy_type_tab[yystos[ps->state]] == toketype_opval
-			&& ps->val.opval)
+		if (yy_type_tab[yystos[ps->state]] == toketype_opval)
 		{
-		    YYDPRINTF ((Perl_debug_log, "(freeing op)\n"));
-		    if (ps->comppad != PL_comppad) {
-			PAD_RESTORE_LOCAL(ps->comppad);
+		    PAD_RESTORE_LOCAL(ps->comppad);
+		    if (ps->val.opval) {
+			YYDPRINTF ((Perl_debug_log, "(freeing op)\n"));
+			op_free(ps->val.opval);
 		    }
-		    op_free(ps->val.opval);
 		}
 		YYPOPSTACK;
 	    }
@@ -626,12 +631,12 @@ Perl_yyparse (pTHX)
 
 	YYDSYMPRINTF ("Error: popping", yystos[ps->state], &ps->val);
 	LEAVE_SCOPE(ps->savestack_ix);
-	if (yy_type_tab[yystos[ps->state]] == toketype_opval && ps->val.opval) {
-	    YYDPRINTF ((Perl_debug_log, "(freeing op)\n"));
-	    if (ps->comppad != PL_comppad) {
-		PAD_RESTORE_LOCAL(ps->comppad);
+	if (yy_type_tab[yystos[ps->state]] == toketype_opval) {
+	    PAD_RESTORE_LOCAL(ps->comppad);
+	    if (ps->val.opval) {
+		YYDPRINTF ((Perl_debug_log, "(freeing op)\n"));
+		op_free(ps->val.opval);
 	    }
-	    op_free(ps->val.opval);
 	}
 	YYPOPSTACK;
 	yystate = ps->state;
@@ -647,7 +652,8 @@ Perl_yyparse (pTHX)
     YYPUSHSTACK;
     ps->state   = yyn;
     ps->val     = parser->yylval;
-    ps->comppad = PL_comppad;
+    if (yy_type_tab[yystos[ps->state]] == toketype_opval)
+	ps->comppad = AvREFCNT_inc(PL_comppad);
     ps->savestack_ix = PL_savestack_ix;
 #ifdef DEBUGGING
     ps->name    ="<err>";
@@ -672,6 +678,8 @@ Perl_yyparse (pTHX)
     goto yyreturn;
 
   yyreturn:
+    /* FIXME should be LEAVE_named("yyparse"), but if an error occured
+       during compilation there could be "sublex" scopes */
     LEAVE;	/* force parser stack cleanup before we return */
     return yyresult;
 }
@@ -695,8 +703,11 @@ Perl_parser_tmprefcnt(pTHX_  const yy_parser *parser)
     {
 	yy_stack_frame *ps;
 	for (ps = parser->stack; ps <= parser->ps; ps++) {
-	    if (yy_type_tab[yystos[ps->state]] == toketype_opval && ps->val.opval) {
-		op_tmprefcnt(ps->val.opval);
+	    if (yy_type_tab[yystos[ps->state]] == toketype_opval) {
+		AvTMPREFCNT_inc(ps->comppad);
+		if (ps->val.opval) {
+		    op_tmprefcnt(ps->val.opval);
+		}
 	    }
 	}
 
@@ -708,9 +719,10 @@ Perl_parser_tmprefcnt(pTHX_  const yy_parser *parser)
 	{
 	    I32 i;
 	    for (i=0; i<parser->nexttoke; i++) {
-		if (yy_type_tab[yytranslate[parser->nexttype[i]]] == toketype_opval &&
-		    parser->nextval[i].opval ) {
-		    op_tmprefcnt(parser->nextval[i].opval);
+		if (yy_type_tab[yytranslate[parser->nexttype[i]]] == toketype_opval) {
+		    if (parser->nextval[i].opval ) {
+			op_tmprefcnt(parser->nextval[i].opval);
+		    }
 		}
 	    }
 	}

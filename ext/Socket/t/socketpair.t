@@ -142,11 +142,10 @@ do
     ok (($^OS_ERROR == EPIPE or $^OS_ERROR == ESHUTDOWN), '$! should be EPIPE or ESHUTDOWN')
         or printf $^STDOUT, "\$\!=\%d(\%s)\n", $err, $err
 
-
+use bytes
 my @gripping = @: chr 255, chr 127
 foreach ( @gripping)
     is (syswrite ($right, $_), length $_, "syswrite to right")
-
 
 ok (!eof $left, "left is not at EOF")
 

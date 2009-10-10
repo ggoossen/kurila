@@ -20,7 +20,7 @@ BEGIN
 
 use Config
 
-my $DOSISH    = $^OS_NAME =~ m/^(?:MSWin32|os2|dos|NetWare|mint)$/ ?? 1 !! 0
+my $DOSISH    = $^OS_NAME =~ m/^(?:MSWin32|os2|dos|NetWare)$/ ?? 1 !! 0
 $DOSISH    = 1 if !$DOSISH and $^OS_NAME =~ m/^uwin/
 my $NONSTDIO  = defined env::var('PERLIO') && env::var('PERLIO') ne 'stdio'     ?? 1 !! 0
 my $FASTSTDIO = config_value('d_faststdio') && config_value('usefaststdio') ?? 1 !! 0
@@ -108,9 +108,6 @@ SKIP: do
                 is($result[$i], $j,
                    sprintf("$id - $i is \%s",
                    defined $j ?? $j !! "undef"))
-            
-        
-    
 
     check(PerlIO::get_layers($^STDIN),
           $UTF8_STDIN ?? (@:  "stdio", "utf8" ) !! (@:  "stdio" ),
@@ -165,7 +162,6 @@ SKIP: do
               (@: "stdio",    undef,        sub (@< @_) { @_[0] +> 0 }
                   "encoding", "iso-8859-1", sub (@< @_) { @_[0] ^&^ PerlIO::F_UTF8() } ),
               ":raw:encoding(latin1)")
-    
 
     binmode($f)
 
@@ -191,7 +187,5 @@ SKIP: do
 
         close $f
         close $g
-    
 
     1 while unlink "afile"
-

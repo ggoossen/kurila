@@ -1,6 +1,6 @@
 /*    utf8.h
  *
- *    Copyright (C) 2000, 2001, 2002, 2005, 2006 by Larry Wall and others
+ *    Copyright (C) 2000, 2001, 2002, 2005, 2006, 2007, 2009 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -16,14 +16,6 @@
 #define uvuni_to_utf8(d, uv)		uvuni_to_utf8_flags(d, uv, 0)
 #define is_utf8_string_loc(s, len, ep)	is_utf8_string_loclen(s, len, ep, 0)
 
-#ifdef EBCDIC
-/* The equivalent of these macros but implementing UTF-EBCDIC
-   are in the following header file:
- */
-
-#include "utfebcdic.h"
-
-#else
 START_EXTERN_C
 
 #ifdef DOINIT
@@ -108,17 +100,10 @@ encoded character.
 #define UTF8_IS_INVARIANT(c)		UNI_IS_INVARIANT(NATIVE_TO_UTF(c))
 #define NATIVE_IS_INVARIANT(c)		UNI_IS_INVARIANT(NATIVE_TO_ASCII(c))
 #define UTF8_IS_START(c)		(((U8)c) >= 0xc0 && (((U8)c) <= 0xfd))
-static __inline__ bool UTF8_IS_CONTINUATION(const char c) {
-    return (((U8)c) >= 0x80) && (((U8)c) <= 0xbf);
-}
-
-static __inline__ bool UTF8_IS_CONTINUED(const char c) {
-    return (U8)c & 0x80;
-}
 #define UTF8_IS_DOWNGRADEABLE_START(c)	(((U8)c & 0xfc) == 0xc0)
 
-#define UTF_START_MARK(len) ((len >  7) ? 0xFF : (0xFE << (7-len)))
-#define UTF_START_MASK(len) ((len >= 7) ? 0x00 : (0x1F >> (len-2)))
+#define UTF_START_MARK(len) (((len) >  7) ? 0xFF : (0xFE << (7-(len))))
+#define UTF_START_MASK(len) (((len) >= 7) ? 0x00 : (0x1F >> ((len)-2)))
 
 #define UTF_CONTINUATION_MARK		0x80
 #define UTF_ACCUMULATION_SHIFT		6
@@ -159,8 +144,6 @@ static __inline__ bool UTF8_IS_CONTINUED(const char c) {
 				? isALNUM(*(p)) \
 				: isALNUM_utf8(p))
 
-
-#endif /* EBCDIC vs ASCII */
 
 /* Rest of these are attributes of Unicode and perl's internals rather than the encoding */
 
@@ -246,28 +229,15 @@ static __inline__ bool UTF8_IS_CONTINUED(const char c) {
 #define UNI_DISPLAY_QQ		(UNI_DISPLAY_ISPRINT|UNI_DISPLAY_BACKSLASH)
 #define UNI_DISPLAY_REGEX	(UNI_DISPLAY_ISPRINT|UNI_DISPLAY_BACKSLASH)
 
-#ifdef EBCDIC
-#   define ANYOF_FOLD_SHARP_S(node, input, end)	\
-	(ANYOF_BITMAP_TEST(node, EBCDIC_LATIN_SMALL_LETTER_SHARP_S) && \
-	 (ANYOF_FLAGS(node) & ANYOF_UNICODE) && \
-	 (ANYOF_FLAGS(node) & ANYOF_FOLD) && \
-	 ((end) > (input) + 1) && \
-	 toLOWER((input)[0]) == 's' && \
-	 toLOWER((input)[1]) == 's')
-#else
-#   define ANYOF_FOLD_SHARP_S(node, input, end)	\
+#define ANYOF_FOLD_SHARP_S(node, input, end)	\
 	(ANYOF_BITMAP_TEST(node, UNICODE_LATIN_SMALL_LETTER_SHARP_S) && \
 	 (ANYOF_FLAGS(node) & ANYOF_UNICODE) && \
 	 (ANYOF_FLAGS(node) & ANYOF_FOLD) && \
 	 ((end) > (input) + 1) && \
 	 toLOWER((input)[0]) == 's' && \
 	 toLOWER((input)[1]) == 's')
-#endif
 #define SHARP_S_SKIP 2
 
-#ifdef EBCDIC
-/* IS_UTF8_CHAR() is not ported to EBCDIC */
-#else
 #define IS_UTF8_CHAR_1(p)	\
 	((p)[0] <= 0x7F)
 #define IS_UTF8_CHAR_2(p)	\
@@ -326,21 +296,7 @@ static __inline__ bool UTF8_IS_CONTINUED(const char c) {
 	 IS_UTF8_CHAR_4b(p) || \
 	 IS_UTF8_CHAR_4c(p))
 
-/* IS_UTF8_CHAR(p) is strictly speaking wrong (not UTF-8) because it
- * (1) allows UTF-8 encoded UTF-16 surrogates
- * (2) it allows code points past U+10FFFF.
- * The Perl_is_utf8_char() full "slow" code will handle the Perl
- * "extended UTF-8". */
-static __inline__ int IS_UTF8_CHAR(const char* p, int n) {
-    return ((n) == 1 ? IS_UTF8_CHAR_1((U8*)p) :
-            (n) == 2 ? IS_UTF8_CHAR_2((U8*)p) :
-            (n) == 3 ? IS_UTF8_CHAR_3((U8*)p) :
-            (n) == 4 ? IS_UTF8_CHAR_4((U8*)p) : 0);
-}
-
 #define IS_UTF8_CHAR_FAST(n) ((n) <= 4)
-
-#endif /* IS_UTF8_CHAR() for UTF-8 */
 
 /*
  * Local variables:

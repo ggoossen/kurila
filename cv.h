@@ -1,14 +1,14 @@
 /*    cv.h
  *
- *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1999, 2000,
- *    2001, 2002, 2003, 2004, 2005, 2006, 2007, by Larry Wall and others
+ *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1999, 2000, 2001,
+ *    2002, 2003, 2004, 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
  *
  */
 
-typedef U16 cv_flags_t;
+typedef U32 cv_flags_t;
 
 #define _XPVCV_COMMON								\
     union {									\
@@ -22,6 +22,7 @@ typedef U16 cv_flags_t;
     AV *	xcv_padlist;							\
     I32         xcv_n_minargs;	/* minium number of argument (excl. rhs) */     \
     I32         xcv_n_maxargs;	/* maximum number of argument (-1 for no-limit) (excl. rhs) */     \
+    I32         xcv_n_add_refs;	/* number of additional references to the body */     \
     cv_flags_t	xcv_flags
 
 struct xpvcv {
@@ -29,12 +30,6 @@ struct xpvcv {
     _XPVMG_HEAD;
     _XPVCV_COMMON;
 };
-
-typedef struct {
-    _XPV_ALLOCATED_HEAD;
-    _XPVMG_HEAD;
-    _XPVCV_COMMON;
-} xpvcv_allocated;
 
 /*
 =head1 Handy Values
@@ -58,17 +53,18 @@ Null CV pointer.
 #define CvXSUB(sv)	((XPVCV*)SvANY(sv))->xcv_root_u.xcv_xsub
 #define CvXSUBANY(sv)	((XPVCV*)SvANY(sv))->xcv_start_u.xcv_xsubany
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
-#  define CvDEPTH(sv) (*({const CV *_cv = (CV *)sv; \
-			  assert(SvTYPE(_cv) == SVt_PVCV);	 \
-			  &((XPVCV*)SvANY(_cv))->xiv_u.xivu_i32; \
+#  define CvDEPTH(sv) (*({const CV *const _cvdepth = (const CV *)sv; \
+			  assert(SvTYPE(_cvdepth) == SVt_PVCV);	 \
+			  &((XPVCV*)SvANY(_cvdepth))->xiv_u.xivu_i32; \
 			}))
 #else
-#  define CvDEPTH(sv)	((XPVCV*)SvANY(sv))->xiv_u.xivu_i32
+#  define CvDEPTH(sv)	((XPVCV*)MUTABLE_PTR(SvANY(sv)))->xiv_u.xivu_i32
 #endif
 #define CvPADLIST(sv)	((XPVCV*)SvANY(sv))->xcv_padlist
 #define CvFLAGS(sv)	((XPVCV*)SvANY(sv))->xcv_flags
 #define CvN_MINARGS(sv)	((XPVCV*)SvANY(sv))->xcv_n_minargs
 #define CvN_MAXARGS(sv)	((XPVCV*)SvANY(sv))->xcv_n_maxargs
+#define CvN_ADD_REFS(sv)	((XPVCV*)SvANY(sv))->xcv_n_add_refs
 
 #define CVf_BLOCK	0x0001	/* CV accept one argument which is assigned to $_ */
 #define CVf_CLONE	0x0020	/* anon CV uses external lexicals */
@@ -84,6 +80,8 @@ Null CV pointer.
 #define CVf_DEFARGS	0x2000	/* arguments are passed to @_ */
 #define CVf_ASSIGNARG	0x4000	/* last argument should be the rhs of an assignment (only used in combination with CVf_PROTO */
 #define CVf_OPTASSIGNARG	0x8000	/* last argument should be the rhs of an assignment (only used in combination with CVf_PROTO */
+#define CVf_TMPREFCNT	0x10000	/* already counted for refcounting checking */
+#define CVf_SPECIAL	0x20000	/* BEGIN/END/UNIT block */
 
 #define CvCLONE(cv)		(CvFLAGS(cv) & CVf_CLONE)
 #define CvCLONE_on(cv)		(CvFLAGS(cv) |= CVf_CLONE)
@@ -110,10 +108,9 @@ Null CV pointer.
 #define CvEVAL_off(cv)		CvUNIQUE_off(cv)
 
 /* BEGIN|CHECK|INIT|UNITCHECK|END */
-static __inline__ U32 CvSPECIAL(CV *cv) { return CvUNIQUE(cv) && SvFAKE(cv); }
-
-#define CvSPECIAL_on(cv)	(CvUNIQUE_on(cv),SvFAKE_on(cv))
-#define CvSPECIAL_off(cv)	(CvUNIQUE_off(cv),SvFAKE_off(cv))
+#define CvSPECIAL(cv)		(CvFLAGS(cv) & CVf_SPECIAL)
+#define CvSPECIAL_on(cv)		(CvFLAGS(cv) |= CVf_SPECIAL)
+#define CvSPECIAL_off(cv)		(CvFLAGS(cv) &= ~CVf_SPECIAL)
 
 #define CvCONST(cv)		(CvFLAGS(cv) & CVf_CONST)
 #define CvCONST_on(cv)		(CvFLAGS(cv) |= CVf_CONST)

@@ -17,6 +17,7 @@ package Maintainers;
 	'arandal'       => 'Allison Randal <allison@perl.org>',
 	'audreyt'	=> 'Audrey Tang <cpan@audreyt.org>',
 	'avar'		=> 'Ævar Arnfjörð Bjarmason <avar@cpan.org>',
+	'corion'	=> 'Max Maischein <corion@corion.net>',
 	'craig'		=> 'Craig Berry <craigberry@mac.com>',
 	'dankogai'	=> 'Dan Kogai <dankogai@cpan.org>',
 	'dconway'	=> 'Damian Conway <dconway@cpan.org>',
@@ -63,6 +64,7 @@ package Maintainers;
 	'rkobes'	=> 'Randy Kobes <rkobes@cpan.org>',
 	'rmbarker'	=> 'Robin Barker <rmbarker@cpan.org>',
 	'rra'		=> 'Russ Allbery <rra@cpan.org>',
+	'rurban'	=> 'Reini Urban <rurban@cpan.org>',
 	'sadahiro'	=> 'SADAHIRO Tomoyuki <SADAHIRO@cpan.org>',
 	'salva'		=> 'Salvador Fandiño García <salva@cpan.org>',
 	'saper'		=> 'Sébastien Aperghis-Tramoni <saper@cpan.org>',
@@ -76,6 +78,7 @@ package Maintainers;
 	'tjenness'	=> 'Tim Jenness <tjenness@cpan.org>',
 	'tyemq'		=> 'Tye McQueen <tyemq@cpan.org>',
 	'yves'		=> 'Yves Orton <yves@cpan.org>',
+	'zefram'	=> 'Andrew Main <zefram@cpan.org>',
 	);
 
 # The FILES is either filenames, or glob patterns, or directory
@@ -103,15 +106,7 @@ package Maintainers;
 		'MAINTAINER'	=> 'smueller',
 		'FILES'		=> q[lib/AutoLoader.pm lib/AutoSplit.pm lib/AutoLoader],
 		'CPAN'		=> 1,
-	),
-
-	'Attribute::Handlers' =>
-		\%(
-		'MAINTAINER'	=> 'abergman',
-		'FILES'		=> q[lib/Attribute/Handlers.pm
-				     lib/Attribute/Handlers],
-		'CPAN'		=> 1,
-		),
+	        ),
 
 	'B::Concise' =>
 		\%(
@@ -119,6 +114,13 @@ package Maintainers;
 		'FILES'		=> q[ext/B/B/Concise.pm ext/B/t/concise.t],
 		'CPAN'		=> 0,
 		),
+
+	'B::Debug' =>
+		{
+		'MAINTAINER'	=> 'rurban',
+		'FILES'		=> q[ext/B/B/Debug.pm ext/B/t/debug.t],
+		'CPAN'		=> 1,
+		},
 
 	'B::Deparse' =>
 		\%(
@@ -313,7 +315,8 @@ package Maintainers;
 	'ExtUtils::Constant' =>
 		\%(
 		'MAINTAINER'	=> 'nwclark',
-		'FILES'		=> q[lib/ExtUtils/Constant.pm lib/ExtUtils/Constant],
+		'FILES'		=> q[lib/ExtUtils/Constant.pm lib/ExtUtils/Constant
+				     lib/ExtUtils/t/Constant.t],
 		'CPAN'		=> 1,
 		),
 
@@ -321,7 +324,9 @@ package Maintainers;
 
 		\%(
 		'MAINTAINER' => 'yves',
-		'FILES' => q[lib/ExtUtils/{Install,Installed,Packlist}.pm],
+		# MakeMaker has a basic.t too, and we use that.
+		'FILES' => q[lib/ExtUtils/{Install,Installed,Packlist}.pm
+			     lib/ExtUtils/t/{Install,Installapi2,Packlist,can_write_dir}.t],
 		'CPAN' => 1,
 		),
 
@@ -330,7 +335,7 @@ package Maintainers;
 		'MAINTAINER'	=> 'mschwern',
 		'FILES'	=> q[lib/ExtUtils/{Liblist,MakeMaker,Mkbootstrap,Mksymlists,MM*,MY,testlib}.pm
 			lib/ExtUtils/{Command,Liblist,MakeMaker}
-			lib/ExtUtils/t/{[0-9A-LN-Za-z]*,Mkbootstrap,MM_*}.t
+			lib/ExtUtils/t/{[0-9FLV-Zabd-z]*,IN*,Mkbootstrap,MM_*,PL_FILES,cd,config}.t
 			t/lib/MakeMaker t/lib/TieIn.pm t/lib/TieOut.pm],
 		'CPAN'		=> 1,
 		),
@@ -391,6 +396,13 @@ package Maintainers;
 				     t/lib/Filter/Simple],
 		'CPAN'		=> 1,
 		),
+
+	'Filter::Simple' =>
+		{
+		'MAINTAINER'	=> 'smueller',
+		'FILES'		=> q[lib/Filter/Simple.pm lib/Filter/Simple],
+		'CPAN'		=> 1,
+		},
 
 	'Filter::Util::Call' =>
 		\%(
@@ -456,6 +468,14 @@ package Maintainers;
 		'CPAN'		=> 1,
 		),
 
+	'lib' =>
+		{
+		'MAINTAINER'	=> 'smueller',
+		'FILES'		=>
+			q[lib/lib_pm.PL lib/lib.t],
+		'CPAN'		=> 1,
+		},
+
 	'libnet' =>
 		\%(
 		'MAINTAINER'	=> 'gbarr',
@@ -480,7 +500,7 @@ package Maintainers;
 
 	'Locale::Maketext' =>
 		\%(
-		'MAINTAINER'	=> 'petdance',
+		'MAINTAINER'	=> 'ferreira',
 		'FILES'		=> q[lib/Locale/Maketext.pm lib/Locale/Maketext.pod lib/Locale/Maketext/ChangeLog lib/Locale/Maketext/{Guts,GutsLoader}.pm lib/Locale/Maketext/README lib/Locale/Maketext/TPJ13.pod lib/Locale/Maketext/t],
 		'CPAN'		=> 1,
 		),
@@ -544,7 +564,7 @@ package Maintainers;
 
         'Math::Complex' =>
                 \%(
-                'MAINTAINER'    => 'jhi',
+                'MAINTAINER'    => 'zefram',
                 'FILES'         => q[lib/Math/Complex.pm lib/Math/Trig.pm],
                 'CPAN'          => 1,
                 ),
@@ -643,6 +663,13 @@ package Maintainers;
 		'CPAN'		=> 1,
 		),
 
+	'parent' =>
+		{
+		'MAINTAINER'	=> 'corion',
+		'FILES'		=> q[lib/parent lib/parent.pm],
+		'CPAN'		=> 1,
+		},
+
 	'perlebcdic' =>
 		\%(
 		'MAINTAINER'	=> 'pvhp',
@@ -739,13 +766,13 @@ package Maintainers;
 	'podlators' =>
 		\%(
 		'MAINTAINER'	=> 'rra',
-		'FILES'		=> q[lib/Pod/{Man,ParseLink,Text,Text/{Color,Overstrike,Termcap}}.pm pod/pod2man.PL pod/pod2text.PL lib/Pod/t/{basic.*,{man,parselink,text*}.t}],
+		'FILES'		=> q[lib/Pod/{Man,ParseLink,Text,Text/{Color,Overstrike,Termcap}}.pm pod/pod2man.PL pod/pod2text.PL lib/Pod/t/{basic.*,{color,filehandle,man*,parselink,pod-parser,pod-spelling,pod,termcap,text*}.t}],
 		'CPAN'		=> 1,
 		),
 
 	'Pod::Perldoc' =>
 		\%(
-		'MAINTAINER'	=> 'osfameron',
+		'MAINTAINER'	=> 'ferreira',
 		'FILES'		=> q[lib/Pod/Perldoc.pm lib/Pod/Perldoc],
 		'CPAN'		=> 1,
 		),
@@ -760,7 +787,7 @@ package Maintainers;
 	'Safe' =>
 		\%(
 		'MAINTAINER'	=> 'rgarcia',
-		'FILES'		=> q[ext/Safe ext/Opcode/Safe.pm],
+		'FILES'		=> q[ext/Safe],
 		'CPAN'		=> 1,
 		),
 
@@ -788,7 +815,7 @@ package Maintainers;
 	'Sys::Syslog' =>
 		\%(
 		'MAINTAINER'	=> 'saper',
-		'FILES'		=> q[ext/Sys/Syslog],
+		'FILES'		=> q[ext/Sys-Syslog],
 		'CPAN'		=> 1,
 		),
 
@@ -838,13 +865,7 @@ package Maintainers;
 	'Test::Harness' =>
 		\%(
 		'MAINTAINER'	=> 'andya',
-		'FILES'		=> q[lib/App/Prove.pm lib/App/Prove/State.pm
-				     lib/Test/Harness.pm lib/Test/Harness
-				     lib/TAP
-				     t/lib/data t/lib/sample-tests 
-				     t/lib/source_tests t/lib/Dev/Null.pm
-				     t/lib/App/Prove/Plugin/Dummy.pm
-				     t/lib/IO/c55Capture.pm t/lib/NoFork.pm],
+		'FILES'		=> q[ext/Test/Harness],
 		'CPAN'		=> 1,
 		),
 
@@ -854,7 +875,7 @@ package Maintainers;
 		'FILES'		=> q[lib/Test/Simple.pm lib/Test/Simple
 				     lib/Test/Builder.pm lib/Test/Builder
 				     lib/Test/More.pm
-				     t/lib/Test/Simple],
+				     t/lib/Test/Simple t/lib/Dev/Null.pm],
 		'CPAN'		=> 1,
 		),
 
@@ -910,7 +931,7 @@ package Maintainers;
 
 	'Time::HiRes' =>
 		\%(
-		'MAINTAINER'	=> 'jhi',
+		'MAINTAINER'	=> 'zefram',
 		'FILES'		=> q[ext/Time/HiRes],
 		'CPAN'		=> 1,
 		),

@@ -2,9 +2,7 @@
 
 BEGIN 
     if( env::var('PERL_CORE') )
-        chdir 't'
-        $^INCLUDE_PATH = qw(../lib lib)
-    
+        unshift $^INCLUDE_PATH, "../lib/Test/Simple/t/lib"
 
 
 use lib 't/lib'

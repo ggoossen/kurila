@@ -173,7 +173,6 @@ sub SWASHNEW_real
             ##
 
             return $type
-        
 
         if (defined $file)
             print $^STDERR, "found it (file='$file')\n" if DEBUG
@@ -190,7 +189,8 @@ sub SWASHNEW_real
                 print $^STDERR, "Returning cached '$file' for \\p\{$type\}\n" if DEBUG
                 return $found
             
-
+            local $^EVAL_ERROR = undef
+            local $^OS_ERROR = undef
             $list = evalfile $file; die $^EVAL_ERROR if $^EVAL_ERROR
         
 

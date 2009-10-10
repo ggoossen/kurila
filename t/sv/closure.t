@@ -426,7 +426,7 @@ END
                         close $read2
                         open $^STDOUT, ">&", \$write->*  or die "Can't redirect STDOUT: $^OS_ERROR"
                         open $^STDERR, ">&", \$write2->* or die "Can't redirect STDERR: $^OS_ERROR"
-                        exec which_perl(), '-w', '-MTestInit', '-'
+                        exec which_perl(), '-w', '-I../lib', '-'
                             or die "Can't exec perl: $^OS_ERROR"
                     else
                         # Parent process here.
@@ -447,7 +447,7 @@ END
                     my @tmpfiles = @: $cmdfile, $errfile
                     open my $cmd_fh, ">", "$cmdfile"; print $cmd_fh, $code; close $cmd_fh
                     my $cmd = which_perl()
-                    $cmd .= " -w $cmdfile 2>$errfile"
+                    $cmd .= " \"-I../lib\" -w $cmdfile 2>$errfile"
                     if ($^OS_NAME eq 'VMS' or $^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'NetWare')
                         # Use pipe instead of system so we don't inherit STD* from
                         # this process, and then foul our pipe back to parent by
@@ -582,7 +582,6 @@ sub linger
         $x
         my $y
         sub (@< @_) { $y; }
-    
 
 do
     my $watch = '1'

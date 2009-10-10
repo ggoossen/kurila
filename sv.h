@@ -1,7 +1,7 @@
 /*    sv.h
  *
- *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, by Larry Wall and others
+ *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+ *    2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -84,6 +84,7 @@ typedef enum {
     Dt_CODE,
     Dt_IO,
     Dt_GLOB,
+    Dt_REGEXP,
     Dt_COMPLEX
 } datatype;
 
@@ -131,6 +132,14 @@ typedef struct hek HEK;
 struct STRUCT_SV {		/* struct sv { */
     _SV_HEAD(void*);
     _SV_HEAD_UNION;
+#ifdef DEBUG_LEAKING_SCALARS
+    PERL_BITFIELD32 sv_debug_optype:9;	/* the type of OP that allocated us */
+    PERL_BITFIELD32 sv_debug_inpad:1;	/* was allocated in a pad for an OP */
+    PERL_BITFIELD32 sv_debug_cloned:1;	/* was cloned for an ithread */
+    PERL_BITFIELD32 sv_debug_line:16;	/* the line where we were allocated */
+    U32		    sv_debug_serial;	/* serial number of sv allocation   */
+    char *	sv_debug_file;		/* the file where we were allocated */
+#endif
 };
 
 struct gv {
@@ -215,21 +224,21 @@ perform the upgrade if necessary.  See C<svtype>.
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 #  define SvREFCNT_inc_NN(sv)		\
     ({					\
-	SV * const _sv = (SV*)(sv);	\
+	SV * const _sv = MUTABLE_SV(sv);	\
 	SvREFCNT(_sv)++;		\
 	_sv;				\
     })
 #  define SvREFCNT_inc_void(sv)		\
     ({					\
-	SV * const _sv = (SV*)(sv);	\
+	SV * const _sv = MUTABLE_SV(sv);	\
 	if (_sv)			\
 	    (void)(SvREFCNT(_sv)++);	\
     })
 #else
 #  define SvREFCNT_inc_NN(sv) \
-	(PL_Sv=(SV*)(sv),++(SvREFCNT(PL_Sv)),PL_Sv)
+	(PL_Sv=MUTABLE_SV(sv),++(SvREFCNT(PL_Sv)),PL_Sv)
 #  define SvREFCNT_inc_void(sv) \
-	(void)((PL_Sv=(SV*)(sv)) ? ++(SvREFCNT(PL_Sv)) : 0)
+	(void)((PL_Sv=MUTABLE_SV(sv)) ? ++(SvREFCNT(PL_Sv)) : 0)
 #endif
 
 /* These guys don't need the curly blocks */
@@ -243,7 +252,7 @@ perform the upgrade if necessary.  See C<svtype>.
    them all by using a consistent macro.  */
 #define SvIS_FREED(sv)	((sv)->sv_flags == SVTYPEMASK)
 
-#define SvUPGRADE(sv, mt) (SvTYPE(sv) >= (mt) || (sv_upgrade(sv, mt), 1))
+#define SvUPGRADE(sv, mt) (sv_upgrade(sv, mt), 1)
 
 #define SVf_IOK		0x00000100  /* has valid public integer value */
 #define SVf_NOK		0x00000200  /* has valid public numeric value */
@@ -337,13 +346,10 @@ perform the upgrade if necessary.  See C<svtype>.
 /* RV upwards. However, SVf_ROK and SVp_IOK are exclusive  */
 #define SVprv_WEAKREF   0x80000000  /* Weak reference */
 
-#define _XPV_ALLOCATED_HEAD						\
-    STRLEN	xpv_cur;	/* length of svu_pv as a C string */    \
-    STRLEN	xpv_len 	/* allocated size */
-
 #define _XPV_HEAD	\
     union _xnvu xnv_u;	\
-    _XPV_ALLOCATED_HEAD
+    STRLEN	xpv_cur;	/* length of svu_pv as a C string */    \
+    STRLEN	xpv_len 	/* allocated size */
 
 union _xnvu {
     NV	    xnv_nv;		/* numeric value, if any */
@@ -361,7 +367,7 @@ union _xnvu {
 
 union _xivu {
     IV	    xivu_iv;		/* integer value */
-				/* xpvfm: pv offset */
+				/* xpvfm: lines */
     UV	    xivu_uv;
     void *  xivu_p1;
     I32	    xivu_i32;
@@ -378,19 +384,10 @@ struct xpv {
     _XPV_HEAD;
 };
 
-typedef struct {
-    _XPV_ALLOCATED_HEAD;
-} xpv_allocated;
-
 struct xpviv {
     _XPV_HEAD;
     union _xivu xiv_u;
 };
-
-typedef struct {
-    _XPV_ALLOCATED_HEAD;
-    union _xivu xiv_u;
-} xpviv_allocated;
 
 #define xiv_iv xiv_u.xivu_iv
 
@@ -462,12 +459,6 @@ struct xpvio {
     _XPVIO_TAIL;
 };
 
-typedef struct {
-    _XPV_ALLOCATED_HEAD;
-    _XPVMG_HEAD;
-    _XPVIO_TAIL;
-} xpvio_allocated;
-
 #define xio_dirp	xio_dirpu.xiou_dirp
 #define xio_any		xio_dirpu.xiou_any
 
@@ -487,26 +478,26 @@ double.
 
 =for apidoc Am|U32|SvNIOKp|SV* sv
 Returns a U32 value indicating whether the SV contains a number, integer or
-double.  Checks the B<private> setting.  Use C<SvNIOK>.
+double.  Checks the B<private> setting.  Use C<SvNIOK> instead.
 
 =for apidoc Am|void|SvNIOK_off|SV* sv
 Unsets the NV/IV status of an SV.
 
 =for apidoc Am|U32|SvOK|SV* sv
-Returns a U32 value indicating whether the value is an SV. It also tells
-whether the value is defined or not.
+Returns a U32 value indicating whether the value is defined. This is
+only meaningful for scalars.
 
 =for apidoc Am|U32|SvIOKp|SV* sv
 Returns a U32 value indicating whether the SV contains an integer.  Checks
-the B<private> setting.  Use C<SvIOK>.
+the B<private> setting.  Use C<SvIOK> instead.
 
 =for apidoc Am|U32|SvNOKp|SV* sv
 Returns a U32 value indicating whether the SV contains a double.  Checks the
-B<private> setting.  Use C<SvNOK>.
+B<private> setting.  Use C<SvNOK> instead.
 
 =for apidoc Am|U32|SvPOKp|SV* sv
 Returns a U32 value indicating whether the SV contains a character string.
-Checks the B<private> setting.  Use C<SvPOK>.
+Checks the B<private> setting.  Use C<SvPOK> instead.
 
 =for apidoc Am|U32|SvIOK|SV* sv
 Returns a U32 value indicating whether the SV contains an integer.
@@ -783,23 +774,23 @@ in gv.h: */
 #define SvCOMPILED_off(sv)	(SvFLAGS(sv) &= ~SVpfm_COMPILED)
 
 #if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
-#  define SvVALID(sv)		({ SV *const thwacke = (SV *) (sv);	\
-				   if (SvFLAGS(thwacke) & SVpbm_VALID)	\
-				       assert(!isGV_with_GP(thwacke));	\
-				   (SvFLAGS(thwacke) & SVpbm_VALID);	\
+#  define SvVALID(sv)		({ const SV *const _svvalid = (const SV*)(sv); \
+				   if (SvFLAGS(_svvalid) & SVpbm_VALID)	\
+				       assert(!isGV_with_GP(_svvalid));	\
+				   (SvFLAGS(_svvalid) & SVpbm_VALID);	\
 				})
-#  define SvVALID_on(sv)	({ SV *const thwacke = (SV *) (sv);	\
-				   assert(!isGV_with_GP(thwacke));	\
-				   (SvFLAGS(thwacke) |= SVpbm_VALID);	\
+#  define SvVALID_on(sv)	({ SV *const _svvalid = MUTABLE_SV(sv);	\
+				   assert(!isGV_with_GP(_svvalid));	\
+				   (SvFLAGS(_svvalid) |= SVpbm_VALID);	\
 				})
-#  define SvVALID_off(sv)	({ SV *const thwacke = (SV *) (sv);	\
-				   assert(!isGV_with_GP(thwacke));	\
-				   (SvFLAGS(thwacke) &= ~SVpbm_VALID);	\
+#  define SvVALID_off(sv)	({ SV *const _svvalid = MUTABLE_SV(sv);	\
+				   assert(!isGV_with_GP(_svvalid));	\
+				   (SvFLAGS(_svvalid) &= ~SVpbm_VALID);	\
 				})
 
-#  define SvTAIL(sv)	({ SV *const _svi = (SV *) (sv);		\
-			    assert(SvTYPE(_svi) != SVt_PVAV);		\
-			    assert(SvTYPE(_svi) != SVt_PVHV);		\
+#  define SvTAIL(sv)	({ const SV *const _svtail = (const SV *)(sv);	\
+			    assert(SvTYPE(_svtail) != SVt_PVAV);		\
+			    assert(SvTYPE(_svtail) != SVt_PVHV);		\
 			    (SvFLAGS(sv) & (SVpbm_TAIL|SVpbm_VALID))	\
 				== (SVpbm_TAIL|SVpbm_VALID);		\
 			})
@@ -823,18 +814,13 @@ in gv.h: */
 
 #if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 #define SvPAD_OUR_on(sv)	({					\
-	    SV *const whap = (SV *) (sv);				\
-	    assert(SvTYPE(whap) == SVt_PVMG);				\
-	    (SvFLAGS(whap) |= SVpad_NAME|SVpad_OUR);			\
+	    SV *const _svpad = MUTABLE_SV(sv);				\
+	    assert(SvTYPE(_svpad) == SVt_PVMG);				\
+	    (SvFLAGS(_svpad) |= SVpad_NAME|SVpad_OUR);			\
 	})
 #else
 #  define SvPAD_OUR_on(sv)	(SvFLAGS(sv) |= SVpad_NAME|SVpad_OUR)
 #endif
-
-#define SvOURGV(sv) \
-    ({ assert(SvPAD_OUR(sv));		       \
-	((XPVMG*) SvANY(sv))->xmg_u.xmg_ourgv; \
-     })
 
 #define SvOURGV_set(sv, st)                                 \
         STMT_START {                                           \
@@ -852,6 +838,7 @@ in gv.h: */
 #  define SvUVX(sv) (0 + ((XPVUV*) SvANY(sv))->xuv_uv)
 #  define SvNVX(sv) (-0.0 + ((XPVNV*) SvANY(sv))->xnv_u.xnv_nv)
 #  define SvRV(sv) (0 + (sv)->sv_u.svu_rv)
+#  define SvRV_const(sv) (0 + (sv)->sv_u.svu_rv)
 /* Don't test the core XS code yet.  */
 #  define SvLEN(sv) (0 + ((XPV*) SvANY(sv))->xpv_len)
 #  define SvEND(sv) ((sv)->sv_u.svu_pv + ((XPV*)SvANY(sv))->xpv_cur)
@@ -870,49 +857,61 @@ in gv.h: */
 #  if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 /* These get expanded inside other macros that already use a variable _sv  */
 #    define SvUVX(sv)							\
-	(*({ SV *const _svi = (SV *) (sv);				\
-	    assert(SvTYPE(_svi) == SVt_IV || SvTYPE(_svi) >= SVt_PVIV);	\
-	    assert(SvTYPE(_svi) != SVt_PVAV);				\
-	    assert(SvTYPE(_svi) != SVt_PVHV);				\
-	    assert(SvTYPE(_svi) != SVt_PVCV);				\
-	    assert(!isGV_with_GP(_svi));				\
-	    &(((XPVUV*) SvANY(_svi))->xuv_uv);				\
+	(*({ const SV *const _svuvx = (const SV *)(sv);			\
+	    assert(SvTYPE(_svuvx) == SVt_IV || SvTYPE(_svuvx) >= SVt_PVIV); \
+	    assert(SvTYPE(_svuvx) != SVt_PVAV);				\
+	    assert(SvTYPE(_svuvx) != SVt_PVHV);				\
+	    assert(SvTYPE(_svuvx) != SVt_PVCV);				\
+	    assert(SvTYPE(_svuvx) != SVt_PVIO);				\
+	    assert(!isGV_with_GP(_svuvx));				\
+	    &(((XPVUV*) MUTABLE_PTR(SvANY(_svuvx)))->xuv_uv);		\
 	 }))
 #    define SvNVX(sv)							\
-	(*({ SV *const _svi = (SV *) (sv);				\
-	    assert(SvTYPE(_svi) == SVt_NV || SvTYPE(_svi) >= SVt_PVNV);	\
-	    assert(SvTYPE(_svi) != SVt_PVAV);				\
-	    assert(SvTYPE(_svi) != SVt_PVHV);				\
-	    assert(SvTYPE(_svi) != SVt_PVCV);				\
-	    assert(SvTYPE(_svi) != SVt_PVIO);				\
-	    assert(!isGV_with_GP(_svi));				\
-	   &(((XPVNV*) SvANY(_svi))->xnv_u.xnv_nv);			\
+	(*({ const SV *const _svnvx = (const SV *)(sv);			\
+	    assert(SvTYPE(_svnvx) == SVt_NV || SvTYPE(_svnvx) >= SVt_PVNV); \
+	    assert(SvTYPE(_svnvx) != SVt_PVAV);				\
+	    assert(SvTYPE(_svnvx) != SVt_PVHV);				\
+	    assert(SvTYPE(_svnvx) != SVt_PVCV);				\
+	    assert(SvTYPE(_svnvx) != SVt_PVIO);				\
+	    assert(!isGV_with_GP(_svnvx));				\
+	    &(((XPVNV*) MUTABLE_PTR(SvANY(_svnvx)))->xnv_u.xnv_nv);	\
 	 }))
 #    define SvRV(sv)							\
-	(*({ SV *const _svi = (SV *) (sv);				\
-	    assert(SvTYPE(_svi) >= SVt_PV || SvTYPE(_svi) == SVt_IV);	\
-	    assert(SvTYPE(_svi) != SVt_PVAV);				\
-	    assert(SvTYPE(_svi) != SVt_PVHV);				\
-	    assert(SvTYPE(_svi) != SVt_PVCV);				\
-	    assert(!isGV_with_GP(_svi));				\
-	    &((_svi)->sv_u.svu_rv);					\
+	(*({ SV *const _svrv = MUTABLE_SV(sv);				\
+	    assert(SvTYPE(_svrv) >= SVt_PV || SvTYPE(_svrv) == SVt_IV);	\
+	    assert(SvTYPE(_svrv) != SVt_PVAV);				\
+	    assert(SvTYPE(_svrv) != SVt_PVHV);				\
+	    assert(SvTYPE(_svrv) != SVt_PVCV);				\
+	    assert(!isGV_with_GP(_svrv));				\
+	    &((_svrv)->sv_u.svu_rv);					\
 	 }))
+#    define SvRV_const(sv)						\
+	({ const SV *const _svrv = (const SV *)(sv);			\
+	    assert(SvTYPE(_svrv) >= SVt_PV || SvTYPE(_svrv) == SVt_IV);	\
+	    assert(SvTYPE(_svrv) != SVt_PVAV);				\
+	    assert(SvTYPE(_svrv) != SVt_PVHV);				\
+	    assert(SvTYPE(_svrv) != SVt_PVCV);				\
+	    assert(SvTYPE(_svrv) != SVt_PVFM);				\
+	    assert(!isGV_with_GP(_svrv));				\
+	    (_svrv)->sv_u.svu_rv;					\
+	 })
 #    define SvMAGIC(sv)							\
-	(*({ SV *const _svi = (SV *) (sv);				\
-	    assert(SvTYPE(_svi) >= SVt_PVMG);				\
-	    if(SvTYPE(_svi) == SVt_PVMG)				\
-		assert(!SvPAD_OUR(_svi));				\
-	    &(((XPVMG*) SvANY(_svi))->xmg_u.xmg_magic);			\
+	(*({ const SV *const _svmagic = (const SV *)(sv);		\
+	    assert(SvTYPE(_svmagic) >= SVt_PVMG);			\
+	    if(SvTYPE(_svmagic) == SVt_PVMG)				\
+		assert(!SvPAD_OUR(_svmagic));				\
+	    &(((XPVMG*) MUTABLE_PTR(SvANY(_svmagic)))->xmg_u.xmg_magic); \
 	  }))
 #    define SvSTASH(sv)							\
-	(*({ SV *const _svi = (SV *) (sv);				\
-	    assert(SvTYPE(_svi) >= SVt_PVMG);				\
-	    &(((XPVMG*) SvANY(_svi))->xmg_stash);			\
+	(*({ const SV *const _svstash = (const SV *)(sv);		\
+	    assert(SvTYPE(_svstash) >= SVt_PVMG);			\
+	    &(((XPVMG*) MUTABLE_PTR(SvANY(_svstash)))->xmg_stash);	\
 	  }))
 #  else
 #    define SvUVX(sv) ((XPVUV*) SvANY(sv))->xuv_uv
 #    define SvNVX(sv) ((XPVNV*) SvANY(sv))->xnv_u.xnv_nv
 #    define SvRV(sv) ((sv)->sv_u.svu_rv)
+#    define SvRV_const(sv) (0 + (sv)->sv_u.svu_rv)
 #    define SvMAGIC(sv)	((XPVMG*)  SvANY(sv))->xmg_u.xmg_magic
 #    define SvSTASH(sv)	((XPVMG*)  SvANY(sv))->xmg_stash
 #  endif
@@ -1020,29 +1019,29 @@ in gv.h: */
 */
 #if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 #  define BmFLAGS(sv)							\
-	(*({ SV *const uggh = (SV *) (sv);				\
-		assert(SvTYPE(uggh) == SVt_PVMG);			\
-		assert(SvVALID(uggh));					\
-	    &(((XPVMG*) SvANY(uggh))->xnv_u.xbm_s.xbm_flags);		\
+	(*({ SV *const _bmflags = (SV *) (sv);				\
+		assert(SvTYPE(_bmflags) == SVt_PVMG);			\
+		assert(SvVALID(_bmflags));				\
+	    &(((XPVGV*) SvANY(_bmflags))->xnv_u.xbm_s.xbm_flags);	\
 	 }))
 #  define BmRARE(sv)							\
-	(*({ SV *const uggh = (SV *) (sv);				\
-		assert(SvTYPE(uggh) == SVt_PVMG);			\
-		assert(SvVALID(uggh));					\
-	    &(((XPVMG*) SvANY(uggh))->xnv_u.xbm_s.xbm_rare);		\
+	(*({ SV *const _bmrare = (SV *) (sv);				\
+		assert(SvTYPE(_bmrare) == SVt_PVMG);			\
+		assert(SvVALID(_bmrare));				\
+	    &(((XPVGV*) SvANY(_bmrare))->xnv_u.xbm_s.xbm_rare);		\
 	 }))
 #  define BmUSEFUL(sv)							\
-	(*({ SV *const uggh = (SV *) (sv);				\
-	    assert(SvTYPE(uggh) == SVt_PVMG);				\
-	    assert(SvVALID(uggh));					\
-	    assert(!SvIOK(uggh));					\
-	    &(((XPVMG*) SvANY(uggh))->xiv_u.xivu_i32);			\
+	(*({ SV *const _bmuseful = (SV *) (sv);				\
+	    assert(SvTYPE(_bmuseful) == SVt_PVMG);			\
+	    assert(SvVALID(_bmuseful));					\
+	    assert(!SvIOK(_bmuseful));					\
+	    &(((XPVGV*) SvANY(_bmuseful))->xiv_u.xivu_i32);		\
 	 }))
 #  define BmPREVIOUS(sv)						\
-	(*({ SV *const uggh = (SV *) (sv);				\
-		assert(SvTYPE(uggh) == SVt_PVMG);			\
-		assert(SvVALID(uggh));					\
-	    &(((XPVMG*) SvANY(uggh))->xnv_u.xbm_s.xbm_previous);	\
+    (*({ SV *const _bmprevious = (SV *) (sv);				\
+		assert(SvTYPE(_bmprevious) == SVt_PVMG);		\
+		assert(SvVALID(_bmprevious));				\
+	    &(((XPVGV*) SvANY(_bmprevious))->xnv_u.xbm_s.xbm_previous);	\
 	 }))
 #else
 #  define BmFLAGS(sv)		((XPVMG*) SvANY(sv))->xnv_u.xbm_s.xbm_flags
@@ -1135,7 +1134,7 @@ Like C<SvUV> but doesn't process magic.
 
 =for apidoc Am|bool|SvTRUE|SV* sv
 Returns a boolean indicating whether Perl would evaluate the SV as true or
-false, defined or undefined.  Does not handle 'get' magic.
+false.  See SvOK() for a defined/undefined test.  Does not handle 'get' magic.
 
 =for apidoc Am|bool|SvIsCOW|SV* sv
 Returns a boolean indicating whether the SV is Copy-On-Write. (either shared
@@ -1287,6 +1286,20 @@ mg.c:1024: warning: left-hand operand of comma expression has no effect
 #define SV_CHECK_THINKFIRST(sv) if (SvTHINKFIRST(sv)) \
 				    sv_force_normal_flags(sv, 0)
 
+
+/* all these 'functions' are now just macros */
+
+#define sv_pv(sv) SvPV_nolen(sv)
+
+#define sv_pvn_force_nomg(sv, lp) sv_pvn_force_flags(sv, lp, 0)
+#define sv_catpvn_nomg(dsv, sstr, slen) sv_catpvn_flags(dsv, sstr, slen, 0)
+#define sv_setsv_nomg(dsv, ssv) sv_setsv_flags(dsv, ssv, SV_DO_COW_SVSETSV)
+#define sv_catsv_nomg(dsv, ssv) sv_catsv_flags(dsv, ssv, 0)
+#define sv_2pv_nolen(sv) sv_2pv(sv, 0)
+#define sv_2pv_nomg(sv, lp) sv_2pv_flags(sv, lp, 0)
+#define sv_insert(bigstr, offset, len, little, littlelen)		\
+	Perl_sv_insert_flags(aTHX_ (bigstr),(offset), (len), (little),	\
+			     (littlelen), 0)
 
 /*
 =for apidoc Am|SV*|newRV_inc|SV* sv
@@ -1477,6 +1490,9 @@ Evaluates I<sv> more than once. Sets I<len> to 0 if C<SvOOK(sv)> is false.
 	}								\
     } STMT_END
 #endif
+
+#define newIO()	MUTABLE_IO(newSV_type(SVt_PVIO))
+
 /*
  * Local variables:
  * c-indentation-style: bsd

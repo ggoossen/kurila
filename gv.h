@@ -1,7 +1,7 @@
 /*    gv.h
  *
- *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006, by Larry Wall and others
+ *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+ *    2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -24,27 +24,27 @@ struct gp {
 
 #if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN) && !defined(__INTEL_COMPILER)
 #  define GvGP(gv)							\
-	(*({GV *const shplep = (GV *) (gv);				\
-	    assert(SvTYPE(shplep) == SVt_PVGV); \
-	    assert(isGV_with_GP(shplep));				\
-	    &((shplep)->sv_u.svu_gp);}))
+	(*({GV *const _gvgp = (GV *) (gv);				\
+	    assert(SvTYPE(_gvgp) == SVt_PVGV); \
+	    assert(isGV_with_GP(_gvgp));				\
+	    &((_gvgp)->sv_u.svu_gp);}))
 #  define GvFLAGS(gv)							\
-	(*({GV *const yaah  = (GV *) (gv);				\
-	    assert(SvTYPE(yaah) == SVt_PVGV); \
-	    assert(isGV_with_GP(yaah));					\
-	    &(GvXPVGV(yaah)->xpv_cur);}))
+	(*({GV *const _gvflags = (GV *) (gv);				\
+	    assert(SvTYPE(_gvflags) == SVt_PVGV); \
+	    assert(isGV_with_GP(_gvflags));				\
+	    &(GvXPVGV(_gvflags)->xpv_cur);}))
 #  define GvSTASH(gv)							\
-	(*({ GV * const _gv = (GV *) (gv);				\
-	    assert(isGV_with_GP(_gv));					\
-	    assert(SvTYPE(_gv) >= SVt_PVGV);	\
-	    &(GvXPVGV(_gv)->xnv_u.xgv_stash);				\
+	(*({ GV * const _gvstash = (GV *) (gv);				\
+	    assert(isGV_with_GP(_gvstash));				\
+	    assert(SvTYPE(_gvstash) == SVt_PVGV); \
+	    &(GvXPVGV(_gvstash)->xnv_u.xgv_stash);			\
 	 }))
 #  define GvNAME_HEK(gv)						\
-	(*({ GV * const zzzz = (GV *) (gv);				\
-	   assert(isGV_with_GP(zzzz));					\
-	   assert(SvTYPE(zzzz) >= SVt_PVGV); \
-	   assert(!SvVALID(zzzz));					\
-	   &(GvXPVGV(zzzz)->xiv_u.xivu_namehek);			\
+    (*({ GV * const _gvname_hek = (GV *) (gv);				\
+	   assert(isGV_with_GP(_gvname_hek));				\
+	   assert(SvTYPE(_gvname_hek) == SVt_PVGV); \
+	   assert(!SvVALID(_gvname_hek));				\
+	   &(GvXPVGV(_gvname_hek)->xiv_u.xivu_namehek);			\
 	 }))
 #  define GvNAME_get(gv)	({ assert(GvNAME_HEK(gv)); HEK_KEY(GvNAME_HEK(gv)); })
 #  define GvNAMELEN_get(gv)	({ assert(GvNAME_HEK(gv)); HEK_LEN(GvNAME_HEK(gv)); })
@@ -85,22 +85,11 @@ Return the SV from the GV.
 #endif
 
 #define GvREFCNT(gv)	(GvGP(gv)->gp_refcnt)
-#define GvIO(gv)	((gv) && SvTYPE((SV*)gv) == SVt_PVGV && GvGP(gv) ? GvIOp(gv) : NULL)
+#define GvIO(gv)	((gv) && SvTYPE((const SV*)gv) == SVt_PVGV && GvGP(gv) ? GvIOp(gv) : NULL)
 #define GvIOp(gv)	(GvGP(gv)->gp_io)
 #define GvIOn(gv)	(GvIO(gv) ? GvIOp(gv) : GvIOp(gv_IOadd(gv)))
 
 #define GvAV(gv)	(GvGP(gv)->gp_av)
-
-#define INLINE1(ret, name, arg1) static __inline__ ret ii##name(pTHX_ arg1)
-INLINE1(AV*, GvAVn, GV *gv) {
-    if (GvGP(gv)->gp_av) {
-	/* assert(SvTYPE(GvGP(gv)->gp_av) == SVt_PVAV); */
-	return GvGP(gv)->gp_av;
-    } else {
-	return GvGP(gv_AVadd(gv))->gp_av;
-    }
-}
-#define GvAVn(gv) iiGvAVn(aTHX_ gv)
 
 #define GvHV(gv)	((GvGP(gv))->gp_hv)
 
@@ -162,12 +151,6 @@ INLINE1(AV*, GvAVn, GV *gv) {
 #define GvIN_PAD_on(gv)		(GvFLAGS(gv) |= GVf_IN_PAD)
 #define GvIN_PAD_off(gv)	(GvFLAGS(gv) &= ~GVf_IN_PAD)
 
-#define GvUNIQUE(gv)            0
-#define GvUNIQUE_on(gv)         NOOP
-#define GvUNIQUE_off(gv)        NOOP
-
-#undef  GV_UNIQUE_CHECK
-
 #ifndef PERL_CORE
 #  define Nullgv Null(GV*)
 #endif
@@ -198,9 +181,15 @@ INLINE1(AV*, GvAVn, GV *gv) {
 #define GV_NOEXPAND	0x40	/* Don't expand SvOK() entries to PVGV */
 #define GV_NOTQUAL	0x80	/* A plain symbol name, not qualified with a
 				   package (so skip checks for :: and ')  */
+#define GV_CROAK	0x200	/* gv_fetchmethod_flags() should croak  */
 
 #define GV_NOADD_MASK	(GV_NOADD_NOINIT|GV_NOEXPAND|GV_NOTQUAL)
 /* The bit flags that don't cause gv_fetchpv() to add a symbol if not found */
+
+#define gv_AVadd(gv) gv_add_by_type((gv), SVt_PVAV)
+#define gv_HVadd(gv) gv_add_by_type((gv), SVt_PVHV)
+#define gv_IOadd(gv) gv_add_by_type((gv), SVt_PVIO)
+#define gv_SVadd(gv) gv_add_by_type((gv), SVt_NULL)
 
 /*
  * Local variables:

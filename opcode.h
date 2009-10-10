@@ -40,6 +40,7 @@ EXTCONST char* const PL_op_name[] = {
 	"pushmark",
 	"logassign_assign",
 	"const",
+	"var",
 	"gvsv",
 	"gv",
 	"gelem",
@@ -115,6 +116,8 @@ EXTCONST char* const PL_op_name[] = {
 	"i_ncmp",
 	"ref_eq",
 	"ref_ne",
+	"code_eq",
+	"code_ne",
 	"seq",
 	"sne",
 	"scmp",
@@ -402,6 +405,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"pushmark",
 	"assignment part of a logical assignment",
 	"constant item",
+	"variable item",
 	"scalar variable",
 	"glob value",
 	"glob elem",
@@ -477,6 +481,8 @@ EXTCONST char* const PL_op_desc[] = {
 	"integer comparison (<+>)",
 	"ref eq",
 	"ref ne",
+	"code eq",
+	"code ne",
 	"string eq",
 	"string ne",
 	"string comparison (cmp)",
@@ -776,6 +782,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_pushmark),
 	MEMBER_TO_FPTR(Perl_pp_logassign_assign),
 	MEMBER_TO_FPTR(Perl_pp_const),
+	MEMBER_TO_FPTR(Perl_pp_const),	/* Perl_pp_var */
 	MEMBER_TO_FPTR(Perl_pp_gvsv),
 	MEMBER_TO_FPTR(Perl_pp_gv),
 	MEMBER_TO_FPTR(Perl_pp_gelem),
@@ -851,6 +858,8 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_i_ncmp),
 	MEMBER_TO_FPTR(Perl_pp_ref_eq),
 	MEMBER_TO_FPTR(Perl_pp_ref_ne),
+	MEMBER_TO_FPTR(Perl_pp_code_eq),
+	MEMBER_TO_FPTR(Perl_pp_code_ne),
 	MEMBER_TO_FPTR(Perl_pp_seq),
 	MEMBER_TO_FPTR(Perl_pp_sne),
 	MEMBER_TO_FPTR(Perl_pp_scmp),
@@ -1147,6 +1156,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* pushmark */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* logassign_assign */
 	MEMBER_TO_FPTR(Perl_ck_svconst),	/* const */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* var */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* gvsv */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* gv */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* gelem */
@@ -1222,6 +1232,8 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* i_ncmp */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* ref_eq */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* ref_ne */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* code_eq */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* code_ne */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* seq */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* sne */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* scmp */
@@ -1512,6 +1524,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000004,	/* pushmark */
 	0x00000000,	/* logassign_assign */
 	0x00000c04,	/* const */
+	0x00000c04,	/* var */
 	0x00000c44,	/* gvsv */
 	0x00000c44,	/* gv */
 	0x00022440,	/* gelem */
@@ -1587,6 +1600,8 @@ EXTCONST U32 PL_opargs[] = {
 	0x0002241e,	/* i_ncmp */
 	0x00022414,	/* ref_eq */
 	0x00022414,	/* ref_ne */
+	0x00022414,	/* code_eq */
+	0x00022414,	/* code_ne */
 	0x00022416,	/* seq */
 	0x00022416,	/* sne */
 	0x0002241e,	/* scmp */
@@ -1658,7 +1673,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00042815,	/* push */
 	0x00013604,	/* pop */
 	0x00013604,	/* shift */
-	0x00042815,	/* unshift */
+	0x0004281d,	/* unshift */
 	0x0005a841,	/* sort */
 	0x0000280c,	/* reverse */
 	0x0000280c,	/* arrayjoin */
@@ -1667,9 +1682,9 @@ EXTCONST U32 PL_opargs[] = {
 	0x0002280c,	/* hashconcat */
 	0x00000004,	/* emptyarray */
 	0x00000004,	/* emptyhash */
-	0x0004a845,	/* grepstart */
+	0x0002a845,	/* grepstart */
 	0x00000648,	/* grepwhile */
-	0x0004a845,	/* mapstart */
+	0x0002a845,	/* mapstart */
 	0x00000648,	/* mapwhile */
 	0x00022400,	/* range */
 	0x00000600,	/* and */

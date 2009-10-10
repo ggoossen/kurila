@@ -3,7 +3,12 @@ version: 1.19_0
 abstract: a geneticly modified perl
 author: ~
 license: perl
+resources:
+  homepage: http://www.perl.org/
+  bugtracker: http://rt.perl.org/perlbug/
+  license: http://dev.perl.org/licenses/
 distribution_type: core
+generated_by: Porting/makemeta
 no_index:
   directory:
     - ext/Compress/Raw
@@ -34,6 +39,7 @@ no_index:
     - lib/Archive/Extract
     - lib/Archive/Tar
     - lib/Attribute/Handlers
+    - lib/AutoLoader
     - lib/base
     - lib/bignum
     - lib/CGI
@@ -71,7 +77,6 @@ no_index:
     - lib/Module/Load/Conditional
     - lib/Module/Load/t
     - lib/Module/Loaded
-    - lib/Module/Pluggable
     - lib/Net/FTP
     - lib/Net/Ping
     - lib/Net/t
@@ -79,6 +84,7 @@ no_index:
     - lib/Object/Accessor
     - lib/Package/Constants
     - lib/Params/Check
+    - lib/parent
     - lib/Pod/Escapes
     - lib/Pod/Perldoc
     - lib/Pod/Simple
@@ -90,13 +96,17 @@ no_index:
     - lib/Test/t
     - lib/Text/Balanced
     - lib/Text/TabsWrap
+    - lib/Thread/Queue
+    - lib/Thread/Semaphore
     - lib/Tie/File
     - lib/Tie/RefHash
     - lib/Unicode/Collate
+    - t/lib/data
     - t/lib/Filter/Simple
     - t/lib/MakeMaker
     - t/lib/Math
     - t/lib/sample-tests
+    - t/lib/source_tests
     - t/lib/Test/Simple
     - t/Module_Pluggable
 
@@ -129,7 +139,6 @@ no_index:
     - lib/CPANPLUS/Selfupdate.pm
     - lib/CPANPLUS/Shell.pm
     - lib/Cwd.pm
-    - lib/Devel/InnerPackage.pm
     - lib/Digest.pm
     - lib/encoding/warnings
     - lib/encoding/warnings.pm
@@ -154,6 +163,7 @@ no_index:
     - lib/ExtUtils/MM_Any.pm
     - lib/ExtUtils/MM_BeOS.pm
     - lib/ExtUtils/MM_Cygwin.pm
+    - lib/ExtUtils/MM_Darwin.pm
     - lib/ExtUtils/MM_DOS.pm
     - lib/ExtUtils/MM_MacOS.pm
     - lib/ExtUtils/MM_NW5.pm
@@ -216,7 +226,6 @@ no_index:
     - lib/Module/Load.pm
     - lib/Module/Load/Conditional.pm
     - lib/Module/Loaded.pm
-    - lib/Module/Pluggable.pm
     - lib/Net/ChangeLog
     - lib/Net/Cmd.pm
     - lib/Net/Config.eg
@@ -236,6 +245,7 @@ no_index:
     - lib/Object/Accessor.pm
     - lib/Package/Constants.pm
     - lib/Params/Check.pm
+    - lib/parent.pm
     - lib/PerlIO/via/QuotedPrint.pm
     - lib/PerlIO/via/t/QuotedPrint.t
     - lib/Pod/Checker.pm
@@ -269,6 +279,7 @@ no_index:
     - lib/Pod/Text/Overstrike.pm
     - lib/Pod/Text/Termcap.pm
     - lib/Pod/Usage.pm
+    - lib/SelfLoader.pm
     - lib/Shell.pm
     - lib/Shell.t
     - lib/Switch.pm
@@ -284,6 +295,8 @@ no_index:
     - lib/Text/Balanced.pm
     - lib/Text/Tabs.pm
     - lib/Text/Wrap.pm
+    - lib/Thread/Queue.pm
+    - lib/Thread/Semaphore.pm
     - lib/Tie/File.pm
     - lib/Tie/RefHash.pm
     - lib/Time/Local.pm
@@ -297,7 +310,11 @@ no_index:
     - pod/pod2usage.PL
     - pod/podchecker.PL
     - pod/podselect.PL
+    - t/lib/App/Prove/Plugin/Dummy.pm
+    - t/lib/Dev/Null.pm
     - t/lib/filter-util.pl
+    - t/lib/IO/c55Capture.pm
+    - t/lib/NoFork.pm
     - t/lib/TieIn.pm
     - t/lib/TieOut.pm
     - t/pod/emptycmd.t

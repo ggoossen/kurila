@@ -54,3 +54,10 @@ if (opendir(%fh{+abc}, "op")) { print $^STDOUT, "ok 8\n"; } else { print $^STDOU
 if (ref(%fh{?abc}) eq 'GLOB') { print $^STDOUT, "ok 9\n"; } else { print $^STDOUT, "not ok 9\n"; }
 if (not $fh \== @fh[0]) { print $^STDOUT, "ok 10\n"; } else { print $^STDOUT, "not ok 10\n"; }
 if (not $fh \== %fh{?abc}) { print $^STDOUT, "ok 11\n"; } else { print $^STDOUT, "not ok 11\n"; }
+
+# See that perl does not segfault upon readdir($x="."); 
+# http://rt.perl.org/rt3/Ticket/Display.html?id=68182
+try
+    my $x = "."
+    my @files = readdir($x)
+print $^STDOUT, "ok 12\n"

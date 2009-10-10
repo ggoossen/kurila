@@ -179,9 +179,7 @@ After installing cpan-mac, drop the module archive on the
 B<untarzipme> droplet, which will decompress and unpack for you.
 
 B<Or>, you can either use the shareware B<StuffIt Expander> program
-( http://www.aladdinsys.com/expander/ )
-in combination with B<DropStuff with Expander Enhancer>
-( http://www.aladdinsys.com/dropstuff/ )
+( http://my.smithmicro.com/mac/stuffit/ )
 or the freeware B<MacGzip> program (
 http://persephone.cps.unizar.es/general/gente/spd/gzip/gzip.html ).
 
@@ -199,14 +197,6 @@ reasons why you might have trouble using it with MacPerl.  Look for
 F<.xs> and F<.c> files, which normally denote that the distribution
 must be compiled, and you cannot install it "out of the box."
 (See L<"PORTABILITY">.)
-
-If a module does not work on MacPerl but should, or needs to be
-compiled, see if the module exists already as a port on the
-MacPerl Module Porters site ( http://pudge.net/mmp/ ).
-For more information on doing XS with MacPerl yourself, see
-Arved Sandstrom's XS tutorial ( http://macperl.com/depts/Tutorials/ ),
-and then consider uploading your binary to the CPAN and
-registering it on the MMP site.
 
 D. INSTALL
 
@@ -251,7 +241,7 @@ B<If you're on the DJGPP port of DOS,>
 
    A. DECOMPRESS
 
-djtarx ( ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/ )
+djtarx ( ftp://ftp.delorie.com/pub/djgpp/current/v2/ )
 will both uncompress and unpack.
 
    B. UNPACK
@@ -306,8 +296,7 @@ or, for zipped modules, type
 
 Executables for gzip, zip, and VMStar:
 
-    http://www.openvms.digital.com/freeware/
-    http://www.crinoid.com/utils/
+    http://www.hp.com/go/openvms/freeware/
 
 and their source code:
 

@@ -3,14 +3,11 @@
 BEGIN 
     require './test.pl'
 
-
 BEGIN 
     if ($^OS_NAME eq 'riscos')
         skip_all("kill() not implemented on this platform")
-    
 
-
-plan tests => 2
+plan tests => 5
 
 ok( kill(0, $^PID), 'kill(0, $pid) returns true if $pid exists' )
 
@@ -25,3 +22,14 @@ for my $pid (1 .. $total)
 # It is highly unlikely that all of the above PIDs are genuinely in use,
 # so $count should be less than $total.
 ok( $count +< $total, 'kill(0, $pid) returns false if $pid does not exist' )
+
+# Verify that trying to kill a non-numeric PID is fatal
+my @bad_pids = @:
+    @: undef , 'undef'
+    @: ''    , 'empty string'
+    @: 'abcd', 'alphabetic'
+
+for my $case ( @bad_pids )
+  my @: $pid, $name = $case
+  dies_like( { kill 0, $pid },
+             qr/^Can't kill a non-numeric process ID/, "dies killing $name pid")

@@ -1,7 +1,7 @@
 /*    pp_sort.c
  *
- *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by Larry Wall and others
+ *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+ *    2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -9,8 +9,10 @@
  */
 
 /*
- *   ...they shuffled back towards the rear of the line. 'No, not at the
- *   rear!'  the slave-driver shouted. 'Three files up. And stay there...
+ *   ...they shuffled back towards the rear of the line.  'No, not at the
+ *   rear!' the slave-driver shouted.  'Three files up. And stay there...
+ *
+ *     [p.931 of _The Lord of the Rings_, VI/ii: "The Land of Shadow"]
  */
 
 /* This file contains pp ("push/pop") functions that
@@ -203,7 +205,7 @@ dynprep(pTHX_ gptr *list1, gptr *list2, size_t nmemb, const SVCOMPARE_t cmp)
 	    if (r >= t) p = r = t;	/* too short to care about */
 	    else {
 		while (((cmp(aTHX_ *(p-1), *p) > 0) == sense) &&
-		       ((p -= 2) > q));
+		       ((p -= 2) > q)) {}
 		if (p <= q) {
 		    /* b through r is a (long) run.
 		    ** Extend it as far as possible.
@@ -1499,7 +1501,7 @@ PP(pp_sort)
 	RETPUSHUNDEF;
     }
 
-    ENTER;
+    ENTER_named("sort");
     SAVEVPTR(PL_sortcop);
     if (SP - MARK > 1) {
 	cv = sv_2cv(*++MARK, &gv, 0);
@@ -1604,13 +1606,7 @@ PP(pp_sort)
 			pad_push(padlist, CvDEPTH(cv));
 		    }
 		    SAVECOMPPAD();
-		    PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
-
-		    if (hasargs) {
-			/* This is mostly copied from pp_entersub */
-			CX_CURPAD_SAVE(cx->blk_sub);
-		    }
-
+		    pad_set_cur_nosave(padlist, CvDEPTH(cv));
 		}
 	    }
 	    cx->cx_type |= CXp_MULTICALL;
@@ -1625,6 +1621,10 @@ PP(pp_sort)
 		    CvDEPTH(cv)--;
 	    }
 	    POPBLOCK(cx,PL_curpm);
+	    if (!(flags & OPf_SPECIAL)) {
+		SV* sv;
+		POPSUB(cx,sv);
+	    }
 	    PL_stack_sp = newsp;
 	    POPSTACK;
 	    CATCH_SET(oldcatch);
@@ -1650,7 +1650,7 @@ PP(pp_sort)
 	}
     }
     
-    LEAVE;
+    LEAVE_named("sort");
     PL_stack_sp = ORIGMARK;
     *++PL_stack_sp = avTsv(av);
     return nextop;
@@ -1732,7 +1732,7 @@ S_sortcv_xsub(pTHX_ SV *const a, SV *const b)
     dVAR; dSP;
     const I32 oldsaveix = PL_savestack_ix;
     const I32 oldscopeix = PL_scopestack_ix;
-    CV * const cv=(CV*)PL_sortcop;
+    CV * const cv=MUTABLE_CV(PL_sortcop);
     I32 result;
 
     PERL_ARGS_ASSERT_SORTCV_XSUB;

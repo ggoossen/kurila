@@ -1,22 +1,21 @@
 #!./perl
 
-print $^STDOUT, "1..42\n"
+print $^STDOUT, "1..44\n"
 
-our ($reopen, $x, $outfile)
-
-chdir('op') || chdir('t/op') || die "sysio.t: cannot look for myself: $^OS_ERROR"
-$^INCLUDE_PATH = @:  '../../lib' 
+chdir('op') || die "sysio.t: cannot look for myself: $^OS_NAME"
+$^INCLUDE_PATH = @: '../../lib'
+require '../test.pl'
 
 open(my $i_fh, "<", 'sysio.t') || die "sysio.t: cannot find myself: $^OS_ERROR"
 
-$reopen = ($^OS_NAME eq 'VMS' ||
+my $reopen = ($^OS_NAME eq 'VMS' ||
            $^OS_NAME eq 'os2' ||
            $^OS_NAME eq 'MSWin32' ||
            $^OS_NAME eq 'NetWare' ||
            $^OS_NAME eq 'dos' ||
            $^OS_NAME eq 'mpeix')
 
-$x = 'abc'
+my $x = 'abc'
 
 # should not be able to do negative lengths
 try { sysread($i_fh, $x, -1) }
@@ -62,7 +61,7 @@ print $^STDOUT, "ok 9\n"
 print $^STDOUT, 'not ' unless ($a eq "#!.\0\0erl")
 print $^STDOUT, "ok 10\n"
 
-$outfile = 'sysio.out'
+my $outfile = tempfile()
 
 open(my $o_fh, ">", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR"
 
@@ -180,8 +179,6 @@ if ($reopen)  # must close file to update EOF marker for stat
 print $^STDOUT, 'not ' unless (-s $outfile == 10)
 print $^STDOUT, "ok 31\n"
 
-close($o_fh)
-
 open($i_fh, "<", $outfile) || die "sysio.t: cannot read $outfile: $^OS_ERROR"
 
 $b = 'xyz'
@@ -239,6 +236,17 @@ close($i_fh)
 unlink $outfile
 
 chdir('..')
+
+# [perl #67912] syswrite prints garbage if called with empty scalar and non-zero offset
+try { my $buf = ''; syswrite($o_fh, $buf, 1, 0) }
+print $^STDOUT, 'not ' unless ($^EVAL_ERROR->message =~ m/^Offset outside string /)
+print $^STDOUT, "ok 43\n"
+
+try { my $buf = 'x'; syswrite($o_fh, $buf, 1, 1) }
+print $^STDOUT, 'not ' unless ($^EVAL_ERROR->message =~ m/^Offset outside string /)
+print$^STDOUT,  "ok 44\n"
+
+close($o_fh)
 
 1
 

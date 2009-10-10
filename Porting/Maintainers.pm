@@ -15,6 +15,7 @@ our (@ISA, @EXPORT_OK);
 @EXPORT_OK = qw(%Modules %Maintainers
 		get_module_files get_module_pat
 		show_results process_options);
+$VERSION = 0.02;
 require Exporter;
 
 use File::Find;
@@ -74,7 +75,7 @@ $^PROGRAM_NAME: Usage: $^PROGRAM_NAME [[--maintainer M --module M --files]|[--ch
 			with a file	checks if it has a maintainer
 			with a dir	checks all files have a maintainer
 			otherwise	checks for multiple maintainers
---opened	list all modules of files opened by perforce
+--opened	list all modules of modified files
 Matching is case-ignoring regexp, author matching is both by
 the short id and by the full name and email.  A "module" may
 not be just a module, it may be a file or files or a subdirectory.
@@ -101,11 +102,10 @@ sub process_options {
 		      );
 
     my @Files;
-   
+
     if ($Opened) {
-	my @raw = @( `p4 opened` );
-	die if $^CHILD_ERROR;
-	@Files = map {s!#.*!!s; s!^//depot/.*?/perl/!!; $_} @raw;
+	@Files = `git ls-files -m --full-name`
+	die if $^CHILD_ERROR
     } else {
 	@Files = @ARGV;
     }

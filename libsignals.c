@@ -29,7 +29,7 @@ restore_sigmask(pTHX_ SV *save_sv)
 #endif
 
 void
-S_signals_set_handler(SV* handlersv, SV* namesv)
+S_signals_set_handler(pTHX_ SV* handlersv, SV* namesv)
 {
     I32 i;
     /* Need to be careful with SvREFCNT_dec(), because that can have side
@@ -46,17 +46,14 @@ S_signals_set_handler(SV* handlersv, SV* namesv)
     SV* save_sv;
 #endif
 
-    if ( SvROK(handlersv) ) {
-	if ( SvTYPE(SvRV(handlersv)) != SVt_PVCV )
-	    Perl_croak(aTHX_ "signal handler should be a code refernce, 'DEFAULT' or 'IGNORE'");
-    } else {
+    if ( SvTYPE(handlersv) != SVt_PVCV ) {
         const char *s = SvOK(handlersv) ? SvPV_const(handlersv, len) : "DEFAULT";
         if ( strEQ(s,"IGNORE") )
 	    set_to_ignore = TRUE;
 	else if (strEQ(s,"DEFAULT"))
 	    set_to_default = TRUE;
 	else
-            Perl_croak(aTHX_  "signal handler should be a code reference or 'DEFAULT or 'IGNORE'");
+            Perl_croak(aTHX_  "signal handler should be a CODE or 'DEFAULT or 'IGNORE'");
     }
 
     if (!PL_psig_ptr) {
@@ -75,7 +72,7 @@ S_signals_set_handler(SV* handlersv, SV* namesv)
     sigemptyset(&set);
     sigaddset(&set,i);
     sigprocmask(SIG_BLOCK, &set, &save);
-    ENTER;
+    ENTER_named("signals_set_handler");
     save_sv = newSVpvn((char *)(&save), sizeof(sigset_t));
     SAVEFREESV(save_sv);
     SAVEDESTRUCTOR_X(restore_sigmask, save_sv);
@@ -96,11 +93,11 @@ S_signals_set_handler(SV* handlersv, SV* namesv)
     PL_psig_name[i] = newSVpvn(s, len);
     SvREADONLY_on(PL_psig_name[i]);
 
-    if (SvROK(handlersv)) {
-	PL_psig_ptr[i] = SvREFCNT_inc(SvRV(handlersv));
+    if (SvTYPE(handlersv) == SVt_PVCV) {
+	PL_psig_ptr[i] = newSVsv(handlersv);
 	(void)rsignal(i, PL_csighandlerp);
 #ifdef HAS_SIGPROCMASK
-	LEAVE;
+	LEAVE_named("signals_set_handler");
 #endif
         if(to_dec)
             SvREFCNT_dec(to_dec);
@@ -124,7 +121,7 @@ S_signals_set_handler(SV* handlersv, SV* namesv)
     }
 #ifdef HAS_SIGPROCMASK
     if(i)
-        LEAVE;
+        LEAVE_named("signals_set_handler");
 #endif
     if(to_dec)
         SvREFCNT_dec(to_dec);
@@ -140,7 +137,7 @@ XS(XS_signals_handler)
 
     if (PL_op->op_flags & OPf_ASSIGN) {
         SV* handlersv = POPs;
-        S_signals_set_handler(handlersv, namesv);
+        S_signals_set_handler(aTHX_ handlersv, namesv);
     }
 
     {
@@ -159,7 +156,7 @@ XS(XS_signals_handler)
             Newxz(PL_psig_pend, SIG_SIZE, int);
         }
         if(PL_psig_ptr[i])
-            sv_setsv(sv,sv_2mortal(newRV_inc(PL_psig_ptr[i])));
+            sv_setsv(sv,sv_2mortal(newSVsv(PL_psig_ptr[i])));
         else {
             Sighandler_t sigstate = rsignal_state(i);
 #ifdef FAKE_PERSISTENT_SIGNAL_HANDLERS

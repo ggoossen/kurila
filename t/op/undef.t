@@ -2,7 +2,7 @@
 
 our (@ary, %ary, $test, %hash)
 
-print $^STDOUT, "1..34\n"
+print $^STDOUT, "1..35\n"
 
 print $^STDOUT, defined($a) ?? "not ok 1\n" !! "ok 1\n"
 
@@ -51,7 +51,7 @@ sub foo { print $^STDOUT, "ok 19\n"; }
 
 foo( < @_ ) || print $^STDOUT, "not ok 19\n"
 
-print $^STDOUT, defined &foo ?? "ok 20\n" !! "not ok 20\n"
+print $^STDOUT, exists &foo ?? "ok 20\n" !! "not ok 20\n"
 undef &foo
 print $^STDOUT, defined(&foo) ?? "not ok 21\n" !! "ok 21\n"
 
@@ -76,8 +76,18 @@ $test = 27
     
 undef %hash
 sub X::DESTROY
-    print $^STDOUT, "not " if %hash; print $^STDOUT, "ok $test\n"; $test++
-    print $^STDOUT, "not " if %hash; print $^STDOUT, "ok $test\n"; $test++
+    print $^STDOUT, "not " if keys %hash; print $^STDOUT, "ok $test\n"; $test++
+    print $^STDOUT, "not " if values %hash; print $^STDOUT, "ok $test\n"; $test++
     print $^STDOUT, "not " if each   %hash; print $^STDOUT, "ok $test\n"; $test++
     print $^STDOUT, "not " if defined delete %hash{'key2'}; print $^STDOUT, "ok $test\n"; $test++
 
+# this will segfault if it fails
+
+sub PVBM () { 'foo' }
+do
+    my $dummy = index 'foo', PVBM
+
+my $pvbm = PVBM;
+undef $pvbm;
+print $^STDOUT, 'not ' if defined $pvbm;
+print $^STDOUT, "ok $test\n"; $test++;

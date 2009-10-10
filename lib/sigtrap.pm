@@ -11,7 +11,7 @@ our $Verbose ||= 0
 
 sub import
     my $pkg = shift
-    my $handler = \&handler_traceback
+    my $handler = &handler_traceback
     my $saw_sig = 0
     my $untrapped = 0
     local $_ = undef

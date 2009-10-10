@@ -1,7 +1,7 @@
 /*    patchlevel.h
  *
- *    Copyright (C) 1993, 1995, 1996, 1997, 1998, 1999,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006, by Larry Wall and others
+ *    Copyright (C) 1993, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+ *    2003, 2004, 2005, 2006, 2007, 2008, 2009, by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -13,14 +13,9 @@
 /* do not adjust the whitespace! Configure expects the numbers to be
  * exactly on the third column */
 
-#define KURILA_REVISION "kurila"
-#define KURILA_VERSION 1
-#define KURILA_SUBVERSION 20
-
-/* Fake Perl version 5.10.0 */
-#define PERL_REVISION	5		/* age */
-#define PERL_VERSION	11		/* epoch */
-#define PERL_SUBVERSION	0		/* generation */
+#define PERL_REVISION	"kurila"	/* age */
+#define PERL_VERSION	1		/* epoch */
+#define PERL_SUBVERSION	21		/* generation */
 
 /* The following numbers describe the earliest compatible version of
    Perl ("compatibility" here being defined as sufficient binary/API
@@ -35,9 +30,9 @@
    PERL_INC_VERSION_LIST, which lists version libraries
    to include in $^INCLUDE_PATH.  See INSTALL for how this works.
 */
-#define PERL_API_REVISION	5	/* Adjust manually as needed.  */
-#define PERL_API_VERSION	11	/* Adjust manually as needed.  */
-#define PERL_API_SUBVERSION	0	/* Adjust manually as needed.  */
+#define PERL_API_REVISION	PERL_REVISION	/* Adjust manually as needed.  */
+#define PERL_API_VERSION	PERL_VERSION	/* Adjust manually as needed.  */
+#define PERL_API_SUBVERSION	PERL_SUBVERSION	/* Adjust manually as needed.  */
 /*
    XXX Note:  The selection of non-default Configure options, such
    as -Duselonglong may invalidate these settings.  Currently, Configure
@@ -121,9 +116,21 @@ hunk.
  */
 
 #if !defined(PERL_PATCHLEVEL_H_IMPLICIT) && !defined(LOCAL_PATCH_COUNT)
+#  if defined(PERL_IS_MINIPERL)
+#    define PERL_PATCHNUM "UNKNOWN-miniperl"
+#    define PERL_GIT_UNCOMMITTED_CHANGES ,"UNKNOWN"
+#    define PERL_GIT_UNPUSHED_COMMITS /*leave-this-comment*/
+#  elif defined(PERL_MICRO)
+#    define PERL_PATCHNUM "UNKNOWN-microperl"
+#    define PERL_GIT_UNCOMMITTED_CHANGES ,"UNKNOWN"
+#    define PERL_GIT_UNPUSHED_COMMITS /*leave-this-comment*/
+#  else
+#include "git_version.h"
+#  endif
 static const char * const local_patches[] = {
 	NULL
-	,"DEVEL"
+	PERL_GIT_UNPUSHED_COMMITS    	/* do not remove this line */
+        PERL_GIT_UNCOMMITTED_CHANGES	/* do not remove this line */
 	,NULL
 };
 

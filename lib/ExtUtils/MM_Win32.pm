@@ -44,13 +44,13 @@ my $GCC     = %Config{?'cc'} =~ m/^gcc/i ?? 1 !! 0
 
 sub dlsyms($self,%< %attribs)
 
-    my(@: $funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \$%
-    my(@: $vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \$@
-    my(@: $funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \$@
-    my(@: $imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \$%
-    my(@m)
+    my $funcs = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \$%
+    my $vars  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \$@
+    my $funclist = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \$@
+    my $imports  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \$%
+    my @m
 
-    if (not $self->{SKIPHASH}->{?'dynamic'})
+    if (not $self->{SKIPHASH}{?'dynamic'})
         push(@m,"
 $self->{?BASEEXT}.def: Makefile.PL
 ",
@@ -61,10 +61,10 @@ $self->{?BASEEXT}.def: Makefile.PL
             # a bug in the 4DOS/4NT command line interpreter.  The visible
             # result of the bug was files named q('extension_name',) *with the
             # single quotes and the comma* in the extension build directories.
-            q!', 'DL_FUNCS' => !, <neatvalue($funcs),
-            q!, 'FUNCLIST' => !, <neatvalue($funclist),
-            q!, 'IMPORTS' => !, <neatvalue($imports),
-            q!, 'DL_VARS' => !, < neatvalue($vars), q!);"
+            q!', 'DL_FUNCS' => !, neatvalue($funcs),
+            q!, 'FUNCLIST' => !, neatvalue($funclist),
+            q!, 'IMPORTS' => !, neatvalue($imports),
+            q!, 'DL_VARS' => !, neatvalue($vars), q!);"
 !)
     
     join('', @m)
@@ -146,7 +146,7 @@ Adjustments are made for Borland's quirks needing -L to come first.
 sub init_others($self)
 
     # Used in favor of echo because echo won't strip quotes. :(
-    $self->{+ECHO}     ||= $self->oneliner('print qq{@ARGV}', \(@: '-l'))
+    $self->{+ECHO}     ||= $self->oneliner('print qq{@ARGV}', (@: '-l'))
     $self->{+ECHO_N}   ||= $self->oneliner('print qq{@ARGV}')
 
     $self->{+TOUCH}    ||= '$(ABSPERLRUN) -MExtUtils::Command -e touch'
@@ -286,9 +286,9 @@ sub dynamic_lib($self, %< %attribs)
 
     return '' unless $self->has_link_code
 
-    my(@: $otherldflags) = %attribs{?OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '')
-    my(@: $inst_dynamic_dep) = %attribs{?INST_DYNAMIC_DEP} || ""
-    my(@: $ldfrom) = '$(LDFROM)'
+    my $otherldflags = %attribs{?OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '')
+    my $inst_dynamic_dep = %attribs{?INST_DYNAMIC_DEP} || ""
+    my $ldfrom = '$(LDFROM)'
     my(@m)
 
     # one thing for GCC/Mingw32:
@@ -330,13 +330,11 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
             q{	$(LD) -out:$@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) }
             .q{$(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) -def:$(EXPORT_LIST)})
 
-        # VS2005 (aka VC 8) or higher, but not for 64-bit compiler from Platform SDK
-        if (%Config{?ivsize} == 4 && %Config{?cc} eq 'cl' and %Config{?ccversion} =~ m/^(\d+)/ and $1 +>= 14)
-            push(@m,
-                q{
-	mt -nologo -manifest $@.manifest -outputresource:$@;2 && del $@.manifest})
-        
-    
+        # Embed the manifest file if it exists
+        push(@m, q{
+	  if exist $@.manifest mt -nologo -manifest $@.manifest -outputresource:$@;2
+	  if exist $@.manifest del $@.manifest})
+
     push @m, '
 	$(CHMOD) $(PERM_RWX) $@
 '
@@ -408,7 +406,6 @@ sub pasthru
     return "PASTHRU = " . ($self->make eq 'nmake' ?? "-nologo" !! "")
 
 
-
 =item oneliner
 
 These are based on what command.com does on Win98.  They may be wrong
@@ -416,8 +413,8 @@ for other Windows shells, I don't know.
 
 =cut
 
-sub oneliner($self, $cmd, $switches)
-    $switches = \$@ unless defined $switches
+sub oneliner($self, $cmd, ?$switches)
+    $switches //= $@
 
     # Strip leading and trailing newlines
     $cmd =~ s{^\n+}{}
@@ -426,7 +423,7 @@ sub oneliner($self, $cmd, $switches)
     $cmd = $self->quote_literal($cmd)
     $cmd = $self->escape_newlines($cmd)
 
-    $switches = join ' ', $switches->@
+    $switches = join ' ', $switches
 
     return qq{\$(ABSPERLRUN) $switches -e $cmd --}
 

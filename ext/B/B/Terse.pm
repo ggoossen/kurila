@@ -12,7 +12,6 @@ sub terse($order, ?$subref)
         concise_subref('exec', $subref)
     else
         concise_subref('basic', $subref)
-    
 
 
 sub compile

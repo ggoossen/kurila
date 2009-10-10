@@ -24,11 +24,10 @@ is ($buf, "")
 
 # This is true if Config is not built, or if PerlIO is enabled
 # ie assume that PerlIO is present, unless we know for sure otherwise.
-my $has_perlio = !try {
-    no warnings;
-    require Config;
+my $has_perlio = !try
+    no warnings
+    require Config
     ! Config::config_value("useperlio")
-}
 
 my $tmpfile = 'Op_read.tmp'
 
@@ -54,7 +53,6 @@ do
         is($got, $expect_length)
         is($buffer, $expect)
         close $fh
-    
 
     use utf8
     for (@: \(@: length($value), 0, '', length($value), "$value")
@@ -70,7 +68,6 @@ do
         is($got, $expect_length)
         is($buffer, $expect)
         close $fh
-    
 
 
 END { 1 while unlink $tmpfile }

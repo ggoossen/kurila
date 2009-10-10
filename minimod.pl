@@ -35,7 +35,8 @@ END
 open my $mini, "<", "miniperlmain.c"
 while ( ~< $mini)
     last if m/Do not delete this line--writemain depends on it/
-    print $^STDOUT,
+    print $^STDOUT, $_
+    m/#include "perl.h"/ and print $^STDOUT, qq/#include "XSUB.h"\n/
 
 
 print $^STDOUT, <<'END'
@@ -66,11 +67,12 @@ sub writemain{
         print "EXTERN_C void boot_${cname} (pTHX_ CV* cv);\n";
     }
 
-    my ($tail1,$tail2) = ( $tail =~ /\A(.*\n)(\s*\}.*)\Z/s );
-    print $tail1;
+    my ($tail1,$tail2,$tail3) = ( $tail =~ /\A(.*{\s*\n)(.*\n)(\s*\}.*)\Z/s );
 
+    print $tail1;
     print "\tconst char file[] = __FILE__;\n";
     print "\tdXSUB_SYS;\n" if $] > 5.002;
+    print $tail2;
 
     foreach $_ (@exts){
 	my($pname) = canon('/', $_);
@@ -90,7 +92,7 @@ sub writemain{
 	}
 	print "\t}\n";
     }
-    print $tail2;
+    print $tail3;
 }
 
 sub canon{

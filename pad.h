@@ -1,6 +1,6 @@
 /*    pad.h
  *
- *    Copyright (C) 2002, 2003, 2005, 2006, 2007 by Larry Wall and others
+ *    Copyright (C) 2002, 2003, 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -31,46 +31,50 @@ typedef U64TYPE PADOFFSET;
 #endif
 #define NOT_IN_PAD ((PADOFFSET) -1)
 
-/* B.xs needs these for the benefit of B::Deparse */ 
+/* B.xs needs these for the benefit of B::Deparse */
 /* Low range end is exclusive (valid from the cop seq after this one) */
 /* High range end is inclusive (valid up to this cop seq) */
 
 #if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 #  define COP_SEQ_RANGE_LOW(sv)						\
-	(({ SV *const _svi = (SV *) (sv);				\
-	  assert(SvTYPE(_svi) == SVt_NV || SvTYPE(_svi) >= SVt_PVNV);	\
-	  assert(SvTYPE(_svi) != SVt_PVAV);				\
-	  assert(SvTYPE(_svi) != SVt_PVHV);				\
-	  assert(SvTYPE(_svi) != SVt_PVCV);				\
-	  assert(!isGV_with_GP(_svi));					\
-	  ((XPVNV*) SvANY(_svi))->xnv_u.xpad_cop_seq.xlow;		\
+	(({ const SV *const _sv_cop_seq_range_low = (const SV *) (sv);	\
+	  assert(SvTYPE(_sv_cop_seq_range_low) == SVt_NV		\
+		 || SvTYPE(_sv_cop_seq_range_low) >= SVt_PVNV);		\
+	  assert(SvTYPE(_sv_cop_seq_range_low) != SVt_PVAV);		\
+	  assert(SvTYPE(_sv_cop_seq_range_low) != SVt_PVHV);		\
+	  assert(SvTYPE(_sv_cop_seq_range_low) != SVt_PVCV);		\
+	  assert(!isGV_with_GP(_sv_cop_seq_range_low));			\
+	  ((XPVNV*) MUTABLE_PTR(SvANY(_sv_cop_seq_range_low)))->xnv_u.xpad_cop_seq.xlow; \
 	 }))
 #  define COP_SEQ_RANGE_HIGH(sv)					\
-	(({ SV *const _svi = (SV *) (sv);				\
-	  assert(SvTYPE(_svi) == SVt_NV || SvTYPE(_svi) >= SVt_PVNV);	\
-	  assert(SvTYPE(_svi) != SVt_PVAV);				\
-	  assert(SvTYPE(_svi) != SVt_PVHV);				\
-	  assert(SvTYPE(_svi) != SVt_PVCV);				\
-	  assert(!isGV_with_GP(_svi));					\
-	  ((XPVNV*) SvANY(_svi))->xnv_u.xpad_cop_seq.xhigh;		\
+	(({ const SV *const _sv_cop_seq_range_high = (const SV *) (sv);	\
+	  assert(SvTYPE(_sv_cop_seq_range_high) == SVt_NV 		\
+                 || SvTYPE(_sv_cop_seq_range_high) >= SVt_PVNV);	\
+	  assert(SvTYPE(_sv_cop_seq_range_high) != SVt_PVAV);		\
+	  assert(SvTYPE(_sv_cop_seq_range_high) != SVt_PVHV);		\
+	  assert(SvTYPE(_sv_cop_seq_range_high) != SVt_PVCV);		\
+	  assert(!isGV_with_GP(_sv_cop_seq_range_high));		\
+	  ((XPVNV*) MUTABLE_PTR(SvANY(_sv_cop_seq_range_high)))->xnv_u.xpad_cop_seq.xhigh; \
 	 }))
 #  define PARENT_PAD_INDEX(sv)						\
-	(({ SV *const _svi = (SV *) (sv);				\
-	  assert(SvTYPE(_svi) == SVt_NV || SvTYPE(_svi) >= SVt_PVNV);	\
-	  assert(SvTYPE(_svi) != SVt_PVAV);				\
-	  assert(SvTYPE(_svi) != SVt_PVHV);				\
-	  assert(SvTYPE(_svi) != SVt_PVCV);				\
-	  assert(!isGV_with_GP(_svi));					\
-	  ((XPVNV*) SvANY(_svi))->xnv_u.xpad_cop_seq.xlow;		\
+	(({ const SV *const _sv_parent_pad_index = (const SV *) (sv);	\
+	  assert(SvTYPE(_sv_parent_pad_index) == SVt_NV			\
+		 || SvTYPE(_sv_parent_pad_index) >= SVt_PVNV);		\
+	  assert(SvTYPE(_sv_parent_pad_index) != SVt_PVAV);		\
+	  assert(SvTYPE(_sv_parent_pad_index) != SVt_PVHV);		\
+	  assert(SvTYPE(_sv_parent_pad_index) != SVt_PVCV);		\
+	  assert(!isGV_with_GP(_sv_parent_pad_index));			\
+	  ((XPVNV*) MUTABLE_PTR(SvANY(_sv_parent_pad_index)))->xnv_u.xpad_cop_seq.xlow; \
 	 }))
 #  define PARENT_FAKELEX_FLAGS(sv)					\
-	(({ SV *const _svi = (SV *) (sv);				\
-	  assert(SvTYPE(_svi) == SVt_NV || SvTYPE(_svi) >= SVt_PVNV);	\
-	  assert(SvTYPE(_svi) != SVt_PVAV);				\
-	  assert(SvTYPE(_svi) != SVt_PVHV);				\
-	  assert(SvTYPE(_svi) != SVt_PVCV);				\
-	  assert(!isGV_with_GP(_svi));					\
-	  ((XPVNV*) SvANY(_svi))->xnv_u.xpad_cop_seq.xhigh;		\
+	(({ const SV *const _sv_parent_fakelex_flags = (const SV *) (sv); \
+	  assert(SvTYPE(_sv_parent_fakelex_flags) == SVt_NV  		\
+		 || SvTYPE(_sv_parent_fakelex_flags) >= SVt_PVNV);	\
+	  assert(SvTYPE(_sv_parent_fakelex_flags) != SVt_PVAV);		\
+	  assert(SvTYPE(_sv_parent_fakelex_flags) != SVt_PVHV);		\
+	  assert(SvTYPE(_sv_parent_fakelex_flags) != SVt_PVCV);		\
+	  assert(!isGV_with_GP(_sv_parent_fakelex_flags));		\
+	  ((XPVNV*) MUTABLE_PTR(SvANY(_sv_parent_fakelex_flags)))->xnv_u.xpad_cop_seq.xhigh; \
 	 }))
 #else
 #  define COP_SEQ_RANGE_LOW(sv)		\
@@ -202,7 +206,8 @@ Restore the old pad saved into the local variable opad by PAD_SAVE_LOCAL()
 
 #define PAD_BASE_SV(padlist, po) \
 	(AvARRAY(padlist)[1]) 	\
-	    ? AvARRAY((AV*)(AvARRAY(padlist)[1]))[po] : NULL;
+	? AvARRAY(MUTABLE_AV((AvARRAY(padlist)[1])))[po] : NULL;
+
 
 #define PADLIST_NAMESV(padlist, po) \
     ( AvARRAY((AV*)(AvARRAY(padlist)[0]))[po] )
@@ -212,13 +217,6 @@ Restore the old pad saved into the local variable opad by PAD_SAVE_LOCAL()
 #define PADLIST_BASEPAD(padlist) \
     ( (PAD*)(AvARRAY(padlist)[1]) )
 
-#define PAD_SET_CUR_NOSAVE(padlist,nth) \
-	PL_comppad = (PAD*) (AvARRAY(padlist)[nth]);		\
-	PL_curpad = AvARRAY(PL_comppad);			\
-	DEBUG_Xv(PerlIO_printf(Perl_debug_log,			\
-	      "Pad 0x%"UVxf"[0x%"UVxf"] set_cur    depth=%d\n",	\
-	      PTR2UV(PL_comppad), PTR2UV(PL_curpad), (int)(nth)));
-
 
 #define PAD_SET_CUR(padlist,nth) \
 	SAVECOMPPAD();						\
@@ -226,38 +224,23 @@ Restore the old pad saved into the local variable opad by PAD_SAVE_LOCAL()
 
 
 #define PAD_SAVE_SETNULLPAD()	SAVECOMPPAD(); \
-	PL_comppad = NULL; PL_curpad = NULL;	\
+        AVcpNULL(PL_comppad); PL_curpad = NULL;				\
 	DEBUG_Xv(PerlIO_printf(Perl_debug_log, "Pad set_null\n"));
 
 #define PAD_SAVE_LOCAL(opad,npad) \
 	opad = PL_comppad;					\
-	PL_comppad = (npad);					\
+	PL_comppad = AvREFCNT_inc(npad);					\
 	PL_curpad =  PL_comppad ? AvARRAY(PL_comppad) : NULL;	\
 	DEBUG_Xv(PerlIO_printf(Perl_debug_log,			\
 	      "Pad 0x%"UVxf"[0x%"UVxf"] save_local\n",		\
 	      PTR2UV(PL_comppad), PTR2UV(PL_curpad)));
 
 #define PAD_RESTORE_LOCAL(opad) \
-	PL_comppad = opad;					\
+        AVcpSTEAL(PL_comppad, opad);				\
 	PL_curpad =  PL_comppad ? AvARRAY(PL_comppad) : NULL;	\
 	DEBUG_Xv(PerlIO_printf(Perl_debug_log,			\
 	      "Pad 0x%"UVxf"[0x%"UVxf"] restore_local\n",	\
 	      PTR2UV(PL_comppad), PTR2UV(PL_curpad)));
-
-
-/*
-=for apidoc m|void|CX_CURPAD_SAVE|struct context
-Save the current pad in the given context block structure.
-
-=for apidoc m|SV *|CX_CURPAD_SV|struct context|PADOFFSET po
-Access the SV at offset po in the saved current pad in the given
-context block structure (can be used as an lvalue).
-
-=cut
-*/
-
-#define CX_CURPAD_SAVE(block)  (block).oldcomppad = PL_comppad
-#define CX_CURPAD_SV(block,po) (AvARRAY((AV*)((block).oldcomppad))[po])
 
 
 /*
@@ -334,7 +317,7 @@ Clone the state variables associated with running and compiling pads.
  * sub's CV or padlist. */
 
 #define PAD_CLONE_VARS(proto_perl, param)				\
-    PL_comppad = (AV *) ptr_table_fetch(PL_ptr_table, proto_perl->Icomppad); \
+    PL_comppad = AvREFCNT_inc((AV *) ptr_table_fetch(PL_ptr_table, proto_perl->Icomppad)); \
     PL_curpad = PL_comppad ?  AvARRAY(PL_comppad) : NULL;		\
     SVcpREPLACE(PL_comppad_name, av_dup(proto_perl->Icomppad_name, param)); \
     PL_comppad_name_fill	= proto_perl->Icomppad_name_fill;	\

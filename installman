@@ -1,52 +1,26 @@
 #!./perl -w
-BEGIN $^INCLUDE_PATH = @: 'lib'
+BEGIN
+    $^INCLUDE_PATH = qw(lib)
+    
+    # This needs to be at BEGIN time, before any use of Config
+    require './install_lib.pl'
 
-BEGIN {
-    use Config;
-    if (config_value("userelocatableinc")) {
-        # This might be a considered a hack. Need to get information about the
-        # configuration from Config.pm *before* Config.pm expands any .../
-        # prefixes.
-        #
-        # So we set $^X to pretend that we're the already installed perl, so
-        # Config.pm doesits ... expansion off that location.
-
-        my $location = config_value("initialinstalllocation");
-        die <<'OS' unless defined $location;
-config_value("initialinstalllocation") is not defined - can't install a relocatable
-perl without this.
-OS
-        $^EXECUTABLE_NAME = "$location/perl";
-        # And then remove all trace of ever having loaded Config.pm, so that
-        # it will reload with the revised $^X
-        undef %Config::;
-        delete $^INCLUDED{"Config.pm"};
-        delete $^INCLUDED{"Config_heavy.pl"};
-        # You never saw us. We weren't here.
-    }
-}
-
-use Config;
-use Getopt::Long;
-use File::Find;
-use File::Copy;
-use File::Path < qw(mkpath);
-use ExtUtils::Packlist;
-use Pod::Man;
-our ($packlist);
-
-if (config_value("d_umask")) {
-    umask(022); # umasks like 077 aren't that useful for installations
-}
+use Getopt::Long
+use File::Find
+use File::Copy
+use File::Path < qw(mkpath)
+use ExtUtils::Packlist
+use Pod::Man
+our ($Is_VMS, $Is_W32, $Is_OS2, $Is_Cygwin, $Is_Darwin, $Is_NetWare,
+     %opts, $packlist)
 
 env::var("SHELL") = 'sh' if $^OS_NAME eq 'os2';
 
-my $ver = config_value("version");     # Not used presently.
-$^PERL_VERSION =~ m/kurila-(\d+).(\d+)/ or die "Invalid \$^PERL_VERSION";
+$^PERL_VERSION =~ m/kurila-(\d+).(\d+)/ or die "Invalid \$^PERL_VERSION"
 my @: $release, $patchlevel = @: $1, $2
-warn "Patchlevel of perl ($patchlevel)" .
-    "and patchlevel of config.sh ($(config_value('KURILA_VERSION'))) don't match\n"
-        if $patchlevel != config_value('KURILA_VERSION');
+die "Patchlevel of perl ($patchlevel)"
+    . "and patchlevel of config.sh ($(config_value('PERL_SUBVERSION'))) don't match\n"
+        if $patchlevel != config_value('PERL_SUBVERSION')
 
 my $usage =
   "Usage:  installman --man1dir=/usr/wherever --man1ext=1
@@ -62,7 +36,6 @@ my $usage =
         --verbose (or -V) report all progress.
         --silent  (or -S) be silent. Only report errors.\n";
 
-my %opts;
 GetOptions( \%opts,
             < qw( man1dir=s man1ext=s man3dir=s man3ext=s batchlimit=i
                 destdir:s notify n help silent S verbose V)) 
@@ -70,17 +43,13 @@ GetOptions( \%opts,
 die $usage if %opts{?help};
 %opts{destdir} //= '';
 
-%opts{+man1dir} = "%opts{destdir}" . config_value('installman1dir')
-    unless defined(%opts{?man1dir}); 
-%opts{+man1ext} = config_value('man1ext')
-    unless defined(%opts{?man1ext}); 
-%opts{+man3dir} = "%opts{destdir}" . config_value('installman3dir')
-    unless defined(%opts{?man3dir}); 
-%opts{+man3ext} = config_value('man3ext')
-    unless defined(%opts{?man3ext}); 
+foreach my $pre (qw(man1 man3))
+    %opts{+"$($pre)dir"} //= %opts{destdir} . config_value("install$($pre)dir")
+    %opts{+"$($pre)ext"} //= config_value("$($pre)ext")
+
 %opts{+silent} ||= %opts{?S};
 %opts{+notify} ||= %opts{?n};
-%opts{+verbose} ||= %opts{?V} || %opts{notify};
+%opts{+verbose} ||= %opts{?V} || %opts{?notify};
 
 #Sanity checks
 
@@ -213,67 +182,13 @@ print $^STDOUT, "  Installation complete\n" if %opts{verbose};
 
 exit 0;
 
-###############################################################################
-# Utility subroutines from installperl
-
-sub unlink {
-    my @names = @_;
-    my $cnt = 0;
-
-    foreach my $name (@names) {
-        next unless -e $name;
-        chmod 0777, $name if $^OS_NAME eq 'os2';
-        print $^STDOUT, "  unlink $name\n" if %opts{verbose};
-        ( CORE::unlink($name) and ++$cnt 
-            or warn "Couldn't unlink $name: $^OS_ERROR\n" ) unless %opts{notify};
-    }
-    return $cnt;
-}
-
-sub link($from,$to)
-    my($success) = 0
-
-    print $^STDOUT, "  ln $from $to\n" if %opts{verbose}
-    try
-        CORE::link($from, $to)
-            ?? $success++
-            !! ($from =~ m#^/afs/# || $to =~ m#^/afs/#)
-              ?? die "AFS"  # okay inside try {}
-              !! warn "Couldn't link $from to $to: $^OS_ERROR\n"
-          unless %opts{notify};
-
-    if ($^EVAL_ERROR)
-        File::Copy::copy($from, $to)
-            ?? $success++
-            !! warn "Couldn't copy $from to $to: $^OS_ERROR\n"
-          unless %opts{notify}
-
-    $success
-
 sub rename($from,$to)
-    if (-f $to and not (&unlink <: $to))
-        my $i = 1;
-        while ($i +< 50) {
-            last if CORE::rename($to, "$to.$i");
-            $i++;
-        }
-        warn("Cannot rename to `$to.$i': $^OS_ERROR"), return 0 
-            if $i +>= 50;       # Give up!
+    if (-f $to and not unlink($to))
+        for my $i (1..50)
+            last if CORE::rename($to, "$to.$i")
+            if ($i +>= 50) # Give up!
+                warn("Cannot rename to `$to.$i': $^OS_ERROR")
+                return 0 
 
-    (&link <: $from,$to) || return 0
-    &unlink <: $from
-
-sub chmod($mode,$name)
-    printf $^STDOUT, "  chmod \%o \%s\n", $mode, $name if %opts{verbose}
-    CORE::chmod($mode,$name) || warn sprintf("Couldn't chmod \%o \%s: $^OS_ERROR\n",$mode,$name)
-        unless %opts{notify}
-
-sub samepath($p1, $p2)
-    my($dev1, $ino1, $dev2, $ino2)
-
-    if ($p1 ne $p2)
-        @: $dev1, $ino1, ... = @: stat($p1)
-        @: $dev2, $ino2, ... = @: stat($p2)
-        ($dev1 == $dev2 && $ino1 == $ino2)
-    else
-        1
+    link($from,$to) || return 0
+    unlink($from)

@@ -287,9 +287,7 @@ do
         for ($MIN_INT+1 .. $MIN_INT)
             if (! defined($first))
                 $first = $_
-            
             last if ($lim++ +> 100)
-        
     }
     ok(! $^EVAL_ERROR, 'Range accepted')
     ok(! defined($first), 'Range ineffectual')
@@ -300,9 +298,7 @@ foreach my $ii ((@: ^~^0, ^~^0+1, ^~^0+(^~^0>>4)))
         my $lim=0;
         for (-$ii .. $MIN_INT+10)
             last if ($lim++ +> 100)
-        
     }
     ok($^EVAL_ERROR, 'Lower bound rejected: ' . -$ii)
-
 
 # EOF

@@ -5,7 +5,7 @@ use Test::More
 plan tests => 12
 my $v
 
-ok(defined &first,	'defined')
+ok(exists &first,	'defined')
 
 $v = first { 8 == ($_ - 1) }, 9,4,5,6
 is($v, 9, 'one more than 8')
@@ -51,7 +51,7 @@ is($^EVAL_ERROR, '', 'redefine self')
 
 # Calling a sub from first should leave its refcount unchanged.
 SKIP: do
-    skip("No Internals::SvREFCNT", 1) if !defined &Internals::SvREFCNT
+    skip("No Internals::SvREFCNT", 1) if !exists &Internals::SvREFCNT
     sub huge {$_+>1E6}
     my $refcnt = Internals::SvREFCNT(\&huge)
     $v = first \&huge, < 1..6

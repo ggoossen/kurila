@@ -2,7 +2,7 @@
 
 use File::Path;
 use File::Spec;
-require(env::var('PERL_CORE') ?? "./test.pl" !! "./t/test.pl");
+require "../../t/test.pl"
 plan(tests => 17);
 
 do {

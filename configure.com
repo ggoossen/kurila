@@ -61,6 +61,7 @@ $ use_pack_malloc = "N"
 $ use_debugmalloc = "N"
 $ ccflags = ""
 $ static_ext = ""
+$ dynamic_ext = ""
 $ nonxs_ext = ""
 $ vms_default_directory_name = F$ENVIRONMENT("DEFAULT")
 $ max_allowed_dir_depth = 3  ! e.g. [A.B.PERLxxx] not [A.B.C.PERLxxx]
@@ -368,11 +369,20 @@ $!
 $Shut_up:
 $ IF F$Mode() .eqs. "BATCH"
 $ THEN
-$   STDOUT = F$PARSE(F$GETQUI("DISPLAY_ENTRY", "JOB_NAME"), -
-                    F$GETQUI("DISPLAY_ENTRY", "LOG_SPECIFICATION"), ".LOG")
-$   WRITE SYS$OUTPUT "Warning: Executing in batch mode.  To avoid file locking conflicts,"
-$   WRITE SYS$OUTPUT "output intended for SYS$OUTPUT will be sent to a new version"
+$   x = F$GETQUI("CANCEL_OPERATION")        ! clear the deck
+$   x = "THIS_JOB"
+$   bproc_queue = f$getqui("DISPLAY_QUEUE","QUEUE_NAME","*",x)
+$   bproc_entry = f$getqui("DISPLAY_JOB","ENTRY_NUMBER",,x)
+$   bproc_name = f$getqui("DISPLAY_JOB","JOB_NAME",,x)
+$   bproc_log_spec = f$getqui("DISPLAY_JOB","LOG_SPECIFICATION",,x)
+$   STDOUT = F$PARSE(bproc_name, bproc_log_spec, ".LOG")
+$   WRITE SYS$OUTPUT "Writing output of entry ''bproc_entry' in queue ''bproc_queue' to a new version of: "
 $   WRITE SYS$OUTPUT STDOUT
+$   DELETE_/SYMBOL x
+$   DELETE_/SYMBOL bproc_queue
+$   DELETE_/SYMBOL bproc_entry
+$   DELETE_/SYMBOL bproc_name
+$   DELETE_/SYMBOL bproc_log_spec
 $ ELSE
 $   STDOUT = F$TRNLNM("SYS$OUTPUT")
 $ ENDIF
@@ -550,6 +560,13 @@ $         dot_ele = F$ELEMENT(dots - 1,"_",f$extract(dotloc,f$length(basename),b
 $         basename = -
             f$extract(0,f$length(basename)-(f$length(dot_ele)+1),basename) -
               + "." + dot_ele
+$         found = F$SEARCH(dirname + basename)
+$         file_2_find = file_2_find + "," + basename
+$       ENDIF
+$       tildeloc = f$locate("~",basename)
+$       IF (found .EQS. "" .AND. tildeloc .LT. f$length(basename))
+$       THEN
+$         basename[tildeloc,1] := "_"
 $         found = F$SEARCH(dirname + basename)
 $         file_2_find = file_2_find + "," + basename
 $       ENDIF
@@ -1401,9 +1418,10 @@ $   SET NOON
 $   OPEN/READ PATCH [-].patch
 $   READ PATCH line
 $   CLOSE PATCH
-$   tmp = F$EDIT(line,"COLLAPSE")
+$   tmp = F$EDIT(line,"TRIM,COMPRESS")
+$   IF F$ELEMENT(3, " ", tmp) .NES. "" THEN tmp = F$ELEMENT(3, " ", tmp)
 $   SET ON
-$   IF tmp .GT. perl_patchlevel then perl_patchlevel = tmp
+$   IF tmp .NES. "" THEN perl_patchlevel = tmp
 $ ENDIF
 $!
 $ version_patchlevel_string = "version ''patchlevel' subversion ''subversion'"
@@ -2709,25 +2727,83 @@ $ OPEN/READ CONFIG 'manifestfound'
 $ext_loop:
 $   READ/END_OF_FILE=end_ext/ERROR=end_ext CONFIG line
 $   IF F$EXTRACT(0,4,line) .NES. "ext/" .AND. -
-       F$EXTRACT(0,8,line) .NES. "vms/ext/" THEN goto ext_loop
+       F$EXTRACT(0,5,line) .NES. "cpan/" THEN goto ext_loop
 $   line = F$EDIT(line,"COMPRESS")
 $   line = F$ELEMENT(0," ",line)
-$   line_len = F$LENGTH(line)
-$   IF F$EXTRACT(line_len - 12,12,line) .NES. "/Makefile.PL" THEN goto ext_loop
-$   IF F$EXTRACT(0,4,line) .EQS. "ext/" THEN -
-      xxx = F$EXTRACT(4,line_len - 16,line)
+$   IF F$EXTRACT(0,4,line) .EQS. "ext/"
+$   THEN
+$     xxx = F$ELEMENT(1,"/",line)
+$     IF F$SEARCH("[-.ext]''xxx'.DIR;1") .EQS. "" THEN GOTO ext_loop
+$   ENDIF
+$   IF F$EXTRACT(0,5,line) .EQS. "cpan/"
+$   THEN
+$     xxx = F$ELEMENT(1,"/",line)
+$     IF F$SEARCH("[-.cpan]''xxx'.DIR;1") .EQS. "" THEN GOTO ext_loop
+$   ENDIF
 $   IF xxx .EQS. "DynaLoader" THEN goto ext_loop     ! omit
-$   IF xxx .EQS. "SDBM_File/sdbm" THEN goto ext_loop ! sub extension - omit
-$   IF xxx .EQS. "Devel/PPPort/harness" THEN goto ext_loop ! sub extension - omit
-$   IF F$EXTRACT(0,7,xxx) .EQS. "Encode/" THEN goto ext_loop  ! sub extension - omit
-$   IF xxx .EQS. "B/C" THEN goto ext_loop  ! sub extension - omit
-$   IF F$EXTRACT(0,8,line) .EQS. "vms/ext/" THEN -
-      xxx = "VMS/" + F$EXTRACT(8,line_len - 20,line)
-$   known_extensions = known_extensions + " ''xxx'"
+$!
+$! (extspec = xxx) =~ tr!-!/!
+$ extspec = ""
+$ idx = 0
+$ extension_dir_name = xxx
+$ replace_dash_with_slash:
+$   before = F$ELEMENT(idx, "-", xxx)
+$   IF before .EQS. "-" THEN goto end_replace_dash_with_slash
+$   IF extspec .NES. "" 
+$   THEN
+$	extspec = extspec + "/"
+$   ENDIF
+$   extspec = extspec + before
+$   idx = idx + 1
+$   goto replace_dash_with_slash
+$
+$ end_replace_dash_with_slash:
+$   
+$ xxx = known_extensions
+$ gosub may_already_have_extension
+$ IF $STATUS .EQ. 1
+$ THEN
+$     xxx = nonxs_ext
+$     gosub may_already_have_extension
+$ ENDIF
+$ IF $STATUS .NE. 1 THEN goto ext_loop
+$ goto found_new_extension
+$!
+$ may_already_have_extension:
+$   idx = F$LOCATE(extspec, xxx)
+$   extlen = F$LENGTH(xxx) 
+$   IF idx .EQ. extlen THEN return 1
+$!  But "Flirble" may just be part of "Acme-Flirble"
+$   IF idx .GT. 0 .AND. F$EXTRACT(idx - 1, 1, xxx) .NES. " "
+$   THEN
+$	xxx = F$EXTRACT(idx + F$LENGTH(extspec) + 1, extlen, xxx)
+$	GOTO may_already_have_extension
+$   ENDIF
+$!  But "Foo" may just be part of "Foo-Bar" so check for equality.
+$   xxx = F$EXTRACT(idx, extlen - idx, xxx)
+$   IF F$ELEMENT(0, " ", xxx) .EQS. extspec
+$   THEN 
+$	RETURN 3
+$   ELSE 
+$	xxx = F$EXTRACT(F$LENGTH(extspec) + 1, extlen, xxx)
+	GOTO may_already_have_extension
+$   ENDIF
+$!
+$ found_new_extension:
+$   IF F$SEARCH("[-.ext.''extension_dir_name']*.xs") .EQS. "" .AND. F$SEARCH("[-.cpan.''extension_dir_name']*.xs") .EQS. ""
+$   THEN
+$       nonxs_ext = nonxs_ext + " ''extspec'"
+$   ELSE
+$       known_extensions = known_extensions + " ''extspec'"
+$   ENDIF
 $   goto ext_loop
 $end_ext:
 $ close CONFIG
 $ DELETE/SYMBOL xxx
+$ DELETE/SYMBOL idx
+$ DELETE/SYMBOL extspec
+$ DELETE/SYMBOL extlen
+$ DELETE/SYMBOL extension_dir_name
 $ known_extensions = F$EDIT(known_extensions,"TRIM,COMPRESS")
 $ dflt = known_extensions
 $ IF ccname .NES. "DEC" .AND. ccname .NES. "CXX"
@@ -2745,15 +2821,10 @@ $ IF .NOT. Has_socketshr .AND. .NOT. Has_Dec_C_Sockets
 $ THEN
 $   dflt = dflt - "Socket"            ! optional on VMS
 $ ENDIF
-$ ! Build this one only for threads without ithreads
-$ IF F$TYPE(useithreads) .EQS. "" .OR. .NOT. use_threads
-$ THEN
-$   dflt = dflt - "Thread"
-$ ELSE
-$   IF useithreads .OR. useithreads .EQS. "define" THEN dflt = dflt - "Thread"
-$ ENDIF
-$ dflt = dflt - "Win32API/File" - "Win32CORE" - "Win32"  ! need Dave Cutler's other project
+$ dflt = dflt - "Win32API/File" - "Win32"  ! need Dave Cutler's other project
+$ nonxs_ext = nonxs_ext - "Win32CORE"
 $ dflt = F$EDIT(dflt,"TRIM,COMPRESS")
+$ nonxs_ext = F$EDIT(nonxs_ext,"TRIM,COMPRESS")
 $!
 $! Ask for their default list of extensions to build
 $ echo ""
@@ -2765,7 +2836,7 @@ $ echo ""
 $ echo "Which modules do you want to build into perl?"
 $ rp = "[''dflt'] "
 $ GOSUB myread
-$ extensions = F$EDIT(ans,"TRIM,COMPRESS")
+$ dynamic_ext = F$EDIT(ans,"TRIM,COMPRESS")
 $!
 $! %Config-I-VMS, determine build/make utility here (make gmake mmk mms)
 $ echo ""
@@ -3162,6 +3233,7 @@ $ THEN d_mymalloc="define"
 $ ELSE d_mymalloc="undef"
 $ ENDIF
 $!
+$ usedevel="undef"
 $ usedl="define"
 $ startperl="""$ perl 'f$env(\""procedure\"")' \""'"+"'p1'\"" \""'"+"'p2'\"" \""'"+"'p3'\"" \""'"+"'p4'\"" \""'"+"'p5'\"" \""'"+"'p6'\"" \""'"+"'p7'\"" \""'"+"'p8'\""!\n"
 $ startperl=startperl + "$ exit++ + ++$status!=0 and $exit=$status=undef; while($#ARGV != -1 and $ARGV[$#ARGV] eq '"+"'){pop @ARGV;}"""
@@ -3947,6 +4019,12 @@ $!
 $ tmp = "sys/mode.h"
 $ GOSUB inhdr
 $ i_sysmode = tmp
+$!
+$! Check for poll.h
+$!
+$ tmp = "sys/poll.h"
+$ gosub inhdr
+$ i_syspoll = tmp
 $!
 $! Check for sys/access.h
 $!
@@ -5479,53 +5557,35 @@ $ echo "(IV will be ""''ivtype'"", ''ivsize' bytes)"
 $ echo "(UV will be ""''uvtype'"", ''uvsize' bytes)"
 $ echo "(NV will be ""''nvtype'"", ''nvsize' bytes)"
 $!
-$ echo4 "Checking whether your NVs can preserve your UVs..."
+$ d_nv_preserves_uv = "undef"
+$ echo4 "Checking how many bits of your UVs your NVs can preserve..."
 $ OS
 $ WS "#if defined(__DECC) || defined(__DECCXX)"
 $ WS "#include <stdlib.h>"
 $ WS "#endif"
 $ WS "#include <stdio.h>"
 $ WS "int main() {"
-$ WS "    ''uvtype' k = (''uvtype')~0, l;"
-$ WS "    ''nvtype' d;"
-$ WS "    l = k;"
-$ WS "    d = (''nvtype')l;"
-$ WS "    l = (''uvtype')d;"
-$ WS "    if (l == k)"
-$ WS "       printf(""preserve\n"");"
+$ WS "    ''uvtype' u = 0;"
+$ WS "    int     n = 8 * ''uvsize';"
+$ WS "    int     i;"
+$ WS "    for (i = 0; i < n; i++) {"
+$ WS "      u = u << 1 | (''uvtype')1;"
+$ WS "      if ((''uvtype')(''nvtype')u != u)"
+$ WS "        break;"
+$ WS "    }"
+$ WS "    printf(""%d\n"", i);"
 $ WS "    exit(0);"
 $ WS "}"
 $ CS
 $ GOSUB compile
-$ IF tmp .EQS. "preserve"
-$ THEN 
+$ nv_preserves_uv_bits = tmp
+$ IF F$INTEGER(nv_preserves_uv_bits) .GE. (F$INTEGER(uvsize) * 8)
+$ THEN
 $   d_nv_preserves_uv = "define"
-$   echo "Yes, they can." 
-$   nv_preserves_uv_bits = F$STRING(F$INTEGER(uvsize) * 8)
+$   echo "Your NVs can preserve all ''nv_preserves_uv_bits' bits of your UVs."
 $ ELSE
-$   d_nv_preserves_uv = "undef"
-$   echo "No, they can't."
-$   echo4 "Checking how many bits of your UVs your NVs can preserve..."
-$   OS
-$   WS "#if defined(__DECC) || defined(__DECCXX)"
-$   WS "#include <stdlib.h>"
-$   WS "#endif"
-$   WS "#include <stdio.h>"
-$   WS "int main() {"
-$   WS "    ''uvtype' u = 0;"
-$   WS "    int     n = 8 * ''uvsize';"
-$   WS "    int     i;"
-$   WS "    for (i = 0; i < n; i++) {"
-$   WS "      u = u << 1 | (''uvtype')1;"
-$   WS "      if ((''uvtype')(''nvtype')u != u)"
-$   WS "        break;"
-$   WS "    }"
-$   WS "    printf(""%d\n"", i);"
-$   WS "    exit(0);"
-$   WS "}"
-$   CS
-$   GOSUB compile
-$   nv_preserves_uv_bits = tmp
+$   d_nv_preserves_uv = "undef""
+$   echo "Your NVs can preserve only ''nv_preserves_uv_bits' bits of your UVs."	
 $ ENDIF
 $!
 $ nv_overflows_integers_at = "0"
@@ -5820,9 +5880,11 @@ $ WC "d_accessx='undef'"
 $ WC "d_aintl='undef'"
 $ WC "d_alarm='define'"
 $ WC "d_archlib='define'"
+$ WC "d_asctime64='undef'"
 $ WC "d_atolf='" + d_atolf + "'"
 $ WC "d_atoll='" + d_atoll + "'"
 $ WC "d_attribute_format='" + d_attribut + "'"
+$ WC "d_attribute_deprecated='undef'"
 $ WC "d_attribute_malloc='undef'"
 $ WC "d_attribute_nonnull='undef'"
 $ WC "d_attribute_noreturn='undef'"
@@ -5853,11 +5915,13 @@ $ WC "d_cplusplus='" + d_cplusplus + "'"
 $ WC "d_crypt='define'"
 $ WC "d_csh='undef'"
 $ WC "d_ctermid='define'"
+$ WC "d_ctime64='undef'"
 $ WC "d_cuserid='define'"
 $ WC "d_c99_variadic_macros='undef'"
 $ WC "d_dbl_dig='define'"
 $ WC "d_dbminitproto='undef'"
 $ WC "d_difftime='define'"
+$ WC "d_difftime64='undef'"
 $ WC "d_dir_dd_fd='undef'"
 $ WC "d_dirfd='undef'"
 $ WC "d_dirnamlen='define'"
@@ -5903,6 +5967,7 @@ $ WC "d_fstatvfs='" + d_fstatvfs + "'"
 $ WC "d_fsync='undef'"
 $ WC "d_ftello='" + d_ftello + "'"
 $ WC "d_futimes='undef'"
+$ WC "d_getaddrinfo='undef'"
 $ WC "d_getcwd='define'"
 $ WC "d_getespwnam='undef'"
 $ WC "d_getfsstat='undef'"
@@ -5917,6 +5982,7 @@ $ WC "d_getitimer='" + d_getitimer + "'"
 $ WC "d_getlogin='define'"
 $ WC "d_getmnt='undef'"
 $ WC "d_getmntent='undef'"
+$ WC "d_getnameinfo='undef'"
 $ WC "d_getnbyaddr='" + d_getnbyaddr + "'"
 $ WC "d_getnbyname='" + d_getnbyname + "'"
 $ WC "d_getnent='" + d_getnent + "'"
@@ -5939,6 +6005,7 @@ $ WC "d_getsent='" + d_getsent + "'"
 $ WC "d_getservprotos='" + d_getservprotos + "'"
 $ WC "d_getspnam='undef'"
 $ WC "d_gettimeod='" + d_gettimeod + "'"
+$ WC "d_gmtime64='undef'"
 $ WC "d_gnulibc='undef'"
 $ WC "d_grpasswd='undef'"
 $ WC "d_hasmntopt='undef'"
@@ -5947,6 +6014,8 @@ $ WC "d_ilogbl='undef'"
 $ WC "d_inc_version_list='undef'"
 $ WC "d_index='" + d_index + "'"
 $ WC "d_inetaton='undef'"
+$ WC "d_inetntop='undef'"
+$ WC "d_inetpton='undef'"
 $ WC "d_int64_t='" + d_int64_t + "'"
 $ WC "d_isascii='define'"
 $ WC "d_isfinite='undef'"
@@ -5959,6 +6028,7 @@ $ WC "d_ldbl_dig='define'"
 $ WC "d_libm_lib_version='undef'"
 $ WC "d_link='" + d_link + "'"
 $ WC "d_llseek='undef'"
+$ WC "d_localtime64='undef'"
 $ WC "d_locconv='" + d_locconv + "'"
 $ WC "d_lockf='undef'"
 $ WC "d_longdbl='" + d_longdbl + "'"
@@ -5983,6 +6053,7 @@ $ WC "d_mknod='undef'"
 $ WC "d_mkstemp='" + d_mkstemp + "'"
 $ WC "d_mkstemps='" + d_mkstemps + "'"
 $ WC "d_mktime='" + d_mktime + "'"
+$ WC "d_mktime64='undef'"
 $ WC "d_mmap='" + d_mmap + "'"
 $ WC "d_modfl='" + d_modfl + "'"
 $ WC "d_modflproto='" + d_modflproto + "'"
@@ -6140,6 +6211,7 @@ $ WC "d_tcsetpgrp='undef'"
 $ WC "d_telldir='define'"
 $ WC "d_telldirproto='define'"
 $ WC "d_time='define'"
+$ WC "d_timegm='undef'"
 $ WC "d_times='define'"
 $ IF ("''F$EXTRACT(1,3, F$GETSYI(""VERSION""))'".GES."7.0")
 $ THEN
@@ -6193,9 +6265,9 @@ $ WC "doublesize='" + doublesize + "'"
 $ WC "drand01='" + drand01 + "'"
 $ WC "dtrace='" + "'"
 $!
-$! The extensions symbol may be quite long
+$! The dynamic_ext symbol may be quite long
 $!
-$ tmp = "dynamic_ext='" + extensions + "'"
+$ tmp = "dynamic_ext='" + dynamic_ext + "'"
 $ WC/symbol tmp
 $ DELETE/SYMBOL tmp
 $ WC "eagain=' '"
@@ -6204,9 +6276,9 @@ $ WC "embedmymalloc='" + usemymalloc + "'"
 $ WC "eunicefix=':'"
 $ WC "exe_ext='" + exe_ext + "'"
 $!
-$! The extensions symbol may be quite long
+$! The extensions symbols may be quite long
 $!
-$ tmp = "extensions='" + extensions + "'"
+$ tmp = "extensions='" + nonxs_ext + " " + dynamic_ext + "'"
 $ WC/symbol tmp
 $ DELETE/SYMBOL tmp
 $ WC "fflushNULL='define'"
@@ -6244,6 +6316,8 @@ $ WC "i_float='define'"
 $ WC "i_fp='undef'"
 $ WC "i_fp_class='undef'"
 $ WC "i_gdbm='undef'"
+$ WC "i_gdbm_ndbm='undef'"
+$ WC "i_gdbmndbm='undef'"
 $ WC "i_grp='" + i_grp + "'"
 $ WC "i_ieeefp='undef'"
 $ WC "i_inttypes='" + i_inttypes + "'"
@@ -6253,6 +6327,7 @@ $ WC "i_limits='define'"
 $ WC "i_locale='" + i_locale + "'"
 $ WC "i_machcthr='undef'"
 $ WC "i_machcthreads='undef'"
+$ WC "i_mallocmalloc='undef'"
 $ WC "i_math='define'"
 $ WC "i_memory='undef'"
 $ WC "i_mntent='undef'"
@@ -6285,6 +6360,7 @@ $ WC "i_sysmode='" + i_sysmode + "'"
 $ WC "i_sysmount='undef'"
 $ WC "i_sysndir='undef'"
 $ WC "i_sysparam='undef'"
+$ WC "i_syspoll='" + i_syspoll + "'"
 $ WC "i_sysresrc='undef'"
 $ WC "i_syssecrt='" + i_syssecrt + "'"
 $ WC "i_sysselct='undef'"
@@ -6373,7 +6449,9 @@ $ WC "netdb_hlen_type='" + netdb_hlen_type + "'"
 $ WC "netdb_host_type='" + netdb_host_type + "'"
 $ WC "netdb_name_type='" + netdb_name_type + "'"
 $ WC "netdb_net_type='" + netdb_net_type + "'"
-$ WC "nonxs_ext='" + nonxs_ext + "'"
+$ tmp = "nonxs_ext='" + nonxs_ext + "'"
+$ WC/symbol tmp
+$ DELETE/SYMBOL tmp
 $ WC "nveformat='" + nveformat + "'"
 $ WC "nvfformat='" + nvfformat + "'"
 $ WC "nvgformat='" + nvgformat + "'"
@@ -6415,6 +6493,10 @@ $ WC "randseedtype='" + randseedtype + "'"
 $ WC "ranlib='" + "'"
 $ WC "rd_nodata=' '"
 $ WC "revision='" + revision + "'"
+$ WC "sGMTIME_max='4294967295'"
+$ WC "sGMTIME_min='0'"
+$ WC "sLOCALTIME_max='4294967295'"
+$ WC "sLOCALTIME_min='0'"
 $ WC "sPRId64='" + sPRId64 + "'"
 $ WC "sPRIEldbl='" + sPRIEUldbl + "'"
 $ WC "sPRIFldbl='" + sPRIFUldbl + "'"
@@ -6506,6 +6588,7 @@ $ WC "usecasesensitive='" + be_case_sensitive + "'"    ! VMS-specific
 $ WC "usedebugging_perl='"+use_debugging_perl+"'"
 $ WC "usedefaulttypes='" + usedefaulttypes + "'"    ! VMS-specific
 $ WC "usecrosscompile='undef'"
+$ WC "usedevel='" + usedevel + "'"
 $ WC "usedl='" + usedl + "'"
 $ WC "usedtrace='undef'"
 $ WC "usefaststdio='" + usefaststdio + "'"
@@ -6871,80 +6954,6 @@ $! Clean up after ourselves
 $ DELETE/NOLOG/NOCONFIRM []munchconfig.exe;
 $ DELETE/NOLOG/NOCONFIRM []extra_subs.txt;
 $!
-$ echo4 "Extracting make_ext.com (without variable substitutions)"
-$ Create Sys$Disk:[-]make_ext.com
-$ Deck/Dollar="$EndOfTpl$"
-$!++ make_ext.com
-$!   NOTE: This file is extracted as part of the VMS configuration process.
-$!   Any changes made to it directly will be lost.  If you need to make any
-$!   changes, please edit the template in Configure.Com instead.
-$    mydefault = F$Environment("Default")
-$!   p1 - how to invoke miniperl (passed in from descrip.mms)
-$    p1 = F$Edit(p1,"Upcase,Compress,Trim")
-$    If F$Locate("MCR ",p1).eq.0 Then p1 = F$Extract(3,255,p1)
-$    miniperl = "$" + F$Search(F$Parse(p1,".Exe"))
-$!   p2 - how to invoke local make utility (passed in from descrip.mms)
-$    makeutil = p2
-$    if f$type('p2') .nes. "" then makeutil = 'p2'
-$!   p3 - make target (passed in from descrip.mms)
-$    targ = F$Edit(p3,"Lowercase")
-$    sts = 1
-$    extensions = ""
-$    open/read CONFIG config.sh
-$ find_ext_loop:
-$    read/end=end_ext_loop CONFIG line
-$    if (f$extract(0,12,line) .NES. "extensions='")
-$    then goto find_ext_loop
-$    else extensions = f$extract(12,f$length(line),line) - "'"
-$    endif
-$ end_ext_loop:
-$    close CONFIG
-$    extensions = f$edit(extensions,"TRIM,COMPRESS")
-$    i = 0
-$ next_ext:
-$    ext = f$element(i," ",extensions)
-$    If ext .eqs. " " .or. ext .eqs. "" Then Goto done
-$    Define/User_mode Perl_Env_Tables CLISYM_LOCAL
-$    miniperl
-$    deck
-     ($extdir = $ENV{'ext'}) =~ s/::/./g;
-     $extdir =~ s#/#.#g;
-     if ($extdir =~ /^vms/i) { $extdir =~ s/vms/.vms.ext/i; }
-     else                    { $extdir = ".ext.$extdir";   }
-     ($ENV{'extdir'} = "[$extdir]");
-     ($ENV{'up'} = ('-') x ($extdir =~ tr/././));
-$    eod
-$    Set Default &extdir
-$    redesc = 0
-$    If F$Locate("clean",targ) .eqs. F$Length(targ)
-$    Then
-$      Write Sys$Output ""
-$      Write Sys$Output "	Making ''ext' (dynamic)"
-$      On Error Then Goto done
-$      If F$Search("Descrip.MMS") .eqs. ""
-$      Then
-$        redesc = 1
-$      Else
-$        If F$CvTime(F$File("Descrip.MMS","rdt")) .lts. -
-            F$CvTime(F$File("Makefile.PL","rdt")) Then redesc = 1
-$      EndIf
-$    Else
-$      Write Sys$Output "''targ'ing ''ext' . . ."
-$      On Error Then Continue
-$    EndIf
-$    If redesc Then -
-       miniperl "-I[''up'.lib]" Makefile.PL "INST_LIB=[''up'.lib]" "INST_ARCHLIB=[''up'.lib]"  "PERL_CORE=1"
-$    makeutil 'targ'
-$    i = i + 1
-$    Set Def &mydefault
-$    Goto next_ext
-$ done:
-$    sts = $Status
-$    Set Def &mydefault
-$    Exit sts
-$!-- make_ext.com
-$EndOfTpl$
-$!
 $! Note that the /key qualifier to search, as in:
 $! search README.* "=head"/key=(position=1)/window=0/output=extra.pods
 $! is not supported on VMS V5.5-2, hence not used in extra_pods.com.
@@ -7170,7 +7179,7 @@ $ WRITE CONFIG "$ cpan2dist  == """ + perl_setup_perl + " ''vms_prefix':[utils]c
 $! FIXME: "-" is an operator and illegal in a symbol name -- cpanp-run-perl can't work
 $!$ WRITE CONFIG "$ cpanp-run-perl == """ + perl_setup_perl + " ''vms_prefix':[utils]cpanp-run-perl.com"""
 $ WRITE CONFIG "$ cpanp      == """ + perl_setup_perl + " ''vms_prefix':[utils]cpanp.com"""
-$ IF F$LOCATE("Devel::DProf",extensions) .LT. F$LENGTH(extensions)
+$ IF F$LOCATE("Devel::DProf",dynamic_ext) .LT. F$LENGTH(dynamic_ext)
 $ THEN
 $ WRITE CONFIG "$ dprofpp    == """ + perl_setup_perl + " ''vms_prefix':[utils]dprofpp.com"""
 $ ENDIF 

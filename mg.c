@@ -1,7 +1,7 @@
 /*    mg.c
  *
- *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, by Larry Wall and others
+ *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+ *    2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -9,8 +9,10 @@
  */
 
 /*
- * "Sam sat on the ground and put his head in his hands.  'I wish I had never
- * come here, and I don't want to see no more magic,' he said, and fell silent."
+ *  Sam sat on the ground and put his head in his hands.  'I wish I had never
+ *  come here, and I don't want to see no more magic,' he said, and fell silent.
+ *
+ *     [p.363 of _The Lord of the Rings_, II/vii: "The Mirror of Galadriel"]
  */
 
 /*
@@ -350,7 +352,7 @@ Perl_mg_free(pTHX_ SV *sv)
 	    if (mg->mg_len > 0 || mg->mg_type == PERL_MAGIC_utf8)
 		Safefree(mg->mg_ptr);
 	    else if (mg->mg_len == HEf_SVKEY)
-		SvREFCNT_dec((SV*)mg->mg_ptr);
+		SvREFCNT_dec(MUTABLE_SV(mg->mg_ptr));
 	}
 	if (mg->mg_flags & MGf_REFCOUNTED)
 	    SvREFCNT_dec(mg->mg_obj);
@@ -358,6 +360,7 @@ Perl_mg_free(pTHX_ SV *sv)
 	SvMAGIC_set(sv, moremagic);
     }
     SvMAGIC_set(sv, NULL);
+    SvMAGICAL_off(sv);
     return 0;
 }
 
@@ -456,7 +459,7 @@ Perl_magic_regdatum_set(pTHX_ SV *sv, MAGIC *mg)
     PERL_ARGS_ASSERT_MAGIC_REGDATUM_SET;
     PERL_UNUSED_ARG(sv);
     PERL_UNUSED_ARG(mg);
-    Perl_croak(aTHX_ PL_no_modify);
+    Perl_croak(aTHX_ "%s", PL_no_modify);
     NORETURN_FUNCTION_END;
 }
 
@@ -601,14 +604,7 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 	    }
 
 	    if (strEQ(remaining, "EXTENDED_OS_ERROR")) {
-#if defined(MACOS_TRADITIONAL)
-		{
-		    char msg[256];
-
-		    sv_setnv(sv,(double)gMacPerl_OSErr);
-		    sv_setpv(sv, gMacPerl_OSErr ? GetSysErrText(gMacPerl_OSErr, msg) : "");
-		}
-#elif defined(VMS)
+#if defined(VMS)
 		{
 #	            include <descrip.h>
 #	            include <starlet.h>
@@ -646,10 +642,10 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 		}
 #else
 		{
-		    const int saveerrno = errno;
+		    dSAVE_ERRNO;
 		    sv_setnv(sv, (NV)errno);
 		    sv_setpv(sv, errno ? Strerror(errno) : "");
-		    errno = saveerrno;
+		    RESTORE_ERRNO;
 		}
 #endif
 		SvRTRIM(sv);
@@ -733,7 +729,7 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 		sv_setpv(sv, errno ? Strerror(errno) : "");
 #else
 		{
-		    const int saveerrno = errno;
+		    dSAVE_ERRNO;
 		    sv_setnv(sv, (NV)errno);
 #ifdef OS2
 		    if (errno == errno_isOS2 || errno == errno_isOS2_set)
@@ -741,7 +737,7 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 		    else
 #endif
 			sv_setpv(sv, errno ? Strerror(errno) : "");
-		    errno = saveerrno;
+		    RESTORE_ERRNO;
 		}
 #endif
 		SvRTRIM(sv);
@@ -906,35 +902,6 @@ Perl_magic_getuvar(pTHX_ SV *sv, MAGIC *mg)
     return 0;
 }
 
-/*
- * The signal handling nomenclature has gotten a bit confusing since the advent of
- * safe signals.  S_raise_signal only raises signals by analogy with what the 
- * underlying system's signal mechanism does.  It might be more proper to say that
- * it defers signals that have already been raised and caught.  
- *
- * PL_sig_pending and PL_psig_pend likewise do not track signals that are pending 
- * in the sense of being on the system's signal queue in between raising and delivery.  
- * They are only pending on Perl's deferral list, i.e., they track deferred signals 
- * awaiting delivery after the current Perl opcode completes and say nothing about
- * signals raised but not yet caught in the underlying signal implementation.
- */
-
-#ifndef SIG_PENDING_DIE_COUNT
-#  define SIG_PENDING_DIE_COUNT 120
-#endif
-
-static void
-S_raise_signal(pTHX_ int sig)
-{
-    dVAR;
-    /* Set a flag to say this signal is pending */
-    PL_psig_pend[sig]++;
-    /* And one to say _a_ signal is pending */
-    if (++PL_sig_pending >= SIG_PENDING_DIE_COUNT)
-        Perl_croak(aTHX_ "Maximal count of pending signals (%lu) exceeded",
-                (unsigned long)SIG_PENDING_DIE_COUNT);
-}
-
 Signal_t
 #if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
 Perl_csighandler(int sig, siginfo_t *sip PERL_UNUSED_DECL, void *uap PERL_UNUSED_DECL)
@@ -946,8 +913,6 @@ Perl_csighandler(int sig)
     dTHXa(PERL_GET_SIG_CONTEXT);
 #else
     dTHX;
-#endif
-#if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
 #endif
 #ifdef FAKE_PERSISTENT_SIGNAL_HANDLERS
     (void) rsignal(sig, PL_csighandlerp);
@@ -961,9 +926,7 @@ Perl_csighandler(int sig)
             exit(1);
 #endif
 #endif
-#if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
-#endif
-   if (
+    if (
 #ifdef SIGILL
            sig == SIGILL ||
 #endif
@@ -973,16 +936,28 @@ Perl_csighandler(int sig)
 #ifdef SIGSEGV
            sig == SIGSEGV ||
 #endif
-           (PL_signals & PERL_SIGNALS_UNSAFE_FLAG))
-        /* Call the perl level handler now--
-         * with risk we may be in malloc() etc. */
+	   (PL_signals & PERL_SIGNALS_UNSAFE_FLAG))
+	/* Call the perl level handler now--
+	 * with risk we may be in malloc() or being destructed etc. */
 #if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
         (*PL_sighandlerp)(sig, NULL, NULL);
 #else
         (*PL_sighandlerp)(sig);
 #endif
-   else
-        S_raise_signal(aTHX_ sig);
+    else {
+	if (!PL_psig_pend) return;
+	/* Set a flag to say this signal is pending, that is awaiting delivery after
+	 * the current Perl opcode completes */
+	PL_psig_pend[sig]++;
+
+#ifndef SIG_PENDING_DIE_COUNT
+#  define SIG_PENDING_DIE_COUNT 120
+#endif
+	/* Add one to say _a_ signal is pending */
+	if (++PL_sig_pending >= SIG_PENDING_DIE_COUNT)
+	    Perl_croak(aTHX_ "Maximal count of pending signals (%lu) exceeded",
+		       (unsigned long)SIG_PENDING_DIE_COUNT);
+    }
 }
 
 #if defined(FAKE_PERSISTENT_SIGNAL_HANDLERS) || defined(FAKE_DEFAULT_SIGNAL_HANDLERS)
@@ -1018,12 +993,12 @@ Perl_despatch_signals(pTHX)
             PL_psig_pend[sig] = 0;
             PERL_BLOCKSIG_BLOCK(set);
 #if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
-            (*PL_sighandlerp)(sig, NULL, NULL);
+	    (*PL_sighandlerp)(sig, NULL, NULL);
 #else
-            (*PL_sighandlerp)(sig);
+	    (*PL_sighandlerp)(sig);
 #endif
-            PERL_BLOCKSIG_UNBLOCK(set);
-        }
+	    PERL_BLOCKSIG_UNBLOCK(set);
+	}
     }
 }
 
@@ -1036,12 +1011,12 @@ Perl_magic_setisa(pTHX_ SV *sv, MAGIC *mg)
     PERL_ARGS_ASSERT_MAGIC_SETISA;
     PERL_UNUSED_ARG(sv);
 
-    /* Bail out if destruction is going on */
-    if(PL_dirty) return 0;
-
     /* Skip _isaelem because _isa will handle it shortly */
     if (PL_delaymagic & DM_ARRAY && mg->mg_type == PERL_MAGIC_isaelem)
         return 0;
+
+    /* Bail out if destruction is going on */
+    if(PL_dirty) return 0;
 
     /* XXX Once it's possible, we need to
        detect that our @ISA is aliased in
@@ -1061,7 +1036,8 @@ Perl_magic_setisa(pTHX_ SV *sv, MAGIC *mg)
 	stash = GvSTASH(gv);
     }
 
-    mro_isa_changed_in(stash);
+    if (stash)
+	mro_isa_changed_in(stash);
 
     return 0;
 }
@@ -1077,16 +1053,17 @@ Perl_magic_clearisa(pTHX_ SV *sv, MAGIC *mg)
     /* Bail out if destruction is going on */
     if(PL_dirty) return 0;
 
-    av_clear((AV*)sv);
+    av_clear(MUTABLE_AV(sv));
 
     /* XXX see comments in magic_setisa */
     stash = GvSTASH(
         SvTYPE(mg->mg_obj) == SVt_PVGV
-            ? (GV*)mg->mg_obj
-            : (GV*)SvMAGIC(mg->mg_obj)->mg_obj
+            ? (const GV *)mg->mg_obj
+            : (const GV *)mg_find(mg->mg_obj, PERL_MAGIC_isa)->mg_obj
     );
 
-    mro_isa_changed_in(stash);
+    if (stash)
+	mro_isa_changed_in(stash);
 
     return 0;
 }
@@ -1404,7 +1381,8 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 #ifdef DEBUGGING
 		s = SvPV_nolen_const(sv);
 		PL_debug = get_debug_opts(&s, 0) | DEBUG_TOP_FLAG;
-		DEBUG_x(dump_all());
+		if (DEBUG_x_TEST || DEBUG_B_TEST)
+		    dump_all_perl(!DEBUG_B_TEST);
 #else
 		PL_debug = (SvIV(sv)) | DEBUG_TOP_FLAG;
 #endif
@@ -1425,9 +1403,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 	    }
 
 	    if (strEQ(remaining, "EXTENDED_OS_ERROR")) {
-#ifdef MACOS_TRADITIONAL
-		gMacPerl_OSErr = SvIV(sv);
-#else
 #  ifdef VMS
 		set_vaxc_errno(SvIV(sv));
 #  else
@@ -1442,7 +1417,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 #      endif
 #    endif
 #  endif
-#endif
 		break;
 	    }
 	    if (strEQ(remaining, "EGID")) {  /* $^EGID */
@@ -1719,7 +1693,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		paren = RX_BUFF_IDX_POSTMATCH;
 		goto setparen;
 	    }
-#ifndef MACOS_TRADITIONAL
 	    if (strEQ(remaining, "PROGRAM_NAME")) {
 		LOCK_DOLLARZERO_MUTEX;
 #ifdef HAS_SETPROCTITLE
@@ -1786,7 +1759,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		UNLOCK_DOLLARZERO_MUTEX;
 		break;
 	    }
-#endif /* MACOS_TRADITIONAL */
 	    break;
 
 	case 'S':
@@ -2046,7 +2018,7 @@ Perl_sighandler(int sig)
 
     if (!(cv = (CV*)PL_psig_ptr[sig])
         || SvTYPE(cv) != SVt_PVCV) {
-	Perl_croak(aTHX "SIG%s handler is not valid", PL_sig_name[sig]);
+	Perl_croak(aTHX_ "SIG%s handler is not valid", PL_sig_name[sig]);
     }
 
     if (!cv || !CvROOT(cv)) {
@@ -2091,7 +2063,7 @@ Perl_sighandler(int sig)
 		   hv_stores(sih, "band",       newSViv(sip->si_band));
 #endif
 		   EXTEND(SP, 2);
-		   PUSHs((SV*)rv);
+		   PUSHs(rv);
 		   mPUSHp((char *)sip, sizeof(*sip));
 	      }
 
@@ -2100,7 +2072,7 @@ Perl_sighandler(int sig)
 #endif
     PUTBACK;
 
-    call_sv((SV*)cv, G_DISCARD|G_EVAL);
+    call_sv(MUTABLE_SV(cv), G_DISCARD|G_EVAL);
 
     POPSTACK;
     if (SvTRUE(ERRSV)) {

@@ -29,6 +29,8 @@ expression.
 =head2 Layout
 X<layout>
 
+=head3 Blocks
+
 Blocks are usually made using layout. When a block is expected the
 column of the first token of block, determines the indentation of the
 block.
@@ -42,6 +44,14 @@ Each file or eval string is started with an implicit block with zero
 indentation.
 
 Empty lines, Comments, Pod and heredocs are ignored for the layout.
+
+=head3 Lists
+
+The operators C<@:>, C<%:> and C<< <: >> start a layout based lists.
+
+Similar as with blocks the next token after the operator determines the starting column.
+And a new list item is started starts at the same starting column. The list is terminated
+if a line indented less than the starting column.
 
 =head3 Layout insensitivity
 X<Layout insensitivity>

@@ -312,7 +312,7 @@ IO_NLM		= $(AUTODIR)\IO\IO.NLM
 OPCODE_NLM	= $(AUTODIR)\Opcode\Opcode.NLM
 SDBM_FILE_NLM = $(AUTODIR)\SDBM_File\SDBM_File.NLM
 POSIX_NLM	= $(AUTODIR)\POSIX\POSIX.NLM
-ATTRS_NLM	= $(AUTODIR)\attrs\attrs.NLM
+ATTRIBUTES_NLM	= $(AUTODIR)\attributes\attributes.NLM
 B_NLM		= $(AUTODIR)\B\B.NLM
 DUMPER_NLM	= $(AUTODIR)\Data\Dumper\Dumper.NLM
 PEEK_NLM	= $(AUTODIR)\Devel\Peek\Peek.NLM
@@ -336,7 +336,7 @@ EXTENSION_NLM	= 		\
 		$(SOCKET_NLM)	\
 		$(OPCODE_NLM)	\
 		$(B_NLM)		\
-		$(ATTRS_NLM)	\
+		$(ATTRIBUTES_NLM)	\
 		$(SDBM_FILE_NLM)	\
 		$(POSIX_NLM)	\
 		$(DUMPER_NLM)	\
@@ -667,7 +667,6 @@ UTILS		=			\
 		..\utils\c2ph		\
 		..\utils\h2xs		\
 		..\utils\perldoc	\
-		..\pod\checkpods	\
 		..\pod\pod2html		\
 		..\pod\pod2latex	\
 		..\pod\pod2man		\
@@ -725,8 +724,7 @@ MICROCORE_SRC	=		\
 		..\toke.c	\
 		..\universal.c	\
 		..\utf8.c	\
-		..\util.c	\
-		..\xsutils.c
+		..\util.c
 
 #EXTRACORE_SRC	= $(EXTRACORE_SRC) perllib.c
 
@@ -789,7 +787,7 @@ CORE_H		= $(CORE_NOCFG_H) .\config.h
 DLL_OBJ		= $(DLL_SRC:.c=.obj)
 X2P_OBJ		= $(X2P_SRC:.c=.obj)
 
-DYNAMIC_EXT	= Socket IO Fcntl Opcode SDBM_File POSIX attrs B re \
+DYNAMIC_EXT	= Socket IO Fcntl Opcode SDBM_File POSIX attributes B re \
 		Data/Dumper Devel/Peek ByteLoader Devel/DProf File/Glob \
 		Storable/Storable List/Util MIME/Base64/Base64 XS/APItest/APItest \
 		XS/Typemap/Typemap Unicode/Normalize/Normalize Sys/Hostname
@@ -804,7 +802,7 @@ OPCODE		= $(EXTDIR)\Opcode\Opcode
 SDBM_FILE	= $(EXTDIR)\SDBM_File\SDBM_File
 IO			= $(EXTDIR)\IO\IO
 POSIX		= $(EXTDIR)\POSIX\POSIX
-ATTRS		= $(EXTDIR)\attrs\attrs
+ATTRIBUTES		= $(EXTDIR)\attributes\attributes
 B			= $(EXTDIR)\B\B
 RE			= $(EXTDIR)\re\re
 DUMPER		= $(EXTDIR)\Data\Dumper\Dumper
@@ -831,7 +829,7 @@ EXTENSION_C	= 		\
 		$(SDBM_FILE).c	\
 		$(IO).c		\
 		$(POSIX).c	\
-		$(ATTRS).c	\
+		$(ATTRIBUTES).c	\
 		$(RE).c		\
 		$(DUMPER).c	\
 		$(PEEK).c	\
@@ -1043,8 +1041,6 @@ $(NLM_NAME): MESSAGE HEADERS $(BLDDIR)\nul $(NLM_OBJ) $(NEWTARE_OBJ_DEP) $(NEWTA
 !endif
 ##    $(LINK) $(LDFLAGS) $(BS_CFLAGS) -desc "Perl 5.6.1 for NetWare" $(NEWTARE_OBJ_DEP:.obj=.obj) $(NLM_OBJ:.obj=.obj) $(PERL_IO_OBJ_DEP:.obj=.obj) $(DLL_OBJ:.obj=.obj) $(NEWTARE_CPP_OBJ_DEP:.obj=.obj) -commandfile $*.def -o .\$(BLDDIR)\$@
 	$(LINK) $(LDFLAGS) -desc $(MODULE_DESC) $(NEWTARE_OBJ_DEP:.obj=.obj) $(NLM_OBJ:.obj=.obj) $(PERL_IO_OBJ_DEP:.obj=.obj) $(DLL_OBJ:.obj=.obj) $(NEWTARE_CPP_OBJ_DEP:.obj=.obj) -commandfile $*.def -o .\$(BLDDIR)\$@
-	copy splittree.pl .. 
-	$(MINIPERL) -I..\lib ..\splittree.pl "../LIB" $(AUTODIR)
 	@echo ========Linked $@ ==========
 
 	@echo======= Finished building $(BUILT).
@@ -1227,7 +1223,7 @@ $(POSIX_NLM):
 	$(MAKE)
 	cd ..\..\netware
 
-$(ATTRS_NLM):
+$(ATTRIBUTES_NLM):
 	cd $(EXTDIR)\$(*B)
 	..\..\miniperl -I..\..\lib Makefile.PL PERL_CORE=1 INSTALLDIRS=perl
 	$(MAKE)
@@ -1378,15 +1374,12 @@ utils: $(BLDDIR)\$(NLM_NAME8).$(NLM_EXT) $(X2P)
 	copy ..\README.cygwin .\perlcygwin.pod
 	copy ..\README.dos .\perldos.pod
 	copy ..\README.hpux .\perlhpux.pod
-#	copy ..\README.machten .\perlmachten.pod
 	copy ..\README.os2 .\perlos2.pod
 	copy ..\vms\perlvms.pod .\perlvms.pod
 	copy ..\README.win32 .\perlwin32.pod
 	copy ..\README.netware .\perlnw5.pod
 	$(MAKE) -f ..\win32\pod.mak converters
 
-	cd ..\lib
-	$(MINIPERL) lib_pm.PL
 	cd ..\netware
 	$(MINIPERL) $(PL2BAT) $(UTILS)
 
@@ -1398,7 +1391,7 @@ distclean: clean nwclean
 	-del /f /q $(EXTDIR)\DynaLoader\dl_win32.xs
 	-del /f /q $(EXTDIR)\DynaLoader\DynaLoader.pm
 	-del /f /q $(EXTDIR)\DynaLoader\XSLoader.pm
-	-del /f /q $(LIBDIR)\.exists $(LIBDIR)\attrs.pm $(LIBDIR)\DynaLoader.pm
+	-del /f /q $(LIBDIR)\.exists $(LIBDIR)\attributes.pm $(LIBDIR)\DynaLoader.pm
 	-del /f /q $(LIBDIR)\XSLoader.pm
 	-del /f /q $(LIBDIR)\Fcntl.pm $(LIBDIR)\IO.pm $(LIBDIR)\Opcode.pm
 	-del /f /q $(LIBDIR)\ops.pm $(LIBDIR)\Safe.pm
@@ -1422,7 +1415,7 @@ distclean: clean nwclean
 	-del /f /q *.bat *.exe
 	-del /f /q *.obj *.map *.link *.xdc *.err
 	cd ..\netware
-	-del /f /q ..\config.sh ..\splittree.pl dlutils.c config.h.new
+	-del /f /q ..\config.sh dlutils.c config.h.new
 	-del /f /q $(CONFIGPM)
 	-del /f /q bin\*.bat
 	cd $(EXTDIR)
@@ -1468,8 +1461,6 @@ install_tests :
 nwinstall: utils installnw install_tests
 
 inst_lib : $(CONFIGPM)
-	copy ..\win32\splittree.pl .. 
-	$(MINIPERL) -I..\lib ..\splittree.pl "../LIB" $(AUTODIR)
 	$(RCOPY) ..\lib $(INST_LIB)\*.*
 
 clean : 

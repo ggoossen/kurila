@@ -26,7 +26,7 @@ $want_comma =~ s/ => /,/g
 ####################### XS Tests #####################
 
 SKIP: do
-    skip 'XS extension not loaded', 3 unless (defined &Data::Dumper::Dumpxs)
+    skip 'XS extension not loaded', 3 unless (exists &Data::Dumper::Dumpxs)
     is (Data::Dumper::DumperX($HASH), $WANT,
         'XS: Default hash key/value separator: " => "')
     local $Data::Dumper::Pair = ' : '

@@ -25,16 +25,15 @@ my $has_link            = config_value('d_link')
 my $accurate_timestamps =
     !($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' ||
       $^OS_NAME eq 'dos'     || $^OS_NAME eq 'os2'     ||
-      $^OS_NAME eq 'mint'    || $^OS_NAME eq 'cygwin'  ||
+      $^OS_NAME eq 'cygwin'  ||
       $^OS_NAME eq 'amigaos' || $wd =~ m#$(config_value('afsroot'))/# ||
       $Is_MacOS
       )
 
-if (defined &Win32::IsWinNT && Win32::IsWinNT())
+if (exists &Win32::IsWinNT && Win32::IsWinNT())
     if (Win32::FsType() eq 'NTFS')
         $has_link            = 1
         $accurate_timestamps = 1
-    
 
 
 my $needs_fh_reopen =
@@ -42,7 +41,7 @@ my $needs_fh_reopen =
     # Not needed on HPFS, but needed on HPFS386 ?!
     || $^OS_NAME eq 'os2'
 
-$needs_fh_reopen = 1 if (defined &Win32::IsWin95 && Win32::IsWin95())
+$needs_fh_reopen = 1 if (exists &Win32::IsWin95 && Win32::IsWin95())
 
 my $skip_mode_checks =
       $^OS_NAME eq 'cygwin' && env::var('CYGWIN') !~ m/ntsec/
@@ -63,6 +62,8 @@ elsif ($Is_MacOS)
 else
     `rm -f tmp 2>/dev/null; mkdir tmp 2>/dev/null`
 
+my $tmpdir = tempfile();
+my $tmpdir1 = tempfile();
 
 chdir catdir(curdir(), 'tmp')
 
@@ -355,16 +356,13 @@ SKIP: do
     do
         print $fh, "x\n" x 200
         ok(truncate($fh, 200), "fh resize to 200")
-    
 
     if ($needs_fh_reopen)
         close ($fh); open ($fh, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp"
-    
 
     SKIP: do
         if ($^OS_NAME eq 'vos')
             skip ("# TODO - hit VOS bug posix-973 - cannot resize an open file below the current file pos.", 5)
-        
 
         is(-s "Iofs.tmp", 200, "fh resize to 200 working (filename check)")
 
@@ -372,7 +370,6 @@ SKIP: do
 
         if ($needs_fh_reopen)
             close ($fh); open ($fh, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp"
-        
 
         ok(-z "Iofs.tmp", "fh resize to zero working (filename check)")
 
@@ -386,16 +383,13 @@ SKIP: do
         do
             print $fh, "x\n" x 200
             ok(truncate($fh, 100), "fh resize by IO slot")
-        
 
         if ($needs_fh_reopen)
             close ($fh); open ($fh, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp"
-        
 
         is(-s "Iofs.tmp", 100, "fh resize by IO slot working")
 
         close $fh
-    
 
 
 # check if rename() can be used to just change case of filename
@@ -438,5 +432,5 @@ do
     ok(1, "extend sp in pp_chown")
 
 
-# need to remove 'tmp' if rename() in test 28 failed!
-END { rmdir 'tmp1'; rmdir 'tmp'; 1 while unlink "Iofs.tmp"; }
+# need to remove $tmpdir if rename() in test 28 failed!
+END { rmdir $tmpdir1; rmdir $tmpdir; }

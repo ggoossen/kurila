@@ -1,7 +1,7 @@
 /*    deb.c
  *
- *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1998, 1999,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006, by Larry Wall and others
+ *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1998, 1999, 2000, 2001,
+ *    2002, 2003, 2004, 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -9,8 +9,10 @@
  */
 
 /*
- * "Didst thou think that the eyes of the White Tower were blind?  Nay, I
- * have seen more than thou knowest, Gray Fool."  --Denethor
+ * 'Didst thou think that the eyes of the White Tower were blind?  Nay,
+ *  I have seen more than thou knowest, Grey Fool.'        --Denethor
+ *
+ *     [p.853 of _The Lord of the Rings_, V/vii: "The Pyre of Denethor"]
  */
 
 /*
@@ -21,23 +23,6 @@
 #include "EXTERN.h"
 #define PERL_IN_DEB_C
 #include "perl.h"
-
-#if defined(PERL_IMPLICIT_CONTEXT)
-void
-Perl_deb_nocontext(const char *pat, ...)
-{
-#ifdef DEBUGGING
-    dTHX;
-    va_list args;
-    PERL_ARGS_ASSERT_DEB_NOCONTEXT;
-    va_start(args, pat);
-    vdeb(pat, &args);
-    va_end(args);
-#else
-    PERL_UNUSED_ARG(pat);
-#endif /* DEBUGGING */
-}
-#endif
 
 void
 Perl_deb(pTHX_ const char *pat, ...)
@@ -58,8 +43,7 @@ Perl_vdeb(pTHX_ const char *pat, va_list *args)
 {
 #ifdef DEBUGGING
     dVAR;
-    const char* file = "<fixme>";
-    const char* const display_file = file ? file : "<free>";
+    const char* file = "<\?\?\?>";
     long line = 0;
 
     if (PL_op) {
@@ -77,9 +61,9 @@ Perl_vdeb(pTHX_ const char *pat, va_list *args)
 
     if (DEBUG_v_TEST)
 	PerlIO_printf(Perl_debug_log, "(%ld:%s:%ld)\t",
-		      (long)PerlProc_getpid(), display_file, line);
+		      (long)PerlProc_getpid(), file, line);
     else
-	PerlIO_printf(Perl_debug_log, "(%s:%ld)\t", display_file, line);
+	PerlIO_printf(Perl_debug_log, "(%s:%ld)\t", file, line);
     (void) PerlIO_vprintf(Perl_debug_log, pat, *args);
 #else
     PERL_UNUSED_CONTEXT;
@@ -308,7 +292,7 @@ Perl_deb_stack_all(pTHX)
 		deb_stack_n(AvARRAY(si->si_stack),
 			stack_min, stack_max, mark_min, mark_max);
 
-		if (CxTYPE(cx) == CXt_EVAL || CxTYPE(cx) == CXt_SUB)
+		if (CxTYPE(cx) == CXt_EVAL || CxTYPE(cx) == CXt_TRY || CxTYPE(cx) == CXt_SUB)
 		{
 		    const OP * const retop = cx->blk_sub.retop;
 

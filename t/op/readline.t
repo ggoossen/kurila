@@ -16,7 +16,6 @@ do
     is(($a .= (~< $a_fh)), 4, '#21628 - $a .= ~< $a_fh , A closed')
     unlink "a"
 
-
 # 82 is chosen to exceed the length for sv_grow in do_readline (80)
 foreach my $k ((@: 1, 82))
     my $result

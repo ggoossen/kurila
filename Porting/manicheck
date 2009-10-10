@@ -1,83 +1,26 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-#
-# manicheck - check files against the MANIFEST
-#
-# Without options prints out (possibly) two lines:
-#
-# extra: a b c
-# missing: d
-#
-# With option -x prints out only the missing files (and without the "extra: ")
-# With option -m prints out only the extra files (and without the "missing: ")
-#
+# output a list of:
+#  a) files listed in MANIFEST which don't exist
+#  b) files which exist but which aren't in MANIFEST
 
-sub help
-    die <<EOF
-$^PROGRAM_NAME: Usage: $^PROGRAM_NAME [-x|-m|-l|-h]
--x show only the extra files
--m show only the missing files
--l show the files one per line instead of one line
--h show only this help
-EOF
-
-
-use Getopt::Long
-
-our ($x, $m, $l, $h)
-
-GetOptions("extra" => \$x, missing => \$m, lines => \$l, help => \$h)
-
-help() if $h
-
-open(my $manifest_fh, "<", "MANIFEST") or die "MANIFEST: $^OS_ERROR"
-
-my %mani
-my %mand = %: ".", 1
-use File::Basename < qw(dirname)
-
-while ( ~< $manifest_fh )
-    if (m/^(\S+)\s+(.+)$/)
-        %mani{+$1}++
-        my $d = dirname($1)
-        while($d ne '.')
-            %mand{+$d}++
-            $d = dirname($d)
-        
-    else
-        warn "MANIFEST:$(iohandle::input_line_number($manifest_fh)):$_"
-    
-
-
-close($manifest_fh)
-
-my %find
+use warnings
 use File::Find
-find(sub (@< @_)
-         my $n = $File::Find::name
-         $n =~ s:^\./::
-         return if $n =~ m{^\.git/}
-         %find{+$n}++
-     , '.' )
 
-my @xtra
-my @miss
+open my $fh, '<', 'MANIFEST' or die "Can't read MANIFEST: $^OS_ERROR\n"
+my @files = map { (split)[0] }, @: ~< $fh
+close $fh
+for (@files)
+    print $^STDOUT, "$_ from MANIFEST doesn't exist\n" if ! -f
 
-for (sort keys %find)
-    push @xtra, $_ unless %mani{?$_} || %mand{?$_}
-
-
-for (sort keys %mani)
-    push @miss, $_ unless %find{$_}
-
-
-my $separator = $l ?? "\n" !! " "
-
-unshift @xtra, "extra:"   if (nelems @xtra) && !$x
-unshift @miss, "missing:" if (nelems @miss) && !$m
-
-print $^STDOUT, join($separator, @xtra) . "\n", if (nelems @xtra) && !$m
-print $^STDOUT, join($separator, @miss) . "\n"  if (nelems @miss) && !$x
-
-exit 0
+my %files = %+: map { %: $_ => 1 }, @files
+find
+    \%: wanted => sub()
+            my $x = $File::Find::name; $x =~ s/^..//
+            return if -d
+            return if $_ eq '.gitignore'
+            return if $x =~ m/^\.git\b/
+            print $^STDOUT, "$File::Find::name not in MANIFEST\n" if !%files{?$x}
+    ,
+    "."
 

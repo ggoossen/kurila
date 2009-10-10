@@ -84,7 +84,7 @@ test_freeent(freeent_function *f) {
     /* We need to "inline" new_he here as it's static, and the functions we
        test expect to be able to call del_HE on the HE  */
     if (!PL_body_roots[HE_SVSLOT])
-	croak("PL_he_root is 0");
+	croak(aTHX_ "PL_he_root is 0");
     victim = (HE*) PL_body_roots[HE_SVSLOT];
     PL_body_roots[HE_SVSLOT] = HeNEXT(victim);
 #endif
@@ -409,7 +409,7 @@ common(params)
 	if ((svp = hv_fetchs(params, "hv", 0))) {
 	    SV *const rv = *svp;
 	    if (!SvROK(rv))
-		croak("common passed a non-reference for parameter hv");
+		croak(aTHX_ "common passed a non-reference for parameter hv");
 	    hv = (HV *)SvRV(rv);
 	}
 	if ((svp = hv_fetchs(params, "keysv", 0)))
@@ -420,9 +420,18 @@ common(params)
 	if ((svp = hv_fetchs(params, "action", 0)))
 	    action = SvIV(*svp);
 	if ((svp = hv_fetchs(params, "val", 0)))
-	    val = *svp;
+	    val = newSVsv(*svp);
 	if ((svp = hv_fetchs(params, "hash", 0)))
-	    action = SvUV(*svp);
+	    hash = SvUV(*svp);
+
+	if ((svp = hv_fetchs(params, "hash_pv", 0))) {
+	    PERL_HASH(hash, key, klen);
+	}
+	if ((svp = hv_fetchs(params, "hash_sv", 0))) {
+	    STRLEN len;
+	    const char *const p = SvPV(keysv, len);
+	    PERL_HASH(hash, p, len);
+	}
 
 	result = (HE *)hv_common(hv, keysv, key, klen, flags, action, val, hash);
 	if (!result) {
@@ -795,6 +804,14 @@ rmagical_flags(sv)
 	av_push(res, newSVuv(SvFLAGS(sv) & SVs_SMG));
 	av_push(res, newSVuv(SvFLAGS(sv) & SVs_RMG));
         XSRETURN(1);
+
+void
+DPeek (sv)
+    SV   *sv
+
+  PPCODE:
+    ST (0) = newSVpv (Perl_sv_peek (aTHX_ sv), 0);
+    XSRETURN (1);
 
 void
 BEGIN()

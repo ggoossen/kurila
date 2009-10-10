@@ -1,7 +1,7 @@
 /*    mg.h
  *
  *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1999,
- *    2000, 2002, 2005, 2006, by Larry Wall and others
+ *    2000, 2002, 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -43,13 +43,13 @@ struct magic {
 #define MGf_LOCAL   0x20	/* has an svt_local MGVTBL entry */
 
 #define MgPV(mg,lp)		((((int)(lp = (mg)->mg_len)) == HEf_SVKEY) ?   \
-				 SvPV((SV*)((mg)->mg_ptr),lp) :		\
+				 SvPV(MUTABLE_SV((mg)->mg_ptr),lp) :	\
 				 (mg)->mg_ptr)
 #define MgPV_const(mg,lp)	((((int)(lp = (mg)->mg_len)) == HEf_SVKEY) ? \
-				 SvPV_const((SV*)((mg)->mg_ptr),lp) :        \
+				 SvPV_const(MUTABLE_SV((mg)->mg_ptr),lp) :   \
 				 (const char*)(mg)->mg_ptr)
-#define MgPV_nolen_const(mg)	(((((int)(mg)->mg_len)) == HEf_SVKEY) ?   \
-				 SvPV_nolen_const((SV*)((mg)->mg_ptr)) :  \
+#define MgPV_nolen_const(mg)	(((((int)(mg)->mg_len)) == HEf_SVKEY) ?	\
+				 SvPV_nolen_const(MUTABLE_SV((mg)->mg_ptr)) : \
 				 (const char*)(mg)->mg_ptr)
 
 /*

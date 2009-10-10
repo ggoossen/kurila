@@ -2,7 +2,7 @@
 
 
 use bytes
-require(env::var('PERL_CORE') ?? "./test.pl" !! "./t/test.pl")
+require "../../t/test.pl"
 plan(tests => ($^OS_NAME =~ m/MSWin32/ ?? 9 !! 6))
 
 my $Class       = 'IO::File'

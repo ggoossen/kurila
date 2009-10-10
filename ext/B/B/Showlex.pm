@@ -82,22 +82,24 @@ sub showlex_main
 
 
 sub compile
-    my @options = grep { ! ref && m/^-/ }, @_
-    my @args = grep { ref || !m/^-/ }, @_
+    my @options = grep { ref::svtype($_) eq 'PLAINVALUE' && m/^-/ }, @_
+    my @args = grep { ref::svtype($_) ne 'PLAINVALUE' || !m/^-/ }, @_
     for my $o ( @options)
         $newlex = 1 if $o eq "-newlex"
         $nosp1  = 1 if $o eq "-nosp"
-    
 
-    return \&showlex_main unless (nelems @args)
+    return &showlex_main unless (nelems @args)
     return sub (@< @_)
         my $objref
         foreach my $objname ( @args)
             next unless $objname        # skip nulls w/o carping
 
-            if (ref $objname)
+            if (ref($objname))
                 print $walkHandle, "B::Showlex::compile($(dump::view($objname)))\n"
                 $objref = $objname
+                $objname = dump::view($objname)
+            elsif (ref::svtype($objname) ne 'PLAINVALUE')
+                $objref = \ $: $objname
                 $objname = dump::view($objname)
             else
                 $objname = "main::$objname" unless $objname =~ m/::/

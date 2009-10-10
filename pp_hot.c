@@ -1,7 +1,7 @@
 /*    pp_hot.c
  *
- *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 by Larry Wall and others
+ *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+ *    2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -12,8 +12,10 @@
  * Then he heard Merry change the note, and up went the Horn-cry of Buckland,
  * shaking the air.
  *
- *            Awake!  Awake!  Fear, Fire, Foes!  Awake!
- *                     Fire, Foes!  Awake!
+ *                  Awake!  Awake!  Fear, Fire, Foes!  Awake!
+ *                               Fire, Foes!  Awake!
+ *
+ *     [p.1007 of _The Lord of the Rings_, VI/viii: "The Scouring of the Shire"]
  */
 
 /* This file contains 'hot' pp ("push/pop") functions that
@@ -105,7 +107,7 @@ PP(pp_stringify)
 PP(pp_gv)
 {
     dVAR; dSP;
-    XPUSHs((SV*)cGVOP_gv);
+    XPUSHs(MUTABLE_SV(cGVOP_gv));
     RETURN;
 }
 
@@ -173,7 +175,7 @@ PP(pp_concat)
 	if (!SvOK(TARG)) {
 	    if (left == right && ckWARN(WARN_UNINITIALIZED))
 		report_uninit(right);
-	    sv_setpvn(left, "", 0);
+	    sv_setpvs(left, "");
 	}
 	(void)SvPV_const(left, llen);    /* Needed to set UTF8 flag */
     }
@@ -226,7 +228,7 @@ PP(pp_magicsv)
     const OPFLAGS op_flags = PL_op->op_flags;
     const char* name = SvPVX_const(cSVOP_sv);
     if (PL_op->op_private & OPpLVAL_INTRO) {
-	Perl_save_set_magicsv(cSVOP_sv);
+	Perl_save_set_magicsv(aTHX_ cSVOP_sv);
     }
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {
@@ -906,13 +908,17 @@ PP(pp_enter)
     I32 gimme = OP_GIMME(PL_op, -1);
 
     if (gimme == -1) {
-	if (cxstack_ix >= 0)
-	    gimme = cxstack[cxstack_ix].blk_gimme;
-	else
+	if (cxstack_ix >= 0) {
+	    /* If this flag is set, we're just inside a return, so we should
+	     * store the caller's context */
+	    gimme = (PL_op->op_flags & OPf_SPECIAL)
+		? block_gimme()
+		: cxstack[cxstack_ix].blk_gimme;
+	} else
 	    gimme = G_SCALAR;
     }
 
-    ENTER;
+    ENTER_named("block");
 
     SAVETMPS;
     PUSHBLOCK(cx, CXt_BLOCK, SP);
@@ -977,9 +983,7 @@ PP(pp_helem)
 	    Perl_croak(aTHX_ "can't localize a glob");
 	else {
 	    if (!preeminent) {
-		STRLEN keylen;
-		const char * const key = SvPV_const(keysv, keylen);
-		SAVEDELETE(hv, savepvn(key,keylen), (I32)keylen);
+		SAVEHDELETE(hv, keysv);
 	    } else
 		save_helem(hv, keysv, svp);
 	}
@@ -1026,7 +1030,7 @@ PP(pp_leave)
 
     POPBLOCK(cx,newpm);
 
-    gimme = OP_GIMME(PL_op, -1);
+    gimme = OP_GIMME(PL_op, (cxstack_ix >= 0) ? gimme : G_SCALAR);
 
     if (gimme == G_VOID)
 	SP = newsp;
@@ -1055,7 +1059,7 @@ PP(pp_leave)
     }
     PL_curpm = newpm;	/* Don't pop $1 et al till now */
 
-    LEAVE;
+    LEAVE_named("block");
 
     RETURN;
 }
@@ -1180,7 +1184,7 @@ PP(pp_grepwhile)
     if ( av_len(src) == -1 ) {
 
 	FREETMPS;
-	LEAVE;					/* exit outer scope */
+	LEAVE_named("map/grep");					/* exit outer scope */
 	(void)POPMARK;				/* pop dst */
 	SP = PL_stack_base + POPMARK;		/* pop original mark */
 	if (gimme != G_VOID) {
@@ -1264,7 +1268,7 @@ PP(pp_leavesub)
     }
     PUTBACK;
 
-    LEAVE;
+    LEAVE_named("sub");
     cxstack_ix--;
     POPSUB(cx,sv);	/* Stack values are safe: release CV and @_ ... */
     PL_curpm = newpm;	/* ... and pop $1 et al */
@@ -1289,7 +1293,7 @@ PP(pp_entersub_targargs)
     SV* cv;
     SV* args = PAD_SVl(PL_op->op_targ);
     if ( ! SvAVOK(args) )
-	DIE("interneal error: args is expected to be an array");
+	Perl_croak(aTHX_ "panic: args is expected to be an array");
     PUSHMARK(SP);
     {
 	AV *const av = svTav(args);
@@ -1334,49 +1338,58 @@ PP(pp_entersub)
 	av_push(args, SvREFCNT_inc(sv));
     }
 
-    if (!sv)
-	DIE(aTHX_ "Expected a CODE reference but got nothing");
-    switch (SvTYPE(sv)) {
-	/* This is overwhelming the most common case:  */
-    case SVt_PVGV:
-	if (!(cv = GvCVu((GV*)sv))) {
-	    cv = sv_2cv(sv, &gv, 0);
-	}
-	if (!cv) {
-	    SV* sub_name = sv_newmortal();
-	    gv_efullname3(sub_name, (GV*)sv, NULL);
-	    DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sub_name));
-	}
-	break;
-    default:
-	if (sv == &PL_sv_yes && PL_op->op_flags & OPf_SPECIAL) {	/* unfound import, ignore */
-	    SP = PL_stack_base + POPMARK;
-	    if ( gimme != G_VOID )
-		XPUSHs(&PL_sv_undef);
-	    RETURN;
-	}
-	if (!SvROK(sv)) {
-	    const char *sym;
-	    STRLEN len;
-	    sym = SvPV_const(sv, len);
-	    if (!sym)
-		DIE(aTHX_ PL_no_usym, "a subroutine");
-	    DIE(aTHX_ PL_no_symref, sym, "a subroutine");
-	}
-	cv = (CV*)SvRV(sv);
-	if (SvTYPE(cv) == SVt_PVCV)
+    if (op_flags & OPf_ENTERSUB_EARLY_CV) {
+	GV* gv = gv_fetchsv(sv, GV_NOADD_NOINIT, SVt_PVCV);
+	if (! gv)
+	    DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sv));
+	if (! (cv = GvCVu(gv)))
+	    DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sv));
+    }
+    else {
+	if (!sv)
+	    DIE(aTHX_ "Expected a CODE reference but got nothing");
+	switch (SvTYPE(sv)) {
+	    /* This is overwhelming the most common case:  */
+	case SVt_PVGV:
+	    if (!(cv = GvCVu((GV*)sv))) {
+		cv = sv_2cv(sv, &gv, 0);
+	    }
+	    if (!cv) {
+		SV* sub_name = sv_newmortal();
+		gv_efullname3(sub_name, (GV*)sv, NULL);
+		DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sub_name));
+	    }
 	    break;
-	DIE(aTHX_ "Expected a CODE reference but got a %s reference", Ddesc(SvRV(sv)));
-    case SVt_PVHV:
-    case SVt_PVAV:
-	DIE(aTHX_ "Expected a CODE reference but got a %s", Ddesc(sv));
-	/* This is the second most common case:  */
-    case SVt_PVCV:
-	cv = (CV*)sv;
-	break;
+	default:
+	    if (sv == &PL_sv_yes && PL_op->op_flags & OPf_SPECIAL) {	/* unfound import, ignore */
+		SP = PL_stack_base + POPMARK;
+		if ( gimme != G_VOID )
+		    XPUSHs(&PL_sv_undef);
+		RETURN;
+	    }
+	    if (!SvROK(sv)) {
+		const char *sym;
+		STRLEN len;
+		sym = SvPV_const(sv, len);
+		if (!sym)
+		    DIE(aTHX_ PL_no_usym, "a subroutine");
+		DIE(aTHX_ PL_no_symref, sym, "a subroutine");
+	    }
+	    cv = (CV*)SvRV(sv);
+	    if (SvTYPE(cv) == SVt_PVCV)
+		break;
+	    DIE(aTHX_ "Expected a CODE reference but got a %s reference", Ddesc(SvRV(sv)));
+	case SVt_PVHV:
+	case SVt_PVAV:
+	    DIE(aTHX_ "Expected a CODE reference but got a %s", Ddesc(sv));
+	    /* This is the second most common case:  */
+	case SVt_PVCV:
+	    cv = (CV*)sv;
+	    break;
+	}
     }
 
-    ENTER;
+    ENTER_named("sub");
     SAVETMPS;
 
     if (!CvROOT(cv) && !CvXSUB(cv)) {
@@ -1406,7 +1419,7 @@ PP(pp_entersub)
 	    XPUSHs(cv_const_sv(cv));
 	    PUTBACK;
 
-	    LEAVE;
+	    LEAVE_named("sub");
 	    return NORMAL;
 	}
 	padlist = CvPADLIST(cv);
@@ -1424,7 +1437,7 @@ PP(pp_entersub)
 	    pad_push(padlist, CvDEPTH(cv));
 	}
 	SAVECOMPPAD();
-	PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
+	pad_set_cur_nosave(padlist, CvDEPTH(cv));
 
 	if ( ! cv_optassignarg_flag(cv) 
 	    && ( is_assignment != cv_assignarg_flag(cv) ) ) {
@@ -1438,7 +1451,6 @@ PP(pp_entersub)
 
 	if (CvFLAGS(cv) & CVf_BLOCK) {
 	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
-	    CX_CURPAD_SAVE(cx->blk_sub);
 	    ++MARK;
 
 	    if (items > 1)
@@ -1462,7 +1474,6 @@ PP(pp_entersub)
 		Perl_croak_at(aTHX_ SvLOCATION(cv),
 		    "Not enough arguments for %s",
 		    SvPVX_const(loc_name(SvLOCATION(cv))));
-	    CX_CURPAD_SAVE(cx->blk_sub);
 
 	    ++MARK;
 	    PUSHMARK(MARK-1);
@@ -1508,7 +1519,6 @@ PP(pp_entersub)
 	    av = svTav(avsv);
 	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
 	    AvREAL_on(av);
-	    CX_CURPAD_SAVE(cx->blk_sub);
 	    ++MARK;
 
 	    if (items > AvMAX(av) + 1) {
@@ -1559,9 +1569,17 @@ PP(pp_entersub)
 	    PL_curcop = PL_curcopdb;
 	    PL_curcopdb = NULL;
 	}
-	/* Do we need to open block here? XXXX */
-	if (CvXSUB(cv)) /* XXX this is supposed to be true */
-	    (void)(*CvXSUB(cv))(aTHX_ cv);
+
+	PUSHBLOCK(cx, CXt_XSSUB, PL_stack_base + markix );
+	cx->blk_sub.cv = CvREFCNT_inc(cv);				\
+
+	/* CvXSUB(cv) must not be NULL because newXS() refuses NULL xsub address */
+	assert(CvXSUB(cv));
+	CALL_FPTR(CvXSUB(cv))(aTHX_ cv);
+
+	CvREFCNT_dec(cv);
+	pop_block();
+	(void)POPMARK;
 
 	/* Enforce some sanity in scalar context. */
 	if (gimme == G_SCALAR && ++markix != PL_stack_sp - PL_stack_base ) {
@@ -1571,7 +1589,7 @@ PP(pp_entersub)
 		*(PL_stack_base + markix) = *PL_stack_sp;
 	    PL_stack_sp = PL_stack_base + markix;
 	}
-	LEAVE;
+	LEAVE_named("sub");
 	return NORMAL;
     }
 }
@@ -1688,23 +1706,22 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
     SV* ob;
     CV* cv;
     HV* stash;
-    STRLEN namelen;
     const char* packname = NULL;
     SV *packsv = NULL;
     STRLEN packlen;
-    const char * const name = SvPV_const(meth, namelen);
     SV * const sv = *(PL_stack_base + TOPMARK + 1);
 
     PERL_ARGS_ASSERT_METHOD_COMMON;
 
     if (!sv)
-	Perl_croak(aTHX_ "Can't call method \"%s\" on an undefined value", name);
+	Perl_croak(aTHX_ "Can't call method \"%"SVf"\" on an undefined value",
+		   SVfARG(meth));
 
     if (SvROK(sv))
-	ob = (SV*)SvRV(sv);
+	ob = MUTABLE_SV(SvRV(sv));
     else {
 	if ( ! SvPVOK(sv) )
-	    Perl_croak(aTHX_ "Can't call method \"%s\" on %s", name, Ddesc(sv));
+	    Perl_croak(aTHX_ "Can't call method \"%"SVf"\" on %s", SVfARG(meth), Ddesc(sv));
 
 	/* this isn't a reference */
         if(SvOK(sv) && (packname = SvPV_const(sv, packlen))) {
@@ -1728,9 +1745,12 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 
     /* if we got here, ob should be a reference or a glob */
     if (!ob || !(SvOBJECT(ob)
-		 || (SvTYPE(ob) == SVt_PVGV && (ob = (SV*)GvIO((GV*)ob))
+		 || (SvTYPE(ob) == SVt_PVGV 
+		     && isGV_with_GP(ob)
+		     && (ob = MUTABLE_SV(GvIO((const GV *)ob)))
 		     && SvOBJECT(ob))))
     {
+	const char * const name = SvPV_nolen_const(meth);
 	Perl_croak(aTHX_ "Can't call method \"%s\" on unblessed reference",
 		   (SvSCREAM(meth) && strEQ(name,"isa")) ? "DOES" :
 		   name);
@@ -1746,73 +1766,16 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
     if (hashp) {
 	const HE* const he = hv_fetch_ent(stash, meth, 0, *hashp);
 	if (he) {
-	    GV* gv = (GV*)HeVAL(he);
+	    GV* gv = MUTABLE_GV(HeVAL(he));
 	    if (isGV(gv) && GvCV(gv) &&
 		(!GvCVGEN(gv) || GvCVGEN(gv)
                   == (PL_sub_generation + HvMROMETA(stash)->cache_gen)))
-		return (SV*)GvCV(gv);
+		return MUTABLE_SV(GvCV(gv));
 	}
     }
 
-    cv = gv_fetchmethod(stash ? stash : (HV*)packsv, name);
+    cv = gv_fetchmethod_flags(stash ? stash : (HV*)packsv, SvPV_nolen_const(meth), GV_CROAK);
 
-    if (!cv) {
-	/* This code tries to figure out just what went wrong with
-	   gv_fetchmethod.  It therefore needs to duplicate a lot of
-	   the internals of that function.  We can't move it inside
-	   Perl_gv_fetchmethod(), however, since that would
-	   cause UNIVERSAL->can("NoSuchPackage::foo") to croak, and we
-	   don't want that.
-	*/
-	const char* leaf = name;
-	const char* sep = NULL;
-	const char* p;
-
-	for (p = name; *p; p++) {
-	    if (*p == '\'')
-		sep = p, leaf = p + 1;
-	    else if (*p == ':' && *(p + 1) == ':')
-		sep = p, leaf = p + 2;
-	}
-	if (!sep || ((sep - name) == 5 && strnEQ(name, "SUPER", 5))) {
-	    /* the method name is unqualified or starts with SUPER:: */
-	    if (sep)
-		stash = CopSTASH(PL_curcop);
-	    if (stash) {
-		HEK * const packhek = HvNAME_HEK(stash);
-		if (packhek) {
-		    packname = HEK_KEY(packhek);
-		    packlen = HEK_LEN(packhek);
-		} else {
-		    goto croak;
-		}
-	    }
-
-	    if (!packname) {
-	    croak:
-		Perl_croak(aTHX_
-			   "Can't use anonymous symbol table for method lookup");
-	    }
-	}
-	else {
-	    /* the method name is qualified */
-	    packname = name;
-	    packlen = sep - name;
-	}
-	
-	/* we're relying on gv_fetchmethod not autovivifying the stash */
-	if (gv_stashpvn(packname, packlen, 0)) {
-	    Perl_croak(aTHX_
-		       "Can't locate object method \"%s\" via package \"%.*s\"",
-		       leaf, (int)packlen, packname);
-	}
-	else {
-	    Perl_croak(aTHX_
-		       "Can't locate object method \"%s\" via package \"%.*s\""
-		       " (perhaps you forgot to load \"%.*s\"?)",
-		       leaf, (int)packlen, packname, (int)packlen, packname);
-	}
-    }
     return cvTsv(cv);
 }
 

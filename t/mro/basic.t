@@ -1,9 +1,8 @@
 #!./perl
 
-
 use warnings
 
-require q(./test.pl); plan(tests => 27)
+require q(./test.pl); plan(tests => 29)
 
 do
     package MRO_ISA_NO_ARRAY
@@ -199,3 +198,18 @@ do
     is($stk_obj->foo(3), 6)
 
 
+do
+  do
+    # assigning @ISA via arrayref to globref RT 60220
+    package P1
+    sub new($class)
+        bless \$%, $class
+    
+    package P2
+
+  *P2::ISA = @: 'P1'
+  my $foo = P2->new
+  ok(!try { $foo->bark }, "no bark method")
+  no warnings 'once'  # otherwise it'll bark about P1::bark used only once
+  *P1::bark = sub { "[bark]" }
+  is(try { $foo->bark }, "[bark]", "can bark now")

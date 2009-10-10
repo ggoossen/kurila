@@ -27,9 +27,9 @@ my $IsMacOS = $^OS_NAME eq 'MacOS'
 
 # check imports
 can_ok('main', < qw(cwd getcwd fastcwd fastgetcwd))
-ok( !defined(&chdir),           'chdir() not exported by default' )
-ok( !defined(&abs_path),        '  nor abs_path()' )
-ok( !defined(&fast_abs_path),   '  nor fast_abs_path()')
+ok( !exists(&chdir),           'chdir() not exported by default' )
+ok( !exists(&abs_path),        '  nor abs_path()' )
+ok( !exists(&fast_abs_path),   '  nor fast_abs_path()')
 
 do
     my @fields = qw(PATH IFS CDPATH ENV BASH_ENV)
@@ -142,9 +142,9 @@ for (1..nelems @test_dirs)
 rmtree(@test_dirs[0], 0, 0)
 
 do
-    my $check = ($IsVMS   ?? qr|\b((?i)t)\]$| !!
-                 $IsMacOS ?? qr|\bt:$| !!
-                 qr|\bt$| )
+    my $check = ($IsVMS   ?? qr|\b((?i)Cwd)\]$| !!
+                 $IsMacOS ?? qr|\bCwd:$| !!
+                 qr|\bCwd$| )
 
     like(env::var('PWD'), $check)
 
@@ -181,7 +181,7 @@ SKIP: do
 
 
 if (env::var('PERL_CORE'))
-    chdir '../ext/Cwd/t'
+    chdir 't'
     unshift $^INCLUDE_PATH, '../../../lib'
 
 

@@ -34,6 +34,7 @@ sub usage { die <<EOF }
 usage: $^PROGRAM_NAME  [ options ]
     --cross=PLATFORM    cross-compile for a different platform
     --no-glossary       don't include Porting/Glossary in lib/Config.pod
+    --chdir=dir         change directory before writing files
 EOF
 
 
@@ -59,8 +60,8 @@ my %Extensions = %+: map {(%: $_,$_)},
 my %Allowed_Opts = %: 
     'cross'    => '' # --cross=PLATFORM - crosscompiling for PLATFORM
     'glossary' => 1  # --no-glossary  - no glossary file inclusion,
-    #                  for compactness
-    
+                     #                  for compactness
+    'chdir'    => '', # --chdir=dir    - change directory before writing files
 
 sub opts
     # user specified options
@@ -84,6 +85,9 @@ sub opts
 
 
 my %Opts = %:  < opts() 
+
+if (%Opts{?chdir})
+    chdir %Opts{chdir} or die "$^PROGRAM_NAME: could not chdir %Opts{chdir}: $^OS_ERROR"
 
 my ($Config_SH, $Config_PM, $Config_heavy, $Config_POD)
 my $Glossary = 'Porting/Glossary'
@@ -128,6 +132,10 @@ my $myver = $^PERL_VERSION
 $config_txt .= sprintf <<'ENDOFBEG', < (@: $myver) x 3
 # This file was created by configpm when Perl was built. Any changes
 # made to this file will be lost the next time perl is built.
+
+# for a description of the variables, please have a look at the
+# Glossary file, as written in the Porting folder, or use the url:
+# http://perl5.git.perl.org/perl.git/blob/HEAD:/Porting/Glossary
 
 package Config;
 # use strict;
@@ -439,7 +447,19 @@ my $summary_expanded;
 sub myconfig {
     return $summary_expanded if $summary_expanded;
     ($summary_expanded = $summary) =~ s{\$(\w+)}
-              {$( do { my $c = config_value($1); defined($c) ?? $c !! 'undef' } )}g;
+                 {$( do {
+                        my $c;
+                        if ($1 eq 'git_ancestor_line') {
+                                if (config_value('git_ancestor')) {
+                                        $c= "\n  Ancestor: $(config_value('git_ancestor'))";
+                                } else {
+                                        $c= ""
+                                }
+                        } else {
+                                $c = config_value($1)
+                        }
+                        $c // 'undef';
+                } )}g;
     $summary_expanded;
 }
 
@@ -487,8 +507,6 @@ foreach my $prefix (qw(ccflags ldflags))
     if (defined $withlargefiles)
         $value =~ s/\Q$withlargefiles\E\b//
         $heavy_txt .= "$($prefix)_nolargefiles='$value'\n"
-    
-
 
 foreach my $prefix (qw(libs libswanted))
     my $value = fetch_string (\$%, $prefix)
@@ -508,12 +526,19 @@ foreach my $prefix (qw(libs libswanted))
             my @libswanted = grep { not exists %lflibswanted{$_} },
                 split(' ', fetch_string (\$%, 'libswanted'))
             $value = join(' ', @libswanted)
-        
-    
     $heavy_txt .= "$($prefix)_nolargefiles='$value'\n"
 
 
 $heavy_txt .= "EOVIRTUAL\n"
+
+$heavy_txt .= <<'ENDOFGIT'
+try
+        # do not have hairy conniptions if this isnt available
+        require 'Config_git.pl'
+        $Config_SH_expanded .= $Config::Git_Data
+        1
+    or warn "Warning: failed to load Config_git.pl, something strange about this perl...\n"
+ENDOFGIT
 
 $heavy_txt .= $fetch_string
 
@@ -724,6 +749,10 @@ Values stored in config.sh as 'undef' are returned as undefined
 values.  The perl C<exists> function can be used to check if a
 named variable exists.
 
+For a description of the variables, please have a look at the
+Glossary file, as written in the Porting folder, or use the url:
+http://perl5.git.perl.org/perl.git/blob/HEAD:/Porting/Glossary
+
 =over 4
 
 =item myconfig()
@@ -881,6 +910,21 @@ if (%Opts{?glossary})
 print $config_pod, <<'ENDOFTAIL'
 
 =back
+
+=head1 GIT DATA
+
+Information on the git commit from which the current perl binary was compiled
+can be found in the variable C<$Config::Git_Data>.  The variable is a
+structured string that looks something like this:
+
+  git_commit_id='ea0c2dbd5f5ac6845ecc7ec6696415bf8e27bd52'
+  git_describe='GitLive-blead-1076-gea0c2db'
+  git_branch='smartmatch'
+  git_uncommitted_changes=''
+  git_commit_id_title='Commit id:'
+  git_commit_date='2009-05-09 17:47:31 +0200'
+
+Its format is not guaranteed not to change over time.
 
 =head1 NOTE
 

@@ -38,7 +38,7 @@ T_OP_OBJ
 	    $var = INT2PTR($type,tmp);
 	\}
 	else
-	    croak(\"$var is not a reference\")
+	    croak(aTHX_ \"$var is not a reference\")
 
 T_SV_OBJ
 	if (SvROK($arg)) \{
@@ -46,7 +46,7 @@ T_SV_OBJ
 	    $var = INT2PTR($type,tmp);
 	\}
 	else
-	    croak(\"$var is not a reference\")
+	    croak(aTHX_ \"$var is not a reference\")
 
 T_MG_OBJ
 	if (SvROK($arg)) \{
@@ -54,7 +54,7 @@ T_MG_OBJ
 	    $var = INT2PTR($type,tmp);
 	\}
 	else
-	    croak(\"$var is not a reference\")
+	    croak(aTHX_ \"$var is not a reference\")
 
 OUTPUT
 T_OP_OBJ

@@ -1,7 +1,7 @@
 /*    av.c
  *
- *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006, by Larry Wall and others
+ *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+ *    2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -9,8 +9,10 @@
  */
 
 /*
- * "...for the Entwives desired order, and plenty, and peace (by which they
- * meant that things should remain where they had set them)." --Treebeard
+ * '...for the Entwives desired order, and plenty, and peace (by which they
+ *  meant that things should remain where they had set them).' --Treebeard
+ *
+ *     [p.476 of _The Lord of the Rings_, III/iv: "Treebeard"]
  */
 
 /*
@@ -112,7 +114,7 @@ Perl_av_extend(pTHX_ AV *av, I32 key)
 		   the current lazy system of only writing to it if our caller
 		   has a need for more space. NWC  */
 		newmax = Perl_safesysmalloc_size((void*)AvALLOC(av)) /
-		    sizeof(SV*) - 1;
+		    sizeof(const SV *) - 1;
 
 		if (key <= newmax) 
 		    goto resized;
@@ -123,20 +125,21 @@ Perl_av_extend(pTHX_ AV *av, I32 key)
 #if defined(STRANGE_MALLOC) || defined(MYMALLOC)
 		Renew(AvALLOC(av),newmax+1, SV*);
 #else
-		bytes = (newmax + 1) * sizeof(SV*);
+		bytes = (newmax + 1) * sizeof(const SV *);
 #define MALLOC_OVERHEAD 16
 		itmp = MALLOC_OVERHEAD;
 		while ((MEM_SIZE)(itmp - MALLOC_OVERHEAD) < bytes)
 		    itmp += itmp;
 		itmp -= MALLOC_OVERHEAD;
-		itmp /= sizeof(SV*);
+		itmp /= sizeof(const SV *);
 		assert(itmp > newmax);
 		newmax = itmp - 1;
 		assert(newmax >= AvMAX(av));
 		Newx(ary, newmax+1, SV*);
 		Copy(AvALLOC(av), ary, AvMAX(av)+1, SV*);
 		if (AvMAX(av) > 64)
-		    offer_nice_chunk(AvALLOC(av), (AvMAX(av)+1) * sizeof(SV*));
+		    offer_nice_chunk(AvALLOC(av),
+				     (AvMAX(av)+1) * sizeof(const SV *));
 		else
 		    Safefree(AvALLOC(av));
 		AvALLOC(av) = ary;
@@ -256,7 +259,7 @@ Perl_av_store(pTHX_ register AV *av, I32 key, SV *val)
     }
 
     if (SvREADONLY(av) && key >= AvFILL(av))
-	Perl_croak(aTHX_ PL_no_modify);
+	Perl_croak(aTHX_ "%s", PL_no_modify);
 
     if (!AvREAL(av) && AvREIFY(av))
 	av_reify(av);
@@ -287,7 +290,7 @@ Perl_av_store(pTHX_ register AV *av, I32 key, SV *val)
 	if (PL_delaymagic && mg->mg_type == PERL_MAGIC_isa)
 	    PL_delaymagic |= DM_ARRAY;
 	else
-	   mg_set((SV*)av);
+	   mg_set(MUTABLE_SV(av));
     }
     return &ary[key];
 }
@@ -305,7 +308,7 @@ will have a reference count of 1.
 AV *
 Perl_av_make(pTHX_ register I32 size, register SV **strp)
 {
-    register AV * const av = (AV*)newSV_type(SVt_PVAV);
+    register AV * const av = MUTABLE_AV(newSV_type(SVt_PVAV));
     /* sv_upgrade does AvREAL_only()  */
     PERL_ARGS_ASSERT_AV_MAKE;
     assert(SvTYPE(av) == SVt_PVAV);
@@ -352,7 +355,7 @@ Perl_av_clear(pTHX_ register AV *av)
 #endif
 
     if (SvREADONLY(av))
-	Perl_croak(aTHX_ PL_no_modify);
+	Perl_croak(aTHX_ "%s", PL_no_modify);
 
     /* Give any tie a chance to cleanup first */
     if (SvRMAGICAL(av)) {
@@ -360,7 +363,7 @@ Perl_av_clear(pTHX_ register AV *av)
 	if (PL_delaymagic && mg && mg->mg_type == PERL_MAGIC_isa)
 	    PL_delaymagic |= DM_ARRAY;
         else
-	    mg_clear((SV*)av); 
+	    mg_clear(MUTABLE_SV(av)); 
     }
 
     if (AvMAX(av) < 0)
@@ -411,7 +414,7 @@ Perl_av_undef(pTHX_ register AV *av)
     AvARRAY(av) = NULL;
     AvMAX(av) = AvFILLp(av) = -1;
 
-    if(SvRMAGICAL(av)) mg_clear((SV*)av);
+    if(SvRMAGICAL(av)) mg_clear(MUTABLE_SV(av));
 }
 
 void
@@ -450,7 +453,8 @@ Perl_av_create_and_push(pTHX_ AV **const avp, SV *const val)
 =for apidoc av_push
 
 Pushes an SV onto the end of the array.  The array will grow automatically
-to accommodate the addition.
+to accommodate the addition. Like C<av_store>, this takes ownership of one
+reference count.
 
 =cut
 */
@@ -464,7 +468,7 @@ Perl_av_push(pTHX_ register AV *av, SV *val)
     assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvREADONLY(av))
-	Perl_croak(aTHX_ PL_no_modify);
+	Perl_croak(aTHX_ "%s", PL_no_modify);
 
     av_store(av,AvFILLp(av)+1,val);
 }
@@ -488,13 +492,13 @@ Perl_av_pop(pTHX_ register AV *av)
     assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvREADONLY(av))
-	Perl_croak(aTHX_ PL_no_modify);
+	Perl_croak(aTHX_ "%s", PL_no_modify);
     if (AvFILL(av) < 0)
 	return &PL_sv_undef;
     retval = AvARRAY(av)[AvFILLp(av)];
     AvARRAY(av)[AvFILLp(av)--] = &PL_sv_undef;
     if (SvSMAGICAL(av))
-	mg_set((SV*)av);
+	mg_set(MUTABLE_SV(av));
     return retval;
 }
 
@@ -540,7 +544,7 @@ Perl_av_unshift(pTHX_ register AV *av, register I32 num)
     assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvREADONLY(av))
-	Perl_croak(aTHX_ PL_no_modify);
+	Perl_croak(aTHX_ "%s", PL_no_modify);
 
     if (num <= 0)
       return;
@@ -579,7 +583,8 @@ Perl_av_unshift(pTHX_ register AV *av, register I32 num)
 /*
 =for apidoc av_shift
 
-Shifts an SV off the beginning of the array.
+Shifts an SV off the beginning of the array. Returns C<&PL_sv_undef> if the 
+array is empty.
 
 =cut
 */
@@ -594,7 +599,7 @@ Perl_av_shift(pTHX_ register AV *av)
     assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvREADONLY(av))
-	Perl_croak(aTHX_ PL_no_modify);
+	Perl_croak(aTHX_ "%s", PL_no_modify);
     if (AvFILL(av) < 0)
       return &PL_sv_undef;
     retval = *AvARRAY(av);
@@ -604,7 +609,7 @@ Perl_av_shift(pTHX_ register AV *av)
     AvMAX(av)--;
     AvFILLp(av)--;
     if (SvSMAGICAL(av))
-	mg_set((SV*)av);
+	mg_set(MUTABLE_SV(av));
     return retval;
 }
 
@@ -618,7 +623,7 @@ array is C<av_len(av) + 1>.  Returns -1 if the array is empty.
 */
 
 I32
-Perl_av_len(pTHX_ register const AV *av)
+Perl_av_len(pTHX_ AV *av)
 {
     PERL_ARGS_ASSERT_AV_LEN;
     assert(SvTYPE(av) == SVt_PVAV);
@@ -667,7 +672,7 @@ Perl_av_fill(pTHX_ register AV *av, I32 fill)
 	    
 	AvFILLp(av) = fill;
 	if (SvSMAGICAL(av))
-	    mg_set((SV*)av);
+	    mg_set(MUTABLE_SV(av));
     }
     else
 	(void)av_store(av,fill,&PL_sv_undef);
@@ -692,7 +697,7 @@ Perl_av_delete(pTHX_ AV *av, I32 key, I32 flags)
     assert(SvTYPE(av) == SVt_PVAV);
 
     if (SvREADONLY(av))
-	Perl_croak(aTHX_ PL_no_modify);
+	Perl_croak(aTHX_ "%s", PL_no_modify);
 
     if (key < 0) {
 	key += AvFILL(av) + 1;
@@ -715,7 +720,7 @@ Perl_av_delete(pTHX_ AV *av, I32 key, I32 flags)
 	else
 	    AvARRAY(av)[key] = &PL_sv_undef;
 	if (SvSMAGICAL(av))
-	    mg_set((SV*)av);
+	    mg_set(MUTABLE_SV(av));
     }
     if (flags & G_DISCARD) {
 	SvREFCNT_dec(sv);

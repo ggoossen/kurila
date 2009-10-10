@@ -311,26 +311,34 @@ they must always be used within a character class expression.
     # this is not, and will generate a warning:
     $string =~ m/[:alpha:]/;
 
-The available classes and their backslash equivalents (if available) are
-as follows:
-X<character class>
+The following table shows the mapping of POSIX character class
+names, common escapes, literal escape sequences and their equivalent
+Unicode style property names.
+X<character class> X<\p> X<\p{}>
 X<alpha> X<alnum> X<ascii> X<blank> X<cntrl> X<digit> X<graph>
 X<lower> X<print> X<punct> X<space> X<upper> X<word> X<xdigit>
 
-    alpha
-    alnum
-    ascii
-    blank		[1]
-    cntrl
-    digit       \d
-    graph
-    lower
-    print
-    punct
-    space       \s	[2]
-    upper
-    word        \w	[3]
-    xdigit
+B<Note:> up to Perl 5.10 the property names used were shared with
+standard Unicode properties, this was changed in Perl 5.11, see
+L<perl5110delta> for details.
+
+    POSIX  Esc  Class               Property		Note
+    --------------------------------------------------------
+    alnum       [0-9A-Za-z]         IsPosixAlnum
+    alpha       [A-Za-z]            IsPosixAlpha
+    ascii       [\000-\177]         IsASCII
+    blank       [\011 ]             IsPosixBlank	[1]
+    cntrl       [\0-\37\177]        IsPosixCntrl
+    digit   \d  [0-9]               IsPosixDigit
+    graph       [!-~]               IsPosixGraph
+    lower       [a-z]               IsPosixLower
+    print       [ -~]               IsPosixPrint
+    punct       [!-/:-@[-`{-~]      IsPosixPunct
+    space       [\11-\15 ]          IsPosixSpace        [2]
+            \s  [\11\12\14\15 ]     IsPerlSpace         [2]
+    upper       [A-Z]               IsPosixUpper
+    word    \w  [0-9A-Z_a-z]        IsPerlWord		[3]
+    xdigit      [0-9A-Fa-f]         IsXDigit
 
 =over
 
@@ -340,8 +348,9 @@ A GNU extension equivalent to C<[ \t]>, "all horizontal whitespace".
 
 =item [2]
 
-Not exactly equivalent to C<\s> since the C<[[:space:]]> includes
-also the (very rare) "vertical tabulator", "\cK" or chr(11) in ASCII.
+Note that C<\s> and C<[[:space:]]> are B<not> equivalent as C<[[:space:]]>
+includes also the (very rare) "vertical tabulator", "\cK" or chr(11) in
+ASCII.
 
 =item [3]
 
@@ -357,33 +366,21 @@ whole character class.  For example:
 
 matches zero, one, any alphabetic character, and the percent sign.
 
-The following equivalences to Unicode \p{} constructs and equivalent
-backslash character classes (if available), will hold:
-X<character class> X<\p> X<\p{}>
+=item C<$>
 
-    [[:...:]]	\p{...}		backslash
+Currency symbol
 
-    alpha       IsAlpha
-    alnum       IsAlnum
-    ascii       IsASCII
-    blank
-    cntrl       IsCntrl
-    digit       IsDigit        \d
-    graph       IsGraph
-    lower       IsLower
-    print       IsPrint
-    punct       IsPunct
-    space       IsSpace
-                IsSpacePerl    \s
-    upper       IsUpper
-    word        IsWord
-    xdigit      IsXDigit
+=item C<+> C<< < >> C<=> C<< > >> C<|> C<~>
 
-For example C<[[:lower:]]> and C<\p{IsLower}> are equivalent.
+Mathematical symbols
 
-If the C<utf8> pragma is not used but the C<locale> pragma is, the
-classes correlate with the usual isalpha(3) interface (except for
-"word" and "blank").
+=item C<^> C<`>
+
+Modifier symbols (accents)
+
+=back
+
+=back
 
 The other named classes are:
 
@@ -428,9 +425,9 @@ X<character class, negation>
 
     POSIX         traditional  Unicode
 
-    [[:^digit:]]    \D         \P{IsDigit}
-    [[:^space:]]    \S         \P{IsSpace}
-    [[:^word:]]	    \W         \P{IsWord}
+    [[:^digit:]]    \D         \P{IsPosixDigit}
+    [[:^space:]]    \S         \P{IsPosixSpace}
+    [[:^word:]]     \W         \P{IsPerlWord}
 
 Perl respects the POSIX standard in that POSIX character classes are
 only supported within a character class.  The POSIX character classes

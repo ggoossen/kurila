@@ -1,6 +1,6 @@
 /*    mathoms.c
  *
- *    Copyright (C) 2005, 2006, by Larry Wall and others
+ *    Copyright (C) 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -8,13 +8,15 @@
  */
 
 /*
- * "Anything that Hobbits had no immediate use for, but were unwilling to 
- * throw away, they called a mathom. Their dwellings were apt to become
- * rather crowded with mathoms, and many of the presents that passed from
- * hand to hand were of that sort." 
+ *  Anything that Hobbits had no immediate use for, but were unwilling to
+ *  throw away, they called a mathom.  Their dwellings were apt to become
+ *  rather crowded with mathoms, and many of the presents that passed from
+ *  hand to hand were of that sort.
+ *
+ *     [p.5 of _The Lord of the Rings_: "Prologue"]
  */
 
-#ifndef NO_MATHOMS
+
 
 /* 
  * This file contains mathoms, various binary artifacts from previous
@@ -28,6 +30,12 @@
 #include "EXTERN.h"
 #define PERL_IN_MATHOMS_C
 #include "perl.h"
+
+#ifdef NO_MATHOMS
+/* ..." warning: ISO C forbids an empty source file"
+   So make sure we have something in here by processing the headers anyway.
+ */
+#else
 
 PERL_CALLCONV OP * Perl_ref(pTHX_ OP *o, I32 type);
 PERL_CALLCONV void Perl_sv_unref(pTHX_ SV *sv);
@@ -59,6 +67,7 @@ PERL_CALLCONV int Perl_printf_nocontext(const char *format, ...);
 PERL_CALLCONV int Perl_magic_setglob(pTHX_ SV* sv, MAGIC* mg);
 PERL_CALLCONV AV * Perl_newAV(pTHX);
 PERL_CALLCONV HV * Perl_newHV(pTHX);
+PERL_CALLCONV IO * Perl_newIO(pTHX);
 
 /* ref() is now a macro using Perl_doref;
  * this version provided for binary compatibility only.
@@ -326,36 +335,6 @@ Perl_sv_pvn_force(pTHX_ SV *sv, STRLEN *lp)
     return sv_pvn_force_flags(sv, lp, 0);
 }
 
-int
-Perl_fprintf_nocontext(PerlIO *stream, const char *format, ...)
-{
-    dTHXs;
-    va_list(arglist);
-
-    /* Easier to special case this here than in embed.pl. (Look at what it
-       generates for proto.h) */
-#ifdef PERL_IMPLICIT_CONTEXT
-    PERL_ARGS_ASSERT_FPRINTF_NOCONTEXT;
-#endif
-
-    va_start(arglist, format);
-    return PerlIO_vprintf(stream, format, arglist);
-}
-
-int
-Perl_printf_nocontext(const char *format, ...)
-{
-    dTHX;
-    va_list(arglist);
-
-#ifdef PERL_IMPLICIT_CONTEXT
-    PERL_ARGS_ASSERT_PRINTF_NOCONTEXT;
-#endif
-
-    va_start(arglist, format);
-    return PerlIO_vprintf(PerlIO_stdout(), format, arglist);
-}
-
 #if defined(HUGE_VAL) || (defined(USE_LONG_DOUBLE) && defined(HUGE_VALL))
 /*
  * This hack is to force load of "huge" support from libm.a
@@ -386,30 +365,7 @@ Perl_hv_magic(pTHX_ HV *hv, GV *gv, int how)
 {
     PERL_ARGS_ASSERT_HV_MAGIC;
 
-    sv_magic((SV*)hv, (SV*)gv, how, NULL, 0);
-}
-
-AV *
-Perl_av_fake(pTHX_ register I32 size, register SV **strp)
-{
-    register SV** ary;
-    register AV * const av = (AV*)newSV_type(SVt_PVAV);
-
-    PERL_ARGS_ASSERT_AV_FAKE;
-
-    Newx(ary,size+1,SV*);
-    AvALLOC(av) = ary;
-    Copy(strp,ary,size,SV*);
-    AvREIFY_only(av);
-    AvARRAY(av) = ary;
-    AvFILLp(av) = size - 1;
-    AvMAX(av) = size - 1;
-    while (size--) {
-        assert (*strp);
-        SvTEMP_off(*strp);
-        strp++;
-    }
-    return av;
+    sv_magic(MUTABLE_SV(hv), MUTABLE_SV(gv), how, NULL, 0);
 }
 
 bool
@@ -458,17 +414,6 @@ Perl_do_exec(pTHX_ const char *cmd)
     return do_exec3(cmd,0,0);
 }
 #endif
-
-OP *
-Perl_oopsCV(pTHX_ OP *o)
-{
-    PERL_ARGS_ASSERT_OOPSCV;
-
-    Perl_croak(aTHX_ "NOT IMPL LINE %d",__LINE__);
-    /* STUB */
-    PERL_UNUSED_ARG(o);
-    NORETURN_FUNCTION_END;
-}
 
 PP(pp_mapstart)
 {
@@ -1076,8 +1021,8 @@ Perl_hv_delete_ent(pTHX_ HV *hv, SV *keysv, I32 flags, U32 hash)
 {
     PERL_ARGS_ASSERT_HV_DELETE_ENT;
 
-    return (SV *) hv_common(hv, keysv, NULL, 0, 0, flags | HV_DELETE, NULL,
-			    hash);
+    return MUTABLE_SV(hv_common(hv, keysv, NULL, 0, 0, flags | HV_DELETE, NULL,
+				hash));
 }
 
 bool
@@ -1141,7 +1086,7 @@ Perl_magic_setglob(pTHX_ SV *sv, MAGIC *mg)
 AV *
 Perl_newAV(pTHX)
 {
-    return (AV*)newSV_type(SVt_PVAV);
+    return MUTABLE_AV(newSV_type(SVt_PVAV));
     /* sv_upgrade does AvREAL_only():
     AvALLOC(av) = 0;
     AvARRAY(av) = NULL;
@@ -1151,10 +1096,53 @@ Perl_newAV(pTHX)
 HV *
 Perl_newHV(pTHX)
 {
-    HV * const hv = (HV*)newSV_type(SVt_PVHV);
+    HV * const hv = MUTABLE_HV(newSV_type(SVt_PVHV));
     assert(!SvOK(hv));
 
     return hv;
+}
+
+void
+Perl_sv_insert(pTHX_ SV *const bigstr, const STRLEN offset, const STRLEN len, 
+              const char *const little, const STRLEN littlelen)
+{
+    PERL_ARGS_ASSERT_SV_INSERT;
+    sv_insert_flags(bigstr, offset, len, little, littlelen, 0);
+}
+
+#ifdef PERL_DONT_CREATE_GVSV
+GV *
+Perl_gv_SVadd(pTHX_ GV *gv)
+{
+    return gv_SVadd(gv);
+}
+#endif
+
+GV *
+Perl_gv_AVadd(pTHX_ GV *gv)
+{
+    PERL_ARGS_ASSERT_GV_AVADD;
+    return gv_AVadd(gv);
+}
+
+GV *
+Perl_gv_HVadd(pTHX_ register GV *gv)
+{
+    PERL_ARGS_ASSERT_GV_HVADD;
+    return gv_HVadd(gv);
+}
+
+GV *
+Perl_gv_IOadd(pTHX_ register GV *gv)
+{
+    PERL_ARGS_ASSERT_GV_IOADD;
+    return gv_IOadd(gv);
+}
+
+IO *
+Perl_newIO(pTHX)
+{
+    return MUTABLE_IO(newSV_type(SVt_PVIO));
 }
 
 #endif /* NO_MATHOMS */

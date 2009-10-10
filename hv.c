@@ -1,7 +1,7 @@
 /*    hv.c
  *
- *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, by Larry Wall and others
+ *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+ *    2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -9,7 +9,11 @@
  */
 
 /*
- * "I sit beside the fire and think of all that I have seen."  --Bilbo
+ *      I sit beside the fire and think
+ *          of all that I have seen.
+ *                         --Bilbo
+ *
+ *     [p.278 of _The Lord of the Rings_, II/iii: "The Ring Goes South"]
  */
 
 /* 
@@ -279,7 +283,11 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	if (flags & HVhek_FREEKEY)
 	    Safefree(key);
 	key = SvPV_const(keysv, klen);
-	flags = 0;
+	if (SvIsCOW_shared_hash(keysv)) {
+	    flags = HVhek_KEYCANONICAL;
+	} else {
+	    flags = 0;
+	}
     }
 
     if (action & HV_DELETE) {
@@ -490,7 +498,7 @@ Perl_hv_scalar(pTHX_ HV *hv)
     PERL_ARGS_ASSERT_HV_SCALAR;
 
     sv = sv_newmortal();
-    if (HvFILL((HV*)hv)) 
+    if (HvFILL((const HV *)hv)) 
         Perl_sv_setpvf(aTHX_ sv, "%ld/%ld",
                 (long)HvFILL(hv), (long)HvMAX(hv) + 1);
     else
@@ -658,7 +666,7 @@ S_hsplit(pTHX_ HV *hv)
       return;
     }
     if (SvOOK(hv)) {
-	Copy(&a[oldsize * sizeof(HE*)], &a[newsize * sizeof(HE*)], 1, struct xpvhv_aux);
+	Move(&a[oldsize * sizeof(HE*)], &a[newsize * sizeof(HE*)], 1, struct xpvhv_aux);
     }
 #else
     Newx(a, PERL_HV_ARRAY_ALLOC_BYTES(newsize)
@@ -981,8 +989,9 @@ Perl_newHVhv(pTHX_ HV *ohv)
 		const STRLEN len = HeKLEN(oent);
 		const int flags  = HeKFLAGS(oent);
 		HE * const ent   = new_HE();
+		SV *const val    = HeVAL(oent);
 
-		HeVAL(ent)     = newSVsv(HeVAL(oent));
+		HeVAL(ent) = SvIMMORTAL(val) ? val : newSVsv(val);
 		HeKEY_hek(ent)
                     = shared ? share_hek_flags(key, len, hash, flags)
                              :  save_hek_flags(key, len, hash, flags);
@@ -1095,7 +1104,7 @@ Perl_hv_clear(pTHX_ HV *hv)
 	Zero(HvARRAY(hv), xhv->xhv_max+1 /* HvMAX(hv)+1 */, HE*);
 
     if (SvRMAGICAL(hv))
-	mg_clear((SV*)hv);
+	mg_clear(MUTABLE_SV(hv));
 
     HvREHASH_off(hv);
     reset:
@@ -1246,6 +1255,7 @@ S_hfreeentries(pTHX_ HV *hv)
             if((meta = iter->xhv_mro_meta)) {
                 if(meta->mro_linear_c3)  AvREFCNT_dec(meta->mro_linear_c3);
                 if(meta->mro_nextmethod) HvREFCNT_dec(meta->mro_nextmethod);
+                HvREFCNT_dec(meta->isa);
                 Safefree(meta);
                 iter->xhv_mro_meta = NULL;
             }
@@ -1350,7 +1360,7 @@ Perl_hv_undef(pTHX_ HV *hv)
     HvPLACEHOLDERS_set(hv, 0);
 
     if (SvRMAGICAL(hv))
-	mg_clear((SV*)hv);
+	mg_clear(MUTABLE_SV(hv));
 }
 
 void
@@ -1603,7 +1613,8 @@ Perl_hv_kill_backrefs(pTHX_ HV *hv) {
 
     if (av) {
 	HvAUX(hv)->xhv_backreferences = 0;
-	Perl_sv_kill_backrefs(aTHX_ (SV*) hv, av);
+	Perl_sv_kill_backrefs(aTHX_ MUTABLE_SV(hv), av);
+	AvREFCNT_dec(av);
     }
 }
 
@@ -1679,26 +1690,31 @@ Perl_hv_iternext_flags(pTHX_ HV *hv, I32 flags)
             }
 	}
     }
-    while (!entry) {
-	/* OK. Come to the end of the current list.  Grab the next one.  */
 
-	iter->xhv_riter++; /* HvRITER(hv)++ */
-	if (iter->xhv_riter > (I32)xhv->xhv_max /* HvRITER(hv) > HvMAX(hv) */) {
-	    /* There is no next one.  End of the hash.  */
-	    iter->xhv_riter = -1; /* HvRITER(hv) = -1 */
-	    break;
-	}
-	entry = (HvARRAY(hv))[iter->xhv_riter];
+    /* Skip the entire loop if the hash is empty.   */
+    if ((flags & HV_ITERNEXT_WANTPLACEHOLDERS)
+	? HvTOTALKEYS(hv) : HvUSEDKEYS(hv)) {
+	while (!entry) {
+	    /* OK. Come to the end of the current list.  Grab the next one.  */
 
-        if (!(flags & HV_ITERNEXT_WANTPLACEHOLDERS)) {
-            /* If we have an entry, but it's a placeholder, don't count it.
-	       Try the next.  */
-	    while (entry && HeVAL(entry) == &PL_sv_placeholder)
-		entry = HeNEXT(entry);
+	    iter->xhv_riter++; /* HvRITER(hv)++ */
+	    if (iter->xhv_riter > (I32)xhv->xhv_max /* HvRITER(hv) > HvMAX(hv) */) {
+		/* There is no next one.  End of the hash.  */
+		iter->xhv_riter = -1; /* HvRITER(hv) = -1 */
+		break;
+	    }
+	    entry = (HvARRAY(hv))[iter->xhv_riter];
+
+	    if (!(flags & HV_ITERNEXT_WANTPLACEHOLDERS)) {
+		/* If we have an entry, but it's a placeholder, don't count it.
+		   Try the next.  */
+		while (entry && HeVAL(entry) == &PL_sv_placeholder)
+		    entry = HeNEXT(entry);
+	    }
+	    /* Will loop again if this linked list starts NULL
+	       (for HV_ITERNEXT_WANTPLACEHOLDERS)
+	       or if we run through it and find only placeholders.  */
 	}
-	/* Will loop again if this linked list starts NULL
-	   (for HV_ITERNEXT_WANTPLACEHOLDERS)
-	   or if we run through it and find only placeholders.  */
     }
 
     if (oldentry && HvLAZYDEL(hv)) {		/* was deleted earlier? */
@@ -1850,13 +1866,10 @@ S_unshare_hek_or_pvn(pTHX_ const HEK *hek, const char *str, I32 len, U32 hash)
 	   shared hek  */
 	assert (he->shared_he_he.hent_hek == hek);
 
-	LOCK_STRTAB_MUTEX;
 	if (he->shared_he_he.he_valu.hent_refcount - 1) {
 	    --he->shared_he_he.he_valu.hent_refcount;
-	    UNLOCK_STRTAB_MUTEX;
 	    return;
 	}
-	UNLOCK_STRTAB_MUTEX;
 
         hash = HEK_HASH(hek);
     }
@@ -1868,7 +1881,6 @@ S_unshare_hek_or_pvn(pTHX_ const HEK *hek, const char *str, I32 len, U32 hash)
     } */
     xhv = (XPVHV*)SvANY(PL_strtab);
     /* assert(xhv_array != 0) */
-    LOCK_STRTAB_MUTEX;
     first = oentry = &(HvARRAY(PL_strtab))[hash & (I32) HvMAX(PL_strtab)];
     if (he) {
 	const HE *const he_he = &(he->shared_he_he);
@@ -1903,7 +1915,6 @@ S_unshare_hek_or_pvn(pTHX_ const HEK *hek, const char *str, I32 len, U32 hash)
         }
     }
 
-    UNLOCK_STRTAB_MUTEX;
     if (!entry && ckWARN_d(WARN_INTERNAL))
 	Perl_warner(aTHX_ packWARN(WARN_INTERNAL),
                     "Attempt to free non-existent shared string '%s'%s"
@@ -1949,7 +1960,6 @@ S_share_hek_flags(pTHX_ const char *str, I32 len, register U32 hash, int flags)
     */
 
     /* assert(xhv_array != 0) */
-    LOCK_STRTAB_MUTEX;
     entry = (HvARRAY(PL_strtab))[hindex];
     for (;entry; entry = HeNEXT(entry)) {
 	if (HeHASH(entry) != hash)		/* strings can't be equal */
@@ -2007,7 +2017,6 @@ S_share_hek_flags(pTHX_ const char *str, I32 len, register U32 hash, int flags)
     }
 
     ++entry->he_valu.hent_refcount;
-    UNLOCK_STRTAB_MUTEX;
 
     if (flags & HVhek_FREEKEY)
 	Safefree(str);
@@ -2019,12 +2028,12 @@ I32 *
 Perl_hv_placeholders_p(pTHX_ HV *hv)
 {
     dVAR;
-    MAGIC *mg = mg_find((SV*)hv, PERL_MAGIC_rhash);
+    MAGIC *mg = mg_find((const SV *)hv, PERL_MAGIC_rhash);
 
     PERL_ARGS_ASSERT_HV_PLACEHOLDERS_P;
 
     if (!mg) {
-	mg = sv_magicext((SV*)hv, 0, PERL_MAGIC_rhash, 0, 0, 0);
+	mg = sv_magicext(MUTABLE_SV(hv), 0, PERL_MAGIC_rhash, 0, 0, 0);
 
 	if (!mg) {
 	    Perl_croak(aTHX_ "panic: hv_placeholders_p");
@@ -2035,10 +2044,10 @@ Perl_hv_placeholders_p(pTHX_ HV *hv)
 
 
 I32
-Perl_hv_placeholders_get(pTHX_ HV *hv)
+Perl_hv_placeholders_get(pTHX_ const HV *hv)
 {
     dVAR;
-    MAGIC * const mg = mg_find((SV*)hv, PERL_MAGIC_rhash);
+    MAGIC * const mg = mg_find((const SV *)hv, PERL_MAGIC_rhash);
 
     PERL_ARGS_ASSERT_HV_PLACEHOLDERS_GET;
 
@@ -2049,7 +2058,7 @@ void
 Perl_hv_placeholders_set(pTHX_ HV *hv, I32 ph)
 {
     dVAR;
-    MAGIC * const mg = mg_find((SV*)hv, PERL_MAGIC_rhash);
+    MAGIC * const mg = mg_find((const SV *)hv, PERL_MAGIC_rhash);
 
     PERL_ARGS_ASSERT_HV_PLACEHOLDERS_SET;
 
@@ -2099,7 +2108,7 @@ Perl_hv_assert(pTHX_ HV *hv)
 	} 
     }
     if (bad) {
-	sv_dump((SV *)hv);
+	sv_dump(MUTABLE_SV(hv));
     }
     HvRITER_set(hv, riter);		/* Restore hash iterator state */
     HvEITER_set(hv, eiter);

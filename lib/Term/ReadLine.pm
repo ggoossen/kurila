@@ -192,7 +192,7 @@ sub readline
     print $out, @rl_term_set[0], $prompt, @rl_term_set[1], @rl_term_set[2]
     $self->register_Tk
         if not $Term::ReadLine::registered and $Term::ReadLine::toloop
-      and defined &Tk::DoOneEvent
+      and exists &Tk::DoOneEvent
     #$str = scalar <$in>;
     $str = $self->get_line
     $str =~ s/^\s*\Q$prompt\E// if ($^OS_NAME eq 'MacOS')
@@ -312,11 +312,11 @@ elsif (defined $which and $which ne '') {       # Defined but false
 # To make possible switch off RL in debugger: (Not needed, work done
 # in debugger).
 our @ISA
-if (defined &Term::ReadLine::Gnu::readline)
+if (exists &Term::ReadLine::Gnu::readline)
     @ISA = qw(Term::ReadLine::Gnu Term::ReadLine::Stub)
-elsif (defined &Term::ReadLine::Perl::readline)
+elsif (exists &Term::ReadLine::Perl::readline)
     @ISA = qw(Term::ReadLine::Perl Term::ReadLine::Stub)
-elsif (defined $which && defined Symbol::fetch_glob("Term::ReadLine::$which\::readline")->*->&)
+elsif (defined $which && exists Symbol::fetch_glob("Term::ReadLine::$which\::readline")->*->&)
     @ISA = @:  "Term::ReadLine::$which" 
 else
     @ISA = qw(Term::ReadLine::Stub)
@@ -384,13 +384,13 @@ sub tkRunning
 
 sub get_c
     my $self = shift
-    $self->Tk_loop if $Term::ReadLine::toloop && defined &Tk::DoOneEvent
+    $self->Tk_loop if $Term::ReadLine::toloop && exists &Tk::DoOneEvent
     return getc $self->IN
 
 
 sub get_line
     my $self = shift
-    $self->Tk_loop if $Term::ReadLine::toloop && defined &Tk::DoOneEvent
+    $self->Tk_loop if $Term::ReadLine::toloop && exists &Tk::DoOneEvent
     my $in = $self->IN
     local ($^INPUT_RECORD_SEPARATOR) = "\n"
     return scalar ~< $in

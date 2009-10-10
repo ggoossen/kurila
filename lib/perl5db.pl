@@ -1380,7 +1380,9 @@ running interactively, this is C<.perldb>; if not, it's C<perldb.ini>.
 # As noted, this test really doesn't check accurately that the debugger
 # is running at a terminal or not.
 
-if ( -e "/dev/tty" ) {                      # this is the wrong metric!
+my $dev_tty = '/dev/tty';
+   $dev_tty = 'TT:' if ($^O eq 'VMS');
+if ( -e $dev_tty ) {                      # this is the wrong metric!
     $rcfile = ".perldb";
 }
 else {
@@ -6080,6 +6082,16 @@ qq[3>&1 xterm -title "Daughter Perl debugger $pids $name" -e sh -c 'tty 1>&3;\
 
     $pidprompt = '';    # Shown anyway in titlebar
 
+    # We need $term defined or we can not switch to the newly created xterm
+    if ($tty ne '' && !defined $term) {
+        eval { require Term::ReadLine } or die $@;
+        if ( !$rl ) {
+            $term = new Term::ReadLine::Stub 'perldb', $IN, $OUT;
+        }
+        else {
+            $term = new Term::ReadLine 'perldb', $IN, $OUT;
+        }
+    }
     # There's our new TTY.
     return $tty;
 } ## end sub xterm_get_fork_TTY
@@ -6746,18 +6758,6 @@ we go ahead and set C<$console> and C<$tty> to the file indicated.
 
 sub TTY {
 
-    # With VMS we can get here with $term undefined, so we do not
-    # switch to this terminal.  There may be a better place to make
-    # sure that $term is defined on VMS
-    if ( (nelems @_) and ($^O eq 'VMS') and !defined($term) ) {
-	try { require Term::ReadLine } or die $@;
-        if ( !$rl ) {
-	    $term = Term::ReadLine::Stub->new( 'perldb', $IN, $OUT);
-	}
-	else {
-	    $term = Term::ReadLine->new( 'perldb', $IN, $OUT);
-	}
-    }
     if ( (nelems @_) and $term and $term->Features->{newTTY} ) {
 
         # This terminal supports switching to a new TTY.
@@ -7489,15 +7489,13 @@ being debugged in place.
 =cut
 
 sub warnLevel {
-    if ((nelems @_)) {
-        $prevwarn = $^WARN_HOOK unless $warnLevel;
-        $warnLevel = shift;
-        if ($warnLevel) {
-            $^WARN_HOOK = \&DB::dbwarn;
-        }
-        elsif ($prevwarn) {
-            $^WARN_HOOK = $prevwarn;
-        }
+    if ((nelems @_))
+        $prevwarn = $^WARN_HOOK unless $warnLevel
+        $warnLevel = shift
+        if ($warnLevel)
+            $^WARN_HOOK = \&DB::dbwarn
+        else
+            $^WARN_HOOK = $prevwarn
     } ## end if (@_)
     $warnLevel;
 } ## end sub warnLevel
@@ -7538,6 +7536,9 @@ sub dieLevel {
         elsif ($prevdie) {
             $^DIE_HOOK = $prevdie;
             print $OUT "Default die handler restored.\n";
+        } else {
+            undef $SIG{__DIE__};
+            print $OUT "Die handler removed.\n";
         }
     } ## end if (@_)
     $dieLevel;
@@ -7861,10 +7862,8 @@ my @pods = @( qw(
     lexwarn
     locale
     lol
-    machten
     macos
     macosx
-    mint
     modinstall
     modlib
     mod
@@ -7879,7 +7878,6 @@ my @pods = @( qw(
     os2
     os390
     os400
-    othrtut
     packtut
     plan9
     pod

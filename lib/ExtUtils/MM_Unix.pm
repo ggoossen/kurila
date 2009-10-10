@@ -1489,13 +1489,13 @@ sub init_main($self)
     # Some systems have restrictions on files names for DLL's etc.
     # mod2fname returns appropriate file base name (typically truncated)
     # It may also edit @modparts if required.
-    if (defined &DynaLoader::mod2fname)
+    if (exists &DynaLoader::mod2fname)
         $modfname = DynaLoader::mod2fname(\@modparts)
 
     @: $self->{+PARENT_NAME}, $self->{+BASEEXT} = @: $self->{?NAME} =~ m!(?:([\w:]+)::)?(\w+)\z!
     $self->{+PARENT_NAME} ||= ''
 
-    if (defined &DynaLoader::mod2fname)
+    if (exists &DynaLoader::mod2fname)
         # As of 5.001m, dl_os2 appends '_'
         $self->{+DLBASE} = $modfname
     else
@@ -1737,7 +1737,7 @@ sub init_others($self) # --- Initialize Other Attributes
     $self->{+UNINST}     ||= 0
     $self->{+VERBINST}   ||= 0
     $self->{+MOD_INSTALL} ||=
-        $self->oneliner(<<'CODE', \@: '-MExtUtils::Install')
+        $self->oneliner(<<'CODE', @: '-MExtUtils::Install')
 install(\(%:<@ARGV), '$(VERBINST)', 0, '$(UNINST)');
 CODE
     $self->{+DOC_INSTALL}        ||=
@@ -2424,7 +2424,7 @@ $tmp/perlmain.c: $makefilename}, q{
 
 }
     push @m, "\t", q{$(NOECHO) $(PERL) $(INSTALLSCRIPT)/fixpmain
-} if (defined (&Dos::UseLFN) && Dos::UseLFN()==0)
+} if (exists (&Dos::UseLFN) && Dos::UseLFN()==0)
 
 
     push @m, q{
@@ -2785,7 +2785,7 @@ sub pm_to_blib
 pm_to_blib : $(TO_INST_PM)
 }
 
-    my $pm_to_blib = $self->oneliner(<<CODE, \@: '-MExtUtils::Install')
+    my $pm_to_blib = $self->oneliner(<<CODE, @: '-MExtUtils::Install')
 pm_to_blib(\\(\%: < \@ARGV ), '$autodir', '\$(PM_FILTER)')
 CODE
 
@@ -3062,7 +3062,7 @@ sub cd($self, $dir, @< @cmds)
 =cut
 
 sub oneliner($self, $cmd, ?$switches)
-    $switches = \$@ unless defined $switches
+    $switches //= $@
 
     # Strip leading and trailing newlines
     $cmd =~ s{^\n+}{}
@@ -3072,7 +3072,7 @@ sub oneliner($self, $cmd, ?$switches)
     $cmd = join " \n\t  -e ", map { $self->quote_literal($_) }, @cmds
     $cmd = $self->escape_newlines($cmd)
 
-    $switches = join ' ', $switches->@
+    $switches = join ' ', $switches
 
     return qq{\$(ABSPERLRUN) $switches -e $cmd --}
 
@@ -3444,8 +3444,6 @@ sub tool_xsubpp($self)
         (!exists($self->{XSOPT}) || $self->{?XSOPT} !~ m/linenumbers/)
         )
         unshift(@tmargs,'-nolinenumbers')
-
-
 
     $self->{+XSPROTOARG} = "" unless defined $self->{?XSPROTOARG}
 

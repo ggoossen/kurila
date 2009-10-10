@@ -34,7 +34,7 @@ if ($^OS_NAME eq 'MacOS')
 
 
 sub _catname($from, $to)
-    if (not defined &basename)
+    if (not exists &basename)
         require File::Basename
         File::Basename->import('basename')
     
@@ -61,6 +61,11 @@ sub copy
 
     my $from = shift
     my $to = shift
+
+    my $size
+    if (@_)
+        $size = shift(@_) + 0
+        croak("Bad buffer size for copy: $size\n") unless $size +> 0
 
     my $from_a_handle = (ref($from)
                          ?? (ref($from) eq 'GLOB'
@@ -97,7 +102,7 @@ sub copy
         $to = _catname($from, $to)
     
 
-    if (defined &syscopy && !$Syscopy_is_copy
+    if (exists &syscopy && !$Syscopy_is_copy
           && !$to_a_handle
           && !($from_a_handle && $^OS_NAME eq 'os2' )   # OS/2 cannot handle handles
           && !($from_a_handle && $^OS_NAME eq 'mpeix')  # and neither can MPE/iX.
@@ -123,15 +128,12 @@ sub copy
 
                 # Get rid of the old versions to be like UNIX
                 1 while unlink $copy_to
-            
-        
 
         return syscopy($from, $copy_to)
-    
 
     my $closefrom = 0
     my $closeto = 0
-    my ($size, $status, $r, $buf)
+    my ($status, $r, $buf)
 
     my $from_h
     my $to_h
@@ -278,14 +280,8 @@ sub move
 *mv = \&move
 
 
-if ($^OS_NAME eq 'MacOS')
-    *_protect = sub (@< @_) { MacPerl::MakeFSSpec(@_[0]) }
-else
-    *_protect = sub (@< @_) { "./@_[0]" }
-
-
 # &syscopy is an XSUB under OS/2
-unless (defined &syscopy)
+unless (exists &syscopy)
     if ($^OS_NAME eq 'VMS')
         *syscopy = \&rmscopy
     elsif ($^OS_NAME eq 'mpeix')
@@ -295,7 +291,7 @@ unless (defined &syscopy)
             # preserve MPE file attributes.
             return system('/bin/cp', '-f', @_[0], @_[1]) == 0
         
-    elsif ($^OS_NAME eq 'MSWin32' && defined &DynaLoader::boot_DynaLoader)
+    elsif ($^OS_NAME eq 'MSWin32' && exists &DynaLoader::boot_DynaLoader)
         # Win32::CopyFile() fill only work if we can load Win32.xs
         *syscopy = sub (@< @_)
             return 0 unless (nelems @_) == 2
@@ -380,6 +376,9 @@ upon the file, but will generally be the whole file (up to 2MB), or
 
 You may use the syntax C<use File::Copy "cp"> to get at the
 "cp" alias for this function. The syntax is I<exactly> the same.
+
+As of version 2.13, on UNIX systems, "copy" will preserve permission
+bits like the shell utility C<cp> would do.
 
 =item move
 X<move> X<mv> X<rename>

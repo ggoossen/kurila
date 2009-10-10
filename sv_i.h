@@ -1,6 +1,7 @@
 
-#define Dtype(sv) inlineDtype(aTHX_ sv)
-static __inline__ datatype inlineDtype(pTHX_ SV *sv) {
+datatype
+Perl_Dtype(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_DTYPE;
     if(!SvOK(sv))
         return Dt_UNDEF;
     else if (SvAVOK(sv))
@@ -11,6 +12,8 @@ static __inline__ datatype inlineDtype(pTHX_ SV *sv) {
         return Dt_CODE;
     else if (SvTYPE(sv) == SVt_PVGV)
         return Dt_GLOB;
+    else if (SvTYPE(sv) == SVt_REGEXP)
+        return Dt_REGEXP;
     else if (SvROK(sv))
         return Dt_REF;
     else if (SvPVOK(sv))
@@ -21,14 +24,15 @@ static __inline__ datatype inlineDtype(pTHX_ SV *sv) {
         return Dt_COMPLEX;
 }
 
-
-#define Ddesc(sv) inlineDdesc(aTHX_ sv)
-static __inline__ const char* inlineDdesc(pTHX_ SV *sv) {
-    switch (Dtype(sv)) {
+const char*
+Perl_Ddesc(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_DDESC;
+    switch (Perl_Dtype(aTHX_ sv)) {
     case Dt_UNDEF: return "UNDEF";
     case Dt_ARRAY: return "ARRAY";
     case Dt_HASH: return "HASH";
     case Dt_CODE: return "CODE";
+    case Dt_REGEXP: return "REGEXP";
     case Dt_REF: return "REF";
     case Dt_PLAIN: return "PLAINVALUE";
     case Dt_IO: return "IO";
@@ -43,10 +47,6 @@ static __inline__ const char* inlineDdesc(pTHX_ SV *sv) {
 IV
 Perl_SvIV(pTHX_ SV *sv) {
     PERL_ARGS_ASSERT_SVIV;
-    assert(SvTYPE(sv) != SVt_PVAV);
-    assert(SvTYPE(sv) != SVt_PVHV);
-    assert(SvTYPE(sv) != SVt_PVCV);
-    assert(!isGV_with_GP(sv));
     return SvIOK(sv) ? I_SvIV(sv) : sv_2iv(sv);
 }
 UV
@@ -60,11 +60,21 @@ Perl_SvNV(pTHX_ SV *sv) {
     return SvNOK(sv) ? SvNVX(sv) : sv_2nv(sv);
 }
 
+GV*
+Perl_SvOURGV(pTHX_ SV* sv) {
+    PERL_ARGS_ASSERT_SVOURGV;
+
+    assert(SvPAD_OUR(sv));
+    return ((XPVMG*) SvANY(sv))->xmg_u.xmg_ourgv;
+}
+
 #define SvIV_nomg(sv) (SvIOK(sv) ? I_SvIV(sv) : sv_2iv(sv))
 #define SvUV_nomg(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv))
 
 STRLEN
-Perl_SvCUR(pTHX_ SV* sv) {
+Perl_SvCUR(pTHX_ const SV* sv) {
+    PERL_ARGS_ASSERT_SVCUR;
+
     assert(SvTYPE(sv) >= SVt_PV);
     assert(SvTYPE(sv) != SVt_PVAV);
     assert(SvTYPE(sv) != SVt_PVHV);
@@ -74,6 +84,8 @@ Perl_SvCUR(pTHX_ SV* sv) {
 
 void
 Perl_SvCUR_set(pTHX_ SV* sv, STRLEN len) {
+    PERL_ARGS_ASSERT_SVCUR_SET;
+
     assert(SvTYPE(sv) >= SVt_PV);
     assert(SvTYPE(sv) != SVt_PVAV);
     assert(SvTYPE(sv) != SVt_PVHV);
@@ -142,42 +154,36 @@ SV** Perl_repTsvp(pTHX_ REGEXP **rep) { return (SV**)rep; }
 SV** Perl_iopTsvp(pTHX_ struct io **iop) { return (SV**)iop; }
 
 AV* Perl_svTav(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVTAV;
-    assert(SvAVOK(sv));
+    assert(! sv || SvAVOK(sv));
     return (AV*)sv;
 }
 
 HV* Perl_svThv(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVTHV;
-    assert(SvHVOK(sv));
+    assert(!sv || SvHVOK(sv));
     return (HV*)sv;
 }
 
 CV* Perl_svTcv(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVTCV;
-    assert(SvCVOK(sv));
+    assert(!sv || SvCVOK(sv));
     return (CV*)sv;
 }
 
 GV* Perl_svTgv(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVTGV;
-    assert(SvTYPE(sv) == SVt_PVGV);
+    assert(!sv || SvTYPE(sv) == SVt_PVGV);
     return (GV*)sv;
 }
 
 IO* Perl_svTio(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVTIO;
-    assert(SvIOOK(sv));
+    assert(!sv || SvIOOK(sv));
     return (IO*)sv;
 }
 
 REGEXP* Perl_svTre(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVTRE;
-    assert(SvTYPE(sv) == SVt_REGEXP);
+    assert(!sv || SvTYPE(sv) == SVt_REGEXP);
     return (REGEXP*)sv;
 }
 
-SV* SvREFCNT_inc(pTHX_ SV* sv) {
+SV* Perl_SvREFCNT_inc(pTHX_ SV* sv) {
     if (sv) {
         assert(SvTYPE(sv) != SVTYPEMASK);
         (SvREFCNT(sv))++;
@@ -264,7 +270,7 @@ Perl_SvNAME(pTHX_ SV *sv) {
     return loc_name(SvLOCATION(sv));
 }
 
-const char* Perl_SvPVX_const(pTHX_ SV *sv) {
+const char* Perl_SvPVX_const(pTHX_ const SV *sv) {
     PERL_ARGS_ASSERT_SVPVX_CONST;
     assert(SvTYPE(sv) >= SVt_PV);
     assert(SvTYPE(sv) != SVt_PVAV);

@@ -80,7 +80,7 @@ do {
 };
 EXPECT
 Use of uninitialized value $b in chop at - line 8 character 17.
-    (eval) called at - line 6 character 5.
+    (try) called at - line 6 character 5.
 ########
 
 # Check scope of pragma with eval
@@ -94,7 +94,7 @@ do {
 };
 EXPECT
 Use of uninitialized value $b in chop at - line 7 character 17.
-    (eval) called at - line 6 character 5.
+    (try) called at - line 6 character 5.
 Use of uninitialized value $b in chop at - line 9 character 13.
 ########
 

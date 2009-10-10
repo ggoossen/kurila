@@ -11,7 +11,10 @@ use XSLoader ()
 use Fcntl < qw(FD_CLOEXEC F_DUPFD F_GETFD F_GETFL F_GETLK F_RDLCK F_SETFD
              F_SETFL F_SETLK F_SETLKW F_UNLCK F_WRLCK O_ACCMODE O_APPEND
              O_CREAT O_EXCL O_NOCTTY O_NONBLOCK O_RDONLY O_RDWR O_TRUNC
-             O_WRONLY)
+	     O_WRONLY SEEK_CUR SEEK_END SEEK_SET
+	     S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG
+	     S_IRGRP S_IROTH S_IRUSR S_IRWXG S_IRWXO S_IRWXU S_ISGID S_ISUID
+	     S_IWGRP S_IWOTH S_IWUSR S_IXGRP S_IXOTH S_IXUSR)
 
 # Grandfather old foo_h form to new :foo_h form
 my $loaded
@@ -25,14 +28,6 @@ sub import
 
 
 XSLoader::load 'POSIX', $VERSION
-
-my %NON_CONSTS = %: < @+: map {(@: $_,1)}
-                    qw(S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG WEXITSTATUS
-                     WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG)
-
-for my $name (keys %NON_CONSTS)
-    Symbol::fetch_glob($name)->* = sub (@< @_) { int_macro_int($name, @_[?0]) }
-
 
 sub usage($mess)
     die "Usage: POSIX::$mess"
@@ -934,9 +929,7 @@ sub load_imports
 package POSIX::SigAction
 
 sub new { bless \(%: HANDLER => @_[?1], MASK => @_[?2], FLAGS => @_[?3] || 0, SAFE => 0), @_[0] }
-sub handler { @_[0]->{+HANDLER} = @_[1] if (nelems @_) +> 1; @_[0]->{?HANDLER} };
-sub mask    { @_[0]->{+MASK}    = @_[1] if (nelems @_) +> 1; @_[0]->{?MASK} };
-sub flags   { @_[0]->{+FLAGS}   = @_[1] if (nelems @_) +> 1; @_[0]->{?FLAGS} };
-sub safe    { @_[0]->{+SAFE}    = @_[1] if (nelems @_) +> 1; @_[0]->{?SAFE} };
-
-1
+sub handler { @_[0]->{HANDLER} = @_[1] if (nelems @_) +> 1; @_[0]->{HANDLER} };
+sub mask    { @_[0]->{MASK}    = @_[1] if (nelems @_) +> 1; @_[0]->{MASK} };
+sub flags   { @_[0]->{FLAGS}   = @_[1] if (nelems @_) +> 1; @_[0]->{FLAGS} };
+sub safe    { @_[0]->{SAFE}    = @_[1] if (nelems @_) +> 1; @_[0]->{SAFE} };

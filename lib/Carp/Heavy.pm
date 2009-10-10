@@ -168,7 +168,7 @@ sub ret_backtrace($i, @< @error)
     $i++
 
     my $tid_msg = ''
-    if (defined &threads::tid)
+    if (exists &threads::tid)
         my $tid = threads->tid
         $tid_msg = " thread $tid" if $tid
     
@@ -188,7 +188,7 @@ sub ret_summary($i, @< @error)
     $i++
 
     my $tid_msg = ''
-    if (defined &threads::tid)
+    if (exists &threads::tid)
         my $tid = threads->tid
         $tid_msg = " thread $tid" if $tid
     

@@ -57,10 +57,8 @@ sub DESTROY($self)
     no warnings 'io'
     closedir($self)
 
-
 sub open($dh, $dirname)
     opendir($dh, $dirname)
-
 
 sub close($dh)
     closedir($dh)
@@ -76,6 +74,3 @@ sub readdirs($dh)
 
 sub rewind($dh)
     rewinddir($dh)
-
-
-1

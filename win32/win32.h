@@ -1,7 +1,7 @@
 /* WIN32.H
  *
  * (c) 1995 Microsoft Corporation. All rights reserved.
- * 		Developed by hip communications inc., http://info.hip.com/info/
+ * 		Developed by hip communications inc.
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -345,9 +345,9 @@ extern FILE *		my_fdopen(int, char *);
 #endif
 extern int		my_fclose(FILE *);
 extern int		my_fstat(int fd, Stat_t *sbufptr);
-extern char *		win32_get_privlib(const char *pl);
-extern char *		win32_get_sitelib(const char *pl);
-extern char *		win32_get_vendorlib(const char *pl);
+extern char *		win32_get_privlib(const char *pl, STRLEN *const len);
+extern char *		win32_get_sitelib(const char *pl, STRLEN *const len);
+extern char *		win32_get_vendorlib(const char *pl, STRLEN *const len);
 extern int		IsWin95(void);
 extern int		IsWinNT(void);
 

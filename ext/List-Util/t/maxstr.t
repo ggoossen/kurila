@@ -6,7 +6,7 @@ use List::Util < qw(maxstr)
 
 my $v
 
-ok(defined &maxstr, 'defined')
+ok(exists &maxstr, 'defined')
 
 $v = maxstr('a')
 is($v, 'a', 'single arg')

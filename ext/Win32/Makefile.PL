@@ -1,15 +1,16 @@
+use strict
+use warnings
 use ExtUtils::MakeMaker
 
-my @libs
-push @libs, '-L/lib/w32api -lole32 -lversion' if $^OS_NAME eq "cygwin"
+unless ($^O eq "MSWin32" || $^O eq "cygwin")
+    die "OS unsupported\n"
 
-WriteMakefile(
+my %param = (
     NAME          => 'Win32',
     VERSION_FROM  => 'Win32.pm',
-    LIBS          => \@libs,
-    INSTALLDIRS   => 'perl',
-    NO_META       => 1,
+    INSTALLDIRS   => ($] >= 5.008004 ? 'perl' : 'site'),
+);
+$param{NO_META} = 1 if eval "$ExtUtils::MakeMaker::VERSION" >= 6.10_03;
+$param{LIBS} = ['-L/lib/w32api -lole32 -lversion'] if $^O eq "cygwin";
 
-    AUTHOR        => 'Jan Dubois <jand@activestate.com>',
-    ABSTRACT_FROM => 'Win32.pm',
-    )
+WriteMakefile(%param);

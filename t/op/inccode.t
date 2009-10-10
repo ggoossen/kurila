@@ -155,15 +155,12 @@ cmp_ok( $^INCLUDED{?'Quux2.pm'}, '\==', $sref,       '  val Quux2.pm is correct 
 
 pop $^INCLUDE_PATH
 
-push $^INCLUDE_PATH, sub (@< @_)
-    my (@: $self, $filename) =  @_
+push $^INCLUDE_PATH, sub ($self, $filename)
     if (substr($filename,0,4) eq 'Toto')
         $^INCLUDED{+$filename} = 'xyz'
         return get_temp_fh($filename)
     else
         return undef
-    
-
 
 $evalret = try { require Toto; 1 }
 die $^EVAL_ERROR if $^EVAL_ERROR
@@ -211,7 +208,6 @@ SKIP: do
             or die $^OS_ERROR
         $^INCLUDED{+$filename} = "/custom/path/to/$filename"
         return $fh
-    
 
     require Publius::Vergilius::Maro
     is( $^INCLUDED{?'Publius/Vergilius/Maro.pm'},

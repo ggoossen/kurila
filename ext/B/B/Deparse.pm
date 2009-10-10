@@ -525,6 +525,7 @@ sub new
     $self->{+'ambient_warnings'} = undef # Assume no lexical warnings
     $self->{+'ambient_hints'} = 0
     $self->{+'ambient_hinthash'} = undef
+    $self->{+'inlined_constants'} = $self->scan_for_constants
     $self->init()
 
     while (my $arg = shift @_)
@@ -560,6 +561,24 @@ do
         return $WARN_MASK
 
 
+sub scan_for_constants {
+    my ($self) = @_;
+    my %ret;
+
+    B::walksymtable(Symbol::stash('%main'), sub {
+        my ($gv) = @_;
+
+        my $cv = $gv->CV;
+        return if !$cv || class($cv) ne 'CV';
+
+        my $const = $cv->const_sv;
+        return if !$const || class($const) eq 'SPECIAL';
+
+        %ret{ dump::view( $const->object_2svref ) } = $gv->NAME;
+    }, sub { 1 });
+
+    return %ret;
+}
 
 # Initialise the contextual information, either from
 # defaults provided with the ambient_pragmas method,
@@ -625,13 +644,11 @@ sub compile
 
 
 
-sub coderef2text
-    my $self = shift
-    my $sub = shift
-    die "Usage: ->coderef2text(CODEREF)" unless UNIVERSAL::isa($sub, "CODE")
+sub coderef2text($self, $sub)
+    die "Usage: ->coderef2text(CODEREF)" unless type::is_code($sub)
 
     $self->init()
-    return $self->indent($self->deparse_sub(svref_2object($sub)))
+    return $self->indent($self->deparse_sub(svref_2object(\$sub)))
 
 
 sub ambient_pragmas
@@ -1669,9 +1686,7 @@ sub pp_srefgen($self, $op, $cx)
     if ($kid->name eq "null")
         $kid = $kid->first
 
-    if ($kid->name eq "anoncode")
-        return $self->e_anoncode((%:  code => $self->padval($kid->targ) ))
-    elsif ($kid->name eq "pushmark")
+    if ($kid->name eq "pushmark")
         my $sib_name = $kid->sibling->name
         if ($sib_name =~ m/^(pad|rv2)[ah]v$/
             and not $kid->sibling->flags ^&^ OPf_REF)
@@ -1689,8 +1704,8 @@ sub pp_srefgen($self, $op, $cx)
     $self->pfixop($op, $cx, "\\", 20)
 
 
-sub e_anoncode($self, %info)
-    my $text = $self->deparse_sub(%info{code})
+sub pp_anoncode($self, $op, $cx)
+    my $text = $self->deparse_sub($self->padval($op->targ))
     return "sub " . $text
 
 
@@ -2995,8 +3010,11 @@ sub pp_entersub($self, $op, $cx)
     if (is_scope($kid))
         $amper = "&"
         $kid = "\{" . $self->deparse($kid, 0) . "\}"
-    elsif ($kid->first->name eq "gv")
-        my $gv = $self->gv_or_padgv($kid->first)
+    elsif ($kid->name eq "var")
+        $kid = ($kid->sv->LOCATION || $@)[?3]
+        $kid =~ s/^\Q$self->{?'curstash'}\E::(\w+)$/$1/
+    elsif ($kid->name eq "gv")
+        my $gv = $self->gv_or_padgv($kid)
         if (class($gv->CV) ne "SPECIAL")
             $proto = $gv->CV->PV if $gv->CV->FLAGS ^&^ SVf_POK
 
@@ -3008,7 +3026,6 @@ sub pp_entersub($self, $op, $cx)
             elsif ($kid !~ m/^(?:\w|::)(?:[\w\d]|::(?!\z))*\z/)
                 $kid = single_delim("q", "'", $kid) . '->'
 
-
     elsif (is_scalar ($kid->first) && $kid->first->name ne 'rv2cv')
         $amper = "&"
         $kid = $self->deparse($kid, 24)
@@ -3016,7 +3033,6 @@ sub pp_entersub($self, $op, $cx)
         $prefix = ""
         my $arrow = is_subscriptable($kid->first) ?? "" !! "->"
         $kid = $self->deparse($kid, 24) . $arrow
-
 
     # Doesn't matter how many prototypes there are, if
     # they haven't happened yet!
@@ -3028,14 +3044,10 @@ sub pp_entersub($self, $op, $cx)
           defined Symbol::stash($self->{?'curstash'})->{?$kid}
           && !exists(
             ($self->{?'subs_deparsed'}||\$%)->{$self->{?'curstash'}."::".$kid})
-            && defined prototype(
-            \Symbol::fetch_glob($self->{?'curstash'}."::".$kid)->*->&)
             )
         if (!$declared && defined($proto))
             # Avoid "too early to check prototype" warning
             (@: $amper, $proto) = @: '&'
-
-
 
     my $args
     if ($declared and defined $proto and not $amper)
@@ -3282,7 +3294,6 @@ sub split_float($f)
         while ($f % 2 == 0)
             $f /= 2
             $exponent++
-
     else
         while ($f != int($f))
             $f *= 2
@@ -3302,6 +3313,8 @@ sub const($self, $sv, $cx)
         return (@: 'undef', '1', < $self->maybe_parens("!1", $cx, 21))[$sv->$-1]
     elsif (class($sv) eq "NULL")
         return 'undef'
+    elsif (my $const = $self->{?'inlined_constants'}{? dump::view( $sv->object_2svref ) })
+        return $const
 
     # convert a version object into the "v1.2.3" string in its V magic
     if ($sv->FLAGS ^&^ SVs_RMG)
@@ -3309,8 +3322,6 @@ sub const($self, $sv, $cx)
         while ($mg)
             return $mg->PTR if $mg->TYPE eq 'V'
             $mg = $mg->MOREMAGIC
-
-
 
     if ($sv->FLAGS ^&^ SVf_IOK)
         my $str = $sv->int_value
@@ -3385,8 +3396,6 @@ sub const($self, $sv, $cx)
                     return single_delim("qr", "", $re)
 
                 $mg = $mg->MOREMAGIC
-
-
 
         return $self->maybe_parens("\\" . $self->const($ref, 20), $cx, 20)
     elsif ($sv->FLAGS ^&^ SVf_POK)
@@ -4069,9 +4078,7 @@ programs.
 Create an object to store the state of a deparsing operation and any
 options. The options are the same as those that can be given on the
 command line (see L</OPTIONS>); options that are separated by commas
-after B<-MO=Deparse> should be given as separate strings. Some
-options, like B<-u>, don't make sense for a single subroutine, so
-don't pass them.
+after B<-MO=Deparse> should be given as separate strings.
 
 =head2 ambient_pragmas
 

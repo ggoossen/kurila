@@ -26,7 +26,7 @@ PerlIOScalar_pushed(pTHX_ PerlIO * f, const char *mode, SV * arg,
 	if (SvROK(arg)) {
 	    if (SvREADONLY(SvRV(arg)) && mode && *mode != 'r') {
 		if (ckWARN(WARN_LAYER))
-		    Perl_warner(aTHX_ packWARN(WARN_LAYER), PL_no_modify);
+		    Perl_warner(aTHX_ packWARN(WARN_LAYER), "%s", PL_no_modify);
 		SETERRNO(EINVAL, SS_IVCHAN);
 		return -1;
 	    }
@@ -121,17 +121,6 @@ PerlIOScalar_tell(pTHX_ PerlIO * f)
 {
     PerlIOScalar *s = PerlIOSelf(f, PerlIOScalar);
     return s->posn;
-}
-
-SSize_t
-PerlIOScalar_unread(pTHX_ PerlIO * f, const void *vbuf, Size_t count)
-{
-    PerlIOScalar *s = PerlIOSelf(f, PerlIOScalar);
-    char *dst = SvGROW(s->var, (STRLEN)s->posn + count);
-    s->posn -= count;
-    Move(vbuf, dst + s->posn, count, char);
-    SvPOK_on(s->var);
-    return count;
 }
 
 SSize_t
@@ -290,7 +279,7 @@ PERLIO_FUNCS_DECL(PerlIO_scalar) = {
     PerlIOScalar_fileno,
     PerlIOScalar_dup,
     PerlIOBase_read,
-    PerlIOScalar_unread,
+    NULL, /* unread */
     PerlIOScalar_write,
     PerlIOScalar_seek,
     PerlIOScalar_tell,

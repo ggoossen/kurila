@@ -171,7 +171,7 @@ else
 unless ($have_ualarm && $have_alarm) {
     skip 12..13;
 }
-else 
+else
     my $tick = 0
     local signals::handler("ALRM") = sub { $tick++ }
 
@@ -209,9 +209,9 @@ my $has_ualarm = config_value('d_ualarm')
 
 $has_ualarm ||= $xdefine =~ m/-DHAS_UALARM/
 
-unless (   defined &Time::HiRes::gettimeofday
-    && defined &Time::HiRes::ualarm
-    && defined &Time::HiRes::usleep
+unless (   exists &Time::HiRes::gettimeofday
+    && exists &Time::HiRes::ualarm
+    && exists &Time::HiRes::usleep
     && $has_ualarm) {
     for (15..17) {
         diag "ok $_ # Skip: no gettimeofday or no ualarm or no usleep\n";
@@ -220,7 +220,7 @@ unless (   defined &Time::HiRes::gettimeofday
     use Time::HiRes < qw(time alarm sleep)
     try { require POSIX }
     my $use_sigaction =
-        !$^EVAL_ERROR && defined &POSIX::sigaction && POSIX::SIGALRM() +> 0
+        !$^EVAL_ERROR && exists &POSIX::sigaction && POSIX::SIGALRM() +> 0
 
     my ($f, $r, $i, $not, $ok)
 
@@ -244,13 +244,12 @@ unless (   defined &Time::HiRes::gettimeofday
         # a restartable select(), so use POSIX::sigaction if available.
 
         POSIX::sigaction(POSIX::SIGALRM(),
-                  POSIX::SigAction->new(\&tick),
+                  POSIX::SigAction->new(&tick),
                   $oldaction)
             or die "Error setting SIGALRM handler with sigaction: $^OS_ERROR\n";
     }else 
         diag "# SIG tick\n"
-        signals::handler("ALRM") = "tick"
-    
+        signals::handler("ALRM") = &tick
 
     # On VMS timers can not interrupt select.
     if ($^OS_NAME eq 'VMS') {
@@ -306,8 +305,8 @@ unless (   defined &Time::HiRes::gettimeofday
 
 
 SKIP: do
-    if ( not(   defined &Time::HiRes::setitimer
-        && defined &Time::HiRes::getitimer
+    if ( not(   exists &Time::HiRes::setitimer
+        && exists &Time::HiRes::getitimer
         && has_symbol('ITIMER_VIRTUAL')
         && config_value("sig_name") =~ m/\bVTALRM\b/
         && $^OS_NAME !~ m/^(nto)$/) ) { # nto: QNX 6 has the API but no implementation
@@ -602,13 +601,13 @@ if ($^OS_NAME =~ m/^(cygwin|MSWin)/) {
         open(my $x, ">", "$^PID");
         print $x, $^PID;
         close($x);
-        @stat = (@:  Time::HiRes::stat($^PID) );
+        @stat = (@: Time::HiRes::stat("$^PID") );
         push @mtime, @stat[?9];
         Time::HiRes::sleep(rand(0.1) + 0.1);
         open($x, "<", "$^PID");
         ~< $x->*;
         close($x);
-        @stat = (@:  Time::HiRes::stat($^PID) );
+        @stat = (@: Time::HiRes::stat($^PID) );
         push @atime, @stat[?8];
     }
     1 while unlink $^PID;

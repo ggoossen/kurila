@@ -3,7 +3,7 @@
  *    embedvar.h
  *
  *    Copyright (C) 1993, 1994, 1995, 1996, 1997, 1998, 1999,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, by Larry Wall and others
+ *    2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -68,9 +68,9 @@
 #define PL_argvout_stack	(vTHX->Iargvout_stack)
 #define PL_argvoutgv		(vTHX->Iargvoutgv)
 #define PL_basetime		(vTHX->Ibasetime)
-#define PL_bitcount		(vTHX->Ibitcount)
 #define PL_body_arenas		(vTHX->Ibody_arenas)
 #define PL_body_roots		(vTHX->Ibody_roots)
+#define PL_breakable_sub_gen	(vTHX->Ibreakable_sub_gen)
 #define PL_checkav		(vTHX->Icheckav)
 #define PL_clocktick		(vTHX->Iclocktick)
 #define PL_colors		(vTHX->Icolors)
@@ -189,6 +189,7 @@
 #define PL_oldname		(vTHX->Ioldname)
 #define PL_op			(vTHX->Iop)
 #define PL_op_mask		(vTHX->Iop_mask)
+#define PL_opfreehook		(vTHX->Iopfreehook)
 #define PL_opsave		(vTHX->Iopsave)
 #define PL_origalen		(vTHX->Iorigalen)
 #define PL_origargc		(vTHX->Iorigargc)
@@ -233,6 +234,7 @@
 #define PL_scopestack		(vTHX->Iscopestack)
 #define PL_scopestack_ix	(vTHX->Iscopestack_ix)
 #define PL_scopestack_max	(vTHX->Iscopestack_max)
+#define PL_scopestack_name	(vTHX->Iscopestack_name)
 #define PL_screamfirst		(vTHX->Iscreamfirst)
 #define PL_screamnext		(vTHX->Iscreamnext)
 #define PL_secondgv		(vTHX->Isecondgv)
@@ -270,6 +272,7 @@
 #define PL_sv_no		(vTHX->Isv_no)
 #define PL_sv_objcount		(vTHX->Isv_objcount)
 #define PL_sv_root		(vTHX->Isv_root)
+#define PL_sv_serial		(vTHX->Isv_serial)
 #define PL_sv_undef		(vTHX->Isv_undef)
 #define PL_sv_yes		(vTHX->Isv_yes)
 #define PL_sys_intern		(vTHX->Isys_intern)
@@ -286,7 +289,6 @@
 #define PL_unlockhook		(vTHX->Iunlockhook)
 #define PL_unsafe		(vTHX->Iunsafe)
 #define PL_utf8_alnum		(vTHX->Iutf8_alnum)
-#define PL_utf8_alnumc		(vTHX->Iutf8_alnumc)
 #define PL_utf8_alpha		(vTHX->Iutf8_alpha)
 #define PL_utf8_ascii		(vTHX->Iutf8_ascii)
 #define PL_utf8_cntrl		(vTHX->Iutf8_cntrl)
@@ -344,9 +346,9 @@
 #define PL_Iargvout_stack	PL_argvout_stack
 #define PL_Iargvoutgv		PL_argvoutgv
 #define PL_Ibasetime		PL_basetime
-#define PL_Ibitcount		PL_bitcount
 #define PL_Ibody_arenas		PL_body_arenas
 #define PL_Ibody_roots		PL_body_roots
+#define PL_Ibreakable_sub_gen	PL_breakable_sub_gen
 #define PL_Icheckav		PL_checkav
 #define PL_Iclocktick		PL_clocktick
 #define PL_Icolors		PL_colors
@@ -465,6 +467,7 @@
 #define PL_Ioldname		PL_oldname
 #define PL_Iop			PL_op
 #define PL_Iop_mask		PL_op_mask
+#define PL_Iopfreehook		PL_opfreehook
 #define PL_Iopsave		PL_opsave
 #define PL_Iorigalen		PL_origalen
 #define PL_Iorigargc		PL_origargc
@@ -509,6 +512,7 @@
 #define PL_Iscopestack		PL_scopestack
 #define PL_Iscopestack_ix	PL_scopestack_ix
 #define PL_Iscopestack_max	PL_scopestack_max
+#define PL_Iscopestack_name	PL_scopestack_name
 #define PL_Iscreamfirst		PL_screamfirst
 #define PL_Iscreamnext		PL_screamnext
 #define PL_Isecondgv		PL_secondgv
@@ -546,6 +550,7 @@
 #define PL_Isv_no		PL_sv_no
 #define PL_Isv_objcount		PL_sv_objcount
 #define PL_Isv_root		PL_sv_root
+#define PL_Isv_serial		PL_sv_serial
 #define PL_Isv_undef		PL_sv_undef
 #define PL_Isv_yes		PL_sv_yes
 #define PL_Isys_intern		PL_sys_intern
@@ -562,7 +567,6 @@
 #define PL_Iunlockhook		PL_unlockhook
 #define PL_Iunsafe		PL_unsafe
 #define PL_Iutf8_alnum		PL_utf8_alnum
-#define PL_Iutf8_alnumc		PL_utf8_alnumc
 #define PL_Iutf8_alpha		PL_utf8_alpha
 #define PL_Iutf8_ascii		PL_utf8_ascii
 #define PL_Iutf8_cntrl		PL_utf8_cntrl

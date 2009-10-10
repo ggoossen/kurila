@@ -11,12 +11,30 @@
 
 typedef OP OP_4tree;			/* Will be redefined later. */
 
-
 /* Convert branch sequences to more efficient trie ops? */
 #define PERL_ENABLE_TRIE_OPTIMISATION 1
 
 /* Be really agressive about optimising patterns with trie sequences? */
 #define PERL_ENABLE_EXTENDED_TRIE_OPTIMISATION 1
+
+/* Use old style unicode mappings for perl and posix character classes
+ *
+ * NOTE: Enabling this essentially breaks character class matching against unicode 
+ * strings, so that POSIX char classes match when they shouldn't, and \d matches 
+ * way more than 10 characters, and sometimes a charclass and its complement either
+ * both match or neither match.
+ * NOTE: Disabling this will cause various backwards compatibility issues to rear 
+ * their head, and tests to fail. However it will make the charclass behaviour 
+ * consistant regardless of internal string type, and make character class inversions
+ * consistant. The tests that fail in the regex engine are basically broken tests.
+ *
+ * Personally I think 5.12 should disable this for sure. Its a bit more debatable for
+ * 5.10, so for now im leaving it enabled.
+ * XXX: It is now enabled for 5.11/5.12
+ *
+ * -demerphq
+ */
+#define PERL_LEGACY_UNICODE_CHARCLASS_MAPPINGS 0
 
 /* Should the optimiser take positive assertions into account? */
 #define PERL_ENABLE_POSITIVE_ASSERTION_STUDY 0
@@ -313,9 +331,9 @@ struct regnode_charclass_class {	/* has [[:blah:]] classes */
 #define ANYOF_NALNUM	 1
 #define ANYOF_SPACE	 2	/* \s */
 #define ANYOF_NSPACE	 3
-#define ANYOF_DIGIT	 4
+#define ANYOF_DIGIT	 4	/* \d */
 #define ANYOF_NDIGIT	 5
-#define ANYOF_ALNUMC	 6	/* isalnum(3), utf8::IsAlnum, ALNUMC */
+#define ANYOF_ALNUMC	 6	/* [[:alnum:]] isalnum(3), utf8::IsAlnum, ALNUMC */
 #define ANYOF_NALNUMC	 7
 #define ANYOF_ALPHA	 8
 #define ANYOF_NALPHA	 9
@@ -388,7 +406,6 @@ struct regnode_charclass_class {	/* has [[:blah:]] classes */
 /*
  * Utility definitions.
  */
-static __inline__ UV UCHARAT(const char *p) {	return *(U8*)p; }
 
 #define EXTRA_SIZE(guy) ((sizeof(guy)-1)/sizeof(struct regnode))
 
@@ -447,6 +464,7 @@ EXTCONST regexp_engine PL_core_reg_engine = {
         Perl_re_intuit_start,
         Perl_re_intuit_string, 
         Perl_regfree_internal,
+        Perl_reg_tmprefcnt_internal,
         Perl_reg_numbered_buff_fetch,
         Perl_reg_numbered_buff_store,
         Perl_reg_numbered_buff_length,
@@ -566,7 +584,7 @@ struct _reg_trie_data {
     U32             statecount;      /* Build only - number of states in the states array 
                                         (including the unused zero state) */
     U32             wordcount;       /* Build only */
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     STRLEN          charcount;       /* Build only */
 #endif
 };
@@ -574,7 +592,7 @@ struct _reg_trie_data {
    structure, but are held outside as they need duplication on thread cloning,
    whereas the rest of the structure can be read only:
     HV              *widecharmap;    code points > 255 to charid
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
     AV              *words;          Array of words contained in trie, for dumping
     AV              *revcharmap;     Map of each charid back to its character representation
 #endif
@@ -616,7 +634,7 @@ typedef struct _reg_ac_data reg_ac_data;
 #define SAFE_TRIE_NODENUM(state) ((state) ? (((state)-1)/(trie->uniquecharcount)+1) : (state))
 #define TRIE_NODEIDX(state) ((state) ? (((state)-1)*(trie->uniquecharcount)+1) : (state))
 
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 #define TRIE_CHARCOUNT(trie) ((trie)->charcount)
 #else
 #define TRIE_CHARCOUNT(trie) (trie_charcount)
@@ -680,6 +698,7 @@ re.pm, especially to the documentation.
 #define RE_DEBUG_EXTRA_STATE       0x080000
 #define RE_DEBUG_EXTRA_OPTIMISE    0x100000
 #define RE_DEBUG_EXTRA_BUFFERS     0x400000
+#define RE_DEBUG_EXTRA_GPOS        0x800000
 /* combined */
 #define RE_DEBUG_EXTRA_STACK       0x280000
 
@@ -735,17 +754,19 @@ re.pm, especially to the documentation.
 #define DEBUG_TRIE_r(x) DEBUG_r( \
     if (re_debug_flags & (RE_DEBUG_COMPILE_TRIE \
         | RE_DEBUG_EXECUTE_TRIE )) x )
+#define DEBUG_GPOS_r(x) DEBUG_r( \
+    if (re_debug_flags & RE_DEBUG_EXTRA_GPOS) x )
 
 /* initialization */
 #define GET_RE_DEBUG_FLAGS DEBUG_r({ \
 	SV * re_debug_flags_sv = sv_2mortal(newSV(0)); \
-        Perl_magic_get(RE_DEBUG_FLAGS, re_debug_flags_sv);	\
+        magic_get(RE_DEBUG_FLAGS, re_debug_flags_sv);	\
         if (!SvIOK(re_debug_flags_sv)) \
             sv_setuv(re_debug_flags_sv, RE_DEBUG_COMPILE_DUMP | RE_DEBUG_EXECUTE_MASK ); \
         re_debug_flags=SvIV(re_debug_flags_sv); \
 })
 
-#ifdef DEBUGGING
+#ifdef RE_DEBUGGING
 
 #define GET_RE_DEBUG_FLAGS_DECL IV re_debug_flags = 0; GET_RE_DEBUG_FLAGS;
 

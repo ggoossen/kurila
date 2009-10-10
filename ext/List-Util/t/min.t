@@ -6,7 +6,7 @@ use List::Util < qw(min)
 
 my $v
 
-ok(defined &min, 'defined')
+ok(exists &min, 'defined')
 
 $v = min(9)
 is($v, 9, 'single arg')

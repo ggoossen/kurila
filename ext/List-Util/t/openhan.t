@@ -5,7 +5,7 @@ use Config
 use Test::More tests => 4
 use Scalar::Util < qw(openhandle)
 
-ok(defined &openhandle, 'defined')
+ok(exists &openhandle, 'defined')
 
 my $fh = $^STDERR
 is(openhandle($fh), $fh, 'STDERR')

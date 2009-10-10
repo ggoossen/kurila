@@ -3,7 +3,6 @@
 BEGIN 
     require './test.pl'
 
-
 $^OUTPUT_AUTOFLUSH  = 1
 use warnings
 use Config

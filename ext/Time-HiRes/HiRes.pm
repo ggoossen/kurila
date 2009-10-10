@@ -186,6 +186,9 @@ Getting even accuracy of one thousand nanoseconds is good.
 Issues a C<ualarm> call; the C<$interval_useconds> is optional and
 will be zero if unspecified, resulting in C<alarm>-like behaviour.
 
+Returns the remaining time in the alarm in microseconds, or C<undef>
+if an error occurred.
+
 ualarm(0) will cancel an outstanding ualarm().
 
 Note that the interaction between alarms and sleeps is unspecified.
@@ -237,10 +240,14 @@ Note that the interaction between alarms and sleeps is unspecified.
 =item alarm ( $floating_seconds [, $interval_floating_seconds ] )
 
 The C<SIGALRM> signal is sent after the specified number of seconds.
-Implemented using C<ualarm()>.  The C<$interval_floating_seconds> argument
-is optional and will be zero if unspecified, resulting in C<alarm()>-like
-behaviour.  This function can be imported, resulting in a nice drop-in
-replacement for the C<alarm> provided with perl, see the L</EXAMPLES> below.
+Implemented using C<setitimer()> if available, C<ualarm()> if not.
+The C<$interval_floating_seconds> argument is optional and will be
+zero if unspecified, resulting in C<alarm()>-like behaviour.  This
+function can be imported, resulting in a nice drop-in replacement for
+the C<alarm> provided with perl, see the L</EXAMPLES> below.
+
+Returns the remaining time in the alarm in seconds, or C<undef>
+if an error occurred.
 
 B<NOTE 1>: With some combinations of operating systems and Perl
 releases C<SIGALRM> restarts C<select()>, instead of interrupting it.
@@ -267,9 +274,9 @@ An array with both the remaining time and the interval is returned.
 There are usually three or four interval timers (signals) available: the
 C<$which> can be C<ITIMER_REAL>, C<ITIMER_VIRTUAL>, C<ITIMER_PROF>, or
 C<ITIMER_REALPROF>.  Note that which ones are available depends: true
-UNIX platforms usually have the first three, but (for example) Win32
-and Cygwin have only C<ITIMER_REAL>, and only Solaris seems to have
-C<ITIMER_REALPROF> (which is used to profile multithreaded programs).
+UNIX platforms usually have the first three, but only Solaris seems to
+have C<ITIMER_REALPROF> (which is used to profile multithreaded programs).
+Win32 unfortunately does not haveinterval timers.
 
 C<ITIMER_REAL> results in C<alarm()>-like behaviour.  Time is counted in
 I<real time>; that is, wallclock time.  C<SIGALRM> is delivered when
@@ -310,8 +317,8 @@ January 1, 1970 Greenwich Mean Time (GMT).  Do not assume that
 CLOCK_REALTIME is zero, it might be one, or something else.
 Another potentially useful (but not available everywhere) value is
 C<CLOCK_MONOTONIC>, which guarantees a monotonically increasing time
-value (unlike time(), which can be adjusted).  See your system
-documentation for other possibly supported values.
+value (unlike time() or gettimeofday(), which can be adjusted).
+See your system documentation for other possibly supported values.
 
 =item clock_getres ( $which )
 
@@ -501,6 +508,15 @@ You tried to use a negative time argument.
 Something went horribly wrong-- the number of microseconds that cannot
 become negative just became negative.  Maybe your compiler is broken?
 
+=head2 useconds or uinterval equal to or more than 1000000
+
+In some platforms it is not possible to get an alarm with subsecond
+resolution and later than one second.
+
+=head2 unimplemented in this platform
+
+Some calls simply aren't available, real or emulated, on every platform.
+
 =head1 CAVEATS
 
 Notice that the core C<time()> maybe rounding rather than truncating.
@@ -516,6 +532,9 @@ drift off from the system clock (and the original time())  by up to 0.5
 seconds. Time::HiRes will notice this eventually and recalibrate.
 Note that since Time::HiRes 1.77 the clock_gettime(CLOCK_MONOTONIC)
 might help in this (in case your system supports CLOCK_MONOTONIC).
+
+Some systems have APIs but not implementations: for example QNX and Haiku
+have the interval timer APIs but not the functionality.
 
 =head1 SEE ALSO
 
@@ -536,7 +555,8 @@ G. Aas <gisle@aas.no>
 
 Copyright (c) 1996-2002 Douglas E. Wegscheid.  All rights reserved.
 
-Copyright (c) 2002, 2003, 2004, 2005, 2006, 2007 Jarkko Hietaniemi.  All rights reserved.
+Copyright (c) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Jarkko Hietaniemi.
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

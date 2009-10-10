@@ -8,6 +8,18 @@ This is a list of wishes for Perl Kurila. The items are listed by importance.
 
 =head1 Items
 
+=head2 Rename execute to kurila
+
+Rename execute to kurila, and use it in scripts
+
+=head3 Tasks
+=over
+=item Rename executable
+=item Extend p5kurila to change shebangs
+=item Change shebangs
+=item Change emacs mode detection
+=back
+
 =head2 Check all sub references at the end
 
 Resolve all sub routine references, and throw an error if the
@@ -29,7 +41,64 @@ at compile time.
 All subs must have formal arguments, with exception of blocks, which
 have an implicit C<$_>
 
+=head2 Remove prototypes from XS
+
 =head2 Lexical scoped subroutines imports
+
+=head2 Lexical scoped $^EVAL_ERROR
+
+=head2 Replace hash iteration with something like C<for (pairs $h)>
+
+=head2 Complain about assigning to optional element (i.e. $foo{?'bar'} = 'baz')
+
+=head2 Smartmatch design issues
+
+In 5.10.0 the smartmatch operator C<~~> isn't working quite "right". But
+before we can fix the implementation, we need to define what "right" is.
+The first problem is that Robin Houston implemented the Perl 6 smart match
+spec as of February 2006, when smart match was axiomatically symmetrical:
+L<http://groups.google.com/group/perl.perl6.language/msg/bf2b486f089ad021>
+
+Since then the Perl 6 target moved, but the Perl 5 implementation did not.
+
+So it would be useful for someone to compare the Perl 6 smartmatch table
+as of February 2006 L<http://svn.perl.org/viewvc/perl6/doc/trunk/design/syn/S03.pod?view=markup&pathrev=7615>
+and the current table L<http://svn.perl.org/viewvc/perl6/doc/trunk/design/syn/S03.pod?revision=14556&view=markup>
+and tabulate the differences in Perl 6. The annotated view of changes is
+L<http://svn.perl.org/viewvc/perl6/doc/trunk/design/syn/S03.pod?view=annotate> and the diff is
+C<svn diff -r7615:14556 http://svn.perl.org/perl6/doc/trunk/design/syn/S03.pod>
+-- search for C<=head1 Smart matching>. (In theory F<viewvc> can generate that,
+but in practice when I tried it hung forever, I assume "thinking")
+
+With that done and published, someone (else) can then map any changed Perl 6
+semantics back to Perl 5, based on how the existing semantics map to Perl 5:
+L<http://search.cpan.org/~rgarcia/perl-5.10.0/pod/perlsyn.pod#Smart_matching_in_detail>
+
+
+There are also some questions that need answering:
+
+=over 4
+
+=item *
+
+How do you negate one?  (documentation issue)
+http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2008-01/msg00071.html
+
+=item *
+
+Array behaviors
+http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-12/msg00799.html
+
+* Should smart matches be symmetrical? (Perl 6 says no)
+
+* Other differences between Perl 5 and Perl 6 smart match?
+
+=item *
+
+Objects and smart match
+http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-12/msg00865.html
+
+=back
 
 =head2 Remove duplication of test setup.
 
@@ -37,21 +106,6 @@ Schwern notes, that there's duplication of code - lots and lots of tests have
 some variation on the big block of C<$Is_Foo> checks.  We can safely put this
 into a file, change it to build an C<%Is> hash and require it.  Maybe just put
 it into F<test.pl>. Throw in the handy tainting subroutines.
-
-=head2 merge common code in installperl and installman
-
-There are some common subroutines and a common C<BEGIN> block in F<installperl>
-and F<installman>. These should probably be merged. It would also be good to
-check for duplication in all the utility scripts supplied in the source
-tarball. It might be good to move them all to a subdirectory, but this would
-require careful checking to find all places that call them, and change those
-correctly.
-
-=head2 common test code for timed bail out
-
-Write portable self destruct code for tests to stop them burning CPU in
-infinite loops. This needs to avoid using alarm, as some of the tests are
-testing alarm/sleep or timers.
 
 =head2 POD -E<gt> HTML conversion in the core still sucks
 
@@ -64,13 +118,6 @@ is needed to improve the cross-linking.
 
 The addition of C<Pod::Simple> and its related modules may make this task
 easier to complete.
-
-=head2 merge checkpods and podchecker
-
-F<pod/checkpods.PL> (and C<make check> in the F<pod/> subdirectory)
-implements a very basic check for pod files, but the errors it discovers
-aren't found by podchecker. Add this check to podchecker, get rid of
-checkpods and have C<make check> use podchecker.
 
 =head2 A decent benchmark
 
@@ -256,28 +303,6 @@ is currently no guarantee that passing no use64bitall option to the
 Configure process will build a 32bit perl. Implementing -Duse32bit*
 options would be nice for perl 5.12.
 
-=head2 Make it clear from -v if this is the exact official release
-
-Currently perl from C<p4>/C<rsync> ships with a F<patchlevel.h> file that
-usually defines one local patch, of the form "MAINT12345" or "RC1". The output
-of perl -v doesn't report that a perl isn't an official release, and this
-information can get lost in bugs reports. Because of this, the minor version
-isn't bumped up until RC time, to minimise the possibility of versions of perl
-escaping that believe themselves to be newer than they actually are.
-
-It would be useful to find an elegant way to have the "this is an interim
-maintenance release" or "this is a release candidate" in the terse -v output,
-and have it so that it's easy for the pumpking to remove this just as the
-release tarball is rolled up. This way the version pulled out of rsync would
-always say "I'm a development release" and it would be safe to bump the
-reported minor version as soon as a release ships, which would aid perl
-developers.
-
-This task is really about thinking of an elegant way to arrange the C source
-such that it's trivial for the Pumpking to flag "this is an official release"
-when making a tarball, yet leave the default source saying "I'm not the
-official release".
-
 =head2 Profile Perl - am I hot or not?
 
 The Perl source code is stable enough that it makes sense to profile it,
@@ -295,6 +320,8 @@ Except that it's not clear if these really are the most commonly used ops. So
 as part of exercising your skills with coverage and profiling tools you might
 want to determine what ops I<really> are the most commonly used. And in turn
 suggest evictions and promotions to achieve a better F<pp_hot.c>.
+
+One piece of Perl code that might make a good testbed is F<installman>.
 
 =head2 Allocate OPs from arenas
 
@@ -337,6 +364,31 @@ been deprecated in favour of ISO C++ conformant names like _fileno. These
 warnings are also currently suppressed by adding -D_CRT_NONSTDC_NO_DEPRECATE. It
 might be nice to do as Microsoft suggest here too, although, unlike the secure
 functions issue, there is presumably little or no benefit in this case.
+
+=head2 Fix POSIX::access() and chdir() on Win32
+
+These functions currently take no account of DACLs and therefore do not behave
+correctly in situations where access is restricted by DACLs (as opposed to the
+read-only attribute).
+
+Furthermore, POSIX::access() behaves differently for directories having the
+read-only attribute set depending on what CRT library is being used. For
+example, the _access() function in the VC6 and VC7 CRTs (wrongly) claim that
+such directories are not writable, whereas in fact all directories are writable
+unless access is denied by DACLs. (In the case of directories, the read-only
+attribute actually only means that the directory cannot be deleted.) This CRT
+bug is fixed in the VC8 and VC9 CRTs (but, of course, the directory may still
+not actually be writable if access is indeed denied by DACLs).
+
+For the chdir() issue, see ActiveState bug #74552:
+http://bugs.activestate.com/show_bug.cgi?id=74552
+
+Therefore, DACLs should be checked both for consistency across CRTs and for
+the correct answer.
+
+(Note that perl's -w operator should not be modified to check DACLs. It has
+been written so that it reflects the state of the read-only attribute, even
+for directories (whatever CRT is being used), for symmetry with chmod().)
 
 =head2 strcat(), strcpy(), strncat(), strncpy(), sprintf(), vsprintf()
 
@@ -410,13 +462,6 @@ readlink().
 
 See also L</"Virtualize operating system access">.
 
-=head2 Propagate const outwards from Perl_moreswitches()
-
-Change 32057 changed the parameter and return value of C<Perl_moreswitches()>
-from <char *> to <const char *>. It should now be possible to propagate
-const-correctness outwards to C<S_parse_body()>, C<Perl_moreswitches()>
-and C<Perl_yylex()>.
-
 =head2 Organize error messages
 
 Perl's diagnostics (error messages, see L<perldiag>) could use
@@ -442,6 +487,23 @@ have catgets().
 
 For the really pure at heart, consider extending this item to cover
 also the warning messages (see L<perllexwarn>, C<warnings.pl>).
+
+=head2 error reporting of [$a ; $b]
+
+Using C<;> inside brackets is a syntax error, and we don't propose to change
+that by giving it any meaning. However, it's not reported very helpfully:
+
+    $ perl -e '$a = [$b; $c];'
+    syntax error at -e line 1, near "$b;"
+    syntax error at -e line 1, near "$c]"
+    Execution of -e aborted due to compilation errors.
+
+It should be possible to hook into the tokeniser or the lexer, so that when a
+C<;> is parsed where it is not legal as a statement terminator (ie inside
+C<{}> used as a hashref, C<[]> or C<()>) it issues an error something like
+I<';' isn't legal inside an expression - if you need multiple statements use a
+do {...} block>. See the thread starting at
+http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2008-09/msg00573.html
 
 =head2 lexicals used only once
 
@@ -544,16 +606,6 @@ reinstated.
 
 The old perltodo notes "Look at the "reification" code in C<av.c>".
 
-=head2 The yada yada yada operators
-
-Perl 6's Synopsis 3 says:
-
-I<The ... operator is the "yada, yada, yada" list operator, which is used as
-the body in function prototypes. It complains bitterly (by calling fail)
-if it is ever executed. Variant ??? calls warn, and !!! calls die.>
-
-Those would be nice to add to Perl 5. That could be done without new ops.
-
 =head2 Virtualize operating system access
 
 Implement a set of "vtables" that virtualizes operating system access
@@ -591,9 +643,119 @@ See also L</"Extend PerlIO and PerlIO::Scalar">.
 
 =head2 Investigate PADTMP hash pessimisation
 
-The peephole optimier converts constants used for hash key lookups to shared
-hash key scalars. Under ithreads, something is undoing this work. See
+The peephole optimiser converts constants used for hash key lookups to shared
+hash key scalars. Under ithreads, something is undoing this work.
 See http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-09/msg00793.html
+
+=head2 Store the current pad in the OP slab allocator
+
+=for clarification
+I hope that I got that "current pad" part correct
+
+Currently we leak ops in various cases of parse failure. I suggested that we
+could solve this by always using the op slab allocator, and walking it to
+free ops. Dave comments that as some ops are already freed during optree
+creation one would have to mark which ops are freed, and not double free them
+when walking the slab. He notes that one problem with this is that for some ops
+you have to know which pad was current at the time of allocation, which does
+change. I suggested storing a pointer to the current pad in the memory allocated
+for the slab, and swapping to a new slab each time the pad changes. Dave thinks
+that this would work.
+
+=head2 repack the optree
+
+Repacking the optree after execution order is determined could allow
+removal of NULL ops, and optimal ordering of OPs with respect to cache-line
+filling.  The slab allocator could be reused for this purpose.  I think that
+the best way to do this is to make it an optional step just before the
+completed optree is attached to anything else, and to use the slab allocator
+unchanged, so that freeing ops is identical whether or not this step runs.
+Note that the slab allocator allocates ops downwards in memory, so one would
+have to actually "allocate" the ops in reverse-execution order to get them
+contiguous in memory in execution order.
+
+See http://www.nntp.perl.org/group/perl.perl5.porters/2007/12/msg131975.html
+
+Note that running this copy, and then freeing all the old location ops would
+cause their slabs to be freed, which would eliminate possible memory wastage if
+the previous suggestion is implemented, and we swap slabs more frequently.
+
+=head2 eliminate incorrect line numbers in warnings
+
+This code
+
+    use warnings;
+    my $undef;
+    
+    if ($undef == 3) {
+    } elsif ($undef == 0) {
+    }
+
+used to produce this output:
+
+    Use of uninitialized value in numeric eq (==) at wrong.pl line 4.
+    Use of uninitialized value in numeric eq (==) at wrong.pl line 4.
+
+where the line of the second warning was misreported - it should be line 5.
+Rafael fixed this - the problem arose because there was no nextstate OP
+between the execution of the C<if> and the C<elsif>, hence C<PL_curcop> still
+reports that the currently executing line is line 4. The solution was to inject
+a nextstate OPs for each C<elsif>, although it turned out that the nextstate
+OP needed to be a nulled OP, rather than a live nextstate OP, else other line
+numbers became misreported. (Jenga!)
+
+The problem is more general than C<elsif> (although the C<elsif> case is the
+most common and the most confusing). Ideally this code
+
+    use warnings;
+    my $undef;
+    
+    my $a = $undef + 1;
+    my $b
+      = $undef
+      + 1;
+
+would produce this output
+
+    Use of uninitialized value $undef in addition (+) at wrong.pl line 4.
+    Use of uninitialized value $undef in addition (+) at wrong.pl line 7.
+
+(rather than lines 4 and 5), but this would seem to require every OP to carry
+(at least) line number information.
+
+What might work is to have an optional line number in memory just before the
+BASEOP structure, with a flag bit in the op to say whether it's present.
+Initially during compile every OP would carry its line number. Then add a late
+pass to the optimiser (potentially combined with L</repack the optree>) which
+looks at the two ops on every edge of the graph of the execution path. If
+the line number changes, flags the destination OP with this information.
+Once all paths are traced, replace every op with the flag with a
+nextstate-light op (that just updates C<PL_curcop>), which in turn then passes
+control on to the true op. All ops would then be replaced by variants that
+do not store the line number. (Which, logically, why it would work best in
+conjunction with L</repack the optree>, as that is already copying/reallocating
+all the OPs)
+
+(Although I should note that we're not certain that doing this for the general
+case is worth it)
+
+=head2 optimize tail-calls
+
+Tail-calls present an opportunity for broadly applicable optimization;
+anywhere that C<< return foo(...) >> is called, the outer return can
+be replaced by a goto, and foo will return directly to the outer
+caller, saving (conservatively) 25% of perl's call&return cost, which
+is relatively higher than in C.  The scheme language is known to do
+this heavily.  B::Concise provides good insight into where this
+optimization is possible, ie anywhere entersub,leavesub op-sequence
+occurs.
+
+ perl -MO=Concise,-exec,a,b,-main -e 'sub a{ 1 }; sub b {a()}; b(2)'
+
+Bottom line on this is probably a new pp_tailcall function which
+combines the code in pp_entersub, pp_leavesub.  This should probably
+be done 1st in XS, and using B::Generate to patch the new OP into the
+optrees.
 
 =head1 Big projects
 
@@ -631,3 +793,24 @@ This will allow the use of a regex from inside (?{ }), (??{ }) and
 Apparently these are quite useful. Anyway, Jeffery Friedl wants them.
 
 demerphq has this on his todo list, but right at the bottom.  
+
+
+=head1 Tasks for microperl
+
+
+[ Each and every one of these may be obsolete, but they were listed
+  in the old Todo.micro file]
+
+
+=head2 make creating uconfig.sh automatic 
+
+=head2 make creating Makefile.micro automatic
+
+=head2 do away with fork/exec/wait?
+
+(system, popen should be enough?)
+
+=head2 some of the uconfig.sh really needs to be probed (using cc) in buildtime:
+
+(uConfigure? :-) native datatype widths and endianness come to mind
+

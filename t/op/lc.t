@@ -89,7 +89,6 @@ do
     is(uc($b)         , "$($x101)$($x100)AA",  'uc')
     is(lc($b)         , "$($x101)$($x100)aa",  'lc')
 
-
 # \x{DF} is LATIN SMALL LETTER SHARP S, its uppercase is SS or \x{53}\x{53};
 # \x{149} is LATIN SMALL LETTER N PRECEDED BY APOSTROPHE, its uppercase is
 # \x{2BC}\x{E4} or MODIFIER LETTER APOSTROPHE and N.
@@ -156,16 +155,16 @@ is(uc("\x{1C6}") , "\x{1C4}",      "U+01C6 uc is U+01C4, too")
 $a = "\x{3c3}foo.bar" # \x{3c3} == GREEK SMALL LETTER SIGMA.
 $b = "\x{3a3}FOO.BAR" # \x{3a3} == GREEK CAPITAL LETTER SIGMA.
 
-($c = $b) =~ s/(\w+)/$(lc($1))/g
+($c = $b) =~ s/(\p{IsWord}+)/$(lc($1))/g
 is($c , $a, "Using s///e to change case.")
 
-($c = $a) =~ s/(\w+)/$(uc($1))/g
+($c = $a) =~ s/(\p{IsWord}+)/$(uc($1))/g
 is($c , $b, "Using s///e to change case.")
 
-($c = $b) =~ s/(\w+)/$(lcfirst($1))/g
+($c = $b) =~ s/(\p{IsWord}+)/$(lcfirst($1))/g
 is($c , "\x{3c3}FOO.bAR", "Using s///e to change case.")
 
-($c = $a) =~ s/(\w+)/$(ucfirst($1))/g
+($c = $a) =~ s/(\p{IsWord}+)/$(ucfirst($1))/g
 is($c , "\x{3a3}foo.Bar", "Using s///e to change case.")
 
 # #18931: perl5.8.0 bug in \U..\E processing

@@ -1,4 +1,19 @@
-BEGIN 
+#!/usr/bin/perl
+# 
+# Regenerate (overwriting only if changed):
+#
+#    regnodes.h
+#
+# from information stored in
+#
+#    regcomp.sym
+#    regexp.h
+#
+# Accepts the standard regen_lib -q and -v args.
+#
+# This script is normally invoked from regen.pl.
+
+BEGIN
     # Get function prototypes
     require 'regen_lib.pl'
 
@@ -64,7 +79,7 @@ close $desc_fh
 die "Too many regexp/state opcodes! Maximum is 256, but there are $lastregop in file!"
     if $lastregop+>256
 
-my $tmp_h = 'tmp_reg.h'
+my $tmp_h = 'regnodes.h-new'
 
 unlink $tmp_h if -f $tmp_h
 

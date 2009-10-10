@@ -63,8 +63,10 @@ corresponding built-in functions:
 
     $io->close
     $io->eof
+    $io->fcntl( FUNCTION, SCALAR )
     $io->fileno
     $io->getc
+    $io->ioctl( FUNCTION, SCALAR )
     $io->read ( BUF, LEN, [OFFSET] )
     $io->print ( ARGS )
     $io->printf ( FMT, [ARGS] )
@@ -98,7 +100,8 @@ Furthermore, for doing normal I/O you might need these:
 
 C<fdopen> is like an ordinary C<open> except that its first parameter
 is not a filename but rather a file handle name, an IO::Handle object,
-or a file descriptor number.
+or a file descriptor number.  (For the documentation of the C<open>
+method, see L<IO::File>.)
 
 =item $io->opened
 
@@ -433,12 +436,10 @@ sub input_line_number
     return $prev
 
 
-# XXX undocumented
 sub fcntl($io, $op, $value)
     return fcntl($io, $op, $value)
 
 
-# XXX undocumented
 sub ioctl($io, $op, $value)
     return ioctl($io, $op, $value)
 
@@ -450,7 +451,7 @@ sub ioctl($io, $op, $value)
 # any new code should just chech defined(&CONSTANT_NAME)
 
 sub constant($name)
-    (($name =~ m/^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && defined Symbol::fetch_glob($name)->*->&)
+    (($name =~ m/^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && exists Symbol::fetch_glob($name)->*->&)
         ?? Symbol::fetch_glob($name)->*->() !! undef
 
 

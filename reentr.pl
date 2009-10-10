@@ -1,9 +1,20 @@
 #!/usr/bin/perl -w
-
-#
-# Generate the reentr.c and reentr.h,
-# and optionally also the relevant metaconfig units (-U option).
 # 
+# Regenerate (overwriting only if changed):
+#
+#    reentr.h
+#    reentr.c
+#
+# from information stored in the DATA section of this file.
+#
+# With the -U option, it also unconditionally regenerates the relevant
+# metaconfig units:
+#
+#    d_${func}_r.U
+#
+# Also accepts the standard regen_lib -q and -v args.
+#
+# This script is normally invoked from regen.pl.
 
 BEGIN {
     # Get function prototypes
@@ -504,7 +515,7 @@ EOF
 EOF
 	    pushssif $endif;
 	}
-        elsif ($func =~ m/^(drand48|gmtime|localtime|random|srandom)$/) {
+        elsif ($func =~ m/^(drand48|random|srandom)$/) {
 	    pushssif $ifdef;
 	    push @struct, <<EOF;
 	%seent{$func} _$func_struct;
@@ -715,10 +726,7 @@ EOF
 		$w = ", $w" if length $v;
 	    }
 
-	    my $call = "{$func}_r($v$w)";
-	    if ($func eq 'localtime') {
-		$call = "L_R_TZSET $call";
-	    }
+	    my $call = "$($func)_r($v$w)";
 
             # Must make OpenBSD happy
             my $memzero = '';
@@ -751,13 +759,13 @@ EOF
 EOF
 		}
 	    }
-	    push @wrap, <<EOF;
-#  endif /* if defined(PERL_REENTR_API) && (PERL_REENTR_API+0 == 1) */
+	    push @wrap, <<EOF;  # !defined(xxx) && XXX_R_PROTO == REENTRANT_PROTO_Y_TS
+#   endif
 EOF
 	}
 
-	    push @wrap, <<EOF;
-#   endif /* HAS_\U$func */
+	    push @wrap, <<EOF;  # defined(PERL_REENTR_API) && (PERL_REENTR_API+0 == 1)
+#  endif
 EOF
 
 	push @wrap, $endif, "\n";
@@ -1124,8 +1132,6 @@ getservbyname CC|netdb	|struct servent	|I_CCSBWR|S_CCSBI|I_CCSD|D=struct servent
 getservbyport IC|netdb	|struct servent	|I_ICSBWR|S_ICSBI|I_ICSD|D=struct servent_data*
 getservent	|netdb	|struct servent	|I_SBWR|I_SBI|S_SBI|I_SD|D=struct servent_data*
 getspnam C	|shadow	|struct spwd	|I_CSBWR|S_CSBI
-gmtime T	|time	|struct tm	|S_TS|I_TS|T=const time_t*
-localtime T	|time	|struct tm	|S_TS|I_TS|T=const time_t*
 random		|stdlib	|struct random_data|I_iS|I_lS|I_St|i=int*|l=long*|t=int32_t*
 readdir T	|dirent	|struct dirent	|I_TSR|I_TS|T=DIR*
 readdir64 T	|dirent	|struct dirent64|I_TSR|I_TS|T=DIR*

@@ -1,7 +1,7 @@
 /*
  * perlio.c
  * Copyright (c) 1996-2006, Nick Ing-Simmons
- * Copyright (c) 2006, 2007, Larry Wall and others
+ * Copyright (c) 2006, 2007, 2008 Larry Wall and others
  *
  * You may distribute under the terms of either the GNU General Public License
  * or the Artistic License, as specified in the README file.
@@ -10,6 +10,8 @@
 /*
  * Hour after hour for nearly three weary days he had jogged up and down,
  * over passes, and through long dales, and across many streams.
+ *
+ *     [pp.791-792 of _The Lord of the Rings_, V/iii: "The Muster of Rohan"]
  */
 
 /* This file contains the functions needed to implement PerlIO, which
@@ -133,7 +135,7 @@ perlsio_binmode(FILE *fp, int iotype, int mode)
      * This used to be contents of do_binmode in doio.c
      */
 #ifdef DOSISH
-#  if defined(atarist) || defined(__MINT__)
+#  if defined(atarist)
     PERL_UNUSED_ARG(iotype);
     if (!fflush(fp)) {
         if (mode & O_BINARY)
@@ -773,8 +775,8 @@ PerlIO_find_layer(pTHX_ const char *name, STRLEN len, int load)
 	} else {
 	    SV * const pkgsv = newSVpvs("PerlIO");
 	    SV * const layer = newSVpvn(name, len);
-	    CV * const cv    = Perl_get_cvn_flags(aTHX_ STR_WITH_LEN("PerlIO::Layer::NoWarnings"), 0);
-	    ENTER;
+	    CV * const cv    = get_cvs("PerlIO::Layer::NoWarnings", 0);
+	    ENTER_named("load_PerlIO");
 	    SAVEINT(PL_in_load_module);
 	    if (cv) {
 		SAVEGENERICSV(PL_warnhook);
@@ -786,7 +788,7 @@ PerlIO_find_layer(pTHX_ const char *name, STRLEN len, int load)
 	     */
 	    Perl_load_module(aTHX_ 0, pkgsv, NULL, layer, NULL);
 	    PL_in_load_module--;
-	    LEAVE;
+	    LEAVE_named("load_PerlIO");
 	    return PerlIO_find_layer(aTHX_ name, len, 0);
 	}
     }
@@ -800,7 +802,7 @@ static int
 perlio_mg_set(pTHX_ SV *sv, MAGIC *mg)
 {
     if (SvROK(sv)) {
-	IO * const io = GvIOn((GV *) SvRV(sv));
+	IO * const io = GvIOn(MUTABLE_GV(SvRV(sv)));
 	PerlIO * const ifp = IoIFP(io);
 	PerlIO * const ofp = IoOFP(io);
 	Perl_warn(aTHX_ "set %" SVf " %p %p %p",
@@ -813,7 +815,7 @@ static int
 perlio_mg_get(pTHX_ SV *sv, MAGIC *mg)
 {
     if (SvROK(sv)) {
-	IO * const io = GvIOn((GV *) SvRV(sv));
+	IO * const io = GvIOn(MUTABLE_GV(SvRV(sv)));
 	PerlIO * const ifp = IoIFP(io);
 	PerlIO * const ofp = IoOFP(io);
 	Perl_warn(aTHX_ "get %" SVf " %p %p %p",
@@ -852,7 +854,7 @@ XS(XS_io_MODIFY_SCALAR_ATTRIBUTES)
     MAGIC *mg;
     int count = 0;
     int i;
-    sv_magic(sv, (SV *) av, PERL_MAGIC_ext, NULL, 0);
+    sv_magic(sv, MUTABLE_SV(av), PERL_MAGIC_ext, NULL, 0);
     SvRMAGICAL_off(sv);
     mg = mg_find(sv, PERL_MAGIC_ext);
     mg->mg_virtual = &perlio_vtab;
@@ -1263,7 +1265,7 @@ PerlIORaw_pushed(pTHX_ PerlIO *f, const char *mode, SV *arg, PerlIO_funcs *tab)
 	while (t && (l = *t)) {
 	    if (l->tab->Binmode) {
 		/* Has a handler - normal case */
-		if ((*l->tab->Binmode)(aTHX_ f) == 0) {
+		if ((*l->tab->Binmode)(aTHX_ t) == 0) {
 		    if (*t == l) {
 			/* Layer still there - move down a layer */
 			t = PerlIONext(t);
@@ -1739,10 +1741,7 @@ PerlIO_has_base(PerlIO *f)
 
 	  if (tab)
 	       return (tab->Get_base != NULL);
-	  SETERRNO(EINVAL, LIB_INVARG);
      }
-     else
-	  SETERRNO(EBADF, SS_IVCHAN);
 
      return 0;
 }
@@ -1750,15 +1749,14 @@ PerlIO_has_base(PerlIO *f)
 int
 PerlIO_fast_gets(PerlIO *f)
 {
-    if (PerlIOValid(f) && (PerlIOBase(f)->flags & PERLIO_F_FASTGETS)) {
-	 const PerlIO_funcs * const tab = PerlIOBase(f)->tab;
+    if (PerlIOValid(f)) {
+	 if (PerlIOBase(f)->flags & PERLIO_F_FASTGETS) {
+	     const PerlIO_funcs * const tab = PerlIOBase(f)->tab;
 
-	 if (tab)
-	      return (tab->Set_ptrcnt != NULL);
-	 SETERRNO(EINVAL, LIB_INVARG);
+	     if (tab)
+		  return (tab->Set_ptrcnt != NULL);
+	 }
     }
-    else
-	 SETERRNO(EBADF, SS_IVCHAN);
 
     return 0;
 }
@@ -1771,10 +1769,7 @@ PerlIO_has_cntptr(PerlIO *f)
 
 	if (tab)
 	     return (tab->Get_ptr != NULL && tab->Get_cnt != NULL);
-	  SETERRNO(EINVAL, LIB_INVARG);
     }
-    else
-	 SETERRNO(EBADF, SS_IVCHAN);
 
     return 0;
 }
@@ -1787,10 +1782,7 @@ PerlIO_canset_cnt(PerlIO *f)
 
 	  if (tab)
 	       return (tab->Set_ptrcnt != NULL);
-	  SETERRNO(EINVAL, LIB_INVARG);
     }
-    else
-	 SETERRNO(EBADF, SS_IVCHAN);
 
     return 0;
 }
@@ -2980,7 +2972,9 @@ PerlIOStdio_dup(pTHX_ PerlIO *f, PerlIO *o, CLONE_PARAMS *param, int flags)
     	stdio = PerlSIO_fdopen(fd, PerlIO_modestr(o,mode));
     set_this:
 	PerlIOSelf(f, PerlIOStdio)->stdio = stdio;
-	PerlIOUnix_refcnt_inc(fileno(stdio));
+        if(stdio) {
+	    PerlIOUnix_refcnt_inc(fileno(stdio));
+        }
     }
     return f;
 }
@@ -3078,8 +3072,11 @@ PerlIOStdio_close(pTHX_ PerlIO *f)
         const int fd = fileno(stdio);
 	int invalidate = 0;
 	IV result = 0;
-	int saveerr = 0;
 	int dupfd = -1;
+	dSAVEDERRNO;
+#ifdef USE_ITHREADS
+	dVAR;
+#endif
 #ifdef SOCKS5_VERSION_NAME
     	/* Socks lib overrides close() but stdio isn't linked to
 	   that library (though we are) - so we must call close()
@@ -3090,8 +3087,15 @@ PerlIOStdio_close(pTHX_ PerlIO *f)
 	if (getsockopt(fd, SOL_SOCKET, SO_TYPE, (void *) &optval, &optlen) == 0)
 	    invalidate = 1;
 #endif
-	if (PerlIOUnix_refcnt_dec(fd) > 0) /* File descriptor still in use */
+	/* Test for -1, as *BSD stdio (at least) on fclose sets the FILE* such
+	   that a subsequent fileno() on it returns -1. Don't want to croak()
+	   from within PerlIOUnix_refcnt_dec() if some buggy caller code is
+	   trying to close an already closed handle which somehow it still has
+	   a reference to. (via.xs, I'm looking at you).  */
+	if (fd != -1 && PerlIOUnix_refcnt_dec(fd) > 0) {
+	    /* File descriptor still in use */
 	    invalidate = 1;
+	}
 	if (invalidate) {
 	    /* For STD* handles, don't close stdio, since we shared the FILE *, too. */
 	    if (stdio == stdin) /* Some stdios are buggy fflush-ing inputs */
@@ -3103,18 +3107,20 @@ PerlIOStdio_close(pTHX_ PerlIO *f)
 	       fileno slot of the FILE *
 	    */
 	    result = PerlIO_flush(f);
-	    saveerr = errno;
+	    SAVE_ERRNO;
 	    invalidate = PerlIOStdio_invalidate_fileno(aTHX_ stdio);
 	    if (!invalidate) {
 		dupfd = PerlLIO_dup(fd);
 	    }
+	} else {
+	    SAVE_ERRNO;   /* This is here only to silence compiler warnings */
 	}
         result = PerlSIO_fclose(stdio);
 	/* We treat error from stdio as success if we invalidated
 	   errno may NOT be expected EBADF
 	 */
 	if (invalidate && result != 0) {
-	    errno = saveerr;
+	    RESTORE_ERRNO;
 	    result = 0;
 	}
 #ifdef SOCKS5_VERSION_NAME
@@ -3273,9 +3279,9 @@ PerlIOStdio_flush(pTHX_ PerlIO *f)
 	/*
 	 * Not writeable - sync by attempting a seek
 	 */
-	const int err = errno;
+	dSAVE_ERRNO;
 	if (PerlSIO_fseek(stdio, (Off_t) 0, SEEK_CUR) != 0)
-	    errno = err;
+	    RESTORE_ERRNO;
 #endif
     }
     return 0;
@@ -4546,9 +4552,7 @@ PerlIOCrlf_binmode(pTHX_ PerlIO *f)
 	PerlIOBase(f)->flags &= ~PERLIO_F_CRLF;
 #ifndef PERLIO_USING_CRLF
 	/* CRLF is unusual case - if this is just the :crlf layer pop it */
-	if (PerlIOBase(f)->tab == &PerlIO_crlf) {
-		PerlIO_pop(aTHX_ f);
-	}
+	PerlIO_pop(aTHX_ f);
 #endif
     }
     return 0;
@@ -5076,18 +5080,30 @@ PerlIO_tmpfile(void)
 	  f = PerlIO_fdopen(fd, "w+b");
 #else /* WIN32 */
 #    if defined(HAS_MKSTEMP) && ! defined(VMS) && ! defined(OS2)
-     SV * const sv = newSVpvs("/tmp/PerlIO_XXXXXX");
+     int fd = -1;
+     char tempname[] = "/tmp/PerlIO_XXXXXX";
+     const char * const tmpdir = PerlEnv_getenv("TMPDIR");
+     SV * const sv = tmpdir && *tmpdir ? newSVpv(tmpdir, 0) : NULL;
      /*
       * I have no idea how portable mkstemp() is ... NI-S
       */
-     const int fd = mkstemp(SvPVX_mutable(sv));
+     if (sv) {
+	 /* if TMPDIR is set and not empty, we try that first */
+	 sv_catpv(sv, tempname + 4);
+	 fd = mkstemp(SvPVX_mutable(sv));
+     }
+     if (fd < 0) {
+	 /* else we try /tmp */
+	 fd = mkstemp(tempname);
+     }
      if (fd >= 0) {
 	  f = PerlIO_fdopen(fd, "w+");
 	  if (f)
 	       PerlIOBase(f)->flags |= PERLIO_F_TEMP;
-	  PerlLIO_unlink(SvPVX_const(sv));
+	  PerlLIO_unlink(sv ? SvPVX_const(sv) : tempname);
      }
-     SvREFCNT_dec(sv);
+     if (sv)
+	 SvREFCNT_dec(sv);
 #    else	/* !HAS_MKSTEMP, fallback to stdio tmpfile(). */
      FILE * const stdio = PerlSIO_tmpfile();
 

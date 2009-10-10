@@ -1,9 +1,7 @@
 #!./perl
 
 BEGIN 
-    require './test.pl'		# we use runperl from 'test.pl', so can't use Test::More
-
-
+    require '../../t/test.pl'		# we use runperl from 'test.pl', so can't use Test::More
 
 plan tests => 150
 

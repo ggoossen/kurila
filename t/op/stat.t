@@ -48,6 +48,10 @@ open($foo, ">", "$tmpfile") || DIE("Can't open temp test file: $^OS_ERROR")
 
 my(@: $nlink, $mtime, $ctime) =  (@: stat($foo))[[(@: $NLINK, $MTIME, $CTIME)]]
 
+# The clock on a network filesystem might be different from the
+# system clock.
+my $Filesystem_Time_Offset = abs($mtime - time); 
+
 #nlink should if link support configured in Perl.
 SKIP: do
     skip "No link count - Hard link support not built in.", 1

@@ -7,8 +7,7 @@ BEGIN
     $^OUTPUT_AUTOFLUSH = 1
     require "./test.pl"
 
-
-plan tests => 88
+plan tests => 99
 
 $a = \$%
 bless $a, "Bob"
@@ -87,7 +86,7 @@ ok (!Cedric->isa('Programmer'))
 
 my $b = 'abc'
 my @refs = qw(SCALAR SCALAR     GLOB ARRAY HASH CODE)
-my @vals = @:   \$b,   \3.14, \*b,  \$@,  \$%, sub {} 
+my @vals = @:   \$b,   \3.14, \*b,  \$@,  \$%, \ sub {} 
 for my $p (0 .. nelems(@refs) -1)
     for my $q (0 .. nelems(@vals) -1)
         is UNIVERSAL::isa(@vals[$p], @refs[$q]), ($p==$q or $p+$q==1)
@@ -109,7 +108,7 @@ dies_like( sub (@< @_) { $a->VERSION(2.719) },
 ok (try { $a->VERSION(2.718) })
 is $^EVAL_ERROR, ''
 
-my $subs = join ' ', sort grep { defined Symbol::fetch_glob("UNIVERSAL::$_")->& }, keys %UNIVERSAL::
+my $subs = join ' ', sort grep { exists Symbol::fetch_glob("UNIVERSAL::$_")->& }, keys %UNIVERSAL::
 ## The test for import here is *not* because we want to ensure that UNIVERSAL
 ## can always import; it is an historical accident that UNIVERSAL can import.
 is $subs, "DOES VERSION can import isa"
@@ -129,7 +128,7 @@ eval "use UNIVERSAL"
 
 ok $a->isa("UNIVERSAL")
 
-my $sub2 = join ' ', sort grep { defined Symbol::fetch_glob("UNIVERSAL::$_")->& }, keys %UNIVERSAL::
+my $sub2 = join ' ', sort grep { exists Symbol::fetch_glob("UNIVERSAL::$_")->& }, keys %UNIVERSAL::
 # XXX import being here is really a bug
 is $sub2, "DOES VERSION can import isa"
 
@@ -197,3 +196,68 @@ package main
 main::dies_like( sub (@< @_) { UNIVERSAL::DOES(\$@, "foo") },
                  qr/Can't call method "DOES" on unblessed reference/,
                  'DOES call error message says DOES, not isa' )
+# Tests for can seem to be split between here and method.t
+# Add the verbatim perl code mentioned in the comments of
+# http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2001-05/msg01710.html
+# but never actually tested.
+is(UNIVERSAL->can("NoSuchPackage::foo"), undef);
+
+@splatt::ISA = @: 'zlopp'
+ok (splatt->isa('zlopp'))
+ok (!splatt->isa('plop'))
+
+# This should reset the ->isa lookup cache
+@splatt::ISA = @: 'plop'
+# And here is the new truth.
+ok (!splatt->isa('zlopp'))
+ok (splatt->isa('plop'))
+
+
+# Test: [perl #66112]: change @ISA inside  sub isa
+do
+    package RT66112::A
+
+    package RT66112::B
+
+    sub isa($self, @< @args)
+        our @ISA = qw/RT66112::A/
+        return $self->SUPER::isa(< @args)
+
+    package RT66112::C
+
+    package RT66112::D
+
+    sub isa($self, @< @args)
+        @RT66112::E::ISA = qw/RT66112::A/
+        return $self->SUPER::isa(< @args)
+
+    package RT66112::E
+
+    package main
+
+    @RT66112::B::ISA = qw//
+    @RT66112::C::ISA = qw/RT66112::B/
+    @RT66112::T1::ISA = qw/RT66112::C/
+    ok(RT66112::T1->isa('RT66112::C'), "modify \@ISA in isa (RT66112::T1 isa RT66112::C)")
+
+    @RT66112::B::ISA = qw//
+    @RT66112::C::ISA = qw/RT66112::B/
+    @RT66112::T2::ISA = qw/RT66112::C/
+    ok(RT66112::T2->isa('RT66112::B'), "modify \@ISA in isa (RT66112::T2 isa RT66112::B)")
+
+    @RT66112::B::ISA = qw//
+    @RT66112::C::ISA = qw/RT66112::B/
+    @RT66112::T3::ISA = qw/RT66112::C/
+    ok(RT66112::T3->isa('RT66112::A'), "modify \@ISA in isa (RT66112::T3 isa RT66112::A)")
+
+    @RT66112::E::ISA = qw/RT66112::D/
+    @RT66112::T4::ISA = qw/RT66112::E/
+    ok(RT66112::T4->isa('RT66112::E'), "modify \@ISA in isa (RT66112::T4 isa RT66112::E)")
+
+    @RT66112::E::ISA = qw/RT66112::D/
+    @RT66112::T5::ISA = qw/RT66112::E/
+    ok(! RT66112::T5->isa('RT66112::D'), "modify \@ISA in isa (RT66112::T5 not isa RT66112::D)")
+
+    @RT66112::E::ISA = qw/RT66112::D/
+    @RT66112::T6::ISA = qw/RT66112::E/
+    ok(RT66112::T6->isa('RT66112::A'), "modify \@ISA in isa (RT66112::T6 isa RT66112::A)")

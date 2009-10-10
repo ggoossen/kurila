@@ -89,7 +89,6 @@ For ease of access, the Perl manual has been split up into several sections.
     perlnumber		Perl number semantics
 
     perlthrtut		Perl threads tutorial
-      perlothrtut	Old Perl threads tutorial
 
     perlport		Perl portability guide
     perllocale		Perl locale support
@@ -134,6 +133,7 @@ For ease of access, the Perl manual has been split up into several sections.
     perlapio		Perl internal IO abstraction interface
 
     perlhack		Perl hackers guide
+    perlrepository	Perl source repository
 
 =head2 Miscellaneous
 
@@ -144,6 +144,7 @@ For ease of access, the Perl manual has been split up into several sections.
     perldoc		Look up Perl documentation in Pod format
 
     perlhist		Perl history records
+    kurila121delta	What is new for Perl Kurila 1.21
     kurila120delta	What is new for Perl Kurila 1.20
     kurila119delta	What is new for Perl Kurila 1.19
     kurila118delta	What is new for Perl Kurila 1.18
@@ -165,6 +166,7 @@ For ease of access, the Perl manual has been split up into several sections.
     kurila02delta	What is new for Perl Kurila 0.2
     kurila01delta	What is new for Perl Kurila 0.1
     perldelta		Perl changes since previous version
+    perl5101delta	Perl changes in version 5.10.1
     perl5100delta	Perl changes in version 5.10.0
     perl595delta	Perl changes in version 5.9.5
     perl594delta	Perl changes in version 5.9.4
@@ -172,6 +174,7 @@ For ease of access, the Perl manual has been split up into several sections.
     perl592delta	Perl changes in version 5.9.2
     perl591delta	Perl changes in version 5.9.1
     perl590delta	Perl changes in version 5.9.0
+    perl589delta	Perl changes in version 5.8.9
     perl588delta	Perl changes in version 5.8.8
     perl587delta	Perl changes in version 5.8.7
     perl586delta	Perl changes in version 5.8.6
@@ -213,14 +216,13 @@ For ease of access, the Perl manual has been split up into several sections.
     perldos		Perl notes for DOS
     perlepoc		Perl notes for EPOC
     perlfreebsd 	Perl notes for FreeBSD
+    perlhaiku		Perl notes for Haiku
     perlhpux		Perl notes for HP-UX
     perlhurd		Perl notes for Hurd
     perlirix		Perl notes for Irix
     perllinux		Perl notes for Linux
-    perlmachten 	Perl notes for Power MachTen
     perlmacos		Perl notes for Mac OS (Classic)
     perlmacosx		Perl notes for Mac OS X
-    perlmint		Perl notes for MiNT
     perlmpeix		Perl notes for MPE/iX
     perlnetware 	Perl notes for NetWare
     perlopenbsd 	Perl notes for OpenBSD

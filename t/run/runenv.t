@@ -4,14 +4,16 @@
 #
 # $PERL5OPT, $PERL5LIB, etc.
 
-use TestInit
+BEGIN
+    chdir 't' if -d 't'
+    $^INCLUDE_PATH = @: '../lib'
+
 use Config
 
 BEGIN 
     unless (config_value('d_fork'))
         print $^STDOUT, "1..0 # Skip: no fork\n"
         exit 0
-    
 
 
 BEGIN { require './test.pl'; }

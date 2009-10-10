@@ -1,8 +1,7 @@
 /*   intrpvar.h 
  *
  *    Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
- *    2006, 2007
- *    by Larry Wall and others
+ *    2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -44,6 +43,9 @@ PERLVAR(Istack_base,	SV **)
 PERLVAR(Istack_max,	SV **)
 
 PERLVAR(Iscopestack,	I32 *)		/* scopes we've ENTERed */
+#ifdef DEBUGGING
+    PERLVAR(Iscopestack_name, const char * *) /* name of the scopes we've ENTERed */
+#endif
 PERLVAR(Iscopestack_ix,	I32)
 PERLVAR(Iscopestack_max,I32)
 
@@ -157,6 +159,20 @@ PERLVARA(Icolors,6,	char *)		/* from regcomp.c */
 
 PERLVARI(Ipeepp,	peep_t, MEMBER_TO_FPTR(Perl_peep))
 					/* Pointer to peephole optimizer */
+
+/*
+=for apidoc Amn|Perl_ophook_t|PL_opfreehook
+
+When non-C<NULL>, the function pointed by this variable will be called each time an OP is freed with the corresponding OP as the argument.
+This allows extensions to free any extra attribute they have locally attached to an OP.
+It is also assured to first fire for the parent OP and then for its kids.
+
+When you replace this variable, it is considered a good practice to store the possibly previously installed hook and that you recall it inside your own.
+
+=cut
+*/
+
+PERLVARI(Iopfreehook,	Perl_ophook_t, 0) /* op_free() hook */
 
 PERLVARI(Imaxscream,	I32,	-1)
 PERLVARI(Ireginterp_cnt,I32,	 0)	/* Whether "Regexp" was interpolated. */
@@ -432,12 +448,13 @@ PERLVAR(Imax_intro_pending,	I32)	/* end of vars to introduce */
 PERLVAR(Ipadix,		I32)		/* max used index in current "register" pad */
 
 PERLVAR(Ipadix_floor,	I32)		/* how low may inner block reset padix */
-PERLVAR(Ipad_reset_pending,	I32)	/* reset pad on next attempted alloc */
 
 PERLVAR(Ihints,		U32)		/* pragma-tic compile-time flags */
 
 PERLVAR(Idebug,		VOL U32)	/* flags given to -D switch */
 
+/* Perl_Ibreakable_sub_generation_ptr was too long for VMS, hence "gen"  */
+PERLVARI(Ibreakable_sub_gen, U32, 0)
 
 #if defined (PERL_UTF8_CACHE_ASSERT) || defined (DEBUGGING)
 #  define PERL___I -1
@@ -459,7 +476,6 @@ PERLVAR(Inumeric_name,	char *)		/* Name of current numeric locale */
 
 /* utf8 character classes */
 PERLVAR(Iutf8_alnum,	SV *)
-PERLVAR(Iutf8_alnumc,	SV *)
 PERLVAR(Iutf8_ascii,	SV *)
 PERLVAR(Iutf8_alpha,	SV *)
 PERLVAR(Iutf8_space,	SV *)
@@ -481,15 +497,20 @@ PERLVAR(Iutf8_tofold,	SV *)
 PERLVARI(Icryptseen,	bool,	FALSE)	/* has fast crypt() been initialized? */
 #endif
 
+PERLVAR(Ipad_reset_pending,	bool)	/* reset pad on next attempted alloc */
+
 PERLVARI(Iglob_index,	int,	0)
 
 
 PERLVAR(Iparser,	yy_parser *)	/* current parser state */
 
-PERLVAR(Ibitcount,	char *)
-
+/* Array of signal handlers, indexed by signal number, through which the C
+   signal handler dispatches.  */
 PERLVAR(Ipsig_ptr, SV**)
-PERLVAR(Ipsig_name, SV**)
+/* Array of names of signals, indexed by signal number, for (re)use as the first
+   argument to a signal handler.   Only one block of memory is allocated for
+   both psig_name and psig_ptr.  */
+PERLVAR(Ipsig_name, SV**)		
 
 #if defined(PERL_IMPLICIT_SYS)
 PERLVAR(IMem,		struct IPerlMem*)
@@ -618,8 +639,12 @@ PERLVARI(Islab_count, U32, 0)	/* Size of the array */
 
 PERLVARI(Iisarev, HV*, NULL) /* Reverse map of @ISA dependencies */
 
-/* If you are adding a U8 or U16, see the 'Space' comments above on where
- * there are gaps which currently will be structure padding.  */
+#ifdef DEBUG_LEAKING_SCALARS
+PERLVARI(Isv_serial, U32, 0) /* SV serial number, used in sv.c */
+#endif
+
+/* If you are adding a U8 or U16, check to see if there are 'Space' comments
+ * above on where there are gaps which currently will be structure padding.  */
 
 /* Within a stable branch, new variables must be added to the very end, before
  * this comment, for binary compatibility (the offsets of the old members must

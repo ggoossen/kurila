@@ -1,6 +1,7 @@
  /*    perly.y
  *
  *    Copyright (c) 1991-2002, 2003, 2004, 2005, 2006 Larry Wall
+ *    Copyright (c) 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -9,8 +10,12 @@
 
 /*
  * 'I see,' laughed Strider.  'I look foul and feel fair.  Is that it?
- * All that is gold does not glitter, not all those who wander are lost.'
+ *  All that is gold does not glitter, not all those who wander are lost.'
  *
+ *     [p.171 of _The Lord of the Rings_, I/x: "Strider"]
+ */
+
+/*
  * This file holds the grammar for the Perl language. If edited, you need
  * to run regen_perly.pl, which re-creates the files perly.h, perly.tab
  * and perly.act which are derived from this.
@@ -112,7 +117,7 @@
 %nonassoc <i_tkval> PREC_LOW
 %nonassoc LOOPEX
 
-%right <i_tkval> RETURNOP
+%right <i_tkval> RETURNTOKEN
 %left <i_tkval> OROP DOROP
 %left <i_tkval> ANDOP
 %right <i_tkval> NOTOP
@@ -1163,17 +1168,15 @@ term	:	'?' term
                         }
 	|	NOAMPCALL indirob '(' ')'                        /* &foo() */
 			{
-                            OP* cv = newCVREF(0, $2, LOCATION($1));
-                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar(cv), $2->op_location);
+                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED | IVAL($1), $2, $2->op_location);
                             TOKEN_GETMAD($3,$$,'(');
                             TOKEN_GETMAD($4,$$,')');
                             APPEND_MADPROPS_PV("amper", $$, '>');
 			}
 	|	NOAMPCALL indirob '(' expr ')'                   /* &foo(@args) */
 			{
-                            OP* cv = newCVREF(0, $2, LOCATION($1));
-                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
-				append_elem(OP_LIST, $4, scalar(cv)), $2->op_location);
+                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED | IVAL($1),
+				append_elem(OP_LIST, $4, $2), $2->op_location);
 			  DO_MAD({
 			      OP* op = $$;
 			      if (op->op_type == OP_CONST) { /* defeat const fold */
@@ -1201,11 +1204,11 @@ term	:	'?' term
 			{ $$ = newLOOPEX(IVAL($1),$2);
 			  TOKEN_GETMAD($1,$$,'o');
 			}
-	|	RETURNOP expr                        /* return $foo */
+	|	RETURNTOKEN expr                        /* return $foo */
                         { $$ = newUNOP(OP_RETURN, OPf_STACKED, scalar($2), LOCATION($1));
 			  TOKEN_GETMAD($1,$$,'o');
 			}
-	|	RETURNOP
+	|	RETURNTOKEN
                         { $$ = newOP(OP_RETURN, 0, LOCATION($1));
 			  TOKEN_GETMAD($1,$$,'o');
 			}

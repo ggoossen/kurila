@@ -6,7 +6,7 @@ BEGIN
 plan tests => 9
 use env
 
-is( env::var("PERL_CORE"), 1, "PERL_CORE is set to '1'" )
+ok( env::var("PERL_CORE"), "PERL_CORE is set" )
 is( env::var("PERL_DO_NOT_EXIST"), undef, "PERL_DO_NOT_EXIST does not exist" )
 
 env::var("PERL_TEST_ENV_VAR") = "test1"
@@ -24,7 +24,7 @@ is( env::var("PERL_TEST_ENV_VAR"), undef, "PERL_TEST_ENV_VAR is undef" )
 
 env::var("PERL_TEST_ENV_VAR") = "test3"
 my %envhash = %:< @+: map { @: $_ => env::var($_) }, env::keys() 
-is( %envhash{"PERL_CORE"}, 1 )
+ok( %envhash{"PERL_CORE"} )
 is( %envhash{"PERL_TEST_ENV_VAR"}, "test3" )
 
 do

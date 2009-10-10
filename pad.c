@@ -1,16 +1,21 @@
 /*    pad.c
  *
- *    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 by Larry Wall and others
+ *    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008
+ *    by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
+ */
+
+/*
+ *  'Anyway: there was this Mr. Frodo left an orphan and stranded, as you
+ *   might say, among those queer Bucklanders, being brought up anyhow in
+ *   Brandy Hall.  A regular warren, by all accounts.  Old Master Gorbadoc
+ *   never had fewer than a couple of hundred relations in the place.
+ *   Mr. Bilbo never did a kinder deed than when he brought the lad back
+ *   to live among decent folk.'                           --the Gaffer
  *
- *  "Anyway: there was this Mr Frodo left an orphan and stranded, as you
- *  might say, among those queer Bucklanders, being brought up anyhow in
- *  Brandy Hall. A regular warren, by all accounts. Old Master Gorbadoc
- *  never had fewer than a couple of hundred relations in the place. Mr
- *  Bilbo never did a kinder deed than when he brought the lad back to
- *  live among decent folk." --the Gaffer
+ *     [p.23 of _The Lord of the Rings_, I/i: "A Long-Expected Party"]
  */
 
 /* XXX DAPM
@@ -176,7 +181,7 @@ Perl_pad_new(pTHX_ int flags, PAD* parent_padnames, PAD* parent_pad, IV parent_s
 	    SAVEI32(PL_max_intro_pending);
 	    SAVEBOOL(PL_cv_has_eval);
 	    if (flags & padnew_SAVESUB) {
-		SAVEI32(PL_pad_reset_pending);
+		SAVEBOOL(PL_pad_reset_pending);
 	    }
 	}
     }
@@ -201,13 +206,13 @@ Perl_pad_new(pTHX_ int flags, PAD* parent_padnames, PAD* parent_pad, IV parent_s
     av_store(pad, PAD_ARGS_INDEX -1, &PL_sv_undef); /* make sure pad is filled to PAD_ARGS_INDEX */
 
     AvREAL_off(padlist);
-    av_store(padlist, 0, (SV*)padname);
-    av_store(padlist, 1, (SV*)pad);
+    av_store(padlist, 0, MUTABLE_SV(padname));
+    av_store(padlist, 1, MUTABLE_SV(pad));
 
     /* ... then update state variables */
 
     AVcpREPLACE(PL_comppad_name, (AV*)(*av_fetch(padlist, 0, FALSE)));
-    PL_comppad		= (AV*)(*av_fetch(padlist, 1, FALSE));
+    AVcpREPLACE(PL_comppad,      (AV*)(*av_fetch(padlist, 1, FALSE)));
     PL_curpad		= AvARRAY(PL_comppad);
 
     if (! (flags & padnew_CLONE)) {
@@ -272,13 +277,13 @@ Perl_pad_undef(pTHX_ CV* cv)
 	    if (sv == (SV*)PL_comppad_name)
 		AVcpNULL(PL_comppad_name)
 	    else if (sv == (SV*)PL_comppad) {
-		PL_comppad = NULL;
+		AVcpNULL(PL_comppad);
 		PL_curpad = NULL;
 	    }
 	}
 	SvREFCNT_dec(sv);
     }
-    SvREFCNT_dec((SV*)CvPADLIST(cv));
+    SvREFCNT_dec(MUTABLE_SV(CvPADLIST(cv)));
     CvPADLIST(cv) = NULL;
 }
 
@@ -359,9 +364,9 @@ Perl_pad_add_name(pTHX_ const char *name, GV* ourgv, bool fake)
 	/* XXX DAPM since slot has been allocated, replace
 	 * av_store with PL_curpad[offset] ? */
 	if (*name == '@')
-	    av_store(PL_comppad, offset, (SV*)newAV());
+	    av_store(PL_comppad, offset, MUTABLE_SV(newAV()));
 	else if (*name == '%')
-	    av_store(PL_comppad, offset, (SV*)newHV());
+	    av_store(PL_comppad, offset, MUTABLE_SV(newHV()));
 	SvPADMY_on(PL_curpad[offset]);
 	DEBUG_Xv(PerlIO_printf(Perl_debug_log,
 	    "Pad addname: %ld \"%s\" new lex=0x%"UVxf"\n",
@@ -458,7 +463,7 @@ Perl_pad_add_anon(pTHX_ SV* sv, OPCODE op_type)
     PERL_ARGS_ASSERT_PAD_ADD_ANON;
 
     pad_peg("add_anon");
-    sv_setpvn(name, "&", 1);
+    sv_setpvs(name, "&");
     /* Are these two actually ever read? */
     COP_SEQ_RANGE_HIGH_set(name, ~0);
     COP_SEQ_RANGE_LOW_set(name, 1);
@@ -561,7 +566,7 @@ Perl_pad_findmy(pTHX_ const char *name)
      *    our $foo = 0 unless defined $foo;
      * to not give a warning. (Yes, this is a hack) */
 
-    nameav = (AV*)AvARRAY(CvPADLIST(PL_compcv))[0];
+    nameav = MUTABLE_AV(AvARRAY(CvPADLIST(PL_compcv))[0]);
     name_svp = AvARRAY(nameav);
     for (offset = AvFILLp(nameav); offset >= PAD_NAME_START_INDEX; offset--) {
         SV * const namesv = name_svp[offset];
@@ -979,8 +984,8 @@ Mark all the current temporaries for reuse
  * to  a shared TARG.  Such an alias will change randomly and unpredictably.
  * We avoid doing this until we can think of a Better Way.
  * GSAR 97-10-29 */
-void
-Perl_pad_reset(pTHX)
+static void
+S_pad_reset(pTHX)
 {
     dVAR;
 #ifdef USE_BROKEN_PAD_RESET
@@ -1080,7 +1085,7 @@ Perl_pad_tidy(pTHX_ padtidy_type type)
 	/* XXX DAPM this same bit of code keeps appearing !!! Rationalise? */
 	AV * const av = newAV();			/* Will be @_ */
 	av_extend(av, 0);
-	av_store(PL_comppad, 0, (SV*)av);
+	av_store(PL_comppad, 0, MUTABLE_SV(av));
 	AvREIFY_only(av);
     }
 
@@ -1157,8 +1162,8 @@ Perl_do_dump_pad(pTHX_ I32 level, PerlIO *file, PADLIST *padlist, int full)
     if (!padlist) {
 	return;
     }
-    pad_name = (AV*)*av_fetch((AV*)padlist, 0, FALSE);
-    pad = (AV*)*av_fetch((AV*)padlist, 1, FALSE);
+    pad_name = MUTABLE_AV(*av_fetch(MUTABLE_AV(padlist), 0, FALSE));
+    pad = MUTABLE_AV(*av_fetch(MUTABLE_AV(padlist), 1, FALSE));
     pname = AvARRAY(pad_name);
     ppad = AvARRAY(pad);
     Perl_dump_indent(aTHX_ level, file,
@@ -1244,7 +1249,7 @@ S_cv_dump(pTHX_ const CV *cv, const char *title)
 
 
 /*
-=for apidoc cv_clone
+=for apidoc cv_clone_anon
 
 Clone a CV: make a new CV which points to the same code etc, but which
 has a newly-created pad built by copying the prototype pad and capturing
@@ -1253,21 +1258,21 @@ any outer lexicals.
 =cut
 */
 
-void Perl_cv_setcv(pTHX_ CV *dst, CV* src)
+void Perl_cv_clone_anon(pTHX_ CV *dst, CV* src)
 {
     dVAR;
     I32 ix;
     PAD* parent_pad = PL_comppad;
     SV** outpad;
-
-    PERL_ARGS_ASSERT_CV_SETCV;
-
+ 
+    PERL_ARGS_ASSERT_CV_CLONE_ANON;
+ 
     assert(!CvUNIQUE(src));
 
     outpad = AvARRAY(parent_pad);
     assert(outpad == PL_curpad);
 
-    ENTER;
+    ENTER_named("cv_clone_anon");
     SAVESPTR(PL_compcv);
 
     CVcpREPLACE(PL_compcv, dst);
@@ -1277,96 +1282,94 @@ void Perl_cv_setcv(pTHX_ CV *dst, CV* src)
     CvN_MAXARGS(dst) = CvN_MAXARGS(src);
 
     if (CvISXSUB(src)) {
-	CvXSUB(dst) = CvXSUB(src);
-	CvXSUBANY(dst) = CvXSUBANY(src);
+       CvXSUB(dst) = CvXSUB(src);
+       CvXSUBANY(dst) = CvXSUBANY(src);
     }
     else {
-	AV* const srcpadlist = CvPADLIST(src);
-	const AV* const srcpad_name = (AV*)*av_fetch(srcpadlist, 0, FALSE);
-	const AV* const srcpad = (AV*)*av_fetch(srcpadlist, 1, FALSE);
-	SV** const pname = AvARRAY(srcpad_name);
-	SV** const ppad = AvARRAY(srcpad);
-	const I32 fname = AvFILLp(srcpad_name);
-	const I32 fpad = AvFILLp(srcpad);
-	PAD* parent_padnames = PADLIST_PADNAMES(srcpadlist);
+       AV* const srcpadlist = CvPADLIST(src);
+       const AV* const srcpad_name = (AV*)*av_fetch(srcpadlist, 0, FALSE);
+       const AV* const srcpad = (AV*)*av_fetch(srcpadlist, 1, FALSE);
+       SV** const pname = AvARRAY(srcpad_name);
+       SV** const ppad = AvARRAY(srcpad);
+       const I32 fname = AvFILLp(srcpad_name);
+       const I32 fpad = AvFILLp(srcpad);
+       PAD* parent_padnames = PADLIST_PADNAMES(srcpadlist);
 
-	OP_REFCNT_LOCK;
-	CvROOT(dst)		= OpREFCNT_inc(CvROOT(src));
-	OP_REFCNT_UNLOCK;
-	CvSTART(dst)		= CvSTART(src);
+       OP_REFCNT_LOCK;
+       CvROOT(dst)             = OpREFCNT_inc(CvROOT(src));
+       OP_REFCNT_UNLOCK;
+       CvSTART(dst)            = CvSTART(src);
 
-	CvPADLIST(dst) = pad_new(padnew_CLONE|padnew_SAVE,
-	    parent_padnames,
-	    parent_pad,
-	    0);
+       CvPADLIST(dst) = pad_new(padnew_CLONE|padnew_SAVE,
+           parent_padnames,
+           parent_pad,
+           0);
 
-	av_fill(PL_comppad, fpad);
-	for (ix = fname; ix >= PAD_NAME_START_INDEX; ix--)
-	    av_store(PL_comppad_name, ix, SvREFCNT_inc(pname[ix]));
+       av_fill(PL_comppad, fpad);
+       for (ix = fname; ix >= PAD_NAME_START_INDEX; ix--)
+           av_store(PL_comppad_name, ix, SvREFCNT_inc(pname[ix]));
 
-	PL_curpad = AvARRAY(PL_comppad);
+       PL_curpad = AvARRAY(PL_comppad);
 
-	for (ix = fpad; ix >= PAD_NAME_START_INDEX; ix--) {
-	    SV* const namesv = (ix <= fname) ? pname[ix] : NULL;
-	    SV *sv = NULL;
-	    if (namesv && namesv != &PL_sv_undef) { /* lexical */
-		if (SvFAKE(namesv)) {   /* lexical from outside? */
-		    sv = outpad[PARENT_PAD_INDEX(namesv)];
-		    assert(sv);
-		    /* formats may have an inactive parent,
-		       while my $x if $false can leave an active var marked as
-		       stale. And state vars are always available */
-		    if (SvPADSTALE(sv)) {
-			if (ckWARN(WARN_CLOSURE))
-			    Perl_warner(aTHX_ packWARN(WARN_CLOSURE),
-				"Variable \"%s\" is not available", SvPVX_const(namesv));
-			sv = NULL;
-		    }
-		    else 
-			SvREFCNT_inc_void_NN(sv);
-		}
-		if (!sv) {
-		    const char sigil = SvPVX_const(namesv)[0];
-		    if (sigil == '&')
-			sv = SvREFCNT_inc(ppad[ix]);
-		    else if (sigil == '@')
-			sv = (SV*)newAV();
-		    else if (sigil == '%')
-			sv = (SV*)newHV();
-		    else
-			sv = newSV(0);
-		    SvPADMY_on(sv);
-		}
-	    }
-	    else if (IS_PADGV(ppad[ix]) || IS_PADCONST(ppad[ix])) {
-		sv = SvREFCNT_inc_NN(ppad[ix]);
-	    }
-	    else {
-		sv = newSV(0);
-		SvPADTMP_on(sv);
-	    }
-	    PL_curpad[ix] = sv;
-	}
+       for (ix = fpad; ix >= PAD_NAME_START_INDEX; ix--) {
+           SV* const namesv = (ix <= fname) ? pname[ix] : NULL;
+           SV *sv = NULL;
+           if (namesv && namesv != &PL_sv_undef) { /* lexical */
+               if (SvFAKE(namesv)) {   /* lexical from outside? */
+                   sv = outpad[PARENT_PAD_INDEX(namesv)];
+                   assert(sv);
+                   /* formats may have an inactive parent,
+                      while my $x if $false can leave an active var marked as
+                      stale. And state vars are always available */
+                   if (SvPADSTALE(sv)) {
+                       if (ckWARN(WARN_CLOSURE))
+                           Perl_warner(aTHX_ packWARN(WARN_CLOSURE),
+                               "Variable \"%s\" is not available", SvPVX_const(namesv));
+                       sv = NULL;
+                   }
+                   else 
+                       SvREFCNT_inc_void_NN(sv);
+               }
+               if (!sv) {
+                   const char sigil = SvPVX_const(namesv)[0];
+                   if (sigil == '&')
+                       sv = SvREFCNT_inc(ppad[ix]);
+                   else if (sigil == '@')
+                       sv = (SV*)newAV();
+                   else if (sigil == '%')
+                       sv = (SV*)newHV();
+                   else
+                       sv = newSV(0);
+                   SvPADMY_on(sv);
+               }
+           }
+           else if (IS_PADGV(ppad[ix]) || IS_PADCONST(ppad[ix])) {
+               sv = SvREFCNT_inc_NN(ppad[ix]);
+           }
+           else {
+               sv = newSV(0);
+               SvPADTMP_on(sv);
+           }
+           PL_curpad[ix] = sv;
+       }
     }
 
     DEBUG_Xv(
-	PerlIO_printf(Perl_debug_log, "\nPad CV clone\n");
-	cv_dump(src,	 "Src");
-	cv_dump(dst,	 "To");
+       PerlIO_printf(Perl_debug_log, "\nPad CV clone\n");
+       cv_dump(src,     "Src");
+       cv_dump(dst,     "To");
     );
 
-    LEAVE;
-
+    LEAVE_named("cv_clone_anon");
+ 
     if (CvCONST(dst)) {
-	/* Constant sub () { $x } closing over $x - see lib/constant.pm:
-	 * The prototype was marked as a candiate for const-ization,
-	 * so try to grab the current const value, and if successful,
-	 * turn into a const sub:
-	 */
-	CvCONST_off(dst);
+       /* Constant sub () { $x } closing over $x - see lib/constant.pm:
+        * The prototype was marked as a candiate for const-ization,
+        * so try to grab the current const value, and if successful,
+        * turn into a const sub:
+        */
+       CvCONST_off(dst);
     }
-
-    return;
 }
 
 /*
@@ -1390,8 +1393,8 @@ Perl_pad_push(pTHX_ PADLIST *padlist, int depth)
 	SV** const svp = AvARRAY(padlist);
 	AV* const newpad = newAV();
 	SV** const oldpad = AvARRAY(svp[depth-1]);
-	I32 ix = AvFILLp((AV*)svp[1]);
-        const I32 names_fill = AvFILLp((AV*)svp[0]);
+	I32 ix = AvFILLp((const AV *)svp[1]);
+        const I32 names_fill = AvFILLp((const AV *)svp[0]);
 	SV** const names = AvARRAY(svp[0]);
 	AV *av;
 
@@ -1408,9 +1411,9 @@ Perl_pad_push(pTHX_ PADLIST *padlist, int depth)
 		else {		/* our own lexical */
 		    SV *sv; 
 		    if (sigil == '@')
-			sv = (SV*)newAV();
+			sv = MUTABLE_SV(newAV());
 		    else if (sigil == '%')
-			sv = (SV*)newHV();
+			sv = MUTABLE_SV(newHV());
 		    else
 			sv = newSV(0);
 		    av_store(newpad, ix, sv);
@@ -1429,10 +1432,10 @@ Perl_pad_push(pTHX_ PADLIST *padlist, int depth)
 	}
 	av = newAV();
 	av_extend(av, 0);
-	av_store(newpad, 0, (SV*)av);
+	av_store(newpad, 0, MUTABLE_SV(av));
 	AvREIFY_only(av);
 
-	av_store(padlist, depth, (SV*)newpad);
+	av_store(padlist, depth, MUTABLE_SV(newpad));
 	AvFILLp(padlist) = depth;
     }
 }

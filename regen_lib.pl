@@ -1,21 +1,10 @@
 #!/usr/bin/perl -w
 
-our ($Is_W32, $Is_OS2, $Is_Cygwin, $Is_NetWare, $Needs_Write)
-use Config # Remember, this is running using an existing perl
+our ($Needs_Write)
 use File::Compare
 use Symbol
 
-# Common functions needed by the regen scripts
-
-$Is_W32 = $^OS_NAME eq 'MSWin32'
-$Is_OS2 = $^OS_NAME eq 'os2'
-$Is_Cygwin = $^OS_NAME eq 'cygwin'
-$Is_NetWare = config_value('osname') eq 'NetWare'
-if ($Is_NetWare)
-    $Is_W32 = 0
-
-
-$Needs_Write = $Is_OS2 || $Is_W32 || $Is_Cygwin || $Is_NetWare
+$Needs_Write = $^OS_NAME eq 'cygwin' || $^OS_NAME eq 'os2' || $^OS_NAME eq 'MSWin32'
 
 sub safer_unlink
     my @names = @_

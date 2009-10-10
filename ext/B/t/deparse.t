@@ -3,7 +3,7 @@
 use warnings
 
 use feature ":5.10"
-use Test::More tests => 48
+use Test::More tests => 56
 
 use B::Deparse
 my $deparse = B::Deparse->new()
@@ -31,7 +31,6 @@ while ( ~< $^DATA)
         (@: $input, $expected) = @: $1, $2
     else
         (@: $input, $expected) = @: $_, $_
-    
 
     local our $TODO = $todo
 
@@ -115,6 +114,9 @@ sub getcode
 
 
 package main
+
+use constant PI => 3.14
+use Fcntl < qw/O_TRUNC O_APPEND O_EXCL/
 
 use warnings
 sub test
@@ -250,7 +252,7 @@ my $f = sub {
     \%(: \@(: ));
 } ;
 ####
-# 38 (bug #43010)
+# TODO (bug #43010)
 '!@$%'->();
 ####
 #
@@ -300,5 +302,54 @@ if ($x) {
     $y * $y;
 }
 ####
+# ||
 my($x, $y, $z);
 $x = $y || $y;
+####
+# TODO calling non-existing sub
+x()
+####
+# TODO 53 conditions in elsifs (regression in change #33710 which fixed bug #37302)
+my ($x, $y);
+if ($x) { testsub(); }
+elsif ($y) { testsub(); }
+elsif ($x and $y) { testsub(); }
+elsif ($x or $y) { testsub(); }
+else { testsub(); }
+####
+# TODO 54 interpolation in regexps
+my($y, $t)
+m/x$($y)z$t/
+my $c;
+x() unless $a;
+x() if $a;
+x() unless $a or $b;
+x() if $a or $b;
+x() unless $a and $b;
+x() if $a and $b;
+x() if not $a || $b and $c;
+x() unless not $a || $b and $c;
+x() if not $a && $b or $c;
+x() unless not $a && $b or $c;
+x() unless $a or $b or $c;
+x() if $a or $b or $c;
+x() unless $a and $b and $c;
+x() if $a and $b and $c;
+x() unless not $a && $b && $c;
+####
+# TODO tests for deparsing constants
+warn PI;
+####
+# TODO tests for deparsing imported constants
+warn O_TRUNC;
+####
+# TODO tests for deparsing re-exported constants
+warn O_CREAT;
+####
+# TODO tests for deparsing imported constants that got deleted from the original namespace
+warn O_APPEND;
+####
+# TODO tests for deparsing constants which got turned into full typeglobs
+warn O_EXCL;
+eval '@Fcntl::O_EXCL = qw/affe tiger/;';
+warn O_EXCL;

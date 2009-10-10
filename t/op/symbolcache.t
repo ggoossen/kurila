@@ -23,17 +23,17 @@ sub replaced { 'meth' }
 
 # and now with undef
 # simple removal
-sub removed2 { 24 }
-sub bound2 { removed2() }
+sub removed2() 24
+sub bound2()   &removed2 <:
 undef %main::{+removed2}
-dies_like( sub (@< @_) { bound2() },
-           qr/Undefined subroutine &main::removed2 called/,
+dies_like( sub () { bound2() },
+           qr/Undefined subroutine &main::removed2/,
            'function not bound' )
 ok( !main->can('removed2'), 'function not available as method' )
 
 # replacement
 sub replaced2 { 'func' }
-is( replaced2(), 'meth', 'original function not bound, was replaced' )
+is( replaced2(), 'func', 'original function bound, was not replaced' )
 ok( main->replaced2 eq 'meth', 'method is replaced function' )
 BEGIN { undef %main::{+replaced2} }
 sub replaced2 { 'meth' }

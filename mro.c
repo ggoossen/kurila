@@ -1,6 +1,7 @@
 /*    mro.c
  *
  *    Copyright (c) 2007 Brandon L Black
+ *    Copyright (c) 2007, 2008 Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -8,8 +9,10 @@
  */
 
 /*
- * "Which order shall we go in?" said Frodo. "Eldest first, or quickest first?
- *  You'll be last either way, Master Peregrin."
+ * 'Which order shall we go in?' said Frodo.  'Eldest first, or quickest first?
+ *  You'll be last either way, Master Peregrin.'
+ *
+ *     [p.101 of _The Lord of the Rings_, I/iii: "A Conspiracy Unmasked"]
  */
 
 /*
@@ -58,7 +61,7 @@ invalidated).
 */
 
 static AV*
-S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
+S_mro_get_linear_isa_c3(pTHX_ HV* stash, U32 level)
 {
     AV* retval;
     GV** gvp;
@@ -103,8 +106,8 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
     if(isa && AvFILLp(isa) >= 0) {
         SV** seqs_ptr;
         I32 seqs_items;
-        HV* const tails = (HV*)sv_2mortal((SV*)newHV());
-        AV* const seqs = (AV*)sv_2mortal((SV*)newAV());
+        HV* const tails = MUTABLE_HV(sv_2mortal(MUTABLE_SV(newHV())));
+        AV *const seqs = MUTABLE_AV(sv_2mortal(MUTABLE_SV(newAV())));
         I32* heads;
 
         /* This builds @seqs, which is an array of arrays.
@@ -149,7 +152,7 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
         seqs_ptr = AvARRAY(seqs);
         seqs_items = AvFILLp(seqs) + 1;
         while(seqs_items--) {
-            AV* const seq = (AV*)*seqs_ptr++;
+            AV *const seq = MUTABLE_AV(*seqs_ptr++);
             I32 seq_items = AvFILLp(seq);
             if(seq_items > 0) {
                 SV** seq_ptr = AvARRAY(seq) + 1;
@@ -183,7 +186,7 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
             SV** const avptr = AvARRAY(seqs);
             for(s = 0; s <= AvFILLp(seqs); s++) {
                 SV** svp;
-                AV * const seq = (AV*)(avptr[s]);
+                AV * const seq = MUTABLE_AV(avptr[s]);
 		SV* seqhead;
                 if(!seq) continue; /* skip empty seqs */
                 svp = av_fetch(seq, heads[s], 0);
@@ -243,13 +246,23 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
             /* If we had candidates, but nobody won, then the @ISA
                hierarchy is not C3-incompatible */
             if(!winner) {
+                SV *errmsg;
+                I32 i;
+
+                errmsg = newSVpvf(aTHX_ "Inconsistent hierarchy during C3 merge of class '%s':\n\t"
+                                  "current merge results [\n", HEK_KEY(stashhek));
+                for (i = 0; i <= av_len(retval); i++) {
+                    SV **elem = av_fetch(retval, i, 0);
+                    sv_catpvf(aTHX_ errmsg, "\t\t%"SVf",\n", SVfARG(*elem));
+                }
+                sv_catpvf(aTHX_ errmsg, "\t]\n\tmerging failed on '%"SVf"'", SVfARG(cand));
+
                 /* we have to do some cleanup before we croak */
 
                 AvREFCNT_dec(retval);
                 Safefree(heads);
 
-                Perl_croak(aTHX_ "Inconsistent hierarchy during C3 merge of class '%s': "
-                    "merging failed on parent '%"SVf"'", HEK_KEY(stashhek), SVfARG(cand));
+                croak(aTHX_ "%"SVf, SVfARG(errmsg));
             }
         }
     }
@@ -328,8 +341,12 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
 
     /* wipe out the cached linearizations for this stash */
     meta = HvMROMETA(stash);
-    SvREFCNT_dec((SV*)meta->mro_linear_c3);
+    SvREFCNT_dec(MUTABLE_SV(meta->mro_linear_c3));
     meta->mro_linear_c3 = NULL;
+    if (meta->isa) {
+	HvREFCNT_dec(meta->isa);
+	meta->isa = NULL;
+    }
 
     /* Inc the package generation, since our @ISA changed */
     meta->pkg_gen++;
@@ -338,7 +355,7 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
        is UNIVERSAL or one of its parents */
 
     svp = hv_fetch(PL_isarev, stashname, stashname_len, 0);
-    isarev = svp ? (HV*)*svp : NULL;
+    isarev = svp ? MUTABLE_HV(*svp) : NULL;
 
     if((stashname_len == 9 && strEQ(stashname, "UNIVERSAL"))
         || (isarev && hv_exists(isarev, "UNIVERSAL", 9))) {
@@ -354,7 +371,7 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
     if(meta->mro_nextmethod) hv_clear(meta->mro_nextmethod);
 
     /* Iterate the isarev (classes that are our children),
-       wiping out their linearization and method caches */
+       wiping out their linearization, method and isa caches */
     if(isarev) {
         hv_iterinit(isarev);
         while((iter = hv_iternext(isarev))) {
@@ -365,12 +382,16 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
 
             if(!revstash) continue;
             revmeta = HvMROMETA(revstash);
-            SvREFCNT_dec((SV*)revmeta->mro_linear_c3);
+            SvREFCNT_dec(MUTABLE_SV(revmeta->mro_linear_c3));
             revmeta->mro_linear_c3 = NULL;
             if(!is_universal)
                 revmeta->cache_gen++;
             if(revmeta->mro_nextmethod)
                 hv_clear(revmeta->mro_nextmethod);
+	    if (revmeta->isa) {
+		HvREFCNT_dec(revmeta->isa);
+		revmeta->isa = NULL;
+	    }
         }
     }
 
@@ -395,9 +416,9 @@ Perl_mro_isa_changed_in(pTHX_ HV* stash)
 	   us, then will need to upgrade it to an HV (which sv_upgrade() can
 	   now do for us. */
 
-        mroisarev = (HV*)HeVAL(he);
+        mroisarev = MUTABLE_HV(HeVAL(he));
 
-	SvUPGRADE((SV*)mroisarev, SVt_PVHV);
+	SvUPGRADE(MUTABLE_SV(mroisarev), SVt_PVHV);
 
 	/* This hash only ever contains PL_sv_yes. Storing it over itself is
 	   almost as cheap as calling hv_exists, so on aggregate we expect to
@@ -454,7 +475,7 @@ Perl_mro_method_changed_in(pTHX_ HV *stash)
     const STRLEN stashname_len = HvNAMELEN_get(stash);
 
     SV ** const svp = hv_fetch(PL_isarev, stashname, stashname_len, 0);
-    HV * const isarev = svp ? (HV*)*svp : NULL;
+    HV * const isarev = svp ? MUTABLE_HV(*svp) : NULL;
 
     PERL_ARGS_ASSERT_MRO_METHOD_CHANGED_IN;
 
@@ -526,10 +547,7 @@ XS(XS_mro_get_linear_isa) {
     HV* class_stash;
     SV* classname;
 
-    PERL_UNUSED_ARG(cv);
-
-    if(items < 1 || items > 2)
-       Perl_croak(aTHX_ "Usage: mro::get_linear_isa(classname [, type ])");
+    assert(items >= 1 && items <= 2);
 
     classname = ST(0);
     class_stash = gv_stashsv(classname, 0);
@@ -538,14 +556,14 @@ XS(XS_mro_get_linear_isa) {
         /* No stash exists yet, give them just the classname */
         AV* isalin = newAV();
         av_push(isalin, newSVsv(classname));
-        ST(0) = sv_2mortal(newRV_noinc((SV*)isalin));
+        ST(0) = sv_2mortal(newRV_noinc(MUTABLE_SV(isalin)));
         XSRETURN(1);
     }
     else {
         RETVAL = mro_get_linear_isa(class_stash);
     }
 
-    ST(0) = newRV_inc((SV*)RETVAL);
+    ST(0) = newRV_inc(MUTABLE_SV(RETVAL));
     sv_2mortal(ST(0));
     XSRETURN(1);
 }
@@ -559,10 +577,7 @@ XS(XS_mro_get_isarev)
     HV* isarev;
     AV* ret_array;
 
-    PERL_UNUSED_ARG(cv);
-
-    if (items != 1)
-       Perl_croak(aTHX_ "Usage: mro::get_isarev(classname)");
+    assert(items == 1);
 
     classname = ST(0);
 
@@ -570,7 +585,7 @@ XS(XS_mro_get_isarev)
 
     
     he = hv_fetch_ent(PL_isarev, classname, 0, 0);
-    isarev = he ? (HV*)HeVAL(he) : NULL;
+    isarev = he ? MUTABLE_HV(HeVAL(he)) : NULL;
 
     ret_array = newAV();
     if(isarev) {
@@ -579,7 +594,7 @@ XS(XS_mro_get_isarev)
         while((iter = hv_iternext(isarev)))
             av_push(ret_array, newSVsv(hv_iterkeysv(iter)));
     }
-    mXPUSHs(newRV_noinc((SV*)ret_array));
+    mXPUSHs(newRV_noinc(MUTABLE_SV(ret_array)));
 
     PUTBACK;
     return;
@@ -595,17 +610,14 @@ XS(XS_mro_is_universal)
     STRLEN classname_len;
     HE* he;
 
-    PERL_UNUSED_ARG(cv);
-
-    if (items != 1)
-       Perl_croak(aTHX_ "Usage: mro::is_universal(classname)");
+    assert(items == 1);
 
     classname = ST(0);
 
     classname_pv = SvPV(classname,classname_len);
 
     he = hv_fetch_ent(PL_isarev, classname, 0, 0);
-    isarev = he ? (HV*)HeVAL(he) : NULL;
+    isarev = he ? MUTABLE_HV(HeVAL(he)) : NULL;
 
     if((classname_len == 9 && strEQ(classname_pv, "UNIVERSAL"))
         || (isarev && hv_exists(isarev, "UNIVERSAL", 9)))
@@ -619,10 +631,7 @@ XS(XS_mro_invalidate_method_caches)
     dVAR;
     dXSARGS;
 
-    PERL_UNUSED_ARG(cv);
-
-    if (items != 0)
-        Perl_croak(aTHX_ "Usage: mro::invalidate_all_method_caches()");
+    assert(items == 0);
 
     PL_sub_generation++;
 
@@ -636,10 +645,7 @@ XS(XS_mro_method_changed_in)
     SV* classname;
     HV* class_stash;
 
-    PERL_UNUSED_ARG(cv);
-
-    if(items != 1)
-        Perl_croak(aTHX_ "Usage: mro::method_changed_in(classname)");
+    assert(items == 1);
     
     classname = ST(0);
 
@@ -658,10 +664,7 @@ XS(XS_mro_get_pkg_gen)
     SV* classname;
     HV* class_stash;
 
-    PERL_UNUSED_ARG(cv);
-
-    if(items != 1)
-        Perl_croak(aTHX_ "Usage: mro::get_pkg_gen(classname)");
+    assert(items == 1);
     
     classname = ST(0);
 

@@ -1,7 +1,7 @@
 /* win32sck.c
  *
  * (c) 1995 Microsoft Corporation. All rights reserved. 
- * 		Developed by hip communications inc., http://info.hip.com/info/
+ * 		Developed by hip communications inc.
  * Portions (c) 1993 Intergraph Corporation. All rights reserved.
  *
  *    You may distribute under the terms of either the GNU General Public
@@ -79,9 +79,9 @@ start_sockets(void)
      */
     version = 0x2;
     if(ret = WSAStartup(version, &retdata))
-	Perl_croak_nocontext("Unable to locate winsock library!\n");
+	croak(aTHX_ "Unable to locate winsock library!\n");
     if(retdata.wVersion != version)
-	Perl_croak_nocontext("Could not find version 2.0 of winsock dll\n");
+	croak(aTHX_ "Could not find version 2.0 of winsock dll\n");
 
     /* atexit((void (*)(void)) EndSockets); */
     wsock_started = 1;
@@ -259,9 +259,8 @@ win32_select(int nfds, Perl_fd_set* rd, Perl_fd_set* wr, Perl_fd_set* ex, const 
 {
     int r;
 #ifdef USE_SOCKETS_AS_HANDLES
-    Perl_fd_set dummy;
     int i, fd, save_errno = errno;
-    FD_SET nrd, nwr, nex, *prd, *pwr, *pex;
+    FD_SET nrd, nwr, nex;
 
     /* winsock seems incapable of dealing with all three null fd_sets,
      * so do the (millisecond) sleep as a special case
@@ -275,45 +274,45 @@ win32_select(int nfds, Perl_fd_set* rd, Perl_fd_set* wr, Perl_fd_set* ex, const 
 	return 0;
     }
     StartSockets();
-    PERL_FD_ZERO(&dummy);
-    if (!rd)
-	rd = &dummy, prd = NULL;
-    else
-	prd = &nrd;
-    if (!wr)
-	wr = &dummy, pwr = NULL;
-    else
-	pwr = &nwr;
-    if (!ex)
-	ex = &dummy, pex = NULL;
-    else
-	pex = &nex;
 
     FD_ZERO(&nrd);
     FD_ZERO(&nwr);
     FD_ZERO(&nex);
     for (i = 0; i < nfds; i++) {
-	fd = TO_SOCKET(i);
-	if (PERL_FD_ISSET(i,rd))
+	if (rd && PERL_FD_ISSET(i,rd)) {
+	    fd = TO_SOCKET(i);
 	    FD_SET((unsigned)fd, &nrd);
-	if (PERL_FD_ISSET(i,wr))
+	}
+	if (wr && PERL_FD_ISSET(i,wr)) {
+	    fd = TO_SOCKET(i);
 	    FD_SET((unsigned)fd, &nwr);
-	if (PERL_FD_ISSET(i,ex))
+	}
+	if (ex && PERL_FD_ISSET(i,ex)) {
+	    fd = TO_SOCKET(i);
 	    FD_SET((unsigned)fd, &nex);
+	}
     }
 
     errno = save_errno;
-    SOCKET_TEST_ERROR(r = select(nfds, prd, pwr, pex, timeout));
+    SOCKET_TEST_ERROR(r = select(nfds, &nrd, &nwr, &nex, timeout));
     save_errno = errno;
 
     for (i = 0; i < nfds; i++) {
-	fd = TO_SOCKET(i);
-	if (PERL_FD_ISSET(i,rd) && !FD_ISSET(fd, &nrd))
-	    PERL_FD_CLR(i,rd);
-	if (PERL_FD_ISSET(i,wr) && !FD_ISSET(fd, &nwr))
-	    PERL_FD_CLR(i,wr);
-	if (PERL_FD_ISSET(i,ex) && !FD_ISSET(fd, &nex))
-	    PERL_FD_CLR(i,ex);
+	if (rd && PERL_FD_ISSET(i,rd)) {
+	    fd = TO_SOCKET(i);
+	    if (!FD_ISSET(fd, &nrd))
+		PERL_FD_CLR(i,rd);
+	}
+	if (wr && PERL_FD_ISSET(i,wr)) {
+	    fd = TO_SOCKET(i);
+	    if (!FD_ISSET(fd, &nwr))
+		PERL_FD_CLR(i,wr);
+	}
+	if (ex && PERL_FD_ISSET(i,ex)) {
+	    fd = TO_SOCKET(i);
+	    if (!FD_ISSET(fd, &nex))
+		PERL_FD_CLR(i,ex);
+	}
     }
     errno = save_errno;
 #else
@@ -653,7 +652,7 @@ win32_ioctl(int i, unsigned int u, char *data)
     int retval;
     
     if (!wsock_started) {
-	Perl_croak_nocontext("ioctl implemented only on sockets");
+	croak(aTHX_ "ioctl implemented only on sockets");
 	/* NOTREACHED */
     }
 
@@ -664,7 +663,7 @@ win32_ioctl(int i, unsigned int u, char *data)
     
     if (retval == SOCKET_ERROR) {
 	if (WSAGetLastError() == WSAENOTSOCK) {
-	    Perl_croak_nocontext("ioctl implemented only on sockets");
+	    croak(aTHX_ "ioctl implemented only on sockets");
 	    /* NOTREACHED */
 	}
 	errno = WSAGetLastError();
@@ -694,28 +693,28 @@ void
 win32_endhostent() 
 {
     dTHX;
-    Perl_croak_nocontext("endhostent not implemented!\n");
+    croak(aTHX_ "endhostent not implemented!\n");
 }
 
 void
 win32_endnetent()
 {
     dTHX;
-    Perl_croak_nocontext("endnetent not implemented!\n");
+    croak(aTHX_ "endnetent not implemented!\n");
 }
 
 void
 win32_endprotoent()
 {
     dTHX;
-    Perl_croak_nocontext("endprotoent not implemented!\n");
+    croak(aTHX_ "endprotoent not implemented!\n");
 }
 
 void
 win32_endservent()
 {
     dTHX;
-    Perl_croak_nocontext("endservent not implemented!\n");
+    croak(aTHX_ "endservent not implemented!\n");
 }
 
 
@@ -723,7 +722,7 @@ struct netent *
 win32_getnetent(void) 
 {
     dTHX;
-    Perl_croak_nocontext("getnetent not implemented!\n");
+    croak(aTHX_ "getnetent not implemented!\n");
     return (struct netent *) NULL;
 }
 
@@ -731,7 +730,7 @@ struct netent *
 win32_getnetbyname(char *name) 
 {
     dTHX;
-    Perl_croak_nocontext("getnetbyname not implemented!\n");
+    croak(aTHX_ "getnetbyname not implemented!\n");
     return (struct netent *)NULL;
 }
 
@@ -739,7 +738,7 @@ struct netent *
 win32_getnetbyaddr(long net, int type) 
 {
     dTHX;
-    Perl_croak_nocontext("getnetbyaddr not implemented!\n");
+    croak(aTHX_ "getnetbyaddr not implemented!\n");
     return (struct netent *)NULL;
 }
 
@@ -747,7 +746,7 @@ struct protoent *
 win32_getprotoent(void) 
 {
     dTHX;
-    Perl_croak_nocontext("getprotoent not implemented!\n");
+    croak(aTHX_ "getprotoent not implemented!\n");
     return (struct protoent *) NULL;
 }
 
@@ -755,7 +754,7 @@ struct servent *
 win32_getservent(void) 
 {
     dTHX;
-    Perl_croak_nocontext("getservent not implemented!\n");
+    croak(aTHX_ "getservent not implemented!\n");
     return (struct servent *) NULL;
 }
 
@@ -763,7 +762,7 @@ void
 win32_sethostent(int stayopen)
 {
     dTHX;
-    Perl_croak_nocontext("sethostent not implemented!\n");
+    croak(aTHX_ "sethostent not implemented!\n");
 }
 
 
@@ -771,7 +770,7 @@ void
 win32_setnetent(int stayopen)
 {
     dTHX;
-    Perl_croak_nocontext("setnetent not implemented!\n");
+    croak(aTHX_ "setnetent not implemented!\n");
 }
 
 
@@ -779,7 +778,7 @@ void
 win32_setprotoent(int stayopen)
 {
     dTHX;
-    Perl_croak_nocontext("setprotoent not implemented!\n");
+    croak(aTHX_ "setprotoent not implemented!\n");
 }
 
 
@@ -787,7 +786,7 @@ void
 win32_setservent(int stayopen)
 {
     dTHX;
-    Perl_croak_nocontext("setservent not implemented!\n");
+    croak(aTHX_ "setservent not implemented!\n");
 }
 
 static struct servent*

@@ -46,6 +46,7 @@ struct mro_meta {
     HV      *mro_nextmethod; /* next::method caching */
     U32     cache_gen;       /* Bumping this invalidates our method cache */
     U32     pkg_gen;         /* Bumps when local methods/@ISA change */
+    HV      *isa;            /* Everything this class @ISA */
 };
 
 /* Subject to change.
@@ -60,30 +61,16 @@ struct xpvhv_aux {
     struct mro_meta *xhv_mro_meta;
 };
 
-#define _XPVHV_ALLOCATED_HEAD						    \
-    STRLEN	xhv_fill;	/* how full xhv_array currently is */	    \
-    STRLEN	xhv_max		/* subscript of last element of xhv_array */
-
-#define _XPVHV_HEAD	\
-    union _xnvu xnv_u;	\
-    _XPVHV_ALLOCATED_HEAD
-
 /* hash structure: */
 /* This structure must match the beginning of struct xpvmg in sv.h. */
 struct xpvhv {
-    _XPVHV_HEAD;
+    union _xnvu xnv_u;
+    STRLEN      xhv_fill;       /* how full xhv_array currently is */
+    STRLEN      xhv_max;        /* subscript of last element of xhv_array */
     _XPVMG_HEAD;
 };
 
 #define xhv_keys xiv_u.xivu_iv
-
-typedef struct {
-    _XPVHV_ALLOCATED_HEAD;
-    _XPVMG_HEAD;
-} xpvhv_allocated;
-
-#undef _XPVHV_ALLOCATED_HEAD
-#undef _XPVHV_HEAD
 
 /* hash a key */
 /* FYI: This is the "One-at-a-Time" algorithm by Bob Jenkins
@@ -224,10 +211,10 @@ C<SV*>.
 /* This quite intentionally does no flag checking first. That's your
    responsibility.  */
 #define HvAUX(hv)	((struct xpvhv_aux*)&(HvARRAY(hv)[HvMAX(hv)+1]))
-#define HvRITER(hv)	(*Perl_hv_riter_p(aTHX_ (HV*)(hv)))
-#define HvEITER(hv)	(*Perl_hv_eiter_p(aTHX_ (HV*)(hv)))
-#define HvRITER_set(hv,r)	Perl_hv_riter_set(aTHX_ (HV*)(hv), r)
-#define HvEITER_set(hv,e)	Perl_hv_eiter_set(aTHX_ (HV*)(hv), e)
+#define HvRITER(hv)	(*Perl_hv_riter_p(aTHX_ MUTABLE_HV(hv)))
+#define HvEITER(hv)	(*Perl_hv_eiter_p(aTHX_ MUTABLE_HV(hv)))
+#define HvRITER_set(hv,r)	Perl_hv_riter_set(aTHX_ MUTABLE_HV(hv), r)
+#define HvEITER_set(hv,e)	Perl_hv_eiter_set(aTHX_ MUTABLE_HV(hv), e)
 #define HvRITER_get(hv)	(SvOOK(hv) ? HvAUX(hv)->xhv_riter : -1)
 #define HvEITER_get(hv)	(SvOOK(hv) ? HvAUX(hv)->xhv_eiter : NULL)
 #define HvNAME(hv)	HvNAME_get(hv)
@@ -258,9 +245,9 @@ C<SV*>.
 #define HvKEYS(hv)		HvUSEDKEYS(hv)
 #define HvUSEDKEYS(hv)		(HvTOTALKEYS(hv) - HvPLACEHOLDERS_get(hv))
 #define HvTOTALKEYS(hv)		XHvTOTALKEYS((XPVHV*)  SvANY(hv))
-#define HvPLACEHOLDERS(hv)	(*Perl_hv_placeholders_p(aTHX_ (HV*)hv))
-#define HvPLACEHOLDERS_get(hv)	(SvMAGIC(hv) ? Perl_hv_placeholders_get(aTHX_ (HV*)hv) : 0)
-#define HvPLACEHOLDERS_set(hv,p)	Perl_hv_placeholders_set(aTHX_ (HV*)hv, p)
+#define HvPLACEHOLDERS(hv)	(*Perl_hv_placeholders_p(aTHX_ MUTABLE_HV(hv)))
+#define HvPLACEHOLDERS_get(hv)	(SvMAGIC(hv) ? Perl_hv_placeholders_get(aTHX_ (const HV *)hv) : 0)
+#define HvPLACEHOLDERS_set(hv,p)	Perl_hv_placeholders_set(aTHX_ MUTABLE_HV(hv), p)
 
 #define HvSHAREKEYS(hv)		(SvFLAGS(hv) & SVphv_SHAREKEYS)
 #define HvSHAREKEYS_on(hv)	(SvFLAGS(hv) |= SVphv_SHAREKEYS)
@@ -320,6 +307,9 @@ C<SV*>.
 #define HVhek_FREEKEY	0x100 /* Internal flag to say key is malloc()ed.  */
 #define HVhek_PLACEHOLD	0x200 /* Internal flag to create placeholder.
                                * (may change, but Storable is a core module) */
+#define HVhek_KEYCANONICAL 0x400 /* Internal flag - key is in canonical form.
+				    If the string is UTF-8, it cannot be
+				    converted to bytes. */
 #define HVhek_MASK	0xFF
 
 #define HEK_REHASH(hek)		(HEK_FLAGS(hek) & HVhek_REHASH)
@@ -343,7 +333,7 @@ C<SV*>.
 #define HV_ITERNEXT_WANTPLACEHOLDERS	0x01	/* Don't skip placeholders.  */
 
 #define hv_iternext(hv)	hv_iternext_flags(hv, 0)
-#define hv_magic(hv, gv, how) sv_magic((SV*)(hv), (SV*)(gv), how, NULL, 0)
+#define hv_magic(hv, gv, how) sv_magic(MUTABLE_SV(hv), MUTABLE_SV(gv), how, NULL, 0)
 
 /* available as a function in hv.c */
 #define Perl_sharepvn(sv, len, hash) HEK_KEY(share_hek(sv, len, hash))
@@ -370,14 +360,14 @@ C<SV*>.
     (hv_common_key_len((urkk), (zamm), (clunk), HV_FETCH_ISEXISTS, NULL, 0) \
      ? TRUE : FALSE)
 
-#define hv_fetch(urkk, zamm, clunk, pam)				\
-    ((SV**) hv_common_key_len((urkk), (zamm), (clunk), (pam)		\
+#define hv_fetch(hv, key, klen, lval)					\
+    ((SV**) hv_common_key_len((hv), (key), (klen), (lval)		\
 			      ? (HV_FETCH_JUST_SV | HV_FETCH_LVALUE)	\
 			      : HV_FETCH_JUST_SV, NULL, 0))
 
-#define hv_delete(urkk, zamm, clunk, pam)				\
-    ((SV*) hv_common_key_len((urkk), (zamm), (clunk),			\
-			     (pam) | HV_DELETE, NULL, 0))
+#define hv_delete(hv, key, klen, flags)					\
+    (MUTABLE_SV(hv_common_key_len((hv), (key), (klen),			\
+				  (flags) | HV_DELETE, NULL, 0)))
 
 #    define HINTS_REFCNT_LOCK          NOOP
 #    define HINTS_REFCNT_UNLOCK                NOOP
@@ -405,7 +395,7 @@ Creates a new HV.  The reference count is set to 1.
 =cut
 */
 
-#define newHV()	((HV*)newSV_type(SVt_PVHV))
+#define newHV()	MUTABLE_HV(newSV_type(SVt_PVHV))
 
 /*
  * Local variables:

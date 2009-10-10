@@ -3,7 +3,7 @@
  *    perlapi.h
  *
  *    Copyright (C) 1993, 1994, 1995, 1996, 1997, 1998, 1999,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, by Larry Wall and others
+ *    2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -172,12 +172,12 @@ END_EXTERN_C
 #define PL_argvoutgv		(*Perl_Iargvoutgv_ptr(aTHX))
 #undef  PL_basetime
 #define PL_basetime		(*Perl_Ibasetime_ptr(aTHX))
-#undef  PL_bitcount
-#define PL_bitcount		(*Perl_Ibitcount_ptr(aTHX))
 #undef  PL_body_arenas
 #define PL_body_arenas		(*Perl_Ibody_arenas_ptr(aTHX))
 #undef  PL_body_roots
 #define PL_body_roots		(*Perl_Ibody_roots_ptr(aTHX))
+#undef  PL_breakable_sub_gen
+#define PL_breakable_sub_gen	(*Perl_Ibreakable_sub_gen_ptr(aTHX))
 #undef  PL_checkav
 #define PL_checkav		(*Perl_Icheckav_ptr(aTHX))
 #undef  PL_clocktick
@@ -414,6 +414,8 @@ END_EXTERN_C
 #define PL_op			(*Perl_Iop_ptr(aTHX))
 #undef  PL_op_mask
 #define PL_op_mask		(*Perl_Iop_mask_ptr(aTHX))
+#undef  PL_opfreehook
+#define PL_opfreehook		(*Perl_Iopfreehook_ptr(aTHX))
 #undef  PL_opsave
 #define PL_opsave		(*Perl_Iopsave_ptr(aTHX))
 #undef  PL_origalen
@@ -502,6 +504,8 @@ END_EXTERN_C
 #define PL_scopestack_ix	(*Perl_Iscopestack_ix_ptr(aTHX))
 #undef  PL_scopestack_max
 #define PL_scopestack_max	(*Perl_Iscopestack_max_ptr(aTHX))
+#undef  PL_scopestack_name
+#define PL_scopestack_name	(*Perl_Iscopestack_name_ptr(aTHX))
 #undef  PL_screamfirst
 #define PL_screamfirst		(*Perl_Iscreamfirst_ptr(aTHX))
 #undef  PL_screamnext
@@ -576,6 +580,8 @@ END_EXTERN_C
 #define PL_sv_objcount		(*Perl_Isv_objcount_ptr(aTHX))
 #undef  PL_sv_root
 #define PL_sv_root		(*Perl_Isv_root_ptr(aTHX))
+#undef  PL_sv_serial
+#define PL_sv_serial		(*Perl_Isv_serial_ptr(aTHX))
 #undef  PL_sv_undef
 #define PL_sv_undef		(*Perl_Isv_undef_ptr(aTHX))
 #undef  PL_sv_yes
@@ -608,8 +614,6 @@ END_EXTERN_C
 #define PL_unsafe		(*Perl_Iunsafe_ptr(aTHX))
 #undef  PL_utf8_alnum
 #define PL_utf8_alnum		(*Perl_Iutf8_alnum_ptr(aTHX))
-#undef  PL_utf8_alnumc
-#define PL_utf8_alnumc		(*Perl_Iutf8_alnumc_ptr(aTHX))
 #undef  PL_utf8_alpha
 #define PL_utf8_alpha		(*Perl_Iutf8_alpha_ptr(aTHX))
 #undef  PL_utf8_ascii

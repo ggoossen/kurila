@@ -30,29 +30,34 @@ Perl_boot_core_error(pTHX)
 STATIC
 AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
     AV* av = av_2mortal(newAV());
+
     const char *stashname;
-    
     stashname = CopSTASHPV(cx->blk_oldcop);
 
     if (!stashname)
-	av_push(av, &PL_sv_undef);
+        av_push(av, &PL_sv_undef);
     else
-	av_push(av, newSVpv(stashname, 0));
+        av_push(av, newSVpv(stashname, 0));
     if (cx->blk_oldop->op_location) {
-	sv_setsv(avTsv(av), cx->blk_oldop->op_location);
+        sv_setsv(avTsv(av), cx->blk_oldop->op_location);
     } else {
-	av_push(av, newSVpv("unknown location", 0));
+        av_push(av, newSVpv("unknown location", 0));
     }
 
-    if (CxTYPE(cx) == CXt_SUB) {
+    if (CxTYPE(cx) == CXt_SUB || CxTYPE(cx) == CXt_XSSUB) {
 	/* So is ccstack[dbcxix]. */
 	CV* cv = cx->blk_sub.cv;
 	SV** name = NULL;
 	if (SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
 	    name = av_fetch(svTav(SvLOCATION(cv)), 3, FALSE);
-	av_push(av, name ? newSVsv(*name) : &PL_sv_undef );
+	av_push(av, name ? newSVsv(*name) : 
+            newSVpvn(CxTYPE(cx) == CXt_XSSUB ? "(xsub)" : "(sub)", 0));
+    }
+    else if (CxTYPE(cx) == CXt_TRY) {
+	av_push(av, newSVpvs("(try)"));
     }
     else {
+        assert(CxTYPE(cx) == CXt_EVAL);
 	av_push(av, newSVpvs("(eval)"));
     }
     
@@ -62,12 +67,9 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
 	    av_push(av, newSVsv(cx->blk_eval.cur_text));
 	}
 	/* require */
-	else if (cx->blk_eval.old_namesv) {
+	else { 
+            assert(cx->blk_eval.old_namesv);
 	    av_push(av, newSVsv(cx->blk_eval.old_namesv));
-	}
-	/* eval BLOCK (try blocks have old_namesv == 0) */
-	else {
-	    av_push(av, &PL_sv_undef);
 	}
     }
     else {
@@ -85,6 +87,7 @@ STATIC AV* S_error_backtrace(pTHX)
     const PERL_SI *top_si = PL_curstackinfo;
 
     AV* trace;
+    int index = 0;
 
     trace = av_2mortal(newAV());
 
@@ -105,8 +108,11 @@ STATIC AV* S_error_backtrace(pTHX)
 /* 	    continue; */
 /* 	} */
 
+
 	/* make stack entry */
-	av_push(trace, SvREFCNT_inc((SV*)S_context_info(aTHX_ &ccstack[cxix]) ));
+        ++index;
+        if (index > 1)
+            av_push(trace, SvREFCNT_inc((SV*)S_context_info(aTHX_ &ccstack[cxix]) ));
 
 	/* stop after BEGIN/CHECK/.../END blocks */
 	if ((CxTYPE(&ccstack[cxix]) == CXt_SUB) &&
@@ -242,20 +248,20 @@ XS(XS_error_message)
     if (items < 1)
 	Perl_croak(aTHX_ "Usage: $error->message()");
     error = POPs;
-    ENTER;
+    ENTER_named("call_description");
     PUSHMARK(SP);
     PUSHs(error);
     PUTBACK;
     msg = call_method("description", G_SCALAR);
     SPAGAIN;
-    LEAVE;
-    ENTER;
+    LEAVE_named("call_description");
+    ENTER_named("call_stacktrace");
     PUSHMARK(SP);
     XPUSHs(error);
     PUTBACK;
     sv_catsv(msg, call_method("stacktrace", G_SCALAR) );
     SPAGAIN;
-    LEAVE;
+    LEAVE_named("call_stacktrace");
     XPUSHs(msg);
     XSRETURN(1);
 }
@@ -340,7 +346,7 @@ XS(XS_error_write_to_stderr) {
     if (items != 1)
 	Perl_croak(aTHX_ "Usage: $error->write_to_stderr()");
 
-    ENTER;
+    ENTER_named("call_message");
     PUSHMARK(SP);
     PUSHs(ST(0));
     PUTBACK;
@@ -349,7 +355,7 @@ XS(XS_error_write_to_stderr) {
     SPAGAIN;
     message = SvPV_const(tmpsv, msglen);
 
-    LEAVE;
+    LEAVE_named("call_message");
 
     write_to_stderr(message, msglen);
 }

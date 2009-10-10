@@ -16,7 +16,7 @@ my @test = @:
  \(@:  SCALAR => \$t,	'SCALAR ref'	)
  \(@:  REF    => \(\$t),	'REF ref'	)
  \(@:  GLOB   => gensym,	'GLOB ref'	)
- \(@:  CODE   => sub {},	'CODE ref'	)
+ \(@:  CODE   => \ sub {},	'CODE ref'	)
     # \@( IO => *STDIN{IO} ) the internal sv_reftype returns UNKNOWN
     
 

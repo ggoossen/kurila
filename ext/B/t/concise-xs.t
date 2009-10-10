@@ -179,8 +179,7 @@ my $testpkgs = \ %:
                             getgid getgroups getlogin getpgrp getpid getppid getuid isatty link
                             rmdir setbuf setvbuf sleep unlink utime
 
-                            S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG WEXITSTATUS
-                            WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG
+                            S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG
                             /
 
                   XS => qw/ write wctomb wcstombs uname tzset tzname
@@ -194,7 +193,7 @@ my $testpkgs = \ %:
                       mblen lseek log10 localeconv ldexp lchown
                       isxdigit isupper isspace ispunct isprint
                       islower isgraph isdigit iscntrl isalpha
-                      isalnum int_macro_int getcwd frexp fpathconf
+                      isalnum getcwd frexp fpathconf
                       fmod floor dup2 dup difftime cuserid ctime
                       ctermid cosh constant close clock ceil
                       bootstrap atan asin asctime acos access abort

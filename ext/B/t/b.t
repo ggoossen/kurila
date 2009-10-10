@@ -99,7 +99,7 @@ is(ref $null_ret, "SCALAR", "Test object_2svref() return is SCALAR")
 is($null_ret->$, $nv, "Test object_2svref()")
 
 my $RV_class = 'B::IV'
-my $cv = sub (@< @_){ 1; }
+my $cv = \ sub (@< @_){ 1; }
 my $cv_ref = B::svref_2object(\$cv)
 is($cv_ref->REFCNT, 1, "Test $RV_class->REFCNT")
 is(ref $cv_ref, "$RV_class",
@@ -141,7 +141,7 @@ is(B::perlstring("\n"), '"\n"', "Testing B::perlstring()")
 is(B::perlstring("\""), '"\""', "Testing B::perlstring()")
 is(B::class(bless \$%, "Wibble::Bibble"), "Bibble", "Testing B::class()")
 is(B::cast_I32(3.14), 3, "Testing B::cast_I32()")
-is(B::opnumber("chop"), 35, "Testing opnumber with opname (chop)")
+is(B::opnumber("chop"), 36, "Testing opnumber with opname (chop)")
 
 do
     no warnings 'once'

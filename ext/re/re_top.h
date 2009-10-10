@@ -1,10 +1,8 @@
+#define RE_DEBUGGING
+
 /* need to replace pregcomp et al, so enable that */
 #ifndef PERL_IN_XSUB_RE
 #  define PERL_IN_XSUB_RE
-#endif
-/* need access to debugger hooks */
-#if defined(PERL_EXT_RE_DEBUG) && !defined(DEBUGGING)
-#  define DEBUGGING
 #endif
 
 /* We *really* need to overwrite these symbols: */
@@ -14,6 +12,7 @@
 #define Perl_re_intuit_start    my_re_intuit_start
 #define Perl_re_compile         my_re_compile
 #define Perl_regfree_internal   my_regfree
+#define Perl_reg_tmprefcnt_internal   my_reg_tmprefcnt
 #define Perl_re_intuit_string   my_re_intuit_string
 #define Perl_regdupe_internal   my_regdupe
 #define Perl_reg_numbered_buff_fetch  my_reg_numbered_buff_fetch

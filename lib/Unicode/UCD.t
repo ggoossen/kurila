@@ -5,7 +5,7 @@ use Unicode::UCD
 use Test::More
 use utf8
 
-BEGIN { plan tests => 193 };
+BEGIN { plan tests => 221 };
 
 use Unicode::UCD 'charinfo'
 
@@ -241,7 +241,9 @@ ok(exists $bt{L}, 'has L')
 is($bt{?L}, 'Left-to-Right', 'L is Left-to-Right')
 is($bt{?AL}, 'Right-to-Left Arabic', 'AL is Right-to-Left Arabic')
 
-is(Unicode::UCD::UnicodeVersion, '5.0.0', 'UnicodeVersion')
+# If this fails, then maybe one should look at the Unicode changes to see
+# what else might need to be updated.
+is(Unicode::UCD::UnicodeVersion, '5.1.0', 'UnicodeVersion');
 
 use Unicode::UCD < qw(compexcl)
 
@@ -254,15 +256,69 @@ my $casefold
 
 $casefold = casefold(0x41)
 
-ok($casefold{?code} eq '0041' &&
-   $casefold{?status} eq 'C'  &&
-   $casefold{?mapping} eq '0061', 'casefold 0x41')
+is($casefold{code}, '0041', 'casefold 0x41 code')
+is($casefold{status}, 'C', 'casefold 0x41 status')
+is($casefold{mapping}, '0061', 'casefold 0x41 mapping')
+is($casefold{full}, '0061', 'casefold 0x41 full')
+is($casefold{simple}, '0061', 'casefold 0x41 simple')
+is($casefold{turkic}, "", 'casefold 0x41 turkic')
 
 $casefold = casefold(0xdf)
 
-ok($casefold{?code} eq '00DF' &&
-   $casefold{?status} eq 'F'  &&
-   $casefold{?mapping} eq '0073 0073', 'casefold 0xDF')
+is($casefold{code}, '00DF', 'casefold 0xDF code')
+is($casefold{status}, 'F', 'casefold 0xDF status')
+is($casefold{mapping}, '0073 0073', 'casefold 0xDF mapping')
+is($casefold{full}, '0073 0073', 'casefold 0xDF full')
+is($casefold{simple}, "", 'casefold 0xDF simple')
+is($casefold{turkic}, "", 'casefold 0xDF turkic')
+
+# Do different tests depending on if version <= 3.1, or not.
+(my $version = Unicode::UCD::UnicodeVersion) =~ m/^(\d+)\.(\d+)/
+if (defined $1 && ($1 +<= 2 || $1 == 3 && defined $2 && $2 +<= 1))
+        $casefold = casefold(0x130)
+
+        is($casefold{code}, '0130', 'casefold 0x130 code')
+        is($casefold{status}, 'I' , 'casefold 0x130 status')
+        is($casefold{mapping}, '0069', 'casefold 0x130 mapping')
+        is($casefold{full}, '0069', 'casefold 0x130 full')
+        is($casefold{simple}, "0069", 'casefold 0x130 simple')
+        is($casefold{turkic}, "0069", 'casefold 0x130 turkic')
+
+        $casefold = casefold(0x131)
+
+        is($casefold{code}, '0131', 'casefold 0x131 code')
+        is($casefold{status}, 'I' , 'casefold 0x131 status')
+        is($casefold{mapping}, '0069', 'casefold 0x131 mapping')
+        is($casefold{full}, '0069', 'casefold 0x131 full')
+        is($casefold{simple}, "0069", 'casefold 0x131 simple')
+        is($casefold{turkic}, "0069", 'casefold 0x131 turkic')
+else
+        $casefold = casefold(0x49)
+
+        is($casefold{code}, '0049', 'casefold 0x49 code')
+        is($casefold{status}, 'C' , 'casefold 0x49 status')
+        is($casefold{mapping}, '0069', 'casefold 0x49 mapping')
+        is($casefold{full}, '0069', 'casefold 0x49 full')
+        is($casefold{simple}, "0069", 'casefold 0x49 simple')
+        is($casefold{turkic}, "0131", 'casefold 0x49 turkic')
+
+        $casefold = casefold(0x130)
+
+        is($casefold{code}, '0130', 'casefold 0x130 code')
+        is($casefold{status}, 'F' , 'casefold 0x130 status')
+        is($casefold{mapping}, '0069 0307', 'casefold 0x130 mapping')
+        is($casefold{full}, '0069 0307', 'casefold 0x130 full')
+        is($casefold{simple}, "", 'casefold 0x130 simple')
+        is($casefold{turkic}, "0069", 'casefold 0x130 turkic')
+
+$casefold = casefold(0x1F88)
+
+is($casefold{code}, '1F88', 'casefold 0x1F88 code')
+is($casefold{status}, 'S' , 'casefold 0x1F88 status')
+is($casefold{mapping}, '1F80', 'casefold 0x1F88 mapping')
+is($casefold{full}, '1F00 03B9', 'casefold 0x1F88 full')
+is($casefold{simple}, '1F80', 'casefold 0x1F88 simple')
+is($casefold{turkic}, "", 'casefold 0x1F88 turkic')
 
 ok(!casefold(0x20))
 
@@ -312,7 +368,7 @@ is(Unicode::UCD::_getcode('U+123x'),  undef, "_getcode(x123)")
 do
     my $r1 = charscript('Latin')
     my $n1 = nelems $r1
-    is($n1, 35, "number of ranges in Latin script (Unicode 5.0.0)")
+    is($n1, 42, "number of ranges in Latin script (Unicode 5.1.0)")
     shift $r1 while $r1
     my $r2 = charscript('Latin')
     is((nelems $r2), $n1, "modifying results should not mess up internal caches")

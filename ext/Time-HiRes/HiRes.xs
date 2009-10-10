@@ -2,7 +2,8 @@
  * 
  * Copyright (c) 1996-2002 Douglas E. Wegscheid.  All rights reserved.
  * 
- * Copyright (c) 2002,2003,2004,2005,2006,2007 Jarkko Hietaniemi.  All rights reserved.
+ * Copyright (c) 2002,2003,2004,2005,2006,2007,2008 Jarkko Hietaniemi.
+ * All rights reserved.
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the same terms as Perl itself.
@@ -70,9 +71,13 @@ extern "C" {
 /* HP-UX has CLOCK_XXX values but as enums, not as defines.
  * The only way to detect these would be to test compile for each. */
 # ifdef __hpux
-#  define CLOCK_REALTIME CLOCK_REALTIME
-#  define CLOCK_VIRTUAL  CLOCK_VIRTUAL
-#  define CLOCK_PROFILE  CLOCK_PROFILE
+/* However, it seems that at least in HP-UX 11.31 ia64 there *are*
+ * defines for these, so let's try detecting them. */
+#  ifndef CLOCK_REALTIME
+#    define CLOCK_REALTIME CLOCK_REALTIME
+#    define CLOCK_VIRTUAL  CLOCK_VIRTUAL
+#    define CLOCK_PROFILE  CLOCK_PROFILE
+#  endif
 # endif /* # ifdef __hpux */
 
 #endif /* #if defined(TIME_HIRES_CLOCK_GETTIME) && defined(_STRUCT_ITIMERSPEC) */
@@ -389,10 +394,10 @@ gettimeofday (struct timeval *tp, void *tpz)
   * The TIME_HIRES_NANOSLEEP is set by Makefile.PL. */
 #if !defined(HAS_USLEEP) && defined(TIME_HIRES_NANOSLEEP)
 #define HAS_USLEEP
-#define usleep hrt_nanosleep  /* could conflict with ncurses for static build */
+#define usleep hrt_usleep  /* could conflict with ncurses for static build */
 
 void
-hrt_nanosleep(unsigned long usec) /* This is used to emulate usleep. */
+hrt_usleep(unsigned long usec) /* This is used to emulate usleep. */
 {
     struct timespec res;
     res.tv_sec = usec / IV_1E6;
@@ -432,21 +437,6 @@ hrt_usleep(unsigned long usec)
 }
 #endif /* #if !defined(HAS_USLEEP) && defined(WIN32) */
 
-#if !defined(HAS_USLEEP) && defined(TIME_HIRES_NANOSLEEP)
-#define HAS_USLEEP
-#define usleep hrt_usleep  /* could conflict with ncurses for static build */
-
-void
-hrt_usleep(unsigned long usec)
-{
-	struct timespec ts1;
-	ts1.tv_sec  = usec * 1000; /* Ignoring wraparound. */
-	ts1.tv_nsec = 0;
-	nanosleep(&ts1, NULL);
-}
-
-#endif /* #if !defined(HAS_USLEEP) && defined(TIME_HIRES_NANOSLEEP) */
-
 #if !defined(HAS_USLEEP) && defined(HAS_POLL)
 #define HAS_USLEEP
 #define usleep hrt_usleep  /* could conflict with ncurses for static build */
@@ -461,16 +451,24 @@ hrt_usleep(unsigned long usec)
 #endif /* #if !defined(HAS_USLEEP) && defined(HAS_POLL) */
 
 #if defined(HAS_SETITIMER) && defined(ITIMER_REAL)
-int
-hrt_ualarm_itimer(int usec, int interval)
+
+static int
+hrt_ualarm_itimero(struct itimerval* itv, int usec, int uinterval)
 {
-   struct itimerval itv;
-   itv.it_value.tv_sec = usec / IV_1E6;
-   itv.it_value.tv_usec = usec % IV_1E6;
-   itv.it_interval.tv_sec = interval / IV_1E6;
-   itv.it_interval.tv_usec = interval % IV_1E6;
-   return setitimer(ITIMER_REAL, &itv, 0);
+   itv->it_value.tv_sec = usec / IV_1E6;
+   itv->it_value.tv_usec = usec % IV_1E6;
+   itv->it_interval.tv_sec = uinterval / IV_1E6;
+   itv->it_interval.tv_usec = uinterval % IV_1E6;
+   return setitimer(ITIMER_REAL, itv, 0);
 }
+
+int
+hrt_ualarm_itimer(int usec, int uinterval)
+{
+  struct itimerval itv;
+  return hrt_ualarm_itimero(&itv, usec, uinterval);
+}
+
 #ifdef HAS_UALARM
 int
 hrt_ualarm(int usec, int interval) /* for binary compat before 1.91 */
@@ -788,7 +786,7 @@ usleep(useconds)
 		    useconds -= 1E6 * seconds;
 		}
 	    } else if (useconds < 0.0)
-	        croak("Time::HiRes::usleep(%"NVgf"): negative time not invented yet", useconds);
+	        croak(aTHX_ "Time::HiRes::usleep(%"NVgf"): negative time not invented yet", useconds);
 	    usleep((U32)useconds);
 	} else
 	    PerlProc_pause();
@@ -810,7 +808,7 @@ nanosleep(nsec)
 	struct timespec sleepfor, unslept;
 	CODE:
 	if (nsec < 0.0)
-	    croak("Time::HiRes::nanosleep(%"NVgf"): negative time not invented yet", nsec);
+	    croak(aTHX_ "Time::HiRes::nanosleep(%"NVgf"): negative time not invented yet", nsec);
 	sleepfor.tv_sec = (Time_t)(nsec / 1e9);
 	sleepfor.tv_nsec = (long)(nsec - ((NV)sleepfor.tv_sec) * 1e9);
 	if (!nanosleep(&sleepfor, &unslept)) {
@@ -859,11 +857,11 @@ sleep(...)
 		   useconds = -(IV)useconds;
 #endif /* #if defined(__sparc64__) && defined(__GNUC__) */
 		   if ((IV)useconds < 0)
-		     croak("Time::HiRes::sleep(%"NVgf"): internal error: useconds < 0 (unsigned %"UVuf" signed %"IVdf")", seconds, useconds, (IV)useconds);
+		     croak(aTHX_ "Time::HiRes::sleep(%"NVgf"): internal error: useconds < 0 (unsigned %"UVuf" signed %"IVdf")", seconds, useconds, (IV)useconds);
 		 }
 		 usleep(useconds);
 	    } else
-	        croak("Time::HiRes::sleep(%"NVgf"): negative time not invented yet", seconds);
+	        croak(aTHX_ "Time::HiRes::sleep(%"NVgf"): negative time not invented yet", seconds);
 	} else
 	    PerlProc_pause();
 	gettimeofday(&Tb, NULL);
@@ -888,21 +886,27 @@ usleep(useconds)
 
 #ifdef HAS_UALARM
 
-int
-ualarm(useconds,interval=0)
+IV
+ualarm(useconds,uinterval=0)
 	int useconds
-	int interval
+	int uinterval
 	CODE:
-	if (useconds < 0 || interval < 0)
-	    croak("Time::HiRes::ualarm(%d, %d): negative time not invented yet", useconds, interval);
-	if (useconds >= IV_1E6 || interval >= IV_1E6)
+	if (useconds < 0 || uinterval < 0)
+	    croak(aTHX_ "Time::HiRes::ualarm(%d, %d): negative time not invented yet", useconds, uinterval);
 #if defined(HAS_SETITIMER) && defined(ITIMER_REAL)
-		RETVAL = hrt_ualarm_itimer(useconds, interval);
+	  {
+	        struct itimerval itv;
+	        if (hrt_ualarm_itimero(&itv, useconds, uinterval)) {
+		  RETVAL = itv.it_value.tv_sec + IV_1E6 * itv.it_value.tv_usec;
+		} else {
+		  RETVAL = 0;
+		}
+	  }
 #else
-		croak("Time::HiRes::ualarm(%d, %d): useconds or interval equal or more than %"IVdf, useconds, interval, IV_1E6);
+	if (useconds >= IV_1E6 || uinterval >= IV_1E6) 
+		croak("Time::HiRes::ualarm(%d, %d): useconds or uinterval equal to or more than %"IVdf, useconds, uinterval, IV_1E6);
+	RETVAL = ualarm(useconds, uinterval);
 #endif
-	else
-		RETVAL = ualarm(useconds, interval);
 
 	OUTPUT:
 	RETVAL
@@ -913,9 +917,25 @@ alarm(seconds,interval=0)
 	NV interval
 	CODE:
 	if (seconds < 0.0 || interval < 0.0)
-	    croak("Time::HiRes::alarm(%"NVgf", %"NVgf"): negative time not invented yet", seconds, interval);
-	RETVAL = (NV)ualarm((IV)(seconds  * IV_1E6),
-			    (IV)(interval * IV_1E6)) / NV_1E6;
+	    croak(aTHX_ "Time::HiRes::alarm(%"NVgf", %"NVgf"): negative time not invented yet", seconds, interval);
+	{
+	  IV useconds     = IV_1E6 * seconds;
+	  IV uinterval    = IV_1E6 * interval;
+#if defined(HAS_SETITIMER) && defined(ITIMER_REAL)
+	  {
+	        struct itimerval itv;
+	        if (hrt_ualarm_itimero(&itv, useconds, uinterval)) {
+		  RETVAL = (NV)itv.it_value.tv_sec + (NV)itv.it_value.tv_usec / NV_1E6;
+		} else {
+		  RETVAL = 0;
+		}
+	  }
+#else
+	  if (useconds >= IV_1E6 || uinterval >= IV_1E6)
+		croak("Time::HiRes::alarm(%d, %d): seconds or interval equal to or more than 1.0 ", useconds, uinterval, IV_1E6);
+	    RETVAL = (NV)ualarm( useconds, uinterval ) / NV_1E6;
+#endif
+	}
 
 	OUTPUT:
 	RETVAL
@@ -941,45 +961,6 @@ alarm(seconds,interval=0)
 #endif /* #ifdef HAS_UALARM */
 
 #ifdef HAS_GETTIMEOFDAY
-#    ifdef MACOS_TRADITIONAL	/* fix epoch TZ and use unsigned time_t */
-void
-gettimeofday()
-        PREINIT:
-        struct timeval Tp;
-        struct timezone Tz;
-        PPCODE:
-        int status;
-        AV* res;
-        status = gettimeofday (&Tp, &Tz);
-
-        RESULT = sv2_mortal(newAV());
-	if (status == 0) {
-	     Tp.tv_sec += Tz.tz_minuteswest * 60;	/* adjust for TZ */
-             /* Mac OS (Classic) has unsigned time_t */
-             res = newAV();
-             mXPUSHs((SV*)res);
-             av_push(res, newSVuv(Tp.tv_sec));
-             av_push(res, newSViv(Tp.tv_usec));
-        }
-
-NV
-time()
-        PREINIT:
-        struct timeval Tp;
-        struct timezone Tz;
-        CODE:
-        int status;
-        status = gettimeofday (&Tp, &Tz);
-	if (status == 0) {
-            Tp.tv_sec += Tz.tz_minuteswest * 60;	/* adjust for TZ */
-	    RETVAL = Tp.tv_sec + (Tp.tv_usec / NV_1E6);
-        } else {
-	    RETVAL = -1.0;
-	}
-	OUTPUT:
-	RETVAL
-
-#    else	/* MACOS_TRADITIONAL */
 void
 gettimeofday()
         PREINIT:
@@ -1010,7 +991,6 @@ time()
 	OUTPUT:
 	RETVAL
 
-#    endif	/* MACOS_TRADITIONAL */
 #endif /* #ifdef HAS_GETTIMEOFDAY */
 
 #if defined(HAS_GETITIMER) && defined(HAS_SETITIMER)
@@ -1028,7 +1008,7 @@ setitimer(which, seconds, interval = 0)
     PPCODE:
         AV* res;
 	if (seconds < 0.0 || interval < 0.0)
-	    croak("Time::HiRes::setitimer(%"IVdf", %"NVgf", %"NVgf"): negative time not invented yet", (IV)which, seconds, interval);
+	    croak(aTHX_ "Time::HiRes::setitimer(%"IVdf", %"NVgf", %"NVgf"): negative time not invented yet", (IV)which, seconds, interval);
 	newit.it_value.tv_sec  = (IV)seconds;
 	newit.it_value.tv_usec =
 	  (IV)((seconds  - (NV)newit.it_value.tv_sec)    * NV_1E6);
@@ -1131,7 +1111,7 @@ clock_nanosleep(clock_id, nsec, flags = 0)
 	struct timespec sleepfor, unslept;
     CODE:
 	if (nsec < 0.0)
-	    croak("Time::HiRes::clock_nanosleep(..., %"NVgf"): negative time not invented yet", nsec);
+	    croak(aTHX_ "Time::HiRes::clock_nanosleep(..., %"NVgf"): negative time not invented yet", nsec);
 	sleepfor.tv_sec = (Time_t)(nsec / 1e9);
 	sleepfor.tv_nsec = (long)(nsec - ((NV)sleepfor.tv_sec) * 1e9);
 	if (!clock_nanosleep(clock_id, flags, &sleepfor, &unslept)) {

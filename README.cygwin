@@ -124,14 +124,14 @@ Alternatively, the crypt libraries in GNU libc have been ported to Cygwin.
 
 The DES based Ultra Fast Crypt port was done by Alexey Truhan:
 
-  ftp://ftp.uni-erlangen.de/pub/pc/gnuwin32/cygwin/porters/Okhapkin_Sergey/cw32crypt-dist-0.tgz
+  ftp://ftp.franken.de/pub/win32/develop/gnuwin32/cygwin/porters/Okhapkin_Sergey/cw32crypt-dist-0.tgz
 
 NOTE: There are various export restrictions on DES implementations,
 see the glibc README for more details.
 
 The MD5 port was done by Andy Piper:
 
-  ftp://ftp.uni-erlangen.de/pub/pc/gnuwin32/cygwin/porters/Okhapkin_Sergey/libcrypt.tgz
+  ftp://ftp.franken.de/pub/win32/develop/gnuwin32/cygwin/porters/Okhapkin_Sergey/libcrypt.tgz
 
 =item * C<-lgdbm_compat> (C<use GDBM_File>)
 
@@ -564,12 +564,12 @@ be kept as clean as possible.
   pod/perl561delta.pod pod/perl570delta.pod pod/perl572delta.pod
   pod/perl573delta.pod pod/perl58delta.pod pod/perl581delta.pod
   pod/perl590delta.pod pod/perlhist.pod pod/perlmodlib.pod
-  pod/perltoc.pod pod.lst Porting/Glossary Porting/repository.pod
+  pod/perltoc.pod pod.lst Porting/Glossary pod/perlrepository.pod
   Porting/checkAUTHORS.pl
-  ext/Compress/Raw/Zlib/Changes ext/Compress/Raw/Zlib/README
-  ext/Compress/Zlib/Changes ext/Cwd/Changes ext/DB_File/Changes
-  ext/Encode/Changes ext/Sys/Syslog/Changes ext/Time/HiRes/Changes
-  ext/Win32API/File/Changes lib/CGI/Changes lib/ExtUtils/CBuilder/Changes
+  ext/Compress-Raw-Zlib/Changes ext/Compress-Raw-Zlib/README
+  ext/Compress-Zlib/Changes ext/Cwd/Changes ext/DB_File/Changes
+  ext/Encode/Changes ext/Sys-Syslog/Changes ext/Time-HiRes/Changes
+  ext/Win32API-File/Changes lib/CGI/Changes lib/ExtUtils/CBuilder/Changes
   lib/ExtUtils/Changes lib/ExtUtils/NOTES lib/ExtUtils/PATCHING
   lib/ExtUtils/README lib/Module/Build/Changes lib/Net/Ping/Changes
   lib/Test/Harness/Changes
@@ -721,7 +721,7 @@ be kept as clean as possible.
   ext/DB_File/t/db-hash.t
   ext/DB_File/t/db-recno.t
   ext/DynaLoader/t/DynaLoader.t
-  ext/File/Glob/t/basic.t
+  ext/File-Glob/t/basic.t
   ext/GDBM_File/t/gdbm.t
   ext/POSIX/t/sysconf.t
   ext/POSIX/t/time.t

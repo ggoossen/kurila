@@ -16,9 +16,7 @@ our $got_files = 0 # set to 1 to generate output files.
 $^OUTPUT_AUTOFLUSH = 1
 
 my $Is_MacOS = $^OS_NAME eq 'MacOS'
-my $tmpfile = "tmp0000"
-1 while -e ++$tmpfile
-END { 1 while unlink $tmpfile }
+my $tmpfile = tempfile()
 
 my @prgs = $@ 
 my @w_files = $@ 
@@ -83,16 +81,16 @@ for ( @prgs)
     
     my(@: $prog,$expected) =  split(m/\nEXPECT(?:\n|$)/, $_, 2)
 
-    my ($todo, $todo_reason)
-    $todo = $prog =~ s/^#\s*TODO\s*(.*)\n//m and $todo_reason = $1
-    # If the TODO reason starts ? then it's taken as a code snippet to evaluate
-    # This provides the flexibility to have conditional TODOs
-    if ($todo_reason && $todo_reason =~ s/^\?//)
-        my $temp = eval $todo_reason
-        if ($^EVAL_ERROR)
-            die "# In TODO code reason:\n# $todo_reason\n$($^EVAL_ERROR->message)"
-        
-        $todo_reason = $temp
+    my %reason;
+    foreach my $what (qw(skip todo))
+        $prog =~ s/^#\s*\U$what\E\s*(.*)\n//m and %reason{+$what} = $1
+        # If the SKIP reason starts ? then it's taken as a code snippet to
+        # evaluate. This provides the flexibility to have conditional SKIPs
+        if (%reason{?$what} && %reason{$what} =~ s/^\?//)
+            my $temp = eval %reason{$what}
+            if ($^EVAL_ERROR)
+                die "# In \U$what\E code reason:\n# %reason{$what}\n$($^EVAL_ERROR->message)"
+            %reason{$what} = $temp
     
     if ( $prog =~ m/--FILE--/)
         my @files = split(m/\n--FILE--\s*([^\s\n]*)\s*\n/, $prog) 
@@ -115,7 +113,6 @@ for ( @prgs)
         shift @files 
         $prog = shift @files 
     
-
     # fix up some paths
     if ($Is_MacOS)
         $prog =~ s|require "./abc(d)?";|require ":abc$1";|g
@@ -137,8 +134,8 @@ for ( @prgs)
     my $status = $^CHILD_ERROR
     $results =~ s/\n+$//
     # allow expected output to be written as if $prog is on STDIN
-    $results =~ s/tmp\d+/-/g
-    $results =~ s|at \.\./lib/warnings\.pm line \d+ character \d+\.|at .../warnings.pm line xxx.|g
+    $results =~ s/$::tempfile_regexp/-/g
+    $results =~ s[at \.\./lib/warnings\.pm line \d+ character \d+\.][at .../warnings.pm line xxx.]g
     if ($^OS_NAME eq 'VMS')
         # some tests will trigger VMS messages that won't be expected
         $results =~ s/\n?%[A-Z]+-[SIWEF]-[A-Z]+,.*//
@@ -171,7 +168,6 @@ for ( @prgs)
                 $option_random = 1
             else
                 die "$^PROGRAM_NAME: Unknown OPTION '$option'\n"
-            
         
     
     die "$^PROGRAM_NAME: can't have OPTION regex and random\n"
@@ -189,13 +185,12 @@ for ( @prgs)
     else
         $ok = $results eq $expected
 
-        $src =~ s/\nEXPECT(?:\n|$)(.|\n)*/\nEXPECT\n$results/
+    $src =~ s/\nEXPECT(?:\n|$)(.|\n)*/\nEXPECT\n$results/
     
     print $out_file, $src, "\n########\n" if $got_files
 
-    our $TODO = $todo ?? $todo_reason !! 0
-
-    print_err_line( $switch, $prog, $expected, $results, $todo, $file ) unless $ok or $TODO
+    local our $TODO = %reason{?'todo'}
+    print_err_line( $switch, $prog, $expected, $results, $TODO, $file ) unless $ok or $TODO
 
     ok($ok)
 

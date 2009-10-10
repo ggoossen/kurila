@@ -26,13 +26,6 @@
 #endif
 
 #ifdef PerlIO
-#if defined(MACOS_TRADITIONAL) && defined(USE_SFIO)
-#define PERLIO_IS_STDIO 1
-#undef setbuf
-#undef setvbuf
-#define setvbuf		_stdsetvbuf
-#define setbuf(f,b)	( __sf_setbuf(f,b) )
-#endif
 typedef int SysRet;
 typedef PerlIO * InputStream;
 typedef PerlIO * OutputStream;
@@ -57,11 +50,11 @@ typedef FILE * OutputStream;
 # define NORETURN_FUNCTION_END /* NOT REACHED */ return 0
 #endif
 
-static int not_here(const char *s) __attribute__noreturn__;
+static int not_here(pTHX_ const char *s) __attribute__noreturn__;
 static int
-not_here(const char *s)
+not_here(pTHX_ const char *s)
 {
-    croak("%s not implemented on this architecture", s);
+    croak(aTHX_ "%s not implemented on this architecture", s);
     NORETURN_FUNCTION_END;
 }
 
@@ -121,7 +114,12 @@ io_blocking(pTHX_ InputStream f, int block)
     }
     return RETVAL;
 #else
+#   ifdef WIN32
+    char flags = (char)block;
+    return ioctl(PerlIO_fileno(f), FIONBIO, &flags);
+#   else
     return -1;
+#   endif
 #endif
 }
 
@@ -133,21 +131,10 @@ fgetpos(handle)
     CODE:
 	if (handle) {
 #ifdef PerlIO
-#if PERL_VERSION < 8
-	    Fpos_t pos;
-	    ST(0) = sv_newmortal();
-	    if (PerlIO_getpos(handle, &pos) != 0) {
-		ST(0) = &PL_sv_undef;
-	    }
-	    else {
-		sv_setpvn(ST(0), (char *)&pos, sizeof(Fpos_t));
-	    }
-#else
 	    ST(0) = sv_newmortal();
 	    if (PerlIO_getpos(handle, ST(0)) != 0) {
 		ST(0) = &PL_sv_undef;
 	    }
-#endif
 #else
 	    Fpos_t pos;
 	    if (fgetpos(handle, &pos)) {
@@ -169,19 +156,7 @@ fsetpos(handle, pos)
     CODE:
 	if (handle) {
 #ifdef PerlIO
-#if PERL_VERSION < 8
-	    char *p;
-	    STRLEN len;
-	    if (SvOK(pos) && (p = SvPV(pos,len)) && len == sizeof(Fpos_t)) {
-		RETVAL = PerlIO_setpos(handle, (Fpos_t*)p);
-	    }
-	    else {
-		RETVAL = -1;
-		errno = EINVAL;
-	    }
-#else
 	    RETVAL = PerlIO_setpos(handle, pos);
-#endif
 #else
 	    char *p;
 	    STRLEN len;
@@ -382,7 +357,7 @@ setbuf(handle, ...)
 	    setbuf(handle, buf);
 	}
 #else
-	    not_here("IO::Handle::setbuf");
+	    not_here(aTHX_ "IO::Handle::setbuf");
 #endif
 
 SysRet
@@ -413,7 +388,7 @@ setvbuf(...)
 	}
     }
 #else
-	RETVAL = (SysRet) not_here("IO::Handle::setvbuf");
+	RETVAL = (SysRet) not_here(aTHX_ "IO::Handle::setvbuf");
 #endif
     OUTPUT:
 	RETVAL

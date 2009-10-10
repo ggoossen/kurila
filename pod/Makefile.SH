@@ -56,7 +56,7 @@ CPS = $cp
 ## In the following dollars and backticks do not need the extra backslash.
 $spitshell >>Makefile <<'!NO!SUBS!'
 
-CONVERTERS = pod2html pod2latex pod2man pod2text checkpods \
+CONVERTERS = pod2html pod2latex pod2man pod2text \
 		pod2usage podchecker podselect
 
 HTMLROOT = /	# Change this to fix cross-references in HTML
@@ -75,10 +75,6 @@ FIXIN = "-I../lib" "-MExtUtils::MY" -e "MY->fixin(shift @ARGV)"
 all: $(CONVERTERS) man
 
 converters: $(CONVERTERS)
-
-regen_pods: perlmodlib.pod toc
-
-kurilatoc.pod:	buildtoc
 
 man:	pod2man $(MAN)
 
@@ -130,9 +126,9 @@ distclean:	realclean
 veryclean:	distclean
 	-rm -f *~ *.orig
 
-check:	checkpods
+check:	podchecker
 	@echo "checking..."; \
-	$(PERL) -I../lib checkpods $(POD)
+	$(PERL) -I../lib podchecker $(POD)
 
 # Dependencies.
 pod2html:	pod2html.pl ../config.sh
@@ -151,10 +147,6 @@ pod2text:	pod2text.pl ../config.sh
 	$(CPS) $@.pl $@
 	$(LDLIBPTH) $(PERL) $(FIXIN) $@
 
-checkpods:	checkpods.pl ../config.sh
-	$(CPS) $@.pl $@
-	$(LDLIBPTH) $(PERL) $(FIXIN) $@
-
 pod2usage:	pod2usage.pl ../config.sh
 	$(CPS) $@.pl $@
 	$(LDLIBPTH) $(PERL) $(FIXIN) $@
@@ -166,9 +158,5 @@ podchecker:	podchecker.pl ../config.sh
 podselect:	podselect.pl ../config.sh
 	$(CPS) $@.pl $@
 	$(LDLIBPTH) $(PERL) $(FIXIN) $@
-
-perlmodlib.pod:	$(PERL) perlmodlib.PL ../MANIFEST
-	rm -f perlmodlib.pod
-	$(PERL) -I ../lib perlmodlib.PL
 
 !NO!SUBS!

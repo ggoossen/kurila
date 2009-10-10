@@ -148,6 +148,7 @@ for file in `$cat .clist`; do
         $sed \
     	    -e '/^#.*<stdin>/d' \
 	    -e '/^#.*"-"/d' \
+	    -e '/^#.*git_version\.h/d' \
 	    -e 's#\.[0-9][0-9]*\.c#'"$file.c#" \
 	    -e 's/^[	 ]*#[	 ]*line/#/' \
 	    -e '/^# *[0-9][0-9]* *[".\/]/!d' \
@@ -168,6 +169,7 @@ for file in `$cat .clist`; do
 	    -e '/^#.*"-"/d' \
 	    -e '/^#.*"\/.*\/"/d' \
 	    -e '/: file path prefix .* never used$/d' \
+	    -e '/^#.*git_version\.h/d' \
 	    -e 's#\.[0-9][0-9]*\.c#'"$file.c#" \
 	    -e 's/^[	 ]*#[	 ]*line/#/' \
 	    -e '/^# *[0-9][0-9]* *[".\/]/!d' \
@@ -177,6 +179,7 @@ for file in `$cat .clist`; do
            -e 's|\.c\.c|.c|' $uwinfix .cout .cerr| \
         $uniq | $sort | $uniq >> .deptmp
     fi
+    echo "$filebase\$(OBJ_EXT): cflags" >> .deptmp
 done
 
 $sed <$mf >$mf.new -e '1,/^# AUTOMATICALLY/!d'
@@ -209,7 +212,7 @@ if $test -s .deptmp; then
     $echo "# If this runs make out of memory, delete /usr/include lines." \
 	>> $mf.new
     if [ "$osname" = vos ]; then
-        $sed 's|.incl.c|.h|' .deptmp >.deptmp.vos
+        $sed 's|\.incl\.c|.h|' .deptmp >.deptmp.vos
         mv -f .deptmp.vos .deptmp
     fi
     $sed 's|^\(.*\$(OBJ_EXT):\) *\(.*/.*\.c\) *$|\1 \2; '"$defrule \2|" .deptmp \

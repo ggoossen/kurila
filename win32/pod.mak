@@ -1,4 +1,4 @@
-CONVERTERS = pod2html pod2latex pod2man pod2text checkpods \
+CONVERTERS = pod2html pod2latex pod2man pod2text \
 		pod2usage podchecker podselect
 
 HTMLROOT = /	# Change this to fix cross-references in HTML
@@ -14,11 +14,14 @@ converters: $(CONVERTERS)
 PERL = ..\miniperl.exe
 REALPERL = ..\perl.exe
 
+ICWD = -I..\ext\Cwd
+
 POD = \
 	perl.pod	\
 	perl5004delta.pod	\
 	perl5005delta.pod	\
 	perl5100delta.pod	\
+	perl5101delta.pod	\
 	perl5110delta.pod	\
 	perl561delta.pod	\
 	perl56delta.pod	\
@@ -34,6 +37,7 @@ POD = \
 	perl586delta.pod	\
 	perl587delta.pod	\
 	perl588delta.pod	\
+	perl589delta.pod	\
 	perl58delta.pod	\
 	perl590delta.pod	\
 	perl591delta.pod	\
@@ -98,7 +102,6 @@ POD = \
 	perlobj.pod	\
 	perlop.pod	\
 	perlopentut.pod	\
-	perlothrtut.pod	\
 	perlpacktut.pod	\
 	perlpod.pod	\
 	perlpodspec.pod	\
@@ -111,6 +114,7 @@ POD = \
 	perlref.pod	\
 	perlreftut.pod	\
 	perlreguts.pod	\
+	perlrepository.pod	\
 	perlrequick.pod	\
 	perlreref.pod	\
 	perlretut.pod	\
@@ -132,6 +136,7 @@ POD = \
 	perlunitut.pod	\
 	perlutil.pod	\
 	perlvar.pod	\
+	perlvms.pod	\
 	perlxs.pod	\
 	perlxstut.pod	
 
@@ -140,6 +145,7 @@ MAN = \
 	perl5004delta.man	\
 	perl5005delta.man	\
 	perl5100delta.man	\
+	perl5101delta.man	\
 	perl5110delta.man	\
 	perl561delta.man	\
 	perl56delta.man	\
@@ -155,6 +161,7 @@ MAN = \
 	perl586delta.man	\
 	perl587delta.man	\
 	perl588delta.man	\
+	perl589delta.man	\
 	perl58delta.man	\
 	perl590delta.man	\
 	perl591delta.man	\
@@ -219,7 +226,6 @@ MAN = \
 	perlobj.man	\
 	perlop.man	\
 	perlopentut.man	\
-	perlothrtut.man	\
 	perlpacktut.man	\
 	perlpod.man	\
 	perlpodspec.man	\
@@ -232,6 +238,7 @@ MAN = \
 	perlref.man	\
 	perlreftut.man	\
 	perlreguts.man	\
+	perlrepository.man	\
 	perlrequick.man	\
 	perlreref.man	\
 	perlretut.man	\
@@ -253,6 +260,7 @@ MAN = \
 	perlunitut.man	\
 	perlutil.man	\
 	perlvar.man	\
+	perlvms.man	\
 	perlxs.man	\
 	perlxstut.man	
 
@@ -261,6 +269,7 @@ HTML = \
 	perl5004delta.html	\
 	perl5005delta.html	\
 	perl5100delta.html	\
+	perl5101delta.html	\
 	perl5110delta.html	\
 	perl561delta.html	\
 	perl56delta.html	\
@@ -276,6 +285,7 @@ HTML = \
 	perl586delta.html	\
 	perl587delta.html	\
 	perl588delta.html	\
+	perl589delta.html	\
 	perl58delta.html	\
 	perl590delta.html	\
 	perl591delta.html	\
@@ -340,7 +350,6 @@ HTML = \
 	perlobj.html	\
 	perlop.html	\
 	perlopentut.html	\
-	perlothrtut.html	\
 	perlpacktut.html	\
 	perlpod.html	\
 	perlpodspec.html	\
@@ -353,6 +362,7 @@ HTML = \
 	perlref.html	\
 	perlreftut.html	\
 	perlreguts.html	\
+	perlrepository.html	\
 	perlrequick.html	\
 	perlreref.html	\
 	perlretut.html	\
@@ -373,6 +383,7 @@ HTML = \
 	perlunitut.html	\
 	perlutil.html	\
 	perlvar.html	\
+	perlvms.html	\
 	perlxs.html	\
 	perlxstut.html	
 # not kurilatoc.html
@@ -382,6 +393,7 @@ TEX = \
 	perl5004delta.tex	\
 	perl5005delta.tex	\
 	perl5100delta.tex	\
+	perl5101delta.tex	\
 	perl5110delta.tex	\
 	perl561delta.tex	\
 	perl56delta.tex	\
@@ -397,6 +409,7 @@ TEX = \
 	perl586delta.tex	\
 	perl587delta.tex	\
 	perl588delta.tex	\
+	perl589delta.tex	\
 	perl58delta.tex	\
 	perl590delta.tex	\
 	perl591delta.tex	\
@@ -461,7 +474,6 @@ TEX = \
 	perlobj.tex	\
 	perlop.tex	\
 	perlopentut.tex	\
-	perlothrtut.tex	\
 	perlpacktut.tex	\
 	perlpod.tex	\
 	perlpodspec.tex	\
@@ -474,6 +486,7 @@ TEX = \
 	perlref.tex	\
 	perlreftut.tex	\
 	perlreguts.tex	\
+	perlrepository.tex	\
 	perlrequick.tex	\
 	perlreref.tex	\
 	perlretut.tex	\
@@ -495,6 +508,7 @@ TEX = \
 	perlunitut.tex	\
 	perlutil.tex	\
 	perlvar.tex	\
+	perlvms.tex	\
 	perlxs.tex	\
 	perlxstut.tex	
 
@@ -545,31 +559,28 @@ realclean:	clean
 
 distclean:	realclean
 
-check:	checkpods
+check:	podchecker
 	@echo "checking..."; \
-	$(PERL) -I../lib checkpods $(POD)
+	$(PERL) -I../lib podchecker $(POD)
 
 # Dependencies.
 pod2latex:	pod2latex.PL ../lib/Config.pm
-	$(PERL) -I../lib pod2latex.PL
+	$(PERL) -I../lib $(ICWD) pod2latex.PL
 
 pod2html:	pod2html.PL ../lib/Config.pm
-	$(PERL) -I ../lib pod2html.PL
+	$(PERL) -I ../lib $(ICWD) pod2html.PL
 
 pod2man:	pod2man.PL ../lib/Config.pm
-	$(PERL) -I ../lib pod2man.PL
+	$(PERL) -I ../lib $(ICWD) pod2man.PL
 
 pod2text:	pod2text.PL ../lib/Config.pm
-	$(PERL) -I ../lib pod2text.PL
-
-checkpods:	checkpods.PL ../lib/Config.pm
-	$(PERL) -I ../lib checkpods.PL
+	$(PERL) -I ../lib $(ICWD) pod2text.PL
 
 pod2usage:	pod2usage.PL ../lib/Config.pm
-	$(PERL) -I ../lib pod2usage.PL
+	$(PERL) -I ../lib $(ICWD) pod2usage.PL
 
 podchecker:	podchecker.PL ../lib/Config.pm
-	$(PERL) -I ../lib podchecker.PL
+	$(PERL) -I ../lib $(ICWD) podchecker.PL
 
 podselect:	podselect.PL ../lib/Config.pm
-	$(PERL) -I ../lib podselect.PL
+	$(PERL) -I ../lib $(ICWD) podselect.PL

@@ -32,7 +32,7 @@ if ($^OS_NAME ne 'MacOS')
 
     if ($^OS_NAME ne 'VMS')
         my $posix_ok = try { require POSIX; }
-        my $wait_macros_ok = defined &POSIX::WIFEXITED
+        my $wait_macros_ok = exists &POSIX::WIFEXITED
 
         $exit = run('exit 42')
         is( $exit >> 8, 42,             'Non-zero exit' )

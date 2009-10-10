@@ -47,7 +47,7 @@ sub openhandle($fh)
     defined(fileno($fh)) ?? $fh !! undef
 
 
-eval <<'ESQ' unless defined &dualvar
+eval <<'ESQ' unless exists &dualvar
 
 our @EXPORT_FAIL;
 push @EXPORT_FAIL, qw(weaken isweak dualvar isvstring);

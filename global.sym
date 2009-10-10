@@ -3,7 +3,7 @@
 #    global.sym
 #
 #    Copyright (C) 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-#    2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, by Larry Wall and others
+#    2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, by Larry Wall and others
 #
 #    You may distribute under the terms of either the GNU General Public
 #    License or the Artistic License, as specified in the README file.
@@ -52,12 +52,14 @@ Perl_SvPVX_mutable
 Perl_SvREFCNT_dec
 Perl_SvREFCNT_inc
 Perl_SvTMPREFCNT_inc
+Perl_del_body_allocated
 Perl_sv_cp_replace
 Perl_SvIV
 Perl_SvUV
 Perl_SvNV
 Perl_SvCUR
 Perl_SvCUR_set
+Perl_SvOURGV
 Perl_SvPVx_nolen
 Perl_SvPVx_nolen_const
 Perl_SvTRUE
@@ -66,8 +68,12 @@ Perl_loc_desc
 Perl_loc_name
 Perl_SvNAME
 Perl_LocationFilename
-Perl_PushBlock
-Perl_PopBlock
+Perl_Dtype
+Perl_Ddesc
+Perl_push_block
+Perl_pop_block
+Perl_push_stack
+Perl_pop_stack
 Perl_cx_free_eval
 Perl_av_clear
 Perl_av_delete
@@ -95,21 +101,6 @@ Perl_my_chsize
 Perl_croak
 Perl_croak_at
 Perl_vcroak
-Perl_croak_nocontext
-Perl_die_nocontext
-Perl_deb_nocontext
-Perl_form_nocontext
-Perl_load_module_nocontext
-Perl_mess_nocontext
-Perl_warn_nocontext
-Perl_warner_nocontext
-Perl_newSVpvf_nocontext
-Perl_sv_catpvf_nocontext
-Perl_sv_setpvf_nocontext
-Perl_sv_catpvf_mg_nocontext
-Perl_sv_setpvf_mg_nocontext
-Perl_fprintf_nocontext
-Perl_printf_nocontext
 Perl_cv_const_sv
 Perl_cv_assignarg_flag
 Perl_cv_optassignarg_flag
@@ -158,10 +149,10 @@ Perl_fbm_instr
 Perl_form
 Perl_vform
 Perl_free_tmps
-Perl_tmps_tmprefcnt
 Perl_gp_free
 Perl_gp_tmprefcnt
 Perl_gp_ref
+Perl_gv_add_by_type
 Perl_gv_AVadd
 Perl_gv_HVadd
 Perl_gv_IOadd
@@ -172,6 +163,7 @@ Perl_gv_fetchfile
 Perl_gv_fetchfile_flags
 Perl_gv_fetchmeth
 Perl_gv_fetchmethod
+Perl_gv_fetchmethod_flags
 Perl_gv_fetchpv
 Perl_gv_fullname3
 Perl_gv_init
@@ -214,7 +206,6 @@ Perl_to_uni_upper_lc
 Perl_to_uni_title_lc
 Perl_to_uni_lower_lc
 Perl_is_uni_alnum
-Perl_is_uni_alnumc
 Perl_is_uni_idfirst
 Perl_is_uni_alpha
 Perl_is_uni_ascii
@@ -232,7 +223,6 @@ Perl_to_uni_title
 Perl_to_uni_lower
 Perl_to_uni_fold
 Perl_is_uni_alnum_lc
-Perl_is_uni_alnumc_lc
 Perl_is_uni_idfirst_lc
 Perl_is_uni_alpha_lc
 Perl_is_uni_ascii_lc
@@ -250,7 +240,6 @@ Perl_is_utf8_string
 Perl_is_utf8_string_loc
 Perl_is_utf8_string_loclen
 Perl_is_utf8_alnum
-Perl_is_utf8_alnumc
 Perl_is_utf8_idfirst
 Perl_is_utf8_idcont
 Perl_is_utf8_alpha
@@ -432,6 +421,7 @@ Perl_pregfree2
 Perl_preg_tmprefcnt
 Perl_reg_temp_copy
 Perl_regfree_internal
+Perl_reg_tmprefcnt_internal
 Perl_pregcomp
 Perl_re_compile
 Perl_re_intuit_start
@@ -468,6 +458,8 @@ Perl_save_ary
 Perl_save_bool
 Perl_save_clearsv
 Perl_save_delete
+Perl_save_hdelete
+Perl_save_adelete
 Perl_save_destructor
 Perl_save_destructor_x
 Perl_save_freesv
@@ -499,6 +491,7 @@ Perl_save_padsv_and_mortalize
 Perl_save_set_magicsv
 Perl_save_sptr
 Perl_save_svref
+Perl_save_pushptr
 Perl_scan_bin
 Perl_scan_hex
 Perl_scan_num
@@ -526,7 +519,6 @@ Perl_sv_uv
 Perl_sv_nv
 Perl_sv_pvn
 Perl_sv_pvutf8n
-Perl_sv_true
 Perl_sv_backoff
 Perl_sv_bless
 Perl_sv_catpvf
@@ -551,6 +543,7 @@ Perl_sv_gets
 Perl_sv_grow
 Perl_sv_inc
 Perl_sv_insert
+Perl_sv_insert_flags
 Perl_sv_isa
 Perl_sv_isobject
 Perl_sv_len

@@ -635,7 +635,7 @@ sub runloop($n, $c)
     
 
     my ($subcode, $subref)
-    if (ref $c eq 'CODE')
+    if (ref::svtype($c) eq 'CODE')
         $subcode = "sub \{ for (1 .. $n) \{ package $pack; \$c->(); \} \}"
         $subref  = eval $subcode
     else

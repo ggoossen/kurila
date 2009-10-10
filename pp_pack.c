@@ -1,7 +1,7 @@
 /*    pp_pack.c
  *
- *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
- *    2000, 2001, 2002, 2003, 2004, 2005, 2006, by Larry Wall and others
+ *    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+ *    2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by Larry Wall and others
  *
  *    You may distribute under the terms of either the GNU General Public
  *    License or the Artistic License, as specified in the README file.
@@ -14,6 +14,8 @@
  * wooden spoon, a short two-pronged fork and some skewers were stowed; and
  * hidden at the bottom of the pack in a flat wooden box a dwindling treasure,
  * some salt.
+ *
+ *     [p.653 of _The Lord of the Rings_, IV/iv: "Of Herbs and Stewed Rabbit"]
  */
 
 /* This file contains pp ("push/pop") functions that
@@ -68,10 +70,8 @@ typedef struct tempsym {
 	(symptr)->previous = NULL;	\
    } STMT_END
 
-#if PERL_VERSION >= 9
-# define PERL_PACK_CAN_BYTEORDER
-# define PERL_PACK_CAN_SHRIEKSIGN
-#endif
+#define PERL_PACK_CAN_BYTEORDER
+#define PERL_PACK_CAN_SHRIEKSIGN
 
 #ifndef CHAR_BIT
 # define CHAR_BIT	8
@@ -1352,20 +1352,6 @@ S_unpack_rec(pTHX_ tempsym_t* symptr, const char *s, const char *strbeg, const c
 	    if (howlen == e_star || len > (strend - s) * 8)
 		len = (strend - s) * 8;
 	    if (checksum) {
-		if (!PL_bitcount) {
-		    int bits;
-		    Newxz(PL_bitcount, 256, char);
-		    for (bits = 1; bits < 256; bits++) {
-			if (bits & 1)	PL_bitcount[bits]++;
-			if (bits & 2)	PL_bitcount[bits]++;
-			if (bits & 4)	PL_bitcount[bits]++;
-			if (bits & 8)	PL_bitcount[bits]++;
-			if (bits & 16)	PL_bitcount[bits]++;
-			if (bits & 32)	PL_bitcount[bits]++;
-			if (bits & 64)	PL_bitcount[bits]++;
-			if (bits & 128)	PL_bitcount[bits]++;
-		    }
-		}
 		if (utf8)
 		    while (len >= 8 && s < strend) {
 			cuv += PL_bitcount[uni_to_byte(aTHX_ &s, strend, datumtype)];
@@ -3139,7 +3125,7 @@ PP(pp_pack)
     register const char *patend = pat + fromlen;
 
     MARK++;
-    sv_setpvn(cat, "", 0);
+    sv_setpvs(cat, "");
 
     packlist(cat, pat, patend, MARK, SP + 1);
 

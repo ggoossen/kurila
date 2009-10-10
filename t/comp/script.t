@@ -3,7 +3,6 @@
 BEGIN 
     require './test.pl'	# for which_perl() etc
 
-
 my $Perl = which_perl()
 
 print $^STDOUT, "1..3\n"

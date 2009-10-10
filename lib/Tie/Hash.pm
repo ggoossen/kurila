@@ -173,7 +173,7 @@ proper time, see L<perltie>.
 C<SCALAR> is only defined in B<Tie::StdHash> and B<Tie::ExtraHash>.
 
 If needed, these methods should be defined by the package inheriting from
-B<Tie::Hash>, B<Tie::StdHash>, or B<Tie::ExtraHash>. See L<pertie/"SCALAR">
+B<Tie::Hash>, B<Tie::StdHash>, or B<Tie::ExtraHash>. See L<perltie/"SCALAR">
 to find out what happens when C<SCALAR> does not exist.
 
 =head1 MORE INFORMATION
@@ -196,7 +196,7 @@ sub new
 
 sub TIEHASH
     my $pkg = shift
-    if (defined Symbol::fetch_glob("$($pkg)::new")->&)
+    if (exists Symbol::fetch_glob("$($pkg)::new")->&)
         warnings::warnif("WARNING: calling $($pkg)->new since $($pkg)->TIEHASH is missing")
         $pkg->new(< @_)
     else

@@ -35,7 +35,8 @@ do
     dies_like( sub (@< @_) { %hash = (%:  \( 1..3 ) ); }, qr/reference as string/ )
 
     @warnings = $@
-    dies_like( sub (@< @_) { %hash = (%:  sub (@< @_) { print $^STDOUT, "fenice" } ); }, qr/reference as string/ )
+    dies_like( sub (@< @_) { %hash = (%:  sub (@< @_) { print $^STDOUT, "fenice" } ); },
+               qr/CODE can not be used as a string/ )
 
     @warnings = $@
     $_ = \%:  < 1..10 

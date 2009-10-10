@@ -16,8 +16,6 @@
 # In this file, we use the latter "Baby Perl" approach, and increment
 # will be worked over by t/op/inc.t
 
-use env
-
 our ($Level, $TODO, $NO_ENDING)
 
 $Level = 1
@@ -260,8 +258,7 @@ sub like_yn ($flip, $got, $expected, ?$name, @< @mess)
     $pass = $got !~ m/$expected/ if $flip
     unless ($pass)
         unshift(@mess, "#      got '$got'\n",
-            $flip
-            ?? "# expected !~ m/$expected/\n" !! "# expected m/$expected/\n")
+            $flip ?? "# expected !~ m/$expected/\n" !! "# expected m/$expected/\n")
     
     local $Level = $Level + 1
     _ok($pass, _where(), $name, < @mess)
@@ -540,16 +537,41 @@ sub which_perl
 
 
 sub unlink_all
-    foreach my $file ( @_)
+    foreach my $file (@_)
         1 while unlink $file
         _print_stderr "# Couldn't unlink '$file': $^OS_ERROR\n" if -f $file
-    
 
 
+my %tmpfiles;
+END { unlink_all < keys %tmpfiles }
 
-my $tmpfile = "misctmp000"
-1 while -f ++$tmpfile
-END { unlink_all $tmpfile }
+# A regexp that matches the tempfile names
+$::tempfile_regexp = 'tmp\d+[A-Z][A-Z]?'
+
+# Avoid ++, avoid ranges, avoid split //
+my @letters = qw(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
+sub tempfile()
+    my $count = 0
+    loop
+        my $temp = $count
+        my $try = "tmp$^PID"
+        loop
+            $try .= @letters[$temp % 26]
+            $temp = int ($temp / 26)
+        while $temp
+        # Need to note all the file names we allocated, as a second request may
+        # come before the first is created.
+        if (!-e $try && !%tmpfiles{?$try})
+            # We have a winner
+            %tmpfiles{+$try}++
+            return $try
+
+        $count = $count + 1
+    while ($count +< 26 * 26)
+    die "Can't find temporary file name starting 'tmp$^PID'"
+
+# This is the temporary file for _fresh_perl
+my $tmpfile = tempfile();
 
 #
 # _fresh_perl
@@ -585,8 +607,8 @@ sub _fresh_perl
 
     # Clean up the results into something a bit more predictable.
     $results =~ s/\n+$//
-    $results =~ s/at\s+misctmp\d+\s+line/at - line/g
-    $results =~ s/of\s+misctmp\d+\s+aborted/of - aborted/g
+    $results =~ s/at\s+$::tempfile_regexp\s+line/at - line/g;
+    $results =~ s/of\s+$::tempfile_regexp\s+aborted/of - aborted/g;
 
     # bison says 'parse error' instead of 'syntax error',
     # various yaccs may or may not capitalize 'syntax'.
@@ -600,7 +622,7 @@ sub _fresh_perl
         $results =~ s/\n\n/\n/g
     
 
-    my $pass = $resolve->($results)
+    my $pass = $resolve <: $results
     unless ($pass)
         _diag "# PROG: \n$prog\n"
         _diag "# EXPECTED:\n", $resolve->(), "\n"
@@ -624,14 +646,16 @@ sub _fresh_perl
 # Combination of run_perl() and is().
 #
 
-sub fresh_perl_is
-    my(@: $prog, $expected, ?$runperl_args, ?$name) =  @_
+sub fresh_perl_is($prog, $expected, ?$runperl_args, ?$name)
+
+    # _fresh_perl() is going to clip the trailing newlines off the result.
+    # This will make it so the test author doesn't have to know that.
+    $expected =~ s/\n+$//
+
     local $Level = 2
-    $expected =~ s/\n+$// # is also removed from program output
     _fresh_perl($prog,
                 sub (@< @_) { (nelems @_) ?? @_[0] eq $expected !! $expected },
                 $runperl_args, $name)
-
 
 #
 # fresh_perl_like
@@ -699,8 +723,6 @@ WHOA
         elsif( !$rslt )
             my $ref = ref $object
             $diag = "$obj_name isn't a '$class' it's a '$ref'"
-        
-    
 
     _ok( !$diag, _where(), $name )
 
@@ -737,7 +759,97 @@ sub eval_dies_like ($e, $qr, ?$name)
             return ok(0, $name)
         
         return like_yn(0, $err->{description}, $qr, $name )
-    
 
+# Set a watchdog to timeout the entire test file
+# NOTE:  If the test file uses 'threads', then call the watchdog() function
+#        _AFTER_ the 'threads' module is loaded.
+sub watchdog($timeout)
+    my $timeout_msg = 'Test process timed out - terminating'
 
-1
+    my $pid_to_kill = $^PID   # PID for this process
+
+    # Don't use a watchdog process if 'threads' is loaded -
+    #   use a watchdog thread instead
+    if (! $threads::threads)
+
+        # On Windows and VMS, try launching a watchdog process
+        #   using system(1, ...) (see perlport.pod)
+        if (($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'VMS'))
+            # On Windows, try to get the 'real' PID
+            if ($^OS_NAME eq 'MSWin32')
+                try require Win32
+                if (defined(&Win32::GetCurrentProcessId))
+                    $pid_to_kill = Win32::GetCurrentProcessId()
+
+            # If we still have a fake PID, we can't use this method at all
+            return if ($pid_to_kill +<= 0)
+
+            # Launch watchdog process
+            my $watchdog
+            try
+                local $^WARN_HOOK = sub($err)
+                    _diag("Watchdog warning: $($err->message)")
+
+                my $sig = $^OS_NAME eq 'VMS' ?? 'TERM' !! 'KILL'
+                $watchdog = system(1, which_perl(), '-e',
+                                                    "sleep($timeout);" .
+                                                    "warn('# $timeout_msg\n');" .
+                                                    "kill($sig, $pid_to_kill);")
+
+            if ($^EVAL_ERROR || ($watchdog +<= 0))
+                _diag('Failed to start watchdog')
+                _diag($^EVAL_ERROR) if $^EVAL_ERROR
+                undef($watchdog)
+                return
+
+            # Add END block to parent to terminate and
+            #   clean up watchdog process
+            eval "END \{ local \$^CHILD_ERROR = 0;
+                         wait() if kill('KILL', $watchdog); \};"
+            return
+
+        # Try using fork() to generate a watchdog process
+        my $watchdog
+        try { $watchdog = fork() }
+        if (defined($watchdog))
+            if ($watchdog)    # Parent process
+                # Add END block to parent to terminate and
+                #   clean up watchdog process
+                eval "END \{ local \$^OS_ERROR = 0; local \$^CHILD_ERROR = 0;
+                            wait() if kill('KILL', $watchdog); \};"
+                return
+
+            ### Watchdog process code
+
+            # Load POSIX if available
+            try { require POSIX; }
+
+            # Execute the timeout
+            sleep($timeout - 2) if ($timeout +> 2)   # Workaround for perlbug #49073
+            sleep(2)
+
+            # Kill test process if still running
+            if (kill(0, $pid_to_kill))
+                _diag($timeout_msg)
+                kill('KILL', $pid_to_kill)
+
+            # Don't execute END block (added at beginning of this file)
+            $NO_ENDING = 1
+
+            # Terminate ourself (i.e., the watchdog)
+            POSIX::_exit(1) if (defined(&POSIX::_exit))
+            exit(1)
+
+        # fork() failed - fall through and try using a thread
+
+    # If everything above fails, then just use an alarm timeout
+    if (try { alarm($timeout); 1; })
+        # Load POSIX if available
+        try { require POSIX; }
+
+        # Alarm handler will do the actual 'killing'
+        signals::handler('ALRM') = sub()
+            _diag($timeout_msg)
+            POSIX::_exit(1) if (defined(&POSIX::_exit))
+            my $sig = $^OS_NAME eq 'VMS' ?? 'TERM' !! 'KILL'
+            kill($sig, $pid_to_kill)

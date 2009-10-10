@@ -182,9 +182,9 @@ my_inet_aton(register const char *cp, struct in_addr *addr)
 
 
 static int
-not_here(const char *s)
+not_here(pTHX_ const char *s)
 {
-    croak("Socket::%s not implemented on this architecture", s);
+    croak(aTHX_ "Socket::%s not implemented on this architecture", s);
     return -1;
 }
 
@@ -261,7 +261,7 @@ inet_ntoa(ip_address_sv)
 		    (ip_address[2] & 0xFF) <<  8 |
 		    (ip_address[3] & 0xFF);
 	else
-	        croak("Bad arg length for %s, length is %d, should be %d",
+	        croak(aTHX_ "Bad arg length for %s, length is %d, should be %d",
 		      "Socket::inet_ntoa",
 		      addrlen, sizeof(addr));
 	/* We could use inet_ntoa() but that is broken
@@ -286,7 +286,7 @@ sockaddr_family(sockaddr)
 	char *sockaddr_pv = SvPV(sockaddr, sockaddr_len);
 	CODE:
 	if (sockaddr_len < offsetof(struct sockaddr, sa_data)) {
-	    croak("Bad arg length for %s, length is %d, should be at least %d",
+	    croak(aTHX_ "Bad arg length for %s, length is %d, should be at least %d",
 	          "Socket::sockaddr_family", sockaddr_len,
 		  offsetof(struct sockaddr, sa_data));
 	}
@@ -333,7 +333,7 @@ pack_sockaddr_un(pathname)
 #  else	/* !( defined OS2 ) */
 	Copy( pathname_pv, sun_ad.sun_path, len, char );
 #  endif
-	if (0) not_here("dummy");
+	if (0) not_here(aTHX_ "dummy");
 	ST(0) = sv_2mortal(newSVpvn((char *)&sun_ad, sizeof sun_ad));
 #else
 	ST(0) = (SV *) not_here("pack_sockaddr_un");
@@ -364,7 +364,7 @@ unpack_sockaddr_un(sun_sv)
 	Copy( sun_ad, &addr, sizeof addr, char );
 
 	if ( addr.sun_family != AF_UNIX ) {
-	    croak("Bad address family for %s, got %d, should be %d",
+	    croak(aTHX_ "Bad address family for %s, got %d, should be %d",
 			"Socket::unpack_sockaddr_un",
 			addr.sun_family,
 			AF_UNIX);
@@ -399,7 +399,7 @@ pack_sockaddr_in(port, ip_address_sv)
 		    (ip_address[2] & 0xFF) <<  8 |
 		    (ip_address[3] & 0xFF);
 	else
-	        croak("Bad arg length for %s, length is %d, should be %d",
+	        croak(aTHX_ "Bad arg length for %s, length is %d, should be %d",
 		      "Socket::pack_sockaddr_in",
 		      addrlen, sizeof(addr));
 	Zero( &sin, sizeof sin, char );
@@ -420,13 +420,13 @@ unpack_sockaddr_in(sin_sv)
 	struct in_addr  ip_address;
 	char *	sin = SvPV(sin_sv,sockaddrlen);
 	if (sockaddrlen != sizeof(addr)) {
-	    croak("Bad arg length for %s, length is %d, should be %d",
+	    croak(aTHX_ "Bad arg length for %s, length is %d, should be %d",
 			"Socket::unpack_sockaddr_in",
 			sockaddrlen, sizeof(addr));
 	}
 	Copy( sin, &addr,sizeof addr, char );
 	if ( addr.sin_family != AF_INET ) {
-	    croak("Bad address family for %s, got %d, should be %d",
+	    croak(aTHX_ "Bad address family for %s, got %d, should be %d",
 			"Socket::unpack_sockaddr_in",
 			addr.sin_family,
 			AF_INET);
@@ -441,3 +441,54 @@ unpack_sockaddr_in(sin_sv)
                 av_push(av, newSVpvn((char *)&ip_address, sizeof ip_address));
 	}
         }
+
+void
+inet_ntop(af, ip_address_sv)
+        int     af
+        SV *    ip_address_sv
+        CODE:
+#ifdef HAS_INETNTOP
+	STRLEN addrlen, struct_size;
+	struct in6_addr addr;
+	char str[INET6_ADDRSTRLEN];
+	char *ip_address = SvPV(ip_address_sv, addrlen);
+
+        if(af == AF_INET) {
+            struct_size = sizeof(struct in_addr);
+        } else if(af == AF_INET6) {
+            struct_size = sizeof(struct in6_addr);
+        } else {
+           croak(aTHX_ "Bad address family for Socket::inet_ntop, got %d, should be either AF_INET or AF_INET6",
+               af);
+        }
+
+	Copy( ip_address, &addr, sizeof addr, char );
+	inet_ntop(af, &addr, str, INET6_ADDRSTRLEN);
+
+	ST(0) = sv_2mortal(newSVpv(str, strlen(str)));
+#else
+        ST(0) = (SV *)not_here("inet_ntop");
+#endif
+
+void
+inet_pton(af, host)
+        int           af
+        const char *  host
+        CODE:
+#ifdef HAS_INETPTON
+        int ok;
+        struct in6_addr ip_address;
+        if(af != AF_INET && af != AF_INET6) {
+           croak(aTHX_ "Bad address family for %s, got %d, should be either AF_INET or AF_INET6",
+                        "Socket::inet_pton",
+                        af);
+        }
+        ok = (*host != '\0') && inet_pton(af, host, &ip_address);
+
+        ST(0) = sv_newmortal();
+        if (ok) {
+                sv_setpvn( ST(0), (char *)&ip_address, sizeof ip_address );
+        }
+#else
+        ST(0) = (SV *)not_here("inet_pton");
+#endif

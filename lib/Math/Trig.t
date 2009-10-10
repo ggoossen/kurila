@@ -11,10 +11,10 @@
 use Test::More
 use signals
 
-plan(tests => 69)
+plan(tests => 87)
 
 use Math::Trig v1.16
-use Math::Trig v1.16 < qw(:pi)
+use Math::Trig v1.16 < qw(:pi Inf)
 
 my $pip2 = pi / 2
 
@@ -243,9 +243,32 @@ do
 
     ok(near($dst1, $dst2))
 
+print $^STDOUT, "# Infinity\n"
+
+my $BigDouble = 1e40
 
 # E.g. netbsd-alpha core dumps on Inf arith without this.
 local signals::handler("FPE") = undef
+
+ok(Inf() +> $BigDouble)  # This passes in netbsd-alpha.
+ok(Inf() + $BigDouble +> $BigDouble) # This coredumps in netbsd-alpha.
+ok(Inf() + $BigDouble == Inf())
+ok(Inf() - $BigDouble +> $BigDouble)
+ok(Inf() - $BigDouble == Inf())
+ok(Inf() * $BigDouble +> $BigDouble)
+ok(Inf() * $BigDouble == Inf())
+ok(Inf() / $BigDouble +> $BigDouble)
+ok(Inf() / $BigDouble == Inf())
+
+ok(-Inf() +< -$BigDouble)
+ok(-Inf() + $BigDouble +< $BigDouble)
+ok(-Inf() + $BigDouble == -Inf())
+ok(-Inf() - $BigDouble +< -$BigDouble)
+ok(-Inf() - $BigDouble == -Inf())
+ok(-Inf() * $BigDouble +< -$BigDouble)
+ok(-Inf() * $BigDouble == -Inf())
+ok(-Inf() / $BigDouble +< -$BigDouble)
+ok(-Inf() / $BigDouble == -Inf())
 
 print $^STDOUT, "# great_circle_distance with small angles\n"
 

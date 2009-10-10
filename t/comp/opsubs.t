@@ -1,5 +1,7 @@
 #!./perl
 
+use TestInit
+
 use warnings
 
 $^OUTPUT_AUTOFLUSH++
