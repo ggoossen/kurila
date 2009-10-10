@@ -1630,7 +1630,7 @@ sub ast {
     local $::curstate;		# hide nested statements in sub
     local $::curenc = $::curenc;
     if (defined $arg) {
-	return $arg->ast(@_);
+	return $self->newtype->new( Kids => [ $self->madness('o'), $arg->ast(@_) ] );
     }
     return ';';  # XXX literal ; should come through somewhere
 }

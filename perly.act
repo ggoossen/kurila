@@ -1607,7 +1607,7 @@ case 2:
 #line 1364 "perly.y"
     { 
 #ifdef PERL_MAD
-                            (yyval.opval) = convert(OP_LIST, 0, (ps[(1) - (2)].val.opval), (ps[(1) - (2)].val.opval)->op_location);
+                            (yyval.opval) = convert(OP_LIST, 0, (ps[(1) - (2)].val.opval), (ps[(1) - (2)].val.opval) ? (ps[(1) - (2)].val.opval)->op_location : LOCATION((ps[(2) - (2)].val.i_tkval)) );
 #else
                             (yyval.opval) = (ps[(1) - (2)].val.opval)
 #endif
