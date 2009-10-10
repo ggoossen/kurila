@@ -1948,6 +1948,28 @@ sub sub_deref {
     return;
 }
 
+sub defined_sub {
+    my ($xml) = @_;
+    for my $op (find_ops($xml, "defined")) {
+        my $rv2cv = $op->child(1);
+        next unless $rv2cv and $rv2cv->tag eq "op_rv2cv";
+        my $opv = get_madprop($op, 'operator');
+        $opv =~ s/defined/exists/;
+        set_madprop($op, 'operator', $opv);
+    }
+}
+
+sub sub_ref {
+    my ($xml) = @_;
+    for my $op (find_ops($xml, "srefgen")) {
+        my $rv2cv = $op->child(1);
+        next unless $rv2cv and $rv2cv->tag eq "op_rv2cv";
+        my $opv = get_madprop($op, 'operator');
+        $opv =~ s/\\//;
+        set_madprop($op, 'operator', $opv);
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 my $to;
 GetOptions("from=s" => \$from, "to=s" => \$to);
@@ -2082,7 +2104,9 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.20') {
     empty_array($twig);
 }
 
-sub_deref($twig);
+#sub_deref($twig);
+#defined_sub($twig);
+sub_ref($twig);
 
 #array_simplify($twig);
 
