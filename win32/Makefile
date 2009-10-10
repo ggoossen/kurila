@@ -396,6 +396,7 @@ COREDIR		= ..\lib\CORE
 AUTODIR		= ..\lib\auto
 LIBDIR		= ..\lib
 EXTDIR		= ..\ext
+DISTDIR		= ..\dist
 CPANDIR		= ..\cpan
 PODDIR		= ..\pod
 EXTUTILSDIR	= $(LIBDIR)\ExtUtils
@@ -645,12 +646,6 @@ NULL		=
 
 DEL		= del
 
-#
-# filenames given to xsubpp must have forward slashes (since it puts
-# full pathnames in #line strings)
-XSUBPP		= ..\$(MINIPERL) -I..\..\lib -I..\Cwd -I..\Cwd\lib ..\$(EXTUTILSDIR)\xsubpp \
-		-C++ -prototypes
-
 MICROCORE_SRC	=		\
 		..\av.c		\
 		..\deb.c	\
@@ -834,7 +829,7 @@ CFG_VARS	=					\
 		"LINK_FLAGS=$(LINK_FLAGS:"=\")"		\
 		"optimize=$(OPTIMIZE:"=\")"
 
-ICWD = -I..\ext\Cwd -I..\ext\Cwd\lib
+ICWD = -I..\cpan\Cwd -I..\cpan\Cwd\lib
 
 #
 # Top targets
@@ -1035,30 +1030,30 @@ $(PERLEXESTATIC): $(PERLSTATICLIB) $(CONFIGPM) $(PERLEXEST_OBJ) $(PERLEXE_RES)
 # DynaLoader.pm, so this will have to do
 Extensions: ..\make_ext.pl $(PERLDEP) $(CONFIGPM) $(DYNALOADER)
 	$(XCOPY) ..\*.h $(COREDIR)\*.*
-	$(MINIPERL) -I..\lib ..\make_ext.pl "MAKE=$(MAKE)" --dir=$(CPANDIR) --dir=$(EXTDIR) --dynamic
+	$(MINIPERL) -I..\lib ..\make_ext.pl "MAKE=$(MAKE)" --dir=$(CPANDIR) --dir=$(DISTDIR) --dir=$(EXTDIR) --dynamic
 
 Extensions_reonly: ..\make_ext.pl $(PERLDEP) $(CONFIGPM) $(DYNALOADER)
 	$(XCOPY) ..\*.h $(COREDIR)\*.*
-	$(MINIPERL) -I..\lib ..\make_ext.pl "MAKE=$(MAKE)" --dir=$(CPANDIR) --dir=$(EXTDIR) --dynamic +re
+	$(MINIPERL) -I..\lib ..\make_ext.pl "MAKE=$(MAKE)" --dir=$(CPANDIR) --dir=$(DISTDIR) --dir=$(EXTDIR) --dynamic +re
 
 Extensions_static : ..\make_ext.pl list_static_libs.pl $(PERLDEP) $(CONFIGPM)
 	$(XCOPY) ..\*.h $(COREDIR)\*.*
-	$(MINIPERL) -I..\lib ..\make_ext.pl "MAKE=$(MAKE)" --dir=$(CPANDIR) --dir=$(EXTDIR) --static
+	$(MINIPERL) -I..\lib ..\make_ext.pl "MAKE=$(MAKE)" --dir=$(CPANDIR) --dir=$(DISTDIR) --dir=$(EXTDIR) --static
 	$(MINIPERL) -I..\lib list_static_libs.pl > Extensions_static
 
 Extensions_nonxs: ..\make_ext.pl $(PERLDEP) $(CONFIGPM)
 	$(XCOPY) ..\*.h $(COREDIR)\*.*
-	$(MINIPERL) -I..\lib ..\make_ext.pl "MAKE=$(MAKE)" --dir=$(CPANDIR) --dir=$(EXTDIR) --nonxs
+	$(MINIPERL) -I..\lib ..\make_ext.pl "MAKE=$(MAKE)" --dir=$(CPANDIR) --dir=$(DISTDIR) --dir=$(EXTDIR) --nonxs
 
 $(DYNALOADER) : ..\make_ext.pl $(PERLDEP) $(CONFIGPM) Extensions_nonxs
 	$(XCOPY) ..\*.h $(COREDIR)\*.*
 	$(MINIPERL) -I..\lib ..\make_ext.pl "MAKE=$(MAKE)" --dir=$(EXTDIR) --dynaloader
 
 Extensions_clean: 
-	-if exist $(MINIPERL) $(MINIPERL) -I..\lib ..\make_ext.pl "MAKE=$(MAKE)" --dir=$(CPANDIR) --dir=$(EXTDIR) --all --target=clean
+	-if exist $(MINIPERL) $(MINIPERL) -I..\lib ..\make_ext.pl "MAKE=$(MAKE)" --dir=$(CPANDIR) --dir=$(DISTDIR) --dir=$(EXTDIR) --all --target=clean
 
 Extensions_realclean: 
-	-if exist $(MINIPERL) $(MINIPERL) -I..\lib ..\make_ext.pl "MAKE=$(MAKE)" --dir=$(CPANDIR) --dir=$(EXTDIR) --all --target=realclean
+	-if exist $(MINIPERL) $(MINIPERL) -I..\lib ..\make_ext.pl "MAKE=$(MAKE)" --dir=$(CPANDIR) --dir=$(DISTDIR) --dir=$(EXTDIR) --all --target=realclean
 
 #-------------------------------------------------------------------------------
 
@@ -1155,6 +1150,7 @@ distclean: realclean
 	-del /f $(LIBDIR)\Win32CORE.pm
 	-del /f $(LIBDIR)\Win32API\File.pm
 	-del /f $(LIBDIR)\Win32API\File\cFile.pc
+	-del /f $(DISTDIR)\XSLoader\XSLoader.pm
 	-if exist $(LIBDIR)\B rmdir /s /q $(LIBDIR)\B
 	-if exist $(LIBDIR)\Compress rmdir /s /q $(LIBDIR)\Compress
 	-if exist $(LIBDIR)\Data rmdir /s /q $(LIBDIR)\Data
@@ -1202,6 +1198,7 @@ distclean: realclean
 	-del /f perl.base
 	-cd .. && del /s *.lib *.map *.pdb *.ilk *.bs *$(o) .exists pm_to_blib
 	-cd $(EXTDIR) && del /s *.def Makefile Makefile.old
+	-cd $(DISTDIR) && del /s *.def Makefile Makefile.old
 	-cd $(CPANDIR) && del /s *.def Makefile Makefile.old
 	-if exist $(AUTODIR) rmdir /s /q $(AUTODIR)
 	-if exist $(COREDIR) rmdir /s /q $(COREDIR)
@@ -1229,7 +1226,7 @@ inst_lib : $(CONFIGPM)
 
 $(UNIDATAFILES) : $(MINIPERL) $(CONFIGPM) ..\lib\unicore\mktables Extensions_nonxs
 	cd ..\lib\unicore && \
-	..\$(MINIPERL) -I.. -I..\..\ext\Cwd\lib mktables -check $@ $(FIRSTUNIFILE)
+	..\$(MINIPERL) -I.. -I..\..\cpan\Cwd\lib mktables -check $@ $(FIRSTUNIFILE)
 
 minitest : $(MINIPERL) $(GLOBEXE) $(CONFIGPM) utils $(UNIDATAFILES)
 	$(XCOPY) $(MINIPERL) ..\t\$(NULL)

@@ -56,10 +56,10 @@ my $max   = chr(0x10FFFF);
 EXPECT
 UTF-16 surrogate 0xd800 at - line 3 character 13.
 UTF-16 surrogate 0xdfff at - line 4 character 13.
-Unicode character 0xfffe is illegal at - line 8 character 13.
-Unicode character 0xffff is illegal at - line 9 character 13.
-Unicode character 0x10fffe is illegal at - line 12 character 13.
-Unicode character 0x10ffff is illegal at - line 13 character 13.
+Unicode non-character 0xfffe is illegal for interchange at - line 8 character 13.
+Unicode non-character 0xffff is illegal for interchange at - line 9 character 13.
+Unicode non-character 0x10fffe is illegal for interchange at - line 12 character 13.
+Unicode non-character 0x10ffff is illegal for interchange at - line 13 character 13.
 ########
 use warnings 'utf8';
 my $d7ff  = pack("U", 0xD7FF);
@@ -90,10 +90,10 @@ my $max   = pack("U", 0x10FFFF);
 EXPECT
 UTF-16 surrogate 0xd800 at - line 3 character 13.
 UTF-16 surrogate 0xdfff at - line 4 character 13.
-Unicode character 0xfffe is illegal at - line 8 character 13.
-Unicode character 0xffff is illegal at - line 9 character 13.
-Unicode character 0x10fffe is illegal at - line 12 character 13.
-Unicode character 0x10ffff is illegal at - line 13 character 13.
+Unicode non-character 0xfffe is illegal for interchange at - line 8 character 13.
+Unicode non-character 0xffff is illegal for interchange at - line 9 character 13.
+Unicode non-character 0x10fffe is illegal for interchange at - line 12 character 13.
+Unicode non-character 0x10ffff is illegal for interchange at - line 13 character 13.
 ########
 use warnings 'utf8'; use utf8;
 my $d7ff  = "\x{D7FF}";
@@ -124,8 +124,8 @@ my $max   = "\x{10FFFF}";
 EXPECT
 UTF-16 surrogate 0xd800 at - line 3 character 14.
 UTF-16 surrogate 0xdfff at - line 4 character 14.
-Unicode character 0xfffe is illegal at - line 8 character 14.
-Unicode character 0xffff is illegal at - line 9 character 14.
-Unicode character 0x10fffe is illegal at - line 12 character 14.
-Unicode character 0x10ffff is illegal at - line 13 character 14.
+Unicode non-character 0xfffe is illegal for interchange at - line 8 character 14.
+Unicode non-character 0xffff is illegal for interchange at - line 9 character 14.
+Unicode non-character 0x10fffe is illegal for interchange at - line 12 character 14.
+Unicode non-character 0x10ffff is illegal for interchange at - line 13 character 14.
 ########

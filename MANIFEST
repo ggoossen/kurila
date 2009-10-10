@@ -17,9 +17,30 @@ configure.gnu		Crude emulation of GNU configure
 cop.h			Control operator header
 cop_i.h			Control operator header
 Copying			The GNU General Public License
+cpan/B-Debug/Debug.pm	Compiler Debug backend
+cpan/B-Debug/t/debug.t	See if B::Debug works
 cpan/Class-ISA/ChangeLog		Changes for Class::ISA
 cpan/Class-ISA/lib/Class/ISA.pm		Class::ISA
 cpan/Class-ISA/t/01_old_junk.t		Tests for Class::ISA
+cpan/Cwd/Changes			Cwd extension Changelog
+cpan/Cwd/Cwd.pm				Various cwd routines (getcwd, fastcwd, chdir)
+cpan/Cwd/Cwd.xs				Cwd extension external subroutines
+cpan/Cwd/lib/File/Spec/Cygwin.pm	portable operations on Cygwin file names
+cpan/Cwd/lib/File/Spec/Epoc.pm		portable operations on EPOC file names
+cpan/Cwd/lib/File/Spec/Functions.pm	Function interface to File::Spec object methods
+cpan/Cwd/lib/File/Spec/Mac.pm		portable operations on Mac file names
+cpan/Cwd/lib/File/Spec/OS2.pm		portable operations on OS2 file names
+cpan/Cwd/lib/File/Spec.pm		portable operations on file names
+cpan/Cwd/lib/File/Spec/Unix.pm		portable operations on Unix file names
+cpan/Cwd/lib/File/Spec/VMS.pm		portable operations on VMS file names
+cpan/Cwd/lib/File/Spec/Win32.pm		portable operations on Win32 and NetWare file names
+cpan/Cwd/t/crossplatform.t		See if File::Spec works crossplatform
+cpan/Cwd/t/cwd.t			See if Cwd works
+cpan/Cwd/t/Functions.t			See if File::Spec::Functions works
+cpan/Cwd/t/rel2abs2rel.t		See if File::Spec->rel2abs/abs2rel works
+cpan/Cwd/t/Spec.t			See if File::Spec works
+cpan/Cwd/t/tmpdir.t			See if File::Spec->tmpdir() works
+cpan/Cwd/t/win32.t			See if Cwd works on Win32
 cpan/DB_File/Changes		Berkeley DB extension change log
 cpan/DB_File/DB_File_BS		Berkeley DB extension mkbootstrap fodder
 cpan/DB_File/DB_File.pm		Berkeley DB extension Perl module
@@ -33,6 +54,13 @@ cpan/DB_File/t/db-hash.t	See if DB_File works
 cpan/DB_File/t/db-recno.t	See if DB_File works
 cpan/DB_File/typemap		Berkeley DB extension interface types
 cpan/DB_File/version.c		Berkeley DB extension interface version check
+cpan/Digest/Changes		Digest changelog
+cpan/Digest/Digest/base.pm	Digest extensions
+cpan/Digest/Digest/file.pm	Digest extensions
+cpan/Digest/Digest.pm		Digest extensions
+cpan/Digest/t/base.t		See if Digest extensions work
+cpan/Digest/t/digest.t		See if Digest extensions work
+cpan/Digest/t/file.t		See if Digest extensions work
 cpan/ExtUtils-CBuilder/Changes					Changes for ExtUtils::CBuilder
 cpan/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Base.pm		Base class for ExtUtils::CBuilder methods
 cpan/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/aix.pm	CBuilder methods for AIX
@@ -46,6 +74,17 @@ cpan/ExtUtils-CBuilder/lib/ExtUtils/CBuilder/Platform/Windows.pm	CBuilder method
 cpan/ExtUtils-CBuilder/lib/ExtUtils/CBuilder.pm			Compile and link C code for Perl modules
 cpan/ExtUtils-CBuilder/t/01-basic.t				tests for ExtUtils::CBuilder
 cpan/ExtUtils-CBuilder/t/02-link.t				tests for ExtUtils::CBuilder
+cpan/ExtUtils-Command/lib/ExtUtils/Command.pm	Utilities for Make on non-UNIX platforms
+cpan/ExtUtils-Command/t/eu_command.t		See if ExtUtils::Command works
+cpan/ExtUtils-Constant/lib/ExtUtils/Constant/Base.pm		generate XS code to import C header constants
+cpan/ExtUtils-Constant/lib/ExtUtils/Constant.pm			generate XS code to import C header constants
+cpan/ExtUtils-Constant/lib/ExtUtils/Constant/ProxySubs.pm	generate XS code for proxy constants
+cpan/ExtUtils-Constant/lib/ExtUtils/Constant/Utils.pm		generate XS code to import C header constants
+cpan/ExtUtils-Constant/lib/ExtUtils/Constant/XS.pm		generate XS code to import C header constants
+cpan/ExtUtils-Constant/t/Constant.t				See if ExtUtils::Constant works
+cpan/ExtUtils-Manifest/lib/ExtUtils/Manifest.pm			Utilities to write MANIFEST files
+cpan/ExtUtils-Manifest/lib/ExtUtils/MANIFEST.SKIP		The default MANIFEST.SKIP
+cpan/ExtUtils-Manifest/t/Manifest.t				See if ExtUtils::Manifest works
 cpan/ExtUtils-ParseXS/Changes			ExtUtils::ParseXS change log
 cpan/ExtUtils-ParseXS/lib/ExtUtils/ParseXS.pm	converts Perl XS code into C code
 cpan/ExtUtils-ParseXS/lib/ExtUtils/xsubpp	External subroutine preprocessor
@@ -54,6 +93,15 @@ cpan/ExtUtils-ParseXS/t/XSTest.pm		Test file for ExtUtils::ParseXS tests
 cpan/ExtUtils-ParseXS/t/XSTest.xs		Test file for ExtUtils::ParseXS tests
 cpan/File-Path/lib/File/Path.pm		Do things like 'mkdir -p' and 'rm -r'
 cpan/File-Path/t/Path.t			See if File::Path works
+cpan/File-Temp/Temp.pm		create safe temporary files and file handles
+cpan/File-Temp/t/fork.t		See if File::Temp works
+cpan/File-Temp/t/lock.t		See if File::Temp works
+cpan/File-Temp/t/mktemp.t	See if File::Temp works
+cpan/File-Temp/t/object.t	See if File::Temp works
+cpan/File-Temp/t/posix.t	See if File::Temp works
+cpan/File-Temp/t/security.t	See if File::Temp works
+cpan/File-Temp/t/seekable.t	See if File::Temp works
+cpan/File-Temp/t/tempfile.t	See if File::Temp works
 cpan/Getopt-Long/CHANGES		Getopt::Long changes
 cpan/Getopt-Long/lib/Getopt/Long.pm	Fetch command options (GetOptions)
 cpan/Getopt-Long/README			Getopt::Long README
@@ -83,6 +131,40 @@ cpan/IPC-SysV/t/msg.t			IPC::SysV test file
 cpan/IPC-SysV/TODO			IPC::SysV todo file
 cpan/IPC-SysV/t/sem.t			IPC::SysV test file
 cpan/IPC-SysV/typemap			IPC::SysV typemap
+cpan/Locale-Codes/ChangeLog			Locale::Codes
+cpan/Locale-Codes/lib/Locale/Constants.pm	Locale::Codes
+cpan/Locale-Codes/lib/Locale/Constants.pod	Locale::Codes documentation
+cpan/Locale-Codes/lib/Locale/Country.pm		Locale::Codes
+cpan/Locale-Codes/lib/Locale/Country.pod	Locale::Codes documentation
+cpan/Locale-Codes/lib/Locale/Currency.pm	Locale::Codes
+cpan/Locale-Codes/lib/Locale/Currency.pod	Locale::Codes documentation
+cpan/Locale-Codes/lib/Locale/Language.pm	Locale::Codes
+cpan/Locale-Codes/lib/Locale/Language.pod	Locale::Codes documentation
+cpan/Locale-Codes/lib/Locale/Script.pm		Locale::Codes
+cpan/Locale-Codes/lib/Locale/Script.pod		Locale::Codes documentation
+cpan/Locale-Codes/Makefile.PL
+cpan/Locale-Codes/README			Locale::Codes
+cpan/Locale-Codes/t/all.t			See if Locale::Codes work
+cpan/Locale-Codes/t/constants.t			See if Locale::Codes work
+cpan/Locale-Codes/t/country.t			See if Locale::Codes work
+cpan/Locale-Codes/t/currency.t			See if Locale::Codes work
+cpan/Locale-Codes/t/language.t			See if Locale::Codes work
+cpan/Locale-Codes/t/rename.t			See if Locale::Codes work
+cpan/Locale-Codes/t/script.t			See if Locale::Codes work
+cpan/Locale-Codes/t/uk.t			See if Locale::Codes work
+cpan/Locale-Maketext-Simple/lib/Locale/Maketext/Simple.pm	Locale::Simple
+cpan/Locale-Maketext-Simple/t/0-signature.t			Locale::Simple tests
+cpan/Locale-Maketext-Simple/t/1-basic.t				Locale::Simple tests
+cpan/MIME-Base64/Base64.pm		MIME::Base64 extension
+cpan/MIME-Base64/Base64.xs		MIME::Base64 extension
+cpan/MIME-Base64/Changes		MIME::Base64 extension
+cpan/MIME-Base64/Makefile.PL		MIME::Base64 extension
+cpan/MIME-Base64/QuotedPrint.pm		MIME::Base64 extension
+cpan/MIME-Base64/README			README for MIME::Base64
+cpan/MIME-Base64/t/base64.t		See whether MIME::Base64 works
+cpan/MIME-Base64/t/quoted-print.t	See whether MIME::QuotedPrint works
+cpan/MIME-Base64/t/unicode.t		See whether MIME::Base64 works
+cpan/MIME-Base64/t/warn.t		See whether MIME::Base64 works
 cpan/Module-Load-Conditional/lib/Module/Load/Conditional.pm	Module::Conditional
 cpan/Module-Load-Conditional/t/01_Module_Load_Conditional.t	Module::Conditional tests
 cpan/Module-Load-Conditional/t/02_Parse_Version.t		Module::Load::Conditional tests
@@ -104,6 +186,262 @@ cpan/Module-Load/t/to_load/TestModule.pm	Module::Load tests
 cpan/Module-Load/t/to_load/ToBeLoaded		Module::Load tests
 cpan/Params-Check/lib/Params/Check.pm	Params::Check
 cpan/Params-Check/t/01_Params-Check.t	Params::Check tests
+cpan/PerlIO-via-QuotedPrint/lib/PerlIO/via/QuotedPrint.pm	PerlIO::via::QuotedPrint
+cpan/PerlIO-via-QuotedPrint/t/QuotedPrint.t			PerlIO::via::QuotedPrint
+cpan/Pod-Escapes/ChangeLog		ChangeLog for Pod::Escapes
+cpan/Pod-Escapes/lib/Pod/Escapes.pm	Pod::Escapes
+cpan/Pod-Escapes/README			README for Pod::Escapes
+cpan/Pod-Escapes/t/01_about_verbose.t	test Pod::Escapes
+cpan/Pod-Escapes/t/10_main.t		test Pod::Escapes
+cpan/Pod-Escapes/t/15_name2charnum.t	test Pod::Escapes
+cpan/Pod-LaTeX/LaTeX.pm		Convert POD data to LaTeX
+cpan/Pod-LaTeX/t/pod2latex.t	See if Pod::LaTeX works
+cpan/Pod-LaTeX/t/user.t		See if Pod::LaTeX works
+cpan/podlators/lib/Pod/Man.pm			Convert POD data to *roff
+cpan/podlators/lib/Pod/ParseLink.pm		Perl an L<> formatting code in POD text
+cpan/podlators/lib/Pod/Text/Color.pm		Convert POD data to color ASCII text
+cpan/podlators/lib/Pod/Text/Overstrike.pm	Convert POD data to formatted overstrike text
+cpan/podlators/lib/Pod/Text.pm			Pod-Parser - convert POD data to formatted ASCII text
+cpan/podlators/lib/Pod/Text/Termcap.pm		Convert POD data to ASCII text with format escapes
+cpan/podlators/Makefile.PL
+cpan/podlators/t/basic.cap			podlators test
+cpan/podlators/t/basic.clr			podlators test
+cpan/podlators/t/basic.man			podlators test
+cpan/podlators/t/basic.ovr			podlators test
+cpan/podlators/t/basic.pod			podlators test
+cpan/podlators/t/basic.t			podlators test
+cpan/podlators/t/basic.txt			podlators test
+cpan/podlators/t/color.t			podlators test
+cpan/podlators/t/filehandle.t			podlators test
+cpan/podlators/t/man-options.t			podlators test
+cpan/podlators/t/man.t				podlators test
+cpan/podlators/t/parselink.t			podlators test
+cpan/podlators/t/pod-parser.t			podlators test
+cpan/podlators/t/pod-spelling.t			podlators test
+cpan/podlators/t/pod.t				podlators test
+cpan/podlators/t/termcap.t			podlators test
+cpan/podlators/t/text-options.t			podlators test
+cpan/podlators/t/text.t				podlators test
+cpan/podlators/VERSION				podlators custom Makefile.PL
+cpan/podlators/VERSION				podlators distribution version
+cpan/Pod-Parser/lib/Pod/Checker.pm		Pod-Parser - check POD documents for syntax errors
+cpan/Pod-Parser/lib/Pod/Find.pm			used by pod/splitpod
+cpan/Pod-Parser/lib/Pod/InputObjects.pm		Pod-Parser - define objects for input streams
+cpan/Pod-Parser/lib/Pod/Parser.pm		Pod-Parser - define base class for parsing POD
+cpan/Pod-Parser/lib/Pod/ParseUtils.pm		Pod-Parser - pod utility functions
+cpan/Pod-Parser/lib/Pod/PlainText.pm		Convert POD data to formatted ASCII text
+cpan/Pod-Parser/lib/Pod/Select.pm		Pod-Parser - select portions of POD docs
+cpan/Pod-Parser/lib/Pod/Usage.pm		Pod-Parser - print usage messages
+cpan/Pod-Parser/t/pod/contains_pod.t		Pod-Parser test
+cpan/Pod-Parser/t/pod/contains_pod.xr		Pod-Parser test file
+cpan/Pod-Parser/t/pod/emptycmd.t		Test empty pod directives
+cpan/Pod-Parser/t/pod/emptycmd.xr		Expected results for emptycmd.t
+cpan/Pod-Parser/t/pod/find.t			See if Pod::Find works
+cpan/Pod-Parser/t/pod/for.t			Test =for directive
+cpan/Pod-Parser/t/pod/for.xr			Expected results for for.t
+cpan/Pod-Parser/t/pod/headings.t		Test =head directives
+cpan/Pod-Parser/t/pod/headings.xr		Expected results for headings.t
+cpan/Pod-Parser/t/pod/included.t		Test =include directive
+cpan/Pod-Parser/t/pod/included.xr		Expected results for included.t
+cpan/Pod-Parser/t/pod/include.t			Test =include directive
+cpan/Pod-Parser/t/pod/include.xr		Expected results for include.t
+cpan/Pod-Parser/t/pod/lref.t			Test L<...> sequences
+cpan/Pod-Parser/t/pod/lref.xr			Expected results for lref.t
+cpan/Pod-Parser/t/pod/multiline_items.t		Test multiline =items
+cpan/Pod-Parser/t/pod/multiline_items.xr	Expected results for multiline_items.t
+cpan/Pod-Parser/t/pod/nested_items.t		Test nested =items
+cpan/Pod-Parser/t/pod/nested_items.xr		Expected results for nested_items.t
+cpan/Pod-Parser/t/pod/nested_seqs.t		Test nested interior sequences
+cpan/Pod-Parser/t/pod/nested_seqs.xr		Expected results for nested_seqs.t
+cpan/Pod-Parser/t/pod/oneline_cmds.t		Test single paragraph ==cmds
+cpan/Pod-Parser/t/pod/oneline_cmds.xr		Expected results for oneline_cmds.t
+cpan/Pod-Parser/t/pod/p2u_data.pl		Test Pod::Usage
+cpan/Pod-Parser/t/pod/pod2usage2.t		Test Pod::Usage
+cpan/Pod-Parser/t/pod/pod2usage.t		Test Pod::Usage
+cpan/Pod-Parser/t/pod/pod2usage.xr		Expected results for pod2usage.t
+cpan/Pod-Parser/t/pod/poderrs.t			Test POD errors
+cpan/Pod-Parser/t/pod/poderrs.xr		Expected results for poderrs.t
+cpan/Pod-Parser/t/pod/podselect.t		Test Pod::Select
+cpan/Pod-Parser/t/pod/podselect.xr		Expected results for podselect.t
+cpan/Pod-Parser/t/pod/special_seqs.t		Test "special" interior sequences
+cpan/Pod-Parser/t/pod/special_seqs.xr		Expected results for special_seqs.t
+cpan/Pod-Parser/t/pod/testcmp.pl		Module to compare output against expected results
+cpan/Pod-Parser/t/pod/testp2pt.pl		Module to test Pod::PlainText for a given file
+cpan/Pod-Parser/t/pod/testpchk.pl		Module to test Pod::Checker for a given file
+cpan/Pod-Parser/t/pod/testpods/lib/Pod/Stuff.pm	Sample data for t/pod/find.t
+cpan/Pod-Parser/t/pod/twice.t			Test Pod::Parser
+cpan/Pod-Simple/ChangeLog				Pod::Simple ChangeLog
+cpan/Pod-Simple/lib/Pod/Simple/BlackBox.pm		Pod::Simple::BlackBox
+cpan/Pod-Simple/lib/Pod/Simple/Checker.pm		check the Pod syntax of a document
+cpan/Pod-Simple/lib/Pod/Simple/Debug.pm			put Pod::Simple into trace/debug mode
+cpan/Pod-Simple/lib/Pod/Simple/DumpAsText.pm		dump Pod-parsing events as text
+cpan/Pod-Simple/lib/Pod/Simple/DumpAsXML.pm		turn Pod into XML
+cpan/Pod-Simple/lib/Pod/Simple/HTMLBatch.pm		convert several Pod files to several HTML files
+cpan/Pod-Simple/lib/Pod/Simple/HTMLLegacy.pm		Pod::Simple::HTMLLegacy
+cpan/Pod-Simple/lib/Pod/Simple/HTML.pm			convert Pod to HTML
+cpan/Pod-Simple/lib/Pod/Simple/LinkSection.pm		represent "section" attributes of L codes
+cpan/Pod-Simple/lib/Pod/Simple/Methody.pm		turn Pod::Simple events into method calls
+cpan/Pod-Simple/lib/Pod/Simple.pm			Pod made simple
+cpan/Pod-Simple/lib/Pod/Simple.pod			Pod for Pod::Simple
+cpan/Pod-Simple/lib/Pod/Simple/Progress.pm		Pod::Simple::Progress
+cpan/Pod-Simple/lib/Pod/Simple/PullParserEndToken.pm	end-tokens from Pod::Simple::PullParser
+cpan/Pod-Simple/lib/Pod/Simple/PullParser.pm		a pull-parser interface to parsing Pod
+cpan/Pod-Simple/lib/Pod/Simple/PullParserStartToken.pm	start-tokens from Pod::Simple::PullParser
+cpan/Pod-Simple/lib/Pod/Simple/PullParserTextToken.pm	text-tokens from Pod::Simple::PullParser
+cpan/Pod-Simple/lib/Pod/Simple/PullParserToken.pm	tokens from Pod::Simple::PullParser
+cpan/Pod-Simple/lib/Pod/Simple/RTF.pm			format Pod as RTF
+cpan/Pod-Simple/lib/Pod/Simple/Search.pm		find POD documents in directory trees
+cpan/Pod-Simple/lib/Pod/Simple/SimpleTree.pm		parse Pod into a simple parse tree
+cpan/Pod-Simple/lib/Pod/Simple/Subclassing.pod		write a formatter as a Pod::Simple subclass
+cpan/Pod-Simple/lib/Pod/Simple/TextContent.pm		get the text content of Pod
+cpan/Pod-Simple/lib/Pod/Simple/Text.pm			format Pod as plaintext
+cpan/Pod-Simple/lib/Pod/Simple/TranscodeDumb.pm		Pod::Simple::TranscodeDumb
+cpan/Pod-Simple/lib/Pod/Simple/Transcode.pm		Pod::Simple::Transcode
+cpan/Pod-Simple/lib/Pod/Simple/TranscodeSmart.pm	Pod::Simple::TranscodeSmart
+cpan/Pod-Simple/lib/Pod/Simple/XHTML.pm			turn Pod into XHTML
+cpan/Pod-Simple/lib/Pod/Simple/XMLOutStream.pm		turn Pod into XML
+cpan/Pod-Simple/README					Pod::Simple README file
+cpan/Pod-Simple/t/00about.t				Pod::Simple test file
+cpan/Pod-Simple/t/20_skip.t				Pod::Simple test file
+cpan/Pod-Simple/t/accept01.t				Pod::Simple test file
+cpan/Pod-Simple/t/accept05.t				Pod::Simple test file
+cpan/Pod-Simple/t/ac_d.t				Pod::Simple test file
+cpan/Pod-Simple/t/basic.t				Pod::Simple test file
+cpan/Pod-Simple/t/begin.t				Pod::Simple test file
+cpan/Pod-Simple/t/cbacks.t				Pod::Simple test file
+cpan/Pod-Simple/t/chunking.t				Pod::Simple test file
+cpan/Pod-Simple/t/closeys.t				Pod::Simple test file
+cpan/Pod-Simple/t/corpus/2202jp.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/2202jp.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/2202jpx.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/2202jpx.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/2202jpy.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/2202jpy.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/2202jpz.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/2202jpz.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus2/fiqhakbar_iso6.txt		Pod::Simple test file
+cpan/Pod-Simple/t/corpus2/fiqhakbar_iso6.xml		Pod::Simple test file
+cpan/Pod-Simple/t/corpus2/polish_implicit_utf8.txt	Pod::Simple test file
+cpan/Pod-Simple/t/corpus2/polish_utf16be_bom.txt	Pod::Simple test file
+cpan/Pod-Simple/t/corpus2/polish_utf16le_bom.txt	Pod::Simple test file
+cpan/Pod-Simple/t/corpus2/polish_utf8_bom2.txt		Pod::Simple test file
+cpan/Pod-Simple/t/corpus2/polish_utf8_bom2.xml		Pod::Simple test file
+cpan/Pod-Simple/t/corpus2/polish_utf8_bom.txt		Pod::Simple test file
+cpan/Pod-Simple/t/corpus2/polish_utf8_bom.xml		Pod::Simple test file
+cpan/Pod-Simple/t/corpus/8859_7.pod			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/8859_7.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/cp1256.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/cp1256.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/fet_cont.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/fet_cont.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/fet_dup.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/fet_dup.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/iso6.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/iso6.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/koi8r.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/koi8r.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/laozi38b.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/laozi38b.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/laozi38p.pod			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/laozi38p.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/laozi38.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/laozi38.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/lat1frim.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/lat1frim.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/lat1fr.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/lat1fr.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/nonesuch.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/nonesuch.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/pasternak_cp1251.txt		Pod::Simple test file
+cpan/Pod-Simple/t/corpus/pasternak_cp1251.xml		Pod::Simple test file
+cpan/Pod-Simple/t/corpus/plain_explicit.txt		Pod::Simple test file
+cpan/Pod-Simple/t/corpus/plain_explicit.xml		Pod::Simple test file
+cpan/Pod-Simple/t/corpus/plain_latin1.txt		Pod::Simple test file
+cpan/Pod-Simple/t/corpus/plain_latin1.xml		Pod::Simple test file
+cpan/Pod-Simple/t/corpus/plain.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/plain_utf8.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/plain_utf8.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/plain.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/polish_utf8.txt		Pod::Simple test file
+cpan/Pod-Simple/t/corpus/polish_utf8.xml		Pod::Simple test file
+cpan/Pod-Simple/t/corpus/s2763_sjis.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/s2763_sjis.xml			Pod::Simple test file
+cpan/Pod-Simple/t/corpus.t				Pod::Simple test file
+cpan/Pod-Simple/t/corpus/thai_iso11.txt			Pod::Simple test file
+cpan/Pod-Simple/t/corpus/thai_iso11.xml			Pod::Simple test file
+cpan/Pod-Simple/t/encod01.t				Pod::Simple test file
+cpan/Pod-Simple/t/encod02.t				Pod::Simple test file
+cpan/Pod-Simple/t/encod03.t				Pod::Simple test file
+cpan/Pod-Simple/t/end_over.t				Pod::Simple test file
+cpan/Pod-Simple/t/fcodes_e.t				Pod::Simple test file
+cpan/Pod-Simple/t/fcodes_l.t				Pod::Simple test file
+cpan/Pod-Simple/t/fcodes_s.t				Pod::Simple test file
+cpan/Pod-Simple/t/fcodes.t				Pod::Simple test file
+cpan/Pod-Simple/t/fornot.t				Pod::Simple test file
+cpan/Pod-Simple/t/for.t					Pod::Simple test file
+cpan/Pod-Simple/t/fullstop.t				Pod::Simple test file
+cpan/Pod-Simple/t/heads.t				Pod::Simple test file
+cpan/Pod-Simple/t/html01.t				Pod::Simple test file
+cpan/Pod-Simple/t/html02.t				Pod::Simple test file
+cpan/Pod-Simple/t/html03.t				Pod::Simple test file
+cpan/Pod-Simple/t/htmlbat.t				Pod::Simple test file
+cpan/Pod-Simple/t/items02.t				Pod::Simple test file
+cpan/Pod-Simple/t/items.t				Pod::Simple test file
+cpan/Pod-Simple/t/itemstar.t				Pod::Simple test file
+cpan/Pod-Simple/t/junk1o.txt				Pod::Simple test file
+cpan/Pod-Simple/t/junk1.pod				Pod::Simple test file
+cpan/Pod-Simple/t/junk2o.txt				Pod::Simple test file
+cpan/Pod-Simple/t/junk2.pod				Pod::Simple test file
+cpan/Pod-Simple/t/linkclas.t				Pod::Simple test file
+cpan/Pod-Simple/t/perlcygo.txt				Pod::Simple test file
+cpan/Pod-Simple/t/perlcyg.pod				Pod::Simple test file
+cpan/Pod-Simple/t/perlfaqo.txt				Pod::Simple test file
+cpan/Pod-Simple/t/perlfaq.pod				Pod::Simple test file
+cpan/Pod-Simple/t/perlvaro.txt				Pod::Simple test file
+cpan/Pod-Simple/t/perlvar.pod				Pod::Simple test file
+cpan/Pod-Simple/t/puller.t				Pod::Simple test file
+cpan/Pod-Simple/t/pulltitl.t				Pod::Simple test file
+cpan/Pod-Simple/t/reinit.t				Pod::Simple test file
+cpan/Pod-Simple/t/render.t				Pod::Simple test file
+cpan/Pod-Simple/t/search05.t				Pod::Simple test file
+cpan/Pod-Simple/t/search10.t				Pod::Simple test file
+cpan/Pod-Simple/t/search12.t				Pod::Simple test file
+cpan/Pod-Simple/t/search20.t				Pod::Simple test file
+cpan/Pod-Simple/t/search22.t				Pod::Simple test file
+cpan/Pod-Simple/t/search25.t				Pod::Simple test file
+cpan/Pod-Simple/t/search26.t				Pod::Simple test file
+cpan/Pod-Simple/t/search27.t				Pod::Simple test file
+cpan/Pod-Simple/t/search28.t				Pod::Simple test file
+cpan/Pod-Simple/t/search29.t				Pod::Simple test file
+cpan/Pod-Simple/t/search50.t				Pod::Simple test file
+cpan/Pod-Simple/t/stree.t				Pod::Simple test file
+cpan/Pod-Simple/t/testlib1/Blorm.pm			Pod::Simple test file
+cpan/Pod-Simple/t/testlib1/hinkhonk/Glunk.pod		Pod::Simple test file
+cpan/Pod-Simple/t/testlib1/hinkhonk/readme.txt		Pod::Simple test file
+cpan/Pod-Simple/t/testlib1/hinkhonk/Vliff.pm		Pod::Simple test file
+cpan/Pod-Simple/t/testlib1/pod/perlflif.pod		Pod::Simple test file
+cpan/Pod-Simple/t/testlib1/pod/perlthng.pod		Pod::Simple test file
+cpan/Pod-Simple/t/testlib1/squaa/Glunk.pod		Pod::Simple test file
+cpan/Pod-Simple/t/testlib1/squaa.pm			Pod::Simple test file
+cpan/Pod-Simple/t/testlib1/squaa/Vliff.pm		Pod::Simple test file
+cpan/Pod-Simple/t/testlib1/zikzik.pod			Pod::Simple test file
+cpan/Pod-Simple/t/testlib1/Zonk/Fiddle.txt		Pod::Simple test file
+cpan/Pod-Simple/t/testlib1/Zonk/Pronk.pm		Pod::Simple test file
+cpan/Pod-Simple/t/testlib1/Zonk/Veng.pm			Pod::Simple test file
+cpan/Pod-Simple/t/testlib2/hinkhonk/Glunk.pod		Pod::Simple test file
+cpan/Pod-Simple/t/testlib2/hinkhonk/readme.txt		Pod::Simple test file
+cpan/Pod-Simple/t/testlib2/hinkhonk/Vliff.pm		Pod::Simple test file
+cpan/Pod-Simple/t/testlib2/pod/perlthng.pod		Pod::Simple test file
+cpan/Pod-Simple/t/testlib2/pod/perlzuk.pod		Pod::Simple test file
+cpan/Pod-Simple/t/testlib2/squaa/Vliff.pm		Pod::Simple test file
+cpan/Pod-Simple/t/testlib2/squaa/Wowo.pod		Pod::Simple test file
+cpan/Pod-Simple/t/testlib2/Suzzle.pm			Pod::Simple test file
+cpan/Pod-Simple/t/testlib3/squaa/Vliff.pm		Pod::Simple test file
+cpan/Pod-Simple/t/verbatim.t				Pod::Simple test file
+cpan/Pod-Simple/t/verb_fmt.t				Pod::Simple test file
+cpan/Pod-Simple/t/xhtml01.t				Pod::Simple test file
+cpan/Pod-Simple/t/xhtml05.t				Pod::Simple test file
+cpan/Pod-Simple/t/x_nixer.t				Pod::Simple test file
 cpan/Sys-Syslog/Changes			Changlog for Sys::Syslog
 cpan/Sys-Syslog/fallback/const-c.inc	Sys::Syslog constants fallback file
 cpan/Sys-Syslog/fallback/const-xs.inc	Sys::Syslog constants fallback file
@@ -121,9 +459,65 @@ cpan/Sys-Syslog/win32/PerlLog_dll.uu	Sys::Syslog extension Win32 related file
 cpan/Sys-Syslog/win32/PerlLog.mc	Sys::Syslog extension Win32 related file
 cpan/Sys-Syslog/win32/PerlLog_RES.uu	Sys::Syslog extension Win32 related file
 cpan/Sys-Syslog/win32/Win32.pm		Sys::Syslog extension Win32 related file
-Cross/build-arm-n770-sh	Cross-compilation
-Cross/cflags-cross-arm	Cross-compilation
-Cross/config		Cross-compilation
+cpan/Term-ANSIColor/ANSIColor.pm	Perl module supporting termcap usage
+cpan/Term-ANSIColor/ChangeLog		Term::ANSIColor
+cpan/Term-ANSIColor/README		Term::ANSIColor
+cpan/Term-ANSIColor/t/basic.t		Tests for Term::ANSIColor
+cpan/Term-Cap/Cap.pm			Perl module supporting termcap usage
+cpan/Term-Cap/test.pl			See if Term::Cap works
+cpan/Text-ParseWords/lib/Text/ParseWords.pm	Perl module to split words on arbitrary delimiter
+cpan/Text-ParseWords/t/ParseWords.t		See if Text::ParseWords works
+cpan/Text-Tabs/CHANGELOG		ChangeLog for Tabs+Wrap
+cpan/Text-Tabs/lib/Text/Tabs.pm		Do expand and unexpand
+cpan/Text-Tabs/lib/Text/Wrap.pm		Paragraph formatter
+cpan/Text-Tabs/t/37000.t		See if Text::Tabs is working
+cpan/Text-Tabs/t/39548.t		See if Text::Tabs is working
+cpan/Text-Tabs/t/belg4mit.t		See if Text::Tabs is working
+cpan/Text-Tabs/t/fill.t			See if Text::Wrap::fill works
+cpan/Text-Tabs/t/Jacobson2.t		See if Text::Tabs is working
+cpan/Text-Tabs/t/Jacobson.t		See if Text::Tabs is working
+cpan/Text-Tabs/t/Jochen.t		See if Text::Tabs is working
+cpan/Text-Tabs/t/sep2.t			See if Text::Tabs is working
+cpan/Text-Tabs/t/sep.t			See if Text::Tabs is working
+cpan/Text-Tabs/t/tabs.t			See if Text::Tabs works
+cpan/Text-Tabs/t/wrap.t			See if Text::Wrap::wrap works
+cpan/Time-HiRes/Changes			Time::HiRes extension
+cpan/Time-HiRes/fallback/const-c.inc	Time::HiRes extension
+cpan/Time-HiRes/fallback/const-xs.inc	Time::HiRes extension
+cpan/Time-HiRes/hints/aix.pl		Hint for Time::HiRes for named architecture
+cpan/Time-HiRes/hints/dec_osf.pl	Hint for Time::HiRes for named architecture
+cpan/Time-HiRes/hints/dynixptx.pl	Hint for Time::HiRes for named architecture
+cpan/Time-HiRes/hints/irix.pl		Hint for Time::HiRes for named architecture
+cpan/Time-HiRes/hints/linux.pl		Hints for Time::HiRes for named architecture
+cpan/Time-HiRes/hints/sco.pl		Hints for Time::HiRes for named architecture
+cpan/Time-HiRes/hints/solaris.pl	Hints for Time::HiRes for named architecture
+cpan/Time-HiRes/hints/svr4.pl		Hints for Time::HiRes for named architecture
+cpan/Time-HiRes/HiRes.pm		Time::HiRes extension
+cpan/Time-HiRes/HiRes.xs		Time::HiRes extension
+cpan/Time-HiRes/Makefile.PL		Time::HiRes extension
+cpan/Time-HiRes/t/HiRes.t		Test for Time::HiRes
+cpan/Time-HiRes/typemap			Time::HiRes extension
+cpan/Win32/Changes			Changes for Win32 extension module
+cpan/Win32/longpath.inc			Win32 extension long path support
+cpan/Win32/Makefile.PL			Win32 extension makefile writer
+cpan/Win32/t/CreateFile.t		See if Win32 extension works
+cpan/Win32/t/ExpandEnvironmentStrings.t	See if Win32 extension works
+cpan/Win32/t/GetCurrentThreadId.t	See if Win32 extension works
+cpan/Win32/t/GetFileVersion.t		See if Win32 extension works
+cpan/Win32/t/GetFolderPath.t		See if Win32 extension works
+cpan/Win32/t/GetFullPathName.t		See if Win32 extension works
+cpan/Win32/t/GetLongPathName.t		See if Win32 extension works
+cpan/Win32/t/GetOSName.t		See if Win32 extension works
+cpan/Win32/t/GetOSVersion.t		See if Win32 extension works
+cpan/Win32/t/GetShortPathName.t		See if Win32 extension works
+cpan/Win32/t/GuidGen.t			See if Win32 extension works
+cpan/Win32/t/Names.t			See if Win32 extension works
+cpan/Win32/t/Unicode.t			See if Win32 extension works
+cpan/Win32/Win32.pm			Win32 extension Perl module
+cpan/Win32/Win32.xs			Win32 extension external subroutines
+Cross/build-arm-n770-sh		Cross-compilation
+Cross/cflags-cross-arm		Cross-compilation
+Cross/config			Cross-compilation
 Cross/config.sh-arm-linux	Cross-compilation
 Cross/config.sh-arm-linux-n770	Cross-compilation
 Cross/generate_config_sh	Cross-compilation
@@ -139,6 +533,125 @@ cv.h			Code value header
 cv_i.h			Code value inline functions
 cygwin/cygwin.c		Additional code for Cygwin port
 deb.c			Debugging routines
+dist/base/Changes		base.pm changelog
+dist/base/lib/base.pm		Establish IS-A relationship at compile time
+dist/base/lib/fields.pm		Set up object field names for pseudo-hash-using classes
+dist/base/MANIFEST		base.pm manifest
+dist/base/META.yml		base.pm META.yml file
+dist/base/t/base.t		See if base works
+dist/base/t/fields-base.t	See if fields work
+dist/base/t/fields.t		See if fields work
+dist/base/t/isa.t		See if base's behaviour doesn't change
+dist/base/t/lib/Dummy.pm	Test module for base.pm
+dist/base/t/sigdie.t		See if base works with SIGDIE
+dist/base/t/version.t		See if base works with versions
+dist/base/t/warnings.t		See if base works with warnings
+dist/B-Deparse/Deparse.pm	Compiler Deparse backend
+dist/B-Deparse/t/deparse.t	See if B::Deparse works
+dist/constant/lib/constant.pm	For "use constant"
+dist/constant/t/constant.t	See if compile-time constants work
+dist/Data-Dumper/Changes	Data pretty printer, changelog
+dist/Data-Dumper/Dumper.pm	Data pretty printer, module
+dist/Data-Dumper/t/bless.t	See if Data::Dumper works
+dist/Data-Dumper/t/bugs.t	See if Data::Dumper works
+dist/Data-Dumper/t/dumper.t	See if Data::Dumper works
+dist/Data-Dumper/t/freezer.t	See if $Data::Dumper::Freezer works
+dist/Data-Dumper/Todo		Data pretty printer, futures
+dist/Data-Dumper/t/pair.t	See if Data::Dumper pair separator works
+dist/ExtUtils-Install/Changes				ExtUtils-Install change log
+dist/ExtUtils-Install/lib/ExtUtils/Installed.pm		Information on installed extensions
+dist/ExtUtils-Install/lib/ExtUtils/Install.pm		Handles 'make install' on extensions
+dist/ExtUtils-Install/lib/ExtUtils/Packlist.pm		Manipulates .packlist files
+dist/ExtUtils-Install/t/can_write_dir.t			Does the _can_write_dir function of ExtUtils::Install work properly?
+dist/ExtUtils-Install/t/Installapi2.t			See if new api for ExtUtils::Install::install() works
+dist/ExtUtils-Install/t/Installed.t			See if ExtUtils::Installed works
+dist/ExtUtils-Install/t/Install.t			See if ExtUtils::Install works
+dist/ExtUtils-Install/t/lib/MakeMaker/Test/Setup/BFD.pm	MakeMaker test utilities
+dist/ExtUtils-Install/t/lib/MakeMaker/Test/Utils.pm	MakeMaker test utilities
+dist/ExtUtils-Install/t/lib/TieOut.pm			Testing library to capture prints
+dist/ExtUtils-Install/t/Packlist.t			See if Packlist works
+dist/I18N-LangTags/ChangeLog			I18N::LangTags
+dist/I18N-LangTags/lib/I18N/LangTags/Detect.pm	Detect language preferences
+dist/I18N-LangTags/lib/I18N/LangTags/List.pm	List of tags for human languages
+dist/I18N-LangTags/lib/I18N/LangTags.pm		I18N::LangTags
+dist/I18N-LangTags/README			I18N::LangTags
+dist/I18N-LangTags/t/05_main.t			See whether I18N::LangTags works
+dist/I18N-LangTags/t/07_listy.t			See whether I18N::LangTags works
+dist/I18N-LangTags/t/10_http.t			See whether I18N::LangTags works
+dist/I18N-LangTags/t/20_locales.t		See whether I18N::LangTags works
+dist/I18N-LangTags/t/50_super.t			See whether I18N::LangTags works
+dist/I18N-LangTags/t/55_supers_strict.t		See whether I18N::LangTags works
+dist/I18N-LangTags/t/80_all_env.t		See whether I18N::LangTags works
+dist/IO/ChangeLog		IO perl module change log
+dist/IO/hints/sco.pl		Hint for IO for named architecture
+dist/IO/IO.pm			Top-level interface to IO::* classes
+dist/IO/IO.xs			IO extension external subroutines
+dist/IO/lib/IO/Dir.pm		IO directory reading package
+dist/IO/lib/IO/File.pm		IO file handle package
+dist/IO/lib/IO/Handle.pm	IO base handle package
+dist/IO/lib/IO/Poll.pm		IO system poll() interface
+dist/IO/lib/IO/Seekable.pm	IO methods for seekable handles
+dist/IO/lib/IO/Select.pm	IO system select() interface
+dist/IO/lib/IO/Socket/INET.pm	IO INET specific socket methods
+dist/IO/lib/IO/Socket.pm	IO socket handle package
+dist/IO/lib/IO/Socket/UNIX.pm	IO UNIX specific socket methods
+dist/IO/Makefile.PL		IO extension makefile writer
+dist/IO/poll.c			IO poll() emulation using select()
+dist/IO/poll.h			IO poll() emulation using select()
+dist/IO/README			IO extension maintenance notice
+dist/IO/t/io_const.t		See if constants from IO work
+dist/IO/t/io_dir.t		See if directory-related methods from IO work
+dist/IO/t/io_dup.t		See if dup()-related methods from IO work
+dist/IO/t/io_file.t		See if binmode()-related methods on IO::File work
+dist/IO/t/io_linenum.t		See if I/O line numbers are tracked correctly
+dist/IO/t/io_multihomed.t	See if INET sockets work with multi-homed hosts
+dist/IO/t/io_poll.t		See if poll()-related methods from IO work
+dist/IO/t/io_sel.t		See if select()-related methods from IO work
+dist/IO/t/io_socket.t		See if IO::Socket methods work
+dist/IO/t/io_sock.t		See if INET socket-related methods from IO work
+dist/IO/t/IO.t			See if IO works
+dist/IO/t/io_tell.t		See if seek()/tell()-related methods from IO work
+dist/IO/t/io_udp.t		See if UDP socket-related methods from IO work
+dist/IO/t/io_unix.t		See if UNIX socket-related methods from IO work
+dist/IO/t/io_utf8.t		See if perlio opens work
+dist/IO/t/io_xs.t		See if XSUB methods from IO work
+dist/lib/lib_pm.PL		For "use lib", produces lib/lib.pm
+dist/lib/Makefile.PL
+dist/lib/t/01lib.t		For "use lib" testing
+dist/Locale-Maketext/ChangeLog				Locale::Maketext
+dist/Locale-Maketext/lib/Locale/Maketext/GutsLoader.pm	Locale::Maketext
+dist/Locale-Maketext/lib/Locale/Maketext/Guts.pm	Locale::Maketext
+dist/Locale-Maketext/lib/Locale/Maketext.pm		Locale::Maketext
+dist/Locale-Maketext/lib/Locale/Maketext.pod		Locale::Maketext documentation
+dist/Locale-Maketext/lib/Locale/Maketext/TPJ13.pod	Locale::Maketext documentation article
+dist/Locale-Maketext/README				Locale::Maketext
+dist/Locale-Maketext/t/10_make.t			See if Locale::Maketext works
+dist/Locale-Maketext/t/20_get.t				See if Locale::Maketext works
+dist/Locale-Maketext/t/30_local.t			See if Locale::Maketext works
+dist/Locale-Maketext/t/40_super.t			See if Locale::Maketext works
+dist/Locale-Maketext/t/50_super.t			See if Locale::Maketext works
+dist/Locale-Maketext/t/60_super.t			See if Locale::Maketext works
+dist/Locale-Maketext/t/90_utf8.t			See if Locale::Maketext works
+dist/Pod-Perldoc/lib/Pod/Perldoc/BaseTo.pm	utility module for perldoc
+dist/Pod-Perldoc/lib/Pod/Perldoc/GetOptsOO.pm	options parsing for perldoc
+dist/Pod-Perldoc/lib/Pod/Perldoc.pm		guts of the 'perldoc' utility
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToChecker.pm	let perldoc check POD for errors
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToMan.pm	render POD as man pages
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToNroff.pm	convert POD to nroff
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToPod.pm	convert POD to POD
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToRtf.pm	convert POD to RTF
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToText.pm	convert POD to plain text
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToTk.pm	convert POD via Tk::Pod
+dist/Pod-Perldoc/lib/Pod/Perldoc/ToXml.pm	convert POD to XML
+dist/Pod-Perldoc/t/01_about_verbose.t		test Pod::Perldoc
+dist/Pod-Perldoc/t/checkerbasic.t		test Pod::Perldoc::ToChecker
+dist/Pod-Perldoc/t/perldocbasic.t		test Pod::Perldoc basic operation
+dist/Pod-Perldoc/t/textbasic.t			test Pod::Perldoc::ToText
+dist/Pod-Plainer/Plainer.pm	Pod migration utility module
+dist/Pod-Plainer/t/plainer.t	Test Pod::Plainer
+dist/XSLoader/Makefile.PL	Dynamic Loader makefile writer
+dist/XSLoader/t/XSLoader.t	See if XSLoader works
+dist/XSLoader/XSLoader_pm.PL	Simple XS Loader perl module
 djgpp/config.over	DOS/DJGPP port
 djgpp/configure.bat	DOS/DJGPP port
 djgpp/djgpp.c		DOS/DJGPP port
@@ -165,22 +678,7 @@ epoc/epocish.c		EPOC port
 epoc/epocish.h		EPOC port
 epoc/epoc_stubs.c	EPOC port
 epoc/link.pl		EPOC port link a exe
-ext/base/Changes		base.pm changelog
-ext/base/lib/base.pm		Establish IS-A relationship at compile time
-ext/base/lib/fields.pm		Set up object field names for pseudo-hash-using classes
-ext/base/MANIFEST		base.pm manifest
-ext/base/META.yml		base.pm META.yml file
-ext/base/t/base.t		See if base works
-ext/base/t/fields-base.t	See if fields work
-ext/base/t/fields.t		See if fields work
-ext/base/t/isa.t		See if base's behaviour doesn't change
-ext/base/t/lib/Dummy.pm		Test module for base.pm
-ext/base/t/sigdie.t		See if base works with SIGDIE
-ext/base/t/version.t		See if base works with versions
-ext/base/t/warnings.t		See if base works with warnings
 ext/B/B/Concise.pm	Compiler Concise backend
-ext/B/B/Debug.pm	Compiler Debug backend
-ext/B/B/Deparse.pm	Compiler Deparse backend
 ext/B/B.pm		Compiler backend support functions and methods
 ext/B/B/Showlex.pm	Compiler Showlex backend
 ext/B/B/Terse.pm	Compiler Terse backend
@@ -201,8 +699,6 @@ ext/B/t/concise.t	See whether B::Concise works
 ext/B/t/concise-xs.t	See whether B::Concise recognizes XS functions
 ext/B/t/debugging.t	-Dx optree rendering
 ext/B/t/debugging.t	-Dx optree rendering
-ext/B/t/debug.t		See if B::Debug works
-ext/B/t/deparse.t	See if B::Deparse works
 ext/B/t/f_map			code from perldoc -f map
 ext/B/t/f_map.t			converted to optreeCheck()s
 ext/B/t/f_sort			optree test raw material
@@ -216,39 +712,6 @@ ext/B/t/pragma.t	See if user pragmas work.
 ext/B/t/showlex.t	See if B::ShowLex works
 ext/B/t/terse.t		See if B::Terse works
 ext/B/typemap			Compiler backend interface types
-ext/constant/lib/constant.pm	For "use constant"
-ext/constant/t/constant.t	See if compile-time constants work
-ext/Cwd/Changes				Cwd extension Changelog
-ext/Cwd/Changes			Cwd extension Changelog
-ext/Cwd/Cwd.pm				Various cwd routines (getcwd, fastcwd, chdir)
-ext/Cwd/Cwd.pm			Various cwd routines (getcwd, fastcwd, chdir)
-ext/Cwd/Cwd.xs				Cwd extension external subroutines
-ext/Cwd/Cwd.xs			Cwd extension external subroutines
-ext/Cwd/lib/File/Spec/Cygwin.pm		portable operations on Cygwin file names
-ext/Cwd/lib/File/Spec/Epoc.pm		portable operations on EPOC file names
-ext/Cwd/lib/File/Spec/Functions.pm	Function interface to File::Spec object methods
-ext/Cwd/lib/File/Spec/Mac.pm		portable operations on Mac file names
-ext/Cwd/lib/File/Spec/OS2.pm		portable operations on OS2 file names
-ext/Cwd/lib/File/Spec.pm		portable operations on file names
-ext/Cwd/lib/File/Spec/Unix.pm		portable operations on Unix file names
-ext/Cwd/lib/File/Spec/VMS.pm		portable operations on VMS file names
-ext/Cwd/lib/File/Spec/Win32.pm		portable operations on Win32 and NetWare file names
-ext/Cwd/Makefile.PL		Cwd extension makefile maker
-ext/Cwd/t/crossplatform.t		See if File::Spec works crossplatform
-ext/Cwd/t/cwd.t			See if Cwd works
-ext/Cwd/t/Functions.t			See if File::Spec::Functions works
-ext/Cwd/t/rel2abs2rel.t			See if File::Spec->rel2abs/abs2rel works
-ext/Cwd/t/Spec.t			See if File::Spec works
-ext/Cwd/t/tmpdir.t			See if File::Spec->tmpdir() works
-ext/Cwd/t/win32.t		See if Cwd works on Win32
-ext/Data-Dumper/Changes		Data pretty printer, changelog
-ext/Data-Dumper/Dumper.pm	Data pretty printer, module
-ext/Data-Dumper/t/bless.t	See if Data::Dumper works
-ext/Data-Dumper/t/bugs.t	See if Data::Dumper works
-ext/Data-Dumper/t/dumper.t	See if Data::Dumper works
-ext/Data-Dumper/t/freezer.t	See if $Data::Dumper::Freezer works
-ext/Data-Dumper/Todo		Data pretty printer, futures
-ext/Data-Dumper/t/pair.t	See if Data::Dumper pair separator works
 ext/DynaLoader/dl_aix.xs	AIX implementation
 ext/DynaLoader/dl_beos.xs	BeOS implementation
 ext/DynaLoader/dl_dld.xs	GNU dld style implementation
@@ -280,29 +743,6 @@ ext/Errno/ChangeLog	Errno changes
 ext/Errno/Errno_pm.PL	Errno perl module create script
 ext/Errno/Makefile.PL	Errno extension makefile writer
 ext/Errno/t/Errno.t	See if Errno works
-ext/ExtUtils-Command/lib/ExtUtils/Command.pm	Utilities for Make on non-UNIX platforms
-ext/ExtUtils-Command/t/eu_command.t		See if ExtUtils::Command works
-ext/ExtUtils-Constant/lib/ExtUtils/Constant/Base.pm		generate XS code to import C header constants
-ext/ExtUtils-Constant/lib/ExtUtils/Constant.pm			generate XS code to import C header constants
-ext/ExtUtils-Constant/lib/ExtUtils/Constant/ProxySubs.pm	generate XS code for proxy constants
-ext/ExtUtils-Constant/lib/ExtUtils/Constant/Utils.pm		generate XS code to import C header constants
-ext/ExtUtils-Constant/lib/ExtUtils/Constant/XS.pm		generate XS code to import C header constants
-ext/ExtUtils-Constant/t/Constant.t				See if ExtUtils::Constant works
-ext/ExtUtils-Install/Changes				ExtUtils-Install change log
-ext/ExtUtils-Install/lib/ExtUtils/Installed.pm		Information on installed extensions
-ext/ExtUtils-Install/lib/ExtUtils/Install.pm		Handles 'make install' on extensions
-ext/ExtUtils-Install/lib/ExtUtils/Packlist.pm		Manipulates .packlist files
-ext/ExtUtils-Install/t/can_write_dir.t			Does the _can_write_dir function of ExtUtils::Install work properly?
-ext/ExtUtils-Install/t/Installapi2.t			See if new api for ExtUtils::Install::install() works
-ext/ExtUtils-Install/t/Installed.t			See if ExtUtils::Installed works
-ext/ExtUtils-Install/t/Install.t			See if ExtUtils::Install works
-ext/ExtUtils-Install/t/lib/MakeMaker/Test/Setup/BFD.pm	MakeMaker test utilities
-ext/ExtUtils-Install/t/lib/MakeMaker/Test/Utils.pm	MakeMaker test utilities
-ext/ExtUtils-Install/t/lib/TieOut.pm			Testing library to capture prints
-ext/ExtUtils-Install/t/Packlist.t			See if Packlist works
-ext/ExtUtils-Manifest/lib/ExtUtils/Manifest.pm		Utilities to write MANIFEST files
-ext/ExtUtils-Manifest/lib/ExtUtils/MANIFEST.SKIP	The default MANIFEST.SKIP
-ext/ExtUtils-Manifest/t/Manifest.t			See if ExtUtils::Manifest works
 ext/Fcntl/Fcntl.pm	Fcntl extension Perl module
 ext/Fcntl/Fcntl.xs	Fcntl extension external subroutines
 ext/Fcntl/Makefile.PL	Fcntl extension makefile writer
@@ -318,15 +758,6 @@ ext/File-Glob/Makefile.PL	File::Glob extension makefile writer
 ext/File-Glob/t/basic.t		See if File::Glob works
 ext/File-Glob/t/case.t		See if File::Glob works
 ext/File-Glob/TODO		File::Glob extension todo list
-ext/File-Temp/Temp.pm		create safe temporary files and file handles
-ext/File-Temp/t/fork.t		See if File::Temp works
-ext/File-Temp/t/lock.t		See if File::Temp works
-ext/File-Temp/t/mktemp.t	See if File::Temp works
-ext/File-Temp/t/object.t	See if File::Temp works
-ext/File-Temp/t/posix.t		See if File::Temp works
-ext/File-Temp/t/security.t	See if File::Temp works
-ext/File-Temp/t/seekable.t	See if File::Temp works
-ext/File-Temp/t/tempfile.t	See if File::Temp works
 ext/Hash-Util/Changes		Change history of Hash::Util
 ext/Hash-Util/lib/Hash/Util.pm	Hash::Util
 ext/Hash-Util/Makefile.PL	Makefile for Hash::Util
@@ -338,58 +769,10 @@ ext/I18N-Langinfo/Langinfo.pm	I18N::Langinfo
 ext/I18N-Langinfo/Langinfo.xs	I18N::Langinfo
 ext/I18N-Langinfo/Makefile.PL	I18N::Langinfo
 ext/I18N-Langinfo/t/Langinfo.t	See whether I18N::Langinfo works
-ext/I18N-LangTags/ChangeLog			I18N::LangTags
-ext/I18N-LangTags/lib/I18N/LangTags/Detect.pm	Detect language preferences
-ext/I18N-LangTags/lib/I18N/LangTags/List.pm	List of tags for human languages
-ext/I18N-LangTags/lib/I18N/LangTags.pm		I18N::LangTags
-ext/I18N-LangTags/README			I18N::LangTags
-ext/I18N-LangTags/t/05_main.t			See whether I18N::LangTags works
-ext/I18N-LangTags/t/07_listy.t			See whether I18N::LangTags works
-ext/I18N-LangTags/t/10_http.t			See whether I18N::LangTags works
-ext/I18N-LangTags/t/20_locales.t		See whether I18N::LangTags works
-ext/I18N-LangTags/t/50_super.t			See whether I18N::LangTags works
-ext/I18N-LangTags/t/55_supers_strict.t		See whether I18N::LangTags works
-ext/I18N-LangTags/t/80_all_env.t		See whether I18N::LangTags works
-ext/IO/ChangeLog		IO perl module change log
-ext/IO/hints/sco.pl		Hint for IO for named architecture
-ext/IO/IO.pm			Top-level interface to IO::* classes
-ext/IO/IO.xs			IO extension external subroutines
-ext/IO/lib/IO/Dir.pm		IO directory reading package
-ext/IO/lib/IO/File.pm		IO file handle package
-ext/IO/lib/IO/Handle.pm		IO base handle package
-ext/IO/lib/IO/Poll.pm		IO system poll() interface
-ext/IO/lib/IO/Seekable.pm	IO methods for seekable handles
-ext/IO/lib/IO/Select.pm		IO system select() interface
-ext/IO/lib/IO/Socket/INET.pm	IO INET specific socket methods
-ext/IO/lib/IO/Socket.pm		IO socket handle package
-ext/IO/lib/IO/Socket/UNIX.pm	IO UNIX specific socket methods
-ext/IO/Makefile.PL		IO extension makefile writer
-ext/IO/poll.c			IO poll() emulation using select()
-ext/IO/poll.h			IO poll() emulation using select()
-ext/IO/README			IO extension maintenance notice
-ext/IO/t/io_const.t	See if constants from IO work
-ext/IO/t/io_dir.t	See if directory-related methods from IO work
-ext/IO/t/io_dup.t	See if dup()-related methods from IO work
-ext/IO/t/io_file.t	See if binmode()-related methods on IO::File work
-ext/IO/t/io_linenum.t	See if I/O line numbers are tracked correctly
-ext/IO/t/io_multihomed.t	See if INET sockets work with multi-homed hosts
-ext/IO/t/io_poll.t	See if poll()-related methods from IO work
-ext/IO/t/io_sel.t	See if select()-related methods from IO work
-ext/IO/t/io-socket.t	See if basic IO::Sockets methods work
-ext/IO/t/io_sock.t	See if INET socket-related methods from IO work
-ext/IO/t/IO.t	See if IO works
-ext/IO/t/io_tell.t	See if seek()/tell()-related methods from IO work
-ext/IO/t/io_udp.t	See if UDP socket-related methods from IO work
-ext/IO/t/io_unix.t	See if UNIX socket-related methods from IO work
-ext/IO/t/io_utf8.t	See if perlio opens work
-ext/IO/t/io_xs.t		See if XSUB methods from IO work
 ext/IPC-Open2/lib/IPC/Open2.pm	Open a two-ended pipe
 ext/IPC-Open2/t/IPC-Open2.t	See if IPC::Open2 works
 ext/IPC-Open3/lib/IPC/Open3.pm	Open a three-ended pipe
 ext/IPC-Open3/t/IPC-Open3.t	See if IPC::Open3 works
-ext/lib/lib_pm.PL		For "use lib", produces lib/lib.pm
-ext/lib/Makefile.PL
-ext/lib/t/01lib.t		For "use lib" testing
 ext/List-Util/Changes		Util extension
 ext/List-Util/lib/List/Util.pm	List::Util
 ext/List-Util/lib/Scalar/Util.pm	Scalar::Util
@@ -412,54 +795,6 @@ ext/List-Util/t/reftype.t	Scalar::Util
 ext/List-Util/t/shuffle.t	List::Util
 ext/List-Util/t/sum.t		List::Util
 ext/List-Util/t/weak.t		Scalar::Util
-ext/Locale-Codes/ChangeLog	Locale::Codes
-ext/Locale-Codes/lib/Locale/Constants.pm		Locale::Codes
-ext/Locale-Codes/lib/Locale/Constants.pod	Locale::Codes documentation
-ext/Locale-Codes/lib/Locale/Country.pm		Locale::Codes
-ext/Locale-Codes/lib/Locale/Country.pod		Locale::Codes documentation
-ext/Locale-Codes/lib/Locale/Currency.pm		Locale::Codes
-ext/Locale-Codes/lib/Locale/Currency.pod		Locale::Codes documentation
-ext/Locale-Codes/lib/Locale/Language.pm		Locale::Codes
-ext/Locale-Codes/lib/Locale/Language.pod		Locale::Codes documentation
-ext/Locale-Codes/lib/Locale/Script.pm		Locale::Codes
-ext/Locale-Codes/lib/Locale/Script.pod		Locale::Codes documentation
-ext/Locale-Codes/Makefile.PL
-ext/Locale-Codes/README		Locale::Codes
-ext/Locale-Codes/t/all.t	See if Locale::Codes work
-ext/Locale-Codes/t/constants.t	See if Locale::Codes work
-ext/Locale-Codes/t/country.t	See if Locale::Codes work
-ext/Locale-Codes/t/currency.t	See if Locale::Codes work
-ext/Locale-Codes/t/language.t	See if Locale::Codes work
-ext/Locale-Codes/t/rename.t	See if Locale::Codes work
-ext/Locale-Codes/t/script.t	See if Locale::Codes work
-ext/Locale-Codes/t/uk.t		See if Locale::Codes work
-ext/Locale-Maketext/ChangeLog	Locale::Maketext
-ext/Locale-Maketext/lib/Locale/Maketext/GutsLoader.pm	Locale::Maketext
-ext/Locale-Maketext/lib/Locale/Maketext/Guts.pm	Locale::Maketext
-ext/Locale-Maketext/lib/Locale/Maketext.pm		Locale::Maketext
-ext/Locale-Maketext/lib/Locale/Maketext.pod		Locale::Maketext documentation
-ext/Locale-Maketext/lib/Locale/Maketext/TPJ13.pod	Locale::Maketext documentation article
-ext/Locale-Maketext/README	Locale::Maketext
-ext/Locale-Maketext-Simple/lib/Locale/Maketext/Simple.pm	Locale::Simple
-ext/Locale-Maketext-Simple/t/0-signature.t	Locale::Simple tests
-ext/Locale-Maketext-Simple/t/1-basic.t	Locale::Simple tests
-ext/Locale-Maketext/t/10_make.t	See if Locale::Maketext works
-ext/Locale-Maketext/t/20_get.t	See if Locale::Maketext works
-ext/Locale-Maketext/t/30_local.t	See if Locale::Maketext works
-ext/Locale-Maketext/t/40_super.t	See if Locale::Maketext works
-ext/Locale-Maketext/t/50_super.t	See if Locale::Maketext works
-ext/Locale-Maketext/t/60_super.t	See if Locale::Maketext works
-ext/Locale-Maketext/t/90_utf8.t	See if Locale::Maketext works
-ext/MIME-Base64/Base64.pm	MIME::Base64 extension
-ext/MIME-Base64/Base64.xs	MIME::Base64 extension
-ext/MIME-Base64/Changes		MIME::Base64 extension
-ext/MIME-Base64/Makefile.PL	MIME::Base64 extension
-ext/MIME-Base64/QuotedPrint.pm	MIME::Base64 extension
-ext/MIME-Base64/README		README for MIME::Base64
-ext/MIME-Base64/t/base64.t	See whether MIME::Base64 works
-ext/MIME-Base64/t/quoted-print.t	See whether MIME::QuotedPrint works
-ext/MIME-Base64/t/unicode.t	See whether MIME::Base64 works
-ext/MIME-Base64/t/warn.t	See whether MIME::Base64 works
 ext/Opcode/Opcode.pm		Opcode extension Perl module
 ext/Opcode/Opcode.xs		Opcode extension external subroutines
 ext/Opcode/ops.pm		"Pragma" form of Opcode extension Perl module
@@ -547,282 +882,9 @@ ext/PerlIO-scalar/scalar.xs	PerlIO layer for scalars
 ext/PerlIO-scalar/t/scalar.t		See if PerlIO::scalar works
 ext/PerlIO-scalar/t/scalar_ungetc.t	Tests for PerlIO layer for scalars
 ext/PerlIO-via/hints/aix.pl	Hint for PerlIO::via for named architecture
-ext/PerlIO-via-QuotedPrint/lib/PerlIO/via/QuotedPrint.pm	PerlIO::via::QuotedPrint
-ext/PerlIO-via-QuotedPrint/t/QuotedPrint.t			PerlIO::via::QuotedPrint
 ext/PerlIO-via/t/via.t		See if PerlIO::via works
 ext/PerlIO-via/via.pm		PerlIO layer for layers in perl
 ext/PerlIO-via/via.xs		PerlIO layer for layers in perl
-ext/Pod-Escapes/ChangeLog		ChangeLog for Pod::Escapes
-ext/Pod-Escapes/lib/Pod/Escapes.pm	Pod::Escapes
-ext/Pod-Escapes/README			README for Pod::Escapes
-ext/Pod-Escapes/t/01_about_verbose.t	test Pod::Escapes
-ext/Pod-Escapes/t/10_main.t		test Pod::Escapes
-ext/Pod-Escapes/t/15_name2charnum.t	test Pod::Escapes
-ext/Pod-LaTeX/LaTeX.pm		Convert POD data to LaTeX
-ext/Pod-LaTeX/t/pod2latex.t	See if Pod::LaTeX works
-ext/Pod-LaTeX/t/user.t		See if Pod::LaTeX works
-ext/podlators/lib/Pod/Man.pm			Convert POD data to *roff
-ext/podlators/lib/Pod/ParseLink.pm		Perl an L<> formatting code in POD text
-ext/podlators/lib/Pod/Text/Color.pm		Convert POD data to color ASCII text
-ext/podlators/lib/Pod/Text/Overstrike.pm	Convert POD data to formatted overstrike text
-ext/podlators/lib/Pod/Text.pm			Pod-Parser - convert POD data to formatted ASCII text
-ext/podlators/lib/Pod/Text/Termcap.pm		Convert POD data to ASCII text with format escapes
-ext/podlators/Makefile.PL
-ext/podlators/t/basic.cap			podlators test
-ext/podlators/t/basic.clr			podlators test
-ext/podlators/t/basic.man			podlators test
-ext/podlators/t/basic.ovr			podlators test
-ext/podlators/t/basic.pod			podlators test
-ext/podlators/t/basic.t				podlators test
-ext/podlators/t/basic.txt			podlators test
-ext/podlators/t/color.t				podlators test
-ext/podlators/t/filehandle.t			podlators test
-ext/podlators/t/man-options.t			podlators test
-ext/podlators/t/man.t				podlators test
-ext/podlators/t/parselink.t			podlators test
-ext/podlators/t/pod-parser.t			podlators test
-ext/podlators/t/pod-spelling.t			podlators test
-ext/podlators/t/pod.t				podlators test
-ext/podlators/t/termcap.t			podlators test
-ext/podlators/t/text-options.t			podlators test
-ext/podlators/t/text.t				podlators test
-ext/podlators/VERSION				podlators custom Makefile.PL
-ext/podlators/VERSION				podlators distribution version
-ext/Pod-Parser/lib/Pod/Checker.pm		Pod-Parser - check POD documents for syntax errors
-ext/Pod-Parser/lib/Pod/Find.pm			used by pod/splitpod
-ext/Pod-Parser/lib/Pod/InputObjects.pm		Pod-Parser - define objects for input streams
-ext/Pod-Parser/lib/Pod/Parser.pm		Pod-Parser - define base class for parsing POD
-ext/Pod-Parser/lib/Pod/ParseUtils.pm		Pod-Parser - pod utility functions
-ext/Pod-Parser/lib/Pod/PlainText.pm		Convert POD data to formatted ASCII text
-ext/Pod-Parser/lib/Pod/Select.pm		Pod-Parser - select portions of POD docs
-ext/Pod-Parser/lib/Pod/Usage.pm			Pod-Parser - print usage messages
-ext/Pod-Parser/t/pod/contains_pod.t		Pod-Parser test
-ext/Pod-Parser/t/pod/contains_pod.xr		Pod-Parser test file
-ext/Pod-Parser/t/pod/emptycmd.t			Test empty pod directives
-ext/Pod-Parser/t/pod/emptycmd.xr		Expected results for emptycmd.t
-ext/Pod-Parser/t/pod/find.t			See if Pod::Find works
-ext/Pod-Parser/t/pod/for.t			Test =for directive
-ext/Pod-Parser/t/pod/for.xr			Expected results for for.t
-ext/Pod-Parser/t/pod/headings.t			Test =head directives
-ext/Pod-Parser/t/pod/headings.xr		Expected results for headings.t
-ext/Pod-Parser/t/pod/included.t			Test =include directive
-ext/Pod-Parser/t/pod/included.xr		Expected results for included.t
-ext/Pod-Parser/t/pod/include.t			Test =include directive
-ext/Pod-Parser/t/pod/include.xr			Expected results for include.t
-ext/Pod-Parser/t/pod/lref.t			Test L<...> sequences
-ext/Pod-Parser/t/pod/lref.xr			Expected results for lref.t
-ext/Pod-Parser/t/pod/multiline_items.t		Test multiline =items
-ext/Pod-Parser/t/pod/multiline_items.xr		Expected results for multiline_items.t
-ext/Pod-Parser/t/pod/nested_items.t		Test nested =items
-ext/Pod-Parser/t/pod/nested_items.xr		Expected results for nested_items.t
-ext/Pod-Parser/t/pod/nested_seqs.t		Test nested interior sequences
-ext/Pod-Parser/t/pod/nested_seqs.xr		Expected results for nested_seqs.t
-ext/Pod-Parser/t/pod/oneline_cmds.t		Test single paragraph ==cmds
-ext/Pod-Parser/t/pod/oneline_cmds.xr		Expected results for oneline_cmds.t
-ext/Pod-Parser/t/pod/p2u_data.pl		Test Pod::Usage
-ext/Pod-Parser/t/pod/pod2usage2.t		Test Pod::Usage
-ext/Pod-Parser/t/pod/pod2usage.t		Test Pod::Usage
-ext/Pod-Parser/t/pod/pod2usage.xr		Expected results for pod2usage.t
-ext/Pod-Parser/t/pod/poderrs.t			Test POD errors
-ext/Pod-Parser/t/pod/poderrs.xr			Expected results for poderrs.t
-ext/Pod-Parser/t/pod/podselect.t		Test Pod::Select
-ext/Pod-Parser/t/pod/podselect.xr		Expected results for podselect.t
-ext/Pod-Parser/t/pod/special_seqs.t		Test "special" interior sequences
-ext/Pod-Parser/t/pod/special_seqs.xr		Expected results for special_seqs.t
-ext/Pod-Parser/t/pod/testcmp.pl			Module to compare output against expected results
-ext/Pod-Parser/t/pod/testp2pt.pl		Module to test Pod::PlainText for a given file
-ext/Pod-Parser/t/pod/testpchk.pl		Module to test Pod::Checker for a given file
-ext/Pod-Parser/t/pod/testpods/lib/Pod/Stuff.pm	Sample data for t/pod/find.t
-ext/Pod-Parser/t/pod/twice.t			Test Pod::Parser
-ext/Pod-Perldoc/lib/Pod/Perldoc/BaseTo.pm	utility module for perldoc
-ext/Pod-Perldoc/lib/Pod/Perldoc/GetOptsOO.pm	options parsing for perldoc
-ext/Pod-Perldoc/lib/Pod/Perldoc.pm		guts of the 'perldoc' utility
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToChecker.pm	let perldoc check POD for errors
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToMan.pm	render POD as man pages
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToNroff.pm	convert POD to nroff
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToPod.pm	convert POD to POD
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToRtf.pm	convert POD to RTF
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToText.pm	convert POD to plain text
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToTk.pm		convert POD via Tk::Pod
-ext/Pod-Perldoc/lib/Pod/Perldoc/ToXml.pm	convert POD to XML
-ext/Pod-Perldoc/t/01_about_verbose.t		test Pod::Perldoc
-ext/Pod-Perldoc/t/checkerbasic.t		test Pod::Perldoc::ToChecker
-ext/Pod-Perldoc/t/perldocbasic.t		test Pod::Perldoc basic operation
-ext/Pod-Perldoc/t/textbasic.t			test Pod::Perldoc::ToText
-ext/Pod-Plainer/Plainer.pm	Pod migration utility module
-ext/Pod-Plainer/t/plainer.t	Test Pod::Plainer
-ext/Pod-Simple/ChangeLog				Pod::Simple ChangeLog
-ext/Pod-Simple/lib/Pod/Simple/BlackBox.pm		Pod::Simple::BlackBox
-ext/Pod-Simple/lib/Pod/Simple/Checker.pm		check the Pod syntax of a document
-ext/Pod-Simple/lib/Pod/Simple/Debug.pm			put Pod::Simple into trace/debug mode
-ext/Pod-Simple/lib/Pod/Simple/DumpAsText.pm		dump Pod-parsing events as text
-ext/Pod-Simple/lib/Pod/Simple/DumpAsXML.pm		turn Pod into XML
-ext/Pod-Simple/lib/Pod/Simple/HTMLBatch.pm		convert several Pod files to several HTML files
-ext/Pod-Simple/lib/Pod/Simple/HTMLLegacy.pm		Pod::Simple::HTMLLegacy
-ext/Pod-Simple/lib/Pod/Simple/HTML.pm			convert Pod to HTML
-ext/Pod-Simple/lib/Pod/Simple/LinkSection.pm		represent "section" attributes of L codes
-ext/Pod-Simple/lib/Pod/Simple/Methody.pm		turn Pod::Simple events into method calls
-ext/Pod-Simple/lib/Pod/Simple.pm			Pod made simple
-ext/Pod-Simple/lib/Pod/Simple.pod			Pod for Pod::Simple
-ext/Pod-Simple/lib/Pod/Simple/Progress.pm		Pod::Simple::Progress
-ext/Pod-Simple/lib/Pod/Simple/PullParserEndToken.pm	end-tokens from Pod::Simple::PullParser
-ext/Pod-Simple/lib/Pod/Simple/PullParser.pm		a pull-parser interface to parsing Pod
-ext/Pod-Simple/lib/Pod/Simple/PullParserStartToken.pm	start-tokens from Pod::Simple::PullParser
-ext/Pod-Simple/lib/Pod/Simple/PullParserTextToken.pm	text-tokens from Pod::Simple::PullParser
-ext/Pod-Simple/lib/Pod/Simple/PullParserToken.pm	tokens from Pod::Simple::PullParser
-ext/Pod-Simple/lib/Pod/Simple/RTF.pm			format Pod as RTF
-ext/Pod-Simple/lib/Pod/Simple/Search.pm			find POD documents in directory trees
-ext/Pod-Simple/lib/Pod/Simple/SimpleTree.pm		parse Pod into a simple parse tree
-ext/Pod-Simple/lib/Pod/Simple/Subclassing.pod		write a formatter as a Pod::Simple subclass
-ext/Pod-Simple/lib/Pod/Simple/TextContent.pm		get the text content of Pod
-ext/Pod-Simple/lib/Pod/Simple/Text.pm			format Pod as plaintext
-ext/Pod-Simple/lib/Pod/Simple/TranscodeDumb.pm		Pod::Simple::TranscodeDumb
-ext/Pod-Simple/lib/Pod/Simple/Transcode.pm		Pod::Simple::Transcode
-ext/Pod-Simple/lib/Pod/Simple/TranscodeSmart.pm		Pod::Simple::TranscodeSmart
-ext/Pod-Simple/lib/Pod/Simple/XHTML.pm			turn Pod into XHTML
-ext/Pod-Simple/lib/Pod/Simple/XMLOutStream.pm		turn Pod into XML
-ext/Pod-Simple/README					Pod::Simple README file
-ext/Pod-Simple/t/00about.t				Pod::Simple test file
-ext/Pod-Simple/t/20_skip.t				Pod::Simple test file
-ext/Pod-Simple/t/accept01.t				Pod::Simple test file
-ext/Pod-Simple/t/accept05.t				Pod::Simple test file
-ext/Pod-Simple/t/ac_d.t					Pod::Simple test file
-ext/Pod-Simple/t/basic.t				Pod::Simple test file
-ext/Pod-Simple/t/begin.t				Pod::Simple test file
-ext/Pod-Simple/t/cbacks.t				Pod::Simple test file
-ext/Pod-Simple/t/chunking.t				Pod::Simple test file
-ext/Pod-Simple/t/closeys.t				Pod::Simple test file
-ext/Pod-Simple/t/corpus/2202jp.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/2202jp.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/2202jpx.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/2202jpx.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/2202jpy.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/2202jpy.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/2202jpz.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/2202jpz.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus2/fiqhakbar_iso6.txt		Pod::Simple test file
-ext/Pod-Simple/t/corpus2/fiqhakbar_iso6.xml		Pod::Simple test file
-ext/Pod-Simple/t/corpus2/polish_implicit_utf8.txt	Pod::Simple test file
-ext/Pod-Simple/t/corpus2/polish_utf16be_bom.txt		Pod::Simple test file
-ext/Pod-Simple/t/corpus2/polish_utf16le_bom.txt		Pod::Simple test file
-ext/Pod-Simple/t/corpus2/polish_utf8_bom2.txt		Pod::Simple test file
-ext/Pod-Simple/t/corpus2/polish_utf8_bom2.xml		Pod::Simple test file
-ext/Pod-Simple/t/corpus2/polish_utf8_bom.txt		Pod::Simple test file
-ext/Pod-Simple/t/corpus2/polish_utf8_bom.xml		Pod::Simple test file
-ext/Pod-Simple/t/corpus/8859_7.pod			Pod::Simple test file
-ext/Pod-Simple/t/corpus/8859_7.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/cp1256.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/cp1256.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/fet_cont.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/fet_cont.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/fet_dup.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/fet_dup.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/iso6.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/iso6.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/koi8r.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/koi8r.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/laozi38b.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/laozi38b.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/laozi38p.pod			Pod::Simple test file
-ext/Pod-Simple/t/corpus/laozi38p.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/laozi38.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/laozi38.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/lat1frim.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/lat1frim.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/lat1fr.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/lat1fr.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/nonesuch.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/nonesuch.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/pasternak_cp1251.txt		Pod::Simple test file
-ext/Pod-Simple/t/corpus/pasternak_cp1251.xml		Pod::Simple test file
-ext/Pod-Simple/t/corpus/plain_explicit.txt		Pod::Simple test file
-ext/Pod-Simple/t/corpus/plain_explicit.xml		Pod::Simple test file
-ext/Pod-Simple/t/corpus/plain_latin1.txt		Pod::Simple test file
-ext/Pod-Simple/t/corpus/plain_latin1.xml		Pod::Simple test file
-ext/Pod-Simple/t/corpus/plain.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/plain_utf8.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/plain_utf8.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/plain.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/polish_utf8.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/polish_utf8.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus/s2763_sjis.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/s2763_sjis.xml			Pod::Simple test file
-ext/Pod-Simple/t/corpus.t				Pod::Simple test file
-ext/Pod-Simple/t/corpus/thai_iso11.txt			Pod::Simple test file
-ext/Pod-Simple/t/corpus/thai_iso11.xml			Pod::Simple test file
-ext/Pod-Simple/t/encod01.t				Pod::Simple test file
-ext/Pod-Simple/t/encod02.t				Pod::Simple test file
-ext/Pod-Simple/t/encod03.t				Pod::Simple test file
-ext/Pod-Simple/t/end_over.t				Pod::Simple test file
-ext/Pod-Simple/t/fcodes_e.t				Pod::Simple test file
-ext/Pod-Simple/t/fcodes_l.t				Pod::Simple test file
-ext/Pod-Simple/t/fcodes_s.t				Pod::Simple test file
-ext/Pod-Simple/t/fcodes.t				Pod::Simple test file
-ext/Pod-Simple/t/fornot.t				Pod::Simple test file
-ext/Pod-Simple/t/for.t					Pod::Simple test file
-ext/Pod-Simple/t/fullstop.t				Pod::Simple test file
-ext/Pod-Simple/t/heads.t				Pod::Simple test file
-ext/Pod-Simple/t/html01.t				Pod::Simple test file
-ext/Pod-Simple/t/html02.t				Pod::Simple test file
-ext/Pod-Simple/t/html03.t				Pod::Simple test file
-ext/Pod-Simple/t/htmlbat.t				Pod::Simple test file
-ext/Pod-Simple/t/items02.t				Pod::Simple test file
-ext/Pod-Simple/t/items.t				Pod::Simple test file
-ext/Pod-Simple/t/itemstar.t				Pod::Simple test file
-ext/Pod-Simple/t/junk1o.txt				Pod::Simple test file
-ext/Pod-Simple/t/junk1.pod				Pod::Simple test file
-ext/Pod-Simple/t/junk2o.txt				Pod::Simple test file
-ext/Pod-Simple/t/junk2.pod				Pod::Simple test file
-ext/Pod-Simple/t/linkclas.t				Pod::Simple test file
-ext/Pod-Simple/t/perlcygo.txt				Pod::Simple test file
-ext/Pod-Simple/t/perlcyg.pod				Pod::Simple test file
-ext/Pod-Simple/t/perlfaqo.txt				Pod::Simple test file
-ext/Pod-Simple/t/perlfaq.pod				Pod::Simple test file
-ext/Pod-Simple/t/perlvaro.txt				Pod::Simple test file
-ext/Pod-Simple/t/perlvar.pod				Pod::Simple test file
-ext/Pod-Simple/t/puller.t				Pod::Simple test file
-ext/Pod-Simple/t/pulltitl.t				Pod::Simple test file
-ext/Pod-Simple/t/reinit.t				Pod::Simple test file
-ext/Pod-Simple/t/render.t				Pod::Simple test file
-ext/Pod-Simple/t/search05.t				Pod::Simple test file
-ext/Pod-Simple/t/search10.t				Pod::Simple test file
-ext/Pod-Simple/t/search12.t				Pod::Simple test file
-ext/Pod-Simple/t/search20.t				Pod::Simple test file
-ext/Pod-Simple/t/search22.t				Pod::Simple test file
-ext/Pod-Simple/t/search25.t				Pod::Simple test file
-ext/Pod-Simple/t/search26.t				Pod::Simple test file
-ext/Pod-Simple/t/search27.t				Pod::Simple test file
-ext/Pod-Simple/t/search28.t				Pod::Simple test file
-ext/Pod-Simple/t/search29.t				Pod::Simple test file
-ext/Pod-Simple/t/search50.t				Pod::Simple test file
-ext/Pod-Simple/t/stree.t				Pod::Simple test file
-ext/Pod-Simple/t/testlib1/Blorm.pm			Pod::Simple test file
-ext/Pod-Simple/t/testlib1/hinkhonk/Glunk.pod		Pod::Simple test file
-ext/Pod-Simple/t/testlib1/hinkhonk/readme.txt		Pod::Simple test file
-ext/Pod-Simple/t/testlib1/hinkhonk/Vliff.pm		Pod::Simple test file
-ext/Pod-Simple/t/testlib1/pod/perlflif.pod		Pod::Simple test file
-ext/Pod-Simple/t/testlib1/pod/perlthng.pod		Pod::Simple test file
-ext/Pod-Simple/t/testlib1/squaa/Glunk.pod		Pod::Simple test file
-ext/Pod-Simple/t/testlib1/squaa.pm			Pod::Simple test file
-ext/Pod-Simple/t/testlib1/squaa/Vliff.pm		Pod::Simple test file
-ext/Pod-Simple/t/testlib1/zikzik.pod			Pod::Simple test file
-ext/Pod-Simple/t/testlib1/Zonk/Fiddle.txt		Pod::Simple test file
-ext/Pod-Simple/t/testlib1/Zonk/Pronk.pm			Pod::Simple test file
-ext/Pod-Simple/t/testlib1/Zonk/Veng.pm			Pod::Simple test file
-ext/Pod-Simple/t/testlib2/hinkhonk/Glunk.pod		Pod::Simple test file
-ext/Pod-Simple/t/testlib2/hinkhonk/readme.txt		Pod::Simple test file
-ext/Pod-Simple/t/testlib2/hinkhonk/Vliff.pm		Pod::Simple test file
-ext/Pod-Simple/t/testlib2/pod/perlthng.pod		Pod::Simple test file
-ext/Pod-Simple/t/testlib2/pod/perlzuk.pod		Pod::Simple test file
-ext/Pod-Simple/t/testlib2/squaa/Vliff.pm		Pod::Simple test file
-ext/Pod-Simple/t/testlib2/squaa/Wowo.pod		Pod::Simple test file
-ext/Pod-Simple/t/testlib2/Suzzle.pm			Pod::Simple test file
-ext/Pod-Simple/t/testlib3/squaa/Vliff.pm		Pod::Simple test file
-ext/Pod-Simple/t/verbatim.t				Pod::Simple test file
-ext/Pod-Simple/t/verb_fmt.t				Pod::Simple test file
-ext/Pod-Simple/t/xhtml01.t				Pod::Simple test file
-ext/Pod-Simple/t/xhtml05.t				Pod::Simple test file
-ext/Pod-Simple/t/x_nixer.t				Pod::Simple test file
 ext/POSIX/hints/bsdos.pl	Hint for POSIX for named architecture
 ext/POSIX/hints/dynixptx.pl	Hint for POSIX for named architecture
 ext/POSIX/hints/freebsd.pl	Hint for POSIX for named architecture
@@ -871,44 +933,6 @@ ext/Socket/t/Socket.t		See if Socket works
 ext/Sys-Hostname/Hostname.pm	Sys::Hostname extension Perl module
 ext/Sys-Hostname/Hostname.xs	Sys::Hostname extension external subroutines
 ext/Sys-Hostname/t/Hostname.t	See if Sys::Hostname works
-ext/Term-ANSIColor/ANSIColor.pm		Perl module supporting termcap usage
-ext/Term-ANSIColor/ChangeLog		Term::ANSIColor
-ext/Term-ANSIColor/README		Term::ANSIColor
-ext/Term-ANSIColor/t/basic.t		Tests for Term::ANSIColor
-ext/Term-Cap/Cap.pm			Perl module supporting termcap usage
-ext/Term-Cap/test.pl			See if Term::Cap works
-ext/Text-ParseWords/lib/Text/ParseWords.pm	Perl module to split words on arbitrary delimiter
-ext/Text-ParseWords/t/ParseWords.t	See if Text::ParseWords works
-ext/Text-Tabs/CHANGELOG			ChangeLog for Tabs+Wrap
-ext/Text-Tabs/lib/Text/Tabs.pm		Do expand and unexpand
-ext/Text-Tabs/lib/Text/Wrap.pm		Paragraph formatter
-ext/Text-Tabs/t/37000.t			See if Text::Tabs is working
-ext/Text-Tabs/t/39548.t			See if Text::Tabs is working
-ext/Text-Tabs/t/belg4mit.t		See if Text::Tabs is working
-ext/Text-Tabs/t/fill.t			See if Text::Wrap::fill works
-ext/Text-Tabs/t/Jacobson2.t		See if Text::Tabs is working
-ext/Text-Tabs/t/Jacobson.t		See if Text::Tabs is working
-ext/Text-Tabs/t/Jochen.t		See if Text::Tabs is working
-ext/Text-Tabs/t/sep2.t			See if Text::Tabs is working
-ext/Text-Tabs/t/sep.t			See if Text::Tabs is working
-ext/Text-Tabs/t/tabs.t			See if Text::Tabs works
-ext/Text-Tabs/t/wrap.t			See if Text::Wrap::wrap works
-ext/Time-HiRes/Changes		Time::HiRes extension
-ext/Time-HiRes/fallback/const-c.inc	Time::HiRes extension
-ext/Time-HiRes/fallback/const-xs.inc	Time::HiRes extension
-ext/Time-HiRes/hints/aix.pl	Hint for Time::HiRes for named architecture
-ext/Time-HiRes/hints/dec_osf.pl		Hint for Time::HiRes for named architecture
-ext/Time-HiRes/hints/dynixptx.pl	Hint for Time::HiRes for named architecture
-ext/Time-HiRes/hints/irix.pl	Hint for Time::HiRes for named architecture
-ext/Time-HiRes/hints/linux.pl	Hints for Time::HiRes for named architecture
-ext/Time-HiRes/hints/sco.pl	Hints for Time::HiRes for named architecture
-ext/Time-HiRes/hints/solaris.pl	Hints for Time::HiRes for named architecture
-ext/Time-HiRes/hints/svr4.pl	Hints for Time::HiRes for named architecture
-ext/Time-HiRes/HiRes.pm		Time::HiRes extension
-ext/Time-HiRes/HiRes.xs		Time::HiRes extension
-ext/Time-HiRes/Makefile.PL	Time::HiRes extension
-ext/Time-HiRes/t/HiRes.t	Test for Time::HiRes
-ext/Time-HiRes/typemap		Time::HiRes extension
 ext/Time-Local/lib/Time/Local.pm	Reverse translation of localtime, gmtime
 ext/Time-Local/t/Local.t		See if Time::Local works
 ext/VMS-DCLsym/0README.txt	ReadMe file for VMS::DCLsym
@@ -921,28 +945,10 @@ ext/VMS-Stdio/Makefile.PL	MakeMaker driver for VMS::Stdio
 ext/VMS-Stdio/Stdio.pm		VMS options to stdio routines
 ext/VMS-Stdio/Stdio.xs		VMS options to stdio routines
 ext/VMS-Stdio/t/vms_stdio.t	regression tests for VMS::Stdio
-ext/Win32/Changes		Changes for Win32 extension module
 ext/Win32CORE/Makefile.PL	Win32CORE extension
 ext/Win32CORE/t/win32core.t	Win32CORE extension
 ext/Win32CORE/Win32CORE.c	Win32CORE extension
 ext/Win32CORE/Win32CORE.pm	Win32CORE extension (stubs for Win32 CORE subs)
-ext/Win32/longpath.inc		Win32 extension long path support
-ext/Win32/Makefile.PL		Win32 extension makefile writer
-ext/Win32/t/CreateFile.t	See if Win32 extension works
-ext/Win32/t/ExpandEnvironmentStrings.t	See if Win32 extension works
-ext/Win32/t/GetCurrentThreadId.t	See if Win32 extension works
-ext/Win32/t/GetFileVersion.t	See if Win32 extension works
-ext/Win32/t/GetFolderPath.t	See if Win32 extension works
-ext/Win32/t/GetFullPathName.t	See if Win32 extension works
-ext/Win32/t/GetLongPathName.t	See if Win32 extension works
-ext/Win32/t/GetOSName.t		See if Win32 extension works
-ext/Win32/t/GetOSVersion.t	See if Win32 extension works
-ext/Win32/t/GetShortPathName.t	See if Win32 extension works
-ext/Win32/t/GuidGen.t		See if Win32 extension works
-ext/Win32/t/Names.t		See if Win32 extension works
-ext/Win32/t/Unicode.t		See if Win32 extension works
-ext/Win32/Win32.pm		Win32 extension Perl module
-ext/Win32/Win32.xs		Win32 extension external subroutines
 ext/XS-APItest/APItest.pm	XS::APItest extension
 ext/XS-APItest/APItest.xs	XS::APItest extension
 ext/XS-APItest/core.c		Test API functions when PERL_CORE is defined
@@ -964,9 +970,6 @@ ext/XS-APItest/t/svpeek.t	XS::APItest extension
 ext/XS-APItest/t/svsetsv.t	Test behaviour of sv_setsv with/without PERL_CORE
 ext/XS-APItest/t/xs_special_subs_require.t	for require too
 ext/XS-APItest/t/xs_special_subs.t	Test that XS BEGIN/CHECK/INIT/END work
-ext/XSLoader/Makefile.PL	Dynamic Loader makefile writer
-ext/XSLoader/t/XSLoader.t	See if XSLoader works
-ext/XSLoader/XSLoader_pm.PL	Simple XS Loader perl module
 ext/XS-Typemap/Makefile.PL	XS::Typemap extension
 ext/XS-Typemap/README		XS::Typemap extension
 ext/XS-Typemap/stdio.c		XS::Typemap extension
@@ -1120,13 +1123,6 @@ lib/Config.t			See if Config works
 lib/CORE.pod			document the CORE namespace
 lib/DB.pm			Debugger API (draft)
 lib/DB.t			See if DB works
-lib/Digest/base.pm		Digest extensions
-lib/Digest/Changes		Digest changelog
-lib/Digest/file.pm		Digest extensions
-lib/Digest.pm			Digest extensions
-lib/Digest/t/base.t		See if Digest extensions work
-lib/Digest/t/digest.t		See if Digest extensions work
-lib/Digest/t/file.t		See if Digest extensions work
 lib/DirHandle.pm		like FileHandle only for directories
 lib/DirHandle.t			See if DirHandle works
 lib/English.pm			Readable aliases for short variables
@@ -2058,7 +2054,6 @@ t/lex/qq.t			See if qq works
 t/lex/qr.t			See if qr work
 t/lex/use.t			See if use works
 t/lex/ver.t			See if v-strings and the %v format flag work
-t/lib/args_assert.t		Check that all PERL_ARGS_ASSERT* macros are used
 t/lib/Cname.pm			Test charnames in regexes (op/pat.t)
 t/lib/common.pl			Helper for lib/{warnings,feature}.t
 t/lib/commonsense.t		See if configuration meets basic needs
@@ -2076,13 +2071,6 @@ t/lib/filter-util.pl		See if Filter::Util::Call works
 t/lib/HasSigDie.pm		Module for testing base.pm
 t/lib/locale/latin1		Part of locale.t in Latin 1
 t/lib/locale/utf8		Part of locale.t in UTF8
-t/lib/MakeMaker/Test/Setup/BFD.pm	MakeMaker test utilities
-t/lib/MakeMaker/Test/Setup/PL_FILES.pm	MakeMaker test utilities
-t/lib/MakeMaker/Test/Setup/Problem.pm	MakeMaker test utilities
-t/lib/MakeMaker/Test/Setup/Recurs.pm	MakeMaker test utilities
-t/lib/MakeMaker/Test/Setup/XS.pm	MakeMaker test utilities
-t/lib/MakeMaker/Test/Utils.pm	MakeMaker test utilities
-t/lib/manifest.t		Test that this MANIFEST file is well formed
 t/lib/mypragma.pm		An example user pragma
 t/lib/mypragma.t		Test the example user pragma
 t/lib/no_load.t			Test that some modules don't load others
@@ -2270,8 +2258,10 @@ t/op/utf8decode.t		See if UTF-8 decoding works
 t/op/vec.t			See if vectors work
 t/op/view.t			See if view function works
 t/perl.supp			Perl valgrind suppressions
-t/pod/diag.t			Test completeness of perldiag.pod
+t/porting/args_assert.t		Check that all PERL_ARGS_ASSERT* macros are used
 t/porting/checkcase.t	Check whether we are case-insensitive-fs-friendly
+t/porting/diag.t		Test completeness of perldiag.pod
+t/porting/manifest.t		Test that this MANIFEST file is well formed
 t/README			Instructions for regression tests
 t/re/pat.t			See if esoteric patterns work
 t/re/qr_gc.t			See if qr doesn't leak

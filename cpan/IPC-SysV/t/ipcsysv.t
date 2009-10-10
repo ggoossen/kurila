@@ -1,7 +1,5 @@
-BEGIN 
-    require Config; Config->import
-    require '../../t/test.pl'
-
+use Test::More
+use Config
 
 if (config_value('d_sem') ne 'define')
     skip_all('$Config{d_sem} undefined')

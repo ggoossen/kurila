@@ -365,9 +365,18 @@ correspond to files or directories in the source kit. Among the areas are:
 
 =item Core modules
 
-Modules shipped as part of the Perl core live in the F<lib/> and F<ext/>
-subdirectories: F<lib/> is for the pure-Perl modules, and F<ext/>
-contains the core XS modules.
+Modules shipped as part of the Perl core live in various subdirectories, where
+two are dedicated to core-only modules, and two are for the dual-life modules
+which live on CPAN and may be maintained separately with respect to the Perl
+core: 
+
+    lib/  is for pure-Perl modules, which exist in the core only.
+
+    ext/  is for XS extensions, and modules with special Makefile.PL requirements, which exist in the core only.
+
+    cpan/ is for dual-life modules, where the CPAN module is canonical (should be patched first).
+
+    dist/ is for dual-life modules, where the blead source is canonical.
 
 =item Tests
 
@@ -1797,11 +1806,6 @@ Tests for perl's method resolution order implementations
 Tests for perl's built in functions that don't fit into any of the
 other directories.
 
-=item F<t/pod/>
-
-Tests for POD directives.  There are still some tests for the Pod
-modules hanging around in here that need to be moved out into F<lib/>.
-
 =item F<t/re/>
 
 Tests for regex related functions or behaviour. (These used to live
@@ -1955,6 +1959,23 @@ you can say
     nmake test TEST_FILES="op/*.t"
     nmake test TEST_SWITCHES="-torture" TEST_FILES="op/*.t"
 
+=item Parallel tests
+
+The core distribution can now run its regression tests in parallel on
+Unix-like platforms. Instead of running C<make test>, set C<TEST_JOBS> in
+your environment to the number of tests to run in parallel, and run
+C<make test_harness>. On a Bourne-like shell, this can be done as
+
+    TEST_JOBS=3 make test_harness  # Run 3 tests in parallel
+
+An environment variable is used, rather than parallel make itself, because
+L<TAP::Harness> needs to be able to schedule individual non-conflicting test
+scripts itself, and there is no standard interface to C<make> utilities to
+interact with their job schedulers.
+
+Note that currently some test scripts may fail when run in parallel (most
+notably C<ext/IO/t/io_dir.t>). If necessary run just the failing scripts
+again sequentially and see if the failures go away.
 =item test-notty test_notty
 
 Sets PERL_SKIP_TTY_TEST to true before running normal test.

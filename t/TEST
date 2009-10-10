@@ -23,29 +23,15 @@ my %dir_to_switch = %:
 # I think in the end I'd like "not absolute" to be the default", as it saves
 # some fakery within TestInit which can peturb tests, and takes CPU.
 my %no_abs = %:
-     '../ext/Pod-Parser' => 1,
+     '../cpan/Pod-Parser' => 1,
               
 my %temp_no_core = %:
-     '../ext/B-Debug' => 1,
-     '../ext/Compress-Raw-Bzip2' => 1,
-     '../ext/Compress-Raw-Zlib' => 1,
-     '../ext/Devel-PPPort' => 1,
+     '../cpan/B-Debug' => 1,
      '../cpan/Getopt-Long' => 1,
-     '../ext/IO-Compress' => 1,
-     '../cpan/IPC-SysV' => 1,
-     '../ext/Math-BigInt' => 1,
-     '../ext/Math-BigRat' => 1,
-     '../ext/MIME-Base64' => 1,
-     '../ext/NEXT' => 1,
-     '../ext/parent' => 1,
-     '../ext/Pod-Simple' => 1,
-     '../ext/Parse-CPAN-Meta' => 1,
-     '../ext/Test-Simple' => 1,
-     '../ext/Tie-RefHash' => 1,
-     '../ext/Time-HiRes' => 1,
-     '../ext/Unicode-Collate' => 1,
-     '../ext/Unicode-Normalize' => 1,
-     '../ext/podlators' => 1,
+     '../cpan/MIME-Base64' => 1,
+     '../cpan/Pod-Simple' => 1,
+     '../cpan/podlators' => 1,
+     '../cpan/Time-HiRes' => 1,
 
 if ($::do_nothing)
     return 1
@@ -89,8 +75,8 @@ do
     @ARGV = @argv
 
 chdir 't' if -f 't/TEST'
-if (-f 'TEST' && -f 'harness' && -d '../lib')
-    $^INCLUDE_PATH = '../lib'
+if (-f 'TEST' && -d '../lib')
+    $^INCLUDE_PATH = @: '../lib'
 
 die "You need to run \"make test\" first to set things up.\n"
   unless -e 'perl' or -e 'perl.exe' or -e 'perl.pm'
@@ -173,7 +159,7 @@ sub _scan_test($test, $type)
     my $dir = $1
     my $testswitch = %dir_to_switch{?$dir}
     if (!defined $testswitch)
-        if ($test =~ s!^(\.\./(?:cpan|ext)/[^/]+)/t!t!)
+        if ($test =~ s!^(\.\./(?:cpan|dist|ext)/[^/]+)/t!t!)
             $run_dir = $1
             $return_dir = '../../t'
             $lib = '../../lib'
@@ -300,7 +286,7 @@ sub _tests_from_manifest($extensions, $known_extensions)
     my $mani = '../MANIFEST'
     if (open(my $MANI, "<", $mani))
         while (~< $MANI)
-            if (m!^((?:cpan|ext)/(\S+)/+(?:[^/\s]+\.t|test\.pl)|lib/\S+?(?:\.t|test\.pl))\s!)
+            if (m!^((?:cpan|dist|ext)/(\S+)/+(?:[^/\s]+\.t|test\.pl)|lib/\S+?(?:\.t|test\.pl))\s!)
                 my $t = $1
                 my $extension = $2
                 if (!$::core || $t =~ m!^lib/[a-z]!)
@@ -360,7 +346,6 @@ unless (@ARGV)
     # something is that badly wrong.
     push @ARGV, < _tests_from_manifest($extensions, $known_extensions)
     unless ($::core)
-        _find_tests('pod')
         _find_tests('porting')
         _find_tests('japh') if $::torture
         _find_tests('t/benchmark') if $::benchmark or env::var('PERL_BENCHMARK')
@@ -520,7 +505,7 @@ EOT
                     else
                         # module tests are allowed extra output,
                         # because Test::Harness allows it
-                        next if $test =~ m/^\W*(ext|lib)\b/
+                        next if $test =~ m/^\W*(cpan|dist|ext|lib)\b/
                         $failure = "FAILED--unexpected output at test $next"
                         last
         close $results

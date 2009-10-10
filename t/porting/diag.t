@@ -28,7 +28,7 @@ while (~< $diagfh)
 my @todo = @: '..'
 while (@todo)
   my $todo = shift @todo
-  next if grep { $todo eq $_ }, @: '../t', '../lib', '../ext', '../cpan'
+  next if grep { $todo eq $_ }, @: '../t', '../lib', '../ext', '../dist', '../cpan'
   # opmini.c is just a copy of op.c, so there's no need to check again.
   next if $todo eq '../opmini.c'
   if (-d $todo)
@@ -337,7 +337,7 @@ U0 mode on a byte string
 Unbalanced string table refcount: (%d) for "%s"
 Undefined top format called
 Unexpected constant lvalue entersub entry via type/targ %d:%d
-Unicode character 0x%04
+Unicode non-character 0x%04
 Unknown PerlIO layer "scalar"
 Unknown Unicode option letter '%c'
 unrecognised control character '%c'

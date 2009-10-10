@@ -3,8 +3,12 @@
 use warnings
 use Config
 BEGIN
-    unshift $^INCLUDE_PATH, $^OS_NAME eq 'MSWin32' ?? '../ext/Cwd' !! 'ext/Cwd'
+    unshift $^INCLUDE_PATH, $^OS_NAME eq 'MSWin32' ?? ('../cpan/Cwd', '../cpan/Cwd/lib') !! 'cpan/Cwd'
 use Cwd
+
+my $is_Win32 = $^OS_NAME eq 'MSWin32'
+my $is_VMS = $^OS_NAME eq 'VMS'
+my $is_Unix = !$is_Win32 && !$is_VMS
 
 # To clarify, this isn't the entire suite of modules considered "toolchain"
 # It's not even all modules needed to build ext/
@@ -13,12 +17,19 @@ use Cwd
 # After which, all nonxs modules are in lib, which was always sufficient to
 # allow miniperl to build everything else.
 
-my @toolchain = qw(ext/constant/lib ext/Cwd ext/Cwd/lib ext/ExtUtils-Command/lib
-		   ext/ExtUtils-Install/lib ext/ExtUtils-MakeMaker/lib
-		   ext/ExtUtils-Manifest/lib ext/Text-ParseWords/lib
-                   cpan/File-Path/lib ext/Getopt-Long/lib)
+# This list cannot get any longer without overflowing the length limit for
+# environment variables on VMS
+my @toolchain = qw(cpan/Cwd cpan/Cwd/lib
+		   cpan/ExtUtils-Command/lib
+		   dist/ExtUtils-Install/lib
+		   cpan/ExtUtils-Manifest/lib
+		   cpan/File-Path/lib
+		   )
 
-my @ext_dirs = qw(cpan ext)
+# Used only in ExtUtils::Liblist::Kid::_win32_ext()
+push @toolchain, 'cpan/Text-ParseWords/lib' if $is_Win32
+
+my @ext_dirs = qw(cpan dist ext)
 my $ext_dirs_re = '(?:' . join('|', @ext_dirs) . ')'
 
 # This script acts as a simple interface for building extensions.
@@ -59,10 +70,6 @@ my $ext_dirs_re = '(?:' . join('|', @ext_dirs) . ')'
 
 # It may be deleted in a later release of perl so try to
 # avoid using it for other purposes.
-
-my $is_Win32 = $^OS_NAME eq 'MSWin32'
-my $is_VMS = $^OS_NAME eq 'VMS'
-my $is_Unix = !$is_Win32 && !$is_VMS
 
 require FindExt if $is_Win32
 
@@ -168,29 +175,29 @@ if ($is_Win32)
         (my $ext = getcwd()) =~ s{/}{\\}g
         FindExt::scan_ext($ext)
         FindExt::set_static_extensions(split ' ', config_value('static_ext'))
-    
-        my @ext
-        push @ext, < FindExt::static_ext() if $static
-        push @ext, < FindExt::dynamic_ext() if $dynamic
-        push @ext, < FindExt::nonxs_ext() if $nonxs
-        push @ext, 'Dynaloader' if $dynaloader
-
-        foreach (sort @ext)
-            if (%incl and !exists %incl{$_})
-                #warn "Skipping extension $ext\\$_, not in inclusion list\n";
-                next
-            if (exists %excl{$_})
-                warn "Skipping extension $ext\\$_, not ported to current platform"
-                next
-            push @extspec, $_
-            if($_ eq 'DynaLoader')
-                # No, we don't know why nmake can't work out the dependency chain
-                push %extra_passthrough{+$_}, 'DynaLoader.c';
-            elsif(FindExt::is_static($_))
-                push %extra_passthrough{+$_}, 'LINKTYPE=static'
-
         chdir $build
-            or die "Couldn't chdir to '$build': $^OS_ERROR"
+            or die "Couldn't chdir to '$build': $^OS_ERROR"; # restore our start directory
+
+    my @ext
+    push @ext, < FindExt::static_ext() if $static
+    push @ext, < FindExt::dynamic_ext() if $dynamic
+    push @ext, < FindExt::nonxs_ext() if $nonxs
+    push @ext, 'Dynaloader' if $dynaloader
+
+    foreach (sort @ext)
+        if (%incl and !exists %incl{$_})
+            #warn "Skipping extension $_, not in inclusion list\n";
+            next
+        if (exists %excl{$_})
+            warn "Skipping extension $_, not ported to current platform"
+            next
+        push @extspec, $_
+        if($_ eq 'DynaLoader')
+            # No, we don't know why nmake can't work out the dependency chain
+            push %extra_passthrough{+$_}, 'DynaLoader.c';
+        elsif(FindExt::is_static($_))
+            push %extra_passthrough{+$_}, 'LINKTYPE=static'
+
     chdir '..'
         or die "Couldn't chdir to build directory: $^OS_ERROR"; # now in the Perl build directory
 elsif ($is_VMS)
@@ -232,19 +239,23 @@ sub build_extension($ext_dir, $perl, $mname, $pass_through)
     my $up = $ext_dir
     $up =~ s![^/]+!..!g
 
+    unless (chdir "$ext_dir")
+        warn "Cannot cd to $ext_dir: $^OS_ERROR"
+        return
+
     $perl ||= "$up/miniperl"
     my $return_dir = $up
     my $lib_dir = "lib"
     # $lib_dir must be last, as we're copying files into it, and in a parallel
     # make there's a race condition if one process tries to open a module that
     # another process has half-written.
+    my @new_inc = map {"$up/$_"}, @: < @toolchain, $lib_dir
+    if ($is_Win32)
+        require File::Spec::Functions
+        @new_inc = map {File::Spec::Functions::rel2abs($_)}, @new_inc
     env::var('PERL5LIB')
-        = join config_value('path_sep'), map {"$up/$_"}, @: < @toolchain, $lib_dir
+        = join config_value('path_sep'), @new_inc
     env::var('PERL_CORE') = 1
-
-    unless (chdir "$ext_dir")
-        warn "Cannot cd to $ext_dir: $^OS_ERROR"
-        return
 
     my $makefile
     if ($is_VMS)
@@ -273,7 +284,9 @@ sub build_extension($ext_dir, $perl, $mname, $pass_through)
 
             unless ($fromname)
                 die "For $mname tried $(join ' ', @locations) in in $ext_dir but can't find source"
-
+            my $pod_name
+            ($pod_name = $fromname) =~ s/\.pm\z/.pod/
+            $pod_name = $fromname unless -e $pod_name
             open my $fh, '>', 'Makefile.PL'
                 or die "Can't open Makefile.PL for writing: $^OS_ERROR"
             print $fh, <<"EOM"
@@ -287,9 +300,9 @@ use ExtUtils::MakeMaker
 WriteMakefile(
     NAME          => '$mname',
     VERSION_FROM  => '$fromname',
-    ABSTRACT_FROM => '$fromname',
+    ABSTRACT_FROM => '$pod_name',
     realclean     => \%: FILES => 'Makefile.PL'
-    );
+    )
 
 # ex: set ro:
 EOM

@@ -4,7 +4,7 @@ BEGIN
     require './test.pl'
 
 use warnings
-plan( tests => 52 )
+plan( tests => 54 )
 
 our (@a, @b)
 
@@ -335,3 +335,13 @@ main::is("$(join ' ',@b)", "1 2 3 4 5 6 7 8 9 10", "return within loop")
 # on the stack at the time.
 @b = sort {$_ = ($a<+>$b) + do{return $b<+> $a}}, 1..10
 main::is("$(join ' ',@b)", "10 9 8 7 6 5 4 3 2 1", "return with SVs on stack")
+
+# As above, but with a sort sub rather than a sort block.
+sub ret_with_stacked { $_ = ($a<+>$b) + do {return $b <+> $a} }
+@b = sort &ret_with_stacked, 1..10
+main::is((join ' ', @b), "10 9 8 7 6 5 4 3 2 1", "return with SVs on stack")
+
+# Comparison code should be able to give result in non-integer representation.
+sub cmp_as_string { @_[0] +< @_[1] ?? "-1" !! @_[0] == @_[1] ?? "0" !! "+1" }
+@b = sort { cmp_as_string($a, $b) }, @: 1,5,4,7,3,2,3
+main::is((join ' ', @b), "1 2 3 3 4 5 7", "comparison result as string")

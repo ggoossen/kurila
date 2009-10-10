@@ -50,7 +50,7 @@ if (-f 't/TEST' && -f 'MANIFEST' && -d 'lib' && -d 'ext')
     # We're being run from the top level. Try to change directory, and set
     # things up correctly. This is a 90% solution, but for hand-running tests,
     # that's good enough
-    if ($^PROGRAM_NAME =~ s!^(ext[\\/][^\\/]+)[\//](.*\.t)$!$2!)
+    if ($^PROGRAM_NAME =~ s!^((?:ext|dist|cpan)[\\/][^\\/]+)[\//](.*\.t)$!$2!)
         # Looks like a test in ext.
         chdir $1 or die "Can't chdir '$1': $^OS_ERROR"
         new_inc(@up_2_t)

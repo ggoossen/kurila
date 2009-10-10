@@ -214,7 +214,7 @@ done
 nonxs_list=' '
 for f in $nonxs_ext; do
     p=`echo "$f" | tr / -`
-    for d in ext cpan; do
+    for d in ext dist cpan; do
 	if test -d $d/$p; then
 	    nonxs_list="$nonxs_list $d/$p/pm_to_blib"
 	fi
@@ -473,7 +473,7 @@ obj = $(ndt_obj) $(DTRACE_O)
 perltoc_pod_prereqs = extra.pods pod/perlapi.pod pod/perldelta.pod pod/perlintern.pod pod/perlmodlib.pod
 generated_pods = pod/perltoc.pod $(perltoc_pod_prereqs)
 
-Icwd = -Iext/Cwd -Iext/Cwd/lib
+Icwd = -Icpan/Cwd -Icpan/Cwd/lib
 
 lintflags = \
     -b \
@@ -946,7 +946,7 @@ $(plfixlocal): $(CONFIGPM)
 unidatafiles $(unidatafiles): uni.data
 
 uni.data: $(MINIPERL_EXE) $(CONFIGPM) lib/unicore/mktables $(nonxs_ext)
-	$(MINIPERL) -Iext/Cwd/lib lib/unicore/mktables -C lib/unicore -w
+	$(MINIPERL) $(Icwd) lib/unicore/mktables -C lib/unicore -w
 	touch uni.data
 
 # perl$(EXE_EXT) and ext because buildtoc uses Text::Wrap uses re
@@ -986,7 +986,7 @@ extras.install: perl$(EXE_EXT)
 	no-install install.perl install.man install.html
 
 META.yml:	Porting/makemeta Porting/Maintainers.pl Porting/Maintainers.pm
-	$(MINIPERL) Porting/makemeta
+	PATH="`pwd`:${PATH}" PERL5LIB="`pwd`/lib" $(LDLIBPTH) $(RUN) ./perl -Ilib Porting/makemeta
 
 install-strip:
 	$(MAKE) STRIPFLAGS=-s install DESTDIR="$(DESTDIR)"
