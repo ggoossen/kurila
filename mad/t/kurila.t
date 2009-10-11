@@ -41,8 +41,10 @@ sub p5convert {
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_sub_deref();
+t_sub_ref();
 die "END";
+t_defined_sub();
+t_sub_deref();
 t_indent2();
 t_empty_array();
 t_array_simplify();
@@ -2738,5 +2740,21 @@ foo()
 &{$a}()
 ----
 $a->()
+END
+}
+
+sub t_defined_sub {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+defined &foo
+----
+exists &foo
+END
+}
+
+sub t_sub_ref {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+my $x = \&main::foo
+----
+my $x = &main::foo
 END
 }

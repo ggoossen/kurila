@@ -1363,7 +1363,7 @@ my_scalar:	scalar
 layoutlistexpr :    listexpr LAYOUTLISTEND
 			{ 
 #ifdef PERL_MAD
-                            $$ = convert(OP_LIST, 0, $1, $1->op_location);
+                            $$ = convert(OP_LIST, 0, $1, $1 ? $1->op_location : LOCATION($2) );
 #else
                             $$ = $1
 #endif

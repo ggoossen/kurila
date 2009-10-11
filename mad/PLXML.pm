@@ -203,6 +203,15 @@ sub check { 'ck_svconst' }
 sub flags { 's$' }
 sub args { '' }
 
+package PLXML::op_var;
+
+our @ISA = ('PLXML::op_const');
+
+sub key { 'var' }
+sub desc { 'variable item' }
+sub check { 'ck_null' }
+sub flags { 's$' }
+sub args { '' }
 
 
 package PLXML::op_gvsv;
@@ -1210,6 +1219,26 @@ our @ISA = ('PLXML::binop');
 
 sub key { 'ref_ne' }
 sub desc { 'ref ne' }
+sub check { 'ck_null' }
+sub flags { 'ifs2' }
+sub args { 'S S' }
+
+package PLXML::op_code_eq;
+
+our @ISA = ('PLXML::binop');
+
+sub key { 'code_eq' }
+sub desc { 'code eq' }
+sub check { 'ck_null' }
+sub flags { 'ifs2' }
+sub args { 'S S' }
+
+package PLXML::op_code_ne;
+
+our @ISA = ('PLXML::binop');
+
+sub key { 'code_ne' }
+sub desc { 'code ne' }
 sub check { 'ck_null' }
 sub flags { 'ifs2' }
 sub args { 'S S' }
@@ -2677,17 +2706,6 @@ sub desc { 'say' }
 sub check { 'ck_listiob' }
 sub flags { 'ims@' }
 sub args { 'F? L' }
-
-package PLXML::op_say;
-
-our @ISA = ('PLXML::listop');
-
-sub key { 'say' }
-sub desc { 'say' }
-sub check { 'ck_listiob' }
-sub flags { 'ims@' }
-sub args { 'F? L' }
-
 
 package PLXML::op_sysopen;
 

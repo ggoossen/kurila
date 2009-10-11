@@ -117,6 +117,7 @@ use File::Find;
 
 our %failing = map { $_, 1 } qw|
 ../t/arch/64bitint.t
+../t/op/symbolcache.t
 |;
 
 my @files;
@@ -374,7 +375,7 @@ foo(33, 55) == 44;
 ########
 local "foo"->&;
 ########
-BEGIN { unless(defined &DEBUG) { *DEBUG = sub () {0} } }
+BEGIN { unless(exists &DEBUG) { *DEBUG = sub () {0} } }
 BEGIN { my $x = DEBUG(); }
 ########
 
@@ -454,3 +455,5 @@ sub
 $a <: "bar"
 ########
 do { $a <: "bar" }
+########
+$a &== &b
