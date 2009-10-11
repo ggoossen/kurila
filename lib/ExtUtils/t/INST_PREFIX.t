@@ -119,7 +119,7 @@ my %Install_Vars = %:
     
 
 while( my(@: ?$type, ?$vars) =(@:  each %Install_Vars))
-    SKIP: do
+    :SKIP do
         skip "VMS must expand macros in INSTALL* vars", scalar nelems $vars->@
             if $Is_VMS
         skip '$Config{usevendorprefix} not set', scalar nelems $vars->@
@@ -129,7 +129,7 @@ while( my(@: ?$type, ?$vars) =(@:  each %Install_Vars))
             my $installvar = "install$var"
             my $prefix = '$('.$type.'PREFIX)'
 
-            SKIP: do
+            :SKIP do
                 skip uc($installvar).' set to another INSTALL variable', 1
                     if $mm->{uc $installvar} =~ m/^\$\(INSTALL.*\)$/
 
@@ -210,7 +210,7 @@ do
 
     is( $mm->{INSTALLMAN1DIR}, File::Spec->catdir('foo', 'bar') )
     is( $mm->{INSTALLMAN3DIR}, File::Spec->catdir('foo', 'baz') )
-    SKIP: do
+    :SKIP do
         skip "VMS must expand macros in INSTALL* vars", 4 if $Is_VMS
 
         is( $mm->{INSTALLSITEMAN1DIR},   '$(INSTALLMAN1DIR)' )
@@ -242,7 +242,7 @@ do
 
     is( $mm->{INSTALLMAN1DIR}, File::Spec->catdir('foo', 'bar') )
     is( $mm->{INSTALLMAN3DIR}, File::Spec->catdir('foo', 'baz') )
-    SKIP: do
+    :SKIP do
         skip "VMS must expand macros in INSTALL* vars", 2 if $Is_VMS
         is( $mm->{INSTALLSITEMAN1DIR},   '$(INSTALLMAN1DIR)' )
         is( $mm->{INSTALLSITEMAN3DIR},   '$(INSTALLMAN3DIR)' )

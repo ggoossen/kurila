@@ -86,7 +86,7 @@ main::is( Symbol::glob_name(*main::FOO), "main::FOO", "glob_name")
 
 # tests for delete_package
 package main
-TODO: do
+:TODO do
     todo_skip("fix delete_package", 2)
     $Transient::variable = 42
     ok( defined %Transient::{?variable}, 'transient variable in stash' )

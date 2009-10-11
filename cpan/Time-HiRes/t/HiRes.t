@@ -102,7 +102,7 @@ if (open(my $fh, "<", "xdefine")) {
 # --A.D., Nov 27, 2001
 my $limit = 0.25 # 25% is acceptable slosh for testing timers
 
-SKIP: do 
+:SKIP do 
     skip 4, "no gettimeofday" unless $have_gettimeofday
 
     my @one = gettimeofday()
@@ -304,7 +304,7 @@ unless (   exists &Time::HiRes::gettimeofday
     ok ! $not
 
 
-SKIP: do
+:SKIP do
     if ( not(   exists &Time::HiRes::setitimer
         && exists &Time::HiRes::getitimer
         && has_symbol('ITIMER_VIRTUAL')
@@ -341,7 +341,7 @@ SKIP: do
     signals::handler("VTALRM") = 'DEFAULT'
 
 
-SKIP: do 
+:SKIP do 
     if (not $have_gettimeofday &&
         $have_usleep) {
         skip 2, "no gettimeofday";
@@ -361,7 +361,7 @@ SKIP: do
 
     $msg = "$td went by while sleeping $sleep, ratio $ratio.\n"
 
-    SKIP: do 
+    :SKIP do 
         if ( not $td +< $sleep * (1 + $limit)) {
             skip 1, $msg;
         }
@@ -374,14 +374,14 @@ SKIP: do
 
     $msg = "$td went by while sleeping $sleep, ratio $ratio.\n"
 
-    SKIP: do 
+    :SKIP do 
         if ( not $td +< $sleep * (1 + $limit)) {
             skip 1, $msg;
         }
         ok $a +< $limit, $msg
 
 
-SKIP: do 
+:SKIP do 
     unless ($have_nanosleep) {
         skip 2, "no nanosleep";
     }
@@ -441,7 +441,7 @@ if ($have_ualarm)
     use Time::HiRes < qw(time)
     my $DelayN = 1024
     my $i
-    N: while(1)
+    :N while(1)
             my $t0 = time()
             my $i = 0
             while ($i +< $DelayN) { $i++ }
@@ -496,7 +496,7 @@ if ($have_clock_gettime &&
     # are SUPPOSED TO support CLOCK_REALTIME.
     has_symbol('CLOCK_REALTIME'))
     my $ok = 0;
-    TRY: for my $try (1..3)
+    :TRY for my $try (1..3)
             info "CLOCK_REALTIME: try = $try"
             my $t0 = clock_gettime(CLOCK_REALTIME( < @_ ))
             use Time::HiRes < qw(sleep)
@@ -635,7 +635,7 @@ if ($^OS_NAME =~ m/^(cygwin|MSWin)/) {
     diag "ai = $ai, mi = $mi, ss = $ss";
   # Need at least 75% of monotonical increase and
   # 20% of subsecond results. Yes, this is guessing.
-  SKIP:
+  :SKIP
     do 
         if ($ss == 0) {
             skip "No subsecond timestamps detected", 1;

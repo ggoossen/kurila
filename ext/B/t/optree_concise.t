@@ -12,7 +12,7 @@ use Config
 
 plan tests => 4
 
-SKIP: do
+:SKIP do
     skip "no perlio in this build", 4 unless Config::config_value("useperlio")
 
     $^WARN_HOOK = sub (@< @_)

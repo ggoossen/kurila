@@ -49,14 +49,14 @@ EXPECT
 1, 2, 3
 ########
 our @a = @: 1, 2, 3
-foo: do
+:foo do
   @a = sort { last foo; }, @a
 EXPECT
 Label not found for "last foo" at - line 3 character 15.
     main::__ANON__ called at - line 3 character 8.
 ########
 our @a = @: 1, 2, 3
-foo: do
+:foo do
   @a = sort { exit(0) }, @a
 END { print $^STDOUT, "foobar\n" }
 EXPECT

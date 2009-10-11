@@ -2529,7 +2529,7 @@ EOFTEST
 	      }x
     ok("\{b\{c\}d" !~ m/^((??{ $brackets }))/, "bracket mismatch")
 
-    :SKIPdo
+    :SKIP do
         our @stack= $@
         my @expect=qw(
         stuff1

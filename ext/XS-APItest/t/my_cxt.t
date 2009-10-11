@@ -38,7 +38,7 @@ sub do_thread
         is(my_cxt_getsv($_),  "dcba", "new SV value (child)$_")
 
 
-SKIP: do
+:SKIP do
     skip "No threads", 6 unless $threads
     threads->create(\&do_thread)->join
 

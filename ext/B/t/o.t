@@ -36,7 +36,7 @@ is( @lines[3], '-e syntax OK', 'O.pm should not munge perl output without -qq')
 @lines = get_lines( < @args )
 isnt( @lines[1], 'Compiling!', 'Output should not be printed with -q switch' )
 
-SKIP: do
+:SKIP do
     skip( '-q redirection does not work without PerlIO', 2)
         unless config_value("useperlio")
     is( @lines[1], "[Compiling!", '... but should be in $O::BEGIN_output' )

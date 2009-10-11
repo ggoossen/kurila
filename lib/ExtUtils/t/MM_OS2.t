@@ -59,7 +59,7 @@ do
     $can_write = open(my $out, ">", 'tmp_imp')
 
 
-SKIP: do
+:SKIP do
     skip("Cannot write test files: $^OS_ERROR", 7) unless $can_write
 
     $mm->{+IMPORTS} = \%:  foo => 'bar' 
@@ -208,27 +208,27 @@ do
         last if $found == 4
     
 
-    SKIP: do
+    :SKIP do
         skip('No appropriate directory found', 1) unless defined $dir
         is( ExtUtils::MM_OS2->maybe_command( $dir ), undef,
                             'maybe_command() should ignore directories' )
     
 
-    SKIP:
+    :SKIP
         do
         skip('No non-exension command found', 1) unless defined $noext
         is( ExtUtils::MM_OS2->maybe_command( $noext ), $noext,
                             'maybe_command() should find executable lacking file extension' )
     
 
-    SKIP: do
+    :SKIP do
         skip('No .exe command found', 1) unless defined $exe
         (my $noexe = $exe) =~ s/\.exe\z//
         is( ExtUtils::MM_OS2->maybe_command( $noexe ), $exe,
                             'maybe_command() should find .exe file lacking extension' )
     
 
-    SKIP: do
+    :SKIP do
         skip('No .cmd command found', 1) unless defined $cmd
         (my $nocmd = $cmd) =~ s/\.cmd\z//
         is( ExtUtils::MM_OS2->maybe_command( $nocmd ), $cmd,

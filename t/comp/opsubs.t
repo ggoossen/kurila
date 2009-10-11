@@ -29,7 +29,7 @@ sub s  { return "s-".shift }
 
 # m operator
 can_ok( 'main', "m" )
-SILENCE_WARNING: do # Complains because $_ is undef
+:SILENCE_WARNING do # Complains because $_ is undef
     no warnings
     isnt( m('unqualified'), "m-unqualified", "m('unqualified') is oper" )
 

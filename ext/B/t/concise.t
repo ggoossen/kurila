@@ -65,7 +65,7 @@ try {  walk_output($foo) }
 is ($^EVAL_ERROR, '', "walk_output() accepts obj that can print")
 
 # test that walk_output accepts a HANDLE arg
-SKIP: do
+:SKIP do
     skip("no perlio in this build", 4)
         unless Config::config_value("useperlio")
 
@@ -119,7 +119,7 @@ sub render
     return  @: $out, $^EVAL_ERROR
 
 
-SKIP: do
+:SKIP do
     # tests output to GLOB, using perlio feature directly
     skip "no perlio on this build", 127
         unless Config::config_value("useperlio")
@@ -174,7 +174,7 @@ SKIP: do
     #      -> &CODE(0x84840cc) in ???
 
     my ($res,$err)
-    TODO: do
+    :TODO do
         #local $TODO = "\tdoes this handling make sense ?";
 
         sub defd_empty {};

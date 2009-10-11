@@ -22,7 +22,7 @@ our %gOpts
 my $tests = 12 + 16 * %gOpts{?selftest}	# pass()s + $#tests
 plan tests => $tests
 
-SKIP: do
+:SKIP do
     skip "no perlio in this build", $tests
         unless Config::config_value("useperlio")
 

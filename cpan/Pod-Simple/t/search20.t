@@ -66,14 +66,14 @@ $p =~ s/, +/,\n/g
 $p =~ s/^/#  /mg
 print $^STDOUT, $p
 
-SKIP: do 
+:SKIP do 
     my $names = join "|", sort values $where2name->%
     skip '-- case may or may not be preserved', 1 if $^OS_NAME eq 'VMS'
     is($names,
        "Blorm|Suzzle|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|perlzuk|squaa|squaa::Glunk|squaa::Vliff|squaa::Wowo|zikzik")
 
 
-SKIP: do 
+:SKIP do 
     my $names = join "|", sort keys $name2where->%
     skip '-- case may or may not be preserved', 1 if $^OS_NAME eq 'VMS'
     is($names,

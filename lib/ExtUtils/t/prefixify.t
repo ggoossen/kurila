@@ -6,7 +6,6 @@ BEGIN
         $^INCLUDE_PATH = @: '../lib', 'lib'
     else
         unshift $^INCLUDE_PATH, 't/lib'
-    
 
 
 use Test::More
@@ -35,7 +34,7 @@ $mm->prefixify('installbin', 'wibble', 'something', $default)
 is( $mm->{INSTALLBIN}, File::Spec->catdir('something', $default),
     'prefixify w/defaults and PREFIX')
 
-SKIP: do
+:SKIP do
     skip "Test for DOSish prefixification", 1 unless $Is_Dosish
 
     %Config{wibble} = 'C:\opt\perl\wibble'

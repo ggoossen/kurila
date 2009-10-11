@@ -24,7 +24,7 @@ ok( (my $testfd = open("../../t/TEST", O_RDONLY, 0)),        'O_RDONLY with open
 read($testfd, my $buffer, 4) if $testfd +> 2
 is( $buffer, "#!./",                      '    with read' )
 
-TODO:
+:TODO
     do
     local our $TODO = "read to array element not working"
 
@@ -36,7 +36,7 @@ TODO:
 write(1,"ok 4\nnot ok 4\n", 5)
 next_test()
 
-SKIP: do
+:SKIP do
     skip("no pipe() support on DOS", 2) if $Is_Dos
 
     our @fds = POSIX::pipe()
@@ -51,7 +51,7 @@ SKIP: do
     next_test()
 
 
-SKIP: do
+:SKIP do
     skip("no sigaction support on win32/dos", 6) if $Is_W32 || $Is_Dos
 
     my $sigset = POSIX::SigSet->new( 1, 3)
@@ -59,7 +59,7 @@ SKIP: do
     ok(! $sigset->ismember(1),  'POSIX::SigSet->delset' )
     ok(  $sigset->ismember(3),  'POSIX::SigSet->ismember' )
 
-    SKIP: do
+    :SKIP do
         skip("no kill() support on Mac OS", 4) if $Is_MacOS
 
         my $sigint_called = 0
@@ -107,7 +107,7 @@ SKIP: do
         for (1..4)
             next_test()
 
-SKIP: do
+:SKIP do
     skip("_POSIX_OPEN_MAX is inaccurate on MPE", 1) if $Is_MPE
     skip('_POSIX_OPEN_MAX undefined (@fds[1])',  1) unless _POSIX_OPEN_MAX( < @_ )
 
@@ -121,7 +121,7 @@ like( getcwd(), qr/$pat/, 'getcwd' )
 
 # Check string conversion functions.
 
-SKIP: do
+:SKIP do
     skip("strtod() not present", 1) unless config_value('d_strtod')
 
     my $lc = POSIX::setlocale(POSIX::LC_NUMERIC( < @_ ), 'C') if config_value('d_setlocale')
@@ -133,7 +133,7 @@ SKIP: do
     POSIX::setlocale(POSIX::LC_NUMERIC( < @_ ), $lc) if config_value('d_setlocale')
 
 
-SKIP: do
+:SKIP do
     skip("strtol() not present", 2) unless config_value('d_strtol')
 
     my (@: $n, $x) =  POSIX::strtol('21_PENGUINS')
@@ -141,7 +141,7 @@ SKIP: do
     is($x, 9,  '         unparsed chars')
 
 
-SKIP: do
+:SKIP do
     skip("strtoul() not present", 2) unless config_value('d_strtoul')
 
     my (@: $n, $x) =  POSIX::strtoul('88_TEARS')
@@ -169,7 +169,7 @@ sub try_strftime
 
 my $lc = POSIX::setlocale(POSIX::LC_TIME( < @_ ), 'C') if config_value('d_setlocale')
 try_strftime("Wed Feb 28 00:00:00 1996 059", 0,0,0, 28,1,96)
-SKIP: do
+:SKIP do
     skip("VC++ 8 and Vista's CRTs regard 60 seconds as an invalid parameter", 1)
         if ($Is_W32 and ((config_value("cc") eq 'cl' and
                           config_value("ccversion") =~ m/^(\d+)/ and $1 +>= 14) or
@@ -201,7 +201,7 @@ do
     
 
 
-SKIP: do
+:SKIP do
     skip("no kill() support on Mac OS", 1) if $Is_MacOS
     is (eval "kill 0", 0, "check we have CORE::kill")
         or print $^STDOUT, "\$\@ is " . _qq($^EVAL_ERROR) . "\n"

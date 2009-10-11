@@ -48,7 +48,7 @@ for my $newlex ((@: '', '-newlex'))
 
     print $^STDOUT, $out if $verbose
 
-    SKIP: do
+    :SKIP do
         skip "no perlio in this build", 5
             unless Config::config_value("useperlio")
 

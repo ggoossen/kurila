@@ -53,7 +53,7 @@ do
 	cd some/dir && command2}
 
 
-SKIP: do
+:SKIP do
     skip("VMS' cd requires vmspath which is only on VMS", 1) unless $Is_VMS
 
     use ExtUtils::MM_VMS;

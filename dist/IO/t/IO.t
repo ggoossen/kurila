@@ -94,7 +94,7 @@ if ( -d $fakedir or mkpath( $fakedir ))
                 $flag = 1;
                 push $^INCLUDE_PATH, 'lib';
 
-SKIP: do {
+:SKIP do {
         skip("Could not write to disk", 2 ) unless $flag;
         try { IO->import( 'fakemod' ) };
         ok( IO::fakemod::exists(), 'import() should import IO:: modules by name' );
