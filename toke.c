@@ -4688,22 +4688,6 @@ Perl_yylex(pTHX)
 
 		/* If followed by a paren, it's certainly a subroutine. */
 		if (*s == '(') {
-		    if (cv) {
-			d = s + 1;
-			while (SPACE_OR_TAB(*d))
-			    d++;
-			if (*d == ')' && (sv = cv_const_sv(cv))) {
-#ifdef PERL_MAD
-			    if (PL_madskills) {
-				curmad('X', PL_thistoken, NULL);
-				curmad('_', PL_thiswhite, NULL);
-				curmad('h', newSVpvn(s, d-s+1), NULL);
-			    }
-#endif
-			    s = d + 1;
-			    goto its_constant;
-			}
-		    }
 #ifdef PERL_MAD
 		    if (PL_madskills) {
 			PL_nextwhite = PL_thiswhite;
