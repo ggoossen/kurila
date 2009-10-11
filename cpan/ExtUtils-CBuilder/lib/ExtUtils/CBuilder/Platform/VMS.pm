@@ -189,7 +189,7 @@ sub _liblist_ext($self, $potential_libs,$verbose,$give_libs)
     @dirs = grep { length($_) }, @dirs
     unshift(@dirs,'') # Check each $lib without additions first
 
-    LIB: foreach my $lib ( @libs)
+    :LIB foreach my $lib ( @libs)
         if (exists %libmap{$lib})
             next unless length %libmap{?$lib}
             $lib = %libmap{?$lib}

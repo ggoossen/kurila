@@ -40,12 +40,12 @@ can_ok( 'DynaLoader' => 'dl_install_xsub'         ) # defined in XS section
 can_ok( 'DynaLoader' => 'dl_load_file'            ) # defined in XS section
 can_ok( 'DynaLoader' => 'dl_load_flags'           ) # defined in Perl section
 can_ok( 'DynaLoader' => 'dl_undef_symbols'        ) # defined in XS section
-SKIP: do
+:SKIP do
     skip "unloading unsupported on $^OS_NAME", 1 if ($^OS_NAME eq 'VMS' || $^OS_NAME eq 'darwin')
     can_ok( 'DynaLoader' => 'dl_unload_file'          ) # defined in XS section
 
 
-TODO: do
+:TODO do
     local $TODO = "Test::More::can_ok() seems to have trouble dealing with AutoLoaded functions"
     can_ok( 'DynaLoader' => 'dl_expandspec'           ) # defined in AutoLoaded section
     can_ok( 'DynaLoader' => 'dl_findfile'             ) # defined in AutoLoaded section
@@ -74,7 +74,7 @@ is( $^EVAL_ERROR, '', "calling DynaLoader::dl_load_file() with undefined argumen
 my ($dlhandle, $dlerr)
 try { $dlhandle = DynaLoader::dl_load_file("egg_bacon_sausage_and_spam") }
 $dlerr = DynaLoader::dl_error()
-SKIP: do
+:SKIP do
     skip "dl_load_file() does not attempt to load file on VMS (and thus does not fail) when \@dl_require_symbols is empty", 1 if $^OS_NAME eq 'VMS'
     ok( !$dlhandle, "calling DynaLoader::dl_load_file() without an existing library should fail" )
 
@@ -85,7 +85,7 @@ ok( defined $dlerr, "dl_error() returning an error message: '$dlerr'" )
 # dl_load_file() is not even guaranteed to set the $! or the $^E.
 
 # ... dl_findfile()
-SKIP: do
+:SKIP do
     my @files = $@
     try { @files = DynaLoader::dl_findfile("c") }
     is( $^EVAL_ERROR, '', "calling dl_findfile()" )
@@ -106,7 +106,7 @@ my $extensions = config_value('dynamic_ext')
 $extensions =~ s|/|::|g
 
 for my $module (sort keys %modules)
-    SKIP: do
+    :SKIP do
         if ($extensions !~ m/\b$module\b/)
             delete(%modules{$module})
             skip "$module not available", 3
@@ -122,7 +122,7 @@ is( nelems @DynaLoader::dl_modules, nelems( keys %modules), "checking number of 
 
 my @loaded_modules = @DynaLoader::dl_modules
 for my $libref (reverse @DynaLoader::dl_librefs)
-    SKIP: do
+    :SKIP do
         skip "unloading unsupported on $^OS_NAME", 2 if ($^OS_NAME eq 'VMS' || $^OS_NAME eq 'darwin')
         my $module = pop @loaded_modules
         my $r = try { DynaLoader::dl_unload_file($libref) }

@@ -185,7 +185,7 @@ sub check_install(%< %hash)
     ### so scan the dirs
     unless( $filename )
 
-        DIR: for my $dir (  $^INCLUDE_PATH )
+        :DIR for my $dir (  $^INCLUDE_PATH )
 
             my $fh
 
@@ -407,7 +407,7 @@ sub can_load
     $CACHE ||= \$% # in case it was undef'd
 
     my $error
-    BLOCK: do
+    :BLOCK do
         my $href = $args->{?modules}
 
         my @load

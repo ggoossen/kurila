@@ -17,7 +17,7 @@ sub doglob
     my $cond = shift
     my @retval = $@
     #print "doglob: ", join('|', @_), "\n";
-    OUTER:
+    :OUTER
         for my $pat ( @_)
         my @matched = $@
         my @globdirs = $@
@@ -73,7 +73,7 @@ sub doglob
 
         #print "regex: '$pat', head: '$head'\n";
         my $matchsub = sub (@< @_) { @_[0] =~ m|^$pat\z|is }
-        INNER:
+        :INNER
             for my $e ( @leaves)
             next INNER if $e eq '.' or $e eq '..'
             next INNER if $cond eq 'd' and ! -d "$head$e"
@@ -103,7 +103,7 @@ sub doglob_Mac
     my @retval = $@
 
     #print "doglob_Mac: ", join('|', @_), "\n";
-    OUTER:
+    :OUTER
         for my $arg ( @_)
         local $_ = $arg
         my @matched = $@
@@ -183,7 +183,7 @@ sub doglob_Mac
         #print "regex: '$_', head: '$head', unescaped head: '$not_esc_head'\n";
         my $matchsub = eval 'sub { $_[0] =~ m|^' . $_ . '\z|ios }'
         warn($^EVAL_ERROR), next OUTER if $^EVAL_ERROR
-        INNER:
+        :INNER
             for my $e ( @leaves)
             next INNER if $e eq '.' or $e eq '..'
             next INNER if $cond eq 'd' and ! -d "$not_esc_head$e"
@@ -323,7 +323,7 @@ sub glob($pat,$cxix)
     #   abc3 will be the original {3} (and drop the {}).
     #   abc1 abc2 will be put in @appendpat.
     # This was just the esiest way, not nearly the best.
-    REHASH: do
+    :REHASH do
         my @appendpat = $@
         for ( @pat)
             # There must be a "," I.E. abc{efg} is not what we want.

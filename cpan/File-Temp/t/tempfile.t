@@ -132,7 +132,7 @@ push( @still_there, $tempfile) # check at END
 # Tempfile croaks on error so we need an eval
 $fh = try { tempfile( 'ftmpXXXXX', DIR => < File::Spec->tmpdir ) }
 
-SKIP:
+:SKIP
     do
     skip "Skip Failed probably due to NFS", 2 if not $fh
 

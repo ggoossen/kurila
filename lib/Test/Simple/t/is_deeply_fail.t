@@ -327,7 +327,7 @@ ERR
 
 # rt.cpan.org 14746
 do
-    TODO: do
+    :TODO do
         $TB->todo_skip("different subs")
         last TODO
 
@@ -346,7 +346,7 @@ ERR
     my $glob1 = gensym
     my $glob2 = gensym
 
-    TODO: do
+    :TODO do
         $TB->todo_skip("different subs")
         last TODO
         #line 357

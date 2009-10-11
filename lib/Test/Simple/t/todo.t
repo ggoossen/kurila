@@ -15,7 +15,7 @@ plan tests => 19
 my $Why = 'Just testing the todo interface.'
 
 my $is_todo
-TODO: do
+:TODO do
     local $TODO = $Why
 
     fail("Expected failure")
@@ -28,7 +28,7 @@ pass("This is not todo")
 ok( $is_todo, 'TB->todo' )
 
 
-TODO: do
+:TODO do
     local $TODO = $Why
 
     fail("Yet another failure")
@@ -37,7 +37,7 @@ TODO: do
 pass("This is still not todo")
 
 
-TODO: do
+:TODO do
     local $TODO = "testing that error messages don't leak out of todo"
 
     ok( 'this' eq 'that',   'ok' )
@@ -53,7 +53,7 @@ TODO: do
 
 
 
-TODO: do
+:TODO do
     todo_skip "Just testing todo_skip", 2
 
     fail("Just testing todo")
@@ -65,7 +65,7 @@ TODO: do
 do
     my $warning
     local $^WARN_HOOK = sub (@< @_) { $warning = @_[0]->message }
-    TODO: do
+    :TODO do
         # perl gets the line number a little wrong on the first
         # statement inside a block.
         1 == 1
@@ -78,7 +78,7 @@ do
 
 
 
-TODO: do
+:TODO do
     Test::More->builder->exported_to("Wibble")
 
     local $TODO = "testing \$TODO with an incorrect exported_to()"

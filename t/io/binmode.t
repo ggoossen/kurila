@@ -29,7 +29,7 @@ else
 ok( binmode($^STDOUT, ":raw"),    '  raw' )
 ok( binmode($^STDOUT, ":crlf"),   '  and crlf' )
 
-SKIP: do
+:SKIP do
     skip "minitest", 1 if env::var('PERL_CORE_MINITEST')
     skip "no EBADF", 1 if (!exists &Errno::EBADF)
 

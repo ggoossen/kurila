@@ -437,7 +437,7 @@ sub _open3_run
     ### code courtesy of theorbtwo from #london.pm
     my $stdout_done = 0
     my $stderr_done = 0
-    OUTER: while ( my @ready = $selector->can_read )
+    :OUTER while ( my @ready = $selector->can_read )
 
         for my $h (  @ready )
             my $buf

@@ -51,7 +51,7 @@ is($oldaction->{?HANDLER}, &foo)
 
 ok($oldaction->{?MASK}->ismember(SIGUSR1), "SIGUSR1 ismember MASK")
 
-SKIP: do
+:SKIP do
     skip("sigaction() thinks different in $^OS_NAME", 1)
         if $^OS_NAME eq 'linux' || $^OS_NAME eq 'unicos'
     is($oldaction->{?FLAGS}, 0)
@@ -111,7 +111,7 @@ try {
 }
 ok($^EVAL_ERROR, "any object not good as new action")
 
-SKIP: do
+:SKIP do
     skip("SIGCONT not trappable in $^OS_NAME", 1)
         if ($^OS_NAME eq 'VMS')
     $newaction=POSIX::SigAction->new(sub (@< @_) { $ok10=1; })
@@ -174,7 +174,7 @@ $ok = 0
 kill 'HUP', $^PID
 ok($ok, "safe signal delivery must work")
 
-SKIP: do
+:SKIP do
     eval 'use POSIX qw(SA_SIGINFO); SA_SIGINFO'
     skip("no SA_SIGINFO", 1) if $^EVAL_ERROR
     sub hiphup

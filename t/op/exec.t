@@ -40,7 +40,7 @@ plan(tests => 20)
 my $Perl = which_perl()
 
 my $exit
-SKIP: do
+:SKIP do
     skip("bug/feature of pdksh", 2) if $^OS_NAME eq 'os2'
 
     my $tnum = curr_test()
@@ -115,7 +115,7 @@ do
     is( readpipe, "ok\n", 'readpipe default argument' )
 
 
-TODO: do
+:TODO do
     my $tnum = curr_test()
     if( $^OS_NAME =~ m/Win32/ )
         print $^STDOUT, "not ok $tnum - exec failure doesn't terminate process " .

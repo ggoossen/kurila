@@ -26,7 +26,7 @@ is($b,"\000\000\000\000_") # otherwise probably "\000bcd_"
 
 unlink 'a'
 
-SKIP: do
+:SKIP do
     skip "no EBADF", 1 if (!exists &Errno::EBADF)
 
     $^OS_ERROR = 0

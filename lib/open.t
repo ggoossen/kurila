@@ -53,7 +53,7 @@ is( $^OPEN, ":raw :crlf\0:raw :crlf",
     'should set multi types, multi layer' )
 is( $^HINTS{?'open_IO'}, 'crlf', 'should record last layer set in %^H' )
 
-SKIP: do
+:SKIP do
     skip("no perlio, no :utf8", 12) unless (PerlIO::Layer->find( 'perlio'))
 
     eval <<'EOE'
@@ -180,7 +180,7 @@ EOE
     
 
 
-SKIP: do
+:SKIP do
     skip("no perlio", 1) unless (PerlIO::Layer->find( 'perlio'))
     use open IN => ':non-existent';
     try {

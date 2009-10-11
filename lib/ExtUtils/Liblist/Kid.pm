@@ -259,7 +259,7 @@ sub _win32_ext($self, $potential_libs, ?$verbose, ?$give_libs)
         push @libpath, < split m/;/, env::var('LIB')
     
 
-    LIBS:
+    :LIBS
         foreach ( Text::ParseWords::quotewords('\s+', 0, $potential_libs))
 
         my $thislib = $_
@@ -303,7 +303,7 @@ sub _win32_ext($self, $potential_libs, ?$verbose, ?$give_libs)
         $_ .= $libext if !m/\Q$libext\E$/i
 
         my $secondpass = 0
-        LOOKAGAIN:
+        :LOOKAGAIN
             do
 
             # look for the file itself
@@ -440,7 +440,7 @@ sub _vms_ext($self, $potential_libs, $verbose, $give_libs)
     @dirs = grep { length($_) }, @dirs
     unshift(@dirs,'') # Check each $lib without additions first
 
-    LIB: foreach my $lib ( @libs)
+    :LIB foreach my $lib ( @libs)
         if (exists %libmap{$lib})
             next unless length %libmap{?$lib}
             $lib = %libmap{?$lib}

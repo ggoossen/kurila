@@ -137,7 +137,7 @@ sub check_file($codefn)
       my $linenr = iohandle::input_line_number($codefh)
       if (exists %entries{$name})
         if (%entries{$name}{todo})
-          TODO: do
+          :TODO do
             local $TODO = 'in DATA'
             fail("Presence of '$name' from $codefn line $linenr")
         else

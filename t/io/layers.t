@@ -53,7 +53,7 @@ print $^STDOUT, <<__EOH__
 # UTF8_STDIN = $UTF8_STDIN
 __EOH__
 
-SKIP: do
+:SKIP do
     # FIXME - more of these could be tested without Encode or full perl
     skip("miniperl does not have Encode", $NTEST) if env::var('PERL_CORE_MINITEST')
 

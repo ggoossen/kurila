@@ -21,7 +21,7 @@ print $^STDOUT, "ok 5\n"
 my $bad = ''
 my $badcont = 1
 open(my $fh, "<",'Cmd_while.tmp') || die "Can't open Cmd_while.tmp."
-entry: while ( ~< $fh->*)
+:entry while ( ~< $fh->*)
     next entry if m/vt100/
     $bad = 1 if m/vt100/
 continue
@@ -35,7 +35,7 @@ if (!$badcont) {print $^STDOUT, "ok 7\n";} else {print $^STDOUT, "not ok 7\n";}
 $bad = ''
 $badcont = ''
 open($fh, "<",'Cmd_while.tmp') || die "Can't open Cmd_while.tmp."
-vtloop: while ( ~< $fh->*)
+:vtloop while ( ~< $fh->*)
     if (s/vt100/VT100/g)
         s/VT100/Vt100/g
         redo 'vtloop'
@@ -70,7 +70,7 @@ print $^STDOUT, "ok $i\n"
 
 # Check curpm is reset when jumping out of a scope
 'abc' =~ m/b/p
-WHILE:
+:WHILE
     while (1)
     $i++
     print $^STDOUT, "not " unless $^PREMATCH . $^MATCH . $^POSTMATCH eq "abc"

@@ -144,7 +144,7 @@ my $failed
 foreach my $lib (qw(applibexp archlibexp privlibexp sitearchexp sitelibexp
 		     vendorarchexp vendorlibexp vendorlib_stem))
     my $dir = config_value($lib)
-    SKIP: do
+    :SKIP do
         skip "lib $lib not in \$^INCLUDE_PATH on Win32" if $^OS_NAME eq 'MSWin32'
         skip "lib $lib not defined" unless defined $dir
         skip "lib $lib not set" unless length $dir

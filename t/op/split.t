@@ -169,7 +169,7 @@ do
 do
     my $s = "\x20\x40\x{80}\x{100}\x{80}\x40\x20"
 
-    SKIP: do
+    :SKIP do
         if (ord('A') == 193)
             skip("EBCDIC", 1)
         else
@@ -186,7 +186,7 @@ do
     my (@: $a, $b) =  split(m/\x{80}\x{100}\x{80}/, $s)
     ok($a eq "\x20\x40" && $b eq "\x40\x20")
 
-    SKIP: do
+    :SKIP do
         if (ord('A') == 193)
             skip("EBCDIC", 1)
         else

@@ -135,7 +135,7 @@ do
               }, qr/^VERSION takes a version object or PLAINVALUE not a REF/ 
 
 
-    SKIP: do
+    :SKIP do
         skip("Can't test version objects",6) unless try { require version }
         version->import
 

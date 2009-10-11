@@ -414,7 +414,7 @@ sub pod_where
         if %options{?'verbose'}
 
     # Loop over directories
-    Dir: foreach my $dir (  @search_dirs )
+    :Dir foreach my $dir (  @search_dirs )
 
         # Don't bother if can't find the directory
         if (-d $dir)

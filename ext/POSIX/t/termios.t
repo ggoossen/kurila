@@ -27,21 +27,21 @@ isa_ok( $termios, "POSIX::Termios", "\tchecking the type of the object" )
 
 # testing getattr()
 
-SKIP: do
+:SKIP do
     -t $^STDIN or skip("STDIN not a tty", 2)
     $r = try { $termios->getattr(0) }
     is( $^EVAL_ERROR, '', "calling getattr(0)" )
     ok( defined $r, "\tchecking if the returned value is defined: $r" )
 
 
-SKIP: do
+:SKIP do
     -t $^STDOUT or skip("STDOUT not a tty", 2)
     $r = try { $termios->getattr(1) }
     is( $^EVAL_ERROR, '', "calling getattr(1)" )
     ok( defined $r, "\tchecking if the returned value is defined: $r" )
 
 
-SKIP: do
+:SKIP do
     -t $^STDERR or skip("STDERR not a tty", 2)
     $r = try { $termios->getattr(2) }
     is( $^EVAL_ERROR, '', "calling getattr(2)" )

@@ -32,7 +32,7 @@ while (~< $m)
 close $m or die $^OS_ERROR
 
 # Test that MANIFEST is properly sorted
-SKIP: do
+:SKIP do
     skip("'Porting/manisort' not found", 1) if (! -f '../Porting/manisort')
 
     my $result = runperl('progfile' => '../Porting/manisort',

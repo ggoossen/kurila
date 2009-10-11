@@ -49,7 +49,7 @@ print $^STDOUT, "got [$foo], expected [foo]\nnot " if $foo ne 'foo'
 pass()
 
 sub local2 { local @_[?0]; last L }
-L: do { local2 }
+:L do { local2 }
 pass()
 
 # [perl #28032] delete $_[0] was freeing things too early

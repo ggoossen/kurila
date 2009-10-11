@@ -87,7 +87,7 @@ do
     ok($status, '       re-open STDOUT')
     close $oldout
 
-    SKIP: do
+    :SKIP do
       skip("TMPDIR not honored on this platform", 2)
         if ! config_value('d_mkstemp')
            || $^OS_NAME eq 'VMS' || $^OS_NAME eq 'MSwin32' || $^OS_NAME eq 'os2'
@@ -100,7 +100,7 @@ do
       ok(open(my $x,"+<",undef), 'TMPDIR honored by magic temp file via 3 arg open with undef - works if TMPDIR points to an existent dir')
 
 # in-memory open
-SKIP: do
+:SKIP do
     try { require PerlIO::scalar }
     unless (PerlIO::Layer->find('scalar'))
         skip("PerlIO::scalar not found", 8)
@@ -114,7 +114,7 @@ SKIP: do
     is( scalar ~<$x, "ok\n",    '       readline' )
     ok( tell($x) +>= 3,          '       tell' )
 
-    TODO: do
+    :TODO do
         local $TODO = "broken"
 
         # test in-memory open over STDOUT

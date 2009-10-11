@@ -72,7 +72,7 @@ do
     unlink("afile")
 
 
-SKIP: do
+:SKIP do
     skip "open -| busted and noisy on VMS", 3 if $Is_VMS
 
     ok( open(my $f, '-|', <<EOC),     'open -|' )
@@ -84,7 +84,7 @@ EOC
     ok( close($f),                      '       close' )
 
 
-SKIP: do
+:SKIP do
     skip "Output for |- doesn't go to shell on MacOS", 5 if $Is_MacOS
 
     ok( open(my $f, '|-', $Perl . <<'EOC'),     'open |-' )
@@ -165,7 +165,7 @@ do
     unlink("afile")
 
 
-SKIP: do
+:SKIP do
     skip "open -| busted and noisy on VMS", 3 if $Is_VMS
 
     ok( open(local $f, '-|', <<EOC),  'open local $f, "-|", ...' )
@@ -177,7 +177,7 @@ EOC
     ok( close($f),                      '       close' )
 
 
-SKIP: do
+:SKIP do
     skip "Output for |- doesn't go to shell on MacOS", 5 if $Is_MacOS
 
     ok( open(local $f, '|-', $Perl . <<'EOC'),  'open local $f, "|-", ...' )
@@ -219,7 +219,7 @@ do
     ok( open(my $stdin,  "<&", fileno $^STDIN),   'dup fileno(STDIN) into lexical fh') or _diag $^OS_ERROR
 
 
-SKIP: do
+:SKIP do
     skip "This perl uses perlio", 1 if config_value("useperlio")
     skip "miniperl cannot be relied on to load \%Errno"
         if env::var('PERL_CORE_MINITEST')
@@ -248,7 +248,7 @@ do
     
 
 
-SKIP: do
+:SKIP do
     skip("These tests use perlio", 5) unless config_value("useperlio")
     my $w
     use warnings 'layer';

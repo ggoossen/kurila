@@ -50,7 +50,7 @@ try { $v = first \&self_updating, 1,2; }
 is($^EVAL_ERROR, '', 'redefine self')
 
 # Calling a sub from first should leave its refcount unchanged.
-SKIP: do
+:SKIP do
     skip("No Internals::SvREFCNT", 1) if !exists &Internals::SvREFCNT
     sub huge {$_+>1E6}
     my $refcnt = Internals::SvREFCNT(\&huge)

@@ -34,7 +34,7 @@ is( $x->_out("=pod\n\nI like S<< bric-a-brac a gogo >>.\n"),
 my $unless_ascii = (chr(65) eq 'A') ?? '' !!
     "Skip because not in ASCIIland"
 
-SKIP: do 
+:SKIP do 
     skip($unless_ascii, 3) if $unless_ascii
     is($x->_out( sub { @_[0]->nbsp_for_S(1) },
        "=pod\n\nI like S<bric-a-brac a gogo>.\n"),

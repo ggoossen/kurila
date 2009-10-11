@@ -97,7 +97,7 @@ sub test_security
         ok( (-e $fname1) )
         push(@files, $fname1) # store for end block
     elsif (File::Temp->safe_level() != File::Temp::STANDARD)
-        SKIP:
+        :SKIP
             do
             my $skip2 = "Skip: " . File::Spec->tmpdir() . " possibly insecure:  $($^EVAL_ERROR && $^EVAL_ERROR->message).  " .
                 "See INSTALL under 'make test'"

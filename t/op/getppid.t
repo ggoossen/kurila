@@ -35,7 +35,7 @@ sub fork_and_retrieve
             unless my (@: $first, $second) = @: m/^(\d+),(\d+)\z/
         cmp_ok ($first, '+>=', 1, "Parent of $which grandchild")
         cmp_ok ($second, '+>=', 1, "New parent of orphaned $which grandchild")
-        SKIP: do
+        :SKIP do
             skip("Orphan processes are not reparented on QNX", 1)
                 if $^OS_NAME eq 'nto'
             isnt($first, $second,
@@ -66,7 +66,7 @@ sub fork_and_retrieve
 
 my $first = fork_and_retrieve("first")
 my $second = fork_and_retrieve("second")
-SKIP: do
+:SKIP do
     skip ("Orphan processes are not reparented on QNX", 1) if $^OS_NAME eq 'nto'
     is ($first, $second, "Both orphaned grandchildren get the same new parent")
 

@@ -27,7 +27,7 @@ $r = runperl( switches => \(@:  '-CO', '-w' ),
               stderr   => 1 )
 like( $r, qr/^$b(?:\r?\n)?$/s, '-CO: no warning on UTF-8 output' )
 
-SKIP: do
+:SKIP do
     if (defined env::var('PERL_UNICODE') &&
         (env::var('PERL_UNICODE') eq "" || env::var('PERL_UNICODE') =~ m/[SO]/))
         skip(qq[cannot test with PERL_UNICODE locale "" or /[SO]/], 1)

@@ -57,7 +57,7 @@ my $r = 0
 
 BEGIN { $tests += 8 }
 # try to open a syslog using a Unix or stream socket
-SKIP: do
+:SKIP do
     skip "can't connect to Unix socket: _PATH_LOG unavailable", 8
         unless -e Sys::Syslog::_PATH_LOG()
 
@@ -67,13 +67,13 @@ SKIP: do
 
     try { setlogsock($sock_type) }
     is( $^EVAL_ERROR, '', "setlogsock() called with '$sock_type'" )
-    TODO: do
+    :TODO do
         local $TODO = "minor bug"
         ok( $r, "setlogsock() should return true: '$r'" )
     
 
     # open syslog with a "local0" facility
-    SKIP: do
+    :SKIP do
         # openlog()
         $r = try { openlog('perl', 'ndelay', 'local0') } || 0
         skip "can't connect to syslog", 6 if $^EVAL_ERROR and $^EVAL_ERROR->{?description} =~ m/^no connection to syslog available/
@@ -97,7 +97,7 @@ BEGIN { $tests += 20 * 8 }
 # try to open a syslog using all the available connection methods
 my @passed = $@
 for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp))
-    SKIP: do
+    :SKIP do
         skip "the 'stream' mechanism because a previous mechanism with similar interface succeeded", 20
             if $sock_type eq 'stream' and grep {m/pipe|unix/}, @passed
 
@@ -155,7 +155,7 @@ for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp))
 
         push @passed, $sock_type
 
-        SKIP: do
+        :SKIP do
             skip "skipping closelog() tests for 'console'", 2 if $sock_type eq 'console'
             # closelog()
             $r = try { closelog() } || 0
@@ -167,7 +167,7 @@ for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp))
 
 
 BEGIN { $tests += 10 }
-SKIP: do
+:SKIP do
     skip "not testing setlogsock('stream') on Win32", 10 if $is_Win32
     skip "the 'unix' mechanism works, so the tests will likely fail with the 'stream' mechanism", 10
         if grep {m/unix/}, @passed
@@ -204,7 +204,7 @@ SKIP: do
     ok( !$r, "setlogsock() should return false: '$r'" )
 
     # setlogsock() with "stream" and a local file
-    SKIP: do
+    :SKIP do
         my $logfile = "test.log"
         open(my $logfh, ">", "$logfile") or skip "can't create file '$logfile': $^OS_ERROR", 2
         close($logfh)

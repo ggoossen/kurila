@@ -204,7 +204,7 @@ for my $i (reverse (@: 1,2,3))
 
 is ($r, '321', 'Reverse for list with var')
 
-TODO: do
+:TODO do
     $test++
     local $TODO = "RT #1085: what should be output of perl -we 'print do \{ foreach (1, 2) \{ 1; \} \}'"
     if (do {17; foreach ((@: 1, 2)) { 1; } } != 17)

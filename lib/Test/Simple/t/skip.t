@@ -13,7 +13,7 @@ use Test::More tests => 17
 # we won't get lots of false bug reports.
 my $Why = "Just testing the skip interface."
 
-SKIP: do
+:SKIP do
     skip $Why, 2
         unless Pigs->can('fly')
 
@@ -25,7 +25,7 @@ SKIP: do
 
 
 
-SKIP: do
+:SKIP do
     skip "We're not skipping", 2 if 0
 
     pass("Inside skip block")
@@ -33,7 +33,7 @@ SKIP: do
 
 
 
-SKIP: do
+:SKIP do
     skip "Again, not skipping", 2 if 0
 
     my (@: ?$pack, ?$file, ?$line) =@:  caller
@@ -43,7 +43,7 @@ SKIP: do
 
 
 
-SKIP: do
+:SKIP do
     skip $Why, 2 if 1
 
     die "A horrible death"
@@ -55,7 +55,7 @@ SKIP: do
 do
     my $warning
     local $^WARN_HOOK = sub (@< @_) { $warning = @_[0]->message }
-    SKIP: do
+    :SKIP do
         # perl gets the line number a little wrong on the first
         # statement inside a block.
         1 == 1
@@ -68,13 +68,13 @@ do
 
 
 
-SKIP: do
+:SKIP do
     skip "Not skipping here.", 4 if 0
 
     pass("This is supposed to run")
 
     # Testing out nested skips.
-    SKIP: do
+    :SKIP do
         skip $Why, 2
         fail("AHHH!")
         fail("You're a failure")
@@ -87,7 +87,7 @@ do
     my $warning = ''
     local $^WARN_HOOK = sub (@< @_) { $warning .= @_[0]->message }
 
-    SKIP: do
+    :SKIP do
         skip 1, "This is backwards" if 1
 
         pass "This does not run"

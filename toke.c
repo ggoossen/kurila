@@ -3791,6 +3791,11 @@ Perl_yylex(pTHX)
 	s++;
 	if(PL_expect == XOPERATOR)
 	    no_op("':'", s);
+	if(PL_expect == XSTATE) {
+	    s = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, FALSE, &len);
+	    pl_yylval.pval = CopLABEL_alloc(PL_tokenbuf);
+	    TOKEN(LABEL);
+	}
 	OPERATOR(':');
     case '(':
 	s++;

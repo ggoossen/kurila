@@ -144,7 +144,7 @@ is( $x, $a . bytes::chr(130) )
 
 # Now we have a deformed file.
 
-SKIP: do
+:SKIP do
     my @warnings
     open $f, "<:utf8", "a" or die $^OS_ERROR
     $x = ~< $f; chomp $x

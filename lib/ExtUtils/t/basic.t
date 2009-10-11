@@ -109,7 +109,7 @@ like( $ppd_html, qr{^\s*</SOFTPKG>}m,                      '  </SOFTPKG>')
 END { unlink 'Big-Dummy.ppd' }
 
 
-SKIP: do
+:SKIP do
     skip 'Test::Harness required for "make test"', 5 if not eval 'require Test::Harness; 1'
 
     my $test_out = run("$make test")
@@ -150,7 +150,7 @@ ok( %files{?'.packlist'},    '  packlist created'   )
 ok( %files{?'perllocal.pod'},'  perllocal.pod created' )
 
 
-SKIP: do
+:SKIP do
     skip 'VMS install targets do not preserve $(PREFIX)', 9 if $Is_VMS
 
     $install_out = run("$make install PREFIX=elsewhere")
@@ -170,7 +170,7 @@ SKIP: do
 
 
 
-SKIP: do
+:SKIP do
     skip 'VMS install targets do not preserve $(DESTDIR)', 11 if $Is_VMS
 
     $install_out = run("$make install PREFIX= DESTDIR=other")
@@ -211,7 +211,7 @@ SKIP: do
 
 
 
-SKIP: do
+:SKIP do
     skip 'VMS install targets do not preserve $(PREFIX)', 10 if $Is_VMS
 
     $install_out = run("$make install PREFIX=elsewhere DESTDIR=other/")
@@ -239,7 +239,7 @@ is( $^CHILD_ERROR, 0, 'dist' ) || diag($dist_out)
 my $distdir_out2 = run("$make distdir")
 is( $^CHILD_ERROR, 0, 'distdir' ) || diag($distdir_out2)
 
-SKIP: do
+:SKIP do
     skip 'Test::Harness required for "make disttest"', 1 if not eval 'require Test::Harness; 1'
     my $dist_test_out = run("$make disttest")
     is( $^CHILD_ERROR, 0, 'disttest' ) || diag($dist_test_out)

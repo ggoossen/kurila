@@ -165,7 +165,7 @@ ok(!isweak($x->{?Z}))
 # Case 7: test weaken on a read only ref
 #
 
-SKIP: do
+:SKIP do
     # in a MAD build, constants have refcnt 2, not 1
     skip("Test does not work with MAD", 5) if config_value("mad")
 

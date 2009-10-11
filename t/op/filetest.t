@@ -26,7 +26,7 @@ eval '$^EUID = 1'               # so switch uid (may not be implemented)
 
 print $^STDOUT, "# oldeuid = $oldeuid, euid = $^EUID\n"
 
-SKIP: do
+:SKIP do
     if (!config_value("d_seteuid"))
         skip('no seteuid')
     elsif (config_value("config_args") =~m/Dmksymlinks/)
@@ -48,7 +48,7 @@ ok( -r 'op' )
 
 # this would fail for the euid 1
 # (unless we have unpacked the source code as uid 1...)
-SKIP: do
+:SKIP do
     if (config_value("d_seteuid"))
         ok( -w 'op' )
     else

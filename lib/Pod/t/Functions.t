@@ -44,7 +44,7 @@ my(@:  _, $path, _ ) =  fileparse( $^PROGRAM_NAME )
 my $pod_functions = File::Spec->catfile(
     $path, File::Spec->updir, 'Functions.pm' )
 
-SKIP: do
+:SKIP do
     my $test_out = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $^DATA }
 
     skip( "Can't fork '$^EXECUTABLE_NAME': $^OS_ERROR", 1)

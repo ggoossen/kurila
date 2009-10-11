@@ -45,7 +45,7 @@ $VERSION = eval $VERSION
 	ftok
 )
 
-BOOT_XS: do
+:BOOT_XS do
     require DynaLoader
 
     # DynaLoader calls dl_load_flags as a static method.

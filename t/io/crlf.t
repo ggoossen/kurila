@@ -25,7 +25,7 @@ if ('PerlIO::Layer'->find( 'perlio'))
     do { local $^INPUT_RECORD_SEPARATOR = undef; $text = ~< $foo->* }
     is(count_chars($text, "\015\012"), 2000)
 
-    SKIP:
+    :SKIP
         do
         skip("miniperl can't rely on loading PerlIO::scalar")
             if env::var('PERL_CORE_MINITEST')

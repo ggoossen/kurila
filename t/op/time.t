@@ -42,7 +42,7 @@ ok(($: localtime() =~ m/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[ ]
    'localtime(), scalar context'
    )
 
-SKIP: do
+:SKIP do
     # This conditional of "No tzset()" is stolen from ext/POSIX/t/time.t
     skip "No tzset()", 1
         if $^OS_NAME eq "MacOS" || $^OS_NAME eq "VMS" || $^OS_NAME eq "cygwin" ||

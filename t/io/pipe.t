@@ -24,7 +24,7 @@ printf $pipe, "oY \%d -    again\n", curr_test()
 next_test()
 close $pipe
 
-SKIP: do
+:SKIP do
     # Technically this should be TODO.  Someone try it if you happen to
     # have a vmesa machine.
     skip "Doesn't work here yet", 6 if $^OS_NAME eq 'vmesa'
@@ -86,7 +86,7 @@ SKIP: do
     # This has to be *outside* the fork
     next_test()
 
-    SKIP: do
+    :SKIP do
         skip "fork required", 2 unless config_value('d_fork')
 
         pipe(my $reader, my $writer) || die "Can't open pipe"
@@ -137,11 +137,11 @@ pass()
 # VMS doesn't like spawning subprocesses that are still connected to
 # STDOUT.  Someone should modify these tests to work with VMS.
 
-SKIP: do
+:SKIP do
     skip "doesn't like spawning subprocesses that are still connected", 10
         if $^OS_NAME eq 'VMS'
 
-    SKIP: do
+    :SKIP do
         # Sfio doesn't report failure when closing a broken pipe
         # that has pending output.  Go figure.
         # BeOS will not write to broken pipes, either.
@@ -159,7 +159,7 @@ SKIP: do
         else
             ok(close $nil,       'print failed on broken pipe')
 
-    SKIP: do
+    :SKIP do
         skip "Don't work yet", 9 if $^OS_NAME eq 'vmesa'
 
         # check that errno gets forced to 0 if the piped program exited
@@ -170,7 +170,7 @@ SKIP: do
         is($^OS_ERROR, '',      '       errno')
         isnt($^CHILD_ERROR, 0,     '       status')
 
-        SKIP: do
+        :SKIP do
             skip "Don't work yet", 6 if $^OS_NAME eq 'mpeix'
 
             # check that status for the correct process is collected
@@ -211,7 +211,7 @@ is($^CHILD_ERROR, 42,      'status unaffected by implicit close')
 $^CHILD_ERROR = 0
 
 # check that child is reaped if the piped program can't be executed
-SKIP: do
+:SKIP do
     skip "/no_such_process exists", 1 if -e "/no_such_process"
     open my $nil, "-|", '/no_such_process'
     close $nil

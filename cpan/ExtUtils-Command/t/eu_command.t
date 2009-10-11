@@ -99,7 +99,7 @@ do
     eqtime()
     ok( -s $Testfile, "eqtime doesn't clear the file being equalized" )
 
-    SKIP: do 
+    :SKIP do 
         if ($^OS_NAME eq 'amigaos' || $^OS_NAME eq 'os2' || $^OS_NAME eq 'MSWin32' ||
             $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'cygwin'  ||
             $^OS_NAME eq 'MacOS'
@@ -139,7 +139,7 @@ do
         ($^OS_NAME eq 'vos' ?? 0700 !! 0600), 'change a file to read-write' )
 
 
-    SKIP: do 
+    :SKIP do 
         if ($^OS_NAME eq 'amigaos' || $^OS_NAME eq 'os2' || $^OS_NAME eq 'MSWin32' ||
             $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'cygwin'  ||
             $^OS_NAME eq 'MacOS' || $^OS_NAME eq 'vos'

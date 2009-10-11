@@ -94,7 +94,7 @@ $port = $listen->sockport
 
 if(my $pid = fork())
     my $sock
-    SERVER_LOOP:
+    :SERVER_LOOP
         while (1)
         last SERVER_LOOP unless $sock = $listen->accept
         while ( ~< $sock)
@@ -332,7 +332,7 @@ elsif (defined($server_pid))
 
     ### Child
     #
-    SERVER_LOOP: while (1)
+    :SERVER_LOOP while (1)
         my $sock
         last SERVER_LOOP unless $sock = $listen->accept
         # Do not print ok/not ok for this binmode() since there's

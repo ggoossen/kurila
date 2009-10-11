@@ -55,7 +55,7 @@ is( $r, "(\066)[\066]", '$/ set at compile-time' )
 # Tests for -c
 
 my $filename = 'swctest.tmp'
-SKIP: do
+:SKIP do
     local $TODO = ''   # this one works on VMS
 
     open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $^OS_ERROR" )
@@ -89,7 +89,7 @@ SWTEST
 # Tests for -m and -M
 
 $filename = 'swtest.pm'
-SKIP: do
+:SKIP do
     open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $^OS_ERROR",4 )
     print $f, <<'SWTESTPM'
 package swtest;

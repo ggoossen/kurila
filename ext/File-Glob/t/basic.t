@@ -25,7 +25,7 @@ else
 
 # look up the user's home directory
 # should return a list with one item, and not set ERROR
-SKIP: do
+:SKIP do
     my ($name, $home)
     skip $^OS_NAME, 1 if $^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'VMS'
       || $^OS_NAME eq 'os2' || $^OS_NAME eq 'beos'
@@ -58,14 +58,14 @@ else
 # should return an empty list
 # XXX since errfunc is NULL on win32, this test is not valid there
 @a = bsd_glob("asdfasdf", 0)
-SKIP: do
+:SKIP do
     skip $^OS_NAME, 1 if $^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare'
     is_deeply(\@a, \$@)
 
 
 # check bad protections
 # should return an empty list, and set ERROR
-SKIP: do
+:SKIP do
     skip $^OS_NAME, 2 if $^OS_NAME eq 'mpeix' or $^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'NetWare'
       or $^OS_NAME eq 'os2' or $^OS_NAME eq 'VMS' or $^OS_NAME eq 'cygwin'
     skip "AFS", 2 if Cwd::cwd() =~ m#^$(config_value('afsroot'))#s
@@ -102,7 +102,7 @@ is_deeply(\@a, \(@: ($^OS_NAME eq 'VMS'?? 'test.' !! 'TEST'), 'a', 'b'))
 # "~" should expand to $ENV{HOME}
 env::var('HOME' ) = "sweet home"
 @a = bsd_glob('~', GLOB_TILDE ^|^ GLOB_NOMAGIC)
-SKIP: do
+:SKIP do
     skip $^OS_NAME, 1 if $^OS_NAME eq "MacOS"
     is_deeply(\@a, \(@: env::var('HOME')))
 

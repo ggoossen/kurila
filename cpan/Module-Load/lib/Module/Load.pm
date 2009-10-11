@@ -17,7 +17,7 @@ sub load ($mod, @< @args)
     if( _is_file( $mod ) )
         require $mod
     else
-        LOAD: do
+        :LOAD do
             my $err
             for my $flag ( qw[1 0] )
                 my $file = _to_file( $mod, $flag)

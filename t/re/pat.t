@@ -865,7 +865,7 @@ sub run_tests
             use utf8; # needed for the raw UTF-8
             $latin =~ s!(s)tr(?:aß|s+e)!$1tr.! # \303\237 after the a
 
-    SKIP: do
+    :SKIP do
         use charnames ":full"
 
         # This is far from complete testing, there are dozens of character
@@ -2529,7 +2529,7 @@ EOFTEST
 	      }x
     ok("\{b\{c\}d" !~ m/^((??{ $brackets }))/, "bracket mismatch")
 
-    SKIP:do
+    :SKIPdo
         our @stack= $@
         my @expect=qw(
         stuff1
@@ -2602,7 +2602,7 @@ EOFTEST
 
         my $ok = 1
         my $msg = "CURLYX stress test"
-        OUTER:
+        :OUTER
             for my $a ((@: "x","a","aa"))
             for my $b ((@: "x","bbb","bbbb"))
                 my $bs = $a.$b

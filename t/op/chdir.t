@@ -27,7 +27,7 @@ sub abs_path
 my $Cwd = abs_path
 
 # Let's get to a known position
-SKIP: do
+:SKIP do
     my (@: $vol,$dir, ...) =  splitpath(abs_path,1)
     my $test_dir = $IsVMS ?? 'T' !! 't'
     skip("Already in t/", 2) if (splitdir($dir))[-1] eq $test_dir
@@ -38,7 +38,7 @@ SKIP: do
 
 $Cwd = abs_path
 
-SKIP: do
+:SKIP do
     skip("no fchdir", 16) unless $has_fchdir
     my $has_dirfd = (config_value("d_dirfd")
                      || config_value("d_dir_dd_fd") || "") eq "define"
@@ -84,7 +84,7 @@ SKIP: do
         try { chdir($h); }
         like($^EVAL_ERROR->{?description}, qr/^The dirfd function is unimplemented at/,
              "dirfd is unimplemented")
-        SKIP: do
+        :SKIP do
             skip("dirfd is unimplemented")
         
     
@@ -94,7 +94,7 @@ SKIP: do
     chdir ".." or die $^OS_ERROR
 
 
-SKIP: do
+:SKIP do
     skip("has fchdir", 1) if $has_fchdir
     opendir(my $dh, "op")
     try { chdir($dh); }

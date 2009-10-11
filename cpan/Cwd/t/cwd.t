@@ -17,7 +17,7 @@ my $EXTRA_ABSPATH_TESTS = (config_value('prefix') =~ m/\//) && $^OS_NAME ne 'cyg
 $tests += 4 if $EXTRA_ABSPATH_TESTS
 plan tests => $tests
 
-SKIP: do
+:SKIP do
     skip "no need to check for blib/ in the core", 1 if env::var('PERL_CORE')
     like $^INCLUDED{?'Cwd.pm'}, qr{blib}i, "Cwd should be loaded from blib/ during testing"
 
@@ -61,7 +61,7 @@ if ($^OS_NAME eq 'MSWin32')
 
 $pwd_cmd =~ s=\\=/=g if ($^OS_NAME eq 'dos')
 
-SKIP: do
+:SKIP do
     skip "No native pwd command found to test against", 4 unless $pwd_cmd
 
     print $^STDOUT, "# native pwd = '$pwd_cmd'\n"
@@ -80,7 +80,7 @@ SKIP: do
     $start =~ s,\\,/,g if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq "NetWare")
     # DCL SHOW DEFAULT has leading spaces
     $start =~ s/^\s+// if $IsVMS
-    SKIP: do
+    :SKIP do
         skip("'$pwd_cmd' failed, nothing to test against", 4) if $^CHILD_ERROR
         skip("/afs seen, paths unlikely to match", 4) if $start =~ m|/afs/|
 
@@ -158,7 +158,7 @@ do
     rmtree(@test_dirs[0], 0, 0)
 
 
-SKIP: do
+:SKIP do
     skip "no symlinks on this platform", 2+$EXTRA_ABSPATH_TESTS unless config_value('d_symlink')
 
     mkpath(\(@: $Test_Dir), 0, 0777)
@@ -200,7 +200,7 @@ path_ends_with(Cwd::_perl_abs_path($path), 'cwd.t', '_perl_abs_path() can be inv
 
 
 
-SKIP: do
+:SKIP do
     my $file
     do
         my $root = Cwd::abs_path(File::Spec->rootdir)	# Add drive letter?

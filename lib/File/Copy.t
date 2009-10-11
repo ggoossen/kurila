@@ -103,7 +103,7 @@ for my $cross_partition_test (0..1)
     open($r, "<", "file-$^PID") or die; $foo = ~< $r->*; close($r)
     is $foo, "ok\n", 'contents preserved'
 
-    TODO: do
+    :TODO do
         local $TODO = 'mtime only preserved on ODS-5 with POSIX dates and DECC$EFS_FILE_TIMESTAMPS enabled' if $^OS_NAME eq 'VMS'
 
         my $dest_mtime = (@: stat("file-$^PID"))[9]
@@ -140,7 +140,7 @@ for my $cross_partition_test (0..1)
     ok !-e "file-$^PID", 'file moved indeed'
     unlink "lib/file-$^PID" or die "unlink: $^OS_ERROR"
 
-    SKIP: do
+    :SKIP do
         skip "Testing symlinks", 3 unless config_value("d_symlink")
 
         open($f, ">", "file-$^PID") or die $^OS_ERROR
@@ -160,7 +160,7 @@ for my $cross_partition_test (0..1)
         unlink "file-$^PID"
     
 
-    SKIP: do
+    :SKIP do
         skip "Testing hard links", 3
             if !config_value("d_link") or $^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'cygwin'
 

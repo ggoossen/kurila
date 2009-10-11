@@ -71,7 +71,7 @@ sub bar
     our @ary = split('', $foo)
 
     # PVOP, LOOP
-    LOOP: for (1 .. 10)
+    :LOOP for (1 .. 10)
         last LOOP if $_ % 2
     
 

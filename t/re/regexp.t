@@ -85,7 +85,7 @@ $^OUTPUT_AUTOFLUSH = 1
 printf $^STDOUT, "1..\%d\n# $iters iterations\n", nelems @tests
 
 my $test
-TEST:
+:TEST
     foreach ( @tests)
     $test++
     if (!m/\S/ || m/^\s*#/ || m/^__END__$/)

@@ -43,7 +43,7 @@ EOM
 
 my $perm = S_IRWXU
 
-SKIP: do
+:SKIP do
 
     skip( 'lacking d_msgget d_msgctl d_msgsnd d_msgrcv', 6 ) unless
         config_value('d_msgget') eq 'define' &&
@@ -125,7 +125,7 @@ EOM
     
  # SKIP
 
-SKIP: do
+:SKIP do
 
     skip('lacking d_semget d_semctl', 11) unless
         config_value('d_semget') eq 'define' &&

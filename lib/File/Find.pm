@@ -610,7 +610,7 @@ sub _find_opt
 
     my ($abs_dir, $Is_Dir)
 
-    Proc_Top_Item:
+    :Proc_Top_Item
         foreach my $TOP ( @_)
         my $top_item = $TOP
 

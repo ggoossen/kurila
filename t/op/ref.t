@@ -322,7 +322,7 @@ is (runperl(
     stderr => 1
     ), '', 'freeing self-referential typeglob')
 
-TODO: do
+:TODO do
     my $name1 = "\0Chalk"
     my $name2 = "\0Cheese"
 

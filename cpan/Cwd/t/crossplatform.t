@@ -29,7 +29,7 @@ ok 1, "Loaded"
 foreach my $platform ( @platforms)
     my $module = "File::Spec::$platform"
 
-    SKIP:
+    :SKIP
         do
         eval "require $module; 1"
 

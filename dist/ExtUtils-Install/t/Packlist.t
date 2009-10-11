@@ -10,7 +10,7 @@ is( ref(ExtUtils::Packlist::mkfh()), 'GLOB', 'mkfh() should return a FH' )
 my $pl = ExtUtils::Packlist->new()
 isa_ok( $pl, 'ExtUtils::Packlist' )
 
-SKIP: do
+:SKIP do
 
     # and some test data to be read
     $pl->{+data} = %: 
@@ -29,7 +29,7 @@ SKIP: do
 
 
 # and more read() tests
-SKIP: do
+:SKIP do
     open my $in, "<", "eplist" or die
     my $file = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $in }
     close $in

@@ -23,7 +23,7 @@ like($^OS_ERROR, qr/cannot find|such|exist|not found|not a directory|unknown/i)
 ok(mkdir('blurfl'))
 ok(rmdir('blurfl'))
 
-SKIP: do
+:SKIP do
     # trailing slashes will be removed before the system call to mkdir
     # but we don't care for MacOS ...
     skip("MacOS", 4) if $^OS_NAME eq 'MacOS'

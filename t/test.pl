@@ -747,7 +747,7 @@ sub dies_like ($e, $qr, ?$name)
 
 
 sub eval_dies_like ($e, $qr, ?$name)
-    TODO:
+    :TODO
         do
         todo_skip("Compile time abortion are known to leak memory", 1) if env::var('PERL_VALGRIND')
 

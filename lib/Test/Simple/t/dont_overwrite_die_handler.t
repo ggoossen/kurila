@@ -9,7 +9,7 @@ BEGIN
 
 use Test::More tests => 1
 
-SKIP: do
+:SKIP do
     skip "CV reference changed", 1
     ok $^DIE_HOOK &== $handler, 'existing DIE handler not overridden'
 

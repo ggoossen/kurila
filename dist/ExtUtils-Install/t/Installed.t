@@ -32,7 +32,7 @@ ok( !$ei->_is_prefix('\foo\bar', '\bar'),
 ok( $ei->_is_type(0, 'all'), '_is_type() should be true for type of "all"' )
 
 foreach my $path (qw( man1dir man3dir ))
-    SKIP: do
+    :SKIP do
         my $dir = config_value($path.'exp')
         skip("no man directory $path on this system", 2 ) unless $dir
 
@@ -55,7 +55,7 @@ $prefix = config_value("prefix") if $prefix eq 'p:' && $^OS_NAME eq 'MSWin32'
 ok( $ei->_is_type( File::Spec->catfile($prefix, 'bar'), 'prog'),
     "... should find prog file under $prefix" )
 
-SKIP: do
+:SKIP do
     skip('no man directories on this system', 1) unless $mandirs
     is( $ei->_is_type('bar', 'doc'), 0,
         '... should not find doc file outside path' )
@@ -168,14 +168,14 @@ dies_like( sub (@< @_) { $ei->files('goodmod', 'badtype' ) },
            qr/type must be/,'files() should croak given bad type' )
 
 my @files
-SKIP: do
+:SKIP do
     skip('no man directory man1dir on this system', 2)
         unless config_value("man1direxp")
     @files = $ei->files('goodmod', 'doc', config_value("man1direxp"))
     is( scalar nelems @files, 1, '... should find doc file under given dir' )
     is( nelems(grep { m/foo$/ }, @files), 1, '... checking file name' )
 
-SKIP: do
+:SKIP do
     skip('no man directories on this system', 1) unless $mandirs
     @files = $ei->files('goodmod', 'doc')
     is( scalar nelems @files, $mandirs, '... should find all doc files with no dir' )
@@ -194,7 +194,7 @@ my %dirnames = %+: map { %: lc($_) => dirname($_) }, @files
 my @dirs = $ei->directories('goodmod', 'prog', 'fake')
 is( scalar nelems @dirs, 0, 'directories() should return no dirs if no files found' )
 
-SKIP: do
+:SKIP do
     skip('no man directories on this system', 1) unless $mandirs
     @dirs = $ei->directories('goodmod', 'doc')
     is( scalar nelems @dirs, $mandirs, '... should find all files files() would' )
@@ -210,7 +210,7 @@ my $expectdirs =
     (dirname(config_value("man1direxp")) eq dirname(config_value("man3direxp")))
     ?? 3 !! 2
 
-SKIP: do
+:SKIP do
     skip('no man directories on this system', 1) unless $mandirs
     @dirs = $ei->directory_tree('goodmod', 'doc', config_value("man1direxp") ??
         dirname(config_value("man1direxp")) !! dirname(config_value("man3direxp")))

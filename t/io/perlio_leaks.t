@@ -9,7 +9,7 @@ use Test::More 'no_plan'
 # :perlio -> ok
 # :crlf   -> ok
 
-TODO: do
+:TODO do
     local $TODO = "[perl #56644] PerlIO resource leaks on open() and then :pop in :unix and :stdio"
     foreach my $layer(qw(:unix :stdio  :perlio :crlf))
         my $base_fd = do{ open my $in, '<', $^PROGRAM_NAME or die $^OS_ERROR; fileno $in }

@@ -228,7 +228,7 @@ sub BaseTests
         ok ( !try { $version*3 }, "noop *" )
         ok ( !try { abs($version) }, "noop abs" )
 
-        SKIP: do
+        :SKIP do
             skip "version require'd instead of use'd, cannot test qv", 3
                 if defined $no_qv
             # test the qv() sub
@@ -344,7 +344,7 @@ sub BaseTests
             unlink 'zzz.pm'
         
 
-        SKIP: 	do
+        :SKIP 	do
             diag "Tests with v-strings" if $Verbose
             $version = $CLASS->new(v1.2.3)
             is($version->stringify, "v1.2.3", '"$version" == 1.2.3')
@@ -399,7 +399,7 @@ sub BaseTests
                "Very small version objects")
     
 
-    SKIP: do
+    :SKIP do
         # dummy up a legal module for testing RT#19017
         open my $f, ">", "www.pm" or die "Cannot open www.pm: $^OS_ERROR\n"
         print $f ,<<"EOF"
@@ -447,7 +447,7 @@ EOF
     isa_ok( eval'qv(1.2)', "vvv")
     unlink 'vvv.pm'
 
-    SKIP: do
+    :SKIP do
         open my $f, ">", "uuu.pm" or die "Cannot open uuu.pm: $^OS_ERROR\n"
         print $f ,<<"EOF"
 package uuu;
@@ -464,7 +464,7 @@ EOF
         unlink 'uuu.pm'
     
 
-    SKIP: do
+    :SKIP do
         # test locale handling
         my $warning
         local $^WARN_HOOK = sub (@< @_) { $warning = @_[0] }

@@ -743,7 +743,7 @@ for (  @tests )
 # an expected result. Works with functions that return scalars or arrays.
 #
 sub tryfunc
-    SKIP: do
+    :SKIP do
         my $function = shift 
         my $expected = shift 
         my $platform = shift 

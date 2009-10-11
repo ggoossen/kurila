@@ -32,7 +32,7 @@ isnt($x ** .5, 2, "power still floating point")
 
 is(++$x, 5.5, "++ still floating point")
 
-SKIP: do
+:SKIP do
     my $ivsize = config_value("ivsize")
     skip "ivsize == $ivsize", 2 unless $ivsize == 4 || $ivsize == 8
 
@@ -48,7 +48,7 @@ SKIP: do
 is(^~^0, -1, "signed instead of unsigned")
 
 # [perl #38485] use integer; 0x80000000/-1;
-SKIP: do
+:SKIP do
     my $ivsize = config_value("ivsize")
     skip "ivsize == $ivsize", 4 unless $ivsize == 4 || $ivsize == 8
 

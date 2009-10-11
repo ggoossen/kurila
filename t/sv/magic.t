@@ -223,7 +223,7 @@ do
     ok($ok, $warn, $Is_VMS ?? "'\$!=undef' does throw a warning" !! '')
 
 
-SKIP: do
+:SKIP do
     # test case-insignificance of %ENV (these tests must be enabled only
     # when perl is compiled with -DENV_IS_CASELESS)
     skip('no caseless %ENV support', 3) unless $Is_MSWin32 || $Is_NetWare

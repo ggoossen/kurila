@@ -86,7 +86,7 @@ open($f, ">&", $dupout) or die "Cannot dup stdout back: $^OS_ERROR"
 
 curr_test(13)
 
-SKIP: do
+:SKIP do
     skip("need perlio", 14) unless config_value("useperlio")
 
     ok(open($f, ">&", $^STDOUT))

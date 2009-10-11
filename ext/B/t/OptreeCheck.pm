@@ -426,7 +426,7 @@ sub checkOptree
     my ($rendering)
 
     print $^STDOUT, "checkOptree args: ", <mydumper($tc) if $tc->{?dump}
-    SKIP: do
+    :SKIP do
         skip("$tc->{?skip} $tc->{?name}", 1) if $tc->{?skip}
 
         return runSelftest($tc) if %gOpts{?selftest}
@@ -435,7 +435,7 @@ sub checkOptree
         $tc->checkErrs()
 
         local $Level = $Level + 2
-        TODO:
+        :TODO
             foreach my $want ( %modes{%gOpts{?testmode}}->@)
             local $TODO = $tc->{?todo} if $tc->{?todo}
 

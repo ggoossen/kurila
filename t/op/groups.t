@@ -49,7 +49,7 @@ quit() if (($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare') or $^OS_NAME =~ m/
 #
 # and the groups= might be after, before, or between uid=... and gid=...
 
-GROUPS: do
+:GROUPS do
     # prefer 'id' over 'groups' (is this ever wrong anywhere?)
     # and 'id -a' over 'id -Gn' (the former is good about spaces in group names)
     if (($groups = `id -a 2>/dev/null`) ne '')

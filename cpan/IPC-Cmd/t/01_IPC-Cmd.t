@@ -67,7 +67,7 @@ do   ### list of commands and regexes matching output ###
 
                 ok( $ok,        "Ran command succesfully" );
 
-                SKIP: do
+                :SKIP do
                     skip "No buffers available", 1
                         unless $Class->can_capture_buffer
 
@@ -86,7 +86,7 @@ do   ### list of commands and regexes matching output ###
                 is( scalar(nelems @list), $list_length,
                     "   Output list has $list_length entries" );
 
-                SKIP: do
+                :SKIP do
                     skip "No buffers available", 6
                         unless $Class->can_capture_buffer
 
@@ -142,7 +142,7 @@ do   ### list of commands and regexes matching output ###
 
                 ok( $ok,        "Ran stderr command succesfully in scalar mode." );
 
-                SKIP: do
+                :SKIP do
                     # No buffers are expected if neither IPC::Run nor IPC::Open3 is used.
                     skip "No buffers available", 1
                         unless $Class->can_capture_buffer
@@ -162,7 +162,7 @@ do   ### list of commands and regexes matching output ###
                 is( scalar(nelems @list), $list_length,
                     "   Output list has $list_length entries" );
 
-                SKIP: do
+                :SKIP do
                     # No buffers are expected if neither IPC::Run nor IPC::Open3 is used.
                     skip "No buffers available", 6
                         unless $Class->can_capture_buffer

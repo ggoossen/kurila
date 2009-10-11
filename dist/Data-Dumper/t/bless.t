@@ -39,7 +39,7 @@ PERL
         is($dt, $o, "package name in bless is escaped if needed")
         is_deeply(scalar eval($dt), $t, "eval reverts dump")
     
-    SKIP: do
+    :SKIP do
         skip(q/no 're::regexp_pattern'/, 1)
             if ! defined(*re::regexp_pattern{CODE})
 

@@ -196,7 +196,7 @@ do
 
 exit if $minitest
 
-SKIP: do
+:SKIP do
     skip( "No PerlIO available", 3 ) unless $has_perlio
     pop $^INCLUDE_PATH
 

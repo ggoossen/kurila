@@ -103,7 +103,7 @@ do
 # before the patch, the eval died with an error like:
 #   "my" variable $strict::VERSION can't be in a package
 #
-SKIP: do
+:SKIP do
     skip("Embedded UTF-8 does not work in EBCDIC", 1) if ord("A") == 193
     ok('' eq runperl(prog => <<'CODE'), "change #17928")
         my $code = qq{ my \$\xe3\x83\x95\xe3\x83\xbc = 5; };
@@ -157,7 +157,7 @@ END
     is("$(join ' ',@i)", "60 62 58 50 52 48 70 72 68", "utf8 heredoc index and rindex")
 
 
-SKIP: do
+:SKIP do
     skip("Embedded UTF-8 does not work in EBCDIC", 1) if ord("A") == 193
     use utf8;
     eval qq{is(q \xc3\xbc test \xc3\xbc, qq\xc2\xb7 test \xc2\xb7,

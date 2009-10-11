@@ -424,7 +424,7 @@ sub pod2html
 
     # put a title in the $html_fh file if one wasn't specified
     if ($Title eq '')
-        TITLE_SEARCH: do
+        :TITLE_SEARCH do
             for my $i (0 .. nelems(@poddata) -1)
                 if (@poddata[$i] =~ m/^=head1\s*NAME\b/m)
                     for my $para ( @poddata[[(@: $i, $i+1)]] )
@@ -1619,7 +1619,7 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing)
         # failing this, we try to find the next best thing...
         my( $url, $ltext, $fid )
 
-        RESOLVE: do
+        :RESOLVE do
             if( defined $ident )
                 ## try to resolve $ident as an item
                 (@:  $url, $fid ) =  coderef( $page, $ident )

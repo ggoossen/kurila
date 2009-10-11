@@ -6,7 +6,7 @@ BEGIN { plan tests => 1 }
 
 use Pod::Parser
 
-SKIP:
+:SKIP
     do
     if (not try {require IO::String; 1})
         skip 'no IO::String', 1

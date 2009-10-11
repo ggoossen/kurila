@@ -11,7 +11,7 @@ my @tmpfiles = $@
 END { unlink < @tmpfiles }
 
 my $filename = 'swdtest.tmp'
-SKIP: do
+:SKIP do
     open my $f, ">", "$filename"
         or skip( "Can't write temp file $filename: $^OS_ERROR" )
     print $f, <<'__SWDTEST__'

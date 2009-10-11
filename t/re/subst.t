@@ -305,7 +305,7 @@ $pv1 =~ s/A/\x{100}/
 substr($pv2,0,1, "\x{100}")
 is($pv1, $pv2)
 
-SKIP: do
+:SKIP do
     skip("EBCDIC", 3) if ord("A") == 193
 
     do

@@ -108,7 +108,7 @@ is ($buffer, $expect, "content what we expected?")
 ok (shutdown($left, SHUT_WR), "shutdown left for writing")
 # This will hang forever if eof is buggy, and alarm doesn't interrupt system
 # Calls. Hence the child process minder.
-SKIP: do
+:SKIP do
     skip "SCO Unixware / OSR have a bug with shutdown",2 if $^OS_NAME =~ m/^(?:svr|sco)/
     local signals::handler("ALRM") = sub (@< @_) { warn "EOF on right took over 3 seconds" }
     local $TODO = "Known problems with unix sockets on $^OS_NAME"
@@ -162,7 +162,7 @@ ok (close $right, "close right")
 # I suspect we also need a self destruct time-bomb for these, as I don't see any
 # guarantee that the stack won't drop a UDP packet, even if it is for localhost.
 
-SKIP: do
+:SKIP do
     skip "No usable SOCK_DGRAM for socketpair", 24 if ($^OS_NAME =~ m/^(MSWin32|os2)\z/)
     local $TODO = "socketpair not supported on $^OS_NAME" if $^OS_NAME eq 'nto'
 
@@ -204,7 +204,7 @@ SKIP: do
     # eof uses buffering. eof is indicated by a sysread of zero.
     # but for a datagram socket there's no way it can know nothing will ever be
     # sent
-    SKIP: do
+    :SKIP do
         skip "$^OS_NAME does length 0 udp reads", 2 if ($^OS_NAME eq 'os390')
 
         my $alarmed = 0

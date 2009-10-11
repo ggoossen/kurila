@@ -524,7 +524,7 @@ sub cp_if_diff($from, $to, $how)
         if (-e $to)
             unlink($to) or die "unlink $to: $^OS_ERROR"
         
-        STRICT_SWITCH: do
+        :STRICT_SWITCH do
             best($from,$to), last STRICT_SWITCH if $how eq 'best'
             cp($from,$to), last STRICT_SWITCH if $how eq 'cp'
             ln($from,$to), last STRICT_SWITCH if $how eq 'ln'

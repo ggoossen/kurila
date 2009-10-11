@@ -13,7 +13,7 @@ my $Invoke_Perl = qq(MCR $perl "-I[-.lib]")
 BEGIN { require "./test.pl"; }
 plan(tests => 25)
 
-SKIP: do
+:SKIP do
     skip("tests for non-VMS only", 1) if $^OS_NAME eq 'VMS'
 
     no utf8;
@@ -26,7 +26,7 @@ SKIP: do
     is( $Orig_Bits, $^HINT_BITS,    'use vmsish a no-op' )
 
 
-SKIP: do
+:SKIP do
     skip("tests for VMS only", 24) unless $^OS_NAME eq 'VMS'
 
     #========== vmsish status ==========

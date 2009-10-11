@@ -65,7 +65,7 @@ ok( ($zzz1 == 13 and $zzz2 == 13 and $l1 == 13),
     "$zzz1 = $l1 = $l2 = $zzz2 = $l3 = $l4 = 13" )
 
 for ( @INPUT)
-    SKIP: do
+    :SKIP do
         (@: $op, _, $comment) = @: m/^([^\#]+)(\#\s+(.*))?/
         $comment = $op unless defined $comment
         chomp
@@ -97,7 +97,7 @@ EOE
 
 
 for ( @simple_input)
-    SKIP:
+    :SKIP
         do
         (@: $op, _, $comment) = @: m/^([^\#]+)(\#\s+(.*))?/
         $comment = $op unless defined $comment

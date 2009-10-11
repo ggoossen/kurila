@@ -312,7 +312,7 @@ is($results, <<"EOHTML", "Verbatim text with encodable entities")
 
 EOHTML
 
-SKIP: for my $use_html_entities (@: 0, 1)
+:SKIP for my $use_html_entities (@: 0, 1)
   if ($use_html_entities and not $Pod::Simple::XHTML::HAS_HTML_ENTITIES)
     skip("HTML::Entities not installed", 1)
   local $Pod::Simple::XHTML::HAS_HTML_ENTITIES = $use_html_entities

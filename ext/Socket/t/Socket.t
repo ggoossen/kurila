@@ -28,7 +28,7 @@ if (socket(my $t, PF_INET, SOCK_STREAM, IPPROTO_TCP))
         '127.0.0.1' !! 'localhost'
     my $localhost = inet_aton($host)
 
-    SKIP:
+    :SKIP
         do
         if ( not ($has_echo && defined $localhost && connect($t,pack_sockaddr_in(7,$localhost)) ) )
 
@@ -74,7 +74,7 @@ if( socket(my $s, PF_INET,SOCK_STREAM, IPPROTO_TCP) )
 
     arm(5)
 
-    SKIP:
+    :SKIP
         do
         if ( not ($has_echo && connect($s,pack_sockaddr_in(7,INADDR_LOOPBACK)) ) )
             print $^STDOUT, "# You're allowed to fail tests 5 and 6 if\n"
@@ -135,7 +135,7 @@ is(sockaddr_family(pack_sockaddr_in(100,inet_aton("10.250.230.10"))), AF_INET)
 dies_like( sub (@< @_) { sockaddr_family("") },
            qr/^Bad arg length for Socket::sockaddr_family, length is 0, should be at least \d+/ )
 
-SKIP: do
+:SKIP do
     skip 2, "no inetntop or inetaton" if not (config_value('d_inetntop') && config_value('d_inetaton'))
     ok(inet_ntop(AF_INET, inet_pton(AF_INET, "10.20.30.40")) eq "10.20.30.40")
     ok(inet_ntop(AF_INET, inet_aton("10.20.30.40")) eq "10.20.30.40")

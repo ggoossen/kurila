@@ -680,7 +680,7 @@ sub install #XXX OS-SPECIFIC
     my @found_files
     my %check_dirs
 
-    MOD_INSTALL: foreach my $source (sort keys %from_to)
+    :MOD_INSTALL foreach my $source (sort keys %from_to)
         #copy the tree to the target directory without altering
         #timestamp and permission and remember for the .packlist
         #file. The packlist file contains the absolute paths of the

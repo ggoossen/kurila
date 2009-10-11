@@ -25,7 +25,7 @@ if (open($outfh, ">", 'mkboot.bs'))
     close $outfh
 
 
-SKIP: do
+:SKIP do
     skip("could not make dummy .bs file: $^OS_ERROR", 2) unless $file_is_ready
 
     Mkbootstrap('mkboot')
@@ -60,7 +60,7 @@ like( $out, qr/bsloadlibs=foo/, 'should still report libraries' )
 # if ${_[0]}_BS exists, require it
 $file_is_ready = open($outfh, ">", 'boot_BS')
 
-SKIP: do
+:SKIP do
     skip("cannot open boot_BS for writing: $^OS_ERROR", 1) unless $file_is_ready
 
     print $outfh, '$main::required = 1'
@@ -74,14 +74,14 @@ SKIP: do
 # if there are any arguments, open a file named baseext.bs
 $file_is_ready = open($outfh, ">", 'dasboot.bs')
 
-SKIP: do
+:SKIP do
     skip("cannot make dasboot.bs: $^OS_ERROR", 5) unless $file_is_ready
 
     # if it can't be opened for writing, we want to prove that it'll die
     close $outfh
     chmod 0444, 'dasboot.bs'
 
-    SKIP: do
+    :SKIP do
         skip("cannot write readonly files", 1) if -w 'dasboot.bs'
 
         try{ Mkbootstrap('dasboot', 1) }
@@ -104,7 +104,7 @@ SKIP: do
 
 
 
-SKIP: do
+:SKIP do
     skip("cannot read .bs file: $^OS_ERROR", 2) unless $file_is_ready
 
     my $file = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $in->* }
@@ -121,7 +121,7 @@ SKIP: do
 $file_is_ready = open($outfh, ">", 'dasboot.bs')
 $out = ''
 
-SKIP: do
+:SKIP do
     skip("cannot make dasboot.bs again: $^OS_ERROR", 1) unless $file_is_ready
     close $outfh
 
@@ -137,7 +137,7 @@ SKIP: do
     $file_is_ready = open($in, "<", 'dasboot.bs')
 
 
-SKIP: do
+:SKIP do
     skip("cannot open dasboot.bs for reading: $^OS_ERROR", 3) unless $file_is_ready
 
     my $file = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $in->* }

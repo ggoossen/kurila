@@ -537,7 +537,7 @@ sub find($self, $pod, @< @search_dirs)
     
 
     my %seen_dir
-    Dir:
+    :Dir
         foreach my $dir (  @search_dirs )
         next unless defined $dir and length $dir
         next if %seen_dir{?$dir}

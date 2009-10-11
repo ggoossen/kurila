@@ -158,7 +158,7 @@ do
 
 
 ### test 'requires' ###
-SKIP:do
+:SKIP do
     skip "Depends on \$^X, which doesn't work well when testing the Perl core",
          1 if env::var('PERL_CORE')
 

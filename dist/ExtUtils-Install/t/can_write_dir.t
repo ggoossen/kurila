@@ -31,7 +31,7 @@ is_deeply \ can_write_dir($abs_dne),
                   FS->rel2abs(FS->catdir('does', 'not'))
                   FS->rel2abs(FS->catdir('does', 'not', 'exist')))
 
-SKIP: do
+:SKIP do
     my $exists = FS->catdir( <qw(exists))
     my $subdir = FS->catdir( <qw(exists subdir))
 

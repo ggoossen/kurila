@@ -19,7 +19,7 @@ is(join(':', @foo[[@foo[0]..5]]), '2:c:d:e:6')
 @bar[[2..4]] = @: 'c','d','e'
 is(join(':', @bar[[1..5]]), ':c:d:e:')
 
-TODO: do
+:TODO do
     todo_skip("slices in the middle of a list assignment", 1)
     eval <<'TODO'; die if $^EVAL_ERROR
    ($a, < @bcd[[0..2]],$e) = ('a','b','c','d','e');

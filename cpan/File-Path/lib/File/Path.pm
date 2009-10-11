@@ -650,7 +650,7 @@ sub _rmtree($arg, $paths)
     my $updir  = File::Spec->updir()
 
     my (@files)
-    ROOT_DIR:
+    :ROOT_DIR
         foreach my $root ($($paths->@))
         if ($Is_MacOS)
             $root  = ":$root" unless $root =~ m/:/

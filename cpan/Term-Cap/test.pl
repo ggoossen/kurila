@@ -40,7 +40,7 @@ env::var('TERMCAP' ) = ''
 my $path = join '', Term::Cap::termcap_path()
 is( $path, $files, 'termcap_path() should find default files' )
 
-SKIP: do
+:SKIP do
     # this is ugly, but -f $0 really *ought* to work
     skip("-f $file fails, some tests difficult now", 2) unless -f $file
 
@@ -108,7 +108,7 @@ is( $warn, '', 'Tgetent() should not work if OSPEED is provided' )
 is( $vals->{?PADDING}, 200, 'Tgetent() should set slow PADDING when needed' )
 
 
-SKIP: do
+:SKIP do
     skip('Tgetent() bad termcap test, since using a fixed termcap',1)
         if $^OS_NAME eq 'VMS'
     # now see if lines 177 or 180 will fail
@@ -119,7 +119,7 @@ SKIP: do
     isnt( $^EVAL_ERROR, '', 'Tgetent() should catch bad termcap file' )
 
 
-SKIP: do
+:SKIP do
     skip( "Can't write 'tcout' file for tests", 9 ) unless $writable
 
     # it won't find the termtype in this fake file, so it should croak
@@ -151,7 +151,7 @@ SKIP: do
 
 
 # Windows hack
-SKIP:
+:SKIP
     do
     skip("QNX's termcap database does not contain an entry for dumb terminals",
          1) if $^OS_NAME eq 'nto'

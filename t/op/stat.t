@@ -53,14 +53,14 @@ my(@: $nlink, $mtime, $ctime) =  (@: stat($foo))[[(@: $NLINK, $MTIME, $CTIME)]]
 my $Filesystem_Time_Offset = abs($mtime - time); 
 
 #nlink should if link support configured in Perl.
-SKIP: do
+:SKIP do
     skip "No link count - Hard link support not built in.", 1
         unless config_value('d_link')
 
     is($nlink, 1, 'nlink on regular file')
 
 
-SKIP: do
+:SKIP do
     skip "mtime and ctime not reliable", 2
         if $Is_MSWin32 or $Is_NetWare or $Is_Cygwin or $Is_Dos or $Is_MacOS or $Is_Darwin
 
@@ -79,7 +79,7 @@ close($foo)
 sleep 2
 
 
-SKIP: do
+:SKIP do
     unlink $tmpfile_link
     my $lnk_result = try { link $tmpfile, $tmpfile_link }
     skip "link() unimplemented", 6 if $^EVAL_ERROR and $^EVAL_ERROR->{?description} =~ m/unimplemented/
@@ -90,7 +90,7 @@ SKIP: do
 
     my(@: $nlink, $mtime, $ctime) =  (@: stat($tmpfile))[[(@: $NLINK, $MTIME, $CTIME)]]
 
-    SKIP: do
+    :SKIP do
         skip "No link count", 1 if config_value('dont_use_nlink')
         skip "Cygwin9X fakes hard links by copying", 1
             if config_value('myuname') =~ m/^cygwin_(?:9\d|me)\b/i
@@ -98,7 +98,7 @@ SKIP: do
         is($nlink, 2,     'Link count on hard linked file' )
     
 
-    SKIP: do
+    :SKIP do
         my $cwd = File::Spec->rel2abs($Curdir)
         skip "Solaris tmpfs has different mtime/ctime link semantics", 2
             if $Is_Solaris and $cwd =~ m#^/tmp# and
@@ -154,17 +154,17 @@ ok(-s $tmpfile,     '   and -s')
 # Strip all access rights from the file.
 ok( chmod(0000, $tmpfile),     'chmod 0000' )
 
-SKIP: do
+:SKIP do
     skip "-r, -w and -x have different meanings on VMS", 3 if $Is_VMS
 
-    SKIP: do
+    :SKIP do
         # Going to try to switch away from root.  Might not work.
         my $olduid = $^UID
         try { $^UID = 1; }
         skip "Can't test -r or -w meaningfully if you're superuser", 2
             if $^UID == 0
 
-        SKIP: do
+        :SKIP do
             skip "Can't test -r meaningfully?", 1 if $Is_Dos || $Is_Cygwin
             ok(!-r $tmpfile,    "   -r")
         
@@ -184,7 +184,7 @@ ok(chmod(0700,$tmpfile),    'chmod 0700')
 ok(-r $tmpfile,     '   -r')
 ok(-w $tmpfile,     '   -w')
 
-SKIP: do
+:SKIP do
     skip "-x simply determines if a file ends in an executable suffix", 1
         if $Is_Dosish || $Is_MacOS
 
@@ -199,7 +199,7 @@ ok(  -d $Curdir,          '-d cwd' )
 ok(! -f $Curdir,          '!-f cwd' )
 
 
-SKIP: do
+:SKIP do
     unlink($tmpfile_link)
     my $symlink_rslt = try { symlink $tmpfile, $tmpfile_link }
     skip "symlink not implemented", 3 if $^EVAL_ERROR and $^EVAL_ERROR->{?description} =~ m/unimplemented/
@@ -216,7 +216,7 @@ ok(-e $tmpfile,     '-e')
 unlink($tmpfile_link)
 ok(! -e $tmpfile_link,  '   -e on unlinked file')
 
-SKIP: do
+:SKIP do
     skip "No character, socket or block special files", 6
         if $Is_MSWin32 || $Is_NetWare || $Is_Dos
     skip "/dev isn't available to test against", 6
@@ -277,7 +277,7 @@ SKIP: do
         is($c1, $c2, "ls and @_[1] agreeing on /dev ($c1 $c2)")
     
 
-    SKIP: do
+    :SKIP do
         skip("DG/UX ls -L broken", 3) if $Is_DGUX
 
         $try->('b', '-b')
@@ -292,7 +292,7 @@ SKIP: do
 
 
 
-SKIP: do
+:SKIP do
     my($cnt, $uid)
     $cnt = 0
     $uid = 0
@@ -324,12 +324,12 @@ SKIP: do
 # To assist in automated testing when a controlling terminal (/dev/tty)
 # may not be available (at, cron  rsh etc), the PERL_SKIP_TTY_TEST env var
 # can be set to skip the tests that need a tty.
-SKIP: do
+:SKIP do
     skip "These tests require a TTY", 4 if env::var('PERL_SKIP_TTY_TEST')
 
     my $TTY = $Is_Rhapsody ?? "/dev/ttyp0" !! "/dev/tty"
 
-    SKIP: do
+    :SKIP do
         skip "Test uses unixisms", 2 if $Is_MSWin32 || $Is_NetWare
         skip "No TTY to test -t with", 2 unless -e $TTY
 
@@ -343,7 +343,7 @@ SKIP: do
 
 
 my $Null = File::Spec->devnull
-SKIP: do
+:SKIP do
     skip "No null device to test with", 1 unless -e $Null
     skip "We know Win32 thinks '$Null' is a TTY", 1 if $Is_MSWin32
 
@@ -358,7 +358,7 @@ my $statfile = File::Spec->catfile($Curdir, 'op', 'stat.t')
 ok(  -T $statfile,    '-T')
 ok(! -B $statfile,    '!-B')
 
-SKIP: do
+:SKIP do
     skip("DG/UX", 1) if $Is_DGUX
     ok(-B $Perl,      '-B')
 
@@ -366,7 +366,7 @@ SKIP: do
 ok(! -T $Perl,    '!-T')
 
 open($foo, "<",$statfile)
-SKIP: do
+:SKIP do
     try { -T $foo; }
     skip "-T/B on filehandle not implemented", 15 if $^EVAL_ERROR and $^EVAL_ERROR->{?description} =~ m/not implemented/
 
@@ -399,7 +399,7 @@ SKIP: do
 close($foo)
 
 
-SKIP: do
+:SKIP do
     skip "No null device to test with", 2 unless -e $Null
 
     ok(-T $Null,  'null device is -T')
@@ -432,7 +432,7 @@ is( "$^EVAL_ERROR", "", "lstat _ ok after lstat" )
 try { -l _ }
 is( "$^EVAL_ERROR", "", "-l _ ok after lstat" )
 
-SKIP: do
+:SKIP do
     skip "No lstat", 2 unless config_value('d_lstat')
 
     # bug id 20020124.004
@@ -477,7 +477,7 @@ do
     unlink $tmpfile
 
 
-SKIP: do
+:SKIP do
     skip "No dirfd()", 9 unless config_value('d_dirfd') || config_value('d_dir_dd_fd')
     ok(opendir(my $dir, "."), 'Can open "." dir') || diag "Can't open '.':  $^OS_ERROR"
     ok(stat($dir), "stat() on dirhandle works")
@@ -507,7 +507,7 @@ do
 
     #PVIO's hold dirhandle information, so let's test them too.
 
-    SKIP: do
+    :SKIP do
         skip "No dirfd()", 9 unless config_value('d_dirfd') || config_value('d_dir_dd_fd')
         ok(opendir(my $dir, "."), 'Can open "." dir') || diag "Can't open '.':  $^OS_ERROR"
         ok(stat($dir), "stat() on *DIR\{IO\} works")

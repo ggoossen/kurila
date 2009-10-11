@@ -205,7 +205,7 @@ is( $files->{?foobar}, '',    '          preserved old entries' )
 
 my %funky_files;
 # test including a filename with a space
-SKIP: do
+:SKIP do
     add_file( 'foo bar' => "space" )
         or skip "couldn't create spaced test file", 2
     local $ExtUtils::Manifest::MANIFEST = "albatross"
@@ -219,7 +219,7 @@ SKIP: do
     %funky_files{+'space'} = 'foo bar'
 
 # test including a filename with a space and a quote
-SKIP: do
+:SKIP do
     add_file( "foo\' baz\'quux" => "quote" )
         or skip "couldn't create quoted test file", 1
     local $ExtUtils::Manifest::MANIFEST = "albatross"
@@ -229,7 +229,7 @@ SKIP: do
     %funky_files{+'space_quote'} = "foo\' baz\'quux"
 
 # test including a filename with a space and a backslash
-SKIP: do
+:SKIP do
     add_file( 'foo bar\\baz' => "backslash" )
         or skip "couldn't create backslash test file", 1
     local $ExtUtils::Manifest::MANIFEST = "albatross"
@@ -239,7 +239,7 @@ SKIP: do
     %funky_files{+'space_backslash'} = "foo bar\\baz"
 
 # test including a filename with a space, quote, and a backslash
-SKIP: do
+:SKIP do
     add_file( "foo bar\\baz\'quux" => "backslash/quote" )
         or skip "couldn't create backslash/quote test file", 1
     local $ExtUtils::Manifest::MANIFEST = "albatross"
@@ -298,7 +298,7 @@ is_deeply( $files, \%expect, 'maniadd() vs MANIFEST without trailing newline')
 #add_file('MANIFEST'   => 'Makefile.PL');
 #maniadd(\%: foo => 'bar' );
 
-SKIP: do
+:SKIP do
     chmod( 0400, 'MANIFEST' )
     skip "Can't make MANIFEST read-only", 2 if -w 'MANIFEST'
 

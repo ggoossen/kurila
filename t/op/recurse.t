@@ -117,7 +117,7 @@ do
             stderr => 1,
             prog => q{our $d=0; our $e=1; sub c { ++$d; if ($d +> 66000) { $e=0 } else { c(); c() unless $d % 32768 } --$d } c(); exit $e});
     }
-    SKIP: do
+    :SKIP do
         skip("Out of memory -- increase your data/heap?", 2)
             if $r =~ m/Out of memory/i
         is($r, '', "64K deep recursion - no output expected")

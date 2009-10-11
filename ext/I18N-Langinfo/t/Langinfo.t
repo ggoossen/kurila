@@ -10,7 +10,7 @@ plan tests => 1 + 3 * nelems @constants
 use_ok('I18N::Langinfo', 'langinfo', < @constants)
 
 for my $constant ( @constants)
-    SKIP: do
+    :SKIP do
         my $string = try { langinfo(eval "$constant()") }
         is( $^EVAL_ERROR && $^EVAL_ERROR->message, '', "calling langinfo() with $constant" )
         skip "returned string was empty, skipping next two tests", 2 unless $string

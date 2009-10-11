@@ -22,7 +22,7 @@ like( $^EVAL_ERROR->{?description}, qr/^'?addition \(\+\)'? trapped by operation
 my $safe2 = Safe->new()
 $safe2->deny('add')
 
-TODO: do
+:TODO do
     todo_skip("segmentation fault", 1)
 
     open my $fh, ">", 'nasty.pl' or die "Can't write nasty.pl: $^OS_ERROR\n"

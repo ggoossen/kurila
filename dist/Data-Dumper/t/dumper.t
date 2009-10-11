@@ -53,7 +53,7 @@ sub TEST($string, ?$name)
 
 sub SKIP_TEST
     my $reason = shift
-    SKIP: do
+    :SKIP do
         skip $reason, 3
     
 

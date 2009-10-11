@@ -60,7 +60,7 @@ open $f, '<', 'File::Spec'->curdir and sysread $f, $_, 1
 my $err = $^OS_ERROR + 0
 close $f
 
-SKIP: do
+:SKIP do
     skip "you can read directories as plain files", 2 unless( $err )
 
     $^OS_ERROR=0

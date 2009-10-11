@@ -223,7 +223,7 @@ do
     # h and H can't do either, so act as sanity checks in blead
     foreach my $base (split '', 'hHsSiIlLqQjJfFdDpPnNvV')
         foreach my $mod ((@: '', '<', '>', '!', '<!', '>!', '!<', '!>'))
-            SKIP: do
+            :SKIP do
                 # Avoid void context warnings.
                 my $a = try {pack "$base$mod"}
                 skip "pack can't $base", 1 if $^EVAL_ERROR and $^EVAL_ERROR->{?description} =~ m/^Invalid type '\w'/
@@ -263,7 +263,7 @@ do
         
     
 
-    SKIP: do
+    :SKIP do
         skip $no_endianness, 2*3 + 2*8 if $no_endianness
         for my $mod (qw( ! < > ))
             dies_like(sub (@< @_) { $x = pack "a$mod", 42 },
@@ -282,7 +282,7 @@ do
         
     
 
-    SKIP: do
+    :SKIP do
         # Is this a stupid thing to do on VMS, VOS and other unusual platforms?
 
         skip("-- the IEEE infinity model is unavailable in this configuration.", 1)
@@ -310,7 +310,7 @@ do
                    qr/^Cannot compress integer/, "Cannot compress integer")
     
 
-    SKIP: do
+    :SKIP do
 
         skip("-- the full range of an IEEE double may not be available in this configuration.", 3)
             if ($^OS_NAME eq 'VMS') && !defined(config_value("useieee"))
@@ -343,14 +343,14 @@ info "test the 'p' template"
 
 # literals
 is(unpack("p",pack("p","foo")), "foo")
-SKIP: do
+:SKIP do
     skip $no_endianness, 2 if $no_endianness
     is(unpack("p<",pack("p<","foo")), "foo")
     is(unpack("p>",pack("p>","foo")), "foo")
 
 # scalars
 is(unpack("p",pack("p",239)), 239)
-SKIP: do
+:SKIP do
     skip $no_endianness, 2 if $no_endianness
     is(unpack("p<",pack("p<",239)), 239)
     is(unpack("p>",pack("p>",239)), 239)
@@ -373,7 +373,7 @@ do
 
 # undef should give null pointer
 like(pack("p", undef), qr/^\0+$/)
-SKIP: do
+:SKIP do
     skip $no_endianness, 2 if $no_endianness
     like(pack("p<", undef), qr/^\0+$/)
     like(pack("p>", undef), qr/^\0+$/)
@@ -397,7 +397,7 @@ while (my (@: ?$base, ?$expect) =(@:  splice @lengths, 0, 2))
     my @formats = @: $base
     $base =~ m/^[nv]/i or push @formats, "$base>", "$base<"
     for my $format ( @formats)
-        SKIP: do
+        :SKIP do
             skip $no_endianness, 1 if $no_endianness && $format =~ m/[<>]/
             skip $no_signedness, 1 if $no_signedness && $format =~ m/[nNvV]!/
             my $len = length(pack($format, 0))
@@ -421,7 +421,7 @@ foreach my $base ( @templates)
     my @tmpl = @: $base
     $base =~ m/^[cwnv]/i or push @tmpl, "$base>", "$base<"
     foreach my $t ( @tmpl)
-        SKIP: do
+        :SKIP do
             my @t = @:  try { unpack("$t*", pack("$t*", 12, 34)) } 
 
             skip "cannot pack '$t' on this perl", 4
@@ -538,7 +538,7 @@ sub numbers_with_total
     
     info "numbers test for $format"
     foreach ( @_)
-        SKIP: do
+        :SKIP do
             my $out = try {unpack($format, pack($format, $_))}
             skip "cannot pack '$format' on this perl", 2
                 if is_valid_error($^EVAL_ERROR)
@@ -558,7 +558,7 @@ sub numbers_with_total
     
 
     foreach ((@: '', 1, 2, 3, 15, 16, 17, 31, 32, 33, 53, 54, 63, 64, 65))
-        SKIP: do
+        :SKIP do
             my $sum = try {unpack "\%$_$format*", pack "$format*", < @_}
             skip "cannot pack '$format' on this perl", 3
                 if is_valid_error($^EVAL_ERROR)
@@ -569,7 +569,7 @@ sub numbers_with_total
             my $len = $_ # Copy, so that we can reassign ''
             $len = 16 unless length $len
 
-            SKIP: do
+            :SKIP do
                 skip "cannot test checksums over $skip_if_longer_than bits", 1
                     if $len +> $skip_if_longer_than
 
@@ -682,7 +682,7 @@ is(pack("v", 0xdead), "\x[adde]")
 is(pack("N", 0xdeadbeef), "\x[deadbeef]")
 is(pack("V", 0xdeadbeef), "\x[efbeadde]")
 
-SKIP: do
+:SKIP do
     skip $no_signedness, 4 if $no_signedness
     is(pack("n!", 0xdead), "\x[dead]")
     is(pack("v!", 0xdead), "\x[adde]")
@@ -696,7 +696,7 @@ sub byteorder
     my $format = shift
     info "byteorder test for $format"
     for my $value ( @_)
-        SKIP: do
+        :SKIP do
             my ($nat,$be,$le)
             try { (@: $nat, $be, $le) = map { pack $format.$_, $value }, (@:  '', '>', '<') }
             skip "cannot pack '$format' on this perl", 5
@@ -707,7 +707,7 @@ sub byteorder
                 info "[$value][$nat][$be][$le][$^EVAL_ERROR]"
             
 
-            SKIP: do
+            :SKIP do
                 skip "cannot compare native byteorder with big-/little-endian", 1
                     if $ByteOrder eq 'unknown'
 
@@ -748,12 +748,12 @@ byteorder('D', -(2**34), -1, 0, 1, 2**34)
 
 info "test negative numbers"
 
-SKIP: do
+:SKIP do
     skip "platform is not using two's complement for negative integers", 120
         unless $IsTwosComplement
 
     for my $format (qw(s i l j s! i! l! q))
-        SKIP: do
+        :SKIP do
             my ($nat,$be,$le)
             try { (@: $nat,$be,$le) = map { pack $format.$_, -1 }, (@:  '', '>', '<') }
             skip "cannot pack '$format' on this perl", 15
@@ -790,7 +790,7 @@ SKIP: do
                 my (@: $nat,$be,$le) = try { map { pack $format.$_, @val[$i] }, (@:  '', '>', '<') }
                 is($^EVAL_ERROR, '')
 
-                SKIP: do
+                :SKIP do
                     skip "cannot compare native byteorder with big-/little-endian", 1
                         if $ByteOrder eq 'unknown'
 
@@ -899,7 +899,7 @@ EOP
 
 
 
-SKIP: do
+:SKIP do
     use utf8 # for sprintf.
     is("1.20.300.4000", sprintf "\%vd", pack("U*",1,20,300,4000))
     is("1.20.300.4000", sprintf "\%vd", pack("  U*",1,20,300,4000))
@@ -926,7 +926,7 @@ do
     is("$(join ' ', @: unpack('U*', pack('U*', 100, 200)))", "100 200")
 
 
-SKIP: do
+:SKIP do
     use utf8
     # does pack U0C create Unicode?
     is("$(join ' ', @: pack('U0C*', 100, 195, 136))", "\x{64}"."\x{c8}")
@@ -1048,7 +1048,7 @@ do
     is(scalar unpack("w/a*", "\x[02]abc"), "ab")
 
 
-SKIP: do
+:SKIP do
     info "group modifiers"
 
     skip $no_endianness, 3 * 2 + 3 * 2 + 1 if $no_endianness
@@ -1105,7 +1105,7 @@ do
         for my $t ((@: $tbe, $tle))
             my $c = compress_template($t)
             info "'$t' -> '$c'"
-            SKIP: do
+            :SKIP do
                 my $p1 = try { pack $t, < @d }
                 skip "cannot pack '$t' on this perl", 5 if is_valid_error($^EVAL_ERROR)
                 my $p2 = try { pack $c, < @d }
@@ -1278,7 +1278,7 @@ do # syntax checks (W.Laun)
     try { my @a = (@:  unpack( "C/", "\3" ) ); }
     like( $^EVAL_ERROR->{?description}, qr{Code missing after '/'} )
 
-    SKIP: do
+    :SKIP do
         skip $no_endianness, 6 if $no_endianness
 
         # modifier warnings
@@ -1344,7 +1344,7 @@ do  # Repeat count [SUBEXPR]
                 $c = $1 if $groupend =~ m/(\d+)/
                 my @list2 = @list1 x $c 
 
-                SKIP: do
+                :SKIP do
                     my $junk1 = "$groupbegin $type$count $groupend"
                     info "junk1=$junk1"
                     my $p = try { pack $junk1, < @list2 }
@@ -1422,7 +1422,7 @@ is(length(pack("F", 0)), config_value("nvsize"))
 numbers ('j', -2147483648, -1, 0, 1, 2147483647)
 numbers ('J', 0, 1, 2147483647, 2147483648, 4294967295)
 numbers ('F', -(2**34), -1, 0, 1, 2**34)
-SKIP: do
+:SKIP do
     my $t = try { unpack("D*", pack("D", 12.34)) }
 
     skip "Long doubles not in use", 166 if $^EVAL_ERROR->{?description} =~ m/Invalid type/
@@ -1436,7 +1436,7 @@ SKIP: do
 my %cant_checksum = %+: map { %: $_=> 1 }, qw(A Z u w) 
 # not a b B h H
 foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w))
-    SKIP: do
+    :SKIP do
         my $packed = try {pack "$($template)4", 1, 4, 9, 16}
         if ($^EVAL_ERROR)
             die unless $^EVAL_ERROR->{?description} =~ m/Invalid type '$template'/
@@ -1583,7 +1583,7 @@ do
 
     for my $string ((@: $down, $up))
         for my $format (sort {lc($a) cmp lc($b) || $a cmp $b }, keys %expect)
-            SKIP: do
+            :SKIP do
                 my $expect = %expect{?$format}
                 # unpack upgraded and downgraded string
                 my @result = @:  try { unpack("$format C0 W", $string) } 
@@ -1618,7 +1618,7 @@ do
              \(@: 'U', 0x300), \(@: 'a3', "abc"), \(@: 'a0', '')
              \(@: 'A3', "abc"), \(@: 'Z3', "ghi")
         )
-        SKIP: do
+        :SKIP do
             my (@: $format, $val) =  $_->@
             no utf8;
             my $down = try { pack($format, $val) }

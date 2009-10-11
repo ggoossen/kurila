@@ -35,7 +35,7 @@ open my $new_fh, '>>', \$new_out or die
 $Test->output($new_fh)
 $Test->todo_output($new_fh)
 
-SKIP: do
+:SKIP do
     $Test->skip( 'just testing skip' )
 
 push @Expected_Details, \%:  'ok'      => 1
@@ -45,7 +45,7 @@ push @Expected_Details, \%:  'ok'      => 1
                              reason    => 'just testing skip'
     
 
-TODO: do
+:TODO do
     local $TODO = 'i need a todo'
     $Test->ok( 0, 'a test to todo!' )
 

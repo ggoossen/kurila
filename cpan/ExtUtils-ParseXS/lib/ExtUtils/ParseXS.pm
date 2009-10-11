@@ -279,7 +279,7 @@ EOM
         if $WantLineNumbers
 
     my $line
-    firstmodule:
+    :firstmodule
         while ($line = ~< $FH)
         $_ = $line
         if (m/^=/)
@@ -335,7 +335,7 @@ EOF
     $lastline    = $line
     $lastline_no = iohandle::input_line_number($FH)
 
-    PARAGRAPH:
+    :PARAGRAPH
         while (fetch_para())
         process_para(< %args)
     

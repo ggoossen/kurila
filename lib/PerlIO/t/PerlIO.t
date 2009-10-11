@@ -95,7 +95,7 @@ do
     is( scalar ~< $x, "ok\n",    '       readline' )
     ok( tell($x) +>= 3,          '       tell' )
 
-    TODO: do
+    :TODO do
         local $TODO = "broken"
 
         # test in-memory open over STDOUT

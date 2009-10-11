@@ -19,7 +19,7 @@ ok(defined $r, 'qr// detected')
 ok(('foo' =~ m/$r/), 'qr// good match')
 ok(('bar' !~ m/$r/), 'qr// bad match')
 
-SKIP: do
+:SKIP do
     my $obj = bless qr/foo/, 'Wibble'
     my $re = $Test->maybe_regex($obj)
     ok( defined $re, "blessed regex detected" )

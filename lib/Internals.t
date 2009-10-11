@@ -87,7 +87,7 @@ try { @foo[2] = 86; }
 like($^EVAL_ERROR->message, $ro_err, q/Can't modify read-only array element/)
 try { undef(@foo[2]); }
 like($^EVAL_ERROR->message, $ro_err, q/Can't undef read-only array element/)
-TODO: do
+:TODO do
     local $TODO = 'Due to restricted hashes implementation'
     try { delete(@foo[2]); }
     like($^EVAL_ERROR && $^EVAL_ERROR->message, $ro_err, q/Can't delete read-only array element/)

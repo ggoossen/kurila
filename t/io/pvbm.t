@@ -36,7 +36,7 @@ do
     ok (!try { chmod 0600, $pvbm }, 'chmod(PVBM) fails');
     ok (!try { chmod 0600, \$pvbm }, 'chmod(PVBM ref) fails');
 
-    SKIP: do
+    :SKIP do
         skip('chown() not implemented on Win32', 2) if $^OS_NAME eq 'MSWin32';
         ok (!try { chown 0, 0, $pvbm }, 'chown(PVBM) fails');
         ok (!try { chown 0, 0, \$pvbm }, 'chown(PVBM ref) fails');

@@ -47,7 +47,7 @@ test_test("testing failing on the same line with the same name")
 
 test_out("not ok 1 - name # TODO Something")
 test_err("#     Failed (TODO) test ($^PROGRAM_NAME at line 52)")
-TODO: do
+:TODO do
     local $TODO = "Something"
     fail("name")
 

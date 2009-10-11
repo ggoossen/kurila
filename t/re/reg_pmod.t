@@ -34,7 +34,7 @@ foreach my $test ( @tests)
                 !! $p eq '(?p)' ?? m/(?p)$pat/
                 !!                m/$pat/
                 => $test_name
-    SKIP: do
+    :SKIP do
         skip "/$pat/$p failed to match", 3
             unless $ok
         is($^PREMATCH,  $l, _u "$test_name: ^PREMATCH",$l)

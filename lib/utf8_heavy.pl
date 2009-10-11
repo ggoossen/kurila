@@ -61,7 +61,7 @@ sub SWASHNEW_real
 
         print $^STDERR, "type = $type\n" if DEBUG
 
-        GETFILE:
+        :GETFILE
             do
             ##
             ## It could be a user-defined property.

@@ -1003,7 +1003,7 @@ sub cmpthese
     my $total = (nelems @col_widths) - 1 
     for (  @col_widths ) { $total += $_ }
 
-    STRETCHER:
+    :STRETCHER
         while ( $total +< 80 )
         my $min_width = @sorted_width_refs[0]->$
         last

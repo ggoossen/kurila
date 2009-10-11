@@ -103,7 +103,7 @@ while (@pats)
                 $description .= "\n"
             $description .= "\n"
     
-TODO: do
+:TODO do
     is( $description, "", "POSIX and perl charclasses should not depend on string type")
 
 __DATA__

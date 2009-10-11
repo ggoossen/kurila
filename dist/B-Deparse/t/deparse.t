@@ -50,7 +50,7 @@ while ( ~< $^DATA)
 
 
 use constant 'c', 'stuff'
-TODO: do
+:TODO do
     todo_skip("fix deparse", 4)
     my $deparsed_txt = "sub ".$deparse->coderef2text(\&c)
     my $deparsed_sub = eval $deparsed_txt; die if $^EVAL_ERROR

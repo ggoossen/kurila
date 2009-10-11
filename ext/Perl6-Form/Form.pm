@@ -721,7 +721,7 @@ sub segment($format, $args, $opts, $fldcnt, $argcache)
 sub layout_groups
     my @groups
     my $i = 0
-    FORMATTER: for my $f ( @_)
+    :FORMATTER for my $f ( @_)
         $f->{+index} = $i++
         for my $group ( @groups)
             if ($f->{?src} == $group->[0]{?src})
@@ -835,7 +835,7 @@ sub delineate_overflows
 
 
 sub resolve_overflows($formatters,$prevformatters)
-    FORMATTER: for my $fld ( $formatters->@)
+    :FORMATTER for my $fld ( $formatters->@)
         next unless $fld->{?overflow}
         my $left  = $fld->{?pos}
         my $right = $left + $fld->{?width} - 1

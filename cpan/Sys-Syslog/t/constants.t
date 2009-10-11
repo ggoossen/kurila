@@ -23,7 +23,7 @@ like( $^EVAL_ERROR->{?description}, "/^Undefined subroutine/", "trying a non-exi
 # Testing all macros
 if((nelems @names))
     for my $name ( @names)
-        SKIP: do
+        :SKIP do
             $name =~ m/^(\w+)$/ or skip "invalid name '$name'", 2
             $name = $1
             my $v = eval "$($callpack)::$name()"

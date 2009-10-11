@@ -58,7 +58,7 @@ is(scalar(nelems @created), 0, "Can't create a directory named ''")
 my $dir
 my $dir2
 
-SKIP: do
+:SKIP do
     $dir = catdir($tmp_base, 'B')
     $dir2 = catdir($dir, updir())
     # IOW: File::Spec->catdir( qw(foo bar), File::Spec->updir ) eq 'foo'
@@ -191,7 +191,7 @@ else
 
 
 # see what happens if a file exists where we want a directory
-SKIP: do
+:SKIP do
     my $entry = catdir($tmp_base, "file")
     skip "Cannot create $entry", 4 unless open my $out, ">", " $entry"
     print $out, "test file, safe to delete\n", scalar(localtime), "\n"
@@ -212,7 +212,7 @@ SKIP: do
 
 my $extra =  catdir(curdir(), < qw(EXTRA 1 a))
 
-SKIP: do
+:SKIP do
     skip "extra scenarios not set up, see eg/setup-extra-tests", 14
         unless -e $extra
 
@@ -256,11 +256,11 @@ SKIP: do
     is( $file, $dir, 'first dir reported in error' )
 
 
-SKIP: do
+:SKIP do
     skip 'Test::Output not available', 14
         unless $has_Test_Output
 
-    SKIP: do
+    :SKIP do
         $dir = catdir('EXTRA', '3')
         skip "extra scenarios not set up, see eg/setup-extra-tests", 3
             unless -e $dir
@@ -348,7 +348,7 @@ cannot restore permissions to \d+ for [^:]+: .* at \1 line \2},
         'mkpath verbose (new style 2)'
         )
 
-    SKIP: do
+    :SKIP do
         $file = catdir($dir2, "file")
         skip "Cannot create $file", 2 unless open my $out, ">", " $file"
         print $out, "test file, safe to delete\n", scalar(localtime), "\n"
@@ -364,7 +364,7 @@ cannot restore permissions to \d+ for [^:]+: .* at \1 line \2},
     
 
 
-SKIP: do
+:SKIP do
     skip "extra scenarios not set up, see eg/setup-extra-tests", 11
         unless -d catdir( <qw(EXTRA 1))
 

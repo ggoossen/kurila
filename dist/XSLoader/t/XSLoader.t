@@ -45,7 +45,7 @@ my $extensions = config_value('extensions')
 $extensions =~ s|/|::|g
 
 for my $module (sort keys %modules)
-    SKIP: do
+    :SKIP do
         skip "$module not available", 3 if $extensions !~ m/\b$module\b/
 
         eval qq{ package $module; XSLoader::load('$module', "qunckkk"); }

@@ -35,7 +35,7 @@ plan( tests => 33 )
 
 my $ok
 
-TEST1: do
+:TEST1 do
 
     $ok = 0
 
@@ -58,7 +58,7 @@ TEST1: do
 
 cmp_ok($ok,'==',1,'no label on while()')
 
-TEST2: do
+:TEST2 do
 
     $ok = 0
 
@@ -81,7 +81,7 @@ TEST2: do
 
 cmp_ok($ok,'==',1,'no label on while() successful next')
 
-TEST3: do
+:TEST3 do
 
     $ok = 0
 
@@ -106,7 +106,7 @@ TEST3: do
 
 cmp_ok($ok,'==',1,'no label on while() unsuccessful next')
 
-TEST4: do
+:TEST4 do
 
     $ok = 0
 
@@ -129,7 +129,7 @@ TEST4: do
 
 cmp_ok($ok,'==',1,'no label on while() last')
 
-TEST5: do
+:TEST5 do
 
     $ok = 0
 
@@ -152,7 +152,7 @@ TEST5: do
 
 cmp_ok($ok,'==',1,'no label on until()')
 
-TEST6: do
+:TEST6 do
 
     $ok = 0
 
@@ -175,7 +175,7 @@ TEST6: do
 
 cmp_ok($ok,'==',1,'no label on until() successful next')
 
-TEST7: do
+:TEST7 do
 
     $ok = 0
 
@@ -200,7 +200,7 @@ TEST7: do
 
 cmp_ok($ok,'==',1,'no label on until() unsuccessful next')
 
-TEST8: do
+:TEST8 do
 
     $ok = 0
 
@@ -223,7 +223,7 @@ TEST8: do
 
 cmp_ok($ok,'==',1,'no label on until() last')
 
-TEST9: do
+:TEST9 do
 
     $ok = 0
 
@@ -245,7 +245,7 @@ TEST9: do
 
 cmp_ok($ok,'==',1,'no label on for(@array)')
 
-TEST10: do
+:TEST10 do
 
     $ok = 0
 
@@ -267,7 +267,7 @@ TEST10: do
 
 cmp_ok($ok,'==',1,'no label on for(@array) successful next')
 
-TEST11: do
+:TEST11 do
 
     $ok = 0
 
@@ -291,7 +291,7 @@ TEST11: do
 
 cmp_ok($ok,'==',1,'no label on for(@array) unsuccessful next')
 
-TEST12: do
+:TEST12 do
 
     $ok = 0
 
@@ -315,13 +315,13 @@ cmp_ok($ok,'==',1,'no label on for(@array) last')
 
 ### Now do it all again with labels
 
-TEST20: do
+:TEST20 do
 
     $ok = 0
 
     my $x = 1
     my $first_time = 1
-    LABEL20: while($x--)
+    :LABEL20 while($x--)
         if (!$first_time)
             $ok = 1
             last TEST20
@@ -338,14 +338,14 @@ TEST20: do
 
 cmp_ok($ok,'==',1,'label on while()')
 
-TEST21: do
+:TEST21 do
 
     $ok = 0
 
     my $x = 2
     my $first_time = 1
     my $been_in_continue = 0
-    LABEL21: while($x--)
+    :LABEL21 while($x--)
         if (!$first_time)
             $ok = $been_in_continue
             last TEST21
@@ -361,7 +361,7 @@ TEST21: do
 
 cmp_ok($ok,'==',1,'label on while() successful next')
 
-TEST22: do
+:TEST22 do
 
     $ok = 0
 
@@ -369,7 +369,7 @@ TEST22: do
     my $first_time = 1
     my $been_in_loop = 0
     my $been_in_continue = 0
-    LABEL22: while($x--)
+    :LABEL22 while($x--)
         $been_in_loop = 1
         if (!$first_time)
             $ok = 0
@@ -386,13 +386,13 @@ TEST22: do
 
 cmp_ok($ok,'==',1,'label on while() unsuccessful next')
 
-TEST23: do
+:TEST23 do
 
     $ok = 0
 
     my $x = 1
     my $first_time = 1
-    LABEL23: while($x++)
+    :LABEL23 while($x++)
         if (!$first_time)
             $ok = 0
             last TEST23
@@ -409,13 +409,13 @@ TEST23: do
 
 cmp_ok($ok,'==',1,'label on while() last')
 
-TEST24: do
+:TEST24 do
 
     $ok = 0
 
     my $x = 0
     my $first_time = 1
-    LABEL24: until($x++)
+    :LABEL24 until($x++)
         if (!$first_time)
             $ok = 1
             last TEST24
@@ -432,14 +432,14 @@ TEST24: do
 
 cmp_ok($ok,'==',1,'label on until()')
 
-TEST25: do
+:TEST25 do
 
     $ok = 0
 
     my $x = 0
     my $first_time = 1
     my $been_in_continue = 0
-    LABEL25: until($x++ +>= 2)
+    :LABEL25 until($x++ +>= 2)
         if (!$first_time)
             $ok = $been_in_continue
             last TEST25
@@ -455,7 +455,7 @@ TEST25: do
 
 cmp_ok($ok,'==',1,'label on until() successful next')
 
-TEST26: do
+:TEST26 do
 
     $ok = 0
 
@@ -463,7 +463,7 @@ TEST26: do
     my $first_time = 1
     my $been_in_loop = 0
     my $been_in_continue = 0
-    LABEL26: until($x++)
+    :LABEL26 until($x++)
         $been_in_loop = 1
         if (!$first_time)
             $ok = 0
@@ -480,13 +480,13 @@ TEST26: do
 
 cmp_ok($ok,'==',1,'label on until() unsuccessful next')
 
-TEST27: do
+:TEST27 do
 
     $ok = 0
 
     my $x = 0
     my $first_time = 1
-    LABEL27: until($x++ == 10)
+    :LABEL27 until($x++ == 10)
         if (!$first_time)
             $ok = 0
             last TEST27
@@ -503,12 +503,12 @@ TEST27: do
 
 cmp_ok($ok,'==',1,'label on until() last')
 
-TEST28: do
+:TEST28 do
 
     $ok = 0
 
     my $first_time = 1
-    LABEL28: for((@: 1))
+    :LABEL28 for((@: 1))
         if (!$first_time)
             $ok = 1
             last TEST28
@@ -525,13 +525,13 @@ TEST28: do
 
 cmp_ok($ok,'==',1,'label on for(@array)')
 
-TEST29: do
+:TEST29 do
 
     $ok = 0
 
     my $first_time = 1
     my $been_in_continue = 0
-    LABEL29: for((@: 1,2))
+    :LABEL29 for((@: 1,2))
         if (!$first_time)
             $ok = $been_in_continue
             last TEST29
@@ -547,14 +547,14 @@ TEST29: do
 
 cmp_ok($ok,'==',1,'label on for(@array) successful next')
 
-TEST30: do
+:TEST30 do
 
     $ok = 0
 
     my $first_time = 1
     my $been_in_loop = 0
     my $been_in_continue = 0
-    LABEL30: for((@: 1))
+    :LABEL30 for((@: 1))
         $been_in_loop = 1
         if (!$first_time)
             $ok = 0
@@ -571,12 +571,12 @@ TEST30: do
 
 cmp_ok($ok,'==',1,'label on for(@array) unsuccessful next')
 
-TEST31: do
+:TEST31 do
 
     $ok = 0
 
     my $first_time = 1
-    LABEL31: for(1..10)
+    :LABEL31 for(1..10)
         if (!$first_time)
             $ok = 0
             last TEST31
@@ -593,12 +593,12 @@ TEST31: do
 
 cmp_ok($ok,'==',1,'label on for(@array) last')
 
-TEST36: do
+:TEST36 do
 
     $ok = 0
     my $first_time = 1
 
-    LABEL36: do
+    :LABEL36 do
         if (!$first_time)
             $ok = 1
             last TEST36
@@ -613,10 +613,10 @@ TEST36: do
 
 cmp_ok($ok,'==',1,'label on bare block')
 
-TEST38: do
+:TEST38 do
 
     $ok = 0
-    LABEL38: do
+    :LABEL38 do
         last LABEL38
         last TEST38
     
@@ -624,14 +624,14 @@ TEST38: do
 
 cmp_ok($ok,'==',1,'label on bare block last')
 
-TEST39: do
+:TEST39 do
     $ok = 0
     my (@: $x, $y, $z) = @: 1,1,1
-    one39: while ($x--)
+    :one39 while ($x--)
         $ok = 0
-        two39: while ($y--)
+        :two39 while ($y--)
             $ok = 0
-            three39: while ($z--)
+            :three39 while ($z--)
                 next two39
             continue
                 $ok = 0
@@ -648,7 +648,7 @@ cmp_ok($ok,'==',1,'nested constructs')
 
 sub test_last_label { last TEST40 }
 
-TEST40: do
+:TEST40 do
     $ok = 1
     test_last_label()
     $ok = 0
@@ -657,7 +657,7 @@ cmp_ok($ok,'==',1,'dynamically scoped label')
 
 sub test_last { last }
 
-TEST41: do
+:TEST41 do
     $ok = 1
     test_last()
     $ok = 0
@@ -672,7 +672,7 @@ cmp_ok($ok,'==',1,'dynamically scoped')
 do
     my $n=10; my $late_free = 0
     sub X::DESTROY { $late_free++ if $n +< 0 };
-    LOOP:
+    :LOOP
         do
         ($n-- && bless \$%, 'X') && redo
     
@@ -697,7 +697,7 @@ do
         last
 
 
-TODO: do
+:TODO do
     todo_skip("modification of readonly value", 1)
     our @a37725
     @a37725[3] = 1 # use package var

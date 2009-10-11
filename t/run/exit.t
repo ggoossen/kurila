@@ -38,7 +38,7 @@ if ($^OS_NAME ne 'MacOS')
         is( $exit >> 8, 42,             'Non-zero exit' )
         is( $exit, $^CHILD_ERROR,                  'Non-zero exit $?' )
         isnt( !$^CHILD_ERROR_NATIVE, 0, 'Non-zero exit $^CHILD_ERROR_NATIVE' )
-        SKIP: do
+        :SKIP do
             skip("No POSIX", 3) unless $posix_ok
             skip("No POSIX wait macros", 3) unless $wait_macros_ok
             ok(POSIX::WIFEXITED($^CHILD_ERROR_NATIVE), "WIFEXITED")
@@ -46,7 +46,7 @@ if ($^OS_NAME ne 'MacOS')
             is(POSIX::WEXITSTATUS($^CHILD_ERROR_NATIVE), 42, "WEXITSTATUS")
         
 
-        SKIP: do
+        :SKIP do
             skip("Skip signals and core dump tests on Win32", 7) if $^OS_NAME eq 'MSWin32'
 
             $exit = run('kill 15, $^PID; sleep(1);')
@@ -55,7 +55,7 @@ if ($^OS_NAME ne 'MacOS')
             ok( !($exit ^&^ 128),             'No core dump' )
             is( $^CHILD_ERROR ^&^ 127, 15,               'Term by signal $?' )
             isnt( $^CHILD_ERROR_NATIVE,  0, 'Term by signal $^CHILD_ERROR_NATIVE' )
-            SKIP: do
+            :SKIP do
                 skip("No POSIX", 3) unless $posix_ok
                 skip("No POSIX wait macros", 3) unless $wait_macros_ok
                 ok(!POSIX::WIFEXITED($^CHILD_ERROR_NATIVE), "WIFEXITED")

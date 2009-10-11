@@ -53,7 +53,7 @@ my $TTY = "/dev/tty"
 sub _check_and_report($eval_status, $return_val, $description)
     my $success = defined($return_val) || $^OS_ERROR == 0
     is( $eval_status, '', $description )
-    SKIP: do
+    :SKIP do
         skip "terminal constants set errno on QNX", 1
             if $^OS_NAME eq 'nto' and $description =~ $TTY
         ok( $success, "\tchecking that the returned value is defined ("
@@ -62,7 +62,7 @@ sub _check_and_report($eval_status, $return_val, $description)
                . (!($^OS_ERROR+0) ?? "it is)" !! "it isn't, it's $^OS_ERROR)"))
             )
     
-    SKIP: do
+    :SKIP do
         skip "constant not implemented on $^OS_NAME or no limit in effect", 1
             if !defined($return_val)
         ok( looks_like_number($return_val), "\tchecking that the returned value looks like a number" )
@@ -70,7 +70,7 @@ sub _check_and_report($eval_status, $return_val, $description)
 
 
 # testing fpathconf() on a non-terminal file
-SKIP: do
+:SKIP do
     my $fd = POSIX::open($testdir, O_RDONLY)
         or skip "could not open test directory '$testdir' ($^OS_ERROR)",
                 3 * nelems @path_consts
@@ -91,7 +91,7 @@ for my $constant ( @path_consts)
     _check_and_report( $^EVAL_ERROR, $r, qq[calling pathconf("$testdir", $constant)] )
 
 
-SKIP: do
+:SKIP do
     my $n = 2 * 3 * nelems @path_consts_terminal
 
     -c $TTY
@@ -121,11 +121,11 @@ SKIP: do
 
 my $fifo = "fifo$^PID"
 
-SKIP: do
+:SKIP do
     try { mkfifo($fifo, 0666) }
         or skip("could not create fifo $fifo ($^OS_ERROR)", 2 * 3 * nelems @path_consts_fifo)
 
-    SKIP: do
+    :SKIP do
         my $fd = POSIX::open($fifo, O_RDWR)
             or skip("could not open $fifo ($^OS_ERROR)", 3 * nelems @path_consts_fifo)
 
@@ -150,7 +150,7 @@ END
     1 while unlink($fifo)
 
 
-SKIP: do
+:SKIP do
     if($^OS_NAME eq 'cygwin')
         pop @sys_consts
         skip("No _SC_TZNAME_MAX on Cygwin", 3)

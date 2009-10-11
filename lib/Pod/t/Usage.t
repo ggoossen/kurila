@@ -25,7 +25,7 @@ pod2usage(\(%:  verbose => 0, exit => 'noexit', output => $fake_out_fh
                 message => $msg ))
 is( $fake_out->$, "$msg\n$vbl_0", 'message parameter' )
 
-SKIP: do
+:SKIP do
     my (@:  $file, $path, _ ) =  fileparse( $^PROGRAM_NAME )
     skip( 'File in current directory', 2 ) if -e $file
     $fake_out->$ = ''
@@ -44,7 +44,7 @@ SKIP: do
     is( $fake_out->$, $vbl_0, '-pathlist parameter' )
 
 
-SKIP: do # Test exit status from pod2usage()
+:SKIP do # Test exit status from pod2usage()
     skip "Exit status broken on Mac OS", 1 if $^OS_NAME eq 'MacOS'
     my $exit = ($^OS_NAME eq 'VMS' ?? 2 !! 42)
     my $dev_null = File::Spec->devnull
