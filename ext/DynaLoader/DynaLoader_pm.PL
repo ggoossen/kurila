@@ -409,7 +409,7 @@ sub dl_findfile
     print $^STDERR, "dl_findfile(@args)\n" if $dl_debug
 
     # accumulate directories but process files as they appear
-    arg: foreach(@args)
+    :arg foreach(@args)
         #  Special fast case: full filepath requires no search
         <<$^O-eq-VMS>>
         if (m%[:>/\]]% && -f $_)
