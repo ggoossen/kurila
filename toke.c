@@ -220,10 +220,10 @@ static const char* const lex_state_names[] = {
 	PL_bufptr = s; \
 	PL_last_uni = PL_oldbufptr; \
 	PL_last_lop_op = f; \
-	if (*s == '(' && ! PL_parser->do_start_newline )	\
+	if (*s == ':' && ! PL_parser->do_start_newline )	\
 	    return REPORT( (int)FUNC1 ); \
 	s = PEEKSPACE(s); \
-	return REPORT( (*s=='(' && ! PL_parser->do_start_newline) ? (int)FUNC1 : (int)UNIOP ); \
+	return REPORT( (*s==':' && ! PL_parser->do_start_newline) ? (int)FUNC1 : (int)UNIOP ); \
 	}
 #define UNI(f)    UNI2(f,XTERM)
 #define UNIDOR(f) UNI2(f,XTERMORDORDOR)
@@ -233,10 +233,10 @@ static const char* const lex_state_names[] = {
 	pl_yylval.i_tkval.location = curlocation(PL_bufptr);	\
 	PL_bufptr = s; \
 	PL_last_uni = PL_oldbufptr; \
-	if (*s == '(' && ! PL_parser->do_start_newline )	\
+	if (*s == ':' && ! PL_parser->do_start_newline )	\
 	    return REPORT( (int)FUNC1 ); \
 	s = PEEKSPACE(s); \
-	return REPORT( (*s == '(' && ! PL_parser->do_start_newline) ? (int)FUNC1 : (int)UNIOP ); \
+	return REPORT( (*s == ':' && ! PL_parser->do_start_newline) ? (int)FUNC1 : (int)UNIOP ); \
 	}
 
 /* grandfather return to old style */
@@ -3716,7 +3716,7 @@ Perl_yylex(pTHX)
 	}
 	if (s[1] == '+' && s[2] == ':') {
 	    /* hashjoin '%+:' */
-	    s += 3;
+	    s += 2;
 	    LOP(OP_HASHJOIN, XTERM);
 	}
 	if (s[1] == '<') {
@@ -3798,6 +3798,8 @@ Perl_yylex(pTHX)
 	    pl_yylval.pval = CopLABEL_alloc(PL_tokenbuf);
 	    TOKEN(LABEL);
 	}
+	s = skipspace(s, NULL);
+	start_list_indent(s);
 	OPERATOR(':');
     case '(':
 	s++;
@@ -4196,7 +4198,7 @@ Perl_yylex(pTHX)
 
 	if (s[1] == '+' && s[2] == ':') {
 	    /* arrayjoin '@+:' */
-	    s += 3;
+	    s += 2;
 	    LOP(OP_ARRAYJOIN, XTERM);
 	}
 	if (s[1] == '(' && s[2] == ':') {
@@ -4683,7 +4685,11 @@ Perl_yylex(pTHX)
 		}
 
 		/* If followed by a paren, it's certainly a subroutine. */
-		if (*s == '(') {
+		if (*s == ':') {
+		    s++;
+		    s = skipspace(s, NULL);
+		    start_list_indent(s);
+
 #ifdef PERL_MAD
 		    if (PL_madskills) {
 			PL_nextwhite = PL_thiswhite;
@@ -4691,6 +4697,7 @@ Perl_yylex(pTHX)
 		    }
 		    start_force(PL_curforce);
 #endif
+
 		    if (cv) {
 			op_free(pl_yylval.opval);
 			NEXTVAL_NEXTTOKE.opval = (OP*)newSVOP(OP_VAR, 0, SvREFCNT_inc_NN(cvTsv(cv)), curlocation(PL_bufptr));
@@ -4706,7 +4713,7 @@ Perl_yylex(pTHX)
 			pl_yylval.i_tkval.ival = OPf_ENTERSUB_EARLY_CV;
 		    }
 
-		    PL_expect = XOPERATOR;
+		    PL_expect = XTERM;
 #ifdef PERL_MAD
 		    if (PL_madskills) {
 			PL_nextwhite = nextPL_nextwhite;
@@ -4727,7 +4734,6 @@ Perl_yylex(pTHX)
 				PL_tokenbuf, PL_tokenbuf);
 		    /* Check for a constant sub */
 		    if ((sv = cv_const_sv(cv))) {
-		  its_constant:
 			SvREFCNT_dec(((SVOP*)pl_yylval.opval)->op_sv);
 			((SVOP*)pl_yylval.opval)->op_sv = SvREFCNT_inc(sv);
 			pl_yylval.opval->op_private = 0;

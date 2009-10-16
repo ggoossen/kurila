@@ -148,7 +148,7 @@
 %nonassoc <i_tkval> PREINC PREDEC POSTINC POSTDEC
 %left <i_tkval> ARROW DEREFSCL DEREFARY DEREFHSH DEREFSTAR DEREFAMP HSLICE ASLICE
 %nonassoc <i_tkval> ')'
-%left <i_tkval> '('
+%left <i_tkval> '(' ':'
 %left '[' '{' ANONSCALAR
 
 %token <i_tkval> PEG
@@ -780,9 +780,9 @@ listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
 			  TOKEN_GETMAD($2,$$,'A');
                           APPEND_MADPROPS_PV("method", $$, '>');
 			}
-	|	LSTOP listexpr                       /* print @args */
+	|	LSTOP ':' layoutlistexpr                       /* print @args */
                         {
-                            $$ = convert(IVAL($1), 0, $2, LOCATION($1));
+                            $$ = convert(IVAL($1), 0, $3, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'o');
                             APPEND_MADPROPS_PV("listop", $$, '>');
 			}
@@ -1166,24 +1166,24 @@ term	:	'?' term
                             TOKEN_GETMAD($1,$$,'&');
                             $$->op_flags |= OPf_SPECIAL;
                         }
-	|	NOAMPCALL indirob '(' ')'                        /* &foo() */
+	|	NOAMPCALL WORD ',' LAYOUTLISTEND                        /* &foo() */
 			{
-                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED | IVAL($1), $2, $2->op_location);
-                            TOKEN_GETMAD($3,$$,'(');
+                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED | IVAL($1), scalar($2), $2->op_location);
+                            TOKEN_GETMAD($1,$$,'(');
                             TOKEN_GETMAD($4,$$,')');
                             APPEND_MADPROPS_PV("amper", $$, '>');
 			}
-	|	NOAMPCALL indirob '(' expr ')'                   /* &foo(@args) */
+	|	NOAMPCALL WORD listexpr LAYOUTLISTEND                   /* &foo(@args) */
 			{
                             $$ = newUNOP(OP_ENTERSUB, OPf_STACKED | IVAL($1),
-				append_elem(OP_LIST, $4, $2), $2->op_location);
+				append_elem(OP_LIST, $3, scalar($2)), $2->op_location);
 			  DO_MAD({
 			      OP* op = $$;
 			      if (op->op_type == OP_CONST) { /* defeat const fold */
 				op = (OP*)op->op_madprop->mad_val;
 			      }
-			      TOKEN_GETMAD($3,op,'(');
-			      TOKEN_GETMAD($5,op,')');
+			      TOKEN_GETMAD($1,op,'(');
+			      TOKEN_GETMAD($4,op,')');
                               APPEND_MADPROPS_PV("amper", $$, '>');
 			  })
 			}
@@ -1261,7 +1261,7 @@ term	:	'?' term
                             $$ = newOP(IVAL($1), 0, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'o');
 			}
-	|	FUNC0 '(' ')'
+	|	FUNC0 ':' LAYOUTLISTEND
 			{
                             $$ = newOP(IVAL($1), 0, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'o');
@@ -1271,7 +1271,7 @@ term	:	'?' term
 	|	FUNC0SUB                             /* Sub treated as nullop */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
 				scalar($1), $1->op_location); }
-	|	FUNC1 '(' ')'                        /* not () */
+	|	FUNC1 ':' LAYOUTLISTEND                                       /* not () */
 			{ $$ = (IVAL($1) == OP_NOT)
                                 ? newUNOP(IVAL($1), 0, newSVOP(OP_CONST, 0, newSViv(0), LOCATION($1)), LOCATION($1))
                                 : newOP(IVAL($1), OPf_SPECIAL, LOCATION($1));
@@ -1281,7 +1281,7 @@ term	:	'?' term
 			  TOKEN_GETMAD($3,$$,')');
                           APPEND_MADPROPS_PV("func1", $$, '>');
 			}
-	|	FUNC1 '(' expr ')'                   /* not($foo) */
+	|	FUNC1 ':' expr LAYOUTLISTEND                  /* not($foo) */
 			{ $$ = newUNOP(IVAL($1), 0, $3, LOCATION($1));
 			  TOKEN_GETMAD($1,$$,'o');
 			  TOKEN_GETMAD($2,$$,'(');
