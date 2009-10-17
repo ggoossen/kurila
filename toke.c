@@ -1335,7 +1335,7 @@ S_force_word(pTHX_ register char *start, int token, int check_keyword, int allow
             curmad('X', newSVpvn(start,s-start), NULL);
         if (token == METHOD) {
             s = SKIPSPACE1(s);
-            if (*s == '(')
+            if (*s == ':')
                 PL_expect = XTERM;
             else {
                 PL_expect = XOPERATOR;

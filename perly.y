@@ -762,7 +762,7 @@ argexpr	:       argexpr ','
 	;
 
 /* List operators */
-listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
+listop	:	term ARROW method ':' layoutlistexpr /* $foo->bar(list) */
 			{ $$ = convert(OP_ENTERSUB, OPf_STACKED,
 				append_elem(OP_LIST,
 				    prepend_elem(OP_LIST, scalar($1), $5),
@@ -770,7 +770,6 @@ listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
                                 $3->op_location);
 			  TOKEN_GETMAD($2,$$,'A');
 			  TOKEN_GETMAD($4,$$,'(');
-			  TOKEN_GETMAD($6,$$,')');
                           APPEND_MADPROPS_PV("method", $$, '>');
 			}
 	|	term ARROW method                     /* $foo->bar */
