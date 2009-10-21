@@ -3543,6 +3543,7 @@ Perl_yylex(pTHX)
 	    else if (*s == '>') {
 		s++;
 		if (*s == '?') {
+		    /* '->?' operator */
 		    s++;
 		    OPERATOR(ARROW);
 		}
@@ -3791,8 +3792,6 @@ Perl_yylex(pTHX)
 	    goto just_a_word_zero_gv;
 	}
 	s++;
-	if(PL_expect == XOPERATOR)
-	    no_op("':'", s);
 	if(PL_expect == XSTATE) {
 	    s = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, FALSE, &len);
 	    pl_yylval.pval = CopLABEL_alloc(PL_tokenbuf);
