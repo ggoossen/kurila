@@ -5271,7 +5271,7 @@ Perl_yylex(pTHX)
 	    OPERATOR(USE);
 
 	case KEY_not:
-	    if (*s == '(' || (s = SKIPSPACE1(s), *s == '(')) {
+	    if (*s == ':' || (s = SKIPSPACE1(s), *s == ':')) {
 		FUN1(OP_NOT);
 	    }
 	    else
