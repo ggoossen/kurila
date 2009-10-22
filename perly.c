@@ -631,13 +631,13 @@ Perl_yyparse (pTHX)
 
 	YYDSYMPRINTF ("Error: popping", yystos[ps->state], &ps->val);
 	LEAVE_SCOPE(ps->savestack_ix);
-	if (yy_type_tab[yystos[ps->state]] == toketype_opval) {
-	    PAD_RESTORE_LOCAL(ps->comppad);
-	    if (ps->val.opval) {
-		YYDPRINTF ((Perl_debug_log, "(freeing op)\n"));
-		op_free(ps->val.opval);
-	    }
-	}
+	/* if (yy_type_tab[yystos[ps->state]] == toketype_opval) { */
+	/*     PAD_RESTORE_LOCAL(ps->comppad); */
+	/*     if (ps->val.opval) { */
+	/* 	YYDPRINTF ((Perl_debug_log, "(freeing op)\n")); */
+	/* 	op_free(ps->val.opval); */
+	/*     } */
+	/* } */
 	YYPOPSTACK;
 	yystate = ps->state;
 
