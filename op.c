@@ -800,7 +800,9 @@ S_my_kid(pTHX_ OP *o, OP **imopsp)
 	       type == OP_RV2AV ||
 	       type == OP_RV2HV) { /* XXX does this let anything illegal in? */
 	if (cUNOPo->op_first->op_type != OP_GV) { /* MJD 20011224 */
-	    yyerror(Perl_form(aTHX_ "Can't declare %s in \"%s\"",
+	    yyerror_at(
+		o->op_location,
+		Perl_form(aTHX_ "Can't declare %s in \"%s\"",
 			OP_DESC(o),
 			PL_parser->in_my == KEY_our
 			    ? "our" : "my"));
@@ -811,10 +813,12 @@ S_my_kid(pTHX_ OP *o, OP **imopsp)
     else if (type != OP_PADSV &&
 	     type != OP_PUSHMARK)
     {
-	yyerror(Perl_form(aTHX_ "Can't declare %s in \"%s\"",
-			  OP_DESC(o),
-			  PL_parser->in_my == KEY_our
-			    ? "our" : "my"));
+	yyerror_at(
+	    o->op_location,
+	    Perl_form(aTHX_ "Can't declare %s in \"%s\"",
+		OP_DESC(o),
+		PL_parser->in_my == KEY_our ? "our" : "my")
+	    );
 	return o;
     }
     o->op_flags |= OPf_MOD;
@@ -5936,7 +5940,7 @@ Perl_rootop_ll_tmprefcnt(pTHX) {
  * Local variables:
  * c-indentation-style: bsd
  * c-basic-offset: 4
- * indent-tabs-mode: t
+ * indent-tabs-mode: f
  * End:
  *
  * ex: set ts=8 sts=4 sw=4 noet:
