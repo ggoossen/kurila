@@ -263,15 +263,10 @@ S_new_SV(pTHX)
     SvLOCATION(sv) = NULL;
 #ifdef DEBUG_LEAKING_SCALARS
     sv->sv_debug_optype = PL_op ? PL_op->op_type : 0;
-    sv->sv_debug_line = (U16) (PL_parser && PL_parser->copline != NOLINE
-		? PL_parser->copline
-		:  PL_curcop
-		    ? CopLINE(PL_curcop)
-		    : 0
-	    );
+    sv->sv_debug_line = (U16) (PL_parser ? PL_parser->lex_line_number : 0 );
     sv->sv_debug_inpad = 0;
     sv->sv_debug_cloned = 0;
-    sv->sv_debug_file = PL_curcop ? savepv(CopFILE(PL_curcop)): NULL;
+    sv->sv_debug_file = (PL_parser && PL_parser->lex_filename) ? SvPVX_const(PL_parser->lex_filename) : NULL ;
     
     sv->sv_debug_serial = PL_sv_serial++;
 
