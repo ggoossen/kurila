@@ -3349,6 +3349,8 @@ Perl_yylex(pTHX)
 		PL_oldoldbufptr = PL_oldbufptr = s = PL_linestart = SvPVX_mutable(PL_linestr);
 		PL_last_lop = PL_last_uni = NULL;
 		sv_setpvs(PL_linestr,"");
+		if (close_layout_lists())
+		    TOKEN(LAYOUTLISTEND);
 		TOKEN(';');	/* not infinite loop because rsfp is NULL now */
 	    }
 	    /* If it looks like the start of a BOM or raw UTF-16,
