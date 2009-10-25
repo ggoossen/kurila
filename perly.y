@@ -1267,10 +1267,27 @@ term	:	'?' term
                             TOKEN_GETMAD($2,$$,'(');
                             TOKEN_GETMAD($3,$$,')');
 			}
+	|	FUNC0 ':' ',' LAYOUTLISTEND
+			{
+                            $$ = newOP(IVAL($1), 0, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'o');
+                            TOKEN_GETMAD($2,$$,'(');
+                            TOKEN_GETMAD($3,$$,')');
+			}
 	|	FUNC0SUB                             /* Sub treated as nullop */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
 				scalar($1), $1->op_location); }
 	|	FUNC1 ':' LAYOUTLISTEND                                       /* not () */
+			{ $$ = (IVAL($1) == OP_NOT)
+                                ? newUNOP(IVAL($1), 0, newSVOP(OP_CONST, 0, newSViv(0), LOCATION($1)), LOCATION($1))
+                                : newOP(IVAL($1), OPf_SPECIAL, LOCATION($1));
+
+			  TOKEN_GETMAD($1,$$,'o');
+			  TOKEN_GETMAD($2,$$,'(');
+			  TOKEN_GETMAD($3,$$,')');
+                          APPEND_MADPROPS_PV("func1", $$, '>');
+			}
+	|	FUNC1 ':' ',' LAYOUTLISTEND                                       /* not () */
 			{ $$ = (IVAL($1) == OP_NOT)
                                 ? newUNOP(IVAL($1), 0, newSVOP(OP_CONST, 0, newSViv(0), LOCATION($1)), LOCATION($1))
                                 : newOP(IVAL($1), OPf_SPECIAL, LOCATION($1));
