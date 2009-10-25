@@ -3,15 +3,15 @@
 
 require Test::Simple;
 
-push $^INCLUDE_PATH, 't/lib';
+push: $^INCLUDE_PATH, 't/lib';
 require Test::Simple::Catch;
-my @: $out, $err = Test::Simple::Catch::caught();
+my @: $out, $err = Test::Simple::Catch::caught:
 
 close $^STDERR;
-die "Knife?";
+die: "Knife?";
 
-Test::Simple->import(tests => 3);
+Test::Simple->import: tests => 3
 
-ok(1);
-ok(1);
-ok(1);
+ok: 1
+ok: 1
+ok: 1

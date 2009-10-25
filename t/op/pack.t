@@ -1313,8 +1313,8 @@ do  # Repeat count [SUBEXPR]
 
     my %val
     %val{[ @codes]} =  map: {
-        my (%:  1 => $v, ...) =
-                                    (%:  $( m/ [Xx] /x )=> undef
+                                my (%:  1 => $v, ...) =
+                                     %:  $( m/ [Xx] /x )=> undef
                                          $( m/ [AZa] /x )=> 'something'
                                          $( m/ C     /x )=> 214
                                          $( m/ W     /x )=> 188
@@ -1323,10 +1323,9 @@ do  # Repeat count [SUBEXPR]
                                          $( m/ [Hh]  /x )=> 'b8'
                                          $( m/ [svnSiIlVNLqQjJ]  /x )=> 10111
                                          $( m/ [FfDd]  /x )=> 1.36514538e67
-                                         $( m/ [pP]  /x )=> "try this buffer"
-                                    );
+                                         $( m/ [pP]  /x )=> "try this buffer";
                                 $v;
-                                }, @codes
+                              }, @codes
     my @end = @: 0x12345678, 0x23456781, 0x35465768, 0x15263748
     my $end = "N4"
 

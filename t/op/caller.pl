@@ -80,19 +80,19 @@ do
     
     is: (hint_fetch: 'dooot'), 6 * 7
 
-    eval "is(hint_fetch('dooot'), 6 * 7); 1" or die: $^EVAL_ERROR
+    eval "is: (hint_fetch: 'dooot'), 6 * 7; 1" or die: $^EVAL_ERROR
 
     eval <<'EOE' or die: $^EVAL_ERROR
-    is(hint_fetch('dooot'), 6 * 7);
-    eval "is(hint_fetch('dooot'), 6 * 7); 1" or die $^EVAL_ERROR;
+    is: (hint_fetch: 'dooot'), 6 * 7;
+    eval "is: (hint_fetch: 'dooot'), 6 * 7; 1" or die: $^EVAL_ERROR;
     BEGIN {
         $^HINTS{dooot} = 54;
     }
-    is(hint_fetch('dooot'), 54);
-    eval "is(hint_fetch('dooot'), 54); 1" or die $^EVAL_ERROR;
-    eval 'BEGIN { $^HINTS{dooot} = -1; }; 1' or die $^EVAL_ERROR;
-    is(hint_fetch('dooot'), 54);
-    eval "is(hint_fetch('dooot'), 54); 1" or die $^EVAL_ERROR;
+    is: (hint_fetch: 'dooot'), 54;
+    eval "is: (hint_fetch: 'dooot'), 54; 1" or die: $^EVAL_ERROR;
+    eval 'BEGIN { $^HINTS{dooot} = -1; }; 1' or die: $^EVAL_ERROR;
+    is: (hint_fetch: 'dooot'), 54;
+    eval "is: (hint_fetch: 'dooot'), 54; 1" or die: $^EVAL_ERROR;
 EOE
 
 

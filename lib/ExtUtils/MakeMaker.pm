@@ -39,16 +39,14 @@ require ExtUtils::MY  # XXX pre-5.8 versions of ExtUtils::Embed expect
 # This will go when Embed is it's own CPAN module.
 
 
-sub WriteMakefile
-    die: "WriteMakefile: Need even number of args" if (nelems @_) % 2
+sub WriteMakefile(%< %att)
 
     require ExtUtils::MY
-    my %att = %:  < @_ 
 
     _verify_att: \%att
 
     my $mm = MM->new: \%att
-    $mm->flush: 
+    ($mm->flush: )
 
     return $mm
 
@@ -416,7 +414,7 @@ END
     if (defined $self->{?CONFIGURE})
         if (!(type::is_code: $self->{?CONFIGURE}))
             die: "Attribute 'CONFIGURE' to WriteMakefile() not a code\n"
-        %configure_att = %:  <(  $self->{?CONFIGURE}->& <:  < @_ )->% 
+        %configure_att = ( $self->{CONFIGURE}->& <: < @_ )->%
         $self = \%:  < $self->%, < %configure_att
 
     my $newclass = ++$PACKNAME
@@ -599,21 +597,17 @@ END
             my %a = $self->{?$section} || $%
             push: $self->{RESULT}, "\n# --- MakeMaker $section section:"
             push: $self->{RESULT}, "# " . (join: ", ", %a) if $Verbose && %a
-            push: $self->{RESULT}, $self->maketext_filter: 
+            push: $self->{RESULT}
+                  $self->maketext_filter: 
                           $self->?$method:  < %a 
-                      
-        
-    
 
     push: $self->{RESULT}, "\n# End."
 
     $self
 
 
-sub WriteEmptyMakefile
-    die: "WriteEmptyMakefile: Need an even number of args" if (nelems @_) % 2
+sub WriteEmptyMakefile(%< %att)
 
-    my %att = %:  < @_ 
     my $self = MM->new: \%att
 
     my $new = $self->{?MAKEFILE}
@@ -781,7 +775,7 @@ sub mv_all_methods
 
     local $^WARN_HOOK = sub (@< @_)
         # can't use 'no warnings redefined', 5.6 only
-        warn: < @_[0]->message: ) unless @_[0]->message: ) =~ m/^Subroutine .* redefined/
+        (warn: < @_[0]->message: ) unless ( @_[0]->message: ) =~ m/^Subroutine .* redefined/
     
     foreach my $method ( @Overridable)
 
@@ -875,7 +869,7 @@ sub flush
         warn: "rename MakeMaker.tmp => $finalname: $^OS_ERROR"
     chmod: 0644, $finalname unless $Is_VMS
 
-    my %keep = %:  < @+: map: { (@: $_ => 1) }, qw(NEEDS_LINKING HAS_LINK_CODE) 
+    my %keep = %+: map: { %: $_ => 1 }, qw(NEEDS_LINKING HAS_LINK_CODE) 
 
     if ($self->{?PARENT} && !$self->{?_KEEP_AFTER_FLUSH})
         foreach (keys $self->%) # safe memory

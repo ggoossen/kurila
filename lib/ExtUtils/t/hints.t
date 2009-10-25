@@ -41,7 +41,7 @@ is:  $out, "Processing hints file $hint_file\n"
 
 (open: $hintfh, ">", "$hint_file") || die: "Can't write dummy hints file $hint_file: $^OS_ERROR"
 print: $hintfh, <<'CLOO'
-die "Argh!\n";
+die: "Argh!\n";
 CLOO
 close $hintfh
 

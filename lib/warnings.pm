@@ -301,10 +301,10 @@ our $BYTES    = 12
 
 our $All = "" ; vec: $All, %Offsets{'all'}, 2 => 3
 
-sub bits
+sub bits(@< @args)
     # called from B::Deparse.pm
 
-    push: @_, 'all' unless @_
+    push: @args, 'all' unless @args
 
     my $mask
     my $catmask 

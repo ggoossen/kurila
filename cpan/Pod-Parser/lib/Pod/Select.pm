@@ -589,8 +589,8 @@ sub podselect(@argv)
                                  my @: $key, $val = @: lc $_, %opts{?$_};
                                  $key =~ s/^(?=\w)/-/;
                                  $key =~ m/^-se[cl]/  and  $key  = '-sections';
-                            #! $key eq '-range'    and  $key .= 's';
-                            %: $key => $val;
+                                 #! $key eq '-range'    and  $key .= 's';
+                                 %: $key => $val;
                                  }, keys %opts
 
             ## Process the options

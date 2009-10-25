@@ -243,7 +243,7 @@ sub _handle_element_start($self, $element, $attrs)
         (DEBUG: )+> 4 and print: $^STDOUT, "Pending: [", < (pretty: $self->{?PENDING}), "]\n"
     elsif (($self->can : "start_$method"))
         my $method = 'start_' . $method
-         $self->?$method : $attrs, ''
+        $self->?$method : $attrs, ''
     else
         (DEBUG: )+> 2 and print: $^STDOUT, "No $method start method, skipping\n"
 
@@ -272,7 +272,7 @@ sub _handle_element_end($self, $element)
         
     elsif (($self->can : "end_$method"))
         my $method = 'end_' . $method
-         $self->?$method : 
+        $self->?$method : 
     else
         (DEBUG: )+> 2 and print: $^STDOUT, "No $method end method, skipping\n"
 
@@ -1001,7 +1001,7 @@ sub cmd_head4($self, $attrs, $text)
 sub cmd_b { return '\f(BS' . @_[2] . '\f(BE' }
 sub cmd_i { return '\f(IS' . @_[2] . '\f(IE' }
 sub cmd_f { return '\f(IS' . @_[2] . '\f(IE' }
-sub cmd_c { return @_[0]->quote_literal : @_[2]) }
+sub cmd_c { return @_[0]->quote_literal : @_[2] }
 
 # Index entries are just added to the pending entries.
 sub cmd_x($self, $attrs, $text)
@@ -1083,10 +1083,10 @@ sub start_over_bullet { my $s = shift; ($s->over_common_start : 'bullet', < @_) 
 sub start_over_number { my $s = shift; ($s->over_common_start : 'number', < @_) }
 sub start_over_text   { my $s = shift; ($s->over_common_start : 'text',   < @_) }
 sub start_over_block  { my $s = shift; ($s->over_common_start : 'block',  < @_) }
-sub end_over_bullet { @_[0]->over_common_end: ) }
-sub end_over_number { @_[0]->over_common_end: ) }
-sub end_over_text   { @_[0]->over_common_end: ) }
-sub end_over_block  { @_[0]->over_common_end: ) }
+sub end_over_bullet { @_[0]->over_common_end: }
+sub end_over_number { @_[0]->over_common_end: }
+sub end_over_text   { @_[0]->over_common_end: }
+sub end_over_block  { @_[0]->over_common_end: }
 
 # The common handler for all item commands.  Takes the type of the item, the
 # attributes, and then the text of the item.

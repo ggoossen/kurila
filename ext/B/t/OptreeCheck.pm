@@ -527,8 +527,8 @@ sub getRendering
         my $opwalker = B::Concise::compile: < @opts, $code
         die: "bad BC::compile retval" unless type::is_code: $opwalker
 
-        (B::Concise::reset_sequence: )(
-        $opwalker->& <: )
+        (B::Concise::reset_sequence: )
+        $opwalker->& <:
 
         # kludge error into rendering if its empty.
         $rendering = ($^EVAL_ERROR->message: ) if $^EVAL_ERROR and ! $rendering

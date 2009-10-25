@@ -157,8 +157,7 @@ sub _handle_element_start($self, $element, $attrs)
         push:  $self->%{PENDING}->@, \(@:  $attrs, '' )
     elsif (($self->can : "start_$method"))
         my $method = 'start_' . $method
-         $self->?$method : $attrs, ''
-    
+        $self->?$method : $attrs, ''
 
 
 # Handle the end of an element.  If we had a cmd_ method for this element,
@@ -178,12 +177,10 @@ sub _handle_element_end($self, $element)
                 $self->%{PENDING}->[-1]->[1] .= $text
             else
                 $self->output : $text
-            
         
     elsif (($self->can : "end_$method"))
         my $method = 'end_' . $method
-         $self->?$method : 
-    
+        $self->?$method : 
 
 
 ##############################################################################
@@ -241,7 +238,7 @@ sub output($self, $text)
 # Output a block of code (something that isn't part of the POD text).  Called
 # by preprocess_paragraph only if we were given the code option.  Exists here
 # only so that it can be overridden by subclasses.
-sub output_code { @_[0]->output : @_[1]) }
+sub output_code { @_[0]->output : @_[1] }
 
 ##############################################################################
 # Document initialization
@@ -418,14 +415,14 @@ sub over_common_end($self)
 
 
 # Dispatch the start and end calls as appropriate.
-sub start_over_bullet { @_[0]->over_common_start : @_[1]) }
-sub start_over_number { @_[0]->over_common_start : @_[1]) }
-sub start_over_text   { @_[0]->over_common_start : @_[1]) }
-sub start_over_block  { @_[0]->over_common_start : @_[1]) }
-sub end_over_bullet { @_[0]->over_common_end: ) }
-sub end_over_number { @_[0]->over_common_end: ) }
-sub end_over_text   { @_[0]->over_common_end: ) }
-sub end_over_block  { @_[0]->over_common_end: ) }
+sub start_over_bullet { @_[0]->over_common_start : @_[1] }
+sub start_over_number { @_[0]->over_common_start : @_[1] }
+sub start_over_text   { @_[0]->over_common_start : @_[1] }
+sub start_over_block  { @_[0]->over_common_start : @_[1] }
+sub end_over_bullet { @_[0]->over_common_end: }
+sub end_over_number { @_[0]->over_common_end: }
+sub end_over_text   { @_[0]->over_common_end: }
+sub end_over_block  { @_[0]->over_common_end: }
 
 # The common handler for all item commands.  Takes the type of the item, the
 # attributes, and then the text of the item.

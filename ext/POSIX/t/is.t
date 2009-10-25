@@ -59,8 +59,8 @@ foreach my $s (keys %classes)
         \%+: map: 
                 sub ($_)
                     %functions{+"is$_"}++	# Keep track of all the 'is<xxx>' functions
-                  %: "is$_" => 1		# Our return value: is<xxx>($s) should pass.
-                , %classes{$s}->@
+                    %: "is$_" => 1		# Our return value: is<xxx>($s) should pass.
+                %classes{$s}->@
 
 # Expected number of tests is one each for every combination of a
 # known is<xxx> function and string listed above.

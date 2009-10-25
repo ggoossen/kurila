@@ -159,7 +159,7 @@ $count += 2 * nelems: (grep: {length $_ == 1}, @ILLEGAL_PROPERTIES)
 
 plan: tests => $count
 
-run_tests:  unless caller: 
+run_tests:  unless caller:;
 
 use utf8
 

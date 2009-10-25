@@ -257,7 +257,7 @@ sub perl_inc
     my_return: " -I$dir "
 
 
-sub ccopts
+sub ccopts()
     (ccflags: ). (perl_inc: )
 
 

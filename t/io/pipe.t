@@ -16,7 +16,7 @@ my $Perl = (which_perl: )
 
 $^OUTPUT_AUTOFLUSH = 1
 
-(open: my $pipe, "|-", "-") || exec: $Perl, '-e', 'while (my $_ = ~< $^STDIN) { s/Y/k/g; s/X/o/g; print $^STDOUT, $_ }'
+(open: my $pipe, "|-", "-") || exec: $Perl, '-e', 'while (my $_ = ~< $^STDIN) { s/Y/k/g; s/X/o/g; print: $^STDOUT, $_ }'
 
 printf: $pipe, "Xk \%d - open |- || exec\n", (curr_test: )
 (next_test: )
@@ -40,7 +40,7 @@ close $pipe
         (next_test: )
         my $tnum = (curr_test: )
         (next_test: )
-        exec: $Perl, '-e', "print \$^STDOUT, q\{not ok $tnum -     again\n\}"
+        exec: $Perl, '-e', "print: \$^STDOUT, q\{not ok $tnum -     again\n\}"
 
     # This has to be *outside* the fork
     for (1..2)
@@ -102,7 +102,7 @@ close $pipe
         else
             die: "Couldn't fork" unless defined $pid
             close $reader
-            printf: $writer, "not ok \%d - pipe & fork\n" (curr_test: )
+            printf: $writer, "not ok \%d - pipe & fork\n", (curr_test: )
             (next_test: )
 
             (open: $^STDOUT, ">&", $writer) || die: "Can't dup WRITER to STDOUT"
@@ -110,7 +110,7 @@ close $pipe
 
             my $tnum = (curr_test: )
             (next_test: )
-            exec: $Perl, '-e', "print \$^STDOUT, q\{not ok $tnum -     with fh dup \n\}"
+            exec: $Perl, '-e', "print: \$^STDOUT, q\{not ok $tnum -     with fh dup \n\}"
 
 
         # This has to be done *outside* the fork.
@@ -124,11 +124,11 @@ close $reader
 
 (signals::handler: 'PIPE') = &broken_pipe
 
-sub broken_pipe
+sub broken_pipe(...)
     (signals::handler: 'PIPE') = 'IGNORE'       # loop preventer
-    (printf: $^STDOUT, "ok \%d - SIGPIPE\n" (curr_test: ))
+    (printf: $^STDOUT, "ok \%d - SIGPIPE\n", (curr_test: ))
 
-(printf: $writer, "not ok \%d - SIGPIPE\n" (curr_test: ))
+(printf: $writer, "not ok \%d - SIGPIPE\n", (curr_test: ))
 close $writer
 sleep 1
 (next_test: )

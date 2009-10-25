@@ -55,8 +55,8 @@ for my $newlex ((@: '', '-newlex'))
         our $buf = 'arb startval'
         my $ak = B::Showlex::walk_output : \$buf
 
-        my $walker = B::Showlex::compile:  $newlex, sub (@< @_){my($foo,$bar); 1} (
-        $walker->& <: )
+        my $walker = B::Showlex::compile:  $newlex, sub (@< @_){my($foo,$bar); 1}
+        $walker->& <:
         $na = padrep: '$foo',$newlex
         $nb = padrep: '$bar',$newlex
         like: $buf, qr/$($start_index+1): $na/ms
@@ -69,8 +69,8 @@ for my $newlex ((@: '', '-newlex'))
 
         my $src = 'sub { my ($scalar,@arr,%hash); 1 }'
         my $sub = eval $src; die: if $^EVAL_ERROR
-        $walker = B::Showlex::compile: $sub(
-        $walker->& <: )
+        $walker = B::Showlex::compile: $sub
+        $walker->& <:
         $na = padrep: '$scalar',$newlex
         $nb = padrep: '@arr',$newlex
         $nc = padrep: '%hash',$newlex
@@ -91,15 +91,10 @@ for my $newlex ((@: '', '-newlex'))
                 
                 for my $i(0..10)
                     $total += $i
-                
-            
         
-        $walker = B::Showlex::compile: $asub, $newlex, "-nosp"(
-        $walker->& <: )
+        $walker = B::Showlex::compile: $asub, $newlex, "-nosp"
+        $walker->& <:
         print: $^STDOUT, $buf if $verbose
 
-        $walker = B::Concise::compile: $asub, '-exec'(
-        $walker->& <: )
-
-    
-
+        $walker = B::Concise::compile: $asub, '-exec'
+        $walker->& <:

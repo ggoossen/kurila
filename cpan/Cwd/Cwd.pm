@@ -302,15 +302,13 @@ sub _backtick_pwd
     my @localize = qw(PATH IFS CDPATH ENV BASH_ENV)
     my $oldvalue = map: { (env::var: $_) }, @localize
     push: dynascope->{onleave}
-        sub (@< @_)
+          sub (@< @_)
               for (@localize)
                   (env::var: $_) = shift $oldvalue
-        
-    
+
     for (@localize)
         (env::var: $_) = undef
     
-
     my $cwd = `$pwd_cmd`
     # Belt-and-suspenders in case someone said "undef $/".
     local $^INPUT_RECORD_SEPARATOR = "\n"
@@ -351,8 +349,7 @@ if ($^OS_NAME eq 'cygwin')
     # got an arg-less prototype and will die if args are present.
     local $^WARNING = 0
     my $orig_cwd = \&cwd
-    *cwd = sub (@< @_) {( $orig_cwd->& <: ) }
-
+    *cwd = sub (@< @_) { $orig_cwd->$ <: }
 
 
 # A non-XS version of getcwd() - also used to bootstrap the perl build
@@ -582,7 +579,7 @@ sub fast_abs_path
             return fast_abs_path: $link_target
         
 
-        return $dir eq File::Spec->rootdir: 
+        return $dir eq File::Spec->rootdir
             ?? File::Spec->catpath: $vol, $dir, $file
             !!( fast_abs_path: (File::Spec->catpath: $vol, $dir, '')) . '/' . $file
     
@@ -714,8 +711,8 @@ sub _qnx_abs_path
     return $realpath
 
 
-sub _epoc_cwd
-    (env::var: 'PWD' ) = (EPOC::getcwd: )
+sub _epoc_cwd()
+    (env::var: 'PWD' ) =( EPOC::getcwd: )
     return env::var: 'PWD'
 
 if ($^OS_NAME eq "MSWin32" and not exists &getdcwd)

@@ -21,37 +21,32 @@ sub import($class, @< @options)
     
     my $backend = shift: @options
     eval q[
-        BEGIN {
-            minus_c;
-            save_BEGINs;
-        }
+BEGIN
+            minus_c
+            save_BEGINs
 
-        CHECK {
-            if ($quiet) {
-                close $^STDOUT;
-                open ($^STDOUT, ">&", \*$saveout);
-                close $saveout;
-            }
+CHECK
+            if ($quiet)
+                close $^STDOUT
+                open: $^STDOUT, ">&", \*$saveout
+                close $saveout
 
             # Note: if you change the code after this 'use', please
             # change the fudge factors in B::Concise (grep for
             # "fragile kludge") so that its output still looks
             # nice. Thanks. --smcc
-            use B::].$backend.q[ ();
-            if ($^EVAL_ERROR) {
-                croak "use of backend $backend failed: $($^EVAL_ERROR->message)";
-            }
+            use B::].$backend.q[ ()
+            if ($^EVAL_ERROR)
+                die: "use of backend $backend failed: $($^EVAL_ERROR->message)"
 
-            my $compilesub = Symbol::fetch_glob("B::$($backend)::compile")->*->& <: < @options;
-            if (ref::svtype($compilesub) ne "CODE") {
-                die "Compilesub isn't CODE. compilesub: $(dump::view($compilesub))";
-            }
+            my $compilesub = (Symbol::fetch_glob: "B::$($backend)::compile")->*->& <: < @options
+            if ((ref::svtype: $compilesub) ne "CODE")
+                die: "Compilesub isn't CODE. compilesub: $(dump::view: $compilesub)"
 
-            local $^OUTPUT_FIELD_SEPARATOR = '';
-            $compilesub->();
+            local $^OUTPUT_FIELD_SEPARATOR = ''
+            $compilesub->& <:
 
-            close $^STDERR if $veryquiet;
-        }
+            close $^STDERR if $veryquiet
     ]
     die: $^EVAL_ERROR if $^EVAL_ERROR
 

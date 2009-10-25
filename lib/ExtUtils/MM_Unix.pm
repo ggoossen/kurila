@@ -371,7 +371,7 @@ sub constants($self)
                    )
                       (<@+: (map: { @: "INSTALL".$_
                                        "DESTINSTALL".$_
-                                      }, ($self->installvars: )))
+                                    }, ($self->installvars: )))
                       < qw(
               PERL_LIB
               PERL_ARCHLIB
@@ -635,9 +635,9 @@ sub dist_ci($self)
     return q{
 ci :
 	$(PERLRUN) "-MExtUtils::Manifest=maniread" \\
-	  -e "@all = keys %{ maniread() };" \\
-	  -e "print(\$$^STDOUT, qq{Executing $(CI) @all\n}); system(qq{$(CI) @all});" \\
-	  -e "print(\$$^STDOUT, qq{Executing $(RCS_LABEL) ...\n}); system(qq{$(RCS_LABEL) @all});"
+	  -e "@all = keys %{ maniread: };" \\
+	  -e "print: \$$^STDOUT, qq{Executing $(CI) @all\n}; system: qq{$(CI) @all};" \\
+	  -e "print: \$$^STDOUT, qq{Executing $(RCS_LABEL) ...\n}; system: qq{$(RCS_LABEL) @all};"
 }
 
 
@@ -832,7 +832,7 @@ $(BOOTSTRAP) : $(FIRST_MAKEFILE) $(BOOTDEP) $(INST_ARCHAUTODIR)$(DFSEP).exists
 	$(NOECHO) $(ECHO) "Running Mkbootstrap for $(NAME) ($(BSLOADLIBS))"
 	$(NOECHO) $(PERLRUN) \
 		"-MExtUtils::Mkbootstrap" \
-		-e "Mkbootstrap('$(BASEEXT)','$(BSLOADLIBS)');"
+		-e "Mkbootstrap: '$(BASEEXT)','$(BSLOADLIBS)';"
 	$(NOECHO) $(TOUCH) %s
 	$(CHMOD) $(PERM_RW) %s
 
@@ -960,7 +960,6 @@ in these dirs:
 $((join: ' ',$dirs->@))
 "
 
-
     my $stderr_duped = 0
     my $stderr_copy
     unless (%Is{?BSD})
@@ -972,16 +971,14 @@ find_perl() can't dup STDERR: $^OS_ERROR
 You might see some garbage while we search for Perl
 WARNING
 
-
-
     foreach my $name ( $names->@)
         foreach my $dir ( $dirs->@)
             next unless defined $dir # $self->{PERL_SRC} may be undefined
             my ($abs, $val)
-            if (($self->file_name_is_absolute: $name))     # /foo/bar
+            if ($self->file_name_is_absolute: $name)     # /foo/bar
                 $abs = $name
             elsif (($self->canonpath: $name) eq
-                ($self->canonpath: (basename: $name)))  # foo
+                ($self->canonpath: basename: $name))  # foo
                 $abs = $self->catfile: $dir, $name
             else                                            # foo/bar
                 $abs = $self->catfile: $Curdir, $name
@@ -990,7 +987,7 @@ WARNING
             next unless $self->maybe_command: $abs
             print: $^STDOUT, "Executing $abs\n" if ($trace +>= 2)
 
-            my $version_check = qq{$abs -e "\$^PERL_VERSION =~ m/^\Q$ver\E/; print \$^STDOUT, qq\{VER_OK\n\}"}
+            my $version_check = qq{$abs -e "\$^PERL_VERSION =~ m/^\Q$ver\E/; print: \$^STDOUT, qq\{VER_OK\n\}"}
             $version_check = "%Config{?run} $version_check"
                 if defined %Config{?run} and length %Config{?run}
 
@@ -1007,18 +1004,14 @@ WARNING
                 $val = `$version_check`
                 open: $^STDERR, '>&', $stderr_copy if $stderr_duped
 
-
             if ($val =~ m/^VER_OK/m)
                 print: $^STDOUT, "Using PERL=$abs\n" if $trace
                 return $abs
             elsif ($trace +>= 2)
                 print: $^STDOUT, "Result: '$val' ".($^CHILD_ERROR >> 8)."\n"
 
-
-
     print: $^STDOUT, "Unable to find a perl $ver (by these names: $((join: ' ',$names->@)), in these dirs: $((join: ' ',$dirs->@)))\n"
-    0 # false and not empty
-
+    return 0 # false and not empty
 
 
 =item fixin
@@ -1269,7 +1262,7 @@ sub init_MANPODS
             $self->{+"$($man)PODS"} //= %: 
         else
             my $init_method = "init_$($man)PODS"
-             $self->?$init_method: 
+            $self->?$init_method: 
 
 
 sub _has_pod($self, $file)
@@ -1747,7 +1740,7 @@ CODE
     $self->{+WARN_IF_OLD_PACKLIST} ||=
         '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e warn_if_old_packlist'
     $self->{+FIXIN}              ||=
-        q{$(PERLRUN) "-MExtUtils::MY" -e "MY->fixin(shift @ARGV)"}
+        q{$(PERLRUN) "-MExtUtils::MY" -e "MY->fixin: shift @ARGV"}
 
     $self->{+UMASK_NULL}         ||= "umask 0"
     $self->{+DEV_NULL}           ||= "> /dev/null 2>&1"
@@ -1870,12 +1863,12 @@ sub init_PERL($self)
     # XXX This logic is flawed.  If "miniperl" is anywhere in the path
     # it will get confused.  It should be fixed to work only on the filename.
     # Define 'FULLPERL' to be a non-miniperl (used in test: target)
-    ($self->{+FULLPERL} = $self->{?PERL}) =~ s/miniperl/$perl_name/i
+    ($self->{+FULLPERL} = $self->{PERL}) =~ s/miniperl/$perl_name/i
         unless $self->{?FULLPERL}
 
     # Little hack to get around VMS's find_perl putting "MCR" in front
     # sometimes.
-    $self->{+ABSPERL} = $self->{?PERL}
+    $self->{+ABSPERL} = $self->{PERL}
     my $has_mcr = $self->{+ABSPERL} =~ s/^MCR\s*//
     if( ($self->file_name_is_absolute: $self->{ABSPERL}) )
         $self->{+ABSPERL} = '$(PERL)'
@@ -2420,7 +2413,7 @@ $tmp/perlmain\$(OBJ_EXT): $tmp/perlmain.c
 $tmp/perlmain.c: $makefilename}, q{
 	$(NOECHO) $(ECHO) Writing $@
 	$(NOECHO) $(PERL) $(MAP_PERLINC) "-MExtUtils::Miniperl" \\
-		-e "writemain(grep s#.*/auto/##s, split(q| |, q|$(MAP_STATIC)|))" > $@t && $(MV) $@t $@
+		-e "writemain: grep: s#.*/auto/##s, split: q| |, q|$(MAP_STATIC)|" > $@t && $(MV) $@t $@
 
 }
     push: @m, "\t", q{$(NOECHO) $(PERL) $(INSTALLSCRIPT)/fixpmain
@@ -2523,7 +2516,7 @@ sub needs_linking($self)
         return 1
 
     foreach my $child ((keys: $self->{?CHILDREN} || $%))
-        if ($self->{CHILDREN}{$child}->needs_linking: ))
+        if ($self->{CHILDREN}{$child}->needs_linking: )
             $self->{+NEEDS_LINKING} = 1
             return 1
 
@@ -2861,8 +2854,8 @@ PPD_HTML
     foreach my $prereq ((sort: (keys: $self->{?PREREQ_PM} || (%: ))))
         my $pre_req = $prereq
         $pre_req =~ s/::/-/g
-        my $dep_ver = join: ",", (@: <split: m/\./, $self->{PREREQ_PM}{?$prereq}
-                                     <((@: 0) x 4))[[0 .. 3]]
+        my $dep_ver = join: ",", ( split: m/\./, $self->{PREREQ_PM}{?$prereq}
+                                   +@+ ((@: 0) x 4))[[0 .. 3]]
         $ppd_xml .= sprintf: <<'PPD_OUT', $pre_req, $dep_ver
         <DEPENDENCY NAME="%s" VERSION="%s" />
 PPD_OUT

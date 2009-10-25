@@ -553,7 +553,7 @@ sub umask
 
 sub wait
     usage: "wait()" if (nelems @_) != 0
-    CORE::wait()
+    CORE::wait:
 
 
 sub waitpid
@@ -643,7 +643,7 @@ sub getgroups
 
 sub getlogin
     usage: "getlogin()" if (nelems @_) != 0
-    CORE::getlogin()
+    CORE::getlogin:
 
 
 sub getpgrp

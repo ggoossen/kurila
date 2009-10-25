@@ -34,7 +34,7 @@ sub populate
     return $gob
 
 
-sub getgrent ( ) { (populate: CORE::getgrent()) }
+sub getgrent ( ) { (populate: CORE::getgrent:) }
 sub getgrnam ($v) { (populate: (CORE::getgrnam: $v)) }
 sub getgrgid ($v) { (populate: (CORE::getgrgid: $v)) }
 sub getgr    ($v) { ($v =~ m/^\d+/) ?? (getgrgid: $v) !! (getgrnam: $v) }

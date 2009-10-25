@@ -271,7 +271,9 @@ ok: ! -e $tmpfile_link,  '   -e on unlinked file'
 
     my $try = sub (@< @_)
         my @c1 = @:  eval qq[\$DEV =~ m/^@_[0].*/mg] 
-        my @c2 = eval qq[grep \{ @_[1] "/dev/\$_" \}, \@DEV]
+        die: if $^EVAL_ERROR
+        my @c2 = eval qq[grep: \{ @_[1] "/dev/\$_" \}, \@DEV]
+        die: if $^EVAL_ERROR
         my $c1 = nelems @c1
         my $c2 = nelems @c2
         is: $c1, $c2, "ls and @_[1] agreeing on /dev ($c1 $c2)"
@@ -486,7 +488,7 @@ do
 
     # And now for the ambigious bareword case
     ok: (open: $dir, "<", "TEST"), 'Can open "TEST" dir'
-        || diag: "Can't open 'TEST':  $^OS_ERROR"
+       || diag: "Can't open 'TEST':  $^OS_ERROR"
     my $size = (@: (stat: $dir))[7]
     ok: defined $size, "stat() on bareword works"
     is: $size, -s "TEST", "size returned by stat of bareword is for the file"
@@ -516,7 +518,7 @@ do
 
         # And now for the ambigious bareword case
         ok: (open: $dir, "<", "TEST"), 'Can open "TEST" dir'
-            || diag: "Can't open 'TEST':  $^OS_ERROR"
+           || diag: "Can't open 'TEST':  $^OS_ERROR"
         my $size = (@: (stat: $dir))[7]
         ok: defined $size, "stat() on *THINGY\{IO\} works"
         is: $size, -s "TEST"

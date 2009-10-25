@@ -46,18 +46,20 @@ __USAGE__
     # Set them all to true
     %Build{[@files]} = @files if (%Build{?all})
     if ($showfiles)
-        print: 
-            (join: " "
-                   (sort: { lc $a cmp lc $b }
-                          (map: {
-                                    my @: $v, $d, $f = (File::Spec->splitpath: $_);
-                                    my @d;
-                                    @d = defined $d ?? (File::Spec->splitdir: $d) !! $@;
-                                    shift @d if (nelems @d);
-                                    (File::Spec->catfile: (nelems @d)
-                                                              ?? ((nelems @d) == 1 && @d[0] eq '' ?? () !! < @d)
-                                                              !! "pod", $f);
-                                    }, %Targets{[ (grep: { $_ ne 'all' && %Build{$_} }, keys %Build)]})))
+        print:
+            join: " "
+                  sort:
+                      { lc $a cmp lc $b }
+                      map: {
+                               my @: $v, $d, $f = (File::Spec->splitpath: $_);
+                               my @d;
+                               @d = defined $d ?? (File::Spec->splitdir: $d) !! $@;
+                               shift @d if (nelems @d);
+                               (File::Spec->catfile:
+                                       (nelems @d)
+                                          ?? ((nelems @d) == 1 && @d[0] eq '' ?? () !! < @d)
+                                          !! "pod", $f);
+                            }, %Targets{[ grep: { $_ ne 'all' && %Build{$_} }, keys %Build ]}
             "\n"
         exit: 0
 
@@ -424,7 +426,7 @@ sub podset
     
 
 
-sub unhead1
+sub unhead1()
     (unhead2: )
     if ($inhead1)
         output: "\n\n=back\n\n"
@@ -432,7 +434,7 @@ sub unhead1
     $inhead1 = 0
 
 
-sub unhead2
+sub unhead2()
     (unitem: )
     if ($inhead2)
         output: "\n\n=back\n\n"
@@ -520,7 +522,7 @@ sub generate_manifest_pod
 sub generate_manifest_readme
     generate_manifest: sort: {$a[0] cmp $b[0]}
                              @: "README.vms", "Notes about installing the VMS port"
-                             +@+ map: { @: "README.$_", %Readmes{$_} }, keys %Readmes
+                               +@+ map: { @: "README.$_", %Readmes{$_} }, keys %Readmes
 
 
 sub generate_roffitall
@@ -536,9 +538,11 @@ sub generate_roffitall
 sub generate_descrip_mms_1()
     local $Text::Wrap::columns = 150
     my $count = 0
-    my @lines = map: {"pod" . $count++ . " = $_"},
-                         split: m/\n/, wrap: '', '', (join: " ", (map: { "[.lib.pods]$_.pod" },
-                                                                 (sort: keys %Pods +@+ keys %Readmepods)))
+    my @lines = map: {"pod" . $count++ . " = $_"}
+                     split: m/\n/,
+                            wrap: '', '',
+                                  join: " ", map: { "[.lib.pods]$_.pod" }
+                                                  sort: keys %Pods +@+ keys %Readmepods
     @lines, "pod = " . join: ' ', map: {"\$(pod$_)"}, 0 .. $count - 1
 
 
@@ -563,8 +567,8 @@ sub generate_nmake_2()
     # Spot the special case
     local $Text::Wrap::columns = 76
     my $line = wrap: "\t    ", "\t    "
-                     (join: " ", (sort: @: < keys %Copies, < keys %Generated
-                                           < (map: {"perl$_.pod"}, keys %Readmes) ))
+                     join: " ", sort: @: < keys %Copies, < keys %Generated
+                                         < map: {"perl$_.pod"}, keys %Readmes
     $line =~ s/$/ \\/mg
     $line
 
@@ -591,11 +595,12 @@ sub do_manifest
                              grep: {! m!^README\.(\S+)! || %Ignore{$1}}, @_
     # Dictionary order - fold and handle non-word chars as nothing
     map: { $_->[0] },
-             sort: { $a->[1] cmp $b->[1] || $a->[0] cmp $b->[0] }
-                   map: { my $f = lc $_; $f =~ s/[^a-z0-9\s]//g; \@: $_, $f },
-                            @:    < @manifest
-                                  < (generate_manifest_pod: )
-                                  < (generate_manifest_readme: )
+             sort:
+                 { $a->[1] cmp $b->[1] || $a->[0] cmp $b->[0] }
+                 map: { my $f = lc $_; $f =~ s/[^a-z0-9\s]//g; \@: $_, $f }
+                      @: < @manifest
+                         < (generate_manifest_pod: )
+                         < (generate_manifest_readme: )
 
 
 sub do_nmake
@@ -718,7 +723,7 @@ while (my @: ?$target, ?$name = @: each %Targets)
     my @orig = @: ~< $thing->*
     my $orig = join: '', @orig
     close $thing
-    my @new = (Symbol::fetch_glob: "do_$target")->*->&->& < $target, < @orig
+    my @new = (Symbol::fetch_glob: "do_$target")->*->& <: $target, < @orig
     my $new = join: '', @new
     if ($new eq $orig)
         print: $^STDOUT, "Was not modified\n" if $Verbose

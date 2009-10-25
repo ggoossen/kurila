@@ -186,9 +186,9 @@ sub rename_country
 
     $country = $CODES[$codeset]{?$code}
 
-    foreach my $cset ((@: (LOCALE_CODE_ALPHA_2: )
-            (LOCALE_CODE_ALPHA_3: )
-        (LOCALE_CODE_NUMERIC: )))
+    foreach my $cset (@: (LOCALE_CODE_ALPHA_2: )
+                         (LOCALE_CODE_ALPHA_3: )
+                         (LOCALE_CODE_NUMERIC: ))
         if ($cset == $codeset)
             $c = $code
         else

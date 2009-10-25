@@ -87,11 +87,10 @@ do
     try {
         (WriteMakefile: 
             NAME            => 'Big::Dummy'
-            PREREQ_PM       => (%:
+            PREREQ_PM       => %:
                 "I::Do::Not::Exist" => 0
                 "Nor::Do::I"        => 0
                 "error"            => 99999
-            )
             PREREQ_FATAL    => 1
             );
     }
@@ -111,12 +110,11 @@ END
     try {
         (WriteMakefile: 
             NAME            => 'Big::Dummy'
-            PREREQ_PM       => (%:
+            PREREQ_PM       => %:
                 "I::Do::Not::Exist" => 0
-            )
             CONFIGURE => sub (@< @_)
                 require I::Do::Not::Exist
-            
+
             PREREQ_FATAL    => 1
             );
     }

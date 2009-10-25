@@ -566,8 +566,8 @@ Works just like Test::More's cmp_ok().
 =cut
 
 
-my %numeric_cmps = %:  < @+: map: { (@: $_, 1) }
-                                      (@:                        ("<",  "<=", ">",  ">=", "==", "!=", "<=>")) 
+my %numeric_cmps = %+: map: { %: $_, 1 }
+                            @: "<",  "<=", ">",  ">=", "==", "!=", "<=>"
 
 sub cmp_ok($self, $got, $type, $expect, ?$name)
 
@@ -675,13 +675,13 @@ sub skip($self, $why)
     lock: $self->{?Curr_Test}
     $self->{+Curr_Test}++
 
-    $self->{Test_Results}->[+$self->{?Curr_Test}-1] = share: \(%:
-                                                                 'ok'      => 1
-                                                                 actual_ok => 1
-                                                                 name      => ''
-                                                                 type      => 'skip'
-                                                                 reason    => $why
-                                                             )
+    $self->{Test_Results}->[+$self->{?Curr_Test}-1] 
+        = share: \ %:
+                       'ok'      => 1
+                       actual_ok => 1
+                       name      => ''
+                       type      => 'skip'
+                       reason    => $why
 
     my $out = "ok"
     $out   .= " $self->{?Curr_Test}" if $self->use_numbers: 
@@ -715,13 +715,12 @@ sub todo_skip($self, $why)
     lock: $self->{?Curr_Test}
     $self->{+Curr_Test}++
 
-    $self->{Test_Results}->[+$self->{?Curr_Test}-1] = share: \(%:
+    $self->{Test_Results}->[+$self->{?Curr_Test}-1] = share: \ %:
                                                                  'ok'      => 1
                                                                  actual_ok => 0
                                                                  name      => ''
                                                                  type      => 'todo_skip'
                                                                  reason    => $why
-                                                             )
 
     my $out = "not ok"
     $out   .= " $self->{?Curr_Test}" if $self->use_numbers: 
@@ -822,7 +821,6 @@ sub _regex_ok($self, $this, $regex, $cmp, $name)
         $ok = $self->ok:  0, $name 
         $self->diag: "    '$regex' doesn't look much like a regex to me."
         return $ok
-    
 
     do
         my $test = $this =~ m/$usable_regex/ ?? 1 !! 0
@@ -894,7 +892,7 @@ sub is_fh
 
     return try { ($maybe_fh->isa: "IO::Handle") } ||
         # 5.5.4's tied() and can() doesn't like getting undef
-        try { ((tied: $maybe_fh) || '')->can: 'TIEHANDLE') }
+        try { ((tied: $maybe_fh) || '')->can: 'TIEHANDLE' }
 
 
 
@@ -1282,8 +1280,6 @@ sub _plan_check
     unless( $self->{?Have_Plan} )
         local $Level = $Level + 2
         die: "You tried to run a test without a plan"
-    
-
 
 =back
 
@@ -1321,13 +1317,12 @@ sub current_test($self ?= $num)
         if( $num +> nelems $test_results->@ )
             my $start = (nelems $test_results->@) ?? (nelems $test_results->@) !! 0
             for ($start..$num-1)
-                $test_results->[+$_] = share: \(%:
+                $test_results->[+$_] = share: \ %:
                                                   'ok'      => 1
                                                   actual_ok => undef
                                                   reason    => 'incrementing test number'
                                                   type      => 'unknown'
                                                   name      => undef
-                                              )
             
         elsif( $num +< nelems $test_results->@ )
             splice: $test_results->@, $num

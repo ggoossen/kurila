@@ -29,7 +29,7 @@ do
 
     my $warning = ''
     local $^WARN_HOOK = sub (@< @_) { $warning = @_[0]->{?description} }
-    dies_like:  { ($MM->eval_in_subdirs: ) }, qr/YYYAaaaakkk/ 
+    dies_like:  { $MM->eval_in_subdirs: }, qr/YYYAaaaakkk/ 
 
     is:  $stdout, qq{\$^INCLUDE_PATH has .\n}, 'cwd in $^INCLUDE_PATH' 
     $stdout = ''

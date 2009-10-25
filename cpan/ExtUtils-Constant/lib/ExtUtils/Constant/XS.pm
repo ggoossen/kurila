@@ -197,9 +197,9 @@ sub dogfood($self, $args, @< @items)
 use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 
 EOT
-    $result .= $self->dump_names : \(%: default_type=>$default_type, what=>$what
-                                        indent=>0, declare_types=>1)
-                                   < @items
+    $result .= $self->dump_names: \ %: default_type=>$default_type, what=>$what
+                                       indent=>0, declare_types=>1
+                                  < @items
     $result .= <<'EOT'
 
 print constant_types(), "\n"; # macro defs

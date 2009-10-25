@@ -457,7 +457,6 @@ sub _cwd
     (Cwd::getcwd: )
 
 
-
 # Internal method to reduce xx\..\yy -> yy
 sub _collapse($fs, $path)
 

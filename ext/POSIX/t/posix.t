@@ -205,7 +205,7 @@ do
 
 :SKIP do
     skip: "no kill() support on Mac OS", 1 if $Is_MacOS
-    is: eval "kill 0", 0, "check we have CORE::kill"
+    is: eval "kill: 0", 0, "check we have CORE::kill"
         or print: $^STDOUT, "\$\@ is " . (_qq: $^EVAL_ERROR) . "\n"
 
 

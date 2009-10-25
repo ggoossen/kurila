@@ -1178,9 +1178,8 @@ sub make_page($section, $sect_opts, $bodylen)
             for my $row (0..(nelems @parts[$col]->@)-1)
                 my $last = @parts[$col][$row] =~ s/\r//
                 $f->{?hjust}->& <: @parts[$col][$row], pre=>$lfill, post=>$rfill
-                                last=>$last, pos=>$f->{?pos}
-                                stretch=>$f->{?stretch}, width=>$f->{?width}
-                               
+                                   last=>$last, pos=>$f->{?pos}
+                                   stretch=>$f->{?stretch}, width=>$f->{?width}
 
         for my $row (0..$maxheight-1)
             push: @text, join: "", map: { @parts[$_][$row] },0..(nelems @parts)-1

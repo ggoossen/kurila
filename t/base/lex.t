@@ -21,9 +21,9 @@ $x = '\\' # ';
 if ((length: $x) == 2) {print: $^STDOUT, "ok 4\n";} else {print: $^STDOUT, "not ok 4\n";}
 
 eval 'while (0) {
-    print $^STDOUT, "foo\n";
+    print: $^STDOUT, "foo\n";
 }
-m/^/ && (print $^STDOUT, "ok 5\n");
+m/^/ && (print: $^STDOUT, "ok 5\n");
 '
 
 our ($foo, %foo, $bar, $bar, @ary, $A, $X, @X, $N)
@@ -46,12 +46,12 @@ $foo
 EOF
 
 eval <<\EOE, (print: $^STDOUT, $^EVAL_ERROR);
-print $^STDOUT, <<'EOF';
+print: $^STDOUT, <<'EOF';
 ok 10
 EOF
 
 $foo = 'ok 11';
-print $^STDOUT, <<EOF;
+print: $^STDOUT, <<EOF;
 $foo
 EOF
 EOE
@@ -66,8 +66,7 @@ print: $^STDOUT, qq/ok 14\n/;
 print: $^STDOUT, qq(ok 15\n);
 
 print: $^STDOUT, qq
- [ok 16\n]
- ;
+         [ok 16\n]
 
 print: $^STDOUT, q<ok 17
 >;
@@ -176,7 +175,7 @@ EOT
     T: '^main:plink:53$', $test++;
     print: $^STDOUT, "ok 44\nok 45\nok 46\n";
 }
-#line 218 "lex.t"
+#line 179 "lex.t"
 
 # tests 47--51 start here
 # tests for new array interpolation semantics:
@@ -185,7 +184,7 @@ EOT
 do
     my $test = 47
     our (@nosuch, @a, @example)
-    (eval: q(">$(join ' ', < @nosuch)<" eq "><")) || print: $^STDOUT, "# $^EVAL_ERROR", "not "
+    (eval: q(">$(join: ' ', < @nosuch)<" eq "><")) || print: $^STDOUT, "# $^EVAL_ERROR", "not "
     print: $^STDOUT, "ok $test\n"
     ++$test
 
@@ -196,7 +195,7 @@ do
     ++$test
 
     # Ditto.
-    eval: q{@nosuch = @: 'a', 'b', 'c'; ">$(join ' ', @nosuch)<" eq ">a b c<"}
+    eval: q{@nosuch = @: 'a', 'b', 'c'; ">$(join: ' ', @nosuch)<" eq ">a b c<"}
         || print: $^STDOUT, "# $^EVAL_ERROR", "not "
     print: $^STDOUT, "ok $test\n"
     ++$test
@@ -205,9 +204,8 @@ do
     sub makearray
         my @array = @: 'fish', 'dog', 'carrot'
         *R::crackers = \@array
-    
 
-    eval: q{makearray(); ">$(join ' ', @R::crackers)<" eq ">fish dog carrot<"}
+    eval: q{makearray(); ">$(join: ' ', @R::crackers)<" eq ">fish dog carrot<"}
         || print: $^STDOUT, "# $^EVAL_ERROR", "not "
     print: $^STDOUT, "ok $test\n"
     ++$test
@@ -221,12 +219,11 @@ my %str = %:
     foo      => 1
     (xyz::foo: ) => 1
     'xyz::bar' => 1
-    
 
 my $test = 51
-(print: $^STDOUT, (exists %str{foo}      ?? "" !! "not ")."ok $test\n"); ++$test
-(print: $^STDOUT, (exists %str{bar}      ?? "" !! "not ")."ok $test\n"); ++$test
-(print: $^STDOUT, (exists %str{'xyz::bar'} ?? "" !! "not ")."ok $test\n"); ++$test
+print: $^STDOUT, (exists %str{foo}      ?? "" !! "not ")."ok $test\n"; ++$test
+print: $^STDOUT, (exists %str{bar}      ?? "" !! "not ")."ok $test\n"; ++$test
+print: $^STDOUT, (exists %str{'xyz::bar'} ?? "" !! "not ")."ok $test\n"; ++$test
 
 sub foo::::::bar { (print: $^STDOUT, "ok $test\n"); $test++ }
 (foo::::::bar: )

@@ -55,14 +55,14 @@ for ( @prgs)
     is: $results, $expected
 
 
-eval "sub #foo\n \{ print \$^STDOUT, 1 \}"
+eval "sub #foo\n \{ print: \$^STDOUT, 1 \}"
 is: $^EVAL_ERROR, '', "No error"
 
 __DATA__
 do {
 sub X {
     my $n = "ok 1\n";
-    sub { print $^STDOUT, $n };
+    sub { print: $^STDOUT, $n };
 }
 my $x = X();
 undef &X;
@@ -76,8 +76,8 @@ sub X {
     my $n = "ok 1\n";
     sub {
         my $dummy = $n; # eval can't close on $n without internal reference
-        eval 'print $^STDOUT, $n';
-        die $^EVAL_ERROR if $^EVAL_ERROR;
+        eval 'print: $^STDOUT, $n';
+        die: $^EVAL_ERROR if $^EVAL_ERROR;
     };
 }
 my $x = X();
@@ -87,19 +87,18 @@ $x->();
 EXPECT
 ok 1
 ########
-do {
-sub X {
-    my $n = "ok 1\n";
-    eval 'sub { print $^STDOUT, $n }';
-}
-my $x = X();
-die $^EVAL_ERROR if $^EVAL_ERROR;
-undef &X;
-$x->();
-};
+do
+  sub X {
+      my $n = "ok 1\n";
+      eval 'sub { print: $^STDOUT, $n }';
+  }
+  my $x = (X: )
+  die: $^EVAL_ERROR if $^EVAL_ERROR
+  undef &X
+  ($x->& <: )
 EXPECT
 ok 1
 ########
-print $^STDOUT, sub { return "ok 1\n" } -> ()
+print: $^STDOUT, ( sub { return "ok 1\n" } ->& <: )
 EXPECT
 ok 1

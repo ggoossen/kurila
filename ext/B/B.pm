@@ -113,7 +113,7 @@ sub walkoptree_slow($op, $method, $level)
     $op_count++ # just for statistics
     $level ||= 0
     warn: (sprintf: "walkoptree: \%d. \%s\n", $level, < (peekop: $op)) if $debug
-     $op->?$method: $level if $op->can: $method
+    $op->?$method: $level if $op->can: $method
     if ($op->$ && (($op->flags: ) ^&^ OPf_KIDS))
         my $kid
         unshift: @parents, $op
@@ -172,7 +172,7 @@ sub walkoptree_exec($op, $method, $level)
             return
         
         savesym: $op, (sprintf: "\%s (0x\%lx)", < (class: $op), $op->$)
-         $op->?$method: $level
+        $op->?$method: $level
         $ppname = $op->name: 
         if ($ppname =~
             m/^(d?or(assign)?|and(assign)?|mapwhile|grepwhile|entertry|range|cond_expr)$/)

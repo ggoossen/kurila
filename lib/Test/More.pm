@@ -616,14 +616,14 @@ sub use_ok($module, @< @imports)
         # probably a version check.  Perl needs to see the bare number
         # for it to work with non-Exporter based modules.
         $code = <<USE
-package $pack;
-use $module $(@imports[0]->stringify: ));
-1;
+package $pack
+use $module $(@imports[0]->stringify: )
+1
 USE
     else
         $code = <<USE
-package $pack;
-use $module < \@args[0]->\@;
+package $pack
+use $module < \@args[0]->\@
 1;
 USE
     
@@ -691,9 +691,9 @@ sub require_ok ($module)
     $module = qq['$module'] unless _is_module_name: $module
 
     my $code = <<REQUIRE
-package $pack;
-require $module;
-1;
+package $pack
+require $module
+1
 REQUIRE
 
     my(@: $eval_result, $eval_error) =  _eval: $code
@@ -704,8 +704,6 @@ REQUIRE
     Tried to require '$module'.
     Error:  $(($eval_error->message: ))
 DIAGNOSTIC
-
-    
 
     return $ok
 

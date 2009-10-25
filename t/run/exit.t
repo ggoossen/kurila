@@ -49,7 +49,7 @@ if ($^OS_NAME ne 'MacOS')
         :SKIP do
             skip: "Skip signals and core dump tests on Win32", 7 if $^OS_NAME eq 'MSWin32'
 
-            $exit = run: 'kill 15, $^PID; sleep(1);'
+            $exit = run: 'kill: 15, $^PID; sleep: 1;'
 
             is:  $exit ^&^ 127, 15,            'Term by signal' 
             ok:  !($exit ^&^ 128),             'No core dump' 

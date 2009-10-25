@@ -159,7 +159,6 @@ sub copy
             $^OS_ERROR = $status unless $^OS_ERROR
         
         return ($fail_open2->& <: )
-    
 
     if ($from_a_handle)
         $from_h = $from
@@ -168,7 +167,6 @@ sub copy
         open: $from_h, "<", "$from\0" or return ($fail_open1->& <: )
         binmode: $from_h or die: "($^OS_ERROR,$^EXTENDED_OS_ERROR)"
         $closefrom = 1
-    
 
     if ($to_a_handle)
         $to_h = $to
@@ -177,7 +175,6 @@ sub copy
         open: $to_h,">", "$to\0" or return ($fail_open2->& <: )
         binmode: $to_h or die: "($^OS_ERROR,$^EXTENDED_OS_ERROR)"
         $closeto = 1
-    
 
     if ((nelems @_))
         $size = (shift: @_) + 0
@@ -186,7 +183,6 @@ sub copy
         $size = -s $from_h || 0
         $size = 1024 if ($size +< 512)
         $size = $Too_Big if ($size +> $Too_Big)
-    
 
     $^OS_ERROR = 0
     while (1)
@@ -199,8 +195,6 @@ sub copy
             $t = syswrite: $to_h, $buf, $r - $w, $w
                 or return ($fail_inner->& <: )
             $w += $t
-        
-    
 
     (close: $to_h) || return ($fail_open2->& <: ) if $closeto
     (close: $from_h) || return ($fail_open1->& <: ) if $closefrom
@@ -209,10 +203,7 @@ sub copy
     return 1
 
 
-sub move
-    die: "Usage: move(FROM, TO) " unless (nelems @_) == 2
-
-    my(@: $from,$to) =  @_
+sub move($from,$to)
 
     my($fromsz,$tosz1,$tomt1,$tosz2,$tomt2,$sts,$ossts)
 

@@ -25,12 +25,10 @@ WriteMakefile:
     PL_FILES     => (%: 'Errno_pm.PL'=>'Errno.pm')
     PM           => (%: 'Errno.pm' => '$(INST_LIBDIR)/Errno.pm')
     'clean'      => (%: FILES => 'Errno.pm arch.txt')
-    'dist'       => (%:
+    'dist'       => %:
         COMPRESS => 'gzip -9f'
         SUFFIX   => '.gz'
         DIST_DEFAULT => 'd/Errno.pm tardist'
-    )
-    
 
 sub MY::postamble
     my $TARG = MM->catfile: 'd','Errno.pm'

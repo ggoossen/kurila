@@ -7,7 +7,7 @@ BEGIN
 plan: tests => 15
 
 # not() tests
-pass:  if not: 
+pass:  if (not: )
 is: (not: ), 1
 is: (not: ), (not: 0)
 

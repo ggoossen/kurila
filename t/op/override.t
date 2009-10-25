@@ -87,7 +87,7 @@ do
 # by the indirect object notation
 do
     local $^WARN_HOOK = sub (@< @_)
-        main::like:  @_[0]->message: ), qr/^ok overriden/ 
+        main::like: ( @_[0]->message: ), qr/^ok overriden/ 
     
     BEGIN { *OverridenWarn::warn = sub (@< @_) { (CORE::warn:  "$((join: ' ',@_)) overriden"); }; }
     package OverridenWarn;

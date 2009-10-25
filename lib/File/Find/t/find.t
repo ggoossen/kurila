@@ -11,7 +11,7 @@ use Carp::Heavy () # make sure Carp::Heavy is already loaded, because $^INCLUDE_
 use Cwd
 
 BEGIN 
-    $^WARN_HOOK = sub (@< @_) { $warn_msg = @_[0]; (print: $^STDERR, "# " . @_[0]->message: )); }
+    $^WARN_HOOK = sub (@< @_) { $warn_msg = @_[0]; (print: $^STDERR, "# " . @_[0]->message: ); }
 
 use Test::More
 
@@ -635,7 +635,7 @@ if ( $symlink_exists )
 
         File::Find::find:  \(%: wanted => \&wanted_File, follow => 1
                                 dangling_symlinks =>
-                               sub (@< @_) { $warn_msg = "@_[0] is a dangling symbolic link" }
+                                sub (@< @_) { $warn_msg = "@_[0] is a dangling symbolic link" }
                             )
                            (topdir: 'dangling_dir_sl'), (topdir: 'fa') 
 

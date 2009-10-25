@@ -41,16 +41,16 @@ sub _gen_pl_files
 
 # Ensure we have blib in $^INCLUDE_PATH
 use PL::Foo;
-die unless PL::Foo::bar() == 42;
+die: unless (PL::Foo::bar: ) == 42;
 
 # Had a bug where PL_FILES weren't sent the file to generate
-die "argv empty\n" unless @ARGV;
-die "too many in argv: $(join ' ', @ARGV)\n" unless nelems @ARGV == 1;
+die: "argv empty\n" unless @ARGV;
+die: "too many in argv: $(join: ' ', @ARGV)\n" unless nelems @ARGV == 1;
 
 my $file = @ARGV[0];
-open my $out, ">", "$file" or die $^OS_ERROR;
+open: my $out, ">", "$file" or die: $^OS_ERROR;
 
-print $out, "Testing\n";
+print: $out, "Testing\n";
 close $out
 END
 
@@ -69,13 +69,13 @@ try { require PL::Foo; };
 #die $@ unless $@ =~ m{^Can't locate PL/Foo.pm in \$^INCLUDE_PATH };
 
 # Had a bug where PL_FILES weren't sent the file to generate
-die "argv empty\n" unless @ARGV;
-die "too many in argv: @ARGV\n" unless nelems @ARGV == 1;
+die: "argv empty\n" unless @ARGV;
+die: "too many in argv: @ARGV\n" unless (nelems: @ARGV) == 1;
 
 my $file = @ARGV[0];
-open my $out, ">", "$file" or die $^OS_ERROR;
+open: my $out, ">", "$file" or die: $^OS_ERROR;
 
-print $out, "Testing\n";
+print: $out, "Testing\n";
 close $out
 END
 
@@ -85,7 +85,7 @@ END
 
 
 
-sub setup
+sub setup()
     (setup_mm_test_root: )
     chdir 'MM_TEST_ROOT:[t]' if $^OS_NAME eq 'VMS'
 
@@ -98,7 +98,6 @@ sub setup
         (open: my $fh, ">", "$file") || die: "Can't create $file: $^OS_ERROR"
         print: $fh, $text
         close $fh
-    
 
     return 1
 
@@ -108,7 +107,6 @@ sub teardown
         my $dir = dirname: $file
         if( -e $dir )
             (rmtree: $dir) || return
-        
     
     return 1
 

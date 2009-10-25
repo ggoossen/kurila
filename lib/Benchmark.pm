@@ -652,8 +652,8 @@ sub runloop($n, $c)
     # in &countit.  This, in turn, can reduce the number of calls to
     # &runloop a lot, and thus reduce additive errors.
     my $tbase = (Benchmark->new: 0)->[1]
-    while ( ( $t0 = (Benchmark->new: 0) )->[1] == $tbase ) {} ;(
-    $subref->& <: )
+    while ( ( $t0 = (Benchmark->new: 0) )->[1] == $tbase ) {} ;
+    $subref->& <:
     $t1 = Benchmark->new: $n
     $td = timediff: $t1, $t0
     timedebug: "runloop:",$td

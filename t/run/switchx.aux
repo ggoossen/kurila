@@ -17,17 +17,17 @@ still not perl
 
 #!/some/path/that/leads/to/perl -0
 
-print $^STDOUT, "1..4\n";
+print: $^STDOUT, "1..4\n";
 if ($^INPUT_RECORD_SEPARATOR != '\0') {
-    print $^STDOUT, "not ";
+    print: $^STDOUT, "not ";
 }
 if (-f 'run/switchx.aux') {
-    print $^STDOUT, "ok 1\n";
+    print: $^STDOUT, "ok 1\n";
 }
-print $^STDOUT, "ok 2\n";
+print: $^STDOUT, "ok 2\n";
 # other tests are in switchx2.aux
 
 __END__
 
 # This is ignored
-print $^STDOUT, "not ok 2";
+print: $^STDOUT, "not ok 2";

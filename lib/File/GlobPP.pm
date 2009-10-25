@@ -7,7 +7,7 @@ sub glob(?$pat, ?_)
 
     open: my $outfh,"-|"
           ( $has_csh
-          ?? "$((config_value: 'csh')) -cf 'set nonomatch; glob $pat' 2>/dev/null"
+              ?? "$((config_value: 'csh')) -cf 'set nonomatch; glob $pat' 2>/dev/null"
               !! "echo $pat |tr -s ' \t\f\r' '\\n\\n\\n\\n'" )
         or die: 
     local $^INPUT_RECORD_SEPARATOR = $has_csh ?? "\0" !! "\n" 

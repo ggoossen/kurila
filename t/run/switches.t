@@ -26,8 +26,8 @@ END { (unlink: < @tmpfiles) }
 $r = runperl: 
     switches    => \$@
     stdin       => 'foo\nbar\nbaz\n'
-    prog        => 'print $^STDOUT, qq(<$_>) while ~< *ARGV'
-    
+    prog        => '(print: $^STDOUT, qq(<$_>)) while ~< *ARGV'
+
 is:  $r, "<foo\n><bar\n><baz\n>", "no switches" 
 
 # Tests for -0
@@ -35,20 +35,20 @@ is:  $r, "<foo\n><bar\n><baz\n>", "no switches"
 $r = runperl: 
     switches    => \(@:  '-0', )
     stdin       => 'foo\0bar\0baz\0'
-    prog        => 'print $^STDOUT, qq(<$_>) while ~< *ARGV'
+    prog        => '(print: $^STDOUT, qq(<$_>)) while ~< *ARGV'
     
 is:  $r, "<foo\0><bar\0><baz\0>", "-0" 
 
 $r = runperl: 
     switches    => \(@:  (sprintf: '-0%o', ord 'x') )
     stdin       => 'fooxbarxbazx'
-    prog        => 'print $^STDOUT, qq(<$_>) while ~< *ARGV'
+    prog        => '(print: $^STDOUT, qq(<$_>)) while ~< *ARGV'
     
 is:  $r, "<foox><barx><bazx>", "-0 with octal number" 
 
 $r = runperl: 
     switches    => \(@:  '-066' )
-    prog        => 'BEGIN { print $^STDOUT, qq{($^INPUT_RECORD_SEPARATOR)} } print $^STDOUT, qq{[$^INPUT_RECORD_SEPARATOR]}'
+    prog        => 'BEGIN { print: $^STDOUT, qq{($^INPUT_RECORD_SEPARATOR)} } print: $^STDOUT, qq{[$^INPUT_RECORD_SEPARATOR]}'
     
 is:  $r, "(\066)[\066]", '$/ set at compile-time' 
 
@@ -60,11 +60,11 @@ my $filename = 'swctest.tmp'
 
     open: my $f, ">", "$filename" or skip:  "Can't write temp file $filename: $^OS_ERROR" 
     print: $f, <<'SWTEST'
-BEGIN { print $^STDOUT, "block 1\n"; }
-CHECK { print $^STDOUT, "block 2\n"; }
-INIT  { print $^STDOUT, "block 3\n"; }
-        print $^STDOUT, "block 4\n";
-END   { print $^STDOUT, "block 5\n"; }
+BEGIN { print: $^STDOUT, "block 1\n"; }
+CHECK { print: $^STDOUT, "block 2\n"; }
+INIT  { print: $^STDOUT, "block 3\n"; }
+        print: $^STDOUT, "block 4\n";
+END   { print: $^STDOUT, "block 5\n"; }
 SWTEST
     close $f or die: "Could not close: $^OS_ERROR"
     $r = runperl: 
@@ -93,7 +93,7 @@ $filename = 'swtest.pm'
     open: my $f, ">", "$filename" or skip:  "Can't write temp file $filename: $^OS_ERROR",4 
     print: $f, <<'SWTESTPM'
 package swtest;
-sub import { print $^STDOUT, < map { "<$_>" }, @_ }
+sub import { print: $^STDOUT, < map: { "<$_>" }, @_ }
 1;
 SWTESTPM
     close $f or die: "Could not close: $^OS_ERROR"

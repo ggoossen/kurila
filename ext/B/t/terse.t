@@ -24,8 +24,8 @@ ok:  exists $sub->&, 'valid subref back from compile()'
 my $out = ""
 open: my $ouf_fh, '>>', \$out or die: 
 B::Concise::walk_output: $ouf_fh
-$sub = B::Terse::compile: '', 'bar'(
-$sub->& <: )
+$sub = B::Terse::compile: '', 'bar'
+$sub->& <:
 
 # now build some regexes that should match the dumped ops
 my (@: $hex, $op) = @: '\(0x[a-f0-9]+\)', '\s+\w+'
@@ -86,7 +86,7 @@ sub bar
 my $path = join: " ", map: { qq["-I$_"] }, $^INCLUDE_PATH
 $path = '-I::lib -MMac::err=unix' if $^OS_NAME eq 'MacOS'
 my $redir = $^OS_NAME eq 'MacOS' ?? '' !! "2>&1"
-my $items = qx{$^EXECUTABLE_NAME $path "-MO=Terse" -e "print \$^STDOUT, \\42" $redir}
+my $items = qx{$^EXECUTABLE_NAME $path "-MO=Terse" -e "print: \$^STDOUT, \\42" $redir}
 like:  $items, qr/IV $hex \\42/, 'RV (but now stored in an IV)' 
 
 package TieOut

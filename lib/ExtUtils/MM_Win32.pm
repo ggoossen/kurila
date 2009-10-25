@@ -166,7 +166,7 @@ sub init_others($self)
     $self->{+LD}     ||= %Config{?ld} || 'link'
     $self->{+AR}     ||= %Config{?ar} || 'lib'
 
-        $self->SUPER::init_others: 
+    $self->SUPER::init_others: 
 
     # Setting SHELL from $Config{sh} can break dmake.  Its ok without it.
     delete $self->{SHELL}

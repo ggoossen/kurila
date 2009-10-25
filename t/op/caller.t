@@ -19,16 +19,16 @@ is:  @c[4], undef, "args undef in an eval \{\}"
 
 eval q{ @c = (Caller(0))[3] }
 is:  @c[3], "(eval)", "subroutine name in an eval ''" 
-is:  @c[4], undef, "args undef in an eval ''" (
+is:  @c[4], undef, "args undef in an eval ''"
 
-sub (@< @_) { @c = (@:  (caller: 0) ) } ->& < : )
+sub (@< @_) { @c = (@:  (caller: 0) ) } ->& <:
 is:  @c[3], undef, "anonymous subroutine name" 
 ok:  defined @c[4], "hasargs defined with anon sub" 
 
 # Bug 20020517.003, used to dump core
 sub foo { @c = (@:  (caller: 0) ) }
-my $fooref = \(delete %main::{foo})(
-$fooref->*->& <: )
+my $fooref = \(delete %main::{foo})
+$fooref->*->& <:
 is:  @c[3], "main::foo", "unknown subroutine name" 
 ok:  defined @c[4], "args true with unknown sub" 
 
@@ -49,14 +49,14 @@ eval q{ f() }
 is:  @c[3], "(eval)", "subroutine name in an eval ''" 
 is:  @c[4], undef, "args false in an eval ''" 
 
-sub (@< @_) { (f: ) } ->& < : "myarg"
+sub (@< @_) { (f: ) } ->& <: "myarg"
 is:  @c[3], 'main::__ANON__', "anonymous subroutine name" 
 ok:  ( (nelems: @c[4]) == 1 and @c[4][0] eq "myarg" )
      "args is correct with anon sub" 
 
 sub foo2 { (f: ) }
-my $fooref2 = \(delete %main::{foo2})(
-$fooref2->* ->& < : )
+my $fooref2 = \(delete %main::{foo2})
+$fooref2->* ->& <:
 is:  @c[3], "main::foo2", "unknown subroutine name" 
 ok:  defined @c[4], "hasargs true with unknown sub" 
 

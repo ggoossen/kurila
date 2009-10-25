@@ -459,16 +459,12 @@ sub _ponder_paragraph_buffer($self)
         DEBUG: and print: $^STDOUT, "# Starting "
                           $starting_contentless ?? 'contentless' !! 'contentful'
                           " document\n"
-        
 
         $self->_handle_element_start: 
             ($scratch = 'Document')
-            \(%:
+            \ %:
                 'start_line' => $paras->[0]->[1]->{?'start_line'}
                 $starting_contentless ?? ( 'contentless' => 1 ) !! ()
-            )
-            
-    
 
     my($para, $para_type)
     while($paras->@)
@@ -1821,8 +1817,8 @@ sub pretty(@< @stuff) # adopted from Class::Classless
                                  ) { $_;
                              }else
                                  s<([^\x[20]\x[21]\x[23]\x[27]-\x[3F]\x[41]-\x[5B]\x[5D]-\x[7E]])>
-                    #<$pretty_form{$1} || '\\x'.(unpack("H2",$1))>eg;
-                    <$(%pretty_form{?$1} || '\\x['.(sprintf: "\%.2x", (ord: $1)) . ']')>g
+                                  #<$pretty_form{$1} || '\\x'.(unpack("H2",$1))>eg;
+                                  <$(%pretty_form{?$1} || '\\x['.(sprintf: "\%.2x", (ord: $1)) . ']')>g
                                  qq{"$_"}
                              }, @stuff
     # $out =~ s/\n */ /g if length($out) < 75;

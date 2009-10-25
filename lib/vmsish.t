@@ -171,11 +171,11 @@ plan: tests => 25
 
 #====== need this to make sure error messages come out, even if
 #       they were turned off in invoking procedure
-sub do_a_perl
+sub do_a_perl(@< @args)
     (open: my $p, ">",'vmsish_test.com') || die: 'not ok ?? : unable to open "vmsish_test.com" for writing'
     print: $p, "\$ set message/facil/sever/ident/text\n"
     print: $p, "\$ define/nolog/user sys\$error _nla0:\n"
-    print: $p, "\$ $Invoke_Perl $((join: ' ',@_))\n"
+    print: $p, "\$ $Invoke_Perl $((join: ' ',@args))\n"
     close $p
     my $x = `\@vmsish_test.com`
     unlink: 'vmsish_test.com'

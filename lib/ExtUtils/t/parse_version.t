@@ -29,7 +29,7 @@ while( my(@: ?$code, ?$expect) =(@:  each %versions) )
 
 for my $v (@: @: q[use version; $VERSION = v1.2.3;], v1.2.3
               (@: q[$VERSION = v1.2.3], v1.2.3))
-    is:  (parse_version_string: $v[0]), $v[1]->stringify: ), $v[0]
+    is:  (parse_version_string: $v[0]), ($v[1]->stringify: ), $v[0]
 
 
 sub parse_version_string
@@ -55,6 +55,6 @@ sub parse_version_string
 do
     is: (parse_version_string: q[ $VERSION = '1.00'; sub version { $VERSION } ])
         '1.00'
-    is: (parse_version_string: q[ use version; $VERSION = version->new("1.2.3") ])
+    is: (parse_version_string: q[ use version; $VERSION = version->new: "1.2.3" ])
         (qv: "1.2.3")->stringify: 
 

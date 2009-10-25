@@ -54,7 +54,7 @@ my $Why = "Just testing the skip interface."
 
 do
     my $warning
-    local $^WARN_HOOK = sub (@< @_) { $warning = @_[0]->message: ) }
+    local $^WARN_HOOK = sub (@< @_) { $warning = @_[0]->message: }
     :SKIP do
         # perl gets the line number a little wrong on the first
         # statement inside a block.
@@ -85,7 +85,7 @@ do
 
 do
     my $warning = ''
-    local $^WARN_HOOK = sub (@< @_) { $warning .= @_[0]->message: ) }
+    local $^WARN_HOOK = sub (@< @_) { $warning .= @_[0]->message: }
 
     :SKIP do
         (skip: 1, "This is backwards") if 1

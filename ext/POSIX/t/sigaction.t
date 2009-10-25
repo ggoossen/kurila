@@ -49,7 +49,7 @@ is: (signals::handler: "HUP"), &foo
 sigaction: SIGHUP, $newaction, $oldaction
 is: $oldaction->{?HANDLER}, &foo
 
-ok: $oldaction->{?MASK}->ismember: SIGUSR1), "SIGUSR1 ismember MASK"
+ok: ($oldaction->{?MASK}->ismember: SIGUSR1), "SIGUSR1 ismember MASK"
 
 :SKIP do
     skip: "sigaction() thinks different in $^OS_NAME", 1

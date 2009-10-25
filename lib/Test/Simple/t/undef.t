@@ -14,7 +14,7 @@ use Test::More tests => 18
 BEGIN { $^WARNING = 1; }
 
 my $warnings = ''
-local $^WARN_HOOK = sub (@< @_) { $warnings .= @_[0]->message: ) }
+local $^WARN_HOOK = sub (@< @_) { $warnings .= @_[0]->message: }
 
 my $TB = Test::Builder->new: 
 sub no_warnings

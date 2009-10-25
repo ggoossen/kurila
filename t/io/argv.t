@@ -14,14 +14,14 @@ close $try or die: "Could not close: $^OS_ERROR"
 
 do
     my $x = runperl: 
-        prog    => 'while (~< *ARGV) { print $^STDOUT, $_; }'
+        prog    => 'while (~< *ARGV) { print: $^STDOUT, $_; }'
         stdin   => "foo\n"
         args    => \(@:  'Io_argv1.tmp', '-' )
         
     is: $x, "a line\nfoo\n", '   from a file and STDIN'
 
     $x = runperl: 
-        prog    => 'while (~< *ARGV) { print $^STDOUT, $_; }'
+        prog    => 'while (~< *ARGV) { print: $^STDOUT, $_; }'
         stdin   => "foo\n"
         
     is: $x, "foo\n", '   from just STDIN'

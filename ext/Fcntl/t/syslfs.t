@@ -28,7 +28,7 @@ sub zap
     unlink: "big2"
 
 
-sub bye
+sub bye()
     (zap: )
     exit: 0
 

@@ -181,7 +181,7 @@ sub concise_cv_obj
         # walk_topdown($cv->ROOT, sub { $_[0]->concise($_[1]) }, 0);
         my $root = $cv->ROOT: 
         unless (ref $root eq 'B::NULL')
-            walk_topdown: $root, sub (@< @_) { @_[0]->concise: @_[1]) }, 0
+            walk_topdown: $root, sub (@< @_) { @_[0]->concise: @_[1] }, 0
         else
             print: $walkHandle, "B::NULL encountered doing ROOT on $cv. avoiding disaster\n"
 
@@ -203,8 +203,7 @@ sub concise_main
     elsif ($order eq "basic")
         return if (class: (main_root: )) eq "NULL"
         walk_topdown: (main_root: )
-                     sub (@< @_) { @_[0]->concise: @_[1]) }, 0
-
+                      sub (@< @_) { @_[0]->concise: @_[1] }, 0
 
 
 sub concise_specials($name, $order, @< @cv_s)
@@ -301,20 +300,20 @@ sub compile
                                   (B::begin_av->isa: "B::AV") ?? <
                                                    (B::begin_av->ARRAY: ) !! ()
             elsif ((type::is_plainvalue: $objname) && $objname eq "INIT")
-                concise_specials: "INIT", $order(
-                                  (B::init_av: )->isa: "B::AV") ?? <(
+                concise_specials: "INIT", $order
+                                  ((B::init_av: )->isa: "B::AV") ?? <(
                                                    (B::init_av: )->ARRAY: ) !! ()
             elsif ((type::is_plainvalue: $objname) && $objname eq "CHECK")
-                concise_specials: "CHECK", $order(
-                                  (B::check_av: )->isa: "B::AV") ?? <(
+                concise_specials: "CHECK", $order
+                                  ((B::check_av: )->isa: "B::AV") ?? <(
                                                    (B::check_av: )->ARRAY: ) !! ()
             elsif ((type::is_plainvalue: $objname) && $objname eq "UNITCHECK")
-                concise_specials: "UNITCHECK", $order(
-                                  (B::unitcheck_av: )->isa: "B::AV") ?? <(
+                concise_specials: "UNITCHECK", $order
+                                  ((B::unitcheck_av: )->isa: "B::AV") ?? <(
                                                    (B::unitcheck_av: )->ARRAY: ) !! ()
             elsif ((type::is_plainvalue: $objname) && $objname eq "END")
-                concise_specials: "END", $order(
-                                  (B::end_av: )->isa: "B::AV") ?? <(
+                concise_specials: "END", $order
+                                  ((B::end_av: )->isa: "B::AV") ?? <(
                                                    (B::end_av: )->ARRAY: ) !! ()
             else
                 # convert function names to subrefs
@@ -738,7 +737,7 @@ sub concise_op($op, $level, $format)
             %h{+targarglife} = %h{+targarg} = "%h{?targ} $refs"
 
     elsif (%h{?targ})
-        my $padname = (((($curcv->PADLIST: )->ARRAY: ))[0]->ARRAY: ))[%h{?targ}]
+        my $padname = ((($curcv->PADLIST: )->ARRAY: )[0]->ARRAY: )[%h{?targ}]
         if (defined $padname and (class: $padname) ne "SPECIAL")
             %h{+targarg}  = $padname->PVX_const: 
             if (($padname->FLAGS: ) ^&^ SVf_FAKE)
@@ -782,7 +781,7 @@ sub concise_op($op, $level, $format)
             # same as the last case, except the value is actually a
             # pad offset for where the GV is kept (this happens under
             # ithreads)
-            my $gv = ( <( <(($curcv->PADLIST: )->ARRAY: ))[[1]]->ARRAY: ))[[$pmreplroot]]
+            my $gv = ( <(($curcv->PADLIST: )->ARRAY: )[[1]]->ARRAY: )[$pmreplroot]
             %h{+arg} = "($precomp => \@" . ($gv->NAME: ) . ")"
         elsif (($op->pmreplstart: )->$)
             undef $lastnext
@@ -821,7 +820,7 @@ sub concise_op($op, $level, $format)
             my $idx = (%h{?class} eq "SVOP") ?? ($op->targ: ) !! $op->padix: 
             my $preferpv = %h{?name} eq "method_named"
             if (%h{?class} eq "PADOP" or !($op->sv: )->$)
-                my $sv =( ($curcv->PADLIST: )->ARRAY: )[1]->ARRAY: )[$idx]
+                my $sv = ((($curcv->PADLIST: )->ARRAY: )[1]->ARRAY: )[$idx]
                 %h{+arg} = "[" . (concise_sv: $sv, \%h, $preferpv) . "]"
                 %h{+targarglife} = %h{+targarg} = ""
             else

@@ -89,7 +89,7 @@ is:  $mm->{PERM_RWX}, 755,    'PERM_RWX'
 # INST_*
 is:  $mm->{INST_ARCHLIB}
      $mm->{PERL_CORE} ?? $mm->{PERL_ARCHLIB}
-     !! (File::Spec->catdir: $Curdir, 'blib', 'arch')
+         !! (File::Spec->catdir: $Curdir, 'blib', 'arch')
      'INST_ARCHLIB'
 is:  $mm->{INST_BIN},     (File::Spec->catdir: $Curdir, 'blib', 'bin')
      'INST_BIN' 
@@ -99,7 +99,7 @@ my(@: $child_pack) =  keys $mm->{CHILDREN}
 my $c_mm = $mm->{CHILDREN}{$child_pack}
 is:  $c_mm->{INST_ARCHLIB}
      $c_mm->{PERL_CORE} ?? $c_mm->{PERL_ARCHLIB}
-     !! (File::Spec->catdir: $Updir, 'blib', 'arch')
+         !! (File::Spec->catdir: $Updir, 'blib', 'arch')
      'CHILD INST_ARCHLIB'
 is:  $c_mm->{INST_BIN},     (File::Spec->catdir: $Updir, 'blib', 'bin')
      'CHILD INST_BIN' 

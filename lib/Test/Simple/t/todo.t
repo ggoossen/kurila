@@ -64,7 +64,7 @@ pass: "This is still not todo"
 
 do
     my $warning
-    local $^WARN_HOOK = sub (@< @_) { $warning = @_[0]->message: ) }
+    local $^WARN_HOOK = sub (@< @_) { $warning = @_[0]->message: }
     :TODO do
         # perl gets the line number a little wrong on the first
         # statement inside a block.

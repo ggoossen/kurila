@@ -47,20 +47,20 @@ do
     
     # In z/OS \x41,\x8c are the codepoints corresponding to \x80,\xc4 respectively under ASCII platform
     if ((ord: 'A') == 193) # EBCDIC?
-        is: (bytes::substr: $c, 0, 1), "\x8c", "bytes::substr under use bytes looks at bytes"
-        is: (bytes::index: $c, "\x41"), 1, "bytes::index under use bytes looks at bytes"
-        is: (bytes::rindex: $c, "\x8c"), 0, "bytes::rindex under use bytes looks at bytes"
+        is: (bytes::substr: $c, 0, 1), "\x[8c]", "bytes::substr under use bytes looks at bytes"
+        is: (bytes::index: $c, "\x[41]"), 1, "bytes::index under use bytes looks at bytes"
+        is: (bytes::rindex: $c, "\x[8c]"), 0, "bytes::rindex under use bytes looks at bytes"
 
     else
-        is: (bytes::substr: $c, 0, 1), "\xc4", "bytes::substr under use bytes looks at bytes"
-        is: (bytes::index: $c, "\x80"), 1, "bytes::index under use bytes looks at bytes"
-        is: (bytes::rindex: $c, "\xc4"), 0, "bytes::rindex under use bytes looks at bytes"
+        is: (bytes::substr: $c, 0, 1), "\x[c4]", "bytes::substr under use bytes looks at bytes"
+        is: (bytes::index: $c, "\x[80]"), 1, "bytes::index under use bytes looks at bytes"
+        is: (bytes::rindex: $c, "\x[c4]"), 0, "bytes::rindex under use bytes looks at bytes"
     
 
 
 
 do
-    fresh_perl_like: 'use bytes; bytes::moo()'
+    fresh_perl_like: 'use bytes; bytes::moo:'
                      qr/Undefined subroutine &bytes::moo/, \(%: stderr=>1)
                      "Check Carp is loaded for AUTOLOADing errors"
 

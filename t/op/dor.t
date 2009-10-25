@@ -61,9 +61,9 @@ eval q# sub f ($y) { } f $x / 2; #
 is:  $^EVAL_ERROR, '' 
 eval q# sub f ($y) { } f $x /2; #
 is:  $^EVAL_ERROR, '' 
-eval q# sub { print $fh / 2 } #
+eval q# sub { print: $fh / 2 } #
 is:  $^EVAL_ERROR, '' 
-eval q# sub { print $fh /2 } #
+eval q# sub { print: $fh /2 } #
 is:  $^EVAL_ERROR, '' 
 
 # [perl #28123] Perl optimizes // away incorrectly

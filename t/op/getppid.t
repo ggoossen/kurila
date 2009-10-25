@@ -23,7 +23,7 @@ BEGIN
 
 sub fork_and_retrieve
     my $which = shift
-    pipemy : $r, $w or die: "pipe: $^OS_ERROR\n"
+    pipe : my ($r, $w) or die: "pipe: $^OS_ERROR\n"
     my $pid = fork; defined $pid or die: "fork: $^OS_ERROR\n"
 
     if ($pid)
@@ -54,10 +54,10 @@ sub fork_and_retrieve
             sleep 1
         else
             # grandchild
-            my $ppid1 = getppid()
+            my $ppid1 = getppid: ;
             # Wait for immediate parent to exit
             sleep 2
-            my $ppid2 = getppid()
+            my $ppid2 = getppid: ;
             print: $w, "$ppid1,$ppid2\n"
         
         exit 0

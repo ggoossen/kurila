@@ -42,16 +42,16 @@ is: ($sub->& <: 4), 5
 sub threeargs($x, $y, $z)
     return 1
 
-dies_like:  {( &threeargs->& < 1, 2)}
+dies_like:  {( &threeargs->& <: 1, 2)}
             qr/Not enough arguments for main::threeargs/
             "runtime min argument check" 
-dies_like:  {( &threeargs->& < 1, 2, 3, 4)}
+dies_like:  {( &threeargs->& <: 1, 2, 3, 4)}
             qr/Too many arguments for main::threeargs/
             "runtime max argument check" 
-eval_dies_like:  'sub { main::threeargs(1, 2) }'
+eval_dies_like:  'sub { main::threeargs: 1, 2 }'
                  qr/Not enough arguments for main::threeargs/
                  "compile-time min argument check" 
-eval_dies_like:  'sub { threeargs(1, 2, 3, 4) }'
+eval_dies_like:  'sub { threeargs: 1, 2, 3, 4 }'
                  qr/Too many arguments for main::threeargs/
                  "compile-time min argument check" 
 

@@ -29,31 +29,31 @@ if(1)
         $y = \$x
         $z = \$x
     
-    print: $^STDOUT, "# START\n"(
-    Dump: $y); Dump: $z
+    print: $^STDOUT, "# START\n"
+    Dump: $y; Dump: $z
 
     ok:  ref: $y and ref: $z
 
     print: $^STDOUT, "# WEAK:\n"
-    weaken: $y(
-    Dump: $y); Dump: $z
+    weaken: $y
+    Dump: $y; Dump: $z
 
     ok:  ref: $y and ref: $z
 
     print: $^STDOUT, "# UNDZ:\n"
-    undef($z)(
-    Dump: $y); Dump: $z
+    undef($z)
+    Dump: $y; Dump: $z
 
-    ok:  (not: defined: $y and defined: $z) 
+    ok: (not: (defined: $y and defined: $z))
 
     print: $^STDOUT, "# UNDY:\n"
-    undef($y)(
-    Dump: $y); Dump: $z
+    undef($y)
+    Dump: $y; Dump: $z
 
-    ok:  (not: defined: $y and defined: $z) 
+    ok:  (not: (defined: $y and defined: $z))
 
-    print: $^STDOUT, "# FIN:\n"(
-    Dump: $y); Dump: $z
+    print: $^STDOUT, "# FIN:\n"
+    Dump: $y; Dump: $z
 
 
     #
@@ -65,7 +65,6 @@ if(1)
     do
         my $x = "foo"
         $y = \$x
-    
 
     ok:  (ref: $y) 
     print: $^STDOUT, "# BW: \n"

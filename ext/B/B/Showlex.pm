@@ -63,10 +63,10 @@ sub newlex($objname, $names, $vals)
     my @vals  = $vals->ARRAY: 
     my $count = (nelems @names)
     print: $walkHandle, "$objname Pad has $count entries\n"
-    printf: $walkHandle, "0: \%s\n", @names[0]->terse: ) unless $nosp1
+    printf: $walkHandle, "0: \%s\n", @names[0]->terse: unless $nosp1
     for my $i (1..$count -1)
-        printf: $walkHandle, "$i: \%s = \%s\n", @names[$i]->terse: ), @vals[$i]->terse: 
-            unless $nosp1 and @names[$i]->terse: ) =~ m/SPECIAL/
+        printf: $walkHandle, "$i: \%s = \%s\n", ( @names[$i]->terse: ), @vals[$i]->terse: 
+            unless $nosp1 and ( @names[$i]->terse: ) =~ m/SPECIAL/
     
 
 

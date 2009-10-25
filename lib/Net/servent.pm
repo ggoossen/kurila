@@ -35,7 +35,7 @@ sub populate
     return $sob
 
 
-sub getservent    (   ) { (populate: CORE::getservent()) }
+sub getservent    (   ) { populate: CORE::getservent: }
 sub getservbyname ($name, ?$proto) { (populate: (CORE::getservbyname: $name,$proto||'tcp')) }
 sub getservbyport ($port, ?$proto) { (populate: (CORE::getservbyport: $port,$proto||'tcp')) }
 

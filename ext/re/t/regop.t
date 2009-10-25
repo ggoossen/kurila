@@ -35,8 +35,6 @@ foreach my $testout (  @tests )
         ok:  $testout=~m/\Q$_\E/, "$_: /$pattern/" 
             or do
             !$diaged++ and diag: "$_: /$pattern/\n'$testout'"
-        
-    
 
 
 # The format below is simple. Each line is an exact

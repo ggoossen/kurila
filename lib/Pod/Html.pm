@@ -1748,7 +1748,7 @@ sub go_ahead( $rstr, $func, $closing)
 sub emit_C( $text, ?$nocode, ?$args)
     $args = '' unless defined $args
     my $res
-    my(@:  $url, $fid ) =  coderef:  undef(), $text 
+    my(@:  $url, $fid ) =  coderef: undef, $text 
 
     # need HTML-safe text
     my $linktext = html_escape:  "$text$args" 

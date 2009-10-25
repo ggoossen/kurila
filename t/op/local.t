@@ -186,9 +186,9 @@ do
     no warnings "redefine"
     do
         local *f1 = sub()  { "g1" }
-        main::ok: ((&f1->& <)) eq "g1", "localised sub via glob"
+        main::ok: (&f1->& <: ) eq "g1", "localised sub via glob"
     
-    main::ok: ((&f1->& <)) eq "f1", "localised sub restored"
+    main::ok: (&f1->& <: ) eq "f1", "localised sub restored"
     do
         main::eval_dies_like:  'local %Other::{+"f1"} = sub { "h1" }'
                                qr/can't localize a glob/, "localised sub via stash" 

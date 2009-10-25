@@ -36,7 +36,7 @@ print "not ok 1\n";
 END
     
 
-sub setup_recurs
+sub setup_recurs()
     (setup_mm_test_root: )
     chdir 'MM_TEST_ROOT:[t]' if $^OS_NAME eq 'VMS'
 

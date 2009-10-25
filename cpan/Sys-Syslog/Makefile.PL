@@ -65,11 +65,10 @@ WriteMakefile:
     INSTALLDIRS     => 'perl'
     XSPROTOARG      => '-noprototypes'
     PM              => %virtual_path
-    PREREQ_PM       => (%:
+    PREREQ_PM       => %:
         'Test::More' => 0
         'XSLoader'   => 0
         < @extra_prereqs
-    )
     dist            => (%:  COMPRESS => 'gzip -9f', SUFFIX => 'gz', )
     clean           => (%:  FILES => 'Sys-Syslog-*' )
     realclean       => (%:  FILES => 'lib const-c.inc const-xs.inc macros.all PerlLog.h *.bak *.bin *.rc' )

@@ -112,7 +112,7 @@ sub hash
 
 use constant PVBM => 'foo'
 
-my $dummy = (index: 'foo' (PVBM: ))
+my $dummy = (index: 'foo', (PVBM: ))
 try { my %h = (%: a => (PVBM: )); 1 }
 
 ok: !$^EVAL_ERROR, 'fbm scalar can be inserted into a hash'

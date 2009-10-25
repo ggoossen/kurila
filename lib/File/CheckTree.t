@@ -78,8 +78,6 @@ do
         ok: 1
     else
         ok: 0
-    
-
 
 
 #### TEST 3 -- Multiple warnings ####
@@ -96,7 +94,7 @@ do
             lib     -effd
             README -f || die
             README -d || warn
-            lib    -f || warn "my warning: $file\n"
+            lib    -f || warn: "my warning: $file\n"
         };
     }
 
@@ -109,8 +107,6 @@ do
         ok: 1
     else
         ok: 0
-    
-
 
 
 #### TEST 4 -- cd directive ####
@@ -143,8 +139,6 @@ do
         ok: 1
     else
         ok: 0
-    
-
 
 
 #### TEST 5 -- Exception ####
@@ -175,7 +169,7 @@ do
 
     try {
         $num_warnings = validate: q{
-            lib       -ef || die "yadda $file yadda...\n"
+            lib       -ef || die: "yadda $file yadda...\n"
             README    -d
         };
     }
@@ -185,7 +179,6 @@ do
         ok: 1
     else
         ok: 0
-    
 
 
 #### TEST 7 -- Quoted file names ####
