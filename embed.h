@@ -240,6 +240,9 @@
 #define dump_form		Perl_dump_form
 #define gv_dump			Perl_gv_dump
 #define op_dump			Perl_op_dump
+#ifdef PERL_CORE
+#define codeseq_dump		Perl_codeseq_dump
+#endif
 #define pmop_dump		Perl_pmop_dump
 #define dump_packsubs		Perl_dump_packsubs
 #ifdef PERL_CORE
@@ -2627,6 +2630,9 @@
 #define dump_form(a)		Perl_dump_form(aTHX_ a)
 #define gv_dump(a)		Perl_gv_dump(aTHX_ a)
 #define op_dump(a)		Perl_op_dump(aTHX_ a)
+#ifdef PERL_CORE
+#define codeseq_dump(a)		Perl_codeseq_dump(aTHX_ a)
+#endif
 #define pmop_dump(a)		Perl_pmop_dump(aTHX_ a)
 #define dump_packsubs(a)	Perl_dump_packsubs(aTHX_ a)
 #ifdef PERL_CORE

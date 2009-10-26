@@ -33,10 +33,12 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
         o = o->op_next;
     }
     codeseq->xcodeseq_instructions[idx].instr_ppaddr = NULL;
+
+    DEBUG_x(codeseq_dump(codeseq));
 }
 
 INSTRUCTION*
-Perl_codeseq_start_instruction(pTHX_ CODESEQ* codeseq)
+Perl_codeseq_start_instruction(pTHX_ const CODESEQ* codeseq)
 {
     PERL_ARGS_ASSERT_CODESEQ_START_INSTRUCTION;
     return codeseq->xcodeseq_instructions;

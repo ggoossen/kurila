@@ -103,6 +103,9 @@ Perl_dump_all_perl(pTHX_ bool justperl)
     PerlIO_setlinebuf(Perl_debug_log);
     if (PL_main_root)
 	op_dump(PL_main_root);
+    if (PL_main_cv && CvCODESEQ(PL_main_cv)) {
+	codeseq_dump(CvCODESEQ(PL_main_cv));
+    }
     dump_packsubs_perl(PL_defstash, justperl);
 }
 
@@ -1169,6 +1172,26 @@ Perl_op_dump(pTHX_ const OP *o)
 {
     PERL_ARGS_ASSERT_OP_DUMP;
     do_op_dump(0, Perl_debug_log, o);
+}
+
+void
+Perl_codeseq_dump(pTHX_ const CODESEQ *codeseq)
+{
+    INSTRUCTION *instr;
+
+    PerlIO_printf(Perl_debug_log, "Instructions of codeseq (0x%"UVxf"):\n", PTR2UV(codeseq));
+    for( instr = codeseq_start_instruction(codeseq) ;
+	 instr->instr_ppaddr ;
+	 instr++ ) {
+	Optype optype;
+	for (optype = 0; optype < OP_CUSTOM; optype++) {
+	    if (PL_ppaddr[optype] == instr->instr_ppaddr) {
+		break;
+	    }
+	}
+	PerlIO_printf(Perl_debug_log, "%s\n", PL_op_name[optype]);
+    }
+    PerlIO_printf(Perl_debug_log, "\n");
 }
 
 void
