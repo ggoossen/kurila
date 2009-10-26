@@ -2282,7 +2282,11 @@ S_run_body(pTHX_ I32 oldscope)
     }
     else if (PL_main_start) {
 	CvDEPTH(PL_main_cv) = 1;
-	PL_op = PL_main_start;
+	if (! CvCODESEQ(PL_main_cv)) {
+	    CvCODESEQ(PL_main_cv) = new_codeseq();
+	    compile_op(PL_main_start, CvCODESEQ(PL_main_cv));
+	}
+	PL_curinstruction = codeseq_start_instruction(CvCODESEQ(PL_main_cv));
 	CALLRUNOPS(aTHX);
     }
     my_exit(0);

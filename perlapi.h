@@ -228,6 +228,8 @@ END_EXTERN_C
 #define PL_curcop		(*Perl_Icurcop_ptr(aTHX))
 #undef  PL_curcopdb
 #define PL_curcopdb		(*Perl_Icurcopdb_ptr(aTHX))
+#undef  PL_curinstruction
+#define PL_curinstruction	(*Perl_Icurinstruction_ptr(aTHX))
 #undef  PL_curpad
 #define PL_curpad		(*Perl_Icurpad_ptr(aTHX))
 #undef  PL_curpm

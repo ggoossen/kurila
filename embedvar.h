@@ -96,6 +96,7 @@
 #define PL_cryptseen		(vTHX->Icryptseen)
 #define PL_curcop		(vTHX->Icurcop)
 #define PL_curcopdb		(vTHX->Icurcopdb)
+#define PL_curinstruction	(vTHX->Icurinstruction)
 #define PL_curpad		(vTHX->Icurpad)
 #define PL_curpm		(vTHX->Icurpm)
 #define PL_curstack		(vTHX->Icurstack)
@@ -413,6 +414,7 @@
 #define PL_Icryptseen		PL_cryptseen
 #define PL_Icurcop		PL_curcop
 #define PL_Icurcopdb		PL_curcopdb
+#define PL_Icurinstruction	PL_curinstruction
 #define PL_Icurpad		PL_curpad
 #define PL_Icurpm		PL_curpm
 #define PL_Icurstack		PL_curstack

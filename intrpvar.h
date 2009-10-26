@@ -37,6 +37,15 @@ PERLVAR(Iopsave,	OP *)
 #else
 PERLVAR(Iop,		OP *)		/* currently executing op */
 #endif
+/*
+=for perlhack
+PL_curinstruction
+
+Pointer to the currently being executed instruction.
+=cut
+*/
+PERLVARI(Icurinstruction,   INSTRUCTION *, NULL)
+
 PERLVAR(Icurpad,	SV **)		/* active pad (lexicals+tmps) */
 
 PERLVAR(Istack_base,	SV **)

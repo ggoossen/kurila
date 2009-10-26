@@ -2367,6 +2367,8 @@ typedef struct padop PADOP;
 typedef struct pvop PVOP;
 typedef struct loop LOOP;
 
+typedef struct codeseq CODESEQ;
+
 typedef struct interpreter PerlInterpreter;
 
 /* Amdahl's <ksync.h> has struct sv */

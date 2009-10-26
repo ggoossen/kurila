@@ -6753,6 +6753,23 @@ PERL_CALLCONV int	Perl_keyword_plugin_standard(pTHX_ char* keyword_ptr, STRLEN k
 	assert(keyword_ptr); assert(op_ptr)
 
 
+PERL_CALLCONV INSTRUCTION*	Perl_codeseq_start_instruction(pTHX_ CODESEQ* codeseq)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_CODESEQ_START_INSTRUCTION	\
+	assert(codeseq)
+
+PERL_CALLCONV void	Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_COMPILE_OP	\
+	assert(startop); assert(codeseq)
+
+PERL_CALLCONV CODESEQ*	Perl_new_codeseq(pTHX)
+			__attribute__malloc__
+			__attribute__warn_unused_result__;
+
+PERL_CALLCONV void	Perl_free_codeseq(pTHX_ CODESEQ* codeseq);
+
 END_EXTERN_C
 /*
  * ex: set ts=8 sts=4 sw=4 noet:

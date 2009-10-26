@@ -2016,7 +2016,7 @@ int
 Perl_runops_debug(pTHX)
 {
     dVAR;
-    if (!PL_op) {
+    if (!PL_curinstruction->instr_ppaddr) {
 	Perl_ck_warner_d(aTHX_ packWARN(WARN_DEBUGGING), "NULL OP IN RUN");
 	return 0;
     }
@@ -2044,7 +2044,10 @@ Perl_runops_debug(pTHX)
 	    if (DEBUG_t_TEST_) debop(PL_op);
 	    if (DEBUG_P_TEST_) debprof(PL_op);
 	}
-    } while ((PL_op = CALL_FPTR(PL_op->op_ppaddr)(aTHX)));
+	PL_op = PL_curinstruction->instr_op;
+	CALL_FPTR(PL_curinstruction->instr_ppaddr)(aTHX);
+	PL_curinstruction++;
+    } while (PL_curinstruction->instr_ppaddr);
     DEBUG_l(Perl_deb(aTHX_ "leaving RUNOPS level\n"));
 
     TAINT_NOT;

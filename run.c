@@ -37,7 +37,8 @@ int
 Perl_runops_standard(pTHX)
 {
     dVAR;
-    while ((PL_op = CALL_FPTR(PL_op->op_ppaddr)(aTHX))) {
+    while (CALL_FPTR(PL_curinstruction->instr_ppaddr)(aTHX)) {
+	PL_curinstruction++;
 	PERL_ASYNC_CHECK();
     }
 

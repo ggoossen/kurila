@@ -2252,6 +2252,11 @@ xpoM	|struct refcounted_he *|store_cop_label \
 
 xpo	|int	|keyword_plugin_standard|NN char* keyword_ptr|STRLEN keyword_len|NN OP** op_ptr
 
+p	|INSTRUCTION*	|codeseq_start_instruction|NN CODESEQ* codeseq
+p	|void	|compile_op|NN OP* startop|NN CODESEQ* codeseq
+ap	|CODESEQ*	|new_codeseq
+p	|void	|free_codeseq|NULLOK CODESEQ* codeseq
+
 END_EXTERN_C
 /*
  * ex: set ts=8 sts=4 sw=4 noet:
