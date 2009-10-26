@@ -206,7 +206,7 @@ ApR	|I32	|cxinc
 Afp	|void	|deb		|NN const char* pat|...
 Ap	|void	|vdeb		|NN const char* pat|NULLOK va_list* args
 Ap	|void	|debprofdump
-Ap	|I32	|debop		|NN const OP* o
+p	|void	|debug_instruction		|NN const INSTRUCTION* instr
 Ap	|I32	|debstack
 Ap	|I32	|debstackptrs
 Anp	|char*	|delimcpy	|NN char* to|NN const char* toend|NN const char* from \
@@ -1600,7 +1600,7 @@ s	|void	|qsortsvu	|NULLOK SV** array|size_t num_elts|NN SVCOMPARE_t compare
 #endif
 
 #if defined(PERL_IN_PP_SYS_C) || defined(PERL_DECL_PROT)
-s	|OP*	|doform		|NN CV *cv|NN GV *gv|NN OP *retop
+s	|OP*	|doform		|NN CV *cv|NN GV *gv|NN OP *ret_instr
 #  if !defined(HAS_MKDIR) || !defined(HAS_RMDIR)
 sR	|int	|dooneliner	|NN const char *cmd|NN const char *filename
 #  endif
@@ -2257,6 +2257,7 @@ p	|INSTRUCTION*	|codeseq_start_instruction|NN const CODESEQ* codeseq
 p	|void	|compile_op|NN OP* startop|NN CODESEQ* codeseq
 ap	|CODESEQ*	|new_codeseq
 p	|void	|free_codeseq|NULLOK CODESEQ* codeseq
+p	|const char*	|instruction_name|NULLOK const INSTRUCTION* instr
 
 END_EXTERN_C
 /*

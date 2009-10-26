@@ -32,11 +32,9 @@ C<instr_ppaddr> can be C<NULL> indicating the end of the instructions.
 */
 
 struct instruction {
-    OP*		(CPERLscope(*instr_ppaddr))(pTHX);
+    INSTRUCTION*		(CPERLscope(*instr_ppaddr))(pTHX);
     OP*         instr_op;
 };
-
-typedef struct instruction INSTRUCTION;
 
 /*
 =head2 C<CODESEQ>

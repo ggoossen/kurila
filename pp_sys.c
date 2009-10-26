@@ -1244,7 +1244,7 @@ PP(pp_getc)
 }
 
 STATIC OP *
-S_doform(pTHX_ CV *cv, GV *gv, OP *retop)
+S_doform(pTHX_ CV *cv, GV *gv, OP *ret_instr)
 {
     dVAR;
     register PERL_CONTEXT *cx;
@@ -1256,7 +1256,7 @@ S_doform(pTHX_ CV *cv, GV *gv, OP *retop)
     SAVETMPS;
 
     PUSHBLOCK(cx, CXt_FORMAT, PL_stack_sp);
-    PUSHFORMAT(cx, retop);
+    PUSHFORMAT(cx, ret_instr);
     SAVECOMPPAD();
     PAD_SET_CUR_NOSAVE(CvPADLIST(cv), 1);
 
@@ -1437,7 +1437,7 @@ PP(pp_leavewrite)
     PUTBACK;
     PERL_UNUSED_VAR(newsp);
     PERL_UNUSED_VAR(gimme);
-    return cx->blk_sub.retop;
+    return cx->blk_sub.ret_instr;
 }
 
 PP(pp_prtf)

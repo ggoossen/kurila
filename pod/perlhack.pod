@@ -667,12 +667,12 @@ and the context and data stacks, as shown by C<-Dstv>, look like:
     STACK 0: MAIN
       CX 0: BLOCK  =>
       CX 1: EVAL   => AV()  PV("A"\0)
-      retop=leave
+      ret_instr=leave
     STACK 1: MAGIC
       CX 0: SUB    =>
-      retop=(null)
+      ret_instr=(null)
       CX 1: EVAL   => *
-    retop=nextstate
+    ret_instr=nextstate
 
 The die pops the first C<CxEVAL> off the context stack, sets
 C<PL_restartop> from it, does a C<JMPENV_JUMP(3)>, and control returns to
@@ -686,10 +686,10 @@ now looks like this, ie with the top CxEVAL popped:
     STACK 0: MAIN
       CX 0: BLOCK  =>
       CX 1: EVAL   => AV()  PV("A"\0)
-      retop=leave
+      ret_instr=leave
     STACK 1: MAGIC
       CX 0: SUB    =>
-      retop=(null)
+      ret_instr=(null)
 
 The die on line 4 pops the context stack back down to the CxEVAL, leaving
 it as:

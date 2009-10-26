@@ -8,7 +8,7 @@
  *
  */
 
-#define PP(s) OP * Perl_##s(pTHX)
+#define PP(s) INSTRUCTION * Perl_##s(pTHX)
 
 /*
 =head1 Stack Manipulation Macros
@@ -85,7 +85,7 @@ Refetch the stack pointer.  Used after a callback.  See L<perlcall>.
 
 #define dTARG SV *targ
 
-#define NORMAL PL_op->op_next
+#define NORMAL (++PL_curinstruction)
 #define DIE Perl_die
 
 /*
@@ -120,6 +120,7 @@ Pops a long off the stack.
 #define PUTBACK		PL_stack_sp = sp
 #define RETURN		return (PUTBACK, NORMAL)
 #define RETURNOP(o)	return (PUTBACK, o)
+#define RETURNINSTR(instr)	return (PUTBACK, (instr))
 #define RETURNX(x)	return (x, PUTBACK, NORMAL)
 
 #define POPs		(*sp--)

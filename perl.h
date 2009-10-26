@@ -2367,6 +2367,7 @@ typedef struct padop PADOP;
 typedef struct pvop PVOP;
 typedef struct loop LOOP;
 
+typedef struct instruction INSTRUCTION;
 typedef struct codeseq CODESEQ;
 
 typedef struct interpreter PerlInterpreter;
@@ -4832,7 +4833,7 @@ typedef void (*XSUBADDR_t) (pTHX_ CV *);
 #define PERLVARIC(var,type,init) type var;
 #define PERLVARISC(var,init) const char var[sizeof(init)];
 
-typedef OP* (CPERLscope(*Perl_ppaddr_t))(pTHX);
+typedef INSTRUCTION* (CPERLscope(*Perl_ppaddr_t))(pTHX);
 typedef OP* (CPERLscope(*Perl_check_t)) (pTHX_ OP*);
 typedef void(CPERLscope(*Perl_ophook_t))(pTHX_ OP*);
 typedef int (CPERLscope(*Perl_keyword_plugin_t))(pTHX_ char*, STRLEN, OP**);
@@ -4926,7 +4927,7 @@ struct tempsym; /* defined in pp_pack.c */
 #undef PERL_CKDEF
 #undef PERL_PPDEF
 #define PERL_CKDEF(s)	PERL_CALLCONV OP *s (pTHX_ OP *o);
-#define PERL_PPDEF(s)	PERL_CALLCONV OP *s (pTHX);
+#define PERL_PPDEF(s)	PERL_CALLCONV INSTRUCTION *s (pTHX);
 
 #include "proto.h"
 

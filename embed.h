@@ -144,7 +144,9 @@
 #define deb			Perl_deb
 #define vdeb			Perl_vdeb
 #define debprofdump		Perl_debprofdump
-#define debop			Perl_debop
+#ifdef PERL_CORE
+#define debug_instruction	Perl_debug_instruction
+#endif
 #define debstack		Perl_debstack
 #define debstackptrs		Perl_debstackptrs
 #define delimcpy		Perl_delimcpy
@@ -2026,6 +2028,7 @@
 #define compile_op		Perl_compile_op
 #define new_codeseq		Perl_new_codeseq
 #define free_codeseq		Perl_free_codeseq
+#define instruction_name	Perl_instruction_name
 #endif
 #define ck_anoncode		Perl_ck_anoncode
 #define ck_bitop		Perl_ck_bitop
@@ -2533,7 +2536,9 @@
 #define cxinc()			Perl_cxinc(aTHX)
 #define vdeb(a,b)		Perl_vdeb(aTHX_ a,b)
 #define debprofdump()		Perl_debprofdump(aTHX)
-#define debop(a)		Perl_debop(aTHX_ a)
+#ifdef PERL_CORE
+#define debug_instruction(a)	Perl_debug_instruction(aTHX_ a)
+#endif
 #define debstack()		Perl_debstack(aTHX)
 #define debstackptrs()		Perl_debstackptrs(aTHX)
 #define delimcpy		Perl_delimcpy
@@ -4443,6 +4448,7 @@
 #define compile_op(a,b)		Perl_compile_op(aTHX_ a,b)
 #define new_codeseq()		Perl_new_codeseq(aTHX)
 #define free_codeseq(a)		Perl_free_codeseq(aTHX_ a)
+#define instruction_name(a)	Perl_instruction_name(aTHX_ a)
 #endif
 #define ck_anoncode(a)		Perl_ck_anoncode(aTHX_ a)
 #define ck_bitop(a)		Perl_ck_bitop(aTHX_ a)

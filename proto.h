@@ -499,10 +499,10 @@ PERL_CALLCONV void	Perl_vdeb(pTHX_ const char* pat, va_list* args)
 	assert(pat)
 
 PERL_CALLCONV void	Perl_debprofdump(pTHX);
-PERL_CALLCONV I32	Perl_debop(pTHX_ const OP* o)
+PERL_CALLCONV void	Perl_debug_instruction(pTHX_ const INSTRUCTION* instr)
 			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DEBOP	\
-	assert(o)
+#define PERL_ARGS_ASSERT_DEBUG_INSTRUCTION	\
+	assert(instr)
 
 PERL_CALLCONV I32	Perl_debstack(pTHX);
 PERL_CALLCONV I32	Perl_debstackptrs(pTHX);
@@ -5190,12 +5190,12 @@ STATIC void	S_qsortsvu(pTHX_ SV** array, size_t num_elts, SVCOMPARE_t compare)
 #endif
 
 #if defined(PERL_IN_PP_SYS_C) || defined(PERL_DECL_PROT)
-STATIC OP*	S_doform(pTHX_ CV *cv, GV *gv, OP *retop)
+STATIC OP*	S_doform(pTHX_ CV *cv, GV *gv, OP *ret_instr)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
 #define PERL_ARGS_ASSERT_DOFORM	\
-	assert(cv); assert(gv); assert(retop)
+	assert(cv); assert(gv); assert(ret_instr)
 
 #  if !defined(HAS_MKDIR) || !defined(HAS_RMDIR)
 STATIC int	S_dooneliner(pTHX_ const char *cmd, const char *filename)
@@ -6774,6 +6774,7 @@ PERL_CALLCONV CODESEQ*	Perl_new_codeseq(pTHX)
 			__attribute__warn_unused_result__;
 
 PERL_CALLCONV void	Perl_free_codeseq(pTHX_ CODESEQ* codeseq);
+PERL_CALLCONV const char*	Perl_instruction_name(pTHX_ const INSTRUCTION* instr);
 
 END_EXTERN_C
 /*

@@ -2480,7 +2480,7 @@ PP(pp_leavesub)
     PL_curpm = newpm;	/* ... and pop $1 et al */
 
     LEAVESUB(sv);
-    return cx->blk_sub.retop;
+    return cx->blk_sub.ret_instr;
 }
 
 /* This duplicates the above code because the above code must not
@@ -2644,7 +2644,7 @@ PP(pp_leavesublv)
     PL_curpm = newpm;	/* ... and pop $1 et al */
 
     LEAVESUB(sv);
-    return cx->blk_sub.retop;
+    return cx->blk_sub.ret_instr;
 }
 
 PP(pp_entersub)
@@ -2783,7 +2783,7 @@ try_autoload:
 	AV* const padlist = CvPADLIST(cv);
 	PUSHBLOCK(cx, CXt_SUB, MARK);
 	PUSHSUB(cx);
-	cx->blk_sub.retop = PL_op->op_next;
+	cx->blk_sub.ret_instr = PL_curinstruction + 1;
 	CvDEPTH(cv)++;
 	/* XXX This would be a natural place to set C<PL_compcv = cv> so
 	 * that eval'' ops within this sub know the correct lexical space.
@@ -2840,7 +2840,11 @@ try_autoload:
 	if (CvDEPTH(cv) == PERL_SUB_DEPTH_WARN && ckWARN(WARN_RECURSION)
 	    && !(PERLDB_SUB && cv == GvCV(PL_DBsub)))
 	    sub_crush_depth(cv);
-	RETURNOP(CvSTART(cv));
+	if (!CvCODESEQ(cv)) {
+	    CvCODESEQ(cv) = new_codeseq();
+	    compile_op(CvSTART(cv), CvCODESEQ(cv));
+	}
+	RETURNINSTR(codeseq_start_instruction(CvCODESEQ(cv)));
     }
     else {
 	I32 markix = TOPMARK;

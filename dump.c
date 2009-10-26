@@ -1177,19 +1177,13 @@ Perl_op_dump(pTHX_ const OP *o)
 void
 Perl_codeseq_dump(pTHX_ const CODESEQ *codeseq)
 {
-    INSTRUCTION *instr;
+    const INSTRUCTION *instr;
 
     PerlIO_printf(Perl_debug_log, "Instructions of codeseq (0x%"UVxf"):\n", PTR2UV(codeseq));
     for( instr = codeseq_start_instruction(codeseq) ;
 	 instr->instr_ppaddr ;
 	 instr++ ) {
-	Optype optype;
-	for (optype = 0; optype < OP_CUSTOM; optype++) {
-	    if (PL_ppaddr[optype] == instr->instr_ppaddr) {
-		break;
-	    }
-	}
-	PerlIO_printf(Perl_debug_log, "%s\n", PL_op_name[optype]);
+	PerlIO_printf(Perl_debug_log, "%s\n", instruction_name(instr));
     }
     PerlIO_printf(Perl_debug_log, "\n");
 }
@@ -2064,12 +2058,11 @@ Perl_runops_debug(pTHX)
 		    debstack();
 	    }
 
-	    if (DEBUG_t_TEST_) debop(PL_op);
+	    if (DEBUG_t_TEST_) debug_instruction(PL_curinstruction);
 	    if (DEBUG_P_TEST_) debprof(PL_op);
 	}
 	PL_op = PL_curinstruction->instr_op;
-	CALL_FPTR(PL_curinstruction->instr_ppaddr)(aTHX);
-	PL_curinstruction++;
+	PL_curinstruction = CALL_FPTR(PL_curinstruction->instr_ppaddr)(aTHX);
     } while (PL_curinstruction->instr_ppaddr);
     DEBUG_l(Perl_deb(aTHX_ "leaving RUNOPS level\n"));
 
@@ -2077,17 +2070,18 @@ Perl_runops_debug(pTHX)
     return 0;
 }
 
-I32
-Perl_debop(pTHX_ const OP *o)
+void
+Perl_debug_instruction(pTHX_ const INSTRUCTION *instr)
 {
     dVAR;
+    OP* o = instr->instr_op;
 
-    PERL_ARGS_ASSERT_DEBOP;
+    PERL_ARGS_ASSERT_DEBUG_INSTRUCTION;
 
     if (CopSTASH_eq(PL_curcop, PL_debstash) && !DEBUG_J_TEST_)
 	return 0;
 
-    Perl_deb(aTHX_ "%s", OP_NAME(o));
+    Perl_deb(aTHX_ "%s", instruction_name(instr));
     switch (o->op_type) {
     case OP_CONST:
     case OP_HINTSEVAL:

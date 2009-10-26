@@ -23,7 +23,7 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 
     o = startop;
     while (o) {
-        codeseq->xcodeseq_instructions[idx].instr_ppaddr = o->op_ppaddr;
+        codeseq->xcodeseq_instructions[idx].instr_ppaddr = PL_ppaddr[o->op_type];
         codeseq->xcodeseq_instructions[idx].instr_op = o;
         idx++;
         if (idx > codeseq->xcodeseq_size) {
@@ -59,6 +59,23 @@ Perl_free_codeseq(pTHX_ CODESEQ* codeseq)
         return;
     Safefree(codeseq->xcodeseq_instructions);
     Safefree(codeseq);
+}
+
+const char*
+Perl_instruction_name(pTHX_ const INSTRUCTION* instr)
+{
+    Optype optype;
+    if (!instr)
+	return "(null)";
+    if (!instr->instr_ppaddr)
+	return "(finished)";
+
+    for (optype = 0; optype < OP_CUSTOM; optype++) {
+	if (PL_ppaddr[optype] == instr->instr_ppaddr) {
+	    return PL_op_name[optype];
+	}
+    }
+    return "(unknown)";
 }
 
 /*

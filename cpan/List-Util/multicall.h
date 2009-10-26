@@ -107,7 +107,7 @@ multicall_pad_push(pTHX_ AV *padlist, int depth)
 #if HAS_RETSTACK
 #  define PUSHSUB_RETSTACK(cx)
 #else
-#  define PUSHSUB_RETSTACK(cx) cx->blk_sub.retop = Nullop;
+#  define PUSHSUB_RETSTACK(cx) cx->blk_sub.ret_instr = Nullop;
 #endif
 #define MULTICALL_PUSHSUB(cx, the_cv) \
         cx->blk_sub.cv = the_cv;					\

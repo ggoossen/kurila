@@ -91,7 +91,6 @@ Perl_cxinc
 Perl_deb
 Perl_vdeb
 Perl_debprofdump
-Perl_debop
 Perl_debstack
 Perl_debstackptrs
 Perl_delimcpy
