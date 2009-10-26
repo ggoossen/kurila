@@ -2,7 +2,7 @@
 
 BEGIN 
     require Config
-    require '../../t/test.pl'
+    require 'test.pl'
 
 
 $^OUTPUT_AUTOFLUSH = 1

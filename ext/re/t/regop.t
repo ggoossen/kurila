@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN 
-    require "../../t/test.pl"
+    require "test.pl"
 our $NUM_SECTS
 my @strs = map { chomp ; $_ }, grep { !m/^\s*\#/ }, @:  ~< $^DATA
 my $out = runperl(progfile => "t/regop.pl", stderr => 1 )

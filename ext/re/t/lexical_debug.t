@@ -2,7 +2,8 @@
 
 # must use a BEGIN or the prototypes wont be respected meaning
 # tests could pass that shouldn't
-BEGIN { require "../../t/test.pl"; }
+BEGIN
+    require "test.pl"
 my $out = runperl(progfile => "t/lexical_debug.pl", stderr => 1 )
 
 print $^STDOUT, "1..10\n"

@@ -3,7 +3,7 @@ use base 'Exporter'
 
 use warnings
 our ($TODO, $Level, $using_open)
-require "../../t/test.pl"
+require "test.pl"
 
 our $VERSION = '0.02'
 
