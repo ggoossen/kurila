@@ -19,21 +19,44 @@ struct op_instrpp {
 
 typedef struct op_instrpp OP_INSTRPP;
 
+struct branch_point_pad {
+    OP_INSTRPP* op_instrpp_compile;
+    OP_INSTRPP* op_instrpp_list;
+    OP_INSTRPP* op_instrpp_end;
+    OP_INSTRPP* op_instrpp_append;
+};
+typedef struct branch_point_pad BRANCH_POINT_PAD;
+
+void
+S_append_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o)
+{
+    if (bpp->op_instrpp_append >= bpp->op_instrpp_end) {
+	OP_INSTRPP* old_lp = bpp->op_instrpp_list;
+	int new_size = 128 + (bpp->op_instrpp_end - bpp->op_instrpp_list);
+	Renew(bpp->op_instrpp_list, new_size, OP_INSTRPP);
+	bpp->op_instrpp_end = bpp->op_instrpp_list + new_size;
+	bpp->op_instrpp_compile = bpp->op_instrpp_list + (bpp->op_instrpp_compile - old_lp);
+	bpp->op_instrpp_append = bpp->op_instrpp_list + (bpp->op_instrpp_append - old_lp);
+    }
+    assert(bpp->op_instrpp_append < bpp->op_instrpp_end);
+    bpp->op_instrpp_append->op = cLOGOPo->op_other;
+    bpp->op_instrpp_append->instrpp = &(cLOGOPo->op_other_instr);
+    bpp->op_instrpp_append->instr_idx = -1;
+    bpp->op_instrpp_append++;
+}
+
 void
 Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 {
     OP* o;
     int idx = 0;
 
-    OP_INSTRPP* op_instrpp_compile;
-    OP_INSTRPP* op_instrpp_list;
-    OP_INSTRPP* op_instrpp_end;
-    OP_INSTRPP* op_instrpp_append;
+    BRANCH_POINT_PAD bpp;
 
-    Newx(op_instrpp_list, 128, OP_INSTRPP);
-    op_instrpp_compile = op_instrpp_list;
-    op_instrpp_append = op_instrpp_list;
-    op_instrpp_end = op_instrpp_list + 128;
+    Newx(bpp.op_instrpp_list, 128, OP_INSTRPP);
+    bpp.op_instrpp_compile = bpp.op_instrpp_list;
+    bpp.op_instrpp_append = bpp.op_instrpp_list;
+    bpp.op_instrpp_end = bpp.op_instrpp_list + 128;
 
     PERL_ARGS_ASSERT_COMPILE_OP;
     codeseq->xcodeseq_size = 128;
@@ -48,11 +71,7 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 
 	    /* Save other instruction for retrieval. */
 	    if ((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOGOP) {
-		assert(op_instrpp_append < op_instrpp_end);
-		op_instrpp_append->op = cLOGOPo->op_other;
-		op_instrpp_append->instrpp = &(cLOGOPo->op_other_instr);
-		op_instrpp_append->instr_idx = -1;
-		op_instrpp_append++;
+		S_append_branch_point(&bpp, o);
 	    }
 
 	    idx++;
@@ -64,11 +83,7 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 	    if (o->op_type == OP_GREPSTART || o->op_type == OP_MAPSTART) {
 		o = o->op_next;
 
-		assert(op_instrpp_append < op_instrpp_end);
-		op_instrpp_append->op = cLOGOPo->op_other;
-		op_instrpp_append->instrpp = &(cLOGOPo->op_other_instr);
-		op_instrpp_append->instr_idx = -1;
-		op_instrpp_append++;
+		S_append_branch_point(&bpp, o);
 	    }
 
 	    o = o->op_next;
@@ -82,39 +97,39 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 
 	/* continue compiling remaining branch. */
 	{
-	    while ( op_instrpp_compile < op_instrpp_append ) {
+	    while ( bpp.op_instrpp_compile < bpp.op_instrpp_append ) {
 		/* check for already exisiting branch point */
 		OP_INSTRPP* i;
-		for (i=op_instrpp_list; i<op_instrpp_compile; i++) {
-		    if (op_instrpp_compile->op == i->op) {
-			op_instrpp_compile->instr_idx = i->instr_idx;
+		for (i=bpp.op_instrpp_list; i<bpp.op_instrpp_compile; i++) {
+		    if (bpp.op_instrpp_compile->op == i->op) {
+			bpp.op_instrpp_compile->instr_idx = i->instr_idx;
 			break;
 		    }
 		}
-		if (op_instrpp_compile->instr_idx == -1)
+		if (bpp.op_instrpp_compile->instr_idx == -1)
 		    break;
-		op_instrpp_compile++;
+		bpp.op_instrpp_compile++;
 	    }
 	}
 
-	if (op_instrpp_compile >= op_instrpp_append)
+	if (bpp.op_instrpp_compile >= bpp.op_instrpp_append)
 	    break;
 
-	op_instrpp_compile->instr_idx = idx;
-	o = op_instrpp_compile->op;
-	op_instrpp_compile++;
+	bpp.op_instrpp_compile->instr_idx = idx;
+	o = bpp.op_instrpp_compile->op;
+	bpp.op_instrpp_compile++;
 
     } while(1);
 
     {
 	OP_INSTRPP* i;
-	for (i=op_instrpp_list; i<op_instrpp_compile; i++) {
+	for (i=bpp.op_instrpp_list; i<bpp.op_instrpp_compile; i++) {
 	    assert(i->instr_idx != -1);
 	    *(i->instrpp) = &(codeseq->xcodeseq_instructions[i->instr_idx]);
 	}
     }
 
-    Safefree(op_instrpp_list);
+    Safefree(bpp.op_instrpp_list);
 
     DEBUG_x(codeseq_dump(codeseq));
 }
