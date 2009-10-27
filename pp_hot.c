@@ -442,7 +442,8 @@ PP(pp_defined)
         if (!sv || !SvANY(sv)) {
 	    if (op_type == OP_DOR)
 		--SP;
-            RETURNOP(cLOGOP->op_other);
+	    run_set_next_instruction(cLOGOP->op_other_instr);
+	    RETURN;
         }
     }
     else {
@@ -478,7 +479,8 @@ PP(pp_defined)
             RETURN; 
         if(op_type == OP_DOR)
             --SP;
-        RETURNOP(cLOGOP->op_other);
+	run_set_next_instruction(cLOGOP->op_other_instr);
+	RETURN;
     }
     /* assuming OP_DEFINED */
     if(defined) 
