@@ -228,8 +228,6 @@ END_EXTERN_C
 #define PL_curcop		(*Perl_Icurcop_ptr(aTHX))
 #undef  PL_curcopdb
 #define PL_curcopdb		(*Perl_Icurcopdb_ptr(aTHX))
-#undef  PL_curinstruction
-#define PL_curinstruction	(*Perl_Icurinstruction_ptr(aTHX))
 #undef  PL_curpad
 #define PL_curpad		(*Perl_Icurpad_ptr(aTHX))
 #undef  PL_curpm
@@ -550,6 +548,8 @@ END_EXTERN_C
 #define PL_restartop		(*Perl_Irestartop_ptr(aTHX))
 #undef  PL_rs
 #define PL_rs			(*Perl_Irs_ptr(aTHX))
+#undef  PL_run_next_instruction
+#define PL_run_next_instruction	(*Perl_Irun_next_instruction_ptr(aTHX))
 #undef  PL_runops
 #define PL_runops		(*Perl_Irunops_ptr(aTHX))
 #undef  PL_savebegin

@@ -1513,6 +1513,9 @@
 #endif
 #  endif
 #endif
+#ifdef PERL_CORE
+#define runop_debug		Perl_runop_debug
+#endif
 #if defined(PERL_IN_DUMP_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define deb_curcv		S_deb_curcv
@@ -2029,6 +2032,10 @@
 #define new_codeseq		Perl_new_codeseq
 #define free_codeseq		Perl_free_codeseq
 #define instruction_name	Perl_instruction_name
+#endif
+#ifdef PERL_CORE
+#define run_get_next_instruction	Perl_run_get_next_instruction
+#define run_set_next_instruction	Perl_run_set_next_instruction
 #endif
 #define ck_anoncode		Perl_ck_anoncode
 #define ck_bitop		Perl_ck_bitop
@@ -3919,6 +3926,9 @@
 #endif
 #  endif
 #endif
+#ifdef PERL_CORE
+#define runop_debug()		Perl_runop_debug(aTHX)
+#endif
 #if defined(PERL_IN_DUMP_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define deb_curcv(a)		S_deb_curcv(aTHX_ a)
@@ -4449,6 +4459,10 @@
 #define new_codeseq()		Perl_new_codeseq(aTHX)
 #define free_codeseq(a)		Perl_free_codeseq(aTHX_ a)
 #define instruction_name(a)	Perl_instruction_name(aTHX_ a)
+#endif
+#ifdef PERL_CORE
+#define run_get_next_instruction()	Perl_run_get_next_instruction(aTHX)
+#define run_set_next_instruction(a)	Perl_run_set_next_instruction(aTHX_ a)
 #endif
 #define ck_anoncode(a)		Perl_ck_anoncode(aTHX_ a)
 #define ck_bitop(a)		Perl_ck_bitop(aTHX_ a)

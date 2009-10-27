@@ -1722,6 +1722,7 @@ Es	|void	|debug_start_match|NN const REGEXP *prog|const bool do_utf8\
 #  endif
 #endif
 
+p	|void	|runop_debug
 #if defined(PERL_IN_DUMP_C) || defined(PERL_DECL_PROT)
 s	|CV*	|deb_curcv	|const I32 ix
 s	|void	|debprof	|NN const OP *o
@@ -2258,6 +2259,9 @@ p	|void	|compile_op|NN OP* startop|NN CODESEQ* codeseq
 ap	|CODESEQ*	|new_codeseq
 p	|void	|free_codeseq|NULLOK CODESEQ* codeseq
 p	|const char*	|instruction_name|NULLOK const INSTRUCTION* instr
+
+p	|INSTRUCTION*	|run_get_next_instruction
+p	|void	|run_set_next_instruction|NN INSTRUCTION* instr
 
 END_EXTERN_C
 /*

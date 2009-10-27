@@ -2286,7 +2286,7 @@ S_run_body(pTHX_ I32 oldscope)
 	    CvCODESEQ(PL_main_cv) = new_codeseq();
 	    compile_op(PL_main_start, CvCODESEQ(PL_main_cv));
 	}
-	PL_curinstruction = codeseq_start_instruction(CvCODESEQ(PL_main_cv));
+	run_set_next_instruction( codeseq_start_instruction(CvCODESEQ(PL_main_cv)) );
 	CALLRUNOPS(aTHX);
     }
     my_exit(0);

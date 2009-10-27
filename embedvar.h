@@ -96,7 +96,6 @@
 #define PL_cryptseen		(vTHX->Icryptseen)
 #define PL_curcop		(vTHX->Icurcop)
 #define PL_curcopdb		(vTHX->Icurcopdb)
-#define PL_curinstruction	(vTHX->Icurinstruction)
 #define PL_curpad		(vTHX->Icurpad)
 #define PL_curpm		(vTHX->Icurpm)
 #define PL_curstack		(vTHX->Icurstack)
@@ -257,6 +256,7 @@
 #define PL_replgv		(vTHX->Ireplgv)
 #define PL_restartop		(vTHX->Irestartop)
 #define PL_rs			(vTHX->Irs)
+#define PL_run_next_instruction	(vTHX->Irun_next_instruction)
 #define PL_runops		(vTHX->Irunops)
 #define PL_savebegin		(vTHX->Isavebegin)
 #define PL_savestack		(vTHX->Isavestack)
@@ -414,7 +414,6 @@
 #define PL_Icryptseen		PL_cryptseen
 #define PL_Icurcop		PL_curcop
 #define PL_Icurcopdb		PL_curcopdb
-#define PL_Icurinstruction	PL_curinstruction
 #define PL_Icurpad		PL_curpad
 #define PL_Icurpm		PL_curpm
 #define PL_Icurstack		PL_curstack
@@ -575,6 +574,7 @@
 #define PL_Ireplgv		PL_replgv
 #define PL_Irestartop		PL_restartop
 #define PL_Irs			PL_rs
+#define PL_Irun_next_instruction	PL_run_next_instruction
 #define PL_Irunops		PL_runops
 #define PL_Isavebegin		PL_savebegin
 #define PL_Isavestack		PL_savestack

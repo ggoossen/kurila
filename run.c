@@ -37,9 +37,10 @@ int
 Perl_runops_standard(pTHX)
 {
     dVAR;
-    while (CALL_FPTR(PL_curinstruction->instr_ppaddr)(aTHX)) {
-	PL_curinstruction++;
+    PL_op = PL_run_next_instruction->instr_op;
+    while (CALL_FPTR((PL_run_next_instruction++)->instr_ppaddr)(aTHX)) {
 	PERL_ASYNC_CHECK();
+	PL_op = PL_run_next_instruction->instr_op;
     }
 
     TAINT_NOT;
@@ -73,6 +74,46 @@ Perl_runops_continue_from_jmpenv(pTHX_ int ret)
 	assert(0);
     }
     return 3;
+}
+
+int
+Perl_runops_debug(pTHX)
+{
+    dVAR;
+    if (!PL_run_next_instruction->instr_ppaddr) {
+	Perl_ck_warner_d(aTHX_ packWARN(WARN_DEBUGGING), "NULL OP IN RUN");
+	return 0;
+    }
+
+    DEBUG_l(Perl_deb(aTHX_ "Entering new RUNOPS level\n"));
+    do {
+	INSTRUCTION* instr = PL_run_next_instruction;
+	PERL_ASYNC_CHECK();
+	assert(PL_stack_base[0] == &PL_sv_undef);
+	assert(PL_stack_sp >= PL_stack_base);
+	if (PL_debug) {
+	    runop_debug();
+	}
+	PL_run_next_instruction++;
+	PL_op = instr->instr_op;
+	CALL_FPTR(instr->instr_ppaddr)(aTHX);
+    } while (PL_run_next_instruction->instr_ppaddr);
+    DEBUG_l(Perl_deb(aTHX_ "leaving RUNOPS level\n"));
+
+    TAINT_NOT;
+    return 0;
+}
+
+INSTRUCTION*
+Perl_run_get_next_instruction(pTHX)
+{
+    return PL_run_next_instruction;
+}
+
+void
+Perl_run_set_next_instruction(pTHX_ INSTRUCTION* instr)
+{
+    PL_run_next_instruction = instr;
 }
 
 /*

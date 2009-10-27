@@ -39,12 +39,12 @@ PERLVAR(Iop,		OP *)		/* currently executing op */
 #endif
 /*
 =for perlhack
-PL_curinstruction
+PL_run_next_instruction
 
-Pointer to the currently being executed instruction.
+Pointer to the next instruction to be exectued.
 =cut
 */
-PERLVARI(Icurinstruction,   INSTRUCTION *, NULL)
+PERLVARI(Irun_next_instruction,   INSTRUCTION *, NULL)
 
 PERLVAR(Icurpad,	SV **)		/* active pad (lexicals+tmps) */
 

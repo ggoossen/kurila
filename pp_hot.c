@@ -2783,7 +2783,7 @@ try_autoload:
 	AV* const padlist = CvPADLIST(cv);
 	PUSHBLOCK(cx, CXt_SUB, MARK);
 	PUSHSUB(cx);
-	cx->blk_sub.ret_instr = PL_curinstruction + 1;
+	cx->blk_sub.ret_instr = run_get_next_instruction();
 	CvDEPTH(cv)++;
 	/* XXX This would be a natural place to set C<PL_compcv = cv> so
 	 * that eval'' ops within this sub know the correct lexical space.
@@ -2840,11 +2840,14 @@ try_autoload:
 	if (CvDEPTH(cv) == PERL_SUB_DEPTH_WARN && ckWARN(WARN_RECURSION)
 	    && !(PERLDB_SUB && cv == GvCV(PL_DBsub)))
 	    sub_crush_depth(cv);
+
 	if (!CvCODESEQ(cv)) {
 	    CvCODESEQ(cv) = new_codeseq();
 	    compile_op(CvSTART(cv), CvCODESEQ(cv));
 	}
-	RETURNINSTR(codeseq_start_instruction(CvCODESEQ(cv)));
+	run_set_next_instruction(codeseq_start_instruction(CvCODESEQ(cv)));
+
+	RETURN;
     }
     else {
 	I32 markix = TOPMARK;

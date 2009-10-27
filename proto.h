@@ -5559,6 +5559,7 @@ STATIC void	S_debug_start_match(pTHX_ const REGEXP *prog, const bool do_utf8, co
 #  endif
 #endif
 
+PERL_CALLCONV void	Perl_runop_debug(pTHX);
 #if defined(PERL_IN_DUMP_C) || defined(PERL_DECL_PROT)
 STATIC CV*	S_deb_curcv(pTHX_ const I32 ix);
 STATIC void	S_debprof(pTHX_ const OP *o)
@@ -6775,6 +6776,13 @@ PERL_CALLCONV CODESEQ*	Perl_new_codeseq(pTHX)
 
 PERL_CALLCONV void	Perl_free_codeseq(pTHX_ CODESEQ* codeseq);
 PERL_CALLCONV const char*	Perl_instruction_name(pTHX_ const INSTRUCTION* instr);
+
+PERL_CALLCONV INSTRUCTION*	Perl_run_get_next_instruction(pTHX);
+PERL_CALLCONV void	Perl_run_set_next_instruction(pTHX_ INSTRUCTION* instr)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_RUN_SET_NEXT_INSTRUCTION	\
+	assert(instr)
+
 
 END_EXTERN_C
 /*

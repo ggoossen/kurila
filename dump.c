@@ -2029,47 +2029,6 @@ Perl_sv_dump(pTHX_ SV *sv)
 	do_sv_dump(0, Perl_debug_log, sv, 0, 0, 0, 0);
 }
 
-int
-Perl_runops_debug(pTHX)
-{
-    dVAR;
-    if (!PL_curinstruction->instr_ppaddr) {
-	Perl_ck_warner_d(aTHX_ packWARN(WARN_DEBUGGING), "NULL OP IN RUN");
-	return 0;
-    }
-
-    DEBUG_l(Perl_deb(aTHX_ "Entering new RUNOPS level\n"));
-    do {
-	PERL_ASYNC_CHECK();
-	assert(PL_stack_base[0] == &PL_sv_undef);
-	assert(PL_stack_sp >= PL_stack_base);
-	if (PL_debug) {
-	    if (PL_watchaddr && (*PL_watchaddr != PL_watchok))
-		PerlIO_printf(Perl_debug_log,
-			      "WARNING: %"UVxf" changed from %"UVxf" to %"UVxf"\n",
-			      PTR2UV(PL_watchaddr), PTR2UV(PL_watchok),
-			      PTR2UV(*PL_watchaddr));
-	    if (DEBUG_s_TEST_) {
-		if (DEBUG_v_TEST_) {
-		    PerlIO_printf(Perl_debug_log, "\n");
-		    deb_stack_all();
-		}
-		else
-		    debstack();
-	    }
-
-	    if (DEBUG_t_TEST_) debug_instruction(PL_curinstruction);
-	    if (DEBUG_P_TEST_) debprof(PL_op);
-	}
-	PL_op = PL_curinstruction->instr_op;
-	PL_curinstruction = CALL_FPTR(PL_curinstruction->instr_ppaddr)(aTHX);
-    } while (PL_curinstruction->instr_ppaddr);
-    DEBUG_l(Perl_deb(aTHX_ "leaving RUNOPS level\n"));
-
-    TAINT_NOT;
-    return 0;
-}
-
 void
 Perl_debug_instruction(pTHX_ const INSTRUCTION *instr)
 {
@@ -2079,7 +2038,7 @@ Perl_debug_instruction(pTHX_ const INSTRUCTION *instr)
     PERL_ARGS_ASSERT_DEBUG_INSTRUCTION;
 
     if (CopSTASH_eq(PL_curcop, PL_debstash) && !DEBUG_J_TEST_)
-	return 0;
+	return;
 
     Perl_deb(aTHX_ "%s", instruction_name(instr));
     switch (o->op_type) {
@@ -2133,7 +2092,7 @@ Perl_debug_instruction(pTHX_ const INSTRUCTION *instr)
 	break;
     }
     PerlIO_printf(Perl_debug_log, "\n");
-    return 0;
+    return;
 }
 
 STATIC CV*
@@ -2164,6 +2123,27 @@ Perl_watch(pTHX_ char **addr)
     PL_watchok = *addr;
     PerlIO_printf(Perl_debug_log, "WATCHING, %"UVxf" is currently %"UVxf"\n",
 	PTR2UV(PL_watchaddr), PTR2UV(PL_watchok));
+}
+
+void
+Perl_runop_debug(pTHX)
+{
+    if (PL_watchaddr && (*PL_watchaddr != PL_watchok))
+	PerlIO_printf(Perl_debug_log,
+	    "WARNING: %"UVxf" changed from %"UVxf" to %"UVxf"\n",
+	    PTR2UV(PL_watchaddr), PTR2UV(PL_watchok),
+	    PTR2UV(*PL_watchaddr));
+    if (DEBUG_s_TEST_) {
+	if (DEBUG_v_TEST_) {
+	    PerlIO_printf(Perl_debug_log, "\n");
+	    deb_stack_all();
+	}
+	else
+	    debstack();
+    }
+
+    if (DEBUG_t_TEST_) debug_instruction(PL_run_next_instruction);
+    if (DEBUG_P_TEST_) debprof(PL_op);
 }
 
 STATIC void

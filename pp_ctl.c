@@ -1879,7 +1879,7 @@ PP(pp_dbstate)
 	else {
 	    PUSHBLOCK(cx, CXt_SUB, SP);
 	    PUSHSUB_DB(cx);
-	    cx->blk_sub.ret_instr = PL_curinstruction + 1;
+	    cx->blk_sub.ret_instr = run_get_next_instruction();
 	    CvDEPTH(cv)++;
 	    SAVECOMPPAD();
 	    PAD_SET_CUR_NOSAVE(CvPADLIST(cv), 1);
