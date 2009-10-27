@@ -4688,6 +4688,7 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
     logop->op_first = first;
     logop->op_flags = (U8)(flags | OPf_KIDS);
     logop->op_other = LINKLIST(other);
+    logop->op_other_instr = NULL;
     logop->op_private = (U8)(1 | (flags >> 8));
 
     /* establish postfix order */
@@ -6554,7 +6555,6 @@ Perl_ck_eval(pTHX_ OP *o)
 
 	    NewOp(1101, enter, 1, LOGOP);
 	    enter->op_type = OP_ENTERTRY;
-	    enter->op_ppaddr = PL_ppaddr[OP_ENTERTRY];
 	    enter->op_private = 0;
 
 	    /* establish postfix order */

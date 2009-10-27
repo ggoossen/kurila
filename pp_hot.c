@@ -421,7 +421,8 @@ PP(pp_or)
     else {
 	if (PL_op->op_type == OP_OR)
             --SP;
-	RETURNOP(cLOGOP->op_other);
+	run_set_next_instruction(cLOGOP->op_other_instr);
+	RETURN;
     }
 }
 

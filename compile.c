@@ -11,28 +11,72 @@
 #define PERL_IN_COMPILE_C
 #include "perl.h"
 
+struct op_instrpp {
+    OP* op;
+    INSTRUCTION** instrpp;
+    int instr_idx;
+};
+
+typedef struct op_instrpp OP_INSTRPP;
+
 void
 Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 {
     OP* o;
     int idx = 0;
 
+    int op_instrpp_idx = 0;
+    int op_instrpp_compile_idx = 0;
+    OP_INSTRPP* op_instrpp_list;
+
+    Newx(op_instrpp_list, 128, OP_INSTRPP);
+
     PERL_ARGS_ASSERT_COMPILE_OP;
     codeseq->xcodeseq_size = 128;
     Renew(codeseq->xcodeseq_instructions, codeseq->xcodeseq_size, INSTRUCTION);
 
     o = startop;
-    while (o) {
-        codeseq->xcodeseq_instructions[idx].instr_ppaddr = PL_ppaddr[o->op_type];
-        codeseq->xcodeseq_instructions[idx].instr_op = o;
-        idx++;
-        if (idx > codeseq->xcodeseq_size) {
-            codeseq->xcodeseq_size += 128;
-            Renew(codeseq->xcodeseq_instructions, codeseq->xcodeseq_size, INSTRUCTION);
-        }
-        o = o->op_next;
+
+    do {
+	while (o) {
+	    codeseq->xcodeseq_instructions[idx].instr_ppaddr = PL_ppaddr[o->op_type];
+	    codeseq->xcodeseq_instructions[idx].instr_op = o;
+
+	    /* Save other instruction for retrieval. */
+	    if ((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOGOP) {
+		op_instrpp_list[op_instrpp_idx].op = cLOGOPo->op_other;
+		op_instrpp_list[op_instrpp_idx].instrpp = &(cLOGOPo->op_other_instr);
+		op_instrpp_list[op_instrpp_idx].instr_idx = -1;
+		op_instrpp_idx++;
+	    }
+
+	    idx++;
+	    if (idx > codeseq->xcodeseq_size) {
+		codeseq->xcodeseq_size += 128;
+		Renew(codeseq->xcodeseq_instructions, codeseq->xcodeseq_size, INSTRUCTION);
+	    }
+	    o = o->op_next;
+	}
+	codeseq->xcodeseq_instructions[idx].instr_ppaddr = NULL;
+	idx++;
+
+	if (op_instrpp_compile_idx >= op_instrpp_idx)
+	    break;
+
+	/* continue compiling remaining branch. */
+	op_instrpp_list[op_instrpp_compile_idx].instr_idx = idx;
+	o = op_instrpp_list[op_instrpp_compile_idx].op;
+	op_instrpp_compile_idx++;
+
+    } while(1);
+
+    {
+	int i;
+	for (i=0; i<op_instrpp_idx; i++) {
+	    assert(op_instrpp_list[i].instr_idx != -1);
+	    *(op_instrpp_list[i].instrpp) = &(codeseq->xcodeseq_instructions[op_instrpp_list[i].instr_idx]);
+	}
     }
-    codeseq->xcodeseq_instructions[idx].instr_ppaddr = NULL;
 
     DEBUG_x(codeseq_dump(codeseq));
 }
