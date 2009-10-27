@@ -2607,7 +2607,14 @@ PP(pp_goto)
 			}
 		    }
 		}
-		RETURNOP(CvSTART(cv));
+		
+		if (!CvCODESEQ(cv)) {
+		    CvCODESEQ(cv) = new_codeseq();
+		    compile_op(CvSTART(cv), CvCODESEQ(cv));
+		}
+		run_set_next_instruction(codeseq_start_instruction(CvCODESEQ(cv)));
+
+		RETURN;
 	    }
 	}
 	else {
