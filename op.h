@@ -15,7 +15,6 @@
  *			but this is replaced when op is grafted in, when
  *			this op will point to the real next op, and the new
  *			parent takes over role of remembering starting op.)
- *	op_ppaddr	Pointer to current ppcode's function.
  *	op_type		The type of the operation.
  *	op_opt		Whether or not the op has been optimised by the
  *			peephole optimiser.
@@ -53,7 +52,6 @@ typedef PERL_BITFIELD16 Optype;
 #define BASEOP				\
     OP*		op_next;		\
     OP*		op_sibling;		\
-    OP*		(CPERLscope(*op_ppaddr))(pTHX);		\
     MADPROP_IN_BASEOP			\
     PADOFFSET	op_targ;		\
     PERL_BITFIELD16 op_type:9;		\

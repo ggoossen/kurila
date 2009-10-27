@@ -30,9 +30,8 @@ sub _printop {
 
 sub B::OP::debug {
     my ($op) = @_;
-    printf <<'EOT', class($op), $$op, $op->ppaddr, _printop($op->next), _printop($op->sibling), $op->targ, $op->type;
+    printf <<'EOT', class($op), $$op, _printop($op->next), _printop($op->sibling), $op->targ, $op->type;
 %s (0x%lx)
-	op_ppaddr	%s
 	op_next		%s
 	op_sibling	%s
 	op_targ		%d

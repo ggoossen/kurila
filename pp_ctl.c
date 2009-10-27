@@ -2722,7 +2722,8 @@ PP(pp_goto)
 		 * for each op.  For now, we punt on the hard ones. */
 		if (PL_op->op_type == OP_ENTERITER)
 		    DIE(aTHX_ "Can't \"goto\" into the middle of a foreach loop");
-		CALL_FPTR(PL_op->op_ppaddr)(aTHX);
+		DIE(aTHX_ "FIXME push wanted frame");
+		/* CALL_FPTR(PL_op->op_ppaddr)(aTHX); */
 	    }
 	    PL_op = oldop;
 	}
@@ -2929,7 +2930,6 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     POPEVAL(cx);
 
     (*startop)->op_type = OP_NULL;
-    (*startop)->op_ppaddr = PL_ppaddr[OP_NULL];
     lex_end();
     /* XXX DAPM do this properly one year */
     *padp = MUTABLE_AV(SvREFCNT_inc_simple(PL_comppad));
