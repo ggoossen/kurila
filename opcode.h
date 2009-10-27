@@ -952,7 +952,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_reverse),
 	MEMBER_TO_FPTR(Perl_pp_grepstart),
 	MEMBER_TO_FPTR(Perl_pp_grepwhile),
-	MEMBER_TO_FPTR(Perl_unimplemented_op),	/* Perl_pp_mapstart */
+	MEMBER_TO_FPTR(Perl_pp_grepstart),	/* Perl_pp_mapstart */
 	MEMBER_TO_FPTR(Perl_pp_mapwhile),
 	MEMBER_TO_FPTR(Perl_pp_range),
 	MEMBER_TO_FPTR(Perl_pp_flip),

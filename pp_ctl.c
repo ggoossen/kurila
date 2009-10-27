@@ -991,7 +991,7 @@ PP(pp_grepstart)
 	(void)POPMARK;
 	if (GIMME_V == G_SCALAR)
 	    mXPUSHi(0);
-	RETURNOP(PL_op->op_next->op_next);
+	RETURN;
     }
     PL_stack_sp = PL_stack_base + *PL_markstack_ptr + 1;
     pp_pushmark();				/* push dst */
@@ -1016,7 +1016,8 @@ PP(pp_grepstart)
     PUTBACK;
     if (PL_op->op_type == OP_MAPSTART)
 	pp_pushmark();			/* push top */
-    return ((LOGOP*)PL_op->op_next)->op_other;
+    run_set_next_instruction(cLOGOPx(PL_op->op_next)->op_other_instr);
+    return;
 }
 
 PP(pp_mapwhile)
@@ -1124,7 +1125,8 @@ PP(pp_mapwhile)
 	else
 	    DEFSV_set(src);
 
-	RETURNOP(cLOGOP->op_other);
+	run_set_next_instruction(cLOGOP->op_other_instr);
+	RETURN;
     }
 }
 

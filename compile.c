@@ -60,6 +60,17 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 		codeseq->xcodeseq_size += 128;
 		Renew(codeseq->xcodeseq_instructions, codeseq->xcodeseq_size, INSTRUCTION);
 	    }
+
+	    if (o->op_type == OP_GREPSTART || o->op_type == OP_MAPSTART) {
+		o = o->op_next;
+
+		assert(op_instrpp_append < op_instrpp_end);
+		op_instrpp_append->op = cLOGOPo->op_other;
+		op_instrpp_append->instrpp = &(cLOGOPo->op_other_instr);
+		op_instrpp_append->instr_idx = -1;
+		op_instrpp_append++;
+	    }
+
 	    o = o->op_next;
 	}
 	codeseq->xcodeseq_instructions[idx].instr_ppaddr = NULL;

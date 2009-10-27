@@ -2424,7 +2424,8 @@ PP(pp_grepwhile)
 	else
 	    DEFSV_set(src);
 
-	RETURNOP(cLOGOP->op_other);
+	run_set_next_instruction(cLOGOP->op_other_instr);
+	RETURN;
     }
 }
 
