@@ -25,11 +25,15 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
     OP* o;
     int idx = 0;
 
-    int op_instrpp_idx = 0;
-    int op_instrpp_compile_idx = 0;
+    OP_INSTRPP* op_instrpp_compile;
     OP_INSTRPP* op_instrpp_list;
+    OP_INSTRPP* op_instrpp_end;
+    OP_INSTRPP* op_instrpp_append;
 
     Newx(op_instrpp_list, 128, OP_INSTRPP);
+    op_instrpp_compile = op_instrpp_list;
+    op_instrpp_append = op_instrpp_list;
+    op_instrpp_end = op_instrpp_list + 128;
 
     PERL_ARGS_ASSERT_COMPILE_OP;
     codeseq->xcodeseq_size = 128;
@@ -44,14 +48,15 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 
 	    /* Save other instruction for retrieval. */
 	    if ((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOGOP) {
-		op_instrpp_list[op_instrpp_idx].op = cLOGOPo->op_other;
-		op_instrpp_list[op_instrpp_idx].instrpp = &(cLOGOPo->op_other_instr);
-		op_instrpp_list[op_instrpp_idx].instr_idx = -1;
-		op_instrpp_idx++;
+		assert(op_instrpp_append < op_instrpp_end);
+		op_instrpp_append->op = cLOGOPo->op_other;
+		op_instrpp_append->instrpp = &(cLOGOPo->op_other_instr);
+		op_instrpp_append->instr_idx = -1;
+		op_instrpp_append++;
 	    }
 
 	    idx++;
-	    if (idx > codeseq->xcodeseq_size) {
+	    if (idx >= codeseq->xcodeseq_size) {
 		codeseq->xcodeseq_size += 128;
 		Renew(codeseq->xcodeseq_instructions, codeseq->xcodeseq_size, INSTRUCTION);
 	    }
@@ -59,22 +64,42 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 	}
 	codeseq->xcodeseq_instructions[idx].instr_ppaddr = NULL;
 	idx++;
-
-	if (op_instrpp_compile_idx >= op_instrpp_idx)
-	    break;
+	if (idx >= codeseq->xcodeseq_size) {
+	    codeseq->xcodeseq_size += 128;
+	    Renew(codeseq->xcodeseq_instructions, codeseq->xcodeseq_size, INSTRUCTION);
+	}
 
 	/* continue compiling remaining branch. */
-	op_instrpp_list[op_instrpp_compile_idx].instr_idx = idx;
-	o = op_instrpp_list[op_instrpp_compile_idx].op;
-	op_instrpp_compile_idx++;
+	{
+	    while ( op_instrpp_compile < op_instrpp_append ) {
+		/* check for already exisiting branch point */
+		OP_INSTRPP* i;
+		for (i=op_instrpp_list; i<op_instrpp_compile; i++) {
+		    if (op_instrpp_compile->op == i->op) {
+			op_instrpp_compile->instr_idx = i->instr_idx;
+			break;
+		    }
+		}
+		if (op_instrpp_compile->instr_idx == -1)
+		    break;
+		op_instrpp_compile++;
+	    }
+	}
+
+	if (op_instrpp_compile >= op_instrpp_append)
+	    break;
+
+	op_instrpp_compile->instr_idx = idx;
+	o = op_instrpp_compile->op;
+	op_instrpp_compile++;
 
     } while(1);
 
     {
-	int i;
-	for (i=0; i<op_instrpp_idx; i++) {
-	    assert(op_instrpp_list[i].instr_idx != -1);
-	    *(op_instrpp_list[i].instrpp) = &(codeseq->xcodeseq_instructions[op_instrpp_list[i].instr_idx]);
+	OP_INSTRPP* i;
+	for (i=op_instrpp_list; i<op_instrpp_compile; i++) {
+	    assert(i->instr_idx != -1);
+	    *(i->instrpp) = &(codeseq->xcodeseq_instructions[i->instr_idx]);
 	}
     }
 
