@@ -103,6 +103,8 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 	}
     }
 
+    Safefree(op_instrpp_list);
+
     DEBUG_x(codeseq_dump(codeseq));
 }
 
