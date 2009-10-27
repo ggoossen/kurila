@@ -2260,8 +2260,9 @@ ap	|CODESEQ*	|new_codeseq
 p	|void	|free_codeseq|NULLOK CODESEQ* codeseq
 p	|const char*	|instruction_name|NULLOK const INSTRUCTION* instr
 
-p	|INSTRUCTION*	|run_get_next_instruction
-p	|void	|run_set_next_instruction|NN INSTRUCTION* instr
+p	|const INSTRUCTION*	|run_get_next_instruction
+p	|void	|run_set_next_instruction|NN const INSTRUCTION* instr
+p	|void	|run_exec_codeseq|NN const CODESEQ* codeseq
 
 END_EXTERN_C
 /*

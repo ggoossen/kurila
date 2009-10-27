@@ -6777,11 +6777,16 @@ PERL_CALLCONV CODESEQ*	Perl_new_codeseq(pTHX)
 PERL_CALLCONV void	Perl_free_codeseq(pTHX_ CODESEQ* codeseq);
 PERL_CALLCONV const char*	Perl_instruction_name(pTHX_ const INSTRUCTION* instr);
 
-PERL_CALLCONV INSTRUCTION*	Perl_run_get_next_instruction(pTHX);
-PERL_CALLCONV void	Perl_run_set_next_instruction(pTHX_ INSTRUCTION* instr)
+PERL_CALLCONV const INSTRUCTION*	Perl_run_get_next_instruction(pTHX);
+PERL_CALLCONV void	Perl_run_set_next_instruction(pTHX_ const INSTRUCTION* instr)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_RUN_SET_NEXT_INSTRUCTION	\
 	assert(instr)
+
+PERL_CALLCONV void	Perl_run_exec_codeseq(pTHX_ const CODESEQ* codeseq)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_RUN_EXEC_CODESEQ	\
+	assert(codeseq)
 
 
 END_EXTERN_C

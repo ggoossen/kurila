@@ -104,15 +104,28 @@ Perl_runops_debug(pTHX)
     return 0;
 }
 
-INSTRUCTION*
+void
+Perl_run_exec_codeseq(pTHX_ const CODESEQ* codeseq)
+{
+    const INSTRUCTION* old_next_instruction;
+    old_next_instruction = run_get_next_instruction();
+    run_set_next_instruction(codeseq_start_instruction(codeseq));
+
+    CALLRUNOPS(aTHX);
+
+    PL_run_next_instruction = old_next_instruction;
+}
+
+const INSTRUCTION*
 Perl_run_get_next_instruction(pTHX)
 {
     return PL_run_next_instruction;
 }
 
 void
-Perl_run_set_next_instruction(pTHX_ INSTRUCTION* instr)
+Perl_run_set_next_instruction(pTHX_ const INSTRUCTION* instr)
 {
+    assert(instr);
     PL_run_next_instruction = instr;
 }
 

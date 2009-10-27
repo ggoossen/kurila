@@ -2036,6 +2036,7 @@
 #ifdef PERL_CORE
 #define run_get_next_instruction	Perl_run_get_next_instruction
 #define run_set_next_instruction	Perl_run_set_next_instruction
+#define run_exec_codeseq	Perl_run_exec_codeseq
 #endif
 #define ck_anoncode		Perl_ck_anoncode
 #define ck_bitop		Perl_ck_bitop
@@ -4463,6 +4464,7 @@
 #ifdef PERL_CORE
 #define run_get_next_instruction()	Perl_run_get_next_instruction(aTHX)
 #define run_set_next_instruction(a)	Perl_run_set_next_instruction(aTHX_ a)
+#define run_exec_codeseq(a)	Perl_run_exec_codeseq(aTHX_ a)
 #endif
 #define ck_anoncode(a)		Perl_ck_anoncode(aTHX_ a)
 #define ck_bitop(a)		Perl_ck_bitop(aTHX_ a)
