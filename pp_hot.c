@@ -204,10 +204,12 @@ PP(pp_sassign)
 PP(pp_cond_expr)
 {
     dVAR; dSP;
-    if (SvTRUEx(POPs))
-	RETURNOP(cLOGOP->op_other);
-    else
-	RETURNOP(cLOGOP->op_next);
+    if (SvTRUEx(POPs)) {
+	run_set_next_instruction(cLOGOP->op_other_instr);
+	RETURN;
+    }
+    else 
+	RETURN;
 }
 
 PP(pp_unstack)
