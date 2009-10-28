@@ -11,5 +11,5 @@ use Test::More tests => 1
 use Pod::Find < qw( contains_pod )
 
 do
-    ok(contains_pod('t/pod/contains_pod.xr'), "contains pod")
+    ok: (contains_pod: 't/pod/contains_pod.xr'), "contains pod"
 

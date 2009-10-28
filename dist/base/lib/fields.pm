@@ -3,7 +3,7 @@ package fields
 unless( eval q{require warnings::register; warnings::register->import; 1} )
     *warnings::warnif = sub (@< @_)
         require Carp
-        Carp::carp(< @_)
+        Carp::carp: < @_
     
 
 our (%attr, $VERSION)
@@ -28,15 +28,15 @@ sub PROTECTED  () { 2**3  }
 sub import
     my $class = shift
     return unless (nelems @_)
-    my $package = caller(0)
+    my $package = caller: 0
     # avoid possible typo warnings
-    Symbol::fetch_glob("$package\::FIELDS")->*->% = $% unless Symbol::fetch_glob("$package\::FIELDS")->*->%
-    my $fields = \Symbol::fetch_glob("$package\::FIELDS")->*->%
+    (Symbol::fetch_glob: "$package\::FIELDS")->*->% = $% unless (Symbol::fetch_glob: "$package\::FIELDS")->*->%
+    my $fields = \(Symbol::fetch_glob: "$package\::FIELDS")->*->%
     my $fattr = (%attr{+$package} ||= \(@: 1))
     my $next = (nelems $fattr->@)
 
     # Quiet pseudo-hash deprecation warning for uses of fields::new.
-    bless \Symbol::fetch_glob("$package\::FIELDS")->*->%, 'pseudohash'
+    bless: \(Symbol::fetch_glob: "$package\::FIELDS")->*->%, 'pseudohash'
 
     if ($next +> $fattr->[0]
           and ($fields->{?@_[0]} || 0) +>= $fattr->[0])
@@ -51,13 +51,13 @@ sub import
         # have not changed.
         if ($fno and $fno != $next)
             if ($fno +< $fattr->[0])
-                warnings::warnif("Hides field '$f' in base class") 
+                warnings::warnif: "Hides field '$f' in base class" 
             else
-                die("Field name '$f' already in use")
+                die: "Field name '$f' already in use"
             
         
         $fields->{+$f} = $next
-        $fattr->[+$next] = ($f =~ m/^_/) ?? PRIVATE !! PUBLIC
+        $fattr->[+$next] = ($f =~ m/^_/) ?? (PRIVATE: )!! (PUBLIC: )
         $next += 1
     
     if ((nelems $fattr->@) +> $next)
@@ -67,35 +67,35 @@ sub import
         # bookkeeping) that the rest of the fields will be declared or
         # have the same positions, so punt.
         require Carp
-        Carp::croak ("Reloaded module must declare all fields at once")
+        Carp::croak : "Reloaded module must declare all fields at once"
     
 
 
 sub inherit
     require base
-    base::inherit_fields(< @_)
+    base::inherit_fields: < @_
 
 
 sub _dump
-    for my $pkg (sort keys %attr)
-        print $^STDOUT, "\n$pkg"
-        if ((nelems Symbol::fetch_glob("$pkg\::ISA")->*->@))
-            print $^STDOUT, " (", join(", ", Symbol::fetch_glob("$pkg\::ISA")->*->@), ")"
+    for my $pkg ((sort: keys %attr))
+        print: $^STDOUT, "\n$pkg"
+        if ((nelems (Symbol::fetch_glob: "$pkg\::ISA")->*->@))
+            print: $^STDOUT, " (", (join: ", ", (Symbol::fetch_glob: "$pkg\::ISA")->*->@), ")"
         
-        print $^STDOUT, "\n"
-        my $fields = \Symbol::fetch_glob("$pkg\::FIELDS")->*->%
-        for my $f (sort {$fields->{?$a} <+> $fields->{?$b}}, keys $fields->%)
+        print: $^STDOUT, "\n"
+        my $fields = \(Symbol::fetch_glob: "$pkg\::FIELDS")->*->%
+        for my $f ((sort: {$fields->{?$a} <+> $fields->{?$b}}, keys $fields->%))
             my $no = $fields->{?$f}
-            print $^STDOUT, "   $no: $f"
+            print: $^STDOUT, "   $no: $f"
             my $fattr = %attr{$pkg}->[$no]
             if (defined $fattr)
                 my @a
-                push(@a, "public")    if $fattr ^&^ PUBLIC
-                push(@a, "private")   if $fattr ^&^ PRIVATE
-                push(@a, "inherited") if $fattr ^&^ INHERITED
-                print $^STDOUT, "\t(", join(", ", @a), ")"
+                push: @a, "public"    if $fattr ^&^ (PUBLIC: )
+                push: @a, "private"   if $fattr ^&^ (PRIVATE: )
+                push: @a, "inherited" if $fattr ^&^ (INHERITED: )
+                print: $^STDOUT, "\t(", (join: ", ", @a), ")"
             
-            print $^STDOUT, "\n"
+            print: $^STDOUT, "\n"
         
     
 
@@ -104,22 +104,22 @@ sub new
     my $class = shift
     $class = ref $class if ref $class
     require Hash::Util
-    my $self = bless \$%, $class
+    my $self = bless: \$%, $class
 
     # The lock_keys() prototype won't work since we require Hash::Util :(
-    Hash::Util::lock_keys(\$self->%, < _accessible_keys($class))
+    Hash::Util::lock_keys: \$self->%, < (_accessible_keys: $class)
     return $self
 
 
 sub _accessible_keys($class)
     return  @:  <
-                    keys Symbol::fetch_glob($class.'::FIELDS')->*->%
-                < @+: map( { _accessible_keys($_) }, Symbol::fetch_glob($class.'::ISA')->*->@)
+                    keys (Symbol::fetch_glob: $class.'::FIELDS')->*->%
+                < @+: map:  { (_accessible_keys: $_) }, (Symbol::fetch_glob: $class.'::ISA')->*->@
         
 
 
 sub phash
-    die "Pseudo-hashes have been removed from Perl"
+    die: "Pseudo-hashes have been removed from Perl"
 
 
 1

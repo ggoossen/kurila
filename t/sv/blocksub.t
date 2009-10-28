@@ -4,9 +4,9 @@ BEGIN
     require "./test.pl"
 
 
-plan tests => 1
+plan: tests => 1
 
 do
     my $blocksub = { return $_ }
-    is( $blocksub->(33), 33 )
+    is: ( $blocksub->& <: 33), 33 
 

@@ -4,7 +4,7 @@ package Foo
 
 use Test::More
 
-plan tests => 3
+plan: tests => 3
 
 use constant MyClass => 'Foo::Bar::Biz::Baz'
 
@@ -16,6 +16,6 @@ use constant NoClass => 'Nope::Foo::Bar::Biz::Baz'
 
 for (qw(Nope Nope:: NoClass))
     eval "sub \{ my $_ \$obj = shift; \}"
-    ok $^EVAL_ERROR
+    ok: $^EVAL_ERROR
 #    print $@ if $@;
 

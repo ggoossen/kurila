@@ -4,7 +4,7 @@ use MIME::QuotedPrint
 my $x70 = "x" x 70
 
 my @tests =
-    @: 
+    @:
    # plain ascii should not be encoded
    \(@: "", "")
    \(@: "quoted printable"  =>
@@ -28,7 +28,7 @@ my @tests =
         "The Quoted-Printable encoding is intended to represent data that largly con=
 sists of octets that correspond to printable characters in the ASCII charac=
 ter set.=\n"
-       )
+     )
 
    # Long lines after short lines were broken through 2.01.
    \(@: "short line
@@ -87,87 +87,87 @@ y. -- H. L. Mencken=\n")
     
 
 my $notests = (nelems @tests) + 15
-print $^STDOUT, "1..$notests\n"
+print: $^STDOUT, "1..$notests\n"
 
 my $testno = 0
 for ( @tests)
     $testno++
     my (@: $plain, $encoded) =  $_->@
-    if (ord('A') == 193)  # EBCDIC 8 bit chars are different
+    if ((ord: 'A') == 193)  # EBCDIC 8 bit chars are different
         if ($testno == 2) { $plain =~ s/\xe5/\x47/; $plain =~ s/\x[e6]/\x[9c]/g; $plain =~ s/\xf8/\x70/; }
         if ($testno == 7) { $plain =~ s/\x[ff]/\x[df]/; }
     
-    my $x = encode_qp($plain)
+    my $x = encode_qp: $plain
     if ($x ne $encoded)
-        print $^STDOUT, "Encode test failed\n"
-        print $^STDOUT, "Got:      '$x'\n"
-        print $^STDOUT, "Expected: '$encoded'\n"
-        print $^STDOUT, "not ok $testno\n"
+        print: $^STDOUT, "Encode test failed\n"
+        print: $^STDOUT, "Got:      '$x'\n"
+        print: $^STDOUT, "Expected: '$encoded'\n"
+        print: $^STDOUT, "not ok $testno\n"
         next
     
-    $x = decode_qp($encoded)
+    $x = decode_qp: $encoded
     if ($x ne $plain)
-        print $^STDOUT, "Decode test failed\n"
-        print $^STDOUT, "Got:      '$x'\n"
-        print $^STDOUT, "Expected: '$plain'\n"
-        print $^STDOUT, "not ok $testno\n"
+        print: $^STDOUT, "Decode test failed\n"
+        print: $^STDOUT, "Got:      '$x'\n"
+        print: $^STDOUT, "Expected: '$plain'\n"
+        print: $^STDOUT, "not ok $testno\n"
         next
     
-    print $^STDOUT, "ok $testno\n"
+    print: $^STDOUT, "ok $testno\n"
 
 
 # Some extra testing for a case that was wrong until libwww-perl-5.09
-print $^STDOUT, "not " unless decode_qp("foo  \n\nfoo =\n\nfoo=20\n\n") eq
+print: $^STDOUT, "not " unless (decode_qp: "foo  \n\nfoo =\n\nfoo=20\n\n") eq
     "foo\n\nfoo \nfoo \n\n"
-$testno++; print $^STDOUT, "ok $testno\n"
+$testno++; print: $^STDOUT, "ok $testno\n"
 
 # Same test but with "\r\n" terminated lines
-print $^STDOUT, "not " unless decode_qp("foo  \r\n\r\nfoo =\r\n\r\nfoo=20\r\n\r\n") eq
+print: $^STDOUT, "not " unless (decode_qp: "foo  \r\n\r\nfoo =\r\n\r\nfoo=20\r\n\r\n") eq
     "foo\n\nfoo \nfoo \n\n"
-$testno++; print $^STDOUT, "ok $testno\n"
+$testno++; print: $^STDOUT, "ok $testno\n"
 
 # Trailing whitespace
-print $^STDOUT, "not " unless decode_qp("foo  ") eq "foo  "
-$testno++; print $^STDOUT, "ok $testno\n"
+print: $^STDOUT, "not " unless (decode_qp: "foo  ") eq "foo  "
+$testno++; print: $^STDOUT, "ok $testno\n"
 
-print $^STDOUT, "not " unless decode_qp("foo  \n") eq "foo\n"
-$testno++; print $^STDOUT, "ok $testno\n"
+print: $^STDOUT, "not " unless (decode_qp: "foo  \n") eq "foo\n"
+$testno++; print: $^STDOUT, "ok $testno\n"
 
-print $^STDOUT, "not " unless decode_qp("foo = \t\x20\nbar\t\x20\n") eq "foo bar\n"
-$testno++; print $^STDOUT, "ok $testno\n"
+print: $^STDOUT, "not " unless (decode_qp: "foo = \t\x20\nbar\t\x20\n") eq "foo bar\n"
+$testno++; print: $^STDOUT, "ok $testno\n"
 
-print $^STDOUT, "not " unless decode_qp("foo = \t\x20\r\nbar\t\x20\r\n") eq "foo bar\n"
-$testno++; print $^STDOUT, "ok $testno\n"
+print: $^STDOUT, "not " unless (decode_qp: "foo = \t\x20\r\nbar\t\x20\r\n") eq "foo bar\n"
+$testno++; print: $^STDOUT, "ok $testno\n"
 
-print $^STDOUT, "not " unless decode_qp("foo = \t\x20\n") eq "foo "
-$testno++; print $^STDOUT, "ok $testno\n"
+print: $^STDOUT, "not " unless (decode_qp: "foo = \t\x20\n") eq "foo "
+$testno++; print: $^STDOUT, "ok $testno\n"
 
-print $^STDOUT, "not " unless decode_qp("foo = \t\x20\r\n") eq "foo "
-$testno++; print $^STDOUT, "ok $testno\n"
+print: $^STDOUT, "not " unless (decode_qp: "foo = \t\x20\r\n") eq "foo "
+$testno++; print: $^STDOUT, "ok $testno\n"
 
-print $^STDOUT, "not " unless decode_qp("foo = \t\x20y\r\n") eq "foo = \t\x20y\n"
-$testno++; print $^STDOUT, "ok $testno\n"
+print: $^STDOUT, "not " unless (decode_qp: "foo = \t\x20y\r\n") eq "foo = \t\x20y\n"
+$testno++; print: $^STDOUT, "ok $testno\n"
 
-print $^STDOUT, "not " unless decode_qp("foo =xy\n") eq "foo =xy\n"
-$testno++; print $^STDOUT, "ok $testno\n"
+print: $^STDOUT, "not " unless (decode_qp: "foo =xy\n") eq "foo =xy\n"
+$testno++; print: $^STDOUT, "ok $testno\n"
 
 # Test with with alternative line break
-print $^STDOUT, "not " unless encode_qp("$x70!2345$x70\n", "***") eq "$x70!2345=***$x70***"
-$testno++; print $^STDOUT, "ok $testno\n"
+print: $^STDOUT, "not " unless (encode_qp: "$x70!2345$x70\n", "***") eq "$x70!2345=***$x70***"
+$testno++; print: $^STDOUT, "ok $testno\n"
 
 # Test with no line breaks
-print $^STDOUT, "not " unless encode_qp("$x70!2345$x70\n", "") eq "$x70!2345$x70=0A"
-$testno++; print $^STDOUT, "ok $testno\n"
+print: $^STDOUT, "not " unless (encode_qp: "$x70!2345$x70\n", "") eq "$x70!2345$x70=0A"
+$testno++; print: $^STDOUT, "ok $testno\n"
 
 # Test binary encoding
-print $^STDOUT, "not " unless encode_qp("foo", undef, 1) eq "foo=\n"
-$testno++; print $^STDOUT, "ok $testno\n"
+print: $^STDOUT, "not " unless (encode_qp: "foo", undef, 1) eq "foo=\n"
+$testno++; print: $^STDOUT, "ok $testno\n"
 
-print $^STDOUT, "not " unless encode_qp("foo\nbar\r\n", undef, 1) eq "foo=0Abar=0D=0A=\n"
-$testno++; print $^STDOUT, "ok $testno\n"
+print: $^STDOUT, "not " unless (encode_qp: "foo\nbar\r\n", undef, 1) eq "foo=0Abar=0D=0A=\n"
+$testno++; print: $^STDOUT, "ok $testno\n"
 
 use bytes
-print $^STDOUT, "not " unless encode_qp(join("", map { chr }, 0..255), undef, 1) eq <<'EOT'; $testno++; print $^STDOUT, "ok $testno\n"
+print: $^STDOUT, "not " unless (encode_qp: (join: "", (map: { chr }, 0..255)), undef, 1) eq <<'EOT'; $testno++; print: $^STDOUT, "ok $testno\n"
 =00=01=02=03=04=05=06=07=08=09=0A=0B=0C=0D=0E=0F=10=11=12=13=14=15=16=17=18=
 =19=1A=1B=1C=1D=1E=1F !"#$%&'()*+,-./0123456789:;<=3D>?@ABCDEFGHIJKLMNOPQRS=
 TUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~=7F=80=81=82=83=84=85=86=87=88=

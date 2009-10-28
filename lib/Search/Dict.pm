@@ -58,26 +58,26 @@ sub look
     
     $comp = sub (@< @_) { @_[0] cmp @_[1] } unless defined $comp
     local($_)
-    my(@: @stat) =@:  (@:  stat($fh) )
+    my(@: @stat) =@:  (@:  (stat: $fh) )
         or return -1
     my(@: $size, $blksize) =  @stat[[(@: 7,11)]]
     $blksize ||= 8192
     $key =~ s/[^\w\s]//g if $dict
     $key = lc $key       if $fold
     # find the right block
-    my(@: $min, $max) = @: 0, int($size / $blksize)
+    my(@: $min, $max) = @: 0, int: $size / $blksize
     my $mid
     while ($max - $min +> 1)
-        $mid = int(($max + $min) / 2)
-        seek($fh, $mid * $blksize, 0)
+        $mid = int: ($max + $min) / 2
+        seek: $fh, $mid * $blksize, 0
             or return -1
         ~< $fh if $mid                  # probably a partial line
         $_ = ~< $fh
-        $_ = $xfrm->($_) if defined $xfrm
+        $_ =( $xfrm->& <: $_) if defined $xfrm
         chomp
         s/[^\w\s]//g if $dict
         $_ = lc $_   if $fold
-        if (defined($_) && $comp->($_, $key) +< 0)
+        if ((defined: $_) &&( $comp->& <: $_, $key) +< 0)
             $min = $mid
         else
             $max = $mid
@@ -85,20 +85,20 @@ sub look
     
     # find the right line
     $min *= $blksize
-    seek($fh,$min,0)
+    seek: $fh,$min,0
         or return -1
     ~< $fh if $min
     while (1)
-        $min = tell($fh)
-        defined($_ = ~< $fh)
+        $min = tell: $fh
+        defined: ($_ = ~< $fh)
             or last
-        $_ = $xfrm->($_) if defined $xfrm
+        $_ =( $xfrm->& <: $_) if defined $xfrm
         chomp
         s/[^\w\s]//g if $dict
         $_ = lc $_   if $fold
-        last if $comp->($_, $key) +>= 0
+        last if ($comp->& <: $_, $key) +>= 0
     
-    seek($fh,$min,0)
+    seek: $fh,$min,0
     $min
 
 

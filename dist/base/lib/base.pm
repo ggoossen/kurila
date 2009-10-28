@@ -15,13 +15,13 @@ my $Fattr = \%fields::attr
 
 sub has_fields
     my(@: $base) =@:  shift
-    my $fglob = Symbol::fetch_glob("$base\::FIELDS")
-    return ($fglob && 'GLOB' eq ref($fglob) && $fglob->*{HASH}) ?? 1 !! 0
+    my $fglob = Symbol::fetch_glob: "$base\::FIELDS"
+    return ($fglob && 'GLOB' eq (ref: $fglob) && $fglob->*{HASH}) ?? 1 !! 0
 
 
 sub has_version
     my(@: $base) =@:  shift
-    my $vglob = Symbol::fetch_glob($base.'::VERSION')
+    my $vglob = Symbol::fetch_glob: $base.'::VERSION'
     return ($vglob && $vglob->*{SCALAR}) ?? 1 !! 0
 
 
@@ -38,16 +38,16 @@ sub get_attr
 
 sub get_fields
     # Shut up a possible typo warning.
-    my $x = \Symbol::fetch_glob(@_[0].'::FIELDS')->*->%
-    return \Symbol::fetch_glob(@_[0].'::FIELDS')->*->%
+    my $x = \(Symbol::fetch_glob: @_[0].'::FIELDS')->*->%
+    return \(Symbol::fetch_glob: @_[0].'::FIELDS')->*->%
 
 
 sub import
     my $class = shift
 
-    return SUCCESS unless (nelems @_)
+    return (SUCCESS: )unless (nelems @_)
 
-    return import_into($(caller(0)), < @_)
+    return import_into: $((caller: 0)), < @_
 
 
 sub import_into
@@ -59,57 +59,57 @@ sub import_into
     my @bases
     foreach my $base ( @_)
         if ( $inheritor eq $base )
-            warn "Class '$inheritor' tried to inherit from itself\n"
+            warn: "Class '$inheritor' tried to inherit from itself\n"
         
 
-        next if grep { $_->isa($base) }, @:  ($inheritor, < @bases)
+        next if grep: { ($_->isa: $base) }, @:  ($inheritor, < @bases)
 
         do
             eval "require $base"
             # Only ignore "Can't locate" errors from our eval require.
             # Other fatal errors (syntax etc) must be reported.
-            die if $^EVAL_ERROR && $^EVAL_ERROR->{?description} !~ m/^Can't locate .*?/
-            unless (Symbol::fetch_glob("$base\::")->*->%)
-                die(<<ERROR)
+            die: if $^EVAL_ERROR && $^EVAL_ERROR->{?description} !~ m/^Can't locate .*?/
+            unless ((Symbol::fetch_glob: "$base\::")->*->%)
+                die: <<ERROR
 Base class package "$base" is empty.
     (Perhaps you need to 'use' the module which defines that package first,
-    or make that module available in \$^INCLUDE_PATH (\$^INCLUDE_PATH contains: $(join ' ',$^INCLUDE_PATH)).
+    or make that module available in \$^INCLUDE_PATH (\$^INCLUDE_PATH contains: $((join: ' ',$^INCLUDE_PATH))).
 ERROR
             
         
-        push @bases, $base
+        push: @bases, $base
 
-        if ( has_fields($base) || has_attr($base) )
+        if ( (has_fields: $base) || (has_attr: $base) )
             # No multiple fields inheritance *suck*
             if ($fields_base)
-                die("Can't multiply inherit fields")
+                die: "Can't multiply inherit fields"
             else
                 $fields_base = $base
             
         
     
     # Save this until the end so it's all or nothing if the above loop croaks.
-    push Symbol::fetch_glob("$inheritor\::ISA")->*->@, < @bases
+    push: (Symbol::fetch_glob: "$inheritor\::ISA")->*->@, < @bases
 
     if( defined $fields_base )
-        inherit_fields($inheritor, $fields_base)
+        inherit_fields: $inheritor, $fields_base
     
 
 
 
 sub inherit_fields($derived, $base)
 
-    return SUCCESS unless $base
+    return (SUCCESS: )unless $base
 
-    my $battr = get_attr($base)
-    my $dattr = get_attr($derived)
-    my $dfields = get_fields($derived)
-    my $bfields = get_fields($base)
+    my $battr = get_attr: $base
+    my $dattr = get_attr: $derived
+    my $dfields = get_fields: $derived
+    my $bfields = get_fields: $base
 
     $dattr->[0] = (nelems $battr->@)
 
     if( $dfields->% )
-        warn <<"END"
+        warn: <<"END"
 $derived is inheriting from $base but already has its own fields!
 This will cause problems.  Be sure you use base BEFORE declaring fields.
 END
@@ -123,20 +123,20 @@ END
     while (my(@: ?$k,?$v) =(@:  each $bfields->%))
         my $fno
         if ($fno = $dfields->{?$k} and $fno != $v)
-            die("Inherited fields can't override existing fields")
+            die: "Inherited fields can't override existing fields"
         
 
-        if( $battr->[$v] ^&^ PRIVATE )
-            $dattr->[+$v] = PRIVATE ^|^ INHERITED
+        if( $battr->[$v] ^&^ (PRIVATE: ))
+            $dattr->[+$v] = (PRIVATE: )^|^ (INHERITED: )
         else
-            $dattr->[+$v] = INHERITED ^|^ $battr->[$v]
+            $dattr->[+$v] = (INHERITED: )^|^ $battr->[$v]
             $dfields->{+$k} = $v
         
     
 
     foreach my $idx (1..(nelems $battr->@)-1)
         next if defined $dattr->[?$idx]
-        $dattr->[+$idx] = $battr->[$idx] ^&^ INHERITED
+        $dattr->[+$idx] = $battr->[$idx] ^&^ (INHERITED: )
     
 
 

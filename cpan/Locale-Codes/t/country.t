@@ -13,7 +13,7 @@ use Locale::Country
 # If it is true (1), the test is treated as passing, otherwise it failed.
 #-----------------------------------------------------------------------
 our @TESTS =
-    @: 
+    @:
  #================================================
  # TESTS FOR code2country
  #================================================
@@ -131,14 +131,14 @@ our @TESTS =
     
 
 use Test::More
-plan tests => nelems(@TESTS)
+plan: tests => nelems: @TESTS
 
 foreach my $test ( @TESTS)
     if ($test->[1])
         eval "$test->[0]"
-        ok $^EVAL_ERROR && $^EVAL_ERROR->message
+        ok: $^EVAL_ERROR && $^EVAL_ERROR->message: 
     else
-        ok($test->[0])
+        ok: $test->[0]
     
 
 

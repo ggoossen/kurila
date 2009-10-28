@@ -15,8 +15,8 @@ do
 
     package Child
 
-    base->import( <qw(Middle Parent))
+    base->import:  <qw(Middle Parent)
 
 
-is_deeply \ @Child::ISA, \qw(Middle),
-          'base.pm will not add to @ISA if you already are-a'
+is_deeply: \ @Child::ISA, \qw(Middle)
+           'base.pm will not add to @ISA if you already are-a'

@@ -19,19 +19,19 @@ unless (-d 't' && -f 'MANIFEST')
 do
     my $proto = $prefix . 'proto.h'
 
-    open my $fh, '<', $proto or die "Can't open $proto: $^OS_ERROR"
+    open: my $fh, '<', $proto or die: "Can't open $proto: $^OS_ERROR"
 
     while (~<$fh)
         %declared{+$1}++ if m/^#define\s+(PERL_ARGS_ASSERT[A-Za-z_]+)\s+/
 
-cmp_ok(nkeys %declared, '+>', 0, 'Some macros were declared')
+cmp_ok: nkeys %declared, '+>', 0, 'Some macros were declared'
 
 if (!@ARGV)
     my $manifest = $prefix . 'MANIFEST'
-    open my $fh, '<', $manifest or die "Can't open $manifest: $^OS_ERROR"
+    open: my $fh, '<', $manifest or die: "Can't open $manifest: $^OS_ERROR"
     while (~<$fh)
         # *.c or */*.c
-        push @ARGV, $prefix . $1 if m!^((?:[^/]+/)?[^/]+(?:\.c|_i\.h))\t!
+        push: @ARGV, $prefix . $1 if m!^((?:[^/]+/)?[^/]+(?:\.c|_i\.h))\t!
 
 while (~< *ARGV)
     %used{+$1}++ if m/^\s+(PERL_ARGS_ASSERT_[A-Za-z_]+);?$/
@@ -42,7 +42,7 @@ foreach (keys %declared)
     %unused{+$_}++ unless %used{?$_}
 
 if (keys %unused)
-    for (sort keys %unused)
-        fail("$_ is declared but not used")
+    for ((sort: keys %unused))
+        fail: "$_ is declared but not used"
 else
-    pass('Every PERL_ARGS_ASSERT* macro declared is used')
+    pass: 'Every PERL_ARGS_ASSERT* macro declared is used'

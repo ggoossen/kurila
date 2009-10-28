@@ -31,7 +31,7 @@
 #
 #  -- .robin. <robin@kitsite.com>  2001-03-13
 require "./test.pl"
-plan( tests => 33 )
+plan:  tests => 33 
 
 my $ok
 
@@ -56,7 +56,7 @@ my $ok
     
     $ok = 0
 
-cmp_ok($ok,'==',1,'no label on while()')
+cmp_ok: $ok,'==',1,'no label on while()'
 
 :TEST2 do
 
@@ -79,7 +79,7 @@ cmp_ok($ok,'==',1,'no label on while()')
     
     $ok = 0
 
-cmp_ok($ok,'==',1,'no label on while() successful next')
+cmp_ok: $ok,'==',1,'no label on while() successful next'
 
 :TEST3 do
 
@@ -104,7 +104,7 @@ cmp_ok($ok,'==',1,'no label on while() successful next')
     
     $ok = $been_in_loop && $been_in_continue
 
-cmp_ok($ok,'==',1,'no label on while() unsuccessful next')
+cmp_ok: $ok,'==',1,'no label on while() unsuccessful next'
 
 :TEST4 do
 
@@ -127,7 +127,7 @@ cmp_ok($ok,'==',1,'no label on while() unsuccessful next')
     
     $ok = 1
 
-cmp_ok($ok,'==',1,'no label on while() last')
+cmp_ok: $ok,'==',1,'no label on while() last'
 
 :TEST5 do
 
@@ -150,7 +150,7 @@ cmp_ok($ok,'==',1,'no label on while() last')
     
     $ok = 0
 
-cmp_ok($ok,'==',1,'no label on until()')
+cmp_ok: $ok,'==',1,'no label on until()'
 
 :TEST6 do
 
@@ -173,7 +173,7 @@ cmp_ok($ok,'==',1,'no label on until()')
     
     $ok = 0
 
-cmp_ok($ok,'==',1,'no label on until() successful next')
+cmp_ok: $ok,'==',1,'no label on until() successful next'
 
 :TEST7 do
 
@@ -198,7 +198,7 @@ cmp_ok($ok,'==',1,'no label on until() successful next')
     
     $ok = $been_in_loop && $been_in_continue
 
-cmp_ok($ok,'==',1,'no label on until() unsuccessful next')
+cmp_ok: $ok,'==',1,'no label on until() unsuccessful next'
 
 :TEST8 do
 
@@ -221,7 +221,7 @@ cmp_ok($ok,'==',1,'no label on until() unsuccessful next')
     
     $ok = 1
 
-cmp_ok($ok,'==',1,'no label on until() last')
+cmp_ok: $ok,'==',1,'no label on until() last'
 
 :TEST9 do
 
@@ -243,7 +243,7 @@ cmp_ok($ok,'==',1,'no label on until() last')
     
     $ok = 0
 
-cmp_ok($ok,'==',1,'no label on for(@array)')
+cmp_ok: $ok,'==',1,'no label on for(@array)'
 
 :TEST10 do
 
@@ -265,7 +265,7 @@ cmp_ok($ok,'==',1,'no label on for(@array)')
     
     $ok = 0
 
-cmp_ok($ok,'==',1,'no label on for(@array) successful next')
+cmp_ok: $ok,'==',1,'no label on for(@array) successful next'
 
 :TEST11 do
 
@@ -289,7 +289,7 @@ cmp_ok($ok,'==',1,'no label on for(@array) successful next')
     
     $ok = $been_in_loop && $been_in_continue
 
-cmp_ok($ok,'==',1,'no label on for(@array) unsuccessful next')
+cmp_ok: $ok,'==',1,'no label on for(@array) unsuccessful next'
 
 :TEST12 do
 
@@ -311,7 +311,7 @@ cmp_ok($ok,'==',1,'no label on for(@array) unsuccessful next')
     
     $ok = 1
 
-cmp_ok($ok,'==',1,'no label on for(@array) last')
+cmp_ok: $ok,'==',1,'no label on for(@array) last'
 
 ### Now do it all again with labels
 
@@ -336,7 +336,7 @@ cmp_ok($ok,'==',1,'no label on for(@array) last')
     
     $ok = 0
 
-cmp_ok($ok,'==',1,'label on while()')
+cmp_ok: $ok,'==',1,'label on while()'
 
 :TEST21 do
 
@@ -359,7 +359,7 @@ cmp_ok($ok,'==',1,'label on while()')
     
     $ok = 0
 
-cmp_ok($ok,'==',1,'label on while() successful next')
+cmp_ok: $ok,'==',1,'label on while() successful next'
 
 :TEST22 do
 
@@ -384,7 +384,7 @@ cmp_ok($ok,'==',1,'label on while() successful next')
     
     $ok = $been_in_loop && $been_in_continue
 
-cmp_ok($ok,'==',1,'label on while() unsuccessful next')
+cmp_ok: $ok,'==',1,'label on while() unsuccessful next'
 
 :TEST23 do
 
@@ -407,7 +407,7 @@ cmp_ok($ok,'==',1,'label on while() unsuccessful next')
     
     $ok = 1
 
-cmp_ok($ok,'==',1,'label on while() last')
+cmp_ok: $ok,'==',1,'label on while() last'
 
 :TEST24 do
 
@@ -430,7 +430,7 @@ cmp_ok($ok,'==',1,'label on while() last')
     
     $ok = 0
 
-cmp_ok($ok,'==',1,'label on until()')
+cmp_ok: $ok,'==',1,'label on until()'
 
 :TEST25 do
 
@@ -453,7 +453,7 @@ cmp_ok($ok,'==',1,'label on until()')
     
     $ok = 0
 
-cmp_ok($ok,'==',1,'label on until() successful next')
+cmp_ok: $ok,'==',1,'label on until() successful next'
 
 :TEST26 do
 
@@ -478,7 +478,7 @@ cmp_ok($ok,'==',1,'label on until() successful next')
     
     $ok = $been_in_loop && $been_in_continue
 
-cmp_ok($ok,'==',1,'label on until() unsuccessful next')
+cmp_ok: $ok,'==',1,'label on until() unsuccessful next'
 
 :TEST27 do
 
@@ -501,7 +501,7 @@ cmp_ok($ok,'==',1,'label on until() unsuccessful next')
     
     $ok = 1
 
-cmp_ok($ok,'==',1,'label on until() last')
+cmp_ok: $ok,'==',1,'label on until() last'
 
 :TEST28 do
 
@@ -523,7 +523,7 @@ cmp_ok($ok,'==',1,'label on until() last')
     
     $ok = 0
 
-cmp_ok($ok,'==',1,'label on for(@array)')
+cmp_ok: $ok,'==',1,'label on for(@array)'
 
 :TEST29 do
 
@@ -545,7 +545,7 @@ cmp_ok($ok,'==',1,'label on for(@array)')
     
     $ok = 0
 
-cmp_ok($ok,'==',1,'label on for(@array) successful next')
+cmp_ok: $ok,'==',1,'label on for(@array) successful next'
 
 :TEST30 do
 
@@ -569,7 +569,7 @@ cmp_ok($ok,'==',1,'label on for(@array) successful next')
     
     $ok = $been_in_loop && $been_in_continue
 
-cmp_ok($ok,'==',1,'label on for(@array) unsuccessful next')
+cmp_ok: $ok,'==',1,'label on for(@array) unsuccessful next'
 
 :TEST31 do
 
@@ -591,7 +591,7 @@ cmp_ok($ok,'==',1,'label on for(@array) unsuccessful next')
     
     $ok = 1
 
-cmp_ok($ok,'==',1,'label on for(@array) last')
+cmp_ok: $ok,'==',1,'label on for(@array) last'
 
 :TEST36 do
 
@@ -611,7 +611,7 @@ cmp_ok($ok,'==',1,'label on for(@array) last')
     
     $ok = 0
 
-cmp_ok($ok,'==',1,'label on bare block')
+cmp_ok: $ok,'==',1,'label on bare block'
 
 :TEST38 do
 
@@ -622,7 +622,7 @@ cmp_ok($ok,'==',1,'label on bare block')
     
     $ok = 1
 
-cmp_ok($ok,'==',1,'label on bare block last')
+cmp_ok: $ok,'==',1,'label on bare block last'
 
 :TEST39 do
     $ok = 0
@@ -644,25 +644,25 @@ cmp_ok($ok,'==',1,'label on bare block last')
         $ok = 0
     
 
-cmp_ok($ok,'==',1,'nested constructs')
+cmp_ok: $ok,'==',1,'nested constructs'
 
 sub test_last_label { last TEST40 }
 
 :TEST40 do
     $ok = 1
-    test_last_label()
+    (test_last_label: )
     $ok = 0
 
-cmp_ok($ok,'==',1,'dynamically scoped label')
+cmp_ok: $ok,'==',1,'dynamically scoped label'
 
 sub test_last { last }
 
 :TEST41 do
     $ok = 1
-    test_last()
+    (test_last: )
     $ok = 0
 
-cmp_ok($ok,'==',1,'dynamically scoped')
+cmp_ok: $ok,'==',1,'dynamically scoped'
 
 
 # [perl #27206] Memory leak in continue loop
@@ -674,9 +674,9 @@ do
     sub X::DESTROY { $late_free++ if $n +< 0 };
     :LOOP
         do
-        ($n-- && bless \$%, 'X') && redo
+        ($n-- && (bless: \$%, 'X')) && redo
     
-    cmp_ok($late_free,'==',0,"bug 27206: redo memory leak")
+    cmp_ok: $late_free,'==',0,"bug 27206: redo memory leak"
 
 
 # ensure that redo doesn't clear a lexical declared in the condition
@@ -686,25 +686,25 @@ do
     while (my $x = $i)
         $i++
         redo if $i == 2
-        cmp_ok($x,'==',1,"while/redo lexical life")
+        cmp_ok: $x,'==',1,"while/redo lexical life"
         last
     
     $i = 1
     until (! (my $x = $i))
         $i++
         redo if $i == 2
-        cmp_ok($x,'==',1,"until/redo lexical life")
+        cmp_ok: $x,'==',1,"until/redo lexical life"
         last
 
 
 :TODO do
-    todo_skip("modification of readonly value", 1)
+    todo_skip: "modification of readonly value", 1
     our @a37725
     @a37725[3] = 1 # use package var
     our $i = 2
-    for my $x ((@: reverse < @a37725))
+    for my $x ((@: (reverse: < @a37725)))
         $x = $i++
     
-    cmp_ok("$(join ' ',@a37725)",'eq',"5 4 3 2",'bug 27725: reverse with empty slots bug')
+    cmp_ok: "$((join: ' ',@a37725))",'eq',"5 4 3 2",'bug 27725: reverse with empty slots bug'
 
 

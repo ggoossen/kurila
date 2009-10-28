@@ -21,18 +21,18 @@ Remove the legs from the lizard, the wings from the owlet, and the tongue of the
 EOHOW
 
 
-print $^STDOUT, < form \(%: bullet=>'*'),
-                       '=================[ {||||||||||||||||||||||||||} ]=================',
-                       $recipe,
-                       '                                                                  ',
-                       'Preparation time:               Method:                           ',
-                       '   {<<<<<<<<<<<<<<<<<<<<}          {<<<<<<<<<<<<<<<<<<<<<<<<<<<<} ',
-                       $prep_time,                     $method,
-                       '                                   {VVVVVVVVVVVVVVVVVVVVVVVVVVVV} ',
-                       'Serves:                            {VVVVVVVVVVVVVVVVVVVVVVVVVVVV} ',
-                       '   {<<<<<<<<<<<<<<<<<<<<}          {VVVVVVVVVVVVVVVVVVVVVVVVVVVV} ',
-                       $serves,
-                       '                                   {VVVVVVVVVVVVVVVVVVVVVVVVVVVV} ',
-                       'Ingredients:                       {VVVVVVVVVVVVVVVVVVVVVVVVVVVV} ',
-                       '   * {[[[[[[[[[[[[[[[[[[}          {VVVVVVVVVVVVVVVVVVVVVVVVVVVV} ',
-                       $ingredients
+print: $^STDOUT, < form: \(%: bullet=>'*')
+                         '=================[ {||||||||||||||||||||||||||} ]================='
+                         $recipe
+                         '                                                                  '
+                         'Preparation time:               Method:                           '
+                         '   {<<<<<<<<<<<<<<<<<<<<}          {<<<<<<<<<<<<<<<<<<<<<<<<<<<<} '
+                         $prep_time,                     $method
+                         '                                   {VVVVVVVVVVVVVVVVVVVVVVVVVVVV} '
+                         'Serves:                            {VVVVVVVVVVVVVVVVVVVVVVVVVVVV} '
+                         '   {<<<<<<<<<<<<<<<<<<<<}          {VVVVVVVVVVVVVVVVVVVVVVVVVVVV} '
+                         $serves
+                         '                                   {VVVVVVVVVVVVVVVVVVVVVVVVVVVV} '
+                         'Ingredients:                       {VVVVVVVVVVVVVVVVVVVVVVVVVVVV} '
+                         '   * {[[[[[[[[[[[[[[[[[[}          {VVVVVVVVVVVVVVVVVVVVVVVVVVVV} '
+                         $ingredients

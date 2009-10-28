@@ -15,19 +15,19 @@ BEGIN
 BEGIN
     require './test.pl'	# for which_perl() etc
 
-my $Perl = which_perl()
+my $Perl = (which_perl: )
 
 $^OUTPUT_AUTOFLUSH=1
 
 my @prgs = $@
 while( ~< $^DATA)
     if(m/^#{8,}\s*(.*)/)
-        push @prgs, \@: '', $1
+        push: @prgs, \@: '', $1
     else
         @prgs[-1]->[0] .= $_
     
 
-plan tests => scalar nelems @prgs
+plan: tests => scalar nelems @prgs
 
 foreach my $prog ( @prgs)
     my(@: $raw_prog, $name) =  $prog->@
@@ -37,18 +37,18 @@ foreach my $prog ( @prgs)
         $switch = $1
     
 
-    my(@: $prog,?$expected) =  split(m/\nEXPECT\n/, $raw_prog)
+    my(@: $prog,?$expected) =  split: m/\nEXPECT\n/, $raw_prog
     $prog .= "\n"
     $expected = '' unless defined $expected
 
     if ($prog =~ m/^\# SKIP: (.+)/m)
         if (eval $1)
-            ok(1, "Skip: $1")
+            ok: 1, "Skip: $1"
             next
 
     $expected =~ s/\n+$//
 
-    fresh_perl_is($prog, $expected, \(%:  switches => \(@: $switch || '') ), $name)
+    fresh_perl_is: $prog, $expected, \(%:  switches => \(@: $switch || '') ), $name
 
 
 __END__

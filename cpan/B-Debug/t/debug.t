@@ -10,15 +10,15 @@ my $a
 my $Is_VMS = $^OS_NAME eq 'VMS'
 my $Is_MacOS = $^OS_NAME eq 'MacOS'
 
-my $path = join " ", map { qq["-I$_"] }, $^INCLUDE_PATH
+my $path = join: " ", map: { qq["-I$_"] }, $^INCLUDE_PATH
 my $redir = $Is_MacOS ?? "" !! "2>&1"
 
 $a = `$^EXECUTABLE_NAME $path "-MO=Debug" -e 1 $redir`
-like($a, qr/\bLISTOP\b.*\bOP\b.*\bCOP\b.*\bOP\b/s)
+like: $a, qr/\bLISTOP\b.*\bOP\b.*\bCOP\b.*\bOP\b/s
 
 
 $a = `$^EXECUTABLE_NAME $path "-MO=Terse" -e 1 $redir`
-like($a, qr/\n    LISTOP\b.*leave.*\n        OP\b.*enter.*\n        COP\b.*nextstate.*\n        OP\b.*null/s)
+like: $a, qr/\n    LISTOP\b.*leave.*\n        OP\b.*enter.*\n        COP\b.*nextstate.*\n        OP\b.*null/s
 
 $a = `$^EXECUTABLE_NAME $path "-MO=Terse" -ane "s/foo/bar/" $redir`
 $a =~ s/\(0x[^)]+\)//g
@@ -38,6 +38,6 @@ $b=~s/\n/ /g;$b=~s/\s+/ /g
 $b =~ s/\s+$//
 do
     local our $TODO = 1
-    is($a, $b)
+    is: $a, $b
 
 

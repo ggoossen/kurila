@@ -43,34 +43,34 @@ with a volume name, a relative pathname should always begin with a
 use Symbol
 
 sub new($class, ?$dir)
-    my $dh = gensym
+    my $dh = (gensym: )
     if (defined $dir)
-        DirHandle::open($dh, $dir)
+        DirHandle::open: $dh, $dir
             or return undef
     
-    bless $dh, $class
+    bless: $dh, $class
 
 
 sub DESTROY($self)
     # Don't warn about already being closed as it may have been closed
     # correctly, or maybe never opened at all.
     no warnings 'io'
-    closedir($self)
+    closedir: $self
 
 sub open($dh, $dirname)
-    opendir($dh, $dirname)
+    opendir: $dh, $dirname
 
 sub close($dh)
-    closedir($dh)
+    closedir: $dh
 
 
 sub readdir($dh)
-    return $( CORE::readdir($dh) )
+    return $( (CORE::readdir: $dh) )
 
 
 sub readdirs($dh)
-    return @:  CORE::readdir($dh)  # Force list context.
+    return @:  CORE::readdir: $dh  # Force list context.
 
 
 sub rewind($dh)
-    rewinddir($dh)
+    rewinddir: $dh

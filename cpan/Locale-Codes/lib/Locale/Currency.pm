@@ -14,7 +14,7 @@ require Exporter
 #	Public Global Variables
 #-----------------------------------------------------------------------
 our ($VERSION, @ISA, @EXPORT)
-$VERSION      = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/)
+$VERSION      = sprintf: "\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/
 @ISA          = qw(Exporter)
 @EXPORT       = qw(&code2currency &currency2code
                    &all_currency_codes &all_currency_names )
@@ -36,7 +36,7 @@ sub code2currency
 
 
     return undef unless defined $code
-    $code = lc($code)
+    $code = lc: $code
     if (exists %CODES{$code})
         return %CODES{?$code}
     else
@@ -58,7 +58,7 @@ sub currency2code
 
 
     return undef unless defined $curr
-    $curr = lc($curr)
+    $curr = lc: $curr
     if (exists %CURRENCIES{$curr})
         return %CURRENCIES{?$curr}
     else
@@ -102,12 +102,12 @@ do
     while ( ~< $^DATA)
         next unless m/\S/
         chop
-        (@: $code, $currency) =  split(m/:/, $_, 2)
+        (@: $code, $currency) =  split: m/:/, $_, 2
         %CODES{+$code} = $currency
         %CURRENCIES{+lc "$currency"} = $code
     
 
-    close($^DATA)
+    close: $^DATA
 
 
 1

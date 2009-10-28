@@ -13,7 +13,7 @@ use Locale::Script
 # If it is true (1), the test is treated as passing, otherwise it failed.
 #-----------------------------------------------------------------------
 our @TESTS =
-    @: 
+    @:
  #================================================
  # TESTS FOR code2script
  #================================================
@@ -82,14 +82,14 @@ our @TESTS =
 
 use Test::More
 
-plan tests => (nelems @TESTS)
+plan: tests => (nelems @TESTS)
 
 foreach my $test ( @TESTS)
-    diag($test->[0])
+    diag: $test->[0]
     my $ok = eval "$test->[0]"
     if ($test->[1])
-        ok($^EVAL_ERROR)
+        ok: $^EVAL_ERROR
     else
-        ok($ok)
+        ok: $ok
     
 

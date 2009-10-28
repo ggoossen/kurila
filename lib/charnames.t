@@ -3,7 +3,7 @@
 my @WARN
 
 BEGIN 
-    $^WARN_HOOK = sub (@< @_) { push @WARN, @_[0]->{?description} }
+    $^WARN_HOOK = sub (@< @_) { (push: @WARN, @_[0]->{?description}) }
 
 
 BEGIN 
@@ -13,13 +13,13 @@ require File::Spec
 
 $^OUTPUT_AUTOFLUSH = 1
 
-plan tests => 76
+plan: tests => 76
 
 use utf8
 
 use charnames ':full'
 
-is("Here\N{EXCLAMATION MARK}?", "Here!?")
+is: "Here\N{EXCLAMATION MARK}?", "Here!?"
 
 our ($res, $encoded_be, $encoded_alpha, $encoded_bet, $encoded_deseng)
 
@@ -32,28 +32,28 @@ do # as on ASCII or UTF-8 machines
 
 
 sub to_bytes
-    unpack"U0a*", shift
+    unpack: "U0a*", shift
 
 
 do
     use charnames ':full'
 
-    ok to_bytes("\N{CYRILLIC SMALL LETTER BE}") eq $encoded_be
+    ok: (to_bytes: "\N{CYRILLIC SMALL LETTER BE}") eq $encoded_be
 
     use charnames < qw(cyrillic greek :short);
 
-    ok to_bytes("\N{be},\N{alpha},\N{hebrew:bet}")
-       eq "$encoded_be,$encoded_alpha,$encoded_bet"
+    ok: to_bytes: "\N{be},\N{alpha},\N{hebrew:bet}"
+           eq "$encoded_be,$encoded_alpha,$encoded_bet"
 
 
 do
     use charnames ':full'
-    ok "\x{263a}" eq "\N{WHITE SMILING FACE}"
-    ok length("\x{263a}") == 1
-    ok length("\N{WHITE SMILING FACE}") == 1
-    ok sprintf("\%vx", "\N{WHITE SMILING FACE}") eq "263a"
-    ok sprintf("\%vx", "\x{FF}\N{WHITE SMILING FACE}") eq "ff.263a"
-    ok sprintf("\%vx", "\x{ff}\N{WHITE SMILING FACE}") eq "ff.263a"
+    ok: "\x{263a}" eq "\N{WHITE SMILING FACE}"
+    ok: (length: "\x{263a}") == 1
+    ok: (length: "\N{WHITE SMILING FACE}") == 1
+    ok: (sprintf: "\%vx", "\N{WHITE SMILING FACE}") eq "263a"
+    ok: (sprintf: "\%vx", "\x{FF}\N{WHITE SMILING FACE}") eq "ff.263a"
+    ok: (sprintf: "\%vx", "\x{ff}\N{WHITE SMILING FACE}") eq "ff.263a"
 
 
 do
@@ -63,19 +63,19 @@ do
     my $x = "\x{221b}"
     my $named = "\N{CUBE ROOT}"
 
-    ok ord($x) == ord($named)
+    ok: (ord: $x) == ord: $named
 
 
 do
     use charnames < qw(:full)
     use utf8
-    ok "\x{100}\N{CENT SIGN}" eq "\x{100}"."\N{CENT SIGN}"
+    ok: "\x{100}\N{CENT SIGN}" eq "\x{100}"."\N{CENT SIGN}"
 
 
 do
     use charnames ':full'
 
-    ok to_bytes("\N{DESERET SMALL LETTER ENG}") eq $encoded_deseng
+    ok: (to_bytes: "\N{DESERET SMALL LETTER ENG}") eq $encoded_deseng
 
 
 do
@@ -85,114 +85,114 @@ do
 
     use charnames ':full'
     my $text = "\N{LATIN CAPITAL LETTER A WITH DIAERESIS}"
-    ok $text eq "\x{c4}" && utf8::ord($text) == 0xc4
+    ok: $text eq "\x{c4}" && (utf8::ord: $text) == 0xc4
 
 
 do
-    ok charnames::viacode(0x1234) eq "ETHIOPIC SYLLABLE SEE"
+    ok: (charnames::viacode: 0x1234) eq "ETHIOPIC SYLLABLE SEE"
 
     # Unused Hebrew.
-    ok not defined charnames::viacode(0x0590)
+    ok: not defined charnames::viacode: 0x0590
 
 
 do
-    ok sprintf("\%04X", charnames::vianame("GOTHIC LETTER AHSA")) eq "10330"
+    ok: (sprintf: "\%04X", (charnames::vianame: "GOTHIC LETTER AHSA")) eq "10330"
 
-    ok not defined charnames::vianame("NONE SUCH")
+    ok: not defined charnames::vianame: "NONE SUCH"
 
 
 do
     # check that caching at least hasn't broken anything
 
-    ok charnames::viacode(0x1234) eq "ETHIOPIC SYLLABLE SEE"
+    ok: (charnames::viacode: 0x1234) eq "ETHIOPIC SYLLABLE SEE"
 
-    ok sprintf("\%04X", charnames::vianame("GOTHIC LETTER AHSA")) eq "10330"
+    ok: (sprintf: "\%04X", (charnames::vianame: "GOTHIC LETTER AHSA")) eq "10330"
 
 
 
-ok "\N{CHARACTER TABULATION}" eq "\t"
+ok: "\N{CHARACTER TABULATION}" eq "\t"
 
-ok "\N{ESCAPE}" eq "\e"
+ok: "\N{ESCAPE}" eq "\e"
 
-ok "\N{NULL}" eq "\c@"
+ok: "\N{NULL}" eq "\c@"
 
 if ($^OS_NAME eq 'MacOS')
-    ok "\N{CARRIAGE RETURN (CR)}" eq "\n"
-    ok "\N{CARRIAGE RETURN}" eq "\n"
-    ok "\N{CR}" eq "\n"
+    ok: "\N{CARRIAGE RETURN (CR)}" eq "\n"
+    ok: "\N{CARRIAGE RETURN}" eq "\n"
+    ok: "\N{CR}" eq "\n"
 else
-    ok "\N{LINE FEED (LF)}" eq "\n"
-    ok "\N{LINE FEED}" eq "\n"
-    ok "\N{LF}" eq "\n"
+    ok: "\N{LINE FEED (LF)}" eq "\n"
+    ok: "\N{LINE FEED}" eq "\n"
+    ok: "\N{LF}" eq "\n"
 
 
-my $nel = ord("A") == 193 ?? qr/^(?:\x15|\x25)$/ !! qr/^\x85$/
+my $nel = (ord: "A") == 193 ?? qr/^(?:\x15|\x25)$/ !! qr/^\x85$/
 
-ok "\N{NEXT LINE (NEL)}" =~ $nel
-ok "\N{NEXT LINE}" =~ $nel
-ok "\N{NEL}" =~ $nel
-ok "\N{BYTE ORDER MARK}" eq chr(0xFEFF)
-ok "\N{BOM}" eq chr(0xFEFF)
+ok: "\N{NEXT LINE (NEL)}" =~ $nel
+ok: "\N{NEXT LINE}" =~ $nel
+ok: "\N{NEL}" =~ $nel
+ok: "\N{BYTE ORDER MARK}" eq chr: 0xFEFF
+ok: "\N{BOM}" eq chr: 0xFEFF
 
 do
     use warnings 'deprecated'
 
-    ok "\N{HORIZONTAL TABULATION}" eq "\t"
+    ok: "\N{HORIZONTAL TABULATION}" eq "\t"
 
-    ok grep { m/"HORIZONTAL TABULATION" is deprecated/ }, @WARN
+    ok: grep: { m/"HORIZONTAL TABULATION" is deprecated/ }, @WARN
 
     no warnings 'deprecated';
 
-    ok "\N{VERTICAL TABULATION}" eq "\013"
+    ok: "\N{VERTICAL TABULATION}" eq "\013"
 
-    ok not grep { m/"VERTICAL TABULATION" is deprecated/ }, @WARN
+    ok: not grep: { m/"VERTICAL TABULATION" is deprecated/ }, @WARN
 
 
-ok charnames::viacode(0xFEFF) eq "ZERO WIDTH NO-BREAK SPACE"
+ok: (charnames::viacode: 0xFEFF) eq "ZERO WIDTH NO-BREAK SPACE"
 
 do
     use warnings
-    ok ord("\N{BOM}") == 0xFEFF
+    ok: (ord: "\N{BOM}") == 0xFEFF
 
 
-ok ord("\N{ZWNJ}") == 0x200C
-ok ord("\N{ZWJ}") == 0x200D
-ok "\N{U+263A}" eq "\N{WHITE SMILING FACE}"
+ok: (ord: "\N{ZWNJ}") == 0x200C
+ok: (ord: "\N{ZWJ}") == 0x200D
+ok: "\N{U+263A}" eq "\N{WHITE SMILING FACE}"
 
 do
-    ok 0x3093 == charnames::vianame("HIRAGANA LETTER N")
-    ok 0x0397 == charnames::vianame("GREEK CAPITAL LETTER ETA")
+    ok: 0x3093 == charnames::vianame: "HIRAGANA LETTER N"
+    ok: 0x0397 == charnames::vianame: "GREEK CAPITAL LETTER ETA"
 
 
-ok not defined charnames::viacode(0x110000)
-ok not grep { m/you asked for U+110000/ }, @WARN
+ok: not defined charnames::viacode: 0x110000
+ok: not grep: { m/you asked for U+110000/ }, @WARN
 
 
 # ---- Alias extensions
 
-my $alifile = File::Spec->catfile(File::Spec->updir, < qw(lib unicore xyzzy_alias.pl))
+my $alifile = File::Spec->catfile: (File::Spec->updir: ), < qw(lib unicore xyzzy_alias.pl)
 
 my @prgs
 do 
     local $^INPUT_RECORD_SEPARATOR = undef
-    @prgs = split "\n########\n", ~< $^DATA
+    @prgs = split: "\n########\n", ~< $^DATA
 
 for ( @prgs)
-    my (@: $code, $exp, ...) = @: ( <split m/\nEXPECT\n/), '$'
-    my (@: $prog, $fil, ...) = @: ( <split m/\nFILE\n/, $code), ""
+    my (@: $code, $exp, ...) = @: ( <(split: m/\nEXPECT\n/)), '$'
+    my (@: $prog, $fil, ...) = @: ( <(split: m/\nFILE\n/, $code)), ""
     $prog = "use utf8; " . $prog
-    my $tmpfile = tempfile()
-    open my $tmp, ">", "$tmpfile" or die "Could not open $tmpfile: $^OS_ERROR"
-    print $tmp, $prog, "\n"
-    close $tmp or die "Could not close $tmpfile: $^OS_ERROR"
+    my $tmpfile = (tempfile: )
+    open: my $tmp, ">", "$tmpfile" or die: "Could not open $tmpfile: $^OS_ERROR"
+    print: $tmp, $prog, "\n"
+    close $tmp or die: "Could not close $tmpfile: $^OS_ERROR"
     if ($fil)
         $fil .= "\n"
-        open my $ali, ">", "$alifile" or die "Could not open $alifile: $^OS_ERROR"
-        print $ali, $fil
-        close $ali or die "Could not close $alifile: $^OS_ERROR"
+        open: my $ali, ">", "$alifile" or die: "Could not open $alifile: $^OS_ERROR"
+        print: $ali, $fil
+        close $ali or die: "Could not close $alifile: $^OS_ERROR"
     
-    my $res = runperl( progfile => $tmpfile,
-                       stderr => 1 )
+    my $res = runperl:  progfile => $tmpfile
+                        stderr => 1 
     my $status = $^CHILD_ERROR
     $res =~ s/[\r\n]+$//
     $res =~ s/tmp\d+/-/g			# fake $prog from STDIN
@@ -206,25 +206,25 @@ for ( @prgs)
     my $pfx = ($res =~ s/^PREFIX\n//)
     my $rexp = qr{^$exp}
     if ($res =~ s/^SKIPPED\n//)
-        print $^STDOUT, "$res\n"
+        print: $^STDOUT, "$res\n"
     elsif (($pfx and $res !~ m/^\Q$exp/) or
         (!$pfx and $res !~ $rexp))
-        print $^STDERR,
-            "PROG:\n$prog\n",
-            "FILE:\n$fil",
-            "EXPECTED:\n$exp\n",
-            "GOT:\n$res\n"
-        print $^STDOUT, "not "
+        print: $^STDERR
+               "PROG:\n$prog\n"
+               "FILE:\n$fil"
+               "EXPECTED:\n$exp\n"
+               "GOT:\n$res\n"
+        print: $^STDOUT, "not "
     
-    ok 1
+    ok: 1
     $fil or next
-    1 while unlink $alifile
+    1 while unlink: $alifile
 
 
 # [perl #30409] charnames.pm clobbers default variable
 $_ = 'foobar'
-eval "use charnames ':full';"; die if $^EVAL_ERROR
-ok $_ eq 'foobar'
+eval "use charnames ':full';"; die: if $^EVAL_ERROR
+ok: $_ eq 'foobar'
 
 # Unicode slowdown noted by Phil Pennock, traced to a bug fix in index
 # SADAHIRO Tomoyuki's suggestion is to ensure that the UTF-8ness of both
@@ -233,19 +233,19 @@ ok $_ eq 'foobar'
 # (or at least should be). So assert that that it's true here.
 
 my $names = evalfile "unicore/Name.pl"
-ok defined $names
+ok: defined $names
 do # as on ASCII or UTF-8 machines
     my $non_ascii = $names =~ s/[^\0-\177]//g
-    ok not $non_ascii
+    ok: not $non_ascii
 
 
 # Verify that charnames propagate to eval("")
 my $evaltry = eval q[ "Eval: \N{LEFT-POINTING DOUBLE ANGLE QUOTATION MARK}" ]
-ok not $^EVAL_ERROR
-ok $evaltry eq "Eval: \N{LEFT-POINTING DOUBLE ANGLE QUOTATION MARK}"
+ok: not $^EVAL_ERROR
+ok: $evaltry eq "Eval: \N{LEFT-POINTING DOUBLE ANGLE QUOTATION MARK}"
 
 # Verify that db includes the normative NameAliases.txt names
-is("\N{BYZANTINE MUSICAL SYMBOL FTHORA SKLIRON CHROMA VASIS}", "\N{U+1D0C5}")
+is: "\N{BYZANTINE MUSICAL SYMBOL FTHORA SKLIRON CHROMA VASIS}", "\N{U+1D0C5}"
 
 
 __END__

@@ -13,7 +13,7 @@ no utf8 # we contain Latin-1
 # otherwise "ok N".
 #-----------------------------------------------------------------------
 our @TESTS =
-    @: 
+    @:
     #================================================
     # TESTS FOR code2language
     #================================================
@@ -94,11 +94,11 @@ our @TESTS =
 
 use Test::More
 
-plan( tests => nelems @TESTS )
+plan:  tests => nelems @TESTS 
 
 foreach my $test ( @TESTS)
     eval "$test"
-    ok( not $^EVAL_ERROR )
+    ok:  not $^EVAL_ERROR 
 
 
 exit 0

@@ -23,18 +23,18 @@ Pod::Simple::Text	Pod::Simple::TextContent
 Pod::Simple::Transcode	Pod::Simple::XMLOutStream
 
   )
-    plan tests => 2 + nelems @modules
+    plan: tests => 2 + nelems @modules
 ;
 
-ok 1
+ok: 1
 
 #chdir "t" if -e "t";
 foreach my $m ( @modules)
-    print $^STDOUT, "# Loading $m ...\n"
+    print: $^STDOUT, "# Loading $m ...\n"
     eval "require $m;"
-    die if $^EVAL_ERROR
-    ok 1
+    die: if $^EVAL_ERROR
+    ok: 1
 
 
-ok 1
+ok: 1
 

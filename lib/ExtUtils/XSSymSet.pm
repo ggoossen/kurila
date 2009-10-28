@@ -6,7 +6,7 @@ sub new($pkg,$maxlen,$silent)
   $maxlen ||= 31
   $silent ||= 0
   my $obj = \%: '__M@xLen' => $maxlen, '__S!lent' => $silent
-  return bless $obj, $pkg
+  return bless: $obj, $pkg
 
 
 sub trimsym($self,$name,$maxlen,$silent)
@@ -54,32 +54,32 @@ sub trimsym($self,$name,$maxlen,$silent)
       if (length $squeezed +<= $maxlen)
           $trimmed = $squeezed
       else
-        my $frac = int((length $trimmed - $maxlen) / length $trimmed + 0.5)
+        my $frac = int: (length $trimmed - $maxlen) / length $trimmed + 0.5
         my $pat = '(.).{$frac}'
         $trimmed =~ s/$pat/$1/g
 
-  warn "Warning: long symbol $name\n\ttrimmed to $trimmed\n\t" unless $silent
+  warn: "Warning: long symbol $name\n\ttrimmed to $trimmed\n\t" unless $silent
   return $trimmed
 
 
 sub addsym($self,$sym,$maxlen,$silent)
-  my $trimmed = $self->get_trimmed($sym)
+  my $trimmed = $self->get_trimmed: $sym
 
   return $trimmed if defined $trimmed
 
   $maxlen ||= $self->{?'__M@xLen'} || 31
   $silent ||= $self->{?'__S!lent'} || 0    
-  $trimmed = $self->trimsym($sym,$maxlen,1)
+  $trimmed = $self->trimsym: $sym,$maxlen,1
   if (exists $self->{$trimmed})
     my $i = "00"
-    $trimmed = $self->trimsym($sym,$maxlen-3,$silent)
+    $trimmed = $self->trimsym: $sym,$maxlen-3,$silent
     while (exists $self->{"$($trimmed)_$i"}) 
         $i++
-    warn "Warning: duplicate symbol $trimmed\n\tchanged to $($trimmed)_$i\n\t(original was $sym)\n\t"
+    warn: "Warning: duplicate symbol $trimmed\n\tchanged to $($trimmed)_$i\n\t(original was $sym)\n\t"
       unless $silent
     $trimmed .= "_$i"
   elsif (not $silent and $trimmed ne $sym)
-    warn "Warning: long symbol $sym\n\ttrimmed to $trimmed\n\t"
+    warn: "Warning: long symbol $sym\n\ttrimmed to $trimmed\n\t"
 
   $self->{+$trimmed} = $sym
   $self->{'__N+Map'}->{+$sym} = $trimmed
@@ -103,7 +103,7 @@ sub get_orig($self,$trimmed)
 
 
 sub all_orig($self) keys $self->{?'__N+Map'}->%
-sub all_trimmed($self) grep { m/^\w+$/ }, keys $self->%
+sub all_trimmed($self) grep: { m/^\w+$/ }, keys $self->%
 
 __END__
 

@@ -7,19 +7,19 @@ use B::Concise < qw(concise_subref set_style_standard)
 use Carp
 
 sub terse($order, ?$subref)
-    set_style_standard("terse")
+    set_style_standard: "terse"
     if ($order eq "exec")
-        concise_subref('exec', $subref)
+        concise_subref: 'exec', $subref
     else
-        concise_subref('basic', $subref)
+        concise_subref: 'basic', $subref
 
 
 sub compile
     my @args = @_
-    my $order = (nelems @args) ?? shift(@args) !! ""
+    my $order = (nelems @args) ?? (shift: @args) !! ""
     $order = "-exec" if $order eq "exec"
-    unshift @args, $order if $order ne ""
-    B::Concise::compile("-terse", < @args)
+    unshift: @args, $order if $order ne ""
+    B::Concise::compile: "-terse", < @args
 
 
 sub indent
@@ -30,31 +30,31 @@ sub indent
 # Don't use this, at least on OPs in subroutines: it has no way of
 # getting to the pad, and will give wrong answers or crash.
 sub B::OP::terse
-    carp "B::OP::terse is deprecated; use B::Concise instead"
-    B::Concise::b_terse(< @_)
+    carp: "B::OP::terse is deprecated; use B::Concise instead"
+    B::Concise::b_terse: < @_
 
 
 sub B::SV::terse
     my(@: $sv, $level) = @: < @_, 0
     my %info
-    B::Concise::concise_sv($sv, \%info)
-    my $s = indent($level)
-        . B::Concise::fmt_line(\%info, $sv,
-                               "#svclass~(?((#svaddr))?)~#svval", 0)
+    B::Concise::concise_sv: $sv, \%info
+    my $s = indent: $level
+        . B::Concise::fmt_line: \%info, $sv
+                                "#svclass~(?((#svaddr))?)~#svval", 0
     chomp $s
     $s
 
 
 sub B::NULL::terse
     my (@: $sv, $level) = @: < @_, 0
-    my $s = indent($level) . sprintf '%s (0x%lx)', class($sv), $sv->$
+    my $s = (indent: $level) . sprintf: '%s (0x%lx)', (class: $sv), $sv->$
     $s
 
 
 sub B::SPECIAL::terse
     my (@: $sv, $level) = @: < @_, 0
-    my $s = indent($level)
-        . sprintf( '%s #%d %s', class($sv), $sv->$, @specialsv_name[$sv->$])
+    my $s = indent: $level
+        . sprintf:  '%s #%d %s', (class: $sv), $sv->$, @specialsv_name[$sv->$]
     $s
 
 

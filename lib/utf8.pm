@@ -26,46 +26,46 @@ sub unimport
 # SWASHNEW
 sub SWASHNEW
     require "utf8_heavy.pl"
-    return utf8::SWASHNEW_real(< @_)
+    return utf8::SWASHNEW_real: < @_
 
 
 # utf version of string functions
 
 sub length($s)
-    BEGIN { utf8::import() }
-    return CORE::length($s)
+    BEGIN { (utf8::import: ) }
+    return CORE::length: $s
 
 
 sub substr($strref, @< @_)
-    BEGIN { utf8::import() }
+    BEGIN { (utf8::import: ) }
     return
-        (nelems @_) == 1 ?? CORE::substr($strref->$, @_[0]) !!
-        (nelems @_) == 2 ?? CORE::substr($strref->$, @_[0], @_[1]) !!
-        CORE::substr($strref->$, @_[0], @_[1], @_[2]) 
+        (nelems @_) == 1 ?? (CORE::substr: $strref->$, @_[0]) !!
+        (nelems @_) == 2 ?? (CORE::substr: $strref->$, @_[0], @_[1]) !!
+        CORE::substr: $strref->$, @_[0], @_[1], @_[2] 
 
 
 sub ord($s)
-    BEGIN { utf8::import() }
-    return CORE::ord($s)
+    BEGIN { (utf8::import: ) }
+    return CORE::ord: $s
 
 
 sub chr ($s)
-    BEGIN { utf8::import() }
-    return CORE::chr($s)
+    BEGIN { (utf8::import: ) }
+    return CORE::chr: $s
 
 
 sub index($s, @< @_)
-    BEGIN { utf8::import() }
+    BEGIN { (utf8::import: ) }
     return
-        (nelems @_) == 1 ?? CORE::index($s, @_[0]) !!
-        CORE::index($s, @_[0], @_[1]) 
+        (nelems @_) == 1 ?? (CORE::index: $s, @_[0]) !!
+        CORE::index: $s, @_[0], @_[1] 
 
 
 sub rindex($s, @< @_)
-    BEGIN { utf8::import() }
+    BEGIN { (utf8::import: ) }
     return
-        (nelems @_) == 1 ?? CORE::rindex($s, @_[0]) !!
-        CORE::rindex($s, @_[0], @_[1]) 
+        (nelems @_) == 1 ?? (CORE::rindex: $s, @_[0]) !!
+        CORE::rindex: $s, @_[0], @_[1] 
 
 
 1

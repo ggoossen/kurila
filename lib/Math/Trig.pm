@@ -52,23 +52,23 @@ my @pi = qw(pi pi2 pi4 pip2 pip4)
                   'pi'     => @pi
 
 sub tan($z)
-    my $cz = cos($z)
-    die "Division by zero in tan($z)" if $cz == 0
-    return sin($z) / $cz
+    my $cz = cos: $z
+    die: "Division by zero in tan($z)" if $cz == 0
+    return (sin: $z) / $cz
 
 
-sub pi () { 4 * CORE::atan2(1, 1) }
-sub pi2 () { 2 * pi }
-sub pi4 () { 4 * pi }
-sub pip2 () { pi / 2 }
-sub pip4 () { pi / 4 }
+sub pi () { 4 * (CORE::atan2: 1, 1) }
+sub pi2 () { 2 * (pi: )}
+sub pi4 () { 4 * (pi: )}
+sub pip2 () { (pi: )/ 2 }
+sub pip4 () { (pi: )/ 4 }
 
-sub _DR  () { pi2/360 }
-sub _RD  () { 360/pi2 }
+sub _DR  () { (pi2: )/360 }
+sub _RD  () { 360/(pi2: )}
 sub _DG  () { 400/360 }
 sub _GD  () { 360/400 }
-sub _RG  () { 400/pi2 }
-sub _GR  () { pi2/400 }
+sub _RG  () { 400/(pi2: )}
+sub _GR  () { (pi2: )/400 }
 
 #
 # Truncating remainder.
@@ -76,30 +76,30 @@ sub _GR  () { pi2/400 }
 
 sub _remt ($v, $p)
     # Oh yes, POSIX::fmod() would be faster. Possibly. If it is available.
-    $v - $p * int($v / $p)
+    $v - $p * int: $v / $p
 
 
 #
 # Angle conversions.
 #
 
-sub rad2rad($v)     { _remt($v, pi2) }
+sub rad2rad($v)     { (_remt: $v, (pi2: )) }
 
-sub deg2deg($v)     { _remt($v, 360) }
+sub deg2deg($v)     { (_remt: $v, 360) }
 
-sub grad2grad($v)   { _remt($v, 400) }
+sub grad2grad($v)   { (_remt: $v, 400) }
 
-sub rad2deg ($v, ?$wrap)  { my $d = _RD * $v; $wrap ?? $d !! deg2deg($d) }
+sub rad2deg ($v, ?$wrap)  { my $d = (_RD: )* $v; $wrap ?? $d !! (deg2deg: $d) }
 
-sub deg2rad ($v, ?$wrap)  { my $d = _DR * $v; $wrap ?? $d !! rad2rad($d) }
+sub deg2rad ($v, ?$wrap)  { my $d = (_DR: )* $v; $wrap ?? $d !! (rad2rad: $d) }
 
-sub grad2deg ($v, ?$wrap) { my $d = _GD * $v; $wrap ?? $d !! deg2deg($d) }
+sub grad2deg ($v, ?$wrap) { my $d = (_GD: )* $v; $wrap ?? $d !! (deg2deg: $d) }
 
-sub deg2grad ($v, ?$wrap) { my $d = _DG * $v; $wrap ?? $d !! grad2grad($d) }
+sub deg2grad ($v, ?$wrap) { my $d = (_DG: )* $v; $wrap ?? $d !! (grad2grad: $d) }
 
-sub rad2grad ($v, ?$wrap) { my $d = _RG * $v; $wrap ?? $d !! grad2grad($d) }
+sub rad2grad ($v, ?$wrap) { my $d = (_RG: )* $v; $wrap ?? $d !! (grad2grad: $d) }
 
-sub grad2rad ($v, ?$wrap) { my $d = _GR * $v; $wrap ?? $d !! rad2rad($d) }
+sub grad2rad ($v, ?$wrap) { my $d = (_GR: )* $v; $wrap ?? $d !! (rad2rad: $d) }
 
 #
 # acos and asin functions which always return a real number
@@ -108,81 +108,81 @@ sub grad2rad ($v, ?$wrap) { my $d = _GR * $v; $wrap ?? $d !! rad2rad($d) }
 sub acos_real
     my $z = @_[0]
     return 0  if @_[0] +>=  1
-    return pi if @_[0] +<= -1
-    return CORE::atan2(CORE::sqrt(1-$z*$z), $z)
+    return (pi: )if @_[0] +<= -1
+    return CORE::atan2: (CORE::sqrt: 1-$z*$z), $z
 
 
 sub asin_real
     my $z = @_[0]
-    return  pip2( < @_ ) if @_[0] +>=  1
-    return -pip2( < @_ ) if @_[0] +<= -1
-    return CORE::atan2($z, CORE::sqrt(1-$z*$z))
+    return  (pip2:  < @_ ) if @_[0] +>=  1
+    return -(pip2:  < @_ ) if @_[0] +<= -1
+    return CORE::atan2: $z, (CORE::sqrt: 1-$z*$z)
 
 
 sub cartesian_to_spherical( $x, $y, $z)
 
-    my $rho = sqrt( $x * $x + $y * $y + $z * $z )
+    my $rho = sqrt:  $x * $x + $y * $y + $z * $z 
 
     return  @:  $rho
-                atan2( $y, $x )
-                $rho ?? acos_real( $z / $rho ) !! 0 
+                atan2:  $y, $x 
+                $rho ?? (acos_real:  $z / $rho ) !! 0 
 
 
 sub spherical_to_cartesian( $rho, $theta, $phi)
 
-    return  @:  $rho * cos( $theta ) * sin( $phi )
-                $rho * sin( $theta ) * sin( $phi )
-                $rho * cos( $phi   ) 
+    return  @:  $rho * (cos:  $theta ) * sin:  $phi 
+                $rho * (sin:  $theta ) * sin:  $phi 
+                $rho * cos:  $phi    
 
 
 sub spherical_to_cylindrical
-    my (@:  $x, $y, $z ) =  spherical_to_cartesian( < @_ )
+    my (@:  $x, $y, $z ) =  spherical_to_cartesian:  < @_ 
 
-    return  @:  sqrt( $x * $x + $y * $y ), @_[1], $z 
+    return  @:  (sqrt:  $x * $x + $y * $y ), @_[1], $z 
 
 
 sub cartesian_to_cylindrical( $x, $y, $z)
 
-    return  @:  sqrt( $x * $x + $y * $y ), atan2( $y, $x ), $z 
+    return  @:  (sqrt:  $x * $x + $y * $y ), (atan2:  $y, $x ), $z 
 
 
 sub cylindrical_to_cartesian( $rho, $theta, $z)
 
-    return  @:  $rho * cos( $theta ), $rho * sin( $theta ), $z 
+    return  @:  $rho * (cos:  $theta ), $rho * (sin:  $theta ), $z 
 
 
 sub cylindrical_to_spherical
-    return cartesian_to_spherical( < cylindrical_to_cartesian( < @_ ) )
+    return cartesian_to_spherical:  < (cylindrical_to_cartesian:  < @_ ) 
 
 
 sub great_circle_distance( $theta0, $phi0, $theta1, $phi1, ?$rho)
 
     $rho = 1 unless defined $rho # Default to the unit sphere.
 
-    my $lat0 = pip2 - $phi0
-    my $lat1 = pip2 - $phi1
+    my $lat0 = (pip2: )- $phi0
+    my $lat1 = (pip2: )- $phi1
 
     return $rho *
-        acos_real( cos( $lat0 ) * cos( $lat1 ) * cos( $theta0 - $theta1 ) +
-                   sin( $lat0 ) * sin( $lat1 ) )
+        acos_real:  (cos:  $lat0 ) * (cos:  $lat1 ) * (cos:  $theta0 - $theta1 ) +
+                                   (sin:  $lat0 ) * (sin:  $lat1 ) 
 
 
 sub great_circle_direction
     my (@:  $theta0, $phi0, $theta1, $phi1 ) =  @_
 
-    my $distance = great_circle_distance( < @_ )
+    my $distance = great_circle_distance:  < @_ 
 
-    my $lat0 = pip2 - $phi0
-    my $lat1 = pip2 - $phi1
+    my $lat0 = (pip2: )- $phi0
+    my $lat1 = (pip2: )- $phi1
 
     my $direction =
-        acos_real((sin($lat1) - sin($lat0) * cos($distance)) /
-                  (cos($lat0) * sin($distance)))
+        acos_real: ((sin: $lat1) - (sin: $lat0) * (cos: $distance)) /
+                                 ((cos: $lat0) * (sin: $distance))
 
-    $direction = pi2 - $direction
-        if sin($theta1 - $theta0) +< 0
+    $direction = (pi2: )- $direction
+        if (sin: $theta1 - $theta0) +< 0
 
-    return rad2rad($direction)
+    return rad2rad: $direction
 
 *great_circle_bearing = \&great_circle_direction
 
@@ -190,46 +190,46 @@ sub great_circle_waypoint( $theta0, $phi0, $theta1, $phi1, $point)
 
     $point = 0.5 unless defined $point
 
-    my $d = great_circle_distance( $theta0, $phi0, $theta1, $phi1 )
+    my $d = great_circle_distance:  $theta0, $phi0, $theta1, $phi1 
 
-    return undef if $d == pi
+    return undef if $d == (pi: )
 
-    my $sd = sin($d)
+    my $sd = sin: $d
 
     return  (@: $theta0, $phi0) if $sd == 0
 
-    my $A = sin((1 - $point) * $d) / $sd
-    my $B = sin(     $point  * $d) / $sd
+    my $A = (sin: (1 - $point) * $d) / $sd
+    my $B = (sin:      $point  * $d) / $sd
 
-    my $lat0 = pip2 - $phi0
-    my $lat1 = pip2 - $phi1
+    my $lat0 = (pip2: )- $phi0
+    my $lat1 = (pip2: )- $phi1
 
-    my $x = $A * cos($lat0) * cos($theta0) + $B * cos($lat1) * cos($theta1)
-    my $y = $A * cos($lat0) * sin($theta0) + $B * cos($lat1) * sin($theta1)
-    my $z = $A * sin($lat0)                + $B * sin($lat1)
+    my $x = $A * (cos: $lat0) * (cos: $theta0) + $B * (cos: $lat1) * cos: $theta1
+    my $y = $A * (cos: $lat0) * (sin: $theta0) + $B * (cos: $lat1) * sin: $theta1
+    my $z = $A * (sin: $lat0)                + $B * sin: $lat1
 
-    my $theta = atan2($y, $x)
-    my $phi   = acos_real($z)
+    my $theta = atan2: $y, $x
+    my $phi   = acos_real: $z
 
     return  @: $theta, $phi
 
 
 sub great_circle_midpoint
-    great_circle_waypoint( <@_[[0..3]], 0.5)
+    great_circle_waypoint:  <@_[[0..3]], 0.5
 
 
 sub great_circle_destination( $theta0, $phi0, $dir0, $dst)
 
-    my $lat0 = pip2 - $phi0
+    my $lat0 = (pip2: )- $phi0
 
-    my $phi1   = asin_real(sin($lat0)*cos($dst) +
-                           cos($lat0)*sin($dst)*cos($dir0))
-    my $theta1 = $theta0 + atan2(sin($dir0)*sin($dst)*cos($lat0),
-        cos($dst)-sin($lat0)*sin($phi1))
+    my $phi1   = asin_real: (sin: $lat0)*(cos: $dst) +
+                                                   (cos: $lat0)*(sin: $dst)*(cos: $dir0)
+    my $theta1 = $theta0 + atan2: (sin: $dir0)*(sin: $dst)*(cos: $lat0)
+                                  (cos: $dst)-(sin: $lat0)*(sin: $phi1)
 
-    my $dir1 = great_circle_bearing($theta1, $phi1, $theta0, $phi0) + pi
+    my $dir1 =( great_circle_bearing: $theta1, $phi1, $theta0, $phi0) + (pi: )
 
-    $dir1 -= pi2 if $dir1 +> pi2
+    $dir1 -= (pi2: )if $dir1 +> (pi2: )
 
     return  @: $theta1, $phi1, $dir1
 
@@ -246,32 +246,32 @@ BEGIN
           12 => '1.1897314953572317650857593266280070162E+4932'
           16 => '1.1897314953572317650857593266280070162E+4932'
 
-    my $nvsize = config_value('nvsize') ||
-                (config_value('uselongdouble') && config_value('longdblsize')) ||
-                 config_value('doublesize');
-    die "Math::Complex: Could not figure out nvsize\n"
+    my $nvsize = (config_value: 'nvsize') ||
+                ((config_value: 'uselongdouble') && (config_value: 'longdblsize')) ||
+                 (config_value: 'doublesize');
+    die: "Math::Complex: Could not figure out nvsize\n"
         unless defined $nvsize
-    die "Math::Complex: Cannot not figure out max nv (nvsize = $nvsize)\n"
+    die: "Math::Complex: Cannot not figure out max nv (nvsize = $nvsize)\n"
         unless defined %DBL_MAX{$nvsize}
     my $DBL_MAX = eval %DBL_MAX{$nvsize}
-    die "Math::Complex: Could not figure out max nv (nvsize = $nvsize)\n"
+    die: "Math::Complex: Could not figure out max nv (nvsize = $nvsize)\n"
         unless defined $DBL_MAX
     my $BIGGER_THAN_THIS = 1e30  # Must find something bigger than this.
     if ($^OS_NAME eq 'unicosmk')
         $Inf = $DBL_MAX
     else
-        local signals::handler('FPE') = { }
+        local (signals::handler: 'FPE') = { }
         local $^OS_ERROR
         # We do want an arithmetic overflow, Inf INF inf Infinity.
         for my $t ( @:
-            'exp(99999)',  # Enough even with 128-bit long doubles.
-            'inf',
-            'Inf',
-            'INF',
-            'infinity',
-            'Infinity',
-            'INFINITY',
-            '1e99999',
+            'exp(99999)'  # Enough even with 128-bit long doubles.
+            'inf'
+            'Inf'
+            'INF'
+            'infinity'
+            'Infinity'
+            'INFINITY'
+            '1e99999'
             )
             local $^WARNING_BITS = 0
             my $i = eval "$t+1.0"
@@ -280,7 +280,7 @@ BEGIN
                 last
 
         $Inf = $DBL_MAX unless defined $Inf  # Oh well, close enough.
-        die "Math::Complex: Could not get Infinity"
+        die: "Math::Complex: Could not get Infinity"
             unless $Inf +> $BIGGER_THAN_THIS
 
     # print "# On this machine, Inf = '$Inf'\n";

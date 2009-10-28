@@ -35,7 +35,7 @@ $VERSION = "0.07"
 sub new
     my $class = shift
 
-    my $self = bless \(@: $%,$%,$%), $class
+    my $self = bless: \(@: $%,$%,$%), $class
 
     $self
 
@@ -43,9 +43,9 @@ sub new
 sub mask
     my $self = shift
     my $io = shift
-    my $fd = fileno($io)
+    my $fd = fileno: $io
     return unless defined $fd
-    $io = dump::view($io)
+    $io = dump::view: $io
     if ((nelems @_))
         my $mask = shift
         if($mask)
@@ -77,17 +77,17 @@ sub poll($self,$timeout)
 
     while((@: ?$fd,?$iom) =(@:  each $self->[0]))
         $mask   = 0
-        for (values($iom))
+        for ((values: $iom))
             $mask  ^|^= $_
-        push(@poll,$fd => $mask)
+        push: @poll,$fd => $mask
 
-    my $ret = (nelems @poll) ?? _poll(defined($timeout) ?? $timeout * 1000 !! -1,< @poll) !! 0
+    my $ret = (nelems @poll) ?? (_poll: (defined: $timeout) ?? $timeout * 1000 !! -1,< @poll) !! 0
 
     return $ret
         unless $ret +> 0
 
     while((nelems @poll))
-        my (@: $fd,$got) = @: splice(@poll,0,2)
+        my (@: $fd,$got) = @: splice: @poll,0,2
         $self->[1]{+$fd} = $got if $got
     
 
@@ -97,8 +97,8 @@ sub poll($self,$timeout)
 sub events
     my $self = shift
     my $io = shift
-    my $fd = fileno($io)
-    $io = dump::view($io)
+    my $fd = fileno: $io
+    $io = dump::view: $io
     exists $self->[1]{$fd} and exists $self->[0]{$fd}{$io}
         ?? $self->[1]{?$fd} ^&^ ($self->[0]{$fd}{?$io}^|^POLLHUP^|^POLLERR^|^POLLNVAL)
         !! 0
@@ -107,7 +107,7 @@ sub events
 sub remove
     my $self = shift
     my $io = shift
-    $self->mask($io,0)
+    $self->mask: $io,0
 
 
 sub handles
@@ -121,7 +121,7 @@ sub handles
     while((@: $fd,$ev) =(@:  each $self->[1]))
         while ((@: $io,$mask) =(@:  each $self->[0]{$fd}))
             $mask ^|^= POLLHUP^|^POLLERR^|^POLLNVAL  # must allow these
-            push @handles,$self->[2]{?$io} if ($ev ^&^ $mask) ^&^ $events
+            push: @handles,$self->[2]{?$io} if ($ev ^&^ $mask) ^&^ $events
         
     
     return @handles

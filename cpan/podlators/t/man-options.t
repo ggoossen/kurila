@@ -17,20 +17,20 @@ while (~< $^DATA)
     next until $_ eq "###\n"
     while (~< $^DATA)
         last if $_ eq "###\n"
-        my @: $option, $value = split
+        my @: $option, $value = split: 
         %options{+$option} = $value
 
     local $TODO = delete %options{?TODO}
-    open (my $tmpfh, '>', 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n"
+    open: my $tmpfh, '>', 'tmp.pod' or die: "Cannot create tmp.pod: $^OS_ERROR\n"
     while (~< $^DATA)
         last if $_ eq "###\n"
-        print $tmpfh, $_
+        print: $tmpfh, $_
     close $tmpfh
-    my $parser = Pod::Man->new( < %options) or die "Cannot create parser\n"
-    open (my $outfh, '>', 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n"
-    $parser->parse_from_file('tmp.pod', $outfh)
+    my $parser = (Pod::Man->new:  < %options) or die: "Cannot create parser\n"
+    open: my $outfh, '>', 'out.tmp' or die: "Cannot create out.tmp: $^OS_ERROR\n"
+    $parser->parse_from_file: 'tmp.pod', $outfh
     close $outfh
-    open ($tmpfh, '<', 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n"
+    open: $tmpfh, '<', 'out.tmp' or die: "Cannot open out.tmp: $^OS_ERROR\n"
     while (~< $tmpfh) 
         last if m/^\.nh/
     my $output
@@ -38,15 +38,15 @@ while (~< $^DATA)
         local $^INPUT_RECORD_SEPARATOR = undef
         $output = ~< $tmpfh
     close $tmpfh
-    unlink ('tmp.pod', 'out.tmp')
+    unlink: 'tmp.pod', 'out.tmp'
     my $expected = ''
     while (~< $^DATA)
         last if $_ eq "###\n"
         $expected .= $_
 
-    ok($output eq $expected)
-        or diag "Expected\n========\n$(dump::view($expected))\n"
-            . "Output\n======\n$(dump::view($output))\n"
+    ok: $output eq $expected
+        or diag: "Expected\n========\n$((dump::view: $expected))\n"
+                             . "Output\n======\n$((dump::view: $output))\n"
     $n++
 
 # Below the marker are bits of POD and corresponding expected text output.

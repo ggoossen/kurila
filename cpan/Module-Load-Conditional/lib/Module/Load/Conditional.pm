@@ -144,25 +144,25 @@ true, since C<check_install> had no way to verify clearly.
 ### if the installed version is higher or equal to the one we want, it will return
 ### a hashref with he module name and version in it.. so 'true' as well.
 sub check_install(%< %hash)
-    my $tmpl = \%: 
+    my $tmpl = \%:
         version => (%:  default    => '0.0'    )
         module  => (%:  required   => 1        )
         verbose => (%:  default    => $VERBOSE )
         
 
     my $args
-    unless( $args = check( $tmpl, \%hash, $VERBOSE ) )
-        warn < loc( q[A problem occurred checking arguments] ) if $VERBOSE
+    unless( $args = (check:  $tmpl, \%hash, $VERBOSE ) )
+        warn: < (loc:  q[A problem occurred checking arguments] ) if $VERBOSE
         return
 
 
-    my $file     = File::Spec->catfile( < split m/::/, $args->{?module} ) . '.pm'
-    my $file_inc = File::Spec::Unix->catfile( <
-        split m/::/, $args->{?module}
+    my $file     = (File::Spec->catfile:  < (split: m/::/, $args->{?module}) ) . '.pm'
+    my $file_inc = (File::Spec::Unix->catfile:  <
+                                                    split: m/::/, $args->{?module}
         ) . '.pm'
 
     ### where we store the return value ###
-    my $href = %: 
+    my $href = %:
         file        => undef
         version     => undef
         uptodate    => undef
@@ -177,7 +177,7 @@ sub check_install(%< %hash)
 
         ### find the version by inspecting the package
         if( defined $filename && $FIND_VERSION )
-            $href{+version} = Symbol::fetch_glob( "$args->{?module}"."::VERSION")->*->$
+            $href{+version} = (Symbol::fetch_glob:  "$args->{?module}"."::VERSION")->*->$
 
 
 
@@ -193,18 +193,18 @@ sub check_install(%< %hash)
                 ### $^INCLUDE_PATH hook -- we invoke it and get the filehandle back
                 ### this is actually documented behaviour as of 5.8 ;)
 
-                if (UNIVERSAL::isa($dir, 'CODE'))
-                    ($fh) = $dir->($dir, $file)
+                if ((UNIVERSAL::isa: $dir, 'CODE'))
+                    ($fh) = $dir->& <: $dir, $file
 
-                elsif (UNIVERSAL::isa($dir, 'ARRAY'))
-                    ($fh) = $dir->[0]->($dir, $file, < $dir->{[1..((nelems $dir->@)-1)]})
+                elsif ((UNIVERSAL::isa: $dir, 'ARRAY'))
+                    ($fh) = $dir->[0]->& <: $dir, $file, < $dir->{[1..((nelems $dir->@)-1)]}
 
-                elsif (UNIVERSAL::can($dir, 'INC'))
-                    ($fh) = $dir->INC->($dir, $file)
+                elsif ((UNIVERSAL::can: $dir, 'INC'))
+                    ($fh) = ($dir->INC: )->& <: $dir, $file
 
 
-                if (!UNIVERSAL::isa($fh, 'GLOB'))
-                    warn < loc(q[Cannot open file '%1': %2], $file, $^OS_ERROR)
+                if (!(UNIVERSAL::isa: $fh, 'GLOB'))
+                    warn: < loc: q[Cannot open file '%1': %2], $file, $^OS_ERROR
                         if $args->{?verbose}
                     next
 
@@ -212,12 +212,12 @@ sub check_install(%< %hash)
                 $filename = $^INCLUDED{?$file_inc} || $file
 
             else
-                $filename = File::Spec->catfile($dir, $file)
+                $filename = File::Spec->catfile: $dir, $file
                 next unless -e $filename
 
-                $fh = IO::File->new
-                if (!$fh->open($filename))
-                    warn < loc(q[Cannot open file '%1': %2], $file, $^OS_ERROR)
+                $fh = IO::File->new: 
+                if (!($fh->open: $filename))
+                    warn: < loc: q[Cannot open file '%1': %2], $file, $^OS_ERROR
                         if $args->{?verbose}
                     next
 
@@ -225,8 +225,8 @@ sub check_install(%< %hash)
 
             ### files need to be in unix format under vms,
             ### or they might be loaded twice
-            $href{+file} = ON_VMS
-                ?? VMS::Filespec::unixify( $filename )
+            $href{+file} = (ON_VMS: )
+                ?? VMS::Filespec::unixify:  $filename 
                 !! $filename
 
             ### user wants us to find the version from files
@@ -244,7 +244,7 @@ sub check_install(%< %hash)
                     next if $in_pod
 
                     ### try to find a version declaration in this string.
-                    my $ver = __PACKAGE__->_parse_version( $_ )
+                    my $ver = __PACKAGE__->_parse_version:  $_ 
 
                     if( defined $ver )
                         $href{+version} = $ver
@@ -265,7 +265,7 @@ sub check_install(%< %hash)
             local $^WARNING = 0
 
             ### if we got here, we didn't find the version
-            warn < loc(q[Could not check version on '%1'], $args->{?module} )
+            warn: < loc: q[Could not check version on '%1'], $args->{?module} 
                 if $args->{?verbose} and $args->{?version} +> 0
 
         $href{+uptodate} = 1
@@ -277,8 +277,8 @@ sub check_install(%< %hash)
         ### use qv(), as it will deal with developer release number
         ### ie ones containing _ as well. This addresses bug report
         ### #29348: Version compare logic doesn't handle alphas?
-        $href{+uptodate} =
-            version->new( $args->{version} )->vcmp( $href{version} ) +<= 0
+        $href{+uptodate} =(
+            (version->new:  $args->{version} )->vcmp:  $href{version} ) +<= 0
 
 
     return $href
@@ -301,7 +301,7 @@ sub _parse_version
 
     if( $str =~ m/(?<!\\)([\$*])(([\w\:\']*)\bVERSION)\b.*\=/ )
 
-        print $^STDOUT, "Evaluating: $str\n" if $verbose
+        print: $^STDOUT, "Evaluating: $str\n" if $verbose
 
         ### this creates a string to be eval'd, like:
         # package Module::Load::Conditional::_version;
@@ -321,19 +321,19 @@ sub _parse_version
             \}; \$$2
         }
 
-        print $^STDOUT, "Evaltext: $eval\n" if $verbose
+        print: $^STDOUT, "Evaltext: $eval\n" if $verbose
 
         my $result = do
             local $^WARNING = 0
-            eval($eval)
+            eval: $eval
 
 
 
         my $rv = defined $result ?? $result !! '0.0'
 
-        print($^STDOUT,  $^EVAL_ERROR ?? "Error: $^EVAL_ERROR\n" !! "Result: $rv\n" ) if $verbose
+        print: $^STDOUT,  $^EVAL_ERROR ?? "Error: $^EVAL_ERROR\n" !! "Result: $rv\n"  if $verbose
 
-        return version->new($rv)
+        return version->new: $rv
 
 
     ### unable to find a version in this string
@@ -381,7 +381,7 @@ cache, but you can override that by setting C<nocache> to true.
 sub can_load
     my %hash = %:  < @_ 
 
-    my $tmpl = \%: 
+    my $tmpl = \%:
         modules     => (%:  default => \$%, strict_type => 1 )
         verbose     => (%:  default => $VERBOSE )
         nocache     => (%:  default => 0 )
@@ -389,9 +389,9 @@ sub can_load
 
     my $args
 
-    unless( $args = check( $tmpl, \%hash, $VERBOSE ) )
-        $ERROR = loc(q[Problem validating arguments!])
-        warn $ERROR if $VERBOSE
+    unless( $args = (check:  $tmpl, \%hash, $VERBOSE ) )
+        $ERROR = loc: q[Problem validating arguments!]
+        warn: $ERROR if $VERBOSE
         return
 
 
@@ -424,33 +424,33 @@ sub can_load
             ### #29348: Version compare logic doesn't handle alphas?
             if (    !$args->{?nocache}
                       && defined $CACHE->{?$mod}{?usable}
-                      && (version->new($CACHE->{$mod}{?version}||0)->vcmp(qv($href->{?$mod})) +>= 0)
+                      && (((version->new: $CACHE->{$mod}{?version}||0)->vcmp: (qv: $href->{?$mod})) +>= 0)
                 )
-                $error = loc( q[Already tried to use '%1', which was unsuccessful], $mod)
+                $error = loc:  q[Already tried to use '%1', which was unsuccessful], $mod
                 last BLOCK
 
 
-            my $mod_data = check_install(
-                module  => $mod,
+            my $mod_data = check_install: 
+                module  => $mod
                 version => $href->{?$mod}
-                )
+                
 
             if( !$mod_data or !defined $mod_data{?file} )
-                $error = loc(q[Could not find or check module '%1'], $mod)
+                $error = loc: q[Could not find or check module '%1'], $mod
                 $CACHE->{+$mod}{+usable} = 0
                 last BLOCK
 
-            map {
-                  $CACHE->{+$mod}{+$_} = $mod_data{?$_}
-                }, qw[version file uptodate]
+            map: {
+                     $CACHE->{+$mod}{+$_} = $mod_data{?$_}
+                     }, qw[version file uptodate]
 
-            push @load, $mod
+            push: @load, $mod
 
         for my $mod (  @load )
 
             if ( $CACHE->{$mod}{?uptodate} )
 
-                try { load $mod }
+                try { (load: $mod) }
 
                 ### in case anything goes wrong, log the error, the fact
                 ### we tried to use this module and return 0;
@@ -464,7 +464,7 @@ sub can_load
             ### module not found in $^INCLUDE_PATH, store the result in
             ### $CACHE and return 0
             else
-                $error = loc(q[Module '%1' is not uptodate!], $mod)
+                $error = loc: q[Module '%1' is not uptodate!], $mod
                 $CACHE->{$mod}{+usable} = 0
                 last BLOCK
 
@@ -472,7 +472,7 @@ sub can_load
 
     if( defined $error )
         $ERROR = $error
-        Carp::carp( < loc(q|%1 [THIS MAY BE A PROBLEM!]|,$error) ) if $args->{?verbose}
+        Carp::carp:  < (loc: q|%1 [THIS MAY BE A PROBLEM!]|,$error)  if $args->{?verbose}
         return
     else
         return 1
@@ -501,18 +501,18 @@ perl and your current install.
 sub requires
     my $who = shift
 
-    unless( check_install( module => $who ) )
-        warn < loc(q[You do not have module '%1' installed], $who) if $VERBOSE
+    unless( (check_install:  module => $who ) )
+        warn: < (loc: q[You do not have module '%1' installed], $who) if $VERBOSE
         return undef
 
 
-    my $lib = join " ", map { qq["-I$_"] }, $^INCLUDE_PATH
+    my $lib = join: " ", map: { qq["-I$_"] }, $^INCLUDE_PATH
     my $cmd = qq[$^EXECUTABLE_NAME $lib -M$who -e"print(join(qq[\\n],keys(\$^INCLUDED)))"]
 
-    return  sort grep { !m/^$who$/  },
-        map  { chomp; s|/|::|g; $_ },
-        grep { s|\.pm$||i; },
-        @:             `$cmd`
+    return  sort: grep: { !m/^$who$/  },
+                            map: { chomp; s|/|::|g; $_ },
+                                     grep: { s|\.pm$||i; },
+                                               @:             `$cmd`
 
 
 1

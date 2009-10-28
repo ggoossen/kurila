@@ -17,7 +17,7 @@ Make a filehandle. Same kind of idea as Symbol::gensym().
 =cut
 
 sub mkfh()
-    my $fh = \Symbol::fetch_glob($fhname++)->*
+    my $fh = \(Symbol::fetch_glob: $fhname++)->*
     return $fh
 
 
@@ -32,84 +32,84 @@ time relative to $^X, and generates a regexp that matches them
 
 sub __find_relocations
     my %paths
-    for my $raw_key (keys config_keys)
-        my $raw_val = config_value($raw_key)
+    for my $raw_key (keys (config_keys: ))
+        my $raw_val = config_value: $raw_key
         my $exp_key = $raw_key . "exp"
-        next unless defined config_value($exp_key)
+        next unless defined config_value: $exp_key
         next unless $raw_val =~ m!\.\.\./!
-        %paths{+config_value($exp_key)}++
+        %paths{+(config_value: $exp_key)}++
     
     # Longest prefixes go first in the alternatives
-    my $alternations = join "|", map {quotemeta $_},
-        sort {length $b <+> length $a}, keys %paths
+    my $alternations = join: "|", map: {quotemeta $_},
+                                           sort: {length $b <+> length $a}, keys %paths
     qr/^($alternations)/o
 
 
 sub new($class, ?$packfile)
-    $class = ref($class) || $class
+    $class = (ref: $class) || $class
 
     my $self = \%:  packfile => $packfile
                     data => $%
         
-    bless($self, $class)
+    bless: $self, $class
 
-    $self->read($packfile) if (defined($packfile) && -f $packfile)
+    $self->read: $packfile if ((defined: $packfile) && -f $packfile)
 
     return $self
 
 
 sub read($self, ?$packfile)
 
-    if (defined($packfile)) { $self->{packfile} = $packfile; }
+    if ((defined: $packfile)) { $self->{packfile} = $packfile; }
     else { $packfile = $self->{packfile}; }
-    die("No packlist filename specified") if (! defined($packfile))
+    die: "No packlist filename specified" if (! (defined: $packfile))
 
-    my $fh = mkfh()
-    open($fh, "<", "$packfile") || die("Can't open file $packfile: $^OS_ERROR")
+    my $fh = (mkfh: )
+    (open: $fh, "<", "$packfile") || die: "Can't open file $packfile: $^OS_ERROR"
     $self->{data} = $%
     my ($line)
-    while (defined($line = ~< $fh))
+    while ((defined: ($line = ~< $fh)))
         chomp $line
         my $key = $line
         my $data
         if ($key =~ m/^(.*?)( \w+=.*)$/)
             $key = $1
-            $data = \%:  < @+: map { split('=', $_) }, split(' ', $2)
+            $data = \%:  < @+: map: { (split: '=', $_) }, split: ' ', $2
 
-            if (config_value("userelocatableinc") && $data->{?relocate_as})
+            if ((config_value: "userelocatableinc") && $data->{?relocate_as})
                 require File::Spec
                 require Cwd
-                my (@: $vol, $dir) =  File::Spec->splitpath($packfile)
-                my $newpath = File::Spec->catpath($vol, $dir, $data->{relocate_as})
-                $key = Cwd::realpath($newpath)
+                my (@: $vol, $dir) =  File::Spec->splitpath: $packfile
+                my $newpath = File::Spec->catpath: $vol, $dir, $data->{relocate_as}
+                $key = Cwd::realpath: $newpath
             
         
         $key =~ s!/\./!/!g   # Some .packlists have spurious '/./' bits in the paths
         $self->{data}{+$key} = $data
     
-    close($fh)
+    close: $fh
 
 
 sub write($self, ?$packfile)
-    if (defined($packfile)) { $self->{packfile} = $packfile; }
+    if ((defined: $packfile)) { $self->{packfile} = $packfile; }
     else { $packfile = $self->{packfile}; }
-    die("No packlist filename specified") if (! defined($packfile))
-    my $fh = mkfh()
-    open($fh, ">", "$packfile") || die("Can't open file $packfile: $^OS_ERROR")
-    foreach my $key (sort(keys($self->{data})))
+    die: "No packlist filename specified" if (! (defined: $packfile))
+    my $fh = (mkfh: )
+    (open: $fh, ">", "$packfile") || die: "Can't open file $packfile: $^OS_ERROR"
+    foreach my $key ((sort: (keys: $self->{data})))
         my $data = $self->{data}{$key}
-        if (config_value("userelocatableinc"))
-            $Relocations ||= __find_relocations()
+        if ((config_value: "userelocatableinc"))
+            $Relocations ||= (__find_relocations: )
             if ($packfile =~ $Relocations)
                 # We are writing into a subdirectory of a run-time relocated
                 # path. Figure out if the this file is also within a subdir.
                 my $prefix = $1
-                if (File::Spec->no_upwards( <File::Spec->abs2rel($key, $prefix)))
+                if ((File::Spec->no_upwards:  <(File::Spec->abs2rel: $key, $prefix)))
                     # The relocated path is within the found prefix
-                    my (@: _, $packfile_prefix) = File::Spec->splitpath($packfile)
+                    my (@: _, $packfile_prefix) = File::Spec->splitpath: $packfile
 
                     my $relocate_as
-                        = File::Spec->abs2rel($key, $packfile_prefix)
+                        = File::Spec->abs2rel: $key, $packfile_prefix
 
                     if (!ref $data)
                         $data = \$%
@@ -118,23 +118,23 @@ sub write($self, ?$packfile)
                 
             
         
-        print $fh, ("$key")
-        if (ref($data))
-            foreach my $k (sort(keys($data->%)))
-                print $fh, (" $k=$data->{$k}")
+        print: $fh, ("$key")
+        if ((ref: $data))
+            foreach my $k ((sort: (keys: $data->%)))
+                print: $fh, (" $k=$data->{$k}")
             
         
-        print $fh, ("\n")
+        print: $fh, ("\n")
     
-    close($fh)
+    close: $fh
 
 
 sub validate($self, ?$remove)
     my @missing
-    foreach my $key (sort(keys($self->{data})))
+    foreach my $key ((sort: (keys: $self->{data})))
         if (! -e $key)
-            push(@missing, $key)
-            delete($self->{data}{$key}) if ($remove)
+            push: @missing, $key
+            delete: $self->{data}{$key} if ($remove)
 
     return @: @missing
 

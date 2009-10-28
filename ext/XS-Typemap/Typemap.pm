@@ -73,7 +73,7 @@ $VERSION = '0.02'
 	   /
 
 
-XS::Typemap->bootstrap
+XS::Typemap->bootstrap: 
 
 =head1 NOTES
 

@@ -15,29 +15,29 @@ our ($gr_name, $gr_gid, $gr_passwd, $gr_mem, @gr_members)
 # Class::Struct forbids use of @ISA
 sub import
     local $Exporter::ExportLevel = $Exporter::ExportLevel + 1
-    return Exporter::import(< @_)
+    return Exporter::import: < @_
 
 
 use Class::Struct < qw(struct)
-struct 'User::grent' => \@: 
-       name    => '$'
-       passwd  => '$'
-       gid          => '$'
-       members => '@'
+struct: 'User::grent' => \@:
+            name    => '$'
+            passwd  => '$'
+            gid          => '$'
+            members => '@'
        
 
 sub populate
     return unless (nelems @_)
-    my $gob = new()
+    my $gob = (new: )
     (@: $gr_name, $gr_passwd, $gr_gid) = $gob->@[[(@: 0,1,2)]] =  @_[[(@: 0,1,2)]]
-    @gr_members = @: ( $gob->[3]->@ = split ' ', @_[3] )
+    @gr_members = @: ( $gob->[3]->@ = (split: ' ', @_[3]) )
     return $gob
 
 
-sub getgrent ( ) { populate(CORE::getgrent()) }
-sub getgrnam ($v) { populate(CORE::getgrnam($v)) }
-sub getgrgid ($v) { populate(CORE::getgrgid($v)) }
-sub getgr    ($v) { ($v =~ m/^\d+/) ?? getgrgid($v) !! getgrnam($v) }
+sub getgrent ( ) { (populate: CORE::getgrent()) }
+sub getgrnam ($v) { (populate: (CORE::getgrnam: $v)) }
+sub getgrgid ($v) { (populate: (CORE::getgrgid: $v)) }
+sub getgr    ($v) { ($v =~ m/^\d+/) ?? (getgrgid: $v) !! (getgrnam: $v) }
 
 1
 __END__

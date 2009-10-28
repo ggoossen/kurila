@@ -1,13 +1,13 @@
 #!/usr/bin/perl -w                                         # -*- perl -*-
 
 BEGIN 
-    unshift $^INCLUDE_PATH, '../lib/Pod/t'
+    unshift: $^INCLUDE_PATH, '../lib/Pod/t'
     require "pod2html-lib.pl"
 
 
 use Test::More tests => 1
 
-convert_n_test("htmlescp", "html escape")
+convert_n_test: "htmlescp", "html escape"
 
 __DATA__
 <?xml version="1.0" ?>

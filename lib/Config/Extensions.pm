@@ -9,7 +9,7 @@ $VERSION = '0.01'
 @EXPORT_OK = @:  '%Extensions' 
 
 foreach my $type (qw(static dynamic nonxs))
-    foreach (split m/\s+/, config_value($type . '_ext'))
+    foreach ((split: m/\s+/, (config_value: $type . '_ext')))
         s!/!::!g
         %Extensions{+$_} = $type
     

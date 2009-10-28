@@ -102,7 +102,7 @@ our $VERSION = '1.06'
 my $genpkg = "Symbol"
 my $genseq = 0
 
-my %global = %+: map { %: $_ => 1 }, qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT) 
+my %global = %+: map: { %: $_ => 1 }, qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT) 
 
 #
 # Note that we never _copy_ the glob; we just make a ref to it.
@@ -111,24 +111,24 @@ my %global = %+: map { %: $_ => 1 }, qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN ST
 #
 sub gensym ()
     my $name = "GEN" . $genseq++
-    my $ref = \Symbol::qualify_to_ref($genpkg . "::" . $name)->*
-    $ref = \Symbol::qualify_to_ref($genpkg . "::" . $name)->*  # second time to supress only-used once warning.
-    delete Symbol::stash($genpkg)->{$name}
+    my $ref = \(Symbol::qualify_to_ref: $genpkg . "::" . $name)->*
+    $ref = \(Symbol::qualify_to_ref: $genpkg . "::" . $name)->*  # second time to supress only-used once warning.
+    delete (Symbol::stash: $genpkg)->{$name}
     $ref
 
 
 sub geniosym ()
-    my $sym = gensym()
+    my $sym = (gensym: )
     # force the IO slot to be filled
-    open $sym
+    open: $sym
     $sym->*{IO}
 
 
 sub ungensym(_) {}
 
 sub qualify($name, ? $pkg)
-    ref \$name eq "GLOB" and Carp::confess("glob..." . ref $name)
-    if (!ref($name) && index($name, '::') == -1 && index($name, "'") == -1)
+    ref \$name eq "GLOB" and Carp::confess: "glob..." . ref $name
+    if (!(ref: $name) && (index: $name, '::') == -1 && (index: $name, "'") == -1)
         # Global names: special character, "^xyz", or other.
         if ($name =~ m/^(([^a-z])|(\^[a-z_]+))\z/i || %global{?$name})
             $pkg = ""
@@ -141,7 +141,7 @@ sub qualify($name, ? $pkg)
 
 
 sub qualify_to_ref($name, ?$package)
-    return \ Symbol::fetch_glob( qualify $name, (defined $package) ?? $package !! scalar(caller) )->*
+    return \ (Symbol::fetch_glob:  (qualify: $name, (defined $package) ?? $package !! (scalar: caller)) )->*
 
 
 #
@@ -157,7 +157,7 @@ sub delete_package($pkg)
     
 
     my (@: $stem, $leaf) = @: $pkg =~ m/(.*)::(\w+::)$/
-    my $stem_symtab = Symbol::stash($stem)
+    my $stem_symtab = Symbol::stash: $stem
     return unless defined $stem_symtab and exists $stem_symtab->{$leaf}
 
 
@@ -165,7 +165,7 @@ sub delete_package($pkg)
 
     my $leaf_symtab = $stem_symtab->{?$leaf}->{HASH}
     foreach my $name (keys $leaf_symtab->%)
-        undef Symbol::qualify_to_ref($pkg . $name)->*
+        undef (Symbol::qualify_to_ref: $pkg . $name)->*
     
 
     # delete the symbol table

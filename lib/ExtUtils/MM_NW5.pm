@@ -28,7 +28,7 @@ our @ISA = qw(ExtUtils::MM_Win32)
 
 use ExtUtils::MakeMaker < qw( &neatvalue )
 
-env::var('EMXSHELL' ) = 'sh' # to run `commands`
+(env::var: 'EMXSHELL' ) = 'sh' # to run `commands`
 
 my $BORLAND  = %Config{?'cc'} =~ m/^bcc/i
 my $GCC      = %Config{?'cc'} =~ m/^gcc/i
@@ -42,7 +42,7 @@ We're Netware in addition to being Windows.
 
 sub os_flavor
     my $self = shift
-    return  @: $self->SUPER::os_flavor, 'Netware'
+    return  @:( $self->SUPER::os_flavor: ), 'Netware'
 
 
 =item init_platform
@@ -62,7 +62,7 @@ Add Netware macros initialized above to the Makefile.
 sub init_platform($self)
 
     # To get Win32's setup.
-    $self->SUPER::init_platform
+    $self->SUPER::init_platform: 
 
     # incpath is copied to makefile var INCLUDE in constants sub, here just
     # make it empty
@@ -85,8 +85,8 @@ sub init_platform($self)
 
     # If the final binary name is greater than 8 chars,
     # truncate it here.
-    if(length($self->{?'BASEEXT'}) +> 8)
-        $self->{+'NLM_SHORT_NAME'} = substr($self->{?'BASEEXT'},0,8)
+    if((length: $self->{?'BASEEXT'}) +> 8)
+        $self->{+'NLM_SHORT_NAME'} = substr: $self->{?'BASEEXT'},0,8
 
     # Get the include path and replace the spaces with ;
     # Copy this to makefile as INCLUDE = d:\...;d:\;
@@ -104,7 +104,7 @@ sub platform_constants
     my $make_frag = ''
 
     # Setup Win32's constants.
-    $make_frag .= $self->SUPER::platform_constants
+    $make_frag .= $self->SUPER::platform_constants: 
 
     foreach my $macro (qw(LIBPTH BASE_IMPORT NLM_VERSION MPKTOOL 
                           TOOLPATH BOOT_SYMBOL NLM_SHORT_NAME INCLUDE PATH
@@ -124,7 +124,7 @@ sub platform_constants
 
 sub const_cccmd($self,$libperl)
     return $self->{?CONST_CCCMD} if $self->{?CONST_CCCMD}
-    return '' unless $self->needs_linking()
+    return '' unless $self->needs_linking: 
     return ($self->{+CONST_CCCMD} = <<'MAKE_FRAG')
 CCCMD = $(CC) $(CCFLAGS) $(INC) $(OPTIMIZE) \
 	$(PERLTYPE) $(MPOLLUTE) -o $@ \
@@ -140,7 +140,7 @@ MAKE_FRAG
 
 sub static_lib($self)
 
-    return '' unless $self->has_link_code
+    return '' unless $self->has_link_code: 
 
     my $m = <<'END'
 $(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists
@@ -162,7 +162,7 @@ END
         $ar_arg = '-type library -o $@ $(OBJECT)'
     
 
-    $m .= sprintf <<'END', $ar_arg
+    $m .= sprintf: <<'END', $ar_arg
 	$(AR) %s
 	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)\extralibs.ld
 	$(CHMOD) 755 $@
@@ -183,9 +183,9 @@ Defines how to produce the *.so (or equivalent) files.
 =cut
 
 sub dynamic_lib($self, %< %attribs)
-    return '' unless $self->needs_linking() #might be because of a subdir
+    return '' unless $self->needs_linking:  #might be because of a subdir
 
-    return '' unless $self->has_link_code
+    return '' unless $self->has_link_code: 
 
     my(@: $otherldflags) = %attribs{?OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '')
     my(@: $inst_dynamic_dep) = %attribs{?INST_DYNAMIC_DEP} || ""
@@ -216,7 +216,7 @@ MAKE_FRAG
 
     # Reconstruct the X.Y.Z version.
     my $version = $^PERL_VERSION
-    $m .= sprintf '	$(LD) $(LDFLAGS) $(OBJECT:.obj=.obj) -desc "Perl %s Extension ($(BASEEXT))  XS_VERSION: $(XS_VERSION)" -nlmversion $(NLM_VERSION)', $version
+    $m .= sprintf: '	$(LD) $(LDFLAGS) $(OBJECT:.obj=.obj) -desc "Perl %s Extension ($(BASEEXT))  XS_VERSION: $(XS_VERSION)" -nlmversion $(NLM_VERSION)', $version
 
     # Taking care of long names like FileHandle, ByteLoader, SDBM_File etc
     if($self->{?NLM_SHORT_NAME})

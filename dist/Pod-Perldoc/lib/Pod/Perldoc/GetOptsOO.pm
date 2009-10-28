@@ -19,7 +19,7 @@ package Pod::Perldoc::GetOptsOO
 ## sburke@cpan.org 2002-10-31
 
 BEGIN  # Make a DEBUG constant ASAP
-    *DEBUG = exists( &Pod::Perldoc::DEBUG )
+    *DEBUG = exists:  &Pod::Perldoc::DEBUG 
         ?? \&Pod::Perldoc::DEBUG
         !! sub(){10}
 
@@ -30,15 +30,15 @@ sub getopts
 
     $args ||= \@ARGV
 
-    $target->aside(
-        "Starting switch processing.  Scanning arguments [$(join ' ',$args->@)]\n"
-        ) if $target->can('aside')
+    $target->aside: 
+        "Starting switch processing.  Scanning arguments [$((join: ' ',$args->@))]\n"
+         if $target->can: 'aside'
 
     return unless (nelems $args->@)
 
     $truth = 1 unless (nelems @_) +> 2
 
-    DEBUG +> 3 and print $^STDOUT, "   Truth is $truth\n"
+    (DEBUG: )+> 3 and print: $^STDOUT, "   Truth is $truth\n"
 
 
     my $error_count = 0
@@ -50,53 +50,53 @@ sub getopts
             last
         
         my $method = "opt_$($first)_with"
-        if( $target->can($method) )  # it's argumental
+        if( ($target->can: $method) )  # it's argumental
             if($rest eq '')   # like -f bar
                 shift $args->@
-                warn "Option $first needs a following argument!\n" unless (nelems $args->@)
+                warn: "Option $first needs a following argument!\n" unless (nelems $args->@)
                 $rest = shift $args->@
             else            # like -fbar  (== -f bar)
                 shift $args->@
             
 
-            DEBUG +> 3 and print $^STDOUT, " $method => $rest\n"
-            $target->?$method( $rest )
+            (DEBUG: )+> 3 and print: $^STDOUT, " $method => $rest\n"
+             $target->?$method:  $rest 
 
         # Otherwise, it's not argumental...
         else
 
-            if( $target->can( $method = "opt_$first" ) )
-                DEBUG +> 3 and print $^STDOUT, " $method is true ($truth)\n"
-                $target->?$method( $truth )
+            if( ($target->can: ( $method = "opt_$first") ) )
+                (DEBUG: )+> 3 and print: $^STDOUT, " $method is true ($truth)\n"
+                 $target->?$method:  $truth 
 
             # Otherwise it's an unknown option...
 
-            elsif( $target->can('handle_unknown_option') )
-                DEBUG +> 3
-                    and print $^STDOUT, " calling handle_unknown_option('$first')\n"
+            elsif( ($target->can: 'handle_unknown_option') )
+                (DEBUG: )+> 3
+                    and print: $^STDOUT, " calling handle_unknown_option('$first')\n"
 
                 $error_count += (
-                    $target->handle_unknown_option( $first ) || 0
+                    ($target->handle_unknown_option:  $first ) || 0
                     )
 
             else
                 ++$error_count
-                warn "Unknown option: $first\n"
+                warn: "Unknown option: $first\n"
             
 
             if($rest eq '')   # like -f
                 shift $args->@
             else            # like -fbar  (== -f -bar )
-                DEBUG +> 2 and print $^STDOUT, "   Setting args->[0] to \"-$rest\"\n"
+                (DEBUG: )+> 2 and print: $^STDOUT, "   Setting args->[0] to \"-$rest\"\n"
                 $args->[0] = "-$rest"
             
         
     
 
 
-    $target->aside(
-        "Ending switch processing.  Args are [$(join ' ',$args->@)] with $error_count errors.\n"
-        ) if $target->can('aside')
+    $target->aside: 
+        "Ending switch processing.  Args are [$((join: ' ',$args->@))] with $error_count errors.\n"
+         if $target->can: 'aside'
 
     $error_count == 0
 

@@ -9,7 +9,7 @@
 use Test::More
 
 
-BEGIN { plan tests => 17 }
+BEGIN { (plan: tests => 17) }
 
 use Pod::LaTeX
 
@@ -19,10 +19,10 @@ my $linkver = $Pod::ParseUtils::VERSION
 
 # Set up an END block to remove the test output file
 END 
-    unlink "test.tex"
+    unlink: "test.tex"
 ;
 
-ok(1)
+ok: 1
 
 # First thing to do is to read the expected output from
 # the DATA filehandle and store it in a scalar.
@@ -30,7 +30,7 @@ ok(1)
 my @reference
 while (my $line = ~< $^DATA)
     last if $line =~ m/^=pod/
-    push(@reference,$line)
+    push: @reference,$line
 
 
 my $user_preamble = <<PRE
@@ -46,35 +46,35 @@ my $user_postamble = <<POST
 POST
 
 # Create a new parser
-my %params = %: 
+my %params = %:
     UserPreamble => $user_preamble
     UserPostamble => $user_postamble
     
 
-my $parser = Pod::LaTeX->new(< %params)
-ok($parser)
+my $parser = Pod::LaTeX->new: < %params
+ok: $parser
 
 # Create an output file
-open(my $outfh, ">", "test.tex" ) or die "Unable to open test tex file: $^OS_ERROR\n"
+open: my $outfh, ">", "test.tex"  or die: "Unable to open test tex file: $^OS_ERROR\n"
 
 # Read from the DATA filehandle and write to a new output file
 # Really want to write this to a scalar
-$parser->parse_from_filehandle($^DATA, $outfh)
+$parser->parse_from_filehandle: $^DATA, $outfh
 
-close($outfh) or die "Error closing OUTFH test.tex: $^OS_ERROR\n"
+close: $outfh or die: "Error closing OUTFH test.tex: $^OS_ERROR\n"
 
 # Now read in OUTFH and compare
-open(my $infh, "<", "test.tex") or die "Unable to read test tex file: $^OS_ERROR\n"
+open: my $infh, "<", "test.tex" or die: "Unable to read test tex file: $^OS_ERROR\n"
 my @output = @:  ~< $infh 
 
-is((nelems @output), nelems @reference)
+is: (nelems @output), nelems @reference
 
 for my $i (0..((nelems @reference)-1))
     next if @reference[$i] =~ m/^%%/ # skip timestamp comments
-    is(@output[$i], @reference[$i])
+    is: @output[$i], @reference[$i]
 
 
-close($infh) or die "Error closing INFH test.tex: $^OS_ERROR\n"
+close: $infh or die: "Error closing INFH test.tex: $^OS_ERROR\n"
 
 
 __DATA__

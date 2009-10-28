@@ -78,7 +78,7 @@ use Perl6::Form
 
 our(%Kinds, %Type, %Flavor)
 
-our %Type_Description = %: 
+our %Type_Description = %:
     'ARRAY'	=> 'Functions for real @ARRAYs'
     'Binary'	=> 'Functions for fixed length data or records'
     'File'	=> 'Functions for filehandles, files, or directories'
@@ -128,11 +128,11 @@ while ( ~< $^DATA)
     chomp
     s/#.*//
     next unless $_
-    my(@: $name, $type, $text) =  split " ", $_, 3
+    my(@: $name, $type, $text) =  split: " ", $_, 3
     %Type{+$name} = $type
     %Flavor{+$name} = $text
-    for my $t ( split m/[,\s]+/, $type )
-        push %Kinds{+$t}, $name
+    for my $t ( (split: m/[,\s]+/, $type) )
+        push: %Kinds{+$t}, $name
     
 
 
@@ -141,15 +141,15 @@ close $^DATA
 my( $typedesc, $list )
 unless (caller)
     foreach my $type (  @Type_Order )
-        $list = join(", ", sort %Kinds{?$type})
+        $list = join: ", ", sort: %Kinds{?$type}
         $typedesc = %Type_Description{?$type} . ":"
 
-        print $^STDOUT, < form("",
-                               "\{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",
-                               $typedesc,
-                               "     \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",
-                               $list,
-                               )
+        print: $^STDOUT, < form: ""
+                                 "\{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}"
+                                 $typedesc
+                                 "     \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}"
+                                 $list
+                               
     
 
 
