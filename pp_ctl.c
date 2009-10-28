@@ -38,7 +38,7 @@
 #define WORD_ALIGN sizeof(U32)
 #endif
 
-#define DOCATCH(o) ((CATCH_GET == TRUE) ? docatch(o) : (o))
+#define DOCATCH(instr) ((CATCH_GET == TRUE) ? docatch(instr) : (run_set_next_instruction(instr)))
 
 #define dopoptosub(plop)	dopoptosub_at(cxstack, (plop))
 
@@ -2809,18 +2809,18 @@ S_save_lines(pTHX_ AV *array, SV *sv)
     }
 }
 
-STATIC OP *
-S_docatch(pTHX_ OP *o)
+STATIC void
+S_docatch(pTHX_ const INSTRUCTION *instr)
 {
     dVAR;
     int ret;
-    OP * const oldop = PL_op;
+    OP * const old_next_instruction = run_get_next_instruction();
     dJMPENV;
 
 #ifdef DEBUGGING
     assert(CATCH_GET == TRUE);
 #endif
-    PL_op = o;
+    run_set_next_instruction(instr);
 
     JMPENV_PUSH(ret);
     switch (ret) {
@@ -2851,13 +2851,13 @@ S_docatch(pTHX_ OP *o)
 	/* FALL THROUGH */
     default:
 	JMPENV_POP;
-	PL_op = oldop;
+	run_set_next_instruction( old_next_instruction );
 	JMPENV_JUMP(ret);
 	/* NOTREACHED */
     }
     JMPENV_POP;
-    PL_op = oldop;
-    return NULL;
+    run_set_next_instruction( old_next_instruction );
+    return;
 }
 
 OP *
@@ -3637,8 +3637,11 @@ PP(pp_require)
     encoding = PL_encoding;
     PL_encoding = NULL;
 
-    if (doeval(gimme, NULL, NULL, PL_curcop->cop_seq))
-	op = DOCATCH(PL_eval_start);
+    if (doeval(gimme, NULL, NULL, PL_curcop->cop_seq)) {
+	CODESEQ* codeseq = new_codeseq(); /* FIXME memory leak */
+	compile_op(PL_eval_start, codeseq);
+	DOCATCH(codeseq_start_instruction(codeseq));
+    }
     else
 	op = PL_op->op_next;
 
@@ -3735,7 +3738,7 @@ PP(pp_entereval)
 
     PUSHBLOCK(cx, (CXt_EVAL|CXp_REAL), SP);
     PUSHEVAL(cx, 0);
-    cx->blk_eval.ret_instr = PL_op->op_next;
+    cx->blk_eval.ret_instr = run_get_next_instruction();
 
     /* prepare to compile string */
 
@@ -3752,7 +3755,10 @@ PP(pp_entereval)
 	    char *const safestr = savepvn(tmpbuf, len);
 	    SAVEDELETE(PL_defstash, safestr, len);
 	}
-	return DOCATCH(PL_eval_start);
+	CODESEQ* codeseq = new_codeseq(); /* FIXME memory leak */
+	compile_op(PL_eval_start, codeseq);
+	DOCATCH(codeseq_start_instruction(codeseq));
+	return;
     } else {
 	/* We have already left the scope set up earler thanks to the LEAVE
 	   in doeval().  */
@@ -3763,7 +3769,7 @@ PP(pp_entereval)
 	} else {
 	    (void)hv_delete(PL_defstash, tmpbuf, len, G_DISCARD);
 	}
-	return PL_op->op_next;
+	RETURN;
     }
 }
 
@@ -3833,7 +3839,8 @@ PP(pp_leaveeval)
 	}
     }
 
-    RETURNOP(ret_instr);
+    run_set_next_instruction(ret_instr);
+    RETURN;
 }
 
 /* Common code for Perl_call_sv and Perl_fold_constants, put here to keep it
@@ -3886,7 +3893,8 @@ PP(pp_entertry)
     dVAR;
     PERL_CONTEXT * const cx = create_eval_scope(0);
     cx->blk_eval.ret_instr = cLOGOP->op_other->op_next;
-    return DOCATCH(PL_op->op_next);
+    DOCATCH(run_get_next_instruction());
+    return;
 }
 
 PP(pp_leavetry)

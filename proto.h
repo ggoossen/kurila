@@ -5013,9 +5013,7 @@ STATIC char *	S_bytes_to_uni(const U8 *start, STRLEN len, char *dest)
 #endif
 
 #if defined(PERL_IN_PP_CTL_C) || defined(PERL_DECL_PROT)
-STATIC OP*	S_docatch(pTHX_ OP *o)
-			__attribute__warn_unused_result__;
-
+STATIC void	S_docatch(pTHX_ const INSTRUCTION *instr);
 STATIC OP*	S_dofindlabel(pTHX_ OP *o, const char *label, OP **opstack, OP **oplimit)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1)

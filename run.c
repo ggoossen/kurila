@@ -37,6 +37,7 @@ int
 Perl_runops_standard(pTHX)
 {
     dVAR;
+    assert(PL_run_next_instruction);
     PL_op = PL_run_next_instruction->instr_op;
     while (CALL_FPTR((PL_run_next_instruction++)->instr_ppaddr)(aTHX)) {
 	PERL_ASYNC_CHECK();
@@ -80,6 +81,7 @@ int
 Perl_runops_debug(pTHX)
 {
     dVAR;
+    assert(PL_run_next_instruction);
     if (!PL_run_next_instruction->instr_ppaddr) {
 	Perl_ck_warner_d(aTHX_ packWARN(WARN_DEBUGGING), "NULL OP IN RUN");
 	return 0;
