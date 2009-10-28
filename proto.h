@@ -516,7 +516,7 @@ PERL_CALLCONV char*	Perl_delimcpy(char* to, const char* toend, const char* from,
 	assert(to); assert(toend); assert(from); assert(fromend); assert(retlen)
 
 PERL_CALLCONV void	Perl_delete_eval_scope(pTHX);
-PERL_CALLCONV OP*	Perl_die(pTHX_ const char* pat, ...)
+PERL_CALLCONV int	Perl_die(pTHX_ const char* pat, ...)
 			__attribute__format__null_ok__(__printf__,pTHX_1,pTHX_2);
 
 #if defined(PERL_IN_UTIL_C) || defined(PERL_DECL_PROT)
@@ -649,7 +649,7 @@ PERL_CALLCONV void	Perl_do_join(pTHX_ SV *sv, SV *delim, SV **mark, SV **sp)
 #define PERL_ARGS_ASSERT_DO_JOIN	\
 	assert(sv); assert(delim); assert(mark); assert(sp)
 
-PERL_CALLCONV OP*	Perl_do_kv(pTHX);
+PERL_CALLCONV int	Perl_do_kv(pTHX);
 /* PERL_CALLCONV bool	Perl_do_open(pTHX_ GV* gv, const char* name, I32 len, int as_raw, int rawmode, int rawperm, PerlIO* supplied_fp)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2); */
@@ -674,7 +674,7 @@ PERL_CALLCONV bool	Perl_do_print(pTHX_ SV* sv, PerlIO* fp)
 #define PERL_ARGS_ASSERT_DO_PRINT	\
 	assert(fp)
 
-PERL_CALLCONV OP*	Perl_do_readline(pTHX)
+PERL_CALLCONV int	Perl_do_readline(pTHX)
 			__attribute__warn_unused_result__;
 
 PERL_CALLCONV I32	Perl_do_chomp(pTHX_ SV* sv)
@@ -4909,7 +4909,7 @@ STATIC SV *	S_incpush_if_exists(pTHX_ AV *const av, SV *dir, SV *const stem)
 #endif
 
 #if defined(PERL_IN_PP_C) || defined(PERL_DECL_PROT)
-STATIC OP*	S_do_delete_local(pTHX);
+STATIC int	S_do_delete_local(pTHX);
 STATIC SV*	S_refto(pTHX_ SV* sv)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);

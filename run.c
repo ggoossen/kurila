@@ -89,7 +89,7 @@ Perl_runops_debug(pTHX)
 
     DEBUG_l(Perl_deb(aTHX_ "Entering new RUNOPS level\n"));
     do {
-	INSTRUCTION* instr = PL_run_next_instruction;
+	const INSTRUCTION* instr = PL_run_next_instruction;
 	PERL_ASYNC_CHECK();
 	assert(PL_stack_base[0] == &PL_sv_undef);
 	assert(PL_stack_sp >= PL_stack_base);

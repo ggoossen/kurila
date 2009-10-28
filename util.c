@@ -1383,7 +1383,7 @@ Perl_die_nocontext(const char* pat, ...)
 }
 #endif /* PERL_IMPLICIT_CONTEXT */
 
-OP *
+int
 Perl_die(pTHX_ const char* pat, ...)
 {
     OP *o;
@@ -1391,7 +1391,7 @@ Perl_die(pTHX_ const char* pat, ...)
     va_start(args, pat);
     o = vdie(pat, &args);
     va_end(args);
-    return o;
+    return NORMAL;
 }
 
 void

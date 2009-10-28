@@ -4602,7 +4602,7 @@ PP(pp_each)
     RETURN;
 }
 
-STATIC OP *
+STATIC int
 S_do_delete_local(pTHX)
 {
     dVAR;

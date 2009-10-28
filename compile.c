@@ -28,7 +28,7 @@ struct branch_point_pad {
 typedef struct branch_point_pad BRANCH_POINT_PAD;
 
 void
-S_append_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o)
+    S_append_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o, INSTRUCTION** instrp)
 {
     if (bpp->op_instrpp_append >= bpp->op_instrpp_end) {
 	OP_INSTRPP* old_lp = bpp->op_instrpp_list;
@@ -39,8 +39,8 @@ S_append_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o)
 	bpp->op_instrpp_append = bpp->op_instrpp_list + (bpp->op_instrpp_append - old_lp);
     }
     assert(bpp->op_instrpp_append < bpp->op_instrpp_end);
-    bpp->op_instrpp_append->op = cLOGOPo->op_other;
-    bpp->op_instrpp_append->instrpp = &(cLOGOPo->op_other_instr);
+    bpp->op_instrpp_append->op = o;
+    bpp->op_instrpp_append->instrpp = instrp;
     bpp->op_instrpp_append->instr_idx = -1;
     bpp->op_instrpp_append++;
 }
@@ -70,8 +70,11 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 	    codeseq->xcodeseq_instructions[idx].instr_op = o;
 
 	    /* Save other instruction for retrieval. */
-	    if ((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOGOP) {
-		S_append_branch_point(&bpp, o);
+            if (o->op_type == OP_ENTERTRY) {
+		S_append_branch_point(&bpp, cLOGOPo->op_other->op_next, &(cLOGOPo->op_other_instr));
+            }
+            else if ((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOGOP) {
+		S_append_branch_point(&bpp, cLOGOPo->op_other, &(cLOGOPo->op_other_instr));
 	    }
 
 	    idx++;
@@ -83,7 +86,7 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 	    if (o->op_type == OP_GREPSTART || o->op_type == OP_MAPSTART) {
 		o = o->op_next;
 
-		S_append_branch_point(&bpp, o);
+		S_append_branch_point(&bpp, cLOGOPo->op_other->op_next, &(cLOGOPo->op_other_instr));
 	    }
 
 	    o = o->op_next;

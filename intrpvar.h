@@ -44,7 +44,7 @@ PL_run_next_instruction
 Pointer to the next instruction to be exectued.
 =cut
 */
-PERLVARI(Irun_next_instruction,   INSTRUCTION *, NULL)
+PERLVARI(Irun_next_instruction,   const INSTRUCTION *, NULL)
 
 PERLVAR(Icurpad,	SV **)		/* active pad (lexicals+tmps) */
 

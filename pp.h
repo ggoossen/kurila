@@ -8,7 +8,7 @@
  *
  */
 
-#define PP(s) INSTRUCTION * Perl_##s(pTHX)
+#define PP(s) int Perl_##s(pTHX)
 
 /*
 =head1 Stack Manipulation Macros
@@ -85,7 +85,7 @@ Refetch the stack pointer.  Used after a callback.  See L<perlcall>.
 
 #define dTARG SV *targ
 
-#define NORMAL NULL
+#define NORMAL 1
 #define DIE Perl_die
 
 /*
