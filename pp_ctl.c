@@ -1634,7 +1634,7 @@ Perl_die_where(pTHX_ SV *msv)
 		    *msg ? msg : "Unknown error\n");
 	    }
 	    assert(CxTYPE(cx) == CXt_EVAL);
-	    PL_restartop = cx->blk_eval.ret_instr;
+	    run_set_next_instruction( cx->blk_eval.ret_instr );
 	    JMPENV_JUMP(3);
 	    /* NOTREACHED */
 	}
