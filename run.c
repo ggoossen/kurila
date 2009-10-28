@@ -99,7 +99,7 @@ Perl_runops_debug(pTHX)
 	PL_run_next_instruction++;
 	PL_op = instr->instr_op;
 	CALL_FPTR(instr->instr_ppaddr)(aTHX);
-    } while (PL_run_next_instruction->instr_ppaddr);
+    } while (PL_run_next_instruction && PL_run_next_instruction->instr_ppaddr);
     DEBUG_l(Perl_deb(aTHX_ "leaving RUNOPS level\n"));
 
     TAINT_NOT;
@@ -127,7 +127,7 @@ Perl_run_get_next_instruction(pTHX)
 void
 Perl_run_set_next_instruction(pTHX_ const INSTRUCTION* instr)
 {
-    assert(instr);
+    /* assert(instr); */
     PL_run_next_instruction = instr;
 }
 

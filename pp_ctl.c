@@ -3627,7 +3627,7 @@ PP(pp_require)
     /* switch to eval mode */
     PUSHBLOCK(cx, CXt_EVAL, SP);
     PUSHEVAL(cx, name);
-    cx->blk_eval.ret_instr = PL_op->op_next;
+    cx->blk_eval.ret_instr = run_get_next_instruction();
 
     SAVECOPLINE(&PL_compiling);
     CopLINE_set(&PL_compiling, 0);
@@ -3894,6 +3894,7 @@ PP(pp_entertry)
     dVAR;
     PERL_CONTEXT * const cx = create_eval_scope(0);
     cx->blk_eval.ret_instr = cLOGOP->op_other_instr;
+    assert(cx->blk_eval.ret_instr);
     DOCATCH(run_get_next_instruction());
     return;
 }
