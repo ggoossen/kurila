@@ -2597,10 +2597,11 @@ S_gen_constant_list(pTHX_ register OP *o)
     PL_op = curop = LINKLIST(o);
     o->op_next = 0;
     CALL_PEEP(curop);
+    CODESEQ* codeseq = new_codeseq();
+    compile_op(curop, codeseq);
     pp_pushmark(NULL);
-    CALLRUNOPS(aTHX);
-    PL_op = curop;
-    assert (!(curop->op_flags & OPf_SPECIAL));
+    run_exec_codeseq(codeseq);
+    assert(!(curop->op_flags & OPf_SPECIAL));
     assert(curop->op_type == OP_RANGE);
     pp_anonlist(NULL);
     PL_tmps_floor = oldtmps_floor;
