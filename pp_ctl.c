@@ -307,7 +307,8 @@ PP(pp_substcont)
 
 	    LEAVE_SCOPE(cx->sb_oldsave);
 	    POPSUBST(cx);
-	    RETURNOP(pm->op_next);
+	    RUN_SET_NEXT_INSTRUCTION(pm->op_subst_next_instr);
+	    RETURN;
 	}
 	cx->sb_iters = saviters;
     }
@@ -344,7 +345,8 @@ PP(pp_substcont)
 	(void)ReREFCNT_inc(rx);
     cx->sb_rxtainted |= RX_MATCH_TAINTED(rx);
     rxres_save(&cx->sb_rxres, rx);
-    RETURNOP(pm->op_pmstashstartu.op_pmreplstart);
+    RUN_SET_NEXT_INSTRUCTION(pm->op_pmreplstart_instr);
+    RETURN;
 }
 
 void

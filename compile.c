@@ -76,6 +76,11 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
             else if ((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOGOP) {
 		S_append_branch_point(&bpp, cLOGOPo->op_other, &(cLOGOPo->op_other_instr));
 	    }
+	    else if (o->op_type == OP_SUBST) {
+		S_append_branch_point(&bpp, cPMOPo->op_pmreplrootu.op_pmreplroot, &(cPMOPo->op_pmreplroot_instr));
+		S_append_branch_point(&bpp, cPMOPo->op_pmstashstartu.op_pmreplstart, &(cPMOPo->op_pmreplstart_instr));
+		S_append_branch_point(&bpp, cPMOPo->op_next, &(cPMOPo->op_subst_next_instr));
+	    }
 
 	    idx++;
 	    if (idx >= codeseq->xcodeseq_size) {

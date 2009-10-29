@@ -325,6 +325,7 @@ struct pmop {
 	GV *	op_pmtargetgv;
 #endif
     }	op_pmreplrootu;
+    INSTRUCTION *	op_pmreplroot_instr;	/* Only used in OP_SUBST */
     union {
 	OP *	op_pmreplstart;	/* Only used in OP_SUBST */
 #ifdef USE_ITHREADS
@@ -333,6 +334,8 @@ struct pmop {
 	HV *	op_pmstash;
 #endif
     }		op_pmstashstartu;
+    INSTRUCTION *	op_pmreplstart_instr;	/* Only used in OP_SUBST */
+    INSTRUCTION *	op_subst_next_instr;	/* Only used in OP_SUBST */
 };
 
 #ifdef USE_ITHREADS

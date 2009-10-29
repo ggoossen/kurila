@@ -36,6 +36,13 @@ struct instruction {
     OP*         instr_op;
 };
 
+#define RUN_SET_NEXT_INSTRUCTION(instr)		\
+    STMT_START {							\
+	DEBUG_t(Perl_deb(aTHX_ "Instruction jump to %p, was %p\n",	\
+		(void*)instr, (void*)PL_run_next_instruction));		\
+	run_set_next_instruction(instr);				\
+    } STMT_END								\
+
 /*
 =head2 C<CODESEQ>
 
