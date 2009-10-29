@@ -451,6 +451,7 @@ struct loop {
     OP *	op_first;
     OP *	op_last;
     OP *	op_redoop;
+    INSTRUCTION *	op_redo_instr;
     OP *	op_nextop;
     INSTRUCTION *	op_next_instr;
     OP *	op_lastop;
