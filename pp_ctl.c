@@ -996,8 +996,8 @@ PP(pp_grepstart)
 	RETURN;
     }
     PL_stack_sp = PL_stack_base + *PL_markstack_ptr + 1;
-    pp_pushmark();				/* push dst */
-    pp_pushmark();				/* push src */
+    pp_pushmark(NULL);				/* push dst */
+    pp_pushmark(NULL);				/* push src */
     ENTER_with_name("grep");					/* enter outer scope */
 
     SAVETMPS;
@@ -1017,7 +1017,7 @@ PP(pp_grepstart)
 
     PUTBACK;
     if (PL_op->op_type == OP_MAPSTART)
-	pp_pushmark();			/* push top */
+	pp_pushmark(NULL);			/* push top */
     run_set_next_instruction(cLOGOPx(PL_op->op_next)->op_other_instr);
     return NORMAL;
 }
@@ -2216,7 +2216,7 @@ PP(pp_last)
     I32 pop2 = 0;
     I32 gimme;
     I32 optype;
-    OP *nextop = NULL;
+    INSTRUCTION *next_instr = NULL;
     SV **newsp;
     PMOP *newpm;
     SV **mark;
@@ -2246,19 +2246,19 @@ PP(pp_last)
     case CXt_LOOP_PLAIN:
 	pop2 = CxTYPE(cx);
 	newsp = PL_stack_base + cx->blk_loop.resetsp;
-	nextop = cx->blk_loop.my_op->op_lastop->op_next;
+	next_instr = cx->blk_loop.my_op->op_last_instr;
 	break;
     case CXt_SUB:
 	pop2 = CXt_SUB;
-	nextop = cx->blk_sub.ret_instr;
+	next_instr = cx->blk_sub.ret_instr;
 	break;
     case CXt_EVAL:
 	POPEVAL(cx);
-	nextop = cx->blk_eval.ret_instr;
+	next_instr = cx->blk_eval.ret_instr;
 	break;
     case CXt_FORMAT:
 	POPFORMAT(cx);
-	nextop = cx->blk_sub.ret_instr;
+	next_instr = cx->blk_sub.ret_instr;
 	break;
     default:
 	DIE(aTHX_ "panic: last");
@@ -2302,7 +2302,8 @@ PP(pp_last)
     LEAVESUB(sv);
     PERL_UNUSED_VAR(optype);
     PERL_UNUSED_VAR(gimme);
-    return nextop;
+    RUN_SET_NEXT_INSTRUCTION(next_instr);
+    return NORMAL;
 }
 
 PP(pp_next)
@@ -4016,7 +4017,7 @@ S_matcher_matches_sv(pTHX_ PMOP *matcher, SV *sv)
     PL_op = (OP *) matcher;
     XPUSHs(sv);
     PUTBACK;
-    (void) pp_match();
+    (void) pp_match(NULL);
     SPAGAIN;
     return (SvTRUEx(POPs));
 }
@@ -4497,9 +4498,9 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
 	PUSHs(d); PUSHs(e);
 	PUTBACK;
 	if (CopHINTS_get(PL_curcop) & HINT_INTEGER)
-	    (void) pp_i_eq();
+	    (void) pp_i_eq(NULL);
 	else
-	    (void) pp_eq();
+	    (void) pp_eq(NULL);
 	SPAGAIN;
 	if (SvTRUEx(POPs))
 	    RETPUSHYES;
@@ -4511,7 +4512,7 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
     DEBUG_M(Perl_deb(aTHX_ "    applying rule Any-Any\n"));
     PUSHs(d); PUSHs(e);
     PUTBACK;
-    return pp_seq();
+    return pp_seq(NULL);
 }
 
 PP(pp_enterwhen)

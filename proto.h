@@ -6787,6 +6787,12 @@ PERL_CALLCONV void	Perl_run_exec_codeseq(pTHX_ const CODESEQ* codeseq)
 	assert(codeseq)
 
 
+PERL_CALLCONV void	Perl_dump_op_short(pTHX_ const OP* o)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_DUMP_OP_SHORT	\
+	assert(o)
+
+
 END_EXTERN_C
 /*
  * ex: set ts=8 sts=4 sw=4 noet:

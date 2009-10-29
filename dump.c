@@ -772,6 +772,13 @@ S_sequence_num(pTHX_ const OP *o)
 }
 
 void
+Perl_dump_op_short(const OP *o)
+{
+    PerlIO_printf(Perl_debug_log, 
+	"op %d %s", sequence_num(o), PL_op_name[o->op_type]);
+}
+
+void
 Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 {
     dVAR;

@@ -31,9 +31,18 @@ C<instr_ppaddr> can be C<NULL> indicating the end of the instructions.
 =cut
 */
 
+struct instr_arg {
+    union {
+	INSTRUCTION* instr;
+    } instr_arg_u;
+};
+
+#define INSTR_ARG_NULL {NULL}
+
 struct instruction {
-    INSTRUCTION*		(CPERLscope(*instr_ppaddr))(pTHX);
+    INSTRUCTION*		(CPERLscope(*instr_ppaddr))(pTHX_ INSTR_ARG instr_arg);
     OP*         instr_op;
+    INSTR_ARG   instr_arg;
 };
 
 #define RUN_SET_NEXT_INSTRUCTION(instr)		\

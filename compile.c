@@ -30,6 +30,7 @@ typedef struct branch_point_pad BRANCH_POINT_PAD;
 void
     S_append_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o, INSTRUCTION** instrp)
 {
+    DEBUG_x(Perl_deb("adding branch point "); dump_op_short(o); Perl_deb("\n"));
     if (bpp->op_instrpp_append >= bpp->op_instrpp_end) {
 	OP_INSTRPP* old_lp = bpp->op_instrpp_list;
 	int new_size = 128 + (bpp->op_instrpp_end - bpp->op_instrpp_list);
@@ -66,8 +67,17 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 
     do {
 	while (o) {
+	    DEBUG_x(Perl_deb("Compiling op "); dump_op_short(o); Perl_deb("\n"));
+
 	    codeseq->xcodeseq_instructions[idx].instr_ppaddr = PL_ppaddr[o->op_type];
 	    codeseq->xcodeseq_instructions[idx].instr_op = o;
+	    codeseq->xcodeseq_instructions[idx].instr_arg = NULL;
+
+	    idx++;
+	    if (idx >= codeseq->xcodeseq_size) {
+		codeseq->xcodeseq_size += 128;
+		Renew(codeseq->xcodeseq_instructions, codeseq->xcodeseq_size, INSTRUCTION);
+	    }
 
 	    /* Save other instruction for retrieval. */
             if (o->op_type == OP_ENTERTRY) {
@@ -81,20 +91,25 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 		S_append_branch_point(&bpp, cPMOPo->op_pmstashstartu.op_pmreplstart, &(cPMOPo->op_pmreplstart_instr));
 		S_append_branch_point(&bpp, cPMOPo->op_next, &(cPMOPo->op_subst_next_instr));
 	    }
-
-	    idx++;
-	    if (idx >= codeseq->xcodeseq_size) {
-		codeseq->xcodeseq_size += 128;
-		Renew(codeseq->xcodeseq_instructions, codeseq->xcodeseq_size, INSTRUCTION);
+            else if ((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOOP) {
+		S_append_branch_point(&bpp, cLOOPo->op_lastop->op_next, &(cLOOPo->op_last_instr));
 	    }
-
-	    if (o->op_type == OP_GREPSTART || o->op_type == OP_MAPSTART) {
+	    else if (o->op_type == OP_GREPSTART || o->op_type == OP_MAPSTART) {
 		o = o->op_next;
 
 		S_append_branch_point(&bpp, cLOGOPo->op_other->op_next, &(cLOGOPo->op_other_instr));
 	    }
+	    else if (o->op_type == OP_LAST) {
+		o = NULL;
+	    }
+	    else if (o->op_type == OP_UNSTACK) {
+		S_append_branch_point(&bpp, o->op_next,
+		    &(o->op_unstack_instr));
+		o = NULL;
+	    }
 
-	    o = o->op_next;
+	    if (o)
+		o = o->op_next;
 	}
 	codeseq->xcodeseq_instructions[idx].instr_ppaddr = NULL;
 	idx++;

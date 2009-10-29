@@ -38,11 +38,14 @@ Perl_runops_standard(pTHX)
 {
     dVAR;
     assert(PL_run_next_instruction);
-    PL_op = PL_run_next_instruction->instr_op;
-    while (CALL_FPTR((PL_run_next_instruction++)->instr_ppaddr)(aTHX)) {
+
+    do {
+	const INSTRUCTION* instr = PL_run_next_instruction;
 	PERL_ASYNC_CHECK();
-	PL_op = PL_run_next_instruction->instr_op;
-    }
+	PL_run_next_instruction++;
+	PL_op = instr->instr_op;
+	CALL_FPTR(instr->instr_ppaddr)(aTHX_ instr->instr_arg);
+    } while (PL_run_next_instruction && PL_run_next_instruction->instr_ppaddr);
 
     TAINT_NOT;
     return 0;
@@ -98,7 +101,7 @@ Perl_runops_debug(pTHX)
 	}
 	PL_run_next_instruction++;
 	PL_op = instr->instr_op;
-	CALL_FPTR(instr->instr_ppaddr)(aTHX);
+	CALL_FPTR(instr->instr_ppaddr)(aTHX_ instr->instr_arg);
     } while (PL_run_next_instruction && PL_run_next_instruction->instr_ppaddr);
     DEBUG_l(Perl_deb(aTHX_ "leaving RUNOPS level\n"));
 

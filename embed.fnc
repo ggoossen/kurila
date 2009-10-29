@@ -2264,6 +2264,8 @@ p	|const INSTRUCTION*	|run_get_next_instruction
 p	|void	|run_set_next_instruction|NN const INSTRUCTION* instr
 p	|void	|run_exec_codeseq|NN const CODESEQ* codeseq
 
+p	|void	|dump_op_short|NN const OP* o
+
 END_EXTERN_C
 /*
  * ex: set ts=8 sts=4 sw=4 noet:

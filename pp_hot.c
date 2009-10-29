@@ -221,6 +221,7 @@ PP(pp_unstack)
     FREETMPS;
     oldsave = PL_scopestack[PL_scopestack_ix - 1];
     LEAVE_SCOPE(oldsave);
+    RUN_SET_NEXT_INSTRUCTION(PL_op->op_unstack_instr);
     return NORMAL;
 }
 
@@ -319,7 +320,7 @@ PP(pp_readline)
 	    dSP;
 	    XPUSHs(MUTABLE_SV(PL_last_in_gv));
 	    PUTBACK;
-	    pp_rv2gv();
+	    pp_rv2gv(NULL);
 	    PL_last_in_gv = MUTABLE_GV(*PL_stack_sp--);
 	}
     }
