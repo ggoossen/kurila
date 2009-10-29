@@ -2513,6 +2513,8 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 {
     dVAR; dSP;
     LOGOP myop;		/* fake syntax tree node */
+    INSTRUCTION myinstr[2];
+    INSTRUCTION* oldinstr;
     UNOP method_op;
     I32 oldmark;
     VOL I32 retval = 0;
@@ -2564,6 +2566,13 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	PL_op = (OP*)&method_op;
     }
     myop.op_ppaddr = PL_ppaddr[OP_ENTERSUB];
+
+    myinstr[0].instr_op = PL_op;
+    myinstr[0].instr_ppaddr = PL_ppaddr[PL_op->op_type];
+    myinstr[0].instr_arg = NULL;
+    myinstr[1].instr_ppaddr = NULL;
+    oldinstr = run_get_next_instruction();
+    RUN_SET_NEXT_INSTRUCTION( &myinstr );
 
     if (!(flags & G_EVAL)) {
 	CATCH_SET(TRUE);
@@ -2618,6 +2627,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	FREETMPS;
 	LEAVE;
     }
+    run_set_next_instruction( oldinstr );
     PL_op = oldop;
     return retval;
 }
