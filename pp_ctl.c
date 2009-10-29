@@ -2336,7 +2336,8 @@ PP(pp_next)
     if (PL_scopestack_ix < inner)
 	leave_scope(PL_scopestack[PL_scopestack_ix]);
     PL_curcop = cx->blk_oldcop;
-    return CX_LOOP_NEXTOP_GET(cx);
+    RUN_SET_NEXT_INSTRUCTION( CX_LOOP_NEXTOP_GET(cx) );
+    return NORMAL;
 }
 
 PP(pp_redo)

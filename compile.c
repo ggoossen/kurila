@@ -93,6 +93,7 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 	    }
             else if ((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOOP) {
 		S_append_branch_point(&bpp, cLOOPo->op_lastop->op_next, &(cLOOPo->op_last_instr));
+		S_append_branch_point(&bpp, cLOOPo->op_nextop, &(cLOOPo->op_next_instr));
 	    }
 	    else if (o->op_type == OP_GREPSTART || o->op_type == OP_MAPSTART) {
 		o = o->op_next;

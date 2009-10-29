@@ -436,7 +436,7 @@ struct block_loop {
     /* This is also accesible via cx->blk_loop.my_op->op_targ */
     PADOFFSET	targoffset;
 #else
-    OP *	next_op;
+    INSTRUCTION *	next_instr;
     SV **	itervar;
 #endif
     union {
@@ -478,10 +478,10 @@ struct block_loop {
 
 #ifdef USE_ITHREADS
 #  define PUSHLOOP_OP_NEXT		/* No need to do anything.  */
-#  define CX_LOOP_NEXTOP_GET(cx)	((cx)->blk_loop.my_op->op_nextop + 0)
+#  define CX_LOOP_NEXTOP_GET(cx)	((cx)->blk_loop.my_op->op_next_instr + 0)
 #else
-#  define PUSHLOOP_OP_NEXT		cx->blk_loop.next_op = cLOOP->op_nextop
-#  define CX_LOOP_NEXTOP_GET(cx)	((cx)->blk_loop.next_op + 0)
+#  define PUSHLOOP_OP_NEXT		cx->blk_loop.next_instr = cLOOP->op_next_instr
+#  define CX_LOOP_NEXTOP_GET(cx)	((cx)->blk_loop.next_instr + 0)
 #endif
 
 #define PUSHLOOP_PLAIN(cx, s)						\
