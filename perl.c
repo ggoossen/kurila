@@ -2225,14 +2225,11 @@ perl_run(pTHXx)
 #endif
 
     JMPENV_PUSH(ret);
+
     switch (ret) {
-    case 1:
-	cxstack_ix = -1;		/* start context stack again */
-	goto redo_body;
     case 0:				/* normal completion */
- redo_body:
 	run_body(oldscope);
-	/* FALL THROUGH */
+	/* NOT REACHED */
     case 2:				/* my_exit() */
 	while (PL_scopestack_ix > oldscope)
 	    LEAVE;
@@ -2247,18 +2244,14 @@ perl_run(pTHXx)
 #endif
 	ret = STATUS_EXIT;
 	break;
-    case 3:
-	if (PL_restartop) {
-	    POPSTACK_TO(PL_mainstack);
-	    goto redo_body;
-	}
-	PerlIO_printf(Perl_error_log, "panic: restartop\n");
-	FREETMPS;
-	ret = 1;
-	break;
+    default:
+	ret = runops_continue_from_jmpenv(ret);
+	my_exit(0);
+	/* NOT REACHED */
     }
 
     JMPENV_POP;
+
     return ret;
 }
 
