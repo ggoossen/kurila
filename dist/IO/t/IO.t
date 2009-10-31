@@ -2,7 +2,7 @@
 
 use File::Path;
 use File::Spec;
-require "../../t/test.pl"
+require "test.pl"
 plan(tests => 17);
 
 do {
