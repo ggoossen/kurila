@@ -219,9 +219,8 @@ do
     sub new
         my $self = shift
         $self = (fields::new: $self) unless ref $self
-         $self->SUPER::new: 
+        $self->SUPER::new: 
         return $self
-    
 
 
     package Z
@@ -231,10 +230,9 @@ do
     sub new
         my $self = shift
         $self = (fields::new: $self) unless ref $self
-         $self->SUPER::new: 
+        $self->SUPER::new: 
         $self->{+Z1} = 'z1'
         return $self
-    
 
     package main
 

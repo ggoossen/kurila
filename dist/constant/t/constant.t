@@ -233,7 +233,7 @@ use constant \%:
     RFAM   => \(@:  \ qw( John Jane Sally ) )
     SPIT   => sub (@< @_) { shift }
 
-(is: (nelems: $:(FAMILY: )->@) (THREE: ))
+is: (nelems: $:(FAMILY: )->@), (THREE: )
 is: (nelems: $:(FAMILY: )->@), nelems (RFAM: )->[0]->@
 is: (FAMILY: )->[2], (RFAM: )->[0]->[2]
 is: (AGES: )->{?(FAMILY: )->[1]}, 28

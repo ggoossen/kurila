@@ -55,8 +55,7 @@ sub connect
             print: $^STDOUT, "ok 4\n"
             return 0
 
-
-     $self->SUPER::connect: < @_
+    $self->SUPER::connect: < @_
 
 
 
@@ -74,7 +73,7 @@ print: $^STDOUT, "ok 1\n"
 
 my $port = $listen->sockport: 
 
-if(my $pid = fork())
+if(my $pid = fork: )
 
     my $sock = ($listen->accept: ) or die: "$^OS_ERROR"
     print: $^STDOUT, "ok 5\n"

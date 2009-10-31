@@ -207,9 +207,9 @@ sub aside  # If we're in -v or DEBUG mode, say this.
                                  my $callsub = ((caller: 1))[[3]]
                                  my $package = quotemeta: __PACKAGE__ . '::'
                                  $callsub =~ s/^$package/'/os
-                               # the o is justified, as $package really won't change.
+                                 # the o is justified, as $package really won't change.
                                  $callsub . ": "
-                                 !! ''
+                               !! ''
                              < @_
             
         if((DEBUG: )) { (print: $^STDOUT, $out) } else { print: $^STDERR, $out }
@@ -939,9 +939,8 @@ sub render_findings($self, $found_things)
     my $formatter_class = $self->{?'formatter_class'}
         || die: "No formatter class set!?"
     my $formatter = $formatter_class->can: 'new'
-        ?? $formatter_class->new: 
+        ?? ($formatter_class->new: )
         !! $formatter_class
-    
 
     if(! nelems $found_things->@)
         die: "Nothing found?!"
@@ -1059,7 +1058,7 @@ sub MSWin_temp_cleanup
     (opendir: my $tmpdh, $tempdir) || return
     my @to_unlink
 
-    my $limit = time() - $Temp_File_Lifetime
+    my $limit = (time: ) - $Temp_File_Lifetime
 
     (DEBUG: )+> 5 and printf: $^STDOUT, "Looking for things pre-dating \%s (\%x)\n"
                               ($limit) x 2
@@ -1105,11 +1104,11 @@ sub MSWin_perldoc_tempfile($self, $suffix, $infix)
             # Yes, we embed the create-time in the filename!
                          $tempdir
                          $infix || 'x'
-                         time()
+                         (time: )
                          $^PID
                          exists:  &Win32::GetTickCount 
-                         ?? ((Win32::GetTickCount: ) ^&^ 0xff)
-                         !! int: rand 256
+                             ?? ((Win32::GetTickCount: ) ^&^ 0xff)
+                             !! int: rand 256
             # Under MSWin, $$ values get reused quickly!  So if we ran
             # perldoc foo and then perldoc bar before there was time for
             # time() to increment time."_$$" would likely be the same

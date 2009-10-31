@@ -58,16 +58,14 @@ unless (defined $listen)
                 $PATH = mktemp: "$TMPDIR/sXXXXXXXX"
                 last if $listen = IO::Socket::UNIX->new: Local => $PATH
                                                          Listen => 0
-            
-        
     
     defined $listen or die: "$PATH: $^OS_ERROR"
 
 print: $^STDOUT, "ok 1\n"
 
-if(my $pid = fork())
+if(my $pid = fork: )
 
-    my $sock = $listen->accept: 
+    my $sock = $listen->accept:
 
     if (defined $sock)
         print: $^STDOUT, "ok 2\n"

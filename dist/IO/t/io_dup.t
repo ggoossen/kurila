@@ -25,7 +25,7 @@ print: $stdout, "ok 2\n"
 print: $stderr, "ok 3\n"
 
 # Since some systems don't have echo, we use Perl.
-my $echo = qq{$^EXECUTABLE_NAME -e "print \\\$^STDOUT, qq(ok \%d\n)"}
+my $echo = qq{$^EXECUTABLE_NAME -e "print: \\\$^STDOUT, qq(ok \%d\n)"}
 
 my $cmd = sprintf: $echo, 4
 print: $^STDOUT, `$cmd`

@@ -46,7 +46,7 @@ if ($^OS_NAME eq 'os2' and
 
 my $port = $listen->sockport: 
 
-if(my $pid = fork())
+if(my $pid = fork: )
 
     my $sock = ($listen->accept: ) or die: "accept failed: $^OS_ERROR"
     print: $^STDOUT, "ok 2\n"
@@ -92,7 +92,7 @@ else
 $listen = (IO::Socket::INET->new: Listen => '', Timeout => 15) or die: "$^OS_ERROR"
 $port = $listen->sockport: 
 
-if(my $pid = fork())
+if(my $pid = fork: )
     my $sock
     :SERVER_LOOP
         while (1)
@@ -168,7 +168,7 @@ my $server = IO::Socket->new: Domain => AF_INET
                         LocalAddr => '127.0.0.1'
 $port = $server->sockport: 
 
-if (my $pid = fork())
+if (my $pid = fork: )
     my $buf
     $server->recv: \$buf, 100
     print: $^STDOUT, $buf
@@ -221,7 +221,7 @@ $listen = (IO::Socket::INET->new:  Listen => 2, Proto => 'tcp', Timeout => 15) |
 print: $^STDOUT, "ok 16\n"
 die: if( !(defined:  $listen))
 my $serverport = $listen->sockport: 
-my $server_pid = fork()
+my $server_pid = fork:
 if( $server_pid)
 
     ### TEST 17 Client/Server establishment

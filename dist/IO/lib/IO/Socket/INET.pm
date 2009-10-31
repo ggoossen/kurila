@@ -247,14 +247,14 @@ sub configure($sock,$arg)
 
 
 sub connect
-    (nelems: @_) == 2 || (nelems @_) == 3 or
+    2 == (nelems: @_) || (nelems @_) == 3 or
         croak: 'usage: $sock->connect(NAME) or $sock->connect(PORT, ADDR)'
     my $sock = shift
     return $sock->SUPER::connect: (nelems @_) == 1 ?? shift !! (pack_sockaddr_in: < @_)
 
 
 sub bind
-    (nelems: @_) == 2 || (nelems @_) == 3 or
+    2 == (nelems: @_) || (nelems @_) == 3 or
         croak: 'usage: $sock->bind(NAME) or $sock->bind(PORT, ADDR)'
     my $sock = shift
     return $sock->SUPER::bind: (nelems @_) == 1 ?? shift !! (pack_sockaddr_in: < @_)

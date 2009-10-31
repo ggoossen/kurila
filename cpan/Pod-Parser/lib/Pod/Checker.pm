@@ -1205,10 +1205,8 @@ sub _preproc_par
     if(@_[0])
         $self->{+_commands_in_head}++
         $self->{+_list_item_contents}++ if(defined $self->{?_list_item_contents})
-        if((nelems $self->{?_list_stack}->@) && !$self->{_list_stack}->[0]->item: ))
+        if((nelems $self->{?_list_stack}->@) && !$self->{_list_stack}->[0]->item: )
             $self->{_list_stack}->[0]->{+_has_par} = 1
-        
-    
 
 
 1

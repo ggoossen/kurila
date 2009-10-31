@@ -8,10 +8,8 @@ BEGIN
     if ($^EVAL_ERROR)
         print: $^STDOUT, "1..0 # Skip: Test::More not available\n"
         die: "Test::More not available\n"
-    
 
     use Config
-
 
 
 my %modules = %:
@@ -32,9 +30,9 @@ can_ok:  'XSLoader' => 'load'
 can_ok:  'XSLoader' => 'bootstrap_inherit' 
 
 # Check error messages
-try { (XSLoader::load: ) }
-like:  $^EVAL_ERROR->{?description}, q|/^XSLoader::load\('Your::Module', \$Your::Module::VERSION\)/|
-       "calling XSLoader::load() with no argument" 
+eval "XSLoader::load: "
+like:  $^EVAL_ERROR->{?description}, qr/Not enough arguments for XSLoader::load/
+       "calling XSLoader::load() with no argument"
 
 eval q{ package Thwack; XSLoader::load('Thwack'); }
 like:  ($^EVAL_ERROR->message: ), q{/^Can't locate loadable object for module Thwack in \$\^INCLUDE_PATH/}
