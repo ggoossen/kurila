@@ -79,12 +79,6 @@ static I32 read_e_script(pTHX_ int idx, SV *buf_sv, int maxlen);
 #  define validate_suid(validarg, scriptname, fdscript, suidscript, linestr_sv, rsfp) S_validate_suid(aTHX_ rsfp)
 #endif
 
-#define CALL_BODY_EVAL(myop) \
-    if (PL_op == (myop)) \
-	PL_op = PL_ppaddr[OP_ENTEREVAL](aTHX); \
-    if (PL_op) \
-	CALLRUNOPS(aTHX);
-
 #define CALL_BODY_SUB(myop) \
     if (PL_op == (myop)) \
 	PL_op = PL_ppaddr[OP_ENTERSUB](aTHX); \
@@ -2685,7 +2679,8 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
 
     switch (ret) {
     case 0:
-	CALL_BODY_EVAL((OP*)&myop);
+	PL_op = PL_ppaddr[OP_ENTEREVAL](aTHX);
+	CALLRUNOPS(aTHX);
 	break;
     default:
 	ret = runops_continue_from_jmpenv(ret);
