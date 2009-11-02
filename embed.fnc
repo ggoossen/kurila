@@ -1325,6 +1325,7 @@ Ap	|struct perl_vars*|init_global_struct
 Ap	|void	|free_global_struct|NN struct perl_vars *plvarsp
 #endif
 Ap	|int	|runops_standard
+p	|int	|runops_continue_from_jmpenv|int ret
 Ap	|int	|runops_debug
 Afpd	|void	|sv_catpvf_mg	|NN SV *const sv|NN const char *const pat|...
 Apd	|void	|sv_vcatpvf_mg	|NN SV *const sv|NN const char *const pat \

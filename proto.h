@@ -3949,6 +3949,7 @@ PERL_CALLCONV void	Perl_free_global_struct(pTHX_ struct perl_vars *plvarsp)
 
 #endif
 PERL_CALLCONV int	Perl_runops_standard(pTHX);
+PERL_CALLCONV int	Perl_runops_continue_from_jmpenv(pTHX_ int ret);
 PERL_CALLCONV int	Perl_runops_debug(pTHX);
 PERL_CALLCONV void	Perl_sv_catpvf_mg(pTHX_ SV *const sv, const char *const pat, ...)
 			__attribute__format__(__printf__,pTHX_2,pTHX_3)

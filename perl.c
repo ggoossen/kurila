@@ -2601,32 +2601,26 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 
 	JMPENV_PUSH(ret);
 
-	switch (ret) {
+	switch(ret) {
 	case 0:
- redo_body:
 	    CALL_BODY_SUB((OP*)&myop);
+	    break;
+	default:
+	    ret = runops_continue_from_jmpenv(ret);
+	    break;
+	}
+
+	JMPENV_POP;
+
+	switch(ret) {
+	case 0:
 	    retval = PL_stack_sp - (PL_stack_base + oldmark);
 	    if (!(flags & G_KEEPERR)) {
 		CLEAR_ERRSV();
 	    }
+	    delete_eval_scope();
 	    break;
-	case 1:
-	    STATUS_ALL_FAILURE;
-	    /* FALL THROUGH */
-	case 2:
-	    /* my_exit() was called */
-	    PL_curstash = PL_defstash;
-	    FREETMPS;
-	    JMPENV_POP;
-	    my_exit_jump();
-	    /* NOTREACHED */
 	case 3:
-	    if (PL_restartop) {
-		PL_restartjmpenv = NULL;
-		PL_op = PL_restartop;
-		PL_restartop = 0;
-		goto redo_body;
-	    }
 	    PL_stack_sp = PL_stack_base + oldmark;
 	    if ((flags & G_WANT) == G_ARRAY)
 		retval = 0;
@@ -2635,11 +2629,9 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 		*++PL_stack_sp = &PL_sv_undef;
 	    }
 	    break;
+	default:
+	    assert(0);
 	}
-
-	if (PL_scopestack_ix > oldscope)
-	    delete_eval_scope();
-	JMPENV_POP;
     }
 
     if (flags & G_DISCARD) {

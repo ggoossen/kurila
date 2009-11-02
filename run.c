@@ -45,6 +45,36 @@ Perl_runops_standard(pTHX)
     return 0;
 }
 
+int
+Perl_runops_continue_from_jmpenv(pTHX_ int ret)
+{
+    switch (ret) {
+    case 1:
+	STATUS_ALL_FAILURE;
+	/* FALL THROUGH */
+    case 2:
+	/* my_exit() was called */
+	DEBUG_l(Perl_deb(aTHX_ "popping jumplevel was %p, now %p\n",
+			 (void*)PL_top_env, (void*)PL_top_env->je_prev));
+	PL_top_env = PL_top_env->je_prev;
+	JMPENV_JUMP(ret);
+	/* NOTREACHED */
+	break;
+    case 3:
+	if (PL_restartop) {
+	    PL_restartjmpenv = NULL;
+	    PL_op = PL_restartop;
+	    PL_restartop = 0;
+	    CALLRUNOPS(aTHX);
+	    return 0;
+	}
+	break;
+    default:
+	assert(0);
+    }
+    return 3;
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

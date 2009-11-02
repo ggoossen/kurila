@@ -1114,6 +1114,9 @@
 #define free_global_struct	Perl_free_global_struct
 #endif
 #define runops_standard		Perl_runops_standard
+#ifdef PERL_CORE
+#define runops_continue_from_jmpenv	Perl_runops_continue_from_jmpenv
+#endif
 #define runops_debug		Perl_runops_debug
 #define sv_catpvf_mg		Perl_sv_catpvf_mg
 #define sv_vcatpvf_mg		Perl_sv_vcatpvf_mg
@@ -3522,6 +3525,9 @@
 #define free_global_struct(a)	Perl_free_global_struct(aTHX_ a)
 #endif
 #define runops_standard()	Perl_runops_standard(aTHX)
+#ifdef PERL_CORE
+#define runops_continue_from_jmpenv(a)	Perl_runops_continue_from_jmpenv(aTHX_ a)
+#endif
 #define runops_debug()		Perl_runops_debug(aTHX)
 #define sv_vcatpvf_mg(a,b,c)	Perl_sv_vcatpvf_mg(aTHX_ a,b,c)
 #define sv_catpv_mg(a,b)	Perl_sv_catpv_mg(aTHX_ a,b)
