@@ -567,6 +567,7 @@ perl_destruct(pTHXx)
             call_list(PL_scopestack_ix, PL_endav);
         JMPENV_POP;
     }
+    assert(PL_scopestack_ix == 1);
     LEAVE;
     FREETMPS;
     assert(PL_scopestack_ix == 0);
