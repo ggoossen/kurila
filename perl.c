@@ -78,12 +78,6 @@ static I32 read_e_script(pTHX_ int idx, SV *buf_sv, int maxlen);
 #  define validate_suid(validarg, scriptname, fdscript, suidscript, linestr_sv, rsfp) S_validate_suid(aTHX_ rsfp)
 #endif
 
-#define CALL_BODY_SUB(myop) \
-    if (PL_op == (myop)) \
-	PL_op = PL_ppaddr[OP_ENTERSUB](aTHX); \
-    if (PL_op) \
-	CALLRUNOPS(aTHX);
-
 #define CALL_LIST_BODY(cv) \
     PUSHMARK(PL_stack_sp); \
     call_sv(MUTABLE_SV((cv)), G_EVAL|G_DISCARD);
@@ -2566,10 +2560,11 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	myop.op_type = OP_ENTERSUB;
 	PL_op = (OP*)&method_op;
     }
+    myop.op_ppaddr = PL_ppaddr[OP_ENTERSUB];
 
     if (!(flags & G_EVAL)) {
 	CATCH_SET(TRUE);
-	CALL_BODY_SUB((OP*)&myop);
+	CALLRUNOPS(aTHX);
 	retval = PL_stack_sp - (PL_stack_base + oldmark);
 	CATCH_SET(oldcatch);
     }
@@ -2583,7 +2578,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 
 	switch(ret) {
 	case 0:
-	    CALL_BODY_SUB((OP*)&myop);
+	    CALLRUNOPS(aTHX);
 	    break;
 	default:
 	    ret = runops_continue_from_jmpenv(ret);
