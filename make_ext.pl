@@ -444,7 +444,7 @@ EOS
     }
     my @targ = ($target, @$pass_through);
     _quote_args(\@targ) if $is_VMS;
-    print "Making $target in $ext_dir\n@run @make @targ\n";
+    print "Making $target in $ext_dir\n@run @make @targ\n" if $opts{verbose};
     my $code = system(@run, @make, @targ);
     die "Unsuccessful make($ext_dir): code=$code" if $code != 0;
 
