@@ -539,6 +539,8 @@ perl_destruct(pTHXx)
     PERL_UNUSED_ARG(my_perl);
 #endif
 
+    assert(PL_scopestack_ix == 1);
+
     /* wait for all pseudo-forked children to finish */
     PERL_WAIT_FOR_CHILDREN;
 
@@ -564,6 +566,7 @@ perl_destruct(pTHXx)
             call_list(PL_scopestack_ix, PL_endav);
         JMPENV_POP;
     }
+    assert(PL_scopestack_ix == 1);
     LEAVE;
     FREETMPS;
 
