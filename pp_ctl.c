@@ -82,7 +82,6 @@ PP(pp_regcomp)
     REGEXP *re = NULL;
 
     /* prevent recompiling under /o and ithreads. */
-#if defined(USE_ITHREADS)
     if (pm->op_pmflags & PMf_KEEP && PM_GETRE(pm)) {
 	if (PL_op->op_flags & OPf_STACKED) {
 	    dMARK;
@@ -92,7 +91,6 @@ PP(pp_regcomp)
 	    (void)POPs;
 	RETURN;
     }
-#endif
 
 #define tryAMAGICregexp(rx)			\
     STMT_START {				\
@@ -219,14 +217,6 @@ PP(pp_regcomp)
 	pm = PL_curpm;
 
 
-#if !defined(USE_ITHREADS)
-    /* can't change the optree at runtime either */
-    /* PMf_KEEP is handled differently under threads to avoid these problems */
-    if (pm->op_pmflags & PMf_KEEP) {
-	pm->op_private &= ~OPpRUNTIME;	/* no point compiling again */
-	cLOGOP->op_first->op_next = PL_op->op_next;
-    }
-#endif
     RETURN;
 }
 
