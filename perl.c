@@ -2687,32 +2687,23 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
     TAINT_PROPER("eval_sv()");
 
     JMPENV_PUSH(ret);
+
     switch (ret) {
     case 0:
- redo_body:
 	CALL_BODY_EVAL((OP*)&myop);
+	break;
+    default:
+	ret = runops_continue_from_jmpenv(ret);
+    }
+
+    switch(ret) {
+    case 0:
 	retval = PL_stack_sp - (PL_stack_base + oldmark);
 	if (!(flags & G_KEEPERR)) {
 	    CLEAR_ERRSV();
 	}
 	break;
-    case 1:
-	STATUS_ALL_FAILURE;
-	/* FALL THROUGH */
-    case 2:
-	/* my_exit() was called */
-	PL_curstash = PL_defstash;
-	FREETMPS;
-	JMPENV_POP;
-	my_exit_jump();
-	/* NOTREACHED */
     case 3:
-	if (PL_restartop) {
-	    PL_restartjmpenv = NULL;
-	    PL_op = PL_restartop;
-	    PL_restartop = 0;
-	    goto redo_body;
-	}
 	PL_stack_sp = PL_stack_base + oldmark;
 	if ((flags & G_WANT) == G_ARRAY)
 	    retval = 0;
@@ -2720,10 +2711,10 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
 	    retval = 1;
 	    *++PL_stack_sp = &PL_sv_undef;
 	}
-	break;
     }
 
     JMPENV_POP;
+
     if (flags & G_DISCARD) {
 	PL_stack_sp = PL_stack_base + oldmark;
 	retval = 0;
