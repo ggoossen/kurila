@@ -1129,10 +1129,11 @@ PP(pp_range)
     dVAR;
     if (GIMME == G_ARRAY)
 	return NORMAL;
-    if (SvTRUEx(PAD_SV(PL_op->op_targ)))
-	return cLOGOP->op_other;
-    else
+    if (SvTRUEx(PAD_SV(PL_op->op_targ))) {
+	RUN_SET_NEXT_INSTRUCTION( cLOGOP->op_other_instr );
 	return NORMAL;
+    }
+    return NORMAL;
 }
 
 PP(pp_flip)
