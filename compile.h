@@ -47,8 +47,10 @@ struct instruction {
 
 #define RUN_SET_NEXT_INSTRUCTION(instr)		\
     STMT_START {							\
-	DEBUG_t(Perl_deb(aTHX_ "Instruction jump to %p, was %p at %s:%d\n",	\
-		(void*)instr, (void*)PL_run_next_instruction, __FILE__, __LINE__)); \
+	DEBUG_t(Perl_deb(aTHX_ "Instruction jump to 0x%p %s, was 0x%p %s at %s:%d\n",	\
+		(void*)instr, instruction_name(instr),			\
+		(void*)PL_run_next_instruction, instruction_name(PL_run_next_instruction), \
+		__FILE__, __LINE__));					\
 	run_set_next_instruction(instr);				\
     } STMT_END								\
 

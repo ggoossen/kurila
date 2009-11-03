@@ -2370,6 +2370,25 @@ PP(pp_redo)
     return NORMAL;
 }
 
+STATIC INSTRUCTION *
+S_dofindinstruction(pTHX_ OP *o)
+{
+    INSTRUCTION* instr;
+    INSTRUCTION* end;
+    CV* cv = find_runcv(NULL);
+    assert(cv);
+
+    instr = codeseq_start_instruction(CvCODESEQ(cv));
+    end = instr + CvCODESEQ(cv)->xcodeseq_size;
+    while(instr < end) {
+	if (instr->instr_ppaddr && instr->instr_op == o) {
+	    return instr;
+	}
+	instr++;
+    }
+    return NULL;
+}
+
 STATIC OP *
 S_dofindlabel(pTHX_ OP *o, const char *label, OP **opstack, OP **oplimit)
 {
@@ -2687,8 +2706,10 @@ PP(pp_goto)
 		break;
 	    }
 	    if (gotoprobe) {
-		ret_instr = dofindlabel(gotoprobe, label,
-				    enterops, enterops + GOTO_DEPTH);
+		ret_instr = S_dofindinstruction(
+		    dofindlabel(gotoprobe, label,
+			enterops, enterops + GOTO_DEPTH)
+		    );
 		if (ret_instr)
 		    break;
 	    }
@@ -2732,8 +2753,7 @@ PP(pp_goto)
 		 * for each op.  For now, we punt on the hard ones. */
 		if (PL_op->op_type == OP_ENTERITER)
 		    DIE(aTHX_ "Can't \"goto\" into the middle of a foreach loop");
-		DIE(aTHX_ "FIXME push wanted frame");
-		/* CALL_FPTR(PL_op->op_ppaddr)(aTHX); */
+		CALL_FPTR(PL_ppaddr[PL_op->op_type])(aTHX);
 	    }
 	    PL_op = oldop;
 	}
@@ -2752,7 +2772,8 @@ PP(pp_goto)
 	PL_do_undump = FALSE;
     }
 
-    RETURNOP(ret_instr);
+    RUN_SET_NEXT_INSTRUCTION(ret_instr);
+    return NORMAL;
 }
 
 PP(pp_exit)
