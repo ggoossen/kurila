@@ -1613,7 +1613,7 @@ perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 	    call_list(oldscope, PL_unitcheckav);
 	if (PL_checkav)
 	    call_list(oldscope, PL_checkav);
-	ret = STATUS_EXIT;
+	ret = 1;
 	break;
     case 3:
 	PerlIO_printf(Perl_error_log, "panic: top_env\n");
