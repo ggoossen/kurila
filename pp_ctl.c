@@ -4544,8 +4544,10 @@ PP(pp_enterwhen)
        pop it again right away, so we skip straight
        to the op that follows the leavewhen.
     */
-    if ((0 == (PL_op->op_flags & OPf_SPECIAL)) && !SvTRUEx(POPs))
-	return cLOGOP->op_other->op_next;
+    if ((0 == (PL_op->op_flags & OPf_SPECIAL)) && !SvTRUEx(POPs)) {
+	RUN_SET_NEXT_INSTRUCTION( cLOGOP->op_other_instr + 1);
+	return NORMAL;
+    }
 
     ENTER_with_name("eval");
     SAVETMPS;
@@ -4595,7 +4597,8 @@ PP(pp_continue)
     if (PL_scopestack_ix < inner)
         leave_scope(PL_scopestack[PL_scopestack_ix]);
     PL_curcop = cx->blk_oldcop;
-    return cx->blk_givwhen.leave_op;
+    RUN_SET_NEXT_INSTRUCTION(cx->blk_givwhen.leave_op_instr);
+    return NORMAL;
 }
 
 PP(pp_break)
@@ -4625,10 +4628,14 @@ PP(pp_break)
         leave_scope(PL_scopestack[PL_scopestack_ix]);
     PL_curcop = cx->blk_oldcop;
 
-    if (CxFOREACH(cx))
-	return CX_LOOP_NEXTOP_GET(cx);
-    else
-	return cx->blk_givwhen.leave_op;
+    if (CxFOREACH(cx)) {
+	RUN_SET_NEXT_INSTRUCTION(CX_LOOP_NEXTOP_GET(cx));
+	return NORMAL;
+    }
+    else {
+	RUN_SET_NEXT_INSTRUCTION(cx->blk_givwhen.leave_op_instr);
+	return NORMAL;
+    }
 }
 
 STATIC OP *

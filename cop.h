@@ -510,11 +510,11 @@ struct block_loop {
 
 /* given/when context */
 struct block_givwhen {
-	OP *leave_op;
+	OP *leave_op_instr;
 };
 
 #define PUSHGIVEN(cx)							\
-	cx->blk_givwhen.leave_op = cLOGOP->op_other;
+	cx->blk_givwhen.leave_op_instr = cLOGOP->op_other_instr;
 
 #define PUSHWHEN PUSHGIVEN
 
