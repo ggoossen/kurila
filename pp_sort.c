@@ -1506,13 +1506,10 @@ PP(pp_sort)
     }
 
     ENTER;
-    SAVEVPTR(PL_sortcop);
+    SAVEVPTR(PL_run_next_instruction);
     if (flags & OPf_STACKED) {
 	if (flags & OPf_SPECIAL) {
-	    OP *kid = cLISTOP->op_first->op_sibling;	/* pass pushmark */
-	    kid = kUNOP->op_first;			/* pass rv2gv */
-	    kid = kUNOP->op_first;			/* pass leave */
-	    PL_sortcop = kid->op_next;
+	    PL_sortcop = PL_op->op_unstack_instr;
 	    stash = CopSTASH(PL_curcop);
 	}
 	else {
@@ -1545,7 +1542,7 @@ PP(pp_sort)
 		    CvCODESEQ(cv) = new_codeseq();
 		    compile_op(CvSTART(cv), CvCODESEQ(cv));
 		}
-		PL_sortcop = CvCODESEQ(cv);
+		PL_sortcop = codeseq_start_instruction(CvCODESEQ(cv));
 	    }
 	}
     }
@@ -1759,7 +1756,8 @@ S_sortcv(pTHX_ SV *const a, SV *const b)
     GvSV(PL_secondgv) = b;
     PL_stack_sp = PL_stack_base;
 
-    run_exec_codeseq(PL_sortcop);
+    RUN_SET_NEXT_INSTRUCTION(PL_sortcop);
+    CALLRUNOPS(aTHX);
 
     if (PL_stack_sp != PL_stack_base + 1)
 	Perl_croak(aTHX_ "Sort subroutine didn't return single value");
@@ -1800,7 +1798,8 @@ S_sortcv_stacked(pTHX_ SV *const a, SV *const b)
     AvARRAY(av)[1] = b;
     PL_stack_sp = PL_stack_base;
 
-    run_exec_codeseq(PL_sortcop);
+    RUN_SET_NEXT_INSTRUCTION(PL_sortcop);
+    CALLRUNOPS(aTHX);
 
     if (PL_stack_sp != PL_stack_base + 1)
 	Perl_croak(aTHX_ "Sort subroutine didn't return single value");

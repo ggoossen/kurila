@@ -109,6 +109,15 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 		    &(o->op_unstack_instr));
 		o = NULL;
 	    }
+	    else if (o->op_type == OP_SORT) {
+		if (o->op_flags & OPf_STACKED && o->op_flags & OPf_SPECIAL) {
+		    OP *kid = cLISTOPo->op_first->op_sibling;	/* pass pushmark */
+		    kid = cUNOPx(kid)->op_first;			/* pass rv2gv */
+		    kid = cUNOPx(kid)->op_first;			/* pass leave */
+		    kid = kid->op_next;
+		    S_append_branch_point(&bpp, kid, &(o->op_unstack_instr));
+		}
+	    }
 
 	    if (o)
 		o = o->op_next;
