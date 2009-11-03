@@ -1540,8 +1540,13 @@ PP(pp_sort)
 
 	    if (is_xsub)
 		PL_sortcop = (OP*)cv;
-	    else
-		PL_sortcop = CvSTART(cv);
+	    else {
+		if (! CvCODESEQ(cv)) {
+		    CvCODESEQ(cv) = new_codeseq();
+		    compile_op(CvSTART(cv), CvCODESEQ(cv));
+		}
+		PL_sortcop = CvCODESEQ(cv);
+	    }
 	}
     }
     else {
@@ -1753,8 +1758,9 @@ S_sortcv(pTHX_ SV *const a, SV *const b)
     GvSV(PL_firstgv) = a;
     GvSV(PL_secondgv) = b;
     PL_stack_sp = PL_stack_base;
-    PL_op = PL_sortcop;
-    CALLRUNOPS(aTHX);
+
+    run_exec_codeseq(PL_sortcop);
+
     if (PL_stack_sp != PL_stack_base + 1)
 	Perl_croak(aTHX_ "Sort subroutine didn't return single value");
     result = SvIV(*PL_stack_sp);
@@ -1793,8 +1799,9 @@ S_sortcv_stacked(pTHX_ SV *const a, SV *const b)
     AvARRAY(av)[0] = a;
     AvARRAY(av)[1] = b;
     PL_stack_sp = PL_stack_base;
-    PL_op = PL_sortcop;
-    CALLRUNOPS(aTHX);
+
+    run_exec_codeseq(PL_sortcop);
+
     if (PL_stack_sp != PL_stack_base + 1)
 	Perl_croak(aTHX_ "Sort subroutine didn't return single value");
     result = SvIV(*PL_stack_sp);

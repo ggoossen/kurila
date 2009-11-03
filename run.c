@@ -67,9 +67,7 @@ Perl_runops_continue_from_jmpenv(pTHX_ int ret)
 	/* NOTREACHED */
 	break;
     case 3:
-	if (PL_restartop) {
-	    PL_op = PL_restartop;
-	    PL_restartop = 0;
+	if (run_get_next_instruction()) {
 	    CALLRUNOPS(aTHX);
 	    return 0;
 	}
@@ -114,7 +112,7 @@ Perl_run_exec_codeseq(pTHX_ const CODESEQ* codeseq)
 {
     const INSTRUCTION* old_next_instruction;
     old_next_instruction = run_get_next_instruction();
-    run_set_next_instruction(codeseq_start_instruction(codeseq));
+    RUN_SET_NEXT_INSTRUCTION(codeseq_start_instruction(codeseq));
 
     CALLRUNOPS(aTHX);
 

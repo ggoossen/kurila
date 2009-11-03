@@ -38,7 +38,7 @@
 #define WORD_ALIGN sizeof(U32)
 #endif
 
-#define DOCATCH(instr) ((CATCH_GET == TRUE) ? docatch(instr) : (run_set_next_instruction(instr)))
+#define DOCATCH(instr) ((CATCH_GET == TRUE) ? docatch(instr) : (RUN_SET_NEXT_INSTRUCTION(instr)))
 
 #define dopoptosub(plop)	dopoptosub_at(cxstack, (plop))
 
@@ -1008,7 +1008,7 @@ PP(pp_grepstart)
     PUTBACK;
     if (PL_op->op_type == OP_MAPSTART)
 	pp_pushmark(NULL);			/* push top */
-    run_set_next_instruction(cLOGOPx(PL_op->op_next)->op_other_instr);
+    RUN_SET_NEXT_INSTRUCTION(cLOGOPx(PL_op->op_next)->op_other_instr);
     return NORMAL;
 }
 
@@ -1117,7 +1117,7 @@ PP(pp_mapwhile)
 	else
 	    DEFSV_set(src);
 
-	run_set_next_instruction(cLOGOP->op_other_instr);
+	RUN_SET_NEXT_INSTRUCTION(cLOGOP->op_other_instr);
 	RETURN;
     }
 }
@@ -2611,7 +2611,7 @@ PP(pp_goto)
 		    CvCODESEQ(cv) = new_codeseq();
 		    compile_op(CvSTART(cv), CvCODESEQ(cv));
 		}
-		run_set_next_instruction(codeseq_start_instruction(CvCODESEQ(cv)));
+		RUN_SET_NEXT_INSTRUCTION(codeseq_start_instruction(CvCODESEQ(cv)));
 
 		RETURN;
 	    }
@@ -2819,7 +2819,7 @@ S_docatch(pTHX_ const INSTRUCTION *instr)
 #ifdef DEBUGGING
     assert(CATCH_GET == TRUE);
 #endif
-    run_set_next_instruction(instr);
+    RUN_SET_NEXT_INSTRUCTION(instr);
 
     JMPENV_PUSH(ret);
     switch (ret) {
@@ -2847,12 +2847,12 @@ S_docatch(pTHX_ const INSTRUCTION *instr)
 	/* FALL THROUGH */
     default:
 	JMPENV_POP;
-	run_set_next_instruction( old_next_instruction );
+	RUN_SET_NEXT_INSTRUCTION( old_next_instruction );
 	JMPENV_JUMP(ret);
 	/* NOTREACHED */
     }
     JMPENV_POP;
-    run_set_next_instruction( old_next_instruction );
+    RUN_SET_NEXT_INSTRUCTION( old_next_instruction );
     return;
 }
 
@@ -3835,7 +3835,7 @@ PP(pp_leaveeval)
 	}
     }
 
-    run_set_next_instruction(ret_instr);
+    RUN_SET_NEXT_INSTRUCTION(ret_instr);
     RETURN;
 }
 

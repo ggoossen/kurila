@@ -1188,9 +1188,9 @@ Perl_codeseq_dump(pTHX_ const CODESEQ *codeseq)
 
     PerlIO_printf(Perl_debug_log, "Instructions of codeseq (0x%"UVxf"):\n", PTR2UV(codeseq));
     for( instr = codeseq_start_instruction(codeseq) ;
-	 instr->instr_ppaddr ;
+	 instr < codeseq_start_instruction(codeseq) + codeseq->xcodeseq_size ;
 	 instr++ ) {
-	PerlIO_printf(Perl_debug_log, "%s\n", instruction_name(instr));
+	PerlIO_printf(Perl_debug_log, "0x%"UVxf": %s\n", PTR2UV(instr), instruction_name(instr));
     }
     PerlIO_printf(Perl_debug_log, "\n");
 }
@@ -2047,7 +2047,7 @@ Perl_debug_instruction(pTHX_ const INSTRUCTION *instr)
     if (CopSTASH_eq(PL_curcop, PL_debstash) && !DEBUG_J_TEST_)
 	return;
 
-    Perl_deb(aTHX_ "%s", instruction_name(instr));
+    Perl_deb(aTHX_ "0x%"UVxf": %s", PTR2UV(instr), instruction_name(instr));
     switch (o->op_type) {
     case OP_CONST:
     case OP_HINTSEVAL:
