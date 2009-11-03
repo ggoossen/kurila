@@ -2853,7 +2853,7 @@ S_docatch(pTHX_ const INSTRUCTION *instr)
 	/* NOTREACHED */
     }
     JMPENV_POP;
-    RUN_SET_NEXT_INSTRUCTION( old_next_instruction );
+    /* RUN_SET_NEXT_INSTRUCTION( old_next_instruction ); */
     return;
 }
 
