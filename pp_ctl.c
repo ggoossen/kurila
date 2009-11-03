@@ -1629,7 +1629,7 @@ Perl_die_where(pTHX_ SV *msv)
 	    }
 	    assert(CxTYPE(cx) == CXt_EVAL);
 
-	    run_set_next_instruction( cx->blk_eval.ret_instr );
+	    RUN_SET_NEXT_INSTRUCTION( cx->blk_eval.ret_instr );
 	    JMPENV_JUMP(3);
 	    /* NOTREACHED */
 	}
@@ -2840,11 +2840,8 @@ S_docatch(pTHX_ const INSTRUCTION *instr)
 	 * is. */
 	assert(CxTYPE(&cxstack[cxstack_ix+1]) == CXt_EVAL);
 
-	if (PL_restartop
-	    && cxstack[cxstack_ix+1].blk_eval.cur_top_env == PL_top_env)
+	if (cxstack[cxstack_ix+1].blk_eval.cur_top_env == PL_top_env)
 	{
-	    PL_op = PL_restartop;
-	    PL_restartop = 0;
 	    goto redo_body;
 	}
 	/* FALL THROUGH */
