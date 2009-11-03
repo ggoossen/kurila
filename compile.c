@@ -99,7 +99,7 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 	    else if (o->op_type == OP_GREPSTART || o->op_type == OP_MAPSTART) {
 		o = o->op_next;
 
-		S_append_branch_point(&bpp, cLOGOPo->op_other->op_next, &(cLOGOPo->op_other_instr));
+		S_append_branch_point(&bpp, cLOGOPo->op_other, &(cLOGOPo->op_other_instr));
 	    }
 	    else if (o->op_type == OP_LAST) {
 		o = NULL;
