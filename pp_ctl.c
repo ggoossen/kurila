@@ -2375,9 +2375,13 @@ S_dofindinstruction(pTHX_ OP *o)
 {
     INSTRUCTION* instr;
     INSTRUCTION* end;
-    CV* cv = find_runcv(NULL);
-    assert(cv);
+    CV* cv;
 
+    if (!o)
+	return NULL;
+
+    cv = find_runcv(NULL);
+    assert(cv);
     instr = codeseq_start_instruction(CvCODESEQ(cv));
     end = instr + CvCODESEQ(cv)->xcodeseq_size;
     while(instr < end) {
