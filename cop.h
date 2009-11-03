@@ -874,7 +874,7 @@ See L<perlcall/Lightweight Callbacks>.
     SV **newsp;			/* set by POPBLOCK */			\
     PERL_CONTEXT *cx;							\
     CV *multicall_cv;							\
-    OP *multicall_cop;							\
+    INSTRUCTION *multicall_instr;					\
     bool multicall_oldcatch; 						\
     U8 hasargs = 0		/* used by PUSHSUB */
 
@@ -885,7 +885,7 @@ See L<perlcall/Lightweight Callbacks>.
 	AV * const padlist = CvPADLIST(cv);				\
 	ENTER;								\
  	multicall_oldcatch = CATCH_GET;					\
-	SAVETMPS; SAVEVPTR(PL_op);					\
+	SAVETMPS; SAVEVPTR(PL_run_next_instruction);			\
 	CATCH_SET(TRUE);						\
 	PUSHSTACKi(PERLSI_SORT);					\
 	PUSHBLOCK(cx, CXt_SUB|CXp_MULTICALL, PL_stack_sp);		\
@@ -897,12 +897,16 @@ See L<perlcall/Lightweight Callbacks>.
 	SAVECOMPPAD();							\
 	PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));			\
 	multicall_cv = cv;						\
-	multicall_cop = CvSTART(cv);					\
+	if (!CvCODESEQ(cv)) {						\
+	    CvCODESEQ(cv) = Perl_new_codeseq(aTHX);					\
+	    Perl_compile_op(aTHX_ CvSTART(cv), CvCODESEQ(cv)); \
+	}								\
+	multicall_instr = Perl_codeseq_start_instruction(aTHX_ CvCODESEQ(cv));	\
     } STMT_END
 
 #define MULTICALL \
     STMT_START {							\
-	PL_op = multicall_cop;						\
+        Perl_run_set_next_instruction(multicall_instr);			\
 	CALLRUNOPS(aTHX);						\
     } STMT_END
 
