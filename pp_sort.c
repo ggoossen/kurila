@@ -1507,6 +1507,8 @@ PP(pp_sort)
 
     ENTER;
     SAVEVPTR(PL_run_next_instruction);
+    SAVEVPTR(PL_sortcop);
+
     if (flags & OPf_STACKED) {
 	if (flags & OPf_SPECIAL) {
 	    PL_sortcop = PL_op->op_unstack_instr;
