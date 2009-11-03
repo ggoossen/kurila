@@ -3677,9 +3677,13 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		COP * const ocurcop = PL_curcop;
 		PAD *old_comppad;
 		char *saved_regeol = PL_regeol;
+		CODESEQ* codeseq;
 	    
 		n = ARG(scan);
 		PL_op = (OP_4tree*)rexi->data->data[n];
+		codeseq = new_codeseq(); /* FIXME memory leak */
+		compile_op(PL_op, codeseq);
+
 		DEBUG_STATE_r( PerlIO_printf(Perl_debug_log, 
 		    "  re_eval 0x%"UVxf"\n", PTR2UV(PL_op)) );
 		PAD_SAVE_LOCAL(old_comppad, (PAD*)rexi->data->data[n + 2]);
@@ -3690,7 +3694,8 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
                     sv_setsv(sv_mrk, sv_yes_mark);
                 }
 
-		CALLRUNOPS(aTHX);			/* Scalar context. */
+		run_exec_codeseq(codeseq);    /* Scalar context. */
+
 		SPAGAIN;
 		if (SP == before)
 		    ret = &PL_sv_undef;   /* protect against empty (?{}) blocks. */
