@@ -357,8 +357,8 @@ for file do
 
 
     : Can we perhaps use $ansi2knr here
-    echo "$cc -c -DPERL_CORE $ccflags $stdflags $optimize $warn $extra"
-    eval "$also "'"$cc -DPERL_CORE -c $ccflags $stdflags $optimize $warn $extra"'
+    echo "$cc -c -DPERL_CORE -DPERL_CORE_${PERL_REVISION}_${PERL_VERSION} $ccflags $stdflags $optimize $warn $extra"
+    eval "$also "'"$cc -DPERL_CORE -DPERL_CORE_${PERL_REVISION}_${PERL_VERSION} -c $ccflags $stdflags $optimize $warn $extra"'
 
     . $TOP/config.sh
 

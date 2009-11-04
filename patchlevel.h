@@ -17,6 +17,12 @@
 #define PERL_VERSION	11		/* epoch */
 #define PERL_SUBVERSION	1		/* generation */
 
+#ifdef PERL_CORE
+#  ifndef PERL_CORE_5_11
+#    error "Access to the Perl CORE requested, but compatibility with the current version not indicated"
+#  endif
+#endif
+
 /* The following numbers describe the earliest compatible version of
    Perl ("compatibility" here being defined as sufficient binary/API
    compatibility to run XS code built with the older version).
