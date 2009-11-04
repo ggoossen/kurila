@@ -1881,7 +1881,12 @@ PP(pp_dbstate)
 	    CvDEPTH(cv)++;
 	    SAVECOMPPAD();
 	    PAD_SET_CUR_NOSAVE(CvPADLIST(cv), 1);
-	    RETURNOP(CvSTART(cv));
+	    if (!CvCODESEQ(cv)) {
+		CvCODESEQ(cv) = new_codeseq();
+		compile_op(CvSTART(cv), CvCODESEQ(cv));
+	    }
+	    RUN_SET_NEXT_INSTRUCTION( codeseq_start_instruction(CvCODESEQ(cv)) );
+	    return NORMAL;
 	}
     }
     else
