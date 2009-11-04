@@ -24,7 +24,7 @@ $|  = 1;
 use warnings;
 use strict;
 use Config;
-use Test::More tests => 8;
+use Test::More tests => 7;
 use B;
 use B::Debug;
 
@@ -76,8 +76,6 @@ like(B::Debug::_printop(B::main_start), qr/OP\s+\[OP_ENTER\]/);
 
 $a = `$^X $path "-MO=Debug" -e "B::main_root->debug" $redir`;
 like($a, qr/op_next\s+0x0/m);
-$a = `$^X $path "-MO=Debug" -e "B::main_start->debug" $redir`;
-like($a, qr/PL_ppaddr\[OP_ENTER\]/m);
 
 # pass missing FETCHSIZE, fixed with 1.06
 my $tmp = "tmp.pl";
