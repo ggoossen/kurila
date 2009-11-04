@@ -2256,8 +2256,8 @@ xpo	|int	|keyword_plugin_standard|NN char* keyword_ptr|STRLEN keyword_len|NN OP*
 
 p	|INSTRUCTION*	|codeseq_start_instruction|NN const CODESEQ* codeseq
 p	|void	|compile_op|NN OP* startop|NN CODESEQ* codeseq
-ap	|CODESEQ*	|new_codeseq
-p	|void	|free_codeseq|NULLOK CODESEQ* codeseq
+Eap	|CODESEQ*	|new_codeseq
+Ep	|void	|free_codeseq|NULLOK CODESEQ* codeseq
 p	|const char*	|instruction_name|NULLOK const INSTRUCTION* instr
 
 p	|const INSTRUCTION*	|run_get_next_instruction
