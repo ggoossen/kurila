@@ -463,16 +463,14 @@ PP(pp_formline)
     const char *fmt;
 
     if (!SvMAGICAL(tmpForm) || !SvCOMPILED(tmpForm)) {
-	OP * parseres = NULL;
 	if (SvREADONLY(tmpForm)) {
 	    SvREADONLY_off(tmpForm);
-	    parseres = doparseform(tmpForm);
+	    doparseform(tmpForm);
 	    SvREADONLY_on(tmpForm);
 	}
 	else
-	    parseres = doparseform(tmpForm);
-	if (parseres)
-	    return parseres;
+	    doparseform(tmpForm);
+	return NORMAL;
     }
     SvPV_force(PL_formtarget, len);
     if (DO_UTF8(PL_formtarget))
@@ -2089,7 +2087,7 @@ PP(pp_return)
     PMOP *newpm;
     I32 optype = 0;
     SV *sv;
-    INSTRUCTION *ret_instr = NULL;
+    const INSTRUCTION *ret_instr = NULL;
 
     const I32 cxix = dopoptosub(cxstack_ix);
 
@@ -2214,7 +2212,7 @@ PP(pp_last)
     I32 pop2 = 0;
     I32 gimme;
     I32 optype;
-    INSTRUCTION *next_instr = NULL;
+    const INSTRUCTION *next_instr = NULL;
     SV **newsp;
     PMOP *newpm;
     SV **mark;
@@ -2449,7 +2447,7 @@ S_dofindlabel(pTHX_ OP *o, const char *label, OP **opstack, OP **oplimit)
 PP(pp_goto)
 {
     dVAR; dSP;
-    OP *ret_instr = NULL;
+    const INSTRUCTION *ret_instr = NULL;
     I32 ix;
     register PERL_CONTEXT *cx;
 #define GOTO_DEPTH 64
@@ -2548,7 +2546,7 @@ PP(pp_goto)
 	    SAVETMPS;
 	    SAVEFREESV(cv); /* later, undo the 'avoid premature free' hack */
 	    if (CvISXSUB(cv)) {
-		OP* const ret_instr = cx->blk_sub.ret_instr;
+		const INSTRUCTION* const ret_instr = cx->blk_sub.ret_instr;
 		SV **newsp;
 		I32 gimme;
 		if (reified) {
@@ -4066,7 +4064,7 @@ PP(pp_smartmatch)
 /* This version of do_smartmatch() implements the
  * table of smart matches that is found in perlsyn.
  */
-STATIC OP*
+STATIC INSTRUCTION*
 S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
 {
     dVAR;
@@ -4643,7 +4641,7 @@ PP(pp_break)
     }
 }
 
-STATIC OP *
+STATIC void
 S_doparseform(pTHX_ SV *sv)
 {
     STRLEN len;
@@ -4859,7 +4857,7 @@ S_doparseform(pTHX_ SV *sv)
 
     if (unchopnum && repeat)
         DIE(aTHX_ "Repeated format line will never terminate (~~ and @#)");
-    return 0;
+    return;
 }
 
 

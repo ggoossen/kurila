@@ -387,7 +387,7 @@ struct block_format {
 
 /* eval context */
 struct block_eval {
-    OP *	ret_instr;	/* op to execute on exit from eval */
+    INSTRUCTION *	ret_instr;	/* op to execute on exit from eval */
     /* Above here is the same for sub, format and eval.  */
     SV *	old_namesv;
     OP *	old_eval_root;
@@ -510,7 +510,7 @@ struct block_loop {
 
 /* given/when context */
 struct block_givwhen {
-	OP *leave_op_instr;
+	INSTRUCTION *leave_op_instr;
 };
 
 #define PUSHGIVEN(cx)							\

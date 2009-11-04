@@ -5023,7 +5023,7 @@ STATIC OP*	S_dofindlabel(pTHX_ OP *o, const char *label, OP **opstack, OP **opli
 #define PERL_ARGS_ASSERT_DOFINDLABEL	\
 	assert(o); assert(label); assert(opstack); assert(oplimit)
 
-STATIC OP*	S_doparseform(pTHX_ SV *sv)
+STATIC void	S_doparseform(pTHX_ SV *sv)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_DOPARSEFORM	\
@@ -5106,7 +5106,7 @@ STATIC void	S_destroy_matcher(pTHX_ PMOP* matcher)
 #define PERL_ARGS_ASSERT_DESTROY_MATCHER	\
 	assert(matcher)
 
-STATIC OP*	S_do_smartmatch(pTHX_ HV* seen_this, HV* seen_other);
+STATIC INSTRUCTION*	S_do_smartmatch(pTHX_ HV* seen_this, HV* seen_other);
 #endif
 
 #if defined(PERL_IN_PP_HOT_C) || defined(PERL_DECL_PROT)
