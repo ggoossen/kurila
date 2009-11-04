@@ -775,7 +775,7 @@ void
 Perl_dump_op_short(const OP *o)
 {
     PerlIO_printf(Perl_debug_log, 
-	"op %d %s", sequence_num(o), PL_op_name[o->op_type]);
+	"op %"UVxf" %s", sequence_num(o), PL_op_name[o->op_type]);
 }
 
 void

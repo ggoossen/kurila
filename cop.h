@@ -275,7 +275,7 @@ struct cop {
 
 /* subroutine context */
 struct block_sub {
-    INSTRUCTION *	ret_instr;	/* instruction to continue executing on exit from sub */
+    const INSTRUCTION *	ret_instr;	/* instruction to continue executing on exit from sub */
     /* Above here is the same for sub, format and eval.  */
     CV *	cv;
     /* Above here is the same for sub and format.  */
@@ -288,7 +288,7 @@ struct block_sub {
 
 /* format context */
 struct block_format {
-    INSTRUCTION *	ret_instr;	/* op to execute on exit from sub */
+    const INSTRUCTION *	ret_instr;	/* op to execute on exit from sub */
     /* Above here is the same for sub, format and eval.  */
     CV *	cv;
     /* Above here is the same for sub and format.  */

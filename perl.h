@@ -2412,6 +2412,8 @@ typedef struct ptr_tbl_ent PTR_TBL_ENT_t;
 typedef struct ptr_tbl PTR_TBL_t;
 typedef struct clone_params CLONE_PARAMS;
 
+typedef INSTRUCTION* (CPERLscope(*Perl_ppaddr_t))(pTHX);
+
 #include "handy.h"
 
 #if defined(USE_LARGE_FILES) && !defined(NO_64_BIT_RAWIO)
@@ -4834,7 +4836,6 @@ typedef void (*XSUBADDR_t) (pTHX_ CV *);
 #define PERLVARIC(var,type,init) type var;
 #define PERLVARISC(var,init) const char var[sizeof(init)];
 
-typedef INSTRUCTION* (CPERLscope(*Perl_ppaddr_t))(pTHX);
 typedef OP* (CPERLscope(*Perl_check_t)) (pTHX_ OP*);
 typedef void(CPERLscope(*Perl_ophook_t))(pTHX_ OP*);
 typedef int (CPERLscope(*Perl_keyword_plugin_t))(pTHX_ char*, STRLEN, OP**);
@@ -4928,7 +4929,7 @@ struct tempsym; /* defined in pp_pack.c */
 #undef PERL_CKDEF
 #undef PERL_PPDEF
 #define PERL_CKDEF(s)	PERL_CALLCONV OP *s (pTHX_ OP *o);
-#define PERL_PPDEF(s)	PERL_CALLCONV int s (pTHX_ INSTR_ARG instr_arg);
+#define PERL_PPDEF(s)	PERL_CALLCONV INSTRUCTION *s (pTHX);
 
 #include "proto.h"
 

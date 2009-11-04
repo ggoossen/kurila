@@ -2513,7 +2513,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     dVAR; dSP;
     LOGOP myop;		/* fake syntax tree node */
     INSTRUCTION myinstr[3];
-    INSTRUCTION* oldinstr;
+    const INSTRUCTION* oldinstr;
     int instr_idx = 0;
     UNOP method_op;
     I32 oldmark;
@@ -2564,18 +2564,18 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	method_op.op_next = PL_op;
 	method_op.op_type = OP_METHOD;
 	myop.op_type = OP_ENTERSUB;
-	myinstr[instr_idx].instr_op = &method_op;
+	myinstr[instr_idx].instr_op = (OP*)&method_op;
 	myinstr[instr_idx].instr_ppaddr = PL_ppaddr[method_op.op_type];
 	myinstr[instr_idx].instr_arg = NULL;
 	instr_idx++;
     }
 
-    myinstr[instr_idx].instr_op = &myop;
+    myinstr[instr_idx].instr_op = (OP*)&myop;
     myinstr[instr_idx].instr_ppaddr = PL_ppaddr[myop.op_type];
     myinstr[instr_idx].instr_arg = NULL;
     myinstr[instr_idx+1].instr_ppaddr = NULL;
     oldinstr = run_get_next_instruction();
-    RUN_SET_NEXT_INSTRUCTION( &myinstr );
+    RUN_SET_NEXT_INSTRUCTION( &myinstr[0] );
 
     if (!(flags & G_EVAL)) {
 	CATCH_SET(TRUE);
@@ -2656,7 +2656,6 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
     VOL I32 oldmark = SP - PL_stack_base;
     VOL I32 retval = 0;
     int ret;
-    OP* const oldop = PL_op;
     INSTRUCTION myinstr[2];
     const INSTRUCTION* oldinstr;
     dJMPENV;
@@ -2684,7 +2683,7 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
 	myop.op_flags |= OPf_SPECIAL;
 
     myinstr[0].instr_ppaddr = PL_ppaddr[OP_ENTEREVAL];
-    myinstr[0].instr_op = &myop;
+    myinstr[0].instr_op = (OP*)&myop;
     myinstr[1].instr_ppaddr = NULL;
 
     /* fail now; otherwise we could fail after the JMPENV_PUSH but

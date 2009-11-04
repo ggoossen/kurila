@@ -732,378 +732,378 @@ PP(pp_keys)
 /* Ops that are simply calls to other ops.  */
 PP(pp_dump)
 {
-    return pp_goto(NULL);
+    return pp_goto();
     /*NOTREACHED*/
 }
 
 PP(pp_dofile)
 {
-    return pp_require(NULL);
+    return pp_require();
 }
 
 PP(pp_dbmclose)
 {
-    return pp_untie(NULL);
+    return pp_untie();
 }
 
 PP(pp_read)
 {
-    return pp_sysread(NULL);
+    return pp_sysread();
 }
 
 PP(pp_recv)
 {
-    return pp_sysread(NULL);
+    return pp_sysread();
 }
 
 PP(pp_seek)
 {
-    return pp_sysseek(NULL);
+    return pp_sysseek();
 }
 
 PP(pp_fcntl)
 {
-    return pp_ioctl(NULL);
+    return pp_ioctl();
 }
 
 PP(pp_gsockopt)
 {
-    return pp_ssockopt(NULL);
+    return pp_ssockopt();
 }
 
 PP(pp_getsockname)
 {
-    return pp_getpeername(NULL);
+    return pp_getpeername();
 }
 
 PP(pp_lstat)
 {
-    return pp_stat(NULL);
+    return pp_stat();
 }
 
 PP(pp_fteowned)
 {
-    return pp_ftrowned(NULL);
+    return pp_ftrowned();
 }
 
 PP(pp_ftbinary)
 {
-    return pp_fttext(NULL);
+    return pp_fttext();
 }
 
 PP(pp_localtime)
 {
-    return pp_gmtime(NULL);
+    return pp_gmtime();
 }
 
 PP(pp_shmget)
 {
-    return pp_semget(NULL);
+    return pp_semget();
 }
 
 PP(pp_shmctl)
 {
-    return pp_semctl(NULL);
+    return pp_semctl();
 }
 
 PP(pp_shmread)
 {
-    return pp_shmwrite(NULL);
+    return pp_shmwrite();
 }
 
 PP(pp_msgget)
 {
-    return pp_semget(NULL);
+    return pp_semget();
 }
 
 PP(pp_msgctl)
 {
-    return pp_semctl(NULL);
+    return pp_semctl();
 }
 
 PP(pp_ghbyname)
 {
-    return pp_ghostent(NULL);
+    return pp_ghostent();
 }
 
 PP(pp_ghbyaddr)
 {
-    return pp_ghostent(NULL);
+    return pp_ghostent();
 }
 
 PP(pp_gnbyname)
 {
-    return pp_gnetent(NULL);
+    return pp_gnetent();
 }
 
 PP(pp_gnbyaddr)
 {
-    return pp_gnetent(NULL);
+    return pp_gnetent();
 }
 
 PP(pp_gpbyname)
 {
-    return pp_gprotoent(NULL);
+    return pp_gprotoent();
 }
 
 PP(pp_gpbynumber)
 {
-    return pp_gprotoent(NULL);
+    return pp_gprotoent();
 }
 
 PP(pp_gsbyname)
 {
-    return pp_gservent(NULL);
+    return pp_gservent();
 }
 
 PP(pp_gsbyport)
 {
-    return pp_gservent(NULL);
+    return pp_gservent();
 }
 
 PP(pp_gpwnam)
 {
-    return pp_gpwent(NULL);
+    return pp_gpwent();
 }
 
 PP(pp_gpwuid)
 {
-    return pp_gpwent(NULL);
+    return pp_gpwent();
 }
 
 PP(pp_ggrnam)
 {
-    return pp_ggrent(NULL);
+    return pp_ggrent();
 }
 
 PP(pp_ggrgid)
 {
-    return pp_ggrent(NULL);
+    return pp_ggrent();
 }
 
 PP(pp_ftsize)
 {
-    return pp_ftis(NULL);
+    return pp_ftis();
 }
 
 PP(pp_ftmtime)
 {
-    return pp_ftis(NULL);
+    return pp_ftis();
 }
 
 PP(pp_ftatime)
 {
-    return pp_ftis(NULL);
+    return pp_ftis();
 }
 
 PP(pp_ftctime)
 {
-    return pp_ftis(NULL);
+    return pp_ftis();
 }
 
 PP(pp_ftzero)
 {
-    return pp_ftrowned(NULL);
+    return pp_ftrowned();
 }
 
 PP(pp_ftsock)
 {
-    return pp_ftrowned(NULL);
+    return pp_ftrowned();
 }
 
 PP(pp_ftchr)
 {
-    return pp_ftrowned(NULL);
+    return pp_ftrowned();
 }
 
 PP(pp_ftblk)
 {
-    return pp_ftrowned(NULL);
+    return pp_ftrowned();
 }
 
 PP(pp_ftfile)
 {
-    return pp_ftrowned(NULL);
+    return pp_ftrowned();
 }
 
 PP(pp_ftdir)
 {
-    return pp_ftrowned(NULL);
+    return pp_ftrowned();
 }
 
 PP(pp_ftpipe)
 {
-    return pp_ftrowned(NULL);
+    return pp_ftrowned();
 }
 
 PP(pp_ftsuid)
 {
-    return pp_ftrowned(NULL);
+    return pp_ftrowned();
 }
 
 PP(pp_ftsgid)
 {
-    return pp_ftrowned(NULL);
+    return pp_ftrowned();
 }
 
 PP(pp_ftsvtx)
 {
-    return pp_ftrowned(NULL);
+    return pp_ftrowned();
 }
 
 PP(pp_unlink)
 {
-    return pp_chown(NULL);
+    return pp_chown();
 }
 
 PP(pp_chmod)
 {
-    return pp_chown(NULL);
+    return pp_chown();
 }
 
 PP(pp_utime)
 {
-    return pp_chown(NULL);
+    return pp_chown();
 }
 
 PP(pp_kill)
 {
-    return pp_chown(NULL);
+    return pp_chown();
 }
 
 PP(pp_symlink)
 {
-    return pp_link(NULL);
+    return pp_link();
 }
 
 PP(pp_ftrwrite)
 {
-    return pp_ftrread(NULL);
+    return pp_ftrread();
 }
 
 PP(pp_ftrexec)
 {
-    return pp_ftrread(NULL);
+    return pp_ftrread();
 }
 
 PP(pp_fteread)
 {
-    return pp_ftrread(NULL);
+    return pp_ftrread();
 }
 
 PP(pp_ftewrite)
 {
-    return pp_ftrread(NULL);
+    return pp_ftrread();
 }
 
 PP(pp_fteexec)
 {
-    return pp_ftrread(NULL);
+    return pp_ftrread();
 }
 
 PP(pp_msgsnd)
 {
-    return pp_shmwrite(NULL);
+    return pp_shmwrite();
 }
 
 PP(pp_msgrcv)
 {
-    return pp_shmwrite(NULL);
+    return pp_shmwrite();
 }
 
 PP(pp_syswrite)
 {
-    return pp_send(NULL);
+    return pp_send();
 }
 
 PP(pp_semop)
 {
-    return pp_shmwrite(NULL);
+    return pp_shmwrite();
 }
 
 PP(pp_dor)
 {
-    return pp_defined(NULL);
+    return pp_defined();
 }
 
 PP(pp_andassign)
 {
-    return pp_and(NULL);
+    return pp_and();
 }
 
 PP(pp_orassign)
 {
-    return pp_or(NULL);
+    return pp_or();
 }
 
 PP(pp_dorassign)
 {
-    return pp_defined(NULL);
+    return pp_defined();
 } 
 
 PP(pp_lcfirst)
 {
-    return pp_ucfirst(NULL);
+    return pp_ucfirst();
 }
 
 PP(pp_slt)
 {
-    return pp_sle(NULL);
+    return pp_sle();
 }
 
 PP(pp_sgt)
 {
-    return pp_sle(NULL);
+    return pp_sle();
 }
 
 PP(pp_sge)
 {
-    return pp_sle(NULL);
+    return pp_sle();
 }
 
 PP(pp_rindex)
 {
-    return pp_index(NULL);
+    return pp_index();
 }
 
 PP(pp_hex)
 {
-    return pp_oct(NULL);
+    return pp_oct();
 }
 
 PP(pp_pop)
 {
-    return pp_shift(NULL);
+    return pp_shift();
 }
 
 PP(pp_cos)
 {
-    return pp_sin(NULL);
+    return pp_sin();
 }
 
 PP(pp_exp)
 {
-    return pp_sin(NULL);
+    return pp_sin();
 }
 
 PP(pp_log)
 {
-    return pp_sin(NULL);
+    return pp_sin();
 }
 
 PP(pp_sqrt)
 {
-    return pp_sin(NULL);
+    return pp_sin();
 }
 
 PP(pp_bit_xor)
 {
-    return pp_bit_or(NULL);
+    return pp_bit_or();
 }
 
 PP(pp_rv2hv)
 {
-    return Perl_pp_rv2av(aTHX_ NULL);
+    return Perl_pp_rv2av(aTHX_);
 }
 
 U8 *

@@ -2131,6 +2131,7 @@ Perl_amagic_call(pTHX_ SV *left, SV *right, int method, int flags)
     BINOP myop;
     SV* res;
     const bool oldcatch = CATCH_GET;
+    const INSTRUCTION* oldinstr = run_get_next_instruction();
 
     CATCH_SET(TRUE);
     Zero(&myop, 1, BINOP);
@@ -2145,7 +2146,7 @@ Perl_amagic_call(pTHX_ SV *left, SV *right, int method, int flags)
     if (PERLDB_SUB && PL_curstash != PL_debstash)
 	PL_op->op_private |= OPpENTERSUB_DB;
     PUTBACK;
-    pp_pushmark(NULL);
+    pp_pushmark();
 
     EXTEND(SP, notfound + 5);
     PUSHs(lr>0? right: left);
@@ -2158,7 +2159,6 @@ Perl_amagic_call(pTHX_ SV *left, SV *right, int method, int flags)
     PUSHs(MUTABLE_SV(cv));
     PUTBACK;
 
-    INSTRUCTION* oldinstr = run_get_next_instruction();
     RUN_SET_NEXT_INSTRUCTION(NULL);
 
     PL_ppaddr[OP_ENTERSUB](aTHX);

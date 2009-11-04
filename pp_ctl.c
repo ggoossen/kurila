@@ -460,10 +460,10 @@ PP(pp_formline)
     bool item_is_utf8 = FALSE;
     bool targ_is_utf8 = FALSE;
     SV * nsv = NULL;
-    OP * parseres = NULL;
     const char *fmt;
 
     if (!SvMAGICAL(tmpForm) || !SvCOMPILED(tmpForm)) {
+	OP * parseres = NULL;
 	if (SvREADONLY(tmpForm)) {
 	    SvREADONLY_off(tmpForm);
 	    parseres = doparseform(tmpForm);
@@ -1007,7 +1007,7 @@ PP(pp_grepstart)
 
     PUTBACK;
     if (PL_op->op_type == OP_MAPSTART)
-	pp_pushmark(NULL);			/* push top */
+	pp_pushmark();			/* push top */
     RUN_SET_NEXT_INSTRUCTION(cLOGOPx(PL_op->op_next)->op_other_instr);
     return NORMAL;
 }
@@ -4039,7 +4039,7 @@ S_matcher_matches_sv(pTHX_ PMOP *matcher, SV *sv)
     PL_op = (OP *) matcher;
     XPUSHs(sv);
     PUTBACK;
-    (void) pp_match(NULL);
+    pp_match();
     SPAGAIN;
     return (SvTRUEx(POPs));
 }
@@ -4520,9 +4520,9 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
 	PUSHs(d); PUSHs(e);
 	PUTBACK;
 	if (CopHINTS_get(PL_curcop) & HINT_INTEGER)
-	    (void) pp_i_eq(NULL);
+	    pp_i_eq();
 	else
-	    (void) pp_eq(NULL);
+	    pp_eq();
 	SPAGAIN;
 	if (SvTRUEx(POPs))
 	    RETPUSHYES;
@@ -4534,7 +4534,8 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
     DEBUG_M(Perl_deb(aTHX_ "    applying rule Any-Any\n"));
     PUSHs(d); PUSHs(e);
     PUTBACK;
-    return pp_seq(NULL);
+    pp_seq();
+    return NORMAL;
 }
 
 PP(pp_enterwhen)

@@ -5890,7 +5890,6 @@ PP(pp_split)
 
 PP(pp_once)
 {
-    dSP;
     SV *const sv = PAD_SVl(PL_op->op_targ);
 
     if (SvPADSTALE(sv)) {

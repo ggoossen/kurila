@@ -40,7 +40,7 @@ struct instr_arg {
 #define INSTR_ARG_NULL {NULL}
 
 struct instruction {
-    INSTRUCTION*		(CPERLscope(*instr_ppaddr))(pTHX_ INSTR_ARG instr_arg);
+    Perl_ppaddr_t	instr_ppaddr;
     OP*         instr_op;
     INSTR_ARG   instr_arg;
 };
