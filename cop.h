@@ -387,7 +387,7 @@ struct block_format {
 
 /* eval context */
 struct block_eval {
-    INSTRUCTION *	ret_instr;	/* op to execute on exit from eval */
+    const INSTRUCTION *	ret_instr;	/* op to execute on exit from eval */
     /* Above here is the same for sub, format and eval.  */
     SV *	old_namesv;
     OP *	old_eval_root;

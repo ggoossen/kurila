@@ -2847,7 +2847,6 @@ S_docatch(pTHX_ const INSTRUCTION *instr)
 {
     dVAR;
     int ret;
-    const INSTRUCTION * const old_next_instruction = run_get_next_instruction();
     dJMPENV;
 
 #ifdef DEBUGGING
@@ -3677,7 +3676,7 @@ PP(pp_require)
     /* Restore encoding. */
     PL_encoding = encoding;
 
-    return op;
+    return NORMAL;
 }
 
 /* This is a op added to hold the hints hash for
@@ -3810,7 +3809,7 @@ PP(pp_leaveeval)
     PMOP *newpm;
     I32 gimme;
     register PERL_CONTEXT *cx;
-    OP *ret_instr;
+    const INSTRUCTION *ret_instr;
     const U8 save_flags = PL_op -> op_flags;
     I32 optype;
 
@@ -3858,8 +3857,7 @@ PP(pp_leaveeval)
 	/* Unassume the success we assumed earlier. */
 	SV * const nsv = cx->blk_eval.old_namesv;
 	(void)hv_delete(GvHVn(PL_incgv), SvPVX_const(nsv), SvCUR(nsv), G_DISCARD);
-	ret_instr = Perl_die(aTHX_ "%"SVf" did not return a true value", SVfARG(nsv));
-	/* die_where() did LEAVE, or we won't be here */
+	DIE(aTHX_ "%"SVf" did not return a true value", SVfARG(nsv));
     }
     else {
 	LEAVE_with_name("eval");
@@ -3924,7 +3922,7 @@ PP(pp_entertry)
     cx->blk_eval.ret_instr = cLOGOP->op_other_instr;
     assert(cx->blk_eval.ret_instr);
     DOCATCH(run_get_next_instruction());
-    return;
+    return NORMAL;
 }
 
 PP(pp_leavetry)
