@@ -2255,14 +2255,14 @@ xpoM	|struct refcounted_he *|store_cop_label \
 xpo	|int	|keyword_plugin_standard|NN char* keyword_ptr|STRLEN keyword_len|NN OP** op_ptr
 
 p	|INSTRUCTION*	|codeseq_start_instruction|NN const CODESEQ* codeseq
-p	|void	|compile_op|NN OP* startop|NN CODESEQ* codeseq
+Ep	|void	|compile_op|NN OP* startop|NN CODESEQ* codeseq
 Eap	|CODESEQ*	|new_codeseq
 Ep	|void	|free_codeseq|NULLOK CODESEQ* codeseq
 p	|const char*	|instruction_name|NULLOK const INSTRUCTION* instr
 
 p	|const INSTRUCTION*	|run_get_next_instruction
 p	|void	|run_set_next_instruction|NULLOK const INSTRUCTION* instr
-p	|void	|run_exec_codeseq|NN const CODESEQ* codeseq
+Ep	|void	|run_exec_codeseq|NN const CODESEQ* codeseq
 
 p	|void	|dump_op_short|NN const OP* o
 

@@ -2028,9 +2028,9 @@
 #endif
 #ifdef PERL_CORE
 #define codeseq_start_instruction	Perl_codeseq_start_instruction
-#define compile_op		Perl_compile_op
 #endif
 #if defined(PERL_CORE) || defined(PERL_EXT)
+#define compile_op		Perl_compile_op
 #define new_codeseq		Perl_new_codeseq
 #define free_codeseq		Perl_free_codeseq
 #endif
@@ -2040,6 +2040,8 @@
 #ifdef PERL_CORE
 #define run_get_next_instruction	Perl_run_get_next_instruction
 #define run_set_next_instruction	Perl_run_set_next_instruction
+#endif
+#if defined(PERL_CORE) || defined(PERL_EXT)
 #define run_exec_codeseq	Perl_run_exec_codeseq
 #endif
 #ifdef PERL_CORE
@@ -4463,9 +4465,9 @@
 #endif
 #ifdef PERL_CORE
 #define codeseq_start_instruction(a)	Perl_codeseq_start_instruction(aTHX_ a)
-#define compile_op(a,b)		Perl_compile_op(aTHX_ a,b)
 #endif
 #if defined(PERL_CORE) || defined(PERL_EXT)
+#define compile_op(a,b)		Perl_compile_op(aTHX_ a,b)
 #define new_codeseq()		Perl_new_codeseq(aTHX)
 #define free_codeseq(a)		Perl_free_codeseq(aTHX_ a)
 #endif
@@ -4475,6 +4477,8 @@
 #ifdef PERL_CORE
 #define run_get_next_instruction()	Perl_run_get_next_instruction(aTHX)
 #define run_set_next_instruction(a)	Perl_run_set_next_instruction(aTHX_ a)
+#endif
+#if defined(PERL_CORE) || defined(PERL_EXT)
 #define run_exec_codeseq(a)	Perl_run_exec_codeseq(aTHX_ a)
 #endif
 #ifdef PERL_CORE
