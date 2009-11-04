@@ -118,6 +118,9 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 		    S_append_branch_point(&bpp, kid, &(o->op_unstack_instr));
 		}
 	    }
+	    else if (o->op_type == OP_FORMLINE) {
+		S_append_branch_point(&bpp, cLISTOPo->op_first, &(o->op_unstack_instr));
+	    }
 
 	    if (o)
 		o = o->op_next;

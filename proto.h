@@ -5024,7 +5024,6 @@ STATIC OP*	S_dofindlabel(pTHX_ OP *o, const char *label, OP **opstack, OP **opli
 	assert(o); assert(label); assert(opstack); assert(oplimit)
 
 STATIC void	S_doparseform(pTHX_ SV *sv)
-			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_DOPARSEFORM	\
 	assert(sv)
@@ -5188,7 +5187,7 @@ STATIC void	S_qsortsvu(pTHX_ SV** array, size_t num_elts, SVCOMPARE_t compare)
 #endif
 
 #if defined(PERL_IN_PP_SYS_C) || defined(PERL_DECL_PROT)
-STATIC OP*	S_doform(pTHX_ CV *cv, GV *gv, OP *ret_instr)
+STATIC void	S_doform(pTHX_ CV *cv, GV *gv, const INSTRUCTION *ret_instr)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);

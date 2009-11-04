@@ -1243,8 +1243,8 @@ PP(pp_getc)
     RETURN;
 }
 
-STATIC OP *
-S_doform(pTHX_ CV *cv, GV *gv, OP *ret_instr)
+STATIC void
+S_doform(pTHX_ CV *cv, GV *gv, const INSTRUCTION *ret_instr)
 {
     dVAR;
     register PERL_CONTEXT *cx;
@@ -1261,7 +1261,13 @@ S_doform(pTHX_ CV *cv, GV *gv, OP *ret_instr)
     PAD_SET_CUR_NOSAVE(CvPADLIST(cv), 1);
 
     setdefout(gv);	    /* locally select filehandle so $% et al work */
-    return CvSTART(cv);
+
+    if(!CvCODESEQ(cv)) {
+	CvCODESEQ(cv) = new_codeseq();
+	compile_op(CvSTART(cv), CvCODESEQ(cv));
+    }
+    RUN_SET_NEXT_INSTRUCTION( codeseq_start_instruction(CvCODESEQ(cv)) );
+    return;
 }
 
 PP(pp_enterwrite)
@@ -1310,7 +1316,8 @@ PP(pp_enterwrite)
 	cv = MUTABLE_CV(sv_2mortal(MUTABLE_SV(cv_clone(cv))));
 
     IoFLAGS(io) &= ~IOf_DIDTOP;
-    return doform(cv,gv,PL_op->op_next);
+    doform(cv,gv, run_get_next_instruction());
+    return NORMAL;
 }
 
 PP(pp_leavewrite)
@@ -1399,7 +1406,8 @@ PP(pp_leavewrite)
 	}
 	if (cv && CvCLONE(cv))
 	    cv = MUTABLE_CV(sv_2mortal(MUTABLE_SV(cv_clone(cv))));
-	return doform(cv, gv, PL_op);
+	doform(cv, gv, run_get_next_instruction() - 1 );
+	return NORMAL;
     }
 
   forget_top:
@@ -1437,7 +1445,8 @@ PP(pp_leavewrite)
     PUTBACK;
     PERL_UNUSED_VAR(newsp);
     PERL_UNUSED_VAR(gimme);
-    return cx->blk_sub.ret_instr;
+    RUN_SET_NEXT_INSTRUCTION( cx->blk_sub.ret_instr );
+    return NORMAL;
 }
 
 PP(pp_prtf)

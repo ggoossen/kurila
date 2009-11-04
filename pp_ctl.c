@@ -470,7 +470,6 @@ PP(pp_formline)
 	}
 	else
 	    doparseform(tmpForm);
-	return NORMAL;
     }
     SvPV_force(PL_formtarget, len);
     if (DO_UTF8(PL_formtarget))
@@ -924,7 +923,8 @@ PP(pp_formline)
 			SvUTF8_on(PL_formtarget);
 		    FmLINES(PL_formtarget) = lines;
 		    SP = ORIGMARK;
-		    RETURNOP(cLISTOP->op_first);
+		    RUN_SET_NEXT_INSTRUCTION(cLISTOP->op_unstack_instr);
+		    RETURN;
 		}
 	    }
 	    else {
