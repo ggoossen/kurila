@@ -3665,13 +3665,12 @@ PP(pp_require)
     encoding = PL_encoding;
     PL_encoding = NULL;
 
+    PL_op = NULL;
     if (doeval(gimme, NULL, NULL, PL_curcop->cop_seq)) {
 	CODESEQ* codeseq = new_codeseq(); /* FIXME memory leak */
 	compile_op(PL_eval_start, codeseq);
 	DOCATCH(codeseq_start_instruction(codeseq));
     }
-    else
-	op = PL_op->op_next;
 
     /* Restore encoding. */
     PL_encoding = encoding;

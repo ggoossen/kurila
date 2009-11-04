@@ -774,6 +774,7 @@ S_sequence_num(pTHX_ const OP *o)
 void
 Perl_dump_op_short(const OP *o)
 {
+    PERL_ARGS_ASSERT_DUMP_OP_SHORT;
     PerlIO_printf(Perl_debug_log, 
 	"op %"UVxf" %s", sequence_num(o), PL_op_name[o->op_type]);
 }
@@ -1185,6 +1186,7 @@ void
 Perl_codeseq_dump(pTHX_ const CODESEQ *codeseq)
 {
     const INSTRUCTION *instr;
+    PERL_ARGS_ASSERT_CODESEQ_DUMP;
 
     PerlIO_printf(Perl_debug_log, "Instructions of codeseq (0x%"UVxf"):\n", PTR2UV(codeseq));
     for( instr = codeseq_start_instruction(codeseq) ;

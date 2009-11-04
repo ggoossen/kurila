@@ -37,6 +37,7 @@ int
 Perl_runops_standard(pTHX)
 {
     dVAR;
+    OP* oldop = PL_op;
     assert(PL_run_next_instruction);
 
     do {
@@ -46,6 +47,8 @@ Perl_runops_standard(pTHX)
 	PL_op = instr->instr_op;
 	CALL_FPTR(instr->instr_ppaddr)(aTHX);
     } while (PL_run_next_instruction && PL_run_next_instruction->instr_ppaddr);
+
+    PL_op = oldop;
 
     TAINT_NOT;
     return 0;
@@ -85,6 +88,7 @@ int
 Perl_runops_debug(pTHX)
 {
     dVAR;
+    OP* oldop = PL_op;
     assert(PL_run_next_instruction);
     if (!PL_run_next_instruction->instr_ppaddr) {
 	/* Perl_ck_warner_d(aTHX_ packWARN(WARN_DEBUGGING), "NULL OP IN RUN"); */
@@ -106,6 +110,8 @@ Perl_runops_debug(pTHX)
     } while (PL_run_next_instruction && PL_run_next_instruction->instr_ppaddr);
     DEBUG_l(Perl_deb(aTHX_ "leaving RUNOPS level\n"));
 
+    PL_op = oldop;
+
     TAINT_NOT;
     return 0;
 }
@@ -114,6 +120,7 @@ void
 Perl_run_exec_codeseq(pTHX_ const CODESEQ* codeseq)
 {
     const INSTRUCTION* old_next_instruction;
+    PERL_ARGS_ASSERT_RUN_EXEC_CODESEQ;
     old_next_instruction = run_get_next_instruction();
     RUN_SET_NEXT_INSTRUCTION(codeseq_start_instruction(codeseq));
 
