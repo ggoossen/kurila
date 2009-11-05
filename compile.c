@@ -31,7 +31,7 @@ typedef struct branch_point_pad BRANCH_POINT_PAD;
 void
 S_append_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o, INSTRUCTION** instrp)
 {
-    DEBUG_x(Perl_deb("adding branch point "); dump_op_short(o); Perl_deb("\n"));
+    DEBUG_g(Perl_deb("adding branch point "); dump_op_short(o); Perl_deb("\n"));
     if (bpp->op_instrpp_append >= bpp->op_instrpp_end) {
 	OP_INSTRPP* old_lp = bpp->op_instrpp_list;
 	int new_size = 128 + (bpp->op_instrpp_end - bpp->op_instrpp_list);
@@ -66,7 +66,7 @@ void
     S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 {
     while (o) {
-	    DEBUG_x(Perl_deb("Compiling op "); dump_op_short(o); Perl_deb("\n"));
+	    DEBUG_g(Perl_deb("Compiling op "); dump_op_short(o); Perl_deb("\n"));
 
 	    S_append_instruction(codeseq, bpp, o, o->op_type);
 
@@ -183,7 +183,7 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 
     Safefree(bpp.op_instrpp_list);
 
-    DEBUG_x(codeseq_dump(codeseq));
+    DEBUG_G(codeseq_dump(codeseq));
 }
 
 INSTRUCTION*
