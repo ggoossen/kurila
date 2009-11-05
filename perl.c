@@ -2566,13 +2566,13 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	myop.op_type = OP_ENTERSUB;
 	myinstr[instr_idx].instr_op = (OP*)&method_op;
 	myinstr[instr_idx].instr_ppaddr = PL_ppaddr[method_op.op_type];
-	myinstr[instr_idx].instr_arg = NULL;
+	myinstr[instr_idx].instr_arg1 = NULL;
 	instr_idx++;
     }
 
     myinstr[instr_idx].instr_op = (OP*)&myop;
     myinstr[instr_idx].instr_ppaddr = PL_ppaddr[myop.op_type];
-    myinstr[instr_idx].instr_arg = NULL;
+    myinstr[instr_idx].instr_arg1 = NULL;
     myinstr[instr_idx+1].instr_ppaddr = NULL;
     oldinstr = run_get_next_instruction();
     RUN_SET_NEXT_INSTRUCTION( &myinstr[0] );

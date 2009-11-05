@@ -31,18 +31,12 @@ C<instr_ppaddr> can be C<NULL> indicating the end of the instructions.
 =cut
 */
 
-struct instr_arg {
-    union {
-	INSTRUCTION* instr;
-    } instr_arg_u;
-};
-
 #define INSTR_ARG_NULL {NULL}
 
 struct instruction {
     Perl_ppaddr_t	instr_ppaddr;
     OP*         instr_op;
-    INSTR_ARG   instr_arg;
+    void*   instr_arg1;
 };
 
 #define RUN_SET_NEXT_INSTRUCTION(instr)		\

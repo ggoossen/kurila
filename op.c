@@ -829,6 +829,9 @@ S_linklist(pTHX_ OP *o)
 
     /* establish postfix order */
     first = cUNOPo->op_first;
+    if (o->op_type == OP_GREPSTART || o->op_type == OP_MAPSTART) {
+	first = cUNOPo->op_first->op_sibling->op_sibling;
+    }
     if (first) {
         register OP *kid;
 	o->op_next = LINKLIST(first);
@@ -839,12 +842,19 @@ S_linklist(pTHX_ OP *o)
 		kid = kid->op_sibling;
 	    } else {
 		kid->op_next = o;
+		if (o->op_type == OP_GREPSTART || o->op_type == OP_MAPSTART)
+		    kid->op_next = NULL;
 		break;
 	    }
 	}
     }
     else
 	o->op_next = o;
+
+    if (o->op_type == OP_GREPSTART || o->op_type == OP_MAPSTART) {
+	o->op_start = o->op_next;
+	o->op_next = o;
+    }
 
     return o->op_next;
 }
@@ -2596,17 +2606,19 @@ S_gen_constant_list(pTHX_ register OP *o)
     if (PL_parser && PL_parser->error_count)
 	return o;		/* Don't attempt to run with errors */
 
+    return o;
+
     curop = LINKLIST(o);
     o->op_next = 0;
     CALL_PEEP(curop);
     codeseq = new_codeseq();
     compile_op(curop, codeseq);
-    pp_pushmark();
+    pp_pushmark(NULL);
     run_exec_codeseq(codeseq);
     assert(!(curop->op_flags & OPf_SPECIAL));
     assert(curop->op_type == OP_RANGE);
     PL_op = curop;
-    pp_anonlist();
+    pp_anonlist(NULL);
     PL_op = NULL;
     PL_tmps_floor = oldtmps_floor;
 
@@ -4709,7 +4721,7 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
     CHECKOP(type,logop);
 
     o = newUNOP(prepend_not ? OP_NOT : OP_NULL, 0, (OP*)logop);
-    other->op_next = o;
+    other->op_next = NULL;
 
     return o;
 }
@@ -4770,12 +4782,12 @@ Perl_newCONDOP(pTHX_ I32 flags, OP *first, OP *trueop, OP *falseop)
 
     first->op_sibling = trueop;
     trueop->op_sibling = falseop;
-    o = newUNOP(OP_NULL, 0, (OP*)logop);
 
-    trueop->op_next = falseop->op_next = o;
+    trueop->op_next = falseop->op_next = NULL;
 
-    o->op_next = start;
-    return o;
+    logop->op_start = logop->op_next;
+    logop->op_next = start;
+    return logop;
 }
 
 OP *
@@ -7163,7 +7175,6 @@ OP *
 Perl_ck_grep(pTHX_ OP *o)
 {
     dVAR;
-    LOGOP *gwop = NULL;
     OP *kid;
     const OPCODE type = o->op_type == OP_GREPSTART ? OP_GREPWHILE : OP_MAPWHILE;
     PADOFFSET offset;
@@ -7181,8 +7192,6 @@ Perl_ck_grep(pTHX_ OP *o)
 	for (k = cUNOPx(kid)->op_first; k; k = k->op_next) {
 	    kid = k;
 	}
-	NewOp(1101, gwop, 1, LOGOP);
-	kid->op_next = (OP*)gwop;
 	o->op_flags &= ~OPf_STACKED;
     }
     kid = cLISTOPo->op_first->op_sibling;
@@ -7198,21 +7207,16 @@ Perl_ck_grep(pTHX_ OP *o)
 	Perl_croak(aTHX_ "panic: ck_grep");
     kid = kUNOP->op_first;
 
-    if (!gwop)
-	NewOp(1101, gwop, 1, LOGOP);
-    gwop->op_type = type;
-    gwop->op_first = listkids(o);
-    gwop->op_flags |= OPf_KIDS;
-    gwop->op_other = LINKLIST(kid);
-    kid->op_next = (OP*)gwop;
+    cLOGOPo->op_more_op = LINKLIST(kid);
+    kid->op_next = NULL;
     offset = Perl_pad_findmy(aTHX_ STR_WITH_LEN("$_"), 0);
     if (offset == NOT_IN_PAD || PAD_COMPNAME_FLAGS_isOUR(offset)) {
-	o->op_private = gwop->op_private = 0;
-	gwop->op_targ = pad_alloc(type, SVs_PADTMP);
+	o->op_private = 0;
+	o->op_targ = pad_alloc(type, SVs_PADTMP);
     }
     else {
-	o->op_private = gwop->op_private = OPpGREP_LEX;
-	gwop->op_targ = o->op_targ = offset;
+	o->op_private = OPpGREP_LEX;
+	o->op_targ = offset;
     }
 
     kid = cLISTOPo->op_first->op_sibling;
@@ -7221,7 +7225,7 @@ Perl_ck_grep(pTHX_ OP *o)
     for (kid = kid->op_sibling; kid; kid = kid->op_sibling)
 	mod(kid, OP_GREPSTART);
 
-    return (OP*)gwop;
+    return o;
 }
 
 OP *

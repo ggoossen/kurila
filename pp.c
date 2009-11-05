@@ -5943,6 +5943,13 @@ PP(pp_boolkeys)
     RETURN;
 }
 
+PP(pp_instr_jump)
+{
+    int instr_offset = (int)pparg1;
+    RUN_SET_NEXT_INSTRUCTION( run_get_next_instruction() + instr_offset );
+    return NORMAL;
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

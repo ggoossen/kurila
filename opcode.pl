@@ -835,10 +835,10 @@ unshift		unshift			ck_fun		imsT@	A L
 sort		sort			ck_sort		dm@	C? L
 reverse		reverse			ck_fun		mt@	L
 
-grepstart	grep			ck_grep		dm@	C L
+grepstart	grep			ck_grep		dt@	C L
 grepwhile	grep iterator		ck_null		dt|	
 
-mapstart	map			ck_grep		dm@	C L
+mapstart	map			ck_grep		dt@	C L
 mapwhile	map iterator		ck_null		dt|
 
 # Range stuff.
@@ -1116,5 +1116,7 @@ lock		lock			ck_rfun		s%	R
 # For state support
 
 once		once			ck_null		|	
+
+instr_jump		instruction jump		ck_null		0
 
 custom		unknown custom operator		ck_null		0

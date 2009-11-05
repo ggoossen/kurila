@@ -41,6 +41,7 @@ PP(pp_const)
 {
     dVAR;
     dSP;
+    PERL_UNUSED_VAR(pparg1);
     XPUSHs(cSVOP_sv);
     RETURN;
 }
@@ -48,6 +49,7 @@ PP(pp_const)
 PP(pp_nextstate)
 {
     dVAR;
+    PERL_UNUSED_VAR(pparg1);
     PL_curcop = (COP*)PL_op;
     TAINT_NOT;		/* Each statement is presumed innocent */
     PL_stack_sp = PL_stack_base + cxstack[cxstack_ix].blk_oldsp;
@@ -59,6 +61,7 @@ PP(pp_gvsv)
 {
     dVAR;
     dSP;
+    PERL_UNUSED_VAR(pparg1);
     EXTEND(SP,1);
     if (PL_op->op_private & OPpLVAL_INTRO)
 	PUSHs(save_scalar(cGVOP_gv));
@@ -70,12 +73,14 @@ PP(pp_gvsv)
 PP(pp_null)
 {
     dVAR;
+    PERL_UNUSED_VAR(pparg1);
     return NORMAL;
 }
 
 PP(pp_pushmark)
 {
     dVAR;
+    PERL_UNUSED_VAR(pparg1);
     PUSHMARK(PL_stack_sp);
     return NORMAL;
 }
@@ -83,6 +88,7 @@ PP(pp_pushmark)
 PP(pp_stringify)
 {
     dVAR; dSP; dTARGET;
+    PERL_UNUSED_VAR(pparg1);
     sv_copypv(TARG,TOPs);
     SETTARG;
     RETURN;
@@ -91,6 +97,7 @@ PP(pp_stringify)
 PP(pp_gv)
 {
     dVAR; dSP;
+    PERL_UNUSED_VAR(pparg1);
     XPUSHs(MUTABLE_SV(cGVOP_gv));
     RETURN;
 }
@@ -98,12 +105,14 @@ PP(pp_gv)
 PP(pp_and)
 {
     dVAR; dSP;
-    if (!SvTRUE(TOPs))
+    PERL_UNUSED_VAR(pparg1);
+    if (!SvTRUE(TOPs)) {
+	RUN_SET_NEXT_INSTRUCTION(cLOGOP->op_other_instr);
 	RETURN;
+    }
     else {
         if (PL_op->op_type == OP_AND)
 	    --SP;
-	RUN_SET_NEXT_INSTRUCTION(cLOGOP->op_other_instr);
 	RETURN;
     }
 }
@@ -111,6 +120,7 @@ PP(pp_and)
 PP(pp_sassign)
 {
     dVAR; dSP; dPOPTOPssrl;
+    PERL_UNUSED_VAR(pparg1);
 
     if (PL_op->op_private & OPpASSIGN_BACKWARDS) {
 	SV * const temp = left;
@@ -204,18 +214,21 @@ PP(pp_sassign)
 PP(pp_cond_expr)
 {
     dVAR; dSP;
+    PERL_UNUSED_VAR(pparg1);
     if (SvTRUEx(POPs)) {
+	RETURN;
+    }
+    else {
 	RUN_SET_NEXT_INSTRUCTION(cLOGOP->op_other_instr);
 	RETURN;
     }
-    else 
-	RETURN;
 }
 
 PP(pp_unstack)
 {
     dVAR;
     I32 oldsave;
+    PERL_UNUSED_VAR(pparg1);
     TAINT_NOT;		/* Each statement is presumed innocent */
     PL_stack_sp = PL_stack_base + cxstack[cxstack_ix].blk_oldsp;
     FREETMPS;
@@ -228,6 +241,7 @@ PP(pp_unstack)
 PP(pp_concat)
 {
   dVAR; dSP; dATARGET; tryAMAGICbin(concat,opASSIGN);
+    PERL_UNUSED_VAR(pparg1);
   {
     dPOPTOPssrl;
     bool lbyte;
@@ -294,6 +308,7 @@ PP(pp_concat)
 PP(pp_padsv)
 {
     dVAR; dSP; dTARGET;
+    PERL_UNUSED_VAR(pparg1);
     XPUSHs(TARG);
     if (PL_op->op_flags & OPf_MOD) {
 	if (PL_op->op_private & OPpLVAL_INTRO)
@@ -311,6 +326,7 @@ PP(pp_padsv)
 PP(pp_readline)
 {
     dVAR;
+    PERL_UNUSED_VAR(pparg1);
     tryAMAGICunTARGET(iter, 0);
     PL_last_in_gv = MUTABLE_GV(*PL_stack_sp--);
     if (!isGV_with_GP(PL_last_in_gv)) {
@@ -320,7 +336,7 @@ PP(pp_readline)
 	    dSP;
 	    XPUSHs(MUTABLE_SV(PL_last_in_gv));
 	    PUTBACK;
-	    pp_rv2gv();
+	    pp_rv2gv(NULL);
 	    PL_last_in_gv = MUTABLE_GV(*PL_stack_sp--);
 	}
     }
@@ -330,6 +346,8 @@ PP(pp_readline)
 PP(pp_eq)
 {
     dVAR; dSP; tryAMAGICbinSET(eq,0);
+    PERL_UNUSED_VAR(pparg1);
+    PERL_UNUSED_VAR(pparg1);
 #ifndef NV_PRESERVES_UV
     if (SvROK(TOPs) && !SvAMAGIC(TOPs) && SvROK(TOPm1s) && !SvAMAGIC(TOPm1s)) {
         SP--;
@@ -403,6 +421,7 @@ PP(pp_eq)
 PP(pp_preinc)
 {
     dVAR; dSP;
+    PERL_UNUSED_VAR(pparg1);
     if (SvTYPE(TOPs) >= SVt_PVAV || isGV_with_GP(TOPs))
 	DIE(aTHX_ "%s", PL_no_modify);
     if (!SvREADONLY(TOPs) && SvIOK_notUV(TOPs) && !SvNOK(TOPs) && !SvPOK(TOPs)
@@ -420,12 +439,14 @@ PP(pp_preinc)
 PP(pp_or)
 {
     dVAR; dSP;
-    if (SvTRUE(TOPs))
+    PERL_UNUSED_VAR(pparg1);
+    if (SvTRUE(TOPs)) {
+	RUN_SET_NEXT_INSTRUCTION(cLOGOP->op_other_instr);
 	RETURN;
+    }
     else {
 	if (PL_op->op_type == OP_OR)
             --SP;
-	RUN_SET_NEXT_INSTRUCTION(cLOGOP->op_other_instr);
 	RETURN;
     }
 }
@@ -437,13 +458,13 @@ PP(pp_defined)
     bool defined;
     const int op_type = PL_op->op_type;
     const bool is_dor = (op_type == OP_DOR || op_type == OP_DORASSIGN);
+    PERL_UNUSED_VAR(pparg1);
 
     if (is_dor) {
         sv = TOPs;
         if (!sv || !SvANY(sv)) {
 	    if (op_type == OP_DOR)
 		--SP;
-	    RUN_SET_NEXT_INSTRUCTION(cLOGOP->op_other_instr);
 	    RETURN;
         }
     }
@@ -476,11 +497,12 @@ PP(pp_defined)
     }
 
     if (is_dor) {
-        if(defined) 
+        if(defined) {
+	    RUN_SET_NEXT_INSTRUCTION(cLOGOP->op_other_instr);
             RETURN; 
+	}
         if(op_type == OP_DOR)
             --SP;
-	RUN_SET_NEXT_INSTRUCTION(cLOGOP->op_other_instr);
 	RETURN;
     }
     /* assuming OP_DEFINED */
@@ -492,6 +514,7 @@ PP(pp_defined)
 PP(pp_add)
 {
     dVAR; dSP; dATARGET; bool useleft; SV *svl, *svr;
+    PERL_UNUSED_VAR(pparg1);
     tryAMAGICbin(add,opASSIGN);
     svl = sv_2num(TOPm1s);
     svr = sv_2num(TOPs);
@@ -663,6 +686,7 @@ PP(pp_aelemfast)
     const U32 lval = PL_op->op_flags & OPf_MOD;
     SV** const svp = av_fetch(av, PL_op->op_private, lval);
     SV *sv = (svp ? *svp : &PL_sv_undef);
+    PERL_UNUSED_VAR(pparg1);
     EXTEND(SP, 1);
     if (!lval && SvGMAGICAL(sv))	/* see note in pp_helem() */
 	sv = sv_mortalcopy(sv);
@@ -673,6 +697,7 @@ PP(pp_aelemfast)
 PP(pp_join)
 {
     dVAR; dSP; dMARK; dTARGET;
+    PERL_UNUSED_VAR(pparg1);
     MARK++;
     do_join(TARG, *MARK, MARK, SP);
     SP = MARK;
@@ -689,6 +714,7 @@ PP(pp_pushre)
      * will be enough to hold an OP*.
      */
     SV* const sv = sv_newmortal();
+    PERL_UNUSED_VAR(pparg1);
     sv_upgrade(sv, SVt_PVLV);
     LvTYPE(sv) = '/';
     Copy(&PL_op, &LvTARGOFF(sv), 1, OP*);
@@ -709,6 +735,7 @@ PP(pp_print)
     MAGIC *mg;
     GV * const gv
 	= (PL_op->op_flags & OPf_STACKED) ? MUTABLE_GV(*++MARK) : PL_defoutgv;
+    PERL_UNUSED_VAR(pparg1);
 
     if (gv && (io = GvIO(gv))
 	&& (mg = SvTIED_mg((const SV *)io, PERL_MAGIC_tiedscalar)))
@@ -817,6 +844,7 @@ PP(pp_rv2av)
     static const char a_hash[] = "a HASH";
     const bool is_pp_rv2av = PL_op->op_type == OP_RV2AV;
     const svtype type = is_pp_rv2av ? SVt_PVAV : SVt_PVHV;
+    PERL_UNUSED_VAR(pparg1);
 
     if (SvROK(sv)) {
       wasref:
@@ -992,6 +1020,7 @@ PP(pp_aassign)
     int magic;
     int duplicates = 0;
     SV **firsthashrelem = NULL;	/* "= 0" keeps gcc 2.95 quiet  */
+    PERL_UNUSED_VAR(pparg1);
 
     PL_delaymagic = DM_DELAY;		/* catch simultaneous items */
     gimme = GIMME_V;
@@ -1214,6 +1243,7 @@ PP(pp_qr)
     REGEXP * rx = PM_GETRE(pm);
     SV * const pkg = rx ? CALLREG_PACKAGE(rx) : NULL;
     SV * const rv = sv_newmortal();
+    PERL_UNUSED_VAR(pparg1);
 
     SvUPGRADE(rv, SVt_IV);
     /* This RV is about to own a reference to the regexp. (In addition to the
@@ -1254,6 +1284,8 @@ PP(pp_match)
     I32 update_minmatch = 1;
     I32 had_zerolen = 0;
     U32 gpos = 0;
+
+    PERL_UNUSED_VAR(pparg1);
 
     if (PL_op->op_flags & OPf_STACKED)
 	TARG = POPs;
@@ -2426,7 +2458,7 @@ PP(pp_grepwhile)
 	else
 	    DEFSV_set(src);
 
-	RUN_SET_NEXT_INSTRUCTION(cLOGOP->op_other_instr);
+	RUN_SET_NEXT_INSTRUCTION(PL_op->op_unstack_instr);
 	RETURN;
     }
 }

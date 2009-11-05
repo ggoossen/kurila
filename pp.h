@@ -8,7 +8,7 @@
  *
  */
 
-#define PP(s) INSTRUCTION* Perl_##s(pTHX)
+#define PP(s) INSTRUCTION* Perl_##s(pTHX_ void* pparg1)
 
 /*
 =head1 Stack Manipulation Macros

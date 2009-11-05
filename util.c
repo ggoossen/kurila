@@ -1391,7 +1391,7 @@ Perl_die(pTHX_ const char* pat, ...)
     va_start(args, pat);
     o = vdie(pat, &args);
     va_end(args);
-    return NORMAL;
+    return 1;
 }
 
 void

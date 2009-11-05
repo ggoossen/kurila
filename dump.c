@@ -684,6 +684,8 @@ S_sequence(pTHX_ register const OP *o)
 	if (hv_exists(Sequence, key, len))
 	    break;
 
+	(void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
+
 	switch (o->op_type) {
 	case OP_STUB:
 	    if ((o->op_flags & OPf_WANT) != OPf_WANT_LIST) {
@@ -744,6 +746,12 @@ S_sequence(pTHX_ register const OP *o)
 	    (void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
 	    break;
 	}
+
+	if (o->op_start)
+	    sequence(o->op_start);
+	if (o->op_more_op)
+	    sequence(o->op_more_op);
+
 	oldop = o;
     }
 }
@@ -804,6 +812,10 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 				sequence_num(o->op_next));
     else
 	PerlIO_printf(file, "DONE\n");
+    if (o->op_start)
+	Perl_dump_indent(aTHX_ level, file, "START = %"UVuf"\n", sequence_num(o->op_start));
+    if (o->op_more_op)
+	Perl_dump_indent(aTHX_ level, file, "MORE = %"UVuf"\n", sequence_num(o->op_more_op));
     if (o->op_targ) {
 	if (optype == OP_NULL) {
 	    Perl_dump_indent(aTHX_ level, file, "  (was %s)\n", PL_op_name[o->op_targ]);
@@ -1139,8 +1151,8 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	break;
     case OP_COND_EXPR:
     case OP_RANGE:
-    case OP_MAPWHILE:
-    case OP_GREPWHILE:
+    case OP_MAPSTART:
+    case OP_GREPSTART:
     case OP_OR:
     case OP_AND:
 	Perl_dump_indent(aTHX_ level, file, "OTHER ===> ");
@@ -2050,55 +2062,57 @@ Perl_debug_instruction(pTHX_ const INSTRUCTION *instr)
 	return;
 
     Perl_deb(aTHX_ "0x%"UVxf": %s", PTR2UV(instr), instruction_name(instr));
-    switch (o->op_type) {
-    case OP_CONST:
-    case OP_HINTSEVAL:
-	/* With ITHREADS, consts are stored in the pad, and the right pad
-	 * may not be active here, so check.
-	 * Looks like only during compiling the pads are illegal.
-	 */
+    if (o) {
+	switch (o->op_type) {
+	case OP_CONST:
+	case OP_HINTSEVAL:
+	    /* With ITHREADS, consts are stored in the pad, and the right pad
+	     * may not be active here, so check.
+	     * Looks like only during compiling the pads are illegal.
+	     */
 #ifdef USE_ITHREADS
-	if ((((SVOP*)o)->op_sv) || !IN_PERL_COMPILETIME)
+	    if ((((SVOP*)o)->op_sv) || !IN_PERL_COMPILETIME)
 #endif
-	    PerlIO_printf(Perl_debug_log, "(%s)", SvPEEK(cSVOPo_sv));
-	break;
-    case OP_GVSV:
-    case OP_GV:
-	if (cGVOPo_gv) {
-	    SV * const sv = newSV(0);
+		PerlIO_printf(Perl_debug_log, "(%s)", SvPEEK(cSVOPo_sv));
+	    break;
+	case OP_GVSV:
+	case OP_GV:
+	    if (cGVOPo_gv) {
+		SV * const sv = newSV(0);
 #ifdef PERL_MAD
-	    /* FIXME - is this making unwarranted assumptions about the
-	       UTF-8 cleanliness of the dump file handle?  */
-	    SvUTF8_on(sv);
+		/* FIXME - is this making unwarranted assumptions about the
+		   UTF-8 cleanliness of the dump file handle?  */
+		SvUTF8_on(sv);
 #endif
-	    gv_fullname3(sv, cGVOPo_gv, NULL);
-	    PerlIO_printf(Perl_debug_log, "(%s)", SvPV_nolen_const(sv));
-	    SvREFCNT_dec(sv);
-	}
-	else
-	    PerlIO_printf(Perl_debug_log, "(NULL)");
-	break;
-    case OP_PADSV:
-    case OP_PADAV:
-    case OP_PADHV:
+		gv_fullname3(sv, cGVOPo_gv, NULL);
+		PerlIO_printf(Perl_debug_log, "(%s)", SvPV_nolen_const(sv));
+		SvREFCNT_dec(sv);
+	    }
+	    else
+		PerlIO_printf(Perl_debug_log, "(NULL)");
+	    break;
+	case OP_PADSV:
+	case OP_PADAV:
+	case OP_PADHV:
 	{
-	/* print the lexical's name */
-	CV * const cv = deb_curcv(cxstack_ix);
-	SV *sv;
-        if (cv) {
-	    AV * const padlist = CvPADLIST(cv);
-            AV * const comppad = MUTABLE_AV(*av_fetch(padlist, 0, FALSE));
-            sv = *av_fetch(comppad, o->op_targ, FALSE);
-        } else
-            sv = NULL;
-        if (sv)
-	    PerlIO_printf(Perl_debug_log, "(%s)", SvPV_nolen_const(sv));
-        else
-	    PerlIO_printf(Perl_debug_log, "[%"UVuf"]", (UV)o->op_targ);
+	    /* print the lexical's name */
+	    CV * const cv = deb_curcv(cxstack_ix);
+	    SV *sv;
+	    if (cv) {
+		AV * const padlist = CvPADLIST(cv);
+		AV * const comppad = MUTABLE_AV(*av_fetch(padlist, 0, FALSE));
+		sv = *av_fetch(comppad, o->op_targ, FALSE);
+	    } else
+		sv = NULL;
+	    if (sv)
+		PerlIO_printf(Perl_debug_log, "(%s)", SvPV_nolen_const(sv));
+	    else
+		PerlIO_printf(Perl_debug_log, "[%"UVuf"]", (UV)o->op_targ);
 	}
         break;
-    default:
-	break;
+	default:
+	    break;
+	}
     }
     PerlIO_printf(Perl_debug_log, "\n");
     return;
