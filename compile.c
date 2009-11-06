@@ -52,7 +52,7 @@ S_append_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o, INSTRUCTION** instrp)
 }
 
 void
-    S_append_instruction_x(pTHX_ CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, Perl_ppaddr_t ppaddr, void* instr_arg1)
+S_append_instruction_x(pTHX_ CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, Perl_ppaddr_t ppaddr, void* instr_arg1)
 {
     codeseq->xcodeseq_instructions[bpp->idx].instr_ppaddr = ppaddr;
     codeseq->xcodeseq_instructions[bpp->idx].instr_op = o;
@@ -67,13 +67,14 @@ void
 }
 
 void
-    S_append_instruction(pTHX_ CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, Optype optype)
+S_append_instruction(pTHX_ CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, Optype optype)
 {
     S_append_instruction_x(codeseq, bpp, o, PL_ppaddr[optype], NULL);
 }
 
 void
-    S_register_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o) {
+S_register_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o)
+{
     DEBUG_g(Perl_deb("registering branch point "); dump_op_short(o); Perl_deb("\n"));
     if (bpp->op_instrpp_append >= bpp->op_instrpp_end) {
 	OP_INSTRPP* old_lp = bpp->op_instrpp_list;
@@ -95,8 +96,19 @@ void
     bpp->op_instrpp_compile++;
 }
 
+int
+S_find_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o)
+{
+    OP_INSTRPP* i;
+    for (i=bpp->op_instrpp_list; i<bpp->op_instrpp_compile; i++) {
+	if (o == i->op)
+	    return i->instr_idx;
+    }
+    return -1;
+}
+
 void
-    S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
+S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 {
 
     DEBUG_g(Perl_deb("Compiling op sequence "); dump_op_short(o); Perl_deb("\n"));
@@ -291,11 +303,43 @@ void
 		    S_append_branch_point(bpp, cLOGOPo->op_other->op_next, &(cLOGOPo->op_other_instr));
 		}
 		else if ((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOGOP) {
+		    int cond_jump_idx = bpp->idx;
+		    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
+
+		    S_register_branch_point(bpp, cLOGOPo->op_other);
+		    if (-1 == S_find_branch_point(bpp, cLOGOPo->op_other)) {
+			S_append_branch_point(bpp, cLOGOPo->op_other, &(cLOGOPo->op_other_instr));
+			S_add_op(codeseq, bpp, cLOGOPo->op_other);
+		    }
+
+                    S_register_branch_point(bpp, o->op_next);
+                    S_append_branch_point(bpp, o->op_next, &(cLOGOPo->op_other_instr));
+
+		    codeseq->xcodeseq_instructions[cond_jump_idx].instr_arg1 = (void*)(bpp->idx - cond_jump_idx - 1);
 		}
 		else if (o->op_type == OP_SUBST) {
+		    int cond_jump_1_idx, cond_jump_2_idx;
+
 		    S_append_branch_point(bpp, cPMOPo->op_pmreplrootu.op_pmreplroot, &(cPMOPo->op_pmreplroot_instr));
 		    S_append_branch_point(bpp, cPMOPo->op_pmstashstartu.op_pmreplstart, &(cPMOPo->op_pmreplstart_instr));
 		    S_append_branch_point(bpp, cPMOPo->op_next, &(cPMOPo->op_subst_next_instr));
+
+		    cond_jump_1_idx = bpp->idx;
+		    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
+
+		    S_register_branch_point(bpp, cPMOPo->op_pmreplrootu.op_pmreplroot);
+		    S_add_op(codeseq, bpp, cPMOPo->op_pmreplrootu.op_pmreplroot);
+
+		    cond_jump_2_idx = bpp->idx;
+		    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
+
+		    S_register_branch_point(bpp, cPMOPo->op_pmstashstartu.op_pmreplstart);
+		    S_add_op(codeseq, bpp, cPMOPo->op_pmstashstartu.op_pmreplstart);
+
+		    codeseq->xcodeseq_instructions[cond_jump_1_idx].instr_arg1 = (void*)(bpp->idx - cond_jump_1_idx - 1);
+		    codeseq->xcodeseq_instructions[cond_jump_2_idx].instr_arg1 = (void*)(bpp->idx - cond_jump_2_idx - 1);
+
+		    S_register_branch_point(bpp, o->op_next);
 		}
 		else if ((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOOP) {
 		    S_append_branch_point(bpp, cLOOPo->op_lastop->op_next, &(cLOOPo->op_last_instr));
@@ -362,13 +406,8 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 	{
 	    while ( bpp.op_instrpp_compile < bpp.op_instrpp_append ) {
 		/* check for already exisiting branch point */
-		OP_INSTRPP* i;
-		for (i=bpp.op_instrpp_list; i<bpp.op_instrpp_compile; i++) {
-		    if (bpp.op_instrpp_compile->op == i->op) {
-			bpp.op_instrpp_compile->instr_idx = i->instr_idx;
-			break;
-		    }
-		}
+		int idx = S_find_branch_point(&bpp, bpp.op_instrpp_compile->op);
+		bpp.op_instrpp_compile->instr_idx = idx;
 		if (bpp.op_instrpp_compile->instr_idx == -1)
 		    break;
 		bpp.op_instrpp_compile++;
