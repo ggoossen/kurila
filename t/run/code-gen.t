@@ -135,25 +135,55 @@ for (1..4) {
 }
 ----
     enter
-    nextstate  
-    pushmark   
-    pushmark   
+    nextstate
+    pushmark
+    pushmark
     const
     const
-    gv 
+    gv
     list
-    enteriter  
+    enteriter
 label2:
     iter
-    instr_cond_jump    label1  
-    nextstate  
-    pushmark   
-    gv 
+    instr_cond_jump    label1
+    nextstate
+    pushmark
+    gv
     rv2av
     gvsv
     aelem
     print
     null
-    instr_jump label2  
+    instr_jump label2
 label1:
     leave
+####
+$ARGV[0] ? $ARGV[1] : $ARGV[2]
+----
+    enter
+    nextstate
+    aelemfast
+    cond_expr  label1
+    aelemfast
+    instr_jump label2
+label1:
+    gv
+    rv2av
+    const
+    aelem
+label2:
+    leave
+####
+$ARGV[0] or $ARGV[1]
+----
+    enter
+    nextstate
+    gv
+    rv2av
+    const
+    aelem
+    or         label1
+    aelemfast
+label1:
+    leave
+

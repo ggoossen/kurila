@@ -1215,11 +1215,23 @@ S_instr_label(pTHX_ HV* labels, const INSTRUCTION* instr) {
 }
 
 void
+S_add_label(pTHX_ HV* labels, const INSTRUCTION* instr, UV* index) {
+    STRLEN len;
+    SV * const instrsv = sv_2mortal(newSVuv(PTR2UV(instr)));
+    const char * const key = SvPV_const(instrsv, len);
+
+    if (hv_exists(labels, key, len))
+	return;
+
+    (void)hv_store(labels, key, len, newSVuv(++(*index)), 0);
+}
+
+void
 Perl_codeseq_dump(pTHX_ const CODESEQ *codeseq)
 {
     const INSTRUCTION *instr;
     HV* jump_points;
-    int jump_point_idx = 0;
+    UV jump_point_idx = 0;
     PERL_ARGS_ASSERT_CODESEQ_DUMP;
 
     jump_points = newHV(); /* memory leak */
@@ -1230,15 +1242,13 @@ Perl_codeseq_dump(pTHX_ const CODESEQ *codeseq)
 	 instr++ ) {
 	if (instr->instr_ppaddr == Perl_pp_instr_jump
 	    || instr->instr_ppaddr == Perl_pp_instr_cond_jump) {
-	    STRLEN len;
 	    const INSTRUCTION* target = instr + ((int)instr->instr_arg1) + 1;
-	    SV * const instrsv = sv_2mortal(newSVuv(PTR2UV(target)));
-	    const char * const key = SvPV_const(instrsv, len);
-
-	    if (hv_exists(jump_points, key, len))
-		break;
-
-	    (void)hv_store(jump_points, key, len, newSVuv(++jump_point_idx), 0);
+	    S_add_label(jump_points, target, &jump_point_idx);
+	}
+	else if (instr->instr_ppaddr == Perl_pp_cond_expr
+	    || instr->instr_ppaddr == Perl_pp_or
+	    ) {
+	    S_add_label(jump_points, cLOGOPx(instr->instr_op)->op_other_instr, &jump_point_idx);
 	}
     }
 
@@ -1256,6 +1266,12 @@ Perl_codeseq_dump(pTHX_ const CODESEQ *codeseq)
 	    || instr->instr_ppaddr == Perl_pp_instr_cond_jump) {
 	    const INSTRUCTION* target = instr + ((int)instr->instr_arg1) + 1;
 	    PerlIO_printf(Perl_debug_log, "label%"UVuf"\t", S_instr_label(jump_points, target));
+	}
+	else if (instr->instr_ppaddr == Perl_pp_cond_expr
+	    || instr->instr_ppaddr == Perl_pp_or
+	    ) {
+	    PerlIO_printf(Perl_debug_log, "label%"UVuf"\t", 
+		S_instr_label(jump_points, cLOGOPx(instr->instr_op)->op_other_instr));
 	}
 
 	PerlIO_printf(Perl_debug_log, "\n");

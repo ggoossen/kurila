@@ -45,10 +45,6 @@ S_append_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o, INSTRUCTION** instrp)
     bpp->op_instrpp_append->instrpp = instrp;
     bpp->op_instrpp_append->instr_idx = -1;
     bpp->op_instrpp_append++;
-
-#ifdef DEBUGGING
-    *instrp = NULL;
-#endif
 }
 
 void
@@ -96,6 +92,30 @@ S_register_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o)
     bpp->op_instrpp_compile++;
 }
 
+void
+S_save_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, INSTRUCTION** instrp)
+{
+    DEBUG_g(Perl_deb("registering branch point "); Perl_deb("\n"));
+    if (bpp->op_instrpp_append >= bpp->op_instrpp_end) {
+	OP_INSTRPP* old_lp = bpp->op_instrpp_list;
+	int new_size = 128 + (bpp->op_instrpp_end - bpp->op_instrpp_list);
+	Renew(bpp->op_instrpp_list, new_size, OP_INSTRPP);
+	bpp->op_instrpp_end = bpp->op_instrpp_list + new_size;
+	bpp->op_instrpp_compile = bpp->op_instrpp_list + (bpp->op_instrpp_compile - old_lp);
+	bpp->op_instrpp_append = bpp->op_instrpp_list + (bpp->op_instrpp_append - old_lp);
+    }
+    assert(bpp->op_instrpp_append < bpp->op_instrpp_end);
+    bpp->op_instrpp_append->op = bpp->op_instrpp_compile->op;
+    bpp->op_instrpp_append->instrpp = bpp->op_instrpp_compile->instrpp;
+    bpp->op_instrpp_append->instr_idx = bpp->op_instrpp_compile->instr_idx;
+    bpp->op_instrpp_append++;
+
+    bpp->op_instrpp_compile->op = NULL;
+    bpp->op_instrpp_compile->instrpp = instrp;
+    bpp->op_instrpp_compile->instr_idx = bpp->idx;
+    bpp->op_instrpp_compile++;
+}
+
 int
 S_find_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o)
 {
@@ -137,12 +157,12 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		S_append_instruction(codeseq, bpp, o, o->op_type);
 
 		grepstart_idx = bpp->idx-1;
-		S_register_branch_point(bpp, o->op_more_op);
 
+		S_save_branch_point(bpp, &(o->op_unstack_instr));
 		S_add_op(codeseq, bpp, o->op_more_op);
 
 		S_append_instruction(codeseq, bpp, o, is_grep ? OP_GREPWHILE : OP_MAPWHILE );
-		S_append_branch_point(bpp, o->op_more_op, &(o->op_unstack_instr));
+
 		S_register_branch_point(bpp, o->op_next);
 
 		codeseq->xcodeseq_instructions[grepstart_idx].instr_arg1 = (void*)(bpp->idx - grepstart_idx - 1);
@@ -169,8 +189,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		jump_idx = bpp->idx-1;
 
 		/* false branch */
-		S_register_branch_point(bpp, cLOGOPo->op_start);
-		S_append_branch_point(bpp, cLOGOPo->op_start, &(cLOGOPo->op_other_instr));
+		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 		S_add_op(codeseq, bpp, cLOGOPo->op_start);
 
 		S_register_branch_point(bpp, o->op_next);
@@ -271,8 +290,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		S_append_instruction_x(codeseq, bpp, NULL, pp_unstack, NULL);
 		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, (void*)(start_idx - bpp->idx - 1));
 
-		S_register_branch_point(bpp, o->op_next);
-		S_append_branch_point(bpp, o->op_next, &(cLOGOPo->op_other_instr));
+		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 		break;
 	    }
 	    case OP_AND:
@@ -291,8 +309,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		S_add_op(codeseq, bpp, o->op_start);
 		S_append_instruction(codeseq, bpp, o, o->op_type);
 		S_add_op(codeseq, bpp, cLOGOPo->op_other);
-		S_register_branch_point(bpp, o->op_next);
-		S_append_branch_point(bpp, o->op_next, &(cLOGOPo->op_other_instr));
+		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 		break;
 	    }
 	    default:
