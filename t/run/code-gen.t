@@ -31,14 +31,16 @@ sub test_prog {
 
     my @expect_lines = split m/\n/, $expect;
 
+    my $linenr = 0;
     for my $expect_line (@expect_lines) {
         my $got = shift @result;
+        $linenr++;
         $expect_line =~ s/\s+/\\s+/g; # make expectation whitespace insensitive
         if ($got !~ m/^$expect_line\s*$/) {
             diag("PROG:\n$prog\n");
-            diag("RESULT: $prog_output");
-            diag("EXPECTED: $expect");
-            return ok(0, "Incorrect output got '$got' expected '$expect_line'");
+            diag("RESULT:\n$prog_output");
+            diag("EXPECTED:\n$expect");
+            return ok(0, "Incorrect line $linenr output got '$got' expected '$expect_line'");
         }
     }
 
@@ -80,6 +82,7 @@ label2:
     unstack
     instr_jump label2
 label1:
+    leaveloop
     leave
 ####
 for (@ARGV) {
@@ -89,10 +92,11 @@ for (@ARGV) {
     enter
     nextstate
     pushmark
+    pushmark
     gv
     rv2av
     gv
-    null
+    list
     enteriter
 label2:
     iter
@@ -105,4 +109,51 @@ label2:
     instr_jump   label2
 label1:
     leave
-
+####
+{
+    print $ARGV[0];
+}
+----
+    enter
+    nextstate
+    enterloop
+label2:
+    null
+    instr_cond_jump    label1
+    nextstate
+    pushmark
+    aelemfast
+    print
+    null
+    instr_jump label2
+label1:
+   leaveloop
+   leave
+####
+for (1..4) {
+    print $ARGV[$_];
+}
+----
+    enter
+    nextstate  
+    pushmark   
+    pushmark   
+    const
+    const
+    gv 
+    list
+    enteriter  
+label2:
+    iter
+    instr_cond_jump    label1  
+    nextstate  
+    pushmark   
+    gv 
+    rv2av
+    gvsv
+    aelem
+    print
+    null
+    instr_jump label2  
+label1:
+    leave
