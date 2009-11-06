@@ -5125,7 +5125,7 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
         expr = mod(force_list(expr), OP_GREPSTART);
     }
 
-    expr = append_elem(OP_NULL, expr, scalar(sv));
+    expr = list(append_elem(OP_LIST, expr, scalar(sv)));
 
     NewOp(1101,loop,1,LOOP);
     loop->op_type = OP_FOREACH;
