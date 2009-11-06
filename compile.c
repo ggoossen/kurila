@@ -60,7 +60,7 @@ void
 
     bpp->idx++;
     if (bpp->idx >= codeseq->xcodeseq_size) {
-	codeseq->xcodeseq_size += 128;
+	codeseq->xcodeseq_size += 32;
 	Renew(codeseq->xcodeseq_instructions, codeseq->xcodeseq_size, INSTRUCTION);
     }
 
@@ -107,6 +107,17 @@ void
 	    switch (o->op_type) {
 	    case OP_GREPSTART:
 	    case OP_MAPSTART: {
+		/*
+		      ...
+		      pushmark
+		      <o->op_start>
+		      grepstart         label2
+		  label1:
+		      <o->op_more_op>
+		      grepwhile         label1
+		  label2:
+		      ...
+		*/
 		bool is_grep = o->op_type == OP_GREPSTART;
 		int grepstart_idx;
 		S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
@@ -127,6 +138,16 @@ void
 		break;
 	    }
 	    case OP_COND_EXPR: {
+		/*
+		      ...
+		      cond_expr                label1
+		      <cLOGOPo->op_op_other>
+		      instr_jump               label2
+		  label1:
+		      <cLOGOPo->op_start>
+		  label2:
+		      ...
+		*/
 		int jump_idx;
 		S_append_instruction(codeseq, bpp, o, o->op_type);
 
@@ -145,6 +166,86 @@ void
 		codeseq->xcodeseq_instructions[jump_idx].instr_arg1 = (void*)(bpp->idx - jump_idx - 1);
 		break;
 	    }
+	    case OP_ENTERLOOP: {
+		/*
+		      ...
+		      enterloop
+		  label1:
+		      <o->op_start>
+		      instr_cond_jump   label2
+		      <o->redoop>
+		      <o->nextop>
+		      instr_jump        label1
+		  label2:
+		      ...
+		*/
+		int start_idx;
+		int cond_jump_idx;
+		S_append_instruction(codeseq, bpp, o, o->op_type);
+
+		/* evaluate condition */
+		start_idx = bpp->idx;
+		S_add_op(codeseq, bpp, o->op_start);
+
+		/* conditional jump to the end */ 
+		cond_jump_idx = bpp->idx;
+		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_cond_jump, NULL);
+
+		S_add_op(codeseq, bpp, cLOOPo->op_redoop);
+
+		S_add_op(codeseq, bpp, cLOOPo->op_nextop);
+
+		/* loop */
+		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, (void*)(start_idx - bpp->idx - 1));
+
+		codeseq->xcodeseq_instructions[cond_jump_idx].instr_arg1 = (void*)(bpp->idx - cond_jump_idx - 1);
+		
+		break;
+	    }
+	    case OP_WHILE_AND: {
+		/*
+                      ...
+		  label1:
+		      <cLOGOPo->op_start>
+		      and                   label2
+		      <cLOGOPo->op_other>
+		      unstack
+		      instr_jump            label1
+                  label2:
+		      ...
+		*/
+		int start_idx;
+		start_idx = bpp->idx;
+		S_add_op(codeseq, bpp, cLOGOPo->op_start);
+		S_append_instruction(codeseq, bpp, o, OP_AND);
+		S_add_op(codeseq, bpp, cLOGOPo->op_other);
+		S_append_instruction_x(codeseq, bpp, NULL, pp_unstack, NULL);
+		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, (void*)(start_idx - bpp->idx - 1));
+
+		S_register_branch_point(bpp, o->op_next);
+		S_append_branch_point(bpp, o->op_next, &(cLOGOPo->op_other_instr));
+		break;
+	    }
+	    case OP_AND:
+	    case OP_OR:
+	    case OP_DOR: {
+		/*
+                      ...
+		      <o->op_start>
+		      o->op_type            label1
+		      <cLOGOPo->op_other>
+		  label1:
+		      ...
+		*/
+		assert((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOGOP);
+
+		S_add_op(codeseq, bpp, o->op_start);
+		S_append_instruction(codeseq, bpp, o, o->op_type);
+		S_add_op(codeseq, bpp, cLOGOPo->op_other);
+		S_register_branch_point(bpp, o->op_next);
+		S_append_branch_point(bpp, o->op_next, &(cLOGOPo->op_other_instr));
+		break;
+	    }
 	    default:
 		S_append_instruction(codeseq, bpp, o, o->op_type);
 
@@ -152,12 +253,7 @@ void
 		if (o->op_type == OP_ENTERTRY) {
 		    S_append_branch_point(bpp, cLOGOPo->op_other->op_next, &(cLOGOPo->op_other_instr));
 		}
-		if (o->op_type == OP_COND_EXPR) {
-		}
 		else if ((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOGOP) {
-		    S_add_op(codeseq, bpp, cLOGOPo->op_other);
-		    S_register_branch_point(bpp, o->op_next);
-		    S_append_branch_point(bpp, o->op_next, &(cLOGOPo->op_other_instr));
 		}
 		else if (o->op_type == OP_SUBST) {
 		    S_append_branch_point(bpp, cPMOPo->op_pmreplrootu.op_pmreplroot, &(cPMOPo->op_pmreplroot_instr));
@@ -172,11 +268,11 @@ void
 		else if (o->op_type == OP_LAST) {
 		    o = NULL;
 		}
-		else if (o->op_type == OP_UNSTACK) {
-		    S_append_branch_point(bpp, o->op_next,
-			&(o->op_unstack_instr));
-		    o = NULL;
-		}
+		/* else if (o->op_type == OP_UNSTACK) { */
+		/*     S_append_branch_point(bpp, o->op_next, */
+		/* 	&(o->op_unstack_instr)); */
+		/*     o = NULL; */
+		/* } */
 		else if (o->op_type == OP_SORT) {
 		    if (o->op_flags & OPf_STACKED && o->op_flags & OPf_SPECIAL) {
 			OP *kid = cLISTOPo->op_first->op_sibling;	/* pass pushmark */

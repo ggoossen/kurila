@@ -209,6 +209,7 @@ Perl_pp_range
 Perl_pp_flip
 Perl_pp_flop
 Perl_pp_and
+Perl_pp_while_and
 Perl_pp_or
 Perl_pp_xor
 Perl_pp_dor
@@ -410,5 +411,6 @@ Perl_pp_syscall
 Perl_pp_lock
 Perl_pp_once
 Perl_pp_instr_jump
+Perl_pp_instr_cond_jump
 
 # ex: set ro:

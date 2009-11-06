@@ -784,7 +784,7 @@ Perl_dump_op_short(const OP *o)
 {
     PERL_ARGS_ASSERT_DUMP_OP_SHORT;
     PerlIO_printf(Perl_debug_log, 
-	"op %"UVxf" %s", sequence_num(o), PL_op_name[o->op_type]);
+	"op %"UVuf" %s", sequence_num(o), PL_op_name[o->op_type]);
 }
 
 void
@@ -1155,6 +1155,7 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
     case OP_GREPSTART:
     case OP_OR:
     case OP_AND:
+    case OP_WHILE_AND:
 	Perl_dump_indent(aTHX_ level, file, "OTHER ===> ");
 	if (cLOGOPo->op_other)
 	    PerlIO_printf(file, "%"UVuf"\n", sequence_num(cLOGOPo->op_other));
@@ -1194,17 +1195,67 @@ Perl_op_dump(pTHX_ const OP *o)
     do_op_dump(0, Perl_debug_log, o);
 }
 
+/* 
+   returns the index of the label of the given instruction or 0 if
+   there is no label for the instruction
+   
+*/
+UV
+S_instr_label(pTHX_ HV* labels, const INSTRUCTION* instr) {
+    const char *key;
+    STRLEN  len;
+    SV* instr_sv = newSVuv(PTR2UV(instr));
+    SV** label;
+    key = SvPV_const(instr_sv, len);
+    label = hv_fetch(labels, key, len, 0);
+    SvREFCNT_dec(instr_sv);
+    return label ? SvUV(*label) : 0;
+}
+
 void
 Perl_codeseq_dump(pTHX_ const CODESEQ *codeseq)
 {
     const INSTRUCTION *instr;
+    HV* jump_points;
+    int jump_point_idx = 0;
     PERL_ARGS_ASSERT_CODESEQ_DUMP;
+
+    jump_points = newHV(); /* memory leak */
+
+    for( instr = codeseq_start_instruction(codeseq) ;
+	 instr < codeseq_start_instruction(codeseq) + codeseq->xcodeseq_size ;
+	 instr++ ) {
+	if (instr->instr_ppaddr == Perl_pp_instr_jump
+	    || instr->instr_ppaddr == Perl_pp_instr_cond_jump) {
+	    STRLEN len;
+	    const INSTRUCTION* target = instr + ((int)instr->instr_arg1) + 1;
+	    SV * const instrsv = sv_2mortal(newSVuv(PTR2UV(target)));
+	    const char * const key = SvPV_const(instrsv, len);
+
+	    if (hv_exists(jump_points, key, len))
+		break;
+
+	    (void)hv_store(jump_points, key, len, newSVuv(++jump_point_idx), 0);
+	}
+    }
 
     PerlIO_printf(Perl_debug_log, "Instructions of codeseq (0x%"UVxf"):\n", PTR2UV(codeseq));
     for( instr = codeseq_start_instruction(codeseq) ;
 	 instr < codeseq_start_instruction(codeseq) + codeseq->xcodeseq_size ;
 	 instr++ ) {
-	PerlIO_printf(Perl_debug_log, "0x%"UVxf": %s\n", PTR2UV(instr), instruction_name(instr));
+	UV label = S_instr_label(aTHX_ jump_points, instr);
+	if (label) {
+	    PerlIO_printf(Perl_debug_log, "label%"UVuf":\n", label);
+	}
+	PerlIO_printf(Perl_debug_log, "0x%"UVxf": %s\t", PTR2UV(instr), instruction_name(instr));
+
+	if (instr->instr_ppaddr == Perl_pp_instr_jump
+	    || instr->instr_ppaddr == Perl_pp_instr_cond_jump) {
+	    const INSTRUCTION* target = instr + ((int)instr->instr_arg1) + 1;
+	    PerlIO_printf(Perl_debug_log, "label%"UVuf"\t", S_instr_label(jump_points, target));
+	}
+
+	PerlIO_printf(Perl_debug_log, "\n");
     }
     PerlIO_printf(Perl_debug_log, "\n");
 }

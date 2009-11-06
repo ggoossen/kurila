@@ -198,6 +198,7 @@ EXTCONST char* const PL_op_name[] = {
 	"flip",
 	"flop",
 	"and",
+	"while_and",
 	"or",
 	"xor",
 	"dor",
@@ -399,6 +400,7 @@ EXTCONST char* const PL_op_name[] = {
 	"lock",
 	"once",
 	"instr_jump",
+	"instr_cond_jump",
 	"custom",
 };
 #endif
@@ -572,6 +574,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"range (or flip)",
 	"range (or flop)",
 	"logical and (&&)",
+	"while",
 	"logical or (||)",
 	"logical xor",
 	"defined or (//)",
@@ -773,6 +776,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"lock",
 	"once",
 	"instruction jump",
+	"instruction conditional jump",
 	"unknown custom operator",
 };
 #endif
@@ -960,6 +964,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_flip),
 	MEMBER_TO_FPTR(Perl_pp_flop),
 	MEMBER_TO_FPTR(Perl_pp_and),
+	MEMBER_TO_FPTR(Perl_pp_and),	/* Perl_pp_while_and */
 	MEMBER_TO_FPTR(Perl_pp_or),
 	MEMBER_TO_FPTR(Perl_pp_xor),
 	MEMBER_TO_FPTR(Perl_pp_defined),	/* Perl_pp_dor */
@@ -1161,6 +1166,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_lock),
 	MEMBER_TO_FPTR(Perl_pp_once),
 	MEMBER_TO_FPTR(Perl_pp_instr_jump),
+	MEMBER_TO_FPTR(Perl_pp_instr_cond_jump),
 	MEMBER_TO_FPTR(Perl_unimplemented_op),	/* Perl_pp_custom */
 }
 #endif
@@ -1345,6 +1351,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* flip */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* flop */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* and */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* while_and */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* or */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* xor */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* dor */
@@ -1546,6 +1553,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_rfun),	/* lock */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* once */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* instr_jump */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* instr_cond_jump */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* custom */
 }
 #endif
@@ -1724,6 +1732,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00022200,	/* flip */
 	0x00000200,	/* flop */
 	0x00000600,	/* and */
+	0x00000600,	/* while_and */
 	0x00000600,	/* or */
 	0x00022406,	/* xor */
 	0x00000600,	/* dor */
@@ -1925,6 +1934,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x0000f604,	/* lock */
 	0x00000600,	/* once */
 	0x00000000,	/* instr_jump */
+	0x00000000,	/* instr_cond_jump */
 	0x00000000,	/* custom */
 };
 #endif

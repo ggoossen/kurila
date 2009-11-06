@@ -4714,16 +4714,17 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
     logop->op_private = (U8)(1 | (flags >> 8));
 
     /* establish postfix order */
-    logop->op_next = LINKLIST(first);
-    first->op_next = (OP*)logop;
+    logop->op_start = LINKLIST(first);
+    first->op_next = NULL;
+    logop->op_next = (OP*)logop;
     first->op_sibling = other;
 
     CHECKOP(type,logop);
 
-    o = newUNOP(prepend_not ? OP_NOT : OP_NULL, 0, (OP*)logop);
+    assert(!prepend_not);
     other->op_next = NULL;
 
-    return o;
+    return logop;
 }
 
 OP *
@@ -4884,14 +4885,18 @@ Perl_newLOOPOP(pTHX_ I32 flags, I32 debuggable, OP *expr, OP *block)
      * op, in listop. This is wrong. [perl #27024] */
     if (!block)
 	block = newOP(OP_NULL, 0);
-    listop = append_elem(OP_LINESEQ, block, newOP(OP_UNSTACK, 0));
-    o = new_logop(OP_AND, 0, &expr, &listop);
+    listop = append_elem(OP_LINESEQ, block, NULL);
+    o = new_logop(OP_WHILE_AND, 0, &expr, &listop);
 
-    if (listop)
-	((LISTOP*)listop)->op_last->op_next = LINKLIST(o);
+    /* if (listop) */
+    /* 	((LISTOP*)listop)->op_last->op_next = NULL; /\* LINKLIST(o); *\/ */
 
-    if (once && o != listop)
-	o->op_next = ((LOGOP*)cUNOPo->op_first)->op_other;
+    /* if (once && o != listop) */
+    /* 	o->op_next = ((LOGOP*)cUNOPo->op_first)->op_other; */
+
+    /* o->op_start = LINKLIST(cUNOPo->op_first); */
+    /* cUNOPo->op_first->op_next = NULL; */
+    /* o->op_next = o; */
 
     if (o == listop)
 	o = newUNOP(OP_NULL, 0, o);	/* or do {} while 1 loses outer block */
@@ -4961,47 +4966,56 @@ whileline, OP *expr, OP *block, OP *cont, I32 has_my)
     }
 
     assert(block);
-    listop = append_list(OP_LINESEQ, (LISTOP*)block, (LISTOP*)cont);
-    assert(listop);
-    redo = LINKLIST(listop);
+    /* listop = append_list(OP_LINESEQ, NULL, NULL); /\* (LISTOP*)block, (LISTOP*)cont); *\/ */
+    /* assert(listop); */
+    /* redo = LINKLIST(listop); */
+    redo = NULL;
 
-    if (expr) {
-	PL_parser->copline = (line_t)whileline;
-	scalar(listop);
-	o = new_logop(OP_AND, 0, &expr, &listop);
-	if (o == expr && o->op_type == OP_CONST && !SvTRUE(cSVOPo->op_sv)) {
-	    op_free(expr);		/* oops, it's a while (0) */
-	    op_free((OP*)loop);
-	    return NULL;		/* listop already freed by new_logop */
-	}
-	if (listop)
-	    ((LISTOP*)listop)->op_last->op_next =
-		(o == listop ? redo : LINKLIST(o));
-    }
-    else
-	o = listop;
+    /* if (expr) { */
+    /* 	PL_parser->copline = (line_t)whileline; */
+    /* 	scalar(listop); */
+    /* 	o = new_logop(OP_AND, 0, &expr, &listop); */
+    /* 	if (o == expr && o->op_type == OP_CONST && !SvTRUE(cSVOPo->op_sv)) { */
+    /* 	    op_free(expr);		/\* oops, it's a while (0) *\/ */
+    /* 	    op_free((OP*)loop); */
+    /* 	    return NULL;		/\* listop already freed by new_logop *\/ */
+    /* 	} */
+    /* 	if (listop) */
+    /* 	    ((LISTOP*)listop)->op_last->op_next = */
+    /* 		(o == listop ? redo : LINKLIST(o)); */
+    /* } */
+    /* else */
+    /* 	o = listop; */
 
-    if (!loop) {
-	NewOp(1101,loop,1,LOOP);
-	loop->op_type = OP_ENTERLOOP;
-	loop->op_private = 0;
-	loop->op_next = (OP*)loop;
-    }
+    NewOp(1101,loop,1,LOOP);
+    loop->op_type = OP_ENTERLOOP;
+    loop->op_private = 0;
+    loop->op_next = (OP*)loop;
+    loop->op_flags = OPf_KIDS;
 
-    o = newBINOP(OP_LEAVELOOP, 0, (OP*)loop, o);
+    loop->op_first = expr;
+    loop->op_last = expr;
 
-    loop->op_redoop = redo;
-    loop->op_lastop = o;
-    o->op_private |= loopflags;
+    append_elem(OP_ENTERLOOP, loop, block);
+    append_elem(OP_ENTERLOOP, loop, cont);
+
+    loop->op_redoop = LINKLIST(block);
+    block->op_next = NULL;
+    loop->op_nextop = LINKLIST(cont);
+    cont->op_next = NULL;
+    loop->op_start = LINKLIST(expr);
+    expr->op_next = NULL;
+
+    loop->op_private |= loopflags;
 
     if (next)
 	loop->op_nextop = next;
     else
-	loop->op_nextop = o;
+	loop->op_nextop = loop;
 
-    o->op_flags |= flags;
-    o->op_private |= (flags >> 8);
-    return o;
+    loop->op_flags |= flags;
+    loop->op_private |= (flags >> 8);
+    return loop;
 }
 
 OP *
@@ -8678,18 +8692,18 @@ Perl_peep(pTHX_ register OP *o)
 	    peep(cLOGOP->op_other); /* Recursive calls are not replaced by fptr calls */
 	    break;
 
-	case OP_ENTERLOOP:
-	case OP_ENTERITER:
-	    while (cLOOP->op_redoop->op_type == OP_NULL)
-		cLOOP->op_redoop = cLOOP->op_redoop->op_next;
-	    peep(cLOOP->op_redoop);
-	    while (cLOOP->op_nextop->op_type == OP_NULL)
-		cLOOP->op_nextop = cLOOP->op_nextop->op_next;
-	    peep(cLOOP->op_nextop);
-	    while (cLOOP->op_lastop->op_type == OP_NULL)
-		cLOOP->op_lastop = cLOOP->op_lastop->op_next;
-	    peep(cLOOP->op_lastop);
-	    break;
+	/* case OP_ENTERLOOP: */
+	/* case OP_ENTERITER: */
+	/*     while (cLOOP->op_redoop->op_type == OP_NULL) */
+	/* 	cLOOP->op_redoop = cLOOP->op_redoop->op_next; */
+	/*     peep(cLOOP->op_redoop); */
+	/*     while (cLOOP->op_nextop->op_type == OP_NULL) */
+	/* 	cLOOP->op_nextop = cLOOP->op_nextop->op_next; */
+	/*     peep(cLOOP->op_nextop); */
+	/*     while (cLOOP->op_lastop->op_type == OP_NULL) */
+	/* 	cLOOP->op_lastop = cLOOP->op_lastop->op_next; */
+	/*     peep(cLOOP->op_lastop); */
+	/*     break; */
 
 	case OP_SUBST:
 	    assert(!(cPMOP->op_pmflags & PMf_ONCE));

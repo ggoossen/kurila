@@ -95,7 +95,7 @@ my @raw_alias = (
 		 Perl_pp_shmwrite => [qw(shmread msgsnd msgrcv semop)],
 		 Perl_pp_send => ['syswrite'],
 		 Perl_pp_defined => [qw(dor dorassign)],
-                 Perl_pp_and => ['andassign'],
+                 Perl_pp_and => [qw(andassign while_and)],
 		 Perl_pp_or => ['orassign'],
 		 Perl_pp_ucfirst => ['lcfirst'],
 		 Perl_pp_sle => [qw(slt sgt sge)],
@@ -850,6 +850,7 @@ flop		range (or flop)		ck_null		1
 # Control.
 
 and		logical and (&&)		ck_null		|	
+while_and		while			ck_null		|	
 or		logical or (||)			ck_null		|	
 xor		logical xor			ck_null		fs2	S S	
 dor		defined or (//)			ck_null		|
@@ -1118,5 +1119,6 @@ lock		lock			ck_rfun		s%	R
 once		once			ck_null		|	
 
 instr_jump		instruction jump		ck_null		0
+instr_cond_jump		instruction conditional jump		ck_null		0
 
 custom		unknown custom operator		ck_null		0

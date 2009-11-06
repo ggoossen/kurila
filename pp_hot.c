@@ -234,7 +234,6 @@ PP(pp_unstack)
     FREETMPS;
     oldsave = PL_scopestack[PL_scopestack_ix - 1];
     LEAVE_SCOPE(oldsave);
-    RUN_SET_NEXT_INSTRUCTION(PL_op->op_unstack_instr);
     return NORMAL;
 }
 

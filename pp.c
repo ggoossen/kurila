@@ -5950,6 +5950,20 @@ PP(pp_instr_jump)
     return NORMAL;
 }
 
+PP(pp_instr_cond_jump)
+{
+    dSP;
+    int instr_offset = (int)pparg1;
+    if (!SvTRUE(TOPs)) {
+	RUN_SET_NEXT_INSTRUCTION( run_get_next_instruction() + instr_offset );
+	RETURN;
+    }
+    else {
+	--SP;
+	RETURN;
+    }
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd
