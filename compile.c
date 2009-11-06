@@ -177,6 +177,7 @@ void
 		      <o->nextop>
 		      instr_jump        label1
 		  label2:
+		      leaveloop
 		      ...
 		*/
 		int start_idx;
@@ -200,6 +201,8 @@ void
 
 		codeseq->xcodeseq_instructions[cond_jump_idx].instr_arg1 = (void*)(bpp->idx - cond_jump_idx - 1);
 		
+		S_append_instruction(codeseq, bpp, o, OP_LEAVELOOP);
+
 		break;
 	    }
 	    case OP_FOREACH: {
