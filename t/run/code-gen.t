@@ -42,6 +42,13 @@ sub test_prog {
         }
     }
 
+    if (@result) {
+        diag("PROG:\n$prog\n");
+        diag("RESULT:\n$prog_output");
+        diag("EXPECTED:\n$expect");
+        return ok(0, "Addidional instructions found");
+    }
+
     return ok(1);
 }
 
@@ -63,17 +70,11 @@ while ($ARGV[0]) {
     nextstate
     enterloop
 label2:
-    gv
-    rv2av
-    const
-    aelem
+    aelemfast
     instr_cond_jump label1
     nextstate
     pushmark
-    gv
-    rv2av
-    const
-    aelem
+    aelemfast
     print
     null
     unstack
@@ -81,3 +82,27 @@ label2:
 label1:
     leave
 ####
+for (@ARGV) {
+    print $_;
+}
+----
+    enter
+    nextstate
+    pushmark
+    gv
+    rv2av
+    gv
+    null
+    enteriter
+label2:
+    iter
+    instr_cond_jump      label1
+    nextstate
+    pushmark
+    gvsv
+    print
+    null
+    instr_jump   label2
+label1:
+    leave
+

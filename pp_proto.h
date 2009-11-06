@@ -413,5 +413,6 @@ PERL_PPDEF(Perl_pp_lock)
 PERL_PPDEF(Perl_pp_once)
 PERL_PPDEF(Perl_pp_instr_jump)
 PERL_PPDEF(Perl_pp_instr_cond_jump)
+PERL_PPDEF(Perl_pp_foreach)
 
 /* ex: set ro: */

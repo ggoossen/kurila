@@ -202,6 +202,40 @@ void
 		
 		break;
 	    }
+	    case OP_FOREACH: {
+		/*
+		      ...
+		      <o->op_start>
+		      enteriter
+		  label1:
+		      iter
+		      and               label2
+		      <cLOOPo->op_redoop>
+		      instr_jump        label1
+		  label2:
+		      ...
+		*/
+		int start_idx;
+		int cond_jump_idx;
+
+		S_add_op(codeseq, bpp, o->op_start);
+		S_append_instruction(codeseq, bpp, o, OP_ENTERITER);
+
+		start_idx = bpp->idx;
+		S_append_instruction(codeseq, bpp, o, OP_ITER);
+
+		cond_jump_idx = bpp->idx;
+		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_cond_jump, NULL);
+
+		S_add_op(codeseq, bpp, cLOOPo->op_redoop);
+
+		/* loop */
+		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, (void*)(start_idx - bpp->idx - 1));
+
+		codeseq->xcodeseq_instructions[cond_jump_idx].instr_arg1 = (void*)(bpp->idx - cond_jump_idx - 1);
+		
+		break;
+	    }
 	    case OP_WHILE_AND: {
 		/*
                       ...

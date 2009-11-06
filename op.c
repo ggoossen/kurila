@@ -818,6 +818,17 @@ Perl_op_refcnt_unlock(pTHX)
 #define LINKLIST(o) ((o)->op_next ? (o)->op_next : linklist((OP*)o))
 
 static OP *
+    S_sequence_op(pTHX_ OP* o)
+{
+    if (!o)
+	return NULL;
+    OP* retop = LINKLIST(o);
+    o->op_next = NULL;
+    CALL_PEEP(retop);
+    return retop;
+}
+
+static OP *
 S_linklist(pTHX_ OP *o)
 {
     OP *first;
@@ -2351,10 +2362,9 @@ Perl_newPROG(pTHX_ OP *o)
 	}
 	PL_main_root = scope(sawparens(scalarvoid(o)));
 	PL_curcop = &PL_compiling;
-	PL_main_start = LINKLIST(PL_main_root);
+	PL_main_start = S_sequence_op(PL_main_root);
 	PL_main_root->op_private |= OPpREFCOUNTED;
 	OpREFCNT_set(PL_main_root, 1);
-	PL_main_root->op_next = 0;
 	CALL_PEEP(PL_main_start);
 	PL_compcv = 0;
 
@@ -4569,7 +4579,6 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
 {
     dVAR;
     LOGOP *logop;
-    OP *o;
     OP *first;
     OP *other;
     OP *cstop = NULL;
@@ -4724,7 +4733,7 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
     assert(!prepend_not);
     other->op_next = NULL;
 
-    return logop;
+    return (OP*)logop;
 }
 
 OP *
@@ -4733,7 +4742,6 @@ Perl_newCONDOP(pTHX_ I32 flags, OP *first, OP *trueop, OP *falseop)
     dVAR;
     LOGOP *logop;
     OP *start;
-    OP *o;
     OP *cstop;
 
     PERL_ARGS_ASSERT_NEWCONDOP;
@@ -4788,7 +4796,7 @@ Perl_newCONDOP(pTHX_ I32 flags, OP *first, OP *trueop, OP *falseop)
 
     logop->op_start = logop->op_next;
     logop->op_next = start;
-    return logop;
+    return (OP*)logop;
 }
 
 OP *
@@ -4987,24 +4995,23 @@ whileline, OP *expr, OP *block, OP *cont, I32 has_my)
     /* else */
     /* 	o = listop; */
 
-    NewOp(1101,loop,1,LOOP);
-    loop->op_type = OP_ENTERLOOP;
-    loop->op_private = 0;
-    loop->op_next = (OP*)loop;
-    loop->op_flags = OPf_KIDS;
+    if (!loop) {
+	NewOp(1101,loop,1,LOOP);
+	loop->op_type = OP_ENTERLOOP;
+	loop->op_private = 0;
+	loop->op_next = (OP*)loop;
+	loop->op_flags = OPf_KIDS;
 
-    loop->op_first = expr;
-    loop->op_last = expr;
+	loop->op_first = expr;
+	loop->op_last = expr;
+    }
 
-    append_elem(OP_ENTERLOOP, loop, block);
-    append_elem(OP_ENTERLOOP, loop, cont);
+    append_elem(OP_ENTERLOOP, (OP*)loop, block);
+    append_elem(OP_ENTERLOOP, (OP*)loop, cont);
 
-    loop->op_redoop = LINKLIST(block);
-    block->op_next = NULL;
-    loop->op_nextop = LINKLIST(cont);
-    cont->op_next = NULL;
-    loop->op_start = LINKLIST(expr);
-    expr->op_next = NULL;
+    loop->op_redoop = S_sequence_op(block);
+    loop->op_nextop = S_sequence_op(cont);
+    loop->op_start = S_sequence_op(expr);
 
     loop->op_private |= loopflags;
 
@@ -5118,29 +5125,34 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
         expr = mod(force_list(expr), OP_GREPSTART);
     }
 
-    loop = (LOOP*)list(convert(OP_ENTERITER, iterflags,
-			       append_elem(OP_LIST, expr, scalar(sv))));
-    assert(!loop->op_next);
+    expr = append_elem(OP_NULL, expr, scalar(sv));
+
+    NewOp(1101,loop,1,LOOP);
+    loop->op_type = OP_FOREACH;
+    loop->op_private = 0;
+    loop->op_next = (OP*)loop;
+    loop->op_flags = OPf_KIDS | iterflags;
+
+    loop->op_first = expr;
+    loop->op_last = expr;
+
+    append_elem(OP_FOREACH, (OP*)loop, block);
+    append_elem(OP_FOREACH, (OP*)loop, cont);
+
+    loop->op_redoop = S_sequence_op(block);
+    loop->op_nextop = S_sequence_op(cont);
+    loop->op_start = S_sequence_op(expr);
+
+    /* prepend_elem(OP_FOREACH, loop, scalar(sv)); */
     /* for my  $x () sets OPpLVAL_INTRO;
      * for our $x () sets OPpOUR_INTRO */
     loop->op_private = (U8)iterpflags;
-#ifdef PL_OP_SLAB_ALLOC
-    {
-	LOOP *tmp;
-	NewOp(1234,tmp,1,LOOP);
-	Copy(loop,tmp,1,LISTOP);
-	S_op_destroy(aTHX_ (OP*)loop);
-	loop = tmp;
-    }
-#else
-    loop = (LOOP*)PerlMemShared_realloc(loop, sizeof(LOOP));
-#endif
     loop->op_targ = padoff;
-    wop = newWHILEOP(flags, 1, loop, forline, newOP(OP_ITER, 0), block, cont, 0);
+    append_elem(OP_FOREACH, loop, cont);
     if (madsv)
 	op_getmad(madsv, (OP*)loop, 'v');
     PL_parser->copline = forline;
-    return newSTATEOP(0, label, wop);
+    return newSTATEOP(0, label, loop);
 }
 
 OP*

@@ -726,6 +726,7 @@ S_sequence(pTHX_ register const OP *o)
 
 	case OP_ENTERLOOP:
 	case OP_ENTERITER:
+	case OP_FOREACH:
 	    (void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
 	    sequence_tail(cLOOPo->op_redoop);
 	    sequence_tail(cLOOPo->op_nextop);
@@ -1133,6 +1134,7 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 			     CopLABEL(cCOPo));
 	break;
     case OP_ENTERLOOP:
+    case OP_FOREACH:
 	Perl_dump_indent(aTHX_ level, file, "REDO ===> ");
 	if (cLOOPo->op_redoop)
 	    PerlIO_printf(file, "%"UVuf"\n", sequence_num(cLOOPo->op_redoop));
@@ -1222,6 +1224,7 @@ Perl_codeseq_dump(pTHX_ const CODESEQ *codeseq)
 
     jump_points = newHV(); /* memory leak */
 
+    /* Search for labels */
     for( instr = codeseq_start_instruction(codeseq) ;
 	 instr < codeseq_start_instruction(codeseq) + codeseq->xcodeseq_size ;
 	 instr++ ) {
