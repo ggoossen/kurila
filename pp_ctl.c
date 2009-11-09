@@ -2414,11 +2414,15 @@ S_dofindlabel(pTHX_ OP *o, const char *label, OP **opstack, OP **oplimit)
 	Perl_croak(aTHX_ too_deep);
     if (o->op_type == OP_LEAVE ||
 	o->op_type == OP_SCOPE ||
-	o->op_type == OP_LEAVELOOP ||
 	o->op_type == OP_LEAVESUB ||
 	o->op_type == OP_LEAVETRY)
     {
 	*ops++ = cUNOPo->op_first;
+	if (ops >= oplimit)
+	    Perl_croak(aTHX_ too_deep);
+    }
+    else if (o->op_type == OP_ENTERLOOP) {
+	*ops++ = o;
 	if (ops >= oplimit)
 	    Perl_croak(aTHX_ too_deep);
     }
