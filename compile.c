@@ -322,8 +322,11 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		break;
 	    }
 	    case OP_AND:
+	    case OP_ANDASSIGN:
 	    case OP_OR:
+	    case OP_ORASSIGN:
 	    case OP_DOR:
+	    case OP_DORASSIGN:
 	    case OP_ONCE:
 	    {
 		/*
