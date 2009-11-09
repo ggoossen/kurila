@@ -1142,7 +1142,6 @@ PP(pp_flip)
     dSP;
 
     if (GIMME == G_ARRAY) {
-	RUN_SET_NEXT_INSTRUCTION(((LOGOP*)cUNOP->op_first)->op_other_instr);
 	RETURN;
     }
     else {
@@ -1167,17 +1166,18 @@ PP(pp_flip)
 	    if (PL_op->op_flags & OPf_SPECIAL) {
 		sv_setiv(targ, 1);
 		SETs(targ);
+		RUN_SET_NEXT_INSTRUCTION(PL_op->op_unstack_instr);
 		RETURN;
 	    }
 	    else {
 		sv_setiv(targ, 0);
 		SP--;
-		RUN_SET_NEXT_INSTRUCTION(((LOGOP*)cUNOP->op_first)->op_other_instr);
 		RETURN;
 	    }
 	}
 	sv_setpvs(TARG, "");
 	SETs(targ);
+	RUN_SET_NEXT_INSTRUCTION(PL_op->op_unstack_instr);
 	RETURN;
     }
 }

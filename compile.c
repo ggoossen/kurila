@@ -355,6 +355,30 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 		break;
 	    }
+	    case OP_RANGE: {
+		/*
+                      ...
+		      pp_range       label2
+                  label1:
+		      <o->op_start>
+		      flip           label3
+		  label2:
+		      <o->op_other>
+		      flop           label1
+		  label3:
+		      ...
+		*/
+		  
+		S_append_instruction(codeseq, bpp, o, o->op_type);
+		S_add_op(codeseq, bpp, o->op_start);
+		S_append_instruction(codeseq, bpp, cLOGOPo->op_first, OP_FLIP);
+		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
+		S_add_op(codeseq, bpp, cLOGOPo->op_other);
+		S_append_instruction(codeseq, bpp, o, OP_FLOP);
+		S_save_branch_point(bpp, &(cLOGOPo->op_first->op_unstack_instr));
+		
+		break;
+	    }
 	    default:
 		S_append_instruction(codeseq, bpp, o, o->op_type);
 

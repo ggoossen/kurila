@@ -820,9 +820,10 @@ Perl_op_refcnt_unlock(pTHX)
 static OP *
     S_sequence_op(pTHX_ OP* o)
 {
+    OP* retop;
     if (!o)
 	return NULL;
-    OP* retop = LINKLIST(o);
+    retop = LINKLIST(o);
     o->op_next = NULL;
     CALL_PEEP(retop);
     return retop;
@@ -4805,32 +4806,23 @@ Perl_newRANGE(pTHX_ I32 flags, OP *left, OP *right)
     dVAR;
     LOGOP *range;
     OP *flip;
-    OP *flop;
-    OP *leftstart;
-    OP *o;
 
     PERL_ARGS_ASSERT_NEWRANGE;
 
     NewOp(1101, range, 1, LOGOP);
 
+    flip = newUNOP(OP_FLIP, flags, left);
+
     range->op_type = OP_RANGE;
-    range->op_first = left;
+    range->op_first = flip;
     range->op_flags = OPf_KIDS;
-    leftstart = LINKLIST(left);
-    range->op_other = LINKLIST(right);
+    range->op_start = S_sequence_op(left);
+    range->op_other = S_sequence_op(right);
     range->op_private = (U8)(1 | (flags >> 8));
 
     left->op_sibling = right;
 
     range->op_next = (OP*)range;
-    flip = newUNOP(OP_FLIP, flags, (OP*)range);
-    flop = newUNOP(OP_FLOP, 0, flip);
-    o = newUNOP(OP_NULL, 0, flop);
-    linklist(flop);
-    range->op_next = leftstart;
-
-    left->op_next = flip;
-    right->op_next = flop;
 
     range->op_targ = pad_alloc(OP_RANGE, SVs_PADMY);
     sv_upgrade(PAD_SV(range->op_targ), SVt_PVNV);
@@ -4838,13 +4830,13 @@ Perl_newRANGE(pTHX_ I32 flags, OP *left, OP *right)
     sv_upgrade(PAD_SV(flip->op_targ), SVt_PVNV);
 
     flip->op_private =  left->op_type == OP_CONST ? OPpFLIP_LINENUM : 0;
-    flop->op_private = right->op_type == OP_CONST ? OPpFLIP_LINENUM : 0;
+    range->op_private = range->op_type == OP_CONST ? OPpFLIP_LINENUM : 0;
 
-    flip->op_next = o;
-    if (!flip->op_private || !flop->op_private)
-	linklist(o);		/* blow off optimizer unless constant */
+    /* flip->op_next = o; */
+    /* if (!flip->op_private || !range->op_private) */
+    /* 	linklist(o);		/\* blow off optimizer unless constant *\/ */
 
-    return o;
+    return (OP*)range;
 }
 
 OP *
@@ -4925,8 +4917,6 @@ whileline, OP *expr, OP *block, OP *cont, I32 has_my)
     dVAR;
     OP *redo;
     OP *next = NULL;
-    OP *listop;
-    OP *o;
     U8 loopflags = 0;
 
     PERL_UNUSED_ARG(debuggable);
@@ -4982,8 +4972,8 @@ whileline, OP *expr, OP *block, OP *cont, I32 has_my)
     /* redo = LINKLIST(listop); */
     redo = NULL;
 
-    /* if (expr) { */
-    /* 	PL_parser->copline = (line_t)whileline; */
+    if (expr) {
+    	PL_parser->copline = (line_t)whileline;
     /* 	scalar(listop); */
     /* 	o = new_logop(OP_AND, 0, &expr, &listop); */
     /* 	if (o == expr && o->op_type == OP_CONST && !SvTRUE(cSVOPo->op_sv)) { */
@@ -4997,6 +4987,7 @@ whileline, OP *expr, OP *block, OP *cont, I32 has_my)
     /* } */
     /* else */
     /* 	o = listop; */
+    }
 
     if (!expr)
 	expr = newOP(OP_NOTHING, 0);
@@ -5025,7 +5016,7 @@ whileline, OP *expr, OP *block, OP *cont, I32 has_my)
 
     loop->op_flags |= flags;
     loop->op_private |= (flags >> 8);
-    return loop;
+    return (OP*)loop;
 }
 
 OP *
@@ -5033,7 +5024,6 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
 {
     dVAR;
     LOOP *loop;
-    OP *wop;
     PADOFFSET padoff = 0;
     I32 iterflags = 0;
     I32 iterpflags = 0;
@@ -5092,17 +5082,15 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
 	expr = mod(force_list(scalar(ref(expr, OP_ITER))), OP_GREPSTART);
 	iterflags |= OPf_STACKED;
     }
-    else if (expr->op_type == OP_NULL &&
-             (expr->op_flags & OPf_KIDS) &&
-             ((BINOP*)expr)->op_first->op_type == OP_FLOP)
+    else if (expr->op_type == OP_RANGE)
     {
 	/* Basically turn for($x..$y) into the same as for($x,$y), but we
 	 * set the STACKED flag to indicate that these values are to be
 	 * treated as min/max values by 'pp_iterinit'.
 	 */
-	const UNOP* const flip = (UNOP*)((UNOP*)((BINOP*)expr)->op_first)->op_first;
-	LOGOP* const range = (LOGOP*) flip->op_first;
-	OP* const left  = range->op_first;
+	LOGOP* const range = (LOGOP*)expr;
+	const UNOP* const flip = range->op_first;
+	OP* const left  = flip->op_first;
 	OP* const right = left->op_sibling;
 	LISTOP* listop;
 
@@ -5110,7 +5098,7 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
 	range->op_first = NULL;
 
 	listop = (LISTOP*)newLISTOP(OP_LIST, 0, left, right);
-	listop->op_first->op_next = range->op_next;
+	listop->op_first->op_next = range->op_start;
 	left->op_next = range->op_other;
 	right->op_next = (OP*)listop;
 	listop->op_next = listop->op_first;
@@ -5151,11 +5139,11 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
      * for our $x () sets OPpOUR_INTRO */
     loop->op_private = (U8)iterpflags;
     loop->op_targ = padoff;
-    append_elem(OP_FOREACH, loop, cont);
+    append_elem(OP_FOREACH, (OP*)loop, cont);
     if (madsv)
 	op_getmad(madsv, (OP*)loop, 'v');
     PL_parser->copline = forline;
-    return newSTATEOP(0, label, loop);
+    return newSTATEOP(0, label, (OP*)loop);
 }
 
 OP*
@@ -6608,7 +6596,7 @@ Perl_ck_eval(pTHX_ OP *o)
 	    o->op_private = 0;
 	    o->op_flags |= OPf_KIDS;
 
-	    cLOGOPo->op_first = kid;
+	    cLOGOPo->op_first = (OP*)kid;
 
 	    /* establish postfix order */
 	    o->op_start = S_sequence_op((OP*)kid);

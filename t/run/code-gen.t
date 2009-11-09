@@ -18,6 +18,7 @@ sub test_prog {
     my $prog_output = runperl( prog => $prog, switches => ['-DGq'], stderr => 1);
     my @result = split m/\n/, $prog_output;
     if ($result[0] !~ m/Instructions of codeseq/) {
+        diag("PROG:\n$prog\n");
         return ok(0, "Unpected output header: $result[0]");
     }
     shift @result;
@@ -143,6 +144,7 @@ for (1..4) {
     pushmark
     const
     const
+    null
     gv
     list
     enteriter
@@ -250,4 +252,16 @@ label1:
     rv2av
     or label1
     leave
+    leave
+####
+$a..$b
+----
+    enter
+    nextstate  
+    range      label1  
+    gvsv
+    flip
+label1:
+    gvsv
+    flop
     leave
