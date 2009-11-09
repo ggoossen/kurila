@@ -4909,6 +4909,9 @@ Perl_newLOOPOP(pTHX_ I32 flags, I32 debuggable, OP *expr, OP *block)
     if (o == listop)
 	o = newUNOP(OP_NULL, 0, o);	/* or do {} while 1 loses outer block */
 
+    if (once)
+	o->op_private |= OPpWHILE_AND_ONCE;
+
     o->op_flags |= flags;
     o = scope(o);
     o->op_flags |= OPf_SPECIAL;	/* suppress POPBLOCK curpm restoration*/

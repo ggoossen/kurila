@@ -218,13 +218,32 @@ shift @ARGV while @ARGV
     enter
     nextstate
     enter
-label1:
+    instr_jump label1
+label2:
     gv
     rv2av
     pop
+label1:
+    gv
+    rv2av
+    or label2
+    leave
+    leave
+####
+do { shift @ARGV } while @ARGV
+----
+    enter
+    nextstate
+    enter
+label1:
+    null
+    gv
+    rv2av
+    pop
+    null
+    null
     gv
     rv2av
     or label1
     leave
     leave
-

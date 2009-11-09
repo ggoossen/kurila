@@ -282,6 +282,9 @@ Deprecated.  Use C<GIMME_V> instead.
 /* Private for OP_ENTEREVAL */
 #define OPpEVAL_HAS_HH		2	/* Does it have a copy of %^H */
     
+/* Private for OP_WHILE_AND */
+#define OPpWHILE_AND_ONCE		2	/* Loop is executed at least once */
+
 struct op {
     BASEOP
 };

@@ -280,20 +280,40 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		break;
 	    }
 	    case OP_WHILE_AND: {
-		/*
-                      ...
-		  label1:
-		      <cLOGOPo->op_other>
-		      <cLOGOPo->op_start>
-		      and                   label1
-		      ...
-		*/
-		int start_idx;
-		start_idx = bpp->idx;
-		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
-		S_add_op(codeseq, bpp, cLOGOPo->op_other);
-		S_add_op(codeseq, bpp, cLOGOPo->op_start);
-		S_append_instruction(codeseq, bpp, o, OP_OR);
+		if (o->op_private & OPpWHILE_AND_ONCE) {
+		    /*
+                          ...
+		      label1:
+		          <cLOGOPo->op_other>
+		          <cLOGOPo->op_start>
+		          or                   label1
+		          ...
+		    */
+		    S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
+		    S_add_op(codeseq, bpp, cLOGOPo->op_other);
+		    S_add_op(codeseq, bpp, cLOGOPo->op_start);
+		    S_append_instruction(codeseq, bpp, o, OP_OR);
+		}
+		else {
+		    /*
+                          ...
+			  instr_jump           label2
+		      label1:
+		          <cLOGOPo->op_other>
+	              label2:
+		          <cLOGOPo->op_start>
+		          or                   label1
+		          ...
+		    */
+		    int start_idx;
+		    start_idx = bpp->idx;
+		    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
+		    S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
+		    S_add_op(codeseq, bpp, cLOGOPo->op_other);
+		    codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
+		    S_add_op(codeseq, bpp, cLOGOPo->op_start);
+		    S_append_instruction(codeseq, bpp, o, OP_OR);
+		}
 
 		break;
 	    }
