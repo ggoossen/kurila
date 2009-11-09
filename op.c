@@ -6591,28 +6591,27 @@ Perl_ck_eval(pTHX_ OP *o)
 	    op_null(o);
 	}
 	else if (kid->op_type == OP_LINESEQ || kid->op_type == OP_STUB) {
-	    LOGOP *enter;
 #ifdef PERL_MAD
-	    OP* const oldo = o;
+            OP* const oldo = o;
 #endif
 
 	    cUNOPo->op_first = 0;
 #ifndef PERL_MAD
-	    op_free(o);
+            op_free(o);
 #endif
 
-	    NewOp(1101, enter, 1, LOGOP);
-	    enter->op_type = OP_ENTERTRY;
-	    enter->op_private = 0;
+	    NewOp(1101, o, 1, LOGOP);
+	    o->op_type = OP_ENTERTRY;
+	    o->op_private = 0;
+	    o->op_flags |= OPf_KIDS;
+
+	    cLOGOPo->op_first = kid;
 
 	    /* establish postfix order */
-	    enter->op_next = (OP*)enter;
+	    o->op_start = S_sequence_op((OP*)kid);
 
-	    CHECKOP(OP_ENTERTRY, enter);
-
-	    o = prepend_elem(OP_LINESEQ, (OP*)enter, (OP*)kid);
-	    o->op_type = OP_LEAVETRY;
-	    enter->op_other = o;
+	    o->op_next = o;
+	    cLOGOPo->op_other = o;
 	    op_getmad(oldo,o,'O');
 	    return o;
 	}

@@ -1245,8 +1245,9 @@ Perl_codeseq_dump(pTHX_ const CODESEQ *codeseq)
 	    const INSTRUCTION* target = instr + ((int)instr->instr_arg1) + 1;
 	    S_add_label(jump_points, target, &jump_point_idx);
 	}
-	else if (instr->instr_ppaddr == Perl_pp_cond_expr
-	    || instr->instr_ppaddr == Perl_pp_or
+	else if (instr->instr_ppaddr == PL_ppaddr[OP_COND_EXPR]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_OR]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_ENTERTRY]
 	    ) {
 	    S_add_label(jump_points, cLOGOPx(instr->instr_op)->op_other_instr, &jump_point_idx);
 	}
@@ -1267,8 +1268,9 @@ Perl_codeseq_dump(pTHX_ const CODESEQ *codeseq)
 	    const INSTRUCTION* target = instr + ((int)instr->instr_arg1) + 1;
 	    PerlIO_printf(Perl_debug_log, "label%"UVuf"\t", S_instr_label(jump_points, target));
 	}
-	else if (instr->instr_ppaddr == Perl_pp_cond_expr
-	    || instr->instr_ppaddr == Perl_pp_or
+	else if (instr->instr_ppaddr == PL_ppaddr[OP_COND_EXPR]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_OR]
+	    || instr->instr_ppaddr == PL_ppaddr[OP_ENTERTRY]
 	    ) {
 	    PerlIO_printf(Perl_debug_log, "label%"UVuf"\t", 
 		S_instr_label(jump_points, cLOGOPx(instr->instr_op)->op_other_instr));

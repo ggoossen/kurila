@@ -186,4 +186,15 @@ $ARGV[0] or $ARGV[1]
     aelemfast
 label1:
     leave
-
+####
+eval { $ARGV[0] }
+----
+    enter
+    nextstate
+    entertry    label1
+    nextstate
+    aelemfast
+    null
+    leavetry
+label1:
+    leave
