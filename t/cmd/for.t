@@ -165,6 +165,7 @@ for (reverse 1 .. 3) {
     $r .= $_;
 }
 is ($r, '321', 'Reverse for list via ..');
+__END__
 $r = '';
 for (reverse 'A' .. 'C') {
     $r .= $_;

@@ -254,8 +254,10 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		      iter
 		      and               label2
 		      <cLOOPo->op_redoop>
+		      unstack
 		      instr_jump        label1
 		  label2:
+		      leaveloop
 		      ...
 		*/
 		int start_idx;
@@ -271,11 +273,13 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_cond_jump, NULL);
 
 		S_add_op(codeseq, bpp, cLOOPo->op_redoop);
+		S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_UNSTACK], NULL);
 
 		/* loop */
 		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, (void*)(start_idx - bpp->idx - 1));
 
 		codeseq->xcodeseq_instructions[cond_jump_idx].instr_arg1 = (void*)(bpp->idx - cond_jump_idx - 1);
+		S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_LEAVELOOP], NULL);
 		
 		break;
 	    }

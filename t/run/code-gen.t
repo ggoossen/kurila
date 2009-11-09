@@ -109,8 +109,10 @@ label2:
     gvsv
     print
     null
+    unstack
     instr_jump   label2
 label1:
+    leaveloop
     leave
 ####
 {
@@ -155,8 +157,10 @@ label2:
     aelem
     print
     null
+    unstack
     instr_jump label2
 label1:
+    leaveloop
     leave
 ####
 $ARGV[0] ? $ARGV[1] : $ARGV[2]
