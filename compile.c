@@ -200,7 +200,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 	    case OP_ENTERLOOP: {
 		/*
 		      ...
-		      enterloop
+		      enterloop         label3
 		  label1:
 		      <o->op_start>
 		      instr_cond_jump   label2
@@ -209,6 +209,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		      instr_jump        label1
 		  label2:
 		      leaveloop
+		  label3:
 		      ...
 		*/
 		int start_idx;
@@ -234,6 +235,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		
 		S_append_instruction(codeseq, bpp, o, OP_LEAVELOOP);
 
+		S_save_branch_point(bpp, &(cLOOPo->op_last_instr));
 		break;
 	    }
 	    case OP_FOREACH: {
