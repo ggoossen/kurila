@@ -283,23 +283,18 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		/*
                       ...
 		  label1:
-		      <cLOGOPo->op_start>
-		      and                   label2
 		      <cLOGOPo->op_other>
-		      unstack
-		      instr_jump            label1
-                  label2:
+		      <cLOGOPo->op_start>
+		      and                   label1
 		      ...
 		*/
 		int start_idx;
 		start_idx = bpp->idx;
-		S_add_op(codeseq, bpp, cLOGOPo->op_start);
-		S_append_instruction(codeseq, bpp, o, OP_AND);
-		S_add_op(codeseq, bpp, cLOGOPo->op_other);
-		S_append_instruction_x(codeseq, bpp, NULL, pp_unstack, NULL);
-		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, (void*)(start_idx - bpp->idx - 1));
-
 		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
+		S_add_op(codeseq, bpp, cLOGOPo->op_other);
+		S_add_op(codeseq, bpp, cLOGOPo->op_start);
+		S_append_instruction(codeseq, bpp, o, OP_OR);
+
 		break;
 	    }
 	    case OP_AND:

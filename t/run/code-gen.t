@@ -203,12 +203,28 @@ label1:
 { last }
 ----
     enter
-    nextstate  
+    nextstate
     enterloop  redo=label1     next=label2     last=label3
 label1:
-    nextstate  
+    nextstate
     last
 label2:
-    leaveloop  
+    leaveloop
 label3:
     leave
+####
+shift @ARGV while @ARGV
+----
+    enter
+    nextstate
+    enter
+label1:
+    gv
+    rv2av
+    pop
+    gv
+    rv2av
+    or label1
+    leave
+    leave
+
