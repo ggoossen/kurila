@@ -60,7 +60,7 @@ my %alias;
 # Format is "this function" => "does these op names"
 my @raw_alias = (
 		 Perl_do_kv => [qw( keys values )],
-		 Perl_unimplemented_op => [qw(padany custom foreach)],
+		 Perl_unimplemented_op => [qw(padany custom foreach nothing)],
 		 # All the ops with a body of { return NORMAL; }
 		 Perl_pp_null => [qw(scalar regcmaybe lineseq scope)],
 
@@ -622,6 +622,7 @@ __END__
 null		null operation		ck_null		0	
 stub		stub			ck_null		0
 scalar		scalar			ck_fun		s%	S
+nothing		nothing			ck_null		0
 
 # Pushy stuff.
 

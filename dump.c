@@ -1208,6 +1208,8 @@ S_instr_label(pTHX_ HV* labels, const INSTRUCTION* instr) {
     STRLEN  len;
     SV* instr_sv = newSVuv(PTR2UV(instr));
     SV** label;
+    if (!instr)
+	return 666;
     key = SvPV_const(instr_sv, len);
     label = hv_fetch(labels, key, len, 0);
     SvREFCNT_dec(instr_sv);
@@ -1219,6 +1221,9 @@ S_add_label(pTHX_ HV* labels, const INSTRUCTION* instr, UV* index) {
     STRLEN len;
     SV * const instrsv = sv_2mortal(newSVuv(PTR2UV(instr)));
     const char * const key = SvPV_const(instrsv, len);
+
+    if (!instr)
+	return;
 
     if (hv_exists(labels, key, len))
 	return;
@@ -1251,6 +1256,11 @@ Perl_codeseq_dump(pTHX_ const CODESEQ *codeseq)
 	    ) {
 	    S_add_label(jump_points, cLOGOPx(instr->instr_op)->op_other_instr, &jump_point_idx);
 	}
+	else if (instr->instr_ppaddr == PL_ppaddr[OP_ENTERLOOP]) {
+	    S_add_label(jump_points, cLOOPx(instr->instr_op)->op_redo_instr, &jump_point_idx);
+	    S_add_label(jump_points, cLOOPx(instr->instr_op)->op_next_instr, &jump_point_idx);
+	    S_add_label(jump_points, cLOOPx(instr->instr_op)->op_last_instr, &jump_point_idx);
+	}
     }
 
     PerlIO_printf(Perl_debug_log, "Instructions of codeseq (0x%"UVxf"):\n", PTR2UV(codeseq));
@@ -1274,6 +1284,14 @@ Perl_codeseq_dump(pTHX_ const CODESEQ *codeseq)
 	    ) {
 	    PerlIO_printf(Perl_debug_log, "label%"UVuf"\t", 
 		S_instr_label(jump_points, cLOGOPx(instr->instr_op)->op_other_instr));
+	}
+	else if (instr->instr_ppaddr == PL_ppaddr[OP_ENTERLOOP]) {
+	    PerlIO_printf(Perl_debug_log, "redo=label%"UVuf"\t", 
+		S_instr_label(jump_points, cLOOPx(instr->instr_op)->op_redo_instr));
+	    PerlIO_printf(Perl_debug_log, "next=label%"UVuf"\t", 
+		S_instr_label(jump_points, cLOOPx(instr->instr_op)->op_next_instr));
+	    PerlIO_printf(Perl_debug_log, "last=label%"UVuf"\t", 
+		S_instr_label(jump_points, cLOOPx(instr->instr_op)->op_last_instr));
 	}
 
 	PerlIO_printf(Perl_debug_log, "\n");

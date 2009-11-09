@@ -36,6 +36,7 @@ EXTCONST char* const PL_op_name[] = {
 	"null",
 	"stub",
 	"scalar",
+	"nothing",
 	"pushmark",
 	"wantarray",
 	"const",
@@ -413,6 +414,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"null operation",
 	"stub",
 	"scalar",
+	"nothing",
 	"pushmark",
 	"wantarray",
 	"constant item",
@@ -804,6 +806,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_null),
 	MEMBER_TO_FPTR(Perl_pp_stub),
 	MEMBER_TO_FPTR(Perl_pp_null),	/* Perl_pp_scalar */
+	MEMBER_TO_FPTR(Perl_unimplemented_op),	/* Perl_pp_nothing */
 	MEMBER_TO_FPTR(Perl_pp_pushmark),
 	MEMBER_TO_FPTR(Perl_pp_wantarray),
 	MEMBER_TO_FPTR(Perl_pp_const),
@@ -1192,6 +1195,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* null */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* stub */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* scalar */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* nothing */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* pushmark */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* wantarray */
 	MEMBER_TO_FPTR(Perl_ck_svconst),	/* const */
@@ -1574,6 +1578,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000000,	/* null */
 	0x00000000,	/* stub */
 	0x00003604,	/* scalar */
+	0x00000000,	/* nothing */
 	0x00000004,	/* pushmark */
 	0x00000014,	/* wantarray */
 	0x00000c04,	/* const */

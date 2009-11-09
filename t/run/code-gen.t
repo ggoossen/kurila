@@ -70,19 +70,22 @@ while ($ARGV[0]) {
 ----
     enter
     nextstate
-    enterloop
-label2:
+    enterloop    redo=label1  next=label2  last=label3
+label5:
     aelemfast
-    instr_cond_jump label1
+    instr_cond_jump label4
+label1:
     nextstate
     pushmark
     aelemfast
     print
     null
+label2:
     unstack
-    instr_jump label2
-label1:
+    instr_jump label5
+label4:
     leaveloop
+label3:
     leave
 ####
 for (@ARGV) {
@@ -116,18 +119,16 @@ label1:
 ----
     enter
     nextstate
-    enterloop
-label2:
-    null
-    instr_cond_jump    label1
+    enterloop      redo=label1  next=label2 last=label3
+label1:
     nextstate
     pushmark
     aelemfast
     print
     null
-    instr_jump label2
-label1:
+label2:
    leaveloop
+label3:
    leave
 ####
 for (1..4) {
@@ -197,4 +198,17 @@ eval { $ARGV[0] }
     null
     leavetry
 label1:
+    leave
+####
+{ last }
+----
+    enter
+    nextstate  
+    enterloop  redo=label1     next=label2     last=label3
+label1:
+    nextstate  
+    last
+label2:
+    leaveloop  
+label3:
     leave

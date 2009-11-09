@@ -109,6 +109,7 @@ $i = 9;
 print "ok $i\n";
 
 # Check curpm is reset when jumping out of a scope
+__END__
 'abc' =~ /b/;
 WHILE:
 while (1) {

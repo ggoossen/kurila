@@ -4996,7 +4996,7 @@ whileline, OP *expr, OP *block, OP *cont, I32 has_my)
     /* 	o = listop; */
 
     if (!expr)
-	expr = newOP(OP_NULL, 0);
+	expr = newOP(OP_NOTHING, 0);
 
     if (!loop) {
 	NewOp(1101,loop,1,LOOP);

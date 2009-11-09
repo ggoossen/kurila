@@ -200,11 +200,13 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 	    case OP_ENTERLOOP: {
 		/*
 		      ...
-		      enterloop         label3
+		      enterloop         last=label3 redo=label4 next=label5
 		  label1:
 		      <o->op_start>
 		      instr_cond_jump   label2
+		  label4:
 		      <o->redoop>
+		  label5:
 		      <o->nextop>
 		      instr_jump        label1
 		  label2:
@@ -214,24 +216,29 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		*/
 		int start_idx;
 		int cond_jump_idx;
+		bool has_condition = o->op_start->op_type != OP_NOTHING;
 		S_append_instruction(codeseq, bpp, o, o->op_type);
 
 		/* evaluate condition */
 		start_idx = bpp->idx;
-		S_add_op(codeseq, bpp, o->op_start);
+		if (has_condition) {
+		    S_add_op(codeseq, bpp, o->op_start);
+		    cond_jump_idx = bpp->idx;
+		    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_cond_jump, NULL);
+		}
 
-		/* conditional jump to the end */ 
-		cond_jump_idx = bpp->idx;
-		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_cond_jump, NULL);
-
+		S_save_branch_point(bpp, &(cLOOPo->op_redo_instr));
 		S_add_op(codeseq, bpp, cLOOPo->op_redoop);
 
+		S_save_branch_point(bpp, &(cLOOPo->op_next_instr));
 		S_add_op(codeseq, bpp, cLOOPo->op_nextop);
 
 		/* loop */
-		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, (void*)(start_idx - bpp->idx - 1));
+		if (has_condition) {
+		    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, (void*)(start_idx - bpp->idx - 1));
 
-		codeseq->xcodeseq_instructions[cond_jump_idx].instr_arg1 = (void*)(bpp->idx - cond_jump_idx - 1);
+		    codeseq->xcodeseq_instructions[cond_jump_idx].instr_arg1 = (void*)(bpp->idx - cond_jump_idx - 1);
+		}
 		
 		S_append_instruction(codeseq, bpp, o, OP_LEAVELOOP);
 
