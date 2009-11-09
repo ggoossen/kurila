@@ -4583,6 +4583,7 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
     OP *first;
     OP *other;
     OP *cstop = NULL;
+    OP *o;
     int prepend_not = 0;
 
     PERL_ARGS_ASSERT_NEW_LOGOP;
@@ -4731,10 +4732,12 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
 
     CHECKOP(type,logop);
 
-    assert(!prepend_not);
     other->op_next = NULL;
 
-    return (OP*)logop;
+    o = (OP*)logop;
+    if (prepend_not)
+	o = newUNOP(OP_NOT, 0, o);
+    return o;
 }
 
 OP *

@@ -323,7 +323,9 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 	    }
 	    case OP_AND:
 	    case OP_OR:
-	    case OP_DOR: {
+	    case OP_DOR:
+	    case OP_ONCE:
+	    {
 		/*
                       ...
 		      <o->op_start>
