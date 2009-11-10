@@ -102,7 +102,7 @@ for (@ARGV) {
     gv
     list
     enteriter        redo=label1 next=label2 last=label3
-label2:
+label5:
     iter
     instr_cond_jump      label4
 label1:
@@ -112,7 +112,8 @@ label1:
     print
     null
     unstack
-    instr_jump   label2
+label2:
+    instr_jump   label5
 label4:
     leaveloop
 label3:
@@ -150,7 +151,7 @@ for (1..4) {
     gv
     list
     enteriter        redo=label1 next=label2 last=label3
-label2:
+label5:
     iter
     instr_cond_jump    label4
 label1:
@@ -163,7 +164,8 @@ label1:
     print
     null
     unstack
-    instr_jump label2
+label2:
+    instr_jump label5
 label4:
     leaveloop
 label3:
@@ -268,4 +270,31 @@ $a..$b
 label1:
     gvsv
     flop
+    leave
+####
+for (@ARGV) { } continue { $ARGV[0] }
+----
+    enter
+    nextstate
+    pushmark
+    pushmark
+    gv
+    rv2av
+    gv
+    list
+    enteriter  redo=label1     next=label2     last=label3
+label5:
+    iter
+    instr_cond_jump    label4
+label1:
+    stub
+    unstack
+label2:
+    null
+    aelemfast
+    null
+    instr_jump label5
+label4:
+    leaveloop
+label3:
     leave
