@@ -267,7 +267,26 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		int start_idx;
 		int cond_jump_idx;
 
-		S_add_op(codeseq, bpp, o->op_start);
+		{
+		    OP* expr = cLOOPo->op_first;
+		    OP* sv = expr->op_sibling;
+		    if (expr->op_type == OP_RANGE) {
+			/* Basically turn for($x..$y) into the same as for($x,$y), but we
+			 * set the STACKED flag to indicate that these values are to be
+			 * treated as min/max values by 'pp_iterinit'.
+			 */
+			LOGOP* const range = (LOGOP*)expr;
+			S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
+			S_add_op(codeseq, bpp, range->op_start);
+			S_add_op(codeseq, bpp, range->op_other);
+			o->op_flags |= OPf_STACKED; /* FIXME manipulation of the optree */
+		    }
+		    else {
+			S_add_op(codeseq, bpp, sequence_op(expr));
+		    }
+		    if (sv->op_type != OP_NOTHING)
+			S_add_op(codeseq, bpp, sequence_op(sv));
+		}
 		S_append_instruction(codeseq, bpp, o, OP_ENTERITER);
 
 		start_idx = bpp->idx;
@@ -449,6 +468,10 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		    S_append_instruction_x(codeseq, bpp, NULL, NULL, NULL);
 		}
 		codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
+		break;
+	    }
+	    case OP_NULL:
+	    {
 		break;
 	    }
 	    default:

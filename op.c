@@ -817,8 +817,8 @@ Perl_op_refcnt_unlock(pTHX)
 
 #define LINKLIST(o) ((o)->op_next ? (o)->op_next : linklist((OP*)o))
 
-static OP *
-    S_sequence_op(pTHX_ OP* o)
+OP *
+Perl_sequence_op(pTHX_ OP* o)
 {
     OP* retop;
     if (!o)
@@ -2363,7 +2363,7 @@ Perl_newPROG(pTHX_ OP *o)
 	}
 	PL_main_root = scope(sawparens(scalarvoid(o)));
 	PL_curcop = &PL_compiling;
-	PL_main_start = S_sequence_op(PL_main_root);
+	PL_main_start = sequence_op(PL_main_root);
 	PL_main_root->op_private |= OPpREFCOUNTED;
 	OpREFCNT_set(PL_main_root, 1);
 	CALL_PEEP(PL_main_start);
@@ -4819,8 +4819,8 @@ Perl_newRANGE(pTHX_ I32 flags, OP *left, OP *right)
     range->op_type = OP_RANGE;
     range->op_first = flip;
     range->op_flags = OPf_KIDS | flags;
-    range->op_start = S_sequence_op(left);
-    range->op_other = S_sequence_op(right);
+    range->op_start = sequence_op(left);
+    range->op_other = sequence_op(right);
     range->op_private = (U8)(1 | (flags >> 8));
 
     left->op_sibling = right;
@@ -5011,9 +5011,9 @@ whileline, OP *expr, OP *block, OP *cont, I32 has_my)
     append_elem(OP_ENTERLOOP, (OP*)loop, block);
     append_elem(OP_ENTERLOOP, (OP*)loop, cont);
 
-    loop->op_redoop = S_sequence_op(block);
-    loop->op_nextop = S_sequence_op(cont);
-    loop->op_start = S_sequence_op(expr);
+    loop->op_redoop = sequence_op(block);
+    loop->op_nextop = sequence_op(cont);
+    loop->op_start = sequence_op(expr);
 
     loop->op_private |= loopflags;
 
@@ -5089,39 +5089,16 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
     }
     else if (expr->op_type == OP_RANGE)
     {
-	/* Basically turn for($x..$y) into the same as for($x,$y), but we
-	 * set the STACKED flag to indicate that these values are to be
-	 * treated as min/max values by 'pp_iterinit'.
-	 */
-	LOGOP* const range = (LOGOP*)expr;
-	const UNOP* const flip = (const UNOP*)range->op_first;
-	OP* const left  = flip->op_first;
-	OP* const right = left->op_sibling;
-	LISTOP* listop;
-
-	range->op_flags &= ~OPf_KIDS;
-	range->op_first = NULL;
-
-	listop = (LISTOP*)newLISTOP(OP_LIST, 0, left, right);
-	listop->op_first->op_next = range->op_start;
-	left->op_next = range->op_other;
-	right->op_next = (OP*)listop;
-	listop->op_next = listop->op_first;
-
-#ifdef PERL_MAD
-	op_getmad(expr,(OP*)listop,'O');
-#else
-	op_free(expr);
-#endif
-	expr = (OP*)(listop);
-        op_null(expr);
-	iterflags |= OPf_STACKED;
+	/* iterflags |= OPf_STACKED; */
     }
     else {
         expr = mod(force_list(expr), OP_GREPSTART);
     }
 
-    expr = list(append_elem(OP_LIST, expr, scalar(sv)));
+    expr = list(expr);
+    if (! sv)
+	sv = newUNOP(OP_NOTHING, 0, NULL);
+    sv = scalar(sv);
 
     NewOp(1101,loop,1,LOOP);
     loop->op_type = OP_FOREACH;
@@ -5132,12 +5109,12 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
     loop->op_first = expr;
     loop->op_last = expr;
 
+    append_elem(OP_FOREACH, (OP*)loop, sv);
     append_elem(OP_FOREACH, (OP*)loop, block);
     append_elem(OP_FOREACH, (OP*)loop, cont);
 
-    loop->op_redoop = S_sequence_op(block);
-    loop->op_nextop = S_sequence_op(cont);
-    loop->op_start = S_sequence_op(expr);
+    loop->op_redoop = sequence_op(block);
+    loop->op_nextop = sequence_op(cont);
 
     /* prepend_elem(OP_FOREACH, loop, scalar(sv)); */
     /* for my  $x () sets OPpLVAL_INTRO;
@@ -6605,7 +6582,7 @@ Perl_ck_eval(pTHX_ OP *o)
 	    cLOGOPo->op_first = (OP*)kid;
 
 	    /* establish postfix order */
-	    o->op_start = S_sequence_op((OP*)kid);
+	    o->op_start = sequence_op((OP*)kid);
 
 	    o->op_next = o;
 	    cLOGOPo->op_other = o;
@@ -8562,7 +8539,7 @@ Perl_peep(pTHX_ register OP *o)
 
 	case OP_PADAV:
 	case OP_GV:
-	    if (o->op_type == OP_PADAV || o->op_next->op_type == OP_RV2AV) {
+	    if (o->op_type == OP_PADAV || (o->op_next && o->op_next->op_type == OP_RV2AV)) {
 		OP* const pop = (o->op_type == OP_PADAV) ?
 			    o->op_next : o->op_next->op_next;
 		IV i;
@@ -8596,7 +8573,7 @@ Perl_peep(pTHX_ register OP *o)
 		break;
 	    }
 
-	    if (o->op_next->op_type == OP_RV2SV) {
+	    if (o->op_next && o->op_next->op_type == OP_RV2SV) {
 		if (!(o->op_next->op_private & OPpDEREF)) {
 		    op_null(o->op_next);
 		    o->op_private |= o->op_next->op_private & (OPpLVAL_INTRO
@@ -8616,7 +8593,7 @@ Perl_peep(pTHX_ register OP *o)
 				SVfARG(sv));
 		}
 	    }
-	    else if (o->op_next->op_type == OP_READLINE
+	    else if (o->op_next && o->op_next->op_type == OP_READLINE
 		    && o->op_next->op_next->op_type == OP_CONCAT
 		    && (o->op_next->op_next->op_flags & OPf_STACKED))
 	    {

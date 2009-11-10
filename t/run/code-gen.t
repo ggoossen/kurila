@@ -96,11 +96,9 @@ for (@ARGV) {
     enter
     nextstate
     pushmark
-    pushmark
     gv
     rv2av
     gv
-    list
     enteriter        redo=label1 next=label2 last=label3
 label5:
     iter
@@ -144,12 +142,9 @@ for (1..4) {
     enter
     nextstate
     pushmark
-    pushmark
     const
     const
-    null
     gv
-    list
     enteriter        redo=label1 next=label2 last=label3
 label5:
     iter
@@ -248,11 +243,9 @@ do { shift @ARGV } while @ARGV
     nextstate
     enter
 label1:
-    null
     gv
     rv2av
     pop
-    null
     null
     gv
     rv2av
@@ -277,11 +270,9 @@ for (@ARGV) { } continue { $ARGV[0] }
     enter
     nextstate
     pushmark
-    pushmark
     gv
     rv2av
     gv
-    list
     enteriter  redo=label1     next=label2     last=label3
 label5:
     iter
@@ -290,7 +281,6 @@ label1:
     stub
     unstack
 label2:
-    null
     aelemfast
     null
     instr_jump label5

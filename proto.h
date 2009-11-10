@@ -1488,6 +1488,7 @@ PERL_CALLCONV void	Perl_op_clear(pTHX_ OP* o)
 
 PERL_CALLCONV void	Perl_op_refcnt_lock(pTHX);
 PERL_CALLCONV void	Perl_op_refcnt_unlock(pTHX);
+PERL_CALLCONV OP*	Perl_sequence_op(pTHX_ OP *o);
 #if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 STATIC OP*	S_linklist(pTHX_ OP *o)
 			__attribute__nonnull__(pTHX_1);
