@@ -4818,7 +4818,7 @@ Perl_newRANGE(pTHX_ I32 flags, OP *left, OP *right)
 
     range->op_type = OP_RANGE;
     range->op_first = flip;
-    range->op_flags = OPf_KIDS;
+    range->op_flags = OPf_KIDS | flags;
     range->op_start = S_sequence_op(left);
     range->op_other = S_sequence_op(right);
     range->op_private = (U8)(1 | (flags >> 8));
@@ -4833,7 +4833,7 @@ Perl_newRANGE(pTHX_ I32 flags, OP *left, OP *right)
     sv_upgrade(PAD_SV(flip->op_targ), SVt_PVNV);
 
     flip->op_private =  left->op_type == OP_CONST ? OPpFLIP_LINENUM : 0;
-    range->op_private = range->op_type == OP_CONST ? OPpFLIP_LINENUM : 0;
+    range->op_private = right->op_type == OP_CONST ? OPpFLIP_LINENUM : 0;
 
     /* flip->op_next = o; */
     /* if (!flip->op_private || !range->op_private) */

@@ -386,7 +386,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		  
 		S_append_instruction(codeseq, bpp, o, o->op_type);
 		S_add_op(codeseq, bpp, o->op_start);
-		S_append_instruction(codeseq, bpp, cLOGOPo->op_first, OP_FLIP);
+		S_append_instruction(codeseq, bpp, cLOGOPo, OP_FLIP);
 		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 		S_add_op(codeseq, bpp, cLOGOPo->op_other);
 		S_append_instruction(codeseq, bpp, o, OP_FLOP);

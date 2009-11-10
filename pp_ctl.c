@@ -1146,10 +1146,10 @@ PP(pp_flip)
     }
     else {
 	dTOPss;
-	SV * const targ = PAD_SV(PL_op->op_targ);
+	SV * const targ = PAD_SV(cLOGOP->op_first->op_targ);
 	int flip = 0;
 
-	if (PL_op->op_private & OPpFLIP_LINENUM) {
+	if (cLOGOP->op_first->op_private & OPpFLIP_LINENUM) {
 	    if (GvIO(PL_last_in_gv)) {
 		flip = SvIV(sv) == (IV)IoLINES(GvIOp(PL_last_in_gv));
 	    }
@@ -1162,11 +1162,11 @@ PP(pp_flip)
 	    flip = SvTRUE(sv);
 	}
 	if (flip) {
-	    sv_setiv(PAD_SV(cUNOP->op_first->op_targ), 1);
+	    sv_setiv(PAD_SV(PL_op->op_targ), 1);
 	    if (PL_op->op_flags & OPf_SPECIAL) {
 		sv_setiv(targ, 1);
 		SETs(targ);
-		RUN_SET_NEXT_INSTRUCTION(PL_op->op_unstack_instr);
+		RUN_SET_NEXT_INSTRUCTION(cLOGOP->op_first->op_unstack_instr);
 		RETURN;
 	    }
 	    else {
@@ -1177,7 +1177,7 @@ PP(pp_flip)
 	}
 	sv_setpvs(TARG, "");
 	SETs(targ);
-	RUN_SET_NEXT_INSTRUCTION(PL_op->op_unstack_instr);
+	RUN_SET_NEXT_INSTRUCTION(cLOGOP->op_first->op_unstack_instr);
 	RETURN;
     }
 }
@@ -1259,7 +1259,7 @@ PP(pp_flop)
 	}
 
 	if (flop) {
-	    sv_setiv(PAD_SV(((UNOP*)cUNOP->op_first)->op_first->op_targ), 0);
+	    sv_setiv(PAD_SV(PL_op->op_targ), 0);
 	    sv_catpvs(targ, "E0");
 	}
 	SETs(targ);
