@@ -5092,7 +5092,7 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
 	 * treated as min/max values by 'pp_iterinit'.
 	 */
 	LOGOP* const range = (LOGOP*)expr;
-	const UNOP* const flip = range->op_first;
+	const UNOP* const flip = (const UNOP*)range->op_first;
 	OP* const left  = flip->op_first;
 	OP* const right = left->op_sibling;
 	LISTOP* listop;
@@ -6588,13 +6588,15 @@ Perl_ck_eval(pTHX_ OP *o)
 #ifdef PERL_MAD
             OP* const oldo = o;
 #endif
+	    LOGOP* logop;
 
 	    cUNOPo->op_first = 0;
 #ifndef PERL_MAD
             op_free(o);
 #endif
 
-	    NewOp(1101, o, 1, LOGOP);
+	    NewOp(1101, logop, 1, LOGOP);
+	    o = (OP*)logop;
 	    o->op_type = OP_ENTERTRY;
 	    o->op_private = 0;
 	    o->op_flags |= OPf_KIDS;
@@ -7780,23 +7782,23 @@ Perl_ck_sort(pTHX_ OP *o)
 		kid->op_next = 0;
 	    }
 	    else if (kid->op_type == OP_LEAVE) {
-		if (o->op_type == OP_SORT) {
-		    op_null(kid);			/* wipe out leave */
-		    kid->op_next = kid;
+		/* if (o->op_type == OP_SORT) { */
+		/*     op_null(kid);			/\* wipe out leave *\/ */
+		/*     kid->op_next = 0; */
 
-		    for (k = kLISTOP->op_first->op_next; k; k = k->op_next) {
-			if (k->op_next == kid)
-			    k->op_next = 0;
-			/* don't descend into loops */
-			else if (k->op_type == OP_ENTERLOOP
-				 || k->op_type == OP_ENTERITER)
-			{
-			    k = cLOOPx(k)->op_lastop;
-			}
-		    }
-		}
-		else
-		    kid->op_next = 0;		/* just disconnect the leave */
+		/*     for (k = kLISTOP->op_first->op_next; k; k = k->op_next) { */
+		/* 	if (k->op_next == kid) */
+		/* 	    k->op_next = 0; */
+		/* 	/\* don't descend into loops *\/ */
+		/* 	else if (k->op_type == OP_ENTERLOOP */
+		/* 		 || k->op_type == OP_ENTERITER) */
+		/* 	{ */
+		/* 	    k = cLOOPx(k)->op_lastop; */
+		/* 	} */
+		/*     } */
+		/* } */
+		/* else */
+		kid->op_next = 0;		/* just disconnect the leave */
 		k = kLISTOP->op_first;
 	    }
 	    CALL_PEEP(k);

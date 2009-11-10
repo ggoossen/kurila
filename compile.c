@@ -424,6 +424,23 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
 		break;
 	    }
+	    case OP_SORT:
+	    {
+		int start_idx;
+		S_append_instruction(codeseq, bpp, o, o->op_type);
+		start_idx = bpp->idx;
+		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
+		if (o->op_flags & OPf_STACKED && o->op_flags & OPf_SPECIAL) {
+		    OP *kid = cLISTOPo->op_first->op_sibling;	/* pass pushmark */
+		    kid = cUNOPx(kid)->op_first;			/* pass null */
+		    kid = cUNOPx(kid)->op_first;			/* pass leave */
+		    S_save_branch_point(bpp, &(o->op_unstack_instr));
+		    S_add_op(codeseq, bpp, kid);
+		    S_append_instruction_x(codeseq, bpp, NULL, NULL, NULL);
+		}
+		codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
+		break;
+	    }
 	    default:
 		S_append_instruction(codeseq, bpp, o, o->op_type);
 
