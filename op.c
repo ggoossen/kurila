@@ -4994,6 +4994,8 @@ whileline, OP *expr, OP *block, OP *cont, I32 has_my)
 
     if (!expr)
 	expr = newOP(OP_NOTHING, 0);
+    else
+	expr = scalar(expr);
 
     if (!loop) {
 	NewOp(1101,loop,1,LOOP);

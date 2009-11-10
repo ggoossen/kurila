@@ -257,8 +257,6 @@ TEST9: {
   $ok = 0;
 }
 cmp_ok($ok,'==',1,'no label on for(@array)');
-die "xx";
-__END__
 
 TEST10: {
 
