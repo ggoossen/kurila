@@ -192,9 +192,9 @@ PP(pp_regcomp)
 		tmpstr = newSVpvn_flags(p, len, SVs_TEMP);
 	    }
 
- 		if (eng) 
+	    if (eng) 
 	        PM_SETRE(pm, CALLREGCOMP_ENG(eng, tmpstr, pm_flags));
-		else
+	    else
 	        PM_SETRE(pm, CALLREGCOMP(tmpstr, pm_flags));
 
 	    PL_reginterp_cnt = 0;	/* XXXX Be extra paranoid - needed
