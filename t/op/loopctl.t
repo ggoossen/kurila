@@ -137,7 +137,6 @@ TEST4: {
   $ok = 1;
 }
 cmp_ok($ok,'==',1,'no label on while() last');
-
 TEST5: {
 
   $ok = 0;
@@ -258,6 +257,8 @@ TEST9: {
   $ok = 0;
 }
 cmp_ok($ok,'==',1,'no label on for(@array)');
+die "xx";
+__END__
 
 TEST10: {
 

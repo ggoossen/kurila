@@ -101,10 +101,11 @@ for (@ARGV) {
     rv2av
     gv
     list
-    enteriter
+    enteriter        redo=label1 next=label2 last=label3
 label2:
     iter
-    instr_cond_jump      label1
+    instr_cond_jump      label4
+label1:
     nextstate
     pushmark
     gvsv
@@ -112,8 +113,9 @@ label2:
     null
     unstack
     instr_jump   label2
-label1:
+label4:
     leaveloop
+label3:
     leave
 ####
 {
@@ -147,10 +149,11 @@ for (1..4) {
     null
     gv
     list
-    enteriter
+    enteriter        redo=label1 next=label2 last=label3
 label2:
     iter
-    instr_cond_jump    label1
+    instr_cond_jump    label4
+label1:
     nextstate
     pushmark
     gv
@@ -161,8 +164,9 @@ label2:
     null
     unstack
     instr_jump label2
-label1:
+label4:
     leaveloop
+label3:
     leave
 ####
 $ARGV[0] ? $ARGV[1] : $ARGV[2]
