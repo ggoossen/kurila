@@ -356,7 +356,6 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 	    case OP_ORASSIGN:
 	    case OP_DOR:
 	    case OP_DORASSIGN:
-	    case OP_ONCE:
 	    {
 		/*
                       ...
@@ -372,6 +371,34 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		S_append_instruction(codeseq, bpp, o, o->op_type);
 		S_add_op(codeseq, bpp, cLOGOPo->op_other);
 		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
+		break;
+	    }
+	    case OP_ONCE:
+	    {
+		/*
+                      ...
+		      o->op_type            label1
+		      <cLOGOPo->op_other>
+		      instr_jump            label2
+		  label1:
+		      <o->op_start>
+                  label2:
+		      ...
+		*/
+		int start_idx;
+		assert((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOGOP);
+
+		S_append_instruction(codeseq, bpp, o, o->op_type);
+
+		S_add_op(codeseq, bpp, cLOGOPo->op_other);
+
+		start_idx = bpp->idx;
+		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
+		    
+		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
+		S_add_op(codeseq, bpp, o->op_start);
+		codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
+
 		break;
 	    }
 	    case OP_ENTERTRY: {
@@ -405,7 +432,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		  
 		S_append_instruction(codeseq, bpp, o, o->op_type);
 		S_add_op(codeseq, bpp, o->op_start);
-		S_append_instruction(codeseq, bpp, cLOGOPo, OP_FLIP);
+		S_append_instruction(codeseq, bpp, o, OP_FLIP);
 		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 		S_add_op(codeseq, bpp, cLOGOPo->op_other);
 		S_append_instruction(codeseq, bpp, o, OP_FLOP);
