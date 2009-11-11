@@ -657,7 +657,6 @@ TODO: {
     print "ok $test # TODO $TODO\n";
 }
 
-__END__
 TODO: {
     $test++;
     no warnings 'reserved';

@@ -5212,26 +5212,26 @@ S_newGIVWHENOP(pTHX_ OP *cond, OP *block,
     o = newUNOP(leave_opcode, 0, (OP *) enterop);
 
     if (cond) {
-	enterop->op_first = scalar(cond);
+	cond = scalar(cond);
+	enterop->op_first = cond;
 	cond->op_sibling = block;
 
 	o->op_next = LINKLIST(cond);
 	cond->op_next = (OP *) enterop;
+	enterop->op_next = o;
     }
     else {
 	/* This is a default {} block */
 	enterop->op_first = block;
 	enterop->op_flags |= OPf_SPECIAL;
 
-	o->op_next = (OP *) enterop;
+	o->op_next = LINKLIST((OP *) enterop);
+	enterop->op_next = o;
     }
 
     CHECKOP(enter_opcode, enterop); /* Currently does nothing, since
     				       entergiven and enterwhen both
     				       use ck_null() */
-
-    enterop->op_next = LINKLIST(block);
-    block->op_next = enterop->op_other = o;
 
     return o;
 }
@@ -5300,7 +5300,7 @@ S_looks_like_bool(pTHX_ const OP *o)
 	case OP_DEFINED: case OP_EXISTS:
 	case OP_MATCH:	 case OP_EOF:
 
-	case OP_FLOP:
+	case OP_RANGE:
 
 	    return TRUE;
 	

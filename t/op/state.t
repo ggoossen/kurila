@@ -29,7 +29,6 @@ is( $x, 0, 'uninitialized state var' );
 is( $y, 1, 'initialized state var' );
 is( $z, 2, 'lexical' );
 is( $t, 3, 'initialized state var, list syntax' );
-__END__
 
 ($x, $y, $z, $t) = stateful();
 is( $x, 1, 'incremented state var' );
