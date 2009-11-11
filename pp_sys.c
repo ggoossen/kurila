@@ -1264,7 +1264,7 @@ S_doform(pTHX_ CV *cv, GV *gv, const INSTRUCTION *ret_instr)
 
     if(!CvCODESEQ(cv)) {
 	CvCODESEQ(cv) = new_codeseq();
-	compile_op(CvSTART(cv), CvCODESEQ(cv));
+	compile_op( CvSTART(cv), CvCODESEQ(cv));
     }
     RUN_SET_NEXT_INSTRUCTION( codeseq_start_instruction(CvCODESEQ(cv)) );
     return;

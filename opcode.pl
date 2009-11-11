@@ -781,7 +781,7 @@ index		index			ck_index	isT@	S S S?
 rindex		rindex			ck_index	isT@	S S S?
 
 sprintf		sprintf			ck_fun		fmst@	S L
-formline	formline		ck_fun		ms@	S L
+formline	formline		ck_formline		ms@	S L
 ord		ord			ck_fun		ifsTu%	S?
 chr		chr			ck_fun		fsTu%	S?
 crypt		crypt			ck_fun		fsT@	S S

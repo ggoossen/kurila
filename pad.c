@@ -1546,6 +1546,11 @@ Perl_cv_clone(pTHX_ CV *proto)
     CvROOT(cv)		= OpREFCNT_inc(CvROOT(proto));
     OP_REFCNT_UNLOCK;
     CvSTART(cv)		= CvSTART(proto);
+    if (!CvCODESEQ(proto)) {
+	CvCODESEQ(proto) = new_codeseq();
+	compile_op(CvSTART(cv), CvCODESEQ(proto));
+    }
+    CvCODESEQ(cv)       = CvCODESEQ(proto);
     CvOUTSIDE(cv)	= MUTABLE_CV(SvREFCNT_inc_simple(outside));
     CvOUTSIDE_SEQ(cv) = CvOUTSIDE_SEQ(proto);
 

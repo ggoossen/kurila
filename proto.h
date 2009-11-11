@@ -4522,6 +4522,12 @@ PERL_CALLCONV OP*	Perl_ck_index(pTHX_ OP *o)
 #define PERL_ARGS_ASSERT_CK_INDEX	\
 	assert(o)
 
+PERL_CALLCONV OP*	Perl_ck_formline(pTHX_ OP *o)
+			__attribute__warn_unused_result__
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_CK_FORMLINE	\
+	assert(o)
+
 PERL_CALLCONV OP*	Perl_ck_join(pTHX_ OP *o)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);

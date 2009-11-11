@@ -846,6 +846,7 @@ S_linklist(pTHX_ OP *o)
     }
     if (first) {
         register OP *kid;
+	assert(o->op_flags & OPf_KIDS);
 	o->op_next = LINKLIST(first);
 	kid = first;
 	for (;;) {
@@ -5392,6 +5393,9 @@ Perl_cv_undef(pTHX_ CV *cv)
 
 	PAD_SAVE_SETNULLPAD();
 
+	/* hack to free codeseq */
+	if (CvROOT(cv)->op_targ == 1)
+	    free_codeseq(CvCODESEQ(cv));
 	op_free(CvROOT(cv));
 	CvROOT(cv) = NULL;
 	CvSTART(cv) = NULL;
@@ -5402,7 +5406,6 @@ Perl_cv_undef(pTHX_ CV *cv)
 
     pad_undef(cv);
 
-    free_codeseq(CvCODESEQ(cv));
     CvCODESEQ(cv) = NULL;
 
     /* remove CvOUTSIDE unless this is an undef rather than a free */
@@ -7239,6 +7242,16 @@ Perl_ck_index(pTHX_ OP *o)
 	if (kid && kid->op_type == OP_CONST)
 	    fbm_compile(((SVOP*)kid)->op_sv, 0);
     }
+    return ck_fun(o);
+}
+
+OP*
+Perl_ck_formline(pTHX_ OP *o)
+{
+    PERL_ARGS_ASSERT_CK_FORMLINE;
+
+    o->op_next = o;
+
     return ck_fun(o);
 }
 

@@ -513,6 +513,22 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
 		break;
 	    }
+	    case OP_FORMLINE:
+	    {
+		/*
+                      ...
+		  label1:
+		      <o->children>
+		      o->op_type          label1
+		      ...
+		*/
+		OP* kid;
+		S_save_branch_point(bpp, &(o->op_unstack_instr));
+		for (kid = cUNOPo->op_first; kid; kid=kid->op_sibling)
+		    S_add_op(codeseq, bpp, sequence_op(kid));
+		S_append_instruction(codeseq, bpp, o, o->op_type);
+		break;
+	    }
 	    case OP_NULL:
 	    {
 		break;
@@ -545,21 +561,6 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		}
 		else if (o->op_type == OP_LAST) {
 		    o = NULL;
-		}
-		/* else if (o->op_type == OP_UNSTACK) { */
-		/*     S_append_branch_point(bpp, o->op_next, */
-		/* 	&(o->op_unstack_instr)); */
-		/*     o = NULL; */
-		/* } */
-		else if (o->op_type == OP_SORT) {
-		    assert(0);
-		    if (o->op_flags & OPf_STACKED && o->op_flags & OPf_SPECIAL) {
-			OP *kid = cLISTOPo->op_first->op_sibling;	/* pass pushmark */
-			kid = cUNOPx(kid)->op_first;			/* pass rv2gv */
-			kid = cUNOPx(kid)->op_first;			/* pass leave */
-			kid = kid->op_next;
-			S_append_branch_point(bpp, kid, &(o->op_unstack_instr));
-		    }
 		}
 		else if (o->op_type == OP_FORMLINE) {
 		    assert(0);

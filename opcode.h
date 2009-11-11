@@ -1310,7 +1310,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_index),	/* index */
 	MEMBER_TO_FPTR(Perl_ck_index),	/* rindex */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* sprintf */
-	MEMBER_TO_FPTR(Perl_ck_fun),	/* formline */
+	MEMBER_TO_FPTR(Perl_ck_formline),	/* formline */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* ord */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* chr */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* crypt */

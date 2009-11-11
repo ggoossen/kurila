@@ -140,36 +140,36 @@ for ('A' .. 'C') {
 }
 is ($r, 'ABC', 'Forwards for list via ..');
 
-# $r = '';
-# for (reverse @array) {
-#     $r .= $_;
-# }
-# is ($r, 'CBA', 'Reverse for array');
-# $r = '';
-# for (reverse 1,2,3) {
-#     $r .= $_;
-# }
-# is ($r, '321', 'Reverse for list');
-# $r = '';
-# for (reverse map {$_} @array) {
-#     $r .= $_;
-# }
-# is ($r, 'CBA', 'Reverse for array via map');
-# $r = '';
-# for (reverse map {$_} 1,2,3) {
-#     $r .= $_;
-# }
-# is ($r, '321', 'Reverse for list via map');
-# $r = '';
-# for (reverse 1 .. 3) {
-#     $r .= $_;
-# }
-# is ($r, '321', 'Reverse for list via ..');
-# $r = '';
-# for (reverse 'A' .. 'C') {
-#     $r .= $_;
-# }
-# is ($r, 'CBA', 'Reverse for list via ..');
+$r = '';
+for (reverse @array) {
+    $r .= $_;
+}
+is ($r, 'CBA', 'Reverse for array');
+$r = '';
+for (reverse 1,2,3) {
+    $r .= $_;
+}
+is ($r, '321', 'Reverse for list');
+$r = '';
+for (reverse map {$_} @array) {
+    $r .= $_;
+}
+is ($r, 'CBA', 'Reverse for array via map');
+$r = '';
+for (reverse map {$_} 1,2,3) {
+    $r .= $_;
+}
+is ($r, '321', 'Reverse for list via map');
+$r = '';
+for (reverse 1 .. 3) {
+    $r .= $_;
+}
+is ($r, '321', 'Reverse for list via ..');
+$r = '';
+for (reverse 'A' .. 'C') {
+    $r .= $_;
+}
+is ($r, 'CBA', 'Reverse for list via ..');
 
 $r = '';
 for my $i (@array) {
