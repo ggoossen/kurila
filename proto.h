@@ -5566,7 +5566,6 @@ STATIC void	S_debprof(pTHX_ const OP *o)
 	assert(o)
 
 STATIC void	S_sequence(pTHX_ const OP *o);
-STATIC void	S_sequence_tail(pTHX_ const OP *o);
 STATIC UV	S_sequence_num(pTHX_ const OP *o);
 STATIC SV*	S_pm_description(pTHX_ const PMOP *pm)
 			__attribute__nonnull__(pTHX_1);

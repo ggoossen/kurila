@@ -657,112 +657,30 @@ Perl_pmop_dump(pTHX_ PMOP *pm)
     do_pmop_dump(0, Perl_debug_log, pm);
 }
 
-/* An op sequencer.  We visit the ops in the order they're to execute. */
+/* An op sequencer.  We visit the ops in the order of the tree. */
 
 STATIC void
 S_sequence(pTHX_ register const OP *o)
 {
     dVAR;
-    const OP *oldop = NULL;
 
     if (!o)
 	return;
 
-#ifdef PERL_MAD
-    if (o->op_next == 0)
- 	return;
-#endif
-
     if (!Sequence)
 	Sequence = newHV();
 
-    for (; o; o = o->op_next) {
+    for (; o; o = o->op_sibling) {
 	STRLEN len;
 	SV * const op = newSVuv(PTR2UV(o));
 	const char * const key = SvPV_const(op, len);
 
-	if (hv_exists(Sequence, key, len))
-	    break;
-
-	(void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
-
-	switch (o->op_type) {
-	case OP_STUB:
-	    if ((o->op_flags & OPf_WANT) != OPf_WANT_LIST) {
-		(void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
-		break;
-	    }
-	    goto nothin;
-	case OP_NULL:
-#ifdef PERL_MAD
-	    if (o == o->op_next)
-		return;
-#endif
-	    if (oldop && o->op_next)
-		continue;
-	    break;
-	case OP_SCALAR:
-	case OP_LINESEQ:
-	case OP_SCOPE:
-	  nothin:
-	    if (oldop && o->op_next)
-		continue;
+	if (! hv_exists(Sequence, key, len))
 	    (void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
-	    break;
 
-	case OP_MAPWHILE:
-	case OP_GREPWHILE:
-	case OP_AND:
-	case OP_OR:
-	case OP_DOR:
-	case OP_ANDASSIGN:
-	case OP_ORASSIGN:
-	case OP_DORASSIGN:
-	case OP_COND_EXPR:
-	case OP_RANGE:
-	    (void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
-	    sequence_tail(cLOGOPo->op_other);
-	    break;
-
-	case OP_ENTERLOOP:
-	case OP_ENTERITER:
-	case OP_FOREACH:
-	    (void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
-	    sequence_tail(cLOOPo->op_redoop);
-	    sequence_tail(cLOOPo->op_nextop);
-	    sequence_tail(cLOOPo->op_lastop);
-	    break;
-
-	case OP_SUBST:
-	    (void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
-	    sequence_tail(cPMOPo->op_pmstashstartu.op_pmreplstart);
-	    break;
-
-	case OP_QR:
-	case OP_MATCH:
-	case OP_HELEM:
-	    break;
-
-	default:
-	    (void)hv_store(Sequence, key, len, newSVuv(++PL_op_seq), 0);
-	    break;
-	}
-
-	if (o->op_start)
-	    sequence(o->op_start);
-	if (o->op_more_op)
-	    sequence(o->op_more_op);
-
-	oldop = o;
+	if (o->op_flags & OPf_KIDS)
+	    sequence(cUNOPo->op_first);
     }
-}
-
-static void
-S_sequence_tail(pTHX_ const OP *o)
-{
-    while (o && (o->op_type == OP_NULL))
-	o = o->op_next;
-    sequence(o);
 }
 
 STATIC UV

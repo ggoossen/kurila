@@ -1728,7 +1728,6 @@ p	|void	|runop_debug
 s	|CV*	|deb_curcv	|const I32 ix
 s	|void	|debprof	|NN const OP *o
 s	|void	|sequence	|NULLOK const OP *o
-s	|void	|sequence_tail	|NULLOK const OP *o
 s	|UV	|sequence_num	|NULLOK const OP *o
 s	|SV*	|pm_description	|NN const PMOP *pm
 #endif

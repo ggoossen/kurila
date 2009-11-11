@@ -1232,7 +1232,7 @@ PROTOTYPE: ;$
 	PUTBACK;
 	ENTER;
 	PL_laststatval = -1;
-	(void)*(PL_ppaddr[OP_STAT])(aTHXR);
+	(void)*(PL_ppaddr[OP_STAT])(aTHXR_ NULL);
 	SPAGAIN;
 	LEAVE;
 	if (PL_laststatval == 0) {

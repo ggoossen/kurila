@@ -1524,7 +1524,6 @@
 #define deb_curcv		S_deb_curcv
 #define debprof			S_debprof
 #define sequence		S_sequence
-#define sequence_tail		S_sequence_tail
 #define sequence_num		S_sequence_num
 #define pm_description		S_pm_description
 #endif
@@ -3955,7 +3954,6 @@
 #define deb_curcv(a)		S_deb_curcv(aTHX_ a)
 #define debprof(a)		S_debprof(aTHX_ a)
 #define sequence(a)		S_sequence(aTHX_ a)
-#define sequence_tail(a)	S_sequence_tail(aTHX_ a)
 #define sequence_num(a)		S_sequence_num(aTHX_ a)
 #define pm_description(a)	S_pm_description(aTHX_ a)
 #endif
