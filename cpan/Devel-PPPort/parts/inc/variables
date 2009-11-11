@@ -363,7 +363,7 @@ PL_ppaddr(string)
 		mXPUSHs(newSVpv(string, 0));
 		PUTBACK;
 		ENTER;
-		(void)*(PL_ppaddr[OP_UC])(aTHXR);
+		(void)*(PL_ppaddr[OP_UC])(aTHXR_ NULL);
 		SPAGAIN;
 		LEAVE;
 		XSRETURN(1);
