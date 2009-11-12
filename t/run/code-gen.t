@@ -109,8 +109,8 @@ label1:
     gvsv
     print
     null
-    unstack
 label2:
+    unstack
     instr_jump   label5
 label4:
     leaveloop
@@ -158,8 +158,8 @@ label1:
     aelem
     print
     null
-    unstack
 label2:
+    unstack
     instr_jump label5
 label4:
     leaveloop
@@ -279,8 +279,8 @@ label5:
     instr_cond_jump    label4
 label1:
     stub
-    unstack
 label2:
+    unstack
     aelemfast
     null
     instr_jump label5

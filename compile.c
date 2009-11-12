@@ -255,8 +255,8 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		      and               label_leave
 		  label_redo:
 		      <cLOOPo->op_redoop>
-		      unstack
 		  label_next:
+		      unstack
 		      <cLOOPo->op_nextop>
 		      instr_jump        label_start
 		  label_leave:
@@ -297,9 +297,9 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 
 		S_save_branch_point(bpp, &(cLOOPo->op_redo_instr));
 		S_add_op(codeseq, bpp, cLOOPo->op_redoop);
-		S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_UNSTACK], NULL);
 
 		S_save_branch_point(bpp, &(cLOOPo->op_next_instr));
+		S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_UNSTACK], NULL);
 		S_add_op(codeseq, bpp, cLOOPo->op_nextop);
 
 		/* loop */
