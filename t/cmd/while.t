@@ -4,7 +4,7 @@ BEGIN {
     require "test.pl";
 }
 
-plan(19);
+plan(21);
 
 my $tmpfile = tempfile();
 open (tmp,'>', $tmpfile) || die "Can't create Cmd_while.tmp.";
@@ -168,4 +168,20 @@ is($` . $& . $', "abc");
         ++$i;
     }
     ok($ok);
+}
+
+{
+    my $context_inner = -1;
+    my $context_last = -1;
+    sub save_context { $_[0] = wantarray }
+    my $p = sub {
+        my $x = 1;
+        while ($x--) {
+            save_context($context_inner);
+            save_context($context_last);
+        }
+    };
+    scalar($p->());
+    is($context_inner, undef);
+    is($context_last, "");
 }
