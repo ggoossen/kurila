@@ -1228,6 +1228,14 @@ Perl_scalarvoid(pTHX_ OP *o)
 	for (kid = cLISTOPo->op_first; kid; kid = kid->op_sibling)
 	    scalarvoid(kid);
 	break;
+    case OP_ENTERLOOP:
+	for (kid = cLISTOPo->op_first->op_sibling; kid; kid = kid->op_sibling)
+	    scalarvoid(kid);
+	break;
+    case OP_FOREACH:
+	for (kid = cLISTOPo->op_first->op_sibling->op_sibling; kid; kid = kid->op_sibling)
+	    scalarvoid(kid);
+	break;
     case OP_ENTEREVAL:
 	scalarkids(o);
 	break;
