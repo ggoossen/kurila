@@ -114,6 +114,20 @@ scope has the given name. Name must be a literal string.
 
 =back
 
+=over
+
+=item ENTER_with_name(name)
+
+Same as C<ENTER>, but when debugging is enable it also associates the
+given literal string with the new scope.
+
+=item LEAVE_with_name(name)
+
+Same as C<LEAVE>, but when debugging is enabled it first checks that the
+scope has the given name. Name must be a literal string.
+
+=back
+
 =cut
 */
 
