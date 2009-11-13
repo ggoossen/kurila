@@ -619,7 +619,7 @@ __END__
 
 # Nothing.
 
-null		null operation		ck_null		0	
+null		null operation		ck_null		%	
 stub		stub			ck_null		0
 scalar		scalar			ck_fun		s%	S
 nothing		nothing			ck_null		0
@@ -676,7 +676,7 @@ trans		transliteration (tr///)	ck_match	is"	S
 # Lvalue operators.
 # sassign is special-cased for op class
 
-sassign		scalar assignment	ck_sassign	s0
+sassign		scalar assignment	ck_sassign	s1
 aassign		list assignment		ck_null		t2	L L
 
 chop		chop			ck_spair	mts%	L

@@ -161,7 +161,7 @@ is(B::cstring("wibble"), '"wibble"', "Testing B::cstring()");
 is(B::perlstring("wibble"), '"wibble"', "Testing B::perlstring()");
 is(B::class(bless {}, "Wibble::Bibble"), "Bibble", "Testing B::class()");
 is(B::cast_I32(3.14), 3, "Testing B::cast_I32()");
-is(B::opnumber("chop"), 38, "Testing opnumber with opname (chop)");
+is(B::opnumber("chop"), 39, "Testing opnumber with opname (chop)");
 
 {
     no warnings 'once';

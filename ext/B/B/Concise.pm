@@ -458,6 +458,8 @@ sub walk_topdown {
     my($op, $sub, $level) = @_;
     $sub->($op, $level);
     if ($op->flags & OPf_KIDS) {
+        use Carp;
+        confess $op->name if not $op->can("first");
 	for (my $kid = $op->first; $$kid; $kid = $kid->sibling) {
 	    walk_topdown($kid, $sub, $level + 1);
 	}
@@ -534,15 +536,15 @@ sub sequence {
 		$other = $other->next while $other->name eq "null";
 		sequence($other);
 	    } elsif (class($op) eq "LOOP") {
-		my $redoop = $op->redoop;
-		$redoop = $redoop->next while $redoop->name eq "null";
-		sequence($redoop);
-		my $nextop = $op->nextop;
-		$nextop = $nextop->next while $nextop->name eq "null";
-		sequence($nextop);
-		my $lastop = $op->lastop;
-		$lastop = $lastop->next while $lastop->name eq "null";
-		sequence($lastop);
+		# my $redoop = $op->redoop;
+		# $redoop = $redoop->next while $redoop->name eq "null";
+		# sequence($redoop);
+		# my $nextop = $op->nextop;
+		# $nextop = $nextop->next while $nextop->name eq "null";
+		# sequence($nextop);
+		# my $lastop = $op->lastop;
+		# $lastop = $lastop->next while $lastop->name eq "null";
+		# sequence($lastop);
 	    } elsif ($name eq "subst" and $ {$op->pmreplstart}) {
 		my $replstart = $op->pmreplstart;
 		$replstart = $replstart->next while $replstart->name eq "null";
