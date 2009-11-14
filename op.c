@@ -917,7 +917,9 @@ Perl_scalar(pTHX_ OP *o)
 	return o;
     }
 
+    assert(!o->op_context_known);
     o->op_flags = (o->op_flags & ~OPf_WANT) | OPf_WANT_SCALAR;
+    o->op_context_known = 1;
 
     switch (o->op_type) {
     case OP_REPEAT:
@@ -1018,6 +1020,8 @@ Perl_scalarvoid(pTHX_ OP *o)
 	return scalar(o);			/* As if inside SASSIGN */
     }
 
+    assert((!o->op_context_known) || want == OPf_WANT_SCALAR);
+    o->op_context_known = 1;
     o->op_flags = (o->op_flags & ~OPf_WANT) | OPf_WANT_VOID;
 
     switch (o->op_type) {
@@ -1201,7 +1205,13 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_DOR:
     case OP_COND_EXPR:
     case OP_ENTERGIVEN:
+    case OP_WHILE_AND:
+	for (kid = cUNOPo->op_first->op_sibling; kid; kid = kid->op_sibling)
+	    scalarvoid(kid);
+	break;
     case OP_ENTERWHEN:
+	if (o->op_flags & OPf_SPECIAL)
+	    scalarvoid(cUNOPo->op_first);
 	for (kid = cUNOPo->op_first->op_sibling; kid; kid = kid->op_sibling)
 	    scalarvoid(kid);
 	break;
@@ -1242,6 +1252,7 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_REQUIRE:
 	/* all requires must return a boolean value */
 	o->op_flags &= ~OPf_WANT;
+	o->op_context_known = 0;
 	/* FALL THROUGH */
     case OP_SCALAR:
 	return scalar(o);
@@ -1282,7 +1293,9 @@ Perl_list(pTHX_ OP *o)
 	return o;				/* As if inside SASSIGN */
     }
 
+    assert(!o->op_context_known);
     o->op_flags = (o->op_flags & ~OPf_WANT) | OPf_WANT_LIST;
+    o->op_context_known = 1;
 
     switch (o->op_type) {
     case OP_FLOP:
@@ -1366,6 +1379,31 @@ S_scalarseq(pTHX_ OP *o)
     return o;
 }
 
+/* Fixes the context to unknown */
+
+static OP *
+S_unknown(pTHX_ OP *o)
+{
+    dVAR;
+
+    /* assumes no premature commitment */
+    if (!o || (o->op_flags & OPf_WANT) || o->op_type == OP_RETURN)
+    {
+	return o;
+    }
+
+    assert(!o->op_context_known);
+    o->op_context_known = 1;
+
+    if (o->op_flags & OPf_KIDS) {
+	OP *kid;
+	for (kid = cUNOPo->op_first; kid; kid = kid->op_sibling)
+	    S_unknown(kid);
+    }
+
+    return o;
+}
+
 STATIC OP *
 S_modkids(pTHX_ OP *o, I32 type)
 {
@@ -1375,6 +1413,42 @@ S_modkids(pTHX_ OP *o, I32 type)
 	    mod(kid, type);
     }
     return o;
+}
+
+static void
+S_finished_op_check(pTHX_ OP* o)
+{
+    /* All ops must have a context */
+
+    if (! (o->op_context_known
+	    || o->op_type == OP_NULL
+	    || o->op_type == OP_NOTHING
+	    || o->op_type == OP_ENTER
+	    || o->op_type == OP_METHOD
+	    || o->op_type == OP_METHOD_NAMED
+	    || o->op_type == OP_REFGEN
+	    || o->op_type == OP_CONST
+	    || o->op_type == OP_PADSV
+	    || o->op_type == OP_RV2CV
+	    ))
+	Perl_op_dump(o);
+    assert(o->op_context_known
+	|| o->op_type == OP_NULL
+	|| o->op_type == OP_NOTHING
+	|| o->op_type == OP_ENTER
+	|| o->op_type == OP_METHOD
+	|| o->op_type == OP_METHOD_NAMED
+	|| o->op_type == OP_REFGEN
+	|| o->op_type == OP_CONST
+	|| o->op_type == OP_PADSV
+	|| o->op_type == OP_RV2CV
+	);
+
+    if (o->op_flags & OPf_KIDS) {
+	OP *kid;
+	for (kid = cUNOPo->op_first; kid; kid = kid->op_sibling)
+	    S_finished_op_check(kid);
+    }
 }
 
 /* Propagate lvalue ("modifiable") context to an op and its children.
@@ -1483,6 +1557,8 @@ Perl_mod(pTHX_ OP *o, I32 type)
 			kid->op_sibling = (OP*)newop;
 			newop->op_private |= OPpLVAL_INTRO;
 			newop->op_private &= ~1;
+			newop->op_flags = OPf_WANT_SCALAR;
+			newop->op_context_known = 1;
 			break;
 		    }
 
@@ -2371,11 +2447,12 @@ Perl_newPROG(pTHX_ OP *o)
 	    return;
 	}
 	PL_main_root = scope(sawparens(scalarvoid(o)));
+	S_unknown(PL_main_root);
 	PL_curcop = &PL_compiling;
 	PL_main_start = sequence_op(PL_main_root);
 	PL_main_root->op_private |= OPpREFCOUNTED;
 	OpREFCNT_set(PL_main_root, 1);
-	CALL_PEEP(PL_main_start);
+	S_finished_op_check(PL_main_root);
 	PL_compcv = 0;
 
 	/* Register with debugger */
@@ -2663,8 +2740,10 @@ Perl_convert(pTHX_ I32 type, I32 flags, OP *o)
     dVAR;
     if (!o || o->op_type != OP_LIST)
 	o = newLISTOP(OP_LIST, 0, o, NULL);
-    else
+    else {
 	o->op_flags &= ~OPf_WANT;
+	o->op_context_known = 0;
+    }
 
     if (!(PL_opargs[type] & OA_MARK))
 	op_null(cLISTOPo->op_first);
@@ -4416,6 +4495,7 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 			right->op_next = tmpop->op_next;  /* fix starting loc */
 			op_free(o);			/* blow off assign */
 			right->op_flags &= ~OPf_WANT;
+			right->op_context_known = 0;
 				/* "I don't know and I don't care." */
 			return right;
 		    }
@@ -5361,7 +5441,7 @@ Perl_newWHENOP(pTHX_ OP *cond, OP *block)
     
     return newGIVWHENOP(
 	cond_op,
-	append_elem(block->op_type, block, newOP(OP_BREAK, OPf_SPECIAL)),
+	    append_elem(block->op_type, block, newOP(OP_BREAK, OPf_SPECIAL)),
 	OP_ENTERWHEN, OP_LEAVEWHEN, 0);
 }
 
@@ -5883,11 +5963,11 @@ Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 	    block->op_attached = 1;
 	CvROOT(cv) = newUNOP(OP_LEAVESUB, 0, scalarseq(block));
     }
+    CvROOT(cv) = S_unknown(CvROOT(cv));
     CvROOT(cv)->op_private |= OPpREFCOUNTED;
     OpREFCNT_set(CvROOT(cv), 1);
-    CvSTART(cv) = LINKLIST(CvROOT(cv));
-    CvROOT(cv)->op_next = 0;
-    CALL_PEEP(CvSTART(cv));
+    CvSTART(cv) = sequence_op(CvROOT(cv));
+    S_finished_op_check(CvROOT(cv));
 
     /* now that optimizer has done its work, adjust pad values */
 
@@ -7440,7 +7520,7 @@ Perl_ck_sassign(pTHX_ OP *o)
 				    kkid->op_flags
 				    | ((kkid->op_private & ~OPpLVAL_INTRO) << 8));
 	    OP *const first = newOP(OP_NULL, 0);
-	    OP *const nullop = newCONDOP(0, first, o, other);
+	    OP *const nullop = scalar(newCONDOP(0, first, o, other));
 	    OP *const condop = first->op_next;
 	    /* hijacking PADSTALE for uninitialized state variables */
 	    SvPADSTALE_on(PAD_SVl(target));
@@ -7696,6 +7776,11 @@ Perl_ck_return(pTHX_ OP *o)
 		}
 	    }
     }
+
+    /* return is always in unknown context */
+    for (kid = cUNOPo->op_first; kid; kid = kid->op_sibling)
+	S_unknown(kid);
+    o->op_context_known = 1;
 
     return o;
 }
@@ -8457,6 +8542,9 @@ Perl_peep(pTHX_ register OP *o)
 
     if (!o || o->op_opt)
 	return;
+
+    return;
+
     ENTER;
     SAVEOP();
     SAVEVPTR(PL_curcop);

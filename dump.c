@@ -793,6 +793,8 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	Perl_dump_indent(aTHX_ level, file, "FLAGS = (%s)\n", SvCUR(tmpsv) ? SvPVX_const(tmpsv) + 1 : "");
 	SvREFCNT_dec(tmpsv);
     }
+    if (o->op_context_known)
+	Perl_dump_indent(aTHX_ level, file, "KNOWN_CONTEXT\n");
     if (o->op_private) {
 	SV * const tmpsv = newSVpvs("");
 	if (PL_opargs[optype] & OA_TARGLEX) {
