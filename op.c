@@ -5229,9 +5229,6 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
     append_elem(OP_FOREACH, (OP*)loop, block);
     append_elem(OP_FOREACH, (OP*)loop, cont);
 
-    loop->op_redoop = sequence_op(block);
-    loop->op_nextop = sequence_op(cont);
-
     /* prepend_elem(OP_FOREACH, loop, scalar(sv)); */
     /* for my  $x () sets OPpLVAL_INTRO;
      * for our $x () sets OPpOUR_INTRO */
@@ -8565,7 +8562,7 @@ Perl_peep(pTHX_ register OP *o)
     if (!o || o->op_opt)
 	return;
 
-    return o;
+    return;
 
     ENTER;
     SAVEOP();

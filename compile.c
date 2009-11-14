@@ -251,16 +251,17 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 	    case OP_FOREACH: {
 		/*
 		      ...
-		      <o->op_start>
+		      <op_expr>
+		      <op_sv>
 		      enteriter         redo=label_redo  next=label_next  last=label_last
                   label_start:
 		      iter
 		      and               label_leave
 		  label_redo:
-		      <cLOOPo->op_redoop>
+		      <op_block>
 		  label_next:
 		      unstack
-		      <cLOOPo->op_nextop>
+		      <op_cont>
 		      instr_jump        label_start
 		  label_leave:
 		      leaveloop
@@ -269,16 +270,18 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		*/
 		int start_idx;
 		int cond_jump_idx;
+		OP* op_expr = cLOOPo->op_first;
+		OP* op_sv = op_expr->op_sibling;
+		OP* op_block = op_sv->op_sibling;
+		OP* op_cont = op_block->op_sibling;
 
 		{
-		    OP* expr = cLOOPo->op_first;
-		    OP* sv = expr->op_sibling;
-		    if (expr->op_type == OP_RANGE) {
+		    if (op_expr->op_type == OP_RANGE) {
 			/* Basically turn for($x..$y) into the same as for($x,$y), but we
 			 * set the STACKED flag to indicate that these values are to be
 			 * treated as min/max values by 'pp_iterinit'.
 			 */
-			LOGOP* const range = (LOGOP*)expr;
+			LOGOP* const range = (LOGOP*)op_expr;
 			UNOP* const flip = cUNOPx(range->op_first);
 			S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
 			S_add_op(codeseq, bpp, sequence_op(flip->op_first));
@@ -286,10 +289,10 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 			o->op_flags |= OPf_STACKED; /* FIXME manipulation of the optree */
 		    }
 		    else {
-			S_add_op(codeseq, bpp, sequence_op(expr));
+			S_add_op(codeseq, bpp, sequence_op(op_expr));
 		    }
-		    if (sv->op_type != OP_NOTHING)
-			S_add_op(codeseq, bpp, sequence_op(sv));
+		    if (op_sv->op_type != OP_NOTHING)
+			S_add_op(codeseq, bpp, sequence_op(op_sv));
 		}
 		S_append_instruction(codeseq, bpp, o, OP_ENTERITER);
 
@@ -300,11 +303,11 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_cond_jump, NULL);
 
 		S_save_branch_point(bpp, &(cLOOPo->op_redo_instr));
-		S_add_op(codeseq, bpp, cLOOPo->op_redoop);
+		S_add_op(codeseq, bpp, sequence_op(op_block));
 
 		S_save_branch_point(bpp, &(cLOOPo->op_next_instr));
 		S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_UNSTACK], NULL);
-		S_add_op(codeseq, bpp, cLOOPo->op_nextop);
+		S_add_op(codeseq, bpp, sequence_op(op_cont));
 
 		/* loop */
 		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, (void*)(start_idx - bpp->idx - 1));
