@@ -4852,19 +4852,14 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp)
     logop->op_type = (OPCODE)type;
     logop->op_first = first;
     logop->op_flags = (U8)(flags | OPf_KIDS);
-    logop->op_other = LINKLIST(other);
     logop->op_other_instr = NULL;
     logop->op_private = (U8)(1 | (flags >> 8));
 
-    /* establish postfix order */
-    logop->op_start = LINKLIST(first);
-    first->op_next = NULL;
-    logop->op_next = (OP*)logop;
     first->op_sibling = other;
 
-    CHECKOP(type,logop);
+    logop->op_next = (OP*)logop;
 
-    other->op_next = NULL;
+    CHECKOP(type,logop);
 
     o = (OP*)logop;
     if (prepend_not)
@@ -4915,23 +4910,14 @@ Perl_newCONDOP(pTHX_ I32 flags, OP *first, OP *trueop, OP *falseop)
     logop->op_first = first;
     logop->op_flags = (U8)(flags | OPf_KIDS);
     logop->op_private = (U8)(1 | (flags >> 8));
-    logop->op_other = LINKLIST(trueop);
-    logop->op_next = LINKLIST(falseop);
 
     CHECKOP(OP_COND_EXPR, /* that's logop->op_type */
 	    logop);
 
-    /* establish postfix order */
-    start = LINKLIST(first);
-    first->op_next = (OP*)logop;
-
     first->op_sibling = trueop;
     trueop->op_sibling = falseop;
 
-    trueop->op_next = falseop->op_next = NULL;
-
-    logop->op_start = logop->op_next;
-    logop->op_next = start;
+    logop->op_next = logop;
     return (OP*)logop;
 }
 
@@ -5016,16 +5002,6 @@ Perl_newLOOPOP(pTHX_ I32 flags, I32 debuggable, OP *expr, OP *block)
 	block = newOP(OP_NULL, 0);
     listop = append_elem(OP_LINESEQ, block, NULL);
     o = new_logop(OP_WHILE_AND, 0, &expr, &listop);
-
-    /* if (listop) */
-    /* 	((LISTOP*)listop)->op_last->op_next = NULL; /\* LINKLIST(o); *\/ */
-
-    /* if (once && o != listop) */
-    /* 	o->op_next = ((LOGOP*)cUNOPo->op_first)->op_other; */
-
-    /* o->op_start = LINKLIST(cUNOPo->op_first); */
-    /* cUNOPo->op_first->op_next = NULL; */
-    /* o->op_next = o; */
 
     if (o == listop)
 	o = newUNOP(OP_NULL, 0, o);	/* or do {} while 1 loses outer block */

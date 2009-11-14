@@ -25,6 +25,7 @@ struct branch_point_pad {
     OP_INSTRPP* op_instrpp_list;
     OP_INSTRPP* op_instrpp_end;
     OP_INSTRPP* op_instrpp_append;
+    int recursion;
 };
 typedef struct branch_point_pad BRANCH_POINT_PAD;
 
@@ -130,11 +131,14 @@ S_find_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o)
 void
 S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 {
-
-    DEBUG_g(Perl_deb("Compiling op sequence "); dump_op_short(o); Perl_deb("\n"));
+    bpp->recursion++;
+    DEBUG_g(
+	Perl_deb("%*sCompiling op sequence ", 2*bpp->recursion, "");
+	if (0) dump_op_short(o);
+	    Perl_deb("\n"); );
     
     while (o) {
-	    DEBUG_g(Perl_deb("Compiling op "); dump_op_short(o); Perl_deb("\n"));
+	DEBUG_g(Perl_deb("%*sCompiling op ", 2*bpp->recursion, ""); dump_op_short(o); Perl_deb("\n"));
 
 	    switch (o->op_type) {
 	    case OP_GREPSTART:
@@ -172,25 +176,32 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 	    case OP_COND_EXPR: {
 		/*
 		      ...
+		      <op_first>
 		      cond_expr                label1
-		      <cLOGOPo->op_op_other>
+		      <op_true>
 		      instr_jump               label2
 		  label1:
-		      <cLOGOPo->op_start>
+		      <op_false>
 		  label2:
 		      ...
 		*/
 		int jump_idx;
+		OP* op_first = cLOGOPo->op_first;
+		OP* op_true = op_first->op_sibling;
+		OP* op_false = op_true->op_sibling;
+
+		S_add_op(codeseq, bpp, sequence_op(op_first));
+
 		S_append_instruction(codeseq, bpp, o, o->op_type);
 
 		/* true branch */
-		S_add_op(codeseq, bpp, cLOGOPo->op_other);
+		S_add_op(codeseq, bpp, sequence_op(op_true));
 		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
 		jump_idx = bpp->idx-1;
 
 		/* false branch */
 		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
-		S_add_op(codeseq, bpp, cLOGOPo->op_start);
+		S_add_op(codeseq, bpp, sequence_op(op_false));
 
 		S_register_branch_point(bpp, o->op_next);
 
@@ -320,18 +331,20 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		break;
 	    }
 	    case OP_WHILE_AND: {
+		OP* op_first = cLOGOPo->op_first;
+		OP* op_other = op_first->op_sibling;
 		if (o->op_private & OPpWHILE_AND_ONCE) {
 		    /*
                           ...
 		      label1:
-		          <cLOGOPo->op_other>
-		          <cLOGOPo->op_start>
+		          <op_other>
+		          <op_first>
 		          or                   label1
 		          ...
 		    */
 		    S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
-		    S_add_op(codeseq, bpp, cLOGOPo->op_other);
-		    S_add_op(codeseq, bpp, cLOGOPo->op_start);
+		    S_add_op(codeseq, bpp, sequence_op(op_other));
+		    S_add_op(codeseq, bpp, sequence_op(op_first));
 		    S_append_instruction(codeseq, bpp, o, OP_OR);
 		}
 		else {
@@ -339,9 +352,9 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
                           ...
 			  instr_jump           label2
 		      label1:
-		          <cLOGOPo->op_other>
+		          <op_other>
 	              label2:
-		          <cLOGOPo->op_start>
+		          <op_first>
 		          or                   label1
 		          ...
 		    */
@@ -349,9 +362,9 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		    start_idx = bpp->idx;
 		    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
 		    S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
-		    S_add_op(codeseq, bpp, cLOGOPo->op_other);
+		    S_add_op(codeseq, bpp, sequence_op(op_other));
 		    codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
-		    S_add_op(codeseq, bpp, cLOGOPo->op_start);
+		    S_add_op(codeseq, bpp, sequence_op(op_first));
 		    S_append_instruction(codeseq, bpp, o, OP_OR);
 		}
 
@@ -366,17 +379,19 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 	    {
 		/*
                       ...
-		      <o->op_start>
+		      <op_first>
 		      o->op_type            label1
-		      <cLOGOPo->op_other>
+		      <op_other>
 		  label1:
 		      ...
 		*/
+		OP* op_first = cLOGOPo->op_first;
+		OP* op_other = op_first->op_sibling;
 		assert((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOGOP);
 
-		S_add_op(codeseq, bpp, o->op_start);
+		S_add_op(codeseq, bpp, sequence_op(op_first));
 		S_append_instruction(codeseq, bpp, o, o->op_type);
-		S_add_op(codeseq, bpp, cLOGOPo->op_other);
+		S_add_op(codeseq, bpp, sequence_op(op_other));
 		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 		break;
 	    }
@@ -555,6 +570,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 	    if (o)
 		o = o->op_next;
     }
+    bpp->recursion--;
 }
 
 void

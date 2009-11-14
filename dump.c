@@ -702,6 +702,7 @@ void
 Perl_dump_op_short(const OP *o)
 {
     PERL_ARGS_ASSERT_DUMP_OP_SHORT;
+    sequence(o);
     PerlIO_printf(Perl_debug_log, 
 	"op %"UVuf" %s", sequence_num(o), PL_op_name[o->op_type]);
 }
