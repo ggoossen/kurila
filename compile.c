@@ -406,13 +406,13 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		/*
                       ...
 		      pp_entertry     label1
-		      <o->op_start>
+		      <o->op_first>
 		      pp_leavetry
 		  label1:
 		      ...
 		*/
 		S_append_instruction(codeseq, bpp, o, OP_ENTERTRY);
-		S_add_op(codeseq, bpp, o->op_start);
+		S_add_op(codeseq, bpp, sequence_op(cLOGOPo->op_first));
 		S_append_instruction(codeseq, bpp, o, OP_LEAVETRY);
 		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 		break;
