@@ -5045,7 +5045,6 @@ whileline, OP *expr, OP *block, OP *cont, I32 has_my)
 {
     dVAR;
     OP *redo;
-    OP *next = NULL;
     U8 loopflags = 0;
 
     PERL_UNUSED_ARG(debuggable);
@@ -5085,14 +5084,12 @@ whileline, OP *expr, OP *block, OP *cont, I32 has_my)
 	block = scope(block);
     }
 
-    if (cont) {
-	next = LINKLIST(cont);
-    }
     if (expr) {
 	OP * const unstack = newOP(OP_UNSTACK, 0);
-	if (!next)
-	    next = unstack;
-	cont = append_elem(OP_LINESEQ, cont, unstack);
+	if (!cont)
+	    cont = unstack;
+	else
+	    cont = append_elem(OP_LINESEQ, cont, unstack);
     }
 
     assert(block);
@@ -5123,27 +5120,20 @@ whileline, OP *expr, OP *block, OP *cont, I32 has_my)
     else
 	expr = scalar(expr);
 
-    if (!loop) {
-	NewOp(1101,loop,1,LOOP);
-	loop->op_type = OP_ENTERLOOP;
-	loop->op_private = 0;
-	loop->op_next = (OP*)loop;
-	loop->op_flags = OPf_KIDS;
-
-	loop->op_first = expr;
-	loop->op_last = expr;
-    }
+    assert(!loop);
+    NewOp(1101,loop,1,LOOP);
+    loop->op_type = OP_ENTERLOOP;
+    loop->op_private = 0;
+    loop->op_next = (OP*)loop;
+    loop->op_flags = OPf_KIDS;
+    
+    loop->op_first = expr;
+    loop->op_last = expr;
 
     append_elem(OP_ENTERLOOP, (OP*)loop, block);
     append_elem(OP_ENTERLOOP, (OP*)loop, cont);
 
-    loop->op_redoop = sequence_op(block);
-    loop->op_nextop = sequence_op(cont);
-    loop->op_start = sequence_op(expr);
-
     loop->op_private |= loopflags;
-
-    loop->op_nextop = next;
 
     loop->op_flags |= flags;
     loop->op_private |= (flags >> 8);
