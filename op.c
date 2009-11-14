@@ -4946,7 +4946,7 @@ Perl_newRANGE(pTHX_ I32 flags, OP *left, OP *right)
 
     NewOp(1101, range, 1, LOGOP);
 
-    flip = newUNOP(OP_FLIP, flags, left);
+    flip = scalar(newUNOP(OP_FLIP, flags, left));
 
     range->op_type = OP_RANGE;
     range->op_first = flip;
