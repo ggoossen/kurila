@@ -276,9 +276,10 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 			 * treated as min/max values by 'pp_iterinit'.
 			 */
 			LOGOP* const range = (LOGOP*)expr;
+			UNOP* const flip = cUNOPx(range->op_first);
 			S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
-			S_add_op(codeseq, bpp, range->op_start);
-			S_add_op(codeseq, bpp, range->op_other);
+			S_add_op(codeseq, bpp, sequence_op(flip->op_first));
+			S_add_op(codeseq, bpp, sequence_op(flip->op_first->op_sibling));
 			o->op_flags |= OPf_STACKED; /* FIXME manipulation of the optree */
 		    }
 		    else {
@@ -421,20 +422,21 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
                       ...
 		      pp_range       label2
                   label1:
-		      <o->op_start>
+		      <o->op_first->op_first>
 		      flip           label3
 		  label2:
-		      <o->op_other>
+		      <o->op_first->op_first->op_sibling>
 		      flop           label1
 		  label3:
 		      ...
 		*/
 		  
+		UNOP* flip = cUNOPx(cLOGOPo->op_first);
 		S_append_instruction(codeseq, bpp, o, o->op_type);
-		S_add_op(codeseq, bpp, o->op_start);
+		S_add_op(codeseq, bpp, sequence_op(flip->op_first));
 		S_append_instruction(codeseq, bpp, o, OP_FLIP);
 		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
-		S_add_op(codeseq, bpp, cLOGOPo->op_other);
+		S_add_op(codeseq, bpp, sequence_op(flip->op_first->op_sibling));
 		S_append_instruction(codeseq, bpp, o, OP_FLOP);
 		S_save_branch_point(bpp, &(cLOGOPo->op_first->op_unstack_instr));
 		
