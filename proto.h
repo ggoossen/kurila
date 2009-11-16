@@ -2031,6 +2031,18 @@ PERL_CALLCONV OP*	Perl_newANONHASH(pTHX_ OP* o)
 			__attribute__warn_unused_result__;
 
 PERL_CALLCONV OP*	Perl_newANONSUB(pTHX_ I32 floor, OP* proto, OP* block);
+#if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
+STATIC bool	S_aassign_common_vars_left(pTHX_ OP* left)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_AASSIGN_COMMON_VARS_LEFT	\
+	assert(left)
+
+STATIC bool	S_aassign_common_vars_right(pTHX_ OP* right)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_AASSIGN_COMMON_VARS_RIGHT	\
+	assert(right)
+
+#endif
 PERL_CALLCONV OP*	Perl_newASSIGNOP(pTHX_ I32 flags, OP* left, I32 optype, OP* right)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;

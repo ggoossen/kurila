@@ -18,7 +18,6 @@ is("$x-$y", "first-second", "basic list assignment to multiple variable");
 is("$x-$y", "second-first", "list assignment with common variables");
 
 {
-    local $TODO = "commonality detection with &&";
     $z = 1;
     ($x, $y) = ("first", "second");
     ($x, $y) = ("new", $z && $x);
