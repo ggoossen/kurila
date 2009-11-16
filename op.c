@@ -3696,6 +3696,49 @@ Perl_newPMOP(pTHX_ I32 type, I32 flags)
     return CHECKOP(type, pmop);
 }
 
+static bool
+S_repl_is_constant(OP* o, bool * const repl_has_varsp)
+{
+    if (o->op_type == OP_SCOPE
+	|| o->op_type == OP_LEAVE
+	|| (PL_opargs[o->op_type] & OA_DANGEROUS)) {
+	if (o->op_type == OP_GV) {
+	    GV * const gv = cGVOPx_gv(o);
+	    *repl_has_varsp = 1;
+	    if (strchr("&`'123456789+-\016\022", *GvENAME(gv)))
+		return FALSE;
+	}
+	else if (o->op_type == OP_RV2CV)
+	    return FALSE;
+	else if (o->op_type == OP_RV2SV ||
+	    o->op_type == OP_RV2AV ||
+	    o->op_type == OP_RV2HV ||
+	    o->op_type == OP_RV2GV) {
+	    if (cUNOPo->op_first->op_type != OP_GV)	/*funny deref?*/
+		return FALSE;
+	}
+	else if (o->op_type == OP_PADSV ||
+	    o->op_type == OP_PADAV ||
+	    o->op_type == OP_PADHV ||
+	    o->op_type == OP_PADANY)
+	    {
+		*repl_has_varsp = 1;
+	    }
+	else if (o->op_type == OP_PUSHRE)
+	    NOOP; /* Okay here, dangerous in newASSIGNOP */
+	else
+	    return FALSE;
+    }
+    if (o->op_flags & OPf_KIDS) {
+	OP* kid;
+	for (kid = cUNOPo->op_first; kid; kid=kid->op_sibling) {
+	    if (!repl_is_constant(kid, repl_has_varsp))
+		return FALSE;
+	}
+    }
+    return TRUE;
+}
+
 /* Given some sort of match op o, and an expression expr containing a
  * pattern, either compile expr into a regex and attach it to o (if it's
  * constant), or convert expr into a runtime regcomp op sequence (if it's
@@ -3714,7 +3757,7 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
     dVAR;
     PMOP *pm;
     LOGOP *rcop;
-    I32 repl_has_vars = 0;
+    bool repl_has_vars = FALSE;
     OP* repl = NULL;
     bool reglist;
 
@@ -3800,7 +3843,7 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 	/* /$x/ may cause an eval, since $x might be qr/(?{..})/  */
 	PL_cv_has_eval = 1;
 
-	rcop->op_next = rcop;
+	rcop->op_next = (OP*)rcop;
 
 	prepend_elem(o->op_type, scalar((OP*)rcop), o);
     }
@@ -3815,40 +3858,10 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 	else if (repl->op_type == OP_CONST)
 	    curop = repl;
 	else {
-	    OP *lastop = NULL;
-	    for (curop = LINKLIST(repl); curop!=repl; curop = LINKLIST(curop)) {
-		if (curop->op_type == OP_SCOPE
-			|| curop->op_type == OP_LEAVE
-			|| (PL_opargs[curop->op_type] & OA_DANGEROUS)) {
-		    if (curop->op_type == OP_GV) {
-			GV * const gv = cGVOPx_gv(curop);
-			repl_has_vars = 1;
-			if (strchr("&`'123456789+-\016\022", *GvENAME(gv)))
-			    break;
-		    }
-		    else if (curop->op_type == OP_RV2CV)
-			break;
-		    else if (curop->op_type == OP_RV2SV ||
-			     curop->op_type == OP_RV2AV ||
-			     curop->op_type == OP_RV2HV ||
-			     curop->op_type == OP_RV2GV) {
-			if (lastop && lastop->op_type != OP_GV)	/*funny deref?*/
-			    break;
-		    }
-		    else if (curop->op_type == OP_PADSV ||
-			     curop->op_type == OP_PADAV ||
-			     curop->op_type == OP_PADHV ||
-			     curop->op_type == OP_PADANY)
-		    {
-			repl_has_vars = 1;
-		    }
-		    else if (curop->op_type == OP_PUSHRE)
-			NOOP; /* Okay here, dangerous in newASSIGNOP */
-		    else
-			break;
-		}
-		lastop = curop;
-	    }
+	    if (repl_is_constant(repl, &repl_has_vars))
+		curop = repl;
+	    else
+		curop = NULL;
 	}
 	if (curop == repl
 	    && !(repl_has_vars
@@ -3869,14 +3882,8 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 	    rcop->op_private = 1;
 	    rcop->op_other = o;
 
-	    /* establish postfix order */
-	    rcop->op_next = LINKLIST(repl);
-	    repl->op_next = (OP*)rcop;
-
 	    pm->op_pmreplrootu.op_pmreplroot = scalar((OP*)rcop);
 	    assert(!(pm->op_pmflags & PMf_ONCE));
-	    pm->op_pmstashstartu.op_pmreplstart = LINKLIST(rcop);
-	    rcop->op_next = 0;
 	}
     }
 

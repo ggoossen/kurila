@@ -2038,15 +2038,15 @@ PERL_CALLCONV OP*	Perl_newANONHASH(pTHX_ OP* o)
 
 PERL_CALLCONV OP*	Perl_newANONSUB(pTHX_ I32 floor, OP* proto, OP* block);
 #if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
-STATIC bool	S_aassign_common_vars_left(pTHX_ OP* left)
+STATIC bool	S_aassign_common_vars_left(pTHX_ OP* o)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_AASSIGN_COMMON_VARS_LEFT	\
-	assert(left)
+	assert(o)
 
-STATIC bool	S_aassign_common_vars_right(pTHX_ OP* right)
+STATIC bool	S_aassign_common_vars_right(pTHX_ OP* o)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_AASSIGN_COMMON_VARS_RIGHT	\
-	assert(right)
+	assert(o)
 
 #endif
 PERL_CALLCONV OP*	Perl_newASSIGNOP(pTHX_ I32 flags, OP* left, I32 optype, OP* right)
@@ -2574,6 +2574,12 @@ PERL_CALLCONV OP*	Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 	assert(o); assert(expr)
 
 #if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
+STATIC bool	S_repl_is_constant(pTHX_ OP* o, bool* const repl_has_varsp)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_REPL_IS_CONSTANT	\
+	assert(o); assert(repl_has_varsp)
+
 STATIC OP*	S_pmtrans(pTHX_ OP* o, OP* expr, OP* repl)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)

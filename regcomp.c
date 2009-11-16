@@ -9537,7 +9537,7 @@ Perl_regfree_internal(pTHX_ REGEXP * const rx)
 		Safefree(ri->data->data[n]);
 		break;
 	    case 'g':
-		free_codeseq(ri->data->data[n]);
+		free_codeseq((CODESEQ*)ri->data->data[n]);
 		break;
 	    case 'p':
 		new_comppad = MUTABLE_AV(ri->data->data[n]);

@@ -558,8 +558,9 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		      pp_subst       label1 label2
 		      instr_jump     label3
                   label1:
+		      substcont
+                  label2:
 		      <o->op_pmreplroot>
-		      <o->op_pmreplstart>
 		  label3:
 		      ...
 		*/
@@ -571,10 +572,10 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
 		    
 		S_save_branch_point(bpp, &(cPMOPo->op_pmreplroot_instr));
-		S_add_op(codeseq, bpp, cPMOPo->op_pmreplrootu.op_pmreplroot);
+		S_append_instruction(codeseq, bpp, cPMOPo->op_pmreplrootu.op_pmreplroot, OP_SUBSTCONT);
 
 		S_save_branch_point(bpp, &(cPMOPo->op_pmreplstart_instr));
-		S_add_op(codeseq, bpp, cPMOPo->op_pmstashstartu.op_pmreplstart);
+		S_add_op(codeseq, bpp, sequence_op(cPMOPo->op_pmreplrootu.op_pmreplroot));
 
 		S_save_branch_point(bpp, &(cPMOPo->op_subst_next_instr));
 		codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);

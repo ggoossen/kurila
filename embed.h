@@ -727,6 +727,7 @@
 #endif
 #if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
+#define repl_is_constant	S_repl_is_constant
 #define pmtrans			S_pmtrans
 #endif
 #endif
@@ -2069,6 +2070,7 @@
 #define ck_exec			Perl_ck_exec
 #define ck_exists		Perl_ck_exists
 #define ck_exit			Perl_ck_exit
+#define ck_formline		Perl_ck_formline
 #define ck_ftst			Perl_ck_ftst
 #define ck_fun			Perl_ck_fun
 #define ck_glob			Perl_ck_glob
@@ -3158,6 +3160,7 @@
 #endif
 #if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
+#define repl_is_constant(a,b)	S_repl_is_constant(aTHX_ a,b)
 #define pmtrans(a,b,c)		S_pmtrans(aTHX_ a,b,c)
 #endif
 #endif
@@ -4520,6 +4523,7 @@
 #define ck_exec(a)		Perl_ck_exec(aTHX_ a)
 #define ck_exists(a)		Perl_ck_exists(aTHX_ a)
 #define ck_exit(a)		Perl_ck_exit(aTHX_ a)
+#define ck_formline(a)		Perl_ck_formline(aTHX_ a)
 #define ck_ftst(a)		Perl_ck_ftst(aTHX_ a)
 #define ck_fun(a)		Perl_ck_fun(aTHX_ a)
 #define ck_glob(a)		Perl_ck_glob(aTHX_ a)
