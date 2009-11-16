@@ -574,6 +574,12 @@
 #define newANONLIST		Perl_newANONLIST
 #define newANONHASH		Perl_newANONHASH
 #define newANONSUB		Perl_newANONSUB
+#if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
+#ifdef PERL_CORE
+#define aassign_common_vars_left	S_aassign_common_vars_left
+#define aassign_common_vars_right	S_aassign_common_vars_right
+#endif
+#endif
 #define newASSIGNOP		Perl_newASSIGNOP
 #define newCONDOP		Perl_newCONDOP
 #define newCONSTSUB		Perl_newCONSTSUB
@@ -3001,6 +3007,12 @@
 #define newANONLIST(a)		Perl_newANONLIST(aTHX_ a)
 #define newANONHASH(a)		Perl_newANONHASH(aTHX_ a)
 #define newANONSUB(a,b,c)	Perl_newANONSUB(aTHX_ a,b,c)
+#if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
+#ifdef PERL_CORE
+#define aassign_common_vars_left(a)	S_aassign_common_vars_left(aTHX_ a)
+#define aassign_common_vars_right(a)	S_aassign_common_vars_right(aTHX_ a)
+#endif
+#endif
 #define newASSIGNOP(a,b,c,d)	Perl_newASSIGNOP(aTHX_ a,b,c,d)
 #define newCONDOP(a,b,c,d)	Perl_newCONDOP(aTHX_ a,b,c,d)
 #define newCONSTSUB(a,b,c)	Perl_newCONSTSUB(aTHX_ a,b,c)

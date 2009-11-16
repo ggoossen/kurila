@@ -4329,6 +4329,115 @@ S_is_list_assignment(pTHX_ register const OP *o)
     return FALSE;
 }
 
+/*
+  Helper function for newASSIGNOP to detection commonality between the
+  lhs and the rhs.  Marks all variables with PL_generation.  If it
+  returns TRUE the assignment must be able to handle common variables.
+*/
+bool
+S_aassign_common_vars_left(pTHX_ OP* o)
+{
+    if (PL_opargs[o->op_type] & OA_DANGEROUS) {
+	if (o->op_type == OP_GV) {
+	    GV *gv = cGVOPx_gv(o);
+	    if (gv == PL_defgv)
+		return TRUE;
+	    GvASSIGN_GENERATION_set(gv, PL_generation);
+	}
+	else if (o->op_type == OP_PADSV ||
+	    o->op_type == OP_PADAV ||
+	    o->op_type == OP_PADHV ||
+	    o->op_type == OP_PADANY)
+	    {
+		PAD_COMPNAME_GEN_set(o->op_targ, PL_generation);
+	    }
+	else if (o->op_type == OP_RV2CV)
+	    return FALSE;
+	else if (o->op_type == OP_RV2SV ||
+	    o->op_type == OP_RV2AV ||
+	    o->op_type == OP_RV2HV ||
+	    o->op_type == OP_RV2GV) {
+	    if (cUNOPo->op_first->op_type != OP_GV)	/* funny deref? */
+		return TRUE;
+	}
+    }
+    if (o->op_flags & OPf_KIDS) {
+	OP *kid;
+	for (kid = cUNOPo->op_first; kid; kid=kid->op_sibling) {
+	    if (aassign_common_vars_left(kid))
+		return TRUE;
+	}
+    }
+    return FALSE;
+}
+
+/*
+  Helper function for newASSIGNOP to detection commonality between the
+  lhs and the rhs.  Checks all variable used for marking with
+  PL_generation, as privously set by aassign_common_vars_left If it
+  returns TRUE the assignment must be able to handle common
+  variables.
+*/
+bool
+S_aassign_common_vars_right(pTHX_ OP* o)
+{
+    if (PL_opargs[o->op_type] & OA_DANGEROUS) {
+	if (o->op_type == OP_GV) {
+	    GV *gv = cGVOPx_gv(o);
+	    if (gv == PL_defgv
+		|| (int)GvASSIGN_GENERATION(gv) == PL_generation)
+		return TRUE;
+	}
+	else if (o->op_type == OP_PADSV ||
+	    o->op_type == OP_PADAV ||
+	    o->op_type == OP_PADHV ||
+	    o->op_type == OP_PADANY)
+	    {
+		if (PAD_COMPNAME_GEN(o->op_targ)
+		    == (STRLEN)PL_generation)
+		    return TRUE;
+	    }
+	else if (o->op_type == OP_RV2CV)
+	    return TRUE;
+	else if (o->op_type == OP_RV2SV ||
+	    o->op_type == OP_RV2AV ||
+	    o->op_type == OP_RV2HV ||
+	    o->op_type == OP_RV2GV) {
+	    if (cUNOPo->op_first->op_type != OP_GV)	/* funny deref? */
+		return TRUE;
+	}
+	else if (o->op_type == OP_PUSHRE) {
+#ifdef USE_ITHREADS
+	    if (((PMOP*)o)->op_pmreplrootu.op_pmtargetoff) {
+		GV *const gv = MUTABLE_GV(PAD_SVl(((PMOP*)o)->op_pmreplrootu.op_pmtargetoff));
+		if (gv == PL_defgv
+		    || (int)GvASSIGN_GENERATION(gv) == PL_generation)
+		    return TRUE;
+	    }
+#else
+	    GV *const gv
+		= ((PMOP*)o)->op_pmreplrootu.op_pmtargetgv;
+	    if (gv) {
+		if (gv == PL_defgv 
+		    || (int)GvASSIGN_GENERATION(gv) == PL_generation)
+		    return TRUE;
+	    }
+#endif
+	}
+	else
+	    return TRUE;
+    }
+    if (o->op_flags & OPf_KIDS) {
+	OP *kid;
+	for (kid = cUNOPo->op_first; kid; kid=kid->op_sibling) {
+	    if (aassign_common_vars_right(kid))
+		return TRUE;
+	}
+    }
+    return FALSE;
+}
+
+
 OP *
 Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 {
@@ -4443,63 +4552,10 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 	 */
 
 	if (maybe_common_vars) {
-	    OP *lastop = o;
 	    PL_generation++;
-	    for (curop = LINKLIST(o); curop != o; curop = LINKLIST(curop)) {
-		if (PL_opargs[curop->op_type] & OA_DANGEROUS) {
-		    if (curop->op_type == OP_GV) {
-			GV *gv = cGVOPx_gv(curop);
-			if (gv == PL_defgv
-			    || (int)GvASSIGN_GENERATION(gv) == PL_generation)
-			    break;
-			GvASSIGN_GENERATION_set(gv, PL_generation);
-		    }
-		    else if (curop->op_type == OP_PADSV ||
-			     curop->op_type == OP_PADAV ||
-			     curop->op_type == OP_PADHV ||
-			     curop->op_type == OP_PADANY)
-		    {
-			if (PAD_COMPNAME_GEN(curop->op_targ)
-						    == (STRLEN)PL_generation)
-			    break;
-			PAD_COMPNAME_GEN_set(curop->op_targ, PL_generation);
-
-		    }
-		    else if (curop->op_type == OP_RV2CV)
-			break;
-		    else if (curop->op_type == OP_RV2SV ||
-			     curop->op_type == OP_RV2AV ||
-			     curop->op_type == OP_RV2HV ||
-			     curop->op_type == OP_RV2GV) {
-			if (lastop->op_type != OP_GV)	/* funny deref? */
-			    break;
-		    }
-		    else if (curop->op_type == OP_PUSHRE) {
-#ifdef USE_ITHREADS
-			if (((PMOP*)curop)->op_pmreplrootu.op_pmtargetoff) {
-			    GV *const gv = MUTABLE_GV(PAD_SVl(((PMOP*)curop)->op_pmreplrootu.op_pmtargetoff));
-			    if (gv == PL_defgv
-				|| (int)GvASSIGN_GENERATION(gv) == PL_generation)
-				break;
-			    GvASSIGN_GENERATION_set(gv, PL_generation);
-			}
-#else
-			GV *const gv
-			    = ((PMOP*)curop)->op_pmreplrootu.op_pmtargetgv;
-			if (gv) {
-			    if (gv == PL_defgv
-				|| (int)GvASSIGN_GENERATION(gv) == PL_generation)
-				break;
-			    GvASSIGN_GENERATION_set(gv, PL_generation);
-			}
-#endif
-		    }
-		    else
-			break;
-		}
-		lastop = curop;
-	    }
-	    if (curop != o)
+	    if (aassign_common_vars_left(left))
+		o->op_private |= OPpASSIGN_COMMON;
+	    else if (aassign_common_vars_right(right))
 		o->op_private |= OPpASSIGN_COMMON;
 	}
 
@@ -4532,7 +4588,6 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 			tmpop = cUNOPo->op_first;	/* to list (nulled) */
 			tmpop = ((UNOP*)tmpop)->op_first; /* to pushmark */
 			tmpop->op_sibling = NULL;	/* don't free split */
-			right->op_next = tmpop->op_next;  /* fix starting loc */
 			op_free(o);			/* blow off assign */
 			right->op_flags &= ~OPf_WANT;
 			right->op_context_known = 0;
