@@ -4326,6 +4326,7 @@ t/mro/vulcan_c3.t		mro tests
 t/mro/vulcan_dfs.t		mro tests
 toke.c				The tokener
 t/op/64bitint.t			See if 64 bit integers work
+t/op/aassign.t			See if list assignment works
 t/op/alarm.t			See if alarm works
 t/op/anonsub.t			See if anonymous subroutines work
 t/op/append.t			See if . works
