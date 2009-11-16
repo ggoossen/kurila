@@ -6,7 +6,7 @@ BEGIN {
     require "test.pl";
 }
 
-plan(3);
+plan(5);
 
 my ($x, $y, $z);
 
@@ -23,4 +23,19 @@ is("$x-$y", "second-first", "list assignment with common variables");
     ($x, $y) = ("first", "second");
     ($x, $y) = ("new", $z && $x);
     is("$x-$y", "new-first", 'list assignment with common variables "hidden" with &&');
+}
+
+$x = "first";
+for ($x) {
+    ($x, $y) = ("new", $_);
+}
+is("$x-$y", "new-first", 'list assignment with common variables "hidden" with "for" alias');
+
+{
+    local $TODO = "commonality detection with lexical alias";
+    $x = "first";
+    for my $w ($x) {
+        ($x, $y) = ("new", $w);
+    }
+    is("$x-$y", "new-first", 'list assignment with common variables "hidden" with "for my" alias');
 }
