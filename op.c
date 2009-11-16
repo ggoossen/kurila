@@ -7340,8 +7340,6 @@ Perl_ck_grep(pTHX_ OP *o)
 	Perl_croak(aTHX_ "panic: ck_grep");
     kid = kUNOP->op_first;
 
-    cLOGOPo->op_more_op = LINKLIST(kid);
-    kid->op_next = NULL;
     offset = Perl_pad_findmy(aTHX_ STR_WITH_LEN("$_"), 0);
     if (offset == NOT_IN_PAD || PAD_COMPNAME_FLAGS_isOUR(offset)) {
 	o->op_private = 0;

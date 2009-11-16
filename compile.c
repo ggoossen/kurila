@@ -156,6 +156,12 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		*/
 		bool is_grep = o->op_type == OP_GREPSTART;
 		int grepstart_idx;
+		OP* op_block;
+
+		op_block = cLISTOPo->op_first->op_sibling;
+		assert(op_block->op_type == OP_NULL);
+		op_block = cUNOPx(op_block)->op_first;
+
 		S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
 		S_add_op(codeseq, bpp, o->op_start);
 		S_append_instruction(codeseq, bpp, o, o->op_type);
@@ -163,7 +169,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		grepstart_idx = bpp->idx-1;
 
 		S_save_branch_point(bpp, &(o->op_unstack_instr));
-		S_add_op(codeseq, bpp, o->op_more_op);
+		S_add_op(codeseq, bpp, sequence_op(op_block));
 
 		S_append_instruction(codeseq, bpp, o, is_grep ? OP_GREPWHILE : OP_MAPWHILE );
 
