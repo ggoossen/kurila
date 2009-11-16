@@ -508,6 +508,7 @@ END_EXTERN_C
 /* .what is a character array with one character for each member of .data
  * The character describes the function of the corresponding .data item:
  *   f - start-class data for regstclass optimization
+ *   g - codeseq cache for (?{EVAL}) item
  *   n - Root of op tree for (?{EVAL}) item
  *   o - Start op for (?{EVAL}) item
  *   p - Pad for (?{EVAL}) item

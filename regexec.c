@@ -3681,8 +3681,13 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 	    
 		n = ARG(scan);
 		PL_op = (OP_4tree*)rexi->data->data[n];
-		codeseq = new_codeseq(); /* FIXME memory leak */
-		compile_op(PL_op, codeseq);
+		if(!rexi->data->data[n+3]) {
+		    codeseq = new_codeseq();
+		    rexi->data->data[n+3] = (void*)codeseq;
+		    compile_op(PL_op, codeseq);
+		}
+		else
+		    codeseq = (CODESEQ*)rexi->data->data[n+3];
 
 		DEBUG_STATE_r( PerlIO_printf(Perl_debug_log, 
 		    "  re_eval 0x%"UVxf"\n", PTR2UV(PL_op)) );

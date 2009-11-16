@@ -5889,10 +5889,11 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 		    OpREFCNT_set(sop, 1);
 		    LEAVE;
 
-		    n = add_data(pRExC_state, 3, "nop");
+		    n = add_data(pRExC_state, 4, "nopg");
 		    RExC_rxi->data->data[n] = (void*)rop;
 		    RExC_rxi->data->data[n+1] = (void*)sop;
 		    RExC_rxi->data->data[n+2] = (void*)pad;
+		    RExC_rxi->data->data[n+3] = NULL;
 		    SvREFCNT_dec(sv);
 		}
 		else {						/* First pass */
@@ -9534,6 +9535,9 @@ Perl_regfree_internal(pTHX_ REGEXP * const rx)
 		break;
 	    case 'f':
 		Safefree(ri->data->data[n]);
+		break;
+	    case 'g':
+		free_codeseq(ri->data->data[n]);
 		break;
 	    case 'p':
 		new_comppad = MUTABLE_AV(ri->data->data[n]);

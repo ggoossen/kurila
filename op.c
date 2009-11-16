@@ -3800,16 +3800,7 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 	/* /$x/ may cause an eval, since $x might be qr/(?{..})/  */
 	PL_cv_has_eval = 1;
 
-	/* establish postfix order */
-	if (pm->op_pmflags & PMf_KEEP || !(PL_hints & HINT_RE_EVAL)) {
-	    LINKLIST(expr);
-	    rcop->op_next = expr;
-	    ((UNOP*)expr)->op_first->op_next = (OP*)rcop;
-	}
-	else {
-	    rcop->op_next = LINKLIST(expr);
-	    expr->op_next = (OP*)rcop;
-	}
+	rcop->op_next = rcop;
 
 	prepend_elem(o->op_type, scalar((OP*)rcop), o);
     }

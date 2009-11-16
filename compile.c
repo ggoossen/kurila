@@ -470,6 +470,18 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		break;
 	    }
 	    case OP_REGCOMP:
+	    {
+		OP* op_first = cLOGOPo->op_first;
+		if (op_first->op_type == OP_REGCRESET) {
+		    S_append_instruction(codeseq, bpp, op_first, op_first->op_type);
+		    S_add_op(codeseq, bpp, sequence_op(cUNOPx(op_first)->op_first));
+		}
+		else {
+		    S_add_op(codeseq, bpp, sequence_op(op_first));
+		}
+		S_append_instruction(codeseq, bpp, o, o->op_type);
+		break;
+	    }
 	    case OP_SUBSTCONT:
 	    {
 		/*
