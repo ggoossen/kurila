@@ -475,18 +475,61 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 		break;
 	    }
 	    case OP_ENTERGIVEN:
-	    case OP_ENTERWHEN:
 	    {
 		/*
                       ...
-		      o->op_type          label1
-		      <o->op_first->op_sibling>
+		      <op_cond>
+		      entergiven          label1
+		      <op_block>
 		  label1:
+		      leavegiven
 		      ...
 		*/
+		OP* op_cond = cLOGOPo->op_first;
+		OP* op_block = op_cond->op_sibling;
+		S_add_op(codeseq, bpp, sequence_op(op_cond));
 		S_append_instruction(codeseq, bpp, o, o->op_type);
-		S_add_op(codeseq, bpp, sequence_op(cLOGOPo->op_first->op_sibling));
+		S_add_op(codeseq, bpp, sequence_op(op_block));
 		S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
+		S_append_instruction(codeseq, bpp, o, OP_LEAVEGIVEN);
+
+		break;
+	    }
+	    case OP_ENTERWHEN:
+	    {
+		if (o->op_flags & OPf_SPECIAL) {
+		    /*
+                          ...
+		          enterwhen          label1
+		          <op_block>
+		      label1:
+		          leavewhen
+		          ...
+		    */
+		    OP* op_block = cLOGOPo->op_first;
+		    S_append_instruction(codeseq, bpp, o, o->op_type);
+		    S_add_op(codeseq, bpp, sequence_op(op_block));
+		    S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
+		    S_append_instruction(codeseq, bpp, o, OP_LEAVEWHEN);
+		}
+		else {
+		    /*
+                          ...
+		          <op_cond>
+		          enterwhen          label1
+		          <op_block>
+		      label1:
+		          leavewhen
+		          ...
+		    */
+		    OP* op_cond = cLOGOPo->op_first;
+		    OP* op_block = op_cond->op_sibling;
+		    S_add_op(codeseq, bpp, sequence_op(op_cond));
+		    S_append_instruction(codeseq, bpp, o, o->op_type);
+		    S_add_op(codeseq, bpp, sequence_op(op_block));
+		    S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
+		    S_append_instruction(codeseq, bpp, o, OP_LEAVEWHEN);
+		}
 
 		break;
 	    }

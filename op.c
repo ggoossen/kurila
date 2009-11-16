@@ -4927,7 +4927,6 @@ Perl_newCONDOP(pTHX_ I32 flags, OP *first, OP *trueop, OP *falseop)
 {
     dVAR;
     LOGOP *logop;
-    OP *start;
     OP *cstop;
 
     PERL_ARGS_ASSERT_NEWCONDOP;
@@ -4972,7 +4971,7 @@ Perl_newCONDOP(pTHX_ I32 flags, OP *first, OP *trueop, OP *falseop)
     first->op_sibling = trueop;
     trueop->op_sibling = falseop;
 
-    logop->op_next = logop;
+    logop->op_next = (OP*)logop;
     return (OP*)logop;
 }
 
@@ -5343,7 +5342,6 @@ S_newGIVWHENOP(pTHX_ OP *cond, OP *block,
 {
     dVAR;
     LOGOP *enterop;
-    OP *o;
 
     PERL_ARGS_ASSERT_NEWGIVWHENOP;
 
@@ -5353,31 +5351,24 @@ S_newGIVWHENOP(pTHX_ OP *cond, OP *block,
     enterop->op_targ = ((entertarg == NOT_IN_PAD) ? 0 : entertarg);
     enterop->op_private = 0;
 
-    o = newUNOP(leave_opcode, 0, (OP *) enterop);
-
     if (cond) {
 	cond = scalar(cond);
 	enterop->op_first = cond;
 	cond->op_sibling = block;
-
-	o->op_next = LINKLIST(cond);
-	cond->op_next = (OP *) enterop;
-	enterop->op_next = o;
     }
     else {
 	/* This is a default {} block */
+	assert(enter_opcode == OP_ENTERWHEN);
 	enterop->op_first = block;
 	enterop->op_flags |= OPf_SPECIAL;
-
-	o->op_next = LINKLIST((OP *) enterop);
-	enterop->op_next = o;
     }
+    enterop->op_next = (OP*)enterop;
 
     CHECKOP(enter_opcode, enterop); /* Currently does nothing, since
     				       entergiven and enterwhen both
     				       use ck_null() */
 
-    return o;
+    return (OP*)enterop;
 }
 
 /* Does this look like a boolean operation? For these purposes
