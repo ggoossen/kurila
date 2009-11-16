@@ -623,7 +623,6 @@ BOOT:
 #define B_begin_av()	PL_beginav_save
 #define B_end_av()	PL_endav
 #define B_main_root()	PL_main_root
-#define B_main_start()	PL_main_start
 #define B_amagic_generation()	PL_amagic_generation
 #define B_sub_generation()	PL_sub_generation
 #define B_defstash()	PL_defstash

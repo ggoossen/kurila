@@ -899,7 +899,7 @@ See L<perlcall/Lightweight Callbacks>.
 	multicall_cv = cv;						\
 	if (!CvCODESEQ(cv)) {						\
 	    CvCODESEQ(cv) = Perl_new_codeseq(aTHX);					\
-	    Perl_compile_op(aTHX_ CvSTART(cv), CvCODESEQ(cv)); \
+	    Perl_compile_op(aTHX_ CvROOT(cv), CvCODESEQ(cv)); \
 	}								\
 	multicall_instr = Perl_codeseq_start_instruction(aTHX_ CvCODESEQ(cv));	\
     } STMT_END

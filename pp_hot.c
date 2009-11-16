@@ -2885,7 +2885,7 @@ try_autoload:
 
 	if (!CvCODESEQ(cv)) {
 	    CvCODESEQ(cv) = new_codeseq();
-	    compile_op(CvSTART(cv), CvCODESEQ(cv));
+	    compile_op(CvROOT(cv), CvCODESEQ(cv));
 	}
 	RUN_SET_NEXT_INSTRUCTION(codeseq_start_instruction(CvCODESEQ(cv)));
 

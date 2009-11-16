@@ -3680,7 +3680,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		CODESEQ* codeseq;
 	    
 		n = ARG(scan);
-		PL_op = (OP_4tree*)rexi->data->data[n];
+		PL_op = (OP_4tree*)rexi->data->data[n+1];
 		if(!rexi->data->data[n+3]) {
 		    codeseq = new_codeseq();
 		    rexi->data->data[n+3] = (void*)codeseq;

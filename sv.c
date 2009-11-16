@@ -5660,7 +5660,7 @@ Perl_sv_clear(pTHX_ register SV *const sv)
 			&& !CvCONST(destructor)
 			/* Don't bother calling an empty destructor */
 			&& (CvISXSUB(destructor)
-			|| CvSTART(destructor)->op_next->op_type != OP_LEAVESUB))
+			     || 1 /* FIXME: CvROOT(destructor)->op_first != OP_LEAVESUB */ ))
 		{
 		    SV* const tmpref = newRV(sv);
 	            SvREADONLY_on(tmpref);   /* DESTROY() could be naughty */
