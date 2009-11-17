@@ -7437,13 +7437,26 @@ Perl_ck_sassign(pTHX_ OP *o)
 	    OP *const other = newOP(OP_PADSV,
 				    kkid->op_flags
 				    | ((kkid->op_private & ~OPpLVAL_INTRO) << 8));
-	    OP *const first = newOP(OP_NULL, 0);
-	    OP *const nullop = scalar(newCONDOP(0, first, o, other));
-	    OP *const condop = NULL; /* FIXME first->op_next; */
+
+	    LOGOP *condop;
+
+	    scalar(o);
+	    scalar(other);
+
+	    NewOp(1101, condop, 1, LOGOP);
+	    condop->op_type = OP_ONCE;
+	    condop->op_first = o;
+	    condop->op_flags = OPf_KIDS;
+	    condop->op_other_instr = NULL;
+	    condop->op_private = 1;
+
+	    o->op_sibling = other;
+	    
+	    CHECKOP(OP_ONCE, condop);
+
 	    /* hijacking PADSTALE for uninitialized state variables */
 	    SvPADSTALE_on(PAD_SVl(target));
 
-	    condop->op_type = OP_ONCE;
 	    condop->op_targ = target;
 	    other->op_targ = target;
 
@@ -7452,7 +7465,7 @@ Perl_ck_sassign(pTHX_ OP *o)
 	       end of Perl_newBINOP(). So need to do it here. */
 	    cBINOPo->op_last = cBINOPo->op_first->op_sibling;
 
-	    return nullop;
+	    return condop;
 	}
     }
     return o;

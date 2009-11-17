@@ -406,25 +406,27 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 	/*
 	  ...
 	  o->op_type            label1
-	  <cLOGOPo->op_other>
+	  <op_first>
 	  instr_jump            label2
 	  label1:
-	  <o->op_start>
+	  <op_other>
 	  label2:
 	  ...
 	*/
 	int start_idx;
+	OP* op_first = cLOGOPo->op_first;
+	OP* op_other = op_first->op_sibling;
 	assert((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOGOP);
 
 	S_append_instruction(codeseq, bpp, o, o->op_type);
 
-	S_add_op(codeseq, bpp, cLOGOPo->op_other); /* FIXME */
+	S_add_op(codeseq, bpp, op_first);
 
 	start_idx = bpp->idx;
 	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
 		    
 	S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
-	S_add_op(codeseq, bpp, o->op_start); /* FIXME */
+	S_add_op(codeseq, bpp, op_other);
 	codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
 
 	break;
