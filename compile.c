@@ -171,6 +171,7 @@ S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP *o)
 	/* Don't expect 1 (setjmp failed) or 2 (something called my_exit)  */
 	PL_warnhook = oldwarnhook;
 	PL_diehook  = olddiehook;
+	assert(0);
 	/* XXX note that this croak may fail as we've already blown away
 	 * the stack - eg any nested evals */
 	Perl_croak(aTHX_ "panic: fold_constants JMPENV_PUSH returned %d", ret);
@@ -180,6 +181,7 @@ S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP *o)
     PL_diehook  = olddiehook;
     if (PL_scopestack_ix > oldscope)
 	delete_eval_scope();
+    assert(PL_scopestack_ix == oldscope);
     RUN_SET_NEXT_INSTRUCTION(old_next_instruction); 
 
     return sv;
@@ -762,7 +764,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 
     if (kid_may_constant_fold && bpp->idx > start_idx + 1) {
 	SV* constsv;
-	S_append_instruction_x(codeseq, bpp, NULL, NULL, NULL);
+	codeseq->xcodeseq_instructions[bpp->idx].instr_ppaddr = NULL;
 	constsv = S_instr_fold_constants(&(codeseq->xcodeseq_instructions[start_idx]), o);
 	if (constsv) {
 	    bpp->idx = start_idx; /* FIXME remove pointer sets from bpp */
