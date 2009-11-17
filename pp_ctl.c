@@ -2421,7 +2421,9 @@ S_dofindlabel(pTHX_ OP *o, const char *label, OP **opstack, OP **oplimit)
 	if (ops >= oplimit)
 	    Perl_croak(aTHX_ too_deep);
     }
-    else if (o->op_type == OP_ENTERLOOP) {
+    else if (o->op_type == OP_ENTERLOOP ||
+	     o->op_type == OP_FOREACH)
+    {
 	*ops++ = o;
 	if (ops >= oplimit)
 	    Perl_croak(aTHX_ too_deep);
@@ -2742,7 +2744,7 @@ PP(pp_goto)
 	if (leaving_eval && *enterops && enterops[1]) {
 	    I32 i;
             for (i = 1; enterops[i]; i++)
-                if (enterops[i]->op_type == OP_ENTERITER)
+                if (enterops[i]->op_type == OP_FOREACH)
                     DIE(aTHX_ "Can't \"goto\" into the middle of a foreach loop");
 	}
 
@@ -2768,7 +2770,7 @@ PP(pp_goto)
 		PL_op = enterops[ix];
 		/* Eventually we may want to stack the needed arguments
 		 * for each op.  For now, we punt on the hard ones. */
-		if (PL_op->op_type == OP_ENTERITER)
+		if (PL_op->op_type == OP_FOREACH)
 		    DIE(aTHX_ "Can't \"goto\" into the middle of a foreach loop");
 		CALL_FPTR(PL_ppaddr[PL_op->op_type])(aTHX_ NULL);
 	    }
