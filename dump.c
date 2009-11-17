@@ -725,7 +725,7 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
     else
 	PerlIO_printf(file, "    ");
     PerlIO_printf(file,
-		  "%*sTYPE = %s  ===> ",
+		  "%*sTYPE = %s\n",
 		  (int)(PL_dumpindent*level-4), "", OP_NAME(o));
     if (o->op_start)
 	Perl_dump_indent(aTHX_ level, file, "START = %"UVuf"\n", sequence_num(o->op_start));

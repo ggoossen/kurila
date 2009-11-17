@@ -2883,13 +2883,15 @@ try_autoload:
 	    && !(PERLDB_SUB && cv == GvCV(PL_DBsub)))
 	    sub_crush_depth(cv);
 
+	PUTBACK;
+
 	if (!CvCODESEQ(cv)) {
 	    CvCODESEQ(cv) = new_codeseq();
 	    compile_op(CvROOT(cv), CvCODESEQ(cv));
 	}
 	RUN_SET_NEXT_INSTRUCTION(codeseq_start_instruction(CvCODESEQ(cv)));
 
-	RETURN;
+	return NORMAL;
     }
     else {
 	I32 markix = TOPMARK;

@@ -196,12 +196,10 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     bpp->recursion++;
     DEBUG_g(
 	Perl_deb("%*sCompiling op sequence ", 2*bpp->recursion, "");
-	if (0) dump_op_short(o);
-	    Perl_deb("\n"); );
+	dump_op_short(o);
+	    PerlIO_printf(Perl_debug_log, "\n") );
     
     assert(o);
-
-    DEBUG_g(Perl_deb("%*sCompiling op ", 2*bpp->recursion, ""); dump_op_short(o); Perl_deb("\n"));
 
     switch (o->op_type) {
     case OP_CONST:
@@ -763,27 +761,36 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     }
 
     if (kid_may_constant_fold && bpp->idx > start_idx + 1) {
-	SV* constsv;
-	codeseq->xcodeseq_instructions[bpp->idx].instr_ppaddr = NULL;
-	constsv = S_instr_fold_constants(&(codeseq->xcodeseq_instructions[start_idx]), o);
-	if (constsv) {
-	    bpp->idx = start_idx; /* FIXME remove pointer sets from bpp */
-	    SvREADONLY_on(constsv);
-	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_const, (void*)constsv);
-	    Perl_av_create_and_push(aTHX_ &codeseq->xcodeseq_svs, constsv);
-	}
+    	SV* constsv;
+    	codeseq->xcodeseq_instructions[bpp->idx].instr_ppaddr = NULL;
+    	constsv = S_instr_fold_constants(&(codeseq->xcodeseq_instructions[start_idx]), o);
+    	if (constsv) {
+    	    bpp->idx = start_idx; /* FIXME remove pointer sets from bpp */
+    	    SvREADONLY_on(constsv);
+    	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_const, (void*)constsv);
+    	    Perl_av_create_and_push(aTHX_ &codeseq->xcodeseq_svs, constsv);
+    	}
     }
 
     *may_constant_fold = *may_constant_fold && kid_may_constant_fold;
     bpp->recursion--;
 }
 
+/*
+=item compile_op
+Compiles to op into the codeseq, assumes the pad is setup correctly
+*/
 void
 Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 {
+    dSP;
     OP* o;
 
     BRANCH_POINT_PAD bpp;
+
+    PUSHSTACKi(PERLSI_COMPILE);
+    ENTER;
+    SAVETMPS;
 
     Newx(bpp.op_instrpp_list, 128, OP_INSTRPP);
     bpp.idx = 0;
@@ -846,6 +853,10 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
     }
 
     Safefree(bpp.op_instrpp_list);
+
+    FREETMPS ;
+    LEAVE ;
+    POPSTACK;
 
     DEBUG_G(codeseq_dump(codeseq));
 }
