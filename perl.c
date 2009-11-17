@@ -2535,7 +2535,6 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     }
 
     Zero(&myop, 1, LOGOP);
-    myop.op_next = NULL;
     if (!(flags & G_NOARGS))
 	myop.op_flags |= OPf_STACKED;
     myop.op_flags |= OP_GIMME_REVERSE(flags);
@@ -2559,7 +2558,6 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 
     if (flags & G_METHOD) {
 	Zero(&method_op, 1, UNOP);
-	method_op.op_next = PL_op;
 	method_op.op_type = OP_METHOD;
 	myop.op_type = OP_ENTERSUB;
 	myinstr[instr_idx].instr_op = (OP*)&method_op;
@@ -2674,7 +2672,6 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
 
     if (!(flags & G_NOARGS))
 	myop.op_flags = OPf_STACKED;
-    myop.op_next = NULL;
     myop.op_type = OP_ENTEREVAL;
     myop.op_flags |= OP_GIMME_REVERSE(flags);
     if (flags & G_KEEPERR)

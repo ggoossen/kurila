@@ -209,8 +209,6 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o)
 	S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 	S_add_op(codeseq, bpp, op_false);
 
-	S_register_branch_point(bpp, o->op_next);
-
 	codeseq->xcodeseq_instructions[jump_idx].instr_arg1 = (void*)(bpp->idx - jump_idx - 1);
 	break;
     }

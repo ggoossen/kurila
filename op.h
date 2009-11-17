@@ -10,11 +10,6 @@
 
 /*
  * The fields of BASEOP are:
- *	op_next		Pointer to next ppcode to execute after this one.
- *			(Top level pre-grafted op points to first op,
- *			but this is replaced when op is grafted in, when
- *			this op will point to the real next op, and the new
- *			parent takes over role of remembering starting op.)
  *	op_type		The type of the operation.
  *	op_opt		Whether or not the op has been optimised by the
  *			peephole optimiser.
@@ -50,7 +45,6 @@ typedef PERL_BITFIELD16 Optype;
 #define BASEOP BASEOP_DEFINITION
 #else
 #define BASEOP				\
-    OP*		op_next;		\
     OP*		op_start;		\
     OP*		op_more_op;		\
     INSTRUCTION*		op_unstack_instr;		\

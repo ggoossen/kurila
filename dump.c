@@ -727,11 +727,6 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
     PerlIO_printf(file,
 		  "%*sTYPE = %s  ===> ",
 		  (int)(PL_dumpindent*level-4), "", OP_NAME(o));
-    if (o->op_next)
-	PerlIO_printf(file, seq ? "%"UVuf"\n" : "(%"UVuf")\n",
-				sequence_num(o->op_next));
-    else
-	PerlIO_printf(file, "DONE\n");
     if (o->op_start)
 	Perl_dump_indent(aTHX_ level, file, "START = %"UVuf"\n", sequence_num(o->op_start));
     if (o->op_more_op)
@@ -2722,11 +2717,6 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	     OP_NAME(o),
 	              seq);
     level++;
-    if (o->op_next)
-	PerlIO_printf(file, seq ? "%"UVuf"\"" : "(%"UVuf")\"",
-		      sequence_num(o->op_next));
-    else
-	PerlIO_printf(file, "DONE\"");
 
     if (o->op_targ) {
 	if (o->op_type == OP_NULL)
@@ -2749,7 +2739,7 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	    PerlIO_printf(file, " targ=\"%ld\"", (long)o->op_targ);
     }
 #ifdef DUMPADDR
-    PerlIO_printf(file, " addr=\"0x%"UVxf" => 0x%"UVxf"\"", (UV)o, (UV)o->op_next);
+    PerlIO_printf(file, " addr=\"0x%"UVxf"\"", (UV)o);
 #endif
     if (o->op_flags) {
 	SV * const tmpsv = newSVpvs("");

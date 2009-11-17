@@ -1480,7 +1480,6 @@ PP(pp_sort)
     GV *gv;
     CV *cv = NULL;
     I32 gimme = GIMME;
-    OP* const nextop = PL_op->op_next;
     I32 overloading = 0;
     bool hasargs = FALSE;
     I32 is_xsub = 0;
@@ -1741,7 +1740,7 @@ PP(pp_sort)
     }
     LEAVE;
     PL_stack_sp = ORIGMARK + (sorting_av ? 0 : max);
-    return nextop;
+    return NORMAL;
 }
 
 static I32
