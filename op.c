@@ -5545,48 +5545,44 @@ Perl_op_const_sv(pTHX_ const OP *o, CV *cv)
     if (o->op_type == OP_LINESEQ && cLISTOPo->op_first)
 	o = cLISTOPo->op_first->op_sibling;
 
-    /* for (; o; o = o->op_next) { */
-    /* 	const OPCODE type = o->op_type; */
+    for (; o; o = o->op_sibling) {
+    	const OPCODE type = o->op_type;
 
-    /* 	if (sv && o->op_next == o) */
-    /* 	    return sv; */
-    /* 	if (o->op_next != o) { */
-    /* 	    if (type == OP_NEXTSTATE || type == OP_NULL || type == OP_PUSHMARK) */
-    /* 		continue; */
-    /* 	    if (type == OP_DBSTATE) */
-    /* 		continue; */
-    /* 	} */
-    /* 	if (type == OP_LEAVESUB || type == OP_RETURN) */
-    /* 	    break; */
-    /* 	if (sv) */
-    /* 	    return NULL; */
-    /* 	if (type == OP_CONST && cSVOPo->op_sv) */
-    /* 	    sv = cSVOPo->op_sv; */
-    /* 	else if (cv && type == OP_CONST) { */
-    /* 	    sv = PAD_BASE_SV(CvPADLIST(cv), o->op_targ); */
-    /* 	    if (!sv) */
-    /* 		return NULL; */
-    /* 	} */
-    /* 	else if (cv && type == OP_PADSV) { */
-    /* 	    if (CvCONST(cv)) { /\* newly cloned anon *\/ */
-    /* 		sv = PAD_BASE_SV(CvPADLIST(cv), o->op_targ); */
-    /* 		/\* the candidate should have 1 ref from this pad and 1 ref */
-    /* 		 * from the parent *\/ */
-    /* 		if (!sv || SvREFCNT(sv) != 2) */
-    /* 		    return NULL; */
-    /* 		sv = newSVsv(sv); */
-    /* 		SvREADONLY_on(sv); */
-    /* 		return sv; */
-    /* 	    } */
-    /* 	    else { */
-    /* 		if (PAD_COMPNAME_FLAGS(o->op_targ) & SVf_FAKE) */
-    /* 		    sv = &PL_sv_undef; /\* an arbitrary non-null value *\/ */
-    /* 	    } */
-    /* 	} */
-    /* 	else { */
-    /* 	    return NULL; */
-    /* 	} */
-    /* } */
+	if (type == OP_NEXTSTATE || type == OP_NULL || type == OP_PUSHMARK)
+	    continue;
+	if (type == OP_DBSTATE)
+	    continue;
+    	if (type == OP_LEAVESUB || type == OP_RETURN)
+    	    break;
+    	if (sv)
+    	    return NULL;
+    	if (type == OP_CONST && cSVOPo->op_sv)
+    	    sv = cSVOPo->op_sv;
+    	else if (cv && type == OP_CONST) {
+    	    sv = PAD_BASE_SV(CvPADLIST(cv), o->op_targ);
+    	    if (!sv)
+    		return NULL;
+    	}
+    	else if (cv && type == OP_PADSV) {
+    	    if (CvCONST(cv)) { /* newly cloned anon */
+    		sv = PAD_BASE_SV(CvPADLIST(cv), o->op_targ);
+    		/* the candidate should have 1 ref from this pad and 1 ref
+    		 * from the parent */
+    		if (!sv || SvREFCNT(sv) != 2)
+    		    return NULL;
+    		sv = newSVsv(sv);
+    		SvREADONLY_on(sv);
+    		return sv;
+    	    }
+    	    else {
+    		if (PAD_COMPNAME_FLAGS(o->op_targ) & SVf_FAKE)
+    		    sv = &PL_sv_undef; /* an arbitrary non-null value */
+    	    }
+    	}
+    	else {
+    	    return NULL;
+    	}
+    }
     return sv;
 }
 
