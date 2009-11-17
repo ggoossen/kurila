@@ -62,8 +62,9 @@ Allocating/freeing must be done using C<new_codeseq> and C<free_codeseq>.
 */
 
 struct codeseq {
-    int xcodeseq_size;
-    INSTRUCTION* xcodeseq_instructions;
+    int xcodeseq_size;                   /* Number of items in xcodeseq_instructions    */
+    INSTRUCTION* xcodeseq_instructions;  /* List of xcodeseq_size items of INSTRUCTIONs */
+    AV* xcodeseq_svs;                    /* Array with SVs to be freed with the codeseq */
 };
 
 /*

@@ -384,12 +384,13 @@ typedef enum opcode {
 	OP_ONCE		 = 366,
 	OP_INSTR_JUMP	 = 367,
 	OP_INSTR_COND_JUMP = 368,
-	OP_CUSTOM	 = 369,
-	OP_FOREACH	 = 370,
+	OP_INSTR_CONST	 = 369,
+	OP_CUSTOM	 = 370,
+	OP_FOREACH	 = 371,
 	OP_max		
 } opcode;
 
-#define MAXO 371
+#define MAXO 372
 #define OP_phoney_INPUT_ONLY -1
 #define OP_phoney_OUTPUT_ONLY -2
 

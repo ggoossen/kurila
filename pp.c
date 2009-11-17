@@ -5964,6 +5964,15 @@ PP(pp_instr_cond_jump)
     }
 }
 
+PP(pp_instr_const)
+{
+    dVAR;
+    dSP;
+    SV* sv = (SV*)pparg1;
+    XPUSHs(sv);
+    RETURN;
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd
