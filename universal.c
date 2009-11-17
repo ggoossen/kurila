@@ -236,6 +236,7 @@ XS(XS_utf8_unicode_to_native);
 XS(XS_utf8_native_to_unicode);
 XS(XS_Internals_SvREADONLY);
 XS(XS_Internals_SvREFCNT);
+XS(XS_Internals_sv_dump);
 XS(XS_Internals_hv_clear_placehold);
 XS(XS_PerlIO_get_layers);
 XS(XS_Internals_hash_seed);
@@ -300,6 +301,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("utf8::unicode_to_native", XS_utf8_unicode_to_native, file);
     newXSproto("Internals::SvREADONLY",XS_Internals_SvREADONLY, file, "\\[$%@];$");
     newXSproto("Internals::SvREFCNT",XS_Internals_SvREFCNT, file, "\\[$%@];$");
+    newXSproto("Internals::sv_dump",XS_Internals_sv_dump, file, "\\[$%@]");
     newXSproto("Internals::hv_clear_placeholders",
                XS_Internals_hv_clear_placehold, file, "\\%");
     newXSproto("PerlIO::get_layers",
@@ -948,6 +950,19 @@ XS(XS_Internals_SvREFCNT)	/* This is dangerous stuff. */
 	 XSRETURN_IV(SvREFCNT(sv));
     }
     XSRETURN_UNDEF; /* Can't happen. */
+}
+
+XS(XS_Internals_sv_dump)
+{
+    dVAR;
+    dXSARGS;
+    SV * const sv = SvRV(ST(0));
+    PERL_UNUSED_ARG(cv);
+    if (items != 1)
+	croak_xs_usage(cv, "sv");
+
+    sv_dump(sv);
+    XSRETURN_UNDEF;
 }
 
 XS(XS_Internals_hv_clear_placehold)
