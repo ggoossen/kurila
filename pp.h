@@ -482,13 +482,10 @@ Does not use C<TARG>.  See also C<XPUSHu>, C<mPUSHu> and C<PUSHu>.
 		ftest_amg, AMGf_unary);			\
 							\
 	    if (tmpsv) {				\
-		const OP *next = PL_op->op_next;	\
 							\
 		SPAGAIN;				\
 							\
-		if (next->op_type >= OP_FTRREAD &&	\
-		    next->op_type <= OP_FTBINARY &&	\
-		    next->op_private & OPpFT_STACKED	\
+		if (PL_op->op_private & OPpFT_STACKING	\
 		) {					\
 		    if (SvTRUE(tmpsv))			\
 			/* leave the object alone */	\
