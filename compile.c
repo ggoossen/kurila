@@ -137,6 +137,7 @@ S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP *o)
     I32 oldscope;
     SV * const oldwarnhook = PL_warnhook;
     SV * const olddiehook  = PL_diehook;
+    const INSTRUCTION* VOL old_next_instruction = run_get_next_instruction();
     dJMPENV;
 
     oldscope = PL_scopestack_ix;
@@ -177,9 +178,9 @@ S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP *o)
     JMPENV_POP;
     PL_warnhook = oldwarnhook;
     PL_diehook  = olddiehook;
-
     if (PL_scopestack_ix > oldscope)
 	delete_eval_scope();
+    RUN_SET_NEXT_INSTRUCTION(old_next_instruction); 
 
     return sv;
 }
