@@ -6464,9 +6464,10 @@ Perl_ck_concat(pTHX_ OP *o)
     PERL_ARGS_ASSERT_CK_CONCAT;
     PERL_UNUSED_CONTEXT;
 
-    if (kid->op_type == OP_CONCAT && !(kid->op_private & OPpTARGET_MY) &&
-	    !(kUNOP->op_first->op_flags & OPf_MOD))
-        o->op_flags |= OPf_STACKED;
+    /* FIXME move to compile.c */
+    /* if (kid->op_type == OP_CONCAT && !(kid->op_private & OPpTARGET_MY) && */
+    /* 	    !(kUNOP->op_first->op_flags & OPf_MOD)) */
+    /*     o->op_flags |= OPf_STACKED; */
     return o;
 }
 
@@ -7399,31 +7400,32 @@ Perl_ck_sassign(pTHX_ OP *o)
     PERL_ARGS_ASSERT_CK_SASSIGN;
 
     /* has a disposable target? */
-    if ((PL_opargs[kid->op_type] & OA_TARGLEX)
-	&& !(kid->op_flags & OPf_STACKED)
-	/* Cannot steal the second time! */
-	&& !(kid->op_private & OPpTARGET_MY)
-	/* Keep the full thing for madskills */
-	&& !PL_madskills
-	)
-    {
-	OP * const kkid = kid->op_sibling;
+    /* FIXME Move to compile.c */
+    /* if ((PL_opargs[kid->op_type] & OA_TARGLEX) */
+    /* 	&& !(kid->op_flags & OPf_STACKED) */
+    /* 	/\* Cannot steal the second time! *\/ */
+    /* 	&& !(kid->op_private & OPpTARGET_MY) */
+    /* 	/\* Keep the full thing for madskills *\/ */
+    /* 	&& !PL_madskills */
+    /* 	) */
+    /* { */
+    /* 	OP * const kkid = kid->op_sibling; */
 
-	/* Can just relocate the target. */
-	if (kkid && kkid->op_type == OP_PADSV
-	    && !(kkid->op_private & OPpLVAL_INTRO))
-	{
-	    kid->op_targ = kkid->op_targ;
-	    kkid->op_targ = 0;
-	    /* Now we do not need PADSV and SASSIGN. */
-	    kid->op_sibling = o->op_sibling;	/* NULL */
-	    cLISTOPo->op_first = NULL;
-	    op_free(o);
-	    op_free(kkid);
-	    kid->op_private |= OPpTARGET_MY;	/* Used for context settings */
-	    return kid;
-	}
-    }
+    /* 	/\* Can just relocate the target. *\/ */
+    /* 	if (kkid && kkid->op_type == OP_PADSV */
+    /* 	    && !(kkid->op_private & OPpLVAL_INTRO)) */
+    /* 	{ */
+    /* 	    kid->op_targ = kkid->op_targ; */
+    /* 	    kkid->op_targ = 0; */
+    /* 	    /\* Now we do not need PADSV and SASSIGN. *\/ */
+    /* 	    kid->op_sibling = o->op_sibling;	/\* NULL *\/ */
+    /* 	    cLISTOPo->op_first = NULL; */
+    /* 	    op_free(o); */
+    /* 	    op_free(kkid); */
+    /* 	    kid->op_private |= OPpTARGET_MY;	/\* Used for context settings *\/ */
+    /* 	    return kid; */
+    /* 	} */
+    /* } */
     if (kid->op_sibling) {
 	OP *kkid = kid->op_sibling;
 	if (kkid->op_type == OP_PADSV
