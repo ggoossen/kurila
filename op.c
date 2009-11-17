@@ -1471,12 +1471,17 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	if (!(o->op_private & OPpCONST_ARYBASE))
 	    goto nomod;
 	localize = 0;
-	/* if (PL_eval_start && PL_eval_start->op_type == OP_CONST) { */
-	/*     CopARYBASE_set(&PL_compiling, */
-	/* 		   (I32)SvIV(cSVOPx(PL_eval_start)->op_sv)); */
-	/*     PL_eval_start = 0; */
-	/* } */
-	if (!type) {
+	if (PL_eval_root && PL_eval_root->op_type == OP_CONST) {
+	    CopARYBASE_set(&PL_compiling,
+			   (I32)SvIV(cSVOPx(PL_eval_root)->op_sv));
+	    PL_eval_root = 0;
+	}
+	else if (PL_eval_root && PL_eval_root->op_type == OP_NEGATE && cUNOPx(PL_eval_root)->op_first->op_type == OP_CONST) {
+	    CopARYBASE_set(&PL_compiling,
+		-(I32)SvIV(cSVOPx(cUNOPx(PL_eval_root)->op_first)->op_sv));
+	    PL_eval_root = 0;
+	}
+	else if (!type) {
 	    SAVECOPARYBASE(&PL_compiling);
 	    CopARYBASE_set(&PL_compiling, 0);
 	}
@@ -4405,9 +4410,11 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 	PL_modcount = 0;
 	/* Grandfathering $[ assignment here.  Bletch.*/
 	/* Only simple assignments like C<< ($[) = 1 >> are allowed */
-	/* PL_eval_start = (left->op_type == OP_CONST) ? right : NULL; */
+	PL_eval_root = (left->op_type == OP_CONST) ? right : NULL;
 	left = mod(left, OP_AASSIGN);
-	if (left->op_type == OP_CONST) {
+	if (PL_eval_root)
+	    PL_eval_root = 0;
+	else if (left->op_type == OP_CONST) {
 	    /* FIXME for MAD */
 	    /* Result of assignment is always 1 (or we'd be dead already) */
 	    return newSVOP(OP_CONST, 0, newSViv(1));
@@ -4553,8 +4560,19 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right)
 	return newBINOP(OP_NULL, flags, mod(scalar(left), OP_SASSIGN), scalar(right));
     }
     else {
+	PL_eval_root = right;  /* Grandfathering $[ assignment here.  Bletch.*/
 	o = newBINOP(OP_SASSIGN, flags,
 	    scalar(right), mod(scalar(left), OP_SASSIGN) );
+	if (PL_eval_root)
+	    PL_eval_root = 0;
+	else {
+	    if (!PL_madskills) { /* assignment to $[ is ignored when making a mad dump */
+		deprecate("assignment to $[");
+		op_free(o);
+		o = newSVOP(OP_CONST, 0, newSViv(CopARYBASE_get(&PL_compiling)));
+		o->op_private |= OPpCONST_ARYBASE;
+	    }
+	}
     }
 
     return o;
