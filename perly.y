@@ -1122,20 +1122,16 @@ term	:	termbinop
 	|       subscripted
 			{ $$ = $1; }
 	|	ary '[' expr ']'                     /* array slice */
-			{ $$ = prepend_elem(OP_ASLICE,
-				newOP(OP_PUSHMARK, 0),
-				    newLISTOP(OP_ASLICE, 0,
+			{ $$ = newLISTOP(OP_ASLICE, 0,
 					list($3),
-					ref($1, OP_ASLICE)));
+					ref($1, OP_ASLICE));
 			  TOKEN_GETMAD($2,$$,'[');
 			  TOKEN_GETMAD($4,$$,']');
 			}
 	|	ary '{' expr ';' '}'                 /* @hash{@keys} */
-			{ $$ = prepend_elem(OP_HSLICE,
-				newOP(OP_PUSHMARK, 0),
-				    newLISTOP(OP_HSLICE, 0,
+			{ $$ = newLISTOP(OP_HSLICE, 0,
 					list($3),
-					ref(oopsHV($1), OP_HSLICE)));
+					ref(oopsHV($1), OP_HSLICE));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'{');
 			  TOKEN_GETMAD($4,$$,';');
@@ -1243,8 +1239,7 @@ term	:	termbinop
 	|	listop
 	|	YADAYADA
 			{
-			  $$ = newLISTOP(OP_DIE, 0, newOP(OP_PUSHMARK, 0),
-				newSVOP(OP_CONST, 0, newSVpvs("Unimplemented")));
+                          $$ = newLISTOP(OP_DIE, 0, newSVOP(OP_CONST, 0, newSVpvs("Unimplemented")), NULL);
 			  TOKEN_GETMAD($1,$$,'X');
 			}
 	|	PLUGEXPR
