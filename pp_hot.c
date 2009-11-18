@@ -1896,7 +1896,7 @@ PP(pp_leave)
 	cx->blk_oldpm = PL_curpm;	/* fake block should preserve $1 et al */
     }
 
-    POPBLOCK(cx,newpm);
+    POPBLOCK_normal(cx,newpm);
 
     gimme = OP_GIMME(PL_op, (cxstack_ix >= 0) ? gimme : G_SCALAR);
 
@@ -2539,7 +2539,7 @@ PP(pp_leavesublv)
     if (CxMULTICALL(&cxstack[cxstack_ix]))
 	return 0;
 
-    POPBLOCK(cx,newpm);
+    POPBLOCK_normal(cx,newpm);
     cxstack_ix++; /* temporarily protect top context */
 
     TAINT_NOT;
