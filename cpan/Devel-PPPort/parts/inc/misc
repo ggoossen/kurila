@@ -475,7 +475,6 @@ Perl_ppaddr_t(string)
 		Perl_ppaddr_t lower;
 	PPCODE:
 		lower = PL_ppaddr[OP_LC];
-		PUSHMARK(SP);
 		mXPUSHs(newSVpv(string, 0));
 		PUTBACK;
 		ENTER;
