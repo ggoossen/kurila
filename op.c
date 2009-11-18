@@ -2515,19 +2515,7 @@ Perl_jmaybe(pTHX_ OP *o)
 static OP *
 S_fold_constants(pTHX_ register OP *o)
 {
-    dVAR;
-    register OP * VOL curop;
-    OP *newop;
     VOL I32 type = o->op_type;
-    SV * VOL sv = NULL;
-    int ret = 0;
-    I32 oldscope;
-    OP *old_next;
-    SV * const oldwarnhook = PL_warnhook;
-    SV * const olddiehook  = PL_diehook;
-    CODESEQ* codeseq;
-    COP not_compiling;
-    dJMPENV;
 
     PERL_ARGS_ASSERT_FOLD_CONSTANTS;
 
@@ -2545,113 +2533,6 @@ S_fold_constants(pTHX_ register OP *o)
 	type = ++(o->op_type);
     }
 
-    if (!(PL_opargs[type] & OA_FOLDCONST))
-	goto nope;
-
-    return o;
-
-    switch (type) {
-    case OP_NEGATE:
-	/* XXX might want a ck_negate() for this */
-	cUNOPo->op_first->op_private &= ~OPpCONST_STRICT;
-	break;
-    case OP_UCFIRST:
-    case OP_LCFIRST:
-    case OP_UC:
-    case OP_LC:
-    case OP_SLT:
-    case OP_SGT:
-    case OP_SLE:
-    case OP_SGE:
-    case OP_SCMP:
-	/* XXX what about the numeric ops? */
-	if (PL_hints & HINT_LOCALE)
-	    goto nope;
-	break;
-    }
-
-    if (PL_parser && PL_parser->error_count)
-	goto nope;		/* Don't try to run w/ errors */
-
-    /* for (curop = LINKLIST(o); curop != o; curop = LINKLIST(curop)) { */
-    /* 	const OPCODE type = curop->op_type; */
-    /* 	if ((type != OP_CONST || (curop->op_private & OPpCONST_BARE)) && */
-    /* 	    type != OP_LIST && */
-    /* 	    type != OP_SCALAR && */
-    /* 	    type != OP_NULL && */
-    /* 	    type != OP_PUSHMARK) */
-    /* 	{ */
-    /* 	    goto nope; */
-    /* 	} */
-    /* } */
-
-    codeseq = new_codeseq();
-    compile_op(curop, codeseq);
-
-    oldscope = PL_scopestack_ix;
-    create_eval_scope(G_FAKINGEVAL);
-
-    /* Verify that we don't need to save it:  */
-    assert(PL_curcop == &PL_compiling);
-    StructCopy(&PL_compiling, &not_compiling, COP);
-    PL_curcop = &not_compiling;
-    /* The above ensures that we run with all the correct hints of the
-       currently compiling COP, but that IN_PERL_RUNTIME is not true. */
-    assert(IN_PERL_RUNTIME);
-    PL_warnhook = PERL_WARNHOOK_FATAL;
-    PL_diehook  = NULL;
-    JMPENV_PUSH(ret);
-
-    switch (ret) {
-    case 0:
-	run_exec_codeseq(codeseq);
-	sv = *(PL_stack_sp--);
-	if (o->op_targ && sv == PAD_SV(o->op_targ))	/* grab pad temp? */
-	    pad_swipe(o->op_targ,  FALSE);
-	else if (SvTEMP(sv)) {			/* grab mortal temp? */
-	    SvREFCNT_inc_simple_void(sv);
-	    SvTEMP_off(sv);
-	}
-	break;
-    case 3:
-	/* Something tried to die.  Abandon constant folding.  */
-	/* Pretend the error never happened.  */
-	CLEAR_ERRSV();
-	break;
-    default:
-	JMPENV_POP;
-	/* Don't expect 1 (setjmp failed) or 2 (something called my_exit)  */
-	PL_warnhook = oldwarnhook;
-	PL_diehook  = olddiehook;
-	/* XXX note that this croak may fail as we've already blown away
-	 * the stack - eg any nested evals */
-	Perl_croak(aTHX_ "panic: fold_constants JMPENV_PUSH returned %d", ret);
-    }
-    JMPENV_POP;
-    PL_warnhook = oldwarnhook;
-    PL_diehook  = olddiehook;
-    PL_curcop = &PL_compiling;
-    free_codeseq(codeseq);
-    PL_op = NULL;
-
-    if (PL_scopestack_ix > oldscope)
-	delete_eval_scope();
-
-    if (ret)
-	goto nope;
-
-#ifndef PERL_MAD
-    op_free(o);
-#endif
-    assert(sv);
-    if (type == OP_RV2GV)
-	newop = newGVOP(OP_GV, 0, MUTABLE_GV(sv));
-    else
-	newop = newSVOP(OP_CONST, 0, MUTABLE_SV(sv));
-    op_getmad(o,newop,'f');
-    return newop;
-
- nope:
     return o;
 }
 
@@ -3619,6 +3500,7 @@ Perl_newPMOP(pTHX_ I32 type, I32 flags)
 static bool
 S_repl_is_constant(OP* o, bool * const repl_has_varsp)
 {
+    PERL_ARGS_ASSERT_REPL_IS_CONSTANT;
     if (o->op_type == OP_SCOPE
 	|| o->op_type == OP_LEAVE
 	|| (PL_opargs[o->op_type] & OA_DANGEROUS)) {
@@ -4250,6 +4132,7 @@ S_is_list_assignment(pTHX_ register const OP *o)
 bool
 S_aassign_common_vars_left(pTHX_ OP* o)
 {
+    PERL_ARGS_ASSERT_AASSIGN_COMMON_VARS_LEFT;
     if (PL_opargs[o->op_type] & OA_DANGEROUS) {
 	if (o->op_type == OP_GV) {
 	    GV *gv = cGVOPx_gv(o);
@@ -4294,6 +4177,7 @@ S_aassign_common_vars_left(pTHX_ OP* o)
 bool
 S_aassign_common_vars_right(pTHX_ OP* o)
 {
+    PERL_ARGS_ASSERT_AASSIGN_COMMON_VARS_RIGHT;
     if (PL_opargs[o->op_type] & OA_DANGEROUS) {
 	if (o->op_type == OP_GV) {
 	    GV *gv = cGVOPx_gv(o);

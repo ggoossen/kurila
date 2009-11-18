@@ -435,7 +435,6 @@
 #endif
 #if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
-#define linklist		S_linklist
 #define listkids		S_listkids
 #endif
 #endif
@@ -2269,6 +2268,7 @@
 #define pp_i_subtract		Perl_pp_i_subtract
 #define pp_index		Perl_pp_index
 #define pp_instr_cond_jump	Perl_pp_instr_cond_jump
+#define pp_instr_const		Perl_pp_instr_const
 #define pp_instr_jump		Perl_pp_instr_jump
 #define pp_int			Perl_pp_int
 #define pp_ioctl		Perl_pp_ioctl
@@ -2872,7 +2872,6 @@
 #endif
 #if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
-#define linklist(a)		S_linklist(aTHX_ a)
 #define listkids(a)		S_listkids(aTHX_ a)
 #endif
 #endif
@@ -4722,6 +4721,7 @@
 #define pp_i_subtract()		Perl_pp_i_subtract(aTHX)
 #define pp_index()		Perl_pp_index(aTHX)
 #define pp_instr_cond_jump()	Perl_pp_instr_cond_jump(aTHX)
+#define pp_instr_const()	Perl_pp_instr_const(aTHX)
 #define pp_instr_jump()		Perl_pp_instr_jump(aTHX)
 #define pp_int()		Perl_pp_int(aTHX)
 #define pp_ioctl()		Perl_pp_ioctl(aTHX)

@@ -792,6 +792,8 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
     ENTER;
     SAVETMPS;
 
+    save_scalar(PL_errgv);
+
     Newx(bpp.op_instrpp_list, 128, OP_INSTRPP);
     bpp.idx = 0;
     bpp.op_instrpp_compile = bpp.op_instrpp_list;

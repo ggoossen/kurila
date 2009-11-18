@@ -133,7 +133,6 @@
 #define PL_errors		(vTHX->Ierrors)
 #define PL_euid			(vTHX->Ieuid)
 #define PL_eval_root		(vTHX->Ieval_root)
-#define PL_eval_start		(vTHX->Ieval_start)
 #define PL_evalseq		(vTHX->Ievalseq)
 #define PL_exit_flags		(vTHX->Iexit_flags)
 #define PL_exitlist		(vTHX->Iexitlist)
@@ -179,7 +178,6 @@
 #define PL_madskills		(vTHX->Imadskills)
 #define PL_main_cv		(vTHX->Imain_cv)
 #define PL_main_root		(vTHX->Imain_root)
-#define PL_main_start		(vTHX->Imain_start)
 #define PL_mainstack		(vTHX->Imainstack)
 #define PL_markstack		(vTHX->Imarkstack)
 #define PL_markstack_max	(vTHX->Imarkstack_max)
@@ -451,7 +449,6 @@
 #define PL_Ierrors		PL_errors
 #define PL_Ieuid		PL_euid
 #define PL_Ieval_root		PL_eval_root
-#define PL_Ieval_start		PL_eval_start
 #define PL_Ievalseq		PL_evalseq
 #define PL_Iexit_flags		PL_exit_flags
 #define PL_Iexitlist		PL_exitlist
@@ -497,7 +494,6 @@
 #define PL_Imadskills		PL_madskills
 #define PL_Imain_cv		PL_main_cv
 #define PL_Imain_root		PL_main_root
-#define PL_Imain_start		PL_main_start
 #define PL_Imainstack		PL_mainstack
 #define PL_Imarkstack		PL_markstack
 #define PL_Imarkstack_max	PL_markstack_max

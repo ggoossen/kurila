@@ -302,8 +302,6 @@ END_EXTERN_C
 #define PL_euid			(*Perl_Ieuid_ptr(aTHX))
 #undef  PL_eval_root
 #define PL_eval_root		(*Perl_Ieval_root_ptr(aTHX))
-#undef  PL_eval_start
-#define PL_eval_start		(*Perl_Ieval_start_ptr(aTHX))
 #undef  PL_evalseq
 #define PL_evalseq		(*Perl_Ievalseq_ptr(aTHX))
 #undef  PL_exit_flags
@@ -394,8 +392,6 @@ END_EXTERN_C
 #define PL_main_cv		(*Perl_Imain_cv_ptr(aTHX))
 #undef  PL_main_root
 #define PL_main_root		(*Perl_Imain_root_ptr(aTHX))
-#undef  PL_main_start
-#define PL_main_start		(*Perl_Imain_start_ptr(aTHX))
 #undef  PL_mainstack
 #define PL_mainstack		(*Perl_Imainstack_ptr(aTHX))
 #undef  PL_markstack
