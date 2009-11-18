@@ -1227,7 +1227,6 @@ void
 stat(...)
 PROTOTYPE: ;$
     PPCODE:
-	PUSHMARK(SP);
 	XPUSHs(sv_2mortal(newSVsv(items == 1 ? ST(0) : DEFSV)));
 	PUTBACK;
 	ENTER;
