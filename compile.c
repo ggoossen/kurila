@@ -575,10 +575,10 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     case OP_REGCOMP:
     {
 	OP* op_first = cLOGOPo->op_first;
-	if (o->op_flags & OPf_STACKED)
-	    S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
 	if (op_first->op_type == OP_REGCRESET) {
 	    S_append_instruction(codeseq, bpp, op_first, op_first->op_type);
+	    if (o->op_flags & OPf_STACKED)
+		S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
 	    S_add_op(codeseq, bpp, cUNOPx(op_first)->op_first, &kid_may_constant_fold);
 	}
 	else {
@@ -825,16 +825,14 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     {
 	OP* op_right = cBINOPo->op_first;
 	OP* op_left = op_right->op_sibling;
-	S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
 	S_add_op(codeseq, bpp, op_right, &kid_may_constant_fold);
-	S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
 	S_add_op(codeseq, bpp, op_left, &kid_may_constant_fold);
 	S_append_instruction(codeseq, bpp, o, OP_AASSIGN);
 	break;
     }
     case OP_LIST:
     {
-	/* S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK); */
+	S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
 	if (o->op_flags & OPf_KIDS) {
 	    OP* kid;
 	    for (kid=cUNOPo->op_first; kid; kid=kid->op_sibling) {

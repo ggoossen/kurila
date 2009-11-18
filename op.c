@@ -7942,7 +7942,7 @@ Perl_ck_subr(pTHX_ OP *o)
 		else if (o3->op_type == OP_ENTERSUB) {
 		    /* accidental subroutine, revert to bareword */
 		    OP *gvop = ((UNOP*)o3)->op_first;
-		    if (gvop && gvop->op_type == OP_NULL) {
+		    if (gvop && gvop->op_type == OP_LIST) {
 			gvop = ((UNOP*)gvop)->op_first;
 			if (gvop) {
 			    for (; gvop->op_sibling; gvop = gvop->op_sibling)
