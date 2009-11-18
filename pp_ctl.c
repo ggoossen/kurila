@@ -2046,7 +2046,7 @@ PP(pp_leaveloop)
     PMOP *newpm;
     SV **mark;
 
-    POPBLOCK(cx,newpm);
+    POPBLOCK_normal(cx,newpm);
     assert(CxTYPE_is_LOOP(cx));
     mark = newsp;
     newsp = PL_stack_base + cx->blk_loop.resetsp;
@@ -3770,7 +3770,7 @@ PP(pp_leaveeval)
     const U8 save_flags = PL_op -> op_flags;
     I32 optype;
 
-    POPBLOCK(cx,newpm);
+    POPBLOCK_normal(cx,newpm);
     POPEVAL(cx);
     retop = cx->blk_eval.retop;
 
@@ -3889,7 +3889,7 @@ PP(pp_leavetry)
     register PERL_CONTEXT *cx;
     I32 optype;
 
-    POPBLOCK(cx,newpm);
+    POPBLOCK_normal(cx,newpm);
     POPEVAL(cx);
     PERL_UNUSED_VAR(optype);
 
@@ -3954,7 +3954,7 @@ PP(pp_leavegiven)
     PMOP *newpm;
     PERL_UNUSED_CONTEXT;
 
-    POPBLOCK(cx,newpm);
+    POPBLOCK_normal(cx,newpm);
     assert(CxTYPE(cx) == CXt_GIVEN);
 
     SP = newsp;
@@ -4524,7 +4524,7 @@ PP(pp_leavewhen)
     SV **newsp;
     PMOP *newpm;
 
-    POPBLOCK(cx,newpm);
+    POPBLOCK_normal(cx,newpm);
     assert(CxTYPE(cx) == CXt_WHEN);
 
     SP = newsp;
