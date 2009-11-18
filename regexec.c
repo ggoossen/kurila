@@ -3681,6 +3681,10 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 	    
 		n = ARG(scan);
 		PL_op = (OP_4tree*)rexi->data->data[n+1];
+		DEBUG_STATE_r( PerlIO_printf(Perl_debug_log, 
+		    "  re_eval 0x%"UVxf"\n", PTR2UV(PL_op)) );
+		PAD_SAVE_LOCAL(old_comppad, (PAD*)rexi->data->data[n + 2]);
+
 		if(!rexi->data->data[n+3]) {
 		    codeseq = new_codeseq();
 		    rexi->data->data[n+3] = (void*)codeseq;
@@ -3689,9 +3693,6 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		else
 		    codeseq = (CODESEQ*)rexi->data->data[n+3];
 
-		DEBUG_STATE_r( PerlIO_printf(Perl_debug_log, 
-		    "  re_eval 0x%"UVxf"\n", PTR2UV(PL_op)) );
-		PAD_SAVE_LOCAL(old_comppad, (PAD*)rexi->data->data[n + 2]);
 		PL_regoffs[0].end = PL_reg_magic->mg_len = locinput - PL_bostr;
 
                 if (sv_yes_mark) {
