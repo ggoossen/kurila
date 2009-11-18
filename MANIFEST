@@ -4547,12 +4547,12 @@ t/re/subst.t			See if substitution works
 t/re/substT.t			See if substitution works with -T
 t/re/subst_wamp.t		See if substitution works with $& present
 t/run/cloexec.t			Test close-on-exec.
+t/run/code-gen.t			See if the code generation is correct
 t/run/exit.t			Test perl's exit status.
 t/run/fresh_perl.t		Tests that require a fresh perl.
 t/run/noswitch.t		Test aliasing ARGV for other switch tests
 t/run/runenv.t			Test if perl honors its environment variables.
 t/run/script.t			See if script invocation works
-t/run/code-gen.t			See if the code generation is correct
 t/run/switch0.t			Test the -0 switch
 t/run/switcha.t			Test the -a switch
 t/run/switchC.t			Test the -C switch
