@@ -669,24 +669,36 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     }
     case OP_SORT:
     {
+	/*
+	      ...
+	      pp_pushmark
+	      [kids]
+	      pp_sort               label2
+	      instr_jump            label1
+          label2:
+	      [op_block]
+	      (finished)
+	  label1:
+              ...        
+	*/
 	int start_idx;
 	OP* kid;
-	bool has_sort_cv = (o->op_flags & OPf_STACKED && o->op_flags & OPf_SPECIAL);
+	OP* op_block;
+	bool has_block = (o->op_flags & OPf_STACKED && o->op_flags & OPf_SPECIAL);
 
 	S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
 
-	kid = cUNOPo->op_first->op_sibling;
-	if (has_sort_cv)
-	    kid = kid->op_sibling;
+	op_block = cUNOPo->op_first->op_sibling;
+	kid = has_block ? op_block->op_sibling : op_block;
 	for (; kid; kid=kid->op_sibling)
 	    S_add_op(codeseq, bpp, kid, &kid_may_constant_fold);
-	S_append_instruction(codeseq, bpp, o, o->op_type);
+
+	S_append_instruction(codeseq, bpp, o, OP_SORT);
 	start_idx = bpp->idx;
 	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
-	if (has_sort_cv) {
-	    OP *kid = cLISTOPo->op_first->op_sibling;	/* pass pushmark */
+	if (has_block) {
 	    S_save_branch_point(bpp, &(o->op_unstack_instr));
-	    S_add_op(codeseq, bpp, kid, &kid_may_constant_fold);
+	    S_add_op(codeseq, bpp, op_block, &kid_may_constant_fold);
 	    S_append_instruction_x(codeseq, bpp, NULL, NULL, NULL);
 	}
 	codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
@@ -704,21 +716,36 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	OP* kid;
 	S_save_branch_point(bpp, &(o->op_unstack_instr));
 	for (kid = cUNOPo->op_first; kid; kid=kid->op_sibling)
-	    S_add_op(codeseq, bpp, kid, may_constant_fold);
+	    S_add_op(codeseq, bpp, kid, &kid_may_constant_fold);
 	S_append_instruction(codeseq, bpp, o, o->op_type);
 	break;
     }
     case OP_AELEM:
     {
+	/*
+	  [op_av]
+	  [op_index]
+	  o->op_type
+	*/
 	OP* op_av = cUNOPo->op_first;
 	OP* op_index = op_av->op_sibling;
+	bool index_is_constant = TRUE;
 	/* if (op_index->op_type == OP_CONST */
 	/*     && ((op_av->op_type == OP_RV2AV  */
 	/* 	    && cUNOPx(op_av)->op_first->op_first == OP_GV) */
 	/* 	)) { */
 	/* } */
-	S_add_op(codeseq, bpp, op_av, may_constant_fold);
-	S_add_op(codeseq, bpp, op_index, may_constant_fold);
+	S_add_op(codeseq, bpp, op_av, &index_is_constant);
+	S_add_op(codeseq, bpp, op_index, &kid_may_constant_fold);
+	kid_may_constant_fold = kid_may_constant_fold && index_is_constant;
+	/* if (index_is_constant) { */
+	/*     if (op_av->op_type == OP_RV2AV */
+	/* 	&& cUNOPx(op_av)->op_first->op_first == OP_GV) { */
+	/* 	assert( */
+	/* 	/\* Convert to AELEMFAST *\/ */
+	/*     } */
+	    
+	/* } */
 	S_append_instruction(codeseq, bpp, o, o->op_type);
 	break;
     }
