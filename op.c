@@ -1151,14 +1151,10 @@ Perl_scalarvoid(pTHX_ OP *o)
 	    break;
 
 	exlist = (LISTOP *)refgen->op_first;
-	if (!exlist || exlist->op_type != OP_NULL
-	    || exlist->op_targ != OP_LIST)
+	if (!exlist || exlist->op_type != OP_LIST)
 	    break;
 
-	if (exlist->op_first->op_type != OP_PUSHMARK)
-	    break;
-
-	rv2cv = (UNOP*)exlist->op_last;
+	rv2cv = (UNOP*)exlist->op_first;
 
 	if (rv2cv->op_type != OP_RV2CV)
 	    break;
