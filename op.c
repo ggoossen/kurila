@@ -7534,7 +7534,7 @@ Perl_ck_require(pTHX_ OP *o)
 #ifndef PERL_MAD
 	op_free(o);
 #endif
-	newop = ck_subr(newUNOP(OP_ENTERSUB, OPf_STACKED,
+	newop = ck_subr(convert(OP_ENTERSUB, OPf_STACKED,
 				append_elem(OP_LIST, kid,
 					    scalar(newUNOP(OP_RV2CV, 0,
 							   newGVOP(OP_GV, 0,
