@@ -12189,7 +12189,7 @@ S_scan_inputsymbol(pTHX_ char *start)
 		    OP * const o = newOP(OP_PADSV, 0);
 		    o->op_targ = tmp;
 		    PL_lex_op = readline_overriden
-			? (OP*)newUNOP(OP_ENTERSUB, OPf_STACKED,
+			? (OP*)convert(OP_ENTERSUB, OPf_STACKED,
 				append_elem(OP_LIST, o,
 				    newCVREF(0, newGVOP(OP_GV,0,gv_readline))))
 			: (OP*)newUNOP(OP_READLINE, 0, o);
@@ -12205,7 +12205,7 @@ intro_sym:
 				 : GV_ADDMULTI),
 				SVt_PV);
 		PL_lex_op = readline_overriden
-		    ? (OP*)newUNOP(OP_ENTERSUB, OPf_STACKED,
+		    ? (OP*)convert(OP_ENTERSUB, OPf_STACKED,
 			    append_elem(OP_LIST,
 				newUNOP(OP_RV2SV, 0, newGVOP(OP_GV, 0, gv)),
 				newCVREF(0, newGVOP(OP_GV, 0, gv_readline))))
@@ -12224,7 +12224,7 @@ intro_sym:
 	else {
 	    GV * const gv = gv_fetchpv(d, GV_ADD, SVt_PVIO);
 	    PL_lex_op = readline_overriden
-		? (OP*)newUNOP(OP_ENTERSUB, OPf_STACKED,
+		? (OP*)convert(OP_ENTERSUB, OPf_STACKED,
 			append_elem(OP_LIST,
 			    newGVOP(OP_GV, 0, gv),
 			    newCVREF(0, newGVOP(OP_GV, 0, gv_readline))))
