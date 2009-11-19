@@ -2247,7 +2247,7 @@ S_sublex_start(pTHX)
     }
     else if (op_type == OP_BACKTICK && PL_lex_op) {
 	/* readpipe() vas overriden */
-	cSVOPx(cLISTOPx(cUNOPx(PL_lex_op)->op_first)->op_first)->op_sv = tokeq(PL_lex_stuff);
+	cSVOPx(cLISTOPx(PL_lex_op)->op_first)->op_sv = tokeq(PL_lex_stuff);
 	pl_yylval.opval = PL_lex_op;
 	PL_lex_op = NULL;
 	PL_lex_stuff = NULL;
@@ -3604,7 +3604,7 @@ S_readpipe_override(pTHX)
 	     && (gv_readpipe = *gvp) && isGV_with_GP(gv_readpipe)
 	     && GvCVu(gv_readpipe) && GvIMPORTED_CV(gv_readpipe)))
     {
-	PL_lex_op = (OP*)newUNOP(OP_ENTERSUB, OPf_STACKED,
+	PL_lex_op = (OP*)convert(OP_ENTERSUB, OPf_STACKED,
 	    append_elem(OP_LIST,
 		newSVOP(OP_CONST, 0, &PL_sv_undef), /* value will be read later */
 		newCVREF(0, newGVOP(OP_GV, 0, gv_readpipe))));
