@@ -8235,65 +8235,66 @@ S_is_inplace_av(pTHX_ OP *o, OP *oright) {
 
     PERL_ARGS_ASSERT_IS_INPLACE_AV;
 
-    if (!oright ||
-	(oright->op_type != OP_RV2AV && oright->op_type != OP_PADAV)
-	|| oright->op_next != o
-	|| (oright->op_private & OPpLVAL_INTRO)
-    )
-	return NULL;
+    /* if (!oright || */
+    /* 	(oright->op_type != OP_RV2AV && oright->op_type != OP_PADAV) */
+    /* 	|| oright->op_next != o */
+    /* 	|| (oright->op_private & OPpLVAL_INTRO) */
+    /* ) */
+    /* 	return NULL; */
 
-    /* o2 follows the chain of op_nexts through the LHS of the
-     * assign (if any) to the aassign op itself */
-    o2 = o->op_next;
-    if (!o2 || o2->op_type != OP_NULL)
-	return NULL;
-    o2 = o2->op_next;
-    if (!o2 || o2->op_type != OP_PUSHMARK)
-	return NULL;
-    o2 = o2->op_next;
-    if (o2 && o2->op_type == OP_GV)
-	o2 = o2->op_next;
-    if (!o2
-	|| (o2->op_type != OP_PADAV && o2->op_type != OP_RV2AV)
-	|| (o2->op_private & OPpLVAL_INTRO)
-    )
-	return NULL;
-    oleft = o2;
-    o2 = o2->op_next;
-    if (!o2 || o2->op_type != OP_NULL)
-	return NULL;
-    o2 = o2->op_next;
-    if (!o2 || o2->op_type != OP_AASSIGN
-	    || (o2->op_flags & OPf_WANT) != OPf_WANT_VOID)
-	return NULL;
+    /* /\* o2 follows the chain of op_nexts through the LHS of the */
+    /*  * assign (if any) to the aassign op itself *\/ */
+    /* o2 = o->op_next; */
+    /* if (!o2 || o2->op_type != OP_NULL) */
+    /* 	return NULL; */
+    /* o2 = o2->op_next; */
+    /* if (!o2 || o2->op_type != OP_PUSHMARK) */
+    /* 	return NULL; */
+    /* o2 = o2->op_next; */
+    /* if (o2 && o2->op_type == OP_GV) */
+    /* 	o2 = o2->op_next; */
+    /* if (!o2 */
+    /* 	|| (o2->op_type != OP_PADAV && o2->op_type != OP_RV2AV) */
+    /* 	|| (o2->op_private & OPpLVAL_INTRO) */
+    /* ) */
+    /* 	return NULL; */
+    /* oleft = o2; */
+    /* o2 = o2->op_next; */
+    /* if (!o2 || o2->op_type != OP_NULL) */
+    /* 	return NULL; */
+    /* o2 = o2->op_next; */
+    /* if (!o2 || o2->op_type != OP_AASSIGN */
+    /* 	    || (o2->op_flags & OPf_WANT) != OPf_WANT_VOID) */
+    /* 	return NULL; */
 
-    /* check that the sort is the first arg on RHS of assign */
+    /* /\* check that the sort is the first arg on RHS of assign *\/ */
 
-    o2 = cUNOPx(o2)->op_first;
-    if (!o2 || o2->op_type != OP_NULL)
-	return NULL;
-    o2 = cUNOPx(o2)->op_first;
-    if (!o2 || o2->op_type != OP_PUSHMARK)
-	return NULL;
-    if (o2->op_sibling != o)
-	return NULL;
+    /* o2 = cUNOPx(o2)->op_first; */
+    /* if (!o2 || o2->op_type != OP_NULL) */
+    /* 	return NULL; */
+    /* o2 = cUNOPx(o2)->op_first; */
+    /* if (!o2 || o2->op_type != OP_PUSHMARK) */
+    /* 	return NULL; */
+    /* if (o2->op_sibling != o) */
+    /* 	return NULL; */
 
-    /* check the array is the same on both sides */
-    if (oleft->op_type == OP_RV2AV) {
-	if (oright->op_type != OP_RV2AV
-	    || !cUNOPx(oright)->op_first
-	    || cUNOPx(oright)->op_first->op_type != OP_GV
-	    || cGVOPx_gv(cUNOPx(oleft)->op_first) !=
-	       cGVOPx_gv(cUNOPx(oright)->op_first)
-	)
-	    return NULL;
-    }
-    else if (oright->op_type != OP_PADAV
-	|| oright->op_targ != oleft->op_targ
-    )
-	return NULL;
+    /* /\* check the array is the same on both sides *\/ */
+    /* if (oleft->op_type == OP_RV2AV) { */
+    /* 	if (oright->op_type != OP_RV2AV */
+    /* 	    || !cUNOPx(oright)->op_first */
+    /* 	    || cUNOPx(oright)->op_first->op_type != OP_GV */
+    /* 	    || cGVOPx_gv(cUNOPx(oleft)->op_first) != */
+    /* 	       cGVOPx_gv(cUNOPx(oright)->op_first) */
+    /* 	) */
+    /* 	    return NULL; */
+    /* } */
+    /* else if (oright->op_type != OP_PADAV */
+    /* 	|| oright->op_targ != oleft->op_targ */
+    /* ) */
+    /* 	return NULL; */
 
-    return oleft;
+    /* return oleft; */
+    return NULL;
 }
 
 /* A peephole optimizer.  We visit the ops in the order they're to execute.
