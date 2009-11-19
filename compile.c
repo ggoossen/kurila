@@ -581,6 +581,8 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	    S_add_op(codeseq, bpp, cUNOPx(op_first)->op_first, &kid_may_constant_fold);
 	}
 	else {
+	    if (o->op_flags & OPf_STACKED)
+		S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
 	    S_add_op(codeseq, bpp, op_first, &kid_may_constant_fold);
 	}
 	S_append_instruction(codeseq, bpp, o, o->op_type);
