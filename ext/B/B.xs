@@ -917,18 +917,20 @@ LOGOP_other(o)
 
 MODULE = B	PACKAGE = B::LISTOP		PREFIX = LISTOP_
 
-U32
+void
 LISTOP_children(o)
 	B::LISTOP	o
 	OP *		kid = NO_INIT
 	int		i = NO_INIT
-    CODE:
+    PPCODE:
 	i = 0;
-	for (kid = o->op_first; kid; kid = kid->op_sibling)
+	for (kid = o->op_first; kid; kid = kid->op_sibling) {
+            SV* opsv = newSV(0);
+	    sv_setiv(newSVrv(opsv, cc_opclassname(aTHX_ kid)), PTR2IV(kid));
+	    mXPUSHs(opsv);
 	    i++;
-	RETVAL = i;
-    OUTPUT:
-        RETVAL
+        }
+	XSRETURN(i);
 
 #define PMOP_pmnext(o)		o->op_pmnext
 #define PMOP_pmregexp(o)	PM_GETRE(o)

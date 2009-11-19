@@ -187,6 +187,13 @@ $test /= 2 if ++$test;
 # 5
 -((1, 2) x 2);
 ####
+{
+    my $test = sub {
+	my $x;
+    }
+    ;
+}
+####
 # 6
 {
     my $test = sub : lvalue {
@@ -251,7 +258,7 @@ my($x, @a);
 $x = 1 foreach (@a);
 ####
 # 19
-for (my $i = 0; $i < 2;) {
+for (my $i = 0; $i < 2; ) {
     my $z = 1;
 }
 ####
@@ -304,7 +311,7 @@ foreach our $i (1, 2) {
 ####
 # 29
 my @x;
-print reverse sort(@x);
+print reverse(sort(@x));
 ####
 # 30
 my @x;
@@ -312,7 +319,7 @@ print((sort {$b cmp $a} @x));
 ####
 # 31
 my @x;
-print((reverse sort {$b <=> $a} @x));
+print reverse((sort {$b <=> $a} @x));
 ####
 # 32
 our @a;
@@ -320,7 +327,7 @@ print $_ foreach (reverse @a);
 ####
 # 33
 our @a;
-print $_ foreach (reverse 1, 2..5);
+print $_ foreach (reverse 1, 2 .. 5);
 ####
 # 34  (bug #38684)
 our @ary;

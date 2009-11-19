@@ -983,7 +983,7 @@ sub is_for_loop {
     if (!is_state $op and !null($lseq) and $lseq->name eq "lineseq") {
 	if ($lseq->first && !null($lseq->first) && is_state($lseq->first)
 	    && (my $sib = $lseq->first->sibling)) {
-	    return (!null($sib) && $sib->name eq "leaveloop");
+	    return (!null($sib) && $sib->name eq "enterloop");
 	}
     }
     return 0;
@@ -1239,6 +1239,11 @@ sub walk_lineseq {
 	$expr =~ s/;\n?\z//;
 	$callback->($expr, $i);
     }
+}
+
+sub skip_pushmark {
+    my ($op) = @_;
+    return $op;
 }
 
 # The BEGIN {} is used here because otherwise this code isn't executed
@@ -1836,7 +1841,7 @@ sub anon_hash_or_list {
     my($pre, $post) = @{{"anonlist" => ["[","]"],
 			 "anonhash" => ["{","}"]}->{$op->name}};
     my($expr, @exprs);
-    $op = $op->first->sibling; # skip pushmark
+    $op = skip_pushmark($op->first);
     for (; !null($op); $op = $op->sibling) {
 	$expr = $self->deparse($op, 6);
 	push @exprs, $expr;
@@ -1864,11 +1869,11 @@ sub pp_refgen {
     my $self = shift;	
     my($op, $cx) = @_;
     my $kid = $op->first;
-    if ($kid->name eq "null") {
+    if ($kid->name eq "list") {
 	$kid = $kid->first;
-	if (!null($kid->sibling) and
-		 $kid->sibling->name eq "anoncode") {
-            return $self->e_anoncode({ code => $self->padval($kid->sibling->targ) });
+	if (!null(skip_pushmark($kid)) and
+		 skip_pushmark($kid)->name eq "anoncode") {
+            return $self->e_anoncode({ code => $self->padval(skip_pushmark($kid)->targ) });
 	} elsif ($kid->name eq "pushmark") {
             my $sib_name = $kid->sibling->name;
             if ($sib_name =~ /^(pad|rv2)[ah]v$/
@@ -2194,16 +2199,10 @@ sub pp_repeat {
 	$eq = "=";
 	$prec = 7;
     }
-    if (null($right)) { # list repeat; count is inside left-side ex-list
-	my $kid = $left->first->sibling; # skip pushmark
-	my @exprs;
-	for (; !null($kid->sibling); $kid = $kid->sibling) {
-	    push @exprs, $self->deparse($kid, 6);
-	}
-	$right = $kid;
-	$left = "(" . join(", ", @exprs). ")";
+    if ($left->name eq "list") { # list repeat; count is inside left-side ex-list
+        $left = "(" . $self->deparse($left, 0) . ")";
     } else {
-	$left = $self->deparse_binop_left($op, $left, $prec);
+        $left = $self->deparse_binop_left($op, $left, $prec);
     }
     $right = $self->deparse_binop_right($op, $right, $prec);
     return $self->maybe_parens("$left x$eq $right", $cx, $prec);
@@ -2225,6 +2224,13 @@ sub pp_flop {
     my $flip = $op->first;
     my $type = ($flip->flags & OPf_SPECIAL) ? "..." : "..";
     return $self->range($flip->first, $cx, $type);
+}
+
+sub pp_range {
+    my $self = shift;
+    my($op, $cx) = @_;
+    my $type = ($op->flags & OPf_SPECIAL) ? "..." : "..";
+    return $self->range($op->first, $cx, $type);
 }
 
 # one-line while/until is handled in pp_leave
@@ -2283,7 +2289,7 @@ sub listop {
     my($op, $cx, $name) = @_;
     my(@exprs);
     my $parens = ($cx >= 5) || $self->{'parens'};
-    my $kid = $op->first->sibling;
+    my $kid = skip_pushmark($op->first);
     return $name if null $kid;
     my $first;
     $name = "socketpair" if $name eq "sockpair";
@@ -2444,7 +2450,7 @@ sub indirop {
     my $self = shift;
     my($op, $cx, $name) = @_;
     my($expr, @exprs);
-    my $kid = $op->first->sibling;
+    my $kid = skip_pushmark($op->first);
     my $indir = "";
     if ($op->flags & OPf_STACKED) {
 	$indir = $kid;
@@ -2532,7 +2538,7 @@ sub pp_list {
     my $self = shift;
     my($op, $cx) = @_;
     my($expr, @exprs);
-    my $kid = $op->first->sibling; # skip pushmark
+    my $kid = $op->first;
     my $lop;
     my $local = "either"; # could be local(...), my(...), state(...) or our(...)
     for ($lop = $kid; !null($lop); $lop = $lop->sibling) {
@@ -2653,8 +2659,8 @@ sub pp_cond_expr {
 
 sub pp_once {
     my ($self, $op, $cx) = @_;
-    my $cond = $op->first;
-    my $true = $cond->sibling;
+    my $true = $op->first;
+    my $cond = $true->sibling;
 
     return $self->deparse($true, $cx);
 }
@@ -2679,7 +2685,7 @@ sub loop_common {
 	}
 	$body = $kid;
     } elsif ($enter->name eq "enteriter") { # foreach
-	my $ary = $enter->first->sibling; # first was pushmark
+	my $ary = $enter->first;
 	my $var = $ary->sibling;
 	if ($ary->name eq 'null' and $enter->private & OPpITER_REVERSED) {
 	    # "reverse" was optimised away
@@ -2769,11 +2775,114 @@ sub loop_common {
 
 sub pp_leaveloop { shift->loop_common(@_, "") }
 
+sub pp_enterloop {
+    my $self = shift;
+    my($op, $cx, $init) = @_;
+
+    my ($op_start, $op_block, $op_cont) = $op->children;
+
+    my $head = "";
+    if ($op_start->name ne "nothing") {
+        $head .= "while (" . $self->deparse($op_start, 0) . ") ";
+    }
+    my $body = $self->deparse($op_block, 0);
+    $body =~ s/;?$/;\n/;
+
+    my $cuddle = $self->{'cuddle'};
+
+    my $cont = "";
+    if ($op_cont and $op_cont->name ne "unstack") {
+        if ($op_cont->name eq "lineseq") {
+            $op_cont = $op_cont->first;
+        }
+        $cont = $cuddle . "continue {\n\t" .
+          $self->deparse($op_cont, 0) . "\n\b}\cK";
+    }
+    else {
+        $cont .= "\cK";
+    }
+
+    return $head . "{\n\t" . $body . "\b}" . $cont;
+}
+
+sub pp_foreach {
+    my $self = shift;
+    my($op, $cx, $init) = @_;
+
+    my ($op_ary, $op_var, $op_block, $op_cont) = $op->children;
+
+    if ($op_block->name ne "lineseq") {
+        return $self->deparse($op_block, 0) . " foreach (" . $self->deparse($op_ary, 0) . ")";
+    }
+
+    my $body = $self->deparse($op_block, 0);
+    $body =~ s/;?$/;\n/;
+
+    my $var = "";
+    if ($op_var->name eq "nothing") {
+        if ($op->flags & OPf_SPECIAL) { # thread special var
+            $var = $self->pp_threadsv($op, 1);
+        } else { # regular my() variable
+            $var = $self->pp_padsv($op, 1);
+        }
+    } elsif ($op_var->name eq "rv2gv") {
+        $var = $self->pp_rv2sv($op_var, 1);
+        if ($op_var->private & OPpOUR_INTRO) {
+            # our declarations don't have package names
+            $var =~ s/^(.).*::/$1/;
+            $var = "our $var";
+        }
+    } elsif ($op_var->name eq "gv") {
+        $var = "\$" . $self->deparse($op_var, 1);
+    }
+
+    my $head = "";
+    $head .= "foreach $var (" . $self->deparse($op_ary, 0) . ") ";
+
+    my $cuddle = $self->{'cuddle'};
+
+    my $cont = "";
+    if ($op_cont and $op_cont->name ne "unstack") {
+        $cont = $cuddle . "continue {\n\t" .
+          $self->deparse($op_cont, 0) . "\n\b}\cK";
+    }
+    else {
+        $cont .= "\cK";
+    }
+
+    return $head . "{\n\t" . $body . "\b}" . $cont;
+}
+
 sub for_loop {
     my $self = shift;
     my($op, $cx) = @_;
     my $init = $self->deparse($op, 1);
-    return $self->loop_common($op->sibling->first->sibling, $cx, $init);
+
+    my $loopop = $op->sibling->first->sibling;
+    my ($op_start, $op_block, $op_cont) = $loopop->children;
+
+    if ($op_cont and $op_cont->name eq "lineseq") {
+        $op_cont = $op_cont->first;
+    }
+
+    my $cuddle = $self->{'cuddle'};
+
+    my $head = "";
+    my $cont;
+    my $cond = $self->deparse($op_start, 0);
+    if (defined $cond and not is_scope $op_cont and $self->{'expand'} < 3) {
+        $head = "for ($init; $cond; " . $self->deparse($op_cont, 0) .") ";
+        $cont = "\cK";
+    } else {
+        $head = "for ($init; $cond;)";
+        $cont = $cuddle . "continue {\n\t" .
+          $self->deparse($op_cont, 0) . "\n\b}\cK";
+    }
+
+    my $body = $self->deparse($op_block, 0);
+    $body =~ s/;?$/;\n/;
+
+    return $head . "{\n\t" . $body . "\b}" . $cont;
 }
 
 sub pp_leavetry {
@@ -3131,9 +3240,9 @@ sub slice {
     $array = $array->first
 	if $array->name eq $regname or $array->name eq "null";
     $array = $self->elem_or_slice_array_name($array,$left,$padname,0);
-    $kid = $op->first->sibling; # skip pushmark
+    $kid = $op->first;
     if ($kid->name eq "list") {
-	$kid = $kid->first->sibling; # skip list, pushmark
+	$kid = $kid->first;
 	for (; !null $kid; $kid = $kid->sibling) {
 	    push @elems, $self->deparse($kid, 6);
 	}
@@ -3171,7 +3280,7 @@ sub want_list {
 sub _method {
     my $self = shift;
     my($op, $cx) = @_;
-    my $kid = $op->first->sibling; # skip pushmark
+    my $kid = $op->first;
     my($meth, $obj, @exprs);
     if ($kid->name eq "list" and want_list $kid) {
 	# When an indirect object isn't a bareword but the args are in
@@ -3186,7 +3295,7 @@ sub _method {
 	# the list is in list context as method arguments always are.
 	# (Good thing there aren't method prototypes!)
 	$meth = $kid->sibling;
-	$kid = $kid->first->sibling; # skip pushmark
+	$kid = $kid->first;
 	$obj = $kid;
 	$kid = $kid->sibling;
 	for (; not null $kid; $kid = $kid->sibling) {
@@ -3332,7 +3441,6 @@ sub pp_entersub {
 	$amper = "&";
     }
     $kid = $op->first;
-    $kid = $kid->first->sibling; # skip ex-list, pushmark
     for (; not null $kid->sibling; $kid = $kid->sibling) {
 	push @exprs, $kid;
     }
@@ -3857,7 +3965,7 @@ sub pp_backtick {
 sub dquote {
     my $self = shift;
     my($op, $cx) = @_;
-    my $kid = $op->first->sibling; # skip ex-stringify, pushmark
+    my $kid = $op->first;
     return $self->deparse($kid, $cx) if $self->{'unquote'};
     $self->maybe_targmy($kid, $cx,
 			sub {single_delim("qq", '"', $self->dq($_[1]))});
