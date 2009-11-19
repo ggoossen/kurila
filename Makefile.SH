@@ -1148,7 +1148,7 @@ manicheck:	FORCE
 #
 # DynaLoader may be needed for extensions that use Makefile.PL.
 
-$(DYNALOADER):	$(MINIPERL_EXE) preplibrary FORCE $(nonxs_ext)
+$(DYNALOADER):	$(MINIPERL_EXE) preplibrary FORCE cpan/ExtUtils-ParseXS/pm_to_blib cpan/Getopt-Long/pm_to_blib dist/constant/pm_to_blib
 	$(MINIPERL) make_ext.pl $@ MAKE=$(MAKE) LIBPERL_A=$(LIBPERL) LINKTYPE=static $(STATIC_LDFLAGS)
 
 d_dummy $(dynamic_ext):	$(MINIPERL_EXE) preplibrary makeppport $(DYNALOADER) FORCE $(PERLEXPORT)
