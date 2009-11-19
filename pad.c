@@ -1546,14 +1546,6 @@ Perl_cv_clone(pTHX_ CV *proto)
     CvROOT(cv)		= OpREFCNT_inc(CvROOT(proto));
     OP_REFCNT_UNLOCK;
     CvSTART(cv)		= CvSTART(proto);
-    if (!CvCODESEQ(proto)) {
-	PAD* oldpad;
-	PAD_SAVE_LOCAL(oldpad, protopad);
-	CvCODESEQ(proto) = new_codeseq();
-	compile_op(CvROOT(cv), CvCODESEQ(proto));
-	PAD_RESTORE_LOCAL(oldpad);
-    }
-    CvCODESEQ(cv)       = CvCODESEQ(proto);
     CvOUTSIDE(cv)	= MUTABLE_CV(SvREFCNT_inc_simple(outside));
     CvOUTSIDE_SEQ(cv) = CvOUTSIDE_SEQ(proto);
 
@@ -1614,6 +1606,16 @@ Perl_cv_clone(pTHX_ CV *proto)
 	PL_curpad[ix] = sv;
     }
 
+    if (!CvCODESEQ(proto)) {
+	PAD* oldpad;
+	const AV *const clonepad = (const AV *)*av_fetch(CvPADLIST(cv), 1, FALSE);
+	PAD_SAVE_LOCAL(oldpad, clonepad);
+	CvCODESEQ(proto) = new_codeseq();
+	compile_op(CvROOT(cv), CvCODESEQ(proto));
+	PAD_RESTORE_LOCAL(oldpad);
+    }
+
+    CvCODESEQ(cv)       = CvCODESEQ(proto);
     DEBUG_Xv(
 	PerlIO_printf(Perl_debug_log, "\nPad CV clone\n");
 	cv_dump(outside, "Outside");
