@@ -3677,6 +3677,11 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		COP * const ocurcop = PL_curcop;
 		PAD *old_comppad;
 		char *saved_regeol = PL_regeol;
+
+		PERL_CONTEXT *cx;
+		I32 gimme = G_SCALAR;
+		PMOP *newpm;
+		SV ** newsp;
 	    
 		n = ARG(scan);
 		PL_op = (OP_4tree*)rexi->data->data[n];
@@ -3690,7 +3695,13 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
                     sv_setsv(sv_mrk, sv_yes_mark);
                 }
 
+		PUSHBLOCK(cx, CXt_BLOCK, SP);
+
 		CALLRUNOPS(aTHX);			/* Scalar context. */
+
+		POPBLOCK_normal(cx, newpm);
+		PL_curpm = newpm;
+
 		SPAGAIN;
 		if (SP == before)
 		    ret = &PL_sv_undef;   /* protect against empty (?{}) blocks. */
