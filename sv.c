@@ -12784,6 +12784,18 @@ S_find_uninit_var(pTHX_ const OP *const obase, const SV *const uninit_sv,
 				    keysv, index, subscript_type);
       }
 
+    case OP_RV2SV:
+	if (cUNOPx(obase)->op_first->op_type == OP_GV) {
+	    /* $global */
+	    gv = cGVOPx_gv(cUNOPx(obase)->op_first);
+	    if (!gv)
+		break;
+	    return varname(gv, '$', sv, NULL, 0, FUV_SUBSCRIPT_NONE);
+	}
+	else /* ${expr} */
+	    return find_uninit_var(cUNOPx(obase)->op_first,
+		uninit_sv, match);
+
     case OP_PADSV:
 	if (match && PAD_SVl(obase->op_targ) != uninit_sv)
 	    break;
@@ -12965,7 +12977,6 @@ S_find_uninit_var(pTHX_ const OP *const obase, const SV *const uninit_sv,
 
 
     case OP_ENTEREVAL: /* could be eval $undef or $x='$undef'; eval $x */
-    case OP_RV2SV:
     case OP_CUSTOM: /* XS or custom code could trigger random warnings */
 
 	/* the following ops are capable of returning PL_sv_undef even for
