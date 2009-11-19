@@ -4054,7 +4054,7 @@ Perl_dofile(pTHX_ OP *term, I32 force_builtin)
     }
 
     if (gv && GvCVu(gv) && GvIMPORTED_CV(gv)) {
-	doop = ck_subr(newUNOP(OP_ENTERSUB, OPf_STACKED,
+	doop = ck_subr(convert(OP_ENTERSUB, OPf_STACKED,
 			       append_elem(OP_LIST, term,
 					   scalar(newUNOP(OP_RV2CV, 0,
 							  newGVOP(OP_GV, 0, gv))))));
@@ -7046,7 +7046,7 @@ Perl_ck_glob(pTHX_ OP *o)
 	append_elem(OP_GLOB, o,
 		    newSVOP(OP_CONST, 0, newSViv(PL_glob_index++)));
 	o->op_type = OP_LIST;
-	o = newUNOP(OP_ENTERSUB, OPf_STACKED,
+	o = convert(OP_ENTERSUB, OPf_STACKED,
 		    append_elem(OP_LIST, o,
 				scalar(newUNOP(OP_RV2CV, 0,
 					       newGVOP(OP_GV, 0, gv)))));
@@ -7941,8 +7941,6 @@ Perl_ck_subr(pTHX_ OP *o)
 		else if (o3->op_type == OP_ENTERSUB) {
 		    /* accidental subroutine, revert to bareword */
 		    OP *gvop = ((UNOP*)o3)->op_first;
-		    if (gvop && gvop->op_type == OP_LIST) {
-			gvop = ((UNOP*)gvop)->op_first;
 			if (gvop) {
 			    for (; gvop->op_sibling; gvop = gvop->op_sibling)
 				;
@@ -7969,7 +7967,6 @@ Perl_ck_subr(pTHX_ OP *o)
 				o2->op_sibling = sibling;
 			    }
 			}
-		    }
 		}
 		scalar(o2);
 		break;
