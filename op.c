@@ -7770,6 +7770,7 @@ Perl_ck_split(pTHX_ OP *o)
     if (!kid) {
 	cLISTOPo->op_first = kid = newSVOP(OP_CONST, 0, newSVpvs(" "));
 	cLISTOPo->op_last = kid; /* There was only one element previously */
+	cLISTOPo->op_flags |= OPf_KIDS;
     }
 
     if (kid->op_type != OP_MATCH || kid->op_flags & OPf_STACKED) {
