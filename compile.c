@@ -138,7 +138,10 @@ S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP *o)
     SV * const oldwarnhook = PL_warnhook;
     SV * const olddiehook  = PL_diehook;
     const INSTRUCTION* VOL old_next_instruction = run_get_next_instruction();
+    I32 oldsp = PL_stack_sp - PL_stack_base;
     dJMPENV;
+
+    DEBUG_g( Perl_deb("Constant folding "); dump_op_short(o); PerlIO_printf(Perl_debug_log, "\n") );
 
     oldscope = PL_scopestack_ix;
 
@@ -153,12 +156,18 @@ S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP *o)
     case 0:
 	RUN_SET_NEXT_INSTRUCTION(instr);
 	CALLRUNOPS(aTHX);
-	sv = *(PL_stack_sp--);
-	if (o->op_targ && sv == PAD_SV(o->op_targ))	/* grab pad temp? */
-	    pad_swipe(o->op_targ,  FALSE);
-	else if (SvTEMP(sv)) {			/* grab mortal temp? */
-	    SvREFCNT_inc_simple_void(sv);
-	    SvTEMP_off(sv);
+	if (PL_stack_sp - 1 == PL_stack_base + oldsp) {
+	    sv = *(PL_stack_sp--);
+	    if (o->op_targ && sv == PAD_SV(o->op_targ)) {	/* grab pad temp? */
+		pad_swipe(o->op_targ,  FALSE);
+	    }
+	    else if (SvTEMP(sv)) {			/* grab mortal temp? */
+		SvREFCNT_inc_simple_void(sv);
+		SvTEMP_off(sv);
+	    }
+	    else {
+		sv = newSVsv(sv);
+	    }
 	}
 	break;
     case 3:
