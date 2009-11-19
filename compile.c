@@ -216,7 +216,6 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 
     switch (o->op_type) {
     case OP_CONST:
-    case OP_LIST:
     case OP_SCALAR:
     case OP_NULL:
 	kid_may_constant_fold = TRUE;
@@ -730,7 +729,6 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	  o->op_type          label1
 	  ...
 	*/
-	OP* kid;
 	S_save_branch_point(bpp, &(o->op_unstack_instr));
 	S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
 	S_add_kids(codeseq, bpp, o, &kid_may_constant_fold);
@@ -825,21 +823,11 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     {
 	OP* op_right = cBINOPo->op_first;
 	OP* op_left = op_right->op_sibling;
+	S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
 	S_add_op(codeseq, bpp, op_right, &kid_may_constant_fold);
+	S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
 	S_add_op(codeseq, bpp, op_left, &kid_may_constant_fold);
 	S_append_instruction(codeseq, bpp, o, OP_AASSIGN);
-	break;
-    }
-    case OP_LIST:
-    {
-	S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
-	if (o->op_flags & OPf_KIDS) {
-	    OP* kid;
-	    for (kid=cUNOPo->op_first; kid; kid=kid->op_sibling) {
-		S_add_op(codeseq, bpp, kid, &kid_may_constant_fold);
-	    }
-	}
-	kid_may_constant_fold = FALSE;
 	break;
     }
     default:

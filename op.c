@@ -7466,7 +7466,7 @@ Perl_ck_repeat(pTHX_ OP *o)
 
     if (cBINOPo->op_first->op_flags & OPf_PARENS) {
 	o->op_private |= OPpREPEAT_DOLIST;
-	cBINOPo->op_first = force_list(cBINOPo->op_first);
+	cBINOPo->op_first = list(force_list(cBINOPo->op_first));
     }
     else
 	scalar(o);
@@ -7832,8 +7832,7 @@ OP *
 Perl_ck_subr(pTHX_ OP *o)
 {
     dVAR;
-    UNOP *oroot = ((cUNOPo->op_first->op_sibling)
-	? cUNOPo : ((UNOP*)cUNOPo->op_first));
+    UNOP *oroot = cUNOPo;
     OP *o2 = oroot->op_first;
     OP *prev = NULL;
     OP *cvop;
