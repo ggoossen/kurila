@@ -1548,8 +1548,7 @@ Perl_cv_clone(pTHX_ CV *proto)
     CvSTART(cv)		= CvSTART(proto);
     if (!CvCODESEQ(proto)) {
 	PAD* oldpad;
-	PAD* proto_pad = (PAD*) (AvARRAY(CvPADLIST(proto))[0]);
-	PAD_SAVE_LOCAL(oldpad, proto_pad);
+	PAD_SAVE_LOCAL(oldpad, protopad);
 	CvCODESEQ(proto) = new_codeseq();
 	compile_op(CvROOT(cv), CvCODESEQ(proto));
 	PAD_RESTORE_LOCAL(oldpad);
