@@ -8,6 +8,8 @@ require "test.pl";
 $/ = undef;
 my @tests = split m/####\n/, <DATA>;
 
+plan(scalar(@tests));
+
 for (@tests) {
     my ($prog, $expect) = split m/----\n/, $_;
     test_prog($prog, $expect);
@@ -107,7 +109,6 @@ label1:
     pushmark
     gvsv
     print
-    null
 label2:
     unstack
     instr_jump   label5
@@ -128,7 +129,6 @@ label1:
     pushmark
     aelemfast
     print
-    null
 label2:
    leaveloop
 label3:
@@ -156,7 +156,6 @@ label1:
     gvsv
     aelem
     print
-    null
 label2:
     unstack
     instr_jump label5
@@ -174,10 +173,7 @@ $ARGV[0] ? $ARGV[1] : $ARGV[2]
     aelemfast
     instr_jump label2
 label1:
-    gv
-    rv2av
-    const
-    aelem
+    aelemfast
 label2:
     leave
 ####
@@ -185,10 +181,7 @@ $ARGV[0] or $ARGV[1]
 ----
     enter
     nextstate
-    gv
-    rv2av
-    const
-    aelem
+    aelemfast
     or         label1
     aelemfast
 label1:
@@ -201,7 +194,6 @@ eval { $ARGV[0] }
     entertry    label1
     nextstate
     aelemfast
-    null
     leavetry
 label1:
     leave
@@ -245,7 +237,6 @@ label1:
     gv
     rv2av
     pop
-    null
     gv
     rv2av
     or label1
@@ -281,7 +272,6 @@ label1:
 label2:
     unstack
     aelemfast
-    null
     instr_jump label5
 label4:
     leaveloop
