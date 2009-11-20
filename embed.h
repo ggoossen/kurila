@@ -268,11 +268,6 @@
 #define form			Perl_form
 #define vform			Perl_vform
 #define free_tmps		Perl_free_tmps
-#if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
-#ifdef PERL_CORE
-#define gen_constant_list	S_gen_constant_list
-#endif
-#endif
 #if !defined(HAS_GETENV_LEN)
 #ifdef PERL_CORE
 #define getenv_len		Perl_getenv_len
@@ -2701,11 +2696,6 @@
 #endif
 #define vform(a,b)		Perl_vform(aTHX_ a,b)
 #define free_tmps()		Perl_free_tmps(aTHX)
-#if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
-#ifdef PERL_CORE
-#define gen_constant_list(a)	S_gen_constant_list(aTHX_ a)
-#endif
-#endif
 #if !defined(HAS_GETENV_LEN)
 #ifdef PERL_CORE
 #define getenv_len(a,b)		Perl_getenv_len(aTHX_ a,b)

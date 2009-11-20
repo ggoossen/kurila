@@ -819,9 +819,6 @@ PERL_CALLCONV char*	Perl_vform(pTHX_ const char* pat, va_list* args)
 	assert(pat)
 
 PERL_CALLCONV void	Perl_free_tmps(pTHX);
-#if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
-STATIC OP*	S_gen_constant_list(pTHX_ OP* o);
-#endif
 #if !defined(HAS_GETENV_LEN)
 PERL_CALLCONV char*	Perl_getenv_len(pTHX_ const char *env_elem, unsigned long *len)
 			__attribute__nonnull__(pTHX_1)
