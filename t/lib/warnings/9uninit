@@ -445,6 +445,7 @@ Use of uninitialized value $g1 in exists at - line 6.
 Use of uninitialized value $m1 in exists at - line 7.
 Use of uninitialized value $g1 in exists at - line 8.
 ########
+# TODO range opname
 use warnings 'uninitialized';
 my ($m1, $m2);
 my ($v, @a);
@@ -488,6 +489,7 @@ Use of uninitialized value $. in range (or flip) at - line 26.
 Use of uninitialized value $. in range (or flip) at - line 29.
 Use of uninitialized value $. in range (or flip) at - line 30.
 ########
+# TODO range opname
 use warnings 'uninitialized';
 my ($m1, $m2);
 my ($v, @a);

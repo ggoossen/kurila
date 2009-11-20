@@ -1407,6 +1407,24 @@ S_finished_op_check(pTHX_ OP* o)
     case OP_DBSTATE:
 	PL_curcop = ((COP*)o);		/* for warnings */
 	break;
+    case OP_EXEC:
+	if (ckWARN(WARN_SYNTAX))
+	    {
+	    	if (o->op_sibling && o->op_sibling->op_type == OP_NEXTSTATE &&
+		    o->op_sibling->op_sibling) {
+	    	    const OPCODE type = o->op_sibling->op_sibling->op_type;
+	    	    if (type != OP_EXIT && type != OP_WARN && type != OP_DIE) {
+	    		const line_t oldline = CopLINE(PL_curcop);
+	    		CopLINE_set(PL_curcop, CopLINE((COP*)o->op_sibling));
+	    		Perl_warner(aTHX_ packWARN(WARN_EXEC),
+	    			    "Statement unlikely to be reached");
+	    		Perl_warner(aTHX_ packWARN(WARN_EXEC),
+	    			    "\t(Maybe you meant system() when you said exec()?)\n");
+	    		CopLINE_set(PL_curcop, oldline);
+	    	    }
+		}
+	    }
+	break;
     case OP_CONST:
 	if (o->op_private & OPpCONST_STRICT)
 	    no_bareword_allowed(o);

@@ -574,7 +574,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"grep iterator",
 	"map",
 	"map iterator",
-	"flipflop",
+	"range",
 	"range (or flip)",
 	"range (or flop)",
 	"logical and (&&)",

@@ -844,7 +844,7 @@ mapwhile	map iterator		ck_null		dt|
 
 # Range stuff.
 
-range		flipflop		ck_null		|	S S
+range		range		ck_null		|	S S
 flip		range (or flip)		ck_null		1	S S
 flop		range (or flop)		ck_null		1
 
