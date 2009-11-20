@@ -761,21 +761,29 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	OP* op_av = cUNOPo->op_first;
 	OP* op_index = op_av->op_sibling;
 	bool index_is_constant = TRUE;
+	int start_idx;
 	/* if (op_index->op_type == OP_CONST */
 	/*     && ((op_av->op_type == OP_RV2AV  */
 	/* 	    && cUNOPx(op_av)->op_first->op_first == OP_GV) */
 	/* 	)) { */
 	/* } */
-	S_add_op(codeseq, bpp, op_av, &index_is_constant);
-	S_add_op(codeseq, bpp, op_index, &kid_may_constant_fold);
+	start_idx = bpp->idx;
+	S_add_op(codeseq, bpp, op_av, &kid_may_constant_fold);
+	S_add_op(codeseq, bpp, op_index, &index_is_constant);
 	kid_may_constant_fold = kid_may_constant_fold && index_is_constant;
 	/* if (index_is_constant) { */
 	/*     if (op_av->op_type == OP_RV2AV */
-	/* 	&& cUNOPx(op_av)->op_first->op_first == OP_GV) { */
-	/* 	assert( */
+	/* 	&& cUNOPx(op_av)->op_first == OP_GV) { */
+	/* 	SV* const constsv = S_sv_const_instruction(bpp->idx-1); */
+	/* 	IV i; */
+	/* 	i = SvIV(((SVOP*)constsv)->op_sv) - CopARYBASE_get(PL_curcop)) */
+	/*     			<= 255 && */
+	/* 	bpp->idx = start_idx; */
+	/* 	SvREADONLY_on(constsv); */
+	/* 	S_append_instruction(codeseq, bpp, o, OP_AELEMFAST); */
+	/* 	break; */
 	/* 	/\* Convert to AELEMFAST *\/ */
 	/*     } */
-	    
 	/* } */
 	S_append_instruction(codeseq, bpp, o, o->op_type);
 	break;
