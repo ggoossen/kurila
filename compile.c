@@ -411,7 +411,10 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 		UNOP* const flip = cUNOPx(range->op_first);
 		S_add_op(codeseq, bpp, flip->op_first, &kid_may_constant_fold);
 		S_add_op(codeseq, bpp, flip->op_first->op_sibling, &kid_may_constant_fold);
-		o->op_flags |= OPf_STACKED; /* FIXME manipulation of the optree */
+	    }
+	    else if (op_expr->op_type == OP_REVERSE) {
+		o->op_private |= OPpITER_REVERSED;
+		S_add_kids(codeseq, bpp, op_expr, &kid_may_constant_fold);
 	    }
 	    else {
 		S_add_op(codeseq, bpp, op_expr, &kid_may_constant_fold);
