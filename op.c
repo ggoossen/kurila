@@ -4981,6 +4981,7 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
     I32 iterflags = 0;
     I32 iterpflags = 0;
     OP *madsv = NULL;
+    PERL_UNUSED_ARG(flags);
 
     PERL_ARGS_ASSERT_NEWFOROP;
 
@@ -5148,7 +5149,7 @@ S_ref_array_or_hash(pTHX_ OP *cond)
 
 STATIC OP *
 S_newGIVWHENOP(pTHX_ OP *cond, OP *block,
-		   I32 enter_opcode, I32 leave_opcode,
+		   I32 enter_opcode,
 		   PADOFFSET entertarg)
 {
     dVAR;
@@ -5272,7 +5273,7 @@ Perl_newGIVENOP(pTHX_ OP *cond, OP *block, PADOFFSET defsv_off)
     return newGIVWHENOP(
     	ref_array_or_hash(cond),
     	block,
-	OP_ENTERGIVEN, OP_LEAVEGIVEN,
+	OP_ENTERGIVEN,
 	defsv_off);
 }
 
@@ -5296,7 +5297,7 @@ Perl_newWHENOP(pTHX_ OP *cond, OP *block)
     return newGIVWHENOP(
 	cond_op,
 	    append_elem(block->op_type, block, newOP(OP_BREAK, OPf_SPECIAL)),
-	OP_ENTERWHEN, OP_LEAVEWHEN, 0);
+	OP_ENTERWHEN, 0);
 }
 
 /*
@@ -8252,29 +8253,29 @@ Perl_ck_each(pTHX_ OP *o)
     return ck_fun(o);
 }
 
-/* caller is supposed to assign the return to the 
-   container of the rep_op var */
-OP *
-S_opt_scalarhv(pTHX_ OP *rep_op) {
-    UNOP *unop;
+/* /\* caller is supposed to assign the return to the  */
+/*    container of the rep_op var *\/ */
+/* OP * */
+/* S_opt_scalarhv(pTHX_ OP *rep_op) { */
+/*     UNOP *unop; */
 
-    PERL_ARGS_ASSERT_OPT_SCALARHV;
+/*     PERL_ARGS_ASSERT_OPT_SCALARHV; */
 
-    NewOp(1101, unop, 1, UNOP);
-    unop->op_type = (OPCODE)OP_BOOLKEYS;
-    unop->op_flags = (U8)(OPf_WANT_SCALAR | OPf_KIDS );
-    unop->op_private = (U8)(1 | ((OPf_WANT_SCALAR | OPf_KIDS) >> 8));
-    unop->op_first = rep_op;
-    rep_op->op_flags|=(OPf_REF | OPf_MOD);
-    unop->op_sibling = rep_op->op_sibling;
-    rep_op->op_sibling = NULL;
-    /* unop->op_targ = pad_alloc(OP_BOOLKEYS, SVs_PADTMP); */
-    if (rep_op->op_type == OP_PADHV) { 
-        rep_op->op_flags &= ~OPf_WANT_SCALAR;
-        rep_op->op_flags |= OPf_WANT_LIST;
-    }
-    return (OP*)unop;
-}                        
+/*     NewOp(1101, unop, 1, UNOP); */
+/*     unop->op_type = (OPCODE)OP_BOOLKEYS; */
+/*     unop->op_flags = (U8)(OPf_WANT_SCALAR | OPf_KIDS ); */
+/*     unop->op_private = (U8)(1 | ((OPf_WANT_SCALAR | OPf_KIDS) >> 8)); */
+/*     unop->op_first = rep_op; */
+/*     rep_op->op_flags|=(OPf_REF | OPf_MOD); */
+/*     unop->op_sibling = rep_op->op_sibling; */
+/*     rep_op->op_sibling = NULL; */
+/*     /\* unop->op_targ = pad_alloc(OP_BOOLKEYS, SVs_PADTMP); *\/ */
+/*     if (rep_op->op_type == OP_PADHV) {  */
+/*         rep_op->op_flags &= ~OPf_WANT_SCALAR; */
+/*         rep_op->op_flags |= OPf_WANT_LIST; */
+/*     } */
+/*     return (OP*)unop; */
+/* }                         */
 
 /* A peephole optimizer.  We visit the ops in the order they're to execute.
  * See the comments at the top of this file for more details about when

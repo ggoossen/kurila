@@ -504,9 +504,6 @@ ApR	|bool	|is_utf8_mark	|NN const U8 *p
 p	|OP*	|jmaybe		|NN OP *o
 : Used in pp.c 
 pP	|I32	|keyword	|NN const char *name|I32 len|bool all_keywords
-#if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
-s	|OP*	|opt_scalarhv	|NN OP* rep_op
-#endif
 Ap	|void	|leave_scope	|I32 base
 : Used in pp_ctl.c, and by Data::Alias
 EXp	|void	|lex_end
@@ -1484,7 +1481,7 @@ sR	|OP*	|too_few_arguments|NN OP *o|NN const char* name
 sR	|OP*	|too_many_arguments|NN OP *o|NN const char* name
 s	|bool	|looks_like_bool|NN const OP* o
 s	|OP*	|newGIVWHENOP	|NULLOK OP* cond|NN OP *block \
-				|I32 enter_opcode|I32 leave_opcode \
+				|I32 enter_opcode \
 				|PADOFFSET entertarg
 s	|OP*	|ref_array_or_hash|NULLOK OP* cond
 s	|void	|process_special_blocks	|NN const char *const fullname\
