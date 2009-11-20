@@ -4786,7 +4786,7 @@ STATIC void	S_bad_type(pTHX_ I32 n, const char *t, const char *name, const OP *k
 #define PERL_ARGS_ASSERT_BAD_TYPE	\
 	assert(t); assert(name); assert(kid)
 
-STATIC void	S_no_bareword_allowed(pTHX_ const OP *o)
+STATIC void	S_no_bareword_allowed(pTHX_ OP *o)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_NO_BAREWORD_ALLOWED	\
 	assert(o)
