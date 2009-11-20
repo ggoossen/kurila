@@ -1290,7 +1290,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_bitop),	/* bit_and */
 	MEMBER_TO_FPTR(Perl_ck_bitop),	/* bit_xor */
 	MEMBER_TO_FPTR(Perl_ck_bitop),	/* bit_or */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* negate */
+	MEMBER_TO_FPTR(Perl_ck_negate),	/* negate */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* i_negate */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* not */
 	MEMBER_TO_FPTR(Perl_ck_bitop),	/* complement */

@@ -29,6 +29,7 @@ Perl_ck_lfun
 Perl_ck_listiob
 Perl_ck_match
 Perl_ck_method
+Perl_ck_negate
 Perl_ck_null
 Perl_ck_open
 Perl_ck_readline

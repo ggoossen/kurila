@@ -1417,6 +1417,7 @@ s	|void	|unwind_handler_stack|NN const void *p
 #if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 : These are all indirectly referenced by globals.c. This is somewhat annoying.
 pR	|OP*	|ck_anoncode	|NN OP *o
+pR	|OP*	|ck_negate	|NN OP *o
 pR	|OP*	|ck_bitop	|NN OP *o
 pR	|OP*	|ck_concat	|NN OP *o
 pR	|OP*	|ck_defined	|NN OP *o
