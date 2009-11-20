@@ -788,12 +788,15 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 		) {
 		/* Convert to AELEMFAST */
 		SV* const constsv = S_sv_const_instruction(codeseq, bpp, bpp->idx-1);
-		IV i = SvIV(constsv) - CopARYBASE_get(PL_curcop);
-		cUNOPx(op_av)->op_first->op_flags |= o->op_flags & OPf_MOD;
-		bpp->idx = start_idx;
-		S_append_instruction_x(codeseq, bpp, cUNOPx(op_av)->op_first,
-		    Perl_pp_aelemfast, INT2PTR(void*, i));
-		break;
+		SvIV_please(constsv);
+		if (SvIOKp(constsv)) {
+		    IV i = SvIV(constsv) - CopARYBASE_get(PL_curcop);
+		    cUNOPx(op_av)->op_first->op_flags |= o->op_flags & OPf_MOD;
+		    bpp->idx = start_idx;
+		    S_append_instruction_x(codeseq, bpp, cUNOPx(op_av)->op_first,
+			Perl_pp_aelemfast, INT2PTR(void*, i));
+		    break;
+		}
 	    }
 	}
 	S_append_instruction(codeseq, bpp, o, o->op_type);
