@@ -3101,9 +3101,12 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	CLEAR_ERRSV();
     if (yyparse() || PL_parser->error_count || !PL_eval_root) {
 	SV **newsp;			/* Used by POPBLOCK. */
-	PERL_CONTEXT *cx = &cxstack[cxstack_ix];
-	I32 optype = 0;			/* Might be reset by POPEVAL. */
+	PERL_CONTEXT *cx;
+	I32 optype;			/* Might be reset by POPEVAL. */
 	const char *msg;
+      parse_error:
+	cx = &cxstack[cxstack_ix];
+	optype = 0;
 
 	PL_op = saveop;
 	if (PL_eval_root) {
@@ -3142,11 +3145,6 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	PUTBACK;
 	return FALSE;
     }
-    CopLINE_set(&PL_compiling, 0);
-    if (startop) {
-	*startop = PL_eval_root;
-    } else
-	SAVEFREEOP(PL_eval_root);
 
     /* Set the context for this new optree.
      * Propagate the context from the eval(). */
@@ -3158,6 +3156,15 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	scalar(PL_eval_root);
 
     finish_optree(PL_eval_root);
+
+    if (PL_parser->error_count) /* finish_optree might have generated new error */
+	goto parse_error;
+
+    CopLINE_set(&PL_compiling, 0);
+    if (startop) {
+	*startop = PL_eval_root;
+    } else
+	SAVEFREEOP(PL_eval_root);
 
     DEBUG_x(dump_eval());
 
