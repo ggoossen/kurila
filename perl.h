@@ -4584,6 +4584,8 @@ EXTCONST char* const PL_block_type[] = {
 #else
 EXTCONST char* PL_block_type[];
 #endif
+#else
+EXTCONST char* PL_block_type[];
 #endif
 
 /* These are all the compile time options that affect binary compatibility.
