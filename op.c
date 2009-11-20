@@ -6394,7 +6394,7 @@ Perl_ck_concat(pTHX_ OP *o)
     PERL_ARGS_ASSERT_CK_CONCAT;
     PERL_UNUSED_CONTEXT;
 
-    assert(!(kid->op_private & OPpTARGET_MY));
+    /* assert(!(kid->op_private & OPpTARGET_MY)); */
     /* FIXME move to compile.c */
     /* if (kid->op_type == OP_CONCAT && !(kid->op_private & OPpTARGET_MY) && */
     /* 	    !(kUNOP->op_first->op_flags & OPf_MOD)) */
