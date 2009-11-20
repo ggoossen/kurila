@@ -1920,7 +1920,7 @@ sub _sqrt
   # 144000 000000 => sqrt(144000) => guess 379
 
   print "$lastelem (elems $elems) => " if DEBUG;
-  $lastelem = $lastelem / 10 if ($elems & 1 == 1);		# odd or even?
+  $lastelem = $lastelem / 10 if ($elems & (1 == 1));		# odd or even?
   my $g = sqrt($lastelem); $g =~ s/\.//;			# 2.345 => 2345
   $r -= 1 if $elems & 1 == 0;					# 70 => 7
 
