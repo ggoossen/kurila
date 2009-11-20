@@ -2259,7 +2259,7 @@ xpoM	|struct refcounted_he *|store_cop_label \
 xpo	|int	|keyword_plugin_standard|NN char* keyword_ptr|STRLEN keyword_len|NN OP** op_ptr
 
 #if defined(PERL_IN_COMPILE_C) || defined(PERL_DECL_PROT)
-s	|OP*	|is_inplace_sort_av	|NN OP* o
+s	|OP*	|is_inplace_av	|NN OP* o
 #endif
 p	|INSTRUCTION*	|codeseq_start_instruction|NN const CODESEQ* codeseq
 Ep	|void	|compile_op|NN OP* startop|NN CODESEQ* codeseq

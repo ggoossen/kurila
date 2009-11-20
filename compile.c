@@ -837,26 +837,33 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	OP* op_right = cBINOPo->op_first;
 	OP* op_left = op_right->op_sibling;
 
-	OP* inplace_sort_av_op = is_inplace_sort_av(o);
-	if (inplace_sort_av_op) {
-	    inplace_sort_av_op->op_private |= OPpSORT_INPLACE;
+	OP* inplace_av_op = is_inplace_av(o);
+	if (inplace_av_op) {
+	    if (inplace_av_op->op_type == OP_SORT) {
+		inplace_av_op->op_private |= OPpSORT_INPLACE;
 	    
-	    S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
-	    S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
-	    if (inplace_sort_av_op->op_flags & OPf_STACKED && !(inplace_sort_av_op->op_flags & OPf_SPECIAL))
-		S_add_op(codeseq, bpp, cLISTOPx(inplace_sort_av_op)->op_first, &kid_may_constant_fold);
-	    S_add_op(codeseq, bpp, op_left, &kid_may_constant_fold);
+		S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
+		S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
+		if (inplace_av_op->op_flags & OPf_STACKED && !(inplace_av_op->op_flags & OPf_SPECIAL))
+		    S_add_op(codeseq, bpp, cLISTOPx(inplace_av_op)->op_first, &kid_may_constant_fold);
+		S_add_op(codeseq, bpp, op_left, &kid_may_constant_fold);
 
-	    o = inplace_sort_av_op;
-	    goto compile_sort_without_kids;
-	}
-	else  {
+		o = inplace_av_op;
+		goto compile_sort_without_kids;
+	    }
+	    assert(inplace_av_op->op_type == OP_REVERSE);
+	    inplace_av_op->op_private |= OPpREVERSE_INPLACE;
 	    S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
-	    S_add_op(codeseq, bpp, op_right, &kid_may_constant_fold);
 	    S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
 	    S_add_op(codeseq, bpp, op_left, &kid_may_constant_fold);
-	    S_append_instruction(codeseq, bpp, o, OP_AASSIGN);
+	    S_append_instruction(codeseq, bpp, inplace_av_op, OP_REVERSE);
+	    break;
 	}
+	S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
+	S_add_op(codeseq, bpp, op_right, &kid_may_constant_fold);
+	S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
+	S_add_op(codeseq, bpp, op_left, &kid_may_constant_fold);
+	S_append_instruction(codeseq, bpp, o, OP_AASSIGN);
 	break;
     }
     case OP_LIST:
@@ -1028,17 +1035,16 @@ Perl_instruction_name(pTHX_ const INSTRUCTION* instr)
     return "(unknown)";
 }
 
-/* Checks if o acts as an in-place operator on an array. oright points to the
- * beginning of the right-hand side. Returns the left-hand side of the
- * assignment if o acts in-place, or NULL otherwise. */
+/* Checks if o acts as an in-place operator on an array. o points to the
+ * assign op. Returns the the in-place operator if available or NULL otherwise */
 
 OP *
-S_is_inplace_sort_av(pTHX_ OP *o) {
+S_is_inplace_av(pTHX_ OP *o) {
     OP *oright = cBINOPo->op_first;
     OP *oleft = cBINOPo->op_first->op_sibling;
     OP *sortop;
 
-    PERL_ARGS_ASSERT_IS_INPLACE_SORT_AV;
+    PERL_ARGS_ASSERT_IS_INPLACE_AV;
 
     /* Only do inplace sort in void context */
     assert(o->op_type == OP_AASSIGN);
@@ -1052,12 +1058,12 @@ S_is_inplace_sort_av(pTHX_ OP *o) {
     oright = cLISTOPx(oright)->op_first;
     if (!oright || oright->op_sibling)
 	return NULL;
-    if (oright->op_type != OP_SORT)
+    if (oright->op_type != OP_SORT && oright->op_type != OP_REVERSE)
 	return NULL;
     sortop = oright;
     oright = cLISTOPx(oright)->op_first;
     if (sortop->op_flags & OPf_STACKED)
-	oright = oright->op_sibling; /* skip sort block */
+	oright = oright->op_sibling; /* skip block */
 
     if (!oright || oright->op_sibling)
 	return NULL;
