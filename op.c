@@ -1227,7 +1227,7 @@ Perl_scalarvoid(pTHX_ OP *o)
 	for (kid = cLISTOPo->op_first->op_sibling->op_sibling; kid; kid = kid->op_sibling)
 	    scalarvoid(kid);
 	break;
-    case OP_ENTEREVAL:
+    case OP_LEAVEEVAL:
 	scalarkids(o);
 	break;
     case OP_SCALAR:
@@ -1393,6 +1393,7 @@ S_finished_op_check(pTHX_ OP* o)
     assert(o->op_context_known
 	|| o->op_type == OP_NULL
 	|| o->op_type == OP_LIST
+	|| o->op_type == OP_STUB
 	|| o->op_type == OP_NOTHING
 	|| o->op_type == OP_ENTER
 	|| o->op_type == OP_METHOD
@@ -2408,8 +2409,6 @@ Perl_newPROG(pTHX_ OP *o)
 				? OPf_SPECIAL : 0), o);
 	PL_eval_root->op_private |= OPpREFCOUNTED;
 	OpREFCNT_set(PL_eval_root, 1);
-	S_unknown(PL_eval_root);
-	finish_optree(PL_eval_root);
     }
     else {
 	if (o->op_type == OP_STUB) {
@@ -7827,7 +7826,7 @@ Perl_ck_split(pTHX_ OP *o)
 OP *
 Perl_ck_join(pTHX_ OP *o)
 {
-    const OP * const kid = cLISTOPo->op_first->op_sibling;
+    const OP * const kid = cLISTOPo->op_first;
 
     PERL_ARGS_ASSERT_CK_JOIN;
 

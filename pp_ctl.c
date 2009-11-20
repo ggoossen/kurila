@@ -3148,6 +3148,17 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     } else
 	SAVEFREEOP(PL_eval_root);
 
+    /* Set the context for this new optree.
+     * Propagate the context from the eval(). */
+    if ((gimme & G_WANT) == G_VOID)
+	scalarvoid(PL_eval_root);
+    else if ((gimme & G_WANT) == G_ARRAY)
+	list(PL_eval_root);
+    else
+	scalar(PL_eval_root);
+
+    finish_optree(PL_eval_root);
+
     DEBUG_x(dump_eval());
 
     /* Register with debugger: */
