@@ -12790,11 +12790,13 @@ S_find_uninit_var(pTHX_ const OP *const obase, const SV *const uninit_sv,
 	    gv = cGVOPx_gv(cUNOPx(obase)->op_first);
 	    if (!gv)
 		break;
+	    if (match && (GvSV(gv) != uninit_sv))
+		break;
 	    return varname(gv, '$', 0, NULL, 0, FUV_SUBSCRIPT_NONE);
 	}
 	else /* ${expr} */
 	    return find_uninit_var(cUNOPx(obase)->op_first,
-		uninit_sv, match);
+		uninit_sv, 1);
 
     case OP_PADSV:
 	if (match && PAD_SVl(obase->op_targ) != uninit_sv)
@@ -12884,28 +12886,30 @@ S_find_uninit_var(pTHX_ const OP *const obase, const SV *const uninit_sv,
 
 	if (kid && kid->op_type == OP_CONST && SvOK(cSVOPx_sv(kid))) {
 	    /* index is constant */
+	    SV* kidsv;
+	    if (negate) {
+		kidsv = sv_2mortal(newSVpvs("-"));
+		sv_catsv(kidsv, cSVOPx_sv(kid));
+	    }
+	    else
+		kidsv = cSVOPx_sv(kid);
 	    if (match) {
 		if (SvMAGICAL(sv))
 		    break;
 		if (obase->op_type == OP_HELEM) {
-		    HE* he = hv_fetch_ent(MUTABLE_HV(sv), cSVOPx_sv(kid), 0, 0);
+		    HE* he = hv_fetch_ent(MUTABLE_HV(sv), kidsv, 0, 0);
 		    if (!he || HeVAL(he) != uninit_sv)
 			break;
 		}
 		else {
-		    SV * const * const svp = av_fetch(MUTABLE_AV(sv), SvIV(cSVOPx_sv(kid)), FALSE);
+		    SV * const * const svp = av_fetch(MUTABLE_AV(sv),
+			negate ? - SvIV(cSVOPx_sv(kid)) : SvIV(cSVOPx_sv(kid)),
+			FALSE);
 		    if (!svp || *svp != uninit_sv)
 			break;
 		}
 	    }
 	    if (obase->op_type == OP_HELEM) {
-		SV* kidsv;
-		if (negate) {
-		    kidsv = sv_2mortal(newSVpvs("-"));
-		    sv_catsv(kidsv, cSVOPx_sv(kid));
-		}
-		else
-		    kidsv = cSVOPx_sv(kid);
 		return varname(gv, '%', o->op_targ,
 			    kidsv, 0, FUV_SUBSCRIPT_HASH);
 	    }
@@ -13118,10 +13122,10 @@ S_find_uninit_var(pTHX_ const OP *const obase, const SV *const uninit_sv,
 	    if (kid) {
 		const OPCODE type = kid->op_type;
 		if ( (type == OP_CONST && SvOK(cSVOPx_sv(kid)))
-		  || (type == OP_NULL  && ! (kid->op_flags & OPf_KIDS))
-		  || (type == OP_PUSHMARK)
-		)
-		continue;
+		    || (type == OP_NULL  && ! (kid->op_flags & OPf_KIDS))
+		    || (type == OP_PUSHMARK)
+		    )
+		    continue;
 	    }
 	    if (o2) { /* more than one found */
 		o2 = NULL;
@@ -13129,6 +13133,7 @@ S_find_uninit_var(pTHX_ const OP *const obase, const SV *const uninit_sv,
 	    }
 	    o2 = kid;
 	}
+
 	if (o2)
 	    return find_uninit_var(o2, uninit_sv, match);
 
