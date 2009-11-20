@@ -687,7 +687,6 @@ PP(pp_aelemfast)
     const U32 lval = PL_op->op_flags & OPf_MOD;
     SV** const svp = av_fetch(av, array_index, lval);
     SV *sv = (svp ? *svp : &PL_sv_undef);
-    PERL_UNUSED_VAR(pparg1);
     EXTEND(SP, 1);
     if (!lval && SvGMAGICAL(sv))	/* see note in pp_helem() */
 	sv = sv_mortalcopy(sv);
