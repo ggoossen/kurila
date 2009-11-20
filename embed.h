@@ -532,6 +532,7 @@
 #define mod			Perl_mod
 #endif
 #ifdef PERL_CORE
+#define finish_optree		Perl_finish_optree
 #define mode_from_discipline	Perl_mode_from_discipline
 #endif
 #define moreswitches		Perl_moreswitches
@@ -2972,6 +2973,7 @@
 #define mod(a,b)		Perl_mod(aTHX_ a,b)
 #endif
 #ifdef PERL_CORE
+#define finish_optree(a)	Perl_finish_optree(aTHX_ a)
 #define mode_from_discipline(a,b)	Perl_mode_from_discipline(aTHX_ a,b)
 #endif
 #define moreswitches(a)		Perl_moreswitches(aTHX_ a)

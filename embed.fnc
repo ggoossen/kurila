@@ -626,6 +626,7 @@ Ap	|I32	|mg_size	|NN SV* sv
 Ap	|void	|mini_mktime	|NN struct tm *ptm
 : Used by MOD(), which Data::Alias uses
 EXp	|OP*	|mod		|NULLOK OP* o|I32 type
+p	|void	|finish_optree		|NN OP* o
 : Used in op.c and pp_sys.c
 p	|int	|mode_from_discipline|NULLOK const char* s|STRLEN len
 Ap	|const char*	|moreswitches	|NN const char* s
