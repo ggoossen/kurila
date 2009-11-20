@@ -7462,7 +7462,7 @@ Perl_ck_open(pTHX_ OP *o)
 	 if ((last->op_type == OP_CONST) &&		/* The bareword. */
 	     (last->op_private & OPpCONST_BARE) &&
 	     (last->op_private & OPpCONST_STRICT) &&
-	     (oa = first->op_sibling) &&		/* The fh. */
+	     (oa = first) &&		                /* The fh. */
 	     (oa = oa->op_sibling) &&			/* The mode. */
 	     (oa->op_type == OP_CONST) &&
 	     SvPOK(((SVOP*)oa)->op_sv) &&
