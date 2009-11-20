@@ -681,10 +681,11 @@ PP(pp_add)
 PP(pp_aelemfast)
 {
     dVAR; dSP;
-    AV * const av = PL_op->op_flags & OPf_SPECIAL
+    IV array_index = PTR2IV(pparg1);
+    AV * const av = PL_op->op_type == OP_PADAV
 	? MUTABLE_AV(PAD_SV(PL_op->op_targ)) : GvAV(cGVOP_gv);
     const U32 lval = PL_op->op_flags & OPf_MOD;
-    SV** const svp = av_fetch(av, PL_op->op_private, lval);
+    SV** const svp = av_fetch(av, array_index, lval);
     SV *sv = (svp ? *svp : &PL_sv_undef);
     PERL_UNUSED_VAR(pparg1);
     EXTEND(SP, 1);

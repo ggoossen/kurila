@@ -2370,6 +2370,7 @@ typedef struct loop LOOP;
 typedef void* INSTR_ARG;
 typedef struct instruction INSTRUCTION;
 typedef struct codeseq CODESEQ;
+typedef struct branch_point_pad BRANCH_POINT_PAD;
 
 typedef struct interpreter PerlInterpreter;
 

@@ -27,7 +27,6 @@ struct branch_point_pad {
     OP_INSTRPP* op_instrpp_append;
     int recursion;
 };
-typedef struct branch_point_pad BRANCH_POINT_PAD;
 
 void
 S_append_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o, INSTRUCTION** instrp)
@@ -770,20 +769,17 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	S_add_op(codeseq, bpp, op_av, &kid_may_constant_fold);
 	S_add_op(codeseq, bpp, op_index, &index_is_constant);
 	kid_may_constant_fold = kid_may_constant_fold && index_is_constant;
-	/* if (index_is_constant) { */
-	/*     if (op_av->op_type == OP_RV2AV */
-	/* 	&& cUNOPx(op_av)->op_first == OP_GV) { */
-	/* 	SV* const constsv = S_sv_const_instruction(bpp->idx-1); */
-	/* 	IV i; */
-	/* 	i = SvIV(((SVOP*)constsv)->op_sv) - CopARYBASE_get(PL_curcop)) */
-	/*     			<= 255 && */
-	/* 	bpp->idx = start_idx; */
-	/* 	SvREADONLY_on(constsv); */
-	/* 	S_append_instruction(codeseq, bpp, o, OP_AELEMFAST); */
-	/* 	break; */
-	/* 	/\* Convert to AELEMFAST *\/ */
-	/*     } */
-	/* } */
+	if (index_is_constant) {
+	    if (op_av->op_type == OP_RV2AV && cUNOPx(op_av)->op_first->op_type == OP_GV) {
+		/* Convert to AELEMFAST */
+		SV* const constsv = S_sv_const_instruction(codeseq, bpp, bpp->idx-1);
+		IV i = SvIV(constsv) - CopARYBASE_get(PL_curcop);
+		bpp->idx = start_idx;
+		S_append_instruction_x(codeseq, bpp, cUNOPx(op_av)->op_first,
+		    Perl_pp_aelemfast, INT2PTR(void*, i));
+		break;
+	    }
+	}
 	S_append_instruction(codeseq, bpp, o, o->op_type);
 	break;
     }
@@ -1111,6 +1107,20 @@ S_is_inplace_av(pTHX_ OP *o) {
     	return NULL;
 
     return sortop;
+}
+
+SV*
+S_sv_const_instruction(pTHX_ CODESEQ *codeseq, BRANCH_POINT_PAD *bpp, int instr_index)
+{
+    INSTRUCTION* instr = &codeseq->xcodeseq_instructions[instr_index];
+    PERL_UNUSED_VAR(bpp);
+    if (instr->instr_op) {
+	assert(instr->instr_op->op_type == OP_CONST);
+	return cSVOPx_sv(instr->instr_op);
+    }
+    else {
+	return (SV*)instr->instr_arg1;
+    }
 }
 
 void

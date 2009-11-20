@@ -6784,6 +6784,12 @@ STATIC OP*	S_is_inplace_av(pTHX_ OP* o)
 #define PERL_ARGS_ASSERT_IS_INPLACE_AV	\
 	assert(o)
 
+STATIC SV*	S_sv_const_instruction(pTHX_ CODESEQ* codeseq, BRANCH_POINT_PAD *bpp, int instr_index)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_SV_CONST_INSTRUCTION	\
+	assert(codeseq); assert(bpp)
+
 #endif
 PERL_CALLCONV INSTRUCTION*	Perl_codeseq_start_instruction(pTHX_ const CODESEQ* codeseq)
 			__attribute__nonnull__(pTHX_1);
