@@ -340,7 +340,8 @@ PP(pp_readline)
 	    PL_last_in_gv = MUTABLE_GV(*PL_stack_sp--);
 	}
     }
-    return do_readline();
+    do_readline();
+    return NORMAL;
 }
 
 PP(pp_eq)
@@ -946,7 +947,8 @@ PP(pp_rv2av)
 	/* The guts of pp_rv2hv  */
     if (gimme == G_ARRAY) { /* array wanted */
 	*PL_stack_sp = sv;
-	return do_kv();
+	do_kv();
+	return NORMAL;
     }
     else if (gimme == G_SCALAR) {
 	dTARGET;
@@ -1575,7 +1577,7 @@ ret_no:
     RETPUSHNO;
 }
 
-int
+void
 Perl_do_readline(pTHX)
 {
     dVAR; dSP; dTARGETSTACKED;
@@ -1602,7 +1604,8 @@ Perl_do_readline(pTHX)
 		SvSetSV_nosteal(TARG, result);
 		PUSHTARG;
 	    }
-	    RETURN;
+	    PUTBACK;
+	    return;
 	}
     }
     fp = NULL;
@@ -1782,7 +1785,8 @@ Perl_do_readline(pTHX)
 		= SvCUR(sv) < 60 ? 80 : SvCUR(sv)+40; /* allow some slop */
 	    SvPV_renew(sv, new_len);
 	}
-	RETURN;
+	PUTBACK;
+	return;
     }
 }
 

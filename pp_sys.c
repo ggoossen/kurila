@@ -388,16 +388,17 @@ PP(pp_glob)
 #endif	/* !CSH */
 #endif	/* !DOSISH */
 
-    result = do_readline();
+    do_readline();
     LEAVE_with_name("glob");
-    return result;
+    return NORMAL;
 }
 
 PP(pp_rcatline)
 {
     dVAR;
     PL_last_in_gv = cGVOP_gv;
-    return do_readline();
+    do_readline();
+    return NORMAL;
 }
 
 PP(pp_warn)

@@ -278,7 +278,7 @@ Ap	|bool	|do_openn	|NN GV *gv|NN const char *oname|I32 len \
 : Used in pp_hot.c and pp_sys.c
 p	|bool	|do_print	|NULLOK SV* sv|NN PerlIO* fp
 : Used in pp_sys.c
-pR	|int	|do_readline
+p	|void	|do_readline
 : Used in pp.c
 p	|I32	|do_chomp	|NN SV* sv
 : Defined in doio.c, used only in pp_sys.c

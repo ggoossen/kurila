@@ -674,9 +674,7 @@ PERL_CALLCONV bool	Perl_do_print(pTHX_ SV* sv, PerlIO* fp)
 #define PERL_ARGS_ASSERT_DO_PRINT	\
 	assert(fp)
 
-PERL_CALLCONV int	Perl_do_readline(pTHX)
-			__attribute__warn_unused_result__;
-
+PERL_CALLCONV void	Perl_do_readline(pTHX);
 PERL_CALLCONV I32	Perl_do_chomp(pTHX_ SV* sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_DO_CHOMP	\
