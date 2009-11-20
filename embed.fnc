@@ -509,7 +509,6 @@ p	|OP*	|jmaybe		|NN OP *o
 pP	|I32	|keyword	|NN const char *name|I32 len|bool all_keywords
 #if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 s	|OP*	|opt_scalarhv	|NN OP* rep_op
-s	|OP*	|is_inplace_av	|NN OP* o|NULLOK OP* oright
 #endif
 Ap	|void	|leave_scope	|I32 base
 : Used in pp_ctl.c, and by Data::Alias
@@ -2259,8 +2258,12 @@ xpoM	|struct refcounted_he *|store_cop_label \
 
 xpo	|int	|keyword_plugin_standard|NN char* keyword_ptr|STRLEN keyword_len|NN OP** op_ptr
 
+#if defined(PERL_IN_COMPILE_C) || defined(PERL_DECL_PROT)
+s	|OP*	|is_inplace_sort_av	|NN OP* o
+#endif
 p	|INSTRUCTION*	|codeseq_start_instruction|NN const CODESEQ* codeseq
 Ep	|void	|compile_op|NN OP* startop|NN CODESEQ* codeseq
+Ep	|void	|compile_cv|NN CV* cv
 Eap	|CODESEQ*	|new_codeseq
 Ep	|void	|free_codeseq|NULLOK CODESEQ* codeseq
 p	|const char*	|instruction_name|NULLOK const INSTRUCTION* instr

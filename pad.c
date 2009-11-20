@@ -1607,15 +1607,13 @@ Perl_cv_clone(pTHX_ CV *proto)
     }
 
     if (!CvCODESEQ(proto)) {
-	PAD* oldpad;
-	const AV *const clonepad = (const AV *)*av_fetch(CvPADLIST(cv), 1, FALSE);
-	PAD_SAVE_LOCAL(oldpad, clonepad);
-	CvCODESEQ(proto) = new_codeseq();
-	compile_op(CvROOT(cv), CvCODESEQ(proto));
-	PAD_RESTORE_LOCAL(oldpad);
+	compile_cv(cv);
+	/* shared the the compiled code with the proto */
+	CvCODESEQ(proto)       = CvCODESEQ(cv);
     }
+    else
+	CvCODESEQ(cv)       = CvCODESEQ(proto);
 
-    CvCODESEQ(cv)       = CvCODESEQ(proto);
     DEBUG_Xv(
 	PerlIO_printf(Perl_debug_log, "\nPad CV clone\n");
 	cv_dump(outside, "Outside");

@@ -707,27 +707,29 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	  label1:
               ...        
 	*/
-	int start_idx;
 	OP* kid;
-	OP* op_block;
-	bool has_block = (o->op_flags & OPf_STACKED && o->op_flags & OPf_SPECIAL);
-
 	S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
 
-	op_block = cUNOPo->op_first;
-	kid = has_block ? op_block->op_sibling : op_block;
+	kid = (o->op_flags & OPf_STACKED && o->op_flags & OPf_SPECIAL) ? cUNOPo->op_first->op_sibling
+	    : cUNOPo->op_first;
 	for (; kid; kid=kid->op_sibling)
 	    S_add_op(codeseq, bpp, kid, &kid_may_constant_fold);
 
-	S_append_instruction(codeseq, bpp, o, OP_SORT);
-	start_idx = bpp->idx;
-	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
-	if (has_block) {
-	    S_save_branch_point(bpp, &(o->op_unstack_instr));
-	    S_add_op(codeseq, bpp, op_block, &kid_may_constant_fold);
-	    S_append_instruction_x(codeseq, bpp, NULL, NULL, NULL);
+      compile_sort_without_kids:
+	{
+	    int start_idx;
+	    bool has_block = (o->op_flags & OPf_STACKED && o->op_flags & OPf_SPECIAL);
+
+	    S_append_instruction(codeseq, bpp, o, OP_SORT);
+	    start_idx = bpp->idx;
+	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
+	    if (has_block) {
+		S_save_branch_point(bpp, &(o->op_unstack_instr));
+		S_add_op(codeseq, bpp, cUNOPo->op_first, &kid_may_constant_fold);
+		S_append_instruction_x(codeseq, bpp, NULL, NULL, NULL);
+	    }
+	    codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
 	}
-	codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
 	break;
     }
     case OP_FORMLINE:
@@ -834,11 +836,40 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     {
 	OP* op_right = cBINOPo->op_first;
 	OP* op_left = op_right->op_sibling;
-	S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
-	S_add_op(codeseq, bpp, op_right, &kid_may_constant_fold);
-	S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
-	S_add_op(codeseq, bpp, op_left, &kid_may_constant_fold);
-	S_append_instruction(codeseq, bpp, o, OP_AASSIGN);
+
+	OP* inplace_sort_av_op = is_inplace_sort_av(o);
+	if (inplace_sort_av_op) {
+	    inplace_sort_av_op->op_private |= OPpSORT_INPLACE;
+	    
+	    S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
+	    S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
+	    if (inplace_sort_av_op->op_flags & OPf_STACKED && !(inplace_sort_av_op->op_flags & OPf_SPECIAL))
+		S_add_op(codeseq, bpp, cLISTOPx(inplace_sort_av_op)->op_first, &kid_may_constant_fold);
+	    S_add_op(codeseq, bpp, op_left, &kid_may_constant_fold);
+
+	    o = inplace_sort_av_op;
+	    goto compile_sort_without_kids;
+	}
+	else  {
+	    S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
+	    S_add_op(codeseq, bpp, op_right, &kid_may_constant_fold);
+	    S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
+	    S_add_op(codeseq, bpp, op_left, &kid_may_constant_fold);
+	    S_append_instruction(codeseq, bpp, o, OP_AASSIGN);
+	}
+	break;
+    }
+    case OP_LIST:
+    {
+	if ((o->op_flags & OPf_WANT) == OPf_WANT_LIST) {
+	    /* don't bother with the pushmark and the pp_list instruction in list context */
+	    S_add_kids(codeseq, bpp, o, &kid_may_constant_fold);
+	}
+	else {
+	    S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
+	    S_add_kids(codeseq, bpp, o, &kid_may_constant_fold);
+	    S_append_instruction(codeseq, bpp, o, o->op_type);
+	}
 	break;
     }
     default:
@@ -884,6 +915,7 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
     SAVETMPS;
 
     save_scalar(PL_errgv);
+    SAVEVPTR(PL_curcop);
 
     Newx(bpp.op_instrpp_list, 128, OP_INSTRPP);
     bpp.idx = 0;
@@ -994,6 +1026,93 @@ Perl_instruction_name(pTHX_ const INSTRUCTION* instr)
 	}
     }
     return "(unknown)";
+}
+
+/* Checks if o acts as an in-place operator on an array. oright points to the
+ * beginning of the right-hand side. Returns the left-hand side of the
+ * assignment if o acts in-place, or NULL otherwise. */
+
+OP *
+S_is_inplace_sort_av(pTHX_ OP *o) {
+    OP *oright = cBINOPo->op_first;
+    OP *oleft = cBINOPo->op_first->op_sibling;
+    OP *sortop;
+
+    PERL_ARGS_ASSERT_IS_INPLACE_SORT_AV;
+
+    /* Only do inplace sort in void context */
+    assert(o->op_type == OP_AASSIGN);
+
+    if ((o->op_flags & OPf_WANT) != OPf_WANT_VOID)
+	return NULL;
+
+    /* check that the sort is the first arg on RHS of assign */
+
+    assert(oright->op_type == OP_LIST);
+    oright = cLISTOPx(oright)->op_first;
+    if (!oright || oright->op_sibling)
+	return NULL;
+    if (oright->op_type != OP_SORT)
+	return NULL;
+    sortop = oright;
+    oright = cLISTOPx(oright)->op_first;
+    if (sortop->op_flags & OPf_STACKED)
+	oright = oright->op_sibling; /* skip sort block */
+
+    if (!oright || oright->op_sibling)
+	return NULL;
+
+    /* Check that the LHS and RHS are both assignments to a variable */
+    if (!oright ||
+    	(oright->op_type != OP_RV2AV && oright->op_type != OP_PADAV)
+    	|| (oright->op_private & OPpLVAL_INTRO)
+    )
+    	return NULL;
+
+    assert(oleft->op_type == OP_LIST);
+    oleft = cLISTOPx(oleft)->op_first;
+    if (!oleft || oleft->op_sibling)
+	return NULL;
+
+    if ((oleft->op_type != OP_PADAV && oleft->op_type != OP_RV2AV)
+	|| (oleft->op_private & OPpLVAL_INTRO)
+	)
+	return NULL;
+
+    /* check the array is the same on both sides */
+    if (oleft->op_type == OP_RV2AV) {
+    	if (oright->op_type != OP_RV2AV
+    	    || !cUNOPx(oright)->op_first
+    	    || cUNOPx(oright)->op_first->op_type != OP_GV
+    	    || cGVOPx_gv(cUNOPx(oleft)->op_first) !=
+    	       cGVOPx_gv(cUNOPx(oright)->op_first)
+    	)
+    	    return NULL;
+    }
+    else if (oright->op_type != OP_PADAV
+    	|| oright->op_targ != oleft->op_targ
+    )
+    	return NULL;
+
+    return sortop;
+}
+
+void
+Perl_compile_cv(pTHX_ CV* cv)
+{
+    PAD* oldpad;
+    AV * const cvpad = (AV *)*av_fetch(CvPADLIST(cv), 1, FALSE);
+
+    if (CvCODESEQ(cv))
+	return;
+
+    CvCODESEQ(cv) = new_codeseq();
+
+    PAD_SAVE_LOCAL(oldpad, cvpad);
+
+    compile_op(CvROOT(cv), CvCODESEQ(cv));
+
+    PAD_RESTORE_LOCAL(oldpad);
 }
 
 /*

@@ -1540,8 +1540,7 @@ PP(pp_sort)
 		PL_sortcop = (OP*)cv;
 	    else {
 		if (! CvCODESEQ(cv)) {
-		    CvCODESEQ(cv) = new_codeseq();
-		    compile_op(CvROOT(cv), CvCODESEQ(cv));
+		    compile_cv(cv);
 		}
 		PL_sortcop = codeseq_start_instruction(CvCODESEQ(cv));
 	    }

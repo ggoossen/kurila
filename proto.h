@@ -1436,11 +1436,6 @@ STATIC OP*	S_opt_scalarhv(pTHX_ OP* rep_op)
 #define PERL_ARGS_ASSERT_OPT_SCALARHV	\
 	assert(rep_op)
 
-STATIC OP*	S_is_inplace_av(pTHX_ OP* o, OP* oright)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_IS_INPLACE_AV	\
-	assert(o)
-
 #endif
 PERL_CALLCONV void	Perl_leave_scope(pTHX_ I32 base);
 PERL_CALLCONV void	Perl_lex_end(pTHX);
@@ -6775,6 +6770,13 @@ PERL_CALLCONV int	Perl_keyword_plugin_standard(pTHX_ char* keyword_ptr, STRLEN k
 	assert(keyword_ptr); assert(op_ptr)
 
 
+#if defined(PERL_IN_COMPILE_C) || defined(PERL_DECL_PROT)
+STATIC OP*	S_is_inplace_sort_av(pTHX_ OP* o)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_IS_INPLACE_SORT_AV	\
+	assert(o)
+
+#endif
 PERL_CALLCONV INSTRUCTION*	Perl_codeseq_start_instruction(pTHX_ const CODESEQ* codeseq)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_CODESEQ_START_INSTRUCTION	\
@@ -6785,6 +6787,11 @@ PERL_CALLCONV void	Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_COMPILE_OP	\
 	assert(startop); assert(codeseq)
+
+PERL_CALLCONV void	Perl_compile_cv(pTHX_ CV* cv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_COMPILE_CV	\
+	assert(cv)
 
 PERL_CALLCONV CODESEQ*	Perl_new_codeseq(pTHX)
 			__attribute__malloc__
