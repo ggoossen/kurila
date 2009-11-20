@@ -80,7 +80,6 @@ label1:
     pushmark
     aelemfast
     print
-    null
 label2:
     unstack
     instr_jump label5

@@ -62,12 +62,12 @@ PP(pp_gvsv)
 {
     dVAR;
     dSP;
-    PERL_UNUSED_VAR(pparg1);
+    GV* gv = (GV*)pparg1;
     EXTEND(SP,1);
     if (PL_op->op_private & OPpLVAL_INTRO)
-	PUSHs(save_scalar(cGVOP_gv));
+	PUSHs(save_scalar(gv));
     else
-	PUSHs(GvSVn(cGVOP_gv));
+	PUSHs(GvSVn(gv));
     RETURN;
 }
 

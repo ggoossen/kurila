@@ -749,6 +749,18 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	S_append_instruction(codeseq, bpp, o, o->op_type);
 	break;
     }
+    case OP_RV2SV:
+    {
+	if (cUNOPo->op_first->op_type == OP_GV &&
+	    !(cUNOPo->op_private & OPpDEREF)) {
+	    GV* gv = cGVOPx_gv(cUNOPo->op_first);
+	    S_append_instruction_x(codeseq, bpp, o, PL_ppaddr[OP_GVSV], (void*)gv);
+	    break;
+	}
+	S_add_kids(codeseq, bpp, o, &kid_may_constant_fold);
+	S_append_instruction(codeseq, bpp, o, o->op_type);
+	break;
+    }
     case OP_AELEM:
     {
 	/*
