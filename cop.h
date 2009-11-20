@@ -563,6 +563,7 @@ struct block {
 		    (long)cxstack_ix, PL_block_type[CxTYPE(cx)]); )
 
 /* Exit a block at the end of its normal lifetime */
+#ifdef DEBUGGING
 #define POPBLOCK_normal(cx,pm) cx = &cxstack[cxstack_ix--],			\
 	newsp		 = PL_stack_base + cx->blk_oldsp,		\
 	PL_curcop	 = cx->blk_oldcop,				\
@@ -573,6 +574,17 @@ struct block {
 	DEBUG_SCOPE("POPBLOCK");					\
 	DEBUG_l( PerlIO_printf(Perl_debug_log, "Leaving block %ld, type %s\n",		\
 		    (long)cxstack_ix+1,PL_block_type[CxTYPE(cx)]); )
+#else
+#define POPBLOCK_normal(cx,pm) cx = &cxstack[cxstack_ix--],			\
+	newsp		 = PL_stack_base + cx->blk_oldsp,		\
+	PL_curcop	 = cx->blk_oldcop,				\
+	PL_scopestack_ix = cx->blk_oldscopesp,				\
+	pm		 = cx->blk_oldpm,				\
+	gimme		 = cx->blk_gimme;				\
+	DEBUG_SCOPE("POPBLOCK");					\
+	DEBUG_l( PerlIO_printf(Perl_debug_log, "Leaving block %ld, type %s\n",		\
+		    (long)cxstack_ix+1,PL_block_type[CxTYPE(cx)]); )
+#endif
 
 /* Exit a block (RETURN and LAST). */
 #define POPBLOCK(cx,pm) cx = &cxstack[cxstack_ix--],			\
