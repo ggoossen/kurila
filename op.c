@@ -5007,11 +5007,13 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
 	expr = mod(force_list(scalar(ref(expr, OP_ITER))), OP_GREPSTART);
 	iterflags |= OPf_STACKED;
     }
-    if (expr->op_type == OP_REVERSE &&
-	(cLISTOPx(expr)->op_first->op_type == OP_RV2AV || cLISTOPx(expr)->op_type == OP_PADAV)) {
-	cLISTOPx(expr)->op_first = mod(force_list(scalar(ref(cLISTOPx(expr)->op_first, OP_ITER))), OP_GREPSTART);
-	iterflags |= OPf_STACKED;
-	iterflags |= OPpITER_REVERSED;
+    if (expr->op_type == OP_REVERSE) {
+	if ((! cLISTOPx(expr)->op_first->op_sibling) &&
+	    (cLISTOPx(expr)->op_first->op_type == OP_RV2AV || cLISTOPx(expr)->op_type == OP_PADAV)) {
+	    cLISTOPx(expr)->op_first = mod(force_list(scalar(ref(cLISTOPx(expr)->op_first, OP_ITER))), OP_GREPSTART);
+	    iterflags |= OPf_STACKED;
+	}
+	iterpflags |= OPpITER_REVERSED;
     }
     else if (expr->op_type == OP_REVERSE) {
     }

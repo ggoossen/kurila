@@ -413,7 +413,6 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 		S_add_op(codeseq, bpp, flip->op_first->op_sibling, &kid_may_constant_fold);
 	    }
 	    else if (op_expr->op_type == OP_REVERSE) {
-		o->op_private |= OPpITER_REVERSED;
 		S_add_kids(codeseq, bpp, op_expr, &kid_may_constant_fold);
 	    }
 	    else {
