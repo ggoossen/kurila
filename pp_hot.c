@@ -1657,7 +1657,8 @@ Perl_do_readline(pTHX)
 	    }
 	    PUSHTARG;
 	}
-	RETURN;
+	PUTBACK;
+	return;
     }
   have_fp:
     if (gimme == G_SCALAR) {
@@ -1733,7 +1734,8 @@ Perl_do_readline(pTHX)
 		PUSHTARG;
 	    }
 	    MAYBE_TAINT_LINE(io, sv);
-	    RETURN;
+	    PUTBACK;
+	    return;
 	}
 	MAYBE_TAINT_LINE(io, sv);
 	IoLINES(io)++;
@@ -1795,6 +1797,7 @@ PP(pp_enter)
     dVAR; dSP;
     register PERL_CONTEXT *cx;
     I32 gimme = OP_GIMME(PL_op, -1);
+    PERL_UNUSED_VAR(pparg1);
 
     if (gimme == -1) {
 	if (cxstack_ix >= 0) {
@@ -1828,6 +1831,7 @@ PP(pp_helem)
     const U32 hash = (SvIsCOW_shared_hash(keysv)) ? SvSHARED_HASH(keysv) : 0;
     const bool localizing = PL_op->op_private & OPpLVAL_INTRO;
     bool preeminent = TRUE;
+    PERL_UNUSED_VAR(pparg1);
 
     if (SvTYPE(hv) != SVt_PVHV)
 	RETPUSHUNDEF;
@@ -1895,6 +1899,7 @@ PP(pp_leave)
     SV **newsp;
     PMOP *newpm;
     I32 gimme;
+    PERL_UNUSED_VAR(pparg1);
 
     if (PL_op->op_flags & OPf_SPECIAL) {
 	cx = &cxstack[cxstack_ix];
@@ -1947,6 +1952,7 @@ PP(pp_iter)
     SV **itersvp;
     AV *av = NULL; /* used for LOOP_FOR on arrays and the stack */
     bool av_is_stack = FALSE;
+    PERL_UNUSED_VAR(pparg1);
 
     EXTEND(SP, 1);
     cx = &cxstack[cxstack_ix];
@@ -2109,6 +2115,7 @@ PP(pp_subst)
 
     /* known replacement string? */
     register SV *dstr = (pm->op_pmflags & PMf_CONST) ? POPs : NULL;
+    PERL_UNUSED_VAR(pparg1);
     if (PL_op->op_flags & OPf_STACKED)
 	TARG = POPs;
     else if (PL_op->op_private & OPpTARGET_MY)
@@ -2418,6 +2425,7 @@ ret_no:
 PP(pp_grepwhile)
 {
     dVAR; dSP;
+    PERL_UNUSED_VAR(pparg1);
 
     if (SvTRUEx(POPs))
 	PL_stack_base[PL_markstack_ptr[-1]++] = PL_stack_base[*PL_markstack_ptr];
@@ -2476,6 +2484,7 @@ PP(pp_leavesub)
     I32 gimme;
     register PERL_CONTEXT *cx;
     SV *sv;
+    PERL_UNUSED_VAR(pparg1);
 
     if (CxMULTICALL(&cxstack[cxstack_ix]))
 	return 0;
@@ -2540,6 +2549,7 @@ PP(pp_leavesublv)
     I32 gimme;
     register PERL_CONTEXT *cx;
     SV *sv;
+    PERL_UNUSED_VAR(pparg1);
 
     if (CxMULTICALL(&cxstack[cxstack_ix]))
 	return 0;
@@ -2702,6 +2712,7 @@ PP(pp_entersub)
     register PERL_CONTEXT *cx;
     I32 gimme;
     const bool hasargs = (PL_op->op_flags & OPf_STACKED) != 0;
+    PERL_UNUSED_VAR(pparg1);
 
     if (!sv)
 	DIE(aTHX_ "Not a CODE reference");
@@ -2970,6 +2981,7 @@ PP(pp_aelem)
     const bool localizing = PL_op->op_private & OPpLVAL_INTRO;
     bool preeminent = TRUE;
     SV *sv;
+    PERL_UNUSED_VAR(pparg1);
 
     if (SvROK(elemsv) && !SvGAMAGIC(elemsv) && ckWARN(WARN_MISC))
 	Perl_warner(aTHX_ packWARN(WARN_MISC),
@@ -3067,6 +3079,7 @@ PP(pp_method)
 {
     dVAR; dSP;
     SV* const sv = TOPs;
+    PERL_UNUSED_VAR(pparg1);
 
     if (SvROK(sv)) {
 	SV* const rsv = SvRV(sv);
@@ -3085,6 +3098,7 @@ PP(pp_method_named)
     dVAR; dSP;
     SV* const sv = cSVOP_sv;
     U32 hash = SvSHARED_HASH(sv);
+    PERL_UNUSED_VAR(pparg1);
 
     XPUSHs(method_common(sv, &hash));
     RETURN;
