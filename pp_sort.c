@@ -1490,6 +1490,7 @@ PP(pp_sort)
     void (*sortsvp)(pTHX_ SV **array, size_t nmemb, SVCOMPARE_t cmp, U32 flags)
       = Perl_sortsv_flags;
     I32 all_SIVs = 1;
+    PERL_UNUSED_ARG(pparg1);
 
     if ((priv & OPpSORT_DESCEND) != 0)
 	sort_flags |= SORTf_DESC;
