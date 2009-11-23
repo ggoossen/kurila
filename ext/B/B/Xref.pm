@@ -92,8 +92,8 @@ Malcolm Beattie, mbeattie@sable.ox.ac.uk.
 
 use strict;
 use Config;
-use B qw(peekop class comppadlist main_start svref_2object walksymtable
-         OPpLVAL_INTRO SVf_POK OPpOUR_INTRO cstring
+use B qw(peekop class comppadlist main_root svref_2object walksymtable
+         OPpLVAL_INTRO SVf_POK OPf_KIDS OPpOUR_INTRO cstring
         );
 
 sub UNKNOWN { ["?", "?", "?"] }
@@ -167,32 +167,24 @@ sub load_pad {
 
 sub xref {
     my $start = shift;
-    my $op;
-    for ($op = $start; $$op; $op = $op->next) {
-	last if $done{$$op}++;
-	warn sprintf("top = [%s, %s, %s]\n", @$top) if $debug_top;
-	warn peekop($op), "\n" if $debug_op;
-	my $opname = $op->name;
-	if ($opname =~ /^(or|and|mapwhile|grepwhile|range|cond_expr)$/) {
-	    xref($op->other);
-	} elsif ($opname eq "match" || $opname eq "subst") {
-	    xref($op->pmreplstart);
-	} elsif ($opname eq "substcont") {
-	    xref($op->other->pmreplstart);
-	    $op = $op->other;
-	    redo;
-	} elsif ($opname eq "enterloop") {
-	    xref($op->redoop);
-	    xref($op->nextop);
-	    xref($op->lastop);
-	} elsif ($opname eq "subst") {
-	    xref($op->pmreplstart);
-	} else {
-	    no strict 'refs';
-	    my $ppname = "pp_$opname";
-	    &$ppname($op) if defined(&$ppname);
-	}
+
+    return unless $$start;
+    return if $done{$$start}++;
+
+    if ($start->flags & OPf_KIDS) {
+        my $op;
+        for ($op = $start->first; $$op; $op = $op->sibling) {
+            xref($op);
+        }
     }
+
+    warn sprintf("top = [%s, %s, %s]\n", @$top) if $debug_top;
+    warn peekop($start), "\n" if $debug_op;
+
+    my $opname = $start->name;
+    no strict 'refs';
+    my $ppname = "pp_$opname";
+    &$ppname($start) if defined(&$ppname);
 }
 
 sub xref_cv {
@@ -200,7 +192,7 @@ sub xref_cv {
     my $pack = $cv->GV->STASH->NAME;
     $subname = ($pack eq "main" ? "" : "$pack\::") . $cv->GV->NAME;
     load_pad($cv->PADLIST);
-    xref($cv->START);
+    xref($cv->ROOT);
     $subname = "(main)";
 }
 
@@ -212,7 +204,7 @@ sub xref_object {
 sub xref_main {
     $subname = "(main)";
     load_pad(comppadlist);
-    xref(main_start);
+    xref(main_root);
     while (@todo) {
 	xref_cv(shift @todo);
     }
