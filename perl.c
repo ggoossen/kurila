@@ -2654,7 +2654,6 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
     VOL I32 oldmark = SP - PL_stack_base;
     VOL I32 retval = 0;
     int ret;
-    INSTRUCTION myinstr[2];
     const INSTRUCTION* oldinstr;
     dJMPENV;
 
@@ -2679,11 +2678,6 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
     if (flags & G_KEEPERR)
 	myop.op_flags |= OPf_SPECIAL;
 
-    myinstr[0].instr_ppaddr = PL_ppaddr[OP_ENTEREVAL];
-    myinstr[0].instr_op = (OP*)&myop;
-    myinstr[1].instr_ppaddr = PL_ppaddr[OP_INSTR_END];
-    myinstr[1].instr_op = NULL;
-
     /* fail now; otherwise we could fail after the JMPENV_PUSH but
      * before a PUSHEVAL, which corrupts the stack after a croak */
     TAINT_PROPER("eval_sv()");
@@ -2692,7 +2686,9 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
 
     switch (ret) {
     case 0:
-	RUN_SET_NEXT_INSTRUCTION(myinstr);
+	RUN_SET_NEXT_INSTRUCTION(NULL);
+	PL_op = (OP*)&myop;
+	PL_ppaddr[OP_ENTEREVAL](NULL);
 	CALLRUNOPS(aTHX);
 	break;
     default:
