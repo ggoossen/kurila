@@ -8486,39 +8486,6 @@ Perl_peep(pTHX_ register OP *o)
 
 	case OP_PADAV:
 	case OP_GV:
-	    /* if (o->op_type == OP_PADAV || (o->op_next && o->op_next->op_type == OP_RV2AV)) { */
-	    /* 	OP* const pop = (o->op_type == OP_PADAV) ? */
-	    /* 		    o->op_next : o->op_next->op_next; */
-	    /* 	IV i; */
-	    /* 	if (pop && pop->op_type == OP_CONST && */
-	    /* 	    ((PL_op = pop->op_next)) && */
-	    /* 	    pop->op_next->op_type == OP_AELEM && */
-	    /* 	    !(pop->op_next->op_private & */
-	    /* 	      (OPpLVAL_INTRO|OPpLVAL_DEFER|OPpDEREF|OPpMAYBE_LVSUB)) && */
-	    /* 	    (i = SvIV(((SVOP*)pop)->op_sv) - CopARYBASE_get(PL_curcop)) */
-	    /* 			<= 255 && */
-	    /* 	    i >= 0) */
-	    /* 	{ */
-	    /* 	    GV *gv; */
-	    /* 	    if (cSVOPx(pop)->op_private & OPpCONST_STRICT) */
-	    /* 		no_bareword_allowed(pop); */
-	    /* 	    if (o->op_type == OP_GV) */
-	    /* 		op_null(o->op_next); */
-	    /* 	    op_null(pop->op_next); */
-	    /* 	    op_null(pop); */
-	    /* 	    o->op_flags |= pop->op_next->op_flags & OPf_MOD; */
-	    /* 	    o->op_next = pop->op_next->op_next; */
-	    /* 	    o->op_private = (U8)i; */
-	    /* 	    if (o->op_type == OP_GV) { */
-	    /* 		gv = cGVOPo_gv; */
-	    /* 		GvAVn(gv); */
-	    /* 	    } */
-	    /* 	    else */
-	    /* 		o->op_flags |= OPf_SPECIAL; */
-	    /* 	    o->op_type = OP_AELEMFAST; */
-	    /* 	} */
-	    /* 	break; */
-	    /* } */
 
 	    /* if (o->op_next && o->op_next->op_type == OP_RV2SV) { */
 	    /* 	if (!(o->op_next->op_private & OPpDEREF)) { */
