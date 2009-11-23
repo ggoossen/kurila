@@ -2256,7 +2256,7 @@ xpo	|int	|keyword_plugin_standard|NN char* keyword_ptr|STRLEN keyword_len|NN OP*
 
 #if defined(PERL_IN_COMPILE_C) || defined(PERL_DECL_PROT)
 s	|OP*	|is_inplace_av	|NN OP* o
-s	|SV*	|sv_const_instruction	|NN CODESEQ* codeseq|NN BRANCH_POINT_PAD *bpp|int instr_index
+s	|SV**	|svp_const_instruction	|NN CODESEQ* codeseq|NN BRANCH_POINT_PAD *bpp|int instr_index
 #endif
 p	|INSTRUCTION*	|codeseq_start_instruction|NN const CODESEQ* codeseq
 Ep	|void	|compile_op|NN OP* startop|NN CODESEQ* codeseq

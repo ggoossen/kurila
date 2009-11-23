@@ -772,11 +772,6 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	OP* op_index = op_av->op_sibling;
 	bool index_is_constant = TRUE;
 	int start_idx;
-	/* if (op_index->op_type == OP_CONST */
-	/*     && ((op_av->op_type == OP_RV2AV  */
-	/* 	    && cUNOPx(op_av)->op_first->op_first == OP_GV) */
-	/* 	)) { */
-	/* } */
 	start_idx = bpp->idx;
 	S_add_op(codeseq, bpp, op_av, &kid_may_constant_fold);
 	S_add_op(codeseq, bpp, op_index, &index_is_constant);
@@ -787,7 +782,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 		!(o->op_private & (OPpLVAL_INTRO|OPpLVAL_DEFER|OPpDEREF|OPpMAYBE_LVSUB))
 		) {
 		/* Convert to AELEMFAST */
-		SV* const constsv = S_sv_const_instruction(codeseq, bpp, bpp->idx-1);
+		SV* const constsv = *(S_svp_const_instruction(codeseq, bpp, bpp->idx-1));
 		SvIV_please(constsv);
 		if (SvIOKp(constsv)) {
 		    IV i = SvIV(constsv) - CopARYBASE_get(PL_curcop);
@@ -800,6 +795,35 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	    }
 	}
 	S_append_instruction(codeseq, bpp, o, o->op_type);
+	break;
+    }
+    case OP_HELEM:
+    {
+	/*
+	  [op_hv]
+	  [op_index]
+	  o->op_type
+	*/
+	OP* op_hv = cUNOPo->op_first;
+	OP* op_key = op_hv->op_sibling;
+	bool key_is_constant = TRUE;
+	U32 hash = 0;
+	int start_idx;
+	start_idx = bpp->idx;
+	S_add_op(codeseq, bpp, op_hv, &kid_may_constant_fold);
+	S_add_op(codeseq, bpp, op_key, &key_is_constant);
+	kid_may_constant_fold = kid_may_constant_fold && key_is_constant;
+	if (key_is_constant) {
+	    SV ** const keysvp = S_svp_const_instruction(codeseq, bpp, bpp->idx-1);
+	    STRLEN keylen;
+	    const char* key = SvPV_const(*keysvp, keylen);
+	    SV* shared_keysv = newSVpvn_share(key,
+		                              SvUTF8(*keysvp) ? -(I32)keylen : (I32)keylen,
+		                              0);
+	    SvREFCNT_dec(*keysvp);
+	    *keysvp = shared_keysv;
+	}
+	S_append_instruction_x(codeseq, bpp, o, PL_ppaddr[o->op_type], (void*)hash);
 	break;
     }
     case OP_DELETE:
@@ -1126,17 +1150,17 @@ S_is_inplace_av(pTHX_ OP *o) {
     return sortop;
 }
 
-SV*
-S_sv_const_instruction(pTHX_ CODESEQ *codeseq, BRANCH_POINT_PAD *bpp, int instr_index)
+SV**
+S_svp_const_instruction(pTHX_ CODESEQ *codeseq, BRANCH_POINT_PAD *bpp, int instr_index)
 {
     INSTRUCTION* instr = &codeseq->xcodeseq_instructions[instr_index];
     PERL_UNUSED_VAR(bpp);
     if (instr->instr_op) {
 	assert(instr->instr_op->op_type == OP_CONST);
-	return cSVOPx_sv(instr->instr_op);
+	return &cSVOPx_sv(instr->instr_op);
     }
     else {
-	return (SV*)instr->instr_arg1;
+	return (SV**)& instr->instr_arg1;
     }
 }
 

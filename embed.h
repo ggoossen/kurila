@@ -2029,7 +2029,7 @@
 #if defined(PERL_IN_COMPILE_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define is_inplace_av		S_is_inplace_av
-#define sv_const_instruction	S_sv_const_instruction
+#define svp_const_instruction	S_svp_const_instruction
 #endif
 #endif
 #ifdef PERL_CORE
@@ -2268,6 +2268,7 @@
 #define pp_index		Perl_pp_index
 #define pp_instr_cond_jump	Perl_pp_instr_cond_jump
 #define pp_instr_const		Perl_pp_instr_const
+#define pp_instr_end		Perl_pp_instr_end
 #define pp_instr_jump		Perl_pp_instr_jump
 #define pp_int			Perl_pp_int
 #define pp_ioctl		Perl_pp_ioctl
@@ -4481,7 +4482,7 @@
 #if defined(PERL_IN_COMPILE_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define is_inplace_av(a)	S_is_inplace_av(aTHX_ a)
-#define sv_const_instruction(a,b,c)	S_sv_const_instruction(aTHX_ a,b,c)
+#define svp_const_instruction(a,b,c)	S_svp_const_instruction(aTHX_ a,b,c)
 #endif
 #endif
 #ifdef PERL_CORE
@@ -4720,6 +4721,7 @@
 #define pp_index()		Perl_pp_index(aTHX)
 #define pp_instr_cond_jump()	Perl_pp_instr_cond_jump(aTHX)
 #define pp_instr_const()	Perl_pp_instr_const(aTHX)
+#define pp_instr_end()		Perl_pp_instr_end(aTHX)
 #define pp_instr_jump()		Perl_pp_instr_jump(aTHX)
 #define pp_int()		Perl_pp_int(aTHX)
 #define pp_ioctl()		Perl_pp_ioctl(aTHX)
