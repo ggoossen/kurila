@@ -1482,6 +1482,61 @@ S_finished_op_check(pTHX_ OP* o)
 	break;
     }
 
+    case OP_HSLICE: {
+	UNOP *rop;
+	SV *lexname;
+	GV **fields;
+	SV **svp;
+	const char *key;
+	STRLEN keylen;
+	SVOP *first_key_op, *key_op;
+
+	if ((o->op_private & (OPpLVAL_INTRO))
+	    || ((LISTOP*)o)->op_first->op_type != OP_LIST)
+	    /* hmmm, no optimization if list contains only one key. */
+	    break;
+	rop = (UNOP*)((LISTOP*)o)->op_last;
+	if (rop->op_type != OP_RV2HV)
+	    break;
+	if (rop->op_first->op_type == OP_PADSV)
+	    /* @$hash{qw(keys here)} */
+	    rop = (UNOP*)rop->op_first;
+	else {
+	    /* @{$hash}{qw(keys here)} */
+	    if (rop->op_first->op_type == OP_SCOPE 
+		&& cLISTOPx(rop->op_first)->op_last->op_type == OP_PADSV)
+		{
+		    rop = (UNOP*)cLISTOPx(rop->op_first)->op_last;
+		}
+	    else
+		break;
+	}
+		    
+	lexname = *av_fetch(PL_comppad_name, rop->op_targ, TRUE);
+	if (!SvPAD_TYPED(lexname))
+	    break;
+	fields = (GV**)hv_fetchs(SvSTASH(lexname), "FIELDS", FALSE);
+	if (!fields || !GvHV(*fields))
+	    break;
+	first_key_op = (SVOP*)((LISTOP*)((LISTOP*)o)->op_first)
+	    ->op_first;
+	for (key_op = first_key_op; key_op;
+	     key_op = (SVOP*)key_op->op_sibling) {
+	    if (key_op->op_type != OP_CONST)
+		continue;
+	    svp = cSVOPx_svp(key_op);
+	    key = SvPV_const(*svp, keylen);
+	    if (!hv_fetch(GvHV(*fields), key, 
+		    SvUTF8(*svp) ? -(I32)keylen : (I32)keylen, FALSE))
+		{
+		    Perl_croak(aTHX_ "No such class field \"%s\" "
+			"in variable %s of type %s",
+			key, SvPV_nolen(lexname), HvNAME_get(SvSTASH(lexname)));
+		}
+	}
+	break;
+    }
+
     default:
 	break;
     }
@@ -8580,61 +8635,6 @@ Perl_peep(pTHX_ register OP *o)
 	case OP_SUBST:
 	    assert(!(cPMOP->op_pmflags & PMf_ONCE));
 	    break;
-
-	case OP_HSLICE: {
-	    UNOP *rop;
-	    SV *lexname;
-	    GV **fields;
-	    SV **svp;
-	    const char *key;
-	    STRLEN keylen;
-	    SVOP *first_key_op, *key_op;
-
-	    if ((o->op_private & (OPpLVAL_INTRO))
-		|| ((LISTOP*)o)->op_first->op_type != OP_LIST)
-		/* hmmm, no optimization if list contains only one key. */
-		break;
-	    rop = (UNOP*)((LISTOP*)o)->op_last;
-	    if (rop->op_type != OP_RV2HV)
-		break;
-	    if (rop->op_first->op_type == OP_PADSV)
-		/* @$hash{qw(keys here)} */
-		rop = (UNOP*)rop->op_first;
-	    else {
-		/* @{$hash}{qw(keys here)} */
-		if (rop->op_first->op_type == OP_SCOPE 
-		    && cLISTOPx(rop->op_first)->op_last->op_type == OP_PADSV)
-		{
-		    rop = (UNOP*)cLISTOPx(rop->op_first)->op_last;
-		}
-		else
-		    break;
-	    }
-		    
-	    lexname = *av_fetch(PL_comppad_name, rop->op_targ, TRUE);
-	    if (!SvPAD_TYPED(lexname))
-		break;
-	    fields = (GV**)hv_fetchs(SvSTASH(lexname), "FIELDS", FALSE);
-	    if (!fields || !GvHV(*fields))
-		break;
-	    first_key_op = (SVOP*)((LISTOP*)((LISTOP*)o)->op_first)
-		->op_first;
-	    for (key_op = first_key_op; key_op;
-		 key_op = (SVOP*)key_op->op_sibling) {
-		if (key_op->op_type != OP_CONST)
-		    continue;
-		svp = cSVOPx_svp(key_op);
-		key = SvPV_const(*svp, keylen);
-		if (!hv_fetch(GvHV(*fields), key, 
-			    SvUTF8(*svp) ? -(I32)keylen : (I32)keylen, FALSE))
-		{
-		    Perl_croak(aTHX_ "No such class field \"%s\" "
-			       "in variable %s of type %s",
-			  key, SvPV_nolen(lexname), HvNAME_get(SvSTASH(lexname)));
-		}
-	    }
-	    break;
-	}
 
 	case OP_QR:
 	case OP_MATCH:
