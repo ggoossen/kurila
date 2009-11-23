@@ -66,6 +66,7 @@ print $ARGV[0]
     aelemfast
     print
     leave
+    instr_end
 ####
 while ($ARGV[0]) {
    print $ARGV[0];
@@ -89,6 +90,7 @@ label4:
     leaveloop
 label3:
     leave
+    instr_end
 ####
 for (@ARGV) {
     print $_;
@@ -116,6 +118,7 @@ label4:
     leaveloop
 label3:
     leave
+    instr_end
 ####
 {
     print $ARGV[0];
@@ -133,6 +136,7 @@ label2:
    leaveloop
 label3:
    leave
+   instr_end
 ####
 for (1..4) {
     print $ARGV[$_];
@@ -163,6 +167,7 @@ label4:
     leaveloop
 label3:
     leave
+    instr_end
 ####
 $ARGV[0] ? $ARGV[1] : $ARGV[2]
 ----
@@ -176,6 +181,7 @@ label1:
     aelemfast
 label2:
     leave
+    instr_end
 ####
 $ARGV[0] or $ARGV[1]
 ----
@@ -186,6 +192,7 @@ $ARGV[0] or $ARGV[1]
     aelemfast
 label1:
     leave
+    instr_end
 ####
 eval { $ARGV[0] }
 ----
@@ -197,6 +204,7 @@ eval { $ARGV[0] }
     leavetry
 label1:
     leave
+    instr_end
 ####
 { last }
 ----
@@ -210,6 +218,7 @@ label2:
     leaveloop
 label3:
     leave
+    instr_end
 ####
 shift @ARGV while @ARGV
 ----
@@ -227,6 +236,7 @@ label1:
     or label2
     leave
     leave
+    instr_end
 ####
 do { shift @ARGV } while @ARGV
 ----
@@ -242,6 +252,7 @@ label1:
     or label1
     leave
     leave
+    instr_end
 ####
 $a..$b
 ----
@@ -254,6 +265,7 @@ label1:
     gvsv
     flop
     leave
+    instr_end
 ####
 for (@ARGV) { } continue { $ARGV[0] }
 ----
@@ -277,3 +289,4 @@ label4:
     leaveloop
 label3:
     leave
+    instr_end
