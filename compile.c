@@ -727,7 +727,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	    if (has_block) {
 		S_save_branch_point(bpp, &(o->op_unstack_instr));
 		S_add_op(codeseq, bpp, cUNOPo->op_first, &kid_may_constant_fold);
-		S_append_instruction_x(codeseq, bpp, NULL, NULL, NULL);
+		S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_INSTR_END], NULL);
 	    }
 	    codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
 	}
