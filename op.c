@@ -5439,7 +5439,6 @@ Perl_cv_undef(pTHX_ CV *cv)
 	    free_codeseq(CvCODESEQ(cv));
 	op_free(CvROOT(cv));
 	CvROOT(cv) = NULL;
-	CvSTART(cv) = NULL;
 	LEAVE;
     }
     SvPOK_off(MUTABLE_SV(cv));		/* forget prototype */
@@ -6267,7 +6266,6 @@ Perl_newFORM(pTHX_ I32 floor, OP *o, OP *block)
     CvROOT(cv) = newUNOP(OP_LEAVEWRITE, 0, scalarseq(block));
     CvROOT(cv)->op_private |= OPpREFCOUNTED;
     OpREFCNT_set(CvROOT(cv), 1);
-    CALL_PEEP(CvSTART(cv));
 #ifdef PERL_MAD
     op_getmad(o,pegop,'n');
     op_getmad_weak(block, pegop, 'b');

@@ -2849,7 +2849,7 @@ try_autoload:
              cv = GvCV(PL_DBsub);
          }
 
-	if (!cv || (!CvXSUB(cv) && !CvSTART(cv)))
+	if (!cv || (!CvXSUB(cv) && !CvROOT(cv)))
 	    DIE(aTHX_ "No DB::sub routine defined");
     }
 

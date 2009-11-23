@@ -1854,14 +1854,6 @@ CvSTASH(cv)
 	B::CV	cv
 
 B::OP
-CvSTART(cv)
-	B::CV	cv
-    CODE:
-	RETVAL = CvISXSUB(cv) ? NULL : CvSTART(cv);
-    OUTPUT:
-	RETVAL
-
-B::OP
 CvROOT(cv)
 	B::CV	cv
     CODE:
