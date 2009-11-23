@@ -1553,6 +1553,8 @@ Perl_finish_optree(pTHX_ OP* o)
 {
     COP* oldcop = PL_curcop;
 
+    PERL_ARGS_ASSERT_FINISH_OPTREE;
+
     S_finished_op_check(o);
     
     PL_curcop = oldcop;
@@ -6437,7 +6439,7 @@ Perl_ck_anoncode(pTHX_ OP *o)
 OP *
 Perl_ck_negate(pTHX_ OP *o)
 {
-    PERL_ARGS_ASSERT_CK_ANONCODE;
+    PERL_ARGS_ASSERT_CK_NEGATE;
 
     if (cUNOPo->op_first->op_type == OP_CONST)
 	cUNOPo->op_first->op_private = ~OPpCONST_STRICT;

@@ -1171,6 +1171,7 @@ SV**
 S_svp_const_instruction(pTHX_ CODESEQ *codeseq, BRANCH_POINT_PAD *bpp, int instr_index)
 {
     INSTRUCTION* instr = &codeseq->xcodeseq_instructions[instr_index];
+    PERL_ARGS_ASSERT_SVP_CONST_INSTRUCTION;
     PERL_UNUSED_VAR(bpp);
     if (instr->instr_op) {
 	assert(instr->instr_op->op_type == OP_CONST);
@@ -1186,6 +1187,8 @@ Perl_compile_cv(pTHX_ CV* cv)
 {
     PAD* oldpad;
     AV * const cvpad = (AV *)*av_fetch(CvPADLIST(cv), 1, FALSE);
+
+    PERL_ARGS_ASSERT_COMPILE_CV;
 
     if (CvCODESEQ(cv))
 	return;
