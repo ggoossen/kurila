@@ -917,6 +917,20 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	S_append_instruction(codeseq, bpp, o, OP_AASSIGN);
 	break;
     }
+    case OP_CONCAT:
+    {
+	if ((o->op_flags & OPf_STACKED) && cBINOPo->op_last->op_type == OP_READLINE) {
+	    /* 	/\* Turn "$a .= <FH>" into an OP_RCATLINE. AMS 20010917 *\/ */
+	    S_add_op(codeseq, bpp, cBINOPo->op_first, &kid_may_constant_fold);
+	    S_add_kids(codeseq, bpp, cBINOPo->op_last, &kid_may_constant_fold);
+	    cBINOPo->op_last->op_type = OP_RCATLINE;
+	    cBINOPo->op_last->op_flags |= OPf_STACKED;
+	    S_append_instruction(codeseq, bpp, cBINOPo->op_last, OP_RCATLINE);
+	    kid_may_constant_fold = FALSE;
+	    break;
+	}
+	goto compile_default;
+    }
     case OP_LIST:
     {
 	if ((o->op_flags & OPf_WANT) == OPf_WANT_LIST) {
@@ -932,6 +946,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     }
     default:
     {
+      compile_default:
 	if (PL_opargs[o->op_type] & OA_MARK)
 	    S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
 	S_add_kids(codeseq, bpp, o, &kid_may_constant_fold);

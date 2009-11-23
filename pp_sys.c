@@ -396,9 +396,11 @@ PP(pp_glob)
 
 PP(pp_rcatline)
 {
+    dSP;
     dVAR;
     PERL_UNUSED_VAR(pparg1);
-    PL_last_in_gv = cGVOP_gv;
+    PL_last_in_gv = (GV*)POPs;
+    PUTBACK;
     do_readline();
     return NORMAL;
 }
