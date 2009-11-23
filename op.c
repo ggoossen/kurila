@@ -1445,6 +1445,45 @@ S_finished_op_check(pTHX_ OP* o)
 	if (o->op_private & OPpCONST_STRICT)
 	    no_bareword_allowed(o);
 	break;
+
+    case OP_HELEM:
+    {
+	SV* keysv;
+	SV* lexname;
+	UNOP* rop;
+	GV** fields;
+	const char* key;
+	STRLEN keylen;
+
+	if (((BINOP*)o)->op_last->op_type != OP_CONST)
+	    break;
+	keysv = cSVOPx_sv(cBINOPx(o)->op_last);
+
+	if ((o->op_private & (OPpLVAL_INTRO)))
+	    break;
+
+	rop = (UNOP*)((BINOP*)o)->op_first;
+	if (rop->op_type != OP_RV2HV || rop->op_first->op_type != OP_PADSV)
+	    break;
+	lexname = *av_fetch(PL_comppad_name, rop->op_first->op_targ, TRUE);
+	if (!SvPAD_TYPED(lexname))
+	    break;
+	fields = (GV**)hv_fetchs(SvSTASH(lexname), "FIELDS", FALSE);
+	if (!fields || !GvHV(*fields))
+	    break;
+	key = SvPV_const(keysv, keylen);
+	if (!hv_fetch(GvHV(*fields), key,
+		SvUTF8(keysv) ? -(I32)keylen : (I32)keylen, FALSE))
+	    {
+		Perl_croak(aTHX_ "No such class field \"%s\" " 
+			   "in variable %s of type %s", 
+		      key, SvPV_nolen_const(lexname), HvNAME_get(SvSTASH(lexname)));
+	    }
+	break;
+    }
+
+    default:
+	break;
     }
 
     if (o->op_flags & OPf_KIDS) {
@@ -8541,52 +8580,6 @@ Perl_peep(pTHX_ register OP *o)
 	case OP_SUBST:
 	    assert(!(cPMOP->op_pmflags & PMf_ONCE));
 	    break;
-
-	case OP_HELEM: {
-	    UNOP *rop;
-            SV *lexname;
-	    GV **fields;
-	    SV **svp, *sv;
-	    const char *key = NULL;
-	    STRLEN keylen;
-
-	    if (((BINOP*)o)->op_last->op_type != OP_CONST)
-		break;
-
-	    /* Make the CONST have a shared SV */
-	    svp = cSVOPx_svp(((BINOP*)o)->op_last);
-	    if (!SvFAKE(sv = *svp) || !SvREADONLY(sv)) {
-		key = SvPV_const(sv, keylen);
-		lexname = newSVpvn_share(key,
-					 SvUTF8(sv) ? -(I32)keylen : (I32)keylen,
-					 0);
-		SvREFCNT_dec(sv);
-		*svp = lexname;
-	    }
-
-	    if ((o->op_private & (OPpLVAL_INTRO)))
-		break;
-
-	    rop = (UNOP*)((BINOP*)o)->op_first;
-	    if (rop->op_type != OP_RV2HV || rop->op_first->op_type != OP_PADSV)
-		break;
-	    lexname = *av_fetch(PL_comppad_name, rop->op_first->op_targ, TRUE);
-	    if (!SvPAD_TYPED(lexname))
-		break;
-	    fields = (GV**)hv_fetchs(SvSTASH(lexname), "FIELDS", FALSE);
-	    if (!fields || !GvHV(*fields))
-		break;
-	    key = SvPV_const(*svp, keylen);
-	    if (!hv_fetch(GvHV(*fields), key,
-			SvUTF8(*svp) ? -(I32)keylen : (I32)keylen, FALSE))
-	    {
-		Perl_croak(aTHX_ "No such class field \"%s\" " 
-			   "in variable %s of type %s", 
-		      key, SvPV_nolen_const(lexname), HvNAME_get(SvSTASH(lexname)));
-	    }
-
-            break;
-        }
 
 	case OP_HSLICE: {
 	    UNOP *rop;
