@@ -1122,6 +1122,7 @@ once		once			ck_null		|
 instr_jump		instruction jump		ck_null		0
 instr_cond_jump		instruction conditional jump		ck_null		0
 instr_const		instruction constant		ck_null		0
+instr_end		instruction end		ck_null		0
 
 custom		unknown custom operator		ck_null		0
 

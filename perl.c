@@ -2569,7 +2569,9 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     myinstr[instr_idx].instr_op = (OP*)&myop;
     myinstr[instr_idx].instr_ppaddr = PL_ppaddr[myop.op_type];
     myinstr[instr_idx].instr_arg1 = NULL;
-    myinstr[instr_idx+1].instr_ppaddr = NULL;
+    myinstr[instr_idx+1].instr_ppaddr = PL_ppaddr[OP_INSTR_END];
+    myinstr[instr_idx+1].instr_op = NULL;
+    myinstr[instr_idx+1].instr_arg1 = NULL;
     oldinstr = run_get_next_instruction();
     RUN_SET_NEXT_INSTRUCTION( &myinstr[0] );
 
@@ -2679,7 +2681,8 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
 
     myinstr[0].instr_ppaddr = PL_ppaddr[OP_ENTEREVAL];
     myinstr[0].instr_op = (OP*)&myop;
-    myinstr[1].instr_ppaddr = NULL;
+    myinstr[1].instr_ppaddr = PL_ppaddr[OP_INSTR_END];
+    myinstr[1].instr_op = NULL;
 
     /* fail now; otherwise we could fail after the JMPENV_PUSH but
      * before a PUSHEVAL, which corrupts the stack after a croak */

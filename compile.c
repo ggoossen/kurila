@@ -916,7 +916,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 
     if (kid_may_constant_fold && bpp->idx > start_idx + 1) {
     	SV* constsv;
-    	codeseq->xcodeseq_instructions[bpp->idx].instr_ppaddr = NULL;
+	S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_INSTR_END], NULL);
     	constsv = S_instr_fold_constants(&(codeseq->xcodeseq_instructions[start_idx]), o);
     	if (constsv) {
     	    bpp->idx = start_idx; /* FIXME remove pointer sets from bpp */
@@ -924,6 +924,9 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_const, (void*)constsv);
     	    Perl_av_create_and_push(aTHX_ &codeseq->xcodeseq_svs, constsv);
     	}
+	else {
+	    bpp->idx--; /* remove OP_INSTR_END */
+	}
     }
 
     *may_constant_fold = *may_constant_fold && kid_may_constant_fold;
@@ -965,12 +968,7 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 	bool may_constant_fold = TRUE;
 	S_add_op(codeseq, &bpp, o, &may_constant_fold);
 
-	codeseq->xcodeseq_instructions[bpp.idx].instr_ppaddr = NULL;
-	bpp.idx++;
-	if (bpp.idx >= codeseq->xcodeseq_size) {
-	    codeseq->xcodeseq_size += 128;
-	    Renew(codeseq->xcodeseq_instructions, codeseq->xcodeseq_size, INSTRUCTION);
-	}
+	S_append_instruction_x(codeseq, &bpp, NULL, PL_ppaddr[OP_INSTR_END], NULL);
 
 	/* continue compiling remaining branch. */
 	{

@@ -416,6 +416,7 @@ Perl_pp_once
 Perl_pp_instr_jump
 Perl_pp_instr_cond_jump
 Perl_pp_instr_const
+Perl_pp_instr_end
 Perl_pp_foreach
 
 # ex: set ro:
