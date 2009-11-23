@@ -8487,26 +8487,6 @@ Perl_peep(pTHX_ register OP *o)
 	case OP_PADAV:
 	case OP_GV:
 
-	    /* if (o->op_next && o->op_next->op_type == OP_RV2SV) { */
-	    /* 	if (!(o->op_next->op_private & OPpDEREF)) { */
-	    /* 	    op_null(o->op_next); */
-	    /* 	    o->op_private |= o->op_next->op_private & (OPpLVAL_INTRO */
-	    /* 						       | OPpOUR_INTRO); */
-	    /* 	    o->op_next = o->op_next->op_next; */
-	    /* 	    o->op_type = OP_GVSV; */
-	    /* 	} */
-	    /* } */
-	    /* else if ((o->op_private & OPpEARLY_CV) && ckWARN(WARN_PROTOTYPE)) { */
-	    /* 	GV * const gv = cGVOPo_gv; */
-	    /* 	if (SvTYPE(gv) == SVt_PVGV && GvCV(gv) && SvPVX_const(GvCV(gv))) { */
-	    /* 	    /\* XXX could check prototype here instead of just carping *\/ */
-	    /* 	    SV * const sv = sv_newmortal(); */
-	    /* 	    gv_efullname3(sv, gv, NULL); */
-	    /* 	    Perl_warner(aTHX_ packWARN(WARN_PROTOTYPE), */
-	    /* 			"%"SVf"() called too early to check prototype", */
-	    /* 			SVfARG(sv)); */
-	    /* 	} */
-	    /* } */
 	    /* else if (o->op_next && o->op_next->op_type == OP_READLINE */
 	    /* 	    && o->op_next->op_next */
 	    /* 	    && o->op_next->op_next->op_type == OP_CONCAT */
