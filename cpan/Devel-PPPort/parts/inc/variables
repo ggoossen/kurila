@@ -359,7 +359,6 @@ void
 PL_ppaddr(string)
 	char *string
 	PPCODE:
-		PUSHMARK(SP);
 		mXPUSHs(newSVpv(string, 0));
 		PUTBACK;
 		ENTER;
