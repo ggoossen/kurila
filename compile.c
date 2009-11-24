@@ -92,17 +92,6 @@ S_save_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, INSTRUCTION** instrp)
     bpp->op_instrpp_compile++;
 }
 
-int
-S_find_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o)
-{
-    OP_INSTRPP* i;
-    for (i=bpp->op_instrpp_list; i<bpp->op_instrpp_compile; i++) {
-	if (o == i->op)
-	    return i->instr_idx;
-    }
-    return -1;
-}
-
 SV*
 S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP *o)
 {
@@ -228,15 +217,15 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     case OP_GREPSTART:
     case OP_MAPSTART: {
 	/*
-	  ...
-	  pushmark
-	  <o->op_start>
-	  grepstart         label2
+	      ...
+	      pushmark
+	      <o->op_start>
+	      grepstart         label2
 	  label1:
-	  <o->op_more_op>
-	  grepwhile         label1
+	      <o->op_more_op>
+	      grepwhile         label1
 	  label2:
-	  ...
+	      ...
 	*/
 	bool is_grep = o->op_type == OP_GREPSTART;
 	int grepstart_idx;
@@ -297,20 +286,20 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     }
     case OP_ENTERLOOP: {
 	/*
-	  ...
-	  enterloop         last=label3 redo=label4 next=label5
+	      ...
+	      enterloop         last=label3 redo=label4 next=label5
 	  label1:
-	  <op_start>
-	  instr_cond_jump   label2
+	      <op_start>
+	      instr_cond_jump   label2
 	  label4:
-	  <op_block>
+	      <op_block>
 	  label5:
-	  <op_cont>
-	  instr_jump        label1
+	      <op_cont>
+	      instr_jump        label1
 	  label2:
-	  leaveloop
+	      leaveloop
 	  label3:
-	  ...
+	      ...
 	*/
 	int start_idx;
 	int cond_jump_idx;
@@ -427,12 +416,12 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	OP* op_other = op_first->op_sibling;
 	if (o->op_private & OPpWHILE_AND_ONCE) {
 	    /*
-	      ...
+	          ...
 	      label1:
-	      <op_other>
-	      <op_first>
-	      or                   label1
-	      ...
+	          <op_other>
+	          <op_first>
+	          or                   label1
+	          ...
 	    */
 	    S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 	    S_add_op(codeseq, bpp, op_other, &kid_may_constant_fold);
@@ -441,14 +430,14 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	}
 	else {
 	    /*
-	      ...
-	      instr_jump           label2
+	          ...
+	          instr_jump           label2
 	      label1:
-	      <op_other>
+	          <op_other>
 	      label2:
-	      <op_first>
-	      or                   label1
-	      ...
+	          <op_first>
+	          or                   label1
+	          ...
 	    */
 	    int start_idx;
 	    start_idx = bpp->idx;
@@ -470,12 +459,12 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     case OP_DORASSIGN:
     {
 	/*
-	  ...
-	  <op_first>
-	  o->op_type            label1
-	  <op_other>
+	      ...
+	      <op_first>
+	      o->op_type            label1
+	      <op_other>
 	  label1:
-	  ...
+	      ...
 	*/
 	OP* op_first = cLOGOPo->op_first;
 	OP* op_other = op_first->op_sibling;
@@ -491,14 +480,14 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     case OP_ONCE:
     {
 	/*
-	  ...
-	  o->op_type            label1
-	  <op_first>
-	  instr_jump            label2
+	      ...
+	      o->op_type            label1
+	      <op_first>
+	      instr_jump            label2
 	  label1:
-	  <op_other>
+	      <op_other>
 	  label2:
-	  ...
+	      ...
 	*/
 	int start_idx;
 	OP* op_first = cLOGOPo->op_first;
@@ -520,12 +509,12 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     }
     case OP_ENTERTRY: {
 	/*
-	  ...
-	  pp_entertry     label1
-	  <o->op_first>
-	  pp_leavetry
+	      ...
+	      pp_entertry     label1
+	      <o->op_first>
+	      pp_leavetry
 	  label1:
-	  ...
+	      ...
 	*/
 	S_append_instruction(codeseq, bpp, o, OP_ENTERTRY);
 	S_add_op(codeseq, bpp, cLOGOPo->op_first, &kid_may_constant_fold);
@@ -535,16 +524,16 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     }
     case OP_RANGE: {
 	/*
-	  ...
-	  pp_range       label2
+	      ...
+	      pp_range       label2
 	  label1:
-	  <o->op_first->op_first>
-	  flip           label3
+	      <o->op_first->op_first>
+	      flip           label3
 	  label2:
-	  <o->op_first->op_first->op_sibling>
-	  flop           label1
+	      <o->op_first->op_first->op_sibling>
+	      flop           label1
 	  label3:
-	  ...
+	      ...
 	*/
 		  
 	UNOP* flip = cUNOPx(cLOGOPo->op_first);
@@ -578,13 +567,13 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     case OP_ENTERGIVEN:
     {
 	/*
-	  ...
-	  <op_cond>
-	  entergiven          label1
-	  <op_block>
+	      ...
+	      <op_cond>
+	      entergiven          label1
+	      <op_block>
 	  label1:
-	  leavegiven
-	  ...
+	      leavegiven
+	      ...
 	*/
 	OP* op_cond = cLOGOPo->op_first;
 	OP* op_block = op_cond->op_sibling;
@@ -600,12 +589,12 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     {
 	if (o->op_flags & OPf_SPECIAL) {
 	    /*
-	      ...
-	      enterwhen          label1
-	      <op_block>
+	          ...
+	          enterwhen          label1
+	          <op_block>
 	      label1:
-	      leavewhen
-	      ...
+	          leavewhen
+	          ...
 	    */
 	    OP* op_block = cLOGOPo->op_first;
 	    S_append_instruction(codeseq, bpp, o, o->op_type);
@@ -615,13 +604,13 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	}
 	else {
 	    /*
-	      ...
-	      <op_cond>
+	          ...
+	          <op_cond>
 	      enterwhen          label1
-	      <op_block>
+	          <op_block>
 	      label1:
-	      leavewhen
-	      ...
+	          leavewhen
+	          ...
 	    */
 	    OP* op_cond = cLOGOPo->op_first;
 	    OP* op_block = op_cond->op_sibling;
@@ -637,16 +626,16 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     case OP_SUBST:
     {
 	/*
-	  ...
-	  <kids>
-	  pp_subst       label1 label2
-	  instr_jump     label3
+	      ...
+	      <kids>
+	      pp_subst       label1 label2
+	      instr_jump     label3
 	  label1:
-	  substcont
+	      substcont
 	  label2:
-	  <o->op_pmreplroot>
+	      <o->op_pmreplroot>
 	  label3:
-	  ...
+	      ...
 	*/
 		  
 	int start_idx;
@@ -713,12 +702,12 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     case OP_FORMLINE:
     {
 	/*
-	  ...
+	      ...
 	  label1:
-	  pp_pushmark
-	  <o->children>
-	  o->op_type          label1
-	  ...
+	      pp_pushmark
+	      <o->children>
+	      o->op_type          label1
+	      ...
 	*/
 	S_save_branch_point(bpp, &(o->op_unstack_instr));
 	S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
