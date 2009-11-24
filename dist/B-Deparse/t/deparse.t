@@ -17,7 +17,7 @@ BEGIN {
     require feature;
     feature->import(':5.10');
 }
-use Test::More tests => 83;
+use Test::More tests => 84;
 use Config ();
 
 use B::Deparse;
@@ -116,7 +116,7 @@ BEGIN { $/ = "\n"; $\ = "\n"; }
 LINE: while (defined($_ = <ARGV>)) {
     chomp $_;
     our(@F) = split(' ', $_, 0);
-    '???';
+    1;
 }
 EOF
 is($a, $b);
@@ -513,33 +513,70 @@ x();
 x();
 x() unless GLIPP;
 x();
+x() if not GLIPP or GLIPP;
 x();
-x();
-x();
-do {
-    '???'
+x() if do {
+    BEGIN {${^WARNING_BITS} = "TUUUUUUUUUUQ"}
+    5;
+    GLIPP
+};
+x() if do {
+    not GLIPP
 };
 do {
     x()
 };
-do {
-    z()
-};
-do {
-    x()
-};
-do {
-    z()
-};
+if (not GLIPP) {
+    x();
+}
+else {
+    z();
+}
 do {
     x()
 };
-'???';
+if (not GLIPP) {
+    x();
+}
+else {
+    z();
+}
 do {
-    t()
+    x()
 };
-'???';
-!1;
+if (not GLIPP) {
+    x();
+}
+elsif (not GLIPP) {
+    z();
+}
+if (not GLIPP) {
+    x();
+}
+elsif (not GLIPP) {
+    z();
+}
+else {
+    t();
+}
+if (not GLIPP) {
+    x();
+}
+elsif (not GLIPP) {
+    z();
+}
+elsif (not GLIPP) {
+    t();
+}
+if (not GLIPP) {
+    x();
+}
+elsif (not GLIPP) {
+    z();
+}
+elsif (not GLIPP) {
+    t();
+}
 ####
 # TODO ? $Config::Config{useithreads} && "doesn't work with threads"
 # 61 tests that shouldn't be constant folded
@@ -613,12 +650,12 @@ my $pi = 4;
 ####
 our @a;
 my @b;
-@a = sort @a;
-@b = sort @b;
+@a = sort(@a);
+@b = sort(@b);
 ();
 ####
 our @a;
 my @b;
-@a = reverse @a;
-@b = reverse @b;
+@a = reverse(@a);
+@b = reverse(@b);
 ();

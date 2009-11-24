@@ -390,8 +390,8 @@ sub begin_is_use {
     my $version_op = $req_op->sibling;
     return if class($version_op) eq "NULL";
     if ($version_op->name eq "lineseq") {
-	# We have a version parameter; skip nextstate & pushmark
-	my $constop = $version_op->first->next->next;
+	# We have a version parameter; skip nextstate & entersub
+	my $constop = $version_op->first->sibling->first;
 
 	return unless $self->const_sv($constop)->PV eq $module;
 	$constop = $constop->sibling;
@@ -424,7 +424,7 @@ sub begin_is_use {
     # See if there are import arguments
     my $args = '';
 
-    my $svop = $entersub->first->sibling; # Skip over pushmark
+    my $svop = skip_pushmark($entersub->first);
     return unless $self->const_sv($svop)->PV eq $module;
 
     # Pull out the arguments
@@ -3906,9 +3906,9 @@ sub const_sv {
 sub pp_const {
     my $self = shift;
     my($op, $cx) = @_;
-    if ($op->private & OPpCONST_ARYBASE) {
-        return '$[';
-    }
+    # if ($op->private & OPpCONST_ARYBASE) {
+    #     return '$[';
+    # }
 #    if ($op->private & OPpCONST_BARE) { # trouble with `=>' autoquoting
 #	return $self->const_sv($op)->PV;
 #    }

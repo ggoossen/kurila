@@ -503,9 +503,10 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	*/
 	OP* op_first = cLOGOPo->op_first;
 	OP* op_other = op_first->op_sibling;
+	bool cond_may_constant_fold = TRUE;
 	assert((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOGOP);
 
-	S_add_op(codeseq, bpp, op_first, &kid_may_constant_fold);
+	S_add_op(codeseq, bpp, op_first, &cond_may_constant_fold);
 	S_append_instruction(codeseq, bpp, o, o->op_type);
 	S_add_op(codeseq, bpp, op_other, &kid_may_constant_fold);
 	S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
