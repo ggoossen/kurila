@@ -4310,11 +4310,10 @@ sub regcomp {
     my $kid = $op->first;
     $kid = $kid->first if $kid->name eq "regcmaybe";
     $kid = $kid->first if $kid->name eq "regcreset";
-    if ($kid->name eq "null" and !null($kid->first)
-	and $kid->first->name eq 'pushmark')
+    if ($kid->name eq "null" and !null($kid->first))
     {
 	my $str = '';
-	$kid = $kid->first->sibling;
+	$kid = $kid->first;
 	while (!null($kid)) {
 	    my $first = $str;
 	    my $last = $self->re_dq($kid, $extended);
