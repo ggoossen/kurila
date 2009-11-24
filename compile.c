@@ -851,12 +851,6 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	S_add_kids(codeseq, bpp, o, &kid_may_constant_fold);
 	break;
     }
-    case OP_LAST:
-    {
-	S_append_instruction(codeseq, bpp, o, o->op_type);
-	o = NULL;
-	break;
-    }
     case OP_NEXTSTATE:
     case OP_DBSTATE:
     {
@@ -920,21 +914,21 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	}
 	goto compile_default;
     }
-    case OP_LIST:
-    {
+    case OP_LIST: {
 	if ((o->op_flags & OPf_WANT) == OPf_WANT_LIST) {
 	    /* don't bother with the pushmark and the pp_list instruction in list context */
 	    S_add_kids(codeseq, bpp, o, &kid_may_constant_fold);
 	}
-	else {
-	    S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
-	    S_add_kids(codeseq, bpp, o, &kid_may_constant_fold);
-	    S_append_instruction(codeseq, bpp, o, o->op_type);
-	}
-	break;
+	goto compile_default;
     }
-    default:
-    {
+
+    case OP_STUB:
+	if ((o->op_flags & OPf_WANT) == OPf_WANT_LIST) {
+	    break; /* Scalar stub must produce undef.  List stub is noop */
+	}
+	goto compile_default;
+
+    default: {
       compile_default:
 	if (PL_opargs[o->op_type] & OA_MARK)
 	    S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
