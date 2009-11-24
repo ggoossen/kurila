@@ -898,6 +898,14 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	S_append_instruction(codeseq, bpp, o, OP_AASSIGN);
 	break;
     }
+    case OP_STRINGIFY:
+    {
+	if (cUNOPo->op_first->op_type == OP_CONCAT) {
+	    S_add_op(codeseq, bpp, cUNOPo->op_first, &kid_may_constant_fold);
+	    break;
+	}
+	goto compile_default;
+    }
     case OP_CONCAT:
     {
 	if ((o->op_flags & OPf_STACKED) && cBINOPo->op_last->op_type == OP_READLINE) {

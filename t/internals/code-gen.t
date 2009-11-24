@@ -257,8 +257,8 @@ label1:
 $a..$b
 ----
     enter
-    nextstate  
-    range      label1  
+    nextstate
+    range      label1
     gvsv
     flip
 label1:
@@ -288,5 +288,15 @@ label2:
 label4:
     leaveloop
 label3:
+    leave
+    instr_end
+####
+"b$a"
+----
+    enter
+    nextstate
+    const
+    gvsv
+    concat
     leave
     instr_end
