@@ -165,7 +165,7 @@ S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP *o)
 		SvTEMP_off(sv);
 	    }
 	    else {
-		sv = newSVsv(sv);
+		SvREFCNT_inc_simple_void(sv);       /* immortal ? */
 	    }
 	}
 	break;
