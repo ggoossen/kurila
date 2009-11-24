@@ -92,6 +92,13 @@ S_save_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, INSTRUCTION** instrp)
     bpp->op_instrpp_compile++;
 }
 
+/* Saves the instruction index difference to the pparg of the "instr_from_index" added instruction */
+void
+S_save_instr_from_to_pparg(pTHX_ CODESEQ* codeseq, int instr_from_index, int instr_to_index)
+{
+    codeseq->xcodeseq_instructions[instr_from_index].instr_arg1 = (void*)(instr_to_index - instr_from_index - 1);
+}
+
 SV*
 S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP *o)
 {
@@ -247,7 +254,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 
 	S_append_instruction(codeseq, bpp, o, is_grep ? OP_GREPWHILE : OP_MAPWHILE );
 
-	codeseq->xcodeseq_instructions[grepstart_idx].instr_arg1 = (void*)(bpp->idx - grepstart_idx - 1);
+	S_save_instr_from_to_pparg(codeseq, grepstart_idx, bpp->idx);
 
 	break;
     }
@@ -274,14 +281,16 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 
 	/* true branch */
 	S_add_op(codeseq, bpp, op_true, &kid_may_constant_fold);
+
+	jump_idx = bpp->idx;
 	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
-	jump_idx = bpp->idx-1;
 
 	/* false branch */
 	S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 	S_add_op(codeseq, bpp, op_false, &kid_may_constant_fold);
 
-	codeseq->xcodeseq_instructions[jump_idx].instr_arg1 = (void*)(bpp->idx - jump_idx - 1);
+	S_save_instr_from_to_pparg(codeseq, jump_idx, bpp->idx);
+
 	break;
     }
     case OP_ENTERLOOP: {
@@ -328,7 +337,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	if (has_condition) {
 	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, (void*)(start_idx - bpp->idx - 1));
 
-	    codeseq->xcodeseq_instructions[cond_jump_idx].instr_arg1 = (void*)(bpp->idx - cond_jump_idx - 1);
+	    S_save_instr_from_to_pparg(codeseq, cond_jump_idx, bpp->idx);
 	}
 		
 	S_append_instruction(codeseq, bpp, o, OP_LEAVELOOP);
@@ -402,9 +411,10 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	    S_add_op(codeseq, bpp, op_cont, &kid_may_constant_fold);
 
 	/* loop */
-	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, (void*)(start_idx - bpp->idx - 1));
+	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
+	S_save_instr_from_to_pparg(codeseq, bpp->idx-1, start_idx);
 
-	codeseq->xcodeseq_instructions[cond_jump_idx].instr_arg1 = (void*)(bpp->idx - cond_jump_idx - 1);
+	S_save_instr_from_to_pparg(codeseq, cond_jump_idx, bpp->idx);
 	S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_LEAVELOOP], NULL);
 
 	S_save_branch_point(bpp, &(cLOOPo->op_last_instr));
@@ -442,10 +452,13 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	    int start_idx;
 	    start_idx = bpp->idx;
 	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
+
 	    S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 	    S_add_op(codeseq, bpp, op_other, &kid_may_constant_fold);
-	    codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
+
+	    S_save_instr_from_to_pparg(codeseq, start_idx, bpp->idx);
 	    S_add_op(codeseq, bpp, op_first, &kid_may_constant_fold);
+
 	    S_append_instruction(codeseq, bpp, o, OP_OR);
 	}
 
@@ -503,7 +516,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 		    
 	S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 	S_add_op(codeseq, bpp, op_other, &kid_may_constant_fold);
-	codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
+	S_save_instr_from_to_pparg(codeseq, start_idx, bpp->idx);
 
 	break;
     }
@@ -657,7 +670,9 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	    S_add_op(codeseq, bpp, cPMOPo->op_pmreplrootu.op_pmreplroot, &kid_may_constant_fold);
 
 	S_save_branch_point(bpp, &(cPMOPo->op_subst_next_instr));
-	codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
+
+	S_save_instr_from_to_pparg(codeseq, start_idx, bpp->idx);
+
 	break;
     }
     case OP_SORT:
@@ -695,7 +710,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 		S_add_op(codeseq, bpp, cUNOPo->op_first, &kid_may_constant_fold);
 		S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_INSTR_END], NULL);
 	    }
-	    codeseq->xcodeseq_instructions[start_idx].instr_arg1 = (void*)(bpp->idx - start_idx - 1);
+	    S_save_instr_from_to_pparg(codeseq, start_idx, bpp->idx);
 	}
 	break;
     }
