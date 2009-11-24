@@ -1844,13 +1844,13 @@ PP(pp_helem)
     SV **svp;
     SV * const keysv = POPs;
     HV * const hv = MUTABLE_HV(POPs);
-    const U32 lval = PL_op->op_flags & OPf_MOD || LVRET;
-    const U32 defer = PL_op->op_private & OPpLVAL_DEFER;
+    int const flags = (int)pparg1;
+    const bool lval = flags & INSTRf_HELEM_MOD || ((flags & INSTRf_HELEM_MAYBE_LVSUB) && is_lvalue_sub());
+    const U32 defer = flags & INSTRf_HELEM_LVAL_DEFER;
     SV *sv;
     const U32 hash = (SvIsCOW_shared_hash(keysv)) ? SvSHARED_HASH(keysv) : 0;
-    const bool localizing = PL_op->op_private & OPpLVAL_INTRO;
+    const bool localizing = flags & INSTRf_HELEM_LVAL_INTRO;
     bool preeminent = TRUE;
-    PERL_UNUSED_VAR(pparg1);
 
     if (SvTYPE(hv) != SVt_PVHV)
 	RETPUSHUNDEF;
@@ -1888,15 +1888,15 @@ PP(pp_helem)
 	}
 	if (localizing) {
 	    if (HvNAME_get(hv) && isGV(*svp))
-		save_gp(MUTABLE_GV(*svp), !(PL_op->op_flags & OPf_SPECIAL));
+		save_gp(MUTABLE_GV(*svp), !(flags & INSTRf_HELEM_SPECIAL));
 	    else if (preeminent)
 		save_helem_flags(hv, keysv, svp,
-		     (PL_op->op_flags & OPf_SPECIAL) ? 0 : SAVEf_SETMAGIC);
+		    (flags & INSTRf_HELEM_SPECIAL) ? 0 : SAVEf_SETMAGIC);
 	    else
 		SAVEHDELETE(hv, keysv);
 	}
-	else if (PL_op->op_private & OPpDEREF)
-	    vivify_ref(*svp, PL_op->op_private & OPpDEREF);
+	else if (flags & OPpDEREF)
+	    vivify_ref(*svp, flags & OPpDEREF);
     }
     sv = (svp ? *svp : &PL_sv_undef);
     /* This makes C<local $tied{foo} = $tied{foo}> possible.

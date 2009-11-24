@@ -790,8 +790,14 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	OP* op_hv = cUNOPo->op_first;
 	OP* op_key = op_hv->op_sibling;
 	bool key_is_constant = TRUE;
-	U32 hash = 0;
 	int start_idx;
+	int flags = 0;
+	flags |= (o->op_flags & OPf_MOD) && INSTRf_HELEM_MOD;
+	flags |= (o->op_private & OPpMAYBE_LVSUB) && INSTRf_HELEM_MAYBE_LVSUB;
+	flags |= (o->op_private & OPpLVAL_DEFER) && INSTRf_HELEM_LVAL_DEFER;
+	flags |= (o->op_private & OPpLVAL_INTRO) && INSTRf_HELEM_LVAL_INTRO;
+	flags |= (o->op_flags & OPf_SPECIAL) && INSTRf_HELEM_SPECIAL;
+	flags |= (o->op_private & OPpDEREF);
 	start_idx = bpp->idx;
 	S_add_op(codeseq, bpp, op_hv, &kid_may_constant_fold);
 	S_add_op(codeseq, bpp, op_key, &key_is_constant);
@@ -806,7 +812,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	    SvREFCNT_dec(*keysvp);
 	    *keysvp = shared_keysv;
 	}
-	S_append_instruction_x(codeseq, bpp, o, PL_ppaddr[o->op_type], (void*)hash);
+	S_append_instruction_x(codeseq, bpp, o, PL_ppaddr[o->op_type], (void*)flags);
 	break;
     }
     case OP_DELETE:
