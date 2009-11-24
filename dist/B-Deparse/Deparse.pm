@@ -1734,7 +1734,7 @@ sub givwhen {
     my $self = shift;
     my($op, $cx, $givwhen) = @_;
 
-    my $enterop = $op->first;
+    my $enterop = $op;
     my ($head, $block);
     if ($enterop->flags & OPf_SPECIAL) {
 	$head = "default";
@@ -1752,8 +1752,8 @@ sub givwhen {
 	"\b}\cK";
 }
 
-sub pp_leavegiven { givwhen(@_, "given"); }
-sub pp_leavewhen  { givwhen(@_, "when"); }
+sub pp_entergiven { givwhen(@_, "given"); }
+sub pp_enterwhen  { givwhen(@_, "when"); }
 
 sub pp_exists {
     my $self = shift;
@@ -2608,9 +2608,8 @@ sub pp_list {
 
 sub is_ifelse_cont {
     my $op = shift;
-    return ($op->name eq "null" and class($op) eq "UNOP"
-	    and $op->first->name =~ /^(and|cond_expr)$/
-	    and is_scope($op->first->first->sibling));
+    return ($op->name =~ /^(and|cond_expr)$/
+	    and is_scope($op->first->sibling));
 }
 
 sub pp_cond_expr {
@@ -2634,8 +2633,7 @@ sub pp_cond_expr {
     my $head = "if ($cond) {\n\t$true\n\b}";
     my @elsifs;
     while (!null($false) and is_ifelse_cont($false)) {
-	my $newop = $false->first;
-	my $newcond = $newop->first;
+	my $newcond = $false->first;
 	my $newtrue = $newcond->sibling;
 	$false = $newtrue->sibling; # last in chain is OP_AND => no else
 	if ($newcond->name eq "lineseq")
