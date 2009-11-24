@@ -69,30 +69,6 @@ S_append_instruction(pTHX_ CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, Optyp
 }
 
 void
-S_register_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o)
-{
-    DEBUG_g(Perl_deb("registering branch point "); dump_op_short(o); Perl_deb("\n"));
-    if (bpp->op_instrpp_append >= bpp->op_instrpp_end) {
-	OP_INSTRPP* old_lp = bpp->op_instrpp_list;
-	int new_size = 128 + (bpp->op_instrpp_end - bpp->op_instrpp_list);
-	Renew(bpp->op_instrpp_list, new_size, OP_INSTRPP);
-	bpp->op_instrpp_end = bpp->op_instrpp_list + new_size;
-	bpp->op_instrpp_compile = bpp->op_instrpp_list + (bpp->op_instrpp_compile - old_lp);
-	bpp->op_instrpp_append = bpp->op_instrpp_list + (bpp->op_instrpp_append - old_lp);
-    }
-    assert(bpp->op_instrpp_append < bpp->op_instrpp_end);
-    bpp->op_instrpp_append->op = bpp->op_instrpp_compile->op;
-    bpp->op_instrpp_append->instrpp = bpp->op_instrpp_compile->instrpp;
-    bpp->op_instrpp_append->instr_idx = bpp->op_instrpp_compile->instr_idx;
-    bpp->op_instrpp_append++;
-
-    bpp->op_instrpp_compile->op = o;
-    bpp->op_instrpp_compile->instrpp = NULL;
-    bpp->op_instrpp_compile->instr_idx = bpp->idx;
-    bpp->op_instrpp_compile++;
-}
-
-void
 S_save_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, INSTRUCTION** instrp)
 {
     DEBUG_g(Perl_deb("registering branch point "); Perl_deb("\n"));
