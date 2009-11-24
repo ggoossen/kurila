@@ -982,10 +982,10 @@ void
 Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 {
     dSP;
-    OP* o;
 
     BRANCH_POINT_PAD bpp;
 
+    /* preserve current state */
     PUSHSTACKi(PERLSI_COMPILE);
     ENTER;
     SAVETMPS;
@@ -993,6 +993,7 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
     save_scalar(PL_errgv);
     SAVEVPTR(PL_curcop);
 
+    /* create scratch pad */
     Newx(bpp.op_instrpp_list, 128, OP_INSTRPP);
     bpp.idx = 0;
     bpp.op_instrpp_compile = bpp.op_instrpp_list;
@@ -1003,38 +1004,22 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
     codeseq->xcodeseq_size = 12;
     Renew(codeseq->xcodeseq_instructions, codeseq->xcodeseq_size, INSTRUCTION);
 
-    o = startop;
-
-    do {
+    {
+	/* actually compile */
 	bool may_constant_fold = TRUE;
-	S_add_op(codeseq, &bpp, o, &may_constant_fold);
+	S_add_op(codeseq, &bpp, startop, &may_constant_fold);
 
 	S_append_instruction_x(codeseq, &bpp, NULL, PL_ppaddr[OP_INSTR_END], NULL);
+    }
 
-	/* continue compiling remaining branch. */
-	{
-	    while ( bpp.op_instrpp_compile < bpp.op_instrpp_append ) {
-		/* check for already exisiting branch point */
-		int idx = S_find_branch_point(&bpp, bpp.op_instrpp_compile->op);
-		bpp.op_instrpp_compile->instr_idx = idx;
-		if (bpp.op_instrpp_compile->instr_idx == -1)
-		    break;
-		bpp.op_instrpp_compile++;
-	    }
-	}
-
-	if (bpp.op_instrpp_compile >= bpp.op_instrpp_append)
-	    break;
-
-	assert(0);
-
-	bpp.op_instrpp_compile->instr_idx = bpp.idx;
-	o = bpp.op_instrpp_compile->op;
-	bpp.op_instrpp_compile++;
-
-    } while(1);
+    /* mark remaining instruction with NULL */
+    while (bpp.idx < codeseq->xcodeseq_size) {
+	codeseq->xcodeseq_instructions[bpp.idx].instr_ppaddr = NULL;
+	bpp.idx++;
+    }
 
     {
+	/* resolve instruction pointers */
 	OP_INSTRPP* i;
 	for (i=bpp.op_instrpp_list; i<bpp.op_instrpp_compile; i++) {
 	    assert(i->instr_idx != -1);
@@ -1043,18 +1028,14 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 	}
     }
 
-    while (bpp.idx < codeseq->xcodeseq_size) {
-	codeseq->xcodeseq_instructions[bpp.idx].instr_ppaddr = NULL;
-	bpp.idx++;
-    }
+    DEBUG_G(codeseq_dump(codeseq));
 
     Safefree(bpp.op_instrpp_list);
 
+    /* restore original state */
     FREETMPS ;
     LEAVE ;
     POPSTACK;
-
-    DEBUG_G(codeseq_dump(codeseq));
 }
 
 INSTRUCTION*
