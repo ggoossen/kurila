@@ -8443,42 +8443,6 @@ Perl_peep(pTHX_ register OP *o)
 #endif
 	    break;
 
-	case OP_NULL:
-	    if (o->op_targ == OP_NEXTSTATE
-		|| o->op_targ == OP_DBSTATE)
-	    {
-		PL_curcop = ((COP*)o);
-	    }
-	    /* XXX: We avoid setting op_seq here to prevent later calls
-	       to peep() from mistakenly concluding that optimisation
-	       has already occurred. This doesn't fix the real problem,
-	       though (See 20010220.007). AMS 20010719 */
-	    /* op_seq functionality is now replaced by op_opt */
-	    o->op_opt = 0;
-	    /* FALL THROUGH */
-	case OP_SCALAR:
-	case OP_LINESEQ:
-	case OP_SCOPE:
-	nothin:
-	    break;
-
-	case OP_PADAV:
-	case OP_GV:
-
-	    /* else if (o->op_next && o->op_next->op_type == OP_READLINE */
-	    /* 	    && o->op_next->op_next */
-	    /* 	    && o->op_next->op_next->op_type == OP_CONCAT */
-	    /* 	    && (o->op_next->op_next->op_flags & OPf_STACKED)) */
-	    /* { */
-	    /* 	/\* Turn "$a .= <FH>" into an OP_RCATLINE. AMS 20010917 *\/ */
-	    /* 	o->op_type   = OP_RCATLINE; */
-	    /* 	o->op_flags |= OPf_STACKED; */
-	    /* 	op_null(o->op_next->op_next); */
-	    /* 	op_null(o->op_next); */
-	    /* } */
-
-	    break;
-        
         {
             OP *fop;
             OP *sop;
