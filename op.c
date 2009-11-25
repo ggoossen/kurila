@@ -1292,7 +1292,6 @@ Perl_list(pTHX_ OP *o)
 	if (cUNOPo->op_first->op_type == OP_FLOP) {
 	    list(cBINOPo->op_first);
 	    return o;
-	    /* return gen_constant_list(o); */
 	}
     case OP_LIST:
 	listkids(o);
@@ -2703,48 +2702,6 @@ S_fold_constants(pTHX_ register OP *o)
 
     return o;
 }
-
-/* static OP * */
-/* S_gen_constant_list(pTHX_ register OP *o) */
-/* { */
-/*     dVAR; */
-/*     register OP *curop; */
-/*     const I32 oldtmps_floor = PL_tmps_floor; */
-/*     CODESEQ* codeseq; */
-
-/*     list(o); */
-/*     if (PL_parser && PL_parser->error_count) */
-/* 	return o;		/\* Don't attempt to run with errors *\/ */
-
-/*     return o; */
-
-/*     curop = LINKLIST(o); */
-/*     CALL_PEEP(curop); */
-/*     codeseq = new_codeseq(); */
-/*     compile_op(curop, codeseq); */
-/*     pp_pushmark(NULL); */
-/*     run_exec_codeseq(codeseq); */
-/*     assert(!(curop->op_flags & OPf_SPECIAL)); */
-/*     assert(curop->op_type == OP_RANGE); */
-/*     PL_op = curop; */
-/*     pp_anonlist(NULL); */
-/*     PL_op = NULL; */
-/*     PL_tmps_floor = oldtmps_floor; */
-
-/*     o->op_type = OP_RV2AV; */
-/*     o->op_flags &= ~OPf_REF;	/\* treat \(1..2) like an ordinary list *\/ */
-/*     o->op_flags |= OPf_PARENS;	/\* and flatten \(1..2,3) *\/ */
-/*     o->op_opt = 0;		/\* needs to be revisited in peep() *\/ */
-/*     curop = ((UNOP*)o)->op_first; */
-/*     ((UNOP*)o)->op_first = newSVOP(OP_CONST, 0, SvREFCNT_inc_NN(*PL_stack_sp--)); */
-/* #ifdef PERL_MAD */
-/*     op_getmad(curop,o,'O'); */
-/* #else */
-/*     op_free(curop); */
-/* #endif */
-/*     linklist(o); */
-/*     return list(o); */
-/* } */
 
 OP *
 Perl_convert(pTHX_ I32 type, I32 flags, OP *o)
