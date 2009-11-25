@@ -67,16 +67,17 @@ struct codeseq {
     AV* xcodeseq_svs;                    /* Array with SVs to be freed with the codeseq */
 };
 
-#define INSTRf_HELEM_MOD          0x1
-#define INSTRf_HELEM_MAYBE_LVSUB  0x2
-#define INSTRf_HELEM_LVAL_DEFER   0x4
-#define INSTRf_HELEM_LVAL_INTRO   0x8
-#define INSTRf_HELEM_SPECIAL     0x10
+#define INSTRf_STACKED_TARG       0x1
 
+#define INSTRf_HELEM_MOD          0x2
+#define INSTRf_HELEM_MAYBE_LVSUB  0x4
+#define INSTRf_HELEM_LVAL_DEFER   0x8
+#define INSTRf_HELEM_LVAL_INTRO  0x10
 /* #define OPpDEREF		(32|64)	/\* autovivify: Want ref to something: *\/ */
 /* #define OPpDEREF_AV		32	/\*   Want ref to AV. *\/ */
 /* #define OPpDEREF_HV		64	/\*   Want ref to HV. *\/ */
 /* #define OPpDEREF_SV		(32|64)	/\*   Want ref to SV. *\/ */
+#define INSTRf_HELEM_SPECIAL     0x80
 
 /*
  * Local variables:

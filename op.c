@@ -4966,9 +4966,6 @@ whileline, OP *expr, OP *block, OP *cont, I32 has_my)
     }
 
     assert(block);
-    /* listop = append_list(OP_LINESEQ, NULL, NULL); /\* (LISTOP*)block, (LISTOP*)cont); *\/ */
-    /* assert(listop); */
-    /* redo = LINKLIST(listop); */
     redo = NULL;
 
     if (expr) {
@@ -6391,6 +6388,7 @@ Perl_ck_bitop(pTHX_ OP *o)
 	 (op) == OP_EQ   || (op) == OP_I_EQ || \
 	 (op) == OP_NE   || (op) == OP_I_NE || \
 	 (op) == OP_NCMP || (op) == OP_I_NCMP)
+
     o->op_private = (U8)(PL_hints & HINT_INTEGER);
     if (!(o->op_flags & OPf_STACKED) /* Not an assignment */
 	    && (o->op_type == OP_BIT_OR

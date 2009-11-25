@@ -948,6 +948,19 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	PL_curcop = ((COP*)o);
 	break;
     }
+    case OP_SASSIGN: {
+	OP* op_right = cBINOPo->op_first;
+	OP* op_left = cBINOPo->op_last;
+    	/* if (op_left->op_type == OP_PADSV */
+    	/*     && !(op_left->op_private & OPpLVAL_INTRO) */
+	/*     && (PL_opargs[op_right->op_type] & OA_TARGLEX) */
+	/*     ) { */
+	/*     assert(op_left->op_flags & OPf_STACKED); */
+	/*     S_add_op(codeseq, bpp, op_right, INSTRf_STACKED_TARG); */
+	/*     break; */
+	/* } */
+	goto compile_default;
+    }
     case OP_AASSIGN:
     {
 	OP* op_right = cBINOPo->op_first;
