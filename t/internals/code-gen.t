@@ -345,3 +345,20 @@ label1:
     aassign
     leave
     instr_end
+####
+# and/or/dor branching
+1+1 and $a
+----
+    enter
+    nextstate
+    gvsv
+    leave
+    instr_end
+####
+1 ? $a : $b
+----
+    enter
+    nextstate
+    gvsv
+    leave
+    instr_end

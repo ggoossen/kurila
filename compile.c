@@ -254,22 +254,30 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     }
     case OP_COND_EXPR: {
 	/*
-	  ...
-	  <op_first>
-	  cond_expr                label1
-	  <op_true>
-	  instr_jump               label2
+	      ...
+	      <op_first>
+	      cond_expr                label1
+	      <op_true>
+	      instr_jump               label2
 	  label1:
-	  <op_false>
+	      <op_false>
 	  label2:
-	  ...
+	      ...
 	*/
 	int jump_idx;
 	OP* op_first = cLOGOPo->op_first;
 	OP* op_true = op_first->op_sibling;
 	OP* op_false = op_true->op_sibling;
+	bool cond_may_constant_fold = TRUE;
 
-	S_add_op(codeseq, bpp, op_first, &kid_may_constant_fold, 0);
+	S_add_op(codeseq, bpp, op_first, &cond_may_constant_fold, 0);
+
+	if (cond_may_constant_fold) {
+	    SV* const constsv = *(S_svp_const_instruction(codeseq, bpp, bpp->idx-1));
+	    bpp->idx--;
+	    S_add_op(codeseq, bpp, SvTRUE(constsv) ? op_true : op_false , &kid_may_constant_fold, 0);
+	    break;
+	}
 
 	S_append_instruction(codeseq, bpp, o, o->op_type);
 
@@ -479,6 +487,18 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	    addop_cond_flags |= ADDOPf_BOOLEANCONTEXT;
 	S_add_op(codeseq, bpp, op_first, &cond_may_constant_fold, addop_cond_flags);
 
+	if (cond_may_constant_fold) {
+	    SV* const constsv = *(S_svp_const_instruction(codeseq, bpp, bpp->idx-1));
+	    bool const cond_true = ((o->op_type == OP_AND &&  SvTRUE(constsv)) ||
+		(o->op_type == OP_OR  && !SvTRUE(constsv)) ||
+		(o->op_type == OP_DOR && !SvOK(constsv)));
+	    if (cond_true) {
+		bpp->idx--;
+		S_add_op(codeseq, bpp, op_other, &kid_may_constant_fold, 0);
+	    }
+	    break;
+	}
+		
 	S_append_instruction(codeseq, bpp, o, o->op_type);
 	S_add_op(codeseq, bpp, op_other, &kid_may_constant_fold, 0);
 	S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
@@ -497,11 +517,9 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	*/
 	OP* op_first = cLOGOPo->op_first;
 	OP* op_other = op_first->op_sibling;
-	bool cond_may_constant_fold = TRUE;
 	assert((PL_opargs[o->op_type] & OA_CLASS_MASK) == OA_LOGOP);
 
-	S_add_op(codeseq, bpp, op_first, &cond_may_constant_fold, 0);
-
+	S_add_op(codeseq, bpp, op_first, &kid_may_constant_fold, 0);
 	S_append_instruction(codeseq, bpp, o, o->op_type);
 	S_add_op(codeseq, bpp, op_other, &kid_may_constant_fold, 0);
 	S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
