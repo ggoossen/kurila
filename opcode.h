@@ -403,6 +403,7 @@ EXTCONST char* const PL_op_name[] = {
 	"instr_jump",
 	"instr_cond_jump",
 	"instr_const",
+	"instr_const_list",
 	"instr_end",
 	"custom",
 	"foreach",
@@ -783,6 +784,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"instruction jump",
 	"instruction conditional jump",
 	"instruction constant",
+	"instruction constant list",
 	"instruction end",
 	"unknown custom operator",
 	"foreach loop",
@@ -1177,6 +1179,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_instr_jump),
 	MEMBER_TO_FPTR(Perl_pp_instr_cond_jump),
 	MEMBER_TO_FPTR(Perl_pp_instr_const),
+	MEMBER_TO_FPTR(Perl_pp_instr_const_list),
 	MEMBER_TO_FPTR(Perl_pp_instr_end),
 	MEMBER_TO_FPTR(Perl_unimplemented_op),	/* Perl_pp_custom */
 	MEMBER_TO_FPTR(Perl_unimplemented_op),	/* Perl_pp_foreach */
@@ -1568,6 +1571,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* instr_jump */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* instr_cond_jump */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* instr_const */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* instr_const_list */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* instr_end */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* custom */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* foreach */
@@ -1953,6 +1957,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000000,	/* instr_jump */
 	0x00000000,	/* instr_cond_jump */
 	0x00000000,	/* instr_const */
+	0x00000000,	/* instr_const_list */
 	0x00000000,	/* instr_end */
 	0x00000000,	/* custom */
 	0x00001240,	/* foreach */

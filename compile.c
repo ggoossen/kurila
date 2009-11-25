@@ -99,8 +99,13 @@ S_save_instr_from_to_pparg(pTHX_ CODESEQ* codeseq, int instr_from_index, int ins
     codeseq->xcodeseq_instructions[instr_from_index].instr_arg1 = (void*)(instr_to_index - instr_from_index - 1);
 }
 
+/* executes the instruction given to it, and returns the SV pushed on the stack by it.
+   if C<list> is true, items added to the stack are returned as an AV.
+   NULL is returned if an error occured during execution.
+   The caller is responsible for decrementing the reference count of the returned SV.
+ */
 SV*
-S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP *o)
+S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP* o, bool list)
 {
     dVAR;
     SV * VOL sv = NULL;
@@ -125,19 +130,32 @@ S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP *o)
 
     switch (ret) {
     case 0:
+	if (list) {
+	    PUSHMARK(PL_stack_sp);
+	}
 	RUN_SET_NEXT_INSTRUCTION(instr);
 	CALLRUNOPS(aTHX);
-	if (PL_stack_sp - 1 == PL_stack_base + oldsp) {
-	    sv = *(PL_stack_sp--);
-	    if (o->op_targ && sv == PAD_SV(o->op_targ)) {	/* grab pad temp? */
-		pad_swipe(o->op_targ,  FALSE);
-	    }
-	    else if (SvTEMP(sv)) {			/* grab mortal temp? */
-		SvREFCNT_inc_simple_void(sv);
-		SvTEMP_off(sv);
-	    }
-	    else {
-		SvREFCNT_inc_simple_void(sv);       /* immortal ? */
+	if (list) {
+	    SV** spi;
+	    AV* av = newAV();
+	    for (spi = PL_stack_base + oldsp + 1; spi <= PL_stack_sp; spi++)
+		av_push(av, newSVsv(*spi));
+	    PL_stack_sp = PL_stack_sp + oldsp;
+	    sv = MUTABLE_SV(av);
+	}
+	else {
+	    if (PL_stack_sp - 1 == PL_stack_base + oldsp) {
+		sv = *(PL_stack_sp--);
+		if (o->op_targ && sv == PAD_SV(o->op_targ)) {	/* grab pad temp? */
+		    pad_swipe(o->op_targ,  FALSE);
+		}
+		else if (SvTEMP(sv)) {			/* grab mortal temp? */
+		    SvREFCNT_inc_simple_void(sv);
+		    SvTEMP_off(sv);
+		}
+		else {
+		    SvREFCNT_inc_simple_void(sv);       /* immortal ? */
+		}
 	    }
 	}
 	break;
@@ -185,7 +203,7 @@ S_add_kids(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fo
 void
 S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold, int flags)
 {
-    bool kid_may_constant_fold;
+    bool kid_may_constant_fold = TRUE;
     int start_idx = bpp->idx;
     bool boolean_context = (flags & ADDOPf_BOOLEANCONTEXT) != 0;
 
@@ -196,32 +214,6 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	    PerlIO_printf(Perl_debug_log, "\n") );
     
     assert(o);
-
-    switch (o->op_type) {
-    case OP_CONST:
-    case OP_SCALAR:
-    case OP_NULL:
-	kid_may_constant_fold = TRUE;
-	break;
-    case OP_UCFIRST:
-    case OP_LCFIRST:
-    case OP_UC:
-    case OP_LC:
-    case OP_SLT:
-    case OP_SGT:
-    case OP_SLE:
-    case OP_SGE:
-    case OP_SCMP:
-	/* XXX what about the numeric ops? */
-	if (PL_hints & HINT_LOCALE)
-	    kid_may_constant_fold = FALSE;
-	else
-	    kid_may_constant_fold = TRUE;
-	break;
-    default:
-	kid_may_constant_fold = (PL_opargs[o->op_type] & OA_FOLDCONST) != 0;
-	break;
-    }
 
     switch (o->op_type) {
     case OP_GREPSTART:
@@ -573,11 +565,26 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	          ...
 	    */
 		  
+	    int start_idx = bpp->idx;
+
 	    S_add_op(codeseq, bpp, flip->op_first, &kid_may_constant_fold, 0);
-	    S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 	    S_add_op(codeseq, bpp, flip->op_first->op_sibling, &kid_may_constant_fold, 0);
 	    S_append_instruction(codeseq, bpp, o, OP_FLOP);
 		
+	    if (kid_may_constant_fold) {
+		SV* constsv;
+		S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_INSTR_END], NULL);
+		constsv = S_instr_fold_constants(&(codeseq->xcodeseq_instructions[start_idx]), o, TRUE);
+		if (constsv) {
+		    bpp->idx = start_idx; /* FIXME remove pointer sets from bpp */
+		    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_const_list, (void*)constsv);
+		    Perl_av_create_and_push(aTHX_ &codeseq->xcodeseq_svs, constsv);
+		}
+		else {
+		    bpp->idx--; /* remove OP_INSTR_END */
+		}
+	    }
+
 	    break;
 	}
 
@@ -999,10 +1006,33 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     }
     }
 
+    switch (o->op_type) {
+    case OP_CONST:
+    case OP_SCALAR:
+    case OP_NULL:
+	break;
+    case OP_UCFIRST:
+    case OP_LCFIRST:
+    case OP_UC:
+    case OP_LC:
+    case OP_SLT:
+    case OP_SGT:
+    case OP_SLE:
+    case OP_SGE:
+    case OP_SCMP:
+	/* XXX what about the numeric ops? */
+	if (PL_hints & HINT_LOCALE)
+	    kid_may_constant_fold = FALSE;
+	break;
+    default:
+	kid_may_constant_fold = kid_may_constant_fold && (PL_opargs[o->op_type] & OA_FOLDCONST) != 0;
+	break;
+    }
+
     if (kid_may_constant_fold && bpp->idx > start_idx + 1) {
     	SV* constsv;
 	S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_INSTR_END], NULL);
-    	constsv = S_instr_fold_constants(&(codeseq->xcodeseq_instructions[start_idx]), o);
+    	constsv = S_instr_fold_constants(&(codeseq->xcodeseq_instructions[start_idx]), o, FALSE);
     	if (constsv) {
     	    bpp->idx = start_idx; /* FIXME remove pointer sets from bpp */
     	    SvREADONLY_on(constsv);

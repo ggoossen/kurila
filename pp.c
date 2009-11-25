@@ -6074,6 +6074,19 @@ PP(pp_instr_const)
     RETURN;
 }
 
+PP(pp_instr_const_list)
+{
+    dVAR;
+    dSP;
+    AV* av = (AV*)pparg1;
+    const I32 maxarg = AvFILL(av) + 1;
+    EXTEND(SP, maxarg);
+    assert(!SvRMAGICAL(av));
+    Copy(AvARRAY(av), SP+1, maxarg, SV*);
+    SP += maxarg;
+    RETURN;
+}
+
 PP(pp_instr_end)
 {
     RUN_SET_NEXT_INSTRUCTION( NULL );

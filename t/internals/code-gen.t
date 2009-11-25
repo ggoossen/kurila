@@ -291,6 +291,7 @@ label3:
     leave
     instr_end
 ####
+# stringify with concat
 "b$a"
 ----
     enter
@@ -301,6 +302,7 @@ label3:
     leave
     instr_end
 ####
+# hash in boolean context
 %h and 1
 ----
     enter
@@ -314,17 +316,32 @@ label1:
     leave
     instr_end
 ####
+# range in list context
+@a = 1..$a
+----
+    enter
+    nextstate
+    pushmark
+    const
+    gvsv
+    flop
+    pushmark
+    gv
+    rv2av
+    aassign
+    leave
+    instr_end
+####
+# constant folded range
 @a = 1..4
 ----
-    enter	
-    nextstate	
-    pushmark	
-    const	
-    const	
-    flop	
-    pushmark	
-    gv	
-    rv2av	
-    aassign	
-    leave	
-    instr_end	
+    enter
+    nextstate
+    pushmark
+    instr_const_list
+    pushmark
+    gv
+    rv2av
+    aassign
+    leave
+    instr_end
