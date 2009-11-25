@@ -313,3 +313,18 @@ label3:
 label1:
     leave
     instr_end
+####
+@a = 1..4
+----
+    enter	
+    nextstate	
+    pushmark	
+    const	
+    const	
+    flop	
+    pushmark	
+    gv	
+    rv2av	
+    aassign	
+    leave	
+    instr_end	

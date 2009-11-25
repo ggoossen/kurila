@@ -562,6 +562,25 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	break;
     }
     case OP_RANGE: {
+	UNOP* flip = cUNOPx(cLOGOPo->op_first);
+
+	if ((o->op_flags & OPf_WANT) == OPf_WANT_LIST) {
+	    /*
+	          ...
+	          <o->op_first->op_first>
+	          <o->op_first->op_first->op_sibling>
+	          flop
+	          ...
+	    */
+		  
+	    S_add_op(codeseq, bpp, flip->op_first, &kid_may_constant_fold, 0);
+	    S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
+	    S_add_op(codeseq, bpp, flip->op_first->op_sibling, &kid_may_constant_fold, 0);
+	    S_append_instruction(codeseq, bpp, o, OP_FLOP);
+		
+	    break;
+	}
+
 	/*
 	      ...
 	      pp_range       label2
@@ -575,7 +594,6 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	      ...
 	*/
 		  
-	UNOP* flip = cUNOPx(cLOGOPo->op_first);
 	S_append_instruction(codeseq, bpp, o, o->op_type);
 	S_add_op(codeseq, bpp, flip->op_first, &kid_may_constant_fold, 0);
 	S_append_instruction(codeseq, bpp, o, OP_FLIP);
