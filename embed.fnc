@@ -776,8 +776,6 @@ sd	|void	|pad_reset
 #endif
 : Used in op.c
 pd	|void	|pad_swipe	|PADOFFSET po|bool refadjust
-: FIXME
-p	|void	|peep		|NULLOK OP* o
 : Defined in doio.c, used only in pp_hot.c
 dopM	|PerlIO*|start_glob	|NN SV *tmpglob|NN IO *io
 #if defined(USE_REENTRANT_API)

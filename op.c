@@ -8386,43 +8386,6 @@ Perl_ck_each(pTHX_ OP *o)
     return ck_fun(o);
 }
 
-/* A peephole optimizer.  We visit the ops in the order they're to execute.
- * See the comments at the top of this file for more details about when
- * peep() is called */
-
-void
-Perl_peep(pTHX_ register OP *o)
-{
-    dVAR;
-    register OP* oldop = NULL;
-
-    if (!o || o->op_opt)
-	return;
-
-    return;
-
-    ENTER;
-    SAVEOP();
-    SAVEVPTR(PL_curcop);
-    for (; o; o = NULL /*FIXME */) {
-	if (o->op_opt)
-	    break;
-	/* By default, this op has now been optimised. A couple of cases below
-	   clear this again.  */
-	o->op_opt = 1;
-	PL_op = o;
-	switch (o->op_type) {
-	case OP_NEXTSTATE:
-	case OP_DBSTATE:
-	    PL_curcop = ((COP*)o);		/* for warnings */
-	    break;
-	}
-
-	oldop = o;
-    }
-    LEAVE;
-}
-
 const char*
 Perl_custom_op_name(pTHX_ const OP* o)
 {
