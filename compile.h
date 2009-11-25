@@ -71,7 +71,7 @@ struct codeseq {
 #define INSTRf_HELEM_MAYBE_LVSUB  0x2
 #define INSTRf_HELEM_LVAL_DEFER   0x4
 #define INSTRf_HELEM_LVAL_INTRO   0x8
-#define INSTRf_HELEM_SPECIAL     0x16
+#define INSTRf_HELEM_SPECIAL     0x10
 
 /* #define OPpDEREF		(32|64)	/\* autovivify: Want ref to something: *\/ */
 /* #define OPpDEREF_AV		32	/\*   Want ref to AV. *\/ */

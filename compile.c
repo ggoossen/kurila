@@ -140,7 +140,7 @@ S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP* o, bool list)
 	    AV* av = newAV();
 	    for (spi = PL_stack_base + oldsp + 1; spi <= PL_stack_sp; spi++)
 		av_push(av, newSVsv(*spi));
-	    PL_stack_sp = PL_stack_sp + oldsp;
+	    PL_stack_sp = PL_stack_base + oldsp;
 	    sv = MUTABLE_SV(av);
 	}
 	else {
@@ -169,7 +169,6 @@ S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP* o, bool list)
 	/* Don't expect 1 (setjmp failed) or 2 (something called my_exit)  */
 	PL_warnhook = oldwarnhook;
 	PL_diehook  = olddiehook;
-	assert(0);
 	/* XXX note that this croak may fail as we've already blown away
 	 * the stack - eg any nested evals */
 	Perl_croak(aTHX_ "panic: fold_constants JMPENV_PUSH returned %d", ret);
@@ -843,12 +842,18 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	bool key_is_constant = TRUE;
 	int start_idx;
 	int flags = 0;
-	flags |= (o->op_flags & OPf_MOD) && INSTRf_HELEM_MOD;
-	flags |= (o->op_private & OPpMAYBE_LVSUB) && INSTRf_HELEM_MAYBE_LVSUB;
-	flags |= (o->op_private & OPpLVAL_DEFER) && INSTRf_HELEM_LVAL_DEFER;
-	flags |= (o->op_private & OPpLVAL_INTRO) && INSTRf_HELEM_LVAL_INTRO;
-	flags |= (o->op_flags & OPf_SPECIAL) && INSTRf_HELEM_SPECIAL;
+	if (o->op_flags & OPf_MOD)
+	    flags |= INSTRf_HELEM_MOD;
+	if (o->op_private & OPpMAYBE_LVSUB)
+	    flags |= INSTRf_HELEM_MAYBE_LVSUB;
+	if (o->op_private & OPpLVAL_DEFER)
+	    flags |= INSTRf_HELEM_LVAL_DEFER;
+	if (o->op_private & OPpLVAL_INTRO)
+	    flags |= INSTRf_HELEM_LVAL_INTRO;
+	if (o->op_flags & OPf_SPECIAL)
+	    flags |= INSTRf_HELEM_SPECIAL;
 	flags |= (o->op_private & OPpDEREF);
+
 	start_idx = bpp->idx;
 	S_add_op(codeseq, bpp, op_hv, &kid_may_constant_fold, 0);
 	S_add_op(codeseq, bpp, op_key, &key_is_constant, 0);
@@ -1040,6 +1045,8 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     	    Perl_av_create_and_push(aTHX_ &codeseq->xcodeseq_svs, constsv);
     	}
 	else {
+	    /* constant folding failed */
+	    kid_may_constant_fold = FALSE;
 	    bpp->idx--; /* remove OP_INSTR_END */
 	}
     }
