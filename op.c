@@ -2714,9 +2714,6 @@ Perl_convert(pTHX_ I32 type, I32 flags, OP *o)
 	o->op_context_known = FALSE;
     }
 
-    /* if (!(PL_opargs[type] & OA_MARK)) */
-    /* 	op_null(cLISTOPo->op_first); */
-
     o->op_type = (OPCODE)type;
     o->op_flags |= flags;
 
@@ -3109,14 +3106,6 @@ Perl_newLISTOP(pTHX_ I32 type, I32 flags, OP *first, OP *last)
 	first->op_sibling = last;
     listop->op_first = first;
     listop->op_last = last;
-    /* if (type == OP_LIST) { */
-    /* 	OP* const pushop = newOP(OP_PUSHMARK, 0); */
-    /* 	pushop->op_sibling = first; */
-    /* 	listop->op_first = pushop; */
-    /* 	listop->op_flags |= OPf_KIDS; */
-    /* 	if (!last) */
-    /* 	    listop->op_last = pushop; */
-    /* } */
 
     return CHECKOP(type, listop);
 }
