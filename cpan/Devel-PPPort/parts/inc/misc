@@ -478,7 +478,7 @@ Perl_ppaddr_t(string)
 		mXPUSHs(newSVpv(string, 0));
 		PUTBACK;
 		ENTER;
-		(void)*(lower)(aTHXR_ NULL);
+		(void)*(lower)(aTHXR_ NULL, NULL);
 		SPAGAIN;
 		LEAVE;
 		XSRETURN(1);

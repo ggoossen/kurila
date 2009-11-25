@@ -37,6 +37,7 @@ struct instruction {
     Perl_ppaddr_t	instr_ppaddr;
     OP*         instr_op;
     void*   instr_arg1;
+    void*   instr_arg2;
 };
 
 #define RUN_SET_NEXT_INSTRUCTION(instr)		\

@@ -2688,7 +2688,7 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
     case 0:
 	RUN_SET_NEXT_INSTRUCTION(NULL);
 	PL_op = (OP*)&myop;
-	PL_ppaddr[OP_ENTEREVAL](NULL);
+	PL_ppaddr[OP_ENTEREVAL](NULL, NULL);
 	CALLRUNOPS(aTHX);
 	break;
     default:

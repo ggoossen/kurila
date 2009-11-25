@@ -336,7 +336,7 @@ PP(pp_readline)
 	    dSP;
 	    XPUSHs(MUTABLE_SV(PL_last_in_gv));
 	    PUTBACK;
-	    pp_rv2gv(NULL);
+	    pp_rv2gv(NULL, NULL);
 	    PL_last_in_gv = MUTABLE_GV(*PL_stack_sp--);
 	}
     }
