@@ -300,3 +300,16 @@ label3:
     concat
     leave
     instr_end
+####
+%h and 1
+----
+    enter
+    nextstate
+    gv
+    rv2av
+    boolkeys
+    and         label1
+    const
+label1:
+    leave
+    instr_end
