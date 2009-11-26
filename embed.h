@@ -2267,6 +2267,7 @@
 #define pp_index		Perl_pp_index
 #define pp_instr_cond_jump	Perl_pp_instr_cond_jump
 #define pp_instr_const		Perl_pp_instr_const
+#define pp_instr_const_list	Perl_pp_instr_const_list
 #define pp_instr_end		Perl_pp_instr_end
 #define pp_instr_jump		Perl_pp_instr_jump
 #define pp_int			Perl_pp_int
@@ -2635,7 +2636,7 @@
 #endif
 #define do_join(a,b,c,d)	Perl_do_join(aTHX_ a,b,c,d)
 #ifdef PERL_CORE
-#define do_kv()			Perl_do_kv(aTHX)
+#define do_kv(a,b)		Perl_do_kv(aTHX_ a,b)
 #endif
 #define do_open9(a,b,c,d,e,f,g,h,i)	Perl_do_open9(aTHX_ a,b,c,d,e,f,g,h,i)
 #define do_openn(a,b,c,d,e,f,g,h,i)	Perl_do_openn(aTHX_ a,b,c,d,e,f,g,h,i)
@@ -4719,6 +4720,7 @@
 #define pp_index()		Perl_pp_index(aTHX)
 #define pp_instr_cond_jump()	Perl_pp_instr_cond_jump(aTHX)
 #define pp_instr_const()	Perl_pp_instr_const(aTHX)
+#define pp_instr_const_list()	Perl_pp_instr_const_list(aTHX)
 #define pp_instr_end()		Perl_pp_instr_end(aTHX)
 #define pp_instr_jump()		Perl_pp_instr_jump(aTHX)
 #define pp_int()		Perl_pp_int(aTHX)

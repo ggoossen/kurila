@@ -227,7 +227,6 @@
 #define PL_padix_floor		(vTHX->Ipadix_floor)
 #define PL_parser		(vTHX->Iparser)
 #define PL_patchlevel		(vTHX->Ipatchlevel)
-#define PL_peepp		(vTHX->Ipeepp)
 #define PL_perl_destruct_level	(vTHX->Iperl_destruct_level)
 #define PL_perldb		(vTHX->Iperldb)
 #define PL_perlio		(vTHX->Iperlio)
@@ -543,7 +542,6 @@
 #define PL_Ipadix_floor		PL_padix_floor
 #define PL_Iparser		PL_parser
 #define PL_Ipatchlevel		PL_patchlevel
-#define PL_Ipeepp		PL_peepp
 #define PL_Iperl_destruct_level	PL_perl_destruct_level
 #define PL_Iperldb		PL_perldb
 #define PL_Iperlio		PL_perlio

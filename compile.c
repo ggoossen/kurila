@@ -48,11 +48,13 @@ S_append_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o, INSTRUCTION** instrp)
 }
 
 void
-S_append_instruction_x(pTHX_ CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, Perl_ppaddr_t ppaddr, void* instr_arg1)
+S_append_instruction_x(pTHX_ CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o,
+    Perl_ppaddr_t ppaddr, void* instr_arg1, void* instr_arg2)
 {
     codeseq->xcodeseq_instructions[bpp->idx].instr_ppaddr = ppaddr;
     codeseq->xcodeseq_instructions[bpp->idx].instr_op = o;
     codeseq->xcodeseq_instructions[bpp->idx].instr_arg1 = instr_arg1;
+    codeseq->xcodeseq_instructions[bpp->idx].instr_arg2 = instr_arg2;
 
     bpp->idx++;
     if (bpp->idx >= codeseq->xcodeseq_size) {
@@ -65,7 +67,7 @@ S_append_instruction_x(pTHX_ CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, Per
 void
 S_append_instruction(pTHX_ CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, Optype optype)
 {
-    S_append_instruction_x(codeseq, bpp, o, PL_ppaddr[optype], NULL);
+    S_append_instruction_x(codeseq, bpp, o, PL_ppaddr[optype], NULL, NULL);
 }
 
 void
@@ -285,7 +287,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	S_add_op(codeseq, bpp, op_true, &kid_may_constant_fold, 0);
 
 	jump_idx = bpp->idx;
-	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
+	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL, NULL);
 
 	/* false branch */
 	S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
@@ -325,7 +327,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	if (has_condition) {
 	    S_add_op(codeseq, bpp, op_start, &kid_may_constant_fold, 0);
 	    cond_jump_idx = bpp->idx;
-	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_cond_jump, NULL);
+	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_cond_jump, NULL, NULL);
 	}
 
 	S_save_branch_point(bpp, &(cLOOPo->op_redo_instr));
@@ -337,7 +339,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 
 	/* loop */
 	if (has_condition) {
-	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, (void*)(start_idx - bpp->idx - 1));
+	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, (void*)(start_idx - bpp->idx - 1), NULL);
 
 	    S_save_instr_from_to_pparg(codeseq, cond_jump_idx, bpp->idx);
 	}
@@ -402,22 +404,22 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	S_append_instruction(codeseq, bpp, o, OP_ITER);
 
 	cond_jump_idx = bpp->idx;
-	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_cond_jump, NULL);
+	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_cond_jump, NULL, NULL);
 
 	S_save_branch_point(bpp, &(cLOOPo->op_redo_instr));
 	S_add_op(codeseq, bpp, op_block, &kid_may_constant_fold, 0);
 
 	S_save_branch_point(bpp, &(cLOOPo->op_next_instr));
-	S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_UNSTACK], NULL);
+	S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_UNSTACK], NULL, NULL);
 	if (op_cont)
 	    S_add_op(codeseq, bpp, op_cont, &kid_may_constant_fold, 0);
 
 	/* loop */
-	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
+	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL, NULL);
 	S_save_instr_from_to_pparg(codeseq, bpp->idx-1, start_idx);
 
 	S_save_instr_from_to_pparg(codeseq, cond_jump_idx, bpp->idx);
-	S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_LEAVELOOP], NULL);
+	S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_LEAVELOOP], NULL, NULL);
 
 	S_save_branch_point(bpp, &(cLOOPo->op_last_instr));
 		
@@ -453,7 +455,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	    */
 	    int start_idx;
 	    start_idx = bpp->idx;
-	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
+	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL, NULL);
 
 	    S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 	    S_add_op(codeseq, bpp, op_other, &kid_may_constant_fold, 0);
@@ -547,7 +549,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	S_add_op(codeseq, bpp, op_first, &kid_may_constant_fold, 0);
 
 	start_idx = bpp->idx;
-	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
+	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL, NULL);
 		    
 	S_save_branch_point(bpp, &(cLOGOPo->op_other_instr));
 	S_add_op(codeseq, bpp, op_other, &kid_may_constant_fold, 0);
@@ -590,11 +592,11 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 		
 	    if (kid_may_constant_fold) {
 		SV* constsv;
-		S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_INSTR_END], NULL);
+		S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_INSTR_END], NULL, NULL);
 		constsv = S_instr_fold_constants(&(codeseq->xcodeseq_instructions[start_idx]), o, TRUE);
 		if (constsv) {
 		    bpp->idx = start_idx; /* FIXME remove pointer sets from bpp */
-		    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_const_list, (void*)constsv);
+		    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_const_list, (void*)constsv, NULL);
 		    Perl_av_create_and_push(aTHX_ &codeseq->xcodeseq_svs, constsv);
 		}
 		else {
@@ -728,7 +730,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	S_append_instruction(codeseq, bpp, o, o->op_type);
 
 	start_idx = bpp->idx;
-	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
+	S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL, NULL);
 		    
 	S_save_branch_point(bpp, &(cPMOPo->op_pmreplroot_instr));
 	S_append_instruction(codeseq, bpp, cPMOPo->op_pmreplrootu.op_pmreplroot, OP_SUBSTCONT);
@@ -772,11 +774,11 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 
 	    S_append_instruction(codeseq, bpp, o, OP_SORT);
 	    start_idx = bpp->idx;
-	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL);
+	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_jump, NULL, NULL);
 	    if (has_block) {
 		S_save_branch_point(bpp, &(o->op_unstack_instr));
 		S_add_op(codeseq, bpp, cUNOPo->op_first, &kid_may_constant_fold, 0);
-		S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_INSTR_END], NULL);
+		S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_INSTR_END], NULL, NULL);
 	    }
 	    S_save_instr_from_to_pparg(codeseq, start_idx, bpp->idx);
 	}
@@ -803,7 +805,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	if (cUNOPo->op_first->op_type == OP_GV &&
 	    !(cUNOPo->op_private & OPpDEREF)) {
 	    GV* gv = cGVOPx_gv(cUNOPo->op_first);
-	    S_append_instruction_x(codeseq, bpp, o, PL_ppaddr[OP_GVSV], (void*)gv);
+	    S_append_instruction_x(codeseq, bpp, o, PL_ppaddr[OP_GVSV], (void*)gv, NULL);
 	    break;
 	}
 	S_add_kids(codeseq, bpp, o, &kid_may_constant_fold);
@@ -840,7 +842,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 		    op_arg->op_private |= o->op_private & OPpLVAL_DEFER;
 		    bpp->idx = start_idx;
 		    S_append_instruction_x(codeseq, bpp, op_arg,
-			Perl_pp_aelemfast, INT2PTR(void*, i));
+			Perl_pp_aelemfast, INT2PTR(void*, i), NULL);
 		    break;
 		}
 	    }
@@ -886,7 +888,7 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	    SvREFCNT_dec(*keysvp);
 	    *keysvp = shared_keysv;
 	}
-	S_append_instruction_x(codeseq, bpp, o, PL_ppaddr[o->op_type], (void*)flags);
+	S_append_instruction_x(codeseq, bpp, o, PL_ppaddr[o->op_type], (void*)flags, NULL);
 	break;
     }
     case OP_DELETE:
@@ -951,14 +953,19 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
     case OP_SASSIGN: {
 	OP* op_right = cBINOPo->op_first;
 	OP* op_left = cBINOPo->op_last;
-    	/* if (op_left->op_type == OP_PADSV */
-    	/*     && !(op_left->op_private & OPpLVAL_INTRO) */
-	/*     && (PL_opargs[op_right->op_type] & OA_TARGLEX) */
-	/*     ) { */
-	/*     assert(op_left->op_flags & OPf_STACKED); */
-	/*     S_add_op(codeseq, bpp, op_right, INSTRf_STACKED_TARG); */
-	/*     break; */
-	/* } */
+    	if (op_left && op_left->op_type == OP_PADSV
+    	    && !(op_left->op_private & OPpLVAL_INTRO)
+	    && (PL_opargs[op_right->op_type] & OA_TARGLEX)
+	    && (!(op_right->op_flags & OPf_STACKED))
+	    ) {
+	    assert(!(op_left->op_flags & OPf_STACKED));
+	    if (PL_opargs[op_right->op_type] & OA_MARK)
+		S_append_instruction(codeseq, bpp, NULL, OP_PUSHMARK);
+	    S_add_kids(codeseq, bpp, op_right, &kid_may_constant_fold);
+	    S_append_instruction_x(codeseq, bpp, op_right, PL_ppaddr[op_right->op_type], 
+		(void*)INSTRf_TARG_IN_ARG2, (void*)op_left->op_targ);
+	    break;
+	}
 	goto compile_default;
     }
     case OP_AASSIGN:
@@ -1067,12 +1074,12 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 
     if (kid_may_constant_fold && bpp->idx > start_idx + 1) {
     	SV* constsv;
-	S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_INSTR_END], NULL);
+	S_append_instruction_x(codeseq, bpp, NULL, PL_ppaddr[OP_INSTR_END], NULL, NULL);
     	constsv = S_instr_fold_constants(&(codeseq->xcodeseq_instructions[start_idx]), o, FALSE);
     	if (constsv) {
     	    bpp->idx = start_idx; /* FIXME remove pointer sets from bpp */
     	    SvREADONLY_on(constsv);
-    	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_const, (void*)constsv);
+    	    S_append_instruction_x(codeseq, bpp, NULL, Perl_pp_instr_const, (void*)constsv, NULL);
     	    Perl_av_create_and_push(aTHX_ &codeseq->xcodeseq_svs, constsv);
     	}
 	else {
@@ -1121,7 +1128,7 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 	bool may_constant_fold = TRUE;
 	S_add_op(codeseq, &bpp, startop, &may_constant_fold, 0);
 
-	S_append_instruction_x(codeseq, &bpp, NULL, PL_ppaddr[OP_INSTR_END], NULL);
+	S_append_instruction_x(codeseq, &bpp, NULL, PL_ppaddr[OP_INSTR_END], NULL, NULL);
     }
 
     /* mark remaining instruction with NULL */

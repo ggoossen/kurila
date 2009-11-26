@@ -490,8 +490,6 @@ END_EXTERN_C
 #define PL_parser		(*Perl_Iparser_ptr(aTHX))
 #undef  PL_patchlevel
 #define PL_patchlevel		(*Perl_Ipatchlevel_ptr(aTHX))
-#undef  PL_peepp
-#define PL_peepp		(*Perl_Ipeepp_ptr(aTHX))
 #undef  PL_perl_destruct_level
 #define PL_perl_destruct_level	(*Perl_Iperl_destruct_level_ptr(aTHX))
 #undef  PL_perldb

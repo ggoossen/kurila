@@ -864,7 +864,6 @@ PP(pp_rv2av)
     static const char a_hash[] = "a HASH";
     const bool is_pp_rv2av = PL_op->op_type == OP_RV2AV;
     const svtype type = is_pp_rv2av ? SVt_PVAV : SVt_PVHV;
-    PERL_UNUSED_VAR(pparg1);
 
     if (SvROK(sv)) {
       wasref:
@@ -966,7 +965,7 @@ PP(pp_rv2av)
 	/* The guts of pp_rv2hv  */
     if (gimme == G_ARRAY) { /* array wanted */
 	*PL_stack_sp = sv;
-	do_kv();
+	do_kv(pparg1, pparg2);
 	return NORMAL;
     }
     else if (gimme == G_SCALAR) {

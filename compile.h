@@ -68,7 +68,7 @@ struct codeseq {
     AV* xcodeseq_svs;                    /* Array with SVs to be freed with the codeseq */
 };
 
-#define INSTRf_STACKED_TARG       0x1
+#define INSTRf_TARG_IN_ARG2       0x1
 
 #define INSTRf_HELEM_MOD          0x2
 #define INSTRf_HELEM_MAYBE_LVSUB  0x4

@@ -1427,7 +1427,7 @@ finish:
 }
 
 int
-Perl_do_kv(pTHX)
+Perl_do_kv(pTHX_ void *pparg1, void *pparg2)
 {
     dVAR;
     dSP;

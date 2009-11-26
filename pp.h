@@ -77,10 +77,11 @@ Refetch the stack pointer.  Used after a callback.  See L<perlcall>.
 #define GETTARGETSTACKED targ = (PL_op->op_flags & OPf_STACKED ? POPs : PAD_SV(PL_op->op_targ))
 #define dTARGETSTACKED SV * GETTARGETSTACKED
 
-#define GETTARGET targ = PAD_SV(PL_op->op_targ)
+#define GETTARGET targ = PAD_SV((int)pparg1 & INSTRf_TARG_IN_ARG2 ? pparg2 : PL_op->op_targ)
 #define dTARGET SV * GETTARGET
 
-#define GETATARGET targ = (PL_op->op_flags & OPf_STACKED ? sp[-1] : PAD_SV(PL_op->op_targ))
+#define GETATARGET targ = ((int)pparg1 & INSTRf_TARG_IN_ARG2 ? PAD_SV(pparg2) \
+	: PL_op->op_flags & OPf_STACKED ? sp[-1] : PAD_SV(PL_op->op_targ))
 #define dATARGET SV * GETATARGET
 
 #define dTARG SV *targ
