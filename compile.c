@@ -7,6 +7,72 @@
  *
  */
 
+/*
+=head2 Code-generation
+
+The optree is translated into code. 
+C<compile_op> add the translation of C<o> branch to the codesequence.
+Which is used recursively to translate the whole optree.
+The default translation is to translate each op to the corresponding
+instruction using postfix order. If a the optype has a OA_MARK then
+before the children a "pp_pushmark" instruction is added.
+This is the default which is fine for ops which just operating on
+their arguments.
+Of course this doesn't work for ops like conditionals and loops, these
+ops have their own code generation in C<compile_op>. 
+
+During code-generation the codeseq generated may be realloc so, no
+pointers to it can be made.
+Also the optree may be shared between threads and may not be modified
+in any way.
+
+=head3 Constant folding
+
+C<compile_op> has the C<may_constant_fold> argument which should be
+set to false if the instructions added to the codesequence may not be
+constant folded.
+
+If a op may be constant folded and non of its children sets
+C<may_constant_fold> to false, the sequence of instruction can is
+converted by executing the instructions for this op and executing
+them, and replacing the instruction which a C<instr_const> instruction
+with the returned C<SV>.
+To save a instruction pointer to a C<pparg1> the
+C<save_instr_from_to_pparg> should be used.
+
+To handle special cases if there is a constant (or constant folded
+op), C<svp_const_instruction> can be used to retrieve the value of the
+constant of the last instruction (which should be constant or constant
+folded).
+
+=head3 Jump targets
+
+Jumping is done by setting the "next instruction pointer", to save the
+instruction C<save_branch_point> which saves the translation point
+into the address specified. Note that the during translation the
+addresses of the instruction are not yet fixed (they might be
+C<realloced>), so the addresses actually writing of the intruction
+address to the specified address happens at the end of the
+code-generation.
+
+=head3 Instruction arguments
+
+Because the optree can't be modified during code-generation, arguments
+can be added to the instruction, these have the C<void*> type by
+default so they should normally be typecasted.
+
+=head3 Debugging
+
+If perl is compiled with C<-DDEBUGGING> the command line options
+C<-DG> and C<-Dg> can be used. The C<-DG> option will dump the result
+of the code generation after it is finished (note that the labels in
+this dump are generation by the dump and only pointers to the
+instruction are present in the actual code). The C<-Dg> option will
+trace the code generation process.
+
+=cut
+*/
+
 #include "EXTERN.h"
 #define PERL_IN_COMPILE_C
 #include "perl.h"
@@ -863,13 +929,13 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	int start_idx;
 	int flags = 0;
 	if (o->op_flags & OPf_MOD)
-	    flags |= INSTRf_HELEM_MOD;
+	    flags |= INSTRf_MOD;
 	if (o->op_private & OPpMAYBE_LVSUB)
 	    flags |= INSTRf_HELEM_MAYBE_LVSUB;
 	if (o->op_private & OPpLVAL_DEFER)
 	    flags |= INSTRf_HELEM_LVAL_DEFER;
 	if (o->op_private & OPpLVAL_INTRO)
-	    flags |= INSTRf_HELEM_LVAL_INTRO;
+	    flags |= INSTRf_LVAL_INTRO;
 	if (o->op_flags & OPf_SPECIAL)
 	    flags |= INSTRf_HELEM_SPECIAL;
 	flags |= (o->op_private & OPpDEREF);
@@ -1031,6 +1097,20 @@ S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold
 	    break;
 	}
 	goto compile_default;
+    }
+
+    case OP_PADSV: {
+	int flags = 0;
+	if (o->op_flags & OPf_MOD)
+	    flags |= INSTRf_MOD;
+	if (o->op_private & OPpLVAL_INTRO)
+	    flags |= INSTRf_LVAL_INTRO;
+	if (o->op_private & OPpPAD_STATE)
+	    flags |= INSTRf_PAD_STATE;
+	flags |= o->op_private & OPpDEREF;
+	    
+	S_append_instruction_x(codeseq, bpp, o, PL_ppaddr[o->op_type], (void*)flags, (void*)o->op_targ);
+	break;
     }
 
     case OP_STUB:

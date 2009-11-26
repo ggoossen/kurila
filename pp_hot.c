@@ -307,16 +307,20 @@ PP(pp_concat)
 
 PP(pp_padsv)
 {
-    dVAR; dSP; dTARGET;
-    PERL_UNUSED_VAR(pparg1);
+    dVAR; dSP; /* dTARGET; */
+    dTARG;
+    const int flags = (const int)pparg1;
+    const PADOFFSET padindex = (const PADOFFSET)pparg2;
+    TARG = PAD_SV(padindex);
+    assert(padindex == PL_op->op_targ); 
     XPUSHs(TARG);
-    if (PL_op->op_flags & OPf_MOD) {
-	if (PL_op->op_private & OPpLVAL_INTRO)
-	    if (!(PL_op->op_private & OPpPAD_STATE))
-		SAVECLEARSV(PAD_SVl(PL_op->op_targ));
-        if (PL_op->op_private & OPpDEREF) {
+    if (flags & INSTRf_MOD) {
+	if (flags & INSTRf_LVAL_INTRO)
+	    if (!(flags & INSTRf_PAD_STATE))
+		SAVECLEARSV(PAD_SVl(padindex));
+        if (flags & OPpDEREF) {
 	    PUTBACK;
-	    vivify_ref(PAD_SVl(PL_op->op_targ), PL_op->op_private & OPpDEREF);
+	    vivify_ref(PAD_SVl(padindex), flags & OPpDEREF);
 	    SPAGAIN;
 	}
     }
@@ -1844,11 +1848,11 @@ PP(pp_helem)
     SV * const keysv = POPs;
     HV * const hv = MUTABLE_HV(POPs);
     int const flags = (int)pparg1;
-    const bool lval = flags & INSTRf_HELEM_MOD || ((flags & INSTRf_HELEM_MAYBE_LVSUB) && is_lvalue_sub());
+    const bool lval = flags & INSTRf_MOD || ((flags & INSTRf_HELEM_MAYBE_LVSUB) && is_lvalue_sub());
     const U32 defer = flags & INSTRf_HELEM_LVAL_DEFER;
     SV *sv;
     const U32 hash = (SvIsCOW_shared_hash(keysv)) ? SvSHARED_HASH(keysv) : 0;
-    const bool localizing = flags & INSTRf_HELEM_LVAL_INTRO;
+    const bool localizing = flags & INSTRf_LVAL_INTRO;
     bool preeminent = TRUE;
 
     if (SvTYPE(hv) != SVt_PVHV)
