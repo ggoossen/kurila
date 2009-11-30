@@ -509,12 +509,14 @@ if (!GLIPP) { x() } elsif (!GLIPP) { z() } elsif (GLIPP) { t() }
 if (!GLIPP) { x() } elsif (!GLIPP) { z() } elsif (!GLIPP) { t() }
 if (!GLIPP) { x() } elsif (!GLIPP) { z() } elsif (!GLIPP) { t() }
 >>>>
-x();
-x();
+x() if 1;
+x() if GLIPP;
 x() unless GLIPP;
-x();
+x() if GLIPP and GLIPP;
 x() if not GLIPP or GLIPP;
-x();
+x() if do {
+    GLIPP
+};
 x() if do {
     BEGIN {${^WARNING_BITS} = "TUUUUUUUUUUQ"}
     5;
@@ -523,28 +525,31 @@ x() if do {
 x() if do {
     not GLIPP
 };
-do {
-    x()
-};
+if (GLIPP) {
+    x();
+}
+else {
+    z();
+}
 if (not GLIPP) {
     x();
 }
 else {
     z();
 }
-do {
-    x()
-};
+if (GLIPP) {
+    x();
+}
+elsif (GLIPP) {
+    z();
+}
 if (not GLIPP) {
     x();
 }
-else {
+elsif (GLIPP) {
     z();
 }
-do {
-    x()
-};
-if (not GLIPP) {
+if (GLIPP) {
     x();
 }
 elsif (not GLIPP) {
@@ -556,7 +561,13 @@ if (not GLIPP) {
 elsif (not GLIPP) {
     z();
 }
-else {
+if (not GLIPP) {
+    x();
+}
+elsif (not GLIPP) {
+    z();
+}
+elsif (GLIPP) {
     t();
 }
 if (not GLIPP) {
