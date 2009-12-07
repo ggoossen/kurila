@@ -1210,48 +1210,6 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
     POPSTACK;
 }
 
-INSTRUCTION*
-Perl_codeseq_start_instruction(pTHX_ const CODESEQ* codeseq)
-{
-    PERL_ARGS_ASSERT_CODESEQ_START_INSTRUCTION;
-    return codeseq->xcodeseq_instructions;
-}
-
-CODESEQ*
-Perl_new_codeseq(pTHX)
-{
-    CODESEQ* codeseq;
-    Newxz(codeseq, 1, CODESEQ);
-    return codeseq;
-}
-
-void
-Perl_free_codeseq(pTHX_ CODESEQ* codeseq)
-{
-    if (!codeseq)
-        return;
-    SvREFCNT_dec(codeseq->xcodeseq_svs);
-    Safefree(codeseq->xcodeseq_instructions);
-    Safefree(codeseq);
-}
-
-const char*
-Perl_instruction_name(pTHX_ const INSTRUCTION* instr)
-{
-    Optype optype;
-    if (!instr)
-	return "(null)";
-    if (!instr->instr_ppaddr)
-	return "(finished)";
-
-    for (optype = 0; optype < OP_CUSTOM; optype++) {
-	if (PL_ppaddr[optype] == instr->instr_ppaddr) {
-	    return PL_op_name[optype];
-	}
-    }
-    return "(unknown)";
-}
-
 /* Checks if o acts as an in-place operator on an array. o points to the
  * assign op. Returns the the in-place operator if available or NULL otherwise */
 

@@ -11,7 +11,8 @@ cc_runtime.h		Macros need by runtime of compiler-generated code
 cflags.SH		A script that emits C compilation flags per file
 Changes			Describe how to peruse changes between releases
 compile.c			Compilation code
-compile.h			Compilation header
+instruction.h			Instruction header
+instruction.c			Instruction code
 config_h.SH		Produces config.h
 configpm		Produces lib/Config.pm
 Configure		Portability tool
