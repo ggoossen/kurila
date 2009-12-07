@@ -87,31 +87,11 @@ typedef struct op_instrpp OP_INSTRPP;
 
 struct branch_point_pad {
     int idx;
-    OP_INSTRPP* op_instrpp_compile;
     OP_INSTRPP* op_instrpp_list;
     OP_INSTRPP* op_instrpp_end;
     OP_INSTRPP* op_instrpp_append;
     int recursion;
 };
-
-void
-S_append_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, OP* o, INSTRUCTION** instrp)
-{
-    DEBUG_g(Perl_deb("adding branch point "); dump_op_short(o); Perl_deb("\n"));
-    if (bpp->op_instrpp_append >= bpp->op_instrpp_end) {
-	OP_INSTRPP* old_lp = bpp->op_instrpp_list;
-	int new_size = 128 + (bpp->op_instrpp_end - bpp->op_instrpp_list);
-	Renew(bpp->op_instrpp_list, new_size, OP_INSTRPP);
-	bpp->op_instrpp_end = bpp->op_instrpp_list + new_size;
-	bpp->op_instrpp_compile = bpp->op_instrpp_list + (bpp->op_instrpp_compile - old_lp);
-	bpp->op_instrpp_append = bpp->op_instrpp_list + (bpp->op_instrpp_append - old_lp);
-    }
-    assert(bpp->op_instrpp_append < bpp->op_instrpp_end);
-    bpp->op_instrpp_append->op = o;
-    bpp->op_instrpp_append->instrpp = instrp;
-    bpp->op_instrpp_append->instr_idx = -1;
-    bpp->op_instrpp_append++;
-}
 
 void
 S_append_instruction_x(pTHX_ CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o,
@@ -145,19 +125,13 @@ S_save_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, INSTRUCTION** instrp)
 	int new_size = 128 + (bpp->op_instrpp_end - bpp->op_instrpp_list);
 	Renew(bpp->op_instrpp_list, new_size, OP_INSTRPP);
 	bpp->op_instrpp_end = bpp->op_instrpp_list + new_size;
-	bpp->op_instrpp_compile = bpp->op_instrpp_list + (bpp->op_instrpp_compile - old_lp);
 	bpp->op_instrpp_append = bpp->op_instrpp_list + (bpp->op_instrpp_append - old_lp);
     }
     assert(bpp->op_instrpp_append < bpp->op_instrpp_end);
-    bpp->op_instrpp_append->op = bpp->op_instrpp_compile->op;
-    bpp->op_instrpp_append->instrpp = bpp->op_instrpp_compile->instrpp;
-    bpp->op_instrpp_append->instr_idx = bpp->op_instrpp_compile->instr_idx;
+    bpp->op_instrpp_append->op = NULL;
+    bpp->op_instrpp_append->instrpp = instrp;
+    bpp->op_instrpp_append->instr_idx = bpp->idx;
     bpp->op_instrpp_append++;
-
-    bpp->op_instrpp_compile->op = NULL;
-    bpp->op_instrpp_compile->instrpp = instrp;
-    bpp->op_instrpp_compile->instr_idx = bpp->idx;
-    bpp->op_instrpp_compile++;
 }
 
 /* Saves the instruction index difference to the pparg of the "instr_from_index" added instruction */
@@ -1195,7 +1169,6 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
     /* create scratch pad */
     Newx(bpp.op_instrpp_list, 128, OP_INSTRPP);
     bpp.idx = 0;
-    bpp.op_instrpp_compile = bpp.op_instrpp_list;
     bpp.op_instrpp_append = bpp.op_instrpp_list;
     bpp.op_instrpp_end = bpp.op_instrpp_list + 128;
 
@@ -1220,7 +1193,7 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
     {
 	/* resolve instruction pointers */
 	OP_INSTRPP* i;
-	for (i=bpp.op_instrpp_list; i<bpp.op_instrpp_compile; i++) {
+	for (i=bpp.op_instrpp_list; i<bpp.op_instrpp_append; i++) {
 	    assert(i->instr_idx != -1);
 	    if (i->instrpp)
 		*(i->instrpp) = &(codeseq->xcodeseq_instructions[i->instr_idx]);
