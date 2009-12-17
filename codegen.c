@@ -85,7 +85,7 @@ struct op_instrpp {
 
 typedef struct op_instrpp OP_INSTRPP;
 
-struct branch_point_pad {
+struct codegen_pad {
     int idx;
     OP_INSTRPP* op_instrpp_list;
     OP_INSTRPP* op_instrpp_end;
@@ -94,7 +94,7 @@ struct branch_point_pad {
 };
 
 void
-S_append_instruction_x(pTHX_ CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o,
+S_append_instruction_x(pTHX_ CODESEQ* codeseq, CODEGEN_PAD* bpp, OP* o,
     Perl_ppaddr_t ppaddr, void* instr_arg1, void* instr_arg2)
 {
     codeseq->xcodeseq_instructions[bpp->idx].instr_ppaddr = ppaddr;
@@ -111,13 +111,13 @@ S_append_instruction_x(pTHX_ CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o,
 }
 
 void
-S_append_instruction(pTHX_ CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, Optype optype)
+S_append_instruction(pTHX_ CODESEQ* codeseq, CODEGEN_PAD* bpp, OP* o, Optype optype)
 {
     S_append_instruction_x(codeseq, bpp, o, PL_ppaddr[optype], NULL, NULL);
 }
 
 void
-S_save_branch_point(pTHX_ BRANCH_POINT_PAD* bpp, INSTRUCTION** instrp)
+S_save_branch_point(pTHX_ CODEGEN_PAD* bpp, INSTRUCTION** instrp)
 {
     DEBUG_g(Perl_deb("registering branch point "); Perl_deb("\n"));
     if (bpp->op_instrpp_append >= bpp->op_instrpp_end) {
@@ -227,10 +227,10 @@ S_instr_fold_constants(pTHX_ INSTRUCTION* instr, OP* o, bool list)
 }
 
 void
-    S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold, int flags);
+    S_add_op(CODESEQ* codeseq, CODEGEN_PAD* bpp, OP* o, bool *may_constant_fold, int flags);
 
 void
-S_add_kids(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold)
+S_add_kids(CODESEQ* codeseq, CODEGEN_PAD* bpp, OP* o, bool *may_constant_fold)
 {
     if (o->op_flags & OPf_KIDS) {
 	OP* kid;
@@ -242,7 +242,7 @@ S_add_kids(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fo
 #define ADDOPf_BOOLEANCONTEXT  1
 
 void
-S_add_op(CODESEQ* codeseq, BRANCH_POINT_PAD* bpp, OP* o, bool *may_constant_fold, int flags)
+S_add_op(CODESEQ* codeseq, CODEGEN_PAD* bpp, OP* o, bool *may_constant_fold, int flags)
 {
     bool kid_may_constant_fold = TRUE;
     int start_idx = bpp->idx;
@@ -1156,7 +1156,7 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
 {
     dSP;
 
-    BRANCH_POINT_PAD bpp;
+    CODEGEN_PAD bpp;
 
     /* preserve current state */
     PUSHSTACKi(PERLSI_COMPILE);
@@ -1279,7 +1279,7 @@ S_is_inplace_av(pTHX_ OP *o) {
 }
 
 SV**
-S_svp_const_instruction(pTHX_ CODESEQ *codeseq, BRANCH_POINT_PAD *bpp, int instr_index)
+S_svp_const_instruction(pTHX_ CODESEQ *codeseq, CODEGEN_PAD *bpp, int instr_index)
 {
     INSTRUCTION* instr = &codeseq->xcodeseq_instructions[instr_index];
     PERL_ARGS_ASSERT_SVP_CONST_INSTRUCTION;
