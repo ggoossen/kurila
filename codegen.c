@@ -1208,6 +1208,7 @@ Perl_compile_op(pTHX_ OP* startop, CODESEQ* codeseq)
     DEBUG_G(codeseq_dump(codeseq));
 
     Safefree(bpp.op_instrpp_list);
+    Safefree(bpp.codeseq.xcodeseq_instructions);
 
     /* restore original state */
     FREETMPS ;
