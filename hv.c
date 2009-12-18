@@ -1491,7 +1491,7 @@ S_anonymise_cv(pTHX_ HEK *stash, SV *val)
 
     PERL_ARGS_ASSERT_ANONYMISE_CV;
 
-    if (val && isGV(val) && isGV_with_GP(val) && (cv = GvCV(val))) {
+    if (val && isGV(val) && isGV_with_GP(val) && (cv = GvCV(val)) && !PL_dirty) {
 	if ((SV *)CvGV(cv) == val) {
 	    GV *anongv;
 
