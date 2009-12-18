@@ -594,7 +594,7 @@ Perl_op_clear(pTHX_ OP *o)
 	       allowed to raise and lower references during global destruction,
 	       so any *valid* code that happens to do this during global
 	       destruction might well trigger premature cleanup.  */
-	    bool still_valid = gv && SvREFCNT(gv);
+	    bool still_valid = gv && !PL_dirty;
 
 	    if (still_valid)
 		SvREFCNT_inc_simple_void(gv);
