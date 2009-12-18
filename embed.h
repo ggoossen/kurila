@@ -2038,7 +2038,13 @@
 #define compile_op		Perl_compile_op
 #define compile_cv		Perl_compile_cv
 #define new_codeseq		Perl_new_codeseq
-#define free_codeseq		Perl_free_codeseq
+#define codeseq_refcnt_inc	Perl_codeseq_refcnt_inc
+#define codeseq_refcnt_dec	Perl_codeseq_refcnt_dec
+#endif
+#if defined(PERL_IN_INSTRUCTION_C) || defined(PERL_DECL_PROT)
+#ifdef PERL_CORE
+#define free_codeseq		S_free_codeseq
+#endif
 #endif
 #ifdef PERL_CORE
 #define instruction_name	Perl_instruction_name
@@ -4491,7 +4497,13 @@
 #define compile_op(a,b)		Perl_compile_op(aTHX_ a,b)
 #define compile_cv(a)		Perl_compile_cv(aTHX_ a)
 #define new_codeseq()		Perl_new_codeseq(aTHX)
-#define free_codeseq(a)		Perl_free_codeseq(aTHX_ a)
+#define codeseq_refcnt_inc(a)	Perl_codeseq_refcnt_inc(aTHX_ a)
+#define codeseq_refcnt_dec(a)	Perl_codeseq_refcnt_dec(aTHX_ a)
+#endif
+#if defined(PERL_IN_INSTRUCTION_C) || defined(PERL_DECL_PROT)
+#ifdef PERL_CORE
+#define free_codeseq(a)		S_free_codeseq(aTHX_ a)
+#endif
 #endif
 #ifdef PERL_CORE
 #define instruction_name(a)	Perl_instruction_name(aTHX_ a)

@@ -2260,7 +2260,11 @@ p	|INSTRUCTION*	|codeseq_start_instruction|NN const CODESEQ* codeseq
 Ep	|void	|compile_op|NN OP* startop|NN CODESEQ* codeseq
 Ep	|void	|compile_cv|NN CV* cv
 Eap	|CODESEQ*	|new_codeseq
-Ep	|void	|free_codeseq|NULLOK CODESEQ* codeseq
+Ep	|void	|codeseq_refcnt_inc|NN CODESEQ* codeseq
+Ep	|void	|codeseq_refcnt_dec|NULLOK CODESEQ* codeseq
+#if defined(PERL_IN_INSTRUCTION_C) || defined(PERL_DECL_PROT)
+s	|void	|free_codeseq|NULLOK CODESEQ* codeseq
+#endif
 p	|const char*	|instruction_name|NULLOK const INSTRUCTION* instr
 
 p	|const INSTRUCTION*	|run_get_next_instruction

@@ -5362,9 +5362,7 @@ Perl_cv_undef(pTHX_ CV *cv)
 
 	PAD_SAVE_SETNULLPAD();
 
-	/* hack to free codeseq */
-	if (CvROOT(cv)->op_targ == 1)
-	    free_codeseq(CvCODESEQ(cv));
+	codeseq_refcnt_dec(CvCODESEQ(cv));
 	op_free(CvROOT(cv));
 	CvROOT(cv) = NULL;
 	LEAVE;

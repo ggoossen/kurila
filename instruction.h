@@ -66,6 +66,7 @@ struct codeseq {
     int xcodeseq_size;                   /* Number of items in xcodeseq_instructions    */
     INSTRUCTION* xcodeseq_instructions;  /* List of xcodeseq_size items of INSTRUCTIONs */
     AV* xcodeseq_svs;                    /* Array with SVs to be freed with the codeseq */
+    int xcodeseq_refcnt;                 /* Reference count */
 };
 
 #define INSTRf_TARG_IN_ARG2       0x1

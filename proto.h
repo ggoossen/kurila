@@ -6800,7 +6800,15 @@ PERL_CALLCONV CODESEQ*	Perl_new_codeseq(pTHX)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV void	Perl_free_codeseq(pTHX_ CODESEQ* codeseq);
+PERL_CALLCONV void	Perl_codeseq_refcnt_inc(pTHX_ CODESEQ* codeseq)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_CODESEQ_REFCNT_INC	\
+	assert(codeseq)
+
+PERL_CALLCONV void	Perl_codeseq_refcnt_dec(pTHX_ CODESEQ* codeseq);
+#if defined(PERL_IN_INSTRUCTION_C) || defined(PERL_DECL_PROT)
+STATIC void	S_free_codeseq(pTHX_ CODESEQ* codeseq);
+#endif
 PERL_CALLCONV const char*	Perl_instruction_name(pTHX_ const INSTRUCTION* instr);
 
 PERL_CALLCONV const INSTRUCTION*	Perl_run_get_next_instruction(pTHX);

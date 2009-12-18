@@ -18,19 +18,34 @@ Perl_codeseq_start_instruction(pTHX_ const CODESEQ* codeseq)
     return codeseq->xcodeseq_instructions;
 }
 
+void
+Perl_codeseq_refcnt_inc(pTHX_ CODESEQ* codeseq)
+{
+    PERL_ARGS_ASSERT_CODESEQ_REFCNT_INC;
+    codeseq->xcodeseq_refcnt++;
+}
+
+void
+Perl_codeseq_refcnt_dec(pTHX_ CODESEQ* codeseq)
+{
+    if (!codeseq)
+	return;
+    if (! codeseq->xcodeseq_refcnt--)
+	free_codeseq(codeseq);
+}
+
 CODESEQ*
 Perl_new_codeseq(pTHX)
 {
     CODESEQ* codeseq;
     Newxz(codeseq, 1, CODESEQ);
+    codeseq->xcodeseq_refcnt = 1;
     return codeseq;
 }
 
-void
-Perl_free_codeseq(pTHX_ CODESEQ* codeseq)
+STATIC void
+S_free_codeseq(pTHX_ CODESEQ* codeseq)
 {
-    if (!codeseq)
-        return;
     SvREFCNT_dec(codeseq->xcodeseq_svs);
     Safefree(codeseq->xcodeseq_instructions);
     Safefree(codeseq);

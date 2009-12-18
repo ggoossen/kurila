@@ -1608,11 +1608,11 @@ Perl_cv_clone(pTHX_ CV *proto)
 
     if (!CvCODESEQ(proto)) {
 	compile_cv(cv);
-	/* shared the the compiled code with the proto */
 	CvCODESEQ(proto)       = CvCODESEQ(cv);
     }
     else
 	CvCODESEQ(cv)       = CvCODESEQ(proto);
+    codeseq_refcnt_inc(CvCODESEQ(proto));
 
     DEBUG_Xv(
 	PerlIO_printf(Perl_debug_log, "\nPad CV clone\n");
