@@ -614,8 +614,16 @@ Perl_yyparse (pTHX)
 	}
 
 	YYDSYMPRINTF ("Error: discarding", yytoken, &parser->yylval);
-	if (yy_type_tab[yytoken] == toketype_opval)
+	switch (yy_type_tab[yytoken]) {
+	case toketype_opval:
 	    op_free(parser->yylval.opval);
+	    break;
+	case toketype_p_tkval:
+	    Safefree(parser->yylval.pval);
+	    break;
+	default:
+	    break;
+	}
 	parser->yychar = YYEMPTY;
 
     }
