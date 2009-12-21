@@ -300,6 +300,7 @@ sub _cmd {
             my $vg_opts = $ENV{VG_OPTS}
               //  "--suppressions=perl.supp --leak-check=yes "
                 . "--leak-resolution=high --show-reachable=yes "
+                . "--child-silent-after-fork=yes "                   # ignore immediate exit from failed backticks
                   . "--num-callers=50";
             $perl = "$valgrind --log-fd=3 $vg_opts $perl";
             $redir = "3>$Valgrind_Log";
