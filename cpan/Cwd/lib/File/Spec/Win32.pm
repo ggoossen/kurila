@@ -302,8 +302,8 @@ sub catpath($self,$volume,$directory,$file)
     return $volume
 
 
-sub _same
-    (lc: @_[1]) eq lc: @_[2]
+sub _same(_, $v1, $v2)
+    (lc: $v1) eq lc: $v2
 
 
 sub rel2abs($self,$path,?$base)

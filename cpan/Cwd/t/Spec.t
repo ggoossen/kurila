@@ -48,60 +48,60 @@ if ($^OS_NAME eq 'MacOS')
 my @tests = @:
     # [ Function          ,            Expected          ,         Platform ]
 
-    \(@:  "Unix->case_tolerant()",         '0'  )
+    \(@:  "Unix->case_tolerant: ",         '0'  )
 
-    \(@:  "Unix->catfile('a','b','c')",         'a/b/c'  )
-    \(@:  "Unix->catfile('a','b','./c')",       'a/b/c'  )
-    \(@:  "Unix->catfile('./a','b','c')",       'a/b/c'  )
-    \(@:  "Unix->catfile('c')",                 'c' )
-    \(@:  "Unix->catfile('./c')",               'c' )
+    \(@:  "(Unix->catfile: 'a','b','c')",         'a/b/c'  )
+    \(@:  "(Unix->catfile: 'a','b','./c')",       'a/b/c'  )
+    \(@:  "(Unix->catfile: './a','b','c')",       'a/b/c'  )
+    \(@:  "(Unix->catfile: 'c')",                 'c' )
+    \(@:  "(Unix->catfile: './c')",               'c' )
 
-    \(@:  "Unix->splitpath('file')",            ',,file'            )
-    \(@:  "Unix->splitpath('/d1/d2/d3/')",      ',/d1/d2/d3/,'      )
-    \(@:  "Unix->splitpath('d1/d2/d3/')",       ',d1/d2/d3/,'       )
-    \(@:  "Unix->splitpath('/d1/d2/d3/.')",     ',/d1/d2/d3/.,'     )
-    \(@:  "Unix->splitpath('/d1/d2/d3/..')",    ',/d1/d2/d3/..,'    )
-    \(@:  "Unix->splitpath('/d1/d2/d3/.file')", ',/d1/d2/d3/,.file' )
-    \(@:  "Unix->splitpath('d1/d2/d3/file')",   ',d1/d2/d3/,file'   )
-    \(@:  "Unix->splitpath('/../../d1/')",      ',/../../d1/,'      )
-    \(@:  "Unix->splitpath('/././d1/')",        ',/././d1/,'        )
+    \(@:  "(Unix->splitpath: 'file')",            ',,file'            )
+    \(@:  "(Unix->splitpath: '/d1/d2/d3/')",      ',/d1/d2/d3/,'      )
+    \(@:  "(Unix->splitpath: 'd1/d2/d3/')",       ',d1/d2/d3/,'       )
+    \(@:  "(Unix->splitpath: '/d1/d2/d3/.')",     ',/d1/d2/d3/.,'     )
+    \(@:  "(Unix->splitpath: '/d1/d2/d3/..')",    ',/d1/d2/d3/..,'    )
+    \(@:  "(Unix->splitpath: '/d1/d2/d3/.file')", ',/d1/d2/d3/,.file' )
+    \(@:  "(Unix->splitpath: 'd1/d2/d3/file')",   ',d1/d2/d3/,file'   )
+    \(@:  "(Unix->splitpath: '/../../d1/')",      ',/../../d1/,'      )
+    \(@:  "(Unix->splitpath: '/././d1/')",        ',/././d1/,'        )
 
-    \(@:  "Unix->catpath('','','file')",            'file'            )
-    \(@:  "Unix->catpath('','/d1/d2/d3/','')",      '/d1/d2/d3/'      )
-    \(@:  "Unix->catpath('','d1/d2/d3/','')",       'd1/d2/d3/'       )
-    \(@:  "Unix->catpath('','/d1/d2/d3/.','')",     '/d1/d2/d3/.'     )
-    \(@:  "Unix->catpath('','/d1/d2/d3/..','')",    '/d1/d2/d3/..'    )
-    \(@:  "Unix->catpath('','/d1/d2/d3/','.file')", '/d1/d2/d3/.file' )
-    \(@:  "Unix->catpath('','d1/d2/d3/','file')",   'd1/d2/d3/file'   )
-    \(@:  "Unix->catpath('','/../../d1/','')",      '/../../d1/'      )
-    \(@:  "Unix->catpath('','/././d1/','')",        '/././d1/'        )
-    \(@:  "Unix->catpath('d1','d2/d3/','')",        'd2/d3/'          )
-    \(@:  "Unix->catpath('d1','d2','d3/')",         'd2/d3/'          )
+    \(@:  "(Unix->catpath: '','','file')",            'file'            )
+    \(@:  "(Unix->catpath: '','/d1/d2/d3/','')",      '/d1/d2/d3/'      )
+    \(@:  "(Unix->catpath: '','d1/d2/d3/','')",       'd1/d2/d3/'       )
+    \(@:  "(Unix->catpath: '','/d1/d2/d3/.','')",     '/d1/d2/d3/.'     )
+    \(@:  "(Unix->catpath: '','/d1/d2/d3/..','')",    '/d1/d2/d3/..'    )
+    \(@:  "(Unix->catpath: '','/d1/d2/d3/','.file')", '/d1/d2/d3/.file' )
+    \(@:  "(Unix->catpath: '','d1/d2/d3/','file')",   'd1/d2/d3/file'   )
+    \(@:  "(Unix->catpath: '','/../../d1/','')",      '/../../d1/'      )
+    \(@:  "(Unix->catpath: '','/././d1/','')",        '/././d1/'        )
+    \(@:  "(Unix->catpath: 'd1','d2/d3/','')",        'd2/d3/'          )
+    \(@:  "(Unix->catpath: 'd1','d2','d3/')",         'd2/d3/'          )
 
-    \(@:  "Unix->splitdir('')",           ''           )
-    \(@:  "Unix->splitdir('/d1/d2/d3/')", ',d1,d2,d3,' )
-    \(@:  "Unix->splitdir('d1/d2/d3/')",  'd1,d2,d3,'  )
-    \(@:  "Unix->splitdir('/d1/d2/d3')",  ',d1,d2,d3'  )
-    \(@:  "Unix->splitdir('d1/d2/d3')",   'd1,d2,d3'   )
+    \(@:  "(Unix->splitdir: '')",           ''           )
+    \(@:  "(Unix->splitdir: '/d1/d2/d3/')", ',d1,d2,d3,' )
+    \(@:  "(Unix->splitdir: 'd1/d2/d3/')",  'd1,d2,d3,'  )
+    \(@:  "(Unix->splitdir: '/d1/d2/d3')",  ',d1,d2,d3'  )
+    \(@:  "(Unix->splitdir: 'd1/d2/d3')",   'd1,d2,d3'   )
 
-    \(@:  "Unix->catdir()",                     ''          )
-    \(@:  "Unix->catdir('/')",                  '/'         )
-    \(@:  "Unix->catdir('','d1','d2','d3','')", '/d1/d2/d3' )
-    \(@:  "Unix->catdir('d1','d2','d3','')",    'd1/d2/d3'  )
-    \(@:  "Unix->catdir('','d1','d2','d3')",    '/d1/d2/d3' )
-    \(@:  "Unix->catdir('d1','d2','d3')",       'd1/d2/d3'  )
-    \(@:  "Unix->catdir('/','d2/d3')",          '/d2/d3'    )
+    \(@:  "(Unix->catdir: )",                     ''          )
+    \(@:  "(Unix->catdir: '/')",                  '/'         )
+    \(@:  "(Unix->catdir: '','d1','d2','d3','')", '/d1/d2/d3' )
+    \(@:  "(Unix->catdir: 'd1','d2','d3','')",    'd1/d2/d3'  )
+    \(@:  "(Unix->catdir: '','d1','d2','d3')",    '/d1/d2/d3' )
+    \(@:  "(Unix->catdir: 'd1','d2','d3')",       'd1/d2/d3'  )
+    \(@:  "(Unix->catdir: '/','d2/d3')",          '/d2/d3'    )
 
-    \(@:  "Unix->canonpath('///../../..//./././a//b/.././c/././')",   '/a/b/../c' )
-    \(@:  "Unix->canonpath('')",                       ''               )
+    \(@:  "(Unix->canonpath: '///../../..//./././a//b/.././c/././')",   '/a/b/../c' )
+    \(@:  "(Unix->canonpath: '')",                       ''               )
     # rt.perl.org 27052
-    \(@:  "Unix->canonpath('a/../../b/c')",            'a/../../b/c'    )
-    \(@:  "Unix->canonpath('/.')",                     '/'              )
-    \(@:  "Unix->canonpath('/./')",                    '/'              )
-    \(@:  "Unix->canonpath('/a/./')",                  '/a'             )
-    \(@:  "Unix->canonpath('/a/.')",                   '/a'             )
-    \(@:  "Unix->canonpath('/../../')",                '/'              )
-    \(@:  "Unix->canonpath('/../..')",                 '/'              )
+    \(@:  "(Unix->canonpath: 'a/../../b/c')",            'a/../../b/c'    )
+    \(@:  "(Unix->canonpath: '/.')",                     '/'              )
+    \(@:  "(Unix->canonpath: '/./')",                    '/'              )
+    \(@:  "(Unix->canonpath: '/a/./')",                  '/a'             )
+    \(@:  "(Unix->canonpath: '/a/.')",                   '/a'             )
+    \(@:  "(Unix->canonpath: '/../../')",                '/'              )
+    \(@:  "(Unix->canonpath: '/../..')",                 '/'              )
 
     \(@:   "Unix->abs2rel('/t1/t2/t3','/t1/t2/t3')",          '.'                  )
     \(@:   "Unix->abs2rel('/t1/t2/t4','/t1/t2/t3')",          '../t4'              )
@@ -713,7 +713,7 @@ do
     # Some funky stuff to override Cwd::getdcwd() for testing purposes,
     # in the limited scope of the rel2abs() method.
     if ($Cwd::VERSION)  # Avoid a 'used only once' warning
-        local $^WARNING = undef
+        local $^WARNING = 0
         *rel2abs = sub (@< @_)
             my $self = shift
             local $^WARNING = undef
@@ -751,7 +751,6 @@ sub tryfunc
         if ($platform && $^OS_NAME ne $platform)
             skip: "skip $function", 1
             return
-        
 
         $function =~ s/^([^\$].*->)/File::Spec::$1/
         my $got = eval $function

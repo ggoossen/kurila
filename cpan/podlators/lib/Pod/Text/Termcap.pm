@@ -70,13 +70,13 @@ sub new($self, @< @args)
 # Make level one headings bold.
 sub cmd_head1($self, $attrs, $text)
     $text =~ s/\s+$//
-     $self->SUPER::cmd_head1 : $attrs, "$self->{?BOLD}$text$self->{?NORM}"
+    $self->SUPER::cmd_head1 : $attrs, "$self->{?BOLD}$text$self->{?NORM}"
 
 
 # Make level two headings bold.
 sub cmd_head2($self, $attrs, $text)
     $text =~ s/\s+$//
-     $self->SUPER::cmd_head2 : $attrs, "$self->{?BOLD}$text$self->{?NORM}"
+    $self->SUPER::cmd_head2 : $attrs, "$self->{?BOLD}$text$self->{?NORM}"
 
 
 # Fix up B<> and I<>.  Note that we intentionally don't do F<>.

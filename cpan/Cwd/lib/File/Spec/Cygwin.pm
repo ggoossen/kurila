@@ -58,8 +58,7 @@ sub catdir
         shift
         return $self->SUPER::catdir: '', < @_
 
-
-     $self->SUPER::catdir: < @_
+    $self->SUPER::catdir: < @_
 
 
 =pod

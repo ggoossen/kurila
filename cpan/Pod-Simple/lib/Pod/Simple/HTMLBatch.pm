@@ -108,7 +108,7 @@ sub new
 sub muse
     my $self = shift
     if(($self->verbose: ))
-        print: $^STDOUT, 'T+', (int: time() - $self->{?'_batch_start_time'}), "s: ", < @_, "\n"
+        print: $^STDOUT, 'T+', (int: (time: ) - $self->{?'_batch_start_time'}), "s: ", < @_, "\n"
     
     return 1
 
@@ -144,7 +144,7 @@ sub _batch_convert_main($self, $dirs, $outdir)
     # $dirs is either false, or an arrayref.
     # $outdir is a pathspec.
 
-    $self->{+'_batch_start_time'} ||= time()
+    $self->{+'_batch_start_time'} ||= (time: )
 
     $self->muse:  "= ", (scalar: localtime) 
     $self->muse:  "Starting batch conversion to \"$outdir\"" 

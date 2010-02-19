@@ -46,7 +46,7 @@ do
     @ARGV = @: $self, $self
 
     (cat: )
-    is:  (scalar:  $out =~ s/use_ok\( 'ExtUtils::Command'//g), 2
+    is:  (scalar:  $out =~ s/use_ok:  'ExtUtils::Command'//g), 4
          'concatenation worked' 
 
     # the truth value here is reversed -- Perl true is shell false

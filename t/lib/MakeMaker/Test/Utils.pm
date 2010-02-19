@@ -205,8 +205,6 @@ sub make_macro
             $macros .= qq{/macro="$key=$val"}
         else
             $macros .= qq{ $key=$val}
-        
-    
 
     return $is_mms ?? "$make$macros $target" !! "$make $target $macros"
 

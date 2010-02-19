@@ -43,7 +43,7 @@ sub TEST($string, ?$name)
     $t = eval $string
     $t =~ s/([A-Z]+)\(0x[0-9a-f]+\)/$1(0xdeadbeef)/g
         if ($WANT =~ m/deadbeef/)
-    ok: $t eq $WANT and not $^EVAL_ERROR
+    ok: ($t eq $WANT and not $^EVAL_ERROR)
     if ($^EVAL_ERROR)
         diag: "error: $(($^EVAL_ERROR->message: ))"
     elsif ($t ne $WANT)
@@ -114,4 +114,4 @@ $WANT = <<'EOT'
 #$6 = $a->[1]->{"c"};
 EOT
 
-TEST: q(Data::Dumper->Dump(\(@: $a,$b,$c), \(@: <qw(a b), 6)))
+TEST: q(Data::Dumper->Dump: \(@: $a,$b,$c), \(@: < qw(a b), 6))

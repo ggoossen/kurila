@@ -30,8 +30,8 @@ while(nelems @from)
     my $p = $x->new: 
     my($got, $exp)
     (is: scalar: ($got = ($x->_out: 
-       # Mutor:
-       sub 
+                    # Mutor:
+                    sub 
                          @_[0]->code_handler: sub { $more .= @_[1] . ":" . @_[0] . "\n"       } 
                          @_[0]->cut_handler:  sub { $more .= "~" . @_[1] . ":" .  @_[0]. "\n" } 
                      => join: "\n", @:
@@ -45,8 +45,7 @@ while(nelems @from)
                                   ""
                                   ""
                     ))
-         => (scalar: ($exp = $expected)));
-        ;
+         => (scalar: ($exp = $expected)))
     unless($got eq $exp)
         print: $^STDOUT, '# Got vs exp:\n# ', < (Pod::Simple::BlackBox::pretty: $got)
                "\n# ", <(Pod::Simple::BlackBox::pretty: $exp), "\n"

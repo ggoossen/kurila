@@ -126,8 +126,7 @@ sub initialize
     $self->%{+INDENTS}  = \$@              # Stack of indentations.
     $self->%{+MARGIN}   = $self->%{?indent}  # Current left margin in spaces.
 
-        $self->SUPER::initialize: 
-
+    $self->SUPER::initialize:
 
 
 ############################################################################
@@ -145,7 +144,7 @@ sub command
     return if ($self->%{?EXCLUDE} && $command ne 'end')
     $self->item : "\n" if defined $self->%{?ITEM}
     $command = 'cmd_' . $command
-     $self->?$command : < @_
+    $self->?$command : < @_
 
 
 # Called for a verbatim paragraph.  Gets the paragraph, the line number, and
@@ -520,7 +519,7 @@ sub reformat
 
 
 # Output text to the output device.
-sub output { @_[1] =~ s/\01/ /g; (print: @_[0]->output_handle: )  ,@_[1]) }
+sub output { @_[1] =~ s/\01/ /g; (print: (@_[0]->output_handle: )  ,@_[1]) }
 
 
 ############################################################################

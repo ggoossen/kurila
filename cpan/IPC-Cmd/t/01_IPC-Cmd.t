@@ -113,8 +113,8 @@ do   ### list of commands and regexes matching output ###
 do   ### list of commands and regexes matching output ###
     my $map = \@:
         # command                                    # output regex
-        \(@:  "$^EXECUTABLE_NAME -e'warn 42'",                          qr/^42 /, )
-        \(@:  \(@: $^EXECUTABLE_NAME, "-e'warn 42'"),                       qr/^42 /, )
+        \(@:  "$^EXECUTABLE_NAME -e'warn: 42'",                          qr/^42 /, )
+        \(@:  \(@: $^EXECUTABLE_NAME, "-e'warn: 42'"),                       qr/^42 /, )
         
 
     diag:  "Running tests that print only to stderr"  if $Verbose

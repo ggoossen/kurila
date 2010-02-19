@@ -327,8 +327,8 @@ sub start_L($self, $flags)
       $url = $flags->{'to'}->as_string: 
     elsif ($flags->{'type'} eq 'pod')
       $url .= ($self->perldoc_url_prefix: ) || ''
-      $url .= $flags->{'to'}->as_string: ) || ''
-      $url .= '/' . $flags->{'section'}->as_string: ) if ($flags->{?'section'})
+      $url .= ($flags->{'to'}->as_string: ) || ''
+      $url .= '/' . ($flags->{'section'}->as_string: ) if ($flags->{?'section'})
       $url .= ($self->perldoc_url_postfix: ) || ''
 #    require Data::Dumper
 #    print STDERR Data::Dumper->Dump([$flags])

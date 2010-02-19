@@ -37,7 +37,7 @@ sub _succeed
         use version; our $VERSION = qv('0.0.2');
         use version; our $VERSION = qv('3.0.14');
         (our $VERSION) = '$Revision: 2.03 $' =~ m/\s(\d+\.\d+)\s/; 
-        ( our $VERSION ) = sprintf '%d.%02d', q$Revision: 1.23 $ =~ m/ (\d+) \. (\d+) /gx;
+        ( our $VERSION ) = sprintf: '%d.%02d', q$Revision: 1.23 $ =~ m/ (\d+) \. (\d+) /gx;
         ($GD::Graph::area::VERSION) = '$Revision: 1.16.2.3 $' =~ m/\s([\d.]+)/;
         ($GD::Graph::axestype::VERSION) = '$Revision: 1.44.2.14 $' =~ m/\s([\d.]+)/;
         ($GD::Graph::colour::VERSION) = '$Revision: 1.10 $' =~ m/\s([\d.]+)/;
@@ -45,8 +45,8 @@ sub _succeed
         ($GD::Text::Align::VERSION) = '$Revision: 1.18 $' =~ m/\s([\d.]+)/;
         our $VERSION = qv('0.0.1');
         use version; our $VERSION = qv('0.0.3');
-        our $VERSION = do { my @r = @: ( my $v = q<Version value="0.20.1"> ) =~ m/\d+/g ; sprintf '%d.%02d', @r[0], int( @r[1] / 10 ) };
-        (our $VERSION) = sprintf '%i.%03i', < split(m/\./, (@: '$Revision: 2.0 $' =~ m/Revision: (\S+)\s/)[0]); # $Date: 2005/11/16 02:16:00 $
+        our $VERSION = do { my @r = @: ( my $v = q<Version value="0.20.1"> ) =~ m/\d+/g ; sprintf: '%d.%02d', @r[0], int( @r[1] / 10 ) };
+        (our $VERSION) = sprintf: '%i.%03i', < split(m/\./, (@: '$Revision: 2.0 $' =~ m/Revision: (\S+)\s/)[0]); # $Date: 2005/11/16 02:16:00 $
         (our  $VERSION = q($Id: Tidy.pm,v 1.56 2006/07/19 23:13:33 perltidy Exp $) ) =~ s/^.*\s+(\d+)\/(\d+)\/(\d+).*$/$1$2$3/; # all one line for MakeMaker
         (our $VERSION) = q $Revision: 2.120 $ =~ m/([\d.]+)/;
         (our $VERSION) = q$Revision: 1.00 $ =~ m/([\d.]+)/;

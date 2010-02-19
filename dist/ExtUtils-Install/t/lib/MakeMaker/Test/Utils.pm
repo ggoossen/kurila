@@ -221,7 +221,7 @@ touched.
 
 =cut
 
-sub calibrate_mtime
+sub calibrate_mtime()
     (open: my $file, ">", "calibrate_mtime.tmp") || die: $^OS_ERROR
     print: $file, "foo"
     close $file

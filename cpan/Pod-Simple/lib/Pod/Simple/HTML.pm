@@ -246,10 +246,10 @@ sub do_beginning
     if(($self->html_css: ))
         my $link =
             ($self->html_css: ) =~ m/</
-            ?? $self->html_css:  # It's a big blob of markup, let's drop it in
+            ?? ($self->html_css: )  # It's a big blob of markup, let's drop it in
             !! sprintf:         # It's just a URL, so let's wrap it up
-            qq[<link rel="stylesheet" type="text/css" title="pod_stylesheet" href="\%s">\n], <
-                ($self->html_css: )
+                 qq[<link rel="stylesheet" type="text/css" title="pod_stylesheet" href="\%s">\n], <
+                     ($self->html_css: )
             
         $after =~ s{(</head>)}{$link\n$1}i  # otherwise nevermind
     
@@ -258,10 +258,10 @@ sub do_beginning
     if(($self->html_javascript: ))
         my $link =
             ($self->html_javascript: ) =~ m/</
-            ?? $self->html_javascript:  # It's a big blob of markup, let's drop it in
+            ?? ($self->html_javascript: )  # It's a big blob of markup, let's drop it in
             !! sprintf:         # It's just a URL, so let's wrap it up
-            qq[<script type="text/javascript" src="\%s"></script>\n], <
-                ($self->html_javascript: )
+                 qq[<script type="text/javascript" src="\%s"></script>\n], <
+                     ($self->html_javascript: )
             
         $after =~ s{(</head>)}{$link\n$1}i  # otherwise nevermind
     
@@ -447,7 +447,7 @@ sub _do_middle_main_loop
                 while(1)
                     push: @to_unget, $self->get_token: 
                     last if @to_unget[-1]->is_end: 
-                      and @to_unget[-1]->tagname: ) eq $tagname
+                      and (@to_unget[-1]->tagname: ) eq $tagname
 
                 # TODO: support for X<...>'s found in here?  (maybe hack into linearize_tokens)
                 
@@ -547,7 +547,7 @@ sub do_link($self, $token)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub do_url_link { return @_[1]->attr: 'to') }
+sub do_url_link { return @_[1]->attr: 'to' }
 
 sub do_man_link { return undef }
 # But subclasses are welcome to override this if they have man
@@ -666,10 +666,9 @@ sub general_url_escape($self, $string)
 sub resolve_pod_page_link
     # resolve_pod_page_link must return a properly escaped URL
     my $self = shift
-    return $self->batch_mode: 
+    return ($self->batch_mode: )
         ?? $self->resolve_pod_page_link_batch_mode: < @_
         !! $self->resolve_pod_page_link_singleton_mode: < @_
-    
 
 
 sub resolve_pod_page_link_singleton_mode($self, $it)
@@ -744,11 +743,9 @@ sub linearize_tokens  # self, tokens
             # Ignore until the end of this X<...> sequence:
             my $x_open = 1
             while($x_open)
-                next if( ($t = shift @_)->is_text: ) )
-                if(   $t->is_start:  and ($t->tag: ) eq 'X') { ++$x_open }
-                    elsif($t->is_end:    and ($t->tag: ) eq 'X') { --$x_open }
-            
-        
+                next if( ($t = shift @_)->is_text: )
+                if ( $t->is_start:  and ($t->tag: ) eq 'X') { ++$x_open }
+                elsif($t->is_end:    and ($t->tag: ) eq 'X') { --$x_open }
     
     return undef if length $out +> $Linearization_Limit
     return $out

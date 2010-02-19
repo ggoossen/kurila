@@ -28,7 +28,7 @@ do
         
 
     ok:  $rv{?uptodate},    q[Verify self] 
-    is:  $rv{version}->stringify: ), $Module::Load::Conditional::VERSION
+    is:  ($rv{version}->stringify: ), $Module::Load::Conditional::VERSION
          q[  Found proper version] 
 
     ### break up the specification
@@ -90,7 +90,7 @@ do
 do {   my $rv =( check_install:  module => 'InPod' );
     ok:  $rv,                        'Testing $VERSION in POD' ;
     ok:  $rv{?version},             "   Version found" ;
-    is:  $rv{version}->stringify: ), 2,          "   Version is correct" ;
+    is:  ($rv{version}->stringify: ), 2,          "   Version is correct" ;
 }
 
 ### test beta/developer release versions
@@ -189,6 +189,6 @@ do {   local $Module::Load::Conditional::CHECK_INC_HASH = 1;
     is:  $href{?'version'}, $^PID, '   Found correct version' ;
     ok:  $href{?'uptodate'},    '   Marked as uptodate' ;
     ok: ( can_load:  modules => \(%:  'A::B::C::D' => 0 ) )
-         '   can_load successful' ;
+        '   can_load successful' ;
 }
 

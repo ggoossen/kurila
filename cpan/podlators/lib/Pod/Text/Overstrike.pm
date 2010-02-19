@@ -82,9 +82,9 @@ sub heading($self, $text, $indent, $marker)
 
 
 # Fix the various formatting codes.
-sub cmd_b { local $_ = @_[0]->strip_format : @_[2]); s/(.)/$1\b$1/g; $_ }
-sub cmd_f { local $_ = @_[0]->strip_format : @_[2]); s/(.)/_\b$1/g; $_ }
-sub cmd_i { local $_ = @_[0]->strip_format : @_[2]); s/(.)/_\b$1/g; $_ }
+sub cmd_b { local $_ = @_[0]->strip_format : @_[2]; s/(.)/$1\b$1/g; $_ }
+sub cmd_f { local $_ = @_[0]->strip_format : @_[2]; s/(.)/_\b$1/g; $_ }
+sub cmd_i { local $_ = @_[0]->strip_format : @_[2]; s/(.)/_\b$1/g; $_ }
 
 # Output any included code in bold.
 sub output_code($self, $code)

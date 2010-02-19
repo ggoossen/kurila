@@ -101,12 +101,11 @@ sub new
     (DEBUG: )+> 2 and print: $^STDOUT, "To accept: ", (join: ' ', @_to_accept), "\n"
     $new->doc_lang: 
         (  (env::var: 'RTFDEFLANG') || '') =~ m/^(\d{1,10})$/s ?? $1
-        !! ((env::var: 'RTFDEFLANG') || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ?? hex: $1
-        # yes, tolerate hex!
-        !! ((env::var: 'RTFDEFLANG') || '') =~ m/^([a-fA-F0-9]{4})$/s ?? hex: $1
-        # yes, tolerate even more hex!
+            !! ((env::var: 'RTFDEFLANG') || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ?? hex: $1
+            # yes, tolerate hex!
+            !! ((env::var: 'RTFDEFLANG') || '') =~ m/^([a-fA-F0-9]{4})$/s ?? hex: $1
+            # yes, tolerate even more hex!
             !! '1033'
-        
 
     $new->head1_halfpoint_size: 32
     $new->head2_halfpoint_size: 28
@@ -238,23 +237,23 @@ sub do_middle      # the main work
                     # Erroneously used to be "unshift" instead of pop!  Adds instead
                     # of removes, and operates on the beginning instead of the end!
 
-                    if(@to_unget[-1]->type: ) eq 'text')
-                        if( ($text_count_here += length @to_unget[-1]->text_r: )->$) +> 150 )
+                    if ((@to_unget[-1]->type: ) eq 'text')
+                        if( ($text_count_here += length (@to_unget[-1]->text_r: )->$) +> 150 )
                             (DEBUG: )+> 1 and print: $^STDOUT, "    item-* is too long to be keepn'd.\n"
                             last
                         
                     elsif ((nelems @to_unget) +> 1 and
-                        @to_unget[-2]->type: ) eq 'end' and
-                        @to_unget[-2]->tagname: ) =~ m/^item-/s
+                        (@to_unget[-2]->type: ) eq 'end' and
+                        (@to_unget[-2]->tagname: ) =~ m/^item-/s
                         )
                         # Bail out here, after setting rtfitemkeepn yea or nay.
                         $self->{+'rtfitemkeepn'} = '\keepn' if
-                              @to_unget[-1]->type: ) eq 'start' and
-                              @to_unget[-1]->tagname: ) eq 'Para'
+                              (@to_unget[-1]->type: ) eq 'start' and
+                              (@to_unget[-1]->tagname: ) eq 'Para'
 
                         (DEBUG: )+> 1 and printf: $^STDOUT, "    item-* before \%s(\%s) \%s keepn'd.\n", <
-                                                      @to_unget[-1]->type: )
-                                                  @to_unget[-1]->can: 'tagname') ?? < @to_unget[-1]->tagname: ) !! ''
+                                                      (@to_unget[-1]->type: )
+                                                  (@to_unget[-1]->can: 'tagname') ?? < (@to_unget[-1]->tagname: ) !! ''
                                                   $self->{?'rtfitemkeepn'} ?? "gets" !! "doesn't get"
                         last
                     elsif ((nelems @to_unget) +> 40)
@@ -343,7 +342,7 @@ sub do_end
 ###########################################################################
 
 sub stylesheet
-    return sprintf: <<'END', <
+    return sprintf: <<'END',
 {\stylesheet
 {\snext0 Normal;}
 {\*\cs10 \additive Default Paragraph Font;}
@@ -369,13 +368,11 @@ sub stylesheet
 }
 
 END
-
-                        @_[0]->codeblock_halfpoint_size: ), <
-                        @_[0]->head1_halfpoint_size: ), <
-                        @_[0]->head2_halfpoint_size: ), <
-                        @_[0]->head3_halfpoint_size: ), <
-                        @_[0]->head4_halfpoint_size: )
-    
+                    < (@_[0]->codeblock_halfpoint_size: )
+                    < (@_[0]->head1_halfpoint_size: )
+                    < (@_[0]->head2_halfpoint_size: )
+                    < (@_[0]->head3_halfpoint_size: )
+                    < (@_[0]->head4_halfpoint_size: )
 
 
 ###########################################################################
@@ -431,7 +428,7 @@ END
 
         # None of the following things should need escaping, I dare say!
                     $tag
-                    @ISA[0], < @ISA[0]->VERSION: )
+                    @ISA[0], < (@ISA[0]->VERSION: )
                     $^PERL_VERSION, (scalar: gmtime)
     
 
@@ -497,7 +494,7 @@ sub rtf_esc_codely
     ($x = (((nelems @_) == 1) ?? @_[0] !! (join: '', @_))
      ) =~ s/([F\x[00]-\x[1F]\\\{\}\x[7F]-\x[FF]])/%Escape{?$1}/g  # ESCAPER
     # Escape \, {, }, -, control chars, and 7f-ff.
-    $x =~ s/([^\x00-\xFF])/$('\\uc1\\u'.(((ord: $1)+<32768)??(ord: $1)!!((ord: $1)-65536)).'?')/g
+    $x =~ s/([^\x[00]-\x[FF]])/$('\\uc1\\u'.(((ord: $1)+<32768)??(ord: $1)!!((ord: $1)-65536)).'?')/g
     return $x
 
 

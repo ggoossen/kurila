@@ -94,8 +94,8 @@ END
     
 
 
-sub setup_recurs
-    (setup_mm_test_root: )
+sub setup_recurs()
+    setup_mm_test_root:
     chdir 'MM_TEST_ROOT:[t]' if $Is_VMS
 
     while(my(@: ?$file, ?$text) =(@:  each %Files))
@@ -107,7 +107,6 @@ sub setup_recurs
         (open: my $fh, ">", "$file") || die: "Can't create $file: $^OS_ERROR"
         print: $fh, $text
         close $fh
-    
 
     return 1
 

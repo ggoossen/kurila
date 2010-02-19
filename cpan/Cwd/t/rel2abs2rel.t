@@ -14,7 +14,7 @@ use Test::More (-x $^EXECUTABLE_NAME
 BEGIN                                 # Set up a tiny script file
     open: my $f, ">", "rel2abs2rel$^PID.pl"
         or die: "Can't open rel2abs2rel$^PID.pl file for script -- $^OS_ERROR\n"
-    print: $f, qq(print \$^STDOUT, "ok\\n"\n)
+    print: $f, qq(print: \$^STDOUT, "ok\\n"\n)
     close: $f
 
 END 

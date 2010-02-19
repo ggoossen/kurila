@@ -455,8 +455,7 @@ sub initialize
         unless exists $self->{Label}
 
     # Run base initialize
-        $self->SUPER::initialize: 
-
+    $self->SUPER::initialize:
 
 
 =back
@@ -1409,7 +1408,7 @@ sub add_item
     return if $self->{?_suppress_all_para}
 
     # Check to see whether we are starting a new lists
-    if ((nelems: ($self->lists: )->[-1]->item: )) == 0)
+    if ((nelems: ($self->lists: )->[-1]->item: ) == 0)
 
         # Examine the paragraph to determine what type of list
         # we have

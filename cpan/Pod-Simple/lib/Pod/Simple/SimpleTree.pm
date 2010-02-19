@@ -17,15 +17,15 @@ __PACKAGE__->_accessorize:
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sub _handle_element_start # self, tagname, attrhash
-    (DEBUG: )+> 2 and print: $^STDOUT, "Handling @_[1] start-event\n"
-    my $x = \@: @_[1], @_[2]
-    if(@_[0]->{?'_currpos'})
-        push: @_[0]->{'_currpos'}->[0]->@, $x # insert in parent's child-list
-        unshift: @_[0]->{'_currpos'}->@,    $x # prefix to stack
+sub _handle_element_start($self, $tagname ,$attrhash)
+    (DEBUG: )+> 2 and print: $^STDOUT, "Handling $tagname start-event\n"
+    my $x = \@: $tagname, $attrhash
+    if($self->{?'_currpos'})
+        push: $self->{'_currpos'}->[0]->@, $x # insert in parent's child-list
+        unshift: $self->{'_currpos'}->@,    $x # prefix to stack
     else
         DEBUG: and print: $^STDOUT, " And oo, it gets to be root!\n"
-        @_[0]->{+'_currpos'} = \ @: (  @_[0]->{+'root'} = $x )
+        $self->{+'_currpos'} = \ @: (  $self->{+'root'} = $x )
     # first event!  set to stack, and set as root.
     
     (DEBUG: )+> 3 and print: $^STDOUT, "Stack is now: "
@@ -33,24 +33,23 @@ sub _handle_element_start # self, tagname, attrhash
     return
 
 
-sub _handle_element_end # self, tagname
-    (DEBUG: )+> 2 and print: $^STDOUT, "Handling @_[1] end-event\n"
-    shift @_[0]->{'_currpos'}->@
+sub _handle_element_end($self, $tagname)
+    (DEBUG: )+> 2 and print: $^STDOUT, "Handling $tagname end-event\n"
+    shift $self->{'_currpos'}->@
     (DEBUG: )+> 3 and print: $^STDOUT, "Stack is now: "
-                             (join: ">", (map: { $_->[0] }, @_[0]->{'_currpos'}->@)), "\n"
+                             (join: ">", (map: { $_->[0] }, $self->{'_currpos'}->@)), "\n"
     return
 
 
-sub _handle_text # self, text
-    (DEBUG: )+> 2 and print: $^STDOUT, "Handling @_[1] text-event\n"
-    push: @_[0]->{'_currpos'}->[0]->@, @_[1]
+sub _handle_text($self, $text)
+    (DEBUG: )+> 2 and print: $^STDOUT, "Handling $text text-event\n"
+    push: $self->{'_currpos'}->[0]->@, $text
     return
-
 
 
 # A bit of evil from the black box...  please avert your eyes, kind souls.
 sub _traverse_treelet_bit
-    (DEBUG: )+> 2 and print: $^STDOUT, "Handling @_[1] paragraph event\n"
+    0+(DEBUG: )+> 2 and print: $^STDOUT, "Handling @_[1] paragraph event\n"
     my $self = shift
     push: $self->{'_currpos'}->[0]->@, \ @_
     return

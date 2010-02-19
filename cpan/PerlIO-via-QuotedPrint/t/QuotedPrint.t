@@ -40,7 +40,7 @@ ok:  (close:  $out ),                      'closing encoding handle'
 do
     local $^INPUT_RECORD_SEPARATOR = undef
     ok:  (open:  my $test, "<",$file ),            'opening without layer' 
-    is:  $encoded,(readline:  $test ,             'check encoded content' 
+    is:  $encoded,(readline:  $test) ,             'check encoded content' 
     ok:  (close:  $test ),                 'close test handle' 
 
 # Check decoding _with_ layers

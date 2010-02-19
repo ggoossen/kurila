@@ -178,11 +178,9 @@ sub rename_country
     my $country
     my $c
 
-
     if (not defined $codeset)
         warn: "rename_country(): unknown country code \"$code\"\n"
         return 0
-    
 
     $country = $CODES[$codeset]{?$code}
 
@@ -215,7 +213,7 @@ sub _code2codeset
     my $code = shift
 
 
-    foreach my $codeset (@: (LOCALE_CODE_ALPHA_2: ) (LOCALE_CODE_ALPHA_3: )
+    foreach my $codeset (@: (LOCALE_CODE_ALPHA_2: ), (LOCALE_CODE_ALPHA_3: )
                             (LOCALE_CODE_NUMERIC: ))
         return $codeset if (exists $CODES[$codeset]{$code})
 

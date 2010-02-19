@@ -32,7 +32,7 @@ do {   ok:  (allow:  42, qr/^\d+$/ ), "Allow based on regex" ;
 
     ### check if the subs for allow get what you expect ###
     for my $thing ((@: 1,'foo',\(@: 1)))
-        allow:  $thing
+        allow: $thing
                sub (@< @_) { (is_deeply: shift,$thing,  "Allow coderef gets proper args") }
                
     

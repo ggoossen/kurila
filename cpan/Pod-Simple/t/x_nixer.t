@@ -28,9 +28,9 @@ is:  (Pod::Simple::XMLOutStream->_out: "=pod\n\nZ<>F<C<Z<>fE<111>o> I<bar>> B<st
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sub mergy {@_[0]->merge_text: 1)}
-sub nixy  {@_[0]->nix_X_codes: 1)}
-sub nixy_mergy {@_[0]->merge_text: 1); @_[0]->nix_X_codes: 1);}
+sub mergy {@_[0]->merge_text: 1}
+sub nixy  {@_[0]->nix_X_codes: 1}
+sub nixy_mergy {@_[0]->merge_text: 1; @_[0]->nix_X_codes: 1;}
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
