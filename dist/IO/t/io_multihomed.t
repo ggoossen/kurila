@@ -17,7 +17,7 @@ $^OUTPUT_AUTOFLUSH = 1
 
 print $^STDOUT, "1..8\n"
 
-require '../../t/test.pl'
+require 'test.pl'
 
 watchdog(15);
 

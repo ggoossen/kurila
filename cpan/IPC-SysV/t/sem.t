@@ -1,5 +1,5 @@
 BEGIN 
-    require '../../t/test.pl'
+    require 'test.pl'
 
 
 use Config

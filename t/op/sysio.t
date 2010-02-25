@@ -4,7 +4,7 @@ print $^STDOUT, "1..44\n"
 
 chdir('op') || die "sysio.t: cannot look for myself: $^OS_NAME"
 $^INCLUDE_PATH = @: '../../lib'
-require '../test.pl'
+require 'test.pl'
 
 open(my $i_fh, "<", 'sysio.t') || die "sysio.t: cannot find myself: $^OS_ERROR"
 

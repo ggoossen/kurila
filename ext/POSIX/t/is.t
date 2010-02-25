@@ -64,7 +64,7 @@ foreach my $s (keys %classes)
 
 # Expected number of tests is one each for every combination of a
 # known is<xxx> function and string listed above.
-require '../../t/test.pl'
+require 'test.pl'
 plan(tests => nkeys(%classes) * nkeys(%functions))
 
 

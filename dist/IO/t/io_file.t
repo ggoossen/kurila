@@ -2,7 +2,7 @@
 
 
 use bytes
-require "../../t/test.pl"
+require "test.pl"
 plan(tests => ($^OS_NAME =~ m/MSWin32/ ?? 9 !! 6))
 
 my $Class       = 'IO::File'

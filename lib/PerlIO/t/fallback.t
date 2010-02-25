@@ -2,7 +2,7 @@
 
 BEGIN {
     push $^INCLUDE_PATH, "::lib:$MacPerl::Architecture:" if $^OS_NAME eq 'MacOS';
-    require "../t/test.pl";
+    require "test.pl";
     skip_all("No perlio") unless (PerlIO::Layer->find( 'perlio'));
     if (ord("A") == 193) {
         print $^STDOUT, "1..0 # Skip: EBCDIC\n";
