@@ -763,16 +763,16 @@ sub install #XXX OS-SPECIFIC
 
         my $realtarget= $targetfile
         if ($diff)
-            try {
+            try
                 if (-f $targetfile)
                     print: $^STDOUT, "_unlink_or_rename($targetfile)\n" if $verbose+>1
                     $targetfile= _unlink_or_rename:  $targetfile, 'tryhard', 'install' 
                         unless $dry_run
                 elsif ( ! -d $targetdir )
-                    _mkpath:  $targetdir, 0, 0755, $verbose, $dry_run 
+                    _mkpath:  $targetdir, 0, 0755, $verbose, $dry_run
 
-                print: $^STDOUT, "Installing $targetfile\n";
-                (_copy:  $sourcefile, $targetfile, $verbose, $dry_run, );
+                print: $^STDOUT, "Installing $targetfile\n"
+                _copy:  $sourcefile, $targetfile, $verbose, $dry_run
                 #XXX OS-SPECIFIC
                 print: $^STDOUT, "utime($atime,$mtime,$targetfile)\n" if $verbose+>1;
                 utime: $atime,$mtime + $Is_VMS,$targetfile unless $dry_run+>1;
@@ -784,7 +784,7 @@ sub install #XXX OS-SPECIFIC
                 (_chmod:  $mode, $targetfile, $verbose );
                 $result->{+install}{+$targetfile} = $sourcefile;
                 1
-                } or do
+              or do
                 $result->{+install_fail}{+$targetfile} = $sourcefile
                 die: $^EVAL_ERROR
 
@@ -809,7 +809,6 @@ sub install #XXX OS-SPECIFIC
         _mkpath:  $dir, 0, 0755, $verbose, $dry_run 
         print: $^STDOUT, "Writing %pack{?'write'}\n"
         $packlist->write: (install_rooted_file: %pack{?'write'}) unless $dry_run
-
 
     _do_cleanup: $verbose
     return $result
@@ -1134,7 +1133,6 @@ sub pm_to_blib($fromto,$autodir, ?$pm_filter)
         if( -f $to && -s $from == -s $to && -M $to +< -M $from )
             print: $^STDOUT, "Skip $to (unchanged)\n"
             next
-
 
         # When a pm_filter is defined, we need to pre-process the source first
         # to determine whether it has changed or not.  Therefore, only perform

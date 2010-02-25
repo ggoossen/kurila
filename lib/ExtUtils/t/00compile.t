@@ -30,5 +30,4 @@ foreach my $file (@modules)
     :SKIP do
         skip: "Test::Pod not installed", 1 unless $Has_Test_Pod
         pod_file_ok: $file
-    
 

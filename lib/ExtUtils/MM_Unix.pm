@@ -675,7 +675,7 @@ depends on $(DIST_DEFAULT).
 
 sub dist_target($self)
     my $date_check = $self->oneliner: <<'CODE'
-print $$^STDOUT, 'Warning: Makefile possibly out of date with $(VERSION_FROM)', qq[\n]
+print: $$^STDOUT, 'Warning: Makefile possibly out of date with $(VERSION_FROM)', qq[\n]
     if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' +< -M '$(FIRST_MAKEFILE)';
 CODE
 
@@ -1731,7 +1731,7 @@ sub init_others($self) # --- Initialize Other Attributes
     $self->{+VERBINST}   ||= 0
     $self->{+MOD_INSTALL} ||=
         $self->oneliner: <<'CODE', @: '-MExtUtils::Install'
-install(\(%:<@ARGV), '$(VERBINST)', 0, '$(UNINST)');
+install: \(%:<@ARGV), '$(VERBINST)', 0, '$(UNINST)';
 CODE
     $self->{+DOC_INSTALL}        ||=
         '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e perllocal_install'

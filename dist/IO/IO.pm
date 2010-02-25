@@ -7,7 +7,7 @@ use XSLoader ()
 use warnings
 
 our $VERSION = "1.23_01"
-XSLoader::load:  'IO', $VERSION
+XSLoader::load: 'IO', $VERSION
 
 sub import
     shift
