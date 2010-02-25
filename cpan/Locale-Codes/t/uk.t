@@ -5,7 +5,7 @@
 
 use Locale::Country
 
-Locale::Country::alias_code('uk' => 'gb')
+Locale::Country::alias_code: 'uk' => 'gb'
 
 #-----------------------------------------------------------------------
 # This is an array of tests. Each test is eval'd as an expression.
@@ -13,7 +13,7 @@ Locale::Country::alias_code('uk' => 'gb')
 # otherwise "ok N".
 #-----------------------------------------------------------------------
 our @TESTS =
-    @: 
+    @:
     #================================================
     # TESTS FOR code2country
     #================================================
@@ -54,9 +54,9 @@ our @TESTS =
 
 use Test::More
 
-plan( tests => nelems @TESTS )
+plan:  tests => nelems @TESTS 
 
 foreach my $test ( @TESTS)
     eval "$test"
-    ok( not $^EVAL_ERROR )
+    ok:  not $^EVAL_ERROR 
 

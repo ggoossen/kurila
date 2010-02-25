@@ -10,18 +10,18 @@ BEGIN
     else { *DEBUG = sub () {0}; }
 
 
-foreach my $class (@: 
+foreach my $class (@:
   'Pod::Simple::TranscodeSmart'
   'Pod::Simple::TranscodeDumb'
   ''
     )
-    $class or die "Couldn't load any encoding classes"
-    DEBUG and print $^STDOUT, "About to try loading $class...\n"
+    $class or die: "Couldn't load any encoding classes"
+    DEBUG: and print: $^STDOUT, "About to try loading $class...\n"
     eval "require $class;"
     if($^EVAL_ERROR)
-        DEBUG and print $^STDOUT, "Couldn't load $class: $($^EVAL_ERROR->message)\n"
+        DEBUG: and print: $^STDOUT, "Couldn't load $class: $(($^EVAL_ERROR->message: ))\n"
     else
-        DEBUG and print $^STDOUT, "OK, loaded $class.\n"
+        DEBUG: and print: $^STDOUT, "OK, loaded $class.\n"
         @ISA = @: $class
         last
     

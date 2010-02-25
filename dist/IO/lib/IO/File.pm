@@ -140,9 +140,9 @@ $VERSION = "1.14"
 try {
     # Make all Fcntl O_XXX constants available for importing
     require Fcntl;
-    my @O = grep { m/^O_/ }, @Fcntl::EXPORT;
-    Fcntl->import(< @O);  # first we import what we want to export
-    push(@EXPORT, < @O);
+    my @O = (grep: { m/^O_/ }, @Fcntl::EXPORT);
+    (Fcntl->import: < @O);  # first we import what we want to export
+    (push: @EXPORT, < @O);
 }
 
 ################################################
@@ -151,12 +151,12 @@ try {
 
 sub new
     my $type = shift
-    my $class = ref($type) || $type || "IO::File"
+    my $class = (ref: $type) || $type || "IO::File"
     (nelems @_) +>= 0 && (nelems @_) +<= 3
-        or die "usage: new $class [FILENAME [,MODE [,PERMS]]]"
-    my $fh = $class->SUPER::new()
+        or die: "usage: new $class [FILENAME [,MODE [,PERMS]]]"
+    my $fh = $class->SUPER::new: 
     if ((nelems @_))
-        $fh->open(< @_)
+        $fh->open: < @_
             or return undef
     
     $fh
@@ -167,22 +167,22 @@ sub new
 ##
 
 sub open(@< @_)
-    (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $fh->open(FILENAME [,MODE [,PERMS]])'
+    (nelems @_) +>= 2 && (nelems @_) +<= 4 or die: 'usage: $fh->open(FILENAME [,MODE [,PERMS]])'
     my (@: $fh, $file, ...) =  @_
     if ((nelems @_) +> 2)
         my (@: $mode, $perms) =  @_[[(@: 2, 3)]]
         if ($mode =~ m/^\d+$/)
             defined $perms or $perms = 0666
-            return sysopen($fh, $file, $mode, $perms)
+            return sysopen: $fh, $file, $mode, $perms
         elsif ($mode =~ m/:/)
-            return open($fh, $mode, $file) if (nelems @_) == 3
-            die 'usage: $fh->open(FILENAME, IOLAYERS)'
+            return (open: $fh, $mode, $file) if (nelems @_) == 3
+            die: 'usage: $fh->open(FILENAME, IOLAYERS)'
         else
-            return open($fh, IO::Handle::_open_mode_string($mode), $file)
+            return open: $fh, (IO::Handle::_open_mode_string: $mode), $file
         
     
-    $file =~ m/^<|>>?/ and die 'MODE may not be part of the filename'
-    open($fh, "<", $file)
+    $file =~ m/^<|>>?/ and die: 'MODE may not be part of the filename'
+    open: $fh, "<", $file
 
 
 ################################################
@@ -190,8 +190,8 @@ sub open(@< @_)
 ##
 
 sub binmode($fh, ?$layer)
-    return binmode $fh->$ unless $layer
-    return binmode $fh->$, $layer
+    return (binmode: $fh->$) unless $layer
+    return binmode: $fh->$, $layer
 
 
 1

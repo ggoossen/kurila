@@ -77,7 +77,7 @@ trailing slash :-)
 sub catdir
     my $self = shift
 
-    $self->canonpath(join('/', @_ +@+ @: '')) # '' because need a trailing '/'
+    $self->canonpath: (join: '/', @_ +@+ @: '') # '' because need a trailing '/'
 
 
 =item catfile
@@ -89,10 +89,10 @@ complete path ending with a filename
 
 sub catfile
     my $self = shift
-    my $file = $self->canonpath(pop @_)
+    my $file = $self->canonpath: pop @_
     return $file unless (nelems @_)
-    my $dir = $self->catdir(< @_)
-    $dir .= "/" unless substr($dir,-1) eq "/"
+    my $dir = $self->catdir: < @_
+    $dir .= "/" unless (substr: $dir,-1) eq "/"
     return $dir.$file
 
 
@@ -144,14 +144,14 @@ sub _tmpdir
         $tmpdir = $_
         last
 
-    $tmpdir = $self->curdir unless defined $tmpdir
-    $tmpdir = defined $tmpdir && $self->canonpath($tmpdir)
+    $tmpdir = ($self->curdir: ) unless defined $tmpdir
+    $tmpdir = defined $tmpdir && $self->canonpath: $tmpdir
     return $tmpdir
 
 
 sub tmpdir
     return $tmpdir if defined $tmpdir
-    $tmpdir = @_[0]->_tmpdir( env::var('TMPDIR'), "/tmp" )
+    $tmpdir = @_[0]->_tmpdir:  (env::var: 'TMPDIR'), "/tmp" 
 
 
 =item updir
@@ -171,7 +171,7 @@ directory. (Does not strip symlinks, only '.', '..', and equivalents.)
 
 sub no_upwards
     my $self = shift
-    return grep( {!m/^\.{1,2}\z/s }, @_)
+    return grep:  {!m/^\.{1,2}\z/s }, @_
 
 
 =item case_tolerant
@@ -194,7 +194,7 @@ L<File::Spec::VMS/file_name_is_absolute>).
 =cut
 
 sub file_name_is_absolute($self,$file)
-    return scalar($file =~ m:^/:s)
+    return scalar: $file =~ m:^/:s
 
 
 =item path
@@ -204,8 +204,8 @@ Takes no argument, returns the environment variable PATH as an array.
 =cut
 
 sub path
-    return () unless defined env::var('PATH')
-    my @path = split(':', env::var('PATH'))
+    return () unless defined env::var: 'PATH'
+    my @path = split: ':', (env::var: 'PATH')
     foreach ( @path) { $_ = '.' if $_ eq '' }
     return @path
 
@@ -218,7 +218,7 @@ join is the same as catfile.
 
 sub join
     my $self = shift
-    return $self->catfile(< @_)
+    return $self->catfile: < @_
 
 
 =item splitpath
@@ -280,7 +280,7 @@ Yields:
 =cut
 
 sub splitdir
-    return split m|/|, @_[1], -1  # Preserve trailing fields
+    return split: m|/|, @_[1], -1  # Preserve trailing fields
 
 
 
@@ -297,8 +297,8 @@ sub catpath($self,$volume,$directory,$file)
 
     if ( $directory ne ''                &&
         $file ne ''                     &&
-        substr( $directory, -1 ) ne '/' &&
-        substr( $file, 0, 1 ) ne '/'
+        (substr:  $directory, -1 ) ne '/' &&
+        (substr:  $file, 0, 1 ) ne '/'
         )
         $directory .= "/$file"
     else
@@ -337,51 +337,51 @@ Based on code written by Shigio Yamaguchi.
 =cut
 
 sub abs2rel($self,$path,?$base)
-    $base = $self->_cwd() unless defined $base and length $base
+    $base = ($self->_cwd: ) unless defined $base and length $base
 
-    @: $path, $base =  map { $self->canonpath($_) }, @: $path, $base
+    @: $path, $base =  map: { ($self->canonpath: $_) }, @: $path, $base
 
-    if (grep { $self->file_name_is_absolute($_) }, @: $path, $base)
-        @: $path, $base =  map { $self->rel2abs($_) }, @: $path, $base
+    if ((grep: { ($self->file_name_is_absolute: $_) }, @: $path, $base))
+        @: $path, $base =  map: { ($self->rel2abs: $_) }, @: $path, $base
     else
         # save a couple of cwd()s if both paths are relative
-        @: $path, $base =  map { $self->catdir('/', $_) }, @: $path, $base
+        @: $path, $base =  map: { ($self->catdir: '/', $_) }, @: $path, $base
 
-    my @: $path_volume, ... =  $self->splitpath($path, 1)
-    my @: $base_volume, ... =  $self->splitpath($base, 1)
+    my @: $path_volume, ... =  $self->splitpath: $path, 1
+    my @: $base_volume, ... =  $self->splitpath: $base, 1
 
     # Can't relativize across volumes
     return $path unless $path_volume eq $base_volume
 
-    my $path_directories = $self->splitpath($path, 1)[1]
-    my $base_directories = $self->splitpath($base, 1)[1]
+    my $path_directories = ($self->splitpath: $path, 1)[1]
+    my $base_directories = ($self->splitpath: $base, 1)[1]
 
     # For UNC paths, the user might give a volume like //foo/bar that
     # strictly speaking has no directory portion.  Treat it as if it
     # had the root directory for that volume.
-    if (!length($base_directories) and $self->file_name_is_absolute($base))
-        $base_directories = $self->rootdir
+    if (!(length: $base_directories) and $self->file_name_is_absolute: $base)
+        $base_directories = $self->rootdir: 
 
     # Now, remove all leading components that are the same
-    my @pathchunks = $self->splitdir( $path_directories )
-    my @basechunks = $self->splitdir( $base_directories )
+    my @pathchunks = $self->splitdir:  $path_directories 
+    my @basechunks = $self->splitdir:  $base_directories 
 
-    if ($base_directories eq $self->rootdir)
+    if ($base_directories eq ($self->rootdir: ))
         shift @pathchunks
-        return $self->canonpath( $self->catpath('', $self->catdir( < @pathchunks ), '') )
+        return $self->canonpath:  ($self->catpath: '', ($self->catdir:  < @pathchunks ), '') 
 
 
     while (@pathchunks && @basechunks
-             && $self->_same(@pathchunks[0], @basechunks[0]))
+             && ($self->_same: @pathchunks[0], @basechunks[0]))
         shift @pathchunks
         shift @basechunks
 
-    return $self->curdir unless @pathchunks || @basechunks
+    return ($self->curdir: ) unless @pathchunks || @basechunks
 
     # $base now contains the directories the resulting relative path
     # must ascend out of before it can descend to $path_directory.
-    my $result_dirs = $self->catdir( < ((@: $self->updir) x nelems @basechunks), < @pathchunks )
-    return $self->canonpath( $self->catpath('', $result_dirs, '') )
+    my $result_dirs = $self->catdir:  < ((@: ($self->updir: )) x nelems @basechunks), < @pathchunks 
+    return $self->canonpath:  ($self->catpath: '', $result_dirs, '') 
 
 
 sub _same
@@ -417,21 +417,21 @@ Based on code written by Shigio Yamaguchi.
 sub rel2abs($self,$path,?$base)
 
     # Clean up $path
-    if ( ! $self->file_name_is_absolute( $path ) )
+    if ( ! ($self->file_name_is_absolute:  $path ) )
         # Figure out the effective $base and clean it up.
-        if ( !defined( $base ) || $base eq '' )
-            $base = $self->_cwd()
-        elsif ( ! $self->file_name_is_absolute( $base ) )
-            $base = $self->rel2abs( $base )
+        if ( !(defined:  $base ) || $base eq '' )
+            $base = $self->_cwd: 
+        elsif ( ! ($self->file_name_is_absolute:  $base ) )
+            $base = $self->rel2abs:  $base 
         else
-            $base = $self->canonpath( $base )
+            $base = $self->canonpath:  $base 
 
 
         # Glom them together
-        $path = $self->catdir( $base, $path )
+        $path = $self->catdir:  $base, $path 
 
 
-    return $self->canonpath( $path )
+    return $self->canonpath:  $path 
 
 
 =back
@@ -454,18 +454,17 @@ L<File::Spec>
 # File::Spec subclasses use this.
 sub _cwd
     require Cwd
-    Cwd::getcwd()
-
+    (Cwd::getcwd: )
 
 
 # Internal method to reduce xx\..\yy -> yy
 sub _collapse($fs, $path)
 
-    my $updir  = $fs->updir
-    my $curdir = $fs->curdir
+    my $updir  = $fs->updir: 
+    my $curdir = $fs->curdir: 
 
-    my @: $vol, $dirs, $file =  $fs->splitpath($path)
-    my @dirs = $fs->splitdir($dirs)
+    my @: $vol, $dirs, $file =  $fs->splitpath: $path
+    my @dirs = $fs->splitdir: $dirs
     pop @dirs if (nelems @dirs) && @dirs[-1] eq ''
 
     my @collapsed
@@ -478,14 +477,14 @@ sub _collapse($fs, $path)
             )                                     # then
             pop @collapsed                   # collapse
         else                                # else
-            push @collapsed, $dir            # just hang onto it
+            push: @collapsed, $dir            # just hang onto it
 
 
 
-    return $fs->catpath($vol, <
-        $fs->catdir(< @collapsed),
-        $file
-        )
+    return $fs->catpath: $vol, <
+                             ($fs->catdir: < @collapsed)
+                         $file
+        
 
 
 

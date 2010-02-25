@@ -13,25 +13,25 @@ $VERSION = "1.00"
 
 sub digest_file_ctx
     my $file = shift
-    croak("No digest algorithm specified") unless (nelems @_)
-    open(my $fh, "<", $file) || croak("Can't open '$file': $^OS_ERROR")
-    binmode($fh)
-    my $ctx = Digest->new(< @_)
-    $ctx->addfile($fh)
-    close($fh)
+    croak: "No digest algorithm specified" unless (nelems @_)
+    (open: my $fh, "<", $file) || croak: "Can't open '$file': $^OS_ERROR"
+    binmode: $fh
+    my $ctx = Digest->new: < @_
+    $ctx->addfile: $fh
+    close: $fh
     return $ctx
 
 
-sub digest_file
-    digest_file_ctx(< @_)->digest
+sub digest_file(@< @args)
+    (digest_file_ctx: < @args)->digest:
 
 
-sub digest_file_hex
-    digest_file_ctx(< @_)->hexdigest
+sub digest_file_hex(@< @args)
+    (digest_file_ctx: < @args)->hexdigest: 
 
 
-sub digest_file_base64
-    digest_file_ctx(< @_)->b64digest
+sub digest_file_base64(@< @args)
+    (digest_file_ctx: < @args)->b64digest: 
 
 
 1

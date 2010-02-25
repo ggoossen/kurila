@@ -4,11 +4,11 @@
 use Locale::Maketext
 
 use Test::More
-BEGIN { plan tests => 19 };
+BEGIN { (plan: tests => 19) };
 
-print $^STDOUT, "#\n# Testing non-tight insertion of super-ordinate language tags...\n#\n"
+print: $^STDOUT, "#\n# Testing non-tight insertion of super-ordinate language tags...\n#\n"
 
-my @in = grep { m/\S/ }, split m/[\n\r]/, q{
+my @in = grep: { m/\S/ }, split: m/[\n\r]/, q{
  NIX => NIX
   sv => sv
   en => en
@@ -46,7 +46,7 @@ foreach my $in ( @in)
 
     my(@in, @should)
     do
-        die "What kind of line is <$in>?!"
+        die: "What kind of line is <$in>?!"
             unless $in =~ m/^(.+)=>(.+)$/s
 
         my(@: $i,$s) = @: $1, $2
@@ -54,26 +54,26 @@ foreach my $in ( @in)
         @should = @: $s =~ m/(\S+)/g
     #print "{@in}{@should}\n";
     
-    my @out = Locale::Maketext->_add_supers(
-        ("$(join ' ',@in)" eq 'NIX') ?? () !! < @in
-        )
+    my @out = Locale::Maketext->_add_supers: 
+        ("$((join: ' ',@in))" eq 'NIX') ?? () !! < @in
+        
     #print "O: ", join(' ', map "<$_>", @out), "\n";
     @out = (@:  'NIX' ) unless (nelems @out)
 
 
     if( (nelems @out) == nelems @should
-        and lc( join "\e", @out ) eq lc( join "\e", @should )
+        and (lc:  (join: "\e", @out) ) eq lc:  (join: "\e", @should) 
         )
-        print $^STDOUT, "#     Happily got [$(join ' ',@out)] from [$in]\n"
-        ok 1
+        print: $^STDOUT, "#     Happily got [$((join: ' ',@out))] from [$in]\n"
+        ok: 1
     else
-        ok 0
-        print $^STDOUT, "#!!Got:         [$(join ' ',@out)]\n",
-            "#!! but wanted: [$(join ' ',@should)]\n",
-            "#!! from \"$in\"\n#\n"
+        ok: 0
+        print: $^STDOUT, "#!!Got:         [$((join: ' ',@out))]\n"
+               "#!! but wanted: [$((join: ' ',@should))]\n"
+               "#!! from \"$in\"\n#\n"
     
 
 
-print $^STDOUT, "#\n#\n# Bye-bye!\n"
-ok 1
+print: $^STDOUT, "#\n#\n# Bye-bye!\n"
+ok: 1
 

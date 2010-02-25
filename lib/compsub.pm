@@ -4,7 +4,7 @@ sub define
     my %arg = %:  < @_ 
     # warning: alwyas create a new hash; %^H is saved, and altering
     # values referenced by it, will have effect on it.
-    $^HINTS{+'compsub'} = \%: 
+    $^HINTS{+'compsub'} = \%:
         < ( $^HINTS{?'compsub'} || \$% )->%
         < %arg
         

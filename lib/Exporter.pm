@@ -12,23 +12,23 @@ our (%Cache)
 
 sub import
     my $pkg = shift
-    my $callpkg = caller($ExportLevel)
+    my $callpkg = caller: $ExportLevel
 
     if ($pkg eq "Exporter" and nelems @_ and @_[0] eq "import")
-        Symbol::fetch_glob($callpkg."::import")->* = \&import
+        (Symbol::fetch_glob: $callpkg."::import")->* = \&import
         return
 
     # We *need* to treat @{"$pkg\::EXPORT_FAIL"} since Carp uses it :-(
-    my (@: $exports, $fail) = @: \Symbol::fetch_glob("$pkg\::EXPORT")->*->@
-                                 \Symbol::fetch_glob("$pkg\::EXPORT_FAIL")->*->@
-    return export($pkg, $callpkg, < @_)
+    my (@: $exports, $fail) = @: \(Symbol::fetch_glob: "$pkg\::EXPORT")->*->@
+                                 \(Symbol::fetch_glob: "$pkg\::EXPORT_FAIL")->*->@
+    return export: $pkg, $callpkg, < @_
         if $Verbose or $Debug or (nelems $fail->@) +> 1
     my $export_cache = (%Cache{+$pkg} ||= \$%)
     my $args = (nelems @_) or @_ = $exports->@
 
     local $_ = undef
     if ($args and not $export_cache->%)
-        foreach ($exports->@ +@+  Symbol::fetch_glob("$pkg\::EXPORT_OK")->*->@)
+        foreach ($exports->@ +@+  (Symbol::fetch_glob: "$pkg\::EXPORT_OK")->*->@)
             s/^&//
             $export_cache->{+$_} = 1
 
@@ -43,10 +43,10 @@ sub import
         foreach (@_)
             ($heavy = m/\W/) and last
 
-    return export($pkg, $callpkg, ($args ?? < @_ !! ())) if $heavy
+    return (export: $pkg, $callpkg, ($args ?? < @_ !! ())) if $heavy
     # shortcut for the common case of no type character
     for (@_)
-        Symbol::fetch_glob("$callpkg\::$_")->* = \Symbol::fetch_glob("$pkg\::$_")->*->&
+        (Symbol::fetch_glob: "$callpkg\::$_")->* = \(Symbol::fetch_glob: "$pkg\::$_")->*->&
 
 # Default methods
 
@@ -56,8 +56,8 @@ sub export_fail
 
 
 sub export_to_level($pkg, $level, _, @< @args)
-    my $callpkg = caller($level)
-    $pkg->export($callpkg, < @args)
+    my $callpkg = caller: $level
+    $pkg->export: $callpkg, < @args
 
 
 1

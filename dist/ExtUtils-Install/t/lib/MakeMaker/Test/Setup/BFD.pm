@@ -10,7 +10,7 @@ use MakeMaker::Test::Utils
 
 my $Is_VMS = $^OS_NAME eq 'VMS'
 
-my %Files = %: 
+my %Files = %:
     'Big-Dummy/lib/Big/Dummy.pm'     => <<'END'
 package Big::Dummy;
 
@@ -54,18 +54,18 @@ program - this is a program
 END
 
     'Big-Dummy/t/compile.t'          => <<'END'
-print $^STDOUT, "1..2\n";
+print: $^STDOUT, "1..2\n";
 
-print $^STDOUT, eval "use Big::Dummy; 1;" ?? "ok 1\n" !! "not ok 1\n";
-print $^STDOUT, "ok 2 - TEST_VERBOSE\n";
+print: $^STDOUT, eval "use Big::Dummy; 1;" ?? "ok 1\n" !! "not ok 1\n";
+print: $^STDOUT, "ok 2 - TEST_VERBOSE\n";
 END
 
     'Big-Dummy/Liar/t/sanity.t'      => <<'END'
-print $^STDOUT, "1..3\n";
+print: $^STDOUT, "1..3\n";
 
-print $^STDOUT, eval "use Big::Dummy; 1;" ?? "ok 1\n" !! "not ok 1\n";
-print $^STDOUT, eval "use Big::Liar; 1;" ?? "ok 2\n" !! "not ok 2\n";
-print $^STDOUT, "ok 3 - TEST_VERBOSE\n";
+print: $^STDOUT, eval "use Big::Dummy; 1;" ?? "ok 1\n" !! "not ok 1\n";
+print: $^STDOUT, eval "use Big::Liar; 1;" ?? "ok 2\n" !! "not ok 2\n";
+print: $^STDOUT, "ok 3 - TEST_VERBOSE\n";
 END
 
     'Big-Dummy/Liar/lib/Big/Liar.pm' => <<'END'
@@ -85,38 +85,37 @@ my $mm = WriteMakefile(
               _KEEP_AFTER_FLUSH => 1
              );
 
-print $^STDOUT, "Big::Liar's vars\n";
+print: $^STDOUT, "Big::Liar's vars\n";
 foreach my $key (qw(INST_LIB INST_ARCHLIB)) {
-    print $^STDOUT, "$key = $mm->{$key}\n";
+    print: $^STDOUT, "$key = $mm->{$key}\n";
 }
 END
 
     
 
 
-sub setup_recurs
-    setup_mm_test_root()
+sub setup_recurs()
+    setup_mm_test_root:
     chdir 'MM_TEST_ROOT:[t]' if $Is_VMS
 
     while(my(@: ?$file, ?$text) =(@:  each %Files))
         # Convert to a relative, native file path.
-        $file = 'File::Spec'->catfile('File::Spec'->curdir, < split m{\/}, $file)
+        $file = 'File::Spec'->catfile: ('File::Spec'->curdir: ), < (split: m{\/}, $file)
 
-        my $dir = dirname($file)
-        mkpath $dir
-        open(my $fh, ">", "$file") || die "Can't create $file: $^OS_ERROR"
-        print $fh, $text
+        my $dir = dirname: $file
+        mkpath: $dir
+        (open: my $fh, ">", "$file") || die: "Can't create $file: $^OS_ERROR"
+        print: $fh, $text
         close $fh
-    
 
     return 1
 
 
 sub teardown_recurs
     foreach my $file (keys %Files)
-        my $dir = dirname($file)
+        my $dir = dirname: $file
         if( -e $dir )
-            rmtree($dir) || return
+            (rmtree: $dir) || return
         
     
     return 1

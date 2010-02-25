@@ -46,7 +46,7 @@ sub canonpath($self,?$path)
     if ( $path =~ s@^(//[^/]+)(?:/|\z)@/@s )
         $node = $1
     
-    return $node . $self->SUPER::canonpath($path)
+    return $node . $self->SUPER::canonpath: $path
 
 
 sub catdir
@@ -56,10 +56,9 @@ sub catdir
     # Don't create something that looks like a //network/path
     if (@_[0] and (@_[0] eq '/' or @_[0] eq '\'))
         shift
-        return $self->SUPER::catdir('', < @_)
-    
+        return $self->SUPER::catdir: '', < @_
 
-    $self->SUPER::catdir(< @_)
+    $self->SUPER::catdir: < @_
 
 
 =pod
@@ -74,7 +73,7 @@ and if not, File::Spec::Unix file_name_is_absolute() is called.
 
 sub file_name_is_absolute($self,$file)
     return 1 if $file =~ m{^([a-z]:)?[\\/]}is # C:/test
-    return $self->SUPER::file_name_is_absolute($file)
+    return $self->SUPER::file_name_is_absolute: $file
 
 
 =item tmpdir (override)
@@ -96,7 +95,7 @@ variables are tainted, they are not used.
 my $tmpdir
 sub tmpdir
     return $tmpdir if defined $tmpdir
-    $tmpdir = @_[0]->_tmpdir( env::var('TMPDIR'), "/tmp", env::var('TMP'), env::var('TEMP'), 'C:/temp' )
+    $tmpdir = @_[0]->_tmpdir:  (env::var: 'TMPDIR'), "/tmp", (env::var: 'TMP'), (env::var: 'TEMP'), 'C:/temp' 
 
 
 =item case_tolerant
@@ -113,8 +112,8 @@ sub case_tolerant(?$drive)
         and exists &Cygwin::mount_flags
 
     if (! $drive)
-        my @flags = split(m/,/, Cygwin::mount_flags('/cygwin'))
-        my $prefix = pop(@flags)
+        my @flags = split: m/,/,( Cygwin::mount_flags: '/cygwin')
+        my $prefix = pop: @flags
         if (! $prefix || $prefix eq 'cygdrive')
             $drive = '/cygdrive/c'
         elsif ($prefix eq '/')
@@ -123,7 +122,7 @@ sub case_tolerant(?$drive)
             $drive = "$prefix/c"
         
     
-    my $mntopts = Cygwin::mount_flags($drive)
+    my $mntopts = Cygwin::mount_flags: $drive
     if ($mntopts and ($mntopts =~ m/,managed/))
         return 0
     
@@ -131,8 +130,8 @@ sub case_tolerant(?$drive)
     my $osFsType = "\0"x256
     my $osVolName = "\0"x256
     my $ouFsFlags = 0
-    Win32API::File::GetVolumeInformation($drive, $osVolName, 256, \(@: ), \(@: ), $ouFsFlags, $osFsType, 256 )
-    if ($ouFsFlags ^&^ Win32API::File::FS_CASE_SENSITIVE()) { return 0; }
+    Win32API::File::GetVolumeInformation: $drive, $osVolName, 256, \(@: ), \(@: ), $ouFsFlags, $osFsType, 256 
+    if ($ouFsFlags ^&^ (Win32API::File::FS_CASE_SENSITIVE: )) { return 0; }
     else { return 1; }
 
 

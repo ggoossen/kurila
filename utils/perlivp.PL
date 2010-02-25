@@ -14,30 +14,30 @@ use Cwd
 
 # This forces PL files to create target in same directory as PL file.
 # This is so that make depend always knows where to find PL derivatives.
-my $origdir = cwd
-chdir dirname($^PROGRAM_NAME)
-my $file = basename($^PROGRAM_NAME, '.PL')
+my $origdir = (cwd: )
+chdir dirname: $^PROGRAM_NAME
+my $file = basename: $^PROGRAM_NAME, '.PL'
 $file .= '.com' if $^OS_NAME eq 'VMS'
 
 # Create output file.
-open my $out,">", "$file" or die "Can't create $file: $^OS_ERROR"
+open: my $out,">", "$file" or die: "Can't create $file: $^OS_ERROR"
 
-print $^STDOUT, "Extracting $file (with variable substitutions)\n"
+print: $^STDOUT, "Extracting $file (with variable substitutions)\n"
 
 # In this section, perl variables will be expanded during extraction.
 # You can use $Config{...} to use Configure variables.
 
-print $out, <<"!GROK!THIS!"
-$(config_value('startperl'))
-    eval 'exec $(config_value('perlpath')) -S \$0 \$\{1+"\$@"\}'
+print: $out, <<"!GROK!THIS!"
+$((config_value: 'startperl'))
+    eval 'exec $((config_value: 'perlpath')) -S \$0 \$\{1+"\$@"\}'
         if \$running_under_some_shell;
 !GROK!THIS!
 
-print $out, "\n# perlivp $^PERL_VERSION\n"
+print: $out, "\n# perlivp $^PERL_VERSION\n"
 
 # In the following, perl variables are not expanded during extraction.
 
-print $out, <<'!NO!SUBS!'
+print: $out, <<'!NO!SUBS!'
 
 sub usage {
     warn "@_\n" if @_;
@@ -84,20 +84,20 @@ my $tests_total = 0;
 # We cannot merely check the variable `$^X' in general since on many
 # Unixes it is the basename rather than the full path to the perl binary.
 my $perlpath = ''
-if (defined(config_value('perlpath'))) { $perlpath = config_value('perlpath'); }
+if ((defined: (config_value: 'perlpath'))) { $perlpath = (config_value: 'perlpath'); }
 
 # The useithreads Config variable plays a role in whether or not
 # threads and threads/shared work when C<use>d.  They apparently always
 # get installed on systems that can run Configure.
 my $useithreads = ''
-if (defined(config_value('useithreads'))) { $useithreads = config_value('useithreads'); }
+if ((defined: (config_value: 'useithreads'))) { $useithreads = (config_value: 'useithreads'); }
 
-print $out, <<"!GROK!THIS!"
+print: $out, <<"!GROK!THIS!"
 my \$perlpath = '$perlpath';
 my \$useithreads = '$useithreads';
 !GROK!THIS!
 
-print $out, <<'!NO!SUBS!'
+print: $out, <<'!NO!SUBS!'
 
 print "## Checking Perl binary via variable `\$perlpath' = $perlpath.\n" if $opt{'p'};
 
@@ -118,11 +118,11 @@ print "## Checking Perl version via variable `\$^V'.\n" if $opt{'p'};
 
 !NO!SUBS!
 
-print $out, <<"!GROK!THIS!"
+print: $out, <<"!GROK!THIS!"
 my \$ivp_VERSION = "$^PERL_VERSION";
 
 !GROK!THIS!
-print $out, <<'!NO!SUBS!'
+print: $out, <<'!NO!SUBS!'
 if ($ivp_VERSION eq $^V) {
     print "## Perl version `$^V' appears installed as expected.\n" if $opt{'v'};
     print "ok 2\n";
@@ -497,8 +497,8 @@ Peter Prymmer
 
 !NO!SUBS!
 
-close $out or die "Can't close $file: $^OS_ERROR"
-chmod 0755, $file or die "Can't reset permissions for $file: $^OS_ERROR\n"
-exec("$(config_value('eunicefix')) $file") if config_value('eunicefix') ne ':'
+close $out or die: "Can't close $file: $^OS_ERROR"
+chmod: 0755, $file or die: "Can't reset permissions for $file: $^OS_ERROR\n"
+exec: "$((config_value: 'eunicefix')) $file" if (config_value: 'eunicefix') ne ':'
 chdir $origdir
 

@@ -3,7 +3,7 @@ package OS2::ExtAttr
 use XSLoader
 
 our $VERSION = '0.02'
-XSLoader::load 'OS2::ExtAttr', $VERSION
+XSLoader::load:  'OS2::ExtAttr', $VERSION
 
 # Preloaded methods go here.
 
@@ -12,73 +12,73 @@ XSLoader::load 'OS2::ExtAttr', $VERSION
 
 sub TIEHASH
     my $class = shift
-    my $ea = _create() || die "Cannot create EA: $^OS_ERROR"
+    my $ea = (_create: ) || die: "Cannot create EA: $^OS_ERROR"
     my $file = shift
     my ($name, $handle)
     if (ref $file eq 'GLOB' or ref \$file eq 'GLOB')
-        die "File handle is not opened" unless $handle = fileno $file
-        _read($ea, undef, $handle, 0)
+        die: "File handle is not opened" unless $handle = fileno $file
+        _read: $ea, undef, $handle, 0
     else
         $name = $file
-        _read($ea, $name, 0, 0)
+        _read: $ea, $name, 0, 0
     
-    bless \(@: $ea, $name, $handle, 0, 0, 0), $class
+    bless: \(@: $ea, $name, $handle, 0, 0, 0), $class
 
 
 sub DESTROY
     my $eas = shift
     # 0 means: discard eas which are not in $eas->[0].
-    _write( $eas->[0], $eas->[1], $eas->[2], 0) and die "Cannot write EA: $^OS_ERROR"
+    _write:  $eas->[0], $eas->[1], $eas->[2], 0 and die: "Cannot write EA: $^OS_ERROR"
         if $eas->[5]
-    _destroy( $eas->[0] )
+    _destroy:  $eas->[0] 
 
 
 sub FIRSTKEY
     my $eas = shift
-    $eas->[3] = _count($eas->[0])
+    $eas->[3] = _count: $eas->[0]
     $eas->[4] = 1
     return undef if $eas->[4] +> $eas->[3]
-    return _get_name($eas->[0], $eas->[4])
+    return _get_name: $eas->[0], $eas->[4]
 
 
 sub NEXTKEY
     my $eas = shift
     $eas->[4]++
     return undef if $eas->[4] +> $eas->[3]
-    return _get_name($eas->[0], $eas->[4])
+    return _get_name: $eas->[0], $eas->[4]
 
 
 sub FETCH
     my $eas = shift
-    my $index = _find($eas->[0], shift)
+    my $index = _find: $eas->[0], shift
     return undef if $index +<= 0
-    return value($eas->[0], $index)
+    return value: $eas->[0], $index
 
 
 sub EXISTS
     my $eas = shift
-    return _find($eas->[0], shift) +> 0
+    return (_find: $eas->[0], shift) +> 0
 
 
 sub STORE
     my $eas = shift
     $eas->[5] = 1
-    add($eas->[0], shift, shift) +> 0 or die "Error setting EA: $^OS_ERROR"
+    (add: $eas->[0], shift, shift) +> 0 or die: "Error setting EA: $^OS_ERROR"
 
 
 sub DELETE
     my $eas = shift
-    my $index = _find($eas->[0], shift)
+    my $index = _find: $eas->[0], shift
     return undef if $index +<= 0
-    my $value = value($eas->[0], $index)
-    _delete($eas->[0], $index) and die "Error deleting EA: $^OS_ERROR"
+    my $value = value: $eas->[0], $index
+    _delete: $eas->[0], $index and die: "Error deleting EA: $^OS_ERROR"
     $eas->[5] = 1
     return $value
 
 
 sub CLEAR
     my $eas = shift
-    _clear($eas->[0])
+    _clear: $eas->[0]
     $eas->[5] = 1
 
 
@@ -91,18 +91,18 @@ sub copy
     my $file = shift
     my ($name, $handle)
     if (ref $file eq 'GLOB' or ref \$file eq 'GLOB')
-        die "File handle is not opened" unless $handle = fileno $file
-        _write($eas->[0], undef, $handle, 0) or die "Cannot write EA: $^OS_ERROR"
+        die: "File handle is not opened" unless $handle = fileno $file
+        _write: $eas->[0], undef, $handle, 0 or die: "Cannot write EA: $^OS_ERROR"
     else
         $name = $file
-        _write($eas->[0], $name, 0, 0) or die "Cannot write EA: $^OS_ERROR"
+        _write: $eas->[0], $name, 0, 0 or die: "Cannot write EA: $^OS_ERROR"
     
 
 
 sub update
     my $eas = shift
     # 0 means: discard eas which are not in $eas->[0].
-    _write( $eas->[0], $eas->[1], $eas->[2], 0) and die "Cannot write EA: $^OS_ERROR"
+    _write:  $eas->[0], $eas->[1], $eas->[2], 0 and die: "Cannot write EA: $^OS_ERROR"
 
 
 # Autoload methods go after =cut, and are processed by the autosplit program.

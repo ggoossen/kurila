@@ -3,7 +3,7 @@
 BEGIN 
     require './test.pl'
 
-plan tests => 44;
+(plan: tests => 44)
 
 our (@: $beguser,$begsys, ...) = @: times
 
@@ -12,7 +12,7 @@ our $beg = time
 our $now
 while (($now = time) == $beg) { sleep 1 }
 
-ok($now +> $beg && $now - $beg +< 10,             'very basic time test')
+ok: $now +> $beg && $now - $beg +< 10,             'very basic time test'
 
 our $i = 0
 while ($i +< 1_000_000)
@@ -25,56 +25,56 @@ while ($i +< 1_000_000)
     $i++
 
 
-ok($i +>= 2_000_000, 'very basic times test')
+ok: $i +>= 2_000_000, 'very basic times test'
 
-our (@: $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = @: localtime($beg)
-our (@: $xsec,$foo, ...) = @: localtime($now)
+our (@: $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = @: localtime: $beg
+our (@: $xsec,$foo, ...) = @: localtime: $now
 our $localyday = $yday
 
-isnt($sec, $xsec,      'localtime() list context')
-ok($mday,               '  month day')
-ok($year,               '  year')
+isnt: $sec, $xsec,      'localtime() list context'
+ok: $mday,               '  month day'
+ok: $year,               '  year'
 
-ok(($: localtime() =~ m/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[ ]
+ok: ($: (localtime: ) =~ m/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[ ]
                     (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[ ]
                     ([ \d]\d)\ (\d\d):(\d\d):(\d\d)\ (\d{4})$
-                  /x),
-   'localtime(), scalar context'
-   )
+                  /x)
+    'localtime(), scalar context'
+   
 
 :SKIP do
     # This conditional of "No tzset()" is stolen from ext/POSIX/t/time.t
-    skip "No tzset()", 1
+    skip: "No tzset()", 1
         if $^OS_NAME eq "MacOS" || $^OS_NAME eq "VMS" || $^OS_NAME eq "cygwin" ||
       $^OS_NAME eq "djgpp" || $^OS_NAME eq "MSWin32" || $^OS_NAME eq "dos" ||
       $^OS_NAME eq "interix"
 
     # check that localtime respects changes to $ENV{TZ}
-    env::var('TZ' ) = "GMT-5"
-    (@: $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = @: localtime($beg)
-    env::var('TZ' ) = "GMT+5"
-    my (@: $sec,$min,$hour2,$mday,$mon,$year,$wday,$yday,$isdst) = @: localtime($beg)
-    ok($hour != $hour2,                             'changes to $ENV{TZ} respected')
+    (env::var: 'TZ' ) = "GMT-5"
+    (@: $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = @: localtime: $beg
+    (env::var: 'TZ' ) = "GMT+5"
+    my (@: $sec,$min,$hour2,$mday,$mon,$year,$wday,$yday,$isdst) = @: localtime: $beg
+    ok: $hour != $hour2,                             'changes to $ENV{TZ} respected'
 
 
-(@: $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = @: gmtime($beg)
-(@: $xsec,$foo, ...) = @: localtime($now)
+(@: $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = @: gmtime: $beg
+(@: $xsec,$foo, ...) = @: localtime: $now
 
-isnt($sec, $xsec,      'gmtime() list conext')
-ok($mday,               '  month day')
-ok($year,               '  year')
+isnt: $sec, $xsec,      'gmtime() list conext'
+ok: $mday,               '  month day'
+ok: $year,               '  year'
 
 my $day_diff = $localyday - $yday
-ok( ($: grep({ $day_diff == $_ }, (@:  (0, 1, -1, 364, 365, -364, -365)))),
-        'gmtime() and localtime() agree what day of year')
+ok:  ($: (grep: { $day_diff == $_ }, (@:  (0, 1, -1, 364, 365, -364, -365))))
+     'gmtime() and localtime() agree what day of year'
 
 
 # This could be stricter.
-ok( ($: gmtime() =~ m/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[ ]
+ok:  ($: (gmtime: ) =~ m/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[ ]
                  (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[ ]
                  ([ \d]\d)\ (\d\d):(\d\d):(\d\d)\ (\d{4})$
-               /x),
-   'gmtime(), scalar context')
+               /x)
+     'gmtime(), scalar context'
 
 
 # Test gmtime over a range of times.
@@ -99,8 +99,8 @@ do
         my @expected  = %tests{$time}
         my $scalar    = pop @expected
 
-        ok eq_array((\@: gmtime($time)), \@expected),  "gmtime($time) list context"
-        is(($: gmtime($time)), $scalar,       "  scalar")
+        ok: (eq_array: (\@: (gmtime: $time)), \@expected),  "gmtime($time) list context"
+        is: ($: (gmtime: $time)), $scalar,       "  scalar"
 
 
 # Test localtime
@@ -119,18 +119,18 @@ do
         my @expected  = %tests{$time}
         my $scalar    = pop @expected
 
-        my @time = (@: localtime($time))[[@: 4, 5]]
-        ok( eq_array(\@time, \@expected),  "localtime($time) list context" )
-          or diag("@time")
-        like scalar localtime($time), $scalar,       "  scalar"
+        my @time = (@: (localtime: $time))[[@: 4, 5]]
+        ok:  (eq_array: \@time, \@expected),  "localtime($time) list context" 
+          or diag: "@time"
+        like: scalar (localtime: $time), $scalar,       "  scalar"
 
 # Test floating point args
 do
     try
-        $^WARN_HOOK = sub { die @_; }
-        localtime(1.23)
-    is($^EVAL_ERROR, '', 'Ignore fractional time');
+        $^WARN_HOOK = sub { (die: @_); }
+        localtime: 1.23
+    (is: $^EVAL_ERROR, '', 'Ignore fractional time');
     try
-        $^WARN_HOOK = sub { die @_; }
-        gmtime(1.23)
-    is($^EVAL_ERROR, '', 'Ignore fractional time');
+        $^WARN_HOOK = sub { (die: @_); }
+        gmtime: 1.23
+    (is: $^EVAL_ERROR, '', 'Ignore fractional time');

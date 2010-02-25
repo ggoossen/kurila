@@ -267,11 +267,11 @@ my %Items = $%			# associative array used to find the location
 my %Local_Items
 my $Is83
 
-my $Curdir = File::Spec->curdir
+my $Curdir = File::Spec->curdir: 
 
 my $html_fh
 
-init_globals()
+(init_globals: )
 
 sub init_globals
     $Cachedir = "."		# The directory to which item and directory
@@ -334,8 +334,8 @@ sub clean_data($dataref)
 
         # have a look for all-space lines
         if( $dataref->[$i] =~ m/^\s+$/m and $dataref->[$i] !~ m/^\s/ )
-            my @chunks = split( m/^\s+$/m, $dataref->[$i] )
-            splice( $dataref->@, $i, 1, < @chunks )
+            my @chunks = split:  m/^\s+$/m, $dataref->[$i] 
+            splice:  $dataref->@, $i, 1, < @chunks 
         
     
 
@@ -346,26 +346,26 @@ sub pod2html
     local($^INPUT_RECORD_SEPARATOR)
     local $_ = undef
 
-    init_globals()
+    (init_globals: )
 
-    $Is83 = 0 if exists(&Dos::UseLFN) && Dos::UseLFN()
+    $Is83 = 0 if (exists: &Dos::UseLFN) &&( Dos::UseLFN: )
 
     # cache of %Pages and %Items from last time we ran pod2html
 
     #undef $opt_help if defined $opt_help;
 
     # parse the command-line parameters
-    parse_command_line()
+    (parse_command_line: )
 
     # escape the backlink argument (same goes for title but is done later...)
-    $Backlink = html_escape($Backlink) if defined $Backlink
+    $Backlink = (html_escape: $Backlink) if defined $Backlink
 
     # set some variables to their default values if necessary
     my $pod
     unless ((nelems @ARGV) && @ARGV[0])
         $Podfile  = "-" unless $Podfile # stdin
-        open($pod, "<", "$Podfile")
-            || die "$^PROGRAM_NAME: cannot open $Podfile file for input: $^OS_ERROR\n"
+        open: $pod, "<", "$Podfile"
+            || die: "$^PROGRAM_NAME: cannot open $Podfile file for input: $^OS_ERROR\n"
     else
         $Podfile = @ARGV[0]  # XXX: might be more filenames
         $pod = \*ARGV
@@ -374,58 +374,58 @@ sub pod2html
     $Htmlroot = "" if $Htmlroot eq "/"  # so we don't get a //
     $Htmldir =~ s#/\z##                # so we don't get a //
     if (  $Htmlroot eq ''
-            && defined( $Htmldir )
+            && defined:  $Htmldir 
             && $Htmldir ne ''
-            && substr( $Htmlfile, 0, length( $Htmldir ) ) eq $Htmldir
+            && (substr:  $Htmlfile, 0, (length:  $Htmldir ) ) eq $Htmldir
         )
         # Set the 'base' url for this file, so that we can use it
         # as the location from which to calculate relative links
         # to other files. If this is '', then absolute links will
         # be used throughout.
-        $Htmlfileurl= "$Htmldir/" . substr( $Htmlfile, length( $Htmldir ) + 1)
+        $Htmlfileurl= "$Htmldir/" . substr:  $Htmlfile, (length:  $Htmldir ) + 1
     
 
     # read the pod a paragraph at a time
-    warn "Scanning for sections in input file(s)\n" if $Verbose
+    warn: "Scanning for sections in input file(s)\n" if $Verbose
     $^INPUT_RECORD_SEPARATOR = ""
     my @poddata  = @:  ~< $pod 
-    close($pod)
+    close: $pod
 
     # be eol agnostic
     for my $pd ( @poddata)
         if ($pd =~ m/\r/)
             if ($pd =~ m/\r\n/)
-                @poddata = @+: map { s/\r\n/\n/g;
-                    m/\n\n/ ??
-                        map { "$_\n\n" }, split m/\n\n/ !!
-                        (@: $_) }, @poddata
+                @poddata = @+: map: { s/\r\n/\n/g;
+                                        m/\n\n/ ??
+                                            (map: { "$_\n\n" }, (split: m/\n\n/)) !!
+                                            (@: $_) }, @poddata
             else
-                @poddata = @+: map { s/\r/\n/g;
-                    m/\n\n/ ??
-                        map { "$_\n\n" }, split m/\n\n/ !!
-                        (@: $_) }, @poddata
+                @poddata = @+: map: { s/\r/\n/g;
+                                        m/\n\n/ ??
+                                            (map: { "$_\n\n" }, (split: m/\n\n/)) !!
+                                            (@: $_) }, @poddata
             
             last
         
     
 
-    clean_data( \@poddata )
+    clean_data:  \@poddata 
 
     # scan the pod for =head[1-6] directives and build an index
-    my $index = scan_headings(\%Sections, < @poddata)
+    my $index = scan_headings: \%Sections, < @poddata
 
     unless($index)
-        warn "No headings in $Podfile\n" if $Verbose
+        warn: "No headings in $Podfile\n" if $Verbose
     
 
     # open the output file
-    open($html_fh, ">", "$Htmlfile")
-        || die "$^PROGRAM_NAME: cannot open $Htmlfile file for output: $^OS_ERROR\n"
+    open: $html_fh, ">", "$Htmlfile"
+        || die: "$^PROGRAM_NAME: cannot open $Htmlfile file for output: $^OS_ERROR\n"
 
     # put a title in the $html_fh file if one wasn't specified
     if ($Title eq '')
         :TITLE_SEARCH do
-            for my $i (0 .. nelems(@poddata) -1)
+            for my $i (0 .. (nelems: @poddata) -1)
                 if (@poddata[$i] =~ m/^=head1\s*NAME\b/m)
                     for my $para ( @poddata[[(@: $i, $i+1)]] )
                         last TITLE_SEARCH
@@ -433,21 +433,21 @@ sub pod2html
 
     if (!$Title and $Podfile =~ m/\.pod\z/)
         # probably a split pod so take first =head[12] as title
-        for my $i (0 .. nelems(@poddata) -1)
+        for my $i (0 .. (nelems: @poddata) -1)
             last if (@: $Title) = @: @poddata[$i] =~ m/^=head[12]\s*(.*)/
 
-        warn "adopted '$Title' as title for $Podfile\n"
+        warn: "adopted '$Title' as title for $Podfile\n"
             if $Verbose and $Title
     
     if ($Title)
         $Title =~ s/\s*\(.*\)//
     else
-        warn "$^PROGRAM_NAME: no title for $Podfile.\n" unless $Quiet
+        warn: "$^PROGRAM_NAME: no title for $Podfile.\n" unless $Quiet
         $Podfile =~ m/^(.*)(\.[^.\/]+)?\z/s
         $Title = ($Podfile eq "-" ?? 'No Title' !! $1)
-        warn "using $Title" if $Verbose
+        warn: "using $Title" if $Verbose
     
-    $Title = html_escape($Title)
+    $Title = html_escape: $Title
 
     my $csslink = ''
     my $bodystyle = ' style="background-color: white"'
@@ -469,14 +469,14 @@ sub pod2html
 </table>
 END_OF_BLOCK
 
-    print $html_fh ,<<END_OF_HEAD
+    print: $html_fh ,<<END_OF_HEAD
 <?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>$Title</title>$csslink
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:$(config_value('perladmin'))" />
+<link rev="made" href="mailto:$((config_value: 'perladmin'))" />
 </head>
 
 <body$bodystyle>
@@ -484,10 +484,10 @@ $block
 END_OF_HEAD
 
     # load/reload/validate/cache %Pages and %Items
-    get_cache($Dircache, $Itemcache, \@Podpath, $Podroot, $Recurse)
+    get_cache: $Dircache, $Itemcache, \@Podpath, $Podroot, $Recurse
 
     # scan the pod for =item directives
-    scan_items( \%Local_Items, "", < @poddata)
+    scan_items:  \%Local_Items, "", < @poddata
 
     # put an index at the top of the file.  note, if $Doindex is 0 we
     # still generate an index, but surround it with an html comment.
@@ -500,7 +500,7 @@ END_OF_HEAD
         $index = qq(<!--\n$index\n-->\n)
     
 
-    print $html_fh ,<< "END_OF_INDEX"
+    print: $html_fh ,<< "END_OF_INDEX"
 
 <!-- INDEX BEGIN -->
 <div name="index">
@@ -514,7 +514,7 @@ END_OF_INDEX
 
     # now convert this file
     my $after_item             # set to true after an =item
-    warn "Converting input file $Podfile\n" if $Verbose
+    warn: "Converting input file $Podfile\n" if $Verbose
     foreach my $i (0..(nelems @poddata)-1)
         $_ = @poddata[$i]
         $Paragraph = $i+1
@@ -523,57 +523,57 @@ END_OF_INDEX
             $after_item = 0
             $_ = $1
             if (m/^=begin\s+(\S+)\s*(.*)/si)# =begin
-                process_begin($1, $2)
+                process_begin: $1, $2
             elsif (m/^=end\s+(\S+)\s*(.*)/si)# =end
-                process_end($1, $2)
+                process_end: $1, $2
             elsif (m/^=cut/)                    # =cut
-                process_cut()
+                (process_cut: )
             elsif (m/^=pod/)                    # =pod
-                process_pod()
+                (process_pod: )
             else
                 next if (nelems @Begin_Stack) && @Begin_Stack[-1] ne 'html'
 
                 if (m/^=(head[1-6])\s+(.*\S)/s) # =head[1-6] heading
-                    process_head( $1, $2, $Doindex && $index )
+                    process_head:  $1, $2, $Doindex && $index 
                 elsif (m/^=item\s*(.*\S)?/sm)   # =item text
-                    process_item( $1 )
+                    process_item:  $1 
                     $after_item = 1
                 elsif (m/^=over\s*(.*)/)                # =over N
-                    process_over()
+                    (process_over: )
                 elsif (m/^=back/)               # =back
-                    process_back()
+                    (process_back: )
                 elsif (m/^=for\s+(\S+)\s*(.*)/si)# =for
-                    process_for($1,$2)
+                    process_for: $1,$2
                 else
                     m/^=(\S*)\s*/
-                    warn "$^PROGRAM_NAME: $Podfile: unknown pod directive '$1' in "
-                        . "paragraph $Paragraph.  ignoring.\n" unless $Quiet
+                    warn: "$^PROGRAM_NAME: $Podfile: unknown pod directive '$1' in "
+                              . "paragraph $Paragraph.  ignoring.\n" unless $Quiet
                 
             
             $Top = 0
         else
             next if $Ignore
             next if (nelems @Begin_Stack) && @Begin_Stack[-1] ne 'html'
-            print $html_fh, $_ and next if (nelems @Begin_Stack) && @Begin_Stack[-1] eq 'html'
+            print: $html_fh, $_ and next if (nelems @Begin_Stack) && @Begin_Stack[-1] eq 'html'
             my $text = $_
 
             # Open tag for definition list as we have something to put in it
             if( $ListNewTerm )
-                print $html_fh ,"<dd>\n"
+                print: $html_fh ,"<dd>\n"
                 $ListNewTerm = 0
             
 
             if( $text =~ m/\A\s+/ )
-                process_pre( \$text )
-                print $html_fh ,"<pre>\n$text</pre>\n"
+                process_pre:  \$text 
+                print: $html_fh ,"<pre>\n$text</pre>\n"
 
             else
-                process_text( \$text )
+                process_text:  \$text 
 
                 # experimental: check for a paragraph where all lines
                 # have some ...\t...\t...\n pattern
                 if( $text =~ m/\t/ )
-                    my @lines = split( "\n", $text )
+                    my @lines = split:  "\n", $text 
                     if( (nelems @lines) +> 1 )
                         my $all = 2
                         foreach my $line (  @lines )
@@ -592,20 +592,20 @@ END_OF_INDEX
                 
                 ## end of experimental
 
-                print $html_fh ,"<p>$text</p>\n"
+                print: $html_fh ,"<p>$text</p>\n"
             
             $after_item = 0
         
     
 
     # finish off any pending directives
-    finish_list()
+    (finish_list: )
 
     # link to page index
-    print $html_fh ,"<p><a href=\"#__index__\"><small>$Backlink</small></a></p>\n"
+    print: $html_fh ,"<p><a href=\"#__index__\"><small>$Backlink</small></a></p>\n"
         if $Doindex and $index and $Backlink
 
-    print $html_fh ,<<END_OF_TAIL
+    print: $html_fh ,<<END_OF_TAIL
 $block
 </body>
 
@@ -613,17 +613,17 @@ $block
 END_OF_TAIL
 
     # close the html file
-    close($html_fh)
+    close: $html_fh
 
-    warn "Finished\n" if $Verbose
+    warn: "Finished\n" if $Verbose
 
 
 ##############################################################################
 
 sub usage
     my $podfile = shift
-    warn "$^PROGRAM_NAME: $podfile: $(join ' ',@_)\n" if (nelems @_)
-    die <<END_OF_USAGE
+    warn: "$^PROGRAM_NAME: $podfile: $((join: ' ',@_))\n" if (nelems @_)
+    die: <<END_OF_USAGE
 Usage:  $^PROGRAM_NAME --help --htmlroot=<name> --infile=<name> --outfile=<name>
            --podpath=<name>:...:<name> --podroot=<name>
            --libpods=<name>:...:<name> --recurse --verbose --index
@@ -670,36 +670,36 @@ sub parse_command_line
         $opt_netscape,$opt_outfile,$opt_podpath,$opt_podroot,$opt_quiet,
         $opt_recurse,$opt_title,$opt_verbose,$opt_hiddendirs)
 
-    unshift @ARGV, < split ' ', config_value('pod2html') if config_value('pod2html')
-    my $result = GetOptions(
-       'backlink=s' => \$opt_backlink,
-       'cachedir=s' => \$opt_cachedir,
-       'css=s'      => \$opt_css,
-       'flush'      => \$opt_flush,
-       'header!'    => \$opt_header,
-       'help'       => \$opt_help,
-       'hiddendirs!'=> \$opt_hiddendirs,
-       'htmldir=s'  => \$opt_htmldir,
-       'htmlroot=s' => \$opt_htmlroot,
-       'index!'     => \$opt_index,
-       'infile=s'   => \$opt_infile,
-       'libpods=s'  => \$opt_libpods,
-       'netscape!'  => \$opt_netscape,
-       'outfile=s'  => \$opt_outfile,
-       'podpath=s'  => \$opt_podpath,
-       'podroot=s'  => \$opt_podroot,
-       'quiet!'     => \$opt_quiet,
-       'recurse!'   => \$opt_recurse,
-       'title=s'    => \$opt_title,
-       'verbose!'   => \$opt_verbose,
-       )
-    usage("-", "invalid parameters") if not $result
+    unshift: @ARGV, < (split: ' ', (config_value: 'pod2html')) if config_value: 'pod2html'
+    my $result = GetOptions: 
+       'backlink=s' => \$opt_backlink
+       'cachedir=s' => \$opt_cachedir
+       'css=s'      => \$opt_css
+       'flush'      => \$opt_flush
+       'header!'    => \$opt_header
+       'help'       => \$opt_help
+       'hiddendirs!'=> \$opt_hiddendirs
+       'htmldir=s'  => \$opt_htmldir
+       'htmlroot=s' => \$opt_htmlroot
+       'index!'     => \$opt_index
+       'infile=s'   => \$opt_infile
+       'libpods=s'  => \$opt_libpods
+       'netscape!'  => \$opt_netscape
+       'outfile=s'  => \$opt_outfile
+       'podpath=s'  => \$opt_podpath
+       'podroot=s'  => \$opt_podroot
+       'quiet!'     => \$opt_quiet
+       'recurse!'   => \$opt_recurse
+       'title=s'    => \$opt_title
+       'verbose!'   => \$opt_verbose
+       
+    usage: "-", "invalid parameters" if not $result
 
-    usage("-") if defined $opt_help     # see if the user asked for help
+    usage: "-" if defined $opt_help     # see if the user asked for help
     $opt_help = ""                      # just to make -w shut-up.
 
-    @Podpath  = split(":", $opt_podpath) if defined $opt_podpath
-    @Libpods  = split(":", $opt_libpods) if defined $opt_libpods
+    @Podpath  = (split: ":", $opt_podpath) if defined $opt_podpath
+    @Libpods  = (split: ":", $opt_libpods) if defined $opt_libpods
 
     $Backlink = $opt_backlink if defined $opt_backlink
     $Cachedir = $opt_cachedir if defined $opt_cachedir
@@ -717,12 +717,12 @@ sub parse_command_line
     $Title    = $opt_title    if defined $opt_title
     $Verbose  = $opt_verbose  if defined $opt_verbose
 
-    warn "Flushing item and directory caches\n"
+    warn: "Flushing item and directory caches\n"
         if $opt_verbose && defined $opt_flush
     $Dircache = "$Cachedir/pod2htmd.tmp"
     $Itemcache = "$Cachedir/pod2htmi.tmp"
     if (defined $opt_flush)
-        1 while unlink($Dircache, $Itemcache)
+        1 while unlink: $Dircache, $Itemcache
     
 
 
@@ -737,7 +737,7 @@ sub get_cache
     # Don't bother reading the cache files if they still apply
     # and haven't changed since we last read them.
 
-    my $this_cache_key = cache_key(< @cache_key_args)
+    my $this_cache_key = cache_key: < @cache_key_args
 
     return if $Saved_Cache_Key and $this_cache_key eq $Saved_Cache_Key
 
@@ -745,22 +745,22 @@ sub get_cache
     # non-zero if successful.
     my $tests = 0
     if (-f $dircache && -f $itemcache)
-        warn "scanning for item cache\n" if $Verbose
-        $tests = load_cache($dircache, $itemcache, $podpath, $podroot)
+        warn: "scanning for item cache\n" if $Verbose
+        $tests = load_cache: $dircache, $itemcache, $podpath, $podroot
     
 
     # if we didn't succeed in loading the cache then we must (re)build
     #  %Pages and %Items.
     if (!$tests)
-        warn "scanning directories in pod-path\n" if $Verbose
-        scan_podpath($podroot, $recurse, 0)
+        warn: "scanning directories in pod-path\n" if $Verbose
+        scan_podpath: $podroot, $recurse, 0
     
-    $Saved_Cache_Key = cache_key(< @cache_key_args)
+    $Saved_Cache_Key = cache_key: < @cache_key_args
 
 
 sub cache_key($dircache, $itemcache, $podpath, $podroot, $recurse)
-    return join('!', (@:  $dircache, $itemcache, $recurse
-                          < $podpath->@, $podroot, stat($dircache), stat($itemcache)))
+    return join: '!', (@:  $dircache, $itemcache, $recurse
+                           < $podpath->@, $podroot, (stat: $dircache), (stat: $itemcache))
 
 
 #
@@ -774,62 +774,62 @@ sub load_cache($dircache, $itemcache, $podpath, $podroot)
 
     $tests = 0
 
-    open(my $cache, "<", "$itemcache") ||
-        die "$^PROGRAM_NAME: error opening $itemcache for reading: $^OS_ERROR\n"
+    (open: my $cache, "<", "$itemcache") ||
+        die: "$^PROGRAM_NAME: error opening $itemcache for reading: $^OS_ERROR\n"
     $^INPUT_RECORD_SEPARATOR = "\n"
 
     # is it the same podpath?
     $_ = ~< $cache
-    chomp($_)
-    $tests++ if (join(":", $podpath->@) eq $_)
+    chomp: $_
+    $tests++ if ((join: ":", $podpath->@) eq $_)
 
     # is it the same podroot?
     $_ = ~< $cache
-    chomp($_)
+    chomp: $_
     $tests++ if ($podroot eq $_)
 
     # load the cache if its good
     if ($tests != 2)
-        close($cache)
+        close: $cache
         return 0
     
 
-    warn "loading item cache\n" if $Verbose
+    warn: "loading item cache\n" if $Verbose
     while ( ~< $cache)
         m/(.*?) (.*)$/
         %Items{+$1} = $2
     
-    close($cache)
+    close: $cache
 
-    warn "scanning for directory cache\n" if $Verbose
-    open($cache, "<", "$dircache") ||
-        die "$^PROGRAM_NAME: error opening $dircache for reading: $^OS_ERROR\n"
+    warn: "scanning for directory cache\n" if $Verbose
+    (open: $cache, "<", "$dircache") ||
+        die: "$^PROGRAM_NAME: error opening $dircache for reading: $^OS_ERROR\n"
     $^INPUT_RECORD_SEPARATOR = "\n"
     $tests = 0
 
     # is it the same podpath?
     $_ = ~< $cache
-    chomp($_)
-    $tests++ if (join(":", $podpath->@) eq $_)
+    chomp: $_
+    $tests++ if ((join: ":", $podpath->@) eq $_)
 
     # is it the same podroot?
     $_ = ~< $cache
-    chomp($_)
+    chomp: $_
     $tests++ if ($podroot eq $_)
 
     # load the cache if its good
     if ($tests != 2)
-        close($cache)
+        close: $cache
         return 0
     
 
-    warn "loading directory cache\n" if $Verbose
+    warn: "loading directory cache\n" if $Verbose
     while ( ~< $cache)
         m/(.*?) (.*)$/
         %Pages{+$1} = $2
     
 
-    close($cache)
+    close: $cache
 
     return 1
 
@@ -849,11 +849,11 @@ sub scan_podpath($podroot, $recurse, $append)
     
 
     # scan each directory listed in @Podpath
-    $pwd = getcwd()
-    chdir($podroot)
-        || die "$^PROGRAM_NAME: error changing to directory $podroot: $^OS_ERROR\n"
+    $pwd = (getcwd: )
+    chdir: $podroot
+        || die: "$^PROGRAM_NAME: error changing to directory $podroot: $^OS_ERROR\n"
     foreach my $dir ( @Podpath)
-        scan_dir($dir, $recurse)
+        scan_dir: $dir, $recurse
     
 
     # scan the pods listed in @Libpods for =item directives
@@ -868,20 +868,20 @@ sub scan_podpath($podroot, $recurse, $append)
         if (%Pages{?$libpod} =~ m/([^:]*(?<!\.pod)(?<!\.pm)):/)
             #  find all the .pod and .pm files within the directory
             $dirname = $1
-            opendir(my $dir, $dirname) ||
-                die "$^PROGRAM_NAME: error opening directory $dirname: $^OS_ERROR\n"
-            @files = grep( {m/(\.pod|\.pm)\z/ && ! -d $_ }, (@:  readdir($dir)))
-            closedir($dir)
+            (opendir: my $dir, $dirname) ||
+                die: "$^PROGRAM_NAME: error opening directory $dirname: $^OS_ERROR\n"
+            @files = grep:  {m/(\.pod|\.pm)\z/ && ! -d $_ }, (@:  (readdir: $dir))
+            closedir: $dir
 
             # scan each .pod and .pm file for =item directives
             foreach my $pod ( @files)
-                open(my $pod_fh, "<", "$dirname/$pod") ||
-                    die "$^PROGRAM_NAME: error opening $dirname/$pod for input: $^OS_ERROR\n"
+                (open: my $pod_fh, "<", "$dirname/$pod") ||
+                    die: "$^PROGRAM_NAME: error opening $dirname/$pod for input: $^OS_ERROR\n"
                 @poddata = @:  ~< $pod_fh->* 
-                close($pod_fh)
-                clean_data( \@poddata )
+                close: $pod_fh
+                clean_data:  \@poddata 
 
-                scan_items( \%Items, "$dirname/$pod", < @poddata)
+                scan_items:  \%Items, "$dirname/$pod", < @poddata
             
 
         # use the names of files as =item directives too.
@@ -894,45 +894,45 @@ sub scan_podpath($podroot, $recurse, $append)
             %Pages{?$libpod} =~ m/([^:]*\.pm):/)
             # scan the .pod or .pm file for =item directives
             my $pod = $1
-            open(my $pod_fh, "<", "$pod") ||
-                die "$^PROGRAM_NAME: error opening $pod for input: $^OS_ERROR\n"
+            (open: my $pod_fh, "<", "$pod") ||
+                die: "$^PROGRAM_NAME: error opening $pod for input: $^OS_ERROR\n"
             @poddata = @:  ~< $pod_fh->* 
-            close($pod_fh)
-            clean_data( \@poddata )
+            close: $pod_fh
+            clean_data:  \@poddata 
 
-            scan_items( \%Items, "$pod", < @poddata)
+            scan_items:  \%Items, "$pod", < @poddata
         else
-            warn "$^PROGRAM_NAME: shouldn't be here (line ".__LINE__."\n" unless $Quiet
+            warn: "$^PROGRAM_NAME: shouldn't be here (line ".__LINE__."\n" unless $Quiet
         
     
     @poddata = $@  # clean-up a bit
 
-    chdir($pwd)
-        || die "$^PROGRAM_NAME: error changing to directory $pwd: $^OS_ERROR\n"
+    chdir: $pwd
+        || die: "$^PROGRAM_NAME: error changing to directory $pwd: $^OS_ERROR\n"
 
     # cache the item list for later use
-    warn "caching items for later use\n" if $Verbose
-    open(my $cache, ">", "$Itemcache") ||
-        die "$^PROGRAM_NAME: error open $Itemcache for writing: $^OS_ERROR\n"
+    warn: "caching items for later use\n" if $Verbose
+    (open: my $cache, ">", "$Itemcache") ||
+        die: "$^PROGRAM_NAME: error open $Itemcache for writing: $^OS_ERROR\n"
 
-    print $cache, join(":", @Podpath) . "\n$podroot\n"
+    print: $cache, (join: ":", @Podpath) . "\n$podroot\n"
     foreach my $key (keys %Items)
-        print $cache, "$key %Items{?$key}\n"
+        print: $cache, "$key %Items{?$key}\n"
     
 
-    close($cache)
+    close: $cache
 
     # cache the directory list for later use
-    warn "caching directories for later use\n" if $Verbose
-    open($cache, ">", "$Dircache") ||
-        die "$^PROGRAM_NAME: error open $Dircache for writing: $^OS_ERROR\n"
+    warn: "caching directories for later use\n" if $Verbose
+    (open: $cache, ">", "$Dircache") ||
+        die: "$^PROGRAM_NAME: error open $Dircache for writing: $^OS_ERROR\n"
 
-    print $cache, join(":", @Podpath) . "\n$podroot\n"
+    print: $cache, (join: ":", @Podpath) . "\n$podroot\n"
     foreach my $key (keys %Pages)
-        print $cache, "$key %Pages{?$key}\n"
+        print: $cache, "$key %Pages{?$key}\n"
     
 
-    close($cache)
+    close: $cache
 
 
 #
@@ -948,20 +948,20 @@ sub scan_dir($dir, $recurse)
     @subdirs = $@
     @pods = $@
 
-    opendir(my $dh, $dir) ||
-        die "$^PROGRAM_NAME: error opening directory $dir: $^OS_ERROR\n"
-    while (defined($_ = readdir($dh)))
+    (opendir: my $dh, $dir) ||
+        die: "$^PROGRAM_NAME: error opening directory $dir: $^OS_ERROR\n"
+    while ((defined: ($_ = (readdir: $dh))))
         if (-d "$dir/$_" && $_ ne "." && $_ ne ".."
             && ($HiddenDirs || !m/^\./)
             )         # directory
             %Pages{+$_}  = "" unless defined %Pages{?$_}
             %Pages{+$_} .= "$dir/$_:"
-            push(@subdirs, $_)
+            push: @subdirs, $_
         elsif (m/\.pod\z/)                                  # .pod
             s/\.pod\z//
             %Pages{+$_}  = "" unless defined %Pages{?$_}
             %Pages{+$_} .= "$dir/$_.pod:"
-            push(@pods, "$dir/$_.pod")
+            push: @pods, "$dir/$_.pod"
         elsif (m/\.html\z/)                                 # .html
             s/\.html\z//
             %Pages{+$_}  = "" unless defined %Pages{?$_}
@@ -970,27 +970,27 @@ sub scan_dir($dir, $recurse)
             s/\.pm\z//
             %Pages{+$_}  = "" unless defined %Pages{?$_}
             %Pages{+$_} .= "$dir/$_.pm:"
-            push(@pods, "$dir/$_.pm")
+            push: @pods, "$dir/$_.pm"
         elsif (-T "$dir/$_")                        # script(?)
-            if (open(my $f, "<", "$dir/$_"))
+            if ((open: my $f, "<", "$dir/$_"))
                 my $line
-                while (defined($line = ~< $f))
+                while ((defined: ($line = ~< $f)))
                     if ($line =~ m/^=(?:pod|head1)/)
                         %Pages{+$_}  = "" unless defined %Pages{?$_}
                         %Pages{+$_} .= "$dir/$_.pod:"
                         last
                     
                 
-                close($f)
+                close: $f
             
         
     
-    closedir($dh)
+    closedir: $dh
 
     # recurse on the subdirectories if necessary
     if ($recurse)
         foreach my $subdir ( @subdirs)
-            scan_dir("$dir/$subdir", $recurse)
+            scan_dir: "$dir/$subdir", $recurse
         
     
 
@@ -1013,10 +1013,10 @@ sub scan_headings($sections, @< @data)
         if ($line =~ m/^=(head)([1-6])\s+(.*)/)
             (@: $tag, $which_head, $otitle) = @: $1,$2,$3
 
-            my $title = depod( $otitle )
-            my $name = anchorify( $title )
+            my $title = depod:  $otitle 
+            my $name = anchorify:  $title 
             $sections->%{+$name} = 1
-            $title = process_text( \$otitle )
+            $title = process_text:  \$otitle 
 
             while ($which_head != $listdepth)
                 if ($which_head +> $listdepth)
@@ -1057,7 +1057,7 @@ sub scan_items( $itemref, $pod, @< @poddata)
     $pod .= ".html" if $pod
 
     foreach my $i (0..(nelems @poddata)-1)
-        my $txt = depod( @poddata[$i] )
+        my $txt = depod:  @poddata[$i] 
 
         # figure out what kind of item it is.
         # Build string for referencing this item.
@@ -1071,7 +1071,7 @@ sub scan_items( $itemref, $pod, @< @poddata)
         else
             next
         
-        my $fid = fragment_id( $item )
+        my $fid = fragment_id:  $item 
         $itemref->%{+$fid} = "$pod" if $fid
     
 
@@ -1085,20 +1085,20 @@ sub process_head($tag, $heading, $hasindex)
     $tag =~ m/head([1-6])/
     my $level = $1
 
-    finish_list()
+    (finish_list: )
 
-    print $html_fh, "<p>\n"
+    print: $html_fh, "<p>\n"
     if( $level == 1 && ! $Top )
-        print $html_fh, "<a href=\"#__index__\"><small>$Backlink</small></a>\n"
+        print: $html_fh, "<a href=\"#__index__\"><small>$Backlink</small></a>\n"
             if $hasindex and $Backlink
-        print $html_fh, "</p>\n<hr />\n"
+        print: $html_fh, "</p>\n<hr />\n"
     else
-        print $html_fh, "</p>\n"
+        print: $html_fh, "</p>\n"
     
 
-    my $name = anchorify( depod( $heading ) )
-    my $convert = process_text( \$heading )
-    print $html_fh, "<h$level><a name=\"$name\">$convert</a></h$level>\n"
+    my $name = anchorify:  (depod:  $heading ) 
+    my $convert = process_text:  \$heading 
+    print: $html_fh, "<h$level><a name=\"$name\">$convert</a></h$level>\n"
 
 
 
@@ -1109,45 +1109,45 @@ sub process_head($tag, $heading, $hasindex)
 my $EmittedItem
 
 sub emit_item_tag( $otext, $text, $compact)
-    my $item = fragment_id( depod($text) , "generate")
-    Carp::confess("Undefined fragment '$text' (".depod($text).") from fragment_id() in emit_item_tag() in $Podfile")
+    my $item = fragment_id:  (depod: $text) , "generate"
+    Carp::confess: "Undefined fragment '$text' (".(depod: $text).") from fragment_id() in emit_item_tag() in $Podfile"
         if !defined $item
     $EmittedItem = $item
     ### print STDERR "emit_item_tag=$item ($text)\n";
 
-    print $html_fh, '<strong>'
+    print: $html_fh, '<strong>'
     if (%Items_Named{+$item}++)
-        print $html_fh, process_text( \$otext )
+        print: $html_fh, process_text:  \$otext 
     else
         my $name = $item
-        $name = anchorify($name)
-        print $html_fh, qq{<a name="$name" class="item">}, process_text( \$otext ), '</a>'
+        $name = anchorify: $name
+        print: $html_fh, qq{<a name="$name" class="item">}, (process_text:  \$otext ), '</a>'
     
-    print $html_fh, "</strong>"
+    print: $html_fh, "</strong>"
     undef( $EmittedItem )
 
 
 sub new_listitem( $tag)
     # Open tag for definition list as we have something to put in it
     if( ($tag ne 'dl') && ($ListNewTerm) )
-        print $html_fh, "<dd>\n"
+        print: $html_fh, "<dd>\n"
         $ListNewTerm = 0
     
 
     if( @Items_Seen[+$Listlevel]++ == 0 )
         # start of new list
-        push( @Listtype, "$tag" )
-        print $html_fh, "<$tag>\n"
+        push:  @Listtype, "$tag" 
+        print: $html_fh, "<$tag>\n"
     else
         # if this is not the first item, close the previous one
         if ( $tag eq 'dl' )
-            print $html_fh, "</dd>\n" unless $ListNewTerm
+            print: $html_fh, "</dd>\n" unless $ListNewTerm
         else
-            print $html_fh, "</li>\n"
+            print: $html_fh, "</li>\n"
         
     
     my $opentag = $tag eq 'dl' ?? 'dt' !! 'li'
-    print $html_fh, "<$opentag>"
+    print: $html_fh, "<$opentag>"
 
 
 #
@@ -1159,45 +1159,45 @@ sub process_item( $otext)
     # bad!  but, the proper thing to do seems to be to just assume
     # they did do an =over.  so warn them once and then continue.
     if( $Listlevel == 0 )
-        warn "$^PROGRAM_NAME: $Podfile: unexpected =item directive in paragraph $Paragraph.  ignoring.\n" unless $Quiet
-        process_over()
+        warn: "$^PROGRAM_NAME: $Podfile: unexpected =item directive in paragraph $Paragraph.  ignoring.\n" unless $Quiet
+        (process_over: )
     
 
     # remove formatting instructions from the text
-    my $text = depod( $otext )
+    my $text = depod:  $otext 
 
     # all the list variants:
     if( $text =~ m/\A\*/ ) # bullet
-        new_listitem( 'ul' )
+        new_listitem:  'ul' 
         if ($text =~ m/\A\*\s+(\S.*)\Z/s ) # with additional text
             my $tag = $1
             $otext =~ s/\A\*\s+//
-            emit_item_tag( $otext, $tag, 1 )
-            print $html_fh, "\n"
+            emit_item_tag:  $otext, $tag, 1 
+            print: $html_fh, "\n"
         
 
     elsif( $text =~ m/\A\d+/ ) # numbered list
-        new_listitem( 'ol' )
+        new_listitem:  'ol' 
         if ($text =~ m/\A(?>\d+\.?)\s*(\S.*)\Z/s ) # with additional text
             my $tag = $1
             $otext =~ s/\A\d+\.?\s*//
-            emit_item_tag( $otext, $tag, 1 )
-            print $html_fh, "\n"
+            emit_item_tag:  $otext, $tag, 1 
+            print: $html_fh, "\n"
         
 
     else                        # definition list
         # new_listitem takes care of opening the <dt> tag
-        new_listitem( 'dl' )
+        new_listitem:  'dl' 
         if ($text =~ m/\A(.+)\Z/s ) # should have text
-            emit_item_tag( $otext, $text, 1 )
+            emit_item_tag:  $otext, $text, 1 
             # write the definition term and close <dt> tag
-            print $html_fh, "</dt>\n"
+            print: $html_fh, "</dt>\n"
         
         # trigger opening a <dd> tag for the actual definition; will not
         # happen if next paragraph is also a definition term (=item)
         $ListNewTerm = 1
     
-    print $html_fh, "\n"
+    print: $html_fh, "\n"
 
 
 #
@@ -1206,7 +1206,7 @@ sub process_item( $otext)
 sub process_over
     # start a new list
     $Listlevel++
-    push( @Items_Seen, 0 )
+    push:  @Items_Seen, 0 
 
 
 #
@@ -1214,7 +1214,7 @@ sub process_over
 #
 sub process_back
     if( $Listlevel == 0 )
-        warn "$^PROGRAM_NAME: $Podfile: unexpected =back directive in paragraph $Paragraph.  ignoring.\n" unless $Quiet
+        warn: "$^PROGRAM_NAME: $Podfile: unexpected =back directive in paragraph $Paragraph.  ignoring.\n" unless $Quiet
         return
     
 
@@ -1224,17 +1224,17 @@ sub process_back
     $Listlevel--
     if( defined @Listtype[?$Listlevel] )
         if ( @Listtype[$Listlevel] eq 'dl' )
-            print $html_fh, "</dd>\n" unless $ListNewTerm
+            print: $html_fh, "</dd>\n" unless $ListNewTerm
         else
-            print $html_fh, "</li>\n"
+            print: $html_fh, "</li>\n"
         
-        print $html_fh, "</@Listtype[$Listlevel]>\n"
-        pop( @Listtype )
+        print: $html_fh, "</@Listtype[$Listlevel]>\n"
+        pop:  @Listtype 
         $ListNewTerm = 0
     
 
     # clean up item count
-    pop( @Items_Seen )
+    pop:  @Items_Seen 
 
 
 #
@@ -1258,13 +1258,13 @@ sub process_pod {
 #
 sub process_for($whom, $text)
     if ( $whom =~ m/^(pod2)?html$/i)
-        print $html_fh, $text
+        print: $html_fh, $text
     elsif ($whom =~ m/^illustration$/i)
         1 while chomp $text
         for my $ext (qw[.png .gif .jpeg .jpg .tga .pcl .bmp])
             ($text .= $ext), last if -r "$text$ext"
         
-        print $html_fh, qq{<p align="center"><img src="$text" alt="$text illustration" /></p>}
+        print: $html_fh, qq{<p align="center"><img src="$text" alt="$text illustration" /></p>}
     
 
 
@@ -1274,10 +1274,10 @@ sub process_for($whom, $text)
 # begin stack, we only print if it us.
 #
 sub process_begin($whom, $text)
-    $whom = lc($whom)
-    push (@Begin_Stack, $whom)
+    $whom = lc: $whom
+    push: @Begin_Stack, $whom
     if ( $whom =~ m/^(pod2)?html$/)
-        print $html_fh, $text if $text
+        print: $html_fh, $text if $text
     
 
 
@@ -1286,11 +1286,11 @@ sub process_begin($whom, $text)
 # begin stack.  die if we're mismatched.
 #
 sub process_end($whom, $text)
-    $whom = lc($whom)
+    $whom = lc: $whom
     if (!defined @Begin_Stack[-1] or @Begin_Stack[-1] ne $whom )
-        Carp::confess("Unmatched begin/end at chunk $Paragraph in pod $Podfile\n")
+        Carp::confess: "Unmatched begin/end at chunk $Paragraph in pod $Podfile\n"
     
-    pop( @Begin_Stack )
+    pop:  @Begin_Stack 
 
 
 #
@@ -1305,12 +1305,12 @@ sub process_pre( $text)
     # insert spaces in place of tabs
     $rest =~ s#(.+)#$( do {
         my $line = $1;
-        1 while $line =~ s/^(.*?)(\t+)/$($1 . ' ' x ((length($2) * 8 - length($1) % 8)))/;
+        1 while $line =~ s/^(.*?)(\t+)/$($1 . ' ' x (((length: $2) * 8 - (length: $1) % 8)))/;
         $line;
     })#g
 
     # convert some special chars to HTML escapes
-    $rest = html_escape($rest)
+    $rest = html_escape: $rest
 
     # try and create links for all occurrences of perl.* within
     # the preformatted text.
@@ -1319,8 +1319,8 @@ sub process_pre( $text)
               }{$( do {
         if ( defined %Pages{?$2} ){     # is a link
             qq($1<a href="$Htmlroot/%Pages{?$2}">$2</a>);
-        } elsif (defined %Pages{?dosify($2)}) { # is a link
-            qq($1<a href="$Htmlroot/%Pages{?dosify($2)}">$2</a>);
+        } elsif (defined %Pages{?(dosify: $2)}) { # is a link
+            qq($1<a href="$Htmlroot/%Pages{?(dosify: $2)}">$2</a>);
         } else {
             "$1$2";
         }
@@ -1339,7 +1339,7 @@ sub process_pre( $text)
             # to avoid corrupting links that are #, file:, etc.
             my $old_url = $3 ;
             $old_url = "$Htmldir$old_url" if $old_url =~ m{^\/};
-            $url = relativize_url( "$old_url.html", $Htmlfileurl );
+            $url = (relativize_url:  "$old_url.html", $Htmlfileurl );
         } else {
             $url = "$3.html" ;
         }
@@ -1350,7 +1350,7 @@ sub process_pre( $text)
     # Look for embedded URLs and make them into links.  We don't
     # relativize them since they are best left as the author intended.
 
-    my $urls = '(' . join ('|', qw{
+    my $urls = '(' . join: '|', qw{
                 http
                 telnet
                 mailto
@@ -1359,7 +1359,7 @@ sub process_pre( $text)
                 file
                 wais
                 ftp
-            } )
+            } 
         . ')'
 
     my $ltrs = '\w'
@@ -1402,11 +1402,11 @@ sub process_pre( $text)
 # we don't want this to happen within IS
 #
 sub pure_text($text)
-    process_puretext( $text, 1 )
+    process_puretext:  $text, 1 
 
 
 sub inIS_text($text)
-    process_puretext( $text, 0 )
+    process_puretext:  $text, 0 
 
 
 #
@@ -1426,7 +1426,7 @@ sub process_puretext($text, $notinIS)
     $trail = ($text =~ s/(\s+)\Z//s ?? $1 !! "")
 
     # split at space/non-space boundaries
-    @words = split( m/(?<=\s)(?=\S)|(?<=\S)(?=\s)/, $text )
+    @words = split:  m/(?<=\s)(?=\S)|(?<=\S)(?=\s)/, $text 
 
     # process each word individually
     foreach my $word ( @words)
@@ -1454,14 +1454,14 @@ sub process_puretext($text, $notinIS)
             ## try for a pagename (perlXXX(1))?
             my(@:  $func, $args, $rest ) = @:  $1, $2, $3 || '' 
             if( $args =~ m/^\d+$/ )
-                my $url = page_sect( $word, '' )
+                my $url = page_sect:  $word, '' 
                 if( defined $url )
                     $word = qq(<a href="$url" class="man">the $word manpage</a>$rest)
                     next
                 
             
             ## try function name for a link, append tt'ed argument list
-            $word = emit_C( $func, '', "($args)") . $rest
+            $word = (emit_C:  $func, '', "($args)") . $rest
 
         #### disabled. either all (including $\W, $\w+{.*} etc.) or nothing.
         ##      } elsif( $notinIS && $word =~ /^[\$\@%&*]+\w+$/) {
@@ -1479,12 +1479,12 @@ sub process_puretext($text, $notinIS)
             (@: $w1, $w2, $w3) = (@: "&lt;", $1, "&gt;$2") if $word =~ m/^<(.*?)>(,?)/
             $word = qq($w1<a href="mailto:$w2">$w2</a>$w3)
         else
-            $word = html_escape($word) if $word =~ m/["&<>]/
+            $word = (html_escape: $word) if $word =~ m/["&<>]/
         
     
 
     # put everything back together
-    return $lead . join( '', @words ) . $trail
+    return $lead . (join:  '', @words ) . $trail
 
 
 
@@ -1495,12 +1495,12 @@ sub process_puretext($text, $notinIS)
 #
 
 sub pattern ($v) { $v ?? '\s+'.('>' x ($v + 1)) !! '>' }
-sub closing ($_) { (defined && s/\s+\z//) ?? length($_) !! 0 }
+sub closing ($_) { (defined && s/\s+\z//) ?? (length: $_) !! 0 }
 
 sub process_text( $tref)
     return if $Ignore
 
-    my $res = process_text1( 0, $tref )
+    my $res = process_text1:  0, $tref 
     $res =~ s/\s+$//s
     $tref->$ = $res
 
@@ -1530,20 +1530,20 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing)
 
     if( $func eq 'B' )
         # B<text> - boldface
-        $res = '<strong>' . process_text1( $lev, $rstr ) . '</strong>'
+        $res = '<strong>' . (process_text1:  $lev, $rstr ) . '</strong>'
 
     elsif( $func eq 'C' )
         # C<code> - can be a ref or <code></code>
         # need to extract text
-        my $par = go_ahead( $rstr, 'C', $closing )
+        my $par = go_ahead:  $rstr, 'C', $closing 
 
         ## clean-up of the link target
-        my $text = depod( $par )
+        my $text = depod:  $par 
 
         ### my $x = $par =~ /[BI]</ ? 'yes' : 'no' ;
         ### print STDERR "-->call emit_C($par) lev=$lev, par with BI=$x\n";
 
-        $res = emit_C( $text, $lev +> 1 || ($par =~ m/[BI]</) )
+        $res = emit_C:  $text, $lev +> 1 || ($par =~ m/[BI]</) 
 
     elsif( $func eq 'E' )
         # E<x> - convert to character
@@ -1554,28 +1554,28 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing)
 
     elsif( $func eq 'F' )
         # F<filename> - italicize
-        $res = '<em class="file">' . process_text1( $lev, $rstr ) . '</em>'
+        $res = '<em class="file">' . (process_text1:  $lev, $rstr ) . '</em>'
 
     elsif( $func eq 'I' )
         # I<text> - italicize
-        $res = '<em>' . process_text1( $lev, $rstr ) . '</em>'
+        $res = '<em>' . (process_text1:  $lev, $rstr ) . '</em>'
 
     elsif( $func eq 'L' )
         # L<link> - link
         ## L<text|cross-ref> => produce text, use cross-ref for linking
         ## L<cross-ref> => make text from cross-ref
         ## need to extract text
-        my $par = go_ahead( $rstr, 'L', $closing )
+        my $par = go_ahead:  $rstr, 'L', $closing 
 
         # some L<>'s that shouldn't be:
         # a) full-blown URL's are emitted as-is
         if( $par =~ m{^\w+://}s )
-            return make_URL_href( $par )
+            return make_URL_href:  $par 
         
         # b) C<...> is stripped and treated as C<>
         if( $par =~ m/^C<(.*)>$/ )
-            my $text = depod( $1 )
-            return emit_C( $text, $lev +> 1 || ($par =~ m/[BI]</) )
+            my $text = depod:  $1 
+            return emit_C:  $text, $lev +> 1 || ($par =~ m/[BI]</) 
         
 
         # analyze the contents
@@ -1622,9 +1622,9 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing)
         :RESOLVE do
             if( defined $ident )
                 ## try to resolve $ident as an item
-                (@:  $url, $fid ) =  coderef( $page, $ident )
+                (@:  $url, $fid ) =  coderef:  $page, $ident 
                 if( $url )
-                    if( ! defined( $linktext ) )
+                    if( ! (defined:  $linktext ) )
                         $linktext = $ident
                         $linktext .= " in " if $ident && $page
                         $linktext .= "the $page manpage" if $page
@@ -1636,10 +1636,10 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing)
                 $section = $ident
             
             ## now go for a section
-            my $htmlsection = htmlify( $section )
-            $url = page_sect( $page, $htmlsection )
+            my $htmlsection = htmlify:  $section 
+            $url = page_sect:  $page, $htmlsection 
             if( $url )
-                if( ! defined( $linktext ) )
+                if( ! (defined:  $linktext ) )
                     $linktext = $section
                     $linktext .= " in " if $section && $page
                     $linktext .= "the $page manpage" if $page
@@ -1654,9 +1654,9 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing)
                 $ident = $page
                 $page  = undef()
             
-            (@:  $url, $fid ) =  coderef( $page, $ident )
+            (@:  $url, $fid ) =  coderef:  $page, $ident 
             if( $url )
-                if( ! defined( $linktext ) )
+                if( ! (defined:  $linktext ) )
                     $linktext = $ident
                     $linktext .= " in " if $ident && $page
                     $linktext .= "the $page manpage" if $page
@@ -1667,52 +1667,52 @@ sub process_text1( $lev, $rstr, ?$func, ?$closing)
 
             # warning; show some text.
             $linktext = $opar unless defined $linktext
-            warn "$^PROGRAM_NAME: $Podfile: cannot resolve L<$opar> in paragraph $Paragraph.\n" unless $Quiet
+            warn: "$^PROGRAM_NAME: $Podfile: cannot resolve L<$opar> in paragraph $Paragraph.\n" unless $Quiet
         
 
         # now we have a URL or just plain code
         $rstr->$ = $linktext . '>' . $rstr->$
-        if( defined( $url ) )
-            $res = "<a href=\"$url\">" . process_text1( $lev, $rstr ) . '</a>'
+        if( (defined:  $url ) )
+            $res = "<a href=\"$url\">" . (process_text1:  $lev, $rstr ) . '</a>'
         else
-            $res = '<em>' . process_text1( $lev, $rstr ) . '</em>'
+            $res = '<em>' . (process_text1:  $lev, $rstr ) . '</em>'
         
 
     elsif( $func eq 'S' )
         # S<text> - non-breaking spaces
-        $res = process_text1( $lev, $rstr )
+        $res = process_text1:  $lev, $rstr 
         $res =~ s/ /&nbsp;/g
 
     elsif( $func eq 'X' )
         # X<> - ignore
-        warn "$^PROGRAM_NAME: $Podfile: invalid X<> in paragraph $Paragraph.\n"
+        warn: "$^PROGRAM_NAME: $Podfile: invalid X<> in paragraph $Paragraph.\n"
             unless $rstr->$ =~ s/^[^>]*>// or $Quiet
     elsif( $func eq 'Z' )
         # Z<> - empty
-        warn "$^PROGRAM_NAME: $Podfile: invalid Z<> in paragraph $Paragraph.\n"
+        warn: "$^PROGRAM_NAME: $Podfile: invalid Z<> in paragraph $Paragraph.\n"
             unless $rstr->$ =~ s/^>// or $Quiet
 
     else
-        my $term = pattern $closing
+        my $term = pattern: $closing
         while( $rstr->$ =~ s/\A(.*?)(([BCEFILSXZ])<(<+[^\S\n]+)?|$term)//s )
             # all others: either recurse into new function or
             # terminate at closing angle bracket(s)
             my $pt = $1
             $pt .= $2 if !$3 &&  $lev == 1
-            $res .= $lev == 1 ?? pure_text( $pt ) !! inIS_text( $pt )
+            $res .= $lev == 1 ?? (pure_text:  $pt ) !! inIS_text:  $pt 
             return $res if !$3 && $lev +> 1
             if( $3 )
-                $res .= process_text1( $lev, $rstr, $3, closing $4 )
+                $res .= process_text1:  $lev, $rstr, $3, (closing: $4) 
             
         
         if( $lev == 1 )
-            $res .= pure_text( $rstr->$ )
+            $res .= pure_text:  $rstr->$ 
         elsif( ! $Quiet )
-            my $snippet = substr($rstr->$,0,60)
-            warn "$^PROGRAM_NAME: $Podfile: undelimited $func<> in paragraph $Paragraph: '$snippet'.\n"
+            my $snippet = substr: $rstr->$,0,60
+            warn: "$^PROGRAM_NAME: $Podfile: undelimited $func<> in paragraph $Paragraph: '$snippet'.\n"
 
         
-        $res = process_text_rfc_links($res)
+        $res = process_text_rfc_links: $res
     
     return $res
 
@@ -1724,19 +1724,19 @@ sub go_ahead( $rstr, $func, $closing)
     my $res = ''
     my @closing = @: $closing
     while( $rstr->$ =~
-             s/\A (.*?) (([BCEFILSXZ])<(<+\s+)?| $(pattern @closing[0]) )//xs )
+             s/\A (.*?) (([BCEFILSXZ])<(<+\s+)?| $((pattern: @closing[0])) )//xs )
         $res .= $1
         unless( $3 )
             shift @closing
             return $res unless @closing
         else
-            unshift @closing, closing $4
+            unshift: @closing, closing: $4
         
         $res .= $2
     
     unless ($Quiet)
-        my $snippet = substr($rstr->$,0,60)
-        warn "$^PROGRAM_NAME: $Podfile: undelimited $func<> in paragraph $Paragraph (go_ahead): '$snippet'.\n"
+        my $snippet = substr: $rstr->$,0,60
+        warn: "$^PROGRAM_NAME: $Podfile: undelimited $func<> in paragraph $Paragraph (go_ahead): '$snippet'.\n"
     
     return $res
 
@@ -1748,13 +1748,13 @@ sub go_ahead( $rstr, $func, $closing)
 sub emit_C( $text, ?$nocode, ?$args)
     $args = '' unless defined $args
     my $res
-    my(@:  $url, $fid ) =  coderef( undef(), $text )
+    my(@:  $url, $fid ) =  coderef: undef, $text 
 
     # need HTML-safe text
-    my $linktext = html_escape( "$text$args" )
+    my $linktext = html_escape:  "$text$args" 
 
-    if( defined( $url ) &&
-        (!defined( $EmittedItem ) || $EmittedItem ne $fid ) )
+    if( (defined:  $url ) &&
+        (!(defined:  $EmittedItem ) || $EmittedItem ne $fid ) )
         $res = "<a href=\"$url\"><code>$linktext</code></a>"
     elsif( 0 && $nocode )
         $res = $linktext
@@ -1783,11 +1783,11 @@ sub html_escape
 # dosify - convert filenames to 8.3
 #
 sub dosify($str)
-    return lc($str) if $^OS_NAME eq 'VMS'     # VMS just needs casing
+    return (lc: $str) if $^OS_NAME eq 'VMS'     # VMS just needs casing
     if ($Is83)
         $str = lc $str
-        $str =~ s/(\.\w+)/$(substr ($1,0,4))/g
-        $str =~ s/(\w+)/$(substr ($1,0,8))/g
+        $str =~ s/(\.\w+)/$((substr: $1,0,4))/g
+        $str =~ s/(\w+)/$((substr: $1,0,8))/g
     
     return $str
 
@@ -1805,10 +1805,10 @@ sub page_sect( $page, $section)
     ### print STDERR "reset page='', section=$section\n";
     
 
-    $page83=dosify($page)
+    $page83=dosify: $page
     $page=$page83 if (defined %Pages{?$page83})
     if ($page eq "")
-        $link = "#" . anchorify( $section )
+        $link = "#" . anchorify:  $section 
     elsif ( $page =~ m/::/ )
         $page =~ s,::,/,g
         # Search page cache for an entry keyed under the html page name,
@@ -1817,7 +1817,7 @@ sub page_sect( $page, $section)
         # an intermediate page that is an index to all such pages.
         my $page_name = $page 
         $page_name =~ s,^.*/,,s 
-        if ( defined( %Pages{?$page_name } ) &&
+        if ( (defined:  %Pages{?$page_name } ) &&
             %Pages{?$page_name } =~ m/([^:]*$page)\.(?:pod|pm):/
             )
             $page = $1 
@@ -1835,11 +1835,11 @@ sub page_sect( $page, $section)
 
         }
         $link = "$Htmlroot/$page.html"
-        $link .= "#" . anchorify( $section ) if ($section)
+        $link .= "#" . (anchorify:  $section ) if ($section)
     elsif (!defined %Pages{?$page})
         $link = ""
     else
-        $section = anchorify( $section ) if $section ne ""
+        $section = (anchorify:  $section ) if $section ne ""
         ### print STDERR "...section=$section\n";
 
         # if there is a directory by the name of the page, then assume that an
@@ -1875,7 +1875,7 @@ sub page_sect( $page, $section)
         my $url 
         if (  $Htmlfileurl ne '' )
             $link = "$Htmldir$link" if $link =~ m{^/}s
-            $url = relativize_url( $link, $Htmlfileurl )
+            $url = relativize_url:  $link, $Htmlfileurl 
         # print( "  b: [$link,$Htmlfileurl,$url]\n" );
         else
             $url = $link 
@@ -1894,21 +1894,21 @@ sub page_sect( $page, $section)
 sub relativize_url($dest,$source)
 
     my (@: $dest_volume,$dest_directory,$dest_file) =
-        File::Spec::Unix->splitpath( $dest ) 
-    $dest = File::Spec::Unix->catpath( $dest_volume, $dest_directory, '' ) 
+        File::Spec::Unix->splitpath:  $dest  
+    $dest = File::Spec::Unix->catpath:  $dest_volume, $dest_directory, ''  
 
     my (@: $source_volume,$source_directory,$source_file) =
-        File::Spec::Unix->splitpath( $source ) 
-    $source = File::Spec::Unix->catpath( $source_volume, $source_directory, '' ) 
+        File::Spec::Unix->splitpath:  $source  
+    $source = File::Spec::Unix->catpath:  $source_volume, $source_directory, ''  
 
     my $rel_path = '' 
     if ( $dest ne '' )
-        $rel_path = File::Spec::Unix->abs2rel( $dest, $source ) 
+        $rel_path = File::Spec::Unix->abs2rel:  $dest, $source  
     
 
     if ( $rel_path ne ''                &&
-        substr( $rel_path, -1 ) ne '/' &&
-        substr( $dest_file, 0, 1 ) ne '#'
+        (substr:  $rel_path, -1 ) ne '/' &&
+        (substr:  $dest_file, 0, 1 ) ne '#'
         )
         $rel_path .= "/$dest_file" 
     else
@@ -1925,13 +1925,13 @@ sub relativize_url($dest,$source)
 sub coderef( $page, $item)
     my( $url )
 
-    my $fid = fragment_id( $item )
+    my $fid = fragment_id:  $item 
 
-    if( defined( $page ) && $page ne "" )
+    if( (defined:  $page ) && $page ne "" )
         # we have been given a $page...
         $page =~ s{::}{/}g
 
-        Carp::confess("Undefined fragment '$item' from fragment_id() in coderef() in $Podfile")
+        Carp::confess: "Undefined fragment '$item' from fragment_id() in coderef() in $Podfile"
             if !defined $fid
         # Do we take it? Item could be a section!
         my $base = %Items{?$fid} || ""
@@ -1943,7 +1943,7 @@ sub coderef( $page, $item)
 
     else
         # no page - local items precede cached items
-        if( defined( $fid ) )
+        if( (defined:  $fid ) )
             if(  exists %Local_Items{$fid} )
                 $page = %Local_Items{?$fid}
             else
@@ -1959,20 +1959,20 @@ sub coderef( $page, $item)
             if( exists %Pages{$page} and %Pages{?$page} =~ m/([^:.]*)\.[^:]*:/)
                 $page = $1 . '.html'
             
-            my $link = "$Htmlroot/$page#" . anchorify($fid)
+            my $link = "$Htmlroot/$page#" . anchorify: $fid
 
             # Here, we take advantage of the knowledge that $Htmlfileurl
             # ne '' implies $Htmlroot eq ''.
             if (  $Htmlfileurl ne '' )
                 $link = "$Htmldir$link" 
-                $url = relativize_url( $link, $Htmlfileurl ) 
+                $url = relativize_url:  $link, $Htmlfileurl  
             else
                 $url = $link 
             
         else
-            $url = "#" . anchorify($fid)
+            $url = "#" . anchorify: $fid
 
-        confess "url has space: $url" if $url =~ m/"[^"]*\s[^"]*"/
+        confess: "url has space: $url" if $url =~ m/"[^"]*\s[^"]*"/
 
     return @:  $url, $fid
 
@@ -1985,9 +1985,9 @@ sub relative_url
     my $source_file = shift 
     my $destination_file = shift
 
-    my $source = URI::file->new_abs($source_file)
-    my $uo = URI::file->new($destination_file,$source)->abs
-    return $uo->rel->as_string
+    my $source = URI::file->new_abs: $source_file
+    my $uo = (URI::file->new: $destination_file,$source)->abs: 
+    return ($uo->rel: )->as_string: 
 
 
 
@@ -1997,9 +1997,9 @@ sub relative_url
 #
 sub finish_list
     if( $Listlevel )
-        warn "$^PROGRAM_NAME: $Podfile: unterminated list(s) at =head in paragraph $Paragraph.  ignoring.\n" unless $Quiet
+        warn: "$^PROGRAM_NAME: $Podfile: unterminated list(s) at =head in paragraph $Paragraph.  ignoring.\n" unless $Quiet
         while( $Listlevel )
-            process_back()
+            (process_back: )
         
     
 
@@ -2016,7 +2016,7 @@ sub htmlify( $heading)
     # The hyphen is a disgrace to the English language.
     # $heading =~ s/[-"?]//g;
     $heading =~ s/["?]//g
-    $heading = lc( $heading )
+    $heading = lc:  $heading 
     return $heading
 
 
@@ -2024,7 +2024,7 @@ sub htmlify( $heading)
 # similar to htmlify, but turns non-alphanumerics into underscores
 #
 sub anchorify($anchor)
-    $anchor = htmlify($anchor)
+    $anchor = htmlify: $anchor
     $anchor =~ s/\W/_/g
     return $anchor
 
@@ -2042,23 +2042,23 @@ my %E2c
 
 sub depod($v)
     my $string
-    if( ref( $v ) )
+    if( (ref:  $v ) )
         $string =  $v->$
-        $v->$ = depod1( \$string )
+        $v->$ = depod1:  \$string 
     else
         $string =  $v
-        depod1( \$string )
+        depod1:  \$string 
     
 
 
 sub depod1( $rstr, ?$func, ?$closing)
     my $res = ''
     return $res unless defined $rstr->$
-    if( ! defined( $func ) )
+    if( ! (defined:  $func ) )
         # skip to next begin of an interior sequence
         while( $rstr->$ =~ s/\A(.*?)([BCEFILSXZ])<(<+[^\S\n]+)?//s )
             # recurse into its text
-            $res .= $1 . depod1( $rstr, $2, closing $3)
+            $res .= $1 . depod1:  $rstr, $2, (closing: $3)
         
         $res .= $rstr->$
     elsif( $func eq 'E' )
@@ -2074,11 +2074,11 @@ sub depod1( $rstr, ?$func, ?$closing)
     else
         # all others: either recurse into new function or
         # terminate at closing angle bracket
-        my $term = pattern $closing
+        my $term = pattern: $closing
         while( $rstr->$ =~ s/\A(.*?)(([BCEFILSXZ])<(<+[^\S\n]+)?|$term)//s )
             $res .= $1
             last unless $3
-            $res .= depod1( $rstr, $3, closing $4 )
+            $res .= depod1:  $rstr, $3, (closing: $4) 
         
     ## If we're here and $2 ne '>': undelimited interior sequence.
     ## Ignored, as this is called without proper indication of where we are.
@@ -2132,9 +2132,9 @@ sub fragment_id_obfuscated  # This was the old "_2d_2d__"
     $text =~ s/\s+/_/sg
 
     $text =~ s{(\W)}{$(
-    defined( @HC[ord($1)] ) ?? @HC[ord($1)]
-    !! ( @HC[ord($1)] = sprintf( "\%\%\%02X", ord($1) ) ) )}gx
-    $text = substr( $text, 0, 50 )
+    (defined:  @HC[(ord: $1)] ) ?? @HC[(ord: $1)]
+    !! ( @HC[(ord: $1)] = (sprintf:  "\%\%\%02X", (ord: $1) ) ) )}gx
+    $text = substr:  $text, 0, 50 
 
     $text
 
@@ -2169,7 +2169,7 @@ sub fragment_id
         return $1 if $text =~ m{^([a-z\d_]+)(\s+[A-Z,/& ][A-Z\d,/& ]*)?$}
         return $1 if $text =~ m{^([a-z\d]+)\s+Module(\s+[A-Z\d,/& ]+)?$}
 
-        return fragment_id_readable($text, $generate)
+        return fragment_id_readable: $text, $generate
     else
         return
     

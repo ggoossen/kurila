@@ -20,23 +20,23 @@ do
 
     use Class::Struct < qw(struct)
 
-    struct 'IPC::Semaphore::stat' => \@: 
-           uid  => '$'
-           gid  => '$'
-           cuid => '$'
-           cgid => '$'
-           mode => '$'
-           ctime        => '$'
-           otime        => '$'
-           nsems        => '$'
+    struct: 'IPC::Semaphore::stat' => \@:
+                uid  => '$'
+                gid  => '$'
+                cuid => '$'
+                cgid => '$'
+                mode => '$'
+                ctime        => '$'
+                otime        => '$'
+                nsems        => '$'
            
 
 
 sub new($class, $key, $nsems, $flags)
-    my $id = semget($key, $nsems, $flags)
+    my $id = semget: $key, $nsems, $flags
 
-    defined($id)
-        ?? bless \$id, $class
+    defined: $id
+        ?? bless: \$id, $class
         !! undef
 
 
@@ -47,42 +47,42 @@ sub id
 
 sub remove
     my $self = shift
-    (@: semctl($self->$,0,IPC_RMID,0), undef $self->$)[0]
+    (@: (semctl: $self->$,0,IPC_RMID,0), undef $self->$)[0]
 
 
 sub getncnt($self, $sem)
-    my $v = semctl($self->$,$sem,GETNCNT,0)
+    my $v = semctl: $self->$,$sem,GETNCNT,0
     $v ?? 0 + $v !! undef
 
 
 sub getzcnt($self, $sem)
-    my $v = semctl($self->$,$sem,GETZCNT,0)
+    my $v = semctl: $self->$,$sem,GETZCNT,0
     $v ?? 0 + $v !! undef
 
 
 sub getval($self, $sem)
-    my $v = semctl($self->$,$sem,GETVAL,0)
+    my $v = semctl: $self->$,$sem,GETVAL,0
     $v ?? 0 + $v !! undef
 
 
 sub getpid($self, $sem)
-    my $v = semctl($self->$,$sem,GETPID,0)
+    my $v = semctl: $self->$,$sem,GETPID,0
     $v ?? 0 + $v !! undef
 
 
 sub op($self, @< $oplist)
-    (nelems $oplist) +>= 3 || croak '$sem->op( OPLIST )'
-    croak 'Bad arg count' if (nelems $oplist) % 3
-    my $data = pack("s!*",< $oplist)
-    semop($self->$,$data)
+    (nelems $oplist) +>= 3 || croak: '$sem->op( OPLIST )'
+    croak: 'Bad arg count' if (nelems $oplist) % 3
+    my $data = pack: "s!*",< $oplist
+    semop: $self->$,$data
 
 
 sub stat
     my $self = shift
     my $data = ""
-    semctl($self->$,0,IPC_STAT,$data)
+    semctl: $self->$,0,IPC_STAT,$data
         or return undef
-    IPC::Semaphore::stat->new->unpack($data)
+    (IPC::Semaphore::stat->new: )->unpack: $data
 
 
 sub set
@@ -92,36 +92,36 @@ sub set
     if((nelems @_) == 1)
         $ds = shift
     else
-        croak 'Bad arg count' if (nelems @_) % 2
+        croak: 'Bad arg count' if (nelems @_) % 2
         my %arg = %:  < @_ 
-        $ds = $self->stat
+        $ds = $self->stat: 
             or return undef
         my($key,$val)
-        $ds->?$key($val)
+        $ds->?$key: $val
             while((@: $key,$val) =(@:  each %arg))
     
 
-    my $v = semctl($self->$,0,IPC_SET,$ds->pack)
+    my $v = semctl: $self->$,0,IPC_SET,($ds->pack: )
     $v ?? 0 + $v !! undef
 
 
 sub getall
     my $self = shift
     my $data = ""
-    semctl($self->$,0,GETALL,$data)
+    semctl: $self->$,0,GETALL,$data
         or return ()
-    @: unpack("s!*",$data)
+    @: unpack: "s!*",$data
 
 
 sub setall
     my $self = shift
-    my $data = pack("s!*",< @_)
-    semctl($self->$,0,SETALL,$data)
+    my $data = pack: "s!*",< @_
+    semctl: $self->$,0,SETALL,$data
 
 
 sub setval($self, $sem, $val)
-    (nelems @_) == 3 || croak '$sem->setval( SEM, VAL )'
-    semctl($self->$,$sem,SETVAL,$val)
+    (nelems @_) == 3 || croak: '$sem->setval( SEM, VAL )'
+    semctl: $self->$,$sem,SETVAL,$val
 
 
 1

@@ -28,26 +28,26 @@ $XS_VERSION = $VERSION
 sub import
     my $this = shift
     for my $i (@_)
-        if (($i eq 'clock_getres'    && !d_clock_getres( < @_ ))    ||
-            ($i eq 'clock_gettime'   && !d_clock_gettime( < @_ ))   ||
-            ($i eq 'clock_nanosleep' && !d_clock_nanosleep( < @_ )) ||
-            ($i eq 'clock'           && !d_clock( < @_ ))           ||
-            ($i eq 'nanosleep'       && !d_nanosleep( < @_ ))       ||
-            ($i eq 'usleep'          && !d_usleep( < @_ ))          ||
-            ($i eq 'ualarm'          && !d_ualarm( < @_ )))
+        if (($i eq 'clock_getres'    && !(d_clock_getres:  < @_ ))    ||
+            ($i eq 'clock_gettime'   && !(d_clock_gettime:  < @_ ))   ||
+            ($i eq 'clock_nanosleep' && !(d_clock_nanosleep:  < @_ )) ||
+            ($i eq 'clock'           && !(d_clock:  < @_ ))           ||
+            ($i eq 'nanosleep'       && !(d_nanosleep:  < @_ ))       ||
+            ($i eq 'usleep'          && !(d_usleep:  < @_ ))          ||
+            ($i eq 'ualarm'          && !(d_ualarm:  < @_ )))
             require Carp
-            Carp::croak("Time::HiRes::$i(): unimplemented in this platform")
+            Carp::croak: "Time::HiRes::$i(): unimplemented in this platform"
         
     
-    Time::HiRes->export_to_level(1, $this, < @_)
+    Time::HiRes->export_to_level: 1, $this, < @_
 
 
-Time::HiRes->bootstrap()
+Time::HiRes->bootstrap: 
 
 # Preloaded methods go here.
 
 sub tv_interval($a, ?$b)
-    $b = \(@:  < gettimeofday() ) unless defined($b)
+    $b = \(@:  < (gettimeofday: ) ) unless defined: $b
     ($b->[0] - $a->[0]) + (($b->[1] - $a->[1]) / 1_000_000)
 
 

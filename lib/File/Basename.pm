@@ -44,7 +44,7 @@ require Exporter
 @EXPORT = qw(fileparse fileparse_set_fstype basename dirname)
 $VERSION = "2.76"
 
-fileparse_set_fstype($^OS_NAME)
+fileparse_set_fstype: $^OS_NAME
 
 
 =over 4
@@ -92,13 +92,13 @@ denote the same location as the original $path.
 sub fileparse($fullname, @< @suffices)
 
     unless (defined $fullname)
-        die("fileparse(): need a valid pathname")
+        die: "fileparse(): need a valid pathname"
     
 
     my $orig_type = ''
     my(@: $type,$igncase) = @: $Fileparse_fstype, $Fileparse_igncase
 
-    my $taint = substr($fullname,0,0)  # Is $fullname tainted?
+    my $taint = substr: $fullname,0,0  # Is $fullname tainted?
 
     if ($type eq "VMS" and $fullname =~ m{/} )
         # We're doing Unix emulation
@@ -108,7 +108,7 @@ sub fileparse($fullname, @< @suffices)
 
     my($dirpath, $basename)
 
-    if (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 Epoc))
+    if (grep: { $type eq $_ }, qw(MSDOS DOS MSWin32 Epoc))
         (@: $dirpath,$basename) = @: $fullname =~ m/^((?:.*[:\\\/])?)(.*)/s
         $dirpath .= '.\' unless $dirpath =~ m/[\\\/]\z/
     elsif ($type eq "OS2")
@@ -144,7 +144,7 @@ sub fileparse($fullname, @< @suffices)
         foreach my $suffix ( @suffices)
             my $pat = ($igncase ?? '(?i)' !! '') . "($suffix)\$"
             if ($basename =~ s/$pat//s)
-                $taint .= substr($suffix,0,0)
+                $taint .= substr: $suffix,0,0
                 $tail = $1 . $tail
             
         
@@ -195,9 +195,9 @@ sub basename($path, @< @_)
     # From BSD basename(1)
     # The basename utility deletes any prefix ending with the last slash `/'
     # character present in string (after first stripping trailing slashes)
-    $path = _strip_trailing_sep($path)
+    $path = _strip_trailing_sep: $path
 
-    my(@: $basename, $dirname, $suffix) =  fileparse( $path, < map( {"\Q$_\E" }, @_) )
+    my(@: $basename, $dirname, $suffix) =  fileparse:  $path, < (map:  {"\Q$_\E" }, @_) 
 
     # From BSD basename(1)
     # The suffix is not stripped if it is identical to the remaining
@@ -266,34 +266,34 @@ sub dirname
     if( $type eq 'VMS' and $path =~ m{/} )
         # Parse as Unix
         local($File::Basename::Fileparse_fstype) = ''
-        return dirname($path)
+        return dirname: $path
     
 
-    my (@: $basename, $dirname, ...) =  fileparse($path)
+    my (@: $basename, $dirname, ...) =  fileparse: $path
 
     if ($type eq 'VMS')
-        $dirname ||= env::var('DEFAULT')
+        $dirname ||= env::var: 'DEFAULT'
     elsif ($type eq 'MacOS')
-        if( !length($basename) && $dirname !~ m/^[^:]+:\z/)
-            $dirname = _strip_trailing_sep($dirname)
-            (@: $basename,$dirname, _) =  fileparse $dirname
+        if( !(length: $basename) && $dirname !~ m/^[^:]+:\z/)
+            $dirname = _strip_trailing_sep: $dirname
+            (@: $basename,$dirname, _) =  fileparse: $dirname
         
         $dirname .= ":" unless $dirname =~ m/:\z/
-    elsif (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 OS2))
-        $dirname = _strip_trailing_sep($dirname)
-        unless( length($basename) )
-            (@: $basename,$dirname, _) =  fileparse $dirname
-            $dirname = _strip_trailing_sep($dirname)
+    elsif (grep: { $type eq $_ }, qw(MSDOS DOS MSWin32 OS2))
+        $dirname = _strip_trailing_sep: $dirname
+        unless( (length: $basename) )
+            (@: $basename,$dirname, _) =  fileparse: $dirname
+            $dirname = _strip_trailing_sep: $dirname
         
     elsif ($type eq 'AmigaOS')
         if ( $dirname =~ m/:\z/) { return $dirname }
         chop $dirname
-        $dirname =~ s{[^:/]+\z}{} unless length($basename)
+        $dirname =~ s{[^:/]+\z}{} unless length: $basename
     else
-        $dirname = _strip_trailing_sep($dirname)
-        unless( length($basename) )
-            (@: $basename,$dirname, _) =  fileparse $dirname
-            $dirname = _strip_trailing_sep($dirname)
+        $dirname = _strip_trailing_sep: $dirname
+        unless( (length: $basename) )
+            (@: $basename,$dirname, _) =  fileparse: $dirname
+            $dirname = _strip_trailing_sep: $dirname
         
     
 
@@ -307,7 +307,7 @@ sub _strip_trailing_sep($v)
 
     if ($type eq 'MacOS')
         $v =~ s/([^:]):\z/$1/s
-    elsif (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 OS2))
+    elsif (grep: { $type eq $_ }, qw(MSDOS DOS MSWin32 OS2))
         $v =~ s/([^:])[\\\/]*\z/$1/
     else
         $v =~ s{(.)/*\z}{$1}s
@@ -359,7 +359,7 @@ sub fileparse_set_fstype
         
 
         $Fileparse_igncase =
-            (grep { $Fileparse_fstype eq $_ }, @Ignore_Case) ?? 1 !! 0
+            ((grep: { $Fileparse_fstype eq $_ }, @Ignore_Case)) ?? 1 !! 0
     
 
     return $old

@@ -29,8 +29,8 @@ BEGIN
     $CALLER_DEPTH           = 0
 
 
-my %known_keys = %+: map { %: $_ => 1 },
-                       qw| required allow default strict_type no_override
+my %known_keys = %+: map: { %: $_ => 1 },
+                              qw| required allow default strict_type no_override
                           store defined |
 
 =pod
@@ -251,7 +251,7 @@ sub check($utmpl, $href, ?$verbose)
     $verbose ||= $VERBOSE || 0
 
     ### clear the current error string ###
-    _clear_error()
+    (_clear_error: )
 
     ### XXX what type of template is it? ###
     ### { key => { } } ?
@@ -260,10 +260,10 @@ sub check($utmpl, $href, ?$verbose)
     #}
 
     ### clean up the template ###
-    my $args = _clean_up_args( $href ) or return
+    my $args = (_clean_up_args:  $href ) or return
 
     ### sanity check + defaults + required keys set? ###
-    my $defs = _sanity_check_and_defaults( $utmpl, $args, $verbose )
+    my $defs = _sanity_check_and_defaults:  $utmpl, $args, $verbose 
         or return
 
     ### deref only once ###
@@ -288,9 +288,9 @@ sub check($utmpl, $href, ?$verbose)
 
             ### warn about the error ###
             else
-                _store_error(
-                    loc("Key '\%1' is not a valid key for \%2 provided by \%3",
-                        $key, _who_was_it(), _who_was_it(1)), $verbose)
+                _store_error: 
+                    (loc: "Key '\%1' is not a valid key for \%2 provided by \%3"
+                          $key, (_who_was_it: ), (_who_was_it: 1)), $verbose
                 $warned ||= 1
             
             next
@@ -298,11 +298,11 @@ sub check($utmpl, $href, ?$verbose)
 
         ### check if you're even allowed to override this key ###
         if( %utmpl{$key}{?'no_override'} )
-            _store_error(
-                loc(q[You are not allowed to override key '%1'].
-                    q[for %2 from %3], $key, _who_was_it(), _who_was_it(1)),
+            _store_error: 
+                (loc: q[You are not allowed to override key '%1'].
+                          q[for %2 from %3], $key, (_who_was_it: ), (_who_was_it: 1))
                 $verbose
-                )
+                
             $warned ||= 1
             next
         
@@ -314,8 +314,8 @@ sub check($utmpl, $href, ?$verbose)
         if( (%tmpl{?'defined'} || $ONLY_ALLOW_DEFINED) and
             not defined %args{?$key}
             )
-            _store_error(loc(q|Key '%1' must be defined when passed|, $key),
-                             $verbose )
+            _store_error: (loc: q|Key '%1' must be defined when passed|, $key)
+                          $verbose 
             $wrong ||= 1
             next
         
@@ -324,8 +324,8 @@ sub check($utmpl, $href, ?$verbose)
         if( (%tmpl{?'strict_type'} || $STRICT_TYPE) and
             (ref %args{?$key} ne ref %tmpl{?'default'})
             )
-            _store_error(loc(q|Key '%1' needs to be of type '%2'|,
-                                 $key, ref %tmpl{?'default'} || 'SCALAR'), $verbose )
+            _store_error: (loc: q|Key '%1' needs to be of type '%2'|
+                                $key, ref %tmpl{?'default'} || 'SCALAR'), $verbose 
             $wrong ||= 1
             next
         
@@ -334,14 +334,14 @@ sub check($utmpl, $href, ?$verbose)
         ### allow() will report its own errors ###
         if( exists %tmpl{'allow'} and not do
                 local $_ERROR_STRING = undef
-                allow( %args{?$key}, %tmpl{?'allow'} )
+                allow:  %args{?$key}, %tmpl{?'allow'} 
             )
             ### stringify the value in the error report -- we don't want dumps
             ### of objects, but we do want to see *roughly* what we passed
-            _store_error(loc(q|Key '%1' (%2) is of invalid type for '%3' |.
-                                 q|provided by %4|,
-                                 $key, dump::view(%args{?$key}), _who_was_it(),
-                                 _who_was_it(1)), $verbose)
+            _store_error: (loc: q|Key '%1' (%2) is of invalid type for '%3' |.
+                                   q|provided by %4|
+                                $key, (dump::view: %args{?$key}), (_who_was_it: )
+                                (_who_was_it: 1)), $verbose
             $wrong ||= 1
             next
         
@@ -353,7 +353,7 @@ sub check($utmpl, $href, ?$verbose)
 
     ### croak with the collected errors if there were errors and
     ### we have the fatal flag toggled.
-    die(__PACKAGE__->last_error) if ($wrong || $warned) && $WARNINGS_FATAL
+    die: (__PACKAGE__->last_error: ) if ($wrong || $warned) && $WARNINGS_FATAL
 
     ### done with our loop... if $wrong is set, somethign went wrong
     ### and the user is already informed, just return...
@@ -423,8 +423,8 @@ sub allow
         return if @_[0] !~ m/@_[1]/
 
     ### it's a sub ###
-    elsif ( ref::svtype(@_[1]) eq 'CODE' )
-        return unless @_[1]->( @_[0] )
+    elsif ( (ref::svtype: @_[1]) eq 'CODE' )
+        return unless @_[1]->& <:  @_[0] 
 
     ### it's an array ###
     elsif ( ref @_[1] eq 'ARRAY' )
@@ -433,14 +433,14 @@ sub allow
         ### value is OK
         ### also, short-cicruit when possible
         for (  @_[1]->@ )
-            return 1 if allow( @_[0], $_ )
+            return 1 if allow:  @_[0], $_ 
         
 
         return
 
     ### fall back to a simple, but safe 'eq' ###
     else
-        return unless _safe_eq( @_[0], @_[1] )
+        return unless _safe_eq:  @_[0], @_[1] 
     
 
     ### we got here, no failures ###
@@ -482,9 +482,9 @@ sub _sanity_check_and_defaults
         ### at which point, the utmpl keys must match, but that's the users
         ### problem.
         if( %utmpl{$key}{?'required'} and not exists %args{$key} )
-            _store_error(
-                loc(q|Required option '%1' is not provided for %2 by %3|,
-                    $key, _who_was_it(1), _who_was_it(2)), $verbose )
+            _store_error: 
+                (loc: q|Required option '%1' is not provided for %2 by %3|
+                      $key, (_who_was_it: 1), (_who_was_it: 2)), $verbose 
 
             ### mark the error ###
             $fail++
@@ -499,21 +499,18 @@ sub _sanity_check_and_defaults
             ### last, check if they provided any weird template keys
             ### -- do this last so we don't always execute this code.
             ### just a small optimization.
-            map {   _store_error(
-                        loc(q|Template type '%1' not supported [at key '%2']|,
-                            $_, $key), 1, 1 );
-                }, grep {
-                    not %known_keys{?$_}
-                }, keys %utmpl{?$key}
+            map: {   (_store_error: 
+                        (loc: q|Template type '%1' not supported [at key '%2']|
+                              $_, $key), 1, 1 );
+                     }, grep: {
+                                  not %known_keys{?$_}
+                                  }, keys %utmpl{?$key}
 
             ### make sure you passed a ref, otherwise, complain about it!
             if ( exists %utmpl{$key}{'store'} )
-                _store_error( loc(
-                    q|Store variable for '%1' is not a reference!|, $key
-                    ), 1, 1 ) unless ref %utmpl{$key}{?'store'}
-            
-        
-    
+                _store_error:  (loc: 
+                                   q|Store variable for '%1' is not a reference!|, $key
+                                 ), 1, 1  unless ref %utmpl{$key}{?'store'}
 
     ### errors found ###
     return if $fail
@@ -525,15 +522,15 @@ sub _sanity_check_and_defaults
 
 sub _safe_eq
     ### only do a straight 'eq' if they're both defined ###
-    return defined(@_[0]) && defined(@_[1])
+    return (defined: @_[0]) && defined: @_[1]
         ?? @_[0] eq @_[1]
-        !! defined(@_[0]) eq defined(@_[1])
+        !! (defined: @_[0]) eq defined: @_[1]
 
 
 sub _who_was_it
     my $level = @_[?0] || 0
 
-    return (@: caller(2 + $CALLER_DEPTH + $level))[?3] || 'ANON'
+    return (@: (caller: 2 + $CALLER_DEPTH + $level))[?3] || 'ANON'
 
 
 =head2 last_error()
@@ -557,7 +554,7 @@ do
         $offset  ||= 0
         my $level   = 1 + $offset
 
-        warn $err if $verbose
+        warn: $err if $verbose
 
         $_ERROR_STRING .= $err . "\n"
 

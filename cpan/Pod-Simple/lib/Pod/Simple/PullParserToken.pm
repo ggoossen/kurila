@@ -7,11 +7,11 @@ our $VERSION = '2.02'
 
 sub new  # Class->new('type', stuff...);  ## Overridden in derived classes anyway
     my $class = shift
-    return bless \$(@_), ref($class) || $class
+    return bless: \$(@_), (ref: $class) || $class
 
 
 sub type { @_[0]->[0] }  # Can't change the type of an object
-sub dump { Pod::Simple::pretty( \ $: @_[0]->@ ) }
+sub dump { (Pod::Simple::pretty:  \ $: @_[0]->@ ) }
 
 sub is_start { @_[0]->[0] eq 'start' }
 sub is_end   { @_[0]->[0] eq 'end'   }

@@ -3,19 +3,19 @@
 do
     my $wide = "\x{100}"
     use bytes;
-    my $ordwide = ord($wide)
-    printf $^STDOUT, "# under use bytes ord(v256) = 0x\%02x\n", $ordwide
+    my $ordwide = ord: $wide
+    printf: $^STDOUT, "# under use bytes ord(v256) = 0x\%02x\n", $ordwide
     if ($ordwide == 140)
-        print $^STDOUT, "1..0 # Skip: UTF-EBCDIC (not UTF-8) used here\n"
+        print: $^STDOUT, "1..0 # Skip: UTF-EBCDIC (not UTF-8) used here\n"
         exit 0
     elsif ($ordwide != 196)
-        printf $^STDOUT, "# v256 starts with 0x\%02x\n", $ordwide
+        printf: $^STDOUT, "# v256 starts with 0x\%02x\n", $ordwide
     
 
 
 no utf8
 
-print $^STDOUT, "1..78\n"
+print: $^STDOUT, "1..78\n"
 
 my $test = 1
 
@@ -26,7 +26,7 @@ my $test = 1
 # We use the \x notation instead of raw binary bytes for \x00-\x1f\x7f-\xff
 # because e.g. many patch programs have issues with binary data.
 
-my @MK = split(m/\n/, <<__EOMK__)
+my @MK = split: m/\n/, <<__EOMK__
 1	Correct UTF-8
 1.1.1 y "\x[ce]\x[ba]\x[e1]\x[bd]\x[b9]\x[cf]\x[83]\x[ce]\x[bc]\x[ce]\x[b5]"	-		11	ce:ba:e1:bd:b9:cf:83:ce:bc:ce:b5	5
 2	Boundary conditions
@@ -134,17 +134,17 @@ do
 
     my $x_warn
     local $^WARN_HOOK = sub (@< @_)
-        print $^STDOUT, "# $id: " . @_[0]->{?description} . "\n"
+        print: $^STDOUT, "# $id: " . @_[0]->{?description} . "\n"
         $x_warn = @_[0]->{?description}
     
 
     sub moan
-        print $^STDOUT, "$id: $(join ' ',@_)"
+        print: $^STDOUT, "$id: $((join: ' ',@_))"
     
 
     sub warn_unpack_U
         $x_warn = ''
-        my @null = @:  unpack('U0U*', @_[0]) 
+        my @null = @:  unpack: 'U0U*', @_[0] 
         return $x_warn
     
 
@@ -155,34 +155,34 @@ do
             $id = $1
             my (@: $okay, $bytes, $Unicode, $byteslen, $hex, $charslen, $experr) =
                 @: $2, $3, $4, $5, $6, $7, $8
-            my @hex = split(m/:/, $hex)
+            my @hex = split: m/:/, $hex
             unless ((nelems @hex) == $byteslen)
                 my $nhex = (nelems @hex)
-                moan "amount of hex ($nhex) not equal to byteslen ($byteslen)\n"
+                moan: "amount of hex ($nhex) not equal to byteslen ($byteslen)\n"
             
             do
                 use bytes
-                my $bytesbyteslen = length($bytes)
+                my $bytesbyteslen = length: $bytes
                 unless ($bytesbyteslen == $byteslen)
-                    moan "bytes length() ($bytesbyteslen) not equal to $byteslen\n"
+                    moan: "bytes length() ($bytesbyteslen) not equal to $byteslen\n"
                 
             
-            my $warn = warn_unpack_U($bytes)
+            my $warn = warn_unpack_U: $bytes
             if ($okay eq 'y')
                 if ($warn)
-                    moan "unpack('U0U*') false negative\n"
-                    print $^STDOUT, "not "
+                    moan: "unpack('U0U*') false negative\n"
+                    print: $^STDOUT, "not "
                 
             elsif ($okay eq 'n')
                 if (not $warn || ($experr ne '' && $warn !~ m/$experr/))
-                    moan "unpack('U0U*') false positive\n"
-                    print $^STDOUT, "not "
+                    moan: "unpack('U0U*') false positive\n"
+                    print: $^STDOUT, "not "
                 
             
-            print $^STDOUT, "ok $test # $id $okay\n"
+            print: $^STDOUT, "ok $test # $id $okay\n"
             $test++
         else
-            moan "unknown format\n"
+            moan: "unknown format\n"
         
     
 

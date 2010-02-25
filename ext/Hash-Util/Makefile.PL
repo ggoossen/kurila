@@ -3,11 +3,11 @@ use ExtUtils::MakeMaker
 # this file was templated from ext/List/Util/Makefile.PL
 # thanks to Graham Barr who wrote that module.
 
-WriteMakefile(
-    VERSION_FROM    => "lib/Hash/Util.pm",
-    NAME            => "Hash::Util",
-    DEFINE          => "-DPERL_EXT",
-    )
+WriteMakefile: 
+    VERSION_FROM    => "lib/Hash/Util.pm"
+    NAME            => "Hash::Util"
+    DEFINE          => "-DPERL_EXT"
+    
 
 package MY
 
@@ -22,7 +22,7 @@ package MY
 
 BEGIN 
     use Config
-    unless (defined config_value("usedl"))
+    unless (defined (config_value: "usedl"))
         eval <<'__EOMM__'
 sub xs_c {
     my($self) = shift;

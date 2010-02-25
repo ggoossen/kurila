@@ -4,11 +4,11 @@
 # Summary of, well, things.
 
 use Test::More
-BEGIN {plan tests => 2};
+BEGIN {(plan: tests => 2)};
 
-ok 1
+ok: 1
 
 use Pod::Perldoc
 
-ok 1
+ok: 1
 

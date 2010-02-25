@@ -23,24 +23,22 @@ $VERSION = eval $VERSION
 
 sub DIR_UNLINK () { 1 }
 
-sub new
-    nelems(@_) +>= 1 && (nelems @_) +<= 2 or croak 'usage: new IO::Dir [DIRNAME]'
-    my $class = shift
-    my $dh = gensym
-    if ((nelems @_))
-        IO::Dir::open($dh, @_[0])
+sub new($class, ?$dirname)
+    my $dh = (gensym: )
+    if (defined $dirname)
+        IO::Dir::open: $dh, $dirname
             or return undef
     
-    bless $dh, $class
+    bless: $dh, $class
 
 
 sub DESTROY($dh)
     no warnings 'io'
-    closedir($dh)
+    closedir: $dh
 
 sub open($dh, $dirname)
     return undef
-        unless opendir($dh, $dirname)
+        unless opendir: $dh, $dirname
     # a dir name should always have a ":" in it; assume dirname is
     # in current directory
     $dirname = ':' .  $dirname if ( ($^OS_NAME eq 'MacOS') && ($dirname !~ m/:/) )
@@ -49,27 +47,27 @@ sub open($dh, $dirname)
 
 
 sub close($dh)
-    closedir($dh)
+    closedir: $dh
 
 
 sub read($dh)
-    readdir($dh)
+    readdir: $dh
 
 
 sub read_all($dh)
-    return @:  readdir($dh) 
+    return @:  readdir: $dh 
 
 
 sub seek($dh,$pos)
-    seekdir($dh,$pos)
+    seekdir: $dh,$pos
 
 
 sub tell($dh)
-    telldir($dh)
+    telldir: $dh
 
 
 sub rewind($dh)
-    rewinddir($dh)
+    rewinddir: $dh
 
 
 1

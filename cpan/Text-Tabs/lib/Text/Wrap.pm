@@ -30,44 +30,44 @@ sub wrap($ip, $xp, @< @t)
 
     local($Text::Tabs::tabstop) = $tabstop
     my $r = ""
-    my $tail = pop(@t)
-    my $t = expand(join("", @: < (@+: map { m/\s+\z/ ?? (@:  $_ ) !! (@: $_, ' ') }, @t), $tail))
+    my $tail = pop: @t
+    my $t = expand: (join: "", @: < (@+: (map: { m/\s+\z/ ?? (@:  $_ ) !! (@: $_, ' ') }, @t)), $tail)
     my $lead = $ip
-    my $ll = $columns - length(expand($ip)) - 1
+    my $ll = $columns - (length: (expand: $ip)) - 1
     $ll = 0 if $ll +< 0
-    my $nll = $columns - length(expand($xp)) - 1
+    my $nll = $columns - (length: (expand: $xp)) - 1
     my $nl = ""
     my $remainder = ""
 
     while ($t !~ m/\G(?:$break)*\Z/gc)
         if ($t =~ m/\G([^\n]{0,$ll})($break|\n+|\z)/xmgc)
             $r .= $unexpand
-                ?? unexpand($nl . $lead . $1)
+                ?? unexpand: $nl . $lead . $1
                 !! $nl . $lead . $1
             $remainder = $2
         elsif ($huge eq 'wrap' && $t =~ m/\G([^\n]{$ll})/gc)
             $r .= $unexpand
-                ?? unexpand($nl . $lead . $1)
+                ?? unexpand: $nl . $lead . $1
                 !! $nl . $lead . $1
-            $remainder = defined($separator2) ?? $separator2 !! $separator
+            $remainder = (defined: $separator2) ?? $separator2 !! $separator
         elsif ($huge eq 'overflow' && $t =~ m/\G([^\n]*?)($break|\n+|\z)/xmgc)
             $r .= $unexpand
-                ?? unexpand($nl . $lead . $1)
+                ?? unexpand: $nl . $lead . $1
                 !! $nl . $lead . $1
             $remainder = $2
         elsif ($huge eq 'die')
-            die "couldn't wrap '$t'"
+            die: "couldn't wrap '$t'"
         elsif ($columns +< 2)
-            warnings::warnif "Increasing \$Text::Wrap::columns from $columns to 2"
+            warnings::warnif:  "Increasing \$Text::Wrap::columns from $columns to 2"
             $columns = 2
             return  @: $ip, $xp, @t
         else
-            die "This shouldn't happen"
+            die: "This shouldn't happen"
         
 
         $lead = $xp
         $ll = $nll
-        $nl = defined($separator2)
+        $nl = defined: $separator2
             ?? ($remainder eq "\n"
                 ?? "\n"
                 !! $separator2)
@@ -75,14 +75,14 @@ sub wrap($ip, $xp, @< @t)
     
     $r .= $remainder
 
-    print $^STDOUT, "-----------$r---------\n" if $debug
+    print: $^STDOUT, "-----------$r---------\n" if $debug
 
-    print $^STDOUT, "Finish up with '$lead'\n" if $debug
+    print: $^STDOUT, "Finish up with '$lead'\n" if $debug
 
-    $r .= $lead . substr($t, pos($t), length($t)-pos($t))
-        if pos($t) ne length($t)
+    $r .= $lead . substr: $t, (pos: $t), (length: $t)-(pos: $t)
+        if (pos: $t) ne length: $t
 
-    print $^STDOUT, "-----------$r---------\n" if $debug;
+    print: $^STDOUT, "-----------$r---------\n" if $debug;
 
     return $r
 
@@ -90,17 +90,17 @@ sub wrap($ip, $xp, @< @t)
 sub fill($ip, $xp, @< @raw)
     my @para
 
-    for my $pp (split(m/\n\s+/, join("\n", @raw)))
+    for my $pp ((split: m/\n\s+/, (join: "\n", @raw)))
         $pp =~ s/\s+/ /g
-        my $x = wrap($ip, $xp, $pp)
-        push(@para, $x)
+        my $x = wrap: $ip, $xp, $pp
+        push: @para, $x
     
 
     # if paragraph_indent is the same as line_indent,
     # separate paragraphs with blank lines
 
     my $ps = ($ip eq $xp) ?? "\n\n" !! "\n"
-    return join ($ps, @para)
+    return join: $ps, @para
 
 
 1

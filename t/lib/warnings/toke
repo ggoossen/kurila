@@ -47,7 +47,7 @@ toke.c	AOK
 	@a = qw(a b # c) ;
 
      %s (...) interpreted as function 
-	print ("")
+	print: ("")
 	printf ("")
 	sort ("")
 
@@ -143,116 +143,116 @@ Possible attempt to put comments in qw() list at - line 3 character 10.
 ########
 # TODO toke.c
 use warnings 'syntax' ; our $x;
-print ($^STDOUT, "");
-print ($^STDOUT, "") and $x = 1;
-print ($^STDOUT, "") or die;
-print ($^STDOUT, "") // die;
-print ($^STDOUT, 1+2) * 3 if 0; # only this one should warn
-print ($^STDOUT, 1+2) if 0;
+print: ($^STDOUT, "");
+print: ($^STDOUT, "") and $x = 1;
+print: ($^STDOUT, "") or die;
+print: ($^STDOUT, "") // die;
+print: ($^STDOUT, 1+2) * 3 if 0; # only this one should warn
+print: ($^STDOUT, 1+2) if 0;
 EXPECT
-print (...) interpreted as function at - line 7 character 1.
+print: (...) interpreted as function at - line 7 character 1.
 ########
 # toke.c
 no warnings 'syntax' ;
-print ($^STDOUT, "")
+print: ($^STDOUT, "")
 EXPECT
 
 ########
 # TODO toke.c
 use warnings 'syntax' ;
-printf ($^STDOUT, "");
-printf ($^STDOUT, "") . '';
+printf: ($^STDOUT, "");
+printf: ($^STDOUT, "") . '';
 EXPECT
 printf (...) interpreted as function at - line 4 character 1.
 ########
 # toke.c
 no warnings 'syntax' ;
-printf ($^STDOUT, "")
+printf: ($^STDOUT, "")
 EXPECT
 
 ########
 # toke.c
 use warnings 'syntax' ;
-$a = eval "_123"; print $^STDOUT, "$a\n";		#( 3	string)
-$a = 1_23; print $^STDOUT, "$a\n";
-$a = 12_3; print $^STDOUT, "$a\n";
-$a = 123_; print $^STDOUT, "$a\n";		#  6
-$a = eval "_+123"; print $^STDOUT, "$a\n";		#  7	string)
-$a = eval "+_123"; print $^STDOUT, "$a\n";		#( 8	string)
-$a = 1_23; print $^STDOUT, "$a\n";
-$a = 12_3; print $^STDOUT, "$a\n";
-$a = 123_; print $^STDOUT, "$a\n";		# 11
-$a = eval "_-123"; print $^STDOUT, "$a\n";		#(12	string)
+$a = eval "_123"; print: $^STDOUT, "$a\n";		#( 3	string)
+$a = 1_23; print: $^STDOUT, "$a\n";
+$a = 12_3; print: $^STDOUT, "$a\n";
+$a = 123_; print: $^STDOUT, "$a\n";		#  6
+$a = eval "_+123"; print: $^STDOUT, "$a\n";		#  7	string)
+$a = eval "+_123"; print: $^STDOUT, "$a\n";		#( 8	string)
+$a = 1_23; print: $^STDOUT, "$a\n";
+$a = 12_3; print: $^STDOUT, "$a\n";
+$a = 123_; print: $^STDOUT, "$a\n";		# 11
+$a = eval "_-123"; print: $^STDOUT, "$a\n";		#(12	string)
 
-$a = -1_23; print $^STDOUT, "$a\n";
-$a = -12_3; print $^STDOUT, "$a\n";
-$a = -123_; print $^STDOUT, "$a\n";		# 16
-$a = 123._456; print $^STDOUT, "$a\n";		# 17
-$a = 123.4_56; print $^STDOUT, "$a\n";
-$a = 123.45_6; print $^STDOUT, "$a\n";
-$a = 123.456_; print $^STDOUT, "$a\n";		# 20
-$a = 123._456; print $^STDOUT, "$a\n";		# 21
-$a = 123.4_56; print $^STDOUT, "$a\n";	
-$a = 123.45_6; print $^STDOUT, "$a\n";	
-$a = 123.456_; print $^STDOUT, "$a\n";		# 24
-$a = -123._456; print $^STDOUT, "$a\n";		# 25
-$a = -123.4_56; print $^STDOUT, "$a\n";	
-$a = -123.45_6; print $^STDOUT, "$a\n";
-$a = -123.456_; print $^STDOUT, "$a\n";		# 28
-$a = 123.456E_12; printf($^STDOUT, "%.0f\n", $a);	# 29
-$a = 123.456E1_2; printf($^STDOUT, "%.0f\n", $a);
-$a = 123.456E12_; printf($^STDOUT, "%.0f\n", $a);	# 31
-$a = 123.456E_+12; printf($^STDOUT, "%.0f\n", $a);	# 32
-$a = 123.456E+_12; printf($^STDOUT, "%.0f\n", $a);	# 33
-$a = 123.456E+1_2; printf($^STDOUT, "%.0f\n", $a);
-$a = 123.456E+12_; printf($^STDOUT, "%.0f\n", $a);	# 35
-$a = 123.456E_-12; print $^STDOUT, "$a\n";	# 36
-$a = 123.456E-_12; print $^STDOUT, "$a\n";	# 37
-$a = 123.456E-1_2; print $^STDOUT, "$a\n";
-$a = 123.456E-12_; print $^STDOUT, "$a\n";	# 39
-$a = 1__23; print $^STDOUT, "$a\n";		# 40
-$a = 12.3__4; print $^STDOUT, "$a\n";		# 41
+$a = -1_23; print: $^STDOUT, "$a\n";
+$a = -12_3; print: $^STDOUT, "$a\n";
+$a = -123_; print: $^STDOUT, "$a\n";		# 16
+$a = 123._456; print: $^STDOUT, "$a\n";		# 17
+$a = 123.4_56; print: $^STDOUT, "$a\n";
+$a = 123.45_6; print: $^STDOUT, "$a\n";
+$a = 123.456_; print: $^STDOUT, "$a\n";		# 20
+$a = 123._456; print: $^STDOUT, "$a\n";		# 21
+$a = 123.4_56; print: $^STDOUT, "$a\n";	
+$a = 123.45_6; print: $^STDOUT, "$a\n";	
+$a = 123.456_; print: $^STDOUT, "$a\n";		# 24
+$a = -123._456; print: $^STDOUT, "$a\n";		# 25
+$a = -123.4_56; print: $^STDOUT, "$a\n";	
+$a = -123.45_6; print: $^STDOUT, "$a\n";
+$a = -123.456_; print: $^STDOUT, "$a\n";		# 28
+$a = 123.456E_12; printf: $^STDOUT, "%.0f\n", $a;	# 29
+$a = 123.456E1_2; printf: $^STDOUT, "%.0f\n", $a;
+$a = 123.456E12_; printf: $^STDOUT, "%.0f\n", $a;	# 31
+$a = 123.456E_+12; printf: $^STDOUT, "%.0f\n", $a;	# 32
+$a = 123.456E+_12; printf: $^STDOUT, "%.0f\n", $a;	# 33
+$a = 123.456E+1_2; printf: $^STDOUT, "%.0f\n", $a;
+$a = 123.456E+12_; printf: $^STDOUT, "%.0f\n", $a;	# 35
+$a = 123.456E_-12; print: $^STDOUT, "$a\n";	# 36
+$a = 123.456E-_12; print: $^STDOUT, "$a\n";	# 37
+$a = 123.456E-1_2; print: $^STDOUT, "$a\n";
+$a = 123.456E-12_; print: $^STDOUT, "$a\n";	# 39
+$a = 1__23; print: $^STDOUT, "$a\n";		# 40
+$a = 12.3__4; print: $^STDOUT, "$a\n";		# 41
 $a = 12.34e1__2; printf($^STDOUT, "%.0f\n", $a);	# 42
 no warnings 'syntax' ;
-$a = eval "_123"; print $^STDOUT, "$a\n";
-$a = 1_23; print $^STDOUT, "$a\n";
-$a = 12_3; print $^STDOUT, "$a\n";
-$a = 123_; print $^STDOUT, "$a\n";
-$a = eval "_+123"; print $^STDOUT, "$a\n";
-$a = eval "+_123"; print $^STDOUT, "$a\n";
-$a = 1_23; print $^STDOUT, "$a\n";
-$a = 12_3; print $^STDOUT, "$a\n";
-$a = 123_; print $^STDOUT, "$a\n";
-$a = eval "_-123"; print $^STDOUT, "$a\n";
+$a = eval "_123"; print: $^STDOUT, "$a\n";
+$a = 1_23; print: $^STDOUT, "$a\n";
+$a = 12_3; print: $^STDOUT, "$a\n";
+$a = 123_; print: $^STDOUT, "$a\n";
+$a = eval "_+123"; print: $^STDOUT, "$a\n";
+$a = eval "+_123"; print: $^STDOUT, "$a\n";
+$a = 1_23; print: $^STDOUT, "$a\n";
+$a = 12_3; print: $^STDOUT, "$a\n";
+$a = 123_; print: $^STDOUT, "$a\n";
+$a = eval "_-123"; print: $^STDOUT, "$a\n";
 
-$a = -1_23; print $^STDOUT, "$a\n";
-$a = -12_3; print $^STDOUT, "$a\n";
-$a = -123_; print $^STDOUT, "$a\n";
-$a = 123._456; print $^STDOUT, "$a\n";
-$a = 123.4_56; print $^STDOUT, "$a\n";
-$a = 123.45_6; print $^STDOUT, "$a\n";
-$a = 123.456_; print $^STDOUT, "$a\n";
-$a = 123._456; print $^STDOUT, "$a\n";
-$a = 123.4_56; print $^STDOUT, "$a\n";
-$a = 123.45_6; print $^STDOUT, "$a\n";
-$a = 123.456_; print $^STDOUT, "$a\n";
-$a = -123._456; print $^STDOUT, "$a\n";
-$a = -123.4_56; print $^STDOUT, "$a\n";
-$a = -123.45_6; print $^STDOUT, "$a\n";
-$a = -123.456_; print $^STDOUT, "$a\n";
-$a = 123.456E_12; printf($^STDOUT, "%.0f\n", $a);
-$a = 123.456E1_2; printf($^STDOUT, "%.0f\n", $a);
-$a = 123.456E12_; printf($^STDOUT, "%.0f\n", $a);
-$a = 123.456E_+12; printf($^STDOUT, "%.0f\n", $a);
-$a = 123.456E+_12; printf($^STDOUT, "%.0f\n", $a);
-$a = 123.456E+1_2; printf($^STDOUT, "%.0f\n", $a);
-$a = 123.456E+12_; printf($^STDOUT, "%.0f\n", $a);
-$a = 123.456E_-12; print $^STDOUT, "$a\n";
-$a = 123.456E-_12; print $^STDOUT, "$a\n";
-$a = 123.456E-1_2; print $^STDOUT, "$a\n";
-$a = 123.456E-12_; print $^STDOUT, "$a\n";
-$a = 1__23; print $^STDOUT, "$a\n";
-$a = 12.3__4; print $^STDOUT, "$a\n";
+$a = -1_23; print: $^STDOUT, "$a\n";
+$a = -12_3; print: $^STDOUT, "$a\n";
+$a = -123_; print: $^STDOUT, "$a\n";
+$a = 123._456; print: $^STDOUT, "$a\n";
+$a = 123.4_56; print: $^STDOUT, "$a\n";
+$a = 123.45_6; print: $^STDOUT, "$a\n";
+$a = 123.456_; print: $^STDOUT, "$a\n";
+$a = 123._456; print: $^STDOUT, "$a\n";
+$a = 123.4_56; print: $^STDOUT, "$a\n";
+$a = 123.45_6; print: $^STDOUT, "$a\n";
+$a = 123.456_; print: $^STDOUT, "$a\n";
+$a = -123._456; print: $^STDOUT, "$a\n";
+$a = -123.4_56; print: $^STDOUT, "$a\n";
+$a = -123.45_6; print: $^STDOUT, "$a\n";
+$a = -123.456_; print: $^STDOUT, "$a\n";
+$a = 123.456E_12; printf: $^STDOUT, "%.0f\n", $a;
+$a = 123.456E1_2; printf: $^STDOUT, "%.0f\n", $a;
+$a = 123.456E12_; printf: $^STDOUT, "%.0f\n", $a;
+$a = 123.456E_+12; printf: $^STDOUT, "%.0f\n", $a;
+$a = 123.456E+_12; printf: $^STDOUT, "%.0f\n", $a;
+$a = 123.456E+1_2; printf: $^STDOUT, "%.0f\n", $a;
+$a = 123.456E+12_; printf: $^STDOUT, "%.0f\n", $a;
+$a = 123.456E_-12; print: $^STDOUT, "$a\n";
+$a = 123.456E-_12; print: $^STDOUT, "$a\n";
+$a = 123.456E-1_2; print: $^STDOUT, "$a\n";
+$a = 123.456E-12_; print: $^STDOUT, "$a\n";
+$a = 1__23; print: $^STDOUT, "$a\n";
+$a = 12.3__4; print: $^STDOUT, "$a\n";
 $a = 12.34e1__2; printf($^STDOUT, "%.0f\n", $a);
 EXPECT
 Misplaced _ in number at - line 6 character 6.
@@ -367,12 +367,12 @@ Ambiguous call resolved as CORE::time(), qualify as such or use & at - line 4 ch
 use warnings ;
 eval <<'EOE';
 #  line 30 "foo"
-warn "yelp";
-do {
-  use utf8;
-  $_ = " \x{123} " ;
-};
+warn: "yelp"
+do
+  use utf8
+  $_ = " \x{123} "
 EOE
+die: if $^EVAL_ERROR
 EXPECT
 yelp at foo line 30 character 1.
     (eval) called at - line 3 character 1.
@@ -420,7 +420,7 @@ Ambiguous use of -fred resolved as -&fred() at - line 9 character 6.
 Ambiguous use of -fred resolved as -&fred() at - line 11 character 2.
 ########
 # toke.c (and [perl #16184])
-open \*FOO => "<&", "0"; close \*FOO;
+open: \*FOO => "<&", "0"; close: \*FOO;
 EXPECT
 
 ########

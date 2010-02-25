@@ -33,72 +33,72 @@ $HTML_RENDER_CLASS ||= "Pod::Simple::HTML"
 # Methods beginning with "_" are particularly internal and possibly ugly.
 #
 
-Pod::Simple::_accessorize( __PACKAGE__,
-                           'verbose', # how verbose to be during batch conversion
-                           'html_render_class', # what class to use to render
-                           'contents_file', # If set, should be the name of a file (in current directory)
+Pod::Simple::_accessorize:  __PACKAGE__
+                            'verbose' # how verbose to be during batch conversion
+                            'html_render_class' # what class to use to render
+                            'contents_file' # If set, should be the name of a file (in current directory)
                            # to write the list of all modules to
-                           'index', # will set $htmlpage->index(...) to this (true or false)
-                           'progress', # progress object
-                           'contents_page_start',  'contents_page_end',
+                            'index' # will set $htmlpage->index(...) to this (true or false)
+                            'progress' # progress object
+                            'contents_page_start',  'contents_page_end'
 
-                           'css_flurry', '_css_wad', 'javascript_flurry', '_javascript_wad',
-                           'no_contents_links', # set to true to suppress automatic adding of << links.
-                           '_contents',
-                           )
+                            'css_flurry', '_css_wad', 'javascript_flurry', '_javascript_wad'
+                            'no_contents_links' # set to true to suppress automatic adding of << links.
+                            '_contents'
+                           
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Just so we can run from the command line more easily
 sub go()
-    (nelems @ARGV) == 2 or die sprintf(
-        "Usage: perl -M\%s -e \%s:go indirs outdir\n  (or use \"\$^INCLUDE_PATH\" for indirs)\n",
-        __PACKAGE__, __PACKAGE__,
-        )
+    (nelems @ARGV) == 2 or die: sprintf: 
+                                    "Usage: perl -M\%s -e \%s:go indirs outdir\n  (or use \"\$^INCLUDE_PATH\" for indirs)\n"
+                                    __PACKAGE__, __PACKAGE__
+                                    
 
-    if(defined(@ARGV[1]) and length(@ARGV[1]))
+    if(defined: @ARGV[1] and length: @ARGV[1])
         my $d = @ARGV[1]
-        -e $d or die "I see no output directory named \"$d\"\nAborting"
-        -d $d or die "But \"$d\" isn't a directory!\nAborting"
-        -w $d or die "Directory \"$d\" isn't writeable!\nAborting"
+        -e $d or die: "I see no output directory named \"$d\"\nAborting"
+        -d $d or die: "But \"$d\" isn't a directory!\nAborting"
+        -w $d or die: "Directory \"$d\" isn't writeable!\nAborting"
     
 
-    __PACKAGE__->batch_convert(< @ARGV)
+    __PACKAGE__->batch_convert: < @ARGV
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
 sub new
-    my $new = bless \$%, ref(@_[0]) || @_[0]
-    $new->html_render_class($HTML_RENDER_CLASS)
-    $new->verbose(1 + DEBUG)
-    $new->_contents(\$@)
+    my $new = bless: \$%, (ref: @_[0]) || @_[0]
+    $new->html_render_class: $HTML_RENDER_CLASS
+    $new->verbose: 1 + (DEBUG: )
+    $new->_contents: \$@
 
-    $new->index(1)
+    $new->index: 1
 
-    $new->       _css_wad(\$@);         $new->css_flurry(1)
-    $new->_javascript_wad(\$@);  $new->javascript_flurry(1)
+    ($new->       _css_wad: \$@);         $new->css_flurry: 1
+    ($new->_javascript_wad: \$@);  $new->javascript_flurry: 1
 
-    $new->contents_file(
+    $new->contents_file: 
         'index' . ($HTML_EXTENSION || $Pod::Simple::HTML::HTML_EXTENSION)
-        )
+        
 
-    $new->contents_page_start( join "\n", grep { $_ }, @: 
-        $Pod::Simple::HTML::Doctype_decl
-        "<html><head>"
-        "<title>Perl Documentation</title>"
-        $Pod::Simple::HTML::Content_decl
-        "</head>"
-        "\n<body class='contentspage'>\n<h1>Perl Documentation</h1>\n"
-        ) # override if you need a different title
+    $new->contents_page_start:  join: "\n", grep: { $_ }, @:
+                                                      $Pod::Simple::HTML::Doctype_decl
+                                                      "<html><head>"
+                                                      "<title>Perl Documentation</title>"
+                                                      $Pod::Simple::HTML::Content_decl
+                                                      "</head>"
+                                                      "\n<body class='contentspage'>\n<h1>Perl Documentation</h1>\n"
+                                                       # override if you need a different title
 
 
-    $new->contents_page_end( sprintf(
-        "\n\n<p class='contentsfooty'>Generated by \%s v\%s under Perl v\%s\n<br >At \%s GMT, which is \%s local time.</p>\n\n</body></html>\n",
-        (< map { esc($_) },
-         @:       ref($new)
-                  try {$new->VERSION} || $VERSION
-                  $^PERL_VERSION, scalar(gmtime), scalar(localtime)
-         )))
+    $new->contents_page_end:  (sprintf: 
+                                  "\n\n<p class='contentsfooty'>Generated by \%s v\%s under Perl v\%s\n<br >At \%s GMT, which is \%s local time.</p>\n\n</body></html>\n"
+                                  (< map: { (esc: $_) },
+                                              @:       ref: $new
+                                                       try {($new->VERSION: )} || $VERSION
+                                                       $^PERL_VERSION, (scalar: gmtime), scalar: localtime
+                                      ))
 
     return $new
 
@@ -107,8 +107,8 @@ sub new
 
 sub muse
     my $self = shift
-    if($self->verbose)
-        print $^STDOUT, 'T+', int(time() - $self->{?'_batch_start_time'}), "s: ", < @_, "\n"
+    if(($self->verbose: ))
+        print: $^STDOUT, 'T+', (int: (time: ) - $self->{?'_batch_start_time'}), "s: ", < @_, "\n"
     
     return 1
 
@@ -117,25 +117,25 @@ sub muse
 
 sub batch_convert($self, $dirs, $outdir)
     $self ||= __PACKAGE__ # tolerate being called as an optionless function
-    $self = $self->new unless ref $self # tolerate being used as a class method
+    $self = ($self->new: ) unless ref $self # tolerate being used as a class method
 
     if(ref $dirs) {
     # OK, it's an explicit set of dirs to scan, specified as an arrayref.
-    }elsif(!defined($dirs)  or  $dirs eq ''  or  $dirs eq '$^INCLUDE_PATH' )
+    }elsif(!(defined: $dirs)  or  $dirs eq ''  or  $dirs eq '$^INCLUDE_PATH' )
         $dirs = ''
     else
         # OK, it's an explicit set of dirs to scan, specified as a
         #  string like "/thing:/also:/whatever/perl" (":"-delim, as usual)
         #  or, under MSWin, like "c:/thing;d:/also;c:/whatever/perl" (";"-delim!)
         require Config
-        my $ps = quotemeta( config::config_value('path_sep') || ":" )
-        $dirs = \ grep { length($_) }, split qr/$ps/, $dirs
+        my $ps = quotemeta:  (config::config_value: 'path_sep') || ":" 
+        $dirs = \ grep: { (length: $_) }, split: qr/$ps/, $dirs
     
 
-    $outdir = $self->filespecsys->curdir
+    $outdir = ($self->filespecsys: )->curdir: 
         unless defined $outdir and length $outdir
 
-    $self->_batch_convert_main($dirs, $outdir)
+    $self->_batch_convert_main: $dirs, $outdir
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -144,50 +144,50 @@ sub _batch_convert_main($self, $dirs, $outdir)
     # $dirs is either false, or an arrayref.
     # $outdir is a pathspec.
 
-    $self->{+'_batch_start_time'} ||= time()
+    $self->{+'_batch_start_time'} ||= (time: )
 
-    $self->muse( "= ", scalar(localtime) )
-    $self->muse( "Starting batch conversion to \"$outdir\"" )
+    $self->muse:  "= ", (scalar: localtime) 
+    $self->muse:  "Starting batch conversion to \"$outdir\"" 
 
-    my $progress = $self->progress
-    if(!$progress and $self->verbose +> 0 and $self->verbose() +<= 5)
+    my $progress = $self->progress: 
+    if(!$progress and ($self->verbose: ) +> 0 and ($self->verbose: ) +<= 5)
         require Pod::Simple::Progress
-        $progress = Pod::Simple::Progress->new(
-            ($self->verbose  +< 2) ?? () # Default omission-delay
-            !! ($self->verbose == 2) ?? 1  # Reduce the omission-delay
-            !! 0  # Eliminate the omission-delay
-            )
-        $self->progress($progress)
+        $progress = Pod::Simple::Progress->new: 
+            (($self->verbose: )  +< 2) ?? () # Default omission-delay
+                !! (($self->verbose: ) == 2) ?? 1  # Reduce the omission-delay
+                !! 0  # Eliminate the omission-delay
+            
+        $self->progress: $progress
     
 
     if($dirs)
-        $self->muse(scalar(nelems $dirs->@), " dirs to scan: $(join ' ',$dirs->@)")
+        $self->muse: (scalar: nelems $dirs->@), " dirs to scan: $((join: ' ',$dirs->@))"
     else
-        $self->muse("Scanning \$^INCLUDE_PATH.  This could take a minute or two.")
+        $self->muse: "Scanning \$^INCLUDE_PATH.  This could take a minute or two."
     
-    my $mod2path = $self->find_all_pods($dirs ?? $dirs !! ())
-    $self->muse("Done scanning.")
+    my $mod2path = $self->find_all_pods: $dirs ?? $dirs !! ()
+    $self->muse: "Done scanning."
 
     my $total = nkeys $mod2path->%
     unless($total)
-        $self->muse("No pod found.  Aborting batch conversion.\n")
+        $self->muse: "No pod found.  Aborting batch conversion.\n"
         return $self
     
 
-    $progress and $progress->goal($total)
-    $self->muse("Now converting pod files to HTML.",
-        ($total +> 25) ?? "  This will take a while more." !! ()
-        )
+    $progress and $progress->goal: $total
+    $self->muse: "Now converting pod files to HTML."
+                 ($total +> 25) ?? "  This will take a while more." !! ()
+        
 
-    $self->_spray_css(        $outdir )
-    $self->_spray_javascript( $outdir )
+    $self->_spray_css:         $outdir 
+    $self->_spray_javascript:  $outdir 
 
-    $self->_do_all_batch_conversions($mod2path, $outdir)
+    $self->_do_all_batch_conversions: $mod2path, $outdir
 
-    $progress and $progress->done(sprintf (
-        "Done converting \%d files.",  $self->{"__batch_conv_page_count"}
-        ))
-    return $self->_batch_convert_finish($outdir)
+    $progress and $progress->done: (sprintf: 
+                                       "Done converting \%d files.",  $self->{"__batch_conv_page_count"}
+                                       )
+    return $self->_batch_convert_finish: $outdir
     return $self
 
 
@@ -195,19 +195,19 @@ sub _batch_convert_main($self, $dirs, $outdir)
 sub _do_all_batch_conversions($self, $mod2path, $outdir)
     $self->{+"__batch_conv_page_count"} = 0
 
-    foreach my $module (sort {lc($a) cmp lc($b)}, keys $mod2path->%)
-        $self->_do_one_batch_conversion($module, $mod2path, $outdir)
-        sleep($SLEEPY - 1) if $SLEEPY
+    foreach my $module ((sort: {(lc: $a) cmp (lc: $b)}, keys $mod2path->%))
+        $self->_do_one_batch_conversion: $module, $mod2path, $outdir
+        sleep: $SLEEPY - 1 if $SLEEPY
     
 
     return
 
 
 sub _batch_convert_finish($self, $outdir)
-    $self->write_contents_file($outdir)
-    $self->muse("Done with batch conversion.  $self->{?'__batch_conv_page_count'} files done.")
-    $self->muse( "= ", scalar(localtime) )
-    $self->progress and $self->progress->done("All done!")
+    $self->write_contents_file: $outdir
+    $self->muse: "Done with batch conversion.  $self->{?'__batch_conv_page_count'} files done."
+    $self->muse:  "= ", (scalar: localtime) 
+    $self->progress:  and ($self->progress: )->done: "All done!"
     return
 
 
@@ -218,54 +218,54 @@ sub _do_one_batch_conversion($self, $module, $mod2path, $outdir, ?$outfile)
     my $retval
     my $total    = nkeys $mod2path->%
     my $infile   = $mod2path->{?$module}
-    my @namelets = grep { m/\S/ }, split "::", $module
+    my @namelets = grep: { m/\S/ }, split: "::", $module
     # this can stick around in the contents LoL
     my $depth    = scalar nelems @namelets
-    die "Contentless thingie?! $module $infile" unless (nelems @namelets) #sanity
+    die: "Contentless thingie?! $module $infile" unless (nelems @namelets) #sanity
 
     $outfile  ||= do
         my @n = @namelets
         @n[-1] .= $HTML_EXTENSION || $Pod::Simple::HTML::HTML_EXTENSION
-        $self->filespecsys->catfile( $outdir, < @n )
+        ($self->filespecsys: )->catfile:  $outdir, < @n 
     
 
-    my $progress = $self->progress
+    my $progress = $self->progress: 
 
-    my $page = $self->html_render_class->new
-    if(DEBUG +> 5)
-        $self->muse($self->{?"__batch_conv_page_count"} + 1, "/$total: ",
-            ref($page), " render ($depth) $module => $outfile")
-    elsif(DEBUG +> 2)
-        $self->muse($self->{?"__batch_conv_page_count"} + 1, "/$total: $module => $outfile")
+    my $page = ($self->html_render_class: )->new: 
+    if((DEBUG: )+> 5)
+        $self->muse: $self->{?"__batch_conv_page_count"} + 1, "/$total: "
+                     (ref: $page), " render ($depth) $module => $outfile"
+    elsif((DEBUG: )+> 2)
+        $self->muse: $self->{?"__batch_conv_page_count"} + 1, "/$total: $module => $outfile"
     
 
     # Give each class a chance to init the converter:
 
-    $page->batch_mode_page_object_init($self, $module, $infile, $outfile, $depth)
-        if $page->can('batch_mode_page_object_init')
-    $self->batch_mode_page_object_init($page, $module, $infile, $outfile, $depth)
-        if $self->can('batch_mode_page_object_init')
+    $page->batch_mode_page_object_init: $self, $module, $infile, $outfile, $depth
+        if $page->can: 'batch_mode_page_object_init'
+    $self->batch_mode_page_object_init: $page, $module, $infile, $outfile, $depth
+        if $self->can: 'batch_mode_page_object_init'
 
     # Now get busy...
-    $self->makepath($outdir => \@namelets)
+    $self->makepath: $outdir => \@namelets
 
-    $progress and $progress->reach($self->{?"__batch_conv_page_count"}, "Rendering $module")
+    $progress and $progress->reach: $self->{?"__batch_conv_page_count"}, "Rendering $module"
 
-    if( $retval = $page->parse_from_file($infile, $outfile) )
+    if( $retval = ($page->parse_from_file: $infile, $outfile) )
         ++ $self->{+"__batch_conv_page_count"} 
-        $self->note_for_contents_file( \@namelets, $infile, $outfile )
+        $self->note_for_contents_file:  \@namelets, $infile, $outfile 
     else
-        $self->muse("Odd, parse_from_file(\"$infile\", \"$outfile\") returned false.")
+        $self->muse: "Odd, parse_from_file(\"$infile\", \"$outfile\") returned false."
     
 
-    $page->batch_mode_page_object_kill($self, $module, $infile, $outfile, $depth)
-        if $page->can('batch_mode_page_object_kill')
+    $page->batch_mode_page_object_kill: $self, $module, $infile, $outfile, $depth
+        if $page->can: 'batch_mode_page_object_kill'
     # The following isn't a typo.  Note that it switches $self and $page.
-    $self->batch_mode_page_object_kill($page, $module, $infile, $outfile, $depth)
-        if $self->can('batch_mode_page_object_kill')
+    $self->batch_mode_page_object_kill: $page, $module, $infile, $outfile, $depth
+        if $self->can: 'batch_mode_page_object_kill'
 
-    DEBUG +> 4 and printf $^STDOUT, "\%s \%sb < $infile \%s \%sb\n",
-        $outfile, -s $outfile, $infile, -s $infile
+    (DEBUG: )+> 4 and printf: $^STDOUT, "\%s \%sb < $infile \%s \%sb\n"
+                              $outfile, -s $outfile, $infile, -s $infile
     
 
     undef($page)
@@ -282,13 +282,13 @@ sub note_for_contents_file($self, $namelets, $infile, $outfile)
     # I think the infile and outfile parts are never used. -- SMB
     # But it's handy to have them around for debugging.
 
-    if( $self->contents_file )
-        my $c = $self->_contents()
-        push $c->@,
-            \@:  join("::", $namelets->@), $infile, $outfile, $namelets 
+    if( ($self->contents_file: ) )
+        my $c = $self->_contents: 
+        push: $c->@
+              \@:  (join: "::", $namelets->@), $infile, $outfile, $namelets 
         #            0               1         2         3
         
-        DEBUG +> 3 and print $^STDOUT, "Noting  $c->[-1]\n"
+        (DEBUG: )+> 3 and print: $^STDOUT, "Noting  $c->[-1]\n"
     
     return
 
@@ -296,48 +296,48 @@ sub note_for_contents_file($self, $namelets, $infile, $outfile)
 #_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
 sub write_contents_file($self, $outdir)
-    my $outfile  = $self->_contents_filespec($outdir) || return
+    my $outfile  = ($self->_contents_filespec: $outdir) || return
 
-    $self->muse("Preparing list of modules for ToC")
+    $self->muse: "Preparing list of modules for ToC"
 
     my(@: $toplevel           # maps  toplevelbit => [all submodules]
           $toplevel_form_freq # ends up being  'foo' => 'Foo'
-        ) =  $self->_prep_contents_breakdown
+        ) =  $self->_prep_contents_breakdown: 
 
-    my $Contents = try { $self->_wopen($outfile) }
+    my $Contents = try { ($self->_wopen: $outfile) }
     if( $Contents )
-        $self->muse( "Writing contents file $outfile" )
+        $self->muse:  "Writing contents file $outfile" 
     else
-        warn "Couldn't write-open contents file $outfile: $^OS_ERROR\nAbort writing to $outfile at all"
+        warn: "Couldn't write-open contents file $outfile: $^OS_ERROR\nAbort writing to $outfile at all"
         return
     
 
-    $self->_write_contents_start(  $Contents, $outfile, )
-    $self->_write_contents_middle( $Contents, $outfile, $toplevel, $toplevel_form_freq )
-    $self->_write_contents_end(    $Contents, $outfile, )
+    $self->_write_contents_start:   $Contents, $outfile, 
+    $self->_write_contents_middle:  $Contents, $outfile, $toplevel, $toplevel_form_freq 
+    $self->_write_contents_end:     $Contents, $outfile, 
     return $outfile
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 sub _write_contents_start($self, $Contents, $outfile)
-    my $starter = $self->contents_page_start || ''
+    my $starter = ($self->contents_page_start: ) || ''
 
     do
-        my $css_wad = $self->_css_wad_to_markup(1)
+        my $css_wad = $self->_css_wad_to_markup: 1
         if( $css_wad )
             $starter =~ s{(</head>)}{\n$css_wad\n$1}i  # otherwise nevermind
         
 
-        my $javascript_wad = $self->_javascript_wad_to_markup(1)
+        my $javascript_wad = $self->_javascript_wad_to_markup: 1
         if( $javascript_wad )
             $starter =~ s{(</head>)}{\n$javascript_wad\n$1}i   # otherwise nevermind
         
     
 
-    unless(print $Contents, $starter, "<dl class='superindex'>\n" )
-        warn "Couldn't print to $outfile: $^OS_ERROR\nAbort writing to $outfile at all"
-        close($Contents)
+    unless((print: $Contents, $starter, "<dl class='superindex'>\n") )
+        warn: "Couldn't print to $outfile: $^OS_ERROR\nAbort writing to $outfile at all"
+        close: $Contents
         return 0
     
     return 1
@@ -347,22 +347,22 @@ sub _write_contents_start($self, $Contents, $outfile)
 
 sub _write_contents_middle($self, $Contents, $outfile, $toplevel2submodules, $toplevel_form_freq)
 
-    foreach my $t (sort keys $toplevel2submodules->%)
-        my @downlines = sort {$a->[-1] cmp $b->[-1]},
-            $toplevel2submodules->{?$t}
+    foreach my $t ((sort: keys $toplevel2submodules->%))
+        my @downlines = sort: {$a->[-1] cmp $b->[-1]}
+                              $toplevel2submodules->{?$t}
 
-        printf $Contents, qq[<dt><a name="\%s">\%s</a></dt>\n<dd>\n],
-            esc( $t ), esc( $toplevel_form_freq->{?$t} )
+        printf: $Contents, qq[<dt><a name="\%s">\%s</a></dt>\n<dd>\n]
+                (esc:  $t ), esc:  $toplevel_form_freq->{?$t} 
         
 
         my($path, $name)
         foreach my $e ( @downlines)
             $name = $e->[0]
-            $path = join( "/", (@:  '.', < map { esc($_) }, $e->[3]->@) )
+            $path = join:  "/", (@:  '.', < (map: { (esc: $_) }, $e->[3]->@)) 
                 . ($HTML_EXTENSION || $Pod::Simple::HTML::HTML_EXTENSION)
-            print $Contents, qq{  <a href="$path">}, esc($name), "</a>&nbsp;&nbsp;\n"
+            print: $Contents, qq{  <a href="$path">}, (esc: $name), "</a>&nbsp;&nbsp;\n"
         
-        print $Contents, "</dd>\n\n"
+        print: $Contents, "</dd>\n\n"
     
     return 1
 
@@ -371,19 +371,19 @@ sub _write_contents_middle($self, $Contents, $outfile, $toplevel2submodules, $to
 
 sub _write_contents_end($self, $Contents, $outfile)
     unless(
-        print $Contents, "</dl>\n",
-        $self->contents_page_end || '',
+        print: $Contents, "</dl>\n"
+               ($self->contents_page_end: ) || ''
         )
-        warn "Couldn't write to $outfile: $^OS_ERROR"
+        warn: "Couldn't write to $outfile: $^OS_ERROR"
     
-    close($Contents) or warn "Couldn't close $outfile: $^OS_ERROR"
+    close: $Contents or warn: "Couldn't close $outfile: $^OS_ERROR"
     return 1
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 sub _prep_contents_breakdown($self)
-    my $contents = $self->_contents
+    my $contents = $self->_contents: 
     my %toplevel # maps  lctoplevelbit => [all submodules]
     my %toplevel_form_freq # ends up being  'foo' => 'Foo'
     # (mapping anycase forms to most freq form)
@@ -395,16 +395,16 @@ sub _prep_contents_breakdown($self)
             !! $entry->[3]->[0] # normal case
         
         ++%toplevel_form_freq{ + lc $toplevel }{+$toplevel }
-        push  %toplevel{ + lc $toplevel }, $entry
-        push $entry->@, lc($entry->[0]) # add a sort-order key to the end
+        push: %toplevel{ + lc $toplevel }, $entry
+        push: $entry->@, lc: $entry->[0] # add a sort-order key to the end
     
 
-    foreach my $toplevel (sort keys %toplevel)
+    foreach my $toplevel ((sort: keys %toplevel))
         my $fgroup = %toplevel_form_freq{?$toplevel}
         %toplevel_form_freq{+$toplevel} =
             (
-            sort { $fgroup{?$b} <+> $fgroup{?$a}  or  $a cmp $b },
-            keys $fgroup
+            sort: { $fgroup{?$b} <+> $fgroup{?$a}  or  $a cmp $b }
+                  keys $fgroup
             # This hash is extremely unlikely to have more than 4 members, so this
             # sort isn't so very wasteful
             )[0]
@@ -415,9 +415,9 @@ sub _prep_contents_breakdown($self)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 sub _contents_filespec($self, $outdir)
-    my $outfile = $self->contents_file
+    my $outfile = $self->contents_file: 
     return unless $outfile
-    return $self->filespecsys->catfile( $outdir, $outfile )
+    return ($self->filespecsys: )->catfile:  $outdir, $outfile 
 
 
 #_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
@@ -425,14 +425,14 @@ sub _contents_filespec($self, $outdir)
 sub makepath($self, $outdir, $namelets)
     return unless (nelems $namelets->@) +> 1
     for my $i (0 .. ((nelems $namelets->@) - 2))
-        my $dir = $self->filespecsys->catdir( $outdir, < $namelets->@[[0 .. $i]] )
+        my $dir = ($self->filespecsys: )->catdir:  $outdir, < $namelets->@[[0 .. $i]] 
         if(-e $dir)
-            die "$dir exists but not as a directory!?" unless -d $dir
+            die: "$dir exists but not as a directory!?" unless -d $dir
             next
         
-        DEBUG +> 3 and print $^STDOUT, "  Making $dir\n"
-        mkdir $dir, 0777
-            or die "Can't mkdir $dir: $^OS_ERROR\nAborting"
+        (DEBUG: )+> 3 and print: $^STDOUT, "  Making $dir\n"
+        mkdir: $dir, 0777
+            or die: "Can't mkdir $dir: $^OS_ERROR\nAborting"
         
     
     return
@@ -443,14 +443,14 @@ sub makepath($self, $outdir, $namelets)
 sub batch_mode_page_object_init($self, $page, $module, $infile, $outfile, $depth)
     # TODO: any further options to percolate onto this new object here?
 
-    $page->default_title($module)
-    $page->index( $self->index )
+    $page->default_title: $module
+    $page->index:  ($self->index: ) 
 
-    $page->html_css(         $self->       _css_wad_to_markup($depth) )
-    $page->html_javascript(  $self->_javascript_wad_to_markup($depth) )
+    $page->html_css:          ($self->       _css_wad_to_markup: $depth) 
+    $page->html_javascript:   ($self->_javascript_wad_to_markup: $depth) 
 
-    $self->add_header_backlink($page, $module, $infile, $outfile, $depth)
-    $self->add_footer_backlink($page, $module, $infile, $outfile, $depth)
+    $self->add_header_backlink: $page, $module, $infile, $outfile, $depth
+    $self->add_footer_backlink: $page, $module, $infile, $outfile, $depth
 
 
     return $self
@@ -459,38 +459,38 @@ sub batch_mode_page_object_init($self, $page, $module, $infile, $outfile, $depth
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 sub add_header_backlink($self, $page, $module, $infile, $outfile, $depth)
-    return if $self->no_contents_links
+    return if $self->no_contents_links: 
 
-    $page->html_header_after_title( join '', @: 
-        $page->html_header_after_title || ''
+    $page->html_header_after_title:  join: '', @:
+                                               ($page->html_header_after_title: ) || ''
 
-        qq[<p class="backlinktop"><b><a name="___top" href="]
-        $self->url_up_to_contents($depth)
-        qq[" accesskey="1" title="All Documents">&lt;&lt;</a></b></p>\n]
-        )
-        if $self->contents_file
+                                               qq[<p class="backlinktop"><b><a name="___top" href="]
+                                               $self->url_up_to_contents: $depth
+                                               qq[" accesskey="1" title="All Documents">&lt;&lt;</a></b></p>\n]
+                                               
+        if $self->contents_file: 
     
     return
 
 
 sub add_footer_backlink($self, $page, $module, $infile, $outfile, $depth)
-    return if $self->no_contents_links
+    return if $self->no_contents_links: 
 
-    $page->html_footer( join '', @: 
-        qq[<p class="backlinkbottom"><b><a name="___bottom" href="]
-        $self->url_up_to_contents($depth)
-        qq[" title="All Documents">&lt;&lt;</a></b></p>\n]
+    $page->html_footer:  join: '', @:
+                                   qq[<p class="backlinkbottom"><b><a name="___bottom" href="]
+                                   $self->url_up_to_contents: $depth
+                                   qq[" title="All Documents">&lt;&lt;</a></b></p>\n]
 
-        $page->html_footer || ''
-        )
-        if $self->contents_file
+                                   ($page->html_footer: ) || ''
+                                   
+        if $self->contents_file: 
     
     return
 
 
 sub url_up_to_contents($self, $depth)
     --$depth
-    return join '/', @:  ('..') x $depth, esc($self->contents_file)
+    return join: '/', @:  ('..') x $depth, esc: ($self->contents_file: )
 
 
 #_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
@@ -499,7 +499,7 @@ sub find_all_pods($self, $dirs)
     # You can override find_all_pods in a subclass if you want to
     #  do extra filtering or whatnot.  But for the moment, we just
     #  pass to modnames2paths:
-    return $self->modnames2paths($dirs)
+    return $self->modnames2paths: $dirs
 
 
 #_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
@@ -508,28 +508,28 @@ sub modnames2paths($self, $dirs)
 
     my $m2p
     do
-        my $search = $SEARCH_CLASS->new
-        DEBUG and print $^STDOUT, "Searching via $search\n"
-        $search->verbose(1) if DEBUG +> 10
-        $search->progress( < $self->progress->copy->goal(0) ) if $self->progress
-        $search->shadows(0)  # don't bother noting shadowed files
-        $search->inc(     $dirs ?? 0      !!  1 )
-        $search->survey(  $dirs ?? < $dirs->@ !! () )
-        $m2p = $search->name2path
-        die "What, no name2path?!" unless $m2p
+        my $search = $SEARCH_CLASS->new: 
+        DEBUG: and print: $^STDOUT, "Searching via $search\n"
+        $search->verbose: 1 if (DEBUG: )+> 10
+        $search->progress:  <(( ($self->progress: )->copy: )->goal: 0)  if $self->progress: 
+        $search->shadows: 0  # don't bother noting shadowed files
+        $search->inc:      $dirs ?? 0      !!  1 
+        $search->survey:   $dirs ?? < $dirs->@ !! () 
+        $m2p = $search->name2path: 
+        die: "What, no name2path?!" unless $m2p
     
 
-    $self->muse("That's odd... no modules found!") unless $m2p->%
-    if( DEBUG +> 4 )
-        print $^STDOUT, "Modules found (name => path):\n"
-        foreach my $m (sort {lc($a) cmp lc($b)}, keys $m2p->%)
-            print $^STDOUT, "  $m  $m2p->?$m->%\n"
+    $self->muse: "That's odd... no modules found!" unless $m2p->%
+    if( (DEBUG: )+> 4 )
+        print: $^STDOUT, "Modules found (name => path):\n"
+        foreach my $m ((sort: {(lc: $a) cmp (lc: $b)}, keys $m2p->%))
+            print: $^STDOUT, "  $m  $m2p->?$m->%\n"
         
-        print $^STDOUT, "(total ",     nkeys $m2p->%, ")\n\n"
-     elsif( DEBUG )
-        print $^STDOUT,      "Found ", nkeys $m2p->%, " modules.\n"
+        print: $^STDOUT, "(total ",     nkeys $m2p->%, ")\n\n"
+     elsif( (DEBUG: ))
+        print: $^STDOUT,      "Found ", nkeys $m2p->%, " modules.\n"
     
-    $self->muse( "Found ", nkeys $m2p->%, " modules." )
+    $self->muse:  "Found ", nkeys $m2p->%, " modules." 
 
     # return the Foo::Bar => /whatever/Foo/Bar.pod|pm hashref
     return $m2p
@@ -539,11 +539,11 @@ sub modnames2paths($self, $dirs)
 
 sub _wopen($self, $outpath)
     require Symbol
-    my $out_fh = Symbol::gensym()
-    DEBUG +> 5 and print $^STDOUT, "Write-opening to $outpath\n"
-    return $out_fh if open($out_fh, ">", "$outpath")
+    my $out_fh = (Symbol::gensym: )
+    (DEBUG: )+> 5 and print: $^STDOUT, "Write-opening to $outpath\n"
+    return $out_fh if open: $out_fh, ">", "$outpath"
     require Carp
-    Carp::croak("Can't write-open $outpath: $^OS_ERROR")
+    Carp::croak: "Can't write-open $outpath: $^OS_ERROR"
 
 
 #==========================================================================
@@ -562,8 +562,8 @@ sub add_css($self, $url, $is_default, $name, $content_type, $media, $_code)
     $content_type ||= 'text/css'
 
     my $bunch = \@: $url, $name, $content_type, $media, $_code
-    if($is_default) { unshift  $self->_css_wad->@, $bunch }
-    else            { push     $self->_css_wad->@, $bunch }
+    if($is_default) { unshift: ($self->_css_wad: )->@, $bunch }
+    else            { push: ($self->_css_wad: )->@, $bunch }
     return
 
 
@@ -571,28 +571,28 @@ sub add_css($self, $url, $is_default, $name, $content_type, $media, $_code)
 
 sub _spray_css($self, $outdir)
 
-    return unless $self->css_flurry()
-    $self->_gen_css_wad()
+    return unless $self->css_flurry: 
+    $self->_gen_css_wad: 
 
-    my $lol = $self->_css_wad
+    my $lol = $self->_css_wad: 
     foreach my $chunk ( $lol->@)
         my $url = $chunk->[0]
         my $outfile
-        if( ref($chunk->[-1]) and $url =~ m{^(_[-a-z0-9_]+\.css$)} )
-            $outfile = $self->filespecsys->catfile( $outdir, $1 )
-            DEBUG +> 5 and print $^STDOUT, "Noting $chunk->@[0] as a file I'll create.\n"
+        if( ref: $chunk->[-1] and $url =~ m{^(_[-a-z0-9_]+\.css$)} )
+            $outfile = ($self->filespecsys: )->catfile:  $outdir, $1 
+            (DEBUG: )+> 5 and print: $^STDOUT, "Noting $chunk->@[0] as a file I'll create.\n"
         else
-            DEBUG +> 5 and print $^STDOUT, "OK, noting $chunk->@[0] as an external CSS.\n"
+            (DEBUG: )+> 5 and print: $^STDOUT, "OK, noting $chunk->@[0] as an external CSS.\n"
             # Requires no further attention.
             next
         
 
         #$self->muse( "Writing autogenerated CSS file $outfile" );
-        my $Cssout = $self->_wopen($outfile)
-        print $Cssout, $chunk->[-1]->$
-            or warn "Couldn't print to $outfile: $^OS_ERROR\nAbort writing to $outfile at all"
-        close($Cssout)
-        DEBUG +> 5 and print $^STDOUT, "Wrote $outfile\n"
+        my $Cssout = $self->_wopen: $outfile
+        print: $Cssout, $chunk->[-1]->$
+            or warn: "Couldn't print to $outfile: $^OS_ERROR\nAbort writing to $outfile at all"
+        close: $Cssout
+        (DEBUG: )+> 5 and print: $^STDOUT, "Wrote $outfile\n"
 
     return
 
@@ -601,7 +601,7 @@ sub _spray_css($self, $outdir)
 
 sub _css_wad_to_markup($self, $depth)
 
-    my @css  = ( $self->_css_wad || return '' )->@
+    my @css  = ( ($self->_css_wad: ) || return '' )->@
     return '' unless (nelems @css)
 
     my $rel = 'stylesheet'
@@ -613,9 +613,9 @@ sub _css_wad_to_markup($self, $depth)
     foreach my $chunk ( @css)
         next unless $chunk and nelems $chunk->@
 
-        my(@:  $url1, $url2, $title, $type, $media) = @: 
-            $self->_maybe_uplink( $chunk->[0], $uplink )
-            < map { esc($_) }, @:  (< grep { !ref($_) }, $chunk->@)
+        my(@:  $url1, $url2, $title, $type, $media) = @:
+            $self->_maybe_uplink:  $chunk->[0], $uplink 
+            < map: { (esc: $_) }, @:  (< (grep: { !(ref: $_) }, $chunk->@))
             
 
         $out .= qq{<link rel="$rel" title="$title" type="$type" href="$url1$url2" media="$media" >\n}
@@ -636,7 +636,7 @@ sub _maybe_uplink($self, $url, $uplink)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 sub _gen_css_wad
     my $self = @_[0]
-    my $css_template = $self->_css_template
+    my $css_template = $self->_css_template: 
     foreach my $variation (
 
         # Commented out for sake of concision:
@@ -666,7 +666,7 @@ sub _gen_css_wad
         my $outname = $variation
         my(@: $flipmode, @< @swap) = @:  ($4 || ''), $1,$2,$3
             if $outname =~ s/^([012])([012])([[012])([a-z]*)=?//s
-        @swap = $@ if '010' eq join '', @swap # 010 is a swop-no-op!
+        @swap = $@ if '010' eq join: '', @swap # 010 is a swop-no-op!
 
         my $this_css =
             "/* This file is autogenerated.  Do not edit.  $variation */\n\n"
@@ -674,11 +674,11 @@ sub _gen_css_wad
 
         # Only look at three-digitty colors, for now at least.
         if( $flipmode =~ m/n/ )
-            $this_css =~ s/(#[0-9a-fA-F]{3})\b/$(_color_negate($1))/g
+            $this_css =~ s/(#[0-9a-fA-F]{3})\b/$((_color_negate: $1))/g
             $this_css =~ s/\bthin\b/medium/g
         
         $this_css =~ s<#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])\b>
-                  |$( join '', (@:  '#', < (@: $1,$2,$3)[[@swap]]) )|g   if (nelems @swap)
+                  |$( (join: '', (@:  '#', < (@: $1,$2,$3)[[@swap]])) )|g   if (nelems @swap)
 
         if(   $flipmode =~ m/a/)
             $this_css =~ s/#fff\b/#999/gi  # black -> dark grey
@@ -687,7 +687,7 @@ sub _gen_css_wad
 
         my $name = $outname
         $name =~ s/-|_/ /g
-        $self->add_css( "_$outname.css", 0, $name, 0, 0, \$this_css)
+        $self->add_css:  "_$outname.css", 0, $name, 0, 0, \$this_css
     
 
     # Now a few indexless variations:
@@ -696,15 +696,15 @@ sub _gen_css_wad
     white_with_green_on_grey  grey_with_green_on_white
   ])
         my $outname = "indexless_$variation"
-        my $this_css = join "\n", @: 
-            "/* This file is autogenerated.  Do not edit.  $outname */\n"
-            "\@import url(\"./_$variation.css\");"
-            ".indexgroup \{ display: none; \}"
-            "\n"
+        my $this_css = join: "\n", @:
+                                 "/* This file is autogenerated.  Do not edit.  $outname */\n"
+                                 "\@import url(\"./_$variation.css\");"
+                                 ".indexgroup \{ display: none; \}"
+                                 "\n"
 
         my $name = $outname
         $name =~ s/-|_/ /g
-        $self->add_css( "_$outname.css", 0, $name, 0, 0, \$this_css)
+        $self->add_css:  "_$outname.css", 0, $name, 0, 0, \$this_css
     
 
     return
@@ -721,50 +721,50 @@ sub _color_negate
 
 sub add_javascript($self, $url, $content_type, $_code)
     return unless $url
-    push   $self->_javascript_wad->@, \@: 
-        $url, $content_type || 'text/javascript', $_code
+    push: ($self->_javascript_wad: )->@, \@:
+              $url, $content_type || 'text/javascript', $_code
         
     return
 
 
 sub _spray_javascript($self, $outdir)
-    return unless $self->javascript_flurry()
-    $self->_gen_javascript_wad()
+    return unless $self->javascript_flurry: 
+    $self->_gen_javascript_wad: 
 
-    my $lol = $self->_javascript_wad
+    my $lol = $self->_javascript_wad: 
     foreach my $script ( $lol->@)
         my $url = $script->[0]
         my $outfile
 
-        if( ref($script->[-1]) and $url =~ m{^(_[-a-z0-9_]+\.js$)} )
-            $outfile = $self->filespecsys->catfile( $outdir, $1 )
-            DEBUG +> 5 and print $^STDOUT, "Noting $script->@[0] as a file I'll create.\n"
+        if( ref: $script->[-1] and $url =~ m{^(_[-a-z0-9_]+\.js$)} )
+            $outfile = ($self->filespecsys: )->catfile:  $outdir, $1 
+            (DEBUG: )+> 5 and print: $^STDOUT, "Noting $script->@[0] as a file I'll create.\n"
         else
-            DEBUG +> 5 and print $^STDOUT, "OK, noting $script->@[0] as an external JavaScript.\n"
+            (DEBUG: )+> 5 and print: $^STDOUT, "OK, noting $script->@[0] as an external JavaScript.\n"
             next
         
 
         #$self->muse( "Writing JavaScript file $outfile" );
-        my $Jsout = $self->_wopen($outfile)
+        my $Jsout = $self->_wopen: $outfile
 
-        print $Jsout, $script->[-1]->$
-            or warn "Couldn't print to $outfile: $^OS_ERROR\nAbort writing to $outfile at all"
-        close($Jsout)
-        DEBUG +> 5 and print $^STDOUT, "Wrote $outfile\n"
+        print: $Jsout, $script->[-1]->$
+            or warn: "Couldn't print to $outfile: $^OS_ERROR\nAbort writing to $outfile at all"
+        close: $Jsout
+        (DEBUG: )+> 5 and print: $^STDOUT, "Wrote $outfile\n"
     
     return
 
 
 sub _gen_javascript_wad
     my $self = @_[0]
-    my $js_code = $self->_javascript || return
-    $self->add_javascript( "_podly.js", 0, \$js_code)
+    my $js_code = ($self->_javascript: ) || return
+    $self->add_javascript:  "_podly.js", 0, \$js_code
     return
 
 
 sub _javascript_wad_to_markup($self, $depth)
 
-    my @scripts  = ( $self->_javascript_wad || return '' )->@
+    my @scripts  = ( ($self->_javascript_wad: ) || return '' )->@
     return '' unless (nelems @scripts)
 
     my $out = ''
@@ -775,9 +775,9 @@ sub _javascript_wad_to_markup($self, $depth)
     foreach my $s ( @scripts)
         next unless $s and nelems $s->@
 
-        my(@:  $url1, $url2, $type, ?$media) = @: 
-            $self->_maybe_uplink( $s->[0], $uplink )
-            < map { esc($_) }, @:  (< grep { !ref($_) }, $s->@)
+        my(@:  $url1, $url2, $type, ?$media) = @:
+            $self->_maybe_uplink:  $s->[0], $uplink 
+            < map: { (esc: $_) }, @:  (< (grep: { !(ref: $_) }, $s->@))
             
 
         $out .= qq{<script type="$type" src="$url1$url2"></script>\n}

@@ -61,22 +61,22 @@ my %OSTYPES = %:  < qw(
 my $load = sub (@< @_)
     my $mod = shift
     eval "use $mod"
-    die $^EVAL_ERROR if $^EVAL_ERROR
+    die: $^EVAL_ERROR if $^EVAL_ERROR
     @ISA = @: $mod
 
 
 do
-    my @package = split m/::/, __PACKAGE__
+    my @package = split: m/::/, __PACKAGE__
 
-    if (grep {-e File::Spec->catfile($_, < @package, 'Platform', $^OS_NAME) . '.pm'}, $^INCLUDE_PATH)
-        $load->(__PACKAGE__ . "::Platform::$^OS_NAME")
+    if ((grep: {-e (File::Spec->catfile: $_, < @package, 'Platform', $^OS_NAME) . '.pm'}, $^INCLUDE_PATH))
+        $load->& <: __PACKAGE__ . "::Platform::$^OS_NAME"
 
     elsif (exists %OSTYPES{$^OS_NAME} and
-        grep {-e File::Spec->catfile($_, < @package, 'Platform', %OSTYPES{$^OS_NAME}) . '.pm'}, $^INCLUDE_PATH)
-        $load->(__PACKAGE__ . "::Platform::%OSTYPES{?$^OS_NAME}")
+        grep: {-e (File::Spec->catfile: $_, < @package, 'Platform', %OSTYPES{$^OS_NAME}) . '.pm'}, $^INCLUDE_PATH)
+        $load->& <: __PACKAGE__ . "::Platform::%OSTYPES{?$^OS_NAME}"
 
     else
-        $load->(__PACKAGE__ . "::Base")
+        $load->& <: __PACKAGE__ . "::Base"
     
 
 

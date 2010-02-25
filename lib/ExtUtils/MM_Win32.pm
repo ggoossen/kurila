@@ -28,7 +28,7 @@ require ExtUtils::MM_Unix
 our @ISA = qw( ExtUtils::MM_Unix )
 our $VERSION = '6.44'
 
-env::var('EMXSHELL' ) = 'sh' # to run `commands`
+(env::var: 'EMXSHELL' ) = 'sh' # to run `commands`
 
 my $BORLAND = %Config{?'cc'} =~ m/^bcc/i ?? 1 !! 0
 my $GCC     = %Config{?'cc'} =~ m/^gcc/i ?? 1 !! 0
@@ -51,23 +51,23 @@ sub dlsyms($self,%< %attribs)
     my @m
 
     if (not $self->{SKIPHASH}{?'dynamic'})
-        push(@m,"
+        push: @m,"
 $self->{?BASEEXT}.def: Makefile.PL
-",
-            q!	$(PERLRUN) -MExtUtils::Mksymlists \\
-     -e "Mksymlists('NAME'=>\"!, $self->{?NAME},
-            q!\", 'DLBASE' => '!,$self->{?DLBASE},
+"
+              q!	$(PERLRUN) -MExtUtils::Mksymlists \\
+     -e "Mksymlists('NAME'=>\"!, $self->{?NAME}
+              q!\", 'DLBASE' => '!,$self->{?DLBASE}
             # The above two lines quoted differently to work around
             # a bug in the 4DOS/4NT command line interpreter.  The visible
             # result of the bug was files named q('extension_name',) *with the
             # single quotes and the comma* in the extension build directories.
-            q!', 'DL_FUNCS' => !, neatvalue($funcs),
-            q!, 'FUNCLIST' => !, neatvalue($funclist),
-            q!, 'IMPORTS' => !, neatvalue($imports),
-            q!, 'DL_VARS' => !, neatvalue($vars), q!);"
-!)
+              q!', 'DL_FUNCS' => !, (neatvalue: $funcs)
+              q!, 'FUNCLIST' => !, (neatvalue: $funclist)
+              q!, 'IMPORTS' => !, (neatvalue: $imports)
+              q!, 'DL_VARS' => !, (neatvalue: $vars), q!);"
+!
     
-    join('', @m)
+    join: '', @m
 
 
 =item replace_manpage_separator
@@ -94,8 +94,8 @@ used by default.
 =cut
 
 sub maybe_command($self,$file)
-    my @e = defined(env::var('PATHEXT'))
-        ?? split(m/;/, env::var('PATHEXT'))
+    my @e = defined: (env::var: 'PATHEXT')
+        ?? split: m/;/, (env::var: 'PATHEXT')
         !! qw(.com .exe .bat .cmd)
     my $e = ''
     for ( @e) { $e .= "\Q$_\E|" }
@@ -121,7 +121,7 @@ Using \ for Windows.
 sub init_DIRFILESEP
     my(@: $self) =@:  shift
 
-    my $make = $self->make
+    my $make = $self->make: 
 
     # The ^ makes sure its not interpreted as an escape in nmake
     $self->{+DIRFILESEP} = $make eq 'nmake' ?? '^\' !!
@@ -146,8 +146,8 @@ Adjustments are made for Borland's quirks needing -L to come first.
 sub init_others($self)
 
     # Used in favor of echo because echo won't strip quotes. :(
-    $self->{+ECHO}     ||= $self->oneliner('print qq{@ARGV}', (@: '-l'))
-    $self->{+ECHO_N}   ||= $self->oneliner('print qq{@ARGV}')
+    $self->{+ECHO}     ||= $self->oneliner: 'print qq{@ARGV}', (@: '-l')
+    $self->{+ECHO_N}   ||= $self->oneliner: 'print qq{@ARGV}'
 
     $self->{+TOUCH}    ||= '$(ABSPERLRUN) -MExtUtils::Command -e touch'
     $self->{+CHMOD}    ||= '$(ABSPERLRUN) -MExtUtils::Command -e chmod'
@@ -166,7 +166,7 @@ sub init_others($self)
     $self->{+LD}     ||= %Config{?ld} || 'link'
     $self->{+AR}     ||= %Config{?ar} || 'lib'
 
-    $self->SUPER::init_others
+    $self->SUPER::init_others: 
 
     # Setting SHELL from $Config{sh} can break dmake.  Its ok without it.
     delete $self->{SHELL}
@@ -224,9 +224,9 @@ Add .USESHELL target for dmake.
 
 sub special_targets($self)
 
-    my $make_frag = $self->SUPER::special_targets
+    my $make_frag = $self->SUPER::special_targets: 
 
-    $make_frag .= <<'MAKE_FRAG' if $self->make eq 'dmake'
+    $make_frag .= <<'MAKE_FRAG' if ($self->make: ) eq 'dmake'
 .USESHELL :
 MAKE_FRAG
 
@@ -244,34 +244,34 @@ to its own method.
 =cut
 
 sub static_lib($self)
-    return '' unless $self->has_link_code
+    return '' unless $self->has_link_code: 
 
     my(@m)
-    push(@m, <<'END')
+    push: @m, <<'END'
 $(INST_STATIC): $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists
 	$(RM_RF) $@
 END
 
     # If this extension has its own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
-    push @m, <<'MAKE_FRAG' if $self->{?MYEXTLIB}
+    push: @m, <<'MAKE_FRAG' if $self->{?MYEXTLIB}
 	$(CP) $(MYEXTLIB) $@
 MAKE_FRAG
 
-    push @m,
-        q{	$(AR) }.($BORLAND ?? '$@ $(OBJECT:^"+")'
+    push: @m
+          q{	$(AR) }.($BORLAND ?? '$@ $(OBJECT:^"+")'
                     !! ($GCC ?? '-ru $@ $(OBJECT)'
-                !! '-out:$@ $(OBJECT)')).q{
+                        !! '-out:$@ $(OBJECT)')).q{
 	$(CHMOD) $(PERM_RWX) $@
 	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)\extralibs.ld
 }
 
     # Old mechanism - still available:
-    push @m, <<'MAKE_FRAG' if $self->{?PERL_SRC} && $self->{?EXTRALIBS}
+    push: @m, <<'MAKE_FRAG' if $self->{?PERL_SRC} && $self->{?EXTRALIBS}
 	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)\ext.libs
 MAKE_FRAG
 
-    join('', @m)
+    join: '', @m
 
 
 
@@ -282,9 +282,9 @@ Complicated stuff for Win32 that I don't understand. :(
 =cut
 
 sub dynamic_lib($self, %< %attribs)
-    return '' unless $self->needs_linking() #might be because of a subdir
+    return '' unless $self->needs_linking:  #might be because of a subdir
 
-    return '' unless $self->has_link_code
+    return '' unless $self->has_link_code: 
 
     my $otherldflags = %attribs{?OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '')
     my $inst_dynamic_dep = %attribs{?INST_DYNAMIC_DEP} || ""
@@ -298,48 +298,48 @@ sub dynamic_lib($self, %< %attribs)
     if ($GCC)
         my $dllname = $self->{?BASEEXT} . "." . $self->{?DLEXT}
         $dllname =~ m/(....)(.{0,4})/
-        my $baseaddr = unpack("n", $1 ^^^ $2)
-        $otherldflags .= sprintf("-Wl,--image-base,0x\%x0000 ", $baseaddr)
+        my $baseaddr = unpack: "n", $1 ^^^ $2
+        $otherldflags .= sprintf: "-Wl,--image-base,0x\%x0000 ", $baseaddr
     
 
-    push(@m,'
+    push: @m,'
 # This section creates the dynamically loadable $(INST_DYNAMIC)
 # from $(OBJECT) and possibly $(MYEXTLIB).
 OTHERLDFLAGS = '.$otherldflags.'
 INST_DYNAMIC_DEP = '.$inst_dynamic_dep.'
 
 $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPORT_LIST) $(PERL_ARCHIVE) $(INST_DYNAMIC_DEP)
-')
+'
     if ($GCC)
-        push(@m,
-            q{	dlltool --def $(EXPORT_LIST) --output-exp dll.exp
+        push: @m
+              q{	dlltool --def $(EXPORT_LIST) --output-exp dll.exp
 	$(LD) -o $@ -Wl,--base-file -Wl,dll.base $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) $(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) dll.exp
 	dlltool --def $(EXPORT_LIST) --base-file dll.base --output-exp dll.exp
-	$(LD) -o $@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) $(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) dll.exp })
+	$(LD) -o $@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) $(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) dll.exp }
     elsif ($BORLAND)
-        push(@m,
-            q{	$(LD) $(LDDLFLAGS) $(OTHERLDFLAGS) }.$ldfrom.q{,$@,,}
-            .($self->make eq 'dmake'
-              ?? q{$(PERL_ARCHIVE:s,/,\,) $(LDLOADLIBS:s,/,\,) }
-              .q{$(MYEXTLIB:s,/,\,),$(EXPORT_LIST:s,/,\,)}
-              !! q{$(subst /,\,$(PERL_ARCHIVE)) $(subst /,\,$(LDLOADLIBS)) }
-              .q{$(subst /,\,$(MYEXTLIB)),$(subst /,\,$(EXPORT_LIST))})
-            .q{,$(RESFILES)})
+        push: @m
+              q{	$(LD) $(LDDLFLAGS) $(OTHERLDFLAGS) }.$ldfrom.q{,$@,,}
+                  .(($self->make: ) eq 'dmake'
+                  ?? q{$(PERL_ARCHIVE:s,/,\,) $(LDLOADLIBS:s,/,\,) }
+                  .q{$(MYEXTLIB:s,/,\,),$(EXPORT_LIST:s,/,\,)}
+                  !! q{$(subst /,\,$(PERL_ARCHIVE)) $(subst /,\,$(LDLOADLIBS)) }
+                  .q{$(subst /,\,$(MYEXTLIB)),$(subst /,\,$(EXPORT_LIST))})
+                  .q{,$(RESFILES)}
     else        # VC
-        push(@m,
-            q{	$(LD) -out:$@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) }
-            .q{$(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) -def:$(EXPORT_LIST)})
+        push: @m
+              q{	$(LD) -out:$@ $(LDDLFLAGS) }.$ldfrom.q{ $(OTHERLDFLAGS) }
+                  .q{$(MYEXTLIB) $(PERL_ARCHIVE) $(LDLOADLIBS) -def:$(EXPORT_LIST)}
 
         # Embed the manifest file if it exists
-        push(@m, q{
+        push: @m, q{
 	  if exist $@.manifest mt -nologo -manifest $@.manifest -outputresource:$@;2
-	  if exist $@.manifest del $@.manifest})
+	  if exist $@.manifest del $@.manifest}
 
-    push @m, '
+    push: @m, '
 	$(CHMOD) $(PERM_RWX) $@
 '
 
-    join('', @m)
+    join: '', @m
 
 
 =item extra_clean_files
@@ -403,7 +403,7 @@ banner.
 
 sub pasthru
     my(@: $self) =@:  shift
-    return "PASTHRU = " . ($self->make eq 'nmake' ?? "-nologo" !! "")
+    return "PASTHRU = " . (($self->make: ) eq 'nmake' ?? "-nologo" !! "")
 
 
 =item oneliner
@@ -420,10 +420,10 @@ sub oneliner($self, $cmd, ?$switches)
     $cmd =~ s{^\n+}{}
     $cmd =~ s{\n+$}{}
 
-    $cmd = $self->quote_literal($cmd)
-    $cmd = $self->escape_newlines($cmd)
+    $cmd = $self->quote_literal: $cmd
+    $cmd = $self->escape_newlines: $cmd
 
-    $switches = join ' ', $switches
+    $switches = join: ' ', $switches
 
     return qq{\$(ABSPERLRUN) $switches -e $cmd --}
 
@@ -439,7 +439,7 @@ sub quote_literal($self, $text)
     # quotes; however it transforms {{ into { either inside and outside double
     # quotes.  It also translates }} into }.  The escaping below is not
     # 100% correct.
-    if( $self->make eq 'dmake' )
+    if( ($self->make: ) eq 'dmake' )
         $text =~ s/{/\{\{/g
         $text =~ s/}}/\}\}\}/g
     
@@ -473,14 +473,14 @@ NOTE: This only works with simple relative directories.  Throw it an absolute di
 
 sub cd($self, $dir, @< @cmds)
 
-    return $self->SUPER::cd($dir, < @cmds) unless $self->make eq 'nmake'
+    return ($self->SUPER::cd: $dir, < @cmds) unless ($self->make: ) eq 'nmake'
 
-    my $cmd = join "\n\t", map { "$_" }, @cmds
+    my $cmd = join: "\n\t", map: { "$_" }, @cmds
 
-    my $updirs = $self->catdir(< map { $self->updir }, $self->splitdir($dir))
+    my $updirs = $self->catdir: < (map: { ($self->updir: ) }, ($self->splitdir: $dir))
 
     # No leading tab and no trailing newline makes for easier embedding.
-    my $make_frag = sprintf <<'MAKE_FRAG', $dir, $cmd, $updirs
+    my $make_frag = sprintf: <<'MAKE_FRAG', $dir, $cmd, $updirs
 cd %s
 	%s
 	cd %s
@@ -525,10 +525,10 @@ defined.
 
 sub cflags($self,$libperl)
     return $self->{?CFLAGS} if $self->{?CFLAGS}
-    return '' unless $self->needs_linking()
+    return '' unless $self->needs_linking: 
 
-    my $base = $self->SUPER::cflags($libperl)
-    foreach (split m/\n/, $base)
+    my $base = $self->SUPER::cflags: $libperl
+    foreach ((split: m/\n/, $base))
         m/^(\S*)\s*=\s*(\S*)$/ and $self->{+$1} = $2
     ;
     $self->{+CCFLAGS} .= " -DPERLDLL" if ($self->{?LINKTYPE} eq 'static')

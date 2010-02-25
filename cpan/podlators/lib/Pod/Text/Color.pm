@@ -33,24 +33,24 @@ $VERSION = 2.03
 # Make level one headings bold.
 sub cmd_head1($self, $attrs, $text)
     $text =~ s/\s+$//
-    $self->SUPER::cmd_head1 ($attrs, colored ($text, 'bold'))
+    $self->SUPER::cmd_head1 : $attrs, (colored: $text, 'bold')
 
 
 # Make level two headings bold.
 sub cmd_head2($self, $attrs, $text)
     $text =~ s/\s+$//
-    $self->SUPER::cmd_head2 ($attrs, colored ($text, 'bold'))
+    $self->SUPER::cmd_head2 : $attrs, (colored: $text, 'bold')
 
 
 # Fix the various formatting codes.
-sub cmd_b { return colored (@_[2], 'bold')   }
-sub cmd_f { return colored (@_[2], 'cyan')   }
-sub cmd_i { return colored (@_[2], 'yellow') }
+sub cmd_b { return (colored: @_[2], 'bold')   }
+sub cmd_f { return (colored: @_[2], 'cyan')   }
+sub cmd_i { return (colored: @_[2], 'yellow') }
 
 # Output any included code in green.
 sub output_code($self, $code)
-    $code = colored ($code, 'green')
-    $self->output ($code)
+    $code = colored: $code, 'green'
+    $self->output : $code
 
 
 # We unfortunately have to override the wrapping code here, since the normal

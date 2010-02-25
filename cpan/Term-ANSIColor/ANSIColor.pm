@@ -28,7 +28,7 @@ use Exporter ()
                                  YELLOW BLUE MAGENTA CYAN WHITE ON_BLACK
                                  ON_RED ON_GREEN ON_YELLOW ON_BLUE ON_MAGENTA
                                  ON_CYAN ON_WHITE)
-Exporter::export_ok_tags ('constants')
+Exporter::export_ok_tags : 'constants'
 
 $VERSION = '1.12'
 
@@ -56,7 +56,7 @@ $VERSION = '1.12'
                  'white'      => 37,   'on_white'   => 47
 
 # Reverse lookup.  Alphabetically first name for a sequence is preferred.
-for (reverse sort keys %attributes)
+for ((reverse: (sort: keys %attributes)))
     %attributes_r{+%attributes{?$_}} = $_
 
 
@@ -87,8 +87,8 @@ for (reverse sort keys %attributes)
 # sequences.  This is to make it easier to write scripts that also work on
 # systems without any ANSI support, like Windows consoles.
 for my $attr (keys %attributes)
-    my $enable_colors = !defined env::var('ANSI_COLORS_DISABLED')
-    Symbol::fetch_glob(uc $attr)->* =
+    my $enable_colors = !defined env::var: 'ANSI_COLORS_DISABLED'
+    (Symbol::fetch_glob: uc $attr)->* =
         sub (@< @_)
         my $xattr = $enable_colors ?? "\e[" . $attr . 'm' !! ''
         if (\$AUTORESET && \@_)
@@ -105,14 +105,14 @@ for my $attr (keys %attributes)
 
 # Return the escape code for a given set of color attributes.
 sub color
-    return '' if defined env::var('ANSI_COLORS_DISABLED')
-    my @codes = @+: map { split }, @_
+    return '' if defined env::var: 'ANSI_COLORS_DISABLED'
+    my @codes = @+: map: { (split: )}, @_
     my $attribute = ''
     foreach ( @codes)
         $_ = lc $_
         unless (defined %attributes{?$_})
             require Carp
-            Carp::croak ("Invalid attribute name $_")
+            Carp::croak : "Invalid attribute name $_"
         
         $attribute .= %attributes{?$_} . ';'
     
@@ -131,18 +131,18 @@ sub uncolor
         $escape =~ s/m$//
         unless ($escape =~ m/^((?:\d+;)*\d*)$/)
             require Carp
-            Carp::croak ("Bad escape sequence $_")
+            Carp::croak : "Bad escape sequence $_"
         
-        push (@nums, < split (m/;/, $1))
+        push: @nums, < (split: m/;/, $1)
     
     for ( @nums)
         $_ += 0 # Strip leading zeroes
         my $name = %attributes_r{?$_}
         if (!defined $name)
             require Carp
-            Carp::croak ("No name for escape sequence $_" )
+            Carp::croak : "No name for escape sequence $_" 
         
-        push (@result, $name)
+        push: @result, $name
     
     @result
 
@@ -159,19 +159,19 @@ sub colored
     my ($string, @codes)
     if (ref @_[0])
         @codes = $:(shift @_)->@
-        $string = join ('', @_)
+        $string = join: '', @_
     else
         $string = shift
         @codes = @_
     
-    return $string if defined env::var('ANSI_COLORS_DISABLED')
+    return $string if defined env::var: 'ANSI_COLORS_DISABLED'
     if (defined $EACHLINE)
-        my $attr = color (< @codes)
-        join '', map { $_ ne $EACHLINE ?? $attr . $_ . "\e[0m" !! $_ },
-            grep { length ($_) +> 0 },
-            split (m/(\Q$EACHLINE\E)/, $string)
+        my $attr = color: < @codes
+        join: '', map: { $_ ne $EACHLINE ?? $attr . $_ . "\e[0m" !! $_ },
+                           grep: { (length: $_) +> 0 },
+                                     split: m/(\Q$EACHLINE\E)/, $string
     else
-        color (< @codes) . $string . "\e[0m"
+        (color: < @codes) . $string . "\e[0m"
     
 
 

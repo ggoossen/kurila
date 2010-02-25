@@ -15,7 +15,7 @@ my $LAST_API_CHANGE = 0
 eval "require $PACKAGE"
 
 unless ($^EVAL_ERROR) # Make sure we did find the module.
-    print <<"CHANGE_WARN" if $PACKAGE::VERSION +< $LAST_API_CHANGE
+    print: <<"CHANGE_WARN" if $PACKAGE::VERSION +< $LAST_API_CHANGE
 
 NOTE: There have been API changes between this version and any older
 than version $LAST_API_CHANGE!  Please read the Changes file if you
@@ -24,21 +24,21 @@ are upgrading from a version older than $LAST_API_CHANGE.
 CHANGE_WARN
 
 # In case the empty lib/ directory was not created.
-mkdir 'lib', 0755 unless env::var('PERL_CORE')
+mkdir: 'lib', 0755 unless env::var: 'PERL_CORE'
 
-WriteMakefile(
-    NAME            => $PACKAGE,
-    LICENSE         => 'perl',
-    AUTHOR          => 'Sebastien Aperghis-Tramoni <sebastien@aperghis.net>',
-    VERSION_FROM    => 'XSLoader_pm.PL',
-    ABSTRACT_FROM   => 'XSLoader_pm.PL',
-    PL_FILES        => (%: 'XSLoader_pm.PL'  => 'XSLoader.pm' ),
-    PM              => (%: 'XSLoader.pm' => '$(INST_ARCHLIB)/XSLoader.pm' ),
+WriteMakefile: 
+    NAME            => $PACKAGE
+    LICENSE         => 'perl'
+    AUTHOR          => 'Sebastien Aperghis-Tramoni <sebastien@aperghis.net>'
+    VERSION_FROM    => 'XSLoader_pm.PL'
+    ABSTRACT_FROM   => 'XSLoader_pm.PL'
+    PL_FILES        => (%: 'XSLoader_pm.PL'  => 'XSLoader.pm' )
+    PM              => (%: 'XSLoader.pm' => '$(INST_ARCHLIB)/XSLoader.pm' )
     PREREQ_PM       => %:
-        'Test::More' => '0.62',
-    ,
-    clean           => (%: FILES => 'XSLoader-*' ),
-    )
+        'Test::More' => '0.62'
+    
+    clean           => (%: FILES => 'XSLoader-*' )
+    
 
 # Unlink the .pm file included with the distribution
-1 while unlink "XSLoader.pm"
+1 while unlink: "XSLoader.pm"

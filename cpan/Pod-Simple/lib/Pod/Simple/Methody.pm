@@ -12,27 +12,27 @@ $VERSION = '2.02'
 sub _handle_element_start
     @_[1] =~ s/-|:/_/g
     @_[1] =~ s/\.//g
-    ( @_[0]->can( 'start_' . @_[1] )
+    ( @_[0]->can:  'start_' . @_[1] 
       || return
-      )->(
+      )->& <: 
         @_[0], @_[2]
-        )
+        
 
 
 sub _handle_text($self, @< @args)
-    ( $self->can( 'handle_text' )
+    ( $self->can:  'handle_text' 
       || return
-      )->( $self, < @args )
+      )->& <:  $self, < @args 
 
 
 sub _handle_element_end
     @_[1] =~ s/-|:/_/g
     @_[1] =~ s/\.//g
-    ( @_[0]->can( 'end_' . @_[1] )
+    ( @_[0]->can:  'end_' . @_[1] 
       || return
-      )->(
+      )->& <: 
         @_[0]
-        )
+        
 
 
 1

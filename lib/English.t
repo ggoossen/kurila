@@ -6,4 +6,4 @@ use English < qw( -no_match_vars )
 use Config
 use Errno
 
-ok 1
+ok: 1

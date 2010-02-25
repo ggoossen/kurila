@@ -1,10 +1,10 @@
 use ExtUtils::MakeMaker
 
-WriteMakefile(
-    VERSION_FROM    => "lib/List/Util.pm",
-    NAME            => "List::Util",
-    DEFINE          => "-DPERL_EXT",
-    )
+WriteMakefile: 
+    VERSION_FROM    => "lib/List/Util.pm"
+    NAME            => "List::Util"
+    DEFINE          => "-DPERL_EXT"
+    
 
 package MY
 
@@ -19,7 +19,7 @@ package MY
 
 BEGIN 
     use Config
-    unless (defined config_value("usedl"))
+    unless (defined (config_value: "usedl"))
         eval <<'__EOMM__'
 sub xs_c {
     my($self) = shift;

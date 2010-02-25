@@ -48,7 +48,7 @@ $VERSION = '0.58'
 # The Unicode name of each character is given in the comments.
 # Complete LaTeX set added by Peter Acklam.
 
-%HTML_Escapes = %: 
+%HTML_Escapes = %:
     'sol'    => '\textfractionsolidus{}'  # xxx - or should it be just '/'
     'verbar' => '|'
 
@@ -455,8 +455,7 @@ sub initialize
         unless exists $self->{Label}
 
     # Run base initialize
-    $self->SUPER::initialize
-
+    $self->SUPER::initialize:
 
 
 =back
@@ -571,7 +570,7 @@ sub Head1Level
         if ($arg =~ m/^\d$/ && $arg +< nelems @LatexSections)
             $self->{+Head1Level} = $arg
         else
-            carp "Head1Level supplied ($arg) must be integer in range 0 to ".((nelems @LatexSections)-1) . "- Ignoring\n"
+            carp: "Head1Level supplied ($arg) must be integer in range 0 to ".((nelems @LatexSections)-1) . "- Ignoring\n"
         
     
     return $self->{?Head1Level}
@@ -866,9 +865,9 @@ sub begin_pod
     # Get the pod identification
     # This should really come from the '=head1 NAME' paragraph
 
-    my $infile = $self->input_file
-    my $class = ref($self)
-    my $date = gmtime(time)
+    my $infile = $self->input_file: 
+    my $class = ref: $self
+    my $date = gmtime: time
 
     # Comment message to say where this came from
     my $comment = << "__TEX_COMMENT__"
@@ -882,11 +881,11 @@ __TEX_COMMENT__
 
     my $preamble = ''
 
-    if ($self->AddPreamble)
+    if (($self->AddPreamble: ))
 
-        if (defined $self->UserPreamble)
+        if (defined ($self->UserPreamble: ))
 
-            $preamble = $self->UserPreamble
+            $preamble = $self->UserPreamble: 
 
             # Add the description of where this came from
             $preamble .=  "\n$comment\n\%\%  Preamble supplied by user.\n\n"
@@ -898,21 +897,21 @@ __TEX_COMMENT__
             # Code to initialise index making
             # Use an array so that we can prepend comment if required
             my @makeidx = @:
-                '\usepackage{makeidx}',
-                '\makeindex',
+                '\usepackage{makeidx}'
+                '\makeindex'
 
-            unless ($self->MakeIndex)
+            unless (($self->MakeIndex: ))
                 foreach ( @makeidx)
                     $_ = '%% ' . $_
                 
             
-            my $makeindex = join("\n", @makeidx) . "\n"
+            my $makeindex = (join: "\n", @makeidx) . "\n"
 
             # Table of contents
             my $tableofcontents = '\tableofcontents'
 
             $tableofcontents = '%% ' . $tableofcontents
-                unless $self->TableOfContents
+                unless $self->TableOfContents: 
 
             # Roll our own
             $preamble = << "__TEX_HEADER__"
@@ -934,10 +933,10 @@ __TEX_HEADER__
     
 
     # Write the header (blank if none)
-    $self->_output($preamble)
+    $self->_output: $preamble
 
     # Start on new page if requested
-    $self->_output("\\clearpage\n") if $self->StartWithNewPage
+    $self->_output: "\\clearpage\n" if $self->StartWithNewPage: 
 
 
 
@@ -956,23 +955,23 @@ sub end_pod
     my $end = ''
 
     # Use the user version of the postamble if defined
-    if ($self->AddPostamble)
+    if (($self->AddPostamble: ))
 
-        if (defined $self->UserPostamble)
-            $end = $self->UserPostamble
+        if (defined ($self->UserPostamble: ))
+            $end = $self->UserPostamble: 
 
         else
 
             # Check for index
             my $makeindex = '\printindex'
 
-            $makeindex = '%% '. $makeindex  unless $self->MakeIndex
+            $makeindex = '%% '. $makeindex  unless $self->MakeIndex: 
 
             $end = "$makeindex\n\n\\end\{document\}\n"
         
     
 
-    $self->_output($end)
+    $self->_output: $end
 
 
 
@@ -992,28 +991,28 @@ sub command($self, $command, $paragraph, $line_num, $parobj)
     my $rawpara = $paragraph
 
     # Do the latex escapes
-    $paragraph = $self->_replace_special_chars($paragraph)
+    $paragraph = $self->_replace_special_chars: $paragraph
 
     # Interpolate pod sequences in paragraph
-    $paragraph = $self->interpolate($paragraph, $line_num)
+    $paragraph = $self->interpolate: $paragraph, $line_num
     $paragraph =~ s/\s+$//
 
     # Replace characters that can only be done after
     # interpolation of interior sequences
-    $paragraph = $self->_replace_special_chars_late($paragraph)
+    $paragraph = $self->_replace_special_chars_late: $paragraph
 
     # Now run the command
     if ($command eq 'over')
 
-        $self->begin_list($paragraph, $line_num)
+        $self->begin_list: $paragraph, $line_num
 
     elsif ($command eq 'item')
 
-        $self->add_item($paragraph, $line_num)
+        $self->add_item: $paragraph, $line_num
 
     elsif ($command eq 'back')
 
-        $self->end_list($line_num)
+        $self->end_list: $line_num
 
     elsif ($command eq 'head1')
 
@@ -1021,27 +1020,27 @@ sub command($self, $command, $paragraph, $line_num, $parobj)
         $self->{+_CURRENT_HEAD1} = $paragraph
 
         # Print it
-        $self->head(1, $paragraph, $parobj)
+        $self->head: 1, $paragraph, $parobj
 
     elsif ($command eq 'head2')
 
-        $self->head(2, $paragraph, $parobj)
+        $self->head: 2, $paragraph, $parobj
 
     elsif ($command eq 'head3')
 
-        $self->head(3, $paragraph, $parobj)
+        $self->head: 3, $paragraph, $parobj
 
     elsif ($command eq 'head4')
 
-        $self->head(4, $paragraph, $parobj)
+        $self->head: 4, $paragraph, $parobj
 
     elsif ($command eq 'head5')
 
-        $self->head(5, $paragraph, $parobj)
+        $self->head: 5, $paragraph, $parobj
 
     elsif ($command eq 'head6')
 
-        $self->head(6, $paragraph, $parobj)
+        $self->head: 6, $paragraph, $parobj
 
     elsif ($command eq 'begin')
 
@@ -1068,13 +1067,13 @@ sub command($self, $command, $paragraph, $line_num, $parobj)
 
         # The first line contains the format and the rest is the
         # raw code.
-        my @: $format, $chunk = split(m/\n/, $rawpara, 2)
+        my @: $format, $chunk = split: m/\n/, $rawpara, 2
 
         # If we have got some latex code print it out immediately
         # unmodified. Else do nothing.
         if ($format =~ m/^latex/i)
             # Make sure that next paragraph is not modfied before printing
-            $self->_output( $chunk )
+            $self->_output:  $chunk 
 
         
 
@@ -1089,7 +1088,7 @@ sub command($self, $command, $paragraph, $line_num, $parobj)
     # Do nothing
 
     }else
-        carp "Command $command not recognised at line $line_num\n"
+        carp: "Command $command not recognised at line $line_num\n"
     
 
 
@@ -1104,7 +1103,7 @@ sub verbatim($self, $paragraph, $line_num, $parobj)
     # Expand paragraph unless in =begin block
     if ($self->{?_dont_modify_any_para})
         # Just print as is
-        $self->_output($paragraph)
+        $self->_output: $paragraph
 
     else
 
@@ -1116,20 +1115,20 @@ sub verbatim($self, $paragraph, $line_num, $parobj)
         # Clean tabs. Routine taken from Tabs.pm
         # by David Muir Sharnoff muir@idiom.com,
         # slightly modified by hsmyers@sdragons.com 10/22/01
-        my @l = split("\n",$paragraph)
+        my @l = split: "\n",$paragraph
         foreach ( @l)
             1 while s/(^|\n)([^\t\n]*)(\t+)/$(
             $1. $2 . (" " x
-            (8 * length($3)
-            - (length($2) % 8)))
+            (8 * (length: $3)
+            - ((length: $2) % 8)))
             )/sx
         
-        $paragraph = join("\n", @l)
+        $paragraph = join: "\n", @l
         # End of change.
 
 
 
-        $self->_output('\begin{verbatim}' . "\n$paragraph\n". '\end{verbatim}'."\n")
+        $self->_output: '\begin{verbatim}' . "\n$paragraph\n". '\end{verbatim}'."\n"
     
 
 
@@ -1146,35 +1145,35 @@ sub textblock($self, $paragraph, $line_num, $parobj)
     # Expand paragraph unless in =begin block
     if ($self->{?_dont_modify_any_para})
         # Just print as is
-        $self->_output($paragraph)
+        $self->_output: $paragraph
 
         return
     
 
 
     # Escape latex special characters
-    $paragraph = $self->_replace_special_chars($paragraph)
+    $paragraph = $self->_replace_special_chars: $paragraph
 
     # Interpolate interior sequences
-    my $expansion = $self->interpolate($paragraph, $line_num)
+    my $expansion = $self->interpolate: $paragraph, $line_num
     $expansion =~ s/\s+$//
 
     # Escape special characters that can not be done earlier
-    $expansion = $self->_replace_special_chars_late($expansion)
+    $expansion = $self->_replace_special_chars_late: $expansion
 
     # If we are replacing 'head1 NAME' with a section
     # we need to look in the paragraph and rewrite things
     # Need to make sure this is called only on the first paragraph
     # following 'head1 NAME' and not on subsequent paragraphs that may be
     # present.
-    if ($self->{?_CURRENT_HEAD1} =~ m/^NAME/i && $self->ReplaceNAMEwithSection())
+    if ($self->{?_CURRENT_HEAD1} =~ m/^NAME/i && ($self->ReplaceNAMEwithSection: ))
 
         # Strip white space from start and end
         $paragraph =~ s/^\s+//
         $paragraph =~ s/\s$//
 
         # Split the string into 2 parts
-        my @: $name, $purpose = split(m/\s+-\s+/, $expansion,2)
+        my @: $name, $purpose = split: m/\s+-\s+/, $expansion,2
 
         # Now prevent this from triggering until a new head1 NAME is set
         $self->{+_CURRENT_HEAD1} = '_NAME'
@@ -1182,24 +1181,24 @@ sub textblock($self, $paragraph, $line_num, $parobj)
         # Might want to clear the Label() before doing this (CHECK)
 
         # Print the heading
-        $self->head(1, $name, $parobj)
+        $self->head: 1, $name, $parobj
 
         # Set the labeling in case we want unique names later
-        $self->Label( < $self->_create_label( $name, 1 ) )
+        $self->Label:  < ($self->_create_label:  $name, 1 ) 
 
         # Raise the Head1Level by one so that subsequent =head1 appear
         # as subsections of the main name section unless we are already
         # at maximum [Head1Level() could check this itself - CHECK]
-        $self->Head1Level( $self->Head1Level() + 1)
-            unless $self->Head1Level == (nelems @LatexSections)-1
+        $self->Head1Level:  ($self->Head1Level: ) + 1
+            unless ($self->Head1Level: ) == (nelems @LatexSections)-1
 
         # Now write out the new latex paragraph
-        $purpose = ucfirst($purpose)
-        $self->_output("\n\n$purpose\n\n")
+        $purpose = ucfirst: $purpose
+        $self->_output: "\n\n$purpose\n\n"
 
     else
         # Just write the output
-        $self->_output("\n\n$expansion\n\n")
+        $self->_output: "\n\n$expansion\n\n"
     
 
 
@@ -1222,14 +1221,14 @@ sub interior_sequence($self, $seq_command, $seq_argument, $pod_seq)
 
         # If it is simply a number
         if ($seq_argument =~ m/^\d+$/)
-            return chr($seq_argument)
+            return chr: $seq_argument
         # Look up escape in hash table
         elsif (exists %HTML_Escapes{$seq_argument})
             return %HTML_Escapes{?$seq_argument}
 
         else
-            my @: $file, $line = $pod_seq->file_line()
-            warn "Escape sequence $seq_argument not recognised at line $line of file $file\n"
+            my @: $file, $line = $pod_seq->file_line: 
+            warn: "Escape sequence $seq_argument not recognised at line $line of file $file\n"
             return
         
 
@@ -1252,34 +1251,34 @@ sub interior_sequence($self, $seq_command, $seq_argument, $pod_seq)
         return $seq_argument
 
     elsif ($seq_command eq 'L')
-        my $link = Pod::Hyperlink->new($seq_argument)
+        my $link = Pod::Hyperlink->new: $seq_argument
 
         # undef on failure
         unless (defined $link)
-            carp $^EVAL_ERROR
+            carp: $^EVAL_ERROR
             return
         
 
         # Handle internal links differently
-        my $type = $link->type
-        my $page = $link->page
+        my $type = $link->type: 
+        my $page = $link->page: 
 
         if ($type eq 'section' && $page eq '')
             # Use internal latex reference
-            my $node = $link->node
+            my $node = $link->node: 
 
             # Convert to a label
-            $node = $self->_create_label($node)
+            $node = $self->_create_label: $node
 
             return "\\S\\ref\{$node\}"
 
         else
             # Use default markup for external references
             # (although Starlink would use \xlabel)
-            my $markup = $link->markup
-            my @: $file, $line = $pod_seq->file_line()
+            my $markup = $link->markup: 
+            my @: $file, $line = $pod_seq->file_line: 
 
-            return $self->interpolate( $link->markup, $line)
+            return $self->interpolate:  ($link->markup: ), $line
         
 
 
@@ -1304,11 +1303,11 @@ sub interior_sequence($self, $seq_command, $seq_argument, $pod_seq)
         # use \index command
         # I will let '!' go through for now
         # not sure how sub categories are handled in X<>
-        my $index = $self->_create_index($seq_argument)
+        my $index = $self->_create_index: $seq_argument
         return "\\index\{$index\}\n"
 
     else
-        carp "Unknown sequence $seq_command<$seq_argument>"
+        carp: "Unknown sequence $seq_command<$seq_argument>"
     
 
 
@@ -1338,10 +1337,10 @@ sub begin_list
 
     # Indicate that a list should be started for the next item
     # need to do this to work out the type of list
-    push ( $self->lists->@, Pod::List->new(-indent => $indent,
-        -start => $line_num,
-        -file => $self->input_file,)
-        )
+    push:  ($self->lists: )->@, Pod::List->new: -indent => $indent
+                                                -start => $line_num
+                                                -file => ($self->input_file: ),
+        
 
 
 
@@ -1359,23 +1358,23 @@ sub end_list
     my $self = shift
     my $line_num = shift
 
-    unless (defined $self->lists->[-1])
-        my $file = $self->input_file
-        warn "No list is active at line $line_num (file=$file). Missing =over?\n"
+    unless (defined ($self->lists: )->[-1])
+        my $file = $self->input_file: 
+        warn: "No list is active at line $line_num (file=$file). Missing =over?\n"
         return
     
 
     # What to write depends on list type
-    my $type = $self->lists->[-1]->type
+    my $type = ($self->lists: )->[-1]->type: 
 
     # Dont write anything if the list type is not set
     # iomplying that a list was created but no entries were
     # placed in it (eg because of a =begin/=end combination)
-    $self->_output("\\end\{$type\}\n")
-        if (defined $type && length($type) +> 0)
+    $self->_output: "\\end\{$type\}\n"
+        if (defined $type && (length: $type) +> 0)
 
     # Clear list
-    pop( $self->lists->@)
+    pop:  ($self->lists: )->@
 
 
 
@@ -1395,12 +1394,12 @@ sub add_item
     my $paragraph = shift
     my $line_num = shift
 
-    unless (defined $self->lists->[-1])
-        my $file = $self->input_file
-        warn "List has already ended by line $line_num of file $file. Missing =over?\n"
+    unless (defined ($self->lists: )->[-1])
+        my $file = $self->input_file: 
+        warn: "List has already ended by line $line_num of file $file. Missing =over?\n"
         # Replace special chars
         #    $paragraph = $self->_replace_special_chars($paragraph);
-        $self->_output("$paragraph\n\n")
+        $self->_output: "$paragraph\n\n"
         return
     
 
@@ -1409,7 +1408,7 @@ sub add_item
     return if $self->{?_suppress_all_para}
 
     # Check to see whether we are starting a new lists
-    if (nelems($self->lists->[-1]->item) == 0)
+    if ((nelems: ($self->lists: )->[-1]->item: ) == 0)
 
         # Examine the paragraph to determine what type of list
         # we have
@@ -1417,37 +1416,37 @@ sub add_item
         $paragraph =~ s/^\s+//
 
         my $type
-        if (substr($paragraph, 0,1) eq '*')
+        if ((substr: $paragraph, 0,1) eq '*')
             $type = 'itemize'
         elsif ($paragraph =~ m/^\d/)
             $type = 'enumerate'
         else
             $type = 'description'
         
-        $self->lists->[-1]->type($type)
+        ($self->lists: )->[-1]->type: $type
 
-        $self->_output("\\begin\{$type\}\n")
+        $self->_output: "\\begin\{$type\}\n"
 
     
 
-    my $type = $self->lists->[-1]->type
+    my $type = ($self->lists: )->[-1]->type: 
 
     if ($type eq 'description')
         # Handle long items - long items do not wrap
         # If the string is longer than 40 characters we split
         # it into a real item header and some bold text.
         my $maxlen = 40
-        my @: $hunk1, $hunk2 = $self->_split_delimited( $paragraph, $maxlen )
+        my @: $hunk1, $hunk2 = $self->_split_delimited:  $paragraph, $maxlen 
 
         # Print the first hunk
-        $self->_output("\n\\item[\{$hunk1\}] ")
+        $self->_output: "\n\\item[\{$hunk1\}] "
 
         # and the second hunk if it is defined
         if ($hunk2)
-            $self->_output("\\textbf\{$hunk2\}")
+            $self->_output: "\\textbf\{$hunk2\}"
         else
             # Not there so make sure we have a new line
-            $self->_output("\\mbox\{\}")
+            $self->_output: "\\mbox\{\}"
         
 
     else
@@ -1455,12 +1454,12 @@ sub add_item
         # out the something. Also allow 1) and 1.
         my $extra_info = $paragraph
         $extra_info =~ s/^(\*|\d+[\.\)]?)\s*//
-        $self->_output("\n\\item $extra_info")
+        $self->_output: "\n\\item $extra_info"
     
 
     # Store the item name in the object. Required so that
     # we can tell if the list is new or not
-    $self->lists->[-1]->item($paragraph)
+    ($self->lists: )->[-1]->item: $paragraph
 
 
 
@@ -1491,32 +1490,32 @@ sub head
     # If we are replace 'head1 NAME' with a section
     # we return immediately if we get it
     return
-        if ($self->{?_CURRENT_HEAD1} =~ m/^NAME/i && $self->ReplaceNAMEwithSection())
+        if ($self->{?_CURRENT_HEAD1} =~ m/^NAME/i && ($self->ReplaceNAMEwithSection: ))
 
     # Create a label
-    my $label = $self->_create_label($paragraph)
+    my $label = $self->_create_label: $paragraph
 
     # Create an index entry
-    my $index = $self->_create_index($paragraph)
+    my $index = $self->_create_index: $paragraph
 
     # Work out position in the above array taking into account
     # that =head1 is equivalent to $self->Head1Level
 
-    my $level = $self->Head1Level() - 1 + $num
+    my $level = ($self->Head1Level: ) - 1 + $num
 
     # Warn if heading to large
     if ($num +>= nelems @LatexSections)
-        my $line = $parobj->file_line
-        my $file = $self->input_file
-        warn "Heading level too large ($level) for LaTeX at line $line of file $file\n"
+        my $line = $parobj->file_line: 
+        my $file = $self->input_file: 
+        warn: "Heading level too large ($level) for LaTeX at line $line of file $file\n"
         $level = (nelems @LatexSections)-1
     
 
     # Check to see whether section should be unnumbered
-    my $star = ($level +>= $self->LevelNoNum ?? '*' !! '')
+    my $star = ($level +>= ($self->LevelNoNum: ) ?? '*' !! '')
 
     # Section
-    $self->_output("\\" .@LatexSections[$level] .$star ."\{$paragraph\\label\{".$label ."\}\\index\{".$index."\}\}\n")
+    $self->_output: "\\" .@LatexSections[$level] .$star ."\{$paragraph\\label\{".$label ."\}\\index\{".$index."\}\}\n"
 
 
 
@@ -1550,7 +1549,7 @@ sub _output
     my $self = shift
     my $text = shift
 
-    print  $self->output_handle  ,$text
+    print: ($self->output_handle: )  ,$text
         unless $self->{?_suppress_all_para}
 
 
@@ -1665,7 +1664,7 @@ sub _create_label
     my $suppress = ((nelems @_) ?? 1 !! 0 )
 
     # Remove latex commands
-    $paragraph = $self->_clean_latex_commands($paragraph)
+    $paragraph = $self->_clean_latex_commands: $paragraph
 
     # Remove non alphanumerics from the label and replace with underscores
     # want to protect '-' though so use negated character classes
@@ -1679,8 +1678,8 @@ sub _create_label
     # If required need to make sure that the label is unique
     # since it is possible to have multiple pods in a single
     # document
-    if (!$suppress && $self->UniqueLabels() && defined $self->Label)
-        $paragraph = $self->Label() .'_'. $paragraph
+    if (!$suppress && ($self->UniqueLabels: ) && defined ($self->Label: ))
+        $paragraph = ($self->Label: ) .'_'. $paragraph
     
 
     return $paragraph
@@ -1706,13 +1705,13 @@ sub _create_index
     my $suppress = ((nelems @_) ?? 1 !! 0 )
 
     # Remove latex commands
-    $paragraph = $self->_clean_latex_commands($paragraph)
+    $paragraph = $self->_clean_latex_commands: $paragraph
 
     # If required need to make sure that the index entry is unique
     # since it is possible to have multiple pods in a single
     # document
-    if (!$suppress && $self->UniqueLabels() && defined $self->Label)
-        $paragraph = $self->Label() .'!'. $paragraph
+    if (!$suppress && ($self->UniqueLabels: ) && defined ($self->Label: ))
+        $paragraph = ($self->Label: ) .'!'. $paragraph
     
 
     # Need to replace _ with space
@@ -1773,7 +1772,7 @@ sub _split_delimited
     my $limit = shift
 
     # Return immediately if already small
-    return  @: $input, '' if length($input) +< $limit
+    return  @: $input, '' if (length: $input) +< $limit
 
     my @output
     my $s = ''
@@ -1783,18 +1782,18 @@ sub _split_delimited
 
     $input =~ s/\n/ /gm
     $input .= ' '
-    foreach ( split ( m//, $input ) )
+    foreach ( (split:  m//, $input ) )
         $token .= $_
         if (m/\{/)
             $depth++
         elsif ( m/}/ )
             $depth--
         elsif ( m/ / and $depth == 0)
-            push @output, $token if ( $token and $token ne ' ' )
+            push: @output, $token if ( $token and $token ne ' ' )
             $token = ''
 
     foreach  ( @output)
-        if (length($s) +< $limit)
+        if ((length: $s) +< $limit)
             $s .= $_
         else
             $t .= $_

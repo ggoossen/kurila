@@ -18,13 +18,13 @@ our $foo_called;
 #                         foo => sub { $foo_called++; return @_[0] },
 #                        };
 # }
-BEGIN { compsub::define( foo => sub { $foo_called++; @_[0] or die "no arguments"; return @_[0] } ); }
+BEGIN { compsub::define: foo => sub { $foo_called++; @_[0] or die: "no arguments"; return @_[0] } }
 
 BEGIN { is $foo_called, undef; }
 sub bar { foo(); }
 BEGIN { is $foo_called, 1; }
 
-is( (join '*', (@: foo 1, 2)), "1*2");
+is( (join: '*', (@: foo 1, 2)), "1*2");
 
 BEGIN { is $foo_called, 2; }
 
@@ -35,7 +35,7 @@ use B::OP ();
 # this leaks the OP_LIST, and the remaining items in the listop
 BEGIN { compsub::define( fst => sub { my $first = @_[0]->first->sibling;
                                         # remove $first from the list of children of @_[0]
-                                        @_[0]->first->set_sibling($first->sibling);
+                                        @_[0]->first->set_sibling: $first->sibling;
                                         @_[0]->free; undef @_[0];
                                         # free the @_[0] opcode.
                                         return $first;
@@ -48,7 +48,11 @@ fst(($a="newa"), ($b="notset"));
 is("$a-$b", "newa-oldb");
 
 do {
-    BEGIN { compsub::define( nothing => sub { @_[?0] and @_[0]->free; return B::OP->new('null', 0, (@: "myop", 33, 66)) } ); }
+    BEGIN 
+        compsub::define:
+            nothing => sub { @_[?0] and @_[0]->free;
+                             return B::OP->new: 'null', 0, (@: "myop", 33, 66)
+                           }
     nothing;
 
     eval "nothing";
@@ -61,13 +65,13 @@ like $^EVAL_ERROR->{description}, qr/Bareword "nothing" not allowed/, "compsub l
 ## calling a function
 do {
     our $x;
-    sub func1 { $x++; return "func1 called. args: $(join ' ', @_)" };
+    sub func1 { $x++; return "func1 called. args: $(join: ' ', @_)" };
 
     BEGIN { compsub::define( compfunc1 => 
                                sub { my $op = shift;
-                                     my $cvop = B::SVOP->new('const', 0, \&func1, (@: 'myop', 1, 1));
-                                     $op = B::LISTOP->new('list', 0, ($op ?? ($op, $cvop) !! ($cvop, undef)), $@);
-                                     return B::UNOP->new('entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op, (@: 'compfunc1'));
+                                     my $cvop = B::SVOP->new: 'const', 0, \&func1, (@: 'myop', 1, 1);
+                                     $op = B::LISTOP->new: 'list', 0, ($op ?? ($op, $cvop) !! ($cvop, undef), $@);
+                                     return B::UNOP->new: 'entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op, (@: 'compfunc1');
                                  } ); }
 
     is( (compfunc1), "func1 called. args: ");
@@ -92,18 +96,18 @@ do {
     # this will be converted like C<parseparams('foo', \(my $foo), 'bar', \(my $bar), { @_ })>
     sub compparams {
         my $op = shift;
-        $op or return B::UNOP->new('null', 0);
+        $op or return B::UNOP->new: 'null', 0;
         my $kid = $op->first;
         while (ref $kid ne "B::NULL") {
             if ($kid->name eq "const") {
                 # allocate a 'my' variable
-                my $targ = B::PAD::allocmy( '$' . $kid->sv->object_2svref()->$ );
+                my $targ = B::PAD::allocmy: '$' . $kid->sv->object_2svref->$ ;
                 # introduce the 'my' variable, and insert it into the list of argument.
-                my $padsv = B::OP->new('padsv', B::OPf_MOD, undef);
-                $padsv->set_private(B::OPpLVAL_INTRO);
-                $padsv->set_targ($targ);
-                $padsv->set_sibling($kid->sibling);
-                $kid->set_sibling($padsv);
+                my $padsv = B::OP->new: 'padsv', B::OPf_MOD, undef;
+                $padsv->set_private: B::OPpLVAL_INTRO;
+                $padsv->set_targ: $targ;
+                $padsv->set_sibling: $kid->sibling;
+                $kid->set_sibling: $padsv;
 
                 $kid = $padsv;
             } elsif ($kid->name eq "list" or $kid->name eq "pushmark") {
@@ -111,14 +115,14 @@ do {
             } elsif ($kid->name eq "srefgen") {
                 # ignore, assume it is the last item in the list.
             } else {
-                die "Expected constant opcode but got " . $kid->name;
+                die: "Expected constant opcode but got " . $kid->name;
             }
             $kid = $kid->sibling;
         }
-        my $cvop = B::SVOP->new('const', 0, \&parseparams, undef);
-        $op = B::LISTOP->new('list', 0,
-                             ($op ?? ($op, $cvop) !! ($cvop, undef)), undef);
-        my $entersubop = B::UNOP->new('entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op, undef);
+        my $cvop = B::SVOP->new: 'const', 0, \&parseparams, undef;
+        $op = B::LISTOP->new: 'list', 0,
+                              ($op ?? ($op, $cvop) !! ($cvop, undef)), undef;
+        my $entersubop = B::UNOP->new: 'entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op, undef;
         return $entersubop;
     }
 

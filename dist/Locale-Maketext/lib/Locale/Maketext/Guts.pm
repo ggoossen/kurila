@@ -19,7 +19,7 @@ sub _compile
     # It returns either a coderef if there's brackety bits in this, or
     #  otherwise a ref to a scalar.
 
-    my $target = ref(@_[0]) || @_[0]
+    my $target = (ref: @_[0]) || @_[0]
 
     my(@code)
     my @c = @: '' # "chunks" -- scratch.
@@ -44,29 +44,29 @@ sub _compile
        $
      )>xgs
             )
-            print $^STDOUT, "  \"$1\"\n" if DEBUG +> 2
+            print: $^STDOUT, "  \"$1\"\n" if (DEBUG: )+> 2
 
             if($1 eq '[' or $1 eq '')       # "[" or end
                 # Whether this is "[" or end, force processing of any
                 #  preceding literal.
                 if($in_group)
                     if($1 eq '')
-                        $target->_die_pointing(@_[1], "Unterminated bracket group")
+                        $target->_die_pointing: @_[1], "Unterminated bracket group"
                     else
-                        $target->_die_pointing(@_[1], "You can't nest bracket groups")
+                        $target->_die_pointing: @_[1], "You can't nest bracket groups"
                     
                 else
                     if($1 eq '')
-                        print $^STDOUT, "   [end-string]\n" if DEBUG +> 2
+                        print: $^STDOUT, "   [end-string]\n" if (DEBUG: )+> 2
                     else
                         $in_group = 1
                     
-                    die "How come \@c is empty?? in <@_[1]>" unless (nelems @c) # sanity
+                    die: "How come \@c is empty?? in <@_[1]>" unless (nelems @c) # sanity
                     if(length @c[-1])
                         # Now actually processing the preceding literal
                         $big_pile .= @c[-1]
                         if($USE_LITERALS and (
-                            (ord('A') == 65)
+                            ((ord: 'A') == 65)
                             ?? @c[-1] !~ m<[^\x20-\x7E]>s
                             # ASCII very safe chars
                             !! @c[-1] !~ m/[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~\x07]/s
@@ -74,11 +74,11 @@ sub _compile
                             ))
                             # normal case -- all very safe chars
                             @c[-1] =~ s/'/\\'/g
-                            push @code, q{ '} . @c[-1] . "',\n"
+                            push: @code, q{ '} . @c[-1] . "',\n"
                             @c[-1] = '' # reuse this slot
                         else
-                            push @code, ' @c[' . ((nelems @c)-1) . "],\n"
-                            push @c, '' # new chunk
+                            push: @code, ' @c[' . ((nelems @c)-1) . "],\n"
+                            push: @c, '' # new chunk
                         
                     
                 # else just ignore the empty string.
@@ -89,23 +89,23 @@ sub _compile
                 if($in_group)
                     $in_group = 0
 
-                    print $^STDOUT, "   --Closing group [@c[-1]]\n" if DEBUG +> 2
+                    print: $^STDOUT, "   --Closing group [@c[-1]]\n" if (DEBUG: )+> 2
 
                     # And now process the group...
 
-                    if(!length(@c[-1]) or @c[-1] =~ m/^\s+$/s)
-                        DEBUG +> 2 and print $^STDOUT, "   -- (Ignoring)\n"
+                    if(!(length: @c[-1]) or @c[-1] =~ m/^\s+$/s)
+                        (DEBUG: )+> 2 and print: $^STDOUT, "   -- (Ignoring)\n"
                         @c[-1] = '' # reset out chink
                         next
                     
 
                     #$c[-1] =~ s/^\s+//s;
                     #$c[-1] =~ s/\s+$//s;
-                    (@: $m,@< @params) =  split(",", @c[-1], -1)  # was /\s*,\s*/
+                    (@: $m,@< @params) =  split: ",", @c[-1], -1  # was /\s*,\s*/
 
                     # A bit of a hack -- we've turned "~,"'s into DELs, so turn
                     #  'em into real commas here.
-                    if (ord('A') == 65) # ASCII, etc
+                    if ((ord: 'A') == 65) # ASCII, etc
                         foreach((@: $m, < @params)) { s/\x7F/,/g }
                     else              # EBCDIC (1047, 0037, POSIX-BC)
                         # Thanks to Peter Prymmer for the EBCDIC handling
@@ -115,7 +115,7 @@ sub _compile
                     # Special-case handling of some method names:
                     if($m eq '_*' or $m =~ m<^_(-?\d+)$>s)
                         # Treat [_1,...] as [,_1,...], etc.
-                        unshift @params, $m
+                        unshift: @params, $m
                         $m = ''
                     elsif($m eq '*')
                         $m = 'quant' # "*" for "times": "4 cars" is 4 times "cars"
@@ -126,30 +126,30 @@ sub _compile
                     # Most common case: a simple, legal-looking method name
                     if($m eq '')
                         # 0-length method name means to just interpolate:
-                        push @code, ' ('
+                        push: @code, ' ('
                     elsif($m =~ m<^\w+(?:\:\:\w+)*$>s
                         and $m !~ m<(?:^|\:)\d>s
                         # exclude starting a (sub)package or symbol with a digit
                         )
                         # Yes, it even supports the demented (and undocumented?)
                         #  $obj->Foo::bar(...) syntax.
-                        $target->_die_pointing(
-                            @_[1], "Can't (yet?) use \"SUPER::\" in a bracket-group method",
-                            2 + length(@c[-1])
-                            )
+                        $target->_die_pointing: 
+                            @_[1], "Can't (yet?) use \"SUPER::\" in a bracket-group method"
+                            2 + length: @c[-1]
+                            
                             if $m =~ m/^SUPER::/s
                         # Because for SUPER:: to work, we'd have to compile this into
                         #  the right package, and that seems just not worth the bother,
                         #  unless someone convinces me otherwise.
 
-                        push @code, ' @_[0]->' . $m . '('
+                        push: @code, ' ( @_[0]->' . $m . ':'
                     else
                         # TODO: implement something?  or just too icky to consider?
-                        $target->_die_pointing(
-                            @_[1],
-                            "Can't use \"$m\" as a method name in bracket group",
-                            2 + length(@c[-1])
-                            )
+                        $target->_die_pointing: 
+                            @_[1]
+                            "Can't use \"$m\" as a method name in bracket group"
+                            2 + length: @c[-1]
+                            
                     
 
                     pop @c # we don't need that chunk anymore
@@ -164,7 +164,7 @@ sub _compile
                             # _3 meaning @_[3]
                             @code[-1] .= '@_[' . (0 + $1) . '], '
                         elsif($USE_LITERALS and (
-                            (ord('A') == 65)
+                            ((ord: 'A') == 65)
                             ?? $p !~ m<[^\x20-\x7E]>s
                             # ASCII very safe chars
                             !! $p !~ m/[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~\x07]/s
@@ -175,18 +175,18 @@ sub _compile
                             @code[-1] .= q{'} . $p . q{', }
                         else
                             # Stow it on the chunk-stack, and just refer to that.
-                            push @c, $p
-                            push @code, ' $c[' . ((nelems @c)-1) . "], "
+                            push: @c, $p
+                            push: @code, ' $c[' . ((nelems @c)-1) . "], "
                         
                     
                     @code[-1] .= "),\n"
 
-                    push @c, ''
+                    push: @c, ''
                 else
-                    $target->_die_pointing(@_[1], "Unbalanced ']'")
+                    $target->_die_pointing: @_[1], "Unbalanced ']'"
                 
 
-            elsif(substr($1,0,1) ne '~')
+            elsif((substr: $1,0,1) ne '~')
                 # it's stuff not containing "~" or "[" or "]"
                 # i.e., a literal blob
                 @c[-1] .= $1
@@ -204,7 +204,7 @@ sub _compile
                 if($in_group)
                     # This is a hack, based on the assumption that no-one will actually
                     # want a DEL inside a bracket group.  Let's hope that's it's true.
-                    if (ord('A') == 65) # ASCII etc
+                    if ((ord: 'A') == 65) # ASCII etc
                         @c[-1] .= "\x7F"
                     else              # EBCDIC (cp 1047, 0037, POSIX-BC)
                         @c[-1] .= "\x07"
@@ -228,20 +228,20 @@ sub _compile
         # So don't bother with the eval.  Return a SCALAR reference.
         return \$big_pile
 
-    die "Last chunk isn't null??" if (nelems @c) and length @c[-1] # sanity
-    print $^STDOUT, scalar(nelems @c), " chunks under closure\n" if DEBUG
+    die: "Last chunk isn't null??" if (nelems @c) and length @c[-1] # sanity
+    print: $^STDOUT, (scalar: nelems @c), " chunks under closure\n" if DEBUG: 
     if((nelems @code) == 0) # not possible?
-        print $^STDOUT, "Empty code\n" if DEBUG
+        print: $^STDOUT, "Empty code\n" if DEBUG:
         return \''
     elsif((nelems @code) +> 1) # most cases, presumably!
-        unshift @code, "join '',@(:\n"
+        unshift: @code, "join: '',@(:\n"
 
-    unshift @code, "sub \{\n"
-    push @code, ")\}\n"
+    unshift: @code, "sub \{\n"
+    push: @code, ")\}\n"
 
-    print $^STDOUT, < @code if DEBUG
-    my $sub = eval(join '', @code)
-    die "$($^EVAL_ERROR->message) while evalling" . join('', @code) if $^EVAL_ERROR # Should be impossible.
+    print: $^STDOUT, < @code if DEBUG:
+    my $sub = eval: (join: '', @code)
+    die: "$(($^EVAL_ERROR->message: )) while evalling" . (join: '', @code) if $^EVAL_ERROR # Should be impossible.
     return $sub
 
 
@@ -252,21 +252,21 @@ sub _die_pointing
     my $target = shift # class name
     # ...leaving @_[0] the error-causing text, and @_[1] the error message
 
-    my $i = index(@_[0], "\n")
+    my $i = index: @_[0], "\n"
 
     my $pointy
-    my $pos = pos(@_[0]) - (defined(@_[2]) ?? @_[2] !! 0) - 1
+    my $pos = (pos: @_[0]) - ((defined: @_[2]) ?? @_[2] !! 0) - 1
     if($pos +< 1)
         $pointy = "^=== near there\n"
     else # we need to space over
-        my $first_tab = index(@_[0], "\t")
-        if($pos +> 2 and ( -1 == $first_tab  or  $first_tab +> pos(@_[0])))
+        my $first_tab = index: @_[0], "\t"
+        if($pos +> 2 and ( -1 == $first_tab  or  $first_tab +> (pos: @_[0])))
             # No tabs, or the first tab is harmlessly after where we will point to,
             # AND we're far enough from the margin that we can draw a proper arrow.
             $pointy = ('=' x $pos) . "^ near there\n"
         else
             # tabs screw everything up!
-            $pointy = substr(@_[0],0,$pos)
+            $pointy = substr: @_[0],0,$pos
             $pointy =~ s/[^\t ]//g
             # make everything into whitespace, but preseving tabs
             $pointy .= "^=== near there\n"
@@ -278,13 +278,13 @@ sub _die_pointing
     if($i == -1)
         # No newline.
         $errmsg .= "\n" . $pointy
-    elsif($i == (length(@_[0]) - 1)  )
+    elsif($i == ((length: @_[0]) - 1)  )
         # Already has a newline at end.
         $errmsg .= $pointy
      else {
     # don't bother with the pointy bit, I guess.
     }
-    Carp::croak( "$errmsg via $target, as used" )
+    Carp::croak:  "$errmsg via $target, as used" 
 
 
 1

@@ -14,31 +14,31 @@ our ($p_name, @p_aliases, $p_proto)
 # Class::Struct forbids use of @ISA
 sub import
     local $Exporter::ExportLevel = $Exporter::ExportLevel + 1
-    return Exporter::import(< @_)
+    return Exporter::import: < @_
 
 
 use Class::Struct < qw(struct)
-struct 'Net::protoent' => \@: 
-       name             => '$'
-       aliases  => '@'
-       proto    => '$'
+struct: 'Net::protoent' => \@:
+            name             => '$'
+            aliases  => '@'
+            proto    => '$'
        
 
 sub populate
     return unless (nelems @_)
-    my $pob = new()
+    my $pob = (new: )
     $p_name      =    $pob->[0]              = @_[0]
-    @p_aliases   = @:   $pob->[1]->@ = split ' ', @_[1] 
+    @p_aliases   = @:   $pob->[1]->@ = split: ' ', @_[1] 
     $p_proto     =    $pob->[2]              = @_[2]
     return $pob
 
 
-sub getprotoent      ( )  { populate(CORE::getprotoent()) }
-sub getprotobyname   ($name)  { populate(CORE::getprotobyname($name)) }
-sub getprotobynumber ($number)  { populate(CORE::getprotobynumber($number)) }
+sub getprotoent      ( )  { (populate: CORE::getprotoent:) }
+sub getprotobyname   ($name)  { (populate: (CORE::getprotobyname: $name)) }
+sub getprotobynumber ($number)  { (populate: (CORE::getprotobynumber: $number)) }
 
 sub getproto
-    return {'getprotoby' . (@_[0]=~m/^\d+$/ ?? 'number' !! 'name')}->(< @_)
+    return {'getprotoby' . (@_[0]=~m/^\d+$/ ?? 'number' !! 'name')}->& <: < @_
 
 
 1

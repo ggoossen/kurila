@@ -12,17 +12,17 @@ sub escape_ltgt(_, my $text, _)
 
 
 sub simple_delimiters(_, my $seq)
-    $seq -> left_delimiter( '<' )
-    $seq -> right_delimiter( '>' )
+    $seq -> left_delimiter:  '<' 
+    $seq -> right_delimiter:  '>' 
     $seq
 
 
 sub textblock($parser,$text,$line, _)
-    print $parser->output_handle()
-        ,$parser->parse_text(
-        \(%:  expand_text => q(escape_ltgt)
-              expand_seq => q(simple_delimiters) ),
-        $text, $line ) -> raw_text()
+    print: $parser->output_handle: 
+           ,($parser->parse_text: 
+               \(%:  expand_text => q(escape_ltgt)
+                     expand_seq => q(simple_delimiters) )
+               $text, $line ) -> raw_text: 
 
 
 1

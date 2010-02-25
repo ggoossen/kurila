@@ -32,7 +32,7 @@ BEGIN
     require 'regen_lib.pl'
 
 
-my @az = map { chr }, ord('a')..ord('z')
+my @az = map: { chr }, (ord: 'a')..ord: 'z'
 
 my $SPLINT = 0 # Turn true for experimental splint support http://www.splint.org
 
@@ -90,22 +90,22 @@ EOW
     $warning
  # do_not_edit
 
-open my $in, '<', "embed.fnc" or die $^OS_ERROR
+open: my $in, '<', "embed.fnc" or die: $^OS_ERROR
 
 # walk table providing an array of components in each line to
 # subroutine, printing the result
 sub walk_table ($function, ?$filename, ?$leader, ?$trailer)
     $filename //= '-'
-    $leader //= do_not_edit($filename)
+    $leader //= do_not_edit: $filename
     my $F
     if (ref $filename)  # filehandle
         $F = $filename
     else
         # safer_unlink $filename if $filename ne '/dev/null';
-        $F = safer_open("$filename-new")
+        $F = safer_open: "$filename-new"
     
-    print $F, $leader if $leader
-    seek $in, 0, 0              # so we may restart
+    print: $F, $leader if $leader
+    seek: $in, 0, 0              # so we may restart
     while ( ~< $in->*)
         chomp
         next if m/^:/
@@ -118,29 +118,29 @@ sub walk_table ($function, ?$filename, ?$leader, ?$trailer)
         if (m/^\s*(#|$)/)
             @args = @:  $_ 
         else
-            @args = split m/\s*\|\s*/, $_
+            @args = split: m/\s*\|\s*/, $_
         
-        my @outs = @:  $function->(< @args) 
-        print $F, < @outs
+        my @outs = @:  $function->& <: < @args 
+        print: $F, < @outs
     
-    print $F, $trailer if $trailer
+    print: $F, $trailer if $trailer
     unless (ref $filename)
-        safer_close($F)
-        rename_if_different("$filename-new", $filename)
+        safer_close: $F
+        rename_if_different: "$filename-new", $filename
     
 
 
 sub munge_c_files ()
     my $functions = \%: 
     unless (nelems @ARGV)
-        warn "\@ARGV empty, nothing to do\n"
+        warn: "\@ARGV empty, nothing to do\n"
         return
     
-    walk_table {
-                   if ((nelems @_) +> 1)
-                       $functions->{+@_[2]} = \@_ if @_[(nelems @_)-1] =~ m/\.\.\./
-                   
-               }, '/dev/null', '', ''
+    walk_table: {
+                    if ((nelems @_) +> 1)
+                        $functions->{+@_[2]} = \@_ if @_[(nelems @_)-1] =~ m/\.\.\./
+
+                    }, '/dev/null', '', ''
     while ( ~< *ARGV)
         s{(\b(\w+)[ \t]*\([ \t]*(?!aTHX))}
          {$( do {
@@ -148,11 +148,11 @@ sub munge_c_files ()
             my $f = $2;
             if (exists $functions->{$f}) {
                 $repl .= "aTHX_ ";
-                die("$ARGV:#$repl");
+                die: "$ARGV:#$repl";
             }
             $repl;
         })}g
-        print $^STDOUT, $_
+        print: $^STDOUT, $_
         close *ARGV if eof      # restart $.
     
     exit
@@ -214,12 +214,12 @@ sub write_protos
             for my $arg (  @args )
                 ++$n
                 if ( $arg =~ m/\*/ && $arg !~ m/\b(NN|NULLOK)\b/ )
-                    warn "$func: $arg needs NN or NULLOK\n"
+                    warn: "$func: $arg needs NN or NULLOK\n"
                     our $unflagged_pointers
                     ++$unflagged_pointers
                 
                 my $nn = ( $arg =~ s/\s*\bNN\b\s+// )
-                push( @nonnull, $n ) if $nn
+                push:  @nonnull, $n  if $nn
 
                 my $nullok = ( $arg =~ s/\s*\bNULLOK\b\s+// ) # strip NULLOK with no effect
 
@@ -230,32 +230,32 @@ sub write_protos
                 $temp_arg =~ s/\s*\bstruct\b\s*/ /g
                 if ( ($temp_arg ne "...")
                        && ($temp_arg !~ m/\w+\s+(\w+)(?:\[\d+\])?\s*$/) )
-                    warn "$func: $arg ($n) doesn't have a name\n"
+                    warn: "$func: $arg ($n) doesn't have a name\n"
                 
                 if ( $SPLINT && $nullok && !$commented_out )
                     $arg = '/*@null@*/ ' . $arg
                 
                 if (defined $1 && $nn && !($commented_out && !$binarycompat))
-                    push @names_of_nn, $1
+                    push: @names_of_nn, $1
             
-            $ret .= join ", ", @args
+            $ret .= join: ", ", @args
         else
             $ret .= "void" if !$has_context
         
         $ret .= ")"
         my @attrs
         if ( $flags =~ m/r/ )
-            push @attrs, "__attribute__noreturn__"
+            push: @attrs, "__attribute__noreturn__"
         if ( $flags =~ m/D/ )
-            push @attrs, "__attribute__deprecated__"
+            push: @attrs, "__attribute__deprecated__"
         if ( $is_malloc )
-            push @attrs, "__attribute__malloc__"
+            push: @attrs, "__attribute__malloc__"
         
         if ( !$can_ignore )
-            push @attrs, "__attribute__warn_unused_result__"
+            push: @attrs, "__attribute__warn_unused_result__"
         
         if ( $flags =~ m/P/ )
-            push @attrs, "__attribute__pure__"
+            push: @attrs, "__attribute__pure__"
         
         if( $flags =~ m/f/ )
             my $prefix  = $has_context ?? 'pTHX_' !! ''
@@ -264,22 +264,22 @@ sub write_protos
             my $macro   = (nelems @nonnull) && @nonnull[-1] == $pat
                 ?? '__attribute__format__'
                 !! '__attribute__format__null_ok__'
-            push @attrs, sprintf "\%s(__printf__,\%s\%d,\%s\%d)", $macro,
-                $prefix, $pat, $prefix, $args
+            push: @attrs, sprintf: "\%s(__printf__,\%s\%d,\%s\%d)", $macro
+                                   $prefix, $pat, $prefix, $args
         
         if ( (nelems @nonnull) )
-            my @pos = map { $has_context ?? "pTHX_$_" !! $_ }, @nonnull
-            push @attrs, < map { sprintf( "__attribute__nonnull__(\%s)", $_ ) }, @pos
+            my @pos = map: { $has_context ?? "pTHX_$_" !! $_ }, @nonnull
+            push: @attrs, < map: { (sprintf:  "__attribute__nonnull__(\%s)", $_ ) }, @pos
         
         if ( (nelems @attrs) )
             $ret .= "\n"
-            $ret .= join( "\n", map { "\t\t\t$_" }, @attrs )
+            $ret .= join:  "\n", (map: { "\t\t\t$_" }, @attrs) 
         
         $ret .= ";"
         $ret = "/* $ret */" if $commented_out
         if ((nelems @names_of_nn))
             $ret .= "\n#define PERL_ARGS_ASSERT_\U$plain_func\E\t\\\n\t"
-                . join '; ', map { "assert($_)" }, @names_of_nn
+                . join: '; ', map: { "assert($_)" }, @names_of_nn
         
         $ret .= (nelems @attrs) ?? "\n\n" !! "\n"
     
@@ -307,9 +307,9 @@ do
 
 
 our $unflagged_pointers
-walk_table(\&write_protos,     "proto.h", undef, "/* ex: set ro: */\n")
-warn "$unflagged_pointers pointer arguments to clean up\n" if $unflagged_pointers
-walk_table(\&write_global_sym, "global.sym", undef, "# ex: set ro:\n")
+walk_table: \&write_protos,     "proto.h", undef, "/* ex: set ro: */\n"
+warn: "$unflagged_pointers pointer arguments to clean up\n" if $unflagged_pointers
+walk_table: \&write_global_sym, "global.sym", undef, "# ex: set ro:\n"
 
 # XXX others that may need adding
 #       warnhook
@@ -334,59 +334,59 @@ my @extvars = qw(sv_undef sv_yes sv_no na dowarn
 sub readsyms($syms, $file)
     local ($_)
     my $fh
-    open($fh, "<", "$file")
-        or die "embed.pl: Can't open $file: $^OS_ERROR\n"
+    open: $fh, "<", "$file"
+        or die: "embed.pl: Can't open $file: $^OS_ERROR\n"
     while ( ~< $fh->*)
         s/[ \t]*#.*//           # Delete comments.
         if (m/^\s*(\S+)\s*$/)
             my $sym = $1
-            warn "duplicate symbol $sym while processing $file line $(iohandle::input_line_number(\*FILE)).\n"
+            warn: "duplicate symbol $sym while processing $file line $((iohandle::input_line_number: \*FILE)).\n"
                 if exists $syms->{$sym}
             $syms->{+$sym} = 1
         
     
-    close($fh)
+    close: $fh
 
 
 # Perl_pp_* and Perl_ck_* are in pp.sym
-readsyms \my %ppsym, 'pp.sym'
+readsyms: \my %ppsym, 'pp.sym'
 
 sub readvars($syms, $file,$pre,?$keep_pre)
     local ($_)
-    open(my $fh, "<", "$file")
-        or die "embed.pl: Can't open $file: $^OS_ERROR\n"
+    open: my $fh, "<", "$file"
+        or die: "embed.pl: Can't open $file: $^OS_ERROR\n"
     while ( ~< $fh->*)
         s/[ \t]*#.*//           # Delete comments.
         if (m/PERLVARA?I?S?C?\($pre(\w+)/)
             my $sym = $1
             $sym = $pre . $sym if $keep_pre
-            warn "duplicate symbol $sym while processing $file line $(iohandle::input_line_number(\*FILE))\n"
+            warn: "duplicate symbol $sym while processing $file line $((iohandle::input_line_number: \*FILE))\n"
                 if exists $syms->%{$sym}
             $syms->%{+$sym} = $pre || 1
         
     
-    close($fh)
+    close: $fh
 
 
 my %intrp
 my %globvar
 
-readvars \%intrp,  'intrpvar.h','I'
-readvars \%globvar, 'perlvars.h','G'
+readvars: \%intrp,  'intrpvar.h','I'
+readvars: \%globvar, 'perlvars.h','G'
 
 sub undefine($sym)
     "#undef  $sym\n"
 
 
 sub hide($from, $to)
-    my $t = int(length($from) / 8)
+    my $t = int: (length: $from) / 8
     "#define $from" . "\t" x ($t +< 3 ?? 3 - $t !! 1) . "$to\n"
 
 
 sub hide_func($from, $to, $n_args)
-    my $alist = join(",", @az[[0..$n_args-1]])
+    my $alist = join: ",", @az[[0..$n_args-1]]
     my $ret = "#define $from($alist)"
-    my $t = int(length($ret) / 8)
+    my $t = int: (length: $ret) / 8
     $ret .=  "\t" x ($t +< 4 ?? 4 - $t !! 1)
     $ret .= "$to(aTHX"
     $ret .= "_ " if $alist
@@ -395,20 +395,20 @@ sub hide_func($from, $to, $n_args)
 
 sub bincompat_var($pfx, $sym)
     my $arg = ($pfx eq 'G' ?? 'NULL' !! 'aTHX')
-    undefine("PL_$sym") . hide("PL_$sym", "(*Perl_$($pfx)$($sym)_ptr($arg))")
+    (undefine: "PL_$sym") . hide: "PL_$sym", "(*Perl_$($pfx)$($sym)_ptr($arg))"
 
 
 sub multon($sym,$pre,$ptr)
-    hide("PL_$sym", "($ptr$pre$sym)")
+    hide: "PL_$sym", "($ptr$pre$sym)"
 
 
 sub multoff($sym,$pre)
-    return hide("PL_$pre$sym", "PL_$sym")
+    return hide: "PL_$pre$sym", "PL_$sym"
 
 
-my $em = safer_open('embed.h-new')
+my $em = safer_open: 'embed.h-new'
 
-print $em, do_not_edit ("embed.h"), <<'END'
+print: $em, (do_not_edit: "embed.h"), <<'END'
 
 /* (Doing namespace management portably in C is really gross.) */
 
@@ -437,141 +437,141 @@ my $ifdef_state = ''
 sub write_xv_defines($retval, $func, @args)
     for my $xv (qw[Av Hv Cv Gv Io Re])
         my $i = 0
-        my @arglist = map {
-                my $n = @az[$i++];
-                if ($_ =~ m/XV\s*([*]+)/)
-                    my $p = 'p' x (length($1)-1)
-                    @: $n, "$(lc $xv)$($p)Tsv$p($n)"
-                else
-                    @: $n, $n
-            }, @args
-        my $dlist = join(",", map { $_[0] }, @arglist)
-        my $alist = join(",", map { $_[1] }, @arglist)
+        my @arglist = map: {
+                               my $n = @az[$i++];
+                               if ($_ =~ m/XV\s*([*]+)/)
+                                   my $p = 'p' x ((length: $1)-1)
+                                   @: $n, "$(lc $xv)$($p)Tsv$p($n)"
+                               else
+                                   @: $n, $n
+                               }, @args
+        my $dlist = join: ",", (map: { $_[0] }, @arglist)
+        my $alist = join: ",", (map: { $_[1] }, @arglist)
         my $xvname = $func
         $xvname =~ s/^Sv/$xv/
         $xvname =~ s/^sv/$(lc $xv)/
         my $ret_convert = $retval =~ m/SV/
         my $call = "Perl_" . $func . "(aTHX_ $alist)"
-        print $em, "#define $xvname($dlist)\t\t" . ($ret_convert ?? "svT$(lc $xv)" . "($call)" !! $call ) . "\n"
+        print: $em, "#define $xvname($dlist)\t\t" . ($ret_convert ?? "svT$(lc $xv)" . "($call)" !! $call ) . "\n"
 
 
-walk_table sub (@< @_)
-               my $ret = ""
-               my $new_ifdef_state = ''
-               if ((nelems @_) == 1)
-                   my $arg = shift
-                   $ret .= "$arg\n" if $arg =~ m/^#\s*(if|ifn?def|else|endif)\b/
-               else
-                   my (@: $flags,$retval,$func,@< @args) =  @_
-                   unless ($flags =~ m/[om]/)
-                       if ($flags =~ m/s/)
-                           $ret .= hide($func,"S_$func")
-                       elsif ($flags =~ m/p/)
-                           $ret .= hide($func,"Perl_$func")
-                       
-                       if ($flags =~ m/S/)
-                           write_xv_defines($retval, $func, @args)
-                       
-                   
-                   if ($ret ne '' && $flags !~ m/A/)
-                       if ($flags =~ m/E/)
-                           $new_ifdef_state
-                               = "#if defined(PERL_CORE) || defined(PERL_EXT)\n"
-                       else
-                           $new_ifdef_state = "#ifdef PERL_CORE\n"
-                       
+walk_table: sub (@< @_)
+                my $ret = ""
+                my $new_ifdef_state = ''
+                if ((nelems @_) == 1)
+                    my $arg = shift
+                    $ret .= "$arg\n" if $arg =~ m/^#\s*(if|ifn?def|else|endif)\b/
+                else
+                    my (@: $flags,$retval,$func,@< @args) =  @_
+                    unless ($flags =~ m/[om]/)
+                        if ($flags =~ m/s/)
+                            $ret .= hide: $func,"S_$func"
+                        elsif ($flags =~ m/p/)
+                            $ret .= hide: $func,"Perl_$func"
 
-                       if ($new_ifdef_state ne $ifdef_state)
-                           $ret = $new_ifdef_state . $ret
-                       
-                   
-               
-               if ($ifdef_state && $new_ifdef_state ne $ifdef_state)
+                        if ($flags =~ m/S/)
+                            write_xv_defines: $retval, $func, @args
+
+
+                    if ($ret ne '' && $flags !~ m/A/)
+                        if ($flags =~ m/E/)
+                            $new_ifdef_state
+                                = "#if defined(PERL_CORE) || defined(PERL_EXT)\n"
+                        else
+                            $new_ifdef_state = "#ifdef PERL_CORE\n"
+
+
+                        if ($new_ifdef_state ne $ifdef_state)
+                            $ret = $new_ifdef_state . $ret
+
+
+
+                if ($ifdef_state && $new_ifdef_state ne $ifdef_state)
                    # Close the old one ahead of opening the new one.
-                   $ret = "#endif\n$ret"
-               
+                    $ret = "#endif\n$ret"
+
                # Remember the new state.
-               $ifdef_state = $new_ifdef_state
-               $ret
-           , $em, ""
+                $ifdef_state = $new_ifdef_state
+                $ret
+            , $em, ""
 
 if ($ifdef_state)
-    print $em, "#endif\n"
+    print: $em, "#endif\n"
 
 
-for my $sym (sort keys %ppsym)
+for my $sym ((sort: keys %ppsym))
     $sym =~ s/^Perl_//
-    print $em, hide($sym, "Perl_$sym")
+    print: $em, hide: $sym, "Perl_$sym"
 
 
-print $em, <<'END'
+print: $em, <<'END'
 
 #else   /* PERL_IMPLICIT_CONTEXT */
 
 END
 
 $ifdef_state = ''
-walk_table sub (@< @_)
-               my $ret = ""
-               my $new_ifdef_state = ''
-               if ((nelems @_) == 1)
-                   my $arg = shift
-                   $ret .= "$arg\n" if $arg =~ m/^#\s*(if|ifn?def|else|endif)\b/
-               else
-                   my (@: $flags,$retval,$func,@< @args) =  @_
-                   unless ($flags =~ m/[om]/)
-                       my $args = scalar nelems @args
-                       my $to_func = ($flags =~ m/s/ ?? "S_$func" !! "Perl_$func" )
-                       if ($args and @args[$args-1] =~ m/\.\.\./)
+walk_table: sub (@< @_)
+                my $ret = ""
+                my $new_ifdef_state = ''
+                if ((nelems @_) == 1)
+                    my $arg = shift
+                    $ret .= "$arg\n" if $arg =~ m/^#\s*(if|ifn?def|else|endif)\b/
+                else
+                    my (@: $flags,$retval,$func,@< @args) =  @_
+                    unless ($flags =~ m/[om]/)
+                        my $args = scalar nelems @args
+                        my $to_func = ($flags =~ m/s/ ?? "S_$func" !! "Perl_$func" )
+                        if ($args and @args[$args-1] =~ m/\.\.\./)
                            # we're out of luck for varargs functions under CPP
-                           $ret .= hide($func, $to_func)
-                       elsif ($flags =~ m/n/)
-                           $ret .= hide($func, $to_func)
-                       else
-                           $ret .= hide_func($func, $to_func, $args)
-                       
-                       if ($flags =~ m/S/)
-                           write_xv_defines($retval, $func, @args)
-                       
-                   
-                   unless ($flags =~ m/A/)
-                       if ($flags =~ m/E/)
-                           $new_ifdef_state
-                               = "#if defined(PERL_CORE) || defined(PERL_EXT)\n"
-                       else
-                           $new_ifdef_state = "#ifdef PERL_CORE\n"
-                       
+                            $ret .= hide: $func, $to_func
+                        elsif ($flags =~ m/n/)
+                            $ret .= hide: $func, $to_func
+                        else
+                            $ret .= hide_func: $func, $to_func, $args
 
-                       if ($new_ifdef_state ne $ifdef_state)
-                           $ret = $new_ifdef_state . $ret
-                       
-                   
-               
-               if ($ifdef_state && $new_ifdef_state ne $ifdef_state)
+                        if ($flags =~ m/S/)
+                            write_xv_defines: $retval, $func, @args
+
+
+                    unless ($flags =~ m/A/)
+                        if ($flags =~ m/E/)
+                            $new_ifdef_state
+                                = "#if defined(PERL_CORE) || defined(PERL_EXT)\n"
+                        else
+                            $new_ifdef_state = "#ifdef PERL_CORE\n"
+
+
+                        if ($new_ifdef_state ne $ifdef_state)
+                            $ret = $new_ifdef_state . $ret
+
+
+
+                if ($ifdef_state && $new_ifdef_state ne $ifdef_state)
                    # Close the old one ahead of opening the new one.
-                   $ret = "#endif\n$ret"
-               
+                    $ret = "#endif\n$ret"
+
                # Remember the new state.
-               $ifdef_state = $new_ifdef_state
-               $ret
-           , $em, ""
+                $ifdef_state = $new_ifdef_state
+                $ret
+            , $em, ""
 
 if ($ifdef_state)
-    print $em, "#endif\n"
+    print: $em, "#endif\n"
 
 
-for my $sym (sort keys %ppsym)
+for my $sym ((sort: keys %ppsym))
     $sym =~ s/^Perl_//
     if ($sym =~ m/^ck_/)
-        print $em, hide("$sym(a)", "Perl_$sym(aTHX_ a)")
+        print: $em, hide: "$sym(a)", "Perl_$sym(aTHX_ a)"
     elsif ($sym =~ m/^pp_/)
-        print $em, hide("$sym()", "Perl_$sym(aTHX)")
+        print: $em, hide: "$sym()", "Perl_$sym(aTHX)"
     else
-        warn "Illegal symbol '$sym' in pp.sym"
+        warn: "Illegal symbol '$sym' in pp.sym"
     
 
 
-print $em, <<'END'
+print: $em, <<'END'
 
 #endif  /* PERL_IMPLICIT_CONTEXT */
 
@@ -579,7 +579,7 @@ print $em, <<'END'
 
 END
 
-print $em, <<'END'
+print: $em, <<'END'
 
 /* Compatibility stubs.  Compile extensions with -DPERL_NOCOMPAT to
    disable them.
@@ -627,12 +627,12 @@ print $em, <<'END'
 /* ex: set ro: */
 END
 
-safer_close($em)
-rename_if_different('embed.h-new', 'embed.h')
+safer_close: $em
+rename_if_different: 'embed.h-new', 'embed.h'
 
-$em = safer_open('embedvar.h-new')
+$em = safer_open: 'embedvar.h-new'
 
-print $em, do_not_edit ("embedvar.h"), <<'END'
+print: $em, (do_not_edit: "embedvar.h"), <<'END'
 
 /* (Doing namespace management portably in C is really gross.) */
 
@@ -660,10 +660,10 @@ print $em, do_not_edit ("embedvar.h"), <<'END'
 
 END
 
-for my $sym (sort keys %intrp)
-    print $em, multon($sym,'I','vTHX->')
+for my $sym ((sort: keys %intrp))
+    print: $em, multon: $sym,'I','vTHX->'
 
-print $em, <<'END'
+print: $em, <<'END'
 
 #else   /* !MULTIPLICITY */
 
@@ -671,15 +671,15 @@ print $em, <<'END'
 
 END
 
-for my $sym (sort keys %intrp)
-    print $em, multoff($sym,'I')
+for my $sym ((sort: keys %intrp))
+    print: $em, multoff: $sym,'I'
 
 
-print $em, <<'END'
+print: $em, <<'END'
 
 END
 
-print $em, <<'END'
+print: $em, <<'END'
 
 #endif  /* MULTIPLICITY */
 
@@ -687,22 +687,22 @@ print $em, <<'END'
 
 END
 
-for my $sym (sort keys %globvar)
-    print $em, multon($sym,   'G','my_vars->')
-    print $em, multon("G$sym",'', 'my_vars->')
+for my $sym ((sort: keys %globvar))
+    print: $em, multon: $sym,   'G','my_vars->'
+    print: $em, multon: "G$sym",'', 'my_vars->'
 
 
-print $em, <<'END'
+print: $em, <<'END'
 
 #else /* !PERL_GLOBAL_STRUCT */
 
 END
 
-for my $sym (sort keys %globvar)
-    print $em, multoff($sym,'G')
+for my $sym ((sort: keys %globvar))
+    print: $em, multoff: $sym,'G'
 
 
-print $em, <<'END'
+print: $em, <<'END'
 
 #endif /* PERL_GLOBAL_STRUCT */
 
@@ -710,24 +710,24 @@ print $em, <<'END'
 
 END
 
-for my $sym (sort @extvars)
-    print $em, hide($sym,"PL_$sym")
+for my $sym ((sort: @extvars))
+    print: $em, hide: $sym,"PL_$sym"
 
 
-print $em, <<'END'
+print: $em, <<'END'
 
 #endif /* PERL_POLLUTE */
 
 /* ex: set ro: */
 END
 
-safer_close($em)
-rename_if_different('embedvar.h-new', 'embedvar.h')
+safer_close: $em
+rename_if_different: 'embedvar.h-new', 'embedvar.h'
 
-my $capi = safer_open('perlapi.c-new')
-my $capih = safer_open('perlapi.h-new')
+my $capi = safer_open: 'perlapi.c-new'
+my $capih = safer_open: 'perlapi.h-new'
 
-print $capih, do_not_edit ("perlapi.h"), <<'EOT'
+print: $capih, (do_not_edit: "perlapi.h"), <<'EOT'
 
 /* declare accessor functions for Perl variables */
 #ifndef __perlapi_h__
@@ -831,15 +831,15 @@ END_EXTERN_C
 
 EOT
 
-foreach my $sym (sort keys %intrp)
-    print $capih, bincompat_var('I',$sym)
+foreach my $sym ((sort: keys %intrp))
+    print: $capih, bincompat_var: 'I',$sym
 
 
-foreach my $sym (sort keys %globvar)
-    print $capih, bincompat_var('G',$sym)
+foreach my $sym ((sort: keys %globvar))
+    print: $capih, bincompat_var: 'G',$sym
 
 
-print $capih, <<'EOT'
+print: $capih, <<'EOT'
 
 #endif /* !PERL_CORE */
 #endif /* MULTIPLICITY */
@@ -848,10 +848,10 @@ print $capih, <<'EOT'
 
 /* ex: set ro: */
 EOT
-safer_close($capih)
-rename_if_different('perlapi.h-new', 'perlapi.h')
+safer_close: $capih
+rename_if_different: 'perlapi.h-new', 'perlapi.h'
 
-print $capi, do_not_edit ("perlapi.c"), <<'EOT'
+print: $capi, (do_not_edit: "perlapi.c"), <<'EOT'
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -930,8 +930,8 @@ END_EXTERN_C
 /* ex: set ro: */
 EOT
 
-safer_close($capi)
-rename_if_different('perlapi.c-new', 'perlapi.c')
+safer_close: $capi
+rename_if_different: 'perlapi.c-new', 'perlapi.c'
 
 # functions that take va_list* for implementing vararg functions
 # NOTE: makedef.pl must be updated if you add symbols to %vfuncs

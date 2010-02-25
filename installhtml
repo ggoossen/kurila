@@ -166,16 +166,16 @@ $verbose = 0            # whether or not to print debugging info
 
 $pod2html = "pod/pod2html"
 
-usage("") unless (nelems @ARGV)
+usage: "" unless (nelems @ARGV)
 
 # Overcome shell's p1,..,p8 limitation.
 # See vms/descrip_mms.template -> descrip.mms for invokation.
-if ( $^OS_NAME eq 'VMS' ) { @ARGV = split(m/\s+/,@ARGV[0]); }
+if ( $^OS_NAME eq 'VMS' ) { @ARGV = (split: m/\s+/,@ARGV[0]); }
 
 our (%Options)
 
 # parse the command-line
-my $result = GetOptions( \%Options, < qw(
+my $result = GetOptions:  \%Options, < qw(
         help
         podpath=s
         podroot=s
@@ -188,9 +188,9 @@ my $result = GetOptions( \%Options, < qw(
         splititem=s
         splitpod=s
         verbose
-))
-usage("invalid parameters") unless $result
-parse_command_line()
+)
+usage: "invalid parameters" unless $result
+(parse_command_line: )
 
 
 # set these variables to appropriate values if the user didn't specify
@@ -200,8 +200,8 @@ $splitpod = "$podroot/pod" unless $splitpod
 
 
 # make sure that the destination directory exists
-(mkdir($htmldir, 0755) ||
- die "$^PROGRAM_NAME: cannot make directory $htmldir: $^OS_ERROR\n") if ! -d $htmldir
+((mkdir: $htmldir, 0755) ||
+ (die: "$^PROGRAM_NAME: cannot make directory $htmldir: $^OS_ERROR\n")) if ! -d $htmldir
 
 
 # the following array will eventually contain files that are to be
@@ -213,80 +213,80 @@ my @splitdirs
 # split pods. It's important to do this before convert ANY pods because
 # it may affect some of the links
 @splitdirs = $@    # files in these directories won't get an index
-split_on_head($podroot, $htmldir, \@splitdirs, \@ignore, < @splithead)
-split_on_item($podroot,           \@splitdirs, \@ignore, < @splititem)
+split_on_head: $podroot, $htmldir, \@splitdirs, \@ignore, < @splithead
+split_on_item: $podroot,           \@splitdirs, \@ignore, < @splititem
 
 
 # convert the pod pages found in @poddirs
 #warn "converting files\n" if $verbose;
 #warn "\@ignore\t= @ignore\n" if $verbose;
 foreach my $dir ( @podpath)
-    installdir($dir, $recurse, $podroot, \@splitdirs, \@ignore)
+    installdir: $dir, $recurse, $podroot, \@splitdirs, \@ignore
 
 
 
 # now go through and create master indices for each pod we split
 foreach my $dir ( @splititem)
-    print $^STDOUT, "creating index $htmldir/$dir.html\n" if $verbose
-    create_index("$htmldir/$dir.html", "$htmldir/$dir")
+    print: $^STDOUT, "creating index $htmldir/$dir.html\n" if $verbose
+    create_index: "$htmldir/$dir.html", "$htmldir/$dir"
 
 
 foreach my $dir ( @splithead)
     (my $pod = $dir) =~ s,^.*/,,
     $dir .= ".pod" unless $dir =~ m/(\.pod|\.pm)$/
     # let pod2html create the file
-    runpod2html($dir, 1)
+    runpod2html: $dir, 1
 
     # now go through and truncate after the index
     $dir =~ m/^(.*?)(\.pod|\.pm)?$/sm
     my $file = "$htmldir/$1"
-    print $^STDOUT, "creating index $file.html\n" if $verbose
+    print: $^STDOUT, "creating index $file.html\n" if $verbose
 
     # read in everything until what would have been the first =head
     # directive, patching the index as we go.
-    open(my $h_fh, "<", "$file.html") ||
-        die "$^PROGRAM_NAME: error opening $file.html for input: $^OS_ERROR\n"
+    (open: my $h_fh, "<", "$file.html") ||
+        die: "$^PROGRAM_NAME: error opening $file.html for input: $^OS_ERROR\n"
     $^INPUT_RECORD_SEPARATOR = ""
     my @data = $@
     while ( ~< $h_fh->*)
         last if m/name="name"/i
         $_ =~ s{href="#(.*)">}{$( do {
             my $url = "$pod/$1.html" ;
-            $url = Pod::Html::relativize_url( $url, "$file.html" )
+            $url = (Pod::Html::relativize_url:  $url, "$file.html" )
             if ( ! defined %Options{?htmlroot} || %Options{?htmlroot} eq '' );
             "href=\"$url\">" ;
         })}gi
-        push @data, $_
+        push: @data, $_
 
-    close($h_fh)
+    close: $h_fh
 
     # now rewrite the file
-    open($h_fh, ">", "$file.html") ||
-        die "$^PROGRAM_NAME: error opening $file.html for output: $^OS_ERROR\n"
-    print $h_fh, "$(join ' ',@data)", "\n"
-    close($h_fh)
+    (open: $h_fh, ">", "$file.html") ||
+        die: "$^PROGRAM_NAME: error opening $file.html for output: $^OS_ERROR\n"
+    print: $h_fh, "$((join: ' ',@data))", "\n"
+    close: $h_fh
 
 
 ##############################################################################
 
 
 sub usage
-    warn "$^PROGRAM_NAME: $(join ' ',@_)\n" if (nelems @_)
-    die $usage
+    warn: "$^PROGRAM_NAME: $((join: ' ',@_))\n" if (nelems @_)
+    die: $usage
 
 
 
 sub parse_command_line
-    usage() if defined %Options{?help}
+    usage:  if defined %Options{?help}
     %Options{+help} = ""                    # make -w shut up
 
     # list of directories
-    @podpath   = split(":", %Options{?podpath}) if defined %Options{?podpath}
+    @podpath   = (split: ":", %Options{?podpath}) if defined %Options{?podpath}
 
     # lists of files
-    @splithead = split(",", %Options{?splithead}) if defined %Options{?splithead}
-    @splititem = split(",", %Options{?splititem}) if defined %Options{?splititem}
-    @libpods   = split(",", %Options{?libpods}) if defined %Options{?libpods}
+    @splithead = (split: ",", %Options{?splithead}) if defined %Options{?splithead}
+    @splititem = (split: ",", %Options{?splititem}) if defined %Options{?splititem}
+    @libpods   = (split: ",", %Options{?libpods}) if defined %Options{?libpods}
 
     $htmldir  = %Options{?htmldir}          if defined %Options{?htmldir}
     $htmlroot = %Options{?htmlroot}         if defined %Options{?htmlroot}
@@ -296,7 +296,7 @@ sub parse_command_line
     $recurse  = %Options{?recurse}          if defined %Options{?recurse}
     $verbose  = %Options{?verbose}          if defined %Options{?verbose}
 
-    @ignore = map "$podroot/$_", split(",", %Options{?ignore}) if defined %Options{?ignore}
+    @ignore = (map: "$podroot/$_", (split: ",", %Options{?ignore})) if defined %Options{?ignore}
 
 
 
@@ -307,54 +307,54 @@ sub create_index($html, $dir)
 
 
     # get the list of .html files in this directory
-    opendir(my $dirhandle, $dir) ||
-        die "$^PROGRAM_NAME: error opening directory $dir for reading: $^OS_ERROR\n"
-    @files = sort( grep { m/\.html?$/ }, (@:  readdir($dirhandle)))
-    closedir($dirhandle)
+    (opendir: my $dirhandle, $dir) ||
+        die: "$^PROGRAM_NAME: error opening directory $dir for reading: $^OS_ERROR\n"
+    @files = sort:  (grep: { m/\.html?$/ }, (@:  (readdir: $dirhandle)))
+    closedir: $dirhandle
 
-    open(my $html_fh, ">", "$html") ||
-        die "$^PROGRAM_NAME: error opening $html for output: $^OS_ERROR\n"
+    (open: my $html_fh, ">", "$html") ||
+        die: "$^PROGRAM_NAME: error opening $html for output: $^OS_ERROR\n"
 
     # for each .html file in the directory, extract the index
     #   embedded in the file and throw it into the big index.
-    print $html_fh, "<DL COMPACT>\n"
+    print: $html_fh, "<DL COMPACT>\n"
     foreach my $file ( @files)
         $^INPUT_RECORD_SEPARATOR = ""
 
-        open(my $in_fh, "<", "$dir/$file") ||
-            die "$^PROGRAM_NAME: error opening $dir/$file for input: $^OS_ERROR\n"
+        (open: my $in_fh, "<", "$dir/$file") ||
+            die: "$^PROGRAM_NAME: error opening $dir/$file for input: $^OS_ERROR\n"
         @filedata = @:  ~< $in_fh->* 
-        close($in_fh)
+        close: $in_fh
 
         # pull out the NAME section
         my $name
-        ($name) = < grep( { m/name="name"/i }, @filedata)
+        ($name) = < grep:  { m/name="name"/i }, @filedata
         (@: $lcp1,$lcp2) = @: $name =~ m,/H1>\s(\S+)\s[\s-]*(.*?)\s*$,smi
         if (defined $lcp1 and $lcp1 =~ m,^<P>$,i) # Uninteresting.  Try again.
             (@: $lcp1,$lcp2) = @: $name =~ m,/H1>\s<P>\s*(\S+)\s[\s-]*(.*?)\s*$,smi
 
         my $url= "$pod/$file"
         if ( ! defined %Options{?htmlroot} || %Options{?htmlroot} eq '' )
-            $url = Pod::Html::relativize_url( "$pod/$file", $html )
+            $url = Pod::Html::relativize_url:  "$pod/$file", $html 
 
 
         if (defined $lcp1)
-            print $html_fh, qq(<DT><A HREF="$url">)
-            print $html_fh, "$lcp1</A></DT><DD>$lcp2</DD>\n"
+            print: $html_fh, qq(<DT><A HREF="$url">)
+            print: $html_fh, "$lcp1</A></DT><DD>$lcp2</DD>\n"
 
 
         next
 
-        @index = grep( { m/<!-- INDEX BEGIN -->.*<!-- INDEX END -->/s }, @filedata)
+        @index = grep:  { m/<!-- INDEX BEGIN -->.*<!-- INDEX END -->/s }, @filedata
         for ( @index)
             s/<!-- INDEX BEGIN -->(\s*<!--)(.*)(-->\s*)<!-- INDEX END -->/$lcp2/s
             s,#,$dir/$file#,g
-            print $html_fh, "$_\n<P><HR><P>\n"
+            print: $html_fh, "$_\n<P><HR><P>\n"
 
 
-    print $html_fh, "</DL>\n"
+    print: $html_fh, "</DL>\n"
 
-    close($html_fh)
+    close: $html_fh
 
 
 
@@ -362,7 +362,7 @@ sub split_on_head($podroot, $htmldir, $splitdirs, $ignore, @< @splithead)
     my($dirname, $filename)
 
     # split the files specified in @splithead on =head[1-6] pod directives
-    print $^STDOUT, "splitting files by head.\n" if $verbose &&( (nelems @splithead)-1) +>= 0
+    print: $^STDOUT, "splitting files by head.\n" if $verbose &&( (nelems @splithead)-1) +>= 0
     foreach my $pod ( @splithead)
         # figure out the directory name and filename
         $pod      =~ s,^([^/]*)$,/$1,
@@ -371,11 +371,11 @@ sub split_on_head($podroot, $htmldir, $splitdirs, $ignore, @< @splithead)
         $filename = "$2.pod"
 
         # since we are splitting this file it shouldn't be converted.
-        push($ignore->@, "$podroot/$dirname/$filename")
+        push: $ignore->@, "$podroot/$dirname/$filename"
 
         # split the pod
-        splitpod("$podroot/$dirname/$filename", "$podroot/$dirname", $htmldir,
-                 $splitdirs)
+        splitpod: "$podroot/$dirname/$filename", "$podroot/$dirname", $htmldir
+                  $splitdirs
 
 
 
@@ -383,10 +383,10 @@ sub split_on_head($podroot, $htmldir, $splitdirs, $ignore, @< @splithead)
 sub split_on_item($podroot, $splitdirs, $ignore, @< @splititem)
     my($pwd, $dirname, $filename)
 
-    print $^STDOUT, "splitting files by item.\n" if $verbose &&( (nelems @splititem)-1) +>= 0
-    $pwd = getcwd()
-    my $splitter = File::Spec->rel2abs("$splitpod/splitpod", $pwd)
-    my $perl = File::Spec->rel2abs($^EXECUTABLE_NAME, $pwd)
+    print: $^STDOUT, "splitting files by item.\n" if $verbose &&( (nelems @splititem)-1) +>= 0
+    $pwd = (getcwd: )
+    my $splitter = File::Spec->rel2abs: "$splitpod/splitpod", $pwd
+    my $perl = File::Spec->rel2abs: $^EXECUTABLE_NAME, $pwd
     foreach my $pod ( @splititem)
         # figure out the directory to split into
         $pod      =~ s,^([^/]*)$,/$1,
@@ -395,23 +395,23 @@ sub split_on_item($podroot, $splitdirs, $ignore, @< @splititem)
         $filename = "$2.pod"
 
         # since we are splitting this file it shouldn't be converted.
-        push($ignore->@, "$podroot/$dirname.pod")
+        push: $ignore->@, "$podroot/$dirname.pod"
 
         # split the pod
-        push($splitdirs->@, "$podroot/$dirname")
+        push: $splitdirs->@, "$podroot/$dirname"
         if (! -d "$podroot/$dirname")
-            mkdir("$podroot/$dirname", 0755) ||
-                die "$^PROGRAM_NAME: error creating directory $podroot/$dirname: $^OS_ERROR\n"
+            (mkdir: "$podroot/$dirname", 0755) ||
+                die: "$^PROGRAM_NAME: error creating directory $podroot/$dirname: $^OS_ERROR\n"
 
-        chdir("$podroot/$dirname") ||
-            die "$^PROGRAM_NAME: error changing to directory $podroot/$dirname: $^OS_ERROR\n"
-        die "$splitter not found. Use '-splitpod dir' option.\n"
+        (chdir: "$podroot/$dirname") ||
+            die: "$^PROGRAM_NAME: error changing to directory $podroot/$dirname: $^OS_ERROR\n"
+        die: "$splitter not found. Use '-splitpod dir' option.\n"
             unless -f $splitter
-        system($perl, $splitter, "../$filename") &&
-            warn "$^PROGRAM_NAME: error running '$splitter ../$filename'"
-            ." from $podroot/$dirname"
+        (system: $perl, $splitter, "../$filename") &&
+            warn: "$^PROGRAM_NAME: error running '$splitter ../$filename'"
+                      ." from $podroot/$dirname"
 
-    chdir($pwd)
+    chdir: $pwd
 
 
 
@@ -424,15 +424,15 @@ sub splitpod($pod, $poddir, $htmldir, $splitdirs)
     my(@poddata, @filedata, @heads)
     my($file, $i, $j, $prevsec, $section, $nextsec)
 
-    print $^STDOUT, "splitting $pod\n" if $verbose
+    print: $^STDOUT, "splitting $pod\n" if $verbose
 
     # read the file in paragraphs
     $^INPUT_RECORD_SEPARATOR = ""
-    open(my $splitin_fh, "<", "$pod") ||
-        die "$^PROGRAM_NAME: error opening $pod for input: $^OS_ERROR\n"
+    (open: my $splitin_fh, "<", "$pod") ||
+        die: "$^PROGRAM_NAME: error opening $pod for input: $^OS_ERROR\n"
     @filedata = @:  ~< $splitin_fh->* 
-    close($splitin_fh) ||
-        die "$^PROGRAM_NAME: error closing $pod: $^OS_ERROR\n"
+    (close: $splitin_fh) ||
+        die: "$^PROGRAM_NAME: error closing $pod: $^OS_ERROR\n"
 
     # restore the file internally by =head[1-6] sections
     @poddata = $@
@@ -450,7 +450,7 @@ sub splitpod($pod, $poddir, $htmldir, $splitdirs)
     #  L<> links as necessary.
     my %heads = $%
     foreach my $i (0..((nelems @poddata)-1))
-        %heads{+anchorify($1)} = 1 if @poddata[$i] =~ m/=head[1-6]\s+(.*)/
+        %heads{+(anchorify: $1)} = 1 if @poddata[$i] =~ m/=head[1-6]\s+(.*)/
 
 
     # create a directory of a similar name and store all the
@@ -458,9 +458,9 @@ sub splitpod($pod, $poddir, $htmldir, $splitdirs)
     $pod =~ s,.*/(.*),$1,       # get the last part of the name
     my $dir = $pod
     $dir =~ s/\.pod//g
-    push($splitdirs->@, "$poddir/$dir")
-    mkdir("$poddir/$dir", 0755) ||
-        die "$^PROGRAM_NAME: could not create directory $poddir/$dir: $^OS_ERROR\n"
+    push: $splitdirs->@, "$poddir/$dir"
+    (mkdir: "$poddir/$dir", 0755) ||
+        die: "$^PROGRAM_NAME: could not create directory $poddir/$dir: $^OS_ERROR\n"
         unless -d "$poddir/$dir"
 
     @poddata[0] =~ m/^\s*=head[1-6]\s+(.*)/
@@ -482,23 +482,23 @@ sub splitpod($pod, $poddir, $htmldir, $splitdirs)
         # determine an appropriate filename (this must correspond with
         #  what pod2html will try and guess)
         # $poddata[$i] =~ /^\s*=head[1-6]\s+(.*)/;
-        $file = "$dir/" . anchorify($section) . ".pod"
+        $file = "$dir/" . (anchorify: $section) . ".pod"
 
         # create the new .pod file
-        print $^STDOUT, "\tcreating $poddir/$file\n" if $verbose
-        open(my $splitout_fh, ">", "$poddir/$file") ||
-            die "$^PROGRAM_NAME: error opening $poddir/$file for output: $^OS_ERROR\n"
+        print: $^STDOUT, "\tcreating $poddir/$file\n" if $verbose
+        (open: my $splitout_fh, ">", "$poddir/$file") ||
+            die: "$^PROGRAM_NAME: error opening $poddir/$file for output: $^OS_ERROR\n"
         @poddata[$i] =~ s,L<([^<>]*)>,$(
-        defined %heads{?anchorify($1)} ?? "L<$dir/$1>" !! "L<$1>"
+        defined %heads{?(anchorify: $1)} ?? "L<$dir/$1>" !! "L<$1>"
         ),g
-        print $splitout_fh, @poddata[$i]."\n\n"
-        print $splitout_fh, "=over 4\n\n"
-        print $splitout_fh, "=item *\n\nBack to L<$dir/\"$prevsec\">\n\n" if $prevsec
-        print $splitout_fh, "=item *\n\nForward to L<$dir/\"$nextsec\">\n\n" if $nextsec
-        print $splitout_fh, "=item *\n\nUp to L<$dir>\n\n"
-        print $splitout_fh, "=back\n\n"
-        close($splitout_fh) ||
-            die "$^PROGRAM_NAME: error closing $poddir/$file: $^OS_ERROR\n"
+        print: $splitout_fh, @poddata[$i]."\n\n"
+        print: $splitout_fh, "=over 4\n\n"
+        print: $splitout_fh, "=item *\n\nBack to L<$dir/\"$prevsec\">\n\n" if $prevsec
+        print: $splitout_fh, "=item *\n\nForward to L<$dir/\"$nextsec\">\n\n" if $nextsec
+        print: $splitout_fh, "=item *\n\nUp to L<$dir>\n\n"
+        print: $splitout_fh, "=back\n\n"
+        (close: $splitout_fh) ||
+            die: "$^PROGRAM_NAME: error closing $poddir/$file: $^OS_ERROR\n"
 
 
 
@@ -515,54 +515,54 @@ sub installdir($dir, $recurse, $podroot, $splitdirs, $ignore)
     @pmlist  = $@  # .pm files to install
 
     # should files in this directory get an index?
-    $doindex = (grep( { $_ eq "$podroot/$dir" }, $splitdirs->@) ?? 0 !! 1)
+    $doindex = ((grep:  { $_ eq "$podroot/$dir" }, $splitdirs->@) ?? 0 !! 1)
 
-    opendir(my $dirhandle, "$podroot/$dir")
-        || die "$^PROGRAM_NAME: error opening directory $podroot/$dir: $^OS_ERROR\n"
+    opendir: my $dirhandle, "$podroot/$dir"
+        || die: "$^PROGRAM_NAME: error opening directory $podroot/$dir: $^OS_ERROR\n"
 
     # find the directories to recurse on
-    @dirlist = map { if ($^OS_NAME eq 'VMS') {m/^(.*)\.dir$/i; "$dir/$1";} else {"$dir/$_";}},
-        grep( { -d "$podroot/$dir/$_" && !m/^\.{1,2}/ }, (@:  readdir($dirhandle))) if $recurse
-    rewinddir($dirhandle)
+    @dirlist = (map: { if ($^OS_NAME eq 'VMS') {m/^(.*)\.dir$/i; "$dir/$1";} else {"$dir/$_";}},
+                         (grep:  { -d "$podroot/$dir/$_" && !m/^\.{1,2}/ }, (@:  (readdir: $dirhandle)))) if $recurse
+    rewinddir: $dirhandle
 
     # find all the .pod files within the directory
-    @podlist = map { m/^(.*)\.pod$/; "$dir/$1" },
-        grep( { ! -d "$podroot/$dir/$_" && m/\.pod$/ }, (@:  readdir($dirhandle)))
-    rewinddir($dirhandle)
+    @podlist = map: { m/^(.*)\.pod$/; "$dir/$1" },
+                        grep:  { ! -d "$podroot/$dir/$_" && m/\.pod$/ }, (@:  (readdir: $dirhandle))
+    rewinddir: $dirhandle
 
     # find all the .pm files within the directory
-    @pmlist = map { m/^(.*)\.pm$/; "$dir/$1" },
-        grep( { ! -d "$podroot/$dir/$_" && m/\.pm$/ }, (@:  readdir($dirhandle)))
+    @pmlist = map: { m/^(.*)\.pm$/; "$dir/$1" },
+                       grep:  { ! -d "$podroot/$dir/$_" && m/\.pm$/ }, (@:  (readdir: $dirhandle))
 
-    closedir($dirhandle)
+    closedir: $dirhandle
 
     # recurse on all subdirectories we kept track of
     foreach my $dir ( @dirlist)
-        installdir($dir, $recurse, $podroot, $splitdirs, $ignore)
+        installdir: $dir, $recurse, $podroot, $splitdirs, $ignore
 
 
     # install all the pods we found
     foreach my $pod ( @podlist)
         # check if we should ignore it.
         next if $pod =~ m(/t/) # comes from a test file
-        next if grep( { $_ eq "$pod.pod" }, $ignore->@)
+        next if grep:  { $_ eq "$pod.pod" }, $ignore->@
 
         # check if a .pm files exists too
-        if (grep( { $_ eq $pod }, @pmlist))
-            print  $^STDOUT, "$^PROGRAM_NAME: Warning both '$podroot/$pod.pod' and "
-                . "'$podroot/$pod.pm' exist, using pod\n"
-            push(@ignore, "$pod.pm")
+        if ((grep:  { $_ eq $pod }, @pmlist))
+            print: $^STDOUT, "$^PROGRAM_NAME: Warning both '$podroot/$pod.pod' and "
+                       . "'$podroot/$pod.pm' exist, using pod\n"
+            push: @ignore, "$pod.pm"
 
-        runpod2html("$pod.pod", $doindex)
+        runpod2html: "$pod.pod", $doindex
 
 
     # install all the .pm files we found
     foreach my $pm ( @pmlist)
         # check if we should ignore it.
         next if $pm =~ m(/t/) # comes from a test file
-        next if grep( { $_ eq "$pm.pm" }, @ignore)
+        next if grep:  { $_ eq "$pm.pm" }, @ignore
 
-        runpod2html("$pm.pm", $doindex)
+        runpod2html: "$pm.pm", $doindex
 
 
 
@@ -578,27 +578,27 @@ sub runpod2html($pod, $doindex)
     $html =~ s/\.(pod|pm)$/.html/g
 
     # make sure the destination directories exist
-    @dirs = split("/", $html)
+    @dirs = split: "/", $html
     $dir  = "$htmldir/"
     for my $i ( 0 ..  (nelems @dirs)-2 )
         if (! -d "$dir@dirs[$i]")
-            mkdir("$dir@dirs[$i]", 0755) ||
-                die "$^PROGRAM_NAME: error creating directory $dir@dirs[$i]: $^OS_ERROR\n"
+            (mkdir: "$dir@dirs[$i]", 0755) ||
+                die: "$^PROGRAM_NAME: error creating directory $dir@dirs[$i]: $^OS_ERROR\n"
 
         $dir .= "@dirs[$i]/"
 
 
     # invoke pod2html
-    print $^STDOUT, "$podroot/$pod => $htmldir/$html\n" if $verbose
-    Pod::Html::pod2html(
-        "--htmldir=$htmldir",
-        "--htmlroot=$htmlroot",
-        "--podpath=".join(":", @podpath),
-        "--podroot=$podroot", "--netscape",
-        "--header",
-        ($doindex ?? "--index" !! "--noindex"),
-        "--" . ($recurse ?? "" !! "no") . "recurse",
-        (((nelems @libpods)-1) +>= 0) ?? "--libpods=" . join(":", @libpods) !! "",
-        "--infile=$podroot/$pod", "--outfile=$htmldir/$html")
-    die "$^PROGRAM_NAME: error running $pod2html: $^OS_ERROR\n" if $^CHILD_ERROR
+    print: $^STDOUT, "$podroot/$pod => $htmldir/$html\n" if $verbose
+    Pod::Html::pod2html: 
+        "--htmldir=$htmldir"
+        "--htmlroot=$htmlroot"
+        "--podpath=".(join: ":", @podpath)
+        "--podroot=$podroot", "--netscape"
+        "--header"
+        ($doindex ?? "--index" !! "--noindex")
+        "--" . ($recurse ?? "" !! "no") . "recurse"
+        (((nelems @libpods)-1) +>= 0) ?? "--libpods=" . (join: ":", @libpods) !! ""
+        "--infile=$podroot/$pod", "--outfile=$htmldir/$html"
+    die: "$^PROGRAM_NAME: error running $pod2html: $^OS_ERROR\n" if $^CHILD_ERROR
 

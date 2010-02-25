@@ -16,27 +16,27 @@ sub case_tolerant
 
 
 sub file_name_is_absolute($self,$file)
-    return scalar($file =~ m{^([a-z]:)?[\\/]}is)
+    return scalar: $file =~ m{^([a-z]:)?[\\/]}is
 
 
 sub path
-    my $path = env::var('PATH')
+    my $path = env::var: 'PATH'
     $path =~ s:\\:/:g
-    my @path = split(';',$path)
+    my @path = split: ';',$path
     foreach ( @path) { $_ = '.' if $_ eq '' }
     return @path
 
 
 sub _cwd
     # In OS/2 the "require Cwd" is unnecessary bloat.
-    return Cwd::sys_cwd()
+    return (Cwd::sys_cwd: )
 
 
 my $tmpdir
 sub tmpdir
     return $tmpdir if defined $tmpdir
-    my @d = map { env::var($_) }, qw(TMPDIR TEMP TMP)
-    $tmpdir = @_[0]->_tmpdir( < @d, '/tmp', '/'  )
+    my @d = map: { (env::var: $_) }, qw(TMPDIR TEMP TMP)
+    $tmpdir = @_[0]->_tmpdir:  < @d, '/tmp', '/'  
 
 
 sub catdir
@@ -47,13 +47,13 @@ sub catdir
         # append a backslash to each argument unless it has one there
         $_ .= "/" unless m{/$}
     
-    return $self->canonpath(join('', @args))
+    return $self->canonpath: (join: '', @args)
 
 
 sub canonpath($self,?$path)
     return unless defined $path
 
-    $path =~ s/^([a-z]:)/$(lc($1))/s
+    $path =~ s/^([a-z]:)/$((lc: $1))/s
     $path =~ s|\\|/|g
     $path =~ s|([^/])/+|$1/|g                  # xx////xx  -> xx/xx
     $path =~ s|(/\.)+/|/|g                     # xx/././xx -> xx/xx
@@ -94,7 +94,7 @@ sub splitpath($self,$path, ?$nofile)
 
 
 sub splitdir($self,$directories)
-    split m|[\\/]|, $directories, -1
+    split: m|[\\/]|, $directories, -1
 
 
 
@@ -129,41 +129,41 @@ sub catpath($self,$volume,$directory,$file)
 sub abs2rel($self,$path,$base)
 
     # Clean up $path
-    if ( ! $self->file_name_is_absolute( $path ) )
-        $path = $self->rel2abs( $path ) 
+    if ( ! ($self->file_name_is_absolute:  $path ) )
+        $path = $self->rel2abs:  $path  
     else
-        $path = $self->canonpath( $path ) 
+        $path = $self->canonpath:  $path  
     
 
     # Figure out the effective $base and clean it up.
-    if ( !defined( $base ) || $base eq '' )
-        $base = $self->_cwd()
-    elsif ( ! $self->file_name_is_absolute( $base ) )
-        $base = $self->rel2abs( $base ) 
+    if ( !(defined:  $base ) || $base eq '' )
+        $base = $self->_cwd: 
+    elsif ( ! ($self->file_name_is_absolute:  $base ) )
+        $base = $self->rel2abs:  $base  
     else
-        $base = $self->canonpath( $base ) 
+        $base = $self->canonpath:  $base  
     
 
     # Split up paths
-    my (@:  $path_volume, $path_directories, $path_file ) =  $self->splitpath( $path, 1 ) 
-    my (@:  $base_volume, $base_directories, _ ) =  $self->splitpath( $base, 1 ) 
+    my (@:  $path_volume, $path_directories, $path_file ) =  $self->splitpath:  $path, 1  
+    my (@:  $base_volume, $base_directories, _ ) =  $self->splitpath:  $base, 1  
     return $path unless $path_volume eq $base_volume
 
     # Now, remove all leading components that are the same
-    my @pathchunks = $self->splitdir( $path_directories )
-    my @basechunks = $self->splitdir( $base_directories )
+    my @pathchunks = $self->splitdir:  $path_directories 
+    my @basechunks = $self->splitdir:  $base_directories 
 
     while ( (nelems @pathchunks) &&
               nelems @basechunks &&
-              lc( @pathchunks[0] ) eq lc( @basechunks[0] )
+              (lc:  @pathchunks[0] ) eq lc:  @basechunks[0] 
         )
         shift @pathchunks 
         shift @basechunks 
     
 
     # No need to catdir, we know these are well formed.
-    $path_directories = CORE::join( '/', @pathchunks )
-    $base_directories = CORE::join( '/', @basechunks )
+    $path_directories = CORE::join:  '/', @pathchunks 
+    $base_directories = CORE::join:  '/', @basechunks 
 
     # $base_directories now contains the directories the resulting relative
     # path must ascend out of before it can descend to $path_directory.  So,
@@ -182,38 +182,38 @@ sub abs2rel($self,$path,$base)
         $path_directories = "$base_directories$path_directories" 
     
 
-    return $self->canonpath(
-        $self->catpath( "", $path_directories, $path_file )
-        ) 
+    return $self->canonpath: 
+        $self->catpath:  "", $path_directories, $path_file 
+         
 
 
 
 sub rel2abs($self,$path,?$base)
 
-    if ( ! $self->file_name_is_absolute( $path ) )
+    if ( ! ($self->file_name_is_absolute:  $path ) )
 
-        if ( !defined( $base ) || $base eq '' )
-            $base = $self->_cwd()
-        elsif ( ! $self->file_name_is_absolute( $base ) )
-            $base = $self->rel2abs( $base ) 
+        if ( !(defined:  $base ) || $base eq '' )
+            $base = $self->_cwd: 
+        elsif ( ! ($self->file_name_is_absolute:  $base ) )
+            $base = $self->rel2abs:  $base  
         else
-            $base = $self->canonpath( $base ) 
+            $base = $self->canonpath:  $base  
         
 
         my (@:  $path_directories, $path_file ) =
-            ($self->splitpath( $path, 1 ))[[1..2]] 
+            (($self->splitpath:  $path, 1 ))[[1..2]] 
 
         my (@:  $base_volume, $base_directories ) =
-            $self->splitpath( $base, 1 ) 
+            $self->splitpath:  $base, 1  
 
-        $path = $self->catpath(
+        $path = $self->catpath: 
             $base_volume, <
-            $self->catdir( $base_directories, $path_directories ),
+                ($self->catdir:  $base_directories, $path_directories )
             $path_file
-            ) 
+             
     
 
-    return $self->canonpath( $path ) 
+    return $self->canonpath:  $path  
 
 
 1

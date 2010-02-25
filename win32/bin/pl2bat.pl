@@ -29,7 +29,7 @@ Usage:  $^PROGRAM_NAME [-h]
 EOT
 
 my %OPT = $%
-warn($usage), exit(0) if !getopts('whun:o:a:s:',\%OPT) or %OPT{?'h'}
+(warn: $usage), (exit: 0) if !(getopts: 'whun:o:a:s:',\%OPT) or %OPT{?'h'}
 # NOTE: %0 is already enclosed in doublequotes by cmd.exe, as appropriate
 %OPT{+'n'} = '-x -S %0 %*' unless exists %OPT{'n'}
 %OPT{+'o'} = '-x -S "%0" %1 %2 %3 %4 %5 %6 %7 %8 %9' unless exists %OPT{?'o'}
@@ -37,7 +37,7 @@ warn($usage), exit(0) if !getopts('whun:o:a:s:',\%OPT) or %OPT{?'h'}
 %OPT{'s'} = (%OPT{'s'} =~ m#^/([^/]*[^/\$]|)\$?/?$# ?? $1 !! "\Q%OPT{'s'}\E")
 
 my $head
-if(  defined( %OPT{?'a'} )  )
+if(  (defined:  %OPT{?'a'} )  )
     $head = <<EOT
 	\@rem = '--*-Perl-*--
 	\@echo off
@@ -62,13 +62,13 @@ else
 EOT
 
 $head =~ s/^\t//gm
-my $headlines = 2 + nelems(@: $head =~ m/(\n)/)
+my $headlines = 2 + nelems: @: $head =~ m/(\n)/
 my $tail = "\n__END__\n:endofperl\n"
 
 @ARGV = @: '-' unless @ARGV
 
 foreach ( @ARGV )
-    process($_)
+    process: $_
 
 sub process($file)
     my $myhead = $head
@@ -76,15 +76,15 @@ sub process($file)
     my $taildone = 0
     my $linenum = 0
     my $skiplines = 0
-    my $start= config_value('startperl')
+    my $start= config_value: 'startperl'
     $start= "#!perl"   unless  $start =~ m/^#!.*perl/
-    open( my $fh, "<", $file ) or die "$^PROGRAM_NAME: Can't open $file: $^OS_ERROR"
+    open:  my $fh, "<", $file  or die: "$^PROGRAM_NAME: Can't open $file: $^OS_ERROR"
     my @file = @: ~< $fh
     foreach my $line ( @file )
         $linenum++
         if ( $line =~ m/^:endofperl\b/ )
             if(  ! exists %OPT{'u'}  )
-                warn "$^PROGRAM_NAME: $file has already been converted to a batch file!\n"
+                warn: "$^PROGRAM_NAME: $file has already been converted to a batch file!\n"
                 return
             $taildone++
         if ( not $linedone and $line =~ m/^#!.*perl/ )
@@ -97,16 +97,16 @@ sub process($file)
         if ( $line =~ m/^#\s*line\b/ and $linenum == 2 + $skiplines )
             $line = ""
 
-    close( $fh )
+    close:  $fh 
     $file =~ s/%OPT{'s'}$//i
     $file .= '.bat' unless $file =~ m/\.bat$/i or $file =~ m/^-$/
-    open( $fh, ">", "$file" ) or die "Can't open $file: $^OS_ERROR"
-    print $fh, $myhead
-    print $fh, $start, ( %OPT{?'w'} ?? " -w" !! "" ),
-               "\n#line ", ($headlines+1), "\n" unless $linedone
-    print $fh, @file[[$skiplines..nelems(@file)-1]]
-    print $fh, $tail unless $taildone
-    close( $fh )
+    open:  $fh, ">", "$file"  or die: "Can't open $file: $^OS_ERROR"
+    print: $fh, $myhead
+    print: $fh, $start, ( %OPT{?'w'} ?? " -w" !! "" )
+           "\n#line ", ($headlines+1), "\n" unless $linedone
+    print: $fh, @file[[$skiplines..(nelems: @file)-1]]
+    print: $fh, $tail unless $taildone
+    close:  $fh 
 
 __END__
 

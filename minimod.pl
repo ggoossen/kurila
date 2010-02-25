@@ -11,10 +11,10 @@
 #
 # Version 1.0, Feb 2nd 1995 by Andreas Koenig
 
-BEGIN { unshift $^INCLUDE_PATH, "lib" }
+BEGIN { (unshift: $^INCLUDE_PATH, "lib") }
 
 
-print $^STDOUT, <<'END'
+print: $^STDOUT, <<'END'
 # This File keeps the contents of miniperlmain.c.
 #
 # It was generated automatically by minimod.PL from the contents
@@ -32,24 +32,24 @@ require Exporter;
 $head= <<'EOF!HEAD';
 END
 
-open my $mini, "<", "miniperlmain.c"
+open: my $mini, "<", "miniperlmain.c"
 while ( ~< $mini)
     last if m/Do not delete this line--writemain depends on it/
-    print $^STDOUT, $_
-    m/#include "perl.h"/ and print $^STDOUT, qq/#include "XSUB.h"\n/
+    print: $^STDOUT, $_
+    m/#include "perl.h"/ and print: $^STDOUT, qq/#include "XSUB.h"\n/
 
 
-print $^STDOUT, <<'END'
+print: $^STDOUT, <<'END'
 EOF!HEAD
 $tail=<<'EOF!TAIL';
 END
 
 while ( ~< $mini)
-    print $^STDOUT, unless m/dXSUB_SYS/
+    print: $^STDOUT, unless m/dXSUB_SYS/
 
 close $mini
 
-print $^STDOUT, <<'END'
+print: $^STDOUT, <<'END'
 EOF!TAIL
 
 sub writemain{

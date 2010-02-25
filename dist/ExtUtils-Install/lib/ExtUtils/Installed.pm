@@ -20,15 +20,15 @@ sub _is_prefix($self, $path, $prefix)
     return unless defined $prefix && defined $path
 
     if( $Is_VMS )
-        $prefix = VMS::Filespec::unixify($prefix)
-        $path   = VMS::Filespec::unixify($path)
+        $prefix = VMS::Filespec::unixify: $prefix
+        $path   = VMS::Filespec::unixify: $path
     
 
     # Sloppy Unix path normalization.
     $prefix =~ s{/+}{/}g
     $path   =~ s{/+}{/}g
 
-    return 1 if substr($path, 0, length($prefix)) eq $prefix
+    return 1 if (substr: $path, 0, (length: $prefix)) eq $prefix
 
     if ($DOSISH)
         $path =~ s|\\|/|g
@@ -42,21 +42,21 @@ sub _is_doc($self, $path)
 
     my $man1dir = $self->{':private:'}{Config}{?man1direxp}
     my $man3dir = $self->{':private:'}{Config}{?man3direxp}
-    return ($man1dir && $self->_is_prefix($path, $man1dir))
+    return ($man1dir && ($self->_is_prefix: $path, $man1dir))
         ||
-        ($man3dir && $self->_is_prefix($path, $man3dir))
+        ($man3dir && ($self->_is_prefix: $path, $man3dir))
         ?? 1 !! 0
 
 
 sub _is_type($self, $path, $type)
     return 1 if $type eq "all"
 
-    return $self->_is_doc($path) if $type eq "doc"
+    return ($self->_is_doc: $path) if $type eq "doc"
 
     if ($type eq "prog")
-        return ($self->_is_prefix($path, $self->{':private:'}{Config}{?prefix} || $self->{':private:'}{Config}{prefixexp})
+        return ($self->_is_prefix: $path, $self->{':private:'}{Config}{?prefix} || $self->{':private:'}{Config}{prefixexp}
                 &&
-                !($self->_is_doc($path))
+                !(($self->_is_doc: $path))
                 ?? 1 !! 0)
     
     return 0
@@ -65,15 +65,15 @@ sub _is_type($self, $path, $type)
 sub _is_under($self, $path, @< @under)
     @under[+0] = "" if (! nelems @under)
     foreach my $dir ( @under)
-        return 1 if ($self->_is_prefix($path, $dir))
+        return 1 if (($self->_is_prefix: $path, $dir))
     
 
     return 0
 
 
 sub new
-    my $class = shift(@_)
-    $class = ref($class) || $class
+    my $class = shift: @_
+    $class = (ref: $class) || $class
 
     my %args = %:  < @_ 
 
@@ -85,7 +85,7 @@ sub new
         $self->{':private:'}{+Config} = %args{?config_override}
     else
         $self->{':private:'}{+Config} = %+:
-            map { (%: $_ => config_value($_)) }, config_keys()
+            map: { (%: $_ => (config_value: $_)) }, (config_keys: )
     
 
     for my $tuple (@: (@: inc_override => INC => $($^INCLUDE_PATH) )
@@ -94,29 +94,29 @@ sub new
         if ( %args{?$arg} )
             try {
                 $self->{':private:'}{+$key} = %args{$arg}->@;
-            } or die(
+            } or die: 
                 "The '$arg' parameter must be an array reference."
-                )
+                
         elsif ($val)
             $self->{':private:'}{+$key} = $val
         
     
     do
         my %dupe
-        $self->{':private:'}{INC} = grep { -e $_ && !%dupe{+$_}++ },
-            $self->{':private:'}{?INC} +@+ ($self->{':private:'}{?EXTRA}||$@)
+        $self->{':private:'}{INC} = grep: { -e $_ && !%dupe{+$_}++ },
+                                              $self->{':private:'}{?INC} +@+ ($self->{':private:'}{?EXTRA}||$@)
     
-    my $perl5lib = defined env::var('PERL5LIB') ?? env::var('PERL5LIB') !! ""
+    my $perl5lib = defined (env::var: 'PERL5LIB') ?? (env::var: 'PERL5LIB') !! ""
 
     my @dirs = @:  $self->{':private:'}{Config}{?archlibexp}
                    $self->{':private:'}{Config}{?sitearchexp}
-                   < split(m/\Q$(config_value("path_sep"))\E/, $perl5lib)
+                   < split: m/\Q$(config_value("path_sep"))\E/, $perl5lib
                    < $self->{':private:'}{?EXTRA}
 
     # File::Find does not know how to deal with VMS filepaths.
     if( $Is_VMS )
         for (@dirs)
-            $_ = VMS::Filespec::unixify($_)
+            $_ = VMS::Filespec::unixify: $_
 
     if ($DOSISH)
         for (@dirs)
@@ -126,7 +126,7 @@ sub new
 
     # Read the core packlist
     $self->{Perl}{+packlist} =
-        ExtUtils::Packlist->new( File::Spec->catfile($archlib, '.packlist') )
+        ExtUtils::Packlist->new:  (File::Spec->catfile: $archlib, '.packlist') 
     $self->{Perl}{+version} = $self->{':private:'}{Config}{?version}
 
     # Read the module packlists
@@ -152,25 +152,25 @@ sub new
         # Find the top-level module file in $^INCLUDE_PATH
         $self->{+$module}{+version} = ''
         foreach my $dir ( $self->{':private:'}{INC} )
-            my $p = File::Spec->catfile($dir, $modfile)
+            my $p = File::Spec->catfile: $dir, $modfile
             if (-r $p)
-                $module = _module_name($p, $module) if $Is_VMS
+                $module = (_module_name: $p, $module) if $Is_VMS
 
-                $self->{$module}{+version} = MM->parse_version($p)
+                $self->{$module}{+version} = MM->parse_version: $p
                 last
             
         
 
         # Read the .packlist
         $self->{$module}{+packlist} =
-            ExtUtils::Packlist->new($File::Find::name)
+            ExtUtils::Packlist->new: $File::Find::name
     
     my %dupe
-    @dirs= grep { -e $_ && !%dupe{+$_}++ }, @dirs
+    @dirs= grep: { -e $_ && !%dupe{+$_}++ }, @dirs
     $self->{':private:'}{+LIBDIRS} = \@dirs
-    find($sub, < @dirs) if (nelems @dirs)
+    find: $sub, < @dirs if (nelems @dirs)
 
-    return bless($self, $class)
+    return bless: $self, $class
 
 
 # VMS's non-case preserving file-system means the package name can't
@@ -178,14 +178,14 @@ sub new
 sub _module_name($file, $orig_module)
 
     my $module = ''
-    if (open my $packfh, "<", $file)
+    if ((open: my $packfh, "<", $file))
         while ( ~< $packfh->*)
             if (m/package\s+(\S+)\s*;/)
                 my $pack = $1
                 # Make a sanity check, that lower case $module
                 # is identical to lowercase $pack before
                 # accepting it
-                if (lc($pack) eq lc($orig_module))
+                if ((lc: $pack) eq (lc: $orig_module))
                     $module = $pack
                     last
                 
@@ -194,7 +194,7 @@ sub _module_name($file, $orig_module)
         close $packfh
     
 
-    print $^STDERR, "Couldn't figure out the package name for $file\n"
+    print: $^STDERR, "Couldn't figure out the package name for $file\n"
         unless $module
 
     return $module
@@ -205,61 +205,61 @@ sub _module_name($file, $orig_module)
 sub modules($self)
 
     # Bug/feature of sort in scalar context requires this.
-    return sort grep { not m/^:private:$/ }, keys $self->%
+    return sort: grep: { not m/^:private:$/ }, keys $self->%
 
 
 sub files($self, $module, ?$type, @< @under)
 
     # Validate arguments
-    die("$module is not installed") if (! exists($self->{$module}))
-    $type = "all" if (! defined($type))
-    die('type must be "all", "prog" or "doc"')
+    die: "$module is not installed" if (! (exists: $self->{$module}))
+    $type = "all" if (! (defined: $type))
+    die: 'type must be "all", "prog" or "doc"'
         if ($type ne "all" && $type ne "prog" && $type ne "doc")
 
     my (@files)
-    foreach my $file (keys($self->{$module}->{?packlist}->%))
-        push(@files, $file)
-            if ($self->_is_type($file, $type) &&
-                $self->_is_under($file, < @under))
+    foreach my $file ((keys: $self->{$module}->{?packlist}->%))
+        push: @files, $file
+            if (($self->_is_type: $file, $type) &&
+                ($self->_is_under: $file, < @under))
     
     return @files
 
 
 sub directories($self, $module, ?$type, @< @under)
     my (%dirs)
-    foreach my $file ( $self->files($module, $type, < @under))
-        %dirs{+dirname($file)}++
+    foreach my $file ( ($self->files: $module, $type, < @under))
+        %dirs{+(dirname: $file)}++
     
-    return sort keys %dirs
+    return sort: keys %dirs
 
 
 sub directory_tree($self, $module, $type, @< @under)
     my (%dirs)
-    foreach my $dir ( $self->directories($module, $type, < @under))
+    foreach my $dir ( ($self->directories: $module, $type, < @under))
         %dirs{+$dir}++
         my (@: $last) = @: ""
         while ($last ne $dir)
             $last = $dir
-            $dir = dirname($dir)
-            last if !$self->_is_under($dir, < @under)
+            $dir = dirname: $dir
+            last if !$self->_is_under: $dir, < @under
             %dirs{+$dir}++
         
     
-    return sort(keys(%dirs))
+    return sort: (keys: %dirs)
 
 
 sub validate($self, $module, ?$remove)
-    die("$module is not installed") if (! exists($self->{$module}))
-    return $self->{$module}->{?packlist}->validate($remove)
+    die: "$module is not installed" if (! (exists: $self->{$module}))
+    return $self->{$module}->{?packlist}->validate: $remove
 
 
 sub packlist($self, $module)
-    die("$module is not installed") if (! exists($self->{$module}))
+    die: "$module is not installed" if (! (exists: $self->{$module}))
     return $self->{$module}->{?packlist}
 
 
 sub version($self, $module)
-    die("$module is not installed") if (! exists($self->{$module}))
+    die: "$module is not installed" if (! (exists: $self->{$module}))
     return $self->{$module}->{?version}
 
 

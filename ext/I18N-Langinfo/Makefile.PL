@@ -1,20 +1,20 @@
 use ExtUtils::MakeMaker
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
-WriteMakefile(
-    'NAME'		=> 'I18N::Langinfo',
-    'VERSION_FROM'	=> 'Langinfo.pm', # finds $VERSION
-    'PREREQ_PM'		=> $%, # e.g., Module::Name => 1.1
-    ABSTRACT_FROM => 'Langinfo.pm', # retrieve abstract from module
-    AUTHOR     => 'Jarkko Hietaniemi <jhi@hut.fi>',
-    'LIBS'		=> (@: ''), # e.g., '-lm'
-    'DEFINE'		=> '', # e.g., '-DHAVE_SOMETHING'
+WriteMakefile: 
+    'NAME'		=> 'I18N::Langinfo'
+    'VERSION_FROM'	=> 'Langinfo.pm' # finds $VERSION
+    'PREREQ_PM'		=> $% # e.g., Module::Name => 1.1
+    ABSTRACT_FROM => 'Langinfo.pm' # retrieve abstract from module
+    AUTHOR     => 'Jarkko Hietaniemi <jhi@hut.fi>'
+    'LIBS'		=> (@: '') # e.g., '-lm'
+    'DEFINE'		=> '' # e.g., '-DHAVE_SOMETHING'
     # Insert -I. if you add *.h files later:
-    'INC'		=> '', # e.g., '-I/usr/include/other'
-    realclean => (%:  FILES=> 'const-c.inc const-xs.inc' ),
+    'INC'		=> '' # e.g., '-I/usr/include/other'
+    realclean => (%:  FILES=> 'const-c.inc const-xs.inc' )
     # Un-comment this if you add C files to link with later:
     # 'OBJECT'		=> '$(O_FILES)', # link all the C files too
-    )
+    
 if (try {require ExtUtils::Constant; 1})
     # Some older versions of glibc use only enums, no defines, hence all this
     # hassle (so old glibc that the define is GNU_LIBRARY, not GLIBC):
@@ -26,24 +26,23 @@ if (try {require ExtUtils::Constant; 1})
                  ERA_D_FMT ERA_D_T_FMT ERA_T_FMT MON_1 MON_10 MON_11 MON_12
                  MON_2 MON_3 MON_4 MON_5 MON_6 MON_7 MON_8 MON_9 NOEXPR NOSTR
                  PM_STR T_FMT T_FMT_AMPM YESEXPR YESSTR))
-        push @names,           # This lot are always enums in old langinfo.h:
-            \%:  name=>$_, type=>"IV"
-                 macro=> \(@: "#if defined($_) || (defined(__GNU_LIBRARY__) && defined(_NL_ITEM))\n"
-                              "#endif\n")
+        push: @names           # This lot are always enums in old langinfo.h:
+              \%: name=>$_, type=>"IV"
+                  macro=> \(@: "#if defined($_) || (defined(__GNU_LIBRARY__) && defined(_NL_ITEM))\n"
+                               "#endif\n")
     foreach (qw (CRNCYSTR THOUSEP RADIXCHAR))
-        push @names,           # This lot are only enums for __SVR4_I386_ABI_L1__:
-            \%: name=>$_, type=>"IV"
-                macro=>\(@: "#if defined($_) || (defined(__GNU_LIBRARY__) && defined(_NL_ITEM) && defined(__SVR4_I386_ABI_L1__))\n"
-                            "#endif\n")
-    ExtUtils::Constant::WriteConstants(
-        NAME => 'I18N::Langinfo',
-        NAMES => \@names,
-        PROXYSUBS => 1,
-        )
+        push: @names           # This lot are only enums for __SVR4_I386_ABI_L1__:
+              \%: name=>$_, type=>"IV"
+                  macro=>\(@: "#if defined($_) || (defined(__GNU_LIBRARY__) && defined(_NL_ITEM) && defined(__SVR4_I386_ABI_L1__))\n"
+                              "#endif\n")
+    ExtUtils::Constant::WriteConstants: 
+        NAME => 'I18N::Langinfo'
+        NAMES => \@names
+        PROXYSUBS => 1
 else
     use File::Copy
     use File::Spec
     foreach my $file ((@: 'const-c.inc', 'const-xs.inc'))
-        my $fallback = File::Spec->catfile('fallback', $file)
-        copy ($fallback, $file) or die "Can't copy $fallback to $file: $^OS_ERROR"
+        my $fallback = File::Spec->catfile: 'fallback', $file
+        copy: $fallback, $file or die: "Can't copy $fallback to $file: $^OS_ERROR"
 

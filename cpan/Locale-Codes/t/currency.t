@@ -10,7 +10,7 @@ use Locale::Currency
 # otherwise "ok N".
 #-----------------------------------------------------------------------
 our @TESTS =
-    @: 
+    @:
     #================================================
     # TESTS FOR code2currency
     #================================================
@@ -69,9 +69,9 @@ our @TESTS =
 
 use Test::More
 
-plan(tests => nelems @TESTS)
+plan: tests => nelems @TESTS
 
 foreach my $test ( @TESTS)
     eval "$test"
-    ok( not $^EVAL_ERROR )
+    ok:  not $^EVAL_ERROR 
 

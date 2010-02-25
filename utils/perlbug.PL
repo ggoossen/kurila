@@ -15,17 +15,17 @@ use File::Spec::Functions
 
 # This forces PL files to create target in same directory as PL file.
 # This is so that make depend always knows where to find PL derivatives.
-my $origdir = cwd
-chdir dirname($^PROGRAM_NAME)
-my $file = basename($^PROGRAM_NAME, '.PL')
+my $origdir = (cwd: )
+chdir dirname: $^PROGRAM_NAME
+my $file = basename: $^PROGRAM_NAME, '.PL'
 $file .= '.com' if $^OS_NAME eq 'VMS'
 
-open my $out, ">", "$file" or die "Can't create $file: $^OS_ERROR"
+open: my $out, ">", "$file" or die: "Can't create $file: $^OS_ERROR"
 
 # extract patchlevel.h information
 
-open my $patch_level, "<", catfile( updir, "patchlevel.h")
-    or die "Can't open patchlevel.h: $^OS_ERROR"
+open: my $patch_level, "<", catfile:  (updir: ), "patchlevel.h"
+    or die: "Can't open patchlevel.h: $^OS_ERROR"
 
 my $patchlevel_date = (@: stat $patch_level)[9]
 
@@ -33,8 +33,8 @@ while ( ~< $patch_level)
     last if $_ =~ m/^\s*static\s+(?:const\s+)?char.*?local_patches\[\]\s*=\s*{\s*$/
 
 
-if (! defined($_))
-    warn "Warning: local_patches section not found in patchlevel.h\n"
+if (! (defined: $_))
+    warn: "Warning: local_patches section not found in patchlevel.h\n"
 
 
 my @patches
@@ -47,31 +47,31 @@ while ( ~< $patch_level)
     s/^\s+,?\s*"?//
     s/"?\s*,?$//
     s/(['\\])/\\$1/g
-    push @patches, $_ unless $_ eq 'NULL'
+    push: @patches, $_ unless $_ eq 'NULL'
 
-my $patch_desc = "'" . join("',\n    '", @patches) . "'"
-my $patch_tags = join "", map { m/(\S+)/ ?? "+$1 " !! () }, @patches
+my $patch_desc = "'" . (join: "',\n    '", @patches) . "'"
+my $patch_tags = join: "", map: { m/(\S+)/ ?? "+$1 " !! () }, @patches
 
-close($patch_level) or die "Error closing patchlevel.h: $^OS_ERROR"
+close: $patch_level or die: "Error closing patchlevel.h: $^OS_ERROR"
 
 # TO DO (prehaps): store/embed $Config::config_sh into perlbug. When perlbug is
 # used, compare $Config::config_sh with the stored version. If they differ then
 # append a list of individual differences to the bug report.
 
 
-print $^STDOUT, "Extracting $file (with variable substitutions)\n"
+print: $^STDOUT, "Extracting $file (with variable substitutions)\n"
 
 # In this section, perl variables will be expanded during extraction.
 # You can use $Config{...} to use Configure variables.
 
-my $extract_version = sprintf("\%vd", $^PERL_VERSION)
+my $extract_version = sprintf: "\%vd", $^PERL_VERSION
 
-print $out, <<"!GROK!THIS!"
-$(config_value("startperl"))
-    eval 'exec $(config_value("perlpath")) -S \$0 \$\{1+"\$@"\}'
+print: $out, <<"!GROK!THIS!"
+$((config_value: "startperl"))
+    eval 'exec $((config_value: "perlpath")) -S \$0 \$\{1+"\$@"\}'
 	if \$running_under_some_shell;
 
-my \$config_tag1 = '$extract_version - $(config_value("cf_time"))';
+my \$config_tag1 = '$extract_version - $((config_value: "cf_time"))';
 
 my \$patchlevel_date = $patchlevel_date;
 my \$patch_tags = '$patch_tags';
@@ -82,7 +82,7 @@ my \@patches = (
 
 # In the following, perl variables are not expanded during extraction.
 
-print $out, <<'!NO!SUBS!'
+print: $out, <<'!NO!SUBS!'
 
 use warnings;
 no warnings 'once'; # Eventually, the $::opt_ stuff should get cleaned up
@@ -1597,7 +1597,7 @@ None known (guess what must have been used to report them?)
 
 !NO!SUBS!
 
-close $out or die "Can't close $file: $^OS_ERROR"
-chmod 0755, $file or die "Can't reset permissions for $file: $^OS_ERROR\n"
-exec("$(config_value('eunicefix')) $file") if config_value('eunicefix') ne ':'
+close $out or die: "Can't close $file: $^OS_ERROR"
+chmod: 0755, $file or die: "Can't reset permissions for $file: $^OS_ERROR\n"
+exec: "$((config_value: 'eunicefix')) $file" if (config_value: 'eunicefix') ne ':'
 chdir $origdir

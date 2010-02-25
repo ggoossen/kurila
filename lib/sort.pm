@@ -15,11 +15,11 @@ sub import
     shift
     if ((nelems @_) == 0)
         require Carp
-        Carp::croak("sort pragma requires arguments")
+        Carp::croak: "sort pragma requires arguments"
     
     local $_ = undef
     $^HINTS{+sort} //= 0
-    while ($_ = shift(@_))
+    while ($_ = (shift: @_))
         if (m/^_q(?:uick)?sort$/)
             $^HINTS{+sort} ^&^= ^~^$sort::sort_bits
             $^HINTS{+sort} ^|^=  $sort::quicksort_bit
@@ -31,7 +31,7 @@ sub import
         elsif ($_ eq 'defaults')
             $^HINTS{+sort} =   0
         else
-            die("sort: unknown subpragma '$_'")
+            die: "sort: unknown subpragma '$_'"
         
     
 
@@ -39,11 +39,11 @@ sub import
 sub unimport
     shift
     if ((nelems @_) == 0)
-        die("sort pragma requires arguments")
+        die: "sort pragma requires arguments"
     
     local $_ = undef
     no warnings 'uninitialized';	# bitops would warn
-    while ($_ = shift(@_))
+    while ($_ = (shift: @_))
         if (m/^_q(?:uick)?sort$/)
             $^HINTS{+sort} ^&^= ^~^$sort::sort_bits
         elsif ($_ eq '_mergesort')
@@ -51,7 +51,7 @@ sub unimport
         elsif ($_ eq 'stable')
             $^HINTS{+sort} ^&^= ^~^$sort::stable_bit
         else
-            die("sort: unknown subpragma '$_'")
+            die: "sort: unknown subpragma '$_'"
         
     
 
@@ -59,12 +59,12 @@ sub unimport
 sub current
     my @sort
     if ($^HINTS{?sort})
-        push @sort, 'quicksort' if $^HINTS{?sort} ^&^ $sort::quicksort_bit
-        push @sort, 'mergesort' if $^HINTS{?sort} ^&^ $sort::mergesort_bit
-        push @sort, 'stable'    if $^HINTS{?sort} ^&^ $sort::stable_bit
+        push: @sort, 'quicksort' if $^HINTS{?sort} ^&^ $sort::quicksort_bit
+        push: @sort, 'mergesort' if $^HINTS{?sort} ^&^ $sort::mergesort_bit
+        push: @sort, 'stable'    if $^HINTS{?sort} ^&^ $sort::stable_bit
     
-    push @sort, 'mergesort' unless (nelems @sort)
-    join(' ', @sort)
+    push: @sort, 'mergesort' unless (nelems @sort)
+    join: ' ', @sort
 
 
 1

@@ -44,45 +44,45 @@ otherwise.
 ##--------------------------------------------------------------------------
 
 sub testcmp
-    my %opts = %:  ref(@_[0]) eq 'HASH' ?? < shift()->% !! () 
+    my %opts = %:  (ref: @_[0]) eq 'HASH' ?? < (shift: )->% !! () 
     my (@: $file1, $file2) =  @_
     my (@: $fh1, $fh2) = @: $file1, $file2
     unless (ref $fh1)
-        $fh1 = IO::File->new($file1, "r") or die "Can't open $file1: $^OS_ERROR"
+        $fh1 = (IO::File->new: $file1, "r") or die: "Can't open $file1: $^OS_ERROR"
     
     unless (ref $fh2)
-        $fh2 = IO::File->new($file2, "r") or die "Can't open $file2: $^OS_ERROR"
+        $fh2 = (IO::File->new: $file2, "r") or die: "Can't open $file2: $^OS_ERROR"
     
 
     my $cmplines = %opts{?'cmplines'} || undef
     my (@: $f1text, $f2text) = @: "", ""
     my (@: $line, $diffs)    = @: 0, 0
 
-    while ( defined($f1text) and defined($f2text) )
-        defined($f1text = ~< $fh1)  and  chomp($f1text)
-        defined($f2text = ~< $fh2)  and  chomp($f2text)
+    while ( defined: $f1text and defined: $f2text )
+        defined: ($f1text = ~< $fh1)  and  chomp: $f1text
+        defined: ($f2text = ~< $fh2)  and  chomp: $f2text
         ++$line
-        last unless ( defined($f1text) and defined($f2text) )
+        last unless ( defined: $f1text and defined: $f2text )
         # kill any extra line endings
         $f1text =~ s/[\r\n]+$//s
         $f2text =~ s/[\r\n]+$//s
-        $diffs = (ref $cmplines) ?? $cmplines->($f1text, $f2text)
+        $diffs = (ref $cmplines) ?? $cmplines->& <: $f1text, $f2text
             !! ($f1text ne $f2text)
         last if $diffs
     
-    close($fh1) unless (ref $file1)
-    close($fh2) unless (ref $file2)
+    close: $fh1 unless (ref $file1)
+    close: $fh2 unless (ref $file2)
 
-    $diffs = 1  if (defined($f1text) or defined($f2text))
-    if ( defined($f1text) and defined($f2text) )
+    $diffs = 1  if (defined: $f1text or defined: $f2text)
+    if ( defined: $f1text and defined: $f2text )
         ## these two lines must be different
-        warn "$file1 and $file2 differ at line $line\n"
-    elsif (defined($f1text)  and  (! defined($f1text)))
+        warn: "$file1 and $file2 differ at line $line\n"
+    elsif (defined: $f1text  and  (! (defined: $f1text)))
         ## file1 must be shorter
-        warn "$file1 is shorter than $file2\n"
+        warn: "$file1 is shorter than $file2\n"
     elsif (defined $f2text)
         ## file2 must be longer
-        warn "$file1 is shorter than $file2\n"
+        warn: "$file1 is shorter than $file2\n"
     
     return $diffs
 

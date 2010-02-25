@@ -92,8 +92,8 @@ output the string to $FH if specified.
 # in $Term::Cap::VMS_TERMCAP before Tgetent is called.
 
 if ( $^OS_NAME eq 'VMS' )
-    chomp( my @entry = (@:  ~< $^DATA ) )
-    $VMS_TERMCAP = join '', @entry
+    chomp: ( my @entry = (@:  ~< $^DATA )) 
+    $VMS_TERMCAP = join: '', @entry
 
 
 # Returns a list of termcap files to check.
@@ -102,29 +102,29 @@ sub termcap_path    ## private
     my @termcap_path
 
     # $TERMCAP, if it's a filespec
-    push( @termcap_path, env::var('TERMCAP') )
+    push:  @termcap_path, (env::var: 'TERMCAP') 
         if (
-          ( defined env::var('TERMCAP') )
+          ( defined (env::var: 'TERMCAP') )
         && (
             ( $^OS_NAME eq 'os2' || $^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'dos' )
-            ?? env::var('TERMCAP') =~ m/^[a-z]:[\\\/]/is
-            !! env::var('TERMCAP') =~ m/^\//s
+            ?? (env::var: 'TERMCAP') =~ m/^[a-z]:[\\\/]/is
+            !! (env::var: 'TERMCAP') =~ m/^\//s
             )
         )
-    if ( env::var('TERMPATH') )
+    if ( (env::var: 'TERMPATH') )
 
         # Add the users $TERMPATH
-        push( @termcap_path, < split( m/(:|\s+)/, env::var('TERMPATH') ) )
+        push:  @termcap_path, < (split:  m/(:|\s+)/, (env::var: 'TERMPATH') ) 
     else
 
         # Defaults
-        push( @termcap_path,
-            defined env::var('HOME') ?? env::var('HOME') . '/.termcap' !! undef,
-            '/etc/termcap', '/usr/share/misc/termcap', )
+        push:  @termcap_path
+               defined (env::var: 'HOME') ?? (env::var: 'HOME') . '/.termcap' !! undef
+               '/etc/termcap', '/usr/share/misc/termcap', 
     
 
     # return the list of those termcaps that exist
-    return grep { defined $_ && -f $_ }, @termcap_path
+    return grep: { defined $_ && -f $_ }, @termcap_path
 
 
 =item B<Tgetent>
@@ -184,7 +184,7 @@ It calls C<die> on failure.
 sub Tgetent($class, $self)    ## public -- static method
 
     $self = \(%: ) unless defined $self
-    bless $self, $class
+    bless: $self, $class
 
     my ( $term, $cap, $search, $max, $tmp_term, $TERMCAP )
     local ( $termpat, $state, $first, $entry )    # used inside eval
@@ -193,14 +193,14 @@ sub Tgetent($class, $self)    ## public -- static method
     # Compute PADDING factor from OSPEED (to be used by Tpad)
     if ( !$self->{?OSPEED} )
         if ($^WARNING)
-            warn "OSPEED was not set, defaulting to 9600"
+            warn: "OSPEED was not set, defaulting to 9600"
         
         $self->{+OSPEED} = 9600
     
     if ( $self->{?OSPEED} +< 16 )
 
         # delays for old style speeds
-        my @pad = @: 
+        my @pad = @:
             0,    200, 133.3, 90.9, 74.3, 66.7, 50, 33.3
             16.7, 8.3, 5.5,   4.1,  2,    1,    .5, .2
             
@@ -210,13 +210,13 @@ sub Tgetent($class, $self)    ## public -- static method
     
 
     unless ( $self->{?TERM} )
-        if ( env::var('TERM') )
-            $self->{+TERM} =  env::var('TERM') 
+        if ( (env::var: 'TERM') )
+            $self->{+TERM} =  env::var: 'TERM' 
         else
             if ( $^OS_NAME eq 'Win32' )
                 $self->{+TERM} =  'dumb'
             else
-                die "TERM not set"
+                die: "TERM not set"
             
         
     
@@ -230,24 +230,24 @@ sub Tgetent($class, $self)    ## public -- static method
     $termpat = $tmp_term
     $termpat =~ s/(\W)/\\$1/g
 
-    my $foo = env::var('TERMCAP') // '' 
+    my $foo = (env::var: 'TERMCAP') // '' 
 
     # $entry is the extracted termcap entry
     if ( ( $foo !~ m:^/:s ) && ( $foo =~ m/(^|\|)$termpat(?:)[:|]/s ) )
         $entry = $foo
     
 
-    my @termcap_path = @:  termcap_path() 
+    my @termcap_path = @:  (termcap_path: ) 
 
     unless ( (nelems @termcap_path) || $entry )
 
         # last resort--fake up a termcap from terminfo
-        local env::var('TERM' ) = $term
+        local (env::var: 'TERM' ) = $term
 
         if ( $^OS_NAME eq 'VMS' )
             $entry = $VMS_TERMCAP
         else
-            if ( grep { -x "$_/infocmp" }, split m/:/, env::var('PATH') )
+            if ( (grep: { -x "$_/infocmp" }, (split: m/:/, (env::var: 'PATH'))) )
                 try {
                     my $tmp = `infocmp -C 2>/dev/null`;
                     $tmp =~ s/^#.*\n//gm;    # remove comments
@@ -265,7 +265,7 @@ sub Tgetent($class, $self)    ## public -- static method
         
     
 
-    die "Can't find a valid termcap file" unless (nelems @termcap_path) || $entry
+    die: "Can't find a valid termcap file" unless (nelems @termcap_path) || $entry
 
     $state = 1    # 0 == finished
     # 1 == next file
@@ -315,18 +315,18 @@ sub Tgetent($class, $self)    ## public -- static method
 
             # get the next TERMCAP
             $TERMCAP = shift @termcap_path
-                || die "failed termcap lookup on $tmp_term"
+                || die: "failed termcap lookup on $tmp_term"
         else
 
             # do the same file again
             # prevent endless recursion
-            $max-- || die "failed termcap loop at $tmp_term"
+            $max-- || die: "failed termcap loop at $tmp_term"
             $state = 1    # ok, maybe do a new file next time
         
 
-        open( my $termcap_fh, "<", "$TERMCAP\0" ) || die "open $TERMCAP: $^OS_ERROR"
+        (open:  my $termcap_fh, "<", "$TERMCAP\0" ) || die: "open $TERMCAP: $^OS_ERROR"
         eval $search
-        die $^EVAL_ERROR if $^EVAL_ERROR
+        die: $^EVAL_ERROR if $^EVAL_ERROR
         close $termcap_fh
 
         # If :tc=...: found then search this file again
@@ -337,7 +337,7 @@ sub Tgetent($class, $self)    ## public -- static method
         $termpat =~ s/(\W)/\\$1/g
     
 
-    die "Can't find $term" if $entry eq ''
+    die: "Can't find $term" if $entry eq ''
     $entry =~ s/:+\s*:+/:/g    # cleanup $entry
     $entry =~ s/:+/:/g         # cleanup $entry
     $self->{+TERMCAP} = $entry  # save it
@@ -345,7 +345,7 @@ sub Tgetent($class, $self)    ## public -- static method
 
     # Precompile $entry into the object
     $entry =~ s/^[^:]*://
-    foreach my $field ( split( m/:[\s:\\]*/, $entry ) )
+    foreach my $field ( (split:  m/:[\s:\\]*/, $entry ) )
         if ( defined $field && $field =~ m/^(\w\w)$/ )
             $self->{+'_' . $field } = 1 unless defined $self->{?'_' . $1 }
 
@@ -364,7 +364,7 @@ sub Tgetent($class, $self)    ## public -- static method
             next if defined $self->{?'_' . ( $cap = $1 ) }
             $_ = $2
             s/\\E/\033/g
-            s/\\(\d\d\d)/$(pack('c',oct($1) ^&^ 0177))/g
+            s/\\(\d\d\d)/$((pack: 'c',(oct: $1) ^&^ 0177))/g
             s/\\n/\n/g
             s/\\r/\r/g
             s/\\t/\t/g
@@ -372,7 +372,7 @@ sub Tgetent($class, $self)    ## public -- static method
             s/\\f/\f/g
             s/\\\^/\377/g
             s/\^\?/\177/g
-            s/\^(.)/$(pack('c',ord($1) ^&^ 31))/g
+            s/\^(.)/$((pack: 'c',(ord: $1) ^&^ 31))/g
             s/\\(.)/$1/g
             s/\377/^/g
             $self->{+'_' . $cap } = $_
@@ -429,7 +429,7 @@ sub Tpad( $self, $string, $cnt, ?$FH)    ## public
             $string .= $self->{?'_pc'} x ( $ms / $decr )
         
     
-    print $FH, $string if $FH
+    print: $FH, $string if $FH
     $string
 
 
@@ -469,16 +469,16 @@ sub Tputs( $self, $cap, $cnt, $FH)    ## public
     $cnt = 0 unless $cnt
 
     if ($cnt +> 1)
-        $string = Tpad($self, $self->{?'_' . $cap}, $cnt)
+        $string = Tpad: $self, $self->{?'_' . $cap}, $cnt
     else
         # cache result because Tpad can be slow
         unless (exists $self->{$cap})
             $self->{+$cap} = exists $self->{"_$cap"} ??
-                Tpad($self, $self->{?"_$cap"}, 1) !! undef
+                (Tpad: $self, $self->{?"_$cap"}, 1) !! undef
         
         $string = $self->{?$cap}
     
-    print $FH, $string if $FH
+    print: $FH, $string if $FH
     $string
 
 
@@ -548,9 +548,9 @@ sub Tgoto( $self, $cap, $code, $tmp, $FH)    ## public
         $code = $2
         $string = $3
         if ($code eq 'd')
-            $result .= sprintf("\%d",shift(@tmp))
+            $result .= sprintf: "\%d",(shift: @tmp)
         elsif ($code eq '.')
-            $tmp = shift(@tmp)
+            $tmp = shift: @tmp
             if ($tmp == 0 || $tmp == 4 || $tmp == 10)
                 if ($online)
                     ++$tmp, ($after .= $self->{?'_up'}) if $self->{?'_up'}
@@ -558,26 +558,26 @@ sub Tgoto( $self, $cap, $code, $tmp, $FH)    ## public
                     ++$tmp, ($after .= $self->{?'_bc'})
                 
             
-            $result .= sprintf("\%c",$tmp)
+            $result .= sprintf: "\%c",$tmp
             $online = !$online
         elsif ($code eq '+')
-            $result .= sprintf("\%c",shift(@tmp)+ord($string))
-            $string = substr($string,1,99)
+            $result .= sprintf: "\%c",(shift: @tmp)+(ord: $string)
+            $string = substr: $string,1,99
             $online = !$online
         elsif ($code eq 'r')
             (@: $code,$tmp) =  @tmp
             @tmp = @: $tmp,$code
             $online = !$online
         elsif ($code eq '>')
-            (@: $code,$tmp,$string) = unpack@: "CCa99",$string
+            (@: $code,$tmp,$string) = unpack: @: "CCa99",$string
             if (@tmp[0] +> $code)
                 @tmp[0] += $tmp
             
         elsif ($code eq '2')
-            $result .= sprintf("\%02d",shift(@tmp))
+            $result .= sprintf: "\%02d",(shift: @tmp)
             $online = !$online
         elsif ($code eq '3')
-            $result .= sprintf("\%03d",shift(@tmp))
+            $result .= sprintf: "\%03d",(shift: @tmp)
             $online = !$online
         elsif ($code eq 'i')
             (@: $code,$tmp) =  @tmp
@@ -586,8 +586,8 @@ sub Tgoto( $self, $cap, $code, $tmp, $FH)    ## public
             return "OOPS"
         
     
-    $string = Tpad( $self, $result . $string . $after, $cnt )
-    print $FH, $string if $FH
+    $string = Tpad:  $self, $result . $string . $after, $cnt 
+    print: $FH, $string if $FH
     $string
 
 
@@ -604,10 +604,10 @@ sub Trequire    ## public
     my $self = shift
     my ( @undefined )
     foreach my $cap ( @_)
-        push( @undefined, $cap )
+        push:  @undefined, $cap 
             unless defined $self->{?'_' . $cap } && $self->{?'_' . $cap }
     
-    die "Terminal does not support: ($(join ' ',@undefined))" if (nelems @undefined)
+    die: "Terminal does not support: ($((join: ' ',@undefined)))" if (nelems @undefined)
 
 
 =back

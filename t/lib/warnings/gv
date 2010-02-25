@@ -9,7 +9,7 @@
 __END__
 # gv.c
 no warnings 'syntax' ;
-our @ISA = qw(Fred); joe()
+our @ISA = qw(Fred); joe:
 EXPECT
 Undefined subroutine &joe called at - line 3 character 22.
 ########

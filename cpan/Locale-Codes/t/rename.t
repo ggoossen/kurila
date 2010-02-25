@@ -5,7 +5,7 @@
 
 use Locale::Country
 
-Locale::Country::rename_country('gb' => 'Great Britain')
+Locale::Country::rename_country: 'gb' => 'Great Britain'
 
 #-----------------------------------------------------------------------
 # This is an array of tests. Each test is eval'd as an expression.
@@ -13,7 +13,7 @@ Locale::Country::rename_country('gb' => 'Great Britain')
 # otherwise "ok N".
 #-----------------------------------------------------------------------
 our @TESTS =
-    @: 
+    @:
     #================================================
     # TESTS FOR code2country
     #================================================
@@ -66,12 +66,12 @@ our @TESTS =
 
 use Test::More
 
-plan tests => (nelems @TESTS)
+plan: tests => (nelems @TESTS)
 
 foreach my $test ( @TESTS)
     my $ok = eval "$test"
-    die if $^EVAL_ERROR
-    ok $ok
+    die: if $^EVAL_ERROR
+    ok: $ok
 
 
 exit 0

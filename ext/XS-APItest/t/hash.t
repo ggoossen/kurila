@@ -3,10 +3,9 @@
 use TestInit;
 use Config;
 
-BEGIN {
-    print $^STDOUT, "1..0 # TODO Skip: Fix for kurila\n";
-    exit 0;
-}
+BEGIN
+    print: $^STDOUT, "1..0 # TODO Skip: Fix for kurila\n"
+    exit 0
 
 use utf8;
 use Tie::Hash;

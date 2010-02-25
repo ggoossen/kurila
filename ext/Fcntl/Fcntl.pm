@@ -190,7 +190,7 @@ BEGIN
 	&S_ISWHT &S_ISENFMT &S_IFMT &S_IMODE
 )
 # Named groups of exports
-%EXPORT_TAGS = %: 
+%EXPORT_TAGS = %:
     'flock'   => qw(LOCK_SH LOCK_EX LOCK_NB LOCK_UN)
     'Fcompat' => qw(FAPPEND FASYNC FCREAT FDEFER FDSYNC FEXCL FLARGEFILE
 		     FNDELAY FNONBLOCK FRSYNC FSYNC FTRUNC)
@@ -210,20 +210,20 @@ BEGIN
 
 # Force the constants to become inlined
 BEGIN 
-    XSLoader::load 'Fcntl', $VERSION
+    XSLoader::load:  'Fcntl', $VERSION
 
 
-sub S_IFMT  { (nelems @_) ??  (@:  @_[0] ^&^ _S_IFMT() ) !! _S_IFMT()  }
+sub S_IFMT  { (nelems @_) ??  (@:  @_[0] ^&^ (_S_IFMT: ) ) !! (_S_IFMT: )  }
 sub S_IMODE { @_[0] ^&^ 07777 }
 
-sub S_ISREG    { ( @_[0] ^&^ _S_IFMT() ) == S_IFREG()   }
-sub S_ISDIR    { ( @_[0] ^&^ _S_IFMT() ) == S_IFDIR()   }
-sub S_ISLNK    { ( @_[0] ^&^ _S_IFMT() ) == S_IFLNK()   }
-sub S_ISSOCK   { ( @_[0] ^&^ _S_IFMT() ) == S_IFSOCK()  }
-sub S_ISBLK    { ( @_[0] ^&^ _S_IFMT() ) == S_IFBLK()   }
-sub S_ISCHR    { ( @_[0] ^&^ _S_IFMT() ) == S_IFCHR()   }
-sub S_ISFIFO   { ( @_[0] ^&^ _S_IFMT() ) == S_IFIFO()   }
-sub S_ISWHT    { ( @_[0] ^&^ _S_IFMT() ) == S_IFWHT()   }
-sub S_ISENFMT  { ( @_[0] ^&^ _S_IFMT() ) == S_IFENFMT() }
+sub S_ISREG    { ( @_[0] ^&^ (_S_IFMT: ) ) == (S_IFREG: )   }
+sub S_ISDIR    { ( @_[0] ^&^ (_S_IFMT: ) ) == (S_IFDIR: )   }
+sub S_ISLNK    { ( @_[0] ^&^ (_S_IFMT: ) ) == (S_IFLNK: )   }
+sub S_ISSOCK   { ( @_[0] ^&^ (_S_IFMT: ) ) == (S_IFSOCK: )  }
+sub S_ISBLK    { ( @_[0] ^&^ (_S_IFMT: ) ) == (S_IFBLK: )   }
+sub S_ISCHR    { ( @_[0] ^&^ (_S_IFMT: ) ) == (S_IFCHR: )   }
+sub S_ISFIFO   { ( @_[0] ^&^ (_S_IFMT: ) ) == (S_IFIFO: )   }
+sub S_ISWHT    { ( @_[0] ^&^ (_S_IFMT: ) ) == (S_IFWHT: )   }
+sub S_ISENFMT  { ( @_[0] ^&^ (_S_IFMT: ) ) == (S_IFENFMT: ) }
 
 1

@@ -14,7 +14,7 @@ sub output_extension   { 'txt' }  # override in subclass!
 #sub new { return bless {}, ref($_[0]) || $_[0] }
 
 sub _perldoc_elem
-    my(@: $self, $name) =@:  splice @_,0,2
+    my(@: $self, $name) =@:  splice: @_,0,2
     if((nelems @_))
         $self->{+$name} = @_[0]
     else

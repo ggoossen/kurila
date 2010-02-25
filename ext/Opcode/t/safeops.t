@@ -2,9 +2,9 @@
 # Tests that all ops can be trapped by a Safe compartment
 
 BEGIN 
-    if (not env::var('PERL_CORE'))
+    if (not (env::var: 'PERL_CORE'))
         # this won't work outside of the core, so exit
-        print $^STDOUT, "1..0\n"; exit 0
+        (print: $^STDOUT, "1..0\n"); exit 0
     
 
 use Config
@@ -18,38 +18,38 @@ my %code
 
 while ( ~< $^DATA)
     chomp
-    die "Can't match $_" unless m/^([a-z_0-9]+)\t+(.*)/
+    die: "Can't match $_" unless m/^([a-z_0-9]+)\t+(.*)/
     %code{+$1} = $2
 
 
-open my $fh, '<', '../../opcode.pl' or die "Can't open opcode.pl: $^OS_ERROR"
+open: my $fh, '<', '../../opcode.pl' or die: "Can't open opcode.pl: $^OS_ERROR"
 while ( ~< $fh)
     last if m/^__END__/
 
 while ( ~< $fh)
     chomp
     next if !$_ or m/^#/
-    my (@: $op, $opname, ...) =  split m/\t+/
-    push @op, \@: $op, $opname, %code{?$op}
+    my (@: $op, $opname, ...) =  split: m/\t+/
+    push: @op, \@: $op, $opname, %code{?$op}
 
 close $fh
 
-plan(tests => nelems(@op))
+plan: tests => (nelems: @op)
 
 sub testop($op, $opname, $code)
-    pass("$op : skipped") and return if $code =~ m/^SKIP/
-    my $c = Safe->new()
-    $c->deny_only($op)
-    $c->reval($code)
-    like($^EVAL_ERROR->message, qr/'\Q$opname\E' trapped by operation mask/, $op)
+    pass: "$op : skipped" and return if $code =~ m/^SKIP/
+    my $c = Safe->new: 
+    $c->deny_only: $op
+    $c->reval: $code
+    like: ($^EVAL_ERROR->message: ), qr/'\Q$opname\E' trapped by operation mask/, $op
 
 
 foreach (@op)
     if ($_->[2])
-        testop < $_->@
+        testop: < $_->@
     else
         local $TODO = "No test yet for $_->[1]"
-        fail()
+        (fail: )
     
 
 
@@ -61,7 +61,7 @@ __DATA__
 null		SKIP
 stub		SKIP
 scalar		scalar $x
-pushmark	print @x
+pushmark	print: @x
 const		42
 gvsv		SKIP (set by optimizer) $x
 gv		SKIP *x
@@ -79,7 +79,7 @@ prototype	prototype 'foo'
 refgen		\($x,$y)
 srefgen		SKIP \$x
 ref		ref
-bless		bless
+bless		bless:
 backtick	qx/ls/
 readline	~< *FH
 rcatline	SKIP (set by optimizer) $x .= ~< *F
@@ -98,7 +98,7 @@ schomp		chomp
 defined		defined
 undef		undef
 study		study
-pos		pos
+pos		pos:
 preinc		++$i
 i_preinc	SKIP (set by optimizer)
 predec		--$i
@@ -151,27 +151,27 @@ negate		-$x
 i_negate	SKIP (set by optimizer)
 not		!$x
 complement	^~^$x
-atan2		atan2 1
-sin		sin 1
-cos		cos 1
-rand		rand
-srand		srand
-exp		exp 1
-log		log 1
-sqrt		sqrt 1
+atan2		atan2: 1
+sin		sin: 1
+cos		cos: 1
+rand		rand:
+srand		srand:
+exp		exp: 1
+log		log: 1
+sqrt		sqrt: 1
 int		int
 hex		hex
 oct		oct
 abs		abs
 length		length
-substr		substr $x, 1
-vec		vec
-index		index
-rindex		rindex
-sprintf		sprintf '%s', 'foo'
+substr		substr: $x, 1
+vec		vec:
+index		index:
+rindex		rindex:
+sprintf		sprintf: '%s', 'foo'
 ord		ord
 chr		chr
-crypt		crypt 'foo','bar'
+crypt		crypt: 'foo','bar'
 ucfirst		ucfirst
 lcfirst		lcfirst
 uc		uc
@@ -189,24 +189,24 @@ exists		exists %h{Key}
 rv2hv		%h
 helem		%h{kEy}
 hslice		%h{[kEy]}
-unpack		unpack
-pack		pack
-split		split m/foo/
-join		join $a, @b
+unpack		unpack:
+pack		pack:
+split		split: m/foo/
+join		join: $a, @b
 list		@x = (1,2)
 lslice		SKIP @x[[1,2]]
 anonarray	\@: 1,2
 anonhash	\%: a => 1
-splice		splice @x, 1, 2, 3
-push		push @x, $x
-pop		pop @x
-shift		shift @x
-unshift		unshift @x
-sort		sort @x
-reverse		reverse @x
-grepstart	grep { $_ eq 'foo' } @x
+splice		splice: @x, 1, 2, 3
+push		push: @x, $x
+pop		pop: @x
+shift		shift: @x
+unshift		unshift: @x
+sort		sort: @x
+reverse		reverse: @x
+grepstart	grep: { $_ eq 'foo' }, @x
 grepwhile	SKIP grep { $_ eq 'foo' } @x
-mapstart	map $_ + 1, @foo
+mapstart	map: { $_ + 1 }, @foo
 mapwhile	SKIP (set by optimizer)
 range		SKIP
 flip		1..2
@@ -218,11 +218,11 @@ cond_expr	$x ?? 1 !! 0
 andassign	$x &&= $y
 orassign	$x ||= $y
 method		Foo->?$x()
-entersub	f()
-leavesub	sub f{} f()
+entersub	(f: )
+leavesub	sub f{} (f: )
 caller		caller
-warn		warn
-die		die
+warn		warn:
+die		die:
 reset		reset
 lineseq		SKIP
 nextstate	SKIP
@@ -241,47 +241,47 @@ next		next
 redo		redo THIS
 dump		dump
 exit		exit 0
-open		open FOO
+open		open: FOO
 close		close FOO
-pipe_op		pipe FOO,BAR
+pipe_op		pipe: FOO,BAR
 fileno		fileno FOO
-umask		umask 0755, 'foo'
-binmode		binmode FOO
+umask		umask: 0755, 'foo'
+binmode		binmode: FOO
 tied		tied
 sselect		SKIP (set by optimizer)
-select		select FOO
-getc		getc FOO
-read		read FOO
+select		select: FOO
+getc		getc: FOO
+read		read: FOO
 enterwrite	write
 leavewrite	SKIP
-prtf		printf
-print		print
-sysopen		sysopen
-sysseek		sysseek
-sysread		sysread
-syswrite	syswrite
-send		send
-recv		recv
+prtf		printf:
+print		print:
+sysopen		sysopen:
+sysseek		sysseek:
+sysread		sysread:
+syswrite	syswrite:
+send		send:
+recv		recv:
 eof		eof FOO
 tell		tell
-seek		seek FH, $pos, $whence
-truncate	truncate FOO, 42
-fcntl		fcntl
-ioctl		ioctl
-flock		flock FOO, 1
-socket		socket
-sockpair	socketpair
-bind		bind
-connect		connect
-listen		listen
-accept		accept
-shutdown	shutdown
-gsockopt	getsockopt
-ssockopt	setsockopt
-getsockname	getsockname
-getpeername	getpeername
-lstat		lstat FOO
-stat		stat FOO
+seek		seek: FH, $pos, $whence
+truncate	truncate: FOO, 42
+fcntl		fcntl:
+ioctl		ioctl:
+flock		flock: FOO, 1
+socket		socket:
+sockpair	socketpair:
+bind		bind:
+connect		connect:
+listen		listen:
+accept		accept:
+shutdown	shutdown:
+gsockopt	getsockopt:
+ssockopt	setsockopt:
+getsockname	getsockname:
+getpeername	getpeername:
+lstat		lstat: FOO
+stat		stat: FOO
 ftrread		-R
 ftrwrite	-W
 ftrexec		-X
@@ -310,93 +310,93 @@ fttty		-t
 fttext		-T
 ftbinary	-B
 chdir		chdir '/'
-chown		chown
-chroot		chroot
-unlink		unlink 'foo'
-chmod		chmod 511, 'foo'
-utime		utime
-rename		rename 'foo', 'bar'
-link		link 'foo', 'bar'
-symlink		symlink 'foo', 'bar'
-readlink	readlink 'foo'
-mkdir		mkdir 'foo'
-rmdir		rmdir 'foo'
-open_dir	opendir DIR
-readdir		readdir DIR
-telldir		telldir DIR
-seekdir		seekdir DIR, $pos
-rewinddir	rewinddir DIR
-closedir	closedir DIR
-fork		fork
-wait		wait
-waitpid		waitpid
-system		system
-exec		exec
-kill		kill
-getppid		getppid
-getpgrp		getpgrp
-setpgrp		setpgrp
-getpriority	getpriority
-setpriority	setpriority
-time		time
-tms		times
-localtime	localtime
-gmtime		gmtime
-alarm		alarm
+chown		chown:
+chroot		chroot:
+unlink		unlink: 'foo'
+chmod		chmod: 511, 'foo'
+utime		utime:
+rename		rename: 'foo', 'bar'
+link		link: 'foo', 'bar'
+symlink		symlink: 'foo', 'bar'
+readlink	readlink: 'foo'
+mkdir		mkdir: 'foo'
+rmdir		rmdir: 'foo'
+open_dir	opendir: DIR
+readdir		readdir: DIR
+telldir		telldir: DIR
+seekdir		seekdir: DIR, $pos
+rewinddir	rewinddir: DIR
+closedir	closedir: DIR
+fork		fork:
+wait		wait:
+waitpid		waitpid:
+system		system:
+exec		exec:
+kill		kill:
+getppid		getppid:
+getpgrp		getpgrp:
+setpgrp		setpgrp:
+getpriority	getpriority:
+setpriority	setpriority:
+time		time:
+tms		times:
+localtime	localtime:
+gmtime		gmtime:
+alarm		alarm:
 sleep		sleep 1
-shmget		shmget
-shmctl		shmctl
-shmread		shmread
-shmwrite	shmwrite
-msgget		msgget
-msgctl		msgctl
-msgsnd		msgsnd
-msgrcv		msgrcv
-semget		semget
-semctl		semctl
-semop		semop
+shmget		shmget:
+shmctl		shmctl:
+shmread		shmread:
+shmwrite	shmwrite:
+msgget		msgget:
+msgctl		msgctl:
+msgsnd		msgsnd:
+msgrcv		msgrcv:
+semget		semget:
+semctl		semctl:
+semop		semop:
 require		use error
 dofile		do 'file'
 entereval	eval "1+1"
 leaveeval	eval "1+1"
 entertry	SKIP try { 1+1 }
 leavetry	SKIP try { 1+1 }
-ghbyname	gethostbyname 'foo'
-ghbyaddr	gethostbyaddr 'foo'
-ghostent	gethostent
-gnbyname	getnetbyname 'foo'
-gnbyaddr	getnetbyaddr 'foo'
-gnetent		getnetent
-gpbyname	getprotobyname 'foo'
-gpbynumber	getprotobynumber 42
-gprotoent	getprotoent
-gsbyname	getservbyname 'name', 'proto'
-gsbyport	getservbyport 'a', 'b'
-gservent	getservent
-shostent	sethostent
-snetent		setnetent
-sprotoent	setprotoent
-sservent	setservent
-ehostent	endhostent
-enetent		endnetent
-eprotoent	endprotoent
-eservent	endservent
-gpwnam		getpwnam
-gpwuid		getpwuid
-gpwent		getpwent
-spwent		setpwent
-epwent		endpwent
-ggrnam		getgrnam
-ggrgid		getgrgid
-ggrent		getgrent
-sgrent		setgrent
-egrent		endgrent
-getlogin	getlogin
-syscall		syscall
+ghbyname	gethostbyname: 'foo'
+ghbyaddr	gethostbyaddr: 'foo'
+ghostent	gethostent:
+gnbyname	getnetbyname: 'foo'
+gnbyaddr	getnetbyaddr: 'foo'
+gnetent		getnetent:
+gpbyname	getprotobyname: 'foo'
+gpbynumber	getprotobynumber: 42
+gprotoent	getprotoent:
+gsbyname	getservbyname: 'name', 'proto'
+gsbyport	getservbyport: 'a', 'b'
+gservent	getservent:
+shostent	sethostent:
+snetent		setnetent:
+sprotoent	setprotoent:
+sservent	setservent:
+ehostent	endhostent:
+enetent		endnetent:
+eprotoent	endprotoent:
+eservent	endservent:
+gpwnam		getpwnam:
+gpwuid		getpwuid:
+gpwent		getpwent:
+spwent		setpwent:
+epwent		endpwent:
+ggrnam		getgrnam:
+ggrgid		getgrgid:
+ggrent		getgrent:
+sgrent		setgrent:
+egrent		endgrent:
+getlogin	getlogin:
+syscall		syscall:
 lock		SKIP
 threadsv	SKIP
 setstate	SKIP
-method_named	$x->y()
+method_named	$x->y:
 dor		$x // $y
 dorassign	$x //= $y
 once		SKIP {use feature 'state'; state $foo = 42;}

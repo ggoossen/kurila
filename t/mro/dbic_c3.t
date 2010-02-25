@@ -3,7 +3,7 @@
 
 use warnings
 
-require q(./test.pl); plan(tests => 1)
+require q(./test.pl); plan: tests => 1
 
 =pod
 
@@ -100,9 +100,9 @@ do
     use mro 'c3'
 
 
-ok(eq_array(
-    mro::get_linear_isa('xx::DBIx::Class::Core'),
-    \qw/
+ok: (eq_array: 
+        (mro::get_linear_isa: 'xx::DBIx::Class::Core')
+        \qw/
         xx::DBIx::Class::Core
         xx::DBIx::Class::Serialize::Storable
         xx::DBIx::Class::InflateColumn
@@ -126,4 +126,4 @@ ok(eq_array(
         xx::DBIx::Class::Componentised
         xx::Class::Data::Accessor
     /
-    ), '... got the right C3 merge order for xx::DBIx::Class::Core')
+        ), '... got the right C3 merge order for xx::DBIx::Class::Core'

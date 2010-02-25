@@ -70,7 +70,7 @@ PERLILIB = $(PERL) -I../lib
 REALPERL = ../perl
 
 # From MakeMaker.
-FIXIN = "-I../lib" "-MExtUtils::MY" -e "MY->fixin(shift @ARGV)"
+FIXIN = "-I../lib" "-MExtUtils::MY" -e "MY->fixin: shift @ARGV"
 
 all: $(CONVERTERS) man
 

@@ -8,12 +8,12 @@ $VERSION = '1.15'
 #=======================================================================
 
 # Some names are evil choices.
-my %keywords = %:  < @+: map { (@: $_, 1) }, qw{ BEGIN INIT CHECK UNITCHECK END DESTROY } 
+my %keywords = %+: map: { %: $_, 1 }, qw{ BEGIN INIT CHECK UNITCHECK END DESTROY }
 
-my %forced_into_main = %:< @+: map { (@: $_, 1) }
-                         qw{ STDIN STDOUT STDERR ARGV ARGVOUT ENV INC SIG }
+my %forced_into_main = %+: map: { %: $_, 1 }
+                                qw{ STDIN STDOUT STDERR ARGV ARGVOUT ENV INC SIG }
 
-my %forbidden = %: < %keywords, < %forced_into_main
+my %forbidden = %keywords +%+ %forced_into_main
 
 #=======================================================================
 # import() - import symbols into user's namespace
@@ -32,16 +32,16 @@ sub import
 
     if ( $multiple )
         if (ref @_[0] ne 'HASH')
-            die("Invalid reference type '".ref(shift)."' not 'HASH'")
+            die: "Invalid reference type '".(ref: shift)."' not 'HASH'"
         
         $constants = (shift @_)->%
     else
-        $constants{+shift(@_)} = undef
+        $constants{+(shift: @_)} = undef
     
 
     foreach my $name ( keys $constants )
         unless (defined $name)
-            die("Can't use undef as constant name")
+            die: "Can't use undef as constant name"
         
 
         # Normal constant name
@@ -50,21 +50,21 @@ sub import
 
         # Name forced into main, but we're not in main. Fatal.
         }elsif (%forced_into_main{?$name} and $pkg ne 'main')
-            die("Constant name '$name' is forced into main::")
+            die: "Constant name '$name' is forced into main::"
 
         # Starts with double underscore. Fatal.
         elsif ($name =~ m/^__/)
-            die("Constant name '$name' begins with '__'")
+            die: "Constant name '$name' begins with '__'"
 
         # Maybe the name is tolerable
         elsif ($name =~ m/^[A-Za-z_]\w*\z/)
             # Then we'll warn only if you've asked for warnings
-            if (warnings::enabled())
+            if ((warnings::enabled: ))
                 if (%keywords{?$name})
-                    warnings::warn("Constant name '$name' is a Perl keyword")
+                    warnings::warn: "Constant name '$name' is a Perl keyword"
                 elsif (%forced_into_main{?$name})
-                    warnings::warn("Constant name '$name' is " .
-                                   "forced into package main::")
+                    warnings::warn: "Constant name '$name' is " .
+                                                   "forced into package main::"
                 
             
 
@@ -72,14 +72,14 @@ sub import
         # use constant FRED == fred;
         elsif ($name =~ m/^[01]?\z/)
             if ((nelems @_))
-                die("Constant name '$name' is invalid")
+                die: "Constant name '$name' is invalid"
             else
-                die("Constant name looks like boolean value")
+                die: "Constant name looks like boolean value"
             
 
         else
             # Must have bad characters
-            die("Constant name '$name' has invalid characters")
+            die: "Constant name '$name' has invalid characters"
         
 
         do
@@ -87,12 +87,12 @@ sub import
             %declared{+$full_name}++
             if ($multiple || (nelems @_) == 1)
                 my $scalar = $multiple ?? $constants{?$name} !! @_[0]
-                Symbol::fetch_glob($full_name)->* = sub () { $scalar }
+                (Symbol::fetch_glob: $full_name)->* = sub () { $scalar }
             elsif ((nelems @_))
                 my @list = @_
-                Symbol::fetch_glob($full_name)->* = sub () { @list }
+                (Symbol::fetch_glob: $full_name)->* = sub () { @list }
             else
-                Symbol::fetch_glob($full_name)->* = sub () { }
+                (Symbol::fetch_glob: $full_name)->* = sub () { }
             
         
     

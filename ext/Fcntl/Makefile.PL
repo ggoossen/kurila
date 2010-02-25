@@ -33,15 +33,15 @@ my @names = @:  <qw(
                 \%: name=>"SEEK_END", default=>\(@: "IV", "2")
                 \%: name=>"_S_IFMT", macro=>"S_IFMT", value=>"S_IFMT"
 
-WriteConstants(
-    PROXYSUBS => 1,
-    NAME => 'Fcntl',
-    NAMES => \@names,
-    )
+WriteConstants: 
+    PROXYSUBS => 1
+    NAME => 'Fcntl'
+    NAMES => \@names
+    
 
-WriteMakefile(
-    NAME        => 'Fcntl',
-    XSPROTOARG => '-noprototypes',              # XXX remove later?
-    VERSION_FROM => 'Fcntl.pm',
-    realclean => (%:  FILES=> 'const-c.inc const-xs.inc'),
-    )
+WriteMakefile: 
+    NAME        => 'Fcntl'
+    XSPROTOARG => '-noprototypes'              # XXX remove later?
+    VERSION_FROM => 'Fcntl.pm'
+    realclean => (%:  FILES=> 'const-c.inc const-xs.inc')
+    

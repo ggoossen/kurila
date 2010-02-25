@@ -3,7 +3,7 @@
 
 use warnings
 
-require q(./test.pl); plan(tests => 12)
+require q(./test.pl); plan: tests => 12
 
 =pod
 
@@ -84,62 +84,62 @@ do
 
     package Test::K; use mro 'c3'
     use base < qw/Test::J Test::I/
-    sub testmeth($self) { $self->SUPER::testmeth() }
+    sub testmeth($self) {( $self->SUPER::testmeth: ) }
 
 
-ok(eq_array(
-    mro::get_linear_isa('Test::A'),
-    \ qw(Test::A)
-    ), '... got the right C3 merge order for Test::A')
+ok: (eq_array: 
+        (mro::get_linear_isa: 'Test::A')
+        \ qw(Test::A)
+        ), '... got the right C3 merge order for Test::A'
 
-ok(eq_array(
-    mro::get_linear_isa('Test::B'),
-    \ qw(Test::B)
-    ), '... got the right C3 merge order for Test::B')
+ok: (eq_array: 
+        (mro::get_linear_isa: 'Test::B')
+        \ qw(Test::B)
+        ), '... got the right C3 merge order for Test::B'
 
-ok(eq_array(
-    mro::get_linear_isa('Test::C'),
-    \ qw(Test::C)
-    ), '... got the right C3 merge order for Test::C')
+ok: (eq_array: 
+        (mro::get_linear_isa: 'Test::C')
+        \ qw(Test::C)
+        ), '... got the right C3 merge order for Test::C'
 
-ok(eq_array(
-    mro::get_linear_isa('Test::D'),
-    \ qw(Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::D')
+ok: (eq_array: 
+        (mro::get_linear_isa: 'Test::D')
+        \ qw(Test::D Test::A Test::B Test::C)
+        ), '... got the right C3 merge order for Test::D'
 
-ok(eq_array(
-    mro::get_linear_isa('Test::E'),
-    \ qw(Test::E Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::E')
+ok: (eq_array: 
+        (mro::get_linear_isa: 'Test::E')
+        \ qw(Test::E Test::D Test::A Test::B Test::C)
+        ), '... got the right C3 merge order for Test::E'
 
-ok(eq_array(
-    mro::get_linear_isa('Test::F'),
-    \ qw(Test::F Test::E Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::F')
+ok: (eq_array: 
+        (mro::get_linear_isa: 'Test::F')
+        \ qw(Test::F Test::E Test::D Test::A Test::B Test::C)
+        ), '... got the right C3 merge order for Test::F'
 
-ok(eq_array(
-    mro::get_linear_isa('Test::G'),
-    \ qw(Test::G Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::G')
+ok: (eq_array: 
+        (mro::get_linear_isa: 'Test::G')
+        \ qw(Test::G Test::D Test::A Test::B Test::C)
+        ), '... got the right C3 merge order for Test::G'
 
-ok(eq_array(
-    mro::get_linear_isa('Test::H'),
-    \ qw(Test::H Test::G Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::H')
+ok: (eq_array: 
+        (mro::get_linear_isa: 'Test::H')
+        \ qw(Test::H Test::G Test::D Test::A Test::B Test::C)
+        ), '... got the right C3 merge order for Test::H'
 
-ok(eq_array(
-    mro::get_linear_isa('Test::I'),
-    \ qw(Test::I Test::H Test::G Test::F Test::E Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::I')
+ok: (eq_array: 
+        (mro::get_linear_isa: 'Test::I')
+        \ qw(Test::I Test::H Test::G Test::F Test::E Test::D Test::A Test::B Test::C)
+        ), '... got the right C3 merge order for Test::I'
 
-ok(eq_array(
-    mro::get_linear_isa('Test::J'),
-    \ qw(Test::J Test::F Test::E Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::J')
+ok: (eq_array: 
+        (mro::get_linear_isa: 'Test::J')
+        \ qw(Test::J Test::F Test::E Test::D Test::A Test::B Test::C)
+        ), '... got the right C3 merge order for Test::J'
 
-ok(eq_array(
-    mro::get_linear_isa('Test::K'),
-    \ qw(Test::K Test::J Test::I Test::H Test::G Test::F Test::E Test::D Test::A Test::B Test::C)
-    ), '... got the right C3 merge order for Test::K')
+ok: (eq_array: 
+        (mro::get_linear_isa: 'Test::K')
+        \ qw(Test::K Test::J Test::I Test::H Test::G Test::F Test::E Test::D Test::A Test::B Test::C)
+        ), '... got the right C3 merge order for Test::K'
 
-is('Test::K'->testmeth(), "right", 'next::method working ok')
+is: ('Test::K'->testmeth: ), "right", 'next::method working ok'
