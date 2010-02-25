@@ -122,7 +122,7 @@ False [] range "[:digit:]-" in regex; marked by <-- HERE in m/[[:digit:]- <-- HE
 # regcomp.c [S_regclassutf8]
 BEGIN {
     if (ord("\t") == 5) {
-        print $^STDOUT, "SKIPPED\n# ebcdic regular expression ranges differ.";
+        print: $^STDOUT, "SKIPPED\n# ebcdic regular expression ranges differ.";
         exit 0;
     }
 }

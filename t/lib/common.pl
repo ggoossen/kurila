@@ -121,8 +121,8 @@ for ( @prgs)
 
     my $prog_header = q[
         BEGIN {
-            open($^STDERR, ">&", $^STDOUT)
-              or die "Can't dup STDOUT->STDERR: $^OS_ERROR;";
+            open: $^STDERR, ">&", $^STDOUT
+              or die: "Can't dup STDOUT->STDERR: $^OS_ERROR;";
         }
     ] . "\n#line 1\n"
     my $real_prog = $prog

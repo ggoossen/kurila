@@ -6,10 +6,10 @@
 
 __END__
 # universal.c [S_isa_lookup]
-print($^STDOUT, "SKIPPED\n# todo fix: overloading triggers spurious warnings\n"),exit
+(print: $^STDOUT, "SKIPPED\n# todo fix: overloading triggers spurious warnings\n"),exit
 use warnings 'misc'
 our @ISA = qw(Joe)
-my $a = bless \$@
+my $a = bless: \$@
 UNIVERSAL::isa($a, 'Jim')
 EXPECT
 Can't locate package Joe for @main::ISA at - line 5.

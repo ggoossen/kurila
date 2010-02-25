@@ -60,7 +60,7 @@ do {
     no warnings ;
     eval '
         my $a = oct "0xfffffffffffffffffg" ;
-    '; print $^STDERR, $^EVAL_ERROR ;
+    '; print: $^STDERR, $^EVAL_ERROR ;
     my $a = oct "0xfffffffffffffffffg" ;
 };
 EXPECT
@@ -74,7 +74,7 @@ do {
     eval q[ 
         use warnings ;
         my $a = oct "0xfffffffffffffffffg" ;
-    ]; print $^STDERR, $^EVAL_ERROR;
+    ]; print: $^STDERR, $^EVAL_ERROR;
     my $a = oct "0xfffffffffffffffffg" ;
 };
 EXPECT
@@ -92,7 +92,7 @@ do {
     use warnings ;
     eval '
         my $a = oct "0xfffffffffffffffffg" ;
-    '; print $^STDERR, $^EVAL_ERROR ;
+    '; print: $^STDERR, $^EVAL_ERROR ;
 };
 EXPECT
 Integer overflow in hexadecimal number at (eval 1) line 2 character 17.
@@ -110,7 +110,7 @@ do {
     eval '
         no warnings ;
         my $a = oct "0xfffffffffffffffffg" ;
-    '; print $^STDERR, $^EVAL_ERROR ;
+    '; print: $^STDERR, $^EVAL_ERROR ;
 };
 EXPECT
 
@@ -122,7 +122,7 @@ do {
     use warnings 'deprecated' ;
     eval '
         my $a = oct "0xfffffffffffffffffg" ;
-    '; print $^STDERR, $^EVAL_ERROR;
+    '; print: $^STDERR, $^EVAL_ERROR;
 };
 EXPECT
 

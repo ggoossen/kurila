@@ -9,7 +9,7 @@ do {
     my $b ; chop $b ;
 };
 my $b ; chop $b ;
-print $^STDERR, "The End.\n" ;
+print: $^STDERR, "The End.\n" ;
 EXPECT
 Use of uninitialized value $b in chop at - line 8 character 9.
 ########
@@ -21,7 +21,7 @@ do {
     my $b ; chop $b ;
 };
 my $b ; chop $b ;
-print $^STDERR, "The End.\n" ;
+print: $^STDERR, "The End.\n" ;
 EXPECT
 Use of uninitialized value $b in chop at - line 8 character 9.
 ########
@@ -31,9 +31,9 @@ no warnings ;
 try {
     use warnings FATAL => 'uninitialized' ;
     my $b ; chop $b ;
-}; print $^STDERR, "-- $($^EVAL_ERROR->description)\n" ;
+}; print: $^STDERR, "-- $($^EVAL_ERROR->description)\n" ;
 my $b ; chop $b ;
-print $^STDERR, "The End.\n" ;
+print: $^STDERR, "The End.\n" ;
 EXPECT
 -- Use of uninitialized value $b in chop
 The End.
@@ -43,9 +43,9 @@ The End.
 use warnings FATAL => 'uninitialized' ;
 try {
     my $b ; chop $b ;
-}; print $^STDERR, "-- $($^EVAL_ERROR->description)\n" ;
+}; print: $^STDERR, "-- $($^EVAL_ERROR->description)\n" ;
 my $b ; chop $b ;
-print $^STDERR, "The End.\n" ;
+print: $^STDERR, "The End.\n" ;
 EXPECT
 -- Use of uninitialized value $b in chop
 Use of uninitialized value $b in chop at - line 7 character 9.
@@ -56,9 +56,9 @@ use warnings FATAL => 'uninitialized' ;
 try {
     no warnings ;
     my $b ; chop $b ;
-}; print $^STDERR, $^EVAL_ERROR;
+}; print: $^STDERR, $^EVAL_ERROR;
 my $b ; chop $b ;
-print $^STDERR, "The End.\n" ;
+print: $^STDERR, "The End.\n" ;
 EXPECT
 Use of uninitialized value $b in chop at - line 8 character 9.
 ########
@@ -68,9 +68,9 @@ no warnings ;
 eval q[ 
     use warnings FATAL => 'uninitialized' ;
     my $b ; chop $b ;
-]; print $^STDERR, "-- $($^EVAL_ERROR->description)\n";
+]; print: $^STDERR, "-- $($^EVAL_ERROR->description)\n";
 my $b ; chop $b ;
-print $^STDERR, "The End.\n" ;
+print: $^STDERR, "The End.\n" ;
 EXPECT
 -- Use of uninitialized value $b in chop
 The End.
@@ -80,9 +80,9 @@ The End.
 use warnings FATAL => 'uninitialized' ;
 eval '
     my $b ; chop $b ;
-'; print $^STDERR, "-- $($^EVAL_ERROR->description)\n" ;
+'; print: $^STDERR, "-- $($^EVAL_ERROR->description)\n" ;
 my $b ; chop $b ;
-print $^STDERR, "The End.\n" ;
+print: $^STDERR, "The End.\n" ;
 EXPECT
 -- Use of uninitialized value $b in chop
 Use of uninitialized value $b in chop at - line 7 character 9.
@@ -93,8 +93,8 @@ use warnings FATAL => 'uninitialized' ;
 eval '
     no warnings ;
     my $b ; chop $b ;
-'; print $^STDERR, $^EVAL_ERROR;
+'; print: $^STDERR, $^EVAL_ERROR;
 my $b ; chop $b ;
-print $^STDERR, "The End.\n" ;
+print: $^STDERR, "The End.\n" ;
 EXPECT
 Use of uninitialized value $b in chop at - line 8 character 9.

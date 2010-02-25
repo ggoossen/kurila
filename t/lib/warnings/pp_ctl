@@ -69,10 +69,10 @@ Exiting substitution via last at - line 7 character 9.
 # pp_ctl.c
 use warnings 'exiting' ;
 sub fred { last }
-do { fred() };
+do { fred: };
 no warnings 'exiting' ;
 sub joe { last }
-do { joe() };
+do { joe: };
 EXPECT
 Exiting subroutine via last at - line 3 character 12.
     main::fred called at - line 4 character 6.
@@ -81,11 +81,11 @@ Exiting subroutine via last at - line 3 character 12.
 do {
   eval "use warnings 'exiting' ; last;" 
 };
-print $^STDERR, $^EVAL_ERROR ;
+print: $^STDERR, $^EVAL_ERROR ;
 do {
   eval "no warnings 'exiting' ;last;" 
 };
-print $^STDERR, $^EVAL_ERROR ;
+print: $^STDERR, $^EVAL_ERROR ;
 EXPECT
 Exiting eval via last at (eval 1) line 1 character 26.
     (eval) called at - line 3 character 3.
@@ -107,10 +107,10 @@ Exiting substitution via last at - line 6 character 9.
 # pp_ctl.c
 use warnings 'exiting' ;
 sub fred { last joe }
-:joe do { fred() };
+:joe do { fred: };
 no warnings 'exiting' ;
 sub Fred { last Joe }
-:Joe do { Fred() };
+:Joe do { Fred: };
 EXPECT
 Exiting subroutine via last at - line 3 character 12.
     main::fred called at - line 4 character 11.
@@ -118,22 +118,22 @@ Exiting subroutine via last at - line 3 character 12.
 # pp_ctl.c
 :joe
   do { eval "use warnings 'exiting' ; last joe;" };
-print $^STDERR, $^EVAL_ERROR ;
+print: $^STDERR, $^EVAL_ERROR ;
 :Joe
   do { eval "no warnings 'exiting' ; last Joe;" };
-print $^STDERR, $^EVAL_ERROR ;
+print: $^STDERR, $^EVAL_ERROR ;
 EXPECT
 Exiting eval via last at (eval 1) line 1 character 26.
     (eval) called at - line 3 character 8.
 ########
 # pp_ctl.c
 use warnings 'recursion' ;
-BEGIN { warn "PREFIX\n" ;}
+BEGIN { warn: "PREFIX\n" ;}
 
 sub fred
-    fred() if $a++ +< 200
+    fred: if $a++ +< 200
  
-fred()
+fred:
 EXPECT
  at - line 3 character 9.
     BEGIN called at - line 3 character 1.
@@ -241,11 +241,9 @@ Deep recursion on subroutine "main::fred" at - line 6 character 5.
 ########
 # pp_ctl.c
 no warnings 'recursion' ;
-BEGIN { warn "PREFIX\n" ;}
-sub fred
-{
-    fred() if $a++ +< 200
-}
+BEGIN { warn: "PREFIX\n" ;}
+sub fred()
+    fred: if $a++ +< 200
  
-fred()
+fred:
 EXPECT

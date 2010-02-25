@@ -51,23 +51,23 @@ use warnings 'io' ;
 # Certainly on some BSDs (at least FreeBSD, Darwin, BSDi) file descriptors
 # 1 and 2 are opened read/write on the tty, and the IO layers may reflect this.
 # So we must make our own file handle that is read only.
-my $file = "./xcv" ; unlink $file ;
-open (my $fh, ">", "$file") or die $^OS_ERROR ;
-close $fh or die $^OS_ERROR ;
-die "There is no file $file" unless -f $file ;
-open ($fh, "<", "$file") or die $^OS_ERROR ;
-print $fh, "anc" ;
-open(my $foo, "<&", $fh) or die $^OS_ERROR ;
-print $foo, "anc" ;
+my $file = "./xcv" ; unlink: $file ;
+open: (my $fh, ">", "$file") or die: $^OS_ERROR ;
+close $fh or die: $^OS_ERROR ;
+die: "There is no file $file" unless -f $file ;
+open: ($fh, "<", "$file") or die: $^OS_ERROR ;
+print: $fh, "anc" ;
+open(my $foo, "<&", $fh) or die: $^OS_ERROR ;
+print: $foo, "anc" ;
 no warnings 'io' ;
-print $fh, "anc" ;
-print $foo, "anc" ;
+print: $fh, "anc" ;
+print: $foo, "anc" ;
 use warnings 'io' ;
-print $fh, "anc" ;
-print $foo, "anc" ;
-close ($fh) or die $^OS_ERROR ;
-close ($foo) or die $^OS_ERROR ;
-unlink $file ;
+print: $fh, "anc" ;
+print: $foo, "anc" ;
+close ($fh) or die: $^OS_ERROR ;
+close ($foo) or die: $^OS_ERROR ;
+unlink: $file ;
 EXPECT
 Filehandle opened only for input at - line 12 character 1.
 Filehandle opened only for input at - line 14 character 1.
@@ -77,17 +77,17 @@ Filehandle opened only for input at - line 20 character 1.
 # pp_hot.c [pp_print]
 use warnings 'closed' ;
 close $^STDIN ;
-print $^STDIN, "anc";
-opendir $^STDIN, ".";
-print $^STDIN, "anc";
+print: $^STDIN, "anc";
+opendir: $^STDIN, ".";
+print: $^STDIN, "anc";
 closedir $^STDIN;
 no warnings 'closed' ;
-print $^STDIN, "anc";
-opendir $^STDIN, ".";
-print $^STDIN, "anc";
+print: $^STDIN, "anc";
+opendir: $^STDIN, ".";
+print: $^STDIN, "anc";
 use warnings;
 no warnings 'closed' ;
-print $^STDIN, "anc";
+print: $^STDIN, "anc";
 EXPECT
 print() on closed filehandle STDIN at - line 4 character 1.
 print() on closed filehandle STDIN at - line 6 character 1.
@@ -99,20 +99,20 @@ print() on closed filehandle STDIN at - line 6 character 1.
 # This goes segv on 5.7.3
 use warnings 'closed' ;
 my $fh = $^STDOUT;
-close $^STDOUT or die "Can't close STDOUT";
-print $fh, "Shouldn't print anything, but shouldn't SEGV either\n";
+close $^STDOUT or die: "Can't close STDOUT";
+print: $fh, "Shouldn't print anything, but shouldn't SEGV either\n";
 EXPECT
 print() on closed filehandle STDOUT at - line 7 character 1.
 ########
 # pp_hot.c [pp_print]
 package foo;
 use warnings 'closed';
-open my $fh1, "<", "nonexistent";
-print $fh1, 42;
-open my $fh2, "<", "nonexistent";
-print $fh2, 42;
-open $bar::fh3, "<", "nonexistent";
-print $bar::fh3, 42;
+open: my $fh1, "<", "nonexistent";
+print: $fh1, 42;
+open: my $fh2, "<", "nonexistent";
+print: $fh2, 42;
+open: $bar::fh3, "<", "nonexistent";
+print: $bar::fh3, 42;
 EXPECT
 print() on closed filehandle at - line 5 character 1.
 print() on closed filehandle at - line 7 character 1.
@@ -121,35 +121,35 @@ print() on closed filehandle at - line 9 character 1.
 # pp_hot.c [Perl_do_readline]
 use warnings 'closed' ;
 close $^STDIN        ; $a = ~< $^STDIN ;
-opendir $^STDIN, "." ; $a = ~< $^STDIN ;
+opendir: $^STDIN, "." ; $a = ~< $^STDIN ;
 closedir $^STDIN;
 no warnings 'closed' ;
-opendir $^STDIN, "." ; $a = ~< $^STDIN ;
+opendir: $^STDIN, "." ; $a = ~< $^STDIN ;
 $a = ~< *STDIN ;
 EXPECT
 readline() on closed filehandle STDIN at - line 3 character 29.
-readline() on closed filehandle STDIN at - line 4 character 29.
+readline() on closed filehandle STDIN at - line 4 character 30.
         (Are you trying to call readline() on dirhandle STDIN?)
- at - line 4 character 29.
+ at - line 4 character 30.
 ########
 # pp_hot.c [Perl_do_readline]
 use warnings 'io' ;
-my $file = "./xcv" ; unlink $file ;
-open (my $fh, ">", "$file") or die $^OS_ERROR ;
+my $file = "./xcv" ; unlink: $file ;
+open: (my $fh, ">", "$file") or die: $^OS_ERROR ;
 my $a = ~< *$fh ;
 no warnings 'io' ;
 $a = ~< *$fh ;
 use warnings 'io' ;
-open(my $foo, ">&", $fh) or die $^OS_ERROR ;
+open(my $foo, ">&", $fh) or die: $^OS_ERROR ;
 $a = ~< *$foo ;
 no warnings 'io' ;
 $a = ~< *$foo ;
 use warnings 'io' ;
 $a = ~< *$foo ;
 $a = ~< *$fh ;
-close ($fh) or die $^OS_ERROR ;
-close ($foo) or die $^OS_ERROR ;
-unlink $file ;
+close ($fh) or die: $^OS_ERROR ;
+close ($foo) or die: $^OS_ERROR ;
+unlink: $file ;
 EXPECT
 Filehandle opened only for output at - line 5 character 9.
 Filehandle opened only for output at - line 10 character 6.
@@ -160,16 +160,16 @@ Filehandle opened only for output at - line 15 character 6.
 use warnings 'recursion' ;
 
 sub fred 
-    fred() if $a++ +< 200
+    fred: if $a++ +< 200
 
 do
   local $^WARN_HOOK = sub {
     if (@_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
-        print $^STDOUT, "ok\n";
+        print: $^STDOUT, "ok\n";
         exit 0;
     }
-  };
-  fred();
+  }
+  fred:
 
 EXPECT
 ok
@@ -177,17 +177,17 @@ ok
 # pp_hot.c [Perl_sub_crush_depth]
 no warnings 'recursion' ;
 sub fred 
-    fred() if $a++ +< 200
+    fred: if $a++ +< 200
  
-do {
+do
   local $^WARN_HOOK = sub {
     if (@_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
-        print $^STDOUT, "ok\n";
+        print: $^STDOUT, "ok\n";
         exit 0;
     }
-  };
-  fred();
-};
+  }
+  fred:
+
 EXPECT
 
 ########
