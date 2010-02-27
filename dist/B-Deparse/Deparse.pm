@@ -565,17 +565,15 @@ sub scan_for_constants
     my ($self) = @_
     my %ret
 
-    (B::walksymtable: (Symbol::stash: '%main'), sub 
-                          my ($gv) = @_
-
+    (B::walksymtable: (Symbol::stash: '%main'), sub ($gv)
                           my $cv = ($gv->CV: )
                           return if !$cv || (class: $cv) ne 'CV'
 
                           my $const = ($cv->const_sv: )
                           return if !$const || (class: $const) eq 'SPECIAL'
 
-                          %ret{ (dump::view:  ($const->object_2svref: ) ) } = ($gv->NAME: )
-                      , sub { 1 })
+                          %ret{ dump::view: $const->object_2svref: } = ($gv->NAME: )
+                      sub { 1 })
 
     return %ret
 
@@ -610,7 +608,7 @@ sub compile
 
         my @BEGINs  = @:  (B::begin_av->isa: "B::AV") ?? < (B::begin_av->ARRAY: ) !! ()
         my @UNITCHECKs = @:  (B::unitcheck_av: )->isa: "B::AV"
-                                 ?? < (B::unitcheck_av: )->ARRAY: 
+                                 ?? ( < (B::unitcheck_av: )->ARRAY: )
                                  !! ()
         my @CHECKs  = @:(  (B::check_av: )->isa: "B::AV") ?? <( (B::check_av: )->ARRAY: ) !! ()
         my @INITs   = @:(  (B::init_av: )->isa: "B::AV") ?? <( (B::init_av: )->ARRAY: ) !! ()
@@ -634,7 +632,7 @@ sub compile
 
         # Print __DATA__ section, if necessary
         my $laststash = defined $self->{?'curcop'}
-            ??( $self->{'curcop'}->stash: )->NAME: ) !! $self->{?'curstash'}
+            ?? ( ( $self->{'curcop'}->stash: )->NAME: ) !! $self->{?'curstash'}
         if (defined (Symbol::fetch_glob: $laststash."::DATA")->*{IO})
             print: $^STDOUT, "package $laststash;\n"
                 unless $laststash eq $self->{?'curstash'}
@@ -954,7 +952,7 @@ sub maybe_targmy($self, $op, $cx, $func, @< @args)
 sub padname_sv
     my $self = shift
     my $targ = shift
-    return ($self->{'curcv'}->PADLIST: )->ARRAYelt: 0)->ARRAYelt: $targ
+    return ( ($self->{'curcv'}->PADLIST: )->ARRAYelt: 0)->ARRAYelt: $targ
 
 
 sub maybe_my($self, $op, $cx, $text)
@@ -998,7 +996,7 @@ sub lineseq
     local $self->{+'limit_seq'} = $limit_seq
 
     $self->walk_lineseq: $root, \@ops
-        sub (@< @_) { (push: @exprs, @_[0])} 
+                         sub ($expr, _) { push: @exprs, $expr }
 
     my $body = join: ";\n", (grep: {length}, @exprs)
     my $subs = ""
@@ -1076,10 +1074,11 @@ sub deparse_root
         push: @kids, $kid
         $kid = $kid->sibling: 
 
-    $self->walk_lineseq: $op, \@kids
+    $self->walk_lineseq:
+        $op, \@kids
         sub (@< @_) { (print: $^STDOUT, ($self->indent: @_[0].';'));
-                             print: $^STDOUT, "\n" unless @_[1] ==( (nelems @kids)-1);
-                         }
+                      print: $^STDOUT, "\n" unless @_[1] ==( (nelems @kids)-1);
+                    }
 
 
 sub walk_lineseq($self, $op, $kids, $callback)
@@ -1180,16 +1179,16 @@ sub populate_curcvlex
 
         for my $i (4 .. (nelems: @ns) -1)
             next if (class: @ns[$i]) eq "SPECIAL"
-            next if @ns[$i]->FLAGS: ) ^&^ SVpad_OUR  # Skip "our" vars
+            next if ( @ns[$i]->FLAGS: ) ^&^ SVpad_OUR  # Skip "our" vars
             if ((class: @ns[$i]) eq "PV" or (class: @ns[$i]) eq "IV")
                 # Probably that pesky lexical @_
                 next
 
             my $name = @ns[$i]->PVX_const: 
             my (@: $seq_st, $seq_en) =
-                (@ns[$i]->FLAGS: ) ^&^ SVf_FAKE)
+                ((@ns[$i]->FLAGS: ) ^&^ SVf_FAKE)
                 ?? @: 0, 999999
-                !! @: @ns[$i]->COP_SEQ_RANGE_LOW: ), @ns[$i]->COP_SEQ_RANGE_HIGH: 
+                !! @: ( @ns[$i]->COP_SEQ_RANGE_LOW: ), @ns[$i]->COP_SEQ_RANGE_HIGH: 
 
             push: $self->{+'curcvlex'}{+$name}, \@: $seq_st, $seq_en
 
@@ -1654,7 +1653,7 @@ sub pp_scalar
 sub padval
     my $self = shift
     my $targ = shift
-    return ($self->{'curcv'}->PADLIST: )->ARRAYelt: 1)->ARRAYelt: $targ
+    return (($self->{'curcv'}->PADLIST: )->ARRAYelt: 1)->ARRAYelt: $targ
 
 
 sub anon_hash_or_list($self, $op, $cx)
@@ -2968,17 +2967,17 @@ sub check_proto($self, $proto, @< @args)
                     !(null: ($real = ($arg->first: ))) and
                     ($chr =~ m/\$/ && is_scalar: ($real->first: )
                      or ($chr =~ m/@/
-                  && (class: (($real->first: )->sibling: )) ne 'NULL'
-                    &&( ($real->first: )->sibling: )->name: 
-                    =~ m/^(rv2|pad)av$/)
+                         && (class: (($real->first: )->sibling: )) ne 'NULL'
+                         && ((( ($real->first: )->sibling: )->name: )
+                             =~ m/^(rv2|pad)av$/))
                      or ($chr =~ m/%/
-                  && (class: (($real->first: )->sibling: )) ne 'NULL'
-                    &&( ($real->first: )->sibling: )->name: 
-                    =~ m/^(rv2|pad)hv$/)
+                         && (class: (($real->first: )->sibling: )) ne 'NULL'
+                         && (((($real->first: )->sibling: )->name: )
+                             =~ m/^(rv2|pad)hv$/))
                      #or ($chr =~ /&/ # This doesn't work
                      #   && $real->first->name eq "rv2cv")
                      or ($chr =~ m/\*/
-                    &&( ($real->first: )->name: ) eq "rv2gv")))
+                         && ( ($real->first: )->name: ) eq "rv2gv")))
                     push: @reals, $self->deparse: $real, 6
                 else
                     return "&"
@@ -3412,8 +3411,8 @@ sub const($self, $sv, $cx)
 
 sub const_dumper($self, $sv, $cx)
     my $ref = $sv->object_2svref: 
-    my $dumper = Data::Dumper->new: \(@: $ref->$), \(@: '$v')((((
-    ($dumper->Purity: 1)->Terse: 1)->Deparse: 1)->Indent: 0)->Useqq: 1)->Sortkeys: 1
+    my $dumper = Data::Dumper->new: \(@: $ref->$), \(@: '$v')
+    ((((($dumper->Purity: 1)->Terse: 1)->Deparse: 1)->Indent: 0)->Useqq: 1)->Sortkeys: 1
     my $str = $dumper->Dump: 
     if ($str =~ m/^\$v/)
         return '${my ' . $str . ' \$v}'
@@ -3485,7 +3484,8 @@ sub dquote
     my(@: $op, $cx) =  @_
     my $kid = ($op->first: )->sibling:  # skip ex-stringify, pushmark
     return ($self->deparse: $kid, $cx) if $self->{?'unquote'}
-    $self->maybe_targmy: $kid, $cx
+    $self->maybe_targmy:
+        $kid, $cx
         sub (@< @_) {(single_delim: "qq", '"', < ($self->dq: @_[1]))}
 
 

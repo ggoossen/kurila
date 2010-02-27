@@ -127,7 +127,7 @@ do
     local (env::var: 'PERL5LIB' ) = ''
     ok:  -r $tfile, 'different install exists' 
     my @warn
-    local $^WARN_HOOK =sub (@< @_) { (push: @warn, @_[0]->message: )); return }
+    local $^WARN_HOOK =sub ($e) { push: @warn, $e->message: ; return }
     install: \(@: from_to=> \%: 'blib/lib' => 'install-test/other_lib/perl'
                                 read   => 'install-test/packlist'
                                 write  => 'install-test/packlist'

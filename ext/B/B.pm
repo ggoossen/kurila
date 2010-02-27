@@ -25,7 +25,7 @@ BEGIN
                            init_av end_av regex_padav dowarn defstash
                            curstash warnhook diehook inc_gv @optype @specialsv_name
                       )
-    XSLoader::load:  'B'
+    XSLoader::load: 'B'
 
 
 @B::SV::ISA = @:  'B::OBJECT' 

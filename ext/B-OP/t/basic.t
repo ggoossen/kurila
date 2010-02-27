@@ -1,10 +1,9 @@
 #!/usr/bin/perl -w
 
-use Config;
-BEGIN {
-    print $^STDOUT, "1..0 # Skip: FIX B-OP\n";
-    exit 0;
-}
+use Config
+BEGIN
+    print: $^STDOUT, "1..0 # Skip: FIX B-OP\n"
+    exit 0
 
 use Test::More tests => 10;
 

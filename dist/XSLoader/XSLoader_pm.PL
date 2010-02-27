@@ -43,7 +43,7 @@ sub load($module, @< @args)
     unless ($module and exists &dl_load_file)
         my $bootstrap_inherit = (DynaLoader->can: 'bootstrap_inherit') || 
                                 (XSLoader->can: 'bootstrap_inherit')
-        return $bootstrap_inherit->& <: < @args
+        return $bootstrap_inherit->& <: $module, < @args
 
     my @modparts = split: m/::/,$module
     my $modfname = @modparts[-1]
@@ -84,7 +84,7 @@ print: $out, <<'EOT'
     if (not -f $file or -s $bs)
         my $bootstrap_inherit = (DynaLoader->can: 'bootstrap_inherit') || 
                                 (XSLoader->can: 'bootstrap_inherit')
-        return $bootstrap_inherit->& <: < @args
+        return $bootstrap_inherit->& <: $module, < @args
 
     my $bootname = "boot_$module"
     $bootname =~ s/\W/_/g
