@@ -2048,6 +2048,7 @@ t/io/utf8.t			See if file seeking works
 t/japh/abigail.t		Obscure tests
 t/lex/chars.t			See if character escapes work
 t/lex/indentation.t		See if indentation works
+t/lex/label.t			See if label are correctly recognized
 t/lex/location.t		See if locations are correctly saved
 t/lex/pod.t			See if pod works
 t/lex/qq.t			See if qq works

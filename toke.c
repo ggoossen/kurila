@@ -1011,7 +1011,7 @@ S_skipspace(pTHX_ register char *s, bool* iscontinuationp)
         else {
 	    if (PL_linestart != PL_bufend) {
 		assert(PL_linestart[-1] == '\n');
-		PL_bufptr = PL_linestart;
+		PL_bufptr = PL_linestart - 1;
 		PL_parser->do_start_newline = TRUE;
 	    }
 #ifdef PERL_MAD
