@@ -191,11 +191,9 @@ sub rename_country
             $c = $code
         else
             $c = country_code2code: $code, $codeset, $cset
-        
 
         $CODES[$cset]{+$c} = $new_name
         $COUNTRIES->[$cset]{+lc "$new_name"} = $c
-    
 
     return 1
 
