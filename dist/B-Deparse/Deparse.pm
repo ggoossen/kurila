@@ -288,6 +288,9 @@ use warnings ()
 # \f - flush left (no indent)
 # \cK - kill following semicolon, if any
 
+sub PRECEDENCE_COMMA_OPERATOR() 6
+sub PRECEDENCE_LIST_OPERATOR() 5
+
 sub null
     my $op = shift
     return (class: $op) eq "NULL"
@@ -873,7 +876,7 @@ sub is_scalar
 
 sub maybe_parens($self, $text, $cx, $prec)
     if ($prec +< $cx              # unary ops nest just fine
-        or $prec == $cx and $cx != 4 and $cx != 16 and $cx != 21
+        or $prec == $cx and $cx != 4 and $cx != 16 and $cx != 21 and $cx != PRECEDENCE_LIST_OPERATOR
         or $self->{?'parens'})
         $text = "($text)"
         # In a unop, let parent reuse our parens; see maybe_parens_unop
@@ -891,7 +894,7 @@ sub maybe_parens_unop($self, $name, $kid, $cx)
         if ($name eq "umask" && $kid =~ m/^\d+$/)
             $kid = sprintf: "\%#o", $kid
 
-        return "$name($kid)"
+        return "($name $kid)"
     else
         $kid = $self->deparse: $kid, 16
         if ($name eq "umask" && $kid =~ m/^\d+$/)
@@ -903,7 +906,7 @@ sub maybe_parens_unop($self, $name, $kid, $cx)
         elsif ((substr: $kid, 0, 1) eq "(")
             # avoid looks-like-a-function trap with extra parens
             # (`+' can lead to ambiguities)
-            return "$name(" . $kid  . ")"
+            return "($name $kid)"
         else
             return "$name $kid"
 
@@ -911,11 +914,14 @@ sub maybe_parens_unop($self, $name, $kid, $cx)
 
 
 sub maybe_parens_func($self, $func, $text, $cx, $prec)
-    if ($prec +<= $cx or (substr: $text, 0, 1) eq "(" or $self->{?'parens'})
-        return "$func($text)"
-    else
-        return "$func $text"
+    return $self->maybe_parens: "$func: $text", $cx, $prec
 
+
+sub maybe_parens_def($self, $op, $text, $cx, $prec)
+    if ($prec +<= $cx or (substr: $text, 0, 1) eq "(" or $self->{?'parens'})
+        return "$op($text)"
+    else
+        return "$op $text"
 
 
 sub maybe_local($self, $op, $cx, $text)
@@ -932,7 +938,7 @@ sub maybe_local($self, $op, $cx, $text)
         if ((want_scalar: $op))
             return "$our_local $text"
         else
-            return $self->maybe_parens_func: "$our_local", $text, $cx, 16
+            return $self->maybe_parens_def: "$our_local", $text, $cx, 16
 
     else
         return $text
@@ -961,11 +967,10 @@ sub maybe_my($self, $op, $cx, $text)
         if ((want_scalar: $op))
             return "$my $text"
         else
-            return $self->maybe_parens_func: $my, $text, $cx, 16
+            return $self->maybe_parens_def: $my, $text, $cx, 16
 
     else
         return $text
-
 
 
 # The following OPs don't have functions:
@@ -1662,7 +1667,8 @@ sub anon_hash_or_list($self, $op, $cx)
     my($expr, @exprs)
     $op = ($op->first: )->sibling:  # skip pushmark
     while (!(null: $op))
-        $expr = $self->deparse: $op, 6
+        $expr = $self->deparse: $op
+                                (null: $op->sibling) ?? PRECEDENCE_LIST_OPERATOR !! PRECEDENCE_COMMA_OPERATOR
         push: @exprs, $expr
 
         $op = $op->sibling: 
@@ -2063,9 +2069,10 @@ sub listop($self, $op, $cx, $name)
     if (defined $proto
           && $proto =~ m/^;?\*/
         && ($kid->name: ) eq "rv2gv")
-        $first = $self->deparse: ($kid->first: ), 6
+        $first = $self->deparse: ($kid->first: ), PRECEDENCE_COMMA_OPERATOR
     else
-        $first = $self->deparse: $kid, 6
+        $first = $self->deparse: $kid
+                                 (null: $kid->sibling) ?? PRECEDENCE_LIST_OPERATOR !! PRECEDENCE_COMMA_OPERATOR
 
     if ($name eq "chmod" && $first =~ m/^\d+$/)
         $first = sprintf: "\%#o", $first
@@ -2074,18 +2081,15 @@ sub listop($self, $op, $cx, $name)
     push: @exprs, $first
     $kid = $kid->sibling: 
     if (defined $proto && $proto =~ m/^\*\*/ && ($kid->name: ) eq "rv2gv")
-        push: @exprs, < $self->deparse:  <($kid->first: ), 6
+        push: @exprs, < $self->deparse:  <($kid->first: ), PRECEDENCE_COMMA_OPERATOR
         $kid = $kid->sibling: 
 
     while (!(null: $kid))
-        push: @exprs, $self->deparse: $kid, 6
+        push: @exprs, $self->deparse: $kid
+                                      (null: $kid->sibling) ?? PRECEDENCE_LIST_OPERATOR !! PRECEDENCE_COMMA_OPERATOR
         $kid = $kid->sibling: 
 
-    if ($parens)
-        return "$name(" . (join: ", ", @exprs) . ")"
-    else
-        return "$name " . join: ", ", @exprs
-
+    return $self->maybe_parens_func: $name, (join: ", ", @exprs), $cx, PRECEDENCE_LIST_OPERATOR
 
 
 sub pp_bless { (listop: < @_, "bless") }
@@ -2228,14 +2232,14 @@ sub indirop($self, $op, $cx, $name)
         $indir = '{$b cmp $a} '
 
     while (!(null: $kid))
-        $expr = $self->deparse: $kid, 6
+        $expr = $self->deparse: $kid
+                                (null: $kid->sibling) ?? PRECEDENCE_LIST_OPERATOR !! PRECEDENCE_COMMA_OPERATOR
         push: @exprs, $expr
         $kid = $kid->sibling: 
 
     my $name2 = $name
     if ($name eq "sort" && ($op->private: ) ^&^ OPpSORT_REVERSE)
         $name2 = 'reverse sort'
-
 
     my $args = $indir . join: ", ", @exprs
     if ($indir ne "" and $name eq "sort")
@@ -2245,16 +2249,13 @@ sub indirop($self, $op, $cx, $name)
         # 3)". Unfortunately, we'll currently think the parens are
         # necessary more often that they really are, because we don't
         # distinguish which side of an assignment we're on.
-        if ($cx +>= 5)
+        if ($cx +>= PRECEDENCE_COMMA_OPERATOR)
             return "($name2 $args)"
         else
             return "$name2 $args"
 
     else
-        return $self->maybe_parens_func: $name2, $args, $cx, 5
-
-
-
+        return $self->maybe_parens_func: $name2, $args, $cx, PRECEDENCE_LIST_OPERATOR 
 
 sub pp_prtf { (indirop: < @_, "printf") }
 sub pp_print { (indirop: < @_, "print") }
@@ -2761,7 +2762,7 @@ sub elem_or_slice_single_index($self, $idx)
     # for constant strings.) So we can cheat slightly here - if we see
     # a bareword, we know that it is supposed to be a function call.
     #
-    $idx =~ s/^([A-Za-z_]\w*)$/$1()/
+    $idx =~ s/^([A-Za-z_]\w*)$/$1:/
 
     return $idx
 
@@ -2771,8 +2772,7 @@ sub elem($self, $op, $cx, $left, $right, $padname)
 
     $idx = $self->elem_or_slice_single_index: $idx
 
-    if (my $array_name=($self->elem_or_slice_array_name
-        : $array, $left, $padname, 1))
+    if (my $array_name=($self->elem_or_slice_array_name: $array, $left, $padname, 1))
         return $array_name . $left . $idx . $right
     else
         # $x[20][3]{hi} or expr->[20]
@@ -2879,7 +2879,6 @@ sub _method($self, $op, $cx)
 
         $meth = $kid
 
-
     if (($meth->name: ) eq "method_named")
         $meth = ($self->const_sv: $meth)->PV: 
     else
@@ -2900,7 +2899,7 @@ sub method
     return $self->e_method:  < ($self->_method: < @_) 
 
 
-sub e_method($self, $info)
+sub e_method($self, $info, $cx)
     my $obj = $self->deparse: $info->{?object}, 24
 
     my $meth = $info->{?method}
@@ -2908,7 +2907,7 @@ sub e_method($self, $info)
     my $args = join: ", ", (map: { ($self->deparse: $_, 6) }, $info->{args}->@) 
     my $kid = $obj . "->" . $meth
     if (length $args)
-        return $kid . "(" . $args . ")" # parens mandatory
+        return $self->maybe_parens_func: $kid, $args, $cx, PRECEDENCE_LIST_OPERATOR
     else
         return $kid
 
@@ -2988,7 +2987,7 @@ sub check_proto($self, $proto, @< @args)
 
 
 sub pp_entersub($self, $op, $cx)
-    return $self->e_method: ($self->_method: $op, $cx)
+    return $self->e_method: ($self->_method: $op, $cx), $cx
         unless null: ($op->first: )->sibling: 
     my $prefix = ""
     my $amper = ""
@@ -3083,9 +3082,7 @@ sub pp_entersub($self, $op, $cx)
         elsif ($dproto ne '$' and (defined: $proto) || $simple) #'
             return $self->maybe_parens_func: $kid, $args, $cx, 5
         else
-            return "$kid(" . $args . ")"
-
-
+            return $self->maybe_parens: "$kid: $args", $cx, PRECEDENCE_LIST_OPERATOR
 
 
 # escape things that cause interpolation in double quotes,
@@ -3738,15 +3735,13 @@ sub pp_split($self, $op, $cx)
         push: @exprs, $self->deparse: $kid, 6
         $kid = $kid->sibling: 
 
-
     # handle special case of split(), and split(' ') that compiles to /\s+/
     $kid = $op->first: 
     if ( ($kid->flags: ) ^&^ OPf_SPECIAL
            and ( ($kid->reflags: ) ^&^ (RXf_SKIPWHITE: ) ) )
         @exprs[0] = "' '"
 
-
-    $expr = "split(" . (join: ", ", @exprs) . ")"
+    $expr = $self->maybe_parens_func: "split", (join: ", ", @exprs), $cx, PRECEDENCE_LIST_OPERATOR
     if ($ary)
         return $self->maybe_parens: "$ary = $expr", $cx, 7
     else
