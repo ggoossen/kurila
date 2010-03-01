@@ -3753,6 +3753,7 @@ Perl_yylex(pTHX)
 	}
     case '~':
 	if (s[1] == '<') {
+	    /* readline operator '~<' */
 	    s += 2;
 	    UNI(OP_READLINE);
 	}
