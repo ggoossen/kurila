@@ -1458,6 +1458,7 @@ lib/vmsish.t			Tests for vmsish.pm
 lib/warnings.pm			For "use warnings"
 lib/warnings/register.pm	For "use warnings::register"
 lib/warnings.t			See if warning controls work
+lib/warnings-pm.t		See if warning.pm is correct
 locale.c			locale-specific utility functions
 mad/convert		Utility script to run convert Perl 5 code to Perl Kurila code	
 mad/Convert.pm		Used by	mad/convert

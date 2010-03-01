@@ -311,7 +311,7 @@ sub bits(@< @args)
     my $fatal = 0 
     my $no_fatal = 0 
 
-    foreach my $word ( @_ )
+    foreach my $word ( @args )
         if ($word eq 'FATAL')
             $fatal = 1
             $no_fatal = 0
@@ -325,7 +325,6 @@ sub bits(@< @args)
         
         else
             die: "Unknown warnings category '$word'"
-    
 
     return $mask 
 
