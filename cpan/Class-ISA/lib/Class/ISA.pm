@@ -185,15 +185,16 @@ sub self_and_super_path
         next unless (defined: ($current = shift @in_stack)) && length: $current
         print: $^STDOUT, "At $current\n" if $Debug
         push: @out, $current
-        unshift: @in_stack
-                 < map: 
-            { my $c = $_; # copy, to avoid being destructive
-                         substr: $c,0,2, "main::" if (substr: $c,0,2) eq '::';
-              # Canonize the :: -> main::, ::foo -> main::foo thing.
-              # Should I ever canonize the Foo'Bar = Foo::Bar thing?
-                         %seen{+$c}++ ?? () !! $c;
-                         },
-                         (Symbol::fetch_glob: "$current\::ISA")->*->@
+        unshift:
+            @in_stack
+            < map:
+                { my $c = $_; # copy, to avoid being destructive
+                  substr: $c,0,2, "main::" if (substr: $c,0,2) eq '::';
+                  # Canonize the :: -> main::, ::foo -> main::foo thing.
+                  # Should I ever canonize the Foo'Bar = Foo::Bar thing?
+                  %seen{+$c}++ ?? () !! $c;
+                 }
+                (Symbol::fetch_glob: "$current\::ISA")->*->@
 
     # I.e., if this class has any parents (at least, ones I've never seen
     # before), push them, in order, onto the stack of classes I need to

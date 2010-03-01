@@ -219,9 +219,7 @@ sub splitpath($self,$path, ?$nofile)
         $directory = $2
         $file      = $3
 
-
     return  @: $volume,$directory,$file
-
 
 
 =item splitdir

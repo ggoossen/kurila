@@ -260,7 +260,7 @@ shell's idea of true and false).
 =cut
 
 sub test_f
-    exit: -f @ARGV[0] ?? 0 !! 1
+    exit: (-f @ARGV[0]) ?? 0 !! 1
 
 
 =item test_d
@@ -273,7 +273,7 @@ not (ie. shell's idea of true and false).
 =cut
 
 sub test_d
-    exit: -d @ARGV[0] ?? 0 !! 1
+    exit: (-d @ARGV[0]) ?? 0 !! 1
 
 
 =item dos2unix
