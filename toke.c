@@ -4683,7 +4683,7 @@ Perl_yylex(pTHX)
 		    TERM(WORD);
 		}
 
-		/* If followed by a paren, it's certainly a subroutine. */
+		/* If followed by a colon, it's certainly a subroutine. */
 		if (*s == ':') {
 		    s++;
 		    s = skipspace(s, NULL);

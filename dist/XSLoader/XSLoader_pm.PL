@@ -38,7 +38,7 @@ sub load($module, @< @args)
 
     # work with static linking too
     my $boots = Symbol::fetch_glob("$module\::bootstrap");
-    return $boots->*->& <: < @args if exists $boots->*->&
+    return $boots->*->& <: $module, < @args if exists $boots->*->&
 
     unless ($module and exists &dl_load_file)
         my $bootstrap_inherit = (DynaLoader->can: 'bootstrap_inherit') || 

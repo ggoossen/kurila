@@ -46,7 +46,7 @@ for my $module ((sort: keys %modules))
     :SKIP do
         skip: "$module not available", 3 if $extensions !~ m/\b$module\b/
 
-        eval qq{ package $module; XSLoader::load('$module', "qunckkk"); }
+        eval: qq{ package $module; XSLoader::load: '$module', "qunckkk"; }
         like:  ($^EVAL_ERROR->message: ), "/^$module object version \\S+ does not match bootstrap parameter (?:qunckkk|0)/"
                "calling XSLoader::load() with a XS module and an incorrect version" 
 
